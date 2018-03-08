@@ -18904,16 +18904,27 @@ Ext.ColorPalette = Ext.extend(Ext.Component, {
         }
     },
 
-    
+    //Merijn: changed this function so it won't error on non existing colors
     select : function(color, suppressEvent){
         color = color.replace('#', '');
         if(color != this.value || this.allowReselect){
             var el = this.el;
             if(this.value){
-                el.child('a.color-'+this.value).removeClass('x-color-palette-sel');
+							var colorEl = el.child('a.color-'+this.value);
+							if(colorEl) {
+                colorEl.removeClass('x-color-palette-sel');
+							}
             }
-            el.child('a.color-'+color).addClass('x-color-palette-sel');
-            this.value = color;
+						
+						this.value = color;
+						
+						var colorEl = el.child('a.color-'+color);
+						if(!colorEl) {
+							return;
+						}
+						
+            colorEl.addClass('x-color-palette-sel');
+            
             if(suppressEvent !== true){
                 this.fireEvent('select', this, color);
             }
