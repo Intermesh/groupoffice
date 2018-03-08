@@ -6,10 +6,10 @@ GO.addressbook.SexCombobox = function(config){
 		store: new Ext.data.SimpleStore({
 			fields: ['value', 'text'],
 			data : [
-			['M', GO.lang['strMale']],
-			['F', GO.lang['strFemale']]
-//			[1, GO.lang['strMale']],
-//			[2, GO.lang['strFemale']]
+			['M', t("Male")],
+			['F', t("Female")]
+//			[1, t("Male")],
+//			[2, t("Female")]
 			]
 
 		}),
@@ -20,7 +20,7 @@ GO.addressbook.SexCombobox = function(config){
 		editable: false,
 		selectOnFocus:true,
 		forceSelection: true,
-		fieldLabel: GO.lang.strSex,
+		fieldLabel: t("Sex"),
 		hiddenName:'sex'
 	});
 

@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: InstallationsGrid.js 16975 2014-03-07 11:24:48Z mschering $
+ * @version $Id: InstallationsGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  * @author WilmarVB <wilmar@intermesh.nl>
@@ -21,7 +21,7 @@ GO.servermanager.InstallationsGrid = function(config){
 	
 
 	
-	config.title = GO.servermanager.lang.installations;
+	config.title = t("installations", "servermanager");
 	config.layout='fit';
 	config.autoScroll=true;
 	config.split=true;
@@ -44,71 +44,71 @@ GO.servermanager.InstallationsGrid = function(config){
 		},
 		columns:[
 		{
-			header: GO.lang.strName, 
+			header: t("Name"), 
 			dataIndex: 'name'
 		},{
-			header: GO.servermanager.lang.status,
+			header: t("status", "servermanager"),
 			dataIndex: 'status'
 		},		{
-			header: GO.servermanager.lang.webmasterEmail, 
+			header: t("webmasterEmail", "servermanager"), 
 			dataIndex: 'webmaster_email',
 			sortable:false
 		},		{
-			header: GO.servermanager.lang.title, 
+			header: t("title", "servermanager"), 
 			dataIndex: 'title',
 			sortable:false
 		},	{
-			header: GO.servermanager.lang.maxUsers, 
+			header: t("maxUsers", "servermanager"), 
 			dataIndex: 'max_users'
 		},		{
-			header: GO.lang.strCtime, 
+			header: t("Created at"), 
 			dataIndex: 'ctime',
 			width:110
 		},		{
-			header: GO.lang.strMtime, 
+			header: t("Modified at"), 
 			dataIndex: 'mtime',
 			width:110
 		},	{
-			header: GO.servermanager.lang.countUsers,
+			header: t("countUsers", "servermanager"),
 			dataIndex: 'count_users',
 			align:'right'
 		},		{
-			header: GO.servermanager.lang.lastlogin,
+			header: t("lastlogin", "servermanager"),
 			dataIndex: 'lastlogin'
 		},		{
-			header: GO.servermanager.lang.totalLogins,
+			header: t("totalLogins", "servermanager"),
 			dataIndex: 'total_logins',
 			align:'right'
 		},		{
-			header: GO.servermanager.lang.databaseUsage,
+			header: t("databaseUsage", "servermanager"),
 			dataIndex: 'database_usage',
 			align:'right'
 		},
 		{
-			header: GO.servermanager.lang.fileStorageUsage,
+			header: t("fileStorageUsage", "servermanager"),
 			dataIndex: 'file_storage_usage',
 			align:'right'
 		},{
-			header: GO.servermanager.lang.quota,
+			header: t("quota", "servermanager"),
 			dataIndex: 'quota',
 			align:'right'
 		},
 		{
-			header: GO.servermanager.lang.mailboxUsage,
+			header: t("mailboxUsage", "servermanager"),
 			dataIndex: 'mailbox_usage',
 			align:'right'
 		},
 		{
-			header: GO.servermanager.lang.totalUsage,
+			header: t("totalUsage", "servermanager"),
 			dataIndex: 'total_usage',
 			align:'right'
 		}
 //		,{
-//			header: GO.servermanager.lang.strComment,
+//			header: t("strComment", "servermanager"),
 //			dataIndex: 'comment'
 //		}
 		,{
-			header: GO.servermanager.lang.mailDomains,
+			header: t("mailDomains", "servermanager"),
 			dataIndex: 'serverclient_domains',
 			sortable:false
 		}
@@ -120,7 +120,7 @@ GO.servermanager.InstallationsGrid = function(config){
 	config.view=new Ext.grid.GridView({
 		autoFill: true,
 		forceFit: true,
-		emptyText: GO.lang['strNoItems'],
+		emptyText: t("No items to display"),
 		getRowClass : function(record, rowIndex, p, store){
 			if(GO.util.empty(record.data.enabled)){
 				return 'installation-disabled';
@@ -140,11 +140,11 @@ GO.servermanager.InstallationsGrid = function(config){
 		cls:'go-head-tb',
 		items:[{
 				xtype:'htmlcomponent',
-				html:GO.servermanager.lang.installations,
+				html:t("installations", "servermanager"),
 				cls:'go-module-title-tbar'
 			},{
 			iconCls: 'btn-add',
-			text: GO.lang['cmdAdd'],
+			text: t("Add"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 				GO.servermanager.installationDialog.show();
@@ -152,7 +152,7 @@ GO.servermanager.InstallationsGrid = function(config){
 			scope: this
 		},{
 			iconCls: 'btn-delete',
-			text: GO.lang['cmdDelete'],
+			text: t("Delete"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 				this.deleteSelected();
@@ -162,7 +162,7 @@ GO.servermanager.InstallationsGrid = function(config){
 		'-',
 		{
 			iconCls: 'btn-addressbook-manage',
-			text: GO.lang.administration,
+			text: t("Administration"),
 			cls: 'x-btn-text-icon',
 			handler:function(){
 				if(!this.manageDialog)
@@ -181,7 +181,7 @@ GO.servermanager.InstallationsGrid = function(config){
 //			handler: function(){
 //				var reqconf = { 
 //					url: 'servermanager/installation/testBilling',
-//					success: function() { alert(GO.servermanager.lang["testBillingConnection"]); }
+//					success: function() { alert(t("testBillingConnection", "servermanager")); }
 //				};
 //
 //				GO.request(reqconf);
@@ -189,7 +189,7 @@ GO.servermanager.InstallationsGrid = function(config){
 //			scope: this
 //		},
 		'-',
-		GO.lang['strSearch']+': ', ' ',this.searchField]		
+		t("Search")+': ', ' ',this.searchField]		
 	});
 		    			    		
 	GO.servermanager.installationDialog.on('save', function(){   

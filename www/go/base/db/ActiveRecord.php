@@ -184,6 +184,14 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	public function modelTypeId(){
 		return \GO\Base\Model\ModelType::model()->findByModelName($this->className());
 	}
+	
+	/**
+	 * For compatibility with new framework
+	 * @return type
+	 */
+	public static function getType() {
+		return \go\core\orm\EntityType::findByClassName(static::class);
+	}
 
 	/**
 	 * Get the localized human friendly name of this model.
@@ -548,29 +556,36 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if(!isset($this->_attributeLabels)){
 			$this->_attributeLabels = array();
 
-			$classParts = explode('\\',$this->className());
-			$prefix = strtolower(array_pop($classParts));
+//			$classParts = explode('\\',$this->className());
+//			$prefix = strtolower(array_pop($classParts));
 
 			foreach($this->columns as $columnName=>$columnData){
-				$this->_attributeLabels[$columnName] = GO::t($prefix.ucfirst($columnName), $this->getModule(),'common',$found);
-				if(!$found) {
+				
+				$str = ucfirst(str_replace("_", " ", $columnName));
+				
+				$label = GO::t($str, $this->getModule());
+				if($label == $str) {
+					$label = GO::t($str);
+				}
+				$this->_attributeLabels[$columnName] = $label;
+				if(!$str == $label) {
 						switch($columnName){
 							case 'user_id':
-								$this->_attributeLabels[$columnName] = GO::t('createdBy');
+								$this->_attributeLabels[$columnName] = GO::t("Created by");
 								break;
 							case 'muser_id':
-								$this->_attributeLabels[$columnName] = GO::t('mUser');
+								$this->_attributeLabels[$columnName] = GO::t("Modified by");
 								break;
 
 							case 'ctime':
-								$this->_attributeLabels[$columnName] = GO::t('strCtime');
+								$this->_attributeLabels[$columnName] = GO::t("Created at");
 								break;
 
 							case 'mtime':
-								$this->_attributeLabels[$columnName] = GO::t('strMtime');
+								$this->_attributeLabels[$columnName] = GO::t("Modified at");
 								break;
 							case 'name':
-								$this->_attributeLabels[$columnName] = GO::t('strName');
+								$this->_attributeLabels[$columnName] = GO::t("Name");
 								break;
 						}
 					}
@@ -592,7 +607,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		$labels = $this->attributeLabels();
 
-		return isset($labels[$attribute]) ? $labels[$attribute] : $attribute;
+		return isset($labels[$attribute]) ? $labels[$attribute] : GO::t(ucfirst(str_replace("_", " ", $attribute)));
 	}
 
 	/**
@@ -847,7 +862,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	/**
 	 * Find the acl_id integer value that applies to this model.
 	 *
-	 * @return int ACL id from go_acl_items table.
+	 * @return int ACL id from core_acl_group_items table.
 	 */
 	public function findAclId() {
 		if (!$this->aclField()) {
@@ -1466,9 +1481,9 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 //			//quick and dirty way to use and in next sql build blocks
 //			$sql .= "\nWHERE ";
 //
-//			$sql .= "\nEXISTS (SELECT level FROM go_acl WHERE `".$aclJoin['table']."`.`".$aclJoin['aclField']."` = go_acl.acl_id";
+//			$sql .= "\nEXISTS (SELECT level FROM core_acl_group WHERE `".$aclJoin['table']."`.`".$aclJoin['aclField']."` = core_acl_group.acl_id";
 //			if(isset($params['permissionLevel']) && $params['permissionLevel']>\GO\Base\Model\Acl::READ_PERMISSION){
-//				$sql .= " AND go_acl.level>=".intval($params['permissionLevel']);
+//				$sql .= " AND core_acl_group.level>=".intval($params['permissionLevel']);
 //			}
 //
 //			$groupIds = \GO\Base\Model\User::getGroupIds($params['userId']);
@@ -1480,7 +1495,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 //			}
 //
 //
-//			$sql .= " AND (go_acl.user_id=".intval($params['userId'])." OR go_acl.group_id IN (".implode(',',$groupIds)."))) ";
+//			$sql .= " AND (core_acl_group.user_id=".intval($params['userId'])." OR core_acl_group.group_id IN (".implode(',',$groupIds)."))) ";
 //		}else
 //		{
 			$where = "\nWHERE 1 ";
@@ -1675,7 +1690,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 			//SQLSTATE[42S22]: Column not found: 1054 Unknown column 'progress' in 'order clause
 			if(strpos($msg, 'order clause')!==false && strpos($msg, 'Unknown column')!==false)
 			{
-				$msg = GO::t('sortOrderError');
+				$msg = GO::t("Sorry, you can't sort on that column. Please click on another column header in the grid for sorting.");
 			}
 
 			throw new \Exception($msg);
@@ -1800,9 +1815,9 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 
 
 
-		$sql = "\nINNER JOIN go_acl ON (`".$aclJoinProps['table']."`.`".$aclJoinProps['attribute']."` = go_acl.acl_id";
+		$sql = "\nINNER JOIN core_acl_group ON (`".$aclJoinProps['table']."`.`".$aclJoinProps['attribute']."` = core_acl_group.aclId";
 		if(isset($findParams['permissionLevel']) && $findParams['permissionLevel']>\GO\Base\Model\Acl::READ_PERMISSION){
-			$sql .= " AND go_acl.level>=".intval($findParams['permissionLevel']);
+			$sql .= " AND core_acl_group.level>=".intval($findParams['permissionLevel']);
 		}
 
 		$groupIds = \GO\Base\Model\User::getGroupIds($findParams['userId']);
@@ -1814,7 +1829,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 		}
 
 
-		$sql .= " AND (go_acl.user_id=".intval($findParams['userId'])." OR go_acl.group_id IN (".implode(',',$groupIds)."))) ";
+		$sql .= " AND core_acl_group.groupId IN (".implode(',',$groupIds).")) ";
 
 		return $sql;
 	}
@@ -2056,9 +2071,9 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 					);
 		}
 		
-		$cfMod = \GO::modules()->customfields;
+		
 //\GO::debug($cfMod);
-		if($this->customfieldsModel() && $cfMod){
+		if($this->customfieldsModel()){
 			$r['customfields']=array(
 					'type'=>self::BELONGS_TO,
 					'model'=>$this->customfieldsModel(),
@@ -2093,7 +2108,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 					throw new \Exception("Relation $name conflicts with column attribute in ".$this->className());
 
 				$method = 'get'.ucfirst($name);
-				if(method_exists($this, $method))
+				if($method != 'getType' && method_exists($this, $method))
 					throw new \Exception("Relation $name conflicts with getter function $method in ".$this->className());
 
 				if($attr['type']==self::BELONGS_TO && !empty($attr['delete'])){
@@ -2379,6 +2394,8 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 
 	public function formatAttribute($attributeName, $value, $html=false){
 		if(!isset($this->columns[$attributeName]['gotype'])){
+			
+			//TODO
 			if($this->customfieldsModel() && substr($attributeName,0,4)=='col_'){
 				//if it's a custom field then we create a dummy customfields model.
 				$cfModel = $this->_createCustomFieldsRecordFromAttributes();
@@ -2433,11 +2450,12 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 			case 'boolean':
 //				Formatting as yes no breaks many functions
 //				if($html)
-//					return !empty($value) ? GO::t('yes') : GO::t('no');
+//					return !empty($value) ? GO::t("Yes") : GO::t("No");
 //				else
 					return !empty($value);
 				break;
 
+			case 'raw':
 			case 'html':
 				return $value;
 				break;
@@ -2805,19 +2823,19 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 			$attributes=$this->columns[$field];
 
 			if(!empty($attributes['required']) && empty($this->_attributes[$field])){
-				$this->setValidationError($field, sprintf(GO::t('attributeRequired'),$this->getAttributeLabel($field)));
+				$this->setValidationError($field, sprintf(GO::t("Field %s is required"),$this->getAttributeLabel($field)));
 			}elseif(!empty($attributes['length']) && !empty($this->_attributes[$field]) && \GO\Base\Util\StringHelper::length($this->_attributes[$field])>$attributes['length'])
 			{
-				$this->setValidationError($field, sprintf(GO::t('attributeTooLong'),$this->getAttributeLabel($field),$attributes['length']));
+				$this->setValidationError($field, sprintf(GO::t("Field %s is longer than the maximum of %s characters"),$this->getAttributeLabel($field),$attributes['length']));
 			}elseif(!empty($attributes['regex']) && !empty($this->_attributes[$field]) && !preg_match($attributes['regex'], $this->_attributes[$field]))
 			{
-				$this->setValidationError($field, sprintf(GO::t('attributeIncorrectFormat'),$this->getAttributeLabel($field)).' ('.$this->$field.')');
+				$this->setValidationError($field, sprintf(GO::t("Field %s is formatted incorrectly"),$this->getAttributeLabel($field)).' ('.$this->$field.')');
 			}elseif(!empty($attributes['greater']) && !empty($this->_attributes[$field])){
 				if($this->_attributes[$field]<=$this->_attributes[$attributes['greater']])
-					$this->setValidationError($field, sprintf(GO::t('attributeGreater'), $this->getAttributeLabel($field), $this->getAttributeLabel($attributes['greater'])));
+					$this->setValidationError($field, sprintf(GO::t("Field '%s' must be greater than '%s'"), $this->getAttributeLabel($field), $this->getAttributeLabel($attributes['greater'])));
 			}elseif(!empty($attributes['greaterorequal']) && !empty($this->_attributes[$field])){
 				if($this->_attributes[$field]<$this->_attributes[$attributes['greaterorequal']])
-					$this->setValidationError($field, sprintf(GO::t('attributeGreaterOrEqual'), $this->getAttributeLabel($field), $this->getAttributeLabel($attributes['greaterorequal'])));
+					$this->setValidationError($field, sprintf(GO::t("Field '%s' must be greater or equal than '%s'"), $this->getAttributeLabel($field), $this->getAttributeLabel($attributes['greaterorequal'])));
 			}else {
 				$this->_validateValidatorFunc ($attributes, $field);
 			}
@@ -2838,7 +2856,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 				$errorMsg = array_pop($attributes['validator']);
 			}else
 			{
-				$errorMsg = GO::t('attributeInvalid');
+				$errorMsg = GO::t("Field %s was invalid");
 			}
 
 			$valid = call_user_func($attributes['validator'], $this->_attributes[$field]);
@@ -2892,14 +2910,14 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 
 					if($existing) {
 
-						$msg = str_replace(array('%cf','%val'),array($this->getAttributeLabel($field), $this->_attributes[$field]),GO::t('duplicateExistsFeedback','customfields'));
+						$msg = str_replace(array('%cf','%val'),array($this->getAttributeLabel($field), $this->_attributes[$field]),GO::t("The value \"%val\" entered for the field \"%cf\" already exists in the database. The field value must be unique. Please enter a different value in that field.", "customfields"));
 						
 						if(\GO::config()->debug){
 							$msg .= var_export($where, true);
 						}
 						
 						$this->setValidationError($field, $msg);
-//						$this->setValidationError($field, sprintf(GO::t('alreadyExists'),$this->localizedName, $this->_attributes[$field]));
+//						$this->setValidationError($field, sprintf(GO::t("%s \"%s\" already exists"),$this->localizedName, $this->_attributes[$field]));
 					}
 				}
 			}
@@ -2951,7 +2969,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 	 * Just update the mtime timestamp
 	 */
 	public function touch(){
-		if (isset ($this->mtime)) {
+		if ($this->getColumn('mtime')) {
 			$time = time();
 			if($this->mtime==$time){
 				return true;
@@ -2959,6 +2977,11 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 				$this->mtime=time();
 				return $this->_dbUpdate();
 			}
+		}
+		
+		if ($this->getColumn('modifiedAt')) {
+			$this->modifiedAt = gmdate('Y-m-d H:i:s');
+			return $this->_dbUpdate();			
 		}
 	}
 
@@ -3121,7 +3144,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 
 		// when foreignkey to acl field changes check PermissionLevel of origional related ACL object as well
 		if(!$this->_moveAllowed()){
-			$msg = GO::config()->debug ? $this->className().' pk: '.var_export($this->pk, true) : sprintf(GO::t('cannotMoveError'),'1');
+			$msg = GO::config()->debug ? $this->className().' pk: '.var_export($this->pk, true) : sprintf(GO::t("%s item(s) cannot be moved, you do not have the right permissions."),'1');
 			throw new \GO\Base\Exception\AccessDenied($msg);
 		}
 
@@ -3146,9 +3169,25 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 
 		if (isset($this->columns['muser_id']) && isset($this->_modifiedAttributes['mtime']))
 			$this->muser_id=GO::user() ? GO::user()->id : 1;
-
+		
+		if(isset($this->columns['modifiedBy'])) {
+			$this->modifiedBy = GO::user() ? GO::user()->id : 1;
+		}
+		
+		if(isset($this->columns['modifiedAt'])) {
+			$this->modifiedAt = gmdate("Y-m-d H:i:s");
+		}
+		
+		if(isset($this->columns['createdAt']) && empty($this->createdAt)) {
+			$this->createdAt = gmdate("Y-m-d H:i:s");
+		}
+		
+		if(isset($this->columns['createdBy']) && empty($this->createdBy)) {
+			$this->createdBy = GO::user() ? GO::user()->id : 1;
+		}
+		
 		//user id is set by defaultAttributes now.
-		//do not use empty() here for checking the user id because some times it must be 0. eg. go_acl
+		//do not use empty() here for checking the user id because some times it must be 0. eg. core_acl_group
 //		if(isset($this->columns['user_id']) && !isset($this->user_id)){
 //			$this->user_id=GO::user() ? GO::user()->id : 1;
 //		}
@@ -3248,7 +3287,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 			
 			//change ACL owner
 			if($this->aclField() && $this->isModified('user_id')) {
-				$this->acl->user_id = $this->user_id;
+				$this->acl->ownedBy = $this->user_id;
 				$this->acl->save();
 			}
 
@@ -3470,8 +3509,8 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 			$user_id = GO::user() ? GO::user()->id : 1;
 
 		$acl = new \GO\Base\Model\Acl();
-		$acl->description=$this->tableName().'.'.$this->aclField();
-		$acl->user_id=$user_id;
+		$acl->usedIn = $this->tableName().'.'.$this->aclField();
+		$acl->ownedBy=$user_id;
 		if(!$acl->save()) {
 			throw new \Exception("Could not save ACL: ".var_export($this->getValidationErrors(), true));
 		}
@@ -3561,66 +3600,103 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 			return;
 
 		$attr = $this->getCacheAttributes();
-
-		//GO::debug($attr);
-
-		if($attr){
-
-			$model = \GO\Base\Model\SearchCacheRecord::model()->findByPk(array('model_id'=>$this->pk, 'model_type_id'=>$this->modelTypeId()),false,true);
-
-			if(!$model)
-				$model = new \GO\Base\Model\SearchCacheRecord();
-
-			$model->mtime=0;
-
-			$acl_id = !empty($attr['acl_id']) ? $attr['acl_id'] : $this->findAclId();
-
-			//if model doesn't have an acl we use the acl of the module it belongs to.
-			if(!$acl_id)
-				$acl_id = GO::modules()->{$this->getModule ()}->acl_id;
-
-			$defaultUserId = isset(GO::session()->values['user_id']) ? GO::session()->values['user_id'] : 1;
-
-			//cache type in default system language.
-			if(GO::user())
-				GO::language()->setLanguage(GO::config()->language);
-
-
-			//GO::debug($model);
-			$autoAttr = array(
-				'model_id'=>$this->pk,
-				'model_type_id'=>$this->modelTypeId(),
-				'user_id'=>isset($this->user_id) ? $this->user_id : $defaultUserId,
-				'module'=>$this->module,
-				'model_name'=>$this->className(),
-				'name' => '',
-				'description'=>'',
-				'type'=>$this->localizedName, //deprecated, for backwards compatibilty
-				'keywords'=>$this->getSearchCacheKeywords($this->localizedName.','.implode(',', $attr)),
-				'mtime'=>$this->mtime,
-				'ctime'=>$this->ctime,
-				'acl_id'=>$acl_id
-			);
-
-			$attr = array_merge($autoAttr, $attr);
-
-			if(GO::user())
-				GO::language()->setLanguage(GO::user()->language);
-
-			if($attr['description']==null)
-				$attr['description']="";
-
-			$model->setAttributes($attr, false);
-			$model->cutAttributeLengths();
-//			$model->save(true);
-			if(!$model->save(true)){
-				throw new \Exception("Error saving search cache record:\n".implode("\n", $model->getValidationErrors()));
-			}
-
-			return $model;
-
+		if(!$attr) {
+			return;
 		}
-		return false;
+		
+		$search = \go\core\search\Search::find()->where('entityTypeId','=', static::getType()->getId())->andWhere('entityId', '=', $this->id)->single();
+		if(!$search) {
+			$search = new \go\core\search\Search();
+			$search->setEntity(static::getType());
+		}
+		// GO 6.3 backwards compatible
+		if(!empty($attr['mtime'])) {
+			$attr['modifiedAt'] = '@'.$attr['mtime'];
+			unset($attr['mtime']);
+		}
+		
+		if(!empty($attr['ctime'])) {
+//			$attr['createdAt'] = '@'.$attr['ctime'];
+			unset($attr['ctime']);
+		}
+		
+		if(!isset($attr['description'])) {
+			$attr['description'] = '';
+		}
+		// end GO 6.3 compat
+		$search->setValues($attr);
+		
+		$search->entityId = $this->id;
+		$search->setAclId(!empty($attr['acl_id']) ? $attr['acl_id'] : $this->findAclId());
+		$search->modifiedAt = \DateTime::createFromFormat("U", $this->mtime);	
+		//$search->createdAt = \DateTime::createFromFormat("U", $this->mtime);		
+		$search->setKeywords($this->getSearchCacheKeywords($this->localizedName.','.implode(',', $attr)));
+		
+		//todo cut lengths
+		
+		if(!$search->save()) {
+			throw new \Exception("Could not save search cache!");
+		}
+
+//		//GO::debug($attr);
+//
+//		if($attr){
+//
+//			$model = \GO\Base\Model\SearchCacheRecord::model()->findByPk(array('model_id'=>$this->pk, 'model_type_id'=>$this->modelTypeId()),false,true);
+//
+//			if(!$model)
+//				$model = new \GO\Base\Model\SearchCacheRecord();
+//
+//			$model->mtime=0;
+//
+//			$acl_id = !empty($attr['acl_id']) ? $attr['acl_id'] : $this->findAclId();
+//
+//			//if model doesn't have an acl we use the acl of the module it belongs to.
+//			if(!$acl_id)
+//				$acl_id = GO::modules()->{$this->getModule ()}->acl_id;
+//
+//			$defaultUserId = isset(GO::session()->values['user_id']) ? GO::session()->values['user_id'] : 1;
+//
+//			//cache type in default system language.
+//			if(GO::user())
+//				GO::language()->setLanguage(GO::config()->language);
+//
+//
+//			//GO::debug($model);
+//			$autoAttr = array(
+//				'model_id'=>$this->pk,
+//				'model_type_id'=>$this->modelTypeId(),
+//				'user_id'=>isset($this->user_id) ? $this->user_id : $defaultUserId,
+//				'module'=>$this->module,
+//				'model_name'=>$this->className(),
+//				'name' => '',
+//				'description'=>'',
+//				'type'=>$this->localizedName, //deprecated, for backwards compatibilty
+//				'keywords'=>$this->getSearchCacheKeywords($this->localizedName.','.implode(',', $attr)),
+//				'mtime'=>$this->mtime,
+//				'ctime'=>$this->ctime,
+//				'acl_id'=>$acl_id
+//			);
+//
+//			$attr = array_merge($autoAttr, $attr);
+//
+//			if(GO::user())
+//				GO::language()->setLanguage(GO::user()->language);
+//
+//			if($attr['description']==null)
+//				$attr['description']="";
+//
+//			$model->setAttributes($attr, false);
+//			$model->cutAttributeLengths();
+////			$model->save(true);
+//			if(!$model->save(true)){
+//				throw new \Exception("Error saving search cache record:\n".implode("\n", $model->getValidationErrors()));
+//			}
+//
+//			return $model;
+//
+//		}
+//		return false;
 	}
 
 
@@ -4008,13 +4084,11 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 		$attr = $this->getCacheAttributes();
 
 		if($attr){
-			$model = \GO\Base\Model\SearchCacheRecord::model()->findByPk(array('model_id'=>$this->pk, 'model_type_id'=>$this->modelTypeId()),false,true);
+			$model = \go\core\search\Search::find()->where(['entityId' => $this->pk, 'entityTypeId'=>$this->modelTypeId()])->single();
+//			$model = \GO\Base\Model\SearchCacheRecord::model()->findByPk(array('model_id'=>$this->pk, 'model_type_id'=>$this->modelTypeId()),false,true);
 			if($model)
-				$model->delete(true);
-		}
-		
-		
-		
+				$model->delete();
+		}		
 
 		if($this->hasFiles() && $this->files_folder_id > 0 && GO::modules()->isInstalled('files')){
 			$folder = \GO\Files\Model\Folder::model()->findByPk($this->files_folder_id,false,true);
@@ -4057,24 +4131,12 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 	private function _deleteLinks(){
 		//cleanup links
 		if($this->hasLinks()){
-			$stmt = \GO\Base\Model\ModelType::model()->find();
-			while($modelType = $stmt->fetch()){
-				if(\GO::classExists($modelType->model_name)){
-					$model = GO::getModel($modelType->model_name);
-					if($model->hasLinks()){
+			
+			$sql = "DELETE FROM core_link WHERE fromEntityTypeId=".intval($this->modelTypeId()).' AND fromId='.intval($this->pk);
+			$this->getDbConnection()->query($sql);
 
-						$linksTable = "go_links_".$model->tableName();
-
-						$sql = "DELETE FROM $linksTable WHERE model_type_id=".intval($this->modelTypeId()).' AND model_id='.intval($this->pk);
-						$this->getDbConnection()->query($sql);
-
-						$linksTable = "go_links_".$this->tableName();
-
-						$sql = "DELETE FROM $linksTable WHERE id=".intval($this->pk);
-						$this->getDbConnection()->query($sql);
-					}
-				}
-			}
+			$sql = "DELETE FROM core_link WHERE toEntityTypeId=".intval($this->modelTypeId()).' AND toId='.intval($this->pk);
+			$this->getDbConnection()->query($sql);
 		}
 	}
 
@@ -4363,11 +4425,11 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 	/**
 	 * Pass another model to this function and they will be linked with the
 	 * Group-Office link system.
-	 *
-	 * @param mixed $model
+
+	 * @param \go\core\orm\Entity|self|GO\Base\Model\SearchCacheRecord $model
 	 */
 
-	public function link($model, $description='', $this_folder_id=0, $model_folder_id=0, $linkBack=true){
+	public function link($model, $description='', $this_folder_id=0, $model_folder_id=0){
 
 		$isSearchCacheModel = ($this instanceof \GO\Base\Model\SearchCacheRecord);
 
@@ -4378,58 +4440,52 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 			return true;
 
 		if($model instanceof \GO\Base\Model\SearchCacheRecord){
-			$model_id = $model->model_id;
-			$model_type_id = $model->model_type_id;
+			$to_model_id = $model->entityId;
+			$to_model_type_id = $model->entityTypeId;
 		}else
 		{
-			$model_id = $model->id;
-			$model_type_id = $model->modelTypeId();
+			$to_model_id = $model->id;
+			$to_model_type_id = $model->getType()->getId();
+		}
+		
+		
+
+		$from_model_type_id = $isSearchCacheModel ? $this->entityTypeId : $this->modelTypeId();
+
+		$from_model_id = $isSearchCacheModel ? $this->model_id : $this->id;
+		
+		if($to_model_id == $from_model_id && $to_model_type_id == $from_model_type_id) {
+			//don't link to self
+			return true;
+		}
+		
+		if(!\go\core\App::get()->getDbConnection()->insert('core_link', [
+				"toId" => $to_model_id,
+				"toEntityTypeId" => $to_model_type_id,
+				"fromId" => $from_model_id,
+				"fromEntityTypeId" => $from_model_type_id,
+				"description" => $description,
+				"createdAt" => new \DateTime()
+				
+		])->execute()){
+			return false;
 		}
 
-		$table = $isSearchCacheModel ? GO::getModel($this->model_name)->tableName() : $this->tableName();
-
-		$id = $isSearchCacheModel ? $this->model_id : $this->id;
-
-		$fieldNames = array(
-				'id',
-				'folder_id',
-				'model_type_id',
-				'model_id',
-				'description',
-				'ctime');
-
-		$sql = "INSERT INTO `go_links_$table` ".
-					"(`".implode('`,`', $fieldNames)."`) VALUES ".
-					"(:".implode(',:', $fieldNames).")";
-
-		$values = array(
-				':id'=>$id,
-				':folder_id'=>$this_folder_id,
-				':model_type_id'=>$model_type_id,
-				':model_id'=>$model_id,
-				':description'=>$description,
-				':ctime'=>time()
-		);
-
-		if($this->_debugSql){
-			GO::debug($sql);
-			GO::debug($values);
+		$reverse = [];
+		$reverse['fromEntityTypeId'] = $to_model_type_id;
+		$reverse['toEntityTypeId'] = $from_model_type_id;
+		$reverse['toId'] = $from_model_id;
+		$reverse['fromId'] = $to_model_id;		
+		$reverse['description'] = $description;
+		$reverse['createdAt'] = new \DateTime();
+	
+		
+		if(!\go\core\App::get()->getDbConnection()->insert('core_link', $reverse)->execute()) {
+			return false;
 		}
 
-		$result = $this->getDbConnection()->prepare($sql);
-		$success = $result->execute($values);
-
-		if($success){
-
-//			if(!$this->afterLink($model, $isSearchCacheModel, $description, $this_folder_id, $model_folder_id, $linkBack))
-//				return false;
-
-			if($linkBack){
-				$this->fireEvent('link', array($this, $model, $description, $this_folder_id, $model_folder_id));
-			}
-
-			return !$linkBack || $model->link($this, $description, $model_folder_id, $this_folder_id, false);
-		}
+		$this->fireEvent('link', array($this, $model, $description, $this_folder_id, $model_folder_id));
+		return true;
 	}
 
 //	/**
@@ -4449,88 +4505,94 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 //		return true;
 //	}
 
-	public function linkExists(ActiveRecord $model){
+	/**
+	 * 
+	 * @param \go\core\orm\Entity|self|GO\Base\Model\SearchCacheRecord $model
+	 * @return boolean
+	 */
+	public function linkExists($model){
 
-		if($model->className()=="GO\Base\Model\SearchCacheRecord"){
-			$model_id = $model->model_id;
-			$model_type_id = $model->model_type_id;
+		if($model instanceof \GO\Base\Model\SearchCacheRecord){
+			$to_model_id = $model->entityId;
+			$to_model_type_id = $model->entityTypeId;
 		}else
 		{
-			$model_id = $model->id;
-			$model_type_id = $model->modelTypeId();
+			$to_model_id = $model->id;
+			$to_model_type_id = $model->getType()->getId();
 		}
 
-		if(!$model_id)
+		if(!$to_model_id)
 			return false;
 
-		$table = $this->className()=="GO\Base\Model\SearchCacheRecord" ? GO::getModel($this->model_name)->model()->tableName() : $this->tableName();
-		$this_id = $this->className()=="GO\Base\Model\SearchCacheRecord" ? $this->model_id : $this->id;
+		$from_model_type_id = $this->className()=="GO\Base\Model\SearchCacheRecord" ? $this->entityTypeId : $this->modelTypeId();
+		$from_id = $this->className()=="GO\Base\Model\SearchCacheRecord" ? $this->model_id : $this->id;
 
-		$sql = "SELECT count(*) FROM `go_links_$table` WHERE ".
-			"`id`=".intval($this_id)." AND model_type_id=".$model_type_id." AND `model_id`=".intval($model_id);
+		$sql = "SELECT id FROM `core_link` WHERE ".
+			"`fromId`=".intval($from_id)." AND fromEntityTypeId=".$from_model_type_id." AND toEntityTypeId=".$to_model_type_id." AND `toId`=".intval($to_model_id);
+		
 		$stmt = $this->getDbConnection()->query($sql);
-		return $stmt->fetchColumn(0) > 0;
+		return $stmt->fetch() !== false;
 	}
-
-	/**
-	 * Update folder_id or description of a link
-	 *
-	 * @param ActiveRecord $model
-	 * @param array $attributes
-	 * @return boolean
-	 */
-	public function updateLink(ActiveRecord $model, array $attributes){
-		$sql = "UPDATE `go_links_".$this->tableName()."`";
-
-		$updates=array();
-		$bindParams=array();
-		foreach($attributes as $field=>$value){
-			$updates[] = "`$field`=:".$field;
-			$bindParams[':'.$field]=$value;
-		}
-
-		$sql .= "SET ".implode(',',$updates).
-			" WHERE model_type_id=".$model->modelTypeId()." AND model_id=".$model->id;
-
-		$result = $this->getDbConnection()->prepare($sql);
-		return $result->execute($bindParams);
-	}
-
-	/**
-	 * Unlink a model from this model
-	 *
-	 * @param ActiveRecord $model
-	 * @param boolean $unlinkBack For private use only
-	 * @return boolean
-	 */
-	public function unlink($model, $unlinkBack=true){
-		$sql = "DELETE FROM `go_links_{$this->tableName()}` WHERE id=:id AND model_type_id=:model_type_id AND model_id=:model_id";
-
-		$values=array(
-				':id'=>$this->id,
-				':model_type_id'=>$model->modelTypeId(),
-				':model_id'=>$model->id
-		);
-
-		$result = $this->getDbConnection()->prepare($sql);
-		$success = $result->execute($values);
-
-		if($success){
-
-			$this->afterUnlink($model);
-
-			return !$unlinkBack || $model->unlink($this, false);
-		}else
-		{
-			return false;
-		}
-	}
-
-	protected function afterUnlink(ActiveRecord $model){
-
-		return true;
-	}
-
+//
+//	/**
+//	 * Update folder_id or description of a link
+//	 *
+//	 * @param ActiveRecord $model
+//	 * @param array $attributes
+//	 * @return boolean
+//	 */
+//	public function updateLink(ActiveRecord $model, array $attributes){
+//		$sql = "UPDATE `go_links_".$this->tableName()."`";
+//
+//		$updates=array();
+//		$bindParams=array();
+//		foreach($attributes as $field=>$value){
+//			$updates[] = "`$field`=:".$field;
+//			$bindParams[':'.$field]=$value;
+//		}
+//
+//		$sql .= "SET ".implode(',',$updates).
+//			" WHERE model_type_id=".$model->modelTypeId()." AND model_id=".$model->id;
+//
+//		$result = $this->getDbConnection()->prepare($sql);
+//		return $result->execute($bindParams);
+//	}
+//
+//	/**
+//	 * Unlink a model from this model
+//	 *
+//	 * @param ActiveRecord $model
+//	 * @param boolean $unlinkBack For private use only
+//	 * @return boolean
+//	 */
+//	public function unlink($model, $unlinkBack=true){
+//		$sql = "DELETE FROM `go_links_{$this->tableName()}` WHERE id=:id AND model_type_id=:model_type_id AND model_id=:model_id";
+//
+//		$values=array(
+//				':id'=>$this->id,
+//				':model_type_id'=>$model->modelTypeId(),
+//				':model_id'=>$model->id
+//		);
+//
+//		$result = $this->getDbConnection()->prepare($sql);
+//		$success = $result->execute($values);
+//
+//		if($success){
+//
+//			$this->afterUnlink($model);
+//
+//			return !$unlinkBack || $model->unlink($this, false);
+//		}else
+//		{
+//			return false;
+//		}
+//	}
+//
+//	protected function afterUnlink(ActiveRecord $model){
+//
+//		return true;
+//	}
+//
 	/**
 	 * Get the number of links this model has to other models.
 	 *
@@ -4540,7 +4602,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 	public function countLinks($model_id=0){
 		if($model_id==0)
 			$model_id=$this->id;
-		$sql = "SELECT count(*) FROM `go_links_{$this->tableName()}` WHERE id=".intval($model_id);
+		$sql = "SELECT count(*) FROM `core_link` WHERE fromId=".intval($model_id)." AND fromEntityTypeId = ".$this->modelTypeId();
 		$stmt = $this->getDbConnection()->query($sql);
 		return intval($stmt->fetchColumn(0));
 	}
@@ -4565,11 +4627,12 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 		$findParams->select('t.*,l.description AS link_description');
 
 		$joinCriteria = FindCriteria::newInstance()
-						->addCondition('id', $model->id,'=','l')
-						->addRawCondition("t.id", "l.model_id")
-						->addCondition('model_type_id', $this->modelTypeId(),'=','l');
+						->addCondition('fromId', $model->id,'=','l')
+						->addCondition('fromEntityTypeId', $model->modelTypeId(),'=','l')
+						->addRawCondition("t.id", "l.toId")
+						->addCondition('toEntityTypeId', $this->modelTypeId(),'=','l');
 
-		$findParams->join("go_links_{$model->tableName()}", $joinCriteria, 'l');
+		$findParams->join("core_link", $joinCriteria, 'l');
 
 		if($extraFindParams)
 			$findParams->mergeWith ($extraFindParams);
@@ -4627,7 +4690,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 
 //		GO::debug($this->className().'::getCustomfieldsRecord');
 
-		if($this->customfieldsModel() && GO::modules()->isInstalled('customfields')){
+		if($this->customfieldsModel()){
 			if(!isset($this->_customfieldsRecord)){// && !empty($this->pk)){
 				$customFieldModelName=$this->customfieldsModel();
 				$this->_customfieldsRecord = GO::getModel($customFieldModelName)->findByPk($this->pk);
@@ -4700,8 +4763,8 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 			else
 			{
 				$user_id = empty($this->user_id) ? 1 : $this->user_id;
-				$acl->user_id=$user_id;
-				$acl->description=$this->tableName().'.'.$this->aclField();
+				$acl->ownedBy=$user_id;
+				$acl->usedIn=$this->tableName().'.'.$this->aclField();
 				$acl->save();
 			}
 		}
@@ -5317,6 +5380,22 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 		}
 
 		return $relationNames;
+	}
+	
+	
+	/**
+	 * 
+	 * Get's the class name without the namespace
+	 * 
+	 * eg. class go\modules\community\notes\model\Note becomes just "note"
+	 * 
+	 * @return string
+	 * 
+	 * @return string
+	 */
+	public static function getClassName() {
+		$cls = static::class;
+		return substr($cls, strrpos($cls, '\\') + 1);
 	}
 	
 }

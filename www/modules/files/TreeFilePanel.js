@@ -16,7 +16,7 @@ GO.files.TreeFilePanel = function (config){
     config.loader.on('beforeload', function(){
         var el =this.getEl();
         if(el){
-            el.mask(GO.lang.waitMsgLoad);
+            el.mask(t("Loading..."));
         }
     }, this);
 

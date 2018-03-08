@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: PortletSettings.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: PortletSettings.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Danny Wijffelaars <dwijffelaars@intermesh.nl>
  */
@@ -20,7 +20,7 @@ GO.calendar.PortletSettings = function(config){
 	config.split=true;
 
 	var CheckColumn = new GO.grid.CheckColumn({
-        header: GO.calendar.lang.visible,
+        header: t("Visible", "calendar"),
         dataIndex: 'visible',
         width: 55,
         disabled_field:''
@@ -29,7 +29,7 @@ GO.calendar.PortletSettings = function(config){
 	var fields ={
 		fields:['name', 'calendar_id'],
 		columns:[{
-			header: GO.lang.strTitle,
+			header: t("Title"),
 			dataIndex: 'name'
 		},
 		CheckColumn
@@ -53,7 +53,7 @@ GO.calendar.PortletSettings = function(config){
 	config.view=new Ext.grid.GridView({
 		autoFill: true,
 		forceFit: true,
-		emptyText: GO.lang['strNoItems']
+		emptyText: t("No items to display")
 	});
 	config.sm=new Ext.grid.RowSelectionModel();
 	config.loadMask=true;

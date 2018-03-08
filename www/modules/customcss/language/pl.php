@@ -1,5 +1,5 @@
 <?php
-
-
-$l["customcss"]='Własne style CSS';
-$l["selectFile"]='Wybierz plik';
+return array (
+  'customcss' => 'Własne style CSS',
+  'Select file' => 'Wybierz plik',
+);

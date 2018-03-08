@@ -12,7 +12,7 @@ GO.site.MenuitemContextMenu = function(config){
 	
 	this.actionProperties = new Ext.menu.Item({
 		iconCls: 'btn-settings',
-		text: GO.site.lang.properties,
+		text: t("Properties", "site"),
 		cls: 'x-btn-text-icon',
 		scope:this,
 		handler: function(){
@@ -27,7 +27,7 @@ GO.site.MenuitemContextMenu = function(config){
 	
 	this.actionAdd = new Ext.menu.Item({
 		iconCls: 'btn-add',
-		text: GO.site.lang.addMenuItem,
+		text: t("New item", "site"),
 		cls: 'x-btn-text-icon',
 		handler:function(){
 			if(!GO.site.menuitemDialog){
@@ -41,7 +41,7 @@ GO.site.MenuitemContextMenu = function(config){
 	
 	this.actionDelete = new Ext.menu.Item({
 		iconCls: 'btn-delete',
-		text: GO.site.lang['delete'],
+		text: t("Delete", "site"),
 		cls: 'x-btn-text-icon',
 		scope:this,
 		handler: function()
@@ -79,7 +79,7 @@ Ext.extend(GO.site.MenuitemContextMenu, Ext.menu.Menu, {
 			if(!this.errorDialog){
 				this.errorDialog = new GO.ErrorDialog();
 			}
-			this.errorDialog.show(GO.site.lang.deleteMenuHasChildren, GO.site.lang.deleteMenu);
+			this.errorDialog.show(t("The selected menu-item has children and cannot be deleted.", "site"), t("Delete menu item", "site"));
 		} else {
 			
 			console.log(this.selected.attributes);
@@ -87,7 +87,7 @@ Ext.extend(GO.site.MenuitemContextMenu, Ext.menu.Menu, {
 			var menuId = this.selected.attributes.menu_id;
 			var menuItemId = this.selected.attributes.menu_item_id;
 
-			Ext.MessageBox.confirm(GO.site.lang.deleteMenu, GO.site.lang.deleteMenuConfirm, function(btn){
+			Ext.MessageBox.confirm(t("Delete menu item", "site"), t("Do you really want to delete this menu item?", "site"), function(btn){
 				if(btn == 'yes'){
 					GO.request({
 						url: 'site/menuItem/delete',
@@ -122,7 +122,7 @@ GO.site.MenuRootContextMenu = function(config){
 	
 	this.actionAdd = new Ext.menu.Item({
 		iconCls: 'btn-add',
-		text: GO.site.lang.addMenu,
+		text: t("Add menu", "site"),
 		cls: 'x-btn-text-icon',
 		handler:function(){
 			if(!GO.site.menuDialog){
@@ -170,7 +170,7 @@ GO.site.ContentContextMenu = function(config){
 	
 //	this.actionView = new Ext.menu.Item({
 //		iconCls: 'btn-view',
-//		text: GO.lang.strView,
+//		text: t("View"),
 //		cls: 'x-btn-text-icon',
 //		handler:function(){
 ////			console.log("View");
@@ -182,7 +182,7 @@ GO.site.ContentContextMenu = function(config){
 	
 	this.actionAdvanced = new Ext.menu.Item({
 		iconCls: 'btn-settings',
-		text: GO.site.lang.advanced,
+		text: t("Advanced options", "site"),
 		cls: 'x-btn-text-icon',
 		scope:this,
 		handler: function()
@@ -193,7 +193,7 @@ GO.site.ContentContextMenu = function(config){
 	
 	this.actionAdd = new Ext.menu.Item({
 		iconCls: 'btn-add',
-		text: GO.site.lang.addContent,
+		text: t("Add content", "site"),
 		cls: 'x-btn-text-icon',
 		handler:function(){
 			// Load an empty contentPanel and set the parent id
@@ -204,7 +204,7 @@ GO.site.ContentContextMenu = function(config){
 	
 	this.actionDelete = new Ext.menu.Item({
 		iconCls: 'btn-delete',
-		text: GO.site.lang.deleteContent,
+		text: t("Delete content", "site"),
 		cls: 'x-btn-text-icon',
 		scope:this,
 		handler: function()
@@ -244,11 +244,11 @@ Ext.extend(GO.site.ContentContextMenu, Ext.menu.Menu, {
 			if(!this.errorDialog){
 				this.errorDialog = new GO.ErrorDialog();
 			}
-			this.errorDialog.show(GO.site.lang.deleteContentHasChildren, GO.site.lang.deleteContent);
+			this.errorDialog.show(t("You cannot delete this item because it has subitems. Please delete the subitems first.", "site"), t("Delete content", "site"));
 		} else {
 			var contentId = this.selected.attributes.content_id;
 
-			Ext.MessageBox.confirm(GO.site.lang.deleteContent, GO.site.lang.deleteContentConfirm, function(btn){
+			Ext.MessageBox.confirm(t("Delete content", "site"), t("Are you sure that you want to delete this content item", "site"), function(btn){
 				if(btn == 'yes'){
 					GO.request({
 						url: 'site/content/delete',
@@ -281,7 +281,7 @@ GO.site.ContentRootContextMenu = function(config){
 	
 	this.actionAdd = new Ext.menu.Item({
 		iconCls: 'btn-add',
-		text: GO.site.lang.addContent,
+		text: t("Add content", "site"),
 		cls: 'x-btn-text-icon',
 		handler:function(){
 			// Create, only send the siteId because it need to be created in the root
@@ -326,7 +326,7 @@ GO.site.SiteContextMenu = function(config){
 	
 	config.items.push({
 		iconCls: 'btn-view',
-		text: GO.lang.strView,
+		text: t("View"),
 		cls: 'x-btn-text-icon',
 		handler:function(){
 			window.open(GO.settings.config.host+'modules/site/index.php?site_id='+this.selected.attributes.site_id);			
@@ -336,7 +336,7 @@ GO.site.SiteContextMenu = function(config){
 	
 	this.actionSiteProperties = new Ext.menu.Item({
 		iconCls: 'btn-settings',
-		text: GO.site.lang.options,
+		text: t("Options", "site"),
 		cls: 'x-btn-text-icon',
 		scope:this,
 		handler: function()

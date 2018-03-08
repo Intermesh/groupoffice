@@ -1,33 +1,44 @@
+6.4
 
-Version in calendars big int
+Template parsing for entities
 
+Demo data
 
-
-
-Branch maken
-
-svn cp
-createchangelog.php aanpassen. "fiveone"
-updatesvn.php aanpassen
-go/base/Config.php aanpassen
-
-alle builddeb.sh aanpassen met "poolfiveone"
+Enabled / disabled custom fields
 
 
-Repo:
+Later
 
-cp apt-fivezero-release.conf apt-fiveone-release.conf
-edit apt-ftparchive.conf 
-mkdir -p dists/fiveone/main/binary-i386
-mkdir -p dists/fiveone/main/binary-amd64
-
-
-edit scanpackages.sh
+-	customcss
+-	dokuwiki
+-	sonylostpassword
 
 
-Intermesh Group-Office
-Create shop packages based on latest version
+TICKETS:
+Nieuwe permissie niveaus implementeren.
+Deze permissies per ticket type instelbaar maken
+- Manager (50) - Mag rechten en type zelf aanpassen + alles wat agent mag.
+- Agent (45) - Mag alles zien en bewerken/antwoorden
+- ..... (30) - Mag alles van dit type bewerken als klant zijnde. ?? - Goed over nadenken (Liefst weg)
+- Organization Manager (20) - Alles van dezelfde organizatie zien en aanmaken
+- Gebruiker (10) - Alleen eigen tickets zien en aanmaken
 
 
-Tools:
-checkout /root/groupoffice-5.1
+
+- Translate module
+
+- Note inline attachments also for MSAS https://msdn.microsoft.com/en-us/library/dn338954(v=exchg.80).aspx 
+	We'll need blob system first
+
+- module that optionally depends on another module. How to handle foreign keys?	
+	eg. sync_user_note_book links to notes but notes may not be installed.
+	Solution 1. Create "modules/intermesh/sync/install/notes.sql". It get's executed when notes is installed.
+	Solution 2. Create "notesync" module that depends on both modules.
+
+- Mac contacts kan ook companies aanmaken los. Dit moet ook kunnen syncen.
+
+- User filter geen combobox in toolbar maar filter waar je users kan toevoegen
+
+- zoeken als header tool net als bij grids
+
+

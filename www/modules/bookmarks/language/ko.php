@@ -1,22 +1,21 @@
 <?php
-
-$l["bookmarks"]='북마크';
-$l["bookmark"]='북마크';
-$l["category"]='카테고리';
-$l["title"]='제목';
-$l["description"]='설명';
-$l["logo"]='로고';
-$l["extern"]='새 브라우져 탭에서 열기';
-$l["administrateCategories"]='카테고리 관리';
-$l["thumbnails"]='Thumbnails';
-$l["chooseIcon"]='북마크 아이콘 선택';
-$l["clearLogo"]='Clear Logo';
-$l["uploadLogo"]='Upload Logo';
-$l["showAll"]='Show all';
-$l["sharedCategory"]='Shared category';
-$l["behaveAsModule"]='Behave as a module (Browser reload required)';
-$l["confirmDelete"]='Are you sure you want to delete this bookmark?';
-$l['name']='북마크';
-$l['description']='Website description.';
-$l['general']='일반';
-$l['googleDescription']="웹 검색";
+return array (
+  'Bookmark' => '북마크',
+  'Category' => '카테고리',
+  'Title' => '제목',
+  'Logo' => '로고',
+  'Open in new browser tab' => '새 브라우져 탭에서 열기',
+  'Administrate categories' => '카테고리 관리',
+  'Choose icon for bookmark' => '북마크 아이콘 선택',
+  'General' => '일반',
+  'Search the web' => '웹 검색',
+  'name' => '북마크',
+  'Bookmarks' => '북마크',
+  'Thumbnails' => 'Thumbnails',
+  'Clear Logo' => 'Clear Logo',
+  'Upload Logo' => 'Upload Logo',
+  'Show all' => 'Show all',
+  'Shared category' => 'Shared category',
+  'Behave as a module (Browser reload required)' => 'Behave as a module (Browser reload required)',
+  'Are you sure you want to delete this bookmark?' => 'Are you sure you want to delete this bookmark?',
+);

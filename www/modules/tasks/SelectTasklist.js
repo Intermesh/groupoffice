@@ -7,7 +7,7 @@
  * If you have questions write an e-mail to info@intermesh.nl
  * 
  * @copyright Copyright Intermesh
- * @version $Id: SelectTasklist.js 16833 2014-02-13 14:22:53Z mschering $
+ * @version $Id: SelectTasklist.js 22112 2018-01-12 07:59:41Z mschering $
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
@@ -20,7 +20,7 @@ GO.tasks.SelectTasklist = function(config){
 
 	if(!config.fieldLabel)
 	{
-		config.fieldLabel=GO.tasks.lang.tasklist;
+		config.fieldLabel=t("Tasklist", "tasks");
 	}
 
 	Ext.apply(this, config);
@@ -42,7 +42,7 @@ GO.tasks.SelectTasklist = function(config){
 		selectOnFocus:true,
 		forceSelection: true,
 		typeAhead: true,
-		emptyText:GO.lang.strPleaseSelect,
+		emptyText:t("Please select..."),
 		pageSize: parseInt(GO.settings.max_rows_list)
 	});
 	

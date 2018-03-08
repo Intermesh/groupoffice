@@ -11,7 +11,7 @@ class Treeselect extends Select{
 	
 	public function fieldSql(){
 		//needs to be text for multiselect field
-		if(!empty($this->field) && $this->field->multiselect)
+		if(!empty($this->field) && $this->field->getOption("multiselect"))
 			return "TEXT NULL";		
 		else
 			return parent::fieldSql ();
@@ -28,7 +28,7 @@ class Treeselect extends Select{
 		if(!empty($attributes[$key])) {
 
 			//multiselect is only valid for the last treeselect_slave
-			if(!empty($this->field->multiselect)){
+			if(!empty($this->field->getOption("multiselect"))){
 
 				$value_arr=array();
 				$id_value_arr = explode('|', $attributes[$this->field->dataname]);

@@ -20,16 +20,8 @@ class UserGroup extends \GO\Customfields\Customfieldtype\AbstractCustomfieldtype
 	public function formatDisplay($key, &$attributes, \GO\Customfields\Model\AbstractCustomFieldsRecord $model) {
 		$html="";
 		if(!empty($attributes[$key])) {
+			$html=$this->getName($attributes[$key]);
 
-//			if(!\GO\Customfields\Model\AbstractCustomFieldsRecord::$formatForExport){
-//				$name = htmlspecialchars($this->getName($attributes[$key]), ENT_COMPAT, 'UTF-8');
-//				$html='<a href="#" onclick=\'GO.linkHandlers["GO\\\\Addressbook\\\\Model\\\\Contact"].call(this,'.
-//					$this->getId($attributes[$key]).');\' title="'.$name.'">'.
-//						$name.'</a>';
-//			}else
-//			{
-				$html=$this->getName($attributes[$key]);
-//			}
 		}
 		return $html;
 	}

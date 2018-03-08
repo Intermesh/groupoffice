@@ -1,14 +1,13 @@
 <?php
-
-
-$l["tools"]='Adminisztrációs eszközök';
-$l["scripts"]='Szkriptek';
-$l["scriptOutput"]='Végeredmény';
-$l['name']='Eszközök';
-$l['description']='A module to perform administrative tasks.';
-$l['dbcheck']='Adatbázis ellenőrzés';
-$l['rm_duplicates']='Duplikált kapcsolatok és események eltávolítása';
-$l['backupdb']='Adatbázis mentése';
-$l['index_files']='Az összes fájl újraindexelése';
-$l['buildsearchcache']='Keresési index létrehozása';
-$l['checkmodules']='Modulok ellenőrzése';
+return array (
+  'Admin tools' => 'Adminisztrációs eszközök',
+  'Scripts' => 'Szkriptek',
+  'Script output' => 'Végeredmény',
+  'Database check' => 'Adatbázis ellenőrzés',
+  'Remove duplicate contacts and events' => 'Duplikált kapcsolatok és események eltávolítása',
+  'Backup database' => 'Adatbázis mentése',
+  'Index all files' => 'Az összes fájl újraindexelése',
+  'Create search index' => 'Keresési index létrehozása',
+  'Check modules' => 'Modulok ellenőrzése',
+  'name' => 'Eszközök',
+);

@@ -20,50 +20,12 @@ cursor:pointer;
 	background-image: url('images/folder.png') !important;
 }
 
-.btn-files {
-	background-image:url('images/files.png') !important;
-}
-
-.btn-up {
-	background-image:url('images/up.png') !important;
-}
-
-.btn-add-folder {
-	background-image:url('images/add.png') !important;
-}
-
-.btn-upload {
-	background-image:url('images/upload.png') !important;
-}
-
-
-.fs-btn-download {
-	width:16px;
-	height:16px;
-	display:block;
-	background-image:url('images/download.png');
-	text-decoration:none;
-}
-
-
 /*.btn-download {
 	background-image:url('images/download.png') !important;
 }*/
 
 .btn-download-gota {
 	background-image:url('images/gota.gif') !important;
-}
-
-.btn-copy {
-	background-image:url('images/copy.png') !important;
-}
-
-.btn-cut {
-	background-image:url('images/cut.png') !important;
-}
-
-.btn-paste {
-	background-image:url('images/paste.png') !important;
 }
 
 .btn-properties{
@@ -79,10 +41,6 @@ cursor:pointer;
 }
 .btn-decompress{
 	background-image:url('images/decompress.png') !important;
-}
-
-.btn-thumbnails{
-	background-image:url('images/thumbs.png') !important;
 }
 
 
@@ -117,22 +75,22 @@ cursor:pointer;
 
 
 .fs-thumb{
-	/*background: #dddddd;*/
-	padding: 3px;
+	padding: 8px;
 	text-align:center;
-	height: 100px;
-	width: 100px;
-	background-position:  center center;
+	height: 120px;
+	width: 140px;
+	background-position: center center;
 	background-repeat: no-repeat;
 	background-size:contain;
 }
 .fs-thumb-wrap{
 	float: left;
-	margin: 4px;
+	margin: 8px;
 	margin-right: 0;
-	padding: 5px;
-	height:120px;
-	width:120px;
+	padding: 8px;
+	height:152px;
+	width:152px;
+	border-radius: 2px;
 	overflow:hidden;
 }
 .fs-thumb-wrap span{
@@ -142,14 +100,10 @@ cursor:pointer;
 }
 
 .fs-view-over{
-  border:1px solid #dddddd;
-  background: #efefef url(../../../../views/Extjs3/themes/Default/images/extjs/grid/row-over.gif) repeat-x left top;
-	padding: 4px;
+  background-color: rgba(23,126,163, .16);
 }
 .fs-view-selected{
-	background: #eff5fb url(images/selected.gif) no-repeat right bottom;
-	border:1px solid #669900;
-	padding: 4px;
+	background-color: #eeeeee;
 }
 /*.fs-view-selected .fs-thumb{
 	background:transparent;

@@ -5,7 +5,7 @@ GO.addressbook.CompanyProfilePanel = function(config)
 	
 	this.formAddress = new Ext.form.TextArea(
 	{
-		fieldLabel: GO.lang['strAddress'], 
+		fieldLabel: t("Address"), 
 		name: 'address',
 		height: 50,
 		maxLength: 255,
@@ -23,7 +23,7 @@ GO.addressbook.CompanyProfilePanel = function(config)
 					
 	this.formAddressNo = new Ext.form.TextField(
 	{
-		fieldLabel: GO.lang['strAddressNo'], 
+		fieldLabel: t("Address 2"), 
 		name: 'address_no',
 		listeners: {
 			change:function(field, v)
@@ -39,7 +39,7 @@ GO.addressbook.CompanyProfilePanel = function(config)
 					
 	this.formZip = new Ext.form.TextField(
 	{
-		fieldLabel: GO.lang['strZip'], 
+		fieldLabel: t("ZIP/Postal"), 
 		name: 'zip',
 		listeners: {
 			change:function(field, v)
@@ -55,7 +55,7 @@ GO.addressbook.CompanyProfilePanel = function(config)
 					
 	this.formCity = new Ext.form.TextField(
 	{
-		fieldLabel: GO.lang['strCity'], 
+		fieldLabel: t("City"), 
 		name: 'city',
 		listeners: {
 			change:function(field, v)
@@ -71,7 +71,7 @@ GO.addressbook.CompanyProfilePanel = function(config)
 					
 	this.formState = new Ext.form.TextField(
 	{
-		fieldLabel: GO.lang['strState'], 
+		fieldLabel: t("State"), 
 		name: 'state',
 		listeners: {
 			change:function(field, v)
@@ -86,7 +86,7 @@ GO.addressbook.CompanyProfilePanel = function(config)
 	});
 
 	this.formCountry = new GO.form.SelectCountry({
-		fieldLabel: GO.lang['strCountry'],
+		fieldLabel: t("Country"),
 		name: 'country_text',
 		hiddenName: 'country',
 		listeners:{
@@ -109,7 +109,7 @@ GO.addressbook.CompanyProfilePanel = function(config)
 	 */
 	 
 	this.btnCopyVisitAddress = new Ext.Button({
-		text: GO.addressbook.lang.copyToPostAddress,
+		text: t("Copy to post address", "addressbook"),
 		disabled:false,
 		fieldLabel: " ",
 		labelSeparator: "",
@@ -121,7 +121,7 @@ GO.addressbook.CompanyProfilePanel = function(config)
 	 	 
 	this.formPostAddress = new Ext.form.TextArea(
 	{
-		fieldLabel: GO.lang['strAddress'], 
+		fieldLabel: t("Address"), 
 		name: 'post_address',
 		height: 50,
 		maxLength: 255
@@ -129,50 +129,50 @@ GO.addressbook.CompanyProfilePanel = function(config)
 					
 	this.formPostAddressNo = new Ext.form.TextField(
 	{
-		fieldLabel: GO.lang['strAddressNo'], 
+		fieldLabel: t("Address 2"), 
 		name: 'post_address_no'
 	});
 					
 	this.formPostZip = new Ext.form.TextField(
 	{
-		fieldLabel: GO.lang['strZip'], 
+		fieldLabel: t("ZIP/Postal"), 
 		name: 'post_zip'
 	});
 					
 	this.formPostCity = new Ext.form.TextField(
 	{
-		fieldLabel: GO.lang['strCity'], 
+		fieldLabel: t("City"), 
 		name: 'post_city'
 	});
 					
 	this.formPostState = new Ext.form.TextField(
 	{
-		fieldLabel: GO.lang['strState'], 
+		fieldLabel: t("State"), 
 		name: 'post_state'
 	});
 	
 	this.formPostCountry = new GO.form.SelectCountry({
-		fieldLabel: GO.lang['strCountry'],
+		fieldLabel: t("Country"),
 		name: 'post_country_text',
 		hiddenName: 'post_country'
 	});
 					 
 	this.formName = new Ext.form.TextField(
 	{
-		fieldLabel: GO.lang['strName'], 
+		fieldLabel: t("Name"), 
 		name: 'name',
 		allowBlank:false
 	});
 
 	this.formName2 = new Ext.form.TextField(
 	{
-		fieldLabel: GO.lang['strName2'],
+		fieldLabel: t("Name 2"),
 		name: 'name2'
 	});
 		
 	this.formPhone = new Ext.form.TextField(
 	{
-		fieldLabel: GO.lang['strPhone'], 
+		fieldLabel: t("Phone"), 
 		name: 'phone', 
 		allowBlank: true,
 		labelSeparator: this.separator,
@@ -181,44 +181,44 @@ GO.addressbook.CompanyProfilePanel = function(config)
 
 	this.formFax = new Ext.form.TextField(
 	{
-		fieldLabel: GO.lang['strFax'], 
+		fieldLabel: t("Fax"), 
 		name: 'fax'
 	});
 	
 	this.formEmail = new Ext.form.TextField(
 	{
-		fieldLabel: GO.lang['strEmail'], 
+		fieldLabel: t("E-mail"), 
 		name: 'email',
 		vtype:'emailAddress'
 	});				
 		
 	this.formHomepage = new Ext.form.TextField(
 	{
-		fieldLabel: GO.lang['strHomepage'],
+		fieldLabel: t("Homepage"),
 		name: 'homepage'
 	});	
 	
 	this.formBankNo = new Ext.form.TextField(
 	{
-		fieldLabel: GO.addressbook.lang['cmdFormLabelBankNo'],
+		fieldLabel: t("Bank number", "addressbook"),
 		name: 'bank_no'
 	});	
 	
 	this.formBankBIC = new Ext.form.TextField(
 	{
-		fieldLabel: GO.addressbook.lang['bankBicNo'],
+		fieldLabel: t("Bank BIC number", "addressbook"),
 		name: 'bank_bic'
 	});	
 
 	this.formVatNo = new Ext.form.TextField(
 	{
-		fieldLabel: GO.addressbook.lang['cmdFormLabelVatNo'],
+		fieldLabel: t("VAT number", "addressbook"),
 		name: 'vat_no'
 	});
 	
 	this.formInvoiceEmail = new Ext.form.TextField(
 	{
-		fieldLabel: GO.addressbook.lang['cmdFormLabelInvoiceEmail'],
+		fieldLabel: t("Invoicing email", "addressbook"),
 		name: 'invoice_email',
 		vtype:'emailAddress'
 	});
@@ -230,7 +230,7 @@ GO.addressbook.CompanyProfilePanel = function(config)
 	 */					
 	
 	this.formAddressBooks = new GO.addressbook.SelectAddressbook({
-			fieldLabel: GO.addressbook.lang['cmdFormLabelAddressBooks'],
+			fieldLabel: t("Address Book", "addressbook"),
 			store: GO.addressbook.writableAddressbooksStore,
 			selectOnFocus:true,
 			forceSelection: true,
@@ -241,13 +241,13 @@ GO.addressbook.CompanyProfilePanel = function(config)
 	{
 		if(this.company_id>0)
 		{
-			return confirm(GO.addressbook.lang.moveAll);
+			return confirm(t("The company and all employees will also be moved to the new address book. Are you sure you want to do this?", "addressbook"));
 		}
 	}, this);	
 
 	
 	this.addressbookFieldset = new Ext.form.FieldSet({
-		title: GO.addressbook.lang['cmdFieldsetSelectAddressbook'],
+		title: t("Select address book", "addressbook"),
 		autoHeight: true,
 		border: true,
 		collapsed: false,
@@ -255,7 +255,7 @@ GO.addressbook.CompanyProfilePanel = function(config)
 	});
 	
 	this.companyFieldset = new Ext.form.FieldSet({
-		title: GO.addressbook.lang['cmdFieldsetCompanyDetails'],
+		title: t("Company details", "addressbook"),
 		autoHeight: true,
 		collapsed: false,
 		border: true,
@@ -271,11 +271,11 @@ GO.addressbook.CompanyProfilePanel = function(config)
 			this.formBankBIC,
 			{
 				xtype:'textfield',
-				fieldLabel:GO.addressbook.lang.iban,
+				fieldLabel:t("IBAN", "addressbook"),
 				name:'iban'
 			},{
 				xtype:'textfield',
-				fieldLabel:GO.addressbook.lang.crn,
+				fieldLabel:t("Company Reg. No.", "addressbook"),
 				name:'crn'
 			},
 			this.formVatNo,
@@ -284,7 +284,7 @@ GO.addressbook.CompanyProfilePanel = function(config)
 	});
 	
 	this.visitAddressFieldset = new Ext.form.FieldSet({
-		title: GO.addressbook.lang['cmdFieldsetVisitAddress'],
+		title: t("Visit address", "addressbook"),
 		autoHeight: true,
 		collapsed: false,
 		border: true,
@@ -301,7 +301,7 @@ GO.addressbook.CompanyProfilePanel = function(config)
 	});
 	
 	this.postAddressFieldset = new Ext.form.FieldSet({
-		title: GO.addressbook.lang['cmdFieldsetPostAddress'], 
+		title: t("Post address", "addressbook"), 
 		autoHeight: true,
 		collapsed: false,
 		border: true,
@@ -319,14 +319,14 @@ GO.addressbook.CompanyProfilePanel = function(config)
 
 this.otherFieldset = new Ext.form.FieldSet({
 			collapsed: false,
-			title: GO.lang.other,
+			title: t("Other"),
 			defaults: {
 				border: false,
 				anchor: '100%'
 			},
 			items: [
 				this.colorField = new GO.form.ColorField({
-					fieldLabel : GO.lang.color,
+					fieldLabel : t("Color"),
 					value : "FFFFFF",
 					width:200,
 					name : 'color',
@@ -470,7 +470,7 @@ this.otherFieldset = new Ext.form.FieldSet({
 			]
 		});
 
-	this.title=GO.addressbook.lang['cmdPanelCompany'];
+	this.title=t("Company details", "addressbook");
 				
 	this.labelWidth=120;
 	this.bodyStyle='padding: 5px'; 

@@ -1,13 +1,14 @@
 <?php
 
-$GO_SCRIPTS_JS .= 'GO.addressbook.lang.defaultSalutationExpression="'.\GO\Base\Util\StringHelper::escape_javascript(\GO::t('defaultSalutation','addressbook')).'";';
+$GO_SCRIPTS_JS .= 'GO.lang.addressbook.defaultSalutationExpression="'.\GO\Base\Util\StringHelper::escape_javascript(\GO::t("Default salutation", "addressbook")).'";';
 
 
 $export_acl_id = \GO::config()->get_setting('go_addressbook_export', 0);
 if(!$export_acl_id)
 {
 	$acl = new \GO\Base\Model\Acl();
-	$acl->description='addressbook_export';
+	$acl->usedIn='go_settings';
+	$acl->ownedBy = 1;
 	$acl->save();
 	
 	$export_acl_id = $acl->id;

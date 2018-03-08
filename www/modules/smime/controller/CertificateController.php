@@ -139,9 +139,9 @@ class CertificateController extends \GO\Base\Controller\AbstractController {
 			if (!$valid) {
 
 				$response['cls'] = 'smi-invalid';
-				$response['text'] = \GO::t('invalidCert', 'smime');
+				$response['text'] = \GO::t("The certificate is invalid!", "smime");
 
-				$response['html'] .= '<h1 class="smi-invalid">' . \GO::t('invalidCert', 'smime') . '</h1>';
+				$response['html'] .= '<h1 class="smi-invalid">' . \GO::t("The certificate is invalid!", "smime") . '</h1>';
 				$response['html'] .= '<p>';
 				while ($msg = openssl_error_string())
 					$response['html'] .= $msg . "<br />\n";
@@ -149,25 +149,25 @@ class CertificateController extends \GO\Base\Controller\AbstractController {
 			} else if (!in_array($params['email'], $emails)) {
 
 				$response['cls'] = 'smi-certemailmismatch';
-				$response['text'] = \GO::t('certEmailMismatch', 'smime');
+				$response['text'] = \GO::t("Valid certificate but the e-mail of the certificate does not match the sender address of the e-mail.", "smime");
 
-				$response['html'] .= $response['short_html'] = '<h1 class="smi-certemailmismatch">' . \GO::t('certEmailMismatch', 'smime') . '</h1>';
+				$response['html'] .= $response['short_html'] = '<h1 class="smi-certemailmismatch">' . \GO::t("Valid certificate but the e-mail of the certificate does not match the sender address of the e-mail.", "smime") . '</h1>';
 			} else {
 				$response['cls'] = 'smi-valid';
-				$response['text'] = \GO::t('validCert', 'smime');
+				$response['text'] = \GO::t("Valid certificate", "smime");
 
-				$response['html'] .= $response['short_html'] = '<h1 class="smi-valid">' . \GO::t('validCert', 'smime') . '</h1>';
+				$response['html'] .= $response['short_html'] = '<h1 class="smi-valid">' . \GO::t("Valid certificate", "smime") . '</h1>';
 			}
 		}
 
 		if (!isset($params['account_id']) || $valid) {
 			$response['html'] .= '<table>';
-			$response['html'] .= '<tr><td width="100">' . \GO::t('name') . ':</td><td>' . $arr['name'] . '</td></tr>';
-			$response['html'] .= '<tr><td width="100">'.\GO::t('email','smime').':</td><td>' . implode(', ', $emails) . '</td></tr>';
-			$response['html'] .= '<tr><td>'.\GO::t('hash','smime').':</td><td>' . $arr['hash'] . '</td></tr>';
-			$response['html'] .= '<tr><td>'.\GO::t('serial_number','smime').':</td><td>' . $arr['serialNumber'] . '</td></tr>';
-			$response['html'] .= '<tr><td>'.\GO::t('version','smime').':</td><td>' . $arr['version'] . '</td></tr>';
-			$response['html'] .= '<tr><td>'.\GO::t('issuer','smime').':</td><td>';
+			$response['html'] .= '<tr><td width="100">' . \GO::t("Name") . ':</td><td>' . $arr['name'] . '</td></tr>';
+			$response['html'] .= '<tr><td width="100">'.\GO::t("E-mail", "smime").':</td><td>' . implode(', ', $emails) . '</td></tr>';
+			$response['html'] .= '<tr><td>'.\GO::t("Hash", "smime").':</td><td>' . $arr['hash'] . '</td></tr>';
+			$response['html'] .= '<tr><td>'.\GO::t("Serial number", "smime").':</td><td>' . $arr['serialNumber'] . '</td></tr>';
+			$response['html'] .= '<tr><td>'.\GO::t("Version", "smime").':</td><td>' . $arr['version'] . '</td></tr>';
+			$response['html'] .= '<tr><td>'.\GO::t("Issuer", "smime").':</td><td>';
 
 			foreach ($arr['issuer'] as $skey => $svalue) {
 				if (is_array($svalue)) {
@@ -180,8 +180,8 @@ class CertificateController extends \GO\Base\Controller\AbstractController {
 			}
 			
 			$response['html'] .= '</td></tr>';
-			$response['html'] .= '<tr><td>'.\GO::t('valid_from','smime').':</td><td>' . \GO\Base\Util\Date::get_timestamp($arr['validFrom_time_t']) . '</td></tr>';
-			$response['html'] .= '<tr><td>'.\GO::t('valid_to','smime').':</td><td>' . \GO\Base\Util\Date::get_timestamp($arr['validTo_time_t']) . '</td></tr>';
+			$response['html'] .= '<tr><td>'.\GO::t("Valid from", "smime").':</td><td>' . \GO\Base\Util\Date::get_timestamp($arr['validFrom_time_t']) . '</td></tr>';
+			$response['html'] .= '<tr><td>'.\GO::t("Valid to", "smime").':</td><td>' . \GO\Base\Util\Date::get_timestamp($arr['validTo_time_t']) . '</td></tr>';
 			$response['html'] .= '</table>';
 		}
 

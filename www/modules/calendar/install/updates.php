@@ -247,7 +247,7 @@ $updates['201507161208'][]="update cal_events set end_time=end_time+60 where all
 $updates['201508111510'][]="ALTER TABLE `cal_calendars` ADD `version` INT UNSIGNED NOT NULL DEFAULT '1';";
 
 $updates['201609141003'][]="ALTER TABLE `cal_events` ADD COLUMN `timezone` VARCHAR(64) NOT NULL DEFAULT '' AFTER `end_time`;";
-$updates['201609141004'][]="UPDATE cal_events JOIN go_users ON cal_events.user_id = go_users.id SET cal_events.timezone = go_users.timezone;";
+$updates['201609141004'][]="UPDATE cal_events JOIN core_user ON cal_events.user_id = core_user.id SET cal_events.timezone = core_user.timezone;";
 $updates["201609141005"][]="script:5_revert_rrule_shifting.php";
 
 $updates['201610281650'][] = 'SET foreign_key_checks = 0;';
@@ -293,7 +293,7 @@ $updates['201610281650'][] = 'ALTER TABLE `go_links_cal_events` CONVERT TO CHARA
 
 $updates['201610281659'][] = 'SET foreign_key_checks = 1;';
 
-$updates['201701310910'][] = 'UPDATE cal_events SET timezone = (SELECT timezone FROM go_users WHERE id = 1) WHERE user_id = 0;';
+$updates['201701310910'][] = 'UPDATE cal_events SET timezone = (SELECT timezone FROM core_user WHERE id = 1) WHERE user_id = 0;';
 
 $updates['201701310910'][] = "ALTER TABLE `cal_exceptions` ADD "
 				. "`user_id` INT NOT NULL DEFAULT '0' AFTER `exception_event_id`, ADD "
@@ -301,8 +301,8 @@ $updates['201701310910'][] = "ALTER TABLE `cal_exceptions` ADD "
 				. "`ctime` INT NOT NULL DEFAULT '0' AFTER `muser_id`, ADD "
 				. "`mtime` INT NOT NULL DEFAULT '0' AFTER `ctime`;";
 
-$updates['201701310910'][] = 'UPDATE cal_events SET timezone = (SELECT timezone FROM go_users WHERE id = 1) WHERE user_id = 0;';
-$updates['201702060910'][] = 'UPDATE cal_events SET timezone = (SELECT timezone FROM go_users WHERE id = 1) WHERE timezone = "";';
+$updates['201701310910'][] = 'UPDATE cal_events SET timezone = (SELECT timezone FROM core_user WHERE id = 1) WHERE user_id = 0;';
+$updates['201702060910'][] = 'UPDATE cal_events SET timezone = (SELECT timezone FROM core_user WHERE id = 1) WHERE timezone = "";';
 
 $updates['201706010945'][] = 'ALTER TABLE `cal_events` CHANGE `reminder` `reminder` INT(11) NULL DEFAULT NULL;';
 $updates['201706011000'][] = 'UPDATE `cal_events` SET `reminder` = NULL WHERE `reminder`=0;';

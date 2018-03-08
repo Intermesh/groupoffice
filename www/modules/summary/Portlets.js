@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: Portlets.js 17672 2014-06-11 12:19:34Z mschering $
+ * @version $Id: Portlets.js 22337 2018-02-07 08:23:15Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -18,7 +18,7 @@ GO.mainLayout.onReady(function(){
 	GO.summary.portlets['portlet-rss-reader']=new GO.summary.Portlet({
 		id: 'portlet-rss-reader',
 		//iconCls: 'rss-icon',
-		title: GO.summary.lang.hotTopics,
+		title: t("News", "summary"),
 		layout:'fit',
 		tools: [{
 			id: 'gear',
@@ -30,14 +30,14 @@ GO.mainLayout.onReady(function(){
 						items:this.WebFeedsGrid =  new GO.summary.WebFeedsGrid(),
 						width:700,
 						height:400,
-						title:GO.summary.lang.rssFeeds,
+						title:t("Rss Feeds", "summary"),
 						closeAction:'hide',
 						buttons:[{
-							text: GO.lang.cmdSave,
+							text: t("Save"),
 							handler: function(){
 
 								if(!this.WebFeedsGrid.isValid(true)){
-									alert(GO.lang['strErrorsInForm']);
+									alert(t("You have errors in your form. The invalid fields are marked."));
 									return false;
 								}
 								var params={
@@ -51,7 +51,7 @@ GO.mainLayout.onReady(function(){
 									callback: function(options, success, response){
 										if(!success)
 										{
-											Ext.MessageBox.alert(GO.lang['strError'], GO.lang['strRequestError']);
+											Ext.MessageBox.alert(t("Error"), t("Could not connect to the server. Please check your internet connection."));
 										}else
 										{
 											var responseParams = Ext.decode(response.responseText);
@@ -88,7 +88,7 @@ GO.mainLayout.onReady(function(){
 											{
 												rssTabPanel.add(new Ext.Panel({
 													title: '<br />',
-													html: '<br />'+GO.summary.lang.noRssFeeds,
+													html: '<br />'+t("No RSS feeds have been added.<br />Click the settings button in the top right corner of this window to add feeds.", "summary"),
 													cls: 'go-form-panel'
 												}));
 												rssTabPanel.setActiveTab(0);
@@ -129,13 +129,13 @@ GO.mainLayout.onReady(function(){
 		Ext.Ajax.request({
 			url: GO.url('summary/rssFeed/store'),
 			params: {},
-			waitMsg: GO.lang['waitMsgLoad'],
+			waitMsg: t("Loading..."),
 			waitMsgTarget: 'portlet-rss-reader',
 			scope:this,
 			callback: function(options, success, response){
 				if(!success)
 				{
-					Ext.MessageBox.alert(GO.lang['strError'], GO.lang['strRequestError']);
+					Ext.MessageBox.alert(t("Error"), t("Could not connect to the server. Please check your internet connection."));
 				}else
 				{
 					var rssTabPanels = Ext.decode(response.responseText);
@@ -143,7 +143,7 @@ GO.mainLayout.onReady(function(){
 					{
 						rssTabPanel.add(new Ext.Panel({
 							title: '<br />',
-							html: '<br />'+GO.summary.lang.noRssFeeds,
+							html: '<br />'+t("No RSS feeds have been added.<br />Click the settings button in the top right corner of this window to add feeds.", "summary"),
 							cls: 'go-form-panel'
 						}));
 						rssTabPanel.setActiveTab(0);
@@ -181,12 +181,16 @@ GO.mainLayout.onReady(function(){
 		notePanel.form.submit({
 			url: GO.url('summary/note/submit'),
 			params: {},
-			waitMsg: GO.lang['waitMsgSave']			
+			waitMsg: t("Saving...")			
 		});
 	});
 	
 	var notePanel = new Ext.form.FormPanel({
-		items: noteInput,
+		items: {
+			xtype: "fieldset",
+			anchor: "100% 100%",
+			items: noteInput
+		},
 		waitMsgTarget: true
 	});
 	
@@ -194,14 +198,14 @@ GO.mainLayout.onReady(function(){
 		notePanel.load({
 			url: GO.url('summary/note/load'),
 			params:{},
-			waitMsg: GO.lang['waitMsgLoad']
+			waitMsg: t("Loading...")
 		});				
 	});
 	
 	GO.summary.portlets['portlet-note']=new GO.summary.Portlet({
 		id: 'portlet-note',
 		//iconCls: 'note-icon',
-		title: GO.summary.lang.notes,
+		title: t("Notes", "summary"),
 		layout:'fit',
 		tools: [{
 			id:'close',
@@ -233,7 +237,7 @@ GO.mainLayout.onReady(function(){
 	
 	GO.summary.portlets['portlet-announcements']=new GO.summary.Portlet({
 		id: 'portlet-announcements',
-		title: GO.summary.lang.announcements,
+		title: t("Announcements", "summary"),
 		layout:'fit',
 		items: GO.summary.announcementsPanel,
 		autoHeight:true,

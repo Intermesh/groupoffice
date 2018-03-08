@@ -5,7 +5,7 @@ GO.WeekPicker = function(config){
 
 	config.items=[{
 		iconCls : 'btn-left-arrow',
-		text : GO.lang.cmdPrevious,
+		text : t("Previous"),
 		cls : 'x-btn-text-icon',
 		handler : function() {
 			this.setDate(this.sunday.add(Date.DAY, -7));
@@ -17,14 +17,14 @@ GO.WeekPicker = function(config){
 		cls : 'cal-period'
 	}),{
 		iconCls : 'btn-right-arrow',
-		text : GO.lang.cmdNext,
+		text : t("Next"),
 		cls : 'x-btn-text-icon',
 		handler : function() {
 			this.setDate(this.sunday.add(Date.DAY, 7));
 		},
 		scope : this
 	},{
-		text : GO.lang.today,
+		text : t("Today"),
 		handler : function() {
 			this.setDate();
 		},
@@ -51,7 +51,7 @@ Ext.extend(GO.WeekPicker ,Ext.Toolbar, {
 
 			var displayDate = this.sunday.add(Date.DAY, 1);
 			this.goToLink.update(
-				GO.lang.strWeek
+				t("Week")
 				+ ' '
 				+ displayDate.format('W')
 				+ ' ('
@@ -107,7 +107,7 @@ GO.GoToWeekDialog = function(config) {
 	};
 
 	config.layout = 'fit';
-	config.title = GO.projects.lang.goToWeek;
+	config.title = t("goToWeek", "projects");
 	config.modal = false;
 	config.width = 335;
 	config.height = 135;
@@ -116,7 +116,7 @@ GO.GoToWeekDialog = function(config) {
 	config.items = this.formPanel;
 	config.focus = focusFirstField.createDelegate(this);
 	config.buttons = [{
-		text : GO.lang['cmdClose'],
+		text : t("Close"),
 		handler : function() {
 			this.hide();
 		},
@@ -158,14 +158,14 @@ Ext.extend(GO.GoToWeekDialog, Ext.Window, {
 			anchor : '95% 95%',
 			items : [this.year = new Ext.form.TextField({
 				name : 'year',
-				fieldLabel : GO.lang['strYear'],
+				fieldLabel : t("Year"),
 				allowBlank : false,
 				anchor : '95%',
 				selectOnFocus : true
 			}), this.selectWeek = new GO.form.ComboBox({
-				fieldLabel : GO.lang['strWeek'],
+				fieldLabel : t("Week"),
 				hiddenName : 'date',
-				emptyText : GO.lang.selectWeek,
+				emptyText : t("Select week"),
 				store : new GO.data.JsonStore({
 					url : BaseHref + 'json.php',
 					baseParams : {

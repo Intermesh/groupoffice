@@ -12,7 +12,7 @@ class MailboxNotFound extends \Exception{
 		
 	//	$imap->last_error(); // Get the last error
 
-		$message = sprintf(\GO::t('MailboxNotFoundException'),$mailbox);
+		$message = sprintf(\GO::t("Cannot open the folder \"%s\". Please check your email account settings."),$mailbox);
 		$imap->clear_errors(); // Needed to clear the imap errors
 		
 		parent::__construct($message);

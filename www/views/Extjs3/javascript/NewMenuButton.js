@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: NewMenuButton.js 15035 2013-06-07 10:26:48Z mschering $
+ * @version $Id: NewMenuButton.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -23,7 +23,7 @@
 				panel:this.panel,
 				showConfigs : this.showConfigs
 			});
-		this.text=GO.lang.cmdNew;
+		this.tooltip=t("New");
 		this.iconCls='btn-add';			
 		this.disabled=true;
 		this.hidden=GO.newMenuItems.length==0;
@@ -59,7 +59,7 @@
 		this.menu = new Ext.menu.Menu({
 				items:GO.newMenuItems
 			});
-		this.text=GO.lang.cmdNew;
+		this.text=t("New");
 		this.iconCls='btn-add';
 		this.disabled=true;
 		this.hidden=GO.newMenuItems.length==0;
@@ -88,25 +88,25 @@
 
 });
 
-
-GO.mainLayout.onReady(function(){
-	GO.newMenuItems.unshift({
-		text: GO.lang.link,
-		iconCls: 'has-links',
-		handler:function(item, e)
-		{
-			if(!this.linksDialog)
-			{
-				this.linksDialog = new GO.dialog.LinksDialog();
-				this.linksDialog.on('link', function()
-				{
-					if(item.parentMenu.panel)
-						item.parentMenu.panel.reload();
-				});
-			}
-
-			this.linksDialog.setSingleLink(item.parentMenu.linkConfig.model_id, item.parentMenu.linkConfig.model_name);
-			this.linksDialog.show();
-		}
-	});
-});
+//
+//GO.mainLayout.onReady(function(){
+//	GO.newMenuItems.unshift({
+//		text: t("Link"),
+//		iconCls: 'has-links',
+//		handler:function(item, e)
+//		{
+//			if(!this.linksDialog)
+//			{
+//				this.linksDialog = new GO.dialog.LinksDialog();
+//				this.linksDialog.on('link', function()
+//				{
+//					if(item.parentMenu.panel)
+//						item.parentMenu.panel.reload();
+//				});
+//			}
+//
+//			this.linksDialog.setSingleLink(item.parentMenu.linkConfig.model_id, item.parentMenu.linkConfig.model_name);
+//			this.linksDialog.show();
+//		}
+//	});
+//});

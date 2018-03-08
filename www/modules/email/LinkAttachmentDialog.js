@@ -8,7 +8,7 @@ GO.email.LinkAttachmentDialog = Ext.extend(GO.dialog.LinksDialog,{
 		config = config || {};
 		
 		Ext.apply(config, {
-			title:GO.email.lang.saveAttachmentTo,
+			title:t("Save the attachment to these items", "email"),
 			singleSelect:true,
 			filesupport:true
 		});

@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: LoginPanel.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: LoginPanel.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -21,7 +21,7 @@ GO.users.LoginPanel = function(config)
 	config.autoHeight=true;
 	config.border=true;
 	config.hideLabel=true;
-	config.title = GO.users.lang.loginInfo;
+	config.title = t("Login information", "users");
 	config.layout='form';
 	config.defaults={anchor:'100%'};
 	config.defaultType = 'textfield';
@@ -31,17 +31,17 @@ GO.users.LoginPanel = function(config)
 	config.items=[
 		{
       xtype: 'plainfield',
-			fieldLabel: GO.users.lang.cmdFormLabelRegistrationTime,
+			fieldLabel: t("Registration time", "users"),
 			name: 'ctime'
 		},
 		{
       xtype: 'plainfield',
-			fieldLabel: GO.users.lang.cmdFormLabelLastLogin,
+			fieldLabel: t("Last Login", "users"),
 			name: 'lastlogin'
 		},
 		{
       xtype: 'plainfield',
-			fieldLabel: GO.users.lang.numberOfLogins,
+			fieldLabel: t("Number of logins", "users"),
 			name: 'logins'
 		}		
 	];

@@ -6,7 +6,7 @@
 //			items:[
 //				new Ext.menu.Item({
 //					iconCls: 'btn-export',
-//					text: GO.licenses.lang.downloadpackage,
+//					text: t("Download package", "licenses"),
 //					cls: 'x-btn-text-icon',
 //					scope:this,
 //					disableOnMultiselect:true, // TAKE SPECIAL ATTENTION TO THIS PARAMETER!
@@ -17,7 +17,7 @@
 //				}),
 //				new Ext.menu.Item({
 //					iconCls: 'btn-export',
-//					text: GO.licenses.lang.downloadlicense,
+//					text: t("Download license file", "licenses"),
 //					cls: 'x-btn-text-icon',
 //					scope:this,
 //					disableOnMultiselect:true, // TAKE SPECIAL ATTENTION TO THIS PARAMETER!

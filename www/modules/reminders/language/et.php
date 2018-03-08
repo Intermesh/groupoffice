@@ -1,13 +1,12 @@
 <?php
-$l['name']='Popup meeldetuletajad';
-$l['description']='Meeldetuletuste valmistamine nii kasutajatele kui ka gruppidele.';
-
-$l['reminders']='Popup meeldetuletajad';
-$l['reminder']="Popup meeldetuletaja";
-$l['time']="Aeg";
-$l['snoozeTime']="Uinumise aeg";
-$l['text']='Teks';
-$l['addUsers']='Lisa kasutajad';
-$l['addUserGroups']='Lisa kasutajate grupid';
-
-?>
+return array (
+  'Popup reminder' => 'Popup meeldetuletaja',
+  'Time' => 'Aeg',
+  'Snooze time' => 'Uinumise aeg',
+  'Text' => 'Teks',
+  'Add users' => 'Lisa kasutajad',
+  'Add user groups' => 'Lisa kasutajate grupid',
+  'name' => 'Popup meeldetuletajad',
+  'description' => 'Meeldetuletuste valmistamine nii kasutajatele kui ka gruppidele.',
+  'Popup reminders' => 'Popup meeldetuletajad',
+);

@@ -8,10 +8,12 @@ GO.tasks.TasksPanel = function(config)
 
 		this.checkColumn = new GO.grid.CheckColumn({
 			id:'completed',
-			dataIndex: 'completed',
-			width: 30,
+			dataIndex: 'completed',			
 			hideInExport:true,
-			header: '<div class="tasks-complete-icon"></div>',
+			header: '<i class="icon ic-check"></i>',
+			width: dp(56),
+			hideable:false,
+			menuDisabled: true,
 			sortable:false,
 			groupable:false
 		});
@@ -38,7 +40,7 @@ GO.tasks.TasksPanel = function(config)
 			columns:[this.checkColumn,{
 				id:'icon',
 				header:"&nbsp;",
-				width:23,
+				width:dp(40),
 				dataIndex: 'icon',
 				renderer: this.renderIcon,
 				hideable:false,
@@ -48,7 +50,7 @@ GO.tasks.TasksPanel = function(config)
 			},{
 				id:'name',
 				width:200,
-				header:GO.lang['strName'],
+				header:t("Name"),
 				dataIndex: 'name'
 //				renderer:function(value, p, record){
 //					if(!GO.util.empty(record.data.description))
@@ -58,86 +60,90 @@ GO.tasks.TasksPanel = function(config)
 //					return value;
 //				}
 			},{
-				header:GO.tasks.lang.tasklist,
+				header:t("Tasklist", "tasks"),
 				dataIndex: 'tasklist_name',
 				width:60,
 				hidden:true,
 				groupable:true
 			},{
-				header:GO.tasks.lang.category,
+				header:t("Category", "tasks"),
 				dataIndex: 'category_name',
 				width:150,
 				sortable:true,
-				groupable:true
+				groupable:true,
+				hidden:true,
 			},
 			{
-				header:GO.lang.priority,
+				header:t("Priority"),
 				dataIndex: 'priority',
 				width:70,
-				hidden:false,
+				hidden:true,
 				renderer : function(value, cell, record) {
 					var str = '';
 					switch(value)
 					{
 						case 0:
-							str = GO.lang.priority_low;
+							str = t("Low");
 							break;
 						case 1:
-							str = GO.lang.priority_normal;
+							str = t("Normal");
 							break;
 						case 2:
-							str = GO.lang.priority_high;
+							str = t("High");
 							break;
 					}
 					return str;
 				}
 			},
 			{
-				header:GO.tasks.lang.dueDate,
+				header:t("Due date", "tasks"),
 				dataIndex: 'due_time',
-				width:100
+				width: dp(120)
 			},{
-				header: GO.tasks.lang.startsAt,
+				header: t("Starts at", "tasks"),
 				dataIndex: 'start_time',
 				hidden:true,
-				width:110
+				width: dp(120),
+				hidden:true
 			},{
-				header: GO.tasks.lang.completedAt,
+				header: t("Completed at", "tasks"),
 				dataIndex: 'completion_time',
 				hidden:true,
-				width:110
+				width: dp(120)
 			},{
-				header: GO.lang.strStatus,
+				header: t("Status"),
 				dataIndex: 'status',
-				width:110,
+				width: dp(140),
 				groupable:true,
 				renderer:function(value, p, record){
-					return GO.tasks.lang.statuses[value];
-				}
+					return t("statuses", "tasks")[value];
+				},
+				hidden:true
 			},{
-				header: GO.tasks.lang.taskPercentage_complete,
+				header: t("Percentage complete", "tasks"),
 				dataIndex: 'percentage_complete',
 				width:60,
 				renderer:function(value, p, record){
 					return value+"%";
-				}
+				},
+				hidden:true
 			},{
 				id:'user_name',
-				header: GO.lang.createdBy,
+				header: t("Created by"),
 				dataIndex: 'user_name',
 				hidden:true,
 				width:150,
 				sortable:false
 			},{
-				header: GO.lang.strCtime,
+				header: t("Created at"),
 				dataIndex: 'ctime',
 				hidden:true,
-				width:110
+				width: dp(140)
 			},{
-				header: GO.lang.strMtime,
+				header: t("Modified at"),
 				dataIndex: 'mtime',
 				hidden:true,
-				width:110
+				width: dp(140)
 			},{
 				id:'id',
 				width:200,
@@ -147,23 +153,23 @@ GO.tasks.TasksPanel = function(config)
 			}]
 		};
 
-		if (GO.projects2){
+		if(go.ModuleManager.isAvailable("projects2")){
 			fields.columns.push({
-				header: GO.projects2.lang.project,
+				header: t("Project", "projects2"),
 				dataIndex: 'project_name',
 				hidden:true,
 				width:150
 			});
-		} else if(GO.projects){
+		} else if(go.ModuleManager.isAvailable("projects")){
 			fields.columns.push({
-				header: GO.projects.lang.project,
+				header: t("project", "projects"),
 				dataIndex: 'project_name',
 				hidden:true,
 				width:150
 			});
 		}
 
-		if(GO.customfields)
+		if(go.ModuleManager.isAvailable("customfields"))
 		{
 			GO.customfields.addColumns("GO\\Tasks\\Model\\Task", fields);
 		}
@@ -211,7 +217,8 @@ GO.tasks.TasksPanel = function(config)
 			scrollOffset: 2,
 			//forceFit:true,
 			hideGroupedColumn:true,
-			emptyText: GO.tasks.lang.noTask,
+			
+			emptyText: t("No Tasks to display", "tasks"),
 			getRowClass : function(record, rowIndex, p, store){
 				if(record.data.late && !record.data.completed){
 					return 'tasks-late';
@@ -247,8 +254,8 @@ GO.tasks.TasksPanel = function(config)
 
 		config.enableDragDrop=true;
 		config.ddGroup='TasklistsDD';
-		
-		config.tbar = [GO.lang['strSearch'] + ':', this.searchField];
+		config.autoExpandColumn = "name";
+		//config.tbar = [t("Search") + ':', this.searchField];
 
 		GO.tasks.TasksPanel.superclass.constructor.call(this, config);
 

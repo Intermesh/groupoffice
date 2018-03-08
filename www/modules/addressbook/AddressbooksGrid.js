@@ -5,24 +5,27 @@ GO.addressbook.AddresbooksGrid = function(config){
 		config = {};
 	}
 	
-	config.title = GO.addressbook.lang.cmdPanelAddressbook;
+	config.title = t("Address books", "addressbook");
 	config.layout='fit';
-	config.autoScroll=true;
 	config.split=true;
 	if(!config.store)
 		config.store = GO.addressbook.readableAddressbooksStore;
 
 	Ext.apply(config, {
+		viewConfig: {
+			scrollOffset: 0,
+			emptyText: t("No items to display")
+		},
 		allowNoSelection:true,
-		bbar: new GO.SmallPagingToolbar({
-			items:[this.searchField = new GO.form.SearchField({
-				store: config.store,
-				width:120,
-				emptyText: GO.lang.strSearch
-			})],
-			store:config.store,
-			pageSize:GO.settings.config.nav_page_size
-		})
+//		bbar: new GO.SmallPagingToolbar({
+//			items:[this.searchField = new GO.form.SearchField({
+//				store: config.store,
+//				width:120,
+//				emptyText: t("Search")
+//			})],
+//			store:config.store,
+//			pageSize:GO.settings.config.nav_page_size
+//		})
 	});
 	
 	GO.addressbook.AddresbooksGrid.superclass.constructor.call(this, config);
@@ -68,7 +71,7 @@ Ext.extend(GO.addressbook.AddresbooksGrid, GO.grid.MultiSelectGrid, {
 			show_confirm = true;
 		}
 			
-		if(book_id > 0 && (!show_confirm || confirm(GO.addressbook.lang.moveAll)))
+		if(book_id > 0 && (!show_confirm || confirm(t("The company and all employees will also be moved to the new address book. Are you sure you want to do this?", "addressbook"))))
 		{
 			GO.request({
 				url: 'addressbook/'+this.type+'/changeAddressbook',

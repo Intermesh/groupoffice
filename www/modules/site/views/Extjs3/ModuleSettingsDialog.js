@@ -4,7 +4,7 @@ GO.site.ModuleSettingsDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		
 		Ext.apply(this, {
 			goDialogId:'siteModuleSettings',
-			title:GO.site.lang.moduleSettings,
+			title:t("moduleSettings", "site"),
 			formControllerUrl: 'site/content'
 		});
 		
@@ -14,7 +14,7 @@ GO.site.ModuleSettingsDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 	buildForm : function () {
 		
 		this.propertiesPanel = new Ext.Panel({
-			title:GO.site.lang.globalProperties,			
+			title:t("globalProperties", "site"),			
 			cls:'go-form-panel',
 			layout:'form',
 			items:[]

@@ -11,11 +11,11 @@ GO.files.FolderPanel = Ext.extend(GO.DisplayPanel,{
 	},
 
 	createTopToolbar : function(){
-		var tbar = GO.files.FilePanel.superclass.createTopToolbar.call(this);
+		var tbar = GO.files.FolderPanel.superclass.createTopToolbar.call(this);
 
-		tbar.splice(1,0,{
+		tbar.splice(1,1,{
 			iconCls: 'btn-settings',
-			text: GO.lang.strProperties,
+			text: t("Properties"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 				GO.files.showFolderPropertiesDialog(this.link_id+"");
@@ -43,33 +43,33 @@ GO.files.FolderPanel = Ext.extend(GO.DisplayPanel,{
 
 				'<table class="display-panel" cellpadding="0" cellspacing="0" border="0">'+
 					'<tr>'+
-						'<td colspan="2" class="display-panel-heading">'+GO.files.lang.folder+': {path}</td>'+
+						'<td colspan="2" class="display-panel-heading">'+t("Folder", "files")+': {path}</td>'+
 					'</tr>'+
-					'<tr>'+
-						'<td>'+GO.lang.strType+':</td>'+
-						'<td>{type}</td>'+
-					'</tr>'+					
+//					'<tr>'+
+//						'<td>'+t("Type")+':</td>'+
+//						'<td>{type}</td>'+
+//					'</tr>'+					
 					
 					'<tr>'+
-						'<td>'+GO.lang['strCtime']+':</td>'+'<td>{ctime}</td>'+
+						'<td>'+t("Created at")+':</td>'+'<td>{ctime}</td>'+
 					'</tr><tr>'+
-						'<td>'+GO.lang['createdBy']+':</td>'+'<td>{username}</td>'+
+						'<td>'+t("Created by")+':</td>'+'<td>{username}</td>'+
 					'</tr><tr>'+
-						'<td>'+GO.lang['strMtime']+':</td>'+'<td>{mtime}</td>'+
+						'<td>'+t("Modified at")+':</td>'+'<td>{mtime}</td>'+
 					'</tr><tr>'+
-						'<td>'+GO.lang['mUser']+':</td>'+'<td>'+
+						'<td>'+t("Modified by")+':</td>'+'<td>'+
 							'<tpl if="muser_id">{musername}</tpl>'+
 							'</td>'+
 					'</tr>'+
 					
 					'<tr>'+
 						'<td>URL:</td>'+
-						'<td><a target="_blank" href="{url}">'+GO.files.lang.rightClickToCopy+'</a></td>'+
+						'<td><a target="_blank" href="{url}">'+t("Right click to copy", "files")+'</a></td>'+
 					'</tr>'+
 
 					'<tpl if="!GO.util.empty(comment)">'+
 						'<tr>'+
-							'<td colspan="2" class="display-panel-heading">'+GO.files.lang.comments+'</td>'+
+							'<td colspan="2" class="display-panel-heading">'+t("Comments", "files")+'</td>'+
 						'</tr>'+
 						'<tr>'+
 							'<td colspan="2">{comment}</td>'+
@@ -77,32 +77,11 @@ GO.files.FolderPanel = Ext.extend(GO.DisplayPanel,{
 					'</tpl>'+
 				'</table>';
 
-		if(GO.customfields)
-		{
-			this.template +=GO.customfields.displayPanelTemplate;
-		}
-
-		if(GO.tasks)
-			this.template +=GO.tasks.TaskTemplate;
-
-		if(GO.calendar)
-			this.template += GO.calendar.EventTemplate;
-
-		if(GO.workflow)
+	
+		if(go.ModuleManager.isAvailable("workflow"))
 			this.template +=GO.workflow.WorkflowTemplate;
 		
-		if(GO.lists)
-			this.template += GO.lists.ListTemplate;
-
-		this.template += GO.linksTemplate;	
 		
-		Ext.apply(this.templateConfig, GO.linksTemplateConfig);
-
-		if(GO.comments)
-		{
-			this.template += GO.comments.displayPanelTemplate;
-		}
-
 		GO.files.FolderPanel.superclass.initComponent.call(this);
 	}
 });

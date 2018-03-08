@@ -12,7 +12,7 @@ class UsersModule extends \GO\Base\Module{
 		return 'mschering@intermesh.nl';
 	}
 	public function autoInstall() {
-		return true;
+		return false; //is installed as core module!
 	}
 	
 	public function adminModule() {

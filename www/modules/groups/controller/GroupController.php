@@ -13,7 +13,7 @@ class GroupController extends \GO\Base\Controller\AbstractModelController {
 	}
 	
 	protected function formatColumns(\GO\Base\Data\ColumnModel $columnModel) {
-		$columnModel->formatColumn('user_name', '$model->user->name');
+//		$columnModel->formatColumn('user_name', '$model->user->name');
 		return parent::formatColumns($columnModel);
 	}
 
@@ -50,12 +50,11 @@ class GroupController extends \GO\Base\Controller\AbstractModelController {
 
 			// The users in the group "everyone" cannot be deleted
 			if ($group->id != \GO::config()->group_everyone) {
-				$store->processDeleteActions($params, 'GO\Base\Model\UserGroup', array('group_id' => $group->id));
+				$store->processDeleteActions($params, 'GO\Base\Model\UserGroup', array('groupId' => $group->id));
 			} else {
 				$delresponse['deleteSuccess'] = false;
 				$delresponse['deleteFeedback'] = 'Members of the group everyone cannot be deleted.';
-			}			
-			
+			}
 		}
 
 		$stmt = $group->users($storeParams);
@@ -73,7 +72,7 @@ class GroupController extends \GO\Base\Controller\AbstractModelController {
 		if (!empty($params['permissions'])) {
 			$permArr = json_decode($params['permissions']);
 			foreach ($permArr as $modPermissions) {
-				$modModel = \GO\Base\Model\Module::model()->findByPk($modPermissions->id);	
+				$modModel = \GO\Base\Model\Module::model()->findByName($modPermissions->id);	
 				$modModel->acl->addGroup(
 						$params['id'],
 						$modPermissions->permissionLevel

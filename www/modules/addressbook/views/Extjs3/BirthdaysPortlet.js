@@ -47,20 +47,20 @@ GO.addressbook.BirthdaysPanel = function(config)
 			}
 		},{
 			id:'birthday-portlet-name-col',
-			header:GO.lang['strName'],
+			header:t("Name"),
 			dataIndex: 'name',
 			sortable:true
 		},{
-			header:GO.addressbook.lang['addressbook'],
+			header:t("Address book", "addressbook"),
 			dataIndex: 'addressbook_id',
 			sortable:true
 		},{
-			header:GO.addressbook.lang['contactBirthday'],
+			header:t("Birthday", "addressbook"),
 			dataIndex: 'birthday',
 			width:100,
 			sortable:true
 		},{
-			header:GO.lang['age'],
+			header:t("Age"),
 			dataIndex: 'age',
 			width:100
 		}];
@@ -97,14 +97,14 @@ Ext.extend(GO.addressbook.BirthdaysPanel, GO.grid.GridPanel, {
 
 
 GO.mainLayout.onReady(function(){
-	if(GO.summary)
+	if(go.ModuleManager.isAvailable("summary"))
 	{
 		var birthdaysGrid = new GO.addressbook.BirthdaysPanel();
 		
 		GO.summary.portlets['portlet-birthdays']=new GO.summary.Portlet({
 			id: 'portlet-birthdays',
 			//iconCls: 'go-module-icon-tasks',
-			title: GO.addressbook.lang['upcomingBirthdays'],
+			title: t("Upcoming birthdays", "addressbook"),
 			layout:'fit',
 			tools: [{
 				id: 'gear',
@@ -113,9 +113,9 @@ GO.mainLayout.onReady(function(){
 					{
 						this.selectAddressbookWin = new GO.base.model.multiselect.dialog({
 							url:'addressbook/portlet',
-							columns:[{ header: GO.lang['strName'], dataIndex: 'name', sortable: true }],
+							columns:[{ header: t("Name"), dataIndex: 'name', sortable: true }],
 							fields:['id','name'],
-							title:GO.addressbook.lang['birthdays'],
+							title:t("birthdays", "addressbook"),
 							model_id:GO.settings.user_id,
 							listeners:{
 								hide:function(){

@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: ComboReset.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: ComboReset.js 21892 2017-12-12 09:15:19Z michaelhart86 $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -14,12 +14,10 @@
 GO.form.ComboBoxReset = Ext.extend(GO.form.ComboBox, {
 			initComponent : Ext.form.TwinTriggerField.prototype.initComponent,
 			getTrigger : Ext.form.TwinTriggerField.prototype.getTrigger,
+			getTriggerWidth : function() {return 0; },
 			initTrigger : Ext.form.TwinTriggerField.prototype.initTrigger,
 			trigger1Class : 'x-form-clear-trigger',
 			//hideTrigger1 : true,
-			onViewClick : Ext.form.ComboBox.prototype.onViewClick.createSequence(function() {
-				//this.triggers[0].setDisplayed(true);
-			}),
 			onTrigger2Click : function() {
 				this.onTriggerClick();
 			},
@@ -42,12 +40,6 @@ GO.form.ComboBoxReset = Ext.extend(GO.form.ComboBox, {
 				{					
 					//this.triggers[0].setDisplayed(v!='');					
 				}
-			},
-			afterRender:function(){
-				GO.form.ComboBoxReset.superclass.afterRender.call(this);
-				if(Ext.isIE8)this.el.setTop(0);
-				
-				//this.on('resize', function(combo, adjWidth, adjHeight, rawWidth, rawHeight ){console.log(adjWidth);}, this);
 			}			
 		});
 

@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: AnnouncementsGrid.js 16251 2013-11-15 08:39:41Z mschering $
+ * @version $Id: AnnouncementsGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -37,23 +37,23 @@ GO.summary.AnnouncementsGrid = function(config){
 		},
 		columns:[
 	{
-		header: GO.summary.lang.title,
+		header: t("Title", "summary"),
 		dataIndex: 'title'
 	},{
-		header: GO.lang.strOwner,
+		header: t("Owner"),
 		dataIndex: 'user_name',
 		sortable: false
 	},{
-		header: GO.summary.lang.dueTime,
+		header: t("Show until", "summary"),
 		dataIndex: 'due_time'
 	},{
-		header: GO.lang.strCtime,
+		header: t("Created at"),
 		dataIndex: 'ctime',
-		width:110
+		width: dp(140)
 	},{
-		header: GO.lang.strMtime,
+		header: t("Modified at"),
 		dataIndex: 'mtime',
-		width:110
+		width: dp(140)
 	}
 
 	]
@@ -63,7 +63,7 @@ GO.summary.AnnouncementsGrid = function(config){
 	config.view=new Ext.grid.GridView({
 		autoFill: true,
 		forceFit: true,
-		emptyText: GO.lang['strNoItems']
+		emptyText: t("No items to display")
 	});
 	config.sm=new Ext.grid.RowSelectionModel();
 	config.loadMask=true;
@@ -75,7 +75,7 @@ GO.summary.AnnouncementsGrid = function(config){
 	
 	config.tbar=[{
 		iconCls: 'btn-add',
-		text: GO.lang['cmdAdd'],
+		text: t("Add"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			this.announcementDialog.show();
@@ -83,7 +83,7 @@ GO.summary.AnnouncementsGrid = function(config){
 		scope: this
 	},{
 		iconCls: 'btn-delete',
-		text: GO.lang['cmdDelete'],
+		text: t("Delete"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			this.deleteSelected();

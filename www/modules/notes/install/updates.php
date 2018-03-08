@@ -54,3 +54,6 @@ $updates['201610281650'][] = 'ALTER TABLE `no_notes` CONVERT TO CHARACTER SET ut
 
 
 $updates['201610281659'][] = 'SET foreign_key_checks = 1;';
+
+//final server update for old module
+$updates['201711071212'][] = 'update core_module set package=\'community\', version=0 where name=\'notes\'';

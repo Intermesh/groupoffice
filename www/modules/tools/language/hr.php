@@ -1,14 +1,15 @@
 <?php
-
-$l['name']='Alati';
-$l['dbcheck']='Provjera baze podataka';
-$l['rm_duplicates']='Ukloni duple kontakte i događaje';
-$l['backupdb']='Backup baze podataka';
-$l['index_files']='Indeksiraj sve datoteke';
-$l['buildsearchcache']='Napravi indeksaciju za pretraživanje';
-$l['checkmodules']='Provjeri module';
-$l['resetState']='Resetiraj stanje prozora, mreža itd.';
-$l["tools"]='Admin alati';
-$l["description"]='Kliknite na jednu od skripti ispod kako biste ju pokrenuli.';
-$l["scripts"]='Skripte';
-$l["scriptOutput"]='Rezultat skripte';
+return array (
+  'Database check' => 'Provjera baze podataka',
+  'Remove duplicate contacts and events' => 'Ukloni duple kontakte i događaje',
+  'Backup database' => 'Backup baze podataka',
+  'Index all files' => 'Indeksiraj sve datoteke',
+  'Create search index' => 'Napravi indeksaciju za pretraživanje',
+  'Check modules' => 'Provjeri module',
+  'Reset state of windows, grids etc.' => 'Resetiraj stanje prozora, mreža itd.',
+  'Admin tools' => 'Admin alati',
+  'Scripts' => 'Skripte',
+  'Script output' => 'Rezultat skripte',
+  'name' => 'Alati',
+  'description' => 'Kliknite na jednu od skripti ispod kako biste ju pokrenuli.',
+);

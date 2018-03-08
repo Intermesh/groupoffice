@@ -1,26 +1,24 @@
 <?php
-
-
-$l['name']='Bladwijzers';
-$l['description']='Een module om bladwijzers aan te maken.';
-$l['general']='Algemeen';
-$l['googleDescription']="Doorzoek het Internet";$l["bookmarks"]='Bladwijzers';
-$l["bookmark"]='Bladwijzer';
-$l["category"]='Categorie';
-$l["title"]='Titel';
-$l["description"]='Beschrijving';
-$l["logo"]='Logo';
-$l["extern"]='Open in nieuw browser tabblad';
-$l["administrateCategories"]='Beheer categorieën';
-$l["thumbnails"]='Pictogrammen';
-$l["chooseIcon"]='Kies pictogram voor de bookmark';
-$l["clearLogo"]='Wis logo';
-$l["uploadLogo"]='Upload Logo';
-$l["showAll"]='Toon alles';
-$l["sharedCategory"]='Gedeelde categorie';
-$l["behaveAsModule"]='Gedraag als een module (Browser herladen vereist)';
-$l["confirmDelete"]='Weet je zeker dat je deze bladwijzer wilt verwijderen?';
-
-$l["bookmarks"]='Favorieten';
-$l['toggle']='Andere weergave';
-$l['showCategoryInStartMenu'] = 'Groepeer bladwijzers in het start menu (Browser herladen vereist)';
+return array (
+  'General' => 'Algemeen',
+  'Search the web' => 'Doorzoek het Internet',
+  'Bookmark' => 'Bladwijzer',
+  'Category' => 'Categorie',
+  'Title' => 'Titel',
+  'Open in new browser tab' => 'Open in nieuw browser tabblad',
+  'Administrate categories' => 'Beheer categorieën',
+  'Thumbnails' => 'Pictogrammen',
+  'Choose icon for bookmark' => 'Kies pictogram voor de bookmark',
+  'Clear Logo' => 'Wis logo',
+  'Show all' => 'Toon alles',
+  'Shared category' => 'Gedeelde categorie',
+  'Behave as a module (Browser reload required)' => 'Gedraag als een module (Browser herladen vereist)',
+  'Are you sure you want to delete this bookmark?' => 'Weet je zeker dat je deze bladwijzer wilt verwijderen?',
+  'Toggle view' => 'Andere weergave',
+  'Group bookmarks in main start menu (Browser reload required)' => 'Groepeer bladwijzers in het start menu (Browser herladen vereist)',
+  'name' => 'Favorieten',
+  'description' => 'Beschrijving',
+  'Bookmarks' => 'Favorieten',
+  'Logo' => 'Logo',
+  'Upload Logo' => 'Upload Logo',
+);

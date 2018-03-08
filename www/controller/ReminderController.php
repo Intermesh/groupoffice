@@ -58,7 +58,7 @@ class ReminderController extends \GO\Base\Controller\AbstractController {
 	public function formatReminderRecord($record, $model, $store){
 		
 		$record['iconCls']='go-icon-reminders';
-		$record['type']=\GO::t('other');
+		$record['type']=\GO::t("Other");
 		$record['model_name']='';
 
 		if(!empty($record['model_type_id'])){

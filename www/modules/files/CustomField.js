@@ -1,7 +1,7 @@
 GO.moduleManager.onModuleReady('customfields', function(){
 	GO.customfields.nonGridTypes.push('file');
 	GO.customfields.dataTypes["GO\\Files\\Customfieldtype\\File"]={
-		label : GO.files.lang.file,
+		label : t("File", "files"),
 		getFormField : function(customfield, config){
 			return {
 				xtype: 'selectfile',

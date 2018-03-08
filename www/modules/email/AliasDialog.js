@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: AliasDialog.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: AliasDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -17,7 +17,7 @@ GO.email.AliasDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 	initComponent : function(){
 		Ext.apply(this, {
 			titleField:'email',
-			title: GO.email.lang.alias,
+			title: t("Alias", "email"),
 			formControllerUrl: 'email/alias',
 			width:700,
 			height:500
@@ -29,7 +29,7 @@ GO.email.AliasDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 	buildForm : function () {
 		
 		this.propertiesPanel = new Ext.Panel({
-			title:GO.lang['strProperties'],			
+			title:t("Properties"),			
 			cls:'go-form-panel',
 			waitMsgTarget:true,			
 			layout:'form',
@@ -39,19 +39,19 @@ GO.email.AliasDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 				name : 'name',
 				anchor : '100%',
 				allowBlank:false,
-				fieldLabel : GO.lang.strName
+				fieldLabel : t("Name")
 			}, {
 				xtype : 'textfield',
 				name : 'email',
 				anchor : '100%',
 				allowBlank:false,
-				fieldLabel : GO.email.lang.email
+				fieldLabel : t("Email", "email")
 			}, {
 				xtype : 'textarea',
 				name : 'signature',
 				anchor : '100%',
 				height:150,
-				fieldLabel : GO.email.lang.signature
+				fieldLabel : t("Signature", "email")
 			}]
 		});
 		

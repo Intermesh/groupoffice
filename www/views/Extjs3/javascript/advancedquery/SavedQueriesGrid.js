@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: SavedQueriesGrid.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: SavedQueriesGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -18,7 +18,7 @@ GO.advancedquery.SavedQueriesGrid = function(config)
 			config = {};
 		}
 
-		config.title = GO.lang.savedQueries;
+		config.title = t("Saved queries");
 		//config.paging=true;
 		config.border=true;
 
@@ -42,7 +42,7 @@ GO.advancedquery.SavedQueriesGrid = function(config)
 		},
 		columns:[
 		{
-			header: GO.lang.strName,
+			header: t("Name"),
 			dataIndex: 'name'
 		}]
 		});
@@ -52,14 +52,14 @@ GO.advancedquery.SavedQueriesGrid = function(config)
 		config.view=new Ext.grid.GridView({
 			autoFill: true,
 			forceFit: true,
-			emptyText: GO.lang.strNoItems
+			emptyText: t("No items to display")
 		}),
 		config.sm=new Ext.grid.RowSelectionModel();
 		config.loadMask=true;
 
 		config.tbar = [{
 			iconCls: 'btn-delete',
-			text: GO.lang['cmdDelete'],
+			text: t("Delete"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 				this.deleteSelected();

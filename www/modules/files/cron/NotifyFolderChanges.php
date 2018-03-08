@@ -18,11 +18,11 @@ class NotifyFolderChanges extends AbstractCron {
 	}
 
 	public function getLabel() {
-		return GO::t("cronNotifyFolderChangeLabel", 'files');
+		return GO::t("Send notification email when something changes in subscribed files folder", "files");
 	}
 
 	public function getDescription() {
-		return GO::t("cronNotifyFolderChangeDescription", 'files');
+		return GO::t("Send an email to the user when a folder is changed", "files");
 	}
 
 	/**

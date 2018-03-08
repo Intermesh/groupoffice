@@ -31,7 +31,7 @@ class DefaultsiteModule extends \GO\Base\Module {
 				
 				$siteProperties = array(
 					//'id'=>'', ID IS AUTO INCREMENT
-					'name'=>\GO::t('name','defaultsite'),
+					'name'=>\GO::t("Default site", "defaultsite"),
 					'user_id'=>1,
 					//'mtime'=>'', AUTOMATIC
 					//'ctime'=>'', AUTOMATIC

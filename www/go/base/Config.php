@@ -269,7 +269,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $default_sort_name = "last_name";
+	var $default_sort_name = "displayName";
 
 
 	/**
@@ -1059,7 +1059,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $version = '6.2.83';
+	var $version = '6.3.0';
 
 	/**
 	 * Modification date
@@ -1407,6 +1407,35 @@ var $billing_clear_payment_method_on_duplicate = true;
 		return $this->_original_config[$key];
 	}
 	
+	//ignore errors
+	public function __get($name) {
+		return null;
+	}
+	
+//	
+//	private function buildConfig() {
+//		
+//		$db = \go\core\App::get()->getDatabase();
+//		
+//		$data = \go\core\App::get()->getConfig();
+//		
+//
+//		$config['file_storage_path'] = \go\core\App::get()->getDataFolder()->getPath() . '/';
+//		$config['root_path'] = \go\core\Environment::get()->getInstallFolder()->getPath() . '/';
+//		$config['db_name'] = $db->getName();
+//		$user = explode('@', $db->getUser());
+//		$config['db_user'] = $user[0];
+//		$config['db_host'] = $user[1];
+//		$config['db_pass'] = $data['db']['password'];
+//
+//		$config['webmaster_email'] = (new \go\core\db\Query())->selectSingleValue('email')->from('core_user')->where('id=1')->single();
+//		
+//		$config['host'] = dirname($_SERVER['PHP_SELF']);
+//		$config['debug'] = !empty($data['general']['debug']);
+//		
+//		return $config;
+//	}
+	
 	/**
 	 * Constructor. Initialises all public variables.
 	 *
@@ -1421,12 +1450,14 @@ var $billing_clear_payment_method_on_duplicate = true;
 		//suppress error for open_basedir warnings etc
 		if(@file_exists('/etc/groupoffice/globalconfig.inc.php')) {
 			require('/etc/groupoffice/globalconfig.inc.php');
-		}
+		}		
 
 		$config_file = $this->get_config_file();
 
 		if($config_file)
 			include($config_file);
+		
+//		$config = $this->buildConfig();
 
 		$this->_original_config = $config;
 		
@@ -1684,7 +1715,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 			return $_SERVER['GO_CONFIG'];
 
 		//on start page always search for config
-		if(empty($_REQUEST['r'])){
+		if(empty($_REQUEST['r']) && isset($_SESSION)){
 			unset($_SESSION['GO_SESSION']['config_file']);
 		}
 

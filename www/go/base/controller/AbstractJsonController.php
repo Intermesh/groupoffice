@@ -112,21 +112,7 @@ abstract class AbstractJsonController extends AbstractController {
 		if ($model->customfieldsRecord)
 			$response = $this->_processCustomFieldsDisplay($model, $response);
 
-		if ($model->hasLinks()) {
-			$response = $this->_processLinksDisplay($model, $response);
 
-			if (!isset($response['data']['events']) && \GO::modules()->calendar)
-				$response = $this->_processEventsDisplay($model, $response);
-
-			if (!isset($response['data']['tasks']) && \GO::modules()->tasks)
-				$response = $this->_processTasksDisplay($model, $response);
-		}
-
-		if (\GO::modules()->files && !isset($response['data']['files']))
-			$response = $this->_processFilesDisplay($model, $response);
-
-		if (\GO::modules()->comments)
-			$response = $this->_processCommentsDisplay($model, $response);
 		
 		if (\GO::modules()->lists)
 			$response = \GO\Lists\ListsModule::displayResponse($model, $response);
@@ -172,7 +158,7 @@ abstract class AbstractJsonController extends AbstractController {
 		} else { // model was not saved
 			$response['success'] = false;
 			//can't use <br /> tags in response because this goes wrong with the extjs fileupload hack with an iframe.
-			$response['feedback'] = sprintf(\GO::t('validationErrorsFound'), strtolower($model->localizedName)) . "\n\n" . implode("\n", $model->getValidationErrors()) . "\n";
+			$response['feedback'] = sprintf(\GO::t("Couldn't save %s:"), strtolower($model->localizedName)) . "\n\n" . implode("\n", $model->getValidationErrors()) . "\n";
 			if (\GO\Base\Util\Http::isAjaxRequest(false)) {
 				$response['feedback'] = nl2br($response['feedback']);
 			}
@@ -317,24 +303,23 @@ abstract class AbstractJsonController extends AbstractController {
 
 		$response['remoteComboTexts'] = array();
 
-		$oldLevel = error_reporting(E_ERROR); //suppress errors in the eval'd code
-
 		foreach ($combofields as $property => $map) {
 			if (is_numeric($property))
 				throw new \Exception("remoteComboFields() must return a key=>value array.");
 
-			$value = '';
-			$eval = '$value = ' . $map . ';';
-			eval($eval);
+			try {
+				eval('$value = ' . $map . ';');
+			}catch (\Exception $e) {
+				$value = '';
+			}
 
 			$response['remoteComboTexts'][$property] = $value;
 
 			//hack for comboboxes displaying 0 instead of the emptyText in extjs
-			if (isset($response['data'][$property]) && $response['data'][$property] === 0)
+			if (isset($response['data'][$property]) && $response['data'][$property] === 0) {
 				$response['data'][$property] = "";
+			}
 		}
-
-		error_reporting($oldLevel);
 
 		return $response;
 	}
@@ -369,7 +354,7 @@ abstract class AbstractJsonController extends AbstractController {
 
 			if ($workflowModel->step_id == '-1') {
 				$workflowResponse['step_progress'] = '';
-				$workflowResponse['step_name'] = \GO::t('complete', 'workflow');
+				$workflowResponse['step_name'] = \GO::t("Complete", "workflow");
 				$workflowResponse['is_approver'] = false;
 				$workflowResponse['step_all_must_approve'] = false;
 			} else {
@@ -411,7 +396,7 @@ abstract class AbstractJsonController extends AbstractController {
 
 
 				if ($history->step_id == '-1')
-					$step_name = \GO::t('complete', 'workflow');
+					$step_name = \GO::t("Complete", "workflow");
 				else
 					$step_name = $history->step->name;
 
@@ -422,7 +407,7 @@ abstract class AbstractJsonController extends AbstractController {
 						'ctime' => $history->ctime,
 						'comment' => $history->comment,
 						'status' => $history->status ? "1" : "0",
-						'status_name' => $history->status ? \GO::t('approved', 'workflow') : \GO::t('declined', 'workflow')
+						'status_name' => $history->status ? \GO::t("Approved", "workflow") : \GO::t("Declined", "workflow")
 				);
 
 				\GO\Base\Db\ActiveRecord::$attributeOutputMode = 'raw';
@@ -439,19 +424,21 @@ abstract class AbstractJsonController extends AbstractController {
 
 		//Get all field models and build an array of categories with their
 		//fields for display.
+		$cls = $model->customfieldsRecord->extendsModel();
+		$entityId = $cls::getType()->getId();;
 
 		$findParams = \GO\Base\Db\FindParams::newInstance()
 						->joinRelation('category')
-						->order(array('category.sort_index', 't.sort_index'), array('ASC', 'ASC'));
+						->order(array('category.sortOrder', 't.sortOrder'), array('ASC', 'ASC'));
 		$findParams->getCriteria()
-						->addCondition('extends_model', $model->customfieldsRecord->extendsModel(), '=', 'category');
+						->addCondition('entityId', $entityId, '=', 'category');
 
 		$stmt = \GO\Customfields\Model\Field::model()->find($findParams);
 
 		$categories = array();
 
 		while ($field = $stmt->fetch()) {
-			if (!isset($categories[$field->category_id])) {
+			if (!isset($categories[$field->fieldSetId])) {
 				$categories[$field->category->id]['id'] = $field->category->id;
 				$categories[$field->category->id]['name'] = $field->category->name;
 				$categories[$field->category->id]['fields'] = array();
@@ -491,190 +478,6 @@ abstract class AbstractJsonController extends AbstractController {
 		}
 
 		return $response;
-	}
-
-	private function _processFilesDisplay($model, $response) {
-		if (isset(\GO::modules()->files) && $model->hasFiles() && $response['data']['files_folder_id'] > 0) {
-			
-			$folder = \GO\Files\Model\Folder::model()->findByPk($response['data']['files_folder_id']);
-			
-			if(!$folder) {
-				$folder = $model->getFilesFolder();
-				$response['data']['files_folder_id'] = $folder->id;
-			}
-
-			if($folder) {
-				$fc = new \GO\Files\Controller\FolderController();
-				$listResponse = $fc->run("list", array('skip_fs_sync'=>true, 'folder_id' => $response['data']['files_folder_id'], "limit" => 20, "sort" => 'name', "dir" => 'ASC'), false);
-				$response['data']['files'] = $listResponse['results'];
-			}
-		} else {
-			$response['data']['files'] = array();
-		}
-		return $response;
-	}
-
-	private function _processLinksDisplay($model, $response) {
-		$findParams = \GO\Base\Db\FindParams::newInstance()
-						->limit(15);
-
-		$ignoreModelTypes = array();
-		if (\GO::modules()->calendar)
-			$ignoreModelTypes[] = \GO\Calendar\Model\Event::model()->modelTypeId();
-		if (\GO::modules()->tasks)
-			$ignoreModelTypes[] = \GO\Tasks\Model\Task::model()->modelTypeId();
-
-		$findParams->getCriteria()->addInCondition('model_type_id', $ignoreModelTypes, 't', true, true);
-
-		$stmt = \GO\Base\Model\SearchCacheRecord::model()->findLinks($model, $findParams);
-
-		$store = \GO\Base\Data\Store::newInstance(\GO\Base\Model\SearchCacheRecord::model());
-		$store->setStatement($stmt);
-
-		$columnModel = $store->getColumnModel();
-		$columnModel->formatColumn('link_count', '\GO::getModel($model->model_name)->countLinks($model->model_id)');
-		$columnModel->formatColumn('link_description', '$model->link_description');
-
-		$data = $store->getData();
-		$response['data']['links'] = $data['results'];
-
-		return $response;
-	}
-
-	private function _processEventsDisplay($model, $response) {
-		$startOfDay = \GO\Base\Util\Date::clear_time(time());
-
-		$findParams = \GO\Base\Db\FindParams::newInstance()->order('start_time', 'DESC');
-		$findParams->getCriteria()->addCondition('start_time', $startOfDay, '>=');
-
-		$stmt = \GO\Calendar\Model\Event::model()->findLinks($model, $findParams);
-
-		$store = \GO\Base\Data\Store::newInstance(\GO\Calendar\Model\Event::model());
-		$store->setStatement($stmt);
-
-		$columnModel = $store->getColumnModel();
-		$columnModel->formatColumn('calendar_name', '$model->calendar->name');
-		$columnModel->formatColumn('link_count', '$model->countLinks()');
-		$columnModel->formatColumn('link_description', '$model->link_description');
-
-		$data = $store->getData();
-		$response['data']['events'] = $data['results'];
-		
-		
-		// Process past events
-		$findParams = \GO\Base\Db\FindParams::newInstance()->order('start_time','DESC');
-		$findParams->getCriteria()->addCondition('start_time', $startOfDay, '<');						
-
-		$stmt = \GO\Calendar\Model\Event::model()->findLinks($model, $findParams);		
-
-		$store = \GO\Base\Data\Store::newInstance(\GO\Calendar\Model\Event::model());
-		$store->setStatement($stmt);
-
-		$columnModel = $store->getColumnModel();			
-		$columnModel->formatColumn('calendar_name','$model->calendar->name');
-		$columnModel->formatColumn('link_count','$model->countLinks()');
-		$columnModel->formatColumn('link_description','$model->link_description');
-		$columnModel->formatColumn('description','GO\Base\Util\StringHelper::cut_string($model->description,500)');
-
-		$data = $store->getData();
-		$response['data']['past_events']=$data['results'];
-
-		return $response;
-	}
-
-	private function _processCommentsDisplay($model, $response) {
-		$stmt = \GO\Comments\Model\Comment::model()->find(\GO\Base\Db\FindParams::newInstance()
-										->limit(5)
-										->select('t.*,cat.name AS categoryName')
-										->order('id', 'DESC')
-										->joinModel(array(
-												'model' => 'GO\Comments\Model\Category',
-												'localTableAlias' => 't',
-												'localField' => 'category_id',
-												'foreignField' => 'id',
-												'tableAlias' => 'cat',
-												'type' => 'LEFT'
-										))
-										->criteria(\GO\Base\Db\FindCriteria::newInstance()
-														->addModel(\GO\Comments\Model\Comment::model())
-														->addCondition('model_id', $model->id)
-														->addCondition('model_type_id', $model->modelTypeId())
-										));
-
-		$store = \GO\Base\Data\Store::newInstance(\GO\Comments\Model\Comment::model());
-		$store->setStatement($stmt);
-
-		$columnModel = $store->getColumnModel();
-		$columnModel->formatColumn('user_name', '$model->user->name');
-
-		$data = $store->getData();
-		foreach ($data['results'] as $k => $v) {
-			$data['results'][$k]['categoryName'] = !empty($v['categoryName']) ? $v['categoryName'] : \GO::t('noCategory', 'comments');
-		}
-		$response['data']['comments'] = $data['results'];
-
-		return $response;
-	}
-
-	private function _processTasksDisplay($model, $response) {
-		//$startOfDay = \GO\Base\Util\Date::clear_time(time());
-
-		$findParams = \GO\Base\Db\FindParams::newInstance()->order('due_time','DESC');
-		//$findParams->getCriteria()->addCondition('start_time', $startOfDay, '<=')->addCondition('status', \GO\Tasks\Model\Task::STATUS_COMPLETED, '!=');						
-		$findParams->getCriteria()->addCondition('status', \GO\Tasks\Model\Task::STATUS_COMPLETED, '!=');						
-
-		$stmt = \GO\Tasks\Model\Task::model()->findLinks($model, $findParams);		
-
-		$store = \GO\Base\Data\Store::newInstance(\GO\Tasks\Model\Task::model());
-		$store->setStatement($stmt);
-
-		$store->getColumnModel()
-						->setFormatRecordFunction(array($this, 'formatTaskLinkRecord'))
-						->formatColumn('late','$model->due_time<time() ? 1 : 0;')
-						->formatColumn('is_active','$model->isActive()')
-						->formatColumn('tasklist_name', '$model->tasklist->name')
-						->formatColumn('link_count','$model->countLinks()')
-						->formatColumn('description','GO\Base\Util\StringHelper::cut_string($model->description,500)')
-						->formatColumn('link_description','$model->link_description');		
-
-		$data = $store->getData();
-		$response['data']['tasks']=$data['results'];
-		
-		// Process linked tasks that are completed.
-		$findParams = \GO\Base\Db\FindParams::newInstance()->order('due_time','DESC');
-		//$findParams->getCriteria()->addCondition('start_time', $startOfDay, '<=')->addCondition('status', \GO\Tasks\Model\Task::STATUS_COMPLETED, '!=');						
-		$findParams->getCriteria()->addCondition('status', \GO\Tasks\Model\Task::STATUS_COMPLETED, '=');						
-
-		$stmt = \GO\Tasks\Model\Task::model()->findLinks($model, $findParams);		
-
-		$store = \GO\Base\Data\Store::newInstance(\GO\Tasks\Model\Task::model());
-		$store->setStatement($stmt);
-
-		$store->getColumnModel()
-						->setFormatRecordFunction(array($this, 'formatTaskLinkRecord'))
-						->formatColumn('late','$model->due_time<time() ? 1 : 0;')
-						->formatColumn('tasklist_name', '$model->tasklist->name')
-						->formatColumn('link_count','$model->countLinks()')
-						->formatColumn('description','GO\Base\Util\StringHelper::cut_string($model->description,500)')
-						->formatColumn('link_description','$model->link_description');		
-		
-
-		$data = $store->getData();
-		$response['data']['completed_tasks']=$data['results'];
-		
-		return $response;
-	}
-
-	public function formatTaskLinkRecord($record, $model, $cm) {
-
-		$statuses = \GO::t('statuses', 'tasks');
-
-		$record['status'] = $statuses[$model->status];
-
-		if ($model->percentage_complete > 0 && $model->status != 'COMPLETED')
-			$record['status'].= ' (' . $model->percentage_complete . '%)';
-
-		return $record;
 	}
 
 }

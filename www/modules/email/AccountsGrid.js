@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: AccountsGrid.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: AccountsGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -36,17 +36,17 @@ GO.email.AccountsGrid = function(config){
 		},
 		columns:[
 		{
-			header:GO.lang.strEmail,
+			header:t("E-mail"),
 			dataIndex: 'email'
 		},{
-			header:GO.lang.strUsername,
+			header:t("Username"),
 			dataIndex: 'username'
 		},{
-			header:GO.lang.strOwner,
+			header:t("Owner"),
 			dataIndex: 'user_name',
 			sortable: false
 		},{
-			header:GO.email.lang.host,
+			header:t("Host", "email"),
 			dataIndex: 'host'
 		},{
 			header:'SMTP',
@@ -59,16 +59,12 @@ GO.email.AccountsGrid = function(config){
 	config.view=new Ext.grid.GridView({
 		autoFill: true,
 		forceFit: true,
-		emptyText: GO.lang['strNoItems']		
+		emptyText: t("No items to display")		
 	});
 
-	this.searchField = new GO.form.SearchField({
-		store: config.store,
-		width:320
-	});
 	config.tbar = [{
 		iconCls: 'btn-add',
-		text: GO.lang.cmdAdd,
+		text: t("Add"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			
@@ -78,7 +74,7 @@ GO.email.AccountsGrid = function(config){
 		disabled: !GO.settings.modules.email.write_permission
 	},{
 		iconCls: 'btn-delete',
-		text: GO.lang.cmdDelete,
+		text: t("Delete"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			this.deleteSelected({
@@ -94,7 +90,10 @@ GO.email.AccountsGrid = function(config){
 		},
 		scope:this,
 		disabled: !GO.settings.modules.email.write_permission
-	},'-',GO.lang['strSearch'] + ':', this.searchField];
+	},'->', {
+		xtype:'tbsearch',
+		store:config.store
+	}];
 	
 	config.sm=new Ext.grid.RowSelectionModel();
 	config.loadMask=true;

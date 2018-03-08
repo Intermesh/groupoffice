@@ -235,14 +235,14 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		
 		$calendarName = empty($this->calendar) ? '' : ', '.$this->calendar->name;
 		return array(
-				'name' => $this->private ?  \GO::t('privateEvent','calendar') : $this->name.' ('.\GO\Base\Util\Date::get_timestamp($this->start_time, false).$calendarName.')',
+				'name' => $this->private ?  \GO::t("Private", "calendar") : $this->name.' ('.\GO\Base\Util\Date::get_timestamp($this->start_time, false).$calendarName.')',
 				'description' => $this->private ?  "" : $this->description,
 				'mtime'=>$this->start_time
 		);
 	}
 
 	protected function getLocalizedName() {
-		return \GO::t('event', 'calendar');
+		return \GO::t("Event", "calendar");
 	}
 
 	/**
@@ -489,9 +489,9 @@ class Event extends \GO\Base\Db\ActiveRecord {
 
 	public function attributeLabels() {
 		$attr = parent::attributeLabels();
-		$attr['repeat_end_time']=\GO::t('repeatUntil','calendar');
-		$attr['start_time']=\GO::t('startsAt','calendar');
-		$attr['end_time']=\GO::t('endsAt','calendar');
+		$attr['repeat_end_time']=\GO::t("Repeat until", "calendar");
+		$attr['start_time']=\GO::t("Starts at", "calendar");
+		$attr['end_time']=\GO::t("Ends at", "calendar");
 		return $attr;
 	}
 	
@@ -522,7 +522,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		if($resourceConflicts !== false){
 
 
-			$errorMessage = GO::t('moveEventResourceError','calendar');
+			$errorMessage = GO::t("Could not move event because the following resources are not available:", "calendar");
 
 			foreach ($resourceConflicts as $rc){
 				$errorMessage .= '<br />- '.$rc->calendar->name;
@@ -937,25 +937,25 @@ class Event extends \GO\Base\Db\ActiveRecord {
 					if($wasNew){
 
 						if ($this->status==Event::STATUS_CONFIRMED) {
-							$body = sprintf(\GO::t('resource_confirmed_mail_body','calendar'),$this->user->name,$this->calendar->name).'<br /><br />'
+							$body = sprintf(\GO::t("%s has made a booking for the resource '%s' and confirmed the booking. You are the maintainer of this resource. Use the link below if you want to decline the booking.", "calendar"),$this->user->name,$this->calendar->name).'<br /><br />'
 											. $this->toHtml()
-											. '<br /><a href="'.$url.'">'.\GO::t('open_resource','calendar').'</a>';
+											. '<br /><a href="'.$url.'">'.\GO::t("Open booking", "calendar").'</a>';
 
-							$subject = sprintf(\GO::t('resource_mail_subject','calendar'),$this->calendar->name, $this->name, \GO\Base\Util\Date::get_timestamp($this->start_time,false));
+							$subject = sprintf(\GO::t("Resource '%s' booked for '%s' on '%s'", "calendar"),$this->calendar->name, $this->name, \GO\Base\Util\Date::get_timestamp($this->start_time,false));
 						} else {
-							$body = sprintf(\GO::t('resource_mail_body','calendar'),$this->user->name,$this->calendar->name).'<br /><br />'
+							$body = sprintf(\GO::t("%s has made a booking for the resource '%s'. You are the maintainer of this resource. Please open the booking to decline or approve it.", "calendar"),$this->user->name,$this->calendar->name).'<br /><br />'
 											. $this->toHtml()
-											. '<br /><a href="'.$url.'">'.\GO::t('open_resource','calendar').'</a>';
+											. '<br /><a href="'.$url.'">'.\GO::t("Open booking", "calendar").'</a>';
 
-							$subject = sprintf(\GO::t('resource_mail_subject','calendar'),$this->calendar->name, $this->name, \GO\Base\Util\Date::get_timestamp($this->start_time,false));
+							$subject = sprintf(\GO::t("Resource '%s' booked for '%s' on '%s'", "calendar"),$this->calendar->name, $this->name, \GO\Base\Util\Date::get_timestamp($this->start_time,false));
 						}
 					}else
 					{
-						$body = sprintf(\GO::t('resource_modified_mail_body','calendar'),$this->user->name,$this->calendar->name).'<br /><br />'
+						$body = sprintf(\GO::t("%s has modified a booking for the resource '%s'. You are the maintainer of this resource. Please open the booking to decline or approve it.", "calendar"),$this->user->name,$this->calendar->name).'<br /><br />'
 										. $this->toHtml()
-										. '<br /><a href="'.$url.'">'.\GO::t('open_resource','calendar').'</a>';
+										. '<br /><a href="'.$url.'">'.\GO::t("Open booking", "calendar").'</a>';
 
-						$subject = sprintf(\GO::t('resource_modified_mail_subject','calendar'),$this->calendar->name, $this->name, \GO\Base\Util\Date::get_timestamp($this->start_time,false));
+						$subject = sprintf(\GO::t("Resource '%s' booking for '%s' on '%s' modified", "calendar"),$this->calendar->name, $this->name, \GO\Base\Util\Date::get_timestamp($this->start_time,false));
 					}
 
 					$message = \GO\Base\Mail\Message::newInstance(
@@ -976,32 +976,32 @@ class Event extends \GO\Base\Db\ActiveRecord {
 				) {
 				if($this->isModified('status')){				
 					if($this->status==Event::STATUS_CONFIRMED){
-						$body = sprintf(\GO::t('your_resource_accepted_mail_body','calendar'),\GO::user()->name,$this->calendar->name).'<br /><br />'
+						$body = sprintf(\GO::t("%s has accepted your booking for the resource '%s'.", "calendar"),\GO::user()->name,$this->calendar->name).'<br /><br />'
 								. $this->toHtml();
-								//. '<br /><a href="'.$url.'">'.\GO::t('open_resource','calendar').'</a>';
+								//. '<br /><a href="'.$url.'">'.\GO::t("Open booking", "calendar").'</a>';
 
-						$subject = sprintf(\GO::t('your_resource_accepted_mail_subject','calendar'),$this->calendar->name, $this->name, \GO\Base\Util\Date::get_timestamp($this->start_time,false));
+						$subject = sprintf(\GO::t("Your booking for '%s' on '%s' is accepted", "calendar"),$this->calendar->name, $this->name, \GO\Base\Util\Date::get_timestamp($this->start_time,false));
 					}else
 					{
-						$body = sprintf(\GO::t('your_resource_declined_mail_body','calendar'),\GO::user()->name,$this->calendar->name).'<br /><br />'
+						$body = sprintf(\GO::t("%s has declined your booking for the resource '%s'.", "calendar"),\GO::user()->name,$this->calendar->name).'<br /><br />'
 								. $this->toHtml();
-								//. '<br /><a href="'.$url.'">'.\GO::t('open_resource','calendar').'</a>';
+								//. '<br /><a href="'.$url.'">'.\GO::t("Open booking", "calendar").'</a>';
 
-						$subject = sprintf(\GO::t('your_resource_declined_mail_subject','calendar'),$this->calendar->name, $this->name, \GO\Base\Util\Date::get_timestamp($this->start_time,false));
+						$subject = sprintf(\GO::t("Your booking for '%s' on '%s' is declined", "calendar"),$this->calendar->name, $this->name, \GO\Base\Util\Date::get_timestamp($this->start_time,false));
 					}
 				}else
 				{
-					$body = sprintf(\GO::t('your_resource_modified_mail_body','calendar'),\GO::user()->name,$this->calendar->name).'<br /><br />'
+					$body = sprintf(\GO::t("%s has modified your booking for the resource '%s'.", "calendar"),\GO::user()->name,$this->calendar->name).'<br /><br />'
 								. $this->toHtml();
-//								. '<br /><a href="'.$url.'">'.\GO::t('open_resource','calendar').'</a>';
-					$subject = sprintf(\GO::t('your_resource_modified_mail_subject','calendar'),$this->calendar->name, $this->name, \GO\Base\Util\Date::get_timestamp($this->start_time,false));
+//								. '<br /><a href="'.$url.'">'.\GO::t("Open booking", "calendar").'</a>';
+					$subject = sprintf(\GO::t("Your booking for '%s' on '%s' in status '%s' is modified", "calendar"),$this->calendar->name, $this->name, \GO\Base\Util\Date::get_timestamp($this->start_time,false));
 				}
 				
 				$url = \GO::createExternalUrl('calendar', 'openCalendar', array(
 					'unixtime'=>$this->start_time
 				));
 		
-				$body .= '<br /><a href="'.$url.'">'.\GO::t('openCalendar','calendar').'</a>';
+				$body .= '<br /><a href="'.$url.'">'.\GO::t("Open calendar", "calendar").'</a>';
 
 				$message = \GO\Base\Mail\Message::newInstance(
 									$subject
@@ -1376,7 +1376,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	 * @return StringHelper 
 	 */
 	public function getLocalizedStatus(){
-		$statuses = \GO::t('statuses','calendar');
+		$statuses = \GO::t("statuses", "calendar");
 		
 		return isset($statuses[$this->status]) ? $statuses[$this->status] : $this->status;
 						
@@ -1390,30 +1390,30 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	 */
 	public function toHtml() {
 		$html = '<table id="event-'.$this->uuid.'">' .
-						'<tr><td>' . \GO::t('subject', 'calendar') . ':</td>' .
+						'<tr><td>' . \GO::t("Subject", "calendar") . ':</td>' .
 						'<td>' . $this->name . '</td></tr>';
 		
 		if($this->calendar){
-			$html .= '<tr><td>' . \GO::t('calendar', 'calendar') . ':</td>' .
+			$html .= '<tr><td>' . \GO::t("Calendar", "calendar") . ':</td>' .
 						'<td>' . $this->calendar->name . '</td></tr>';
 		}
 		
-		$html .= '<tr><td>' . \GO::t('startsAt', 'calendar') . ':</td>' .
+		$html .= '<tr><td>' . \GO::t("Starts at", "calendar") . ':</td>' .
 						'<td>' . \GO\Base\Util\Date::get_timestamp($this->start_time, empty($this->all_day_event)) . '</td></tr>' .
-						'<tr><td>' . \GO::t('endsAt', 'calendar') . ':</td>' .
+						'<tr><td>' . \GO::t("Ends at", "calendar") . ':</td>' .
 						'<td>' . \GO\Base\Util\Date::get_timestamp($this->end_time, empty($this->all_day_event)) . '</td></tr>';
 
-		$html .= '<tr><td>' . \GO::t('status', 'calendar') . ':</td>' .
+		$html .= '<tr><td>' . \GO::t("Status", "calendar") . ':</td>' .
 						'<td>' . $this->getLocalizedStatus() . '</td></tr>';
 
 
 		if (!empty($this->location)) {
-			$html .= '<tr><td style="vertical-align:top">' . \GO::t('location', 'calendar') . ':</td>' .
+			$html .= '<tr><td style="vertical-align:top">' . \GO::t("Location", "calendar") . ':</td>' .
 							'<td>' . \GO\Base\Util\StringHelper::text_to_html($this->location) . '</td></tr>';
 		}
 		
 		if(!empty($this->description)){
-			$html .= '<tr><td style="vertical-align:top">' . \GO::t('strDescription') . ':</td>' .
+			$html .= '<tr><td style="vertical-align:top">' . \GO::t("Description") . ':</td>' .
 							'<td>' . \GO\Base\Util\StringHelper::text_to_html($this->description) . '</td></tr>';
 		}
 		
@@ -1439,8 +1439,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 			$columns = $cfRecord->getColumns();
 			foreach ($columns as $column) {
 				if (isset($column['customfield'])) {
-					$colId = $column['customfield']->id;
-					$colId = 'col_'.$colId;
+					$colId = $column['customfield']->databaseName;
 					$recordAttributes = $cfRecord->getAttributes();
 					if (!empty($recordAttributes[$colId])) {
 						$colValue = $cfRecord->getAttribute($column['customfield']->name);
@@ -1460,9 +1459,9 @@ class Event extends \GO\Base\Db\ActiveRecord {
 			$html .= '<table>';
 			
 			$html .= '<tr><td colspan="3"><br /></td></tr>';
-			$html .= '<tr><td><b>'.\GO::t('participant','calendar').'</b></td><td><b>'.\GO::t('status','calendar').'</b></td><td><b>'.\GO::t('organizer','calendar').'</b></td></tr>';
+			$html .= '<tr><td><b>'.\GO::t("Participant", "calendar").'</b></td><td><b>'.\GO::t("Status", "calendar").'</b></td><td><b>'.\GO::t("Organizer", "calendar").'</b></td></tr>';
 			while($participant = $stmt->fetch()){
-				$html .= '<tr><td>'.$participant->name.'&nbsp;</td><td>'.$participant->statusName.'&nbsp;</td><td>'.($participant->is_organizer ? \GO::t('yes') : '').'</td></tr>';
+				$html .= '<tr><td>'.$participant->name.'&nbsp;</td><td>'.$participant->statusName.'&nbsp;</td><td>'.($participant->is_organizer ? \GO::t("Yes") : '').'</td></tr>';
 			}
 			$html .='</table>';
 		}
@@ -1761,7 +1760,7 @@ $sub = $offset>0;
 		
 		$this->name = (string) $vobject->summary;
 		if(empty($this->name))
-			$this->name = \GO::t('unnamed');
+			$this->name = \GO::t("Unnamed");
 		
 		$dtstart = $vobject->dtstart ? $vobject->dtstart->getDateTime() : new \DateTime();
 		$dtend = $vobject->dtend ? $vobject->dtend->getDateTime() : new \DateTime();
@@ -1899,7 +1898,7 @@ $sub = $offset>0;
 				
 				
 				$this->exception_for_event_id=$exception->event_id;
-				if (empty($this->name) || $this->name==\GO::t('unnamed'))
+				if (empty($this->name) || $this->name==\GO::t("Unnamed"))
 					$this->name = $exception->mainevent->name;
 			}else
 			{				
@@ -1917,7 +1916,7 @@ $sub = $offset>0;
 					$exception = new Exception();
 					$exception->time=$recurrenceTime;
 					$exception->event_id=$recurringEvent->id;
-					if (empty($this->name) || $this->name==\GO::t('unnamed'))
+					if (empty($this->name) || $this->name==\GO::t("Unnamed"))
 						$this->name = $exception->mainevent->name;
 				}else
 				{
@@ -1985,8 +1984,11 @@ $sub = $offset>0;
 						$installationName = !empty(\GO::config()->title) ? \GO::config()->title : 'Group-Office';
 						$validationErrStr = implode("\n", $this->getValidationErrors())."\n";
 
-						$mailSubject = str_replace(array('%cal','%event'),array($this->calendar->name,$this->name),\GO::t('eventNotSavedSubject','calendar'));
-						$body = \GO::t('eventNotSavedBody','calendar');
+						$mailSubject = str_replace(array('%cal','%event'),array($this->calendar->name,$this->name),\GO::t("Event not saved in %event calendar \"%cal\"", "calendar"));
+						$body = \GO::t("This message is from your %goname calendar. %goname attempted to import an event called \"%event\" with start time %starttime from an external calendar into calendar \"%cal\", but that could not be done because the event contained errors. The event may still be in the external calendar.
+
+The following is the error message:
+%errormessage", "calendar");
 						$body = str_replace(
 											array('%goname','%event','%starttime','%cal','%errormessage'),
 											array(
@@ -2479,7 +2481,7 @@ $sub = $offset>0;
 		if(!$organizer)
 			throw new \Exception("Could not find organizer to send message to!");
 
-		$updateReponses = \GO::t('updateReponses','calendar');
+		$updateReponses = \GO::t("updateReponses", "calendar");
 		$subject= sprintf($updateReponses[$sendingParticipant->status], $sendingParticipant->name, $this->name);
 
 
@@ -2494,19 +2496,19 @@ $sub = $offset>0;
 					'unixtime'=>$this->start_time
 				));
 		
-		$body .= '<br /><a href="'.$url.'">'.\GO::t('openCalendar','calendar').'</a>';
+		$body .= '<br /><a href="'.$url.'">'.\GO::t("Open calendar", "calendar").'</a>';
 
 //		if(!$this->getOrganizerEvent()){
 			//organizer is not a Group-Office user with event. We must send a message to him an ICS attachment
 		if($includeIcs){
 			$ics=$this->toICS("REPLY", $sendingParticipant, $recurrenceTime);				
-			$a = Swift_Attachment::newInstance($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="REPLY"');
+			$a = new Swift_Attachment($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="REPLY"');
 			$a->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
 			$a->setDisposition("inline");
 			$message->attach($a);
 			
 			//for outlook 2003 compatibility
-			$a2 = Swift_Attachment::newInstance($ics, 'invite.ics', 'application/ics');
+			$a2 = new Swift_Attachment($ics, 'invite.ics', 'application/ics');
 			$a2->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
 			$message->attach($a2);
 		}
@@ -2540,7 +2542,7 @@ $sub = $offset>0;
 					\GO::language()->setLanguage($user->language);
 			}
 
-			$subject =  \GO::t('cancellation','calendar').': '.$this->name;
+			$subject =  \GO::t("Cancellation", "calendar").': '.$this->name;
 
 			//create e-mail message
 			$message = \GO\Base\Mail\Message::newInstance($subject)
@@ -2551,19 +2553,19 @@ $sub = $offset>0;
 			//check if we have a Group-Office event. If so, we can handle accepting and declining in Group-Office. Otherwise we'll use ICS calendar objects by mail
 			$participantEvent = $participant->getParticipantEvent();
 
-			$body = '<p>'.\GO::t('cancelMessage','calendar').': </p>'.$this->toHtml();					
+			$body = '<p>'.\GO::t("The following event has been cancelled by the organizer", "calendar").': </p>'.$this->toHtml();					
 			
 //			if(!$participantEvent){
 				
 
 				$ics=$this->toICS("CANCEL");				
-				$a = \Swift_Attachment::newInstance($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="CANCEL"');
+				$a = new \Swift_Attachment($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="CANCEL"');
 				$a->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
 				$a->setDisposition("inline");
 				$message->attach($a);
 				
 				//for outlook 2003 compatibility
-				$a2 = \Swift_Attachment::newInstance($ics, 'invite.ics', 'application/ics');
+				$a2 = new \Swift_Attachment($ics, 'invite.ics', 'application/ics');
 				$a2->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
 				$message->attach($a2);
 				
@@ -2573,7 +2575,7 @@ $sub = $offset>0;
 				'unixtime'=>$this->start_time
 				));
 
-				$body .= '<br /><a href="'.$url.'">'.\GO::t('openCalendar','calendar').'</a>';
+				$body .= '<br /><a href="'.$url.'">'.\GO::t("Open calendar", "calendar").'</a>';
 			}
 
 			$message->setHtmlAlternateBody($body);
@@ -2629,13 +2631,13 @@ $sub = $offset>0;
 
 					//if participant status is pending then send a new inviation subject. Otherwise send it as update			
 					if(!$update){
-						$subject = \GO::t('invitation', 'calendar').': '.$this->name;
-						$bodyLine = \GO::t('invited', 'calendar');
+						$subject = \GO::t("Invitation", "calendar").': '.$this->name;
+						$bodyLine = \GO::t("You are invited for the following event", "calendar");
 
 					}else
 					{
-						$subject = \GO::t('invitation_update', 'calendar').': '.$this->name;
-						$bodyLine = \GO::t('eventUpdated', 'calendar');
+						$subject = \GO::t("Updated invitation", "calendar").': '.$this->name;
+						$bodyLine = \GO::t("The following event has been updated by the organizer", "calendar");
 					}				
 
 					//create e-mail message
@@ -2663,24 +2665,24 @@ $sub = $offset>0;
 	//				}
 					$body .= 
 
-							'<p><br /><b>' . \GO::t('linkIfCalendarNotSupported', 'calendar') . '</b></p>' .
-							'<p>' . \GO::t('acccept_question', 'calendar') . '</p>' .
-							'<a href="'.$acceptUrl.'">'.\GO::t('accept', 'calendar') . '</a>' .
+							'<p><br /><b>' . \GO::t("Only use the links below if your mail client does not support calendaring functions.", "calendar") . '</b></p>' .
+							'<p>' . \GO::t("Do you accept this event?", "calendar") . '</p>' .
+							'<a href="'.$acceptUrl.'">'.\GO::t("Accept", "calendar") . '</a>' .
 							'&nbsp;|&nbsp;' .
-							'<a href="'.$declineUrl.'">'.\GO::t('decline', 'calendar') . '</a>';
+							'<a href="'.$declineUrl.'">'.\GO::t("Decline", "calendar") . '</a>';
 
 	//				if($participantEvent){	
 						$body .= '</div>';
 	//				}
 
 					$ics=$this->toICS("REQUEST");				
-					$a = \Swift_Attachment::newInstance($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="REQUEST"');
+					$a = new \Swift_Attachment($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="REQUEST"');
 					$a->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
 					$a->setDisposition("inline");
 					$message->attach($a);
 
 					//for outlook 2003 compatibility
-					$a2 = \Swift_Attachment::newInstance($ics, 'invite.ics', 'application/ics');
+					$a2 = new \Swift_Attachment($ics, 'invite.ics', 'application/ics');
 					$a2->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
 					$message->attach($a2);
 
@@ -2689,7 +2691,7 @@ $sub = $offset>0;
 						'unixtime'=>$this->start_time
 						));
 
-						$body .= '<br /><a href="'.$url.'">'.\GO::t('openCalendar','calendar').'</a>';
+						$body .= '<br /><a href="'.$url.'">'.\GO::t("Open calendar", "calendar").'</a>';
 					}
 
 					$message->setHtmlAlternateBody($body);

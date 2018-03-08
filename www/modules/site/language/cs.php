@@ -1,164 +1,120 @@
 <?php
-
-$l["name"] = "Stránky";
-$l["description"] = "Modul, který umožňuje vytvářet stránky pomocí vlastního CMS.";
-
-$l["content"] = "Obsah";
-$l["site"] = "Webová stránka";
-
-$l["meta"] = "Meta";
-$l["metaDescriptionText"] = "Meta tags are a great way for webmasters to provide search engines with information about their sites.";
-
-$l["info"] = "Informace";
-$l["infoDescriptionText"] = "Information about this content item";
-
-$l["siteOptionsDescriptionText"] = "Information about the options";
-
-
-$l["siteFile"]="Site File";
-$l["siteMultiFile"]="Site Multifile";
-
-$l["template"] = "Šablona";
-$l["defaultChildTemplate"] = "Default child template";
-$l["templateDescriptionText"] = "Vyberte šablonu pomocí které chcete zobrazit tento obsah";
-
-$l["save"] = "Uložit";
-$l["reload"] = "Znovu načíst";
-$l["advanced"] = "Rozšířené možnosti";
-$l["options"] = "Možnosti";
-
-$l["addContent"] = "Přidat obsah";
-
-$l["deleteContent"] = "Smazat obsah";
-$l["deleteContentConfirm"] = "Opravdu chcete smazat položku s tímto obsahem";
-$l["deleteContentHasChildren"] = "Nemůžete smazat tuto položku protože obsahuje podpoložky. Prosím smažte nejdříve všechny podpoložky.";
-
-$l["deleteSite"] = "Smazat webovou stránku";
-$l["deleteSiteConfirm"] = "Opravdu chcete smazat tuto webovou stránku";
-
-// Language for model: GO_Site_Model_Content
-$l["contentId"] = "ID";
-$l["contentUser_id"] = "Uživatel";
-$l["contentCtime"] = "Vytvořeno";
-$l["contentMtime"] = "Modifikováno";
-$l["contentTitle"] = "Název";
-$l["contentSlug"] = "Slug";
-$l["contentMeta_title"] = "Meta název";
-$l["contentMeta_description"] = "Meta popis";
-$l["contentMeta_keywords"] = "Meta klíčová slova";
-$l["contentContent"] = "Obsah";
-$l["contentStatus"] = "Status";
-$l["contentParent_id"] = "Předchůzce";
-$l["contentSite_id"] = "Webová stránka";
-$l["contentSort_order"] = "Řazení";
-
-// Language for model: GO_Site_Model_Site
-$l["siteId"] = "ID";
-$l["siteName"] = "Název";
-$l["siteUser_id"] = "Uživatel";
-$l["siteMtime"] = "Modifikováno";
-$l["siteCtime"] = "Vytvořeno";
-$l["siteDomain"] = "Doména";
-$l["siteModule"] = "Modul";
-$l["siteSsl"] = "SSL";
-$l["siteMod_rewrite"] = "Mod rewrite";
-$l["siteMod_rewrite_base_path"] = "Mod rewrite base path";
-$l["siteBase_path"] = "Base path";
-$l["siteLanguage"] = "Jazyk";
-$l["siteAcl_id"] = "ACL";
-
-
-$l["multifile"] = "Více souborů";
-$l["multifileSelectValue"] = "%s soubor(ů)";
-
-// Frontend language
-$l['login'] = 'Přihlášení';
-$l['register'] = 'Registrace';
-$l['signUp'] = 'Přihlásit';
-$l['forgotPassword'] = 'Zapomenuté heslo';
-$l['passwordChanged'] = 'Heslo změněno';
-$l['changePassword'] = 'Změna hesla';
-$l['changePasswordText'] = 'Použijte následující formulář ke změně hesla';
-$l['alreadySignedupText'] = 'Pokud již vlastníte uživatelské jméno a heslo použijte tento formulář k přihlášení.';
-$l['forgotPasswordText'] = 'Vyplňte e-mailovou adresu v následujícím formuláři a během několika minut obdržíte odkaz pro obnovu Vašeho hesla.';
-$l['submit'] = 'Odeslat';
-$l['noemail'] = 'Nebyla zadána platná emailová adresa!';
-$l['invalidusertoken'] = 'The provided usertoken is not valid!';
-$l['invaliduser'] = 'Nebyl nalezen žádný uživatel s touto emailovou adresou!';
-$l['recoverEmailSent'] = 'E-mail s dalšími instrukcemi byl odeslán na následující e-mailovou adresu:';
-$l['resetPasswordSuccess'] = 'Vaše heslo bylo úspěšně vyresetováno.';
-
-$l["attachFilesPC"]='Přidat z počítače';
-$l["attachFilesGO"]='Přidat z {product_name}';
-
-$l["imageEditor"]='Přizpůsobit obrázek';
-
-$l["imgWidth"]='Šířka';
-$l["imgHeight"]='Výška';
-
-$l["dimensions"]='Rozměry';
-$l["alignment"]='Zarovnání';
-
-$l["imgZoom"]='Změna velikosti';
-$l["imgCrop"]='Oříznout';
-
-$l["imgAlignmentLeft"]='Vlevo';
-$l["imgAlignmentCenter"]='Na střed';
-$l["imgAlignmentRight"]='Vpravo';
-$l["imgAlignmentInline"]='Do bloku';
-
-$l["imgDimensions"]='Rozměry (š x v)';
-
-$l["imgDimensionSmall"]='Malý';
-$l["imgDimensionMedium"]='Střední';
-$l["imgDimensionLarge"]='Velký';
-$l["imgDimensionCustom"]='Volitelný';
-$l["imgAlt"]='Alternativní text';
-
-$l["imageExample"] = "Příklad obrázku";
-
-$l["notImplementedYet"] = "Dosud neimplementováno";
-$l["otherOptions"] = "Další možnosti";
-
-$l['linkEditor']= "Vložit odkaz";
-$l['linkTitle']= "Titulek odkazu";
-$l['linkToContent']= "Odkaz na položku obsahu";
-$l['linkToContentText']= "Odkaz na položku obsahu v rámci tohoto webu. Dvojklikem na tuto položku ji vyberete";
-$l['linkToFile']= "Odkaz na soubor";
-$l['linkToFileText']= "Odkaz na soubor, který jste nahráli na těchto stránkách.";
-$l['linkToUrl']= "Odkaz na URL adresu";
-$l['linkToUrlText']= "Můžete také zadat vlastní URL adresu, prosím zkontrolujte jestli jste přidali http(s):// pro správnou funkčnost.";
-$l['url']= "URL adresa";
-$l['file']= "Soubor";
-$l['openInNewWindow']= "Otevřít v novém okně";
-$l['selectFile']= "Vybrat soubor";
-$l['menus']= "Menu";
-$l['addMenuItem']= "Nová položka";
-$l['addMenu']= "Přidat menu";
-$l['delete']= "Odstranit";
-$l['properties']= "Vlastnosti";
-$l['menuItem']= "Položka menu";
-$l['deleteMenuHasChildren']= "Vybraná položka menu již má podpoložky a proto nemůže bát smazána.";
-$l['deleteMenu']= "Smazat položku";
-$l['deleteMenuConfirm']= "Jste si jistý, že chcete opravdu smazat tuto položku menu?";
-$l['menu']= "Menu";
-$l['menuId']= "ID";
-$l['menuSite_id']= "Stránka";
-$l['menuLabel']= "Štítek";
-$l['menuMenu_slug']= "Slug";
-$l['menuitemLabel']= "Štítek";
-$l['menuitemMenu_id']= "Menu";
-$l['menuitemId']= "ID";
-$l['menuitemParent_id']= "Nadřazená";
-$l['menuitemContent_id']= "Obsah";
-$l['menuitemUrl']= "URL adresa";
-$l['menuitemDisplay_children']= "Zobrazit podpoložky";
-$l['menuitemSort_order']= "Objednávka";
-$l['menuitemTarget']= "Cíl";
-$l['sureCreateContentMenuItemTitle']= "Vytvořte položku z obsahu";
-$l['sureCreateContentMenuItem']= "Jste si jisti, že chcete vytvořit položku v menu z této položky obsahu?";
-
-$l['lostPassword']= 'Ztracené heslo';
-$l['rememberMe']= 'Zapamatovat si mě';
-$l['createNewPassword']= 'Vytvořit nové heslo pomocí vaší e-mailové adresy';
-$l['linkToOriginal']='Připojení k originálu';
+return array (
+  'Content' => 'Obsah',
+  'Site' => 'Stránka',
+  'Info' => 'Informace',
+  'Template' => 'Šablona',
+  'Choose a template in which you want to view this content item' => 'Vyberte šablonu pomocí které chcete zobrazit tento obsah',
+  'Save' => 'Uložit',
+  'Reload' => 'Znovu načíst',
+  'Advanced options' => 'Rozšířené možnosti',
+  'Options' => 'Možnosti',
+  'Add content' => 'Přidat obsah',
+  'Delete content' => 'Smazat obsah',
+  'Are you sure that you want to delete this content item' => 'Opravdu chcete smazat položku s tímto obsahem',
+  'You cannot delete this item because it has subitems. Please delete the subitems first.' => 'Nemůžete smazat tuto položku protože obsahuje podpoložky. Prosím smažte nejdříve všechny podpoložky.',
+  'Delete site' => 'Smazat webovou stránku',
+  'Are you sure that you want to delete this site' => 'Opravdu chcete smazat tuto webovou stránku',
+  'User' => 'Uživatel',
+  'Created' => 'Vytvořeno',
+  'Modified' => 'Modifikováno',
+  'Title' => 'Název',
+  'Meta title' => 'Meta název',
+  'Meta description' => 'Meta popis',
+  'Meta keywords' => 'Meta klíčová slova',
+  'Parent' => 'Nadřazená',
+  'Sort' => 'Řazení',
+  'Name' => 'Název',
+  'Domain' => 'Doména',
+  'Module' => 'Modul',
+  'Language' => 'Jazyk',
+  'Multi File' => 'Více souborů',
+  '%s file(s)' => '%s soubor(ů)',
+  'Login' => 'Přihlášení',
+  'Register' => 'Registrace',
+  'Sign up' => 'Přihlásit',
+  'Forgot password?' => 'Zapomenuté heslo',
+  'Password changed' => 'Heslo změněno',
+  'Change password' => 'Změna hesla',
+  'Use the below form to change your password' => 'Použijte následující formulář ke změně hesla',
+  'If you already have a username and password use this form to login.' => 'Pokud již vlastníte uživatelské jméno a heslo použijte tento formulář k přihlášení.',
+  'Fill in your email address in the form below, and you\'ll recieve a link to recover your password within minutes.' => 'Vyplňte e-mailovou adresu v následujícím formuláři a během několika minut obdržíte odkaz pro obnovu Vašeho hesla.',
+  'Submit' => 'Odeslat',
+  'No email given!' => 'Nebyla zadána platná emailová adresa!',
+  'No user found with the given email address!' => 'Nebyl nalezen žádný uživatel s touto emailovou adresou!',
+  'An email with recover instructions is send to the following email address:' => 'E-mail s dalšími instrukcemi byl odeslán na následující e-mailovou adresu:',
+  'Your password is successfully reset.' => 'Vaše heslo bylo úspěšně vyresetováno.',
+  'Add from PC' => 'Přidat z počítače',
+  'Add from {product_name}' => 'Přidat z {product_name}',
+  'Customize image' => 'Přizpůsobit obrázek',
+  'Width' => 'Šířka',
+  'Height' => 'Výška',
+  'Dimensions' => 'Rozměry',
+  'Alignment' => 'Zarovnání',
+  'Zoom' => 'Změna velikosti',
+  'Crop' => 'Oříznout',
+  'Left' => 'Vlevo',
+  'Center' => 'Na střed',
+  'Right' => 'Vpravo',
+  'Inline' => 'Do bloku',
+  'Dimensions (WxH)' => 'Rozměry (š x v)',
+  'Small' => 'Malý',
+  'Medium' => 'Střední',
+  'Large' => 'Velký',
+  'Custom' => 'Volitelný',
+  'Alt text' => 'Alternativní text',
+  'Image example' => 'Příklad obrázku',
+  'Not yet implemented' => 'Dosud neimplementováno',
+  'Other options' => 'Další možnosti',
+  'Insert link' => 'Vložit odkaz',
+  'Link title' => 'Titulek odkazu',
+  'Link to content item' => 'Odkaz na položku obsahu',
+  'Link to a content item within this site. Doubleclick on an item to select it.' => 'Odkaz na položku obsahu v rámci tohoto webu. Dvojklikem na tuto položku ji vyberete',
+  'Link to file' => 'Odkaz na soubor',
+  'Link to a file that you have uploaded within this site.' => 'Odkaz na soubor, který jste nahráli na těchto stránkách.',
+  'Link to url' => 'Odkaz na URL adresu',
+  'You can also type in your own url, please make sure you add http(s):// to it to make the url work.' => 'Můžete také zadat vlastní URL adresu, prosím zkontrolujte jestli jste přidali http(s):// pro správnou funkčnost.',
+  'Url' => 'URL adresa',
+  'File' => 'Soubor',
+  'Open in new window' => 'Otevřít v novém okně',
+  'Select file' => 'Vybrat soubor',
+  'Menu\'s' => 'Menu',
+  'New item' => 'Nová položka',
+  'Add menu' => 'Přidat menu',
+  'Delete' => 'Odstranit',
+  'Properties' => 'Vlastnosti',
+  'Menu item' => 'Položka menu',
+  'The selected menu-item has children and cannot be deleted.' => 'Vybraná položka menu již má podpoložky a proto nemůže bát smazána.',
+  'Delete menu item' => 'Smazat položku',
+  'Do you really want to delete this menu item?' => 'Jste si jistý, že chcete opravdu smazat tuto položku menu?',
+  'Label' => 'Štítek',
+  'Display children' => 'Zobrazit podpoložky',
+  'Order' => 'Objednávka',
+  'Target' => 'Cíl',
+  'Create menu item from content' => 'Vytvořte položku z obsahu',
+  'Are you sure that you want to create a menu item from this content item?' => 'Jste si jisti, že chcete vytvořit položku v menu z této položky obsahu?',
+  'Lost password' => 'Ztracené heslo',
+  'Remember me' => 'Zapamatovat si mě',
+  'Create a new password using your email address' => 'Vytvořit nové heslo pomocí vaší e-mailové adresy',
+  'Link to original' => 'Připojení k originálu',
+  'name' => 'Stránky',
+  'description' => 'Modul, který umožňuje vytvářet stránky pomocí vlastního CMS.',
+  'Meta' => 'Meta',
+  'Meta tags are a great way for webmasters to provide search engines with information about their sites.' => 'Meta tags are a great way for webmasters to provide search engines with information about their sites.',
+  'Information about this content item' => 'Information about this content item',
+  'Information about the options' => 'Information about the options',
+  'Site File' => 'Site File',
+  'Site Multifile' => 'Site Multifile',
+  'Default child template' => 'Default child template',
+  'ID' => 'ID',
+  'Slug' => 'Slug',
+  'Status' => 'Status',
+  'SSL' => 'SSL',
+  'Mod rewrite' => 'Mod rewrite',
+  'Mod rewrite base path' => 'Mod rewrite base path',
+  'Base path' => 'Base path',
+  'ACL' => 'ACL',
+  'The provided usertoken is not valid!' => 'The provided usertoken is not valid!',
+  'Add from Group-Office' => 'Přidat z {product_name}',
+  'Menu' => 'Menu',
+);

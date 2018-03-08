@@ -6,29 +6,33 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: AddresslistsGrid.js 21434 2017-09-14 12:59:40Z wsmits $
+ * @version $Id: AddresslistsGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
 GO.addressbook.AddresslistsGrid = Ext.extend(GO.grid.GridPanel,{
 	
-	noDelete: !(GO.settings.modules.addressbook.permission_level >= GO.permissionLevels.write),
-	standardTbarDisabled : !(GO.settings.modules.addressbook.permission_level >= GO.permissionLevels.write),
 	
 	initComponent : function(){
+		
+		Ext.apply(this, {
+			noDelete: !(GO.settings.modules.addressbook.permission_level >= GO.permissionLevels.write),
+	standardTbarDisabled : !(GO.settings.modules.addressbook.permission_level >= GO.permissionLevels.write),
+	
+		});
 
 		var fields = {
 			fields:['id', 'name', 'user_name','acl_id'],
 			columns:[{
-				header: GO.lang.strId,
+				header: t("ID"),
 				dataIndex: 'id',
 				hidden:true,				
 				width:30
 			},{
-				header: GO.lang.strName,
+				header: t("Name"),
 				dataIndex: 'name'
 			},{
-				header: GO.addressbook.lang.cmdOwner,
+				header: t("Owner", "addressbook"),
 				dataIndex: 'user_name' ,
 				sortable: false
 			}
@@ -43,7 +47,7 @@ GO.addressbook.AddresslistsGrid = Ext.extend(GO.grid.GridPanel,{
 		
 		Ext.apply(this,{
 			id: 'ab-addresslist-grid',
-			title:GO.addressbook.lang.cmdPanelMailings,
+			title:t("Address lists", "addressbook"),
 			standardTbar:true,
 			store: new GO.data.JsonStore({
 				url: GO.url('addressbook/addresslist/store'),
@@ -61,7 +65,7 @@ GO.addressbook.AddresslistsGrid = Ext.extend(GO.grid.GridPanel,{
 			paging:true,
 			editDialogClass:GO.addressbook.AddresslistDialog,
 			view:new Ext.grid.GridView({
-				emptyText: GO.lang['strNoItems'],
+				emptyText: t("No items to display"),
 				autoFill: true,
 				forceFit: true
 			}),

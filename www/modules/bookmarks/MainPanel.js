@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: MainPanel.js 18927 2015-03-23 08:53:45Z wsmits $
+ * @version $Id: MainPanel.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Twan Verhofstad
  */
@@ -40,7 +40,7 @@ GO.bookmarks.MainPanel = function(config){
 		triggerAction: 'all',
 		editable: true,
 		width:200,
-		emptyText:GO.bookmarks.lang.showAll,
+		emptyText:t("Show all", "bookmarks"),
 		selectOnFocus :false,
 		listeners:{
 			clear:function(){
@@ -53,11 +53,6 @@ GO.bookmarks.MainPanel = function(config){
 			//this.setValue(record.data[this.displayField]);
 			}
 		}
-	});
-
-	this.searchField = new GO.form.SearchField({
-		store: GO.bookmarks.groupingStore ,
-		width:220
 	});
 
 	this.bookmarkColumnView = new GO.bookmarks.BookmarkColumnView({store:GO.bookmarks.groupingStore});
@@ -77,7 +72,6 @@ GO.bookmarks.MainPanel = function(config){
 		layout:'card',
 		border:false,
 		activeItem: 0,
-		tbar: [GO.bookmarks.lang.category+':',this.selectCategory,'-',GO.lang.strSearch+':',this.searchField],
 		layoutConfig: {
 			deferredRender: true
 		},
@@ -88,42 +82,24 @@ GO.bookmarks.MainPanel = function(config){
 	});
 
 	config.tbar=new Ext.Toolbar({
-		cls:'go-head-tb',
+
 		items: [{
-			xtype:'htmlcomponent',
-			html:GO.bookmarks.lang.name,
-			cls:'go-module-title-tbar'
-		},{
 			iconCls: 'btn-add',
-			text: GO.lang['cmdAdd'],
-			cls: 'x-btn-text-icon',
+			text: t("Add"),
 			handler: function(){
 				GO.bookmarks.showBookmarksDialog({edit:0});
 			},
 			scope:this
-//		},{
-//			itemId:'refresh',
-//			iconCls: 'btn-refresh',
-//			text: GO.lang['cmdRefresh'],
-//			cls: 'x-btn-text-icon',
-//			handler: function(){
-//				GO.bookmarks.groupingStore.reload();
-//				this.bookmarkColumnView.refresh();
-//				this.bmView.DV.refresh();
-//			},
-//			scope: this
-		},{ 
-			text: GO.bookmarks.lang.toggle,
-			iconCls: 'btn-refresh',
-			cls: 'x-btn-text-icon',
+		},{
+			text: t("Toggle view", "bookmarks"),
+			iconCls: 'btn-thumbnails',
 			handler: function(){
 				this.nextLayout();
 			},
 			scope:this
 		},{
 			iconCls: 'no-btn-categories',
-			text: GO.bookmarks.lang.administrateCategories,
-			cls: 'x-btn-text-icon',
+			text: t("Administrate categories", "bookmarks"),
 			hidden: !GO.settings.modules.bookmarks.write_permission,
 			handler: function(){
 				if(!this.categoriesDialog)
@@ -141,6 +117,14 @@ GO.bookmarks.MainPanel = function(config){
 				this.categoriesDialog.show();
 			},
 			scope: this
+		},t("Category", "bookmarks"),this.selectCategory,'->',
+		{
+			xtype:'tbsearch',
+			store:GO.bookmarks.groupingStore,
+			onSearch: function(v) {
+				this.store.baseParams.query = v
+				this.store.reload();
+			}
 		}]
 	});
  
@@ -243,7 +227,7 @@ GO.bookmarks.openBookmark = function(record)
 // bookmark verwijderen
 GO.bookmarks.removeBookmark = function(record)
 {
-	if(confirm(GO.bookmarks.lang.confirmDelete))
+	if(confirm(t("Are you sure you want to delete this bookmark?", "bookmarks")))
 	{
 
 		GO.request({
@@ -257,7 +241,7 @@ GO.bookmarks.removeBookmark = function(record)
 				var responseParams = Ext.decode(response.responseText);
 				if(!responseParams.success)
 				{
-					Ext.MessageBox.alert(GO.lang['strError'],responseParams.feedback);
+					Ext.MessageBox.alert(t("Error"),responseParams.feedback);
 				}
 				else
 				{
@@ -271,6 +255,6 @@ GO.bookmarks.removeBookmark = function(record)
 
 // bookmark module toevoegen aan modulemanager
 GO.moduleManager.addModule('bookmarks', GO.bookmarks.MainPanel, {
-	title : GO.bookmarks.lang.bookmarks,
+	title : t("Bookmarks", "bookmarks"),
 	iconCls : 'go-tab-icon-bookmarks'
 });

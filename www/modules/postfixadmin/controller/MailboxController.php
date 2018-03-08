@@ -98,7 +98,7 @@ class MailboxController extends \GO\Base\Controller\AbstractModelController {
 		}
 		
 		if ($params['password']!=$params['password2'])
-			throw new \Exception(\GO::t('passwordMatchError'));
+			throw new \Exception(\GO::t("The passwords didn't match"));
 		
 		if(empty($params['password']))
 			unset($params['password']);

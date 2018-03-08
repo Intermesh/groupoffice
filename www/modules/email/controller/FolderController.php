@@ -108,7 +108,7 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 				
 		$mailbox = new \GO\Email\Model\ImapMailbox($account, array("name"=>$params["mailbox"]));
 		if($mailbox->isSpecial())
-			throw new \Exception(\GO::t("cantDeleteSpecialFolder","email"));
+			throw new \Exception(\GO::t("You can't delete the trash, sent items or drafts folder", "email"));
 			
 		
 		if(strpos($params['mailbox'],$account->trash) !== 0 && !empty($account->trash)) {
@@ -189,7 +189,7 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 		$sourceMailbox = new \GO\Email\Model\ImapMailbox($account, array("name"=>$params["sourceMailbox"]));
 		
 		if($sourceMailbox->isSpecial())
-			throw new \Exception(\GO::t("cantMoveSpecialFolder","email"));
+			throw new \Exception(\GO::t("You can't move the trash, sent items or drafts folder", "email"));
 		
 		$targetMailbox = new \GO\Email\Model\ImapMailbox($account, array("name"=>$params["targetMailbox"]));
 			

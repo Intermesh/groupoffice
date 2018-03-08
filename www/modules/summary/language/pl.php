@@ -1,27 +1,25 @@
 <?php
-
-
-$l["summary"]= 'Podsumowanie';
-$l["noItems"]= 'Nie masz żadnych modułów na swojej stronie startowej.';
-$l["selectPortlet"]= 'Wybierz portlet';
-$l["hotTopics"]= 'Newsy';
-$l["enterRssFeed"]= 'Podaj adres URL dla kanału RSS:';
-$l["notes"]= 'Notatki';
-$l["loadingFeed"]= 'Wczytywanie danych...';
-$l["goToPost"]= 'Pokaż wiadomość';
-$l["today"]= 'Dzisiaj ';
-$l["dueTime"]="Pokaż do";
-$l["title"]="Tytuł";
-$l["manageAnnouncements"]='Zarządzaj powiadomieniami';
-$l["webFeeds"]='Zarządzanie kanałami';
-$l["type"]='Typ';
-$l["summaryType"]='Streszczenie';
-$l["rssFeeds"]='Kanały RSS';
-$l["noRssFeeds"]='Nie został dodany żaden kanał RSS.<br />Aby dodać kanały, kliknij przycisk ustawień w górnym prawym rogu tego okna.';
-
-$l['name']='Podsumowanie';
-$l['description']='Podsumowanie informacji z różnych modułów';
-$l['default_rss_url']='http://www.money.pl/rss/main.xml';
-$l['announcement']='Powiadomienie';
-$l['announcements']='Powiadomienia';
-$l['default_rss_title']='News';
+return array (
+  'You don\'t have any items on your start page.' => 'Nie masz żadnych modułów na swojej stronie startowej.',
+  'Select portlet' => 'Wybierz portlet',
+  'News' => 'Newsy',
+  'Please enter the RSS feed URL:' => 'Podaj adres URL dla kanału RSS:',
+  'Notes' => 'Notatki',
+  'Loading Feed...' => 'Wczytywanie danych...',
+  'Go to Post' => 'Pokaż wiadomość',
+  'Today ' => 'Dzisiaj ',
+  'Show until' => 'Pokaż do',
+  'Title' => 'Tytuł',
+  'Manage announcements' => 'Zarządzaj powiadomieniami',
+  'Manage webfeeds' => 'Zarządzanie kanałami',
+  'Type' => 'Typ',
+  'Summary' => 'Streszczenie',
+  'Rss Feeds' => 'Kanały RSS',
+  'No RSS feeds have been added.<br />Click the settings button in the top right corner of this window to add feeds.' => 'Nie został dodany żaden kanał RSS.<br />Aby dodać kanały, kliknij przycisk ustawień w górnym prawym rogu tego okna.',
+  'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml' => 'http://www.money.pl/rss/main.xml',
+  'Announcement' => 'Powiadomienie',
+  'Announcements' => 'Powiadomienia',
+  'name' => 'Podsumowanie',
+  'description' => 'Podsumowanie informacji z różnych modułów',
+  'Start page' => 'Podsumowanie',
+);

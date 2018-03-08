@@ -12,7 +12,7 @@
  * Build the find params object with the criteria inside
  *
  * @package GO.base.db
- * @version $Id: Query.php 19784 2016-01-26 13:56:16Z michaelhart86 $
+ * @version $Id: Query.php 21970 2017-12-18 09:23:20Z mschering $
  * @copyright Copyright Intermesh BV.
  * @author Michael de Hart <mdhart@intermesh.nl> 
  */
@@ -236,7 +236,7 @@ class Query {
     }
 	
 	/**
-	 * Join by table (eg. `join(array('go_users', 'go_users.id = user_id'))
+	 * Join by table (eg. `join(array('core_user', 'core_user.id = user_id'))
 	 * @param StringHelper $tableName
 	 * @param array $condition key value pair of primary_key => foreign_key
 	 * @see where() for conditions

@@ -7,7 +7,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: MediawikiModule.php 18900 2015-03-12 09:23:10Z mschering $
+ * @version $Id: MediawikiModule.php 21640 2017-11-07 11:25:37Z mschering $
  * @copyright Copyright Intermesh
  * @author Michael de Hart <mdhart@intermesh.nl>
  */
@@ -33,15 +33,5 @@ class MediawikiModule extends Module{
 	
 	public function autoInstall() {
 		return false;
-	}
-	
-	
-	public function install() {
-		parent::install();
-		return;
-		$category = new Category();
-		$category->name=GO::t('general','notes');
-		$category->save();
-		$category->acl->addGroup(GO::config()->group_everyone, Acl::READ_PERMISSION);
 	}
 }

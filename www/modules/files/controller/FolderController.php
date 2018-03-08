@@ -236,20 +236,20 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 //					$folder->checkFsSync();
 
 					$node = $this->_folderToNode($folder, $expandFolderIds, true, $showFiles);
-					$node['text'] = \GO::t('personal', 'files');
-					$node['iconCls'] = 'folder-home';
+					$node['text'] = \GO::t("Personal", "files");
+					$node['iconCls'] = 'ic-home';
 					$node['path'] = $folder->path;
 					$response[] = $node;
 
 
 					$node = array(
-							'text' => \GO::t('shared', 'files'),
+							'text' => \GO::t("Shared", "files"),
 							'id' => 'shared',
 							'readonly' => true,
 							'draggable' => false,
 							'allowDrop' => false,
 							'parent_id'=>0,
-							'iconCls' => 'folder-shares',
+							'iconCls' => 'ic-folder-shared',
 							'path'=>"shared"							
 					);
 					
@@ -267,7 +267,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 						if ($contactsFolder) {
 							$node = $this->_folderToNode($contactsFolder, $expandFolderIds, false, $showFiles);
 							$node['path'] = $contactsFolder->path;
-							$node['text'] = \GO::t('addressbook', 'addressbook');
+							$node['text'] = \GO::t("Address book", "addressbook");
 							$response[] = $node;
 						}
 					}
@@ -279,7 +279,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 						if ($projectsFolder) {
 							$node = $this->_folderToNode($projectsFolder, $expandFolderIds, false, $showFiles);
 							$node['path'] = $projectsFolder->path;
-							$node['text'] = \GO::t('projects', 'projects');
+							$node['text'] = \GO::t("projects", "projects");
 							$response[] = $node;
 						}
 					}
@@ -291,7 +291,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 						if ($projectsFolder) {
 							$node = $this->_folderToNode($projectsFolder, $expandFolderIds, false, $showFiles);
 								$node['path'] = $projectsFolder->path;
-							$node['text'] = \GO::t('projects', 'projects2');
+							$node['text'] = \GO::t("Projects", "projects2");
 							$response[] = $node;
 						}
 					}
@@ -302,7 +302,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 						
 						$node = $this->_folderToNode($logFolder, $expandFolderIds, false, $showFiles);
 						$node['path'] = $logFolder->path;
-						$node['text']=\GO::t('logFiles');
+						$node['text']=\GO::t("Log files");
 						
 						$response[]=$node;
 					}
@@ -343,7 +343,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 				'text' => $folder->name,
 				'id' => $folder->id,
 				'draggable' => false,
-				'iconCls' => !$folder->acl_id || $folder->readonly ? 'folder-default' : 'folder-shared',
+				'iconCls' => !$folder->acl_id || $folder->readonly ? 'ic-folder' : 'ic-folder-shared',
 				'expanded' => $expanded,
 				'parent_id'=>$folder->parent_id,
 				'path'=>$folder->path
@@ -471,7 +471,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 	protected function afterDisplay(&$response, &$model, &$params) {
 		$response['data']['path'] = $model->path;
-		$response['data']['type'] = \GO::t('folder', 'files');
+		$response['data']['type'] = \GO::t("Folder", "files");
 		
 		$response['data']['url']=$model->externalUrl;
 
@@ -751,6 +751,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		$findParams = $store->getDefaultParams($params);
 
 		//sorting on custom fields doesn't work for folders
+		//TODO
 		if(isset($params['sort']) && substr($params['sort'],0,4)=='col_')
 			$findParams->order ("name", $params['dir']);
 
@@ -890,7 +891,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		if ($model instanceof \GO\Files\Model\Folder) {
 			$record['type_id'] = 'd:' . $model->id;
-			$record['type'] = \GO::t('folder', 'files');
+			$record['type'] = \GO::t("Folder", "files");
 			$record['size'] = '-';
 			$record['extension'] = 'folder';
 			$record['readonly']=$model->readonly;
@@ -1068,6 +1069,42 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		
 		return $folder->id;
 	}
+	
+	
+	protected function checkEntityFolder($params) {
+		$cls = $params['model'];
+		
+		$entity = $cls::findById($params['id']);
+		
+		if(empty($entity->filesFolderId)) {
+			$filesPath = $entity->getType()->getModule()->name. '/'. $entity->getType()->getName() . '/' . $entity->id;
+			$aclId =$entity->findAclId();
+			$folder = \GO\Files\Model\Folder::model()->findByPath($filesPath,true, array('acl_id'=>$aclId,'readonly'=>1));
+
+			if(!$folder){
+				throw new \Exception("Failed to create folder ".$filesPath);
+			}
+	//      if (!empty($model->acl_id))
+	//          $folder->acl_id = $model->acl_id;
+
+			$folder->acl_id=$aclId;
+
+			$folder->visible = 0;
+			$folder->readonly = 1;
+			$folder->systemSave = true;
+			$folder->save(true);
+
+			$entity->filesFolderId = $folder->id;
+			if(!$entity->save()) {
+				throw new \Exception("Could not save entity!");
+			}
+		}
+		
+		return [
+				"success" => true,
+				"files_folder_id" => $entity->filesFolderId
+		];
+	}
 
 	/**
 	 * check if a model folder exists
@@ -1076,7 +1113,14 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 	 * @return type
 	 */
 	protected function actionCheckModelFolder($params) {
-		$model = \GO::getModel($params['model'])->findByPk($params['id'],false, true);
+		$cls = \GO::getModel($params['model']);
+		
+		if(is_a($cls, \go\core\orm\Entity::class, true)) {
+			$params['model'] = $cls;
+			return $this->checkEntityFolder($params);
+		}
+		
+		$model = $cls->findByPk($params['id'],false, true);
 
 		$response['success'] = true;
 		$response['files_folder_id'] = $this->checkModelFolder($model, true, !empty($params['mustExist']));
@@ -1210,7 +1254,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		$archiveFile = new \GO\Base\Fs\File(\GO::config()->file_storage_path.$destinationFolder->path . '/' . $params['archive_name'] . '.zip');
 		
 		if($archiveFile->exists())
-			throw new \Exception(sprintf(\GO::t('filenameExists','files'), $archiveFile->stripFileStoragePath()));
+			throw new \Exception(sprintf(\GO::t("Filename %s already exists", "files"), $archiveFile->stripFileStoragePath()));
 		
 		$sourceObjects = array();
 		for($i=0;$i<count($sources);$i++){			
@@ -1266,7 +1310,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			
 			if($totalFileSize >= $maxFilesize){
 				throw new \Exception(sprintf(
-					\GO::t('zipFilesizeTooBig','base'), 
+					\GO::t("The total size of the files that are selected to be zipped is too big. (Only %s is allowed.)"), 
 					\GO\Base\Util\Number::formatSize($maxFilesize,2)
 				));
 			}
@@ -1282,7 +1326,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		// Create the zipped temp file object
 		$archiveFile = \GO\Base\Fs\File::tempFile($params['archive_name'],'zip');
 		if($archiveFile->exists())
-			throw new \Exception(sprintf(\GO::t('filenameExists','files'), $archiveFile->stripFileStoragePath()));
+			throw new \Exception(sprintf(\GO::t("Filename %s already exists", "files"), $archiveFile->stripFileStoragePath()));
 		
 		// Create the zipfile
 		if(\GO\Base\Fs\Zip::create($archiveFile, $workingFolder, $sourceObjects)){

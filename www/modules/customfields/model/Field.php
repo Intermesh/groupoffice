@@ -12,10 +12,10 @@
  * @property string $validation_regex
  * @property boolean $required
  * @property string $function
- * @property int $sort_index
+ * @property int $sortOrder
  * @property string $datatype
  * @property string $name
- * @property int $category_id
+ * @property int $fieldSetId
  * @property int $id
  * @property boolean $unique_values
  * @property int $number_decimals
@@ -45,16 +45,16 @@ class Field extends \GO\Base\Db\ActiveRecord{
 	}
 	
 	public function tableName() {
-		return 'cf_fields';
+		return 'core_customfields_field';
 	}
 	
 	public function aclField() {
-		return 'category.acl_id';
+		return 'category.aclId';
 	}
 	
 	public function relations() {
 		return array(
-				'category' => array('type' => self::BELONGS_TO, 'model' => 'GO\Customfields\Model\Category', 'field' => 'category_id'),
+				'category' => array('type' => self::BELONGS_TO, 'model' => 'GO\Customfields\Model\Category', 'field' => 'fieldSetId'),
 				'treeOptions'=>array('type' => self::HAS_MANY, 'model' => 'GO\Customfields\Model\FieldTreeSelectOption', 'field' => 'field_id','delete'=>true),
 				'selectOptions'=>array('type' => self::HAS_MANY, 'model' => 'GO\Customfields\Model\FieldSelectOption', 'field' => 'field_id','delete'=>true)
 			);
@@ -65,18 +65,16 @@ class Field extends \GO\Base\Db\ActiveRecord{
 	 * @return String 
 	 */
 	public function columnName(){
-		return 'col_'.$this->id;
+		return $this->databaseName;
 	}
 	
 	protected function init() {
 		
-//		$this->columns['max']['gotype']='number';
+		$this->columns['options']['gotype']='raw';
 //		$this->columns['height']['gotype']='number';
 		
 		$this->columns['name']['required']=true;
-		$this->columns['max_length']['gotype']='number';
-		$this->columns['max_length']['decimals']=0;
-		
+			
 		parent::init();
 	}
 	
@@ -90,12 +88,12 @@ class Field extends \GO\Base\Db\ActiveRecord{
 	
 	public function validate() {		
 		
-		if(!empty($this->validation_regex)){
+		if(!empty($this->validationRegex)){
 			$this->_regex_has_errors=false;
 			set_error_handler(array($this,"exception_error_handler"));
-			preg_match($this->validation_regex, "");
+			preg_match($this->validationRegex, "");
 			if($this->_regex_has_errors)
-				$this->setValidationError ("validation_regex", \GO::t("invalidRegex","customfields"));
+				$this->setValidationError ("validationRegex", \GO::t("The regular expression is invalid.", "customfields"));
 			
 			restore_error_handler();
 		}
@@ -106,8 +104,24 @@ class Field extends \GO\Base\Db\ActiveRecord{
 	protected function afterSave($wasNew) {
 		
 		$this->alterDatabase($wasNew);
-		
+				
 		return parent::afterSave($wasNew);
+	}
+	
+	public function setOptions($value) {
+		$existing = empty($this->_attributes['options']) ? [] : json_decode($this->_attributes['options'], true);
+		$this->_attributes['options'] = json_encode(array_merge($existing, $value));
+	}
+	
+	public function getOptions() {
+		return json_decode($this->_attributes['options'], true);
+	}
+	
+	public function getOption($name) {
+		$options = $this->getOptions();
+		
+		return isset($options[$name]) ? $options[$name] : null;
+		
 	}
 	
 	protected function afterDuplicate(&$duplicate) {
@@ -120,13 +134,20 @@ class Field extends \GO\Base\Db\ActiveRecord{
 		
 	public function alterDatabase($wasNew){
 		$table=$this->category->customfieldsTableName();
+		
+		$fieldSql = $this->customfieldtype->fieldSql();
+		
+		foreach($this->getOptions() as $key => $value) {
+			$fieldSql = str_replace('%' . $key .'%', $value, $fieldSql);
+		}
 					
 		if($wasNew){			
-			$sql = "ALTER TABLE `".$table."` ADD `".$this->columnName()."` ".str_replace('%MAX_LENGTH',$this->max_length,$this->customfieldtype->fieldSql()).";";
+			$sql = "ALTER TABLE `".$table."` ADD `".$this->databaseName."` ".$fieldSql.";";
 			
 		}else
 		{
-			$sql = "ALTER TABLE `".$table."` CHANGE `".$this->columnName()."` `".$this->columnName()."` ".str_replace('%MAX_LENGTH',$this->max_length,$this->customfieldtype->fieldSql());
+			$oldName = $this->isModified('databaseName') ? $this->getOldAttributeValue("databaseName") : $this->databaseName;
+			$sql = "ALTER TABLE `".$table."` CHANGE `".$oldName."` `".$this->databaseName."` ".$fieldSql;
 			
 		}		
 		//don't be strict in upgrade process
@@ -154,8 +175,14 @@ class Field extends \GO\Base\Db\ActiveRecord{
 	 */
 	private function _clearColumnCache(){
 	  //deleted cached column schema. See AbstractCustomFieldsRecord			
-		\GO\Base\Db\Columns::clearCache(\GO::getModel(\GO::getModel($this->category->extends_model)->customfieldsModel()));
-		\GO::cache()->delete('customfields_'.$this->category->extends_model);	
+		if(!$this->category->isForEntity()) {
+			\GO\Base\Db\Columns::clearCache(\GO::getModel(\GO::getModel($this->category->extendsModel)->customfieldsModel()));
+			\GO::cache()->delete('customfields_'.$this->category->extendsModel);
+		} else
+		{
+			\go\core\db\Table::getInstance($this->category->customfieldsTableName())->clearCache();
+							
+		}
 	}
 	
 	public function hasLength() {
@@ -216,35 +243,48 @@ class Field extends \GO\Base\Db\ActiveRecord{
 		$nestingLevel = $this->getTreeSelectNestingLevel();
 
 		for($i=1;$i<$nestingLevel;$i++){
-			$field =Field::model()->findSingleByAttributes(array('treemaster_field_id'=>$this->id,'nesting_level'=>$i));
+			$field = $this->findTreeSelectSlave($this->id, $i);
 
 			if(!$field){
 				$field = new Field();
 				$field->name=$this->name.' '.$i;
+				$field->databaseName = $this->databaseName.$i; 
 				$field->datatype='GO\Customfields\Customfieldtype\TreeselectSlave';
-				$field->treemaster_field_id=$this->id;
-				$field->nesting_level=$i;
-				$field->category_id=$this->category_id;
+				$field->setOptions (array_merge($this->getOptions(), ['treeMasterFieldId' => $this->id, 'nestingLevel' => $i]));
+				$field->fieldSetId=$this->fieldSetId;
 				$field->save();
 			}				
 		}
+	}
+	
+	private function findTreeSelectSlave($treeMasterFieldId, $nestingLevel) {
+		$fields = Field::model()->findByAttributes(['datatype' => 'GO\Customfields\Customfieldtype\TreeselectSlave', 'fieldSetId' => $this->fieldSetId]);
+		foreach($fields as $field) {
+			$o = $field->getOptions();
+			if($o['treeMasterFieldId'] == $treeMasterFieldId && $o['nestingLevel'] == $nestingLevel) {
+				return $field;
+			}
+		}
+		
+		return false;
 	}
 	
 	protected function beforeSave() {
 		
 		if(!$this->customfieldtype->hasLength()){
 			//user may not set length so take the default
-			$this->max_length = $this->customfieldtype->getMaxLength();
+			$this->setOptions(['maxLength' => $this->customfieldtype->getMaxLength()]);
 		}
 		
 		if($this->isNew)
-			$this->sort_index=$this->count();		
+			$this->sortOrder=$this->count();		
 		
-		$this->addressbook_ids = preg_replace('/[^\d^,]/','',$this->addressbook_ids);
-		if (strlen($this->addressbook_ids)>0 && $this->addressbook_ids[0]==',')
-			$this->addressbook_ids = substr($this->addressbook_ids,1);
-		if (strlen($this->addressbook_ids)>0 && $this->addressbook_ids[strlen($this->addressbook_ids)-1]==',')
-			$this->addressbook_ids = substr($this->addressbook_ids,0,-1);
+//		$this->addressbook_ids = preg_replace('/[^\d^,]/','',$this->addressbook_ids);
+//		if (strlen($this->addressbook_ids)>0 && $this->addressbook_ids[0]==',')
+//			$this->addressbook_ids = substr($this->addressbook_ids,1);
+//		if (strlen($this->addressbook_ids)>0 && $this->addressbook_ids[strlen($this->addressbook_ids)-1]==',')
+//			$this->addressbook_ids = substr($this->addressbook_ids,0,-1);
+		
 		
 		return parent::beforeSave();
 	}
@@ -252,16 +292,16 @@ class Field extends \GO\Base\Db\ActiveRecord{
 	/**
 	 * Get or create field if not exists
 	 * 
-	 * @param int $category_id
+	 * @param int $fieldSetId
 	 * @param StringHelper $fieldName
 	 * @return \Field 
 	 */
-	public function createIfNotExists($category_id, $fieldName, $createAttributes=array()){
-		$field = Field::model()->findSingleByAttributes(array('category_id'=>$category_id,'name'=>$fieldName));
+	public function createIfNotExists($fieldSetId, $fieldName, $createAttributes=array()){
+		$field = Field::model()->findSingleByAttributes(array('fieldSetId'=>$fieldSetId,'name'=>$fieldName));
 		if(!$field){
 			$field = new Field();
 			$field->setAttributes($createAttributes, false);
-			$field->category_id=$category_id;
+			$field->fieldSetId=$fieldSetId;
 			$field->name=$fieldName;
 			$field->save();
 		}
@@ -314,7 +354,11 @@ class Field extends \GO\Base\Db\ActiveRecord{
 	 * @return Field
 	 */
 	public function findByModel($modelName, $permissionLevel=  \GO\Base\Model\Acl::READ_PERMISSION){
-		$findParams = \GO\Base\Db\FindParams::newInstance()->joinRelation('category')->order('sort_index');
+		
+		$entityId = $modelName::getType()->getId();;		
+		
+		
+		$findParams = \GO\Base\Db\FindParams::newInstance()->joinRelation('category')->order('sortOrder');
 		
 		if($permissionLevel){
 			$findParams->permissionLevel($permissionLevel);
@@ -323,7 +367,15 @@ class Field extends \GO\Base\Db\ActiveRecord{
 			$findParams->ignoreAcl();
 		}
 		
-		$findParams->getCriteria()->addCondition('extends_model', $modelName,'=','category');
+		$findParams->getCriteria()->addCondition('entityId', $entityId,'=','category');
 		return $this->find($findParams);
 	}
+	
+	public function getAttributes($outputType = null) {
+		$attr = parent::getAttributes($outputType);
+		$attr['options'] = $this->getOptions();
+		
+		return $attr;
+	}
+	
 }

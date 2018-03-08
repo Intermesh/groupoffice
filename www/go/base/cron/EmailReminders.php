@@ -23,7 +23,7 @@ class EmailReminders extends AbstractCron {
 	 * @return String
 	 */
 	public function getLabel(){
-		return \GO::t('cronEmailReminders','email');
+		return \GO::t("Email reminders", "email");
 	}
 	
 	/**
@@ -32,7 +32,7 @@ class EmailReminders extends AbstractCron {
 	 * @return String
 	 */
 	public function getDescription(){
-		return \GO::t('cronEmailRemindersDescription','email');
+		return \GO::t("This cron handles the email reminders", "email");
 	}
 	
 	/**
@@ -76,15 +76,15 @@ class EmailReminders extends AbstractCron {
 
 //					var_dump($relatedModel->name);
 
-//					$modelName = $relatedModel ? $relatedModel->localizedName : \GO::t('unknown');
-				$subject = \GO::t('reminder').': '.$reminderModel->name;
+//					$modelName = $relatedModel ? $relatedModel->localizedName : \GO::t("Unknown");
+				$subject = \GO::t("Reminder").': '.$reminderModel->name;
 
 				$time = !empty($reminderModel->vtime) ? $reminderModel->vtime : $reminderModel->time;
 
 				date_default_timezone_set($userModel->timezone);
 
-				$body = \GO::t('time').': '.date($userModel->completeDateFormat.' '.$userModel->time_format,$time)."\n";
-				$body .= \GO::t('name').': '.str_replace('<br />',',',$reminderModel->name)."\n";
+				$body = \GO::t("Time").': '.date($userModel->completeDateFormat.' '.$userModel->time_format,$time)."\n";
+				$body .= \GO::t("Name").': '.str_replace('<br />',',',$reminderModel->name)."\n";
 
 //					date_default_timezone_set(\GO::user()->timezone);
 

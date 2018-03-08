@@ -1,44 +1,48 @@
 <?php
-
-
-$l["files"]='Filer';
-$l["template"]= 'Skabelon';
-$l["manageTemplates"]= 'Rediger skabeloner';
-$l["downloadTemplate"]= 'Download skabelon';
-$l["enterName"]= 'Angiv et navn';
-$l["pleaseEnterName"]= 'Venligst angiv et navn';
-$l["pleaseEnterNameArchive"]= 'Venligst angiv et navn til arkivet';
-$l["startTransfer"]= 'Start overførsel';
-$l["addFolder"]= 'Tilføj folder';
-$l["errorOneItem"]= 'Venligst vælg kun et emne';
-$l["activateSharing"]= 'Aktiver deling';
-$l["notifyChanges"]= 'Informer mig om ændringer i denne folder';
-$l["comments"]= 'Kommentarer';
-$l["downloadGOTA"]= 'Download med GOTA';
-$l["fileBrowser"]= 'Fil browser';
-$l["thumbnails"]= 'Miniaturer';
-$l["saveFile"]='Gem fil';
-$l["confirmOverwrite"]='{filename} eksisterer allerede, ønsker du at overskrive denne fil?';
-$l['name'] = 'Filer';
-$l['description'] = 'Fil modul; Modul til deling af filer.';
-$lang['link_type'][6]='Fil';
-$l['fileNotFound'] = 'Fil ikke fundet';
-$l['folderExists'] = 'Folderen eksisterer allerede';
-$l['filenameExists'] = 'Filnavn eksisterer allerede';
-$l['uploadedSucces'] = 'Fil overført - OK';
-$l['ootextdoc']='Open-Office tekst dokument';
-$l['wordtextdoc']='Microsoft Word dokument';
-$l['personal']='Personlig';
-$l['shared']='Delt';
-$l['general']='Generelt';
-$l['folder_modified_subject']='Ændringer i {product_name} folder';
-$l['folder_modified_body']='Du har anmodet om orientering ved ændringer i:
+return array (
+  'Template' => 'Skabelon',
+  'Manage templates' => 'Rediger skabeloner',
+  'Download template' => 'Download skabelon',
+  'Enter a name' => 'Angiv et navn',
+  'Please enter a name' => 'Venligst angiv et navn',
+  'Please enter a name for the archive' => 'Venligst angiv et navn til arkivet',
+  'Start transfer' => 'Start overførsel',
+  'Add folder' => 'Tilføj folder',
+  'Please select only one item' => 'Venligst vælg kun et emne',
+  'Activate sharing' => 'Aktiver deling',
+  'Notify me about changes in this folder' => 'Informer mig om ændringer i denne folder',
+  'Comments' => 'Kommentarer',
+  'Download with GOTA' => 'Download med GOTA',
+  'File browser' => 'Fil browser',
+  'Thumbnails' => 'Miniaturer',
+  'Save file' => 'Gem fil',
+  '{filename} already exists, do you want to overwrite the file?' => '{filename} eksisterer allerede, ønsker du at overskrive denne fil?',
+  'Sorry, the file you tried to download is not found.' => 'Fil ikke fundet',
+  'The folder already exists' => 'Folderen eksisterer allerede',
+  'Filename %s already exists' => 'Filnavn eksisterer allerede',
+  'File uploaded successfully' => 'Fil overført - OK',
+  'Open-Office Text document' => 'Open-Office tekst dokument',
+  'Microsoft Word document' => 'Microsoft Word dokument',
+  'Personal' => 'Personlig',
+  'Shared' => 'Delt',
+  'General' => 'Generelt',
+  'Changes to {product_name} folder' => 'Ændringer i {product_name} folder',
+  'You requested to be notified when changes are made to:
+%s
+The following changes were made by %s:
+%s;
+' => 'Du har anmodet om orientering ved ændringer i:
 %s
 Følgende ændringer blev foretaget af %s:
 %s;
-';
-$l['modified']='Ændret';
-$l['new']='Ny';
-$l['deleted']='Slettet';
-$l['file']='Fil';
-$l['folder']='Folder';
+',
+  'Modified' => 'Ændret',
+  'New' => 'Ny',
+  'Deleted' => 'Slettet',
+  'File' => 'Fil',
+  'name' => 'Filer',
+  'description' => 'Fil modul; Modul til deling af filer.',
+  'Files' => 'Filer',
+  'Changes to Group-Office folder' => 'Ændringer i {product_name} folder',
+  'Folder' => 'Folder',
+);

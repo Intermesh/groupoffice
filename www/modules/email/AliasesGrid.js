@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: AliasesGrid.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: AliasesGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -29,10 +29,10 @@ GO.email.AliasesGrid = function(config){
 		},
 		columns:[
 		{
-			header: GO.lang.strName, 
+			header: t("Name"), 
 			dataIndex: 'name'
 		},{
-			header: GO.email.lang.email, 
+			header: t("Email", "email"), 
 			dataIndex: 'email'
 		}]
 	});
@@ -41,7 +41,7 @@ GO.email.AliasesGrid = function(config){
 	config.view=new Ext.grid.GridView({
 		autoFill: true,
 		forceFit: true,
-		emptyText: GO.lang['strNoItems']		
+		emptyText: t("No items to display")		
 	});
 	config.sm=new Ext.grid.RowSelectionModel();
 	config.loadMask=true;
@@ -55,7 +55,7 @@ GO.email.AliasesGrid = function(config){
 		}, this);
 	config.tbar=[{
 			iconCls: 'btn-add',							
-			text: GO.lang['cmdAdd'],
+			text: t("Add"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 				this.aliasDialog.formPanel.baseParams.account_id=this.account_id;
@@ -64,7 +64,7 @@ GO.email.AliasesGrid = function(config){
 			scope: this
 		},{
 			iconCls: 'btn-delete',
-			text: GO.lang['cmdDelete'],
+			text: t("Delete"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 				this.deleteSelected({

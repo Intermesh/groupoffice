@@ -1,26 +1,22 @@
 <?php
-
-
-	$l['name'] = 'Moduler';
-	$l['description'] = 'Adminmodul för att hantera, installera resp. avinstallera moduler.';
-	$l['deleteModule'] = 'Modulen "Moduler" kan inte raderas!';
-
-$l["modules"]= 'Moduler';
-$l["cmdSaveChanges"]= 'Spara ändringar';
-$l["cmdInstall"]= 'Installera';
-$l["cmdUninstall"]= 'Avinstallera';
-$l["cmdAvailableModules"]= 'Tillgängliga moduler';
-$l["cmdModuleName"]= 'Modulnamn';
-$l["cmdModuleDescription"]= 'Beskrivning';
-$l["cmdGridColumnModuleName"]= 'Modulnamn';
-$l["cmdUninstallMessage"]= 'VARNING! All data i denna modul kommer raderas! Är du säker på att du vill avinstallera dessa "{0}" moduler?';
-$l["cmdModulesCannotBeDeleted"]= 'Modulen "Moduler" kan inte raderas!';
-
-$l['enabled']='Aktiverad';
-$l['sort_order']='Sortering';
-$l['buyLicenses']='Köp licenser';
-$l['addToCart']="Lägg till i varukorg";
-$l['selectUsersForPackage']='Välj användare för paket {package}';
-$l['trialLicense']="30 dagars prova på licens";
-$l['trialLicenseTitle']="30 dagars prova på licens";
-$l['trialLicenseText']="Få en gratis 30 dagars prova på med obegränsat antal användare och alla moduler. Klicka på 'Ja' för att fortsätta till vår shop och få din gratislicens. Om du inte har ett shop konto behöver du skapa ett.";
+return array (
+  'The module "Modules" cannot be deleted!' => 'Modulen "Moduler" kan inte raderas!',
+  'Save changes' => 'Spara ändringar',
+  'Install' => 'Installera',
+  'Uninstall' => 'Avinstallera',
+  'Available Modules' => 'Tillgängliga moduler',
+  'Module name' => 'Modulnamn',
+  'Description' => 'Beskrivning',
+  'WARNING! All data of this module will be deleted! Are you sure you want to uninstall the "{0}" module?' => 'VARNING! All data i denna modul kommer raderas! Är du säker på att du vill avinstallera dessa "{0}" moduler?',
+  'The module "Modules" cannot be deleted!.' => 'Modulen "Moduler" kan inte raderas!',
+  'Enabled' => 'Aktiverad',
+  'Sort order' => 'Sortering',
+  'Buy licenses' => 'Köp licenser',
+  'Add to shopping cart' => 'Lägg till i varukorg',
+  'Select users for package {package}' => 'Välj användare för paket {package}',
+  '30 day trial license' => '30 dagars prova på licens',
+  'Get a free 30 day trial with unlimited users and all available modules. Click \'Yes\' to continue to our shop and get your trial license. If you don\'t have a shop account you\'ll need to register.' => 'Få en gratis 30 dagars prova på med obegränsat antal användare och alla moduler. Klicka på \'Ja\' för att fortsätta till vår shop och få din gratislicens. Om du inte har ett shop konto behöver du skapa ett.',
+  'name' => 'Moduler',
+  'description' => 'Adminmodul för att hantera, installera resp. avinstallera moduler.',
+  'Modules' => 'Moduler',
+);

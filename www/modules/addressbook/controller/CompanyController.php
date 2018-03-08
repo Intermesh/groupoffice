@@ -308,7 +308,7 @@ class CompanyController extends \GO\Base\Controller\AbstractModelController {
 		
 		if(!$response['success']){
 			$count = count($response['failedToMove']);
-			$response['feedback'] = sprintf(\GO::t('cannotMoveError'),$count);
+			$response['feedback'] = sprintf(\GO::t("%s item(s) cannot be moved, you do not have the right permissions."),$count);
 		}
 		
 		return $response;
@@ -365,7 +365,7 @@ class CompanyController extends \GO\Base\Controller\AbstractModelController {
 // 
 //	protected function afterAttributes(&$attributes, &$response, &$params, \GO\Base\Db\ActiveRecord $model) {
 //		//unset($attributes['t.company_id']);
-//		$attributes['employees.name'] = array('name'=>'employees.name','label'=>\GO::t('cmdPanelEmployee', 'addressbook'));
+//		$attributes['employees.name'] = array('name'=>'employees.name','label'=>\GO::t("Employee", "addressbook"));
 //		return parent::afterAttributes($attributes, $response, $params, $model);
 //	}
 	
@@ -517,7 +517,7 @@ class CompanyController extends \GO\Base\Controller\AbstractModelController {
 		$addresslists = \GO\Addressbook\Model\Addresslist::model()->find($findParams);
 		foreach ($addresslists as $rec) {
 			
-			$attributes['addresslist_'. $rec->id] = array('name'=>'addresslist.addresslist_' . $rec->id, 'label'=>'' .GO::t('addresslists', 'addressbook'). ': ' .$rec->name, 'gotype'=>'boolean');
+			$attributes['addresslist_'. $rec->id] = array('name'=>'addresslist.addresslist_' . $rec->id, 'label'=>'' .GO::t("Address Lists", "addressbook"). ': ' .$rec->name, 'gotype'=>'boolean');
 			
 		}
 		

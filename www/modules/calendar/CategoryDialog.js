@@ -6,7 +6,7 @@ GO.calendar.CategoryDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		
 		Ext.apply(this, {
 			goDialogId:'category',
-			title:GO.calendar.lang.category,
+			title:t("Category", "calendar"),
 			formControllerUrl: 'calendar/category',
       width: 550,
       height: 600
@@ -18,7 +18,7 @@ GO.calendar.CategoryDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 	buildForm : function () {
 		
 		this.colorField = new GO.form.ColorField({
-			fieldLabel : GO.lang.color,
+			fieldLabel : t("Color"),
 			value : 'EBF1E2',
 			anchor:'50%',
 			name : 'color',
@@ -160,12 +160,12 @@ GO.calendar.CategoryDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		
 		
 		this.propertiesPanel = new Ext.Panel({
-			title:GO.lang['strProperties'],			
+			title:t("Properties"),			
 			cls:'go-form-panel',
 			layout:'form',
 			items:[{
 				xtype: 'textfield',
-				fieldLabel: GO.lang['strName'],
+				fieldLabel: t("Name"),
 				name: 'name',
 				anchor:'95%',
 				allowBlank:false

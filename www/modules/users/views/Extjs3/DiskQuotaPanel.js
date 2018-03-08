@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: DiskQuotaPanel.js 16018 2013-10-22 12:26:17Z michaelhart86 $
+ * @version $Id: DiskQuotaPanel.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Michael de Hart <mdhart@intermesh.nl>
  */
@@ -16,17 +16,17 @@ GO.users.DiskQuotaPanel = Ext.extend(Ext.Panel,{
 		
 		Ext.apply(this,{
 			border:false,
-			//title: GO.users.lang['diskQuota'],
+			//title: t("Disk Quota", "users"),
 			layout:'form',
 			items: [{
 					xtype: 'fieldset',
-					title: GO.users.lang['diskSpace'],
+					title: t("Disk Space", "users"),
 					items: [{
 						xtype: 'compositefield',
 						items: [{
 								xtype: 'numberfield',
 								name: 'disk_quota',
-								fieldLabel: GO.users.lang['diskQuota'],
+								fieldLabel: t("Disk Quota", "users"),
 								decimals: 0
 							},{
 								xtype: 'displayfield',
@@ -36,7 +36,7 @@ GO.users.DiskQuotaPanel = Ext.extend(Ext.Panel,{
 					{
 						xtype: 'displayfield',
 						name: 'disk_usage',
-						fieldLabel: GO.users.lang['spaceUsed'],
+						fieldLabel: t("Space used", "users"),
 						setValue: function(v) {
 							this.setRawValue(Math.round(v/1024/1024*100)/100+'MB');
 							return this;

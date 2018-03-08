@@ -148,7 +148,7 @@ class TrialController extends \GO\Site\Components\Controller {
 			throw new Exception('You must set a maximum number of users');
 
 		if (!\GO\Base\Util\StringHelper::validate_email($config['webmaster_email']))
-			throw new Exception(\GO::t('invalidEmail','servermanager'));
+			throw new Exception(\GO::t("Please enter a valid e-mail address", "servermanager"));
 		
 		$tmpFile = \GO\Base\Fs\File::tempFile('', 'php');
 		

@@ -257,7 +257,7 @@ class MultiSelectGrid {
 				$this->_store->setTitle(\GO\Base\Util\StringHelper::encodeHtml ($model->$titleAttribute));	
 		}else
 		{
-		$this->_store->setTitle($count.' '.\GO::t('multiselectSelected'));		
+		$this->_store->setTitle($count.' '.\GO::t("selected"));		
 		}
 	}
 	

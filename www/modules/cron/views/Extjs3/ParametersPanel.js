@@ -1,5 +1,5 @@
 GO.cron.ParametersPanel = Ext.extend(Ext.Panel, {
-	title: GO.cron.lang['parameters'],
+	title: t("Params", "cron"),
 	cls: 'go-form-panel',
 	layout: 'form',
 	labelWidth: 100,

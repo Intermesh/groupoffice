@@ -26,7 +26,7 @@ GO.modules.BuyDialog = Ext.extend(GO.Window, {
 			autoExpandColumn: 'name',
 			noSingleSelect:true,
 			extraColumns:[{
-				header: GO.lang['strUsername'],
+				header: t("Username"),
 				dataIndex: "username",
 				id: "username",
 				width: 200
@@ -68,7 +68,7 @@ GO.modules.BuyDialog = Ext.extend(GO.Window, {
 		this.items = [this.usersGrid, this.formPanel];
 		
 		this.buttons=[{
-			text:GO.lang.cmdCancel,
+			text:t("Cancel"),
 			handler:function(){
 				this.hide();
 				
@@ -76,7 +76,7 @@ GO.modules.BuyDialog = Ext.extend(GO.Window, {
 			},
 			scope:this
 		},{
-				text:GO.modules.lang.addToCart,
+				text:t("Add to shopping cart", "modules"),
 				scope:this,
 				handler:function(){
 					
@@ -100,7 +100,7 @@ GO.modules.BuyDialog = Ext.extend(GO.Window, {
 	},
 	setModule: function(record) {
 		
-		this.setTitle(GO.modules.lang.selectUsersForPackage.replace('{package}',record.data.package));
+		this.setTitle(t("Select users for package {package}", "modules").replace('{package}',record.data.package));
 		
 		this.usersGrid.store.baseParams.module=record.id;
 		this.moduleField.setValue(record.id);

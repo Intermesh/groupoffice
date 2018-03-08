@@ -1,5 +1,5 @@
 GO.moduleManager.addModule('phpbb3', GO.panel.IFrameComponent, {
-	title : GO.phpbb3.lang.forum,
+	title : t("Forum", "phpbb3"),
 	iconCls : 'go-tab-icon-forum',
 	url:GO.url('phpbb3/bridge/redirect'),
 	reloadOnShow:true,

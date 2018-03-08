@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: TasklistFavoritesList.js 16391 2013-12-03 10:01:29Z wsmits $
+ * @version $Id: TasklistFavoritesList.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
@@ -17,18 +17,18 @@ GO.favorites.TasklistFavoritesList = Ext.extend(GO.grid.MultiSelectGrid,{
 		
 		Ext.apply(this,{
 			id : 'fav-tasklist-grid',
-			title:GO.favorites.lang.favorites,
+			title:t("Favorites", "favorites"),
 			allowNoSelection:true,
 			tools: [{
-				text:GO.favorites.lang.manageFavorites,
+				text:t("Manage favorites", "favorites"),
 				id:'gear',
 				handler:function(){
 					if(!GO.favorites.tasklistFavoritesDialog){
 						GO.favorites.tasklistFavoritesDialog = new GO.base.model.multiselect.dialog({
 							url:'favorites/tasklistFavorites',
-							columns:[{ header: GO.lang['strName'], dataIndex: 'name', sortable: true }],
+							columns:[{ header: t("Name"), dataIndex: 'name', sortable: true }],
 							fields:['id','name'],
-							title:GO.favorites.lang.favorites,
+							title:t("Favorites", "favorites"),
 							model_id:GO.settings.user_id
 						});
 					}
@@ -39,9 +39,9 @@ GO.favorites.TasklistFavoritesList = Ext.extend(GO.grid.MultiSelectGrid,{
 				},
 				scope: this
 			},{
-				text:GO.lang.selectAll,
+				text:t("Select all"),
 				id:'plus',
-				qtip:GO.lang.selectAll,
+				qtip:t("Select all"),
 				handler:function(){this.selectAll();},
 				scope: this
 			}],
@@ -50,7 +50,7 @@ GO.favorites.TasklistFavoritesList = Ext.extend(GO.grid.MultiSelectGrid,{
 				items:[this.searchField = new GO.form.SearchField({
 					store: GO.favorites.favoritesTasklistStore,
 					width:120,
-					emptyText: GO.lang.strSearch
+					emptyText: t("Search")
 				})],
 				store:GO.favorites.favoritesTasklistStore,
 				pageSize:GO.settings.config.nav_page_size

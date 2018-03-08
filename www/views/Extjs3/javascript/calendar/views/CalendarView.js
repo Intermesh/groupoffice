@@ -35,7 +35,7 @@ Ext.calendar.CalendarView = Ext.extend(Ext.BoxComponent, {
      * @cfg {Number} startDay
      * The 0-based index for the day on which the calendar week begins (0=Sunday, which is the default)
      */
-    startDay: GO.settings.first_weekday,
+    startDay: 0,
     /**
      * @cfg {Boolean} spansHavePriority
      * Allows switching between two different modes of rendering events that span multiple days. When true,
@@ -98,13 +98,13 @@ Ext.calendar.CalendarView = Ext.extend(Ext.BoxComponent, {
      * The text to display inside the drag proxy while dragging over the calendar to create a new event (defaults to 
      * 'Create event for {0}' where {0} is a date range supplied by the view)
      */
-    ddCreateEventText: GO.lang.createEventText,
+    ddCreateEventText: t("createEventText"),
     /**
      * @cfg {String} ddMoveEventText
      * The text to display inside the drag proxy while dragging an event to reposition it (defaults to 
      * 'Move event to {0}' where {0} is the updated event start date/time supplied by the view)
      */
-    ddMoveEventText: GO.lang.moveEventText,
+    ddMoveEventText: t("moveEventText"),
     /**
      * @cfg {String} ddResizeEventText
      * The string displayed to the user in the drag proxy while dragging the resize handle of an event (defaults to 
@@ -112,7 +112,7 @@ Ext.calendar.CalendarView = Ext.extend(Ext.BoxComponent, {
      * this text is only used in views
      * that allow resizing of events.
      */
-    ddResizeEventText: GO.lang.updateEventText,
+    ddResizeEventText: t("updateEventText"),
 
     //private properties -- do not override:
     weekCount: 1,
@@ -147,6 +147,8 @@ Ext.calendar.CalendarView = Ext.extend(Ext.BoxComponent, {
     // private
     initComponent: function() {
         this.setStartDate(this.startDate || new Date());
+				
+				this.startDay = GO.settings.first_weekday;
 
         Ext.calendar.CalendarView.superclass.initComponent.call(this);
 

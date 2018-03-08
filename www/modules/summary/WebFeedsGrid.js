@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: WebFeedsGrid.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: WebFeedsGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Danny Wijffelaars <dwijffelaars@intermesh.nl>
  */
@@ -15,13 +15,13 @@ GO.summary.WebFeedsGrid = function(config){
 	{
 		config = {};
 	}
-	config.title = GO.summary.lang.webfeeds;
+	config.title = t("webfeeds", "summary");
 	config.layout='fit';
 	config.autoScroll=true;
 	config.split=true;
 
 	 var SummaryColumn = new GO.grid.CheckColumn({
-        header: GO.summary.lang.summaryType,
+        header: t("Summary", "summary"),
         dataIndex: 'summary',
         width: 55,
         disabled_field:''
@@ -30,14 +30,14 @@ GO.summary.WebFeedsGrid = function(config){
 	var fields ={
 		fields:['title', 'url', 'summary'],
 		columns:[{
-			header: GO.lang.strTitle,
+			header: t("Title"),
 			dataIndex: 'title',
 			editor: new Ext.form.TextField({
 				 allowBlank: false
 			})
 		},
 		{
-			header: GO.lang.url,
+			header: t("URL"),
 			dataIndex: 'url',
 			editor: new Ext.form.TextField({
 				 allowBlank: false
@@ -62,8 +62,8 @@ GO.summary.WebFeedsGrid = function(config){
 		store: config.store,
 		pageSize: parseInt(GO.settings['max_rows_list']),
 		displayInfo: true,
-		displayMsg: GO.lang['displayingItems'],
-		emptyMsg: GO.lang['strNoItems']
+		displayMsg: t("Displaying items {0} - {1} of {2}"),
+		emptyMsg: t("No items to display")
 	});
 
 	var columnModel =  new Ext.grid.ColumnModel({
@@ -77,7 +77,7 @@ GO.summary.WebFeedsGrid = function(config){
 	config.view=new Ext.grid.GridView({
 		autoFill: true,
 		forceFit: true,
-		emptyText: GO.lang['strNoItems']
+		emptyText: t("No items to display")
 	});
 	config.sm=new Ext.grid.RowSelectionModel();
 	config.loadMask=true;
@@ -107,7 +107,7 @@ GO.summary.WebFeedsGrid = function(config){
 
 	config.tbar=[{
 		iconCls: 'btn-add',
-		text: GO.lang['cmdAdd'],
+		text: t("Add"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			var e = new Feed({
@@ -120,7 +120,7 @@ GO.summary.WebFeedsGrid = function(config){
 		scope: this
 	},{
 		iconCls: 'btn-delete',
-		text: GO.lang['cmdDelete'],
+		text: t("Delete"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			var selectedRows = this.selModel.getSelections();

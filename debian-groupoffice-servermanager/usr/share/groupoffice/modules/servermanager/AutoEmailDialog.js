@@ -15,7 +15,7 @@ GO.servermanager.AutoEmailDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 	initComponent : function() {
 		Ext.apply(this, {
 			titleField: 'name',
-			title: GO.servermanager.lang.autoEmail,
+			title: t("autoEmail", "servermanager"),
 			formControllerUrl: 'servermanager/automaticEmail', // change this if new panels are added
 			width:700,
 			height:480,
@@ -27,7 +27,7 @@ GO.servermanager.AutoEmailDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 
 	buildForm : function() {
 		this.propertiesPanel = new Ext.Panel({
-			title:GO.lang['strProperties'],					
+			title:t("Properties"),					
 			layout:'border',
 			autoScroll:true,
 			cls: 'go-form-panel',
@@ -41,7 +41,7 @@ GO.servermanager.AutoEmailDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 					name: 'name',
 					width: '100%',
 					anchor: '-20',
-					fieldLabel: GO.lang.strName,
+					fieldLabel: t("Name"),
 					allowBlank: false
 				},{
 					xtype: 'numberfield',
@@ -49,14 +49,14 @@ GO.servermanager.AutoEmailDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 					width: '20',
 					decimals: 0,
 					value: 7,
-					fieldLabel: GO.servermanager.lang.days,
-					plugins:[new Ext.ux.FieldHelp(GO.servermanager.lang.nDays)]
+					fieldLabel: t("days", "servermanager"),
+					plugins:[new Ext.ux.FieldHelp(t("nDays", "servermanager"))]
 				},{
 					xtype: 'xcheckbox',
 					name: 'active',
 					anchor: '-20',
 					hideLabel:false,
-					boxLabel: GO.servermanager.lang.enabled,
+					boxLabel: t("enabled", "servermanager"),
 					checked:true
 				}]
 			}),

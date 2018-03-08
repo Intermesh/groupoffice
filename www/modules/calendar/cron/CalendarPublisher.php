@@ -24,7 +24,7 @@ class CalendarPublisher extends \GO\Base\Cron\AbstractCron {
 	 * @return String
 	 */
 	public function getLabel(){
-		return \GO::t('shareCalendarsCron','calendar');
+		return \GO::t("Update the shared calendar files", "calendar");
 	}
 	
 	/**
@@ -33,7 +33,7 @@ class CalendarPublisher extends \GO\Base\Cron\AbstractCron {
 	 * @return String
 	 */
 	public function getDescription(){
-		return \GO::t('shareCalendarsCronDescription','calendar');
+		return \GO::t("Update the shared calendar files of the calendars that are published", "calendar");
 	}
 	
 	/**

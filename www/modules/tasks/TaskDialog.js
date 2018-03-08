@@ -7,7 +7,7 @@
  * If you have questions write an e-mail to info@intermesh.nl
  * 
  * @copyright Copyright Intermesh
- * @version $Id: TaskDialog.js 21609 2017-11-02 11:18:04Z mschering $
+ * @version $Id: TaskDialog.js 22317 2018-02-02 15:27:30Z mschering $
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
@@ -27,30 +27,24 @@ GO.tasks.TaskDialog = function() {
 		layout : 'fit',
 		modal : false,
 		resizable : true,
-		width : 580,
-		height : 400,
+		width : dp(640),
+		height : dp(560),
 		closeAction : 'hide',
 		collapsible: true,
-		title : GO.tasks.lang.task,
+		title : t("Task", "tasks"),
 		items : this.formPanel,
 		focus : focusName.createDelegate(this),
 		buttons : [{
-			text : GO.lang['cmdOk'],
-			handler : function() {
-				this.submitForm(true);
-
-			},
-			scope : this
-		}, {
-			text : GO.lang['cmdApply'],
+			text : t("Apply"),
 			handler : function() {
 				this.submitForm();
 			},
 			scope : this
-		}, {
-			text : GO.lang['cmdClose'],
+		},{
+			text : t("Save"),
 			handler : function() {
-				this.win.hide();
+				this.submitForm(true);
+
 			},
 			scope : this
 		}]
@@ -138,21 +132,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 						this.selectProject.setRemoteText(action.result.remoteComboTexts.project_id);
 					}
 				}
-				
-				if(GO.comments){	
-					if(action.result.data['id'] > 0){
-						if (!GO.util.empty(action.result.data['action_date'])) {
-							this.commentsGrid.actionDate = action.result.data['action_date'];
-						} else {
-							this.commentsGrid.actionDate = false;
-						}
-						this.commentsGrid.setLinkId(action.result.data['id'], 'GO\\Tasks\\Model\\Task');
-						this.commentsGrid.store.load();
-						this.commentsGrid.setDisabled(false);
-					}else {
-						this.commentsGrid.setDisabled(true);
-					}
-				}
+			
 				
 				if(action.result.data.category_id == 0)
 				{
@@ -199,15 +179,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 		//			}
 		//		}
 
-		// if the newMenuButton from another passed a linkTypeId then set this
-		// value in the select link field
-		if (config.link_config) {
-			this.link_config = config.link_config;
-			if (config.link_config.modelNameAndId) {
-				this.selectLinkField.setValue(config.link_config.modelNameAndId);
-				this.selectLinkField.setRemoteText(config.link_config.text);				
-			}
-		}
+		
 	},
 
 
@@ -247,7 +219,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 	submitForm : function(hide) {
 		this.formPanel.form.submit({
 			url : GO.url('tasks/task/submit'),
-			waitMsg : GO.lang['waitMsgSave'],
+			waitMsg : t("Saving..."),
 			success : function(form, action) {
 
 				if (action.result.id) {
@@ -262,11 +234,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 				this.fireEvent('save', this, this.task_id);
 				
 				
-				if(GO.comments){	
-					this.commentsGrid.setLinkId(action.result.id, 'GO\\Tasks\\Model\\Task');
-					this.commentsGrid.store.load();
-					this.commentsGrid.setDisabled(false);
-				}
+				
 				
 				
 				GO.dialog.TabbedFormDialog.prototype.refreshActiveDisplayPanels.call(this);
@@ -277,7 +245,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 			},
 			failure : function(form, action) {
 				if (action.failureType == 'client') {
-					GO.errorDialog.show(GO.lang['strErrorsInForm']);
+					GO.errorDialog.show(t("You have errors in your form. The invalid fields are marked."));
 				} else {
 					GO.errorDialog.show(action.result.feedback);
 				}
@@ -292,11 +260,10 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 		this.nameField = new Ext.form.TextField({
 			name : 'name',
 			allowBlank : false,
-			fieldLabel : GO.lang.strSubject
+			fieldLabel : t("Subject")
 		});
 
-		this.selectLinkField = new GO.form.SelectLink();
-
+		
 		var checkDateInput = function(field) {
 
 			if (field.name == 'due_time') {
@@ -330,7 +297,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 		var startDate = new Ext.form.DateField({
 			name : 'start_time',
 			format : GO.settings['date_format'],
-			fieldLabel : GO.tasks.lang.startsAt,
+			fieldLabel : t("Starts at", "tasks"),
 			value : now.format(GO.settings.date_format),
 			listeners : {
 				change : {
@@ -344,7 +311,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 			name : 'due_time',
 			format : GO.settings['date_format'],
 			allowBlank : false,
-			fieldLabel : GO.tasks.lang.dueAt,
+			fieldLabel : t("Due at", "tasks"),
 			value : now.format(GO.settings.date_format),
 			listeners : {
 				change : {
@@ -366,19 +333,19 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 		});
 
 		this.selectTaskList = new GO.tasks.SelectTasklist({
-			fieldLabel : GO.tasks.lang.tasklist,
+			fieldLabel : t("Tasklist", "tasks"),
 			allowBlank:false
 		});
 
 		this.selectCategory = new GO.form.ComboBoxReset({
 			hiddenName:'category_id',
-			fieldLabel:GO.tasks.lang.category,
+			fieldLabel:t("Category", "tasks"),
 			valueField:'id',
 			displayField:'name',			
 			store: GO.tasks.categoriesStore,
 			mode:'local',
 			triggerAction:'all',
-			emptyText:GO.tasks.lang.selectCategory,
+			emptyText:t("Select category", "tasks"),
 			editable:false,
 			selectOnFocus:true,
 			forceSelection:true,
@@ -387,27 +354,21 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 
 		this.selectPriority = new GO.form.SelectPriority();
 		
-		var percentages = [];
-		for(var i=0;i<101;i+=10){
-			percentages.push([i,i+"%"]);
-		}
-		
-		var descAnchor = -220;
+		var descAnchor = -320;
 
 		var propertiesPanel = new Ext.Panel({
 			hideMode : 'offsets',
-			title : GO.lang['strProperties'],
+			title : t("Properties"),
 			defaults : {
-				anchor : '-20'
+				anchor : '100%'
 			},
 			labelWidth:120,
-			// cls:'go-form-panel',waitMsgTarget:true,
-			bodyStyle : 'padding:5px',
+			cls:'go-form-panel',
+			//waitMsgTarget:true,
 			layout : 'form',
 			autoScroll : true,
 			items : [
 				this.nameField, 
-				this.selectLinkField,
 				startDate,
 				dueDate,
 				this.statusProgressField = new GO.tasks.StatusProgressField({}),
@@ -419,20 +380,20 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 		});
 
 		if(GO.moduleManager.userHasModule("projects2")){
-			descAnchor-=20;
+			descAnchor-=40;
 			this.selectProject = new GO.projects2.SelectProject();
 			propertiesPanel.add(this.selectProject);
 		} else if(GO.moduleManager.userHasModule("projects")) {
-			descAnchor-=20;
+			descAnchor-=40;
 			this.selectProject = new GO.projects.SelectProject();
 			propertiesPanel.add(this.selectProject);
 		}
 		
 		propertiesPanel.add({
 				xtype:'textarea',
-				fieldLabel:GO.lang.strDescription,
+				fieldLabel:t("Description"),
 				name : 'description',
-				anchor:'-20 '+descAnchor
+				anchor:'100% '+descAnchor
 			});
 				
 
@@ -459,12 +420,12 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 			displayField : 'text',
 			store : new Ext.data.SimpleStore({
 				fields : ['value', 'text'],
-				data : [['', GO.lang.noRecurrence],
-				['DAILY', GO.lang.strDays],
-				['WEEKLY', GO.lang.strWeeks],
-				['MONTHLY_DATE', GO.lang.monthsByDate],
-				['MONTHLY', GO.lang.monthsByDay],
-				['YEARLY', GO.lang.strYears]]
+				data : [['', t("No recurrence")],
+				['DAILY', t("Days")],
+				['WEEKLY', t("Weeks")],
+				['MONTHLY_DATE', t("Months by date")],
+				['MONTHLY', t("Months by day")],
+				['YEARLY', t("Years")]]
 			}),
 			hideLabel : true,
 			listeners : {
@@ -487,17 +448,17 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 			disabled : true,
 			width : 80,
 			forceSelection : true,
-			fieldLabel : GO.tasks.lang.atDays,
+			fieldLabel : t("At days", "tasks"),
 			mode : 'local',
 			value : '1',
 			valueField : 'value',
 			displayField : 'text',
 			store : new Ext.data.SimpleStore({
 				fields : ['value', 'text'],
-				data : [['1', GO.lang.strFirst],
-				['2', GO.lang.strSecond],
-				['3', GO.lang.strThird],
-				['4', GO.lang.strFourth]]
+				data : [['1', t("First")],
+				['2', t("Second")],
+				['3', t("Third")],
+				['4', t("Fourth")]]
 			})
 		});
 		
@@ -507,7 +468,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 		this.cb = [];
 		for (var day = 0; day < 7; day++) {
 			this.cb[day] = new Ext.form.Checkbox({
-				boxLabel : GO.lang.shortDays[day],
+				boxLabel : t("shortDays")[day],
 				name : days[day],
 				disabled : true,
 				checked : false,
@@ -523,7 +484,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 			disabled : true,
 			format : GO.settings['date_format'],
 			allowBlank : true,
-			fieldLabel : GO.tasks.lang.repeatUntil,
+			fieldLabel : t("Repeat until", "tasks"),
 			listeners : {
 				change : {
 					fn : checkDateInput,
@@ -533,7 +494,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 		});
 
 		this.repeatForever = new Ext.form.Checkbox({
-			boxLabel : GO.tasks.lang.repeatForever,
+			boxLabel : t("repeat forever", "tasks"),
 			name : 'repeat_forever',
 			checked : true,
 			disabled : true,
@@ -549,7 +510,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 		});
 
 		this.recurrencePanel = new Ext.Panel({
-			title : GO.tasks.lang.recurrence,
+			title : t("Recurrence", "tasks"),
 			bodyStyle : 'padding: 5px',
 			layout : 'form',
 			hideMode : 'offsets',
@@ -558,15 +519,15 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 				border:false
 			},
 			items : [{
-				fieldLabel : GO.tasks.lang.repeatEvery,
+				fieldLabel : t("Repeat every", "tasks"),
 				xtype : 'compositefield',
 				items : [this.repeatEvery,this.repeatType]
 			}, {
 				xtype : 'compositefield',
-				fieldLabel : GO.tasks.lang.atDays,
+				fieldLabel : t("At days", "tasks"),
 				items : [this.monthTime,this.cb[1],this.cb[2],this.cb[3],this.cb[4],this.cb[5],this.cb[6],this.cb[0]]
 			}, {
-				fieldLabel : GO.tasks.lang.repeatUntil,
+				fieldLabel : t("Repeat until", "tasks"),
 				xtype : 'compositefield',
 				items : [this.repeatEndDate,this.repeatForever]
 			}
@@ -577,7 +538,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 		// start other options tab
 		var optionsPanel = new Ext.Panel({
 
-			title : GO.tasks.lang.options,
+			title : t("Options", "tasks"),
 			defaults : {
 				anchor : '100%'
 			},
@@ -587,7 +548,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 			autoScroll : true,
 			items : [{
 				xtype : 'xcheckbox',
-				boxLabel : GO.tasks.lang.remindMe,
+				boxLabel : t("Remind me", "tasks"),
 				hideLabel : true,
 				name : 'remind',
 				listeners : {
@@ -604,14 +565,14 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 				name : 'remind_date',
 				format : GO.settings.date_format,
 				value : remindDate.format(GO.settings['date_format']),
-				fieldLabel : GO.lang.strDate,
+				fieldLabel : t("Date"),
 				disabled : true
 			}, {
 				xtype : 'timefield',
 				name : 'remind_time',
 				format : GO.settings.time_format,
 				value : GO.tasks.reminderTime,
-				fieldLabel : GO.lang.strTime,
+				fieldLabel : t("Time"),
 				disabled : true
 			}]
 		});
@@ -627,10 +588,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 			}
 		}
 		
-		if(GO.comments){
-			this.commentsGrid = new GO.comments.CommentsGrid({title:GO.comments.lang.comments});
-			items.push(this.commentsGrid);
-		}
+		
 		
 		this.tabPanel = new Ext.TabPanel({
 			activeTab : 0,

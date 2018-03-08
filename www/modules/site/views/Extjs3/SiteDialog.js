@@ -16,7 +16,7 @@ GO.site.SiteDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 	initComponent: function() {
 		Ext.apply(this, {
 			goDialogId: 'site',
-			title: GO.site.lang.options,
+			title: t("Options", "site"),
 			formControllerUrl: 'site/site',
 			height: 550
 		});
@@ -26,7 +26,7 @@ GO.site.SiteDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 	buildForm: function() {
 
 		this.propertiesPanel = new Ext.Panel({
-			title: GO.site.lang.options,
+			title: t("Options", "site"),
 			cls: 'go-form-panel',
 			layout: 'form',
 			labelWidth: 170,
@@ -38,7 +38,7 @@ GO.site.SiteDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 					anchor: '100%',
 					maxLength: 100,
 					allowBlank: false,
-					fieldLabel: GO.site.lang.siteName
+					fieldLabel: t("Name", "site")
 				}, {
 					xtype: 'textfield',
 					name: 'module',
@@ -46,7 +46,7 @@ GO.site.SiteDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 					anchor: '100%',
 					maxLength: 100,
 					allowBlank: false,
-					fieldLabel: GO.site.lang.siteModule,
+					fieldLabel: t("Module", "site"),
 					disabled: true
 				}, {
 					xtype: 'textfield',
@@ -55,7 +55,7 @@ GO.site.SiteDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 					anchor: '100%',
 					maxLength: 100,
 					allowBlank: false,
-					fieldLabel: GO.site.lang.siteDomain
+					fieldLabel: t("Domain", "site")
 				}, {
 					xtype: 'textfield',
 					name: 'base_path',
@@ -63,7 +63,7 @@ GO.site.SiteDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 					anchor: '100%',
 					maxLength: 100,
 					allowBlank: true,
-					fieldLabel: GO.site.lang.siteBase_path
+					fieldLabel: t("Base path", "site")
 				}, {
 					xtype: 'textfield',
 					name: 'language',
@@ -71,21 +71,21 @@ GO.site.SiteDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 					anchor: '100%',
 					maxLength: 100,
 					allowBlank: true,
-					fieldLabel: GO.site.lang.siteLanguage
+					fieldLabel: t("Language", "site")
 				}, {
 					xtype: 'xcheckbox',
 					name: 'ssl',
 					width: 300,
 					anchor: '100%',
 					maxLength: 100,
-					fieldLabel: GO.site.lang.siteSsl
+					fieldLabel: t("SSL", "site")
 				}, {
 					xtype: 'xcheckbox',
 					name: 'mod_rewrite',
 					width: 300,
 					anchor: '100%',
 					maxLength: 100,
-					fieldLabel: GO.site.lang.siteMod_rewrite
+					fieldLabel: t("Mod rewrite", "site")
 				}, {
 					xtype: 'textfield',
 					name: 'mod_rewrite_base_path',
@@ -93,7 +93,7 @@ GO.site.SiteDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 					anchor: '100%',
 					maxLength: 100,
 					allowBlank: false,
-					fieldLabel: GO.site.lang.siteMod_rewrite_base_path
+					fieldLabel: t("Mod rewrite base path", "site")
 				}]
 
 		});

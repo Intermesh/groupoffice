@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: SelectCalendarWindow.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: SelectCalendarWindow.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -25,17 +25,17 @@ SelectCalendarWindow = function(){
 					
 					if(!success)
 					{
-						Ext.MessageBox.alert(GO.lang.strError, GO.lang.strRequestError);
+						Ext.MessageBox.alert(t("Error"), t("Could not connect to the server. Please check your internet connection."));
 					}else
 					{						
 						var responseParams = Ext.decode(response.responseText);
 						if(responseParams.success)
 						{
-							Ext.MessageBox.alert(GO.lang.strSuccess, GO.calendar.lang.closeWindow);
+							Ext.MessageBox.alert(t("Success"), t("The appointment has been accepted and scheduled. You can close this window.", "calendar"));
 							this.window.close();
 						}else
 						{
-							Ext.MessageBox.alert(GO.lang.strError, responseParams.feedback);
+							Ext.MessageBox.alert(t("Error"), responseParams.feedback);
 							
 						}
 					}
@@ -49,7 +49,7 @@ SelectCalendarWindow = function(){
 			this.selectCalendar = new GO.form.ComboBox({
 				value:GO.calendar.defaultCalendar.id,
 				remoteText:GO.calendar.defaultCalendar.name,
-				fieldLabel:GO.calendar.lang.selectCalendarForAppointment,
+				fieldLabel:t("Select the calendar to put this appointment in", "calendar"),
 				store:new GO.data.JsonStore({
 					url: GO.settings.modules.calendar.url+'json.php',
 					baseParams: {
@@ -66,13 +66,13 @@ SelectCalendarWindow = function(){
 				triggerAction:'all',
 				editable: false,
 				forceSelection: true,
-				emptyText:GO.lang.strPleaseSelect
+				emptyText:t("Please select...")
 			});
 	
 
 			this.window = new Ext.Window({
 				renderTo:document.body,
-				title: GO.calendar.lang.selectCalendar,
+				title: t("Select calendar", "calendar"),
 				modal:false,
 				autoHeight:true,
 				width:500,
@@ -85,7 +85,7 @@ SelectCalendarWindow = function(){
 					waitMsgTarget:true
 				}),
 				buttons:[{
-					text:GO.lang.cmdOk,
+					text:t("Ok"),
 					handler: function(){
 						Ext.Ajax.request({
 							url: 'action.php',
@@ -97,17 +97,17 @@ SelectCalendarWindow = function(){
 							callback: function(options, success, response){
 								if(!success)
 								{
-									Ext.MessageBox.alert(GO.lang.strError, GO.lang.strRequestError);
+									Ext.MessageBox.alert(t("Error"), t("Could not connect to the server. Please check your internet connection."));
 								}else
 								{
 									var responseParams = Ext.decode(response.responseText);
 									if(responseParams.success)
 									{
-										Ext.MessageBox.alert(GO.lang.strSuccess, GO.calendar.lang.closeWindow);
+										Ext.MessageBox.alert(t("Success"), t("The appointment has been accepted and scheduled. You can close this window.", "calendar"));
 										this.window.close();
 									}else
 									{
-										Ext.MessageBox.alert(GO.lang.strError, responseParams.feedback);
+										Ext.MessageBox.alert(t("Error"), responseParams.feedback);
 
 									}
 								}							},

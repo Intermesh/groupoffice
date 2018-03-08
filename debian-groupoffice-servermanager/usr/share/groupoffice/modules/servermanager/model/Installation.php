@@ -207,7 +207,7 @@ class Installation extends \GO\Base\Db\ActiveRecord {
 			$installationModule = new InstallationModule();
 			$installationModule->installation_id = $this->id;			
 			$installationModule->installation = $this;
-			$installationModule->name = $module->id();
+			$installationModule->name = $module->name();
 			
 			if(!$installationModule->isHidden()){
 				$result[$installationModule->name] = $installationModule;
@@ -379,7 +379,7 @@ class Installation extends \GO\Base\Db\ActiveRecord {
 		
 		if($this->isNew && !$this->ignoreExistingForImport){
 			if(file_exists('/var/lib/mysql/'.$this->dbName) || file_exists('/etc/apache2/sites-enabled/'.$this->name) || is_dir($this->installPath))
-				$this->setValidationError ('name', \GO::t('duplicateHost','servermanager'));
+				$this->setValidationError ('name', \GO::t("Sorry, the hostname already exists", "servermanager"));
 		}
 		
 		if (!$this->isNew && empty($this->modules)) {

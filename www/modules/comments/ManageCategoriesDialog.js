@@ -25,10 +25,10 @@ GO.comments.ManageCategoriesDialog = function(config){
 	config.width=600;
 	config.height=400;
 	config.closeAction='hide';
-	config.title= GO.comments.lang.manageCategories;					
+	config.title= t("Manage categories", "comments");					
 	config.items= [this.categoriesGrid];
 	config.buttons=[{
-			text: GO.lang['cmdClose'],
+			text: t("Close"),
 			handler: function(){				
 				this.hide();				
 			},

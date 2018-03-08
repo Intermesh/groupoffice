@@ -7,7 +7,7 @@ namespace GO\Groups;
 class GroupsModule extends \GO\Base\Module{
 	
 	public function autoInstall() {
-		return true;
+		return false; //is installed as core module!
 	}
 	public function adminModule() {
 		return true;

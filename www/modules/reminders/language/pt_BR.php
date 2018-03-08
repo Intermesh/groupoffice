@@ -1,12 +1,12 @@
 <?php
-$l['name']='Lembretes';
-$l['description']='Um módulo para agendar lembretes popup para usuários e grupos de usuários.';
-
-$l['reminders']='Lembretes';
-$l['reminder']="Lembrete";
-$l['time']="Horário";
-$l['snoozeTime']="Adiar por";
-$l['text']='Texto';
-$l['addUsers']='Adicionar usuário';
-$l['addUserGroups']='Adicionar grupo';
-?>
+return array (
+  'Popup reminder' => 'Lembrete',
+  'Time' => 'Horário',
+  'Snooze time' => 'Adiar por',
+  'Text' => 'Texto',
+  'Add users' => 'Adicionar usuário',
+  'Add user groups' => 'Adicionar grupo',
+  'name' => 'Lembretes',
+  'description' => 'Um módulo para agendar lembretes popup para usuários e grupos de usuários.',
+  'Popup reminders' => 'Lembretes',
+);

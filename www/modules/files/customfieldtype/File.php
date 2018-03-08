@@ -21,9 +21,9 @@ class File extends \GO\Customfields\Customfieldtype\AbstractCustomfieldtype{
 
 			if($file){
 				if(!\GO\Customfields\Model\AbstractCustomFieldsRecord::$formatForExport){
-					$html='<a href="#" onclick="GO.linkHandlers[\'GO\\Files\\Model\\File\'].call(this,\''.$attributes[$key].'\');">'.basename($attributes[$key]).'</a>'.
-					'<a href="#" onclick=\''.$file->getDefaultHandler()->getHandler($file).'\' style="display:block;float: right;" class="go-icon btn-edit">&nbsp;</a>';
-					//$html='<a href="#"  title="'.$attributes[$key].'">'.$attributes[$key].'</a>';
+					$html='<a href="#files/file/'.$attributes[$key].'">'.basename($attributes[$key]).'</a>'.
+					'<a  onclick=\''.$file->getDefaultHandler()->getHandler($file).'\' style="display:block;float: right;" class="go-icon btn-edit">&nbsp;</a>';
+					//$html='<a   title="'.$attributes[$key].'">'.$attributes[$key].'</a>';
 				}else
 				{
 					$html=$attributes[$key];

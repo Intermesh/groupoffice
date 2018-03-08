@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: SearchPanel.js 21745 2017-11-23 14:51:38Z michaelhart86 $
+ * @version $Id: SearchPanel.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -26,7 +26,7 @@ GO.grid.SearchPanel = function(config){
 	
 	config.border=false;
 	if(!config.noTitle)
-		config.title=GO.lang['strSearch']+': "'+Ext.util.Format.htmlEncode(this.query)+'"';
+		config.title=t("Search")+': "'+Ext.util.Format.htmlEncode(this.query)+'"';
   	
 	config.iconCls='go-search-icon-tab';
 	config.layout='border';
@@ -99,14 +99,14 @@ GO.grid.SearchPanel = function(config){
 			store: this.store,
 			pageSize: GO.settings.max_rows_list,
 			displayInfo: true,
-			displayMsg: GO.lang['displayingItems'],
-			emptyMsg: GO.lang['strNoItems']
+			displayMsg: t("Displaying items {0} - {1} of {2}"),
+			emptyMsg: t("No items to display")
 		}),
 		tbar:[
-		GO.lang['strSearch']+': ', ' ',this.searchField,
+		t("Search")+': ', ' ',this.searchField,
 		'-',{
 			iconCls: 'btn-delete',
-			text: GO.lang['cmdDelete'],
+			text: t("Delete"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 				this.searchGrid.deleteSelected();
@@ -116,7 +116,7 @@ GO.grid.SearchPanel = function(config){
 		store:this.store,
 		columns:[{
 			id:'name',
-			header: GO.lang['strName'],
+			header: t("Name"),
 			dataIndex: 'name',
 			css: 'white-space:normal;',
 			sortable: true,
@@ -124,15 +124,15 @@ GO.grid.SearchPanel = function(config){
 				return '<div class="go-grid-icon go-model-icon-'+record.data.model_name.replace(/\\/g,"_")+'">'+v+'</div>';
 			}
 		},{
-			header: GO.lang['strType'],
+			header: t("Type"),
 			dataIndex: 'type',
 			sortable:true,
 			width:100
 		},{
-			header: GO.lang['strMtime'],
+			header: t("Modified at"),
 			dataIndex: 'mtime',
 			sortable:true,
-			width:110
+			width: dp(140)
 		}],
 		autoExpandMax:2500,
 		autoExpandColumn:'name',
@@ -141,11 +141,11 @@ GO.grid.SearchPanel = function(config){
 		view:new Ext.grid.GridView({
 			enableRowBody:true,
 			showPreview:true,			
-			emptyText:GO.lang.strNoItems,	
+			emptyText:t("No items to display"),	
 			applyEmptyText : function() {
 					if (this.emptyText && !this.hasRows()) {
 
-							this.emptyText = this.ds.baseParams.query=='' ? GO.lang.pleaseEnterASearchTerm : GO.lang.strNoItems;
+							this.emptyText = this.ds.baseParams.query=='' ? t("Please enter a search term") : t("No items to display");
 
 							this.mainBody.update('<div class="x-grid-empty">' + this.emptyText + '</div>');
 					}
@@ -159,7 +159,7 @@ GO.grid.SearchPanel = function(config){
 			}
 		}),
 		loadMask:{
-			msg: GO.lang['waitMsgLoad']
+			msg: t("Loading...")
 			},
 		sm:new Ext.grid.RowSelectionModel({singleSelect:config.singleSelect})
 	};
@@ -181,7 +181,7 @@ GO.grid.SearchPanel = function(config){
 	if(!config.noTitle)
 	{
 		this.searchGrid.store.on('load', function(){
-			this.setTitle(GO.lang['strSearch']+': "'+Ext.util.Format.htmlEncode(this.searchGrid.store.baseParams.query)+'"');
+			this.setTitle(t("Search")+': "'+Ext.util.Format.htmlEncode(this.searchGrid.store.baseParams.query)+'"');
 		}, this);
 	}
 
@@ -233,7 +233,7 @@ GO.grid.SearchPanel = function(config){
 			split:true,
 			items:this.linkDescriptionField = new GO.form.LinkDescriptionField({
 				name:'description',
-				fieldLabel:GO.lang.strDescription,
+				fieldLabel:t("Description"),
 				anchor:'100%'
 			})
 		});

@@ -5,7 +5,7 @@ GO.email.LabelsGrid = Ext.extend(GO.grid.GridPanel, {
 
         Ext.apply(this, {
             standardTbar: true,
-            title : GO.email.lang.labels,
+            title : t("Labels", "email"),
             store: new GO.data.JsonStore({
                 url : GO.url("email/label/store"),
                 baseParams : {
@@ -25,7 +25,7 @@ GO.email.LabelsGrid = Ext.extend(GO.grid.GridPanel, {
             view: new Ext.grid.GridView({
                 autoFill: true,
                 forceFit: true,
-                emptyText: GO.lang['strNoItems']
+                emptyText: t("No items to display")
             }),
             cm: new Ext.grid.ColumnModel({
                 defaults: {
@@ -33,11 +33,11 @@ GO.email.LabelsGrid = Ext.extend(GO.grid.GridPanel, {
                 },
                 columns: [
                     {
-                        header: GO.lang.strName,
+                        header: t("Name"),
                         dataIndex: 'name'
                     },
                     {
-                        header: GO.lang.color,
+                        header: t("Color"),
                         dataIndex: 'color',
                         renderer: function (value, metaData, record) {
                             return '<div style="display:inline-block; width:38px; height:14px; background-color:#' + value + '; margin-right:4px;"></div>';

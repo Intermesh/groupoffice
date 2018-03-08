@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: PlainField.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: PlainField.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -52,7 +52,7 @@ GO.form.PlainField = Ext.extend(Ext.form.Field, {
 	},
 	
 	getName: function(){
-		return this.name;
+		return this.name || '';
 	},
 
 	// private
@@ -76,10 +76,10 @@ GO.form.PlainField = Ext.extend(Ext.form.Field, {
 		{
 			if(v=='1')
 			{
-				v = GO.lang.cmdYes;
+				v = t("Yes");
 			}else
 			{
-				v = GO.lang.cmdNo;
+				v = t("No");
 			}
 		}
 		

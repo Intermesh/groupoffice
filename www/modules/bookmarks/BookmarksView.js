@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: BookmarksView.js 18890 2015-03-11 13:50:01Z wsmits $
+ * @version $Id: BookmarksView.js 22345 2018-02-08 15:24:09Z mschering $
  * @copyright Copyright Intermesh
  * @author Twan Verhofstad
  */
@@ -32,7 +32,7 @@ GO.bookmarks.BookmarksView = function(config){
 		'</tpl>',
 		'<div class="thumb-wrap"  >',
 		'<div class="thumb">',
-		'<div class="thumb-name" style="background-image:url({thumb})"><h1>{name}</h1>{[Ext.util.Format.nl2br(values.description)]}</div>',
+		'<div class="thumb-name" style="background-image:url({thumb})"><h4>{name}</h4>{[Ext.util.Format.nl2br(values.description)]}</div>',
 		'</div>',	'</div>',	'</tpl>',
 		'<div style="clear:both"></div>',
 		{

@@ -11,7 +11,7 @@ GO.bookmarks.BookmarkContextMenu = function(config)
 				
 	this.deleteButton = new Ext.menu.Item({
 		iconCls: 'btn-delete',
-		text: GO.lang.cmdDelete,
+		text: t("Delete"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			GO.bookmarks.removeBookmark(this.record);						
@@ -21,7 +21,7 @@ GO.bookmarks.BookmarkContextMenu = function(config)
 	
 	this.editButton = new Ext.menu.Item({
 		iconCls: 'btn-edit',
-		text: GO.lang.cmdEdit,
+		text: t("Edit"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 

@@ -33,9 +33,9 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController {
 			$model->content = $file->contents();
 			$model->extension = $fileWithName->extension();
 		} else {
-			$response['validationErrors'] = array('attachments'=> \GO::t('files','uploadFailed'));
+			$response['validationErrors'] = array('attachments'=> \GO::t("files", "uploadFailed"));
 			$response['success'] = false;
-			$response['feedback'] = \GO::t('uploadFailed', 'files');
+			$response['feedback'] = \GO::t("The upload failed! Ask the server manager for what wrong", "files");
 			return false;
 		}
 		

@@ -14,7 +14,7 @@ GO.email.ImapAclUserDialog = Ext.extend(GO.Window, {
 			cls : 'go-form-panel',
 			items : [new GO.form.ComboBox({
 					xtype:'textfield',
-					fieldLabel:GO.lang.strUsername,
+					fieldLabel:t("Username"),
 					name:'identifier',
 					anchor:'100%',
 					displayField: 'username',		
@@ -30,27 +30,27 @@ GO.email.ImapAclUserDialog = Ext.extend(GO.Window, {
 					})
 			}),{
 				xtype:'checkboxgroup',
-				fieldLabel:GO.lang.strPermissions,				
+				fieldLabel:t("Permissions"),				
 				anchor:'100%',
 				columns:1,
 				items:[{
-						boxLabel:GO.email.lang.readPerm,
+						boxLabel:t("Read", "email"),
 						name:'read',
 						checked:true
 				},{
-						boxLabel:GO.email.lang.writePerm,
+						boxLabel:t("Write", "email"),
 						name:'write'
 				},{
-						boxLabel:GO.email.lang.deletePerm,
+						boxLabel:t("Delete", "email"),
 						name:'delete'
 				},{
-						boxLabel:GO.email.lang.createMailboxPerm,
+						boxLabel:t("Create mailbox", "email"),
 						name:'createmailbox'
 				},{
-						boxLabel:GO.email.lang.deleteMailboxPerm,
+						boxLabel:t("Delete mailbox", "email"),
 						name:'deletemailbox'
 				},{
-						boxLabel:GO.email.lang.adminPerm,
+						boxLabel:t("Administrate", "email"),
 						name:'admin'
 				}
 				]
@@ -62,16 +62,16 @@ GO.email.ImapAclUserDialog = Ext.extend(GO.Window, {
 		Ext.apply(this, {
 			width:400,
 			autoHeight:true,
-			title:GO.email.lang.shareFolder,
+			title:t("Share", "email"),
 			items:[this.formPanel],
 			buttons:[{
-				text : GO.lang['cmdOk'],
+				text : t("Ok"),
 				handler : function() {
 					this.submitForm();
 				},
 				scope : this
 			},{
-				text : GO.lang['cmdClose'],
+				text : t("Close"),
 				handler : function() {
 					this.hide();
 				},
@@ -111,7 +111,7 @@ GO.email.ImapAclUserDialog = Ext.extend(GO.Window, {
 	submitForm : function(hide) {
 		this.formPanel.form.submit({
 			url : GO.url("email/folder/setAcl"),
-			waitMsg : GO.lang['waitMsgSave'],
+			waitMsg : t("Saving..."),
 			success : function(form, action) {
 
 				this.fireEvent('save', this);
@@ -119,10 +119,10 @@ GO.email.ImapAclUserDialog = Ext.extend(GO.Window, {
 			},
 			failure : function(form, action) {
 				if (action.failureType == 'client') {
-					Ext.MessageBox.alert(GO.lang['strError'],
-						GO.lang['strErrorsInForm']);
+					Ext.MessageBox.alert(t("Error"),
+						t("You have errors in your form. The invalid fields are marked."));
 				} else {
-					Ext.MessageBox.alert(GO.lang['strError'],
+					Ext.MessageBox.alert(t("Error"),
 						action.result.feedback);
 				}
 			},

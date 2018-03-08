@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: InstallationDialog.js 20622 2016-11-08 12:48:42Z mschering $
+ * @version $Id: InstallationDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -34,23 +34,23 @@ GO.servermanager.InstallationDialog = function(config){
 	config.width=750;
 	config.height=550;
 	config.closeAction='hide';
-	config.title= GO.servermanager.lang.installation;					
+	config.title= t("installation", "servermanager");					
 	config.items= this.formPanel;
 	config.focus= focusFirstField.createDelegate(this);
 	config.buttons=[{
-			text: GO.lang['cmdOk'],
+			text: t("Ok"),
 			handler: function(){
 				this.submitForm(true);
 			},
 			scope: this
 		},{
-			text: GO.lang['cmdApply'],
+			text: t("Apply"),
 			handler: function(){
 				this.submitForm();
 			},
 			scope:this
 		},{
-			text: GO.lang['cmdClose'],
+			text: t("Close"),
 			handler: function(){
 				this.hide();
 			},
@@ -84,7 +84,7 @@ Ext.extend(GO.servermanager.InstallationDialog, GO.Window,{
 		{
 			this.formPanel.load({
 				url : GO.url("servermanager/installation/load"),
-				waitMsg:GO.lang.waitMsgLoad,
+				waitMsg:t("Loading..."),
 				success:function(form, action)
 				{					
 //					this.formPanel.getForm().setValues(action.)
@@ -166,7 +166,7 @@ Ext.extend(GO.servermanager.InstallationDialog, GO.Window,{
 		{
 			url:GO.url("servermanager/installation/submit"),
 			params:params,
-			waitMsg:GO.lang['waitMsgSave'],
+			waitMsg:t("Saving..."),
 			success:function(form, action){
 				
 				this.fireEvent('save', this);
@@ -191,7 +191,7 @@ Ext.extend(GO.servermanager.InstallationDialog, GO.Window,{
 			failure: function(form, action) {
 				if(action.failureType == 'client')
 				{					
-					GO.errorDialog.show(GO.lang['strErrorsInForm']);			
+					GO.errorDialog.show(t("You have errors in your form. The invalid fields are marked."));			
 				} else {
 					GO.errorDialog.show(action.result.feedback);
 				}
@@ -207,9 +207,9 @@ Ext.extend(GO.servermanager.InstallationDialog, GO.Window,{
 		var dateFormatData = new Ext.data.SimpleStore({
 			fields: ['id', 'date_format'],		
 			data : [
-			['dmY', GO.users.lang.dmy],
-			['mdY', GO.users.lang.mdy],
-			['Ymd', GO.users.lang.jmd]
+			['dmY', t("Day-Month-Year", "users")],
+			['mdY', t("Month-Day-Year", "users")],
+			['Ymd', t("Year-Month-Day", "users")]
 			]
 		});
 	
@@ -227,8 +227,8 @@ Ext.extend(GO.servermanager.InstallationDialog, GO.Window,{
 		var 	timeFormatData = new Ext.data.SimpleStore({
 			fields: ['id', 'time_format'],		
 			data : [
-			['G:i', GO.users.lang.fullhourformat],
-			['g:i a', GO.users.lang.halfhourformat]
+			['G:i', t("24 hour format", "users")],
+			['g:i a', t("12 hour format", "users")]
 			]
 		});
 	
@@ -236,15 +236,15 @@ Ext.extend(GO.servermanager.InstallationDialog, GO.Window,{
 		var 	firstWeekdayData = new Ext.data.SimpleStore({
 			fields: ['id', 'first_weekday'],		
 			data : [
-			['0', GO.users.lang.sunday],
-			['1', GO.users.lang.monday]
+			['0', t("Sunday", "users")],
+			['1', t("Monday", "users")]
 			]
 		});
 		
 		
 		
 		this.propertiesPanel = new Ext.Panel({
-			title:GO.lang['strProperties'],					
+			title:t("Properties"),					
 			layout:'column',
 			autoScroll:true,
 			items:[{
@@ -258,11 +258,11 @@ Ext.extend(GO.servermanager.InstallationDialog, GO.Window,{
 				  name: 'enabled',
 					anchor: '-20',
 				 	hideLabel:true,
-				  boxLabel: GO.servermanager.lang.enabled,
+				  boxLabel: t("enabled", "servermanager"),
 				  checked:true,
 					disabled:true
 				},new Ext.form.ComboBox({
-						fieldLabel: GO.servermanager.lang.status,
+						fieldLabel: t("status", "servermanager"),
 						hiddenName:'status',
 						store: new Ext.data.SimpleStore({
 								fields: ['value', 'text'],
@@ -290,39 +290,39 @@ Ext.extend(GO.servermanager.InstallationDialog, GO.Window,{
 				  name: 'trial_days',
 					anchor: '-20',
 				  allowBlank:false,
-				  fieldLabel: GO.servermanager.lang.trialDays,
+				  fieldLabel: t("trialDays", "servermanager"),
 					value: '30'
 				},{
 					xtype: 'textfield',
 				  name: 'name',
 					anchor: '-20',
 				  allowBlank:false,
-				  fieldLabel: GO.servermanager.lang.domain
+				  fieldLabel: t("domain", "servermanager")
 				},{
 					xtype: 'textfield',
 				  name: 'admin_password1',
 					anchor: '-20',
 					inputType: 'password',
-				  fieldLabel: GO.servermanager.lang.adminPassword
+				  fieldLabel: t("adminPassword", "servermanager")
 				},{
 					xtype: 'textfield',
 				  name: 'admin_password2',
 					anchor: '-20',
 					inputType: 'password',
-				  fieldLabel: GO.servermanager.lang.confirmAdminPassword
+				  fieldLabel: t("confirmAdminPassword", "servermanager")
 				},{
 					xtype: 'textfield',
 				  name: 'webmaster_email',
 					anchor: '-20',
 				  allowBlank:false,
-				  fieldLabel: GO.servermanager.lang.webmasterEmail,
+				  fieldLabel: t("webmasterEmail", "servermanager"),
 				  value:GO.settings.email
 				},{
 					xtype: 'textfield',
 				  name: 'title',
 					anchor: '-20',
 				  allowBlank:false,
-				  fieldLabel: GO.servermanager.lang.title,
+				  fieldLabel: t("title", "servermanager"),
 				  value: GO.settings.config.title
 				},{
 					xtype: 'combo',
@@ -344,46 +344,46 @@ Ext.extend(GO.servermanager.InstallationDialog, GO.Window,{
 					forceSelection: true,
 					anchor: '-20',
 				  allowBlank:false,
-				  fieldLabel: GO.servermanager.lang.theme,
+				  fieldLabel: t("theme", "servermanager"),
 				  value:GO.settings.config.theme
 				},{
 					xtype: 'xcheckbox',
 				  name: 'allow_themes',
 					anchor: '-20',
 				 	hideLabel:true,
-				  boxLabel: GO.servermanager.lang.allowThemes,
+				  boxLabel: t("allowThemes", "servermanager"),
 				  checked:false
 				},{
 					xtype: 'xcheckbox',
 				  name: 'allow_password_change',
 					anchor: '-20',
 				  hideLabel:true,
-				  boxLabel: GO.servermanager.lang.allowPasswordChange,
+				  boxLabel: t("allowPasswordChange", "servermanager"),
 				  checked:true
 				}/*,{
 					xtype: 'checkbox',
 				  name: 'allow_registration',
 					anchor: '-20',
 				  hideLabel:true,
-				  boxLabel: GO.servermanager.lang.allowRegistration
+				  boxLabel: t("allowRegistration", "servermanager")
 				},{
 					xtype: 'checkbox',
 				  name: 'allow_duplicate_email',
 					anchor: '-20',
 				  hideLabel:true,
-				  boxLabel: GO.servermanager.lang.allowDuplicateEmail
+				  boxLabel: t("allowDuplicateEmail", "servermanager")
 				},{
 					xtype: 'checkbox',
 				  name: 'auto_activate_accounts',
 					anchor: '-20',
 				  hideLabel:true,
-				  boxLabel: GO.servermanager.lang.autoActivateAccounts
+				  boxLabel: t("autoActivateAccounts", "servermanager")
 				},{
 					xtype: 'checkbox',
 				  name: 'notify_admin_of_registration',
 					anchor: '-20',
 				  hideLabel:true,
-				  boxLabel: GO.servermanager.lang.notifyAdminOfRegistration,
+				  boxLabel: t("notifyAdminOfRegistration", "servermanager"),
 				  checked:true
 				}*/]
 			},{
@@ -393,13 +393,13 @@ Ext.extend(GO.servermanager.InstallationDialog, GO.Window,{
 				labelWidth:140,
 				border:false,
 				items:[new GO.form.SelectCountry({
-						fieldLabel: GO.lang['strCountry'],
+						fieldLabel: t("Country"),
 						hiddenName: 'default_country',
 						anchor: '-20',
 						value: GO.settings.config.default_country
 					}),new Ext.form.ComboBox({
 						anchor: '-20',
-						fieldLabel: GO.users.lang['cmdFormLabelLanguage'],
+						fieldLabel: t("Language", "users"),
 						name: 'language',
 						store:  new Ext.data.SimpleStore({
 								fields: ['id', 'language'],
@@ -415,7 +415,7 @@ Ext.extend(GO.servermanager.InstallationDialog, GO.Window,{
 						value: GO.settings.language
 					}),new Ext.form.ComboBox({
 						anchor: '-20',
-						fieldLabel: GO.users.lang.cmdFormLabelTimezone,
+						fieldLabel: t("Timezone", "users"),
 						name: 'default_timezone',
 						store: new Ext.data.SimpleStore({
 								fields: ['timezone'],
@@ -432,12 +432,12 @@ Ext.extend(GO.servermanager.InstallationDialog, GO.Window,{
 						xtype: 'textfield',
 					  name: 'default_currency',						
 					  allowBlank:false,
-					  fieldLabel: GO.servermanager.lang.defaultCurrency,
+					  fieldLabel: t("defaultCurrency", "servermanager"),
 					  value: GO.settings.currency
 					},
 					new Ext.form.ComboBox({
 							anchor: '-20',
-							fieldLabel: GO.users.lang['cmdFormLabelDateFormat'],
+							fieldLabel: t("Date Format", "users"),
 							name: 'date_format',
 							store: dateFormatData,
 							displayField: 'date_format',
@@ -452,7 +452,7 @@ Ext.extend(GO.servermanager.InstallationDialog, GO.Window,{
 						}),
 					new Ext.form.ComboBox({
 						anchor: '-20',
-						fieldLabel: GO.users.lang['cmdFormLabelDateSeperator'],
+						fieldLabel: t("Date Seperator", "users"),
 						name: 'date_separator_name',
 						store: dateSeperatorData,
 						displayField: 'date_separator',			
@@ -466,7 +466,7 @@ Ext.extend(GO.servermanager.InstallationDialog, GO.Window,{
 						forceSelection: true
 					}),
 					new Ext.form.ComboBox({
-						fieldLabel: GO.users.lang.timeFormat,
+						fieldLabel: t("Time Format", "users"),
 						name: 'time_format_name',
 						store: timeFormatData,
 						displayField: 'time_format',
@@ -482,7 +482,7 @@ Ext.extend(GO.servermanager.InstallationDialog, GO.Window,{
 					}),
 						
 					new Ext.form.ComboBox({
-						fieldLabel: GO.users.lang['cmdFormLabelFirstWeekday'],
+						fieldLabel: t("First weekday", "users"),
 						store: firstWeekdayData,
 						displayField: 'first_weekday',
 						valueField: 'id',
@@ -501,14 +501,14 @@ Ext.extend(GO.servermanager.InstallationDialog, GO.Window,{
 					  name: 'default_decimal_separator',
 						anchor: '-20',
 					  allowBlank:false,
-					  fieldLabel: GO.servermanager.lang.defaultDecimalSeperator,
+					  fieldLabel: t("defaultDecimalSeperator", "servermanager"),
 					  value: GO.settings.decimal_separator
 					},{
 						xtype: 'textfield',
 					  name: 'default_thousands_separator',
 						anchor: '-20',
 					  allowBlank:false,
-					  fieldLabel: GO.servermanager.lang.defaultThousandsSeperator,
+					  fieldLabel: t("defaultThousandsSeperator", "servermanager"),
 					  value: GO.settings.thousands_separator
 					}]
 			},{
@@ -521,22 +521,22 @@ Ext.extend(GO.servermanager.InstallationDialog, GO.Window,{
 						xtype: 'textfield',
 					  name: 'restrict_smtp_hosts',
 						anchor: '-20',					  
-					  fieldLabel: GO.servermanager.lang.restrictSmtpHosts
+					  fieldLabel: t("restrictSmtpHosts", "servermanager")
 					},{
 						xtype: 'textfield',
 					  name: 'serverclient_domains',
 						anchor: '-20',					  
-					  fieldLabel: GO.servermanager.lang.mailDomains
+					  fieldLabel: t("mailDomains", "servermanager")
 						},new GO.form.NumberField({
 						decimals:0,
 					  name: 'max_users',
 						anchor: '-20',
 					  allowBlank:false,
-					  fieldLabel: GO.servermanager.lang.maxUsers
+					  fieldLabel: t("maxUsers", "servermanager")
 					}),new GO.form.NumberField({
 					  name: 'quota',
 						anchor: '-20',					  
-					  fieldLabel: GO.servermanager.lang.quota,
+					  fieldLabel: t("quota", "servermanager"),
 					  value:1
 					})]
 			}]
@@ -552,7 +552,7 @@ Ext.extend(GO.servermanager.InstallationDialog, GO.Window,{
 
 		this.modulesGrid = new GO.grid.MultiSelectGrid({
 			id:'sm-modules',
-			title:GO.servermanager.lang.availableModules,
+			title:t("availableModules", "servermanager"),
 			loadMask:true,
 			allowNoSelection:true,
 			store:new GO.data.JsonStore({

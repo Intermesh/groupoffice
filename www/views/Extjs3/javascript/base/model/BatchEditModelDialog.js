@@ -6,7 +6,7 @@ GO.base.model.BatchEditModelDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 	initComponent : function(){
 		
 		Ext.apply(this, {
-			title:GO.lang.batchEdit,
+			title:t("Batch edit"),
 			formControllerUrl: 'batchEdit',
 			loadOnNewModel:false
 		});
@@ -86,7 +86,7 @@ GO.base.model.BatchEditModelDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 	buildForm : function(){
 		
 		var checkColumn = new GO.grid.CheckColumn({
-			header:GO.lang['replace'],
+			header:t("Replace"),
 			id:'replace',
 			dataIndex: 'replace',
 			width: 80,
@@ -104,7 +104,7 @@ GO.base.model.BatchEditModelDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 			columns:[
 				checkColumn,
 				{
-					header:GO.lang['label'],
+					header:t("Label"),
 					dataIndex: 'label',
 					sortable:false,
 					hideable:false,
@@ -112,7 +112,7 @@ GO.base.model.BatchEditModelDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 					id:'label',
 					width: 200
 				},{
-					header:GO.lang['value'],
+					header:t("Value"),
 					dataIndex: 'value',
 					sortable:false,
 					hideable:false,
@@ -137,7 +137,7 @@ GO.base.model.BatchEditModelDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 								var editorRec = editor.getStore().query(editor.valueField,value);
 								value = editorRec.items[0].get(editor.displayField);
 							} else if(record.get('has_data') && value == ""){
-								value = '<span class="x-item-disabled" >'+ GO.lang['hasData'] +'<span>';
+								value = '<span class="x-item-disabled" >'+ t("Has data") +'<span>';
 							}
 							return value;
 						},
@@ -177,7 +177,7 @@ GO.base.model.BatchEditModelDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 			view:new Ext.grid.GridView({
 				autoFill: true,
 				forceFit: true,
-				emptyText: GO.lang['strNoItems']
+				emptyText: t("No items to display")
 			}),
 			sm:new Ext.grid.RowSelectionModel(),
 			loadMask:true,
@@ -205,7 +205,7 @@ GO.base.model.BatchEditModelDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 GO.base.model.showBatchEditModelDialog=function(model_name, keys, primaryKey, editors,exclude,title){
 	
 	if (keys.length<=0) {
-			Ext.Msg.alert(GO.lang.batchSelectionError, GO.lang.batchSelectOne);
+			Ext.Msg.alert(t("You didn't select anything"), t("Select at least one item"));
 			return false;
 	}
 	

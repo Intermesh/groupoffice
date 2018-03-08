@@ -17,7 +17,7 @@ GO.base.QuickEditDialog = function(config) {
 	config.layout = 'fit';
 	config.width = 1024;
 	config.height = 640;
-	config.title = GO.lang.quickEdit;
+	config.title = t("Quick edit");
 	
 	this.editorGridParams = config.editorGridParams;
 	this._buildGrid();
@@ -105,7 +105,7 @@ Ext.extend(GO.base.QuickEditDialog, GO.Window, {
 		});
 
 		this.rowEditor = new GO.grid.RowEditor({
-			saveText: GO.lang['cmdApply'],
+			saveText: t("Apply"),
 			height: '40px'
 		});
 
@@ -128,7 +128,7 @@ Ext.extend(GO.base.QuickEditDialog, GO.Window, {
 			view: new Ext.grid.GridView({
 				autoFill: false,
 //				forceFit: true,
-				emptyText: GO.lang['strNoItems']
+				emptyText: t("No items to display")
 			}),
 			sm:new Ext.grid.RowSelectionModel(),
 			loadMask:true,
@@ -158,8 +158,8 @@ Ext.extend(GO.base.QuickEditDialog, GO.Window, {
 			if (this.editorGridParams.gridColumns[i].datatype=='GO\\Customfields\\Customfieldtype\\Checkbox') {
 				this.editorGridParams.gridColumns[i].renderer = function(v) {
 					if (v==0 || v==false)
-						return GO.lang.cmdNo;
-					return GO.lang.cmdYes;
+						return t("No");
+					return t("Yes");
 				}
 			}
 		}
@@ -194,7 +194,7 @@ Ext.extend(GO.base.QuickEditDialog, GO.Window, {
 					this.fireEvent('save',true);
 				}else
 				{
-					Ext.MessageBox.alert(GO.lang.strError,responseParams.feedback);
+					Ext.MessageBox.alert(t("Error"),responseParams.feedback);
 				}								
 			},
 			scope:this

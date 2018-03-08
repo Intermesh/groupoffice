@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: LinksDialog.js 21473 2017-09-21 15:05:24Z wsmits $
+ * @version $Id: LinksDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -51,7 +51,7 @@ GO.dialog.LinksDialog = function(config){
 		border:false,
 		plain:true,
 		closeAction:'hide',
-		title:GO.lang['strLinkItems'],
+		title:t("Search for items to link"),
 		items: this.grid,
 		listeners : {
 			show:function(){
@@ -62,14 +62,14 @@ GO.dialog.LinksDialog = function(config){
 		},
 		buttons: [
 			{
-				text: GO.lang['cmdOk'],
+				text: t("Ok"),
 				handler: function(){							
 					this.linkItems();
 				},
 				scope:this
 			},
 			{
-				text: GO.lang['cmdClose'],
+				text: t("Close"),
 				handler: function(){this.hide();},
 				scope: this
 			}
@@ -126,7 +126,7 @@ Ext.extend(GO.dialog.LinksDialog, Ext.Window, {
 
 				this.selectFolderWindow = new GO.Window({
 					layout:'fit',
-					title:GO.lang.selectFolder,
+					title:t("Select a folder please"),
 					items:this.selectFolderTree,
 					closeAction:'hide',
 					width:400,
@@ -134,12 +134,12 @@ Ext.extend(GO.dialog.LinksDialog, Ext.Window, {
 					modal:true,
 					closable:true,
 					buttons:[{
-							text:GO.lang.cmdOk,
+							text:t("Ok"),
 							handler:function(){
 
 								var node = this.selectFolderTree.getSelectionModel().getSelectedNode();
 								if(!node){
-									alert(GO.lang.selectFolder);
+									alert(t("Select a folder please"));
 								}
 
 								var to_folder_id = parseInt(node.id.replace('lt-folder-',''));
@@ -182,7 +182,7 @@ Ext.extend(GO.dialog.LinksDialog, Ext.Window, {
 			{
 				if(!success)
 				{
-					Ext.MessageBox.alert(GO.lang['strError'], response.result.errors);
+					Ext.MessageBox.alert(t("Error"), response.result.errors);
 				}else
 				{
 					this.fireEvent('link');

@@ -1,8 +1,7 @@
 <?php
-$l['name']='Google Drive';
-$l['description']='Dokumente online bearbeiten mit Google Docs';
-
-$l['import']="Dokument von Google Drive importieren und löschen?";
-$l['finishedEditing']="Bearbeitung beenden?";
-
-$l['oldOfficeFile']='Diese ältere Microsoft Office Format kann so nicht bearbeitet werden. Möchten Sie es vorher in das neue Format konvertieren?';
+return array (
+  'Import and delete document from Google Drive?' => 'Dokument von Google Drive importieren und löschen?',
+  'Finished editing?' => 'Bearbeitung beenden?',
+  'This older Microsoft office format can\'t be edited with Google drive. Do you want to convert it to the new format?' => 'Diese ältere Microsoft Office Format kann so nicht bearbeitet werden. Möchten Sie es vorher in das neue Format konvertieren?',
+  'description' => 'Dokumente online bearbeiten mit Google Docs',
+);

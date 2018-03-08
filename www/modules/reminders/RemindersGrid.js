@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: RemindersGrid.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: RemindersGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -22,11 +22,11 @@ GO.reminders.RemindersGrid = function(config){
 	var fields ={
 		fields:['id','link_id','link_type','name','time','vtime','mail_send','snooze_time','manual'],
 		columns:[{
-			header: GO.reminders.lang.time,
+			header: t("Time", "reminders"),
 			dataIndex: 'time',
 			width:120
 		},{
-			header: GO.lang.strName,
+			header: t("Name"),
 			dataIndex: 'name',
 			id:'name'
 		}
@@ -51,7 +51,7 @@ GO.reminders.RemindersGrid = function(config){
 	});
 	config.cm=columnModel;
 	config.view=new Ext.grid.GridView({
-			emptyText: GO.lang['strNoItems']		
+			emptyText: t("No items to display")		
 	});
 	config.autoExpandColumn='name';
 	config.sm=new Ext.grid.RowSelectionModel();
@@ -61,7 +61,7 @@ GO.reminders.RemindersGrid = function(config){
 		cls:'go-head-tb',
 		items:[{
 			iconCls: 'btn-add',
-			text: GO.lang['cmdAdd'],
+			text: t("Add"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 				this.showReminderDialog();
@@ -69,7 +69,7 @@ GO.reminders.RemindersGrid = function(config){
 			scope: this
 		},{
 			iconCls: 'btn-delete',
-			text: GO.lang['cmdDelete'],
+			text: t("Delete"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 				this.deleteSelected();

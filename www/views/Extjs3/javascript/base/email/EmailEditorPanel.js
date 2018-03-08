@@ -249,7 +249,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 				name: 'subject',				
 				anchor: '100%',
 				allowBlank: false,
-				fieldLabel: GO.lang['strSubject']
+				fieldLabel: t("Subject")
 			});
 
 		config.items.push(this.htmlEditor);
@@ -434,12 +434,12 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 	getAttachmentsButton : function(){
 		
 		
-		if(GO.files)
+		if(go.ModuleManager.isAvailable("files"))
 		{
 			var uploadItems = [];
 		
 			uploadItems.push(new GO.base.upload.PluploadMenuItem({
-					text:GO.lang.upload,
+					text:t("Upload"),
 					upload_config: {
 						max_file_size: Math.floor(this.maxAttachmentsSize/1048576)+'mb',
 						listeners: {
@@ -462,10 +462,10 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		
 			uploadItems.push({
 				iconCls:'btn-groupoffice',
-				text : GO.email.lang.attachFilesGO.replace('{product_name}', GO.settings.config.product_name),
+				text : t("Add from Group-Office", "email").replace('{product_name}', GO.settings.config.product_name),
 				handler : function()
 				{
-					if(GO.files)
+					if(go.ModuleManager.isAvailable("files"))
 					{
 						GO.files.createSelectFileBrowser();
 
@@ -490,7 +490,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 			
 			return new Ext.Button({
 				iconCls:'btn-attach',
-				text: GO.lang.attachFiles,
+				tooltip: t("Attach files"),
 				menu:{
 					items:uploadItems
 				}
@@ -499,7 +499,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		}else
 		{		
 			return new GO.base.upload.PluploadButton({
-				text:GO.lang.attachFiles,
+				tooltip:t("Attach files"),
 				upload_config: {
 					listeners: {
 						scope:this,

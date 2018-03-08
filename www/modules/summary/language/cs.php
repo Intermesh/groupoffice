@@ -1,31 +1,26 @@
 <?php
-
-
-$l['name']='Přehled';
-$l['description']='Stránka na které je uveden přehled činností.';
-$l['default_rss_url']='http://novinky.cz/rss2/';
-$l['default_rss_title']='Novinky';
-$l['announcement']='Zpráva';
-$l['announcements']='Zprávy';
-$l['announcement']='Zpráva';
-$l['announcements']='Zprávy';
-$l["summary"]= 'Přehled';
-$l["noItems"]= 'Nemáte žádné položky na Vaší počáteční stránce.';
-$l["selectPortlet"]= 'Vyberte portlet';
-$l["hotTopics"]= 'Aktuální novinky';
-$l["enterRssFeed"]= 'Prosím, zadejte adresu pro RSS:';
-$l["notes"]= 'Poznámky';
-$l["loadingFeed"]= 'Nahrávání...';
-$l["goToPost"]= 'Přejít na příspěvek';
-$l["today"]= 'Dnes v ';
-$l["announcement"]="Zpráva";
-$l["announcements"]="Zprávy";
-$l["dueTime"]="Datum";
-$l["title"]="Titulek";
-$l["manageAnnouncements"]='Upravit zprávy';
-$l["webFeeds"]='Upravit webové zprávy';
-$l["type"]='Typ';
-$l["summaryType"]='Přehled';
-$l["rssFeeds"]='RSS zprávy';
-$l["noRssFeeds"]='Žádné RSS zprávy nebyly přidány.<br />Pro přidání zpráv klikněte na tlačítko \'nastavení\' v pravém rohu okna.';
-$l['latestReadAnnouncementRecord'] = 'Záznam nejnovějších přečtených oznámení';
+return array (
+  'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml' => 'http://novinky.cz/rss2/',
+  'News' => 'Aktuální novinky',
+  'Announcement' => 'Zpráva',
+  'Announcements' => 'Zprávy',
+  'You don\'t have any items on your start page.' => 'Nemáte žádné položky na Vaší počáteční stránce.',
+  'Select portlet' => 'Vyberte portlet',
+  'Please enter the RSS feed URL:' => 'Prosím, zadejte adresu pro RSS:',
+  'Notes' => 'Poznámky',
+  'Loading Feed...' => 'Nahrávání...',
+  'Go to Post' => 'Přejít na příspěvek',
+  'Today ' => 'Dnes v ',
+  'Show until' => 'Datum',
+  'Title' => 'Titulek',
+  'Manage announcements' => 'Upravit zprávy',
+  'Manage webfeeds' => 'Upravit webové zprávy',
+  'Type' => 'Typ',
+  'Summary' => 'Přehled',
+  'Rss Feeds' => 'RSS zprávy',
+  'No RSS feeds have been added.<br />Click the settings button in the top right corner of this window to add feeds.' => 'Žádné RSS zprávy nebyly přidány.<br />Pro přidání zpráv klikněte na tlačítko \'nastavení\' v pravém rohu okna.',
+  'Record of latest read announcement' => 'Záznam nejnovějších přečtených oznámení',
+  'name' => 'Přehled',
+  'description' => 'Stránka na které je uveden přehled činností.',
+  'Start page' => 'Přehled',
+);

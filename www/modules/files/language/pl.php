@@ -1,61 +1,63 @@
 <?php
-
-
-$l["template"]= 'Szablon';
-$l["manageTemplates"]= 'Zarządzanie szablonami';
-$l["downloadTemplate"]= 'Pobierz szablon';
-$l["enterName"]= 'Podaj nazwę';
-$l["pleaseEnterName"]= 'Proszę podać nazwę';
-$l["pleaseEnterNameArchive"]= 'Proszę podać nazwę dla archiwum';
-$l["startTransfer"]= 'Rozpocznij transfer';
-$l["addFolder"]= 'Dodaj folder';
-$l["errorOneItem"]= 'Proszę wybrać tylko jedną pozycję';
-$l["activateSharing"]= 'Aktywuj współdzielenie';
-$l["notifyChanges"]= 'Powiadom mnie o zmianach w tym folderze';
-$l["comments"]= 'Uwagi';
-$l["downloadGOTA"]= 'Pobierz za pomocą GOTA';
-$l["fileBrowser"]= 'Przeglądarka plików';
-$l["thumbnails"]= 'Miniatury';
-$l["saveFile"]='Zapisz plik';
-$l["confirmOverwrite"]='{filename} już istnieje, czy chcesz nadpisać ten plik?';
-$l["emptyList"]='Pusta lista';
-$l["newFiles"]='Nowy';
-$l["olderVersions"]='Starsze wersje';
-$l["uploadProperties"]='Właściwości podane niżej będą zastosowane do wszystkich pliów przesłąnych za pomocą opcji "Małe pliki"';
-$l["selectFiles"]= 'Wybierz pliki';
-$l["fitImage"]='Dopasuj obraz';
-$l["normalSize"]='Normalny rozmiar';
-$l["imageViewer"]='Przeglądarka obrazów';
-$l["emailDownloadLink"]= 'Wyślij link do pobierania';
-$l["expireTime"]= 'Okres ważności linku do pobierania';
-$l["newFolder"]= 'Nowy folder';
-$l['name'] = 'Pliki';
-$l['description'] = 'Moduł Pliki; Zarządzanie i udostępnianie plików.';
-$l['fileNotFound'] = 'Plik nie znaleziony';
-$l['folderExists'] = 'Folder już istnieje';
-$l['filenameExists'] = 'Nazwa pliku już istnieje';
-$l['uploadedSucces'] = 'Plik przesłany poprawnie';
-$l['ootextdoc']='Open-Office Text document';
-$l['wordtextdoc']='Microsoft Word document';
-$l['personal']='osobiste';
-$l['shared']='Współdzielone';
-$l['general']='ogólne';
-$l['folder_modified_subject']='Zmiany w folderze {product_name}';
-$l['folder_modified_body']='Zażądano powiadomienia, gdy nastąpią zmiany w:
+return array (
+  'Template' => 'Szablon',
+  'Manage templates' => 'Zarządzanie szablonami',
+  'Download template' => 'Pobierz szablon',
+  'Enter a name' => 'Podaj nazwę',
+  'Please enter a name' => 'Proszę podać nazwę',
+  'Please enter a name for the archive' => 'Proszę podać nazwę dla archiwum',
+  'Start transfer' => 'Rozpocznij transfer',
+  'Add folder' => 'Dodaj folder',
+  'Please select only one item' => 'Proszę wybrać tylko jedną pozycję',
+  'Activate sharing' => 'Aktywuj współdzielenie',
+  'Notify me about changes in this folder' => 'Powiadom mnie o zmianach w tym folderze',
+  'Comments' => 'Uwagi',
+  'Download with GOTA' => 'Pobierz za pomocą GOTA',
+  'File browser' => 'Przeglądarka plików',
+  'Thumbnails' => 'Miniatury',
+  'Save file' => 'Zapisz plik',
+  '{filename} already exists, do you want to overwrite the file?' => '{filename} już istnieje, czy chcesz nadpisać ten plik?',
+  'Empty list' => 'Pusta lista',
+  'New' => 'Nowy',
+  'Older versions' => 'Starsze wersje',
+  'The properties below will be applied to all files uploaded with the "Small files" option' => 'Właściwości podane niżej będą zastosowane do wszystkich pliów przesłąnych za pomocą opcji "Małe pliki"',
+  'Select files' => 'Wybierz pliki',
+  'Fit image' => 'Dopasuj obraz',
+  'Normal size' => 'Normalny rozmiar',
+  'Image viewer' => 'Przeglądarka obrazów',
+  'Email download link' => 'Wyślij link do pobierania',
+  'Download link expire time' => 'Okres ważności linku do pobierania',
+  'New folder' => 'Nowy folder',
+  'Sorry, the file you tried to download is not found.' => 'Plik nie znaleziony',
+  'The folder already exists' => 'Folder już istnieje',
+  'Filename %s already exists' => 'Nazwa pliku już istnieje',
+  'File uploaded successfully' => 'Plik przesłany poprawnie',
+  'Personal' => 'osobiste',
+  'Shared' => 'Współdzielone',
+  'General' => 'ogólne',
+  'Changes to {product_name} folder' => 'Zmiany w folderze {product_name}',
+  'You requested to be notified when changes are made to:
+%s
+The following changes were made by %s:
+%s;
+' => 'Zażądano powiadomienia, gdy nastąpią zmiany w:
 %s
 Następujące zmiany zostały wykonane przez %s:
 %s;
-';
-$l['modified']='Modyfikacje';
-$l['new']='Nowy';
-$l['deleted']='Usunięty';
-$l['file']='Plik';
-$l['folder']='Folder';
-$lang['link_type'][6]='Plik';
-$l['files']='Pliki';
-$lang['link_type'][17]='Folder';
-$l['emptyFile']='Pusty plik';
-$l['downloadLink']= 'Pobierz link';
-$l['clickHereToDownload']= 'Kliknij tutaj, aby pobrać bezpieczny link do pliku';
-$l['copyPasteToDownload']= 'Aby pobrać plik, kliknij poniższy bezpieczny link lub skopuj go do przeglądarki.';
-$l['possibleUntil']= 'możliwe do';
+',
+  'Modified' => 'Modyfikacje',
+  'Deleted' => 'Usunięty',
+  'File' => 'Plik',
+  'Empty file' => 'Pusty plik',
+  'Download link' => 'Pobierz link',
+  'Click on the link to download the file' => 'Kliknij tutaj, aby pobrać bezpieczny link do pliku',
+  'Click the secured link below or copy it to your browser\'s address bar to download the file.' => 'Aby pobrać plik, kliknij poniższy bezpieczny link lub skopuj go do przeglądarki.',
+  'possible until' => 'możliwe do',
+  'name' => 'Pliki',
+  'description' => 'Moduł Pliki; Zarządzanie i udostępnianie plików.',
+  'Open-Office Text document' => 'Open-Office Text document',
+  'Microsoft Word document' => 'Microsoft Word document',
+  'Changes to Group-Office folder' => 'Zmiany w folderze {product_name}',
+  'Folder' => 'Folder',
+  'Files' => 'Pliki',
+);

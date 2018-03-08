@@ -1,21 +1,20 @@
 <?php
-
-
-$l["summary"]= 'Overblik';
-$l["noItems"]= 'Du har ingen emner på din startside.';
-$l["selectPortlet"]= 'Vælg portlet';
-$l["hotTopics"]= 'Aktuelle emner';
-$l["enterRssFeed"]= 'Angiv venligst URL til RSS feed:';
-$l["notes"]= 'Noter';
-$l["loadingFeed"]= 'Henter feed...';
-$l["goToPost"]= 'Gå til post';
-$l["today"]= 'I dag ';
-$l["dueTime"]="Vis indtil";
-$l["title"]="Titel";
-$l["manageAnnouncements"]='Rediger bekendtgørelser';
-
-$l['name']='Overblik';
-$l['description']='Angiv en beskrivelse her';
-$l['default_rss_url']='http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml';
-$l['announcement']='Bekendtgørelse';
-$l['announcements']='Bekendtgørelser';
+return array (
+  'You don\'t have any items on your start page.' => 'Du har ingen emner på din startside.',
+  'Select portlet' => 'Vælg portlet',
+  'News' => 'Aktuelle emner',
+  'Please enter the RSS feed URL:' => 'Angiv venligst URL til RSS feed:',
+  'Notes' => 'Noter',
+  'Loading Feed...' => 'Henter feed...',
+  'Go to Post' => 'Gå til post',
+  'Today ' => 'I dag ',
+  'Show until' => 'Vis indtil',
+  'Title' => 'Titel',
+  'Manage announcements' => 'Rediger bekendtgørelser',
+  'Announcement' => 'Bekendtgørelse',
+  'Announcements' => 'Bekendtgørelser',
+  'name' => 'Overblik',
+  'description' => 'Angiv en beskrivelse her',
+  'Start page' => 'Overblik',
+  'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml' => 'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml',
+);

@@ -1,21 +1,20 @@
 <?php
-
-
-$l["summary"]= '摘要';
-$l["noItems"]= '您的首页没有组件.';
-$l["selectPortlet"]= '请选择portlet';
-$l["hotTopics"]= '热门话题';
-$l["enterRssFeed"]= '请输入 RSS feed URL:';
-$l["notes"]= '记事本';
-$l["loadingFeed"]= 'Loading Feed...';
-$l["goToPost"]= 'Go to Post';
-$l["today"]= '今天 ';
-$l["dueTime"]="显示至";
-$l["title"]="标题";
-$l["manageAnnouncements"]='管理公告';
-
-$l['name']='概要';
-$l['description']='在这里输入说明';
-$l['default_rss_url']='http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml';
-$l['announcement']='公告';
-$l['announcements']='公告';
+return array (
+  'You don\'t have any items on your start page.' => '您的首页没有组件.',
+  'Select portlet' => '请选择portlet',
+  'News' => '热门话题',
+  'Please enter the RSS feed URL:' => '请输入 RSS feed URL:',
+  'Notes' => '记事本',
+  'Today ' => '今天 ',
+  'Show until' => '显示至',
+  'Title' => '标题',
+  'Manage announcements' => '管理公告',
+  'Announcement' => '公告',
+  'Announcements' => '公告',
+  'name' => '概要',
+  'description' => '在这里输入说明',
+  'Start page' => '摘要',
+  'Loading Feed...' => 'Loading Feed...',
+  'Go to Post' => 'Go to Post',
+  'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml' => 'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml',
+);

@@ -114,7 +114,9 @@ class FilesModule extends \GO\Base\Module{
 
 				self::$fileHandlers=array();
 				foreach($modules as $module){
-					self::$fileHandlers = array_merge(self::$fileHandlers, $module->moduleManager->findClasses('filehandler'));
+					if($module->moduleManager instanceof \GO\Base\Module) {
+						self::$fileHandlers = array_merge(self::$fileHandlers, $module->moduleManager->findClasses('filehandler'));
+					}
 				}
 				\GO::cache()->set('files-file-handlers', self::$fileHandlers);
 			}
@@ -139,7 +141,7 @@ class FilesModule extends \GO\Base\Module{
 		parent::install();
 		
 		$template = new \GO\files\Model\Template();
-		$template->name=\GO::t('wordtextdoc','files');
+		$template->name=\GO::t("Microsoft Word document", "files");
 		$template->content = file_get_contents(\GO::modules()->files->path.'install/templates/empty.docx');
 		$template->extension='docx';
 		$template->save();	
@@ -147,7 +149,7 @@ class FilesModule extends \GO\Base\Module{
 		
 		
 		$template = new \GO\files\Model\Template();
-		$template->name=\GO::t('ootextdoc','files');
+		$template->name=\GO::t("Open-Office Text document", "files");
 		$template->content = file_get_contents(\GO::modules()->files->path.'install/templates/empty.odt');
 		$template->extension='odt';
 		$template->save();	

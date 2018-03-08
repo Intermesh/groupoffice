@@ -122,7 +122,9 @@ class Disk implements CacheInterface{
 		
 		unset($this->_ttls[$key]);
 		$this->_ttlsDirty=true;
-		@unlink($this->_dir.$key);
+		if(file_exists($this->_dir.$key)){
+			unlink($this->_dir.$key);
+		}
 	}
 	/**
 	 * Flush all values 

@@ -1,26 +1,22 @@
 <?php
-
-$l["cmdSaveChanges"]= 'Savegarder les changements';
-$l["cmdInstall"]= 'Installer';
-$l["cmdUninstall"]= 'Désinstaller';
-$l["cmdAvailableModules"]= 'Apps disponibles';
-$l["cmdModuleName"]= 'Nom de l\'App';
-$l["cmdModuleDescription"]= 'Description';
-$l["cmdGridColumnModuleName"]= 'Nom de l\'App';
-$l["cmdUninstallMessage"]= 'ATTENTION ! Toutes les données de cette App vont être supprimées ! Etes-vous sûr de vouloir désinstaller l\'App "{0}" ?';
-$l["cmdModulesCannotBeDeleted"]= 'Le module "Apps" ne peut pas être supprimé !.';
-$l["modules"]='Apps';
-$l['name'] = 'Apps';
-$l['description'] = '<i style="color: green">*** Module Admin *** </i>Gérer les Apps de {product_name}.';
-$l['deleteModule'] = 'Le module "Apps" ne peut pas être supprimé !';
-$l['enabled']='Enabled';
-$l['sort_order']='Sort order';
-
-$l['buyLicenses']='Acheter une licence Pro';
-
-$l['addToCart']="Ajouter au panier";
-$l['selectUsersForPackage']='Sélectioner les utilisateurs pour le paquet {package}';
-
-$l['trialLicense']="Licence d'essai de 30 jours";
-$l['trialLicenseTitle']="Licence d'essai de 30 jours";
-$l['trialLicenseText']="Obtenez une licence d'essai de 30 jours avec un nombre d'utilisateurs illimité et tous les modules disponibles. Cliquez sur 'Oui' pour aller sur notre magasin en ligne et récupérer votre licence d'essai (enregistrement obligatoire sur notre site).";
+return array (
+  'Save changes' => 'Savegarder les changements',
+  'Install' => 'Installer',
+  'Uninstall' => 'Désinstaller',
+  'Available Modules' => 'Apps disponibles',
+  'Module name' => 'Nom de l\'App',
+  'WARNING! All data of this module will be deleted! Are you sure you want to uninstall the "{0}" module?' => 'ATTENTION ! Toutes les données de cette App vont être supprimées ! Etes-vous sûr de vouloir désinstaller l\'App "{0}" ?',
+  'The module "Modules" cannot be deleted!.' => 'Le module "Apps" ne peut pas être supprimé !.',
+  'The module "Modules" cannot be deleted!' => 'Le module "Apps" ne peut pas être supprimé !',
+  'Buy licenses' => 'Acheter une licence Pro',
+  'Add to shopping cart' => 'Ajouter au panier',
+  'Select users for package {package}' => 'Sélectioner les utilisateurs pour le paquet {package}',
+  '30 day trial license' => 'Licence d\'essai de 30 jours',
+  'Get a free 30 day trial with unlimited users and all available modules. Click \'Yes\' to continue to our shop and get your trial license. If you don\'t have a shop account you\'ll need to register.' => 'Obtenez une licence d\'essai de 30 jours avec un nombre d\'utilisateurs illimité et tous les modules disponibles. Cliquez sur \'Oui\' pour aller sur notre magasin en ligne et récupérer votre licence d\'essai (enregistrement obligatoire sur notre site).',
+  'name' => 'Apps',
+  'description' => '<i style="color: green">*** Module Admin *** </i>Gérer les Apps de {product_name}.',
+  'Description' => 'Description',
+  'Modules' => 'Apps',
+  'Enabled' => 'Enabled',
+  'Sort order' => 'Sort order',
+);

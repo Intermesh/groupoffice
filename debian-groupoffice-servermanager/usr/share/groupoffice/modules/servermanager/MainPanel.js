@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: MainPanel.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: MainPanel.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -33,7 +33,7 @@
 //		cls:'go-head-tb',
 //		items:[{
 //			iconCls: 'btn-add',
-//			text: GO.lang['cmdAdd'],
+//			text: t("Add"),
 //			cls: 'x-btn-text-icon',
 //			handler: function(){
 //				GO.servermanager.installationDialog.show();
@@ -41,13 +41,13 @@
 //			scope: this
 //		},{
 //			iconCls: 'btn-delete',
-//			text: GO.lang['cmdDelete'],
+//			text: t("Delete"),
 //			cls: 'x-btn-text-icon',
 //			handler: function(){
 //				this.installationsGrid.deleteSelected();
 //			},
 //			scope: this
-//		},'-',GO.lang['strSearch']+': ', ' ',this.installationsGrid.searchField]		
+//		},'-',t("Search")+': ', ' ',this.installationsGrid.searchField]		
 //	});
 //
 //	config.items=[
@@ -72,7 +72,7 @@
 //		this.xtemplate.overwrite(this.infoPanel.body, this.installationsGrid.store.reader.jsonData);
 //	}, this);
 //
-//	config.title=GO.servermanager.lang.servermanager;
+//	config.title=t("servermanager", "servermanager");
 //	
 //	config.layout='border';
 //	GO.servermanager.MainPanel.superclass.constructor.call(this, config);
@@ -97,6 +97,6 @@ GO.mainLayout.onReady(function(){
  */
  
 GO.moduleManager.addModule('servermanager', GO.servermanager.InstallationsGrid, {
-	title : GO.servermanager.lang.servermanager,
+	title : t("servermanager", "servermanager"),
 	iconCls : 'go-tab-icon-servermanager'
 });

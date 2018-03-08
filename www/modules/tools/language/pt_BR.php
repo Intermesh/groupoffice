@@ -1,17 +1,15 @@
 <?php
-
-
-$l["tools"]='Ferramentas administrativas';
-$l["description"]='Clique em um script abaixo para executá-lo.';
-$l["scripts"]='Scripts';
-$l["scriptOutput"]='Resultado do script';
-
-$l['name']='Ferramentas';
-$l['description']='Módulo para executar tarefas administrativas.';
-$l['dbcheck']='Verificar banco de dados';
-$l['rm_duplicates']='Remover contatos e eventos duplicados';
-$l['backupdb']='Backup do banco de dados';
-$l['index_files']='Indexar todos os arquivos';
-$l['buildsearchcache']='Criar índice de busca';
-$l['checkmodules']='Verificar módulos';
-$l['resetState']='Reiniciar o estado das janelas, grids, etc.';
+return array (
+  'Admin tools' => 'Ferramentas administrativas',
+  'Script output' => 'Resultado do script',
+  'Database check' => 'Verificar banco de dados',
+  'Remove duplicate contacts and events' => 'Remover contatos e eventos duplicados',
+  'Backup database' => 'Backup do banco de dados',
+  'Index all files' => 'Indexar todos os arquivos',
+  'Create search index' => 'Criar índice de busca',
+  'Check modules' => 'Verificar módulos',
+  'Reset state of windows, grids etc.' => 'Reiniciar o estado das janelas, grids, etc.',
+  'name' => 'Ferramentas',
+  'description' => 'Módulo para executar tarefas administrativas.',
+  'Scripts' => 'Scripts',
+);

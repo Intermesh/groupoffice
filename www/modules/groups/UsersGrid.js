@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: UsersGrid.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: UsersGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
@@ -34,16 +34,16 @@ GO.groups.UsersGrid = Ext.extend(GO.grid.GridPanel,{
 			view:new Ext.grid.GridView({
 				autoFill: true,
 				forceFit: true,
-				emptyText: GO.lang['strNoItems']		
+				emptyText: t("No items to display")		
 			}),
 			cm:new Ext.grid.ColumnModel({
 				defaults:{
 					sortable:true
 				},
 				columns:[
-          {header: GO.lang.strName, dataIndex: 'name'},
-          {header: GO.lang.strUsername, dataIndex: 'username'},
-          {header: GO.lang.strEmail, dataIndex: 'email'}	
+          {header: t("Name"), dataIndex: 'name'},
+          {header: t("Username"), dataIndex: 'username'},
+          {header: t("E-mail"), dataIndex: 'email'}	
 				]
 			})
 		});

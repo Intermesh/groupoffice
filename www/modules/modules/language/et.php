@@ -1,17 +1,15 @@
 <?php
-
-
-	$l['name'] = 'Moodulid';
-	$l['description'] = 'Admini moodul; Moodulite haldamine.';
-	$l['deleteModule'] = 'Moodulit "Moodulid" ei saa kustutada!';
-
-$l["modules"]='Moodulid';
-$l["cmdSaveChanges"]= 'Salvesta muudatused';
-$l["cmdInstall"]= 'Paigalda';
-$l["cmdUninstall"]= 'Eemalda';
-$l["cmdAvailableModules"]= 'Saada olevad moodulid';
-$l["cmdModuleName"]= 'Mooduli nimi';
-$l["cmdModuleDescription"]= 'Kirjeldus';
-$l["cmdGridColumnModuleName"]= 'Mooduli nimi';
-$l["cmdUninstallMessage"]= 'Hoiatus! Kõik selle mooduli andmed kustutatakse! Oled kindel, et soovid moodulit "{0}" eemaldada?';
-$l["cmdModulesCannotBeDeleted"]= 'Moodulit "Mooodulit" ei saa kustutada!';
+return array (
+  'The module "Modules" cannot be deleted!' => 'Moodulit "Moodulid" ei saa kustutada!',
+  'Save changes' => 'Salvesta muudatused',
+  'Install' => 'Paigalda',
+  'Uninstall' => 'Eemalda',
+  'Available Modules' => 'Saada olevad moodulid',
+  'Module name' => 'Mooduli nimi',
+  'Description' => 'Kirjeldus',
+  'WARNING! All data of this module will be deleted! Are you sure you want to uninstall the "{0}" module?' => 'Hoiatus! Kõik selle mooduli andmed kustutatakse! Oled kindel, et soovid moodulit "{0}" eemaldada?',
+  'The module "Modules" cannot be deleted!.' => 'Moodulit "Mooodulit" ei saa kustutada!',
+  'name' => 'Moodulid',
+  'description' => 'Admini moodul; Moodulite haldamine.',
+  'Modules' => 'Moodulid',
+);

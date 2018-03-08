@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: MainPanel.js 21680 2017-11-14 08:16:38Z michaelhart86 $
+ * @version $Id: MainPanel.js 22445 2018-03-06 08:36:59Z michaelhart86 $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  * @author Boy Wijnmaalen <bwijnmaalen@intermesh.nl>
@@ -26,37 +26,24 @@ GO.users.MainPanel = function(config)
 	config.layout='border';
 	config.border=false;
 	
-	this.usersGridPanel = new GO.users.UsersGrid({'region':'center'});
-	
+	this.usersGridPanel = new GO.users.UsersGrid({'region':'center',tbar:[]});
 	this.groupsGrid = new GO.users.GroupsGrid({
 		relatedStore: this.usersGridPanel.store,
 		region:'west',
-		id:'users-groups-panel',
-		width: 250
-
+		cls: 'go-sidenav',
+		width:dp(224),
+		id:'users-groups-panel'
 	});
 	
-  this.searchField = new GO.form.SearchField({
-		store: this.usersGridPanel.store,
-		width:320
-  });
-	
-	this.tbar = new Ext.Toolbar({		
-			cls:'go-head-tb',
-			items: [{
-		      	 	xtype:'htmlcomponent',
-				html:GO.users.lang.name,
-				cls:'go-module-title-tbar'
-			},
+	this.usersGridPanel.getTopToolbar().add([
 		  	{
-		  		iconCls: 'btn-add', 
-		  		text: GO.lang['cmdAdd'], 
-		  		cls: 'x-btn-text-icon', 
+		  		iconCls: 'ic-add', 
+		  		text: t("Add"),  
 		  		handler: function(){
 		  			//if(GO.settings.config.max_users > 0 && this.usersGridPanel.store.totalLength >= GO.settings.config.max_users)
 		  			//{
 					// THIS is now check serverside because we can only check the enabled users
-		  			//	Ext.Msg.alert(GO.lang.strError, GO.users.lang.maxUsersReached);
+		  			//	Ext.Msg.alert(t("Error"), t("The maximum number of users has been reached. Contact your hosting provider to extend your maximum number of users.", "users"));
 		  			//}else
 		  			//{
 		  				GO.users.showUserDialog();
@@ -65,16 +52,26 @@ GO.users.MainPanel = function(config)
 		  		scope: this
 		  	},
 		  	{
-		  		iconCls: 'btn-delete', 
-		  		text: GO.lang['cmdDelete'], 
-		  		cls: 'x-btn-text-icon', 
+		  		iconCls: 'ic-delete', 
+		  		tooltip: t("Delete"),
 		  		handler: function(){
 						this.usersGridPanel.deleteSelected();
 					},
 		  		scope: this
-		  	},{
-		  		iconCls: 'btn-upload',
-		  		text:GO.lang.cmdImport,
+		  	},'-',{
+				iconCls:'ic-settings',
+				tooltip:t("Administration"),
+				handler:function(){
+					if(!this.settingsDialog)
+					{
+						this.settingsDialog = new GO.users.SettingsDialog();
+					}
+					this.settingsDialog.show();
+				},
+				scope:this
+			},{
+		  		iconCls: 'ic-file-upload',
+		  		text:t("Import"),
 		  		handler:function(){
 		  			if(!this.importDialog)
 		  			{
@@ -84,22 +81,11 @@ GO.users.MainPanel = function(config)
 		  			this.importDialog.show();
 		  		},
 		  		scope:this		  		
-		  	},{
-				iconCls:'btn-settings',
-				text:GO.lang.administration,
-				handler:function(){
-					if(!this.settingsDialog)
-					{
-						this.settingsDialog = new GO.users.SettingsDialog();
-					}
-					this.settingsDialog.show();
-				},
-				scope:this
-			},
+		  	},
 			this.exportMenu = new GO.base.ExportMenu({className:'GO\\Users\\Export\\CurrentGrid'}),
 			{
-				iconCls: 'bsync-btn-sync',
-				text: GO.users.lang['transferData'],
+				iconCls: 'ic-compare-arrows',
+				text: t("Transfer data", "users"),
 				handler:function(){
 					if(!this.transferDialog)
 					{
@@ -111,17 +97,18 @@ GO.users.MainPanel = function(config)
 			},
 //			{
 //				enableToggle:true,
-//				text:GO.users.lang.showProUsers,
+//				text:t("Show pro users", "users"),
 //				toggleHandler:function(btn, pressed){
 //					this.store.baseParams.show_licensed=pressed ? 1 : 0;
 //					this.store.load();
 //				},
 //				scope:this
 //			},
-				'-',
-		         GO.lang['strSearch']+':',
-		        this.searchField
-		    ]});
+			'->',
+			  this.searchField = new go.toolbar.SearchButton({
+					store: this.usersGridPanel.store
+			  })
+		 ]);
 			
 	this.exportMenu.setColumnModel(this.usersGridPanel.getColumnModel());
 	
@@ -152,30 +139,9 @@ GO.users.showUserDialog = function(user_id, config){
 }
 
 
-GO.linkHandlers["GO\\Base\\Model\\User"]=function(id){
-	//GO.users.showUserDialog(id);
-	if(!GO.users.userLinkWindow){
-		var userPanel = new GO.users.UserPanel();
-		GO.users.userLinkWindow = new GO.LinkViewWindow({
-			title: GO.lang.strUser,
-			closeAction:'hide',
-			items: userPanel,
-			userPanel: userPanel
-		});
-	}
-	GO.users.userLinkWindow.userPanel.load(id);
-	GO.users.userLinkWindow.show();
-	return GO.users.userLinkWindow;
-};
-
-GO.linkPreviewPanels["GO\\Base\\Model\\User"]=function(config){
-	config = config || {};
-	return new GO.users.UserPanel(config);
-}
-
 
 GO.moduleManager.addModule('users', GO.users.MainPanel, {
-	title : GO.lang.users,
+	title : t("Users"),
 	iconCls : 'go-tab-icon-users',
 	admin :true
 });

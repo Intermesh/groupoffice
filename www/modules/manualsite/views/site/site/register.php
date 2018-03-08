@@ -1,13 +1,13 @@
 <div class="register-page page">
 	<div class="wrapper">
-		<h2><?php echo \GO::t('register','defaultsite'); ?></h2>								
+		<h2><?php echo \GO::t("Register", "defaultsite"); ?></h2>								
 			
 		<?php $form = new \GO\Site\Widget\Form(); ?>
 		<?php echo $form->beginForm(false,false,array('id'=>'register')); ?>
 		
-		<?php echo \GO::t('registerformText','defaultsite'); ?>
+		<?php echo \GO::t("Fill out this form and click on 'Ok' to register. The fields marked with a * are required.", "defaultsite"); ?>
 		
-		<h3><?php echo \GO::t('contactDetails','defaultsite'); ?></h3>
+		<h3><?php echo \GO::t("Contact Details", "defaultsite"); ?></h3>
 		<table class="table-registration-contact">
 			<tr>
 				<td><?php echo $form->label($user, 'first_name'); ?></td>
@@ -36,7 +36,7 @@
 			</table>
 
 
-			<h3><?php echo \GO::t('companyDetails','defaultsite'); ?></h3>
+			<h3><?php echo \GO::t("Company Details", "defaultsite"); ?></h3>
 			<table class="table-registration-company">
 				<tr>
 					<td><?php echo $form->label($company, 'name'); ?></td>
@@ -61,7 +61,7 @@
 			</table>
 
 
-			<h3><?php echo \GO::t('address','defaultsite'); ?></h3>
+			<h3><?php echo \GO::t("Address", "defaultsite"); ?></h3>
 			<table class="table-registration-address">
 				<tr>
 					<td><?php echo $form->label($company, 'address'); ?></td>
@@ -94,7 +94,7 @@
 		</table>
 
 
-			<h3><?php echo \GO::t('usernameandpassword','defaultsite'); ?></h3>
+			<h3><?php echo \GO::t("Username and Password", "defaultsite"); ?></h3>
 			<table class="table-registration-user">
 				<tr>
 					<td><?php echo $form->label($user, 'username'); ?></td>
@@ -111,7 +111,7 @@
 		</table>
 		
 		<div class="button-bar">
-			<?php echo $form->submitbutton(\GO::t('register','defaultsite'),array('class'=>'button','id'=>'register-submit-button')); ?>
+			<?php echo $form->submitbutton(\GO::t("Register", "defaultsite"),array('class'=>'button','id'=>'register-submit-button')); ?>
 			<div class="clear"></div>
 		</div>
 		

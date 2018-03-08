@@ -1,44 +1,47 @@
 <?php
-
-
-$l["noTask"]= 'Ei tehtäviä';
-$l["tasks"]= 'Tehtävät';
-$l["addTask"]= 'Lisää tehtävä...';
-$l["tasklist"]= 'Tehtävälista';
-$l["tasklists"]= 'Tehtävälistat';
-$l["showCompletedTasks"]= 'Näytä valmiit tehtävät';
-$l["filter"]= 'Suodatin';
-$l["dueDate"]= 'Määräpäivä';
-$l["dueAt"]= 'Määräaika';
-$l["needsAction"]= 'Toimenpiteitä tarvitaan';
-$l["accepted"]= 'Hyväksytty';
-$l["declined"]= 'Hylätty';
-$l["tentative"]= 'Alustava';
-$l["delegated"]= 'Delegoitu';
-$l["completed"]= 'Valmis';
-$l["inProcess"]= 'Keskeneräinen';
-$l["repeatEvery"]= 'Toista joka';
-$l["atDays"]= 'Päivänä';
-$l["repeatUntil"]= 'Toista kunnes';
-$l["repeatForever"]= 'toista ikuisesti';
-$l["recurrence"]= 'Toistuminen';
-$l["remindMe"]= 'Muistuta minua';
-$l["options"]= 'Valinnat';
-$l["createLink"]= 'Luo linkki';
-$l["startsAt"]='Alkaa';
-$l["showInactiveTasks"]='Näytä ei aktiiviset työt';
-$l["scheduleCall"]='Ajasta puhelu';
-$l['name']='Tehtävät';
-$l['description']='Laita kuvaus tähän';
-$lang['link_type'][12]=$l['task']='Tehtävä';
-$l['status']='Tila';
-$l['scheduled_call']='Ajastettu soitto %s';
-$l['statuses']['NEEDS-ACTION'] = 'Toimenpiteitä tarvitaan';
-$l['statuses']['ACCEPTED'] = 'Hyväksytty';
-$l['statuses']['DECLINED'] = 'Hylätty';
-$l['statuses']['TENTATIVE'] = 'Alustava';
-$l['statuses']['DELEGATED'] = 'Delegoitu';
-$l['statuses']['COMPLETED'] = 'Valmis';
-$l['statuses']['IN-PROCESS'] = 'Keskeneräinen';
-$l['import_success']='%s tehtävät tuotiin';
-$l['call']='Soitto';
+return array (
+  'No Tasks to display' => 'Ei tehtäviä',
+  'Add a task...' => 'Lisää tehtävä...',
+  'Tasklist' => 'Tehtävälista',
+  'Tasklists' => 'Tehtävälistat',
+  'Show completed tasks' => 'Näytä valmiit tehtävät',
+  'Filter' => 'Suodatin',
+  'Due date' => 'Määräpäivä',
+  'Due at' => 'Määräaika',
+  'Needs action' => 'Toimenpiteitä tarvitaan',
+  'Accepted' => 'Hyväksytty',
+  'Declined' => 'Hylätty',
+  'Tentative' => 'Alustava',
+  'Delegated' => 'Delegoitu',
+  'Completed' => 'Valmis',
+  'In process' => 'Keskeneräinen',
+  'Repeat every' => 'Toista joka',
+  'At days' => 'Päivänä',
+  'Repeat until' => 'Toista kunnes',
+  'repeat forever' => 'toista ikuisesti',
+  'Recurrence' => 'Toistuminen',
+  'Remind me' => 'Muistuta minua',
+  'Options' => 'Valinnat',
+  'Create a link' => 'Luo linkki',
+  'Starts at' => 'Alkaa',
+  'Show inactive tasks' => 'Näytä ei aktiiviset työt',
+  'Schedule call' => 'Ajasta puhelu',
+  'Task' => 'Tehtävä',
+  'Status' => 'Tila',
+  'Scheduled call at %s' => 'Ajastettu soitto %s',
+  'statuses' => 
+  array (
+    'NEEDS-ACTION' => 'Toimenpiteitä tarvitaan',
+    'ACCEPTED' => 'Hyväksytty',
+    'DECLINED' => 'Hylätty',
+    'TENTATIVE' => 'Alustava',
+    'DELEGATED' => 'Delegoitu',
+    'COMPLETED' => 'Valmis',
+    'IN-PROCESS' => 'Keskeneräinen',
+  ),
+  '%s tasks were imported' => '%s tehtävät tuotiin',
+  'Call' => 'Soitto',
+  'name' => 'Tehtävät',
+  'description' => 'Laita kuvaus tähän',
+  'Tasks' => 'Tehtävät',
+);

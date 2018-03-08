@@ -12,7 +12,7 @@ GO.calendar.SelectCalendarDialog = function(config){
 	};
 
 	config.layout='fit';
-	config.title=GO.calendar.lang.selectCalendar;
+	config.title=t("Select calendar", "calendar");
 	config.modal=false;
 	config.border=false;
 	config.width=400;
@@ -24,14 +24,14 @@ GO.calendar.SelectCalendarDialog = function(config){
 	config.items=this.formPanel;
 	config.focus=focusFirstField.createDelegate(this);
 	config.buttons=[{
-		text:GO.lang['cmdOk'],
+		text:t("Ok"),
 		handler: function()
 		{
 			this.submitForm(true)
 		},
 		scope: this
 	},{
-		text:GO.lang['cmdClose'],
+		text:t("Close"),
 		handler: function()
 		{
 			this.hide()
@@ -57,7 +57,7 @@ Ext.extend(GO.calendar.SelectCalendarDialog, Ext.Window, {
 	{
 		 this.selectCalendar = new GO.form.ComboBox({
                         hiddenName:'cal_id',
-			fieldLabel:GO.calendar.lang.calendar,
+			fieldLabel:t("Calendar", "calendar"),
 			valueField:'id',
 			displayField:'name',
 			store: new Ext.data.ArrayStore({
@@ -65,7 +65,7 @@ Ext.extend(GO.calendar.SelectCalendarDialog, Ext.Window, {
                         }),
 			mode:'local',
 			triggerAction:'all',
-                        emptyText:GO.calendar.lang.selectCalendar,
+                        emptyText:t("Select calendar", "calendar"),
 			editable:false,
 			selectOnFocus:true,
 			forceSelection:true

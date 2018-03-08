@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: SelectGroup.js 19426 2015-09-21 12:03:28Z mschering $
+ * @version $Id: SelectGroup.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -41,7 +41,7 @@
 	this.store.setDefaultSort('name', 'asc');
 
 	if(!this.fieldLabel)
-		this.fieldLabel = GO.lang.userGroup;
+		this.fieldLabel = t("User group");
 
 	if(!this.hiddenName)
 		this.hiddenName = 'group_id';

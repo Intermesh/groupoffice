@@ -10,41 +10,57 @@
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
-
-GO.addressbook.SettingsPanel = function(config) {
-	if(!config) {
-		config = {};
-	}
-
-	config.autoScroll = true;
-	config.border = false;
-	config.hideLabel = true;
-	config.title = GO.addressbook.lang.addressbook;
-	config.hideMode='offsets';
-	config.layout = 'form';
-	config.labelWidth=125;
-	config.bodyStyle='padding:5px;';
-	config.items = {
-		xtype:'fieldset',
-		autoHeight:true,
-		layout:'form',
-		forceLayout:true,
-		title:GO.addressbook.lang.addressbookDefaults,
-		items:[
-			this.selectAddressbook = new GO.addressbook.SelectAddressbook({
-				fieldLabel : GO.addressbook.lang.defaultAddressbook,
-				hiddenName : 'default_addressbook_id'
-			})
-		]
-	};
+GO.addressbook.SettingsPanel = Ext.extend(Ext.Panel, {
+	autoScroll: true,
+	title: t("Address book", "addressbook"),
+	iconCls: 'ic-perm-contact-calendar',
 	
-	GO.addressbook.SettingsPanel.superclass.constructor.call(this, config);
-};
-
-Ext.extend(GO.addressbook.SettingsPanel, Ext.Panel, {
+	onLoadStart: function (userId) {
 		
+		//temporary fix for combo to show address book name. Remove when refactored
+		var userGetRequest = go.Jmap.findRequestByMethod("User/get");
+		if(!userGetRequest) {
+			return;
+		}
+		var userGetRequestId = userGetRequest[2];
+		go.Jmap.request({
+			method: "community/addressbook/AddressBook/get",
+			params: {
+				"properties": ["name"],
+				"#ids": {
+						"resultOf": userGetRequestId,
+						"name": "User/get",
+						"path": "/list/*/addressbookSettings/default_addressbook_id"
+				}
+			},
+			callback: function(options, success, result) {
+				this.selectAddressbook.setRemoteText(result.list[0].name);
+			},
+			scope: this
+		});
+	},
+	initComponent: function() {
+
+		this.items = {
+			xtype:'fieldset',
+			autoHeight:true,
+			layout:'form',
+			forceLayout:true,
+			hideLabel: true,
+			title:t("Defaults settings for address book", "addressbook"),
+			items:[
+				this.selectAddressbook = new GO.addressbook.SelectAddressbook({
+					fieldLabel : t("Default address book", "addressbook"),
+					hiddenName : 'addressbookSettings.default_addressbook_id'
+				})
+			]
+		};
+
+		GO.addressbook.SettingsPanel.superclass.initComponent.call(this);
+	}
 });
 
-GO.mainLayout.onReady(function() {
-	GO.moduleManager.addSettingsPanel('addressbook', GO.addressbook.SettingsPanel);
+
+GO.mainLayout.onReady(function(){
+	go.userSettingsDialog.addPanel('settings-addressbook', GO.addressbook.SettingsPanel,4,false);
 });

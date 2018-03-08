@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: SieveDialog.js 19873 2016-03-01 10:55:30Z michaelhart86 $
+ * @version $Id: SieveDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  * @author WilmarVB <wilmar@intermesh.nl>
@@ -17,20 +17,20 @@ GO.sieve.SieveDialog = function(config) {
 	}
 	
 	this.rgMethod = new Ext.form.RadioGroup({
-		fieldLabel: '<b>'+GO.sieve.lang.ruletext+'</b>',
+		fieldLabel: '<b>'+t("For incoming emails", "sieve")+'</b>',
 		columns: 1,
 		vertical: true,
 		anchor: '100%',
 		value:'anyof',
 		items: [
 				{
-					boxLabel: GO.sieve.lang.allfollowingrules, name: 'join', inputValue: 'allof'
+					boxLabel: t("that meet the following criteria", "sieve"), name: 'join', inputValue: 'allof'
 				},
 				{
-					boxLabel: GO.sieve.lang.somefollowingrules, name: 'join', inputValue: 'anyof'
+					boxLabel: t("that meet at least one of the following criteria", "sieve"), name: 'join', inputValue: 'anyof'
 				},
 				{
-					boxLabel: GO.sieve.lang.allmessages, name: 'join', inputValue: 'any'
+					boxLabel: t("all incoming emails", "sieve"), name: 'join', inputValue: 'any'
 				}
 		],
 		listeners:{
@@ -60,7 +60,7 @@ GO.sieve.SieveDialog = function(config) {
 	})
 
 	this.nameField = new Ext.form.TextField({
-		fieldLabel:GO.lang.strName,
+		fieldLabel:t("Name"),
 		name:'rule_name',
 		width: 360,
 		allowBlank:false
@@ -77,10 +77,10 @@ GO.sieve.SieveDialog = function(config) {
 				name:'active',
 				checked:true,
 				xtype:'checkbox',
-				fieldLabel:GO.sieve.lang.activateFilter
+				fieldLabel:t("Activate this filter", "sieve")
 			},
 			this.rgMethod,
-			this.criteriaLabel = new Ext.form.Label({text: '...'+GO.sieve.lang.meetingTheseCriteria+':',	width:'100%',	style: 'padding-bottom: 10px; font-weight:bold;'})
+			this.criteriaLabel = new Ext.form.Label({text: '...'+t("meeting these criteria", "sieve")+':',	width:'100%',	style: 'padding-bottom: 10px; font-weight:bold;'})
 		]
 	});
 
@@ -105,7 +105,7 @@ GO.sieve.SieveDialog = function(config) {
 		items:[
 				this.formPanel,
 				this.criteriumGrid,
-				new Ext.form.Label({text:GO.sieve.lang.actiontext, width:'100%', style: 'padding-bottom: 10px; margin: 5px; font-weight:bold;'}),
+				new Ext.form.Label({text:t("...execute the following actions", "sieve"), width:'100%', style: 'padding-bottom: 10px; margin: 5px; font-weight:bold;'}),
 				this.actionGrid
 			]
 		};
@@ -118,18 +118,18 @@ GO.sieve.SieveDialog = function(config) {
 	config.width = 700;
 	config.height = 640;
 	config.closeAction = 'hide';
-	config.title = GO.sieve.lang.sieverules;
+	config.title = t("Rules", "sieve");
 	config.buttons = [{
-		text : GO.sieve.lang.cmdSaveChanges,
+		text : t("Save changes", "sieve"),
 		handler : function() {
 			if(this.actionGrid.store.getCount() == 0 || (this.criteriumGrid.store.getCount() == 0 && this.rgMethod.getValue().inputValue != 'any'))
-				alert(GO.sieve.lang.erroremptygrids);
+				alert(t("One or both grids are empty.", "sieve"));
 			else
 				this.saveAll();
 		},
 		scope : this
 	}, {
-		text : GO.lang['cmdCancel'],
+		text : t("Cancel"),
 		handler : function() {
 			this.hide();
 		},
@@ -160,7 +160,7 @@ Ext.extend(GO.sieve.SieveDialog, GO.Window, {
 
 			if(script_index > -1)
 			{	
-				this.title = GO.sieve.lang.editsieve;
+				this.title = t("Edit rule", "sieve");
 	
 				this.formPanel.load({
 					success:function(form, action)
@@ -178,7 +178,7 @@ Ext.extend(GO.sieve.SieveDialog, GO.Window, {
 			} 
 			else
 			{
-				this.title = GO.sieve.lang.newsieverule;
+				this.title = t("New rule", "sieve");
 				this.formPanel.form.setValues({
 					'rule_name' : '',
 					'disabled' : false
@@ -239,9 +239,9 @@ Ext.extend(GO.sieve.SieveDialog, GO.Window, {
 			failure: function(form, action) {
 				if(action.failureType == 'client')
 				{					
-					Ext.MessageBox.alert(GO.lang['strError'], GO.lang['strErrorsInForm']);			
+					Ext.MessageBox.alert(t("Error"), t("You have errors in your form. The invalid fields are marked."));			
 				} else {
-					Ext.MessageBox.alert(GO.lang['strError'], action.result.feedback);
+					Ext.MessageBox.alert(t("Error"), action.result.feedback);
 				}
 				this.body.unmask();
 			},

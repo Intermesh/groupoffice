@@ -39,13 +39,13 @@ class ContactForm extends \GO\Base\Model {
 	public function validate()
 	{		
 		if(empty($this->name))
-			$this->setValidationError('name', sprintf(\GO::t('attributeRequired'),'name'));
+			$this->setValidationError('name', sprintf(\GO::t("Field %s is required"),'name'));
 		if(empty($this->email))
-			$this->setValidationError('email', sprintf(\GO::t('attributeRequired'),'email'));
+			$this->setValidationError('email', sprintf(\GO::t("Field %s is required"),'email'));
 		if(empty($this->message))
-			$this->setValidationError('message', sprintf(\GO::t('attributeRequired'),'message'));
+			$this->setValidationError('message', sprintf(\GO::t("Field %s is required"),'message'));
 		if(!\GO\Base\Util\Validate::email($this->email))
-			$this->setValidationError('email', \GO::t('invalidEmailError'));
+			$this->setValidationError('email', \GO::t("The e-mail address was invalid"));
 			
 		return parent::validate();
 	}

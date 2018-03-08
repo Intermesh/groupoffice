@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: CategoryDialog.js 19024 2015-04-23 11:24:40Z wsmits $
+ * @version $Id: CategoryDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -16,7 +16,7 @@ GO.bookmarks.CategoryDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		
 		Ext.apply(this, {
 			titleField:'name',
-			title:GO.bookmarks.lang.category,
+			title:t("Category", "bookmarks"),
 			formControllerUrl: 'bookmarks/category',
 			height:600,
 			width:500
@@ -28,7 +28,7 @@ GO.bookmarks.CategoryDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 
 		this.showInStartMenuCheck = new Ext.ux.form.XCheckbox({
 			hideLabel: true,
-			boxLabel: GO.bookmarks.lang.showCategoryInStartMenu,
+			boxLabel: t("Group bookmarks in main start menu (Browser reload required)", "bookmarks"),
 			name: 'show_in_startmenu'
 		});
 
@@ -39,7 +39,7 @@ GO.bookmarks.CategoryDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		this.propertiesPanel = new Ext.Panel({
 			border: false,
 			baseParams: {task: 'category'},			
-			title:GO.lang['strProperties'],			
+			title:t("Properties"),			
 			cls:'go-form-panel',waitMsgTarget:true,			
 			layout:'form',
 			autoScroll:true,
@@ -48,12 +48,12 @@ GO.bookmarks.CategoryDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			  name: 'name',
 				anchor: '100%',
 			  allowBlank:false,
-			  fieldLabel: GO.lang.strName
+			  fieldLabel: t("Name")
 			},
 			this.emptyLine,
 			this.showInStartMenuCheck
 //			,this.selectUser = new GO.form.SelectUser({
-//				fieldLabel: GO.lang['strUser'],
+//				fieldLabel: t("User"),
 //				disabled : !GO.settings.has_admin_permission,
 //				value: GO.settings.user_id,
 //				anchor: '100%'

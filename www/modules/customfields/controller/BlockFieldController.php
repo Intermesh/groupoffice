@@ -8,8 +8,8 @@ class BlockFieldController extends \GO\Base\Controller\AbstractJsonController{
 	protected function actionSelectStore($params) {
 		
 		$columnModel = new \GO\Base\Data\ColumnModel(\GO\Customfields\Model\Field::model());
-		$columnModel->formatColumn('extends_model', '$model->category->extends_model', array(), 'category_id');
-		$columnModel->formatColumn('full_info','"[".\GO::t($model->category->extends_model,"customfields")."] ".$model->category->name." : ".$model->name." (col_".$model->id.")"', array(), 'category_id');
+		$columnModel->formatColumn('extendsModel', '$model->category->extendsModel', array(), 'category_id');
+		$columnModel->formatColumn('full_info','"[".\GO::t($model->category->extendsModel,"customfields")."] ".$model->category->name." : ".$model->name." (".$model->databaseName.")"', array(), 'category_id');
 		
 		$findParams = \GO\Base\Db\FindParams::newInstance()
 			->joinModel(array(
@@ -22,7 +22,7 @@ class BlockFieldController extends \GO\Base\Controller\AbstractJsonController{
 			->criteria(
 				\GO\Base\Db\FindCriteria::newInstance()
 					->addInCondition(
-						'extends_model',
+						'extendsModel',
 						array(
 							'GO\Addressbook\Model\Contact',
 							'GO\Addressbook\Model\Company',

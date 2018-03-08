@@ -9,7 +9,7 @@ GO.advancedquery.AdvancedQueryPanel = function (config){
 	config.tbar=[{
 		handler: function()
 		{
-			Ext.Msg.prompt(GO.lang.searchQueryName, GO.lang.enterSearchQueryName, function(btn, text){
+			Ext.Msg.prompt(t("Search query name"), t("Enter search query name"), function(btn, text){
 				Ext.Ajax.request({
 					url:BaseHref +'action.php',
 					params:{
@@ -35,7 +35,7 @@ GO.advancedquery.AdvancedQueryPanel = function (config){
 		},
 		iconCls: 'btn-save',
 		cls: 'x-btn-text-icon',
-		text: GO.lang.cmdSave,
+		text: t("Save"),
 		scope: this
 	},{
 		handler: function()
@@ -44,11 +44,11 @@ GO.advancedquery.AdvancedQueryPanel = function (config){
 		},
 		iconCls: 'btn-delete',
 		cls: 'x-btn-text-icon',
-		text: GO.lang.cmdReset,
+		text: t("Reset"),
 		scope: this
 	},'-',{
 		iconCls:'btn-search',
-		text: GO.lang.strSearch,
+		text: t("Search"),
 		handler: function(){
 			var matchDuplicates="";
 			var showFirstDuplicateOnlyCheckbox=false;
@@ -92,7 +92,7 @@ GO.advancedquery.AdvancedQueryPanel = function (config){
 	config.modal=false;
 	config.resizable=true;
 	config.closeAction='hide';
-	//config.title= GO.filesearch.lang.advancedSearch;
+	//config.title= t("Advanced search", "filesearch");
 
 	GO.advancedquery.AdvancedQueryPanel.superclass.constructor.call(this, config);
 

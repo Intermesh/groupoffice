@@ -13,7 +13,7 @@ GO.comments.CategoryDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		
 		Ext.apply(this, {
 			titleField:'name',
-			title:GO.comments.lang.category,
+			title:t("Category", "comments"),
 			formControllerUrl: 'comments/category',
 			height:440
 		});
@@ -26,7 +26,7 @@ GO.comments.CategoryDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 //			url: GO.settings.modules.notes.url+'action.php',
 			border: false,
 //			baseParams: {task: 'category'},			
-//			title:GO.lang['strProperties'],			
+//			title:t("Properties"),			
 			cls:'go-form-panel',waitMsgTarget:true,			
 			layout:'form',
 			autoScroll:true,
@@ -35,7 +35,7 @@ GO.comments.CategoryDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			  name: 'name',
 				anchor: '100%',
 			  allowBlank:false,
-			  fieldLabel: GO.lang.strName
+			  fieldLabel: t("Name")
 			}]
 				
 		});

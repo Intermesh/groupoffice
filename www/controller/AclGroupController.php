@@ -43,15 +43,15 @@ class AclGroupController extends \GO\Base\Controller\AbstractMultiSelectModelCon
 	 * @return String
 	 */
 	public function linkModelField() {
-		return 'group_id';
+		return 'groupId';
 	}	
 	
 	protected function getRemoteKey() {
-		return 'acl_id';
+		return 'aclId';
 	}
 	
 	protected function getExtraDeletePks($params){
-		return array($this->getRemoteKey()=>$params['model_id'], 'user_id'=>0);
+		return array($this->getRemoteKey()=>$params['model_id']);
 	}
 	
 	protected function formatColumns(\GO\Base\Data\ColumnModel $cm) {
@@ -93,7 +93,7 @@ class AclGroupController extends \GO\Base\Controller\AbstractMultiSelectModelCon
 					throw new \GO\Base\Exception\AccessDenied();
 			foreach ($delKeys as $delKey) {
 				if ($delKey==\GO::config()->group_root) {
-					throw new \Exception(\GO::t('dontChangeAdminsPermissions'));
+					throw new \Exception(\GO::t("You can't change the permissions of the admin group"));
 				}
 			}
 		} else {

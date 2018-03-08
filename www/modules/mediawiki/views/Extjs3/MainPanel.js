@@ -23,7 +23,7 @@ GO.mediawiki.MainPanel = function(config){
 		items:[new Ext.Button({
 			iconCls: 'btn-refresh',
 			cls: 'x-btn-text-icon',
-			text: GO.lang['cmdRefresh'],
+			text: t("Refresh"),
 			handler:function(){
 				GO.mediawiki.iFrameComponent.setUrl(GO.mediawiki.settings.externalUrl);
 			},
@@ -37,7 +37,7 @@ GO.mediawiki.MainPanel = function(config){
 		config.tbar.addItem('-');
 		this.settingsButton = new Ext.Button({
 			iconCls: 'btn-settings',
-			text: GO.lang.administration,
+			text: t("Administration"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 				if(!this.settingsDialog)
@@ -78,7 +78,7 @@ Ext.extend(GO.mediawiki.MainPanel, Ext.Panel,{
 					GO.mediawiki.settings.title = responseParams.data.title;
 					this.title = responseParams.title;
 				} else {
-					Ext.Msg.alert(GO.lang['strError'], responseParams.feedback);
+					Ext.Msg.alert(t("Error"), responseParams.feedback);
 				}
 			}
 		})

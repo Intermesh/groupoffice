@@ -8,11 +8,10 @@ GO.buttons.DeleteButton = Ext.extend(Ext.Button,{
 	initComponent : function(){
 		
 		Ext.applyIf(this,{
-			iconCls: 'btn-delete',
+			iconCls: 'ic-delete',
 			itemId:'delete',
 			disabled:!this.ignoreButtonParams,
-			text: GO.lang.cmdDelete,
-			cls: 'x-btn-text-icon',
+			tooltip: t("Delete"),
 			handler:function(){
 				this.grid.deleteSelected();
 			}

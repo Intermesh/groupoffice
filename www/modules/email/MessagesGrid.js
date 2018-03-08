@@ -6,18 +6,14 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: MessagesGrid.js 22244 2018-01-25 09:47:02Z wsmits $
+ * @version $Id: MessagesGrid.js 22437 2018-03-01 07:55:17Z michaelhart86 $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
 GO.email.MessagesGrid = function(config){
 
-	if(!config)
-	{
-		config = {};
-	}
-
+	config = config || {};
 	config.layout='fit';
 	config.autoScroll=true;
 	config.paging=true;
@@ -26,30 +22,28 @@ GO.email.MessagesGrid = function(config){
 
 	if(config.region=='north')
 	{
-		this.searchtypeWidth = 150;
-		this.searchfieldWidth = 320;
 		config.cm = new Ext.grid.ColumnModel({
-		defaults:{
-			sortable:true
+			defaults:{
+				sortable:true
 			},
 			columns:[
 			{
 				header:"&nbsp;",
-				width:50,
+				width:dp(32),
 				dataIndex: 'icon',
 				renderer: this.renderIcon,
 				hideable:false,
 				sortable:false
 			},{
 				id: 'labels',
-				header: GO.email.lang.labels,
+				header: t("Labels", "email"),
 				width:50,
 				xtype: 'templatecolumn',
 				tpl: new Ext.XTemplate('<div class="em-messages-grid-labels-container"><tpl for="labels"><div ext:qtip="{name}" style="background-color: #{color}">&nbsp;</div></tpl></div>'),
-				hideable:true,
+				hidden:true,
 				sortable:false
 			},{
-				header: GO.email.lang.from,
+				header: t("From", "email"),
 				dataIndex: 'from',
 				renderer:{
 					fn: this.renderNorthMessageRow,
@@ -58,7 +52,7 @@ GO.email.MessagesGrid = function(config){
 				id:'from',
 				width:200
 			},{
-				header: GO.email.lang.to,
+				header: t("To", "email"),
 				dataIndex: 'to',
 				renderer:{
 					fn: this.renderNorthMessageRow,
@@ -68,7 +62,7 @@ GO.email.MessagesGrid = function(config){
 				width:200,
 				hidden: true
 			},{
-				header: GO.email.lang.subject,
+				header: t("Subject", "email"),
 				dataIndex: 'subject',
 				renderer:{
 					fn: this.renderNorthMessageRow,
@@ -76,20 +70,20 @@ GO.email.MessagesGrid = function(config){
 				},
 				width:200
 			},{
-				header: GO.lang.strDate,
-				dataIndex: 'arrival',
+				header: t("Date"),
+				dataIndex: 'internal_udate',
 				width:120,
-				renderer:this.renderNorthArrival,
+				renderer:GO.util.format.smartDate,
 				align:'right',
 				hidden:true
 			},{
-				header: GO.email.lang.dateSent,
-				dataIndex: 'date',
+				header: t("Date sent", "email"),
+				dataIndex: 'udate',
 				width:120,
-				renderer:this.renderNorthDate,
+				renderer:GO.util.format.smartDate,
 				align:'right'
 			},{
-				header: GO.lang.strSize,
+				header: t("Size"),
 				dataIndex: 'size',
 				width:65,
 				align:'right',
@@ -97,21 +91,9 @@ GO.email.MessagesGrid = function(config){
 				renderer:Ext.util.Format.fileSize
 			}]
 		});
-//		config.view=new Ext.grid.GridView({
-//			emptyText: GO.lang['strNoItems'],
-//			getRowClass:function(row, index) {
-//				if (row.data.seen == '0') {
-//					return 'ml-unseen-row';
-//				} else {
-//					return 'ml-seen-row';
-//				}
-//			}
-//		});
 
-	}else
-	{
-		this.searchtypeWidth = 120;
-		this.searchfieldWidth = 150;
+	} else {
+		
 		config.cm =  new Ext.grid.ColumnModel({
 		defaults:{
 			sortable:true
@@ -120,21 +102,21 @@ GO.email.MessagesGrid = function(config){
 		{
 			id:'icon',
 			header:"&nbsp;",
-			width:46,
+			width:dp(32),
 			dataIndex: 'icon',
 			renderer: this.renderIcon,
 			hideable:false,
 			sortable:false
 		},{
 			id: 'labels',
-			header: GO.email.lang.labels,
-			width:50,
+			header: t("Labels", "email"),
+			width:dp(60),
 			xtype: 'templatecolumn',
 			tpl: new Ext.XTemplate('<div class="em-messages-grid-labels-container"><tpl for="labels"><div ext:qtip="{name}" style="background-color: #{color}">&nbsp;</div></tpl></div>'),
-			hideable:true,
+			hidden:true,
 			sortable:false
 		},{
-			header: GO.email.lang.message,
+			header: t("Message", "email"),
 			dataIndex: 'from',
 			renderer:{ 
 				fn: this.renderMessage,
@@ -145,24 +127,24 @@ GO.email.MessagesGrid = function(config){
 
 		},{
 			id:'arrival',
-			header: GO.lang.strDate,
-			dataIndex:'arrival',
-			renderer: this.renderArrival,
-			width:80,
+			header: t("Date"),
+			dataIndex:'internal_udate',
+			renderer: GO.util.format.smartDate,
+			width:dp(100),
 			align:'right',
 			hidden:true
 		},{
 			id:'date',
-			header: GO.email.lang.dateSent,
-			dataIndex:'date',
-			renderer: this.renderDate,
-			width:80,
+			header: t("Date sent", "email"),
+			dataIndex:'udate',
+			renderer: GO.util.format.smartDate,
+			width:dp(108),
 			align:'right'
 		},{
 			id:'size',
-			header: GO.lang.strSize,
+			header: t("Size"),
 			dataIndex: 'size',
-			width:65,
+			width:80,
 			align:'right',
 			hidden:true,
 			renderer:Ext.util.Format.fileSize
@@ -173,39 +155,29 @@ GO.email.MessagesGrid = function(config){
 			store: config.store,
 			pageSize: parseInt(GO.settings['max_rows_list']),
 			displayInfo: true,
-			displayMsg: GO.lang.displayingItemsShort,
-			emptyMsg: GO.lang['strNoItems']
+			displayMsg: t("Total: {2}"),
+			emptyMsg: t("No items to display")
 		});
 		
 		config.autoExpandColumn='message';
-
-//		config.view=new Ext.grid.GridView({
-//			emptyText: GO.lang['strNoItems']
-//		});
 	}
 
 	config.view=new Ext.grid.GridView({
-			holdPosition: true,
-			emptyText: GO.lang['strNoItems'],
-			getRowClass:function(row, index) {
-				if (row.data.seen == '0') {
-					return 'ml-unseen-row';
-				} else {
-					return 'ml-seen-row';
-				}
-			},
-			onLoad : function(){
-					if (!this.holdPosition) { 
-						this.scrollToTop();
-					}
-					this.holdPosition = false;
+		holdPosition: true,
+		emptyText: t("No items to display"),
+		getRowClass:function(row, index) {
+			return (row.data.seen == '0') ? 'ml-unseen-row' : 'ml-seen-row';
+		},
+		onLoad : function(){
+			if (!this.holdPosition) { 
+				this.scrollToTop();
 			}
-			
-		});
+			this.holdPosition = false;
+		}
+	});
 
 	config.sm=new Ext.grid.RowSelectionModel();
 	config.loadMask=true;
-
 	config.border=false;
 	config.split= true;
 	config.header=false;
@@ -214,58 +186,157 @@ GO.email.MessagesGrid = function(config){
 	config.animCollapse=false;
 
 	this.searchType = new GO.form.ComboBox({
-		width:this.searchtypeWidth,
+		width:dp(140),
 		store: new Ext.data.SimpleStore({
 			fields: ['value', 'text'],
 			data : [
-			['any', GO.email.lang.anyField],
-			['fts', GO.email.lang.fts],
-			['from', GO.email.lang.searchFrom],
-			['subject', GO.email.lang.subject],
-			['to', GO.email.lang.searchTo],
-			['cc', GO.email.lang.searchCC]
+			['any', t("Any field", "email")],
+			['fts', t("Full message", "email")],
+			['from', t("Sender", "email")],
+			['subject', t("Subject", "email")],
+			['to', t("Recipient", "email")],
+			['cc', t("Recipient (CC)", "email")]
 			]
 		}),
 		value:GO.email.search_type_default,
 		valueField:'value',
 		displayField:'text',
 		mode:'local',
+		minListWidth: dp(168),
 		triggerAction:'all',
 		editable:false,
 		selectOnFocus:true,
 		forceSelection:true
 	});
 
-	this.searchField = new GO.form.SearchField({
-		store: config.store,
-		paramName:'search',
-		emptyText:GO.lang['strSearch'],
-		width:this.searchfieldWidth
-	});
-
 	this.showUnreadButton = new Ext.Button({
-		iconCls: 'btn-email',
+		iconCls: 'ic-markunread-mailbox',
 		enableToggle:true,
 		toggleHandler:this.toggleUnread,
 		pressed:false,
-		style:'margin-left:10px',
-		tooltip: GO.email.lang.showUnread +' / '+GO.email.lang.showAll
+		tooltip: t("Show unread", "email")
 	});
-	this.showFlaggedButton = new Ext.Button({
-		iconCls: 'btn-flag',
+	this.showFlaggedButton = new Ext.menu.CheckItem({
+		//iconCls: 'ic-flag',
 		enableToggle:true,
-		toggleHandler:this.toggleFlagged,
+		listeners: {checkchange: this.toggleFlagged,scope:this},
 		pressed:false,
-		style:'margin-left:10px',
-		tooltip: GO.email.lang.showFlagged +' / '+GO.email.lang.showAll
+		text: t("Show flagged", "email")
+	});
+	
+	this.searchDialog = new GO.email.SearchDialog({
+		store:config.store
+	});
+	
+	this.settingsMenu = new Ext.menu.Menu({
+		items:[{
+			iconCls: 'ic-account-box',
+			text: t("Accounts", "email"),
+			handler: function(){
+				this.emailClient.showAccountsDialog();
+			},
+			scope: this
+		}
+//		,{
+//			iconCls:'ic-view-compact',
+//			text: t("Toggle message window position", "email"),
+//			handler: function(){
+//				this.emailClient.moveGrid();
+//			},
+//			scope: this
+//		}
+,
+		this.showFlaggedButton
+		]
 	});
 
-	if(!config.hideSearch)
-	{
-		config.tbar = [this.searchType, this.searchField, this.showUnreadButton, this.showFlaggedButton];
+	if(go.ModuleManager.isAvailable("gnupg")) {
+		this.settingsMenu.add('-');
+		this.settingsMenu.add({
+			iconCls:'gpg-btn-settings',
+			text:t("encryptionSettings", "gnupg"),
+			handler:function(){
+				if(!this.securityDialog) {
+					this.securityDialog = new GO.gnupg.SecurityDialog();
+				}
+				this.securityDialog.show();
+			},
+			scope:this
+		});
 	}
-
+	config.tbar = [];
+	
 	GO.email.MessagesGrid.superclass.constructor.call(this, config);
+
+	this.getTopToolbar().add({
+				cls: 'go-narrow',
+				iconCls: "ic-arrow-back",
+				handler: function () {
+					this.emailClient.treePanel.show();
+				},
+				scope: this
+			},
+		this.composerButton = new Ext.Button({
+			iconCls: 'ic-drafts',
+			text: t("Compose", "email"),
+			handler: function(){
+				GO.email.showComposer({account_id: this.account_id});
+			},
+			scope: this
+		}),{
+			iconCls: 'ic-autorenew',
+			tooltip: t("Refresh"),
+			handler: function(){
+				this.emailClient.refresh(true);
+			},
+			scope: this
+		},this.deleteButton = new Ext.Button({
+			iconCls: 'ic-delete',
+			tooltip: t("Delete"),
+			handler: function(){
+				this.deleteSelected();
+				this.expand();
+			},
+			scope: this
+		}),
+		'->',
+		this.showUnreadButton,
+		this.searchField = new go.toolbar.SearchButton({
+			//store: config.store,
+			paramName:'search',
+			hidden: config.hideSearch,
+			tools: [
+				this.searchType,
+				{
+					iconCls: 'ic-more',
+					tooltip: t("Search"),
+					handler: function(){
+						this.searchDialog.show();
+					},
+					scope: this
+				}
+			],
+			listeners: {
+				search: function(me, v) {
+					config.store.baseParams['search']=v;
+					config.store.load();
+				},
+				reset: function() {
+					this.searchDialog.hasSearch = false;
+					delete this.store.baseParams.query;
+					delete this.store.baseParams.search;
+					delete this.store.baseParams.searchIn;
+					this.resetSearch();
+					this.store.load({params:{start:0} });
+				},
+				scope:this
+			}
+		}),{
+			iconCls: 'ic-more-vert',
+			tooltip:t("Settings"),
+			menu: this.settingsMenu
+		}
+	);
 
 	var origRefreshHandler = this.getBottomToolbar().refresh.handler;
 
@@ -278,23 +349,22 @@ GO.email.MessagesGrid = function(config){
 	//stop/start drag and drop when store loads when account is readOnly
 	this.store.on('load', function(store, records, options) {
 		if(this.getView().dragZone){
-			if(store.reader.jsonData.permission_level <= GO.permissionLevels.read)
-			this.getView().dragZone.lock();
-			else
-			this.getView().dragZone.unlock();
+			if(store.reader.jsonData.permission_level <= GO.permissionLevels.read) {
+				this.getView().dragZone.lock();
+			} else {
+				this.getView().dragZone.unlock();
+			}
 		}
 	}, this);
 
-	this.searchType.on('select', function(combo, record)
-	{
+	this.searchType.on('select', function(combo, record) {
 		GO.email.search_type = record.data.value;
 		
 		if(localStorage){
 			localStorage.email_search_type = GO.email.search_type;
 		}
 
-		if(this.searchField.getValue())
-		{
+		if(this.searchField.getValue()) {
 			GO.email.messagesGrid.store.baseParams['search'] = this.searchField.getValue();
 			this.searchField.hasSearch = true;
 
@@ -339,6 +409,8 @@ Ext.extend(GO.email.MessagesGrid, GO.grid.GridPanel,{
 	},
 	toggleUnread : function(item, pressed)
 	{
+		this.setIconClass(pressed ? 'ic-email' : 'ic-markunread-mailbox');
+		this.setTooltip(pressed ? t("Show all", "email") : t("Show unread", "email"));
 		GO.email.messagesGrid.store.baseParams['unread']=pressed ? 1 : 0;
 
 		GO.email.messagesGrid.store.load();
@@ -372,7 +444,7 @@ Ext.extend(GO.email.MessagesGrid, GO.grid.GridPanel,{
 		var qtipTemplate = '';
 		
 		if(this.getStore().baseParams.query){
-			qtipTemplate = 'ext:qtitle="'+GO.email.lang.folder+'" ext:qtip="' + record.data['mailbox'] + '"';
+			qtipTemplate = 'ext:qtitle="'+t('folder','email')+'" ext:qtip="' + record.data['mailbox'] + '"';
 		}
 		
 		return qtipTemplate;
@@ -390,88 +462,34 @@ Ext.extend(GO.email.MessagesGrid, GO.grid.GridPanel,{
 		}
 	},
 
-	renderNorthDate : function(value, p, record){
-		return value+' '+record.data.date_time;
-	},
-
-	renderNorthArrival : function(value, p, record){
-		return value+' '+record.data.arrival_time;
-	},
-
-	renderArrival : function(value, p, record){
-		if(record.data['seen']=='0')
-		{
-			return String.format('<div id="arr_'+record.data['uid']+'" class="ml-unseen-from">{0}</div><div class="ml-unseen-subject">{1}</div>', value, record.data['arrival_time']);
-		}else
-		{
-			return String.format('<div id="arr_'+record.data['uid']+'" class="ml-seen-from">{0}</div><div class="ml-seen-subject">{1}</div>', value, record.data['arrival_time']);
-		}
-	},
-
-	renderDate : function(value, p, record){
-		if(record.data['seen']=='0')
-		{
-			return String.format('<div id="date_'+record.data['uid']+'"  class="ml-unseen-from">{0}</div><div class="ml-unseen-subject">{1}</div>', value, record.data['date_time']);
-		}else
-		{
-			return String.format('<div id="date_'+record.data['uid']+'" class="ml-seen-from">{0}</div><div class="ml-seen-subject">{1}</div>', value, record.data['date_time']);
-		}
-	},
-
 	renderIcon : function(src, p, record){
-		var str = '';
-
-		var cls = "email-grid-icon ";
-
-		if(record.data.answered=='1' && record.data.forwarded=='1')
-		{
-			cls += "btn-message-answered-and-forwarded";
-		}else if(record.data.answered=='1'){
-			cls += "btn-message-answered";
-		}else if(record.data.forwarded=='1'){
-			cls += "btn-message-forwarded";
-		}else
-		{
-			if(record.data.seen=='1')
-				cls += "btn-message-seen";
-			else
-				cls += "btn-message";
+		var icons = [];
+		var unseen = '';
+		if(record.data.answered) {
+			icons.push('reply');
 		}
-		str += '<div class="'+cls+'"></div>';
-
-		if(record.data['has_attachments']=='1')
-		{
-			str += '<div class="email-grid-icon ml-icon-attach"></div>';
-		//str += '<img src=\"' + GOimages['attach'] +' \" style="display:block" />';
-		}else
-		{
-		//str += '<br />';
+		if(record.data.forwarded!=0){
+			icons.push('forward');
 		}
-
-		if(record.data['x_priority'])
-		{
-			if(record.data['x_priority'] < 3)
-			{
-				str += '<div class="email-grid-icon btn-high-priority"></div>';
-			}
-
-			if(record.data['x_priority'] > 3)
-			{
-				str += '<div class="email-grid-icon btn-low-priority"></div>';
-			}
+		if(!record.data.seen) {
+			var unseen = '<div class="ml-unseen-dot"></div>';
 		}
-
-		if(record.data['flagged']==1)
-		{
-			//str += '<img src=\"' + GOimages['flag'] +' \" style="display:block" />';
-			str += '<div class="email-grid-icon btn-flag"></div>';
+		if(record.data['has_attachments']=='1') {
+			icons.push('attachment');
 		}
-
-		return str;
-
+		var priority = record.data['x_priority'];
+		if(priority && priority < 3) {
+			icons.push('high_priority');
+		}
+		if(priority && priority > 3) {
+			icons.push('low_priority');
+		}
+		if(record.data['flagged'] == 1){
+			icons.push('flag');
+		}
+		return unseen + '<i class="icon">'+icons.join('</i><i class="icon">')+'</i>';
+		
 	},
-
-
 
 	renderFlagged : function(value, p, record){
 

@@ -2,7 +2,7 @@ GO.query.SavedQueryGrid = function(config) {
 	
 	config = config || {};
 	
-	config.title = GO.lang['queries'];
+	config.title = t("queries");
 	
 	config.width = 230;
 	
@@ -27,7 +27,7 @@ GO.query.SavedQueryGrid = function(config) {
 			id: 'id'
 		},
 		{
-			header: GO.lang['savedQueries'],
+			header: t("Saved queries"),
 			dataIndex : 'name',
 			hidden: false,
 			width: '230',
@@ -38,7 +38,7 @@ GO.query.SavedQueryGrid = function(config) {
 	config.autoExpandColumn = 'name';
 	
 	config.view=new Ext.grid.GridView({
-		emptyText: GO.lang.strNoItems	
+		emptyText: t("No items to display")	
 	});
 	
 	config.sm=new Ext.grid.RowSelectionModel();
@@ -56,7 +56,7 @@ GO.query.SavedQueryGrid = function(config) {
 			items:[this.searchField = new GO.form.SearchField({
 				store: config.store,
 				width:120,
-				emptyText: GO.lang.strSearch
+				emptyText: t("Search")
 			})],
 			store:config.store,
 			pageSize:GO.settings.config.nav_page_size

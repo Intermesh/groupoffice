@@ -8,30 +8,30 @@ GO.admin2userlogin.UsersGrid = function(config){
 	var fields ={
 		fields : ['id','username','name','lastlogin','ctime','enabled'],
 		columns :[{
-			header: GO.admin2userlogin.lang.userId,
+			header: t("ID", "admin2userlogin"),
 			dataIndex: 'id',
 			id:'id',
 			width:60
 		},{
-			header: GO.admin2userlogin.lang.username,
+			header: t("Username", "admin2userlogin"),
 			dataIndex: 'username',
 			id:'username',
 			width:180
 		},{
-			header: GO.admin2userlogin.lang.name,
+			header: t("Switch user", "admin2userlogin"),
 			dataIndex: 'name',
 			id:'name',
 			width:100
 		},{
-			header: GO.admin2userlogin.lang.lastlogin,
+			header: t("Last login attempt", "admin2userlogin"),
 			dataIndex: 'lastlogin',
 			id:'lastlogin',
-			width:110
+			width: dp(140)
 		},{
-			header: GO.admin2userlogin.lang.registrationtime,
+			header: t("Time Registered", "admin2userlogin"),
 			dataIndex: 'ctime',
 			id:'ctime',
-			width:110
+			width: dp(140)
 		}]
 	};
 	
@@ -47,7 +47,7 @@ GO.admin2userlogin.UsersGrid = function(config){
 		width:320
 	});
 	
-	config.title = GO.admin2userlogin.lang.admin2userlogin;
+	config.title = t("Switch user", "admin2userlogin");
 	config.layout='fit';
 	config.autoScroll=true;
 	config.split=true;
@@ -67,7 +67,7 @@ GO.admin2userlogin.UsersGrid = function(config){
 	config.cm=columnModel;
 	
 	config.view=new Ext.grid.GridView({
-		emptyText: GO.lang['strNoItems'],
+		emptyText: t("No items to display"),
 		getRowClass : function(record, rowIndex, p, store){
 			if(GO.util.empty(record.data.enabled)){
 				return 'user-disabled';
@@ -79,9 +79,9 @@ GO.admin2userlogin.UsersGrid = function(config){
 	config.tbar = new Ext.Toolbar({
 		items:[{
 		xtype:'htmlcomponent',
-		html:GO.admin2userlogin.lang.name,
+		html:t("Switch user", "admin2userlogin"),
 		cls:'go-module-title-tbar'
-	},GO.lang['strSearch']+': ', ' ',this.searchField],
+	},t("Search")+': ', ' ',this.searchField],
 		cls:'go-head-tb'
 	});
 	config.loadMask=true;

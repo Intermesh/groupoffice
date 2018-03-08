@@ -6,6 +6,7 @@ namespace GO\Comments\Controller;
 class CommentController extends \GO\Base\Controller\AbstractModelController{
 
 	protected $model = 'GO\Comments\Model\Comment';
+	
 
 
 	protected function getStoreParams($params){
@@ -36,12 +37,23 @@ class CommentController extends \GO\Base\Controller\AbstractModelController{
 	}
 	
 	protected function beforeStore(&$response, &$params, &$store) {
+		$model = \GO::getModel($params['model_name']);
 		
-		$model = \GO::getModel($params['model_name'])->findByPk($params['model_id']);
-		////\GO\Base\Model\SearchCacheRecord::model()->findByPk(array('model_id'=>$params['model_id'], 'model_type_id'=>\GO\Base\Model\ModelType::model()->findByModelName($params['model_name'])));
+						
+		if(is_a($model, \go\core\orm\Entity::class, true)) {
+			$params['model_name'] = $model;
+			$model = $model::findById($params['model_id']);
+			$response['permisson_level']=$model->getPermissionLevel();
+			$response['write_permission']=$model->hasPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION);
+		} else
+		{
+		
+			$model = $model->findByPk($params['model_id']);
+			////\GO\Base\Model\SearchCacheRecord::model()->findByPk(array('model_id'=>$params['model_id'], 'model_type_id'=>\GO\Base\Model\ModelType::model()->findByModelName($params['model_name'])));
 
-		$response['permisson_level']=$model->permissionLevel;
-		$response['write_permission']=$model->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION);
+			$response['permisson_level']=$model->permissionLevel;
+			$response['write_permission']=$model->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION);
+		}
 		if(!$response['permisson_level'])
 		{
 			throw new AccessDeniedException();

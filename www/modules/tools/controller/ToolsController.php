@@ -12,7 +12,7 @@
  * The GO\Tools\Controller\Tools controller
  *
  * @package GO.modules.Tools
- * @version $Id: ToolsController.php 21143 2017-05-03 08:14:59Z wsmits $
+ * @version $Id: ToolsController.php 22115 2018-01-12 10:41:26Z mschering $
  * @copyright Copyright Intermesh BV.
  * @author Wesley Smits wsmits@intermesh.nl
  */
@@ -28,10 +28,10 @@ class ToolsController extends GO\Base\Controller\AbstractJsonController{
 		
 		$store = new GO\Base\Data\ArrayStore($columnModel);
 
-		$store->addRecord(array('name'=>GO::t('systemCheck','tools'),'script'=>GO::url('tools/tools/systemTest')));
-		$store->addRecord(array('name'=>GO::t('dbcheck','tools'),'script'=>GO::url('maintenance/checkDatabase')));
-		$store->addRecord(array('name'=>GO::t('buildsearchcache','tools'),'script'=>GO::url('maintenance/buildSearchCache')));
-		$store->addRecord(array('name'=>GO::t('rm_duplicates','tools'),'script'=>GO::url('maintenance/removeDuplicates')));
+		$store->addRecord(array('name'=>GO::t("System check", "tools"),'script'=>GO::url('tools/tools/systemTest')));
+		$store->addRecord(array('name'=>GO::t("Database check", "tools"),'script'=>GO::url('maintenance/checkDatabase')));
+		$store->addRecord(array('name'=>GO::t("Create search index", "tools"),'script'=>GO::url('maintenance/buildSearchCache')));
+		$store->addRecord(array('name'=>GO::t("Remove duplicate contacts and events", "tools"),'script'=>GO::url('maintenance/removeDuplicates')));
 		
 		if(GO::modules()->files) {
 			$store->addRecord(array('name'=>'Sync filesystem with files database','script'=>GO::url('files/folder/syncFilesystem')));
@@ -42,7 +42,7 @@ class ToolsController extends GO\Base\Controller\AbstractJsonController{
 			$store->addRecord(array('name'=>'Update filesearch index','script'=>GO::url('filesearch/filesearch/sync')));
 		
 		if(GO::modules()->calendar){
-			$store->addRecord(array('name'=>GO::t('clearHolidayCache','calendar'),'description'=>GO::t('clearHolidayCacheDescription','calendar'),'script'=>GO::url('calendar/calendar/truncateHolidays')));
+			$store->addRecord(array('name'=>GO::t("Clear calendar holiday cache", "calendar"),'description'=>GO::t("Clears calendar holiday cache so they will be rebuilded through the holiday files. (On first view)", "calendar"),'script'=>GO::url('calendar/calendar/truncateHolidays')));
 		}
 
 		echo $this->renderStore($store);

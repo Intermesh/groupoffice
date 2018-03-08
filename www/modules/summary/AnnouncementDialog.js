@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: AnnouncementDialog.js 15954 2013-10-17 12:04:36Z mschering $
+ * @version $Id: AnnouncementDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Michael de Hart <mdhart@intermesh.nl>
  */
@@ -17,7 +17,7 @@ GO.summary.AnnouncementDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 		Ext.apply(this, {
 			goDialogId: 'summaryAnnouncement',
 			layout: 'fit',
-			title: GO.summary.lang['announcement'],
+			title: t("Announcement", "summary"),
 			width: 700,
 			height: 600,
 			resizable: false,
@@ -31,7 +31,7 @@ GO.summary.AnnouncementDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 		this.formPanel = new Ext.Panel({
 			cls: 'go-form-panel',
 			layout: 'form',
-			title: GO.lang['strProperties'],
+			title: t("Properties"),
 			labelWidth: 100,
 			items:[{
 				xtype: 'datefield',
@@ -39,12 +39,12 @@ GO.summary.AnnouncementDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 				minValue:new Date(),
 				anchor: '-5',
 				format: GO.settings.date_format,
-				fieldLabel: GO.summary.lang.dueTime
+				fieldLabel: t("Show until", "summary")
 			},{
 				xtype: 'textfield',
 				name: 'title',
 				anchor: '-5',
-				fieldLabel: GO.summary.lang.title
+				fieldLabel: t("Title", "summary")
 			},{
 				xtype: 'htmleditor',
 				name: 'content',

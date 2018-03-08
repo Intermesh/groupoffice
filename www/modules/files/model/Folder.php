@@ -212,7 +212,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	}
 
 	protected function getLocalizedName() {
-		return \GO::t('folder', 'files');
+		return \GO::t("Folder", "files");
 	}
 
 	/**
@@ -377,7 +377,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		if($this->parent){
 			$existingFolder = $this->parent->hasFolder($this->name);
 			if($existingFolder && $existingFolder->id!=$this->id)
-				throw new \Exception(\GO::t('folderExists','files').': '.$this->path);
+				throw new \Exception(\GO::t("The folder already exists", "files").': '.$this->path);
 		}
 		
 		if($this->isNew && empty($this->quota_user_id)){
@@ -514,7 +514,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	public function getPermissionLevel() {
 		
 		$level = parent::getPermissionLevel();
-		if($level == \GO\Base\Model\Acl::WRITE_PERMISSION && $this->acl->description != 'fs_folders.acl_id') {
+		if($level == \GO\Base\Model\Acl::WRITE_PERMISSION && $this->acl->usedIn != 'fs_folders.acl_id') {
 			$level = \GO\Base\Model\Acl::DELETE_PERMISSION;
 		}
 		
@@ -525,7 +525,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	public function delete($ignoreAcl = false) {
 
 		if(!$ignoreAcl && $this->readonly){
-			throw new \Exception(\GO::t('dontDeleteSystemFolder','files'));
+			throw new \Exception(\GO::t("You can't delete this system folder", "files"));
 		}
 
 		return parent::delete($ignoreAcl);
@@ -1139,13 +1139,12 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			//$findParams->debugSql();
 
 			$aclJoinCriteria = \GO\Base\Db\FindCriteria::newInstance()
-							->addRawCondition('a.acl_id', 't.acl_id','=', false);
+							->addRawCondition('a.aclId', 't.acl_id','=', false);
 
 			$aclWhereCriteria = \GO\Base\Db\FindCriteria::newInstance()
 							//->addRawCondition('a.acl_id', 'NULL','IS', false)
 							->addCondition('acl_id', 0,'=','t',false)
-							->addCondition('user_id', \GO::user()->id,'=','a', false)
-							->addInCondition("group_id", \GO\Base\Model\User::getGroupIds(\GO::user()->id),"a", false);
+							->addInCondition("groupId", \GO\Base\Model\User::getGroupIds(\GO::user()->id),"a", false);
 
 			$findParams->join(\GO\Base\Model\AclUsersGroups::model()->tableName(), $aclJoinCriteria, 'a', 'LEFT');
 

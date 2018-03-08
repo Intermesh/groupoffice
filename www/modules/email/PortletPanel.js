@@ -61,7 +61,7 @@ GO.email.PortletPanel = Ext.extend(Ext.Panel, {
 			{
 //				// Add an empty tab to the panel
 				this.tabPanel.add(new Ext.Panel({
-					title:GO.email.lang.noEmailFolders
+					title:t("No folders have been added.", "email")
 				}));
 				
 				this.messagesGrid.store.removeAll();
@@ -103,7 +103,7 @@ GO.email.PortletPanel = Ext.extend(Ext.Panel, {
 								mailbox : p.mailbox
 							},
 							fail: function(response, options, result) {
-								Ext.Msg.alert(GO.lang.strError, result.feedback);
+								Ext.Msg.alert(t("Error"), result.feedback);
 								this.folderStore.reload();
 							},
 							success:function(){

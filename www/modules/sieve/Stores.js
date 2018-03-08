@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: Stores.js 19372 2015-09-07 08:23:51Z wsmits $
+ * @version $Id: Stores.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
@@ -15,14 +15,14 @@ GO.sieve.cmbFieldStore = new Ext.data.ArrayStore({
 	idIndex: 1,
 	fields: ['field','value'],
 	data: [
-	[GO.sieve.lang.subject, 'Subject'],
-	[GO.sieve.lang.from, 'From'],
-	[GO.sieve.lang.to, 'To'],
-	[GO.sieve.lang.size, 'size'],
-	[GO.sieve.lang.body, 'body'],
-	[GO.sieve.lang.spamflag, 'X-Spam-Flag'],
-	[GO.sieve.lang.currentdate, 'currentdate'],
-	[GO.sieve.lang.custom, 'custom']
+	[t("subject", "sieve"), 'Subject'],
+	[t("sender", "sieve"), 'From'],
+	[t("recipient", "sieve"), 'To'],
+	[t("size", "sieve"), 'size'],
+	[t("Body", "sieve"), 'body'],
+	[t("Spam flag", "sieve"), 'X-Spam-Flag'],
+	[t("Current Date", "sieve"), 'currentdate'],
+	[t("Custom", "sieve"), 'custom']
 	]
 });
 
@@ -30,12 +30,12 @@ GO.sieve.cmbOperatorStore = new Ext.data.ArrayStore({
 	idIndex: 1,
 	fields: ['field', 'value'],
 	data:[
-	[GO.sieve.lang.contains, 'contains'],
-	[GO.sieve.lang.notcontains, 'notcontains'],
-	[GO.sieve.lang.is, 'is'],
-	[GO.sieve.lang.notis, 'notis'],
-	[GO.sieve.lang.exists, 'exists'],
-	[GO.sieve.lang.notexists, 'notexists']
+	[t("contains", "sieve"), 'contains'],
+	[t("doesn't contain", "sieve"), 'notcontains'],
+	[t("is", "sieve"), 'is'],
+	[t("doesn't equal", "sieve"), 'notis'],
+	[t("exists", "sieve"), 'exists'],
+	[t("doesn't exist", "sieve"), 'notexists']
 	]
 });
 
@@ -43,8 +43,8 @@ GO.sieve.cmbBodyOperatorStore = new Ext.data.ArrayStore({
 	idIndex: 1,
 	fields: ['field', 'value'],
 	data:[
-	[GO.sieve.lang.contains, 'contains'],
-	[GO.sieve.lang.notcontains, 'notcontains']
+	[t("contains", "sieve"), 'contains'],
+	[t("doesn't contain", "sieve"), 'notcontains']
 	]
 });
 
@@ -52,15 +52,15 @@ GO.sieve.cmbActionStore = new Ext.data.ArrayStore({
 	idIndex: 1,
 	fields: ['field', 'value'],
 	data:[
-	[GO.sieve.lang.setRead, 'set_read'],
-  [GO.sieve.lang.fileintoLabel, 'fileinto'],
-  [GO.sieve.lang.copytoLabel, 'fileinto_copy'],
-	[GO.sieve.lang.redirect_copy_to, 'redirect_copy'],
-	[GO.sieve.lang.redirect_to, 'redirect'],
-	[GO.sieve.lang.replyToMessage, 'vacation'],
-	[GO.sieve.lang.reject, 'reject'],
-	[GO.sieve.lang.discard, 'discard'],
-	[GO.sieve.lang.stop, 'stop']
+	[t("Mark message as read", "sieve"), 'set_read'],
+  [t("Move email to selected folder", "sieve"), 'fileinto'],
+  [t("Copy email to selected folder", "sieve"), 'fileinto_copy'],
+	[t("Copy to e-mail", "sieve"), 'redirect_copy'],
+	[t("Redirect to", "sieve"), 'redirect'],
+	[t("Reply to message", "sieve"), 'vacation'],
+	[t("Reject with message", "sieve"), 'reject'],
+	[t("Discard", "sieve"), 'discard'],
+	[t("Stop", "sieve"), 'stop']
 	]
 });
 
@@ -68,9 +68,9 @@ GO.sieve.cmbDateOperatorStore = new Ext.data.ArrayStore({
 	idIndex: 1,
 	fields: ['field', 'value'],
 	data:[
-	[GO.sieve.lang.before, 'value-le'], // before
-  [GO.sieve.lang.is, 'is'],					// is
-  [GO.sieve.lang.after, 'value-ge']		// after
+	[t("before", "sieve"), 'value-le'], // before
+  [t("is", "sieve"), 'is'],					// is
+  [t("after", "sieve"), 'value-ge']		// after
 	]
 });
 
@@ -78,7 +78,7 @@ GO.sieve.cmbUnderOverStore = new Ext.data.ArrayStore({
 	idIndex: 1,
 	fields: ['field', 'value'],
 	data:[
-  [GO.sieve.lang.under, 'under'],
-  [GO.sieve.lang.over, 'over']
+  [t("Under", "sieve"), 'under'],
+  [t("Over", "sieve"), 'over']
 	]
 });

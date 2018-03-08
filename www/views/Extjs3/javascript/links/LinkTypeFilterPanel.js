@@ -16,7 +16,7 @@ GO.LinkTypeFilterPanel = function(config)
 	config.allowNoSelection=true;
 	
 	if(!config.title)
-		config.title=GO.lang.strType;
+		config.title=t("Type");
 
 	if(!config.filesupport) // Load only the models that can handle files then set to true else false
 		config.filesupport = false;

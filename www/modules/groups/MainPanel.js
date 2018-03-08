@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: MainPanel.js 15285 2013-07-23 13:51:52Z mschering $
+ * @version $Id: MainPanel.js 22187 2018-01-19 11:37:26Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -27,7 +27,7 @@ GO.groups.MainPanel = function(config){
 	    root: 'results',
 	    id: 'id',
 	    totalProperty:'total',
-	    fields: ['id', 'name', 'user_id', 'user_name','acl_id'],
+	    fields: ['id', 'name', 'createdBy','aclId'],
 	    remoteSort: true
 	});			
 
@@ -36,8 +36,8 @@ GO.groups.MainPanel = function(config){
 			sortable:true
 		},
 		columns:[
-        {header: GO.groups.lang.groups, dataIndex: 'name', width: 300},
-        {header: GO.groups.lang.owner, dataIndex: 'user_name', sortable:false}
+        {header: t("groups", "groups"), dataIndex: 'name', width: 300},
+        {header: t("Created by"), dataIndex: 'createdBy', sortable:false}
     ]
 	});  
 	
@@ -51,12 +51,12 @@ GO.groups.MainPanel = function(config){
 		cls:'go-head-tb',
 		items: [{
                 xtype:'htmlcomponent',
-		        html:GO.groups.lang.name,
+		        html:t("name", "groups"),
 		        cls:'go-module-title-tbar'
 		},
 		{
 			iconCls: 'btn-add',
-			text: GO.lang['cmdAdd'],
+			text: t("Add"),
 			cls: 'x-btn-text-icon',
 			handler: function(){this.showGroupDialog(0);},
 			scope: this,
@@ -64,12 +64,12 @@ GO.groups.MainPanel = function(config){
 		},
 		{
 			iconCls: 'btn-delete',
-			text: GO.lang['cmdDelete'],
+			text: t("Delete"),
 			cls: 'x-btn-text-icon',
 			handler: function(){this.deleteSelected();},
 			scope: this,
 			disabled: !GO.settings.modules.groups.write_permission
-		},'-',GO.lang['strSearch'] + ':', this.searchField
+		},'-',t("Search") + ':', this.searchField
 		]});
       
   config.layout='fit';
@@ -121,7 +121,7 @@ Ext.extend(GO.groups.MainPanel, GO.grid.GridPanel, {
  * This will add the module to the main tabpanel filled with all the modules
  */
 GO.moduleManager.addModule('groups', GO.groups.MainPanel, {
-		title : GO.groups.lang.groups,
+		title : t("name", "groups"),
 		iconCls : 'go-tab-icon-groups',
 		admin :true
 });

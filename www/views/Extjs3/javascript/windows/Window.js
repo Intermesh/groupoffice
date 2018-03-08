@@ -16,6 +16,9 @@ GO.Window = function(config)
 
 GO.Window = Ext.extend(Ext.Window,{
 
+	constrainHeader : true,
+//	renderTo: Ext.get('dialogs'), // render before all script tags
+//this breaks some functionality that do stuff on render.
 	temporaryListeners : [],
 	
 	afterRender : function(){
@@ -56,7 +59,7 @@ GO.Window = Ext.extend(Ext.Window,{
 	},
 		
 	autoSize : function(){
-		if(GO.viewport){
+		if(go.ModuleManager.isAvailable("viewport")){
 
 			var vpH=GO.viewport.getEl().getHeight();
 			var vpW=GO.viewport.getEl().getWidth();
@@ -81,9 +84,8 @@ GO.Window = Ext.extend(Ext.Window,{
 		
 		GO.Window.superclass.show.call(this);
 	},
-
-	hide : function(){
-		
+	
+	removeTempListeners : function() {
 		for(var i=0;i<this.temporaryListeners.length;i++)
 		{
 			this.un(this.temporaryListeners[i].eventName, this.temporaryListeners[i].fn, this.temporaryListeners[i].scope);
@@ -91,7 +93,15 @@ GO.Window = Ext.extend(Ext.Window,{
 		this.temporaryListeners=[];		
 		
 		document.activeElement.blur();
-		
+	},
+	
+	close: function() {
+		this.removeTempListeners();		
+		GO.Window.superclass.close.call(this);
+	},
+
+	hide : function() {		
+		this.removeTempListeners();		
 		GO.Window.superclass.hide.call(this);
 	}		
 });

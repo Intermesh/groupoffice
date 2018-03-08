@@ -1,10 +1,10 @@
 GO.mainLayout.onReady(function(){
-	if(GO.summary)
+	if(go.ModuleManager.isAvailable("summary"))
 	{
 		GO.summary.portlets['portlet-expired-files']={
 			multiple:true,
 			portletType: 'portlet-expired-files',
-			title: GO.files.lang.expiredFilesPortlet,
+			title: t("Expired files", "files"),
 			layout:'fit',
 			tools: [{
 //				id: 'gear',

@@ -2,29 +2,21 @@ GO.ErrorDialog = function(config) {
 	config = config || {};
 
 	Ext.apply(config, {
-		width : 550,
-		height : 220,
+		width: dp(872),
 		closeAction : 'hide',
 		plain : true,
+		height: dp(424),
+		layout: 'fit',
 		border : false,
 		closable : true,
-		title : GO.lang.strError,
+		title : t("Error"),
 		modal : true, 
-		
-		layout:'fit',
 		items : [
 		this.messagePanel = new Ext.Panel({							
 			cls : 'go-error-dialog',		
 			autoScroll:true,
 			html : ''
-		})],
-		buttons : [{
-			text : GO.lang.cmdClose,
-			handler : function() {
-				this.hide();
-			},
-			scope : this
-		}]
+		})]
 	});
 
 	GO.ErrorDialog.superclass.constructor.call(this, config);
@@ -35,7 +27,7 @@ Ext.extend(GO.ErrorDialog, GO.Window, {
 	show : function(error, title) {
 		
 		if(!title)
-			title = GO.lang.strError;
+			title = t("Error");
 		
 		var now = new Date();
 		
@@ -57,7 +49,7 @@ Ext.extend(GO.ErrorDialog, GO.Window, {
 //		if(details)
 //			error += "<br /><br />"+details;
 
-		this.messagePanel.body.update(error);
+		this.messagePanel.body.update(Ext.util.Format.nl2br(error));
 				
 		//				if(GO.util.empty(details))
 		//				{

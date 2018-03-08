@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: TabbedFormDialog.js 21749 2017-11-23 16:57:38Z mschering $
+ * @version $Id: TabbedFormDialog.js 22300 2018-01-30 13:40:04Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  *
@@ -106,11 +106,7 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 	 */
 	modelName : false,
 	
-	/**
-	 * Enable the comments tab when the comments is installed.
-	 * Note: You also need to set the correct modelName to enable this.
-	 */
-	enableComments: false,
+
 	
 	/**
 	 * Enable the customfields tab when the customfieldsmodule is installed
@@ -141,7 +137,7 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 	
 	enableApplyButton : true,
 	
-	enableCloseButton : true,
+	enableCloseButton : false,
 	
 	/**
 	 * Indicates if the form is currenty loading
@@ -179,7 +175,7 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 
 				this.tools.push({
 					id:'help',
-					qtip: GO.lang['help'],
+					qtip: t("Help"),
 					handler: function(event, toolEl, panel){
 						GO.openHelp(this.helppage);
 					},
@@ -192,30 +188,32 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 		var buttons = [];
 		
 		// These three buttons are enabled by default.
-		if (this.enableOkButton)
-			buttons.push(this.buttonOk = new Ext.Button({
-				text: GO.lang['cmdOk'],
-				handler: function(){
-					this.submitForm(true);
-				},
-				scope: this
-			}));
-		if (this.enableApplyButton)
-			buttons.push(this.buttonApply = new Ext.Button({
-				text: GO.lang['cmdApply'],
-				handler: function(){
-					this.submitForm();
-				},
-				scope:this
-			}));
 		if (this.enableCloseButton)
 			buttons.push(this.buttonClose = new Ext.Button({
-				text: GO.lang['cmdClose'],
+				text: t("Close"),
 				handler: function(){
 					this.hide();
 				},
 				scope:this
 			}));
+		
+		if (this.enableApplyButton)
+			buttons.push(this.buttonApply = new Ext.Button({
+				text: t("Apply"),
+				handler: function(){
+					this.submitForm();
+				},
+				scope:this
+			}));
+		if (this.enableOkButton)
+			buttons.push(this.buttonOk = new Ext.Button({
+				text: t("Save"),
+				handler: function(){
+					this.submitForm(true);
+				},
+				scope: this
+			}));
+		
 		
 		Ext.applyIf(this, {
 			buttons: buttons
@@ -230,8 +228,7 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 		
 
 		this.addCustomFields();
-		this.addComments();
-		
+	
 		this.formPanelConfig=this.formPanelConfig || {};
 		this.formPanelConfig = Ext.apply(this.formPanelConfig, {
 			waitMsgTarget:true,			
@@ -342,42 +339,8 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 		}
 	},
 	
-	/**
-	 * Add the comments tab
-	 * 
-	 * @returns {undefined}
-	 */
-	addComments : function(){
-		if(GO.comments && this.enableComments && this.modelName){
-			this.commentsGrid = new GO.comments.CommentsGrid({title:GO.comments.lang.comments});
-			this.addPanel(this.commentsGrid);
-		}
-	},
-	
-	/**
-	 * Add the comments tab functionality
-	 * 
-	 * @param int remoteModelId
-	 * @returns {undefined}
-	 */
-	handleComments : function(remoteModelId){
-		if(GO.comments && this.enableComments && this.modelName){
-			
-			if(remoteModelId > 0){
-//						if (!GO.util.empty(action.result.data['action_date'])) {
-//							this.commentsGrid.actionDate = action.result.data['action_date'];
-//						} else {
-//							this.commentsGrid.actionDate = false;
-//						}
-				this.commentsGrid.setLinkId(remoteModelId, this.modelName);
-				this.commentsGrid.store.load();
-				this.commentsGrid.setDisabled(false);
-			}else {
-				this.commentsGrid.setDisabled(true);
-			}
-		}
-	},
-	
+
+
 	getSubmitParams : function(){
 		return {};
 	},
@@ -470,7 +433,7 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 				id:this.remoteModelId
 			}),
 			jsonData: this.createJSON(params),
-			waitMsg: GO.lang['waitMsgSave'],
+			waitMsg: t("Saving..."),
 			scope: this,
 			success: function(response, options, result) {
 				this.getFooterToolbar().setDisabled(false);
@@ -523,7 +486,7 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 			fail: function(response, options, result) {
 				this.getFooterToolbar().setDisabled(false);
 
-				Ext.MessageBox.alert(GO.lang['strError'], result.feedback);
+				Ext.MessageBox.alert(t("Error"), result.feedback);
 
 				if (result.validationErrors) {
 					for (var modelName in result.validationErrors) {
@@ -570,7 +533,7 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 				url:GO.url(this.formControllerUrl+'/'+this.submitAction),
 				params: params,
 				submitEmptyText: this.submitEmptyText,
-				waitMsg:GO.lang['waitMsgSave'],
+				waitMsg:t("Saving..."),
 				success:function(form, action){		
 					this.getFooterToolbar().setDisabled(false);
 					if(action.result[this.remoteModelIdName])
@@ -621,14 +584,14 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 					this.getFooterToolbar().setDisabled(false);
 					if(action.failureType == 'client')
 					{					
-						Ext.MessageBox.alert(GO.lang['strError'], GO.lang['strErrorsInForm']);			
+						Ext.MessageBox.alert(t("Error"), t("You have errors in your form. The invalid fields are marked."));			
 					} else {					
 
 						if(this.fileUpload){
 							action.result.feedback=Ext.util.Format.nl2br(action.result.feedback);
 						}
 
-						Ext.MessageBox.alert(GO.lang['strError'], action.result.feedback);
+						Ext.MessageBox.alert(t("Error"), action.result.feedback);
 
 						if(action.result.validationErrors){
 							for(var field in action.result.validationErrors){
@@ -658,7 +621,7 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 				id:this.remoteModelId
 			}),
 			jsonData: this.createJSON(),
-			waitMsg: GO.lang['waitMsgSave'],
+			waitMsg: t("Saving..."),
 			scope: this,
 			success: function(response, options, result) {
 			
@@ -699,8 +662,7 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 				this.loadData = result.data;
 				
 				this.afterLoad(remoteModelId, config, {response:response, options:options, result:result});
-				
-				this.handleComments(remoteModelId);
+	
 								
 				GO.dialog.TabbedFormDialog.superclass.show.call(this);
 				this.afterShowAndLoad(remoteModelId, config, result);
@@ -737,6 +699,9 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 			config.loadParams={};
 		
 		this.showConfig = config;
+		
+		// Needed to reset the dirty state of formfields to false
+		this.formPanel.getForm().trackResetOnLoad = true;
 		
 		this.beforeLoad(remoteModelId, config);
 
@@ -786,8 +751,7 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 						this.loadData = action.result.data;
 						
 						this.afterLoad(remoteModelId, config, action);
-						
-						this.handleComments(remoteModelId);
+
 						
 						GO.dialog.TabbedFormDialog.superclass.show.call(this);
 						this.afterShowAndLoad(remoteModelId, config, action.result);
@@ -860,7 +824,7 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 				if(!this.origTitle)
 					this.origTitle=this.title;
 
-				var titleSuffix = this.remoteModelId > 0 ? f.getValue() : GO.lang.cmdNew;
+				var titleSuffix = this.remoteModelId > 0 ? f.getValue() : t("New");
 
 				this.setTitle(Ext.util.Format.htmlEncode(this.origTitle+": "+titleSuffix));
 			}

@@ -1,90 +1,61 @@
 <?php
-$l["name"] = "Standard-Website";
-$l["description"] = "Die Vorlage für den Standard-Seiten";
-  
-$l["installdefaultsiteerror"] = "Konnte \"defaultsite\"-Modul nicht installieren.";
-$l["installsiteerror"] = "Konnte \"site\"-Modul nicht installieren.";
-  
-$l["ticketFirstname"] = "Vorname";
-$l["ticketMiddlename"] = "zweiter Vorname";
-$l["ticketLastname"] = "Nachname";
-$l["ticketEmail"] = "E-Mail";
-$l["ticketPhone"] = "Telefon";
-  
-$l["ticketSubject"] = "Betreff";
-$l["ticketCreated"] = "Erstellt";
-$l["ticketDate"] = "Datum";
-$l["ticketType"] = "Typ";
-$l["ticketStatus"] = "Status";
-$l["ticketNumber"] = "Ticket-Nr.";
-$l["ticketAgent"] = "Agenten";
-$l["ticketStatusOpen"] = "Open";
-  
-$l["ticketFilterAll"] = "Alle";
-$l["ticketFilterOpenInProgress"] = "Offen und in Bearbeitung";
-$l["ticketFilterOpen"] = "Offen";
-$l["ticketFilterInProgress"] = "In Bearbeitung";
-$l["ticketFilterClose"] = "Geschlossen";
-  
-$l["ticketDiscussion"] = "Diskussion";
-$l["ticketFiles"] = "Dateien";
-$l["ticketNoneFound"] = "Keine Tickets gefunden";
-$l["ticketYourTickets"] = "Ihre Tickets";
-$l["ticketFilter"] = "Filter";
-  
-$l["ticketList"] = "Ticketlist";
-$l["ticketPriority"] = "Priorität";
-  
-$l["ticketAddComment"] = "Kommentar hinzufügen - Ticket erstellen";  // nicht eindeutig genug
-  
-$l["ticket"] = "Ticket";
-$l["ticketYourMessage"] = "Ihre Nachricht";
-$l["ticketCloseTicket"] = "Schließen";
-$l["ticketCloseTicketTooltip"] = "Schließen Sie dieses Ticket. Sie können auf dieses Ticket nicht mehr reagieren, wenn Sie es geschlossen haben.";
-$l["ticketNewTicket"] = "Neues Ticket";
-$l["ticketContactInfo"] = "Kontaktinformation";
-$l["ticketBackToList"] = "Zurück zur Übersicht";
-  
-$l["contactDetails"] = "Kontakt";
-$l["companyDetails"] = "Firmen Details";
-$l["address"] = "Adresse";
-$l["usernameandpassword"] = "Benutzername und Passwort";
-  
-$l["changePassword"] = "Passwort ändern";
-$l["passwordChanged"] = "Passwort geändert";
-$l["login"] = "Login";
-$l["changePasswordText"] = "Verwenden Sie unten das Formular, um Ihr Passwort zu ändern";
-$l["forgotPassword"] = "Passwort vergessen?";
-$l["signup"] = "Anmelden";
-$l["register"] = "Registrieren";
-$l["submit"] = "Absenden";
-$l["rememberme"] = "Erinnere mich";
-$l["lostPassword"] = "Passwort vergessen?";
-$l["alreadySignedupText"] = "Wenn Sie bereits über einen Benutzernamen und ein Kennwort verfügen benutzen Sie dieses Formular, um sich anzumelden.";
-$l["forgotPasswordText"] = "Füllen sie Ihre E-Mail Adresse in das untenstehende Formular, und Sie werden einen Link erhalten, um Ihr Passwort innerhalb von Minuten wiederherzustellen.";
-$l["registerformText"] = "Bitte füllen Sie dieses Formular aus und klicken Sie auf\"OK\" um sich zu registrieren. Die Felder mit einem * müssen ausgefüllt werden.";
-  
-  
-$l["ticketCreatedTitle"] = "Wir haben Ihre Anfrage empfangen";
-$l["ticketCreatedText"] = "Danke, wir haben Ihr Ticket empfangen und wir werden Sie über den aktuellen Stand per E-Mail auf dem Laufenden halten.";
-  
-$l["gotoTicket"] = "zum Ticket gehen";
-  
-$l["selectOne"] = "Wählen Sie eine";
-
-$l['ticketCompany']= 'Firma';
-$l['ticketInfo']= 'Ticketinformation';
-$l['contactformTitle']="Kontaktformular";
-$l['contactformText']="Füllen Sie dieses Formular aus und klicken Sie auf "OK", um sich zu registrieren. Die mit einem * gekennzeichneten Felder sind Pflichtfelder.";
-$l['addressbookNotFound']="Kein Adressbuch mit dem Namen '% s' gefunden.";
-$l['contactformDoneText']="Wir haben Ihre Registrierung erhalten.";
-$l['currentPassword']="Aktuelles Passwort";
-$l['passwordExpired']="Ihr Passwort ist abgelaufen";
-$l['changePasswordRequiredText']= 'Sie müssen Ihr Passwort ändern.';
-$l['usernameIncorrect']= 'Der angegebene Benutzername ist falsch';
-$l['pleaseFillInAllFields']= 'Bitte füllen Sie alle Felder aus';
-$l['passwordsDoNotMatch']= 'Das Passwort und die Passwortbestätigung stimmen nicht überein';
-$l['passwordsMayNotBeTheSame']= 'Das neue Passwort stimmt möglicherweise nicht mit dem alten übereind';
-$l['couldNotSaveNewPassword']= 'Das neue Passwort konnte nicht gespeichert werden. Bitte kontaktieren Sie den Administrator des Systems';
-$l['passwordIncorrect']= 'Das von Ihnen angegebene Passwort ist falsch';
-
+return array (
+  'Could not install the "defaultsite" module.' => 'Konnte "defaultsite"-Modul nicht installieren.',
+  'Could not install the "site" module.' => 'Konnte "site"-Modul nicht installieren.',
+  'First Name' => 'Vorname',
+  'Middle Name' => 'zweiter Vorname',
+  'Last Name' => 'Nachname',
+  'Email' => 'E-Mail',
+  'Phone' => 'Telefon',
+  'Subject' => 'Betreff',
+  'Created' => 'Erstellt',
+  'Date' => 'Datum',
+  'Type' => 'Typ',
+  'Ticket no.' => 'Ticket-Nr.',
+  'Agent' => 'Agenten',
+  'All' => 'Alle',
+  'Open and in progress' => 'Offen und in Bearbeitung',
+  'Open' => 'Offen',
+  'In progress' => 'In Bearbeitung',
+  'Closed' => 'Geschlossen',
+  'Discussion' => 'Diskussion',
+  'Files' => 'Dateien',
+  'No tickets found' => 'Keine Tickets gefunden',
+  'Your tickets' => 'Ihre Tickets',
+  'Priority' => 'Priorität',
+  'Add Comment' => 'Kommentar hinzufügen - Ticket erstellen',
+  'Your message' => 'Ihre Nachricht',
+  'Close' => 'Schließen',
+  'Close this ticket. You cannot respond to this ticket anymore when you have closed it.' => 'Schließen Sie dieses Ticket. Sie können auf dieses Ticket nicht mehr reagieren, wenn Sie es geschlossen haben.',
+  'New Ticket' => 'Neues Ticket',
+  'Contact Info' => 'Kontaktinformation',
+  'ticketinfo' => 'Ticket Informationen',
+  'Back to Overview' => 'Zurück zur Übersicht',
+  'Contact Details' => 'Kontakt',
+  'Company Details' => 'Firmen Details',
+  'Address' => 'Adresse',
+  'Username and Password' => 'Benutzername und Passwort',
+  'Change password' => 'Passwort ändern',
+  'Password changed' => 'Passwort geändert',
+  'Use the below form to change your password' => 'Verwenden Sie unten das Formular, um Ihr Passwort zu ändern',
+  'Forgot password?' => 'Passwort vergessen?',
+  'Sign up' => 'Anmelden',
+  'Register' => 'Registrieren',
+  'Submit' => 'Absenden',
+  'Remember me' => 'Erinnere mich',
+  'Lost password?' => 'Passwort vergessen?',
+  'If you already have a username and password use this form to login.' => 'Wenn Sie bereits über einen Benutzernamen und ein Kennwort verfügen benutzen Sie dieses Formular, um sich anzumelden.',
+  'Fill in your email address in the form below, and you\'ll receive a link to recover your password within minuts.' => 'Füllen sie Ihre E-Mail Adresse in das untenstehende Formular, und Sie werden einen Link erhalten, um Ihr Passwort innerhalb von Minuten wiederherzustellen.',
+  'Fill out this form and click on \'Ok\' to register. The fields marked with a * are required.' => 'Bitte füllen Sie dieses Formular aus und klicken Sie auf"OK" um sich zu registrieren. Die Felder mit einem * müssen ausgefüllt werden.',
+  'We received your ticket' => 'Wir haben Ihre Anfrage empfangen',
+  'Thank you, we received your ticket and we will keep you informed about the status per e-mail.' => 'Danke, wir haben Ihr Ticket empfangen und wir werden Sie über den aktuellen Stand per E-Mail auf dem Laufenden halten.',
+  'Go to ticket' => 'zum Ticket gehen',
+  'Select one' => 'Wählen Sie eine',
+  'name' => 'Standard-Website',
+  'description' => 'Die Vorlage für den Standard-Seiten',
+  'Status' => 'Status',
+  'Filter' => 'Filter',
+  'Ticketlist' => 'Ticketlist',
+  'Ticket' => 'Ticket',
+  'Login' => 'Login',
+);

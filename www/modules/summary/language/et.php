@@ -1,26 +1,25 @@
 <?php
-
-
-$l['name']='Esileht';
-$l['description']='Näita erinevate kirjete ülevaateid';
-$l['default_rss_url']='http://postimees.ee/rss/';
-$l['default_rss_title']='Uudised';
-$l["summary"]= 'Ülevaade';
-$l["noItems"]= 'Esilehel kirjed puuduvad.';
-$l["selectPortlet"]= 'Vali moodul';
-$l["hotTopics"]= 'uudised';
-$l["enterRssFeed"]= 'Lisa palun RSS voo URL:';
-$l["notes"]= 'Märkmed';
-$l["loadingFeed"]= 'laen voogu...';
-$l["goToPost"]= 'Mine postituse juurde';
-$l["today"]= 'Täna ';
-$l["announcement"]="Teadaanne";
-$l["announcements"]="TEADAANDED";
-$l["dueTime"]="Näita kuni";
-$l["title"]="Pealkiri";
-$l["manageAnnouncements"]='Halda teadaandeid';
-$l["webFeeds"]='halda veebi vooge';
-$l["type"]='Tüüp';
-$l["summaryType"]='Ülevaade';
-$l["rssFeeds"]='Rss vood';
-$l["noRssFeeds"]='RSS voogusid ei ole lisatud.<br />Voogude lisamiseks kliki selle akna üleval paremal oleval nupul.';
+return array (
+  'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml' => 'http://postimees.ee/rss/',
+  'News' => 'uudised',
+  'You don\'t have any items on your start page.' => 'Esilehel kirjed puuduvad.',
+  'Select portlet' => 'Vali moodul',
+  'Please enter the RSS feed URL:' => 'Lisa palun RSS voo URL:',
+  'Notes' => 'Märkmed',
+  'Loading Feed...' => 'laen voogu...',
+  'Go to Post' => 'Mine postituse juurde',
+  'Today ' => 'Täna ',
+  'Announcement' => 'Teadaanne',
+  'Announcements' => 'TEADAANDED',
+  'Show until' => 'Näita kuni',
+  'Title' => 'Pealkiri',
+  'Manage announcements' => 'Halda teadaandeid',
+  'Manage webfeeds' => 'halda veebi vooge',
+  'Type' => 'Tüüp',
+  'Summary' => 'Ülevaade',
+  'Rss Feeds' => 'Rss vood',
+  'No RSS feeds have been added.<br />Click the settings button in the top right corner of this window to add feeds.' => 'RSS voogusid ei ole lisatud.<br />Voogude lisamiseks kliki selle akna üleval paremal oleval nupul.',
+  'name' => 'Ülevaade',
+  'description' => 'Näita erinevate kirjete ülevaateid',
+  'Start page' => 'Ülevaade',
+);

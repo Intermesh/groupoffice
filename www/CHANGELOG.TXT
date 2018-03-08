@@ -1,3 +1,37 @@
+CHANGELOG
+
+
+UPGRADING: make sure custom fields and search module are installed.
+
+Core:
+- New JMAP API backend
+- Flux technology in frontend
+- Optimized frontend client building
+- New theme (All old ones removed due to incompatibility)
+- Easier theming using SASS
+- Simplified ACL model by using groups only. Every user has a personal group to keep individual permissions.
+- Database optimizations. More clear names and defined foreign key relations
+- Soft delete
+- Two factor authentication using Google Authenticator
+- New UI design for Links
+- Custom fields database name can be defined now
+- New authentication mechanism
+- Improved translation API
+- Frontend Router to make pages directly accessible
+- New global search
+
+Notes
+- Uses new API
+- Redesigned detail view
+
+Address book
+- Redesigned detail view
+
+Comments
+- Always use read more links and removed settings
+- Remove comments from edit dialogs. Always use detail views.
+
+
 06-03-2018 6.2.83
 - Log: Added jsonData column to go_log table that contains modification info on update of activerecord.
 - Billing: Order status has a checkbox to stop asking the user to sent clients a notification about the status change.

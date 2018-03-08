@@ -10,7 +10,7 @@ GO.email.ReplaceEmailDialog = function(config) {
     config.width=400;
     config.height=200;
     config.closeAction='hide';
-    config.title=GO.addressbook.lang.contact;
+    config.title=t("Contact", "addressbook");
  
     this.store = new GO.data.JsonStore({
 	root: 'addresses',
@@ -34,7 +34,7 @@ GO.email.ReplaceEmailDialog = function(config) {
 	items: [
 	new Ext.Panel({
 	    border: false,
-	    html: GO.email.lang.replaceEmailText
+	    html: t("This contact already has three email addresses in it's profile. You can replace one of the existing ones below by clicking on the email address you want replaced.", "email")
 	}),
 	this.list
 	],

@@ -20,18 +20,18 @@ $this->render('externalHeader');
 
 if ($participant->status == \GO\Calendar\Model\Participant::STATUS_ACCEPTED) {
 	?>
-	<p><?php echo \GO::t('eventAccepted', 'calendar'); ?></p>		
+	<p><?php echo \GO::t("You have accepted the event.", "calendar"); ?></p>		
 	<?php
 	}else
 	{
 	?>
-	<p><?php echo \GO::t('eventDeclined', 'calendar'); ?></p>
+	<p><?php echo \GO::t("You have declined the event.", "calendar"); ?></p>
 	<?php
 }
 
 if ($event) {
 	?>
-	<p><?php echo sprintf(\GO::t('eventScheduledIn', 'calendar'), $event->calendar->name, $participant->statusName); ?></p>
+	<p><?php echo sprintf(\GO::t("The event has been scheduled in your calendar named %s with status %s.", "calendar"), $event->calendar->name, $participant->statusName); ?></p>
 	<?php
 }
 $this->render('externalFooter');

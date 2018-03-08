@@ -1,13 +1,12 @@
 <?php
-//Bangla (Bangladesh) Translation by Shubhra Prakash Paul <shuvro.paul@gmail.com>
-$l['name']='পপ-আপ স্মর্তব্য';
-$l['description']='ব্যবহারকারি কিংবা ব্যবহারকারি গোষ্ঠীর জন্য পপ-আপ স্মর্তব্য শিডিউল করার মডিউল।';
-
-$l['reminders']='পপ-আপ স্মর্তব্যসমূহ';
-$l['reminder']="পপ-আপ স্মর্তব্য";
-$l['time']="নির্ঘন্ট";
-$l['snoozeTime']="বিরতি";
-$l['text']='টেক্সট';
-$l['addUsers']='ব্যবহারকারি যোগ কর';
-$l['addUserGroups']='গোষ্ঠী যোগ কর';
-?>
+return array (
+  'Popup reminder' => 'পপ-আপ স্মর্তব্য',
+  'Time' => 'নির্ঘন্ট',
+  'Snooze time' => 'বিরতি',
+  'Text' => 'টেক্সট',
+  'Add users' => 'ব্যবহারকারি যোগ কর',
+  'Add user groups' => 'গোষ্ঠী যোগ কর',
+  'name' => 'পপ-আপ স্মর্তব্যসমূহ',
+  'description' => 'ব্যবহারকারি কিংবা ব্যবহারকারি গোষ্ঠীর জন্য পপ-আপ স্মর্তব্য শিডিউল করার মডিউল।',
+  'Popup reminders' => 'পপ-আপ স্মর্তব্যসমূহ',
+);

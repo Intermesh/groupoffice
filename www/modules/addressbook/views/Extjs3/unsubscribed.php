@@ -18,7 +18,7 @@ extract($data);
 
 $this->render('externalHeader');
 ?>
-<p><?php echo \GO::t('delete_success','addressbook'); ?></p>
+<p><?php echo \GO::t("You have been successfully unsubscribed from the address list.", "addressbook"); ?></p>
 <?php
 $this->render('externalFooter');
 

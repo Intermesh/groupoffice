@@ -203,7 +203,7 @@ Ext.grid.PivotGridView = Ext.extend(Ext.grid.GridView, {
                 '<div class="x-grid3-scroller">',
                     '<div class="x-grid3-row-headers"></div>',
                     '<div class="x-grid3-body" style="{bstyle}">{body}</div>',
-                    '<a href="#" class="x-grid3-focus" tabIndex="-1"></a>',
+                    '<a  class="x-grid3-focus" tabIndex="-1"></a>',
                 '</div>',
             '</div>',
             '<div class="x-grid3-resize-marker">&#160;</div>',
@@ -223,7 +223,7 @@ Ext.grid.PivotGridView = Ext.extend(Ext.grid.GridView, {
             templates.gcell = new Ext.XTemplate(
                 '<td class="x-grid3-hd x-grid3-gcell x-grid3-td-{id} ux-grid-hd-group-row-{row} ' + this.colHeaderCellCls + '" style="{style}">',
                     '<div {tooltip} class="x-grid3-hd-inner x-grid3-hd-{id} x-unselectable" unselectable="on" style="{istyle}">', 
-                        this.grid.enableHdMenu ? '<a class="x-grid3-hd-btn" href="#"></a>' : '', '{value}',
+                        this.grid.enableHdMenu ? '<a class="x-grid3-hd-btn" ></a>' : '', '{value}',
                     '</div>',
                 '</td>'
             );

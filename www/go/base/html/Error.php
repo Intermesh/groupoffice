@@ -71,7 +71,7 @@ class Error extends Input {
 					
 					Input::setError($formAttribute, $message); // replace is needed because of a mix up with order model and company model
 				}
-				Error::setError(\GO::t('errorsInForm'));
+				Error::setError(\GO::t("There were errors in the form. Correct them and try again."));
 				return false;
 			}else
 			{

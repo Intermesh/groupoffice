@@ -1,22 +1,20 @@
 <?php
-
-
-$l['name']='Marcadors';
-$l['description']='Un mòdul per crear marcadors.';
-$l['general']='General';
-$l['googleDescription']="Cercar en la Web";
-
-$l["bookmarks"]='Marcadors';
-$l["bookmark"]='Marcador';
-$l["category"]='Categoria';
-$l["title"]='Títol';
-$l["description"]='Descripció';
-$l["logo"]='Logo';
-$l["extern"]='Obrir en una nova pestanya del navegador';
-$l["administrateCategories"]='Administrar categories';
-$l["thumbnails"]='Miniatures';
-$l["chooseIcon"]='Triar icona pel marcador';
-$l["clearLogo"]='Netejar Logo';
-$l["uploadLogo"]='Pujar Logo';
-$l["showAll"]='Mostrar tot';
-$l["sharedCategory"]='Categoria compartida';
+return array (
+  'Search the web' => 'Cercar en la Web',
+  'Bookmark' => 'Marcador',
+  'Category' => 'Categoria',
+  'Title' => 'Títol',
+  'Open in new browser tab' => 'Obrir en una nova pestanya del navegador',
+  'Administrate categories' => 'Administrar categories',
+  'Thumbnails' => 'Miniatures',
+  'Choose icon for bookmark' => 'Triar icona pel marcador',
+  'Clear Logo' => 'Netejar Logo',
+  'Upload Logo' => 'Pujar Logo',
+  'Show all' => 'Mostrar tot',
+  'Shared category' => 'Categoria compartida',
+  'name' => 'Marcadors',
+  'description' => 'Descripció',
+  'General' => 'General',
+  'Bookmarks' => 'Marcadors',
+  'Logo' => 'Logo',
+);

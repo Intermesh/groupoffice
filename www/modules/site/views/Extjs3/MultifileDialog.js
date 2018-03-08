@@ -16,7 +16,7 @@ GO.site.MultifileDialog = Ext.extend(GO.Window , {
 	initComponent : function(){
 		
 		this.buttonClose = new Ext.Button({
-			text: GO.lang['cmdClose'],
+			text: t("Close"),
 			handler: function(){
 				this.hide();
 			},
@@ -27,10 +27,10 @@ GO.site.MultifileDialog = Ext.extend(GO.Window , {
 		
 		this.addButton = new Ext.Button({
 			iconCls:'btn-add',
-			text : GO.lang.cmdAdd,
+			text : t("Add"),
 			handler : function()
 			{
-				if(GO.files)
+				if(go.ModuleManager.isAvailable("files"))
 				{
 					GO.files.createSelectFileBrowser();
 
@@ -71,7 +71,7 @@ GO.site.MultifileDialog = Ext.extend(GO.Window , {
 
 		Ext.apply(this, {
 			goDialogId:'multifile-dialog',
-			title:GO.site.lang.multifile,
+			title:t("Multi File", "site"),
 			layout:'fit',
 			//autoScroll:true,
 			modal:true,
@@ -84,7 +84,7 @@ GO.site.MultifileDialog = Ext.extend(GO.Window , {
 				{
 					itemId:'delete',
 					iconCls: 'btn-delete',
-					text: GO.lang['cmdDelete'],
+					text: t("Delete"),
 					cls: 'x-btn-text-icon',
 					handler: function(){
 						this.multifileView.deleteSelected();
@@ -95,7 +95,7 @@ GO.site.MultifileDialog = Ext.extend(GO.Window , {
 				'-',
 				{
 					iconCls: 'btn-refresh',
-					text: GO.lang['cmdRefresh'],
+					text: t("Refresh"),
 					cls: 'x-btn-text-icon',
 					handler: function(){
 						this.multifileView.store.load();

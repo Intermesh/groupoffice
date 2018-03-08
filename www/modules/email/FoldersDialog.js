@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: FoldersDialog.js 20871 2017-02-21 10:53:37Z mschering $
+ * @version $Id: FoldersDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -28,7 +28,7 @@ GO.email.FoldersDialog = function(config) {
 			preloadChildren : true,
 			listeners : {
 				beforeload : function() {
-					this.body.mask(GO.lang.waitMsgLoad);
+					this.body.mask(t("Loading..."));
 				},
 				load : function() {
 					this.body.unmask();
@@ -46,7 +46,7 @@ GO.email.FoldersDialog = function(config) {
 
 	// set the root node
 	this.rootNode = new Ext.tree.AsyncTreeNode({
-		text : GO.email.lang.root,
+		text : t("Root", "email"),
 		draggable : false,
 		id : 'root',
 		expanded : false
@@ -73,7 +73,7 @@ GO.email.FoldersDialog = function(config) {
 				mailboxs : Ext.util.JSON.encode(mailboxs) 
 			},
 			fail: function(response, options, result) {
-				Ext.Msg.alert(GO.lang.strError, result.feedback);
+				Ext.Msg.alert(t("Error"), result.feedback);
 				this.foldersTree.getRootNode().reload();
 			},
 			scope : this
@@ -88,7 +88,7 @@ GO.email.FoldersDialog = function(config) {
 	treeEdit.on('beforestartedit', function(editor, boundEl, value) {
 		if (editor.editNode.attributes.folder_id == 0
 			|| editor.editNode.attributes.mailbox == 'INBOX') {
-			alert(GO.email.lang.cantEditFolder);
+			alert(t("You can't edit this folder", "email"));
 			return false;
 		}
 	});
@@ -122,13 +122,13 @@ GO.email.FoldersDialog = function(config) {
 		width : 500,
 		plain : true,
 		closeAction : 'hide',
-		title : GO.email.lang.folders,
+		title : t("Folders", "email"),
 
 		items : this.foldersTree,
 
 		tbar : [{
 			iconCls : 'btn-delete',
-			text : GO.lang.cmdDelete,
+			text : t("Delete"),
 			cls : 'x-btn-text-icon',
 			scope : this,
 			handler : function() {
@@ -137,10 +137,10 @@ GO.email.FoldersDialog = function(config) {
 
 				if(!node|| node.attributes.folder_id<1)
 				{
-					Ext.MessageBox.alert(GO.lang.strError, GO.email.lang.selectFolderDelete);
+					Ext.MessageBox.alert(t("Error"), t("Select a folder to delete please", "email"));
 				}else if(node.attributes.mailbox=='INBOX')
 				{
-					Ext.MessageBox.alert(GO.lang.strError, GO.email.lang.cantDeleteInboxFolder);
+					Ext.MessageBox.alert(t("Error"), t("You can't delete the INBOX folder", "email"));
 				}else
 				{
 					GO.deleteItems({
@@ -156,7 +156,7 @@ GO.email.FoldersDialog = function(config) {
 								node.remove();								
 							}else
 							{
-								Ext.MessageBox.alert(GO.lang.strError,responseParams.feedback);
+								Ext.MessageBox.alert(t("Error"),responseParams.feedback);
 							}
 						},
 						count: 1,
@@ -166,7 +166,7 @@ GO.email.FoldersDialog = function(config) {
 			}
 		}, {
 			iconCls : 'btn-add',
-			text : GO.lang.cmdAdd,
+			text : t("Add"),
 			cls : 'x-btn-text-icon',
 			handler : function() {
 
@@ -174,11 +174,11 @@ GO.email.FoldersDialog = function(config) {
 				var node = sm.getSelectedNode();
 
 				if (!node) {
-					Ext.MessageBox.alert(GO.lang.strError,
-						GO.email.lang.selectFolderAdd);
+					Ext.MessageBox.alert(t("Error"),
+						t("First select a folder from the tree where you want to add the new folder. Then click on 'Add'", "email"));
 				} else {
-					Ext.MessageBox.prompt(GO.lang.strName,
-						GO.email.lang.enterFolderName, function(button,
+					Ext.MessageBox.prompt(t("Name"),
+						t("Enter the folder name:", "email"), function(button,
 							text) {
 
 							if (button == 'ok') {
@@ -208,7 +208,7 @@ GO.email.FoldersDialog = function(config) {
 			scope : this
 		}, {
 			iconCls : 'btn-refresh',
-			text : GO.lang.cmdRefresh,
+			text : t("Refresh"),
 
 			cls : 'x-btn-text-icon',
 			handler : function() {
@@ -219,7 +219,7 @@ GO.email.FoldersDialog = function(config) {
 		'->' 
 		,{
 			iconCls : 'btn-add',
-			text : GO.lang.selectAll,
+			text : t("Select all"),
 			cls : 'x-btn-text-icon',
 			handler : function() {
 
@@ -250,7 +250,7 @@ GO.email.FoldersDialog = function(config) {
 			scope : this
 		},{
 			iconCls : 'btn-add',
-			text : GO.lang.deselectAll,
+			text : t("Deselect all"),
 			cls : 'x-btn-text-icon',
 			handler : function() {
 				
@@ -282,7 +282,7 @@ GO.email.FoldersDialog = function(config) {
 
 		],
 		buttons : [{
-			text : GO.lang.cmdClose,
+			text : t("Close"),
 			handler : function() {
 				this.hide();
 			},

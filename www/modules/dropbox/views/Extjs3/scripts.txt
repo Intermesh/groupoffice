@@ -1,2 +1,0 @@
-modules/dropbox/views/Extjs3/SettingsDialog.js
-modules/dropbox/views/Extjs3/Settings.js

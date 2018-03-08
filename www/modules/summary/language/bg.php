@@ -1,27 +1,25 @@
 <?php
-$l["summary"]= 'Начална страница';
-$l["noItems"]= 'Нямате нищо на началната страница.';
-$l["selectPortlet"]= 'Избор на портлет';
-$l["hotTopics"]= 'Новини';
-$l["enterRssFeed"]= 'Въведете адреса на RSS хранилката:';
-$l["notes"]= 'Бележки';
-$l["loadingFeed"]= 'Зареждане на хранилки...';
-$l["goToPost"]= 'Иди на публикация';
-$l["today"]= 'Днес ';
-$l["announcement"]="Обявление";
-$l["announcements"]="Обявления";
-$l["dueTime"]="Покажи докато";
-$l["title"]="Заглавие";
-$l["manageAnnouncements"]='Управление на обявления';
-$l["webFeeds"]='Управление на уеб хранилките';
-$l["type"]='Вид';
-$l["summaryType"]='Сбито';
-$l["rssFeeds"]='Rss хранилки';
-$l["noRssFeeds"]='Не сте добавили никакви RSS хранилки.<br />Кликнете на бутона Настройки в десния горен ъгъл на този прозорец, за да добавите хранилки.';
-
-$l['name']='Начална страница';
-$l['description']='Показва общ преглед на актуалните събития';
-$l['default_rss_url']='http://www.swe-flex.com/?feed=rss2';
-$l['default_rss_title']='Новини';
-$l['announcement']='Обявление';
-$l['announcements']='Обявления';
+return array (
+  'You don\'t have any items on your start page.' => 'Нямате нищо на началната страница.',
+  'Select portlet' => 'Избор на портлет',
+  'News' => 'Новини',
+  'Please enter the RSS feed URL:' => 'Въведете адреса на RSS хранилката:',
+  'Notes' => 'Бележки',
+  'Loading Feed...' => 'Зареждане на хранилки...',
+  'Go to Post' => 'Иди на публикация',
+  'Today ' => 'Днес ',
+  'Announcement' => 'Обявление',
+  'Announcements' => 'Обявления',
+  'Show until' => 'Покажи докато',
+  'Title' => 'Заглавие',
+  'Manage announcements' => 'Управление на обявления',
+  'Manage webfeeds' => 'Управление на уеб хранилките',
+  'Type' => 'Вид',
+  'Summary' => 'Сбито',
+  'Rss Feeds' => 'Rss хранилки',
+  'No RSS feeds have been added.<br />Click the settings button in the top right corner of this window to add feeds.' => 'Не сте добавили никакви RSS хранилки.<br />Кликнете на бутона Настройки в десния горен ъгъл на този прозорец, за да добавите хранилки.',
+  'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml' => 'http://www.swe-flex.com/?feed=rss2',
+  'name' => 'Начална страница',
+  'description' => 'Показва общ преглед на актуалните събития',
+  'Start page' => 'Начална страница',
+);

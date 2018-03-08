@@ -13,7 +13,7 @@ class CategoryController extends \GO\Base\Controller\AbstractModelController{
 		$sort = 0;
 		foreach ($fields as $field) {
 			$model = \GO\Customfields\Model\Category::model()->findByPk($field['id']);
-			$model->sort_index=$sort;
+			$model->sortOrder=$sort;
 			$model->save();
 			$sort++;
 		}		
@@ -24,10 +24,12 @@ class CategoryController extends \GO\Base\Controller\AbstractModelController{
 	protected function getStoreParams($params) {
 		
 		$findParams = \GO\Base\Db\FindParams::newInstance()
-				->order('sort_index')
+				->order('sortOrder')
 				->limit(0);
 		
-		$findParams->getCriteria()->addCondition('extends_model', $params['extends_model']);						
+		$entityId = $params['extendsModel']::getType()->getId();;
+		
+		$findParams->getCriteria()->addCondition('entityId', $entityId);						
 		
 		return $findParams;
 
@@ -42,9 +44,11 @@ class CategoryController extends \GO\Base\Controller\AbstractModelController{
 		$response['enabled_customfield_categories']=$disableCategories!=false;
 		
 		$findParams = \GO\Base\Db\FindParams::newInstance()
-						->order('sort_index');
+						->order('sortOrder');
 		
-		$findParams->getCriteria()->addCondition('extends_model', $params['model_name']);						
+		$entityId = $params['model_name']::getType()->getId();;
+		
+		$findParams->getCriteria()->addCondition('entityId', $entityId);						
 		
 		$stmt = \GO\Customfields\Model\Category::model()->find($findParams);
 		

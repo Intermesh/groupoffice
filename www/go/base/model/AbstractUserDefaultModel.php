@@ -48,7 +48,7 @@ abstract class AbstractUserDefaultModel extends \GO\Base\Db\ActiveRecord {
 			while ($module=array_shift($modules)) {
 			  $permissionLevel=$user_id ? Acl::getUserPermissionLevel($module->acl_id, $user_id) : 1;
 				if($permissionLevel){
-				  if($module->moduleManager){
+				  if($module->moduleManager instanceof \GO\Base\Module ){
 					  $classes = $module->moduleManager->findClasses('model');
 					  foreach($classes as $class){
 						  if($class->isSubclassOf('GO\Base\Model\AbstractUserDefaultModel')){
@@ -167,7 +167,7 @@ abstract class AbstractUserDefaultModel extends \GO\Base\Db\ActiveRecord {
 			$user=$this->user;
 		
 		if(!$user)
-			throw new \Exception(" - ".\GO::t(get_class($this),'settings')." '".$this->name."' ".\GO::t('notRenamedNoUser','settings').".<br />");
+			throw new \Exception(" - ".\GO::t(get_class($this),'settings')." '".$this->name."' ".\GO::t("could not be renamed, because it has no owner to name after", "settings").".<br />");
 	
 		$template = self::getNameTemplate($this->className());
 

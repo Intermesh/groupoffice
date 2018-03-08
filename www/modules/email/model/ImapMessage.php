@@ -600,7 +600,7 @@ class ImapMessage extends ComposerMessage {
 					} elseif ($part['type'] == 'message') {
 						$a->name = isset($part['description']) ? \GO\Base\Fs\File::stripInvalidChars($part['description']) . '.eml' : 'message.eml';
 					} elseif ($part['subtype'] == 'calendar') {
-						$a->name = \GO::t('event','email') . '.ics';
+						$a->name = \GO::t("Appointment", "email") . '.ics';
 					} else {
 						if ($part['type'] == 'text') {
 							$a->name = $part['subtype'] . '.txt';
@@ -619,7 +619,7 @@ class ImapMessage extends ComposerMessage {
 				
 				$i=1;
 				
-				$a->name = !empty($a->name) ? $a->name : \GO::t('noname','email');
+				$a->name = !empty($a->name) ? $a->name : \GO::t("no name", "email");
 				
 				$file = new \GO\Base\Fs\File($a->name);
 				while(in_array($a->name, $uniqueNames)){

@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: ContentNode.js 16600 2014-01-10 13:48:07Z wsmits $
+ * @version $Id: ContentNode.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
@@ -23,7 +23,7 @@ GO.site.treeNodes.ContentNode = Ext.extend(GO.site.treeNodes.AbstractNode , {
 					items : [
 						new Ext.menu.Item({
 							iconCls: 'btn-add',
-							text: GO.site.lang.addContent,
+							text: t("Add content", "site"),
 							cls: 'x-btn-text-icon',
 							handler:function(){
 								// Create, only send the siteId because it need to be created in the root
@@ -44,7 +44,7 @@ GO.site.treeNodes.ContentNode = Ext.extend(GO.site.treeNodes.AbstractNode , {
 					items : [
 						new Ext.menu.Item({
 							iconCls: 'btn-settings',
-							text: GO.site.lang.advanced,
+							text: t("Advanced options", "site"),
 							cls: 'x-btn-text-icon',
 							scope:this,
 							handler: function()
@@ -54,7 +54,7 @@ GO.site.treeNodes.ContentNode = Ext.extend(GO.site.treeNodes.AbstractNode , {
 						}),
 						new Ext.menu.Item({
 							iconCls: 'btn-view',
-							text: GO.lang.strView,
+							text: t("View"),
 							cls: 'x-btn-text-icon',
 							handler:function(){
 								this.viewExample();
@@ -63,7 +63,7 @@ GO.site.treeNodes.ContentNode = Ext.extend(GO.site.treeNodes.AbstractNode , {
 						}),
 						new Ext.menu.Item({
 							iconCls: 'btn-add',
-							text: GO.site.lang.addContent,
+							text: t("Add content", "site"),
 							cls: 'x-btn-text-icon',
 							handler:function(){
 								// Load an empty contentPanel and set the parent id
@@ -73,7 +73,7 @@ GO.site.treeNodes.ContentNode = Ext.extend(GO.site.treeNodes.AbstractNode , {
 						}),
 						new Ext.menu.Item({
 							iconCls: 'btn-delete',
-							text: GO.site.lang.deleteContent,
+							text: t("Delete content", "site"),
 							cls: 'x-btn-text-icon',
 							scope:this,
 							handler: function()
@@ -106,11 +106,11 @@ GO.site.treeNodes.ContentNode = Ext.extend(GO.site.treeNodes.AbstractNode , {
 			if(!this.errorDialog){
 				this.errorDialog = new GO.ErrorDialog();
 			}
-			this.errorDialog.show(GO.site.lang.deleteContentHasChildren, GO.site.lang.deleteContent);
+			this.errorDialog.show(t("You cannot delete this item because it has subitems. Please delete the subitems first.", "site"), t("Delete content", "site"));
 		} else {
 			var contentId = this.extractedNode.modelId;
 
-			Ext.MessageBox.confirm(GO.site.lang.deleteContent, GO.site.lang.deleteContentConfirm, function(btn){
+			Ext.MessageBox.confirm(t("Delete content", "site"), t("Are you sure that you want to delete this content item", "site"), function(btn){
 				if(btn == 'yes'){
 					GO.request({
 						url: 'site/content/delete',
@@ -152,7 +152,7 @@ GO.site.treeNodes.ContentNode = Ext.extend(GO.site.treeNodes.AbstractNode , {
 			// Object {siteId: "1", type: "menuitem", type_up: "Menuitem", modelId: "30"}
 			
 			//Confirm tonen met daarin de vraag of je het content item zeker toe wilt voegen. 
-			Ext.MessageBox.confirm(GO.site.lang.sureCreateContentMenuItemTitle, GO.site.lang.sureCreateContentMenuItem, function(btn){
+			Ext.MessageBox.confirm(t("Create menu item from content", "site"), t("Are you sure that you want to create a menu item from this content item?", "site"), function(btn){
 				if(btn == 'yes'){
 					
 					GO.request({

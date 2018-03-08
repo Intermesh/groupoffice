@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: MenuitemDialog.js 17133 2014-03-20 08:25:24Z mschering $
+ * @version $Id: MenuitemDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
@@ -19,7 +19,7 @@ GO.site.MenuitemDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		
 		Ext.apply(this, {
 			goDialogId:'site_menuitem',
-			title:GO.site.lang.menuItem,
+			title:t("Menu item", "site"),
 			formControllerUrl: 'site/menuItem',
 			updateAction : 'update',
 			createAction	: 'create',
@@ -37,7 +37,7 @@ GO.site.MenuitemDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			anchor: '100%',
 			maxLength: 255,
 			allowBlank:false,
-			fieldLabel: GO.site.lang.menuitemLabel
+			fieldLabel: t("Label", "site")
 		});
 		
 		this.urlField = new Ext.form.TextField({
@@ -45,11 +45,11 @@ GO.site.MenuitemDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			anchor: '100%',
 			maxLength: 255,
 			allowBlank:false,
-			fieldLabel: GO.site.lang.menuitemUrl
+			fieldLabel: t("Url", "site")
 		});
 		
 		this.parentSelect = new GO.form.ComboBox({
-			fieldLabel: GO.site.lang.menuitemParent_id,
+			fieldLabel: t("Parent", "site"),
 			hiddenName:'parent_id',
 			anchor:'100%',
 			store: GO.site.availableMenuParentsStore,
@@ -61,7 +61,7 @@ GO.site.MenuitemDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		});
 		
 		this.contentSelect = new GO.form.ComboBox({
-			fieldLabel: GO.site.lang.menuitemContent_id,
+			fieldLabel: t("Content", "site"),
 			hiddenName:'content_id',
 			anchor:'100%',
 			store: GO.site.availableMenuContentsStore,
@@ -73,7 +73,7 @@ GO.site.MenuitemDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		});
 		
 		this.targetSelect = new GO.form.ComboBoxReset({
-			fieldLabel: GO.site.lang.menuitemTarget,
+			fieldLabel: t("Target", "site"),
 			hiddenName:'target',
 			anchor:'100%',
 			store: GO.site.linkTargetStore,
@@ -86,13 +86,13 @@ GO.site.MenuitemDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		
 		this.displayChildrenCbx = new Ext.ux.form.XCheckbox({
 			hideLabel: false,
-			boxLabel: GO.site.lang.menuitemDisplay_children,
+			boxLabel: t("Display children", "site"),
 			name: 'display_children',
 			value: false
 		});
 		
 		this.propertiesPanel = new Ext.Panel({
-			title:GO.site.lang.meta,		
+			title:t("Meta", "site"),		
 			cls:'go-form-panel',
 			layout:'form',
 			items:[

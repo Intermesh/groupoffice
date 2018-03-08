@@ -20,9 +20,9 @@
  * 
  * @property int $id
  * @property String $name
- * @property int $user_id
- * @property int $acl_id
- * @property bool $admin_only Obsolete!
+ * @property int $createdBy
+ * @property int $aclId
+ * @property int $isUserGroupFor
  * 
  * @method User users
  *
@@ -56,15 +56,15 @@ class Group extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	protected function getLocalizedName() {
-		return \GO::t('userGroup');
+		return \GO::t("User group");
 	}
 	
   public function aclField(){
-		return 'acl_id';	
+		return 'aclId';	
 	}
   
 	public function tableName() {
-		return 'go_groups';
+		return 'core_group';
 	}
 	
 	/**
@@ -78,10 +78,10 @@ class Group extends \GO\Base\Db\ActiveRecord {
 	
 	protected function beforeDelete() {
 		if($this->id==\GO::config()->group_root){
-			throw new \Exception(\GO::t('noDeleteAdmins','groups'));
+			throw new \Exception(\GO::t("You can't delete the group Admins", "groups"));
 		}	
 		if($this->id==\GO::config()->group_everyone){
-			throw new \Exception(\GO::t('noDeleteEveryone','groups'));
+			throw new \Exception(\GO::t("You can't delete the group Everyone", "groups"));
 		}
 		return parent::beforeDelete();
 	}
@@ -105,20 +105,19 @@ class Group extends \GO\Base\Db\ActiveRecord {
   public function relations() {
     
     return array(
-				'users' => array('type'=>self::MANY_MANY, 'model'=>'GO\Base\Model\User', 'field'=>'group_id', 'linkModel' => 'GO\Base\Model\UserGroup'),
-				'user_group' => array('type'=>self::HAS_MANY, 'model'=>'GO\Base\Model\UserGroup', 'field'=>'group_id', 'delete' => self::DELETE_CASCADE),
+				'users' => array('type'=>self::MANY_MANY, 'model'=>'GO\Base\Model\User', 'field'=>'groupId', 'linkModel' => 'GO\Base\Model\UserGroup'),
+				'user_group' => array('type'=>self::HAS_MANY, 'model'=>'GO\Base\Model\UserGroup', 'field'=>'groupId'),
 				'aclGroups' => array('type'=>self::HAS_MANY, 
 						'model'=>'GO\Base\Model\AclUsersGroups', 
-						'field'=>'group_id', 
-						'delete'=>self::DELETE_CASCADE)
+						'field'=>'groupId')
 			);
   }
   
   public function addUser($user_id){
 		if(!$this->hasUser($user_id)){
 			$userGroup = new UserGroup();
-			$userGroup->group_id = $this->id;
-			$userGroup->user_id = $user_id;
+			$userGroup->groupId = $this->id;
+			$userGroup->userId = $user_id;
 			return $userGroup->save();
 		}else
 		{
@@ -127,7 +126,7 @@ class Group extends \GO\Base\Db\ActiveRecord {
   }
 	
 	public function removeUser($user_id){
-		$model = UserGroup::model()->findByPk(array('user_id'=>$user_id, 'group_id'=>$this->pk));
+		$model = UserGroup::model()->findByPk(array('userId'=>$user_id, 'groupId'=>$this->pk));
 		if($model)
 			return $model->delete();
 		else
@@ -141,7 +140,7 @@ class Group extends \GO\Base\Db\ActiveRecord {
    * @return UserGroup or false 
    */
   public function hasUser($user_id){
-    return UserGroup::model()->findByPk(array('user_id'=>$user_id, 'group_id'=>$this->pk));
+    return UserGroup::model()->findByPk(array('userId'=>$user_id, 'groupId'=>$this->pk));
   }
 	
 	public function checkDatabase() {

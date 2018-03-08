@@ -21,7 +21,7 @@ class FieldTreeSelectOptionController extends \GO\Base\Controller\AbstractModelC
 		else
 			$parent_id=$params['parent_id'];
 		
-		$field_id = str_replace('col_','',$params['field_id']);
+		$field_id = $params['field_id'];
 		
 		$fieldModel = \GO\Customfields\Model\Field::model()->findByPk($field_id, false, true);
 		

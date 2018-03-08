@@ -101,7 +101,7 @@ class Task extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	protected function getLocalizedName() {
-		return \GO::t('task', 'tasks');
+		return \GO::t("Task", "tasks");
 	}
 
 	public function tableName() {

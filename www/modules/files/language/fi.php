@@ -1,44 +1,48 @@
 <?php
-
-
-$l["files"]='Tiedostot';
-$l["template"]= 'Mallipohjat';
-$l["manageTemplates"]= 'Hallinnoi mallipohjia';
-$l["downloadTemplate"]= 'Lataa mallipohja';
-$l["enterName"]= 'Syötä nimi';
-$l["pleaseEnterName"]= 'Ole hyvä ja anna nimi';
-$l["pleaseEnterNameArchive"]= 'Anna nimi arkistolle';
-$l["startTransfer"]= 'Aloita siirto';
-$l["addFolder"]= 'Lisää kansio';
-$l["errorOneItem"]= 'Valitse vain yksi asia';
-$l["activateSharing"]= 'Aktivoi jakaminen';
-$l["notifyChanges"]= 'Ilmoita muutoksista tässä kansiossa';
-$l["comments"]= 'Kommentit';
-$l["downloadGOTA"]= 'Lataa GOTAlla';
-$l["fileBrowser"]= 'Tiedostoselain';
-$l["thumbnails"]= 'Pikkukuvat';
-$l["saveFile"]='Talleta tiedosto';
-$l["confirmOverwrite"]='tiedosto {filename} on jo olemassa, haluatko ylikirjoittaa?';
-$l['name'] = 'Tiedostot';
-$l['description'] = 'Tiedostot moduuli; tiedostojen jakoon tarkoitettu moduuli.';
-$lang['link_type'][6]='Tiedosto';
-$l['fileNotFound'] = 'Tiedostoa ei löydy';
-$l['folderExists'] = 'Kansio on jo olemassa';
-$l['filenameExists'] = 'Tiedostonimi on jo käytössä';
-$l['uploadedSucces'] = 'Tiedosto lähetetty onnistuneesti';
-$l['ootextdoc']='Open-Office Teksti-tiedosto';
-$l['wordtextdoc']='Microsoft Word-tiedosto';
-$l['personal']='Henkilökohtainen';
-$l['shared']='Jaettu';
-$l['general']='Yleinen';
-$l['folder_modified_subject']='Muutokset {product_name}-hakemistoon';
-$l['folder_modified_body']='Pyysitte saada tiedoksi tehdyt muutokset:
+return array (
+  'Template' => 'Mallipohjat',
+  'Manage templates' => 'Hallinnoi mallipohjia',
+  'Download template' => 'Lataa mallipohja',
+  'Enter a name' => 'Syötä nimi',
+  'Please enter a name' => 'Ole hyvä ja anna nimi',
+  'Please enter a name for the archive' => 'Anna nimi arkistolle',
+  'Start transfer' => 'Aloita siirto',
+  'Add folder' => 'Lisää kansio',
+  'Please select only one item' => 'Valitse vain yksi asia',
+  'Activate sharing' => 'Aktivoi jakaminen',
+  'Notify me about changes in this folder' => 'Ilmoita muutoksista tässä kansiossa',
+  'Comments' => 'Kommentit',
+  'Download with GOTA' => 'Lataa GOTAlla',
+  'File browser' => 'Tiedostoselain',
+  'Thumbnails' => 'Pikkukuvat',
+  'Save file' => 'Talleta tiedosto',
+  '{filename} already exists, do you want to overwrite the file?' => 'tiedosto {filename} on jo olemassa, haluatko ylikirjoittaa?',
+  'Sorry, the file you tried to download is not found.' => 'Tiedostoa ei löydy',
+  'The folder already exists' => 'Kansio on jo olemassa',
+  'Filename %s already exists' => 'Tiedostonimi on jo käytössä',
+  'File uploaded successfully' => 'Tiedosto lähetetty onnistuneesti',
+  'Open-Office Text document' => 'Open-Office Teksti-tiedosto',
+  'Microsoft Word document' => 'Microsoft Word-tiedosto',
+  'Personal' => 'Henkilökohtainen',
+  'Shared' => 'Jaettu',
+  'General' => 'Yleinen',
+  'Changes to {product_name} folder' => 'Muutokset {product_name}-hakemistoon',
+  'You requested to be notified when changes are made to:
+%s
+The following changes were made by %s:
+%s;
+' => 'Pyysitte saada tiedoksi tehdyt muutokset:
 %s
 Seuraavat muutokset tehtiin käyttäjän %s toimesta:
 %s;
-';
-$l['modified']='Muokattu';
-$l['new']='Uusi';
-$l['deleted']='Poistettu';
-$l['file']='Tiedosto';
-$l['folder']='Kansio';
+',
+  'Modified' => 'Muokattu',
+  'New' => 'Uusi',
+  'Deleted' => 'Poistettu',
+  'File' => 'Tiedosto',
+  'Folder' => 'Kansio',
+  'name' => 'Tiedostot',
+  'description' => 'Tiedostot moduuli; tiedostojen jakoon tarkoitettu moduuli.',
+  'Files' => 'Tiedostot',
+  'Changes to Group-Office folder' => 'Muutokset {product_name}-hakemistoon',
+);

@@ -28,7 +28,7 @@ class CliOnly extends \Exception
 
 	public function __construct($message='') {
 		
-		$message = empty($message) ? \GO::t('cliOnly') : \GO::t('cliOnly')."\n\n".$message;
+		$message = empty($message) ? \GO::t("This script can only run through the Group-Office Command Line Interface (CLI).") : \GO::t("This script can only run through the Group-Office Command Line Interface (CLI).")."\n\n".$message;
 		
 		parent::__construct($message);
 	}

@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: RegisterEmailPanel.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: RegisterEmailPanel.js 22445 2018-03-06 08:36:59Z michaelhart86 $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
@@ -18,22 +18,22 @@ GO.users.RegisterEmailPanel = Ext.extend(Ext.Panel,{
 		this.autoScroll=true;
 		this.border=false;
 		this.hideLabel=true;
-		this.title = GO.users.lang.registrationEmail;
+		this.title = t("Registration Email", "users");
 		this.layout='form';
 		this.cls='go-form-panel';
-		this.labelWidth=50;
+		this.labelWidth=60;
 		
 		this.emailSubjectField = new Ext.form.TextField({
 			name: 'register_email_subject',
 			anchor: '100%',
-			fieldLabel:GO.lang.strSubject
+			fieldLabel:t("Subject")
 		});
 		
 		this.emailBodyField = new Ext.form.TextArea({
 			hideLabel:true,
 			name: 'register_email_body',
-			anchor:'100% -30',
-			fieldLabel:GO.lang.strSubject,
+			anchor:'100% '+dp(-40),
+			fieldLabel:t("Subject"),
 			height:250
 		});
 		

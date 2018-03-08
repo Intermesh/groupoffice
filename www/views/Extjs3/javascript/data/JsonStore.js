@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: JsonStore.js 21597 2017-10-30 08:23:46Z mschering $
+ * @version $Id: JsonStore.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -93,11 +93,11 @@ GO.data.JsonStore = function(config) {
 		function( store, type, action, options, response, arg){
 
 			if(response.isTimeout){
-				GO.errorDialog.show(GO.lang.errorTimeout);
+				GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
 			}else	if(response.status==0)
 			{
 				//silently ignore because auto refreshing jobs often get here somehow??
-				//GO.errorDialog.show(GO.lang.strRequestError, "");
+				//GO.errorDialog.show(t("Could not connect to the server. Please check your internet connection."), "");
 			}else if(!this.reader.jsonData || GO.jsonAuthHandler(this.reader.jsonData, this.load, this))
 			{
 				var msg;
@@ -109,7 +109,7 @@ GO.data.JsonStore = function(config) {
 						GO.errorDialog.show(msg);
 					}else
 					{
-						msg = GO.lang.serverError;
+						msg = t("An error occurred on the webserver. Contact your system administrator and supply the detailed error.");
 						msg += '<br /><br />JsonStore load exception occurred';
 						GO.errorDialog.show(msg);
 					}

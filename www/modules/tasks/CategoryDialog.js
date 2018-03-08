@@ -12,7 +12,7 @@ GO.tasks.CategoryDialog = function(config){
 	};
     
 	config.layout='fit';
-	config.title=GO.tasks.lang.category;
+	config.title=t("Category", "tasks");
 	config.modal=false;
 	config.border=false;
 	config.width=400;
@@ -24,21 +24,21 @@ GO.tasks.CategoryDialog = function(config){
 	config.items=this.formPanel;
 	config.focus=focusFirstField.createDelegate(this);
 	config.buttons=[{
-		text:GO.lang['cmdOk'],
+		text:t("Ok"),
 		handler: function()
 		{
 			this.submitForm(true)
 		},
 		scope: this
 //	},{
-//		text:GO.lang['cmdApply'],
+//		text:t("Apply"),
 //		handler: function()
 //		{
 //			this.submitForm(false)
 //		},
 //		scope: this
 	},{
-		text:GO.lang['cmdClose'],
+		text:t("Close"),
 		handler: function()
 		{
 			this.hide()
@@ -93,7 +93,7 @@ Ext.extend(GO.tasks.CategoryDialog, Ext.Window, {
 //				task:'save_category',
 			//	id:this.category_id
 			},
-			waitMsg:GO.lang['waitMsgSave'],
+			waitMsg:t("Saving..."),
 			success:function(form, action)
 			{
 				if(action.result.id)
@@ -114,13 +114,13 @@ Ext.extend(GO.tasks.CategoryDialog, Ext.Window, {
 				var error = '';
 				if(action.failureType=='client')
 				{
-					error = GO.lang['strErrorsInForm'];
+					error = t("You have errors in your form. The invalid fields are marked.");
 				}
 				else
 				{
 					error = action.result.feedback;
 				}
-				Ext.MessageBox.alert(GO.lang['strError'], error);
+				Ext.MessageBox.alert(t("Error"), error);
 			},
 			scope:this
 		});		
@@ -129,7 +129,7 @@ Ext.extend(GO.tasks.CategoryDialog, Ext.Window, {
 	{
 		var items = [];
 		items.push({
-			fieldLabel: GO.lang['strName'],
+			fieldLabel: t("Name"),
 			name: 'name',
 			allowBlank:false
 		});
@@ -137,7 +137,7 @@ Ext.extend(GO.tasks.CategoryDialog, Ext.Window, {
 		{
 			items.push(this.globalCategory = new Ext.form.Checkbox({
 				name:'global',
-				boxLabel:GO.tasks.lang.globalCategory,
+				boxLabel:t("Global category", "tasks"),
 				hideLabel:true,
 				checked:false
 			}));

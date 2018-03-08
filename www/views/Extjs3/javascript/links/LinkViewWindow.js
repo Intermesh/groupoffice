@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: LinkViewWindow.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: LinkViewWindow.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -29,7 +29,7 @@ GO.LinkViewWindow = function(config){
 
 
 	/*config.buttons=[{
-			text: GO.lang['cmdClose'],
+			text: t("Close"),
 			handler: function(){
 				if(this.closeAction=='hide')
 					this.hide();

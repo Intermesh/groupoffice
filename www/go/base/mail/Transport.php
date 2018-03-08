@@ -25,7 +25,7 @@ namespace GO\Base\Mail;
 class Transport extends \Swift_SmtpTransport{
 	
 	public static function newGoInstance(){
-		$o = self::newInstance(\GO::config()->smtp_server, \GO::config()->smtp_port, strtolower(\GO::config()->smtp_encryption));
+		$o = new static (\GO::config()->smtp_server, \GO::config()->smtp_port, strtolower(\GO::config()->smtp_encryption));
 		
 		if(!empty(\GO::config()->smtp_username)){
 			$o->setUsername(\GO::config()->smtp_username)

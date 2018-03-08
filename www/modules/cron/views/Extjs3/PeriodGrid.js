@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: PeriodGrid.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: PeriodGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
@@ -23,7 +23,7 @@ GO.cron.PeriodGrid = Ext.extend(GO.grid.GridPanel,{
 			border: false,
 			tbar:[{
 					iconCls: 'btn-refresh',
-					text: GO.lang['cmdRefresh'],
+					text: t("Refresh"),
 					cls: 'x-btn-text-icon',
 					handler: function(){
 						this.store.load();
@@ -32,7 +32,7 @@ GO.cron.PeriodGrid = Ext.extend(GO.grid.GridPanel,{
 				}],
 			paging:true,
 			view:new Ext.grid.GridView({
-				emptyText: GO.lang['strNoItems']
+				emptyText: t("No items to display")
 			}),
 			cm:new Ext.grid.ColumnModel({
 				defaults:{
@@ -40,73 +40,73 @@ GO.cron.PeriodGrid = Ext.extend(GO.grid.GridPanel,{
 				},
 				columns:[
 				{
-					header: GO.cron.lang.name,
+					header: t("System task scheduler", "cron"),
 					dataIndex: 'name',
 					sortable: true,
 					width:100
 				},
 				{
-					header: GO.cron.lang.job,
+					header: t("Job", "cron"),
 					dataIndex: 'job',
 					sortable: true,
 					width:180
 				},
 				{
-					header: GO.cron.lang.nextrun,
+					header: t("Next run", "cron"),
 					dataIndex: 'nextrun',
 					sortable: true,
 					width:100
 				},
 				{
-					header: GO.cron.lang.lastrun,
+					header: t("Last run", "cron"),
 					dataIndex: 'lastrun',
 					sortable: true,
 					width:100
 				},
 				{
-					header: GO.cron.lang.minutes,
+					header: t("Minutes", "cron"),
 					dataIndex: 'minutes',
 					sortable: true,
 					width:100,
 					hidden:true
 				},
 				{
-					header: GO.cron.lang.hours,
+					header: t("Hours", "cron"),
 					dataIndex: 'hours',
 					sortable: true,
 					width:100,
 					hidden:true
 				},
 				{
-					header: GO.cron.lang.monthdays,
+					header: t("Month days", "cron"),
 					dataIndex: 'monthdays',
 					sortable: true,
 					width:100,
 					hidden:true
 				},
 				{
-					header: GO.cron.lang.months,
+					header: t("Months", "cron"),
 					dataIndex: 'months',
 					sortable: true,
 					width:100,
 					hidden:true
 				},
 				{
-					header: GO.cron.lang.weekdays,
+					header: t("Week days", "cron"),
 					dataIndex: 'weekdays',
 					sortable: true,
 					width:100,
 					hidden:true
 				},
 				{
-					header: GO.cron.lang.years,
+					header: t("Years", "cron"),
 					dataIndex: 'years',
 					sortable: true,
 					width:100,
 					hidden:true
 				},
 				{
-					header: GO.cron.lang.active,
+					header: t("Enabled", "cron"),
 					dataIndex: 'active',
 					sortable: true,
 					renderer: GO.grid.ColumnRenderers.coloredYesNo,

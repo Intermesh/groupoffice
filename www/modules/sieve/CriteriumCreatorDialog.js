@@ -37,7 +37,7 @@ GO.sieve.CriteriumCreatorDialog = function(config){
 
 	this._buildForm();
 
-	config.title=GO.sieve.lang.setFilter;
+	config.title=t("Set criterium", "sieve");
 	config.border=false;
 	config.layout= 'fit';
 	config.height=120;
@@ -52,7 +52,7 @@ GO.sieve.CriteriumCreatorDialog = function(config){
 	config.items=[this.formPanel];
 	
 	config.buttons = [{
-		text : GO.lang['cmdOk'],
+		text : t("Ok"),
 		handler : function() {
 			if (this.formPanel.getForm().isValid()) {
 				this.fireEvent('criteriumPrepared',this._prepareValuesForStorage());
@@ -62,7 +62,7 @@ GO.sieve.CriteriumCreatorDialog = function(config){
 		},
 		scope : this
 	}, {
-		text : GO.lang['cmdCancel'],
+		text : t("Cancel"),
 		handler : function() {
 			this.hide();
 			this._resetForm();
@@ -398,7 +398,7 @@ Ext.extend(GO.sieve.CriteriumCreatorDialog, GO.Window,{
 			forceSelection:true,
 			allowBlank:false,
 			width:200,
-			emptyText:GO.sieve.lang.pleaseSelectOne
+			emptyText:t("Please make a selection", "sieve")
 		});
 
 		this.cmbOperator = new GO.form.ComboBox({
@@ -413,8 +413,8 @@ Ext.extend(GO.sieve.CriteriumCreatorDialog, GO.Window,{
 			selectOnFocus:true,
 			forceSelection:true,
 			allowBlank:false,
-			width:110,
-			emptyText:GO.sieve.lang.operator,
+			width: dp(140),
+			emptyText:t("Operator", "sieve"),
 			disabled: true,
 			hidden: true
 		});
@@ -431,8 +431,8 @@ Ext.extend(GO.sieve.CriteriumCreatorDialog, GO.Window,{
 			selectOnFocus:true,
 			forceSelection:true,
 			allowBlank:false,
-			width:110,
-			emptyText:GO.sieve.lang.operator,
+			width: dp(140),
+			emptyText:t("Operator", "sieve"),
 			disabled: true,
 			hidden: true
 		});
@@ -450,8 +450,8 @@ Ext.extend(GO.sieve.CriteriumCreatorDialog, GO.Window,{
 			selectOnFocus:true,
 			forceSelection:true,
 			allowBlank:false,
-			width:110,
-			emptyText:GO.sieve.lang.operator,
+			width: dp(140),
+			emptyText:t("Operator", "sieve"),
 			disabled: true,
 			hidden: true
 		});
@@ -486,8 +486,8 @@ Ext.extend(GO.sieve.CriteriumCreatorDialog, GO.Window,{
 
 		this.txtCustom = new Ext.form.TextField({
 			name: 'custom' ,
-			emptyText: GO.sieve.lang.custom,
-			fieldLabel:GO.sieve.lang.custom,
+			emptyText: t("Custom", "sieve"),
+			fieldLabel:t("Custom", "sieve"),
 			allowBlank:false,
 			width:140,
 			disabled: true,

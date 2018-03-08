@@ -1,9 +1,9 @@
 <?php
-
-
-$l['name']='Comentari';
-$l['description']='Afegir comentaris a la funcionalitat d\'altres mòduls';
-$l["comment"]="Comentari";
-$l["comments"]="Comentaris";
-$l["browseComments"]= 'Persones comentaris';
-$l["recentComments"]='Comentaris recents';
+return array (
+  'Comment' => 'Comentari',
+  'Browse comments' => 'Persones comentaris',
+  'Recent comments' => 'Comentaris recents',
+  'name' => 'Comentaris',
+  'description' => 'Afegir comentaris a la funcionalitat d\'altres mòduls',
+  'Comments' => 'Comentaris',
+);

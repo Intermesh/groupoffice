@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: CommentsBrowser.js 18546 2014-12-04 10:22:30Z wsmits $
+ * @version $Id: CommentsBrowser.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -29,11 +29,11 @@ GO.comments.CommentsBrowser = function(config){
 		plain:true,
 		maximizable:true,
 		closeAction:'hide',
-		title:GO.comments.lang.browseComments,
+		title:t("Browse comments", "comments"),
 		items: this.commentsGrid,
 		buttons: [			
 			{				
-				text: GO.lang['cmdClose'],
+				text: t("Close"),
 				handler: function(){this.hide();},
 				scope: this
 			}

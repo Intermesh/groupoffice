@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: modules.js 18445 2014-11-11 09:58:34Z mschering $
+ * @version $Id: modules.js 22335 2018-02-06 16:25:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -20,8 +20,8 @@ GO.modules.MainPanel = function(config) {
 	var reader = new Ext.data.JsonReader({
 			root: 'results',
 			totalProperty: 'total',
-			fields: ['name', 'package', 'description', 'id', 'sort_order', 'admin_menu', 'acl_id', 'icon', 'enabled', 'warning', 'buyEnabled','not_installable'],
-			id: 'id'
+			fields: ['name', 'package', 'localizedName',  'description', 'id', 'sort_order', 'admin_menu', 'aclId', 'icon', 'enabled', 'warning', 'buyEnabled','not_installable', 'isRefactored'],
+			id: 'name'
 		});
 
 	this.store = new GO.data.GroupingStore({
@@ -45,16 +45,10 @@ GO.modules.MainPanel = function(config) {
 	}, this);
 
 	config.tbar = new Ext.Toolbar({
-		cls: 'go-head-tb',
 		items: [
 			{
-				xtype: 'htmlcomponent',
-				html: GO.modules.lang.name,
-				cls: 'go-module-title-tbar'
-			}, {
-				iconCls: 'btn-refresh',
-				text: GO.lang.cmdRefresh,
-				cls: 'x-btn-text-icon',
+				iconCls: 'ic-refresh',
+				tooltip: t("Refresh"),
 				handler: function() {
 					this.store.load();
 				},
@@ -77,7 +71,7 @@ GO.modules.MainPanel = function(config) {
 //			},
 			{
 				iconCls: 'btn-settings',
-				text: GO.modules.lang.buyLicenses,
+				text: t("Buy licenses", "modules"),
 				cls: 'x-btn-text-icon',
 				hidden: GO.settings.config.product_name != 'Group-Office',
 				handler: function() {				
@@ -89,13 +83,13 @@ GO.modules.MainPanel = function(config) {
 
 			this.trialButton = new Ext.Button({
 				iconCls: 'btn-settings',
-				text: GO.modules.lang.trialLicense,
+				text: t("30 day trial license", "modules"),
 				cls: 'x-btn-text-icon',
 				hidden:true,
 				handler: function() {
 					Ext.MessageBox.confirm(
-						GO.modules.lang.trialLicense,
-						GO.modules.lang.trialLicenseText,
+						t("30 day trial license", "modules"),
+						t("Get a free 30 day trial with unlimited users and all available modules. Click 'Yes' to continue to our shop and get your trial license. If you don't have a shop account you'll need to register.", "modules"),
 						function(btn){
 							if(btn==='yes'){
 								window.open('https://www.group-office.com/30-day-trial?hostname='+document.domain,'groupoffice-shop');
@@ -109,29 +103,36 @@ GO.modules.MainPanel = function(config) {
 	});
 	
 	var checkColumn = new GO.grid.CheckColumn({
-		header: GO.modules.lang.enabled,
+		header: t("Enabled", "modules"),
 		dataIndex: 'enabled',
 		width: 100,
 		disabled_field:'not_installable',
 		listeners: {
 			scope: this,
 			change: function(record, checked) {
+				
+				if(record.data.isRefactored) {
+					return this.submitJmap(record);
+				}
+				
 				GO.request({
 					maskEl:this.getEl(),
 					url: 'modules/module/update',
 					params: {
-						id: record.id,
+						id: record.data.name,
 						enabled: checked
 					},
 					scope: this,
 					success: function(response, options, result) {
 
-						if (result.acl_id) {
-							record.set('acl_id', result.acl_id);
+						if (result.aclId) {
+							record.set('aclId', result.aclId);
+							record.set('id', result.id);
+							record.set("enabled", true);
 
 							if (record.data.enabled) {
-								this.showPermissions(record.data.id, record.data.name, record.data.acl_id);
-								this.store.load();
+								this.showPermissions(record.data.name, t(record.data.name, record.data.name), record.data.aclId);
+								//this.store.load();
 							}
 						}
 						record.commit();
@@ -140,17 +141,20 @@ GO.modules.MainPanel = function(config) {
 			}
 		}
 	});
+	
+	
+	var actions = this.initRowActions();
 
 	config.cm = new Ext.grid.ColumnModel([
 		{
-			header: GO.lang['strName'],
+			header: t("Name"),
 			dataIndex: 'name',
 			id: 'name',
 			renderer: this.iconRenderer
 		}, 
 		checkColumn,
 		{
-			header: GO.modules.lang.sort_order,
+			header: t("Sort order", "modules"),
 			dataIndex: 'sort_order',
 			sortable:true,
 			id: 'sort_order',
@@ -162,10 +166,15 @@ GO.modules.MainPanel = function(config) {
 		{
 			header: "Package",
 			dataIndex: 'package',
-			id: 'package'
-			
-		}
+			id: 'package',
+			renderer: function(v) {
+				return v.ucFirst();
+			}
+		},
+		actions
 	]);
+	
+	config.plugins = [actions];
 	config.clicksToEdit = 1;
 	config.loadMask=true;
 	
@@ -178,7 +187,7 @@ GO.modules.MainPanel = function(config) {
 		showGroupName: false,
 //		autoFill: true,
 		startCollapsed:true,
-		emptyText: GO.lang.strNoItems,
+		emptyText: t("No items to display"),
 //		groupTextTpl: '{text}<tpl if="values.rs[0].data.buyEnabled"><div class="mo-buy">Buy licenses</div></tpl>',
 //		processEvent: function(name, e){
 //			
@@ -223,7 +232,7 @@ GO.modules.MainPanel = function(config) {
 //    },
 		getRowClass: function(record, rowIndex, p, store) {
 			if (this.showPreview && record.data.description.length) {
-				p.body = '<div class="mo-description">' + record.data.description + '</div>';
+				p.body = record.data.description;
 				return 'x-grid3-row-expanded';
 			}
 			return 'x-grid3-row-collapsed';
@@ -256,14 +265,86 @@ GO.modules.MainPanel = function(config) {
 	this.on("rowdblclick", function(grid, rowIndex, event) {
 		var moduleRecord = grid.store.getAt(rowIndex);
 
-		if (moduleRecord.data.acl_id) {
-			this.showPermissions(moduleRecord.data.id, moduleRecord.data.name, moduleRecord.data.acl_id);
+		if (moduleRecord.data.aclId) {
+			this.showPermissions(moduleRecord.data.name, t(moduleRecord.data.name, moduleRecord.data.name), moduleRecord.data.aclId);
 		}
 	}, this);
+	
+	
 
 };
 
 Ext.extend(GO.modules.MainPanel,Ext.grid.EditorGridPanel, {
+	
+	initRowActions: function () {
+
+		var actions = new Ext.ux.grid.RowActions({
+			menuDisabled: true,
+			hideable: false,
+			draggable: false,
+			fixed: true,
+			header: '',
+			hideMode: 'display',
+			keepSelection: true,
+
+			actions: [{
+					iconCls: 'ic-delete',
+					qtip: t("Delete")
+				}]
+		});
+
+		actions.on({
+			scope: this,
+			action: function (grid, record, action, row, col, e, target) {
+				
+				if(!record.data.id) {
+					return;
+				}
+				
+				Ext.MessageBox.confirm(t("Delete"), t("Are you sure you want to delete {item}?", null, {item: record.data.name}), function(cmd) {
+					console.log(cmd);
+					if(cmd != 'yes') {
+						return;
+					}
+					
+					if(record.data.isRefactored) {
+						
+						go.Jmap.request({
+							method: "Module/uninstall",
+							params: {
+								name: record.data.name,
+								package: record.data.package
+							},
+							callback: function() {
+								record.set('enabled', false);
+								record.set('id', null);
+								record.commit();
+							},
+							scope: this
+						});
+					}else
+					{
+						GO.request({
+							url: "modules/module/delete",
+							params: {
+								id: record.data.id
+							},
+							callback: function(){
+								record.set('enabled', false);
+								record.set('id', null);
+								record.commit();
+							},
+							scope: this
+						});
+					}
+					
+				}, this);
+			}
+		});
+
+		return actions;
+
+	},
 	
 
 	afterRender: function() {
@@ -329,24 +410,24 @@ Ext.extend(GO.modules.MainPanel,Ext.grid.EditorGridPanel, {
 //
 //		switch (this.selModel.selections.keys.length) {
 //			case 0 :
-//				Ext.MessageBox.alert(GO.lang['strError'],
-//					GO.lang['noItemSelected']);
+//				Ext.MessageBox.alert(t("Error"),
+//					t("You didn't select an item."));
 //				return false;
 //				break;
 //
 //			case 1 :
-//				var strConfirm = GO.lang['strDeleteSelectedItem'];
+//				var strConfirm = t("Are you sure you want to delete the selected item?");
 //				break;
 //
 //			default :
-//				var t = new Ext.Template(GO.lang['strDeleteSelectedItems']);
+//				var t = new Ext.Template(t("Are you sure you want to delete the {count} items?"));
 //				var strConfirm = t.applyTemplate({
 //					'count' : this.selModel.selections.keys.length
 //				});
 //				break;
 //		}
 //
-//		Ext.MessageBox.confirm(GO.lang['strConfirm'], strConfirm,
+//		Ext.MessageBox.confirm(t("Confirm"), strConfirm,
 //			function(btn) {
 //				if (btn == 'yes') {
 //					this.store.baseParams.uninstall_modules = uninstallModules;
@@ -356,7 +437,7 @@ Ext.extend(GO.modules.MainPanel,Ext.grid.EditorGridPanel, {
 //							if (!this.store.reader.jsonData.uninstallSuccess) {
 //								Ext.MessageBox
 //								.alert(
-//									GO.lang['strError'],
+//									t("Error"),
 //									this.store.reader.jsonData.uninstallFeedback);
 //							}
 //
@@ -387,14 +468,14 @@ Ext.extend(GO.modules.MainPanel,Ext.grid.EditorGridPanel, {
 	},
 	iconRenderer: function(name, cell, record) {
 		return '<div class="mo-title" style="background-image:url(' + record.data["icon"] + ')">'
-						+ name + '</div>';
+						+ record.data.localizedName +'</div>';
 	},
 	warningRenderer: function(name, cell, record) {
 		return record.data.warning != '' ?
 						'<div class="go-icon go-warning-msg" ext:qtip="' + Ext.util.Format.htmlEncode(record.data.warning) + '"></div>' : '';
 	},
 	buyRenderer: function(name, cell, record) {
-		return record.data.buyEnabled ? '<a href="#" class="normal-link" onclick="GO.modules.showBuyDialog(\'' + record.data.id + '\');">'+GO.modules.lang.buyLicenses+'</a>' : '';
+		return record.data.buyEnabled ? '<a  class="normal-link" onclick="GO.modules.showBuyDialog(\'' + record.data.id + '\');">'+t("Buy licenses", "modules")+'</a>' : '';
 	},
 
 	/**
@@ -404,13 +485,18 @@ Ext.extend(GO.modules.MainPanel,Ext.grid.EditorGridPanel, {
 	 * @returns {undefined}
 	 */
 	submitRecord : function(record){
+		
+		if(record.data.isRefactored) {
+			return this.submitJmap(record);
+		}
+		
 		var url = GO.url('modules/module/updateModuleModel');
 
 		Ext.Ajax.request({
 			method:'POST',
 			url: url,
 			params : {
-				id:record.data.id
+				id:record.data.name
 			},
 			jsonData: {module:this.createJSON(record.data)},
 			scope : this,
@@ -427,6 +513,52 @@ Ext.extend(GO.modules.MainPanel,Ext.grid.EditorGridPanel, {
 				}
 			}
 		});
+	},
+	
+	
+	submitJmap : function(record) {
+		
+		var params = {};
+		
+		if(record.data.id) {
+			params['update'] = [{
+				id: record.data.id,
+				enabled: record.data.enabled
+			}];
+			go.stores.Module.set(params, function(options, success, response) {
+
+				if(record.data.enabled && record.isModified("enabled")) {
+					record.set('aclId', response['created'][0].aclId);
+					record.set('id', response['created'][0].id);
+					this.showPermissions(record.data.name, t(record.data.name, record.data.name), record.data.aclId);
+					this.store.load();				
+				}
+
+				record.commit();
+
+			}, this);
+		} else
+		{
+		
+			go.Jmap.request({
+				method: "Module/install",
+				params: {
+					name: record.data.name,
+					package: record.data.package
+				},
+				callback: function(options, success, response) {
+					record.set('enabled', true);										
+					record.set('id', response['list'][0].id);
+					record.set('aclId', response['list'][0].aclId);
+					this.showPermissions(record.data.name, t(record.data.name, record.data.name), record.data.aclId);					
+					record.commit();
+				},
+				scope: this
+			});
+			
+		}		
+		
+		
 	},
 /**
  * Create Json string for posting to the controller
@@ -471,7 +603,7 @@ Ext.extend(GO.modules.MainPanel,Ext.grid.EditorGridPanel, {
 
 
 GO.moduleManager.addModule('modules', GO.modules.MainPanel, {
-	title: GO.modules.lang.modules,
+	title: t("Modules", "modules"),
 	iconCls: 'go-tab-icon-modules',
 	admin: true
 });

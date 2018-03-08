@@ -81,7 +81,7 @@ namespace GO\Addressbook\Model;
 	protected function beforeSave() {
 		
 		if(!isset($this->default_salutation))
-			$this->default_salutation=\GO::t("defaultSalutationTpl","addressbook");
+			$this->default_salutation=\GO::t("Dear {first_name}", "addressbook");
 			
 		return parent::beforeSave();
 	}
@@ -101,10 +101,10 @@ namespace GO\Addressbook\Model;
 	 * @return Addressbook 
 	 */
 	public function getUsersAddressbook(){
-		$ab = Addressbook::model()->findSingleByAttribute('users', '1'); //\GO::t('users','base'));
+		$ab = Addressbook::model()->findSingleByAttribute('users', '1'); //\GO::t("Users"));
 		if (!$ab) {
 			$ab = new Addressbook();
-			$ab->name = \GO::t('users');
+			$ab->name = \GO::t("Users");
 			$ab->users = true;
 			$ab->save();
 			
@@ -115,7 +115,7 @@ namespace GO\Addressbook\Model;
 	
 	public function defaultAttributes() {
 		$attr = parent::defaultAttributes();
-		$attr['default_salutation']=\GO::t('defaultSalutationTpl','addressbook');
+		$attr['default_salutation']=\GO::t("Dear {first_name}", "addressbook");
 		return $attr;
 	}
 

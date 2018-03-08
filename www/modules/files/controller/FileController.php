@@ -175,7 +175,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 					}
 				}else
 				{
-					$response['data']['text'] = \GO::t('notIndexedYet','filesearch');
+					$response['data']['text'] = \GO::t("This file has not been indexed yet", "filesearch");
 				}
 			}
 		}
@@ -331,7 +331,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 				throw new \GO\Base\Exception\NotFound();
 			
 			if(time()>$file->expire_time)
-				throw new \Exception(\GO::t('downloadLinkExpired', 'files'));				
+				throw new \Exception(\GO::t("Sorry, the download link for this file has expired", "files"));				
 		}else
 		{
 			
@@ -403,7 +403,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		$html=$params['content_type']=='html';
 		$bodyindex = $html ? 'htmlbody' : 'plainbody';
 		$lb = $html ? '<br />' : "\n";
-		$text = $html ? \GO::t('clickHereToDownload', "files") : \GO::t('copyPasteToDownload', "files");
+		$text = $html ? \GO::t("Click on the link to download the file", "files") : \GO::t("Click the secured link below or copy it to your browser's address bar to download the file.", "files");
 
 		$linktext = $html ? "<ul>" : $lb;
 		
@@ -412,7 +412,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 			$linktext .= $html ?  '<li><a href="'.$url.'">'.$file->name.'</a></li>'.$lb : $url.$lb;
 		}
 		$linktext .= $html ? "</ul>" : "\n";
-		$text .= ' ('.\GO::t('possibleUntil','files').' '.\GO\Base\Util\Date::get_timestamp(\GO\Base\Util\Date::date_add($file->expire_time,-1), false).')'.$lb;
+		$text .= ' ('.\GO::t("possible until", "files").' '.\GO\Base\Util\Date::get_timestamp(\GO\Base\Util\Date::date_add($file->expire_time,-1), false).')'.$lb;
 		$text .= $linktext;
 		
 		if($params['template_id'] && ($template = \GO\Addressbook\Model\Template::model()->findByPk($params['template_id']))){
@@ -436,7 +436,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 			$response['data'][$bodyindex]=$text;	
 		}
 				
-		$response['data']['subject'] = \GO::t('downloadLink','files'); //.' '.$file->name;
+		$response['data']['subject'] = \GO::t("Download link", "files"); //.' '.$file->name;
 		$response['success']=true;
 		
 		return $response;
@@ -451,7 +451,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		$store = \GO\Base\Data\Store::newInstance(\GO\Files\Model\File::model());
 
 		$store->getColumnModel()->formatColumn('path', '$model->path', array(), array('first_name', 'last_name'));
-		$store->getColumnModel()->formatColumn('weekday', '$fullDays[date("w", $model->mtime)]." ".\GO\Base\Util\Date::get_timestamp($model->mtime, false);', array('fullDays'=>\GO::t('full_days')),array('first_name', 'last_name'));
+		$store->getColumnModel()->formatColumn('weekday', '$fullDays[date("w", $model->mtime)]." ".\GO\Base\Util\Date::get_timestamp($model->mtime, false);', array('fullDays'=>\GO::t("full_days")),array('first_name', 'last_name'));
 		
 		$store->setStatement(\GO\Files\Model\File::model()->findRecent($start,$limit));
 

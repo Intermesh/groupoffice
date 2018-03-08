@@ -12,204 +12,210 @@ GO.addressbook.ContactsGrid = function(config){
 		fields : ['id','uuid','name','company_name','first_name','middle_name','last_name','title','initials','sex','birthday','age','email','email2','email3','home_phone','work_phone','work_fax','cellular','cellular2','fax','address','address_no','zip','city','state','country','function','department','salutation','ab_name','ctime','mtime','action_date','suffix','color'],
 		columns : [
 		{
-			header: GO.addressbook.lang.id,
+			header: t("ID", "addressbook"),
 			dataIndex: 'id',
 			width:20,
 			hidden:true
 		},{
-			header: GO.addressbook.lang.contactUuid,
+			header: t("UUID", "addressbook"),
 			dataIndex: 'uuid',
 			width:50,
 			hidden:true
 		},{
-			header: GO.lang['strName'], 
+			id: 'name',
+			header: t("Name"), 
 			dataIndex: 'name',
-			width:200
+			width:300
 		},
 		{
-			header: GO.lang['strCompany'],
+			header: t("Company"),
 			dataIndex: 'company_name',
-			width:200
+			width:300
 			//sortable:false
 		},
 		{
-			header: GO.lang['strFirstName'],
+			header: t("First name"),
 			dataIndex: 'first_name',
 			hidden:true
 		},
 		{
-			header: GO.lang['strMiddleName'],
+			header: t("Middle name"),
 			dataIndex: 'middle_name',
 			hidden:true
 		},
 		{
-			header: GO.lang['strLastName'],
+			header: t("Last name"),
 			dataIndex: 'last_name',
 			hidden:true
 		},
 		{
-			header: GO.lang['strTitle'],
+			header: t("Title"),
 			dataIndex: 'title',
 			hidden:true
 		},
 		{
-			header: GO.lang['strInitials'],
+			header: t("Initials"),
 			dataIndex: 'initials',
 			hidden:true
 		},{
-			header: GO.lang['strSuffix'],
+			header: t("Suffix"),
 			dataIndex: 'suffix',
 			width:50,
 			hidden:true
 		},
 		{
-			header: GO.lang['strSex'],
+			header: t("Sex"),
 			dataIndex: 'sex',
 			hidden:true,
 			renderer: function(value,meta){
 
 				if (value === 'M') { 
 					meta.css += ' male-cell'; 
-					return GO.addressbook.lang.male; 
+					return t("Male", "addressbook"); 
 				} 
 
 				if (value === 'F') {	
 					meta.css += 'female-cell'; 
-					return GO.addressbook.lang.female;
+					return t("Female", "addressbook");
 				}
 
 				return value;
 			}
 		},
 		{
-			header: GO.lang['strBirthday'],
+			header: t("Birthday"),
 			dataIndex: 'birthday',
 			hidden:true
 		},{
-			header: GO.lang.age,
+			header: t("Age"),
 			dataIndex: 'age',
 			hidden:true
 		},
 		{
-			header: GO.lang['strEmail'],
+			header: t("E-mail"),
 			dataIndex: 'email',
-			width: 150
+			width: 150,
+			hidden:true
 		},
 		{
-			header: GO.lang['strEmail'] + ' 2',
+			header: t("E-mail") + ' 2',
 			dataIndex: 'email2',
 			width: 150,
 			hidden:true
 		},
 		{
-			header: GO.lang['strEmail'] + ' 3',
+			header: t("E-mail") + ' 3',
 			dataIndex: 'email3',
 			width: 150,
 			hidden:true
 		},
 		{
-			header: GO.lang['strPhone'],
+			header: t("Phone"),
 			dataIndex: 'home_phone',
-			width: 100
+			width: 100,
+			hidden:true
 		},
 		{
-			header: GO.lang['strWorkPhone'],
+			header: t("Phone (work)"),
 			dataIndex: 'work_phone',
-			width: 100
+			width: 100,
+			hidden:true
 		},
 		{
-			header: GO.lang['strWorkFax'],
+			header: t("Fax (work)"),
 			dataIndex: 'work_fax',
 			width: 100,
 			hidden:true
 		},
 		{
-			header: GO.lang['strCellular'],
+			header: t("Mobile"),
 			dataIndex: 'cellular',
-			width: 100
+			width: 100,
+			hidden:true
 		},
 		{
-			header: GO.lang['cellular2'],
+			header: t("2nd mobile"),
 			dataIndex: 'cellular2',
 			width: 100,
 			hidden:true
 		},
 		{
-			header: GO.lang['strFax'],
+			header: t("Fax"),
 			dataIndex: 'fax',
 			width: 100,
 			hidden:true
 		},
 		{
-			header: GO.lang['strAddress'],
+			header: t("Address"),
 			dataIndex: 'address',
 			hidden:true
 		},
 		{
-			header: GO.lang['strAddressNo'],
+			header: t("Address 2"),
 			dataIndex: 'address_no',
 			hidden:true
 		},
 		{
-			header: GO.lang['strZip'],
+			header: t("ZIP/Postal"),
 			dataIndex: 'zip',
 			hidden:true
 		},
 		{
-			header: GO.lang['strCity'],
+			header: t("City"),
 			dataIndex: 'city',
 			hidden:true
 		},
 		{
-			header: GO.lang['strState'],
+			header: t("State"),
 			dataIndex: 'state',
 			hidden:true
 		},
 		{
-			header: GO.lang['strCountry'],
+			header: t("Country"),
 			dataIndex: 'country',
 			hidden:true,
 			renderer: GO.grid.ColumnRenderers.countryCode
 		},
 		{
-			header: GO.lang['strFunction'],
+			header: t("Function"),
 			dataIndex: 'function',
 			hidden:true
 		},
 		{
-			header: GO.lang['strDepartment'],
+			header: t("Department"),
 			dataIndex: 'department',
 			hidden:true
 		},
 		{
-			header: GO.lang['strSalutation'],
+			header: t("Salutation"),
 			dataIndex: 'salutation',
 			hidden:true
 		},{
-			header: GO.addressbook.lang.addressbook,
+			header: t("Address book", "addressbook"),
 			dataIndex: 'ab_name',
 			hidden:true,
 			sortable:true
 		},
 		{
-			header: GO.lang.strMtime,
+			header: t("Modified at"),
 			dataIndex:'mtime',
 			hidden:true,
-			width:110
+			width: dp(140)
 		},{
-			header: GO.lang.strCtime,
+			header: t("Created at"),
 			dataIndex:'ctime',
 			hidden:true,
-			width:110
+			width: dp(140)
 		},{
-			header: GO.addressbook.lang['actionDate'],
+			header: t("Action date", "addressbook"),
 			dataIndex:'action_date',
-			width:100
+			width:100,
+			hidden:true
 		}
 		]
 	}
 	
-	if(GO.customfields)
+	if(go.ModuleManager.isAvailable("customfields"))
 		GO.customfields.addColumns("GO\\Addressbook\\Model\\Contact", fields);
 	
 	config.store = new GO.data.JsonStore({
@@ -241,7 +247,7 @@ GO.addressbook.ContactsGrid = function(config){
 	});
 	
 	config.view=new Ext.grid.GridView({
-		emptyText: GO.lang.strNoItems,
+		emptyText: t("No items to display"),
 		getRowClass: function(record, rowIndex, rp, ds){
 
 			if(!rp.tstyle)
@@ -258,28 +264,17 @@ GO.addressbook.ContactsGrid = function(config){
 
 			return;
 		}
-	}),
+	});
+					
+	config.autoExpandColumn = "name";
 	config.sm=new Ext.grid.RowSelectionModel();
 	config.loadMask=true;
 	
 	config.enableDragDrop=true;
 	config.ddGroup='AddressBooksDD';
 
-	config.tbar = config.tbar || [];
-	config.tbar.unshift(this.currentActionsButton = new Ext.Button({
-			text: GO.addressbook.lang['selectCurrentActions'],
-//			disabled: true,
-			tooltip: GO.addressbook.lang['showActieveToolTip'],
-			enableToggle: true
-		}));
-
 //		config.bordertrue;
 	GO.addressbook.ContactsGrid.superclass.constructor.call(this, config);
-	
-	this.currentActionsButton.on('toggle',function(button,pressed){
-		this.store.baseParams['onlyCurrentActions'] = pressed ? 1 : 0;
-		this.store.load();
-	}, this);
 	
 };
 

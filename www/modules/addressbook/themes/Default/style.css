@@ -1,3 +1,12 @@
+.entity.Contact::before {
+	content: "person";
+}
+
+.entity.Company::before {
+	content: "domain";
+}
+
+
 .go-model-icon-GO_Addressbook_Model_Contact
 {
 	background-image: url('images/16x16/contact.png') !important;
@@ -19,38 +28,12 @@
 }
 
 .go-module-icon-addressbook , .go-menu-icon-addressbook{
-	background-image:url('images/16x16/icon-addressbook.png') !important;	
-	
+	background-image:url('images/addressbook.png') !important;	
 }
 
 .go-tab-icon-addressbook {
 	background-image: none !important;
 }
-
-.btn-addressbook-add-contact {
-	background-image:url('images/16x16/add-contact.png') !important;
-}
-
-.btn-addressbook-add-company {
-	background-image:url('images/16x16/add-company.png') !important;
-}
-
-.btn-addressbook-contact {
-	background-image:url('images/16x16/contact.png') !important;
-}
-
-.btn-addressbook-manage {
-	background-image:url('images/16x16/gtk-settings.png') !important;
-}
-
-.btn-addressbook-company {
-	background-image:url('images/16x16/company.png') !important;
-}
-
-.btn-addressbook-addressbooks {
-	background-image:url('images/16x16/addressbook.png') !important;
-}
-
 
 .OO-download-btn
 {
@@ -58,8 +41,7 @@
 	/*background-image:url('images/16x16/mailings.png') !important;*/
 }
 
-.letter
-{
+.letter {
 	margin: 1px;
 	padding: 4px 3px 4px 3px;
 	font-size: 16px;
@@ -71,27 +53,20 @@
 	line-height:40px;
 }
 
-
-
 .alphabet-view-selected,
 .alphabet-view-over
 {
 	padding: 4px 3px 4px 3px;	
 }
 
-.alphabet-view-selected
-{
-	/*background: #eff5fb url(images/selected.gif) no-repeat right bottom !important;
-	border: 1px solid #99bbe8 !important;*/
+.alphabet-view-selected {
 	background-color:#ebf1e2 !important;
 	border:1px solid #669900 !important;
-	/*font-size: 20px;*/	
 }
 	
 .alphabet-view-over
 {
   background-color:#ebf1e2
-  /*background: #efefef url(../../../../ext/resources/images/default/grid/row-over.gif) repeat-x left top;*/
 }
 
 .ab-search-form-panel
@@ -143,80 +118,22 @@
 	padding: 2px;
 }
 
-table.panel-layout, fieldset.panel-layout
-{
-	padding:10px 10px 10px 0px;
-}
-
-table.panel-layout
-{
-	width: 700px;
-	
-	border: 0px solid #000;
-}
-
-fieldset.panel-layout
-{
-	margin-top: 10px;
-	border: 1px solid #000;
-}
-
-table.panel-layout td
-{
-	padding: 2px 2px 2px 10px;
-}
-
-legend.panel-layout
-{
-	margin-left: 10px;
-	font-weight: bold;	
-}
-
-
-
-
 .readPanelSubHeading{
 	font-style:italic;
 }
 
-
-
-
-td.contactCompanyLabelWidth
-{
+td.contactCompanyLabelWidth {
 	width: 110px;
 }
 
-td.table_header_links
-{
+td.table_header_links {
 	background-color: #f1f1f1;
 }
-
-
-.ml-btn-mailings{
-	background-image:url('images/16x16/new_mailing.png') !important;
-}
-
 
 .ml-template-default-spacer {
 	border-bottom:1px solid #D0D0D0 !important;
 	margin:10px 0px !important;
 }
-.ml-btn-pause{
-	background-image:url('images/16x16/pause.png') !important;
-}
-.ml-btn-play{
-	background-image:url('images/16x16/play.png') !important;
-}
-
-.ml-btn-view-log{
-	background-image:url('images/16x16/log.png') !important;
-}
-
-.ml-btn-view{
-	background-image:url('images/16x16/view.png') !important;
-}
-
 
 .ab-photo{
 	width:120px;
@@ -225,66 +142,38 @@ td.table_header_links
 	margin:5px;
 }
 
-
-
-
-
-
-
-
-.facebook-icon {
-	background:url('images/16x16/facebook-icon-16.png') no-repeat top right !important;
+.facebook-icon, .linkedin-icon, .skype-icon, .twitter-icon {
 	width: 16px;
 	height: 16px;
 	margin-left: 3px;
 	margin-top: 2px;
 	margin-right: 5px;
 	float: left;
+}
+
+.facebook-icon {
+	background:url('images/16x16/facebook-icon-16.png') no-repeat top right !important;
 }
 
 .linkedin-icon {
 	background:url('images/16x16/linkedin-icon-16.png') no-repeat top right !important;
-	width: 16px;
-	height: 16px;
-	margin-left: 3px;
-	margin-top: 2px;
-	margin-right: 5px;
-	float: left;
 }
 
 .skype-icon {
 	background:url('images/16x16/skype-icon-16.png') no-repeat top right !important;
-	width: 16px;
-	height: 16px;
-	margin-left: 3px;
-	margin-top: 2px;
-	margin-right: 5px;
-	float: left;
 }
 
 
 .twitter-icon {
 	background:url('images/16x16/twitter-icon-16.png') no-repeat top right !important;
-	width: 16px;
-	height: 16px;
-	margin-left: 3px;
-	margin-top: 2px;
-	margin-right: 5px;
-	float: left;
-}
-
-.img-contact-add{
-	background:url('images/16x16/contact-quickadd.png') no-repeat top right !important;
-	width:16px !important;
-	height:16px !important;
 }
 
 .male-cell { 
-    background: url(images/male.png) no-repeat 2px 1px; 
+    background: url(images/16x16/male.png) no-repeat 8px 12px; 
     padding-left: 18px !important; 
 } 
  
 .female-cell { 
-    background: url(images/female.png) no-repeat 2px 1px; 
+    background: url(images/16x16/female.png) no-repeat 8px 12px; 
     padding-left: 18px !important; 
 }

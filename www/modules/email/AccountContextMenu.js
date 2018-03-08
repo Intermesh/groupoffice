@@ -10,10 +10,10 @@ GO.email.AccountContextMenu = Ext.extend(Ext.menu.Menu,{
 		this.items=[
 		this.addFolderButton = new Ext.menu.Item({
 			iconCls: 'btn-add',
-			text: GO.email.lang.addFolder,
+			text: t("Add folder", "email"),
 			scope:this,
 			handler: function(){
-				Ext.MessageBox.prompt(GO.lang.strName, GO.email.lang.enterFolderName, function(button, text){
+				Ext.MessageBox.prompt(t("Name"), t("Enter the folder name:", "email"), function(button, text){
 					if(button=='ok')
 					{
 						var sm = this.treePanel.getSelectionModel();
@@ -41,7 +41,7 @@ GO.email.AccountContextMenu = Ext.extend(Ext.menu.Menu,{
 			}
 		}),{
 			iconCls : 'btn-settings',
-			text : GO.email.lang.subscribeFolders,
+			text : t("Subscribe to folders", "email"),
 			scope : this,
 			handler : function() {
 				if (!this.foldersDialog) {
@@ -54,7 +54,7 @@ GO.email.AccountContextMenu = Ext.extend(Ext.menu.Menu,{
 		},
 		this.propertiesBtn = new Ext.menu.Item({
 			iconCls: 'btn-edit',
-			text: GO.lang['strProperties'],
+			text: t("Properties"),
 			handler:function(a,b){
 				var sm = this.treePanel.getSelectionModel();
 				var node = sm.getSelectedNode();

@@ -326,7 +326,7 @@ viewConfig: {
                 '</div>',
                 '<div class="x-grid3-scroller">',
                     '<div class="x-grid3-body" style="{bstyle}">{body}</div>',
-                    '<a href="#" class="x-grid3-focus" tabIndex="-1"></a>',
+                    '<a  class="x-grid3-focus" tabIndex="-1"></a>',
                 '</div>',
             '</div>',
             '<div class="x-grid3-resize-marker">&#160;</div>',
@@ -377,7 +377,7 @@ viewConfig: {
             headerCellTpl = new Ext.Template(
                 '<td class="x-grid3-hd x-grid3-cell x-grid3-td-{id} {css}" style="{style}">',
                     '<div {tooltip} {attr} class="x-grid3-hd-inner x-grid3-hd-{id}" unselectable="on" style="{istyle}">', 
-                        this.grid.enableHdMenu ? '<a class="x-grid3-hd-btn" href="#"></a>' : '',
+                        this.grid.enableHdMenu ? '<a class="x-grid3-hd-btn" ></a>' : '',
                         '{value}',
                         '<img alt="" class="x-grid3-sort-icon" src="', Ext.BLANK_IMAGE_URL, '" />',
                     '</div>',

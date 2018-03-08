@@ -1,11 +1,11 @@
 <?php
-
-
-$l["tools"]='Hallintatyökalut';
-$l["scripts"]='Komentotiedostot';
-$l["scriptOutput"]='Komentotiedoston tuotos';
-$l['name']='Työkalut';
-$l['description']='Moduuli, jolla suoritetaan ylläpitotoimenpiteitä.';
-$l['dbcheck']='Tietokantatarkistus';
-$l['rm_duplicates']='Poista tuplakontaktit ja merkinnät';
-$l['backupdb']='Varmuuskopioi tietokanta';
+return array (
+  'Admin tools' => 'Hallintatyökalut',
+  'Scripts' => 'Komentotiedostot',
+  'Script output' => 'Komentotiedoston tuotos',
+  'Database check' => 'Tietokantatarkistus',
+  'Remove duplicate contacts and events' => 'Poista tuplakontaktit ja merkinnät',
+  'Backup database' => 'Varmuuskopioi tietokanta',
+  'name' => 'Työkalut',
+  'description' => 'Moduuli, jolla suoritetaan ylläpitotoimenpiteitä.',
+);

@@ -13,9 +13,9 @@ class FunctionField extends AbstractCustomfieldtype {
 //	public function formatFormOutput($column, &$attributes, \GO\Customfields\Model\AbstractCustomFieldsRecord $model) {
 //		$result_string = '';
 //
-//		if (!empty($this->field->function)) {
-//			
-//			$function = $this->field->function;
+//		$function = $this->field->getOption("function");
+//		
+//		if (!empty($function)) {
 //			
 //			$this->fireEvent('formatformoutput',array($this, $column, &$attributes, $model, &$function));
 //			
@@ -40,6 +40,7 @@ class FunctionField extends AbstractCustomfieldtype {
 //		$attributes[$column] = \GO\Base\Util\Number::localize($result_string);
 //		return $attributes[$column];
 //	}
+
 	
 	public function formatDisplay($key, &$attributes, \GO\Customfields\Model\AbstractCustomFieldsRecord $model) {
 		// recalculate on display will fail sum of col1 and col2 + col3 as the sum would already be localized

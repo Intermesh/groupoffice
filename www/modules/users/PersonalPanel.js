@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: PersonalPanel.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: PersonalPanel.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -30,21 +30,21 @@ GO.users.PersonalPanel = function(config)
 	this.comboBoxId = config.cb_id;
 	
 	var rightColItems = [
-					{fieldLabel: GO.lang['strAddress'], name: 'address'},
-					{fieldLabel: GO.lang['strAddressNo'], name: 'address_no'},
-					{fieldLabel: GO.lang['strZip'], name: 'zip'},
-					{fieldLabel: GO.lang['strCity'], name: 'city'},
-					{fieldLabel: GO.lang['strState'], name: 'state'},
+					{fieldLabel: t("Address"), name: 'address'},
+					{fieldLabel: t("Address 2"), name: 'address_no'},
+					{fieldLabel: t("ZIP/Postal"), name: 'zip'},
+					{fieldLabel: t("City"), name: 'city'},
+					{fieldLabel: t("State"), name: 'state'},
 					new GO.form.SelectCountry({
-						fieldLabel: GO.lang['strCountry'],
+						fieldLabel: t("Country"),
 						id:this.comboBoxId,
 						hiddenName: 'country',
 						value: GO.settings.country
 					}),
 					new GO.form.HtmlComponent({html: '<br />'})];
 
-	rightColItems.push({fieldLabel: GO.lang['strFax'], name: 'fax'});
-	rightColItems.push({fieldLabel: GO.lang['strCellular'], name: 'cellular'});			
+	rightColItems.push({fieldLabel: t("Fax"), name: 'fax'});
+	rightColItems.push({fieldLabel: t("Mobile"), name: 'cellular'});			
 	
 	config.items= [
 			{
@@ -56,19 +56,19 @@ GO.users.PersonalPanel = function(config)
 				defaults: {anchor: '100%'},
 				defaultType: 'textfield',
 				items: [
-					{fieldLabel: GO.lang['strFirstName'], name: 'first_name', allowBlank: false},
-					{fieldLabel: GO.lang['strMiddleName'], name: 'middle_name'},
-					{fieldLabel: GO.lang['strLastName'], name: 'last_name', allowBlank: false},
-					{fieldLabel: GO.lang['strTitle'], name: 'title'},
-					{fieldLabel: GO.lang['strInitials'], name: 'initials'},
+					{fieldLabel: t("First name"), name: 'first_name', allowBlank: false},
+					{fieldLabel: t("Middle name"), name: 'middle_name'},
+					{fieldLabel: t("Last name"), name: 'last_name', allowBlank: false},
+					{fieldLabel: t("Title"), name: 'title'},
+					{fieldLabel: t("Initials"), name: 'initials'},
 					new Ext.form.ComboBox({
-						fieldLabel: GO.lang['strSex'],
+						fieldLabel: t("Sex"),
 						hiddenName:'sex',
 						store: new Ext.data.SimpleStore({
 							fields: ['value', 'text'],
 							data: [
-							['M', GO.lang['strMale']],
-							['F', GO.lang['strFemale']]
+							['M', t("Male")],
+							['F', t("Female")]
 							]
 						}),
 						value:'M',
@@ -81,19 +81,19 @@ GO.users.PersonalPanel = function(config)
 						forceSelection: true
 					}),
 					new Ext.form.DateField({
-						fieldLabel: GO.lang['strBirthday'],
+						fieldLabel: t("Birthday"),
 						name: 'birthday',
 						format: GO.settings['date_format']
 					}),
 					new GO.form.HtmlComponent({html: '<br />'}),
 					{
-						fieldLabel: GO.lang['strEmail'],
+						fieldLabel: t("E-mail"),
 						name: 'email',
 						allowBlank: false,
 						vtype:'emailAddress'
 					},
 					{
-						fieldLabel: GO.lang['strPhone'],
+						fieldLabel: t("Phone"),
 						name: 'home_phone'
 					}
 				]

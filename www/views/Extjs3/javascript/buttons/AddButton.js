@@ -11,7 +11,7 @@ GO.buttons.AddButton = Ext.extend(Ext.Button,{
 			iconCls: 'btn-add',
 			itemId:'add',
 			disabled:!this.ignoreButtonParams,
-			text: GO.lang.cmdAdd,
+			text: t("Add"),
 			cls: 'x-btn-text-icon'
 		});
 		

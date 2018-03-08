@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: AccountDialog.js 21672 2017-11-13 14:05:35Z mschering $
+ * @version $Id: AccountDialog.js 22204 2018-01-22 14:49:13Z wsmits $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -17,19 +17,14 @@ GO.email.AccountDialog = function(config) {
 //	var sslCb;
 
 	var advancedItems = [ new Ext.form.TextField({
-		fieldLabel : GO.email.lang.port,
-		name : 'port',
-		value : '143',
-		allowBlank : false
-	}), new Ext.form.TextField({
-		fieldLabel : GO.email.lang.rootMailbox,
+		fieldLabel : t("Root mailbox", "email"),
 		name : 'mbroot'
 	}) ];
 
-	if (GO.sieve) {
+	if(go.ModuleManager.isAvailable("sieve")) {
 		advancedItems.push(
 			new Ext.form.NumberField({
-				fieldLabel : GO.sieve.lang.sievePort,
+				fieldLabel : t("Sieve filter port number", "sieve"),
 				name : 'sieve_port',
 				decimals : 0,
 				allowBlank : false,
@@ -38,7 +33,7 @@ GO.email.AccountDialog = function(config) {
 		);
 		advancedItems.push(
 			new Ext.ux.form.XCheckbox({
-				boxLabel: GO.sieve.lang.useTLS,
+				boxLabel: t("Use secure connection for (Sieve) email filters", "sieve"),
 				checked:GO.sieve.sieveTls,
 				name: 'sieve_usetls',
 //				allowBlank: true,
@@ -47,10 +42,10 @@ GO.email.AccountDialog = function(config) {
 		);
 	}
 
-	if(GO.addressbook){
+	if(go.ModuleManager.isAvailable("addressbook")){
 				
 		this.templatesCombo = new GO.form.ComboBox({
-			fieldLabel : GO.email.lang['defaultEmailTemplate'],
+			fieldLabel : t("Default e-mail template", "email"),
 			hiddenName : 'default_account_template_id',
 			width: 300,
 			store : new GO.data.JsonStore({
@@ -75,37 +70,10 @@ GO.email.AccountDialog = function(config) {
 			forceSelection : true
 		});
 		
-//		this.templatesBtn = new Ext.Button({
-//
-//			iconCls:'ml-btn-mailings',
-//			text:GO.addressbook.lang.emailTemplate,
-//			menu:this.templatesMenu = new GO.menu.JsonMenu({
-//				store:this.templatesStore,
-//				listeners:{
-//					scope:this,
-//					itemclick : function(item, e ) {
-//						if(item.template_id=='default'){
-//							this.templatesStore.baseParams.default_template_id=this.lastLoadParams.template_id;
-//							this.templatesStore.load();
-//							delete this.templatesStore.baseParams.default_template_id;
-//						}else if(!this.emailEditor.isDirty() || confirm(GO.email.lang.confirmLostChanges))
-//						{							
-//							this.lastLoadParams.template_id=item.template_id;
-//							this.lastLoadParams.keepHeaders=1;
-//							this.loadForm(this.lastLoadUrl, this.lastLoadParams);							
-//						}else
-//						{
-//							return false;							
-//						}
-//					}
-//				}
-//			})
-//		});
-		
 	}
 
 	this.imapAllowSelfSignedCheck = new Ext.ux.form.XCheckbox({
-		boxLabel: GO.email.lang.allowSelfSignedText,
+		boxLabel: t("Allow self signed certificate when using SSL or TLS", "email"),
 		name: 'imap_allow_self_signed',
 		hideLabel:false,
 		fieldLabel:''
@@ -113,7 +81,7 @@ GO.email.AccountDialog = function(config) {
 		
 
 	var incomingTab = {
-		title : GO.email.lang.incomingMail,
+		title : t("Incoming mail", "email"),
 		layout : 'form',
 		defaults : {
 			anchor : '100%'
@@ -123,31 +91,8 @@ GO.email.AccountDialog = function(config) {
 		cls : 'go-form-panel',
 		waitMsgTarget : true,
 		labelWidth : 120,
-		items : [/*typeField = new Ext.form.ComboBox({
-			fieldLabel : GO.email.lang.type,
-			hiddenName : 'type',
-			store : new Ext.data.SimpleStore({
-				fields : ['value', 'text'],
-				data : [['imap', 'IMAP'],
-				['pop3', 'POP-3']]
-
-			}),
-			value : 'imap',
-			valueField : 'value',
-			displayField : 'text',
-			mode : 'local',
-			triggerAction : 'all',
-			editable : false,
-			selectOnFocus : true,
-			forceSelection : true,
-			listeners : {
-				change : function() {
-					this.refreshNeeded = true;
-				},
-				scope : this
-			}
-		}),*/ new Ext.form.TextField({
-			fieldLabel : 'IMAP '+GO.email.lang.host,
+		items : [new Ext.form.TextField({
+			fieldLabel : 'IMAP '+t("Host", "email"),
 			name : 'host',
 			allowBlank : false,
 			listeners : {
@@ -156,8 +101,14 @@ GO.email.AccountDialog = function(config) {
 				},
 				scope : this
 			}
+		}),
+		new Ext.form.TextField({
+			fieldLabel : t("Port", "email"),
+			name : 'port',
+			value : '143',
+			allowBlank : false
 		}), new Ext.form.TextField({
-			fieldLabel : GO.lang.strUsername,
+			fieldLabel : t("Username"),
 			name : 'username',
 			allowBlank : false,
 			listeners : {
@@ -168,7 +119,7 @@ GO.email.AccountDialog = function(config) {
 			}
 		}),
 		new Ext.ux.form.XCheckbox({
-			boxLabel: GO.email.lang.storePassword,
+			boxLabel: t("Permanently store password", "email"),
 			checked: true,
 			name: 'store_password',
 //			allowBlank: true,
@@ -176,7 +127,7 @@ GO.email.AccountDialog = function(config) {
 			hidden: true //this function only works with imap auth at the moment.
 		}),
 		new Ext.form.TextField({
-			fieldLabel : GO.lang.strPassword,
+			fieldLabel : t("Password"),
 			name : 'password',
 			inputType : 'password',
 //			allowBlank : false,
@@ -188,12 +139,12 @@ GO.email.AccountDialog = function(config) {
 			}
 		}),
 		this.ImapEncryptionField = new Ext.form.ComboBox({
-			fieldLabel : GO.email.lang.encryption,
+			fieldLabel : t("Encryption", "email"),
 			hiddenName : 'imap_encryption',
 			store : new Ext.data.SimpleStore({
 				fields : ['value', 'text'],
 				data : [
-				['', GO.email.lang.noEncryption],
+				['', t("No encryption", "email")],
 				['tls', 'TLS'], ['ssl', 'SSL']]
 			}),
 			value : '',
@@ -206,44 +157,24 @@ GO.email.AccountDialog = function(config) {
 			selectOnFocus : true,
 			forceSelection : true
 		}),
-		this.imapAllowSelfSignedCheck,
-//		sslCb = new Ext.ux.form.XCheckbox({
-//			fieldLabel : GO.email.lang.ssl,
-//			name : 'use_ssl',
-//			checked : false
-//		}), 
-		{
-			xtype : 'fieldset',
-			title : GO.email.lang.advanced,
-			collapsible : true,
-			forceLayout:true,
-			collapsed : true,
-			autoHeight : true,
-			autoWidth : true,
-			// defaults: {anchor: '100%'},
-			defaultType : 'textfield',
-			labelWidth : 75,
-			labelAlign : 'left',
-
-			items : advancedItems
-		}]
+		this.imapAllowSelfSignedCheck]
 	};
 
 	// end incomming tab
 
 	var properties_items = [
 	this.selectUser = new GO.form.SelectUser({
-		fieldLabel : GO.lang.strUser,
+		fieldLabel : t("User"),
 		disabled : !GO.settings.has_admin_permission,
 		anchor : '100%'
 	}),
 	{
-		fieldLabel : GO.lang.strName,
+		fieldLabel : t("Name"),
 		name : 'name',
 		allowBlank : false,
 		anchor : '100%'
 	}, {
-		fieldLabel : GO.lang.strEmail,
+		fieldLabel : t("E-mail"),
 		name : 'email',
 		vtype: 'emailAddress',
 		allowBlank : false,
@@ -258,78 +189,26 @@ GO.email.AccountDialog = function(config) {
 	}, {
 		xtype : 'textarea',
 		name : 'signature',
-		fieldLabel : GO.email.lang.signature,
+		fieldLabel : t("Signature", "email"),
 		height : 100,
 		anchor : '100%'
 	}
 	];
 
-	this.aliasesButton = new Ext.Button({
-		text : GO.email.lang.manageAliases,
-		handler : function() {
-			if (!this.aliasesDialog) {
-				this.aliasesDialog = new GO.email.AliasesDialog();
-			}
-			this.aliasesDialog.show(this.account_id);
-		},
-		scope : this
-	})
-
-	this.doNotMarkAsReadCbx = new Ext.ux.form.XCheckbox({
-		boxLabel: GO.email.lang.doNotMarkAsRead,
-		fieldLabel: '',
-		checked:false,
-		name: 'do_not_mark_as_read',
-//		allowBlank: true
-	});
-	
-	this.fullReplyHeadersCbx = new Ext.ux.form.XCheckbox({
-		boxLabel: GO.email.lang.fullReplyHeaders,
-		fieldLabel: '',
-		checked:false,
-		name: 'full_reply_headers',
-//		allowBlank: true
-	});
-	
-	this.placeSignatureBelowReplyCbx = new Ext.ux.form.XCheckbox({
-		boxLabel: GO.email.lang.placeSignatureBelowReply,
-		fieldLabel: '',
-		checked:false,
-		name: 'signature_below_reply',
-//		allowBlank: true
-	});
-	
-	properties_items.push(this.placeSignatureBelowReplyCbx);
-	properties_items.push(this.doNotMarkAsReadCbx);
-	properties_items.push(this.fullReplyHeadersCbx);
-
-	if (GO.addressbook)
+	if(go.ModuleManager.isAvailable("addressbook"))
 		properties_items.push(this.templatesCombo);
 
-	if(GO.settings.modules.email.write_permission || !GO.email.disableAliases)
-		properties_items.push(this.aliasesButton);
-	
-	var propertiesTab = {
-		title : GO.lang.strProperties,
-		layout : 'form',
-		anchor : '100% 100%',
-		defaultType : 'textfield',
-		autoHeight : true,
-		cls : 'go-form-panel',
-		labelWidth : 100,
-		items :properties_items
-	};
-
 	this.smtpAllowSelfSignedCheck = new Ext.ux.form.XCheckbox({
-		boxLabel: GO.email.lang.allowSelfSignedText,
+		boxLabel: t("Allow self signed certificate when using SSL or TLS", "email"),
 		name: 'smtp_allow_self_signed',
 		hideLabel:false,
 		fieldLabel:''
 	});
-
+	
 	var outgoingTab = {
-		title : GO.email.lang.outgoingMail,
+		title : t("Outgoing mail", "email"),
 		layout : 'form',
+		xtype:'fieldset',
 		defaults : {
 			anchor : '100%'
 		},
@@ -338,17 +217,22 @@ GO.email.AccountDialog = function(config) {
 		cls : 'go-form-panel',
 		labelWidth : 120,
 		items : [new Ext.form.TextField({
-			fieldLabel : GO.email.lang.host,
+			fieldLabel : t("Host", "email"),
 			name : 'smtp_host',
 			allowBlank : false,
 			value : GO.email.defaultSmtpHost
+		}),new Ext.form.TextField({
+			fieldLabel : t("Port", "email"),
+			name : 'smtp_port',
+			value : '25',
+			allowBlank : false
 		}), this.encryptionField = new Ext.form.ComboBox({
-			fieldLabel : GO.email.lang.encryption,
+			fieldLabel : t("Encryption", "email"),
 			hiddenName : 'smtp_encryption',
 			store : new Ext.data.SimpleStore({
 				fields : ['value', 'text'],
 				data : [
-				['', GO.email.lang.noEncryption],
+				['', t("No encryption", "email")],
 				['tls', 'TLS'], ['ssl', 'SSL']]
 			}),
 			value : '',
@@ -362,18 +246,12 @@ GO.email.AccountDialog = function(config) {
 			forceSelection : true
 		}),
 		this.smtpAllowSelfSignedCheck,
-		new Ext.form.TextField({
-			fieldLabel : GO.email.lang.port,
-			name : 'smtp_port',
-			value : '25',
-			allowBlank : false
-		}),
 		{
 			xtype:'xcheckbox',
 			checked: false,
 			name: 'smtp_auth',
 			hideLabel:true,
-			boxLabel:GO.email.lang.useAuth,
+			boxLabel:t("Use authentication", "email"),
 			listeners:{
 				check:function(cb, checked){
 					this.smtpUsername.setDisabled(!checked);
@@ -382,7 +260,7 @@ GO.email.AccountDialog = function(config) {
 				scope:this
 			}
 		},this.smtpUsername= new Ext.form.TextField({
-			fieldLabel : GO.lang.strUsername,
+			fieldLabel : t("Username"),
 			name : 'smtp_username',
 			disabled:true
 		}),
@@ -394,12 +272,14 @@ GO.email.AccountDialog = function(config) {
 			hidden: true
 		}),
 		this.smtpPassword = new Ext.form.TextField({
-			fieldLabel : GO.lang.strPassword,
+			fieldLabel : t("Password"),
 			name : 'smtp_password',
 			inputType : 'password',
 			disabled:true
 		})]
 	};
+	
+	
 
 	GO.email.subscribedFoldersStore = new GO.data.JsonStore({
 		url : GO.url("email/folder/store"),
@@ -410,14 +290,8 @@ GO.email.AccountDialog = function(config) {
 		fields : ['name']
 	});
 
-	this.foldersTab = new Ext.Panel({
-		listeners:{
-			show:function(){
-				if(!GO.email.subscribedFoldersStore.loaded)
-					GO.email.subscribedFoldersStore.load();
-			}
-		},
-		title : GO.email.lang.folders,
+	this.foldersTab = new Ext.form.FieldSet({
+		title : t("Folders", "email"),
 		autoHeight : true,
 		layout : 'form',
 		cls : 'go-form-panel',
@@ -426,23 +300,9 @@ GO.email.AccountDialog = function(config) {
 		},
 		defaultType : 'textfield',
 		labelWidth : 150,
-		tbar : [{
-			iconCls : 'btn-add',
-			text : GO.email.lang.manageFolders,
-			cls : 'x-btn-text-icon',
-			scope : this,
-			handler : function() {
-
-				if (!this.foldersDialog) {
-					this.foldersDialog = new GO.email.FoldersDialog();
-				}
-				this.foldersDialog.show(this.account_id);
-
-			}
-		}],
 
 		items : [new GO.form.ComboBoxReset({
-			fieldLabel : GO.email.lang.sendItemsFolder,
+			fieldLabel : t("Sent items folder", "email"),
 			hiddenName : 'sent',
 			store : GO.email.subscribedFoldersStore,
 			valueField : 'name',
@@ -454,9 +314,9 @@ GO.email.AccountDialog = function(config) {
 			editable : false,
 			selectOnFocus : true,
 			forceSelection : true,
-			emptyText : GO.lang.disabled
+			emptyText : t("Disabled")
 		}), new GO.form.ComboBoxReset({
-			fieldLabel : GO.email.lang.trashFolder,
+			fieldLabel : t("Trash folder", "email"),
 			hiddenName : 'trash',
 			value:'Trash',
 			store : GO.email.subscribedFoldersStore,
@@ -468,9 +328,9 @@ GO.email.AccountDialog = function(config) {
 			editable : false,
 			selectOnFocus : true,
 			forceSelection : true,
-			emptyText : GO.lang.disabled
+			emptyText : t("Disabled")
 		}), new GO.form.ComboBoxReset({
-			fieldLabel : GO.email.lang.draftsFolder,
+			fieldLabel : t("Drafts folder", "email"),
 			hiddenName : 'drafts',
 			value:'Drafts',
 			store : GO.email.subscribedFoldersStore,
@@ -482,18 +342,64 @@ GO.email.AccountDialog = function(config) {
 			editable : false,
 			selectOnFocus : true,
 			forceSelection : true,
-			emptyText : GO.lang.disabled
-		}), new Ext.ux.form.XCheckbox({
-			boxLabel : GO.email.lang.ignoreSentFolder,
-			name : 'ignore_sent_folder',
-			checked : false,
-			hideLabel : true
+			emptyText : t("Disabled")
 		})]
 	});
 	
+	var propertiesTab = {
+		title : t("Properties"),
+		autoScroll: true,
+		layout:'table',
+		layoutConfig: {columns: 2},
+		items: [{
+				title : t("Properties"),
+				xtype:'fieldset',
+				layout : 'form',
+				anchor : '100% 100%',
+				defaultType : 'textfield',
+				autoHeight : true,
+				cls : 'go-form-panel',
+				labelWidth : 100,
+				items :properties_items
+			},{ 
+				rowspan: 2,
+				defaults: {xtype:'fieldset'},
+				items: [
+					this.foldersTab,
+					{
+						xtype : 'fieldset',
+						title : t("Extra options", "email"),
+						forceLayout:true,
+						labelWidth : 75,
+						labelAlign : 'left',
+						defaults: {hideLabel : true, checked:false},
+						items : [
+							new Ext.ux.form.XCheckbox({
+								boxLabel : t("Store replies in the same folder as the original message", "email"),
+								name : 'ignore_sent_folder'
+							}),
+							this.doNotMarkAsReadCbx = new Ext.ux.form.XCheckbox({
+								boxLabel: t("Do not automatically mark emails as read", "email"),
+								name: 'do_not_mark_as_read',
+							}),
+							this.fullReplyHeadersCbx = new Ext.ux.form.XCheckbox({
+								boxLabel: t("Show full reply headers", "email"),
+								name: 'full_reply_headers',
+							}),
+							this.placeSignatureBelowReplyCbx = new Ext.ux.form.XCheckbox({
+								boxLabel: t("On reply/forward: Place signature always at the end of the mail.", "email"),
+								name: 'signature_below_reply',
+							})
+						]
+					}
+				]
+			}
+		]
+	};
+	
 	var levelLabels={};
-	levelLabels[GO.permissionLevels.create]=GO.email.lang.useAccount;
-	levelLabels[GO.email.permissionLevels.delegated]=GO.email.lang['permissionDelegated'];
+	levelLabels[GO.permissionLevels.create]=t("Use account", "email");
+	levelLabels[GO.email.permissionLevels.delegated]=t("Read only and delegated", "email");
 
 	this.permissionsTab = new GO.grid.PermissionsPanel({levels:[
 			GO.permissionLevels.read,
@@ -505,22 +411,49 @@ GO.email.AccountDialog = function(config) {
 	});
 
 	//this.permissionsTab.disabled = false;
-	
+	var serverTab = {
+		title: t('Server'),
+		autoScroll: true,
+		visible: (GO.settings.modules.email.write_permission),
+		layout:'table',
+		layoutConfig: {columns: 2},
+		items: [{ 
+				rowspan: 2,
+				defaults: {xtype:'fieldset'},
+				items: [
+					incomingTab,
+					{
+						xtype : 'fieldset',
+						title : t("Advanced", "email"),
+						collapsible : true,
+						forceLayout:true,
+						collapsed : true,
+						autoHeight : true,
+						autoWidth : true,
+						// defaults: {anchor: '100%'},
+						defaultType : 'textfield',
+						labelWidth : 75,
+						labelAlign : 'left',
+
+						items : advancedItems
+					}
+				]
+		},
+		outgoingTab
+		]
+	};
 	
 	this.filterGrid = new GO.email.FilterGrid();
-
-	var items = [propertiesTab,
-
-	this.foldersTab, this.permissionsTab,this.filterGrid];
-
 	this.labelsTab = new GO.email.LabelsGrid();
 
-	items.push(this.labelsTab);
-
-	if (GO.settings.modules.email.write_permission) {
-		items.splice(1, 0, incomingTab, outgoingTab);
-	}
-
+	var items = [
+		propertiesTab,
+		serverTab, 
+		this.permissionsTab,
+		this.filterGrid,
+		this.labelsTab
+	];
+	
 	this.propertiesPanel = new Ext.form.FormPanel({
 		url : GO.url("email/account/submit"),
 		// labelWidth: 75, // label settings here cascade unless
@@ -591,32 +524,48 @@ GO.email.AccountDialog = function(config) {
 	GO.email.AccountDialog.superclass.constructor.call(this, {
 		layout : 'fit',
 		modal : false,
-		height: 600,
-		width : 900,
+		height: dp(550),
+		width : dp(958),
 		closeAction : 'hide',
-		title : GO.email.lang.account,
+		title : t("E-mail Account", "email"),
 
 		items : this.propertiesPanel,
-
-		buttons : [{
-
-			text : GO.lang.cmdOk,
+		buttonAlign: 'left',
+		buttons : [this.aliasesButton = new Ext.Button({
+			iconCls: 'account',
+			text : t("Aliases", "email"),
 			handler : function() {
-				this.save(true);
+				if (!this.aliasesDialog) {
+					this.aliasesDialog = new GO.email.AliasesDialog();
+				}
+				this.aliasesDialog.show(this.account_id);
 			},
+			visible: (GO.settings.modules.email.write_permission || !GO.email.disableAliases),
 			scope : this
-		}, {
+		}),{
+			iconCls : 'btn-folder',
+			text : t("Folders", "email"),
+			cls : 'x-btn-text-icon',
+			scope : this,
+			handler : function() {
 
-			text : GO.lang.cmdApply,
+				if (!this.foldersDialog) {
+					this.foldersDialog = new GO.email.FoldersDialog();
+				}
+				this.foldersDialog.show(this.account_id);
+
+			}
+		},'->',{
+			text : t("Apply"),
 			handler : function() {
 				this.save(false);
 			},
 			scope : this
-		}, {
+		},{
 
-			text : GO.lang.cmdClose,
+			text : t("Ok"),
 			handler : function() {
-				this.hide();
+				this.save(true);
 			},
 			scope : this
 		}]
@@ -637,7 +586,7 @@ Ext.extend(GO.email.AccountDialog, GO.Window, {
 			params : {
 				'id' : this.account_id
 			},
-			waitMsg : GO.lang['waitMsgSave'],
+			waitMsg : t("Saving..."),
 			success : function(form, action) {
 
 				action.result.refreshNeeded = this.refreshNeeded
@@ -664,14 +613,14 @@ Ext.extend(GO.email.AccountDialog, GO.Window, {
 			failure : function(form, action) {
 				var error = '';
 				if (action.failureType == 'client') {
-					error = GO.lang.strErrorsInForm;
+					error = t("You have errors in your form. The invalid fields are marked.");
 				} else if (action.result) {
 					error = action.result.feedback;
 				} else {
-					error = GO.lang.strRequestError;
+					error = t("Could not connect to the server. Please check your internet connection.");
 				}
 
-				Ext.MessageBox.alert(GO.lang.strError, error);
+				Ext.MessageBox.alert(t("Error"), error);
 				
 				if(action.result.validationErrors){
 					for(var field in action.result.validationErrors){
@@ -694,8 +643,8 @@ Ext.extend(GO.email.AccountDialog, GO.Window, {
 			this.loadAccount(account_id);
 			GO.email.subscribedFoldersStore.baseParams.account_id = account_id;
 //			GO.email.subscribedFoldersStore.load();
-
-			GO.email.subscribedFoldersStore.loaded=false;
+			if(!GO.email.subscribedFoldersStore.loaded)
+				GO.email.subscribedFoldersStore.load();
 		} else {
 
 			this.propertiesPanel.form.reset();
@@ -725,7 +674,7 @@ Ext.extend(GO.email.AccountDialog, GO.Window, {
 			params : {
 				id : account_id
 			},
-			waitMsg : GO.lang.waitMsgLoad,
+			waitMsg : t("Loading..."),
 			success : function(form, action) {
 				this.refreshNeeded = false;
 

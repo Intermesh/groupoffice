@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: SelectCountry.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: SelectCountry.js 22151 2018-01-17 13:59:21Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -30,9 +30,9 @@ GO.form.SelectCountry = function(config){
 	{
 		var countries = [];
 
-		for(var c in GO.lang.countries)
+		for(var c in GO.lang.base.countries)
 		{
-			countries.push([c, GO.lang.countries[c]]);
+			countries.push([c, GO.lang.base.countries[c]]);
 		}
 
 		GO.countriesStore = new Ext.data.SimpleStore({
@@ -59,7 +59,7 @@ GO.form.SelectCountry = function(config){
 		mode:'local',
 		selectOnFocus:true,
 		forceSelection: true,
-		emptyText: GO.lang.strNoCountrySelected
+		emptyText: t("No country selected")
 	});
 
 }

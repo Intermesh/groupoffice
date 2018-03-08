@@ -19,19 +19,19 @@ GO.files.ImageViewer = Ext.extend(GO.Window, {
 		this.width=800;
 		this.height=600;
 		this.bodyStyle='text-align:center;vertical-align:middle';
-		this.title=GO.files.lang.imageViewer;
+		this.title=t("Image viewer", "files");
 		this.autoScroll=true;
 		
 		this.tbar=[this.previousButton = new Ext.Button({
 			iconCls: 'btn-left-arrow',
-			text:GO.lang.cmdPrevious,
+			tooltip:t("Previous"),
 			handler: function(){
 				this.loadImage(this.currentImgIndex-1);
 			},
 			scope:this
 		}),this.nextButton = new Ext.Button({
 			iconCls: 'btn-right-arrow',
-			text:GO.lang.cmdNext,
+			tooltip:t("Next"),
 			handler: function(){
 				this.loadImage(this.currentImgIndex+1);
 			},
@@ -39,24 +39,24 @@ GO.files.ImageViewer = Ext.extend(GO.Window, {
 		}),
 		'-',
 		{
-			iconCls: 'btn-save',
-			text: GO.lang.download,
+			iconCls: 'btn-download',
+			text: t("Download"),
 			handler: function(){
 				window.open(this.viewerImages[this.currentImgIndex].download_path);
 			},
 			scope: this
 		},'-',
 		this.normalSizeBtn=new Ext.Button({
-			text: GO.files.lang.normalSize,
-			iconCls: 'fs-btn-normal-size',
+			text: t("Normal size", "files"),
+			iconCls: 'zoom-in',
 			handler: function(){
 				this.loadImage(this.currentImgIndex, true);
 			},
 			scope: this
 		}),
 		this.fitImageBtn=new Ext.Button({
-			text: GO.files.lang.fitImage,
-			iconCls: 'fs-btn-fit-image',
+			text: t("Fit image", "files"),
+			iconCls: 'zoom-out',
 			handler: function(){
 				this.syncImgSize();
 			},
@@ -85,7 +85,7 @@ GO.files.ImageViewer = Ext.extend(GO.Window, {
 		
 		this.fullSize=fullSize;
 		
-		this.body.mask(GO.lang.waitMsgLoad);
+		this.body.mask(t("Loading..."));
 		
 		this.setTitle(this.viewerImages[index].name);
 		

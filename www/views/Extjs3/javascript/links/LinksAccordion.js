@@ -1,7 +1,7 @@
 GO.LinksAccordion = Ext.extend(Ext.Panel, {
 	link_id : 0,
 	link_type : 0,
-	title:GO.lang.strLinks,
+	title:t("Links"),
 	disabled : true,
 	//renderHidden : true,
 	
@@ -13,30 +13,30 @@ GO.LinksAccordion = Ext.extend(Ext.Panel, {
 
 
 
-		if(GO.calendar)
+		if(go.ModuleManager.isAvailable("calendar"))
 		{
 			var eventLinksPanel = new GO.grid.LinksGrid({
-				title:GO.calendar.lang.appointments,
+				title:t("Appointments", "calendar"),
 				noSearchField:true
 			});
 			eventLinksPanel.store.baseParams.types=Ext.encode([1]);
 			this.items.push(eventLinksPanel);
 		}
 
-		if(GO.tasks)
+		if(go.ModuleManager.isAvailable("tasks"))
 		{
 			var tasksLinksPanel = new GO.grid.LinksGrid({
-				title:GO.tasks.lang.tasks,
+				title:t("Tasks", "tasks"),
 				noSearchField:true
 			});
 			tasksLinksPanel.store.baseParams.types=Ext.encode([12]);
 			this.items.push(tasksLinksPanel);
 		}
 
-		if(GO.notes)
+		if(go.ModuleManager.isAvailable("notes"))
 		{
 			var noteLinksPanel = new GO.grid.LinksGrid({
-				title:GO.notes.lang.notes,
+				title:t("Notes", "notes"),
 				noSearchField:true
 			});
 			noteLinksPanel.store.baseParams.types=Ext.encode([4]);

@@ -55,7 +55,7 @@ class ModuleController extends AbstractJsonController{
 				}
 			}
 		}
-		
+		unset($_POST['id']);
 		$module->setAttributes($_POST);		
 		$module->save();
 		
@@ -76,24 +76,52 @@ class ModuleController extends AbstractJsonController{
 			
 			$module = new $moduleClass;	
 			
-			$model = GO::modules()->isInstalled($module->id());
 			
 			
-			$availableModules[$module->name()] = array(
-					'id'=>$module->id(),
+			if($module instanceof \go\core\module\Base) {
+			
+			$model = GO::modules()->isInstalled($module->getName());
+			
+			
+			$availableModules[$module->getName()] = array(		
+					'id' => $model ? $model->id : null,
+					'name'=>$module->getName(),
+					'localizedName' => $module->getTitle(),
+					'author'=>$module->getAuthor(),
+					'description'=>$module->getDescription(),
+					'icon'=>$module->getIcon(),
+					'aclId'=>$model ? $model->acl_id : 0,
+//					'buyEnabled'=>!GO::scriptCanBeDecoded() || 
+//							($module->appCenter() && (\GO\Professional\License::isTrial() || \GO\Professional\License::moduleIsRestricted($module->name())!==false)),
+				
+					'package'=>$module->getPackage(),
+					'enabled'=>$model && $model->enabled,
+					'isRefactored' => true,
+					//'not_installable'=> $module->appCenter() && !GO::scriptCanBeDecoded($module->package()),
+					'sort_order' => ($model && $model->sort_order)?$model->sort_order:''
+			);
+			} else
+			{
+				
+				$model = GO::modules()->isInstalled($module->name());
+				
+				$availableModules[$module->name()] = array(					
+						'id' => $model ? $model->id : null,
 					'name'=>$module->name(),
+					'localizedName' => $module->localizedName(),
 					'author'=>$module->author(),
 					'description'=>$module->description(),
 					'icon'=>$module->icon(),
-					'acl_id'=>$model ? $model->acl_id : 0,
+					'aclId'=>$model ? $model->aclId : 0,
 //					'buyEnabled'=>!GO::scriptCanBeDecoded() || 
-//							($module->appCenter() && (\GO\Professional\License::isTrial() || \GO\Professional\License::moduleIsRestricted($module->id())!==false)),
+//							($module->appCenter() && (\GO\Professional\License::isTrial() || \GO\Professional\License::moduleIsRestricted($module->name())!==false)),
 				
 					'package'=>$module->package(),
 					'enabled'=>$model && $model->enabled,
 					'not_installable'=> $module->appCenter() && !GO::scriptCanBeDecoded($module->package()),
 					'sort_order' => ($model && $model->sort_order)?$model->sort_order:''
 			);
+			}
 		}
 		
 		ksort($availableModules);		
@@ -119,12 +147,22 @@ class ModuleController extends AbstractJsonController{
 		foreach($modules as $moduleClass){		
 			
 			$module = new $moduleClass;//call_user_func($moduleClase();			
-			$availableModules[$module->name()] = array(
-					'id'=>$module->id(),
-					'name'=>$module->name(),
-					'description'=>$module->description(),
-					'icon'=>$module->icon()
-			);
+			
+			if($module instanceof \go\core\module\Base) {
+				$availableModules[$module->name()] = array(						
+						'name'=>$module->getName(),
+						'package'=>$module->getPackage()						
+				);
+			} else
+			{
+				$availableModules[$module->name()] = array(
+						'id'=>$module->name(),
+						'name'=>$module->name(),
+						'package'=>null,
+						'description'=>$module->description(),
+						'icon'=>$module->icon()
+				);
+			}
 		}
 		
 		ksort($availableModules);		
@@ -145,7 +183,7 @@ class ModuleController extends AbstractJsonController{
 //		{
 //			if(!GO::modules()->$moduleId){
 //				$module = new Module();
-//				$module->id=$moduleId;
+//				$module->name=$moduleId;
 //
 //
 //				$module->moduleManager->checkDependenciesForInstallation($modules);	
@@ -208,14 +246,14 @@ class ModuleController extends AbstractJsonController{
 				}
 			}
 			
-			$translated = $module->moduleManager ? $module->moduleManager->name() : $module->id;
+			$translated = GO::t($module->name, $module->name);
 			
 			// Module permissions only support read permission and manage permission:
 			if (Acl::hasPermission($permissionLevel,Acl::CREATE_PERMISSION))
 				$permissionLevel = Acl::MANAGE_PERMISSION;			
 			
 			$modules[$translated]= array(
-				'id' => $module->id,
+				'id' => $module->name,
 				'name' => $translated,
 				'permissionLevel' => $permissionLevel,
 				'disable_none' => $usersGroupPermissionLevel!==false && Acl::hasPermission($usersGroupPermissionLevel,Acl::READ_PERMISSION),
@@ -244,10 +282,14 @@ class ModuleController extends AbstractJsonController{
 		GO::setMaxExecutionTime(120);
 		
 //		GO::$disableModelCache=true;
-		$module = Module::model()->findByPk($params['moduleId']);
+		$module = Module::model()->findByName($params['moduleId']);
+		if($module->package) {
+			return ['success' => true];
+		}
 
+		
 		//only do when modified
-		if($module->acl->mtime>time()-120){
+		if(strtotime($module->acl->modifiedAt)>time()-120){
 
 			$models = array();
 			$modMan = $module->moduleManager;
@@ -297,7 +339,7 @@ class ModuleController extends AbstractJsonController{
 					$response['success'] = true;
 				} else {
 					$response['success'] = false;
-					$response['feedback'] = sprintf(\GO::t('validationErrorsFound'), strtolower($module->localizedName)) . "\n\n" . implode("\n", $module->getValidationErrors()) . "\n";
+					$response['feedback'] = sprintf(\GO::t("Couldn't save %s:"), strtolower($module->localizedName)) . "\n\n" . implode("\n", $module->getValidationErrors()) . "\n";
 					$response['validationErrors'] = $module->getValidationErrors();
 				}
 			}
@@ -316,7 +358,7 @@ class ModuleController extends AbstractJsonController{
 //		
 //		$i=0;
 //		foreach($modules as $module){
-//			$moduleModel = Module::model()->findByPk($module->id);
+//			$moduleModel = Module::model()->findByPk($module->name);
 //			$moduleModel->sort_order=$i++;
 //			$moduleModel->save();
 //		}

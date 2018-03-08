@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: GroupDialog.js 15954 2013-10-17 12:04:36Z mschering $
+ * @version $Id: GroupDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
@@ -17,7 +17,7 @@ GO.groups.GroupDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		
 		Ext.apply(this, {
 			goDialogId:'group',
-			title:GO.groups.lang.group,
+			title:t("group", "groups"),
 			formControllerUrl: 'groups/group',
 			titleField:'name',
 			height:600
@@ -56,7 +56,7 @@ GO.groups.GroupDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 				anchor: '100%',
 				maxLength: 100,
 				allowBlank:false,
-				fieldLabel: GO.lang.strName
+				fieldLabel: t("Name")
 			}
 			]				
 		});
@@ -65,7 +65,7 @@ GO.groups.GroupDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 //      this.adminOnlyCheckBox = new Ext.ux.form.XCheckbox({
 //          name: 'admin_only',
 //          checked: false,
-//          boxLabel: GO.groups.lang.adminOnlyLabel,
+//          boxLabel: t("adminOnlyLabel", "groups"),
 //          hideLabel:true
 //      });
 //      this.propertiesPanel.height=60;
@@ -78,15 +78,16 @@ GO.groups.GroupDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
     
     this.borderPanel = new Ext.Panel({
       layout:'border',
-      title:GO.lang['strProperties'],	
+      title:t("Properties"),	
       items:[this.propertiesPanel, this.userGrid]
     });
 
 		var levelLabels = {};
-		levelLabels[GO.permissionLevels.read]=GO.groups.lang.use;
+		levelLabels[GO.permissionLevels.read]=t("use", "groups");
 
     this.permissionsPanel = new GO.grid.PermissionsPanel({
-      title:GO.groups.lang.managePermissions,
+			fieldName: 'aclId',
+      title:t("managePermissions", "groups"),
 			levels:[GO.permissionLevels.read,GO.permissionLevels.manage],
 			levelLabels:levelLabels
     });
@@ -98,7 +99,7 @@ GO.groups.GroupDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		
 		if(GO.settings.modules.modules.permission_level){
 			this.modulePermissionsGrid = new GO.grid.ModulePermissionsGrid({
-				title: GO.groups.lang['modulePermissions'],
+				title: t("modulePermissions", "groups"),
 				storeUrl: GO.url('modules/module/permissionsStore'),
 				paramIdType: 'groupId',
 				disabled:true

@@ -189,7 +189,7 @@ function user_row_groupoffice($username, $password, $user_id=false)
 	$godb=get_godb();
 	
 
-	$sql = "SELECT username,email,id,password FROM go_users WHERE enabled=1 AND ";
+	$sql = "SELECT username,email,id,password FROM core_user WHERE enabled=1 AND ";
 
 	if($user_id)	
 	{
@@ -221,7 +221,7 @@ function user_row_groupoffice($username, $password, $user_id=false)
 //		$gorow['username']=substr($gorow['username'],0,$adpos);
 //
 //		//check for a duplicate user in GO.
-//		$sql = "SELECT id FROM go_users WHERE username='".$db->sql_escape(utf8_clean_string($gorow['username']))."'";
+//		$sql = "SELECT id FROM core_user WHERE username='".$db->sql_escape(utf8_clean_string($gorow['username']))."'";
 //		$result = $godb->sql_query($sql);
 //		if($godb->sql_fetchrow($result)){
 //			//duplicate found append the id

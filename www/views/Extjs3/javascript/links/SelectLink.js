@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: SelectLink.js 21503 2017-10-03 07:12:38Z mschering $
+ * @version $Id: SelectLink.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -39,7 +39,7 @@ GO.form.SelectLink = function(config){
 		triggerAction:'all',
 		width:400,
 		selectOnFocus:false,
-		fieldLabel:GO.lang.cmdLink,
+		fieldLabel:t("Link"),
 		enableKeyEvents:true
 	});
 		

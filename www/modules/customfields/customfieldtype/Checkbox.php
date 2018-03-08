@@ -10,7 +10,7 @@ class Checkbox extends AbstractCustomfieldtype{
 	}
 	
 	public function formatDisplay($key, &$attributes, \GO\Customfields\Model\AbstractCustomFieldsRecord $model) {
-		return !empty($attributes[$key]) ? \GO::t('yes') : \GO::t('no');
+		return !empty($attributes[$key]) ? \GO::t("Yes") : \GO::t("No");
 	}
 	
 	public function formatFormInput($key, &$attributes, \GO\Customfields\Model\AbstractCustomFieldsRecord $model) {

@@ -2,14 +2,10 @@
 
 GO.query.CriteriaFormPanel = Ext.extend(Ext.form.FormPanel , {
 	
-	style: {
-		border: '1px solid black',
-		marginTop: '5px',
-		marginBottom: '0px',
-		marginRight: '0px',
-		marginLeft: '5px'
-	},
-
+	cls: 'go-form-panel',
+	labelAlign: 'top',
+	layout: 'hbox',
+	
 	andorStore: new Ext.data.ArrayStore({
 		idIndex:0,
 		fields: ['value'],
@@ -41,79 +37,65 @@ GO.query.CriteriaFormPanel = Ext.extend(Ext.form.FormPanel , {
 		]
 	}),
 	
-	constructor: function (config) {
-		if(!config) {
-			config = {};
-		}
-		if(!config.items) {
-			config.items = [];
-		}
-		
-		GO.query.CriteriaFormPanel.superclass.constructor.call(this, config);
-	},
-	
 	initComponent: function(){
 		
-		this.items.push(new Ext.ux.form.XCheckbox({
-			fieldLabel: GO.lang.queryStartGroup,
-			name: 'start_group'
-		}));
+		var removeBtn = this.items[0];
 		
-		this.items.push(new GO.form.ComboBox({
-				hiddenName: 'andor',
-				store: this.andorStore,
-				value: 'AND',
-				anchor:'100%',
-				valueField:'value',
-				displayField:'value',
-				name:'query_operator',
-				fieldLabel: GO.lang.queryAnd+' / '+GO.lang.queryOr,
-				mode: 'local',
-				triggerAction: 'all',
-				editable: false,
-				selectOnFocus:true,
-				forceSelection:true
-			}));
-
-		this.items.push(this.fieldComboBox = new GO.form.ComboBox({
-					store: this.fieldStore,
-					fieldLabel: GO.lang.queryField,
-					hiddenName: 'field',
-//					dataIndex: 'comparator',
-					valueField:'name',
-					anchor:'100%',
-					displayField:'label',
-					mode: 'local',
-					triggerAction: 'all',
-					editable: true,
-					selectOnFocus:true,
-					forceSelection:true,
-					listeners:{
-						scope:this,
-						select:function(combo,record){
-							this.setValueField(record.get('gotype'), record.get('name'));
-						}
-					}
-				}));	
-				
-		this.items.push(new GO.form.ComboBox({
-			hiddenName: 'comparator',
-			store: this.operatorType,
-			fieldLabel: GO.lang.queryComparator,
-			value: 'LIKE',
+		this.items = [removeBtn,new Ext.ux.form.XCheckbox({
+			fieldLabel: t("Start group"),
+			name: 'start_group'
+		}),
+		new GO.form.ComboBox({
+			hiddenName: 'andor',
+			store: this.andorStore,
+			value: 'AND',
 			valueField:'value',
-			displayField:'value',				
-			width: 60,
+			displayField:'value',
+			width: dp(75),
+			name:'query_operator',
+			fieldLabel: t("And")+' / '+t("Or"),
 			mode: 'local',
 			triggerAction: 'all',
 			editable: false,
 			selectOnFocus:true,
 			forceSelection:true
-			}));	
-			
-			this.items.push(this.fieldGotype = new Ext.form.Hidden({
-				name: 'gotype'
-			}));
+		}),
+		this.fieldComboBox = new GO.form.ComboBox({
+			store: this.fieldStore,
+			fieldLabel: GO.lang.queryField,
+			hiddenName: 'field',
+			valueField:'name',
+			displayField:'label',
+			mode: 'local',
+			triggerAction: 'all',
+			editable: true,
+			selectOnFocus:true,
+			forceSelection:true,
+			listeners:{
+				scope:this,
+				select:function(combo,record){
+					this.setValueField(record.get('gotype'), record.get('name'));
+				}
+			}
+		}),
+		new GO.form.ComboBox({
+			hiddenName: 'comparator',
+			store: this.operatorType,
+			fieldLabel: t("Comparator"),
+			value: 'LIKE',
+			valueField:'value',
+			displayField:'value',				
+			width: 70,
+			listWidth: 140,
+			mode: 'local',
+			triggerAction: 'all',
+			editable: false,
+			selectOnFocus:true,
+			forceSelection:true
+		}),
+		this.fieldGotype = new Ext.form.Hidden({
+			name: 'gotype'
+		})];
 
 		GO.query.CriteriaFormPanel.superclass.initComponent.call(this);
 	},
@@ -133,12 +115,12 @@ GO.query.CriteriaFormPanel = Ext.extend(Ext.form.FormPanel , {
 		
 		if(this.fieldComboBox.getValue()) {			
 			
-				var records = this.fieldComboBox.store.query(this.fieldComboBox.valueField, new RegExp('^' + Ext.escapeRe(String(this.fieldComboBox.getValue())) + '$'));
-				var record = records.items[0]
-				
-				var field = this.setValueField(record.get('gotype'), record.get('name'));
-				field.setValue(values.value);
-			}
+			var records = this.fieldComboBox.store.query(this.fieldComboBox.valueField, new RegExp('^' + Ext.escapeRe(String(this.fieldComboBox.getValue())) + '$'));
+			var record = records.items[0]
+
+			var field = this.setValueField(record.get('gotype'), record.get('name'));
+			field.setValue(values.value);
+		}
 		
 	},
 
@@ -147,11 +129,10 @@ GO.query.CriteriaFormPanel = Ext.extend(Ext.form.FormPanel , {
 		if(this.currentValueEditor) {
 			this.remove(this.currentValueEditor);
 		}
-		
-		
-		this.currentValueEditor = Ext.create(GO.base.form.getFormFieldByType(gotype, colName, {name: 'value', hiddenName: 'value', fieldLabel: GO.lang.queryValue, anchor:'100%'}));
-		
-		
+
+		this.currentValueEditor = Ext.create(GO.base.form.getFormFieldByType(gotype, colName, 
+		{name: 'value', hiddenName: 'value', fieldLabel: t("Value"), flex:'1'}));
+
 		// if it is a superboxselect / Multie select swites to combo!!!
 		if(this.currentValueEditor.xtype == 'superboxselect') {
 			
@@ -161,11 +142,9 @@ GO.query.CriteriaFormPanel = Ext.extend(Ext.form.FormPanel , {
 				colName = colName.substr(dotIndex,colName.length-dotIndex);
 			}
 			var customfield = GO.customfields.columnMap[colName]
-			
-			
+
 			customfield.multiselect = 0;
-			this.currentValueEditor = GO.customfields.dataTypes["GO\\Customfields\\Customfieldtype\\Select"].getFormField(customfield, {name: 'value',fieldLabel: GO.lang.queryValue, anchor:'100%'});
-			
+			this.currentValueEditor = GO.customfields.dataTypes["GO\\Customfields\\Customfieldtype\\Select"].getFormField(customfield, {name: 'value',fieldLabel: t("Value"), anchor:'100%'});
 			
 		}
 		

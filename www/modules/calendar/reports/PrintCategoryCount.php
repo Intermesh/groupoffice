@@ -99,7 +99,7 @@ class PrintCategoryCount  extends \GO\Base\Util\Pdf {
 
 	public function render($model){
 		$this->AddPage();
-		$this->printBlockHeader(sprintf(\GO::t('printTimeFormat','calendar'),$model->startDate,$model->endDate));
+		$this->printBlockHeader(sprintf(\GO::t("From %s till %s", "calendar"),$model->startDate,$model->endDate));
 		$this->Ln(15);		
 		$this->htmlTable($model->getHeaders(),$model->getRows(),$model->getTotals());
 	}

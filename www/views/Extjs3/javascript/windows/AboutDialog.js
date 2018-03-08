@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: AboutDialog.js 15395 2013-08-06 10:18:32Z mschering $
+ * @version $Id: AboutDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -42,10 +42,10 @@ GO.dialog.AboutDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 			width: 480,
 			resizable: false,
 			closeAction:'hide',
-			title:GO.lang.strAbout.replace('{product_name}', GO.settings.config.product_name),
+			title:t("About Group-Office").replace('{product_name}', GO.settings.config.product_name),
 			buttons: [
 				{				
-					text: GO.lang['cmdClose'],
+					text: t("Close"),
 					handler: function(){this.hide()},
 					scope:this
 				}
@@ -78,22 +78,22 @@ GO.dialog.AboutDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 					hidden:true,
 					style:'margin-top:10px',
 					xtype:'fieldset',
-					title:GO.lang.usage_text,
+					title:t("This Group-Office installation is using"),
 					items:[
 						new GO.form.PlainField({
-							fieldLabel:GO.lang.files,
+							fieldLabel:t("Files"),
 							name:'file_storage_usage'
 						}),
 						new GO.form.PlainField({
-							fieldLabel:GO.lang.database,
+							fieldLabel:t("Database"),
 							name:'database_usage'
 						}),
 						new GO.form.PlainField({
-							fieldLabel:GO.lang.email,
+							fieldLabel:t("E-mail"),
 							name:'mailbox_usage'
 						}),
 						new GO.form.PlainField({
-							fieldLabel:GO.lang.total,
+							fieldLabel:t("Total"),
 							name:'total_usage'
 						})						
 					]					

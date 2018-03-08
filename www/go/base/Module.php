@@ -34,13 +34,13 @@ class Module extends Observable {
 	
 	const PACKAGE_UNSUPPORTED = '3rd party (Not supported by Intermesh)';
 	
-	const PACKAGE_COMMUNITY = 'Community (AGPL)';
+	const PACKAGE_COMMUNITY = 'Community';
 	
 	const PACKAGE_CUSTOM = 'Custom made';
 	
 	const PACKAGE_IN_DEVELOPMENT = 'In development';
 
-	private $_id;
+	private $_name;
 	/**
 	 * Get the id of the module which is identical to 
 	 * the folder name in the modules folder.
@@ -48,20 +48,17 @@ class Module extends Observable {
 	 * eg. notes, calendar  etc.
 	 * @return StringHelper 
 	 */
-	public function id() {
+	public function name() {
 		
-		if(!isset($this->_id)){
+		if(!isset($this->_name)){
 			$className = get_class($this);
 
 			$arr = explode('\\', $className);
-			$this->_id=strtolower($arr[1]);
+			$this->_name=strtolower($arr[1]);
 		}
-		return $this->_id;
+		return $this->_name;
 	}
 	
-	public function setId($id){
-		$this->_id=$id;
-	}
 	
 	/**
 	 * Get the absolute filesystem path to the module.
@@ -69,7 +66,7 @@ class Module extends Observable {
 	 * @return StringHelper 
 	 */
 	public function path(){
-		return \GO::config()->root_path . 'modules/' . $this->id() . '/';
+		return \GO::config()->root_path . 'modules/' . $this->name() . '/';
 	}
 
 	/**
@@ -77,10 +74,10 @@ class Module extends Observable {
 	 * 
 	 * @return String 
 	 */
-	public function name() {
-		$name = \GO::t('name', $this->id());
+	public function localizedName() {
+		$name = \GO::t('name', $this->name());
 		if($name=='name')
-			$name = $this->id();
+			$name = $this->name();
 		return $name;
 	}
 	
@@ -96,7 +93,7 @@ class Module extends Observable {
 			$icon = $this->_findIconByTheme("Default");
 		
 		if(!$icon)
-			$icon = \GO::config()->host.'views/Extjs3/themes/Default/images/16x16/unknown.png';
+			$icon = \GO::config()->host.'views/Extjs3/themes/Paper/img/default-avatar.svg';
 		
 		return $icon;
 	}
@@ -107,10 +104,10 @@ class Module extends Observable {
 	
 	private function _findIconByTheme($theme){
 		$path = $this->path();
-		if(file_exists($path.'/themes/'.$theme.'/images/'.$this->id().'.png')){
-			return \GO::config()->host.'modules/'.$this->id().'/themes/'.$theme.'/images/'.$this->id().'.png';
-		}elseif(file_exists($path.'views/Extjs3/themes/'.$theme.'/images/'.$this->id().'.png')){
-			return \GO::config()->host.'modules/'.$this->id().'/views/Extjs3/themes/'.$theme.'/images/'.$this->id().'.png';
+		if(file_exists($path.'/themes/'.$theme.'/images/'.$this->name().'.png')){
+			return \GO::config()->host.'modules/'.$this->name().'/themes/'.$theme.'/images/'.$this->name().'.png';
+		}elseif(file_exists($path.'views/Extjs3/themes/'.$theme.'/images/'.$this->name().'.png')){
+			return \GO::config()->host.'modules/'.$this->name().'/views/Extjs3/themes/'.$theme.'/images/'.$this->name().'.png';
 		}  else {
 			return false;
 		}
@@ -122,7 +119,7 @@ class Module extends Observable {
 	 * @return String 
 	 */
 	public function description() {
-		return \GO::t('description', $this->id());
+		return \GO::t('description', $this->name());
 	}
 	
 	/**
@@ -219,16 +216,16 @@ class Module extends Observable {
 	/**
 	 * Find the module manager class by id.
 	 * 
-	 * @param StringHelper $moduleId eg. "addressbook"
+	 * @param StringHelper $name eg. "addressbook"
 	 * @return \Module|boolean 
 	 */
-	public static function findByModuleId($moduleId){
-		$className = 'GO\\'.ucfirst($moduleId).'\\'.ucfirst($moduleId).'Module';
+	public static function findByModuleName($name){
+		$className = 'GO\\'.ucfirst($name).'\\'.ucfirst($name).'Module';
 		if(class_exists($className))
 			return new $className;
 		else{
 			$modMan =  new Module();
-			$modMan->setId($moduleId);
+			$modMan->name = $name;
 			return $modMan;
 		}
 	}
@@ -254,7 +251,7 @@ class Module extends Observable {
 				
 				$moduleNames = array();
 				foreach($depends as $moduleId){
-					$modManager = Module::findByModuleId($moduleId);
+					$modManager = Module::findByModuleName($moduleId);
 					$moduleNames[]=$modManager ? $modManager->name () : $moduleId;
 				}				
 				
@@ -439,7 +436,7 @@ class Module extends Observable {
 	 */
 	public function buildSearchCache(&$response){		
 		
-		$response[]  = "Building search cache for ".$this->id()."\n";		
+		$response[]  = "Building search cache for ".$this->name()."\n";		
 				
 		$models=$this->getModels();
 
@@ -461,7 +458,7 @@ class Module extends Observable {
 		
 		//echo "<pre>";
 		
-		echo "Checking database for ".$this->id()."\n";		
+		echo "Checking database for ".$this->name()."\n";		
 				
 		$models=$this->getModels();
 		
@@ -527,7 +524,7 @@ class Module extends Observable {
 					$subParts = explode('/', $subfolder);
 					$subParts=array_map("ucfirst", $subParts);
 					
-					$className = 'GO\\'.ucfirst($this->id()).'\\'.implode('\\',$subParts).'\\'.$item->nameWithoutExtension();			
+					$className = 'GO\\'.ucfirst($this->name()).'\\'.implode('\\',$subParts).'\\'.$item->nameWithoutExtension();			
 					if(class_exists($className)){
 						$reflectionClass = new \ReflectionClass($className);
 						if(!$reflectionClass->isAbstract())

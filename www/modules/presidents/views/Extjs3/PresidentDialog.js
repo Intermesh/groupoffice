@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: PresidentDialog.js 17133 2014-03-20 08:25:24Z mschering $
+ * @version $Id: PresidentDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -20,7 +20,7 @@ GO.presidents.PresidentDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		Ext.apply(this, {
 			titleField:'lastname',
 			goDialogId:'president',
-			title:GO.presidents.lang.president,
+			title:t("President", "presidents"),
 			width: 300,
 			height: 280,
 			formControllerUrl: 'presidents/president'
@@ -32,7 +32,7 @@ GO.presidents.PresidentDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 	buildForm : function () {
 
 		this.propertiesPanel = new Ext.Panel({
-			title:GO.lang.strProperties,			
+			title:t("Properties"),			
 			cls:'go-form-panel',
 			layout:'form',
 			items:[{
@@ -42,20 +42,20 @@ GO.presidents.PresidentDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 				anchor: '100%',
 				maxLength: 100,
 				allowBlank:false,
-				fieldLabel: GO.presidents.lang.firstname
+				fieldLabel: t("First name", "presidents")
 			},
 			{
 				xtype: 'textfield',
 				name: 'lastname',
-				fieldLabel: GO.presidents.lang.lastname,
+				fieldLabel: t("Last name", "presidents"),
 				anchor: '100%'
 			},
 			{
 				xtype:'combo',
-				fieldLabel: GO.presidents.lang.party_id,
+				fieldLabel: t("Party", "presidents"),
 				hiddenName:'party_id',
 				anchor:'100%',
-				emptyText:GO.lang.strPleaseSelect,
+				emptyText:t("Please select..."),
 				store: new GO.data.JsonStore({
 					url: GO.url('presidents/party/store'),
 					baseParams: {
@@ -73,14 +73,14 @@ GO.presidents.PresidentDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			{
 				xtype: 'datefield',
 				name: 'tookoffice',
-				fieldLabel: GO.presidents.lang.tookoffice,
+				fieldLabel: t("Entering Office", "presidents"),
 				allowBlank: false,
 				anchor: '100%'
 			},
 			{
 				xtype: 'datefield',
 				name: 'leftoffice',
-				fieldLabel: GO.presidents.lang.leftoffice,
+				fieldLabel: t("Leaving Office", "presidents"),
 				//format: GO.settings['date_format'],			    
 				allowBlank: false,
 				anchor: '100%'
@@ -89,7 +89,7 @@ GO.presidents.PresidentDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 				xtype: 'numberfield',
 				name: 'income',
 				value: GO.util.numberFormat(0),
-				fieldLabel: GO.presidents.lang.income,   
+				fieldLabel: t("Income", "presidents"),   
 				allowBlank: false,
 				anchor: '100%'
 			},

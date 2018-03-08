@@ -9,7 +9,7 @@ GO.base.model.ImportPanel = Ext.extend(Ext.Panel, {
 	
 	initComponent : function(){
 		Ext.apply(this, {
-			title:GO.lang.cmdImport,
+			title:t("Import"),
 			layout: 'form',
 			items: [],
 			defaults: {anchor:'100%'},
@@ -58,21 +58,21 @@ GO.base.model.ImportPanel = Ext.extend(Ext.Panel, {
 		
 		this.txtDelimiter = new Ext.form.TextField({
 			name: 'delimiter',
-			fieldLabel: GO.addressbook.lang.cmdFormLabelValueSeperated,
+			fieldLabel: t("Values separated by", "addressbook"),
 			allowBlank: false,
 			value: GO.settings.list_separator
 		});
 		
 		this.txtEnclosure = new Ext.form.TextField({
 			name: 'enclosure',
-			fieldLabel: GO.addressbook.lang.cmdFormLabelValueIncluded,
+			fieldLabel: t("Values encapsulated by", "addressbook"),
 			allowBlank: false,
 			value: GO.settings.text_separator
 		});
 		
 		this.cmbFileType = new GO.form.ComboBox({
 			hiddenName: 'fileType',
-			fieldLabel: GO.addressbook.lang.cmdFormLabelFileType,
+			fieldLabel: t("File type", "addressbook"),
 			store: this.fileTypeStore,
 			valueField:'value',
 			displayField:'label',
@@ -83,7 +83,7 @@ GO.base.model.ImportPanel = Ext.extend(Ext.Panel, {
 		
 		this.cmbController = new GO.form.ComboBox({
 			hiddenName: 'controller',
-			fieldLabel: GO.lang.cmdImport,
+			fieldLabel: t("Import"),
 			store: this.controllersStore,
 			valueField:'value',
 			displayField:'label',
@@ -94,7 +94,7 @@ GO.base.model.ImportPanel = Ext.extend(Ext.Panel, {
 		
 		this.fileSelector = new GO.form.UploadFile({
 			inputName: 'files',
-			fieldLabel: GO.lang.upload,
+			fieldLabel: t("Upload"),
 			max:1
 		});
 

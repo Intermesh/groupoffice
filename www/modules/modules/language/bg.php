@@ -1,14 +1,15 @@
 <?php
-$l["modules"]='Модули';
-$l["cmdSaveChanges"]= 'Запис на промените';
-$l["cmdInstall"]= 'Инсталиране';
-$l["cmdUninstall"]= 'Деинсталиране';
-$l["cmdAvailableModules"]= 'Налични модули';
-$l["cmdModuleName"]= 'Име на модул';
-$l["cmdModuleDescription"]= 'Описание';
-$l["cmdGridColumnModuleName"]= 'Име на модул';
-$l["cmdUninstallMessage"]= 'ПРЕДУПРЕЖДЕНИЕ! Всички данни на този модул ще бъдат изтрити! Сигурни ли сте, че желаете да деинсталирате модул "{0}" ?';
-$l["cmdModulesCannotBeDeleted"]= 'Модул "Модули" не може да бъде изтрит!';
-$l['name'] = 'Модули';
-$l['description'] = 'Административен модул; Управление на модули.';
-$l['deleteModule'] = 'Модул "Модули" не може да бъде изтрит!';
+return array (
+  'Save changes' => 'Запис на промените',
+  'Install' => 'Инсталиране',
+  'Uninstall' => 'Деинсталиране',
+  'Available Modules' => 'Налични модули',
+  'Module name' => 'Име на модул',
+  'Description' => 'Описание',
+  'WARNING! All data of this module will be deleted! Are you sure you want to uninstall the "{0}" module?' => 'ПРЕДУПРЕЖДЕНИЕ! Всички данни на този модул ще бъдат изтрити! Сигурни ли сте, че желаете да деинсталирате модул "{0}" ?',
+  'The module "Modules" cannot be deleted!.' => 'Модул "Модули" не може да бъде изтрит!',
+  'The module "Modules" cannot be deleted!' => 'Модул "Модули" не може да бъде изтрит!',
+  'name' => 'Модули',
+  'description' => 'Административен модул; Управление на модули.',
+  'Modules' => 'Модули',
+);

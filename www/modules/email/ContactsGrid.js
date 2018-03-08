@@ -25,26 +25,26 @@ GO.email.ContactsGrid = function(config){
 			css : 'white-space:normal;'
 		},
 		columns : [{
-			header : GO.lang['strName'],
+			header : t("Name"),
 			dataIndex : 'name'			
 		}, {
-			header : GO.lang['strEmail'],
+			header : t("E-mail"),
 			dataIndex : 'email'			
 		},{
-			header : GO.lang.strCompany,
+			header : t("Company"),
 			dataIndex : 'company_name',
 			css : 'white-space:normal;',
 			sortable : true
 		},{
-			header : GO.addressbook.lang.addressbook,
+			header : t("Address book", "addressbook"),
 			dataIndex : 'ab_name',
 			css : 'white-space:normal;',
 			sortable : false
 		},{
-			header : GO.lang.strDepartment,
+			header : t("Department"),
 			dataIndex : 'department'
 		},{
-			header : GO.lang.strFunction,
+			header : t("Function"),
 			dataIndex : 'function'
 		}]
 	});
@@ -53,7 +53,7 @@ GO.email.ContactsGrid = function(config){
 	config.view=new Ext.grid.GridView({
 		autoFill: true,
 		forceFit: true,
-		emptyText: GO.lang.pleaseEnterQuery,
+		emptyText: t("Please enter a search query"),
 		deferEmptyText: false
 	});
 	
@@ -70,11 +70,11 @@ GO.email.ContactsGrid = function(config){
 	});
 	
 	this.contactsSearchField.on("search", function(){
-		this.getView().emptyText=GO.lang['strNoItems'];
+		this.getView().emptyText=t("No items to display");
 	}, this);
 	
 	this.contactsSearchField.on("reset", function(){
-		this.getView().emptyText=GO.lang.pleaseEnterQuery;
+		this.getView().emptyText=t("Please enter a search query");
 		this.store.removeAll();
 		//cancel store load
 		return false;
@@ -82,7 +82,7 @@ GO.email.ContactsGrid = function(config){
 	
 	
 
-	config.tbar=[GO.lang['strSearch'] + ': ', ' ', this.contactsSearchField];
+	config.tbar=[t("Search") + ': ', ' ', this.contactsSearchField];
 
 	GO.email.ContactsGrid.superclass.constructor.call(this, config);
 

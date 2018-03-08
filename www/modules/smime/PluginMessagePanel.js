@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: PluginMessagePanel.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: PluginMessagePanel.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -45,14 +45,14 @@ GO.moduleManager.onModuleReady('email',function(){
 									
 				if(data.smime_encrypted){
 					var el = this.body.down(".message-header").createChild({													
-						html:GO.smime.lang.messageEncrypted,													
+						html:t("This message was sent to you encrypted.", "smime"),													
 						cls:'smi-encrypt-notification'
 					});
 				}
 									
 				if(data.smime_signed){
 					this.smimeLink = this.body.down(".message-header").createChild({													
-						html:GO.smime.lang.messageSigned,
+						html:t("This message is digitally signed. Click here to verify the signature and import the certificate.", "smime"),
 						cls:'smi-sign-notification'
 													
 					});
@@ -67,7 +67,7 @@ GO.moduleManager.onModuleReady('email',function(){
 			if(!hideDialog){
 				if(!this.certWin){
 					this.certWin = new GO.Window({
-						title:GO.smime.lang.smimeCert,
+						title:t("SMIME Certificate", "smime"),
 						width:500,
 						height:300,
 						closeAction:'hide',

@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: PermissionsPanel.js 19015 2015-04-21 08:15:50Z michaelhart86 $
+ * @version $Id: PermissionsPanel.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -20,7 +20,7 @@ GO.users.PermissionsPanel = function(config)
 	
     config.autoScroll=false;
     config.hideLabel=true;
-    config.title = GO.lang['strPermissions'];
+    config.title = t("Permissions");
     config.layout='columnfit';
     config.anchor='100% 100%';
 	
@@ -31,9 +31,9 @@ GO.users.PermissionsPanel = function(config)
     };
 	
 		this.moduleAccessGrid = new GO.grid.ModulePermissionsGrid({
-			title: GO.users.lang.moduleAccess,
+			title: t("Module access", "users"),
 			storeUrl: GO.url('modules/module/permissionsStore'),
-			columnWidth: .4,
+			columnWidth: .5,
 			layout:'fit',
 			paramIdType: 'userId'
 		});
@@ -62,13 +62,13 @@ GO.users.PermissionsPanel = function(config)
     });
 	
     var groupMemberGrid = new GO.grid.GridPanel({
-        columnWidth: .3,
+        columnWidth: .5,
         layout:'fit',
-        title: GO.users.lang.userIsMemberOf,
+        title: t("User is member of", "users"),
         columns: [
         {
             id:'name',
-            header: GO.users.lang.group,
+            header: t("Group", "users"),
             dataIndex: 'name',
             menuDisabled:true
         },
@@ -86,52 +86,11 @@ GO.users.PermissionsPanel = function(config)
 	
 	
 	
-    /* group visible grid */
 	
-    var groupsVisibleToColumn = new GO.grid.CheckColumn({
-        header: '',
-        dataIndex: 'selected',
-        width: 55,
-        menuDisabled:true
-    });
-	
-	
-	
-    this.groupVisibleStore = new GO.data.JsonStore({
-        url:GO.url('users/user/visibleGroupStore'),
-        baseParams: {
-            user_id: -1,
-			limit: 0
-        },
-        fields: ['id', 'disabled', 'name', 'selected'],
-        root: 'results'
-    });
-	
-    var groupVisibleGrid = new GO.grid.GridPanel({
-        columnWidth: .3,
-        layout:'fit',
-        title: GO.users.lang.userVisibleTo,
-        columns: [
-        {
-            id:'name',
-            header: GO.users.lang.group,
-            dataIndex: 'name',
-            menuDisabled:true
-        },
-        groupsVisibleToColumn
-        ],
-        ds: this.groupVisibleStore,
-        plugins: groupsVisibleToColumn,
-        autoExpandColumn:'name'
-    });
-	
-	
-    /* end group visible grid */
 
     config.items=[
     this.moduleAccessGrid,
-    groupMemberGrid,
-    groupVisibleGrid];
+    groupMemberGrid];
 	
 
     GO.users.PermissionsPanel.superclass.constructor.call(this, config);
@@ -145,13 +104,9 @@ Ext.extend(GO.users.PermissionsPanel, Ext.Panel,{
         if(!this.isVisible() && user_id!=this.user_id)
         {
             this.groupMemberStore.removeAll();
-            //this.modulePermissionsStore.removeAll();
-            this.groupVisibleStore.removeAll();
-			
             //this.modulePermissionsStore.baseParams.user_id=-1;
 						this.moduleAccessGrid.setIdParam(-1);
             this.groupMemberStore.baseParams.user_id=-1;
-            this.groupVisibleStore.baseParams.user_id=-1;
         }
         this.user_id=user_id;
 				
@@ -167,11 +122,9 @@ Ext.extend(GO.users.PermissionsPanel, Ext.Panel,{
 					this.moduleAccessGrid.setIdParam(this.user_id);
           //this.modulePermissionsStore.baseParams.user_id=this.user_id;
 					this.groupMemberStore.baseParams.user_id=this.user_id;
-					this.groupVisibleStore.baseParams.user_id=this.user_id;
 
           this.groupMemberStore.load();
           this.moduleAccessGrid.store.load();
-					this.groupVisibleStore.load();
         }
     },
 
@@ -179,7 +132,6 @@ Ext.extend(GO.users.PermissionsPanel, Ext.Panel,{
 			this.moduleAccessGrid.store.commitChanges();
 			this.moduleAccessGrid.show();
 			this.groupMemberStore.commitChanges();
-			this.groupVisibleStore.commitChanges();
 		},
 	
     getPermissionParameters : function(){
@@ -187,7 +139,6 @@ Ext.extend(GO.users.PermissionsPanel, Ext.Panel,{
 		
 //        var modulePermissions = new Array();
         var memberGroups = new Array();
-        var visibleGroups = new Array();
 		 
 //        for (var i = 0; i < this.modulePermissionsStore.data.items.length;  i++)
 //        {
@@ -209,21 +160,10 @@ Ext.extend(GO.users.PermissionsPanel, Ext.Panel,{
                 selected: this.groupMemberStore.data.items[i].get('selected')
             };
         }
-
-        for (var i = 0; i < this.groupVisibleStore.data.items.length;  i++)
-        {
-            visibleGroups[i] =
-            {
-                id: this.groupVisibleStore.data.items[i].get('id'),
-                group: this.groupVisibleStore.data.items[i].get('name'),
-                selected: this.groupVisibleStore.data.items[i].get('selected')
-            };
-        }
 	
 	
         return {
-            modules : this.moduleAccessGrid.getPermissionData(),
-            groups_visible : Ext.encode(visibleGroups),
+            modules : this.moduleAccessGrid.getPermissionData(),            
             group_member : Ext.encode(memberGroups)
         };
     }

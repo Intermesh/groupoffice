@@ -28,7 +28,7 @@ class ViesDown extends \Exception
 
 	public function __construct($message='') {
 		
-		$message = empty($message) ? \GO::t('viesDownException') : \GO::t('viesDownException')."\n\n".$message;
+		$message = empty($message) ? \GO::t("The VIES service is down. You can complete your order but you can only pay when we have manually checked your Vies number.") : \GO::t("The VIES service is down. You can complete your order but you can only pay when we have manually checked your Vies number.")."\n\n".$message;
 		
 		parent::__construct($message);
 	}

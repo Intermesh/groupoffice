@@ -6,10 +6,14 @@
 	background-image: none !important;
 }
 
+#go-module-panel-bookmarks .x-panel-body{
+	background-color: white;
+}
+
 
 .categorie {
 	clear: both;
-	font: 14px Arial, Helvetica, sans-serif;
+	font-size: 14px;
   color: #333333;
 	margin-left: 6px;
 	padding-top: 10px;
@@ -25,15 +29,12 @@ cursor:pointer;
 .thumbnails {
 	background: transparent;
 	font-size: 11px;
+	padding: 8px 16px;
 }
-
-
-
-
 
 .thumbnails .x-panel-body{
 	background: transparent ;
-	font: 11px Arial, Helvetica, sans-serif;
+	font-size: 11px;
 }
 .thumbnails .thumb{
 	
@@ -50,10 +51,11 @@ cursor:pointer;
 .thumb-name{
 	/*line-height:40px;*/
 	vertical-align:top;
-	padding-bottom:20px;
-	padding-top:4px;
-	padding-left:30px;
-	background-position: 8px 4px;
+	padding-bottom:16px;
+	padding-top:8px;
+	padding-left:48px;
+	background-position: 0px 8px;
+	 background-size: 24px 24px;
 	background-repeat:no-repeat;
 }
 
@@ -62,9 +64,14 @@ cursor:pointer;
 	float: left;
 	width:300px;
 	height:100px;
+	overflow:hidden;
 	cursor:pointer;
+	overflow:hidden;
 /*	margin: 1px;*/
 }
+.thumbnails .thumb-wrap:hover {
+		background-color: white;
+	}
 
 .thumbnails .thumb-wrap span{
 	display: block;
@@ -82,7 +89,7 @@ cursor:pointer;
 
 .thumbnails .textonly {
 	background: transparent;
-	font: normal 12px tahoma,arial,helvetica,sans-serif;color:#000;white-space:nowrap;cursor:pointer;
+	font-size: 12px;
 }
 
 
@@ -91,8 +98,8 @@ cursor:pointer;
     float:left;
     width:320px;
     padding:0px;
-    border-right: 1px solid #2A9AC9;
-    margin: 10px 0 0 0;
+    border-right: 1px solid #eee;
+    margin: 16px 0 0 0;
 }
 
 .bookmark-column span{
@@ -105,22 +112,27 @@ cursor:pointer;
     color:inherit;
     width:100%;
     padding:5px 10px;
+		
 }
 
 .bookmark-column span.title{
     /*font-weight: bold;*/
     color: #333333;
-    letter-spacing:1px;
-    font-family: Arial, Helvetica, sans-serif;
+    letter-spacing:1px;    
     font-size: 1.2em;
     width:100%;
     text-align:left;
     padding:10px;
+		
 }
 
 .bookmark-column span.thumb{
     background-repeat: no-repeat;
-    padding-left:20px;
+	 background-size: 24px 24px;
+	 background-position: left center;
+    padding-left:40px;
+		line-height: 40px;
+		min-height: 40px;
 }
 
 .bookmark-column span.link.x-view-over{

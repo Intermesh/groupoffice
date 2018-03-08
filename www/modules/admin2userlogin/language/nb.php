@@ -1,8 +1,10 @@
 <?php
-$l['admin2userlogin']='Bytt bruker';
-$l['userId']="ID";
-$l['name']="Bytt bruker";
-$l['description']="Administrator kan bytte til andre brukerkontoer med denne modulen.";
-$l['username']="Bruker";
-$l['lastlogin']="Siste innloggingsforsøk";
-$l['registrationtime']="Registrert";
+return array (
+  'Username' => 'Bruker',
+  'Last login attempt' => 'Siste innloggingsforsøk',
+  'Time Registered' => 'Registrert',
+  'name' => 'Bytt bruker',
+  'description' => 'Administrator kan bytte til andre brukerkontoer med denne modulen.',
+  'Switch user' => 'Bytt bruker',
+  'ID' => 'ID',
+);

@@ -1,14 +1,15 @@
 <?php
-
-$l['name']='Instellingen';
-$l['description']='Met deze module kunnen instellingen van Groupoffice en modules aangepast worden';
-$l['mainTitle'] = 'Instellingen';
-$l['loginScreenText']='Tekst bij inlogscherm';
-$l['text']='Text';
-$l['title']='Title';
-$l['loginTextEnabled']='Schakel tekst in bij inlogscherm';
-$l['notRenamedNoUser']='kon niet worden hernoemd, want het heeft geen eigenaar om naar te vernoemen';
-$l['allRenamingSuccess']='Alle standaardmodellen van gebruikers zijn hernoemd.';
-$l['GO\Addressbook\Model\Addressbook']='Adresboek';
-$l['GO\Tasks\Model\Tasklist']='Takenlijst';
-$l['GO\Calendar\Model\Calendar']='Agenda';
+return array (
+  'Text for login screen' => 'Tekst bij inlogscherm',
+  'Enable login screen text' => 'Schakel tekst in bij inlogscherm',
+  'could not be renamed, because it has no owner to name after' => 'kon niet worden hernoemd, want het heeft geen eigenaar om naar te vernoemen',
+  'All the users\' default models have been renamed succesfully.' => 'Alle standaardmodellen van gebruikers zijn hernoemd.',
+  'Address book' => 'Adresboek',
+  'Task list' => 'Takenlijst',
+  'Calendar' => 'Agenda',
+  'name' => 'Instellingen',
+  'description' => 'Met deze module kunnen instellingen van Groupoffice en modules aangepast worden',
+  'Settings' => 'Instellingen',
+  'Text' => 'Text',
+  'Title' => 'Title',
+);

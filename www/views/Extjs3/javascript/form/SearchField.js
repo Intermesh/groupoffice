@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: SearchField.js 21611 2017-11-02 11:32:30Z mschering $
+ * @version $Id: SearchField.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -47,7 +47,7 @@ GO.form.SearchField = Ext.extend(Ext.form.TwinTriggerField, {
 	width:180,
 	hasSearch : false,
 	paramName : 'query',
-	emptyText: GO.lang.strSearch,
+	emptyText: t("Search"),
 
 	onTrigger1Click : function(){		
 		if(this.hasSearch){

@@ -168,7 +168,8 @@ class Calendar extends \GO\Base\Model\AbstractUserDefaultModel {
 		}
 		if(!empty($defaultUserNames)) {
 			// This is someones default calendar
-			throw new \Exception(strtr(\GO::t('calNotDeletedDefault', 'calendar'), array(':username'=>"<br> - ".implode('<br> - ',$defaultUserNames))));
+			throw new \Exception(strtr(\GO::t("Not deleted!
+This is the default calendar of user :username", "calendar"), array(':username'=>"<br> - ".implode('<br> - ',$defaultUserNames))));
 		}
 		return parent::beforeDelete();
 	}

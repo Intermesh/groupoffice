@@ -21,8 +21,19 @@ class LoginController extends \GO\Base\Controller\AbstractController {
 		
 		$user = \GO\Base\Model\User::model()->findByPk($params['user_id']);
 		
+		$token = \go\core\auth\model\Token::find()->where(['accessToken' => \GO::session()->values['accessToken']])->single();
+		$token->userId = $user->id;
+		if(!$token->save()) {
+			throw new \Exception("Could not set token");
+		}
+		
 		\GO::session()->clear(); //clear session
 		\GO::session()->setCurrentUser($user->id, $oldUser->id);
+		
+		
+		\GO::session()->values['accessToken'] = $token->accessToken;
+		
+		
 		//\GO::session()->setCompatibilitySessionVars();
 		
 		if($debug)

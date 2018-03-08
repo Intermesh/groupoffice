@@ -99,7 +99,7 @@ GO.base.ExportMenu = Ext.extend(Ext.Button,{
 
 		Ext.apply(this, {
 			iconCls: 'btn-export',
-			text: GO.lang.cmdExport,
+			text: t("Export"),
 			menu: new Ext.menu.Menu()
 		});
 
@@ -145,7 +145,7 @@ GO.base.ExportMenu = Ext.extend(Ext.Button,{
 					if(menu.items.length < 1){
 						this.savedExportMenu.addItem(
 							new Ext.menu.Item({
-								text : GO.lang.noSavedExports,
+								text : t("No saved exports available"),
 								disabled: true
 							})
 						);
@@ -158,13 +158,15 @@ GO.base.ExportMenu = Ext.extend(Ext.Button,{
 		});
 
 		this.savedExportsButton = new Ext.menu.Item({
-			text: GO.lang.savedExports,
+			text: t("Saved exports"),
+			iconCls: 'ic-save',
 			menu: this.savedExportMenu,
 			scope: this
 		});
 		
 		this.gridExportButton = new Ext.menu.Item({
-			text: GO.lang.exportScreen,
+			text: t("Currently on screen"),
+			iconCls: 'ic-screen-share',
 			handler: function(item,event){
 
 				if(!GO.base.currentGridExportDialog){
@@ -191,7 +193,7 @@ GO.base.ExportMenu = Ext.extend(Ext.Button,{
 		
 		this.manageExportsButton = new Ext.menu.Item({
 			isManageButton: true,
-			text: GO.lang.manageSavedExports,
+			text: t("Manage saved exports"),
 			handler:function(){
 
 				if(!GO.base.savedExportGridDialog){
@@ -227,15 +229,6 @@ GO.base.ExportMenu = Ext.extend(Ext.Button,{
 		
 		window.open(GO.url("core/export/export", data));
 		
-//		this.hiddenExportWindow.show();
-		
-//		this.hiddenExportForm.form.setValues(data);
-//		this.hiddenExportForm.form.submit({
-//			scope:this
-//		});
-//		this.hiddenExportWindow.hide();
-//
-//		window.open(GO.url("core/export/export",data));
 	}
 	
 });

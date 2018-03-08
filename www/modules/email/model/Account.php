@@ -124,8 +124,8 @@ class Account extends \GO\Base\Db\ActiveRecord {
 	public function attributeLabels() {
 		$attr = parent::attributeLabels();
 		
-		$attr['username']=\GO::t('strUsername');
-		$attr['password']=\GO::t('strPassword');
+		$attr['username']=\GO::t("Username");
+		$attr['password']=\GO::t("Password");
 		
 		return $attr;
 	}

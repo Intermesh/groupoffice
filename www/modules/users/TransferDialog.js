@@ -10,7 +10,7 @@ GO.users.TransferDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			formControllerUrl: 'users/user',
 			createAction : 'transfer',
 			layout: 'fit',
-			height:230,
+			height:240,
 			//enableOkButton: GO.fixdossiers.isManager,
 			enableApplyButton: false,
 			width:400,
@@ -35,7 +35,8 @@ GO.users.TransferDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			items:[
 				{
 					xtype:'displayfield',
-					html: 'Select 2 user accounts to transfer data from one account to the other'
+					html: 'Select 2 user accounts to transfer data from one account to the other',
+					hideLabel: true
 				},
 				new GO.form.SelectUser({
 					hiddenName: 'transfer.id_from'

@@ -7,7 +7,7 @@ GO.dialog.date = Ext.extend(GO.dialog.TabbedFormDialog , {
 	initComponent : function(){
 		
 		Ext.apply(this, {
-			title: GO.lang.date,
+			title: t("Date"),
 			height:310,
 			loadOnNewModel : false,
 			enableApplyButton: false,

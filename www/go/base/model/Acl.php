@@ -19,16 +19,16 @@
  * 
  * Add group to ACL:
  * 
- * replace into go_acl (acl_id, group_id, level) select acl_id,<group_id>,4 from go_users;
+ * replace into go_acl (acl_id, group_id, level) select acl_id,<group_id>,4 from core_user;
  * 
  * @version $Id: Group.php 7607 2011-08-04 13:41:42Z mschering $
  * @copyright Copyright Intermesh BV.
  * @author Merijn Schering <mschering@intermesh.nl>
  * @package GO.base.model
- * @property string $description
- * @property int $user_id
+ * @property string $usedIn
+ * @property int $ownedBy
  * @property int $id
- * @property int $mtime
+ * @property string $modifiedAt
  */
 
 namespace GO\Base\Model;
@@ -62,30 +62,23 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 //			$old = \GO::config()->debug;
 //			
 //			\GO::config()->debug = true;
-//			\GO::debug('ACL '.$this->id.' '.$this->description.' removed');
+//			\GO::debug('ACL '.$this->id.' '.$this->usedIn.' removed');
 //			\GO::debug($_POST);
 //			\GO::debugCalledFrom(10);
 //			
 //			\GO::config()->debug = $old;
 //		}
 		
-		return 'ACL '.$this->description;
+		return 'ACL '.$this->usedIn;
 	}
 
-	protected function init() {
-		
-		$this->columns['user_id']['required']=true;
-		$this->columns['description']['required']=true;
-		
-		return parent::init();
-	}
 	
 	public function relations() {
 		return array(
 				'records' => array(
 						'type'=>self::HAS_MANY, 
 						'model'=>'GO\Base\Model\AclUsersGroups', 
-						'field'=>'acl_id', 
+						'field'=>'aclId', 
 						'delete'=>self::DELETE_CASCADE),
 		);
 	}
@@ -103,7 +96,7 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	public function tableName(){
-		return "go_acl_items";
+		return "core_acl";
 	}
 	
 	/**
@@ -115,6 +108,8 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 	 * @return int Permission level. See constants in Acl for values. 
 	 */
 	public static function getUserPermissionLevel($aclId, $userId=false, $checkGroupPermissionOnly=false) {
+		
+		
 		
 		//only ignore when no explicit user is checked. Otherwise you can never check the real permissionlevel when \GO::$ignoreAclPermissions is set to true.
 		if(\GO::$ignoreAclPermissions && $userId===false)
@@ -128,21 +123,21 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 		}
 		
 		$bindParams = array(':acl_id'=>$aclId, ':user_id1'=>$userId);
-		$where = 't.acl_id=:acl_id AND (ug.user_id=:user_id1';
-		if (!$checkGroupPermissionOnly){		
-			$bindParams[':user_id2'] = $userId;		
-			$where .= " OR t.user_id=:user_id2)";			
-		}else
-			$where .= ")";
-
+		$where = 't.aclId=:acl_id AND ug.userId=:user_id1';
+		
 		
 		$findParams=array(
-			'join'=>"LEFT JOIN go_users_groups ug ON t.group_id=ug.group_id",
+			'join'=>"LEFT JOIN core_user_group ug ON t.groupId=ug.groupId",
 			'where'=>$where,
 			'order'=>'t.level',
 			'orderDirection'=>'DESC',
 			'bindParams'=>$bindParams
 		);
+		
+		if($checkGroupPermissionOnly) {
+			$findParams['join'] .= ' INNER JOIN core_group g ON ug.groupId = g.id';
+			$findParams['where'] .= ' AND isUserGroupFor IS NULL';
+		}
 		
 		$model = AclUsersGroups::model()->findSingle($findParams);
 		if($model)
@@ -162,41 +157,7 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 		return Acl::getUserPermissionLevel($this->id, $userId);
 	}
 
-	/**
-	 * Add a user to the ACL with a permission level.
-	 *  
-	 * @param int $userId
-	 * @param int $level See constants in Acl for values. 
-	 * @return bool True on success
-	 */
-	public function addUser($userId, $level=Acl::READ_PERMISSION) {
-		
-		if($userId<1)
-			return false;
-		
-		$usersGroup = $this->hasUser($userId);
-		
-		if($usersGroup){
-			if($level>0){
-				$usersGroup->level=$level;			
-				return !$usersGroup->isModified() || $usersGroup->save();
-			}else{
-				return $usersGroup->delete();
-			}
-		}else
-		{		
-			if($level==0)
-				return true;
-			
-			$usersGroup = new AclUsersGroups();
-			$usersGroup->acl_id = $this->id;
-			$usersGroup->group_id = 0;
-			$usersGroup->user_id = $userId;
-			$usersGroup->level = $level;
-			return $usersGroup->save();
-		}
-
-	}
+	
 
 	/**
 	 * Add a group to the ACL with a permission level.
@@ -205,8 +166,7 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 	 * @param int $level See constants in Acl for values. 
 	 * @return bool True on success
 	 */
-	public function addGroup($groupId, $level=Acl::READ_PERMISSION) {
-		
+	public function addGroup($groupId, $level=Acl::READ_PERMISSION) {	
 		if($groupId<1)
 			return false;
 		
@@ -214,7 +174,7 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 			$level = Acl::MANAGE_PERMISSION;
 		
 		$usersGroup = $this->hasGroup($groupId);
-		
+
 		if($usersGroup){
 			if($level>0){
 				$usersGroup->level=$level;			
@@ -228,9 +188,8 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 				return true;
 			
 			$usersGroup = new AclUsersGroups();
-			$usersGroup->acl_id = $this->id;
-			$usersGroup->group_id = $groupId;
-			$usersGroup->user_id = 0;
+			$usersGroup->aclId = $this->id;
+			$usersGroup->groupId = $groupId;
 			$usersGroup->level = $level;
 			return $usersGroup->save();
 		}
@@ -244,42 +203,14 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 	 */
 	public function hasGroup($groupId){
 		return AclUsersGroups::model()->findByPk(array(
-				'acl_id'=>$this->id,
-				'group_id'=>$groupId,
-				'user_id'=>0
+				'aclId'=>$this->id,
+				'groupId'=>$groupId
 						));
 	}
 	
-	/**
-	 * Returns the links table model if the acl has the user
-	 * 
-	 * @param int $userId
-	 * @return AclUsersGroups 
-	 */
-	public function hasUser($userId){
-		return AclUsersGroups::model()->findByPk(array(
-				'acl_id'=>$this->id,
-				'group_id'=>0,
-				'user_id'=>$userId
-						));
-	}
 
 
-	/**
-	 * Remove a user from the ACL
-	 * 
-	 * @param int $userId
-	 * @return bool 
-	 */
-	public function removeUser($userId) {
-		
-		$model = $this->hasUser($userId);
-		if($model)
-			return $model->delete();
-		else
-			return true;
-	}
-	
+
 	/**
 	 * Remove a group from the ACL
 	 * 
@@ -301,37 +232,20 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 	protected function afterSave($wasNew) {
 
 		if($wasNew){
-			if($this->description!='readonly'){
+			if($this->usedIn!='readonly'){
 				$this->addGroup(\GO::config()->group_root, Acl::MANAGE_PERMISSION);
-				$this->addUser($this->user_id, Acl::MANAGE_PERMISSION);
+				if($this->ownedBy != 1) { //not for admin
+					$this->addGroup(Group::model()->findSingleByAttribute('isUserGroupFor', $this->ownedBy)->id, Acl::MANAGE_PERMISSION);
+				}
 			}
-		}elseif($this->isModified('user_id')){
-			$this->addUser($this->user_id, Acl::MANAGE_PERMISSION);
+		}elseif($this->isModified('ownedBy')){
+			$this->addGroup(Group::model()->findSingleByAttribute('isUserGroupFor', $this->ownedBy)->id, Acl::MANAGE_PERMISSION);
 		}
 
 		return parent::afterSave($wasNew);
 	}
 	
-	/**
-	 * Get all users in this acl. The user models will contain an extra
-	 * permission_level property.
-	 * 
-	 * @return \GO\Base\Db\ActiveStatement 
-	 */
-	public function getUsers(){
-		
-		$findParams = \GO\Base\Db\FindParams::newInstance()
-						->select('t.*,a.level as permission_level')
-						->joinModel(array(
-								'model'=>"GO\Base\Model\AclUsersGroups",
-								'foreignField'=>'user_id',
-								'tableAlias'=>'a'								
-						));
-		
-		$findParams->getCriteria()->addCondition('acl_id', $this->id, '=','a');
-		
-		return User::model()->find($findParams);
-	}
+	
 	
 	/**
 	 * Get all groups in this acl. The group models will contain an extra
@@ -345,11 +259,11 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 						->select('t.*,a.level as permission_level')
 						->joinModel(array(
 								'model'=>"GO\Base\Model\AclUsersGroups",
-								'foreignField'=>'group_id',
+								'foreignField'=>'groupId',
 								'tableAlias'=>'a'								
 						));
 		
-		$findParams->getCriteria()->addCondition('acl_id', $this->id, '=','a');
+		$findParams->getCriteria()->addCondition('aclId', $this->id, '=','a');
 		
 		return Group::model()->find($findParams);
 	}
@@ -364,10 +278,8 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 		
 		$stmt = $this->records;
 		foreach($stmt as $r){
-			if($r->group_id){
-				$targetAcl->addGroup($r->group_id, $r->level);
-			}elseif($r->user_id){
-				$targetAcl->addUser($r->user_id, $r->level);
+			if($r->groupId){
+				$targetAcl->addGroup($r->groupId, $r->level);
 			}
 		}
 	}
@@ -385,80 +297,33 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 	 */
 	public static function getAuthorizedUsers($aclId, $level=Acl::READ_PERMISSION, $callback=false, $callbackArguments=array()){
 		
-		//Very slow!:		
-//		SELECT u.username from go_acl a
-//left JOIN `go_users_groups` ug  ON (a.group_id=ug.group_id)
-//inner join go_users u on (u.id=a.user_id OR u.id=ug.user_id)
-//where a.acl_id=19260 and level>=1 group by u.id
-		
-		//VERy slow too
-		//todo Sub query support with query builder
-//		$stmt = \GO::getDbConnection()->prepare("SELECT * 
-//FROM go_users u
-//where exists
-//(select id from go_acl a LEFT JOIN `go_users_groups` ug  ON ( `a`.`group_id` = ug.group_id) where acl_id=:acl_id and level>=:level and (a.user_id=u.id or ug.user_id=u.id)
-//)");
-//		$stmt->bindParam("acl_id", $aclId, PDO::PARAM_INT);
-//		$stmt->bindParam("level", $level, PDO::PARAM_INT);
-//		$stmt->execute();
-//		
-//		$stmt->setFetchMode(PDO::FETCH_CLASS, "GO\Base\Model\User",array(false));
-//		return $stmt;
-		
-		$joinCriteria = \GO\Base\Db\FindCriteria::newInstance()
-										->addModel(AclUsersGroups::model(), 'a')
-										->addModel(User::model(), 't')
-										->addCondition('id', 'a.user_id','=','t',true,true)
-										->addCondition('acl_id', $aclId,'=','a');
-		
-		if($level > Acl::READ_PERMISSION)
-				$joinCriteria->addCondition('level', $level,'>=','a');
-		
-		$stmt =  User::model()->find(\GO\Base\Db\FindParams::newInstance()		
-						->ignoreAcl()
-						->join(AclUsersGroups::model()->tableName(),$joinCriteria
-										,'a')
-						);
-		
-		$users=array();
-		$ids = array();
-		while($user=$stmt->fetch()){
-			$ids[]=$user->id;
-			if($callback){
-				call_user_func_array($callback, array_merge(array($user), $callbackArguments));
-			}else
-			{
-				$users[]=$user;
-			}
-		}
+
 		
 		$joinCriteria  = \GO\Base\Db\FindCriteria::newInstance()
 										->addModel(AclUsersGroups::model(),'a')										
-										->addCondition('group_id', 'ug.group_id','=','a',true,true)
-										->addCondition('acl_id', $aclId,'=','a');
+										->addCondition('groupId', 'ug.groupId','=','a',true,true)
+										->addCondition('aclId', $aclId,'=','a');
 		
-		if($level > Acl::READ_PERMISSION)
+		if($level > Acl::READ_PERMISSION) {
 			$joinCriteria->addCondition('level', $level,'>=','a');
+		}
 		
 		
 		$stmt =  User::model()->find(\GO\Base\Db\FindParams::newInstance()				
 						->ignoreAcl()
 						->join(UserGroup::model()->tableName(),  \GO\Base\Db\FindCriteria::newInstance()		
-										->addCondition('id', 'ug.user_id','=','t',true,true),
+										->addCondition('id', 'ug.userId','=','t',true,true),
 										'ug')
 						->join(AclUsersGroups::model()->tableName(),$joinCriteria
 										,'a')
 						->order('a.level')
 						->group('t.id'));
 		
-		while($user = $stmt->fetch()){
-			if(!in_array($user->id, $ids)){				
-				if($callback){
-					call_user_func_array($callback, array_merge(array($user), $callbackArguments));
-				}else
-				{
-					$users[]=$user;
-				}
+		while($user = $stmt->fetch()) {				
+			if($callback){
+				call_user_func_array($callback, array_merge(array($user), $callbackArguments));
+			} else {
+				$users[]=$user;
 			}
 		}
 		
@@ -466,47 +331,19 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 			return $users;
 	}
 	
-	/**
-	 * Count the number of users that have access to this acl
-	 * 
-	 * @param int $level
-	 * @return int 
-	 */
-	public function countUsers($level=  Acl::READ_PERMISSION){
-		
-		//Either user_id in go_acl is 0 or user_id in go_users_groups is NULL.
-		//We can add them up to get a distinct count.
-		
-//		SELECT count(distinct a.user_id+IFNULL(ug.user_id,0)) from go_acl a
-//left JOIN `go_users_groups` ug  ON (a.group_id=ug.group_id)
-//where acl_id=19260 and level>1
-		
-		$findParams = \GO\Base\Db\FindParams::newInstance()
-						->single()
-						//->debugSql()
-						->select('count(distinct t.user_id+IFNULL(ug.user_id,0)) AS count')
-						->join(UserGroup::model()->tableName(),  \GO\Base\Db\FindCriteria::newInstance()		
-										->addCondition('group_id', 'ug.group_id','=','t',true,true),
-										'ug','LEFT');
-		
-		$findParams->getCriteria()->addCondition('acl_id', $this->id)->addCondition('level', $level,'>=');
-		
-		$model = AclUsersGroups::model()->find($findParams);
-		
-		return $model->count;		
-	}
+	
 	
 	public function checkDatabase() {
 		
-		if(empty($this->user_id))
-			$this->user_id=1;
+		if(empty($this->ownedBy))
+			$this->ownedBy = 1;
 		
-		if(empty($this->description))
-			$this->description='unknown';
+		if(empty($this->usedIn))
+			$this->usedIn='unknown';
 		
-		if($this->description!='readonly'){
+		if($this->usedIn!='readonly'){
 			$this->addGroup(\GO::config()->group_root, Acl::MANAGE_PERMISSION);
-			$this->addUser($this->user_id, Acl::MANAGE_PERMISSION);
+			$this->addUser($this->ownedBy, Acl::MANAGE_PERMISSION);
 		}
 		
 		return parent::checkDatabase();
@@ -524,14 +361,11 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 		if (!\GO::user()->isAdmin())
 			throw new AccessDeniedException();
 		
-		$adminUserRecordExists = false;
 		$adminGroupRecordExists = false;
 		
 		foreach ($this->records as $aclRecord) {
 			
-			if ($aclRecord->user_id==1) {
-				$adminUserRecordExists=true;
-			} elseif ($aclRecord->group_id==\GO::config()->group_root) {
+			if($aclRecord->groupId==\GO::config()->group_root) {
 				$adminGroupRecordExists=true;
 			} else {
 				$aclRecord->delete();
@@ -539,18 +373,11 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 			
 		}
 
-		if($this->description!='readonly'){
-			if (!$adminUserRecordExists) {
-				$aclRecord = new AclUsersGroups();
-				$aclRecord->acl_id = $this->id;
-				$aclRecord->user_id = 1;
-				$aclRecord->level = Acl::MANAGE_PERMISSION;
-				$aclRecord->save();
-			}
+		if($this->usedIn!='readonly'){
 			if (!$adminGroupRecordExists) {
 				$aclRecord = new AclUsersGroups();
-				$aclRecord->acl_id = $this->id;
-				$aclRecord->group_id = \GO::config()->group_root;
+				$aclRecord->aclId = $this->id;
+				$aclRecord->groupId = \GO::config()->group_root;
 				$aclRecord->level = Acl::MANAGE_PERMISSION;
 				$aclRecord->save();
 			}
@@ -560,6 +387,7 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 	/**
 	 * Get the ACL that can be used to make things read only for everyone.
 	 * 
+	 * @deprecated
 	 * @return \Acl
 	 */
 	public function getReadOnlyAcl(){
@@ -569,7 +397,7 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 		
 		if(!$acl){
 			$acl = new Acl();
-			$acl->description='readonly';
+			$acl->usedIn='readonly';
 			$acl->save();
 			
 			$acl->addGroup(\GO::config()->group_everyone, Acl::READ_PERMISSION);			
@@ -579,4 +407,12 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 		return $acl;
 	}
 	
+	/**
+	 * For backwards compatibility
+	 * 
+	 * @return int
+	 */
+	public function getMtime() {
+		return strtotime($this->modifiedAt);
+	}
 }

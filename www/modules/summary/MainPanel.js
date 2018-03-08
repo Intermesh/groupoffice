@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: MainPanel.js 20553 2016-10-25 09:57:14Z mschering $
+ * @version $Id: MainPanel.js 22356 2018-02-09 16:33:58Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -139,15 +139,15 @@
   
   if(!config.items)
   {
-  	config.html = GO.summary.lang.noItems;
+  	config.html = t("You don't have any items on your start page.", "summary");
   }
 
   var tbarItems = [{
 	 	xtype:'htmlcomponent',
-		html:GO.summary.lang.name,
+		html:t("Start page", "summary"),
 		cls:'go-module-title-tbar'
 	},{
-  	text: GO.lang['cmdAdd'],
+  	text: t("Add"),
   	iconCls:'btn-add',
   	handler: this.showAvailablePortlets,
   	scope: this
@@ -156,7 +156,7 @@
   if(GO.settings.modules.summary.write_permission)
   {
 	  tbarItems.push({
-	  	text: GO.summary.lang.manageAnnouncements,
+	  	text: t("Manage announcements", "summary"),
 	  	iconCls:'btn-settings',
 	  	handler: function(){
 	  		if(!this.manageAnnouncementsWindow)
@@ -167,10 +167,10 @@
 	  				items:this.announcementsGrid =  new GO.summary.AnnouncementsGrid(),
 	  				width:700,
 	  				height:400,
-	  				title:GO.summary.lang.announcements,
+	  				title:t("Announcements", "summary"),
 	  				closeAction:'hide',
 	  				buttons:[{
-							text: GO.lang.cmdClose,
+							text: t("Close"),
 							handler: function(){this.manageAnnouncementsWindow.hide();},
 							scope:this
 						}],
@@ -256,7 +256,7 @@ Ext.extend(GO.summary.MainPanel, GO.summary.Portal, {
 				'<div class="go-item-wrap">{title}</div>'+
 				'</tpl>';
 			
-			var list = new GO.grid.SimpleSelectList({store: this.availablePortletsStore, tpl: tpl,  emptyText: GO.lang.strNoItems});
+			var list = new GO.grid.SimpleSelectList({store: this.availablePortletsStore, tpl: tpl,  emptyText: t("No items to display")});
 			
 			list.on('click', function(dataview, index){
 				
@@ -275,7 +275,7 @@ Ext.extend(GO.summary.MainPanel, GO.summary.Portal, {
 			}, this);
 			
 			this.portletsWindow = new Ext.Window({
-				title: GO.summary.lang.selectPortlet,
+				title: t("Select portlet", "summary"),
 				layout:'fit',
 				modal:false,
 				height:400,
@@ -321,7 +321,7 @@ Ext.extend(GO.summary.MainPanel, GO.summary.Portal, {
 });
 
 GO.moduleManager.addModule('summary', GO.summary.MainPanel, {
-	title : GO.summary.lang.summary,
+	title : t("Start page", "summary"),
 	iconCls : 'go-tab-icon-summary'
 });
 
@@ -329,13 +329,15 @@ GO.moduleManager.addModule('summary', GO.summary.MainPanel, {
 
 GO.mainLayout.onReady(function(){
 	
-	GO.request({
-		url: 'summary/announcement/checkLatestRead',
-		success: function(response,options,result) {
-			if (result.has_unread) {
-				GO.mainLayout.openModule('summary');
+	if(go.ModuleManager.isAvailable("summary")) {
+		GO.request({
+			url: 'summary/announcement/checkLatestRead',
+			success: function(response,options,result) {
+				if (result.has_unread) {
+					GO.mainLayout.openModule('summary');
+				}
 			}
-		}
-	});
+		});
+	};
 	
 });

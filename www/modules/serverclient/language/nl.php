@@ -1,7 +1,7 @@
 <?php
-
-
-$l['name']='Serverclient';
-$l['description']='Maak automatisch mailboxen aan in de postfixadmin module';
-$l['connect_error']='Kan niet verbinden met %s';$l["createMailbox"]='Maak een mailbox aan voor domein';
-$l["mailboxes"]='Mailboxen';
+return array (
+  'Could not connect to %s' => 'Kan niet verbinden met %s',
+  'Create a mailbox for domain' => 'Maak een mailbox aan voor domein',
+  'Mailboxes' => 'Mailboxen',
+  'description' => 'Maak automatisch mailboxen aan in de postfixadmin module',
+);

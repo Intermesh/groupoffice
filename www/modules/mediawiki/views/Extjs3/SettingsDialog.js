@@ -25,17 +25,17 @@ GO.mediawiki.SettingsDialog = function(config){
 	config.width=550;
 	config.autoHeight=true;
 	config.closeAction='hide';
-	config.title= GO.lang.cmdSettings;
+	config.title= t("Settings");
 	config.items=this.formPanel;
 	config.buttons=[{
-		text: GO.lang.cmdOk,
+		text: t("Ok"),
 		handler: function(){
 			this.submitForm(true);
 			this.hide();
 		},
 		scope:this
 	},{
-		text: GO.lang.cmdClose,
+		text: t("Close"),
 		handler: function(){
 			this.hide();
 		},
@@ -59,7 +59,7 @@ Ext.extend(GO.mediawiki.SettingsDialog, Ext.Window,{
 				},
 				failure:function(form, action)
 				{
-					Ext.Msg.alert(GO.lang['strError'], action.result.feedback)
+					Ext.Msg.alert(t("Error"), action.result.feedback)
 				},
 				scope: this
 			});
@@ -69,7 +69,7 @@ Ext.extend(GO.mediawiki.SettingsDialog, Ext.Window,{
 		this.formPanel.form.submit(
 		{
 			url: GO.url('mediawiki/settings/save'),
-			waitMsg:GO.lang['waitMsgSave'],
+			waitMsg:t("Saving..."),
 			success:function(form, action){
 				var response = Ext.decode(action.response.responseText);
 				if (response.success) {
@@ -77,7 +77,7 @@ Ext.extend(GO.mediawiki.SettingsDialog, Ext.Window,{
 					GO.mediawiki.settings.title = response.data.title;
 					GO.mediawiki.iFrameComponent.setUrl(GO.mediawiki.settings.externalUrl);
 				} else {
-					Ext.Msg.alert(GO.lang['strError'], action.result.feedback);
+					Ext.Msg.alert(t("Error"), action.result.feedback);
 				}
 			},
 			scope: this
@@ -95,12 +95,12 @@ Ext.extend(GO.mediawiki.SettingsDialog, Ext.Window,{
 			//height : 150,
 			items:[this.externalUrlField = new Ext.form.TextField({
 				name : 'external_url',
-				fieldLabel : GO.mediawiki.lang.externalUrl,
+				fieldLabel : t("Mediawiki url", "mediawiki"),
 				anchor : '100%',
 				allowBlank : false
 			}),this.titleField = new Ext.form.TextField({
 				name : 'title',
-				fieldLabel : GO.mediawiki.lang.title,
+				fieldLabel : t("Module title", "mediawiki"),
 				anchor : '100%',
 				allowBlank : false
 			})]

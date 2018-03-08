@@ -198,7 +198,7 @@ class Site extends \GO\Base\Db\ActiveRecord {
 							'cls' => 'site-readonly',
 							'site_id'=>$site->id, 
 							'iconCls' => 'go-icon-layout', 
-							'text' => \GO::t('content','site'),
+							'text' => \GO::t("Content", "site"),
 							'expanded' => self::isExpandedNode('site_' . $site->id),
 							'children' => $site->loadContentNodes()
 						),
@@ -209,7 +209,7 @@ class Site extends \GO\Base\Db\ActiveRecord {
 							'cls' => 'site-readonly',
 							'site_id'=>$site->id, 
 							'iconCls' => 'go-model-icon-Menuroot', 
-							'text' => \GO::t('menus','site'),
+							'text' => \GO::t("Menu's", "site"),
 							'expanded' => self::isExpandedNode('site_' . $site->id),
 							'children' => Menu::getTreeMenuNodes($site)
 					)

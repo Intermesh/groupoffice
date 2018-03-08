@@ -1,27 +1,26 @@
 <?php
-
-$l["summary"]='Übersicht';
-$l["noItems"]='Sie haben keine Einträge auf Ihrer Startübersicht';
-$l["selectPortlet"]='Anwendung hinzufügen';
-$l["hotTopics"]='Nachrichten';
-$l["enterRssFeed"]='Geben Sie eine RSS-Feed-Adresse an:';
-$l["notes"]='Notizen';
-$l["loadingFeed"]='Lade Feed...';
-$l["goToPost"]='Gehe zu Beitrag';
-$l["today"]='Heute ';
-$l["dueTime"]='Anzeigedauer';
-$l["title"]='Titel';
-$l["manageAnnouncements"]='Ankündigungen verwalten';
-$l["webFeeds"]='RSS-Feeds verwalten';
-$l["type"]='Typ';
-$l["summaryType"]='Übersicht';
-$l["rssFeeds"]='RSS-Feeds';
-$l["noRssFeeds"]='Es sind keine RSS-Feeds vorhanden.<br />Klicken Sie in diesem Fenster oben rechts auf das Options-Symbol, um RSS-Feeds hinzuzufügen.';
-
-$l['name']='Übersicht';
-$l['description']='Modul zum Anpassen der Startübersicht';
-$l['default_rss_url']='http://rss.sueddeutsche.de/rss/Topthemen/topthemen.xml';
-$l['default_rss_title']='Nachrichten';
-$l['announcement']='Ankündigung';
-$l['announcements']='Ankündigungen';
-$l['latestReadAnnouncementRecord']= 'Datensatz zuletzt gelesener Ankündigung';
+return array (
+  'You don\'t have any items on your start page.' => 'Sie haben keine Einträge auf Ihrer Startübersicht',
+  'Select portlet' => 'Anwendung hinzufügen',
+  'News' => 'Nachrichten',
+  'Please enter the RSS feed URL:' => 'Geben Sie eine RSS-Feed-Adresse an:',
+  'Notes' => 'Notizen',
+  'Loading Feed...' => 'Lade Feed...',
+  'Go to Post' => 'Gehe zu Beitrag',
+  'Today ' => 'Heute ',
+  'Show until' => 'Anzeigedauer',
+  'Title' => 'Titel',
+  'Manage announcements' => 'Ankündigungen verwalten',
+  'Manage webfeeds' => 'RSS-Feeds verwalten',
+  'Type' => 'Typ',
+  'Summary' => 'Übersicht',
+  'Rss Feeds' => 'RSS-Feeds',
+  'No RSS feeds have been added.<br />Click the settings button in the top right corner of this window to add feeds.' => 'Es sind keine RSS-Feeds vorhanden.<br />Klicken Sie in diesem Fenster oben rechts auf das Options-Symbol, um RSS-Feeds hinzuzufügen.',
+  'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml' => 'http://rss.sueddeutsche.de/rss/Topthemen/topthemen.xml',
+  'Announcement' => 'Ankündigung',
+  'Announcements' => 'Ankündigungen',
+  'Record of latest read announcement' => 'Datensatz zuletzt gelesener Ankündigung',
+  'name' => 'Übersicht',
+  'description' => 'Modul zum Anpassen der Startübersicht',
+  'Start page' => 'Übersicht',
+);

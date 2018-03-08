@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: BookmarksDialog.js 19244 2015-07-27 07:17:02Z wsmits $
+ * @version $Id: BookmarksDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Twan Verhofstad
  */
@@ -25,22 +25,16 @@ GO.bookmarks.BookmarksDialog = function(config){
 	config.modal=false;
 	config.resizable=false;
 	config.width=500;
-	config.height=350;
+	config.height=380;
 	config.closeAction='hide';
 	config.items= this.formPanel;
-	config.title=GO.bookmarks.lang.bookmark;
+	config.title=t("Bookmark", "bookmarks");
 	config.buttons=[{
-		text: GO.lang['cmdOk'],
+		text: t("Save"),
 		handler: function(){
 			this.submitForm(true);
 		},
 		scope: this
-	},{
-		text: GO.lang['cmdClose'],
-		handler: function(){
-			this.hide();
-		},
-		scope:this
 	}];
 
 	GO.bookmarks.BookmarksDialog.superclass.constructor.call(this, config);
@@ -107,7 +101,7 @@ Ext.extend(GO.bookmarks.BookmarksDialog, Ext.Window,{
 		this.formPanel.form.submit(
 		{
 			url : GO.url('bookmarks/bookmark/submit'),
-			waitMsg:GO.lang['waitMsgSave'],
+			waitMsg:t("Saving..."),
 			success:function(form, action){
 				if(action.result.bookmark_id){
 					this.formPanel.baseParams['id']=action.result.bookmark_id;
@@ -121,9 +115,9 @@ Ext.extend(GO.bookmarks.BookmarksDialog, Ext.Window,{
 			failure: function(form, action) {
 				if(action.failureType == 'client')
 				{					
-					Ext.MessageBox.alert(GO.lang['strError'], GO.lang['strErrorsInForm']);			
+					Ext.MessageBox.alert(t("Error"), t("You have errors in your form. The invalid fields are marked."));			
 				} else {
-					Ext.MessageBox.alert(GO.lang['strError'], action.result.feedback);
+					Ext.MessageBox.alert(t("Error"), action.result.feedback);
 				}
 			},
 			scope: this
@@ -142,8 +136,8 @@ Ext.extend(GO.bookmarks.BookmarksDialog, Ext.Window,{
 
 		this.thumbExample.getEl().update(GO.bookmarks.thumbTpl.apply({
 			logo:url,
-			title:GO.bookmarks.lang.title,
-			description:GO.bookmarks.lang.description
+			title:t("Title", "bookmarks"),
+			description:t("Website description.", "bookmarks")
 		}));
 	},
 
@@ -156,7 +150,7 @@ Ext.extend(GO.bookmarks.BookmarksDialog, Ext.Window,{
 			waitMsgTarget:true,
 			items: [ // de invoervelden
 			this.selectCategory = new GO.form.ComboBox({
-				fieldLabel: GO.bookmarks.lang.category,
+				fieldLabel: t("Category", "bookmarks"),
 				hiddenName:'category_id',
 				anchor:'100%',
 				store: GO.bookmarks.writableCategoriesStore,
@@ -186,7 +180,7 @@ Ext.extend(GO.bookmarks.BookmarksDialog, Ext.Window,{
 				},
 				listeners:{
 					change:function(combo){
-						this.el.mask(GO.lang.waitMsgLoad);
+						this.el.mask(t("Loading..."));
 						Ext.Ajax.request({
 							url : GO.url('bookmarks/bookmark/description'),
 							params:{
@@ -217,32 +211,32 @@ Ext.extend(GO.bookmarks.BookmarksDialog, Ext.Window,{
 			},{
 				name: 'name',
 				xtype: 'textfield',
-				fieldLabel: GO.bookmarks.lang.title, 
+				fieldLabel: t("Title", "bookmarks"), 
 				anchor: '100%',
 				allowBlank: false
 			},this.externCheck = new Ext.ux.form.XCheckbox({
 				name: 'open_extern',
 				xtype: 'checkbox',
-				boxLabel: GO.bookmarks.lang.extern,
+				boxLabel: t("Open in new browser tab", "bookmarks"),
 				hideLabel:true,
 				anchor: '100%',
 				checked:true
 			}),this.moduleCheck = new Ext.ux.form.XCheckbox({
 				name: 'behave_as_module',
 				xtype: 'checkbox',
-				boxLabel: GO.bookmarks.lang.behaveAsModule,
+				boxLabel: t("Behave as a module (Browser reload required)", "bookmarks"),
 				hideLabel:true,
 				anchor: '100%'
 			}),
 			{
 				name: 'description',
 				xtype: 'textarea',
-				fieldLabel: GO.bookmarks.lang.description,
+				fieldLabel: t("Website description.", "bookmarks"),
 				anchor: '100%',
 				height:65
 			},
 			this.selectFile = new GO.bookmarks.SelectFile({
-				fieldLabel: GO.bookmarks.lang.logo, 
+				fieldLabel: t("Logo", "bookmarks"), 
 				name: 'logo',
 				anchor: '100%',
 				value:'icons/bookmark.png',

@@ -2,7 +2,7 @@
  * Ext.ux.form.XCheckbox - checkbox with configurable submit values
  *
  * @author  Ing. Jozef Sakalos
- * @version $Id: XCheckbox.js 21334 2017-07-31 07:40:36Z devdevilnl $
+ * @version $Id: XCheckbox.js 21993 2017-12-20 13:57:17Z michaelhart86 $
  * @date    10. February 2008
  *
  *
@@ -63,28 +63,6 @@ Ext.ux.form.XCheckbox = Ext.extend(Ext.form.Checkbox, {
 		Ext.ux.form.XCheckbox.superclass.setValue.apply(this, arguments);
 		this.updateHidden();
 	},
-	
-//	/**
-//		* Returns the checked state of the checkbox.
-//		* @return {String} '1' if checked, else '0'
-//		*/
-//	 getValue : function(){
-//		 if(this.rendered){
-//				 return this.el.dom.checked ? this.submitOnValue : this.submitOffValue;
-//		 }
-//		 return this.checked ? this.submitOnValue : this.submitOffValue;
-//	 },
-//
-//	 /**
-//		* Returns the checked state of the checkbox.
-//		* @returns {Boolean} true if checked, else false
-//		*/
-//	 getValueAsBoolean : function(){
-//		 if(this.rendered){
-//				 return this.el.dom.checked ? true : false;
-//		 }
-//		 return this.checked ? true : false;
-//	 },
 
 	/**
 	 * Updates hiddenField
@@ -102,11 +80,7 @@ Ext.ux.form.XCheckbox = Ext.extend(Ext.form.Checkbox, {
 			this.wrap.child('.x-form-cb-label').update(boxLabel);
 		}
 	},
-	
-	
-	
-	
-	
+
 	getErrors: function(value) {
 		var errors = Ext.form.Checkbox.superclass.getErrors.apply(this, arguments);
 		
@@ -117,7 +91,6 @@ Ext.ux.form.XCheckbox = Ext.extend(Ext.form.Checkbox, {
 		
 		return errors;
 	},
-	
 	
 	markInvalid: function (msg) {
 		//don't set the error icon if we're not rendered or marking is prevented

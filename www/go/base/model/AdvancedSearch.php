@@ -48,7 +48,7 @@ class AdvancedSearch extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	protected function getLocalizedName() {
-		return \GO::t('advSearch');
+		return \GO::t("Advanced search");
 	}	
 	
 	protected function getPermissionLevelForNewModel() {

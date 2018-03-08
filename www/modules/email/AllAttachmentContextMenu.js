@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: AllAttachmentContextMenu.js 20914 2017-03-07 13:05:13Z wsmits $
+ * @version $Id: AllAttachmentContextMenu.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
@@ -22,7 +22,7 @@ GO.email.AllAttachmentContextMenu = Ext.extend(Ext.menu.Menu, {
 		
 		this.downloadButton = new Ext.menu.Item({
 			iconCls: 'btn-download',
-			text: GO.email.lang.downloadAllAsZip,
+			text: t("Download all as zipfile", "email"),
 			cls: 'x-btn-text-icon',
 			handler: function(){						
 				window.open(this.allZipFileUrl);
@@ -32,10 +32,10 @@ GO.email.AllAttachmentContextMenu = Ext.extend(Ext.menu.Menu, {
 				
 		mnuItems.push(this.downloadButton);
 		
-		if(GO.files){
+		if(go.ModuleManager.isAvailable("files")){
 			this.saveButton = new Ext.menu.Item({
 				iconCls: 'btn-save',
-				text: GO.email.lang.saveAllToPersonal,
+				text: t("Save all to personal folder", "email"),
 				cls: 'x-btn-text-icon',
 				handler: function(){
 					GO.email.saveAllAttachments(this.messagePanel);
@@ -49,7 +49,7 @@ GO.email.AllAttachmentContextMenu = Ext.extend(Ext.menu.Menu, {
 			// Shows the link dialog so you can select an item to add the attachment to.
 			this.saveToItemButton = new Ext.menu.Item({
 				iconCls: 'btn-save',
-				text: GO.email.lang.saveAllToItem,
+				text: t("Save all to item", "email"),
 				cls: 'x-btn-text-icon',
 				handler: function(){
 

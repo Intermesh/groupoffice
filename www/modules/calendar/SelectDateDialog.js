@@ -19,19 +19,19 @@ GO.calendar.SelectDateDialog = function(config){
 	config.resizable=false;
 	config.plain=true;
 	config.shadow=false,
-	config.title=GO.calendar.lang.copyEvent;
+	config.title=t("Copy event", "calendar");
 	config.closeAction='hide';
 	config.items=this.formPanel;
 	config.focus=focusFirstField.createDelegate(this);
 	config.buttons=[{
-		text:GO.lang['cmdOk'],
+		text:t("Ok"),
 		handler: function()
 		{
 			this.beforeSubmit()
 		},
 		scope: this
 	},{
-		text:GO.lang['cmdClose'],
+		text:t("Close"),
 		handler: function()
 		{
 			this.hide()
@@ -63,7 +63,7 @@ Ext.extend(GO.calendar.SelectDateDialog, Ext.Window, {
 		this.repeats = (repeats) ? true : false;
 		this.view_id = (view_id) ? view_id : 0;
 
-		var title = (this.isCopy) ? GO.calendar.lang.copyEvent : GO.calendar.lang.moveEvent;
+		var title = (this.isCopy) ? t("Copy event", "calendar") : t("Move event", "calendar");
 		this.setTitle(title);
 
 		this.datePicker.setValue(this.event.startDate.add(Date.DAY, 1));
@@ -118,7 +118,7 @@ Ext.extend(GO.calendar.SelectDateDialog, Ext.Window, {
 	{
 		this.formPanel.form.submit(
 		{
-			waitMsg:GO.lang['waitMsgSave'],			
+			waitMsg:t("Saving..."),			
 			success:function(form, action)
 			{
 				var new_event_id = (action.result.event_id) ? action.result.event_id : 0;
@@ -156,14 +156,14 @@ Ext.extend(GO.calendar.SelectDateDialog, Ext.Window, {
 				var error = '';
 				if(action.failureType=='client')
 				{
-					error = GO.lang['strErrorsInForm'];
+					error = t("You have errors in your form. The invalid fields are marked.");
 				}else
 				{
 					error = action.result.feedback;
 				}
 				if(error)
 				{
-					Ext.MessageBox.alert(GO.lang['strError'], error);
+					Ext.MessageBox.alert(t("Error"), error);
 				}
 			},
 			scope:this
@@ -174,7 +174,7 @@ Ext.extend(GO.calendar.SelectDateDialog, Ext.Window, {
 		this.datePicker = new Ext.DatePicker({
 	    		xtype:'datepicker',
 	    		format: GO.settings.date_format,
-	    		fieldLabel:GO.lang.strDate
+	    		fieldLabel:t("Date")
 	    	});
 		
 		this.formPanel = new Ext.form.FormPanel({
@@ -191,7 +191,7 @@ Ext.extend(GO.calendar.SelectDateDialog, Ext.Window, {
 				style:'margin:auto;'
 			},
 			new GO.form.HtmlComponent({html:'<br />'}),
-			this.selectCalendar = new GO.calendar.SelectCalendar({fieldLabel: GO.calendar.lang.calendar, anchor:'100%'})
+			this.selectCalendar = new GO.calendar.SelectCalendar({fieldLabel: t("Calendar", "calendar"), anchor:'100%'})
 			]
 		});
 	}

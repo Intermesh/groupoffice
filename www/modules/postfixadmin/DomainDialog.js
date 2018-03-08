@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: DomainDialog.js 21339 2017-07-31 07:59:22Z devdevilnl $
+ * @version $Id: DomainDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -41,13 +41,13 @@
 //	if(GO.settings.modules.postfixadmin.write_permission)
 //	{
 //		config.buttons.push({
-//			text: GO.lang['cmdOk'],
+//			text: t("Ok"),
 //			handler: function(){
 //				this.submitForm(true);
 //			},
 //			scope: this
 //		},{
-//			text: GO.lang['cmdApply'],
+//			text: t("Apply"),
 //			handler: function(){
 //				this.submitForm();
 //			},
@@ -56,7 +56,7 @@
 //	}
 //
 //	config.buttons.push({
-//			text: GO.lang['cmdClose'],
+//			text: t("Close"),
 //			handler: function(){
 //				this.hide();
 //			},
@@ -69,19 +69,22 @@
 
 GO.postfixadmin.DomainDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 	
-	enableOkButton : GO.settings.modules.postfixadmin.write_permission,
+	enableOkButton: false,
 	
-	enableApplyButton : GO.settings.modules.postfixadmin.write_permission,
+	enableApplyButton: false,
 	
 	initComponent : function(){
 		Ext.apply(this, {
 			titleField:'domain',
-			title: GO.postfixadmin.lang.domain,
+			title: t("Domain", "postfixadmin"),
 			formControllerUrl: 'postfixadmin/domain',
 			width:700,
 			height:600
 			//fileUpload:true
 		});
+		
+		this.enableOkButton = this.enableApplyButton = GO.settings.modules.postfixadmin.write_permission;
+		
 		GO.postfixadmin.DomainDialog.superclass.initComponent.call(this);	
 	},
 	
@@ -109,7 +112,7 @@ GO.postfixadmin.DomainDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 //		this.formPanel.form.submit(
 //		{
 //			url:GO.url('postfixadmin/domain/save'),
-//			waitMsg:GO.lang['waitMsgSave'],
+//			waitMsg:t("Saving..."),
 //			success:function(form, action){
 //				
 //				this.fireEvent('save', this);
@@ -141,9 +144,9 @@ GO.postfixadmin.DomainDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 //			failure: function(form, action) {
 //				if(action.failureType == 'client')
 //				{					
-//					Ext.MessageBox.alert(GO.lang['strError'], GO.lang['strErrorsInForm']);			
+//					Ext.MessageBox.alert(t("Error"), t("You have errors in your form. The invalid fields are marked."));			
 //				} else {
-//					Ext.MessageBox.alert(GO.lang['strError'], action.result.feedback);
+//					Ext.MessageBox.alert(t("Error"), action.result.feedback);
 //				}
 //			},
 //			scope: this
@@ -192,7 +195,7 @@ GO.postfixadmin.DomainDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 
 //	updateTitle : function(title){
 //		if(GO.util.empty(title))
-//			title=GO.postfixadmin.lang.domain;
+//			title=t("Domain", "postfixadmin");
 //
 //		this.setTitle(title);
 //	},
@@ -230,12 +233,12 @@ GO.postfixadmin.DomainDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 
 		if(GO.settings.modules.postfixadmin.write_permission){
 			this.propertiesPanel = new Ext.Panel({
-				title:GO.lang['strProperties'],
+				title:t("Properties"),
 				cls:'go-form-panel',waitMsgTarget:true,
 				layout:'form',
 				autoScroll:true,
 				items:[this.selectUser = new GO.form.SelectUser({
-					fieldLabel: GO.lang['strUser'],
+					fieldLabel: t("User"),
 					disabled: !GO.settings.modules['postfixadmin']['write_permission'],
 					value: GO.settings.user_id,
 					anchor: '-20'
@@ -244,19 +247,19 @@ GO.postfixadmin.DomainDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 					name: 'domain',
 					anchor: '-20',
 					allowBlank:false,
-					fieldLabel: GO.postfixadmin.lang.domain
+					fieldLabel: t("Domain", "postfixadmin")
 				},{
 					xtype: 'textfield',
 					name: 'description',
 					anchor: '-20',
-					fieldLabel: GO.lang.strDescription
+					fieldLabel: t("Description")
 				},new GO.form.NumberField({
 					decimals:"0",
 					disabled:!GO.settings.modules.postfixadmin.write_permission,
 					name: 'max_aliases',
 					anchor: '-20',
 					allowBlank:false,
-					fieldLabel: GO.postfixadmin.lang.maxAliases,
+					fieldLabel: t("Max aliases", "postfixadmin"),
 					value:'0'
 				}),new GO.form.NumberField({
 					decimals:"0",
@@ -264,7 +267,7 @@ GO.postfixadmin.DomainDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 					name: 'max_mailboxes',
 					anchor: '-20',
 					allowBlank:false,
-					fieldLabel: GO.postfixadmin.lang.maxMailboxes,
+					fieldLabel: t("Max mailboxes", "postfixadmin"),
 					value:'0'
 				}),this.maxQuotaField = new GO.form.NumberField({
 					decimals:"0",
@@ -272,21 +275,21 @@ GO.postfixadmin.DomainDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 					name: 'total_quota',
 					anchor: '-20',
 					allowBlank:false,
-					fieldLabel: GO.postfixadmin.lang.maxquota,
+					fieldLabel: t("Max quota (MB)", "postfixadmin"),
 					value:'0'
 				}),this.quotaField = new GO.form.NumberField({
 					decimals:"0",
 					name: 'default_quota',
 					anchor: '-20',
 					allowBlank:false,
-					fieldLabel: GO.postfixadmin.lang.defaultQuota,
+					fieldLabel: t("Default quota (MB)", "postfixadmin"),
 					value:'0'
 				}),{
 					xtype: 'xcheckbox',
 					name: 'active',
 					anchor: '-20',
 //					allowBlank:false,
-					boxLabel: GO.postfixadmin.lang.active,
+					boxLabel: t("Active", "postfixadmin"),
 					hideLabel: true,
 					checked: true
 				},{
@@ -294,7 +297,7 @@ GO.postfixadmin.DomainDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 					name: 'backupmx',
 					anchor: '-20',
 //					allowBlank:false,
-					boxLabel: GO.postfixadmin.lang.backupmx,
+					boxLabel: t("Backup MX", "postfixadmin"),
 					hideLabel: true,
 					listeners:{
 						check:function(cb, check){

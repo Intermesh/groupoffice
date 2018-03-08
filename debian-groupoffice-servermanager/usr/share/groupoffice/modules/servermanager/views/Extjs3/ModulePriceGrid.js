@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: ModulePriceGrid.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: ModulePriceGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Michael de Hart <mdhart@intermesh.nl>
  */
@@ -21,7 +21,7 @@ GO.servermanager.ModulePriceGrid = function(config){
 	
 	config.editDialogClass = GO.servermanager.ModulePriceDialog;
 
-	config.title=GO.servermanager.lang["modules"];
+	config.title=t("modules", "servermanager");
 	config.store = new GO.data.JsonStore({
 		url : GO.url('servermanager/modulePrice/store'),
 		fields:['module_name','price_per_month'],
@@ -33,13 +33,13 @@ GO.servermanager.ModulePriceGrid = function(config){
 			sortable:true
 		},
 		columns:[	{
-			header: GO.servermanager.lang["modules"],
+			header: t("modules", "servermanager"),
 			dataIndex: 'module_name',
 			editor: new Ext.form.TextField({
 				allowBlank: false
 			})
 		},{
-			header: GO.servermanager.lang.price,
+			header: t("price", "servermanager"),
 			dataIndex: 'price_per_month',
 			editor: new GO.form.NumberField({
 				allowBlank: false
@@ -52,14 +52,14 @@ GO.servermanager.ModulePriceGrid = function(config){
 	config.view=new Ext.grid.GridView({
 		autoFill: true,
 		forceFit: true,
-		emptyText: GO.lang['strNoItems']
+		emptyText: t("No items to display")
 	});
 	config.sm=new Ext.grid.RowSelectionModel( {singleSelect : true} );
 	config.loadMask=true;
 
 	config.tbar=[{
 		iconCls: 'btn-add',
-		text: GO.lang['cmdAdd'],
+		text: t("Add"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			this.showEditDialog();
@@ -67,7 +67,7 @@ GO.servermanager.ModulePriceGrid = function(config){
 		scope: this
 	},{
 		iconCls: 'btn-delete',
-		text: GO.lang['cmdDelete'],
+		text: t("Delete"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			this.deleteSelected();

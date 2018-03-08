@@ -1,6 +1,0 @@
-
-
-<div ng-view></div>
-
-
-

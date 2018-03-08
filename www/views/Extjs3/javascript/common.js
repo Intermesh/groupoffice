@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: common.js 21567 2017-10-20 09:16:22Z michaelhart86 $
+ * @version $Id: common.js 22456 2018-03-06 15:42:05Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -14,9 +14,73 @@
 Ext.namespace('GO.util');
 
 Ext.Ajax.timeout = 180000; // 3 minutes
-GO.util.density = 140;
-var dp = function(size) {
-	return ((size * GO.util.density) / 160);
+
+GO.permissionLevels = {
+		read: 10,
+		create: 20,
+		write: 30,
+		writeAndDelete: 40,
+		manage: 50
+	};
+	
+	
+GO.util.isMobileOrTablet = function() {
+  var check = false;
+  (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4))) check = true;})(navigator.userAgent||navigator.vendor||window.opera);
+  return check;
+};
+	
+GO.util.stringToFunction = function(str) {
+  var arr = str.split(".");
+
+  var fn = (window || this);
+  for (var i = 0, len = arr.length; i < len; i++) {
+    fn = fn[arr[i]];
+  }
+
+  if (typeof fn !== "function") {
+    throw new Error("function not found");
+  }
+
+  return  fn;
+};
+
+function t(str, module, sub) {
+	
+	if(!module) {
+		module = "base";
+		sub = "common";
+	}
+	
+	if(!GO.lang[module]) {
+		return str;
+	}
+	
+	var l = GO.lang[module];
+	
+	if(sub) {
+		l = l[sub];
+	}
+	
+	return l[str] || str;
+	
+////	var found = (GO[module] && GO[module].lang && GO[module].lang[str]) || t("str");
+////	if(!found) {
+////		if (t.caller && t.caller.name !== 't' && GO.langMap[str]) {
+////			return t(GO.langMap[str], module);
+////		} else
+////		{
+////			found = str;
+////		}
+////	}
+//	var found = str;
+//	
+//	if(replacements) {
+//		for(var key in replacements) {
+//			found = found.replace("{" +key + "}", replacements[key]);
+//		}
+//	}
+//	return found;
 };
 /**
  * Strpos function for js 
@@ -38,10 +102,12 @@ GO.util.isAndroid=function(){
 	return isAndroid;
 }
 
-GO.log = function(v){
-	if(console)
-		console.log(v);
-}
+//GO.log is a namespace for the log module!
+
+//GO.log = function(v){
+//	if(console)
+//		console.log(v);
+//}
 
 GO.openHelp = function(page){
 
@@ -106,7 +172,7 @@ GO.request = function(config){
 	
 	if(config.maskEl){
 		if(!config.maskText)
-			config.maskText=GO.lang.waitMsgLoad;
+			config.maskText=t("Loading...");
 	
 		config.maskEl.mask(config.maskText);
 	}
@@ -121,7 +187,7 @@ GO.request = function(config){
 //			console.log(response);
 //			
 			if(!success && response.isTimeout){
-				GO.errorDialog.show(GO.lang.errorTimeout);
+				GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
 			}
 			
 			if(config.maskEl)
@@ -135,7 +201,7 @@ GO.request = function(config){
 				if(config.fail){
 					config.fail.call(config.scope, response, options, result);
 				} else {
-					Ext.Msg.alert(GO.lang.strError, result.feedback);
+					Ext.Msg.alert(t("Error"), result.feedback);
 				}
 			}else 
 			{
@@ -210,7 +276,7 @@ GO.mailTo = function(email){
 	
 	if(GO.email && GO.settings.modules.email.read_permission)
 	{
-		return '<a href="#" onclick="GO.email.showAddressMenu(event, \''+email+'\',\'\');">'+email+'</a>';
+		return '<a  onclick="GO.email.showAddressMenu(event, \''+email+'\',\'\');">'+email+'</a>';
 	}else
 	{
 		return '<a href="mailto:'+email+'">'+email+'</a>';
@@ -284,7 +350,7 @@ GO.jsonAuthHandler = function(json, callback, scope)
 		switch(json.authError)
 		{
 			case 'UNAUTHORIZED':
-				alert(GO.lang['strUnauthorizedText']);
+				alert(t("You don't have permission to perform this action"));
 				return false;
 			
 			case 'NOTLOGGEDIN':			
@@ -308,30 +374,30 @@ GO.jsonAuthHandler = function(json, callback, scope)
 //it will reload with a callback that will check for deleteSuccess in the json reponse. If it
 //failed it will display deleteFeedback
 GO.deleteItems = function(config)
-{
+{	
 	config.extraWarning=config.extraWarning || "";
 	switch(config.count)
 	{
 		case 0:
-			alert(GO.lang['noItemSelected']);
+			alert(t("You didn't select an item."));
 			return false;
 		
 		case 1:
-			var strConfirm = config.extraWarning+GO.lang['strDeleteSelectedItem'];
+			var strConfirm = config.extraWarning+t("Are you sure you want to delete the selected item?");
 		break;
 		
 		default:
-			var t = new Ext.Template(
-		    	config.extraWarning+GO.lang['strDeleteSelectedItems']
+			var template = new Ext.Template(
+		    	config.extraWarning+t("Are you sure you want to delete the {count} items?")
 			);
-			var strConfirm = t.applyTemplate({'count': config.count});						
+			var strConfirm = template.applyTemplate({'count': config.count});						
 		break;						
 	}
 
 	if(config.noConfirmation || confirm(strConfirm)){
 		
 		if(config.maskEl){
-			config.maskEl.mask(GO.lang.cmdDelete);
+			config.maskEl.mask(t("Delete"));
 		}
 		
 		if(config.store)
@@ -364,7 +430,7 @@ GO.deleteItems = function(config)
 							callback = config.failure.createDelegate(config.scope);
 							callback.call(config.scope, config);
 						}
-						Ext.MessageBox.alert(GO.lang.strError,this.reader.jsonData.deleteFeedback);
+						Ext.MessageBox.alert(t("Error"),this.reader.jsonData.deleteFeedback);
 //						alert( this.reader.jsonData.deleteFeedback);
 					}else
 					{
@@ -426,7 +492,7 @@ GO.deleteItems = function(config)
 							callback.call(this, responseParams);
 						}
 //						alert( responseParams.feedback);
-						Ext.MessageBox.alert(GO.lang.strError,responseParams.feedback);
+						Ext.MessageBox.alert(t("Error"),responseParams.feedback);
 					}else
 					{
 						if(config.success)
@@ -448,24 +514,6 @@ GO.deleteItems = function(config)
 	}
 	
 }
-
-GO.util.getFlashMovieObject = function(movieName)
-{
-  if (window.document[movieName]) 
-  {
-      return window.document[movieName];
-  }
-  if (navigator.appName.indexOf("Microsoft Internet")==-1)
-  {
-    if (document.embeds && document.embeds[movieName])
-      return document.embeds[movieName]; 
-  }
-  else // if (navigator.appName.indexOf("Microsoft Internet")!=-1)
-  {
-    return document.getElementById(movieName);
-  }
-}
-
 
 GO.util.unlocalizeNumber = function (number, decimal_separator, thousands_separator)
 {
@@ -656,7 +704,7 @@ GO.util.popup = function (c)
 	
 	if(!popup)
 	{
-		alert(GO.lang.popupBlocker);
+		alert(t("Your browser is blocking a popup from Group-Office. Please disable the popup blocker for this site"));
 		return false;
 	}
 	
@@ -930,22 +978,6 @@ if(GO.settings && GO.settings.time_format){
 					['40', '40'], ['45', '45'], ['50', '50'], ['55', '55']];
 }
 
-/**
- * Log data to the console window.
- * Only logs when using debug mode (CTRL+F7)
- * 
- * 
- * @param string data
- * @returns 
- */
-GO.log = function(data) {
-
-	if(GO.debug){
-		if(console.log) {
-			console.log(data);
-		}
-	}
-}
 
 GO.util.HtmlDecode = function HtmlDecode(s) {
 	return s.replace(/&[a-z]+;/gi, function (entity) {
@@ -1458,4 +1490,33 @@ GO.util.HtmlDecode = function HtmlDecode(s) {
 				return '';
 		}
 	});
+}
+
+
+
+GO.util.dateFormat = function(v) {
+	
+	if(!v) {
+		return "";
+	}
+	
+	if (!Ext.isDate(v)) {
+			v = new Date(Date.parse(v));
+	}
+
+	var elapsed = v.getElapsed() / 1000;
+
+	if(elapsed < 86400) {
+		
+		return Ext.util.Format.date(v, GO.settings.time_format);	
+	}
+	
+	if(elapsed < 172800) {		
+		return t('Yesterday');
+	}
+		
+	return Ext.util.Format.date(v, GO.settings.date_format);
+	
+
+	
 }

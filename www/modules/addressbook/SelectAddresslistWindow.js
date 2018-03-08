@@ -3,7 +3,7 @@ GO.addressbook.SelectAddresslistWindow = Ext.extend(Ext.Window, {
 	
 	initComponent : function(){
 		
-		this.title=GO.addressbook.lang.selectMailingGroup;
+		this.title=t("Select an address list", "addressbook");
 		
 		this.grid = new GO.grid.GridPanel({
 				layout: 'fit',
@@ -14,11 +14,11 @@ GO.addressbook.SelectAddresslistWindow = Ext.extend(Ext.Window, {
 				view: new Ext.grid.GridView({
 					autoFill: true,
 					forceFit: true,
-					emptyText: GO.lang.strNoItems
+					emptyText: t("No items to display")
 				}),
 				cm: new Ext.grid.ColumnModel([
 					{
-						header: GO.lang['strName'],
+						header: t("Name"),
 						dataIndex: 'name'
 					}
 				]),
@@ -40,7 +40,7 @@ GO.addressbook.SelectAddresslistWindow = Ext.extend(Ext.Window, {
 		}, this);
 		
 		
-		this.title= GO.addressbook.lang.selectAddresslist;
+		this.title= t("selectAddresslist", "addressbook");
 		this.layout='fit';
 		this.modal=false;
 		this.height=400;			
@@ -53,7 +53,7 @@ GO.addressbook.SelectAddresslistWindow = Ext.extend(Ext.Window, {
 			cls: 'go-form-panel'
 		});
 		this.buttons=[{
-		text: GO.lang['cmdClose'],
+		text: t("Close"),
 		handler: function(){
 			this.hide();
 		},
@@ -81,7 +81,7 @@ GO.addressbook.SelectAddresslistWindow = Ext.extend(Ext.Window, {
 		
 		if(this.grid.store.getCount()==0)
 		{
-			this.panel.body.update(GO.addressbook.lang.noMailingGroups);
+			this.panel.body.update(t("You don't have any address list", "addressbook"));
 		}
 	}
 });

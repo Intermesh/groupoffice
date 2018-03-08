@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: ModuleManager.js 19025 2015-04-23 11:26:00Z wsmits $
+ * @version $Id: ModuleManager.js 22237 2018-01-24 10:24:54Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -48,7 +48,7 @@ GO.ModuleManager = Ext.extend(function(){
 		this.settingsPanels[panelID] = panelClass;
 		this.settingsPanelConfigs[panelID] = panelConfig;
 		
-		if(!sortPriority)
+		if(Ext.isEmpty(sortPriority))
 			this.settingsSortOrder.push(panelID);
 		else
 			this.settingsSortOrder.splice(sortPriority,0,panelID);
@@ -62,10 +62,7 @@ GO.ModuleManager = Ext.extend(function(){
 			return false;				
 	},
 	
-	getAllSettingsPanels : function(){
-		
-		
-		
+	getAllSettingsPanels : function(){	
 		
 		var panels = [];
 		
@@ -76,6 +73,16 @@ GO.ModuleManager = Ext.extend(function(){
 		return panels;
 	},
 	
+	addModule : function(moduleName, panelClass, panelConfig, subMenuConfig) {
+		go.ModuleManager.register(moduleName, {
+			title: panelConfig.title,
+			requiredPermissionLevel: panelConfig.requiredPermissionLevel || GO.permissionLevels.read,
+			mainPanel: panelClass,
+			panelConfig: panelConfig,
+			subMenuConfig: subMenuConfig
+		});
+	},
+	
 	/**
 	 * 
 	 * @param {type} moduleName
@@ -84,13 +91,22 @@ GO.ModuleManager = Ext.extend(function(){
 	 * @param Object subMenuConfig {title:'title',iconCls:'classname'} // title is a required property
 	 * @returns {undefined}
 	 */
-	addModule : function(moduleName, panelClass, panelConfig, subMenuConfig)
+	_addModule : function(moduleName, panelClass, panelConfig, subMenuConfig)
 	{		
 		//this.modules[moduleName]=true;
 		if(panelClass)
-		{
+		{			
+			
+			
+			if(typeof panelClass == "string") {
+				panelClass = GO.util.stringToFunction(panelClass);
+			}
+			
 			panelConfig.inSubmenu = false;
 			panelConfig.moduleName = moduleName;
+			if(!panelConfig.iconCls) {
+				panelConfig.iconCls = "go-tab-icon-"+moduleName;
+			}
 			panelConfig.id='go-module-panel-'+panelConfig.moduleName;
 
 			if(!panelConfig.cls)
@@ -147,14 +163,14 @@ GO.ModuleManager = Ext.extend(function(){
 		}
 	},
 	
-	getPanel : function(moduleName)
-	{
+	getPanel : function(moduleName) {
 		if(this.modulePanels[moduleName]){
-			var p = new this.modulePanels[moduleName](this.panelConfigs[moduleName]);
+			Ext.reg("module-main-"+moduleName, this.modulePanels[moduleName]);
+			this.panelConfigs[moduleName].xtype = "module-main-"+moduleName;
+			var p = this.panelConfigs[moduleName];
 			this.fireEvent('moduleconstructed', this, moduleName, p);
 			return p;
-		}else
-		{
+		} else {
 			return false;
 		}
 	},
@@ -181,7 +197,7 @@ GO.ModuleManager = Ext.extend(function(){
 	},
 	
 	userHasModule : function(module){
-		return module in this.modules;
+		return go.ModuleManager.isAvailable(module);
 	},
 	
 	getAllSubmenus : function(){

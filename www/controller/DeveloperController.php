@@ -336,7 +336,7 @@ END:VCALENDAR';
 
 		foreach($stmt as $category){
 			$category->duplicate(array(
-					'extends_model'=>"GO\Projects2\Model\Project"
+					'extendsModel'=>"GO\Projects2\Model\Project"
 			));
 		}
 		
@@ -371,7 +371,7 @@ END:VCALENDAR';
 
 		foreach($stmt as $category){
 			$category->duplicate(array(
-					'extends_model'=>"GO\Projects2\Model\TimeEntry"
+					'extendsModel'=>"GO\Projects2\Model\TimeEntry"
 			));
 		}
 

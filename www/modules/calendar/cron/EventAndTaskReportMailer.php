@@ -24,7 +24,7 @@ class EventAndTaskReportMailer extends \GO\Base\Cron\AbstractCron {
 	 * @return String
 	 */
 	public function getLabel(){
-		return \GO::t('cronEventAndTaskReportMailer','calendar');
+		return \GO::t("Today's events and tasks mailer", "calendar");
 	}
 	
 	/**
@@ -33,7 +33,7 @@ class EventAndTaskReportMailer extends \GO\Base\Cron\AbstractCron {
 	 * @return String
 	 */
 	public function getDescription(){
-		return \GO::t('cronEventAndTaskReportMailerDescription','calendar');
+		return \GO::t("Send an email with the today's events and tasks to every user in the cron", "calendar");
 	}
 	
 	/**
@@ -79,7 +79,7 @@ class EventAndTaskReportMailer extends \GO\Base\Cron\AbstractCron {
 	private function _getUserPdf(\GO\Base\Model\User $user){		
 		$pdf = new eventAndTaskPdf();
 		$pdf->setTitle($user->name); // Set the title in the header of the PDF
-		$pdf->setSubTitle(\GO::t('cronEventAndTaskReportMailerPdfSubtitle','calendar')); // Set the subtitle in the header of the PDF
+		$pdf->setSubTitle(\GO::t("Today's events and tasks", "calendar")); // Set the subtitle in the header of the PDF
 		$pdf->render($user); // Pass the data to the PDF object and let it draw the PDF
 		
 		return $pdf->Output('','s');// Output the pdf
@@ -97,8 +97,8 @@ class EventAndTaskReportMailer extends \GO\Base\Cron\AbstractCron {
 		$filename = \GO\Base\Fs\File::stripInvalidChars($user->name).'.pdf'; //Set the PDF filename
 		$filename = str_replace(',', '', $filename);
 		
-		$mailSubject = \GO::t('cronEventAndTaskReportMailerSubject','calendar');
-		$body = \GO::t('cronEventAndTaskReportMailerContent','calendar');
+		$mailSubject = \GO::t("Today's events and tasks", "calendar");
+		$body = \GO::t("You can find a list of today's events and tasks in the attached PDF.", "calendar");
 		
 		$message = \GO\Base\Mail\Message::newInstance(
 										$mailSubject
@@ -106,7 +106,7 @@ class EventAndTaskReportMailer extends \GO\Base\Cron\AbstractCron {
 										->addTo($user->email);
 
 		$message->setHtmlAlternateBody(nl2br($body));
-		$message->attach(\Swift_Attachment::newInstance($pdf,$filename,'application/pdf'));
+		$message->attach(new \Swift_Attachment($pdf,$filename,'application/pdf'));
 		\GO::debug('CRON SEND MAIL TO: '.$user->email);
 		return \GO\Base\Mail\Mailer::newGoInstance()->send($message);
 	}
@@ -154,8 +154,8 @@ class eventAndTaskPdf extends \GO\Base\Util\Pdf {
 	public function render($user){
 		$this->AddPage();
 		$this->setEqualColumns(2, ($this->pageWidth/2)-10);
-		$eventsString = \GO::t('appointments','calendar');
-		$tasksString = \GO::t('tasks','tasks');
+		$eventsString = \GO::t("Appointments", "calendar");
+		$tasksString = \GO::t("Tasks", "tasks");
 		
 		$textColor = $this->TextColor;
 		$textFont = $this->getFontFamily();

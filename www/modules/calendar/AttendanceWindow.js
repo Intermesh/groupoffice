@@ -3,7 +3,7 @@ GO.calendar.AttendanceWindow = Ext.extend(GO.dialog.TabbedFormDialog, {
 		
 		
 		Ext.apply(this, {
-			title:GO.calendar.lang.attendance,
+			title:t("Attendance", "calendar"),
 			height: 460,
 			
 			width: 400,
@@ -29,7 +29,7 @@ GO.calendar.AttendanceWindow = Ext.extend(GO.dialog.TabbedFormDialog, {
 	buildForm : function(){
 		
 		
-		var reminderValues = [['0', GO.calendar.lang.noReminder]];
+		var reminderValues = [['0', t("No reminder", "calendar")]];
 
 		for (var i = 1; i < 60; i++) {
 			reminderValues.push([i, i]);
@@ -56,10 +56,10 @@ GO.calendar.AttendanceWindow = Ext.extend(GO.dialog.TabbedFormDialog, {
 			displayField : 'text',
 			store : new Ext.data.SimpleStore({
 				fields : ['value', 'text'],
-				data : [['60', GO.lang.strMinutes],
-				['3600', GO.lang.strHours],
-				['86400', GO.lang.strDays],
-				['604800', GO.lang.strWeeks]
+				data : [['60', t("Minutes")],
+				['3600', t("Hours")],
+				['86400', t("Days")],
+				['604800', t("Weeks")]
 
 				]
 			}),
@@ -69,12 +69,12 @@ GO.calendar.AttendanceWindow = Ext.extend(GO.dialog.TabbedFormDialog, {
 		
 		this.reminderComposite = new Ext.form.CompositeField({
 			style:'margin-top:10px;',
-			fieldLabel : GO.calendar.lang.reminder,
+			fieldLabel : t("Reminder", "calendar"),
 			items : [this.reminderValue,this.reminderMultiplier]
 		});
 		
 		this.enableReminderCheckbox = new Ext.ux.form.XCheckbox({
-			boxLabel : GO.calendar.lang.useReminder,
+			boxLabel : t("Enable reminder for this event", "calendar"),
 			name : 'enable_reminder',
 			width : 'auto',
 			hideLabel : true,
@@ -101,19 +101,19 @@ GO.calendar.AttendanceWindow = Ext.extend(GO.dialog.TabbedFormDialog, {
 				columns:1,
 				items:[
 				{
-					boxLabel: GO.calendar.lang.iWillAttend,
+					boxLabel: t("I will attend", "calendar"),
 					name: 'status',
 					inputValue: 'ACCEPTED'
 				},{
-					boxLabel: GO.calendar.lang.iWillNotAttend,
+					boxLabel: t("I will not attend", "calendar"),
 					name: 'status',
 					inputValue: 'DECLINED'
 				},{
-					boxLabel: GO.calendar.lang.iMightAttend,
+					boxLabel: t("I might attend", "calendar"),
 					name: 'status',
 					inputValue: 'TENTATIVE'
 				},{
-					boxLabel: GO.calendar.lang.iWillDecideLater,
+					boxLabel: t("I haven't decided yet", "calendar"),
 					name: 'status',
 					inputValue: 'NEEDS-ACTION'
 				}
@@ -122,20 +122,20 @@ GO.calendar.AttendanceWindow = Ext.extend(GO.dialog.TabbedFormDialog, {
 				hideLabel:true,
 				name:'notify_organizer',
 				xtype:'xcheckbox',
-				boxLabel:GO.calendar.lang.notifyOrganizer
+				boxLabel:t("Notify the organizer by e-mail about my decision", "calendar")
 			}
 //			{
 //				xtype:'plainfield',
-//				fieldLabel:GO.calendar.lang.organizer,
+//				fieldLabel:t("Organizer", "calendar"),
 //				name:'organizer'
 //			}
 			,this.infoPanel = new Ext.form.FieldSet({
-				title:GO.calendar.lang.eventInfo
+				title:t("Event details", "calendar")
 			}),{
 				xtype : 'fieldset',
 				autoHeight : true,
 				layout : 'form',
-				title : GO.calendar.lang.reminder,
+				title : t("Reminder", "calendar"),
 				items : [
 					this.enableReminderCheckbox,
 					this.reminderComposite

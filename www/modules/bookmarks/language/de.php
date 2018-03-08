@@ -1,27 +1,24 @@
 <?php
-
-
-$l["bookmarks"]='Lesezeichen';
-$l["bookmark"]='Lesezeichen';
-$l["category"]='Kategorie';
-$l["title"]='Titel';
-$l["description"]='Beschreibung';
-$l["logo"]='Logo';
-$l["extern"]='In neuem Reiter öffnen';
-$l["administrateCategories"]='Kategorien verwalten';
-$l["thumbnails"]='Thumbnails';
-$l["chooseIcon"]='Icon für Lesezeichen auswählen';
-$l["clearLogo"]='Icon löschen';
-$l["uploadLogo"]='Icon hochladen';
-$l["showAll"]='Alle anzeigen';
-$l["sharedCategory"]='Freigegebene Kategorie';
-
-$l['name']='Lesezeichen';
-$l['description']='Ein Modul um Lesezeichen zu erstellen.';
-$l['general']='Allgemein';
-$l['googleDescription']="Durchsuche das Internet";
-
-$l['behaveAsModule']='Verhalten wie ein Modul (Browser neu laden)';
-$l['confirmDelete']='Sind Sie sicher, dass Sie dieses Lesezeichen löschen wollen?';
-$l['toggle']='Ansicht umschalten';
-$l['showCategoryInStartMenu']='Lesezeichen gruppieren (Browser Reload nötig)';
+return array (
+  'Bookmark' => 'Lesezeichen',
+  'Category' => 'Kategorie',
+  'Title' => 'Titel',
+  'Open in new browser tab' => 'In neuem Reiter öffnen',
+  'Administrate categories' => 'Kategorien verwalten',
+  'Choose icon for bookmark' => 'Icon für Lesezeichen auswählen',
+  'Clear Logo' => 'Icon löschen',
+  'Upload Logo' => 'Icon hochladen',
+  'Show all' => 'Alle anzeigen',
+  'Shared category' => 'Freigegebene Kategorie',
+  'General' => 'Allgemein',
+  'Search the web' => 'Durchsuche das Internet',
+  'Behave as a module (Browser reload required)' => 'Verhalten wie ein Modul (Browser neu laden)',
+  'Are you sure you want to delete this bookmark?' => 'Sind Sie sicher, dass Sie dieses Lesezeichen löschen wollen?',
+  'Toggle view' => 'Ansicht umschalten',
+  'Group bookmarks in main start menu (Browser reload required)' => 'Lesezeichen gruppieren (Browser Reload nötig)',
+  'name' => 'Lesezeichen',
+  'description' => 'Ein Modul um Lesezeichen zu erstellen.',
+  'Bookmarks' => 'Lesezeichen',
+  'Logo' => 'Logo',
+  'Thumbnails' => 'Thumbnails',
+);

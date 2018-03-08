@@ -1,81 +1,65 @@
 <?php
-$l["name"]="Standard sidan";
-$l["description"]="Mallen för standardsidan";
-
-$l["installdefaultsiteerror"] = 'Kunde inte installera modulen "standardsidan".';
-$l["installsiteerror"] = 'Kunde inte installera "site" modulen.';
-
-$l["ticketFirstname"] = 'Förnamn';
-$l["ticketMiddlename"] = 'Mellannamn';
-$l["ticketLastname"] = 'Efternamn';
-$l["ticketEmail"] = 'Epost';
-$l["ticketPhone"] = 'Telefon';
-$l["ticketCompany"] = 'Företag';
-
-$l["ticketSubject"] = 'Ämne';
-$l["ticketCreated"] = 'Skapad';
-$l["ticketDate"] = 'Datum';
-$l["ticketType"] = 'Typ';
-$l["ticketStatus"] = 'Status';
-$l["ticketNumber"] = 'Ärendenummer';
-$l["ticketAgent"] = 'Agent';
-$l["ticketStatusOpen"] = 'Öppen';
-
-$l["ticketFilterAll"] = 'Alla';
-$l["ticketFilterOpenInProgress"] = 'Öppen och under behandling';
-$l["ticketFilterOpen"] = 'Öppen';
-$l["ticketFilterInProgress"] = 'Under behandling';
-$l["ticketFilterClose"] = 'Stängd';
-
-$l["ticketDiscussion"] = 'Diskussion';
-$l["ticketFiles"] = 'Filer';
-$l["ticketNoneFound"] = 'Inga ärenden hittades';
-$l["ticketYourTickets"] = 'Dina ärenden';
-$l["ticketFilter"] = 'Filter';
-
-$l["ticketList"] = 'Ärendelista';
-$l["ticketPriority"] = 'Prioritet';
-
-$l["ticketAddComment"] = 'Lägg till kommentar';
-
-$l["ticket"] = 'Ärende';
-$l["ticketYourMessage"] = 'Ditt meddelande';
-$l["ticketCloseTicket"] = 'Stäng';
-$l["ticketCloseTicketTooltip"] = 'Stäng detta ärendet. Du kan inte svara på detta ärende efter du har stängt det.';
-$l["ticketNewTicket"] = 'Nytt Ärende';
-$l["ticketContactInfo"] = 'Kontaktinformation';
-$l["ticketInfo"] = 'Ärendeinformation';
-$l["ticketBackToList"] = 'Tillbaka till översikten';
-
-$l["contactDetails"] = 'Kontakt detailjer';
-$l["companyDetails"] = 'Företags detailjer';
-$l["address"] = 'Adress';
-$l["usernameandpassword"] = 'Användarnamn och lösenord';
-
-$l["changePassword"] = 'Byt lösenord';
-$l["passwordChanged"] = 'Lösenordet har ändrats';
-$l["login"] = 'Loggain';
-$l['changePasswordText']='Använd formuläret nedan för att byta ditt lösenord';
-$l['forgotPassword']='Glömt lösenord?';
-$l['signup'] = 'Skapa konto';
-$l['register'] = 'Registrera';
-$l['submit'] = 'Skicka';
-$l['rememberme'] = 'Kom ihåg mig';
-$l['lostPassword'] = 'Glömt lösenordet?';
-$l['alreadySignedupText']='Om du redan har ett användarnamn och lösenord använd detta formulär för att logga in.';
-$l['forgotPasswordText']='Fyll i din epost-adress i formuläret nedan, du får strax ett lösenordslänk för att återställa ditt lösenord.';
-$l['registerformText']="Fyll i formuläret och klicka på 'Ok' för att registrera. Fälten som är markerade med * är obligatoriska.";
-
-
-$l['ticketCreatedTitle']="Vi har tagit emot ditt ärende";
-$l['ticketCreatedText']="Tack, vi har tagit emot ditt ärende och kommer att hålla dig informerad om status via epost.";
-
-$l['gotoTicket']="Gå till ärende";
-
-$l['selectOne']="Välj en status";
-
-$l['contactformTitle']="Kontaktformulär";
-$l['contactformText']="Fyll i formuläret och klicka på 'Ok' för att registrera. Fälten som är markerade med * är obligatoriska.";
-
-$l['addressbookNotFound']="Ingen adressbok med namnet '%s' hittades.";
-$l['contactformDoneText']="Vi har tagit emot din registrering.";
+return array (
+  'Could not install the "defaultsite" module.' => 'Kunde inte installera modulen "standardsidan".',
+  'Could not install the "site" module.' => 'Kunde inte installera "site" modulen.',
+  'First Name' => 'Förnamn',
+  'Middle Name' => 'Mellannamn',
+  'Last Name' => 'Efternamn',
+  'Email' => 'Epost',
+  'Phone' => 'Telefon',
+  'Company' => 'Företag',
+  'Subject' => 'Ämne',
+  'Created' => 'Skapad',
+  'Date' => 'Datum',
+  'Type' => 'Typ',
+  'Ticket no.' => 'Ärendenummer',
+  'Open' => 'Öppen',
+  'All' => 'Alla',
+  'Open and in progress' => 'Öppen och under behandling',
+  'In progress' => 'Under behandling',
+  'Closed' => 'Stängd',
+  'Discussion' => 'Diskussion',
+  'Files' => 'Filer',
+  'No tickets found' => 'Inga ärenden hittades',
+  'Your tickets' => 'Dina ärenden',
+  'Ticketlist' => 'Ärendelista',
+  'Priority' => 'Prioritet',
+  'Add Comment' => 'Lägg till kommentar',
+  'Ticket' => 'Ärende',
+  'Your message' => 'Ditt meddelande',
+  'Close' => 'Stäng',
+  'Close this ticket. You cannot respond to this ticket anymore when you have closed it.' => 'Stäng detta ärendet. Du kan inte svara på detta ärende efter du har stängt det.',
+  'New Ticket' => 'Nytt Ärende',
+  'Contact Info' => 'Kontaktinformation',
+  'Ticket information' => 'Ärendeinformation',
+  'Back to Overview' => 'Tillbaka till översikten',
+  'Contact Details' => 'Kontakt detailjer',
+  'Company Details' => 'Företags detailjer',
+  'Address' => 'Adress',
+  'Username and Password' => 'Användarnamn och lösenord',
+  'Change password' => 'Byt lösenord',
+  'Password changed' => 'Lösenordet har ändrats',
+  'Login' => 'Loggain',
+  'Use the below form to change your password' => 'Använd formuläret nedan för att byta ditt lösenord',
+  'Forgot password?' => 'Glömt lösenord?',
+  'Sign up' => 'Skapa konto',
+  'Register' => 'Registrera',
+  'Submit' => 'Skicka',
+  'Remember me' => 'Kom ihåg mig',
+  'Lost password?' => 'Glömt lösenordet?',
+  'If you already have a username and password use this form to login.' => 'Om du redan har ett användarnamn och lösenord använd detta formulär för att logga in.',
+  'Fill in your email address in the form below, and you\'ll receive a link to recover your password within minuts.' => 'Fyll i din epost-adress i formuläret nedan, du får strax ett lösenordslänk för att återställa ditt lösenord.',
+  'Fill out this form and click on \'Ok\' to register. The fields marked with a * are required.' => 'Fyll i formuläret och klicka på \'Ok\' för att registrera. Fälten som är markerade med * är obligatoriska.',
+  'We received your ticket' => 'Vi har tagit emot ditt ärende',
+  'Thank you, we received your ticket and we will keep you informed about the status per e-mail.' => 'Tack, vi har tagit emot ditt ärende och kommer att hålla dig informerad om status via epost.',
+  'Go to ticket' => 'Gå till ärende',
+  'Select one' => 'Välj en status',
+  'Contact form' => 'Kontaktformulär',
+  'No address book found with name \'%s\'.' => 'Ingen adressbok med namnet \'%s\' hittades.',
+  'We have succesfully received your registration.' => 'Vi har tagit emot din registrering.',
+  'name' => 'Standard sidan',
+  'description' => 'Mallen för standardsidan',
+  'Status' => 'Status',
+  'Agent' => 'Agent',
+  'Filter' => 'Filter',
+);

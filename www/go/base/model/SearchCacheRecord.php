@@ -47,15 +47,15 @@ class SearchCacheRecord extends \GO\Base\Db\ActiveRecord {
 		return parent::model($className);
 	}
 	public function aclField() {
-		return 'acl_id';
+		return 'aclId';
 	}
 
 	public function tableName() {
-		return 'go_search_cache';
+		return 'core_search';
 	}
 
 	public function primaryKey(){
-		return array('model_id', 'model_type_id');					
+		return array('entityId', 'id');					
 	}
 	
 	public function checkDatabaseSupported() {
@@ -71,14 +71,25 @@ class SearchCacheRecord extends \GO\Base\Db\ActiveRecord {
 	 */
 	public function findLinks($model, $findParams=array()){
 		
+		if($model instanceof \GO\Base\Model\SearchCacheRecord) {
+			$entityId = $model->entityId;
+			$entityTypeId = $model->entityTypeId;
+		} else
+		{
+			$entityId = $model->id;
+			$entityTypeId = $model->getType()->getId();
+		}
+		
+		
 		$params = \GO\Base\Db\FindParams::newInstance()
 						->select("t.*,l.description AS link_description")
-						->order('mtime','DESC')
-						->join('go_links_'.$model->tableName(),  \GO\Base\Db\FindCriteria::newInstance()
+						->order('modifiedAt','DESC')
+						->join('core_link',  \GO\Base\Db\FindCriteria::newInstance()
 										->ignoreUnknownColumns() //we don't have models for go_links_* tables
-										->addCondition('id', $model->id,'=','l')
-										->addCondition('model_id', 'l.model_id','=','t',true, true)
-										->addCondition('model_type_id', 'l.model_type_id','=','t',true, true),
+										->addCondition('fromId', $entityId,'=','l')
+										->addCondition('fromEntityTypeId', $entityTypeId,'=','l')
+										->addCondition('entityId', 'l.toId','=','t',true, true)
+										->addCondition('entityTypeId', 'l.toEntityTypeId','=','t',true, true),
 										'l')
 						->mergeWith($findParams);
 
@@ -100,7 +111,26 @@ class SearchCacheRecord extends \GO\Base\Db\ActiveRecord {
 	
 	
 	public function countLinks($model_id = 0) {
-		return class_exists($this->model_name) ? GO::getModel($this->model_name)->countLinks($model_id) :0;
+		
+		$model_name = \go\core\orm\EntityType::findById($this->entityTypeId)->getClassName();
+		
+		return class_exists($model_name) ? GO::getModel($model_name)->countLinks($model_id) :0;
+	}
+	
+	public function getModel_name() {
+		return \go\core\orm\EntityType::findById($this->entityTypeId)->getClassName();
+	}
+	
+	public function getModel_id() {
+		return $this->entityId;
+	}
+	
+	public function getAttributes($outputType = null) {
+		$attr = parent::getAttributes($outputType);
+		$attr['model_id'] = $this->entityId;
+		$attr['model_name'] = $this->getModel_name();
+		
+		return $attr;
 	}
 
 }

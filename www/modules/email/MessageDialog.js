@@ -14,7 +14,7 @@ GO.email.MessageDialog = function(config){
 	this.replyButton=new Ext.Button({
 		disabled:false,
 		iconCls: 'btn-reply',
-		text: GO.email.lang.reply,
+		text: t("Reply", "email"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 
@@ -29,7 +29,7 @@ GO.email.MessageDialog = function(config){
 	}),this.replyAllButton=new Ext.Button({
 		disabled:false,
 		iconCls: 'btn-reply-all',
-		text: GO.email.lang.replyAll,
+		text: t("Reply all", "email"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			GO.email.showComposer({
@@ -44,7 +44,7 @@ GO.email.MessageDialog = function(config){
 	}),this.forwardButton=new Ext.Button({
 		disabled:false,
 		iconCls: 'btn-forward',
-		text: GO.email.lang.forward,
+		text: t("Forward", "email"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			GO.email.showComposer({
@@ -60,7 +60,7 @@ GO.email.MessageDialog = function(config){
 	this.printButton = new Ext.Button({
 		disabled: false,
 		iconCls: 'btn-print',
-		text: GO.lang.cmdPrint,
+		text: t("Print"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			this.messagePanel.body.print();
@@ -69,7 +69,7 @@ GO.email.MessageDialog = function(config){
 	})];
 	
 	config.layout='fit';
-	config.title=GO.email.lang.message;
+	config.title=t("Message", "email");
 	config.stateId='email-message-dialog';
 	config.maximizable=true;
 	config.collapsible=true;
@@ -82,7 +82,7 @@ GO.email.MessageDialog = function(config){
 	config.items=this.messagePanel;
 	config.tbar=this.toolbar;
 	config.buttons=[{	
-		text: GO.lang['cmdClose'],
+		text: t("Close"),
 		handler: function()
 		{
 			this.hide();

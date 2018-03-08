@@ -1,59 +1,51 @@
 <?php
-$l['name'] = 'Plánování systémových úloh';
-$l['description'] = 'Modul, který umožňuje spravovat systémové úlohy v rámci {product_name}.';
-
-$l['cronManager'] = 'Plánování systémových úloh';
-
-$l['cronName'] = 'Název';
-$l['minutes'] = 'Minuta';
-$l['hours'] = 'Hodina';
-$l['monthdays'] = 'Den v měsíci';
-$l['months'] = 'Měsíc';
-$l['weekdays'] = 'Den v týdnu';
-$l['years'] = 'Rok';
-$l['active'] = 'Povoleno';
-$l['runonce'] = 'Spustit pouze jednou';
-$l['job'] = 'Úloha';
-
-$l['minutesExample'] = '(0-59)';
-$l['hoursExample'] = '(0-23)';
-$l['monthdaysExample'] = '(1-31)';
-$l['monthsExample'] = '(1-12)';
-$l['weekdaysExample'] = '(0-6)';
-$l['yearsExample'] = '(2013-2015)';
-
-$l['minutesNotMatch'] = 'Minuta neodpovídají požadovanému formátu.';
-$l['hoursNotMatch'] = 'Hodina neodpovídají požadovanému formátu.';
-$l['monthdaysNotMatch'] = 'Den v měsíci neodpovídají požadovanému formátu.';
-$l['monthsNotMatch'] = 'Měsíc neodpovídají požadovanému formátu.';
-$l['weekdaysNotMatch'] = 'Den v týdnu neodpovídají požadovanému formátu.';
-$l['yearsNotMatch'] = 'Rok neodpovídá požadovanému formátu.';
-
-$l['example'] = 'Example';
-$l['exampleFormat1Explanation'] = '(vše)';
-$l['exampleFormat2Explanation'] = '(pouze jednou)';
-$l['exampleFormat3Explanation'] = '(Vše mezi 1 až 5)';
-$l['exampleFormat4Explanation'] = '(Každou 2. mezi 0 až 23)';
-$l['exampleFormat5Explanation'] = '(Pouze v daných číslech)';
-$l['exampleFormat6Explanation'] = '(Mezi 0 až 4 a mezi 8 až 12)';
-
-$l['exampleFormats'] = 'Prosím, použijte jeden z následujících formátů (např. hodina, bez mezer):';
-
-$l['timeFieldSetTitle'] = 'Čas';
-$l['cronSettings'] = 'Nastavení';
-$l['period'] = 'Období';
-$l['runUpcoming'] = 'Nadcházející úlohy';
-$l['lastrun'] = 'Poslední spuštění';
-$l['nextrun'] = 'Nadcházející spuštění';
-$l['completedat'] = 'Dokončeno v';
-
-$l['running'] = 'Spuštěna';
-
-$l['parameters'] = 'Parametry';
-$l['usersAndGroups'] = 'Uživatelé a skupiny';
-$l['limitUserGroups'] = 'Pouze pro vybrané uživatelé a skupiny';
-
-$l['groups'] = 'Skupiny';
-$l['group'] = 'Skupina';
-$l['users'] = 'Uživatelé';
-$l['user'] = 'Uživatel';
+return array (
+  'Manage system tasks' => 'Plánování systémových úloh',
+  'Name' => 'Název',
+  'Minutes' => 'Minuta',
+  'Hours' => 'Hodina',
+  'Month days' => 'Den v měsíci',
+  'Months' => 'Měsíc',
+  'Week days' => 'Den v týdnu',
+  'Years' => 'Rok',
+  'Enabled' => 'Povoleno',
+  'Run only once' => 'Spustit pouze jednou',
+  'Job' => 'Úloha',
+  'Minutes does not match the required format.' => 'Minuta neodpovídají požadovanému formátu.',
+  'Hours does not match the required format.' => 'Hodina neodpovídají požadovanému formátu.',
+  'Monthdays does not match the required format.' => 'Den v měsíci neodpovídají požadovanému formátu.',
+  'Months does not match the required format.' => 'Měsíc neodpovídají požadovanému formátu.',
+  'Weekdays does not match the required format.' => 'Den v týdnu neodpovídají požadovanému formátu.',
+  'Years does not match the required format.' => 'Rok neodpovídá požadovanému formátu.',
+  '(all)' => '(vše)',
+  '(only the first)' => '(pouze jednou)',
+  '(All between 1 and 5)' => '(Vše mezi 1 až 5)',
+  '(Every 2nd between 0 and 23)' => '(Každou 2. mezi 0 až 23)',
+  '(Only on the given numbers)' => '(Pouze v daných číslech)',
+  '(Between 0 and 4 and between 8 and 12)' => '(Mezi 0 až 4 a mezi 8 až 12)',
+  'Please use one of these formats (eg. hour, no spaces):' => 'Prosím, použijte jeden z následujících formátů (např. hodina, bez mezer):',
+  'Time' => 'Čas',
+  'Cron Settings' => 'Nastavení',
+  'Period' => 'Období',
+  'Upcoming Cron-Jobs' => 'Nadcházející úlohy',
+  'Last run' => 'Poslední spuštění',
+  'Next run' => 'Nadcházející spuštění',
+  'Completed at' => 'Dokončeno v',
+  'Running' => 'Spuštěna',
+  'Params' => 'Parametry',
+  'Users and Groups' => 'Uživatelé a skupiny',
+  'Limit to selected Users and Groups' => 'Pouze pro vybrané uživatelé a skupiny',
+  'Groups' => 'Skupiny',
+  'Group' => 'Skupina',
+  'Users' => 'Uživatelé',
+  'user' => 'Uživatel',
+  'name' => 'Plánování systémových úloh',
+  'description' => 'Modul, který umožňuje spravovat systémové úlohy v rámci {product_name}.',
+  '(0-59)' => '(0-59)',
+  '(0-23)' => '(0-23)',
+  '(1-31)' => '(1-31)',
+  '(1-12)' => '(1-12)',
+  '(0-6)' => '(0-6)',
+  '(2013-2015)' => '(2013-2015)',
+  'Example' => 'Example',
+);

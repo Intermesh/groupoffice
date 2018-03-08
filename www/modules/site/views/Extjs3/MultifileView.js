@@ -90,7 +90,7 @@ GO.site.MultifileView = Ext.extend(Ext.DataView,{
 	},
 	
 	getMaxSizeExceededErrorMsg : function(){
-		return GO.lang.maxAttachmentsSizeExceeded
+		return t("The total size of your attachments ({total}) exceeds the maximum ({max}).")
 			.replace('{max}',Ext.util.Format.fileSize(this.maxSize))
 			.replace('{total}',Ext.util.Format.fileSize(this.getTotalSize()));
 	},
@@ -138,7 +138,7 @@ GO.site.MultifileView = Ext.extend(Ext.DataView,{
 //				items: [
 //				{
 //					iconCls:'btn-delete',
-//					text:GO.lang.cmdDelete,
+//					text:t("Delete"),
 //					scope:this,
 //					handler: function()
 //					{

@@ -29,7 +29,7 @@ GO.email.TemplateGridPanel = Ext.extend(GO.grid.GridPanel,{
 					dataIndex: 'text' 
 				},
 				new GO.grid.RadioColumn({
-					header: GO.lang.strDefault,
+					header: t("Default"),
 					dataIndex: 'checked',
 					width: 90,
 					isDisabled:function(record){

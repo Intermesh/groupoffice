@@ -8,10 +8,10 @@ GO.addressbook.ContextMenu = function(config){
 
 	config.items=[];
 
-	if (GO.email) {
+	if(go.ModuleManager.isAvailable("email")) {
 		this.actionCreateMail = new Ext.menu.Item({
 			iconCls: 'btn-email',
-			text:GO.addressbook.lang.createEmailSelected,
+			text:t("Create email for selection", "addressbook"),
 			cls: 'x-btn-text-icon',
 			scope:this,
 			handler: function()
@@ -34,7 +34,7 @@ GO.addressbook.ContextMenu = function(config){
 	
 	this.actionBatchEdit = new Ext.menu.Item({
 		iconCls: 'btn-settings',
-		text: GO.lang.batchEdit,
+		text: t("Batch edit"),
 		cls: 'x-btn-text-icon',
 		scope:this,
 		handler: function()
@@ -67,7 +67,7 @@ Ext.extend(GO.addressbook.ContextMenu, Ext.menu.Menu, {
 	},
 
 	showCreateMailDialog : function(config) {		
-		if (GO.email) {
+		if(go.ModuleManager.isAvailable("email")) {
 			
 			if(!config)
 				config = {};

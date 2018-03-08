@@ -30,7 +30,7 @@ class EncryptedText extends AbstractCustomfieldtype{
 		if(\GO\Customfields\Model\AbstractCustomFieldsRecord::$formatForExport){
 			return \GO\Base\Util\Crypt::decrypt($attributes[$key]);
 		}
-		$decrypted = !empty($attributes[$key]) ? '<div ext:qtip="'.htmlspecialchars(\GO\Base\Util\Crypt::decrypt($attributes[$key]),ENT_COMPAT, 'utf-8').'">'.\GO::t('pointForText').'</div>' : '';
+		$decrypted = !empty($attributes[$key]) ? '<div ext:qtip="'.htmlspecialchars(\GO\Base\Util\Crypt::decrypt($attributes[$key]),ENT_COMPAT, 'utf-8').'">'.\GO::t("Point cursor here to read entry").'</div>' : '';
 		return $decrypted;
 	}
 }

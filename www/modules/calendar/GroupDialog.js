@@ -17,23 +17,23 @@ GO.calendar.GroupDialog = function(config) {
 	config.width = 550;
 	config.height = 450;
 	config.closeAction = 'hide';
-	config.title = GO.calendar.lang.resource_group;
+	config.title = t("Resource group", "calendar");
 	config.items = this.formPanel;
 	config.focus = focusFirstField.createDelegate(this);
 	config.buttons = [{
-		text : GO.lang['cmdOk'],
+		text : t("Ok"),
 		handler : function() {
 			this.submitForm(true);
 		},
 		scope : this
 	}, {
-		text : GO.lang['cmdApply'],
+		text : t("Apply"),
 		handler : function() {
 			this.submitForm();
 		},
 		scope : this
 	}, {
-		text : GO.lang['cmdClose'],
+		text : t("Close"),
 		handler : function() {
 			this.hide();
 		},
@@ -66,7 +66,7 @@ Ext.extend(GO.calendar.GroupDialog, GO.Window, {
 		{
 			this.formPanel.load({
 				url : GO.url("calendar/group/load"),
-				waitMsg : GO.lang['waitMsgLoad'],
+				waitMsg : t("Loading..."),
 				success : function(form, action)
 				{
 					this.groupAdminsPanel.setModelId(action.result.data.id);
@@ -75,14 +75,14 @@ Ext.extend(GO.calendar.GroupDialog, GO.Window, {
 					{
 						this.tabPanel.hideTabStripItem('permissions-panel');
 						this.tabPanel.hideTabStripItem(this.groupAdminsPanel);
-						this.setTitle(GO.calendar.lang.calendar_group);
+						this.setTitle(t("Calendar group", "calendar"));
 					}else
 					{
 						this.tabPanel.unhideTabStripItem('permissions-panel');
 						this.tabPanel.unhideTabStripItem(this.groupAdminsPanel);
 						
 						
-						this.setTitle(GO.calendar.lang.resource_group);
+						this.setTitle(t("Resource group", "calendar"));
 					}
 
 					GO.calendar.GroupDialog.superclass.show.call(this);
@@ -101,7 +101,7 @@ Ext.extend(GO.calendar.GroupDialog, GO.Window, {
 	},
 	setGroupId : function(group_id)
 	{
-		if(GO.customfields)
+		if(go.ModuleManager.isAvailable("customfields"))
 			this.disableCategoriesPanel.setModel(group_id,"GO\\Calendar\\Model\\Event");
 		
 		this.formPanel.form.baseParams['id'] = group_id;
@@ -111,7 +111,7 @@ Ext.extend(GO.calendar.GroupDialog, GO.Window, {
 	{
 		this.formPanel.form.submit({
 			url : GO.url("calendar/group/submit"),			
-			waitMsg : GO.lang['waitMsgSave'],
+			waitMsg : t("Saving..."),
 			success : function(form, action)
 			{
 				if (action.result.id)
@@ -133,11 +133,11 @@ Ext.extend(GO.calendar.GroupDialog, GO.Window, {
 			{
 				if (action.failureType == 'client')
 				{
-					Ext.MessageBox.alert(GO.lang['strError'],
-						GO.lang['strErrorsInForm']);
+					Ext.MessageBox.alert(t("Error"),
+						t("You have errors in your form. The invalid fields are marked."));
 				} else
 {
-					Ext.MessageBox.alert(GO.lang['strError'],
+					Ext.MessageBox.alert(t("Error"),
 						action.result.feedback);
 				}
 			},
@@ -147,7 +147,7 @@ Ext.extend(GO.calendar.GroupDialog, GO.Window, {
 	buildForm : function()
 	{
 		this.propertiesPanel = new Ext.Panel({
-			title : GO.lang['strProperties'],
+			title : t("Properties"),
 			cls : 'go-form-panel',
 			layout : 'form',
 			autoScroll : true,
@@ -155,12 +155,12 @@ Ext.extend(GO.calendar.GroupDialog, GO.Window, {
 				xtype : 'textfield',
 				name : 'name',
 				anchor : '100%',
-				fieldLabel : GO.lang.strName
+				fieldLabel : t("Name")
 			},{
 				xtype:'xcheckbox',
 				name:'show_not_as_busy',
 				hideLabel: true,
-				boxLabel:GO.calendar.lang.showNotBusy
+				boxLabel:t("Don't show new reservations as busy", "calendar")
 			}]
 		});
 
@@ -168,11 +168,11 @@ Ext.extend(GO.calendar.GroupDialog, GO.Window, {
 		var items = [this.propertiesPanel];
 
 		this.groupAdminsPanel = new GO.base.model.multiselect.panel({
-			title: GO.calendar.lang.admins,
+			title: t("Administrators", "calendar"),
 			url:'calendar/groupAdmin',
 			columns:[
-				{header: GO.lang.strTitle, dataIndex: 'name'},
-				{header:GO.lang.strEmail,dataIndex: 'email'}
+				{header: t("Title"), dataIndex: 'name'},
+				{header:t("E-mail"),dataIndex: 'email'}
 			],
 			fields:['id','name','email'],
 			model_id:0
@@ -180,7 +180,7 @@ Ext.extend(GO.calendar.GroupDialog, GO.Window, {
 
 		items.push(this.groupAdminsPanel);
 		
-		if(GO.customfields){
+		if(go.ModuleManager.isAvailable("customfields")){
 			this.disableCategoriesPanel = new GO.customfields.DisableCategoriesPanel();
 			items.push(this.disableCategoriesPanel);
 		}

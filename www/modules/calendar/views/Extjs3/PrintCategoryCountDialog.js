@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: PrintCategoryCountDialog.js 16635 2014-01-17 14:37:56Z mschering $
+ * @version $Id: PrintCategoryCountDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
@@ -17,7 +17,7 @@ GO.calendar.PrintCategoryCountDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 
 		Ext.apply(this, {
 			goDialogId:'printCategoryCountDialog',
-			title:GO.calendar.lang.cmdPrintCategoryCount,
+			title:t("Print count per category", "calendar"),
 			formControllerUrl:'calendar/calendar',
 			collapsible:true,
 			loadOnNewModel:false,
@@ -33,13 +33,13 @@ GO.calendar.PrintCategoryCountDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			enableCloseButton : false,
 			
 			buttons:[{
-				text: GO.lang['cmdExport'],
+				text: t("Export"),
 				handler: function(){
 					this.submitForm(true);
 				},
 				scope: this
 			},{
-				text: GO.lang['cmdClose'],
+				text: t("Close"),
 				handler: function(){
 					this.hide();
 				},
@@ -71,7 +71,7 @@ GO.calendar.PrintCategoryCountDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			anchor: '100%',
 			format : GO.settings['date_format'],
 			allowBlank : false,
-			fieldLabel: GO.calendar.lang.startDate,
+			fieldLabel: t("Start date", "calendar"),
 			value: startOfLastMonth.format(GO.settings.date_format)
 		});
 		
@@ -81,13 +81,13 @@ GO.calendar.PrintCategoryCountDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			anchor: '100%',
 			format : GO.settings['date_format'],
 			allowBlank : false,
-			fieldLabel: GO.calendar.lang.endDate,
+			fieldLabel: t("End date", "calendar"),
 			value: endOfLastMonth.format(GO.settings.date_format)
 		});
 	
 		this.previousMonthButton = new Ext.Button({
 			flex:1,
-			text: GO.calendar.lang.previousMonth,
+			text: t("Previous month", "calendar"),
 			handler: function(){
 				this.changeMonth(-1);
 			},
@@ -96,7 +96,7 @@ GO.calendar.PrintCategoryCountDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		
 		this.nextMonthButton = new Ext.Button({
 			flex:1,
-			text: GO.calendar.lang.nextMonth,
+			text: t("Next month", "calendar"),
 			handler: function(){
 				this.changeMonth(1);
 			},
@@ -122,7 +122,7 @@ GO.calendar.PrintCategoryCountDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			waitMsgTarget:true,			
 			border: false,
 			autoScroll:true,
-			title:GO.lang['strProperties'],
+			title:t("Properties"),
 			layout:'form',
 			cls:'go-form-panel',
 			items : [

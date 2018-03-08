@@ -1,29 +1,26 @@
 <?php
-
-
-$l["summary"]= 'Sommaire';
-$l["noItems"]= 'Vous n\'avez aucun élément sur votre page de démarrage.';
-$l["selectPortlet"]= 'Sélectionner un portlet';
-$l["hotTopics"]= 'Lecteur de flux RSS';
-$l["enterRssFeed"]= 'Veuillez saisir l\'adresse du flux RSS :';
-$l["notes"]= 'Notes';
-$l["loadingFeed"]= 'Chargement des flux...';
-$l["goToPost"]= 'Lire l\'article';
-$l["today"]= 'Aujourd\'hui ';
-$l["dueTime"]="Afficher jusqu\'à";
-$l["title"]="Titre";
-$l["manageAnnouncements"]='Gérer les annonces';
-$l["webFeeds"]='Gérer les flux web';
-$l["type"]='Type';
-$l["summaryType"]='Afficher sur la page sommaire';
-$l["rssFeeds"]='Flux RSS';
-$l["noRssFeeds"]='Aucun flux RSS ajouté !<br />Cliquez sur le bouton de configuration (dans le coin en haut à droite de cette fenêtre) pour ajouter des flux.';
-
-$l['name']='Sommaire';
-$l['description']='Module de démarrage. Organisation de la page de démarrage.';
-$l['default_rss_url']='http://news.google.fr/nwshp?hl=fr&tab=wn&output=rss';
-$l['announcement']='Annonce';
-$l['announcements']='Annonces';
-$l['default_rss_title']='Actualités';
-
-$l['latestReadAnnouncementRecord'] = 'Enregistrement de la dernière annonce lue';
+return array (
+  'You don\'t have any items on your start page.' => 'Vous n\'avez aucun élément sur votre page de démarrage.',
+  'Select portlet' => 'Sélectionner un portlet',
+  'News' => 'Actualités',
+  'Please enter the RSS feed URL:' => 'Veuillez saisir l\'adresse du flux RSS :',
+  'Loading Feed...' => 'Chargement des flux...',
+  'Go to Post' => 'Lire l\'article',
+  'Today ' => 'Aujourd\'hui ',
+  'Show until' => 'Afficher jusqu\\\'à',
+  'Title' => 'Titre',
+  'Manage announcements' => 'Gérer les annonces',
+  'Manage webfeeds' => 'Gérer les flux web',
+  'Summary' => 'Afficher sur la page sommaire',
+  'Rss Feeds' => 'Flux RSS',
+  'No RSS feeds have been added.<br />Click the settings button in the top right corner of this window to add feeds.' => 'Aucun flux RSS ajouté !<br />Cliquez sur le bouton de configuration (dans le coin en haut à droite de cette fenêtre) pour ajouter des flux.',
+  'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml' => 'http://news.google.fr/nwshp?hl=fr&tab=wn&output=rss',
+  'Announcement' => 'Annonce',
+  'Announcements' => 'Annonces',
+  'Record of latest read announcement' => 'Enregistrement de la dernière annonce lue',
+  'name' => 'Sommaire',
+  'description' => 'Module de démarrage. Organisation de la page de démarrage.',
+  'Start page' => 'Sommaire',
+  'Notes' => 'Notes',
+  'Type' => 'Type',
+);

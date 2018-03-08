@@ -124,7 +124,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 				if(!empty($rrule->byday)){
 					if (!empty($params['duplicate']))
 						$model->delete();
-					throw new \Exception(\GO::t('cantMoveRecurringByDay', 'calendar'));
+					throw new \Exception(\GO::t("Sorry, you can't move events that recur on weekdays to other days like this. Please open the event and adjust the recurrence properties.", "calendar"));
 				}
 			}
 		}
@@ -501,17 +501,17 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 //									
 //				if($shouldSend){
 //					if($isNewEvent){
-//						$subject = \GO::t('invitation', 'calendar').': '.$event->name;
+//						$subject = \GO::t("Invitation", "calendar").': '.$event->name;
 //					}elseif($sendingParticipant)
 //					{							
-//						$updateReponses = \GO::t('updateReponses','calendar');
+//						$updateReponses = \GO::t("updateReponses", "calendar");
 //						$subject= sprintf($updateReponses[$sendingParticipant->status], $sendingParticipant->name, $event->name);
 //					}elseif($method == 'CANCEL')
 //					{
-//						$subject = \GO::t('cancellation','calendar').': '.$event->name;
+//						$subject = \GO::t("Cancellation", "calendar").': '.$event->name;
 //					}else
 //					{
-//						$subject = \GO::t('invitation_update', 'calendar').': '.$event->name;
+//						$subject = \GO::t("Updated invitation", "calendar").': '.$event->name;
 //					}
 //
 //
@@ -519,25 +519,25 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 //					$declineUrl = \GO::url("calendar/event/invitation",array("id"=>$event->id,'accept'=>0,'email'=>$participant->email,'participantToken'=>$participant->getSecurityToken()),false);
 //
 //					if($method=='REQUEST' && $isNewEvent){
-//						$body = '<p>' . \GO::t('invited', 'calendar') . '</p>' .
+//						$body = '<p>' . \GO::t("You are invited for the following event", "calendar") . '</p>' .
 //										$event->toHtml() .
-//										'<p><b>' . \GO::t('linkIfCalendarNotSupported', 'calendar') . '</b></p>' .
-//										'<p>' . \GO::t('acccept_question', 'calendar') . '</p>' .
-//										'<a href="'.$acceptUrl.'">'.\GO::t('accept', 'calendar') . '</a>' .
+//										'<p><b>' . \GO::t("Only use the links below if your mail client does not support calendaring functions.", "calendar") . '</b></p>' .
+//										'<p>' . \GO::t("Do you accept this event?", "calendar") . '</p>' .
+//										'<a href="'.$acceptUrl.'">'.\GO::t("Accept", "calendar") . '</a>' .
 //										'&nbsp;|&nbsp;' .
-//										'<a href="'.$declineUrl.'">'.\GO::t('decline', 'calendar') . '</a>';
+//										'<a href="'.$declineUrl.'">'.\GO::t("Decline", "calendar") . '</a>';
 //					}elseif($method=='CANCEL') {
-//						$body = '<p>' . \GO::t('cancelMessage', 'calendar') . '</p>' .
+//						$body = '<p>' . \GO::t("The following event has been cancelled by the organizer", "calendar") . '</p>' .
 //										$event->toHtml();
 //					}else // on update event
 //					{
-//						$body = '<p>' . \GO::t('invitation_update', 'calendar') . '</p>' .
+//						$body = '<p>' . \GO::t("Updated invitation", "calendar") . '</p>' .
 //										$event->toHtml() .
-//										'<p><b>' . \GO::t('linkIfCalendarNotSupported', 'calendar') . '</b></p>' .
-//										'<p>' . \GO::t('acccept_question', 'calendar') . '</p>' .
-//										'<a href="'.$acceptUrl.'">'.\GO::t('accept', 'calendar') . '</a>' .
+//										'<p><b>' . \GO::t("Only use the links below if your mail client does not support calendaring functions.", "calendar") . '</b></p>' .
+//										'<p>' . \GO::t("Do you accept this event?", "calendar") . '</p>' .
+//										'<a href="'.$acceptUrl.'">'.\GO::t("Accept", "calendar") . '</a>' .
 //										'&nbsp;|&nbsp;' .
-//										'<a href="'.$declineUrl.'">'.\GO::t('decline', 'calendar') . '</a>';
+//										'<a href="'.$declineUrl.'">'.\GO::t("Decline", "calendar") . '</a>';
 //					}
 //
 //					$fromEmail = \GO::user() ? \GO::user()->email : $sendingParticipant->email;
@@ -1070,7 +1070,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 	 */
 	private function _getTaskResponseForPeriod($response,$calendar,$startTime,$endTime){
 		$resultCount = 0;
-		$dayString = \GO::t('full_days');
+		$dayString = \GO::t("full_days");
 		
 		$tasklists = $calendar->visible_tasklists;
 
@@ -1279,7 +1279,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 						);
 		
 		$resultCount = 0;
-		$dayString = \GO::t('full_days');
+		$dayString = \GO::t("full_days");
 		$addressbookKeys = array();
 
 		while($addressbook = $adressbooks->fetch()){
@@ -1303,8 +1303,8 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 				
 				$response['results'][$this->_getIndex($response['results'],strtotime($contact->upcoming.' 00:00'))] = array(
 					'id'=>$response['count']++,
-					'name'=>htmlspecialchars(str_replace('{NAME}',$name,\GO::t('birthday_name','calendar')), ENT_COMPAT, 'UTF-8'),
-					'description'=>htmlspecialchars(str_replace(array('{NAME}','{AGE}'), array($name,$contact->upcoming-$contact->birthday), \GO::t('birthday_desc','calendar')), ENT_COMPAT, 'UTF-8'),
+					'name'=>htmlspecialchars(str_replace('{NAME}',$name,\GO::t("Birthday: {NAME}", "calendar")), ENT_COMPAT, 'UTF-8'),
+					'description'=>htmlspecialchars(str_replace(array('{NAME}','{AGE}'), array($name,$contact->upcoming-$contact->birthday), \GO::t("{NAME} has turned {AGE} today", "calendar")), ENT_COMPAT, 'UTF-8'),
 					'time'=>date(\GO::user()->time_format, $start_unixtime),												
 					'start_time'=>$contact->upcoming.' 00:00',
 					'end_time'=>$contact->upcoming.' 23:59',
@@ -1488,7 +1488,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		
 		$participant = $event->importVObjectAttendee($event, $vevent->attendee);
 
-		$response['feedback']=sprintf(\GO::t('eventUpdatedIn','calendar'), $event->calendar->name, $participant->statusName);
+		$response['feedback']=sprintf(\GO::t("The event in calendar %s has been updated with status %s", "calendar"), $event->calendar->name, $participant->statusName);
 		$response['success']=true;
 		
 		return $response;
@@ -1523,20 +1523,20 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		$settings = \GO\Calendar\Model\Settings::model()->getDefault($account->user);
 		
 		if(!$settings->calendar) {
-			throw new \Exception(GO::t('noDefaultCalendar', 'calendar'));
+			throw new \Exception(GO::t("You don't have a default calendar configured. Please select one at your settings.", "calendar"));
 		}
 		
 		$masterEvent = \GO\Calendar\Model\Event::model()->findByUuid((string)$vevent->uid, 0, $settings->calendar_id);		
 
 		if (!$settings->calendar->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION))
-			throw new \Exception(sprintf(\GO::t('cannotHandleInvitation','calendar'),$masterEvent->calendar->name));
+			throw new \Exception(sprintf(\GO::t("The calendar associated with the email account is \"%s\" and you have no write permission to it. Because the appointment is in that calendar, its status has not been changed now.", "calendar"),$masterEvent->calendar->name));
 		
 		//delete existing data		
 		if(!$recurrenceDate){
 			//if no recurring instance was given delete the master event
 			if($masterEvent) {
 				if (!$masterEvent->calendar->checkPermissionLevel(\GO\Base\Model\Acl::DELETE_PERMISSION))
-					throw new \Exception(sprintf(\GO::t('cannotHandleInvitation2','calendar'),$masterEvent->calendar->name));
+					throw new \Exception(sprintf(\GO::t("Could not update the event because you have too little access permission to the calendar associated with the email account (calendar: \"%s\"). Because the appointment is in that calendar, its status has not been changed now.", "calendar"),$masterEvent->calendar->name));
 				$masterEvent->delete();
 			}
 		}  else if($masterEvent)
@@ -1545,7 +1545,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 				
 			if($exceptionEvent) {
 				if (!$masterEvent->calendar->checkPermissionLevel(\GO\Base\Model\Acl::DELETE_PERMISSION))
-					throw new \Exception(sprintf(\GO::t('cannotHandleInvitation2','calendar'),$masterEvent->calendar->name));
+					throw new \Exception(sprintf(\GO::t("Could not update the event because you have too little access permission to the calendar associated with the email account (calendar: \"%s\"). Because the appointment is in that calendar, its status has not been changed now.", "calendar"),$masterEvent->calendar->name));
 				$exceptionEvent->delete();
 			}else {
 				$event = $this->findByStartTime($vevent, $settings->calendar_id);
@@ -1557,7 +1557,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			$exception = $masterEvent->hasException($recurrenceDate);
 			if($exception) {
 				if (!$masterEvent->calendar->checkPermissionLevel(\GO\Base\Model\Acl::DELETE_PERMISSION))
-					throw new \Exception(sprintf(\GO::t('cannotHandleInvitation2','calendar'),$masterEvent->calendar->name));
+					throw new \Exception(sprintf(\GO::t("Could not update the event because you have too little access permission to the calendar associated with the email account (calendar: \"%s\"). Because the appointment is in that calendar, its status has not been changed now.", "calendar"),$masterEvent->calendar->name));
 				$exception->delete();
 			}
 		}else
@@ -1626,7 +1626,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		}
 		
 		
-		$response['feedback']=sprintf(\GO::t('eventDeleted','calendar'));
+		$response['feedback']=sprintf(\GO::t("The event was deleted from your calendar", "calendar"));
 		$response['success']=true;
 		
 		return $response;

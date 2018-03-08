@@ -50,12 +50,12 @@ Ext.extend(GO.site.HtmlEditorImageInsert, Ext.util.Observable, {
 		element.clickEvent='mousedown';
 		element.tabIndex=-1;
 		element.tooltip={
-			title:GO.lang.image,
-			text:GO.lang.insertImage
+			title:t("Image"),
+			text:t("Insert image in the text")
 		};
-		element.overflowText=GO.lang.insertImage;
+		element.overflowText=t("Insert image in the text");
 
-		if(GO.files){
+		if(go.ModuleManager.isAvailable("files")){
 			element.handler = function(){
 				this.showFileBrowser();
 			};

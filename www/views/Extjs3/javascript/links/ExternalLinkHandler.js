@@ -1,4 +1,4 @@
-GO.links={};
+
 
 /**
  * Open the given model inside Group-Office

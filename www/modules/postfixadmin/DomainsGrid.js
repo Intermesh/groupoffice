@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: DomainsGrid.js 16251 2013-11-15 08:39:41Z mschering $
+ * @version $Id: DomainsGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -37,49 +37,49 @@ GO.postfixadmin.DomainsGrid = function(config){
 		},
 		columns:[
 	   			{
-			header: GO.postfixadmin.lang.domain, 
+			header: t("Domain", "postfixadmin"), 
 			dataIndex: 'domain'
 		},	{
-			header: GO.lang.strOwner, 
+			header: t("Owner"), 
 			dataIndex: 'user_name',
 		  sortable: false
 		},		{
-			header: GO.lang.strDescription, 
+			header: t("Description"), 
 			dataIndex: 'description'
 		},		{
-			header: GO.postfixadmin.lang.aliases, 
+			header: t("Aliases", "postfixadmin"), 
 			dataIndex: 'alias_count',
 			sortable:false
 		},		{
-			header: GO.postfixadmin.lang.mailboxes, 
+			header: t("Mailboxes", "postfixadmin"), 
 			dataIndex: 'mailbox_count',
 			sortable:false
 		},			{
-			header: GO.postfixadmin.lang.quota, 
+			header: t("Quota (MB)", "postfixadmin"), 
 			dataIndex: 'quota',
 			sortable:false
 		},	{
-			header: GO.postfixadmin.lang.usedQuota, 
+			header: t("Used quota", "postfixadmin"), 
 			dataIndex: 'used_quota',
 			sortable:false
 		},			{
-			header: GO.postfixadmin.lang.usage,
+			header: t("Usage", "postfixadmin"),
 			dataIndex: 'usage',
 			sortable:false
 		},	{
-			header: GO.postfixadmin.lang.active, 
+			header: t("Active", "postfixadmin"), 
 			dataIndex: 'active'
 		},		{
-			header: GO.postfixadmin.lang.backupmx, 
+			header: t("Backup MX", "postfixadmin"), 
 			dataIndex: 'backupmx'
 		},	{
-			header: GO.lang.strCtime, 
+			header: t("Created at"), 
 			dataIndex: 'ctime',
-			width:110
+			width: dp(140)
 		},		{
-			header: GO.lang.strMtime, 
+			header: t("Modified at"), 
 			dataIndex: 'mtime',
-			width:110
+			width: dp(140)
 		}
 	]
 	});
@@ -88,7 +88,7 @@ GO.postfixadmin.DomainsGrid = function(config){
 	config.view=new Ext.grid.GridView({
 		autoFill: true,
 		forceFit: true,
-		emptyText: GO.lang['strNoItems']		
+		emptyText: t("No items to display")		
 	});
 	config.sm=new Ext.grid.RowSelectionModel();
 	config.loadMask=true;
@@ -112,11 +112,11 @@ GO.postfixadmin.DomainsGrid = function(config){
 			cls:'go-head-tb',
 			items: [{
 				xtype:'htmlcomponent',
-				html:GO.postfixadmin.lang.name,
+				html:t("Postfix admin", "postfixadmin"),
 				cls:'go-module-title-tbar'
 			},{
 			iconCls: 'btn-add',							
-			text: GO.lang['cmdAdd'],
+			text: t("Add"),
 			cls: 'x-btn-text-icon',
 			handler: function(){				
 	    	this.domainDialog.show();
@@ -124,13 +124,13 @@ GO.postfixadmin.DomainsGrid = function(config){
 			scope: this
 		},{
 			iconCls: 'btn-delete',
-			text: GO.lang['cmdDelete'],
+			text: t("Delete"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 				this.deleteSelected();
 			},
 			scope: this
-		},GO.lang['strSearch']+': ', ' ',this.searchField]});
+		},t("Search")+': ', ' ',this.searchField]});
 	}
 	
 	

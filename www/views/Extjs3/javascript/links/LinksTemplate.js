@@ -6,24 +6,24 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: LinksTemplate.js 16920 2014-02-26 14:44:19Z mschering $
+ * @version $Id: LinksTemplate.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
  
 GO.linksTemplate =
 	'<tpl if="values.links && values.links.length">'+
-		'{[this.collapsibleSectionHeader(GO.lang.latestLinks, "latestlinks-"+values.panelId, "links")]}'+
+		'{[this.collapsibleSectionHeader(t("Latest links"), "latestlinks-"+values.panelId, "links")]}'+
 		
 			'<table class="display-panel" cellpadding="0" cellspacing="0" border="0" id="latestlinks-{panelId}">'+
 			'<tr>'+
 				'<td colspan="2" class="display-panel-links-header">&nbsp;</td>'+
-				'<td style="width: 100%" class="table_header_links">' + GO.lang['strName'] + '</td>'+
-				/*'<td class="table_header_links">' + GO.lang['strType'] + '</td>'+*/
-				'<td class="table_header_links" style="white-space:nowrap">' + GO.lang['strMtime'] + '</td>'+
+				'<td style="width: 100%" class="table_header_links">' + t("Name") + '</td>'+
+				/*'<td class="table_header_links">' + t("Type") + '</td>'+*/
+				'<td class="table_header_links" style="white-space:nowrap">' + t("Modified at") + '</td>'+
 			'</tr>'+
 			'<tpl if="!links.length">'+
-				'<tr><td colspan="4">'+GO.lang.strNoItems+'</td></tr>'+
+				'<tr><td colspan="4">'+t("No items to display")+'</td></tr>'+
 			'</tpl>'+
 			'<tpl for="links">'+
 				'<tr class="display-panel-link">'+
@@ -40,10 +40,10 @@ GO.linksTemplate =
 				'</tr>'+
 				'</tpl>'+
 			'</tpl>'+
-			'<tr><td colspan="4"><a class="display-panel-browse" href="#browselinks">'+GO.lang.browse+'</a>&nbsp;'+
+			'<tr><td colspan="4"><a class="display-panel-browse" href="#browselinks">'+t("Browse")+'</a>&nbsp;'+
 			
 			'<tpl if="values.show_all_btn_enabled">'+
-				'<a class="display-panel-browse" href="#showalllinks">'+GO.lang.showAll+'</a>'+
+				'<a class="display-panel-browse" href="#showalllinks">'+t("Show all")+'</a>'+
 			'</tpl>'+
 			
 			'</td></tr>'+

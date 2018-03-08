@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: AutomaticInvoiceTab.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: AutomaticInvoiceTab.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Michael de Hart <mdhart@intermesh.nl>
  */
@@ -14,7 +14,7 @@
 GO.servermanager.AutomaticInvoiceTab = function(config){
 	config = config || {};
 	
-	config.title = GO.servermanager.lang["automaticInvoice"];
+	config.title = t("automaticInvoice", "servermanager");
 	config.layout = 'column';
 	config.autoScroll = true;
 	config.items = [this.leftCol = new Ext.Panel({
@@ -28,7 +28,7 @@ GO.servermanager.AutomaticInvoiceTab = function(config){
 				name: 'enable_invoicing',
 				anchor: '-20',
 				hideLabel:true,
-				boxLabel: GO.servermanager.lang.enabled,
+				boxLabel: t("enabled", "servermanager"),
 				checked:false,
 				listeners:{
 					check:function(cb, checked){
@@ -38,7 +38,7 @@ GO.servermanager.AutomaticInvoiceTab = function(config){
 				}
 			}),
 			new Ext.form.ComboBox({
-				fieldLabel: GO.servermanager.lang.invoiceTimespan,
+				fieldLabel: t("invoiceTimespan", "servermanager"),
 				hiddenName:'invoice_timespan',
 				store: new Ext.data.SimpleStore({
 						fields: ['value', 'text'],
@@ -65,27 +65,27 @@ GO.servermanager.AutomaticInvoiceTab = function(config){
 				name: 'discount_price',
 				anchor: '-20',
 				allowBlank:false,
-				fieldLabel: GO.servermanager.lang.discountPrice,
+				fieldLabel: t("discountPrice", "servermanager"),
 				value: 0
 			},{
 				xtype: 'textfield',
 				name: 'discount_description',
 				anchor: '-20',
 				allowBlank:false,
-				fieldLabel: GO.servermanager.lang.discountDescription,
+				fieldLabel: t("discountDescription", "servermanager"),
 				value: 0
 			},{
 				xtype: 'numberfield',
 				decimals: 0,
 				name: 'discount_percentage',
 				anchor: '-20',
-				fieldLabel: GO.servermanager.lang.discountPercentage,
+				fieldLabel: t("discountPercentage", "servermanager"),
 				value: 0
 			},{
 				xtype: 'displayfield',
 				name: 'next_invoice_time',
 				anchor: '-20',
-				fieldLabel: GO.servermanager.lang.nextInvoiceOn
+				fieldLabel: t("nextInvoiceOn", "servermanager")
 			}]
 	}),this.rightCol = new Ext.Panel({
 		cls:'go-form-panel',
@@ -99,39 +99,39 @@ GO.servermanager.AutomaticInvoiceTab = function(config){
 				xtype: 'textfield',
 				name: 'customer_name',						
 				allowBlank:false,
-				fieldLabel: GO.lang.strName
+				fieldLabel: t("Name")
 			},{
 				xtype: 'textfield',
 				name: 'customer_address',
 				anchor: '-20',
 				allowBlank:false,
-				fieldLabel: GO.lang.strAddress
+				fieldLabel: t("Address")
 			},{
 				xtype: 'textfield',
 				name: 'customer_address_no',
 				anchor: '-20',
 				allowBlank:false,
-				fieldLabel: GO.lang.strAddressNo
+				fieldLabel: t("Address 2")
 			},{
 				xtype: 'textfield',
 				name: 'customer_zip',
 				anchor: '-20',
 				allowBlank:false,
-				fieldLabel: GO.lang.strZip
+				fieldLabel: t("ZIP/Postal")
 			},{
 				xtype: 'textfield',
 				name: 'customer_city',
 				anchor: '-20',
 				allowBlank:false,
-				fieldLabel: GO.lang.strCity
+				fieldLabel: t("City")
 			},{
 				xtype: 'textfield',
 				name: 'customer_state',
 				anchor: '-20',
 				allowBlank:false,
-				fieldLabel: GO.lang.strState
+				fieldLabel: t("State")
 			},new GO.form.SelectCountry({
-				fieldLabel: GO.lang['strCountry'],
+				fieldLabel: t("Country"),
 				hiddenName: 'customer_country',
 				anchor: '-20',
 				value: GO.settings.config.default_country
@@ -140,7 +140,7 @@ GO.servermanager.AutomaticInvoiceTab = function(config){
 				name: 'customer_vat',
 				anchor: '-20',
 				allowBlank:false,
-				fieldLabel: GO.servermanager.lang.customerVat
+				fieldLabel: t("customerVat", "servermanager")
 			}]
 	})];
 	

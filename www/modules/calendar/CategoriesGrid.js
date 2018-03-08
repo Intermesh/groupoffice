@@ -18,13 +18,13 @@ GO.calendar.CategoriesGrid = Ext.extend(GO.grid.GridPanel,{
 //				remoteSort : true
 //			}),
 			border: false,
-			title:GO.calendar.lang.categories,
+			title:t("Categories", "calendar"),
 			layout:'fit',
 			paging:true,
 			view:new Ext.grid.GridView({
 				autoFill: true,
 				forceFit: true,
-				emptyText: GO.lang['strNoItems']		
+				emptyText: t("No items to display")		
 			}),
 			cm:new Ext.grid.ColumnModel({
 				defaults:{
@@ -32,14 +32,14 @@ GO.calendar.CategoriesGrid = Ext.extend(GO.grid.GridPanel,{
 				},
 				columns:[
           {
-						header: GO.lang.strName,
+						header: t("Name"),
 						dataIndex: 'name'
           },{
-						header: GO.lang.color,
+						header: t("Color"),
 						dataIndex: 'color',
 						renderer: this.renderColor
           },{
-            header: GO.calendar.lang.calendar,
+            header: t("Calendar", "calendar"),
 						dataIndex: 'calendar_id',
 						sortable: false,
 						hidden:true
@@ -98,7 +98,7 @@ GO.calendar.CategoriesGrid = Ext.extend(GO.grid.GridPanel,{
 //	if(!config)
 //		config = {};
 //
-//	config.title = GO.calendar.lang.categories;
+//	config.title = t("Categories", "calendar");
 //	config.layout='fit';
 //	config.autoScroll=true;
 //	config.split=true;
@@ -110,10 +110,10 @@ GO.calendar.CategoriesGrid = Ext.extend(GO.grid.GridPanel,{
 //		},
 //		columns:[
 //		{
-//			header: GO.lang.strName,
+//			header: t("Name"),
 //			dataIndex: 'name'
 //		},{
-//			header: GO.lang.strOwner,
+//			header: t("Owner"),
 //			dataIndex: 'user_name',
 //			sortable: false
 //		}]
@@ -124,7 +124,7 @@ GO.calendar.CategoriesGrid = Ext.extend(GO.grid.GridPanel,{
 //	config.view=new Ext.grid.GridView({
 //		autoFill: true,
 //		forceFit: true,
-//		emptyText: GO.lang['strNoItems']
+//		emptyText: t("No items to display")
 //	});
 //
 //	config.sm=new Ext.grid.RowSelectionModel();
@@ -132,7 +132,7 @@ GO.calendar.CategoriesGrid = Ext.extend(GO.grid.GridPanel,{
 //
 //	config.tbar=[{
 //		iconCls: 'btn-add',
-//		text: GO.lang['cmdAdd'],
+//		text: t("Add"),
 //		cls: 'x-btn-text-icon',
 //		handler: function()
 //		{								
@@ -141,7 +141,7 @@ GO.calendar.CategoriesGrid = Ext.extend(GO.grid.GridPanel,{
 //		scope: this
 //	},{
 //		iconCls: 'btn-delete',
-//		text: GO.lang['cmdDelete'],
+//		text: t("Delete"),
 //		cls: 'x-btn-text-icon',
 //		handler: function()
 //		{

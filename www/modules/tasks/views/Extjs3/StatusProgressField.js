@@ -15,21 +15,11 @@
 GO.tasks.StatusProgressField = function (config) {
 	var config = config || {};
 	
-	var percentages = [];
-	for (var i = 0; i <= 100; i += 10) {
-		percentages.push([i, i + "%"]);
-	}
-	
-	this.progressInpercentagesStore = new Ext.data.SimpleStore({
-		fields: ['value', 'text'],
-		data: percentages
-	});
-	
 	config = Ext.applyIf(config, {
-		fieldLabel: GO.tasks.lang.taskStatus,
+		fieldLabel: t("Status", "tasks"),
 		items: [
 			this.taskStatusField = new GO.tasks.SelectTaskStatus({
-				flex: 3,
+				flex: 2,
 				listeners: {
 					scope: this,
 					select: function (combo, record) {
@@ -38,22 +28,18 @@ GO.tasks.StatusProgressField = function (config) {
 					}
 				}
 			}),
-			this.progressField = new Ext.form.ComboBox({
-				fieldLabel: GO.tasks.lang.taskPercentage_complete,
+			this.progressField = new Ext.form.SliderField({
+				fieldLabel: t("Percentage complete", "tasks"),
 				flex: 1,
-				hiddenName: 'percentage_complete',
-				store: this.progressInpercentagesStore,
-				value: '0',
-				valueField: 'value',
-				displayField: 'text',
-				mode: 'local',
-				triggerAction: 'all',
-				editable: false,
-				selectOnFocus: true,
+				name: 'percentage_complete',
+				minValue: 0,
+				maxValue: 100,
+				increment: 10,
+				value: 0,
 				listeners: {
 					scope: this,
-					select: function (combo, record) {
-						if (record.data.value == 100)
+					change: function (combo, newValue) {
+						if (newValue == 100)
 							this.taskStatusField.setValue("COMPLETED");
 					}
 				}

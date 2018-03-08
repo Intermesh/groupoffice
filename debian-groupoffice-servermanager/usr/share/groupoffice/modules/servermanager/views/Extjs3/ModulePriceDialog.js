@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: ModulePriceDialog.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: ModulePriceDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Michael de Hart <mdhart@intermesh.nl>
  */
@@ -17,7 +17,7 @@ GO.servermanager.ModulePriceDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		Ext.apply(this, {
 			goDialogId:'modulePrice',
 			layout:'fit',
-			title:GO.servermanager.lang.modulePrice,
+			title:t("modulePrice", "servermanager"),
 			width: 400,
 			height: 120,
 			resizable:false,
@@ -36,7 +36,7 @@ GO.servermanager.ModulePriceDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			items: [
 				{
 					xtype: 'combo',
-					fieldLabel: GO.servermanager.lang['moduleName'],
+					fieldLabel: t("moduleName", "servermanager"),
 					mode: 'remote',
 					autoLoad: true,
 					triggerAction: 'all',
@@ -50,7 +50,7 @@ GO.servermanager.ModulePriceDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 				},
 				{
 					xtype: 'numberfield',
-					fieldLabel: GO.servermanager.lang['modulePrice'],
+					fieldLabel: t("modulePrice", "servermanager"),
 					name: 'price_per_month',
 					allowBlank:false
 				}

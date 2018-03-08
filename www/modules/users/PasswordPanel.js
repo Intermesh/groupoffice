@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: PasswordPanel.js 21127 2017-04-24 14:30:47Z wsmits $
+ * @version $Id: PasswordPanel.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -23,7 +23,7 @@ GO.users.PasswordPanel = function(config)
 	config.autoScroll=true;
 	config.border=false;
 	config.hideLabel=true;
-	config.title = GO.users.lang.changePassword;
+	config.title = t("Change password", "users");
 	config.layout='form';
 	config.defaults={anchor:'100%'};
 	config.defaultType = 'textfield';
@@ -32,33 +32,33 @@ GO.users.PasswordPanel = function(config)
 
 	this.currentPasswordField = new Ext.form.TextField({
 		inputType: 'password',
-		fieldLabel: GO.users.lang.currentPassword,
+		fieldLabel: t("Current password", "users"),
 		name: 'current_'+prefix+'password'
 		});
 
 	this.passwordField1 = new Ext.form.TextField({
 		inputType: 'password',
-		fieldLabel: GO.users.lang.newPassword,
+		fieldLabel: t("New password", "users"),
 		name: prefix+'password'
 		});
 	this.passwordField2 = new Ext.form.TextField({
 		inputType: 'password',
-		fieldLabel: GO.users.lang.confirmPassword,
+		fieldLabel: t("Confirm password", "users"),
 		name: prefix+'passwordConfirm'
 		});
 		
 	this.recoveryEmailField = new Ext.form.TextField({
-		fieldLabel: GO.lang.strRecoveryEmail,
-		name: 'recovery_email',
+		fieldLabel: t("Recovery e-mail"),
+		name: 'recoveryEmail',
 		vtype:'emailAddress'
 	});
 
 	config.items=[
 		new Ext.form.FieldSet({
-			title: GO.users.lang.currentPassword,
+			title: t("Current password", "users"),
 			items:[
 				new Ext.Container({
-					html:GO.lang.currentPasswordText,
+					html:t("You need to provide your current password to be able to modify the settings below."),
 					style: {
             marginBottom: '10px'
 					}
@@ -67,17 +67,17 @@ GO.users.PasswordPanel = function(config)
 			]
 		}),
 		new Ext.form.FieldSet({
-			title: GO.users.lang.changePassword,
+			title: t("Change password", "users"),
 			items:[
 				this.passwordField1,
 				this.passwordField2
 			]
 		}),
 		new Ext.form.FieldSet({
-			title: GO.lang.strRecoveryEmail,
+			title: t("Recovery e-mail"),
 			items:[
 				new Ext.Container({
-					html:GO.lang.recoveryEmailText,
+					html:t("This email address is used as recovery to send a forgotten password request to. Please use an email address that you can access from outside Group-Office."),
 					style: {
             marginBottom: '10px'
 					}

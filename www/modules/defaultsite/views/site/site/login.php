@@ -1,6 +1,6 @@
 <div class="login-page page">
 	<div class="wrapper">
-		<h2><?php echo \GO::t('login', 'defaultsite'); ?></h2>								
+		<h2><?php echo \GO::t("Login", "defaultsite"); ?></h2>								
 		<?php $form = new \GO\Site\Widget\Form(); ?>
 		<?php echo $form->beginForm(); ?>
 		
@@ -25,14 +25,14 @@
 			<?php endif; ?>
 				
 			<tr>
-				<td><label><?php echo \GO::t('rememberme', 'defaultsite'); ?></label></td>
+				<td><label><?php echo \GO::t("Remember me", "defaultsite"); ?></label></td>
 				<td><input type="checkbox" name="rememberMe" value="rememberMe"></tr>
 			</tr>
 		</table>
 			
 		<div class="button-bar">
 			<input class="button" type="submit" id="submit-login-button" value="Login">
-			<a id="recover-login-button" href="<?php echo \Site::urlManager()->createUrl('/site/account/recoverpassword'); ?> " class="button"><?php echo \GO::t('lostPassword', 'defaultsite'); ?></a>
+			<a id="recover-login-button" href="<?php echo \Site::urlManager()->createUrl('/site/account/recoverpassword'); ?> " class="button"><?php echo \GO::t("Lost password?", "defaultsite"); ?></a>
 			<div class="clear"></div>
 		</div>
 		

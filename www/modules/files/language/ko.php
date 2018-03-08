@@ -1,64 +1,54 @@
 <?php
-
-
-$l["template"]= '템플릿';
-$l["manageTemplates"]= '템플릿 관리';
-$l["downloadTemplate"]= '템플릿 다운로드';
-$l["enterName"]= 'Enter a name';
-$l["pleaseEnterName"]= 'Please enter a name';
-$l["pleaseEnterNameArchive"]= 'Please enter a name for the archive';
-$l["startTransfer"]= '전송 시작';
-$l["addFolder"]= '폴더 추가';
-$l["errorOneItem"]= 'Please select only one item';
-$l["activateSharing"]= 'Activate sharing';
-$l["notifyChanges"]= '이 폴더가 바뀌면 알려주세요';
-$l["comments"]= '코멘트';
-$l["downloadGOTA"]= '다운로드 (GOTA)';
-$l["fileBrowser"]= '파일 브라우저';
-$l["thumbnails"]= 'Thumbnails';
-$l["saveFile"]='파일 저장';
-$l["confirmOverwrite"]='{filename} already exists, do you want to overwrite the file?';
-$l["emptyList"]='Empty list';
-$l["newFiles"]='새 파일';
-$l["olderVersions"]='이전 버전';
-$l["uploadProperties"]='The properties below will be applied to all files uploaded with the "Small files" option';
-$l["selectFiles"]= '선택된 파일';
-$l["fitImage"]='창에 맞추기';
-$l["normalSize"]='보통 크기';
-$l["imageViewer"]='이미지 뷰어';
-$l["emailDownloadLink"]= '메일로 다운로드 링크 보내기';
-$l["expireTime"]= '다운로드 링크 만료 시간';
-$l["newFolder"]= '새 폴더';
-$l["applyState"]= 'Apply the folder\'s display settings for everyone.';
-$l["stateLocked"]= 'Folder display locked by owner/admin';
-
-$l['name'] = '파일';
-$l['description'] = 'Files module; Module for sharing files.';
-$lang['link_type'][6]='파일';
-$lang['link_type'][17]='폴더';
-$l['folderExists'] = '폴더가 이미 존재합니다';
-$l['filenameExists'] = '파일 이름이 이미 존재합니다';
-$l['uploadedSucces'] = '파일 업로드에 성공했습니다';
-$l['ootextdoc']='오픈 오피스 Text 문서';
-$l['wordtextdoc']='MS Word 문서';
-$l['personal']='개인';
-$l['shared']='공유';
-$l['general']='일반';
-$l['folder_modified_subject']='Changes to {product_name} folder';
-$l['folder_modified_body']='You requested to be notified when changes are made to:
-%s
-The following changes were made by %s:
-%s;
-';
-$l['modified']='변경됨';
-$l['new']='New';
-$l['deleted']='삭제됨';
-$l['file']='파일';
-$l['folder']='폴더';
-$l['files']='파일';
-$l['emptyFile']='빈 파일';
-$l['downloadLink'] = '다운로드 링크';
-$l['clickHereToDownload'] = 'Click here to download the file with a secure link';
-$l['copyPasteToDownload'] = 'Click the secured link below or copy it to your browser\'s address bar to download the file.';
-$l['possibleUntil'] = 'possible until';
-$l['fileNotFound']='Sorry, the file you tried to download is not found.';
+return array (
+  'Template' => '템플릿',
+  'Manage templates' => '템플릿 관리',
+  'Download template' => '템플릿 다운로드',
+  'Start transfer' => '전송 시작',
+  'Add folder' => '폴더 추가',
+  'Notify me about changes in this folder' => '이 폴더가 바뀌면 알려주세요',
+  'Comments' => '코멘트',
+  'Download with GOTA' => '다운로드 (GOTA)',
+  'File browser' => '파일 브라우저',
+  'Save file' => '파일 저장',
+  'New' => '새 파일',
+  'Older versions' => '이전 버전',
+  'Select files' => '선택된 파일',
+  'Fit image' => '창에 맞추기',
+  'Normal size' => '보통 크기',
+  'Image viewer' => '이미지 뷰어',
+  'Email download link' => '메일로 다운로드 링크 보내기',
+  'Download link expire time' => '다운로드 링크 만료 시간',
+  'New folder' => '새 폴더',
+  'The folder already exists' => '폴더가 이미 존재합니다',
+  'Filename %s already exists' => '파일 이름이 이미 존재합니다',
+  'File uploaded successfully' => '파일 업로드에 성공했습니다',
+  'Open-Office Text document' => '오픈 오피스 Text 문서',
+  'Microsoft Word document' => 'MS Word 문서',
+  'Personal' => '개인',
+  'Shared' => '공유',
+  'General' => '일반',
+  'Modified' => '변경됨',
+  'Deleted' => '삭제됨',
+  'File' => '파일',
+  'Folder' => '폴더',
+  'Empty file' => '빈 파일',
+  'Download link' => '다운로드 링크',
+  'Click on the link to download the file' => 'Click here to download the file with a secure link',
+  'name' => '파일',
+  'Enter a name' => 'Enter a name',
+  'Please enter a name' => 'Please enter a name',
+  'Please enter a name for the archive' => 'Please enter a name for the archive',
+  'Please select only one item' => 'Please select only one item',
+  'Activate sharing' => 'Activate sharing',
+  'Thumbnails' => 'Thumbnails',
+  '{filename} already exists, do you want to overwrite the file?' => '{filename} already exists, do you want to overwrite the file?',
+  'Empty list' => 'Empty list',
+  'The properties below will be applied to all files uploaded with the "Small files" option' => 'The properties below will be applied to all files uploaded with the "Small files" option',
+  'Apply the folder\'s display settings for everyone.' => 'Apply the folder\'s display settings for everyone.',
+  'Folder display locked by owner/admin' => 'Folder display locked by owner/admin',
+  'Changes to Group-Office folder' => 'Changes to {product_name} folder',
+  'Files' => '파일',
+  'Click the secured link below or copy it to your browser\'s address bar to download the file.' => 'Click the secured link below or copy it to your browser\'s address bar to download the file.',
+  'possible until' => 'possible until',
+  'Sorry, the file you tried to download is not found.' => 'Sorry, the file you tried to download is not found.',
+);

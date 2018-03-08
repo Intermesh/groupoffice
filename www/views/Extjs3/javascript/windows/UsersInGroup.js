@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: UsersInGroup.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: UsersInGroup.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
@@ -51,17 +51,17 @@ GO.dialog.UsersInGroup = function(config){
 		    		forceFit: true
 	    		}),
 		    columns: [{
-	       	header: GO.lang['strName'],
+	       	header: t("Name"),
 					dataIndex: 'name',
 					sortable: true
 		    	},{
-	       	header: GO.lang['strUsername'],
+	       	header: t("Username"),
 					dataIndex: 'username',
 					sortable: true
 		    	}],
 		    sm: new Ext.grid.RowSelectionModel(),
 		    tbar: [
-	            GO.lang['strSearch']+': ', ' ',
+	            t("Search")+': ', ' ',
 	            this.searchField
 	        ]
 		});
@@ -77,11 +77,11 @@ GO.dialog.UsersInGroup = function(config){
 		width:550,
 		closeAction:'hide',
 		focus: focusSearchField.createDelegate(this),
-		title:GO.lang['strUsersInGroup'],
+		title:t("Users in group"),
 		items: this.grid,
 		buttons: [
 			{
-				text: GO.lang['cmdClose'],
+				text: t("Close"),
 				handler: function(){this.hide();},
 				scope: this
 			}

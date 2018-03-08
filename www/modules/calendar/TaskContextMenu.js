@@ -8,7 +8,7 @@ GO.calendar.TaskContextMenu = function(config){
 	config.items=[
 	this.actionInfo = new Ext.menu.Item({
 		iconCls: 'btn-properties',
-		text:GO.calendar.lang.showInfo,
+		text:t("Details", "calendar"),
 		cls: 'x-btn-text-icon',
 		scope:this,
 		handler: function()
@@ -33,8 +33,8 @@ Ext.extend(GO.calendar.TaskContextMenu, Ext.menu.Menu, {
 	},
 	
 	showTaskInfoDialog : function()
-	{
-		GO.linkHandlers["GO\\Tasks\\Model\\Task"].call(this, this.task.task_id);
+	{		
+		go.Router.goto("#tasks/task/" + this.task.task_id);
 	}
 //	,
 //	menuHandler : function()

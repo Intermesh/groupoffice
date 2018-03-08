@@ -4,7 +4,7 @@ GO.users.ImportDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		
 		Ext.apply(this, {
 			goDialogId:'importUsers',
-			title:GO.lang.cmdImport,
+			title:t("Import"),
 			formControllerUrl: 'users/user',
 			submitAction: 'import',
 			loadOnNewModel: false,
@@ -28,7 +28,7 @@ GO.users.ImportDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 				['csv','CSV (Comma Separated Values)']
 			],
 			controllers:[
-				['GO\\Users\\Controller\\UserController',GO.lang.user]
+				['GO\\Users\\Controller\\UserController',t("User")]
 			]
 //			,
 //			importBaseParams:[
@@ -37,16 +37,16 @@ GO.users.ImportDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		});
 		
 		this.updateExisting = new Ext.ux.form.XCheckbox({
-			fieldLabel: GO.users.lang.updateExistingOnImport,
+			fieldLabel: t("Update existing users by username", "users"),
 			name: 'updateExisting'
 		});
 		
 		this.importPanel.add(this.updateExisting);
 		
 		this.exampleButton = new Ext.Button({
-			text:GO.users.lang.downloadSampleCSV,
+			text:t("Download sample CSV", "users"),
 			width: 200,
-			fieldLabel: GO.users.lang.downloadSampleCSV,
+			fieldLabel: t("Download sample CSV", "users"),
 			handler: function(){
 				window.open(GO.url('users/user/getImportExample'));
 			},
@@ -65,7 +65,7 @@ GO.users.ImportDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 //	
 //	initComponent : function(){
 //		
-//		this.title=GO.lang.cmdImport;
+//		this.title=t("Import");
 //		
 //		this.width=500;
 //		this.autoHeight=true;
@@ -81,7 +81,7 @@ GO.users.ImportDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 //			fileUpload:true,
 //			waitMsgTarget:true,
 //			items: [new GO.form.HtmlComponent({
-//				html: GO.users.lang.importText+'<br /><br />'
+//				html: t("You can import users using a CSV file. To know how the CSV file should be formatted, download the sample file.<br />The first line must contain the column names. The following fields are required for each user:<br /><br />username, password, first_name, last_name, email", "users")+'<br /><br />'
 //			}),
 //			this.uploadFile],
 //			cls: 'go-form-panel'
@@ -95,16 +95,16 @@ GO.users.ImportDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 //		
 //		this.buttons=[
 //		{
-//			text:GO.lang.cmdOk,
+//			text:t("Ok"),
 //			handler: this.uploadHandler, 
 //			scope: this
 //		},
 //		{
-//			text:GO.lang['cmdClose'],
+//			text:t("Close"),
 //			handler: function(){this.hide()}, 
 //			scope: this
 //		},{
-//			text:GO.users.lang.downloadSampleCSV,
+//			text:t("Download sample CSV", "users"),
 //			handler: function(){
 //				window.open(GO.url('users/user/getImportExample'));
 //			},
@@ -117,7 +117,7 @@ GO.users.ImportDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 //	},
 //	uploadHandler : function(){
 //		this.upForm.form.submit({
-//			waitMsg:GO.lang.waitMsgUpload,
+//			waitMsg:t("Uploading..."),
 //			url:GO.settings.modules.users.url+'action.php',
 //			params: {
 //			  task: 'import'	
@@ -130,17 +130,17 @@ GO.users.ImportDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 //				
 //				var fb = action.result.feedback.replace(/BR/g,'<br />');
 //				
-//				Ext.MessageBox.alert(GO.lang.strSuccess, fb);
+//				Ext.MessageBox.alert(t("Success"), fb);
 //			},
 //			failure: function(form, action) {	
 //				if(action.failureType == 'client')
 //				{					
-//					Ext.MessageBox.alert(GO.lang['strError'], GO.lang['strErrorsInForm']);			
+//					Ext.MessageBox.alert(t("Error"), t("You have errors in your form. The invalid fields are marked."));			
 //				} else {
 //					
 //					var fb = action.result.feedback.replace(/BR/g,'<br />');
 //					
-//					Ext.MessageBox.alert(GO.lang['strError'], fb);
+//					Ext.MessageBox.alert(t("Error"), fb);
 //				}
 //			},
 //			scope: this

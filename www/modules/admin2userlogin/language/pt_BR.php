@@ -1,8 +1,10 @@
 <?php
-$l['admin2userlogin']='Alterar Usuário';
-$l['userId']="ID";
-$l['name']="Alterar Usuário";
-$l['description']="Administradores podem alterar para a conta de qualquer outro usuários utilizando esse módulo.";
-$l['username']="Usuário";
-$l['lastlogin']="Última tentativa de login";
-$l['registrationtime']="Tempo de registro";
+return array (
+  'Username' => 'Usuário',
+  'Last login attempt' => 'Última tentativa de login',
+  'Time Registered' => 'Tempo de registro',
+  'name' => 'Alterar Usuário',
+  'description' => 'Administradores podem alterar para a conta de qualquer outro usuários utilizando esse módulo.',
+  'Switch user' => 'Alterar Usuário',
+  'ID' => 'ID',
+);

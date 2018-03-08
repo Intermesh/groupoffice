@@ -18,16 +18,21 @@
  * @author Wesley Smits <wsmits@intermesh.nl>
  * @package GO.base.model
  * 
- * @property int $acl_id
- * @property int $user_id
- * @property int $group_id
+ * @property int $aclId
+  * @property int $groupId
  * @property int $level {@see Acl::READ_PERMISSION etc}
  */
 
 namespace GO\Base\Model;
 
+use GO;
+use GO\Base\Db\ActiveRecord;
+use go\core\App;
+use go\core\orm\StateManager;
+use GO\Log\Model\Log;
 
-class AclUsersGroups extends \GO\Base\Db\ActiveRecord {
+
+class AclUsersGroups extends ActiveRecord {
 
 	/**
 	 * Returns a static model of itself
@@ -41,7 +46,7 @@ class AclUsersGroups extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	public function tableName() {
-		return 'go_acl';
+		return 'core_acl_group';
 	}
 	
 	/**
@@ -53,20 +58,15 @@ class AclUsersGroups extends \GO\Base\Db\ActiveRecord {
 	}
   
   public function primaryKey() {
-    return array('acl_id','user_id','group_id');
+    return array('aclId','groupId');
   }
 	
-	public function defaultAttributes() {
-		$attr = parent::defaultAttributes();
-		$attr['user_id'] = 0;
-		return $attr;
-	}
 	
 	public function relations() {
 		return array('aclItem'=>array(
 			"type"=>self::BELONGS_TO,
 			"model"=>"GO\Base\Model\Acl",
-			"field"=>'acl_id'
+			"field"=>'aclId'
 		));
 	}
 	
@@ -76,17 +76,44 @@ class AclUsersGroups extends \GO\Base\Db\ActiveRecord {
 			$this->aclItem->touch();
 		}
 		
+		$success = App::get()->getDbConnection()
+							->update('core_acl_group_changes', 
+											[
+													'revokeModSeq' => StateManager::get()->next()
+											],
+											[
+													'aclId' => $this->aclId, 
+													'groupId' => $this->groupId, 
+											]
+											)->execute();
+		
+		if(!$success) {
+			return false;
+		}
+		
 		return parent::afterDelete();
 	}
 	
 	protected function afterSave($wasNew) {
 		if($this->aclItem){
 			//Add log message for activitylog here
-			if(\GO::modules()->isInstalled("log")){
-				\GO\Log\Model\Log::create("acl", $this->aclItem->description,$this->aclItem->className(),$this->aclItem->id);
+			if(GO::modules()->isInstalled("log")){
+				Log::create("acl", $this->aclItem->usedIn,$this->aclItem->className(),$this->aclItem->id);
 			}
 		
 			$this->aclItem->touch();
+		}
+		
+		$success = App::get()->getDbConnection()
+							->replace('core_acl_group_changes', 
+											[
+													'aclId' => $this->aclId, 
+													'groupId' => $this->groupId, 
+													'grantModSeq' => StateManager::get()->next()
+											]
+											)->execute();
+		if(!$success) {
+			return false;
 		}
 		
 		return parent::afterSave($wasNew);

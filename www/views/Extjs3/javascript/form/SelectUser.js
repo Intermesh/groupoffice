@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: SelectUser.js 15954 2013-10-17 12:04:36Z mschering $
+ * @version $Id: SelectUser.js 22151 2018-01-17 13:59:21Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -59,13 +59,13 @@ GO.form.SelectUser = function(config){
 	});
 	
 	if(!config.startBlank){
-		this.setRemoteValue(GO.settings.user_id, GO.settings.name);
+		this.setRemoteValue(GO.settings.user_id, GO.settings.displayName);
 		this.value=GO.settings.user_id;
 	}
 }
 
 Ext.extend(GO.form.SelectUser, GO.form.ComboBoxReset,{
-	fieldLabel:GO.lang.strUser,
+	fieldLabel:t("User"),
 	setRemoteValue : function(user_id, name)
 	{
 		this.setValue(user_id);

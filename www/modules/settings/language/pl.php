@@ -1,15 +1,15 @@
 <?php
-
-
-$l['name']='Ustawienia';
-$l['description']='Moduł pozwale na zarządzanie różnymi ustawieniami {product_name} i jego modułów';
-$l['mainTitle'] = 'Ustawienia';
-$l['loginScreenText']='Tekst na stronie logowania';
-$l['text']='Tekst';
-$l['title']='Tytuł';
-$l['loginTextEnabled']='Włącz tekst na stronie logowania';
-$l['notRenamedNoUser']='Nie można zmienić, brak przsypisanych użytkowników po zmianie';
-$l['allRenamingSuccess']='Domyślne wzory dla wszystkich użytkowników zostały zmienione';
-$l['GO\Addressbook\Model\Addressbook']='Książka adresowa';
-$l['GO\Tasks\Model\Tasklist']='Zadania';
-$l['GO\Calendar\Model\Calendar']='Kalendarz';
+return array (
+  'Text for login screen' => 'Tekst na stronie logowania',
+  'Text' => 'Tekst',
+  'Title' => 'Tytuł',
+  'Enable login screen text' => 'Włącz tekst na stronie logowania',
+  'could not be renamed, because it has no owner to name after' => 'Nie można zmienić, brak przsypisanych użytkowników po zmianie',
+  'All the users\' default models have been renamed succesfully.' => 'Domyślne wzory dla wszystkich użytkowników zostały zmienione',
+  'Address book' => 'Książka adresowa',
+  'Task list' => 'Zadania',
+  'Calendar' => 'Kalendarz',
+  'name' => 'Ustawienia',
+  'description' => 'Moduł pozwale na zarządzanie różnymi ustawieniami {product_name} i jego modułów',
+  'Settings' => 'Ustawienia',
+);

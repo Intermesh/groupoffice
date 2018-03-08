@@ -5,7 +5,7 @@ GO.addressbook.ManageAddressbooksGrid = function(config){
 		config = {};
 	}
 	
-	config.title = GO.addressbook.lang.addressbooks;
+	config.title = t("Address books", "addressbook");
 	config.layout='fit';
 	config.autoScroll=true;
 	config.split=true;
@@ -24,11 +24,11 @@ GO.addressbook.ManageAddressbooksGrid = function(config){
 			hidden:true
 	  },
 	  {
-	  	header: GO.lang['strName'], 
+	  	header: t("Name"), 
 	  	dataIndex: 'name'
 	  },
 	  {
-	  	header: GO.addressbook.lang['cmdOwner'], 
+	  	header: t("Owner", "addressbook"), 
 	  	dataIndex: 'user_name' ,
 	  	sortable: false
 	  }
@@ -40,40 +40,36 @@ GO.addressbook.ManageAddressbooksGrid = function(config){
 	config.view=new Ext.grid.GridView({
 		autoFill: true,
 		forceFit: true,
-		emptyText: GO.addressbook.lang.noAddressbooks		
+		emptyText: t("There are no address books", "addressbook")		
 	}),
 	config.sm=new Ext.grid.RowSelectionModel();
 	config.loadMask=true;
 	
-	config.tbar=[
-			{ 
-				iconCls: 'btn-add', 
-				text: GO.lang.cmdAdd, 
-				cls: 'x-btn-text-icon', 
-				handler: function(){
-					this.addressbookDialog.show();
-				},
-				disabled: !GO.settings.modules.addressbook.write_permission,
-				scope: this
-			},
-			{
-				iconCls: 'btn-delete', 
-				text: GO.lang.cmdDelete, 
-				cls: 'x-btn-text-icon', 
-				handler: function(){
-					this.deleteSelected({
-						success: function() {
-							GO.addressbook.readableAddressbooksStore.load();
-						}
-					});
-				}, 
-				disabled: !GO.settings.modules.addressbook.write_permission,
-				scope: this
-			},'-',new GO.form.SearchField({
-				store: config.store,
-				width:150
-			})
-		];
+	config.tbar=[{ 
+		iconCls: 'ic-add', 
+		text: t("Add"),
+		handler: function(){
+			this.addressbookDialog.show();
+		},
+		disabled: !GO.settings.modules.addressbook.write_permission,
+		scope: this
+	},
+	{
+		iconCls: 'ic-delete', 
+		text: t("Delete"),
+		handler: function(){
+			this.deleteSelected({
+				success: function() {
+					GO.addressbook.readableAddressbooksStore.load();
+				}
+			});
+		}, 
+		disabled: !GO.settings.modules.addressbook.write_permission,
+		scope: this
+	},'->',{
+		xtype: 'tbsearch',
+		store: config.store
+	}];
 	
 	GO.addressbook.ManageAddressbooksGrid.superclass.constructor.call(this, config);
 	
@@ -82,13 +78,7 @@ GO.addressbook.ManageAddressbooksGrid = function(config){
 		
 		this.addressbookDialog.show(record.id);
 		
-		}, this);
-
-	// Moved here from Stores.js to let this event only fire from within the
-	// administration grid.
-//	this.store.on('load', function(){
-//		GO.addressbook.readableAddressbooksStore.load();
-//	}, this);
+	}, this);
 };
 
 

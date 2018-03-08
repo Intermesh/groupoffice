@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: ThumbsDialog.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: ThumbsDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Twan Verhofstad
  */
@@ -31,9 +31,9 @@ GO.bookmarks.ThumbsDialog = function(config){
 	config.height=350;
 	config.width=800;
 	config.layout='border';
-	config.title=GO.bookmarks.lang.chooseIcon;
+	config.title=t("Choose icon for bookmark", "bookmarks");
 	config.buttons=[{
-		text: GO.lang['cmdOk'],
+		text: t("Ok"),
 		handler: function(){
 			
 			this.iconfield.setValue(this.chosenlogo); // pad naar logo
@@ -45,7 +45,7 @@ GO.bookmarks.ThumbsDialog = function(config){
 		scope: this
 	}
 	,{
-		text: GO.lang['cmdClose'],
+		text: t("Close"),
 		handler: function(){
 			this.hide();
 		},
@@ -102,7 +102,7 @@ GO.bookmarks.ThumbsDialog = function(config){
 		},
 		border: false,
 		inputName : 'attachments',
-		addText : GO.bookmarks.lang.uploadLogo,
+		addText : t("Upload Logo", "bookmarks"),
 		max: 1		// maar 1 tegelijk, overwrite event word meteen ge-fired.
 	});
 
@@ -173,8 +173,8 @@ Ext.extend(GO.bookmarks.ThumbsDialog, Ext.Window, {
 
 		this.thumbExample.getEl().update(GO.bookmarks.thumbTpl.apply({
 				logo:url,
-				title:GO.bookmarks.lang.title,
-				description:GO.bookmarks.lang.description
+				title:t("Title", "bookmarks"),
+				description:t("Website description.", "bookmarks")
 			}));
 	},
 
@@ -182,7 +182,7 @@ Ext.extend(GO.bookmarks.ThumbsDialog, Ext.Window, {
 	uploadHandler : function(){
 		this.uploadForm.form.submit({
 			url:GO.url("bookmarks/bookmark/upload"),
-			waitMsg : GO.lang.waitMsgUpload,
+			waitMsg : t("Uploading..."),
 			params:{
 				thumb_id:   this.thumb_id,
 				folder_id : this.folder_id
@@ -201,13 +201,13 @@ Ext.extend(GO.bookmarks.ThumbsDialog, Ext.Window, {
 				var error = '';
 				if(action.failureType=='client')
 				{
-					error = GO.lang['strErrorsInForm'];
+					error = t("You have errors in your form. The invalid fields are marked.");
 				}else
 				{
 					error = action.result.feedback;
 				}
 
-				Ext.MessageBox.alert(GO.lang['strError'], error);
+				Ext.MessageBox.alert(t("Error"), error);
 			},
 			scope: this
 		});

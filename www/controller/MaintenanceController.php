@@ -347,7 +347,7 @@ class MaintenanceController extends AbstractController {
 			$models = array(new ReflectionClass($modelName));
 		} else {
 			if(empty($params['keepexisting']))
-			\GO::getDbConnection()->query('TRUNCATE TABLE go_search_cache');
+			\GO::getDbConnection()->query('TRUNCATE TABLE core_search');
 			
 			$models=\GO::findClasses('model');
 		}
@@ -363,6 +363,10 @@ class MaintenanceController extends AbstractController {
 		if(empty($params['modelName'])){
 			\GO::modules()->callModuleMethod('buildSearchCache', array(&$response));
 		}
+		
+		
+		\go\core\orm\SearchableTrait::rebuildSearch();
+		
 		
 //		echo "Adding full text search index\n";
 //		\GO::getDbConnection()->query("ALTER TABLE `go_search_cache` ADD FULLTEXT ft_keywords(`name` ,`keywords`);");
@@ -427,14 +431,14 @@ class MaintenanceController extends AbstractController {
 	private function _checkCoreModels(){
 		
 		//fix for invalid acl rows.
-		$sql = "insert ignore into go_acl (acl_id,group_id) SELECT acl_id,group_id FROM `go_acl` WHERE user_id>0 && group_id>0;";
-		\GO::getDbConnection()->query($sql);
-		
-		$sql = "insert ignore into go_acl (acl_id,user_id) SELECT acl_id,user_id FROM `go_acl` WHERE user_id>0 && group_id>0;";
-		\GO::getDbConnection()->query($sql);		
-		
-		$sql = "delete from go_acl where user_id>0 and group_id>0;";
-		\GO::getDbConnection()->query($sql);
+//		$sql = "insert ignore into go_acl (acl_id,group_id) SELECT acl_id,group_id FROM `go_acl` WHERE user_id>0 && group_id>0;";
+//		\GO::getDbConnection()->query($sql);
+//		
+//		$sql = "insert ignore into go_acl (acl_id,user_id) SELECT acl_id,user_id FROM `go_acl` WHERE user_id>0 && group_id>0;";
+//		\GO::getDbConnection()->query($sql);		
+//		
+//		$sql = "delete from go_acl where user_id>0 and group_id>0;";
+//		\GO::getDbConnection()->query($sql);
 		
 		
 		$sql = 'insert ignore into go_acl_items (select acl_id, "1", "missing", now() from go_acl);';
@@ -463,49 +467,6 @@ class MaintenanceController extends AbstractController {
 		}
 	}
 	
-	private function _checkV3(){
-		
-		if(!\GO\Base\Db\Utils::tableExists('go_model_types')){
-			
-			$upgrade_mtime = \GO::config()->get_setting('upgrade_mtime');
-			
-			if($upgrade_mtime < 20111222)
-				exit("Old version detected but it's older then ".\GO::config()->product_name." 3.7.41. You must upgrade to the latest 3.7 version first.");
-			
-			echo "Older version of ".\GO::config()->product_name." detected. Preparing database for 4.0 upgrade\n";
-		
-			$queries[]="ALTER TABLE `go_modules` ADD `enabled` BOOLEAN NOT NULL DEFAULT '1'";
-			
-			$queries[]="TRUNCATE TABLE `go_state`";
-			$queries[]="delete from go_settings where name='version'";
-
-			$queries[]="ALTER TABLE `go_users` ADD `mute_reminder_sound` ENUM( '0', '1' ) NOT NULL AFTER `mute_sound` ,
-			ADD `mute_new_mail_sound` ENUM( '0', '1' ) NOT NULL AFTER `mute_reminder_sound`";
-
-			$queries[]="ALTER TABLE `go_users` ADD `show_smilies` ENUM( '0', '1' ) NOT NULL DEFAULT '1' AFTER `mute_new_mail_sound`";
-			$queries[]="ALTER TABLE `go_users` CHANGE `password` `password` VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL";
-			
-			$queries[] = "delete from go_modules where id='log';";
-			
-			$queries[] = "ALTER TABLE `em_accounts` ADD INDEX(`acl_id`);";
-
-			foreach($queries as $query){
-				try {
-					echo 'Excuting query: ' . $query . "\n";
-					\GO::getDbConnection()->query($query);
-				} catch (PDOException $e) {
-					echo $e->getMessage() . "\n";
-				}
-			}
-			
-			echo "Done.\n";
-			return true;
-		}else
-		{
-			return false;
-		}
-		
-	}
 	
 	public static function ob_upgrade_log($buffer)
 	{
@@ -517,9 +478,11 @@ class MaintenanceController extends AbstractController {
 	
 	protected function actionUpgrade($params) {
 		
-		
-		
-		if(!version_compare( phpversion(), "5.3", ">="))
+				
+		if(!$this->isCli()){
+			echo '<pre>';
+		}
+		if(!version_compare( phpversion(), "5.6", ">="))
 			exit("You are running a PHP version older than 5.3. PHP 5.3 or greater is required to run Group-Office ".\GO::config()->version);
 		
 		$this->lockAction();
@@ -528,20 +491,24 @@ class MaintenanceController extends AbstractController {
 		
 
 		GO::setIgnoreAclPermissions(true);
-		GO::session()->runAsRoot();
+		
 		
 		\GO::clearCache();
 		
+		\GO::$disableModelCache = true;
+		
+		if(!GO\Base\Db\Utils::tableExists('core_module')) {
+			require(GO::config()->root_path . 'install/62to63.php');
+//			exit();
+		}
+		
+		GO::session()->runAsRoot();
 		
 		
 		\GO\Base\Db\Columns::$forceLoad=true;
 				
 		//don't be strict in upgrade process
 		\GO::getDbConnection()->query("SET sql_mode=''");
-		
-		
-		
-		$v3 = $this->_checkV3();
 		
 		$logDir = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path.'log/upgrade/');
 		$logDir->create();
@@ -559,31 +526,30 @@ class MaintenanceController extends AbstractController {
 		
 		ob_start("GO\Core\Controller\MaintenanceController::ob_upgrade_log");
 		
-		
-		if(!$this->isCli()){
-			echo '<pre>';
-		}
+	
 		
 		echo "Updating ".\GO::config()->product_name." database\n";
 		
 		//build an array of all update files. The queries are indexed by timestamp
 		//so they will all be executed in the right order.
 		$u = array();
-
-		require(\GO::config()->root_path . 'install/updates.php');
 		
-		//put the updates in an extra array dimension so we know to which module
-		//they belong too.
-		foreach ($updates as $timestamp => $updatequeries) {
-			$u["$timestamp"]['core'] = $updatequeries;
-		}
-
-
+//		require(\GO::config()->root_path . 'install/updates.php');
+//		
+//		//put the updates in an extra array dimension so we know to which module
+//		//they belong too.
+//		foreach ($updates as $timestamp => $updatequeries) {
+//			$u["$timestamp"]['core'] = $updatequeries;
+//		}
+		
 		$modules = \GO::modules()->getAllModules();
 			
+		$oldModules  = [];
 		while ($module=array_shift($modules)) {
 			
 			if($module->isAvailable()){
+				$oldModules[$module->name] = $module;
+				
 				$updatesFile = $module->path . 'install/updates.php';
 				if (!file_exists($updatesFile))
 					$updatesFile = $module->path . 'install/updates.inc.php';
@@ -595,7 +561,7 @@ class MaintenanceController extends AbstractController {
 					//put the updates in an extra array dimension so we know to which module
 					//they belong too.
 					foreach ($updates as $timestamp => $updatequeries) {
-						$u["$timestamp"][$module->id] = $updatequeries;
+						$u["$timestamp"][$module->name] = $updatequeries;
 					}
 				}
 			}
@@ -603,14 +569,10 @@ class MaintenanceController extends AbstractController {
 		//sort the array by timestamp
 		ksort($u);
 //		
-//		var_dump($u);
-//		exit();
-		
-		$currentCoreVersion = \GO::config()->get_setting('version');
-		if (!$currentCoreVersion)
-			$currentCoreVersion = 0;
 		
 		$counts=array();
+		
+		$aModuleWasUpgradedToNewBackend = false;
 		
 		foreach ($u as $timestamp => $updateQuerySet) {
 			
@@ -622,10 +584,7 @@ class MaintenanceController extends AbstractController {
 					exit("Invalid queries in module: ".$module);
 				}
 				
-				if($module=='core')
-					$currentVersion=$currentCoreVersion;
-				else
-					$currentVersion = \GO::modules()->$module->version;
+				$currentVersion = \GO::modules()->$module->version;
 				
 				if(!isset($counts[$module]))
 					$counts[$module]=0;			
@@ -633,11 +592,11 @@ class MaintenanceController extends AbstractController {
 				foreach ($queries as $query) {
 					$counts[$module]++;
 					if ($counts[$module] > $currentVersion) {
-						if (substr($query, 0, 7) == 'script:') {
-							if ($module == 'core')
-								$updateScript = \GO::config()->root_path . 'install/updatescripts/' . substr($query, 7);
-							else
-								$updateScript = \GO::modules()->$module->path . 'install/updatescripts/' . substr($query, 7);
+						if(is_callable($query)) {
+							echo "Running callable function\n";
+							call_user_func($query);
+						} else if (substr($query, 0, 7) == 'script:') {
+							$updateScript = \GO::modules()->$module->path . 'install/updatescripts/' . substr($query, 7);
 
 							if (!file_exists($updateScript)) {
 								die($updateScript . ' not found!');
@@ -646,8 +605,13 @@ class MaintenanceController extends AbstractController {
 							//if(!$quiet)
 							echo 'Running ' . $updateScript . "\n";
 							flush();
-							if (empty($params['test']))
-								require_once($updateScript);
+							if (empty($params['test'])) {
+								
+								call_user_func(function() use ($updateScript){
+									require_once($updateScript);
+								});
+								
+							}
 						}else {
 							echo 'Excuting query: ' . $query . "\n";
 							flush();
@@ -662,30 +626,38 @@ class MaintenanceController extends AbstractController {
 									$errorsOccurred = true;
 									
 									echo $e->getMessage() . "\n";									
-									echo "Query: ".$query;
-//									if ($e->getCode() == 1091 || $e->getCode() == 1060) {
-//										//duplicate and drop errors. Ignore those on updates
-//									} else {
-//										die();
-//									}
+									echo "Query: ".$query."\n";
+									echo "Module: ".$module."\n";
+									echo "Module installed version: ".$currentVersion."\n";
+									echo "Module source version: ".$counts[$module]."\n";
+									
+									if ($e->getCode() == 42000 || $e->getCode() == '42S21' || $e->getCode() == '42S01'|| $e->getCode() == '42S22') {
+										//duplicate and drop errors. Ignore those on updates
+									} else {
+										die();
+									}
 								}
 							}
 						}
 
 						if (empty($params['test'])) {
-							if($module=='core')
-								\GO::config()->save_setting('version', $counts[$module]);
-							else{
+					
+								echo $module.' updated to '.$counts[$module]."\n";
 								
-								//echo $module.' updated to '.$counts[$module]."\n";
+					
+								$moduleModel = GO\Base\Model\Module::model()->findByName($module);
 								
-								$moduleModel = \GO::modules()->$module;
+							
+								$newBackendUpgrade = $moduleModel->package && empty($oldModules[$module]->package);
+								if($newBackendUpgrade) {
+									$aModuleWasUpgradedToNewBackend = true;
+								}
 								
-								$moduleModel->version=$counts[$module];
-								$moduleModel->save();
+								$moduleModel->version = $newBackendUpgrade ? 0 : $counts[$module];
+								$moduleModel->save(false);
 							}
 							ob_flush();
-						}
+						
 					}
 				}
 			}
@@ -704,47 +676,27 @@ class MaintenanceController extends AbstractController {
 		//in some exceptions alowed deletes is still on false here.
 		\GO\Base\Fs\File::setAllowDeletes(true);
 		\GO::clearCache();
-		//rebuild listeners
-		\GO\Base\Observable::cacheListeners();		
-		if($v3){
-			
-//			if(\GO::modules()->isInstalled('projects') && \GO::modules()->isInstalled('files')){
-//				echo "Renaming projects folder temporarily for new project paths\n";
-//				$folder = \GO\Files\Model\Folder::model()->findByPath('projects');
-//				if($folder){
-//					$folder->name='oldprojects';
-//					$folder->systemSave=true;
-//					$folder->save();
-//				}
-//			}
-			
-			
-//			echo "Checking database after version 3.7 upgrade.\n";
-//			$this->actionCheckDatabase($params);
-//			echo "Done\n\n";
-//			ob_flush();
-			
-			$versioningFolder = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path.'versioning');
-			if($versioningFolder->exists())
-				$versioningFolder->rename("versioning_backup_3_7");
-			
-			if(!$this->isCli()){
-				echo '</pre>';
-			}
-				
-			echo "Building search cache after version 3.7 upgrade.\n";
-			ob_flush();
-			$this->run("buildsearchcache",$params);
-			ob_flush();
-			
-			if(!$this->isCli()){
-				echo '<pre>';
-			}
-		}		
 		
+		\go\core\App::get()->getCache()->flush(false);
+		
+		\go\core\App::get()->getDataFolder()->getFolder('clientscripts')->delete();
+		
+		//rebuild listeners
+		\GO\Base\Observable::cacheListeners();	
+		
+		
+		
+		if($aModuleWasUpgradedToNewBackend) {
+			//rerun upgrade
+			
+			echo "Rerunning upgrade for new backend\n";
+			
+			return $this->actionUpgrade($params);
+			
+		}
 		
 //		if(!$errorsOccurred) {
-			echo "All Done!\n";		
+		echo "All Done!\n";			
 //		}else
 //		{
 //			echo "All Done! Done but some errors occurred. Please try running this script again.\n";		
@@ -756,14 +708,16 @@ class MaintenanceController extends AbstractController {
 			echo '</pre><br /><br />';
 			
 			if(!$errorsOccurred) {
-				echo '<a href="'.\GO::config()->host.'">'.\GO::t('cmdContinue').'</a>';
+				echo '<a href="'.\GO::config()->host.'">'.\GO::t("Continue").'</a>';
 			}else
 			{
-				echo '<a href="'.\GO::url('maintenance/upgrade').'">'.\GO::t('cmdContinue').'</a>';
+				echo '<a href="'.\GO::url('maintenance/upgrade').'">'.\GO::t("Continue").'</a>';
 			}
 		}
 		
 		ob_end_flush();
+		
+		
 		
 		
 		\GO\Base\Db\Columns::$forceLoad=false;

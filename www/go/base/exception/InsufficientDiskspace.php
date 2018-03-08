@@ -29,7 +29,7 @@ class InsufficientDiskspace extends \Exception
 	
 	public function __construct($message='') {
 
-		$message = \GO::t('quotaExceeded')."\n".sprintf(\GO::t('youAreUsing'),  \GO\Base\Util\Number::formatSize($this->getUsage()), \GO\Base\Util\Number::formatSize($this->getQuota())).$message;
+		$message = \GO::t("You don't have anymore diskspace left. Please delete some files or contact your provider to raise the quota")."\n".sprintf(\GO::t("You are using %s of %s"),  \GO\Base\Util\Number::formatSize($this->getUsage()), \GO\Base\Util\Number::formatSize($this->getQuota())).$message;
 		
 		parent::__construct($message);
 	}

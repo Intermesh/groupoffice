@@ -1,27 +1,27 @@
 <?php
-
-;
-$l['name']='Sumar';
-$l['description']='Introdu aici descrierea';
-$l['default_rss_url']='http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml';
-$l["summary"]= 'Sumar';
-$l["noItems"]= 'Nun ai nici un item în pagina de start.';
-$l["selectPortlet"]= 'Selecţioneaza portlet';
-$l["hotTopics"]= 'Subiecte importante';
-$l["enterRssFeed"]= 'Introdu URL de la feed RSS:';
-$l["notes"]= 'Nota';
-$l["loadingFeed"]= 'Încărcare Feed...';
-$l["goToPost"]= 'Dute la Post';
-$l["today"]= 'Azi ';
-$l["host"]="Host";
-$l["ip"]="Ip";
-$l["linkId"]="Legătura ID";
-$l["expires"]="Expiră";
-$l["upgrades"]="Actualizări";
-$l["notified"]="Notificat";
-$l["announcement"]="Comunicaţiune";
-$l["announcements"]="Comunicaţiuni";
-$l["dueTime"]="Scadenţa";
-$l["title"]="Titlu";
-$l["content"]="Conţinut";
-$l["manageAnnouncements"]='Gestiune comunicaţiuni';
+return array (
+  'You don\'t have any items on your start page.' => 'Nun ai nici un item în pagina de start.',
+  'Select portlet' => 'Selecţioneaza portlet',
+  'News' => 'Subiecte importante',
+  'Please enter the RSS feed URL:' => 'Introdu URL de la feed RSS:',
+  'Notes' => 'Nota',
+  'Loading Feed...' => 'Încărcare Feed...',
+  'Go to Post' => 'Dute la Post',
+  'Today ' => 'Azi ',
+  'host' => 'Host',
+  'ip' => 'Ip',
+  'linkId' => 'Legătura ID',
+  'expires' => 'Expiră',
+  'upgrades' => 'Actualizări',
+  'notified' => 'Notificat',
+  'Announcement' => 'Comunicaţiune',
+  'Announcements' => 'Comunicaţiuni',
+  'Show until' => 'Scadenţa',
+  'Title' => 'Titlu',
+  'content' => 'Conţinut',
+  'Manage announcements' => 'Gestiune comunicaţiuni',
+  'name' => 'Sumar',
+  'description' => 'Introdu aici descrierea',
+  'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml' => 'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml',
+  'Start page' => 'Sumar',
+);

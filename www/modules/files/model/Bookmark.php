@@ -58,7 +58,7 @@ class Bookmark extends \GO\Base\Db\ActiveRecord {
 				array('user_id'=>\GO::user()->id,'folder_id'=>$folderModel->id)
 			);
 		if (!empty($existingBookmarkModel))
-			throw new \Exception(str_replace('%fn',$folderModel->name,\GO::t('bookmarkAlreadyExists','files')));
+			throw new \Exception(str_replace('%fn',$folderModel->name,\GO::t("Folder '%fn' already has a favorite for the current user.", "files")));
 		
 		
 		return parent::beforeSave();

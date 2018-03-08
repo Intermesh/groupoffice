@@ -1,21 +1,20 @@
 <?php
-
-
-$l["summary"]= 'Σύνοψη';
-$l["noItems"]= 'Δεν έχετε στοιχεία στην αρχική σας σελίδα.';
-$l["selectPortlet"]= 'Επιλογή portlet';
-$l["hotTopics"]= 'Ενδιαφέροντα θέματα';
-$l["enterRssFeed"]= 'Παρακαλούμε εισάγετε την διεύθυνση τροφοδότησης RSS:';
-$l["notes"]= 'Σημειώσεις';
-$l["loadingFeed"]= 'Φόρτωση τροφοδότησης...';
-$l["goToPost"]= 'Πήγαινε στην δημοσίευση';
-$l["today"]= 'Σήμερα';
-$l["dueTime"]="Εμφάνιση μέχρι";
-$l["title"]="Τίτλος";
-$l["manageAnnouncements"]='Διαχείριση ανακοινώσεων';
-
-$l['name']='Αρχική σελίδα';
-$l['description']='Εμφανίζει μια σύνοψη διαφορετικών πραγματικών στοιχείων';
-$l['default_rss_url']='http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml';
-$l['announcement']='Ανακοίνωση';
-$l['announcements']='Ανακοινώσεις';
+return array (
+  'You don\'t have any items on your start page.' => 'Δεν έχετε στοιχεία στην αρχική σας σελίδα.',
+  'Select portlet' => 'Επιλογή portlet',
+  'News' => 'Ενδιαφέροντα θέματα',
+  'Please enter the RSS feed URL:' => 'Παρακαλούμε εισάγετε την διεύθυνση τροφοδότησης RSS:',
+  'Notes' => 'Σημειώσεις',
+  'Loading Feed...' => 'Φόρτωση τροφοδότησης...',
+  'Go to Post' => 'Πήγαινε στην δημοσίευση',
+  'Today ' => 'Σήμερα',
+  'Show until' => 'Εμφάνιση μέχρι',
+  'Title' => 'Τίτλος',
+  'Manage announcements' => 'Διαχείριση ανακοινώσεων',
+  'Announcement' => 'Ανακοίνωση',
+  'Announcements' => 'Ανακοινώσεις',
+  'name' => 'Αρχική σελίδα',
+  'description' => 'Εμφανίζει μια σύνοψη διαφορετικών πραγματικών στοιχείων',
+  'Start page' => 'Σύνοψη',
+  'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml' => 'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml',
+);

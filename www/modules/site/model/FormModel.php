@@ -85,7 +85,7 @@ abstract class FormModel extends \GO\Base\Model {
 		foreach($this->requiredAttributes as $attributeName){
 
 			if(empty($this->$attributeName))
-				$this->setValidationError($attributeName, sprintf(\GO::t('attributeRequired'),'"'.$this->getAttributeLabel($attributeName).'"'));
+				$this->setValidationError($attributeName, sprintf(\GO::t("Field %s is required"),'"'.$this->getAttributeLabel($attributeName).'"'));
 		}
 
 		return !$this->hasValidationErrors();

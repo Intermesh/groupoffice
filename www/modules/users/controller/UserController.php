@@ -49,7 +49,7 @@ class UserController extends \GO\Base\Controller\AbstractModelController {
 
 	protected function formatColumns(\GO\Base\Data\ColumnModel $columnModel) {
 		$columnModel->formatColumn('name', '$model->getName()', array(), \GO::user()->sort_name);
-		$columnModel->formatColumn('enabled', "!empty(\$model->enabled) ? \GO::t('yes') : \GO::t('no')");
+		$columnModel->formatColumn('enabled', "!empty(\$model->enabled) ? \GO::t(\"Yes\") : \GO::t(\"No\")");
 		return parent::formatColumns($columnModel);
 	}
 
@@ -127,36 +127,25 @@ class UserController extends \GO\Base\Controller\AbstractModelController {
 
 		//Save the contact fields to the contact.
 		
-		$contact = $model->createContact();
-		if($contact){
-			unset($params['id']);
-			
-			//if user typed in a new company name manually we set this attribute so a new company will be autocreated.
-			if(!is_numeric($params['company_id'])){
-				$contact->company_name = $params['company_id'];
-			}
-			
-			$contact->setAttributes($params);
-			$contact->save();
-		}
-
-
 		if (isset($_POST['modules'])) {
 			$modules = !empty($_POST['modules']) ? json_decode($_POST['modules']) : array();
 			$groupsMember = json_decode($_POST['group_member'], true);
-			$groupsVisible = json_decode($_POST['groups_visible'], true);
-
+			
+			
+			$userGroup = \go\core\auth\model\Group::find()->where(['isUserGroupFor' => $model->id])->single();
 			/**
 			 * Process selected module permissions
 			 */
 			foreach ($modules as $modPermissions) {
-				$modModel = \GO\Base\Model\Module::model()->findByPk(
+				$modModel = \GO\Base\Model\Module::model()->findByName(
 					$modPermissions->id
 				);	
-				$modModel->acl->addUser(
-					$model->id,
+				if(!$modModel->acl->addGroup(
+					$userGroup->id,
 					$modPermissions->permissionLevel
-				);
+				)) {
+					throw new \Exception("Could not add group");
+				}
 			}
 
 			/**
@@ -169,19 +158,6 @@ class UserController extends \GO\Base\Controller\AbstractModelController {
 					} else {
 						\GO\Base\Model\Group::model()->findByPk($group['id'])->removeUser($model->id);
 					}
-				}
-			}
-
-
-			/**
-			 * User will be visible to the selected groups
-			 */
-			foreach ($groupsVisible as $group) {
-				if ($group['selected']) {
-					
-					$model->acl->addGroup($group['id'], \GO\Base\Model\Acl::MANAGE_PERMISSION);
-				} else {
-					$model->acl->removeGroup($group['id']);
 				}
 			}
 		}
@@ -199,10 +175,10 @@ class UserController extends \GO\Base\Controller\AbstractModelController {
 		\GO::$disableModelCache=true; //for less memory usage
 		ini_set('max_execution_time', '300');
 
-		$ab = \GO\Addressbook\Model\Addressbook::model()->findSingleByAttribute('users', '1'); //\GO::t('users','base'));
+		$ab = \GO\Addressbook\Model\Addressbook::model()->findSingleByAttribute('users', '1'); //\GO::t("Users"));
 		if (!$ab) {
 			$ab = new \GO\Addressbook\Model\Addressbook();
-			$ab->name = \GO::t('users');
+			$ab->name = \GO::t("Users");
 			$ab->users = true;
 			$ab->save();
 		}
@@ -242,7 +218,7 @@ class UserController extends \GO\Base\Controller\AbstractModelController {
 				'model'=>'GO\Base\Model\UserGroup',
 				'localTableAlias'=>'t',
 				'localField'=>'id',
-				'foreignField'=>'user_id',
+				'foreignField'=>'userId',
 				'tableAlias'=>'ug'
 			));
 		
@@ -252,7 +228,7 @@ class UserController extends \GO\Base\Controller\AbstractModelController {
 		$groupsMultiSel = new \GO\Base\Component\MultiSelectGrid(
 			'users-groups-panel', 
 			"GO\Base\Model\Group",$store, $params, true);
-			$groupsMultiSel->addSelectedToFindCriteria($storeParams, 'group_id','ug');
+			$groupsMultiSel->addSelectedToFindCriteria($storeParams, 'groupId','ug');
 			
 		return parent::beforeStoreStatement($response, $params, $store, $storeParams);
 	}
@@ -406,6 +382,8 @@ class UserController extends \GO\Base\Controller\AbstractModelController {
 		
 		$store = new \GO\Base\Data\DbStore('GO\Base\Model\Group', $columnModel);
 		$store->defaultSort = array('name');
+		
+		$store->getFindParams()->getCriteria()->addCondition('isUserGroupFor', null);
 		
 		return $store->getData();
 		

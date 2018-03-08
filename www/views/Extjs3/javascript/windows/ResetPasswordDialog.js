@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: ResetPasswordDialog.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: ResetPasswordDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -53,17 +53,17 @@ GO.dialog.ResetPasswordDialog = function(config){
 		items: [
 			new GO.LogoComponent(),
 			new GO.form.HtmlComponent({
-				html: GO.lang.changePasswordText+'<br/><br/>'
+				html: t("Please fill in the form below to reset your password.")+'<br/><br/>'
 			}),
 		{
 			itemId: 'password',
-			fieldLabel: GO.lang.strPassword,
+			fieldLabel: t("Password"),
 			name: 'password',
 			inputType: 'password',
 			allowBlank:false
 			,anchor:'100%'
 		},{
-			fieldLabel: GO.lang.strConfirm,
+			fieldLabel: t("Confirm"),
 			name: 'confirm',
 			inputType: 'password',
 			allowBlank:false,
@@ -77,14 +77,14 @@ GO.dialog.ResetPasswordDialog = function(config){
 		draggable:false,
 		resizable: false,
 		closeAction:'hide',
-		title: GO.lang.changePassword,
+		title: t("Change password"),
 		closable: false,
 		items: [			
 		this.formPanel
 		],		
 		buttons: [
 		{
-			text: GO.lang['cmdOk'],
+			text: t("Ok"),
 			handler: this.changePass,
 			scope:this
 		}
@@ -112,11 +112,11 @@ Ext.extend(GO.dialog.ResetPasswordDialog, GO.Window, {
 				email: GO.email,
 				usertoken: GO.usertoken
 			},
-			waitMsg:GO.lang.waitMsgLoad,
+			waitMsg:t("Loading..."),
 			success:function(form, action){
 				Ext.Msg.show({
-					title:GO.lang.changePasswordSuccessTitle,
-					msg: GO.lang.changePasswordSuccess,
+					title:t("Password has been changed"),
+					msg: t("Your password has been changed"),
 					buttons: Ext.Msg.OK,
 					fn: function() {
 						document.location = GO.url();
@@ -127,7 +127,7 @@ Ext.extend(GO.dialog.ResetPasswordDialog, GO.Window, {
 				
 				if(action.result)
 				{
-					Ext.MessageBox.alert(GO.lang['strError'], action.result.feedback, function(){
+					Ext.MessageBox.alert(t("Error"), action.result.feedback, function(){
 						this.formPanel.form.findField('password').focus(true);
 					},this);
 				}

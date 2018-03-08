@@ -7,9 +7,8 @@ GO.calendar.ContextMenu = function(config){
 
 	config.items=[
 	this.actionInfo = new Ext.menu.Item({
-		iconCls: 'btn-properties',
-		text:GO.calendar.lang.showInfo,
-		cls: 'x-btn-text-icon',
+		iconCls: 'ic-info',
+		text:t("Details", "calendar"),
 		scope:this,
 		handler: function()
 		{
@@ -17,9 +16,8 @@ GO.calendar.ContextMenu = function(config){
 		}
 	}),new Ext.menu.Separator(),
 	this.actionCopy = new Ext.menu.Item({
-		iconCls: 'btn-copy',
-		text: GO.lang.copy,
-		cls: 'x-btn-text-icon',
+		iconCls: 'ic-content-copy',
+		text: t("Copy"),
 		scope:this,		
 		disabled:false,
 		handler: function()
@@ -28,9 +26,8 @@ GO.calendar.ContextMenu = function(config){
 		}
 	}),
 	this.actionCut = new Ext.menu.Item({
-		iconCls: 'btn-cut',
-		text: GO.calendar.lang.move,
-		cls: 'x-btn-text-icon',
+		iconCls: 'ic-content-cut',
+		text: t("Move", "calendar"),
 		scope:this,
 		disabled:true,
 		handler: function()
@@ -45,9 +42,8 @@ GO.calendar.ContextMenu = function(config){
 		}
 	}),new Ext.menu.Separator(),
 	this.actionDelete = new Ext.menu.Item({
-		iconCls: 'btn-delete',
-		text: GO.lang['cmdDelete'],
-		cls: 'x-btn-text-icon',
+		iconCls: 'ic-delete',
+		text: t("Delete"),
 		scope:this,
 		disabled:true,
 		handler: function()
@@ -58,9 +54,8 @@ GO.calendar.ContextMenu = function(config){
 	this.newMenuItem = new GO.NewMenuItem(),
 	'-',
 	this.actionExportAsIcs = new Ext.menu.Item({
-		iconCls: 'btn-export',
-		text: GO.calendar.lang['exportAsIcs'],
-		cls: 'x-btn-text-icon',
+		iconCls: 'ic-import-export',
+		text: t("Export as ICS", "calendar"),
 		scope:this,
 		handler: function()
 		{
@@ -70,11 +65,10 @@ GO.calendar.ContextMenu = function(config){
 	})
 	]
 
-	if (GO.email) {
+	if(go.ModuleManager.isAvailable("email")) {
 		this.actionCreateMail = new Ext.menu.Item({
-			iconCls: 'btn-email',
-			text:GO.calendar.lang.sendEmailParticipants,
-			cls: 'x-btn-text-icon',
+			iconCls: 'ic-email',
+			text:t("Create email for participants", "calendar"),
 			scope:this,
 			handler: function()
 			{
@@ -84,12 +78,11 @@ GO.calendar.ContextMenu = function(config){
 		config.items.splice(1,0,this.actionCreateMail);
 	}
 
-	if(GO.timeregistration)
+	if(go.ModuleManager.isAvailable("timeregistration"))
 	{
 		this.actionAddTimeRegistration = new Ext.menu.Item({
-			text: GO.calendar.lang.addTimeRegistration,
+			text: t("Import into timeregistration", "calendar"),
 			iconCls: 'go-menu-icon-timeregistration',
-			cls: 'x-btn-text-icon',
 			scope:this,
 			handler: function()
 			{
@@ -150,7 +143,7 @@ Ext.extend(GO.calendar.ContextMenu, Ext.menu.Menu, {
 //		this.actionCopy.setDisabled(this.event.read_only);
 		this.actionCut.setDisabled(this.event.read_only);
 		
-		if (GO.email) {
+		if(go.ModuleManager.isAvailable("email")) {
 		// Disable "Create email for participants" when it's a private event and it's not yours
 			if(this.event.private && this.event.user_id != GO.settings.user_id){
 				this.actionCreateMail.setDisabled(true);
@@ -186,7 +179,7 @@ Ext.extend(GO.calendar.ContextMenu, Ext.menu.Menu, {
 			this.actionAddTimeRegistration.setDisabled(!event.event_id);
 		
 
-//		if (GO.email)
+//		if(go.ModuleManager.isAvailable("email"))
 //			this.actionCreateMail.setDisabled(event.has_other_participants==0);
 
 		this.newMenuItem.setLinkConfig({
@@ -197,7 +190,7 @@ Ext.extend(GO.calendar.ContextMenu, Ext.menu.Menu, {
 	},
 	
 	showCreateMailDialog : function() {
-		if (GO.email) {
+		if(go.ModuleManager.isAvailable("email")) {
 			GO.request({
 				url: 'calendar/event/participantEmailRecipients',
 				params : {

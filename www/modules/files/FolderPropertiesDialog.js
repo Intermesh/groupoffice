@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: FolderPropertiesDialog.js 20726 2016-12-16 10:04:54Z mschering $
+ * @version $Id: FolderPropertiesDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -20,7 +20,7 @@ GO.files.FolderPropertiesDialog = function(config){
 
 	this.propertiesPanel = new Ext.Panel({
 		layout:'form',
-		title:GO.lang['strProperties'],
+		title:t("Properties"),
 		cls:'go-form-panel',
 		waitMsgTarget:true,
 		defaultType: 'textfield',
@@ -28,7 +28,7 @@ GO.files.FolderPropertiesDialog = function(config){
 		border:false,   
 		items: [
 		{
-			fieldLabel: GO.lang['strName'],
+			fieldLabel: t("Name"),
 			name: 'name',
 			anchor: '100%',
 			validator:function(v){
@@ -36,7 +36,7 @@ GO.files.FolderPropertiesDialog = function(config){
 			}
 		},{
 			xtype: 'plainfield',
-			fieldLabel: GO.lang.strLocation,
+			fieldLabel: t("Location"),
 			name: 'path'
 		},
 		{
@@ -49,22 +49,22 @@ GO.files.FolderPropertiesDialog = function(config){
 		}),
 		{
 			xtype: 'plainfield',
-			fieldLabel: GO.lang.strCtime,
+			fieldLabel: t("Created at"),
 			name: 'ctime'
 		},
 		{
 			xtype: 'plainfield',
-			fieldLabel: GO.lang.strMtime,
+			fieldLabel: t("Modified at"),
 			name: 'mtime'
 		},
 		{
 			xtype: 'plainfield',
-			fieldLabel: GO.lang.createdBy,
+			fieldLabel: t("Created by"),
 			name: 'username'
 		},
 		{
 			xtype: 'plainfield',
-			fieldLabel: GO.lang.mUser,
+			fieldLabel: t("Modified by"),
 			name: 'musername'
 		},
 		{
@@ -73,19 +73,19 @@ GO.files.FolderPropertiesDialog = function(config){
 		},
 		{
 			xtype:'xcheckbox',
-			boxLabel: GO.files.lang.activateSharing,
+			boxLabel: t("Activate sharing", "files"),
 			name: 'share',
 			checked: false,
 			hideLabel:true
 		},
 		this.notifyCheckBox = new Ext.ux.form.XCheckbox({
-			boxLabel: GO.files.lang.notifyChanges,
+			boxLabel: t("Notify me about changes in this folder", "files"),
 			name: 'notify',
 			checked: false,
 			hideLabel:true
 		}),
 		this.applyStateCheckbox = new Ext.ux.form.XCheckbox({
-			boxLabel: GO.files.lang.applyState,
+			boxLabel: t("Apply the folder's display settings for everyone.", "files"),
 			name: 'apply_state',
 			checked: false,
 			hideLabel:true
@@ -100,7 +100,7 @@ GO.files.FolderPropertiesDialog = function(config){
 	this.commentsPanel = new Ext.Panel({
 		layout:'form',
 		labelWidth: 70,
-		title: GO.files.lang.comments,
+		title: t("Comments", "files"),
 		border:false,
 		items: new Ext.form.TextArea({
 			name: 'comment',
@@ -121,7 +121,7 @@ GO.files.FolderPropertiesDialog = function(config){
 		items:[this.propertiesPanel, this.commentsPanel, this.readPermissionsTab]
 	});
 	
-	if(GO.customfields){
+	if(go.ModuleManager.isAvailable("customfields")){
 		this.disableCategoriesPanel = new GO.customfields.DisableCategoriesPanel();
 		
 		this.recursivePanel = new Ext.Panel({
@@ -141,7 +141,7 @@ GO.files.FolderPropertiesDialog = function(config){
 					}
 				},{
 					type:'displayfield',
-					html: GO.files.lang.applyCFRecursively
+					html: t("Apply these custom field settings to current folder and it's sub folders recursively", "files")
 				}
 			]
 		});
@@ -161,7 +161,7 @@ GO.files.FolderPropertiesDialog = function(config){
 		}
 	}
 
-//	if(GO.workflow)
+//	if(go.ModuleManager.isAvailable("workflow"))
 //	{
 //		this.workflowPanel = new GO.workflow.FolderPropertiesPanel();
 //		this.tabPanel.insert(2,this.workflowPanel);
@@ -178,7 +178,7 @@ GO.files.FolderPropertiesDialog = function(config){
 		}
 	});
 	GO.files.FolderPropertiesDialog.superclass.constructor.call(this,{
-		title:GO.lang['strProperties'],
+		title:t("Properties"),
 		layout:'fit',
 		width:600,
 		height:600,
@@ -186,24 +186,9 @@ GO.files.FolderPropertiesDialog = function(config){
 		items:this.formPanel,
 		buttons:[
 		{
-			text:GO.lang['cmdOk'],
+			text:t("Save"),
 			handler: function(){
 				this.save(true)
-				},
-			scope: this
-		},
-		{
-			text:GO.lang['cmdApply'],
-			handler: function(){
-				this.save(false)
-				},
-			scope: this
-		},
-			
-		{
-			text:GO.lang['cmdClose'],
-			handler: function(){
-				this.hide()
 				},
 			scope: this
 		}
@@ -248,7 +233,7 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 				this.setPermission(action.result.data.is_someones_home_dir, action.result.data.permission_level, action.result.data.readonly);
 
 				this.tabPanel.setActiveTab(0);
-				if(GO.customfields)
+				if(go.ModuleManager.isAvailable("customfields"))
 					this.disableCategoriesPanel.setModel(folder_id,"GO\\Files\\model\\File");
 				
 				this.notifyCheckBox.addListener('check',this.onNotifyChecked,this);
@@ -258,7 +243,7 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 				GO.files.FolderPropertiesDialog.superclass.show.call(this);
 			},
 			failure: function(form, action) {
-				Ext.MessageBox.alert(GO.lang['strError'], action.result.feedback);
+				Ext.MessageBox.alert(t("Error"), action.result.feedback);
 			},
 			scope: this
 		});		
@@ -270,8 +255,8 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 	
 	onNotifyChecked : function(checkbox,checked) {
 		Ext.Msg.show({
-			title: checked  ? GO.files.lang.notifyRecursiveTitle :  GO.files.lang.removeNotifyRecursiveTitle,
-			msg: GO.files.lang.notifyRecursiveQuestion,
+			title: checked  ? t("Set notification on subfolders?", "files") :  t("Remove notification from subfolders?", "files"),
+			msg: t("Do you want to apply this to all the subfolders?", "files"),
 			buttons: Ext.Msg.YESNO,
 			fn: function (btn){
 				this.formPanel.baseParams['notifyRecursive'] = btn=='yes';
@@ -300,7 +285,7 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 			params: {
 				id: this.folder_id
 			},
-			waitMsg:GO.lang['waitMsgSave'],
+			waitMsg:t("Saving..."),
 			success:function(form, action){
 
 				if(typeof(action.result.acl_id) != 'undefined')
@@ -328,13 +313,13 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 				var error = '';
 				if(action.failureType=='client')
 				{
-					error = GO.lang['strErrorsInForm'];
+					error = t("You have errors in your form. The invalid fields are marked.");
 				}else
 				{
 					error = action.result.feedback;
 				}
 				
-				Ext.MessageBox.alert(GO.lang['strError'], error);
+				Ext.MessageBox.alert(t("Error"), error);
 			},
 			scope:this
 			

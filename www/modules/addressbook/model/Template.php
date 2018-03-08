@@ -63,14 +63,14 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	
 	// TODO : move language from mailings module to addressbook module
 	protected function getLocalizedName() {
-		return \GO::t('template', 'addressbook');
+		return \GO::t("template", "addressbook");
 	}
 	
 	protected function init() {
 		$this->columns['content']['required']=true;
 		
-//		$this->addDefaultTag('contact:salutation', \GO::t('default_salutation_unknown'));
-		$this->addDefaultTag('salutation', \GO::t('default_salutation_unknown'));
+//		$this->addDefaultTag('contact:salutation', \GO::t("Dear Mr / Ms"));
+		$this->addDefaultTag('salutation', \GO::t("Dear Mr / Ms"));
 		$this->addDefaultTag('date', \GO\Base\Util\Date::get_timestamp(time(), false));
 		
 		return parent::init();
@@ -157,7 +157,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		
 		if(\GO::user() && \GO::user()->contact){
 			$attributes = array_merge($attributes, $this->_getModelAttributes(\GO::user()->contact,'user:'));
-			$attributes['user:sirmadam']=\GO::user()->contact->sex=="M" ? \GO::t('cmdSir','addressbook') : \GO::t('cmdMadam', 'addressbook');
+			$attributes['user:sirmadam']=\GO::user()->contact->sex=="M" ? \GO::t("sir", "addressbook") : \GO::t("madam", "addressbook");
 			if(\GO::user()->contact->company){
 				$attributes = array_merge($attributes, $this->_getModelAttributes(\GO::user()->contact->company,'usercompany:'));
 			}
@@ -193,12 +193,12 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		if(!empty($contact->salutation))
 			$attributes['salutation']=$contact->salutation;
 		
-		$attributes['contact:sirmadam']=$contact->sex=="M" ? \GO::t('sir') : \GO::t('madam');
+		$attributes['contact:sirmadam']=$contact->sex=="M" ? \GO::t("Sir") : \GO::t("Madam");
 		
 		$attributes = array_merge($attributes, $this->_getModelAttributes($contact, 'contact:'));
 		
 		// By default this was replaced just by M or F but now it will be replaced by the whole text Male or Female.
-		$attributes['contact:sex']=$contact->sex=="M" ? \GO::t('male','addressbook') : \GO::t('female','addressbook');
+		$attributes['contact:sex']=$contact->sex=="M" ? \GO::t("Male", "addressbook") : \GO::t("Female", "addressbook");
 		
 		if($contact->company)
 		{
@@ -312,7 +312,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		
 		$attributes = array_merge($attributes, $this->_getUserAttributes());
 		
-		//$attributes['contact:salutation']=\GO::t('default_salutation_unknown');
+		//$attributes['contact:salutation']=\GO::t("Dear Mr / Ms");
 		
 		if(\GO::modules()->customfields)
 			\GO\Customfields\Model\AbstractCustomFieldsRecord::$formatForExport=false;

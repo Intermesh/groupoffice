@@ -40,7 +40,7 @@ class ViewController extends \GO\Base\Controller\AbstractModelController {
 			'view_id'=>$response['data']['id']
 		));
 		
-		$response['data']['url']='<a class="normal-link" target="_blank" href="'.$url.'">'.\GO::t('rightClickToCopy','calendar').'</a>';
+		$response['data']['url']='<a class="normal-link" target="_blank" href="'.$url.'">'.\GO::t("Right click to copy link location", "calendar").'</a>';
 		
 		return parent::afterLoad($response, $model, $params);
 	}

@@ -85,7 +85,7 @@ GO.calendar.AvailabilityCheckWindow = function(config) {
 			'<tpl for="freebusy">',
 			'<td id="time{time}"class="time {[values.busy == 1 ? "busy" : "free"]}"></td>',
 			'</tpl>', '</tpl>', '<tpl if="!this.hasFreeBusy(freebusy)">',
-			'<td colspan="96">' + GO.calendar.lang.noInformationAvailable
+			'<td colspan="96">' + t("No information available", "calendar")
 					+ '</td>', '</tpl>', '</tr>', '</tpl>', '</table>', {
 				hasFreeBusy : function(freebusy) {
 					return freebusy.length > 0;
@@ -105,7 +105,7 @@ GO.calendar.AvailabilityCheckWindow = function(config) {
 						}),
 				tpl : tpl,
 				autoHeight : true,
-				emptyText : GO.calendar.lang.noParticipantsToDisplay,
+				emptyText : t("No participants to display", "calendar"),
 				itemSelector : 'td.time',
 				overClass : 'time-over'
 			});
@@ -125,7 +125,7 @@ GO.calendar.AvailabilityCheckWindow = function(config) {
 				height : 400,
 				width : 900,
 				closeAction : 'hide',
-				title : GO.lang.strAvailability,
+				title : t("Availability"),
 				items : {
 					layout : 'fit',
 					cls : 'go-form-panel',
@@ -135,7 +135,7 @@ GO.calendar.AvailabilityCheckWindow = function(config) {
 				},
 				tbar : [{
 					iconCls : 'btn-left-arrow',
-					text : GO.calendar.lang.previousDay,
+					text : t("Previous day", "calendar"),
 					cls : 'x-btn-text-icon',
 					handler : function() {
 						var date = Date.parseDate(
@@ -148,7 +148,7 @@ GO.calendar.AvailabilityCheckWindow = function(config) {
 					scope : this
 				}, {
 					iconCls : 'btn-right-arrow',
-					text : GO.calendar.lang.nextDay,
+					text : t("Next day", "calendar"),
 					cls : 'x-btn-text-icon',
 					handler : function() {
 						var date = Date.parseDate(
@@ -161,7 +161,7 @@ GO.calendar.AvailabilityCheckWindow = function(config) {
 					scope : this
 				}],
 				buttons : [{
-							text : GO.lang.cmdClose,
+							text : t("Close"),
 							handler : function() {
 								this.hide();
 							},

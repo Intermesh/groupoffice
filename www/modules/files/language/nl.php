@@ -1,154 +1,136 @@
 <?php
-
-
-$l['name'] = 'Bestanden';
-$lang['link_type'][6]='Bestand';
-$lang['link_type'][17]='Map';
-$l['description'] = 'Bestanden module; Module voor het delen van bestanden.';
-$l['folderExists'] = 'De map bestaat al';
-$l['filenameExists'] = 'De bestandsnaam bestaat al';
-$l['uploadedSucces'] = 'Bestand succesvol ge-upload';
-$l['ootextdoc']='Open-Office Text document';
-$l['wordtextdoc']='Microsoft Word document';
-$l['personal']='Persoonlijk';
-$l['shared']='Gedeeld';
-$l['general']='Algemeen';
-$l['folder_modified_subject']='Wijzigingen aan {product_name} map';
-$l['folder_modified_body']='U heeft verzocht om op de hoogte gehouden te worden over wijzigingen in de map:
+return array (
+  'The folder already exists' => 'De map bestaat al',
+  'Filename %s already exists' => 'De bestandsnaam bestaat al',
+  'File uploaded successfully' => 'Bestand succesvol ge-upload',
+  'Personal' => 'Persoonlijk',
+  'Shared' => 'Gedeeld',
+  'General' => 'Algemeen',
+  'Changes to {product_name} folder' => 'Wijzigingen aan {product_name} map',
+  'You requested to be notified when changes are made to:
+%s
+The following changes were made by %s:
+%s;
+' => 'U heeft verzocht om op de hoogte gehouden te worden over wijzigingen in de map:
 %s
 De volgende wijzigingen zijn aangebracht door %s:
 %s;
-';
-$l['modified']='Gewijzigd';
-$l['new']='Nieuw';
-$l['deleted']='Verwijderd';
-$l['folder']='Map';
-$l['emptyFile']='Leeg bestand';
-$l['downloadLink'] = 'Downloadlink';
-$l['clickHereToDownload'] = 'Klik op de link om het bestand te downloaden';
-$l['copyPasteToDownload'] = 'Klik op onderstaande beveiligde link of kopiëer hem naar de adresbalk van uw browser om het bestand te downloaden.';
-$l['possibleUntil'] = 'mogelijk tot';
-$l['fileNotFound']='Sorry, het bestand dat u probeerde te downloaden is niet gevonden.';
-$l['no_folder_id'] = 'Onjuiste folder-id werd naar de server gestuurd!';$l["template"]= 'Sjabloon';
-$l["manageTemplates"]= 'Beheer sjablonen';
-$l["downloadTemplate"]= 'Download sjabloon';
-$l["enterName"]= 'Voer een naam in';
-$l["pleaseEnterName"]= 'Voer a.u.b. een naam in';
-$l["pleaseEnterNameArchive"]= 'Voer a.u.b. een naam in voor het archief';
-$l["startTransfer"]= 'Start overdracht';
-$l["addFolder"]= 'Map toevoegen';
-$l["errorOneItem"]= 'Selecteer slechts 1 item';
-$l["activateSharing"]= 'Activeer delen';
-$l["notifyChanges"]= 'Stel me op de hoogte van veranderingen in deze map';
-$l["comments"]= 'Opmerkingen';
-$l["downloadGOTA"]= 'Download met GOTA';
-$l["fileBrowser"]= 'Bestands verkenner';
-$l["thumbnails"]= 'Pictogrammen';
-$l["saveFile"]='Bestand opslaan';
-$l["confirmOverwrite"]='{filename} bestaat al, wilt u dit bestand overschrijven?';
-$l["file"]='Bestand';
-$l["emptyList"]='Leeg lijst';
-$l["newFiles"]='Nieuw';
-$l["olderVersions"]='Oudere versies';
-$l["uploadProperties"]='Onderstaande eigenschappen worden toegepast op alle bestanden die dmv. de "Kleine bestanden" optie worden geüpload.';
-$l["selectFiles"]= 'Selecteer bestanden';
-$l["fitImage"]='Passende grootte';
-$l["normalSize"]='Normale grootte';
-$l["emailDownloadLink"]= 'Downloadlink emailen';
-$l["expireTime"]= 'Downloaden mogelijk tot';
-$l["newFolder"]= 'Nieuwe map';
-$l["applyState"]= 'De weergaveinstellingen van deze map toepassen voor iedereen.';
-$l["strDownloadActive"]= 'Externe download link ingeschakeld';
-$l["downloadExpireTime"]='Link verloopt na';
-$l["downloadUrl"]='URL';
-$l["stateLocked"]= 'Map weergave vastgezet door eigenaar/beheerder';
-$l["categoriesFiles"]= 'Extra velden van bestanden';
-$l["applyToCurrentFolder"]= 'Bovenstaande instellingen toepassen op de inhoud van alleen de huidige map';
-$l["applyRecursively"]= 'Bovenstaande instellingen toepassen op de inhoud van de huidige en alle onderliggende mappen';
-$l["applyRecursivelyRUSure"]= 'Weet u het zeker dat u de gekozen instellingen wilt toepassen op ALLE onderliggende mappen? Merk op dat deze bewerking een grote invloed heeft als de gekozen folder zeer veel subfolders in zijn boomstructuur heeft.';
-$l["pleaseConfirm"]= 'A.u.b. bevestigen';
-$l["applyLimits"]= 'Niet alle extra veld categorieën tonen';
-$l["undef"]= '-';
-
-$l['notifyRecursiveTitle']='Notificatie aanzetten voor submappen?';
-$l['removeNotifyRecursiveTitle']='Notificatie uitzetten voor submappen?';
-$l['notifyRecursiveQuestion']='Wilt u dit toepassen op alle submappen?';
-
-$l['unlock']='Vrijgeven';
-$l['lockedBy']='Vergrendeld door';
-$l['lock']='Vergrendelen';
-
-$l['deletedDownloadLink']='Verwijderen';
-$l['deleteDownloadLink']='Je staat op het punt om deze link te verwijderen, weet je het zeker?';
-
-$l['createDownloadLink']='Maak downloadlink';
-
-$l["files"]='Bestanden';
-$l["imageViewer"]='Afbeelding viewer';
-$l['path']='Pad';
-$l['selectFolder']='Selecteer map...';
-$l['shortVersion']='Ver.';
-$l['fileIsLocked']='Bestand is vergrendeld';
-$l["fileId"]= "ID";
-$l["fileFolder_id"]= "Map";
-$l["fileName"]= "Naam";
-$l["fileLocked_user_id"]= "Vergrendeld door";
-$l["fileCtime"]= "Gemaakt op";
-$l["fileMtime"]= "Gewijzigd op";
-$l["fileSize"]= "Grootte";
-$l["fileUser_id"]= "Gebruiker";
-$l["fileComment"]= "Opmerking";
-$l["fileExtension"]= "Extensie";
-$l["fileExpire_time"]= "Verloopt op";
-$l["fileRandom_code"]= "Token";
-$l['notifyFolderAdd']= 'Map %s werd gemaakt in %s door %s';
-$l['notifyFolderRename']= 'Map %s werd hernoemd naar %s door %s';
-$l['notifyFolderMove']= 'Map %s werd verplaatst naar %s door %s';
-$l['notifyFolderDelete']= 'Map %s werd verwijderd door %s';
-$l['notifyFileAdd']= 'Bestand %s werd toegevoegd in %s door %s';
-$l['notifyFileRename']= 'Bestand %s werd hernoemd naar %s door %s';
-$l['notifyFileMove']= 'Bestand %s werd verplaatst naar %s door %s';
-$l['notifyFileDelete']= 'Bestand %s werd verwijderd door %s';
-$l['notifyFileUpdate']= 'Bestand %s werd bijgewerkt door %s';
-$l['notificationEmailSubject']= 'Updates in map';
-$l['downloadLinkExpired']= "Sorry, de download link is niet meer geldig";
-
-$l['recentFiles']="Bestanden gewijzigd in de afgelopen 7 dagen";
-
-$l['bookmarkFolder']="Aan favorieten toevoegen";
-$l['bookmarks']="Favorieten";
-$l['bookmarkAlreadyExists']="Favoriet van folder '%fn' bestaat al voor de huidige gebruiker.";
-$l['removeBookmark']="Uit favorieten verwijderen";
-$l['removeBookmarkQuestion']="Folder '%fn' verwijderen uit favorieten?";
-$l['notInSearchMode']="Dit is niet mogelijk in de zoekmodus.";
-
-
-$l['openInBrowser']='Open in browser';
-
-$l['selectApplication']="Selecteer applicatie om dit bestand te openen...";
-$l['rememberFileHandler']="Onthoud mijn keuze voor dit bestandstype";
-$l['alwaysAsk']="Altijd vragen";
-
-$l['openWith']='Open met';
-
-$l['dontDeleteSystemFolder']="U kunt deze systeemmap niet verwijderen";
-$l['open']='Openen';
-
-$l['rightClickToCopy']='Klik met de rechtermuis knop om te kopiëren';
-
-$l['deleteExpiredLabel']='Verwijder beëindigde downloadlinkbestanden';
-$l['deleteExpiredDescription']='Verwijder downloadlinkbestanden die niet meer geldig zijn';
-
-$l['deleteWhenExpired'] = 'Bestand automatisch verwijderen wanneer de downloadlink verloopt';
-$l['automaticallyDeleted'] = 'Bestand wordt automatisch verwijderd wanneer zijn downloadlink verloopt';
-
-$l['downloadSelected'] = 'Download selectie';
-
-$l['editSelection'] = 'Selectie bewerken';
-$l['contentExpiresAt'] = 'Inhoud verloopt op';
-$l['clear'] = 'Leeg maken';
-
-$l['expiredFilesPortlet'] = 'Verlopen bestanden';
-$l['folderBrowserPortlet'] = 'Map weergeven';
-
-$l['uploadFailed'] = 'De upload mislukt! Vraag het aan de server manager voor wat er mis';
+',
+  'Modified' => 'Gewijzigd',
+  'New' => 'Nieuw',
+  'Deleted' => 'Verwijderd',
+  'Folder' => 'Map',
+  'Empty file' => 'Leeg bestand',
+  'Download link' => 'Downloadlink',
+  'Click on the link to download the file' => 'Klik op de link om het bestand te downloaden',
+  'Click the secured link below or copy it to your browser\'s address bar to download the file.' => 'Klik op onderstaande beveiligde link of kopiëer hem naar de adresbalk van uw browser om het bestand te downloaden.',
+  'possible until' => 'mogelijk tot',
+  'Sorry, the file you tried to download is not found.' => 'Sorry, het bestand dat u probeerde te downloaden is niet gevonden.',
+  'Invalid folder id has been passed with the request to the server!' => 'Onjuiste folder-id werd naar de server gestuurd!',
+  'Template' => 'Sjabloon',
+  'Manage templates' => 'Beheer sjablonen',
+  'Download template' => 'Download sjabloon',
+  'Enter a name' => 'Voer een naam in',
+  'Please enter a name' => 'Voer a.u.b. een naam in',
+  'Please enter a name for the archive' => 'Voer a.u.b. een naam in voor het archief',
+  'Start transfer' => 'Start overdracht',
+  'Add folder' => 'Map toevoegen',
+  'Please select only one item' => 'Selecteer slechts 1 item',
+  'Activate sharing' => 'Activeer delen',
+  'Notify me about changes in this folder' => 'Stel me op de hoogte van veranderingen in deze map',
+  'Comments' => 'Opmerkingen',
+  'Download with GOTA' => 'Download met GOTA',
+  'File browser' => 'Bestands verkenner',
+  'Thumbnails' => 'Pictogrammen',
+  'Save file' => 'Bestand opslaan',
+  '{filename} already exists, do you want to overwrite the file?' => '{filename} bestaat al, wilt u dit bestand overschrijven?',
+  'File' => 'Bestand',
+  'Empty list' => 'Leeg lijst',
+  'Older versions' => 'Oudere versies',
+  'The properties below will be applied to all files uploaded with the "Small files" option' => 'Onderstaande eigenschappen worden toegepast op alle bestanden die dmv. de "Kleine bestanden" optie worden geüpload.',
+  'Select files' => 'Selecteer bestanden',
+  'Fit image' => 'Passende grootte',
+  'Normal size' => 'Normale grootte',
+  'Email download link' => 'Downloadlink emailen',
+  'Download link expire time' => 'Downloaden mogelijk tot',
+  'New folder' => 'Nieuwe map',
+  'Apply the folder\'s display settings for everyone.' => 'De weergaveinstellingen van deze map toepassen voor iedereen.',
+  'External download link enabled' => 'Externe download link ingeschakeld',
+  'Link expires after' => 'Link verloopt na',
+  'Folder display locked by owner/admin' => 'Map weergave vastgezet door eigenaar/beheerder',
+  'Custom fields for files' => 'Extra velden van bestanden',
+  'Apply above changes to contents of only the current folder' => 'Bovenstaande instellingen toepassen op de inhoud van alleen de huidige map',
+  'Apply above changes to contents of the current and all underlying folders' => 'Bovenstaande instellingen toepassen op de inhoud van de huidige en alle onderliggende mappen',
+  'Are you sure to apply the file customfield settings to the contents of ALL of the underlying folders? Note that this can have a great impact if you have many subfolders in this folder\'s tree structure.' => 'Weet u het zeker dat u de gekozen instellingen wilt toepassen op ALLE onderliggende mappen? Merk op dat deze bewerking een grote invloed heeft als de gekozen folder zeer veel subfolders in zijn boomstructuur heeft.',
+  'Please confirm' => 'A.u.b. bevestigen',
+  'Do not show all custom field categories' => 'Niet alle extra veld categorieën tonen',
+  'Set notification on subfolders?' => 'Notificatie aanzetten voor submappen?',
+  'Remove notification from subfolders?' => 'Notificatie uitzetten voor submappen?',
+  'Do you want to apply this to all the subfolders?' => 'Wilt u dit toepassen op alle submappen?',
+  'Unlock' => 'Vrijgeven',
+  'Locked by' => 'Vergrendeld door',
+  'Lock' => 'Vergrendelen',
+  'Delete this link' => 'Verwijderen',
+  'You are going to delete this link, are you sure?' => 'Je staat op het punt om deze link te verwijderen, weet je het zeker?',
+  'Create download link' => 'Maak downloadlink',
+  'Image viewer' => 'Afbeelding viewer',
+  'Path' => 'Pad',
+  'Select folder...' => 'Selecteer map...',
+  'File is locked' => 'Bestand is vergrendeld',
+  'Name' => 'Naam',
+  'Created at' => 'Gemaakt op',
+  'Last modified' => 'Gewijzigd op',
+  'Size' => 'Grootte',
+  'User' => 'Gebruiker',
+  'Comment' => 'Opmerking',
+  'Extension' => 'Extensie',
+  'Expire time' => 'Verloopt op',
+  'Random Code' => 'Token',
+  'Folder %s was add to %s by %s' => 'Map %s werd gemaakt in %s door %s',
+  'Folder %s was renamed to %s by %s' => 'Map %s werd hernoemd naar %s door %s',
+  'Folder %s was moved to %s by %s' => 'Map %s werd verplaatst naar %s door %s',
+  'Folder %s was deleted by %s' => 'Map %s werd verwijderd door %s',
+  'File %s was add to %s by %s' => 'Bestand %s werd toegevoegd in %s door %s',
+  'File %s was renamed to %s by %s' => 'Bestand %s werd hernoemd naar %s door %s',
+  'File %s was moved to %s by %s' => 'Bestand %s werd verplaatst naar %s door %s',
+  'File %s was deleted by %s' => 'Bestand %s werd verwijderd door %s',
+  'File %s was updated by %s' => 'Bestand %s werd bijgewerkt door %s',
+  'Updates in folder' => 'Updates in map',
+  'Sorry, the download link for this file has expired' => 'Sorry, de download link is niet meer geldig',
+  'Files modified in the past 7 days' => 'Bestanden gewijzigd in de afgelopen 7 dagen',
+  'Add to favorites' => 'Aan favorieten toevoegen',
+  'Favorites' => 'Favorieten',
+  'Folder \'%fn\' already has a favorite for the current user.' => 'Favoriet van folder \'%fn\' bestaat al voor de huidige gebruiker.',
+  'Remove favorite' => 'Uit favorieten verwijderen',
+  'Remove folder \'%fn\' from your favorites list?' => 'Folder \'%fn\' verwijderen uit favorieten?',
+  'Can\'t do this when in search mode.' => 'Dit is niet mogelijk in de zoekmodus.',
+  'Select application to open this file...' => 'Selecteer applicatie om dit bestand te openen...',
+  'Remember my decision for this file type' => 'Onthoud mijn keuze voor dit bestandstype',
+  'Always ask' => 'Altijd vragen',
+  'Open with' => 'Open met',
+  'You can\'t delete this system folder' => 'U kunt deze systeemmap niet verwijderen',
+  'Open' => 'Openen',
+  'Right click to copy' => 'Klik met de rechtermuis knop om te kopiëren',
+  'Delete expired download link files' => 'Verwijder beëindigde downloadlinkbestanden',
+  'Delete download link files that are no longer valid' => 'Verwijder downloadlinkbestanden die niet meer geldig zijn',
+  'Automatically delete file when download link expires' => 'Bestand automatisch verwijderen wanneer de downloadlink verloopt',
+  'File will be automatically deleted when its download link expires' => 'Bestand wordt automatisch verwijderd wanneer zijn downloadlink verloopt',
+  'Download selected' => 'Download selectie',
+  'Edit selection' => 'Selectie bewerken',
+  'Content expires at' => 'Inhoud verloopt op',
+  'Clear' => 'Leeg maken',
+  'Expired files' => 'Verlopen bestanden',
+  'Show folder' => 'Map weergeven',
+  'The upload failed! Ask the server manager for what wrong' => 'De upload mislukt! Vraag het aan de server manager voor wat er mis',
+  'name' => 'Bestanden',
+  'description' => 'Bestanden module; Module voor het delen van bestanden.',
+  'Open-Office Text document' => 'Open-Office Text document',
+  'Microsoft Word document' => 'Microsoft Word document',
+  'Changes to Group-Office folder' => 'Wijzigingen aan {product_name} map',
+  'URL' => 'URL',
+  '-' => '-',
+  'Files' => 'Bestanden',
+  'Ver.' => 'Ver.',
+  'ID' => 'ID',
+  'Open in browser' => 'Open in browser',
+);

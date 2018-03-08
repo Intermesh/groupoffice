@@ -10,14 +10,17 @@
 
 namespace GO\Core\Controller;
 
-
+use Exception;
 use GO;
+use GO\Base\Language;
+use GO\Base\Model\State;
+use GO\Base\Util\StringHelper;
 
 
 class CoreController extends \GO\Base\Controller\AbstractController {
 	
 	protected function allowGuests() {
-		return array('compress','cron');
+		return array('compress','cron','language', 'clientscripts');
 	}
 	
 	protected function ignoreAclPermissions() {
@@ -80,9 +83,9 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		$modules = GO::modules()->getAllModules();		
 		foreach($modules as $module){
 			if(!isset($info['modules']))
-				$info['modules']=$module->id;
+				$info['modules']=$module->name;
 			else
-				$info['modules'].=', '.$module->id;
+				$info['modules'].=', '.$module->name;
 		}
 		
 		$info = array_merge($info,$_SERVER);
@@ -113,6 +116,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		$to_folder_id = isset($params['to_folder_id']) ? $params['to_folder_id'] : 0;
 
 		foreach ($fromLinks as $fromLink) {
+			
 			$fromModel = GO::getModel($fromLink['model_name'])->findByPk($fromLink['model_id']);
 
 			foreach ($toLinks as $toLink) {
@@ -181,12 +185,8 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		
 		$store = \GO\Base\Data\Store::newInstance(\GO\Base\Model\User::model(), array('password','digest'));
 		$store->setDefaultSortOrder('name', 'ASC');
-		
-		
-		$sortAlias = GO::user()->sort_name=="first_name" ? array('first_name','last_name') : array('last_name','first_name');
-		
 
-		$store->getColumnModel()->formatColumn('name', '$model->name', array(), $sortAlias);
+		$store->getColumnModel()->formatColumn('name', '$model->name', array(), array('displayName'));
 		$store->getColumnModel()->formatColumn('cf', '$model->id.":".$model->name'); //special field used by custom fields. They need an id an value in one.
 		
 		//only get users that are enabled
@@ -233,6 +233,10 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 //			}
 //			
 //		}
+		
+		if(!empty($params['hideUserGroups'])) {
+			$findParams->getCriteria()->addCondition('isUserGroupFor', null);
+		}
 		
 		
 		$store->setStatement (\GO\Base\Model\Group::model()->find($findParams));
@@ -299,17 +303,97 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 			ob_end_flush();  // The main one
 		}
 	}
+	
+	protected function actionClientScripts($lang) {
+		header('Content-Type: application/javascript');
+		header('Content-Encoding: gzip');
+		
+		$cacheFile = \go\core\App::get()->getDataFolder()->getFolder('clientscripts')->create()->getFile('all-' . $lang . '.js');
+		
+		readfile($cacheFile->getPath());
+	}
+	
+	protected function actionLanguage($lang) {
+		\GO::language()->setLanguage($lang);
+		
+		echo \GO::language()->getScript();
+	}
+	
+	protected function actionModuleScripts() {
+		header('Content-Type: application/javascript');
+		$load_modules = GO::modules()->getAllModules();
+				
+		$GO_SCRIPTS_JS = "";
+
+		foreach ($load_modules as $module) {		
+			if (file_exists($module->moduleManager->path() . 'scripts.inc.php')) {
+				require($module->moduleManager->path() . 'scripts.inc.php');
+			}
+			if (file_exists($module->moduleManager->path() . 'views/Extjs3/scripts.inc.php')) {
+				require($module->moduleManager->path() . 'views/Extjs3/scripts.inc.php');
+			}
+			if (file_exists($module->moduleManager->path() . 'views/extjs3/scripts.inc.php')) {
+				require($module->moduleManager->path() . 'views/extjs3/scripts.inc.php');
+			}			
+		}
+
+		echo $GO_SCRIPTS_JS;
+	}
+	
+	/**
+	 * 
+	 * This loads the client settings for the old modules.
+	 * 
+	 * @deprecated
+	 * @return type
+	 */
+	protected function actionClientSettings() {
+			$user_id  = GO::user()->id;
+			$settings['state'] = State::model()->getFullClientState($user_id);
+			$settings['user_id'] = $user_id;
+			$settings['has_admin_permission'] = GO::user()->isAdmin();
+			$settings['username'] = GO::user()->username;
+			$settings['displayName'] = GO::user()->displayName;
+
+			$settings['email'] = GO::user()->email;
+			$settings['thousands_separator'] = GO::user()->thousands_separator;
+			$settings['decimal_separator'] = GO::user()->decimal_separator;
+			$settings['date_format'] = GO::user()->completeDateFormat;
+			$settings['time_format'] = GO::user()->time_format;
+			$settings['currency'] = GO::user()->currency;
+			$settings['lastlogin'] = GO::user()->lastlogin;
+			$settings['max_rows_list'] = GO::user()->max_rows_list;
+			$settings['timezone'] = GO::user()->timezone;
+			$settings['start_module'] = GO::user()->start_module;
+			$settings['theme'] = GO::user()->theme;
+			$settings['mute_sound'] = GO::user()->mute_sound;
+			$settings['mute_reminder_sound'] = GO::user()->mute_reminder_sound;
+			$settings['mute_new_mail_sound'] = GO::user()->mute_new_mail_sound;
+			$settings['popup_reminders'] = GO::user()->popup_reminders;
+			$settings['popup_emails'] = GO::user()->popup_emails;
+			$settings['show_smilies'] = GO::user()->show_smilies;
+			$settings['auto_punctuation'] = GO::user()->auto_punctuation;
+			$settings['first_weekday'] = GO::user()->first_weekday;
+			$settings['sort_name'] = GO::user()->sort_name;
+			$settings['list_separator'] = GO::user()->list_separator;
+			$settings['text_separator'] = GO::user()->text_separator;
+		$settings['modules'] = GO::view()->exportModules();
+
+		
+		
+		return array('success' => true, 'GO' => ['settings' => $settings]);
+	}
 
 	protected function actionThumb($params) {
 
 		GO::session()->closeWriting();
 
-		$dir = GO::config()->root_path . 'views/Extjs3/themes/Default/images/128x128/filetypes/';
-		$url = GO::config()->host . 'views/Extjs3/themes/Default/images/128x128/filetypes/';
+		$dir = GO::config()->root_path . 'views/Extjs3/themes/Paper/img/filetype/';
+		$url = GO::config()->host . 'views/Extjs3/themes/Paper/img/filetype/';
 		$file = new \GO\Base\Fs\File(GO::config()->file_storage_path . $params['src']);
 		
 		if (is_dir(GO::config()->file_storage_path . $params['src'])) {
-			$src = $dir . 'folder.png';
+			$src = $dir . 'folder.svg';
 		} else {
 
 			switch (strtolower($file->extension())) {
@@ -330,7 +414,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 				case 'gz':
 				case 'bz2':
 				case 'zip':
-					$src = $dir . 'zip.png';
+					$src = $dir . 'zip.svg';
 					break;
 				case 'odt':
 				case 'docx':
@@ -338,7 +422,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 				case 'htm':
 				case 'html':
 				case 'dotx':
-					$src = $dir . 'doc.png';
+					$src = $dir . 'doc.svg';
 
 					break;
 
@@ -347,29 +431,29 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 				case 'xls':
 				case 'xlsx':
 				case 'xltx':
-					$src = $dir . 'spreadsheet.png';
+					$src = $dir . 'xls.svg';
 					break;
 
 				case 'odp':
 				case 'pps':
 				case 'pptx':
 				case 'ppt':
-					$src = $dir . 'pps.png';
+					$src = $dir . 'pps.svg';
 					break;
 				case 'eml':
 				case 'msg':
-					$src = $dir . 'message.png';
+					$src = $dir . 'eml.svg';
 					break;
 
 
 				case 'log':
-					$src = $dir . 'txt.png';
+					$src = $dir . 'txt.svg';
 					break;
 				default:
-					if (file_exists($dir . strtolower($file->extension()) . '.png')) {
-						$src = $dir . strtolower($file->extension()) . '.png';
+					if (file_exists($dir . strtolower($file->extension()) . '.svg')) {
+						$src = $dir . strtolower($file->extension()) . '.svg';
 					} else {
-						$src = $dir . 'unknown.png';
+						$src = $dir . 'unknown.svg';
 					}
 					break;
 			}
@@ -378,7 +462,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		$file = new \GO\Base\Fs\File($src);
 		
 		if($file->size() > \GO::config()->max_thumbnail_size*1024*1024){
-			throw new \Exception("Image may not be larger than 5MB.");
+			throw new Exception("Image may not be larger than 5MB.");
 		}
 		
 
@@ -754,7 +838,9 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 	
 	
 	protected function actionAbout($params){	
-		$response['data']['about']=GO::t('about');
+		$response['data']['about']=GO::t("Version: {version}<br/>
+Copyright (c) 2003-{current_year}, {company_name}<br/>
+All rights reserved.");
 		
 		if(GO::config()->product_name=='Group-Office')
 			$response['data']['about']=str_replace('{company_name}', 'Intermesh B.V.', $response['data']['about']);
@@ -866,15 +952,15 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 //					
 ////					var_dump($relatedModel->name);
 //					
-////					$modelName = $relatedModel ? $relatedModel->localizedName : GO::t('unknown');
-//					$subject = GO::t('reminder').': '.$reminderModel->name;
+////					$modelName = $relatedModel ? $relatedModel->localizedName : GO::t("Unknown");
+//					$subject = GO::t("Reminder").': '.$reminderModel->name;
 //
 //					$time = !empty($reminderModel->vtime) ? $reminderModel->vtime : $reminderModel->time;
 //			
 //					date_default_timezone_set($userModel->timezone);
 //					
-//					$body = GO::t('time').': '.date($userModel->completeDateFormat.' '.$userModel->time_format,$time)."\n";
-//					$body .= GO::t('name').': '.str_replace('<br />',',',$reminderModel->name)."\n";
+//					$body = GO::t("Time").': '.date($userModel->completeDateFormat.' '.$userModel->time_format,$time)."\n";
+//					$body .= GO::t("Name").': '.str_replace('<br />',',',$reminderModel->name)."\n";
 //			
 ////					date_default_timezone_set(GO::user()->timezone);
 //					
@@ -916,7 +1002,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		$modules = GO::modules()->getAllModules(true);
 		
 		foreach($modules as $module){
-			$store->addRecord(array('id'=>$module->id,'name'=>$module->moduleManager->name()));
+			$store->addRecord(array('id'=>$module->name,'name'=>$module->moduleManager->name()));
 		}
 		
 		return $store->getData();

@@ -5,10 +5,11 @@ GO.users.GroupsGrid = function(config){
 		config = {};
 	}
 	
-	config.title = GO.lang['userGroups'];
+	config.title = t("User groups");
 	config.layout='fit';
 	config.autoScroll=true;
 	config.split=true;
+	config.cls = 'go-sidenav';
 	if(!config.store)
 		config.store = new GO.data.JsonStore({
 			url: GO.url('users/group/store'),
@@ -29,7 +30,7 @@ GO.users.GroupsGrid = function(config){
 			items:[this.searchField = new GO.form.SearchField({
 				store: config.store,
 				width:120,
-				emptyText: GO.lang.strSearch
+				emptyText: t("Search")
 			})],
 			store:config.store,
 			pageSize:GO.settings.config.nav_page_size

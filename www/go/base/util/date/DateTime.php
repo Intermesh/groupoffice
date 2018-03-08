@@ -249,22 +249,22 @@ class DateTime extends \DateTime {
 		$string = '';
 
 		if (!empty($diff->y))
-			$string .= $diff->y . ' ' . \GO::t('strYears') . ', ';
+			$string .= $diff->y . ' ' . \GO::t("Years") . ', ';
 
 		if (!empty($diff->m))
-			$string .= $diff->m . ' ' . \GO::t('strMonths') . ', ';
+			$string .= $diff->m . ' ' . \GO::t("months") . ', ';
 
 		if (!empty($diff->d))
-			$string .= $diff->d . ' ' . \GO::t('strDays') . ', ';
+			$string .= $diff->d . ' ' . \GO::t("Days") . ', ';
 
 		if (!empty($diff->h))
-			$string .= $diff->h . ' ' . \GO::t('strHours') . ', ';
+			$string .= $diff->h . ' ' . \GO::t("Hours") . ', ';
 
 		if (!empty($diff->i))
-			$string .= $diff->i . ' ' . \GO::t('strMinutes');
+			$string .= $diff->i . ' ' . \GO::t("Minutes");
 
 //		if(!empty($diff['s']))
-//			$string .= $diff['s'].' '.\GO::t('strSeconds');
+//			$string .= $diff['s'].' '.\GO::t("strSeconds");
 
 		return rtrim($string,', ');
 	}

@@ -5,7 +5,7 @@ GO.tasks.SelectTaskStatus = Ext.extend(GO.form.ComboBox,{
 	editable : false,
 	selectOnFocus : true,
 	forceSelection : true,
-	fieldLabel : GO.lang.strStatus,
+	fieldLabel : t("Status"),
 	mode : 'local',
 	value : 'ACCEPTED',
 	valueField : 'value',
@@ -14,12 +14,12 @@ GO.tasks.SelectTaskStatus = Ext.extend(GO.form.ComboBox,{
 		fields : ['value', 'text'],
 		data : [
 		['NEEDS-ACTION',
-		GO.tasks.lang.needsAction],
-		['ACCEPTED', GO.tasks.lang.accepted],
-		['DECLINED', GO.tasks.lang.declined],
-		['TENTATIVE', GO.tasks.lang.tentative],
-		['DELEGATED', GO.tasks.lang.delegated],
-		['COMPLETED', GO.tasks.lang.completed],
-		['IN-PROCESS', GO.tasks.lang.inProcess]]
+		t("Needs action", "tasks")],
+		['ACCEPTED', t("Accepted", "tasks")],
+		['DECLINED', t("Declined", "tasks")],
+		['TENTATIVE', t("Tentative", "tasks")],
+		['DELEGATED', t("Delegated", "tasks")],
+		['COMPLETED', t("Completed", "tasks")],
+		['IN-PROCESS', t("In process", "tasks")]]
 	})
 });

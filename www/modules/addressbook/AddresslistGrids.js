@@ -20,7 +20,7 @@ GO.addressbook.createAddresslistGrids = function(){
 			config = {};
 		}
 
-		config.title=GO.addressbook.lang.contacts;
+		config.title=t("Contacts", "addressbook");
 
 		this.selectContactDialog = new GO.addressbook.SelectContactDialog({
 			handler: function(grid, allResults){
@@ -44,7 +44,7 @@ GO.addressbook.createAddresslistGrids = function(){
 		config.tbar = [
 			{
 				iconCls: 'btn-add',
-				text: GO.lang.cmdAdd,
+				text: t("Add"),
 				cls: 'x-btn-text-icon',
 				handler: function(){
 					this.selectContactDialog.show();
@@ -53,7 +53,7 @@ GO.addressbook.createAddresslistGrids = function(){
 			},
 			{
 				iconCls: 'btn-add',
-				text: GO.addressbook.lang.addEntireAddressbook,
+				text: t("Add entire address book", "addressbook"),
 				cls: 'x-btn-text-icon',
 				handler: function(){
 					if(!this.selectAddressbookWindow)
@@ -61,7 +61,7 @@ GO.addressbook.createAddresslistGrids = function(){
 						this.selectAddressbookWindow = new GO.addressbook.SelectAddressbookWindow();
 						this.selectAddressbookWindow.on('select', function(addressbook_id){
 
-							if(confirm(GO.addressbook.lang.confirmAddEntireAddressbook))
+							if(confirm(t("Are you sure you want to add everything in this addressbook to this addresslist?", "addressbook")))
 							{
 								this.store.load({
 									params:{'start': 0, 'add_addressbook_id': addressbook_id}
@@ -75,7 +75,7 @@ GO.addressbook.createAddresslistGrids = function(){
 			},
 			{
 				iconCls: 'btn-delete',
-				text: GO.lang['cmdDelete'],
+				text: t("Delete"),
 				cls: 'x-btn-text-icon',
 				handler: function(){
 					this.deleteSelected();
@@ -106,45 +106,45 @@ GO.addressbook.createAddresslistGrids = function(){
 		},
 		columns:[
 			{
-				header: GO.lang['strName'],
+				header: t("Name"),
 				dataIndex: 'name'
 			},
 			{
-				header: GO.lang['strCompany'],
+				header: t("Company"),
 				dataIndex: 'company_name'
 			},
 			{
-				header: GO.lang['strEmail'],
+				header: t("E-mail"),
 				dataIndex: 'email' ,
 				width: 150,
 				hidden:true
 			},
 			{
-				header: GO.lang['strPhone'],
+				header: t("Phone"),
 				dataIndex: 'home_phone' ,
 				width: 100,
 				hidden:true
 			},
 			{
-				header: GO.lang['strWorkPhone'],
+				header: t("Phone (work)"),
 				dataIndex: 'work_phone' ,
 				width: 100,
 				hidden:true
 			},
 			{
-				header: GO.lang['strWorkFax'],
+				header: t("Fax (work)"),
 				dataIndex: 'work_fax' ,
 				width: 100,
 				hidden:true
 			},
 			{
-				header: GO.lang['strCellular'],
+				header: t("Mobile"),
 				dataIndex: 'cellular' ,
 				width: 100,
 				hidden:true
 			},
 			{
-				header: GO.addressbook.lang['addressbook'],
+				header: t("Address book", "addressbook"),
 				dataIndex: 'addressbook_name' ,
 				width: 100,
 				hidden:true
@@ -157,7 +157,7 @@ GO.addressbook.createAddresslistGrids = function(){
 		config.view=new Ext.grid.GridView({
 			autoFill: true,
 			forceFit: true,
-			emptyText: GO.lang.strNoItems
+			emptyText: t("No items to display")
 		}),
 		config.sm=new Ext.grid.RowSelectionModel();
 		config.loadMask=true;
@@ -195,7 +195,7 @@ GO.addressbook.createAddresslistGrids = function(){
 			config = {};
 		}
 
-		config.title=GO.addressbook.lang.companies;
+		config.title=t("Companies", "addressbook");
 		this.selectCompanyDialog = new GO.addressbook.SelectCompanyDialog({
 			handler: function(grid, allResults){
 				if(!allResults){
@@ -218,7 +218,7 @@ GO.addressbook.createAddresslistGrids = function(){
 		config.tbar = [
 			{
 				iconCls: 'btn-add',
-				text: GO.lang.cmdAdd,
+				text: t("Add"),
 				cls: 'x-btn-text-icon',
 				handler: function(){
 					this.selectCompanyDialog.show();
@@ -227,7 +227,7 @@ GO.addressbook.createAddresslistGrids = function(){
 			},
 			{
 				iconCls: 'btn-add',
-				text: GO.addressbook.lang.addEntireAddressbook,
+				text: t("Add entire address book", "addressbook"),
 				cls: 'x-btn-text-icon',
 				handler: function(){
 					if(!this.selectAddressbookWindow)
@@ -235,7 +235,7 @@ GO.addressbook.createAddresslistGrids = function(){
 						this.selectAddressbookWindow = new GO.addressbook.SelectAddressbookWindow();
 						this.selectAddressbookWindow.on('select', function(addressbook_id){
 
-							if(confirm(GO.addressbook.lang.confirmAddEntireAddressbook))
+							if(confirm(t("Are you sure you want to add everything in this addressbook to this addresslist?", "addressbook")))
 							{
 								this.store.load({
 									params:{'start': 0, 'add_addressbook_id': addressbook_id}
@@ -250,7 +250,7 @@ GO.addressbook.createAddresslistGrids = function(){
 			},
 			{
 				iconCls: 'btn-delete',
-				text: GO.lang['cmdDelete'],
+				text: t("Delete"),
 				cls: 'x-btn-text-icon',
 				handler: function(){
 					this.deleteSelected();
@@ -281,34 +281,34 @@ GO.addressbook.createAddresslistGrids = function(){
 		},
 		columns:[
 			{
-				header: GO.lang['strName'],
+				header: t("Name"),
 				dataIndex: 'name'
 			},
 			{
-				header: GO.lang['strEmail'],
+				header: t("E-mail"),
 				dataIndex: 'email' ,
 				width: 150,
 				hidden:true
 			},
 			{
-				header: GO.lang['strHomepage'],
+				header: t("Homepage"),
 				dataIndex: 'homepage' ,
 				width: 100,
 				hidden:true
 			},
 			{
-				header: GO.lang['strPhone'],
+				header: t("Phone"),
 				dataIndex: 'phone' ,
 				width: 100
 			},
 			{
-				header: GO.lang['strFax'],
+				header: t("Fax"),
 				dataIndex: 'fax' ,
 				width: 100,
 				hidden:true
 			},
 			{
-				header: GO.addressbook.lang['addressbook'],
+				header: t("Address book", "addressbook"),
 				dataIndex: 'addressbook_name' ,
 				width: 100,
 				hidden:true
@@ -321,7 +321,7 @@ GO.addressbook.createAddresslistGrids = function(){
 		config.view=new Ext.grid.GridView({
 			autoFill: true,
 			forceFit: true,
-			emptyText: GO.lang.strNoItems
+			emptyText: t("No items to display")
 		}),
 		config.sm=new Ext.grid.RowSelectionModel();
 		config.loadMask=true;

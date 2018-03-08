@@ -10,10 +10,13 @@ class SettingsController extends \GO\Base\Controller\AbstractController{
 		$settings =  \GO\Users\Model\Settings::load();
 		
 		if(empty($settings->register_email_subject))
-			$settings->register_email_subject = \GO::t('register_email_subject','users');
+			$settings->register_email_subject = \GO::t("Your Group-Office account details", "users");
 		
 		if(empty($settings->register_email_body))
-			$settings->register_email_body = \GO::t('register_email_body','users');
+			$settings->register_email_body = \GO::t("A Group-Office account has been created for you at {url}
+Your login details are:
+Username: {username};
+Password: {password}", "users");
 		
 		// Load the custom field categories of the contact model
 		if(\GO::modules()->customfields){

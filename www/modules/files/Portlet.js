@@ -1,11 +1,11 @@
 GO.mainLayout.onReady(function(){
-	if(GO.summary)
+	if(go.ModuleManager.isAvailable("summary"))
 	{
 		var recentFilesGrid = new GO.files.RecentFilesGrid();
 
 		GO.summary.portlets['portlet-files']=new GO.summary.Portlet({
 			id: 'portlet-files',
-			title: GO.files.lang.recentFiles,
+			title: t("Files modified in the past 7 days", "files"),
 			layout:'fit',
 			tools: [{
 				id:'close',

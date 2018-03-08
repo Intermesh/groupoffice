@@ -253,7 +253,7 @@ abstract class AbstractController extends Observable {
 			
 			$moduleId = strtolower($classParts[1]);
 			
-			$this->_module = $moduleId=='core' ? false : Module::model()->findByPk($moduleId, false, true);			
+			$this->_module = $moduleId=='core' ? false : Module::model()->findByName($moduleId, false, true);			
 		}
 		
 		return $this->_module;
@@ -416,13 +416,13 @@ abstract class AbstractController extends Observable {
 			 * a module we run the {Module}Module.php class firstRun function
 			 * The response is added to the controller's action parameters.
 			 */
-			if($module && !isset(GO::session()->values['firstRunDone'][$module->id])){
-				$moduleClass = "GO\\".ucfirst($module->id)."\\".ucfirst($module->id)."Module";
+			if($module && !isset(GO::session()->values['firstRunDone'][$module->name])){
+				$moduleClass = "GO\\".ucfirst($module->name)."\\".ucfirst($module->name)."Module";
 
 				if(class_exists($moduleClass)){
 
 					$_REQUEST['firstRun']=call_user_func(array($moduleClass,'firstRun'));
-					GO::session()->values['firstRunDone'][$module->id]=true;
+					GO::session()->values['firstRunDone'][$module->name]=true;
 				}
 			}
 			
@@ -453,7 +453,7 @@ abstract class AbstractController extends Observable {
 			$response['success'] = false;
 			
 			$response['feedback'] = !empty($response['feedback']) ? $response['feedback']."\r\n\r\n" : '';
-			$response['feedback'] .= $e->getMessage();	
+			$response['feedback'] .= \go\core\ErrorHandler::logException($e);	
 			
 			$response['exceptionCode'] = $e->getCode();
 					
@@ -479,8 +479,8 @@ abstract class AbstractController extends Observable {
 				$response['redirectToLogin']=true;
 
 			if(GO::config()->debug){
-				//$response['trace']=$e->getTraceAsString();
-				$response['exception']=(string) $e;
+				$response['trace']=explode("\n", $e->getTraceAsString());
+				//$response['trace']= $e->getTrace();
 			}
 			
 			if($this->isCli()){
@@ -621,7 +621,7 @@ abstract class AbstractController extends Observable {
 			
 			$maxFileSize = $postMaxSize > $uploadMaxFileSize ? $uploadMaxFileSize : $postMaxSize;
 			
-			throw new Exception(sprintf(GO::t('maybeMaxUploadExceeded'),$maxFileSize));
+			throw new Exception(sprintf(GO::t("The server did not receive the required parameters from your browser. Probably the maximum filesize for upload of %sMB has been exceeded."),$maxFileSize));
 		}
 	}
 	

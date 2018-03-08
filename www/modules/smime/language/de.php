@@ -1,37 +1,39 @@
 <?php
-
-
-$l["enterPassword"]="Geben Sie bitte das Kennwort für Ihren SMIME-Schlüssel ein.";
-$l["messageEncrypted"]="Diese E-Mail wurde Ihnen verschlüsselt geschickt.";
-$l["messageSigned"]="Diese E-Mail ist kryptographisch signiert. Klicken Sie hier, um die Signatur zu überprüfen und das Zertifikat zu importieren.";
-$l["smimeCert"]="SMIME-Zertifikat";
-$l["sign"]="Signieren mit SMIME";
-$l["encrypt"]="Verschlüsseln mit SMIME";
-$l["settings"]="SMIME";
-$l["deleteCert"]="Zertifikat löschen";
-$l["selectPkcs12Cert"]="Neues PKCS12-Zertifikat auswählen";
-$l["alwaysSign"]='E-Mails immer signieren';
-$l["pkcs12Cert"]="PKCS12-Zertifikat";
-$l["pkcs12CertInfo"]="Um ein neues PCSK12-Zertifikat hochzuladen, müssen Sie Ihr {product_name}-Kennwort eingeben. Dieses Kennwort muß sich aufgrund von Sicherheitsrichtlinien vom PCSK12-Schlüsselkennwort unterscheiden. Ein leeres Kennwort ist ebenso nicht zugelassen.";
-$l["pubCerts"]="Öffentliche SMIME-Zertifikate";
-$l["youHaveAcert"]='Sie haben bereits ein Zertifikat hochgeladen. SMIME-Unterstützung ist für diesen Account aktiviert.';
-$l["downloadCert"]='Zertifikat herunterladen';
-$l['name']='SMIME Unterstützung';
-$l['description']='Erweitert das E-Mailmodul mit SMIME-Signatur und -Verschlüsselung';
-$l['noPublicCertForEncrypt']="E-Mail kann nicht verschlüsselt werden, da Sie nicht über das öffentliche Zertifikat für %s verfügen. Öffnen Sie eine signierte E-Mail des Empfängers und überprüfen und installieren Sie das Zertifikat.";
-$l['noPrivateKeyForDecrypt']="Diese E-Mail ist verschlüsselt jedoch verfügen Sie nicht über den privaten Schlüssel, um die E-Mail zu entschlüsseln.";
-$l['badGoLogin']="Das {product_name}-Kennwort war nicht korrekt.";
-$l['smime_pass_matches_go']="Ihr SMIME-Schlüsselkennwort entspricht Ihrem {product_name}-Kennwort. Dies widerspricht den Sicherheitsrichtlinien!";
-$l['smime_pass_empty']="Ihr SMIME-Schlüssel ist nicht durch ein Kennwort geschützt. Dies widerspricht den Sicherheitsrichtlinien!";
-$l['invalidCert']="Das Zertifikat ist ungültig!";
-$l['validCert']="Gültiges Zertifikat";
-$l['certEmailMismatch']="Gültiges Zertifikat, aber die Absenderadresse stimmt nicht mit der E-Mailadresse des Zertifikates überein.";
-$l['decryptionFailed']='SMIME-Entschlüsselung dieser Nachricht fehlgeschlagen.';
-
-$l["email"]="E-Mail";
-$l["hash"]="Hash-Wert";
-$l["serial_number"]="Seriennummer";
-$l["version"]="Version";
-$l["issuer"]="Ausgestellt durch";
-$l["valid_to"]="Gültig bis";
-$l["valid_from"]="Gültig ab";
+return array (
+  'Please enter the password of your SMIME certificate.' => 'Geben Sie bitte das Kennwort für Ihren SMIME-Schlüssel ein.',
+  'This message was sent to you encrypted.' => 'Diese E-Mail wurde Ihnen verschlüsselt geschickt.',
+  'This message is digitally signed. Click here to verify the signature and import the certificate.' => 'Diese E-Mail ist kryptographisch signiert. Klicken Sie hier, um die Signatur zu überprüfen und das Zertifikat zu importieren.',
+  'SMIME Certificate' => 'SMIME-Zertifikat',
+  'Sign with SMIME' => 'Signieren mit SMIME',
+  'Encrypt with SMIME' => 'Verschlüsseln mit SMIME',
+  'SMIME settings' => 'SMIME',
+  'Delete certificate' => 'Zertifikat löschen',
+  'Select new PKCS12 Certificate' => 'Neues PKCS12-Zertifikat auswählen',
+  'Always sign messages' => 'E-Mails immer signieren',
+  'PKCS12 certificate' => 'PKCS12-Zertifikat',
+  'To upload a new PKCS12 certificate you must enter your {product_name} password. The {product_name} password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.' => 'Um ein neues PCSK12-Zertifikat hochzuladen, müssen Sie Ihr {product_name}-Kennwort eingeben. Dieses Kennwort muß sich aufgrund von Sicherheitsrichtlinien vom PCSK12-Schlüsselkennwort unterscheiden. Ein leeres Kennwort ist ebenso nicht zugelassen.',
+  'Public SMIME certificates' => 'Öffentliche SMIME-Zertifikate',
+  'You have uploaded a certificate already. SMIME support is enabled for this account.' => 'Sie haben bereits ein Zertifikat hochgeladen. SMIME-Unterstützung ist für diesen Account aktiviert.',
+  'Download certificate' => 'Zertifikat herunterladen',
+  'Could not encrypt message because you don\'t have the public certificate for %s. Open a signed message of the recipient and verify the signature to import the public key.' => 'E-Mail kann nicht verschlüsselt werden, da Sie nicht über das öffentliche Zertifikat für %s verfügen. Öffnen Sie eine signierte E-Mail des Empfängers und überprüfen und installieren Sie das Zertifikat.',
+  'This message is encrypted and you don\'t have the private key to decrypt this message.' => 'Diese E-Mail ist verschlüsselt jedoch verfügen Sie nicht über den privaten Schlüssel, um die E-Mail zu entschlüsseln.',
+  'The {product_name} password was incorrect.' => 'Das {product_name}-Kennwort war nicht korrekt.',
+  'Your SMIME key password matches your {product_name} password. This is prohibited for security reasons!' => 'Ihr SMIME-Schlüsselkennwort entspricht Ihrem {product_name}-Kennwort. Dies widerspricht den Sicherheitsrichtlinien!',
+  'Your SMIME key has no password. This is prohibited for security reasons!' => 'Ihr SMIME-Schlüssel ist nicht durch ein Kennwort geschützt. Dies widerspricht den Sicherheitsrichtlinien!',
+  'The certificate is invalid!' => 'Das Zertifikat ist ungültig!',
+  'Valid certificate' => 'Gültiges Zertifikat',
+  'Valid certificate but the e-mail of the certificate does not match the sender address of the e-mail.' => 'Gültiges Zertifikat, aber die Absenderadresse stimmt nicht mit der E-Mailadresse des Zertifikates überein.',
+  'SMIME Decryption of this message failed.' => 'SMIME-Entschlüsselung dieser Nachricht fehlgeschlagen.',
+  'E-mail' => 'E-Mail',
+  'Hash' => 'Hash-Wert',
+  'Serial number' => 'Seriennummer',
+  'Issuer' => 'Ausgestellt durch',
+  'Valid to' => 'Gültig bis',
+  'Valid from' => 'Gültig ab',
+  'name' => 'SMIME Unterstützung',
+  'description' => 'Erweitert das E-Mailmodul mit SMIME-Signatur und -Verschlüsselung',
+  'To upload a new PKCS12 certificate you must enter your Group-Office password. The Group-Office password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.' => 'Um ein neues PCSK12-Zertifikat hochzuladen, müssen Sie Ihr {product_name}-Kennwort eingeben. Dieses Kennwort muß sich aufgrund von Sicherheitsrichtlinien vom PCSK12-Schlüsselkennwort unterscheiden. Ein leeres Kennwort ist ebenso nicht zugelassen.',
+  'The Group-Office password was incorrect.' => 'Das {product_name}-Kennwort war nicht korrekt.',
+  'Your SMIME key password matches your Group-Office password. This is prohibited for security reasons!' => 'Ihr SMIME-Schlüsselkennwort entspricht Ihrem {product_name}-Kennwort. Dies widerspricht den Sicherheitsrichtlinien!',
+  'Version' => 'Version',
+);

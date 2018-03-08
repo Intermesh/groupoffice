@@ -38,7 +38,7 @@ GO.smime.PublicCertsGrid = function(config){
 	config.view=new Ext.grid.GridView({
 		autoFill: true,
 		forceFit: true,
-		emptyText: GO.lang['strNoItems']		
+		emptyText: t("No items to display")		
 	});
 	config.sm=new Ext.grid.RowSelectionModel();
 	config.loadMask=true;
@@ -50,13 +50,13 @@ GO.smime.PublicCertsGrid = function(config){
 		    	
 	config.tbar = [{
 		iconCls: 'btn-delete',
-		text: GO.lang['cmdDelete'],
+		text: t("Delete"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			this.deleteSelected();
 		},
 		scope: this
-	},'-',GO.lang['strSearch'] + ':', this.searchField];
+	},'-',t("Search") + ':', this.searchField];
 	
 	
 	config.listeners={
@@ -66,7 +66,7 @@ GO.smime.PublicCertsGrid = function(config){
 			
 			if(!this.certWin){
 				this.certWin = new GO.Window({
-					title:GO.smime.lang.smimeCert,
+					title:t("SMIME Certificate", "smime"),
 					width:500,
 					height:300,
 					closeAction:'hide',
@@ -107,7 +107,7 @@ Ext.extend(GO.smime.PublicCertsGrid, GO.grid.GridPanel,{
 GO.smime.PublicCertsWindow = Ext.extend(GO.Window, {
 	initComponent : function(){
 		
-		this.title=GO.smime.lang.pubCerts;
+		this.title=t("Public SMIME certificates", "smime");
 		this.width=400;
 		this.height=400;
 		this.layout='fit';
@@ -116,7 +116,7 @@ GO.smime.PublicCertsWindow = Ext.extend(GO.Window, {
 		this.closeAction='hide';
 		
 		this.buttons=[{
-			text:GO.lang.cmdClose,
+			text:t("Close"),
 			handler:function(){
 				this.hide();
 			},
@@ -134,12 +134,12 @@ GO.smime.PublicCertsWindow = Ext.extend(GO.Window, {
 
 
 GO.moduleManager.onModuleReady('email',function(){
-	Ext.override(GO.email.EmailClient, {
-		initComponent : GO.email.EmailClient.prototype.initComponent.createSequence(function(){
+	Ext.override(GO.email.MessagesGrid, {
+		initComponent : GO.email.MessagesGrid.prototype.initComponent.createSequence(function(){
 			this.settingsMenu.add('-');
 			this.settingsMenu.add({
-				iconCls:'btn-pub-certs',
-				text:GO.smime.lang.pubCerts,
+				iconCls:'ic-person',
+				text:t("Public SMIME certificates", "smime"),
 				handler:function(){
 					if(!this.pubCertsWin)
 						this.pubCertsWin = new GO.smime.PublicCertsWindow ();

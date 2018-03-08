@@ -3,7 +3,6 @@ modules/files/FilePropertiesDialog.js
 modules/files/FolderPropertiesDialog.js
 modules/files/ContextMenu.js
 modules/files/TemplatesWindow.js
-modules/files/FilesTemplate.js
 modules/files/ImageViewer.js
 modules/files/ThumbsPanel.js
 modules/files/SaveAsDialog.js
@@ -30,3 +29,5 @@ modules/files/FileBrowser.js
 modules/files/BookmarksGrid.js
 modules/files/OpenFileWindow.js
 modules/files/CompressDialog.js
+
+modules/files/FilesDetailPanel.js

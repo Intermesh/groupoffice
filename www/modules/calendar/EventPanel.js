@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: EventPanel.js 19228 2015-06-24 12:36:41Z wsmits $
+ * @version $Id: EventPanel.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -38,37 +38,37 @@ GO.calendar.EventPanel = Ext.extend(GO.DisplayPanel,{
 		this.template =
 				'<table class="display-panel" cellpadding="0" cellspacing="0" border="0">'+
 //					'<tr>'+
-//						'<td colspan="2" class="display-panel-heading">'+GO.calendar.lang.event+': {name}</td>'+
+//						'<td colspan="2" class="display-panel-heading">'+t("Event", "calendar")+': {name}</td>'+
 //					'</tr>'+
 //					'<tr>'+
-//						'<td colspan="2"><table><tr><td>'+GO.calendar.lang.calendar+': </td><td>{calendar_name}</td></tr></table></td>'+
+//						'<td colspan="2"><table><tr><td>'+t("Calendar", "calendar")+': </td><td>{calendar_name}</td></tr></table></td>'+
 //					'</tr>'+
 					'<tr>'+
 						'<td colspan="2">{event_html}</td>'+
 					'</tr>'+					
 				'</table>';
 
-		if(GO.customfields)
+		if(go.ModuleManager.isAvailable("customfields"))
 		{
 			this.template +=GO.customfields.displayPanelTemplate;
 		}
 
-		if(GO.tasks)
+		if(go.ModuleManager.isAvailable("tasks"))
 			this.template +=GO.tasks.TaskTemplate;
 
-		if(GO.workflow){
+		if(go.ModuleManager.isAvailable("workflow")){
 			this.template +=GO.workflow.WorkflowTemplate;
 		}
 		
-		if(GO.calendar)
+		if(go.ModuleManager.isAvailable("calendar"))
 			this.template += GO.calendar.EventTemplate;
 
 		this.template +=GO.linksTemplate;		
 		
-		if(GO.lists)
+		if(go.ModuleManager.isAvailable("lists"))
 			this.template += GO.lists.ListTemplate;
 
-		if(GO.files)
+		if(go.ModuleManager.isAvailable("files"))
 		{
 			Ext.apply(this.templateConfig, GO.files.filesTemplateConfig);
 			this.template += GO.files.filesTemplate;
@@ -76,7 +76,7 @@ GO.calendar.EventPanel = Ext.extend(GO.DisplayPanel,{
 		Ext.apply(this.templateConfig, GO.linksTemplateConfig);
 
 
-		if(GO.comments)
+		if(go.ModuleManager.isAvailable("comments"))
 		{
 			this.template += GO.comments.displayPanelTemplate;
 		}

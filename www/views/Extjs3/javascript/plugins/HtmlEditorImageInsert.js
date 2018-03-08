@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: HtmlEditorImageInsert.js 17133 2014-03-20 08:25:24Z mschering $
+ * @version $Id: HtmlEditorImageInsert.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -47,10 +47,10 @@ Ext.extend(GO.plugins.HtmlEditorImageInsert, Ext.util.Observable, {
 		element.clickEvent='mousedown';
 		element.tabIndex=-1;
 		element.tooltip={
-			title:GO.lang.image,
-			text:GO.lang.insertImage
+			title:t("Image"),
+			text:t("Insert image in the text")
 		}
-		element.overflowText=GO.lang.insertImage;
+		element.overflowText=t("Insert image in the text");
 		
 							
 		this.uploadForm = new GO.UploadPCForm();
@@ -64,10 +64,10 @@ Ext.extend(GO.plugins.HtmlEditorImageInsert, Ext.util.Observable, {
 		this.uploadForm
 		];
 
-		if(GO.files){
+		if(go.ModuleManager.isAvailable("files")){
 			menuItems.push({
 				iconCls:'btn-groupoffice',
-				text : GO.email.lang.attachFilesGO.replace('{product_name}', GO.settings.config.product_name),
+				text : t("Add from Group-Office", "email").replace('{product_name}', GO.settings.config.product_name),
 				handler : function()
 				{
 					this.showFileBrowser();

@@ -32,7 +32,7 @@ class Sitemultifile extends \GO\Customfields\Customfieldtype\AbstractCustomfield
 		$model = \GO\Site\Model\MultifileFile::model()->find($findParams);
 		
 		$string = '';
-		$string = sprintf(\GO::t('multifileSelectValue','site'), $model->count);
+		$string = sprintf(\GO::t("%s file(s)", "site"), $model->count);
 		
 		return $string;
 	}	

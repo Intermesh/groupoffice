@@ -4,11 +4,11 @@ GO.base.upload.PluploadMenuItem = Ext.extend(Ext.menu.Item, {
 	constructor: function(config) {
 			
 		Ext.applyIf(config, {
-			iconCls: 'btn-upload',
-			text: GO.lang.upload,
+			iconCls: 'ic-file-upload',
+			text: t("Upload"),
 			window_width: 640,
 			window_height: 480,
-			window_title: GO.lang.upload,
+			window_title: t("Upload"),
 			clearOnClose: false, //clear queue after window is closed (actually window is hidden )		
 			upload_config: {}
 		});
@@ -17,7 +17,7 @@ GO.base.upload.PluploadMenuItem = Ext.extend(Ext.menu.Item, {
 		
 		var title = config.window_title || config.text || 'Upload files';
 		
-		title += " ("+GO.lang.strMax+": "+this.uploadpanel.max_file_size+")";
+		title += " ("+t("Maximum")+": "+this.uploadpanel.max_file_size+")";
 		
 
 		this.window = new GO.Window({ 
@@ -61,9 +61,9 @@ GO.base.upload.PluploadMenuItem = Ext.extend(Ext.menu.Item, {
 		var humanSize = (new_max_filesize==1) ? '0B': GO.util.format.fileSize(this.uploadpanel.max_file_size);
 		
 		if(typeof humanSize === 'undefined') {
-			this.window.setTitle("("+GO.lang.strMax+": "+humanSize+")");
+			this.window.setTitle("("+t("Maximum")+": "+humanSize+")");
 		} else {
-			this.window.setTitle(GO.lang.upload);
+			this.window.setTitle(t("Upload"));
 		}
 		
 		if(this.uploadpanel.uploader){

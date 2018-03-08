@@ -7,7 +7,7 @@
  * If you have questions write an e-mail to info@intermesh.nl
  *
  * @copyright Copyright Intermesh
- * @version $Id: SelectAddressbook.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: SelectAddressbook.js 22112 2018-01-12 07:59:41Z mschering $
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
@@ -20,7 +20,7 @@ GO.addressbook.SelectAddressbook = function(config){
 
 	if(!config.fieldLabel)
 	{
-		config.fieldLabel=GO.addressbook.lang.addressbook;
+		config.fieldLabel=t("Address book", "addressbook");
 	}
 
 
@@ -35,8 +35,8 @@ GO.addressbook.SelectAddressbook = function(config){
 		selectOnFocus:true,
 		forceSelection: true,
 		typeAhead: true,
-		emptyText:GO.lang.strPleaseSelect,
-		pageSize: parseInt(GO.settings.max_rows_list)
+		emptyText:t("Please select..."),
+		pageSize: 20
 	});
 
 	GO.addressbook.SelectAddressbook.superclass.constructor.call(this,config);

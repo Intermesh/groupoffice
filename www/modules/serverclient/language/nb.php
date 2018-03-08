@@ -1,8 +1,8 @@
 <?php
-
-
-$l['name']='Serverklient';
-$l['description']='Automatisk opprette e-postadresser på en {product_name} installasjon som håndterer e-post med modulen postfixadmin';
-$l['connect_error']='Kan ikke koble til %s';
-$l["mailboxes"]='E-postadresser';
-$l["createMailbox"]='Opprett en e-postadresse i domenet';
+return array (
+  'Could not connect to %s' => 'Kan ikke koble til %s',
+  'Mailboxes' => 'E-postadresser',
+  'Create a mailbox for domain' => 'Opprett en e-postadresse i domenet',
+  'name' => 'Serverklient',
+  'description' => 'Automatisk opprette e-postadresser på en {product_name} installasjon som håndterer e-post med modulen postfixadmin',
+);

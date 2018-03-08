@@ -6,21 +6,22 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: ThumbsPanel.js 20453 2016-09-22 13:40:32Z mschering $
+ * @version $Id: ThumbsPanel.js 22436 2018-03-01 07:55:07Z michaelhart86 $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
 GO.files.ThumbsPanel = Ext.extend(Ext.Panel, {
 	store : false,
+	cls: 'card',
 	initComponent : function(){
 		this.bbar = new Ext.PagingToolbar({
   					cls: 'go-paging-tb',
 	          store: this.store,
 	          pageSize: parseInt(GO.settings['max_rows_list']),
 	          displayInfo: true,
-	          displayMsg: GO.lang['displayingItems'],
-	          emptyMsg: GO.lang['strNoItems']
+	          displayMsg: t("Displaying items {0} - {1} of {2}"),
+	          emptyMsg: t("No items to display")
 	      });
 		
     var tpl = new Ext.XTemplate('<tpl for=".">',
@@ -81,7 +82,7 @@ GO.files.ThumbsPanel = Ext.extend(Ext.Panel, {
 	
 
 	onBeforeLoad : function(){		
-    this.body.mask(GO.lang.waitMsgLoad);     
+    this.body.mask(t("Loading..."));     
 	},
 	
 	onStoreLoad : function(){		

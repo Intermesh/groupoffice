@@ -1,24 +1,17 @@
 <?php
-
-
-$l['name']='Komentáře';
-$l['description']='Umožňuje přidávat komentáře do ostatních modulů';
-$l['comment']='Komentář';
-$l['comments']='Komentáře';
-
-$l["comment"]="Komentář";
-$l["comments"]="Komentáře";
-$l["recentComments"]='Poslední komentáře';
-$l["browseComments"]= 'Procházet komentáře';
-
-$l['manageCategories']='Upravit kategorie';
-$l['category']='Kategorie';
-$l['noCategory']='Žádná kategorie';
-$l['newCommentText']='Vložte nový komentář ...';
-
-$l['readMore']="Číst dále";
-$l['enableReadMore']="Povolit odkaz pro číst dále";
-
-$l['actionDate']='Datum akce';
-
-$l['parent']='Nadřazený';
+return array (
+  'Comment' => 'Komentář',
+  'Recent comments' => 'Poslední komentáře',
+  'Browse comments' => 'Procházet komentáře',
+  'Manage categories' => 'Upravit kategorie',
+  'Category' => 'Kategorie',
+  'No category' => 'Žádná kategorie',
+  'Enter new comment here ...' => 'Vložte nový komentář ...',
+  'Read more' => 'Číst dále',
+  'Enable read more links' => 'Povolit odkaz pro číst dále',
+  'Action date' => 'Datum akce',
+  'Parent' => 'Nadřazený',
+  'name' => 'Komentáře',
+  'description' => 'Umožňuje přidávat komentáře do ostatních modulů',
+  'Comments' => 'Komentáře',
+);

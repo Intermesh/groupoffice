@@ -14,7 +14,7 @@ class Theme{
 		$theme = \GO::config()->allow_themes && \GO::user() ? \GO::user()->theme : \GO::config()->theme;
 		
 		if(!file_exists(\GO::view()->getPath().'themes/'.$theme.'/Layout.php')){
-			return 'Default';
+			return 'Paper';
 		}  else {
 			return $theme;
 		}

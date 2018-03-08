@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: QueryPanel.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: QueryPanel.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -60,14 +60,14 @@ GO.advancedquery.SearchQueryPanel = function(config)
 						hidden: true,
 						name: 'textfield',
 						hideLabel: true,
-						emptyText: GO.lang.keyword,
+						emptyText: t("Keyword"),
 						width: 295,
 						panel: this
 					}),this.criteriumFileField = new GO.files.SelectFile({
 						filesFilter:'foldersonly',
 						width: 295,
 						hidden: true
-						//fieldLabel:GO.filesearch.lang.searchOneFolder
+						//fieldLabel:t("Search a specific folder", "filesearch")
 					}),this.criteriumUserField = new GO.form.SelectUser({
 						allowBlank:true,
 						width: 295,
@@ -260,14 +260,14 @@ GO.advancedquery.SearchQueryPanel = function(config)
 			valueDelimiter:'|',
 			hiddenName:'duplicate_fields[]',
 			anchor:'-20',
-			fieldLabel:GO.lang.matchDuplicates,
+			fieldLabel:t("Match duplicates"),
 			hideLabel:false,
 			queryDelay: 0,
 			triggerAction: 'all'
 		}));
 
 		config.items.push(this.showFirstDuplicateOnlyCheckbox = new Ext.form.Checkbox({
-			boxLabel:GO.lang.showFirstDuplicateOnly,
+			boxLabel:t("Only show first duplicate"),
 			name:'show_first_duplicate_only',
 			hideLabel:true
 		}));

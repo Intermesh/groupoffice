@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: AddresslistDialog.js 21434 2017-09-14 12:59:40Z wsmits $
+ * @version $Id: AddresslistDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
@@ -17,7 +17,7 @@ GO.addressbook.AddresslistDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		
 		Ext.apply(this, {
 			goDialogId:'ab-addresslist',
-			title:GO.addressbook.lang.addresslist,
+			title:t("Address list", "addressbook"),
 			formControllerUrl: 'addressbook/addresslist',
 			width:750,
 			height:600
@@ -33,7 +33,7 @@ GO.addressbook.AddresslistDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			  name: 'name',
 				anchor: '100%',
 			  allowBlank:false,
-			  fieldLabel: GO.lang.strName
+			  fieldLabel: t("Name")
 			};
 			
 		this.defaultSalutationField = {
@@ -41,12 +41,12 @@ GO.addressbook.AddresslistDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			  name: 'default_salutation',
 				anchor: '100%',
 			  allowBlank:false,
-			  fieldLabel: GO.addressbook.lang.cmdFormLabelSalutation,
-			  value: GO.addressbook.lang.cmdSalutation+' '+GO.addressbook.lang.cmdSir+'/'+GO.addressbook.lang.cmdMadam
+			  fieldLabel: t("Salutation", "addressbook"),
+			  value: t("Dear", "addressbook")+' '+t("sir", "addressbook")+'/'+t("madam", "addressbook")
 			};
 		
 		this.selectUser = new GO.form.SelectUser({
-			fieldLabel:GO.lang.strOwner,
+			fieldLabel:t("Owner"),
 			disabled: !GO.settings.has_admin_permission,
 			value: GO.settings.user_id,
 			anchor: '100%'
@@ -57,13 +57,13 @@ GO.addressbook.AddresslistDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		});
 		
 		this.propertiesPanel = new Ext.Panel({
-			title:GO.lang['strProperties'],			
+			title:t("Properties"),			
 			cls:'go-form-panel',
 			layout:'form',
 			items:[
 				this.nameField,	
 				new GO.form.HtmlComponent({
-					html: GO.addressbook.lang.defaultSalutationText,
+					html: t("Enter a salutation that is used when the salutation for the recipient is unknown", "addressbook"),
 					style:'padding:10px 0px'
 				}),
 				this.defaultSalutationField,

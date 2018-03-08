@@ -275,7 +275,7 @@ class ParticipantController extends \GO\Base\Controller\AbstractModelController 
 		}
 		
 		// Create Participants header row
-		$row['name'] = '<b>'.\GO::t('participants','calendar').'</b>';
+		$row['name'] = '<b>'.\GO::t("Participants", "calendar").'</b>';
 		$row['email'] = '';
 		$row['freebusy'] = array();
 		
@@ -322,7 +322,7 @@ class ParticipantController extends \GO\Base\Controller\AbstractModelController 
 		}
 	
 		// Create the together row
-		$row['name'] = \GO::t('allTogetherForParticipants','calendar');
+		$row['name'] = \GO::t("All participants together", "calendar");
 		$row['email'] = '';
 		$row['freebusy'] = array();
 
@@ -336,7 +336,7 @@ class ParticipantController extends \GO\Base\Controller\AbstractModelController 
 		
 		// And now for the resources...
 		
-		$resource['name'] = '<b>'.\GO::t('resources','calendar').'</b>';
+		$resource['name'] = '<b>'.\GO::t("Resources", "calendar").'</b>';
 		$resource['email'] = '';
 		$resource['freebusy'] = array();
 
@@ -386,7 +386,7 @@ class ParticipantController extends \GO\Base\Controller\AbstractModelController 
 		}
 		
 		
-		$resource['name'] = \GO::t('allTogetherForResources','calendar');
+		$resource['name'] = \GO::t("All resources together", "calendar");
 		$resource['email'] = '';
 		$resource['freebusy'] = array();
 
@@ -399,7 +399,7 @@ class ParticipantController extends \GO\Base\Controller\AbstractModelController 
 		$response['results'][] = $resource;
 		
 		
-		$business['name'] = '<b>'.\GO::t('allTogether','calendar').'</b>';
+		$business['name'] = '<b>'.\GO::t("All together", "calendar").'</b>';
 		$business['email'] = '';
 		$business['freebusy'] = array();
 

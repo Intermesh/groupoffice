@@ -6,9 +6,8 @@ GO.addressbook.SentMailingsGrid = function(config){
 	}
 	
 	config.tbar = [{
-				iconCls: 'ml-btn-mailings',
-				text: GO.addressbook.lang.sendMailing,
-				cls: 'x-btn-text-icon',
+				iconCls: 'ic-mail',
+				text: t("Send mailing", "addressbook"),
 				handler: function(){
 					if(!this.selectAddresslistWindow)
 					{
@@ -24,9 +23,8 @@ GO.addressbook.SentMailingsGrid = function(config){
 				},
 				scope: this
 			},'-',{
-			iconCls: 'btn-delete',
-			text: GO.lang['cmdDelete'],
-			cls: 'x-btn-text-icon',
+			iconCls: 'ic-delete',
+			text: t("Delete"),
 			handler: function(){
 				this.deleteSelected();
 			},
@@ -56,21 +54,21 @@ GO.addressbook.SentMailingsGrid = function(config){
 			hideMode:'display',
 			keepSelection:true,
 			actions:[{
-				iconCls:'ml-btn-view',
-				qtip:GO.addressbook.lang.viewMessage
+				iconCls:'ic-pageview',
+				qtip:t("View message", "addressbook")
 			},{
-				iconCls:'ml-btn-view-log',
-				qtip:GO.addressbook.lang.viewLog
+				iconCls:'ic-receipt',
+				qtip:t("View log", "addressbook")
 			},{
 				callback: function(grid,record, iconCls) { Ext.select('.ux-row-action-item.'+iconCls).hide(); },
-				iconCls:'ml-btn-pause',
+				iconCls:'ic-pause',
 				hideIndex:'hide_pause',
-				qtip:GO.addressbook.lang.pauseMailing
+				qtip:t("Pause sending", "addressbook")
 			},{
 				callback: function(grid,record, iconCls) { Ext.select('.ux-row-action-item.'+iconCls).hide(); },
-				iconCls:'ml-btn-play',
+				iconCls:'ic-play-arrow',
 				hideIndex:'hide_play',
-				qtip:GO.addressbook.lang.resumeMailing
+				qtip:t("Resume sending", "addressbook")
 			}],
 			width: 50
 		});
@@ -107,22 +105,22 @@ GO.addressbook.SentMailingsGrid = function(config){
 				
 				
 				switch(action){
-					case 'ml-btn-pause':
+					case 'ic-pause':
 						grid.store.baseParams.pause_mailing_id=record.id;
 						grid.store.load();
 						delete grid.store.baseParams.pause_mailing_id;
 
 						break;
-					case 'ml-btn-play':
+					case 'ic-play-arrow':
 						grid.store.baseParams.start_mailing_id=record.id;
 						grid.store.load();
 						delete grid.store.baseParams.start_mailing_id;
 
 						break;
-					case 'ml-btn-view':
+					case 'ic-pageview':
 						GO.linkHandlers["GO\\Savemailas\\Model\\LinkedEmail"].call(this, 0, {action: "path", path:record.get('message_path')});
 						break;
-					case 'ml-btn-view-log':
+					case 'ic-receipt':
 						window.open(GO.url("addressbook/sentMailing/viewLog",{'mailing_id': record.id}));
 						break;
 				}
@@ -145,36 +143,36 @@ GO.addressbook.SentMailingsGrid = function(config){
 	if (!config.columns)
 		config.columns = [
 	   		{
-					header: GO.addressbook.lang.addresslist,
+					header: t("Address list", "addressbook"),
 					dataIndex: 'addresslist'
 				},	{
-					header: GO.addressbook.lang.subject, 
+					header: t("Subject", "addressbook"), 
 					dataIndex: 'subject'
 				},	{
-					header: GO.lang.strOwner, 
+					header: t("Owner"), 
 					dataIndex: 'user_name'
 				},	{
-					header: GO.lang.strCtime, 
+					header: t("Created at"), 
 					dataIndex: 'ctime',
-					width:110
+					width: dp(140)
 				},		{
-					header: GO.addressbook.lang['status'], 
+					header: t("Status", "addressbook"), 
 					dataIndex: 'status',
 					renderer:function(v){
-						return GO.addressbook.lang.mailingStatus[v];
+						return t("mailingStatus", "addressbook")[v];
 					}
 				},		{
-					header: GO.addressbook.lang.sent, 
+					header: t("Sent", "addressbook"), 
 					dataIndex: 'sent',
 					align:'center',
 					width:60
 				},		{
-					header: GO.addressbook.lang.total, 
+					header: t("Total", "addressbook"), 
 					dataIndex: 'total',
 					align:'center',
 					width:60
 				},		{
-					header: GO.addressbook.lang.errors, 
+					header: t("Errors", "addressbook"), 
 					dataIndex: 'errors',
 					align:'center',
 					width:60
@@ -194,7 +192,7 @@ GO.addressbook.SentMailingsGrid = function(config){
 	config.view=new Ext.grid.GridView({
 		autoFill: true,
 		forceFit: true,
-		emptyText: GO.lang['strNoItems']		
+		emptyText: t("No items to display")		
 	}),
 	config.sm=new Ext.grid.RowSelectionModel();
 	config.loadMask=false;

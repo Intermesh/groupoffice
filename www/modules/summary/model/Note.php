@@ -24,7 +24,7 @@ class Note extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	public function getLocalizedName(){
-		return \GO::t('note','summary');
+		return \GO::t("note", "summary");
 	}
 	
 	public function tableName(){

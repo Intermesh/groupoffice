@@ -10,8 +10,8 @@ class FieldController extends \GO\Base\Controller\AbstractModelController {
 
 	protected function actionTypes($params) {
 
-		if(isset($params['extend_model']))
-			$response['results'] = \GO\Customfields\CustomfieldsModule::getCustomfieldTypes($params['extend_model']);
+		if(isset($params['extendsModel']))
+			$response['results'] = \GO\Customfields\CustomfieldsModule::getCustomfieldTypes($params['extendsModel']);
 		else
 			$response['results'] = \GO\Customfields\CustomfieldsModule::getCustomfieldTypes();
 		$response['success']=true;
@@ -70,12 +70,12 @@ class FieldController extends \GO\Base\Controller\AbstractModelController {
 		} catch (PDOException $e) {
 			$msg = $e->getMessage();
 			if (strpos($msg,'SQLSTATE[42000]')===0 && strpos($msg,'1118')>14) {
-				$catModel = \GO\Customfields\Model\Category::model()->findByPk($params['category_id']);
-				throw new \Exception(sprintf(\GO::t('tooManyCustomfields','customfields'),  \GO::t($catModel->extends_model,'customfields')));
+				$catModel = \GO\Customfields\Model\Category::model()->findByPk($params['fieldSetId']);
+				throw new \Exception(sprintf(\GO::t("The total amount of data reserved for your custom fields (belonging to object type %s) exceeded the limit. You can correct this by lowering the maximum number of characters of some custom fields. The current custom field was not saved.", "customfields"),  \GO::t($catModel->extendsModel,'customfields')));
 			} else if (strpos($msg,'SQLSTATE[42000]')===0 && strpos($msg,'1074')>14) {
 				preg_match('/(max = ([0-9]+))/',$msg,$matches);
 				$str = !empty($matches[2]) ? $matches[2] : '';
-				throw new \Exception(sprintf(\GO::t('customfieldTooLarge','customfields'),$str));
+				throw new \Exception(sprintf(\GO::t("The custom field you tried to save, has more than the allowed number of characters (%s). Please decrease the maximum number of characters of this extra field and try to save again.", "customfields"),$str));
 			} else {
 				throw $e;
 			}
@@ -105,8 +105,8 @@ class FieldController extends \GO\Base\Controller\AbstractModelController {
 		$sort = 0;
 		foreach ($fields as $field) {
 			$model = \GO\Customfields\Model\Field::model()->findByPk($field['id']);
-			$model->sort_index = $sort;
-			$model->category_id = $field['category_id'];
+			$model->sortOrder = $sort;
+			$model->fieldSetId = $field['fieldSetId'];
 			$model->save();
 			$sort++;
 		}
@@ -116,15 +116,17 @@ class FieldController extends \GO\Base\Controller\AbstractModelController {
 
 	protected function getStoreParams($params) {
 //		return array(
-//				'where' => 'category.extends_model=:extends_model',
-//				'bindParams' => array('extends_model' => $params['extends_model']),
+//				'where' => 'category.extendsModel=:extendsModel',
+//				'bindParams' => array('extendsModel' => $params['extendsModel']),
 //
 //		);
 		
+		$entityId = $params['extendsModel']::getType()->getId();;
+		
 		$sfp = \GO\Base\Db\FindParams::newInstance()
 						->limit(0)
-						->order(array('category.sort_index', 't.sort_index'), array('ASC', 'ASC'))
-						->criteria(\GO\Base\Db\FindCriteria::newInstance()->addCondition('extends_model', $params['extends_model'],'=','category'));
+						->order(array('category.sortOrder', 't.sortOrder'), array('ASC', 'ASC'))
+						->criteria(\GO\Base\Db\FindCriteria::newInstance()->addCondition('entityId', $entityId,'=','category'));
 		
 		if(isset($params['datatype'])){
 			$sfp->getCriteria()->addCondition('datatype', $params['datatype']);
@@ -137,7 +139,7 @@ class FieldController extends \GO\Base\Controller\AbstractModelController {
 		$columnModel->formatColumn('category_name', '$model->category->name');
 		$columnModel->formatColumn('column_name', '$model->columnName()');
 		$columnModel->formatColumn('type', '$model->customfieldtype->name()');
-		$columnModel->formatColumn('unique_values', '$model->unique_values ? \GO::t("cmdYes") : \GO::t("cmdNo")');
+		$columnModel->formatColumn('unique_values', '$model->unique_values ? \GO::t("Yes") : \GO::t("No")');
 		return parent::formatColumns($columnModel);
 	}
 

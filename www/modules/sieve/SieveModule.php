@@ -101,7 +101,7 @@ class SieveModule extends Module{
 								
 								
 								$rule['ooo_days'] = isset($action['days'])?$action['days']:3;
-//								$rule['ooo_subject'] = isset($action['subject'])?$action['subject']:\GO::t('standardvacationsubject','sieve');
+//								$rule['ooo_subject'] = isset($action['subject'])?$action['subject']:\GO::t("I am away", "sieve");
 								$rule['ooo_message'] = $action['reason'];
 
 								if(!empty($action['addresses'])){
@@ -129,8 +129,8 @@ class SieveModule extends Module{
 					'ooo_script_index'=>-1,
 					'ooo_activate'=>date(\GO::user()->completeDateFormat),
 					'ooo_deactivate'=>date(\GO::user()->completeDateFormat),
-					'ooo_message'=> \GO::t('standardvacationmessage','sieve'),
-//					'ooo_subject'=> \GO::t('standardvacationsubject','sieve'),
+					'ooo_message'=> \GO::t("I am on vacation", "sieve"),
+//					'ooo_subject'=> \GO::t("I am away", "sieve"),
 					'ooo_aliasses'=>'',
 					'ooo_days' =>	3
 				));
@@ -161,7 +161,7 @@ class SieveModule extends Module{
 			\GO::debug('PROCESS OUT OF OFFICE SIEVE');
 			
 //			if(!isset($params['ooo_subject'])){
-//				$params['ooo_subject'] = \GO::t('standardvacationsubject','sieve');
+//				$params['ooo_subject'] = \GO::t("I am away", "sieve");
 //			}
 			
 			if(!isset($params['ooo_days'])){

@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: ViewDialog.js 17814 2014-07-22 13:15:18Z wsmits $
+ * @version $Id: ViewDialog.js 22457 2018-03-07 07:32:55Z michaelhart86 $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
@@ -18,9 +18,9 @@ GO.calendar.ViewDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		Ext.apply(this, {
 			goDialogId:'view',
 			titleField:'name',
-			title:GO.calendar.lang.view,
+			title:t("View", "calendar"),
 			formControllerUrl: 'calendar/view',
-			width: 440,
+			width: 460,
 			height: 600
 		});
 		
@@ -41,22 +41,22 @@ GO.calendar.ViewDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			region:'center',
       url:'calendar/viewCalendar',
       columns:[
-				{header: GO.lang.strTitle, dataIndex: 'name'},
-				{header:GO.lang.strUsername,dataIndex: 'username'}
+				{header: t("Title"), dataIndex: 'name'},
+				{header:t("Username"),dataIndex: 'username'}
 			],
       fields:['id','name','username'],
       model_id:0
     });
 
 		this.propertiesPanel = new Ext.Panel({
-			title:GO.lang['strProperties'],			
+			title:t("Properties"),			
 			//cls:'go-form-panel',
 			layout:'border',
 			items:[
 				new Ext.Panel({
 				layout:'form',
 				region:'north',
-				height:110,
+				autoHeight:true,
 				defaultType: 'textfield',
 				defaults: {
 					anchor: '100%'
@@ -67,22 +67,22 @@ GO.calendar.ViewDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 				border:false,
 				items: [
 					{
-						fieldLabel: GO.lang.strName,
+						fieldLabel: t("Name"),
 						name: 'name',
 						allowBlank:false		
 					},this.merge = new Ext.ux.form.XCheckbox({
 						name:'merge',
-						boxLabel: GO.calendar.lang.merge,
+						boxLabel: t("Merge", "calendar"),
 						hideLabel : true
 					}),GO.calendar.ownColor = new Ext.ux.form.XCheckbox({
 						name:'owncolor',
-						boxLabel: GO.calendar.lang.ownColor,
+						boxLabel: t("Give each calendar a unique color", "calendar"),
 						hideLabel : true,
 						disabled : true,
 						checked : true
 					}),{
 						xtype:'plainfield',
-						fieldLabel:GO.calendar.lang.directUrl,
+						fieldLabel:t("Direct URL", "calendar"),
 						name:'url',
 						anchor:'100%'
 					}
@@ -102,26 +102,26 @@ GO.calendar.ViewDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		this.addPanel(this.propertiesPanel);
         
         var groupColumns = [{
-			header : GO.lang['strName'],
+			header : t("Name"),
 			dataIndex : 'name',
 			menuDisabled:true,
 			sortable: true
 		}];
         
         this.addPanel (this.groups = new GO.base.model.multiselect.panel({
-            title: GO.lang.strSelectGroups,
+            title: t("Select groups"),
 				anchor: '100% 50%',
 				forceLayout:true,
 				autoExpandColumn:'name',
 				url:'calendar/viewGroup',
 				columns: [{
-                  header : GO.lang['strName'],
+                  header : t("Name"),
                   dataIndex : 'name',
                   menuDisabled:true,
                   sortable: true
               }],
 				/* selectColumns:[{
-					header : GO.lang['strName'],
+					header : t("Name"),
 					dataIndex : 'name',
 					menuDisabled:true,
 					sortable: true

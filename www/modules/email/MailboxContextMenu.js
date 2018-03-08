@@ -24,9 +24,9 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 		this.items=[
 		this.addFolderButton = new Ext.menu.Item({
 			iconCls: 'btn-add',
-			text: GO.email.lang.addFolder,
+			text: t("Add folder", "email"),
 			handler: function(){
-				Ext.MessageBox.prompt(GO.lang.strName, GO.email.lang.enterFolderName, function(button, text){
+				Ext.MessageBox.prompt(t("Name"), t("Enter the folder name:", "email"), function(button, text){
 					if(button=='ok')
 					{
 						var sm = this.treePanel.getSelectionModel();
@@ -56,7 +56,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 		}),
 		this.renameFolderButton = new Ext.menu.Item({
 			iconCls: 'btn-edit',
-			text: GO.email.lang.renameFolder,
+			text: t("Rename folder", "email"),
 			handler: function()
 			{
 				var sm = this.treePanel.getSelectionModel();
@@ -64,13 +64,13 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 
 				if(!node || !node.attributes.mailbox)
 				{
-					Ext.MessageBox.alert(GO.lang.strError, GO.email.lang.selectFolderRename);
+					Ext.MessageBox.alert(t("Error"), t("Select a folder to rename please", "email"));
 				}else if(node.attributes.mailbox=='INBOX')
 				{
-					Ext.MessageBox.alert(GO.lang.strError, GO.email.lang.cantRenameInboxFolder);
+					Ext.MessageBox.alert(t("Error"), t("You can't rename the INBOX folder", "email"));
 				}else
 				{
-					Ext.MessageBox.prompt(GO.lang.strName, GO.email.lang.enterFolderName, function(button, text){
+					Ext.MessageBox.prompt(t("Name"), t("Enter the folder name:", "email"), function(button, text){
 						if(button=='ok')
 						{
 							var sm = this.treePanel.getSelectionModel();
@@ -117,7 +117,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 			scope:this
 		}),'-',	new Ext.menu.Item({
 //			iconCls: 'btn-delete',
-			text:GO.email.lang.markAsRead,
+			text:t("Mark as read", "email"),
 			cls: 'x-btn-text-icon',
 			scope:this,
 			handler: function()
@@ -125,9 +125,9 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 				var sm = this.treePanel.getSelectionModel();
 				var node = sm.getSelectedNode();
 
-				var t = new Ext.Template(GO.email.lang.markFolderReadConfirm);
+				var t = new Ext.Template(t("Are you sure you want to mark all messages in folder '{name}' as read?", "email"));
 
-				Ext.MessageBox.confirm(GO.lang['strConfirm'], t.applyTemplate({name:node.attributes.text}), function(btn){
+				Ext.MessageBox.confirm(t("Confirm"), t.applyTemplate({name:node.attributes.text}), function(btn){
 					if(btn=='yes')
 					{
 						GO.request({
@@ -150,7 +150,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 			}
 		}),	new Ext.menu.Item({
 			iconCls: 'btn-cut',
-			text:GO.email.lang.moveOldMails,
+			text:t("Move old mails", "email"),
 			cls: 'x-btn-text-icon',
 			scope:this,
 			handler: function()
@@ -163,15 +163,15 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 			}
 		}),this.emptyFolderButton = new Ext.menu.Item({
 			iconCls: 'btn-delete',
-			text: GO.email.lang.emptyFolder,
+			text: t("Empty folder", "email"),
 			handler: function(){
 
 				var sm = this.treePanel.getSelectionModel();
 				var node = sm.getSelectedNode();
 
-				var t = new Ext.Template(GO.email.lang.emptyFolderConfirm);
+				var template = new Ext.Template(t("Are you sure you want to EMPTY '{name}'?", "email"));
 
-				Ext.MessageBox.confirm(GO.lang['strConfirm'], t.applyTemplate({name:node.attributes.text}), function(btn){
+				Ext.MessageBox.confirm(t("Confirm"), template.applyTemplate({name:node.attributes.text}), function(btn){
 					if(btn=='yes')
 					{
 						GO.request({
@@ -198,7 +198,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 			scope:this
 		}),this.deleteFolderButton = new Ext.menu.Item({
 			iconCls: 'btn-delete',
-			text: GO.lang.cmdDelete,
+			text: t("Delete"),
 			cls: 'x-btn-text-icon',
 			scope: this,
 			handler: function(){
@@ -207,10 +207,10 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 
 				if(!node|| node.attributes.folder_id<1)
 				{
-					Ext.MessageBox.alert(GO.lang.strError, GO.email.lang.selectFolderDelete);
+					Ext.MessageBox.alert(t("Error"), t("Select a folder to delete please", "email"));
 				}else if(node.attributes.mailbox=='INBOX')
 				{
-					Ext.MessageBox.alert(GO.lang.strError, GO.email.lang.cantDeleteInboxFolder);
+					Ext.MessageBox.alert(t("Error"), t("You can't delete the INBOX folder", "email"));
 				}else
 				{
 					
@@ -232,7 +232,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 									GO.mainLayout.getModulePanel("email").messagesGrid.store.removeAll();
 								}
 
-								if(GO.emailportlet){
+								if(go.ModuleManager.isAvailable("emailportlet")){
 									GO.emailportlet.foldersStore.load();
 								}
 								this.treePanel.mainPanel.refresh(true);
@@ -245,7 +245,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 			}
 		}),'-',this.shareBtn = new Ext.menu.Item({
 			iconCls:'em-btn-share-mailbox ',
-			text: GO.email.lang.shareFolder,
+			text: t("Share", "email"),
 			handler:function(){
 				if(!this.imapAclDialog)
 					this.imapAclDialog = new GO.email.ImapAclDialog();
@@ -260,7 +260,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 
 		}),{
 			iconCls : 'btn-settings',
-			text : GO.email.lang.subscribeFolders,
+			text : t("Subscribe to folders", "email"),
 			scope : this,
 			handler : function() {
 				if (!this.foldersDialog) {
@@ -272,7 +272,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 			}
 		},'-', this.propertiesBtn = new Ext.menu.Item({
 			iconCls: 'btn-edit',
-			text: GO.lang['strProperties'],
+			text: t("Properties"),
 			handler:function(a,b){
 				var sm = this.treePanel.getSelectionModel();
 				var node = sm.getSelectedNode();

@@ -12,21 +12,21 @@ GO.settings.MainPanel = function(config){
 	config.items={
 		xtype:'fieldset',
 		labelAlign:'top',
-		title:GO.settings.lang.loginScreenText,
+		title:t("Text for login screen", "settings"),
 		items:[{
-			boxLabel:GO.settings.lang.loginTextEnabled,
+			boxLabel:t("Enable login screen text", "settings"),
 			xtype:'checkbox',
 			hideLabel:true,			
 			name:'login_screen_text_enabled',
 			anchor:"100%"
 		},{
-			fieldLabel:GO.settings.lang.title,
+			fieldLabel:t("Title", "settings"),
 			xtype:'textfield',
 			hideLabel:true,
 			name:'login_screen_text_title',
 			anchor:"100%"
 		},{
-			fieldLabel:GO.settings.lang.text,
+			fieldLabel:t("Text", "settings"),
 			xtype:'htmleditor',
 			hideLabel:true,
 			name:'login_screen_text',
@@ -39,15 +39,15 @@ GO.settings.MainPanel = function(config){
 		cls:'go-head-tb',
 		items: [{
 	      	 	xtype:'htmlcomponent',
-			html:GO.settings.lang.name,
+			html:t("Settings", "settings"),
 			cls:'go-module-title-tbar'
 		},{
 		iconCls: 'btn-save',
-		text: GO.lang.cmdSave,
+		text: t("Save"),
 		cls: 'x-btn-text-icon',
 		handler: function()
 		{
-			this.el.mask(GO.lang.waitMsgLoad);				
+			this.el.mask(t("Loading..."));				
 //			this.form.baseParams.save = true;
 			this.form.submit({
 				url: GO.url('settings/setting/submit'),
@@ -58,7 +58,7 @@ GO.settings.MainPanel = function(config){
 				},
 				failure: function(form,action){
 					this.el.unmask();
-					Ext.MessageBox.alert(GO.lang.strError,action.result.feedback);
+					Ext.MessageBox.alert(t("Error"),action.result.feedback);
 				},
 				scope: this
 			});
@@ -66,7 +66,7 @@ GO.settings.MainPanel = function(config){
 		scope: this
 	},{
 		iconCls: 'btn-delete',
-		text: GO.lang.cmdCancel,
+		text: t("Cancel"),
 		cls: 'x-btn-text-icon',
 		handler: function()
 		{
@@ -90,7 +90,7 @@ Ext.extend(GO.settings.MainPanel, Ext.FormPanel, {
 });
 
 GO.moduleManager.addModule('settings', GO.settings.MainPanel, {
-	title : GO.settings.lang.mainTitle,
+	title : t("Settings", "settings"),
 	iconCls : 'go-tab-icon-settings',
 	admin :true
 });

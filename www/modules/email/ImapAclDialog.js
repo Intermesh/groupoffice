@@ -19,22 +19,22 @@ GO.email.ImapAclDialog = Ext.extend(GO.Window, {
 				},
 				columns:[
 				{
-					header:GO.lang.strUser,
+					header:t("User"),
 					dataIndex: 'identifier'
 				},{
-					header: GO.lang.strPermissions,
+					header: t("Permissions"),
 					dataIndex: 'permissions'
 				}]
 			}),
 			view: new Ext.grid.GridView({
 				autoFill: true,
 				forceFit: true,
-				emptyText: GO.lang['strNoItems']
+				emptyText: t("No items to display")
 			}),
 			loadMask:true,
 			tbar: [{
 				iconCls: 'btn-add',
-				text: GO.lang.cmdAdd,
+				text: t("Add"),
 				cls: 'x-btn-text-icon',
 				handler: function(){
 					this.showUserDialog();
@@ -42,7 +42,7 @@ GO.email.ImapAclDialog = Ext.extend(GO.Window, {
 				scope: this
 			},{
 				iconCls: 'btn-delete',
-				text: GO.lang.cmdDelete,
+				text: t("Delete"),
 				cls: 'x-btn-text-icon',
 				handler: function(){
 					this.grid.deleteSelected();
@@ -61,11 +61,11 @@ GO.email.ImapAclDialog = Ext.extend(GO.Window, {
 		Ext.apply(this, {
 			width:500,
 			height:400,
-			title:GO.email.lang.shareFolder,
+			title:t("Share", "email"),
 			layout:'fit',
 			items:[this.grid],
 			buttons:[{
-				text : GO.lang['cmdClose'],
+				text : t("Close"),
 				handler : function() {
 					this.hide();
 				},
@@ -80,7 +80,7 @@ GO.email.ImapAclDialog = Ext.extend(GO.Window, {
 		this.grid.store.baseParams.mailbox=mailbox;
 		this.grid.store.load();
 
-		this.setTitle(GO.email.lang.shareFolder+": "+mailboxtext);
+		this.setTitle(t("Share", "email")+": "+mailboxtext);
 	},
 
 	showUserDialog : function(record){

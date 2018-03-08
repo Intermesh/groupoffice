@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: PluginEmailComposer.js 17553 2014-05-27 13:03:02Z mschering $
+ * @version $Id: PluginEmailComposer.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -20,7 +20,7 @@ GO.moduleManager.onModuleReady('email',function(){
 		
 		initComponent : GO.email.EmailComposer.prototype.initComponent.createSequence(function(){
 			this.optionsMenu.add(['-',this.signCheck = new Ext.menu.CheckItem({
-				text:GO.smime.lang.sign,
+				text:t("Sign with SMIME", "smime"),
 				checked: false,
 				listeners : {
 					checkchange: function(check, checked) {	
@@ -32,7 +32,7 @@ GO.moduleManager.onModuleReady('email',function(){
 					scope:this
 				}
 			}),this.encryptCheck = new Ext.menu.CheckItem({
-				text:GO.smime.lang.encrypt,
+				text:t("Encrypt with SMIME", "smime"),
 				checked: false,
 				listeners : {
 					checkchange: function(check, checked) {						
@@ -73,7 +73,7 @@ GO.moduleManager.onModuleReady('email',function(){
 				if(!this.passwordDialog)
 				{
 					this.passwordDialog = new GO.dialog.PasswordDialog({
-						title:GO.smime.lang.enterPassword,
+						title:t("Please enter the password of your SMIME certificate.", "smime"),
 						fn:function(btn, password){
 							
 							var record = this.fromCombo.store.getById(this.fromCombo.getValue());

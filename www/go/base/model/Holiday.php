@@ -318,7 +318,7 @@ class Holiday extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	public function getJson(){
-		$dayString = \GO::t('full_days');
+		$dayString = \GO::t("full_days");
 		return array(
 //			'id'=>$response['count']++,
 			'name'=>htmlspecialchars($this->name, ENT_COMPAT, 'UTF-8'),

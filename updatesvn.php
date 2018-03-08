@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-$root = 'svn+ssh://svn@svn.intermesh.nl/groupoffice-pro/branches/modules-6.2';
+$root = 'svn+ssh://svn@svn.intermesh.nl/groupoffice-pro/branches/modules-6.3';
 exec('svn ls '.$root, $output, $ret);
 
 if($ret!=0)
@@ -13,9 +13,12 @@ chdir($wd);
 
 foreach($output as $module){
 	
+	if(rtrim($module,'/') =='nbproject') {
+		continue;
+	}
+	
 	if(substr($module,-1)=='/'){ //check if it's a directory
-
-		//exec('rm -Rf '.$module);
+//		exec('rm -Rf '.$module);
 
 		//uncomment the following line if subversion is upgraded
 //		system('svn upgrade '.$module);

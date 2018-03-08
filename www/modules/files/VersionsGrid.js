@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: VersionsGrid.js 19784 2016-01-26 13:56:16Z michaelhart86 $
+ * @version $Id: VersionsGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -17,7 +17,7 @@ GO.files.VersionsGrid = function(config) {
 		config = {};
 	}
 
-	config.title = GO.files.lang.olderVersions;
+	config.title = t("Older versions", "files");
 	config.layout = 'fit';
 	config.autoScroll = true;
 	config.split = true;
@@ -35,22 +35,22 @@ GO.files.VersionsGrid = function(config) {
 			sortable:true
 		},
 		columns:[{
-				header:GO.files.lang.shortVersion,
+				header:t("Ver.", "files"),
 				dataIndex : 'version',
-				width:50,
+				width:60,
 				align:'right'
 		},{
-			header : GO.lang['strOwner'],
+			header : t("Owner"),
 			dataIndex : 'user_name',
 			sortable : false,
 			id:'name'
 		},{
-			header : GO.lang['strSize'],
+			header : t("Size"),
 			dataIndex : 'size_bytes',
 			sortable : true,
 			renderer: GO.util.format.fileSize
 		}, {
-			header : GO.lang.strMtime,
+			header : t("Modified at"),
 			dataIndex : 'mtime',
 			width:100
 		}]
@@ -61,7 +61,7 @@ GO.files.VersionsGrid = function(config) {
 	config.autoExpandColumn='name';
 
 	config.view = new Ext.grid.GridView({
-		emptyText : GO.lang['strNoItems']
+		emptyText : t("No items to display")
 	});
 	config.sm = new Ext.grid.RowSelectionModel();
 	config.loadMask = true;

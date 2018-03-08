@@ -13,7 +13,7 @@ GO.base.model.multiselect.addDialog = function(config){
 	
 	this.searchField = new GO.form.SearchField({
 		store: this.store,
-		width:320
+		width:476
 	});
 	
 	this.grid = new GO.grid.EditorGridPanel({
@@ -36,27 +36,20 @@ GO.base.model.multiselect.addDialog = function(config){
 	GO.base.model.multiselect.addDialog.superclass.constructor.call(this, {
 		layout: 'fit',
 		modal:false,
-		height:300,
-		tbar: [GO.lang['strSearch'] + ':', this.searchField],
+		height:600,
+		tbar: [this.searchField],
 		width:500,
 		loadMask:true,
 		closeAction:'hide',
-		title: GO.lang.strPleaseSelect,
+		title: t("Please select..."),
 		items: this.grid,
 		buttons: [
 		{
-			text: GO.lang['cmdOk'],
+			text: t("Add"),
 			handler: function (){
 				this.callHandler(true);
 			},
 			scope:this
-		},
-		{
-			text: GO.lang['cmdClose'],
-			handler: function(){
-				this.hide();
-			},
-			scope: this
 		}]
 	});
 	

@@ -78,7 +78,7 @@ Ext.calendar.EventEditWindow = function(config) {
 
         fbar: [{
             xtype: 'tbtext',
-            text: '<a href="#" id="tblink">Edit Details...</a>'
+            text: '<a  id="tblink">Edit Details...</a>'
         },
         '->', {
             text: 'Save',

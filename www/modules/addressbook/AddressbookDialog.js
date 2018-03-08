@@ -4,7 +4,7 @@ GO.addressbook.AddressbookDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 		
 		Ext.apply(this, {
 			titleField:'name',
-			title:GO.addressbook.lang.addressbook,
+			title:t("Address book", "addressbook"),
 			formControllerUrl: 'addressbook/addressbook',
 			width:800,
 			height:540
@@ -27,7 +27,7 @@ GO.addressbook.AddressbookDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 	buildForm : function(){
 		
 		this.propertiesPanel = new Ext.Panel({
-			title:GO.addressbook.lang.cmdPanelProperties,
+			title:t("Properties", "addressbook"),
 			layout: 'form',
 			labelWidth: 140,
 			defaultType: 'textfield',
@@ -37,12 +37,12 @@ GO.addressbook.AddressbookDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 			//cls:'go-form-panel',
 			items:[
 			{
-				fieldLabel: GO.lang['strName'],
+				fieldLabel: t("Name"),
 				name: 'name',
 				allowBlank: false
 			},
 			this.selectUser = new GO.form.SelectUser({
-				fieldLabel: GO.lang['strUser'],
+				fieldLabel: t("User"),
 				disabled : !GO.settings.has_admin_permission,
 				allowBlank: false
 			}),{
@@ -55,39 +55,39 @@ GO.addressbook.AddressbookDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 					columnWidth:.8,
 					items:{
 						xtype:'textfield',
-						fieldLabel: GO.addressbook.lang['defaultSalutation'],
+						fieldLabel: t("Default salutation", "addressbook"),
 						name: 'default_salutation',
 						allowBlank: false,
 						anchor:'99%',
-						value:GO.addressbook.lang.defaultSalutationExpression
+						value:t("defaultSalutationExpression", "addressbook")
 					}
 				},{
 					columnWidth:.2,
 					border:false,
 					items:{
 						xtype:'button',
-						handler:function(){this.propertiesPanel.form.findField('default_salutation').setValue(GO.addressbook.lang.defaultSalutationExpression);},
+						handler:function(){this.propertiesPanel.form.findField('default_salutation').setValue(t("defaultSalutationExpression", "addressbook"));},
 						scope:this,
-						text:GO.lang.cmdReset
+						text:t("Reset")
 					}
 				}]
 			},
 			{
 				xtype: "xcheckbox",
 				fieldLabel: 'files_module',
-				boxLabel: GO.addressbook.lang['create_folder_contact_or_company'],
+				boxLabel: t("Create folder for on create of a contact or company", "addressbook"),
 				name: "create_folder"
 			},
 			{
 				xtype:'fieldset',
-				title:GO.addressbook.lang.explanationVariables,
+				title:t("Explanation default salutation variables", "addressbook"),
 				border:true,
 				layout:'column',
 				autoHeight:true,
 				items:[{
 					border:false,
 					columnWidth:.2,
-					html:	'['+GO.addressbook.lang.cmdSir+'/'+GO.addressbook.lang.cmdMadam+']<br />'+
+					html:	'['+t("sir", "addressbook")+'/'+t("madam", "addressbook")+']<br />'+
 							'{title}<br />'+
 							'{initials}<br />'+
 							'{first_name}<br />'+
@@ -96,24 +96,24 @@ GO.addressbook.AddressbookDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 				},{
 					columnWidth:.8,
 					border:false,
-					html:	GO.addressbook.lang.explanationSex+
-							'<br />'+GO.lang.strTitle+
-							'<br />'+GO.lang.strInitials+
-							'<br />'+GO.lang.strFirstName+
-							'<br />'+GO.lang.strMiddleName+
-							'<br />'+GO.lang.strLastName
+					html:	t("Male and female form of salutation", "addressbook")+
+							'<br />'+t("Title")+
+							'<br />'+t("Initials")+
+							'<br />'+t("First name")+
+							'<br />'+t("Middle name")+
+							'<br />'+t("Last name")
 				}]
 			},{
 				xtype:'panel',
 				border:false,
 				items:[this.deleteAllItemsButton = new Ext.Button({
 					xtype:'button',
-					text:GO.lang.deleteAllItems,
+					text:t("Delete all items"),
 					handler:function(){
 						Ext.Msg.show({
-							title: GO.lang.deleteAllItems,
+							title: t("Delete all items"),
 							icon: Ext.MessageBox.WARNING,
-							msg: GO.lang.deleteAllItemsAreYouSure,
+							msg: t("Are you sure you want to delete all items?"),
 							buttons: Ext.Msg.YESNO,
 							scope:this,
 							fn: function(btn) {
@@ -136,7 +136,7 @@ GO.addressbook.AddressbookDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 				this.removeDuplicatesButton =new Ext.Button({
 					style:'margin-top:10px',
 					xtype:'button',
-					text:GO.lang.removeDuplicates,
+					text:t("Remove duplicates"),
 					handler:function(){
 
 						window.open(GO.url('addressbook/addressbook/removeDuplicates',{addressbook_id:this.remoteModelId}))
@@ -153,7 +153,7 @@ GO.addressbook.AddressbookDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 		this.importDialogs = {};
 		
 		this.addPanel(this.importPanel = new Ext.Panel({
-			title:GO.lang.cmdImport,
+			title:t("Import"),
 			layout: 'form',
 			items: [],
 			defaults: {anchor:'100%'},
@@ -164,7 +164,7 @@ GO.addressbook.AddressbookDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 			items: [
 				this.fileTypeCB = new GO.form.ComboBox({
 					hiddenName: 'fileType',
-					fieldLabel: GO.addressbook.lang.cmdFormLabelFileType,
+					fieldLabel: t("File type", "addressbook"),
 					store: new Ext.data.ArrayStore({
 						storeId: 'fileTypeStore',
 						idIndex: 0,
@@ -184,14 +184,14 @@ GO.addressbook.AddressbookDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 					value: 'CSV'
 				}), this.controllerNameCB = new GO.form.ComboBox({
 					hiddenName: 'controller',
-					fieldLabel: GO.lang.cmdImport,
+					fieldLabel: t("Import"),
 					store: new Ext.data.ArrayStore({
 						storeId: 'controllersStore',
 						idIndex: 0,
 						fields:['value','label'],
 						data: [
-							['GO\\Addressbook\\Controller\\Contact',GO.addressbook.lang.contacts],
-							['GO\\Addressbook\\Controller\\Company',GO.addressbook.lang.companies]
+							['GO\\Addressbook\\Controller\\Contact',t("Contacts", "addressbook")],
+							['GO\\Addressbook\\Controller\\Company',t("Companies", "addressbook")]
 						]
 					}),
 					valueField:'value',
@@ -206,7 +206,7 @@ GO.addressbook.AddressbookDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 					border: false,
 					items: [
 						new Ext.Button({
-							text: GO.lang.cmdContinue,
+							text: t("Continue"),
 							width: '20%',
 							handler: function(){
 								var controllerName = this.controllerNameCB.getValue();		
@@ -247,8 +247,8 @@ GO.addressbook.AddressbookDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 //				['vcf','VCF (vCard)']
 //			],
 //			controllers:[
-//				['GO_Addressbook_Controller_Contact',GO.addressbook.lang.contacts],
-//				['GO_Addressbook_Controller_Company',GO.addressbook.lang.companies]
+//				['GO_Addressbook_Controller_Contact',t("Contacts", "addressbook")],
+//				['GO_Addressbook_Controller_Company',t("Companies", "addressbook")]
 //			],
 //			importBaseParams:[
 //				{'addressbook_id':this.remoteModelId}
@@ -257,14 +257,14 @@ GO.addressbook.AddressbookDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 		
 		this.addPermissionsPanel(new GO.grid.PermissionsPanel());
 		
-		if(GO.customfields){
+		if(go.ModuleManager.isAvailable("customfields")){
 			this.disableContactsCategoriesPanel = new GO.customfields.DisableCategoriesPanel({
-				title:GO.addressbook.lang.contactCustomFields
+				title:t("Contacts custom fields", "addressbook")
 			});
 			this.addPanel(this.disableContactsCategoriesPanel);
 			
 			this.disableCompaniesCategoriesPanel = new GO.customfields.DisableCategoriesPanel({
-				title:GO.addressbook.lang.companyCustomFields
+				title:t("Company custom fields", "addressbook")
 			});
 			this.addPanel(this.disableCompaniesCategoriesPanel);
 			
@@ -279,7 +279,7 @@ GO.addressbook.AddressbookDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 	
 	setRemoteModelId : function(remoteModelId){
 		
-		if(GO.customfields){
+		if(go.ModuleManager.isAvailable("customfields")){
 			this.disableContactsCategoriesPanel.setModel(remoteModelId, "GO\\Addressbook\\Model\\Contact");
 			this.disableCompaniesCategoriesPanel.setModel(remoteModelId, "GO\\Addressbook\\Model\\Company");
 			this.enableBlocksPanel.setModel(remoteModelId,"GO\\Addressbook\\Model\\Addressbook");

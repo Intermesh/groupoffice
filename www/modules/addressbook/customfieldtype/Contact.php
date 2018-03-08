@@ -23,8 +23,8 @@ class Contact extends \GO\Customfields\Customfieldtype\AbstractCustomfieldtype{
 
 			if(!\GO\Customfields\Model\AbstractCustomFieldsRecord::$formatForExport){
 				$name = htmlspecialchars($this->getName($attributes[$key]), ENT_COMPAT, 'UTF-8');
-				$html='<a href="#" onclick=\'GO.linkHandlers["GO\\\\Addressbook\\\\Model\\\\Contact"].call(this,'.
-					$this->getId($attributes[$key]).');\' title="'.$name.'">'.
+				$html='<a href="#addresbook/contact/{id}'.
+					$this->getId($attributes[$key]).'" title="'.$name.'">'.
 						$name.'</a>';
 			}else
 			{

@@ -35,7 +35,7 @@ class WorkingWeek extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	protected function getLocalizedName() {
-		return \GO::t('workingWeek');
+		return \GO::t("workingWeek");
 	}
 
 	public function tableName() {

@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: UnknownRecipientsDialog.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: UnknownRecipientsDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -27,10 +27,10 @@ GO.email.UnknownRecipientsDialog = Ext.extend(Ext.Window, {
 			keepSelection:true,
 			actions:[{
 				iconCls:'btn-add',
-				qtip:GO.lang.cmdAdd
+				qtip:t("Add")
 			},{
 				iconCls:'btn-edit',
-				qtip:GO.lang.cmdEdit
+				qtip:t("Edit")
 			}],
 			width: 50
 		});
@@ -43,7 +43,7 @@ GO.email.UnknownRecipientsDialog = Ext.extend(Ext.Window, {
 				if(tldi)
 				{
 					var tld = email.substring(tldi+1, email.length).toUpperCase();
-					if(GO.lang.countries[tld])
+					if(t("countries")[tld])
 					{
 						record.data.country=tld;
 					}
@@ -71,7 +71,7 @@ GO.email.UnknownRecipientsDialog = Ext.extend(Ext.Window, {
 								if (this.addresslistId>0) {
 									this.addToAddressbook(contactId,this.addresslistId);
 								} else {
-									alert(GO.addressbook.lang.addresslistIdMustBePositive);
+									alert(t("This panel expects an address list ID that is positive, but did not receive one. Please contact the administrator.", "addressbook"));
 								}
 								}, this);
 						}
@@ -98,10 +98,10 @@ GO.email.UnknownRecipientsDialog = Ext.extend(Ext.Window, {
 			region:'center',
 			loadMask:true,
 			columns : [{
-				header : GO.lang.strName,
+				header : t("Name"),
 				dataIndex : 'name'
 			}, {
-				header : GO.lang.strEmail,
+				header : t("E-mail"),
 				dataIndex : 'email'
 			},
 			action],
@@ -118,7 +118,7 @@ GO.email.UnknownRecipientsDialog = Ext.extend(Ext.Window, {
 			this.descriptionTextPanel = new Ext.Panel({
 				border: false,
 				region:'north',
-				html: this.descriptionText  ? this.descriptionText : GO.email.lang.addUnknownRecipientsText,
+				html: this.descriptionText  ? this.descriptionText : t("You just sent an e-mail to one or more recipients that are not in your addressbook. Click on a name if you want to add that person or close this window.", "email"),
 				cls:'go-form-panel'
 			}),
 			this.grid
@@ -128,7 +128,7 @@ GO.email.UnknownRecipientsDialog = Ext.extend(Ext.Window, {
 			items.push(new Ext.Panel({
 				border: false,
 				items: this.skipUnknownRecipients = new Ext.form.Checkbox({
-					boxLabel:GO.email.lang.skipUnknownRecipientsAction,
+					boxLabel:t("Don't show this window next time", "email"),
 					hideLabel:true,
 					checked:false,
 					name:'skip_unknown_recipients',
@@ -156,7 +156,7 @@ GO.email.UnknownRecipientsDialog = Ext.extend(Ext.Window, {
 			}))
 		}
 		
-		this.title= !GO.util.empty(this.title) ? this.title : GO.email.lang.addUnknownRecipients;
+		this.title= !GO.util.empty(this.title) ? this.title : t("Add unknown recipients", "email");
 		this.layout='fit';
 		this.modal=false;
 		this.height=400;

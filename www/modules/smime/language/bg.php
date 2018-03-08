@@ -1,37 +1,38 @@
 <?php
-
-
-$l["enterPassword"]="Моля, въведете паролата за Вашия SMIME сертификат.";
-$l["messageEncrypted"]="Това съобщение бе изпратено в криптиран вид към вас.";
-$l["messageSigned"]="Това съобшение има цифров подпис. Кликнете тук, за да се уверите в подписа и да импортирате сертификата.";
-$l["smimeCert"]="SMIME сертификат";
-$l["sign"]="Подпис със SMIME";
-$l["encrypt"]="Криптиране със SMIME";
-$l["settings"]="SMIME настройки";
-$l["deleteCert"]="Изтриване сертификат";
-$l["selectPkcs12Cert"]="Изберете нов PKCS12 сертификат";
-$l["alwaysSign"]='Винаги подписва съобщенията';
-$l["pkcs12Cert"]="PKCS12 сертификат";
-$l["pkcs12CertInfo"]="За да качите нов PCSK12 сертификат, вие трябва да въведете паролата си за {product_name}. Паролата за {product_name} трябва да бъде различна от паролата за Вашия PCSK12 сертификат заради сигурността. Липсата на парола е забранена.";
-$l["pubCerts"]="Публични SMIME сертификати";
-$l["youHaveAcert"]='Вече сте качили сертификат. Поддръжката за SMIME е разрешена за този акаунт.';
-$l["downloadCert"]='Изтегли сертификат';
-$l['name']='SMIME поддръжка';
-$l['description']='Extend the mail module with SMIME signing and encryption.';
-$l['noPublicCertForEncrypt']="Съобщението не може да се криптира, защото нямате публичен сертификат %s. Отворете подписано съобщение за получател и удостоверете сертификата, за да импортирате публичния ключ.";
-$l['noPrivateKeyForDecrypt']="Съобщението е криптирано и вие нямате публичния ключ, за да го декриптирате.";
-$l['badGoLogin']="Паролата за {product_name} е неправилна.";
-$l['smime_pass_matches_go']="Паролата за Вашия SMIME key съвпада с паролата за {product_name}. Заради сигурността това е забранено!";
-$l['smime_pass_empty']="Вашият SMIME key няма парола. Заради сигурността това е забранено!";
-$l['invalidCert']="Сертификатът е невалиден!";
-$l['validCert']="Валиден сертификат";
-$l['certEmailMismatch']="Сертификатът е валиден, но E-mail-а на сертификата не съвпада с E-mail-а на подателя.";
-$l['decryptionFailed']='SMIME декриптирането за това съобщение се провали.';
-
-$l['email']="E-mail";
-$l['hash']="Hash";
-$l['serial_number']="Сериен номер";
-$l['version']="Версия";
-$l['issuer']="Издател";
-$l['valid_to']="Важи до";
-$l['valid_from']="Важи от";
+return array (
+  'Please enter the password of your SMIME certificate.' => 'Моля, въведете паролата за Вашия SMIME сертификат.',
+  'This message was sent to you encrypted.' => 'Това съобщение бе изпратено в криптиран вид към вас.',
+  'This message is digitally signed. Click here to verify the signature and import the certificate.' => 'Това съобшение има цифров подпис. Кликнете тук, за да се уверите в подписа и да импортирате сертификата.',
+  'SMIME Certificate' => 'SMIME сертификат',
+  'Sign with SMIME' => 'Подпис със SMIME',
+  'Encrypt with SMIME' => 'Криптиране със SMIME',
+  'SMIME settings' => 'SMIME настройки',
+  'Delete certificate' => 'Изтриване сертификат',
+  'Select new PKCS12 Certificate' => 'Изберете нов PKCS12 сертификат',
+  'Always sign messages' => 'Винаги подписва съобщенията',
+  'PKCS12 certificate' => 'PKCS12 сертификат',
+  'To upload a new PKCS12 certificate you must enter your {product_name} password. The {product_name} password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.' => 'За да качите нов PCSK12 сертификат, вие трябва да въведете паролата си за {product_name}. Паролата за {product_name} трябва да бъде различна от паролата за Вашия PCSK12 сертификат заради сигурността. Липсата на парола е забранена.',
+  'Public SMIME certificates' => 'Публични SMIME сертификати',
+  'You have uploaded a certificate already. SMIME support is enabled for this account.' => 'Вече сте качили сертификат. Поддръжката за SMIME е разрешена за този акаунт.',
+  'Download certificate' => 'Изтегли сертификат',
+  'Could not encrypt message because you don\'t have the public certificate for %s. Open a signed message of the recipient and verify the signature to import the public key.' => 'Съобщението не може да се криптира, защото нямате публичен сертификат %s. Отворете подписано съобщение за получател и удостоверете сертификата, за да импортирате публичния ключ.',
+  'This message is encrypted and you don\'t have the private key to decrypt this message.' => 'Съобщението е криптирано и вие нямате публичния ключ, за да го декриптирате.',
+  'The {product_name} password was incorrect.' => 'Паролата за {product_name} е неправилна.',
+  'Your SMIME key password matches your {product_name} password. This is prohibited for security reasons!' => 'Паролата за Вашия SMIME key съвпада с паролата за {product_name}. Заради сигурността това е забранено!',
+  'Your SMIME key has no password. This is prohibited for security reasons!' => 'Вашият SMIME key няма парола. Заради сигурността това е забранено!',
+  'The certificate is invalid!' => 'Сертификатът е невалиден!',
+  'Valid certificate' => 'Валиден сертификат',
+  'Valid certificate but the e-mail of the certificate does not match the sender address of the e-mail.' => 'Сертификатът е валиден, но E-mail-а на сертификата не съвпада с E-mail-а на подателя.',
+  'SMIME Decryption of this message failed.' => 'SMIME декриптирането за това съобщение се провали.',
+  'Serial number' => 'Сериен номер',
+  'Version' => 'Версия',
+  'Issuer' => 'Издател',
+  'Valid to' => 'Важи до',
+  'Valid from' => 'Важи от',
+  'name' => 'SMIME поддръжка',
+  'To upload a new PKCS12 certificate you must enter your Group-Office password. The Group-Office password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.' => 'За да качите нов PCSK12 сертификат, вие трябва да въведете паролата си за {product_name}. Паролата за {product_name} трябва да бъде различна от паролата за Вашия PCSK12 сертификат заради сигурността. Липсата на парола е забранена.',
+  'The Group-Office password was incorrect.' => 'Паролата за {product_name} е неправилна.',
+  'Your SMIME key password matches your Group-Office password. This is prohibited for security reasons!' => 'Паролата за Вашия SMIME key съвпада с паролата за {product_name}. Заради сигурността това е забранено!',
+  'E-mail' => 'E-mail',
+  'Hash' => 'Hash',
+);

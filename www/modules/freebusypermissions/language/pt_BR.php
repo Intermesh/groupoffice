@@ -1,2 +1,2 @@
 <?php
-
+return 1;

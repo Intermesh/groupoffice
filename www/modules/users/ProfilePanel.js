@@ -8,7 +8,7 @@ GO.users.ProfilePanel = function(config)
 	config.autoScroll = true;
 	config.border = false;
 	config.hideLabel = true;
-	if (!config.title) config.title = GO.users.lang.profile;
+	if (!config.title) config.title = t("Profile", "users");
 	config.layout = 'form';
 	config.labelWidth=125;
 	config.defaults={anchor:'98%'};
@@ -16,7 +16,7 @@ GO.users.ProfilePanel = function(config)
 
 	config.items = [{
 		xtype:'fieldset',
-		title:GO.users.lang.personalProfile,
+		title:t("Personal profile", "users"),
 		autoHeight:true,
 		layout:'fit',
 		items:[
@@ -26,7 +26,7 @@ GO.users.ProfilePanel = function(config)
 		]
 	},{
 		xtype:'fieldset',
-		title:GO.users.lang.companyProfile,
+		title:t("Company profile", "users"),
 		autoHeight:true,
 		layout:'fit',
 		items:[

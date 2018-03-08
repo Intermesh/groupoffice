@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: CommentDialog.js 17206 2014-03-26 12:43:55Z mschering $
+ * @version $Id: CommentDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -27,22 +27,16 @@ GO.comments.CommentDialog = function(config){
 	config.autoHeight=true;
 	
 	config.closeAction='hide';
-	config.title= GO.comments.lang.comment;					
+	config.title= t("Comment", "comments");					
 	config.items= this.formPanel;
 	config.focus= focusFirstField.createDelegate(this);
 	config.buttons=[{
-			text: GO.lang['cmdOk'],
+			text: t("Save"),
 			handler: function(){
 				this.submitForm(true);
 			},
 			scope: this
-		},{
-			text: GO.lang['cmdClose'],
-			handler: function(){
-				this.hide();
-			},
-			scope:this
-		}					
+		}				
 	];
 	GO.comments.CommentDialog.superclass.constructor.call(this, config);
 	this.addEvents({'save' : true});	
@@ -70,7 +64,7 @@ Ext.extend(GO.comments.CommentDialog, Ext.Window,{
 		{
 			this.formPanel.load({
 				url : GO.url('comments/comment/load'),
-				waitMsg:GO.lang['waitMsgLoad'],
+				waitMsg:t("Loading..."),
 				success:function(form, action)
 				{
 					GO.comments.CommentDialog.superclass.show.call(this);
@@ -126,7 +120,7 @@ Ext.extend(GO.comments.CommentDialog, Ext.Window,{
 		{
 			url:GO.url('comments/comment/submit'),
 //			params: {'task' : 'save_comment'},
-			waitMsg:GO.lang['waitMsgSave'],
+			waitMsg:t("Saving..."),
 			success:function(form, action){
 				if(hide)
 				{
@@ -153,9 +147,9 @@ Ext.extend(GO.comments.CommentDialog, Ext.Window,{
 			failure: function(form, action) {
 				if(action.failureType == 'client')
 				{					
-					Ext.MessageBox.alert(GO.lang['strError'], GO.lang['strErrorsInForm']);			
+					Ext.MessageBox.alert(t("Error"), t("You have errors in your form. The invalid fields are marked."));			
 				} else {
-					Ext.MessageBox.alert(GO.lang['strError'], action.result.feedback);
+					Ext.MessageBox.alert(t("Error"), action.result.feedback);
 				}
 			},
 			scope: this
@@ -171,20 +165,24 @@ Ext.extend(GO.comments.CommentDialog, Ext.Window,{
 			cls:'go-form-panel',
 			baseParams: {id:0, model_name:''},				
 			items:[{
-					xtype: 'textarea',
-					name: 'comments',
-					anchor: '100%',
-					height: 200,
-					hideLabel:true
-				},
-				this.categoriesCB = new GO.comments.CategoriesComboBox(),
-				this.actionDateField = new Ext.form.DateField({
-					name: 'action_date',
-					fieldLabel: GO.comments.lang['actionDate'],
-					format : GO.settings['date_format'],
-					disabled: true
-				})
-			]				
+					xtype: 'fieldset',
+					items:[{
+						xtype: 'textarea',
+						name: 'comments',
+						anchor: '100%',
+						height: 200,
+						hideLabel:true
+					},
+					this.categoriesCB = new GO.comments.CategoriesComboBox(),
+					this.actionDateField = new Ext.form.DateField({
+						name: 'action_date',
+						fieldLabel: t("Action date", "comments"),
+						format : GO.settings['date_format'],
+						disabled: true
+					})
+				]
+			}]
+							
 		});
 	}
 });
@@ -201,6 +199,8 @@ GO.comments.showCommentDialog = function(comment_id, config){
 	}
 
 	GO.comments.commentDialog.show(comment_id, config);
+	
+	return GO.comments.commentDialog;
 }
 
 GO.comments.browseComments= function (model_id, model_name, action_date)
@@ -217,15 +217,17 @@ GO.comments.browseComments= function (model_id, model_name, action_date)
 		GO.comments.commentsBrowser.show({model_id: model_id, model_name:model_name, action_date: action_date});
 	else
 		GO.comments.commentsBrowser.show({model_id: model_id, model_name:model_name});
+	
+	return GO.comments.commentsBrowser;
 };
 
-
-GO.newMenuItems.push({
-	text: GO.comments.lang.comment,
-	iconCls: 'go-menu-icon-comments',
-	handler:function(item, e){				
-		GO.comments.showCommentDialog(0, {
-			link_config: item.parentMenu.link_config			
-		});
-	}
-});
+//
+//GO.newMenuItems.push({
+//	text: t("Comment", "comments"),
+//	iconCls: 'go-menu-icon-comments',
+//	handler:function(item, e){				
+//		GO.comments.showCommentDialog(0, {
+//			link_config: item.parentMenu.link_config			
+//		});
+//	}
+//});

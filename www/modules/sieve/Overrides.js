@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: Overrides.js 20871 2017-02-21 10:53:37Z mschering $
+ * @version $Id: Overrides.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
@@ -66,7 +66,7 @@ GO.moduleManager.onModuleReady('email',function(){
 						}						
 					},
 					fail: function(response, options, result) {
-						Ext.Msg.alert(GO.sieve.lang.checksieveerror);			
+						Ext.Msg.alert(t("Error while checking for sieve support", "sieve"));			
 					},
 					params: {
 						account_id: this.account_id

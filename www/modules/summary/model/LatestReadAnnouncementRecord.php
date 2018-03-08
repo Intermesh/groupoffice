@@ -17,7 +17,7 @@ class LatestReadAnnouncementRecord extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	public function getLocalizedName(){
-		return GO::t('latestReadAnnouncementRecord','summary');
+		return GO::t("Record of latest read announcement", "summary");
 	}
 	
 	public function tableName(){

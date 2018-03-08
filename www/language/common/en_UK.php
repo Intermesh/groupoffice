@@ -1,5 +1,2 @@
 <?php
-
-
-if(isset($GO_LANGUAGE));
-	
+return array();

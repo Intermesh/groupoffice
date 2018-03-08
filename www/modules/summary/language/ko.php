@@ -1,27 +1,24 @@
 <?php
-
-
-$l["summary"]= '요약';
-$l["noItems"]= 'You don\'t have any items on your startpage.';
-$l["selectPortlet"]= 'Select portlet';
-$l["hotTopics"]= 'News';
-$l["enterRssFeed"]= 'Please enter the RSS feed URL:';
-$l["notes"]= '노트';
-$l["loadingFeed"]= 'Loading Feed...';
-$l["goToPost"]= 'Go to Post';
-$l["today"]= 'Today ';
-$l["dueTime"]="Show until";
-$l["title"]="제목";
-$l["manageAnnouncements"]='알림 관리';
-$l["webFeeds"]='피드 관리';
-$l["type"]='Type';
-$l["summaryType"]='요약';
-$l["rssFeeds"]='Rss Feeds';
-$l["noRssFeeds"]='No RSS feeds have been added.<br />Click the settings button in the top right corner of this window to add feeds.';
-
-$l['name']='시작 페이지';
-$l['description']='Show an overview of different actual items';
-$l['default_rss_url']='http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml';
-$l['default_rss_title']='News';
-$l['announcement']='알림';
-$l['announcements']='알림';
+return array (
+  'You don\'t have any items on your start page.' => 'You don\'t have any items on your startpage.',
+  'Notes' => '노트',
+  'Title' => '제목',
+  'Manage announcements' => '알림 관리',
+  'Manage webfeeds' => '피드 관리',
+  'Summary' => '요약',
+  'Announcement' => '알림',
+  'Announcements' => '알림',
+  'name' => '시작 페이지',
+  'Start page' => '요약',
+  'Select portlet' => 'Select portlet',
+  'News' => 'News',
+  'Please enter the RSS feed URL:' => 'Please enter the RSS feed URL:',
+  'Loading Feed...' => 'Loading Feed...',
+  'Go to Post' => 'Go to Post',
+  'Today ' => 'Today ',
+  'Show until' => 'Show until',
+  'Type' => 'Type',
+  'Rss Feeds' => 'Rss Feeds',
+  'No RSS feeds have been added.<br />Click the settings button in the top right corner of this window to add feeds.' => 'No RSS feeds have been added.<br />Click the settings button in the top right corner of this window to add feeds.',
+  'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml' => 'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml',
+);

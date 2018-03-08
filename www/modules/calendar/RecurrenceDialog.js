@@ -5,42 +5,43 @@ GO.calendar.RecurrenceDialog = function(config){
 		config = {};
 	}
 
-	config.width=400;
+	config.width=450;
 	config.autoHeight=true;
 	config.closeable=true;
+	config.cls = 'go-form-panel';
 	config.closeAction='hide';
 	config.plain=true;
 	config.border=false;
-	config.title=GO.calendar.lang.recurringEvent;
+	config.title=t("Recurring event", "calendar");
 	config.modal=false;
-	config.html=config.forDelete ? GO.calendar.lang.deleteRecurringEvent : GO.calendar.lang.editRecurringEvent;
+	config.html=config.forDelete ? t("Do you want to delete a single instance or all instances of this recurring event?", "calendar") : t("Do you want to edit this occurence or the entire series?", "calendar");
 	config.focus=function(){
 		this.getFooterToolbar().items.get('single').focus();
 	};
 	config.buttons=[{
 		itemId:'single',
-		text: GO.calendar.lang.singleOccurence,
+		text: t("Single occurence", "calendar"),
 		handler: function()
 		{
 			this.fireEvent('single', this);
 		},
 		scope: this
 	},{
-		text: GO.calendar.lang.entireSeries,
+		text: t("Entire series", "calendar"),
 		handler: function()
 		{		
 			this.fireEvent('entire', this);
 		},
 		scope: this
 	},{
-		text: GO.calendar.lang.thisAndFuture,
+		text: t("This and future", "calendar"),
 		handler: function()
 		{
 			this.fireEvent('thisandfuture', this);
 		},
 		scope: this
 //	},{
-//		text: GO.lang.cmdCancel,
+//		text: t("Cancel"),
 //		handler: function()
 //		{
 //			this.fireEvent('cancel', this);

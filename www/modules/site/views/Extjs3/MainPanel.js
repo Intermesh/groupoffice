@@ -51,7 +51,7 @@ GO.site.MainPanel = function(config){
 	this.reloadButton = new Ext.Button({
 		iconCls: 'btn-refresh',
 		itemId:'refresh',
-		text: GO.lang.cmdRefresh,
+		text: t("Refresh"),
 		cls: 'x-btn-text-icon'
 	});
 	
@@ -63,13 +63,13 @@ GO.site.MainPanel = function(config){
 			cls:'go-head-tb',
 			items: [{
 					xtype:'htmlcomponent',
-					html:GO.site.lang.name,
+					html:t("Website Manager", "site"),
 					cls:'go-module-title-tbar'
 				},this.reloadButton
 			]
 	});
 	
-//	if (GO.files) {
+//	if(go.ModuleManager.isAvailable("files")) {
 //		this.fileBrowserButton = new GO.files.FileBrowserButton({
 //			model_name:"GO\\Site\\Model\\Site"
 //		});
@@ -106,7 +106,7 @@ Ext.extend(GO.site.MainPanel, Ext.Panel,{
 });
 
 GO.moduleManager.addModule('site', GO.site.MainPanel, {
-	title : GO.site.lang.name,
+	title : t("Website Manager", "site"),
 	iconCls : 'go-tab-icon-site'
 });
 

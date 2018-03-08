@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: ListGrid.js 20164 2016-06-23 13:31:47Z mschering $
+ * @version $Id: ListGrid.js 22335 2018-02-06 16:25:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -74,12 +74,12 @@ GO.calendar.ListGrid = function(config)
   
 	config.columns=[
 	{
-		header:GO.lang.strDay,
+		header:t("Day"),
 		dataIndex: 'day',
 		menuDisabled:true
 	},
 	{
-		header:GO.lang.strTime,
+		header:t("Time"),
 		dataIndex: 'time',
 		width:90,
 		renderer: function(v, metadata, record)
@@ -109,7 +109,7 @@ GO.calendar.ListGrid = function(config)
 	},	
 	{
 		id:'listview-calendar-name-heading',
-		header:GO.lang.strName,
+		header:t("Name"),
 		dataIndex: 'name',
 		renderer: this.renderName,
 		menuDisabled:true
@@ -117,8 +117,8 @@ GO.calendar.ListGrid = function(config)
 		
 	config.view=  new Ext.grid.GroupingView({
 		hideGroupedColumn:true,
-		groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "'+GO.lang.items+'" : "'+GO.lang.item+'"]})',
-		emptyText: GO.calendar.lang.noAppointmentsToDisplay,
+		groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "'+t("items")+'" : "'+t("item")+'"]})',
+		emptyText: t("No appointments to display", "calendar"),
 		showGroupName:false
 	});
 	config.sm=new Ext.grid.RowSelectionModel({
@@ -210,7 +210,7 @@ Ext.extend(GO.calendar.ListGrid, Ext.grid.GridPanel, {
 				});
 			}else	if(record.data.contact_id)
 			{
-				GO.linkHandlers["GO\\Addressbook\\Model\\Contact"].call(this, record.data.contact_id);
+				go.Router.goto("#addressbook/contact/"+record.data.contact_id);
 			}
 			
 		}, this);
@@ -226,7 +226,7 @@ Ext.extend(GO.calendar.ListGrid, Ext.grid.GridPanel, {
 			var theEventData = grid.getStore().getAt(rowIndex).data;
 			console.log(theEventData);
 			if (theEventData.model_name=='GO\\Tasks\\Model\\Task') {
-				if (GO.tasks) {
+				if(go.ModuleManager.isAvailable("tasks")) {
 					if (!this.taskContextMenu)
 						this.taskContextMenu = new GO.calendar.TaskContextMenu();
 
@@ -306,7 +306,7 @@ Ext.extend(GO.calendar.ListGrid, Ext.grid.GridPanel, {
 			this.periodDisplay = '1 ';
 		}
 
-		this.periodDisplay = GO.calendar.lang.quarterShort+this.periodDisplay+year;
+		this.periodDisplay = t("Q", "calendar")+this.periodDisplay+year;
 		
 		this.startDate=Date.parseDate(dateStr, this.dateFormat);
 		this.endDate = this.nextDate();		

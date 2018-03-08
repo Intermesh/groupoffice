@@ -4,70 +4,44 @@ Ext.ns('GO.query');
 GO.query.QueryPanel = Ext.extend(Ext.Panel , {
 	autoScroll: true,
 	layout: 'anchor',
-	style: {
-			overflow: 'auto'
-	},
+	style: {overflow: 'auto'},
 
-	
 	constructor: function (config) {
-		if(!config) {
-			config = {};
-		}
-		
+		config = config || {};
 		
 		config.fieldStore = new GO.data.JsonStore({
-				//url: GO.url("core/modelAttributes"),
-				url:config.modelAttributesUrl,
-				id:'name',
-				baseParams:{
-					modelName: config.modelName,
-					exclude: config.modelExcludeAttributes
-				},
-				fields: ['name','label','gotype'],
-				remoteSort: true,
-				autoLoad: true
-			});
-		var idRecord = new Ext.data.Record({'name':'t.id','label':'ID','gotype':'numberfield'},'id');
-		config.fieldStore.on('load',function(){
-			config.fieldStore.insert(0,[idRecord]);
-		},this);
-		
+			//url: GO.url("core/modelAttributes"),
+			url:config.modelAttributesUrl,
+			id:'name',
+			baseParams:{
+				modelName: config.modelName,
+				exclude: config.modelExcludeAttributes
+			},
+			fields: ['name','label','gotype'],
+			remoteSort: true,
+			autoLoad: true
+		});
+//		var idRecord = new Ext.data.Record({'name':'t.id','label':'ID','gotype':'numberfield'},'id');
+//		config.fieldStore.on('load',function(){
+//			config.fieldStore.insert(0,[idRecord]);
+//		},this);
 		
 		config.criteriaRecord =  Ext.data.Record.create([
-		{
-			name: 'andor',
-			type: 'string'
-		},
-		{
-			name: 'gotype',
-			type: 'string'
-		},
-		{
-			name: 'field',
-			type: 'string'
-		},
-		{
-			name: 'comparator',
-			type: 'string'
-		},
-		{
-			name: 'value'
-		},
-		{
-			name: 'start_group',
-			type:'string'
-		}
-	]);
+			{name: 'andor',type: 'string'},
+			{name: 'gotype',type: 'string'},
+			{name: 'field',type: 'string'},
+			{name: 'comparator',type: 'string'},
+			{name: 'value'},
+			{name: 'start_group',type:'string'}
+		]);
 		
 		
 		//add furst criteri item
-		config.title = GO.lang['strNew'];
+		config.title = t("New");
 		config.tbar = [
 			new Ext.Button({
-				iconCls: 'btn-add',
-				text: GO.lang['addQueryArgument'],
-//				text: 'asd'
-				cls: 'x-btn-text-icon',
+				iconCls: 'ic-add',
+				text: t("Add query argument"),
 				handler: function(){
 					this.newCriteria();
 				},
@@ -75,9 +49,8 @@ GO.query.QueryPanel = Ext.extend(Ext.Panel , {
 			}),
 			'->',
 			new Ext.Button({
-				iconCls: 'btn-delete',
-				text: GO.lang['cmdReset'],
-				cls: 'x-btn-text-icon',
+				iconCls: 'ic-delete',
+				text: t("Reset"),
 				handler: function(){
 					this.reset();
 				},
@@ -87,21 +60,20 @@ GO.query.QueryPanel = Ext.extend(Ext.Panel , {
 		
 		
 		config.criteriaStore = new GO.data.JsonStore({
-				fields: ['andor','field','comparator', 'value','start_group','gotype','rawValue','rawFieldLabel'],
+			fields: ['andor','field','comparator', 'value','start_group','gotype','rawValue','rawFieldLabel'],
 //				remoteSort: true,
-				listeners: {
-					scope: this,
-					add: function( store, records, options ) {
-						
-						Ext.each(records, function(record) {
-							this.addCriteriaPanel(record);
-						}, this);
-						
-					}
+			listeners: {
+				scope: this,
+				add: function( store, records, options ) {
+
+					Ext.each(records, function(record) {
+						this.addCriteriaPanel(record);
+					}, this);
+
 				}
-			});
-		
-		
+			}
+		});
+
 		GO.query.QueryPanel.superclass.constructor.call(this, config);
 		
 	},
@@ -110,31 +82,22 @@ GO.query.QueryPanel = Ext.extend(Ext.Panel , {
 	afterRender: function () {
 		
 		GO.query.QueryPanel.superclass.afterRender.call(this);
-		
-		
-		this.newCriteria();
 	},
 	
-	
 	addCriteriaPanel: function(record) {
-		
 		
 		var criteriaPanel = new GO.query.CriteriaFormPanel({
 			fieldStore: this.fieldStore,
 			trackResetOnLoad: true,
-//			record: rec,
-			buttons: [
+			items: [
 				new Ext.Button({
-					iconCls: 'btn-delete',
-					text: GO.lang.cmdDelete,
-					cls: 'x-btn-text-icon',
-					handler: function(){
-						
+					iconCls: 'ic-close',
+					tooltip: t("Delete"),
+					handler: function() {
 						// remove the criteria form panel
 						this.criteriaStore.remove(record);
 						this.remove(criteriaPanel);
 						this.doLayout();
-						
 					},
 					scope: this
 				})
@@ -144,18 +107,16 @@ GO.query.QueryPanel = Ext.extend(Ext.Panel , {
 				scope: this,
 				clientvalidation: function(form, valid) {
 					
-						var formVal = form.getValues();
-						
-						record.set('andor', formVal.andor);
-						record.set('field', formVal.field);
-						record.set('comparator', formVal.comparator);
-						record.set('value', formVal.value);
-						record.set('start_group', formVal.start_group);
-						record.set('gotype', formVal.gotype);
-						record.set('rawValue', formVal.rawValue);
-						record.set('rawFieldLabel', formVal.rawFieldLabel);
-						
-						
+					var formVal = form.getValues();
+
+					record.set('andor', formVal.andor);
+					record.set('field', formVal.field);
+					record.set('comparator', formVal.comparator);
+					record.set('value', formVal.value);
+					record.set('start_group', formVal.start_group);
+					record.set('gotype', formVal.gotype);
+					record.set('rawValue', formVal.rawValue);
+					record.set('rawFieldLabel', formVal.rawFieldLabel);
 				}
 			}
 		});
@@ -203,7 +164,6 @@ GO.query.QueryPanel = Ext.extend(Ext.Panel , {
 			data.push(rec.data)
 		});
 		
-		
 		return data;
 	},
 	
@@ -215,14 +175,11 @@ GO.query.QueryPanel = Ext.extend(Ext.Panel , {
 	
 	reset: function() {
 		this.clear();
-					
-		this.newCriteria();
-		this.setQueryTitel(GO.lang['strNew'])
+		this.setQueryTitel(t("New"))
 	},
 	
 	setQueryTitel: function (value) {
 		this.setTitle(value);
 	}
-	
 	
 });

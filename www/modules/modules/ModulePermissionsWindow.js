@@ -3,7 +3,7 @@ GO.modules.ModulePermissionsWindow = Ext.extend(GO.Window,{
 	module_id : '',
 	initComponent : function(){
 		this.permissionsTab = new GO.grid.PermissionsPanel({
-					title : GO.users.lang.useModule,
+					title : t("Use", "users"),
 					levels:[
 						GO.permissionLevels.read,
 						GO.permissionLevels.manage
@@ -11,7 +11,7 @@ GO.modules.ModulePermissionsWindow = Ext.extend(GO.Window,{
 				});
 				
 		Ext.apply(this,{
-			title : GO.lang['strPermissions'],
+			title : t("Permissions"),
 			layout : 'fit',
 			height : 600,
 			width : 440,
@@ -20,7 +20,7 @@ GO.modules.ModulePermissionsWindow = Ext.extend(GO.Window,{
 			closeAction:'hide',
 			items : [this.permissionsTab],
 			buttons : [{
-				text : GO.lang['cmdOk'],
+				text : t("Ok"),
 				handler : function() {
 					GO.request({
 						timeout : 2 * 60 * 1000,
@@ -44,7 +44,7 @@ GO.modules.ModulePermissionsWindow = Ext.extend(GO.Window,{
 	show: function(moduleId, name, acl_id) {
 		this.module_id=moduleId;
 		
-		this.setTitle(GO.lang['strPermissions'] + ' ' + name);		
+		this.setTitle(t("Permissions") + ' ' + name);		
 		GO.modules.ModulePermissionsWindow.superclass.show.call(this);		
 		this.permissionsTab.setAcl(acl_id);		
 	}

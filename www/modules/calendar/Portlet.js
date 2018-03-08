@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: Portlet.js 16920 2014-02-26 14:44:19Z mschering $
+ * @version $Id: Portlet.js 22337 2018-02-07 08:23:15Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -63,14 +63,14 @@ GO.calendar.SummaryGroupPanel = function(config)
 	config.paging=false,			
 	config.autoExpandColumn='summary-calendar-name-heading';
 
-
+	config.cls = "go-grid3-hide-headers";
 	config.columns=[
 	{
-		header:GO.lang.strDay,
+		header:t("Day"),
 		dataIndex: 'day'
 	},
 	{
-		header:GO.lang.strTime,
+		header:t("Time"),
 		dataIndex: 'time',
 		width:100,
 		align:'right',
@@ -78,7 +78,7 @@ GO.calendar.SummaryGroupPanel = function(config)
 	},
 	{
 		id:'summary-calendar-name-heading',
-		header:GO.lang.strName,
+		header:t("Name"),
 		dataIndex: 'name',
 		renderer:function(value, p, record){
 			p.attr = 'ext:qtip="'+Ext.util.Format.htmlEncode(GO.calendar.formatQtip(record.data))+'"';
@@ -86,7 +86,7 @@ GO.calendar.SummaryGroupPanel = function(config)
 		},
 		groupable:false
 	},{
-		header:GO.calendar.lang.calendar,
+		header:t("Calendar", "calendar"),
 		dataIndex: 'calendar_name',
 		width:140
 	}];
@@ -94,8 +94,8 @@ GO.calendar.SummaryGroupPanel = function(config)
 	config.view=  new Ext.grid.GroupingView({
 		scrollOffset: 2,
 		hideGroupedColumn:true,
-		groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "'+GO.lang.items+'" : "'+GO.lang.item+'"]})',
-		emptyText: GO.calendar.lang.noAppointmentsToDisplay,
+		groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "'+t("items")+'" : "'+t("item")+'"]})',
+		emptyText: t("No appointments to display", "calendar"),
 		showGroupName:false
 	});
 	config.sm=new Ext.grid.RowSelectionModel();
@@ -126,18 +126,16 @@ Ext.extend(GO.calendar.SummaryGroupPanel, Ext.grid.GridPanel, {
 			scope:this
 		});		
 
-		this.on("rowdblclick", function(grid, rowClicked, e){
+		this.on("rowclick", function(grid, rowClicked, e){
 
 			var record = grid.store.getAt(rowClicked);
 
 			if(record.data.contact_id)
 			{
-				GO.linkHandlers["GO\\Addressbook\\Model\\Contact"].call(this, record.data.contact_id);
+				go.Router.goto('addressbook/contact/' + record.data.contact_id);
 			}else
 			{				
-				GO.calendar.showEventDialog({
-					event_id: record.data.event_id
-				});
+				go.Router.goto('calendar/event/' + record.data.event_id);
 			}
 		}, this);
 		
@@ -152,7 +150,7 @@ Ext.extend(GO.calendar.SummaryGroupPanel, Ext.grid.GridPanel, {
 
 GO.mainLayout.onReady(function(){
 	
-	if(GO.summary)
+	if(go.ModuleManager.isAvailable("summary"))
 	{
 		var calGrid = new GO.calendar.SummaryGroupPanel({
 			//state causes it to load: id: 'summary-calendar-grid'
@@ -161,7 +159,7 @@ GO.mainLayout.onReady(function(){
 		GO.summary.portlets['portlet-calendar']=new GO.summary.Portlet({
 			id: 'portlet-calendar',
 			//iconCls: 'go-module-icon-calendar',
-			title: GO.calendar.lang.appointments,
+			title: t("Appointments", "calendar"),
 			layout:'fit',
 			tools: [{
 				id: 'gear',
@@ -170,9 +168,9 @@ GO.mainLayout.onReady(function(){
 					{
 						this.selectCalendarWin = new GO.base.model.multiselect.dialog({
 							url:'calendar/portlet',
-							columns:[{ header: GO.lang['strName'], dataIndex: 'name', sortable: true }],
+							columns:[{ header: t("Name"), dataIndex: 'name', sortable: true }],
 							fields:['id','name'],
-							title:GO.calendar.lang.visibleCalendars,
+							title:t("Visible calendars", "calendar"),
 							model_id:GO.settings.user_id,
 							listeners:{
 								hide:function(){
@@ -191,10 +189,10 @@ GO.mainLayout.onReady(function(){
 //							items:this.PortletSettings =  new GO.calendar.PortletSettings(),
 //							width:700,
 //							height:400,
-//							title:GO.calendar.lang.visibleCalendars,
+//							title:t("Visible calendars", "calendar"),
 //							closeAction:'hide',
 //							buttons:[{
-//								text: GO.lang.cmdSave,
+//								text: t("Save"),
 //								handler: function(){
 //									var params={
 //										'task' : 'save_portlet'
@@ -208,7 +206,7 @@ GO.mainLayout.onReady(function(){
 //										callback: function(options, success, response){
 //											if(!success)
 //											{
-//												Ext.MessageBox.alert(GO.lang['strError'], GO.lang['strRequestError']);
+//												Ext.MessageBox.alert(t("Error"), t("Could not connect to the server. Please check your internet connection."));
 //											}else
 //											{
 //												//var responseParams = Ext.decode(response.responseText);

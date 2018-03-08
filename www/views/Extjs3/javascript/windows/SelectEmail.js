@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: SelectEmail.js 20201 2016-07-07 09:25:28Z mschering $
+ * @version $Id: SelectEmail.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  * 
@@ -49,7 +49,7 @@ GO.dialog.SelectEmail = function(config) {
 
 	this.usersGrid = new GO.grid.GridPanel({
 		id : 'select-users-grid',
-		title : GO.lang.users,
+		title : t("Users"),
 		paging : true,
 		border : false,
 		store : this.usersStore,
@@ -58,18 +58,18 @@ GO.dialog.SelectEmail = function(config) {
 			forceFit : true
 		}),
 		columns : [{
-			header : GO.lang['strName'],
+			header : t("Name"),
 			dataIndex : 'name',
 			css : 'white-space:normal;',
 			sortable : true
 		}, {
-			header : GO.lang['strEmail'],
+			header : t("E-mail"),
 			dataIndex : 'email',
 			css : 'white-space:normal;',
 			sortable : true
 		}],
 		sm : new Ext.grid.RowSelectionModel(),
-		tbar : [GO.lang['strSearch'] + ': ', ' ', this.usersSearchField]
+		tbar : [t("Search") + ': ', ' ', this.usersSearchField]
 	});
 
 	this.usersGrid.on('show', function() {
@@ -87,7 +87,7 @@ GO.dialog.SelectEmail = function(config) {
 
 	items.push(this.usersGrid);
 
-	if (GO.addressbook) {
+	if(go.ModuleManager.isAvailable("addressbook")) {
 		this.contactsStore = new GO.data.JsonStore({
 			url : GO.url("addressbook/contact/searchEmail"),
 			id : 'email',
@@ -102,7 +102,7 @@ GO.dialog.SelectEmail = function(config) {
 
 		this.contactsGrid = new GO.grid.GridPanel({
 			id : 'select-contacts-grid',
-			title : GO.addressbook.lang.contacts,
+			title : t("Contacts", "addressbook"),
 			paging : true,
 			border : false,
 			store : this.contactsStore,
@@ -111,18 +111,18 @@ GO.dialog.SelectEmail = function(config) {
 				forceFit : true
 			}),
 			columns : [{
-				header : GO.lang['strName'],
+				header : t("Name"),
 				dataIndex : 'name',
 				css : 'white-space:normal;',
 				sortable : true
 			}, {
-				header : GO.lang['strEmail'],
+				header : t("E-mail"),
 				dataIndex : 'email',
 				css : 'white-space:normal;',
 				sortable : true
 			}],
 			sm : new Ext.grid.RowSelectionModel(),
-			tbar : [GO.lang['strSearch'] + ': ', ' ',
+			tbar : [t("Search") + ': ', ' ',
 			this.contactsSearchField]
 		});
 
@@ -157,7 +157,7 @@ GO.dialog.SelectEmail = function(config) {
 
 		this.companyGrid = new GO.grid.GridPanel({
 			id : 'select-companies-grid',
-			title : GO.addressbook.lang.companies,
+			title : t("Companies", "addressbook"),
 			paging : true,
 			border : false,
 			store : this.companiesStore,
@@ -166,18 +166,18 @@ GO.dialog.SelectEmail = function(config) {
 				forceFit : true
 			}),
 			columns : [{
-				header : GO.lang['strName'],
+				header : t("Name"),
 				dataIndex : 'name',
 				css : 'white-space:normal;',
 				sortable : true
 			}, {
-				header : GO.lang['strEmail'],
+				header : t("E-mail"),
 				dataIndex : 'email',
 				css : 'white-space:normal;',
 				sortable : true
 			}],
 			sm : new Ext.grid.RowSelectionModel(),
-			tbar : [GO.lang['strSearch'] + ': ', ' ',
+			tbar : [t("Search") + ': ', ' ',
 			this.companySearchField]
 		});
 
@@ -192,7 +192,7 @@ GO.dialog.SelectEmail = function(config) {
 		items.push(this.contactsGrid);
 		items.push(this.companyGrid);
 
-		if (GO.addressbook) {
+		if(go.ModuleManager.isAvailable("addressbook")) {
 			
 			this.addresslistsStore = GO.addressbook.readableAddresslistsStore;
 			
@@ -203,7 +203,7 @@ GO.dialog.SelectEmail = function(config) {
 			
 			this.mailingsGrid = new GO.grid.GridPanel({
 				id : 'select-mailings-grid',
-				title : GO.addressbook.lang.cmdPanelMailings,
+				title : t("Address lists", "addressbook"),
 				paging : true,
 				border : false,
 				store : this.addresslistsStore,
@@ -212,14 +212,14 @@ GO.dialog.SelectEmail = function(config) {
 					forceFit : true
 				}),
 				columns : [{
-					header : GO.lang['strName'],
+					header : t("Name"),
 					dataIndex : 'name',
 					css : 'white-space:normal;',
 					sortable : true
 				}],
 				sm : new Ext.grid.RowSelectionModel(),
 				tbar : [
-					GO.lang['strSearch'] + ': ', ' ',
+					t("Search") + ': ', ' ',
 					this.addresslistsSearchField
 				]
 			});
@@ -254,7 +254,7 @@ GO.dialog.SelectEmail = function(config) {
 
 	this.userGroupsGrid = new GO.grid.GridPanel({
 		id : 'select-usergroups-grid',
-		title : GO.lang.userGroups,
+		title : t("User groups"),
 		paging : true,
 		border : false,
 		store : this.userGroupsStore,
@@ -263,19 +263,19 @@ GO.dialog.SelectEmail = function(config) {
 			forceFit : true
 		}),
 		columns : [{
-			header : GO.lang['strName'],
+			header : t("Name"),
 			dataIndex : 'name',
 			css : 'white-space:normal;',
 			sortable : true
 		}, {
-			header : GO.lang['strOwner'],
+			header : t("Owner"),
 			dataIndex : 'user_name',
 			css : 'white-space:normal;',
 			sortable : true
 		}],
 		sm : new Ext.grid.RowSelectionModel(),
 		tbar : [
-					GO.lang['strSearch'] + ': ', ' ',
+					t("Search") + ': ', ' ',
 					this.userGroupsSearchField
 				]
 	});
@@ -301,22 +301,22 @@ GO.dialog.SelectEmail = function(config) {
 		height : 400,
 		width : 600,
 		closeAction : 'hide',
-		title : GO.lang['strSelectEmail'],
+		title : t("strSelectEmail"),
 		items : this.tabPanel,
 		buttons : [{
-			text : GO.lang['cmdOk'],
+			text : t("Ok"),
 			handler : function() {
 				this.callHandler(true);
 			},
 			scope : this
 		}, {
-			text : GO.lang['cmdAdd'],
+			text : t("Add"),
 			handler : function() {
 				this.callHandler(false);
 			},
 			scope : this
 		}, {
-			text : GO.lang['cmdClose'],
+			text : t("Close"),
 			handler : function() {
 				this.hide();
 			},

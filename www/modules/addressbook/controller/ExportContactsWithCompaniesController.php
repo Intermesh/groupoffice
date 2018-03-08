@@ -97,9 +97,9 @@ class ExportContactsWithCompaniesController extends \GO\Base\Controller\Abstract
 						foreach($compAttrs->getAttributes() as $cattr=>$cval){
 
 								if (!$headerPrinted) {
-									$header[GO::t('contacts','addressbook').$cattr] = GO::t('contacts','addressbook').':'.$compAttrs->getAttributeLabel($cattr);
+									$header[GO::t("Contacts", "addressbook").$cattr] = GO::t("Contacts", "addressbook").':'.$compAttrs->getAttributeLabel($cattr);
 								}
-								$record[GO::t('contacts','addressbook').$cattr] = $compAttrs->{$cattr};
+								$record[GO::t("Contacts", "addressbook").$cattr] = $compAttrs->{$cattr};
 							}
 
 						}
@@ -119,9 +119,9 @@ class ExportContactsWithCompaniesController extends \GO\Base\Controller\Abstract
 					foreach($compAttrs as $cattr=>$cval){
 
 						if (!$headerPrinted) {
-							$header[GO::t('company','addressbook').$cattr] = GO::t('company','addressbook').':'.$m->company->getAttributeLabel($cattr);
+							$header[GO::t("Company", "addressbook").$cattr] = GO::t("Company", "addressbook").':'.$m->company->getAttributeLabel($cattr);
 						}
-						$record[GO::t('company','addressbook').$cattr] = $m->company->{$cattr};
+						$record[GO::t("Company", "addressbook").$cattr] = $m->company->{$cattr};
 					}
 			
 				}

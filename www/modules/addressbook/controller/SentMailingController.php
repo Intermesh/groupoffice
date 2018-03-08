@@ -54,7 +54,7 @@ class SentMailingController extends \GO\Base\Controller\AbstractModelController 
 
 	protected function actionSend($params) {
 		if (empty($params['addresslist_id'])) {
-			throw new \Exception(\GO::t('feedbackNoReciepent', 'email'));
+			throw new \Exception(\GO::t("You didn't enter a recipient", "email"));
 		} else {
 			try {
 				//$params = $this->_convertOldParams($params);
@@ -70,7 +70,7 @@ class SentMailingController extends \GO\Base\Controller\AbstractModelController 
 						|| empty(\GO::config()->campaigns_from) || empty(\GO::config()->campaigns_max_mails_per_period)
 					)
 				) {
-					throw new \Exception(\GO::t('mustSetCampaignsConfig','campaigns'));
+					throw new \Exception(\GO::t("Could not send the campaigns mailing because one or more of the following config.php settings were not set:<br />\$config['campaigns_imap_user'], \$config['campaigns_imap_pass'], \$config['campaigns_imap_server'], \$config['campaigns_imap_port'],<br />\$config['campaigns_smtp_user'], \$config['campaigns_smtp_pass'], \$config['campaigns_smtp_server'], \$config['campaigns_smtp_port'],<br />\$config['campaigns_from'], \$config['campaigns_max_mails_per_period'].", "campaigns"));
 				}
 					
 				$message = \GO\Base\Mail\Message::newInstance();
@@ -103,7 +103,7 @@ class SentMailingController extends \GO\Base\Controller\AbstractModelController 
 
 				$response['success'] = true;
 			} catch (\Exception $e) {
-				$response['feedback'] = \GO::t('feedbackUnexpectedError', 'email') . $e->getMessage();
+				$response['feedback'] = \GO::t("There was an unexpected problem building the email: ", "email") . $e->getMessage();
 			}
 		}
 		return $response;
@@ -275,7 +275,7 @@ class SentMailingController extends \GO\Base\Controller\AbstractModelController 
 				$templateModel = \GO\Addressbook\Model\Template::model();
 				$templateModel->htmlSpecialChars = false;
 				$body = $templateModel->replaceCustomTags($body,array(				
-					'unsubscribe_link'=>'<a href="'.$unsubscribeHref.'" target="_blank">'.\GO::t("unsubscription","addressbook").'</a>'
+					'unsubscribe_link'=>'<a href="'.$unsubscribeHref.'" target="_blank">'.\GO::t("Click here to unsubscribe from this address list.", "addressbook").'</a>'
 				), true);
 				$templateModel->htmlSpecialChars = true;
 
@@ -301,7 +301,7 @@ class SentMailingController extends \GO\Base\Controller\AbstractModelController 
 						if ($mailing->campaign_id>0 && $nSentMails>=\GO::config()->campaigns_max_mails_per_period) {
 							$this->_pauseMailing($mailing->id);
 							echo "Error for ".$contact->firstEmail.": \n";
-							echo str_replace('%maxMails',\GO::config()->campaigns_max_mails_per_period,\GO::t('sentMailLimitReached','campaigns'));
+							echo str_replace('%maxMails',\GO::config()->campaigns_max_mails_per_period,\GO::t("Maximum number of campaign emails for the current period has been reached. The limit is: %maxMails. This mailing has been paused.", "campaigns"));
 							exit();
 						}
 
@@ -343,7 +343,7 @@ class SentMailingController extends \GO\Base\Controller\AbstractModelController 
 				$body = str_replace('%unsubscribe_href%', $unsubscribeHref, $bodyWithTags); //curly brackets don't work inside links in browser wysiwyg editors.
 
 				$body = \GO\Addressbook\Model\Template::model()->replaceCustomTags($body,array(				
-					'unsubscribe_link'=>'<a href="'.$unsubscribeHref.'">'.\GO::t("unsubscription","addressbook").'</a>'
+					'unsubscribe_link'=>'<a href="'.$unsubscribeHref.'">'.\GO::t("Click here to unsubscribe from this address list.", "addressbook").'</a>'
 				), true);
 
 				try{
@@ -368,7 +368,7 @@ class SentMailingController extends \GO\Base\Controller\AbstractModelController 
 						if ($mailing->campaign_id>0 && $nSentMails>=\GO::config()->campaigns_max_mails_per_period) {
 							$this->_pauseMailing($mailing->id);
 							echo "Error for ".$contact->firstEmail.": \n";
-							echo str_replace('%maxMails',\GO::config()->campaigns_max_mails_per_period,\GO::t('sentMailLimitReached','campaigns'));
+							echo str_replace('%maxMails',\GO::config()->campaigns_max_mails_per_period,\GO::t("Maximum number of campaign emails for the current period has been reached. The limit is: %maxMails. This mailing has been paused.", "campaigns"));
 							exit();
 						}
 

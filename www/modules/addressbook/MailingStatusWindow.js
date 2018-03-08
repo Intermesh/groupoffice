@@ -2,7 +2,7 @@ GO.addressbook.MailingStatusWindow = function(config){
 
 	config = config || {};
 
-	config.title=GO.addressbook.lang.sentMailings;
+	config.title=t("Sent newsletters", "addressbook");
 	config.id='ml-sent-mailings';
 
 	config.width=770;

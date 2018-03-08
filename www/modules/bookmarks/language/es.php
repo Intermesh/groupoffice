@@ -1,16 +1,19 @@
 <?php
-$l["bookmarks"]='Marcadores';
-$l["bookmark"]='Marcador';
-$l["administrateCategories"]='Administrar categorías';
-$l["category"]= 'Categoría';
-$l["title"]='Título';
-$l["extern"]='Abrir en una nueva pestaña del navegador';
-$l["behaveAsModule"]='Comportarse como un módulo (requiere recargar el navegador)';
-$l['description']='Descripción';
-$l["logo"]='Icono';
-$l["chooseIcon"]='Elige un icono para el enlace';
-$l["clearLogo"]='Quitar Icono';
-$l["uploadLogo"]='Subir Icono';
-$l["showAll"]='Mostrar todo';
-$l["thumbnails"]='Miniaturas';
-$l["sharedCategory"]='Categoría compartida';
+return array (
+  'Bookmark' => 'Marcador',
+  'Administrate categories' => 'Administrar categorías',
+  'Category' => 'Categoría',
+  'Title' => 'Título',
+  'Open in new browser tab' => 'Abrir en una nueva pestaña del navegador',
+  'Behave as a module (Browser reload required)' => 'Comportarse como un módulo (requiere recargar el navegador)',
+  'Logo' => 'Icono',
+  'Choose icon for bookmark' => 'Elige un icono para el enlace',
+  'Clear Logo' => 'Quitar Icono',
+  'Upload Logo' => 'Subir Icono',
+  'Show all' => 'Mostrar todo',
+  'Thumbnails' => 'Miniaturas',
+  'Shared category' => 'Categoría compartida',
+  'name' => 'Marcadores',
+  'description' => 'Descripción',
+  'Bookmarks' => 'Marcadores',
+);

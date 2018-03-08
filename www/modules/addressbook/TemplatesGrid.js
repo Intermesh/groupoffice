@@ -23,7 +23,7 @@ GO.addressbook.TemplatesGrid = function(config)
 	config.sm= new Ext.grid.RowSelectionModel({
 		singleSelect:false
 	});
-	config.title= GO.addressbook.lang['cmdPanelTemplate'];
+	config.title= t("Templates", "addressbook");
 	
 	config.store = new GO.data.JsonStore({
 		url: GO.url('addressbook/template/store'),
@@ -38,7 +38,7 @@ GO.addressbook.TemplatesGrid = function(config)
 	config.store.setDefaultSort('name', 'ASC');
 	if (GO.util.empty(config.noDocumentTemplates)) {
 		config.store.on('load', function(){
-			if(GO.documenttemplates)
+			if(go.ModuleManager.isAvailable("documenttemplates"))
 				GO.documenttemplates.ooTemplatesStore.load();
 		}, this);
 	} else {
@@ -48,9 +48,8 @@ GO.addressbook.TemplatesGrid = function(config)
 	}
 	
 	var tbarItems = [{
-		iconCls: 'btn-add',
-		text: GO.addressbook.lang['cmdAddEmailTemplate'],
-		cls: 'x-btn-text-icon',
+		iconCls: 'ic-add',
+		text: t("Add e-mail template", "addressbook"),
 //		disabled:!GO.settings.modules.addressbook.write_permission,
 		handler: function(){
 
@@ -61,10 +60,9 @@ GO.addressbook.TemplatesGrid = function(config)
 	
 	if (GO.util.empty(config.noDocumentTemplates)) {
 		tbarItems.push({
-			iconCls: 'btn-add',
-			text: GO.addressbook.lang.addDocumentTemplate,
+			iconCls: 'ic-add',
+			text: t("Add document template", "addressbook"),
 //			disabled:!GO.settings.modules.addressbook.write_permission,
-			cls: 'x-btn-text-icon',
 			handler: function(){
 				this.showOOTemplateDialog();
 			},
@@ -73,22 +71,17 @@ GO.addressbook.TemplatesGrid = function(config)
 	}
 	
 	tbarItems.push({
-		iconCls: 'btn-delete',
-		text: GO.lang['cmdDelete'],
-		cls: 'x-btn-text-icon',
+		iconCls: 'ic-delete',
+		text: t("Delete"),
 		disabled:!GO.settings.modules.addressbook.write_permission,
 		handler: function(){
 			this.deleteSelected();
 		},
 		scope: this
-	},
-	'-'
-	,
-		this.searchField = new GO.form.SearchField({
-			store: config.store,
-			width:150,
-			emptyText: GO.lang.strSearch
-		})
+	},'->',{
+		xtype:'tbsearch',
+		store: config.store
+	}
 	);
 	
 	config.tbar= tbarItems;
@@ -99,20 +92,20 @@ GO.addressbook.TemplatesGrid = function(config)
 		},
 		columns:[
 		{
-			header: GO.lang['strName'],
+			header: t("Name"),
 			dataIndex: 'name'
 		},
 		{
-			header: GO.lang.strOwner,
-			dataIndex: 'owner' ,
-			width: 300,
-			sortable: false
-		},
-		{
-			header: GO.addressbook.lang['cmdType'],
+			header: t("Type", "addressbook"),
 			dataIndex: 'type' ,
 			renderer: this.typeRenderer.createDelegate(this),
 			width: 100
+		},
+		{
+			header: t("Owner"),
+			dataIndex: 'owner' ,
+			width: 200,
+			sortable: false
 		}
 		]
 	});
@@ -121,7 +114,7 @@ GO.addressbook.TemplatesGrid = function(config)
 	config.view=new Ext.grid.GridView({
 		autoFill: true,
 		forceFit: true,
-		emptyText: GO.lang.strNoItems
+		emptyText: t("No items to display")
 	});
 	config.cm= columnModel;
 	config.border= false;
@@ -156,13 +149,13 @@ GO.addressbook.TemplatesGrid = function(config)
 Ext.extend(GO.addressbook.TemplatesGrid, GO.grid.GridPanel,{
 	templateType : {
 		'0' : 'E-mail',
-		'1' : GO.addressbook.lang.documentTemplate
+		'1' : t("Document template", "addressbook")
 	},
 
 	showOOTemplateDialog : function(template_id){
 
 		if(!GO.documenttemplates){
-			alert(GO.lang.moduleRequired.replace('%s', 'Document templates'));
+			alert(t("The %s module is required for this function").replace('%s', 'Document templates'));
 			return false;
 		}
 

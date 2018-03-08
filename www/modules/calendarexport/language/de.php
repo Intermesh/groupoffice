@@ -1,3 +1,5 @@
 <?php
-$l['name'] = 'Kalendarexport';
-$l['description'] = 'Exportfunktion für Termine.';
+return array (
+  'name' => 'Kalendarexport',
+  'description' => 'Exportfunktion für Termine.',
+);

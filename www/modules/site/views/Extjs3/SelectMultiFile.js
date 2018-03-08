@@ -34,7 +34,7 @@ GO.site.SelectMultiFile = Ext.extend(Ext.form.TriggerField,{
 		if(!this.multifileDialog){
 			this.multifileDialog = new GO.site.MultifileDialog();
 			this.multifileDialog.on('hide',function(){
-				this.setRawValue(GO.site.lang.multifileSelectValue.replace('%s', this.multifileDialog.multifileView.store.getCount()))
+				this.setRawValue(t("%s file(s)", "site").replace('%s', this.multifileDialog.multifileView.store.getCount()))
 			},this);
 		}
 		this.multifileDialog.show(this.model_id,this.customfield.customfield_id);

@@ -1,6 +1,6 @@
 <div class="recover-password-page page">
 	<div class="wrapper">
-		<h2><?php echo \GO::t('forgotPassword', 'site'); ?></h2>					
+		<h2><?php echo \GO::t("Forgot password?", "site"); ?></h2>					
 
 		<?php $form = new \GO\Site\Widget\Form(); ?>
 		<?php echo $form->beginForm(); ?>
@@ -15,16 +15,16 @@
 
 			<table class="table-login">
 				<tr>
-					<td colspan="2"><?php echo \GO::t('forgotPasswordText', 'site'); ?></td>
+					<td colspan="2"><?php echo \GO::t("Fill in your email address in the form below, and you'll recieve a link to recover your password within minutes.", "site"); ?></td>
 				</tr>
 				<tr>
-					<td><label><?php echo \GO::t('ticketEmail', 'defaultsite'); ?></label></td>
+					<td><label><?php echo \GO::t("Email", "defaultsite"); ?></label></td>
 					<td><input type="text" name="email" /></td>
 				</tr>	
 			</table>
 
 			<div class="button-bar">
-				<?php echo $form->submitButton(\GO::t('submit', 'defaultsite'), array('id' => 'submit-forgotpassword-button', 'class' => 'button')); ?>
+				<?php echo $form->submitButton(\GO::t("Submit", "defaultsite"), array('id' => 'submit-forgotpassword-button', 'class' => 'button')); ?>
 				<div class="clear"></div>
 			</div>
 

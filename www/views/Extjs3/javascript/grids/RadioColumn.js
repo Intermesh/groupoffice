@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: RadioColumn.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: RadioColumn.js 22361 2018-02-12 18:42:16Z mschering $
  * @copyright Copyright Intermesh
  * @author Danny Wijffelaars <dwijffelaars@intermesh.nl>
  */
@@ -31,6 +31,16 @@ GO.grid.RadioColumn.prototype = {
 	value : false,
 	
 	horizontal : false,
+	
+	
+	menuDisabled: true,
+	
+	sortable: false,
+	hideable: false,
+	
+	align: "center",
+	
+	isColumn: true,
 	/**
 	 * @param {} grid passes Ext.grid.GridPanel.
 	 */

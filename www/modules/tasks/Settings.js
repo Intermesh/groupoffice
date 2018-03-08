@@ -6,37 +6,58 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: Settings.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: Settings.js 22307 2018-02-01 14:07:32Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
+GO.tasks.SettingsPanel = Ext.extend(Ext.Panel, {
+	autoScroll: true,
+	border: false,
+	hideLabel: true,
+	title : t("Tasks", "tasks"),
+	iconCls: 'ic-assignment-turned-in',
+	labelWidth: 125,
+	
+	onLoadStart: function (userId) {
+		
+		//temporary fix for combo to show address book name. Remove when refactored
+		var userGetRequest = go.Jmap.findRequestByMethod("User/get");
+		if(!userGetRequest) {
+			return;
+		}
+		var userGetRequestId = userGetRequest[2];
+		go.Jmap.request({
+			method: "community/tasks/TaskList/get",
+			params: {
+				"properties": ["name"],
+				"#ids": {
+						"resultOf": userGetRequestId,
+						"name": "User/get",
+						"path": "/list/*/taskSettings/default_tasklist_id"
+				}
+			},
+			callback: function(options, success, result) {
+				this.selectTaskList.setRemoteText(result.list[0].name);
+			},
+			scope: this
+		});
+	},
+	
+	initComponent: function() {
 
-GO.tasks.SettingsPanel = function(config) {
-	if (!config) {
-		config = {};
-	}
-
-	var now = new Date();
-	var eight = Date.parseDate(now.format('Y-m-d') + ' 08:00', 'Y-m-d G:i');
-
-	config.autoScroll = true;
-	config.border = false;
-	config.hideLabel = true;
-	config.title = GO.tasks.lang.tasks;
-	config.hideMode='offsets';
-	config.layout = 'form';
-	config.labelWidth=125;
-	config.bodyStyle='padding:5px;';
-	config.items = {
+		var now = new Date();
+		var eight = Date.parseDate(now.format('Y-m-d') + ' 08:00', 'Y-m-d G:i');
+		
+		this.items = {
 		xtype:'fieldset',
 		autoHeight:true,
 		layout:'form',
 		forceLayout:true,
-		title:GO.tasks.lang.taskDefaults,
+		title:t("Defaults settings for tasks", "tasks"),
 		items:[this.remindCheck=new Ext.form.Checkbox({
-				boxLabel : GO.tasks.lang.remindMe,
+				boxLabel : t("Remind me", "tasks"),
 				hideLabel : true,
-				name : 'remind',
+				name : 'taskSettings.remind',
 				listeners : {
 					'check' : function(field, checked) {
 						this.numberField.setDisabled(!checked);
@@ -46,51 +67,48 @@ GO.tasks.SettingsPanel = function(config) {
 				}
 			}), this.numberField = new GO.form.NumberField({
 				decimals:0,
-				name : 'reminder_days',			
+				name : 'taskSettings.reminder_days',			
 				value : '0',
-				fieldLabel : GO.tasks.lang.daysBeforeStart,
+				fieldLabel : t("Days before start", "tasks"),
 				disabled : true
 			}),this.timeField = new Ext.form.TimeField({
-				name : 'reminder_time',
+				name : 'taskSettings.reminder_time',
 				format : GO.settings.time_format,
 				value : eight.format(GO.settings['time_format']),
-				fieldLabel : GO.lang.strTime,
+				fieldLabel : t("Time"),
 				disabled : true
 			}),
 			new GO.form.HtmlComponent({html:'<br />'}),
 			this.selectTaskList = new GO.tasks.SelectTasklist({
-					fieldLabel : GO.tasks.lang.defaultTasklist,
-					hiddenName : 'default_tasklist_id'
+					fieldLabel : t("Default tasklist", "tasks"),
+					hiddenName : 'taskSettings.default_tasklist_id'
 				})]
 		};
+		GO.tasks.SettingsPanel.superclass.initComponent.call(this);
+	},
 	
-	GO.tasks.SettingsPanel.superclass.constructor.call(this, config);
-};
+	onLoadComplete : function(action) {
+		//this.selectTaskList.setRemoteText(action.result.data.default_tasklist_name);
+	},
 
-Ext.extend(GO.tasks.SettingsPanel, Ext.Panel, {
-			onLoadSettings : function(action) {
-				//this.selectTaskList.setRemoteText(action.result.data.default_tasklist_name);
-			},
-			
-			onSaveSettings : function(){
-				var t = GO.tasks.taskDialog;
-				
-				var now = new Date();
-				
-				GO.tasks.reminderDaysBefore=parseInt(this.numberField.getValue());
-				GO.tasks.reminderTime=this.timeField.getValue();
-				if(t){				
-					var remindDate = now.add(Date.DAY, -GO.tasks.reminderDaysBefore);
+	onSubmitComplete : function(){
+		var t = GO.tasks.taskDialog;
 
-					t.formPanel.form.findField('remind').originalValue=this.remindCheck.getValue();
-					t.formPanel.form.findField('remind_time').originalValue=this.timeField.getValue();
-					t.formPanel.form.findField('remind_date').originalValue=remindDate;
-				}
-			}
+		var now = new Date();
 
-		});
+		GO.tasks.reminderDaysBefore=parseInt(this.numberField.getValue());
+		GO.tasks.reminderTime=this.timeField.getValue();
+		if(t){				
+			var remindDate = now.add(Date.DAY, -GO.tasks.reminderDaysBefore);
 
-GO.mainLayout.onReady(function() {
-			GO.moduleManager.addSettingsPanel('tasks',
-					GO.tasks.SettingsPanel);
-		});
+			t.formPanel.form.findField('taskSettings.remind').originalValue=this.remindCheck.getValue();
+			t.formPanel.form.findField('taskSettings.remind_time').originalValue=this.timeField.getValue();
+			t.formPanel.form.findField('taskSettings.remind_date').originalValue=remindDate;
+		}
+	}
+
+});
+
+GO.mainLayout.onReady(function(){
+	go.userSettingsDialog.addPanel('settings-tasks', GO.tasks.SettingsPanel,3,false);
+});

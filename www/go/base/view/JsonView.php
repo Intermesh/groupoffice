@@ -108,11 +108,16 @@ class JsonView extends AbstractView{
 		
 		//Get all field models and build an array of categories with their
 		//fields for display.
+		
+		
+		$cls = $model->customfieldsRecord->extendsModel();
+		$entityId = $cls::getType()->getId();
+
 
 		$findParams = \GO\Base\Db\FindParams::newInstance()
 						->order(array('category.sort_index', 't.sort_index'), array('ASC', 'ASC'));
 		$findParams->getCriteria()
-						->addCondition('extends_model', $model->customfieldsRecord->extendsModel(), '=', 'category');
+						->addCondition('entityId', $entityId, '=', 'category');
 
 		$stmt = \GO\Customfields\Model\Field::model()->find($findParams);
 
@@ -132,7 +137,7 @@ class JsonView extends AbstractView{
 				$categories[$field->category->id]['fields'][] = $header;
 				$header = null;
 			}
-			$categories[$field->category->id]['fields'][] = array_merge($field->getAttributes(), array('dataname'=>'col_'.$field->id));
+			$categories[$field->category->id]['fields'][] = array_merge($field->getAttributes(), array('dataname'=>$field->databaseName));
 
 		}
 		
@@ -327,14 +332,14 @@ class JsonView extends AbstractView{
 				} else { // model was not saved
 					$response['success'] = false;
 					//can't use <br /> tags in response because this goes wrong with the extjs fileupload hack with an iframe.
-					$response['feedback'] = sprintf(\GO::t('validationErrorsFound'), strtolower($model->localizedName)) . "\n\n" . implode("\n", $model->getValidationErrors()) . "\n";
+					$response['feedback'] = sprintf(\GO::t("Couldn't save %s:"), strtolower($model->localizedName)) . "\n\n" . implode("\n", $model->getValidationErrors()) . "\n";
 					if (\GO\Base\Util\Http::isAjaxRequest(false)) {
 						$response['feedback'] = nl2br($response['feedback']);
 					}
 					
 					
 					$response['errors']=array(
-							sprintf(\GO::t('validationErrorsFound'), strtolower($model->localizedName)) . "\n\n" . implode("\n", $model->getValidationErrors()) . "\n"
+							sprintf(\GO::t("Couldn't save %s:"), strtolower($model->localizedName)) . "\n\n" . implode("\n", $model->getValidationErrors()) . "\n"
 					);
 					
 					
@@ -422,7 +427,7 @@ class JsonView extends AbstractView{
 
 			if ($workflowModel->step_id == '-1') {
 				$workflowResponse['step_progress'] = '';
-				$workflowResponse['step_name'] = \GO::t('complete', 'workflow');
+				$workflowResponse['step_name'] = \GO::t("Complete", "workflow");
 				$workflowResponse['is_approver'] = false;
 				$workflowResponse['step_all_must_approve'] = false;
 			} else {
@@ -464,7 +469,7 @@ class JsonView extends AbstractView{
 
 
 				if ($history->step_id == '-1')
-					$step_name = \GO::t('complete', 'workflow');
+					$step_name = \GO::t("Complete", "workflow");
 				else
 					$step_name = $history->step->name;
 
@@ -475,7 +480,7 @@ class JsonView extends AbstractView{
 						'ctime' => $history->ctime,
 						'comment' => $history->comment,
 						'status' => $history->status ? "1" : "0",
-						'status_name' => $history->status ? \GO::t('approved', 'workflow') : \GO::t('declined', 'workflow')
+						'status_name' => $history->status ? \GO::t("Approved", "workflow") : \GO::t("Declined", "workflow")
 				);
 
 				\GO\Base\Db\ActiveRecord::$attributeOutputMode = 'raw';
@@ -496,7 +501,7 @@ class JsonView extends AbstractView{
 		$findParams = \GO\Base\Db\FindParams::newInstance()
 						->order(array('category.sort_index', 't.sort_index'), array('ASC', 'ASC'));
 		$findParams->getCriteria()
-						->addCondition('extends_model', $model->customfieldsRecord->extendsModel(), '=', 'category');
+						->addCondition('extendsModel', $model->customfieldsRecord->extendsModel(), '=', 'category');
 
 		$stmt = \GO\Customfields\Model\Field::model()->find($findParams);
 
@@ -633,7 +638,7 @@ class JsonView extends AbstractView{
 
 		$data = $store->getData();
 		foreach ($data['results'] as $k => $v) {
-			$data['results'][$k]['categoryName'] = !empty($v['categoryName']) ? $v['categoryName'] : \GO::t('noCategory', 'comments');
+			$data['results'][$k]['categoryName'] = !empty($v['categoryName']) ? $v['categoryName'] : \GO::t("No category", "comments");
 		}
 		$response['data']['comments'] = $data['results'];
 
@@ -666,7 +671,7 @@ class JsonView extends AbstractView{
 
 	public function formatTaskLinkRecord($record, $model, $cm) {
 
-		$statuses = \GO::t('statuses', 'tasks');
+		$statuses = \GO::t("statuses", "tasks");
 
 		$record['status'] = $statuses[$model->status];
 

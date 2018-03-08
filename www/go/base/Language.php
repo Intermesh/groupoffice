@@ -30,6 +30,12 @@
 
 namespace GO\Base;
 
+use Exception;
+use GO;
+use GO\Base\Fs\Folder;
+use GO\Base\Util\ArrayUtil;
+use GO\Base\Util\StringHelper;
+
 
 class Language{
 	
@@ -54,8 +60,8 @@ class Language{
 		if(!$isoCode){
 			if(isset($_REQUEST['SET_LANGUAGE'])){
 				$this->_langIso=$_REQUEST['SET_LANGUAGE'];
-			}elseif(\GO::user()){
-				$this->_langIso=\GO::user()->language;
+//			}elseif(GO::user()){
+//				$this->_langIso=GO::user()->language;
 			}else{
 				$this->_langIso=$this->_getDefaultLanguage();
 			}
@@ -66,7 +72,7 @@ class Language{
 		
 		//validate given language string
 		if(!preg_match('/^[a-z_-]+$/i', $this->_langIso)){
-			throw new \Exception("Invalid language iso code given (".$this->_langIso);
+			throw new Exception("Invalid language iso code given (".$this->_langIso);
 		}
 		
 		if($oldIso!=$this->_langIso)
@@ -76,17 +82,31 @@ class Language{
 	}
 	
 	private function _getDefaultLanguage(){
-		if(isset($_SERVER['HTTP_ACCEPT_LANGUAGE']))
+		$browserLanguages=array();
+		if(isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
 			$browserLanguages = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
-		else
-			$browserLanguages=array();
-		
+		}
+
 		foreach($browserLanguages as $lang){
-			if($this->hasLanguage($lang))
+			//turn "en-US;q=0.8" into "en_US"
+			$lang = str_replace('-', '_', $lang);
+			$lang = explode(';', $lang)[0];
+			
+			if($this->hasLanguage($lang)) {
 				return $lang;
+			}
+			
+			if(strpos($lang, '_')) {
+				$lang = explode('_', $lang)[0];
+				if($this->hasLanguage($lang)) {
+					return $lang;
+				}
+
+			}
 		}
 		
-		return \GO::config()->language;		
+			
+		return GO::config()->language;		
 	}
 	
 	/**
@@ -96,6 +116,46 @@ class Language{
 		return $this->_langIso;
 	}
 	
+	public function getScript() {
+
+		$language = $this->_langIso;
+
+		$str = "var GO = GO || {};\n";
+
+		$extjsLang = GO::t("extjs_lang");
+		if ($extjsLang == 'extjs_lang')
+			$extjsLang = $language;
+
+		$view_root_path = GO::config()->root_path . 'views/Extjs3/';
+
+
+		if (file_exists($view_root_path . 'ext/src/locale/ext-lang-' . $extjsLang . '.js')) {
+			$str .= file_get_contents($view_root_path . 'ext/src/locale/ext-lang-' . $extjsLang . '.js');
+		}
+
+		require(GO::config()->root_path . 'language/languages.php');
+		$str .= "GO.Languages=[];\n";
+
+		foreach ($languages as $code => $language) {
+			$str .= 'GO.Languages.push(["' . $code . '","' . $language . '"]);' . "\n";
+		}
+
+		//Put all lang vars in js		
+		$l = $this->getAllLanguage();
+		$l['iso'] = $this->_langIso;
+
+		$str .= 'GO.lang = ' . json_encode($l, JSON_PRETTY_PRINT) . ";\n";
+//		$str .= 'GO.lang.countries=' . json_encode($l['base']['countries'], JSON_PRETTY_PRINT) . ";\n";
+//		unset($l['base']);
+//
+//		foreach ($l as $module => $langVars) {
+//			$str .= 'Ext.ns("GO.' . $module . '");' . "\n";
+//			$str .= 'GO.' . $module . '.lang=' . json_encode($langVars, JSON_PRETTY_PRINT) . ';' . "\n";
+//		}
+
+		return $str;
+	}
+
 	/**
 	 * Check if language is supported
 	 * 
@@ -141,12 +201,12 @@ class Language{
 			}
 		}
 		
-		return str_replace('{product_name}',\GO::config()->product_name,$translation);
+		return str_replace('{product_name}',GO::config()->product_name,$translation);
 	}
 	
 	private function _replaceProductName($l){
 		foreach($l as $key=>$value)
-			$l[$key]=str_replace('{product_name}',\GO::config()->product_name,$value);
+			$l[$key]=str_replace('{product_name}',GO::config()->product_name,$value);
 		return $l;
 	}
 	
@@ -154,8 +214,12 @@ class Language{
 		if(!isset($this->_lang[$module]) || ($module=='base' && !isset($this->_lang[$module][$basesection]))){
 			
 			$file = $this->_find_file('en', $module, $basesection);
-			if($file)
-				require($file);
+			if($file) {
+				$ret = require($file);
+				if(is_array($ret)) {
+					$l = $ret;
+				}
+			}
 			
 			//$langcode = \GO::user() ? \GO::user()->language : \GO::config()->language;
 			$defaultLang=isset($l) ? $l : array();
@@ -165,9 +229,13 @@ class Language{
 			{
 				$file = $this->_find_file($this->_langIso, $module, $basesection);
 				if($file){
-					require($file);
+					$ret = require($file);
+					
+					if(is_array($ret)) {						
+						$l = $ret;						
+					}
 					if(isset($l)){
-						$defaultLang = Util\ArrayUtil::mergeRecurive($defaultLang, $l);
+						$defaultLang = ArrayUtil::mergeRecurive($defaultLang, $l);
 						unset($l);
 					}
 				}
@@ -175,9 +243,12 @@ class Language{
 			
 			$file = $this->_find_override_file($this->_langIso, $module, $basesection);
 			if($file){
-				require($file);
+				$ret = require($file);
+				if(is_array($ret)) {
+					$l = $ret;
+				}
 				if(isset($l)){
-					$defaultLang = Util\ArrayUtil::mergeRecurive($defaultLang, $l);
+					$defaultLang = ArrayUtil::mergeRecurive($defaultLang, $l);
 					unset($l);
 				}
 			}
@@ -195,9 +266,20 @@ class Language{
 	
 	private function _find_file($lang, $module, $basesection){
 		if($module=='base')
-			$dir=\GO::config()->root_path.'language/'.$basesection.'/';
-		else
-			$dir=\GO::config()->root_path.'modules/'.$module.'/language/';
+			$dir=GO::config()->root_path.'language/'.$basesection.'/';
+		else {
+//			$dir=GO::config()->root_path.'modules/'.$module.'/language/';
+			
+			//for refactored modules
+			if(GO::modules()->$module) {
+				$dir=GO::modules()->$module->path.'language/';
+			} else
+			{
+				$dir=GO::config()->root_path.'modules/'.$module.'/language/';
+			}
+			
+			
+		}
 				
 		$file = $dir.$lang.'.php';
 		
@@ -209,7 +291,7 @@ class Language{
 	
 	private function _find_override_file($lang, $module, $basesection){
 		
-		$dir=\GO::config()->file_storage_path.'users/admin/lang/'.$lang.'/';		
+		$dir=GO::config()->file_storage_path.'users/admin/lang/'.$lang.'/';		
 		$filename = $module=='base' ? 'base_'.$basesection.'.php' : $module.'.php';
 						
 		$file = $dir.$filename;
@@ -218,7 +300,7 @@ class Language{
 			return $file;
 		
 
-		$dir=\GO::config()->file_storage_path.'users/admin/lang/';		
+		$dir=GO::config()->file_storage_path.'users/admin/lang/';		
 
 		$file = $dir.$filename;
 
@@ -231,10 +313,10 @@ class Language{
 	
 	
 	public function getAllLanguage(){
-		$folder = new Fs\Folder(\GO::config()->root_path.'language');
+		$folder = new Folder(GO::config()->root_path.'language');
 		$items = $folder->ls();
 		foreach($items as $folder){
-			if($folder instanceof Fs\Folder){
+			if($folder instanceof Folder){
 				$this->_loadSection('base', $folder->name());
 			}
 		}
@@ -242,9 +324,9 @@ class Language{
 		//always load users lang for settings panels
 		$this->_loadSection('users');
 		
-		$modules = \GO::modules()->getAllModules();			
+		$modules = GO::modules()->getAllModules(true);			
 		while ($module=array_shift($modules)) {
-			$this->_loadSection($module->id);
+			$this->_loadSection($module->name);
 		}
 		
 		return $this->_lang;
@@ -256,7 +338,7 @@ class Language{
 	 * @return array array('en'=>'English');
 	 */
 	public function getLanguages(){
-		require(\GO::config()->root_path.'language/languages.php');
+		require(GO::config()->root_path.'language/languages.php');
 		asort($languages);
 		return $languages;
 	}

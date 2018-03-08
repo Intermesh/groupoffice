@@ -3,7 +3,7 @@ GO.email.FilterDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 		
 		Ext.apply(this, {
 			titleField:'keyword',
-			title:GO.email.lang.filter,			
+			title:t("Filter", "email"),			
 			formControllerUrl: 'email/filter',
 			height:200
 		});
@@ -23,21 +23,21 @@ GO.email.FilterDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 			cls : 'go-form-panel',
 			waitMsgTarget : true,
 			items : [new Ext.form.ComboBox({
-					fieldLabel : GO.email.lang.field,
+					fieldLabel : t("Field", "email"),
 					hiddenName : 'field',
 					store : new Ext.data.SimpleStore({
 						fields : ['value', 'text'],
 						data : [
 							[
 								'from',
-								GO.email.lang.sender],
+								t("From field", "email")],
 							[
 								'subject',
-								GO.email.lang.subject],
-							['to', GO.email.lang.sendTo],
+								t("Subject", "email")],
+							['to', t("Send To", "email")],
 							[
 								'cc',
-								GO.email.lang.ccField]]
+								t("CC field", "email")]]
 					}),
 					value : 'from',
 					valueField : 'value',
@@ -49,11 +49,11 @@ GO.email.FilterDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 					selectOnFocus : true,
 					forceSelection : true
 				}), {
-					fieldLabel : GO.email.lang.keyword,
+					fieldLabel : t("Keyword", "email"),
 					name : 'keyword',
 					allowBlank : false
 				}, new Ext.form.ComboBox({
-					fieldLabel : GO.email.lang.moveToFolder,
+					fieldLabel : t("Move to folder", "email"),
 					hiddenName : 'folder',
 					store : GO.email.subscribedFoldersStore,
 					valueField : 'name',
@@ -67,7 +67,7 @@ GO.email.FilterDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 					allowBlank : false
 				}), {
 					xtype:'xcheckbox',
-					boxLabel : GO.email.lang.markAsRead,
+					boxLabel : t("Mark as read", "email"),
 					name : 'mark_as_read',
 					checked : false,
 					hideLabel : true

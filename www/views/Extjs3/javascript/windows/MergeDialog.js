@@ -24,7 +24,7 @@ GO.dialog.MergeWindow = Ext.extend(GO.Window,{
 			region:'center',
 			layout:'fit',
 			tbar:[
-			GO.lang['strSearch']+': ', ' ',this.searchField
+			t("Search")+': ', ' ',this.searchField
 			],
 			store:this.store,
 			columns:[{
@@ -33,7 +33,7 @@ GO.dialog.MergeWindow = Ext.extend(GO.Window,{
 				width:40
 			},{
 				id:'name',
-				header: GO.lang['strName'],
+				header: t("Name"),
 				dataIndex: 'name',
 				css: 'white-space:normal;',
 				sortable: true,
@@ -41,15 +41,15 @@ GO.dialog.MergeWindow = Ext.extend(GO.Window,{
 					return '<div class="go-grid-icon go-model-icon-'+record.data.model_name+'">'+v+'</div>';
 				}
 			},{
-				header: GO.lang['strType'],
+				header: t("Type"),
 				dataIndex: 'type',
 				sortable:true,
 				width:100
 			},{
-				header: GO.lang['strMtime'],
+				header: t("Modified at"),
 				dataIndex: 'mtime',
 				sortable:true,
-				width:110
+				width: dp(140)
 			}],
 			autoExpandMax:2500,
 			autoExpandColumn:'name',
@@ -57,7 +57,7 @@ GO.dialog.MergeWindow = Ext.extend(GO.Window,{
 			view:new Ext.grid.GridView({
 				enableRowBody:true,
 				showPreview:true,			
-				emptyText:GO.lang.strNoItems,	
+				emptyText:t("No items to display"),	
 				getRowClass : function(record, rowIndex, p, store){
 					if(this.showPreview && record.data.description.length){
 						p.body = '<div class="go-links-panel-description">'+record.data.description+'</div>';
@@ -67,7 +67,7 @@ GO.dialog.MergeWindow = Ext.extend(GO.Window,{
 				}
 			}),
 			loadMask:{
-				msg: GO.lang['waitMsgLoad']
+				msg: t("Loading...")
 			},
 			sm:new Ext.grid.RowSelectionModel()
 		};
@@ -75,7 +75,7 @@ GO.dialog.MergeWindow = Ext.extend(GO.Window,{
 		this.searchGrid = new GO.grid.GridPanel(gridConfig);
 		this.layout='border';
 		
-		this.title=GO.lang.merge;
+		this.title=t("Merge");
 		
 		this.items = [this.formPanel = new Ext.FormPanel({
 			region:'north',
@@ -85,13 +85,13 @@ GO.dialog.MergeWindow = Ext.extend(GO.Window,{
 				hideLabel:true,
 				xtype:'checkbox',
 				name:'delete_merge_models',
-				boxLabel:GO.lang.mergeDeleteItems,
+				boxLabel:t("Delete the selected items after merging"),
 				checked:true
 			},{
 				hideLabel:true,
 				xtype:'checkbox',
 				name:'merge_attributes',
-				boxLabel:GO.lang.mergeAttributes,
+				boxLabel:t("Merge data fields if they are empty in the target item."),
 				checked:true
 			}]
 		}),this.searchGrid];
@@ -100,14 +100,14 @@ GO.dialog.MergeWindow = Ext.extend(GO.Window,{
 		this.height=500;
 		
 		this.buttons=[{
-			text: GO.lang['cmdOk'],
+			text: t("Ok"),
 			handler: function(){							
 				this.merge();
 			},
 			scope:this
 		},
 		{
-			text: GO.lang['cmdClose'],
+			text: t("Close"),
 			handler: function(){
 				this.hide();
 			},

@@ -70,6 +70,8 @@ class CfSettingTab extends \GO\Base\Db\ActiveRecord{
 	  * @return \GO\Base\Db\ActiveStatement
 	  */
 	 public function getSettingTabs(){
+		 
+		 $entityId = \GO\Addressbook\Model\Contact::getType()->getId();;
 		 		 
 		 $findParams = \GO\Base\Db\FindParams::newInstance()
 						 ->ignoreAcl()
@@ -81,8 +83,8 @@ class CfSettingTab extends \GO\Base\Db\ActiveRecord{
 								'tableAlias'=>'cfs', //Optional table alias					
 								'type'=>'INNER' //defaults to INNER,
 						 ))
-						 ->criteria(\GO\Base\Db\FindCriteria::newInstance()->addCondition('extends_model', "GO\Addressbook\Model\Contact"))
-						 ->order('sort_index');
+						 ->criteria(\GO\Base\Db\FindCriteria::newInstance()->addCondition('entityId', $entityId))
+						 ->order('sortOrder');
 		 
 		 $stmt = \GO\Customfields\Model\Category::model()->find($findParams);
 		 return $stmt;

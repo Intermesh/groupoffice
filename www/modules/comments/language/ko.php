@@ -1,9 +1,8 @@
 <?php
-
-
-$l["recentComments"]='최근 코멘트';
-$l["browseComments"]= 'Browse comments';
-$l['name']='코멘트';
-$l['description']='Adds comments functionality to other modules';
-$l['comment']='코멘트';
-$l['comments']='코멘트';
+return array (
+  'Recent comments' => '최근 코멘트',
+  'Comment' => '코멘트',
+  'name' => '코멘트',
+  'Browse comments' => 'Browse comments',
+  'Comments' => '코멘트',
+);

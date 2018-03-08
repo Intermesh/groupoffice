@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: PermissionsPanel.js 18580 2014-12-12 08:38:18Z mschering $
+ * @version $Id: PermissionsPanel.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  * @author WilmarVB <wilmar@intermesh.nl>
@@ -42,7 +42,7 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 	initComponent : function() {
 
 		if(!this.title){
-			this.title=GO.lang.strPermissions;
+			this.title=t("Permissions");
 		}
 		
 		var levelData = [];
@@ -50,15 +50,15 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 		this.levelLabels = this.levelLabels || {};
 		
 		if(!this.levelLabels[GO.permissionLevels.read])
-			this.levelLabels[GO.permissionLevels.read] =GO.lang.permissionRead;
+			this.levelLabels[GO.permissionLevels.read] =t("Read only");
 		if(!this.levelLabels[GO.permissionLevels.create])
-			this.levelLabels[GO.permissionLevels.create] =GO.lang.permissionCreate;
+			this.levelLabels[GO.permissionLevels.create] =t("Read and Create only");
 		if(!this.levelLabels[GO.permissionLevels.write])
-			this.levelLabels[GO.permissionLevels.write] =GO.lang.permissionWrite;
+			this.levelLabels[GO.permissionLevels.write] =t("Write");
 		if(!this.levelLabels[GO.permissionLevels.writeAndDelete])
-			this.levelLabels[GO.permissionLevels.writeAndDelete] =GO.lang.permissionDelete;
+			this.levelLabels[GO.permissionLevels.writeAndDelete] =t("Write and delete");
 		if(!this.levelLabels[GO.permissionLevels.manage])
-			this.levelLabels[GO.permissionLevels.manage] =GO.lang.permissionManage;
+			this.levelLabels[GO.permissionLevels.manage] =t("Manage");
 		
 		if(!this.levels){
 			this.levels=[
@@ -101,13 +101,12 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 		if(!this.addLevel)
 			this.addLevel = GO.permissionLevels.read;
 
-		var selectUsersPermissionLevel = new GO.form.ComboBox(permissionLevelConfig);
+//		var selectUsersPermissionLevel = new GO.form.ComboBox(permissionLevelConfig);
 		var selectGroupsPermissionLevel = new GO.form.ComboBox(permissionLevelConfig);
 
 		this.header = false;
-		this.layout = 'anchor';
+		this.layout = 'fit';
 		this.border = false;
-		this.anchor = '100% 100%';
 		this.disabled = true;
 
 		var renderLevel = function(v){
@@ -116,7 +115,7 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 		}
 
 		var groupColumns = [{
-			header : GO.lang['strName'],
+			header : t("Name"),
 			dataIndex : 'name',
 			menuDisabled:true,
 			sortable: true
@@ -124,10 +123,10 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 		if(this.showLevel)
 		{
 			groupColumns.push({
-				header : GO.lang.permissionsLevel,
+				header : t("Level"),
 				dataIndex : 'level',
 				menuDisabled:true,
-				editor : selectUsersPermissionLevel,
+				editor : selectGroupsPermissionLevel,
 				renderer:renderLevel,
 				sortable: true
 			});
@@ -138,8 +137,8 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 			autoWidth:true,
 			align : 'center',
 			actions : [{
-				iconCls : 'btn-users',
-				qtip: GO.lang.users
+				iconCls : 'ic-group',
+				qtip: t("Users")
 			}]
 		});
 
@@ -147,10 +146,11 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 
 
 		this.aclGroupsGrid = new GO.base.model.multiselect.panel({
-			title:GO.lang.strAuthorizedGroups,
+//			title:t("Authorized groups"),
 			plain:true,
-			style:'margin:4px',
-			anchor: '100% 50%',
+//			style:'margin:4px',
+//			anchor: '100% 50%',
+			
 			forceLayout:true,
 			autoExpandColumn:'name',
 			url:'aclGroup',
@@ -158,7 +158,7 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 			plugins: action,
 			addAttributes:{level:this.addLevel},
 			selectColumns:[{
-				header : GO.lang['strName'],
+				header : t("Name"),
 				dataIndex : 'name',
 				menuDisabled:true,
 				sortable: true
@@ -170,7 +170,6 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 		this.aclGroupsGrid.store.on("load", function(){
 			this.managePermission = this.aclGroupsGrid.store.reader.jsonData.manage_permission;
 			this.aclGroupsGrid.getTopToolbar().setDisabled(!this.isEditable());
-			this.aclUsersGrid.getTopToolbar().setDisabled(!this.isEditable());
 			
 			
 			this.overWriteCheckBox.setDisabled(!this.managePermission);
@@ -183,7 +182,7 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 				this.aclGroupsGrid.getSelectionModel().selectRow(row);
 
 				switch(action){
-					case 'btn-users':
+					case 'ic-group':
 						this.showUsersInGroupDialog(record.data.id);
 						break;
 				}
@@ -194,69 +193,17 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 			return this.isEditable();
 		},this);
 
-		var userColumns = [{
-			header : GO.lang['strName'],
-			dataIndex : 'name',
-			menuDisabled:true,
-			sortable: true
-		},{
-			header: GO.lang.username,
-			dataIndex:'username',
-			menuDisabled:true,
-			sortable: true
-		}];
-		if(this.showLevel)
-		{
-			userColumns.push({
-				header : GO.lang.permissionsLevel,
-				dataIndex : 'level',
-				menuDisabled:true,
-				editor : selectGroupsPermissionLevel,
-				renderer:renderLevel,
-				sortable: true
-			})
-		}
-
-		this.aclUsersGrid = new GO.base.model.multiselect.panel({
-			title:GO.lang.strAuthorizedUsers,
-			plain:true,
-			style:'margin:4px',
-			anchor: '100% 50%',
-			forceLayout:true,
-			autoExpandColumn:'name',
-			url:'aclUser',
-			columns: userColumns,
-			addAttributes:{level:this.addLevel},
-			selectColumns:[{
-				header : GO.lang['strName'],
-				dataIndex : 'name',
-				menuDisabled:true,
-				sortable: true
-			},{
-				header: GO.lang.username,
-				dataIndex:'username',
-				menuDisabled:true,
-				sortable: true
-			}],
-			fields:['id','name','username','level'],
-			model_id: this.acl_id//GO.settings.user_id
-		});
-			
-		this.aclUsersGrid.on('beforeedit', function(e) {
-			return this.isEditable();
-		},this);
-		
+	
 		this.items =[];
 		this.overWriteCheckBox = new Ext.ux.form.XCheckbox({
 			style:'margin:4px 0 0 10px',
 			name: 'acl_overwritten',
-			boxLabel: GO.lang.overwriteAcl
+			boxLabel: t("Overwrite default permissions for this item (click apply to activate)")
 		});
 		if(this.isOverwritable) {
 			this.items.push(this.overWriteCheckBox);
 		}
 		this.items.push(this.aclGroupsGrid);
-		this.items.push(this.aclUsersGrid);
 		
 		GO.grid.PermissionsPanel.superclass.initComponent.call(this);
 	},
@@ -276,7 +223,6 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 			this.isOverwritten = this.overWriteCheckBox.getValue();
 		this.acl_id = acl_id || 0;
 		this.aclGroupsGrid.setModelId(acl_id, this.isVisible());
-		this.aclUsersGrid.setModelId(acl_id, this.isVisible());
 		this.setDisabled(GO.util.empty(acl_id));	
 	},
 
@@ -296,7 +242,7 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 	loadAcl : function(){
 		if(this.acl_id>0){
 			this.aclGroupsGrid.store.load();
-			this.aclUsersGrid.store.load();
+		
 		}
 	},
 

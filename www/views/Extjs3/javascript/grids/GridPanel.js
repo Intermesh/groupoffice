@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: GridPanel.js 20049 2016-05-10 08:09:14Z mschering $
+ * @version $Id: GridPanel.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -68,7 +68,7 @@ GO.grid.GridPanel =Ext.extend(Ext.grid.GridPanel, {
 			this.view = new Ext.grid.GridView({
 				autoFill: true,
 				forceFit: true,
-				emptyText: GO.lang.strNoItems
+				emptyText: t("No items to display")
 			});
 		}
 		
@@ -128,8 +128,8 @@ GO.grid.GridPanel =Ext.extend(Ext.grid.GridPanel, {
 					store: this.store,
 					pageSize: this.paging,
 					displayInfo: true,
-					displayMsg: GO.lang['displayingItems'],
-					emptyMsg: GO.lang['strNoItems']
+					displayMsg: t("Displaying items {0} - {1} of {2}"),
+					emptyMsg: t("No items to display")
 				});
 			}
     
@@ -164,17 +164,20 @@ GO.grid.GridPanel =Ext.extend(Ext.grid.GridPanel, {
 			this.tbar = this.tbar ? this.tbar : [];
 			if(!this.hideSearchField){
 				this.tbar.unshift(					
-					'-',
-					new GO.form.SearchField({
+					'->',{
+						xtype: 'tbsearch',
 						store: this.store,
-						width:150
-					})					
+						onSearch: function(v) { 
+							this.store.baseParams['query'] = v;
+							this.store.reload();
+						}
+					}				
 				);
 			}
 			this.tbar.unshift({
 				itemId:'add',
 				iconCls: 'btn-add',							
-				text: GO.lang['cmdAdd'],
+				text: t("Add"),
 				cls: 'x-btn-text-icon',
 				handler: this.btnAdd,
 				disabled:this.standardTbarDisabled,
@@ -182,7 +185,7 @@ GO.grid.GridPanel =Ext.extend(Ext.grid.GridPanel, {
 			},{
 				itemId:'delete',
 				iconCls: 'btn-delete',
-				text: GO.lang['cmdDelete'],
+				text: t("Delete"),
 				cls: 'x-btn-text-icon',
 				disabled:this.standardTbarDisabled,
 				handler: function(){
@@ -570,8 +573,8 @@ GO.grid.EditorGridPanel = function(config)
 				store: config.store,
 				pageSize: parseInt(GO.settings['max_rows_list']),
 				displayInfo: true,
-				displayMsg: GO.lang['displayingItems'],
-				emptyMsg: GO.lang['strNoItems']
+				displayMsg: t("Displaying items {0} - {1} of {2}"),
+				emptyMsg: t("No items to display")
 			});
 		}
 

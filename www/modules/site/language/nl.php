@@ -1,169 +1,119 @@
 <?php
-
-$l["name"] = "Website beheer";
-$l["description"] = "Dit is de nieuwe CMS module";
-
-$l["content"] = "Content";
-$l["site"] = "Site";
-
-$l["meta"] = "Meta";
-$l["metaDescriptionText"] = "Met Meta tags kunnen webmasters de zoekmachines voorzien van informatie voor hun website.";
-
-$l["info"] = "Informatie";
-$l["infoDescriptionText"] = "Information over het content item";
-
-$l["siteOptionsDescriptionText"] = "Information over de opties";
-
-
-$l["siteFile"]="Site Bestand";
-$l["siteMultiFile"]="Site Multibestand";
-
-$l["template"] = "Template";
-$l["defaultChildTemplate"] = "Standaard template voor child";
-$l["templateDescriptionText"] = "Kies de template die je voor dit content item wilt gebruiken";
-
-$l["save"] = "Opslaan";
-$l["reload"] = "Herladen";
-$l["advanced"] = "Geavanceerde opties";
-$l["options"] = "Opties";
-
-$l["addContent"] = "Content toevoegen";
-
-$l["deleteContent"] = "Content verwijderen";
-$l["deleteContentConfirm"] = "Weet je zeker dat je dit content item wilt verwijderen";
-$l["deleteContentHasChildren"] = "je kunt dit content item niet verwijderen want het heeft nog child items. Verwijder eerst de child items.";
-
-$l["deleteSite"] = "Verwijder site";
-$l["deleteSiteConfirm"] = "Weet je zeker dat je deze site wilt verwijderen";
-
-// Language for model: \GO\Site\Model\Content
-$l["contentId"] = "ID";
-$l["contentUser_id"] = "Gebruiker";
-$l["contentCtime"] = "Aangemaakt";
-$l["contentMtime"] = "Bewerkt";
-$l["contentTitle"] = "Titel";
-$l["contentSlug"] = "Slug";
-$l["contentMeta_title"] = "Meta titel";
-$l["contentMeta_description"] = "Meta beschrijving";
-$l["contentMeta_keywords"] = "Meta sleutelwoorden";
-$l["contentContent"] = "Content";
-$l["contentStatus"] = "Status";
-$l["contentParent_id"] = "Ouder";
-$l["contentSite_id"] = "Site";
-$l["contentSort_order"] = "Volgorde";
-
-// Language for model: \GO\Site\Model\Site
-$l["siteId"] = "ID";
-$l["siteName"] = "Naam";
-$l["siteUser_id"] = "Gebruiker";
-$l["siteMtime"] = "Bewerkt";
-$l["siteCtime"] = "Aangemaakt";
-$l["siteDomain"] = "Domein";
-$l["siteModule"] = "Module";
-$l["siteSsl"] = "SSL";
-$l["siteMod_rewrite"] = "Mod rewrite";
-$l["siteMod_rewrite_base_path"] = "Mod rewrite base path";
-$l["siteBase_path"] = "Base path";
-$l["siteLanguage"] = "Taal";
-$l["siteAcl_id"] = "ACL";
-
-
-$l["multifile"] = "Multibestand";
-$l["multifileSelectValue"] = "%s bestand(en)";
-
-// Frontend language
-$l['login'] = 'Inloggen';
-$l['register'] = 'Registreren';
-$l['signUp'] = 'Aanmelden';
-$l['lostPassword'] = 'Wachtwoord vergeten';
-$l['rememberMe'] = 'Ingelogd blijven';
-$l['createNewPassword'] = 'Maak een nieuwe wachtwoord via uw email adres';
-$l['forgotPassword'] = 'Wachtwoord vergeten?';
-$l['passwordChanged'] = 'Wachtwoord veranderd';
-$l['changePassword'] = 'Verander wachtwoord';
-$l['changePasswordText'] = 'Gebruik het onderstaande formulier om het wachtwoord te veranderen';
-$l['alreadySignedupText'] = 'Heeft u al een gebruikersnaam en wachtwoord? Log dan in met het onderstaande formulier';
-$l['forgotPasswordText'] = 'Vul uw email-adres in en u ontvangt binnen enkele minuten een email met een link om uw wachtwoord te resetten.';
-$l['submit'] = 'Verzenden';
-$l['noemail'] = 'Geen email-adres opgegeven!';
-$l['invalidusertoken'] = 'De opgegeven gebruikerstoken is niet correct!';
-$l['invaliduser'] = 'Er is geen gebruiker gevonden met het opgegeven email-adres!';
-$l['recoverEmailSent'] = 'Er is een email met reset instructies gestuurd naar het volgende email-adres:';
-$l['resetPasswordSuccess'] = 'Uw wachtwoord is succesvol gewijzigd.';
-
-$l["attachFilesPC"]='Toevoegen van PC';
-$l["attachFilesGO"]='Toevoegen van {product_name}';
-
-$l["imageEditor"]='Berwerk afbeelding';
-
-$l["imgWidth"]='Breedte';
-$l["imgHeight"]='Hoogte';
-
-$l["dimensions"]='Afmetingen';
-$l["alignment"]='Positie';
-
-$l["imgZoom"]='Zoom';
-$l["imgCrop"]='Knippen';
-
-$l["imgAlignmentLeft"]='Links';
-$l["imgAlignmentCenter"]='Midden';
-$l["imgAlignmentRight"]='Rechts';
-$l["imgAlignmentInline"]='Inline';
-
-$l["imgDimensions"]='Afmetingen (BxH)';
-
-$l["imgDimensionSmall"]='Klein';
-$l["imgDimensionMedium"]='Middel';
-$l["imgDimensionLarge"]='Groot';
-$l["imgDimensionCustom"]='Aangepast';
-$l["imgAlt"]='Alt tekst';
-
-$l["imageExample"] = "Voorbeeld afbeelding";
-
-$l["notImplementedYet"] = "Nog niet geimplementeerd";
-$l["otherOptions"] = "Overige opties";
-
-$l["linkEditor"] = "Link invoegen";
-
-$l["linkTitle"] = "Link titel";
-$l["linkToContent"] = "Link naar content";
-$l["linkToContentText"] = "Maak een link naar een content item binnen deze site. Dubbelklik op een item om hem te selecteren.";
-$l["linkToFile"] = "Link naar bestand";
-$l["linkToFileText"] = "Maak een link naar een bestand dat is geupload binnen de site.";
-$l["linkToUrl"] = "Link naar url";
-$l["linkToUrlText"] = "U kunt u ook aangepaste links maken. Begin de url met http(s):// ";
-$l["url"] = "Url";
-$l["file"] = "Bestand";
-$l["openInNewWindow"] = "Openen in nieuw venster";
-$l["selectFile"] = "Bestand selecteren";
-
-$l["menus"] = "Menu's";
-$l["addMenuItem"] = "Nieuw item";
-$l["addMenu"] = "Menu toevoegen";
-$l["delete"] = "Verwijderen";
-$l["properties"] = "Opties";
-$l["menuItem"] = "Menuitem";
-
-$l["deleteMenuHasChildren"] = "Kan het geselecteerde menuitem niet verwijderen, verwijder eerst alle kinderen.";
-$l["deleteMenu"] = "Verwijder menuitem";
-$l["deleteMenuConfirm"] = "Weet u zeker dat u dit menuitem wilt verwijderen?";
-
-$l["menu"] = "Menu";
-
-$l["menuId"] = "ID";
-$l["menuSite_id"] = "Site";
-$l["menuLabel"] = "Label";
-$l["menuMenu_slug"] = "Slug";
-
-$l["menuitemLabel"] = "Label";
-$l["menuitemMenu_id"] = "Menu";
-$l["menuitemId"] = "ID";
-$l["menuitemParent_id"] = "Ouder";
-$l["menuitemContent_id"] = "Content";
-$l["menuitemUrl"] = "Url";
-$l["menuitemDisplay_children"] = "Toon kinderen";
-$l["menuitemSort_order"] = "Volgorde";
-$l["menuitemTarget"] = "Doel";
-
-$l["sureCreateContentMenuItemTitle"] = "Maak menuitem van content";
-$l["sureCreateContentMenuItem"] = "Weet u zeker dat u een menuitem wilt maken van deze content?";
+return array (
+  'Meta tags are a great way for webmasters to provide search engines with information about their sites.' => 'Met Meta tags kunnen webmasters de zoekmachines voorzien van informatie voor hun website.',
+  'Info' => 'Informatie',
+  'Information about this content item' => 'Information over het content item',
+  'Information about the options' => 'Information over de opties',
+  'Site File' => 'Site Bestand',
+  'Site Multifile' => 'Site Multibestand',
+  'Default child template' => 'Standaard template voor child',
+  'Choose a template in which you want to view this content item' => 'Kies de template die je voor dit content item wilt gebruiken',
+  'Save' => 'Opslaan',
+  'Reload' => 'Herladen',
+  'Advanced options' => 'Geavanceerde opties',
+  'Options' => 'Opties',
+  'Add content' => 'Content toevoegen',
+  'Delete content' => 'Content verwijderen',
+  'Are you sure that you want to delete this content item' => 'Weet je zeker dat je dit content item wilt verwijderen',
+  'You cannot delete this item because it has subitems. Please delete the subitems first.' => 'je kunt dit content item niet verwijderen want het heeft nog child items. Verwijder eerst de child items.',
+  'Delete site' => 'Verwijder site',
+  'Are you sure that you want to delete this site' => 'Weet je zeker dat je deze site wilt verwijderen',
+  'User' => 'Gebruiker',
+  'Created' => 'Aangemaakt',
+  'Modified' => 'Bewerkt',
+  'Title' => 'Titel',
+  'Meta title' => 'Meta titel',
+  'Meta description' => 'Meta beschrijving',
+  'Meta keywords' => 'Meta sleutelwoorden',
+  'Parent' => 'Ouder',
+  'Sort' => 'Volgorde',
+  'Name' => 'Naam',
+  'Domain' => 'Domein',
+  'Language' => 'Taal',
+  'Multi File' => 'Multibestand',
+  '%s file(s)' => '%s bestand(en)',
+  'Login' => 'Inloggen',
+  'Register' => 'Registreren',
+  'Sign up' => 'Aanmelden',
+  'Lost password' => 'Wachtwoord vergeten',
+  'Remember me' => 'Ingelogd blijven',
+  'Create a new password using your email address' => 'Maak een nieuwe wachtwoord via uw email adres',
+  'Forgot password?' => 'Wachtwoord vergeten?',
+  'Password changed' => 'Wachtwoord veranderd',
+  'Change password' => 'Verander wachtwoord',
+  'Use the below form to change your password' => 'Gebruik het onderstaande formulier om het wachtwoord te veranderen',
+  'If you already have a username and password use this form to login.' => 'Heeft u al een gebruikersnaam en wachtwoord? Log dan in met het onderstaande formulier',
+  'Fill in your email address in the form below, and you\'ll recieve a link to recover your password within minutes.' => 'Vul uw email-adres in en u ontvangt binnen enkele minuten een email met een link om uw wachtwoord te resetten.',
+  'Submit' => 'Verzenden',
+  'No email given!' => 'Geen email-adres opgegeven!',
+  'The provided usertoken is not valid!' => 'De opgegeven gebruikerstoken is niet correct!',
+  'No user found with the given email address!' => 'Er is geen gebruiker gevonden met het opgegeven email-adres!',
+  'An email with recover instructions is send to the following email address:' => 'Er is een email met reset instructies gestuurd naar het volgende email-adres:',
+  'Your password is successfully reset.' => 'Uw wachtwoord is succesvol gewijzigd.',
+  'Add from PC' => 'Toevoegen van PC',
+  'Add from {product_name}' => 'Toevoegen van {product_name}',
+  'Customize image' => 'Berwerk afbeelding',
+  'Width' => 'Breedte',
+  'Height' => 'Hoogte',
+  'Dimensions' => 'Afmetingen',
+  'Alignment' => 'Positie',
+  'Crop' => 'Knippen',
+  'Left' => 'Links',
+  'Center' => 'Midden',
+  'Right' => 'Rechts',
+  'Dimensions (WxH)' => 'Afmetingen (BxH)',
+  'Small' => 'Klein',
+  'Medium' => 'Middel',
+  'Large' => 'Groot',
+  'Custom' => 'Aangepast',
+  'Alt text' => 'Alt tekst',
+  'Image example' => 'Voorbeeld afbeelding',
+  'Not yet implemented' => 'Nog niet geimplementeerd',
+  'Other options' => 'Overige opties',
+  'Insert link' => 'Link invoegen',
+  'Link title' => 'Link titel',
+  'Link to content item' => 'Link naar content',
+  'Link to a content item within this site. Doubleclick on an item to select it.' => 'Maak een link naar een content item binnen deze site. Dubbelklik op een item om hem te selecteren.',
+  'Link to file' => 'Link naar bestand',
+  'Link to a file that you have uploaded within this site.' => 'Maak een link naar een bestand dat is geupload binnen de site.',
+  'Link to url' => 'Link naar url',
+  'You can also type in your own url, please make sure you add http(s):// to it to make the url work.' => 'U kunt u ook aangepaste links maken. Begin de url met http(s):// ',
+  'File' => 'Bestand',
+  'Open in new window' => 'Openen in nieuw venster',
+  'Select file' => 'Bestand selecteren',
+  'New item' => 'Nieuw item',
+  'Add menu' => 'Menu toevoegen',
+  'Delete' => 'Verwijderen',
+  'Properties' => 'Opties',
+  'Menu item' => 'Menuitem',
+  'The selected menu-item has children and cannot be deleted.' => 'Kan het geselecteerde menuitem niet verwijderen, verwijder eerst alle kinderen.',
+  'Delete menu item' => 'Verwijder menuitem',
+  'Do you really want to delete this menu item?' => 'Weet u zeker dat u dit menuitem wilt verwijderen?',
+  'Display children' => 'Toon kinderen',
+  'Order' => 'Volgorde',
+  'Target' => 'Doel',
+  'Create menu item from content' => 'Maak menuitem van content',
+  'Are you sure that you want to create a menu item from this content item?' => 'Weet u zeker dat u een menuitem wilt maken van deze content?',
+  'name' => 'Website beheer',
+  'description' => 'Dit is de nieuwe CMS module',
+  'Content' => 'Content',
+  'Site' => 'Site',
+  'Meta' => 'Meta',
+  'Template' => 'Template',
+  'ID' => 'ID',
+  'Slug' => 'Slug',
+  'Status' => 'Status',
+  'Module' => 'Module',
+  'SSL' => 'SSL',
+  'Mod rewrite' => 'Mod rewrite',
+  'Mod rewrite base path' => 'Mod rewrite base path',
+  'Base path' => 'Base path',
+  'ACL' => 'ACL',
+  'Add from Group-Office' => 'Toevoegen van {product_name}',
+  'Zoom' => 'Zoom',
+  'Inline' => 'Inline',
+  'Url' => 'Url',
+  'Menu\'s' => 'Menu\'s',
+  'Menu' => 'Menu',
+  'Label' => 'Label',
+);

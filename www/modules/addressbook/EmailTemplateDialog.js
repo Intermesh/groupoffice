@@ -7,7 +7,7 @@
  * If you have questions write an e-mail to info@intermesh.nl
  * 
  * @copyright Copyright Intermesh
- * @version $Id: EmailTemplateDialog.js 19784 2016-01-26 13:56:16Z michaelhart86 $
+ * @version $Id: EmailTemplateDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @author Merijn Schering <mschering@intermesh.nl>
  * @author Wilmar van Beusekom <wilmar@intermesh.nl>
  */
@@ -34,28 +34,10 @@ GO.addressbook.EmailTemplateDialog = function(config){
 	config.width=760;
 	config.height=600;
 	config.closeAction='hide';
-	config.title= GO.addressbook.lang.emailTemplate;					
+	config.title= t("E-mail template", "addressbook");					
 	config.items= this.formPanel;
 	config.focus= focusFirstField.createDelegate(this);
-	config.buttons=[{
-		text: GO.lang['cmdOk'],
-		handler: function(){
-			this.submitForm(true);
-		},
-		scope: this
-	},{
-		text: GO.lang['cmdApply'],
-		handler: function(){
-			this.submitForm();
-		},
-		scope:this
-	},{
-		text: GO.lang['cmdClose'],
-		handler: function(){
-			this.hide();
-		},
-		scope:this
-	}];
+	config.buttonAlign='left';
 
 	
 	GO.addressbook.EmailTemplateDialog.superclass.constructor.call(this, config);
@@ -135,7 +117,7 @@ Ext.extend(GO.addressbook.EmailTemplateDialog, Ext.Window,{
 		this.formPanel.form.submit(
 		{
 			url: GO.url('addressbook/template/submit'),
-			waitMsg:GO.lang['waitMsgSave'],
+			waitMsg:t("Saving..."),
 			success:function(form, action){
 				
 				this.fireEvent('save', this);
@@ -155,9 +137,9 @@ Ext.extend(GO.addressbook.EmailTemplateDialog, Ext.Window,{
 			failure: function(form, action) {
 				if(action.failureType == 'client')
 				{					
-					Ext.MessageBox.alert(GO.lang['strError'], GO.lang['strErrorsInForm']);			
+					Ext.MessageBox.alert(t("Error"), t("You have errors in your form. The invalid fields are marked."));			
 				} else {
-					Ext.MessageBox.alert(GO.lang['strError'], action.result.feedback);
+					Ext.MessageBox.alert(t("Error"), action.result.feedback);
 				}
 			},
 			scope: this
@@ -182,80 +164,80 @@ Ext.extend(GO.addressbook.EmailTemplateDialog, Ext.Window,{
 //		}, this);
 		
 		var autodata = [			
-		['{date}',GO.lang['strDate']],
-		['{contact:salutation}',GO.lang['strSalutation']],
-		['{contact:first_name}',GO.lang['strFirstName']],
-		['{contact:middle_name}',GO.lang['strMiddleName']],
-		['{contact:last_name}',GO.lang['strLastName']],
-		['{contact:initials}',GO.lang['strInitials']],
-		['{contact:title}',GO.lang['strTitle']],
-		['{contact:email}',GO.lang['strEmail']],
-		['{contact:home_phone}',GO.lang['strPhone']],
-		['{contact:fax}',GO.lang['strFax']],
-		['{contact:cellular}',GO.lang['strCellular']],
-		['{contact:cellular2}',GO.lang['cellular2']],
-		['{contact:address}',GO.lang['strAddress']],
-		['{contact:address_no}',GO.lang['strAddressNo']],
-		['{contact:zip}',GO.lang['strZip']],
-		['{contact:city}',GO.lang['strCity']],
-		['{contact:state}',GO.lang['strState']],
-		['{contact:country}',GO.lang['strCountry']],
-		['{contact:company}',GO.lang['strCompany']],
-		['{contact:department}',GO.lang['strDepartment']],
-		['{contact:function}',GO.lang['strFunction']],
-		['{contact:work_phone}',GO.lang['strWorkPhone']],
-		['{contact:work_fax}',GO.lang['strWorkFax']],
-		['{contact:work_address}',GO.lang['strWorkAddress']],
-		['{contact:work_address_no}',GO.lang.strWorkAddressNo],
-		['{contact:work_city}',GO.lang['strWorkCity']],
-		['{contact:work_zip}',GO.lang['strWorkZip']],
-		['{contact:work_state}',GO.lang['strWorkState']],
-		['{contact:work_country}',GO.lang['strWorkCountry']],
-		['{contact:work_post_address}',GO.lang['strPostAddress']],
-		['{contact:work_post_address_no}',GO.lang['strPostAddressNo']],
-		['{contact:work_post_city}',GO.lang['strPostCity']],
-		['{contact:work_post_zip}',GO.lang['strPostZip']],
-		['{contact:work_post_state}',GO.lang['strPostState']],
-		['{contact:work_post_country}',GO.lang['strPostCountry']],
-		['{contact:homepage}',GO.lang['strHomepage']],
-		['{user:name}',GO.lang.strName+' ('+GO.lang.strUser+')'],
-		['{user:first_name}',GO.lang['strFirstName']+' ('+GO.lang.strUser+')'],
-		['{user:middle_name}',GO.lang['strMiddleName']+' ('+GO.lang.strUser+')'],
-		['{user:last_name}',GO.lang['strLastName']+' ('+GO.lang.strUser+')'],
-		['{user:initials}',GO.lang['strInitials']+' ('+GO.lang.strUser+')'],
-		['{user:title}',GO.lang['strTitle']+' ('+GO.lang.strUser+')'],
-		['{user:email}',GO.lang['strEmail']+' ('+GO.lang.strUser+')'],
-		['{user:home_phone}',GO.lang['strPhone']+' ('+GO.lang.strUser+')'],
-		['{user:fax}',GO.lang['strFax']+' ('+GO.lang.strUser+')'],
-		['{user:work_phone}',GO.lang['strWorkPhone']+' ('+GO.lang.strUser+')'],
-		['{user:work_fax}',GO.lang['strWorkFax']+' ('+GO.lang.strUser+')'],
-		['{user:cellular}',GO.lang['strCellular']+' ('+GO.lang.strUser+')'],
-		['{user:cellular2}',GO.lang['cellular2']+' ('+GO.lang.strUser+')'],
-		['{user:address}',GO.lang['strAddress']+' ('+GO.lang.strUser+')'],
-		['{user:address_no}',GO.lang['strAddressNo']+' ('+GO.lang.strUser+')'],
-		['{user:zip}',GO.lang['strZip']+' ('+GO.lang.strUser+')'],
-		['{user:city}',GO.lang['strCity']+' ('+GO.lang.strUser+')'],
-		['{user:state}',GO.lang['strState']+' ('+GO.lang.strUser+')'],
-		['{user:country}',GO.lang['strCountry']+' ('+GO.lang.strUser+')'],
-		['{usercompany:name}',GO.lang['strCompany']+' ('+GO.lang.strUser+')'],
-		['{user:department}',GO.lang['strDepartment']+' ('+GO.lang.strUser+')'],
-		['{user:function}',GO.lang['strFunction']+' ('+GO.lang.strUser+')'],
-		['{usercompany:phone}',GO.lang['strWorkPhone']+' ('+GO.lang.strUser+')'],
-		['{usercompany:fax}',GO.lang['strWorkFax']+' ('+GO.lang.strUser+')'],
-		['{usercompany:address}',GO.lang['strWorkAddress']+' ('+GO.lang.strUser+')'],
-		['{usercompany:address_no}',GO.lang['strWorkAddressNo']+' ('+GO.lang.strUser+')'],
-		['{usercompany:city}',GO.lang['strWorkCity']+' ('+GO.lang.strUser+')'],
-		['{usercompany:zip}',GO.lang['strWorkZip']+' ('+GO.lang.strUser+')'],
-		['{usercompany:state}',GO.lang['strWorkState']+' ('+GO.lang.strUser+')'],
-		['{usercompany:country}',GO.lang['strWorkCountry']+' ('+GO.lang.strUser+')'],
-		['{user:homepage}',GO.lang.strHomepage+' ('+GO.lang.strUser+')'],
-		['{unsubscribe_link}',GO.addressbook.lang.unsubscribeLink],
-		['%unsubscribe_href%',GO.addressbook.lang.unsubscribeHref],
-		['{link}',GO.lang.cmdLink]
+		['{date}',t("Date")],
+		['{contact:salutation}',t("Salutation")],
+		['{contact:first_name}',t("First name")],
+		['{contact:middle_name}',t("Middle name")],
+		['{contact:last_name}',t("Last name")],
+		['{contact:initials}',t("Initials")],
+		['{contact:title}',t("Title")],
+		['{contact:email}',t("E-mail")],
+		['{contact:home_phone}',t("Phone")],
+		['{contact:fax}',t("Fax")],
+		['{contact:cellular}',t("Mobile")],
+		['{contact:cellular2}',t("2nd mobile")],
+		['{contact:address}',t("Address")],
+		['{contact:address_no}',t("Address 2")],
+		['{contact:zip}',t("ZIP/Postal")],
+		['{contact:city}',t("City")],
+		['{contact:state}',t("State")],
+		['{contact:country}',t("Country")],
+		['{contact:company}',t("Company")],
+		['{contact:department}',t("Department")],
+		['{contact:function}',t("Function")],
+		['{contact:work_phone}',t("Phone (work)")],
+		['{contact:work_fax}',t("Fax (work)")],
+		['{contact:work_address}',t("Address (work)")],
+		['{contact:work_address_no}',t("Address 2 (work)")],
+		['{contact:work_city}',t("City (work)")],
+		['{contact:work_zip}',t("ZIP/Postal (work)")],
+		['{contact:work_state}',t("State (work)")],
+		['{contact:work_country}',t("Country (work)")],
+		['{contact:work_post_address}',t("Address (post)")],
+		['{contact:work_post_address_no}',t("Number of house (post)")],
+		['{contact:work_post_city}',t("City (post)")],
+		['{contact:work_post_zip}',t("ZIP/Postal (post)")],
+		['{contact:work_post_state}',t("State (post)")],
+		['{contact:work_post_country}',t("Country (post)")],
+		['{contact:homepage}',t("Homepage")],
+		['{user:name}',t("Name")+' ('+t("User")+')'],
+		['{user:first_name}',t("First name")+' ('+t("User")+')'],
+		['{user:middle_name}',t("Middle name")+' ('+t("User")+')'],
+		['{user:last_name}',t("Last name")+' ('+t("User")+')'],
+		['{user:initials}',t("Initials")+' ('+t("User")+')'],
+		['{user:title}',t("Title")+' ('+t("User")+')'],
+		['{user:email}',t("E-mail")+' ('+t("User")+')'],
+		['{user:home_phone}',t("Phone")+' ('+t("User")+')'],
+		['{user:fax}',t("Fax")+' ('+t("User")+')'],
+		['{user:work_phone}',t("Phone (work)")+' ('+t("User")+')'],
+		['{user:work_fax}',t("Fax (work)")+' ('+t("User")+')'],
+		['{user:cellular}',t("Mobile")+' ('+t("User")+')'],
+		['{user:cellular2}',t("2nd mobile")+' ('+t("User")+')'],
+		['{user:address}',t("Address")+' ('+t("User")+')'],
+		['{user:address_no}',t("Address 2")+' ('+t("User")+')'],
+		['{user:zip}',t("ZIP/Postal")+' ('+t("User")+')'],
+		['{user:city}',t("City")+' ('+t("User")+')'],
+		['{user:state}',t("State")+' ('+t("User")+')'],
+		['{user:country}',t("Country")+' ('+t("User")+')'],
+		['{usercompany:name}',t("Company")+' ('+t("User")+')'],
+		['{user:department}',t("Department")+' ('+t("User")+')'],
+		['{user:function}',t("Function")+' ('+t("User")+')'],
+		['{usercompany:phone}',t("Phone (work)")+' ('+t("User")+')'],
+		['{usercompany:fax}',t("Fax (work)")+' ('+t("User")+')'],
+		['{usercompany:address}',t("Address (work)")+' ('+t("User")+')'],
+		['{usercompany:address_no}',t("Address 2 (work)")+' ('+t("User")+')'],
+		['{usercompany:city}',t("City (work)")+' ('+t("User")+')'],
+		['{usercompany:zip}',t("ZIP/Postal (work)")+' ('+t("User")+')'],
+		['{usercompany:state}',t("State (work)")+' ('+t("User")+')'],
+		['{usercompany:country}',t("Country (work)")+' ('+t("User")+')'],
+		['{user:homepage}',t("Homepage")+' ('+t("User")+')'],
+		['{unsubscribe_link}',t("Unsubscribe link", "addressbook")],
+		['%unsubscribe_href%',t("Unsubscribe href", "addressbook")],
+		['{link}',t("Link")]
 		];
    	
 		var items = [new Ext.Panel({
-			title:GO.addressbook.lang.autoData ,
+			title:t("Autodata", "addressbook") ,
 			autoScroll:true,
 			items:new GO.grid.SimpleSelectList({
 				store:  new Ext.data.SimpleStore({
@@ -274,13 +256,13 @@ Ext.extend(GO.addressbook.EmailTemplateDialog, Ext.Window,{
 			})
 		})];
 
-		if(GO.customfields){
+		if(go.ModuleManager.isAvailable("customfields")){
 			autodata=[];
 
 			if(autodata.length){
 				items.push(new Ext.Panel({
 					autoScroll:true,
-					title:GO.addressbook.lang.customContactFields,
+					title:t("Custom contact fields", "addressbook"),
 
 					items:new GO.grid.SimpleSelectList({
 						store:  new Ext.data.SimpleStore({
@@ -304,7 +286,7 @@ Ext.extend(GO.addressbook.EmailTemplateDialog, Ext.Window,{
 			if(autodata.length){
 				items.push(new Ext.Panel({
 					autoScroll:true,
-					title:GO.addressbook.lang.customCompanyFields,
+					title:t("Custom company fields", "addressbook"),
 					items:new GO.grid.SimpleSelectList({
 						store:  new Ext.data.SimpleStore({
 							fields: ['value', 'name'],
@@ -329,7 +311,7 @@ Ext.extend(GO.addressbook.EmailTemplateDialog, Ext.Window,{
 			if(autodata.length){
 				items.push(new Ext.Panel({
 					autoScroll:true,
-					title:GO.addressbook.lang.customUserFields,
+					title:t("Custom user fields", "addressbook"),
 					items:new GO.grid.SimpleSelectList({
 						store:  new Ext.data.SimpleStore({
 							fields: ['value', 'name'],
@@ -366,7 +348,7 @@ Ext.extend(GO.addressbook.EmailTemplateDialog, Ext.Window,{
 			layout:'border',
 			items:[{
 				region:'north',
-				height:60,
+				autoHeight: true,
 				layout:'form',
 				border: false,
 				cls:'go-form-panel',			
@@ -376,14 +358,14 @@ Ext.extend(GO.addressbook.EmailTemplateDialog, Ext.Window,{
 					name: 'name',
 					anchor: '100%',
 					allowBlank:false,
-					fieldLabel: GO.lang.strName
+					fieldLabel: t("Name")
 				},
 				{
 					xtype: 'textfield',
 					name: 'subject',
 					anchor: '100%',
 					allowBlank: true,
-					fieldLabel: GO.lang.strSubject
+					fieldLabel: t("Subject")
 				}
 			]
 			},
@@ -396,8 +378,7 @@ Ext.extend(GO.addressbook.EmailTemplateDialog, Ext.Window,{
 		//{text:'Toggle HTML',handler:function(){this.htmlEditPanel.setContentTypeHtml(this.htmlEditPanel.getContentType()!='html')}, scope:this}
 		var borderLayoutPanel = new Ext.Panel({
 			layout:'border',
-			title:GO.lang['strProperties'],	
-			tbar:[this.htmlEditPanel.getAttachmentsButton()],
+			title:t("Properties"),	
 			items: [this.propertiesPanel, this.autoDataPanel]			
 		});
 		
@@ -428,6 +409,19 @@ Ext.extend(GO.addressbook.EmailTemplateDialog, Ext.Window,{
 			items:this.tabPanel				
 		});
     
-    
+		this.buttons = [this.htmlEditPanel.getAttachmentsButton(),'->',
+		{
+			text: t("Apply"),
+			handler: function(){
+				this.submitForm();
+			},
+			scope:this
+		},{
+			text: t("Save"),
+			handler: function(){
+				this.submitForm(true);
+			},
+			scope: this
+		}];
 	}
 });

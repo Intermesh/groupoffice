@@ -123,7 +123,7 @@ class AccountController extends \GO\Site\Components\Controller {
 			$user = \GO\Base\Model\User::model()->findSingleByAttribute('email', $_POST['email']);
 			
 			if($user == null){
-				\Site::notifier()->setMessage('error', \GO::t("invaliduser","site"));
+				\Site::notifier()->setMessage('error', \GO::t("No user found with the given email address!", "site"));
 			}else{
 				$siteTitle = \Site::model()->name;
 				$url = \Site::request()->getHostInfo(). \Site::urlManager()->createUrl('/site/account/resetpassword', array(), false);
@@ -132,7 +132,7 @@ class AccountController extends \GO\Site\Components\Controller {
 				$fromEmail = \GO::config()->noreply_email;
 
 				$user->sendResetPasswordMail($siteTitle,$url,$fromName,$fromEmail);
-				\Site::notifier()->setMessage('success', \GO::t('recoverEmailSent', 'site')." ".$user->email);
+				\Site::notifier()->setMessage('success', \GO::t("An email with recover instructions is send to the following email address:", "site")." ".$user->email);
 			}
 		}
 		
@@ -142,12 +142,12 @@ class AccountController extends \GO\Site\Components\Controller {
 	public function actionResetPassword()
 	{
 		if(empty($_GET['email']))
-			throw new \Exception(\GO::t("noemail","site"));
+			throw new \Exception(\GO::t("No email given!", "site"));
 
 		$user = \GO\Base\Model\User::model()->findSingleByAttribute('email', $_GET['email']);
 
 		if(!$user)
-			throw new \Exception(\GO::t("invaliduser","site"));
+			throw new \Exception(\GO::t("No user found with the given email address!", "site"));
 
 		if(isset($_GET['usertoken']) && $_GET['usertoken'] == $user->getSecurityToken())
 		{
@@ -159,11 +159,11 @@ class AccountController extends \GO\Site\Components\Controller {
 				\GO::$ignoreAclPermissions = true; 
 				
 				if($user->validate() && $user->save())
-					\Site::notifier()->setMessage('success',\GO::t('resetPasswordSuccess', 'site'));
+					\Site::notifier()->setMessage('success',\GO::t("Your password is successfully reset.", "site"));
 			}
 		}
 		else
-			\Site::notifier()->setMessage('error',\GO::t("invalidusertoken","site"));
+			\Site::notifier()->setMessage('error',\GO::t("The provided usertoken is not valid!", "site"));
 				
 		$user->password = null;
 		echo $this->render('resetPassword', array('user'=>$user));
@@ -174,7 +174,7 @@ class AccountController extends \GO\Site\Components\Controller {
 		$user = \GO\Base\Model\User::model()->findSingleByAttribute('username',$params['username']);
 		
 		if(!$user){
-			\Site::notifier()->setMessage('error', \GO::t("usernameIncorrect","defaultsite"));
+			\Site::notifier()->setMessage('error', \GO::t("The given username is incorrect", "defaultsite"));
 			echo $this->render('resetExpiredPassword',array('user'=>$user));
 			return;
 		}
@@ -183,13 +183,13 @@ class AccountController extends \GO\Site\Components\Controller {
 
 			// Check if the neccesary fields are here
 			if(empty($_POST['current_password']) || empty($_POST['password'])	|| empty($_POST['confirm'])){
-				\Site::notifier()->setMessage('error', \GO::t("pleaseFillInAllFields","defaultsite"));
+				\Site::notifier()->setMessage('error', \GO::t("Please fill in all fields", "defaultsite"));
 				echo $this->render('resetExpiredPassword',array('user'=>$user));
 				return;
 			}
 			
 			if($_POST['password'] != $_POST['confirm']){
-				\Site::notifier()->setMessage('error', \GO::t("passwordsDoNotMatch","defaultsite"));
+				\Site::notifier()->setMessage('error', \GO::t("The password and the password confirmation do not match", "defaultsite"));
 				echo $this->render('resetExpiredPassword',array('user'=>$user));
 				return;
 			}
@@ -201,7 +201,7 @@ class AccountController extends \GO\Site\Components\Controller {
 				if($user->checkPassword($_POST['password'])){
 					// The password validates with the current value, so it's the same
 					// Now validate to false
-					\Site::notifier()->setMessage('error', \GO::t("passwordsMayNotBeTheSame","defaultsite"));
+					\Site::notifier()->setMessage('error', \GO::t("The new password may not be the same as the old password", "defaultsite"));
 					echo $this->render('resetExpiredPassword',array('user'=>$user));
 					return;
 					
@@ -213,13 +213,13 @@ class AccountController extends \GO\Site\Components\Controller {
 					if($user->save(true)){
 						\Site::notifier()->setMessage('success', 'YOUR PASSWORD IS CHANGED SUCCESSFULLY');	
 					}else{
-						\Site::notifier()->setMessage('error', \GO::t("couldNotSaveNewPassword","defaultsite"));
+						\Site::notifier()->setMessage('error', \GO::t("The new password could not be saved. Please contact the administrator of the system", "defaultsite"));
 						echo $this->render('resetExpiredPassword',array('user'=>$user));
 						return;
 					}
 				}
 			} else {
-					\Site::notifier()->setMessage('error', \GO::t("passwordIncorrect","defaultsite"));
+					\Site::notifier()->setMessage('error', \GO::t("The password you have given is incorrect", "defaultsite"));
 					echo $this->render('resetExpiredPassword',array('user'=>$user));
 					return;
 			}
@@ -258,7 +258,7 @@ class AccountController extends \GO\Site\Components\Controller {
 				\GO::language()->setLanguage(\Site::model()->language);
 			
 			if (!$user) {
-				\Site::notifier()->setMessage('error', \GO::t('badLogin')); // set the correct login failure message
+				\Site::notifier()->setMessage('error', \GO::t("Wrong username or password")); // set the correct login failure message
 			} else {
 				if (!empty($_POST['rememberMe'])) {
 

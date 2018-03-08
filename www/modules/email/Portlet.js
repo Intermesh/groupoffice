@@ -1,12 +1,12 @@
 GO.mainLayout.onReady(function(){
-	if(GO.summary)
+	if(go.ModuleManager.isAvailable("summary"))
 	{
 		this.emailPortlet = new GO.email.PortletPanel();
 		
 		GO.summary.portlets['portlet-email']=new GO.summary.Portlet({
 			id: 'portlet-email',
 			iconCls: 'go-module-icon-email',
-			title: GO.email.lang.email,
+			title: t("Email", "email"),
 			layout:'fit',
 			tools: [{
 				id: 'gear',

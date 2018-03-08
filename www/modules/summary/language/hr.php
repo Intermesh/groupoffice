@@ -1,25 +1,25 @@
 <?php
-
-$l['name']='Početna stranica';
-$l['description']='Prikazuje pregled različitih aktualnih stavki';
-$l['default_rss_url']='http://www.vecernji.hr/rss/';
-$l['default_rss_title']='Vijesti';
-$l["summary"]= 'Početna stranica';
-$l["noItems"]= 'Nemate nikakve stavke na vašoj početnoj stranici.';
-$l["selectPortlet"]= 'Odaberi stavku';
-$l["hotTopics"]= 'Vijesti';
-$l["enterRssFeed"]= 'Unesite web adresu RSS pretplate:';
-$l["notes"]= 'Bilješke';
-$l["loadingFeed"]= 'Učitavanje pretplate...';
-$l["goToPost"]= 'Idi na objavu';
-$l["today"]= 'Danas ';
-$l["announcement"]="Objava";
-$l["announcements"]="Objave";
-$l["dueTime"]="Prikazuj do";
-$l["title"]="Naslov";
-$l["manageAnnouncements"]='Upravljanje objavama';
-$l["webFeeds"]='Upravljaj web pretplatama';
-$l["type"]='Tip';
-$l["summaryType"]='Početna stranica';
-$l["rssFeeds"]='RSS pretplate';
-$l["noRssFeeds"]='Nije dodana niti jedna RSS pretplata.<br />Kliknite na tipku postavki u gornjem desnom kutu ovog prozora kako biste dodali RSS pretplate.';
+return array (
+  'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml' => 'http://www.vecernji.hr/rss/',
+  'News' => 'Vijesti',
+  'You don\'t have any items on your start page.' => 'Nemate nikakve stavke na vašoj početnoj stranici.',
+  'Select portlet' => 'Odaberi stavku',
+  'Please enter the RSS feed URL:' => 'Unesite web adresu RSS pretplate:',
+  'Notes' => 'Bilješke',
+  'Loading Feed...' => 'Učitavanje pretplate...',
+  'Go to Post' => 'Idi na objavu',
+  'Today ' => 'Danas ',
+  'Announcement' => 'Objava',
+  'Announcements' => 'Objave',
+  'Show until' => 'Prikazuj do',
+  'Title' => 'Naslov',
+  'Manage announcements' => 'Upravljanje objavama',
+  'Manage webfeeds' => 'Upravljaj web pretplatama',
+  'Type' => 'Tip',
+  'Summary' => 'Početna stranica',
+  'Rss Feeds' => 'RSS pretplate',
+  'No RSS feeds have been added.<br />Click the settings button in the top right corner of this window to add feeds.' => 'Nije dodana niti jedna RSS pretplata.<br />Kliknite na tipku postavki u gornjem desnom kutu ovog prozora kako biste dodali RSS pretplate.',
+  'name' => 'Početna stranica',
+  'description' => 'Prikazuje pregled različitih aktualnih stavki',
+  'Start page' => 'Početna stranica',
+);

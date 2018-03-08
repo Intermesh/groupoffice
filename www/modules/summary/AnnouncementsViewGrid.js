@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: AnnouncementsViewGrid.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: AnnouncementsViewGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -61,7 +61,7 @@ GO.summary.AnnouncementsViewGrid = function(config){
 			}
 			return 'x-grid3-row-collapsed';
 		},
-		emptyText: GO.lang['strNoItems']		
+		emptyText: t("No items to display")		
 	});
 	//config.sm=new Ext.grid.RowSelectionModel();
 	config.loadMask=true;

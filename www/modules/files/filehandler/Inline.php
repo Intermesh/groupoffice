@@ -12,7 +12,7 @@ class Inline implements FilehandlerInterface{
 	}
 	
 	public function getName(){
-		return \GO::t('openInBrowser','files');
+		return \GO::t("Open in browser", "files");
 	}
 	
 	public function fileIsSupported(\GO\Files\Model\File $file){

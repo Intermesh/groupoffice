@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: AccountsTree.js 21337 2017-07-31 07:56:53Z devdevilnl $
+ * @version $Id: AccountsTree.js 22407 2018-02-21 09:38:43Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -16,10 +16,9 @@ GO.email.AccountsTree = function(config){
 	{
 		config = {};
 	}
-	config.layout='fit';
   config.split=true;
 	config.autoScroll=true;
-	config.width=200;
+	config.width=dp(280);
 	
 	config.animate=true;
 	config.loader=new GO.base.tree.TreeLoader(
@@ -41,8 +40,8 @@ GO.email.AccountsTree = function(config){
 		
 		if(result.success===false){
 //			GO.errorDialog.show(result.feedback);
-			node.setText(node.text+' ('+GO.lang.strError+')');
-			node.setTooltip(result.feedback, GO.lang.strError);
+			node.setText(node.text+' ('+t("Error")+')');
+			node.setTooltip(result.feedback, t("Error"));
 			
 			if(result.exceptionClass && result.exceptionClass=='GO\\Base\\Mail\\ImapAuthenticationFailedException'){
 				this._errorNodes.push(node.attributes);
@@ -53,18 +52,10 @@ GO.email.AccountsTree = function(config){
 		this._nodeId = 0;
 		this._handleFailedIMAPConnections();
 	},this);
-	
-	
-//	config.loader.on("load", function(treeLoader, node)
-//	{
-//		node.attributes.parentExpanded=true;
-//	}, this);
+
 
 	config.containerScroll=true;
 	config.rootVisible=false;
-	config.collapseFirst=false;
-	config.collapsible=true;
-	config.collapseMode='mini';
 	config.header=false;
 	config.ddAppendOnly=true;
 	config.containerScroll=true;	
@@ -75,20 +66,9 @@ GO.email.AccountsTree = function(config){
 
 	GO.email.AccountsTree.superclass.constructor.call(this, config);	
 	
-	
-	// set the root node
-//	var rootNode = new Ext.tree.AsyncTreeNode({
-//		text: 'Root',
-//		id:'bs-folder-0',
-//		draggable:false,
-//		iconCls : 'folder-default',
-//		expanded:false
-//	});
-//	this.setRootNode(rootNode);
-	
 	// set the root node
 	var root = new Ext.tree.AsyncTreeNode({
-		text: GO.email.lang.accounts,
+		text: t("Accounts", "email"),
 		draggable:false,
 		id:'root'
 	});
@@ -246,7 +226,7 @@ GO.email.AccountsTree = function(config){
 						to_mailbox:e.target.attributes['mailbox'],
 						messages:Ext.encode(messages)
 					}
-					Ext.MessageBox.progress(GO.email.lang.moving, '', '');
+					Ext.MessageBox.progress(t("Moving...", "email"), '', '');
 					Ext.MessageBox.updateProgress(0, '0%', '');
 
 				
@@ -357,36 +337,6 @@ GO.email.AccountsTree = function(config){
 		this.dropZone.appendOnly=true;
 	},
 	this);
-	
-	
-
-	
-	
-	
-//	this.treeEditor = new Ext.tree.TreeEditor(
-//		this,
-//		new Ext.form.TextField({
-//			cancelOnEsc:true,
-//			completeOnEnter:true,
-//			maskRe:/[^:]/
-//		}),
-//		{
-//			listeners:{
-//				complete  : this.afterEdit,
-//				startedit : function( editor, boundEl, value )
-//				{
-//					editor.setValue(editor.editNode.attributes.mailbox);
-//				},
-//				beforecomplete  : function( editor, value, startValue){
-//					value=value.trim();
-//					if(GO.util.empty(value)){
-//						editor.focus();
-//						return false;
-//					}
-//				},
-//				scope:this
-//			}
-//		});
 }
 
 Ext.extend(GO.email.AccountsTree, Ext.tree.TreePanel, {	
@@ -479,25 +429,8 @@ Ext.extend(GO.email.AccountsTree, Ext.tree.TreePanel, {
 			fail : function(){
 				this.refresh();
 			},
-			success:function(options, response, result)
-			{
-				
-				this.refresh(node.parentNode);
-				
-//				var responseParams = Ext.decode(response.responseText);
-//				if(responseParams.success)
-//				{
-//					//remove preloaded children otherwise it won't request the server
-//					delete node.parentNode.attributes.children;
-//					node.parentNode.reload();
-//				}else
-//				{
-//					var accountNode = this.getNodeById('account_'+account_id)
-//					if(accountNode)
-//						accountNode.reload();
-//					
-//					Ext.MessageBox.alert(GO.lang.strError,responseParams.feedback);
-//				}								
+			success:function(options, response, result){
+				this.refresh(node.parentNode);							
 			},
 			scope:this
 		});
@@ -517,40 +450,32 @@ Ext.extend(GO.email.AccountsTree, Ext.tree.TreePanel, {
 	
 	_handleFailedIMAPConnections : function() {
 		var errorNode=this._errorNodes.shift();
-//		if(typeof(errorNode)!='Object' && errorNode!==false)
-//			errorNode=this._errorNodes.shift();
-//		
 		if(errorNode){
 			
 			this.accountId =errorNode['account_id'];
 			if (!this.imapLoginFailedDialog)
 				this.imapLoginFailedDialog = new GO.Window({
-					title: GO.lang['strError'],
-					layout: 'fit',
-					width: 320,
-					height: 220,
+					title: t('mailbox', 'email'),
+					width: dp(424),
+					autoHeight: true,
 					cls : 'go-form-panel',
 					items: [this.imapLoginFailedFormPanel = new Ext.form.FormPanel({
 						items: [this.imapLoginFailedInfoField = new GO.form.PlainField({
-							value: GO.email.lang['imapLoginFailed'],
+							value: t("Authentication failed for user \"%username\".", "email"),
 							hideLabel: true,
-							//							height: 80,
-							anchor: '-20'
 						}), this.passwordField = new Ext.form.TextField({
-							fieldLabel : GO.lang.strPassword,
+							fieldLabel : t("Password"),
 							name : 'password',
 							inputType : 'password',
 							allowBlank : false,
-							anchor: '-20'
 						}),new Ext.ux.form.XCheckbox({
-							boxLabel: GO.email.lang.storePassword,
+							boxLabel: t("Permanently store password", "email"),
 							checked: false,
 							name: 'store_password',
-//							allowBlank: true,
 							hideLabel:true
 						})],
 						buttons: [{
-							text : GO.lang.cmdOk,
+							text : t("Ok"),
 							handler : function() {
 								this.imapLoginFailedFormPanel.form.submit({
 									url: GO.url('email/account/savePassword'),
@@ -565,31 +490,23 @@ Ext.extend(GO.email.AccountsTree, Ext.tree.TreePanel, {
 									failure : function(form, action) {
 										var error = '';
 										if (action.failureType == 'client') {
-											error = GO.lang.strErrorsInForm;
+											error = t("You have errors in your form. The invalid fields are marked.");
 										} else if (action.result) {
 											error = action.result.feedback;
 										} else {
-											error = GO.lang.strRequestError;
+											error = t("Could not connect to the server. Please check your internet connection.");
 										}
 											
-										Ext.MessageBox.alert(GO.lang.strError, error);
+										Ext.MessageBox.alert(t("Error"), error);
 									},
 									scope: this
 								});
 							},
 							scope : this
-						}, {
-							text : GO.lang.cmdClose,
-							handler : function() {
-								this.imapLoginFailedDialog.hide();
-								this.imapLoginFailedFormPanel.form.reset();
-								this._handleFailedIMAPConnections();								
-							},
-							scope : this
 						}]
 					})]
 				});
-			this.imapLoginFailedInfoField.setValue(GO.email.lang['imapLoginFailed'].replace('%username',errorNode.name)+' '+GO.email.lang['tryNewCredentials']);
+			this.imapLoginFailedInfoField.setValue(t("Authentication failed for user \"%username\".", "email").replace('%username',errorNode.name)+' '+t("Please enter try with a different IMAP password.", "email"));
 			this.imapLoginFailedDialog.show();
 		}
 	
@@ -628,33 +545,4 @@ Ext.extend(GO.email.AccountsTree, Ext.tree.TreePanel, {
 					
 	}
 
-//	_setErrorNodes : function (nodes) {
-//		this._errorNodes = [];
-//		for (var nodeId in nodes) {
-//			if (!nodes[nodeId].isAccount && !GO.util.empty(nodes[nodeId].hasError))
-//				this._errorNodes.push(nodes[nodeId]);
-//		}
-//	}
-//	
-//	afterEdit : function(editor, text, oldText ){
-//
-//		GO.request({
-//			url:'email/folder/submit',
-//			params:{				
-//				parent:editor.editNode.parentNode.id=='root' ? "" : editor.editNode.parentNode.attributes.mailbox,
-//				account_id:editor.editNode.parentNode.attributes.account_id,
-//				oldmailbox:oldText,
-//				newmailbox:text
-//			},
-//			success: function(response, options, result)
-//			{
-//				if(!result.success)
-//				{					
-//					editor.editNode.destroy();
-//					alert(result.feedback);
-//				}				
-//			},
-//			scope:this
-//		});
-//	}
 });

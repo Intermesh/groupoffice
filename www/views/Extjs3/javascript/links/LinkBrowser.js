@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: LinkBrowser.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: LinkBrowser.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -35,7 +35,7 @@ GO.LinkBrowser = function(config){
 		maximizable:true,
 		collapsible:true,
 		closeAction:'hide',
-		title:GO.lang.cmdBrowseLinks,
+		title:t("Links"),
 		items: this.linksPanel
     });
     

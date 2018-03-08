@@ -54,8 +54,8 @@ Ext.extend(GO.plugins.HtmlEditorSpellCheck, Ext.util.Observable, {
 			},
             clickEvent:'mousedown',
             tabIndex:-1,
-			overflowText: GO.lang.spellcheck,
-            tooltip:{title:GO.lang.spellcheck, text:GO.lang.spellcheckdetails}
+			overflowText: t("Spell Check"),
+            tooltip:{title:t("Spell Check"), text:t("Check Spelling")}
         });
     }
 	},
@@ -81,7 +81,7 @@ Ext.extend(GO.plugins.HtmlEditorSpellCheck, Ext.util.Observable, {
 	processResults : function(result, request,self){
 		var jsonData = Ext.util.JSON.decode(result.responseText);
 		if (jsonData.errorcount == 0){
-			Ext.Msg.alert(GO.lang.spellcheck,GO.lang.spellcheckNoError);
+			Ext.Msg.alert(t("Spell Check"),t("No Errors Found"));
 		}else{
 			self.showSpellChecker(jsonData.errorcount,jsonData.text,self);
 		}
@@ -91,7 +91,7 @@ Ext.extend(GO.plugins.HtmlEditorSpellCheck, Ext.util.Observable, {
 		
 		/*htmlobj = Ext.DomHelper.createDom(text);*/
 		
-		var PanelTitle = GO.lang.spellcheckNoErrors.replace(/\{1\}/ig,errors);
+		var PanelTitle = t("Text with [{1}] mistake(s)").replace(/\{1\}/ig,errors);
 		
 		self.textarea = new Ext.Panel({
 					title: PanelTitle,
@@ -108,17 +108,17 @@ Ext.extend(GO.plugins.HtmlEditorSpellCheck, Ext.util.Observable, {
 			closeAction: 'close',
 			closable : true,
 			layout:'fit',
-			title: GO.lang.spellcheck,
+			title: t("Spell Check"),
 			items : [self.textarea],
 			buttons: [
 				{
-					text:GO.lang.cmdSave,
+					text:t("Save"),
 					handler: function(){
 						self.UpdateEditorValue(self);
 					}
 				},
 				{
-					text: GO.lang.cmdCancel,
+					text: t("Cancel"),
 					handler: function(){
 							self.closeWindow(self);
 						}
@@ -187,8 +187,8 @@ Ext.extend(GO.plugins.HtmlEditorSpellCheck, Ext.util.Observable, {
 	
 	problem : function (result,request) {
 		Ext.Msg.show({
-			title: GO.lang.spellcheck,
-			msg: GO.lang.spellcheckServerError,
+			title: t("Spell Check"),
+			msg: t("There was a problem running the spell check, if the problem continues, please contact support"),
 			buttons: Ext.Msg.OK,
 			icon: Ext.Msg.WARNING
 		});	

@@ -28,7 +28,7 @@ class NotFound extends \Exception
 
 	public function __construct($message='') {
 		
-		$message = empty($message) ? \GO::t('notFound') : \GO::t('notFound')."\n\n".$message;
+		$message = empty($message) ? \GO::t("The requested item was not found.") : \GO::t("The requested item was not found.")."\n\n".$message;
 		
 		parent::__construct($message);
 	}

@@ -264,7 +264,7 @@ abstract class Controller extends \GO\Base\Controller\AbstractController {
 		}
 		
 		$module = $this->getModule();
-		return !$module || \GO::modules()->isInstalled($module->id);
+		return !$module || \GO::modules()->isInstalled($module->name);
 	}
 
 	public function run($action = '', $params = array(), $render = true, $checkPermissions = true)
@@ -319,6 +319,8 @@ abstract class Controller extends \GO\Base\Controller\AbstractController {
 			echo $this->render('/site/404', array('error' => $e));
 		}
 		catch (\Exception $e){
+			
+			echo $e->getMessage();
 			echo $this->render('/site/error', array('error' => $e));
 		}
 	}

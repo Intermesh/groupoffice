@@ -1,7 +1,7 @@
 GO.addressbook.AddresslistsMultiSelectGrid = function(config) {
 	var config = config || {};
 	
-	config.title = GO.addressbook.lang.filterMailings;
+	config.title = t("Address list", "addressbook");
 	config.loadMask = true;
 	config.store = GO.addressbook.readableAddresslistsStore;
 	config.allowNoSelection = true;
@@ -10,17 +10,17 @@ GO.addressbook.AddresslistsMultiSelectGrid = function(config) {
 		region:'center'
 	});
 	
-	Ext.apply(config, {		
-		bbar: new GO.SmallPagingToolbar({
-			items:[this.searchField = new GO.form.SearchField({
-				store: config.store,
-				width:120,
-				emptyText: GO.lang.strSearch
-			})],
-			store:config.store,
-			pageSize:GO.settings.config.nav_page_size
-		})
-	});
+//	Ext.apply(config, {		
+//		bbar: new GO.SmallPagingToolbar({
+//			items:[this.searchField = new GO.form.SearchField({
+//				store: config.store,
+//				width:120,
+//				emptyText: t("Search")
+//			})],
+//			store:config.store,
+//			pageSize:GO.settings.config.nav_page_size
+//		})
+//	});
 	
 	GO.addressbook.AddresslistsMultiSelectGrid.superclass.constructor.call(this,config);
 	
@@ -59,8 +59,8 @@ Ext.extend(GO.addressbook.AddresslistsMultiSelectGrid, GO.grid.MultiSelectGrid, 
 		}
 		
 		Ext.Msg.show({
-			title: GO.addressbook.lang['addToAddresslist'].replace('%s',list_name),
-			msg: GO.addressbook.lang['addToAddresslistPrompt'].replace(/%s/g,list_name),
+			title: t("Add to address list %s", "addressbook").replace('%s',list_name),
+			msg: t("You are about to add the selected items to the address list %s. Do you want these items to exist only in %s?", "addressbook").replace(/%s/g,list_name),
 			buttons: Ext.Msg.YESNOCANCEL,
 			scope: this,
 			fn: function(btn) {
@@ -75,7 +75,7 @@ Ext.extend(GO.addressbook.AddresslistsMultiSelectGrid, GO.grid.MultiSelectGrid, 
 						},
 						success: function(options, response, result)
 						{
-							Ext.Msg.alert(GO.lang['strSuccess'],GO.addressbook.lang['addAddresslistSuccess']);
+							Ext.Msg.alert(t("Success"),t("The items have been successfully added to the address list.", "addressbook"));
 						},
 						scope: this
 					})

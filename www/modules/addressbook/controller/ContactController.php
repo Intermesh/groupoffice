@@ -221,10 +221,10 @@ class ContactController extends \GO\Base\Controller\AbstractModelController{
 	protected function formatColumns(\GO\Base\Data\ColumnModel $columnModel) {
 		
 		$sortAlias = \GO::user()->sort_name=="first_name" ? array('first_name','last_name') : array('last_name','first_name');
-		
-		$columnModel->formatColumn('name','$model->getName(\GO::user()->sort_name)', array(),$sortAlias, \GO::t('strName'));
-		$columnModel->formatColumn('company_name','$model->company_name', array(),'', \GO::t('company','addressbook'));
-		$columnModel->formatColumn('ab_name','$model->ab_name', array(),'ab_name', \GO::t('addressbook','addressbook'));
+
+		$columnModel->formatColumn('name','$model->getName(\GO::user()->sort_name)', array(),$sortAlias, \GO::t("Name"));
+		$columnModel->formatColumn('company_name','$model->company_name', array(),'', \GO::t("Company", "addressbook"));
+		$columnModel->formatColumn('ab_name','$model->ab_name', array(),'', \GO::t("Address book", "addressbook"));
 		$columnModel->formatColumn('age', '$model->age', array(), 'birthday');
 		$columnModel->formatColumn('action_date', '$model->getActionDate()', array(), 'action_date');
 		
@@ -352,13 +352,13 @@ class ContactController extends \GO\Base\Controller\AbstractModelController{
 					}	
 					$response['success'] = true;
 				} else {
-					$response['feedback'] = \GO::t('emailAlreadyExists','addressbook');
+					$response['feedback'] = \GO::t("E-mail address is already added to this contact", "addressbook");
 				}
 			} else {
 				$index = array_search($replaceEmail, $emailAddresses);
 				if($index === false)
 				{
-					$response['feedback'] = \GO::t('emailDoesntExists','addressbook');
+					$response['feedback'] = \GO::t("E-mail address wasn't found", "addressbook");
 				}else
 				{
 					$field = ($index == 0) ? 'email' : 'email'.($index+1);
@@ -450,7 +450,7 @@ class ContactController extends \GO\Base\Controller\AbstractModelController{
 		
 		if(!$response['success']){
 			$count = count($response['failedToMove']);
-			$response['feedback'] = sprintf(\GO::t('cannotMoveError'),$count);
+			$response['feedback'] = sprintf(\GO::t("%s item(s) cannot be moved, you do not have the right permissions."),$count);
 		}
 		
 		return $response;
@@ -505,8 +505,8 @@ class ContactController extends \GO\Base\Controller\AbstractModelController{
 	
 	protected function afterAttributes(&$attributes, &$response, &$params, \GO\Base\Db\ActiveRecord $model) {
 		unset($attributes['t.company_id']);
-		//$attributes['name']=\GO::t('strName');
-		$attributes['companies.name']=array('name'=>'companies.name','label'=>\GO::t('company','addressbook'));
+		//$attributes['name']=\GO::t("Name");
+		$attributes['companies.name']=array('name'=>'companies.name','label'=>\GO::t("Company", "addressbook"));
 		
 		
 		/**
@@ -518,7 +518,7 @@ class ContactController extends \GO\Base\Controller\AbstractModelController{
 		$addresslists = \GO\Addressbook\Model\Addresslist::model()->find($findParams);
 		foreach ($addresslists as $rec) {
 			
-			$attributes['addresslist_'. $rec->id] = array('name'=>'addresslist.addresslist_' . $rec->id, 'label'=>'' .GO::t('addresslists', 'addressbook'). ': ' .$rec->name, 'gotype'=>'boolean');
+			$attributes['addresslist_'. $rec->id] = array('name'=>'addresslist.addresslist_' . $rec->id, 'label'=>'' .GO::t("Address Lists", "addressbook"). ': ' .$rec->name, 'gotype'=>'boolean');
 			
 		}
 		
@@ -762,7 +762,7 @@ class ContactController extends \GO\Base\Controller\AbstractModelController{
 			$findParams = \GO\Base\Db\FindParams::newInstance()
 					->searchQuery($query,
 									array("CONCAT(t.first_name,' ',t.middle_name,' ',t.last_name)",'t.email','t.email2','t.email3'))
-					->select('t.*, "'.addslashes(\GO::t('strUser')).'" AS ab_name,c.name AS company_name')
+					->select('t.*, "'.addslashes(\GO::t("User")).'" AS ab_name,c.name AS company_name')
 					->limit(10)
 					->joinModel(array(
 						'model'=>'GO\Addressbook\Model\Company',
@@ -782,20 +782,20 @@ class ContactController extends \GO\Base\Controller\AbstractModelController{
 				$findParams->getCriteria()->mergeWith($criteria);
 			}
 
-			$stmt = \GO\Addressbook\Model\Contact::model()->findUsers(\GO::user()->id, $findParams);
-			
-			$userContactIds=array();
-		
-			foreach($stmt as $contact){
-				$record =$contact->getAttributes();
-				$record['name']=$contact->name;
-				$record['cf']=$contact->id.":".$contact->name;
-
-				$response['results'][]=$record;
-				$response['total']++;	
-				
-				$userContactIds[]=$contact->id;
-			}
+//			$stmt = \GO\Addressbook\Model\Contact::model()->findUsers(\GO::user()->id, $findParams);
+//			
+//			$userContactIds=array();
+//		
+//			foreach($stmt as $contact){
+//				$record =$contact->getAttributes();
+//				$record['name']=$contact->name;
+//				$record['cf']=$contact->id.":".$contact->name;
+//
+//				$response['results'][]=$record;
+//				$response['total']++;	
+//				
+//				$userContactIds[]=$contact->id;
+//			}
 					
 		}
 

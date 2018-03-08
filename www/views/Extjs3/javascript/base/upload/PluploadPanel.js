@@ -10,7 +10,7 @@ GO.base.upload.PluploadPanel = Ext.extend(Ext.ux.PluploadPanel, {
 			url: GO.url('core/plupload'),
 			//the only required parameter
 
-			runtimes: 'html5,gears,flash,html4',
+			runtimes: 'html5,gears,html4',
 			// first available runtime will be used
 
 			multipart: true,
@@ -32,7 +32,7 @@ GO.base.upload.PluploadPanel = Ext.extend(Ext.ux.PluploadPanel, {
 	//			quality: 60
 	//		},
 
-			flash_swf_url: BaseHref+'views/Extjs3/javascript/plupload/plupload/js/plupload.flash.swf',
+//			flash_swf_url: BaseHref+'views/Extjs3/javascript/plupload/plupload/js/plupload.flash.swf',
 	//		silverlight_xap_url: BaseHref+'views/Extjs3/javascript/plupload/plupload/js/plupload.silverlight.xap',
 			// urls must be set properly or absent, otherwise uploader fail to initialize
 
@@ -61,26 +61,26 @@ GO.base.upload.PluploadPanel = Ext.extend(Ext.ux.PluploadPanel, {
 			deleteButtonCls: 'btn-delete',
 
 			// localization
-			addButtonText: GO.lang.cmdAdd,
-			uploadButtonText: GO.lang.upload,
-			cancelButtonText: GO.lang.cmdCancel,
-			deleteButtonText: GO.lang.remove,
-			deleteSelectedText: '<b>'+GO.lang.removeSelected+'</b>',
-			deleteUploadedText: GO.lang.removeUpload,
-			deleteAllText: GO.lang.removeAll,
+			addButtonText: t("Add"),
+			uploadButtonText: t("Upload"),
+			cancelButtonText: t("Cancel"),
+			deleteButtonText: t("Remove"),
+			deleteSelectedText: '<b>'+t("Remove selected")+'</b>',
+			deleteUploadedText: t("Remove upload"),
+			deleteAllText: t("Remove all"),
 
-			statusQueuedText: GO.lang.queued,
-			statusUploadingText: GO.lang.uploading,
-			statusFailedText: '<span style="color: red">'+GO.lang.failed+'</span>',
-			statusDoneText: '<span style="color: green">'+GO.lang.done+'</span>',
+			statusQueuedText: t("Queued"),
+			statusUploadingText: t("Uploading ({0}%)"),
+			statusFailedText: '<span style="color: red">'+t("Failed")+'</span>',
+			statusDoneText: '<span style="color: green">'+t("Done")+'</span>',
 
-			statusInvalidSizeText: GO.lang.tooBig,
-			statusInvalidExtensionText: GO.lang.invalidFileType,
+			statusInvalidSizeText: t("Too big"),
+			statusInvalidExtensionText: t("Invalid file type"),
 
-			emptyText: '<div class="plupload_emptytext"><span>'+GO.lang.uploadQueueEmpty+'</span></div>',
-			emptyDropText: '<div class="plupload_emptytext"><span>'+GO.lang.dropFilesHere+'</span></div>',
+			emptyText: '<div class="plupload_emptytext"><span>'+t("Upload queue is empty")+'</span></div>',
+			emptyDropText: '<div class="plupload_emptytext"><span>'+t("Drop files here")+'</span></div>',
 
-			progressText: GO.lang.pluploadProgressText
+			progressText: t("{0}/{1} ({3} failed) ({5}/s)")
 		// params are number of
 		// {0} files sent
 		// {1} total files

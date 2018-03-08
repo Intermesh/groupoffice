@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: ConditionPanel.js 15346 2013-07-30 09:36:26Z mschering $
+ * @version $Id: ConditionPanel.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
@@ -26,7 +26,7 @@ config = config || {};
 		forceSelection:true,
 		allowBlank:false,
 		width:90,
-		emptyText:GO.sieve.lang.field
+		emptyText:t("Field", "sieve")
 	});
 
 	this.cmbOperator = new GO.form.ComboBox({
@@ -41,8 +41,8 @@ config = config || {};
 		selectOnFocus:true,
 		forceSelection:true,
 		allowBlank:false,
-		width:110,
-		emptyText:GO.sieve.lang.operator
+		width: dp(140),
+		emptyText:t("Operator", "sieve")
 	});
 
 	this.txtCondition = new Ext.form.TextField({
@@ -54,8 +54,8 @@ config = config || {};
 
 	this.txtCustom = new Ext.form.TextField({
 		name: 'custom' ,
-		emptyText: GO.sieve.lang.custom,
-		fieldLabel:GO.sieve.lang.custom,
+		emptyText: t("Custom", "sieve"),
+		fieldLabel:t("Custom", "sieve"),
 		allowBlank:false,
 		width:140,
 		hidden: true
@@ -129,7 +129,7 @@ config = config || {};
 
 
 	this.btnAddRule = new Ext.Button({
-		text: GO.lang.cmdAdd,
+		text: t("Add"),
 		handler : function() {
 			// Build up the data before adding the data to the grid.
 			var _test = '';
@@ -255,7 +255,7 @@ config = config || {};
 	})
 
 	this.btnClearRule = new Ext.Button({
-		text: GO.sieve.lang.clear,
+		text: t("Clear", "sieve"),
 		handler : function() {			
 			this.resetForm();
 		},
@@ -360,8 +360,8 @@ Ext.extend(GO.sieve.ConditionPanel, Ext.FormPanel,{
 		}
 
 		this.setVisibleFields();
-		this.btnAddRule.setText(GO.lang.cmdEdit);
-		this.btnClearRule.setText(GO.lang.cmdCancel);
+		this.btnAddRule.setText(t("Edit"));
+		this.btnClearRule.setText(t("Cancel"));
 	},
 	toggleCondition : function(){
 		var type = this.cmbOperator.getValue();
@@ -432,8 +432,8 @@ Ext.extend(GO.sieve.ConditionPanel, Ext.FormPanel,{
 		GO.sieve.ConditionPanel.superclass.onShow.call(this);
 	},
 	resetForm : function(){
-		this.btnAddRule.setText(GO.lang.cmdAdd);
-		this.btnClearRule.setText(GO.sieve.lang.clear);
+		this.btnAddRule.setText(t("Add"));
+		this.btnClearRule.setText(t("Clear", "sieve"));
 		this.form.reset();
 		this.setVisibleFields();
 		this.index=-1;

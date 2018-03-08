@@ -1,22 +1,16 @@
 <?php
-
-$l["browseComments"]= 'Parcourir les commentaires';
-$l["recentComments"]='Commentaires récents';
-$l['name']='Commentaires';
-$l['description']='Ajoute la fonctionnalité de commentaires aux autres modules.';
-$l['comment']='Commentaire';
-$l['comments']='Commentaires';
-$l['manageCategories']='Gérer les categories';
-$l['category']='Catégorie';
-$l['noCategory']='Pas de catégorie';
-$l['newCommentText']='Rédiger un nouveau commentaire ici ...';
-$l['readMore']="Lire la suite";
-$l['enableReadMore']="Permettre de lire plus de liens";
-$l['manageCategories']='Gérer les catégories';
-$l['category']='Catégorie';
-$l['noCategory']='Pas de catégorie';
-$l['newCommentText']='Rédiger un nouveau commentaire ici ...';
-$l['readMore']="Lire la suite";
-$l['enableReadMore']="Permettre de lire plus de liens";
-
-$l['actionDate']='Date d\'action';
+return array (
+  'Browse comments' => 'Parcourir les commentaires',
+  'Recent comments' => 'Commentaires récents',
+  'Comment' => 'Commentaire',
+  'Manage categories' => 'Gérer les catégories',
+  'Category' => 'Catégorie',
+  'No category' => 'Pas de catégorie',
+  'Enter new comment here ...' => 'Rédiger un nouveau commentaire ici ...',
+  'Read more' => 'Lire la suite',
+  'Enable read more links' => 'Permettre de lire plus de liens',
+  'Action date' => 'Date d\'action',
+  'name' => 'Commentaires',
+  'description' => 'Ajoute la fonctionnalité de commentaires aux autres modules.',
+  'Comments' => 'Commentaires',
+);

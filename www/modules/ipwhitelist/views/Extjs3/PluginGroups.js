@@ -16,7 +16,7 @@ GO.moduleManager.onModuleReady('groups',function(){
 						this.enableWhitelistCheckBox = new Ext.ux.form.XCheckbox({
 								name: 'enable_whitelist',
 //								checked: false,
-								boxLabel: GO.ipwhitelist.lang['enableWhitelist'],
+								boxLabel: t("Enable whitelist for this user group", "ipwhitelist"),
 								hideLabel:true
 						})
 					]				
@@ -36,7 +36,7 @@ GO.moduleManager.onModuleReady('groups',function(){
 
 				this.whitelistPanel = new Ext.Panel({
 					layout:'border',
-					title:GO.ipwhitelist.lang['ipWhitelist'],	
+					title:t("IP whitelist", "ipwhitelist"),	
 					items:[this.checkboxPanel, GO.ipwhitelist.ipGrid],
 					disabled: true
 				});

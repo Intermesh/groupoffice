@@ -1,17 +1,13 @@
 <?php
-// Bangla (Bangladesh) Translation by Shubhra Prakash Paul <shuvro.paul@gmail.com>
-$l['name'] = 'প্রিয়';
-$l['description'] = 'প্রিয় মডিউল, এই মডিউলটি দিনপঞ্জী, কর্ম, .... মডিউলে প্রিয় সেকসন যোগ করবে।';
-
-$l['favorites'] = 'প্রিয়';
-$l['favorite'] = 'প্রিয়';
-$l['addToFavorites'] = 'প্রিয়তে যোগ কর';
-$l['manageFavorites'] = 'প্রিয় ব্যবস্থাপনা';
-
-$l['calendarUser_id'] = 'ব্যবহারকারি';
-$l['calendarCalendar_id'] = 'দিনপঞ্জী';
-$l['calendarSort'] = 'বিন্যস্ত কর';
-
-$l['tasklistUser_id'] = 'ব্যবহারকারি';
-$l['tasklistTasklist_id'] = 'কর্মতালিকা';
-$l['tasklistSort'] = 'বিন্যস্ত কর';
+return array (
+  'Favorite' => 'প্রিয়',
+  'Add to favorites' => 'প্রিয়তে যোগ কর',
+  'Manage favorites' => 'প্রিয় ব্যবস্থাপনা',
+  'User' => 'ব্যবহারকারি',
+  'Calendar' => 'দিনপঞ্জী',
+  'Sort' => 'বিন্যস্ত কর',
+  'Tasklist' => 'কর্মতালিকা',
+  'name' => 'প্রিয়',
+  'description' => 'প্রিয় মডিউল, এই মডিউলটি দিনপঞ্জী, কর্ম, .... মডিউলে প্রিয় সেকসন যোগ করবে।',
+  'Favorites' => 'প্রিয়',
+);

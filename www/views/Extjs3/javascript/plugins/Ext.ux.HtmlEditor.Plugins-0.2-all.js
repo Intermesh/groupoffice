@@ -113,15 +113,15 @@ Ext.ux.form.HtmlEditor.IndentOutdent = Ext.extend(Ext.ux.form.HtmlEditor.MidasCo
     midasBtns: ['|', {
         cmd: 'indent',
         tooltip: {
-            title: GO.lang.indent
+            title: t("Indent Text")
         },
-        overflowText: GO.lang.indent
+        overflowText: t("Indent Text")
     }, {
         cmd: 'outdent',
         tooltip: {
-            title: GO.lang.outdent
+            title: t("Outdent Text")
         },
-        overflowText: GO.lang.outdent
+        overflowText: t("Outdent Text")
     }]
 });
 /**
@@ -135,9 +135,9 @@ Ext.ux.form.HtmlEditor.RemoveFormat = Ext.extend(Ext.ux.form.HtmlEditor.MidasCom
         enableOnSelection: true,
         cmd: 'removeFormat',
         tooltip: {
-            title: GO.lang.removeFormatting
+            title: t("Remove Formatting")
         },
-        overflowText: GO.lang.removeFormatting
+        overflowText: t("Remove Formatting")
     }]
 });
 /**
@@ -504,7 +504,7 @@ Ext.ux.form.HtmlEditor.Word = Ext.extend(Ext.util.Observable, {
             scope: this,
 			overflowText:'Word paste',
             tooltip: {
-                text: GO.lang.pasteFromWord
+                text: t("Cleans text pasted from Word or other Rich Text applications")
             }
         });
 
@@ -536,7 +536,7 @@ Ext.ux.form.HtmlEditor.HR = Ext.extend(Ext.util.Observable, {
 												width:400,
 												autoHeight:true,
 												resizable:false,
-                        title: GO.lang.insertHorizontalRule,
+                        title: t("Insert Horizontal Rule"),
                         closeAction: 'hide',
 												focus: function(){
 													this.items.get(0).form.findField('hrwidth').focus(true);
@@ -550,13 +550,13 @@ Ext.ux.form.HtmlEditor.HR = Ext.extend(Ext.util.Observable, {
                             labelAlign: 'right',
                             items: [{
                                 xtype: 'label',
-                                html: GO.lang.insertHRtext+'<br/>&nbsp;'
+                                html: t("Enter the width of the Rule in percentage<br/> followed by the % sign at the end, or to<br/> set a fixed width ommit the % symbol.")+'<br/>&nbsp;'
                             }, {
 
                                 xtype: 'textfield',
                                 maskRe: /[0-9]|%/,
                                 regex: /^[1-9][0-9%]{1,3}/,
-                                fieldLabel: GO.lang.width,
+                                fieldLabel: t("Width"),
                                 name: 'hrwidth',
 																value:'100%',
                                 width: 60,
@@ -573,7 +573,7 @@ Ext.ux.form.HtmlEditor.HR = Ext.extend(Ext.util.Observable, {
                             }]
                         }],
                         buttons: [{
-                            text: GO.lang.cmdInsert,
+                            text: t("Insert"),
                             handler: function(){
                                 var frm = this.hrWindow.getComponent('insert-hr').getForm();
                                 if (frm.isValid()){
@@ -584,7 +584,7 @@ Ext.ux.form.HtmlEditor.HR = Ext.extend(Ext.util.Observable, {
     						},
                             scope: this
                         }, {
-                            text: GO.lang.cmdCancel,
+                            text: t("Cancel"),
                             handler: function(){
                                 this.hrWindow.hide();
                             },
@@ -598,9 +598,9 @@ Ext.ux.form.HtmlEditor.HR = Ext.extend(Ext.util.Observable, {
             },
             scope: this,
             tooltip: {
-                title: GO.lang.insertHorizontalRule
+                title: t("Insert Horizontal Rule")
             },
-            overflowText: GO.lang.insertHorizontalRule
+            overflowText: t("Insert Horizontal Rule")
         });
     },
     // private

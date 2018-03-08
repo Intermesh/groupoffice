@@ -13,7 +13,7 @@ class Number extends AbstractCustomfieldtype{
 		if (isset($attributes[$key])) {
 			$prefix = !empty($this->field->prefix) ? $this->field->prefix.' ' : '';
 			$suffix = !empty($this->field->suffix) ? ' '.$this->field->suffix : '';
-			return $prefix.\GO\Base\Util\Number::localize($attributes[$key],$this->field->number_decimals).$suffix;
+			return $prefix.\GO\Base\Util\Number::localize($attributes[$key],$this->field->getOption("numberDecimals")).$suffix;
 		} else {
 			return null;
 		}
@@ -23,7 +23,7 @@ class Number extends AbstractCustomfieldtype{
 		if (empty($attributes[$key]) && $attributes[$key]!=0)
 			return null;
 		else {
-			return \GO\Base\Util\Number::localize($attributes[$key],$this->field->number_decimals);
+			return \GO\Base\Util\Number::localize($attributes[$key], $this->field->getOption("numberDecimals"));
 		}
 	}
 	
@@ -46,6 +46,6 @@ class Number extends AbstractCustomfieldtype{
 	}
 	
 	public function getValidationError(){
-		return \GO::t('numberValidationError','customfields');
+		return \GO::t("The value must be a number", "customfields");
 	}
 }

@@ -1,18 +1,16 @@
 <?php
-
-
-$l['name']= 'Verktyg';
-$l['dbcheck']= 'Databaskontroll';
-$l['rm_duplicates']= 'Ta bort dubbla kontakter och händelser';
-$l['backupdb']= 'Backup av databas';
-$l['index_files']='Indexera alla filer';
-$l['buildsearchcache']='Skapa sökindex';
-$l['checkmodules']='Kontrollera moduler';
-$l['resetState']='Nollställ fönsterpositioner, rutsystem etc.';
-
-$l["tools"]= 'Adminverktyg';
-$l['description']= 'Klicka på ett av skripten för att köra det.';
-$l["scripts"]= 'Skript';
-$l["scriptOutput"]= 'Skript-utdata';
-
-$l['systemCheck']='System kontroll';
+return array (
+  'Database check' => 'Databaskontroll',
+  'Remove duplicate contacts and events' => 'Ta bort dubbla kontakter och händelser',
+  'Backup database' => 'Backup av databas',
+  'Index all files' => 'Indexera alla filer',
+  'Create search index' => 'Skapa sökindex',
+  'Check modules' => 'Kontrollera moduler',
+  'Reset state of windows, grids etc.' => 'Nollställ fönsterpositioner, rutsystem etc.',
+  'Admin tools' => 'Adminverktyg',
+  'Scripts' => 'Skript',
+  'Script output' => 'Skript-utdata',
+  'System check' => 'System kontroll',
+  'name' => 'Verktyg',
+  'description' => 'Klicka på ett av skripten för att köra det.',
+);

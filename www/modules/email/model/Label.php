@@ -128,7 +128,7 @@ class Label extends ActiveRecord
     {
 		$maxLabels = isset(\GO::config()->email_max_labels) ? (int)\GO::config()->email_max_labels : 10;
         if ($this->isNew && $this->getLabelsCount($this->account_id) >= $maxLabels) {
-            throw new \Exception(sprintf(GO::t('labelsLimit', 'email'), $maxLabels));
+            throw new \Exception(sprintf(GO::t("Label's limit reached. The maximum number of labels is %d", "email"), $maxLabels));
         }
 
         if (!$this->default && $this->isNew) {

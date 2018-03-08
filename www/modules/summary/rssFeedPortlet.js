@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: rssFeedPortlet.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: rssFeedPortlet.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -37,20 +37,20 @@ GO.portlets.rssFeedPortlet = function(config) {
 
 	config.columns = [{
 		id: 'title',
-		header: GO.lang.strTitle,
+		header: t("Title"),
 		dataIndex: 'title',
 		sortable:true,
 		width: 420,
 		renderer: this.formatTitle
 	},{
-		header: GO.lang.author,
+		header: t("Author"),
 		dataIndex: 'author',
 		width: 100,
 		hidden: true,
 		sortable:true
 	},{
 		id: 'last',
-		header: GO.lang.strDate,
+		header: t("Date"),
 		dataIndex: 'pubDate',
 		width: 150,
 		renderer:  this.formatDate,
@@ -58,7 +58,7 @@ GO.portlets.rssFeedPortlet = function(config) {
 	}];
 
 	config.loadMask = {
-			msg:GO.summary.lang.loadingFeed
+			msg:t("Loading Feed...", "summary")
 			};
 	config.sm = new Ext.grid.RowSelectionModel({
 			singleSelect:true
@@ -126,14 +126,14 @@ Ext.extend(GO.portlets.rssFeedPortlet, GO.grid.GridPanel, {
 				items: [
 				{
 					iconCls: 'new-win',
-					text: GO.summary.lang.goToPost,
+					text: t("Go to Post", "summary"),
 					scope:this,
 					handler: function(){
 						window.open(this.ctxRecord.data.link);
 					}
 				},'-',{
 					iconCls: 'refresh-icon',
-					text:GO.lang.cmdRefresh,
+					text:t("Refresh"),
 					scope:this,
 					handler: function(){
 						this.ctxRow = null;
@@ -190,7 +190,7 @@ Ext.extend(GO.portlets.rssFeedPortlet, GO.grid.GridPanel, {
 		var d = now.clearTime(true);
 		var notime = date.clearTime(true).getTime();
 		if (notime == d.getTime()) {
-			return GO.summary.lang.today + date.dateFormat('g:i a');
+			return t("Today ", "summary") + date.dateFormat('g:i a');
 		}
 		d = d.add('d', -6);
 		if (d.getTime() <= notime) {

@@ -33,7 +33,7 @@ GO.files.PortletFolderBrowserGrid = Ext.extend(GO.grid.GridPanel, {
 				fields: ['type_id', 'id', 'name', 'type', 'size', 'mtime', 'extension', 'timestamp', 'thumb_url', 'path', 'acl_id', 'locked_user_id', 'locked', 'folder_id', 'permission_level', 'readonly', 'unlock_allowed', 'handler']
 			}),
 			view: new Ext.grid.GridView({
-				emptyText: GO.lang['strNoItems'],
+				emptyText: t("No items to display"),
 				getRowClass: function (record, rowIndex, rp, ds) {
 					return '';
 				}
@@ -45,7 +45,7 @@ GO.files.PortletFolderBrowserGrid = Ext.extend(GO.grid.GridPanel, {
 				},
 				columns: [{
 						id: 'name',
-						header: GO.lang['strName'],
+						header: t("Name"),
 						dataIndex: 'name',
 						renderer: function (v, meta, r) {
 							var cls = r.get('acl_id') > 0 && r.get('readonly') == 0 ? 'folder-shared' : 'filetype filetype-' + r.get('extension');
@@ -56,14 +56,14 @@ GO.files.PortletFolderBrowserGrid = Ext.extend(GO.grid.GridPanel, {
 						}
 					}, {
 						id: 'type',
-						header: GO.lang.strType,
+						header: t("Type"),
 						dataIndex: 'type',
 						sortable: true,
 						hidden: true,
 						width: 100
 					}, {
 						id: 'size',
-						header: GO.lang.strSize,
+						header: t("Size"),
 						dataIndex: 'size',
 						renderer: function (v) {
 							return  v == '-' ? v : Ext.util.Format.fileSize(v);
@@ -72,7 +72,7 @@ GO.files.PortletFolderBrowserGrid = Ext.extend(GO.grid.GridPanel, {
 						width: 100
 					}, {
 						id: 'mtime',
-						header: GO.lang.strMtime,
+						header: t("Modified at"),
 						dataIndex: 'mtime',
 						width: 40
 					}]
@@ -86,9 +86,11 @@ GO.files.PortletFolderBrowserGrid = Ext.extend(GO.grid.GridPanel, {
 					var record = selectionModel.getSelected();
 					
 					if(record.data.extension == 'folder'){
-						GO.linkHandlers["GO\\Files\\Model\\Folder"].call(this, record.data.id);
+						go.Router.goto("#files/folder/" + record.data.id);
+						
 					} else {
-						GO.linkHandlers["GO\\Files\\Model\\File"].call(this, record.data.id);
+						go.Router.goto("#files/file/" + record.data.id);
+						
 					}
 				},
 				scope:this

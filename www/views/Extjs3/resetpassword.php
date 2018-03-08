@@ -14,22 +14,22 @@
 
 
 if (empty($_REQUEST['email'])) {
-	die(\GO::t("noEmailGiven"));
+	die(\GO::t("No email given"));
 } else {
 //	$user = \GO\Base\Model\User::model()->findSingleByAttribute('email', $_REQUEST['email']);
 	$findParams = \GO\Base\Db\FindParams::newInstance();
 	$findCriteria = \GO\Base\Db\FindCriteria::newInstance()
 				->addCondition('email', $_REQUEST['email'], '=','t', false)
-				->addCondition('recovery_email',$_REQUEST['email'], '=','t', false);
+				->addCondition('recoveryEmail',$_REQUEST['email'], '=','t', false);
 
 	$findParams->criteria($findCriteria);
 	$user = \GO\Base\Model\User::model()->findSingle($findParams);
 	
 	if ($user) {
 		if (empty($_REQUEST['usertoken']) || $_REQUEST['usertoken'] != $user->getSecurityToken()) 
-			die(\GO::t("usertokenInvalid"));
+			die(\GO::t("No valid usertoken given!"));
 	} else {
-		die(\GO::t("noUserFoundWithEmail"));
+		die(\GO::t("Sorry, No user has been found for the given email address"));
 	}
 }
 	

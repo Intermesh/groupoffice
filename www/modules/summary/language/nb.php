@@ -1,28 +1,26 @@
 <?php
-
-
-$l['name']='Oversikt';
-$l['description']='Viser en oversikt over aktuelle elementer';
-$l['default_rss_url']='http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml';
-$l['default_rss_title']='Nyheter';
-
-$l["summary"]= 'Oversikt';
-$l["noItems"]= 'Du har ingen elementer på oversikten din.';
-$l["selectPortlet"]= 'Velg portlet';
-$l["hotTopics"]= 'Aktuelle emner';
-$l["enterRssFeed"]= 'Angi URL til RSS nyhetsstrøm:';
-$l["notes"]= 'Notater';
-$l["loadingFeed"]= 'Laster strøm...';
-$l["goToPost"]= 'Gå til post';
-$l["today"]= 'I dag ';
-$l["announcement"]="Kunngjøring";
-$l["announcements"]="Kunngjøringer";
-$l["dueTime"]="Vis til og med";
-$l["title"]="Tittel";
-$l["manageAnnouncements"]='Behandle kunngjøringer';
-$l["webFeeds"]='Behandle nyhetsstrømmer';
-$l["type"]='Type';
-$l["summaryType"]='Sammendrag';
-$l["rssFeeds"]='RSS strømmer';
-$l["noRssFeeds"]='Ingen RSS strømmer er lagt inn!<br />Trykk på knappen for innstillinger, i øverste høyre hjørne av dette dialogvinduet, for å legge til nyhetsstrømmer.';
-$l['latestReadAnnouncementRecord']= 'Kvittering for siste leste kunngjøring';
+return array (
+  'News' => 'Aktuelle emner',
+  'You don\'t have any items on your start page.' => 'Du har ingen elementer på oversikten din.',
+  'Select portlet' => 'Velg portlet',
+  'Please enter the RSS feed URL:' => 'Angi URL til RSS nyhetsstrøm:',
+  'Notes' => 'Notater',
+  'Loading Feed...' => 'Laster strøm...',
+  'Go to Post' => 'Gå til post',
+  'Today ' => 'I dag ',
+  'Announcement' => 'Kunngjøring',
+  'Announcements' => 'Kunngjøringer',
+  'Show until' => 'Vis til og med',
+  'Title' => 'Tittel',
+  'Manage announcements' => 'Behandle kunngjøringer',
+  'Manage webfeeds' => 'Behandle nyhetsstrømmer',
+  'Summary' => 'Sammendrag',
+  'Rss Feeds' => 'RSS strømmer',
+  'No RSS feeds have been added.<br />Click the settings button in the top right corner of this window to add feeds.' => 'Ingen RSS strømmer er lagt inn!<br />Trykk på knappen for innstillinger, i øverste høyre hjørne av dette dialogvinduet, for å legge til nyhetsstrømmer.',
+  'Record of latest read announcement' => 'Kvittering for siste leste kunngjøring',
+  'name' => 'Oversikt',
+  'description' => 'Viser en oversikt over aktuelle elementer',
+  'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml' => 'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml',
+  'Start page' => 'Oversikt',
+  'Type' => 'Type',
+);

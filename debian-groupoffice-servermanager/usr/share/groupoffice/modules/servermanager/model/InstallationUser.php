@@ -130,7 +130,7 @@ class InstallationUser extends \GO\Base\Db\ActiveRecord {
 			return true;
 		
 		$message = \GO\Base\Mail\Message::newInstance();
-		$subject = vsprintf(\GO::t('user_trial_email_title','servermanager'),array($this->username));
+		$subject = vsprintf(\GO::t("Trial period for user %s", "servermanager"),array($this->username));
 		$message->setSubject($subject);
 		
 		$fromName = \GO::config()->product_name;
@@ -140,7 +140,7 @@ class InstallationUser extends \GO\Base\Db\ActiveRecord {
 		
 		$toEmail = $this->installation->config['webmaster_email'];
 
-		$emailBody = \GO::t('user_trial_email_body','servermanager'); //TODO: add to translation
+		$emailBody = \GO::t("Your trial time for user '%s' will expire in %d days", "servermanager"); //TODO: add to translation
 		$emailBody = vsprintf($emailBody,array($this->username, $this->trialDaysLeft));
 		
 		$message->setBody($emailBody);

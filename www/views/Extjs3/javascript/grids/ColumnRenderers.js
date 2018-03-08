@@ -2,9 +2,9 @@ GO.grid.ColumnRenderers = {
 	
 	yesNo : function(val){
 		if(val == 1)
-			return GO.lang.yes;
+			return t("Yes");
 		else if(val == 0)
-			return GO.lang.no;
+			return t("No");
 		else
 			return val;
 	},
@@ -12,10 +12,10 @@ GO.grid.ColumnRenderers = {
 	coloredYesNo : function(val, meta, record, rowIndex, columnIndex, store){
 		if(val == 1){
 			meta.css = 'cellbg-green';
-			return GO.lang.yes;
+			return t("Yes");
 		}else if(val == 0){
 			meta.css = 'cellbg-red';
-			return GO.lang.no;
+			return t("No");
 		}else{
 			meta.css = 'cellbg-blue';
 			return val;
@@ -33,12 +33,12 @@ GO.grid.ColumnRenderers = {
 		
 		if(date < Math.round(new Date().now()/1000)){
 			meta.css = 'cellbg-red';
-			return GO.lang.no;
+			return t("No");
 		}
 	},
 
 	countryCode: function(val, meta, record, rowIndex, columnIndex, store) {
-		return GO.lang.countries[val.toUpperCase()] ? GO.lang.countries[val.toUpperCase()] : val;
+		return t("countries")[val.toUpperCase()] ? t("countries")[val.toUpperCase()] : val;
 	},
 	
 

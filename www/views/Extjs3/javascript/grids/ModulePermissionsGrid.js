@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: ModulePermissionsGrid.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: ModulePermissionsGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wilmar van Beusekom <wilmar@intermesh.nl>
  */
@@ -28,7 +28,7 @@ GO.grid.ModulePermissionsGrid = function(config)
 			missingParams = missingParams + '- paramIdType<br />';
 
 		if (!GO.util.empty(missingParams))
-			Ext.alert('',GO.lang['gridMissingParams']+'<br />');
+			Ext.alert('',t("Please let the Group-Office administrator that the window you just attempted to use contains a grid that expected the following paramaters, but did not receive them")+'<br />');
 
 		
 		config.width = '100%';
@@ -38,7 +38,7 @@ GO.grid.ModulePermissionsGrid = function(config)
     var radioPermissionNoneColumn = new GO.grid.RadioColumn({
 			horizontal:true,
 			value:0,
-			header: GO.lang['permissionNone'],
+			header: t("No permissions"),
 			dataIndex: 'permissionLevel',
 			disabled_field: 'disable_none',
 			width: 40
@@ -47,7 +47,7 @@ GO.grid.ModulePermissionsGrid = function(config)
 		var radioPermissionUseColumn = new GO.grid.RadioColumn({
 			horizontal:true,
 			value:GO.permissionLevels.read,
-			header: GO.lang['permissionUse'],
+			header: t("Use"),
 			dataIndex: 'permissionLevel',
 			disabled_field: 'disable_use',
 			width: 40
@@ -56,7 +56,7 @@ GO.grid.ModulePermissionsGrid = function(config)
 		var radioPermissionManageColumn = new GO.grid.RadioColumn({
 			horizontal:true,
 			value:GO.permissionLevels.manage,
-			header: GO.lang['permissionManage'],
+			header: t("Manage"),
 			dataIndex: 'permissionLevel',
 			disabled_field: 'never',
 			width: 40
@@ -79,7 +79,7 @@ GO.grid.ModulePermissionsGrid = function(config)
 			columns:[
 				{
 						id:'name',
-						header: GO.lang.strName,
+						header: t("Name"),
 						dataIndex: 'name',
 						renderer: function(name, cell, reader) {
 							return '<div class="go-module-icon-'+reader.data.id+'" style="height:16px;padding-left:22px;background-repeat:no-repeat;">'+name+'</div>';
@@ -94,7 +94,7 @@ GO.grid.ModulePermissionsGrid = function(config)
 		config.view=new Ext.grid.GridView({
 			autoFill: true,
 			forceFit: true,
-			emptyText: GO.lang['strNoItems']		
+			emptyText: t("No items to display")		
 		});
 		config.sm=new Ext.grid.RowSelectionModel();
 		

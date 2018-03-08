@@ -11,7 +11,7 @@ GO.site.HtmlEditorContentTreePanel = function (config){
 	config.loader.on('beforeload', function(){
 		var el =this.getEl();
 		if(el)
-			el.mask(GO.lang.waitMsgLoad);
+			el.mask(t("Loading..."));
 	}, this);
 
 	config.loader.on('load', function(){
@@ -92,7 +92,7 @@ Ext.extend(GO.site.HtmlEditorContentTreePanel, Ext.tree.TreePanel,{
 					draggable : false,
 					site_id	:	this.siteId, 
 					iconCls : 'go-icon-layout', 
-					text : GO.site.lang.content,
+					text : t("Content", "site"),
 					expanded : true // Needs to be false, otherwise it will load records multiple times.
 			});
 

@@ -11,7 +11,7 @@ GO.menu.JsonMenu = function(config) {
 
 Ext.extend(GO.menu.JsonMenu, Ext.menu.Menu, {
 
-	loadingText: GO.lang.waitMsgLoad,
+	loadingText: t("Loading..."),
 
 	loaded:      false,
 

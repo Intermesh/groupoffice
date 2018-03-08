@@ -20,7 +20,7 @@ GO.users.UserPanel = Ext.extend(GO.DisplayPanel,{
 		this.template =
 				'<table class="display-panel" cellpadding="0" cellspacing="0" border="0">'+
 					'<tr>'+
-						'<td colspan="2" class="display-panel-heading"><b>'+GO.lang.strUsername+': {username}</b></td>'+
+						'<td colspan="2" class="display-panel-heading"><b>'+t("Username")+': {username}</b></td>'+
 					'</tr>'+
 
 					'<tr>'+
@@ -31,17 +31,17 @@ GO.users.UserPanel = Ext.extend(GO.DisplayPanel,{
 								//NAME
 
 								'<tr>'+
-									'<td>' + GO.lang['strName'] + ':</td><td> {name}</td>'+
+									'<td>' + t("Name") + ':</td><td> {name}</td>'+
 								'</tr>'+
 								'<tr>'+
-									'<td>' + GO.lang['strUsername'] + ':</td><td> {username}</td>'+
+									'<td>' + t("Username") + ':</td><td> {username}</td>'+
 								'</tr>'+
 								'<tr>'+
-									'<td>' + GO.lang['strEmail'] + ':</td><td> {email}</td>'+
+									'<td>' + t("E-mail") + ':</td><td> {email}</td>'+
 								'</tr>'+
 								
 								'<tpl if="contact_id"><tr>'+
-									'<td colspan="2"><a href="#" onclick="GO.linkHandlers[\'GO\\\\\\\\Addressbook\\\\\\\\Model\\\\\\\\Contact\'].call(this, {contact_id});">'+GO.users.lang.openContact+'</a></td></tr></tpl>'+
+									'<td colspan="2"><a href="#addressbook/contact/{contact_id}">'+t("Open contact", "users")+'</a></td></tr></tpl>'+
 								
 							'</table>'+
 							
@@ -49,14 +49,7 @@ GO.users.UserPanel = Ext.extend(GO.DisplayPanel,{
 							
 						'</td>'+
 					'</tr>'+
-				'</table>'+
-				GO.linksTemplate;
-
-				if(GO.customfields)
-				{
-					this.template +=GO.customfields.displayPanelTemplate;
-				}
-
+				'</table>';
 
 		Ext.apply(this.templateConfig, {
 			addSlashes : function(str)
@@ -69,7 +62,7 @@ GO.users.UserPanel = Ext.extend(GO.DisplayPanel,{
 
 				if(GO.email && GO.settings.modules.email.read_permission)
 				{
-					return '<a href="#" onclick="GO.email.showAddressMenu(event, \''+this.addSlashes(email)+'\',\''+this.addSlashes(name)+'\');">'+email+'</a>';
+					return '<a  onclick="GO.email.showAddressMenu(event, \''+this.addSlashes(email)+'\',\''+this.addSlashes(name)+'\');">'+email+'</a>';
 				}else
 				{
 					return '<a href="mailto:'+email+'">'+email+'</a>';
@@ -139,44 +132,13 @@ GO.users.UserPanel = Ext.extend(GO.DisplayPanel,{
 			}
 		});
 
-		Ext.apply(this.templateConfig, GO.linksTemplateConfig);
 
-
-		if(GO.files)
-		{
-			Ext.apply(this.templateConfig, GO.files.filesTemplateConfig);
-			this.template += GO.files.filesTemplate;
-		}
-
-		if(GO.comments)
-		{
-			this.template += GO.comments.displayPanelTemplate;
-		}
 
 
 		GO.users.UserPanel.superclass.initComponent.call(this);
 
-
-		if(GO.documenttemplates)
-		{
-			this.newOODoc = new GO.documenttemplates.NewOODocumentMenuItem();
-			this.newOODoc.on('create', function(){this.reload();}, this);
-
-			this.newMenuButton.menu.add(this.newOODoc);
-
-			GO.documenttemplates.ooTemplatesStore.on('load', function(){
-				this.newOODoc.setDisabled(GO.documenttemplates.ooTemplatesStore.getCount() == 0);
-			}, this);
-		}
 	},
 	getLinkName : function(){
 		return this.data.full_name;
-	},
-	setData : function(data)
-	{
-		GO.users.UserPanel.superclass.setData.call(this, data);
-
-		if(GO.documenttemplates && !GO.documenttemplates.ooTemplatesStore.loaded)
-			GO.documenttemplates.ooTemplatesStore.load();
 	}
 });

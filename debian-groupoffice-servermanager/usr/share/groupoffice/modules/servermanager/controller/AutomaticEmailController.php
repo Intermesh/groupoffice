@@ -92,7 +92,7 @@ class AutomaticEmailController extends \GO\Base\Controller\AbstractModelControll
 		$store->addRecord(array(
 			'group' => 'templates',
 			'checked'=>isset($this->_defaultTemplate->template_id) && $this->_defaultTemplate->template_id==0,
-			'text' => \GO::t('none'),
+			'text' => \GO::t("None"),
 			'template_id'=>0
 		));
 		
@@ -103,7 +103,7 @@ class AutomaticEmailController extends \GO\Base\Controller\AbstractModelControll
 			$response['results'][] = '-';
 
 			$record = array(
-				'text' => \GO::t('setCurrentTemplateAsDefault','addressbook'),
+				'text' => \GO::t("Set current template as default for myself", "addressbook"),
 				'template_id'=>'default'
 			);
 

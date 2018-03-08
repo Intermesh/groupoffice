@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: LinkFolderWindow.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: LinkFolderWindow.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -22,9 +22,9 @@ GO.LinkFolderWindow = function(config){
 	};
 		
 	this.newFolderNameField = new Ext.form.TextField({	             	
-        fieldLabel: GO.lang['strName'],
+        fieldLabel: t("Name"),
         name: 'name',
-        value: GO.lang['newFolder'],
+        value: t("New folder"),
         allowBlank:false,
         anchor:'100%'   
     });
@@ -44,23 +44,23 @@ GO.LinkFolderWindow = function(config){
 	config.width=400;
 	config.autHeight=true;
 	config.closeAction='hide';
-	config.title= GO.lang['newFolder'];
+	config.title= t("New folder");
 	config.items= this.formPanel;
 	config.focus= focusName.createDelegate(this);
 	config.buttons=[{
-			text: GO.lang['cmdOk'],
+			text: t("Ok"),
 			handler: function(){
 				this.submitForm(true);
 			},
 			scope: this
 		},{
-			text: GO.lang['cmdApply'],
+			text: t("Apply"),
 			handler: function(){
 				this.submitForm();
 			},
 			scope:this
 		},{
-			text: GO.lang['cmdClose'],
+			text: t("Close"),
 			handler: function(){
 				this.hide();
 			},
@@ -139,7 +139,7 @@ Ext.extend(GO.LinkFolderWindow, GO.Window,{
 				model_name : this.model_name,
 				parent_id : this.parent_id
 				},
-			waitMsg:GO.lang['waitMsgSave'],
+			waitMsg:t("Saving..."),
 			success:function(form, action){
 				
 				this.fireEvent('save', this);
@@ -158,9 +158,9 @@ Ext.extend(GO.LinkFolderWindow, GO.Window,{
 			failure: function(form, action) {
 				if(action.failureType == 'client')
 				{					
-					Ext.MessageBox.alert(GO.lang['strError'], GO.lang['strErrorsInForm']);			
+					Ext.MessageBox.alert(t("Error"), t("You have errors in your form. The invalid fields are marked."));			
 				} else {
-					Ext.MessageBox.alert(GO.lang['strError'], action.result.feedback);
+					Ext.MessageBox.alert(t("Error"), action.result.feedback);
 				}
 			},
 			scope: this

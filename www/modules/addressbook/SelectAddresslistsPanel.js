@@ -5,21 +5,24 @@ GO.addressbook.SelectAddresslistsPanel = Ext.extend(Ext.Panel, {
 		
 	initComponent : function(){
 		
-		this.title=GO.addressbook.lang.addresslists;
-		this.cls='go-form-panel';
+		this.title=t("Address Lists", "addressbook");
 		this.autoScroll=true;
 		
-		this.items=[];
-
-		this.items.push({
+		this.items=[{
+			xtype: 'fieldset',
+			items: [{
 				xtype:'xcheckbox',
-				boxLabel: GO.addressbook.lang.sendingEmailAllowed,
+				boxLabel: t("Sending e-mails to this e-mail address is allowed", "addressbook"),
 				name: 'email_allowed',
 				hideLabel:true,
 				checked: true
-			});		
-
-		this.items.push(new GO.form.HtmlComponent({html:'<br /><h1>'+GO.addressbook.lang.enabledMailingGroups+'</h1>'}));
+			}]
+		},this.mailGroups = new Ext.form.FieldSet({
+				title: t("Enabled address lists:", "addressbook"),
+				defaults:{hideLabel: true},
+				items: []
+			})
+		];		
 
 		GO.addressbook.SelectAddresslistsPanel.superclass.initComponent.call(this);
 
@@ -53,7 +56,7 @@ GO.addressbook.SelectAddresslistsPanel = Ext.extend(Ext.Panel, {
 				value:false
 			}));
 			
-			this.add(this.addresslistElements[i]);
+			this.mailGroups.add(this.addresslistElements[i]);
 			f.add(this.addresslistElements[i]);
 		}
 		this.doLayout(false, true);

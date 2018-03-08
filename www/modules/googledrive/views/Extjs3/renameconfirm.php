@@ -19,11 +19,11 @@ extract($data);
 $this->render('externalHeader');
 ?>
 
-<p><?php echo \GO::t('oldOfficeFile','googledrive') ; ?></p>
+<p><?php echo \GO::t("This older Microsoft office format can't be edited with Google drive. Do you want to convert it to the new format?", "googledrive") ; ?></p>
 
-<button onclick="self.close()"><?php echo \GO::t('cmdCancel') ; ?></button>
+<button onclick="self.close()"><?php echo \GO::t("Cancel") ; ?></button>
 
-<button onclick="document.location.href='<?php echo $continueUrl; ?>';"><?php echo \GO::t('cmdOk') ; ?></button>
+<button onclick="document.location.href='<?php echo $continueUrl; ?>';"><?php echo \GO::t("Ok") ; ?></button>
 
 <?php
 $this->render('externalFooter');

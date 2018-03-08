@@ -7,7 +7,7 @@
  * If you have questions write an e-mail to info@intermesh.nl
  *
  * @copyright Copyright Intermesh
- * @version $Id: MonthGrid.js 21238 2017-06-22 13:30:12Z michaelhart86 $
+ * @version $Id: MonthGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
@@ -176,7 +176,7 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 
 		for(var i=this.firstWeekday; i<7+this.firstWeekday; i++)
 		{
-			var dayName = (i == 7) ? GO.lang.full_days[0] : GO.lang.full_days[i];
+			var dayName = (i == 7) ? t("full_days")[0] : t("full_days")[i];
 
 			var cell = Ext.DomHelper.append(this.cellWrap,
 			{
@@ -363,7 +363,7 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 					tag: 'a',
 					cls: 'cal-overflow-indicator',
 					href: '#',
-					html: GO.lang.more+'...'
+					html: t("More")+'...'
 				}, true);
 
 				el.on('click', this.onMoreClick, this);
@@ -495,7 +495,7 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 	{
 		if(this.rendered)
 		{
-			this.body.mask(GO.lang.waitMsgLoad,'x-mask-loading');
+			this.body.mask(t("Loading..."),'x-mask-loading');
 		}
 	},
 	unmask : function()
@@ -809,7 +809,7 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 					var theEventData = this._elementToEvent(eventEl);
 					
 					if (theEventData.model_name=='GO\\Tasks\\Model\\Task') {
-						if (GO.tasks) {
+						if(go.ModuleManager.isAvailable("tasks")) {
 							if (!this.taskContextMenu)
 								this.taskContextMenu = new GO.calendar.TaskContextMenu();
 

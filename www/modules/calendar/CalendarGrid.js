@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: CalendarGrid.js 21238 2017-06-22 13:30:12Z michaelhart86 $
+ * @version $Id: CalendarGrid.js 22371 2018-02-13 14:17:26Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -247,10 +247,12 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 
 		//get content size of element
 		var ctSize = this.container.getSize(true);
+		
+		this.containerSize = ctSize['width']-this.scrollOffset;
 
 		//column width is the container size minus the time column width
-		var columnWidth = ((ctSize['width']-40-this.scrollOffset)/this.days);
-		columnWidth = Math.floor(columnWidth);
+		this.columnWidth = ((ctSize['width']-40-this.scrollOffset)/this.days);
+		this.columnWidth = Math.floor(this.columnWidth);
 
 		//generate table for headings and all day events
 		this.headingsTable = Ext.DomHelper.append(this.body,
@@ -258,7 +260,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 			tag: 'table',
 			id: Ext.id(),
 			cls: "x-calGrid-headings-table",
-			style: "width:"+(ctSize['width'])+"px;"
+			style: "width:"+this.containerSize+"px;"
 
 		},true);
 
@@ -271,7 +273,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 			tag: 'tr',
 			children:{
 				tag:'td',
-				style:'width:37px',
+				style:'width:40px',
 				cls: "x-calGrid-heading"
 			}
 		}, true);
@@ -289,7 +291,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 			tag: 'table',
 			id: Ext.id(),
 			cls: "x-calGrid-all-day-table",
-			style: "width:"+(ctSize['width']-this.scrollOffset)+"px;"
+			style: "width:"+this.containerSize+"px;"
 
 		},true);
 
@@ -341,7 +343,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 				children:[{
 					tag:'div',
 					cls: headingCls,
-					style: "width:"+(columnWidth-3)+"px",
+					style: "width:"+(this.columnWidth)+"px",
 					html: dt.format(dateFormat)
 					}]
 				}, true);
@@ -357,7 +359,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 				tag: 'td',
 				id: 'all_day_'+day,
 				cls: "x-calGrid-all-day-container",
-				style: "width:"+(columnWidth-3)+"px;height:0px"
+				style: "width:"+(this.columnWidth)+"px;height:0px"
 				}, true);
 
 			this.allDayColumns.push(allDayColumn);
@@ -406,7 +408,8 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 		{
 			tag: 'table',
 			id: Ext.id(),
-			cls: "x-calGrid-table"
+			cls: "x-calGrid-table",
+			style: "width:"+(ctSize['width']-this.scrollOffset)+"px;"
 
 		},true);
 
@@ -471,7 +474,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 			{
 				tag: 'td',
 				id: 'dayCol'+day,
-				style:'width:'+columnWidth+'px'
+				style:'width:'+this.columnWidth+'px'
 				}, true);
 
 
@@ -638,7 +641,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 	{
 		if(this.rendered)
 		{
-			this.body.mask(GO.lang.waitMsgLoad,'x-mask-loading');
+			this.body.mask(t("Loading..."),'x-mask-loading');
 		}
 	},
 
@@ -1210,7 +1213,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 			if (eventData.model_name=='GO_Tasks_Model_Task') {
 				event.on('contextmenu', function(e, eventEl)
 				{
-					if (GO.tasks) {
+					if(go.ModuleManager.isAvailable("tasks")) {
 						var task = this.elementToEvent(this.clickedEventId);
 						if (!this.taskContextMenu)
 							this.taskContextMenu = new GO.calendar.TaskContextMenu();
@@ -1780,7 +1783,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 		if(load)
 			this.store.reload();
 
-		this.periodDisplay = GO.lang.strWeek+' '+this.startDate.format('W');
+		this.periodDisplay = t("Week")+' '+this.startDate.format('W');
 
 	},
 
@@ -2338,59 +2341,40 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 		}
 	},
 					
-	_setTimeIndicator : function(reloaded) {
+	_setTimeIndicator : function() {
 		
 		var reloaded = reloaded || false;
 		
 		var now = new Date();
 				
-		if(this.todaysHeading){
+		if(this.todaysHeading){	
 			var minutesElapsed = now.getMinutes()+now.getHours()*60;
-			var indicatorTop = Math.ceil((11/15)*minutesElapsed);
+			var indicatorTop = Math.ceil(minutesElapsed / (24 * 60) * this.gridTable.getHeight());
 
-			var x = this.todaysHeading.getX()-this.gridTable.getX()-this.theWeekDay+1;
+			var left = 41 + (this.theWeekDay * this.columnWidth);
+
 			
-			if(!Ext.isIE){
-				x+=4;
-			}
+			if (this.timeIndicator1)
+				Ext.removeNode(this.timeIndicator1);
+			this.timeIndicator1 = Ext.DomHelper.append(this.gridContainer,
+				{
+					tag: 'div',
+					id: Ext.id(),
+					cls: "x-calGrid-indicator",
+					style:"left:"+left+"px;top:"+indicatorTop+"px;width:"+this.columnWidth+"px;"
+				},true);
 
-			if(!reloaded && this.timeIndicator1) {
-				this.timeIndicator1.replaceWith({
-						tag: 'div',
-						id: Ext.id(),
-						cls: "x-calGrid-indicator",
-						style:"left:"+x+"px;top:"+indicatorTop+"px;width:"+(this.todaysHeading.getWidth()-3)+"px;"
-					});
-			} else {
-				if (this.timeIndicator1)
-					Ext.removeNode(this.timeIndicator1);
-				this.timeIndicator1 = Ext.DomHelper.append(this.gridContainer,
-					{
-						tag: 'div',
-						id: Ext.id(),
-						cls: "x-calGrid-indicator",
-						style:"left:"+x+"px;top:"+indicatorTop+"px;width:"+(this.todaysHeading.getWidth()-3)+"px;"
-					},true);
-			}
-
-			if(!reloaded && this.timeIndicator2) {
-				this.timeIndicator2.replaceWith({
-						tag: 'div',
-						id: Ext.id(),
-						cls: "x-calGrid-indicator",
-						style:"left:0px;top:"+indicatorTop+"px;width:6px;"
-					});
-			} else {
-				if (this.timeIndicator2)
-					Ext.removeNode(this.timeIndicator2);
-				this.timeIndicator2 = Ext.DomHelper.append(this.gridContainer,
-					{
-						tag: 'div',
-						id: Ext.id(),
-						cls: "x-calGrid-indicator",
-						style:"left:0px;top:"+indicatorTop+"px;width:6px;"
-					},true);
-			}
+	
+			if (this.timeIndicator2)
+				Ext.removeNode(this.timeIndicator2);
+			this.timeIndicator2 = Ext.DomHelper.append(this.gridContainer,
+				{
+					tag: 'div',
+					id: Ext.id(),
+					cls: "x-calGrid-indicator",
+					style:"left:0px;top:"+indicatorTop+"px;width:6px;"
+				},true);
+			
 
 		}
 

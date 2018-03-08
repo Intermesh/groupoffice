@@ -8,7 +8,7 @@ GO.grid.MultiSelectGrid = function (config){
 	this.checkColumn = new GO.grid.CheckColumn({
 		header: '&nbsp;',
 		dataIndex: 'checked',
-		width: 20,
+		width: dp(40),
 		listeners:{
 			scope:this,
 			change:function(record){
@@ -32,25 +32,28 @@ GO.grid.MultiSelectGrid = function (config){
 	
 	config.tools.push(
 		{
-			text:GO.lang.selectAll,
+			text:t("Select all"),
 			id:'plus',
-			qtip:GO.lang.selectAll,
+			qtip:t("Select all"),
 			handler:function(){this.selectAll();},
 			scope: this
 		});
 
 	Ext.apply(config, {
 		plugins: [this.checkColumn],		
-		layout:'fit',		
+		layout:'fit',
 		autoScroll:true,
 		columns:this.getColumns(),		
 		autoExpandColumn:'name',
 		view:new Ext.grid.GridView({
-			emptyText: GO.lang['strNoItems']
+			emptyText: t("No items to display")
 		})
 	});
-
-	config.cls = 'go-multiselect-grid';
+	if(config.cls) {
+		config.cls += ' go-multiselect-grid';
+	} else {
+		config.cls = 'go-multiselect-grid';
+	}
 	
 	if(!config.showHeaders)
 		config.cls +=' go-grid3-hide-headers';
@@ -83,7 +86,7 @@ GO.grid.MultiSelectGrid = function (config){
 
 //		if(this.allowNoSelection)
 //		{
-//			var text = (this.selectedAll) ? GO.lang.deselectAll : GO.lang.selectAll;
+//			var text = (this.selectedAll) ? t("Deselect all") : t("Select all");
 //			this.selectButton.setText(text);
 //		}
 	    
@@ -147,7 +150,7 @@ Ext.extend(GO.grid.MultiSelectGrid, GO.grid.GridPanel,{
 	
 	getColumns : function (){
 		var columns = [this.checkColumn,{
-			header:GO.lang.strName,
+			header:t("Name"),
 			dataIndex: 'name',
 			id:'name',
 			renderer:function(value, p, record){
@@ -220,7 +223,7 @@ Ext.extend(GO.grid.MultiSelectGrid, GO.grid.GridPanel,{
 		
 		if(select_records=='all' && max>50){
 			
-			if(!confirm(GO.lang.confirmSelectLotsOfItems.replace('{count}', max).replace('Group-Office', GO.settings.config.product_name))){
+			if(!confirm(t("This action will select {count} items and might cause Group-Office to become slow. Are you sure you want continue?").replace('{count}', max).replace('Group-Office', GO.settings.config.product_name))){
 				return;
 			}
 		}
@@ -260,7 +263,7 @@ Ext.extend(GO.grid.MultiSelectGrid, GO.grid.GridPanel,{
 
 		if(!this.allowNoSelection && (ids.length == 0))
 		{
-			alert(GO.lang.noItemSelectedWarning);
+			alert(t("Select at least one item please."));
 
 			if(this.lastRecordClicked){
 				this.lastRecordClicked.set('checked', true);
@@ -294,7 +297,7 @@ Ext.extend(GO.grid.MultiSelectGrid, GO.grid.GridPanel,{
 		this.selectedAll = (records.length == this.store.data.items.length) ? true : false;
 		if(this.allowNoSelection)
 		{						
-//			var text = (this.selectedAll) ? GO.lang.deselectAll : GO.lang.selectAll;			
+//			var text = (this.selectedAll) ? t("Deselect all") : t("Select all");			
 			//this.selectButton.setText(text);
 		}
 		

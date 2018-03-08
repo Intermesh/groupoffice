@@ -45,7 +45,7 @@ $GO_SCRIPTS_JS .= 'GO.email.sievePortValue=';
 
 $font_size = \GO::config()->get_setting('email_font_size', \GO::user()->id);
 if(empty($font_size))
-	$GO_SCRIPTS_JS .= 'GO.email.fontSize="12px";';
+	$GO_SCRIPTS_JS .= 'GO.email.fontSize="14px";';
 else
 	$GO_SCRIPTS_JS .= 'GO.email.fontSize="'.$font_size.'";';
 

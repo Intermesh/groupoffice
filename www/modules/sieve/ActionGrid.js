@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: ActionGrid.js 19294 2015-08-10 09:10:27Z wsmits $
+ * @version $Id: ActionGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  * @author WilmarVB <wilmar@intermesh.nl>
@@ -47,19 +47,19 @@ GO.sieve.ActionGrid = function(config){
 	config.view=new Ext.grid.GridView({
 		autoFill: true,
 		forceFit: true,
-		emptyText: GO.sieve.lang.pleaseAddAction
+		emptyText: t("Please click 'add' to add an action", "sieve")
 	});
 	config.sm=new Ext.grid.RowSelectionModel();
 	config.loadMask=true;
 	config.tbar=[{
 			iconCls: 'btn-add',
-			text: GO.lang['cmdAdd'],
+			text: t("Add"),
 			cls: 'x-btn-text-icon',
 			handler: function(){this.showActionCreatorDialog();},
 				scope: this
 		},{
 			iconCls: 'btn-delete',
-			text: GO.lang['cmdDelete'],
+			text: t("Delete"),
 			cls: 'x-btn-text-icon',
 			handler: function(){this.deleteSelected();},
 				scope: this
@@ -134,7 +134,7 @@ Ext.extend(GO.sieve.ActionGrid, GO.grid.GridPanel,{
 //								days:"",
 //								addresses:"",
 //								reason:"",
-//								text : GO.sieve.lang.stop
+//								text : t("Stop", "sieve")
 //							});
 //
 //					this.store.insert(insertId, stopRecord);

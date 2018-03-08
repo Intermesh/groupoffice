@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: LoginDialog.js 21431 2017-09-13 11:26:27Z wsmits $
+ * @version $Id: LoginDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -46,7 +46,7 @@ GO.dialog.LoginDialog = function(config){
 	Ext.apply(this, config);
 	
 	var langCombo = new GO.form.ComboBoxReset({
-		fieldLabel: GO.lang.strLanguage,
+		fieldLabel: t("Language"),
 		name: 'language_text',
 		store:  new Ext.data.SimpleStore({
 			fields: ['id', 'language'],
@@ -59,7 +59,7 @@ GO.dialog.LoginDialog = function(config){
 		mode:'local',
 		triggerAction:'all',
 		forceSelection: false,
-		emptyText: GO.lang.userSelectedLanguage,
+		emptyText: t("My selected language"),
 		editable: false,
 		value: GO.loginSelectedLanguage || ""
 	});
@@ -79,7 +79,7 @@ GO.dialog.LoginDialog = function(config){
 		langCombo,		
 		{
 			itemId: 'username',
-			fieldLabel: GO.lang.strUsername,
+			fieldLabel: t("Username"),
 			name: 'username',
 			allowBlank:false
 			,anchor:'100%'
@@ -87,7 +87,7 @@ GO.dialog.LoginDialog = function(config){
 		
 	
 		,{
-			fieldLabel: GO.lang.strPassword,
+			fieldLabel: t("Password"),
 			name: 'password',
 			inputType: 'password',
 			allowBlank:false,
@@ -95,14 +95,14 @@ GO.dialog.LoginDialog = function(config){
 		},{
 			xtype: 'checkbox',
 			hideLabel:true,
-			boxLabel: GO.lang.remindPassword,
+			boxLabel: t("Remember my login on this computer until I press logout"),
 			name:'remind',
 			hidden: !GO.settings.config.remember_login,
 			height:20//explicit height for IE7 bug with ext 3.2
 		}
 //		,this.fullscreenField = new Ext.form.Checkbox({
 //			hideLabel:true,
-//			boxLabel: GO.lang.fullscreen,
+//			boxLabel: t("Fullscreen mode"),
 //			checked:GO.fullscreen,
 //			name:'fullscreen',
 //			height:20//explicit height for IE7 bug with ext 3.2
@@ -118,21 +118,21 @@ GO.dialog.LoginDialog = function(config){
 		draggable:false,
 		resizable: false,
 		closeAction:'hide',
-		title:GO.lang['strLogin'],
+		title:t("Login required"),
 		closable: false,
 		items: [			
 		this.formPanel
 		],		
 		buttons: [
 		{
-			text: GO.lang.lostPassword,
+			text: t("Lost password?"),
 			id:'btn-lost-password',
 			cls:'login-lost-password-button',
 			handler:this.doLostPassword,
 			scope:this
 		},
 		{
-			text: GO.lang['cmdOk'],
+			text: t("Ok"),
 			id:'btn-login',
 			handler: this.doLogin,
 			scope:this
@@ -176,12 +176,12 @@ Ext.extend(GO.dialog.LoginDialog, GO.Window, {
 	doLostPassword : function(){
 			
 		// Prompt for user data and process the result using a callback:
-		Ext.Msg.prompt(GO.lang.lostPassword, GO.lang.lostPasswordText.replace('{product_name}', GO.settings.config.product_name), function(btn, text){
+		Ext.Msg.prompt(t("Lost password?"), t("To recover your password you must be able to read your e-mail without access to Group-Office. If you enter your e-mail address an e-mail with instructions will be sent to your e-mail address.<br /><br />Enter your e-mail address:").replace('{product_name}', GO.settings.config.product_name), function(btn, text){
 			if (btn == 'ok'){
 
 				this.hide();
 
-				Ext.getBody().mask(GO.lang.waitMsgLoad);
+				Ext.getBody().mask(t("Loading..."));
 				Ext.Ajax.request({
 					url:GO.url('auth/sendResetPasswordMail'),
 					scope:this,
@@ -195,16 +195,16 @@ Ext.extend(GO.dialog.LoginDialog, GO.Window, {
 
 						if(!success)
 						{
-							Ext.MessageBox.alert(GO.lang['strError'], GO.lang['strRequestError']);
+							Ext.MessageBox.alert(t("Error"), t("Could not connect to the server. Please check your internet connection."));
 						}else
 						{
 							var responseParams = Ext.decode(response.responseText);
 							if(!responseParams.success)
 							{
-								Ext.MessageBox.alert(GO.lang['strError'], responseParams.feedback);
+								Ext.MessageBox.alert(t("Error"), responseParams.feedback);
 							}else
 							{
-								Ext.MessageBox.alert(GO.lang['strSuccess'], responseParams.feedback);
+								Ext.MessageBox.alert(t("Success"), responseParams.feedback);
 							}
 						}
 
@@ -221,7 +221,7 @@ Ext.extend(GO.dialog.LoginDialog, GO.Window, {
 //			params: {
 //				'task' : 'login'
 //			},
-			waitMsg:GO.lang.waitMsgLoad,
+			waitMsg:t("Loading..."),
 			success:function(form, action){
 
 				//Another user logs in after a session expire			
@@ -249,7 +249,7 @@ Ext.extend(GO.dialog.LoginDialog, GO.Window, {
 				}else if(action.result && !GO.util.empty(action.result.exceptionCode) && action.result.exceptionCode == 498){
 					this.otherLoginLocationDetected(action.result.feedback, action.result.userId, action.result.userToken);
 				} else if(action.result) {
-					Ext.MessageBox.alert(GO.lang['strError'], action.result.feedback, function(){
+					Ext.MessageBox.alert(t("Error"), action.result.feedback, function(){
 						this.formPanel.form.findField('username').focus(true);
 					},this);
 					
@@ -333,17 +333,17 @@ Ext.extend(GO.dialog.LoginDialog, GO.Window, {
 	
 	addRequiredUserFields : function(){
 		this.formPanel.add({
-			fieldLabel: GO.lang['strFirstName'], 
+			fieldLabel: t("First name"), 
 			name: 'first_name', 
 			allowBlank: false});
 		
 		this.formPanel.add({
-			fieldLabel: GO.lang['strMiddleName'], 
+			fieldLabel: t("Middle name"), 
 			name: 'middle_name', 
 			allowBlank: true});
 		
 		this.formPanel.add({
-			fieldLabel: GO.lang['strLastName'], 
+			fieldLabel: t("Last name"), 
 			name: 'last_name', 
 			allowBlank: false});		
 		

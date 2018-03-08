@@ -43,10 +43,10 @@ Ext.extend(GO.site.HtmlEditorLinkInsert, Ext.util.Observable, {
 		element.clickEvent='mousedown';
 		element.tabIndex=-1;
 		element.tooltip={
-			title:GO.site.lang.linkEditor,
-			text:GO.site.lang.linkEditor
+			title:t("Insert link", "site"),
+			text:t("Insert link", "site")
 		};
-		element.overflowText=GO.site.lang.linkEditor;
+		element.overflowText=t("Insert link", "site");
 
 		element.handler = function(){
 			this.showLinkDialog();

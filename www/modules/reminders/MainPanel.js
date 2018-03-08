@@ -1,4 +1,4 @@
 GO.moduleManager.addModule('reminders', GO.reminders.RemindersGrid, {
-	title : GO.reminders.lang.reminders,
+	title : t("Popup reminders", "reminders"),
 	iconCls : 'go-tab-icon-reminders'
 });

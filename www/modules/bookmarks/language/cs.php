@@ -1,25 +1,24 @@
 <?php
-
-$l['name']='Záložky';
-$l['description']='Modul pro vytváření záložek.';
-$l['general']='Všeobecné';
-$l['googleDescription']="Hledat na webu";
-$l["bookmarks"]='Záložky';
-$l["bookmark"]='Záložka';
-$l["category"]='Kategorie';
-$l["title"]='Název';
-$l["description"]='Popis';
-$l["logo"]='Logo';
-$l["extern"]='Otevřít v prohlížeči';
-$l["administrateCategories"]='Správa kategorií';
-$l["thumbnails"]='Náhledy';
-$l["chooseIcon"]='Vyberte logo pro záložku';
-$l["clearLogo"]='Smazat logo';
-$l["uploadLogo"]='Nahrát logo';
-$l["showAll"]='Zobrazit vše';
-$l["sharedCategory"]='Sdílená kategorie';
-$l["behaveAsModule"]='Zobrazit jako modul (Je potřebný restart prohlížeče)';
-$l["confirmDelete"]='Jste si opravdu jistý, že chcete smazat tuto záložku?';
-
-$l['toggle']='Přepnout pohled';
-$l['showCategoryInStartMenu']= 'Záložky v nabídce start (požadováno znovu načtení stránky)';
+return array (
+  'General' => 'Všeobecné',
+  'Search the web' => 'Hledat na webu',
+  'Bookmark' => 'Záložka',
+  'Category' => 'Kategorie',
+  'Title' => 'Název',
+  'Open in new browser tab' => 'Otevřít v prohlížeči',
+  'Administrate categories' => 'Správa kategorií',
+  'Thumbnails' => 'Náhledy',
+  'Choose icon for bookmark' => 'Vyberte logo pro záložku',
+  'Clear Logo' => 'Smazat logo',
+  'Upload Logo' => 'Nahrát logo',
+  'Show all' => 'Zobrazit vše',
+  'Shared category' => 'Sdílená kategorie',
+  'Behave as a module (Browser reload required)' => 'Zobrazit jako modul (Je potřebný restart prohlížeče)',
+  'Are you sure you want to delete this bookmark?' => 'Jste si opravdu jistý, že chcete smazat tuto záložku?',
+  'Toggle view' => 'Přepnout pohled',
+  'Group bookmarks in main start menu (Browser reload required)' => 'Záložky v nabídce start (požadováno znovu načtení stránky)',
+  'name' => 'Záložky',
+  'description' => 'Popis',
+  'Bookmarks' => 'Záložky',
+  'Logo' => 'Logo',
+);

@@ -47,7 +47,7 @@ GO.sieve.ActionCreatorDialog = function(config){
 	this._buildForm();
 
 //	this.btnAddAction = new Ext.Button({
-//		text: GO.lang.cmdAdd,
+//		text: t("Add"),
 //		handler : function() {
 //			this._prepareValuesForStorage();
 //			this.resetForm();
@@ -56,14 +56,14 @@ GO.sieve.ActionCreatorDialog = function(config){
 //	})
 //
 //	this.btnClearAction = new Ext.Button({
-//		text: GO.sieve.lang.clear,
+//		text: t("Clear", "sieve"),
 //		handler : function() {
 //			this.resetForm();
 //		},
 //		scope : this
 //	})
 
-	config.title=GO.sieve.lang.setAction;
+	config.title=t("Set action", "sieve");
 	config.border=false;
 	config.layout= 'fit';
 	config.height=400;
@@ -78,7 +78,7 @@ GO.sieve.ActionCreatorDialog = function(config){
 	config.items=[this.formPanel];
 	
 	config.buttons = [{
-		text : GO.lang['cmdOk'],
+		text : t("Ok"),
 		handler : function() {
 			if (this.formPanel.getForm().isValid()) {
 				this.fireEvent('actionPrepared',this._prepareValuesForStorage());
@@ -88,7 +88,7 @@ GO.sieve.ActionCreatorDialog = function(config){
 		},
 		scope : this
 	}, {
-		text : GO.lang['cmdCancel'],
+		text : t("Cancel"),
 		handler : function() {
 			this.hide();
 			this._resetForm();
@@ -160,33 +160,33 @@ Ext.extend(GO.sieve.ActionCreatorDialog, GO.Window,{
 			case 'set_read':
 				_type		= 'addflag';
 				_target = '\\Seen';
-				_text		= GO.sieve.lang.setRead;
+				_text		= t("Mark message as read", "sieve");
 				break;
 			case 'fileinto':
 				_type		= 'fileinto';
 				_target = this.cmbFolder.getValue();
-				_text		= GO.sieve.lang.fileinto+': '+_target;
+				_text		= t("Move email to the folder", "sieve")+': '+_target;
 				
 				break;
 			case 'fileinto_copy':
 				_type		= 'fileinto_copy';
 				_target = this.cmbFolder.getValue();
-				_text		= GO.sieve.lang.copyto+': '+_target;
+				_text		= t("Copy email to the folder", "sieve")+': '+_target;
 				break;
 			case 'redirect':
 				_type		= 'redirect';
 				_target = this.txtEmailAddress.getValue();
-				_text		= GO.sieve.lang.forwardto+': '+_target;
+				_text		= t("Redirect to", "sieve")+': '+_target;
 				break;
 			case 'redirect_copy':
 				_type		= 'redirect_copy';
 				_target = this.txtEmailAddress.getValue();
-				_text		= GO.sieve.lang.sendcopyto+': '+_target;
+				_text		= t("Send a copy to", "sieve")+': '+_target;
 				break;
 			case 'reject':
 				_type		= 'reject';
 				_target = this.txtMessage.getValue();
-				_text		= GO.sieve.lang.reject+': "'+_target+'"';
+				_text		= t("Reject with message", "sieve")+': "'+_target+'"';
 				break;
 			case 'vacation':
 				_type = 'vacation';
@@ -195,20 +195,20 @@ Ext.extend(GO.sieve.ActionCreatorDialog, GO.Window,{
 				_addresses = this.txtEmailAddressOptional.getValue();
 				_reason = this.txtMessage.getValue();
 				if (!GO.util.empty(_addresses))
-					var addressesText = GO.sieve.lang.vacAlsoMailTo+': '+_addresses+'. ';
+					var addressesText = t("Autoreply is active for", "sieve")+': '+_addresses+'. ';
 				else
 					var addressesText = '';
-				_text = GO.sieve.lang.vacsendevery+' '+_days+' '+GO.sieve.lang.vacsendevery2+'. '+addressesText+GO.sieve.lang.vacationmessage+' "'+_reason+'"';
+				_text = t("Reply every", "sieve")+' '+_days+' '+t("day(s)", "sieve")+'. '+addressesText+t("Message:", "sieve")+' "'+_reason+'"';
 				break;
 			case 'discard':
 				_type		= 'discard';
 				_target = '';
-				_text		= GO.sieve.lang.discard;
+				_text		= t("Discard", "sieve");
 				break;
 			case 'stop':
 				_type		= 'stop';
 				_target = '';
-				_text		= GO.sieve.lang.stop;
+				_text		= t("Stop", "sieve");
 				break;
 			default:
 				break;
@@ -286,7 +286,7 @@ Ext.extend(GO.sieve.ActionCreatorDialog, GO.Window,{
 	_buildForm : function() {
 		this.cmbAction = new GO.form.ComboBox({
 			hiddenName: 'type',
-			fieldLabel:GO.sieve.lang.action,
+			fieldLabel:t("Action", "sieve"),
 			valueField:'value',
 			displayField:'field',
 			store: GO.sieve.cmbActionStore,
@@ -297,12 +297,12 @@ Ext.extend(GO.sieve.ActionCreatorDialog, GO.Window,{
 			forceSelection:true,
 			allowBlank:false,
 			width:300,
-			emptyText:GO.sieve.lang.action
+			emptyText:t("Action", "sieve")
 		});
 
 		this.cmbFolder = new GO.form.ComboBox({
 			hiddenName:'target',
-			fieldLabel:GO.sieve.lang.toFolder,
+			fieldLabel:t("To folder", "sieve"),
 			valueField:'name',
 			value: 'INBOX',
 			displayField:'name',
@@ -322,7 +322,7 @@ Ext.extend(GO.sieve.ActionCreatorDialog, GO.Window,{
 			name: 'email',
 			allowBlank:true,
 			anchor: '100%',
-			fieldLabel:GO.sieve.lang.addressesLabelOptional,
+			fieldLabel:t("Activate also for these aliases (separated by comma)", "sieve"),
 			hidden: true,
 			disabled: true
 		});
@@ -332,7 +332,7 @@ Ext.extend(GO.sieve.ActionCreatorDialog, GO.Window,{
 			allowBlank:false,
 			vtype:'emailAddress',
 			anchor: '100%',
-			fieldLabel:GO.lang.strEmail,
+			fieldLabel:t("E-mail"),
 			hidden: true,
 			disabled: true
 		});
@@ -343,7 +343,7 @@ Ext.extend(GO.sieve.ActionCreatorDialog, GO.Window,{
 //			hideLabel:true,
 			anchor:'100%',
 			height:200,
-			fieldLabel:GO.sieve.lang.reason,
+			fieldLabel:t("Message", "sieve"),
 //			listeners:{
 //				scope:this,
 //				focus: function(){
@@ -360,7 +360,7 @@ Ext.extend(GO.sieve.ActionCreatorDialog, GO.Window,{
 			allowBlank:false,
 			width:70,
 			decimals:0,
-			fieldLabel:GO.sieve.lang.days,
+			fieldLabel:t("Reply every x days", "sieve"),
 			disabled: true,
 			minValue:1,
 			value:7

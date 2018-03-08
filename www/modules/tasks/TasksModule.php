@@ -2,13 +2,27 @@
 
 namespace GO\Tasks;
 
+use go\core\auth\model\User;
+use go\core\orm\Mapping;
+use go\core\orm\Property;
 
-class TasksModule extends \GO\Base\Module{
+class TasksModule extends \GO\Base\Module {
+	
+	public static function defineListeners() {
+
+		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
+	}
+	
 	public static function initListeners() {
 		
-		\GO\Base\Model\User::model()->addListener('delete', "GO\Tasks\TasksModule", "deleteUser");
+		\GO\Base\Model\User::model()->addListener('delete', "GO\Tasks\TasksModule", "deleteUser"); // TODO: remove and put relation in the database
+
 	}
 
+	public static function onMap(Mapping $mapping) {
+		$mapping->addRelation('taskSettings', \GO\Tasks\Model\UserSettings::class, ['id' => 'user_id'], false);
+	}
+	
 	public function autoInstall() {
 		return true;
 	}

@@ -8,6 +8,7 @@
  * If you have questions write an e-mail to info@intermesh.nl
  *
  */
+namespace GO\Base\Model;
 
 /**
  * A model has an ID stored in the database that is used for faster searches
@@ -17,29 +18,25 @@
  * @copyright Copyright Intermesh BV.
  * @author Merijn Schering <mschering@intermesh.nl>
  * @package GO.base.model 
- * @property string $model_name
+ * @property string $name
+ * @property int $moduleId
  * @property int $id
  */
-
-
-namespace GO\Base\Model;
-
-
 class ModelType extends \GO\Base\Db\ActiveRecord {
 
-	/**
-	 * Returns a static model of itself
-	 * 
-	 * @param String $className
-	 * @return LinkType 
-	 */
-	public static function model($className=__CLASS__)
-	{	
-		return parent::model($className);
-	}
 
 	public function tableName(){
-		return "go_model_types";
+		return "core_entity";
+	}
+
+	/**
+	 * @deprecated (for search controller to find links etc)
+	 * @return type
+	 */
+	public function relations() {
+		return [
+			'moduleRel' => array('type'=>self::BELONGS_TO, 'model'=>'GO\Base\Model\Module', 'field'=>'moduleId')
+		];
 	}
 	
 	public function findByModelName($modelName){
@@ -47,22 +44,67 @@ class ModelType extends \GO\Base\Db\ActiveRecord {
 		if(empty($modelName))
 			throw new \Exception("Model name may not be empty");
 		
-		$model = $this->findSingleByAttribute('model_name', $modelName);
+		$shortName = self::getShortName($modelName);
+		
+		$model = $this->findSingleByAttribute('name', $shortName);
 		if($model)
 			return $model->id;
 		
+		$module = Module::model()->findByName($modelName::getModule());
+		
+		if(!$module) {
+			throw new \Exception("No module found for $modelName");
+		}
+		
 		$model = new ModelType();
-		$model->model_name=$modelName;
+		$model->name=$shortName;
+		$model->moduleId = $module->id;
 		$model->save();
 		
 		return $model->id;
+	}
+	
+	private static function getShortName($cls) {		
+		return lcfirst(substr($cls, strrpos($cls, '\\') + 1));
+	}
+	
+	/**
+	 * @deprecated since 6.3
+	 * Added to be backwards compatible
+	 * 
+	 * @return name
+	 */
+	public function getModel_name(){
+		if($this->moduleRel->package) {
+			
+			switch($this->name) {
+				
+				case 'user':
+					//todo
+					break;
+				
+				default:
+					return 'go\\modules\\' . $this->moduleRel->package . '\\' . $this->moduleRel->name . '\\model\\' . ucfirst($this->name);
+			}			
+		} else
+		{
+			switch($this->name) {
+				
+				case 'user':
+					return User::class;
+									
+				default:
+					return 'GO\\' . ucfirst($this->moduleRel->name) . '\\Model\\' . ucfirst($this->name);
+			}
+		}
+		return $this->name;
 	}
 	
 	public function checkDatabase() {
 		
 		//delete if module is no longer installed. This should happen automatically
 		//after module uninstall but in some cases this went wrong.
-		$parts = explode('\\',$this->model_name);
+		$parts = explode('\\',$this->name);
 		$module = strtolower($parts[1]);
 		if($module!='base' && !\GO::modules()->isInstalled($module)){
 			$this->delete();

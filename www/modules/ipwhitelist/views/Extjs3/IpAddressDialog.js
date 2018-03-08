@@ -3,7 +3,7 @@ GO.ipwhitelist.IpAddressDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		
 		Ext.apply(this, {
 			titleField:'ip_address',
-			title:GO.ipwhitelist.lang['ipAddress'],
+			title:t("IP address", "ipwhitelist"),
 			formControllerUrl: 'ipwhitelist/ipAddress',
 			height:200
 		});
@@ -15,7 +15,7 @@ GO.ipwhitelist.IpAddressDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		this.propertiesPanel = new Ext.Panel({
 			border: false,
 //			baseParams: {task: 'category'},			
-			title:GO.lang['strProperties'],			
+			title:t("Properties"),			
 			cls:'go-form-panel',waitMsgTarget:true,			
 			layout:'form',
 			autoScroll:true,
@@ -23,19 +23,19 @@ GO.ipwhitelist.IpAddressDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			  name: 'group_id',
 				anchor: '-20',
 			  allowBlank:false,
-//			  fieldLabel: GO.lang.strName
+//			  fieldLabel: t("Name")
 			}), this.ipAddressField = new Ext.form.TextField({
 			  name: 'ip_address',
 				anchor: '-20',
 			  allowBlank:false,
 				maxLength: 64,
-			  fieldLabel: GO.ipwhitelist.lang['ipAddress']
+			  fieldLabel: t("IP address", "ipwhitelist")
 			}), this.descriptionField = new Ext.form.TextField({
 			  name: 'description',
 				anchor: '-20',
 			  allowBlank:true,
 				maxLength: 64,
-			  fieldLabel: GO.lang['strDescription']
+			  fieldLabel: t("Description")
 			})]
 				
 		});

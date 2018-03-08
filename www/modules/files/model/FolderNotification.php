@@ -122,13 +122,13 @@ class FolderNotification extends \GO\Base\Db\ActiveRecord {
 				if ($user)
 					$users[$notification->modified_user_id] = $user->getName();
 				else
-					$users[$notification->modified_user_id] = \GO::t('deletedUser', 'files');
+					$users[$notification->modified_user_id] = \GO::t("deletedUser", "files");
 			}
 
 			switch ($notification->type) {
 				case FolderNotificationMessage::ADD_FOLDER:
 					$messages[$notification->type][] = sprintf(
-						\GO::t('notifyFolderAdd', 'files'),
+						\GO::t("Folder %s was add to %s by %s", "files"),
 						$notification->arg1,
 						$notification->arg2,
 						$users[$notification->modified_user_id]
@@ -136,7 +136,7 @@ class FolderNotification extends \GO\Base\Db\ActiveRecord {
 					break;
 				case FolderNotificationMessage::RENAME_FOLDER:
 					$messages[$notification->type][] = sprintf(
-						\GO::t('notifyFolderRename', 'files'),
+						\GO::t("Folder %s was renamed to %s by %s", "files"),
 						$notification->arg1,
 						$notification->arg2,
 						$users[$notification->modified_user_id]
@@ -144,7 +144,7 @@ class FolderNotification extends \GO\Base\Db\ActiveRecord {
 					break;
 				case FolderNotificationMessage::MOVE_FOLDER:
 					$messages[$notification->type][] = sprintf(
-						\GO::t('notifyFolderMove', 'files'),
+						\GO::t("Folder %s was moved to %s by %s", "files"),
 						$notification->arg1,
 						$notification->arg2,
 						$users[$notification->modified_user_id]
@@ -152,14 +152,14 @@ class FolderNotification extends \GO\Base\Db\ActiveRecord {
 					break;
 				case FolderNotificationMessage::DELETE_FOLDER:
 					$messages[$notification->type][] = sprintf(
-						\GO::t('notifyFolderDelete', 'files'),
+						\GO::t("Folder %s was deleted by %s", "files"),
 						$notification->arg1,
 						$users[$notification->modified_user_id]
 					);
 					break;
 				case FolderNotificationMessage::ADD_FILE:
 					$messages[$notification->type][] = sprintf(
-						\GO::t('notifyFileAdd', 'files'),
+						\GO::t("File %s was add to %s by %s", "files"),
 						$notification->arg1,
 						$notification->arg2,
 						$users[$notification->modified_user_id]
@@ -167,7 +167,7 @@ class FolderNotification extends \GO\Base\Db\ActiveRecord {
 					break;
 				case FolderNotificationMessage::RENAME_FILE:
 					$messages[$notification->type][] = sprintf(
-						\GO::t('notifyFileRename', 'files'),
+						\GO::t("File %s was renamed to %s by %s", "files"),
 						$notification->arg1,
 						$notification->arg2,
 						$users[$notification->modified_user_id]
@@ -175,7 +175,7 @@ class FolderNotification extends \GO\Base\Db\ActiveRecord {
 					break;
 				case FolderNotificationMessage::MOVE_FILE:
 					$messages[$notification->type][] = sprintf(
-						\GO::t('notifyFileMove', 'files'),
+						\GO::t("File %s was moved to %s by %s", "files"),
 						$notification->arg1,
 						$notification->arg2,
 						$users[$notification->modified_user_id]
@@ -183,14 +183,14 @@ class FolderNotification extends \GO\Base\Db\ActiveRecord {
 					break;
 				case FolderNotificationMessage::DELETE_FILE:
 					$messages[$notification->type][] = sprintf(
-						\GO::t('notifyFileDelete', 'files'),
+						\GO::t("File %s was deleted by %s", "files"),
 						$notification->arg1,
 						$users[$notification->modified_user_id]
 					);
 					break;
 				case FolderNotificationMessage::UPDATE_FILE:
 					$messages[$notification->type][] = sprintf(
-						\GO::t('notifyFileUpdate', 'files'),
+						\GO::t("File %s was updated by %s", "files"),
 						$notification->arg1,
 						$users[$notification->modified_user_id]
 					);
@@ -222,7 +222,7 @@ class FolderNotification extends \GO\Base\Db\ActiveRecord {
 		}
 		
 		$message = new \GO\Base\Mail\Message();
-		$message->setSubject(\GO::t('notificationEmailSubject', 'files'))
+		$message->setSubject(\GO::t("Updates in folder", "files"))
 				->setTo(array($toUser->email=>$toUser->name))
 				->setFrom(array(\GO::config()->webmaster_email=>\GO::config()->title))
 				->setBody($emailBody);

@@ -62,7 +62,7 @@ class PrintCategoryCount extends \GO\Base\Model {
 	public function getHeaders(){
 		
 		if(empty($this->_headers)){
-			$this->_headers[] = \GO::t('calendars','calendar');
+			$this->_headers[] = \GO::t("Calendars", "calendar");
 
 			foreach($this->categories as $cat){
 				$this->_headers[] = $cat->name;
@@ -134,7 +134,7 @@ class PrintCategoryCount extends \GO\Base\Model {
 		if(empty($this->_totals)){
 			$rows = $this->getRows();
 			
-			$this->_totals[] =\GO::t('total','calendar');
+			$this->_totals[] =\GO::t("Total", "calendar");
 			
 			foreach($rows as $row){
 				$i = 1;

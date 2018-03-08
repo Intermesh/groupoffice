@@ -5,7 +5,7 @@
  * Group-Office license along with Group-Office. See the file /LICENSE.TXT
  *
  * If you have questions write an e-mail to info@intermesh.nl
- * @version $Id: MessagePanel.js 21549 2017-10-19 07:30:00Z mschering $
+ * @version $Id: MessagePanel.js 22346 2018-02-08 15:57:36Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  * @since Group-Office 1.0
@@ -45,38 +45,37 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 
 		var templateStr =
+						
 		'<div class="message-header">'+
+			
 			'<table class="message-header-table">'+
 			'<tr>'+
 
-			'<td rowspan="99"><img id="'+this.contactImageId+'" src="{contact_thumb_url}" style="height:60px;border:1px solid #d0d0d0;margin-right:10px;cursor:pointer" /></td>'+
+			'<td style="width:70px"><b>'+t("From", "email")+'</b></td>'+
 
-
-			'<td style="width:70px"><b>'+GO.email.lang.from+'</b></td>'+
-
-			'<td>: {from} &lt;<a class="normal-link" href="#" onclick="GO.email.showAddressMenu(event, \'{sender}\', \'{[this.addSlashes(values.from)]}\');">{sender}</a>&gt;</td>'+
+			'<td>: {from} &lt;<a class="normal-link" onclick="GO.email.showAddressMenu(event, \'{sender}\', \'{[this.addSlashes(values.from)]}\');">{sender}</a>&gt;</td>'+
 //			'<td rowspan="99"><span id="'+this.linkMessageId+'" class="em-contact-link"></span></td>'+
 
 			'</tr>'+
-			'<tr><td><b>'+GO.email.lang.subject+'</b></td><td>: {subject}</td></tr>'+
-			'<tr><td><b>'+GO.lang.strDate+'</b></td><td>: {date}</td></tr>'+
-			//'<tr><td><b>'+GO.lang.strSize+'</b></td><td>: {size}</td></tr>'+
-			'<tr><td><b>'+GO.email.lang.to+'</b></td><td>: '+
+			'<tr><td><b>'+t("Subject", "email")+'</b></td><td>: {subject}</td></tr>'+
+			'<tr><td><b>'+t("Date")+'</b></td><td>: {date}</td></tr>'+
+			//'<tr><td><b>'+t("Size")+'</b></td><td>: {size}</td></tr>'+
+			'<tr><td><b>'+t("To", "email")+'</b></td><td>: '+
 			'<tpl for="to">'+
-			'{personal} <tpl if="email.length">&lt;<a class="normal-link" href="#" onclick="GO.email.showAddressMenu(event, \'{email}\', \'{[this.addSlashes(values.personal)]}\');">{email}</a>&gt;; </tpl>'+
+			'{personal} <tpl if="email.length">&lt;<a class="normal-link" onclick="GO.email.showAddressMenu(event, \'{email}\', \'{[this.addSlashes(values.personal)]}\');">{email}</a>&gt;; </tpl>'+
 			'</tpl>'+
 			'</td></tr>'+
 			'<tpl if="cc.length">'+
-			'<tr><td><b>'+GO.email.lang.cc+'</b></td><td>: '+
+			'<tr><td><b>'+t("CC", "email")+'</b></td><td>: '+
 			'<tpl for="cc">'+
-			'{personal} <tpl if="email.length">&lt;<a class="normal-link" href="#" onclick="GO.email.showAddressMenu(event, \'{email}\', \'{[this.addSlashes(values.personal)]}\');">{email}</a>&gt;; </tpl>'+
+			'{personal} <tpl if="email.length">&lt;<a class="normal-link" onclick="GO.email.showAddressMenu(event, \'{email}\', \'{[this.addSlashes(values.personal)]}\');">{email}</a>&gt;; </tpl>'+
 			'</tpl>'+
 			'</td></tr>'+
 			'</tpl>'+
 			'<tpl if="bcc.length">'+
-			'<tr><td><b>'+GO.email.lang.bcc+'</b></td><td>: '+
+			'<tr><td><b>'+t("BCC", "email")+'</b></td><td>: '+
 			'<tpl for="bcc">'+
-			'{personal} <tpl if="email.length">&lt;<a class="normal-link" href="#" onclick="GO.email.showAddressMenu(event, \'{email}\', \'{[this.addSlashes(values.name)]}\');">{email}</a>&gt;; </tpl>'+
+			'{personal} <tpl if="email.length">&lt;<a class="normal-link"  onclick="GO.email.showAddressMenu(event, \'{email}\', \'{[this.addSlashes(values.name)]}\');">{email}</a>&gt;; </tpl>'+
 			'</tpl>'+
 			'</td></tr>'+
 			'</tpl>'+
@@ -85,27 +84,27 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			'<tpl if="attachments.length">'+
 			'<div style="clear:both;"></div>'+
 			'<table>'+
-			'<tr><td><b>'+GO.email.lang.attachments+':</b></td></tr><tr><td id="'+this.attachmentsId+'">'+
+			'<tr><td><b>'+t("Attachments", "email")+':</b></td></tr><tr><td id="'+this.attachmentsId+'">'+
 			'<tpl for="attachments">'+
 				'<tpl if="extension==\'vcf\'">';
-				if (GO.addressbook)
-					templateStr += '<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}" href="javascript:GO.email.readVCard(\'{url}&importVCard=1\');">{name:htmlEncode} ({human_size})</a> ';
+				if(go.ModuleManager.isAvailable("addressbook"))
+					templateStr += '<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}" onclick="GO.email.readVCard(\'{url}&importVCard=1\');">{name:htmlEncode} ({human_size})</a> ';
 				else
-					templateStr += '<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}" href="#">{name:htmlEncode} ({human_size})</a> ';
+					templateStr += '<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}">{name:htmlEncode} ({human_size})</a> ';
 				templateStr += '</tpl>'+
 				'<tpl if="extension!=\'vcf\'">'+
-				'<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}" href="#">{name:htmlEncode} ({human_size})</a> '+
+				'<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}">{name:htmlEncode} ({human_size})</a> '+
 				'</tpl>'+
 			'</tpl>'+
 //			ORIGINAL
 //			'<tpl if="attachments.length&gt;1 && zip_of_attachments_url!=\'\'">'+
-//			'<a class="filetype-link filetype-zip" href="{zip_of_attachments_url}" target="_blank">'+GO.email.lang.downloadAllAsZip+'</a>'+
+//			'<a class="filetype-link filetype-zip" href="{zip_of_attachments_url}" target="_blank">'+t("Download all as zipfile", "email")+'</a>'+
 //			'</tpl>'+
 			
 			'<tpl if="attachments.length&gt;1">'+
-//				'<a class="filetype-link btn-menu" id="downloadAllMenu" href="#"></a>'+
-				'<a class="filetype-link btn-more-vert" id="downloadAllMenu-'+this.downloadAllMenuId +'" href="#"></a>'+
-//				'<a class="filetype-link btn-expand-more" id="downloadAllMenu" href="#"></a>'+
+//				'<a class="filetype-link btn-menu" id="downloadAllMenu" ></a>'+
+				'<a class="filetype-link btn-more-vert" id="downloadAllMenu-'+this.downloadAllMenuId +'"></a>'+
+//				'<a class="filetype-link btn-expand-more" id="downloadAllMenu" ></a>'+
 			'</tpl>'+
 			
 			'</td></tr>'+
@@ -113,10 +112,10 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			'</tpl>'+
 			'<div style="clear:both;"></div>'+
 			'<tpl if="blocked_images&gt;0">'+
-			'<div class="go-warning-msg em-blocked">'+GO.email.lang.blocked+' <a id="em-unblock-'+this.bodyId+'" href="#" class="normal-link">'+GO.email.lang.unblock+'</a></div>'+
+			'<div class="go-warning-msg em-blocked">'+t("{blocked_images} external images were blocked for your security.", "email")+' <a id="em-unblock-'+this.bodyId+'" class="normal-link">'+t("Click here to unblock them", "email")+'</a></div>'+
 			'</tpl>'+
 			'<tpl if="xssDetected">'+
-			'<div class="go-warning-msg em-blocked"><a id="em-filterxss-'+this.bodyId+'" href="#" class="normal-link">'+GO.email.lang.xssDetected+'</a></div>'+
+			'<div class="go-warning-msg em-blocked"><a id="em-filterxss-'+this.bodyId+'" class="normal-link">'+t("This message may contain malicious content. Click here to view the filtered message anyway.", "email")+'</a></div>'+
 			'</tpl>'+
 
 			'<tpl if="labels.length">' +
@@ -127,9 +126,12 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				'</div>' +
 				'<div style="clear: both"></div>' +
 			'</tpl>' +
+			
+			'<div class="avatar" id="'+this.contactImageId+'" src="" style="background-image: url(\'{contact_thumb_url}\');cursor:pointer"></div>'+
+			
 		'</div>';
 
-		if(GO.calendar){
+		if(go.ModuleManager.isAvailable("calendar")){
 
 			templateStr += '<tpl if="!GO.util.empty(values.iCalendar)">'+
 				'<tpl if="iCalendar.feedback">'+
@@ -140,11 +142,11 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				'<tpl if="iCalendar.invitation">'+
 
 					'<tpl if="!GO.util.empty(iCalendar.invitation.is_processed)">'+
-						'<a id="em-icalendar-open-'+this.bodyId+'" class="go-model-icon-GO_Calendar_Model_Event normal-link" style="padding-left:20px;background-repeat:no-repeat;" href="#" class="go-model-icon-GO\\Calendar\\Model\\Event message-icalendar-icon">'+GO.email.lang.appointementAlreadyProcessed+'</a>'+
+						'<a id="em-icalendar-open-'+this.bodyId+'" class="go-model-icon-GO_Calendar_Model_Event normal-link" style="padding-left:20px;background-repeat:no-repeat;" class="go-model-icon-GO\\Calendar\\Model\\Event message-icalendar-icon">'+t("This message contains an appointment invitation that was already processed.", "email")+'</a>'+
 					'</tpl>'+
 					'<tpl if="iCalendar.invitation.is_invitation">'+
 
-								'<a id="em-icalendar-accept-invitation-'+this.bodyId+'" class="go-model-icon-GO_Calendar_Model_Event normal-link" style="padding-left:20px;background-repeat:no-repeat;" href="#" class="go-model-icon-GO\\Calendar\\Model\\Event message-icalendar-icon">'+GO.calendar.lang.clickForAttendance+'</a>'+
+								'<a id="em-icalendar-accept-invitation-'+this.bodyId+'" class="go-model-icon-GO_Calendar_Model_Event normal-link" style="padding-left:20px;background-repeat:no-repeat;" class="go-model-icon-GO\\Calendar\\Model\\Event message-icalendar-icon">'+t("Indicate whether you participate in this event", "calendar")+'</a>'+
 
 					'</tpl>'+
 
@@ -152,7 +154,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 						'<div class="go-model-icon-GO_Calendar_Model_Event message-icalendar-icon ">'+
 						'{[values.iCalendar.feedback]}</div>'+
 						'<div class="message-icalendar-actions">'+
-							'<a class="normal-link" id="em-icalendar-delete-event-'+this.bodyId+'" href="#">'+GO.email.lang.icalendarDeleteEvent+'</a>'+
+							'<a class="normal-link" id="em-icalendar-delete-event-'+this.bodyId+'" >'+t("Delete Event", "email")+'</a>'+
 							'</div>'+
 					'</tpl>'+
 
@@ -160,8 +162,8 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 						'<div class="go-model-icon-GO_Calendar_Model_Event message-icalendar-icon ">'+
 						'{[values.iCalendar.feedback]}</div>'+
 						'<div class="message-icalendar-actions">'+
-						'<a id="em-icalendar-open-'+this.bodyId+'" class="normal-link" style="padding-right:20px;" href="#">'+GO.email.lang.icalendarOpenEvent+'</a>'+
-							'<a class="normal-link" id="em-icalendar-update-event-'+this.bodyId+'" href="#">'+GO.email.lang.icalendarUpdateEvent+'</a>'+
+						'<a id="em-icalendar-open-'+this.bodyId+'" class="normal-link" style="padding-right:20px;" >'+t("Open Event", "email")+'</a>'+
+							'<a class="normal-link" id="em-icalendar-update-event-'+this.bodyId+'" >'+t("Update Event", "email")+'</a>'+
 							'</div>'+
 					'</tpl>'+
 
@@ -174,18 +176,18 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 		templateStr += '<tpl if="values.isInSpamFolder==\'1\';">'+
 				'<div class="message-move">'+
-					GO.email.lang['thisIsSpam1']+' <a id="em-move-mail-link-'+this.bodyId+'" class="go-model-icon-GO\\Email\\Model\\Message normal-link" style="background-repeat:no-repeat;" href="javascript:GO.email.moveToInbox(\'{values.uid}\',\'{values.account_id}\');" >'+GO.email.lang['thisIsSpam2']+'</a> '+GO.email.lang['thisIsSpam3']+
+					t("This message has been identified as spam. Click", "email")+' <a id="em-move-mail-link-'+this.bodyId+'" class="go-model-icon-GO\\Email\\Model\\Message normal-link" style="background-repeat:no-repeat;" href="javascript:GO.email.moveToInbox(\'{values.uid}\',\'{values.account_id}\');" >'+t("here", "email")+'</a> '+t("if you think this message is NOT spam.", "email")+
 				'</div>'+
 			'</tpl>'+
 			'<tpl if="values.isInSpamFolder==\'0\';">'+
 				'<div class="message-move">'+
-					GO.email.lang['thisIsNotSpam1']+' <a id="em-move-mail-link-'+this.bodyId+'" class="go-model-icon-GO\\Email\\Model\\Message normal-link" style="background-repeat:no-repeat;" href="javascript:GO.email.moveToSpam(\'{values.uid}\',\'{values.mailbox}\',\'{values.account_id}\');" >'+GO.email.lang['thisIsNotSpam2']+'</a> '+GO.email.lang['thisIsNotSpam3']+
+					t("Click", "email")+' <a id="em-move-mail-link-'+this.bodyId+'" class="go-model-icon-GO\\Email\\Model\\Message normal-link" style="background-repeat:no-repeat;" href="javascript:GO.email.moveToSpam(\'{values.uid}\',\'{values.mailbox}\',\'{values.account_id}\');" >'+t("here", "email")+'</a> '+t("if you think this message is spam.", "email")+
 				'</div>'+
 			'</tpl>';
 
 		templateStr += '<div id="'+this.bodyId+'" class="message-body go-html-formatted">{htmlbody}'+
 			'<tpl if="body_truncated">'+
-			'<br /><a href="javascript:GO.email.showMessageDialog({uid},\'{[this.addSlashes(values.mailbox)]}\',{account_id},true);" class="normal-link">'+GO.email.lang.clickSeeWholeMessage+'</a>'+
+			'<br /><a href="javascript:GO.email.showMessageDialog({uid},\'{[this.addSlashes(values.mailbox)]}\',{account_id},true);" class="normal-link">'+t("The actual message is larger than can be shown here. Click here to see the entire message.", "email")+'</a>'+
 			'</tpl>'+
 			'</div>';
 
@@ -204,7 +206,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 	lookupContact : function(){
 		if(this.data.sender_contact_id){
-			GO.linkHandlers["GO\\Addressbook\\Model\\Contact"].call(this, this.data.sender_contact_id);
+			go.Router.goto("addressbook/contact/" + this.data.sender_contact_id);
 		}else{
 			GO.addressbook.searchSender(this.data.sender, this.data.from);
 		}
@@ -256,7 +258,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 
 		this.loading=true;
-		this.el.mask(GO.lang.waitMsgLoad);
+		this.el.mask(t("Loading..."));
 		GO.request({
 			url: "email/message/view",
 			params: this.params,
@@ -268,7 +270,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				this.fireEvent('load', options, true, response, data, password);
 			},
 			fail: function(response, options, result) {
-				Ext.Msg.alert(GO.lang.strError, result.feedback);
+				Ext.Msg.alert(t("Error"), result.feedback);
 				this.loading=false;
 			}
 		});
@@ -285,22 +287,22 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 //				if(this.updated)
 //				{
-//					data.iCalendar.feedback = GO.email.lang.icalendarEventUpdated;
+//					data.iCalendar.feedback = t("Event has been updated.", "email");
 //					this.updated = false;
 //				}else
 //				if(this.created)
 //				{
-//					data.iCalendar.feedback = GO.email.lang.icalendarEventCreated;
+//					data.iCalendar.feedback = t("Event has been created.", "email");
 //					this.created = false;
 //				}else
 //				if(this.deleted)
 //				{
-//					data.iCalendar.feedback = GO.email.lang.icalendarEventDeleted;
+//					data.iCalendar.feedback = t("Event has been deleted.", "email");
 //					this.deleted = false;
 //				}else
 //				if(this.declined)
 //				{
-//					data.iCalendar.feedback = GO.email.lang.icalendarInvitationDeclined;
+//					data.iCalendar.feedback = t("Invitation has been declined.", "email");
 //					this.declined = false;
 //				}
 
@@ -316,7 +318,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			if(!this.passwordDialog)
 			{
 				this.passwordDialog = new GO.dialog.PasswordDialog({
-					title:GO.smime ? GO.smime.lang.enterPassword : GO.gnupg.lang.enterPassword,
+					title:GO.smime ? t("Please enter the password of your SMIME certificate.", "smime") : t("enterPassword", "gnupg"),
 					fn:function(button, password, passwordDialog){
 						if(button=='cancel')
 						{
@@ -509,7 +511,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		if(GO.savemailas && this.data.sender_contact_id){
 			this.linkMessageCB = new Ext.form.Checkbox({
 				name:'link',
-				boxLabel:GO.savemailas.lang.linkToContact.replace('%s', this.data.contact_name),
+				boxLabel:t("Link e-mail conversation to contact %s", "savemailas").replace('%s', this.data.contact_name),
 				hideLabel:true,
 				renderTo:this.linkMessageId,
 				checked:this.data.contact_linked_message_id>0,
@@ -561,7 +563,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		if(GO.savemailas && this.data.sender_company_id){
 			this.linkCompanyMessageCB = new Ext.form.Checkbox({
 				name:'link',
-				boxLabel:GO.savemailas.lang.linkToCompany.replace('%s', this.data.company_name),
+				boxLabel:t("Link e-mail conversation to company %s", "savemailas").replace('%s', this.data.company_name),
 				hideLabel:true,
 				renderTo:this.linkMessageId,
 				checked:this.data.company_linked_message_id>0,
@@ -737,7 +739,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 
 GO.email.readVCard = function(url) {
-	if (GO.addressbook)
+	if(go.ModuleManager.isAvailable("addressbook"))
 		Ext.Ajax.request({
 			url: url,
 			callback: function(options, success, response)
@@ -745,7 +747,7 @@ GO.email.readVCard = function(url) {
 				var responseData = Ext.decode(response.responseText);
 				if(!success || !responseData.success)
 				{
-					Ext.MessageBox.alert(GO.lang['strError'], responseData['feedback']);
+					Ext.MessageBox.alert(t("Error"), responseData['feedback']);
 				} else {
 					if (!GO.util.empty(responseData.contacts[0])) {
 						GO.addressbook.showContactDialog(0,{contactData : responseData.contacts[0]});

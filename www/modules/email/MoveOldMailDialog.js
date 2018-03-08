@@ -8,7 +8,7 @@ GO.email.MoveOldMailDialog = function(config){
 	this.buildForm();
 
 	config.layout='fit';
-	config.title=GO.email.lang.moveOldMails;
+	config.title=t("Move old mails", "email");
 	//	config.stateId='email-message-dialog';
 	config.maximizable=true;
 	config.modal=false;
@@ -19,14 +19,14 @@ GO.email.MoveOldMailDialog = function(config){
 	config.closeAction='hide';	
 	config.items=this.formPanel;
 	config.buttons=[{
-		text: GO.lang['cmdOk'],
+		text: t("Ok"),
 		handler: function()
 		{
 			this.submitForm();
 		},
 		scope:this
 	},{
-		text: GO.lang['cmdClose'],
+		text: t("Close"),
 		handler: function()
 		{
 			this.hide();
@@ -58,15 +58,15 @@ Ext.extend(GO.email.MoveOldMailDialog, Ext.Window,{
 			items : [this.folderNameField = new GO.form.PlainField({
 				anchor : '100%',
 				allowBlank:false,
-				fieldLabel : GO.email.lang.folder
+				fieldLabel : t("Folder", "email")
 			}),{
 				xtype : 'plainfield',
 				anchor : '100%',
 				allowBlank:false,
 				hideLabel : true,
-				value : GO.email.lang.moveOldMailsInstructions
+				value : t("Select a date. If you click OK after that, all the emails in the selected folder before that date will be moved to the selected target folder.", "email")
 			},this.selectMailbox = new GO.form.ComboBoxReset({
-				fieldLabel : GO.email.lang.moveTo,
+				fieldLabel : t("Move to", "email"),
 				hiddenName : 'target_mailbox',
 				store : new GO.data.JsonStore({
 					url : GO.url("email/folder/store"),
@@ -91,7 +91,7 @@ Ext.extend(GO.email.MoveOldMailDialog, Ext.Window,{
 				width : 100,
 				format : GO.settings['date_format'],
 				allowBlank : false,
-				fieldLabel : GO.email.lang.everythingBefore
+				fieldLabel : t("All emails before", "email")
 			})
 			]
 		});
@@ -124,9 +124,9 @@ Ext.extend(GO.email.MoveOldMailDialog, Ext.Window,{
 
 	submitForm : function(hide) {
 		Ext.Msg.show({
-			title: GO.email.lang.MoveOldMails,
+			title: t("MoveOldMails", "email"),
 			icon: Ext.MessageBox.WARNING,
-			msg: GO.email.lang.moveOldMailsSure.replace("{date}", this.untilDate.value).replace("{source}", this.folderNameField.getValue()).replace("{target}", this.selectMailbox.getValue()),
+			msg: t("Are you sure you want to move all the emails older then {date} from \"{source}\" to \"{target}\"?", "email").replace("{date}", this.untilDate.value).replace("{source}", this.folderNameField.getValue()).replace("{target}", this.selectMailbox.getValue()),
 			buttons: Ext.Msg.YESNO,
 			fn: function(btn) {
 				if (btn=='yes') {
@@ -136,12 +136,12 @@ Ext.extend(GO.email.MoveOldMailDialog, Ext.Window,{
 							'account_id' : this.account_id,
 							'mailbox' : this.node.attributes.mailbox
 						},
-						waitMsg : GO.lang['waitMsgSave'],
+						waitMsg : t("Saving..."),
 						success : function(form, action) {
 
 							GO.email.messagesGrid.store.load({
 								callback:function(){
-									Ext.MessageBox.alert(GO.lang.strSuccess, GO.email.lang.nMovedMailsTxt+": "+action.result.total);
+									Ext.MessageBox.alert(t("Success"), t("The number of moved messages is", "email")+": "+action.result.total);
 									this.hide();
 								},
 								scope:this
@@ -152,14 +152,14 @@ Ext.extend(GO.email.MoveOldMailDialog, Ext.Window,{
 						failure : function(form, action) {
 							var error = '';
 							if (action.failureType == 'client') {
-								error = GO.lang.strErrorsInForm;
+								error = t("You have errors in your form. The invalid fields are marked.");
 							} else if (action.result) {
 								error = action.result.feedback;
 							} else {
-								error = GO.lang.strRequestError;
+								error = t("Could not connect to the server. Please check your internet connection.");
 							}
 
-							Ext.MessageBox.alert(GO.lang.strError, error);
+							Ext.MessageBox.alert(t("Error"), error);
 						},
 						scope : this
 

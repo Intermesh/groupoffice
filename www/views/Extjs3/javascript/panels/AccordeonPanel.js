@@ -121,7 +121,7 @@ GO.AccordionPanel = Ext.extend(Ext.form.FormPanel,{
 
 				this.tools.push({
 					id:'help',
-					qtip: GO.lang['help'],
+					qtip: t("Help"),
 					handler: function(event, toolEl, panel){
 						GO.openHelp(this.helppage);
 					},
@@ -216,7 +216,7 @@ GO.AccordionPanel = Ext.extend(Ext.form.FormPanel,{
 		{
 			url:GO.url(this.formControllerUrl+'/'+this.submitAction),
 			params: params,
-			waitMsg:GO.lang['waitMsgSave'],
+			waitMsg:t("Saving..."),
 			success:function(form, action){		
 				this.getFooterToolbar().setDisabled(false);
 				if(action.result[this.remoteModelIdName])
@@ -259,9 +259,9 @@ GO.AccordionPanel = Ext.extend(Ext.form.FormPanel,{
 				this.getFooterToolbar().setDisabled(false);
 				if(action.failureType == 'client')
 				{					
-					Ext.MessageBox.alert(GO.lang['strError'], GO.lang['strErrorsInForm']);			
+					Ext.MessageBox.alert(t("Error"), t("You have errors in your form. The invalid fields are marked."));			
 				} else {
-					Ext.MessageBox.alert(GO.lang['strError'], action.result.feedback);
+					Ext.MessageBox.alert(t("Error"), action.result.feedback);
 					
 					if(action.result.validationErrors){
 						for(var field in action.result.validationErrors){
@@ -395,7 +395,7 @@ GO.AccordionPanel = Ext.extend(Ext.form.FormPanel,{
 				if(!this.origTitle)
 					this.origTitle=this.title;
 
-				var titleSuffix = this.remoteModelId > 0 ? f.getValue() : GO.lang.cmdNew;
+				var titleSuffix = this.remoteModelId > 0 ? f.getValue() : t("New");
 
 				this.setTitle(this.origTitle+": "+titleSuffix);
 			}

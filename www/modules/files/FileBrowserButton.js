@@ -2,33 +2,48 @@ GO.files.FileBrowserButton = Ext.extend(Ext.Button, {
 	
 	model_name : "",
 	id: 0,
-	iconCls: 'btn-files',
 	setId : function(id){
 		this.id=id;
 		this.setDisabled(!id);
 	},
 	
 	initComponent : function(){
-		Ext.apply(this, {				
-				cls: 'x-btn-text-icon', 
-				text: GO.files.lang.files,
+		Ext.applyIf(this, {
+				text: t("Browse"),
 				handler: function(){			
 					
 
 					GO.request({
 						url:'files/folder/checkModelFolder',
 						maskEl:this.ownerCt.ownerCt.getEl(),
+						jsonData: {},
 						params:{								
 							mustExist:true,
 							model:this.model_name,
 							id:this.id
 						},
 						success:function(response, options, result){														
-							GO.files.openFolder(result.files_folder_id);
+							var fb = GO.files.openFolder(result.files_folder_id);
+							fb.model_name = this.model_name;
+							fb.model_id = this.id;
+							
+							//hack to update entity store
+							if(go.stores[fb.model_name]) {
+								go.stores[fb.model_name].data[this.id].filesFolderId = result.files_folder_id;
+								go.stores[fb.model_name].saveState();
+							}
+							
+							fb.on('hide', function() {
+								fb.model_id = null;
+								fb.model = null;
+								
+							}, {single: true});
 							
 							//reload display panel on close
-							if(this.ownerCt.ownerCt.isDisplayPanel)
-								GO.files.fileBrowserWin.on('hide', this.ownerCt.ownerCt.reload, this.ownerCt.ownerCt, {single:true});
+				
+							GO.files.fileBrowserWin.on('hide', function() {
+								this.fireEvent('close', this, result.files_folder_id);
+							}, this, {single: true});
 						},
 						scope:this
 
@@ -47,3 +62,6 @@ GO.files.FileBrowserButton = Ext.extend(Ext.Button, {
 
 
 Ext.reg('filebrowserbutton', GO.files.FileBrowserButton);
+
+
+

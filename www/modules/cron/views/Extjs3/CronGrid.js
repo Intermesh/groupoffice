@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: CronGrid.js 17292 2014-04-08 11:19:49Z mschering $
+ * @version $Id: CronGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
@@ -23,12 +23,12 @@ GO.cron.CronGrid = Ext.extend(GO.grid.GridPanel,{
 				cls:'go-head-tb',
 				items: [{
 					xtype:'htmlcomponent',
-					html:GO.cron.lang.name,
+					html:t("System task scheduler", "cron"),
 					cls:'go-module-title-tbar'
 				},{
 					itemId:'add',
 					iconCls: 'btn-add',
-					text: GO.lang['cmdAdd'],
+					text: t("Add"),
 					cls: 'x-btn-text-icon',
 					disabled:this.standardTbarDisabled,
 					handler: function(){
@@ -38,7 +38,7 @@ GO.cron.CronGrid = Ext.extend(GO.grid.GridPanel,{
 				},{
 					itemId:'delete',
 					iconCls: 'btn-delete',
-					text: GO.lang['cmdDelete'],
+					text: t("Delete"),
 					cls: 'x-btn-text-icon',
 					disabled:this.standardTbarDisabled,
 					handler: function(){
@@ -49,7 +49,7 @@ GO.cron.CronGrid = Ext.extend(GO.grid.GridPanel,{
 				'-',
 				{
 					iconCls: 'btn-refresh',
-					text: GO.lang['cmdRefresh'],
+					text: t("Refresh"),
 					cls: 'x-btn-text-icon',
 					handler: function(){
 						this.store.load();
@@ -60,7 +60,7 @@ GO.cron.CronGrid = Ext.extend(GO.grid.GridPanel,{
 			//				{
 			//					itemId:'settings',
 			//					iconCls: 'btn-settings',
-			//					text: GO.lang['cmdSettings'],
+			//					text: t("Settings"),
 			//					cls: 'x-btn-text-icon',
 			//					disabled:this.standardTbarDisabled,
 			//					handler: function(){
@@ -73,7 +73,7 @@ GO.cron.CronGrid = Ext.extend(GO.grid.GridPanel,{
 			border: false,
 			paging:true,
 			view:new Ext.grid.GridView({
-				emptyText: GO.lang['strNoItems']
+				emptyText: t("No items to display")
 			}),
 			cm:new Ext.grid.ColumnModel({
 				defaults:{
@@ -81,77 +81,77 @@ GO.cron.CronGrid = Ext.extend(GO.grid.GridPanel,{
 				},
 				columns:[
 				{
-					header: GO.cron.lang.active,
+					header: t("Enabled", "cron"),
 					dataIndex: 'active',
 					sortable: true,
 					renderer: GO.grid.ColumnRenderers.coloredYesNo,
 					width:70
 				},
 				{
-					header: GO.cron.lang.name,
+					header: t("System task scheduler", "cron"),
 					dataIndex: 'name',
 					sortable: true,
 					width:250
 				},
 				{
-					header: GO.cron.lang.minutes,
+					header: t("Minutes", "cron"),
 					dataIndex: 'minutes',
 					sortable: true,
 					width:100
 				},
 				{
-					header: GO.cron.lang.hours,
+					header: t("Hours", "cron"),
 					dataIndex: 'hours',
 					sortable: true,
 					width:100
 				},
 				{
-					header: GO.cron.lang.monthdays,
+					header: t("Month days", "cron"),
 					dataIndex: 'monthdays',
 					sortable: true,
 					width:100
 				},
 				{
-					header: GO.cron.lang.months,
+					header: t("Months", "cron"),
 					dataIndex: 'months',
 					sortable: true,
 					width:100
 				},
 				{
-					header: GO.cron.lang.weekdays,
+					header: t("Week days", "cron"),
 					dataIndex: 'weekdays',
 					sortable: true,
 					width:100
 				},
 				//				{
-				//					header: GO.cron.lang.years,
+				//					header: t("Years", "cron"),
 				//					dataIndex: 'years',
 				//					sortable: true,
 				//					width:100
 				//				},
 				{
-					header: GO.cron.lang.job,
+					header: t("Job", "cron"),
 					dataIndex: 'job',
 					sortable: true,
 					width:250
 				},
 				{
-					header: GO.cron.lang.nextrun,
+					header: t("Next run", "cron"),
 					dataIndex: 'nextrun',
 					sortable: true,
-					width:110
+					width: dp(140)
 				},
 				{
-					header: GO.cron.lang.lastrun,
+					header: t("Last run", "cron"),
 					dataIndex: 'lastrun',
 					sortable: true,
-					width:110
+					width: dp(140)
 				},
 				{
-					header: GO.cron.lang.completedat,
+					header: t("Completed at", "cron"),
 					dataIndex: 'completedat',
 					sortable: true,
-					width:110
+					width: dp(140)
 				}
 				]
 			})

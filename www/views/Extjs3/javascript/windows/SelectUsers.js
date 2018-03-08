@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: SelectUsers.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: SelectUsers.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -51,17 +51,17 @@ GO.dialog.SelectUsers = function(config){
 			forceFit: true
 		}),
 		columns: [{
-			header: GO.lang['strName'],
+			header: t("Name"),
 			dataIndex: 'name',					
 			sortable: true
 		},{
-			header: GO.lang['strEmail'],
+			header: t("E-mail"),
 			dataIndex: 'email',					
 			sortable: true
 		}],
 		sm: new Ext.grid.RowSelectionModel(),
 		tbar: [
-		GO.lang['strSearch']+': ', ' ',
+		t("Search")+': ', ' ',
 		this.searchField
 		]		
 	});
@@ -81,25 +81,25 @@ GO.dialog.SelectUsers = function(config){
 		width:600,
 		closeAction:'hide',
 		focus: focusSearchField.createDelegate(this),
-		title:GO.lang['strSelectUsers'],
+		title:t("Select users"),
 		items: this.grid,
 		buttons: [
 		{
-			text: GO.lang['cmdOk'],
+			text: t("Ok"),
 			handler: function (){
 				this.callHandler(true);
 			},
 			scope:this
 		},
 		{
-			text: GO.lang['cmdAdd'],
+			text: t("Add"),
 			handler: function (){
 				this.callHandler(false);
 			},
 			scope:this
 		},
 		{
-			text: GO.lang['cmdClose'],
+			text: t("Close"),
 			handler: function(){
 				this.hide();
 			},

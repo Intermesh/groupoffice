@@ -1,21 +1,20 @@
 <?php
-
-
-$l['name']='Закладки';
-$l['description']='Модуль для создания закладок.';
-$l['general']='Обшие';
-$l['googleDescription']="Найти в web";
-$l["bookmarks"]='Закладки';
-$l["bookmark"]='Закладка';
-$l["category"]='Категория';
-$l["title"]='Наименование';
-$l["description"]='Описание';
-$l["logo"]='Логотип';
-$l["extern"]='Открыть в новой вкладке';
-$l["administrateCategories"]='Управление категориями';
-$l["thumbnails"]='Вид';
-$l["chooseIcon"]='Выберите иконку для закладки';
-$l["clearLogo"]='Очистить логотип';
-$l["uploadLogo"]='Загрузить логотип';
-$l["showAll"]='Показать все';
-$l["sharedCategory"]='Общая категория';
+return array (
+  'General' => 'Обшие',
+  'Search the web' => 'Найти в web',
+  'Bookmark' => 'Закладка',
+  'Category' => 'Категория',
+  'Title' => 'Наименование',
+  'Logo' => 'Логотип',
+  'Open in new browser tab' => 'Открыть в новой вкладке',
+  'Administrate categories' => 'Управление категориями',
+  'Thumbnails' => 'Вид',
+  'Choose icon for bookmark' => 'Выберите иконку для закладки',
+  'Clear Logo' => 'Очистить логотип',
+  'Upload Logo' => 'Загрузить логотип',
+  'Show all' => 'Показать все',
+  'Shared category' => 'Общая категория',
+  'name' => 'Закладки',
+  'description' => 'Описание',
+  'Bookmarks' => 'Закладки',
+);

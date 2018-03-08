@@ -8,7 +8,7 @@
  * If you have questions write an e-mail to info@intermesh.nl
  * 
  * @copyright Copyright Intermesh
- * @version $Id: gotest.php 22190 2018-01-19 13:15:04Z mschering $
+ * @version $Id: gotest.php 22371 2018-02-13 14:17:26Z mschering $
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
@@ -116,8 +116,8 @@ function test_system(){
 	
 	$test['name']='PHP version';
 	$test['showSuccessFeedback'] = false;
-	$test['pass']=function_exists('version_compare') && version_compare( phpversion(), "5.6", ">=");
-	$test['feedback']='Fatal error: Your PHP version is too old to run '.$product_name.'. PHP 5.5 or higher is required';
+	$test['pass']=function_exists('version_compare') && version_compare( phpversion(), "7.0", ">=");
+	$test['feedback']='Fatal error: Your PHP version is too old to run '.$product_name.'. PHP 7.0 or higher is required';
 	$test['fatal']=true;
 
 //	$tests[]=$test;
@@ -388,7 +388,15 @@ function test_system(){
 	
 	$url = "http".(!empty($_SERVER['HTTPS'])?"s":"")."://".$_SERVER['HTTP_HOST'];
 	
-	$headers = @get_headers($url.'/caldav');	
+	if($_SERVER['SERVER_PORT'] != 80 && $_SERVER['SERVER_PORT'] != 443) {
+		$url .= ':'.$_SERVER['SERVER_PORT'];
+	}
+	
+	try {
+		$headers = get_headers($url.'/caldav');	
+	}catch(\Exception $e) {
+		$headers = false;
+	}
 	$test['name']='CalDAV alias';
 	$test['showSuccessFeedback'] = false;
 	$test['pass']=$headers && (strpos($headers[0], '401')!==false || strpos($headers[0], '200')!==false);
@@ -397,8 +405,11 @@ function test_system(){
 
 	$tests[]=$test;	
 	
-	
-	$headers = @get_headers($url.'/.well-known/caldav');	
+	try {
+	$headers = get_headers($url.'/.well-known/caldav');	
+	}catch(\Exception $e) {
+		$headers = false;
+	}
 	
 	$test['name']='CalDAV autodiscovery';
 	$test['showSuccessFeedback'] = false;
@@ -408,8 +419,11 @@ function test_system(){
 
 	$tests[]=$test;	
 	
-	
-	$headers = @get_headers($url.'/carddav');	
+	try {
+	$headers = get_headers($url.'/carddav');	
+	}catch(\Exception $e) {
+		$headers = false;
+	}
 	$test['name']='CardDAV alias';
 	$test['showSuccessFeedback'] = false;
 	$test['pass']=$headers && (strpos($headers[0], '401')!==false || strpos($headers[0], '200')!==false);;
@@ -418,8 +432,11 @@ function test_system(){
 
 	$tests[]=$test;	
 	
-	
-	$headers = @get_headers($url.'/.well-known/carddav');	
+	try {
+	$headers = get_headers($url.'/.well-known/carddav');	
+	}catch(\Exception $e) {
+		$headers = false;
+	}
 	$test['name']='CardDAV autodiscovery';
 	$test['showSuccessFeedback'] = false;
 	$test['pass']=$headers && (strpos($headers[0], '301')!==false || strpos($headers[0], '200')!==false);
@@ -428,8 +445,11 @@ function test_system(){
 
 	$tests[]=$test;	
 	
-	
-	$headers = @get_headers($url.'/Microsoft-Server-ActiveSync');	
+	try {
+	$headers = get_headers($url.'/Microsoft-Server-ActiveSync');	
+	}catch(\Exception $e) {
+		$headers = false;
+	}
 	
 //	var_dump($headers);
 	$test['name']='Microsoft-Server-ActiveSync alias';
@@ -500,7 +520,7 @@ function test_system(){
 
 
 
-		if(\GO::isInstalled())
+		if(GO\Base\Db\Utils::tableExists('core_module'))
 		{		
 			$test['name']='Protected files path';
 			$test['showSuccessFeedback'] = false;

@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: AttachmentContextMenu.js 17572 2014-05-28 13:32:01Z mschering $
+ * @version $Id: AttachmentContextMenu.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -21,7 +21,7 @@ GO.email.AttachmentContextMenu = function(config)
 	
 	this.downloadButton = new Ext.menu.Item({
 					iconCls: 'btn-download',
-					text: GO.lang.download,
+					text: t("Download"),
 					cls: 'x-btn-text-icon',
 					handler: function(){						
 						GO.email.openAttachment(
@@ -36,7 +36,7 @@ GO.email.AttachmentContextMenu = function(config)
 	{
 		this.saveButton = new Ext.menu.Item({
 					iconCls: 'btn-save',
-					text: GO.email.lang.saveToPersonal,
+					text: t("Save to personal folder", "email"),
 					cls: 'x-btn-text-icon',
 					handler: function(){
 						GO.email.saveAttachment(this.attachment,this.messagePanel);
@@ -49,7 +49,7 @@ GO.email.AttachmentContextMenu = function(config)
 		// Shows the link dialog so you can select an item to add the attachment to.
 		this.saveToItemButton = new Ext.menu.Item({
 			iconCls: 'btn-save',
-			text: GO.email.lang.saveToItem,
+			text: t("Save to item", "email"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 

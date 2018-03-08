@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: QuickAddPanel.js 21544 2017-10-18 08:55:32Z michaelhart86 $
+ * @version $Id: QuickAddPanel.js 21644 2017-11-07 13:08:07Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits<wsmits@intermesh.nl>
  */

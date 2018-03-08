@@ -30,6 +30,6 @@ class RelationDeleteRestrict extends \Exception
 		
 		$relationModelName = \GO::getModel($relation['model'])->localizedName;	
 		
-		parent::__construct(sprintf(\GO::t('relationDeleteRestrict'), strtolower($model->localizedName), $relationModelName));
+		parent::__construct(sprintf(\GO::t("You can't delete this %s because it contains '%s' items. Please remove those first."), strtolower($model->localizedName), $relationModelName));
 	}
 }

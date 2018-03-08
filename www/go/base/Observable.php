@@ -49,6 +49,10 @@ class Observable{
 		\GO::debug("GO\Base\Observable::cacheListeners");
 		\GO::modules()->callModuleMethod('initListeners');
 		self::writeListenersFile();
+		
+		
+		//for new framework
+		\go\core\event\Listeners::get()->init();
 	}
 	
 	public static function writeListenersFile(){

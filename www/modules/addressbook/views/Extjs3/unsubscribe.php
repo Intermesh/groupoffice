@@ -18,13 +18,13 @@ extract($data);
 
 $this->render('externalHeader');
 ?>
-<p><?php echo \GO::t('r_u_sure','addressbook'); ?></p>
+<p><?php echo \GO::t("Are you sure you want to unsubscribe from the address list?", "addressbook"); ?></p>
 <form method="POST">
 	<input type="hidden" name="contact_id" value="<?php echo $contact_id; ?>" />
 	<input type="hidden" name="token" value="<?php echo $token; ?>" />
 	<input type="hidden" name="company_id" value="<?php echo $company_id; ?>" />
 	<input type="hidden" name="sure" value="1" />
-	<input type="submit" value="<?php echo \GO::t('cmdOk'); ?>" />
+	<input type="submit" value="<?php echo \GO::t("Ok"); ?>" />
 </form>
 <?php
 $this->render('externalFooter');

@@ -52,26 +52,26 @@ GO.addressbook.EmployeesPanel = function(config)
 			},
 			columns:[
 			{
-				header: GO.lang['strName'],
+				header: t("Name"),
 				dataIndex: 'name'
 			},
 			{
-				header: GO.lang['strEmail'],
+				header: t("E-mail"),
 				dataIndex: 'email' ,
 				width: 200
 			},
 			{
-				header: GO.lang['strPhone'],
+				header: t("Phone"),
 				dataIndex: 'work_phone' ,
 				width: 100
 			},
 			{
-				header: GO.lang['strFunction'],
+				header: t("Function"),
 				dataIndex: 'function',
 				width: 150
 			},
 			{
-				header: GO.lang['strDepartment'],
+				header: t("Department"),
 				dataIndex: 'department' ,
 				width: 150
 			}
@@ -86,7 +86,7 @@ GO.addressbook.EmployeesPanel = function(config)
 	
 		config.layout= 'fit';
 		config.paging=true;
-		config.title= GO.addressbook.lang['cmdPanelEmployees'];
+		config.title= t("Employees", "addressbook");
 		config.id= 'ab-employees-grid';
 		config.sm= new Ext.grid.RowSelectionModel();
 		config.autoScroll=false;
@@ -97,7 +97,7 @@ GO.addressbook.EmployeesPanel = function(config)
 		config.tbar = [
 		{
 			iconCls: 'btn-add',
-			text: GO.addressbook.lang['addEmployee'],
+			text: t("Add new", "addressbook"),
 			cls: 'x-btn-text-icon',
 			handler: function () {
 				GO.addressbook.showContactDialog(0, {values: {company_id: this.company_id, addressbook_id: this.addressbookId}});
@@ -112,7 +112,7 @@ GO.addressbook.EmployeesPanel = function(config)
 		},
 		{
 			iconCls: 'btn-add',
-			text: GO.addressbook.lang['addExistingEmployee'],
+			text: t("Add existing", "addressbook"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 				if(!this.selectContactDialog)
@@ -137,7 +137,7 @@ GO.addressbook.EmployeesPanel = function(config)
 		},{
 
 			iconCls: 'btn-delete',
-			text: GO.lang['cmdDelete'],
+			text: t("Delete"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 				this.deleteSelected();

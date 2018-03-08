@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: ViewGroupGrid.js 15395 2013-08-06 10:18:32Z mschering $
+ * @version $Id: ViewGroupGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Michael de Hart <mdhart@intermesh.nl>
  */
@@ -15,7 +15,7 @@ GO.calendar.ViewGroupGrid = Ext.extend(GO.grid.GridPanel,{
 	initComponent : function(){
 		
 		Ext.apply(this,{
-			title:GO.calendar.lang.group,
+			title:t("Group", "calendar"),
 			standardTbar:true,
 			store: new GO.data.JsonStore({
 				url:GO.url("calendar/viewGroup/store"),
@@ -36,11 +36,11 @@ GO.calendar.ViewGroupGrid = Ext.extend(GO.grid.GridPanel,{
 				},
 				columns:[
 				{
-					header: GO.lang.strName, 
+					header: t("Name"), 
 					dataIndex: 'name'
 				},
                 {
-					header: GO.lang.strDescription, 
+					header: t("Description"), 
 					dataIndex: 'description'
 				}
 				]

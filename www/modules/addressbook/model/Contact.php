@@ -147,12 +147,12 @@ class Contact extends \GO\Base\Db\ActiveRecord {
 		
 		$labels = parent::attributeLabels();
 		
-		$labels['url_facebook'] = \GO::t('facebookUrl','addressbook');
-		$labels['url_linkedin'] = \GO::t('linkedinUrl','addressbook');
-		$labels['url_twitter'] = \GO::t('twitterUrl','addressbook');
-		$labels['skype_name'] = \GO::t('skypeName','addressbook');
-		$labels['photo'] = \GO::t('photo','addressbook');
-		$labels['action_date'] = \GO::t('actionDate','addressbook');
+		$labels['url_facebook'] = \GO::t("Facebook URL", "addressbook");
+		$labels['url_linkedin'] = \GO::t("LinkedIn URL", "addressbook");
+		$labels['url_twitter'] = \GO::t("Twitter URL", "addressbook");
+		$labels['skype_name'] = \GO::t("Skype name", "addressbook");
+		$labels['photo'] = \GO::t("Photo", "addressbook");
+		$labels['action_date'] = \GO::t("Action date", "addressbook");
 		
 		return $labels;
 	}
@@ -270,7 +270,7 @@ class Contact extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	protected function getLocalizedName() {
-		return \GO::t('contact', 'addressbook');
+		return \GO::t("Contact", "addressbook");
 	}
 
 	/**
@@ -316,7 +316,7 @@ class Contact extends \GO\Base\Db\ActiveRecord {
 		
 		$this->_autoSalutation();
 		
-		if (strtolower($this->sex)==strtolower(\GO::t('female','addressbook')))
+		if (strtolower($this->sex)==strtolower(\GO::t("Female", "addressbook")))
 			$this->sex = 'F';
 		$this->sex = $this->sex=='M' || $this->sex=='F' ? $this->sex : 'M';
 		
@@ -464,9 +464,7 @@ class Contact extends \GO\Base\Db\ActiveRecord {
 		}
 		
 		if(!$this->skip_user_update &&  $this->isModified(array('first_name','middle_name','last_name','email')) && $this->goUser){
-			$this->goUser->first_name = $this->first_name;
-			$this->goUser->middle_name = $this->middle_name;
-			$this->goUser->last_name = $this->last_name;
+			$this->goUser->displayName = $this->getName('first_name');
 			$this->goUser->email = $this->email;
 			$this->goUser->skip_contact_update=true;
 			if($this->goUser->isModified())
@@ -501,7 +499,7 @@ class Contact extends \GO\Base\Db\ActiveRecord {
 //
 //			$img = new \GO\Base\Util\Image();
 //			if(!$img->load($srcFileName)){
-//				throw new \Exception(\GO::t('imageNotSupported','addressbook'));
+//				throw new \Exception(\GO::t("The image you uploaded is not supported. Only gif, png and jpg images are supported.", "addressbook"));
 //			}
 //
 //			$img->zoomcrop(90,120);
@@ -545,48 +543,21 @@ class Contact extends \GO\Base\Db\ActiveRecord {
 	 */
 	public function getPhotoURL(){
 		return $this->photoFile->exists() 
-						? \GO::url('addressbook/contact/photo', array('id'=>$this->id,'mtime'=>$this->photoFile->mtime())) 
-						: \GO::config()->host.'modules/addressbook/themes/Default/images/unknown-person.png';
+			? \GO::url('addressbook/contact/photo', array('id'=>$this->id,'mtime'=>$this->photoFile->mtime())) 
+			: null;
 	}
 	
-	public function getPhotoThumbURL($urlParams=array("w"=>120, "h"=>160, "zc"=>1)) {
+	public function getPhotoThumbURL($urlParams=array("w"=>300, "h"=>300, "zc"=>1)) {
 		
-		if($this->getPhotoFile()->exists()){
-			$urlParams['filemtime']=$this->getPhotoFile()->mtime();
-			$urlParams['src']=$this->getPhotoFile()->stripFileStoragePath();
-			return \GO::url('core/thumb', $urlParams);	
-		}else
-		{
-// TODO: Finish the implementation of gravatar (Scaling gravatar image etc..)
-//			$hash = $this->_getGravatarHash();
-//			if(!empty($hash))
-//				return 'http://www.gravatar.com/avatar/'.$hash.'.jpg?s='.$urlParams['h'].'&d=mm';
-//			else			
-				return \GO::config()->host.'modules/addressbook/themes/Default/images/unknown-person.png';
+		if(!$this->getPhotoFile()->exists()){
+			return null;
 		}
+		$urlParams['filemtime']=$this->getPhotoFile()->mtime();
+		$urlParams['src']=$this->getPhotoFile()->stripFileStoragePath();
+		return \GO::url('core/thumb', $urlParams);	
 	}
 	
-// TODO: Finish the implementation of gravatar (Scaling gravatar image etc..)
-//	/**
-//	 * Get the hash to request the gravatar image
-//	 * 
-//	 * @return mixed Hash/Boolean
-//	 */
-//	private function _getGravatarHash(){
-//		
-//		$gravatarEmail = false;
-//		
-//		if(!empty($this->email))
-//			$gravatarEmail = $this->email;
-//		else if(!empty($this->email2))
-//			$gravatarEmail = $this->email2;
-//		else if(!empty($this->email3))
-//			$gravatarEmail = $this->email3;
-//		else
-//			return false;	
-//		
-//		return md5(strtolower(trim($gravatarEmail)));
-//	}
+
 	
 	/**
 	 * Set new photo file. The file will be converted into JPEG and resized to fit
@@ -610,7 +581,7 @@ class Contact extends \GO\Base\Db\ActiveRecord {
 		$img = new \GO\Base\Util\Image();
 		\GO::debug($file->path());
 		if(!$img->load($file->path())){
-			throw new \Exception(\GO::t('imageNotSupported','addressbook'));
+			throw new \Exception(\GO::t("The image you uploaded is not supported. Only gif, png and jpg images are supported.", "addressbook"));
 		}
 		
 		//resize it to small image so we don't get in trouble with sync clients
@@ -1393,37 +1364,7 @@ class Contact extends \GO\Base\Db\ActiveRecord {
 		return $diff->y;
 	}
 	
-	/**
-	 * Get all user contacts that a given user is authorized to see
-	 * 
-	 * @param int $user_id
-	 * @param \GO\Base\Db\FindParams $findParams
-	 * @return Contact Statement
-	 */
-	public function findUsers($user_id, \GO\Base\Db\FindParams $findParams=null){
-		$aclJoinCriteria = \GO\Base\Db\FindCriteria::newInstance()
-						->addRawCondition('a.acl_id', 'goUser.acl_id', '=', false);
 
-		$aclWhereCriteria = \GO\Base\Db\FindCriteria::newInstance()				
-				->addCondition('user_id', $user_id, '=', 'a', false)
-				->addInCondition("group_id", \GO\Base\Model\User::getGroupIds($user_id), "a", false);
-
-		$fp = \GO\Base\Db\FindParams::newInstance()				
-				->group('t.id')
-				->ignoreAcl()
-				->joinRelation('goUser')							
-				->join(\GO\Base\Model\AclUsersGroups::model()->tableName(), $aclJoinCriteria, 'a', 'INNER');
-
-		$fp->getCriteria()
-						->addCondition('enabled', true,'=','goUser')
-						->mergeWith($aclWhereCriteria);
-		
-		
-		if(isset($findParams))
-			$fp->mergeWith ($findParams);
-		
-		return Contact::model()->find($fp);
-	}
 
 	public function getActionDate() {
 		

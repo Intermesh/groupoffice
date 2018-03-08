@@ -7,7 +7,7 @@
  * If you have questions write an e-mail to info@intermesh.nl
  * 
  * @copyright Copyright Intermesh
- * @version $Id: ManageDialog.js 21434 2017-09-14 12:59:40Z wsmits $
+ * @version $Id: ManageDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
@@ -16,7 +16,7 @@ GO.addressbook.ManageDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 	initComponent : function(){
 
 		Ext.apply(this, {
-			title:GO.addressbook.lang.cmdManageDialog,
+			title:t("Manage", "addressbook"),
 			formControllerUrl: 'addressbook/settings',
 			enableOkButton : false,
 			enableApplyButton : false,
@@ -39,7 +39,7 @@ GO.addressbook.ManageDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 		
 		if(GO.settings.has_admin_permission){
 			this.exportPermissionsTab = new GO.grid.PermissionsPanel({
-				title:GO.addressbook.lang.exportPermission,
+				title:t("Export permissions", "addressbook"),
 				hideLevel:true
 			});
 			this.addPanel(this.exportPermissionsTab);

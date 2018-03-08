@@ -18,7 +18,7 @@ GO.email.TemplateSelectionDialog = Ext.extend(GO.Window,{
 		
 		
 		Ext.apply(this,{
-			title: GO.addressbook.lang.emailTemplate,
+			title: t("E-mail template", "addressbook"),
 			layout:"border",
 			items:[
 				this.grid

@@ -5,7 +5,7 @@ GO.UploadPCForm = function(config)
 	}
 
 	if(!config.addText){
-		config.addText=GO.email.lang.attachFilesPC;
+		config.addText=t("Add from PC", "email");
 	}
 	
 	if(!config.url)
@@ -45,7 +45,7 @@ Ext.extend(GO.UploadPCForm, Ext.form.FormPanel, {
 	uploadHandler : function(){
 
 		this.form.submit({			
-			waitMsg: GO.lang.waitMsgUpload,
+			waitMsg: t("Uploading..."),
 			success:function(form, action){
 				this.uploadFile.clearQueue();
 				
@@ -60,13 +60,13 @@ Ext.extend(GO.UploadPCForm, Ext.form.FormPanel, {
 				var error = '';
 				if(action.failureType=='client')
 				{
-					error = GO.lang['strErrorsInForm'];
+					error = t("You have errors in your form. The invalid fields are marked.");
 				}else
 				{
 					error = action.result.feedback;
 				}
 
-				Ext.MessageBox.alert(GO.lang['strError'], error);
+				Ext.MessageBox.alert(t("Error"), error);
 			},
 			scope: this
 		});

@@ -1,26 +1,25 @@
 <?php
-
-
-$l['name']='Contingut';
-$l['description']='Per favor, introduïu una descripció';
-$l['default_rss_url']='http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml';
-$l['default_rss_title']='Novetats';
-$l["summary"]= 'Contingut';
-$l["noItems"]= 'No teniu cap element en el vostre inici.';
-$l["selectPortlet"]= 'Seleccioneu portlet';
-$l["hotTopics"]= 'Temes';
-$l["enterRssFeed"]= 'Introduïu URL del feed RSS:';
-$l["notes"]= 'Notes';
-$l["loadingFeed"]= 'Carregant Feed...';
-$l["goToPost"]= 'Anar a Correus';
-$l["today"]= 'Avui';
-$l["announcement"]="Comunicació";
-$l["announcements"]="Comunicacions";
-$l["dueTime"]="Data límit";
-$l["title"]="Títol";
-$l["manageAnnouncements"]='Administrar comunicacions';
-$l["webFeeds"]='Administrar webfeeds';
-$l["type"]='Tipus';
-$l["summaryType"]='Resum';
-$l["rssFeeds"]='Rss Feeds';
-$l["noRssFeeds"]='No s\'ha afegit cap feed RSS.<br />Feu clic en el botó de configuració en la cantonada superior dreta d\'aquesta finestra per afegir feeds RSS';
+return array (
+  'News' => 'Temes',
+  'You don\'t have any items on your start page.' => 'No teniu cap element en el vostre inici.',
+  'Select portlet' => 'Seleccioneu portlet',
+  'Please enter the RSS feed URL:' => 'Introduïu URL del feed RSS:',
+  'Loading Feed...' => 'Carregant Feed...',
+  'Go to Post' => 'Anar a Correus',
+  'Today ' => 'Avui',
+  'Announcement' => 'Comunicació',
+  'Announcements' => 'Comunicacions',
+  'Show until' => 'Data límit',
+  'Title' => 'Títol',
+  'Manage announcements' => 'Administrar comunicacions',
+  'Manage webfeeds' => 'Administrar webfeeds',
+  'Type' => 'Tipus',
+  'Summary' => 'Resum',
+  'No RSS feeds have been added.<br />Click the settings button in the top right corner of this window to add feeds.' => 'No s\'ha afegit cap feed RSS.<br />Feu clic en el botó de configuració en la cantonada superior dreta d\'aquesta finestra per afegir feeds RSS',
+  'name' => 'Contingut',
+  'description' => 'Per favor, introduïu una descripció',
+  'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml' => 'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml',
+  'Start page' => 'Contingut',
+  'Notes' => 'Notes',
+  'Rss Feeds' => 'Rss Feeds',
+);

@@ -1,5 +1,6 @@
 <?php
-
-$l['name'] = 'PhpBB3';
-$l['description'] = 'Passerelle entre PhpBB3 et {product_name}.';
-$l['forum']='Forum';
+return array (
+  'name' => 'PhpBB3',
+  'description' => 'Passerelle entre PhpBB3 et {product_name}.',
+  'Forum' => 'Forum',
+);

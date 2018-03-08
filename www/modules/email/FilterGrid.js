@@ -4,9 +4,9 @@ GO.email.FilterGrid = Ext.extend(GO.grid.GridPanel,{
 		config=config||{};
 		
 		Ext.applyIf(config, {
-			tbar:[GO.email.lang.sieveNote],
+			tbar:[t("Not all features are supported. Check the manual.", "email")],
 			standardTbar:true,
-			title : GO.email.lang.filters,
+			title : t("Filters", "email"),
 			disabled:true,
 			store: new GO.data.JsonStore({
 				url : GO.url("email/filter/store"),
@@ -22,25 +22,25 @@ GO.email.FilterGrid = Ext.extend(GO.grid.GridPanel,{
 			enableDragDrop:true,
 			ddGroup:'EmailFiltersDD',			
 			cm : new Ext.grid.ColumnModel([{
-				header : GO.email.lang.field,
+				header : t("Field", "email"),
 				dataIndex : 'field'
 			}, {
-				header : GO.email.lang.contains,
+				header : t("Contains", "email"),
 				dataIndex : 'keyword'
 			}, {
-				header : GO.email.lang.moveToFolder,
+				header : t("Move to folder", "email"),
 				dataIndex : 'folder'
 			}, {
-				header : GO.email.lang.markAsRead,
+				header : t("Mark as read", "email"),
 				dataIndex : 'mark_as_read',
 				renderer : function (value) {
-					return value == "1" ? GO.lang.cmdYes : GO.lang.cmdNo;
+					return value == "1" ? t("Yes") : t("No");
 				}
 			}]),
 			view : new Ext.grid.GridView({
 				autoFill : true,
 				forceFit : true,
-				emptyText : GO.lang.strNoItems
+				emptyText : t("No items to display")
 			}),
 			sm : new Ext.grid.RowSelectionModel(),
 			listeners:{

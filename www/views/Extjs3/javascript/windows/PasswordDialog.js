@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: PasswordDialog.js 18111 2014-09-19 09:06:22Z mschering $
+ * @version $Id: PasswordDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -29,7 +29,7 @@ GO.dialog.PasswordDialog = function(config){
 		layout:'form',    
 		bodyStyle:'padding:5px 10px 5px 10px',
 		items: [this.passwordField = new Ext.form.TextField({
-			fieldLabel: GO.lang.strPassword,
+			fieldLabel: t("Password"),
 			name: 'password',
 			inputType: 'password',
 			allowBlank:false,
@@ -58,13 +58,13 @@ GO.dialog.PasswordDialog = function(config){
 		],
 		
 		buttons: [{				
-			text: GO.lang['cmdOk'],
+			text: t("Ok"),
 			handler: function(){
 				this.pressButton('ok');
 			},
 			scope:this
 		},{
-			text: GO.lang.cmdCancel,
+			text: t("Cancel"),
 			handler:function(){
 				this.pressButton('cancel');					
 			},

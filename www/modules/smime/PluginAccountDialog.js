@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: PluginAccountDialog.js 17553 2014-05-27 13:03:02Z mschering $
+ * @version $Id: PluginAccountDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -20,38 +20,38 @@ GO.moduleManager.onModuleReady('email',function(){
 								
 			this.smimePanel=new Ext.Panel({
 				cls:'go-form-panel',
-				title:GO.smime.lang.settings,
+				title:t("SMIME settings", "smime"),
 				disabled:true,
 				items:[{
 					xtype:'fieldset',
 					labelWidth:160,
-					title:GO.smime.lang.pkcs12Cert,
+					title:t("PKCS12 certificate", "smime"),
 					items:[
 						{
 							id:'smimeHasCert',
 							xtype:'label',
 							style:'display:block;margin-bottom:15px',
-							html:GO.smime.lang.youHaveAcert
+							html:t("You have uploaded a certificate already. SMIME support is enabled for this account.", "smime")
 						},
 						{
 							xtype:'label',
-							html:GO.smime.lang.pkcs12CertInfo,
+							html:t("To upload a new PKCS12 certificate you must enter your Group-Office password. The Group-Office password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.", "smime"),
 							style:'display:block;margin-bottom:10px'
 						},{
 							xtype:'textfield',
-							fieldLabel:GO.settings.config.product_name+' '+GO.lang.strPassword,
+							fieldLabel:GO.settings.config.product_name+' '+t("Password"),
 							inputType:'password',
 							name:'smime_password',
 							width:200
 						},
 						
 						this.uploadFile = new GO.form.UploadFile({
-							addText:GO.smime.lang.selectPkcs12Cert,
+							addText:t("Select new PKCS12 Certificate", "smime"),
 							inputName : 'cert',
 							max: 1
 						}),
 						this.deleteCert = new Ext.form.Checkbox({						
-							boxLabel:GO.smime.lang.deleteCert,
+							boxLabel:t("Delete certificate", "smime"),
 							labelSeparator: '',
 							name: 'delete_cert',
 							allowBlank: true,
@@ -62,7 +62,7 @@ GO.moduleManager.onModuleReady('email',function(){
 							handler:function(){
 								window.open(GO.url("smime/certificate/download",{account_id:this.account_id}));
 							},
-							text:GO.smime.lang.downloadCert,
+							text:t("Download certificate", "smime"),
 							disabled:true,
 							scope:this
 						})]
@@ -70,7 +70,7 @@ GO.moduleManager.onModuleReady('email',function(){
 				{
 					xtype:'checkbox',
 					hideLabel:true,
-					boxLabel:GO.smime.lang.alwaysSign,
+					boxLabel:t("Always sign messages", "smime"),
 					name:'always_sign'
 				}
 				]

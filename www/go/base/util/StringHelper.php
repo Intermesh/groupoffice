@@ -12,7 +12,7 @@
  * This class contains functions for string operations
  *
  * @copyright Copyright Intermesh
- * @version $Id: StringHelper.php 22430 2018-02-28 09:15:18Z wsmits $
+ * @version $Id: StringHelper.php 22467 2018-03-07 08:42:50Z mschering $
  * @author Merijn Schering <mschering@intermesh.nl>
  * @package GO.base.util
  * @since Group-Office 3.0
@@ -293,16 +293,18 @@ class StringHelper {
 		if($source_charset == 'UNICODE')
 			$source_charset = 'UTF-8';
 		
-		//Does not always work. We suppress the:
-		//Notice:  iconv() [function.iconv]: Detected an illegal character in input string in /var/www/community/trunk/www/classes/String.class.inc.php on line 31		
-		$old_lvl = error_reporting (E_ALL ^ E_NOTICE);
+		
 		
 		$str = str_replace("€","&euro;", $str);
 		
 		$source_charset = self::fixCharset($source_charset);
+		try {
+			$c = iconv($source_charset, 'UTF-8//IGNORE', $str);
+		} catch(\ErrorException $e) {
+			//Does not always work. We suppress the:
+			//Notice:  iconv() [function.iconv]: Detected an illegal character in input string in /var/www/community/trunk/www/classes/String.class.inc.php on line 31		
+		}
 		
-		$c = iconv($source_charset, 'UTF-8//IGNORE', $str);
-		error_reporting ($old_lvl);
 		if(!empty($c))
 		{
 			$str=$c;

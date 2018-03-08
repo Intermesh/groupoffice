@@ -27,11 +27,11 @@ class InstallationController extends \GO\Base\Controller\AbstractJsonController 
 			$defaultSiteModule->id='defaultsite';
 			if(!$defaultSiteModule->save()){
 				$response['success'] = false;
-				$response['feedback'] = \GO::t('installdefaultsiteerror','defaultsite');
+				$response['feedback'] = \GO::t("Could not install the \"defaultsite\" module.", "defaultsite");
 			}
 		} else {
 			$response['success'] = false;
-			$response['feedback'] = \GO::t('installsiteerror','defaultsite');
+			$response['feedback'] = \GO::t("Could not install the \"site\" module.", "defaultsite");
 		}
 
 		echo $this->renderJson($response);

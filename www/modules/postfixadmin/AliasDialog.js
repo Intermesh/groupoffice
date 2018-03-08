@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: AliasDialog.js 21624 2017-11-06 08:29:46Z mschering $
+ * @version $Id: AliasDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -16,7 +16,7 @@ GO.postfixadmin.AliasDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 	initComponent : function(){
 		Ext.apply(this, {
 			titleField:'address',
-			title: GO.postfixadmin.lang.alias,
+			title: t("Alias", "postfixadmin"),
 			formControllerUrl: 'postfixadmin/alias',
 			width:700,
 			height:500
@@ -32,7 +32,7 @@ GO.postfixadmin.AliasDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 		});
 		
 		this.propertiesPanel = new Ext.Panel({
-			title:GO.lang['strProperties'],			
+			title:t("Properties"),			
 			cls:'go-form-panel',waitMsgTarget:true,			
 			layout:'form',
 			autoScroll:true,
@@ -44,13 +44,13 @@ GO.postfixadmin.AliasDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 			
 			new Ext.form.CompositeField({
 				anchor: '-20',
-				plugins:[new Ext.ux.FieldHelp(GO.postfixadmin.lang.aliasAddresHelp)],
+				plugins:[new Ext.ux.FieldHelp(t("Use '*' for a catch all alias (not recommended).", "postfixadmin"))],
 				items:[{
 					xtype: 'textfield',
 					name: 'address',
 					flex:3,
 					allowBlank:false,
-					fieldLabel: GO.postfixadmin.lang.address
+					fieldLabel: t("Address", "postfixadmin")
 					
 				},this.domainLabel]
 			}),				
@@ -60,14 +60,14 @@ GO.postfixadmin.AliasDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 				anchor: '-20',
 			  allowBlank:true,
 				height:120,
-			  fieldLabel: GO.postfixadmin.lang.goto_address,
-				plugins:[new Ext.ux.FieldHelp(GO.postfixadmin.lang.aliasHelp)]
+			  fieldLabel: t("Goto", "postfixadmin"),
+				plugins:[new Ext.ux.FieldHelp(t("For multiple recipients use a comma separated list eg. alias1@domain.com,alias2@domain.com", "postfixadmin"))]
 			},{
 				xtype: 'xcheckbox',
 			  name: 'active',
 				anchor: '-20',
 			  allowBlank:false,
-			  boxLabel: GO.postfixadmin.lang.active,
+			  boxLabel: t("Active", "postfixadmin"),
 			  hideLabel: true
 			}]
 		});

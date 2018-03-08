@@ -5,7 +5,7 @@ GO.calendar.ResourcesGrid = function(config){
 		config = {};
 	}
 
-	config.title = GO.calendar.lang.resources;
+	config.title = t("Resources", "calendar");
 	config.layout='fit';
 	config.autoScroll=true;
 	config.split=true;
@@ -13,12 +13,12 @@ GO.calendar.ResourcesGrid = function(config){
 
 	var columnModel =  new Ext.grid.ColumnModel([
 	{
-		header:GO.lang.strName,
+		header:t("Name"),
 		dataIndex: 'name',
 		id:'name',
 		sortable:true
 	},{
-		header:GO.calendar.lang.group,
+		header:t("Group", "calendar"),
 		dataIndex: 'group_name',
 		id:'group_name',
 		hidden:true
@@ -29,7 +29,7 @@ GO.calendar.ResourcesGrid = function(config){
 		autoFill: true,
 		forceFit:true,
 		groupTextTpl: '{text}',
-		emptyText: GO.lang['strNoItems']
+		emptyText: t("No items to display")
 	});
 
 	config.sm=new Ext.grid.RowSelectionModel();
@@ -37,7 +37,7 @@ GO.calendar.ResourcesGrid = function(config){
 
 	config.tbar=[{
 		iconCls: 'btn-add',
-		text: GO.lang.cmdAdd,
+		text: t("Add"),
 		disabled: !GO.settings.modules.calendar.write_permission,
 		cls: 'x-btn-text-icon',
 		handler: function(){
@@ -47,7 +47,7 @@ GO.calendar.ResourcesGrid = function(config){
 	},{
 		iconCls: 'btn-delete',
 		disabled: !GO.settings.modules.calendar.write_permission,
-		text: GO.lang.cmdDelete,
+		text: t("Delete"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			this.deleteSelected();
@@ -59,7 +59,7 @@ GO.calendar.ResourcesGrid = function(config){
 		this.searchField = new GO.form.SearchField({
 			store: config.store,
 			width:150,
-			emptyText: GO.lang.strSearch
+			emptyText: t("Search")
 		})
 	];
 

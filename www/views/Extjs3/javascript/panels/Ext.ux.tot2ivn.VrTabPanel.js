@@ -236,7 +236,7 @@ Ext.ux.tot2ivn.VrTabPanel = Ext.extend(Ext.Panel,  {
         if(!this.itemTpl){
             var tt = new Ext.Template(
                  '<li class="{cls} x-tot2ivn-vr-tab-strip-title" id="{id}"><a class="x-tab-strip-close"></a>',
-                 '<a class="x-tab-right" href="#"><em class="x-tab-left">',
+                 '<a class="x-tab-right" ><em class="x-tab-left">',
                  '<span class="x-tab-strip-inner"><span class="x-tab-strip-text x-tot2ivn-vr-tab-strip-text {iconCls}">{text}</span></span>',
                  '</em></a></li>'
             );

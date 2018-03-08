@@ -52,8 +52,8 @@ class BasicBackend extends AbstractBasic {
 			return false;
 		}
 
-		$davModule = Module::model()->findByPk($this->checkModuleAccess, false, true);
-		if(!$davModule || !\GO\Base\Model\Acl::getUserPermissionLevel($davModule->acl_id, $this->_user->id))
+		$davModule = Module::model()->findByName($this->checkModuleAccess, false, true);
+		if(!$davModule || !\GO\Base\Model\Acl::getUserPermissionLevel($davModule->aclId, $this->_user->id))
 		{
 			$errorMsg = "No '".$this->checkModuleAccess."' module access for user '".$this->_user->username."'";
 			\GO::debug($errorMsg);

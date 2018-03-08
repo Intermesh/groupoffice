@@ -28,7 +28,7 @@ GO.base.model.multiselect.panel = function(config){
 							this.store.commitChanges();
 						},
 						fail: function(response, options, result) {
-							Ext.Msg.alert(GO.lang.strError, result.feedback);
+							Ext.Msg.alert(t("Error"), result.feedback);
 							this.store.rejectChanges();
 						},
 						scope: this
@@ -38,12 +38,7 @@ GO.base.model.multiselect.panel = function(config){
 			scope:this
 		}
 	});
-	
-		
-	this.searchField = new GO.form.SearchField({
-		store: config.store,
-		width:320
-	});
+
 	
 	if(typeof(config.paging)=='undefined')
 		config.paging=true;
@@ -66,12 +61,15 @@ GO.base.model.multiselect.panel = function(config){
 	Ext.apply(config,{
 		loadMask:true,
 		layout: 'fit',
-		title:config.title,
+		header: false,
 		tbar : [
+			{
+				xtype: "tbtitle",
+				text: config.title
+			},'->',
 		{
-			iconCls: 'btn-add',
-			text: GO.lang['cmdAdd'],
-			cls: 'add-btn-text-icon',
+			iconCls: 'ic-add',
+			tooltip: t("Add"),
 			handler: function(){
 				if(!this.addDialog){
 					if(!config.selectColumns)
@@ -113,16 +111,14 @@ GO.base.model.multiselect.panel = function(config){
 			},
 			scope: this
 		},{
-			iconCls: 'btn-delete',
-			text: GO.lang['cmdDelete'],
-			cls: 'x-btn-text-icon',
+			iconCls: 'ic-delete',
+			tooltip: t("Delete"),
 			handler: function()
 			{
 				this.deleteSelected();
 			},
 			scope: this
-		},
-		GO.lang['strSearch'] + ':', this.searchField
+		}
 	]
 	});	
 

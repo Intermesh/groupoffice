@@ -1,4 +1,5 @@
 <?php
+$GO_SCRIPTS_JS .= "GO.mainLayout.on('authenticated', function(){";
 $findParams = \GO\Base\Db\FindParams::newInstance()->criteria(\GO\Base\Db\FindCriteria::newInstance()->addCondition('behave_as_module', 1));
 
 $stmt = \GO\Bookmarks\Model\Bookmark::model()->find($findParams);
@@ -9,7 +10,7 @@ while($bookmark = $stmt->fetch()){
 	} else {
 		$name = $bookmark->name;
 	}
-	$GO_SCRIPTS_JS .= 'GO.moduleManager.addModule(\'bookmarks-id-' . $bookmark->id . '\', GO.panel.IFrameComponent, {title : \'' . \GO\Base\Util\StringHelper::escape_javascript($name) . '\', url : \'' . \GO\Base\Util\StringHelper::escape_javascript($bookmark->content) . '\',iconCls: \'go-tab-icon-bookmarks\'});';
+	$GO_SCRIPTS_JS .= 'GO.moduleManager._addModule(\'bookmarks-id-' . $bookmark->id . '\', GO.panel.IFrameComponent, {title : \'' . \GO\Base\Util\StringHelper::escape_javascript($name) . '\', url : \'' . \GO\Base\Util\StringHelper::escape_javascript($bookmark->content) . '\',iconCls: \'go-tab-icon-bookmarks\'});';
 }
 
 // Load the bookmark categories for the start menu
@@ -34,7 +35,9 @@ while($category = $categoryStmt->fetch()){
 			$name = $bookmark->name;
 		}
 		
-		$GO_SCRIPTS_JS .= 'GO.moduleManager.addModule(\'bookmarks-id-' . $bookmark->id . '\', GO.panel.IFrameComponent, {title : \'' . \GO\Base\Util\StringHelper::escape_javascript($name) . '\', url : \'' . \GO\Base\Util\StringHelper::escape_javascript($bookmark->content) . '\',iconCls: \'go-tab-icon-bookmarks\'},{title:\''.\GO\Base\Util\StringHelper::escape_javascript($categoryName).'\',iconCls: \'go-menu-icon-bookmarks\'});';
+		$GO_SCRIPTS_JS .= 'GO.moduleManager._addModule(\'bookmarks-id-' . $bookmark->id . '\', GO.panel.IFrameComponent, {title : \'' . \GO\Base\Util\StringHelper::escape_javascript($name) . '\', url : \'' . \GO\Base\Util\StringHelper::escape_javascript($bookmark->content) . '\',iconCls: \'go-tab-icon-bookmarks\'},{title:\''.\GO\Base\Util\StringHelper::escape_javascript($categoryName).'\',iconCls: \'go-menu-icon-bookmarks\'});';
 	}
 
 }
+
+$GO_SCRIPTS_JS .= "});";

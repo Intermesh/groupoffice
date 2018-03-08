@@ -17,7 +17,7 @@ GO.files.TreePanel = function (config){
 	config.loader.on('beforeload', function(){
 		var el =this.getEl();
 		if(el){
-			el.mask(GO.lang.waitMsgLoad);
+			el.mask(t("Loading..."));
 		}
 	}, this);
 
@@ -33,7 +33,6 @@ GO.files.TreePanel = function (config){
 		layout:'fit',
 		split:true,
 		autoScroll:true,
-		width: 200,
 		animate:true,
 		rootVisible:false,
 		containerScroll: true,

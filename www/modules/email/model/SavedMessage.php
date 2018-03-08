@@ -45,7 +45,7 @@ class SavedMessage extends ComposerMessage {
 		$file = new \GO\Base\Fs\File($fullPath);
 		
 		if(!$file->exists()){
-			throw new \Exception("E-mail message file does not exist!");
+			return null; //throw new \Exception("E-mail message file does not exist!");
 		}
 		
 		$mimeData = $file->contents();

@@ -26,7 +26,7 @@ class Transport extends \Swift_SmtpTransport{
 	
 	public static function newGoInstance(Model\Account $account){
 		$encryption = empty($account->smtp_encryption) ? null : $account->smtp_encryption;
-		$o = self::newInstance($account->smtp_host, $account->smtp_port, $encryption);
+		$o = new self($account->smtp_host, $account->smtp_port, $encryption);
 		
 		if(!empty($account->smtp_username)){
 			$o->setUsername($account->smtp_username)

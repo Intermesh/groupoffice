@@ -62,9 +62,9 @@ class Comment extends \GO\Base\Db\ActiveRecord{
 		}
 		
 		return array(
-				'name' => empty($this->comments)?\GO::t('emptyComment','comments'):\GO\Base\Util\StringHelper::cut_string($this->comments, 100),
+				'name' => empty($this->comments)?\GO::t("Empty comment", "comments"):\GO\Base\Util\StringHelper::cut_string($this->comments, 100),
 				'description'=>'',
-				'acl_id' => $this->getAttachedObject()->findAclId()
+				'aclId' => $this->getAttachedObject()->findAclId()
 		);
 	}
 	
@@ -79,10 +79,22 @@ class Comment extends \GO\Base\Db\ActiveRecord{
 	
 	public function getAttachedObject(){
 		
+		
+		
 		$modelType = \GO\Base\Model\ModelType::model()->findByPk($this->model_type_id);
 		
+		
+		
+		
+		
 		if($modelType){
-			$obj = \GO::getModel($modelType->model_name)->findByPk($this->model_id);
+			$model_name = $modelType->model_name;
+			
+			if(is_a($model_name, \go\core\orm\Entity::class, true)) {
+				return $model_name::findById($this->model_id);
+			}
+			
+			$obj = \GO::getModel($model_name)->findByPk($this->model_id);
 			
 			if($obj)
 				return $obj;

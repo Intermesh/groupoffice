@@ -318,7 +318,7 @@ Ext.DatePicker = Ext.extend(Ext.BoxComponent, {
     onRender : function(container, position){
         var m = [
              '<table cellspacing="0">',
-                '<tr><td class="x-date-left"><a href="#" title="', this.prevText ,'">&#160;</a></td><td class="x-date-middle" align="center"></td><td class="x-date-right"><a href="#" title="', this.nextText ,'">&#160;</a></td></tr>',
+                '<tr><td class="x-date-left"><a  title="', this.prevText ,'">&#160;</a></td><td class="x-date-middle" align="center"></td><td class="x-date-right"><a  title="', this.nextText ,'">&#160;</a></td></tr>',
                 '<tr><td colspan="3"><table class="x-date-inner" cellspacing="0"><thead><tr>'],
                 dn = this.dayNames,
                 i;
@@ -334,7 +334,7 @@ Ext.DatePicker = Ext.extend(Ext.BoxComponent, {
             if(i % 7 === 0 && i !== 0){
                 m[m.length] = '</tr><tr>';
             }
-            m[m.length] = '<td><a href="#" hidefocus="on" class="x-date-date" tabIndex="1"><em><span></span></em></a></td>';
+            m[m.length] = '<td><a  hidefocus="on" class="x-date-date" tabIndex="1"><em><span></span></em></a></td>';
         }
         m.push('</tr></tbody></table></td></tr>',
                 this.showToday ? '<tr><td colspan="3" class="x-date-bottom" align="center"></td></tr>' : '',
@@ -450,11 +450,11 @@ Ext.DatePicker = Ext.extend(Ext.BoxComponent, {
             var buf = ['<table border="0" cellspacing="0">'];
             for(var i = 0; i < 6; i++){
                 buf.push(
-                    '<tr><td class="x-date-mp-month"><a href="#">', Date.getShortMonthName(i), '</a></td>',
-                    '<td class="x-date-mp-month x-date-mp-sep"><a href="#">', Date.getShortMonthName(i + 6), '</a></td>',
+                    '<tr><td class="x-date-mp-month"><a >', Date.getShortMonthName(i), '</a></td>',
+                    '<td class="x-date-mp-month x-date-mp-sep"><a >', Date.getShortMonthName(i + 6), '</a></td>',
                     i === 0 ?
                     '<td class="x-date-mp-ybtn" align="center"><a class="x-date-mp-prev"></a></td><td class="x-date-mp-ybtn" align="center"><a class="x-date-mp-next"></a></td></tr>' :
-                    '<td class="x-date-mp-year"><a href="#"></a></td><td class="x-date-mp-year"><a href="#"></a></td></tr>'
+                    '<td class="x-date-mp-year"><a ></a></td><td class="x-date-mp-year"><a ></a></td></tr>'
                 );
             }
             buf.push(

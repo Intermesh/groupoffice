@@ -27,19 +27,19 @@ class EventHandlers {
 		if (isset($_FILES['cert']['tmp_name'][0]) && is_uploaded_file($_FILES['cert']['tmp_name'][0])) {
 			//check Group-Office password
 			if (!GO::user()->checkPassword($params['smime_password']))
-				throw new \Exception(GO::t('badGoLogin', 'smime'));
+				throw new \Exception(GO::t("The Group-Office password was incorrect.", "smime"));
 
 			$certData = file_get_contents($_FILES['cert']['tmp_name'][0]);
 
 			//smime password may not match the Group-Office password
 			openssl_pkcs12_read($certData, $certs, $params['smime_password']);
 			if (!empty($certs))
-				throw new \Exception(GO::t('smime_pass_matches_go', 'smime'));
+				throw new \Exception(GO::t("Your SMIME key password matches your Group-Office password. This is prohibited for security reasons!", "smime"));
 
 			//password may not be empty.
 			openssl_pkcs12_read($certData, $certs, "");
 			if (!empty($certs))
-				throw new \Exception(GO::t('smime_pass_empty', 'smime'));
+				throw new \Exception(GO::t("Your SMIME key has no password. This is prohibited for security reasons!", "smime"));
 		}
 
 		$cert = Model\Certificate::model()->findByPk($account->id);
@@ -127,7 +127,7 @@ class EventHandlers {
 
 				if (!$cert || empty($cert->cert)) {					
 					GO::debug('SMIME: No private key at all found for this account');
-					$response['htmlbody'] =GO::t('noPrivateKeyForDecrypt','smime');
+					$response['htmlbody'] =GO::t("This message is encrypted and you don't have the private key to decrypt this message.", "smime");
 					return false;
 				}
 
@@ -196,7 +196,7 @@ class EventHandlers {
 				$infile->delete();
 
 				if (!$return || !$outfile->exists() || !$outfile->size()) {					
-					$response['htmlbody'] = GO::t('decryptionFailed','smime') . '<br />';
+					$response['htmlbody'] = GO::t("SMIME Decryption of this message failed.", "smime") . '<br />';
 					while ($str = openssl_error_string()) {
 						$response['htmlbody'].='<br />' . $str;
 					}
@@ -284,7 +284,7 @@ class EventHandlers {
 			}
 
 			if (count($failed))
-				throw new \Exception(sprintf(GO::t('noPublicCertForEncrypt', 'smime'), implode(', ', $failed)));
+				throw new \Exception(sprintf(GO::t("Could not encrypt message because you don't have the public certificate for %s. Open a signed message of the recipient and verify the signature to import the public key.", "smime"), implode(', ', $failed)));
 
 			$message->setEncryptParams($publicCerts);
 		}

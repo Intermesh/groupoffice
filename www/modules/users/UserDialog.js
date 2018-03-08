@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: UserDialog.js 16919 2014-02-26 14:12:07Z mschering $
+ * @version $Id: UserDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -17,7 +17,7 @@
 		
 		Ext.apply(this, {
 			goDialogId:'user',
-			title:GO.users.lang.userSettings,
+			title:t("User settings", "users"),
 			formControllerUrl: 'users/user',
 			height:600,
 			width:800,
@@ -29,7 +29,7 @@
 //		this.linkBrowseButton = new Ext.Button({
 //			iconCls: 'btn-link', 
 //			cls: 'x-btn-text-icon', 
-//			text: GO.lang.cmdBrowseLinks,
+//			text: t("Links"),
 //			disabled:true,
 //			handler: function(){
 //				if(!GO.linkBrowser){
@@ -40,12 +40,12 @@
 //			scope: this
 //		})];
 //		
-//		if(GO.files)
+//		if(go.ModuleManager.isAvailable("files"))
 //		{		
 //			this.tbar.push(this.fileBrowseButton = new Ext.Button({
 //				iconCls: 'btn-files',
 //				cls: 'x-btn-text-icon', 
-//				text: GO.files.lang.files,
+//				text: t("Files", "files"),
 //				handler: function(){
 //					GO.files.openFolder(this.files_folder_id);				
 //				},
@@ -128,7 +128,7 @@
 		this.diskQuotaPanel = new GO.users.DiskQuotaPanel();
 
 		this.profileTab = new Ext.Panel({
-			title:GO.users.lang.account,
+			title:t("Account", "users"),
 			autoScroll:true,
 			layout:'column',
 			//cls:'go-form-panel',
@@ -151,15 +151,7 @@
 		});
 		
 		this.addPanel(this.profileTab);
-		
-		if(GO.addressbook){
-			this.contactPanel = new  GO.addressbook.ContactProfilePanel({
-				forUser:true
-			});
-			this.addPanel(this.contactPanel);
-		}
-		
-		
+	
 		this.addPanel(this.permissionsTab);
     this.addPanel(this.regionalSettingsTab);
     this.addPanel(this.lookAndFeelTab);
@@ -176,10 +168,10 @@
 		if(GO.serverclient && GO.serverclient.domains)
 		{				
 			this.serverclientFieldSet = new Ext.form.FieldSet({
-				title: GO.serverclient.lang.mailboxes, 
+				title: t("Mailboxes", "serverclient"), 
 				autoHeight:true,
 				items:new GO.form.HtmlComponent({
-					html:'<p class="go-form-text">'+GO.serverclient.lang.createMailbox+':</p>'
+					html:'<p class="go-form-text">'+t("Create a mailbox for domain", "serverclient")+':</p>'
 				})
 			});
 

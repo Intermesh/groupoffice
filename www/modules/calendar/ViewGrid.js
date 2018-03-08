@@ -7,7 +7,7 @@
  * If you have questions write an e-mail to info@intermesh.nl
  * 
  * @copyright Copyright Intermesh
- * @version $Id: ViewGrid.js 21238 2017-06-22 13:30:12Z michaelhart86 $
+ * @version $Id: ViewGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
@@ -230,10 +230,10 @@ GO.grid.ViewGrid = Ext.extend(Ext.Panel, {
            
 				
 		var timeOfDay = {
-							'allday': GO.calendar.lang.viewDay,
-              'morning': GO.calendar.lang.viewMorning,
-              'afternoon': GO.calendar.lang.viewAfternoon,
-              'evening': GO.calendar.lang.viewEvening
+							'allday': t("Day", "calendar"),
+              'morning': t("Morning", "calendar"),
+              'afternoon': t("Afternoon", "calendar"),
+              'evening': t("Evening", "calendar")
             };
 						
 		//for(var calendar_id in this.jsonData)
@@ -488,7 +488,7 @@ GO.grid.ViewGrid = Ext.extend(Ext.Panel, {
 	{
 		if(this.rendered)
 		{
-			this.body.mask(GO.lang.waitMsgLoad,'x-mask-loading');
+			this.body.mask(t("Loading..."),'x-mask-loading');
 		}
 	},
 	
@@ -914,7 +914,7 @@ GO.grid.ViewGrid = Ext.extend(Ext.Panel, {
 	    	
 		this.endDate = this.startDate.add(Date.DAY, this.days);
 
-		this.periodDisplay = GO.lang.strWeek+' '+this.startDate.format('W');
+		this.periodDisplay = t("Week")+' '+this.startDate.format('W');
 
 		if(load)
 			this.reload(); 

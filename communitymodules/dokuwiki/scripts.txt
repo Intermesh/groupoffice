@@ -1,2 +1,0 @@
-modules/dokuwiki/MainPanel.js
-modules/dokuwiki/SettingsDialog.js

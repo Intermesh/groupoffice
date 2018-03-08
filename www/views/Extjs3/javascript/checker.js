@@ -6,7 +6,7 @@ GO.CheckerWindow = function(config){
 		config = {};
 	}
 	
-	config.title=GO.lang.reminders;
+	config.title=t("Reminders");
 	config.maximizable=true;
 	config.layout='fit';
 	config.modal=false;
@@ -20,7 +20,7 @@ GO.CheckerWindow = function(config){
 
 
 	config.buttons=[{
-		text: GO.lang['cmdClose'],
+		text: t("Close"),
 		handler: function(){
 			this.hide();
 		},
@@ -29,21 +29,21 @@ GO.CheckerWindow = function(config){
 	];
 
 	GO.checkerSnoozeTimes = [
-	[300,'5 '+GO.lang.strMinutes],
-	[600, '10 '+GO.lang.strMinutes],
-	[1200, '20 '+GO.lang.strMinutes],
-	[1800, '30 '+GO.lang.strMinutes],
-	[3600, '1 '+GO.lang.strHour],
-	[7200, '2 '+GO.lang.strHours],
-	[10800, '3 '+GO.lang.strHours],
-	[14400, '4 '+GO.lang.strHours],
-	[86400, '1 '+GO.lang.strDay],
-	[2*86400, '2 '+GO.lang.strDays],
-	[3*86400, '3 '+GO.lang.strDays],
-	[4*86400, '4 '+GO.lang.strDays],
-	[5*86400, '5 '+GO.lang.strDays],
-	[6*86400, '6 '+GO.lang.strDays],
-	[7*86400, '7 '+GO.lang.strDays]
+	[300,'5 '+t("Minutes")],
+	[600, '10 '+t("Minutes")],
+	[1200, '20 '+t("Minutes")],
+	[1800, '30 '+t("Minutes")],
+	[3600, '1 '+t("Hour")],
+	[7200, '2 '+t("Hours")],
+	[10800, '3 '+t("Hours")],
+	[14400, '4 '+t("Hours")],
+	[86400, '1 '+t("Day")],
+	[2*86400, '2 '+t("Days")],
+	[3*86400, '3 '+t("Days")],
+	[4*86400, '4 '+t("Days")],
+	[5*86400, '5 '+t("Days")],
+	[6*86400, '6 '+t("Days")],
+	[7*86400, '7 '+t("Days")]
 	];
 
 	var snoozeMenuItems = [];
@@ -65,7 +65,7 @@ GO.CheckerWindow = function(config){
 
 	config.tbar=[{
 		iconCls:'btn-delete',
-		text:GO.lang.dismiss,
+		text:t("Dismiss"),
 		handler: function(){			
 			this.checkerGrid.doTask('dismiss_reminders');
 		},
@@ -73,12 +73,12 @@ GO.CheckerWindow = function(config){
 	},
 	{
 		iconCls:'btn-dismiss',
-		text:GO.lang.snooze,
+		text:t("Snooze"),
 		menu:snoozeMenu
 	},'-',
 	{
 		iconCls:'btn-select-all',
-		text:GO.lang.selectAll,
+		text:t("Select all"),
 		handler: function(){			
 			this.checkerGrid.getSelectionModel().selectAll();
 		},
@@ -92,7 +92,7 @@ GO.CheckerWindow = function(config){
 	config.listeners={
 		scope:this,
 		show:function(){
-			GO.blinkTitle.blink(this.checkerGrid.store.getCount()+' '+GO.lang.reminders);
+			GO.blinkTitle.blink(this.checkerGrid.store.getCount()+' '+t("Reminders"));
 		},
 		hide: function(){
 			GO.blinkTitle.blink(false);
@@ -159,10 +159,10 @@ GO.CheckerPanel = Ext.extend(function(config){
 		align : 'center',
 		actions : [{
 			iconCls : 'btn-dismiss',
-			qtip: GO.lang.snooze
+			qtip: t("Snooze")
 		},{
 			iconCls : 'btn-delete',
-			qtip:GO.lang.dismiss
+			qtip:t("Dismiss")
 		}]
 	});
 
@@ -197,20 +197,20 @@ GO.CheckerPanel = Ext.extend(function(config){
 		groupable: false
 	},
 	{
-		header:GO.lang.strTime,
+		header:t("Time"),
 		dataIndex: 'local_time',
 		width: 80,
 		groupable: false
 	},
 	{
-		header:GO.lang['strName'],
+		header:t("Name"),
 		dataIndex: 'name',
 		id:'name',
 		groupable: false
 	},
 	{
 		width:80,
-		header:GO.lang.snooze,
+		header:t("Snooze"),
 		dataIndex: 'snooze_time',
 		renderer : this.renderSelect.createDelegate(this),
 		editor:new GO.form.ComboBox({
@@ -252,13 +252,13 @@ GO.CheckerPanel = Ext.extend(function(config){
 			}
 			return 'x-grid3-row-collapsed';
 		},
-		emptyText: GO.lang['strNoItems']
+		emptyText: t("No items to display")
 	});
 			
 	config.view=  new Ext.grid.GroupingView({
 		hideGroupedColumn:true,
-		groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "'+GO.lang.items+'" : "'+GO.lang.item+'"]})',
-		emptyText: GO.lang.strNoItems,
+		groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "'+t("items")+'" : "'+t("item")+'"]})',
+		emptyText: t("No items to display"),
 		showGroupName:false,
 		enableRowBody:true,
 		getRowClass : function(record, rowIndex, p, ds) {
@@ -281,13 +281,9 @@ GO.CheckerPanel = Ext.extend(function(config){
 		var selectionModel = grid.getSelectionModel();
 		var record = selectionModel.getSelected();
 		
-		if(GO.linkHandlers[record.data.model_name])
-		{
-			GO.linkHandlers[record.data.model_name].call(this, record.data.model_id);
-		}else
-		{
-			GO.errorDialog.show('No handler definded for link type: '+record.data.model_name);
-		}
+		var parts = record.data.model_name.split("\\");		
+		go.Router.goto(parts[1].toLowerCase()+"/"+parts[3].toLowerCase()+"/"+record.data.model_id);
+		
 	}, this);
 	
 	
@@ -300,7 +296,7 @@ GO.CheckerPanel = Ext.extend(function(config){
 
 		if(!selected.length)
 		{
-			Ext.MessageBox.alert(GO.lang['strError'], GO.lang['noItemSelected']);
+			Ext.MessageBox.alert(t("Error"), t("You didn't select an item."));
 		}else
 		{
 			var reminders = [];
@@ -364,12 +360,9 @@ GO.Checker = function(){
 			
 	this.checkerWindow = new GO.CheckerWindow();
 			
-	this.reminderIcon = Ext.get("reminder-icon");
-	this.reminderIcon.setDisplayed(false);
 	
-	this.reminderIcon.on('click', function(){
-		this.checkerWindow.show();
-	}, this);   
+	
+	
 };
 
 Ext.extend(GO.Checker, Ext.util.Observable, {
@@ -390,6 +383,11 @@ Ext.extend(GO.Checker, Ext.util.Observable, {
 	
 	init : function(){
 		
+		this.reminderIcon = Ext.get("reminder-icon");
+	this.reminderIcon.setDisplayed(false);
+	this.reminderIcon.on('click', function(){
+		this.checkerWindow.show();
+	}, this);   
 		//this.fireEvent('startcheck', this);
 
 		Ext.TaskMgr.start({
@@ -428,7 +426,7 @@ Ext.extend(GO.Checker, Ext.util.Observable, {
 			{
 				if(!success)
 				{
-				//Ext.MessageBox.alert(GO.lang['strError'], "Connection to the internet was lost. Couldn't check for reminders.");
+				//Ext.MessageBox.alert(t("Error"), "Connection to the internet was lost. Couldn't check for reminders.");
 				//silently ignore
 				}else
 				{
@@ -452,7 +450,7 @@ Ext.extend(GO.Checker, Ext.util.Observable, {
 						}	else if (id!='success') {
 							this.callbacks[id].callback.call(this.callbacks[id].scope, this, result[id],data);
 						}
-						if (id=="emails") {
+						if (id=="emails" && result[id].email_status) {
 
 							if((!result[id].email_status.has_new && this.countEmailShown) 
 											|| result[id].email_status.total_unseen <= 0  
@@ -501,7 +499,7 @@ Ext.extend(GO.Checker, Ext.util.Observable, {
 		};
 
 		var notificationText = convertResultsToText(storeData);
-		var title = GO.lang.reminders;
+		var title = t("Reminders");
 		var options = {
 			body: notificationText,
 			icon: 'views/Extjs3/themes/Group-Office/images/32x32/reminder.png'
@@ -532,9 +530,9 @@ Ext.extend(GO.Checker, Ext.util.Observable, {
 	triggerEmailNotification : function(email_status) {
 
 		this.countEmailShown = true;
-		var title = GO.lang['newEmail'];
+		var title = t("New email");
 		var options = {
-			body: GO.lang.unreadEmailMessage.replace('%d',email_status.total_unseen),
+			body: t("You have %d unread email(s)").replace('%d',email_status.total_unseen),
 			icon: 'modules/email/themes/Group-Office/images/22x22/email.png'
 		};
 

@@ -152,7 +152,7 @@ class InstallationModule extends \GO\Base\Db\ActiveRecord
 //			return true;
 //		
 //		$message = \GO\Base\Mail\Message::newInstance();
-//		$subject = vsprintf(\GO::t('module_trial_email_title','servermanager'),array($this->getModuleName()));
+//		$subject = vsprintf(\GO::t("Trial period for %s module", "servermanager"),array($this->getModuleName()));
 //		$message->setSubject($subject);
 //		
 //		$fromName = \GO::config()->title;
@@ -162,7 +162,7 @@ class InstallationModule extends \GO\Base\Db\ActiveRecord
 //		
 //		$toEmail = $this->installation->config['webmaster_email'];
 //
-//		$emailBody = \GO::t('module_trial_email_body','servermanager'); //TODO: add to translation
+//		$emailBody = \GO::t("Your trial time for the module %s will expire in %d days", "servermanager"); //TODO: add to translation
 //		$emailBody = vsprintf($emailBody,array($this->getModuleName(), $this->trialDaysLeft));
 //		
 //		$message->setBody($emailBody);

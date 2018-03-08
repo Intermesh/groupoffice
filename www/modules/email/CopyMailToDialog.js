@@ -2,7 +2,7 @@ GO.email.CopyMailToDialog = Ext.extend(GO.Window, {
 	
 	_selectedEmailMessages : [],
 	
-	title : GO.email.lang['copyMailToTxt'],
+	title : t("Select a folder to copy the email to", "email"),
 	
 	width: 300,
 	
@@ -27,7 +27,7 @@ GO.email.CopyMailToDialog = Ext.extend(GO.Window, {
 				preloadChildren : true,
 				listeners : {
 					beforeload : function() {
-						this.body.mask(GO.lang.waitMsgLoad);
+						this.body.mask(t("Loading..."));
 					},
 					load : function() {
 						this.body.unmask();
@@ -39,7 +39,7 @@ GO.email.CopyMailToDialog = Ext.extend(GO.Window, {
 		
 		// set the root node
 		this.rootNode = new Ext.tree.AsyncTreeNode({
-			text : GO.email.lang.root,
+			text : t("Root", "email"),
 			draggable : false,
 			id : 'root',
 			expanded : true
@@ -64,7 +64,7 @@ GO.email.CopyMailToDialog = Ext.extend(GO.Window, {
 //					mailbox : node.attributes.mailbox
 //				},
 //				fail: function(response, options, result) {
-//						Ext.Msg.alert(GO.lang.strError, result.feedback);
+//						Ext.Msg.alert(t("Error"), result.feedback);
 //					this.foldersTree.getRootNode().reload();
 //				},
 //				scope : this
@@ -77,7 +77,7 @@ GO.email.CopyMailToDialog = Ext.extend(GO.Window, {
 //		},this);
 
 		this.buttons = [new Ext.Button({
-			text : GO.lang['cmdOk'],
+			text : t("Ok"),
 			handler : function() {
 				var node = this.foldersTree.getSelectionModel().getSelectedNode();
 				if (!GO.util.empty(node))
@@ -86,13 +86,13 @@ GO.email.CopyMailToDialog = Ext.extend(GO.Window, {
 			},
 			scope : this
 		}),new Ext.Button({
-			text : GO.lang['cmdCancel'],
+			text : t("Cancel"),
 			handler : function() {
 				this.hide();
 			},
 			scope : this
 		}),new Ext.Button({
-			text : GO.lang['cmdRefresh'],
+			text : t("Refresh"),
 			handler : function() {
 				this.rootNode.reload();
 			},
@@ -118,16 +118,16 @@ GO.email.CopyMailToDialog = Ext.extend(GO.Window, {
 	_copyMail : function(targetAccountId,targetMailboxPath) {
 		
 		if (GO.util.empty(targetAccountId) || GO.util.empty(targetMailboxPath)) {
-			Ext.MessageBox.alert(GO.lang['strError'],GO.email.lang['selectValidMailFolder']);
+			Ext.MessageBox.alert(t("Error"),t("Please select a valid email folder to copy to.", "email"));
 		} else {
 //			if (this._selectedEmailMessages.length>1){
-//				var messageStr = GO.email.lang['copyMailsToRUSure'];
+//				var messageStr = t("Are you sure you want to copy the selected email messages to this mailbox folder?", "email");
 //			}else{
-//				var messageStr = GO.email.lang['copyMailToRUSure'];
+//				var messageStr = t("Are you sure you want to copy the selected email message to this mailbox folder?", "email");
 //			}
 
 //			Ext.Msg.show({
-//				title: GO.email.lang['copyMailTo'],
+//				title: t("Copy email to...", "email"),
 //				msg: messageStr,
 //				buttons: Ext.Msg.YESNO,
 //				fn: function(btn) {

@@ -343,10 +343,10 @@ class Sieve {
 				if($this->sieve->hasExtension('vacation')){
 					
 				$content = $requireString."
-	# rule:[".GO::t('standardvacation','sieve')."]
+	# rule:[".GO::t("Standard vacation rule", "sieve")."]
 	if false # anyof (true)
 	{
-	\tvacation :days 3 :addresses [\"".implode('","',$aliasEmails)."\"] \"".GO::t('standardvacationmessage','sieve')."\";
+	\tvacation :days 3 :addresses [\"".implode('","',$aliasEmails)."\"] \"".GO::t("I am on vacation", "sieve")."\";
 	\tstop;
 	}
 	# rule:[Spam]

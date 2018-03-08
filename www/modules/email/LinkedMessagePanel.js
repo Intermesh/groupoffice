@@ -2,7 +2,7 @@ GO.email.LinkedMessagePanel = Ext.extend(GO.email.MessagePanel,{
 	initComponent : function(){
 		this.tbar=[{
 					iconCls: 'btn-print',
-					text: GO.lang.cmdPrint,
+					text: t("Print"),
 					cls: 'x-btn-text-icon',
 					handler: function(){
 						this.body.print();
@@ -12,7 +12,7 @@ GO.email.LinkedMessagePanel = Ext.extend(GO.email.MessagePanel,{
 				'-',
 				{
 					iconCls: 'btn-reply',
-					text: GO.email.lang.reply,
+					text: t("Reply", "email"),
 					cls: 'x-btn-text-icon',
 					handler: function(){
 						GO.email.showComposer({
@@ -27,7 +27,7 @@ GO.email.LinkedMessagePanel = Ext.extend(GO.email.MessagePanel,{
 				},
 				{
 					iconCls: 'btn-reply-all',
-					text: GO.email.lang.replyAll,
+					text: t("Reply all", "email"),
 					cls: 'x-btn-text-icon',
 					handler: function(){
 						GO.email.showComposer({
@@ -42,7 +42,7 @@ GO.email.LinkedMessagePanel = Ext.extend(GO.email.MessagePanel,{
 				},
 				{
 					iconCls: 'btn-forward',
-					text: GO.email.lang.forward,
+					text: t("Forward", "email"),
 					cls: 'x-btn-text-icon',
 					handler: function(){						
 						GO.email.showComposer({
@@ -57,7 +57,7 @@ GO.email.LinkedMessagePanel = Ext.extend(GO.email.MessagePanel,{
 				},
 //				{
 //					iconCls: 'btn-edit',
-//					text: GO.lang.cmdEdit,
+//					text: t("Edit"),
 //					handler: function(){
 //						var composer = GO.email.showComposer({
 //							task:'opendraft',
@@ -74,7 +74,7 @@ GO.email.LinkedMessagePanel = Ext.extend(GO.email.MessagePanel,{
 //				},
 				this.linkButton = new Ext.Button({
 					iconCls: 'btn-link',
-					text: GO.lang.cmdLink,
+					text: t("Link"),
 					hidden:true,
 					handler: function(){
 						if(!this.linksDialog)

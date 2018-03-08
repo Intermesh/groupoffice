@@ -86,7 +86,7 @@ class PortletController extends \GO\Base\Controller\AbstractMultiSelectModelCont
 		
 		foreach($events as $event){
 			$record = $event->getResponseData();
-			$record['day']=$event->getAlternateStartTime()<$today_end ? \GO::t('today') : \GO::t('tomorrow');
+			$record['day']=$event->getAlternateStartTime()<$today_end ? \GO::t("Today") : \GO::t("Tomorrow");
 			$record['time']=$event->getEvent()->all_day_event==1 ? '-' : $record['time'];
 			$store->addRecord($record);
 		}

@@ -7,7 +7,7 @@
  * If you have questions write an e-mail to info@intermesh.nl
  * 
  * @copyright Copyright Intermesh
- * @version $Id: Calendar.js 21587 2017-10-24 09:22:23Z michaelhart86 $
+ * @version $Id: Calendar.js 22335 2018-02-06 16:25:41Z mschering $
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
@@ -37,18 +37,18 @@ GO.calendar.formatQtip = function(data,verbose)
 		new_df = GO.settings.date_format+' '+GO.settings.time_format;
 	}
 
-	var str = GO.calendar.lang.startsAt+': '+data.startDate.format(new_df)+'<br />'+
-	GO.calendar.lang.endsAt+': '+data.endDate.format(new_df);
+	var str = t("Starts at", "calendar")+': '+data.startDate.format(new_df)+'<br />'+
+	t("Ends at", "calendar")+': '+data.endDate.format(new_df);
 
 	if(!GO.util.empty(data.duration))
-		str += '<br />'+GO.calendar.lang.duration+': '+data.duration;
+		str += '<br />'+t("Timespan", "calendar")+': '+data.duration;
 
 	if(!GO.util.empty(data.status))
 	{
-		str += '<br />'+GO.calendar.lang.status+': ';
+		str += '<br />'+t("Status", "calendar")+': ';
 		
-		if(GO.calendar.lang.statuses[data.status]){
-			str+=Ext.util.Format.htmlEncode(GO.calendar.lang.statuses[data.status]);
+		if(t("statuses", "calendar")[data.status]){
+			str+=Ext.util.Format.htmlEncode(t("statuses", "calendar")[data.status]);
 		}else
 		{
 			str+=data.status;
@@ -57,26 +57,26 @@ GO.calendar.formatQtip = function(data,verbose)
 
 	if(!GO.util.empty(data.calendar_name))
 	{
-		str += '<br />'+GO.calendar.lang.calendar+': '+Ext.util.Format.htmlEncode(data.calendar_name);
+		str += '<br />'+t("Calendar", "calendar")+': '+Ext.util.Format.htmlEncode(data.calendar_name);
 	}
 
 	if(!GO.util.empty(data.username))
 	{
-		str += '<br />'+GO.lang.strOwner+': '+Ext.util.Format.htmlEncode(data.username);
+		str += '<br />'+t("Owner")+': '+Ext.util.Format.htmlEncode(data.username);
 	}
 
-	str += '<br />'+GO.lang.strCtime+': '+data.creationDate.format(GO.settings.date_format+' '+GO.settings.time_format);
+	str += '<br />'+t("Created at")+': '+data.creationDate.format(GO.settings.date_format+' '+GO.settings.time_format);
 	if (verbose)
-		str += '<br />'+GO.lang.strMtime+': '+data.modifyDate.format(GO.settings.date_format+' '+GO.settings.time_format);
+		str += '<br />'+t("Modified at")+': '+data.modifyDate.format(GO.settings.date_format+' '+GO.settings.time_format);
 		
 	if(verbose && !GO.util.empty(data.musername))
 	{
-		str += '<br />'+GO.lang.mUser+': '+Ext.util.Format.htmlEncode(data.musername);
+		str += '<br />'+t("Modified by")+': '+Ext.util.Format.htmlEncode(data.musername);
 	}
 	
 	if(!GO.util.empty(data.location))
 	{
-		str += '<br />'+GO.calendar.lang.location+': '+Ext.util.Format.htmlEncode(data.location);
+		str += '<br />'+t("Location", "calendar")+': '+Ext.util.Format.htmlEncode(data.location);
 	}
 	
 	if(!GO.util.empty(data.description))
@@ -84,13 +84,13 @@ GO.calendar.formatQtip = function(data,verbose)
 		str += '<br /><br />'+GO.util.nl2br(data.description);
 	}
 	if (!GO.util.empty(data.resources)) {
-		str += '<br />'+GO.calendar.lang['usedResources']+':';
+		str += '<br />'+t("Used resources", "calendar")+':';
 		for (var i in data.resources)
 			str += '<br /> - '+Ext.util.Format.htmlEncode(data.resources[i]);
 	}
 	
 	if (!GO.util.empty(data.resourced_calendar_name))
-		str += '<br />'+GO.calendar.lang['resourceUsedIn']+': '+Ext.util.Format.htmlEncode(data.resourced_calendar_name);
+		str += '<br />'+t("Resource used in", "calendar")+': '+Ext.util.Format.htmlEncode(data.resourced_calendar_name);
 	
 	return str;
 //	return Ext.util.Format.htmlEncode(str);
@@ -167,7 +167,7 @@ GO.calendar.MainPanel = function(config){
 		}
 	}, this);
 
-//	if(GO.projects){
+//	if(go.ModuleManager.isAvailable("projects")){
 //		this.projectCalendarsStore.on('load', function(){
 //			this.projectCalendarsList.setVisible(this.projectCalendarsStore.data.length);
 //			this.calendarListPanel.doLayout();
@@ -199,13 +199,13 @@ GO.calendar.MainPanel = function(config){
 	
 
 	this.calendarList = new GO.grid.MultiSelectGrid({
-		title:GO.calendar.lang.calendars,
+		title:t("Calendars", "calendar"),
 		store: this.calendarsStore,
 		allowNoSelection:true,
 		tools: [{
-			text:GO.calendar.lang.colors,
+			text:t("colors", "calendar"),
 			id:'gear',
-			qtip:GO.calendar.lang.setColors,
+			qtip:t("Calendar color", "calendar"),
 			handler:function(){
 				if(!GO.calendar.colorPickerDialog){
 					GO.calendar.colorPickerDialog = new GO.calendar.ColorPickerDialog();
@@ -218,37 +218,20 @@ GO.calendar.MainPanel = function(config){
 			scope: this
 		}],
 		bbar: new GO.SmallPagingToolbar({
-			items:[this.searchField = new GO.form.SearchField({
-				store: this.calendarsStore,
-				width:120,
-				emptyText: GO.lang.strSearch
-			})],
 			store:this.calendarsStore,
 			pageSize:GO.settings.config.nav_page_size
 		})
 	});
 
-//	if(GO.projects){
-//		this.projectCalendarsList = new GO.grid.MultiSelectGrid({
-//			title:GO.projects.lang.projectCalendars,
-//			store: this.projectCalendarsStore,
-//			allowNoSelection:true,
-//			bbar: new GO.SmallPagingToolbar({
-//				store:this.calendarsStore,
-//				pageSize:GO.settings.config.nav_page_size
-//			})
-//		});
-//	}
-
 	this.viewsList = new GO.grid.GridPanel({
 		border: false,
 		layout:'fit',
-		title:GO.calendar.lang.views,
+		title:t("Views", "calendar"),
 		store: this.viewsStore,
 		cls: 'go-grid3-hide-headers',
 		autoScroll:true,
 		columns:[{
-			header:GO.lang.strName,
+			header:t("Name"),
 			dataIndex: 'name',
 			id:'name',
 			width:188
@@ -262,7 +245,7 @@ GO.calendar.MainPanel = function(config){
 	
 	this.resourcesList = new GO.grid.GridPanel({
 		border: false,
-		title:GO.calendar.lang.resources,
+		title:t("Resources", "calendar"),
 		layout:'fit',
 		store: this.resourcesStore,
 		cls: 'go-grid3-hide-headers',
@@ -273,7 +256,7 @@ GO.calendar.MainPanel = function(config){
 			pageSize:GO.settings.config.nav_page_size
 		}),
 		columns:[{
-			header:GO.lang.strName,
+			header:t("Name"),
 			dataIndex: 'name',
 			id:'name',
 			width:188,
@@ -284,7 +267,7 @@ GO.calendar.MainPanel = function(config){
 				return value;
 			}
 		},{
-			header:GO.calendar.lang.group,
+			header:t("Group", "calendar"),
 			dataIndex: 'group_name',
 			id:'group_name',
 			width:188,
@@ -353,28 +336,6 @@ GO.calendar.MainPanel = function(config){
 		region:'center',
 		layoutConfig:{hideCollapseTool:true},
 		layout:'accordion',
-		tbar:[{
-			iconCls:'cal-btn-home',
-			text : GO.calendar.lang.myCalendar,
-			handler : function() {
-				this.setDisplay({
-					group_id: 1,
-					project_id:0,
-					applyFilter:true,
-					calendars: [GO.calendar.defaultCalendar['id']]
-				});
-			},
-			scope : this
-		},{
-			iconCls:'btn-one-day',
-			text : GO.lang.today,
-			handler : function(){
-				this.setDisplay({
-					date: new Date().clearTime()
-				});
-			},
-			scope : this
-		}],
 		items: [
 		this.calendarList
 		]
@@ -467,8 +428,7 @@ GO.calendar.MainPanel = function(config){
 	    
 	    GO.calendar.activePanel = this.getActivePanel();
 
-		this.calendarComments.setText(Ext.util.Format.htmlEncode(GO.calendar.activePanel.store.reader.jsonData.comment));
-		this.calendarTitle.setText(Ext.util.Format.htmlEncode(GO.calendar.activePanel.store.reader.jsonData.title));
+		this.setCalendarInfo(GO.calendar.activePanel.store.reader.jsonData.title,GO.calendar.activePanel.store.reader.jsonData.comment);
 
 		this.calendar_name = GO.calendar.activePanel.store.reader.jsonData.calendar_name;
 		this.calendar_id = GO.calendar.activePanel.store.reader.jsonData.calendar_id;
@@ -482,8 +442,7 @@ GO.calendar.MainPanel = function(config){
 
 	    GO.calendar.activePanel = this.getActivePanel();
 
-		this.calendarComments.setText(Ext.util.Format.htmlEncode(GO.calendar.activePanel.store.reader.jsonData.comment));
-		this.calendarTitle.setText(Ext.util.Format.htmlEncode(GO.calendar.activePanel.store.reader.jsonData.title));
+		this.setCalendarInfo(GO.calendar.activePanel.store.reader.jsonData.title,GO.calendar.activePanel.store.reader.jsonData.comment);
 
 		this.calendar_name = GO.calendar.activePanel.store.reader.jsonData.calendar_name;
 		this.calendar_id = GO.calendar.activePanel.store.reader.jsonData.calendar_id;
@@ -496,8 +455,7 @@ GO.calendar.MainPanel = function(config){
 
 	    GO.calendar.activePanel = this.getActivePanel();
 
-		this.calendarComments.setText(Ext.util.Format.htmlEncode(GO.calendar.activePanel.store.reader.jsonData.comment));
-		this.calendarTitle.setText(Ext.util.Format.htmlEncode(GO.calendar.activePanel.store.reader.jsonData.title));
+		this.setCalendarInfo(GO.calendar.activePanel.store.reader.jsonData.title,GO.calendar.activePanel.store.reader.jsonData.comment);
 
 		this.calendar_name = GO.calendar.activePanel.store.reader.jsonData.calendar_name;
 		this.calendar_id = GO.calendar.activePanel.store.reader.jsonData.calendar_id;
@@ -511,9 +469,8 @@ GO.calendar.MainPanel = function(config){
 	    GO.calendar.activePanel = this.getActivePanel();
 	    GO.calendar.activePanel.count = count;
 	    GO.calendar.activePanel.mtime = mtime;
-
-		this.calendarComments.setText(Ext.util.Format.htmlEncode(grid.jsonData.comment));
-		this.calendarTitle.setText(Ext.util.Format.htmlEncode(grid.jsonData.title));
+		 
+		this.setCalendarInfo(grid.jsonData.title,grid.jsonData.comment);
 
 		this.calendar_name = grid.jsonData.calendar_name;
 		this.calendar_id = grid.jsonData.calendar_id;
@@ -548,72 +505,12 @@ GO.calendar.MainPanel = function(config){
 		border: true,
 		split: true,
 		cls: 'cal-display-panel',
-		tbar: [this.calendarComments = new Ext.Toolbar.TextItem({
-			text:'',
-			cls:'cal-comment'
-		}),'-',this.calendarTitle = new Ext.Toolbar.TextItem({
-			text:'Calendar'
-		}),'-',{
-			iconCls: 'btn-left-arrow',
-			//text: GO.lang.cmdPrevious,
-			cls: 'x-btn-text-icon',
-			handler: function(){
-							
-				/*var displayDate = this.getActivePanel().startDate;
-				if(this.displayType=='month')
-				{
-					displayDate = displayDate.add(Date.MONTH, -1);
-				}else
-				{
-					var days = this.days < 8 ? 7 : this.days;
-					displayDate = displayDate.add(Date.DAY, -days);
-				}*/
-
-				this.setDisplay({
-					date: this.getActivePanel().previousDate()
-				});
-			},
-			scope: this
-		},this.periodInfoPanel = new Ext.Panel({
-			html: '',
-			plain:true,
-			border:true,
-			cls:'cal-period'
-		}),{
-			iconCls: 'btn-right-arrow',
-			//text: GO.lang.cmdNext,
-			cls: 'x-btn-text-icon',
-			handler: function(){
-				/*var displayDate = this.getActivePanel().startDate;
-				if(this.displayType=='month')
-				{
-					displayDate = displayDate.add(Date.MONTH, 1);
-				}else
-				{
-					var days = this.days < 8 ? 7 : this.days;
-					displayDate = displayDate.add(Date.DAY, days);
-				}*/
-							
-				this.setDisplay({
-					date: this.getActivePanel().nextDate()
-				});
-			},
-			scope: this
-		}],
-		
-						items: [this.daysGrid, this.monthGrid, this.viewGrid, this.listGrid]
+		items: [this.daysGrid, this.monthGrid, this.viewGrid, this.listGrid]
 	});
-	
-
-						
+			
 	var tbar = [{
-	      	 	xtype:'htmlcomponent',
-			html:GO.calendar.lang.name,
-			cls:'go-module-title-tbar'
-		},{
-		iconCls: 'btn-add',
-		text: GO.lang['cmdAdd'],
-		cls: 'x-btn-text-icon',
+		iconCls: 'ic-add',
+		text: t("Add"),
 		handler: function(){
 							
 			GO.calendar.showEventDialog({
@@ -623,119 +520,119 @@ GO.calendar.MainPanel = function(config){
 										
 		},
 		scope: this
-	},{
-			
-		iconCls: 'btn-delete',
-		text: GO.lang['cmdDelete'],
-		cls: 'x-btn-text-icon',
+	},{	
+		iconCls: 'ic-delete',
+		tooltip: t("Delete"),
 		handler: this.deleteHandler,
 		scope: this
-	},{
-			
-		iconCls: 'btn-refresh',
-		text: GO.lang['cmdRefresh'],
-		cls: 'x-btn-text-icon',
+	},'-',{
+		iconCls: 'ic-refresh',
+		tooltip: t("Refresh"),
 		handler: function(){
-			/*this.calendarsStore.load();
-										this.viewsStore.load();
-										this.setDisplay();*/
 			this.init();
 		},
 		scope: this
 	},{
-		iconCls: 'btn-settings',
-		text: GO.lang.administration,
-		cls: 'x-btn-text-icon',
+		iconCls: 'ic-settings',
+		tooltip: t("Administration"),
 		handler: function(){
 			this.showAdminDialog();
 		},
 		scope: this
-	},
-	'-',
-	{
-            xtype:'buttongroup',
-            items: [
-	this.dayButton = new Ext.Button({
-		iconCls: 'btn-one-day',
-		text: GO.calendar.lang.oneDay,
-		cls: 'x-btn-text-icon',
-		handler: function(){
-			
+	},{
+		iconCls:'ic-today',
+		tooltip : t("Today"),
+		handler : function(){
 			this.setDisplay({
-				days:1,
-				displayType: this.displayType == 'view' ? 'view' : 'days',
-				calendar_name: this.calendar_name,
-				view_id : this.view_id
+				date: new Date().clearTime()
 			});
 		},
-		scope: this
-	}),
-	this.workWeekButton = new Ext.Button({
-		iconCls: 'btn-five-days',
-		text: GO.calendar.lang.fiveDays,
-		cls: 'x-btn-text-icon',
-		handler: function(){
-			
-			this.setDisplay({
-				days: 5,
-				displayType: this.displayType == 'view' ? 'view' : 'days',
-				calendar_name: this.calendar_name,
-				view_id : this.view_id
-			});
-		},
-		scope: this
-	}),
-	this.weekButton = new Ext.Button({
-		iconCls: 'btn-seven-days',
-		text: GO.calendar.lang.sevenDays,
-		cls: 'x-btn-text-icon',
-		handler: function(){
-		
-			this.setDisplay({
-				days: 7,
-				displayType: this.displayType == 'view' ? 'view' : 'days',
-				calendar_name: this.calendar_name,
-				view_id : this.view_id
-			});
-		},
-		scope: this
-	}),this.monthButton= new Ext.Button({
-		iconCls: 'btn-month',
-		text: GO.calendar.lang.month,
-		cls: 'x-btn-text-icon',
-		handler: function(){
-			
-			this.setDisplay({
-				displayType:'month',
-				calendar_name: this.calendar_name,
-				view_id : this.view_id
-			});
-		},
-		scope: this
-	}),
-	this.listButton= new Ext.Button({
-		iconCls: 'btn-list',
-		text: GO.calendar.lang.list,
-		cls: 'x-btn-text-icon',
-		handler: function(item, pressed){
-			
-			this.setDisplay({
-				displayType:'list',
-				calendar_name: this.calendar_name,
-				view_id : this.view_id
-			});
-			        		
-		},
-		scope: this
-	})]
+		scope : this
+	},{
+	xtype:'buttongroup',
+	items: [
+		this.dayButton = new Ext.Button({
+			iconCls: 'ic-view-day',
+			text: t("Day"),
+			handler: function(){
+
+				this.setDisplay({
+					days:1,
+					displayType: this.displayType == 'view' ? 'view' : 'days',
+					calendar_name: this.calendar_name,
+					view_id : this.view_id
+				});
+			},
+			scope: this
+		}),
+		this.workWeekButton = new Ext.Button({
+			iconCls: 'ic-view-week',
+			text: t("5 Days", "calendar"),
+			handler: function(){
+
+				this.setDisplay({
+					days: 5,
+					displayType: this.displayType == 'view' ? 'view' : 'days',
+					calendar_name: this.calendar_name,
+					view_id : this.view_id
+				});
+			},
+			scope: this
+		}),
+		this.weekButton = new Ext.Button({
+			iconCls: 'ic-view-week',
+			text: t("Week"),
+			handler: function(){
+
+				this.setDisplay({
+					days: 7,
+					displayType: this.displayType == 'view' ? 'view' : 'days',
+					calendar_name: this.calendar_name,
+					view_id : this.view_id
+				});
+			},
+			scope: this
+		}),this.monthButton= new Ext.Button({
+			iconCls: 'ic-view-module',
+			text: t("Month"),
+			handler: function(){
+
+				this.setDisplay({
+					displayType:'month',
+					calendar_name: this.calendar_name,
+					view_id : this.view_id
+				});
+			},
+			scope: this
+		}),
+		this.listButton= new Ext.Button({
+			iconCls: 'ic-view-list',
+			text: t("List", "calendar"),
+			handler: function(item, pressed){
+
+				this.setDisplay({
+					displayType:'list',
+					calendar_name: this.calendar_name,
+					view_id : this.view_id
+				});
+
+			},
+			scope: this
+		})]
    },
-	'-',
+	'->',
+	this.calendarTitle = new Ext.Button({
+		iconCls: 'ic-info',
+		disabled: true,
+		tooltip: 'Calendar'
+	}),
 	this.printButton = new Ext.Button({
 		iconCls: 'btn-print',
-		text:GO.lang.cmdPrint,
+		tooltip:t("Print"),
 		menu:new Ext.menu.Menu({
 				items:[{		
-					text: GO.calendar.lang.cmdPrintView,
+					text: t("Print current view", "calendar"),
+					iconCls: 'btn-print',
 					handler: function(){
 
 						var sD = this.getActivePanel().startDate;
@@ -758,7 +655,7 @@ GO.calendar.MainPanel = function(config){
 					},
 					scope: this
 				},{		
-					text: GO.calendar.lang.cmdPrintCategoryCount,
+					text: t("Print count per category", "calendar"),
 					handler: function(){
 						if(!GO.calendar.printCategoryCountDialog){
 							GO.calendar.printCategoryCountDialog = new GO.calendar.PrintCategoryCountDialog();
@@ -769,7 +666,8 @@ GO.calendar.MainPanel = function(config){
 					scope: this
 				},'-',
 				{
-					text: GO.lang['strDay'],
+					text: t("Day"),
+					iconCls: 'ic-view-day',
 					handler: function () {
 						var urlParams = {
 							calendars: Ext.encode(this.calendars),
@@ -780,7 +678,8 @@ GO.calendar.MainPanel = function(config){
 					scope: this
 				},
 				{
-					text: GO.calendar.lang['fiveDays'],
+					text: t("5 Days", "calendar"),
+					iconCls: 'ic-view-week',
 					handler: function () {
 						var urlParams = {
 							calendars: Ext.encode(this.calendars),
@@ -791,7 +690,8 @@ GO.calendar.MainPanel = function(config){
 					scope: this
 				},
 				{
-					text: GO.lang['strWeek'],
+					text: t("Week"),
+					iconCls: 'ic-view-week',
 					handler: function () {
 						var urlParams = {
 							calendars: Ext.encode(this.calendars),
@@ -802,7 +702,8 @@ GO.calendar.MainPanel = function(config){
 					scope: this
 				},
 				{
-					text: GO.lang['strMonth'],
+					text: t("Month"),
+					iconCls: 'ic-view-module',
 					handler: function () {
 						var urlParams = {
 							calendars: Ext.encode(this.calendars),
@@ -813,8 +714,33 @@ GO.calendar.MainPanel = function(config){
 					scope: this
 				}]
 			})
-		})
+		}),
+		{
+			iconCls: 'ic-keyboard-arrow-left',
+			handler: function(){
+				this.setDisplay({
+					date: this.getActivePanel().previousDate()
+				});
+			},
+			scope: this
+		},this.periodInfoPanel = new Ext.Panel({
+			html: '',
+			plain:true,
+			border:true,
+			cls:'cal-period'
+		}),{
+			iconCls: 'ic-keyboard-arrow-right',
+			important: true,
+			handler: function(){
+				this.setDisplay({
+					date: this.getActivePanel().nextDate()
+				});
+			},
+			scope: this
+		}
 	];
+	
+	
 							
 	for(var i=0;i<GO.calendar.extraToolbarItems.length;i++)
 	{
@@ -823,30 +749,20 @@ GO.calendar.MainPanel = function(config){
 		
 		
 	config.layout='border';
-	config.border=false;
-	config.tbar= new Ext.Toolbar({
-			cls:'go-head-tb',
-			items: tbar
-		});
-
+	
 	config.items=[
 		this.westPanel = new Ext.Panel({
 			region:'west',
-			titlebar: false,
-			autoScroll:false,
-			//closeOnTab: true,
-			width: dp(280),
+			width: dp(224),
+			cls:'go-sidenav',
 			split:true,
 			layout:'border',
-			border:false,
-			//plain:true,
 			items:[
 			new Ext.Panel({
 				region:'north',
 				border:true,
-				autoHeight:true,
+				height:dp(241),
 				split:false,
-				cls:'go-date-picker-wrap-outer',
 				baseCls:'x-plain',
 				items:[
 					new Ext.Panel({
@@ -860,6 +776,7 @@ GO.calendar.MainPanel = function(config){
 		this.centerPanel = new Ext.Panel({
 			layout:'fit',
 			region:'center',
+			tbar: {enableOverflow: true,items: tbar},
 			items: [this.displayPanel]
 		})
 	];		
@@ -877,6 +794,14 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 	calendarId : 0,
 	viewId : 0,
 	group_id: 1,
+	
+	route : function(id, entity) {
+		GO.calendar.showEventDialog({event_id: id});
+	},
+	
+	setCalendarInfo: function(title, comment) {
+		this.calendarTitle.setTooltip({title:title,text:comment});
+	},
 	
 	setCalendarBackgroundColors : function(){
 
@@ -920,7 +845,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 	afterRender : function(){
 		GO.calendar.MainPanel.superclass.afterRender.call(this);
 
-		if(GO.tasks){
+		if(go.ModuleManager.isAvailable("tasks")){
 			GO.dialogListeners.add('tasks',{
 				scope:this,
 				save:function(){
@@ -1192,7 +1117,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 		}else
 		{
 			if(this.days<8){
-				html = GO.lang.strWeek+' '+displayDate.format('W');
+				html = t("Week")+' '+displayDate.format('W');
 			}else
 			{
 				html = displayDate.format('W')+' - '+displayDate.add(Date.DAY,this.days).format('W');
@@ -1262,7 +1187,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			this.recurrenceDialog.show();
 		}else
 		{
-			Ext.MessageBox.confirm(GO.lang.strConfirm, GO.lang.strDeleteSelectedItem, function(btn){
+			Ext.MessageBox.confirm(t("Confirm"), t("Are you sure you want to delete the selected item?"), function(btn){
 				if(btn=='yes')
 				{
 					var params={
@@ -1285,17 +1210,17 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			success:function(options, response,result){
 				if(!result.success)
 				{
-					Ext.MessageBox.alert(GO.lang.strError, result.feedback);
+					Ext.MessageBox.alert(t("Error"), result.feedback);
 				}else
 				{					
 					if(result.askForCancelNotice){
 						
 						var msg = result.is_organizer ? 
-							GO.calendar.lang.notifyCancelParticipants :
-							GO.calendar.lang.notifyCancelOrganizer
+							t("Would you like to send a cancellation notice to the participants?", "calendar") :
+							t("Would you like to notify the organizer that you will not attend by e-mail?", "calendar")
 						
 						Ext.Msg.show({
-							title:GO.calendar.lang.sendNotificationTitle,
+							title:t("Send notification?", "calendar"),
 							msg: msg,
 							buttons: Ext.Msg.YESNO,
 							fn: function(buttonId, text, config){
@@ -1617,7 +1542,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			};
 
 //			if(event.has_other_participants)
-//				params.send_invitation=confirm(GO.calendar.lang.sendInvitationUpdate) ? 1 : 0;
+//				params.send_invitation=confirm(t("Would you like to send updated meeting information to participants?", "calendar")) ? 1 : 0;
 			
 			if(actionData.singleInstance)
 			{				
@@ -1714,7 +1639,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			};
 
 //			if(event.has_other_participants)
-//				params.send_invitation=confirm(GO.calendar.lang.sendInvitationUpdate) ? 1 : 0;
+//				params.send_invitation=confirm(t("Would you like to send updated meeting information to participants?", "calendar")) ? 1 : 0;
 			
 			if(actionData.offset)
 				params['offset']=actionData.offset;
@@ -1740,7 +1665,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 					var responseParams = Ext.decode(response.responseText);
 					if(!responseParams.success)
 					{
-						Ext.MessageBox.alert(GO.lang.strError, responseParams.feedback);
+						Ext.MessageBox.alert(t("Error"), responseParams.feedback);
 					}else
 					{
 						if(event.repeats && !actionData.singleInstance)
@@ -1807,7 +1732,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			break;
 			
 			case "GO\\Adressbook\\Model\\Contact":
-				GO.linkHandlers["GO\\Addressbook\\Model\\Contact"].call(this, event['contact_id']);
+				go.Router.goto("addressbook/contact/" + event['contact_id']);
 			break;
 			
 			case "GO\\Calendar\\Model\\Event":
@@ -1817,7 +1742,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 				if(!event.is_organizer){
 					// You are not authorised to edit this event because you are not the organizer.
 					// Show message to the user
-					//Ext.Msg.alert(GO.calendar.lang.errorOrganizerOnlyTitle, GO.calendar.lang.errorOrganizerOnly);
+					//Ext.Msg.alert(t("You are not the organizer", "calendar"), t("You are not authorised to edit this event because you are not the organizer.", "calendar"));
 
 					if(!this.attendanceWindow){
 						this.attendanceWindow = new GO.calendar.AttendanceWindow ();
@@ -1887,7 +1812,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 		}
 
 //		if(event.has_other_participants)
-//			params.send_invitation=confirm(GO.calendar.lang.sendInvitationUpdate) ? 1 : 0;
+//			params.send_invitation=confirm(t("Would you like to send updated meeting information to participants?", "calendar")) ? 1 : 0;
 
 		GO.request({
 			url: 'calendar/event/submit',
@@ -1989,32 +1914,29 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			this.calendarDialog.on('calendarimport', function(){this.adminDialog.madeChanges=true;}, this);
 
 			var tbar = [{
-				iconCls: 'btn-add',
-				text: GO.lang.cmdAdd,
+				iconCls: 'ic-add',
+				text: t("Add"),
 				disabled: !GO.settings.modules.calendar.write_permission,
-				cls: 'x-btn-text-icon',
 				handler: function(){
 					this.calendarDialog.show(0, false);
 				},
 				scope: this
 			},{				
-				iconCls: 'btn-delete',
-				text: GO.lang.cmdDelete,
+				iconCls: 'ic-delete',
+				text: t("Delete"),
 				disabled: !GO.settings.modules.calendar.write_permission,
-				cls: 'x-btn-text-icon',
 				handler: function(){
 					this.calendarsGrid.deleteSelected();
 				},
 				scope:this
-			}]
+			},'-']
 
-			if(GO.customfields)
+			if(go.ModuleManager.isAvailable("customfields"))
 			{
 				tbar.push(new Ext.Button({
-					iconCls: 'btn-settings',
+					iconCls: 'ic-settings',
 					disabled: !GO.settings.modules.calendar.write_permission,
-					text: GO.customfields.lang.customfields,
-					cls: 'x-btn-text-icon',
+					text: t("Custom fields", "customfields"),
 					handler: function()
 					{
 						GO.calendar.groupDialog.show(1);
@@ -2023,29 +1945,13 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 				}));
 			}
 
-			tbar.push('-');
-//			tbar.push(new Ext.Button({			    
-//				iconCls: 'btn-settings',
-//				text: GO.lang.strPermissions,
-//				disabled: !GO.settings.modules.calendar.write_permission,
-//				cls: 'x-btn-text-icon',
-//				handler: function(){
-//					if(!GO.calendar.permissionsDialog)
-//					{
-//						GO.calendar.permissionsDialog = new GO.calendar.PermissionsDialog();
-//					}
-//					GO.calendar.permissionsDialog.show(0);
-//				},
-//				scope: this
-//			}));
-
-			tbar.push(new GO.form.SearchField({
-				store: this.writableCalendarsStore,
-				width:150
+			tbar.push('->');
+			tbar.push(new go.toolbar.SearchButton({
+				store: this.writableCalendarsStore
 			}));
 
 			this.calendarsGrid = new GO.grid.GridPanel( {
-				title: GO.calendar.lang.calendars,
+				title: t("Calendars", "calendar"),
 				paging: true,
 				border: false,
 				store: this.writableCalendarsStore,
@@ -2056,11 +1962,11 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 					scope:this
 				},
 				columns:[{
-					header:GO.lang.strName,
+					header:t("Name"),
 					dataIndex: 'name',
 					sortable:true
 				},{
-					header:GO.lang.strOwner,
+					header:t("Owner"),
 					dataIndex: 'user_name'
 				}],
 				view:new  Ext.grid.GridView({
@@ -2085,7 +1991,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			}, this);
 
 			this.viewsGrid = new GO.grid.GridPanel( {
-				title: GO.calendar.lang.views,
+				title: t("Views", "calendar"),
 				paging: true,
 				border: false,
 				store: this.writableViewsStore,
@@ -2096,11 +2002,11 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 					scope:this
 				},
 				columns:[{
-					header:GO.lang.strName,
+					header:t("Name"),
 					dataIndex: 'name',
 					sortable:true
 				},{
-					header:GO.lang.strOwner,
+					header:t("Owner"),
 					dataIndex: 'user_name'
 				}
 				],
@@ -2110,30 +2016,26 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 				sm: new Ext.grid.RowSelectionModel(),
 				loadMask: true,
 				tbar: [{					
-					iconCls: 'btn-add',
-					text: GO.lang.cmdAdd,
+					iconCls: 'ic-add',
+					text: t("Add"),
 //					disabled: !GO.settings.modules.calendar.write_permission,
-					cls: 'x-btn-text-icon',
 					handler: function(){
 						this.viewDialog.show();
 					},
 					scope: this
 				},{
-					iconCls: 'btn-delete',
-					text: GO.lang.cmdDelete,
+					iconCls: 'ic-delete',
+					text: t("Delete"),
 //					disabled: !GO.settings.modules.calendar.write_permission,
-					cls: 'x-btn-text-icon',
 					handler: function(){
 						this.viewsGrid.deleteSelected();
 					},
 					scope:this
 				},
-				'-',
-						this.searchField = new GO.form.SearchField({
-							store: this.writableViewsStore,
-							width:150,
-							emptyText: GO.lang.strSearch
-						})]
+				'->',
+				this.searchField = new go.toolbar.SearchButton({
+					store: this.writableViewsStore
+				})]
 			});
 			
 			this.viewsGrid.on("rowdblclick", function(grid, rowClicked, e){
@@ -2147,7 +2049,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			});
 			
 			GO.calendar.groupsGrid = this.groupsGrid = new GO.calendar.GroupsGrid({
-				title:GO.calendar.lang.resource_groups,
+				title:t("Resource groups", "calendar"),
 				layout:'fit',
 				store:GO.calendar.groupsStore,
 				deleteConfig: {
@@ -2159,7 +2061,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			});
 			            
 			this.resourcesGrid = new GO.calendar.ResourcesGrid({
-				title:GO.calendar.lang.resources,
+				title:t("Resources", "calendar"),
 				layout:'fit',
 				store:this.writableResourcesStore,
 				deleteConfig: {
@@ -2171,7 +2073,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			});
 
 			this.categoriesGrid = new GO.calendar.CategoriesGrid({
-				title:GO.calendar.lang.globalCategories,
+				title:t("Global categories", "calendar"),
 				layout:'fit',
 				store:GO.calendar.globalOnlyCategoriesStore
 			});
@@ -2195,27 +2097,20 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			}
             
 			this.adminDialog = new Ext.Window({
-				title: GO.calendar.lang.administration,
+				title: t("Administration", "calendar"),
 				layout:'fit',
 				modal:true,
-				minWidth:300,
-				minHeight:300,
-				height:400,
-				width:600,
+				minWidth:dp(440),
+				minHeight:dp(616),
+				height:dp(616),
+				width:dp(784),
 				closeAction:'hide',
 				madeChanges:false,//used for reloading other stuff in the calendar
 				items: new Ext.TabPanel({
 					border:false,
 					activeTab:0,
 					items:items
-				}),
-				buttons:[{
-					text:GO.lang.cmdClose,
-					handler: function(){
-						this.adminDialog.hide()
-					},
-					scope: this
-				}]
+				})
 			});
 
 			this.adminDialog.on('hide', function(){
@@ -2239,10 +2134,23 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 
 GO.calendar.extraToolbarItems = [];
 
-GO.moduleManager.addModule('calendar', GO.calendar.MainPanel, {
-	title : GO.calendar.lang.calendar,
-	iconCls : 'go-tab-icon-calendar'
+
+
+go.ModuleManager.register('calendar', {
+	mainPanel: GO.calendar.MainPanel,
+	title : t("Calendar", "calendar"),
+	iconCls : 'go-tab-icon-calendar',
+	entities: ["Event"],
+	initModule: function () {	
+		go.Links.registerLinkToWindow("Event", function() {
+			var win = new GO.calendar.EventDialog();
+			win.closeAction = "close";
+			return win;
+		});
+	}
 });
+
+
 
 GO.mainLayout.onReady(function(){
 	GO.calendar.groupsStore = new GO.data.JsonStore({
@@ -2287,22 +2195,22 @@ GO.mainLayout.onReady(function(){
 		id : 'id',
 		fields : ['id', 'name','color','calendar_id'],
 		remoteSort : true
-	}),
-
-	GO.newMenuItems.push({
-		text: GO.calendar.lang.appointment,
-		iconCls: 'go-model-icon-GO\\Calendar\\Model\\Event',
-		handler:function(item, e){
-
-			var eventShowConfig = item.parentMenu.eventShowConfig || {};
-			eventShowConfig.link_config=item.parentMenu.link_config
-
-			GO.calendar.showEventDialog(eventShowConfig);
-		}
 	});
 
+//	GO.newMenuItems.push({
+//		text: t("Appointment", "calendar"),
+//		iconCls: 'go-model-icon-GO\\Calendar\\Model\\Event',
+//		handler:function(item, e){
+//
+//			var eventShowConfig = item.parentMenu.eventShowConfig || {};
+//			eventShowConfig.link_config=item.parentMenu.link_config
+//
+//			GO.calendar.showEventDialog(eventShowConfig);
+//		}
+//	});
+
 	//GO.checker is not available in some screens like accept invitation from calendar
-	if(GO.checker){
+	if(go.ModuleManager.isAvailable("checker")){
 
 		GO.checker.on('check', function(checker, data){
 			var tp = GO.mainLayout.getModulePanel('calendar');
@@ -2334,36 +2242,6 @@ GO.calendar.showEventDialog = function(config){
 	GO.calendar.eventDialog.show(config);
 }
 
-GO.linkHandlers["GO\\Calendar\\Model\\Event"]=function(id){
-	//GO.calendar.showEventDialog({event_id:id});
-	if(!GO.calendar.eventLinkWindow){
-		var eventPanel = new GO.calendar.EventPanel();
-		GO.calendar.eventLinkWindow = new GO.LinkViewWindow({
-			title: GO.calendar.lang.appointment,
-			closeAction:'hide',
-			items: eventPanel,
-			eventPanel: eventPanel
-		});
-	}
-	GO.calendar.eventLinkWindow.eventPanel.load(id);
-	GO.calendar.eventLinkWindow.show();
-	return GO.files.eventLinkWindow;
-};
-
-GO.quickAddPanel.addButton(new Ext.Button({
-	iconCls:'img-calendar-add',
-	cls: 'x-btn-icon', 
-	tooltip:GO.calendar.lang.appointment,
-	handler:function(item, e){
-		GO.calendar.showEventDialog({});
-	},
-	scope: this
-}),0);
-
-GO.linkPreviewPanels["GO\\Calendar\\Model\\Event"]=function(config){
-	var config = config || {};
-	return new GO.calendar.EventPanel(config);
-}
 
 GO.calendar.openCalendar = function(displayConfig){
 		var mp = GO.mainLayout.initModule('calendar');
@@ -2391,12 +2269,12 @@ GO.calendar.handleMeetingRequest=function(responseResult){
 	
 	if (responseResult.askForMeetingRequestForNewParticipants) {
 		Ext.Msg.show({
-			title:GO.calendar.lang.notifyParticipants,
-			msg: GO.calendar.lang.sendNotificationToNewParticipants,
+			title:t("Notify participants?", "calendar"),
+			msg: t("Do you want to notify by e-mail only the participants that you just added?", "calendar"),
 			buttons: {
-				yes:GO.calendar.lang.newParticipants,
-				no:GO.calendar.lang.allParticipants,
-				cancel:GO.calendar.lang.noParticipants
+				yes:t("New participants", "calendar"),
+				no:t("All participants", "calendar"),
+				cancel:t("No participants", "calendar")
 			},
 			fn: function(buttonId, text, config){
 				if(buttonId=='yes'){
@@ -2428,8 +2306,8 @@ GO.calendar.handleMeetingRequest=function(responseResult){
 	} else if (responseResult.askForMeetingRequest){
 		
 		Ext.Msg.show({
-			title:GO.calendar.lang.notifyParticipants,
-			msg: GO.calendar.lang.sendNotification,
+			title:t("Notify participants?", "calendar"),
+			msg: t("Would you like to notify the participants by e-mail?", "calendar"),
 			buttons: Ext.Msg.YESNO,
 			fn: function(buttonId, text, config){
 				if(buttonId=='yes'){

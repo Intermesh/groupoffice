@@ -4,7 +4,7 @@ GO.cron.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		
 		Ext.apply(this, {
 			goDialogId:'cronjob',
-			title:GO.cron.lang.job,
+			title:t("Job", "cron"),
 			formControllerUrl: 'core/cron',
 			updateAction : 'update',
 			createAction : 'create',
@@ -12,14 +12,14 @@ GO.cron.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			width:350,
 			tools: [{
 				id:'help',
-				qtip: GO.cron.lang.exampleFormats+
+				qtip: t("Please use one of these formats (eg. hour, no spaces):", "cron")+
 					'<table>'+
-					'<tr><td>*</td><td>'+GO.cron.lang.exampleFormat1Explanation+'</td></tr>'+
-					'<tr><td>1</td><td>'+GO.cron.lang.exampleFormat2Explanation+'</td></tr>'+
-					'<tr><td>1-5</td><td>'+GO.cron.lang.exampleFormat3Explanation+'</td></tr>'+
-					'<tr><td>0-23/2</td><td>'+GO.cron.lang.exampleFormat4Explanation+'</td></tr>'+
-					'<tr><td>1,2,3,13,22</td><td>'+GO.cron.lang.exampleFormat5Explanation+'</td></tr>'+
-					'<tr><td>0-4,8-12</td><td>'+GO.cron.lang.exampleFormat6Explanation+'</td></tr>'+
+					'<tr><td>*</td><td>'+t("(all)", "cron")+'</td></tr>'+
+					'<tr><td>1</td><td>'+t("(only the first)", "cron")+'</td></tr>'+
+					'<tr><td>1-5</td><td>'+t("(All between 1 and 5)", "cron")+'</td></tr>'+
+					'<tr><td>0-23/2</td><td>'+t("(Every 2nd between 0 and 23)", "cron")+'</td></tr>'+
+					'<tr><td>1,2,3,13,22</td><td>'+t("(Only on the given numbers)", "cron")+'</td></tr>'+
+					'<tr><td>0-4,8-12</td><td>'+t("(Between 0 and 4 and between 8 and 12)", "cron")+'</td></tr>'+
 					'<table>'
 			}],
 			select: false
@@ -31,17 +31,17 @@ GO.cron.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 	buildForm : function () {
 			
 		this.usersPanel = new GO.base.model.multiselect.panel({
-      title:GO.cron.lang.users,	
+      title:t("Users", "cron"),	
       url:'cron/cronUser',
-      columns:[{header: GO.cron.lang.user, dataIndex: 'name', sortable: true}],
+      columns:[{header: t("user", "cron"), dataIndex: 'name', sortable: true}],
       fields:['id','name'],
       model_id:this.remoteModelId
     });
 		
 		this.groupsPanel = new GO.base.model.multiselect.panel({
-      title:GO.cron.lang.groups,	
+      title:t("Groups", "cron"),	
       url:'cron/cronGroup',
-      columns:[{header: GO.cron.lang.group, dataIndex: 'name', sortable: true}],
+      columns:[{header: t("Group", "cron"), dataIndex: 'name', sortable: true}],
       fields:['id','name'],
       model_id:this.remoteModelId
     });
@@ -52,7 +52,7 @@ GO.cron.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			anchor: '100%',
 			maxLength: 100,
 			allowBlank:false,
-			fieldLabel: GO.cron.lang.cronName
+			fieldLabel: t("Name", "cron")
 		});
 		
 		this.minutesField = new Ext.form.TextField({
@@ -61,7 +61,7 @@ GO.cron.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			anchor: '99%',
 			maxLength: 100,
 			allowBlank:false,
-			fieldLabel: GO.cron.lang.minutes +' '+ GO.cron.lang.minutesExample
+			fieldLabel: t("Minutes", "cron") +' '+ t("(0-59)", "cron")
 		});
 		
 		this.hoursField = new Ext.form.TextField({
@@ -70,7 +70,7 @@ GO.cron.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			anchor: '99%',
 			maxLength: 100,
 			allowBlank:false,
-			fieldLabel: GO.cron.lang.hours +' '+ GO.cron.lang.hoursExample
+			fieldLabel: t("Hours", "cron") +' '+ t("(0-23)", "cron")
 		});
 		
 		this.monthDaysField = new Ext.form.TextField({
@@ -79,7 +79,7 @@ GO.cron.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			anchor: '99%',
 			maxLength: 100,
 			allowBlank:false,
-			fieldLabel: GO.cron.lang.monthdays +' '+ GO.cron.lang.monthdaysExample
+			fieldLabel: t("Month days", "cron") +' '+ t("(1-31)", "cron")
 		});
 		
 		this.monthsField = new Ext.form.TextField({
@@ -88,7 +88,7 @@ GO.cron.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			anchor: '99%',
 			maxLength: 100,
 			allowBlank:false,
-			fieldLabel: GO.cron.lang.months +' '+ GO.cron.lang.monthsExample
+			fieldLabel: t("Months", "cron") +' '+ t("(1-12)", "cron")
 		});
 		
 		this.weekdaysField = new Ext.form.TextField({
@@ -97,7 +97,7 @@ GO.cron.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			anchor: '99%',
 			maxLength: 100,
 			allowBlank:false,
-			fieldLabel: GO.cron.lang.weekdays +' '+ GO.cron.lang.weekdaysExample
+			fieldLabel: t("Week days", "cron") +' '+ t("(0-6)", "cron")
 		});
 		
 //		this.yearsField = new Ext.form.TextField({
@@ -106,7 +106,7 @@ GO.cron.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 //			anchor: '99%',
 //			maxLength: 100,
 //			allowBlank:false,
-//			fieldLabel: GO.cron.lang.years +' '+ GO.cron.lang.yearsExample
+//			fieldLabel: t("Years", "cron") +' '+ t("(2013-2015)", "cron")
 //		});
 //		
 		this.activeCheckbox = new Ext.ux.form.XCheckbox({
@@ -115,7 +115,7 @@ GO.cron.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			anchor: '100%',
 			maxLength: 100,
 //			allowBlank:false,
-			boxLabel: GO.cron.lang.active
+			boxLabel: t("Enabled", "cron")
 		});
 		
 		this.runOnceCheckbox = new Ext.ux.form.XCheckbox({
@@ -124,12 +124,12 @@ GO.cron.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			anchor: '100%',
 			maxLength: 100,
 //			allowBlank:false,
-			boxLabel: GO.cron.lang.runonce
+			boxLabel: t("Run only once", "cron")
 		});
 		
 		this.jobCombo = new GO.form.ComboBox({
 			hiddenName: 'job',
-			fieldLabel: GO.cron.lang.job,
+			fieldLabel: t("Job", "cron"),
 			store: GO.cron.jobStore,
 			valueField:'class',
 			displayField:'name',
@@ -154,7 +154,7 @@ GO.cron.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		
 		
 		this.timeFieldSet = new Ext.form.FieldSet({
-			title: GO.cron.lang.timeFieldSetTitle,
+			title: t("Time", "cron"),
 			labelWidth: 140,
 			autoHeight: true,
 			border: true,
@@ -171,7 +171,7 @@ GO.cron.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		});
 			
 		this.propertiesPanel = new Ext.Panel({
-			title:GO.lang['strProperties'],			
+			title:t("Properties"),			
 			cls:'go-form-panel',
 			layout:'form',
 			labelWidth: 90,

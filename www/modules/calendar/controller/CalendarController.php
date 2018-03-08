@@ -74,13 +74,13 @@ class CalendarController extends \GO\Base\Controller\AbstractModelController {
 		if(empty($response['data']['tasklist_id']))
 				$response['data']['tasklist_id'] = "";
 		
-		$response['data']['url']='<a class="normal-link" target="_blank" href="'.$url.'">'.\GO::t('rightClickToCopy','calendar').'</a>';
+		$response['data']['url']='<a class="normal-link" target="_blank" href="'.$url.'">'.\GO::t("Right click to copy link location", "calendar").'</a>';
 		
 		// Get a link to the ics exporter
-		//$response['data']['ics_url']='<a class="normal-link" target="_blank" href="'.\GO::url("calendar/calendar/exportIcs", array("calendar_id"=>$response['data']['id'],"months_in_past"=>1)).'">'.\GO::t('rightClickToCopy','calendar').'</a>';
+		//$response['data']['ics_url']='<a class="normal-link" target="_blank" href="'.\GO::url("calendar/calendar/exportIcs", array("calendar_id"=>$response['data']['id'],"months_in_past"=>1)).'">'.\GO::t("Right click to copy link location", "calendar").'</a>';
 
 		// Get a link to the ics file that is exported
-		$response['data']['ics_url'] = '<a class="normal-link" target="_blank" href="'.$model->getPublicIcsUrl().'">'.\GO::t('rightClickToCopy','calendar').'</a>';
+		$response['data']['ics_url'] = '<a class="normal-link" target="_blank" href="'.$model->getPublicIcsUrl().'">'.\GO::t("Right click to copy link location", "calendar").'</a>';
 		return parent::afterLoad($response, $model, $params);
 	}
 	
@@ -164,7 +164,7 @@ class CalendarController extends \GO\Base\Controller\AbstractModelController {
 		$count = 0;
 		$failed=array();
 		if (!isset($_FILES['ical_file']) || !file_exists($_FILES['ical_file']['tmp_name'][0])) {
-			throw new \Exception(\GO::t('noFileUploaded'));
+			throw new \Exception(\GO::t("No file was received"));
 		}else {
 			$file = new File($_FILES['ical_file']['tmp_name'][0]);
 			
@@ -190,7 +190,7 @@ class CalendarController extends \GO\Base\Controller\AbstractModelController {
 				throw new \Exception("Extension $ext is not supported");
 			}
 		}
-		$response['feedback'] = sprintf(\GO::t('import_success','calendar'), $count);
+		$response['feedback'] = sprintf(\GO::t("%s events were imported", "calendar"), $count);
 		
 		if(count($failed)){
 			$response['feedback'] .= "\n\n".count($failed)." events failed: ".implode("\n", $failed);
@@ -227,7 +227,7 @@ class CalendarController extends \GO\Base\Controller\AbstractModelController {
 			}		
 		}
 		
-		$response['feedback'] = sprintf(\GO::t('import_success','calendar'), $count);
+		$response['feedback'] = sprintf(\GO::t("%s events were imported", "calendar"), $count);
 		
 		if(count($failed)){
 			$response['feedback'] .= "\n\n".count($failed)." events failed: ".implode("\n", $failed);
@@ -394,7 +394,7 @@ class CalendarController extends \GO\Base\Controller\AbstractModelController {
 			
 			if(empty($params['model']) || $modelName==$params['model']){
 
-				echo '<h1>'.\GO::t('removeDuplicates').'</h1>';
+				echo '<h1>'.\GO::t("Remove duplicates").'</h1>';
 
 				$checkFieldsStr = 't.'.implode(', t.',$checkFields);
 				$findParams = \GO\Base\Db\FindParams::newInstance()
@@ -455,9 +455,9 @@ class CalendarController extends \GO\Base\Controller\AbstractModelController {
 							if(!empty($params['delete'])){
 
 								if($model->hasLinks() && $model->countLinks()){
-									echo '<tr><td colspan="99">'.\GO::t('skippedDeleteHasLinks').'</td></tr>';
+									echo '<tr><td colspan="99">'.\GO::t("Skipped delete because model has links").'</td></tr>';
 								}elseif(($filesFolder = $model->getFilesFolder(false)) && ($filesFolder->hasFileChildren() || $filesFolder->hasFolderChildren())){
-									echo '<tr><td colspan="99">'.\GO::t('skippedDeleteHasFiles').'</td></tr>';
+									echo '<tr><td colspan="99">'.\GO::t("Skipped delete because model has folder or files").'</td></tr>';
 								}else{									
 									$model->delete();
 								}
@@ -473,8 +473,8 @@ class CalendarController extends \GO\Base\Controller\AbstractModelController {
 
 				echo '</table>';
 
-				echo '<p>'.sprintf(\GO::t('foundDuplicates'),$count).'</p>';
-				echo '<br /><br /><a href="'.\GO::url('calendar/calendar/removeDuplicates', array('delete'=>true, 'calendar_id'=>$calendar->id)).'">'.\GO::t('clickToDeleteDuplicates').'</a>';
+				echo '<p>'.sprintf(\GO::t("Found %s duplicates."),$count).'</p>';
+				echo '<br /><br /><a href="'.\GO::url('calendar/calendar/removeDuplicates', array('delete'=>true, 'calendar_id'=>$calendar->id)).'">'.\GO::t("Click here to delete the newest duplicates marked in red.").'</a>';
 				
 			}
 		}
@@ -518,13 +518,13 @@ class CalendarController extends \GO\Base\Controller\AbstractModelController {
 		$categoryCountModel = new \GO\Calendar\Model\PrintCategoryCount($startDate,$endDate);
 		
 //		//Set the PDF filename
-		$filename = \GO::t('eventsPerCategoryCount','calendar').'.pdf';
+		$filename = \GO::t("Number of events for each category", "calendar").'.pdf';
 //		
 //		// Start building the PDF file
 		$pdf = new \GO\Calendar\Reports\PrintCategoryCount($orientation='L');
 		
-		$pdf->setTitle(\GO::t('eventsPerCategoryCount','calendar'));
-		//$pdf->setSubTitle($startDate.' '.\GO::t('till','calendar').' '.$endDate);
+		$pdf->setTitle(\GO::t("Number of events for each category", "calendar"));
+		//$pdf->setSubTitle($startDate.' '.\GO::t("till", "calendar").' '.$endDate);
 		
 		$pdf->render($categoryCountModel);
 

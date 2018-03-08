@@ -1,16 +1,15 @@
 <?php
-
-
-$l["modules"]='Modulok';
-$l["cmdSaveChanges"]= 'Változások mentése';
-$l["cmdInstall"]= 'Telepítés';
-$l["cmdUninstall"]= 'Eltávolítás';
-$l["cmdAvailableModules"]= 'Elérhető modulok';
-$l["cmdModuleName"]= 'Modul neve';
-$l["cmdModuleDescription"]= 'Leírás';
-$l["cmdGridColumnModuleName"]= 'Modul név';
-$l["cmdUninstallMessage"]= 'FIGYELEM! Minden a modulban lévő adat el fog veszni! Folytatod a "{0}" eltávoltását?';
-$l["cmdModulesCannotBeDeleted"]= 'A "Modulok" modul nem törölhető!.';
-$l['name'] = 'Modulok';
-$l['description'] = 'Admin modul; Modulok kezelése.';
-$l['deleteModule'] = 'A "Modules" modul -értelemszerűen- nem törölhető!';
+return array (
+  'Save changes' => 'Változások mentése',
+  'Install' => 'Telepítés',
+  'Uninstall' => 'Eltávolítás',
+  'Available Modules' => 'Elérhető modulok',
+  'Module name' => 'Modul név',
+  'Description' => 'Leírás',
+  'WARNING! All data of this module will be deleted! Are you sure you want to uninstall the "{0}" module?' => 'FIGYELEM! Minden a modulban lévő adat el fog veszni! Folytatod a "{0}" eltávoltását?',
+  'The module "Modules" cannot be deleted!.' => 'A "Modulok" modul nem törölhető!.',
+  'The module "Modules" cannot be deleted!' => 'A "Modules" modul -értelemszerűen- nem törölhető!',
+  'name' => 'Modulok',
+  'description' => 'Admin modul; Modulok kezelése.',
+  'Modules' => 'Modulok',
+);

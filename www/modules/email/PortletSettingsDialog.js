@@ -18,7 +18,7 @@ GO.email.PortletSettingsDialog = Ext.extend(GO.Window, {
 				preloadChildren : true,
 				listeners : {
 					beforeload : function() {
-						this.body.mask(GO.lang.waitMsgLoad);
+						this.body.mask(t("Loading..."));
 					},
 					load : function() {
 						this.body.unmask();
@@ -30,7 +30,7 @@ GO.email.PortletSettingsDialog = Ext.extend(GO.Window, {
 		
 		// set the root node
 		this.rootNode = new Ext.tree.AsyncTreeNode({
-			text : GO.email.lang.root,
+			text : t("Root", "email"),
 			draggable : false,
 			id : 'root',
 			expanded : true
@@ -55,7 +55,7 @@ GO.email.PortletSettingsDialog = Ext.extend(GO.Window, {
 					mailbox : node.attributes.mailbox
 				},
 				fail: function(response, options, result) {
-					Ext.Msg.alert(GO.lang.strError, result.feedback);
+					Ext.Msg.alert(t("Error"), result.feedback);
 					this.foldersTree.getRootNode().reload();
 				},
 				scope : this

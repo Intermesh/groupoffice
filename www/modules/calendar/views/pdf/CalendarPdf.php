@@ -87,23 +87,23 @@ class CalendarPdf extends \GO\Base\Util\Pdf {
 		
 		switch((int)$this->_days){
 			case 1:
-				$this->_headerTitle = \GO::t('oneDay','calendar');
+				$this->_headerTitle = \GO::t("1 Day", "calendar");
 				break;
 			case 5:
-				$this->_headerTitle = \GO::t('fiveDays','calendar');
+				$this->_headerTitle = \GO::t("5 Days", "calendar");
 				break;
 			case 7:
-				$this->_headerTitle = \GO::t('sevenDays','calendar');
+				$this->_headerTitle = \GO::t("7 Days", "calendar");
 				break;
 			case 35:
-				$this->_headerTitle = \GO::t('month','calendar');
+				$this->_headerTitle = \GO::t("Month", "calendar");
 				break;
 			default:
-				$this->_headerTitle = \GO::t('list','calendar');
+				$this->_headerTitle = \GO::t("List", "calendar");
 				break;
 		}
 	
-		$fullDays = \GO::t('full_days');
+		$fullDays = \GO::t("full_days");
 		$calendarPrinted=false;
 		
 		for ($i = 0; $i < $this->_days; $i++) {
@@ -363,7 +363,7 @@ class CalendarPdf extends \GO\Base\Util\Pdf {
 			//if($calendarPrinted)
 				$this->AddPage();
 
-			$this->H1(\GO::t('printList','calendar'));
+			$this->H1(\GO::t("List of appointments", "calendar"));
 
 			$time = $this->_start_time;
 			for ($i = 0; $i < $this->_days; $i++) {
@@ -411,20 +411,20 @@ class CalendarPdf extends \GO\Base\Util\Pdf {
 						$this->H4($event['name']);
 						
 						if (empty($event['all_day_event'])) {
-							$text = sprintf(\GO::t('printTimeFormat','calendar'), $event['start_time'], $event['end_time']);
+							$text = sprintf(\GO::t("From %s till %s", "calendar"), $event['start_time'], $event['end_time']);
 						} else {
 							$start_date = date(\GO::user()->date_format, strtotime($event['start_time']));
 							$end_date = date(\GO::user()->date_format, strtotime($event['end_time']));
 
 							if ($start_date == $end_date) {
-								$text = sprintf(\GO::t('printAllDaySingle','calendar'));
+								$text = sprintf(\GO::t("All day", "calendar"));
 							} else {
-								$text = sprintf(\GO::t('printAllDayMultiple','calendar'), $start_date, $end_date);
+								$text = sprintf(\GO::t("All day from %s till %s", "calendar"), $start_date, $end_date);
 							}
 						}
 
 						if (!empty($event['location']))
-							$text .= sprintf(\GO::t('printLocationFormat','calendar'), $event['location']);
+							$text .= sprintf(\GO::t(" at location \"%s\"", "calendar"), $event['location']);
 
 						$pW = $this->getPageWidth() - $this->lMargin - $this->rMargin;
 						
@@ -468,7 +468,7 @@ class CalendarPdf extends \GO\Base\Util\Pdf {
 		$index_time = mktime(0, 0, 0, $startDate['mon'], $startDate['mday'], $startDate['year']);
 		while ($index_time <= $endTime && $index_time < $this->_end_time) {
 			if ($this->_calendar->user_id != \GO::user()->id && !empty($event['private'])) {
-				$event['name'] = \GO::t('private','calendar');
+				$event['name'] = \GO::t("Private", "calendar");
 				$event['description'] = '';
 				$event['location'] = '';
 			}

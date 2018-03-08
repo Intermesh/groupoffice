@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: SavedQueryDialog.js 21261 2017-06-27 11:53:13Z devdevilnl $
+ * @version $Id: SavedQueryDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -18,7 +18,7 @@ GO.query.SavedQueryDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		Ext.apply(this, {
 			titleField:'name',
 			goDialogId:'SavedQuery',
-			title:GO.lang.savedQuery,
+			title:t("Saved query"),
 			formControllerUrl: 'advancedSearch'
 		});
 		
@@ -37,7 +37,7 @@ GO.query.SavedQueryDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 	buildForm : function () {
 
 		this.propertiesPanel = new Ext.Panel({
-			title:GO.lang['strProperties'],			
+			title:t("Properties"),			
 			cls:'go-form-panel',
 			layout:'form',
 			items:[{
@@ -47,7 +47,7 @@ GO.query.SavedQueryDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 				anchor: '100%',
 				maxLength: 100,
 				allowBlank:false,
-				fieldLabel: GO.lang.strName
+				fieldLabel: t("Name")
 			}]		
 		});
 
@@ -63,7 +63,7 @@ GO.query.SavedQueryDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		if (!GO.util.empty(config.model_name))
 			this.formPanel.baseParams.model_name = config.model_name;
 		else
-			Ext.MessageBox.alert(GO.lang['strError'],GO.lang.missingRemoteModelId);
+			Ext.MessageBox.alert(t("Error"),t("Model name not passed to the dialog."));
 		
 	}	
 });

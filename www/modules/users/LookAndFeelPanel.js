@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: LookAndFeelPanel.js 20022 2016-05-02 12:19:19Z mschering $
+ * @version $Id: LookAndFeelPanel.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -23,7 +23,7 @@ GO.users.LookAndFeelPanel = function(config)
 	
 	config.border=false;
 	config.hideLabel=true;
-	config.title = GO.users.lang.cmdPanelLookFeel;
+	config.title = t("Look & Feel", "users");
 	config.layout='form';
 	config.defaults={anchor:'100%'};
 	config.defaultType = 'textfield';
@@ -51,7 +51,7 @@ GO.users.LookAndFeelPanel = function(config)
 	if(GO.settings.config.allow_themes)
 	{
 		config.items.push(this.themeCombo = new Ext.form.ComboBox({
-			fieldLabel: GO.users.lang['cmdFormLabelTheme'],
+			fieldLabel: t("Theme", "users"),
 			name: 'theme',
 			store: themesStore,
 			displayField:'label',
@@ -66,7 +66,7 @@ GO.users.LookAndFeelPanel = function(config)
 	}
 	
 	config.items.push(this.startModuleField = new GO.form.ComboBox({
-			fieldLabel: GO.users.lang['cmdFormLabelStartModule'],
+			fieldLabel: t("Start in module", "users"),
 			name: 'start_module_name',
 			hiddenName: 'start_module',
 			store: this.modulesStore,
@@ -82,7 +82,7 @@ GO.users.LookAndFeelPanel = function(config)
 		
 		config.items.push({
 			xtype:'combo',
-			fieldLabel: GO.users.lang['cmdFormLabelMaximunRows'],
+			fieldLabel: t("Maximum number of rows in lists", "users"),
 			store: new Ext.data.SimpleStore({
 				fields: ['value'],
 				data : [
@@ -107,12 +107,12 @@ GO.users.LookAndFeelPanel = function(config)
 		
 		config.items.push({
 			xtype:'combo',
-			fieldLabel: GO.users.lang['cmdFormLabelSortNamesBy'],
+			fieldLabel: t("Sort names by", "users"),
 			store: new Ext.data.SimpleStore({
 				fields: ['value', 'text'],
 				data : [
-				['first_name',GO.users.lang.firstName],
-				['last_name',GO.users.lang.lastName]
+				['first_name',t("First name", "users")],
+				['last_name',t("Last name", "users")]
 				]
 			}),
 			displayField:'text',
@@ -128,20 +128,20 @@ GO.users.LookAndFeelPanel = function(config)
 
     this.cbMuteReminderSound = new Ext.ux.form.XCheckbox({
       hideLabel:true,
-      boxLabel: GO.users.lang.muteReminderSound,
+      boxLabel: t("Mute reminder sounds", "users"),
 			name: 'mute_reminder_sound'
     });
 
     this.cbMuteNewMailSound = new Ext.ux.form.XCheckbox({
       hideLabel: true,
-			boxLabel: GO.users.lang.muteNewMailSound,
+			boxLabel: t("Mute new mail sounds", "users"),
 			name: 'mute_new_mail_sound'
     });
 
 		config.items.push({
 			xtype:'xcheckbox',
 			hideLabel: true,
-			boxLabel: GO.users.lang.muteSound,
+			boxLabel: t("Mute all sounds", "users"),
 			name: 'mute_sound',
       listeners:{
         check: function(cb, val){
@@ -162,13 +162,13 @@ GO.users.LookAndFeelPanel = function(config)
 //    {
 //			xtype:'checkbox',
 //			hideLabel: true,
-//			boxLabel: GO.users.lang.muteReminderSound,
+//			boxLabel: t("Mute reminder sounds", "users"),
 //			name: 'mute_reminder_sound'
 //		}
 //    ,{
 //			xtype:'checkbox',
 //			hideLabel: true,
-//			boxLabel: GO.users.lang.muteNewMailSound,
+//			boxLabel: t("Mute new mail sounds", "users"),
 //			name: 'mute_new_mail_sound'
 //		},
 
@@ -176,13 +176,13 @@ GO.users.LookAndFeelPanel = function(config)
     {
 		xtype:'xcheckbox',
 		hideLabel: true,
-			boxLabel: GO.users.lang.popupReminderNotification,
+			boxLabel: t("Show a popup window when a reminder becomes active", "users"),
 		name: 'popup_reminders',
 		listeners: {
 			check: function(cb,checked) {
 				if(checked) {
 					var options = {
-						body: GO.users.lang.desktopNotificationsActive,
+						body: t("Desktop notifications active", "users"),
 						icon: 'views/Extjs3/themes/Group-Office/images/groupoffice.ico'
 					}
 					// Let's check if the browser supports notifications
@@ -192,7 +192,7 @@ GO.users.LookAndFeelPanel = function(config)
 					  Notification.requestPermission(function (permission) {
 						// If the user accepts, let's create a notification
 						if (permission === "granted") {
-						   var notification = new Notification(GO.users.lang.desktopNotificationsActive,options);
+						   var notification = new Notification(t("Desktop notifications active", "users"),options);
 						} else {
 							cb.setValue(false);
 						}
@@ -204,13 +204,13 @@ GO.users.LookAndFeelPanel = function(config)
 		}, {
 		xtype: 'xcheckbox',
 		hideLabel: true,
-		boxLabel: GO.users.lang.popupEmailNotification,
+		boxLabel: t("Show a popup window when an e-mail arrives", "users"),
 		name: 'popup_emails',
 		listeners: {
 			check: function (cb, checked) {
 				if (checked) {
 					var options = {
-						body: GO.users.lang.desktopNotificationsActive,
+						body: t("Desktop notifications active", "users"),
 						icon: 'views/Extjs3/themes/Group-Office/images/groupoffice.ico'
 					}
 					// Let's check if the browser supports notifications
@@ -220,7 +220,7 @@ GO.users.LookAndFeelPanel = function(config)
 						Notification.requestPermission(function (permission) {
 							// If the user accepts, let's create a notification
 							if (permission === "granted") {
-								var notification = new Notification(GO.users.lang.desktopNotificationsActive, options);
+								var notification = new Notification(t("Desktop notifications active", "users"), options);
 							} else {
 								cb.setValue(false);
 							}
@@ -232,24 +232,24 @@ GO.users.LookAndFeelPanel = function(config)
 	}, {
 		xtype:'xcheckbox',
 		hideLabel: true,
-		boxLabel: GO.users.lang.mailReminders,
+		boxLabel: t("Mail reminders", "users"),
 		name: 'mail_reminders'
 	},{
 		xtype:'xcheckbox',
 		hideLabel: true,
-		boxLabel: GO.users.lang.showSmilies,
+		boxLabel: t("Show smilies", "users"),
 		name: 'show_smilies'
 	},{
 		xtype:'xcheckbox',
 		hideLabel: true,
-		boxLabel: GO.users.lang.autoPunctuation,
+		boxLabel: t("Capital after punctuation", "users"),
 		name: 'auto_punctuation'
 	},{
 		xtype:'button',
 		style:'margin-top:20px',
 		handler:this.resetState,
 		scope:this,
-		text:GO.users.lang.resetState,
+		text:t("Reset windows and grids", "users"),
 		anchor:''
 	});
 	
@@ -260,7 +260,7 @@ GO.users.LookAndFeelPanel = function(config)
 
 Ext.extend(GO.users.LookAndFeelPanel, Ext.Panel,{
 	resetState : function(){
-		if(confirm(GO.users.lang.resetStateConfirm)){
+		if(confirm(t("Are you sure you want to reset all grid columns, windows, panel sizes etc. to the factory defaults?", "users"))){
 			GO.request({
 				maskEl:Ext.getBody(),
 				url:'maintenance/resetState',

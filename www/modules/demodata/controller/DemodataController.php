@@ -51,14 +51,14 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 		
 
 
-		$addressbook = \GO\Addressbook\Model\Addressbook::model()->findSingleByAttribute('name', \GO::t('customers', 'addressbook'));
+		$addressbook = \GO\Addressbook\Model\Addressbook::model()->findSingleByAttribute('name', \GO::t("Customers", "addressbook"));
 		if (!$addressbook) {
 			$addressbook = new \GO\Addressbook\Model\Addressbook();
 			$addressbook->setAttributes(array(
 					'user_id' => 1,
-					'name' => \GO::t('prospects', 'addressbook'),
+					'name' => \GO::t("Prospects", "addressbook"),
 					//				'default_iso_address_format' => $default_language,
-					'default_salutation' => \GO::t('defaultSalutation', 'addressbook')
+					'default_salutation' => \GO::t("Default salutation", "addressbook")
 			));
 			$addressbook->save();
 			$addressbook->acl->addGroup(\GO::config()->group_internal, \GO\Base\Model\Acl::WRITE_PERMISSION);
@@ -390,7 +390,7 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 			
 			
 			$view = new \GO\Calendar\Model\View();
-			$view->name=\GO::t('group_everyone');
+			$view->name=\GO::t("Everyone");
 			if($view->save()){
 				$view->addManyMany('groups', \GO::config()->group_everyone);
 			
@@ -400,7 +400,7 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 			
 			
 			$view = new \GO\Calendar\Model\View();
-			$view->name=\GO::t('group_everyone').' ('.\GO::t('merge', 'calendar').')';
+			$view->name=\GO::t("Everyone").' ('.\GO::t("Merge", "calendar").')';
 			$view->merge=true;
 			$view->owncolor=true;
 			if($view->save()){
@@ -673,13 +673,13 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 			
 			if(!\GO::modules()->isInstalled('site') && \GO::modules()->isAvailable('site')){
 				$module = new \GO\Base\Model\Module();
-				$module->id='site';			
+				$module->name='site';			
 				$module->save();
 			}
 			
 			if(!\GO::modules()->isInstalled('defaultsite') && \GO::modules()->isAvailable('defaultsite')){
 				$module = new \GO\Base\Model\Module();
-				$module->id='defaultsite';			
+				$module->name='defaultsite';			
 				$module->save();
 			}
 			
@@ -717,11 +717,11 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 		
 		if(\GO::modules()->notes){
 			
-			$category = \GO\Notes\Model\Category::model()->findSingleByAttribute('name', \GO::t('general','notes'));
+			$category = \GO\Notes\Model\Category::model()->findSingleByAttribute('name', \GO::t("General", "notes"));
 			
 			if(!$category){
 				$category = new \GO\Notes\Model\Category();
-				$category->name=\GO::t('general','notes');
+				$category->name=\GO::t("General", "notes");
 				$category->save();
 				$category->acl->addGroup(\GO::config()->group_everyone, \GO\Base\Model\Acl::READ_PERMISSION);
 			}
@@ -1135,11 +1135,11 @@ In one short (Hare-Breadth Hurry, 1963), Bugs Bunny — with the help of "speed 
 		
 		
 		if(\GO::modules()->bookmarks){
-			$category = \GO\Bookmarks\Model\Category::model()->findSingleByAttribute('name', \GO::t('general','bookmarks'));
+			$category = \GO\Bookmarks\Model\Category::model()->findSingleByAttribute('name', \GO::t("General", "bookmarks"));
 			
 			if(!$category){
 				$category = new \GO\Bookmarks\Model\Category();
-				$category->name=\GO::t('general','bookmarks');		
+				$category->name=\GO::t("General", "bookmarks");		
 				$category->save();
 				$category->acl->addGroup(\GO::config()->group_internal, \GO\Base\Model\Acl::READ_PERMISSION);
 			}

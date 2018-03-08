@@ -52,7 +52,7 @@ class CronCollection extends \GO\Base\Model {
 		$foundCronJobClasses=array();
 		foreach($modules as $module){
 			
-			if(in_array($module->id,$this->_excludedModules))
+			if(in_array($module->name,$this->_excludedModules))
 				continue;
 			
 			$foundCronJobClasses = array_merge($this->getModuleCronJobClasses($module),$foundCronJobClasses);

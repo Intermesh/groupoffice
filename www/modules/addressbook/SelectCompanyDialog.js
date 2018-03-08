@@ -7,7 +7,7 @@
  * If you have questions write an e-mail to info@intermesh.nl
  * 
  * @copyright Copyright Intermesh
- * @version $Id: SelectCompanyDialog.js 15314 2013-07-26 09:23:02Z mschering $
+ * @version $Id: SelectCompanyDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @author Merijn Schering <mschering@intermesh.nl>
  * 
  * Params:
@@ -73,7 +73,7 @@ GO.addressbook.SelectCompanyDialog = function(config){
 	this.grid = this.companiesGrid = new GO.addressbook.CompaniesGrid({
 		region:'center',
 		tbar: [
-    GO.lang['strSearch']+': ', ' ', this.searchField,{
+    t("Search")+': ', ' ', this.searchField,{
 				handler: function()
 				{
 					if(!this.advancedSearchWindow)
@@ -82,7 +82,7 @@ GO.addressbook.SelectCompanyDialog = function(config){
 						this.advancedSearchWindow.on('ok', function(win){
 
 //						this.grid.store.baseParams.advancedQuery=this.searchField.getValue();
-						this.searchField.setValue("[ "+GO.addressbook.lang.advancedSearch+" ]");
+						this.searchField.setValue("[ "+t("Advanced search", "addressbook")+" ]");
 						this.searchField.setDisabled(true);
 						this.grid.store.load();
 
@@ -90,7 +90,7 @@ GO.addressbook.SelectCompanyDialog = function(config){
 					}
 					this.advancedSearchWindow.show({dataType:'companies',masterPanel : this });
 				},
-				text: GO.addressbook.lang.advancedSearch,
+				text: t("Advanced search", "addressbook"),
 				scope: this,
 				style:'margin-left:5px;'
 			},{
@@ -101,7 +101,7 @@ GO.addressbook.SelectCompanyDialog = function(config){
 					this.searchField.setDisabled(false);
 					this.grid.store.load();
 				},
-				text: GO.lang.cmdReset,
+				text: t("Reset"),
 				scope: this
 			}
     ]});
@@ -125,34 +125,34 @@ GO.addressbook.SelectCompanyDialog = function(config){
 		height:600,
 		width:800,
 		closeAction:'hide',
-		title: GO.addressbook.lang['strSelectCompany'],
+		title: t("Select company", "addressbook"),
 		items: [westPanel,this.grid],
 		buttons: [
 			{
-				text: GO.lang['cmdOk'],
+				text: t("Ok"),
 				handler: function (){
 					this.callHandler(true);
 				},
 				scope:this
 			},
 			{
-				text: GO.lang['cmdAdd'],
+				text: t("Add"),
 				handler: function (){
 					this.callHandler(false);
 				},
 				scope:this
 			},
 			{
-				text: GO.addressbook.lang.addAllSearchResults,
+				text: t("Add all search results", "addressbook"),
 				handler: function (){
-					if(confirm(GO.addressbook.lang.confirmAddAllSearchResults)){
+					if(confirm(t("Are you sure you want to add all the search results to the address list?", "addressbook"))){
 						this.callHandler(true, true);
 					}
 				},
 				scope:this
 			},
 			{
-				text: GO.lang['cmdClose'],
+				text: t("Close"),
 				handler: function(){this.hide();},
 				scope: this
 			}

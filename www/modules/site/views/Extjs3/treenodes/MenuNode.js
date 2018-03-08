@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: MenuNode.js 16600 2014-01-10 13:48:07Z wsmits $
+ * @version $Id: MenuNode.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
@@ -22,7 +22,7 @@ GO.site.treeNodes.MenuNode = Ext.extend(GO.site.treeNodes.AbstractNode , {
 					items : [
 						new Ext.menu.Item({
 							iconCls: 'btn-add',
-							text: GO.site.lang.addMenu,
+							text: t("Add menu", "site"),
 							cls: 'x-btn-text-icon',
 							handler:function(){
 								this.openMenuDialog();
@@ -42,7 +42,7 @@ GO.site.treeNodes.MenuNode = Ext.extend(GO.site.treeNodes.AbstractNode , {
 					items : [
 						new Ext.menu.Item({
 							iconCls: 'btn-settings',
-							text: GO.site.lang.properties,
+							text: t("Properties", "site"),
 							cls: 'x-btn-text-icon',
 							scope:this,
 							handler: function(){
@@ -51,7 +51,7 @@ GO.site.treeNodes.MenuNode = Ext.extend(GO.site.treeNodes.AbstractNode , {
 						}),
 						new Ext.menu.Item({
 							iconCls: 'btn-add',
-							text: GO.site.lang.addMenuItem,
+							text: t("New item", "site"),
 							cls: 'x-btn-text-icon',
 							handler:function(){
 								this.openMenuItemDialog();
@@ -60,7 +60,7 @@ GO.site.treeNodes.MenuNode = Ext.extend(GO.site.treeNodes.AbstractNode , {
 						}),
 						new Ext.menu.Item({
 							iconCls: 'btn-delete',
-							text: GO.site.lang['delete'],
+							text: t("Delete", "site"),
 							cls: 'x-btn-text-icon',
 							scope:this,
 							handler: function(){
@@ -113,11 +113,11 @@ GO.site.treeNodes.MenuNode = Ext.extend(GO.site.treeNodes.AbstractNode , {
 			if(!this.errorDialog)
 				this.errorDialog = new GO.ErrorDialog();
 			
-			this.errorDialog.show(GO.site.lang.deleteMenuHasChildren, GO.site.lang.deleteMenu);
+			this.errorDialog.show(t("The selected menu-item has children and cannot be deleted.", "site"), t("Delete menu item", "site"));
 			
 		} else {
 			
-			Ext.MessageBox.confirm(GO.site.lang.deleteMenu, GO.site.lang.deleteMenuConfirm, function(btn){
+			Ext.MessageBox.confirm(t("Delete menu item", "site"), t("Do you really want to delete this menu item?", "site"), function(btn){
 				if(btn == 'yes'){
 					GO.request({
 						url: 'site/menu/delete',

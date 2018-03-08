@@ -5,7 +5,7 @@ GO.tasks.MainPanel = function(config){
 		config = {};
 	}
 		
-	this.taskListsStore = new GO.data.JsonStore({
+	GO.tasks.taskListsStore = this.taskListsStore = new GO.data.JsonStore({
 		url: GO.url('tasks/tasklist/store'),
 		baseParams: {
 			limit:GO.settings.config.nav_page_size
@@ -27,7 +27,7 @@ GO.tasks.MainPanel = function(config){
 		region:'center',
 		loadMask:true,
 		store: this.taskListsStore,
-		title: GO.tasks.lang.tasklists,	
+		title: t("Tasklists", "tasks"),	
 		relatedStore: this.gridPanel.store,
 		autoLoadRelatedStore:false,
 		split:true
@@ -39,22 +39,6 @@ GO.tasks.MainPanel = function(config){
 			this.gridPanel.store.reload();
 	}, this);
 
-//	this.taskListsPanel.on('change', function(grid, tasklists, records)
-//	{                		                
-////		this.gridPanel.store.baseParams.tasks_tasklist_filter = Ext.encode(tasklists);
-////		this.gridPanel.store.load();
-//		this.tasklist_ids = tasklists;
-//
-//		if(records.length)
-//		{
-//			this.addTaskPanel.populateComboBox(records);
-//
-//			this.tasklist_id = records[0].data.id;
-//			this.tasklist_name = records[0].data.name;
-//		}
-//
-//		// this.gridPanel.store.baseParams.tasklists;
-//	}, this);
 
 this.gridPanel.store.on('load', function(store, records, options)
 	{    
@@ -65,26 +49,14 @@ this.gridPanel.store.on('load', function(store, records, options)
 			this.tasklist_id = lists[0].data.id;
 			this.tasklist_name = lists[0].data.name;
 		}
-//		
-//		if(records.length)
-//		{
-//			this.addTaskPanel.populateComboBox(records);
-//
-//			this.tasklist_id = records[0].data.id;
-//			this.tasklist_name = records[0].data.name;
-//		}
+
 	}, this);
 	
 	var filterPanel = new Ext.form.FormPanel({
-		title:GO.tasks.lang.filter,
-		height:180,
-//		id:'ta-filter-form',
-//		stateId:'ta-filter-form',
-//		cls:'go-form-panel',
+		autoHeight: true,
 		waitMsgTarget:true,
 		region:'north',
 		border:true,
-		split:true,
 		items: [{
 				hideLabel:true,
 				anchor:'100%',
@@ -100,31 +72,31 @@ this.gridPanel.store.on('load', function(store, records, options)
 					scope:this
 				},
 				items: [{
-					boxLabel:  GO.tasks.lang.active,
+					boxLabel:  t("Active", "tasks"),
 					name: 'show',
 					inputValue: 'active'
 				},{
-					boxLabel: GO.tasks.lang.dueInSevenDays,
+					boxLabel: t("Due in seven days", "tasks"),
 					name: 'show',
 					inputValue: 'sevendays'
 				},{
-					boxLabel: GO.tasks.lang.overDue,
+					boxLabel: t("Overdue", "tasks"),
 					name: 'show',
 					inputValue: 'overdue'
 				},{
-					boxLabel: GO.tasks.lang.incompleteTasks,
+					boxLabel: t("Incomplete tasks", "tasks"),
 					name: 'show',
 					inputValue: 'incomplete'
 				},{
-					boxLabel: GO.tasks.lang.completed,
+					boxLabel: t("Completed", "tasks"),
 					name: 'show',
 					inputValue: 'completed'
 				},{
-					boxLabel: GO.tasks.lang.futureTasks,
+					boxLabel: t("Future tasks", "tasks"),
 					name: 'show',
 					inputValue: 'future'
 				},{
-					boxLabel: GO.tasks.lang.all,
+					boxLabel: t("All", "tasks"),
 					name: 'show',
 					inputValue: 'all'
 				}]
@@ -133,7 +105,7 @@ this.gridPanel.store.on('load', function(store, records, options)
       
 	this.categoriesPanel= new GO.grid.MultiSelectGrid({
 		id:'ta-categories-grid',
-		title:GO.tasks.lang.categories,
+		title:t("Categories", "tasks"),
 		region:'south',
 		loadMask:true,
 		height:150,
@@ -148,14 +120,7 @@ this.gridPanel.store.on('load', function(store, records, options)
                 
 		//delete this.gridPanel.store.baseParams.categories;
 	}, this);
-
-
-	this.addTaskPanel = new GO.tasks.AddTaskPanel({
-		region:'north'
-	});
-
 	
-			
 	this.gridPanel.on("delayedrowselect",function(grid, rowIndex, r){
 		this.taskPanel.load(r.data.id);
 	}, this);
@@ -170,23 +135,17 @@ this.gridPanel.store.on('load', function(store, records, options)
 			
 	}, this);
 			
-	this.taskPanel = new GO.tasks.TaskPanel({
-		//title:GO.tasks.lang.task,
+	this.taskPanel = this.taskDetail = new GO.tasks.TaskPanel({
 		region:'east',
-		width:400,
-		border:true
+		width:dp(504)
 	});
 
 	this.accordionPanel = new Ext.Panel({
 		region:'center',
-		titlebar: false,
 		autoScroll:false,
-//		closeOnTab: true,
 		resizable:true,
-//		layout:'border',
 		layoutConfig:{hideCollapseTool:true},
 		layout:'accordion',
-		baseCls: 'x-plain',
 		items:[
 			this.taskListsPanel,
 			this.categoriesPanel
@@ -197,155 +156,90 @@ this.gridPanel.store.on('load', function(store, records, options)
 	config.items=[
 		new Ext.Panel({
 			region:'west',
-			titlebar: false,
 			autoScroll:false,
 			closeOnTab: true,
-			width: 230,
-			split:true,
+			width: dp(224),
 			resizable:true,
+			cls: 'go-sidenav',
 			layout:'border',
-			baseCls: 'x-plain',
 			items:[
 				filterPanel,
 				this.accordionPanel
 			]
 		}),
 		{
-			//title:GO.tasks.lang.tasks,
 			region:'center',
-			border:false,
-			layout:'border',
-			items:[ this.addTaskPanel,this.gridPanel]
+			layout:'fit',
+			tbar: {  // configured using the anchor layout
+				xtype : 'container',
+				items :[new Ext.Toolbar({
+					items: [{
+						grid: this.gridPanel,
+						xtype:'addbutton',
+						handler: function(b){
+							this.taskPanel.reset();
+							GO.tasks.showTaskDialog({
+								tasklist_id: b.buttonParams.id,
+								tasklist_name: b.buttonParams.name
+							});
+						},
+						scope: this
+					},
+					{
+						grid: this.gridPanel,
+						xtype:'deletebutton',
+						handler: function(b){
+							this.gridPanel.deleteSelected({
+								callback : this.taskPanel.gridDeleteCallback,
+								scope: this.taskPanel
+							});
+						},
+						scope: this
+					},{
+						iconCls: 'btn-settings',
+						tooltip: t("Administration"),
+						handler: function(){
+							this.showAdminDialog();
+						},
+						scope: this
+					},{
+						iconCls: 'btn-refresh',
+						tooltip: t("Refresh"),
+						handler: function(){
+							this.taskListsStore.load();
+							this.gridPanel.store.load();
+						},
+						scope: this
+					},
+					this.exportMenu = new GO.base.ExportMenu({className:'GO\\Tasks\\Export\\CurrentGrid'}),
+					'->',{
+						xtype: 'tbsearch',
+						store: this.gridPanel.store,
+						onSearch: function(v) {
+							console.log(this);
+							this.store.baseParams['query']=v;
+							this.store.load();
+						}
+					}]
+				}),
+				this.addTaskPanel = new GO.tasks.AddTaskBar({
+					layout:'hbox',
+					layoutConfig: {
+						align: 'middle',
+						defaultMargins: {left: dp(4), right: dp(4),bottom:0,top:0}
+					}
+				})
+			]},
+			items:[this.gridPanel]
 		},
-	this.taskPanel
+		this.taskPanel
 	];
 	
-	config.tbar=new Ext.Toolbar({
-			cls:'go-head-tb',
-			items: [{
-		      	 	xtype:'htmlcomponent',
-				html:GO.tasks.lang.name,
-				cls:'go-module-title-tbar'
-			},{
-				grid: this.gridPanel,
-				xtype:'addbutton',
-				handler: function(b){
-					this.taskPanel.reset();
-					GO.tasks.showTaskDialog({
-						tasklist_id: b.buttonParams.id,
-						tasklist_name: b.buttonParams.name
-					});
-				},
-				scope: this
-			},
-			{
-				grid: this.gridPanel,
-				xtype:'deletebutton',
-				handler: function(b){
-					this.gridPanel.deleteSelected({
-						callback : this.taskPanel.gridDeleteCallback,
-						scope: this.taskPanel
-					});
-				},
-				scope: this
-			},
-//			this.addButton = new Ext.Button({
-//				iconCls: 'btn-add',
-//				text: GO.lang['cmdAdd'],
-//				cls: 'x-btn-text-icon',
-//				handler: function(){
-//					this.taskPanel.reset();
-//					GO.tasks.showTaskDialog({
-//						tasklist_id: this.tasklist_id,
-//						tasklist_name: this.tasklist_name
-//					});
-//
-//				},
-//				scope: this
-//			}),this.deleteButton = new Ext.Button({
-//				iconCls: 'btn-delete',
-//				text: GO.lang['cmdDelete'],
-//				cls: 'x-btn-text-icon',
-//				handler: function(){
-//					this.gridPanel.deleteSelected({
-//						callback : this.taskPanel.gridDeleteCallback,
-//						scope: this.taskPanel
-//					});
-//				},
-//				scope: this
-//			})
-			{
-				iconCls: 'btn-settings',
-				text: GO.lang.administration,
-				cls: 'x-btn-text-icon',
-				handler: function(){
-					this.showAdminDialog();
-				},
-				scope: this
-			},
-//			{
-//				iconCls: 'btn-export',
-//				text: GO.lang.cmdExport,
-//				cls: 'x-btn-text-icon',
-//				handler:function(){
-////					var config = {};
-////					config.colModel = this.gridPanel.getColumnModel();
-////					config.title = GO.tasks.lang.tasks;
-////
-////					var query = this.gridPanel.searchField.getValue();
-////					if(!GO.util.empty(query))
-////					{
-////						config.subtitle= GO.lang.searchQuery+': '+query;
-////					}else
-////					{
-////						config.subtitle='';
-////					}
-////
-////					if(!this.exportDialog)
-////					{
-////						this.exportDialog = new GO.ExportQueryDialog({
-////							query:'get_tasks'
-////						});
-////					}
-////					this.exportDialog.show(config);
-//
-//				
-//				if(!this.exportDialog)
-//				{
-//					this.exportDialog = new GO.ExportGridDialog({
-//						url: 'tasks/task/export',
-//						name: 'tasks',
-//						documentTitle:'ExportTask',
-//						colModel: this.gridPanel.getColumnModel()
-//					});
-//				}
-//				
-//				this.exportDialog.show();
-//
-//				},
-//				scope: this
-//			},
-			this.exportMenu = new GO.base.ExportMenu({className:'GO\\Tasks\\Export\\CurrentGrid'}),
-			{
-				iconCls: 'btn-refresh',
-				text: GO.lang['cmdRefresh'],
-				cls: 'x-btn-text-icon',
-				handler: function(){
-					this.taskListsStore.load();
-					this.gridPanel.store.load();
-				},
-				scope: this
-			}
-			]
-		});
 	
+
 	this.exportMenu.setColumnModel(this.gridPanel.getColumnModel());
 	
 	GO.tasks.MainPanel.superclass.constructor.call(this, config);
-	
-	this.on('show', function(){
-		//GO.tasks.notificationEl.setDisplayed(false);
-	},this);
 	
 }
  
@@ -432,13 +326,6 @@ Ext.extend(GO.tasks.MainPanel, Ext.Panel,{
 		{
 			this.tasklistDialog = new GO.tasks.TasklistDialog();
 			this.categoryDialog = new GO.tasks.CategoryDialog();
-
-//			GO.tasks.writableTasklistsStore.on('load', function(){
-//				if(GO.tasks.writableTasklistsStore.reader.jsonData.new_default_tasklist){
-//					GO.tasks.defaultTasklist=GO.tasks.writableTasklistsStore.reader.jsonData.new_default_tasklist;
-//				}
-//			
-//			}, this);
 			
 			this.tasklistDialog.on('save', function(){
 				GO.tasks.writableTasklistsStore.load();
@@ -452,7 +339,7 @@ Ext.extend(GO.tasks.MainPanel, Ext.Panel,{
 			this.tasklistsGrid = new GO.grid.GridPanel( {
 				paging:true,
 				border:false,
-				title: GO.tasks.lang.tasklists,
+				title: t("Tasklists", "tasks"),
 				store: GO.tasks.writableTasklistsStore,
 				deleteConfig: {
 					callback:function(){
@@ -461,17 +348,17 @@ Ext.extend(GO.tasks.MainPanel, Ext.Panel,{
 					scope:this
 				},
 				columns:[{
-					header:GO.tasks.lang.id,
+					header:t("ID", "tasks"),
 					dataIndex: 'id',
 					sortable:true,
 					hidden:true,
 					width:20
 				},{
-					header:GO.lang['strName'],
+					header:t("Name"),
 					dataIndex: 'name',
 					sortable:true
 				},{
-					header:GO.lang['strOwner'],
+					header:t("Owner"),
 					dataIndex: 'user_name'
 				}],
 				view:new  Ext.grid.GridView({
@@ -481,7 +368,7 @@ Ext.extend(GO.tasks.MainPanel, Ext.Panel,{
 				loadMask: true,
 				tbar: [{
 					iconCls: 'btn-add',
-					text: GO.lang['cmdAdd'],
+					text: t("Add"),
 					cls: 'x-btn-text-icon',
 					handler: function(){						
 						this.tasklistDialog.show();
@@ -490,7 +377,7 @@ Ext.extend(GO.tasks.MainPanel, Ext.Panel,{
 					scope: this
 				},{
 					iconCls: 'btn-delete',
-					text: GO.lang['cmdDelete'],
+					text: t("Delete"),
 					cls: 'x-btn-text-icon',
 					disabled: !GO.settings.modules.tasks.write_permission,
 					handler: function(){
@@ -505,7 +392,7 @@ Ext.extend(GO.tasks.MainPanel, Ext.Panel,{
 
 			this.deleteCategoryButton = new Ext.Button({
 				iconCls: 'btn-delete',
-				text: GO.lang['cmdDelete'],
+				text: t("Delete"),
 				cls: 'x-btn-text-icon',
 				//disabled: !GO.settings.modules.tasks.write_permission,
 				handler: function(){
@@ -518,7 +405,7 @@ Ext.extend(GO.tasks.MainPanel, Ext.Panel,{
 			this.categoriesGrid = new GO.grid.GridPanel( {
 				paging:true,
 				border:false,
-				title: GO.tasks.lang.categories,
+				title: t("Categories", "tasks"),
 				store: GO.tasks.categoriesStore,
 				deleteConfig: {
 					callback:function(){
@@ -527,11 +414,11 @@ Ext.extend(GO.tasks.MainPanel, Ext.Panel,{
 					scope:this
 				},
 				columns:[{
-					header:GO.lang['strName'],
+					header:t("Name"),
 					dataIndex: 'name',
 					sortable:true
 				},{
-					header:GO.lang['strOwner'],
+					header:t("Owner"),
 					dataIndex: 'user_name'
 				}],
 				view:new  Ext.grid.GridView({
@@ -541,7 +428,7 @@ Ext.extend(GO.tasks.MainPanel, Ext.Panel,{
 				loadMask: true,
 				tbar: [{
 					iconCls: 'btn-add',
-					text: GO.lang['cmdAdd'],
+					text: t("Add"),
 					cls: 'x-btn-text-icon',
 					handler: function(){
 						this.categoryDialog.show();
@@ -589,22 +476,15 @@ Ext.extend(GO.tasks.MainPanel, Ext.Panel,{
 			})
 
 			this.adminDialog = new Ext.Window({
-				title: GO.lang.cmdSettings,
+				title: t("Settings"),
 				layout:'fit',
 				modal:false,
-				minWidth:300,
-				minHeight:300,
-				height:400,
-				width:600,
+				minWidth:dp(440),
+				minHeight:dp(616),
+				height:dp(616),
+				width:dp(784),
 				closeAction:'hide',				
-				items: this.tabPanel,
-				buttons:[{
-					text:GO.lang['cmdClose'],
-					handler: function(){
-						this.adminDialog.hide()
-					},
-					scope: this
-				}]
+				items: this.tabPanel
 			});
 			
 		}
@@ -666,103 +546,18 @@ GO.tasks.categoriesStore = new GO.data.JsonStore({
 	}
 });
 
-/*
- * This will add the module to the main tabpanel filled with all the modules
- */
- 
-GO.moduleManager.addModule('tasks', GO.tasks.MainPanel, {
-	title : GO.tasks.lang.tasks,
-	iconCls : 'go-tab-icon-tasks'
-});
-/*
- * If your module has a linkable item, you should add a link handler like this. 
- * The index (no. 1 in this case) should be a unique identifier of your item.
- * See classes/base/links.class.inc for an overview.
- * 
- * Basically this function opens a task window when a user clicks on it from a 
- * panel with links. 
- */
-GO.linkHandlers["GO\\Tasks\\Model\\Task"]=function(id, link_config){
 
-	if(!GO.tasks.taskLinkWindow){
-		var taskPanel = new GO.tasks.TaskPanel();
-		GO.tasks.taskLinkWindow = new GO.LinkViewWindow({
-			title: GO.tasks.lang.task,
-			closeAction:'hide',
-			items: taskPanel,
-			taskPanel: taskPanel
+
+go.ModuleManager.register('tasks', {
+	mainPanel: GO.tasks.MainPanel,
+	title: t("Tasks", "tasks"),
+	iconCls: 'go-tab-icon-tasks',
+	entities: ["Task"],
+	initModule: function () {	
+		go.Links.registerLinkToWindow("Task", function(entity, entityId) {
+			var win = new GO.tasks.TaskDialog();
+			win.closeAction = "close";
+			return win;
 		});
 	}
-	GO.tasks.taskLinkWindow.taskPanel.load(id);
-	GO.tasks.taskLinkWindow.show();
-	return GO.tasks.taskLinkWindow;
-}
-
-GO.linkPreviewPanels["GO\\Tasks\\Model\\Task"]=function(config){
-	config = config || {};
-	return new GO.tasks.TaskPanel(config);
-}
-
-
-GO.newMenuItems.push({
-	text: GO.tasks.lang.task,
-	iconCls: 'go-model-icon-GO\\Tasks\\Model\\Task',
-	itemId:'ta-new-task',
-	handler:function(item, e){
-
-		var taskShowConfig = item.parentMenu.taskShowConfig || {};
-		taskShowConfig.link_config=item.parentMenu.link_config
-
-		GO.tasks.showTaskDialog(taskShowConfig);
-	}
 });
-	
-if(GO.addressbook){	
-	GO.quickAddPanel.addButton(new Ext.Button({
-		iconCls:'img-call-add',
-		cls: 'x-btn-icon', 
-		tooltip:GO.tasks.lang.scheduleCall,
-		handler: function(){
-			if(!GO.tasks.scheduleCallDialog)
-				GO.tasks.scheduleCallDialog = new GO.tasks.ScheduleCallDialog();
-			
-			GO.tasks.scheduleCallDialog.show(0,{link_config : this.linkConfig});			
-		}, 
-		scope: this
-	}),0);
-}
-
-//GO.mainLayout.onReady(function(){
-//
-//	//GO.checker is not available in some screens like accept invitation from calendar
-//	if(GO.checker){
-//		//create notify icon
-//		var notificationArea = Ext.get('notification-area');
-//		if(notificationArea)
-//		{
-//			GO.tasks.notificationEl = notificationArea.createChild({
-//				id: 'ta-notify',
-//				tag:'a',
-//				href:'#',
-//				style:'display:none'
-//			});
-//			GO.tasks.notificationEl.on('click', function(){
-//				GO.mainLayout.openModule('tasks');
-//			}, this);
-//		}
-//
-//		GO.checker.on('check', function(checker, data){
-//			var tp = GO.mainLayout.getModulePanel('tasks');
-//
-//			if(data.tasks.active!=GO.tasks.last_active && data.tasks.active>0)
-//			{
-//				
-//				if(!tp || !tp.isVisible())
-//					GO.tasks.notificationEl.setDisplayed(true);
-//			}
-//
-//			GO.tasks.notificationEl.update(data.tasks.active);			
-//			GO.tasks.last_active=data.tasks.active;			
-//		});
-//	}
-//});

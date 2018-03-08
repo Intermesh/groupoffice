@@ -7,7 +7,7 @@
  * If you have questions write an e-mail to info@intermesh.nl
  *
  * @copyright Copyright Intermesh
- * @version $Id: SelectCalendar.js 17032 2014-03-12 09:41:25Z mschering $
+ * @version $Id: SelectCalendar.js 22112 2018-01-12 07:59:41Z mschering $
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
@@ -20,7 +20,7 @@ GO.calendar.SelectCalendar = function(config){
 
 	if(!config.fieldLabel)
 	{
-		config.fieldLabel=GO.calendar.lang.calendar;
+		config.fieldLabel=t("Calendar", "calendar");
 	}
 
 	Ext.apply(this, config);
@@ -36,7 +36,7 @@ GO.calendar.SelectCalendar = function(config){
 	});
 
 	if(!config.emptyText)
-		this.emptyText=GO.lang.strPleaseSelect;
+		this.emptyText=t("Please select...");
 
 	GO.calendar.SelectCalendar.superclass.constructor.call(this,{
 		displayField: 'name',

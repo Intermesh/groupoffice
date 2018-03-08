@@ -15,7 +15,7 @@
 
 $this->render('externalHeader');
 
-echo \GO::t('groupofficeDisabled');
+echo \GO::t("<p>This Group-Office account has been suspended.</p><p>Please contact your account manager.</p>");
 
 $this->render('externalFooter');
 

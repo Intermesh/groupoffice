@@ -37,7 +37,7 @@ class CategoryController extends \GO\Base\Controller\AbstractModelController{
 	}
 	
 	protected function formatColumns(\GO\Base\Data\ColumnModel $columnModel) {
-		$columnModel->formatColumn('user_name','$model->user ? $model->user->name : \GO::t("globalCategory","tasks")');
+		$columnModel->formatColumn('user_name','$model->user ? $model->user->name : \GO::t("Global category", "tasks")');
 		return parent::formatColumns($columnModel);
 	}
 	

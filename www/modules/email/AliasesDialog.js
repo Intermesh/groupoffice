@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: AliasesDialog.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: AliasesDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -25,10 +25,10 @@ GO.email.AliasesDialog = function(config){
 	config.width=500;
 	config.height=400;
 	config.closeAction='hide';
-	config.title= GO.email.lang.aliases;					
+	config.title= t("Aliases", "email");					
 	config.items=this.aliasesGrid;
 	config.buttons=[{
-		text: GO.lang.cmdClose,
+		text: t("Close"),
 		handler: function(){this.hide();},
 		scope:this
 	}];

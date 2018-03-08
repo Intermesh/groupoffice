@@ -20,7 +20,7 @@ GO.ExportQueryDialog = Ext.extend(Ext.Window, {
 			inputValue : 'pdf_export_query',
 			supportsOrientation:true
 		}, {
-			boxLabel : GO.lang.toScreen,
+			boxLabel : t("To screen"),
 			name : 'type',
 			inputValue : 'html_export_query'
 		},
@@ -43,7 +43,7 @@ GO.ExportQueryDialog = Ext.extend(Ext.Window, {
 
 
 		if(!this.title)
-			this.title = GO.lang.cmdExport;
+			this.title = t("Export");
 		
 		Ext.apply(this, {
 			
@@ -58,7 +58,7 @@ GO.ExportQueryDialog = Ext.extend(Ext.Window, {
 			height : 400,
 			width : 400,
 			buttons : [{
-				text : GO.lang.strEmail,
+				text : t("E-mail"),
 				handler : function() {
 					this.hide();
 
@@ -70,7 +70,7 @@ GO.ExportQueryDialog = Ext.extend(Ext.Window, {
 				},
 				scope : this
 			}, {
-				text : GO.lang.download,
+				text : t("Download"),
 				handler : function() {
 
 					this.beforeRequest();
@@ -108,7 +108,7 @@ GO.ExportQueryDialog = Ext.extend(Ext.Window, {
 				},
 				scope : this
 			}, {
-				text : GO.lang['cmdClose'],
+				text : t("Close"),
 				handler : function() {
 					this.hide();
 				},
@@ -126,7 +126,7 @@ GO.ExportQueryDialog = Ext.extend(Ext.Window, {
 	formPanelItems : [{
 		autoHeight : true,
 		xtype : 'radiogroup',
-		fieldLabel : GO.lang.strType,
+		fieldLabel : t("Type"),
 		listeners:{
 			scope:this,
 			change:function(group, checkedRadio){
@@ -139,16 +139,16 @@ GO.ExportQueryDialog = Ext.extend(Ext.Window, {
 		xtype:'checkbox',
 		name:'export_hidden',
 		hideLabel:true,
-		boxLabel:GO.lang.exportHiddenColumns
+		boxLabel:t("Export hidden columns too")
 	},this.orientationCombo = new GO.form.ComboBox({
 		xtype:'combo',
 		disabled:true,
-		fieldLabel : GO.lang.orientation,
+		fieldLabel : t("Orientation"),
 		hiddenName : 'orientation',
 		store : new Ext.data.SimpleStore({
 			fields : ['value', 'text'],
-			data : [['L', GO.lang.landscape],
-			['P', GO.lang.portrait]]
+			data : [['L', t("Landscape")],
+			['P', t("Portrait")]]
 
 		}),
 		value : 'landscape',

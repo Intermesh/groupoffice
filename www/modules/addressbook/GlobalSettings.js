@@ -2,20 +2,20 @@ GO.moduleManager.on('moduleconstructed',function(mm,moduleName,panel){
 	if(moduleName=='settings'){
 
 		var fieldset =new Ext.form.FieldSet({
-			title:GO.addressbook.lang.addressbook,
+			title:t("Address book", "addressbook"),
 			items:[{
 				xtype:'textfield',
 				name:'addressbook_name_template',
-				fieldLabel:GO.addressbook.lang.globalsettings_templatelabel,
+				fieldLabel:t("Template", "addressbook"),
 				width: 300
 			}
 //			,{
 //				xtype:'checkbox',
 //				name:'change_all_addressbook_names',
-//				fieldLabel:GO.addressbook.lang.globalsettings_allchangelabel,
+//				fieldLabel:t("Change all?", "addressbook"),
 //				listeners: {
 //	  			 "check": function(cb, isenabled) {
-//						if(isenabled && !confirm(GO.addressbook.lang.globalsettings_renameall))
+//						if(isenabled && !confirm(t("Rename all?", "addressbook")))
 //							cb.setValue(false);
 //					},
 //					scope:this

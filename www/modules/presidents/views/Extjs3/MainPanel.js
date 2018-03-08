@@ -35,7 +35,7 @@ GO.presidents.MainPanel = function(config){
 			items: [
 				{
 					iconCls: 'btn-add',							
-					text: GO.lang['cmdAdd'],
+					text: t("Add"),
 					cls: 'x-btn-text-icon',
 					handler: function(){					
 						this.centerPanel.showEditDialog();
@@ -44,7 +44,7 @@ GO.presidents.MainPanel = function(config){
 				},
 				{
 					iconCls: 'btn-delete',
-					text: GO.lang['cmdDelete'],
+					text: t("Delete"),
 					cls: 'x-btn-text-icon',
 					handler: function(){
 						this.centerPanel.deleteSelected();
@@ -85,7 +85,7 @@ GO.linkHandlers["GO\\Presidents\\Model\\President"]=function(id){
 	if(!GO.presidents.linkWindow){
 		var presidentPanel = new GO.presidents.PresidentPanel();
 		GO.presidents.linkWindow= new GO.LinkViewWindow({
-			title: GO.presidents.lang.president,
+			title: t("President", "presidents"),
 			items: presidentPanel,
 			presidentPanel: presidentPanel,
 			closeAction:"hide"

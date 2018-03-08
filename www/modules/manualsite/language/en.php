@@ -1,3 +1,5 @@
 <?php
-$l['name']='Manual site';
-$l['description']='A website template for creating manuals';
+return array (
+  'name' => 'Manual site',
+  'description' => 'A website template for creating manuals',
+);

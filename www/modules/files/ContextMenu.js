@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: ContextMenu.js 20093 2016-06-09 09:34:40Z mschering $
+ * @version $Id: ContextMenu.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -21,7 +21,7 @@ GO.files.FilesContextMenu = function(config)
 	config['minWidth']=180;
 	
 	this.openButton = new Ext.menu.Item({
-		text: GO.files.lang.open,
+		text: t("Open", "files"),
 		iconCls: 'btn-edit',
 		cls: 'x-btn-text-icon',
 		handler: function(){
@@ -36,7 +36,7 @@ GO.files.FilesContextMenu = function(config)
 
 	this.downloadButton = new Ext.menu.Item({
 		iconCls: 'btn-save',
-		text: GO.lang.download,
+		text: t("Download"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			window.open(GO.url("files/file/download",{id:this.records[0].data.id,inline:false}));
@@ -45,7 +45,7 @@ GO.files.FilesContextMenu = function(config)
 	});
 	
 	this.openWithButton = new Ext.menu.Item({
-		text: GO.files.lang.openWith,
+		text: t("Open with", "files"),
 		iconCls: 'btn-edit',
 		cls: 'x-btn-text-icon',
 		handler: function(){
@@ -71,7 +71,7 @@ GO.files.FilesContextMenu = function(config)
 
 	this.deleteButton = new Ext.menu.Item({
 		iconCls: 'btn-delete',
-		text: GO.lang['cmdDelete'],
+		text: t("Delete"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			this.fireEvent('delete', this, this.records, this.clickedAt);
@@ -81,7 +81,7 @@ GO.files.FilesContextMenu = function(config)
 	
 	this.batchEditButton = new Ext.menu.Item({
 		iconCls: 'btn-edit',
-		text: GO.files.lang.editSelection,
+		text: t("Edit selection", "files"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			this.fireEvent('batchEdit', this, this.records, this.clickedAt);
@@ -91,7 +91,7 @@ GO.files.FilesContextMenu = function(config)
 
 	this.cutButton= new Ext.menu.Item({
 		iconCls: 'btn-cut',
-		text: GO.lang.cut,
+		text: t("Cut"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			this.fireEvent('cut', this, this.records, this.clickedAt);
@@ -100,7 +100,7 @@ GO.files.FilesContextMenu = function(config)
 	});
 	this.copyButton = new Ext.menu.Item({
 		iconCls: 'btn-copy',
-		text: GO.lang.copy,
+		text: t("Copy"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			this.fireEvent('copy', this, this.records, this.clickedAt);
@@ -111,7 +111,7 @@ GO.files.FilesContextMenu = function(config)
 
 	this.lockButton = new Ext.menu.Item({
 		iconCls: 'btn-lock',
-		text: GO.files.lang.lock,
+		text: t("Lock", "files"),
 		cls: 'x-btn-text-icon',
 		scope:this,
 		handler: function(){
@@ -143,7 +143,7 @@ GO.files.FilesContextMenu = function(config)
 
 	this.unlockButton = new Ext.menu.Item({
 		iconCls: 'btn-unlock',
-		text: GO.files.lang.unlock,
+		text: t("Unlock", "files"),
 		cls: 'x-btn-text-icon',
 		scope:this,
 		handler: function(){
@@ -173,7 +173,7 @@ GO.files.FilesContextMenu = function(config)
 
 	this.bookmarkButton = new Ext.menu.Item({
 		iconCls: 'btn-copy',
-		text: GO.files.lang['bookmarkFolder'],
+		text: t("Add to favorites", "files"),
 		cls: 'x-btn-text-icon',
 		scope:this,
 		handler: function(){
@@ -193,7 +193,7 @@ GO.files.FilesContextMenu = function(config)
 
 	this.compressButton = new Ext.menu.Item({
 		iconCls: 'btn-compress',
-		text: GO.lang.compress,
+		text: t("Compress"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			this.fireEvent('compress', this, this.records, this.clickedAt);
@@ -202,7 +202,7 @@ GO.files.FilesContextMenu = function(config)
 	});
 	this.decompressButton = new Ext.menu.Item({
 		iconCls: 'btn-decompress',
-		text: GO.lang.decompress,
+		text: t("Decompress"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			this.fireEvent('decompress', this, this.records, this.clickedAt);
@@ -218,7 +218,7 @@ GO.files.FilesContextMenu = function(config)
 
 	config['items'].push({
 		iconCls: 'btn-properties',
-		text: GO.lang['strProperties'],
+		text: t("Properties"),
 		handler: function(){
 			this.fireEvent('properties', this, this.records);
 		},
@@ -240,7 +240,7 @@ GO.files.FilesContextMenu = function(config)
 
 	this.createDownloadLinkButton = new Ext.menu.Item({
 		iconCls: 'btn-save',
-		text: GO.files.lang.createDownloadLink,
+		text: t("Create download link", "files"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			this.fireEvent('download_link', this, this.records, this.clickedAt, false);
@@ -249,10 +249,10 @@ GO.files.FilesContextMenu = function(config)
 	});
 	config['items'].push(this.createDownloadLinkButton);
 
-	if(GO.email) {
+	if(go.ModuleManager.isAvailable("email")) {
 		this.downloadLinkButton = new Ext.menu.Item({
 			iconCls: 'btn-email',
-			text: GO.files.lang.emailDownloadLink,
+			text: t("Email download link", "files"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 				this.fireEvent('download_link', this, this.records, this.clickedAt, true);
@@ -263,7 +263,7 @@ GO.files.FilesContextMenu = function(config)
 
 		this.emailFilesButton = new Ext.menu.Item({
 			iconCls: 'em-btn-email-files',
-			text: GO.email.lang.emailFiles,
+			text: t("Email files", "email"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 				this.fireEvent('email_files', this, this.records);
@@ -276,7 +276,7 @@ GO.files.FilesContextMenu = function(config)
 	// Download selected (As Zip)
 	this.downloadSelectedFilesButton = new Ext.menu.Item({
 			iconCls: 'filetype-zip',
-			text: GO.files.lang.downloadSelected,
+			text: t("Download selected", "files"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 				this.fireEvent('download_selected', this, this.records, this.clickedAt);

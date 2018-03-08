@@ -42,14 +42,12 @@ Ext.calendar.EventMappings = {
     StartDate: {
         name: 'StartDate',
         mapping: 'start',
-        type: 'date',
-        dateFormat: GO.settings.date_format + ' ' + GO.settings.time_format
+        type: 'date'
     },
     EndDate: {
         name: 'EndDate',
         mapping: 'end',
-        type: 'date',
-        dateFormat: GO.settings.date_format + ' ' + GO.settings.time_format
+        type: 'date'        
     },
     Location: {
         name: 'Location',

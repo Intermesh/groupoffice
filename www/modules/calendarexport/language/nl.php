@@ -1,3 +1,5 @@
 <?php
-$l['name'] = 'Agenda Export';
-$l['description'] = 'Export-functionaliteit voor agenda-afspraken.';
+return array (
+  'name' => 'Agenda Export',
+  'description' => 'Export-functionaliteit voor agenda-afspraken.',
+);

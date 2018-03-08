@@ -9,7 +9,7 @@ GO.base.model.ImportDialog = function(config) {
 	this._initDialog(config); // config MUST have parameters 'controllerName' and 'fileType'
 	this._buildForm();
 	
-	config.title = GO.lang.cmdImport;
+	config.title = t("Import");
 	config.layout = 'form';
 	config.defaults = {anchor:'100%'};
 	config.border = false;
@@ -95,7 +95,7 @@ Ext.extend( GO.base.model.ImportDialog, GO.Window, {
 	// Submit form to import the file.
 	_submitForm : function() {
 		if (!this._loadMask)
-			this._loadMask = new Ext.LoadMask(Ext.getBody(), {msg: GO.addressbook.lang.importing+'...'});
+			this._loadMask = new Ext.LoadMask(Ext.getBody(), {msg: t("Importing", "addressbook")+'...'});
 		this._loadMask.show();
 
 		if (this._fieldsDialog)
@@ -125,33 +125,33 @@ Ext.extend( GO.base.model.ImportDialog, GO.Window, {
 				if (!GO.util.empty(response.result.summarylog)) {
 					for (var i=0; i<response.result.summarylog.errors.length; i++) {
 						if (i==0)
-							errorsText = '<br />' + GO.lang.failedImportItems + ':<br />';
-						errorsText = errorsText + GO.lang.item + ' ' + response.result.summarylog.errors[i].name + ': ' +
+							errorsText = '<br />' + t("Failed import items") + ':<br />';
+						errorsText = errorsText + t("item") + ' ' + response.result.summarylog.errors[i].name + ': ' +
 													response.result.summarylog.errors[i].message + '<br />';
 					}
-					//Ext.MessageBox.alert(GO.lang.strError,errorsText);
+					//Ext.MessageBox.alert(t("Error"),errorsText);
 				}
 
 				if (!response.result.success) {
-					Ext.MessageBox.alert(GO.lang.strError,result.feedback);
+					Ext.MessageBox.alert(t("Error"),result.feedback);
 				} else {
 					if (response.result.totalCount){
 						if(response.result.totalCount != response.result.successCount){
 							GO.errorDialog.show(
 								errorsText,
-								GO.addressbook.lang['importSuccessCount']+' '+response.result.successCount+'/'+response.result.totalCount
+								t("Records imported successfully:", "addressbook")+' '+response.result.successCount+'/'+response.result.totalCount
 							);
 						} else {
 							Ext.MessageBox.alert(
 								'',
-								GO.addressbook.lang['importSuccessCount']+' '+response.result.successCount+'/'+response.result.totalCount
+								t("Records imported successfully:", "addressbook")+' '+response.result.successCount+'/'+response.result.totalCount
 								+ errorsText
 							);
 						}
 					}else{
 						Ext.MessageBox.alert(
 							'',
-							GO.addressbook.lang['importSuccess']
+							t("Records imported successfully!", "addressbook")
 							+ errorsText
 						);
 					}
@@ -169,9 +169,9 @@ Ext.extend( GO.base.model.ImportDialog, GO.Window, {
 					var messageText = '';
 					for (var i=0; i<action.result.summarylog.errors.length; i++)
 						messageText = messageText + action.result.summarylog.errors[i].message + '<br />';
-					Ext.MessageBox.alert(GO.lang.strError,messageText);
+					Ext.MessageBox.alert(t("Error"),messageText);
 				} else if (!GO.util.empty(action.result.feedback)) {
-					Ext.MessageBox.alert(GO.lang.strError,action.result.feedback);
+					Ext.MessageBox.alert(t("Error"),action.result.feedback);
 				}
 				this._loadMask.hide();
 			},
@@ -187,7 +187,7 @@ Ext.extend( GO.base.model.ImportDialog, GO.Window, {
 		if (!GO.util.empty(this._possibleUpdateFindAttributes)) {
 			formItems.push({
 				xtype: 'plainfield',
-				value: GO.lang['updateWithMatchingAttributes']+':',
+				value: t("Update items (instead of create new items) with the following matching attributes")+':',
 				hideLabel: true
 			});
 						
@@ -211,7 +211,7 @@ Ext.extend( GO.base.model.ImportDialog, GO.Window, {
 
 		this.txtDelimiter = new Ext.form.TextField({
 			name: 'delimiter',
-			fieldLabel: GO.addressbook.lang.cmdFormLabelValueSeperated,
+			fieldLabel: t("Values separated by", "addressbook"),
 			allowBlank: false,
 			value: GO.settings.list_separator,
 			disabled: this._fileType!='CSV',
@@ -220,7 +220,7 @@ Ext.extend( GO.base.model.ImportDialog, GO.Window, {
 		
 		this.txtEnclosure = new Ext.form.TextField({
 			name: 'enclosure',
-			fieldLabel: GO.addressbook.lang.cmdFormLabelValueIncluded,
+			fieldLabel: t("Values encapsulated by", "addressbook"),
 			allowBlank: false,
 			value: GO.settings.text_separator,
 			disabled: this._fileType!='CSV',
@@ -229,7 +229,7 @@ Ext.extend( GO.base.model.ImportDialog, GO.Window, {
 		
 		this.fileSelector = new GO.form.UploadFile({
 			inputName: 'files',
-			fieldLabel: GO.lang.upload,
+			fieldLabel: t("Upload"),
 			max:1
 		});
 				
@@ -266,7 +266,7 @@ Ext.extend( GO.base.model.ImportDialog, GO.Window, {
 			fileUpload : true,
 			items: formItems,
 			buttons: [{
-				text: GO.lang.cmdImport,
+				text: t("Import"),
 				width: '20%',
 				disabled: this._fileType=='CSV' || this._fileType=='XLS',
 				hidden: this._fileType=='CSV' || this._fileType=='XLS',
@@ -275,7 +275,7 @@ Ext.extend( GO.base.model.ImportDialog, GO.Window, {
 				},
 				scope: this
 			},{
-				text: GO.lang.cmdClose,
+				text: t("Close"),
 				width: '20%',
 				handler: function(){
 					this.hide();
@@ -306,7 +306,7 @@ Ext.extend( GO.base.model.ImportDialog, GO.Window, {
 			},
 			failure: function(form, action) {
 				this.fileSelector.clearQueue();
-				Ext.Msg.alert('UTF-8',GO.lang['selectError']);
+				Ext.Msg.alert('UTF-8',t("Error trying to read the data"));
 			},
 			scope: this
 		});
@@ -314,7 +314,7 @@ Ext.extend( GO.base.model.ImportDialog, GO.Window, {
 	
 	_createAttributesStore : function() {
 		var data = [];
-		data.push(['-','-','< < '+GO.lang.unused+' > >']);
+		data.push(['-','-','< < '+t("Unused")+' > >']);
 		
 		if (!(this._attributesStore)) {
 			this._attributesStore = new Ext.data.ArrayStore({
@@ -338,7 +338,7 @@ Ext.extend( GO.base.model.ImportDialog, GO.Window, {
 					var nameArray = attributeResult.results[i]['name'].split('.');
 					var nameOnly = nameArray[1];
 					if (attributeResult.results[i]['gotype']=='customfield') {
-						if (GO.customfields)
+						if(go.ModuleManager.isAvailable("customfields"))
 							data.push([nameOnly,attributeResult.results[i]['name'],attributeResult.results[i]['label']]);
 					} else {
 						data.push([nameOnly,attributeResult.results[i]['name'],attributeResult.results[i]['label']]);
@@ -425,12 +425,12 @@ Ext.extend( GO.base.model.ImportDialog, GO.Window, {
 				height: 400,
 				width: 400,
 				modal:true,
-				title: GO.addressbook.lang.matchFields,
+				title: t("Match the fields", "addressbook"),
 				items: [
 				this.importFieldsFormPanel
 				],
 				buttons: [{
-					text: GO.lang['cmdImport'],
+					text: t("Import"),
 					handler: function() {
 						this._rememberFieldMappings();
 						this._submitForm();
@@ -439,7 +439,7 @@ Ext.extend( GO.base.model.ImportDialog, GO.Window, {
 					},
 					scope: this
 				},{
-					text: GO.lang['cmdCancel'],
+					text: t("Cancel"),
 					handler: function(){
 						this._fieldsDialog.hide();
 						this.hide();

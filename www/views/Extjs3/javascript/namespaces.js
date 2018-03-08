@@ -6,13 +6,14 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: namespaces.js 16414 2013-12-05 13:13:44Z mschering $
+ * @version $Id: namespaces.js 22359 2018-02-11 19:11:59Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
  
 Ext.namespace("GO");
 Ext.namespace("GO.form");
+Ext.namespace("GO.util");
 Ext.namespace('GO.plugins');
 Ext.namespace("GO.grid");
 Ext.namespace("GO.panel");
@@ -36,10 +37,15 @@ Ext.namespace("GO.panels");
 //An object of functions that open a particular link.
 //the index is the link type and the function gets the id as a parameter
 GO.linkHandlers={};
-GO.linkPreviewPanels={};
+//GO.linkPreviewPanels={};
 
 //Will be filled by modules with menu items for the new menu in various panels.
 GO.newMenuItems=[];
+
+
+Ext.namespace("GO.customfields");
+GO.customfields.types={};
+GO.customfields.columns={};
 
 
 //GO.settings = Ext.decode(GO.settings);

@@ -14,11 +14,6 @@ GO.tasks.TaskListsGrid = function(config){
 	Ext.apply(config, {
 		allowNoSelection:true,
 		bbar: new GO.SmallPagingToolbar({
-			items:[this.searchField = new GO.form.SearchField({
-				store: config.store,
-				width:120,
-				emptyText: GO.lang.strSearch
-			})],
 			store:config.store,
 			pageSize:GO.settings.config.nav_page_size
 		})

@@ -247,14 +247,14 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 		if(isset($quota['usage'])) {
 			if(!empty($quota['limit'])) {
 				$percentage = ceil($quota['usage']*100/$quota['limit']);
-				$usage = sprintf(\GO::t('usage_limit','email'), $percentage.'%', \GO\Base\Util\Number::formatSize($quota['limit']*1024));
+				$usage = sprintf(\GO::t("%s of %s used", "email"), $percentage.'%', \GO\Base\Util\Number::formatSize($quota['limit']*1024));
 				
 				$round5 = floor($quota['usage']/5)*5;
-
+				
 				$usage='<span class="em-usage-'.$round5.'">'.$usage.'</span>';
 
 			}	else {
-				$usage = sprintf(\GO::t('usage','email'), \GO\Base\Util\Number::formatSize($quota['usage']*1024));
+				$usage = sprintf(\GO::t("%s used", "email"), \GO\Base\Util\Number::formatSize($quota['usage']*1024));
 			}
 		}
 		//var_dump($usage);
@@ -304,7 +304,7 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 							'isAccount'=>true,
 							'permission_level'=>$account->getPermissionLevel(),
 							'hasError'=>false,
-							'iconCls' => 'folder-account',
+							'iconCls' => 'ic-account-box',
 							'expanded' => $this->_isExpanded($nodeId),
 							'noselect' => false,
 							'account_id' => $account->id,
@@ -328,10 +328,10 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 //						//$this->_checkImapConnectException($e,$node);
 //						$node['isAccount'] = false;
 //						$node['hasError'] = true;
-//						$node['text'] .= ' ('.\GO::t('error').')';
+//						$node['text'] .= ' ('.\GO::t("Error").')';
 //						$node['children']=array();
 //						$node['expanded']=true;
-//						$node['qtipCfg'] = array('title'=>\GO::t('error'), 'text' =>htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8'));	
+//						$node['qtipCfg'] = array('title'=>\GO::t("Error"), 'text' =>htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8'));	
 //					}
 
 					$response[] = $node;
@@ -364,10 +364,10 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 //		if (strpos($e->getMessage(),'Authentication failed')==0) {
 //			$node['isAccount'] = false;
 //			$node['hasError'] = true;
-//			$node['text'] .= ' ('.\GO::t('error').')';
+//			$node['text'] .= ' ('.\GO::t("Error").')';
 //			$node['children']=array();
 //			$node['expanded']=true;
-//			$node['qtipCfg'] = array('title'=>\GO::t('error'), 'text' =>htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8'));	
+//			$node['qtipCfg'] = array('title'=>\GO::t("Error"), 'text' =>htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8'));	
 //		} else {
 //			throw $e;
 //		}
@@ -397,7 +397,7 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 
 			if(!$fetchAllWithSubscribedFlag){
 				if ($mailbox->unseen > 0) {
-					$text .= '&nbsp;<span class="em-folder-status" id="status_' . $nodeId . '">(' . $mailbox->unseen . ')</span>';
+					$text .= '&nbsp;<span class="em-folder-status" id="status_' . $nodeId . '">' . $mailbox->unseen . '</span>';
 				} else {
 					$text .= '&nbsp;<span class="em-folder-status" id="status_' . $nodeId . '"></span>';
 				}
@@ -407,12 +407,19 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 
 //			$children = $this->_getMailboxTreeNodes($mailbox->getChildren());
 
+			$cls = $mailbox->noselect==1 ? 'em-tree-node-noselect' : "";
+			
+			if($mailbox->unseen > 0 ) {
+				$cls .= ' ml-folder-unseen';
+			}
+			
 			$node = array(
+					'cls' => $cls,
 					'text' => $text,
 					'mailbox' => $mailbox->name,
 					'name' => $mailbox->getDisplayName(), // default value when renaming folder
 					'account_id' => $mailbox->getAccount()->id,
-					'iconCls' => 'folder-default',
+					'iconCls' => 'ic-folder-open',
 					'id' => $nodeId,
 					'draggable'=>$mailbox->getAccount()->getPermissionLevel() > \GO\Base\Model\Acl::READ_PERMISSION,
 					'permission_level'=>$mailbox->getAccount()->getPermissionLevel(),
@@ -421,16 +428,11 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 					'noinferiors' => $mailbox->noinferiors,
 					'children' => !$mailbox->haschildren ? array() : null,
 					'expanded' => !$mailbox->haschildren,
-					'permittedFlags' => $mailbox->areFlagsPermitted(),
-//					'usage'=>'',
-//					'acl_supported'=>false,
-					'cls'=>$mailbox->noselect==1 ? 'em-tree-node-noselect' : ""
-							//'children'=>$children,
-							//'expanded' => !count($children),
+					'permittedFlags' => $mailbox->areFlagsPermitted()
 			);
-
+			
 			if (!$fetchAllWithSubscribedFlag && $mailbox->unseen > 0) {
-				$node['cls'] .= ' ml-folder-unseen';
+				$node['iconCls'] .= ' ic-folder';
 			}
 
 //			\GO::debug($node);
@@ -455,25 +457,25 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 
 			switch ($mailbox->name) {
 				case 'INBOX':
-					$node['iconCls'] = 'email-folder-inbox';
+					$node['iconCls'] = 'ic-inbox';
 					$sortIndex = 0;
 					break;
 				case $mailbox->getAccount()->sent:
-					$node['iconCls'] = 'email-folder-sent';
+					$node['iconCls'] = 'ic-send';
 					$sortIndex = 1;
 					break;
 				case $mailbox->getAccount()->trash:
-					$node['iconCls'] = 'email-folder-trash';
+					$node['iconCls'] = 'ic-delete';
 					$sortIndex = 3;
 					break;
 				case $mailbox->getAccount()->drafts:
-					$node['iconCls'] = 'email-folder-drafts';
+					$node['iconCls'] = 'ic-drafts';
 					$sortIndex = 2;
 					break;
 				case 'INBOX/Spam':
 				case 'INBOX.Spam':
 				case 'Spam':
-					$node['iconCls'] = 'email-folder-spam';
+					$node['iconCls'] = 'ic-new-releases';
 					$sortIndex = 4;
 					break;
 			}

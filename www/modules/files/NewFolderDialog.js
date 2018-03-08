@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: NewFolderDialog.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: NewFolderDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -17,9 +17,9 @@ GO.files.NewFolderDialog = function(config){
 	}
 	
 	this.newFolderNameField = new Ext.form.TextField({	              	
-		fieldLabel: GO.lang['strName'],
+		fieldLabel: t("Name"),
 		name: 'name',
-		value: GO.files.lang.newFolder,
+		value: t("New folder", "files"),
 		allowBlank:false,
 		anchor:'100%',
 		validator:function(v){
@@ -58,16 +58,16 @@ GO.files.NewFolderDialog = function(config){
 	config.autoHeight=true;
 	config.closeAction='hide';
 	config.focus=focusName.createDelegate(this);
-	config.title= GO.files.lang.addFolder;		
+	config.title= t("Add folder", "files");		
 	config.buttons= [{
-		text: GO.lang['cmdOk'],
+		text: t("Ok"),
 		handler: function(){	
 			this.submitForm();						
 		},
 		scope:this
 	},
 	{
-		text: GO.lang['cmdClose'],
+		text: t("Close"),
 		handler: function(){
 			this.hide();
 		},
@@ -86,7 +86,7 @@ Ext.extend(GO.files.NewFolderDialog, Ext.Window,{
 		this.newFolderFormPanel.form.submit({
 										
 			url: GO.url('files/folder/submit'),
-			waitMsg:GO.lang['waitMsgSave'],
+			waitMsg:t("Saving..."),
 			success:function(form, action){								
 				this.fireEvent('save', action.result);															
 				this.hide();
@@ -96,13 +96,13 @@ Ext.extend(GO.files.NewFolderDialog, Ext.Window,{
 				var error = '';
 				if(action.failureType=='client')
 				{
-					error = GO.lang['strErrorsInForm'];
+					error = t("You have errors in your form. The invalid fields are marked.");
 				}else
 				{
 					error = action.result.feedback;
 				}
 								
-				Ext.MessageBox.alert(GO.lang['strError'], error);
+				Ext.MessageBox.alert(t("Error"), error);
 			},
 			scope:this
 							

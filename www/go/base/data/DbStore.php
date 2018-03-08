@@ -459,7 +459,7 @@ class DbStore extends AbstractStore {
 			$error_string = '';
 			foreach($errors as $error)
 				$error_string .= implode("<br>", $error)."<br>";
-			$this->response['deleteFeedback'] = str_replace("{count}", count($errors), \GO::t('deleteErrors')) . "<br><br>" . $error_string;
+			$this->response['deleteFeedback'] = str_replace("{count}", count($errors), \GO::t("Errors occured while trying to delete {count} records")) . "<br><br>" . $error_string;
 		}
 		return empty($errors);
 	}

@@ -6,7 +6,7 @@ GO.addressbook.ContactProfilePanel = function(config)
 		if(!config.forUser){		
 			this.formFirstName = new Ext.form.TextField(
 			{
-				fieldLabel: GO.lang['strFirstName'],
+				fieldLabel: t("First name"),
 				name: 'first_name',
 				panel: this,
 				validateValue: function(val) {
@@ -24,13 +24,13 @@ GO.addressbook.ContactProfilePanel = function(config)
 
 			this.formMiddleName = new Ext.form.TextField(
 			{
-				fieldLabel: GO.lang.strMiddleName,
+				fieldLabel: t("Middle name"),
 				name: 'middle_name'
 			});
 
 			this.formLastName = new Ext.form.TextField(
 			{
-				fieldLabel: GO.lang.strLastName,
+				fieldLabel: t("Last name"),
 				name: 'last_name',
 				panel: this,
 				validateValue: function(val) {
@@ -49,30 +49,30 @@ GO.addressbook.ContactProfilePanel = function(config)
 	
 		this.formTitle = new Ext.form.TextField(
 		{
-			fieldLabel: GO.lang.strTitle,
+			fieldLabel: t("Title"),
 			name: 'title'
 		});
 		
 		this.formAfternameTitle = new Ext.form.TextField(
 		{
-			fieldLabel: GO.lang.strSuffix,
+			fieldLabel: t("Suffix"),
 			name: 'suffix'
 		});
 	
 		this.formInitials = new Ext.form.TextField(
 		{
-			fieldLabel: GO.lang.strInitials,
+			fieldLabel: t("Initials"),
 			name: 'initials'
 		});
 	
 		this.sexCombo = new GO.form.ComboBox({
-			fieldLabel: GO.lang.strSex,
+			fieldLabel: t("Sex"),
 			hiddenName:'sex',
 			store: new Ext.data.SimpleStore({
 				fields: ['value', 'text'],
 				data : [
-				['M', GO.lang['strMale']],
-				['F', GO.lang['strFemale']]
+				['M', t("Male")],
+				['F', t("Female")]
 				]
         
 			}),
@@ -88,12 +88,12 @@ GO.addressbook.ContactProfilePanel = function(config)
 
 		this.formSalutation = new Ext.form.TextField(
 		{
-			fieldLabel: GO.addressbook.lang['cmdFormLabelSalutation'],
+			fieldLabel: t("Salutation", "addressbook"),
 			name: 'salutation'
 		});
 	
 		this.formBirthday = new Ext.form.DateField({
-			fieldLabel: GO.lang['strBirthday'],
+			fieldLabel: t("Birthday"),
 			name: 'birthday',
 			format: GO.settings['date_format']
 		});
@@ -101,7 +101,7 @@ GO.addressbook.ContactProfilePanel = function(config)
 		if(!config.forUser){
 			this.formEmail = new Ext.form.TextField(
 			{
-				fieldLabel: GO.lang['strEmail'],
+				fieldLabel: t("E-mail"),
 				name: 'email',
 				vtype:'emailAddress'
 
@@ -110,45 +110,45 @@ GO.addressbook.ContactProfilePanel = function(config)
 	
 		this.formEmail2 = new Ext.form.TextField(
 		{
-			fieldLabel: GO.lang['strEmail'] + ' 2',
+			fieldLabel: t("E-mail") + ' 2',
 			name: 'email2',
 			vtype:'emailAddress'
 		});
 	
 		this.formEmail3 = new Ext.form.TextField(
 		{
-			fieldLabel: GO.lang['strEmail'] + ' 3',
+			fieldLabel: t("E-mail") + ' 3',
 			name: 'email3',
 			vtype:'emailAddress'
 		});
 	
 		this.formHomePhone = new Ext.form.TextField(
 		{
-			fieldLabel: GO.addressbook.lang['contactHome_phone'],
+			fieldLabel: t("Phone (Home)", "addressbook"),
 			name: 'home_phone'
 		});
 	
 		this.formFax = new Ext.form.TextField(
 		{
-			fieldLabel: GO.addressbook.lang['contactFax'],
+			fieldLabel: t("Fax (Home)", "addressbook"),
 			name: 'fax'
 		});
 	
 		this.formCellular = new Ext.form.TextField(
 		{
-			fieldLabel: GO.lang['strCellular'],
+			fieldLabel: t("Mobile"),
 			name: 'cellular'
 		});
 		
 		this.formCellular2 = new Ext.form.TextField(
 		{
-			fieldLabel: GO.lang['cellular2'],
+			fieldLabel: t("2nd mobile"),
 			name: 'cellular2'
 		});
 		
 		this.formHomepage = new Ext.form.TextField(
 		{
-			fieldLabel: GO.lang['strHomepage'],
+			fieldLabel: t("Homepage"),
 			name: 'homepage'
 		});
 	
@@ -156,7 +156,7 @@ GO.addressbook.ContactProfilePanel = function(config)
 	
 		this.formAddress = new Ext.form.TextArea(
 		{
-			fieldLabel: GO.lang['strAddress'],
+			fieldLabel: t("Address"),
 			name: 'address',
 			height: 50,
 			maxLength: 255
@@ -164,30 +164,30 @@ GO.addressbook.ContactProfilePanel = function(config)
 	
 		this.formAddressNo = new Ext.form.TextField(
 		{
-			fieldLabel: GO.lang['strAddressNo'],
+			fieldLabel: t("Address 2"),
 			name: 'address_no'
 		});
 	
 		this.formPostal = new Ext.form.TextField(
 		{
-			fieldLabel: GO.lang['strZip'],
+			fieldLabel: t("ZIP/Postal"),
 			name: 'zip'
 		});
 
 		this.formCity = new Ext.form.TextField(
 		{
-			fieldLabel: GO.lang['strCity'],
+			fieldLabel: t("City"),
 			name: 'city'
 		});
 
 		this.formState = new Ext.form.TextField(
 		{
-			fieldLabel: GO.lang['strState'],
+			fieldLabel: t("State"),
 			name: 'state'
 		});
 	
 		this.formCountry = new GO.form.SelectCountry({
-			fieldLabel: GO.lang['strCountry'],
+			fieldLabel: t("Country"),
 			name: 'country_text',
 			hiddenName: 'country'
 		});
@@ -195,40 +195,40 @@ GO.addressbook.ContactProfilePanel = function(config)
 
 
 		this.formCompany = new GO.addressbook.SelectCompany({
-			fieldLabel: GO.lang['strCompany'],
+			fieldLabel: t("Company"),
 			name: 'company',
 			hiddenName: 'company_id',
-			emptyText: GO.addressbook.lang['cmdFormCompanyEmptyText'],
+			emptyText: t("Please select a company", "addressbook"),
 			addressbook_id: this.addressbook_id
 		});
 	
 		this.formDepartment = new Ext.form.TextField(
 		{
-			fieldLabel: GO.lang['strDepartment'],
+			fieldLabel: t("Department"),
 			name: 'department'
 		});
 
 		this.formFunction = new Ext.form.TextField(
 		{
-			fieldLabel: GO.lang['strFunction'],
+			fieldLabel: t("Function"),
 			name: 'function'
 		});
 
 		this.formWorkPhone = new Ext.form.TextField(
 		{
-			fieldLabel: GO.lang['strWorkPhone'],
+			fieldLabel: t("Phone (work)"),
 			name: 'work_phone'
 		});	
 
 		this.formWorkFax = new Ext.form.TextField(
 		{
-			fieldLabel: GO.lang['strWorkFax'],
+			fieldLabel: t("Fax (work)"),
 			name: 'work_fax'
 		});
 
 
 		this.formAddressBooks = new GO.addressbook.SelectAddressbook({
-			fieldLabel: GO.addressbook.lang['cmdFormLabelAddressBooks'],
+			fieldLabel: t("Address Book", "addressbook"),
 			store: GO.addressbook.writableAddressbooksStore,			
 			selectOnFocus:true,
 			forceSelection: true,
@@ -239,7 +239,7 @@ GO.addressbook.ContactProfilePanel = function(config)
 		if(!config.forUser){
 			this.formAddressBooks.on('beforeselect', function(combo, record)
 			{
-				if(this.formCompany.getValue()==0 || confirm(GO.addressbook.lang.moveAll))
+				if(this.formCompany.getValue()==0 || confirm(t("The company and all employees will also be moved to the new address book. Are you sure you want to do this?", "addressbook")))
 				{
 					this.setAddressbookID(record.data.id);
 					this.setSalutation();
@@ -296,7 +296,7 @@ GO.addressbook.ContactProfilePanel = function(config)
 		this.addressbookFieldset = new Ext.form.FieldSet(
 		{
 			xtype: 'fieldset',
-			title: GO.addressbook.lang['cmdFieldsetSelectAddressbook'],
+			title: t("Select address book", "addressbook"),
 			collapsed: false,
 			items: this.formAddressBooks
 		});
@@ -305,7 +305,7 @@ GO.addressbook.ContactProfilePanel = function(config)
 		this.personalFieldset = new Ext.form.FieldSet(
 		{
 			xtype: 'fieldset',
-			title: GO.addressbook.lang['cmdFieldsetPersonalDetails'],
+			title: t("Personal details", "addressbook"),
 			collapsed: false,
 			defaults: {
 				border: false,
@@ -328,7 +328,7 @@ GO.addressbook.ContactProfilePanel = function(config)
 		this.addressFieldset = new Ext.form.FieldSet(
 		{
 			xtype: 'fieldset',
-			title: GO.addressbook.lang['cmdFieldsetAddress'],
+			title: t("Address", "addressbook"),
 			collapsed: false,
 			defaults: {
 				border: false,
@@ -340,7 +340,7 @@ GO.addressbook.ContactProfilePanel = function(config)
 		this.contactFieldset =new Ext.form.FieldSet(
 		{
 			xtype: 'fieldset',
-			title: GO.addressbook.lang['cmdFieldsetContact'],
+			title: t("Contact details", "addressbook"),
 			collapsed: false,
 			defaults: {
 				border: false,
@@ -359,7 +359,7 @@ GO.addressbook.ContactProfilePanel = function(config)
 		this.workFieldset = new Ext.form.FieldSet(
 		{
 			xtype: 'fieldset',
-			title: GO.addressbook.lang['cmdFieldsetWork'],
+			title: t("Work", "addressbook"),
 			collapsed: false,
 			defaults: {
 				border: false,
@@ -370,7 +370,7 @@ GO.addressbook.ContactProfilePanel = function(config)
   
 		this.actionDateFieldset = new Ext.form.FieldSet({
 			collapsed: false,
-			title: GO.lang.other,
+			title: t("Other"),
 			defaults: {
 				border: false,
 				anchor: '100%'
@@ -380,10 +380,10 @@ GO.addressbook.ContactProfilePanel = function(config)
 					name : 'action_date',
 					format : GO.settings['date_format'],
 					allowBlank : true,
-					fieldLabel: GO.addressbook.lang['actionDate']
+					fieldLabel: t("Action date", "addressbook")
 				}),
 				this.colorField = new GO.form.ColorField({
-					fieldLabel : GO.lang.color,
+					fieldLabel : t("Color"),
 					value : "FFFFFF",
 					width:200,
 					name : 'color',
@@ -535,7 +535,7 @@ GO.addressbook.ContactProfilePanel = function(config)
 		leftColItems.push(this.personalFieldset,this.workFieldset,this.actionDateFieldset);
 		
 	
-		this.title= GO.addressbook.lang['cmdPanelContact'];
+		this.title= t("Contact details", "addressbook");
 		this.autoScroll=true;
 		this.layout= 'column';
 		this.labelWidth=125;
@@ -601,7 +601,7 @@ Ext.extend(GO.addressbook.ContactProfilePanel, Ext.Panel,{
 		this.formCompany.store.baseParams['addressbook_id'] = addressbook_id;
 		this.formCompany.clearLastSearch();
 
-//		if (GO.customfields) {
+//		if(go.ModuleManager.isAvailable("customfields")) {
 //			var allowed_cf_categories = this.formAddressBooks.store.getById(addressbook_id).data.allowed_cf_categories.split(',');
 //			GO.addressbook.contactDialog.updateCfTabs(allowed_cf_categories);
 //		}

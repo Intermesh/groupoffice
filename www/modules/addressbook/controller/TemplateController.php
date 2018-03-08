@@ -121,7 +121,7 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 		$store->addRecord(array(
 			'group' => 'templates',
 			'checked'=>isset($this->_defaultTemplate->template_id) && $this->_defaultTemplate->template_id==0,
-			'text' => \GO::t('none'),
+			'text' => \GO::t("None"),
 			'template_id'=>0
 		));
 		
@@ -172,7 +172,7 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 		$response = $store->getData();
 			
 		$response['total']++;
-		$response['results'][] = array('id'=>-1,'name'=>'-- '.\GO::t('userDefaultTemplate','addressbook').' --','group'=>'','text'=>'','template_id'=>'','checked'=>false);
+		$response['results'][] = array('id'=>-1,'name'=>'-- '.\GO::t("User default template", "addressbook").' --','group'=>'','text'=>'','template_id'=>'','checked'=>false);
 		return $response;
 	}
 	

@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: TasklistOverrides.js 16391 2013-12-03 10:01:29Z wsmits $
+ * @version $Id: TasklistOverrides.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
@@ -37,7 +37,7 @@ GO.moduleManager.onModuleReady('tasks',function(){
 //			this.contextMenu = new Ext.menu.Menu({
 //				items: [{	
 //					id: 'addToFavorites',
-//					text: GO.favorites.lang.addToFavorites,
+//					text: t("Add to favorites", "favorites"),
 //					iconCls:'btn-add-to-favorites'
 //				}],
 //				listeners: {

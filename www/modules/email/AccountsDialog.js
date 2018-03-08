@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: AccountsDialog.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: AccountsDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -28,22 +28,12 @@ GO.email.AccountsDialog = function(config){
 	config.modal=false;
 	config.resizable=true;
 	
-	config.width=600;
-	config.height=400;
+	config.width=700;
+	config.height=600;
 	config.closeAction='hide';
-	config.title=GO.email.lang.accounts;	
-
-
-	
-	config.buttons=[{
-		text: GO.lang.cmdClose,
-		handler: function(){this.hide();},
-		scope: this
-	}];
+	config.title=t("Accounts", "email");	
 
 	config.items=this.accountsGrid;
-
-	
 
 	config.listeners={
 		render:function(){

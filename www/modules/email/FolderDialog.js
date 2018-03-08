@@ -15,7 +15,7 @@ GO.email.FolderDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 	initComponent : function(){
 		
 		Ext.apply(this, {
-			title:GO.email.lang.mailbox,
+			title:t("Mail box", "email"),
 			titleField: 'mailboxPath',
 //			goDialogId:'note',
 			height: 160,
@@ -47,7 +47,7 @@ GO.email.FolderDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 				hidden: true
 			}), this.checkUnseenField = new Ext.form.Checkbox({
 				name : 'checkUnseen',
-				boxLabel: GO.email.lang.checkUnseen,
+				boxLabel: t("Automatically check this folder for new messages", "email"),
 				allowBlank: true,
 				hideLabel:true
 			})]

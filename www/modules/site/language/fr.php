@@ -1,171 +1,120 @@
 <?php
-
-$l["name"] = "Gestionnaire de site web";
-$l["description"] = "Nouveau module de CMS.";
-
-$l["content"] = "Contenu";
-$l["site"] = "Site";
-
-$l["meta"] = "Meta";
-$l["metaDescriptionText"] = "Les balises META sont un excellent moyen pour les webmasters de fournir aux moteurs de recherche des informations sur leurs sites.";
-
-$l["info"] = "Info";
-$l["infoDescriptionText"] = "Information sur cet élément de contenu";
-
-$l["siteOptionsDescriptionText"] = "Information sur les options";
-
-
-$l["siteFile"]="Site Fichier";
-$l["siteMultiFile"]="Site Multifichiers";
-
-$l["template"] = "Modèle";
-$l["defaultChildTemplate"] = "Modèlé enfant par défaut";
-$l["templateDescriptionText"] = "Choisissez un modèle dans lequel vous voulez voir apparaître cet élément de contenu";
-
-$l["save"] = "Sauvegarder";
-$l["reload"] = "Recharger";
-$l["advanced"] = "Options avancées";
-$l["options"] = "Options";
-
-$l["addContent"] = "Ajouter du contenu";
-
-$l["deleteContent"] = "Supprimer le contenu";
-$l["deleteContentConfirm"] = "Etes-vous sûr de vouloir supprimer cet élément de contenu ?";
-$l["deleteContentHasChildren"] = "Vous ne pouvez pas supprimer cet élément parce qu'il possède des sous-éléments. Veuillez d\'abord supprimer les sous-éléments.";
-
-$l["deleteSite"] = "Supprimer le site";
-$l["deleteSiteConfirm"] = "Etes-vous sûr de vouloir supprimer ce site";
-
-// Language for model: \GO\Site\Model\Content
-$l["contentId"] = "ID";
-$l["contentUser_id"] = "Utilisateur";
-$l["contentCtime"] = "Créé";
-$l["contentMtime"] = "Modifié";
-$l["contentTitle"] = "Titre";
-$l["contentSlug"] = "Slug";
-$l["contentMeta_title"] = "Meta title";
-$l["contentMeta_description"] = "Meta description";
-$l["contentMeta_keywords"] = "Meta keywords";
-$l["contentContent"] = "Contenu";
-$l["contentStatus"] = "Statut";
-$l["contentParent_id"] = "Parent";
-$l["contentSite_id"] = "Site";
-$l["contentSort_order"] = "Trier";
-
-// Language for model: \GO\Site\Model\Site
-$l["siteId"] = "ID";
-$l["siteName"] = "Nom";
-$l["siteUser_id"] = "Utilisateur";
-$l["siteMtime"] = "Modifié";
-$l["siteCtime"] = "Créé";
-$l["siteDomain"] = "Domaine";
-$l["siteModule"] = "Module";
-$l["siteSsl"] = "SSL";
-$l["siteMod_rewrite"] = "Mod rewrite";
-$l["siteMod_rewrite_base_path"] = "Mod rewrite base path";
-$l["siteBase_path"] = "Base path";
-$l["siteLanguage"] = "Langage";
-$l["siteAcl_id"] = "ACL";
-
-
-$l["multifile"] = "Multi Fichier";
-$l["multifileSelectValue"] = "%s fichier(s)";
-
-// Frontend language
-$l['login'] = 'Login';
-$l['register'] = 'S\'enregistrer';
-$l['signUp'] = 'Se connecter';
-$l['lostPassword'] = 'Mot de passe perdu';
-$l['rememberMe'] = 'Se souvenir de moi';
-$l['forgotPassword'] = 'Vous avez oublié votre mot de passe ?';
-$l['createNewPassword'] = 'Créez un nouveau mot de passe en utilisant votre adresse e-mail';
-$l['passwordChanged'] = 'Mot de passe modifié';
-$l['changePassword'] = 'Changer le mot de passe';
-$l['changePasswordText'] = 'Utilisez le formulaire ci-dessous pour modifier votre mot de passe';
-$l['alreadySignedupText'] = 'Si vous avez déjà un nom d\'utilisateur et un mot de passe, utilisez ce formulaire pour vous identifier.';
-$l['forgotPasswordText'] = 'Entrez votre adresse e-mail dans le formulaire ci-dessous, et vous recevrez un lien pour récupérer votre mot de passe en quelques minutes.';
-$l['submit'] = 'Soumettre';
-$l['noemail'] = 'Aucune adresse e-mail saisie !';
-$l['invalidusertoken'] = 'Le jeton utilisateur saisi n\'est pas valide !';
-$l['invaliduser'] = 'Aucun utilisateur trouvé avec l\'adresse e-mail indiquée !';
-$l['recoverEmailSent'] = 'Un e-mail avec les instructions de récupération a été envoyé à l\'adresse suivante :';
-$l['resetPasswordSuccess'] = 'Votre mot de passe a bien été réinitialisé';
-
-$l["attachFilesPC"]='Ajouter depuis le PC';
-$l["attachFilesGO"]='Ajouter depuis {product_name}';
-
-$l["imageEditor"]='Personnaliser l\'image';
-
-$l["imgWidth"]='Largeur';
-$l["imgHeight"]='Hauteur';
-
-$l["dimensions"]='Dimensions';
-$l["alignment"]='Alignement';
-
-$l["imgZoom"]='Zoom';
-$l["imgCrop"]='Recadrer';
-
-$l["imgAlignmentLeft"]='Gauche';
-$l["imgAlignmentCenter"]='Centrer';
-$l["imgAlignmentRight"]='Droite';
-$l["imgAlignmentInline"]='En ligne';
-
-$l["imgDimensions"]='Dimensions (LxH)';
-
-$l["imgDimensionSmall"]='Petit';
-$l["imgDimensionMedium"]='Moyen';
-$l["imgDimensionLarge"]='Grand';
-$l["imgDimensionCustom"]='Personnalisé';
-$l["imgAlt"]='Texte d\'image Alt';
-
-$l["imageExample"] = "Exemple d\'image";
-
-$l["notImplementedYet"] = "Pas encore implémenté";
-$l["otherOptions"] = "Autres options";
-
-$l["linkEditor"] = "Inserer un lien";
-
-$l["linkTitle"] = "Titre du lien";
-$l["linkToContent"] = "Lien vers un élément de contenu";
-$l["linkToContentText"] = "Lien vers un élément de contenu de ce site. Double-cliquez sur un élément pour le sélectionner.";
-$l["linkToFile"] = "Lien vers un fichier";
-$l["linkToFileText"] = "Lien vers un fichier que vous avez téléchargé sur ce site.";
-$l["linkToUrl"] = "Lien vers un url";
-$l["linkToUrlText"] = "Vous pouvez également saisir votre propre URL. Veuillez vérifier qu\'il commence bien par http:// ou https://";
-$l["url"] = "Url";
-$l["file"] = "Fichier";
-$l["openInNewWindow"] = "Ouvrir dans une nouvelle fenêtre";
-$l["selectFile"] = "Selectionner un fichier";
-
-$l["menus"] = "Menus";
-$l["addMenuItem"] = "Nouvel élément";
-$l["addMenu"] = "Ajouter un menu";
-$l["delete"] = "supprimer";
-$l["properties"] = "Propriétés";
-$l["menuItem"] = "Elément de menu";
-
-$l["deleteMenuHasChildren"] = "L\'élément de menu sélectionné a des enfants et ne peut être supprimé !";
-$l["deleteMenu"] = "supprimer l\'élément de menu";
-$l["deleteMenuConfirm"] = "Voulez-vous vraiment supprimer cet élément de menu ?";
-
-$l["menu"] = "Menu";
-
-$l["menuId"] = "ID";
-$l["menuSite_id"] = "Site";
-$l["menuLabel"] = "Label";
-$l["menuMenu_slug"] = "Slug";
-
-$l["menuitemLabel"] = "Label";
-$l["menuitemMenu_id"] = "Menu";
-$l["menuitemId"] = "ID";
-$l["menuitemParent_id"] = "Parent";
-$l["menuitemContent_id"] = "Contenu";
-$l["menuitemUrl"] = "Url";
-$l["menuitemDisplay_children"] = "Afficher les enfants";
-$l["menuitemSort_order"] = "Tri";
-$l["menuitemTarget"] = "Cible";
-
-$l["sureCreateContentMenuItemTitle"] = "Créer un élément de menu à partir du contenu";
-$l["sureCreateContentMenuItem"] = "Etes-vous sûr de vouloir créer un élément de menu à partir de cet élément de contenu ?";
-
-$l['linkToOriginal']='Lier à l\'original';
+return array (
+  'Content' => 'Contenu',
+  'Meta tags are a great way for webmasters to provide search engines with information about their sites.' => 'Les balises META sont un excellent moyen pour les webmasters de fournir aux moteurs de recherche des informations sur leurs sites.',
+  'Information about this content item' => 'Information sur cet élément de contenu',
+  'Information about the options' => 'Information sur les options',
+  'Site File' => 'Site Fichier',
+  'Site Multifile' => 'Site Multifichiers',
+  'Template' => 'Modèle',
+  'Default child template' => 'Modèlé enfant par défaut',
+  'Choose a template in which you want to view this content item' => 'Choisissez un modèle dans lequel vous voulez voir apparaître cet élément de contenu',
+  'Save' => 'Sauvegarder',
+  'Reload' => 'Recharger',
+  'Advanced options' => 'Options avancées',
+  'Add content' => 'Ajouter du contenu',
+  'Delete content' => 'Supprimer le contenu',
+  'Are you sure that you want to delete this content item' => 'Etes-vous sûr de vouloir supprimer cet élément de contenu ?',
+  'You cannot delete this item because it has subitems. Please delete the subitems first.' => 'Vous ne pouvez pas supprimer cet élément parce qu\'il possède des sous-éléments. Veuillez d\\\'abord supprimer les sous-éléments.',
+  'Delete site' => 'Supprimer le site',
+  'Are you sure that you want to delete this site' => 'Etes-vous sûr de vouloir supprimer ce site',
+  'User' => 'Utilisateur',
+  'Created' => 'Créé',
+  'Modified' => 'Modifié',
+  'Title' => 'Titre',
+  'Status' => 'Statut',
+  'Sort' => 'Trier',
+  'Name' => 'Nom',
+  'Domain' => 'Domaine',
+  'Language' => 'Langage',
+  'Multi File' => 'Multi Fichier',
+  '%s file(s)' => '%s fichier(s)',
+  'Register' => 'S\'enregistrer',
+  'Sign up' => 'Se connecter',
+  'Lost password' => 'Mot de passe perdu',
+  'Remember me' => 'Se souvenir de moi',
+  'Forgot password?' => 'Vous avez oublié votre mot de passe ?',
+  'Create a new password using your email address' => 'Créez un nouveau mot de passe en utilisant votre adresse e-mail',
+  'Password changed' => 'Mot de passe modifié',
+  'Change password' => 'Changer le mot de passe',
+  'Use the below form to change your password' => 'Utilisez le formulaire ci-dessous pour modifier votre mot de passe',
+  'If you already have a username and password use this form to login.' => 'Si vous avez déjà un nom d\'utilisateur et un mot de passe, utilisez ce formulaire pour vous identifier.',
+  'Fill in your email address in the form below, and you\'ll recieve a link to recover your password within minutes.' => 'Entrez votre adresse e-mail dans le formulaire ci-dessous, et vous recevrez un lien pour récupérer votre mot de passe en quelques minutes.',
+  'Submit' => 'Soumettre',
+  'No email given!' => 'Aucune adresse e-mail saisie !',
+  'The provided usertoken is not valid!' => 'Le jeton utilisateur saisi n\'est pas valide !',
+  'No user found with the given email address!' => 'Aucun utilisateur trouvé avec l\'adresse e-mail indiquée !',
+  'An email with recover instructions is send to the following email address:' => 'Un e-mail avec les instructions de récupération a été envoyé à l\'adresse suivante :',
+  'Your password is successfully reset.' => 'Votre mot de passe a bien été réinitialisé',
+  'Add from PC' => 'Ajouter depuis le PC',
+  'Add from {product_name}' => 'Ajouter depuis {product_name}',
+  'Customize image' => 'Personnaliser l\'image',
+  'Width' => 'Largeur',
+  'Height' => 'Hauteur',
+  'Alignment' => 'Alignement',
+  'Crop' => 'Recadrer',
+  'Left' => 'Gauche',
+  'Center' => 'Centrer',
+  'Right' => 'Droite',
+  'Inline' => 'En ligne',
+  'Dimensions (WxH)' => 'Dimensions (LxH)',
+  'Small' => 'Petit',
+  'Medium' => 'Moyen',
+  'Large' => 'Grand',
+  'Custom' => 'Personnalisé',
+  'Alt text' => 'Texte d\'image Alt',
+  'Image example' => 'Exemple d\\\'image',
+  'Not yet implemented' => 'Pas encore implémenté',
+  'Other options' => 'Autres options',
+  'Insert link' => 'Inserer un lien',
+  'Link title' => 'Titre du lien',
+  'Link to content item' => 'Lien vers un élément de contenu',
+  'Link to a content item within this site. Doubleclick on an item to select it.' => 'Lien vers un élément de contenu de ce site. Double-cliquez sur un élément pour le sélectionner.',
+  'Link to file' => 'Lien vers un fichier',
+  'Link to a file that you have uploaded within this site.' => 'Lien vers un fichier que vous avez téléchargé sur ce site.',
+  'Link to url' => 'Lien vers un url',
+  'You can also type in your own url, please make sure you add http(s):// to it to make the url work.' => 'Vous pouvez également saisir votre propre URL. Veuillez vérifier qu\\\'il commence bien par http:// ou https://',
+  'File' => 'Fichier',
+  'Open in new window' => 'Ouvrir dans une nouvelle fenêtre',
+  'Select file' => 'Selectionner un fichier',
+  'Menu\'s' => 'Menus',
+  'New item' => 'Nouvel élément',
+  'Add menu' => 'Ajouter un menu',
+  'Delete' => 'supprimer',
+  'Properties' => 'Propriétés',
+  'Menu item' => 'Elément de menu',
+  'The selected menu-item has children and cannot be deleted.' => 'L\\\'élément de menu sélectionné a des enfants et ne peut être supprimé !',
+  'Delete menu item' => 'supprimer l\\\'élément de menu',
+  'Do you really want to delete this menu item?' => 'Voulez-vous vraiment supprimer cet élément de menu ?',
+  'Display children' => 'Afficher les enfants',
+  'Order' => 'Tri',
+  'Target' => 'Cible',
+  'Create menu item from content' => 'Créer un élément de menu à partir du contenu',
+  'Are you sure that you want to create a menu item from this content item?' => 'Etes-vous sûr de vouloir créer un élément de menu à partir de cet élément de contenu ?',
+  'Link to original' => 'Lier à l\'original',
+  'name' => 'Gestionnaire de site web',
+  'description' => 'Nouveau module de CMS.',
+  'Site' => 'Site',
+  'Meta' => 'Meta',
+  'Info' => 'Info',
+  'Options' => 'Options',
+  'ID' => 'ID',
+  'Slug' => 'Slug',
+  'Meta title' => 'Meta title',
+  'Meta description' => 'Meta description',
+  'Meta keywords' => 'Meta keywords',
+  'Parent' => 'Parent',
+  'Module' => 'Module',
+  'SSL' => 'SSL',
+  'Mod rewrite' => 'Mod rewrite',
+  'Mod rewrite base path' => 'Mod rewrite base path',
+  'Base path' => 'Base path',
+  'ACL' => 'ACL',
+  'Login' => 'Login',
+  'Add from Group-Office' => 'Ajouter depuis {product_name}',
+  'Dimensions' => 'Dimensions',
+  'Zoom' => 'Zoom',
+  'Url' => 'Url',
+  'Menu' => 'Menu',
+  'Label' => 'Label',
+);

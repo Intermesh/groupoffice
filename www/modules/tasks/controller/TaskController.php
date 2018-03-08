@@ -28,7 +28,7 @@ class TaskController extends \GO\Base\Controller\AbstractModelController{
 	protected function afterDisplay(&$response, &$model,&$params) {
 		$response['data']['user_name']=$model->user ?  \GO\Base\Util\StringHelper::encodeHtml($model->user->name) : '';
 		$response['data']['tasklist_name']=  \GO\Base\Util\StringHelper::encodeHtml($model->tasklist->name);
-		$statuses = \GO::t('statuses','tasks');
+		$statuses = \GO::t("statuses", "tasks");
 		$response['data']['status_text']=isset($statuses[$model->status]) ? $statuses[$model->status] : $model->status;
 		
 		
@@ -50,7 +50,7 @@ class TaskController extends \GO\Base\Controller\AbstractModelController{
 	}
 	
 	protected function afterLoad(&$response, &$model, &$params) {
-		
+		$user = \go\core\App::get()->getAuthState()->getUser();
 		if(!empty($model->rrule)) {
 			$rRule = new \GO\Base\Util\Icalendar\Rrule();
 			$rRule->readIcalendarRruleString($model->due_time, $model->rrule);
@@ -59,8 +59,7 @@ class TaskController extends \GO\Base\Controller\AbstractModelController{
 			$response['data'] = array_merge($response['data'],$createdRule);
 		}
 		
-		$settings = \GO\Tasks\Model\Settings::model()->findByPk(\GO::user()->id);
-		$response['data']['remind_before'] = $settings->reminder_days;
+		$response['data']['remind_before'] = $user->taskSettings->reminder_days;
 		
 		if(!empty($response['data']['reminder'])) {			
 			$response['data']['remind']=1;

@@ -24,7 +24,7 @@ GO.base.SavedExportGrid = Ext.extend(GO.grid.GridPanel,{
 			view:new Ext.grid.GridView({
 				autoFill: true,
 				forceFit: true,
-				emptyText: GO.lang['strNoItems']		
+				emptyText: t("No items to display")		
 			}),
 			cm:new Ext.grid.ColumnModel({
 				defaults:{
@@ -32,7 +32,7 @@ GO.base.SavedExportGrid = Ext.extend(GO.grid.GridPanel,{
 				},
 				columns:[
 				{
-					header: GO.lang.strName, 
+					header: t("Name"), 
 					dataIndex: 'name'
 				}	
 				]

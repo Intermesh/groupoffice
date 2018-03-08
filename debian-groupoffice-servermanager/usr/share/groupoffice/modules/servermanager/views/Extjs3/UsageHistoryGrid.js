@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: UsageHistoryGrid.js 16251 2013-11-15 08:39:41Z mschering $
+ * @version $Id: UsageHistoryGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Michael de Hart <mdhart@intermesh.nl>
  */
@@ -15,7 +15,7 @@
 		
 		config=config||{};
 		
-		config.title = GO.servermanager.lang["usageHistory"];
+		config.title = t("usageHistory", "servermanager");
 		//config.autoHeight=true;
 		config.paging=true;
 		
@@ -36,13 +36,13 @@
 		config.viewConfig = {'forceFit':true,'autoFill':true};
 		
 		config.columns = [
-			{dataIndex:'ctime', header:GO.lang.strCtime, width:110},
-			{dataIndex:'count_users',header:GO.servermanager.lang["countUsers"], width:100},
-			{dataIndex:'database_usage',header:GO.servermanager.lang["databaseUsage"]},
-			{dataIndex:'file_storage_usage',header:GO.servermanager.lang["fileStorageUsage"]},
-			{dataIndex:'mailbox_usage',header:GO.servermanager.lang["mailboxUsage"]},
-			{dataIndex:'total_usage',header:GO.servermanager.lang["totalUsage"]},
-			{dataIndex:'total_logins',header:GO.servermanager.lang["totalLogins"]}
+			{dataIndex:'ctime', header:t("Created at"), width:110},
+			{dataIndex:'count_users',header:t("countUsers", "servermanager"), width:100},
+			{dataIndex:'database_usage',header:t("databaseUsage", "servermanager")},
+			{dataIndex:'file_storage_usage',header:t("fileStorageUsage", "servermanager")},
+			{dataIndex:'mailbox_usage',header:t("mailboxUsage", "servermanager")},
+			{dataIndex:'total_usage',header:t("totalUsage", "servermanager")},
+			{dataIndex:'total_logins',header:t("totalLogins", "servermanager")}
 		];
 		
 		config.listeners={

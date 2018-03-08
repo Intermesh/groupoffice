@@ -5,7 +5,7 @@ GO.email.LabelDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
         Ext.apply(this, {
             titleField: 'name',
             goDialogId: 'label',
-            title: GO.email.lang.label,
+            title: t("Label", "email"),
             height: 260,
             width: 490,
             formControllerUrl: 'email/label'
@@ -17,7 +17,7 @@ GO.email.LabelDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
     buildForm: function () {
 
         this.propertiesPanel = new Ext.Panel({
-            title: GO.lang['strProperties'],
+            title: t("Properties"),
             cls: 'go-form-panel',
             layout: 'form',
             labelWidth: 160,
@@ -29,10 +29,10 @@ GO.email.LabelDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
                     anchor: '100%',
                     maxLength: 100,
                     allowBlank: false,
-                    fieldLabel: GO.lang.strName
+                    fieldLabel: t("Name")
                 },
                 this.colorField = new GO.form.ColorField({
-                    fieldLabel: GO.lang.color,
+                    fieldLabel: t("Color"),
                     width: 100,
                     value: "7A7AFF",
                     name: 'color'

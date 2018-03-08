@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: LinksTree.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: LinksTree.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -44,7 +44,7 @@ GO.LinksTree = function(config){
 	
 	// set the root node
 	this.rootNode = new Ext.tree.AsyncTreeNode({
-		text: GO.lang['root'],
+		text: t("Root"),
 		draggable:false,
 		iconCls : 'folder-default',
 		expanded:false

@@ -5,10 +5,10 @@ GO.base.upload.PluploadButton = Ext.extend(Ext.Button, {
 			
 		Ext.applyIf(config, {
 			iconCls: 'btn-upload',
-			text: GO.lang.upload,
+			text: t("Upload"),
 			window_width: 640,
 			window_height: 480,
-			window_title: GO.lang.upload,
+			window_title: t("Upload"),
 			clearOnClose: false, //clear queue after window is closed (actually window is hidden )		
 			upload_config: {}
 		});
@@ -17,7 +17,7 @@ GO.base.upload.PluploadButton = Ext.extend(Ext.Button, {
 		
 		var title = config.window_title || config.text || 'Upload files';
 		
-		title += " ("+GO.lang.strMax+": "+this.uploadpanel.max_file_size+")";
+		title += " ("+t("Maximum")+": "+this.uploadpanel.max_file_size+")";
 
 		this.window = new GO.Window({ 
 			title: title,

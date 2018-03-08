@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: FilePanel.js 20453 2016-09-22 13:40:32Z mschering $
+ * @version $Id: FilePanel.js 22151 2018-01-17 13:59:21Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -41,11 +41,11 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 	createTopToolbar : function(){
 		var tbar = GO.files.FilePanel.superclass.createTopToolbar.call(this);
 				
-		this.editButton.setText(GO.files.lang.open);
+		this.editButton.setText(t("Edit"));
 
 		tbar.splice(1,0,this.downloadButton= new Ext.Button({
 			iconCls: 'btn-save',
-			text: GO.lang.download,
+			text: t("Download"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 				GO.files.downloadFile(this.model_id);
@@ -53,7 +53,7 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 			scope: this
 		}),this.propertiesBtn = new Ext.Button({
 			iconCls: 'btn-settings',
-			text: GO.lang.strProperties,
+			text: t("Properties"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 				GO.files.showFilePropertiesDialog(this.model_id+"");
@@ -112,7 +112,7 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 			
 			if(target.hasClass("fs-deleteDL")){
 				
-			var answer = confirm(GO.files.lang.deleteDownloadLink);
+			var answer = confirm(t("You are going to delete this link, are you sure?", "files"));
 			if(answer){
 				
 					GO.request({
@@ -138,62 +138,64 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 		
 		this.loadUrl=('files/file/display');
 		
-		this.template =
+		this.template ='<tpl if="!GO.util.empty(thumbnail_url)">\
+				<figure style="background-image: url({thumbnail_url});" ></figure>\
+					</tpl>' +
 
 				'<table class="display-panel" cellpadding="0" cellspacing="0" border="0">'+
 //					'<tr>'+
-//						'<td width="120">'+GO.files.lang.path+':</td>'+
+//						'<td width="120">'+t("Path", "files")+':</td>'+
 //						'<td>{path}</td>'+
 //					'</tr>'+
 					'<tr>'+
-						'<td colspan="2" class="display-panel-heading">'+GO.files.lang.file+': {path}</td>'+
+						'<td colspan="2" class="display-panel-heading">{path}</td>'+
 					'</tr>'+
 					
-					'<tr>'+
-						'<td>ID</td><td>{id}</td>'+
-					'</tr>'+
+//					'<tr>'+
+//						'<td>ID</td><td>{id}</td>'+
+//					'</tr>'+
 					
-					'<tr>'+
-						'<td>'+GO.lang.strType+':</td>'+
-						'<td colspan=><div class="go-grid-icon filetype filetype-{extension}">{type}</div></td>'+						
-					'</tr>'+
+//					'<tr>'+
+//						'<td>'+t("Type")+':</td>'+
+//						'<td colspan=><div class="go-grid-icon filetype filetype-{extension}">{type}</div></td>'+						
+//					'</tr>'+
 
 					'<tr>'+
-						'<td>'+GO.lang.strSize+':</td>'+
+						'<td>'+t("Size")+':</td>'+
 						'<td>{size}</td>'+
 						
 					'</tr>'+
 
 					'<tr>'+
-						'<td>'+GO.lang.strCtime+':</td>'+
+						'<td>'+t("Created at")+':</td>'+
 						'<td>{ctime}</td>'+
 						
 					'</tr>'+
 
 					'<tr>'+
-						'<td>'+GO.lang.strMtime+':</td>'+
+						'<td>'+t("Modified at")+':</td>'+
 						'<td>{mtime}</td>'+						
 					'</tr>'+
 
 					'<tr>'+
-						'<td>'+GO.lang['strUser']+':</td>'+'<td>{username}</td>'+
+						'<td>'+t("Created by")+':</td>'+'<td>{username}</td>'+
 					'</tr><tr>'+
-						'<td>'+GO.lang['mUser']+':</td>'+'<td>'+
+						'<td>'+t("Modified by")+':</td>'+'<td>'+
 							'<tpl if="muser_id">{musername}</tpl>'+
 							'</td>'+
 					'</tr>'+
 					
 					'<tr>'+
 						'<td>URL:</td>'+
-						'<td><a target="_blank" href="{url}">'+GO.files.lang.rightClickToCopy+'</a></td>'+
+						'<td><a target="_blank" href="{url}">'+t("Right click to copy", "files")+'</a></td>'+
 					'</tr>'+
 										
 					'<tpl if="!GO.util.empty(locked_user_name)">'+
 						'<tr>'+
-            '<td>'+GO.files.lang.lockedBy+':</td>'+
+            '<td>'+t("Locked by", "files")+':</td>'+
             '<td><div class="go-grid-icon btn-lock">{locked_user_name}'+
 						'<tpl if="unlock_allowed">'+
-							' <span class="fs-unlock" style="cursor:pointer;text-decoration:underline;">['+GO.files.lang.unlock+']</span>'+
+							' <span class="fs-unlock" style="cursor:pointer;text-decoration:underline;">['+t("Unlock", "files")+']</span>'+
 						'</tpl>'+
 						'</div></td>'+
 						'</tr>'+
@@ -202,25 +204,25 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 
           '<tpl if="!GO.util.empty(expire_time)">'+
 						'<tr>'+
-							'<td colspan="2" class="display-panel-heading">'+GO.files.lang.strDownloadActive+'</td>'+
+							'<td colspan="2" class="display-panel-heading">'+t("External download link enabled", "files")+'</td>'+
 						'</tr>'+
 						'<tr>'+
-            '<td style="white-space:nowrap">'+GO.files.lang.downloadExpireTime+':</td>'+
+            '<td style="white-space:nowrap">'+t("Link expires after", "files")+':</td>'+
             '<td>{expire_time}</td>'+
 						'</tr>'+
 						
 						'<tr>'+
-            '<td>'+GO.files.lang.downloadUrl+':</td>'+
-            '<td><a href="{download_link}" target="_blank">'+GO.files.lang.rightClickToCopy+'</a>'+
+            '<td>'+t("URL", "files")+':</td>'+
+            '<td><a href="{download_link}" target="_blank">'+t("Right click to copy", "files")+'</a>'+
 						//'<tpl if="unlock_allowed">'+
-							' <span class="fs-deleteDL" style="cursor:pointer;text-decoration:underline;">['+GO.files.lang.deletedDownloadLink+']</span>'+
+							' <span class="fs-deleteDL" style="cursor:pointer;text-decoration:underline;">['+t("Delete this link", "files")+']</span>'+
 						//'</tpl>'+
 						'</td>'+
 						'</tr>'+
 						
 						'<tpl if="!GO.util.empty(delete_when_expired)">'+
 							'<tr>'+
-								'<td colspan="2"><span style="color:red;">'+GO.files.lang['automaticallyDeleted']+'</span></td>'+
+								'<td colspan="2"><span style="color:red;">'+t("File will be automatically deleted when its download link expires", "files")+'</span></td>'+
 							'</tr>'+
 						'</tpl>'+
 						
@@ -228,7 +230,7 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 					
 					'<tpl if="!GO.util.empty(content_expire_date)">'+
 						'<tr>'+
-            '<td>'+GO.files.lang.contentExpiresAt+':</td>'+
+            '<td>'+t("Content expires at", "files")+':</td>'+
 						
 						'<tpl if="GO.files.isContentExpired(content_expire_date) == false">'+
 							'<td><span>{content_expire_date}</span></td>'+
@@ -239,55 +241,22 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 						'</tr>'+
           '</tpl>'+
 
-					'<tpl if="!GO.util.empty(thumbnail_url)"><tr><td colspan="2">'+
-						'<img src="{thumbnail_url}" style="max-width:100px;max-height:100px;" />'+
-					'</td></tr></tpl>'+
-
 					this.extraTemplateProperties +
 
 					/*'<tr>'+
-						'<td>'+GO.lang.Atime+'</td>'+
+						'<td>'+t("Accessed at")+'</td>'+
 						'<td>{atime}</td>'+
 					'</tr>'+*/
 
-					'<tpl if="!GO.util.empty(comment)">'+
-						'<tr>'+
-							'<td colspan="2" class="display-panel-heading">'+GO.files.lang.comments+'</td>'+
-						'</tr>'+
-						'<tr>'+
-							'<td colspan="2">{comment}</td>'+
-						'</tr>'+
-					'</tpl>'+
+				
 				'</table>';
 
 
-	
-
-		if(GO.customfields)
-		{
-			this.template +=GO.customfields.displayPanelTemplate;
-		}
-
-		if(GO.tasks)
-			this.template +=GO.tasks.TaskTemplate;
-
-		if(GO.calendar)
-			this.template += GO.calendar.EventTemplate;
 		
-		if(GO.workflow)
+		if(go.ModuleManager.isAvailable("workflow"))
 			this.template +=GO.workflow.WorkflowTemplate;
-
-		if(GO.lists)
-			this.template += GO.lists.ListTemplate;
-
-		this.template += GO.linksTemplate;
 		
 		Ext.apply(this.templateConfig, GO.linksTemplateConfig);
-
-		if(GO.comments)
-		{
-			this.template += GO.comments.displayPanelTemplate;
-		}
 
 		GO.files.FilePanel.superclass.initComponent.call(this);
 	}

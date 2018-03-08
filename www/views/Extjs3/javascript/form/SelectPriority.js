@@ -4,13 +4,13 @@ GO.form.SelectPriority = function(config){
 
 	GO.form.SelectPriority.superclass.constructor.call(this,{
 		hiddenName:'priority',
-		fieldLabel:GO.lang.priority,
+		fieldLabel:t("Priority"),
 		store: new Ext.data.SimpleStore({
 			fields: ['value', 'text'],
 			data : [
-			[0, GO.lang.priority_low],
-			[1, GO.lang.priority_normal],
-			[2, GO.lang.priority_high]
+			[0, t("Low")],
+			[1, t("Normal")],
+			[2, t("High")]
 			]
 		}),
 		value:1,

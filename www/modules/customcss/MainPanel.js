@@ -23,15 +23,15 @@ GO.customcss.MainPanel = function(config){
 		cls:'go-head-tb',
 		items:[{
 		        xtype:'htmlcomponent',
-		        html:GO.customcss.lang.name,
+		        html:t("Custom CSS styles and scripts", "customcss"),
 		        cls:'go-module-title-tbar'
 		},{
 				iconCls:'btn-save',
-				text:GO.lang.cmdSave,
+				text:t("Save"),
 				handler:function(){
 					this.form.submit({
 						url:GO.url('customcss/customcss/data'),
-						waitMsg:GO.lang['waitMsgSave'],
+						waitMsg:t("Saving..."),
 						callback:function(){
 
 						}
@@ -40,7 +40,7 @@ GO.customcss.MainPanel = function(config){
 				scope:this
 		},{
 			iconCls: 'btn-files',
-			text:GO.customcss.lang.selectFile,
+			text:t("Select file", "customcss"),
 			handler:function(){
 
 				GO.files.createSelectFileBrowser();
@@ -68,7 +68,7 @@ Ext.extend(GO.customcss.MainPanel, Ext.form.FormPanel, {
 		GO.customcss.MainPanel.superclass.afterRender.call(this);
 		this.form.load({
 			url:GO.url('customcss/customcss/data'),
-			waitMsg:GO.lang['waitMsgLoad']
+			waitMsg:t("Loading...")
 		});
 	}
 	
@@ -76,7 +76,7 @@ Ext.extend(GO.customcss.MainPanel, Ext.form.FormPanel, {
 
 
 GO.moduleManager.addModule('customcss', GO.customcss.MainPanel, {
-	title : GO.customcss.lang.name,
+	title : t("Custom CSS styles and scripts", "customcss"),
 	iconCls : 'go-tab-icon-customcss',
 	admin:true
 });

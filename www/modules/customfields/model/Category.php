@@ -20,18 +20,27 @@
  * The Category model
  *
  * @package GO.modules.customfields.model
- * @property int $sort_index
+ * @property int $sortOrder
  * @property string $name
- * @property int $acl_id
- * @property string $extends_model
+ * @property int $aclId
+ * @property string $extendsModel
  * @property int $id
  */
 
 
 namespace GO\Customfields\Model;
 
+use GO;
+use GO\Base\Db\ActiveRecord;
+use GO\Base\Db\FindCriteria;
+use GO\Base\Db\FindParams;
+use GO\Base\Model\Acl;
+use GO\Base\Util\StringHelper;
+use go\core\db\Query;
+use go\core\orm\Entity;
 
-class Category extends \GO\Base\Db\ActiveRecord{
+
+class Category extends ActiveRecord{
 	/**
 	 * Returns a static model of itself
 	 * 
@@ -44,37 +53,56 @@ class Category extends \GO\Base\Db\ActiveRecord{
 	}
 	
 	public function aclField() {	
-		return 'acl_id';
+		return 'aclId';
 	}
 	
 	public function tableName() {
-		return 'cf_categories';
+		return 'core_customfields_field_set';
 	}
 	
 	public function relations() {
 		return array(
-		'fields' => array('type' => self::HAS_MANY, 'model' => 'GO\Customfields\Model\Field', 'field' => 'category_id', 'delete' => true, 'findParams'=>  \GO\Base\Db\FindParams::newInstance()->order('sort_index')),
-		'_fieldsUnsorted' => array('type' => self::HAS_MANY, 'model' => 'GO\Customfields\Model\Field', 'field' => 'category_id'	),
-		'_fieldsSortedById' => array('type' => self::HAS_MANY, 'model' => 'GO\Customfields\Model\Field', 'field' => 'category_id', 'delete' => true, 'findParams'=>  \GO\Base\Db\FindParams::newInstance()->order('id')),
+		'fields' => array('type' => self::HAS_MANY, 'model' => 'GO\Customfields\Model\Field', 'field' => 'fieldSetId', 'delete' => true, 'findParams'=>  FindParams::newInstance()->order('sortOrder')),
+		'_fieldsUnsorted' => array('type' => self::HAS_MANY, 'model' => 'GO\Customfields\Model\Field', 'field' => 'fieldSetId'	),
+		'_fieldsSortedById' => array('type' => self::HAS_MANY, 'model' => 'GO\Customfields\Model\Field', 'field' => 'fieldSetId', 'delete' => true, 'findParams'=>  FindParams::newInstance()->order('id')),
 				);
 	}
 	
 	
-	public function customfieldsTableName(){
+	public function isForEntity() {
+		return is_a($this->extendsModel, Entity::class, true);
+	}
+	
+	public function customfieldsTableName() {		
+		if($this->isForEntity()) {
+			$cls = $this->extendsModel;
+			return $cls::customFieldsTableName();
+		} else
+		{
+			$model = GO::getModel($this->extendsModel);
 		
-		
-		$model = \GO::getModel($this->extends_model);
-		
-		return 'cf_'.$model->tableName();
+			return 'cf_'.$model->tableName();
+		}		
+	}
+	
+	public function getExtendsModel() {
+		return \go\core\orm\EntityType::findById($this->entityId)->getClassName();
+	}
+	
+	public function setExtendsModel($className) {
+		$this->entityId = \go\core\orm\EntityType::findByClassName($className)->getId();
 	}
 	
 	
-	public function findByModel($modelName, $permissionLevel=  \GO\Base\Model\Acl::READ_PERMISSION){
+	public function findByModel($modelName, $permissionLevel=  Acl::READ_PERMISSION){
+		
+		$entityId = $modelName::getType()->getId();
+		
 		return Category::model()->find(
-                    \GO\Base\Db\FindParams::newInstance()												
+                    FindParams::newInstance()												
 												->permissionLevel($permissionLevel)
-                        ->criteria(\GO\Base\Db\FindCriteria::newInstance()->addCondition('extends_model', $modelName))
-                        ->order('sort_index')
+												->criteria(FindCriteria::newInstance()->addCondition('entityId', $entityId))
+                        ->order('sortOrder')
 		);
 	}
 	
@@ -86,11 +114,13 @@ class Category extends \GO\Base\Db\ActiveRecord{
 	 * @return \Category 
 	 */
 	public function createIfNotExists($extendsModel, $categoryName){
-		$category = Category::model()->findSingleByAttributes(array('extends_model'=>$extendsModel, 'name'=>$categoryName));
+		$entityId = $extendsModel::getType()->getId();;		
+		
+		$category = Category::model()->findSingleByAttributes(array('entityId'=>$entityId, 'name'=>$categoryName));
 		
 		if(!$category){
 			$category = new Category();
-			$category->extends_model=$extendsModel;
+			$category->entityId=$entityId;
 			$category->name=$categoryName;
 			$category->save();
 		}	
@@ -101,7 +131,7 @@ class Category extends \GO\Base\Db\ActiveRecord{
 	
 	protected function beforeSave() {
 		if($this->isNew)
-			$this->sort_index=$this->count();		
+		$this->sortOrder=$this->count();		
 		
 		return parent::beforeSave();
 	}

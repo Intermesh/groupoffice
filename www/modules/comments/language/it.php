@@ -1,17 +1,15 @@
 <?php
-
-$l["comment"]="Commento";
-$l["comments"]="Commenti";
-$l["browseComments"]= 'Sfoglia commenti';
-
-$l['name']='Commenti';
-$l['description']='Aggiungi la funzionalità commento agli altri moduli';
-$l['comment']='Commento';
-$l['comments']='Commenti';
-$l["recentComments"]='Commenti recenti';
-$l['manageCategories']='Gestisci categorie';
-$l['category']='Categoria';
-$l['noCategory']='Nesuna categoria';
-$l['newCommentText']='Inserisci qui un nuovo commento ...';
-$l['readMore']="Leggi altro";
-$l['enableReadMore']="Abilita i collegamenti Leggi altro";
+return array (
+  'Comment' => 'Commento',
+  'Browse comments' => 'Sfoglia commenti',
+  'Recent comments' => 'Commenti recenti',
+  'Manage categories' => 'Gestisci categorie',
+  'Category' => 'Categoria',
+  'No category' => 'Nesuna categoria',
+  'Enter new comment here ...' => 'Inserisci qui un nuovo commento ...',
+  'Read more' => 'Leggi altro',
+  'Enable read more links' => 'Abilita i collegamenti Leggi altro',
+  'name' => 'Commenti',
+  'description' => 'Aggiungi la funzionalità commento agli altri moduli',
+  'Comments' => 'Commenti',
+);

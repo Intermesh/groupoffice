@@ -42,7 +42,7 @@ class Block extends \GO\Base\Db\ActiveRecord{
 
 	public function getItemNames($forModelId,$forModelName) {
 		
-		$modelUnderBlock = \GO::getModel($this->customField->category->extends_model);
+		$modelUnderBlock = \GO::getModel($this->customField->category->extendsModel);
 		
 		$cfTableName = 'cf_'.$modelUnderBlock->tableName();
 		
@@ -57,7 +57,7 @@ class Block extends \GO\Base\Db\ActiveRecord{
 				)
 				->criteria(
 					\GO\Base\Db\FindCriteria::newInstance()
-						->addCondition('col_'.$this->field_id, $forModelId.':%', 'LIKE', 'cf')
+						->addCondition($this->customField->databaseName, $forModelId.':%', 'LIKE', 'cf')
 				)
 		);
 		

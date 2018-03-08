@@ -560,8 +560,6 @@ class GO{
 					
 					$filePath = self::config()->root_path.$file;
 					
-				}else if(substr($className, 0,7)=='Michelf'){
-					$filePath = self::config()->root_path."go/vendor/Markdown/".preg_replace('{\\\\|_(?!.*\\\\)}', "/", ltrim($className, '\\')).'.php';
 				}
 			}
 
@@ -598,8 +596,8 @@ class GO{
 		self::$initialized=true;
 		
 		//register our custom error handler here
-		set_error_handler(array('GO','errorHandler'));
-		register_shutdown_function(array('GO','shutdown'));
+//		set_error_handler(array('GO','errorHandler'));
+//		register_shutdown_function(array('GO','shutdown'));
 
    	spl_autoload_register(array('GO', 'autoload'));	
 		
@@ -613,9 +611,9 @@ class GO{
 				\GO::config()->debug=true;
 		}
 		
-		if(\GO::config()->debug){
-			error_reporting(E_ALL | E_STRICT);
-		}
+//		if(\GO::config()->debug){
+//			error_reporting(E_ALL | E_STRICT);
+//		}
 		
 		if(!self::isInstalled()){
 			return;
@@ -941,6 +939,8 @@ class GO{
 	 * @param StringHelper $text log entry
 	 */
 	public static function debug($text, $config=false) {
+		
+		return GO()->debug($text, 'general', 1);
 
 		if (   self::config()->debug
 			|| self::config()->debug_log
@@ -984,6 +984,8 @@ class GO{
 					$user = isset(\GO::session()->values['username']) ? \GO::session()->values['username'] : 'notloggedin';
 
 					$text = "[$user] ".str_replace("\n","\n[$user] ", $text);
+					
+					$text .= "[" . \GO\Base\Util\Date::getmicrotime() . "] ";
 
 					file_put_contents(self::config()->file_storage_path . 'log/debug.log', $text . "\n", FILE_APPEND);
 //				}
@@ -1067,9 +1069,23 @@ class GO{
 		//backwards compat
 		//$modelName = str_replace('_','\\', $modelName);
 		
-		if(!class_exists($modelName))
-			throw new \Exception("Model class '$modelName' not found in \GO::getModel()");
+		if(!class_exists($modelName)){			
 
+			$entityType = \go\core\orm\EntityType::findByName($modelName);
+			
+			if(!$entityType) {		
+				throw new \Exception("Model class '$modelName' not found in \GO::getModel()");
+			}
+			
+			$modelName = $entityType->getClassName();
+			return $modelName;
+		} 
+		
+
+		
+		if(!method_exists($modelName, 'model')) {
+			return new $modelName(false);
+		}
 		return call_user_func(array($modelName, 'model'));
 	}
 

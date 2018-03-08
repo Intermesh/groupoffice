@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: CriteriumGrid.js 21460 2017-09-20 09:21:26Z wsmits $
+ * @version $Id: CriteriumGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  * @author WilmarVB <wilmar@intermesh.nl>
@@ -27,22 +27,22 @@ GO.sieve.CriteriumGrid = function(config){
 		header: false,
 		columns:[
 //		{
-//			header: GO.sieve.lang.test,
+//			header: t("Test", "sieve"),
 //			dataIndex: 'test'
 //		},{
-//			header: GO.sieve.lang.not,
+//			header: t("Not", "sieve"),
 //			dataIndex: 'not'
 //		},{
-//			header: GO.sieve.lang.type,
+//			header: t("Type", "sieve"),
 //			dataIndex: 'type'
 //		},{
-//			header: GO.sieve.lang.arg,
+//			header: t("Argument", "sieve"),
 //			dataIndex: 'arg'
 //		},{
-//			header: GO.sieve.lang.arg1,
+//			header: t("Argument1", "sieve"),
 //			dataIndex: 'arg1'
 //		},{
-//			header: GO.sieve.lang.arg2,
+//			header: t("Argument2", "sieve"),
 //			dataIndex: 'arg2'
 //		},
 		{
@@ -59,13 +59,13 @@ GO.sieve.CriteriumGrid = function(config){
 //						id: 1, test: "currentdate", not: false, type: "is", arg: Date 2015-08-19T22:00:00.000Z, arg1: "", arg2: ""
 						switch(record.data.type){
 							case 'value-le':
-								txtToDisplay = GO.sieve.lang.currentdate+' '+GO.sieve.lang.before+' '+record.data.arg;
+								txtToDisplay = t("Current Date", "sieve")+' '+t("before", "sieve")+' '+record.data.arg;
 								break;
 							case 'is':
-								txtToDisplay = GO.sieve.lang.currentdate+' '+GO.sieve.lang.is+' '+record.data.arg;
+								txtToDisplay = t("Current Date", "sieve")+' '+t("is", "sieve")+' '+record.data.arg;
 								break;
 							case 'value-ge':
-								txtToDisplay = GO.sieve.lang.currentdate+' '+GO.sieve.lang.after+' '+record.data.arg;
+								txtToDisplay = t("Current Date", "sieve")+' '+t("after", "sieve")+' '+record.data.arg;
 								break;
 						}
 
@@ -76,9 +76,9 @@ GO.sieve.CriteriumGrid = function(config){
 						{
 							if(record.data.not)
 							{
-								txtToDisplay = GO.sieve.lang.bodycontainsnot+' '+record.data.arg;
+								txtToDisplay = t("Body doesn't contain", "sieve")+' '+record.data.arg;
 							} else {
-								txtToDisplay = GO.sieve.lang.bodycontains+' '+record.data.arg;
+								txtToDisplay = t("Body contains", "sieve")+' '+record.data.arg;
 							}
 						}
 						break;
@@ -88,26 +88,26 @@ GO.sieve.CriteriumGrid = function(config){
 							if(record.data.not)
 							{
 								if(record.data.arg1 == 'Subject')
-									txtToDisplay = GO.sieve.lang.subjectcontainsnot+' '+record.data.arg2;
+									txtToDisplay = t("Subject doesn't contain", "sieve")+' '+record.data.arg2;
 								else if(record.data.arg1 == 'From')
-									txtToDisplay = GO.sieve.lang.fromcontainsnot+' '+record.data.arg2;
+									txtToDisplay = t("Sender doesn't contain", "sieve")+' '+record.data.arg2;
 								else if(record.data.arg1 == 'To')
-									txtToDisplay = GO.sieve.lang.tocontainsnot+' '+record.data.arg2;
+									txtToDisplay = t("Recipient doesn't contain", "sieve")+' '+record.data.arg2;
 								else
-									txtToDisplay = GO.sieve.lang.custommailheader+" "+record.data.arg1+" "+GO.sieve.lang.notcontains+" "+record.data.arg2;
+									txtToDisplay = t("Mailheader:", "sieve")+" "+record.data.arg1+" "+t("doesn't contain", "sieve")+" "+record.data.arg2;
 							}
 							else
 							{
 								if(record.data.arg1 == 'Subject')
-									txtToDisplay = GO.sieve.lang.subjectcontains+' '+record.data.arg2;
+									txtToDisplay = t("Subject contains", "sieve")+' '+record.data.arg2;
 								else if(record.data.arg1 == 'From')
-									txtToDisplay = GO.sieve.lang.fromcontains+' '+record.data.arg2;
+									txtToDisplay = t("Sender contains", "sieve")+' '+record.data.arg2;
 								else if(record.data.arg1 == 'To')
-									txtToDisplay = GO.sieve.lang.tocontains+' '+record.data.arg2;
+									txtToDisplay = t("Recipient contains", "sieve")+' '+record.data.arg2;
 								else if(record.data.arg1 == 'X-Spam-Flag')
-									txtToDisplay = GO.sieve.lang.markedasspam;
+									txtToDisplay = t("Marked as spam", "sieve");
 								else
-									txtToDisplay = GO.sieve.lang.custommailheader+" "+record.data.arg1+" "+GO.sieve.lang.contains+" "+record.data.arg2;
+									txtToDisplay = t("Mailheader:", "sieve")+" "+record.data.arg1+" "+t("contains", "sieve")+" "+record.data.arg2;
 							}
 						}
 						else if(record.data.type == 'is')
@@ -115,24 +115,24 @@ GO.sieve.CriteriumGrid = function(config){
 							if(record.data.not)
 							{
 								if(record.data.arg1 == 'Subject')
-									txtToDisplay = GO.sieve.lang.subjectequalsnot+' '+record.data.arg2;
+									txtToDisplay = t("Subject is not equal to", "sieve")+' '+record.data.arg2;
 								else if(record.data.arg1 == 'From')
-									txtToDisplay = GO.sieve.lang.fromequalsnot+' '+record.data.arg2;
+									txtToDisplay = t("From is not equal to", "sieve")+' '+record.data.arg2;
 								else if(record.data.arg1 == 'To')
-									txtToDisplay = GO.sieve.lang.toequalsnot+' '+record.data.arg2;
+									txtToDisplay = t("To is not equal to", "sieve")+' '+record.data.arg2;
 								else
-									txtToDisplay = GO.sieve.lang.custommailheader+" "+record.data.arg1+" "+GO.sieve.lang.notis +" "+record.data.arg2;
+									txtToDisplay = t("Mailheader:", "sieve")+" "+record.data.arg1+" "+t("doesn't equal", "sieve") +" "+record.data.arg2;
 							}
 							else
 							{
 								if(record.data.arg1 == 'Subject')
-									txtToDisplay = GO.sieve.lang.subjectequals+' '+record.data.arg2;
+									txtToDisplay = t("Subject equals", "sieve")+' '+record.data.arg2;
 								else if(record.data.arg1 == 'From')
-									txtToDisplay = GO.sieve.lang.fromequals+' '+record.data.arg2;
+									txtToDisplay = t("From equals", "sieve")+' '+record.data.arg2;
 								else if(record.data.arg1 == 'To')
-									txtToDisplay = GO.sieve.lang.toequals+' '+record.data.arg2;
+									txtToDisplay = t("To equals", "sieve")+' '+record.data.arg2;
 								else
-									txtToDisplay = GO.sieve.lang.custommailheader+" "+record.data.arg1+" "+GO.sieve.lang.is +" "+record.data.arg2;
+									txtToDisplay = t("Mailheader:", "sieve")+" "+record.data.arg1+" "+t("is", "sieve") +" "+record.data.arg2;
 							}
 						}
 						break;
@@ -141,24 +141,24 @@ GO.sieve.CriteriumGrid = function(config){
 						if(record.data.not)
 						{
 							if(record.data.arg == 'Subject')
-								txtToDisplay = GO.sieve.lang.subjectexistsnot;
+								txtToDisplay = t("Subject doesn't exist", "sieve");
 							else if(record.data.arg == 'From')
-								txtToDisplay = GO.sieve.lang.fromexistsnot;
+								txtToDisplay = t("Sender doesn't exist", "sieve");
 							else if(record.data.arg == 'To')
-								txtToDisplay = GO.sieve.lang.toexistsnot;
+								txtToDisplay = t("Recipient doesn't exist", "sieve");
 							else
-								txtToDisplay = GO.sieve.lang.custommailheader+" "+record.data.arg+" "+GO.sieve.lang.notexists;
+								txtToDisplay = t("Mailheader:", "sieve")+" "+record.data.arg+" "+t("doesn't exist", "sieve");
 						}
 						else
 						{
 							if(record.data.arg == 'Subject')
-								txtToDisplay = GO.sieve.lang.subjectexists;
+								txtToDisplay = t("Subject exists", "sieve");
 							else if(record.data.arg == 'From')
-								txtToDisplay = GO.sieve.lang.fromexists;
+								txtToDisplay = t("Sender exists", "sieve");
 							else if(record.data.arg == 'To')
-								txtToDisplay = GO.sieve.lang.toexists;
+								txtToDisplay = t("Recipient exists", "sieve");
 							else
-								txtToDisplay = GO.sieve.lang.custommailheader+" "+record.data.arg+" "+GO.sieve.lang.notexists;
+								txtToDisplay = t("Mailheader:", "sieve")+" "+record.data.arg+" "+t("doesn't exist", "sieve");
 						}
 						break;
 
@@ -168,13 +168,13 @@ GO.sieve.CriteriumGrid = function(config){
 
 					case 'size':
 						if(record.data.type == 'under')
-							txtToDisplay = GO.sieve.lang.sizesmallerthan+' '+record.data.arg;
+							txtToDisplay = t("Size is smaller than", "sieve")+' '+record.data.arg;
 						else
-							txtToDisplay = GO.sieve.lang.sizebiggerthan+' '+record.data.arg;
+							txtToDisplay = t("Size is bigger than", "sieve")+' '+record.data.arg;
 						break;
 						
 					default:
-						txtToDisplay = GO.sieve.lang.errorshowtext;
+						txtToDisplay = t("Error while displaying test line", "sieve");
 						break;
 				}
 				return txtToDisplay;
@@ -200,19 +200,19 @@ GO.sieve.CriteriumGrid = function(config){
 	config.view=new Ext.grid.GridView({
 		autoFill: true,
 		forceFit: true,
-		emptyText: GO.sieve.lang['pleaseAddCriterium']
+		emptyText: t("Please click 'add' to add a criterium", "sieve")
 	});
 	config.sm=new Ext.grid.RowSelectionModel();
 	config.loadMask=true;
 	config.tbar=[{
 			iconCls: 'btn-add',
-			text: GO.lang['cmdAdd'],
+			text: t("Add"),
 			cls: 'x-btn-text-icon',
 			handler: function(){this.showCriteriumCreatorDialog();},
 				scope: this
 		},{
 			iconCls: 'btn-delete',
-			text: GO.lang['cmdDelete'],
+			text: t("Delete"),
 			cls: 'x-btn-text-icon',
 			handler: function(){this.deleteSelected();},
 				scope: this

@@ -372,7 +372,7 @@ new Ext.TabPanel({
          '&lt;tpl if="closable">',
             '&lt;a class="x-tab-strip-close">&lt;/a>',
          '&lt;/tpl>',
-         '&lt;a class="x-tab-right" href="#" style="padding-left:6px">',
+         '&lt;a class="x-tab-right"  style="padding-left:6px">',
             '&lt;em class="x-tab-left">',
                 '&lt;span class="x-tab-strip-inner">',
                     '&lt;img src="{src}" style="float:left;margin:3px 3px 0 0">',
@@ -410,7 +410,7 @@ new Ext.TabPanel({
         if(!this.itemTpl){
             var tt = new Ext.Template(
                  '<li class="{cls}" id="{id}"><a class="x-tab-strip-close"></a>',
-                 '<a class="x-tab-right" href="#"><em class="x-tab-left">',
+                 '<a class="x-tab-right" ><em class="x-tab-left">',
                  '<span class="x-tab-strip-inner"><span class="x-tab-strip-text {iconCls}">{text}</span></span>',
                  '</em></a></li>'
             );

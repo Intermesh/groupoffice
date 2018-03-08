@@ -7,7 +7,7 @@
  * If you have questions write an e-mail to info@intermesh.nl
  * 
  * @copyright Copyright Intermesh
- * @version $Id: AddresslistsFilterPanel.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: AddresslistsFilterPanel.js 22112 2018-01-12 07:59:41Z mschering $
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
@@ -19,7 +19,7 @@ GO.addressbook.AddresslistsFilterPanel = function(config)
 	}
 	
 	config.autoScroll=true;
-	config.title= GO.addressbook.lang.filterMailings;
+	config.title= t("Address list filter", "addressbook");
 	
 	var checkColumn = new GO.grid.CheckColumn({
 		header: '&nbsp;',
@@ -37,21 +37,21 @@ GO.addressbook.AddresslistsFilterPanel = function(config)
 		columns: [
 				checkColumn,
 				{
-					header: GO.lang.strName, 
+					header: t("Name"), 
 					dataIndex: 'name',
 					id:'name'
 				}				
 			],
 		plugins: [checkColumn],
 		autoExpandColumn:'name',
-		viewConfig: {emptyText:GO.addressbook.lang.noAddressLists}
+		viewConfig: {emptyText:t("No address lists", "addressbook")}
 	});	
 
 	config.layout= 'fit';
 
 	
 	var applyButton = new Ext.Button({
-		text:GO.lang.cmdApply,
+		text:t("Apply"),
 		handler:function(){			
 			var mailings = [];
 			
@@ -72,7 +72,7 @@ GO.addressbook.AddresslistsFilterPanel = function(config)
 	});    
 	
 	var resetButton = new Ext.Button({
-		text:GO.lang.cmdReset,
+		text:t("Reset"),
 		handler:function(){			
 			
 			var mailings = [];

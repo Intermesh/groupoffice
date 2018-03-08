@@ -1,5 +1,5 @@
 GO.mainLayout.onReady(function(){
-	if(GO.summary)
+	if(go.ModuleManager.isAvailable("summary"))
 	{
 		GO.summary.portlets['portlet-folder-browser']={
 			multiple:true,
@@ -9,7 +9,7 @@ GO.mainLayout.onReady(function(){
 			},
 //			folderBrowserTabPanel:folderBrowserTabPanel,
 			portletType: 'portlet-folder-browser',
-			title: GO.files.lang.folderBrowserPortlet,
+			title: t("Show folder", "files"),
 			layout:'fit',
 			height:200,
 			tools: [{
@@ -47,7 +47,7 @@ GO.mainLayout.onReady(function(){
 				// Remove all panels from the tabs
 				this.folderBrowserTabPanel.removeAll();
 				
-				this.setTitle(GO.files.lang.folder +': '+path);
+				this.setTitle(t("Folder", "files") +': '+path);
 				this.folderBrowserTabPanel.setFolderId(id);
 			},
 			

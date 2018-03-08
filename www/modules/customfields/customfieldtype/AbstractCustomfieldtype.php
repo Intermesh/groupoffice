@@ -12,7 +12,7 @@ abstract class AbstractCustomfieldtype extends \GO\Base\Observable{
 	 */
 	protected $field;
 	
-	protected $maxLength=255;
+	protected $maxLength=190;
 	
 	public function __construct($field=false){
 		if($field)
@@ -26,7 +26,7 @@ abstract class AbstractCustomfieldtype extends \GO\Base\Observable{
 	 * @return MySQL field 
 	 */
 	public function fieldSql(){
-		return "VARCHAR(%MAX_LENGTH) NOT NULL default ''";
+		return "VARCHAR(%maxLength%) NOT NULL default ''";
 	}
 
 	public function hasLength() {
@@ -137,7 +137,7 @@ abstract class AbstractCustomfieldtype extends \GO\Base\Observable{
 	 * @return StringHelper The errormessage for this validator 
 	 */
 	public function getValidationError(){
-		return \GO::t('defaultValidationError','customfields');
+		return \GO::t("The value was not formatted correctly", "customfields");
 	}
 	
 	

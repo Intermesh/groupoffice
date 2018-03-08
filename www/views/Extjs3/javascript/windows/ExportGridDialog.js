@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: ExportGridDialog.js 16148 2013-10-31 10:45:13Z mschering $
+ * @version $Id: ExportGridDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -38,7 +38,7 @@ GO.ExportGridDialog = Ext.extend(GO.Window , {
 		});
 	
 		this.radioGroup = new Ext.form.RadioGroup({
-			fieldLabel : GO.lang['strType'],
+			fieldLabel : t("Type"),
 			name       : 'exportFormat',
 			columns: 1,
 			items: []
@@ -49,22 +49,22 @@ GO.ExportGridDialog = Ext.extend(GO.Window , {
 		}, this);
 		
 		this.includeHidden = new Ext.ux.form.XCheckbox({
-			fieldLabel : GO.lang.exportIncludeHidden,
+			fieldLabel : t("Export hidden columns too"),
 			name       : 'includeHidden'
 		});
 		
 		this.humanHeaders = new Ext.ux.form.XCheckbox({
-			fieldLabel : GO.lang.exportHumanHeaders,
+			fieldLabel : t("Use DB column names"),
 			name       : 'humanHeaders'
 		});
 		
 		this.includeHeaders = new Ext.ux.form.XCheckbox({
-			fieldLabel  : GO.lang.exportIncludeHeaders,
+			fieldLabel  : t("Export headers too"),
 			name				: 'includeHeaders'
 		});
 		
 		this.exportOrientation = new Ext.form.ComboBox({
-			fieldLabel : GO.lang.exportOrientation,
+			fieldLabel : t("Orientation"),
 			hiddenName: 'exportOrientation',
 			name: 'exportOrientation',
 			mode: 'local',
@@ -78,7 +78,7 @@ GO.ExportGridDialog = Ext.extend(GO.Window , {
 						'myId',
 						'displayText'
 				],
-				data: [['H', GO.lang.landscape], ['V', GO.lang.portrait]]
+				data: [['H', t("Landscape")], ['V', t("Portrait")]]
 			}),
 			valueField: 'myId',
 			displayField: 'displayText'
@@ -118,19 +118,19 @@ GO.ExportGridDialog = Ext.extend(GO.Window , {
 		
 		Ext.apply(this, {
 			goDialogId:'export',
-			title:GO.lang['exportDialog'],
+			title:t("Export Dialog"),
 			autoHeight:true,
 			width:400,
 			items: [this.formPanel],
 			buttons:[
 			{ 
-				text: GO.lang['cmdExport'], 
+				text: t("Export"), 
 				handler: function(){ 
 					this.submitForm(true);
 				}, 
 				scope: this 
 			},{ 
-				text: GO.lang['cmdClose'], 
+				text: t("Close"), 
 				handler: function(){ 
 					this.hide(); 
 				}, 
@@ -256,15 +256,15 @@ GO.ExportGridDialog = Ext.extend(GO.Window , {
 				'name': this.name,
 				'documentTitle' : this.documentTitle	
 			},
-			waitMsg:GO.lang['waitMsgSave'],
+			waitMsg:t("Saving..."),
 			success:function(form, action) {		
 				//console.log("SUCCESSFULL");
 			},		
 			failure: function(form, action) {
 				if(action.failureType == 'client')			
-					Ext.MessageBox.alert(GO.lang['strError'], GO.lang['strErrorsInForm']);			
+					Ext.MessageBox.alert(t("Error"), t("You have errors in your form. The invalid fields are marked."));			
 			 else
-					Ext.MessageBox.alert(GO.lang['strError'], action.result.feedback);
+					Ext.MessageBox.alert(t("Error"), action.result.feedback);
 			},
 			scope: this
 		});
@@ -284,7 +284,7 @@ GO.ExportGridDialog = Ext.extend(GO.Window , {
 //		
 //		Ext.apply(this, {
 //			goDialogId:'export',
-//			title:GO.lang['exportDialog'],
+//			title:t("Export Dialog"),
 //			//autoHeight:true,
 //			height:400,
 //			width:400,
@@ -292,13 +292,13 @@ GO.ExportGridDialog = Ext.extend(GO.Window , {
 //			enableOkButton : false,
 //			enableApplyButton : false,
 //			buttons:[{ 
-//				text: GO.lang['cmdExport'], 
+//				text: t("Export"), 
 //				handler: function(){ 
 //					this.submitForm();
 //				}, 
 //				scope: this 
 //			},{ 
-//				text: GO.lang['cmdClose'], 
+//				text: t("Close"), 
 //				handler: function(){ 
 //					this.hide(); 
 //				}, 
@@ -318,7 +318,7 @@ GO.ExportGridDialog = Ext.extend(GO.Window , {
 //		this.hiddenHeaders = new Ext.form.Hidden({name:'headers'});
 //	
 //		this.radioGroup = new Ext.form.RadioGroup({
-//			fieldLabel : GO.lang['strType'],
+//			fieldLabel : t("Type"),
 //			name       : 'exportFormat',
 //			columns: 1,
 //			items: []
@@ -329,25 +329,25 @@ GO.ExportGridDialog = Ext.extend(GO.Window , {
 ////		}, this);
 //		
 //		this.includeHidden = new Ext.form.Checkbox({
-//			fieldLabel : GO.lang.exportIncludeHidden,
+//			fieldLabel : t("Export hidden columns too"),
 //			name       : 'includeHidden'
 //		});
 //		
 //		this.humanHeaders = {
 //			xtype				: 'xcheckbox',
-//			fieldLabel	: GO.lang.exportHumanHeaders,
+//			fieldLabel	: t("Use DB column names"),
 //			name				: 'humanHeaders',
 //			checked			: true
 //		};
 //		
 //		this.includeHeaders = {
 //			xtype				: 'xcheckbox',
-//			fieldLabel  : GO.lang.exportIncludeHeaders,
+//			fieldLabel  : t("Export headers too"),
 //			name				: 'includeHeaders'
 //		};
 //		
 //		this.exportOrientation = new Ext.form.ComboBox({
-//			fieldLabel : GO.lang.exportOrientation,
+//			fieldLabel : t("Orientation"),
 //			hiddenName: 'exportOrientation',
 //			name: 'exportOrientation',
 //			mode: 'local',
@@ -361,7 +361,7 @@ GO.ExportGridDialog = Ext.extend(GO.Window , {
 //						'myId',
 //						'displayText'
 //				],
-//				data: [['H', GO.lang.landscape], ['V', GO.lang.portrait]]
+//				data: [['H', t("Landscape")], ['V', t("Portrait")]]
 //			}),
 //			valueField: 'myId',
 //			displayField: 'displayText'
@@ -374,7 +374,7 @@ GO.ExportGridDialog = Ext.extend(GO.Window , {
 //		});
 //		
 //		this.propertiesPanel = new Ext.Panel({
-//			title:GO.lang['strProperties'],			
+//			title:t("Properties"),			
 //			cls:'go-form-panel',
 //			layout:'form',
 //			items:[

@@ -1,27 +1,20 @@
 <?php
-
-$l["browseComments"]='Kommentare durchschauen';
-$l["recentComments"]='Letzte Kommentare';
-
-$l['name']='Kommentare';
-$l['description']='Modul zur Aktivierung von Kommentaren in anderen Modulen';
-$l['comment']='Kommentar';
-$l['comments']='Kommentare';
-
-$l['manageCategories']='Kategorien verwalten';
-$l['category']='Kategorie';
-$l['noCategory']='Keine Kategorie';
-$l['newCommentText']='Hier einen neuen Kommentar eingeben ...';
-$l['readMore']="Mehr lesen";
-$l['enableReadMore']="Aktiviere \"Mehr lesen\"-Links";
-
-$l['actionDate']='Handlungsdatum';
-
-$l['parent']='Übergeordnet';
-
-$l['originalCommentTabs'] = 'Original Kommentar Reiter';
-$l['disableOriginalCommentsContact'] = 'Original Kommentar Reiter im Kontakt-Dialogfenster verstecken';
-$l['disableOriginalCommentsCompany'] = 'Original Kommentar Reiter im Firmen-Dialogfenster verstecken';
-
-$l['emptyComment']='Kommentar leeren';
-
+return array (
+  'Browse comments' => 'Kommentare durchschauen',
+  'Recent comments' => 'Letzte Kommentare',
+  'Comment' => 'Kommentar',
+  'Manage categories' => 'Kategorien verwalten',
+  'Category' => 'Kategorie',
+  'No category' => 'Keine Kategorie',
+  'Enter new comment here ...' => 'Hier einen neuen Kommentar eingeben ...',
+  'Read more' => 'Mehr lesen',
+  'Enable read more links' => 'Aktiviere "Mehr lesen"-Links',
+  'Action date' => 'Handlungsdatum',
+  'Parent' => 'Übergeordnet',
+  'Original comment tabs' => 'Original Kommentar Reiter',
+  'Hide original comments tab in contact dialog' => 'Original Kommentar Reiter im Kontakt-Dialogfenster verstecken',
+  'Hide original comments tab in company dialog' => 'Original Kommentar Reiter im Firmen-Dialogfenster verstecken',
+  'name' => 'Kommentare',
+  'description' => 'Modul zur Aktivierung von Kommentaren in anderen Modulen',
+  'Comments' => 'Kommentare',
+);

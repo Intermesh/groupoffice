@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: MenuDialog.js 17133 2014-03-20 08:25:24Z mschering $
+ * @version $Id: MenuDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
@@ -19,7 +19,7 @@ GO.site.MenuDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		
 		Ext.apply(this, {
 			goDialogId:'site_menu',
-			title:GO.site.lang.menu,
+			title:t("Menu", "site"),
 			formControllerUrl: 'site/menu',
 			updateAction : 'update',
 			createAction	: 'create',
@@ -37,7 +37,7 @@ GO.site.MenuDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			anchor: '100%',
 			maxLength: 255,
 			allowBlank:false,
-			fieldLabel: GO.site.lang.menuLabel
+			fieldLabel: t("Label", "site")
 		});
 		
 		this.menuSlugField = new Ext.form.TextField({
@@ -45,11 +45,11 @@ GO.site.MenuDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			anchor: '100%',
 			maxLength: 255,
 			allowBlank:false,
-			fieldLabel: GO.site.lang.menuMenu_slug
+			fieldLabel: t("Slug", "site")
 		});
 		
 		this.propertiesPanel = new Ext.Panel({
-			title:GO.site.lang.meta,		
+			title:t("Meta", "site"),		
 			cls:'go-form-panel',
 			layout:'form',
 			items:[

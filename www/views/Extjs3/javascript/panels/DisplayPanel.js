@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: DisplayPanel.js 19345 2015-08-25 10:11:22Z wsmits $
+ * @version $Id: DisplayPanel.js 22372 2018-02-13 14:47:17Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -65,69 +65,76 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 			panel:this
 		});
 		
-		var tbar=[];
+		
+		
+		var tbar=['->'];
+		
+		
+		
+//		
+//		if (!this.noLinkBrowser) {
+//			tbar.push(this.linkBrowseButton = new Ext.Button({
+//				iconCls: 'btn-link', 
+//				cls: 'x-btn-text-icon', 
+//				text: t("Links"),
+//				handler: function(){
+//					if(!GO.linkBrowser){
+//						GO.linkBrowser = new GO.LinkBrowser();
+//					}
+//					GO.linkBrowser.show({model_id: this.data.id,model_name: this.model_name,folder_id: "0"});
+//					GO.linkBrowser.on('hide', this.reload, this,{single:true});
+//				},
+//				scope: this
+//			}));
+//		}
+		
+//		if(GO.files && !this.noFileBrowser)
+//		{
+//			tbar.push(this.fileBrowseButton = new GO.files.FileBrowserButton({
+//				model_name:this.model_name
+//			}));
+//		}
+		
+//		tbar.push('-');
+//		tbar.push({            
+//	      iconCls: "btn-refresh",
+//	      text:t("Refresh"),      
+//				tooltip:t("Refresh"),      
+//	      handler: this.reload,
+//	      scope:this
+//	  });
+
 		tbar.push(this.editButton = new Ext.Button({
 				iconCls: 'btn-edit', 
-				text: GO.lang['cmdEdit'], 
+				tooltip: t("Edit"), 
 				cls: 'x-btn-text-icon', 
 				handler:this.editHandler, 
 				scope: this,
 				disabled : true
 			}));
 
-		tbar.push(this.newMenuButton);
+		this.moreButton = new Ext.Button({
+			iconCls: 'ic-more-vert',
+			menu:[
+				{            
+					iconCls: "ic-print",
+					
+					text:t("Print"),      
+					handler: function(){
+						this.body.print({title:this.getTitle()});
+					},
+					scope:this
+				},{            
+					iconCls: "btn-refresh",
+					text:t("Refresh"),      
+					handler: this.reload,
+					scope:this
+				}
+			]
+		});
 		
-		if(GO.documenttemplates)
-		{
-			this.newOODoc = new GO.documenttemplates.NewOODocumentMenuItem();
-			this.newOODoc.on('create', function(){
-				this.reload();
-			}, this);
+		tbar.push(this.moreButton);
 
-			this.newMenuButton.menu.add(this.newOODoc);		
-		}
-		
-		if (!this.noLinkBrowser) {
-			tbar.push(this.linkBrowseButton = new Ext.Button({
-				iconCls: 'btn-link', 
-				cls: 'x-btn-text-icon', 
-				text: GO.lang.cmdBrowseLinks,
-				handler: function(){
-					if(!GO.linkBrowser){
-						GO.linkBrowser = new GO.LinkBrowser();
-					}
-					GO.linkBrowser.show({model_id: this.data.id,model_name: this.model_name,folder_id: "0"});
-					GO.linkBrowser.on('hide', this.reload, this,{single:true});
-				},
-				scope: this
-			}));
-		}
-		
-		if(GO.files && !this.noFileBrowser)
-		{
-			tbar.push(this.fileBrowseButton = new GO.files.FileBrowserButton({
-				model_name:this.model_name
-			}));
-		}
-		
-		tbar.push('-');
-		tbar.push({            
-	      iconCls: "btn-refresh",
-	      text:GO.lang.cmdRefresh,      
-				tooltip:GO.lang.cmdRefresh,      
-	      handler: this.reload,
-	      scope:this
-	  });
-	  tbar.push({            
-	      iconCls: "btn-print",
-	      text:GO.lang.cmdPrint,
-				tooltip:GO.lang.cmdPrint,      
-	 			handler: function(){
-					this.body.print({title:this.getTitle()});
-				},
-				scope:this
-	  });
-	  
 	  return tbar;
 	},
 
@@ -136,16 +143,17 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 	},
 	
 	initComponent : function(){
+		
 		this.autoScroll=true;
 		this.split=true;
 		var tbar = this.createTopToolbar();
 	
-		if(Ext.isArray(tbar)){
-			tbar = new Ext.Toolbar({				
-				enableOverflow:true,
-				items:tbar
-			});
-		}
+//		if(Ext.isArray(tbar)){
+//			tbar = new Ext.Toolbar({				
+//				enableOverflow:true,
+//				items:tbar
+//			});
+//		}
 		
 		if(tbar)
 			this.tbar = tbar;
@@ -178,7 +186,37 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		this.xtemplate = new Ext.XTemplate(this.template, this.templateConfig);
 		this.xtemplate.compile();
 		
+		
+		this.mainItem = new Ext.Panel({
+			listeners: {
+				render: function() {
+					this.mainItem.body.on('click', this.onBodyClick, this);
+				},
+				scope: this
+
+			}
+		});
+		
+		this.items = [this.mainItem];
+		
 		GO.DisplayPanel.superclass.initComponent.call(this);
+		
+		
+		if(this.model_name) {
+			var parts = this.model_name.split("\\");
+			this.entity = parts[3];
+		}
+		
+		
+		this.add(new go.links.LinksDetailPanel());
+		
+		if(go.ModuleManager.isAvailable("files")) {
+			this.add(new go.modules.files.FilesDetailPanel());
+		}
+		
+		if(go.ModuleManager.isAvailable("comments") ){
+			this.add(new go.modules.comments.CommentsDetailPanel());
+		}
 
 		if(!this.expandListenObject){
 			this.expandListenObject=this;
@@ -206,8 +244,8 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		var tbar = this.getTopToolbar();
 		if(tbar)
 			tbar.setDisabled(true);
-
-		this.body.on('click', this.onBodyClick, this);
+		
+		this.reset();
 
 		if(this.editGoDialogId){
 			GO.dialogListeners.add(this.editGoDialogId,{
@@ -258,6 +296,10 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		if(tbar)
 			tbar.setDisabled(true);
 		
+		this.items.each(function (item, index, length) {
+			item.hide();
+		}, this);
+		
 		this.fireEvent('reset', this);
 	},
 
@@ -273,23 +315,6 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		if(this.editButton)
 			this.editButton.setDisabled(this.data.permission_level<GO.permissionLevels.write);
 		
-		
-		if(this.newMenuButton){
-			if(this.data.permission_level>=GO.permissionLevels.write)
-			{
-				this.newMenuButton.setLinkConfig({
-					model_id:this.data.id,
-					model_name:this.model_name,
-					text: this.getLinkName(),
-					action_date: GO.util.empty(this.actionDate) ? "" : this.actionDate, // Actopm date is used in Contacts with Comments module
-					callback:this.reload,
-					scope:this
-				});
-			}else
-			{
-				this.newMenuButton.setDisabled(true);
-			}
-		}
 		
 		if(this.fileBrowseButton)
 		{
@@ -315,7 +340,7 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		
 		this.updateToolbar();
 		
-		this.xtemplate.overwrite(this.body, data);
+		this.xtemplate.overwrite(this.mainItem.body, data);
 
 		for(var id in this.collapsibleSections){
 			if(this.hiddenSections.indexOf(this.collapsibleSections[id])>-1){
@@ -383,8 +408,9 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 
 	
 	onBodyClick :  function(e, target){
-
+		
 		this.fireEvent('bodyclick', this, target, e);
+		
 
 		if(target.id.substring(0,6)=='toggle'){
 			var toggleId = target.id.substring(7,target.id.length);
@@ -399,7 +425,7 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 				return false;
 		}	
 		
-		if(target.tagName=='A')
+		if(target.tagName=='A' && target.attributes['href'])
 		{
 			
 			
@@ -421,76 +447,9 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 				//this.fireEvent('emailClicked', email);			
 			}else 
 			{			
-				var pos = href.indexOf('#link_');
-				if(pos>-1)
-				{
-					var index = href.substr(pos+6, href.length);		
-					var link = this.data.links[index];			
-					if(link.model_name=='folder')
-					{
-						GO.linkBrowser.show({model_id: link.parent_model_id,model_name: link.parent_model_name,folder_id: link.id});
-					}else
-					{
-						if(!GO.linkHandlers[link.model_name]){
-							GO.errorDialog.show(GO.lang.handlerNotInstalled,GO.lang.moduleNotInstalled);
-						} else {
-							GO.linkHandlers[link.model_name].call(this, link.model_id, {data: link});
-						}
-					}
-					e.preventDefault();
-					return;
-				}
-
-				pos = href.indexOf('#files_');
-				if(pos>-1)
-				{
-					var index = href.substr(pos+7, href.length);
-					var file = this.data.files[index];
-
-					if(file.extension=='folder')
-					{
-						GO.files.openFolder(this.data.files_folder_id, file.id);
-					}else
-					{
-						if(GO.files){
-							//GO.files.openFile({id:file.id});
-							file.handler.call(this);
-						}else
-						{
-							window.open(GO.url("files/file/download",{id:file.id}));
-						}
-					}
-					e.preventDefault();
-					return;
-				}
-
-				if(href.indexOf('#browselinks')>-1){
-
-					if(!GO.linkBrowser){
-						GO.linkBrowser = new GO.LinkBrowser();
-					}
-					GO.linkBrowser.show({model_id: this.data.id,model_name: this.model_name,folder_id: "0"});
-					GO.linkBrowser.on('hide', this.reload, this,{single:true});
-					e.preventDefault();
-
-					return;
-				}
 				
-				if(href.indexOf('#showalllinks')>-1){
-					this.loadParams['links_limit']=0;
-					this.reload();
-					delete this.loadParams['links_limit'];
-				
-				}
+			
 
-				if(href.indexOf('#browsefiles')>-1){
-
-					GO.files.openFolder(this.data.files_folder_id);
-					GO.files.fileBrowserWin.on('hide', this.reload, this, {single:true});
-					e.preventDefault();
-
-					return;
-				}
 
 				this.fireEvent('afterbodyclick', this, target, e, href);
 
@@ -517,61 +476,6 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 	
 	afterLoad : function(loadResponseData) {
 	
-		if (GO.comments && this.data.comments.length>0) {
-			
-		  this.newCommentPanel = new Ext.form.FormPanel({			
-			  renderTo: 'newCommentForModelDiv_'+this.model_name.replace(/\\/g,"_")+'_'+this.data.id,
-			  layout: 'form',
-			  border: false,
-
-			  items: [this.commentsField = new Ext.form.TextArea({
-				  name: 'comments',
-				  anchor: '90%',
-				  height: 70,
-				  hideLabel:true,
-				  allowBlank:false,
-				  emptyText: GO.comments.lang['newCommentText']
-			  }),
-				this.categoriesCB = new GO.comments.CategoriesComboBox(),
-				this.actionDateField = new Ext.form.DateField({
-					name: 'action_date',
-					fieldLabel: GO.comments.lang['actionDate'],
-					format : GO.settings['date_format'],
-					disabled: true
-				}),
-					  new Ext.Button({
-						  text: GO.lang.cmdAdd,
-						  handler: function(){
-							  this.newCommentPanel.form.submit({
-								  url: GO.url('comments/comment/submit'),
-								  params: {
-//										comments : this.commentsField.getValue(),
-//										category_id : this.categoriesCB.getValue(),
-										withActionDate: this._commentsWithActionDate,
-									  model_id : this.model_id,
-									  model_name : this.model_name
-								  },
-								  success:function(form, action){
-									  if (!GO.util.empty(action.result.feedback))
-										  Ext.MessageBox.alert('', action.result.feedback);
-									  this.load(this.model_id,true);
-										this.fireEvent('commentAdded');
-								  },
-								  scope: this
-							  });
-						  },
-						  scope: this
-					  })
-			  ]
-		  });
-			
-			this._toggleActionDate();
-			if (!GO.util.empty(loadResponseData['action_date']))
-				this.actionDateField.setValue(loadResponseData['action_date']);
-			else
-				this.actionDateField.setValue();
-			
-		}
 		
 		this.fireEvent('afterload',this.model_id);
 		
@@ -579,6 +483,8 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 	
 	load : function(id, reload)
 	{
+		this.fireEvent('beforeload',this, id);
+		
 		if(this.loading && id==this.model_id)
 			return false;
 		
@@ -600,6 +506,7 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 				success: function(options, response, result)
 				{				
 					this.setData(result.data);
+					this.onLoad();
 					if(!reload)
 						this.body.scrollTo('top', 0);
 					
@@ -607,12 +514,31 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 					
 					this.afterLoad(result.data);
 					
-					
 					this.fireEvent('load',this, this.model_id);
 				},
 				scope: this			
 			});
 		}
+	},
+	
+	//for compatibility with new detail view panels
+	onLoad : function() {
+		this.items.each(function(item, index, length){
+			item.show();
+			
+			if(index == 0) {
+				return;
+			}
+			
+			if(item.tpl) {
+				item.update(this.data);
+			}
+			if (item.onLoad) {
+				item.onLoad.call(item, this);
+			}
+		},this);
+		this.doLayout();
+		this.body.scrollTo('top', 0);
 	},
 	
 	stopLoading : function(){
@@ -651,38 +577,3 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 });
 
 Ext.reg('displaypanel',GO.DisplayPanel);
-
-// TODO: Idea for a kind of displaymanager that keeps track of the panels by a specific model.
-// 
-// Maybe this must be generated through PHP???
-// 		
-//GO.DisplayManager = function(){
-//	var templateBlocks = [];
-//	var newMenuItems = [];
-//
-//	return {
-//		/**
-//		 * Registers a component.
-//		 * @param {Ext.Component} c The component
-//		 */
-//		addTemplateBlock : function(title, template){
-//			templateBlocks.add({title:title, template: template});
-//		},
-//		
-//		getTemplateBlocks : function(){
-//			return this.templateBlocks;
-//		},
-//		
-//		/**
-//		 * Registers a component.
-//		 * @param {Ext.Component} c The component
-//		 */
-//		addNewMenuItem : function(item){
-//			newMenuItems.add(item);
-//		},
-//		
-//		getNewMenuItems : function(){
-//			return this.newMenuItems;
-//		}
-//	}
-//}

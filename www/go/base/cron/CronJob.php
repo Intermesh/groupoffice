@@ -115,14 +115,14 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 		
 		$id = $this->id;
 		
-		$query = "SELECT * FROM `go_users` as `t`
+		$query = "SELECT * FROM `core_user` as `t`
 							WHERE `id` IN (
 								SELECT `id` FROM `go_cron_users` cu 
 								WHERE user_id=`t`.`id` AND `cu`.`cronjob_id`=:cronjob_id
 							)
 							OR `id` IN (
 								SELECT `ug`.`user_id` FROM `go_cron_groups` cg 
-								INNER JOIN `go_users_groups` ug ON `ug`.`group_id`=`cg`.`group_id`
+								INNER JOIN `core_user_group` ug ON `ug`.`group_id`=`cg`.`group_id`
 								WHERE `cg`.`cronjob_id`=:cronjob_id
 							);";
 		$stmnt = GO::getDbConnection()->prepare($query);
@@ -143,22 +143,22 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 	public function validate() {
 		
 		if(!$this->_validateExpression('minutes'))
-			$this->setValidationError('minutes', GO::t('minutesNotMatch','cron'));
+			$this->setValidationError('minutes', GO::t("Minutes does not match the required format.", "cron"));
 		
 		if(!$this->_validateExpression('hours'))
-			$this->setValidationError('hours', GO::t('hoursNotMatch','cron'));
+			$this->setValidationError('hours', GO::t("Hours does not match the required format.", "cron"));
 		
 		if(!$this->_validateExpression('monthdays'))
-			$this->setValidationError('monthdays', GO::t('monthdaysNotMatch','cron'));
+			$this->setValidationError('monthdays', GO::t("Monthdays does not match the required format.", "cron"));
 		
 		if(!$this->_validateExpression('months'))
-			$this->setValidationError('months', GO::t('monthsNotMatch','cron'));
+			$this->setValidationError('months', GO::t("Months does not match the required format.", "cron"));
 		
 		if(!$this->_validateExpression('weekdays'))
-			$this->setValidationError('weekdays', GO::t('weekdaysNotMatch','cron'));
+			$this->setValidationError('weekdays', GO::t("Weekdays does not match the required format.", "cron"));
 		
 		if(!$this->_validateExpression('years'))
-			$this->setValidationError('years', GO::t('yearsNotMatch','cron'));
+			$this->setValidationError('years', GO::t("Years does not match the required format.", "cron"));
 		
 		if($this->hasValidationErrors())
 			$this->setValidationError('active', '<br /><br />'.$this->_getExampleFormats());
@@ -215,14 +215,14 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	private function _getExampleFormats(){
-		return GO::t('exampleFormats','cron').
+		return GO::t("Please use one of these formats (eg. hour, no spaces):", "cron").
 			'<table>'.
-				'<tr><td>*</td><td>'.GO::t('exampleFormat1Explanation','cron').'</td></tr>'.
-				'<tr><td>1</td><td>'.GO::t('exampleFormat2Explanation','cron').'</td></tr>'.
-				'<tr><td>1-5</td><td>'.GO::t('exampleFormat3Explanation','cron').'</td></tr>'.
-				'<tr><td>0-23/2</td><td>'.GO::t('exampleFormat4Explanation','cron').'</td></tr>'.
-				'<tr><td>1,2,3,13,22</td><td>'.GO::t('exampleFormat5Explanation','cron').'</td></tr>'.
-				'<tr><td>0-4,8-12</td><td>'.GO::t('exampleFormat6Explanation','cron').'</td></tr>'.
+				'<tr><td>*</td><td>'.GO::t("(all)", "cron").'</td></tr>'.
+				'<tr><td>1</td><td>'.GO::t("(only the first)", "cron").'</td></tr>'.
+				'<tr><td>1-5</td><td>'.GO::t("(All between 1 and 5)", "cron").'</td></tr>'.
+				'<tr><td>0-23/2</td><td>'.GO::t("(Every 2nd between 0 and 23)", "cron").'</td></tr>'.
+				'<tr><td>1,2,3,13,22</td><td>'.GO::t("(Only on the given numbers)", "cron").'</td></tr>'.
+				'<tr><td>0-4,8-12</td><td>'.GO::t("(Between 0 and 4 and between 8 and 12)", "cron").'</td></tr>'.
 			'<table>';
 	}
 	

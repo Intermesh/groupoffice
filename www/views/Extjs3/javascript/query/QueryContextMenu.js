@@ -18,7 +18,7 @@ GO.query.QueryContextMenu = function(config)
 	
 	config.items=[this.deleteBtn = new Ext.menu.Item({
 		iconCls: 'btn-delete',
-		text: GO.lang['cmdDelete'],
+		text: t("Delete"),
 		cls: 'x-btn-text-icon',
 		handler: function(){						
 			this.callingGrid.deleteSelected();
@@ -26,7 +26,7 @@ GO.query.QueryContextMenu = function(config)
 		scope: this
 	}), this.permissionsButton = new Ext.menu.Item({
 		iconCls: 'btn-edit',
-		text: GO.lang['cmdEdit'],
+		text: t("Edit"),
 		cls: 'x-btn-text-icon',
 		handler: function(button,item) {
 			var record = this.callingGrid.getSelectionModel().getSelected();

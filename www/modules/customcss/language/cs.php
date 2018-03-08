@@ -1,4 +1,6 @@
 <?php
-$l['name']='Vlastní CSS styly a javaskripty';
-$l['description']='Přepíše výchozí styly {product_name}. Například můžete změnit logo {product_name} na Vaše.';
-$l["selectFile"]='Vybrat soubor';
+return array (
+  'Select file' => 'Vybrat soubor',
+  'name' => 'Vlastní CSS styly a javaskripty',
+  'description' => 'Přepíše výchozí styly {product_name}. Například můžete změnit logo {product_name} na Vaše.',
+);

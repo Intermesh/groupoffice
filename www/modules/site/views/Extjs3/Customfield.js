@@ -2,7 +2,7 @@ GO.moduleManager.onModuleReady('customfields', function(){
 	
 	GO.customfields.nonGridTypes.push('sitefile');
 	GO.customfields.dataTypes["GO\\Site\\Customfieldtype\\Sitefile"]={
-		label : GO.site.lang.siteFile,
+		label : t("Site File", "site"),
 		getFormField : function(customfield, config){
 			return {
 				xtype: 'siteselectfile',
@@ -15,7 +15,7 @@ GO.moduleManager.onModuleReady('customfields', function(){
 	
 	GO.customfields.nonGridTypes.push('siteselectmultifile');
 	GO.customfields.dataTypes["GO\\Site\\Customfieldtype\\Sitemultifile"]={
-		label : GO.site.lang.siteMultiFile,
+		label : t("Site Multifile", "site"),
 		getFormField : function(customfield, config){
 			return {
 				xtype: 'siteselectmultifile',

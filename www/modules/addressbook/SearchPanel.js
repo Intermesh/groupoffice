@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: SearchPanel.js 15954 2013-10-17 12:04:36Z mschering $
+ * @version $Id: SearchPanel.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -33,7 +33,7 @@ GO.addressbook.SearchPanel = function(config)
 			scope:this
 		}];
 
-		this.alphabetArray = GO.addressbook.lang['alphabet'].split(",");
+		this.alphabetArray = t("A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z", "addressbook").split(",");
   
 		var alphabetStoreData = new Array();
 		alphabetStoreData.push({
@@ -92,7 +92,7 @@ GO.addressbook.SearchPanel = function(config)
 		this.queryField = new Ext.form.TextField({
 			name: 'query',
 			width: 200,
-			emptyText:GO.lang.strSearch+ ' '+GO.addressbook.lang['cmdFormSearchFourth']
+			emptyText:t("Search")+ ' '+t("(Use '%' as a wildcard) ", "addressbook")
 		});
  	
 		config.defaults={
@@ -115,7 +115,7 @@ GO.addressbook.SearchPanel = function(config)
 					this.alphabetView.clearSelections();
 					this.fireQueryEvent();
 				},
-				text: GO.lang.strSearch,
+				text: t("Search"),
 				scope: this
 			})
 		},{
@@ -128,7 +128,7 @@ GO.addressbook.SearchPanel = function(config)
 									
 					this.fireQueryEvent();
 				},
-				text: GO.lang.cmdReset,
+				text: t("Reset"),
 				scope: this
 			})
 		}];

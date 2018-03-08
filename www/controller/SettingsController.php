@@ -18,22 +18,20 @@ class SettingsController extends \GO\Base\Controller\AbstractController {
 		}
 		
 		if(!empty($params["dateformat"])){
-			$dateparts = explode(':',$params["dateformat"]);
-			$params['date_separator'] = $dateparts[0];
-			$params['date_format'] = $dateparts[1];
+			$params['date_format'] = $params["dateformat"];
 		}
 		
 //		$user = \GO\Base\Model\User::model()->findByPk($params['id']);
 		$user = GO::user();
 		
 		
-		if(!empty($params['recovery_email'])) {
-			$user->setAttribute('recovery_email', $params['recovery_email']);
+		if(!empty($params['recoveryEmail'])) {
+			$user->setAttribute('recoveryEmail', $params['recoveryEmail']);
 		}
 		
 		$checkCurrentPassword = false;
 		
-		if($user->isModified('recovery_email')){
+		if($user->isModified('recoveryEmail')){
 			$checkCurrentPassword = true;
 		}
 		
@@ -84,8 +82,8 @@ class SettingsController extends \GO\Base\Controller\AbstractController {
 		if($user->contact)
 			$response['data']=array_merge($response['data'],$user->contact->getAttributes('formatted'));
 		
-		if(!empty($response['data']['date_separator'])&& !empty($response['data']['date_format'])){
-			$response['data']['dateformat'] = $response['data']['date_separator'].':'.$response['data']['date_format'];
+		if(!empty($response['data']['date_format'])){
+			$response['data']['dateformat'] = $response['data']['date_format'];
 		}
 		
 		$response['success']=true;

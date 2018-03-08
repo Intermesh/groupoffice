@@ -1,23 +1,22 @@
 <?php
-
-
-$l["bookmarks"]='Zakładki';
-$l["bookmark"]='Zakładka';
-$l["category"]='Kategoria';
-$l["title"]='Tytuł';
-$l["description"]='Opis';
-$l["logo"]='Logo';
-$l["extern"]='Otwórz w nowej zakładce';
-$l["administrateCategories"]='Zarządzaj kategoriami';
-$l["thumbnails"]='Miniatury';
-$l["chooseIcon"]='Wybierz ikonę dla zakładki';
-$l["clearLogo"]='Wyczyść logo';
-$l["uploadLogo"]='Wyślij logo';
-$l["showAll"]='Pokaż wszystkie';
-$l["sharedCategory"]='Udostępnij kategorię';
-$l["behaveAsModule"]='Zachowuj się jako moduł (wymagany restart przeglądarki)';
-$l["confirmDelete"]='Czy jesteś pewien, że chcesz usunąć zakładkę?';
-$l['name']='Zakładki';
-$l['description']='Opis strony';
-$l['general']='Ogólne';
-$l['googleDescription']="Wyszukaj w sieci";
+return array (
+  'Bookmark' => 'Zakładka',
+  'Category' => 'Kategoria',
+  'Title' => 'Tytuł',
+  'Open in new browser tab' => 'Otwórz w nowej zakładce',
+  'Administrate categories' => 'Zarządzaj kategoriami',
+  'Thumbnails' => 'Miniatury',
+  'Choose icon for bookmark' => 'Wybierz ikonę dla zakładki',
+  'Clear Logo' => 'Wyczyść logo',
+  'Upload Logo' => 'Wyślij logo',
+  'Show all' => 'Pokaż wszystkie',
+  'Shared category' => 'Udostępnij kategorię',
+  'Behave as a module (Browser reload required)' => 'Zachowuj się jako moduł (wymagany restart przeglądarki)',
+  'Are you sure you want to delete this bookmark?' => 'Czy jesteś pewien, że chcesz usunąć zakładkę?',
+  'General' => 'Ogólne',
+  'Search the web' => 'Wyszukaj w sieci',
+  'name' => 'Zakładki',
+  'description' => 'Opis strony',
+  'Bookmarks' => 'Zakładki',
+  'Logo' => 'Logo',
+);

@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: UsersGrid.js 16251 2013-11-15 08:39:41Z mschering $
+ * @version $Id: UsersGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Michael de Hart <mdhart@intermesh.nl>
  */
@@ -15,7 +15,7 @@
 		
 		config=config||{};
 		
-		config.title = GO.servermanager.lang["users"];
+		config.title = t("users", "servermanager");
 		//config.autoHeight=true;
 		config.paging=true;
 		
@@ -32,12 +32,12 @@
 		config.viewConfig = {'forceFit':true,'autoFill':true};
 		
 		config.columns = [
-			{dataIndex:'user_id',header:GO.lang.strUser},
-			{dataIndex:'username', header:GO.lang.strUsername},
-			{dataIndex:'used_modules', header:GO.servermanager.lang['modules']},
-			{dataIndex:'enabled',header:GO.servermanager.lang['enabled'],width:100},
-			{dataIndex:'lastlogin',header:GO.servermanager.lang['lastlogin']},
-			{dataIndex:'ctime',header:GO.lang.strCtime, width:110},
+			{dataIndex:'user_id',header:t("User")},
+			{dataIndex:'username', header:t("Username")},
+			{dataIndex:'used_modules', header:t("modules", "servermanager")},
+			{dataIndex:'enabled',header:t("enabled", "servermanager"),width:100},
+			{dataIndex:'lastlogin',header:t("lastlogin", "servermanager")},
+			{dataIndex:'ctime',header:t("Created at"), width:110},
 			{dataIndex:'trialDaysLeft',header:'Trial days left'}
 		];
 		

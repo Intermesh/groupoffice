@@ -266,19 +266,19 @@ class Participant extends \GO\Base\Db\ActiveRecord {
 	public function getStatusName() {
 		switch ($this->status) {
 			case self::STATUS_TENTATIVE :
-				return \GO::t('tentative', 'calendar');
+				return \GO::t("Tentative", "calendar");
 				break;
 
 			case self::STATUS_DECLINED :
-				return \GO::t('declined', 'calendar');
+				return \GO::t("Declined", "calendar");
 				break;
 
 			case self::STATUS_ACCEPTED :
-				return \GO::t('accepted', 'calendar');
+				return \GO::t("Accepted", "calendar");
 				break;
 
 			default:
-				return \GO::t('notRespondedYet', 'calendar');
+				return \GO::t("Not responded yet", "calendar");
 				break;
 		}
 	}
@@ -461,7 +461,7 @@ class Participant extends \GO\Base\Db\ActiveRecord {
 //		if(!$organizer)
 //			throw new \Exception("Could not find organizer to send message to!");
 //
-//		$updateReponses = \GO::t('updateReponses','calendar');
+//		$updateReponses = \GO::t("updateReponses", "calendar");
 //		$subject= sprintf($updateReponses[$this->status], $this->user->name, $this->event->name);
 //
 //

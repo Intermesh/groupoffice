@@ -67,7 +67,7 @@ class AddressbookController extends \GO\Base\Controller\AbstractModelController{
 		
 		$store = new \GO\Base\Data\DbStore('GO\Addressbook\Model\Contact',new \GO\Base\Data\ColumnModel('GO\Addressbook\Model\Contact'),$params,$findParams);
 		
-		$file = new \GO\Base\Fs\File(\GO::t('contacts','addressbook').'.vcf');
+		$file = new \GO\Base\Fs\File(\GO::t("Contacts", "addressbook").'.vcf');
 		\GO\Base\Util\Http::outputDownloadHeaders($file);
 		
 		while($record = $store->nextRecord()){
@@ -253,7 +253,7 @@ class AddressbookController extends \GO\Base\Controller\AbstractModelController{
 			
 			if(empty($params['model']) || $modelName==$params['model']){
 
-				echo '<h1>'.\GO::t('removeDuplicates').'</h1>';
+				echo '<h1>'.\GO::t("Remove duplicates").'</h1>';
 
 				$checkFieldsStr = 't.'.implode(', t.',$checkFields);
 				$findParams = \GO\Base\Db\FindParams::newInstance()
@@ -314,9 +314,9 @@ class AddressbookController extends \GO\Base\Controller\AbstractModelController{
 							if(!empty($params['delete'])){
 
 								if($model->hasLinks() && $model->countLinks()){
-									echo '<tr><td colspan="99">'.\GO::t('skippedDeleteHasLinks').'</td></tr>';
+									echo '<tr><td colspan="99">'.\GO::t("Skipped delete because model has links").'</td></tr>';
 								}elseif(($filesFolder = $model->getFilesFolder(false)) && ($filesFolder->hasFileChildren() || $filesFolder->hasFolderChildren())){
-									echo '<tr><td colspan="99">'.\GO::t('skippedDeleteHasFiles').'</td></tr>';
+									echo '<tr><td colspan="99">'.\GO::t("Skipped delete because model has folder or files").'</td></tr>';
 								}else{									
 									$model->delete();
 								}
@@ -332,8 +332,8 @@ class AddressbookController extends \GO\Base\Controller\AbstractModelController{
 
 				echo '</table>';
 
-				echo '<p>'.sprintf(\GO::t('foundDuplicates'),$count).'</p>';
-				echo '<br /><br /><a href="'.\GO::url('addressbook/addressbook/removeDuplicates', array('delete'=>true, 'addressbook_id'=>$addressbook->id)).'">'.\GO::t('clickToDeleteDuplicates').'</a>';
+				echo '<p>'.sprintf(\GO::t("Found %s duplicates."),$count).'</p>';
+				echo '<br /><br /><a href="'.\GO::url('addressbook/addressbook/removeDuplicates', array('delete'=>true, 'addressbook_id'=>$addressbook->id)).'">'.\GO::t("Click here to delete the newest duplicates marked in red.").'</a>';
 				
 			}
 		}

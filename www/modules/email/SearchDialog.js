@@ -11,52 +11,52 @@ GO.email.SearchDialog = function(config){
 				
 				this.formPanel = new Ext.FormPanel({
 					defaults: {
-						anchor: '96%'
+						anchor: '100%'
 					},
 					defaultType: 'textfield',
+					cls: 'go-form-panel',
 					autoHeight:true,
-					bodyStyle:'padding:5px',
 					labelWidth:125,
 			        
 					items: [{
-						fieldLabel: GO.email.lang.subject,
+						fieldLabel: t("Subject", "email"),
 						name: 'subject'
 					},
 					{
-						fieldLabel: GO.email.lang.searchFrom,
+						fieldLabel: t("Sender", "email"),
 						name: 'from'
 					},
 					{
-						fieldLabel: GO.email.lang.searchTo,
+						fieldLabel: t("Recipient", "email"),
 						name: 'to'
 					},
 					{
-						fieldLabel: GO.email.lang.searchCC,
+						fieldLabel: t("Recipient (CC)", "email"),
 						name: 'cc'
 					},
 					{
-						fieldLabel: GO.email.lang.body,
+						fieldLabel: t("Body", "email"),
 						name: 'body'
 					},
 					new Ext.form.DateField({
-						fieldLabel: GO.email.lang.recievedBefore,
+						fieldLabel: t("Received before", "email"),
 						name: 'before',
 						format: GO.settings['date_format']
 					}),
 					new Ext.form.DateField({
-						fieldLabel: GO.email.lang.recievedSince,
+						fieldLabel: t("Received since", "email"),
 						name: 'since',
 						format: GO.settings['date_format']
 					}),
 					new Ext.form.ComboBox({
-						fieldLabel: GO.email.lang.flagged,
+						fieldLabel: t("Flagged", "email"),
 						name:'flagged',
 						store: new Ext.data.SimpleStore({
 							fields: ['value', 'text'],
 							data : [
-							['', GO.email.lang.NA],
-							['FLAGGED', GO.lang.cmdYes],
-							['UNFLAGGED', GO.lang.cmdNo]
+							['', t("N/A", "email")],
+							['FLAGGED', t("Yes")],
+							['UNFLAGGED', t("No")]
 							]
 				                    
 						}),
@@ -70,14 +70,14 @@ GO.email.SearchDialog = function(config){
 						forceSelection: true
 					}),
 					new Ext.form.ComboBox({
-						fieldLabel: GO.email.lang.answered,
+						fieldLabel: t("Answered", "email"),
 						name:'answered',
 						store: new Ext.data.SimpleStore({
 							fields: ['value', 'text'],
 							data : [
-							['', GO.email.lang.NA],
-							['ANSWERED', GO.lang.cmdYes],
-							['UNANSWERED', GO.lang.cmdNo]
+							['', t("N/A", "email")],
+							['ANSWERED', t("Yes")],
+							['UNANSWERED', t("No")]
 							]
 				                    
 						}),
@@ -91,14 +91,14 @@ GO.email.SearchDialog = function(config){
 						forceSelection: true
 					}),
 					new Ext.form.ComboBox({
-						fieldLabel: GO.email.lang.read,
+						fieldLabel: t("Read", "email"),
 						name:'seen',
 						store: new Ext.data.SimpleStore({
 							fields: ['value', 'text'],
 							data : [
-							['', GO.email.lang.NA],
-							['SEEN', GO.lang.cmdYes],
-							['UNSEEN', GO.lang.cmdNo]
+							['', t("N/A", "email")],
+							['SEEN', t("Yes")],
+							['UNSEEN', t("No")]
 							]
 				                    
 						}),
@@ -115,21 +115,21 @@ GO.email.SearchDialog = function(config){
 						xtype: 'radiogroup',
 						//hideLabel: true,
 						name: 'searchInGroup',
-						fieldLabel: GO.email.lang['searchIn'],
+						fieldLabel: t("Search in", "email"),
 						itemCls: 'x-check-group-alt',
 						columns: 1,
 						items: [
 							{
-								boxLabel: GO.email.lang['currentFolder'],
+								boxLabel: t("Current folder", "email"),
 								name: 'searchIn',
 								inputValue: 'current',
 								checked: true
 							},{
-								boxLabel: GO.email.lang['searchRecursive'],
+								boxLabel: t("Include subfolders", "email"),
 								name: 'searchIn',
 								inputValue: 'recursive'
 							},{
-								boxLabel: GO.email.lang['allFolders'],
+								boxLabel: t("All folders", "email"),
 								name: 'searchIn',
 								inputValue: 'all'
 							}
@@ -141,27 +141,21 @@ GO.email.SearchDialog = function(config){
 				
 				this.dialog = new Ext.Window({
 					layout: 'fit',
-					title: GO.lang.strSearch,
+					title: t("Search"),
 					modal:false,
 					autoHeight:true,
 					width:500,
 					closeAction:'hide',				
 					items: this.formPanel,
 					buttons:[{
-						text: GO.lang.cmdOk,
-						handler: this.doSearch,
-						scope:this					
-					},{
-						text: GO.lang.cmdReset,
+						text: t("Reset"),
 						handler: function(){
 							this.formPanel.form.reset();			
 						},
 						scope:this					
 					},{
-						text: GO.lang.cmdClose,
-						handler: function(){
-							this.dialog.hide();					
-						},
+						text: t("Search"),
+						handler: this.doSearch,
 						scope:this					
 					}],
 					keys: [{

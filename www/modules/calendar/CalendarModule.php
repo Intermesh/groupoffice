@@ -3,9 +3,22 @@
 
 namespace GO\Calendar;
 
+use GO\Calendar\Model\UserSettings;
+use go\core\auth\model\User;
+use go\core\orm\Mapping;
+use go\core\orm\Property;
 
 class CalendarModule extends \GO\Base\Module{
 	
+	
+	public static function defineListeners() {
+		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
+	}
+	
+	public static function onMap(Mapping $mapping) {
+		$mapping->addRelation('calendarSettings', UserSettings::class, ['id' => 'user_id'], false);
+		return true;
+	}
 	
 	public function author() {
 		return 'Merijn Schering';
@@ -51,61 +64,12 @@ class CalendarModule extends \GO\Base\Module{
 		Model\View::model()->deleteByAttribute('user_id', $user->id);		
 	}
 	
-	public static function submitSettings($settingsController, &$params, &$response, $user) {
-		
-		$settings = Model\Settings::model()->getDefault($user);
-		if(!$settings){
-			$settings = new Model\Settings();
-			$settings->user_id=$params['id'];
-		}
-		
-		$settings->background=$params['background'];
-		
-//		var_dump($params['reminder_value']);
-		
-		if(isset($params['reminder_value'])){
-			if($params['reminder_value'] !== ''){
-				$settings->reminder=$params['reminder_multiplier'] * $params['reminder_value'];
-			} else {
-				$settings->reminder = null;
-			}
-		}
-		$settings->calendar_id=$params['default_calendar_id'];
-		$settings->show_statuses=$params['show_statuses'];
-		$settings->check_conflict=$params['check_conflict'];
-	
-
-		$settings->save();
-		
-		return parent::submitSettings($settingsController, $params, $response, $user);
-	}
-	
-	public static function loadSettings($settingsController, &$params, &$response, $user) {
-		
-		$settings = Model\Settings::model()->getDefault($user);
-		$response['data']=array_merge($response['data'], $settings->getAttributes());
-		
-		$calendar = Model\Calendar::model()->findByPk($settings->calendar_id);
-		
-		if($calendar){
-			$response['data']['default_calendar_id']=$calendar->id;
-			$response['remoteComboTexts']['default_calendar_id']=$calendar->name;
-		}
-
-		$response = Controller\EventController::reminderSecondsToForm($response);
-		
-		if(!$response['data']['enable_reminder']){
-			$response['data']['reminder_value'] = null;
-		}
-				
-		return parent::loadSettings($settingsController, $params, $response, $user);
-	}
 	
 	public function install() {
 		parent::install();
 		
 		$group = new Model\Group();
-		$group->name=\GO::t('calendars','calendar');
+		$group->name=\GO::t("Calendars", "calendar");
 		$group->save();
 		
 		

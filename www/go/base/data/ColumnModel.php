@@ -349,7 +349,7 @@ class ColumnModel {
 	 */
 	public function formatModel($model) {
 
-		$oldLevel = error_reporting(E_ERROR); //suppress errors in the eval'd code
+		set_error_handler(function(){});
 		
 		$formattedRecord = array();
 		if($model instanceof \GO\Base\Db\ActiveRecord)
@@ -365,7 +365,7 @@ class ColumnModel {
 			$formattedRecord[$column->getDataIndex()]=$column->render($model);			
 		}
 			
-		error_reporting($oldLevel);		
+		restore_error_handler();
 		
 		if (isset($this->_formatRecordFunction)){
 			$formattedRecord = call_user_func($this->_formatRecordFunction, $formattedRecord, $model, $this);

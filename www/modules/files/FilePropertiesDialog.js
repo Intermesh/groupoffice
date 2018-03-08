@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: FilePropertiesDialog.js 22441 2018-03-01 11:13:36Z michaelhart86 $
+ * @version $Id: FilePropertiesDialog.js 22467 2018-03-07 08:42:50Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -26,7 +26,7 @@ GO.files.FilePropertiesDialog = function(config){
 	});
 	
 	this.clearExpireDateButton = new Ext.Button({
-		text:GO.files.lang.clear,
+		text:t("Clear", "files"),
 		listeners: {
 			click: function() {
 				this.contentExpireDate.setValue(null);
@@ -37,109 +37,110 @@ GO.files.FilePropertiesDialog = function(config){
 	
 	this.propertiesPanel = new Ext.Panel({
 		layout:'form',
-		title:GO.lang['strProperties'],
-		cls:'go-form-panel',
+		title:t("Properties"),
 		waitMsgTarget:true,
-		labelWidth: 120,
+		labelWidth: dp(128),
 		defaultType: 'textfield',
 		items: [
-		{
-			xtype: 'compositefield',
-			anchor: '100%',
-			items: [this.nameField = new Ext.form.TextField({
-				fieldLabel: GO.lang['strName'],
-				name: 'name',
-				flex: 1,
-				validator:function(v){
-					return !v.match(/[\/\*\"<>|\\]/);
-				}
-			}),{
-				xtype: 'textfield',
-				fieldLabel: GO.lang.strExtension,
-				name: 'extension',
-				width: 45
-			}]
-		},{
+			{xtype:'fieldset', 
+				items:[
+				{
+				xtype: 'compositefield',
+				anchor: '100%',
+				items: [this.nameField = new Ext.form.TextField({
+					fieldLabel: t("Name"),
+					name: 'name',
+					flex: 1,
+					validator:function(v){
+						return !v.match(/[\/\*\"<>|\\]/);
+					}
+				}),{
+					xtype: 'textfield',
+					fieldLabel: t("Extension"),
+					name: 'extension',
+					width: 45
+				}]
+			}					
+		,
+		this.pathField = new Ext.form.DisplayField({
+				fieldLabel: t("Location"),
+				name: 'path'
+			})
+		]},
+		{xtype:'fieldset', items:[{
+		
 			xtype: 'plainfield',
-			fieldLabel: GO.lang.strLocation,
-			name: 'path'
-		},
-		new GO.form.HtmlComponent({
-			html:'<hr />'
-		}),
-		{
-			xtype: 'plainfield',
-			fieldLabel: GO.lang.strCtime,
+			fieldLabel: t("Created at"),
 			name: 'ctime'
 		},
 		{
 			xtype: 'plainfield',
-			fieldLabel: GO.lang.strMtime,
+			fieldLabel: t("Modified at"),
 			name: 'mtime'
 		},
 		{
 			xtype: 'plainfield',
-			fieldLabel: GO.lang.strUser,
+			fieldLabel: t("User"),
 			name: 'username'
 		},
 		{
 			xtype: 'plainfield',
-			fieldLabel: GO.lang.mUser,
+			fieldLabel: t("Modified by"),
 			name: 'musername'
 		},{
 			xtype: 'plainfield',
-			fieldLabel: GO.files.lang.lockedBy,
+			fieldLabel: t("Locked by", "files"),
 			name: 'locked_user_name'
-		},
-		new GO.form.HtmlComponent({
-			html:'<hr />'
-		}),
-		{
-			xtype: 'plainfield',
-			fieldLabel: GO.lang.strType,
-			name: 'type'
-		},
-		{
-			xtype: 'plainfield',
-			fieldLabel: GO.lang.strSize,
-			name: 'size'
-		},this.selectHandler = new GO.form.ComboBoxReset({
-			xtype:'comboboxreset',
-			emptyText:GO.lang.strDefault,
-			store:new GO.data.JsonStore({
-				url:GO.url('files/file/handlers'),
-				fields:['name','cls','handler','iconCls','extension'],
-				baseParams:{
-					id:0,
-					all:1
-				}
-			}),
-			displayField:'name',
-			valueField:'cls',
-			mode:'remote',
-			triggerAction:'all',
-			hiddenName:'handlerCls',
-			fieldLabel:GO.files.lang.openWith
-		}),
-		new GO.form.HtmlComponent({
-			html:'<hr />'
-		}),{
-			xtype: 'compositefield',
-			border: false,
-			anchor: '100%',
-			fieldLabel: GO.files.lang.contentExpiresAt,
-			items: [
-				this.contentExpireDate,
-				this.clearExpireDateButton
-			]
-		}
+		}]}
+		,
+		{xtype:'fieldset', items:[
+			{
+				xtype: 'plainfield',
+				fieldLabel: t("Type"),
+				name: 'type'
+			},
+			{
+				xtype: 'plainfield',
+				fieldLabel: t("Size"),
+				name: 'size'
+			},this.selectHandler = new GO.form.ComboBoxReset({
+				xtype:'comboboxreset',
+				emptyText:t("Default"),
+				store:new GO.data.JsonStore({
+					url:GO.url('files/file/handlers'),
+					fields:['name','cls','handler','iconCls','extension'],
+					baseParams:{
+						id:0,
+						all:1
+					}
+				}),
+				displayField:'name',
+				valueField:'cls',
+				mode:'remote',
+				triggerAction:'all',
+				hiddenName:'handlerCls',
+				fieldLabel:t("Open with", "files")
+			})
+		]},
+		{xtype:'fieldset', items:[		
+			{
+				xtype: 'compositefield',
+				border: false,
+				anchor: '100%',
+				fieldLabel: t("Content expires at", "files"),
+				items: [
+					this.contentExpireDate,
+					this.clearExpireDateButton
+				]
+			}
+		]}
 	]
 	});
 		
 	this.commentsPanel = new Ext.Panel({
 		layout:'form',
 		labelWidth: 70,
-		title: GO.files.lang.comments,
+		title: t("Comments", "files"),
 		border:false,
 		items: new Ext.form.TextArea({
 			name: 'comment',
@@ -153,14 +154,6 @@ GO.files.FilePropertiesDialog = function(config){
 	this.versionsGrid = new GO.files.VersionsGrid();
 	
 	var items = [this.propertiesPanel, this.commentsPanel, this.versionsGrid];
-
-//	
-//	if(GO.workflow)
-//	{
-//		this.workflowPanel = new GO.workflow.FilePropertiesPanel();
-//		items.push(this.workflowPanel);
-//	}
-
 
 	if(GO.customfields && GO.customfields.types["GO\\Files\\Model\\File"])
 	{
@@ -192,7 +185,7 @@ GO.files.FilePropertiesDialog = function(config){
 
 		
 	GO.files.FilePropertiesDialog.superclass.constructor.call(this,{
-		title:GO.lang['strProperties'],
+		title:t("Properties"),
 		layout:'fit',
 		width:650,
 		height:550,
@@ -202,23 +195,9 @@ GO.files.FilePropertiesDialog = function(config){
 		collapsible:true,
 		buttons:[
 		{
-			text:GO.lang['cmdOk'],
+			text:t("Save"),
 			handler: function(){
 				this.save(true)
-				},
-			scope: this
-		},
-		{
-			text:GO.lang['cmdApply'],
-			handler: function(){
-				this.save(false)
-				},
-			scope: this
-		},
-		{
-			text:GO.lang['cmdClose'],
-			handler: function(){
-				this.hide()
 				},
 			scope: this
 		}]
@@ -270,7 +249,7 @@ Ext.extend(GO.files.FilePropertiesDialog, GO.Window, {
 				
 				this.folder_id=action.result.data.folder_id;
 				
-				if(GO.customfields)
+				if(go.ModuleManager.isAvailable("customfields"))
 					GO.customfields.disableTabs(this.tabPanel, action.result);	
 				
 				
@@ -282,38 +261,35 @@ Ext.extend(GO.files.FilePropertiesDialog, GO.Window, {
 				GO.files.FilePropertiesDialog.superclass.show.call(this);
 			},
 			failure: function(form, action) {
-				Ext.MessageBox.alert(GO.lang['strError'], action.result.feedback);
+				Ext.MessageBox.alert(t("Error"), action.result.feedback);
 			},
 			scope: this
 		});
 	},
 	
-	setFileID : function(file_id)
-	{
+	setFileID : function(file_id) {
+		
 		this.file_id = file_id;
 		this.versionsGrid.setFileID(file_id);
-		//this.linkBrowseButton.setDisabled(file_id < 1);
 	},
 	
-	setWritePermission : function(writePermission)
-	{
-		var form = this.formPanel.form;
+	setWritePermission : function(writePermission) {		
 		this.nameField.setDisabled(!writePermission);
 	},
 	
-	save : function(hide)
-	{
+	save : function(hide) {
+		
 		this.formPanel.form.submit({
 						
 			url: GO.url("files/file/submit"),
 			params: {
 				id: this.file_id
 			},
-			waitMsg:GO.lang['waitMsgSave'],
+			waitMsg:t("Saving..."),
 			success:function(form, action){
 				if(action.result.path)
 				{
-					this.formPanel.form.findField('path').setValue(action.result.path);
+					this.pathField.setValue(action.result.path);
 					this.fireEvent('rename', this, this.folder_id);					
 				}
 				
@@ -330,13 +306,13 @@ Ext.extend(GO.files.FilePropertiesDialog, GO.Window, {
 				var error = '';
 				if(action.failureType=='client')
 				{
-					error = GO.lang['strErrorsInForm'];
+					error = t("You have errors in your form. The invalid fields are marked.");
 				}else
 				{
 					error = action.result.feedback;
 				}
 				
-				Ext.MessageBox.alert(GO.lang['strError'], error);
+				Ext.MessageBox.alert(t("Error"), error);
 			},
 			scope:this			
 		});			

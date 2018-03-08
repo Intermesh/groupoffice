@@ -9,7 +9,7 @@ GO.tasks.TasklistDialog = function(config)
 		waitMsgTarget:true,
 		url: GO.settings.modules.tasks.url+'action.php',
 		//url:GO.url('tasks/tasklist/submit'),
-		title:GO.lang['strProperties'],
+		title:t("Properties"),
 		layout:'form',
 		anchor: '100% 100%',
 		defaultType: 'textfield',
@@ -19,18 +19,18 @@ GO.tasks.TasklistDialog = function(config)
    
 		items: [
 		this.selectUser = new GO.form.SelectUser({
-			fieldLabel: GO.lang['strUser'],
+			fieldLabel: t("User"),
 			disabled : !GO.settings.has_admin_permission,
 			value: GO.settings.user_id,
 			anchor: '100%'
 		}),
 		{
-			fieldLabel: GO.lang['strName'],
+			fieldLabel: t("Name"),
 			name: 'name',
 			allowBlank:false,
 			anchor: '100%'
 		},this.exportButton = new Ext.Button({			
-				text:GO.lang.cmdExport,
+				text:t("Export"),
 				disabled:true,
 				handler:function(){
 					document.location=GO.url('tasks/task/exportIcs', {"tasklist_id":this.tasklist_id});
@@ -40,12 +40,12 @@ GO.tasks.TasklistDialog = function(config)
 			this.deleteAllItemsButton = new Ext.Button({
 				style:'margin-top:10px',
 				xtype:'button',
-				text:GO.lang.deleteAllItems,
+				text:t("Delete all items"),
 				handler:function(){
 					Ext.Msg.show({
-						title: GO.lang.deleteAllItems,
+						title: t("Delete all items"),
 						icon: Ext.MessageBox.WARNING,
-						msg: GO.lang.deleteAllItemsAreYouSure,
+						msg: t("Are you sure you want to delete all items?"),
 						buttons: Ext.Msg.YESNO,
 						scope:this,
 						fn: function(btn) {
@@ -68,7 +68,7 @@ GO.tasks.TasklistDialog = function(config)
 			this.removeDuplicatesButton =new Ext.Button({
 				style:'margin-top:10px',
 				xtype:'button',
-				text:GO.lang.removeDuplicates,
+				text:t("Remove duplicates"),
 				handler:function(){
 					
 					window.open(GO.url('tasks/tasklist/removeDuplicates',{tasklist_id:this.tasklist_id}))
@@ -99,18 +99,18 @@ GO.tasks.TasklistDialog = function(config)
 		fileUpload:true,
 		waitMsgTarget:true,
 		disabled:true,
-		title:GO.lang.cmdImport,
+		title:t("Import"),
 		items: [{
 			xtype: 'panel',
-			html: GO.tasks.lang.selectIcalendarFile,
+			html: t("Select an icalendar (*.ics) file", "tasks"),
 			border:false	
 		},uploadFile,this.importButton = new Ext.Button({
 				xtype:'button',
 				disabled:true,
-				text:GO.lang.cmdImport,
+				text:t("Import"),
 				handler: function(){						
 					this.importTab.form.submit({
-						//waitMsg:GO.lang.waitMsgUpload,
+						//waitMsg:t("Uploading..."),
 						// TODO: Fix this import so it works with the new MVC structure
 						url: GO.url('tasks/tasklist/importIcs'),//O.settings.modules.tasks.url+'action.php',
 						params: {
@@ -123,14 +123,14 @@ GO.tasks.TasklistDialog = function(config)
 
 							if(action.result.success)
 							{
-								Ext.MessageBox.alert(GO.lang.strSuccess,action.result.feedback);
+								Ext.MessageBox.alert(t("Success"),action.result.feedback);
 							}else
 							{
-								Ext.MessageBox.alert(GO.lang.strError,action.result.feedback);
+								Ext.MessageBox.alert(t("Error"),action.result.feedback);
 							}						
 						},
 						failure: function(form, action) {
-							Ext.MessageBox.alert(GO.lang.strError, action.result.feedback);
+							Ext.MessageBox.alert(t("Error"), action.result.feedback);
 						},
 						scope: this
 					});
@@ -156,7 +156,7 @@ GO.tasks.TasklistDialog = function(config)
 	
 	
 	GO.tasks.TasklistDialog.superclass.constructor.call(this,{
-					title: GO.tasks.lang.tasklist,
+					title: t("Tasklist", "tasks"),
 					layout:'fit',
 					modal:false,
 					height:600,
@@ -165,18 +165,18 @@ GO.tasks.TasklistDialog = function(config)
 					items: this.tabPanel,
 					buttons:[
 					{
-						text:GO.lang['cmdOk'],
+						text:t("Ok"),
 						handler: function(){this.save(true)},
 						scope: this
 					},
 					{
-						text:GO.lang['cmdApply'],
+						text:t("Apply"),
 						handler: function(){this.save(false)},
 						scope: this
 					},
 
 					{
-						text:GO.lang['cmdClose'],
+						text:t("Close"),
 						handler: function(){this.hide()},
 						scope: this
 					}
@@ -262,7 +262,7 @@ Ext.extend(GO.tasks.TasklistDialog, Ext.Window, {
 			//		'task' : 'save_tasklist', 
 					'id': this.tasklist_id
 			},
-			waitMsg:GO.lang['waitMsgSave'],
+			waitMsg:t("Saving..."),
 			success:function(form, action){
 										
 				if(action.result.id)
@@ -288,13 +288,13 @@ Ext.extend(GO.tasks.TasklistDialog, Ext.Window, {
 				var error = '';
 				if(action.failureType=='client')
 				{
-					error = GO.lang['strErrorsInForm'];
+					error = t("You have errors in your form. The invalid fields are marked.");
 				}else
 				{
 					error = action.result.feedback;
 				}
 					
-				Ext.MessageBox.alert(GO.lang['strError'], error);
+				Ext.MessageBox.alert(t("Error"), error);
 			},
 			scope:this
 

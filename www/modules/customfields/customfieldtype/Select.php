@@ -12,7 +12,7 @@ class Select extends AbstractCustomfieldtype{
 	
 	public function fieldSql(){
 		//needs to be text for multiselect field
-		if($this->field && $this->field->multiselect)
+		if($this->field && $this->field->getOption("multiselect"))
 			return "TEXT NULL";		
 		else
 			return parent::fieldSql ();

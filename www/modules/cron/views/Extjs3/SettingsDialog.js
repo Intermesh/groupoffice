@@ -4,7 +4,7 @@ GO.cron.SettingsDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		
 		Ext.apply(this, {
 			goDialogId:'cronsettings',
-			title:GO.cron.lang.cronSettings,
+			title:t("Cron Settings", "cron"),
 			formControllerUrl: 'core/cron',
 			submitAction : 'submitSettings',
 			loadAction : 'loadSettings',
@@ -22,7 +22,7 @@ GO.cron.SettingsDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		});	
 			
 		this.periodPanel = new Ext.Panel({
-			title:GO.cron.lang.runUpcoming,			
+			title:t("Upcoming Cron-Jobs", "cron"),			
 			layout:'fit',
 			items:[
 				this.periodGrid
@@ -31,7 +31,7 @@ GO.cron.SettingsDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			
 			
 		this.propertiesPanel = new Ext.Panel({
-			title:GO.lang['strProperties'],			
+			title:t("Properties"),			
 			cls:'go-form-panel',
 			layout:'form',
 			items:[

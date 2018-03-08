@@ -27,7 +27,7 @@ GO.base.model.multiselect.dialog = function(config){
 		items: this.multiselectPanel,
 		buttons: [		
 		{
-			text: GO.lang['cmdClose'],
+			text: t("Close"),
 			handler: function(){
 				this.hide();
 			},

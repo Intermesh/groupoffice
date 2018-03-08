@@ -291,6 +291,11 @@ class Session extends Observable{
 		}elseif($countLogin && $user->checkPasswordChangeRequired()){
 			throw new \GO\Base\Exception\PasswordNeedsChange();
 		}
+				
+		// Implemented to authenticate with more authenticators
+		if($success && !$this->fireEvent('passwordvalidated', array($username, $password, $user, $countLogin))) {
+			$success = false;
+		}		
 		
 		$str = "LOGIN ";		
 		$str .= $success ? "SUCCESS" : "FAILED" ;		

@@ -20,8 +20,8 @@
  * 
  * @package GO.base.model
  * 
- * @property int $user_id
- * @property int $group_id
+ * @property int $userId
+ * @property int $groupId
  */
 
 namespace GO\Base\Model;
@@ -41,21 +41,21 @@ class UserGroup extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	public function tableName() {
-		return 'go_users_groups';
+		return 'core_user_group';
 	}
   
 	public function relations() {
 		return array(
-			'user' => array('type' => self::BELONGS_TO, 'model' => 'GO\Base\Model\User', 'field' => 'user_id'),
-			'group' => array('type' => self::BELONGS_TO, 'model' => 'GO\Base\Model\Group', 'field' => 'group_id'),
+			'user' => array('type' => self::BELONGS_TO, 'model' => 'GO\Base\Model\User', 'field' => 'userId'),
+			'group' => array('type' => self::BELONGS_TO, 'model' => 'GO\Base\Model\Group', 'field' => 'groupId'),
 		);
 	}
   public function primaryKey() {
-    return array('user_id','group_id');
+    return array('userId','groupId');
   }
 	
 	private function updateAclMtime(){
-		$sql = "UPDATE go_acl_items SET mtime=unix_timestamp() WHERE id IN (SELECT acl_id FROM go_acl WHERE group_id=".$this->group_id.")";		
+		$sql = "UPDATE core_acl SET modifiedAt=now() WHERE id IN (SELECT aclId FROM core_acl_group WHERE groupId=".$this->groupId.")";		
 		\GO::getDbConnection()->query($sql);
 	}
 	
@@ -68,7 +68,7 @@ class UserGroup extends \GO\Base\Db\ActiveRecord {
 	
 	protected function beforeDelete() {
 		
-		if($this->group_id == \GO::config()->group_root && $this->user_id == 1) {
+		if($this->groupId == \GO::config()->group_root && $this->userId == 1) {
 			throw new \Exception("You can't remove the administrator from the administrators group.");
 		}
 		

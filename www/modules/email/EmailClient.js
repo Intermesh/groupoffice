@@ -5,7 +5,7 @@
  * Group-Office license along with Group-Office. See the file /LICENSE.TXT
  *
  * If you have questions write an e-mail to info@intermesh.nl
- * @version $Id: EmailClient.js 22244 2018-01-25 09:47:02Z wsmits $
+ * @version $Id: EmailClient.js 22437 2018-03-01 07:55:17Z michaelhart86 $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -25,7 +25,7 @@ GO.email.EmailClient = function(config){
 		root: 'results',
 		totalProperty: 'total',
 		id: 'uid',
-		fields:['uid','icon','deleted','flagged','labels','has_attachments','seen','subject','from','to','sender','size','date', 'x_priority','answered','forwarded','account_id','mailbox','mailboxname','arrival','arrival_time','date_time'],
+		fields:['uid','icon','deleted','flagged','labels','has_attachments','seen','subject','from','to','sender','size','udate','internal_udate', 'x_priority','answered','forwarded','account_id','mailbox','mailboxname'],
 		remoteSort: true
 	});
 
@@ -40,19 +40,17 @@ GO.email.EmailClient = function(config){
 
 			this.permissionLevel = this.messagesGrid.store.reader.jsonData.permission_level;
 			
-			this.deleteButton.setDisabled(this.readOnly);
-			this.propertiesButton.setDisabled(!this.isManager);
+			this.messagesGrid.deleteButton.setDisabled(this.readOnly);
+//			this.propertiesButton.setDisabled(!this.isManager);
 		}, this);		
 		
 		
 
 	var messagesAtTop = Ext.state.Manager.get('em-msgs-top');
-	if(messagesAtTop)
-	{
+	if(messagesAtTop) {
 		messagesAtTop = Ext.decode(messagesAtTop);
-	}else
-	{
-		messagesAtTop =screen.width<1024;
+	} else {
+		messagesAtTop = screen.width < 1024;
 	}
 
 	var deleteConfig = {
@@ -67,139 +65,99 @@ GO.email.EmailClient = function(config){
 
 	this.leftMessagesGrid = new GO.email.MessagesGrid({
 		id:'em-pnl-west',
+		emailClient:this,
 		store:this.messagesStore,
-		width: 420,
-		region:'west',
+		region:'center',
 		hidden:messagesAtTop,
 		deleteConfig : deleteConfig,
-		floatable:false,
 		header:false,
-		collapsible:true,
-		collapseMode:'mini',
 		split:true
 	});
 	this.addGridHandlers(this.leftMessagesGrid);
 
-	this.topMessagesGrid = new GO.email.MessagesGrid({
-		id:'em-pnl-north',
-		store:this.messagesStore,
-		height: 250,
-		region:'north',
-		hidden:!messagesAtTop,
-		deleteConfig : deleteConfig,
-		floatable:false,
-		collapsible:true,
-		collapseMode:'mini',
-		split:true
-	});
-	this.addGridHandlers(this.topMessagesGrid);
+//	this.topMessagesGrid = new GO.email.MessagesGrid({
+//		id:'em-pnl-north',
+//		emailClient:this,
+//		store:this.messagesStore,
+//		height: 250,
+//		region:'north',
+//		hidden:!messagesAtTop,
+//		deleteConfig : deleteConfig,
+//		floatable:false,
+//		collapsible:true,
+//		collapseMode:'mini',
+//		split:true
+//	});
+//	this.addGridHandlers(this.topMessagesGrid);
 
-	if(!this.topMessagesGrid.hidden)
-	{
-		this.messagesGrid=this.topMessagesGrid;
-	}else
-	{
+//	if(!this.topMessagesGrid.hidden)
+//	{
+//		this.messagesGrid=this.topMessagesGrid;
+//	}else
+//	{
 		this.messagesGrid=this.leftMessagesGrid;
-	}
+//	}
 
 	//for global access by composers
-	GO.email.messagesGrid=this.messagesGrid;
+	GO.email.messagesGrid = this.messagesGrid;
 
+	this.messagesGrid.store.on('load',function(){
 
-	this.messagesGrid.store.on("beforeload", function()
-	{	
-		this.messagesGrid.getView().holdPosition = true;
+//		var cm = this.topMessagesGrid.getColumnModel();
+		var header = this.messagesGrid.store.reader.jsonData.sent || this.messagesGrid.store.reader.jsonData.drafts ? t("To", "email") : t("From", "email");
+		var header2 = this.messagesGrid.store.reader.jsonData.sent || this.messagesGrid.store.reader.jsonData.drafts ? t("From", "email") : t("To", "email");
+//		cm.setColumnHeader(cm.getIndexById('from'), header);
+//		cm.setColumnHeader(cm.getIndexById('to'), header2);
 
-		if(this.messagesGrid.store.baseParams['search'] != undefined)
-		{
-			GO.email.search_query = this.messagesGrid.store.baseParams['search'];
+		var unseen = this.messagesGrid.store.reader.jsonData.unseen;
+		for(var mailbox in unseen)
+			this.updateFolderStatus(mailbox,unseen[mailbox]);
+
+		//don't confirm delete to trashfolder
+		this.messagesGrid.deleteConfig.noConfirmation=!this.messagesGrid.store.reader.jsonData.deleteConfirm;
+	}, this);
+	
+	this.messagesGrid.store.on("beforeload", function(store) {	
+		this.getView().holdPosition = true;
+		if(store.baseParams['search'] != undefined) {
+			GO.email.search_query = store.baseParams['search'];
 			this.searchDialog.hasSearch = false;
-			delete(this.messagesGrid.store.baseParams['search']);
-		}else
-		if(this.searchDialog.hasSearch)
-		{
-			this.messagesGrid.resetSearch();
+			delete(store.baseParams['search']);
+		} else if(this.searchDialog.hasSearch) {
+			this.resetSearch();
 		}
-
-		if(GO.email.search_query)
-		{
+		if(GO.email.search_query) {
 			this.searchDialog.hasSearch = false;
 			var search_type = (GO.email.search_type)
 			? GO.email.search_type : GO.email.search_type_default;
 
 			var query;
 
-			if(search_type=='any'){
-				query='OR OR OR FROM "' + GO.email.search_query + '" SUBJECT "' + GO.email.search_query + '" TO "' + GO.email.search_query + '" CC "' + GO.email.search_query + '"';
-				
-//				query='OR OR FROM "' + GO.email.search_query + '" SUBJECT "' + GO.email.search_query + '" TO "' + GO.email.search_query + '"';
-			}else if(search_type=='fts'){
-				query='TEXT ' + GO.email.search_query;
-			}else
-			{
-				query=search_type.toUpperCase() + ' "' + GO.email.search_query + '"';
+			if(search_type == 'any'){
+				query = 'OR OR OR FROM "' + GO.email.search_query + '" SUBJECT "' + GO.email.search_query + '" TO "' + GO.email.search_query + '" CC "' + GO.email.search_query + '"';
+			} else if(search_type=='fts') {
+				query = 'TEXT ' + GO.email.search_query;
+			} else {
+				query = search_type.toUpperCase() + ' "' + GO.email.search_query + '"';
 			}
-
-			this.messagesGrid.store.baseParams['query'] = query;
-		}else
-		if(!this.searchDialog.hasSearch && this.messagesGrid.store.baseParams['query'])
-		{
-			this.messagesGrid.resetSearch();
-			delete(this.messagesGrid.store.baseParams['query']);
-			delete(this.messagesGrid.store.baseParams['searchIn']);
+			store.baseParams['query'] = query;
+			
+		} else if(!this.searchDialog.hasSearch && store.baseParams['query']) {
+			this.resetSearch();
+			delete(store.baseParams['query']);
+			delete(store.baseParams['searchIn']);
 		}
 
-	}, this);
-
-	this.messagesGrid.store.on('load',function(){
-
-		var cm = this.topMessagesGrid.getColumnModel();
-		var header = this.messagesGrid.store.reader.jsonData.sent || this.messagesGrid.store.reader.jsonData.drafts ? GO.email.lang.to : GO.email.lang.from;
-		var header2 = this.messagesGrid.store.reader.jsonData.sent || this.messagesGrid.store.reader.jsonData.drafts ? GO.email.lang.from : GO.email.lang.to;
-		cm.setColumnHeader(cm.getIndexById('from'), header);
-		cm.setColumnHeader(cm.getIndexById('to'), header2);
-
-		var unseen = this.messagesGrid.store.reader.jsonData.unseen;
-		for(var mailbox in unseen)
-			this.updateFolderStatus(mailbox,unseen[mailbox]);
-
-		if(this.messagesGrid.store.baseParams['query'] && this.messagesGrid.store.baseParams['query']!='' && this.searchDialog.hasSearch){
-			this.resetSearchButton.setVisible(true);
-		}else
-		{
-			this.resetSearchButton.setVisible(false);
-		}
-
-//		var selModel = this.treePanel.getSelectionModel();
-//		if(!selModel.getSelectedNode())
-//		{
-//			var node = this.treePanel.getNodeById('folder_'+this.messagesGrid.store.reader.jsonData.mailbox);
-//			if(node)
-//			{
-//				selModel.select(node);
-//			}
-//		}
-
-		/*
-		 *This method is annoying when searching for unread mails
-		if(this.messagePanel.uid && !this.messagesGrid.store.getById(this.messagePanel.uid))
-		{
-			this.messagePanel.reset();
-		}*/
-
-		//don't confirm delete to trashfolder
-		this.messagesGrid.deleteConfig.noConfirmation=!this.messagesGrid.store.reader.jsonData.deleteConfirm;
-	}, this);
+	}, this.messagesGrid);
 
 	GO.email.saveAsItems = GO.email.saveAsItems || [];
 
-	for(var i=0;i<GO.email.saveAsItems.length;i++)
-	{
+	for(var i = 0; i < GO.email.saveAsItems.length; i++) {
 		GO.email.saveAsItems[i].scope=this;
 	}
 
 	var addSendersItems = [{
-		text:GO.email.lang.to,
+		text:t("To", "email"),
 		field:'to',
 		handler:this.addSendersTo,
 		scope:this
@@ -215,10 +173,9 @@ GO.email.EmailClient = function(config){
 		scope:this
 	}];
 
-	if (GO.addressbook) {
+	if(go.ModuleManager.isAvailable("addressbook")) {
 		addSendersItems.push({
-			text: GO.addressbook.lang.addresslist,
-			cls: 'x-btn-text-icon',
+			text: t("Address list", "addressbook"),
 			menu: this.addresslistsMenu = new GO.menu.JsonMenu({
 				store: new GO.data.JsonStore({
 					url: GO.url("addressbook/addresslist/store"),
@@ -244,10 +201,9 @@ GO.email.EmailClient = function(config){
 
 	var deleteSendersItems = [];
 
-	if (GO.addressbook) {
+	if(go.ModuleManager.isAvailable("addressbook")) {
 		deleteSendersItems.push({
-			text: GO.addressbook.lang.addresslist,
-			cls: 'x-btn-text-icon',
+			text: t("Address list", "addressbook"),
 			menu: this.addresslistsMenu = new GO.menu.JsonMenu({
 				store: new GO.data.JsonStore({
 					url: GO.url("addressbook/addresslist/store"),
@@ -271,142 +227,140 @@ GO.email.EmailClient = function(config){
 		});
 	}
 
-	  var contextItems = [
-	  this.contextMenuMarkAsRead = new Ext.menu.Item({
-		  text: GO.email.lang.markAsRead,
-		  handler: function(){
-			  this.flagMessages('Seen', false);
-		  },
-		  scope:this,
-		  multiple:true
-	  }),
-	  this.contextMenuMarkAsUnread = new Ext.menu.Item({
-		  text: GO.email.lang.markAsUnread,
-		  handler: function(){
-			  this.flagMessages('Seen', true);
-		  },
-		  scope: this,
-		  multiple:true
-	  }),
-	  this.contextMenuFlag = new Ext.menu.Item({
-		  text: GO.email.lang.flag,
-		  handler: function(){
-			  this.flagMessages('Flagged', false);
-		  },
-		  scope: this,
-		  multiple:true
-	  }),
-	  this.contextMenuUnflag = new Ext.menu.Item({
-		  text: GO.email.lang.unflag,
-		  handler: function(){
-			  this.flagMessages('Flagged', true);
-		  },
-		  scope: this,
-		  multiple:true
-	  }),
-	  '-',
-	  this.contextMenuSource = new Ext.menu.Item ({
-		  text: GO.email.lang.viewSource,
-		  handler: function(){
+	var contextItems = [
+	this.contextMenuMarkAsRead = new Ext.menu.Item({
+		text: t("Mark as read", "email"),
+		handler: function(){
+			this.flagMessages('Seen', false);
+		},
+		scope:this,
+		multiple:true
+	}),
+	this.contextMenuMarkAsUnread = new Ext.menu.Item({
+		iconCls: 'ic-markunread',
+		text: t("Mark as unread", "email"),
+		handler: function(){
+			this.flagMessages('Seen', true);
+		},
+		scope: this,
+		multiple:true
+	}),
+	this.contextMenuFlag = new Ext.menu.Item({
+		iconCls: 'ic-flag',
+		text: t("Add flag", "email"),
+		handler: function(){
+			this.flagMessages('Flagged', false);
+		},
+		scope: this,
+		multiple:true
+	}),
+	this.contextMenuUnflag = new Ext.menu.Item({
+		iconCls: 'ic-flag',
+		text: t("Remove flag", "email"),
+		handler: function(){
+			this.flagMessages('Flagged', true);
+		},
+		scope: this,
+		multiple:true
+	}),
+	'-',
+	this.contextMenuSource = new Ext.menu.Item ({
+		text: t("View source", "email"),
+		iconCls: 'ic-code',
+		handler: function(){
 
-			  var record = this.messagesGrid.selModel.getSelected();
-			  if(record)
-			  {
-				  //var win = window.open(GO.url("email/message/source",{account_id:this.account_id,mailbox:this.mailbox,uid:record.data.uid}));
-				  var win = window.open(GO.url("email/message/source",{account_id:this.account_id,mailbox:record.data.mailbox,uid:record.data.uid}));
-				  win.focus();
-			  }
+			var record = this.messagesGrid.selModel.getSelected();
+			if(record)
+			{
+				//var win = window.open(GO.url("email/message/source",{account_id:this.account_id,mailbox:this.mailbox,uid:record.data.uid}));
+				var win = window.open(GO.url("email/message/source",{account_id:this.account_id,mailbox:record.data.mailbox,uid:record.data.uid}));
+				win.focus();
+			}
 
-		  },
-		  scope: this
-	  }),'-',
-	  this.contextMenuCopyTo = new Ext.menu.Item ({
-		  iconCls: 'btn-copy',
-		  text: GO.email.lang['copyMailTo'],
-		  cls: 'x-btn-text-icon',
-		  handler: function(a,b,c){
-			  var selectedEmails = this.messagesGrid.getSelectionModel().getSelections();
-			  this.showCopyMailToDialog(selectedEmails);
-		  },
-		  scope: this,
-		  multiple:true
-	  }),
-		this.addEmailButton = new Ext.menu.Item({
-				iconCls: 'btn-email',
-				text: GO.email.lang.addEmailAsAttachment,
-				handler: function(){
-					var records = this.messagesGrid.selModel.getSelections();
-					if(records) {
-						
-						var addEmailAsAttachmentList = [];
-						
-						
-						Ext.each(records, function(record) {
-							addEmailAsAttachmentList.push({
-								uid: record.get('uid'), 
-								mailbox: record.get('mailbox')
-							})
-						});
-						
-						GO.email.showComposer({
-							account_id: this.account_id,
-							addEmailAsAttachmentList: addEmailAsAttachmentList
-						});
-					}
-				},
-				scope:this,
-				multiple:true
-			}),
-		'-',
-	  this.contextMenuDelete = new Ext.menu.Item({
-		  iconCls: 'btn-delete',
-		  text: GO.lang.cmdDelete,
-		  cls: 'x-btn-text-icon',
-		  handler: function(){
-			  this.messagesGrid.deleteSelected();
-		  },
-		  scope: this,
-		  multiple:true
-	  }),
-		this.contextMoveToSpamFolder = new Ext.menu.Item({
-		  
-		  text: GO.email.lang.moveToSpamFolder,
-		  cls: 'x-btn-text-icon',
-		  handler: function(){
-				var records = this.messagesGrid.selModel.getSelections();
-				if(records) {
-						Ext.each(records, function(record) {
-								
-								
-							GO.email.moveToSpam(record.get('uid'), record.get('mailbox'), this.account_id);
-							
-						}, this);
-				}
-				
-		  },
-		  scope: this,
-		  multiple:true
-	  })
-		,'-',{
-		  iconCls: 'btn-add',
-		  text: GO.email.lang.addSendersTo,
-		  cls: 'x-btn-text-icon',
-		  menu: {
-			  items: addSendersItems
-		  },
-		  multiple:true
-	  },{
-		  iconCls: 'btn-delete',
-		  text: GO.email.lang.deleteSendersFrom,
-		  cls: 'x-btn-text-icon',
-		  menu: {
-			  items: deleteSendersItems
-		  },
-		  multiple:true
-	  }];
+		},
+		scope: this
+	}),'-',
+	this.contextMenuCopyTo = new Ext.menu.Item ({
+		iconCls: 'ic-content-copy',
+		text: t("Copy email to...", "email"),
+		handler: function(a,b,c){
+			var selectedEmails = this.messagesGrid.getSelectionModel().getSelections();
+			this.showCopyMailToDialog(selectedEmails);
+		},
+		scope: this,
+		multiple:true
+	}),
+	 this.addEmailButton = new Ext.menu.Item({
+		iconCls: 'ic-mail',
+		text: t("Forward as attachment ", "email"),
+		handler: function(){
+			var records = this.messagesGrid.selModel.getSelections();
+			if(records) {
 
-	if(GO.email.saveAsItems && GO.email.saveAsItems.length)
-	{
+				var addEmailAsAttachmentList = [];
+
+
+				Ext.each(records, function(record) {
+					addEmailAsAttachmentList.push({
+						uid: record.get('uid'), 
+						mailbox: record.get('mailbox')
+					})
+				});
+
+				GO.email.showComposer({
+					account_id: this.account_id,
+					addEmailAsAttachmentList: addEmailAsAttachmentList
+				});
+			}
+		},
+		scope:this,
+		multiple:true
+	}),
+	'-',
+	this.contextMenuDelete = new Ext.menu.Item({
+		iconCls: 'ic-delete',
+		text: t("Delete"),
+		handler: function(){
+			this.messagesGrid.deleteSelected();
+		},
+		scope: this,
+		multiple:true
+	}),
+	 this.contextMoveToSpamFolder = new Ext.menu.Item({
+		iconCls: 'ic-report',
+		text: t("Move to spam folder", "email"),
+		handler: function(){
+			 var records = this.messagesGrid.selModel.getSelections();
+			 if(records) {
+					 Ext.each(records, function(record) {
+
+
+						 GO.email.moveToSpam(record.get('uid'), record.get('mailbox'), this.account_id);
+
+					 }, this);
+			 }
+
+		},
+		scope: this,
+		multiple:true
+	})
+	,'-',{
+		iconCls: 'ic-add',
+		text: t("Add senders to...", "email"),
+		menu: {
+			items: addSendersItems
+		},
+		multiple:true
+	},{
+		iconCls: 'ic-delete',
+		text: t("Delete senders from...", "email"),
+		menu: {
+			items: deleteSendersItems
+		},
+		multiple:true
+	}];
+
+	if(GO.email.saveAsItems && GO.email.saveAsItems.length) {
 		this.saveAsMenu = new Ext.menu.Menu({
 			items:GO.email.saveAsItems
 		});
@@ -424,8 +378,8 @@ GO.email.EmailClient = function(config){
 		}, this);
 
 		contextItems.push({
-			iconCls: 'btn-save',
-			text:GO.lang.cmdSaveAs,
+			iconCls: 'ic-save',
+			text:t("Save as"),
 			menu:this.saveAsMenu,
 			multiple:true
 		});
@@ -457,8 +411,8 @@ GO.email.EmailClient = function(config){
 
 	contextItems.push(
 		this.contextMenuLabels = new Ext.menu.Item ({
-			iconCls: 'btn-labels',
-			text: GO.email.lang.labels,
+			iconCls: 'ic-label',
+			text: t("Labels", "email"),
 			menu: this.labelsContextMenu = new GO.menu.JsonMenu({
 				id: 'email-messages-labels-menu',
 				store: new GO.data.JsonStore({
@@ -528,9 +482,18 @@ GO.email.EmailClient = function(config){
 
 	
 	this.gridContextMenu.on("show", function(){
+		
+		var record = this.messagesGrid.selModel.getSelected();
+		
+		this.contextMenuMarkAsUnread.setVisible(record.data.seen);
+		this.contextMenuMarkAsRead.setVisible(!record.data.seen);
+		
 		this.contextMenuMarkAsUnread.setDisabled(this.permissionLevel<GO.permissionLevels.create);
 		this.contextMenuMarkAsRead.setDisabled(this.permissionLevel<GO.email.permissionLevels.delegated);
 
+		this.contextMenuFlag.setVisible(!record.data.flagged);
+		this.contextMenuUnflag.setVisible(record.data.flagged);
+		
 		this.contextMenuFlag.setDisabled(this.permissionLevel<GO.email.permissionLevels.delegated);
 		this.contextMenuUnflag.setDisabled(this.permissionLevel<GO.email.permissionLevels.delegated);
 
@@ -542,7 +505,7 @@ GO.email.EmailClient = function(config){
 		minWidth: 180,
 		items: [
 		  new Ext.menu.Item ({
-		  text: GO.email.lang.viewSource,
+		  text: t("View source", "email"),
 		  handler: function(){
 
 			  var record = this.messagesGrid.selModel.getSelected();
@@ -558,9 +521,8 @@ GO.email.EmailClient = function(config){
 	  }),
 		  '-',
 		 new Ext.menu.Item ({
-		  iconCls: 'btn-copy',
-		  text: GO.email.lang['copyMailTo'],
-		  cls: 'x-btn-text-icon',
+		  iconCls: 'ic-content-copy',
+		  text: t("Copy email to...", "email"),
 		  handler: function(a,b,c){
 			  var selectedEmails = this.messagesGrid.getSelectionModel().getSelections();
 			  this.showCopyMailToDialog(selectedEmails);
@@ -574,364 +536,197 @@ GO.email.EmailClient = function(config){
 	GO.email.treePanel = this.treePanel = new GO.email.AccountsTree({
 		id:'email-tree-panel',
 		region:'west',
+		cls: 'go-sidenav',
 		mainPanel:this
 	});
 
-
-
-
 	//select the first inbox to be displayed in the messages grid
-	this.treePanel.getRootNode().on('load', function(node)
-	{
+	this.treePanel.getRootNode().on('load', function(node) {
 		this.body.unmask();
-		if(node.childNodes[0])
-		{
+		if(node.childNodes[0]) {
 			var firstAccountNode=false;
-
-//			this.updateNotificationEl();
-
 			for(var i=0;i<node.childNodes.length;i++){
 				firstAccountNode = node.childNodes[i];
-
-				if(firstAccountNode.expanded){
-
+				if(firstAccountNode.expanded) {
 					firstAccountNode.on('load', function(node){
-
-						if(node.childNodes[0])
-						{
+						if(node.childNodes[0]){
 							//don't know why but it doesn't work without a 10ms delay.
 							this.treePanel.getSelectionModel().select.defer(10,this.treePanel.getSelectionModel(), [node.childNodes[0]]);
-
-
-//							var firstInboxNode = node.childNodes[0];
-//							this.setAccount(
-//								firstInboxNode.attributes.account_id,
-//								firstInboxNode.attributes.mailbox,
-//								firstInboxNode.parentNode.attributes.usage
-//								);
-						//if(!this.checkMailStarted)
-						//this.checkMail.defer(this.checkMailInterval, this);
 						}
-					},this, {
-						single: true
-					});
+					},this, {single: true});
 					break;
 				}
 			}
-
-
 		}
 	}, this);
 
-//	this.treePanel.on('beforeclick', function(node){
-//		if(node.attributes.mailbox==0)
-//			return false;
-//	}, this);
-
-
 
 	this.treePanel.getSelectionModel().on('selectionchange', function(sm, node)	{
-//		if(node.attributes.mailbox>0)
-//		{
-			if(node){
-				var usage='';
+		if(!node){
+			return;
+		}
+		var usage = '';
 
-				var inboxNode =this.treePanel.findInboxNode(node);
-				if(inboxNode)
-					usage=inboxNode.attributes.usage;
+		var inboxNode = this.treePanel.findInboxNode(node);
+		if(inboxNode) {
+			usage=inboxNode.attributes.usage;
+		}
 
-				this.setAccount(
-					node.attributes.account_id,
-					node.attributes.mailbox,
-					usage
-					);
-
-		// Commented out the lines below because this sometimes hides the label tag
-//				var labelsColumnIndex = this.messagesGrid.getColumnModel().getIndexById('labels');
-//				if (!this.messagesGrid.getColumnModel().isHidden(labelsColumnIndex) && !node.attributes.permittedFlags) {
-//					this.messagesGrid.getColumnModel().setHidden(labelsColumnIndex, true);
-//				}				
-			}
-//		}
+		this.setAccount(
+			node.attributes.account_id,
+			node.attributes.mailbox,
+			usage
+		);
+		
+		
 	}, this);
 
 	this.treePanel.on('click',function(node){
 		var selectedNode = this.treePanel.getSelectionModel().getSelectedNode();
 
-
-
-		
-
-
-		if(selectedNode && node.id==selectedNode.id){
-			var usage='';
-
-				var inboxNode =this.treePanel.findInboxNode(node);
-				if(inboxNode)
-					usage=inboxNode.attributes.usage;
-
+		if(selectedNode && node.id==selectedNode.id) {
+			var inboxNode =this.treePanel.findInboxNode(node),
+				usage = inboxNode ? inboxNode.attributes.usage : '';
 			this.setAccount(
 				node.attributes.account_id,
 				node.attributes.mailbox,
 				usage
-				);
+			);
 		}
+		this.messagesGrid.show();
 	}, this);
 
-	this.searchDialog = new GO.email.SearchDialog({
-		store:this.messagesGrid.store
-	});
-
-	this.settingsMenu = new Ext.menu.Menu({
-		items:[{
-			iconCls: 'btn-accounts',
-			text: GO.email.lang.accounts,
-			cls: 'x-btn-text-icon',
-			handler: function(){
-				this.showAccountsDialog();
-			},
-			scope: this
-		},{
-			iconCls:'btn-toggle-window',
-			text: GO.email.lang.toggleWindowPosition,
-			cls: 'x-btn-text-icon',
-			handler: function(){
-				this.moveGrid();
-			},
-			scope: this
-		}
-		]
-	});
-
-	if(GO.gnupg)
-	{
-		this.settingsMenu.add('-');
-		this.settingsMenu.add({
-			iconCls:'gpg-btn-settings',
-			cls: 'x-btn-text-icon',
-			text:GO.gnupg.lang.encryptionSettings,
-			handler:function(){
-				if(!this.securityDialog)
-				{
-					this.securityDialog = new GO.gnupg.SecurityDialog();
-				}
-				this.securityDialog.show();
-			},
-			scope:this
-		});
-	}
-
-	var tbar =[{
-				xtype:'htmlcomponent',
-			html:GO.email.lang.name,
-			cls:'go-module-title-tbar'
-		},this.composerButton = new Ext.Button({
-		iconCls: 'btn-compose',
-		text: GO.email.lang['compose'],
-		cls: 'x-btn-text-icon',
-		handler: function(){
-
-			GO.email.showComposer({
-				account_id: this.account_id
-			});
-		},
-		scope: this
-	}),this.deleteButton = new Ext.Button({
-		iconCls: 'btn-delete',
-		text: GO.lang.cmdDelete,
-		cls: 'x-btn-text-icon',
-		handler: function(){
-			this.messagesGrid.deleteSelected();
-			this.messagesGrid.expand();
-		},
-		scope: this
-	}),new Ext.Toolbar.Separator(),
-	// This button goes to the settings of the account that is selected in the tree
-	this.propertiesButton = new Ext.Button({
-		iconCls: 'btn-edit',
-		text: GO.lang['strProperties'],
-		handler:function(a,b){
-			if(!this.accountDialog){
-				this.accountDialog = new GO.email.AccountDialog();
-				this.accountDialog.on('save', function(){
-					GO.mainLayout.getModulePanel("email").refresh();
-				}, this);
-			}
-			this.accountDialog.show(this.account_id);
-		},
-		scope:this
-	}),
-	new Ext.Toolbar.Separator(),
-	{
-		iconCls: 'btn-settings',
-		text:GO.lang.administration,
-		menu: this.settingsMenu
-	},{
-		iconCls: 'btn-refresh',
-		text: GO.lang.cmdRefresh,
-		cls: 'x-btn-text-icon',
-		handler: function(){
-			this.refresh(true);
-		},
-		scope: this
-	},
-	{
-		iconCls: 'btn-search',
-		text: GO.lang.strSearch,
-		cls: 'x-btn-text-icon',
-		handler: function(){
-			this.searchDialog.show();
-		},
-		scope: this
-	},
-	this.resetSearchButton = new Ext.Button({
-		iconCls: 'btn-delete',
-		text: GO.email.lang.resetSearch,
-		cls: 'x-btn-text-icon',
-		hidden:true,
-		handler: function(){
-			this.searchDialog.hasSearch = false;
-			this.messagesGrid.store.baseParams['query']='';
-			this.messagesGrid.store.baseParams['searchIn']='';
-			this.messagesGrid.store.load({
-				params:{
-					start:0
-				}
-			});
-		},
-		scope: this
-	})
-	,
-	'-',
-	this.replyButton=new Ext.Button({
-		disabled:true,
-		iconCls: 'btn-reply',
-		text: GO.email.lang.reply,
-		cls: 'x-btn-text-icon',
-		handler: function(){
-
-			if (!this._permissionDelegated) {
-				GO.email.showComposer({
-					uid: this.messagePanel.uid,
-					task: 'reply',
-					mailbox: this.messagePanel.mailbox,
-					account_id: this.account_id
-				});
-			} else {
-				GO.email.showComposer({
-					uid: this.messagePanel.uid,
-					task: 'reply',
-					mailbox: this.messagePanel.mailbox,
-					account_id: this.account_id,
-					delegated_cc_enabled: true
-				});
-			}
-		},
-		scope: this
-	}),this.replyAllButton=new Ext.Button({
-		disabled:true,
-		iconCls: 'btn-reply-all',
-		text: GO.email.lang.replyAll,
-		cls: 'x-btn-text-icon',
-		handler: function(){
-			GO.email.showComposer({
-				uid: this.messagePanel.uid,
-				task: 'reply_all',
-				mailbox: this.messagePanel.mailbox,
-				account_id: this.account_id
-			});
-		},
-		scope: this
-	}),this.forwardButton=new Ext.Button({
-		disabled:'true',
-		iconCls: 'btn-forward',
-		text: GO.email.lang.forward,
-		cls: 'x-btn-text-icon',
-		handler: function(){
-			if (!this._permissionDelegated) {
-				GO.email.showComposer({
-					uid: this.messagePanel.uid,
-					task: 'forward',
-					mailbox: this.messagePanel.mailbox,
-					account_id: this.account_id
-				});
-			} else {
-				GO.email.showComposer({
-					uid: this.messagePanel.uid,
-					task: 'forward',
-					mailbox: this.messagePanel.mailbox,
-					account_id: this.account_id,
-					delegated_cc_enabled: true
-				});
-			}
-		},
-		scope: this
-	}),
-
-	this.printButton = new Ext.Button({
-		disabled: true,
-		iconCls: 'btn-print',
-		text: GO.lang.cmdPrint,
-		cls: 'x-btn-text-icon',
-		handler: function(){
-			this.messagePanel.body.print();
-		},
-		scope: this
-	})];
-
-
-	if(GO.email.saveAsItems && GO.email.saveAsItems.length)
-	{
-		tbar.push({
-			iconCls: 'btn-save',
-			text:GO.lang.cmdSaveAs,
-			menu:this.saveAsMenu
-		});
-	}
-
-	tbar.push(new Ext.Toolbar.Separator());
-
-
-	tbar.push(this.closeMessageButton = new Ext.Button({
-		hidden:true,
-		iconCls: 'btn-close',
-		text: GO.lang.cmdClose,
-		cls: 'x-btn-text-icon',
-		handler: function(){
-			this.messagesGrid.expand();
-
-		},
-		scope: this
-	}));
-
-
-	config.layout='border';
-	config.tbar=new Ext.Toolbar({
-		cls:'go-head-tb',
-		items: tbar
-	});
+	config.layout='responsive';
+	config.layoutConfig = {
+			triggerWidth: 1000
+		};
 
 	this.messagePanel = new GO.email.MessagePanel({
 		id:'email-message-panel',
+		tbar:new Ext.Toolbar({
+			enableOverflow: true,
+			items:[{
+				cls: 'go-narrow',
+				iconCls: "ic-arrow-back",
+				handler: function () {
+					this.westPanel.show();
+				},
+				scope: this
+			},
+			this.replyButton=new Ext.Button({
+				disabled:true,
+				iconCls: 'ic-reply',
+				text: t("Reply", "email"),
+				handler: function(){
+
+					if (!this._permissionDelegated) {
+						GO.email.showComposer({
+							uid: this.messagePanel.uid,
+							task: 'reply',
+							mailbox: this.messagePanel.mailbox,
+							account_id: this.account_id
+						});
+					} else {
+						GO.email.showComposer({
+							uid: this.messagePanel.uid,
+							task: 'reply',
+							mailbox: this.messagePanel.mailbox,
+							account_id: this.account_id,
+							delegated_cc_enabled: true
+						});
+					}
+				},
+				scope: this
+			}),this.replyAllButton=new Ext.Button({
+				disabled:true,
+				iconCls: 'ic-reply-all',
+				text: t("Reply all", "email"),
+				handler: function(){
+					GO.email.showComposer({
+						uid: this.messagePanel.uid,
+						task: 'reply_all',
+						mailbox: this.messagePanel.mailbox,
+						account_id: this.account_id
+					});
+				},
+				scope: this
+			}),this.forwardButton=new Ext.Button({
+				disabled:'true',
+				iconCls: 'ic-forward',
+				text: t("Forward", "email"),
+				handler: function(){
+					if (!this._permissionDelegated) {
+						GO.email.showComposer({
+							uid: this.messagePanel.uid,
+							task: 'forward',
+							mailbox: this.messagePanel.mailbox,
+							account_id: this.account_id
+						});
+					} else {
+						GO.email.showComposer({
+							uid: this.messagePanel.uid,
+							task: 'forward',
+							mailbox: this.messagePanel.mailbox,
+							account_id: this.account_id,
+							delegated_cc_enabled: true
+						});
+					}
+				},
+				scope: this
+			}),'->',
+			{
+				hidden: !GO.email.saveAsItems || !GO.email.saveAsItems.length,
+				iconCls: 'ic-save',
+				text:t("Save as"),
+				menu:this.saveAsMenu
+			},this.printButton = new Ext.Button({
+				disabled: true,
+				iconCls: 'ic-print',
+				tooltip: t("Print"),
+				overflowText: t("Print"),
+				handler: function(){
+					this.messagePanel.body.print();
+				},
+				scope: this
+			})
+//			this.closeMessageButton = new Ext.Button({
+//				hidden:true,
+//				iconCls: 'ic-close',
+//				text: t("Close"),
+//				handler: function(){
+//					this.messagesGrid.expand();
+//
+//				},
+//				scope: this
+//			})
+		]}),
 		region:'center',
 		autoScroll:true,
 		titlebar: false,
 		border:true,
 		attachmentContextMenu: new GO.email.AttachmentContextMenu()
 	});
+	
+	this.westPanel = new Ext.Panel({
+		region:"west",
+		layout:'responsive',
+
+		split: true,
+					narrowWidth: dp(400), //this will only work for panels inside another panel with layout=responsive. Not ideal but at the moment the only way I could make it work
+
+			width: dp(700),
+			stateId: 'go-email-west',
+		items: [
+			
+			this.leftMessagesGrid,
+			this.treePanel
+		]
+	})
 
 	config.items=[
-	this.treePanel,
-	{
-		region:'center',
-		titlebar: false,
-		layout:'border',
-		items: [
-		this.messagePanel,
-		this.topMessagesGrid,
-		this.leftMessagesGrid
-		]
-	}];
+		this.westPanel,
+		this.messagePanel
+	];
 	
 
 	this.messagePanel.on('load', function(options, success, response, data, password){
@@ -955,7 +750,7 @@ GO.email.EmailClient = function(config){
 
 			if(!record.data.seen && data.notification)
 			{
-				if(GO.email.alwaysRespondToNotifications || confirm(GO.email.lang.sendNotification.replace('%s', data.notification)))
+				if(GO.email.alwaysRespondToNotifications || confirm(t("The sender of this messages likes a read notification by you at: %s. Do you want to send a read notification now?", "email").replace('%s', data.notification)))
 				{
 					GO.request({
 						url: "email/message/notification",
@@ -1016,7 +811,7 @@ GO.email.EmailClient = function(config){
 				GO.mainLayout.tabPanel.setActiveTab(this.id);
 		}else
 		{
-			alert(GO.email.lang.loadEmailFirst);
+			alert(t("To use this function you must load your e-mail first by pressing the e-mail tab", "email"));
 		}
 	}
 	GO.email.searchSender = GO.email.searchSender.createDelegate(this);
@@ -1030,23 +825,23 @@ Ext.extend(GO.email.EmailClient, Ext.Panel,{
 
 	_permissionDelegated : false,
 
-	moveGrid : function(){
-		if(this.topMessagesGrid.isVisible())
-		{
-			this.messagesGrid=this.leftMessagesGrid;
-			this.topMessagesGrid.hide();
-
-		}else
-		{
-			this.messagesGrid=this.topMessagesGrid;
-			this.leftMessagesGrid.hide();
-		}
-		//this.messagesGridContainer.add(this.messagesGrid);
-		this.messagesGrid.show();
-		this.messagesGrid.ownerCt.doLayout();
-
-		Ext.state.Manager.set('em-msgs-top', Ext.encode(this.topMessagesGrid.isVisible()));
-	},
+//	moveGrid : function(){
+//		if(this.topMessagesGrid.isVisible())
+//		{
+//			this.messagesGrid=this.leftMessagesGrid;
+//			this.topMessagesGrid.hide();
+//
+//		}else
+//		{
+//			this.messagesGrid=this.topMessagesGrid;
+//			this.leftMessagesGrid.hide();
+//		}
+//		//this.messagesGridContainer.add(this.messagesGrid);
+//		this.messagesGrid.show();
+//		this.messagesGrid.ownerCt.doLayout();
+//
+//		Ext.state.Manager.set('em-msgs-top', Ext.encode(this.topMessagesGrid.isVisible()));
+//	},
 
 	addGridHandlers : function(grid)
 	{
@@ -1095,7 +890,7 @@ Ext.extend(GO.email.EmailClient, Ext.Panel,{
 				//this.messagePanel.uid=r.data['uid'];
 				//this.messagePanel.loadMessage(r.data.uid, this.mailbox, this.account_id);
 				this.messagePanel.loadMessage(r.data.uid, r.data['mailbox'], this.account_id);
-
+this.messagePanel.show();
 				if(!r.data.seen && this.messagesGrid.store.reader.jsonData.permission_level > GO.permissionLevels.read){
 					//set read with 2 sec delay.
 					//this.markAsRead.defer(2000, this, [r.data.uid, this.mailbox, this.account_id]);
@@ -1137,7 +932,7 @@ Ext.extend(GO.email.EmailClient, Ext.Panel,{
 
 //		GO.email.notificationEl.setDisplayed(false);
 
-		this.body.mask(GO.lang.waitMsgLoad);
+		this.body.mask(t("Loading..."));
 	},
 
 	onShow : function(){
@@ -1182,6 +977,7 @@ Ext.extend(GO.email.EmailClient, Ext.Panel,{
 		this.mailbox = mailbox;
 
 		//messagesPanel.setTitle(mailbox);
+		this.messagesGrid.account_id = account_id;
 		this.messagesGrid.store.baseParams['task']='messages';
 		this.messagesGrid.store.baseParams['account_id']=account_id;
 		this.messagesGrid.store.baseParams['mailbox']=mailbox;
@@ -1234,7 +1030,7 @@ Ext.extend(GO.email.EmailClient, Ext.Panel,{
 			{
 				if(unseen>0)
 				{
-					statusEl.dom.innerHTML = "("+unseen+")";
+					statusEl.dom.innerHTML = unseen;
 				}else
 				{
 					statusEl.dom.innerHTML = "";
@@ -1293,7 +1089,7 @@ Ext.extend(GO.email.EmailClient, Ext.Panel,{
 
 			this.accountsDialog.accountsGrid.on('delete', function(){
 				this.refresh();
-				if(GO.emailportlet)
+				if(go.ModuleManager.isAvailable("emailportlet"))
 					GO.emailportlet.foldersStore.load();
 			}, this);
 		}
@@ -1433,13 +1229,13 @@ Ext.extend(GO.email.EmailClient, Ext.Panel,{
 			{
 				if(!success)
 				{
-					Ext.MessageBox.alert(GO.lang.strError, response.result.errors);
+					Ext.MessageBox.alert(t("Error"), response.result.errors);
 				}else
 				{
 					var responseParams = Ext.decode(response.responseText);
 					if(responseParams.success)
 					{
-						Ext.MessageBox.alert(GO.lang['strSuccess'],GO.addressbook.lang['addContactsSuccess'].replace('%i',responseParams['addedSenders']));
+						Ext.MessageBox.alert(t("Success"),t("%i contacts have been succesfully added to the address list.", "addressbook").replace('%i',responseParams['addedSenders']));
 					}else
 					{
 						if (!GO.util.empty(responseParams.unknownSenders)) {
@@ -1459,13 +1255,13 @@ Ext.extend(GO.email.EmailClient, Ext.Panel,{
 							this.unknownRecipientsDialogForAddresslist.addresslistId = addresslistId;
 
 							this.unknownRecipientsDialogForAddresslist.show({
-								title : GO.email.lang.addUnknownSenders,
-								descriptionText : GO.email.lang.addUnknownSendersText,
+								title : t("Add unknown senders", "email"),
+								descriptionText : t("You are adding selected email senders to an addresslist. First, the following selected senders must be added to a Group-Office address book. Click on a name if you want to add that person or close this window.", "email"),
 								disableSkipUnknownCheckbox : true
 							});
 
 						} else {
-							Ext.MessageBox.alert(GO.lang.strError,responseParams.feedback);
+							Ext.MessageBox.alert(t("Error"),responseParams.feedback);
 						}
 					}
 				}
@@ -1475,7 +1271,7 @@ Ext.extend(GO.email.EmailClient, Ext.Panel,{
 	},
 
 	deleteSendersFromAddresslist : function(addresslistId) {
-		if (GO.addressbook) {
+		if(go.ModuleManager.isAvailable("addressbook")) {
 			var records = this.messagesGrid.getSelectionModel().getSelections();
 			var senderEmails = new Array();
 			for (var i=0;i<records.length;i++) {
@@ -1492,9 +1288,9 @@ Ext.extend(GO.email.EmailClient, Ext.Panel,{
 				{
 					var responseData = Ext.decode(response.responseText);
 					if(!success) {
-						Ext.MessageBox.alert(GO.lang.strError, responseData.feedback);
+						Ext.MessageBox.alert(t("Error"), responseData.feedback);
 					} else {
-						Ext.MessageBox.alert(GO.lang.strSuccess, GO.addressbook.lang['nRemovedFromAddresslist'].replace('%n',responseData.nRemoved));
+						Ext.MessageBox.alert(t("Success"), t("%n contacts have been identified and removed from the selected address list.", "addressbook").replace('%n',responseData.nRemoved));
 					}
 				},
 				scope: this
@@ -1533,6 +1329,10 @@ GO.mainLayout.onReady(function(){
 
 			//register a new request to the checker. It will poll unseen tickets every two minutes
 		GO.checker.registerRequest("email/account/checkUnseen",{},function(checker, result, data){
+			
+			if(!result.email_status) {
+				return;
+			}
 
 				var ep = GO.mainLayout.getModulePanel('email');
 
@@ -1579,7 +1379,7 @@ GO.mainLayout.onReady(function(){
 });
 
 GO.email.aliasesStore = new GO.data.JsonStore({
-	url: GO.url("email/alias/store"),
+	url: "email/alias/store",
 	baseParams:{limit:0},
 	fields: ['id','account_id', 'from', 'name','email','html_signature', 'plain_signature','template_id','signature_below_reply'],
 	remoteSort: true
@@ -1816,20 +1616,21 @@ GO.email.showComposer = function(config){
 
 GO.email.extraTreeContextMenuItems = [];
 
-GO.moduleManager.addModule('email', GO.email.EmailClient, {
-	title : GO.lang.strEmail,
-	iconCls : 'go-tab-icon-email'
+go.ModuleManager.register('email', {
+	mainPanel: GO.email.EmailClient,
+	title: t("E-mail"),
+	iconCls: 'go-tab-icon-email'
 });
 
-GO.quickAddPanel.addButton(new Ext.Button({
-		iconCls:'img-email-add',
-		cls: 'x-btn-icon',
-		tooltip:GO.email.lang.email,
-		handler: function(){
-			GO.email.showComposer();
-		},
-		scope: this
-	}),0);
+//GO.quickAddPanel.addButton(new Ext.Button({
+//		iconCls:'img-email-add',
+//		cls: 'x-btn-icon',
+//		tooltip:t("Email", "email"),
+//		handler: function(){
+//			GO.email.showComposer();
+//		},
+//		scope: this
+//	}),0);
 
 
 GO.email.showAddressMenu = function(e, email, name)
@@ -1839,21 +1640,24 @@ GO.email.showAddressMenu = function(e, email, name)
 	GO.email.addressContextMenu.showAt(e.getXY(), email, name);
 }
 
-GO.newMenuItems.push({
-	itemId : 'email',
-	text: GO.email.lang.email,
-	iconCls: 'go-model-icon-GO_Email_Model_ImapMessage',
-	handler:function(item, e){
-		var taskShowConfig = GO.email.getTaskShowConfig(item);
+GO.newMenuItems.push(
+//				{
+//	itemId : 'email',
+//	text: t("Email", "email"),
+//	iconCls: 'go-model-icon-GO_Email_Model_ImapMessage',
+//	handler:function(item, e){
+//		var taskShowConfig = GO.email.getTaskShowConfig(item);
+//
+////		if(GO.settings.modules.savemailas.read_permission)
+////			taskShowConfig.values.subject='[id:'+item.parentMenu.link_config.modelNameAndId+'] ';
+//
+//		GO.email.showComposer(taskShowConfig);
+//	}
+//},
 
-//		if(GO.settings.modules.savemailas.read_permission)
-//			taskShowConfig.values.subject='[id:'+item.parentMenu.link_config.modelNameAndId+'] ';
-
-		GO.email.showComposer(taskShowConfig);
-	}
-},{
+{
 	itemId : 'email-files',
-	text: GO.email.lang.emailFiles,
+	text: t("Email files", "email"),
 	iconCls: 'em-btn-email-files',
 	handler:function(item, e){
 		var panel = item.parentMenu.panel;
@@ -1942,7 +1746,7 @@ GO.email.openFolderTree = function(id, folder_id, referenceItem) {
 
 	if (!GO.email.treeFileBrowser) {
 		GO.email.treeFileBrowser = new GO.Window({
-			title: GO.files.lang.fileBrowser,
+			title: t("File browser", "files"),
 			height:500,
 			width:400,
 			layout:'fit',
@@ -1960,12 +1764,10 @@ GO.email.openFolderTree = function(id, folder_id, referenceItem) {
 				scope:this
 			},
 			tbar: new Ext.Toolbar({
-				cls:'go-head-tb',
 				region:'north',
 				items:[{
-					iconCls: 'btn-refresh',
-					text: GO.lang.cmdRefresh,
-					cls: 'x-btn-text-icon',
+					iconCls: 'ic-refresh',
+					text: t("Refresh"),
 					handler: function() {
 						GO.email.folderTree.getRootNode().reload()
 						this.btnSelectAll.toggle(false);
@@ -1973,9 +1775,8 @@ GO.email.openFolderTree = function(id, folder_id, referenceItem) {
 					scope: this
 				},
 				this.btnSelectAll = new Ext.Button({
-					iconCls: 'btn-select-all',
-					text: GO.lang.selectAll,
-					cls: 'x-btn-text-icon',
+					iconCls: 'ic-done-all',
+					text: t("Select all"),
 					enableToggle: true,
 					pressed: false,
 					toggleHandler: function(btn, state) {
@@ -1988,7 +1789,7 @@ GO.email.openFolderTree = function(id, folder_id, referenceItem) {
 				]
 			}),
 			buttons:[{
-				text: GO.lang['cmdOk'],
+				text: t("Ok"),
 				handler: function(){
 
 					var selFiles = new Array();
@@ -2034,7 +1835,7 @@ GO.email.showMessageAttachment = function(id, remoteMessage){
 			maximizable:true,
 			collapsible:true,
 			stateId:'em-linked-message-panel',
-			title: GO.email.lang.emailMessage,
+			title: t("E-mail message", "email"),
 			height: 500,
 			width: 800,
 			closeAction:'hide',
@@ -2062,9 +1863,9 @@ GO.email.showAttendanceWindow=function(event_id){
 
 GO.email.moveToSpam = function(mailUid,mailboxName,fromAccountId) {
 	Ext.Msg.show({
-		title: GO.email.lang.moveToSpamTitle,
+		title: t("Move to Spam folder?", "email"),
 		icon: Ext.MessageBox.QUESTION,
-		msg: GO.email.lang.moveToSpamMsg,
+		msg: t("Are you sure you want to classify this message as spam?", "email"),
 		buttons: Ext.Msg.YESNO,
 		fn: function(btn) {
 			if (btn=='yes') {
@@ -2093,9 +1894,9 @@ GO.email.moveToSpam = function(mailUid,mailboxName,fromAccountId) {
 
 GO.email.moveToInbox = function(mailUid,fromAccountId) {
 	Ext.Msg.show({
-		title: GO.email.lang.moveToInboxTitle,
+		title: t("Move out of Spam folder?", "email"),
 		icon: Ext.MessageBox.QUESTION,
-		msg: GO.email.lang.moveToInboxMsg,
+		msg: t("Are you sure you want to remove the spam mark and move this message into your inbox?", "email"),
 		buttons: Ext.Msg.YESNO,
 		fn: function(btn) {
 			if (btn=='yes') {
@@ -2106,7 +1907,7 @@ GO.email.moveToInbox = function(mailUid,fromAccountId) {
 						mail_uid: mailUid
 					},
 					success: function() {
-						GO.email.emailClient.topMessagesGrid.store.load();
+//						GO.email.emailClient.topMessagesGrid.store.load();
 						GO.email.emailClient.leftMessagesGrid.store.load();
 					},
 					failure: function(response,options,result) {

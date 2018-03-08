@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: ScheduleCallDialog.js 19324 2015-08-18 10:17:13Z wsmits $
+ * @version $Id: ScheduleCallDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -19,7 +19,7 @@ GO.tasks.ScheduleCallDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			height:580,
 			width:600,
 			goDialogId:'task-schedule-call',
-			title:GO.tasks.lang.scheduleCall,
+			title:t("Schedule call", "tasks"),
 			formControllerUrl: 'tasks/scheduleCall',
 			submitAction : 'save',
 			loadAction : 'load',
@@ -54,7 +54,7 @@ GO.tasks.ScheduleCallDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			xtype:'this.datePicker',
 			name:'remind_date',
 			format: GO.settings.date_format,
-			fieldLabel:GO.lang.strDate
+			fieldLabel:t("Date")
 		});
 
 		this.datePicker.on("select", function(datePicker, DateObj){						
@@ -62,7 +62,7 @@ GO.tasks.ScheduleCallDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		},this);
 				
 		this.selectTaskList = new GO.tasks.SelectTasklist({
-			fieldLabel: GO.tasks.lang.tasklist, 
+			fieldLabel: t("Tasklist", "tasks"), 
 			anchor:'100%'
 		});
 		
@@ -70,7 +70,7 @@ GO.tasks.ScheduleCallDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			name:'remind_time',
 			width:220,
 			format: GO.settings.time_format,
-			fieldLabel:GO.lang.strTime,
+			fieldLabel:t("Time"),
 			anchor:'100%'
 		});
 			
@@ -79,12 +79,12 @@ GO.tasks.ScheduleCallDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			anchor: '100%',
 			width:300,
 			height:45,
-			fieldLabel: GO.lang.strDescription
+			fieldLabel: t("Description")
 		});		
 
 //		this.selectContact = new GO.addressbook.SelectContact ({
 //			name: 'contact_name',
-//			fieldLabel:GO.addressbook.lang.contact,
+//			fieldLabel:t("Contact", "addressbook"),
 //			enableKeyEvents : true,
 //			remoteSort: true,
 //			allowBlank:false,
@@ -94,7 +94,7 @@ GO.tasks.ScheduleCallDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		
 		this.selectContact = new GO.form.ComboBoxReset({
 			name: 'contact_name',
-			fieldLabel:GO.addressbook.lang.contact,
+			fieldLabel:t("Contact", "addressbook"),
 			anchor: '100%',
 			allowBlank:false,
 			mode:'remote',
@@ -143,7 +143,7 @@ GO.tasks.ScheduleCallDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		
 		this.phoneNumberField = new GO.form.ComboBoxReset({
 			name: 'number',
-			fieldLabel:GO.tasks.lang.phoneNr,
+			fieldLabel:t("Phone nr.", "tasks"),
 			anchor: '100%',
 			allowBlank:false,
 			mode:'local',
@@ -159,7 +159,7 @@ GO.tasks.ScheduleCallDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		});
 		
 		this.btnAddContact = new Ext.Button ({
-			text:GO.addressbook.lang.btnAddContact,
+			text:t("Add Contact", "addressbook"),
 			anchor: '50%',
 			disabled:true,
 			style:{
@@ -207,7 +207,7 @@ GO.tasks.ScheduleCallDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 
 		this.savePhoneNumberField = new GO.form.ComboBox({
 			hiddenName: 'save_as',
-			fieldLabel:GO.tasks.lang.savePhoneNr,
+			fieldLabel:t("Save number to", "tasks"),
 			disabled:true,
 			anchor: '100%',
 			mode:'local',
@@ -252,7 +252,7 @@ GO.tasks.ScheduleCallDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			items:[
 			{
 				xtype:'fieldset',
-				title: GO.tasks.lang.task,
+				title: t("Task", "tasks"),
 				items:[
 				{	
 					items:this.datePicker,
@@ -287,7 +287,7 @@ GO.tasks.ScheduleCallDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 				}
 			]},{
 				xtype:'fieldset',
-				title: GO.addressbook.lang.contact,
+				title: t("Contact", "addressbook"),
 				items:[
 					this.contactIdField,
 					this.selectContact,
@@ -358,13 +358,13 @@ GO.tasks.ScheduleCallDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		var label = '';
 		
 		if(!GO.util.empty(oldvalue))
-			label = GO.tasks.lang.overwritePhoneNumber;
+			label = t("Overwrite {field} ({number})", "tasks");
 		else 
-			label = GO.tasks.lang.addToPhoneNumber;
+			label = t("Add to {field}", "tasks");
 		
 		var fieldname = 'contact'+this.capitalize(field);
 
-		label = label.replace("{field}",GO.addressbook.lang[fieldname]);
+		label = label.replace("{field}",t("fieldname", "addressbook"));
 		label = label.replace("{number}",oldvalue);
 
 		return label;

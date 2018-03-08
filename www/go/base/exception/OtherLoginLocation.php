@@ -28,7 +28,7 @@ class OtherLoginLocation extends \Exception
 
 	public function __construct($message='') {
 		
-		$message = empty($message) ? \GO::t('alreadyLoggedInOther') : \GO::t('alreadyLoggedInOther')."\n\n".$message;
+		$message = empty($message) ? \GO::t("Already logged in on other location") : \GO::t("Already logged in on other location")."\n\n".$message;
 		$code = 498;		
 		parent::__construct($message,$code);
 	}

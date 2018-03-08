@@ -76,7 +76,7 @@ class TasklistController extends \GO\Base\Controller\AbstractModelController{
 				}
 			}
 		}
-		$response['feedback'] = sprintf(\GO::t('import_success','tasks'), $count);
+		$response['feedback'] = sprintf(\GO::t("%s tasks were imported", "tasks"), $count);
 		
 		if(count($failed)){
 			$response['feedback'] .= "\n\n".count($failed)." tasks failed: ".implode('\n', $failed);
@@ -126,7 +126,7 @@ class TasklistController extends \GO\Base\Controller\AbstractModelController{
 			
 			if(empty($params['model']) || $modelName==$params['model']){
 
-				echo '<h1>'.\GO::t('removeDuplicates').'</h1>';
+				echo '<h1>'.\GO::t("Remove duplicates").'</h1>';
 
 				$checkFieldsStr = 't.'.implode(', t.',$checkFields);
 				$findParams = \GO\Base\Db\FindParams::newInstance()
@@ -187,9 +187,9 @@ class TasklistController extends \GO\Base\Controller\AbstractModelController{
 							if(!empty($params['delete'])){
 
 								if($model->hasLinks() && $model->countLinks()){
-									echo '<tr><td colspan="99">'.\GO::t('skippedDeleteHasLinks').'</td></tr>';
+									echo '<tr><td colspan="99">'.\GO::t("Skipped delete because model has links").'</td></tr>';
 								}elseif(($filesFolder = $model->getFilesFolder(false)) && ($filesFolder->hasFileChildren() || $filesFolder->hasFolderChildren())){
-									echo '<tr><td colspan="99">'.\GO::t('skippedDeleteHasFiles').'</td></tr>';
+									echo '<tr><td colspan="99">'.\GO::t("Skipped delete because model has folder or files").'</td></tr>';
 								}else{									
 									$model->delete();
 								}
@@ -205,8 +205,8 @@ class TasklistController extends \GO\Base\Controller\AbstractModelController{
 
 				echo '</table>';
 
-				echo '<p>'.sprintf(\GO::t('foundDuplicates'),$count).'</p>';
-				echo '<br /><br /><a href="'.\GO::url('tasks/tasklist/removeDuplicates', array('delete'=>true, 'tasklist_id'=>$tasklist->id)).'">'.\GO::t('clickToDeleteDuplicates').'</a>';
+				echo '<p>'.sprintf(\GO::t("Found %s duplicates."),$count).'</p>';
+				echo '<br /><br /><a href="'.\GO::url('tasks/tasklist/removeDuplicates', array('delete'=>true, 'tasklist_id'=>$tasklist->id)).'">'.\GO::t("Click here to delete the newest duplicates marked in red.").'</a>';
 				
 			}
 		}

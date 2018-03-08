@@ -10,7 +10,7 @@ GO.buttons.QuickEditButton = Ext.extend(Ext.Button,{
 		Ext.applyIf(this,{
 			iconCls: 'btn-edit',
 			itemId:'quickedit',
-			text: GO.lang.quickEdit,
+			text: t("Quick edit"),
 			cls: 'x-btn-text-icon'
 		});
 				

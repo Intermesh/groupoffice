@@ -73,7 +73,7 @@ class SharedRootFolder extends \GO\Base\Db\ActiveRecord {
 		));
 		
 		$findParams = \GO\Base\Db\FindParams::newInstance()->debugSql()
-						->select("max(a.mtime) AS mtime")
+						->select("unix_timestamp(max(a.modifiedAt)) AS mtime")
 						->single()
 						->joinModel(array(
 								'model'=>"GO\Base\Model\Acl",

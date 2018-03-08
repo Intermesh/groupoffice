@@ -30,9 +30,9 @@ class CurrentGridContact extends AbstractExport {
 		
 		$sortAlias = \GO::user()->sort_name=="first_name" ? array('first_name','last_name') : array('last_name','first_name');
 		
-		$columnModel->formatColumn('name','$model->getName(\GO::user()->sort_name)', array(),$sortAlias, \GO::t('strName'));
-		$columnModel->formatColumn('company_name','$model->company_name', array(),'', \GO::t('company','addressbook'));
-		$columnModel->formatColumn('ab_name','$model->ab_name', array(),'', \GO::t('addressbook','addressbook'));
+		$columnModel->formatColumn('name','$model->getName(\GO::user()->sort_name)', array(),$sortAlias, \GO::t("Name"));
+		$columnModel->formatColumn('company_name','$model->company_name', array(),'', \GO::t("Company", "addressbook"));
+		$columnModel->formatColumn('ab_name','$model->ab_name', array(),'', \GO::t("Address book", "addressbook"));
 		$columnModel->formatColumn('age', '$model->age', array(), 'birthday');
 		$columnModel->formatColumn('action_date', '$model->getActionDate()', array(), 'action_date');
 		
@@ -44,7 +44,7 @@ class CurrentGridContact extends AbstractExport {
 					$result2[] = $addresslist->name;
 				}
 				return implode("|", $result2);
-			}), '', \GO::t('addresslists','addressbook'));
+			}), '', \GO::t("Address Lists", "addressbook"));
 		
 		$columnModel->formatColumn('cf', '$model->id.":".$model->name');//special field used by custom fields. They need an id an value in one.)
 		return parent::formatColumns($columnModel);
@@ -59,7 +59,7 @@ class CurrentGridContact extends AbstractExport {
 		$availableColumns[] = array(
 				'id' => 'custom_function_address_lists',
 				'name' => 'custom_function_address_lists',
-				'label' =>  \GO::t('addresslists','addressbook'),
+				'label' =>  \GO::t("Address Lists", "addressbook"),
 				'field_id' => 'custom_function_address_lists',
 		);
 		

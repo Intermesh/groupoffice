@@ -107,7 +107,7 @@ GO.DebugWindow = Ext.extend(GO.Window, {
 	
 			},
 			fail: function(response, options, result) {
-				Ext.Msg.alert(GO.lang.strError, result.feedback);
+				Ext.Msg.alert(t("Error"), result.feedback);
 				Ext.TaskMgr.stop(this.taskConfig);
 				this.hide();
 			},

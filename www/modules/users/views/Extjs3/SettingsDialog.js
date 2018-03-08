@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: SettingsDialog.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: SettingsDialog.js 22445 2018-03-06 08:36:59Z michaelhart86 $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -17,9 +17,9 @@ GO.users.SettingsDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		
 		Ext.apply(this, {
 			goDialogId:'usersettings',
-			title: GO.lang['cmdSettings'],
+			title: t("Settings"),
 			formControllerUrl: 'users/settings',
-			height:360,
+			height:dp(382),
 			width:500
 //			,
 //			helppage:'Z-push_admin_user_manual#Settings'

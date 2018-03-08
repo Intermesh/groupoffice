@@ -28,7 +28,7 @@ class PasswordNeedsChange extends \Exception
 
 	public function __construct($message='') {
 		
-		$message = empty($message) ? \GO::t('passwordNeedsChange') : \GO::t('passwordNeedsChange')."\n\n".$message;
+		$message = empty($message) ? \GO::t("The password needs to be changed") : \GO::t("The password needs to be changed")."\n\n".$message;
 		$code = 499;		
 		parent::__construct($message,$code);
 	}

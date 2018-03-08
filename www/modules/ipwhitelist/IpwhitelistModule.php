@@ -75,7 +75,7 @@ class IpwhitelistModule extends \GO\Base\Module{
 		\GO::setIgnoreAclPermissions($oldIgnoreAcl);
 		
 		if (count($allowedIpAddresses)>0 && !in_array($_SERVER['REMOTE_ADDR'],$allowedIpAddresses)) {
-			$response['feedback'] = sprintf(\GO::t('wrongLocation','ipwhitelist'),$_SERVER['REMOTE_ADDR']);
+			$response['feedback'] = sprintf(\GO::t("You are not authorized from your current location. Attempted to log in from IP address %s.", "ipwhitelist"),$_SERVER['REMOTE_ADDR']);
 			$response['success'] = false;
 			return false;
 		}

@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: AddressContextMenu.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: AddressContextMenu.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -24,7 +24,7 @@ GO.email.AddressContextMenu = function(config)
 				
 	this.composeButton = new Ext.menu.Item({
 		iconCls: 'btn-compose',
-		text: GO.email.lang.compose,
+		text: t("Compose", "email"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 
@@ -57,7 +57,7 @@ GO.email.AddressContextMenu = function(config)
 	});
 	this.searchButton = new Ext.menu.Item({
 		iconCls: 'btn-search',
-		text: GO.email.lang.searchGO.replace('{product_name}', GO.settings.config.product_name),
+		text: t("Search through Group-Office", "email").replace('{product_name}', GO.settings.config.product_name),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			var searchPanel = new GO.grid.SearchPanel(
@@ -73,7 +73,7 @@ GO.email.AddressContextMenu = function(config)
 				
 	this.searchMessagesButton = new Ext.menu.Item({
 		iconCls: 'btn-search',
-		text: GO.email.lang.searchOnSender,
+		text: t("Show messages in current folder", "email"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			GO.email.searchSender(this.address);
@@ -85,11 +85,11 @@ GO.email.AddressContextMenu = function(config)
 	this.searchButton,
 	this.searchMessagesButton];
 	
-	if(GO.addressbook)
+	if(go.ModuleManager.isAvailable("addressbook"))
 	{
 		this.lookUpButton = new Ext.menu.Item({
 			iconCls: 'btn-addressbook',
-			text: GO.addressbook.lang.searchOnSender,
+			text: t("Lookup in address book", "addressbook"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 				GO.addressbook.searchSender(this.address, this.personal);

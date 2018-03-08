@@ -35,7 +35,7 @@ class BookmarksModule extends \GO\Base\Module{
 		parent::install();
 		
 		$category = new Model\Category();
-		$category->name=\GO::t('general','bookmarks');		
+		$category->name=\GO::t("General", "bookmarks");		
 		$category->save();
 		$category->acl->addGroup(\GO::config()->group_internal, \GO\Base\Model\Acl::READ_PERMISSION);
 	}

@@ -14,7 +14,7 @@
  * preferences into account.
  *
  * @copyright Copyright Intermesh
- * @version $Id: Date.php 21422 2017-09-08 10:14:11Z wsmits $
+ * @version $Id: Date.php 22381 2018-02-16 10:02:56Z mschering $
  * @package GO.base.util
  * @since Group-Office 3.0
  */
@@ -129,8 +129,8 @@ class Date {
 
 	public static function format_long_date($time,$add_time=true,$full_day_names=false,$full_month_names=false){
 
-		$days = $full_day_names ? \GO::t('full_days') : \GO::t('short_days');
-		$months = $full_month_names ? \GO::t('months') : \GO::t('short_months');
+		$days = $full_day_names ? \GO::t("full_days") : \GO::t("short_days");
+		$months = $full_month_names ? \GO::t("full_months") : \GO::t("short_months");
 		$str  = $days[date('w', $time)].' '.date('d', $time).' '.$months[date('n', $time)].' ';
 		if ($add_time)
 			return $str.date('Y - '.\GO::user()->time_format, $time);

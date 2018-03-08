@@ -43,7 +43,7 @@ GO.site.HtmlEditorImageDialog = Ext.extend(GO.Window , {
 	initComponent : function(){
 		
 		this.buttonOk = new Ext.Button({
-			text: GO.lang['cmdOk'],
+			text: t("Ok"),
 			handler: function(){
 				this.generateTag();
 				this.hide();
@@ -52,7 +52,7 @@ GO.site.HtmlEditorImageDialog = Ext.extend(GO.Window , {
 		});
 
 		this.buttonClose = new Ext.Button({
-			text: GO.lang['cmdClose'],
+			text: t("Close"),
 			handler: function(){
 				this.clearTag();
 				this.hide();
@@ -62,7 +62,7 @@ GO.site.HtmlEditorImageDialog = Ext.extend(GO.Window , {
 		
 		Ext.apply(this, {
 			goDialogId:'imageEditor',
-			title:GO.site.lang.imageEditor,
+			title:t("Customize image", "site"),
 			height:400,
 			width:700,
 			layout:'fit',
@@ -116,7 +116,7 @@ GO.site.HtmlEditorImageDialog = Ext.extend(GO.Window , {
 			maxLength: 255,
 			value: this.dimensionMediumWidth,
 			allowBlank:false,
-			fieldLabel: GO.site.lang.imgWidth,
+			fieldLabel: t("Width", "site"),
 			listeners:{
 				change:function(oldValue,newValue){
 					this.imgWidth = newValue;
@@ -137,7 +137,7 @@ GO.site.HtmlEditorImageDialog = Ext.extend(GO.Window , {
 			maxLength: 255,
 			value: this.dimensionMediumHeight,
 			allowBlank:false,
-			fieldLabel: GO.site.lang.imgHeight,
+			fieldLabel: t("Height", "site"),
 			listeners:{
 				change:function(oldValue,newValue){
 					this.imgHeight = newValue;
@@ -147,7 +147,7 @@ GO.site.HtmlEditorImageDialog = Ext.extend(GO.Window , {
 		});
 		
 		this.dimensionsComp = new Ext.form.CompositeField({
-			fieldLabel: GO.site.lang.imgDimensions,
+			fieldLabel: t("Dimensions (WxH)", "site"),
 			items: [this.widthField,this.betweenLabel,this.heightField],
 			disabled:true
 		});
@@ -156,13 +156,13 @@ GO.site.HtmlEditorImageDialog = Ext.extend(GO.Window , {
 			columns: 1,
 			width:300,
 			items: [{
-				boxLabel: GO.site.lang.imgZoom, 
+				boxLabel: t("Zoom", "site"), 
 				name: 'dimensionoptions', 
 				inputValue: 'zoom', 
 				style: 'margin-left: 4px; margin-right: -2px;', 
 				checked: true
 			},{
-				boxLabel: GO.site.lang.imgCrop, 
+				boxLabel: t("Crop", "site"), 
 				name: 'dimensionoptions', 
 				inputValue: 'crop', 
 				style: 'margin-left: 4px; margin-right: -2px;'
@@ -190,23 +190,23 @@ GO.site.HtmlEditorImageDialog = Ext.extend(GO.Window , {
 			columns: 1,
 			width:300,
 			items: [{
-				boxLabel: GO.site.lang.imgDimensionSmall, 
+				boxLabel: t("Small", "site"), 
 				name: 'dimensions', 
 				inputValue: 'small', 
 				style: 'margin-left: 4px; margin-right: -2px;'
 			},{
-				boxLabel: GO.site.lang.imgDimensionMedium, 
+				boxLabel: t("Medium", "site"), 
 				name: 'dimensions', 
 				inputValue: 'medium', 
 				style: 'margin-left: 4px; margin-right: -2px;', 
 				checked: true
 			},{
-				boxLabel: GO.site.lang.imgDimensionLarge, 
+				boxLabel: t("Large", "site"), 
 				name: 'dimensions', 
 				inputValue: 'large', 
 				style: 'margin-left: 4px; margin-right: -2px;'
 			},{
-				boxLabel: GO.site.lang.imgDimensionCustom, 
+				boxLabel: t("Custom", "site"), 
 				name: 'dimensions', 
 				inputValue: 'custom', 
 				style: 'margin-left: 4px; margin-right: -2px;'
@@ -254,7 +254,7 @@ GO.site.HtmlEditorImageDialog = Ext.extend(GO.Window , {
 			items: [
 				{ items:
 					{
-						boxLabel: GO.site.lang.imgAlignmentLeft, 
+						boxLabel: t("Left", "site"), 
 						name: 'alignment', 
 						inputValue: 'left', 
 						style: 'margin-left: 4px; margin-right: -2px;'
@@ -262,7 +262,7 @@ GO.site.HtmlEditorImageDialog = Ext.extend(GO.Window , {
 				},{
 					items:
 					{
-					boxLabel: GO.site.lang.imgAlignmentCenter, 
+					boxLabel: t("Center", "site"), 
 					name: 'alignment', 
 					inputValue: 'center', 
 					style: 'margin-left: 4px; margin-right: -2px;'
@@ -270,7 +270,7 @@ GO.site.HtmlEditorImageDialog = Ext.extend(GO.Window , {
 				},{
 					items:
 					{
-						boxLabel: GO.site.lang.imgAlignmentRight, 
+						boxLabel: t("Right", "site"), 
 						name: 'alignment', 
 						inputValue: 'right', 
 						style: 'margin-left: 4px; margin-right: -2px;'
@@ -278,7 +278,7 @@ GO.site.HtmlEditorImageDialog = Ext.extend(GO.Window , {
 				},{
 					items:
 					{
-						boxLabel: GO.site.lang.imgAlignmentInline, 
+						boxLabel: t("Inline", "site"), 
 						name: 'alignment', 
 						inputValue: 'inline', 
 						style: 'margin-left: 4px; margin-right: -2px;', 
@@ -301,7 +301,7 @@ GO.site.HtmlEditorImageDialog = Ext.extend(GO.Window , {
 		
 		
 		this.dimensionsFieldset = new Ext.form.FieldSet({
-			title: GO.site.lang.dimensions,
+			title: t("Dimensions", "site"),
 			autoHeight: true,
 			border: true,
 			collapsed: false,
@@ -313,7 +313,7 @@ GO.site.HtmlEditorImageDialog = Ext.extend(GO.Window , {
 		});
 		
 		this.alignmentFieldset = new Ext.form.FieldSet({
-			title: GO.site.lang.alignment,
+			title: t("Alignment", "site"),
 			autoHeight: true,
 			border: true,
 			collapsed: false,
@@ -323,11 +323,11 @@ GO.site.HtmlEditorImageDialog = Ext.extend(GO.Window , {
 		});
 		
 		this.NotavailableLabel = new Ext.form.Label({
-			html: GO.site.lang.notImplementedYet
+			html: t("Not yet implemented", "site")
 		});
 		
 		this.imageFieldset = new Ext.form.FieldSet({
-			title: GO.site.lang.imageExample,
+			title: t("Image example", "site"),
 			height:203,
 			border: true,
 			collapsed: false,
@@ -341,7 +341,7 @@ GO.site.HtmlEditorImageDialog = Ext.extend(GO.Window , {
 			name: 'alt',
 			width:250,
 			allowBlank:true,
-			fieldLabel: GO.site.lang.imgAlt,
+			fieldLabel: t("Alt text", "site"),
 			listeners:{
 				change:function(oldValue,newValue){
 					this.imgAlt = newValue;
@@ -354,7 +354,7 @@ GO.site.HtmlEditorImageDialog = Ext.extend(GO.Window , {
 			name: 'link_to_original',
 			checked:true,			
 			hideLabel:true,
-			boxLabel: GO.site.lang.linkToOriginal,
+			boxLabel: t("Link to original", "site"),
 			listeners:{
 				check:function(cb,checked){
 					this.imgLinkToOriginal = checked;
@@ -364,7 +364,7 @@ GO.site.HtmlEditorImageDialog = Ext.extend(GO.Window , {
 		});
 		
 		this.otherOptionsFieldset = new Ext.form.FieldSet({
-			title: GO.site.lang.otherOptions,
+			title: t("Other options", "site"),
 			height: 200,
 			labelWidth: 45,
 			border: true,

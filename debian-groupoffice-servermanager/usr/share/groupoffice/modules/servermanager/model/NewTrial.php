@@ -83,11 +83,11 @@ class NewTrial extends \GO\Base\Db\ActiveRecord {
 	
 	public function attributeLabels() {
 		return array_merge(parent::attributeLabels(), array(
-				'name'=>\GO::t("domainName", "servermanager"),
-				'first_name'=>\GO::t("strFirstName"),
-				'middle_name'=>\GO::t("strMiddleName"),
-				'last_name'=>\GO::t("strLastName"),
-				'email'=>\GO::t("strEmail"),
+				'name'=>\GO::t("Domain name", "servermanager"),
+				'first_name'=>\GO::t("First name"),
+				'middle_name'=>\GO::t("Middle name"),
+				'last_name'=>\GO::t("Last name"),
+				'email'=>\GO::t("E-mail"),
 		));
 	}
 	

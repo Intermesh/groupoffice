@@ -1,60 +1,61 @@
 <?php
-
-
-$l['name'] = 'Файлы';
-$l['description'] = 'Модуль Файлы; Модуль для совместного использования файлов.';
-$lang['link_type'][6]='Файл';
-$lang['link_type'][17]='Папка';
-$l['fileNotFound'] = 'Файл не найден';
-$l['folderExists'] = 'Папка уже существует';
-$l['filenameExists'] = 'Файл с данным именем уже существует';
-$l['uploadedSucces'] = 'Файл успешно размещен на сервере';
-$l['ootextdoc']='Open-Office Text документ';
-$l['wordtextdoc']='Microsoft Word документ';
-$l['personal']='Личные';
-$l['shared']='Общие';
-$l['general']='Основные';
-$l['folder_modified_subject']='Изменения в папке {product_name}';
-$l['folder_modified_body']='Вы запрашивали уведомление о изменениях в:
+return array (
+  'Sorry, the file you tried to download is not found.' => 'Файл не найден',
+  'The folder already exists' => 'Папка уже существует',
+  'Filename %s already exists' => 'Файл с данным именем уже существует',
+  'File uploaded successfully' => 'Файл успешно размещен на сервере',
+  'Open-Office Text document' => 'Open-Office Text документ',
+  'Microsoft Word document' => 'Microsoft Word документ',
+  'Personal' => 'Личные',
+  'Shared' => 'Общие',
+  'General' => 'Основные',
+  'Changes to {product_name} folder' => 'Изменения в папке {product_name}',
+  'You requested to be notified when changes are made to:
+%s
+The following changes were made by %s:
+%s;
+' => 'Вы запрашивали уведомление о изменениях в:
 %s
 Следующие изменения были сделаны %s:
 %s;
-';
-$l['modified']='Изменен';
-$l['new']='Создать';
-$l['deleted']='Удален';
-$l['folder']='Папка';
-$l['emptyFile']='Пустой файл';
-
-$l["files"]='Файлы';
-$l["template"]= 'Шаблон';
-$l["manageTemplates"]= 'Управление шаблонами';
-$l["downloadTemplate"]= 'Загрузить шаблон';
-$l["enterName"]= 'Введите имя';
-$l["pleaseEnterName"]= 'Пожалуйста, введите имя';
-$l["pleaseEnterNameArchive"]= 'Пожалуйста, введите имя архива';
-$l["startTransfer"]= 'Начать передачу';
-$l["addFolder"]= 'Добавить папку';
-$l["errorOneItem"]= 'Пожалуйста, выберите только одно';
-$l["activateSharing"]= 'Активировать совместное использование';
-$l["notifyChanges"]= 'Уведомлять меня об изменениях, сделанных в этой папке';
-$l["comments"]= 'Коментарии';
-$l["downloadGOTA"]= 'Разместить на сервере с помощью GOTA';
-$l["fileBrowser"]= 'Просмотр файлов';
-$l["thumbnails"]= 'Предпросмотр';
-$l["saveFile"]='Сохранить файл';
-$l["confirmOverwrite"]='{filename} уже существует, хотите перезаписать этот файл?';
-$l["file"]='Файл';
-$l["emptyList"]='Простой список';
-$l["newFiles"]='Новый';
-$l["olderVersions"]='Старые версии';
-$l["uploadProperties"]='Эти настройки будут применены для всех файлов, загруженных с опцией "Маленькие файлы"';
-$l["selectFiles"]= 'Выберите файлы';
-$l["fitImage"]='Вписать изображение';
-$l["normalSize"]='Нормальный размер';
-$l["imageViewer"]='Просмотр изображений';
-$l["emailDownloadLink"]= 'Ссылка на загрузку Email';
-$l["downloadLink"]= 'Ссылка на загрузку';
-$l["clickHereToDownload"]= 'Нажмите здесь чтобы загрузить файл';
-$l["expireTime"]= 'Время жизни ссылки';
-$l["possibleUntil"]= 'доступно до';
+',
+  'Modified' => 'Изменен',
+  'New' => 'Новый',
+  'Deleted' => 'Удален',
+  'Folder' => 'Папка',
+  'Empty file' => 'Пустой файл',
+  'Template' => 'Шаблон',
+  'Manage templates' => 'Управление шаблонами',
+  'Download template' => 'Загрузить шаблон',
+  'Enter a name' => 'Введите имя',
+  'Please enter a name' => 'Пожалуйста, введите имя',
+  'Please enter a name for the archive' => 'Пожалуйста, введите имя архива',
+  'Start transfer' => 'Начать передачу',
+  'Add folder' => 'Добавить папку',
+  'Please select only one item' => 'Пожалуйста, выберите только одно',
+  'Activate sharing' => 'Активировать совместное использование',
+  'Notify me about changes in this folder' => 'Уведомлять меня об изменениях, сделанных в этой папке',
+  'Comments' => 'Коментарии',
+  'Download with GOTA' => 'Разместить на сервере с помощью GOTA',
+  'File browser' => 'Просмотр файлов',
+  'Thumbnails' => 'Предпросмотр',
+  'Save file' => 'Сохранить файл',
+  '{filename} already exists, do you want to overwrite the file?' => '{filename} уже существует, хотите перезаписать этот файл?',
+  'File' => 'Файл',
+  'Empty list' => 'Простой список',
+  'Older versions' => 'Старые версии',
+  'The properties below will be applied to all files uploaded with the "Small files" option' => 'Эти настройки будут применены для всех файлов, загруженных с опцией "Маленькие файлы"',
+  'Select files' => 'Выберите файлы',
+  'Fit image' => 'Вписать изображение',
+  'Normal size' => 'Нормальный размер',
+  'Image viewer' => 'Просмотр изображений',
+  'Email download link' => 'Ссылка на загрузку Email',
+  'Download link' => 'Ссылка на загрузку',
+  'Click on the link to download the file' => 'Нажмите здесь чтобы загрузить файл',
+  'Download link expire time' => 'Время жизни ссылки',
+  'possible until' => 'доступно до',
+  'name' => 'Файлы',
+  'description' => 'Модуль Файлы; Модуль для совместного использования файлов.',
+  'Changes to Group-Office folder' => 'Изменения в папке {product_name}',
+  'Files' => 'Файлы',
+);

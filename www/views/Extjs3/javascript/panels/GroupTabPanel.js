@@ -73,7 +73,7 @@ Ext.ux.GroupTabPanel = Ext.extend(Ext.TabPanel, {
             var tt = new Ext.Template(
                 '<li class="{cls}" id="{id}">', 
                 '<a class="x-grouptabs-expand" onclick="return false;"></a>', 
-                '<a class="x-grouptabs-text {iconCls}" href="#" onclick="return false;">',
+                '<a class="x-grouptabs-text {iconCls}"  onclick="return false;">',
                 '<span>{text}</span></a>', 
                 '</li>'
             );

@@ -325,7 +325,7 @@ abstract class Message extends \GO\Base\Model {
 		$response['to_string'] = (string) $this->to;
 
 		if (!$recipientsAsString && empty($response['to']))
-			$response['to'][] = array('email' => '', 'personal' => \GO::t('no_recipients', 'email'));
+			$response['to'][] = array('email' => '', 'personal' => \GO::t("Undisclosed recipients", "email"));
 
 		$response['full_from'] = (string) $this->from;
 		$response['priority'] = intval($this->x_priority);
@@ -420,7 +420,7 @@ abstract class Message extends \GO\Base\Model {
 
 		
 		$response['contact_name']="";			
-		$response['contact_thumb_url']=GO::config()->host.'modules/addressbook/themes/Default/images/unknown-person.png';
+		$response['contact_thumb_url']=null; //GO::config()->host.'modules/addressbook/themes/Default/images/unknown-person.png';
 		
 		$response['blocked_images']=0;
 		$response['xssDetected']=false;

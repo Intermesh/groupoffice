@@ -6,7 +6,7 @@ GO.base.CurrentGridExportDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 	initComponent : function(){
 		
 		Ext.apply(this, {
-			title:GO.lang.exportScreen,
+			title:t("Currently on screen"),
 			goDialogId:'current-grid-export-dialog',
 			formControllerUrl: 'core/export',
 			height:600,
@@ -25,7 +25,7 @@ GO.base.CurrentGridExportDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		});
 
 		this.viewCombo = new Ext.form.ComboBox({
-			fieldLabel : GO.lang.strType,
+			fieldLabel : t("Type"),
 			hiddenName: 'view',
 			name: 'view',
 			mode: 'local',
@@ -45,11 +45,11 @@ GO.base.CurrentGridExportDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 //			anchor: '100%',
 //			maxLength: 100,
 //			allowBlank:false,
-//			fieldLabel: GO.lang.strName
+//			fieldLabel: t("Name")
 //		});
 		
 		this.exportOrientation = new Ext.form.ComboBox({
-			fieldLabel : GO.lang.exportOrientation,
+			fieldLabel : t("Orientation"),
 			hiddenName: 'orientation',
 			name: 'orientation',
 			mode: 'local',
@@ -63,19 +63,19 @@ GO.base.CurrentGridExportDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 						'id',
 						'label'
 				],
-				data: [['H', GO.lang.landscape], ['V', GO.lang.portrait]]
+				data: [['H', t("Landscape")], ['V', t("Portrait")]]
 			}),
 			valueField: 'id',
 			displayField: 'label'
 		});
 		
 		this.useDbColumnNames = new Ext.ux.form.XCheckbox({
-			fieldLabel : GO.lang.exportHumanHeaders,
+			fieldLabel : t("Use DB column names"),
 			name       : 'use_db_column_names'
 		});
 		
 		this.includeColumnNames = new Ext.ux.form.XCheckbox({
-			fieldLabel : GO.lang.includeColumnNames,
+			fieldLabel : t("Include column names"),
 			name       : 'include_column_names'
 		});
 
@@ -84,7 +84,7 @@ GO.base.CurrentGridExportDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		});
 
 		this.propertiesPanel = new Ext.Panel({
-			title:GO.lang.strProperties,
+			title:t("Properties"),
 			cls:'go-form-panel',
 			layout:'form',
 			labelWidth:160,

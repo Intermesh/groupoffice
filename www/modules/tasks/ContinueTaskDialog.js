@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: ContinueTaskDialog.js 21045 2017-04-10 08:17:15Z mschering $
+ * @version $Id: ContinueTaskDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -19,7 +19,7 @@ GO.tasks.ContinueTaskDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 			//autoHeight:true,
 			height: 540,
 			goDialogId: 'continuetask',
-			title: GO.tasks.lang.continueTask,
+			title: t("Continue task", "tasks"),
 			formControllerUrl: 'tasks/task'
 		});
 
@@ -46,7 +46,7 @@ GO.tasks.ContinueTaskDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 			xtype: 'datepicker',
 			name: 'due_time',
 			format: GO.settings.date_format,
-			fieldLabel: GO.lang.strDate
+			fieldLabel: t("Date")
 		});
 
 		this.datePicker.setValue(tomorrow);
@@ -77,11 +77,11 @@ GO.tasks.ContinueTaskDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 							width: 220,
 							format: GO.settings.time_format,
 							value: eight.format(GO.settings['time_format']),
-							fieldLabel: GO.lang.strTime,
+							fieldLabel: t("Time"),
 							anchor: '100%'
 						},
 						this.statusProgressField = new GO.tasks.StatusProgressField({}),
-						this.selectTaskList = new GO.tasks.SelectTasklist({fieldLabel: GO.tasks.lang.tasklist, anchor: '100%'}),
+						this.selectTaskList = new GO.tasks.SelectTasklist({fieldLabel: t("Tasklist", "tasks"), anchor: '100%'}),
 					]
 				},
 				{
@@ -93,7 +93,7 @@ GO.tasks.ContinueTaskDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 							xtype: 'textarea',
 							name: 'comment',
 							anchor: '100% 100%',							
-							fieldLabel: GO.lang.strDescription
+							fieldLabel: t("Description")
 						}]
 				}
 

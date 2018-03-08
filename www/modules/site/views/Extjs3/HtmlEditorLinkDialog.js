@@ -25,7 +25,7 @@ GO.site.HtmlEditorLinkDialog = Ext.extend(GO.Window , {
 	initComponent : function(){
 		
 		this.buttonOk = new Ext.Button({
-			text: GO.lang['cmdOk'],
+			text: t("Ok"),
 			handler: function(){
 				this.generateTag();
 				
@@ -36,7 +36,7 @@ GO.site.HtmlEditorLinkDialog = Ext.extend(GO.Window , {
 		});
 
 		this.buttonClose = new Ext.Button({
-			text: GO.lang['cmdClose'],
+			text: t("Close"),
 			handler: function(){
 				this.clearTag();
 				this.hide();
@@ -46,7 +46,7 @@ GO.site.HtmlEditorLinkDialog = Ext.extend(GO.Window , {
 		
 		Ext.apply(this, {
 			goDialogId:'linkEditor',
-			title:GO.site.lang.linkEditor,
+			title:t("Insert link", "site"),
 			height:410,
 			width:600,
 			layout:'fit',
@@ -104,17 +104,17 @@ GO.site.HtmlEditorLinkDialog = Ext.extend(GO.Window , {
 		this.contentTreePanel.on('dblclick',function(node, event){
 			node.select();
 			if(this.contentTreePanel.isContentNode(node)){
-				this.fillUrlField('content:'+node.attributes.content_id,GO.site.lang.content+': '+node.attributes.text)
+				this.fillUrlField('content:'+node.attributes.content_id,t("Content", "site")+': '+node.attributes.text)
 			}
 			
 		},this);
 		
 		this.contentTreePanelText = new GO.form.HtmlComponent({
-			html: '<p class="go-form-text">'+GO.site.lang.linkToContentText+'</p>'
+			html: '<p class="go-form-text">'+t("Link to a content item within this site. Doubleclick on an item to select it.", "site")+'</p>'
 		});
 		
 		this.fileButton = new Ext.Button({
-			text: GO.site.lang.selectFile,
+			text: t("Select file", "site"),
 			name:'select_file'
 		});
 		
@@ -141,11 +141,11 @@ GO.site.HtmlEditorLinkDialog = Ext.extend(GO.Window , {
 		},this);
 		
 		this.fileButtonText = new GO.form.HtmlComponent({
-			html: '<p class="go-form-text">'+GO.site.lang.linkToFileText+'</p>'
+			html: '<p class="go-form-text">'+t("Link to a file that you have uploaded within this site.", "site")+'</p>'
 		});
 		
 		this.urlText = new GO.form.HtmlComponent({
-			html: '<p class="go-form-text">'+GO.site.lang.linkToUrlText+'</p>'
+			html: '<p class="go-form-text">'+t("You can also type in your own url, please make sure you add http(s):// to it to make the url work.", "site")+'</p>'
 		});
 		
 		this.titleField = new Ext.form.TextField({
@@ -154,7 +154,7 @@ GO.site.HtmlEditorLinkDialog = Ext.extend(GO.Window , {
 			maxLength: 255,
 			value: this.linkTitle,
 			allowBlank:true,
-			fieldLabel: GO.site.lang.linkTitle,
+			fieldLabel: t("Link title", "site"),
 			listeners:{
 				change:function(oldValue,newValue){
 					this.linkTitle = newValue;
@@ -169,7 +169,7 @@ GO.site.HtmlEditorLinkDialog = Ext.extend(GO.Window , {
 			maxLength: 255,
 			allowBlank:true,
 			value:'http://',
-			fieldLabel: GO.site.lang.url
+			fieldLabel: t("Url", "site")
 		});
 		
 		this.urlField.on('change',function(){
@@ -179,13 +179,13 @@ GO.site.HtmlEditorLinkDialog = Ext.extend(GO.Window , {
 		
 		this.openInNewWindowCbx = new Ext.ux.form.XCheckbox({
 			hideLabel: false,
-			boxLabel: GO.site.lang.openInNewWindow,
+			boxLabel: t("Open in new window", "site"),
 			name: 'open_in_new_window',
 			value: false
 		});
 	
 		this.contentTreeFieldset = new Ext.form.FieldSet({
-			title: GO.site.lang.linkToContent,
+			title: t("Link to content item", "site"),
 			height:297,
 			border: true,
 			collapsed: false,
@@ -196,7 +196,7 @@ GO.site.HtmlEditorLinkDialog = Ext.extend(GO.Window , {
 		});
 		
 		this.fileFieldset = new Ext.form.FieldSet({
-			title: GO.site.lang.linkToFile,
+			title: t("Link to file", "site"),
 			height:120,
 			border: true,
 			collapsed: false,
@@ -207,7 +207,7 @@ GO.site.HtmlEditorLinkDialog = Ext.extend(GO.Window , {
 		});
 			
 		this.labelFieldset = new Ext.form.FieldSet({
-			title: GO.site.lang.url,
+			title: t("Url", "site"),
 			height:170,
 			border: true,
 			collapsed: false,
@@ -245,7 +245,7 @@ GO.site.HtmlEditorLinkDialog = Ext.extend(GO.Window , {
 	},
 
 	setUrlFromImage : function(file){
-		this.fillUrlField('file:'+file.data.path,GO.site.lang.file+': '+file.data.name);
+		this.fillUrlField('file:'+file.data.path,t("File", "site")+': '+file.data.name);
 		GO.selectFileBrowserWindow.hide();
 	},
 
@@ -281,7 +281,7 @@ GO.site.HtmlEditorLinkDialog = Ext.extend(GO.Window , {
 		this.clearTag();
 		var tag = '';
 		var linkType = this.getLinkType(this.selectedUrl);
-		var tagLink = '<a href="#" title="'+this.linkTitle+'"';
+		var tagLink = '<a  title="'+this.linkTitle+'"';
 
 		tag += '<site:link';
 		tag += ' linktype="'+linkType+'"';

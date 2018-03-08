@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: LinksContextMenu.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: LinksContextMenu.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -23,7 +23,7 @@ GO.LinksContextMenu = function(config)
 
 //	this.deleteButton = new Ext.menu.Item({
 //					iconCls: 'btn-delete',
-//					text: GO.lang['cmdDelete'],
+//					text: t("Delete"),
 //					cls: 'x-btn-text-icon',
 //					handler: function(){
 //						this.fireEvent('delete', this, this.selected);
@@ -33,7 +33,7 @@ GO.LinksContextMenu = function(config)
 				
 	this.unlinkButton = new Ext.menu.Item({
 					iconCls: 'btn-unlink',
-					text: GO.lang['cmdUnlink'],
+					text: t("Unlink"),
 					cls: 'x-btn-text-icon',
 					handler: function(){
 						this.fireEvent('unlink', this, this.selected);
@@ -43,7 +43,7 @@ GO.LinksContextMenu = function(config)
 				
 	this.propertiesButton = new Ext.menu.Item({
 					iconCls: 'btn-properties',
-					text: GO.lang['strProperties'], 
+					text: t("Properties"), 
 					handler: function(){
 							this.fireEvent('properties', this, this.selected);
 					},

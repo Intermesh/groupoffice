@@ -41,10 +41,7 @@
 	color:#666 !important;
 }
 
-.em-folder-status{
-	padding:0 !important;
-	margin:0 !important;
-}
+
 
 .em-statusbar-body span{
 line-height:21px !important;
@@ -79,11 +76,6 @@ margin:5px 2px;
 	font-size: 10px;
 	margin-top:3px;
 }
-
-/*.ml-unseen-row .x-grid3-cell-inner{
-	font-weight:bold !important;
-}*/
-
 .go-model-icon-GO_Email_Model_ImapMessage, .go-model-icon-GO_Savemailas_Model_LinkedEmail {
 	background-image: url('images/16x16/message.png') !important;
 	width:16px;
@@ -95,104 +87,26 @@ margin:5px 2px;
 }
 
 .go-module-icon-email , .go-menu-icon-email{
-	background-image: url('images/16x16/message.png') !important;
+	background-image: url('images/email.png') !important;
 }
 
 .go-tab-icon-email {
 	background-image: none !important;
 }
 
-.btn-low-priority{
-	background-image:url('images/16x16/low_priority.png') !important;
-}
 
-.btn-high-priority{
-	background-image:url('images/16x16/high_priority.png') !important;
-}
-
-
-.btn-message {
-	background-image:url('images/16x16/message.png') !important;
-}
-
-.btn-message-seen {
-	background-image:url('images/16x16/readmessage.png') !important;
-}
-
-.btn-message-answered {
-	background-image:url('images/16x16/message_answered.png') !important;
-}
-
-.btn-message-forwarded {
-	background-image:url('images/16x16/message_forwarded.png') !important;
-}
-
-.btn-message-answered-and-forwarded {
-	background-image:url('images/16x16/message_answered_and_forwarded.png') !important;
-}
-
-.btn-compose {
-	background-image:url('images/16x16/gtk-add.png') !important;
-}
-
-.btn-reply {
-	background-image:url('images/16x16/mail_reply.png') !important;
-}
-
-.btn-reply-all {
-	background-image:url('images/16x16/mail_replyall.png') !important;
-}
-
-
-.btn-addressbook {
-	background-image:url('images/16x16/addressbook.png') !important;
-}
-
-
-.btn-forward {
-	background-image:url('images/16x16/mail_forward.png') !important;
-}
-
-.btn-toggle-window{
-	background-image:url('images/16x16/toggle_window.png') !important;
-}
-
-
-
-.btn-reload {
-	background-image:url('images/16x16/reload.png') !important;
-}
-
-.btn-flag {
-	background-image:url('images/16x16/flag.png') !important;
-}
-
-.btn-attach {
-	background-image:url('images/16x16/btn-attach.png') !important;
-}
-.btn-accounts {
-	background-image:url('images/16x16/accounts.png') !important;
-}
-.btn-send {
-	background-image:url('images/16x16/mail_send.png') !important;
-}
-.btn-show {
-	background-image:url('images/16x16/show.png') !important;
+.btn-message-unseen {
+	border-radius: 50%;
+	background-color: rgba(23,126,163, .16);
+	max-width:8px;
+	margin: 0 8px;
+	max-height: 8px;
 }
 
 .em-btn-share-mailbox {
 	background-image:url('images/16x16/share_mailbox.png') !important;
 }
 
-
-.ml-icon-attach {
-	background-image:url('images/16x16/attach.png') !important;
-}
-
-.ml-folder-unseen a span{
-	color:#15428B;
-	font-weight:bold ;
-}
 
 .ml-seen-mail{
 	margin:2px 0px;
@@ -207,49 +121,19 @@ margin:5px 2px;
 .ml-seen-from{
 }
 
-.ml-unseen-from{
-	margin:0px;
-	margin-bottom:2px;
-	font-weight:bold;
-	color:#15428B;
-}
 
 .ml-seen-subject{
 	margin:0px;
-/*	margin-bottom:4px;*/
 	font-weight:normal;
 }
 
 .ml-unseen-subject{
 	margin:0px;
-/*	margin-bottom:4px;*/
 }
 
-.ml-unseen-row{
-}
 
-.ml-seen-row{
-   background-color:#f6f6f6;
-}
 
-.message-header{
-	font-family:tahoma,arial,helvetica,sans-serif;
-	font-size:12px;
-	background-color: #cfdce0;
-	border-bottom:1px solid #d0d0d0;
-	padding-left: 10px;
-	padding-top:5px;
-}
 
-.message-header a{
-	color: black;
-	text-decoration: none;
-}
-
-.message-header a:hover{
-	color: black;
-	text-decoration: underline;
-}
 
 .message-header-table{
 	float:left;
@@ -298,6 +182,9 @@ margin:5px 2px;
 	text-decoration: underline;
 }
 
+#email-message-panel .x-panel-body {
+	background-color:white;
+}
 .message-body{
 	padding: 8px;
 	position: relative;
@@ -308,13 +195,7 @@ margin:5px 2px;
 }
 
 
-.message-body a:link,.message-body a:active,.message-body a:visited{
-	color: blue;
-	text-decoration: underline;
-}
-.message-body a:hover{
-	text-decoration:none;
-}
+
 
 .message-body p.MsoListParagraph, .message-body li.MsoListParagraph, .message-body div.MsoListParagraph
 {
@@ -326,29 +207,10 @@ margin:5px 2px;
 	font-size:11.0pt;
 }
 
-.x-tree-node img.folder-account, .x-tree-node-collapsed img.folder-account{
-    background-image:  url("images/16x16/account.png");
-}
-
-.x-tree-node-expanded img.folder-account{
-    background-image:  url("images/16x16/account.png");
-}
-
-
-.x-tree-node img.folder-default, .x-tree-node-collapsed img.folder-default{
-    background-image:  url("images/16x16/folder.png");
-}
-
-.x-tree-node-expanded img.folder-default{
-    background-image:  url("images/16x16/folder_open.png");
-}
-
 .email-grid-icon{
 	float:left;
 	width:16px;
 	height:16px;
-	margin:1px;
-	background-repeat: no-repeat;
 }
 
 .em-attachments-container{
@@ -397,22 +259,6 @@ margin:5px 2px;
 	background:transparent !important;
 }
 
-.email-folder-inbox{
-	background-image:url(images/16x16/inbox.png) !important;
-}
-.email-folder-drafts{
-	background-image:url(images/16x16/drafts.png) !important;
-}
-.email-folder-sent{
-	background-image:url(images/16x16/sent.png) !important;
-}
-.email-folder-trash{
-	background-image:url(images/16x16/trash.png) !important;
-}
-.email-folder-spam{
-	background-image:url(images/16x16/spam.png) !important;
-}
-
 .em-contact-link-container{
 	float:left;
 }
@@ -425,12 +271,6 @@ margin:5px 2px;
 
 .em-contact-link .x-form-check-wrap{
 	line-height:inherit !important;
-}
-
-.img-email-add{
-	background:url('images/16x16/email-quickadd.png') no-repeat top right !important;
-	width:16px !important;
-	height:16px !important;
 }
 
 div.em-message-labels-container span {

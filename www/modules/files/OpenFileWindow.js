@@ -1,6 +1,6 @@
 GO.files.OpenFileWindow = Ext.extend(GO.Window, {
 	initComponent : function(){
-		this.title=GO.files.lang.selectApplication;
+		this.title=t("Select application to open this file...", "files");
 		
 		this.list = new GO.grid.SimpleSelectList({
 			store: new GO.data.JsonStore({
@@ -53,11 +53,11 @@ GO.files.OpenFileWindow = Ext.extend(GO.Window, {
 			items:[this.rememberCB = new Ext.form.Checkbox({
 				xtype:'checkbox',
 				hideLabel:true,
-				boxLabel:GO.files.lang.rememberFileHandler
+				boxLabel:t("Remember my decision for this file type", "files")
 			})]
 		}];
 		this.buttons=[{
-				text: GO.lang['cmdClose'],
+				text: t("Close"),
 				handler: function(){
 					this.hide();
 				},
@@ -69,7 +69,7 @@ GO.files.OpenFileWindow = Ext.extend(GO.Window, {
 	show : function(config){	
 		
 
-		Ext.getBody().mask(GO.lang.waitMsgLoad);
+		Ext.getBody().mask(t("Loading..."));
 		this.list.store.load({
 			params:{
 				id:config.id,

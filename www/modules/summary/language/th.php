@@ -1,27 +1,25 @@
 <?php
-
-
-$l['name']='หน้าหลัก';
-$l['description']='แสดงรายการเมนูต่างๆ.';
-$l['default_rss_url']='http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml';
-$l['default_rss_title']='ข่าว';
-
-$l["summary"]= 'หน้าหลัก';
-$l["noItems"]= 'ไม่มีรายการในหน้าหลัก.';//You don\'t have any items on your startpage;
-$l["selectPortlet"]= 'เลือกพอร์ตเล็ต';//Select portlet;
-$l["hotTopics"]= 'รายการข่าว';//Hot topics;
-$l["enterRssFeed"]= 'กรอก URL รูปแบบ Rss feed:';//Please enter the RSS feed URL;
-$l["notes"]= 'สมุดเตือนความจำ';
-$l["loadingFeed"]= 'กำลังโหลด ...';
-$l["goToPost"]= 'ไปที่โพสต์';//Go to Post;
-$l["today"]= 'วันนี้ ';
-$l["announcement"]="ประกาศ";
-$l["announcements"]="ประกาศ";
-$l["dueTime"]="แสดงสิ้นสุด";
-$l["title"]="หัวข้อ";
-$l["manageAnnouncements"]='การจัดการประกาศ';
-$l["webFeeds"]='จัดการเว็บฟีด';
-$l["type"]='ชนิด';
-$l["summaryType"]='หน้าหลัก';
-$l["rssFeeds"]='Rss Feeds';
-$l["noRssFeeds"]='ไม่มีรายการ RSS feeds ที่เพิ่มไว้.<br />คลิ๊กปุ่มกำหนดค่าในมุมบนขวาเพื่อเพิ่มรายการ';
+return array (
+  'News' => 'รายการข่าว',
+  'You don\'t have any items on your start page.' => 'ไม่มีรายการในหน้าหลัก.',
+  'Select portlet' => 'เลือกพอร์ตเล็ต',
+  'Please enter the RSS feed URL:' => 'กรอก URL รูปแบบ Rss feed:',
+  'Notes' => 'สมุดเตือนความจำ',
+  'Loading Feed...' => 'กำลังโหลด ...',
+  'Go to Post' => 'ไปที่โพสต์',
+  'Today ' => 'วันนี้ ',
+  'Announcement' => 'ประกาศ',
+  'Announcements' => 'ประกาศ',
+  'Show until' => 'แสดงสิ้นสุด',
+  'Title' => 'หัวข้อ',
+  'Manage announcements' => 'การจัดการประกาศ',
+  'Manage webfeeds' => 'จัดการเว็บฟีด',
+  'Type' => 'ชนิด',
+  'Summary' => 'หน้าหลัก',
+  'No RSS feeds have been added.<br />Click the settings button in the top right corner of this window to add feeds.' => 'ไม่มีรายการ RSS feeds ที่เพิ่มไว้.<br />คลิ๊กปุ่มกำหนดค่าในมุมบนขวาเพื่อเพิ่มรายการ',
+  'name' => 'หน้าหลัก',
+  'description' => 'แสดงรายการเมนูต่างๆ.',
+  'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml' => 'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml',
+  'Start page' => 'หน้าหลัก',
+  'Rss Feeds' => 'Rss Feeds',
+);

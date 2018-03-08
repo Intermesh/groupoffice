@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: AliasesGrid.js 16251 2013-11-15 08:39:41Z mschering $
+ * @version $Id: AliasesGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -18,7 +18,7 @@ GO.postfixadmin.AliasesGrid = function(config){
 		config = {};
 	}
 	
-	config.title = GO.postfixadmin.lang.aliases;
+	config.title = t("Aliases", "postfixadmin");
 	config.layout='fit';
 	config.autoScroll=true;
 	config.split=true;
@@ -38,21 +38,21 @@ GO.postfixadmin.AliasesGrid = function(config){
 		},
 		columns:[
 	   		{
-			header: GO.postfixadmin.lang.address, 
+			header: t("Address", "postfixadmin"), 
 			dataIndex: 'address'
 		},		{
-			header: GO.postfixadmin.lang.goto_address, 
+			header: t("Goto", "postfixadmin"), 
 			dataIndex: 'goto'
 		},		{
-			header: GO.lang.strCtime, 
+			header: t("Created at"), 
 			dataIndex: 'ctime',
-			width:110
+			width: dp(140)
 		},		{
-			header: GO.lang.strMtime, 
+			header: t("Modified at"), 
 			dataIndex: 'mtime',
-			width:110
+			width: dp(140)
 		},		{
-			header: GO.postfixadmin.lang.active, 
+			header: t("Active", "postfixadmin"), 
 			dataIndex: 'active'
 		}
 	]
@@ -64,7 +64,7 @@ GO.postfixadmin.AliasesGrid = function(config){
 	config.view=new Ext.grid.GridView({
 		autoFill: true,
 		forceFit: true,
-		emptyText: GO.lang['strNoItems']		
+		emptyText: t("No items to display")		
 	});
 	config.sm=new Ext.grid.RowSelectionModel();
 	config.loadMask=true;
@@ -83,7 +83,7 @@ GO.postfixadmin.AliasesGrid = function(config){
 	
 	config.tbar=[{
 			iconCls: 'btn-add',							
-			text: GO.lang['cmdAdd'],
+			text: t("Add"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 	    	this.aliasDialog.show(0,{loadParams:{domain_id:this.store.baseParams.domain_id}});	    	
@@ -91,13 +91,13 @@ GO.postfixadmin.AliasesGrid = function(config){
 			scope: this
 		},{
 			iconCls: 'btn-delete',
-			text: GO.lang['cmdDelete'],
+			text: t("Delete"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 				this.deleteSelected();
 			},
 			scope: this
-		},GO.lang['strSearch']+': ', ' ',this.searchField];
+		},t("Search")+': ', ' ',this.searchField];
 	
 	
 	

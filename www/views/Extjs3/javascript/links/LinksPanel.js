@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: LinksPanel.js 19273 2015-07-28 08:30:25Z mschering $
+ * @version $Id: LinksPanel.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -292,7 +292,7 @@ GO.grid.LinksPanel = function(config){
 	config['tbar'] = [
 	this.linkButton = new Ext.Button({
 		iconCls: 'btn-link',
-		text: GO.lang['cmdLink'],
+		text: t("Link"),
 		cls: 'x-btn-text-icon',
 		handler: function(){				
 			this.linksDialog.show();					
@@ -302,7 +302,7 @@ GO.grid.LinksPanel = function(config){
 	}),
 	this.newFolderButton = new Ext.Button({
 		iconCls: 'btn-add',
-		text: GO.lang.newFolder,
+		text: t("New folder"),
 		cls: 'x-btn-text-icon',
 		handler: function() {
 					
@@ -316,7 +316,7 @@ GO.grid.LinksPanel = function(config){
 	}),
 	this.unlinkButton = new Ext.Button({
 		iconCls: 'btn-unlink',
-		text: GO.lang['cmdUnlink'],
+		text: t("Unlink"),
 		cls: 'x-btn-text-icon',
 		handler: function() {
 
@@ -325,7 +325,7 @@ GO.grid.LinksPanel = function(config){
 		scope: this
 	}),'-',{
 		iconCls: 'btn-refresh',
-		text: GO.lang['cmdRefresh'],
+		text: t("Refresh"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			this.linksGrid.store.load();
@@ -337,7 +337,7 @@ GO.grid.LinksPanel = function(config){
 	}
 	//			,'-',this.deleteButton = new Ext.Button({
 	//				iconCls: 'btn-delete',
-	//				text: GO.lang['cmdDelete'],
+	//				text: t("Delete"),
 	//				cls: 'x-btn-text-icon',
 	//				handler: function(){
 	//					this.linksGrid.deleteSelected();
@@ -351,7 +351,7 @@ GO.grid.LinksPanel = function(config){
 		config.tbar.push('-');
 		
 		config.tbar.push({
-			text: GO.lang.cmdSettings,
+			text: t("Settings"),
 			scope:this,
 			iconCls:'btn-settings',
 			handler:function(){

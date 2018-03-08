@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: PersonalSettingsDialog.js 18970 2015-04-01 12:11:24Z michaelhart86 $
+ * @version $Id: PersonalSettingsDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -17,11 +17,12 @@ GO.PersonalSettingsDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		
 		Ext.apply(this, {
 			goDialogId:'settings',
-			title:GO.lang.settings,
+			title:t("Settings"),
 			formControllerUrl: 'settings',
 			width:900,
 			fileUpload : true,
 			height:550,
+			maximizable:true,
 			enableApplyButton:false
 		});
 		

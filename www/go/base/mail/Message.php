@@ -224,7 +224,7 @@ class Message extends \Swift_Message{
 		
 		if($loadDate){
 			$date=isset($structure->headers['date']) ? $structure->headers['date'] : date('c');		
-			$udate=strtotime($date);
+			$udate=new \DateTime($date);
 
 			$this->setDate($udate);
 		}

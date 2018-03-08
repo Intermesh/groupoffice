@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: SieveGrid.js 19390 2015-09-10 11:44:35Z wsmits $
+ * @version $Id: SieveGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
@@ -42,16 +42,16 @@ GO.sieve.SieveGrid = function(config){
 	var fields ={
 		fields:['id','name', 'index', 'script_name','active'],
 		columns:[{
-			header: GO.sieve.lang.name,
+			header: t("Sieve", "sieve"),
 			dataIndex: 'name'
 		},{
-			header: GO.sieve.lang.active,
+			header: t("Active", "sieve"),
 			dataIndex: 'active',
 			renderer: function(value, metaData, record, rowIndex, colIndex, store) {
 				if(value)
-					value = GO.lang.cmdYes;
+					value = t("Yes");
 				else
-					value = GO.lang.cmdNo;
+					value = t("No");
 				return value;
 			}
 		}
@@ -61,7 +61,7 @@ GO.sieve.SieveGrid = function(config){
 	{
 		config = {};
 	}
-	config.title=GO.email.lang.filters;
+	config.title=t("Filters", "email");
 	config.layout='fit';
 	config.region='center';
 	config.autoScroll=true;
@@ -91,7 +91,7 @@ GO.sieve.SieveGrid = function(config){
 	config.view=new Ext.grid.GridView({
 		autoFill: true,
 		forceFit: true,
-		emptyText: GO.lang['strNoItems']
+		emptyText: t("No items to display")
 	});
 	config.sm=new Ext.grid.RowSelectionModel();
 	config.loadMask=true;
@@ -106,7 +106,7 @@ GO.sieve.SieveGrid = function(config){
 
 	config.tbar=[{
 			iconCls: 'btn-add',
-			text: GO.lang['cmdAdd'],
+			text: t("Add"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 	    	this.sieveDialog.show(-1,this.selectScript.getValue(),this.store.baseParams.account_id);
@@ -114,15 +114,15 @@ GO.sieve.SieveGrid = function(config){
 			scope: this
 		},{
 			iconCls: 'btn-delete',
-			text: GO.lang['cmdDelete'],
+			text: t("Delete"),
 			cls: 'x-btn-text-icon',
 			handler:function(){this.deleteSelected();},
 				scope: this
 		},
-		GO.sieve.lang.filterset,
+		t("Filterset:", "sieve"),
 		this.selectScript,{
 			iconCls: 'btn-extra',
-			text: GO.sieve.lang.activate,
+			text: t("Activate filterset", "sieve"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 				
@@ -145,7 +145,7 @@ GO.sieve.SieveGrid = function(config){
 //				 success: function(){
 //					 this.selectScript.store.reload();
 //					 this.setSelectedScript();
-//					 this.selectScript.setRawValue(this.selectScript.getRawValue() + ' ('+GO.sieve.lang.active+')');
+//					 this.selectScript.setRawValue(this.selectScript.getRawValue() + ' ('+t("Active", "sieve")+')');
 //					 this.store.reload();
 //				 }
 //				},this);

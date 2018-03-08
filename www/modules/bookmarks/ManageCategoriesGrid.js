@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: ManageCategoriesGrid.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: ManageCategoriesGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Twan Verhofstad
  */
@@ -32,10 +32,10 @@ GO.bookmarks.ManageCategoriesGrid = function(config){
 		},
 		columns:[
 		{
-			header: GO.lang.strName, 
+			header: t("Name"), 
 			dataIndex: 'name'
 		},{
-			header: GO.lang.strOwner, 
+			header: t("Owner"), 
 			dataIndex: 'user_name',
 			sortable: false
 		}		
@@ -47,7 +47,7 @@ GO.bookmarks.ManageCategoriesGrid = function(config){
 	config.view=new Ext.grid.GridView({
 		autoFill: true,
 		forceFit: true,
-		emptyText: GO.lang['strNoItems']		
+		emptyText: t("No items to display")		
 	});
 	
 	config.sm=new Ext.grid.RowSelectionModel();
@@ -63,7 +63,7 @@ GO.bookmarks.ManageCategoriesGrid = function(config){
 	
 	config.tbar=[{
 		iconCls: 'btn-add',
-		text: GO.lang['cmdAdd'],
+		text: t("Add"),
 		cls: 'x-btn-text-icon',
 		handler: function(){				
 			this.categoryDialog.show();
@@ -71,7 +71,7 @@ GO.bookmarks.ManageCategoriesGrid = function(config){
 		scope: this
 	},{
 		iconCls: 'btn-delete',
-		text: GO.lang['cmdDelete'],
+		text: t("Delete"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
 			this.deleteSelected();

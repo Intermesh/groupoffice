@@ -1,9 +1,9 @@
 #!/usr/bin/php
 <?php
 
-$commitMsg='translate update';
+$commitMsg= isset($argv[1]) ? $argv[1] : 'translate update';
 
-$root = 'svn+ssh://svn@svn.intermesh.nl/groupoffice-pro/branches/modules-6.0';
+$root = 'svn+ssh://svn@svn.intermesh.nl/groupoffice-pro/branches/modules-6.3';
 exec('svn ls '.$root, $output, $ret);
 
 if($ret!=0)
@@ -22,7 +22,7 @@ foreach($output as $module){
 				
 		if(is_dir($module)){
 			echo "COMMIT ".rtrim($module,'/')."\n";
-			$cmd = 'svn ci -m "'.$commitMsg.'" '.$module;
+			$cmd = 'svn ci -m '.escapeshellarg($commitMsg).' '.$module;
 			system($cmd, $ret);
 		}
 

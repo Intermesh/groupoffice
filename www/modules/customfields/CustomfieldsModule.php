@@ -8,7 +8,7 @@ use GO;
 class CustomfieldsModule extends \GO\Base\Module {
 
 	public function autoInstall() {
-		return true;
+		return false; //is installed as core module!
 	}
 
 	public static function getCustomfieldTypes($extendModel=false) {
@@ -16,9 +16,16 @@ class CustomfieldsModule extends \GO\Base\Module {
 		$types = array();
 
 		$modules = \GO::modules()->getAllModules();
+		
+		//hack for refactoring module
+		$cfModule = new \stdClass();
+		$cfModule->moduleManager = new CustomfieldsModule();
+		$modules[] = $cfModule;
 
 		while ($module = array_shift($modules)) {
-			if ($module->moduleManager) {
+			if ($module->moduleManager instanceof \GO\Base\Module) {
+				
+				
 				$classes = $module->moduleManager->findClasses('customfieldtype');
 
 				foreach ($classes as $class) {
@@ -54,11 +61,17 @@ class CustomfieldsModule extends \GO\Base\Module {
 		$cfModels=array();
 		$moduleObjects = \GO::modules()->getAllModules();
 		foreach ($moduleObjects as $moduleObject) {
-			$file = $moduleObject->path . ucfirst($moduleObject->id) . 'Module.php';
+			
+			if($moduleObject->package) {
+				//module is refactored
+				continue;
+			}
+			
+			$file = $moduleObject->path . ucfirst($moduleObject->name) . 'Module.php';
 			//todo load listeners
 			if (file_exists($file)) {
 //		require_once($file);
-				$class = 'GO\\' . ucfirst($moduleObject->id) . '\\' . ucfirst($moduleObject->id) . 'Module';
+				$class = 'GO\\' . ucfirst($moduleObject->name). '\\' . ucfirst($moduleObject->name) . 'Module';
 
 				$object = new $class;
 				$models = $object->findClasses("customfields/model");
@@ -73,6 +86,23 @@ class CustomfieldsModule extends \GO\Base\Module {
 		}
 		
 		return $cfModels;
+	}
+	
+	public static function getExtendableModels() {
+		$m = [];
+		foreach(self::getCustomfieldModels() as $cfModel) {
+			$cls = $cfModel->getName();
+			$m[] = (new $cls)->extendsModel();
+		}
+		
+		
+		//for new framework
+		
+		$cf = new \go\core\util\ClassFinder();
+		$m = array_merge($m, $cf->findByTrait(\go\core\orm\CustomFieldsTrait::class));
+		
+		return $m;
+		
 	}
 	
 	
@@ -104,7 +134,7 @@ class CustomfieldsModule extends \GO\Base\Module {
 
 		foreach ($stmt as $category) {
 			$category->duplicate(array(
-					'extends_model' => $targetModelName
+					'extendsModel' => $targetModelName
 			));
 		}
 

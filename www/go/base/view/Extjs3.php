@@ -61,6 +61,20 @@ class Extjs3{
 		$modules = \GO::modules()->getAllModules(true);
 		foreach($modules as $module)
 		{
+			if(isset($module->package)) {
+				//new location
+				$path = str_replace(\go\core\Environment::get()->getInstallFolder()->getPath() .'/', \GO::config()->root_path, $module->moduleManager->path()).'views/extjs3/themes/default/style.css';
+				if(file_exists($path)){
+					$this->addStylesheet($path);
+				} else {
+					$path = \GO::config()->root_path . 'modules/' . $module->moduleManager->getName() . '/';
+					if(file_exists($path.'themes/Default/style.css')){
+						$this->addStylesheet($path.'themes/Default/style.css');
+					}
+				}
+				continue;
+			}
+			
 			$path = $module->moduleManager->path();
 			if(file_exists($path.'themes/Default/style.css')){
 				$this->addStylesheet($path.'themes/Default/style.css');
@@ -101,7 +115,7 @@ class Extjs3{
 		
 		$mods='';
 		foreach($modules as $module) {
-			$mods.=$module->id;
+			$mods.=$module->name;
 		}
 
 		$hash = md5(\GO::config()->mtime.$mods);
@@ -118,7 +132,6 @@ class Extjs3{
 				
 				$baseurl = str_replace(\GO::config()->root_path, \GO::config()->host, dirname($s)).'/';
 				$css .= $this->_replaceUrl(file_get_contents($s),$baseurl);
-				//fputs($fp, $this->_replaceUrl(file_get_contents($s),$baseurl));
 			}
 			//fclose($fp);
 			
@@ -148,15 +161,15 @@ class Extjs3{
 		$arr = array();
 		
 		foreach($modules as $module){
-			$arr[$module->id]=$module->getAttributes();
+			$arr[$module->name]=$module->getAttributes();
 			
-			$arr[$module->id]['url']=\GO::config()->host.'modules/'.$module->id.'/';
-			$arr[$module->id]['path']=\GO::config()->root_path.'modules/'.$module->id.'/';
-			$arr[$module->id]['full_url']=\GO::config()->full_url.'modules/'.$module->id.'/';
+			$arr[$module->name]['url']=\GO::config()->host.'modules/'.$module->name.'/';
+			$arr[$module->name]['path']=\GO::config()->root_path.'modules/'.$module->name.'/';
+			$arr[$module->name]['full_url']=\GO::config()->full_url.'modules/'.$module->name.'/';
 			
-			$arr[$module->id]['permission_level']=$module->permissionLevel;
-			$arr[$module->id]['read_permission']=$module->permissionLevel>=\GO\Base\Model\Acl::READ_PERMISSION;
-			$arr[$module->id]['write_permission']=$module->permissionLevel>=\GO\Base\Model\Acl::WRITE_PERMISSION;
+			$arr[$module->name]['permission_level']=$module->permissionLevel;
+			$arr[$module->name]['read_permission']=$module->permissionLevel>=\GO\Base\Model\Acl::READ_PERMISSION;
+			$arr[$module->name]['write_permission']=$module->permissionLevel>=\GO\Base\Model\Acl::WRITE_PERMISSION;
 			
 		}
 		

@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: LiveGridPanel.js 15267 2013-07-18 08:54:52Z michaelhart86 $
+ * @version $Id: LiveGridPanel.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author michael de Hart <mdhart@intermesh.nl>
  */
@@ -37,7 +37,7 @@ GO.grid.LiveGridPanel = Ext.extend(Ext.ux.grid.livegrid.GridPanel, {
 			this.view = new Ext.ux.grid.livegrid.GridView({
 				autoFill: true,
 				forceFit: true,
-				emptyText: GO.lang.strNoItems,
+				emptyText: t("No items to display"),
 				nearLimit: 2
 			});
 		}
@@ -89,8 +89,8 @@ GO.grid.LiveGridPanel = Ext.extend(Ext.ux.grid.livegrid.GridPanel, {
 				view        : this.view,
 				store: this.store,
 				displayInfo : true,
-				displayMsg: GO.lang['displayingItems'],
-				emptyMsg: GO.lang['strNoItems']
+				displayMsg: t("Displaying items {0} - {1} of {2}"),
+				emptyMsg: t("No items to display")
 			})
 		}
 
@@ -131,7 +131,7 @@ GO.grid.LiveGridPanel = Ext.extend(Ext.ux.grid.livegrid.GridPanel, {
 			this.tbar.unshift({
 				itemId:'add',
 				iconCls: 'btn-add',							
-				text: GO.lang['cmdAdd'],
+				text: t("Add"),
 				cls: 'x-btn-text-icon',
 				handler: this.btnAdd,
 				disabled:this.standardTbarDisabled,
@@ -139,7 +139,7 @@ GO.grid.LiveGridPanel = Ext.extend(Ext.ux.grid.livegrid.GridPanel, {
 			},{
 				itemId:'delete',
 				iconCls: 'btn-delete',
-				text: GO.lang['cmdDelete'],
+				text: t("Delete"),
 				cls: 'x-btn-text-icon',
 				disabled:this.standardTbarDisabled,
 				handler: function(){

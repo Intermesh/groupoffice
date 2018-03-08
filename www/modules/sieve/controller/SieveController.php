@@ -67,7 +67,7 @@ class SieveController extends \GO\Base\Controller\AbstractModelController{
 
 			if($script == $response['active'])
 			{
-				$name .= ' ('.\GO::t('active','sieve').')';
+				$name .= ' ('.\GO::t("Active", "sieve").')';
 			}
 
 			$response['results'][]=array('value'=>$script,'name'=>$name, 'active'=>$script == $response['active']);
@@ -183,7 +183,7 @@ class SieveController extends \GO\Base\Controller\AbstractModelController{
 				}
 				
 				if($rule['actions'][$i]['type'] == 'stop' && $i < $c-1){
-					Throw new \GO\Base\Exception\Save(\GO::t('stopEndError','sieve'));
+					Throw new \GO\Base\Exception\Save(\GO::t("Stop needs to be on the end!", "sieve"));
 				}
 			}
 			
@@ -327,17 +327,17 @@ class SieveController extends \GO\Base\Controller\AbstractModelController{
 				{
 					case 'addflag':
 						if($action['target'] == '\\Seen'){
-							$action['text'] = \GO::t('setRead','sieve');
+							$action['text'] = \GO::t("Mark message as read", "sieve");
 						}
 						break;
 					case 'set_read':
-							$action['text'] = \GO::t('setRead','sieve');
+							$action['text'] = \GO::t("Mark message as read", "sieve");
 						break;
 					case 'fileinto':
 						if(empty($action['copy'])){
-							$action['text'] = \GO::t('fileinto','sieve').' "'.$action['target'].'"';
+							$action['text'] = \GO::t("Move email to the folder", "sieve").' "'.$action['target'].'"';
 						}else{
-							$action['text']=\GO::t('copyto','sieve').' "'.$action['target'].'"';
+							$action['text']=\GO::t("Copy email to the folder", "sieve").' "'.$action['target'].'"';
 							$action['type'] = 'fileinto_copy';
 						}
 						break;
@@ -345,32 +345,32 @@ class SieveController extends \GO\Base\Controller\AbstractModelController{
 					case 'redirect':
 						if (!empty($action['copy'])) {
 							$action['type'] = 'redirect_copy';
-							$action['text'] = \GO::t('sendcopyto','sieve').' "'.$action['target'].'"';
+							$action['text'] = \GO::t("Send a copy to", "sieve").' "'.$action['target'].'"';
 						} else {
-							$action['text'] = \GO::t('forwardto','sieve').' "'.$action['target'].'"';
+							$action['text'] = \GO::t("Redirect to", "sieve").' "'.$action['target'].'"';
 						}
 						break;
 					case 'reject':
-						$action['text']=\GO::t('refusewithmesssage','sieve').' "'.$action['target'].'"';
+						$action['text']=\GO::t("Reject with message:", "sieve").' "'.$action['target'].'"';
 						break;
 					case 'vacation':
 						$addressesText = !empty($action['addresses']) && is_array($action['addresses'])
-							? \GO::t('vacAlsoMailTo','sieve').': '.implode(',',$action['addresses']).'. '
+							? \GO::t("Autoreply is active for", "sieve").': '.implode(',',$action['addresses']).'. '
 							: '';
 						
 						if(empty($action['days']))
 							$action['days']=7;
 						
-						$action['text']=\GO::t('vacsendevery','sieve').' '.$action['days'].' '.\GO::t('vacsendevery2','sieve').'. '.$addressesText.\GO::t('vacationmessage','sieve').' "'.$action['reason'].'"';
+						$action['text']=\GO::t("Reply every", "sieve").' '.$action['days'].' '.\GO::t("day(s)", "sieve").'. '.$addressesText.\GO::t("Message:", "sieve").' "'.$action['reason'].'"';
 						break;
 					case 'discard':
-						$action['text']=\GO::t('discard','sieve');
+						$action['text']=\GO::t("Discard", "sieve");
 						break;
 					case 'stop':
-						$action['text']=\GO::t('stop','sieve');
+						$action['text']=\GO::t("Stop", "sieve");
 						break;
 					default:
-						$action['text']=\GO::t('errorshowtext','sieve');
+						$action['text']=\GO::t("Error while displaying test line", "sieve");
 						break;
 				}
 				$response['actions'][] = $action;

@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: SelectSettingPanels.js 17133 2014-03-20 08:25:24Z mschering $
+ * @version $Id: SelectSettingPanels.js 22445 2018-03-06 08:36:59Z michaelhart86 $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
@@ -20,26 +20,26 @@ GO.users.SelectSettingPanels = Ext.extend(Ext.Panel,{
 		this.autoScroll=true;
 		this.border=false;
 		this.hideLabel=true;
-		this.title = GO.users.lang.enabledSettingtabs;
+		this.title = t("Enabled Setting tabs", "users");
 		this.layout='form';
 		this.cls='go-form-panel';
 		this.labelWidth=50;
 		
 		this.items = [];
-		this.items.push(new GO.form.HtmlComponent({html:GO.users.lang.explanation_cf_settingspanels}));
+		this.items.push(new GO.form.HtmlComponent({html:t("To show the custom field tabs in the settings panel you need to be sure that the user has at least \"Read\" access to the custom fields module.", "users")}));
 		
-		this.items.push(new GO.form.HtmlComponent({html:'<br /><h1>'+GO.users.lang.show_addresslists_panel+'</h1>'}));
+		this.items.push(new GO.form.HtmlComponent({html:'<br /><h4>'+t("Show the addresslist panel", "users")+'</h4>'}));
 		
 		// This item is saved in the go_settings table as "globalsettings_show_tab_addresslist".
 		this.items.push({
 			xtype:'xcheckbox',
-			boxLabel: GO.users.lang.addresslist_panel,
+			boxLabel: t("Address list panel", "users"),
 			name: 'globalsettings_show_tab_addresslist',
 			hideLabel:true,
 			checked: false
 			});		
 		
-		this.items.push(new GO.form.HtmlComponent({html:'<br /><h1>'+GO.users.lang.enabled_cf_tabs+'</h1>'}));
+		this.items.push(new GO.form.HtmlComponent({html:'<br /><h4>'+t("Enabled custom field tabs", "users")+'</h4>'}));
 		GO.users.SelectSettingPanels.superclass.initComponent.call(this);
 	},
 	

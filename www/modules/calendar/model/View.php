@@ -90,14 +90,14 @@ class View extends \GO\Base\Db\ActiveRecord{
         $findParams->joinModel(array(
             'model'=>'GO\Base\Model\UserGroup',
             'localField'=>'user_id',
-            'foreignField'=>'user_id',
+            'foreignField'=>'userId',
             'tableAlias'=>'usg', 
             
         ));
         
 		$findParams->joinModel(array(
             'model'=>'GO\Base\Model\Group',
-            'localField'=>'group_id',
+            'localField'=>'groupId',
             'localTableAlias'=>'usg',
             'tableAlias'=>'grp', 
 		));

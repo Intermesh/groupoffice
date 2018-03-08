@@ -9,7 +9,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: MainPanel.js 21354 2017-08-03 15:05:25Z wsmits $
+ * @version $Id: MainPanel.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -19,7 +19,7 @@ GO.log.MainPanel = function(config) {
 	}
 	
 	config.noDelete = true;
-	config.title = GO.log.lang.name;
+	config.title = t("Activity log", "log");
 	config.layout = 'fit';
 	config.autoScroll = true;
 	config.split = true;
@@ -34,32 +34,32 @@ GO.log.MainPanel = function(config) {
 			sortable:true
 		},
 		columns:[{
-			header : GO.log.lang.logCtime	,
+			header : t("Time", "log")	,
 			dataIndex : 'ctime'
 		},{
-			header : GO.log.lang.logAction,
+			header : t("Action", "log"),
 			dataIndex : 'action'
 		}, {
-			header : GO.log.lang.logMessage,
+			header : t("Message", "log"),
 			dataIndex : 'message'
 		},{
-			header : GO.lang.strUsername,
+			header : t("Username"),
 			dataIndex : 'username',
 			sortable : false
 		}, {
-			header : GO.log.lang.logModel,
+			header : t("Model", "log"),
 			dataIndex : 'model'
 		}, {
-			header : GO.log.lang.logModel_id,
+			header : t("ID", "log"),
 			dataIndex : 'model_id'
 		}, {
-			header : GO.log.lang.logUser_agent,
+			header : t("User agent", "log"),
 			dataIndex : 'user_agent'
 		}, {
-			header : GO.log.lang.logIp,
+			header : t("IP address", "log"),
 			dataIndex : 'ip'
 		}, {
-			header : GO.log.lang.logController_route,
+			header : t("Controller", "log"),
 			dataIndex : 'controller_route'
 		}
 		]
@@ -69,7 +69,7 @@ GO.log.MainPanel = function(config) {
 	config.view = new Ext.grid.GridView({
 		autoFill : true,
 		forceFit : true,
-		emptyText : GO.lang['strNoItems']
+		emptyText : t("No items to display")
 	});
 	config.sm = new Ext.grid.RowSelectionModel();
 	config.loadMask = true;
@@ -81,11 +81,11 @@ GO.log.MainPanel = function(config) {
 		
 	config.tbar=new Ext.Toolbar({items:[{
 	    xtype:'htmlcomponent',
-			html:GO.log.lang.name,
+			html:t("Activity log", "log"),
 			cls:'go-module-title-tbar'
 		},
 		this.exportMenu = new GO.base.ExportMenu({className:'GO\\Log\\Export\\CurrentGrid'})
-			,'-',GO.lang['strSearch'] + ':', this.searchField], cls:'go-head-tb'});
+			,'-',t("Search") + ':', this.searchField], cls:'go-head-tb'});
 	
 	this.exportMenu.setColumnModel(columnModel);
 			
@@ -100,7 +100,7 @@ Ext.extend(GO.log.MainPanel, GO.grid.GridPanel, {
 
 
 GO.moduleManager.addModule('log', GO.log.MainPanel, {
-	title : GO.log.lang.name,
+	title : t("Activity log", "log"),
 	iconCls : 'go-tab-icon-log',
 	admin:true
 });

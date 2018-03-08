@@ -306,10 +306,11 @@ class Net_Sieve
         if (NET_SIEVE_STATE_DISCONNECTED != $this->_state) {
             return PEAR::raiseError('Not currently in DISCONNECTED state', 1);
         }
-
-        if (PEAR::isError($res = $this->_sock->connect($host, $port, false, 5, $options))) {
-            return $res;
-        }
+		  try{
+			PEAR::isError($res = $this->_sock->connect($host, $port, false, 5, $options));
+		  } catch(\Exception $e) {
+			  return null;
+		  }
 
         if ($this->_bypassAuth) {
             $this->_state = NET_SIEVE_STATE_TRANSACTION;

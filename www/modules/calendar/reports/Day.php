@@ -12,7 +12,7 @@ namespace GO\Calendar\Reports;
  * If you have questions write an e-mail to info@intermesh.nl
  *
  * @copyright Copyright Intermesh
- * @version $Id: Day.php 21220 2017-06-12 09:43:55Z mschering $
+ * @version $Id: Day.php 22115 2018-01-12 10:41:26Z mschering $
  * @author Michael de Hart <mdhart@intermesh.nl>
  */
 class Day extends Calendar {
@@ -167,7 +167,7 @@ class Day extends Calendar {
 		$this->SetXY($x, $this->headerHeight);
 		
 		$this->SetFillColor(240);
-		$this->Cell($w, $this->rowHeight-3, \GO::t('tasklist','tasks') .' '. \GO::t('today'), 1,1,'C', true);
+		$this->Cell($w, $this->rowHeight-3, \GO::t("Tasklist", "tasks") .' '. \GO::t("Today"), 1,1,'C', true);
 		
 		foreach($this->tasks as $task) {
 			$this->SetX($x);
@@ -186,7 +186,7 @@ class Day extends Calendar {
 		$w= $this->rightCol; //200-$this->leftCol-$margin['left']-2;
 
 		$this->SetXY($x, $y);
-		$this->Cell($w, $this->rowHeight-3, \GO::t('printAllDaySingle','calendar'), 1,1,'C', true);
+		$this->Cell($w, $this->rowHeight-3, \GO::t("All day", "calendar"), 1,1,'C', true);
 		
 		$this->Rect($x, $this->headerHeight+14.5*$this->rowHeight+2, $w, 30*$this->rowHeight/2, '',$this->thickBorder);
 		if(!isset($this->events[$this->day]['fd']))

@@ -11,7 +11,7 @@
 GO.comments.CategoriesComboBox = Ext.extend(GO.form.ComboBox, {
 	initComponent : function(){
 		Ext.apply(this, {
-			fieldLabel : GO.comments.lang.category,	
+			fieldLabel : t("Category", "comments"),	
 //			hideTrigger : !GO.settings.modules.comments.write_permission,
 			hiddenName : 'category_id',
 			store:GO.comments.categoriesStore,

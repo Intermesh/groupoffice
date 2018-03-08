@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: MailboxesGrid.js 16251 2013-11-15 08:39:41Z mschering $
+ * @version $Id: MailboxesGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -18,7 +18,7 @@ GO.postfixadmin.MailboxesGrid = function(config){
 		config = {};
 	}
 	
-	config.title = GO.postfixadmin.lang.mailboxes;
+	config.title = t("Mailboxes", "postfixadmin");
 	config.layout='fit';
 	config.autoScroll=true;
 	config.split=true;
@@ -39,27 +39,27 @@ GO.postfixadmin.MailboxesGrid = function(config){
 		},
 		columns:[
 	   		{
-			header: GO.postfixadmin.lang.username, 
+			header: t("Username", "postfixadmin"), 
 			dataIndex: 'username'
 		},		{
-			header: GO.lang.strName, 
+			header: t("Name"), 
 			dataIndex: 'name'
 		},	{
-			header: GO.postfixadmin.lang.quota, 
+			header: t("Quota (MB)", "postfixadmin"), 
 			dataIndex: 'quota'
 		}, {
-			header: GO.postfixadmin.lang.usage,
+			header: t("Usage", "postfixadmin"),
 			dataIndex: 'usage'
 		}, 		{
-			header: GO.lang.strCtime, 
+			header: t("Created at"), 
 			dataIndex: 'ctime',
-			width:110
+			width: dp(140)
 		},		{
-			header: GO.lang.strMtime, 
+			header: t("Modified at"), 
 			dataIndex: 'mtime',
-			width:110
+			width: dp(140)
 		},		{
-			header: GO.postfixadmin.lang.active, 
+			header: t("Active", "postfixadmin"), 
 			dataIndex: 'active'
 		}
 	]});
@@ -69,7 +69,7 @@ GO.postfixadmin.MailboxesGrid = function(config){
 	config.view=new Ext.grid.GridView({
 		autoFill: true,
 		forceFit: true,
-		emptyText: GO.lang['strNoItems']		
+		emptyText: t("No items to display")		
 	});
 	config.sm=new Ext.grid.RowSelectionModel();
 	config.loadMask=true;
@@ -88,7 +88,7 @@ GO.postfixadmin.MailboxesGrid = function(config){
 	
 	config.tbar=[{
 			iconCls: 'btn-add',							
-			text: GO.lang['cmdAdd'],
+			text: t("Add"),
 			cls: 'x-btn-text-icon',
 			handler: function(){				
 	    	this.mailboxDialog.show(0, {
@@ -99,13 +99,13 @@ GO.postfixadmin.MailboxesGrid = function(config){
 			scope: this
 		},{
 			iconCls: 'btn-delete',
-			text: GO.lang['cmdDelete'],
+			text: t("Delete"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 				this.deleteSelected();
 			},
 			scope: this
-		},GO.lang['strSearch']+': ', ' ',this.searchField];
+		},t("Search")+': ', ' ',this.searchField];
 
 	config.listeners={
 		show:function(){

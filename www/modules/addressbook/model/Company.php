@@ -76,7 +76,7 @@ class Company extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	protected function getLocalizedName() {
-		return \GO::t('company', 'addressbook');
+		return \GO::t("Company", "addressbook");
 	}
 	
 	public function aclField(){
@@ -113,9 +113,9 @@ class Company extends \GO\Base\Db\ActiveRecord {
 		$labels = parent::attributeLabels();
 		
 		$labels['postAddressIsEqual']="Post address is equal to visit address";
-		$labels['link_id'] = \GO::t('cmdLink');
-		$labels['invoice_email'] = \GO::t('email');
-		$labels['photo'] = \GO::t('photo','addressbook');
+		$labels['link_id'] = \GO::t("Link");
+		$labels['invoice_email'] = \GO::t("E-mail");
+		$labels['photo'] = \GO::t("Photo", "addressbook");
 		
 		return $labels;
 	}
@@ -389,7 +389,7 @@ class Company extends \GO\Base\Db\ActiveRecord {
 //		$filename = $photoPath->path().'/'.$this->id.'.jpg';
 //		$img = new \GO\Base\Util\Image();
 //		if(!$img->load($file->path())){
-//			throw new \Exception(\GO::t('imageNotSupported','addressbook'));
+//			throw new \Exception(\GO::t("The image you uploaded is not supported. Only gif, png and jpg images are supported.", "addressbook"));
 //		}
 //		
 //		//resize it to small image so we don't get in trouble with sync clients
@@ -423,7 +423,7 @@ class Company extends \GO\Base\Db\ActiveRecord {
 		$filename = $photoPath->path().'/com_'.$this->id.'.jpg';
 		$img = new \GO\Base\Util\Image();
 		if(!$img->load($file->path())){
-			throw new \Exception(\GO::t('imageNotSupported','addressbook'));
+			throw new \Exception(\GO::t("The image you uploaded is not supported. Only gif, png and jpg images are supported.", "addressbook"));
 		}
 		
 		$aspectRatio = $img->getHeight() > $img->getWidth()
@@ -475,21 +475,18 @@ class Company extends \GO\Base\Db\ActiveRecord {
 	public function getPhotoURL(){
 		return $this->photoFile->exists() 
 						? \GO::url('addressbook/company/photo', array('id'=>$this->id,'mtime'=>$this->photoFile->mtime())) 
-						: \GO::config()->host.'modules/addressbook/themes/Default/images/unknown-person.png';
+						: null;
 	}
 	
-	public function getPhotoThumbURL($urlParams=array("lw"=>120,"pw"=>120,"zc"=>0)) {
+	public function getPhotoThumbURL($urlParams=array("lw"=>280,"pw"=>210,"zc"=>0)) {
 		
-		if($this->getPhotoFile()->exists()){
-			$urlParams['filemtime']=$this->getPhotoFile()->mtime();
-			$urlParams['src']=$this->getPhotoFile()->stripFileStoragePath();
-			return \GO::url('core/thumb', $urlParams);	
-		}else
-		{
-			return \GO::config()->host.'modules/addressbook/themes/Default/images/unknown-person.png';
+		if(!$this->getPhotoFile()->exists()){
+			return null;
 		}
-		
-		
+		$urlParams['filemtime']=$this->getPhotoFile()->mtime();
+		$urlParams['src']=$this->getPhotoFile()->stripFileStoragePath();
+		return \GO::url('core/thumb', $urlParams);	
+
 	}
 	
 }

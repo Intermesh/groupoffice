@@ -1,20 +1,20 @@
 <?php
-
-
-$l['name']='Kommentarer';
-$l['description']='Gir kommentarfunksjon til andre moduler';
-$l["comment"]="Kommentar";
-$l["comments"]="Kommentarer";
-$l["browseComments"]= 'Bla i kommentarer';
-$l["recentComments"]='Siste kommentarer';
-$l['manageCategories']='Behandle kategorier';
-$l['category']='Kategori';
-$l['noCategory']='Ingen kategori';
-$l['newCommentText']='Skriv ny kommentar her ...';
-$l['readMore']="Les mer";
-$l['enableReadMore']="Bruk les mer-lenker ";
-$l['actionDate']='Oppfølgingsdato';
-$l['parent']='Forelder';
-$l['originalCommentTabs']= 'Original kommentarfane';
-$l['disableOriginalCommentsContact']= 'Skjul original kommentarfane i kontaktpersondialog';
-$l['disableOriginalCommentsCompany']= 'Skjul original kommentarfane i firmadialog';
+return array (
+  'Comment' => 'Kommentar',
+  'Browse comments' => 'Bla i kommentarer',
+  'Recent comments' => 'Siste kommentarer',
+  'Manage categories' => 'Behandle kategorier',
+  'Category' => 'Kategori',
+  'No category' => 'Ingen kategori',
+  'Enter new comment here ...' => 'Skriv ny kommentar her ...',
+  'Read more' => 'Les mer',
+  'Enable read more links' => 'Bruk les mer-lenker ',
+  'Action date' => 'Oppfølgingsdato',
+  'Parent' => 'Forelder',
+  'Original comment tabs' => 'Original kommentarfane',
+  'Hide original comments tab in contact dialog' => 'Skjul original kommentarfane i kontaktpersondialog',
+  'Hide original comments tab in company dialog' => 'Skjul original kommentarfane i firmadialog',
+  'name' => 'Kommentarer',
+  'description' => 'Gir kommentarfunksjon til andre moduler',
+  'Comments' => 'Kommentarer',
+);

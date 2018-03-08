@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: ReminderDialog.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: ReminderDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -20,7 +20,7 @@ GO.reminders.ReminderDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			titleField:'name',
 			goDialogId:'reminder',
 //			remoteModelIdName: 'reminder_id',
-			title:GO.reminders.lang.reminder,
+			title:t("Popup reminder", "reminders"),
 			formControllerUrl: 'reminders/reminder',
 			collapsible: true,
 			maximizable: true,
@@ -56,10 +56,10 @@ GO.reminders.ReminderDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		this.usersGrid = new GO.grid.GridPanel( {
 			disabled:true,
 			layout:'fit',
-			title:GO.lang.users,
+			title:t("Users"),
 			tbar:[{
 				iconCls: 'btn-delete',
-				text: GO.lang['cmdDelete'],
+				text: t("Delete"),
 				cls: 'x-btn-text-icon',
 				handler: function(){
 					this.usersGrid.deleteSelected();
@@ -67,7 +67,7 @@ GO.reminders.ReminderDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 				scope: this
 			},{
 				iconCls: 'btn-add',
-				text: GO.reminders.lang.addUsers,
+				text: t("Add users", "reminders"),
 				cls: 'x-btn-text-icon',
 				handler: function(){
 
@@ -93,7 +93,7 @@ GO.reminders.ReminderDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 				scope: this
 			},{
 				iconCls: 'btn-add',
-				text: GO.reminders.lang.addUserGroups,
+				text: t("Add user groups", "reminders"),
 				cls: 'x-btn-text-icon',
 				handler: function(){
 					if(!this.selectGroupsWindow){
@@ -122,7 +122,7 @@ GO.reminders.ReminderDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			store: this.usersStore,
 			columns:[
 			{
-				header:GO.lang.strName,
+				header:t("Name"),
 				dataIndex: 'name',
 				id:'name'
 			}],
@@ -134,14 +134,14 @@ GO.reminders.ReminderDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		this.propertiesPanel = new Ext.Panel({
 			layout:'form',
 			border: false,
-			title:GO.lang.strProperties,
+			title:t("Properties"),
 			bodyStyle:'padding:5px',
 			items:[
 			{
 				xtype: 'textfield',
 				name: 'name',
 				anchor: '100%',
-				fieldLabel: GO.lang.strName,
+				fieldLabel: t("Name"),
 				allowBlank:false
 			}
 			,this.selectLink = new GO.form.SelectLink({
@@ -155,7 +155,7 @@ GO.reminders.ReminderDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			})
 			,{
 				xtype : 'compositefield',
-				fieldLabel:GO.reminders.lang.time,
+				fieldLabel:t("Time", "reminders"),
 				anchor: '100%',
 				items : [{
 					xtype: 'datefield',
@@ -175,7 +175,7 @@ GO.reminders.ReminderDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			,{
 				xtype:'combo',
 				anchor: '100%',
-				fieldLabel: GO.reminders.lang.snoozeTime,
+				fieldLabel: t("Snooze time", "reminders"),
 				hiddenName : 'snooze_time',
 				store : new Ext.data.ArrayStore({
 					idIndex:0,
@@ -193,7 +193,7 @@ GO.reminders.ReminderDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			},{
 				xtype:'htmleditor',
 				name:'text',
-				fieldLabel:GO.reminders.lang.text,
+				fieldLabel:t("Text", "reminders"),
 				anchor:'100% -105'
 			}]
 		});

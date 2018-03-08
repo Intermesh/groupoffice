@@ -97,7 +97,7 @@ class AuthController extends \GO\Base\Controller\AbstractController {
 		
 		if(!$user){
 			$response['success']=false;
-			$response['feedback']=GO::t('notFound');
+			$response['feedback']=GO::t("The requested item was not found.");
 		} else {
 		
 			if($user->checkPassword($params['current_password'])){
@@ -107,7 +107,7 @@ class AuthController extends \GO\Base\Controller\AbstractController {
 					// The password validates with the current value, so it's the same
 					// Now validate to false
 					$response['success']=false;
-					$response['feedback']=GO::t('passwordSameAsPreviousError');
+					$response['feedback']=GO::t("New password cannot be the same as the old password");
 					
 				}else {
 				
@@ -129,7 +129,7 @@ class AuthController extends \GO\Base\Controller\AbstractController {
 				}
 			} else {
 				$response['success']=false;
-				$response['feedback']=GO::t('badPassword');
+				$response['feedback']=GO::t("The current password you entered was incorrect");
 			}
 		}
 		return $response;	
@@ -212,7 +212,7 @@ class AuthController extends \GO\Base\Controller\AbstractController {
 		
 		$findCriteria = \GO\Base\Db\FindCriteria::newInstance()
 						->addCondition('email', $params['email'], '=','t', false)
-						->addCondition('recovery_email', $params['email'], '=','t', false);
+						->addCondition('recoveryEmail', $params['email'], '=','t', false);
 		
 		$findParams->criteria($findCriteria);
 		$user = \GO\Base\Model\User::model()->findSingle($findParams);
@@ -243,13 +243,13 @@ class AuthController extends \GO\Base\Controller\AbstractController {
 	
 	protected function actionSendResetPasswordMail($params){
 //		$user = \GO\Base\Model\User::model()->findSingleByAttribute('email', $params['email']);
-//		$user = \GO\Base\Model\User::model()->findSingleByAttributes(array('email' =>  $params['email'], 'recovery_email' => $params['email']));
+//		$user = \GO\Base\Model\User::model()->findSingleByAttributes(array('email' =>  $params['email'], 'recoveryEmail' => $params['email']));
 		
 		$findParams = \GO\Base\Db\FindParams::newInstance();
 		
 		$findCriteria = \GO\Base\Db\FindCriteria::newInstance()
 						->addCondition('email', $params['email'], '=','t', false)
-						->addCondition('recovery_email', $params['email'], '=','t', false);
+						->addCondition('recoveryEmail', $params['email'], '=','t', false);
 		
 		$findParams->criteria($findCriteria);
 		$user = \GO\Base\Model\User::model()->findSingle($findParams);
@@ -260,8 +260,8 @@ class AuthController extends \GO\Base\Controller\AbstractController {
 		}else{
 			
 			$toEmail = $user->email;
-			if($user->recovery_email == $params['email']) {
-				$toEmail = $user->recovery_email;
+			if($user->recoveryEmail == $params['email']) {
+				$toEmail = $user->recoveryEmail;
 			}
 			$user->sendResetPasswordMail(false, false, false, false, $toEmail);
 			
@@ -324,7 +324,7 @@ class AuthController extends \GO\Base\Controller\AbstractController {
 			$response['success'] = false;
 			
 			if(!isset($response['feedback']))
-				$response['feedback']=GO::t('badLogin');
+				$response['feedback']=GO::t("Wrong username or password");
 
 			return $response;		
 		}
@@ -341,7 +341,8 @@ class AuthController extends \GO\Base\Controller\AbstractController {
 			$response['success'] = false;
 			$response['userId'] = $user->id;
 			$response['userToken'] = $user->digest;
-			$response['feedback']= nl2br(str_replace(array('{last_login_ip}','{last_login_time}'), array($otherClient->ip,\GO\Base\Util\Date::get_timestamp($otherClient->last_active)), GO::t('alreadyLoggedInOtherText')));
+			$response['feedback']= nl2br(str_replace(array('{last_login_ip}','{last_login_time}'), array($otherClient->ip,\GO\Base\Util\Date::get_timestamp($otherClient->last_active)), GO::t("You are already logged in from another computer at IP {last_login_ip} since {last_login_time}.
+If you log in here, your other instance will be logged out.")));
 			$response['exceptionCode']=$e->getCode();
 			return $response;
 		}
@@ -349,7 +350,7 @@ class AuthController extends \GO\Base\Controller\AbstractController {
 		$response['success'] = $user != false;		
 
 		if (!$response['success']) {		
-			$response['feedback']=\GO::t('badLogin');			
+			$response['feedback']=\GO::t("Wrong username or password");			
 		} else {		
 			if (\GO::config()->remember_login && !empty($params['remind'])) {
 
@@ -381,7 +382,7 @@ class AuthController extends \GO\Base\Controller\AbstractController {
 				$response['modules']=array();
 				
 				foreach(\GO::modules()->getAllModules() as $module){
-					$response['modules'][]=$module->id;
+					$response['modules'][]=$module->name;
 				}
 				
 				$response['user']=\GO::user()->getAttributes();

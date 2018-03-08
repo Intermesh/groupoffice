@@ -14,6 +14,7 @@
 GO.bookmarks.BookmarkColumnView = Ext.extend(Ext.DataView,{
 
 	initComponent : function(){
+	
 		
 		Ext.applyIf(this,{
 			autoScroll: true,
@@ -41,7 +42,7 @@ GO.bookmarks.BookmarkColumnView = Ext.extend(Ext.DataView,{
 						{
 							return false;
 						}
-					}
+					}.createDelegate(this)
 					
 				}
 			),
@@ -52,7 +53,7 @@ GO.bookmarks.BookmarkColumnView = Ext.extend(Ext.DataView,{
 			trackOver:true,
 			overClass:'x-view-over',
 			itemSelector:'.link',
-			emptyText: GO.bookmarks.lang.noEmployeesToDisplay
+			emptyText: t("noEmployeesToDisplay", "bookmarks")
 			,
 			listeners: {
 				contextmenu: function(dv, index, node, e){
@@ -79,6 +80,10 @@ GO.bookmarks.BookmarkColumnView = Ext.extend(Ext.DataView,{
 				}
 			}
 		});
+		
+		this.store.on('load', function() {
+			this.lastcategory = null;
+		}, this);
 		
 		GO.bookmarks.BookmarkColumnView .superclass.initComponent.call(this);
 	}

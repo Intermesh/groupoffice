@@ -22,7 +22,7 @@ GO.sieve.VacationDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 		
 		Ext.apply(this, {
 			titleField: false,
-			title:GO.sieve.lang.autoReplyMessage,
+			title:t("autoReplyMessage", "sieve"),
 			formControllerUrl: 'sieve/sieve',
 			autoScroll: true,
 			border: false,
@@ -63,7 +63,7 @@ GO.sieve.VacationDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 			this.scriptName = config.script_name;
 		} else {
 			this._accountId = 0;
-			Ext.MessageBox.alert(GO.lang.strError,'Attempt was made to open Out of office dialog, but the required account id is lacking or invalid. Please contact the administrator.');
+			Ext.MessageBox.alert(t("Error"),'Attempt was made to open Out of office dialog, but the required account id is lacking or invalid. Please contact the administrator.');
 		}
 	},
 	
@@ -91,21 +91,21 @@ GO.sieve.VacationDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 //			params: {
 //				'accountId' : this._remoteModelId
 //			},
-//			waitMsg : GO.lang['waitMsgSave'],
+//			waitMsg : t("Saving..."),
 //			success : function(form, action) {
 //				this.hide();
 //			},
 //			failure : function(form, action) {
 //				var error = '';
 //				if (action.failureType == 'client') {
-//					error = GO.lang.strErrorsInForm;
+//					error = t("You have errors in your form. The invalid fields are marked.");
 //				} else if (action.result) {
 //					error = action.result.feedback;
 //				} else {
-//					error = GO.lang.strRequestError;
+//					error = t("Could not connect to the server. Please check your internet connection.");
 //				}
 //
-//				Ext.MessageBox.alert(GO.lang.strError, error);
+//				Ext.MessageBox.alert(t("Error"), error);
 //			},
 //			scope : this
 //		});
@@ -133,7 +133,7 @@ GO.sieve.VacationDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 		this.disabledCheckbox = new Ext.form.Checkbox({
 			name:'disabled',
 			checked:false,
-			fieldLabel:GO.sieve.lang.disablefilter
+			fieldLabel:t("Disable filter", "sieve")
 		});
 		this.messageField = new Ext.form.TextArea({
 			name: 'message',
@@ -141,7 +141,7 @@ GO.sieve.VacationDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 			anchor:'100%',
 			height:80,
 			width: 300,
-			fieldLabel:GO.sieve.lang.reason
+			fieldLabel:t("Message", "sieve")
 		});
 		this.nDaysField = new GO.form.NumberField({
 			name: 'days',
@@ -149,27 +149,27 @@ GO.sieve.VacationDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 			allowBlank:false,
 			width:70,
 			decimals:0,
-			fieldLabel:GO.sieve.lang.days
+			fieldLabel:t("Reply every x days", "sieve")
 		});
 		this.startDate = new Ext.form.DateField({
 			name : 'start_date',
 			width : 100,
 			format : GO.settings['date_format'],
-			fieldLabel: GO.sieve.lang.vacationStart,
+			fieldLabel: t("First day of this message", "sieve"),
 			allowBlank : false
 		});
 		this.endDate = new Ext.form.DateField({
 			name : 'end_date',
 			width : 100,
 			format : GO.settings['date_format'],
-			fieldLabel: GO.sieve.lang.vacationEnd,
+			fieldLabel: t("Last day of this message", "sieve"),
 			allowBlank : false
 		});
 		this.emailAddressesField = new Ext.form.TextArea({
 			name: 'email',
 			allowBlank:true,
 			width:300,
-			fieldLabel:GO.sieve.lang.addressesLabelOptional
+			fieldLabel:t("Activate also for these aliases (separated by comma)", "sieve")
 		});
 		
 		this.addPanel({

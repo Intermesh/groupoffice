@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: RequirePasswordResetDialog.js 21065 2017-04-12 13:59:29Z wsmits $
+ * @version $Id: RequirePasswordResetDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
@@ -19,7 +19,7 @@ GO.dialog.RequirePasswordResetDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			enableApplyButton:false,
 			enableOkButton:true,
 			goDialogId:'go-require-password-reset-dialog',
-			title:GO.lang.passwordExpired,
+			title:t("Your password is expired."),
 			formControllerUrl: 'core/auth',
 			submitAction: 'resetExpiredPassword',
 			loadOnNewModel:false,
@@ -42,7 +42,7 @@ GO.dialog.RequirePasswordResetDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		});
 		
 		this.currentPasswordField = new Ext.form.TextField({
-			fieldLabel: GO.lang.strCurrentPassword,
+			fieldLabel: t("Current Password"),
 			name: 'current_password',
 			inputType: 'password',
 			allowBlank:false,
@@ -50,7 +50,7 @@ GO.dialog.RequirePasswordResetDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		});
 		
 		this.newPasswordField = new Ext.form.TextField({
-			fieldLabel: GO.lang.strNewPassword,
+			fieldLabel: t("New Password"),
 			name: 'password',
 			inputType: 'password',
 			allowBlank:false,
@@ -58,7 +58,7 @@ GO.dialog.RequirePasswordResetDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		});
 		
 		this.confirmPasswordField = new Ext.form.TextField({
-			fieldLabel: GO.lang.strConfirmPassword,
+			fieldLabel: t("Confirm password"),
 			name: 'confirm',
 			inputType: 'password',
 			allowBlank:false,
@@ -66,7 +66,7 @@ GO.dialog.RequirePasswordResetDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		});
 		
 		this.passwordPanel = new Ext.Panel({
-			title:GO.lang['passwordExpired'],			
+			title:t("Your password is expired."),			
 			labelWidth: 120,
 			waitMsgTarget:true,        
 			bodyStyle:'padding:0px 0px 0px 0px',
@@ -74,7 +74,7 @@ GO.dialog.RequirePasswordResetDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			layout:'form',
 			items:[
 				new GO.form.HtmlComponent({
-					html: GO.lang.passwordNeedsChangeText+'<br/><br/>'
+					html: t("Please create a new password to continue working in Group-Office.")+'<br/><br/>'
 				}),
 				this.usernameField,
 				this.currentPasswordField,

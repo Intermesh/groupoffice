@@ -1,21 +1,19 @@
 <?php
-
-;
-$l["summary"]= 'Összegzés';
-$l["noItems"]= 'Nincs egyetlen elem sem a kezdőlapodon.';
-$l["selectPortlet"]= 'Select portlet';
-$l["hotTopics"]= 'Friss...';
-$l["enterRssFeed"]= 'Kérem az új RSS URL címét:';
-$l["notes"]= 'Feljegyzések';
-$l["loadingFeed"]= 'Hírcsatorna betöltése...';
-$l["goToPost"]= 'Go to Post';
-$l["today"]= 'Ma';
-$l["dueTime"]="Eddig mutassa";
-$l["title"]="Cím";
-$l["manageAnnouncements"]='Hirdetmények kezelése';
-
-$l['name']='Kezdőlap';
-$l['description']='Show an overview of different actual items';
-$l['default_rss_url']='http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml';
-$l['announcement']='Hirdetmény';
-$l['announcements']='Hirdetmények';
+return array (
+  'You don\'t have any items on your start page.' => 'Nincs egyetlen elem sem a kezdőlapodon.',
+  'News' => 'Friss...',
+  'Please enter the RSS feed URL:' => 'Kérem az új RSS URL címét:',
+  'Notes' => 'Feljegyzések',
+  'Loading Feed...' => 'Hírcsatorna betöltése...',
+  'Today ' => 'Ma',
+  'Show until' => 'Eddig mutassa',
+  'Title' => 'Cím',
+  'Manage announcements' => 'Hirdetmények kezelése',
+  'Announcement' => 'Hirdetmény',
+  'Announcements' => 'Hirdetmények',
+  'name' => 'Kezdőlap',
+  'Start page' => 'Összegzés',
+  'Select portlet' => 'Select portlet',
+  'Go to Post' => 'Go to Post',
+  'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml' => 'http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml',
+);

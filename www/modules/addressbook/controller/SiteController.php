@@ -40,7 +40,7 @@ class SiteController extends \GO\Site\Components\Controller{
 				$addressbookModel = \GO\Addressbook\Model\Addressbook::model()->findByPk($_POST['Addressbook']['id']);
 			}
 			if (!$addressbookModel)
-				throw new \Exception(sprintf(\GO::t('addressbookNotFound','defaultsite'),$_POST['Addressbook']['name']));
+				throw new \Exception(sprintf(\GO::t("No address book found with name '%s'.", "defaultsite"),$_POST['Addressbook']['name']));
 			
 			$contactModel = \GO\Addressbook\Model\Contact::model()->findSingleByAttributes(array('email'=>$_POST['Contact']['email'],'addressbook_id'=>$addressbookModel->id));
 			if (!$contactModel) {

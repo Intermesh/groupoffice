@@ -5,7 +5,7 @@ GO.ipwhitelist.WhitelistGrid = function(config){
 		config = {};
 	}
 	
-	config.title = GO.ipwhitelist.lang['allowedIpAddresses'];
+	config.title = t("Allowed IP addresses", "ipwhitelist");
 	config.layout='fit';
 	config.autoScroll=true;
 	config.split=true;
@@ -32,43 +32,43 @@ GO.ipwhitelist.WhitelistGrid = function(config){
 	
 	config.columns=[
 		{
-			header: GO.ipwhitelist.lang['ipAddress'],
+			header: t("IP address", "ipwhitelist"),
 			dataIndex: 'ip_address',
 			sortable: true
 		},
 		{
-			header: GO.lang.strDescription,
+			header: t("Description"),
 			dataIndex: 'description',
 			sortable: true
 		},{
-			header: GO.lang.strCtime,
+			header: t("Created at"),
 			dataIndex:'ctime',
 			hidden:true,
-			width:110
+			width: dp(140)
 		},
 		{
-			header: GO.lang.strUser,
+			header: t("User"),
 			dataIndex:'username',
 			hidden:true,
-			width:110
+			width: dp(140)
 		},
 		{
-			header: GO.lang.strMtime,
+			header: t("Modified at"),
 			dataIndex:'mtime',
 			hidden:true,
-			width:110
+			width: dp(140)
 		},{
-			header: GO.lang.mUser,
+			header: t("Modified by"),
 			dataIndex:'mUsername',
 			hidden:true,
-			width:110
+			width: dp(140)
 		}
 		];
 		
 	config.view=new Ext.grid.GridView({
 		autoFill: true,
 		forceFit: true,
-		emptyText: GO.lang['strNoItems']		
+		emptyText: t("No items to display")		
 	});
 	
 	config.sm=new Ext.grid.RowSelectionModel();
@@ -98,7 +98,7 @@ GO.ipwhitelist.WhitelistGrid = function(config){
 			scope: this
 		},
 		'-',
-		GO.lang['strSearch'] + ':', this.searchField
+		t("Search") + ':', this.searchField
 	];
 	
 	GO.ipwhitelist.WhitelistGrid.superclass.constructor.call(this, config);

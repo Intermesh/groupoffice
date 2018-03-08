@@ -24,7 +24,7 @@ use GO;
  * @property StringHelper $id The id of the module which is identical to the folder name inside the "modules" folder.
  * @property String $path The absolute filesystem path to module.
  * @property \GO\Base\Module $moduleManager The module class to install, initialize etc the module.
- * @property int $acl_id
+ * @property int $aclId
  * @property boolean $admin_menu
  * @property int $sort_order
  * @property int $version
@@ -49,24 +49,24 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	/**
 	 * Install's a module with all it's dependencies
 	 * 
-	 * @param StringHelper $moduleId
+	 * @param StringHelper $name
 	 * @return \GO\Base\Model\Module
 	 * @throws \GO\Base\Exception\Save
 	 */
-	public static function install($moduleId,$ignoreDependentModule=false){
+	public static function install($name,$ignoreDependentModule=false){
 		
 		
-		GO::debug("install($moduleId,$ignoreDependentModule)");
+		GO::debug("install($name,$ignoreDependentModule)");
 		
-		if(!($module = Module::model()->findByPk($moduleId, false, true))){
+		if(!($module = Module::model()->findByName($name))){
 			$module = new Module();
-			$module->id=$moduleId;
-			
+			$module->name=$name;
+						
 			$dependencies = $module->moduleManager->getDependencies();	
 			
 			foreach($dependencies as $dependency){
 				if($ignoreDependentModule!==$dependency){
-					self::install($dependency, $moduleId);
+					self::install($dependency, $name);
 				}
 			}
 
@@ -83,7 +83,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 			
 				foreach($dependencies as $dependency){
 					if($ignoreDependentModule!==$dependency){
-						self::install($dependency, $moduleId);
+						self::install($dependency, $name);
 					}
 				}
 				$module->save();				
@@ -94,20 +94,36 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	}
 
 	public function aclField() {
-		return 'acl_id';
+		return 'aclId';
 	}
 
 	public function tableName() {
-		return 'go_modules';
+		return 'core_module';
+	}
+	
+	public function primaryKey() {
+		return 'id';
 	}
 	
 	protected function getPath(){
-		return \GO::config()->root_path . 'modules/' . $this->id . '/';
+		
+		if(!empty($this->package)) {
+			return \GO::config()->root_path . 'go/modules/'.$this->package. '/' . $this->name . '/';
+		} else {		
+			return \GO::config()->root_path . 'modules/' . $this->name . '/';
+		}
 	}
 	
 	protected function getModuleManager(){
-		if(!isset($this->_moduleManager))	
-			$this->_moduleManager = \GO\Base\Module::findByModuleId ($this->id);
+		if(!isset($this->_moduleManager))	{
+			
+			if(!isset($this->package)) {
+				$this->_moduleManager = \GO\Base\Module::findByModuleName ($this->name);
+			} else {
+				$cls = "go\\modules\\" . $this->package ."\\" . $this->name . "\\Module";
+				$this->_moduleManager = new $cls;
+			}
+		}
 		
 		return $this->_moduleManager;
 	}
@@ -131,8 +147,8 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	
 	public function validate() {
 		
-		if($this->id=='modules' && $this->enabled==0){
-			$this->setValidationError('enabled', GO::t('cmdModulesCannotBeDeleted','modules'));
+		if($this->name=='modules' && $this->enabled==0){
+			$this->setValidationError('enabled', GO::t("The module \"Modules\" cannot be deleted!.", "modules"));
 		}
 		
 		return parent::validate();
@@ -147,7 +163,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	
 	protected function afterSave($wasNew) {
 		
-		if(!$this->admin_menu)
+		if(!$this->admin_menu && $wasNew)
 			$this->acl->addGroup(\GO::config()->group_internal);
 		
 		if($wasNew){			
@@ -173,7 +189,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		}
 		
 		$this->acl->getAuthorizedUsers(
-						$this->acl_id, 
+						$this->aclId, 
 						Acl::READ_PERMISSION, 
 						function($user, $models){		
 							foreach ($models as $model)
@@ -181,11 +197,21 @@ class Module extends \GO\Base\Db\ActiveRecord {
 						}, array($models));
 	}
 	
+	/**
+	 * @deprecated since 6.3
+	 * Added to be backwards compatible
+	 * 
+	 * @return ACL ID
+	 */
+	public function getAcl_id(){
+		return $this->aclId;
+	}
+	
 	protected function beforeDelete() {
 		
 		
-		if($this->id=='modules'){
-			$this->setValidationError('delete', GO::t('cmdModulesCannotBeDeleted','modules'));
+		if($this->name=='modules'){
+			$this->setValidationError('delete', GO::t("The module \"Modules\" cannot be deleted!.", "modules"));
 		}
 		
 		$this->_checkDependencies();
@@ -198,13 +224,18 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		$dependentModuleNames = array();
 		$modules = \GO::modules()->getAllModules(true);
 		foreach ($modules as $module) {
+			
+			if($module->moduleManager instanceof \go\core\module\Base) {
+				continue;
+			}
+			
 			$depends = $module->moduleManager->depends();
 			if (in_array($this->id,$depends))
 				$dependentModuleNames[] = $module->moduleManager->name();
 		}
 		
 		if (count($dependentModuleNames)>0)
-			throw new \Exception(sprintf(\GO::t('dependenciesCannotDelete'),implode(', ',$dependentModuleNames)));
+			throw new \Exception(sprintf(\GO::t("You cannot delete the current module, because the following (installed) modules depend on it: %s."),implode(', ',$dependentModuleNames)));
 		
 	}
 	
@@ -225,7 +256,11 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		if(!$this->enabled)
 			return false;
 		
-		$ucfirst = ucfirst($this->id);
+		if(!empty($this->package)) {
+			return $this->isAvailableJmap();
+		}
+		
+		$ucfirst = ucfirst($this->name);
 		$moduleClassPath = $this->path.'/'.$ucfirst.'Module.php';
 		
 		if(!file_exists($moduleClassPath)){
@@ -244,10 +279,24 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		
 	}
 	
+	private function isAvailableJmap() {
+		return is_dir($this->getPath());
+	}
+	
 	public function isAllowed(){
 		$allowedModules=empty(\GO::config()->allowed_modules) ? array() : explode(',', \GO::config()->allowed_modules);
 		
-		return empty($allowedModules) || in_array($this->id, $allowedModules);
+		return empty($allowedModules) || in_array($this->name, $allowedModules);
+	}
+	
+	/**
+	 * Finds module by name without checking ACL
+	 * 
+	 * @param string $name
+	 * @return self
+	 */
+	public function findByName($name) {
+		return $this->findSingleByAttribute('name', $name, (new \GO\Base\Db\FindParams())->ignoreAcl());
 	}
 
 //	protected function getName() {

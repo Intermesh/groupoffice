@@ -3,7 +3,7 @@ GO.tasks.ScheduleCallMenuItem = Ext.extend(Ext.menu.Item,{
 	
 	initComponent : function(){
 		this.iconCls= 'tasks-call';
-		this.text= GO.tasks.lang.scheduleCall;
+		this.text= t("Schedule call", "tasks");
 		this.cls='x-btn-text-icon';
 		this.disabled=true;
 		this.handler= function()

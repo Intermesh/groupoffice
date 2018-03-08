@@ -165,7 +165,7 @@ class ChatModule extends \GO\Base\Module {
 		$xmppHost = self::getXmppHost();
 
 		if(!$showGroups) {
-			fwrite($fp, "[" . GO::config()->product_name . " " . strtolower(GO::t('users')) . "]\n");
+			fwrite($fp, "[" . GO::config()->product_name . " " . strtolower(GO::t("Users")) . "]\n");
 
 			\GO\Base\Model\Acl::getAuthorizedUsers(GO::modules()->chat->acl_id, \GO\Base\Model\Acl::READ_PERMISSION, function($user) use ($fp, $xmppHost) {
 				if($user->enabled){
@@ -188,7 +188,7 @@ class ChatModule extends \GO\Base\Module {
 				if($userModel->enabled && \GO\Base\Model\Acl::getUserPermissionLevel(GO::modules()->chat->acl_id, $userModel->id)) {
 					$groupName = $groupModel->name;
 					if(!isset($$groupName)) {
-						fwrite($fp, "\n[" . $groupModel->name . " " . strtolower(GO::t('group')) . "]\n"); 
+						fwrite($fp, "\n[" . $groupModel->name . " " . strtolower(GO::t("group")) . "]\n"); 
 						$$groupName = true;
 					}
 					
@@ -205,7 +205,7 @@ class ChatModule extends \GO\Base\Module {
 		foreach ($userStmt as $userModel) {
 			if($userModel->enabled && \GO\Base\Model\Acl::getUserPermissionLevel(GO::modules()->chat->acl_id, $userModel->id)) {
 					if(!isset($rendereOthersLable)) {
-						fwrite($fp, "\n[" . strtolower(GO::t('others')) . " " . strtolower(GO::t('group')) . "]\n"); 
+						fwrite($fp, "\n[" . strtolower(GO::t("others")) . " " . strtolower(GO::t("group")) . "]\n"); 
 						$RendereOthersLable = true;
 					}
 					$line = $userModel->username . '@' . $xmppHost . '=' . $userModel->name . "\n";

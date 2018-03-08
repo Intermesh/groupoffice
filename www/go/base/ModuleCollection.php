@@ -37,12 +37,16 @@ class ModuleCollection extends Model\ModelCollection{
 		parent::__construct($model);
 	}
 	
-	private function _isAllowed($moduleid){
+	
+	
+	
+	
+	private function _isAllowed($name){
 		
 		if(!isset($this->_allowedModules))
 			$this->_allowedModules=empty(\GO::config()->allowed_modules) ? array() : explode(',', \GO::config()->allowed_modules);
 		
-		return empty($this->_allowedModules) || in_array($moduleid, $this->_allowedModules);			
+		return empty($this->_allowedModules) || in_array($name, $this->_allowedModules);			
 	}
 	
 	/**
@@ -78,6 +82,17 @@ class ModuleCollection extends Model\ModelCollection{
 				
 			}
 		}
+		
+		//for new framework
+		$classFinder = new \go\core\util\ClassFinder(false);
+		$classFinder->addNamespace("go\\modules");
+		$mods = $classFinder->findByParent(\go\core\module\Base::class);
+		$mods = array_filter($mods, function($mod) {
+			return $this->_isAllowed($mod::getName());
+		});
+		$modules = array_merge($modules, $mods);
+		
+		
 		sort($modules);
 		
 		return $modules;		
@@ -139,12 +154,12 @@ class ModuleCollection extends Model\ModelCollection{
 		
 		foreach($modules as $module)
 		{	
-//			if($this->_isAllowed($module->id)){
-				$file = $module->path.ucfirst($module->id).'Module.php';
+//			if($this->_isAllowed($module->name)){
+				$file = $module->path.ucfirst($module->name).'Module.php';
 				//todo load listeners
 				if(file_exists($file)){
 					//require_once($file);
-					$class='GO\\'.ucfirst($module->id).'\\'.ucfirst($module->id).'Module';
+					$class='GO\\'.ucfirst($module->name).'\\'.ucfirst($module->name).'Module';
 
 					$object = new $class;
 					if(method_exists($object, $method)){					
@@ -164,11 +179,19 @@ class ModuleCollection extends Model\ModelCollection{
 	public function __get($name) {
 		
 		if(!isset($this->_modules[$name])){		
-			if(!$this->isAvailable($name)){			
-				return false;
-			}
+//			if(!$this->isAvailable($name)){			
+//				return false;
+//			}
 
-			$model = parent::__get($name);
+			try {
+				$model = $this->model->findSingleByAttribute('name', $name);
+			} catch (\GO\Base\Exception\AccessDenied $e) {
+				$model = false;
+			}
+			
+			if($model && !$model->isAvailable()) {
+				$model = false;
+			}
 			
 			if(!$model || !$model->enabled){
 				$model=false;
@@ -189,13 +212,13 @@ class ModuleCollection extends Model\ModelCollection{
 	/**
 	 * Check if a module is installed.
 	 * 
-	 * @param StringHelper $moduleId
+	 * @param StringHelper $name
 	 * @return Model\Module 
 	 */
-	public function isInstalled($moduleId){
-		$model = $this->model->findByPk($moduleId, false, true);
+	public function isInstalled($name){
+		$model = $this->model->findByName($name);
 		
-		if(!$model || !$model->enabled || !$this->_isAllowed($model->id))
+		if(!$model || !$model->enabled || !$this->_isAllowed($model->name))
 				return false;
 		
 		return $model;
@@ -228,7 +251,7 @@ class ModuleCollection extends Model\ModelCollection{
 		$stmt = $this->model->find($findParams);
 		$modules = array();
 		while($module = $stmt->fetch()){
-			if($this->_isAllowed($module->id) && $module->isAvailable())
+			if($this->_isAllowed($module->name) && $module->isAvailable())
 				$modules[]=$module;
 		}
 		

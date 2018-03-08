@@ -490,7 +490,7 @@ class RecurrencePattern{
 		$this->shiftDays(false);
 		$days = array();
 				
-		$fulldays=\GO::t('full_days');
+		$fulldays=\GO::t("full_days");
 		foreach($this->_byday as $icalDay){
 			$index = array_search($icalDay, $this->_days);
 			$days[]=$fulldays[$index];
@@ -499,7 +499,7 @@ class RecurrencePattern{
 		if (count($days) == 1) {
 			$daysStr = $days[0];
 		} else {
-			$daysStr = ' '.\GO::t('and').' ' . array_pop($days);
+			$daysStr = ' '.\GO::t("and").' ' . array_pop($days);
 			$daysStr = implode(', ', $days) . $daysStr;
 		}
 
@@ -509,58 +509,58 @@ class RecurrencePattern{
 		switch ($this->_freq) {
 			case 'WEEKLY':
 				if ($this->_interval > 1) {
-					$html .= sprintf(\GO::t('repeats_at_not_every'), $this->_interval, \GO::t('weeks'), $daysStr);
+					$html .= sprintf(\GO::t("Repeats every %s %s at %s"), $this->_interval, \GO::t("weeks"), $daysStr);
 				} else {
-					$html .= sprintf(\GO::t('repeats_at'), \GO::t('week'), $daysStr);
+					$html .= sprintf(\GO::t("Repeats every %s at %s"), \GO::t("week"), $daysStr);
 				}
 
 				break;
 
 			case 'DAILY':
 				if ($this->_interval > 1) {
-					$html .= sprintf(\GO::t('repeats_at_not_every'), $this->_interval, \GO::t('days'));
+					$html .= sprintf(\GO::t("Repeats every %s %s at %s"), $this->_interval, \GO::t("days"));
 				} else {
-					$html .= sprintf(\GO::t('repeats'), \GO::t('day'));
+					$html .= sprintf(\GO::t("Repeats every %s"), \GO::t("day"));
 				}
 				break;
 
 			case 'MONTHLY':
 				if (!$this->_byday) {
 					if ($this->_interval > 1) {
-						$html .= sprintf(\GO::t('repeats_at_not_every'), $this->_interval, \GO::t('months'));
+						$html .= sprintf(\GO::t("Repeats every %s %s at %s"), $this->_interval, \GO::t("months"));
 					} else {
-						$html .= sprintf(\GO::t('repeats'), \GO::t('month'));
+						$html .= sprintf(\GO::t("Repeats every %s"), \GO::t("month"));
 					}
 				} else {
 
-					$bySetPositions = \GO::t('month_times');
+					$bySetPositions = \GO::t("month_times");
 	
 					if (count($days) == 1) {
 						$daysStr = $bySetPositions[$this->_bysetpos] . ' ' . $days[0];
 					} else {
-						$daysStr = ' ' . \GO::t('and') . ' ' . array_pop($days);
+						$daysStr = ' ' . \GO::t("and") . ' ' . array_pop($days);
 						$daysStr = $bySetPositions[$this->_bysetpos]. ' ' . implode(', ', $days) . $daysStr;
 					}
 
 					if ($this->_interval > 1) {
-						$html .= sprintf(\GO::t('repeats_at_not_every'), $this->_interval, \GO::t('months'), $daysStr);
+						$html .= sprintf(\GO::t("Repeats every %s %s at %s"), $this->_interval, \GO::t("months"), $daysStr);
 					} else {
-						$html .= sprintf(\GO::t('repeats_at'), \GO::t('month'), $daysStr);
+						$html .= sprintf(\GO::t("Repeats every %s at %s"), \GO::t("month"), $daysStr);
 					}
 				}
 				break;
 
 			case 'YEARLY':
 				if ($this->_interval > 1) {
-					$html .= sprintf(\GO::t('repeats_at_not_every'), $this->_interval, \GO::t('years'));
+					$html .= sprintf(\GO::t("Repeats every %s %s at %s"), $this->_interval, \GO::t("years"));
 				} else {
-					$html .= sprintf(\GO::t('repeats'), \GO::t('year'));
+					$html .= sprintf(\GO::t("Repeats every %s"), \GO::t("year"));
 				}
 				break;
 		}
 
 		if ($this->until) 
-			$html .= ' ' . \GO::t('until') . ' ' . \GO\Base\Util\Date::get_timestamp ($this->until, false);
+			$html .= ' ' . \GO::t("until") . ' ' . \GO\Base\Util\Date::get_timestamp ($this->until, false);
 		
 		return $html;
 	}

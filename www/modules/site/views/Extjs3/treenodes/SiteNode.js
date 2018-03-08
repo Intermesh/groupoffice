@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: SiteNode.js 16600 2014-01-10 13:48:07Z wsmits $
+ * @version $Id: SiteNode.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
@@ -19,7 +19,7 @@ GO.site.treeNodes.SiteNode = Ext.extend(GO.site.treeNodes.AbstractNode , {
 					items : [
 						new Ext.menu.Item({
 							iconCls: 'btn-view',
-							text: GO.lang.strView,
+							text: t("View"),
 							cls: 'x-btn-text-icon',
 							handler:function(){
 								this.viewExample();
@@ -28,7 +28,7 @@ GO.site.treeNodes.SiteNode = Ext.extend(GO.site.treeNodes.AbstractNode , {
 						}),
 						new Ext.menu.Item({
 							iconCls: 'btn-settings',
-							text: GO.site.lang.properties,
+							text: t("Properties", "site"),
 							cls: 'x-btn-text-icon',
 							scope:this,
 							handler: function(){

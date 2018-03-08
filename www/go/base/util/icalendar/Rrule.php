@@ -106,9 +106,9 @@ class Rrule extends \GO\Base\Util\Date\RecurrencePattern
 		// Monthly by day recurrence _must_ have valid BYSETPOS and BYDAY.
 		else if (strtolower($parameters['freq'])=='monthly' && isset($json['bysetpos'])) {
 			if (count($parameters['byday'])<1)
-				throw new \Exception(\GO::t('selectMonthlyDay'));
+				throw new \Exception(\GO::t("Please select a week day for the monthly recurrence."));
 			else if (empty($json['bysetpos']))
-				throw new \Exception(\GO::t('selectWeekOfMonth'));
+				throw new \Exception(\GO::t("Please select the number of the week day for the monthly recurrence."));
 		}
 		
 		$this->setParams($parameters);

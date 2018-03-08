@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: LinksGrid.js 16948 2014-02-28 14:26:56Z mschering $
+ * @version $Id: LinksGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -66,7 +66,7 @@ GO.grid.LinksGrid = function(config){
 		});
 	
 		config['tbar']=[
-		GO.lang['strSearch']+': ', ' ',this.searchField
+		t("Search")+': ', ' ',this.searchField
 		];
 	}
 	
@@ -82,7 +82,7 @@ GO.grid.LinksGrid = function(config){
 					dataIndex: 'icon',
 					renderer: this.iconRenderer
 		    },*/{
-		header: GO.lang['strName'],
+		header: t("Name"),
 		dataIndex: 'name',
 		css: 'white-space:normal;',
 		sortable: true,
@@ -90,20 +90,20 @@ GO.grid.LinksGrid = function(config){
 			return '<div class="go-grid-icon  go-model-icon-'+record.data.model_name.replace(/\\/g,"_")+'">'+v+'</div>';
 		}
 	},{
-		header: GO.lang['strDescription'],
+		header: t("Description"),
 		dataIndex: 'link_description',
 		sortable:true,
 		editor : new GO.form.LinkDescriptionField()
 	},{
-		header: GO.lang['strType'],
+		header: t("Type"),
 		dataIndex: 'type',
 		sortable:true,
 		hidden:true			    
 	},{
-		header: GO.lang['strMtime'],
+		header: t("Modified at"),
 		dataIndex: 'mtime',
 		sortable:true,
-		width:110
+		width: dp(140)
 	}];
 		    
 		    
@@ -118,8 +118,8 @@ GO.grid.LinksGrid = function(config){
 		store: config.store,
 		pageSize: 20,//parseInt(GO.settings['max_rows_list']),
 		displayInfo: true,
-		displayMsg: GO.lang.displayingItemsShort,
-		emptyMsg: GO.lang['strNoItems']
+		displayMsg: t("Total: {2}"),
+		emptyMsg: t("No items to display")
 	});
 	      
 	config['layout']='fit';
@@ -128,7 +128,7 @@ GO.grid.LinksGrid = function(config){
 		showPreview:true,
 		autoFill:true,
 		forceFit:true,
-		emptyText:GO.lang.strNoItems,	
+		emptyText:t("No items to display"),	
 		getRowClass : function(record, rowIndex, p, store){
 			if(this.showPreview && record.data.description.length){
 				p.body = '<div class="go-links-panel-description">'+record.data.description+'</div>';
@@ -139,7 +139,7 @@ GO.grid.LinksGrid = function(config){
 	});
 
 	config['loadMask']={
-		msg: GO.lang['waitMsgLoad']
+		msg: t("Loading...")
 		};
 	config['sm']=new Ext.grid.RowSelectionModel({});
   

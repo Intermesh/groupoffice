@@ -12,11 +12,11 @@ GO.dialog.ExportDialog = Ext.extend(GO.Window,{
 			closeAction:'hide',
 			buttons: [
 				{				
-					text: GO.lang['cmdOk'],
+					text: t("Ok"),
 					handler: function(){this.submitForm()},
 					scope:this
 				},{				
-					text: GO.lang['cmdClose'],
+					text: t("Close"),
 					handler: function(){this.hide()},
 					scope:this
 				}
@@ -80,7 +80,7 @@ GO.dialog.ExportDialog = Ext.extend(GO.Window,{
 		{
 			failure: function(form, action) {
 				if(action.failureType == 'client')			
-					Ext.MessageBox.alert(GO.lang['strError'], GO.lang['strErrorsInForm']);			
+					Ext.MessageBox.alert(t("Error"), t("You have errors in your form. The invalid fields are marked."));			
 			 
 			},
 			scope: this

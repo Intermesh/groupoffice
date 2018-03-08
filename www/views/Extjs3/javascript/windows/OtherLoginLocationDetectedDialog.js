@@ -16,7 +16,7 @@ GO.dialog.OtherLoginLocationDetectedDialog = Ext.extend(GO.Window , {
 	initComponent : function(){
 		
 		Ext.apply(this, {
-			title:GO.lang.alreadyLoggedInOther,
+			title:t("Already logged in on other location"),
 			width: 650,
 			height:120,
 			closable:false,
@@ -27,7 +27,7 @@ GO.dialog.OtherLoginLocationDetectedDialog = Ext.extend(GO.Window , {
 			}],
 			buttons: [
 				{
-					text: GO.lang.cmdContinue,
+					text: t("Continue"),
 					handler: function(){
 						this.fireEvent('continue', this);
 						this.hide();
@@ -35,7 +35,7 @@ GO.dialog.OtherLoginLocationDetectedDialog = Ext.extend(GO.Window , {
 					scope:this
 				},
 				{
-					text: GO.lang.cmdCancel,
+					text: t("Cancel"),
 					handler: function(){
 						this.fireEvent('cancel', this);
 						this.hide();

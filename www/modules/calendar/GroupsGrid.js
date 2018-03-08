@@ -5,7 +5,7 @@ GO.calendar.GroupsGrid = function(config){
 		config = {};
 	}
 
-	config.title = GO.calendar.lang.resource_groups;
+	config.title = t("Resource groups", "calendar");
 	config.layout='fit';
 	config.autoScroll=true;
 	config.split=true;
@@ -17,10 +17,10 @@ GO.calendar.GroupsGrid = function(config){
 		},
 		columns:[
 		{
-			header: GO.lang.strName,
+			header: t("Name"),
 			dataIndex: 'name'
 		},{
-			header: GO.lang.strOwner,
+			header: t("Owner"),
 			dataIndex: 'user_name',
 			sortable: false
 		}]
@@ -31,7 +31,7 @@ GO.calendar.GroupsGrid = function(config){
 	config.view=new Ext.grid.GridView({
 		autoFill: true,
 		forceFit: true,
-		emptyText: GO.lang['strNoItems']		
+		emptyText: t("No items to display")		
 	});
 
 	config.sm=new Ext.grid.RowSelectionModel();
@@ -39,7 +39,7 @@ GO.calendar.GroupsGrid = function(config){
     
 	config.tbar=[{
 		iconCls: 'btn-add',
-		text: GO.lang['cmdAdd'],
+		text: t("Add"),
 		cls: 'x-btn-text-icon',
 		handler: function()
 		{
@@ -48,7 +48,7 @@ GO.calendar.GroupsGrid = function(config){
 		scope: this
 	},{
 		iconCls: 'btn-delete',
-		text: GO.lang['cmdDelete'],
+		text: t("Delete"),
 		cls: 'x-btn-text-icon',
 		handler: function()
 		{
@@ -61,7 +61,7 @@ GO.calendar.GroupsGrid = function(config){
 		this.searchField = new GO.form.SearchField({
 			store: config.store,
 			width:150,
-			emptyText: GO.lang.strSearch
+			emptyText: t("Search")
 		})
 	];
 

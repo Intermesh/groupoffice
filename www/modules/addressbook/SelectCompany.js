@@ -7,7 +7,7 @@
  * If you have questions write an e-mail to info@intermesh.nl
  * 
  * @copyright Copyright Intermesh
- * @version $Id: SelectCompany.js 21235 2017-06-21 08:11:59Z wsmits $
+ * @version $Id: SelectCompany.js 22112 2018-01-12 07:59:41Z mschering $
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
@@ -38,10 +38,10 @@ GO.addressbook.SelectCompany = function(config){
 	}
 		
 	if(!this.fieldLabel){
-		this.fieldLabel=GO.addressbook.lang.company;
+		this.fieldLabel=t("Company", "addressbook");
 	}
 
-	if(GO.customfields)
+	if(go.ModuleManager.isAvailable("customfields"))
 	{
 		GO.customfields.addColumns("GO\\Addressbook\\Model\\Company", config.fields);
 	}

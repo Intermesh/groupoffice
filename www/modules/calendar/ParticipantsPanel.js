@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: ParticipantsPanel.js 19784 2016-01-26 13:56:16Z michaelhart86 $
+ * @version $Id: ParticipantsPanel.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -59,7 +59,7 @@ GO.calendar.ParticipantsPanel = function(eventDialog, config) {
 		
 	var tbar = [{
 		iconCls : 'btn-add',
-		text : GO.lang.cmdAdd,
+		text : t("Add"),
 		cls : 'x-btn-text-icon',
 		handler : function() {
 			this.showAddParticipantsDialog();
@@ -67,7 +67,7 @@ GO.calendar.ParticipantsPanel = function(eventDialog, config) {
 		scope : this
 	}, {
 		iconCls : 'btn-delete',
-		text : GO.lang.cmdDelete,
+		text : t("Delete"),
 		cls : 'x-btn-text-icon',
 		handler : function() {
 			this.gridPanel.deleteSelected();
@@ -75,11 +75,11 @@ GO.calendar.ParticipantsPanel = function(eventDialog, config) {
 		scope : this
 	}];
 
-	if(GO.addressbook){
+	if(go.ModuleManager.isAvailable("addressbook")){
 		this.selectContact = new GO.addressbook.SelectContact ({
 			name: 'quick_add_contact',
 			anchor: '100%',
-			fieldLabel:GO.lang.cmdAdd,
+			fieldLabel:t("Add"),
 			remoteSort: true,
 			requireEmail:true
 		});
@@ -120,8 +120,8 @@ GO.calendar.ParticipantsPanel = function(eventDialog, config) {
 		this.selectContactPanel = new Ext.Panel({
 			border : true,
 			region:'north',
-			height:30,
-			bodyStyle:'padding:3px',
+			autoHeight: true,
+			cls:'go-form-panel',
 			layout:'form',
 			items:[this.selectContact]
 		});
@@ -134,61 +134,61 @@ GO.calendar.ParticipantsPanel = function(eventDialog, config) {
 		store: config.store,		
 		region:'center',
 		columns : [{
-			header : GO.lang.strName,
+			header : t("Name"),
 			dataIndex : 'name'
 		}, {
-			header : GO.lang.strEmail,
+			header : t("E-mail"),
 			dataIndex : 'email'
 		}, {
-			header : GO.lang.strStatus,
+			header : t("Status"),
 			dataIndex : 'status',
 			renderer : function(v) {
 				switch (v) {
 					case 'TENTATIVE' :
-						return GO.calendar.lang.tentative;
+						return t("Tentative", "calendar");
 						break;
 						
 					case 'DECLINED' :
-						return GO.calendar.lang.declined;
+						return t("Declined", "calendar");
 						break;
 
 					case 'ACCEPTED' :
-						return GO.calendar.lang.accepted;
+						return t("Accepted", "calendar");
 						break;
 
 					case 'NEEDS-ACTION' :
-						return GO.calendar.lang.notRespondedYet;
+						return t("Not responded yet", "calendar");
 						break;
 				}
 			}
 		}, {
-			header : GO.lang.strAvailable,
+			header : t("Available"),
 			dataIndex : 'available',
 			renderer : function(v) {
 
-				var className = 'img-unknown';
+				var className = 'ic-help warning';
 				if(v!='?')
-					className = v ? 'img-available' : 'img-unavailable';
+					className = v ? 'ic-check-circle success' : 'ic-cancel danger';
 				
-				return '<div class="' + className + '"></div>';
+				return '<div class="icon ' + className + '"></div>';
 			}
 		}, {
-			header : GO.calendar.lang.createPermission,
+			header : t("Create permission", "calendar"),
 			dataIndex : 'create_permission',
 			width:140,
 			renderer : function(v) {
 
-				var className = v ? 'img-available' : 'img-unavailable';
+				var className = v ? 'ic-check-circle success' : 'ic-cancel warning';
 				
-				return '<div class="' + className + '"></div>';
+				return '<div class="icon ' + className + '"></div>';
 			}
 		}, {
-			header : GO.calendar.lang.isOrganizer,
+			header : t("Organizer", "calendar"),
 			dataIndex : 'is_organizer',
 			renderer : function(v) {
-				var className = v ? 'img-available' : 'img-unavailable';		
+				var className = v ? 'ic-done success' : '';		
 
-				return '<div class="' + className + '"></div>';
+				return '<div class="icon ' + className + '"></div>';
 			}
 		}],
 		view : new Ext.grid.GridView({
@@ -196,7 +196,7 @@ GO.calendar.ParticipantsPanel = function(eventDialog, config) {
 			forceFit : true
 		}),
 		loadMask : {
-			msg : GO.lang.waitMsgLoad
+			msg : t("Loading...")
 		},
 		sm : new Ext.grid.RowSelectionModel(),
 		deleteSelected : function(){
@@ -205,7 +205,7 @@ GO.calendar.ParticipantsPanel = function(eventDialog, config) {
 				selectedRows[i].commit();
 				
 				if(selectedRows[i].data.is_organizer){
-					alert(GO.calendar.lang.cantRemoveOrganizer);
+					alert(t("You can't remove the organizer", "calendar"));
 					return;
 				}
 				
@@ -216,7 +216,7 @@ GO.calendar.ParticipantsPanel = function(eventDialog, config) {
 		
 	
 	Ext.apply(config, {
-		title : GO.calendar.lang.participants,
+		title : t("Participants", "calendar"),
 		border : false,
 		tbar:tbar,
 		layout : GO.addressbook ? 'border' : 'fit',
@@ -297,9 +297,9 @@ Ext.extend(GO.calendar.ParticipantsPanel, Ext.Panel, {
 
 	showAddParticipantsDialog : function() {
 		/*if (!GO.addressbook) {
-			var tpl = new Ext.XTemplate(GO.lang.moduleRequired);
-			Ext.Msg.alert(GO.lang.strError, tpl.apply({
-				module : GO.calendar.lang.addressbook
+			var tpl = new Ext.XTemplate(t("The %s module is required for this function"));
+			Ext.Msg.alert(t("Error"), tpl.apply({
+				module : t("Addressbook", "calendar")
 			}));
 			return false;
 		}*/

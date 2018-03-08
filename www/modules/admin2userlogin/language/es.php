@@ -1,10 +1,10 @@
 <?php
-
-$l['name']="Seleccionar usuario (Doble click)";
-$l['description']="Los Administradores pueden cambiar a otra cuenta de usuario con este módulo.";
-
-$l['username']="Usuario";
-$l['lastlogin']="Último intento de login";
-$l['registrationtime']="Fecha de registro";
-$l['admin2userlogin']='Ingresar como otro usuario';
-$l['userId']="ID";
+return array (
+  'Username' => 'Usuario',
+  'Last login attempt' => 'Último intento de login',
+  'Time Registered' => 'Fecha de registro',
+  'name' => 'Ingresar como otro usuario',
+  'description' => 'Los Administradores pueden cambiar a otra cuenta de usuario con este módulo.',
+  'Switch user' => 'Ingresar como otro usuario',
+  'ID' => 'ID',
+);

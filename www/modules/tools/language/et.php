@@ -1,16 +1,15 @@
 <?php
-
-
-$l['name']='Tööriistad';
-$l['dbcheck']='Andmebaasi kontroll';
-$l['rm_duplicates']='eemalda dubleeritud kontaktid ja sündmused';
-$l['backupdb']='Andmebaasi varundamine';
-$l['index_files']='Indekseeri kõik failid';
-$l['buildsearchcache']='Loo otsingu indeks';
-$l['checkmodules']='Kontrolli mooduleid';
-$l['resetState']='Taasta akna või võrgu olek';
-
-$l["tools"]='Admini tööriistad';
-$l["description"]='All olevate skrpitide käivitamiseks vajutas soovitul.';
-$l["scripts"]='Skriptid';
-$l["scriptOutput"]='Skripti väljund';
+return array (
+  'Database check' => 'Andmebaasi kontroll',
+  'Remove duplicate contacts and events' => 'eemalda dubleeritud kontaktid ja sündmused',
+  'Backup database' => 'Andmebaasi varundamine',
+  'Index all files' => 'Indekseeri kõik failid',
+  'Create search index' => 'Loo otsingu indeks',
+  'Check modules' => 'Kontrolli mooduleid',
+  'Reset state of windows, grids etc.' => 'Taasta akna või võrgu olek',
+  'Admin tools' => 'Admini tööriistad',
+  'Scripts' => 'Skriptid',
+  'Script output' => 'Skripti väljund',
+  'name' => 'Tööriistad',
+  'description' => 'All olevate skrpitide käivitamiseks vajutas soovitul.',
+);

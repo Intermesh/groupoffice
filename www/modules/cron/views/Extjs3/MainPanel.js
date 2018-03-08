@@ -30,7 +30,7 @@
 //		cls:'go-head-tb',
 //		items: [{
 //			xtype:'htmlcomponent',
-//			html:GO.cron.lang.name,
+//			html:t("System task scheduler", "cron"),
 //			cls:'go-module-title-tbar'
 //		}]
 //	});
@@ -46,7 +46,7 @@
 //	});
 
 GO.moduleManager.addModule('cron', GO.cron.CronGrid, {
-	title : GO.cron.lang.cronManager,
+	title : t("Manage system tasks", "cron"),
 	iconCls : 'go-tab-icon-cron',
 	admin :true
 });

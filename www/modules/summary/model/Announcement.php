@@ -31,7 +31,7 @@ class Announcement extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	public function getLocalizedName(){
-		return GO::t('announcement','summary');
+		return GO::t("Announcement", "summary");
 	}
 	
 	public function tableName(){

@@ -1,7 +1,6 @@
 modules/email/AliasesDialog.js
 modules/email/AliasDialog.js
 modules/email/AliasesGrid.js
-modules/email/LinkAttachmentDialog.js
 modules/email/FoldersDialog.js
 modules/email/AccountDialog.js
 modules/email/SearchDialog.js

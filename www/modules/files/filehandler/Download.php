@@ -10,7 +10,7 @@ class Download implements FilehandlerInterface{
 	}
 	
 	public function getName(){
-		return \GO::t('download');
+		return \GO::t("Download");
 	}
 	
 	public function fileIsSupported(\GO\Files\Model\File $file){

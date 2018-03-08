@@ -19,7 +19,7 @@ GO.site.ContentDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		
 		Ext.apply(this, {
 			goDialogId:'content',
-			title:GO.site.lang.content,
+			title:t("Content", "site"),
 			formControllerUrl: 'site/content',
 			updateAction : 'update',
 			createAction	: 'create',
@@ -41,16 +41,16 @@ GO.site.ContentDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		});
 		
 		this.metaPanel = new Ext.Panel({
-			title:GO.site.lang.meta,		
+			title:t("Meta", "site"),		
 			cls:'go-form-panel',
 			layout:'form',
 			items:[
 				this.metaDescriptionText = new GO.form.HtmlComponent({
-					html: '<p class="go-form-text">'+GO.site.lang.metaDescriptionText+'</p>'
+					html: '<p class="go-form-text">'+t("Meta tags are a great way for webmasters to provide search engines with information about their sites.", "site")+'</p>'
 				})
 				,{
 					xtype: 'fieldset',
-					title: GO.site.lang.meta,
+					title: t("Meta", "site"),
 					autoHeight: true,
 					border: true,
 					collapsed: false,
@@ -61,7 +61,7 @@ GO.site.ContentDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 						anchor: '100%',
 						maxLength: 100,
 						allowBlank:true,
-						fieldLabel: GO.site.lang.contentMeta_title
+						fieldLabel: t("Meta title", "site")
 					},{
 						xtype: 'textfield',
 						name: 'meta_keywords',
@@ -69,7 +69,7 @@ GO.site.ContentDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 						anchor: '100%',
 						maxLength: 100,
 						allowBlank:true,
-						fieldLabel: GO.site.lang.contentMeta_keywords
+						fieldLabel: t("Meta keywords", "site")
 					},{
 						xtype: 'textarea',
 						name: 'meta_description',
@@ -77,23 +77,23 @@ GO.site.ContentDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 						anchor: '100%',
 						maxLength: 100,
 						allowBlank:true,
-						fieldLabel: GO.site.lang.contentMeta_description
+						fieldLabel: t("Meta description", "site")
 					}]
 				}
 			]
 		});
 		
 		this.infoPanel = new Ext.Panel({
-			title:GO.site.lang.info,		
+			title:t("Info", "site"),		
 			cls:'go-form-panel',
 			layout:'form',
 			items:[
 				this.metaDescriptionText = new GO.form.HtmlComponent({
-					html: '<p class="go-form-text">'+GO.site.lang.infoDescriptionText+'</p>'
+					html: '<p class="go-form-text">'+t("Information about this content item", "site")+'</p>'
 				})
 				,{
 					xtype: 'fieldset',
-					title: GO.site.lang.info,
+					title: t("Info", "site"),
 					autoHeight: true,
 					border: true,
 					collapsed: false,
@@ -105,7 +105,7 @@ GO.site.ContentDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 						anchor: '100%',
 						maxLength: 100,
 						allowBlank:true,
-						fieldLabel: GO.site.lang.contentCtime
+						fieldLabel: t("Created", "site")
 					},{
 						xtype: 'textfield',
 						name: 'mtime',
@@ -114,7 +114,7 @@ GO.site.ContentDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 						anchor: '100%',
 						maxLength: 100,
 						allowBlank:true,
-						fieldLabel: GO.site.lang.contentMtime
+						fieldLabel: t("Modified", "site")
 					},{
 						xtype: 'textfield',
 						name: 'user_id',
@@ -123,21 +123,21 @@ GO.site.ContentDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 						anchor: '100%',
 						maxLength: 100,
 						allowBlank:true,
-						fieldLabel: GO.site.lang.contentUser_id
+						fieldLabel: t("User", "site")
 					}
 				]}
 				,this.metaDescriptionText = new GO.form.HtmlComponent({
-					html: '<p class="go-form-text">'+GO.site.lang.templateDescriptionText+'</p>'
+					html: '<p class="go-form-text">'+t("Choose a template in which you want to view this content item", "site")+'</p>'
 				})
 				,{
 					xtype: 'fieldset',
-					title: GO.site.lang.template,
+					title: t("Template", "site"),
 					autoHeight: true,
 					border: true,
 					collapsed: false,
 					items:[
 						this.selectTemplateCombo = new GO.form.ComboBox({
-							fieldLabel: GO.site.lang.template,
+							fieldLabel: t("Template", "site"),
 							hiddenName:'template',
 							anchor:'100%',
 							store: this.availableTemplatesStore,
@@ -148,7 +148,7 @@ GO.site.ContentDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 							allowBlank: false
 						}),
 						this.selectParentTemplateCombo = new GO.form.ComboBox({
-							fieldLabel: GO.site.lang.defaultChildTemplate,
+							fieldLabel: t("Default child template", "site"),
 							hiddenName:'default_child_template',
 							anchor:'100%',
 							store: this.availableTemplatesStore,

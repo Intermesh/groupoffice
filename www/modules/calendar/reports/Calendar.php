@@ -12,7 +12,7 @@ namespace GO\Calendar\Reports;
  * If you have questions write an e-mail to info@intermesh.nl
  *
  * @copyright Copyright Intermesh
- * @version $Id: Calendar.php 21701 2017-11-15 14:57:05Z wsmits $
+ * @version $Id: Calendar.php 22381 2018-02-16 10:02:56Z mschering $
  * @author Michael de Hart <mdhart@intermesh.nl>
  */
 abstract class Calendar extends \GO\Base\Util\Pdf {
@@ -50,10 +50,10 @@ abstract class Calendar extends \GO\Base\Util\Pdf {
 		parent::init();
 		$this->font_size--;
 		$this->setCellPaddings(1,1,0,1);
-		$this->days_long = \GO::t('full_days', 'base');
-		$this->months_short = \GO::t('short_months', 'base');
-		$this->months_long = \GO::t('months', 'base');
-		$this->days_short = \GO::t('short_days', 'base');
+		$this->days_long = \GO::t("full_days");
+		$this->months_short = \GO::t("short_months");
+		$this->months_long = \GO::t("full_months");
+		$this->days_short = \GO::t("short_days");
 		if(\GO::user()->first_weekday==1) { // place sunday at the end
 			$elm = array_shift($this->days_long);
 			array_push($this->days_long, $elm);
@@ -100,7 +100,7 @@ abstract class Calendar extends \GO\Base\Util\Pdf {
 			}
                         
 			if($event->isPrivate()){
-				$event->name = \GO::t('private','calendar');
+				$event->name = \GO::t("Private", "calendar");
 				$event->description = '';
 				$event->location = '';
 			}

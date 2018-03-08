@@ -82,7 +82,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 	}
 
 	protected function getLocalizedName() {
-		return \GO::t('file', 'files');
+		return \GO::t("File", "files");
 	}
 
 	public function customfieldsModel() {
@@ -230,7 +230,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 
 		//blocked database check. We check this in the controller now.
 		if($this->isLocked() && !\GO::user()->isAdmin())
-			throw new \Exception(\GO::t("fileIsLocked","files").': '.$this->path);
+			throw new \Exception(\GO::t("File is locked", "files").': '.$this->path);
 
 		return parent::beforeDelete();
 	}
@@ -277,7 +277,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 		if($this->isNew || $this->isModified('name')){
 			$existingFile = $this->folder->hasFile($this->name);
 			if($existingFile && $existingFile->id!=$this->id)
-				throw new \Exception(sprintf(\GO::t('filenameExists','files'), $this->path));
+				throw new \Exception(sprintf(\GO::t("Filename %s already exists", "files"), $this->path));
 		}
 
 		if(!$this->isNew){
@@ -500,7 +500,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 	}
 
 
-	public function getThumbURL($urlParams=array("lw"=>100, "ph"=>100, "zc"=>1)) {
+	public function getThumbURL($urlParams=array("lw"=>480, "ph"=>270, "zc"=>0)) {
 
 		$urlParams['filemtime']=$this->mtime;
 		$urlParams['src']=$this->path;

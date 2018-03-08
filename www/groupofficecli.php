@@ -3,7 +3,6 @@
 $root = dirname(__FILE__) . '/';
 //chdir($root);
 //on the command line you can pass -c=/path/to/config.php to set the config file.
-
 require_once($root . 'go/base/util/Cli.php');
 
 $args = \GO\Base\Util\Cli::parseArgs();
@@ -11,6 +10,16 @@ $args = \GO\Base\Util\Cli::parseArgs();
 if (isset($args['c'])) {
 	define("GO_CONFIG_FILE", $args['c']);
 }
+
+require_once($root.'vendor/autoload.php');
+
+//Initialize new framework
+use go\core\App;
+use go\core\jmap\State;
+
+App::get()->setAuthState(new State());
+
+
 
 //initialize autoloading of library
 require_once($root.'vendor/autoload.php');

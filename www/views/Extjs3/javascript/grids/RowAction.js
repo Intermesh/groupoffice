@@ -15,7 +15,7 @@
  * @copyright (c) 2008, by Ing. Jozef Sakáloš
  * @date      22. March 2008
  * @version   1.0
- * @revision  $Id: RowAction.js 14816 2013-05-21 08:31:20Z mschering $
+ * @revision  $Id: RowAction.js 22065 2018-01-05 08:03:23Z mschering $
  *
  * @license Ext.ux.grid.RowActions is licensed under the terms of
  * the Open Source LGPL 3.0 license.  Commercial use is permitted to the extent
@@ -285,7 +285,7 @@ Ext.extend(Ext.ux.grid.RowActions, Ext.util.Observable, {
 	 * @cfg {Number} widthIntercept Constant used for auto-width calculation (defaults to 4).
 	 * See {@link #autoWidth} for explanation.
 	 */
-	,widthIntercept:4
+	,widthIntercept:20
 
 	/**
 	 * @cfg {Number} widthSlope Constant used for auto-width calculation (defaults to 21).
@@ -321,7 +321,7 @@ Ext.extend(Ext.ux.grid.RowActions, Ext.util.Observable, {
 
 		// calculate width
 		if(this.autoWidth) {
-			this.width =  this.widthSlope * this.actions.length + this.widthIntercept;
+			this.width =  dp(this.widthSlope * this.actions.length + this.widthIntercept);
 			this.fixed = true;
 		}
 
@@ -469,13 +469,13 @@ Ext.extend(Ext.ux.grid.RowActions, Ext.util.Observable, {
 				return;
 			}
 			else if(true !== this.eventsSuspended) {
-				this.fireEvent('action', this.grid, record, action, row.rowIndex, col);
+				this.fireEvent('action', this.grid, record, action, row.rowIndex, col, e, target);
 			}
 
 		}
 
 		// handle group action click
-		t = e.getTarget('.ux-grow-action-item');
+		var t = e.getTarget('.ux-grow-action-item');
 		if(t) {
 			// get groupId
 			var group = view.findGroup(target);
@@ -505,6 +505,10 @@ Ext.extend(Ext.ux.grid.RowActions, Ext.util.Observable, {
 		}
 	} // eo function onClick
 	// }}}
+	
+	,destroy : function() {
+	 //nothing needed It's destroyed when the grid is destroyed	
+	}
 
 });
 

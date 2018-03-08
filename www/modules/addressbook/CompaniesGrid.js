@@ -6,176 +6,180 @@ GO.addressbook.CompaniesGrid = function (config) {
 	}
 	config.border = false;
 	config.paging = true;
+	
+	config.autoExpandColumn = 'name';
 
 	this.fieldDefs = {
 		fields: ['id', 'name', 'name2', 'homepage', 'email', 'phone', 'fax', 'address', 'address_no', 'zip', 'city', 'state', 'country', 'post_address', 'post_address_no', 'post_city', 'post_state', 'post_country', 'post_zip', 'bank_no', 'vat_no', 'invoice_email', 'ctime', 'mtime', 'iban', 'crn', 'ab_name', 'color'],
 		columns: [
 			{
-				header: GO.addressbook.lang.id,
+				header: t("ID", "addressbook"),
 				dataIndex: 'id',
 				width: 20,
 				hidden: true,
 				id: 'id'
 			}, {
-				header: GO.lang['strName'],
+				header: t("Name"),
 				dataIndex: 'name',
 				width: 200,
 				id: 'name'
 			}, {
-				header: GO.lang['strName2'],
+				header: t("Name 2"),
 				dataIndex: 'name2',
 				hidden: true,
 				width: 200,
 				id: 'name2'
 			},
 			{
-				header: GO.lang['strEmail'],
+				header: t("E-mail"),
 				dataIndex: 'email',
 				width: 150,
+				hidden: true,
 				id: 'email'
 			},
 			{
-				header: GO.lang['strHomepage'],
+				header: t("Homepage"),
 				dataIndex: 'homepage',
 				width: 100,
 				hidden: true,
 				id: 'homepage'
 			},
 			{
-				header: GO.lang['strPhone'],
+				header: t("Phone"),
 				dataIndex: 'phone',
 				width: 100,
+				hidden: true,
 				id: 'phone'
 			},
 			{
-				header: GO.lang['strFax'],
+				header: t("Fax"),
 				dataIndex: 'fax',
 				width: 80,
 				hidden: true,
 				id: 'fax'
 			},
 			{
-				header: GO.lang['strAddress'],
+				header: t("Address"),
 				dataIndex: 'address',
 				hidden: true,
 				id: 'address'
 			},
 			{
-				header: GO.lang['strAddressNo'],
+				header: t("Address 2"),
 				dataIndex: 'address_no',
 				hidden: true,
 				id: 'address_no'
 			},
 			{
-				header: GO.lang['strZip'],
+				header: t("ZIP/Postal"),
 				dataIndex: 'zip',
 				hidden: true,
 				id: 'zip'
 			},
 			{
-				header: GO.lang['strCity'],
+				header: t("City"),
 				dataIndex: 'city',
 				width: 150,
 				id: 'city'
 			},
 			{
-				header: GO.lang['strState'],
+				header: t("State"),
 				dataIndex: 'state',
 				width: 80,
 				hidden: true,
 				id: 'state'
 			},
 			{
-				header: GO.lang['strCountry'],
+				header: t("Country"),
 				dataIndex: 'country',
 				hidden: true,
 				id: 'country',
 				renderer: GO.grid.ColumnRenderers.countryCode
 			},
 			{
-				header: GO.lang['strPostAddress'],
+				header: t("Address (post)"),
 				dataIndex: 'post_address',
 				hidden: true,
 				id: 'post_address'
 			},
 			{
-				header: GO.lang['strPostAddressNo'],
+				header: t("Number of house (post)"),
 				dataIndex: 'post_address_no',
 				hidden: true,
 				id: 'post_address_no'
 			},
 			{
-				header: GO.lang['strPostZip'],
+				header: t("ZIP/Postal (post)"),
 				dataIndex: 'post_zip',
 				hidden: true,
 				id: 'post_zip'
 			},
 			{
-				header: GO.lang['strPostCity'],
+				header: t("City (post)"),
 				dataIndex: 'post_city',
 				hidden: true,
 				id: 'post_city'
 			},
 			{
-				header: GO.lang['strPostState'],
+				header: t("State (post)"),
 				dataIndex: 'post_state',
 				width: 80,
 				hidden: true,
 				id: 'post_state'
 			},
 			{
-				header: GO.lang['strPostCountry'],
+				header: t("Country (post)"),
 				dataIndex: 'post_country',
 				hidden: true,
 				id: 'post_country',
 				renderer: GO.grid.ColumnRenderers.countryCode
 			},
 			{
-				header: GO.addressbook.lang['cmdFormLabelBankNo'],
+				header: t("Bank number", "addressbook"),
 				dataIndex: 'bank_no',
 				hidden: true,
 				id: 'bank_no'
 			}, {
-				header: GO.addressbook.lang['bankBicNo'],
+				header: t("Bank BIC number", "addressbook"),
 				dataIndex: 'bank_bic',
 				hidden: true,
 				id: 'bank_bic'
 			}, {
-				header: GO.addressbook.lang.iban,
+				header: t("IBAN", "addressbook"),
 				dataIndex: 'iban',
 				hidden: true,
 				id: 'iban'
 			}, {
-				header: GO.addressbook.lang.crn,
+				header: t("Company Reg. No.", "addressbook"),
 				dataIndex: 'crn',
 				hidden: true,
 				id: 'crn'
 			},
 			{
-				header: GO.addressbook.lang['cmdFormLabelVatNo'],
+				header: t("VAT number", "addressbook"),
 				dataIndex: 'vat_no',
 				hidden: true,
 				id: 'vat_no'
 			},
 			{
-				header: GO.addressbook.lang['cmdFormLabelInvoiceEmail'],
+				header: t("Invoicing email", "addressbook"),
 				dataIndex: 'invoice_email',
 				hidden: true,
 				id: 'invoice_email'
 			}, {
-				header: GO.lang.strMtime,
+				header: t("Modified at"),
 				dataIndex: 'mtime',
 				hidden: true,
-				width: 110,
+				width: dp(140),
 				id: 'mtime'
 			}, {
-				header: GO.lang.strCtime,
+				header: t("Created at"),
 				dataIndex: 'ctime',
 				hidden: true,
-				width: 110,
+				width: dp(140),
 				id: 'ctime'
 			}, {
-				header: GO.addressbook.lang.addressbook,
+				header: t("Address book", "addressbook"),
 				dataIndex: 'ab_name',
 				hidden: true,
 				id: 'ab_name'
@@ -184,7 +188,7 @@ GO.addressbook.CompaniesGrid = function (config) {
 	};
 
 
-	if (GO.customfields)
+	if(go.ModuleManager.isAvailable("customfields"))
 	{
 		GO.customfields.addColumns("GO\\Addressbook\\Model\\Company", this.fieldDefs);
 	}
@@ -234,7 +238,7 @@ Ext.extend(GO.addressbook.CompaniesGrid, GO.grid.GridPanel, {
 		this.colModel = companiesColumnModel;
 
 		this.view = new Ext.grid.GridView({
-			emptyText: GO.lang.strNoItems,
+			emptyText: t("No items to display"),
 			getRowClass: function (record, rowIndex, rp, ds) {
 
 				if (!rp.tstyle)

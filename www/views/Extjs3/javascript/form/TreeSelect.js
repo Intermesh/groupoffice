@@ -43,7 +43,7 @@ GO.form.TreeSelectWindow = Ext.extend(function(config){
 	config.closable=true;
 	
 	config.buttons=[{
-    text: GO.lang.cmdOk,
+    text: t("Ok"),
     handler: function(){
         var newids = [], selNodes = this.treePanel.getChecked();        
         var oldv = this.textfield.getValue();

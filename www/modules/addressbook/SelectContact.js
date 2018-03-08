@@ -7,7 +7,7 @@
  * If you have questions write an e-mail to info@intermesh.nl
  * 
  * @copyright Copyright Intermesh
- * @version $Id: SelectContact.js 21235 2017-06-21 08:11:59Z wsmits $
+ * @version $Id: SelectContact.js 22025 2017-12-28 15:56:53Z mschering $
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
@@ -29,7 +29,7 @@ GO.addressbook.SelectContact = function(config){
 	var customfieldId = config.customfieldId || '';
 
 	var fields = {fields: ['id', 'cf', 'name', 'salutation', 'email', 'first_name', 'middle_name','last_name', 'home_phone', 'work_phone', 'cellular', 'cellular2', 'company_id','company_name','address','address_no','zip','city','state','country','ab_name','go_user_id','department'], columns:[]};
-	if(GO.customfields)
+	if(go.ModuleManager.isAvailable("customfields"))
 	{
 		GO.customfields.addColumns("GO\\Addressbook\\Model\\Contact", fields);
 	}

@@ -1,22 +1,17 @@
 <?php
-
-
-$l['name']='Opmerkingen';
-$l['description']='Voegt opmerkingen functionaliteit toe aan andere modules';
-$l["comment"]="Opmerking";
-$l["comments"]="Opmerkingen";
-$l["recentComments"]='Meest recente opmerkingen';
-$l["browseComments"]= 'Blader door opmerkingen';
-
-$l['manageCategories']='Categorieën beheren';
-$l['category']='Categorie';
-$l['noCategory']='Geen categorie';
-
-$l['newCommentText']='Voer hier nieuwe commentaar in ...';
-
-$l['readMore']="Lees meer";
-$l['enableReadMore']="Gebruik \"Lees meer\" links";
-
-$l['actionDate']='Actiedatum';
-
-$l['emptyComment']='Geen opmerking';
+return array (
+  'Comment' => 'Opmerking',
+  'Recent comments' => 'Meest recente opmerkingen',
+  'Browse comments' => 'Blader door opmerkingen',
+  'Manage categories' => 'Categorieën beheren',
+  'Category' => 'Categorie',
+  'No category' => 'Geen categorie',
+  'Enter new comment here ...' => 'Voer hier nieuwe commentaar in ...',
+  'Read more' => 'Lees meer',
+  'Enable read more links' => 'Gebruik "Lees meer" links',
+  'Action date' => 'Actiedatum',
+  'Empty comment' => 'Geen opmerking',
+  'name' => 'Opmerkingen',
+  'description' => 'Voegt opmerkingen functionaliteit toe aan andere modules',
+  'Comments' => 'Opmerkingen',
+);

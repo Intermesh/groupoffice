@@ -29,7 +29,7 @@ class DeleteExpiredLinks extends AbstractCron {
      */
     public function getLabel()
     {
-        return GO::t("deleteExpiredLabel", 'files');
+        return GO::t("Delete expired download link files", "files");
     }
 
     /**
@@ -39,7 +39,7 @@ class DeleteExpiredLinks extends AbstractCron {
      */
     public function getDescription()
     {
-        return GO::t("deleteExpiredDescription", 'files');
+        return GO::t("Delete download link files that are no longer valid", "files");
     }
 
     /**

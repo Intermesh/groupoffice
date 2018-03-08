@@ -38,7 +38,7 @@ class AddresslistController extends \GO\Base\Controller\AbstractModelController 
 		
 		
 		
-		$storeParams->getCriteria()->addCondition('level', $params['permissionLevel'],'>=','go_acl');
+		$storeParams->getCriteria()->addCondition('level', $params['permissionLevel'],'>=','core_acl_group');
 	}
 
 	public function formatStoreRecord($record, $model, $store) {
@@ -67,7 +67,7 @@ class AddresslistController extends \GO\Base\Controller\AbstractModelController 
 		$store = \GO\Base\Data\Store::newInstance(\GO\Addressbook\Model\Contact::model());
 
 		$sortAlias = \GO::user()->sort_name=="first_name" ? array('first_name','last_name') : array('last_name','first_name');
-		$store->getColumnModel()->formatColumn('name','$model->getName(\GO::user()->sort_name)', array(),$sortAlias, \GO::t('strName'));
+		$store->getColumnModel()->formatColumn('name','$model->getName(\GO::user()->sort_name)', array(),$sortAlias, \GO::t("Name"));
 		//$store->getColumnModel()->formatColumn('name', '$model->name', array(), array('first_name', 'last_name'));
 		$store->getColumnModel()->formatColumn('company_name', '$model->company->name', array(), 'company_id');
 		$store->getColumnModel()->formatColumn('addressbook_name', '$model->addressbook->name', array(), 'addressbook_id');

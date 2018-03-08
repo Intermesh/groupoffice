@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: NumberField.js 21282 2017-07-07 12:59:14Z devdevilnl $
+ * @version $Id: NumberField.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -25,12 +25,12 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 	/**
      * @cfg {String} minText Error text to display if the minimum value validation fails (defaults to "The minimum value for this field is {minValue}")
      */
-	minText : GO.lang.numMinValue,
+	minText : t("The minimum value for this field is {0}"),
     
 	/**
      * @cfg {String} maxText Error text to display if the maximum value validation fails (defaults to "The maximum value for this field is {maxValue}")
      */
-	maxText : GO.lang.numMaxValue,
+	maxText : t("The maximum value for this field is {0}"),
 	
 	/**
 		* @cfg {Number} minValue The minimum allowed value (defaults to Number.NEGATIVE_INFINITY)
@@ -46,6 +46,12 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 	 * @cfg {Number} decimals The maximum precision to display after the decimal separator (defaults to 2)
 	 */
 	decimals : 2,
+	
+	/**
+	 * Old framework wants it formatted. The new framework wants it unformatted.
+	 */
+	serverFormats: true,
+	
 	initComponent : function(){
 		GO.form.NumberField.superclass.initComponent.call(this);
 		
@@ -67,11 +73,30 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 			if(!number && this.minValue!=Number.NEGATIVE_INFINITY){
 				number = this.minValue;
 			}
-			this.setValue(GO.util.numberFormat(number, this.decimals));
+			if(this.serverFormats) {
+				number = GO.util.numberFormat(number, this.decimals);
+			}
+			this.setValue(number);
 		}
 	},
 	
+	getValue : function() {		
+		var v = GO.form.NumberField.superclass.getValue.call(this);
+		if(this.serverFormats) {
+			return v;
+		} else
+		{
+			return GO.util.unlocalizeNumber(v);
+		}
+	},	
 	
+	setValue : function(v) {
+		if(!this.serverFormats) {
+			v = GO.util.numberFormat(v, this.decimals);
+		} 
+		
+		return GO.form.NumberField.superclass.setValue.call(this, v);
+	},
 	
 	/**
      * Runs all of NumberFields validations and returns an array of any errors. Note that this first

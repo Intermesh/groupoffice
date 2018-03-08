@@ -10,7 +10,7 @@ GO.email.FindContactDialog = function(config) {
 	config.width=600;
 	config.height=400;
 	config.closeAction='hide';
-	config.title=GO.addressbook.lang.contacts;
+	config.title=t("Contacts", "addressbook");
 
 	this.contactsGrid = new GO.email.ContactsGrid({
 		singleSelect:true,
@@ -90,7 +90,7 @@ Ext.extend(GO.email.FindContactDialog, Ext.Window, {
 						this.showReplaceDialog(data.addresses, data.contact_name);
 					}else
 					{
-						alert(GO.addressbook.lang.emailAdded);
+						alert(t("Email address succesfully added to contact", "addressbook"));
 						this.fireEvent('email_merged',contact_id);
 						this.hide();
 					}
@@ -121,7 +121,7 @@ Ext.extend(GO.email.FindContactDialog, Ext.Window, {
 			addresses : addresses
 		});
 
-		GO.email.replaceEmailDialog.setTitle(GO.addressbook.lang.contact + ': '+ contact_name);
+		GO.email.replaceEmailDialog.setTitle(t("Contact", "addressbook") + ': '+ contact_name);
 
 		GO.email.replaceEmailDialog.show();	
 	}

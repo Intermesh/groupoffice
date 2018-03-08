@@ -6,26 +6,39 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: overrides.js 21602 2017-10-31 13:05:55Z michaelhart86 $
+ * @version $Id: overrides.js 22456 2018-03-06 15:42:05Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
+/**
+ * Density Independend pixel calculation
+ * @type Number
+ */
+GO.util.density = 160; // set in Theme
+function dp(size) {
+	return ((size * GO.util.density) / 160);
+};
 /*
  *When upgrading extjs don't forget to check htmleditor overrides in E-mail composer
  */
 
-Ext.override(Ext.Panel,{
-	initComponent : Ext.Panel.prototype.initComponent.createSequence(function(){
-		if(this.region){
-			if(this.cls)
-				this.cls += ' ';
-			else
-				this.cls = '';
-			
-			this.cls += 'go-border-'+this.region;
-		}
-	})
+Ext.override(Ext.Component, {
+	
+	//Without this override findParentByType doesn't work if you don't Ext.reg() all your components
+	 getXTypes : function(){
+        var tc = this.constructor;
+        if(!tc.xtypes){
+            var c = [], sc = this;
+            while(sc){
+                c.unshift(sc.constructor.xtype);
+                sc = sc.constructor.superclass;
+            }
+            tc.xtypeChain = c;
+            tc.xtypes = c.join('/');
+        }
+        return tc.xtypes;
+    }
 });
 
 Ext.override(Ext.form.TextArea,{
@@ -56,13 +69,16 @@ Ext.override(Ext.form.TriggerField,{
 
         this.wrap = this.el.wrap({cls: 'x-form-field-wrap x-form-field-trigger-wrap'});
         this.trigger = this.wrap.createChild(this.triggerConfig ||
-                {tag: "button", type: "button", cls: "x-form-trigger " + this.triggerClass});
+                {tag: "button", type: "button", tabindex: "-1", cls: "x-form-trigger " + this.triggerClass});
         this.initTrigger();
         if(!this.width){
-            this.wrap.setWidth(this.el.getWidth()+this.trigger.getWidth());
+            this.wrap.setWidth(this.el.getWidth()+this.getTriggerWidth());
         }
         this.resizeEl = this.positionEl = this.wrap;
-    }
+    },
+	 getTriggerWidth: function(){
+		 return 0;
+	 }
 });
 
 Ext.override(Ext.form.TwinTriggerField, {
@@ -71,10 +87,13 @@ Ext.override(Ext.form.TwinTriggerField, {
 
         this.triggerConfig = {
             tag:'span', cls:'x-form-twin-triggers', cn:[
-            {tag: "button", type: "button", cls: "x-form-trigger " + this.trigger1Class},
-            {tag: "button", type: "button", cls: "x-form-trigger " + this.trigger2Class}
+            {tag: "button", type: "button",tabindex: "-1", cls: "x-form-trigger " + this.trigger1Class},
+            {tag: "button", type: "button",tabindex: "-1", cls: "x-form-trigger " + this.trigger2Class}
         ]};
-    }
+    },
+	 getTriggerWidth: function(){
+		 return 0;
+	 }
 });
 
 Ext.override(Ext.data.GroupingStore,{
@@ -136,75 +155,112 @@ Ext.override(Ext.FormPanel,{
 	})
 });
 
-Ext.override(Ext.grid.GridView, {
-    scrollToTopOnLoad: true,
-    onLoad : function(){
-        if (this.scrollToTopOnLoad){
-					if (Ext.isGecko) {
-							if (!this.scrollToTopTask) {
-									this.scrollToTopTask = new Ext.util.DelayedTask(this.scrollToTop, this);
-							}
-							this.scrollToTopTask.delay(1);
-					} else {
-							this.scrollToTop();
-					}
-				}
-				this.scrollToTopOnLoad=true;
+Ext.override(Ext.slider.MultiSlider, {
+	moveThumb: function(index, v, animate){
+        var thumb = this.thumbs[index].el;
+
+        if(!animate || this.animate === false){
+            thumb.setLeft(v);
+        }else{
+            thumb.shift({left: v, stopFx: true, duration:.35});
+        }
+		  // This line was added to create a fill track
+		  this.focusEl.setStyle({transform: 'scaleX('+(this.thumbs[index].value/100)+')'});
     }
 });
 
+Ext.override(Ext.tree.TreeNodeUI, {
+	renderElements : function(n, a, targetNode, bulkRender){
+        // add some indent caching, this helps performance when rendering a large tree
+        this.indentMarkup = n.parentNode ? n.parentNode.ui.getChildIndent() : '';
 
-/*
- * Scroll menu when higher then the screen is
- *
- */
+        var cb = Ext.isBoolean(a.checked),
+            nel,
+            href = this.getHref(a.href),
+            buf = ['<li class="x-tree-node"><div ext:tree-node-id="',n.id,'" class="x-tree-node-el x-tree-node-leaf x-unselectable ', a.cls,'" unselectable="on">',
+            '<span class="x-tree-node-indent">',this.indentMarkup,"</span>",
+            '<span class="x-tree-ec-icon x-tree-elbow"></span>',
+            '<span style="background-image:url(', a.icon || this.emptyIcon, ');" class="x-tree-node-icon',(a.icon ? " x-tree-node-inline-icon" : ""),(a.iconCls ? " "+a.iconCls : ""),'" unselectable="on"></span>',
+            cb ? ('<input class="x-tree-node-cb" type="checkbox" ' + (a.checked ? 'checked="checked" />' : '/>')) : '',
+            '<a hidefocus="on" class="x-tree-node-anchor" href="',href,'" tabIndex="1" ',
+             a.hrefTarget ? ' target="'+a.hrefTarget+'"' : "", '><span unselectable="on">',n.text,"</span></a></div>",
+            '<ul class="x-tree-node-ct" style="display:none;"></ul>',
+            "</li>"].join('');
 
-//Ext.override(Ext.menu.Menu, {
-//	showAt : function(xy, parentMenu, /* private: */_e){
-//		this.parentMenu = parentMenu;
-//		if(!this.el){
-//			this.render();
-//		}
-//		if(_e !== false){
-//			this.fireEvent("beforeshow", this);
-//			xy = this.el.adjustForConstraints(xy);
-//		}
-//		this.el.setXY(xy);
-//
-//		//this.el.applyStyles('height: auto;');
-//
-//		// get max height from body height minus y cordinate from this.el
-//		var maxHeight = Ext.getBody().getHeight() - xy[1];
-//		// store orig element height
-//		if (!this.el.origHeight) {
-//			this.el.origHeight = this.el.getHeight();
-//		}
-//		// if orig height bigger than max height
-//		if (this.el.origHeight > maxHeight) {
-//			// set element with max height and apply scrollbar
-//			this.el.setHeight(maxHeight);
-//			this.el.applyStyles('overflow-y: auto;');
-//		} else {
-//		// set the orig height
-//		//this.el.setHeight(this.el.origHeight);
-//		}
-//
-//		this.el.show();
-//		this.hidden = false;
-//		this.focus();
-//		this.fireEvent("show", this);
-//	}
-//});
+        if(bulkRender !== true && n.nextSibling && (nel = n.nextSibling.ui.getEl())){
+            this.wrap = Ext.DomHelper.insertHtml("beforeBegin", nel, buf);
+        }else{
+            this.wrap = Ext.DomHelper.insertHtml("beforeEnd", targetNode, buf);
+        }
 
-
-/*
-* for Ubuntu new wave theme
-*/
-
-Ext.override(Ext.grid.GridView, {
-	scrollOffset:20
+        this.elNode = this.wrap.childNodes[0];
+        this.ctNode = this.wrap.childNodes[1];
+        var cs = this.elNode.childNodes;
+        this.indentNode = cs[0];
+        this.ecNode = cs[1];
+        this.iconNode = cs[2];
+        var index = 3;
+        if(cb){
+            this.checkbox = cs[3];
+            // fix for IE6
+            this.checkbox.defaultChecked = this.checkbox.checked;
+            index++;
+        }
+        this.anchor = cs[index];
+        this.textNode = cs[index].firstChild;
+    },
+	 getChildIndent : function(){
+        if(!this.childIndent){
+            var buf = [],
+                p = this.node;
+            while(p){
+                if(!p.isRoot || (p.isRoot && p.ownerTree.rootVisible)){
+                    if(!p.isLast()) {
+                        buf.unshift('<span class="x-tree-elbow-line"></span>');
+                    } else {
+                        buf.unshift('<span class="x-tree-icon"></span>');
+                    }
+                }
+                p = p.parentNode;
+            }
+            this.childIndent = buf.join("");
+        }
+        return this.childIndent;
+    }
 });
 
+Ext.override(Ext.grid.GridView, {
+	
+	origOnLoad: Ext.grid.GridView.prototype.onLoad,
+	
+	//emptyText: 	'<i>add_circle_outline</i><p>' +t("No items to display") + '</p>',
+
+
+	onLoad: function (store, records, options) {
+		
+		if(options.add) {
+			return;
+		}
+		this.origOnLoad.call(this, store, records, options);
+	}
+});
+
+Ext.override(Ext.grid.CheckboxSelectionModel, {
+	width: dp(40),
+});
+
+Ext.override(Ext.layout.ToolbarLayout, {
+	triggerWidth: dp(40)
+});
+
+/**
+ * Fixed issue were some fonts came 1 pixel short and would wrap to the second line
+ */
+Ext.override(Ext.Element, {
+	getTextWidth : function(text, min, max){
+      return (Ext.util.TextMetrics.measure(this.dom, Ext.value(text, this.dom.innerHTML, true)).width+1).constrain(min || 0, max || 1000000);
+   }
+});
 
 /* password vtype */ 
 Ext.apply(Ext.form.VTypes, {    
@@ -215,27 +271,18 @@ Ext.apply(Ext.form.VTypes, {
 		}
 		return true;
 	},
-	passwordText : GO.lang.passwordMatchError
+	passwordText : t("The passwords didn't match")
 });
 
  
-/**
- * Keep window in viewport and no shadows by default for IE performance
- */
-
-Ext.Window.override({
-	//shadow : false,
-	constrainHeader : true,
-	animCollapse : false
-});
 
 /*
  * Localization
  */
-Ext.MessageBox.buttonText.yes = GO.lang['cmdYes'];
-Ext.MessageBox.buttonText.no = GO.lang['cmdNo'];
-Ext.MessageBox.buttonText.ok = GO.lang['cmdOk'];
-Ext.MessageBox.buttonText.cancel = GO.lang['cmdCancel'];
+Ext.MessageBox.buttonText.yes = t("Yes");
+Ext.MessageBox.buttonText.no = t("No");
+Ext.MessageBox.buttonText.ok = t("Ok");
+Ext.MessageBox.buttonText.cancel = t("Cancel");
 
 
 /*
@@ -248,26 +295,16 @@ Ext.override(Ext.form.HtmlEditor, {
 	}
 }); */
 
-//only present when logged in.
-if(GO.settings.date_format){
-	Ext.override(Ext.DatePicker, {
-		startDay: parseInt(GO.settings.first_weekday)
-	});
-	
-	Ext.override(Ext.form.DateField, {
-		format: GO.settings.date_format,
-		startDay: parseInt(GO.settings.first_weekday)
-	});
 
-	Ext.override(Ext.form.DateField, {
-		format: GO.settings.date_format,
-		altFormats:GO.settings.date_format+"|"+GO.settings.date_format.replace("Y","y")
-	});
-}
 
 /*
 * Print elements
 */
+var noBoxAdjust = Ext.isStrict ? {
+    select:1
+} : {
+    input:1, select:1, textarea:1
+};
 Ext.override(Ext.Element, {
 	/**
      * @cfg {string} printCSS The file path of a CSS file for printout.
@@ -290,6 +327,9 @@ Ext.override(Ext.Element, {
      * @param config {object} (optional)
      */
 	,
+	isBorderBox : function(){
+        return this.isStyle('box-sizing', 'border-box') || Ext.isBorderBox || Ext.isForcedBorderBox || noBoxAdjust[(this.dom.tagName || "").toLowerCase()];
+   },
 	print: function(config) {
 
 		config = config || {};
@@ -380,50 +420,16 @@ Ext.decode = Ext.util.JSON.decode = function(jsonStr){
 			break;
 
 			case 'UNAUTHORIZED':
-				Ext.Msg.alert(GO.lang['strUnauthorized'], GO.lang['strUnauthorizedText']);
+				Ext.Msg.alert(t("Unauthorized"), t("You don't have permission to perform this action"));
 			break;
 
 			default:	
 				json += '<br /><br />Ext.decode exception occurred';
-				GO.errorDialog.show(GO.lang.serverError+'<br /><br />'+jsonStr);
+				GO.errorDialog.show(t("An error occurred on the webserver. Contact your system administrator and supply the detailed error.")+'<br /><br />'+jsonStr);
 				break;
 		}
 	}
 };
-
-
-/*
- * Don't position tooltip outside the screen
-
-
-Ext.override(Ext.ToolTip,{
-
-	adjustPosition : function(x, y){
-    // keep the position from being under the mouse
-    var ay = this.targetXY[1], h = this.getSize().height;
-    if(this.constrainPosition && y <= ay && (y+h) >= ay){
-        y = ay-h-5;
-    }
-    
-    var body = Ext.getBody();
-    var bodyHeight = body.getHeight();
-    var tipSize = this.getSize();
-    
-    if(y+tipSize.height>bodyHeight)
-    {
-    	y=bodyHeight-tipSize.height-5;
-    }
-    
-    if(y<0)
-    {
-    	y=5;
-    }
-    
-    return {x : x, y: y};
-  }    
-}); */
-
-
 
 Ext.apply(Ext.form.VTypes, {
     emailAddress:  function(v) {
@@ -434,10 +440,7 @@ Ext.apply(Ext.form.VTypes, {
     emailAddressMask: /[a-z0-9_\.\-\'@\+\&]/i
 });
 
-
-
-Ext.override(
-	Ext.grid.GridView,{
+Ext.override(Ext.grid.GridView,{
 		/**
      * @private
      * Renders the header row using the 'header' template. Does not inject the HTML into the DOM, just
@@ -592,3 +595,75 @@ Ext.override(Ext.layout.ToolbarLayout ,{
     }
 	}
 );
+
+Ext.menu.Item.prototype.itemTpl = new Ext.XTemplate(
+	'<a id="{id}" class="{cls} x-unselectable" hidefocus="true" unselectable="on" href="{href}"',
+		 '<tpl if="hrefTarget">',
+			  ' target="{hrefTarget}"',
+		 '</tpl>',
+	 '>',
+		  '<span class="x-menu-item-icon {iconCls}"></span>',
+		  '<span class="x-menu-item-text">{text}</span>',
+	 '</a>'
+);
+Ext.layout.MenuLayout.prototype.itemTpl = new Ext.XTemplate(
+	'<li id="{itemId}" class="{itemCls}">',
+		 '<tpl if="needsIcon">',
+			  '<span class="{iconCls}"><tpl if="icon"><img alt="{altText}" src="{icon}" /></tpl></span>',
+		 '</tpl>',
+	'</li>'
+);
+
+Ext.override(Ext.data.Field, {
+	dateFormat: "c" //from server
+});
+
+GO.mainLayout.onReady(function() {
+
+		//Override this when authenticated and mainlayout initializes
+		Ext.override(Ext.DatePicker, {
+			startDay: parseInt(GO.settings.first_weekday)
+		});
+
+		Ext.override(Ext.form.DateField, {
+			format: GO.settings.date_format,
+			startDay: parseInt(GO.settings.first_weekday),
+			altFormats: "Y-m-d|c|" + GO.settings.date_format.replace("Y","y"),
+			dtSeparator:' '
+		});
+
+		Ext.override(Ext.grid.DateColumn, {
+			align: "right",
+			format: GO.settings.date_format + " " + GO.settings.time_format
+		});
+	
+});
+
+Ext.override(Ext.Window, {
+	resizable : !GO.util.isMobileOrTablet(),
+	draggable: !GO.util.isMobileOrTablet(),
+	maximized: GO.util.isMobileOrTablet(),
+});
+
+Ext.override(Ext.Panel, {
+	origInitComponent : Ext.Panel.prototype.initComponent,
+	
+	initComponent : function() {
+		
+		if(GO.util.isMobileOrTablet()) {
+			this.split = false;
+			
+		}
+		
+		this.origInitComponent.call(this);
+	}
+});
+
+Ext.util.Format.dateRenderer = function(format) {
+		return function(v) {
+				return GO.util.dateFormat(v);
+		};
+};
+				
+				
+				

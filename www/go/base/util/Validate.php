@@ -291,26 +291,26 @@ class Validate {
 		$minUniqueChars=\GO::config()->password_require_uniq;
 		
 		
-		$str = \GO::t('passwordIsWeak')."\n\n";
+		$str = \GO::t("The entered password is not strong enough. It should comply to the following rules:")."\n\n";
 		
 		if($minLength && strlen($password)<$minLength){
-			$str .=  sprintf(\GO::t('passwordMinLength'),$minLength)."\n";
+			$str .=  sprintf(\GO::t("The minimum length is %s"),$minLength)."\n";
 		}
 		
 		if($requireUpperCase && !preg_match('/[A-Z]/', $password)){
-			$str .=  \GO::t('passwordRequireUc')."\n";
+			$str .=  \GO::t("It must contain at least one uppercase character")."\n";
 		}
 		
 		if($requireLowerCase && !preg_match('/[a-z]/', $password)){
-			$str .=  \GO::t('passwordRequireLc')."\n";
+			$str .=  \GO::t("It must contain at least one lowercase character")."\n";
 		}
 		
 		if($requireNumber && !preg_match('/[0-9]/', $password)){
-			$str .=  \GO::t('passwordRequireNum')."\n";
+			$str .=  \GO::t("It must contain at least one a number")."\n";
 		}
 		
 		if($requireSpecialChars && !preg_match('/[^\da-zA-Z]/', $password)){
-			$str .=  \GO::t('passwordRequireSc')."\n";
+			$str .=  \GO::t("It must contain at least one special character")."\n";
 		}
 		
 		if($minUniqueChars){
@@ -318,7 +318,7 @@ class Validate {
 			$arr = array_unique($arr);
 			
 			if(count($arr)<$minUniqueChars){
-				$str .=  sprintf(\GO::t('passwordUnique'),$minLength)."\n";
+				$str .=  sprintf(\GO::t("It must contain at least %s unique characters"),$minLength)."\n";
 			}
 		}
 		return $str;

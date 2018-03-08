@@ -4,12 +4,12 @@ GO.base.ColumnSelectPanel = Ext.extend(Ext.Panel,{
 
 		var cols = [{
 			dataIndex: 'name',
-			header: GO.lang.strName,
+			header: t("Name"),
 			id:'name',
 			sortable:true
 		},{
 			dataIndex: 'label',
-			header: GO.lang.label,
+			header: t("Label"),
 			id:'label',
 			sortable:true
 		}];
@@ -31,7 +31,7 @@ GO.base.ColumnSelectPanel = Ext.extend(Ext.Panel,{
 			enableDragDrop: true,
 			stripeRows: true,
 			autoExpandColumn: 'name',
-			title: GO.lang.availableColumns
+			title: t("Available columns")
 		});
 
 		this.selectedColGrid = new GO.grid.GridPanel({
@@ -43,18 +43,18 @@ GO.base.ColumnSelectPanel = Ext.extend(Ext.Panel,{
 			enableDragDrop: true,
 			stripeRows: true,
 			autoExpandColumn: 'name',
-			title: GO.lang.selectedColumns
+			title: t("Selected Columns")
 		});
 
 		this.helpText = new GO.form.HtmlComponent({
 			region: 'north',
 			hegith:30,
-			html:GO.lang.exportSelectHelpText,
+			html:t("Drag or double-click the columns you want to export from the left grid to the right."),
 			style:'padding:10px;background-color:#FFF;'
 		});
 
 		Ext.applyIf(this, {
-			title: GO.lang.columns,
+			title: t("Columns"),
 			layout: 'border',
 			items:[
 				this.helpText,

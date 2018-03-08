@@ -1,8 +1,8 @@
 <?php
-
-$l["mailboxes"]='Mailboxen';
-$l["createMailbox"]='Mailbox für Domäne anlegen';
-
-$l['name']='PostfixClient';
-$l['description']='Modul zur automatischen Mailbox-Erstellung bei aktiver PostfixVerwaltung';
-$l['connect_error']='Konnte keine Verbindung mit %s herstellen';
+return array (
+  'Mailboxes' => 'Mailboxen',
+  'Create a mailbox for domain' => 'Mailbox für Domäne anlegen',
+  'Could not connect to %s' => 'Konnte keine Verbindung mit %s herstellen',
+  'name' => 'PostfixClient',
+  'description' => 'Modul zur automatischen Mailbox-Erstellung bei aktiver PostfixVerwaltung',
+);

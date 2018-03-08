@@ -38,11 +38,19 @@ abstract class AbstractCustomFieldsRecord extends \GO\Base\Db\ActiveRecord{
 			return 'model_id';
 	}	
 	
+	
+	
 	public function init(){
 		//$className = $this->className();
 		$this->_getAllFields();		
+		
+		
 		return parent::init();
 	}
+	
+	
+	
+	
 	
 	public function tableName(){
 		return 'cf_'.$this->getExtendedModel()->tableName();
@@ -69,7 +77,7 @@ abstract class AbstractCustomFieldsRecord extends \GO\Base\Db\ActiveRecord{
 	 * 
 	 * @return \GO\Base\Db\ActiveRecord 
 	 */
-	protected function extendsModel(){
+	public function extendsModel(){
 		return false;
 	}
 	
@@ -100,7 +108,10 @@ abstract class AbstractCustomFieldsRecord extends \GO\Base\Db\ActiveRecord{
 								->ignoreAcl()
 								->joinRelation('category');
 				
-				$findParams->getCriteria()->addCondition('extends_model', $this->extendsModel(),'=','category');
+				$extendsModel = $this->extendsModel();
+				$entityId = $extendsModel::getType()->getId();;
+				
+				$findParams->getCriteria()->addCondition('entityId', $entityId, '=','category');
 				
 				$stmt = \GO\Customfields\Model\Field::model()->find($findParams);
 				
@@ -112,7 +123,7 @@ abstract class AbstractCustomFieldsRecord extends \GO\Base\Db\ActiveRecord{
 					self::$attributeLabels[$this->extendsModel()][$field->columnName()]=$field->category->name.':'.$field->name;
 
 					self::$cacheColumns[$this->extendsModel()][$field->columnName()]['customfield']=$field;
-					self::$cacheColumns[$this->extendsModel()][$field->columnName()]['regex']=$field->validation_regex;
+					self::$cacheColumns[$this->extendsModel()][$field->columnName()]['regex']=isset($field->options['validationRegex']) ? $field->options['validationRegex'] : "";
 					self::$cacheColumns[$this->extendsModel()][$field->columnName()]['gotype']='customfield';
 					self::$cacheColumns[$this->extendsModel()][$field->columnName()]['unique']=$field->unique_values;
 	
@@ -308,11 +319,15 @@ abstract class AbstractCustomFieldsRecord extends \GO\Base\Db\ActiveRecord{
 	 */
 	public function convertLabelKeyAttributes($categoryName, $labelValueArray) {
 
+		$cls = $this->extendsModel();
+		
+		$entityId = $cls::getType()->getId();;
+		
 		$stmt = Field::model()->find(array(
 				'ignoreAcl' => true,
-				'join' => 'INNER JOIN cf_categories c ON (t.category_id=c.id AND c.name=:categoryName)',
-				'where' => 'c.extends_model=:extends_model',
-				'bindParams' => array('extends_model' => $this->extendsModel(), 'categoryName' => $categoryName)
+				'join' => 'INNER JOIN cf_categories c ON (t.fieldSetId=c.id AND c.name=:categoryName)',
+				'where' => 'c.entityId=:entityId',
+				'bindParams' => array('entityId' => $entityId, 'categoryName' => $categoryName)
 						));
 
 		$fieldValueArray = array();
@@ -336,12 +351,12 @@ abstract class AbstractCustomFieldsRecord extends \GO\Base\Db\ActiveRecord{
 	public function getAttributeByName($categoryName, $fieldName, $outputType='raw'){
 
 		$category = Category::model()->findSingleByAttributes(array(
-				'extends_model'=>$this->extendsModel(),
+				'extendsModel'=>$this->extendsModel(),
 				'name'=>$categoryName
 		));
 		
 		$field = Field::model()->findSingleByAttributes(array(
-				'category_id'=>$category->id,
+				'fieldSetId'=>$category->id,
 				'name'=>$fieldName
 		));
 		if($field)
@@ -360,9 +375,8 @@ abstract class AbstractCustomFieldsRecord extends \GO\Base\Db\ActiveRecord{
 	 */
 	public function getValueByName($fieldNameString,$categoryNameString='') {		
 
-		$colId = $this->getColIdByName($fieldNameString, $categoryNameString);
-		if ($colId>0) {
-			$colName = 'col_'.$colId;
+		$colName = $this->getDatabaseNameByName($fieldNameString, $categoryNameString);
+		if ($colName) {
 			return $this->$colName;
 		} else {
 			return false;
@@ -377,10 +391,9 @@ abstract class AbstractCustomFieldsRecord extends \GO\Base\Db\ActiveRecord{
 	 * @param StringHelper $categoryNameString (Optional) The name of the custom field's category.
 	 */
 	public function setValueByName($fieldNameString,$value,$categoryNameString='', $save=true) {
-		$colId = $this->getColIdByName($fieldNameString, $categoryNameString);
-		if ($colId>0) {
-			$colName = 'col_'.$colId;
-			$this->$colName = $value;
+		$databaseName = $this->getDatabaseNameByName($fieldNameString, $categoryNameString);
+		if ($databaseName) {
+			$this->$databaseName = $value;
 			if($save && !$this->save()) {
 				\GO::debug('Save failed in '.$this->className().' when setting '.$fieldNameString.' in the category:'.$categoryNameString);
 			}	
@@ -389,21 +402,24 @@ abstract class AbstractCustomFieldsRecord extends \GO\Base\Db\ActiveRecord{
 		}
 	}
 	
-	public function getColIdByName($fieldNameString,$categoryNameString='') {
+	public function getDatabaseNameByName($fieldNameString,$categoryNameString='') {
 		$findParams = \GO\Base\Db\FindParams::newInstance()
 				->single()
-				->select('`t`.`id`')
+				->select('`t`.`databaseName`')
 				->joinModel(array(
 					'model' => 'GO\Customfields\Model\Category',
 					'localTableAlias' => 't',
-					'localField' => 'category_id',
+					'localField' => 'fieldSetId',
 					'foreignField' => 'id',
 					'tableAlias' => 'cat'
 				));
+		
+		$cls = $this->getExtendedModel()->className();
+		$entityId = $cls::getType()->getId();;
 
 		$findCriteria = \GO\Base\Db\FindCriteria::newInstance()
 						->addCondition('name', $fieldNameString, '=', 't')
-						->addCondition('extends_model', $this->getExtendedModel()->className(), '=', 'cat');
+						->addCondition('entityId', $entityId, '=', 'cat');
 		if (!empty($categoryNameString))
 			$findCriteria->addCondition('name',$categoryNameString, '=','cat');
 		
@@ -411,7 +427,7 @@ abstract class AbstractCustomFieldsRecord extends \GO\Base\Db\ActiveRecord{
 		
 		$fieldRecord = Field::model()->find($findParams);
 		if (!empty($fieldRecord))
-			return $fieldRecord->id;
+			return $fieldRecord->databaseName;
 		else
 			return false;
 	}
@@ -445,7 +461,7 @@ abstract class AbstractCustomFieldsRecord extends \GO\Base\Db\ActiveRecord{
 //				if (count($cfMatches)>1) {
 //					$cField = Field::model()->findByPk($cfMatches[1]);
 //					$cFieldPath = $cField->category->name.':'.$cField->name;
-//					$feedbackString = str_replace('%cf',$cFieldPath,\GO::t('duplicateExistsFeedback','customfields'));
+//					$feedbackString = str_replace('%cf',$cFieldPath,\GO::t("The value \"%val\" entered for the field \"%cf\" already exists in the database. The field value must be unique. Please enter a different value in that field.", "customfields"));
 //					throw new \Exception($feedbackString);
 //				} else {
 //					throw $e;

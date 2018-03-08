@@ -95,7 +95,7 @@ class LocalEvent extends \GO\Base\Model {
 		// If there is no user attached to this event (user_id = 0) then create a temporary user object
 //		if(!$event->user){
 //			$event->user = new \GO\Base\Model_User();
-//			$event->user->first_name = \GO::t('unknown').' '.\GO::t('user');
+//			$event->user->first_name = \GO::t("Unknown").' '.\GO::t("User");
 //		}
 		
 		$this->_initials[] = $event->user ? $event->user->getShortName() : '??';
@@ -112,7 +112,7 @@ class LocalEvent extends \GO\Base\Model {
 	
 	public function getResponseData(){
 		
-		$dayString = \GO::t('full_days');
+		$dayString = \GO::t("full_days");
 		
 		$response = $this->_event->getAttributes('formatted');
 
@@ -127,7 +127,7 @@ class LocalEvent extends \GO\Base\Model {
 //		$response['time_of_day'] = $this->getTimeOfDay();
         
 		$response['status'] = $this->_event->status;
-		$response['username'] = $this->_event->user ? $this->_event->user->getName() : \GO::t('unknown').' '.\GO::t('user');
+		$response['username'] = $this->_event->user ? $this->_event->user->getName() : \GO::t("Unknown").' '.\GO::t("User");
 		$response['musername'] = !empty($this->_event->mUser) ? $this->_event->mUser->getName() : '';
 		
 //		if($this->_event->status==Event::STATUS_CANCELLED){			
@@ -159,7 +159,7 @@ class LocalEvent extends \GO\Base\Model {
 		$response['resources'] = array();
 		
 		if($response['private']){
-			$response['name']=\GO::t('private','calendar');
+			$response['name']=\GO::t("Private", "calendar");
 			$response['description']="";
 			$response['location']="";
 			$response['repeats'] = false;
@@ -203,7 +203,7 @@ class LocalEvent extends \GO\Base\Model {
 		if($duration >= 60){
 			$durationHours = floor($duration / 60);
 			$durationRestMinutes = $duration % 60;
-			$response['duration'] = $durationHours.' '.\GO::t('hours').', '.$durationRestMinutes.' '.\GO::t('mins');
+			$response['duration'] = $durationHours.' '.\GO::t("hours").', '.$durationRestMinutes.' '.\GO::t("Mins");
 		} else {
 			$response['duration'] = $duration.'m';
 		}
@@ -399,7 +399,7 @@ class LocalEvent extends \GO\Base\Model {
 	 * @return StringHelper 
 	 */
 	public function getDay(){
-		$dayString = \GO::t('full_days','common');
+		$dayString = \GO::t("full_days", "common");
 		return $dayString[date('w',$this->_event->start_time)];
 	}
 	

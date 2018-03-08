@@ -1,5 +1,6 @@
 <?php
-
+//Breaks forms with file inputs :(
+//header('Content-Type: application/json;charset=utf-8');
 $string = json_encode($data);
 
 if($string === false) {

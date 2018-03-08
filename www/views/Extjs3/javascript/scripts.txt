@@ -1,8 +1,10 @@
+views/Extjs3/javascript/common.js
+
+views/Extjs3/javascript/MainLayout.js
 views/Extjs3/javascript/overrides.js
 views/Extjs3/javascript/ModuleManager.js
 views/Extjs3/javascript/Date.js
-views/Extjs3/javascript/DeployJava.js
-views/Extjs3/javascript/MainLayout.js
+
 views/Extjs3/javascript/ColumnFitLayout.js
 views/Extjs3/javascript/windows/Window.js
 views/Extjs3/javascript/windows/PasswordDialog.js
@@ -29,10 +31,9 @@ modules/users/PasswordPanel.js
 modules/users/Settings.js
 
 
-views/Extjs3/javascript/common.js
+
 views/Extjs3/javascript/windows/LoginDialog.js
 
-views/Extjs3/javascript/plugins/livegrid-all-debug.js
 views/Extjs3/javascript/data/JsonStore.js
 views/Extjs3/javascript/data/GroupingStore.js
 
@@ -99,19 +100,7 @@ views/Extjs3/javascript/panels/PermissionsPanel.js
 
 views/Extjs3/javascript/NewMenuButton.js
 
-views/Extjs3/javascript/links/LinkFolderWindow.js
-views/Extjs3/javascript/links/SelectLink.js
-views/Extjs3/javascript/links/LinksTree.js
-views/Extjs3/javascript/links/LinksGrid.js
-views/Extjs3/javascript/links/LinksDialog.js
-views/Extjs3/javascript/links/LinksPanel.js
-views/Extjs3/javascript/links/LinksTemplate.js
-views/Extjs3/javascript/links/LinksContextMenu.js
-views/Extjs3/javascript/links/LinkBrowser.js
-views/Extjs3/javascript/links/LinkViewWindow.js
-views/Extjs3/javascript/links/LinkTypeFilterPanel.js
-views/Extjs3/javascript/links/LinkDescriptionField.js
-views/Extjs3/javascript/links/ExternalLinkHandler.js
+
 
 views/Extjs3/javascript/panels/SearchPanel.js
 views/Extjs3/javascript/checker.js
@@ -125,7 +114,6 @@ views/Extjs3/javascript/panels/PortalColumn.js
 views/Extjs3/javascript/panels/Portlet.js
 views/Extjs3/javascript/panels/QuickAddPanel.js
 
-views/Extjs3/javascript/SWFObject/swfobject.js
 views/Extjs3/javascript/form/UploadPCForm.js
 views/Extjs3/javascript/Export.js
 
@@ -242,3 +230,75 @@ views/Extjs3/javascript/calendar/EventEditForm.js
 views/Extjs3/javascript/calendar/EventEditWindow.js
 views/Extjs3/javascript/calendar/EventRecord.js
 views/Extjs3/javascript/calendar/WeekEventRenderer.js
+
+
+views/Extjs3/javascript/go/go.js
+
+
+
+views/Extjs3/javascript/go/flux/Dispatcher.js
+views/Extjs3/javascript/go/flux/Store.js
+views/Extjs3/javascript/go/Jmap.js
+
+views/Extjs3/javascript/go/data/JmapProxy.js
+views/Extjs3/javascript/go/data/Store.js
+views/Extjs3/javascript/go/data/GroupingStore.js
+
+views/Extjs3/javascript/go/data/EntityStore.js
+views/Extjs3/javascript/go/EntityManager.js
+views/Extjs3/javascript/go/ModuleManager.js
+
+views/Extjs3/javascript/go/grid/GridPanel.js
+views/Extjs3/javascript/go/grid/SelectAllCheckBox.js
+
+
+views/Extjs3/javascript/go/Window.js
+views/Extjs3/javascript/go/form/FormWindow.js
+views/Extjs3/javascript/go/form/FormFieldSet.js
+views/Extjs3/javascript/go/form/BasicForm.js
+views/Extjs3/javascript/go/form/DateField.js
+views/Extjs3/javascript/go/form/ComboBox.js
+views/Extjs3/javascript/go/form/multiselect/Field.js
+views/Extjs3/javascript/go/form/multiselect/Window.js
+
+views/Extjs3/javascript/go/panels/CreateModifyTpl.js
+views/Extjs3/javascript/go/panels/LinksTpl.js
+views/Extjs3/javascript/go/panels/DetailView.js
+views/Extjs3/javascript/go/panels/Panel.js
+views/Extjs3/javascript/go/Toolbar.js
+views/Extjs3/javascript/go/Notifier.js
+
+views/Extjs3/javascript/go/layout/ResponsiveLayout.js
+
+
+views/Extjs3/javascript/go/AuthenticationManager.js
+views/Extjs3/javascript/go/login/LanguageCombobox.js
+views/Extjs3/javascript/go/login/LoginDialog.js
+views/Extjs3/javascript/go/login/BaseLoginPanel.js
+views/Extjs3/javascript/go/login/ForgotPanel.js
+views/Extjs3/javascript/go/login/UsernamePanel.js
+views/Extjs3/javascript/go/login/LoginPanel.js
+views/Extjs3/javascript/go/login/RecoveryDialog.js
+
+views/Extjs3/javascript/go/CustomFields.js
+views/Extjs3/javascript/go/Links.js
+views/Extjs3/javascript/go/links/LinkToButton.js
+views/Extjs3/javascript/go/links/CreateLinkWindow.js
+views/Extjs3/javascript/go/links/LinkBrowser.js
+views/Extjs3/javascript/go/links/LinksDetailPanel.js
+
+views/Extjs3/javascript/go/usersettings/AccountSettingsPanel.js
+views/Extjs3/javascript/go/usersettings/LookAndFeelPanel.js
+views/Extjs3/javascript/go/usersettings/UserSettingsDialog.js
+
+views/Extjs3/javascript/go/Router.js
+views/Extjs3/javascript/go/Search.js
+views/Extjs3/javascript/go/PasswordPrompt.js
+
+views/Extjs3/javascript/go/User.js
+views/Extjs3/javascript/go/String.js
+
+views/Extjs3/javascript/go/detail/ReadMore.js
+
+views/Extjs3/javascript/go/acl/ShareWindow.js
+

@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: MailboxDialog.js 21340 2017-07-31 07:59:42Z devdevilnl $
+ * @version $Id: MailboxDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -34,17 +34,17 @@
 //	config.width=700;
 //	config.height=500;
 //	config.closeAction='hide';
-//	config.title= GO.postfixadmin.lang.mailbox;					
+//	config.title= t("Mailbox", "postfixadmin");					
 //	config.items= this.formPanel;
 //	config.focus= focusFirstField.createDelegate(this);
 //	config.buttons=[{
-//			text: GO.lang['cmdOk'],
+//			text: t("Ok"),
 //			handler: function(){
 //				this.submitForm(true);
 //			},
 //			scope: this
 //		},{
-//			text: GO.lang['cmdClose'],
+//			text: t("Close"),
 //			handler: function(){
 //				this.hide();
 //			},
@@ -62,7 +62,7 @@ GO.postfixadmin.MailboxDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 	initComponent : function(){
 		Ext.apply(this, {
 			titleField:'username',
-			title: GO.postfixadmin.lang.mailbox,
+			title: t("Mailbox", "postfixadmin"),
 			formControllerUrl: 'postfixadmin/mailbox',
 			width:700,
 			height:500
@@ -140,7 +140,7 @@ GO.postfixadmin.MailboxDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 //		this.formPanel.form.submit(
 //		{
 //			url: GO.url('postfixadmin/mailbox/submit'),
-//			waitMsg:GO.lang['waitMsgSave'],
+//			waitMsg:t("Saving..."),
 //			success:function(form, action){
 //				
 //				this.fireEvent('save', this);
@@ -159,9 +159,9 @@ GO.postfixadmin.MailboxDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 //			failure: function(form, action) {
 //				if(action.failureType == 'client')
 //				{					
-//					Ext.MessageBox.alert(GO.lang['strError'], GO.lang['strErrorsInForm']);			
+//					Ext.MessageBox.alert(t("Error"), t("You have errors in your form. The invalid fields are marked."));			
 //				} else {
-//					Ext.MessageBox.alert(GO.lang['strError'], action.result.feedback);
+//					Ext.MessageBox.alert(t("Error"), action.result.feedback);
 //				}
 //			},
 //			scope: this
@@ -173,7 +173,7 @@ GO.postfixadmin.MailboxDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 	buildForm : function () {
 		
 		this.propertiesPanel = new Ext.Panel({
-			title:GO.lang['strProperties'],			
+			title:t("Properties"),			
 			cls:'go-form-panel',waitMsgTarget:true,			
 			layout:'form',
 			autoScroll:true,
@@ -185,7 +185,7 @@ GO.postfixadmin.MailboxDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 			},{
 					xtype:'compositefield',
 					anchor:'-20',
-					fieldLabel: GO.postfixadmin.lang.username,
+					fieldLabel: t("Username", "postfixadmin"),
 					items:[{
 							xtype: 'textfield',
 							name: 'username',
@@ -203,32 +203,32 @@ GO.postfixadmin.MailboxDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 			  name: 'password',
 				anchor: '-20',
 			  allowBlank:false,
-			  fieldLabel: GO.postfixadmin.lang.password
+			  fieldLabel: t("Password", "postfixadmin")
 			},{
 				xtype: 'textfield',
 				inputType: 'password',
 			  name: 'password2',
 				anchor: '-20',
 			  allowBlank:false,
-			  fieldLabel: GO.postfixadmin.lang.confirmPassword
+			  fieldLabel: t("Confirm password", "postfixadmin")
 			},{
 				xtype: 'textfield',
 			  name: 'name',
 				anchor: '-20',
-			  fieldLabel: GO.lang.strName
+			  fieldLabel: t("Name")
 			},new GO.form.NumberField({
 				decimals:"0",				
 			  name: 'quota',
 				anchor: '-20',
 			  allowBlank:false,
-			  fieldLabel: GO.postfixadmin.lang.quota,
+			  fieldLabel: t("Quota (MB)", "postfixadmin"),
 			  value: 0
 			}),{
 				xtype: 'xcheckbox',
 			  name: 'active',
 				anchor: '-20',
 //			  allowBlank:false,
-			  boxLabel: GO.postfixadmin.lang.active,
+			  boxLabel: t("Active", "postfixadmin"),
 			  hideLabel: true,
 			  checked:true
 			}]
@@ -237,7 +237,7 @@ GO.postfixadmin.MailboxDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 		this.addPanel(this.propertiesPanel);
 
 //    this.vacationPanel = new Ext.Panel({
-//			title:GO.postfixadmin.lang.vacation,			
+//			title:t("Automatic reply", "postfixadmin"),			
 //			cls:'go-form-panel',waitMsgTarget:true,			
 //			layout:'form',
 //			autoScroll:true,
@@ -246,19 +246,19 @@ GO.postfixadmin.MailboxDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 //				xtype: 'checkbox',
 //			  name: 'vacation_active',
 //				anchor: '-20',
-//			  boxLabel: GO.postfixadmin.lang.vacationActive,
+//			  boxLabel: t("Enable automatic reply", "postfixadmin"),
 //			  hideLabel: true
 //			  
 //			},{
 //				xtype: 'textfield',
 //			  name: 'vacation_subject',
 //				anchor: '-20',
-//			  fieldLabel: GO.postfixadmin.lang.subject
+//			  fieldLabel: t("Subject", "postfixadmin")
 //			},{
 //				xtype: 'textarea',
 //			  name: 'vacation_body',
 //				anchor: '-20',
-//			  fieldLabel: GO.postfixadmin.lang.body
+//			  fieldLabel: t("Body", "postfixadmin")
 //			}]
 //				
 //		});

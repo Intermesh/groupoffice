@@ -8,10 +8,10 @@ class BlockController extends \GO\Base\Controller\AbstractJsonController{
 	protected function actionManageStore($params) {
 		
 		$columnModel = new \GO\Base\Data\ColumnModel(\GO\Customfields\Model\Block::model());
-		$columnModel->formatColumn('col_id', '"col_".$model->customField->id', array(), 'field_id');
+		$columnModel->formatColumn('col_id', '"col_".$model->customField->databaseName', array(), 'field_id');
 		$columnModel->formatColumn('customfield_name', '$model->customField->name', array(), 'field_id');
 		$columnModel->formatColumn('customfield_datatype', '$model->customField->datatype', array(), 'field_id');
-		$columnModel->formatColumn('extends_model', '$model->customField->category->extends_model', array(), 'field_id');
+		$columnModel->formatColumn('extendsModel', '$model->customField->category->extendsModel', array(), 'field_id');
 
 		$findParams = \GO\Base\Db\FindParams::newInstance()
 			->joinModel(array(
@@ -25,7 +25,7 @@ class BlockController extends \GO\Base\Controller\AbstractJsonController{
 			->joinModel(array(
 				'model'=>'GO\Customfields\Model\Category',
 				'localTableAlias'=>'cf',
-				'localField'=>'category_id',
+				'localField'=>'fieldSetId',
 				'foreignField'=>'id',
 				'tableAlias'=>'cfcat',
 				'type'=>'INNER'
@@ -36,7 +36,7 @@ class BlockController extends \GO\Base\Controller\AbstractJsonController{
 				'a'
 				)
 			->join(
-				'go_users_groups',
+				'core_user_group',
 				\GO\Base\Db\FindCriteria::newInstance()->addRawCondition('a.group_id', 'ug.group_id'),
 				'ug',
 				'LEFT'
@@ -74,7 +74,7 @@ class BlockController extends \GO\Base\Controller\AbstractJsonController{
 		else
 			$blockModel = new \GO\Customfields\Model\Block();
 		
-		$remoteComboFields = array('field_id' => '"[".\GO::t($model->customField->category->extends_model,"customfields")."] ".$model->customField->category->name." : ".$model->customField->name." (col_".$model->id.")"');
+		$remoteComboFields = array('field_id' => '"[".\GO::t($model->customField->category->extendsModel,"customfields")."] ".$model->customField->category->name." : ".$model->customField->name." (".$model->databaseName.")"');
 		
 		echo $this->renderForm($blockModel,$remoteComboFields);
 		
@@ -83,10 +83,10 @@ class BlockController extends \GO\Base\Controller\AbstractJsonController{
 	protected function actionEnableStore($params) {
 				
 		$columnModel = new \GO\Base\Data\ColumnModel(\GO\Customfields\Model\Block::model());
-		$columnModel->formatColumn('col_id', '"col_".$model->customField->id', array(), 'field_id');
+		$columnModel->formatColumn('col_id', '$model->customField->databaseName', array(), 'field_id');
 		$columnModel->formatColumn('customfield_name', '$model->customField->name', array(), 'field_id');
 		$columnModel->formatColumn('customfield_datatype', '$model->customField->datatype', array(), 'field_id');
-		$columnModel->formatColumn('extends_model', '$model->customField->category->extends_model', array(), 'field_id');
+		$columnModel->formatColumn('extendsModel', '$model->customField->category->extendsModel', array(), 'field_id');
 		$columnModel->formatColumn('enabled', '!empty($model->enabled_block_id)', array(), 'enabled_block_id');
 
 		$findParams = \GO\Base\Db\FindParams::newInstance()
@@ -113,7 +113,7 @@ class BlockController extends \GO\Base\Controller\AbstractJsonController{
 			->joinModel(array(
 				'model'=>'GO\Customfields\Model\Category',
 				'localTableAlias'=>'cf',
-				'localField'=>'category_id',
+				'localField'=>'fieldSetId',
 				'foreignField'=>'id',
 				'tableAlias'=>'cfcat',
 				'type'=>'INNER'
@@ -124,7 +124,7 @@ class BlockController extends \GO\Base\Controller\AbstractJsonController{
 				'a'
 				)
 			->join(
-				'go_users_groups',
+				'core_user_group',
 				\GO\Base\Db\FindCriteria::newInstance()->addRawCondition('a.group_id', 'ug.group_id'),
 				'ug',
 				'LEFT'

@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: UserPriceDialog.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: UserPriceDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Michael de Hart <mdhart@intermesh.nl>
  */
@@ -17,7 +17,7 @@ GO.servermanager.UserPriceDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		Ext.apply(this, {
 			goDialogId:'sm-userPrice',
 			layout:'fit',
-			title:GO.servermanager.lang.users,
+			title:t("users", "servermanager"),
 			width: 400,
 			height: 120,
 			resizable:false,
@@ -36,14 +36,14 @@ GO.servermanager.UserPriceDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			items: [
 				{
 					xtype: 'numberfield',
-					fieldLabel: GO.servermanager.lang.users,
+					fieldLabel: t("users", "servermanager"),
 					name: 'max_users',
 					allowBlank: false,
 					decimals: 0
 				},
 				{
 					xtype: 'numberfield',
-					fieldLabel: GO.servermanager.lang.price,
+					fieldLabel: t("price", "servermanager"),
 					name: 'price_per_month',
 					allowBlank:false
 				}

@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: PricePanel.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: PricePanel.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Michael de Hart <mdhart@intermesh.nl>
  */
@@ -17,21 +17,21 @@ GO.servermanager.PricePanel = function(config)
 
 	config.border=true;
 	config.hideLabel=true;
-	config.title = GO.servermanager.lang.userPricing;
+	config.title = t("userPricing", "servermanager");
 	config.layout='border';
 	config.labelWidth=140;
 	
 	config.items=[{
 			xtype:'panel',
 			region:'north',
-			title:GO.servermanager.lang.space,
+			title:t("space", "servermanager"),
 			height:80,
 			bodyStyle: 'padding:5px',
 			items:[
 			{
 				xtype: 'compositefield',
 				labelWidth: 70,
-				fieldLabel: GO.servermanager.lang.mbsIncluded,
+				fieldLabel: t("mbsIncluded", "servermanager"),
 				items: [
 				{
 					xtype:'label',
@@ -45,14 +45,14 @@ GO.servermanager.PricePanel = function(config)
 				}),
 				{
 					xtype:'label',
-					text: 'MB '+GO.servermanager.lang.perUser
+					text: 'MB '+t("perUser", "servermanager")
 					}
 				]
 			},
 			{
 				xtype: 'compositefield',
 				labelWidth: 70,
-				fieldLabel: GO.servermanager.lang.extraMbs,
+				fieldLabel: t("extraMbs", "servermanager"),
 				items: [
 				{
 					xtype:'label',
@@ -65,7 +65,7 @@ GO.servermanager.PricePanel = function(config)
 				}),
 				{
 					xtype:'label',
-					text:GO.servermanager.lang.perMonth+'/GB'
+					text:t("perMonth", "servermanager")+'/GB'
 				}
 				]
 			}

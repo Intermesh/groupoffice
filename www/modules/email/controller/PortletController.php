@@ -177,10 +177,10 @@ class PortletController extends \GO\Base\Controller\AbstractModelController {
 						if (strpos($e->getMessage(),'Authentication failed')==0) {
 							$node['isAccount'] = false;
 							$node['hasError'] = true;
-							$node['text'] .= ' ('.\GO::t('error').')';
+							$node['text'] .= ' ('.\GO::t("Error").')';
 							$node['children']=array();
 							$node['expanded']=true;
-							$node['qtipCfg'] = array('title'=>\GO::t('error'), 'text' =>htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8'));	
+							$node['qtipCfg'] = array('title'=>\GO::t("Error"), 'text' =>htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8'));	
 						} else {
 							throw $e;
 						}

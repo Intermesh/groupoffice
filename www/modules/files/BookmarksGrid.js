@@ -2,12 +2,13 @@ GO.files.BookmarksGrid = function(config) {
 	
 	var config = config || {};
 	
-	config.title = GO.files.lang['bookmarks'];
+	config.title = t("Favorites", "files");
 	config.collapsible=true;
 	config.stateId='fs-bookmarks';
 	config.layout = 'fit';
 	config.split = true;
 	config.paging = false;
+	config.cls = 'go-grid3-hide-headers';
 	config.height = 200;
 	config.store = new GO.data.JsonStore({
 		url:GO.url("files/bookmark/store"),
@@ -16,7 +17,7 @@ GO.files.BookmarksGrid = function(config) {
 		remoteSort:true
 	});
 	config.columns = [{
-		header:GO.lang['strName'],
+		header:t("Name"),
 		dataIndex: 'name',
 //					renderer:function(v, metaData,record){
 //						return '<div class="go-grid-icon filetype filetype-'+record.get("extension")+'">'+v+'</div>';
@@ -34,7 +35,7 @@ GO.files.BookmarksGrid = function(config) {
 //			items:[this.searchField = new GO.form.SearchField({
 //				store: config.store,
 //				width:120,
-//				emptyText: GO.lang.strSearch
+//				emptyText: t("Search")
 //			})],
 			store:config.store,
 			pageSize:GO.settings.config.nav_page_size
@@ -70,7 +71,7 @@ Ext.extend(GO.files.BookmarksGrid,GO.grid.GridPanel,{
 			minWidth : 180,
 			items : [{
 				iconCls: 'btn-delete',
-				text: GO.lang.cmdDelete,
+				text: t("Delete"),
 				cls: 'x-btn-text-icon',
 				handler: function(){
 					this._promptDelete(this._clickedBookmarkRecord);

@@ -1,5 +1,5 @@
-GO.mainLayout.onReady(function(){
-	 Ext.Msg.confirm(GO.demodata.lang.addDemoData, GO.demodata.lang.confirm, function(btn){
+go.ModuleManager.onReady(function(){
+	 Ext.Msg.confirm(t("Add demo data?", "demodata"), t("Welcome to Group-Office! We can add some demo users and demonstration data to Group-Office. All users will have the password 'demo'. Do you want to add this?", "demodata"), function(btn){
 		if(btn=='yes'){
 			document.location=GO.url('demodata/demodata/create');
 		}else
@@ -7,7 +7,7 @@ GO.mainLayout.onReady(function(){
 			GO.request({
 				url:'modules/module/delete',
 				params:{
-					id:'demodata'
+					id: go.stores.Module.findBy(function(mod) {console.log(mod);return mod.name == 'demodata';}).id
 				}
 			})
 		}

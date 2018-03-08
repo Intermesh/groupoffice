@@ -9,31 +9,24 @@
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
-
-GO.addressbook.AdvancedSearchWindow = function(config){
-
-	config = config || {};
-
-	config.title = GO.addressbook.lang.advancedSearch;
-	//config.closable=true;
-//	config.width=400;
-//	config.height=600;
-	config.border=false;
-	config.collapsible=true;
+GO.addressbook.AdvancedSearchWindow = Ext.extend(GO.Window, {
 	
-	config.stateId = 'ab-adv-search-window';
-	
-	config.layout='card';
-		config.layoutConfig={
-			deferredRender:false,
-			layoutOnCardChange:true
-		};
-	config.modal=false;
-	config.resizable=true;
-	config.width=900;
-	config.height=350;
-	config.closeAction='hide';
-	config.items = [{
+	title: t("Advanced search", "addressbook"),
+	collapsible: true,
+	stateId: 'ab-adv-search-window',
+	layout: 'card',
+	layoutConfig: {
+		deferredRender: false,
+		layoutOnCardChange: true
+	},
+	resizable: true,
+	width: 900,
+	height: 650,
+	closeAction: 'hide',
+	queryId : 0,
+	initComponent: function() {
+		
+		this.items = [{
 			layout:'border',
 			items:[this._contactsQueryPanel = new GO.query.QueryPanel({
 					region:'center',
@@ -43,7 +36,6 @@ GO.addressbook.AdvancedSearchWindow = function(config){
 					region: 'west',
 					queryPanel: this._contactsQueryPanel,
 					width:120,
-					split:true,
 					modelName:'GO\\Addressbook\\Model\\Contact'
 				})]
 		},{
@@ -55,18 +47,14 @@ GO.addressbook.AdvancedSearchWindow = function(config){
 				}), this._companiesQueriesGrid = new GO.query.SavedQueryGrid({
 					region: 'west',
 					width:120,
-					split:true,
 					queryPanel: this._companiesQueryPanel,
 					modelName:'GO\\Addressbook\\Model\\Company'
 				})
 			]
 		}];
-		
-	
 
-		
-		config.buttons=[{
-			text: GO.lang['cmdSave'],
+		this.buttons= [{
+			text: t("Save"),
 			handler: function(){
 				if(this._getModelName()=='GO\\Addressbook\\Model\\Company')
 					this._companiesQueriesGrid.showSavedQueryDialog();
@@ -75,26 +63,15 @@ GO.addressbook.AdvancedSearchWindow = function(config){
 			},
 			scope: this
 		},{
-			text: GO.lang.executeQuery,
+			text: t("Execute query"),
 			handler: function(){
 				this.search();
 			},
 			scope: this
-		},{
-			text: GO.lang['cmdClose'],
-			handler: function(){
-				this.hide();
-			},
-			scope:this
 		}];
-
-	GO.addressbook.AdvancedSearchWindow.superclass.constructor.call(this,config);
-
-}
-
-Ext.extend(GO.addressbook.AdvancedSearchWindow, GO.Window, {
-	
-	queryId : 0,
+		
+		GO.addressbook.AdvancedSearchWindow.superclass.initComponent.call(this);
+	},
 	
 	/*
 	 * Sets whether, during the time of use of this window, the data type is
@@ -103,7 +80,7 @@ Ext.extend(GO.addressbook.AdvancedSearchWindow, GO.Window, {
 	 */
 	updateDataType : function(type,masterPanel) {
 		if (type!='companies' && type!='contacts')
-			Ext.MessageBox.alert(GO.lang.strWarning,"AdvancedSearchWindow.updateDataType() parameter must be either 'contacts' or 'companies'.");
+			Ext.MessageBox.alert(t("strWarning"),"AdvancedSearchWindow.updateDataType() parameter must be either 'contacts' or 'companies'.");
 		
 		if (type=='contacts')
 			this.getLayout().setActiveItem(0);
@@ -161,8 +138,8 @@ Ext.extend(GO.addressbook.AdvancedSearchWindow, GO.Window, {
 	reset : function(){
 		this.externalTargetGrid.store.removeAll();
 		this.externalTargetGrid.setDisabled(true);
-//		this.setTitle(GO.filesearch.lang.filesearch);
-		this.externalTargetGrid.exportTitle=GO.lang.strSearch;
+//		this.setTitle(t("Search files", "filesearch"));
+		this.externalTargetGrid.exportTitle=t("Search");
 	}
 	
 	

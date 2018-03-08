@@ -28,7 +28,7 @@ class AccessDenied extends \Exception
 
 	public function __construct($message='') {
 		
-		$message = empty($message) ? \GO::t('accessDenied') : \GO::t('accessDenied')."\n\n".$message;
+		$message = empty($message) ? \GO::t("Access denied") : \GO::t("Access denied")."\n\n".$message;
 		
 		parent::__construct($message);
 	}

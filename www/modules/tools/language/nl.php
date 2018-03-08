@@ -1,16 +1,15 @@
 <?php
-
-
-$l['name']='Systeembeheer';
-$l['dbcheck']='Database controleren';
-$l['rm_duplicates']='Verwijder dubbele contacten en afspraken';
-$l['backupdb']='Backup database';
-$l['index_files']='Indexeer alle bestanden';
-$l['buildsearchcache']='Maak zoek index';
-$l['checkmodules']='Controleer modules';
-$l["tools"]='Systeembeheer';
-$l["description"]='Klik op een van de scripts hieronder om deze uit te voeren.';
-$l["scripts"]='Scripts';
-$l["scriptOutput"]='Script uitvoer';
-
-$l['resetState']='Alle vensters en tabellen terugzetten naar fabrieksinstellingen';
+return array (
+  'Database check' => 'Database controleren',
+  'Remove duplicate contacts and events' => 'Verwijder dubbele contacten en afspraken',
+  'Index all files' => 'Indexeer alle bestanden',
+  'Create search index' => 'Maak zoek index',
+  'Check modules' => 'Controleer modules',
+  'Admin tools' => 'Systeembeheer',
+  'Script output' => 'Script uitvoer',
+  'Reset state of windows, grids etc.' => 'Alle vensters en tabellen terugzetten naar fabrieksinstellingen',
+  'name' => 'Systeembeheer',
+  'description' => 'Klik op een van de scripts hieronder om deze uit te voeren.',
+  'Backup database' => 'Backup database',
+  'Scripts' => 'Scripts',
+);

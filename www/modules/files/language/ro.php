@@ -1,38 +1,43 @@
 <?php
-
-
-$l['name'] = 'Fişier';
-$l['description'] = 'Modul fişier; Modul pentru partajarea fişierelor.';
-$l['fileNotFound'] = 'Fişierul nu a fost găsit';
-$l['folderExists'] = 'Fişierul există deja';
-$l['filenameExists'] = 'Numele fişierului exista deja';
-$l['uploadedSucces'] = 'Încărcarea a fost terminată cu succes';
-$l['ootextdoc']='Document Open-Office Text';
-$l['wordtextdoc']='Document Microsoft Word';
-$l['personal']='Personal';
-$l['shared']='Partajat';
-$l['general']='General';
-$l['folder_modified_subject']='Modificari la fişierul {product_name}';
-$l['folder_modified_body']='Ai cerut notificarea schimbărilor de la:
+return array (
+  'Sorry, the file you tried to download is not found.' => 'Fişierul nu a fost găsit',
+  'The folder already exists' => 'Fişierul există deja',
+  'Filename %s already exists' => 'Numele fişierului exista deja',
+  'File uploaded successfully' => 'Încărcarea a fost terminată cu succes',
+  'Open-Office Text document' => 'Document Open-Office Text',
+  'Microsoft Word document' => 'Document Microsoft Word',
+  'Shared' => 'Partajat',
+  'Changes to {product_name} folder' => 'Modificari la fişierul {product_name}',
+  'You requested to be notified when changes are made to:
+%s
+The following changes were made by %s:
+%s;
+' => 'Ai cerut notificarea schimbărilor de la:
 %s
 Modificările a fost făcute de %s:
 %s;
-';
-$l['modified']='Modificat';
-$l['new']='Nou';
-$l['deleted']='Şters';;
-$l["files"]='Dosar';
-$l["template"]= 'Model';
-$l["manageTemplates"]= 'Administrează modelele';
-$l["downloadTemplate"]= 'Descarcă modelul';
-$l["enterName"]= 'Introdu un nume';
-$l["pleaseEnterName"]= 'Introdu un nume';
-$l["pleaseEnterNameArchive"]= 'Introdu numele de arhivă?';
-$l["startTransfer"]= 'Începe transferul';
-$l["addFolder"]= 'Adaugă un fişier';
-$l["errorOneItem"]= 'Alege numai un fişier';
-$l["activateSharing"]= 'Activează partajarea';
-$l["notifyChanges"]= 'Comunică-mi dacă sunt modificări în acest fişier';
-$l["comments"]= 'Note';
-$l["downloadGOTA"]= 'Descarcă cu GOTA';
-$l["fileBrowser"]= 'Răsfoieşte dosarul';
+',
+  'Modified' => 'Modificat',
+  'New' => 'Nou',
+  'Deleted' => 'Şters',
+  'Template' => 'Model',
+  'Manage templates' => 'Administrează modelele',
+  'Download template' => 'Descarcă modelul',
+  'Enter a name' => 'Introdu un nume',
+  'Please enter a name' => 'Introdu un nume',
+  'Please enter a name for the archive' => 'Introdu numele de arhivă?',
+  'Start transfer' => 'Începe transferul',
+  'Add folder' => 'Adaugă un fişier',
+  'Please select only one item' => 'Alege numai un fişier',
+  'Activate sharing' => 'Activează partajarea',
+  'Notify me about changes in this folder' => 'Comunică-mi dacă sunt modificări în acest fişier',
+  'Comments' => 'Note',
+  'Download with GOTA' => 'Descarcă cu GOTA',
+  'File browser' => 'Răsfoieşte dosarul',
+  'name' => 'Dosar',
+  'description' => 'Modul fişier; Modul pentru partajarea fişierelor.',
+  'Personal' => 'Personal',
+  'General' => 'General',
+  'Changes to Group-Office folder' => 'Modificari la fişierul {product_name}',
+  'Files' => 'Dosar',
+);

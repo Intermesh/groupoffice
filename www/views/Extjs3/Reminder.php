@@ -7,10 +7,10 @@ require("externalHeader.php");
 ?>
 		<div id="reminderText">
 		<?php
-			$reminders= $count==1 ? \GO::t('oneReminder') : sprintf(\GO::t('nReminders'), $count);
+			$reminders= $count==1 ? \GO::t("1 reminder") : sprintf(\GO::t("%s reminders"), $count);
 			
 			if($count>0)
-				echo '<p>'.sprintf(\GO::t('youHaveReminders'), $reminders, \GO::config()->product_name).'</p>';
+				echo '<p>'.sprintf(\GO::t("You have %s in %s."), $reminders, \GO::config()->product_name).'</p>';
 			
 			echo $html;
 

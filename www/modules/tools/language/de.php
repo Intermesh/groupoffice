@@ -1,17 +1,16 @@
 <?php
-
-$l["tools"]='Werkzeuge';
-$l["scripts"]='Skripte';
-$l["scriptOutput"]='Skriptausgabe';
-
-$l['name']='Werkzeuge';
-$l['description']='Modul zur Durchführung administrativer Aufgaben';
-$l['dbcheck']='Datenbank überprüfen';
-$l['rm_duplicates']='Doppelte Kontakte und Termine löschen';
-$l['backupdb']='Datenbank sichern';
-$l['index_files']='Alle Daten neu indizieren';
-$l['buildsearchcache']='Suchindex neu aufbauen';
-$l['checkmodules']='Module überprüfen';
-$l['resetState']='Anpassungen von Fenstern, Rastern, etc. zurücksetzen';
-
-$l['systemCheck']='Systemüberprüfung';
+return array (
+  'Admin tools' => 'Werkzeuge',
+  'Scripts' => 'Skripte',
+  'Script output' => 'Skriptausgabe',
+  'Database check' => 'Datenbank überprüfen',
+  'Remove duplicate contacts and events' => 'Doppelte Kontakte und Termine löschen',
+  'Backup database' => 'Datenbank sichern',
+  'Index all files' => 'Alle Daten neu indizieren',
+  'Create search index' => 'Suchindex neu aufbauen',
+  'Check modules' => 'Module überprüfen',
+  'Reset state of windows, grids etc.' => 'Anpassungen von Fenstern, Rastern, etc. zurücksetzen',
+  'System check' => 'Systemüberprüfung',
+  'name' => 'Werkzeuge',
+  'description' => 'Modul zur Durchführung administrativer Aufgaben',
+);

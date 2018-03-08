@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: ComboBoxMulti.js 15289 2013-07-23 14:01:44Z mschering $
+ * @version $Id: ComboBoxMulti.js 22070 2018-01-05 15:13:12Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -34,6 +34,22 @@ GO.form.ComboBoxMulti = function(config){
     };
     
     GO.form.ComboBoxMulti.superclass.constructor.call(this, config);
+		
+		
+		
+		this.on('render', function() {			
+			this.getEl().on('input', function(e) {				
+				this.el.dom.style.overflowY = 'hidden';
+        this.el.dom.style.height = dp(32) + "px";
+				if(this.el.dom.scrollHeight != this.el.dom.offsetHeight) {
+					
+					this.el.dom.style.height = this.el.dom.scrollHeight + "px";
+					
+					this.fireEvent('grow', this);
+				}
+      }, this);
+			
+		}, this);
    
 //    this.on('focus', function(){this.focused=true;}, this);
 //    this.on('blur', function(){this.focused=false;}, this);

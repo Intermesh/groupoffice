@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: CommentsGrid.js 18977 2015-04-02 08:47:13Z michaelhart86 $
+ * @version $Id: CommentsGrid.js 22117 2018-01-13 09:39:30Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -42,18 +42,18 @@ GO.comments.CommentsGrid = function(config){
 			sortable:true
 		},
 		columns:[{
-			header: GO.lang.strOwner, 
+			header: t("Owner"), 
 			dataIndex: 'user_name',
 		  sortable: false,
 		  renderer: function(v){
 		  	return '<i>'+v+'</i>';
 		  }
 		},{
-			header: GO.comments.lang['category'], 
+			header: t("Category", "comments"), 
 			dataIndex: 'category_name',
 			width:50
 		 },{
-			header: GO.lang.strCtime, 
+			header: t("Created at"), 
 			dataIndex: 'ctime',
 			width:50,
 			align:'right',
@@ -81,7 +81,7 @@ GO.comments.CommentsGrid = function(config){
 		
 	config.tbar=[{
 			iconCls: 'btn-add',							
-			text: GO.lang['cmdAdd'],
+			text: t("Add"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 				GO.comments.showCommentDialog(0,{model_name:this.store.baseParams['model_name'],model_id:this.store.baseParams.model_id,action_date:this.actionDate});
@@ -91,7 +91,7 @@ GO.comments.CommentsGrid = function(config){
 			scope: this
 		},{
 			iconCls: 'btn-delete',
-			text: GO.lang['cmdDelete'],
+			text: t("Delete"),
 			cls: 'x-btn-text-icon',
 			handler: function(){
 				this.deleteSelected();
@@ -151,7 +151,7 @@ Ext.extend(GO.comments.CommentsGrid, GO.grid.GridPanel,{
   	this.setDisabled(model_id<1);
   },
   onShow : function(){
-		GO.grid.LinksPanel.superclass.onShow.call(this);
+		GO.comments.CommentsGrid.superclass.onShow.call(this);
 		
 		if(!this.store.loaded)
 			this.store.load();

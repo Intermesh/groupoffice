@@ -19,7 +19,7 @@ GO.tools.MainPanel = function(config){
 	
 	this.runPanel = new Ext.ux.IFrameComponent();
 	this.runWindow = new Ext.Window({
-		title:GO.tools.lang.scriptOutput,
+		title:t("Script output", "tools"),
 		width:500,
 		height:500,
 		maximizable:true,
@@ -34,7 +34,7 @@ GO.tools.MainPanel = function(config){
 		cls:'go-head-tb',
 		items: [{
 			xtype:'htmlcomponent',
-			html:GO.tools.lang.tools,
+			html:t("Admin tools", "tools"),
 			cls:'go-module-title-tbar'
 		}]
 	});
@@ -50,7 +50,7 @@ GO.tools.MainPanel = function(config){
 	});
 	
 	var scriptList = new GO.grid.SimpleSelectList({
-//		title: GO.tools.lang.scripts, 
+//		title: t("Scripts", "tools"), 
 		cls: 'simple-list',
 		tpl:'<tpl for=".">'+
 			'<div id="{dom_id}" class="go-item-wrap">{name}<span>{description}</span></div>'+
@@ -85,7 +85,7 @@ Ext.extend(GO.tools.MainPanel, Ext.Panel,{
  */
  
 GO.moduleManager.addModule('tools', GO.tools.MainPanel, {
-	title : GO.tools.lang.tools,
+	title : t("Admin tools", "tools"),
 	iconCls : 'go-tab-icon-tools',
 	admin :true
 });

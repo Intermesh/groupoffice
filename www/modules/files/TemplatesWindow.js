@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: TemplatesWindow.js 15954 2013-10-17 12:04:36Z mschering $
+ * @version $Id: TemplatesWindow.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -36,14 +36,14 @@ GO.files.TemplateWindow = function(config){
 		paging:true,
 		store: this.gridStore,
 		columns:[{
-			header:GO.lang['strName'],
+			header:t("Name"),
 			dataIndex: 'name',
 			renderer:function(v, metaData,record){
 				return '<div class="go-grid-icon filetype filetype-'+record.get("extension")+'">'+v+'</div>';
 			},
 			sortable:true
 		},{
-			header:GO.lang.strType,
+			header:t("Type"),
 			dataIndex: 'type',
 			sortable:false
 		}],
@@ -55,7 +55,7 @@ GO.files.TemplateWindow = function(config){
 		loadMask: true	,
 		tbar: [{
 			iconCls: 'btn-add',
-			text: GO.lang['cmdAdd'],
+			text: t("Add"),
 			cls: 'x-btn-text-icon',
 			scope: this,
 			handler:function(){
@@ -63,7 +63,7 @@ GO.files.TemplateWindow = function(config){
 			}
 		},{
 			iconCls: 'btn-delete',
-			text: GO.lang['cmdDelete'],
+			text: t("Delete"),
 			cls: 'x-btn-text-icon',
 			scope: this,
 			handler:function(){
@@ -77,7 +77,7 @@ GO.files.TemplateWindow = function(config){
 	}, this);	
 	
 	GO.files.TemplateWindow.superclass.constructor.call(this,{
-		title:GO.files.lang.manageTemplates,
+		title:t("Manage templates", "files"),
 		layout:'fit',
 		width:500,
 		height:600,
@@ -85,7 +85,7 @@ GO.files.TemplateWindow = function(config){
 		items:this.gridPanel,
 		buttons:[
 		{
-			text:GO.lang['cmdClose'],
+			text:t("Close"),
 			handler: function(){
 				this.hide()
 				},
@@ -111,12 +111,12 @@ Ext.extend(GO.files.TemplateWindow,Ext.Window, {
 					document.location.href = GO.url('files/template/download&id='+this.template_id);
 				},
 				disabled: true,
-				text: GO.files.lang.downloadTemplate,
+				text: t("Download template", "files"),
 				scope: this
 			});				
 			
 			this.formPanel = new Ext.form.FormPanel({
-				title: GO.lang['strProperties'],
+				title: t("Properties"),
 				cls:'go-form-panel',
 				waitMsgTarget:true,
 				labelWidth: 85,
@@ -124,7 +124,7 @@ Ext.extend(GO.files.TemplateWindow,Ext.Window, {
 				fileUpload: true,
 				items:[
 				{
-					fieldLabel: GO.lang['strName'],
+					fieldLabel: t("Name"),
 					name: 'name',
 					id: 'template-name',
 					anchor: '100%',
@@ -144,7 +144,7 @@ Ext.extend(GO.files.TemplateWindow,Ext.Window, {
 			
 			var buttons = [			
 			{
-				text: GO.lang['cmdOk'],
+				text: t("Ok"),
 				handler: function(){
 					this.saveTemplate(true)
 					},
@@ -152,7 +152,7 @@ Ext.extend(GO.files.TemplateWindow,Ext.Window, {
 			},
 
 			{
-				text: GO.lang['cmdApply'],
+				text: t("Apply"),
 				handler: function(){
 					this.saveTemplate(false)
 					},
@@ -160,7 +160,7 @@ Ext.extend(GO.files.TemplateWindow,Ext.Window, {
 			},
 
 			{
-				text: GO.lang['cmdClose'],
+				text: t("Close"),
 				handler:
 				function()
 				{
@@ -177,7 +177,7 @@ Ext.extend(GO.files.TemplateWindow,Ext.Window, {
 				height: 400,
 				width: 400,
 				closeAction: 'hide',
-				title: GO.files.lang.template,
+				title: t("Template", "files"),
 				items: [this.templateTabPanel = new Ext.TabPanel({
 					activeTab: 0,
 					border:false,
@@ -235,7 +235,7 @@ Ext.extend(GO.files.TemplateWindow,Ext.Window, {
 	saveTemplate : function(hide)
 	{
 		this.formPanel.form.submit({
-			waitMsg:GO.lang.waitMsgSave,
+			waitMsg:t("Saving..."),
 			url:GO.url('files/template/submit'),
 			params:
 			{
@@ -261,7 +261,7 @@ Ext.extend(GO.files.TemplateWindow,Ext.Window, {
 				
 				if(action.failureType != 'client')
 				{					
-					Ext.MessageBox.alert(GO.lang['strError'], action.result.feedback);			
+					Ext.MessageBox.alert(t("Error"), action.result.feedback);			
 				}
 			},
 			scope: this				

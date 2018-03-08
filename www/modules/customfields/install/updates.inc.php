@@ -66,7 +66,7 @@ $updates["201108291450"][]="ALTER TABLE `cf_categories` CHANGE `type` `type` VAR
 $updates["201108291450"][]="ALTER TABLE `cf_categories` CHANGE `type` `extends_model` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0'";
 
 $updates["201108291450"][]="ALTER TABLE `cf_8` CHANGE `link_id` `model_id` INT( 11 ) NOT NULL DEFAULT '0'";
-$updates["201108291450"][]="RENAME TABLE `cf_8` TO `cf_go_users` ;";
+$updates["201108291450"][]="RENAME TABLE `cf_8` TO `cf_core_user` ;";
 $updates["201108291450"][]="update cf_categories set extends_model='GO_Base_Model_User' where extends_model=8;";
 
 

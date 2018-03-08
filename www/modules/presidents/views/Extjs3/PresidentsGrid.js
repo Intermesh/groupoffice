@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: PresidentsGrid.js 17133 2014-03-20 08:25:24Z mschering $
+ * @version $Id: PresidentsGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -18,7 +18,7 @@ GO.presidents.PresidentsGrid = function(config){
 		config = {};
 	}
 	
-	config.title = GO.presidents.lang.presidents; //Title of this panel
+	config.title = t("Presidents", "presidents"); //Title of this panel
 	config.layout='fit'; //How to lay out the panel
 	config.autoScroll=true;
 	config.split=true;
@@ -45,22 +45,22 @@ GO.presidents.PresidentsGrid = function(config){
 			},
 			width: 50
 		},{
-			header: GO.presidents.lang.firstname,
+			header: t("First name", "presidents"),
 			dataIndex: 'firstname'
 		},{
-			header: GO.presidents.lang.lastname,
+			header: t("Last name", "presidents"),
 			dataIndex: 'lastname'
 		},{
-			header: GO.presidents.lang.party_id,
+			header: t("Party", "presidents"),
 			dataIndex: 'party_id'
 		},{
-			header: GO.presidents.lang.tookoffice,
+			header: t("Entering Office", "presidents"),
 			dataIndex: 'tookoffice'
 		},{
-			header: GO.presidents.lang.leftoffice,
+			header: t("Leaving Office", "presidents"),
 			dataIndex: 'leftoffice'
 		},{
-			header: GO.presidents.lang.income,
+			header: t("Income", "presidents"),
 			dataIndex: 'income',
 			width: 120,
 			renderer: function(value, metaData, record){
@@ -87,13 +87,13 @@ GO.presidents.PresidentsGrid = function(config){
 	
 	//Adding the gridview to the grid panel
 	config.view=new Ext.grid.GridView({
-		emptyText: GO.lang.strNoItemse
+		emptyText: t("strNoItemse")
 	});
 	
 	//Setup a toolbar for the grid panel
 	config.tbar = new Ext.Toolbar({
 			items: [
-				GO.lang.strSearch + ':',
+				t("Search") + ':',
 				new GO.form.SearchField({
 					store: config.store,
 					width:320

@@ -8,7 +8,7 @@
  * 
  * Based on the File Upload Widget of Ing. Jozef Sakalos
  * 
- * @version $Id: UploadFile.js 17251 2014-04-03 12:53:08Z mschering $
+ * @version $Id: UploadFile.js 22345 2018-02-08 15:24:09Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */ 
@@ -29,7 +29,7 @@ GO.form.UploadFile = function(config) {
 	
 	if(!config.addText)
 	{
-		config.addText = GO.lang.browse;
+		config.addText = t("Browse");
 	}
 	
 	this.inputs = new Ext.util.MixedCollection();
@@ -69,10 +69,10 @@ Ext.extend(GO.form.UploadFile, Ext.BoxComponent, {
 	max:0,
 	
 	onRender : function(ct, position){
-		this.id=Ext.id();
+		
 		this.el = ct.createChild({
 			tag: 'div',
-			id: this.id,
+			id: this.getId(),
 			cls: this.cls
 			});
 	},
@@ -91,8 +91,6 @@ Ext.extend(GO.form.UploadFile, Ext.BoxComponent, {
 			this.inputName = Ext.id();
 		}
 		
-		var id = Ext.id();
-		
 		var inp = this.inputWrap.createChild({
 			tag:'input'
 			,
@@ -102,13 +100,13 @@ Ext.extend(GO.form.UploadFile, Ext.BoxComponent, {
 			,
 			size:0
 			,
-			id:id
-			,
 			name:this.inputName+'[]'
 		});
 		inp.on('change', this.onFileAdded, this);
 		this.inputs.add(inp);
 		
+		console.log(inp);
+		console.log(this);
 		
 		return inp;
 	},
@@ -120,23 +118,18 @@ Ext.extend(GO.form.UploadFile, Ext.BoxComponent, {
 		this.buttonsWrap = this.el.createChild({
 			tag:'div',
 			cls:'x-uf-buttons-ct',
-			id:Ext.id(),
 			children:[
 			{
 				tag:'div',
 				cls:'x-uf-input-ct',
-				id:Ext.id()
-				,
 				children: [
 				{
 					tag:'div',
-					cls:'x-uf-bbtn-ct',
-					id:Ext.id()
+					cls:'x-uf-bbtn-ct'
 				}
 				, {
 					tag:'div',
-					cls:'x-uf-input-wrap',
-					id:Ext.id()
+					cls:'x-uf-input-wrap'
 				}
 				]
 			}
@@ -155,7 +148,6 @@ Ext.extend(GO.form.UploadFile, Ext.BoxComponent, {
 		this.browseBtn = new Ext.Button({
 			renderTo: bbtnCt,
 			text:this.addText
-		//, cls: 'x-btn-text-icon'
 		//, iconCls: 'btn-add'
 		});
 	},
@@ -243,7 +235,7 @@ Ext.extend(GO.form.UploadFile, Ext.BoxComponent, {
 			, '<td class="x-unselectable">'
 			, '<span class="filetype-link {fileCls}" unselectable="on" qtip="{fileQtip}">{fileName}</span>'
 			, '</td>'
-			, '<td id="m-{id}" class="x-uf-filedelete"><a id="d-{id}" href="#"><div class="go-icon btn-delete"></div></a>'
+			, '<td id="m-{id}" class="x-uf-filedelete"><a id="d-{id}" ><i class="icon">delete</i></a>'
 			, '</td>'
 			, '</tr>'
 			]);
@@ -263,7 +255,7 @@ Ext.extend(GO.form.UploadFile, Ext.BoxComponent, {
 		* @param {String} id Id of the file to remove (id is auto generated)
 		* @param {Boolean} suppresEvent Set to true not to fire event
 		*/
-	removeFile: function(id) {
+	removeFile: function(id) {		
 		if(this.uploading) {
 			return;
 		}
@@ -291,8 +283,8 @@ Ext.extend(GO.form.UploadFile, Ext.BoxComponent, {
 		}
 	}, 
 	clearQueue: function() {
-		this.inputs.each(function(inp) {
-			if(!inp.isVisible()) {
+		this.inputs.each(function(inp, index, length) {
+			if(index < length - 1) {
 				this.removeFile(inp.id, true);
 			}
 		}, this);

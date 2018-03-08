@@ -1,6 +1,5 @@
 <?php
 
-
 namespace GO\Imapauth;
 
 use GO;
@@ -12,6 +11,76 @@ class ImapauthModule extends \GO\Base\Module {
 
 		$controller = new \GO\Core\Controller\AuthController();
 		$controller->addListener('beforelogin', 'GO\Imapauth\ImapauthModule', 'beforeLogin');
+
+		$controller->addListener('head', 'GO\Imapauth\ImapauthModule', 'head');
+	}
+
+	public static function head() {
+		$conf = str_replace('config.php', 'imapauth.config.php', \GO::config()->get_config_file());
+		if (file_exists($conf)) {
+			require_once($conf);
+
+			if (!empty($config[0]['imapauth_combo_domains'])) {
+				$arr = explode(',', $config[0]['imapauth_combo_domains']);
+				$domains = json_encode($arr);
+				$default_domain = empty($config[0]['imapauth_default_domain']) ? $arr[0] : $config[0]['imapauth_default_domain'];
+			}
+		}
+
+		if (!empty($domains) && !empty($default_domain)) {
+
+			$script = <<< END
+<script type='text/javascript'>
+Ext.override(GO.dialog.LoginDialog, {
+	initComponent : GO.dialog.LoginDialog.prototype.initComponent.createSequence(function(){
+		var domains = $domains;
+		domains.push('');
+		var domainData = new Array();
+		domainData[0] = ['-', domains[i]]
+		for (var i=0; i<domains.length; i++) {
+			if (domains[i]!='')
+				domainData[i+1] = ['@'+domains[i], '@'+domains[i]];
+		}
+
+		var usernameField = this.formPanel.items.get('username');
+		var fieldLabel = usernameField.fieldLabel;
+		delete usernameField.fieldLabel;
+		usernameField.flex=1;
+
+		this.usernameCompositeField = new Ext.form.CompositeField({
+			anchor:'100%',
+			fieldLabel: fieldLabel,
+			items:[
+				usernameField,
+				{
+					flex:1,
+					xtype:'combo',
+					hideLabel: true,
+					triggerAction : 'all',
+					editable : false,
+					selectOnFocus : true,
+					width : 144,
+					forceSelection : true,
+					mode : 'local',
+					value : '@$default_domain',
+					hiddenName : 'domain',
+					valueField : 'value',
+					displayField : 'name',
+					store : new Ext.data.SimpleStore({
+							fields: ['name', 'value'],
+							data: domainData
+						})
+				}
+			]
+		})
+
+		this.formPanel.insert(2,this.usernameCompositeField);
+	})
+});
+</script>
+
+END;
+		}
 	}
 
 //	public static function beforeControllerLogin($params, &$response) {
@@ -39,7 +108,7 @@ class ImapauthModule extends \GO\Base\Module {
 //		}
 //	}
 
-	
+
 	public static function beforeLogin($params, &$response) {
 
 		$oldIgnoreAcl = \GO::setIgnoreAclPermissions(true);
@@ -54,7 +123,7 @@ class ImapauthModule extends \GO\Base\Module {
 						$response['needCompleteProfile'] = true;
 						$response['success'] = false;
 
-						$response['feedback'] = \GO::t('pleaseCompleteProfile', 'imapauth');
+						$response['feedback'] = \GO::t("Please fill in some additional information to complete your user account.", "imapauth");
 						return false;
 					} else {
 						//user doesn't exist. create it now
@@ -68,14 +137,14 @@ class ImapauthModule extends \GO\Base\Module {
 
 						try {
 
-							if(!$user->save()){
-								throw new \Exception("Could not save user: ".implode("\n", $user->getValidationErrors()));
+							if (!$user->save()) {
+								throw new \Exception("Could not save user: " . implode("\n", $user->getValidationErrors()));
 							}
 							if (!empty($ia->config['groups']))
 								$user->addToGroups($ia->config['groups']);
-							
+
 							$ia->user = $user;
-							
+
 							$user->checkDefaultModels();
 
 							//todo testen of deze regel nodig is om e-mail account aan te maken voor nieuwe gebruiker
@@ -88,13 +157,13 @@ class ImapauthModule extends \GO\Base\Module {
 						}
 					}
 				}
-			}else
-			{
-				$response['feedback'] = GO::t('badLogin').' (IMAP)';
+			} else {
+				$response['feedback'] = GO::t("Wrong username or password") . ' (IMAP)';
 				return false;
 			}
 		}
 
 		\GO::setIgnoreAclPermissions($oldIgnoreAcl);
 	}
+
 }

@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: PresidentPanel.js 17133 2014-03-20 08:25:24Z mschering $
+ * @version $Id: PresidentPanel.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -36,45 +36,45 @@ GO.presidents.PresidentPanel = Ext.extend(GO.DisplayPanel,{
 						'<td>{id}</td>'+
 					'</tr>'+
 					'<tr>'+
-						'<td>'+GO.presidents.lang.party_id+':</td>'+
+						'<td>'+t("Party", "presidents")+':</td>'+
 						'<td>{partyName}</td>'+
 					'</tr>'+
 					'<tr>'+
-						'<td>'+GO.presidents.lang.tookoffice+':</td>'+
+						'<td>'+t("Entering Office", "presidents")+':</td>'+
 						'<td>{tookoffice}</td>'+
 					'</tr>'+
 					'<tr>'+
-						'<td>'+GO.presidents.lang.leftoffice+':</td>'+
+						'<td>'+t("Leaving Office", "presidents")+':</td>'+
 						'<td>{leftoffice}</td>'+
 					'</tr>'+
 					'<tr>'+
-						'<td>'+GO.presidents.lang.income+':</td>'+
+						'<td>'+t("Income", "presidents")+':</td>'+
 						'<td>$ {income}</td>'+
 					'</tr>'+
 				'</table>';																		
 				
-		if(GO.customfields)
+		if(go.ModuleManager.isAvailable("customfields"))
 			this.template += GO.customfields.displayPanelTemplate;
 		
-		if(GO.tasks)
+		if(go.ModuleManager.isAvailable("tasks"))
 			this.template += GO.tasks.TaskTemplate;
 
-		if(GO.calendar)
+		if(go.ModuleManager.isAvailable("calendar"))
 			this.template += GO.calendar.EventTemplate;
 		
-		if(GO.workflow)
+		if(go.ModuleManager.isAvailable("workflow"))
 			this.template +=GO.workflow.WorkflowTemplate;
 
 		this.template += GO.linksTemplate;	
 				
-		if(GO.files)
+		if(go.ModuleManager.isAvailable("files"))
 		{
 			Ext.apply(this.templateConfig, GO.files.filesTemplateConfig);
 			this.template += GO.files.filesTemplate;
 		}
 		Ext.apply(this.templateConfig, GO.linksTemplateConfig);
 		
-		if(GO.comments)
+		if(go.ModuleManager.isAvailable("comments"))
 			this.template += GO.comments.displayPanelTemplate;
 
 		GO.presidents.PresidentPanel.superclass.initComponent.call(this);

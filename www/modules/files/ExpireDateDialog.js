@@ -7,7 +7,7 @@ GO.files.ExpireDateDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 	initComponent : function(){
 		
 		Ext.apply(this, {
-			title: GO.files.lang.expireTime,
+			title: t("Download link expire time", "files"),
 			height:310,
 			loadOnNewModel : false,
 			enableApplyButton: false,
@@ -29,7 +29,7 @@ GO.files.ExpireDateDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		this.deleteWhenExpiredCB = new Ext.ux.form.XCheckbox({
 			hideLabel: true,
 			anchor: '-20',
-			boxLabel: GO.files.lang.deleteWhenExpired,
+			boxLabel: t("Automatically delete file when download link expires", "files"),
 			name: 'delete_when_expired',
 			value: false,
 			disabled: true,

@@ -68,7 +68,7 @@ GO.site.ContentPanel = Ext.extend(Ext.form.FormPanel, {
 		config = config || {};
 
 		config.id = 'site-content';
-//		config.title = GO.site.lang.content;
+//		config.title = t("Content", "site");
 		config.layout = 'form';
 		config.border = false;
 		config.url = GO.url('site/content/update');
@@ -83,7 +83,7 @@ GO.site.ContentPanel = Ext.extend(Ext.form.FormPanel, {
 		this.saveButton = new Ext.Button({
 			iconCls: 'btn-save',
 			itemId: 'save',
-			text: GO.site.lang.save,
+			text: t("Save", "site"),
 			cls: 'x-btn-text-icon'
 		});
 
@@ -91,16 +91,16 @@ GO.site.ContentPanel = Ext.extend(Ext.form.FormPanel, {
 			// submit the content
 			this.form.submit({
 				url: GO.url('site/content/' + this.submitAction),
-				waitMsg: GO.lang['waitMsgSave'],
+				waitMsg: t("Saving..."),
 				success: function(form, action) {
 					this.setContentId(action.result.id);
 					this.parentPanel.rebuildTree(true); // Rebuild the tree after submit
 				},
 				failure: function(form, action) {
 					if (action.failureType == 'client')
-						Ext.MessageBox.alert(GO.lang['strError'], GO.lang['strErrorsInForm']);
+						Ext.MessageBox.alert(t("Error"), t("You have errors in your form. The invalid fields are marked."));
 					else
-						Ext.MessageBox.alert(GO.lang['strError'], action.result.feedback);
+						Ext.MessageBox.alert(t("Error"), action.result.feedback);
 				},
 				scope: this
 			});
@@ -109,7 +109,7 @@ GO.site.ContentPanel = Ext.extend(Ext.form.FormPanel, {
 		this.advancedButton = new Ext.Button({
 			iconCls: 'btn-settings',
 			itemId: 'advanced',
-			text: GO.site.lang.advanced,
+			text: t("Advanced options", "site"),
 			cls: 'x-btn-text-icon'
 		});
 
@@ -123,7 +123,7 @@ GO.site.ContentPanel = Ext.extend(Ext.form.FormPanel, {
 		this.viewButton = new Ext.Button({
 			iconCls: 'btn-view',
 			itemId: 'view',
-			text: GO.lang.strView,
+			text: t("View"),
 			cls: 'x-btn-text-icon',
 			handler : function(){
 				window.open(GO.url('site/content/redirect', {content_id: this.form.baseParams.id}));	
@@ -144,7 +144,7 @@ GO.site.ContentPanel = Ext.extend(Ext.form.FormPanel, {
 			]
 		});
 
-		if (GO.files) {
+		if(go.ModuleManager.isAvailable("files")) {
 			config.tbar.add(this.fileBrowseButton = new GO.files.FileBrowserButton({
 				model_name: "GO\\Site\\Model\\Site"
 			}));
@@ -155,7 +155,7 @@ GO.site.ContentPanel = Ext.extend(Ext.form.FormPanel, {
 			anchor:'100%',
 			maxLength: 255,
 			allowBlank: false,
-			fieldLabel: GO.site.lang.contentTitle
+			fieldLabel: t("Title", "site")
 		});
 
 		this.parentSlug = new Ext.form.TextField({
@@ -171,11 +171,11 @@ GO.site.ContentPanel = Ext.extend(Ext.form.FormPanel, {
 			flex: 1,
 			maxLength: 255,
 			allowBlank: true,
-			fieldLabel: GO.site.lang.contentSlug
+			fieldLabel: t("Slug", "site")
 		});
 
 		this.completeSlug = new Ext.form.CompositeField({
-			fieldLabel: GO.site.lang.contentSlug,
+			fieldLabel: t("Slug", "site"),
 			items: [this.parentSlug, this.slugField],
 			anchor:'100%'
 		});
@@ -191,7 +191,7 @@ GO.site.ContentPanel = Ext.extend(Ext.form.FormPanel, {
 //			anchor: '100% -80',
 //			allowBlank:true,
 //			enableLinks:false,
-//			fieldLabel: GO.site.lang.contentContent,
+//			fieldLabel: t("Content", "site"),
 //			plugins:this.initHtmlEditorPlugins()
 //		});
 
@@ -201,7 +201,7 @@ GO.site.ContentPanel = Ext.extend(Ext.form.FormPanel, {
 			name: 'content',
 			anchor: '100% -80',
 			allowBlank: true,
-			fieldLabel: GO.site.lang.contentContent,
+			fieldLabel: t("Content", "site"),
 			listeners: {
 				render: function() {
 					

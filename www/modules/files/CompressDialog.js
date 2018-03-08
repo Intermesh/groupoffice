@@ -2,7 +2,7 @@ GO.files.CompressDialog = Ext.extend(GO.Window,{
 	width: 300,
 	height:120,
 	layout:'fit',
-	title:GO.lang.compress,
+	title:t("Compress"),
 	focus:function(){
 		this.formPanel.form.reset();
 		this.formPanel.form.findField('name').focus(true);
@@ -11,7 +11,7 @@ GO.files.CompressDialog = Ext.extend(GO.Window,{
 		this.formPanel = new Ext.FormPanel({
 			cls:'go-form-panel',
 			items:[{
-				fieldLabel: GO.files.lang.enterName,
+				fieldLabel: t("Enter a name", "files"),
 				anchor:'100%',
 				xtype:'textfield',
 				name: 'name',
@@ -29,7 +29,7 @@ GO.files.CompressDialog = Ext.extend(GO.Window,{
 		this.items=[this.formPanel];
 		
 		this.buttons=[{
-			text:GO.lang.cmdOk,
+			text:t("Ok"),
 			handler:function(){
 				var f = this.formPanel.form;
 				if(f.isValid()){

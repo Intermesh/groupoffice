@@ -1,45 +1,47 @@
 <?php
-
-
-$l["task"]= 'Opgave';
-$l["noTask"]= 'Ingen opgaver at vise';
-$l["tasks"]= 'Opgaver';
-$l["addTask"]= 'Tilføj opgave...';
-$l["tasklist"]= 'Opgaveliste';
-$l["tasklists"]= 'Opgavelister';
-$l["showCompletedTasks"]= 'Vis udførte opgaver';
-$l["filter"]= 'Filter';
-$l["dueDate"]= 'Forfaldsdato';
-$l["dueAt"]= 'Forfalden';
-$l["needsAction"]= 'Afventer reaktion';
-$l["accepted"]= 'Accepteret';
-$l["declined"]= 'Afvist';
-$l["tentative"]= 'Foreløbig';
-$l["delegated"]= 'Delegeret';
-$l["completed"]= 'Fuldført';
-$l["inProcess"]= 'Igangværende';
-$l["repeatEvery"]= 'Gentag hver';
-$l["atDays"]= 'På dage';
-$l["repeatUntil"]= 'Gentag indtil';
-$l["repeatForever"]= 'gentag uendeligt';
-$l["recurrence"]= 'Gentagelse';
-$l["remindMe"]= 'Påmind mig';
-$l["options"]= 'Valg';
-$l["createLink"]= 'Opret link';
-$l["startsAt"]='Starter';
-$l["showInactiveTasks"]='Vis inaktive opgaver';
-$l["scheduleCall"]='Planlæg opringning';
-$l['name']='Opgaver';
-$l['description']='Angiv beskrivelse her';
-$lang['link_type'][12]=$lang['opgaver']['opgave']='Opgave';
-$l['status']='Status';
-$l['scheduled_call']='Planlagt opringning  %s';
-$l['statuses']['NEEDS-ACTION'] = 'Afventer reaktion';
-$l['statuses']['ACCEPTED'] = 'Accepteret';
-$l['statuses']['DECLINED'] = 'Afvist';
-$l['statuses']['TENTATIVE'] = 'Foreløbig';
-$l['statuses']['DELEGATED'] = 'Delegeret';
-$l['statuses']['COMPLETED'] = 'Fuldført';
-$l['statuses']['IN-PROCESS'] = 'Igangværende';
-$l['import_success']='%s opgaver importeret';
-$l['call']='Ring';
+return array (
+  'Task' => 'Opgave',
+  'No Tasks to display' => 'Ingen opgaver at vise',
+  'Add a task...' => 'Tilføj opgave...',
+  'Tasklist' => 'Opgaveliste',
+  'Tasklists' => 'Opgavelister',
+  'Show completed tasks' => 'Vis udførte opgaver',
+  'Due date' => 'Forfaldsdato',
+  'Due at' => 'Forfalden',
+  'Needs action' => 'Afventer reaktion',
+  'Accepted' => 'Accepteret',
+  'Declined' => 'Afvist',
+  'Tentative' => 'Foreløbig',
+  'Delegated' => 'Delegeret',
+  'Completed' => 'Fuldført',
+  'In process' => 'Igangværende',
+  'Repeat every' => 'Gentag hver',
+  'At days' => 'På dage',
+  'Repeat until' => 'Gentag indtil',
+  'repeat forever' => 'gentag uendeligt',
+  'Recurrence' => 'Gentagelse',
+  'Remind me' => 'Påmind mig',
+  'Options' => 'Valg',
+  'Create a link' => 'Opret link',
+  'Starts at' => 'Starter',
+  'Show inactive tasks' => 'Vis inaktive opgaver',
+  'Schedule call' => 'Planlæg opringning',
+  'Scheduled call at %s' => 'Planlagt opringning  %s',
+  'statuses' => 
+  array (
+    'NEEDS-ACTION' => 'Afventer reaktion',
+    'ACCEPTED' => 'Accepteret',
+    'DECLINED' => 'Afvist',
+    'TENTATIVE' => 'Foreløbig',
+    'DELEGATED' => 'Delegeret',
+    'COMPLETED' => 'Fuldført',
+    'IN-PROCESS' => 'Igangværende',
+  ),
+  '%s tasks were imported' => '%s opgaver importeret',
+  'Call' => 'Ring',
+  'name' => 'Opgaver',
+  'description' => 'Angiv beskrivelse her',
+  'Tasks' => 'Opgaver',
+  'Filter' => 'Filter',
+  'Status' => 'Status',
+);

@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: ListField.js 16666 2014-01-22 11:22:29Z mschering $
+ * @version $Id: ListField.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -55,7 +55,7 @@ GO.form.ListField = Ext.extend(GO.grid.EditorGridPanel, {
 			tbar: [{
 				itemId:'add',
 				iconCls: 'btn-add',							
-				text: GO.lang['cmdAdd'],
+				text: t("Add"),
 				cls: 'x-btn-text-icon',
 				handler: function(){
 					this.addNewRow();
@@ -64,7 +64,7 @@ GO.form.ListField = Ext.extend(GO.grid.EditorGridPanel, {
 			},{
 				itemId:'delete',
 				iconCls: 'btn-delete',
-				text: GO.lang['cmdDelete'],
+				text: t("Delete"),
 				cls: 'x-btn-text-icon',
 				handler: function(){
 					this.deleteSelected();

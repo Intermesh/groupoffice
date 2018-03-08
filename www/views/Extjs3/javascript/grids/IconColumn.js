@@ -1,5 +1,5 @@
 GO.grid.IconColumn = Ext.extend(Ext.grid.Column, {
-	emptyIcon: GO.settings.config.full_url + 'views/Extjs3/ext/resources/images/default/s.gif', // todo: change
+	emptyIcon: BaseHref + 'views/Extjs3/ext/resources/images/default/s.gif', // todo: change
 	constructor: function(cfg) {
 		//set required properties
 		cfg.id = 'icon';

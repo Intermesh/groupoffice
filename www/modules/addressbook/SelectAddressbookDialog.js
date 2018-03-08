@@ -5,7 +5,7 @@ GO.addressbook.SelectAddressbookWindow = Ext.extend(Ext.Window, {
 		this.addEvents({'select' : true});	
 		
 		
-		this.title=GO.addressbook.lang.selectAddressbook;
+		this.title=t("Select an addressbook", "addressbook");
 		
 		this.list = new GO.grid.SimpleSelectList({
 			store : new GO.data.JsonStore({
@@ -38,7 +38,7 @@ GO.addressbook.SelectAddressbookWindow = Ext.extend(Ext.Window, {
 			this.list.store.load();
 		}, this);
 		
-		this.title= GO.addressbook.lang.selectAddressbook;
+		this.title= t("Select an addressbook", "addressbook");
 		this.layout='fit';
 		this.modal=false;
 		this.height=400;			
@@ -51,7 +51,7 @@ GO.addressbook.SelectAddressbookWindow = Ext.extend(Ext.Window, {
 			cls: 'go-form-panel'
 		});
 		this.buttons=[{
-			text: GO.lang['cmdClose'],
+			text: t("Close"),
 			handler: function(){
 				this.hide();
 			},

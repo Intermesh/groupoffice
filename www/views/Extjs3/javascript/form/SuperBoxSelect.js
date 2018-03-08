@@ -1510,7 +1510,7 @@ Ext.ux.form.SuperBoxSelect = Ext.extend(Ext.ux.form.SuperBoxSelect,Ext.form.Comb
 			}
 		
 			if(this.max && this.items.getCount()>=this.max){
-				alert(GO.lang.multiselectComboMaxItemsReachedWarning.replace('{max}', this.max));
+				alert(t("You may select a maximum of {max} options").replace('{max}', this.max));
 				return;
 			}
 

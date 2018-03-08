@@ -17,7 +17,7 @@ GO.servermanager.ManageDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 
 	initComponent : function() {
 		Ext.apply(this, {
-			title: GO.lang.administration,
+			title: t("Administration"),
 			formControllerUrl: 'servermanager/price', // change this if new panels are added
 			width:700,
 			height:440,
@@ -29,7 +29,7 @@ GO.servermanager.ManageDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 
 	buildForm : function() {
 		this.autoEmailGrid = new GO.grid.GridPanel({
-			title: GO.servermanager.lang.autoEmails,
+			title: t("autoEmails", "servermanager"),
 			layout: 'fit',
 			store: new GO.data.JsonStore({
 				url: GO.url("servermanager/automaticEmail/store"),
@@ -48,15 +48,15 @@ GO.servermanager.ManageDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 					dataIndex: 'id',
 					hidden: true
 				}, {
-					header: GO.lang.strName, 
+					header: t("Name"), 
 					dataIndex: 'name',
 					sortable: true
 				}, {
-					header: GO.servermanager.lang.days, 
+					header: t("days", "servermanager"), 
 					dataIndex: 'days',
 					sortable: true
 				}, {
-					header: GO.servermanager.lang.enabled,
+					header: t("enabled", "servermanager"),
 					dataIndex: 'active',
 					sortable: true,
 					width: 20
@@ -65,13 +65,13 @@ GO.servermanager.ManageDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 			view: new Ext.grid.GridView({
 				autoFill: true,
 				forceFit: true,
-				emptyText: GO.lang['strNoItems']
+				emptyText: t("No items to display")
 			}),
 			sm : new Ext.grid.RowSelectionModel(),
 			loadMask : true,
 			tbar : [{
 				iconCls: 'btn-add',
-				text: GO.lang['cmdAdd'],
+				text: t("Add"),
 				cls: 'x-btn-text-icon',
 				handler: function(){
 					this.showAutoEmailDialog(0);
@@ -79,7 +79,7 @@ GO.servermanager.ManageDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 				scope: this
 			},{
 				iconCls: 'btn-delete',
-				text: GO.lang['cmdDelete'],
+				text: t("Delete"),
 				cls: 'x-btn-text-icon',
 				handler: function(){
 					this.autoEmailGrid.deleteSelected();

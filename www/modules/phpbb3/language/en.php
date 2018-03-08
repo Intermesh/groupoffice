@@ -1,5 +1,5 @@
 <?php
-
-$l['name'] = 'phpBB3';
-$l['description'] = 'Bridge between phpBB3 and {product_name}.';
-$l['forum']='Forum';
+return array (
+  'name' => 'phpBB3',
+  'description' => 'Bridge between phpBB3 and {product_name}.',
+);

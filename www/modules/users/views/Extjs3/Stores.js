@@ -3,6 +3,6 @@ GO.users.contactCustomFieldsCategoriesStore = new GO.data.JsonStore({
 	root: 'results', 
 	totalProperty: 'total', 
 	id: 'cf_category_id',
-	fields: Array('id','extends_model','acl_id','name','sort_index'),
+	fields: Array('id','extendsModel','aclId','name','sortOrder'),
 	remoteSort: true
 });

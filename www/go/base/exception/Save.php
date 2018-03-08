@@ -33,7 +33,7 @@ class Save extends \Exception
 
 	public function __construct($message='') {
 		
-		$message = empty($message) ? \GO::t('saveError') : \GO::t('saveError').":\n\n".$message;
+		$message = empty($message) ? \GO::t("Error while saving the data") : \GO::t("Error while saving the data").":\n\n".$message;
 		
 		parent::__construct($message);
 	}

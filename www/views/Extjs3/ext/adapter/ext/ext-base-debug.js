@@ -1736,11 +1736,11 @@ Ext.TaskMgr = new Ext.util.TaskRunner();(function(){
             return full ? this.getDocumentHeight() : this.getViewportHeight();
         },
 
-        getDocumentHeight: function() {            
+        getDocumentHeight: function() { 
             return MAX(!isCSS1 ? doc.body.scrollHeight : doc.documentElement.scrollHeight, this.getViewportHeight());
         },
 
-        getDocumentWidth: function() {            
+        getDocumentWidth: function() {  
             return MAX(!isCSS1 ? doc.body.scrollWidth : doc.documentElement.scrollWidth, this.getViewportWidth());
         },
 

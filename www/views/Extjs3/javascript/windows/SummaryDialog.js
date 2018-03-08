@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: SummaryDialog.js 14816 2013-05-21 08:31:20Z mschering $
+ * @version $Id: SummaryDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  *
@@ -31,10 +31,10 @@ GO.dialog.SummaryDialog = Ext.extend(GO.Window, {
 	initComponent : function(){
 
 		this.xTemplate = new Ext.XTemplate(
-			GO.lang.summarylogImportText+'<br /><br />'+
+			t("Imported {importCount} items.")+'<br /><br />'+
 			'<tpl if="errorCount &gt;= 1">'+
 				'<font class="summary-error-font">'+
-				GO.lang.summarylogErrorText+'<br />'+
+				t("There where some errors during the import")+'<br />'+
 				'</font>'+
 				'<hr />'+
 				'<table class="summary-log-table">'+
@@ -52,7 +52,7 @@ GO.dialog.SummaryDialog = Ext.extend(GO.Window, {
 			'</tpl>'+
 			'<tpl if="errorCount < 1">'+
 				'<font class="summary-success-font">'+
-				GO.lang.summarylogSuccessText+'<br />'+
+				t("Import successful")+'<br />'+
 				'</font>'+
 			'</tpl>'
 		);
@@ -78,7 +78,7 @@ GO.dialog.SummaryDialog = Ext.extend(GO.Window, {
 			title:'Import Summary',
 			items: this.templatePanel,		
 			buttons: [{				
-				text: GO.lang['cmdClose'],
+				text: t("Close"),
 				handler: function(){
 					this.hide()
 				},

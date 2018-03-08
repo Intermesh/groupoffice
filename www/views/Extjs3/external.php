@@ -44,7 +44,7 @@ function launchGO(){
 <body onload="launchGO();" style="font:12px arial">
 <h1><?php echo \GO::config()->product_name; ?></h1>
 <?php
-echo str_replace('{FUNCTION}', $module.'.'.$function.'()', \GO::t('goAlreadyStarted'));
+echo str_replace('{FUNCTION}', $module.'.'.$function.'()', \GO::t("Group-Office was already started. The requested screen is loaded in Group-Office. You can close this window or tab now and continue working in Group-Office."));
 ?>
 </body>
 

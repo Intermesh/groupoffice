@@ -25,7 +25,7 @@ class Backend extends AbstractDigest {
 	private $_user;
 	
 	public function __construct() {
-		$this->setRealm(\GO::config()->product_name);
+		$this->setRealm('Group-Office');
 	}
 	
 	/**
@@ -43,8 +43,8 @@ class Backend extends AbstractDigest {
 		
 		if($user){
 			//check dav module access		
-			$davModule = Module::model()->findByPk($this->checkModuleAccess, false, true);		
-			if(!\GO\Base\Model\Acl::getUserPermissionLevel($davModule->acl_id, $user->id))
+			$davModule = Module::model()->findByName($this->checkModuleAccess, false, true);		
+			if(!\GO\Base\Model\Acl::getUserPermissionLevel($davModule->aclId, $user->id))
 			{
 				$errorMsg = "No '".$this->checkModuleAccess."' module access for user '".$user->username."'";
 				\GO::debug($errorMsg);

@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: RegionalSettingsPanel.js 14977 2013-06-03 14:22:02Z michaelhart86 $
+ * @version $Id: RegionalSettingsPanel.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -28,9 +28,9 @@ GO.users.RegionalSettingsPanel = function(config)
 //	var dateFormatData = new Ext.data.SimpleStore({
 //		fields: ['id', 'date_format'],		
 //		data : [
-//		['dmY', GO.users.lang.dmy],
-//		['mdY', GO.users.lang.mdy],
-//		['Ymd', GO.users.lang.jmd]
+//		['dmY', t("Day-Month-Year", "users")],
+//		['mdY', t("Month-Day-Year", "users")],
+//		['Ymd', t("Year-Month-Day", "users")]
 //		]
 //	});
 //
@@ -48,12 +48,12 @@ GO.users.RegionalSettingsPanel = function(config)
 	var dateFormatData = new Ext.data.SimpleStore({
 		fields: ['id', 'dateformat'],
 		data : [
-		['-:dmY', GO.users.lang.dashdmy],
-		['/:mdY', GO.users.lang.slashmdy],
-		['/:dmY', GO.users.lang.slashdmy],
-		['.:dmY', GO.users.lang.dotdmy],
-		['-:Ymd', GO.users.lang.slashymd],
-		['.:Ymd', GO.users.lang.dotymd]
+		['-:dmY', t("Day-Month-Year", "users")],
+		['/:mdY', t("Month/Day/Year", "users")],
+		['/:dmY', t("Day/Month/Year", "users")],
+		['.:dmY', t("Day.Month.Year", "users")],
+		['-:Ymd', t("Year-Month-Day", "users")],
+		['.:Ymd', t("Year.Month.Day", "users")]
 		]
 	});
 	
@@ -62,8 +62,8 @@ GO.users.RegionalSettingsPanel = function(config)
 	var 	timeFormatData = new Ext.data.SimpleStore({
 		fields: ['id', 'time_format'],		
 		data : [
-		['H:i', GO.users.lang.fullhourformat],
-		['h:i a', GO.users.lang.halfhourformat]
+		['H:i', t("24 hour format", "users")],
+		['h:i a', t("12 hour format", "users")]
 		]
 	});
 
@@ -71,8 +71,8 @@ GO.users.RegionalSettingsPanel = function(config)
 	var 	firstWeekdayData = new Ext.data.SimpleStore({
 		fields: ['id', 'first_weekday'],		
 		data : [
-		['0', GO.users.lang.sunday],
-		['1', GO.users.lang.monday]
+		['0', t("Sunday", "users")],
+		['1', t("Monday", "users")]
 		]
 	});
 	
@@ -81,7 +81,7 @@ var dateFormat = GO.settings.date_format.substring(0,1)+GO.settings.date_format.
 	
 	config.border=false;
 	config.hideLabel=true;
-	config.title = GO.users.lang.regionalSettings;
+	config.title = t("Regional settings", "users");
 	config.layout='column';
 	config.defaults={columnWidth:.5, cls: 'go-form-panel', border:false};
 	config.labelWidth=190;
@@ -94,7 +94,7 @@ var dateFormat = GO.settings.date_format.substring(0,1)+GO.settings.date_format.
 				defaults: { anchor:'100%' },
 				items:[
 				this.languageCombo = new Ext.form.ComboBox({
-					fieldLabel: GO.users.lang['cmdFormLabelLanguage'],
+					fieldLabel: t("Language", "users"),
 					name: 'language_id',
 					store:  new Ext.data.SimpleStore({
 							fields: ['id', 'language'],
@@ -111,7 +111,7 @@ var dateFormat = GO.settings.date_format.substring(0,1)+GO.settings.date_format.
 //					value: GO.settings.language
 				}),
 				new Ext.form.ComboBox({
-					fieldLabel: GO.users.lang.cmdFormLabelTimezone,
+					fieldLabel: t("Timezone", "users"),
 					name: 'timezone',
 					store: new Ext.data.SimpleStore({
 							fields: ['timezone'],
@@ -125,7 +125,7 @@ var dateFormat = GO.settings.date_format.substring(0,1)+GO.settings.date_format.
 					value: GO.settings.timezone
 				}),
 //				new Ext.form.ComboBox({
-//					fieldLabel: GO.users.lang['cmdFormLabelDateFormat'],
+//					fieldLabel: t("Date Format", "users"),
 //					name: 'date_format',
 //					store: dateFormatData,
 //					displayField: 'date_format',
@@ -139,7 +139,7 @@ var dateFormat = GO.settings.date_format.substring(0,1)+GO.settings.date_format.
 //					forceSelection: true
 //				}),
 //				new Ext.form.ComboBox({
-//					fieldLabel: GO.users.lang['cmdFormLabelDateSeperator'],
+//					fieldLabel: t("Date Seperator", "users"),
 //					name: 'date_separator_name',
 //					store: dateSeperatorData,
 //					displayField: 'date_separator',			
@@ -153,7 +153,7 @@ var dateFormat = GO.settings.date_format.substring(0,1)+GO.settings.date_format.
 //					forceSelection: true
 //				}),
 				new Ext.form.ComboBox({
-					fieldLabel: GO.users.lang.cmdFormLabelDateFormat,
+					fieldLabel: t("Date Format", "users"),
 					name: 'date_format_name',
 					store: dateFormatData,
 					displayField: 'dateformat',
@@ -167,7 +167,7 @@ var dateFormat = GO.settings.date_format.substring(0,1)+GO.settings.date_format.
 					forceSelection: true
 				}),
 				new Ext.form.ComboBox({
-					fieldLabel: GO.users.lang.timeFormat,
+					fieldLabel: t("Time Format", "users"),
 					name: 'time_format_name',
 					store: timeFormatData,
 					displayField: 'time_format',
@@ -182,7 +182,7 @@ var dateFormat = GO.settings.date_format.substring(0,1)+GO.settings.date_format.
 				}),
 					
 				new Ext.form.ComboBox({
-					fieldLabel: GO.users.lang['cmdFormLabelFirstWeekday'],
+					fieldLabel: t("First weekday", "users"),
 					name: 'first_weekday_name',
 					store: firstWeekdayData,
 					displayField: 'first_weekday',
@@ -196,7 +196,7 @@ var dateFormat = GO.settings.date_format.substring(0,1)+GO.settings.date_format.
 					value: GO.settings.first_weekday
 				}),
 				this.holidaysetCombo = new GO.form.ComboBox({
-					fieldLabel: GO.users.lang['cmdFormLabelHolidaySet'],
+					fieldLabel: t("Bank holidays", "users"),
 					name: 'holidayset',
 					store:  new GO.data.JsonStore({
 						url: GO.url("core/holidays"),
@@ -219,22 +219,22 @@ var dateFormat = GO.settings.date_format.substring(0,1)+GO.settings.date_format.
 				xtype:'fieldset',		
 				defaults: { width:50 },
 				autoHeight:true,
-				title:GO.users.lang.numberFormat,
+				title:t("Number format", "users"),
 				items:[{
 						xtype: 'textfield', 
-						fieldLabel: GO.users.lang['cmdFormLabelThousandSeperator'], 
+						fieldLabel: t("Thousand Seperator", "users"), 
 						name: 'thousands_separator',
 						value: GO.settings.thousands_separator
 					},
 					{
 						xtype: 'textfield', 
-						fieldLabel: GO.users.lang['cmdFormLabelDecimalSeperator'], 
+						fieldLabel: t("Decimal Seperator", "users"), 
 						name: 'decimal_separator',
 						value: GO.settings.decimal_separator
 					},
 					{
 						xtype: 'textfield', 
-						fieldLabel: GO.users.lang['cmdFormLabelCurrency'], 
+						fieldLabel: t("Currency", "users"), 
 						name: 'currency',
 						value: GO.settings.currency
 					}]
@@ -244,15 +244,15 @@ var dateFormat = GO.settings.date_format.substring(0,1)+GO.settings.date_format.
 					xtype:'fieldset',
 					defaults: { width:50 },
 					autoHeight:true,
-					title:GO.users.lang.importExport,
+					title:t("Import / Export", "users"),
 					items:[{
 						xtype: 'textfield', 
-						fieldLabel: GO.users.lang.listSeparator, 
+						fieldLabel: t("List separator", "users"), 
 						name: 'list_separator',
 						value: GO.settings.list_separator
 					},{
 						xtype: 'textfield', 
-						fieldLabel: GO.users.lang.textSeparator, 
+						fieldLabel: t("Text separator", "users"), 
 						name: 'text_separator',
 						value: GO.settings.text_separator
 					}]

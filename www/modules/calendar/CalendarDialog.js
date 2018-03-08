@@ -6,7 +6,7 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  *
- * @version $Id: CalendarDialog.js 21247 2017-06-26 09:28:06Z devdevilnl $
+ * @version $Id: CalendarDialog.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -19,32 +19,32 @@ GO.calendar.CalendarDialog = function(config)
 	}
 	
 	this.propertiesTab = new Ext.Panel({	
-		title:GO.lang['strProperties'],
+		title:t("Properties"),
 		layout:'form',
 		anchor: '100% 100%',		
 		cls:'go-form-panel',
 		labelWidth: 120,
 		items: [
 		this.selectUser = new GO.form.SelectUser({
-			fieldLabel: GO.lang.strUser,
+			fieldLabel: t("User"),
 			disabled : !GO.settings.has_admin_permission,
 			value: GO.settings.user_id,
 			anchor: '100%'
 		}),
 		this.name = new Ext.form.TextField({
-			fieldLabel: GO.lang.strName,
+			fieldLabel: t("Name"),
 			name: 'name',
 			allowBlank:false,
 			anchor: '100%'
 		}),
 		this.selectGroup = new GO.form.ComboBox({
 			hiddenName:'group_id',
-			fieldLabel:GO.calendar.lang.group,
+			fieldLabel:t("Group", "calendar"),
 			valueField:'id',
 			value:1,
 			displayField:'name',
 			id:'resource_groups',
-			emptyText: GO.lang.strPleaseSelect,
+			emptyText: t("Please select..."),
 			store: new GO.data.JsonStore({
 				url: GO.url("calendar/group/store"),
 				fields:['id','name','user_name','fields','acl_id'],
@@ -61,28 +61,28 @@ GO.calendar.CalendarDialog = function(config)
 		}),{
 			xtype:'xcheckbox',
 			name:'show_bdays',
-			boxLabel:GO.calendar.lang.show_bdays,
+			boxLabel:t("Show birthdays from addressbook", "calendar"),
 			hideLabel:true
 		},{
 			xtype:'xcheckbox',
 			name:'show_holidays',
-			boxLabel:GO.calendar.lang.show_holidays,
+			boxLabel:t("Show holidays", "calendar"),
 			hideLabel:true
 		},{
 			xtype:'xcheckbox',
 			name:'show_completed_tasks',
-			boxLabel:GO.calendar.lang.show_completed_tasks,
+			boxLabel:t("Show completed tasks", "calendar"),
 			hideLabel:true,
 			hidden: !GO.tasks
 		},{
 			xtype:'textarea',
-			fieldLabel:GO.lang.strComment,
+			fieldLabel:t("Comment"),
 			name:'comment',
 			anchor:'100%',
 			height:50
 		},{
 			xtype:'textarea',
-			fieldLabel:GO.calendar.lang['tooltip'],
+			fieldLabel:t("Tooltip text", "calendar"),
 			name:'tooltip',
 			anchor:'100%',
 			height:50,
@@ -91,18 +91,18 @@ GO.calendar.CalendarDialog = function(config)
 		]
 	});
 
-	if(GO.tasks)
+	if(go.ModuleManager.isAvailable("tasks"))
 	{
 		this.tasklistsTab = new GO.base.model.multiselect.panel({
-      title:GO.tasks.lang.visibleTasklists,
+      title:t("Visible tasklists", "tasks"),
       url:'calendar/calendarTasklist',
-      columns:[{header: GO.lang.strTitle, dataIndex: 'name'}],
+      columns:[{header: t("Title"), dataIndex: 'name'}],
       fields:['id','name'],
       model_id:0
     });
 		
 		this.selectTasklist = new GO.form.ComboBoxReset({
-			fieldLabel:'CalDAV '+GO.tasks.lang.tasklist,
+			fieldLabel:'CalDAV '+t("Tasklist", "tasks"),
 				store:new GO.data.JsonStore({
 				url: GO.url('tasks/tasklist/store'),
 				baseParams: {'permissionLevel': GO.permissionLevels.write},
@@ -118,7 +118,7 @@ GO.calendar.CalendarDialog = function(config)
 			selectOnFocus:true,
 			forceSelection: true,
 			typeAhead: true,
-			emptyText:GO.lang.none,
+			emptyText:t("None"),
 			pageSize: parseInt(GO.settings.max_rows_list)
 		});
 
@@ -127,13 +127,13 @@ GO.calendar.CalendarDialog = function(config)
 
 	this.propertiesTab.add([{
 			xtype:'plainfield',
-			fieldLabel:GO.calendar.lang.directUrl,
+			fieldLabel:t("Direct URL", "calendar"),
 			name:'url',
 			anchor:'100%'
 		},{
 			xtype:'xcheckbox',
 			hideLabel:true,
-			boxLabel:GO.calendar.lang.publishICS,
+			boxLabel:t("Publish iCalendar file of last month and future events. Caution! The calendar will be readable to everyone.", "calendar"),
 			hidden: GO.calendar.disablePublishing,
 			name:'public'
 		},{
@@ -144,7 +144,7 @@ GO.calendar.CalendarDialog = function(config)
 			anchor:'100%'
 		},
 		this.exportButton = new Ext.Button({
-			text:GO.lang.cmdExport,
+			text:t("Export"),
 			disabled:true,
 			handler:function(){
 				document.location=GO.url("calendar/calendar/exportIcs", {"calendar_id":this.calendar_id});
@@ -154,12 +154,12 @@ GO.calendar.CalendarDialog = function(config)
 		,this.deleteAllItemsButton = new Ext.Button({
 				style:'margin-top:10px',
 				xtype:'button',
-				text:GO.lang.deleteAllItems,
+				text:t("Delete all items"),
 				handler:function(){
 					Ext.Msg.show({
-						title: GO.lang.deleteAllItems,
+						title: t("Delete all items"),
 						icon: Ext.MessageBox.WARNING,
-						msg: GO.lang.deleteAllItemsAreYouSure,
+						msg: t("Are you sure you want to delete all items?"),
 						buttons: Ext.Msg.YESNO,
 						scope:this,
 						fn: function(btn) {
@@ -182,7 +182,7 @@ GO.calendar.CalendarDialog = function(config)
 			this.removeDuplicatesButton =new Ext.Button({
 				style:'margin-top:10px',
 				xtype:'button',
-				text:GO.lang.removeDuplicates,
+				text:t("Remove duplicates"),
 				handler:function(){
 					
 					window.open(GO.url('calendar/calendar/removeDuplicates',{calendar_id:this.calendar_id}))
@@ -206,7 +206,7 @@ GO.calendar.CalendarDialog = function(config)
 	
 	
 	this.categoriesGrid = new GO.calendar.CategoriesGrid({
-		title:GO.calendar.lang.category,
+		title:t("Category", "calendar"),
 		store: GO.calendar.categoriesStore
 	});
 	
@@ -214,20 +214,20 @@ GO.calendar.CalendarDialog = function(config)
 		layout:'form',
 		waitMsgTarget:true,
 		disabled:true,
-		title:GO.lang.cmdImport,
+		title:t("Import"),
 		items: [{
 			xtype: 'panel',
-			html: GO.calendar.lang.selectIcalendarFile,
+			html: t("Select an icalendar (*.ics) file", "calendar"),
 			border:false
 		},
 		this.uploadFile,
 		this.importButton = new Ext.Button({
 			xtype:'button',
 			disabled:true,
-			text:GO.lang.cmdImport,
+			text:t("Import"),
 			handler: function(){
 				this.formPanel.form.submit({
-					waitMsg:GO.lang.waitMsgUpload,
+					waitMsg:t("Uploading..."),
 					url: GO.url('calendar/calendar/importIcs'),
 					params: {
 //						task: 'import',
@@ -238,7 +238,7 @@ GO.calendar.CalendarDialog = function(config)
 						this.uploadFile.clearQueue();
 
 						Ext.Msg.show({
-							title: GO.lang.strSuccess,
+							title: t("Success"),
 							width : 600,
 							height : 220,
 							icon: Ext.MessageBox.INFO,
@@ -261,7 +261,7 @@ GO.calendar.CalendarDialog = function(config)
 
 	var items = [this.propertiesTab];
 	
-	if(GO.tasks)
+	if(go.ModuleManager.isAvailable("tasks"))
 	{
 		items.push(this.tasklistsTab);
 	}
@@ -301,7 +301,7 @@ GO.calendar.CalendarDialog = function(config)
 
 	
 	GO.calendar.CalendarDialog.superclass.constructor.call(this,{
-		title: GO.calendar.lang.calendar,
+		title: t("Calendar", "calendar"),
 		layout:'fit',
 		modal:false,
 		height:600,
@@ -310,24 +310,15 @@ GO.calendar.CalendarDialog = function(config)
 		items: this.formPanel,
 		buttons:[
 		{
-			text:GO.lang.cmdOk,
-			handler: function(){
-				this.save(true)
-			},
-			scope: this
-		},
-		{
-			text:GO.lang.cmdApply,
+			text:t("Apply"),
 			handler: function(){
 				this.save(false)
 			},
 			scope: this
-		},
-
-		{
-			text:GO.lang.cmdClose,
+		},{
+			text:t("Save"),
 			handler: function(){
-				this.hide()
+				this.save(true)
 			},
 			scope: this
 		}
@@ -356,7 +347,7 @@ Ext.extend(GO.calendar.CalendarDialog, GO.Window, {
 		} else {
 			this.selectGroup.store.reload()
 		}
-		if(GO.tasks)
+		if(go.ModuleManager.isAvailable("tasks"))
 		{
 			this.tasklistsTab.setModelId(calendar_id);
 		}
@@ -376,7 +367,7 @@ Ext.extend(GO.calendar.CalendarDialog, GO.Window, {
 
 		this.resource = (resource > 0) ? resource : 0;
 
-		var title = (this.resource) ? GO.calendar.lang.resource : GO.calendar.lang.calendar;
+		var title = (this.resource) ? t("Resource", "calendar") : t("Calendar", "calendar");
 		this.setTitle(title);
 
 		this.removeDuplicatesButton.setDisabled(!calendar_id);
@@ -426,7 +417,7 @@ Ext.extend(GO.calendar.CalendarDialog, GO.Window, {
 	
 	loadCalendar : function(calendar_id)
 	{
-		if(GO.tasks)
+		if(go.ModuleManager.isAvailable("tasks"))
 		{
 			this.tasklistsTab.setModelId(calendar_id);
 //			this.tasklistsTab.store.loaded = false;
@@ -440,7 +431,7 @@ Ext.extend(GO.calendar.CalendarDialog, GO.Window, {
 			params: {
 				id:calendar_id				
 			},
-			waitMsg:GO.lang.waitMsgLoad,
+			waitMsg:t("Loading..."),
 			success: function(form, action) {
 				this.calendar_id=calendar_id;
 				this.selectUser.setRawValue(action.result.remoteComboTexts.user_id);
@@ -457,7 +448,7 @@ Ext.extend(GO.calendar.CalendarDialog, GO.Window, {
 			},
 			failure:function(form, action)
 			{
-				Ext.Msg.alert(GO.lang.strError, action.result.feedback)
+				Ext.Msg.alert(t("Error"), action.result.feedback)
 			},
 			scope: this
 		});
@@ -466,7 +457,7 @@ Ext.extend(GO.calendar.CalendarDialog, GO.Window, {
 	{        
 		if(this.resource && this.name.getValue() && !this.selectGroup.getValue())
 		{
-			Ext.MessageBox.alert(GO.lang.strError, GO.calendar.lang.no_group_selected);
+			Ext.MessageBox.alert(t("Error"), t("You have errors in your form. You need to select a group for this resource.", "calendar"));
 		}else
 		{
 			var tasklists = (GO.tasks && !this.resource) ? Ext.encode(this.tasklistsTab.getGridData()) : '';
@@ -477,7 +468,7 @@ Ext.extend(GO.calendar.CalendarDialog, GO.Window, {
 					'id': this.calendar_id,
 					'tasklists':tasklists
 				},
-				waitMsg:GO.lang.waitMsgSave,
+				waitMsg:t("Saving..."),
 				success:function(form, action){
 
 					if(action.result.id)
@@ -489,7 +480,7 @@ Ext.extend(GO.calendar.CalendarDialog, GO.Window, {
 					//this.loadAccount(this.calendar_id);
 					}
 
-					if(GO.tasks)
+					if(go.ModuleManager.isAvailable("tasks"))
 					{
 						this.tasklistsTab.setModelId(action.result.id);
 						this.tasklistsTab.store.commitChanges();
@@ -507,13 +498,13 @@ Ext.extend(GO.calendar.CalendarDialog, GO.Window, {
 					var error = '';
 					if(action.failureType=='client')
 					{
-						error = GO.lang.strErrorsInForm;
+						error = t("You have errors in your form. The invalid fields are marked.");
 					}else
 					{
 						error = action.result.feedback;
 					}
 
-					Ext.MessageBox.alert(GO.lang.strError, error);
+					Ext.MessageBox.alert(t("Error"), error);
 				},
 				scope:this
 
@@ -529,7 +520,7 @@ Ext.extend(GO.calendar.CalendarDialog, GO.Window, {
 		f = this.formPanel.form.findField('show_bdays');
 		f.container.up('div.x-form-item').setDisplayed(!resource);
 
-		if(GO.tasks)
+		if(go.ModuleManager.isAvailable("tasks"))
 		{
 			if(resource)
 			{

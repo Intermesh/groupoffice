@@ -9,7 +9,7 @@
  * If you have questions write an e-mail to info@intermesh.nl
  * 
  * @copyright Copyright Intermesh
- * @version $Id: autoinstall.php 21321 2017-07-18 09:53:11Z wsmits $
+ * @version $Id: autoinstall.php 22115 2018-01-12 10:41:26Z mschering $
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 $root = dirname(dirname(__FILE__)).'/';
@@ -56,21 +56,21 @@ $dbVersion = \GO\Base\Util\Common::countUpgradeQueries("updates.php");
 
 $adminGroup = new \GO\Base\Model\Group();
 $adminGroup->id = 1;
-$adminGroup->name = \GO::t('group_admins');
+$adminGroup->name = \GO::t("Admins");
 $adminGroup->save();
 
 $everyoneGroup = new \GO\Base\Model\Group();
 $everyoneGroup->id = 2;
-$everyoneGroup->name = \GO::t('group_everyone');
+$everyoneGroup->name = \GO::t("Everyone");
 $everyoneGroup->save();
 
 $internalGroup = new \GO\Base\Model\Group();
 $internalGroup->id = 3;
-$internalGroup->name = \GO::t('group_internal');
+$internalGroup->name = \GO::t("Internal");
 $internalGroup->save();
 
-//\GO::config()->register_user_groups = \GO::t('group_internal');
-//\GO::config()->register_visible_user_groups = \GO::t('group_internal');
+//\GO::config()->register_user_groups = \GO::t("Internal");
+//\GO::config()->register_visible_user_groups = \GO::t("Internal");
 
 $modules = \GO::modules()->getAvailableModules();
 
@@ -90,20 +90,20 @@ if(isset($installModules)){
 foreach ($modules as $moduleClass) {
 	$moduleController = new $moduleClass;
 	if($moduleController->isInstallable()){
-		if ((!isset($installModules) && $moduleController->autoInstall()) || (isset($installModules) && in_array($moduleController->id(), $installModules))) {
+		if ((!isset($installModules) && $moduleController->autoInstall()) || (isset($installModules) && in_array($moduleController->name(), $installModules))) {
 
-			echo "Installing module ".$moduleController->id()."\n";
+			echo "Installing module ".$moduleController->name()."\n";
 
 			$module = new \GO\Base\Model\Module();
-			$module->id = $moduleController->id();
+			$module->name = $moduleController->name();
 			$module->save();
 		}
 	}
 }
 
 $admin = new \GO\Base\Model\User();
-$admin->first_name = \GO::t('system');
-$admin->last_name = \GO::t('admin');
+$admin->first_name = \GO::t("System");
+$admin->last_name = \GO::t("Administrator");
 $admin->username = $args['adminusername'];
 $admin->password = $args['adminpassword'];
 $admin->email = \GO::config()->webmaster_email = $args['adminemail'];

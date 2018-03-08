@@ -147,19 +147,19 @@ class ImapMailbox extends \GO\Base\Model {
 	public function getDisplayName() {
 		switch ($this->name) {
 			case 'INBOX':
-				return \GO::t('inbox', 'email');
+				return \GO::t("Inbox", "email");
 				break;
 			case $this->getAccount()->sent:
-				return \GO::t('sent', 'email');
+				return \GO::t("Sent items", "email");
 				break;
 			case $this->getAccount()->trash:
-				return \GO::t('trash', 'email');
+				return \GO::t("Trash", "email");
 				break;
 			case $this->getAccount()->drafts:
-				return \GO::t('drafts', 'email');
+				return \GO::t("Drafts", "email");
 				break;
 			case 'Spam':
-				return \GO::t('spam','email');
+				return \GO::t("Spam", "email");
 			default:
 				return $this->getBaseName(true);
 				break;
@@ -275,7 +275,7 @@ class ImapMailbox extends \GO\Base\Model {
 		}
 
 		if(preg_match('/['.preg_quote($illegalChars,'/').']/', $name)){
-			throw new \Exception(sprintf(\GO::t('illegalCharsError'),': '.$illegalChars));
+			throw new \Exception(sprintf(\GO::t("The name contained one of the following illegal characters %s"),': '.$illegalChars));
 		}else
 		{
 			return true;

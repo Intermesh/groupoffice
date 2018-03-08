@@ -6,7 +6,7 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id: AccountPanel.js 21480 2017-09-28 06:46:58Z mschering $
+ * @version $Id: AccountPanel.js 22371 2018-02-13 14:17:26Z mschering $
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
@@ -21,7 +21,7 @@ GO.users.AccountPanel = function(config)
 	config.autoHeight=true;
 	config.border=true;
 	config.hideLabel=true;
-	config.title = GO.users.lang.account;
+	config.title = t("Account", "users");
 	config.layout='form';
 	config.defaults={anchor:'100%'};
 	config.defaultType = 'textfield';
@@ -30,50 +30,50 @@ GO.users.AccountPanel = function(config)
 	
 	this.passwordField1 = new Ext.form.TriggerField({
 		inputType: 'password', 
-		fieldLabel: GO.users.lang['cmdFormLabelPassword'], 
+		fieldLabel: t("Password", "users"), 
 		name: 'password',
 		panel:this,
 		triggerConfig:{
-			tag: "img",
-			src: Ext.BLANK_IMAGE_URL,
-			cls: "x-form-trigger x-form-trigger-plus",
-			'ext:qtip':GO.users.lang.generatePassword
+			tag: "button",
+			type: "button",
+			cls: "x-form-trigger ic-refresh",
+			'ext:qtip':t("Generate password", "users")
 		},
 		onTriggerClick:function(){
 			var pass = this.panel.randomPassword(6);
 			this.panel.passwordField1.setValue(pass);
 			this.panel.passwordField2.setValue(pass);
 			
-			Ext.MessageBox.alert(GO.users.lang['cmdFormLabelPassword'],GO.users.lang.generatedPasswordIs+": "+pass);
+			Ext.MessageBox.alert(t("Password", "users"),t("The generated password is", "users")+": "+Ext.util.Format.htmlEncode(pass));
 		}
 		});
 	this.passwordField2 = new Ext.form.TextField({
 		inputType: 'password', 
-		fieldLabel: GO.users.lang.confirmPassword, 
+		fieldLabel: t("Confirm password", "users"), 
 		name: 'passwordConfirm'
 		});
 		
 	this.usernameField = new Ext.form.TextField({
-			fieldLabel: GO.lang['strUsername'], 
+			fieldLabel: t("Username"), 
 			name: 'username'
 		});
 		
 	this.enabledField = new Ext.ux.form.XCheckbox({
-		boxLabel: GO.users.lang['cmdBoxLabelEnabled'],
+		boxLabel: t("Enabled", "users"),
 		name: 'enabled',
 		checked: true,
 		hideLabel:true
 	});
 	
 	this.forcePasswordChange = new Ext.ux.form.XCheckbox({
-		boxLabel: GO.users.lang.forcePasswordChange,
+		boxLabel: t("Force password change on next login", "users"),
 		name: 'force_password_change',
 		checked: false,
 		hideLabel:true
 	});
 
 	this.invitationField = new Ext.form.Checkbox({
-		boxLabel: GO.users.lang.sendInvitation,
+		boxLabel: t("Send invitation", "users"),
 		name: 'send_invitation',
 		checked: true,
 		hideLabel:true
@@ -84,14 +84,14 @@ GO.users.AccountPanel = function(config)
 		this.passwordField1,
 		this.passwordField2,
 		{
-			fieldLabel: GO.lang['strEmail'],
+			fieldLabel: t("E-mail"),
 			name: 'email',
 			allowBlank: false,
 			vtype:'emailAddress',
 			listeners: {
 				change: function(field, newValue, oldValue) {
-					if(this.items.item('recovery_email').getValue() == "") {
-						this.items.item('recovery_email').setValue(newValue);
+					if(this.items.item('recoveryEmail').getValue() == "") {
+						this.items.item('recoveryEmail').setValue(newValue);
 					}
 				},
 				scope: this
@@ -99,15 +99,13 @@ GO.users.AccountPanel = function(config)
 		},
 		{
 			
-			itemId: 'recovery_email',
-			fieldLabel: GO.lang.strRecoveryEmail,
-			name: 'recovery_email',
+			itemId: 'recoveryEmail',
+			fieldLabel: t("Recovery e-mail"),
+			name: 'recoveryEmail',
 			allowBlank: false,
 			vtype:'emailAddress'
 		},
-		{fieldLabel: GO.lang['strFirstName'], name: 'first_name', allowBlank: false},
-		{fieldLabel: GO.lang['strMiddleName'], name: 'middle_name'},
-		{fieldLabel: GO.lang['strLastName'], name: 'last_name', allowBlank: false},
+		{fieldLabel: t('Display name'), name: 'displayName', allowBlank: false},
 		{
 			xtype:'panel',
 			hideLabel:true,

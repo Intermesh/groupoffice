@@ -54,19 +54,19 @@ if(empty($_REQUEST['r']) && PHP_SAPI!='cli'){
 		exit();
 	}
 	
-	$installed=true;
-	if(!\GO::config()->get_config_file() || empty(\GO::config()->db_user)){			
-		$installed=false;
-	}else
-	{
-		$stmt = \GO::getDbConnection()->query("SHOW TABLES");
-		if(!$stmt->rowCount())
-			$installed=false;
-	}
-	if(!$installed){
-		header('Location: '.\GO::config()->host.'install/');				
-		exit();
-	}
+//	$installed=true;
+//	if(!\GO::config()->get_config_file() || empty(\GO::config()->db_user)){			
+//		$installed=false;
+//	}else
+//	{
+//		$stmt = \GO::getDbConnection()->query("SHOW TABLES");
+//		if(!$stmt->rowCount())
+//			$installed=false;
+//	}
+//	if(!$installed){
+//		header('Location: '.\GO::config()->host.'install/');				
+//		exit();
+//	}
 
 	//check for database upgrades
 	$mtime = \GO::config()->get_setting('upgrade_mtime');
