@@ -941,8 +941,6 @@ table.display-panel {
 }
 .go-select-all-checkbox {
 	color: color($foreground, 'text');
-	margin-left: dp(8);
-	line-height: dp(24);
 	@extend %font-caption;
 	.x-form-checkbox + label:before{
 		color: color($foreground, "icon");

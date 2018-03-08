@@ -302,8 +302,8 @@ ul.x-tab-strip-bottom{
 	@extend %icon;
 	content: 'check_box_outline_blank'; // 'check_box' when on
 	position: relative;
-	top: dp(-3);
-	left: dp(-3);
+	top: dp(-4);
+	left: dp(-4);
 	width: dp(18);
 	height: dp(18);
 	color:color($foreground, 'icon');
@@ -385,29 +385,69 @@ ul.x-tab-strip-bottom{
       //border-bottom: 1px solid $cBgDark;
       color: color($foreground, 'text');
 	}
+	&-cb-label {
+		display: inline-block;
+		padding: dp(8) 0 dp(8) dp(40);
+	}
 	&-checkbox {
+		
 		position:absolute;
-		visibility:hidden;
+		opacity: 0;
+		
 		+ label::before {
 			@extend %checkbox;
-			margin-right: dp(16);
+			position: absolute;
+			top: dp(6);
+			left: dp(4);
 		}
 		&:checked + label::before {
 			content: 'check_box';
 		}
+		
+		+ label::after {
+			height: dp(32);
+			width: dp(32);
+			background-color: transparent;
+			border-radius: 50%;
+			content: " ";
+			position:absolute;
+			top: 1px;
+			left: 0;
+		}
+		&:focus + label::after {
+			background-color: rgba($cPrimary, 0.16);
+		}
 	}
 	&-radio {
-		display:none;
+		position:absolute;
+		opacity:0;
 		+ label {
 			margin-left: 0;
 		}
 		+ label:before {
-			padding-right: dp(16);
+			/*padding-right: dp(16);*/
 			@extend %icon;
 			content: 'radio_button_unchecked';
+			position: absolute;
+			top: dp(6);
+			left: dp(4);
 		}
 		&:checked + label:before {
 			content: 'radio_button_checked';
+		}
+		
+		+ label::after {
+			height: dp(32);
+			width: dp(32);
+			background-color: transparent;
+			border-radius: 50%;
+			content: " ";
+			position:absolute;
+			top: 1px;
+			left: 0;
+		}
+		&:focus + label::after {
+			background-color: rgba($cPrimary, 0.16);
 		}
 	}
 	&-radio-group {
@@ -618,7 +658,7 @@ ul.x-tab-strip-bottom{
 	//  }
 	&.x-btn-focus, &.x-btn-over {
 		transition: background-color 195ms linear, box-shadow 195ms $curve-standard;
-		background-color: rgba(14, 156, 197, 0.096);
+		background-color: rgba($cPrimary, 0.16);
 	}
 	&.primary {
 		.x-btn-text {
@@ -627,7 +667,7 @@ ul.x-tab-strip-bottom{
    }
 	&.danger {
 		&.x-btn-focus, &.x-btn-over {
-			background-color: rgba(14, 156, 197, 0.096);
+			background-color: rgba($cPrimary, 0.16);
 		}
 		.x-btn-text {
 			color: $cDanger;
@@ -1013,6 +1053,7 @@ ul.x-tab-strip-bottom{
 		&::before {
 			@extend %checkbox;
 		}
+		
 		.x-grid3-row-selected &::before {
 			content: 'check_box';
 		}
@@ -1109,7 +1150,7 @@ ul.x-tab-strip-bottom{
 		background-color: rgba(color($orange, 300), .08);
 	}
 	&-body  {
-		min-height: dp(56);
+		min-height: dp(152);
 		position:relative;
 		
 		.x-grid3-td-expander, 
@@ -1324,14 +1365,13 @@ td.grid-hd-group-cell {
 	left:50%;
 	top: 50%;
 	transform: translate(-50%, -50%);
+	padding: dp(16);
 	text-align:center;
 	color: color($foreground, 'disabled-text');
 	&::before {
 		@extend %icon;
 		font-size: sp(120) !important;
-		position:relative;
-		left: 25%;
-		top: dp(-120);
+		display: block;		
 	}
 }
 

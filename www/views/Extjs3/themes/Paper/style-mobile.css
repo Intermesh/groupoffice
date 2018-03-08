@@ -269,8 +269,8 @@ h1, #loading .loading-indicator {
   font-style: normal;
   font-size: 24px;
   /* Preferred icon size */
-  max-width: 24px;
-  max-height: 24px;
+  /*	max-width: dp(24);
+  	max-height: dp(24);*/
   color: inherit;
   width: auto;
   height: auto;
@@ -7041,8 +7041,8 @@ ul.x-tab-strip-bottom {
 .x-form-checkbox + label::before, .x-grid3-row-checker::before, .x-grid3-hd-checker::before, .x-grid3-check-col-td > div > div::before {
   content: 'check_box_outline_blank';
   position: relative;
-  top: -3px;
-  left: -3px;
+  top: -4px;
+  left: -4px;
   width: 18px;
   height: 18px;
   color: rgba(0, 0, 0, 0.54);
@@ -7091,22 +7091,53 @@ ul.x-tab-strip-bottom {
   border-color: rgba(0, 0, 0, 0.12); }
 .x-form-check-group-label {
   color: rgba(0, 0, 0, 0.87); }
+.x-form-cb-label {
+  display: inline-block;
+  padding: 8px 0 8px 40px; }
 .x-form-checkbox {
   position: absolute;
-  visibility: hidden; }
+  opacity: 0; }
   .x-form-checkbox + label::before {
-    margin-right: 16px; }
+    position: absolute;
+    top: 6px;
+    left: 4px; }
   .x-form-checkbox:checked + label::before {
     content: 'check_box'; }
+  .x-form-checkbox + label::after {
+    height: 32px;
+    width: 32px;
+    background-color: transparent;
+    border-radius: 50%;
+    content: " ";
+    position: absolute;
+    top: 1px;
+    left: 0; }
+  .x-form-checkbox:focus + label::after {
+    background-color: rgba(36, 58, 128, 0.16); }
 .x-form-radio {
-  display: none; }
+  position: absolute;
+  opacity: 0; }
   .x-form-radio + label {
     margin-left: 0; }
   .x-form-radio + label:before {
-    padding-right: 16px;
-    content: 'radio_button_unchecked'; }
+    /*padding-right: dp(16);*/
+    content: 'radio_button_unchecked';
+    position: absolute;
+    top: 6px;
+    left: 4px; }
   .x-form-radio:checked + label:before {
     content: 'radio_button_checked'; }
+  .x-form-radio + label::after {
+    height: 32px;
+    width: 32px;
+    background-color: transparent;
+    border-radius: 50%;
+    content: " ";
+    position: absolute;
+    top: 1px;
+    left: 0; }
+  .x-form-radio:focus + label::after {
+    background-color: rgba(36, 58, 128, 0.16); }
 .x-form-radio-group {
   padding-left: 16px; }
 .x-form-item {
@@ -7249,11 +7280,11 @@ ul.x-tab-strip-bottom {
     color: inherit; }
   .x-btn.x-btn-focus, .x-date-mp-btns button.x-btn-focus, .x-btn-focus.go-display-panel-browse, .x-btn.x-btn-over, .x-date-mp-btns button.x-btn-over, .x-btn-over.go-display-panel-browse {
     transition: background-color 195ms linear, box-shadow 195ms cubic-bezier(0.4, 0, 0.2, 1);
-    background-color: rgba(14, 156, 197, 0.096); }
+    background-color: rgba(36, 58, 128, 0.16); }
   .x-btn.primary .x-btn-text, .x-date-mp-btns button.primary .x-btn-text, .primary.go-display-panel-browse .x-btn-text {
     color: #243a80; }
   .x-btn.danger.x-btn-focus, .x-date-mp-btns button.danger.x-btn-focus, .danger.x-btn-focus.go-display-panel-browse, .x-btn.danger.x-btn-over, .x-date-mp-btns button.danger.x-btn-over, .danger.x-btn-over.go-display-panel-browse {
-    background-color: rgba(14, 156, 197, 0.096); }
+    background-color: rgba(36, 58, 128, 0.16); }
   .x-btn.danger .x-btn-text, .x-date-mp-btns button.danger .x-btn-text, .danger.go-display-panel-browse .x-btn-text {
     color: #d32f2f; }
   .x-btn-icon-small-top {
@@ -7530,7 +7561,7 @@ ul.x-tab-strip-bottom {
     padding-left: 12px;
     background-color: rgba(255, 183, 77, 0.08); }
   .x-grid3-body {
-    min-height: 56px;
+    min-height: 152px;
     position: relative;
     /*		.x-grid3-check-col-td, .x-grid3-row-checker {
     			padding-left: dp(16) !important;
@@ -7665,13 +7696,12 @@ td.grid-hd-group-cell {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  padding: 16px;
   text-align: center;
   color: rgba(0, 0, 0, 0.38); }
   .x-grid-empty::before {
     font-size: 120px !important;
-    position: relative;
-    left: 25%;
-    top: -120px; }
+    display: block; }
 
 .x-grid-with-col-lines .x-grid3-row td.x-grid3-cell {
   border-right-color: #ededed; }
@@ -9284,9 +9314,7 @@ table.display-panel {
   background-size: 16px 16px; }
 
 .go-select-all-checkbox {
-  color: rgba(0, 0, 0, 0.87);
-  margin-left: 8px;
-  line-height: 24px; }
+  color: rgba(0, 0, 0, 0.87); }
   .go-select-all-checkbox .x-form-checkbox + label:before {
     color: rgba(0, 0, 0, 0.54); }
 
