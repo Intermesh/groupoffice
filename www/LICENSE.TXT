@@ -1,6 +1,6 @@
 Group-Office groupware license
 
-Copyright (c) 2003-2016, Intermesh
+Copyright (c) 2003-2018, Intermesh
 All rights reserved.
 
 This program is protected by copyright law and the Group-Office license.
@@ -40,8 +40,6 @@ Used components / libraries
 ------------------------------------------------------------------------------------------
 Swift: LGPL 3.0 license /usr/share/common-licenses/LGPL
 TCPDF: LGPL 2.0 license /usr/share/common-licenses/LGPL
-TinyMCE: LGPL 2.1 license /usr/share/common-licenses/LGPL
-libwbxml: GPL 2.0 license /usr/share/common-licenses/GPL
 ExtJS: GPL 3.0 license /usr/share/common-licenses/GPL
 SabreDAV BSD license
 PLupload OEM Proprietary license
