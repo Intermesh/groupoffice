@@ -1,3 +1,6 @@
+08-03-2018 6.2.85
+- Fixed parse error in german translation
+
 06-03-2018 6.2.83
 - Log: Added jsonData column to go_log table that contains modification info on update of activerecord.
 - Billing: Order status has a checkbox to stop asking the user to sent clients a notification about the status change.
