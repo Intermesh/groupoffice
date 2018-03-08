@@ -68,10 +68,10 @@ go.Router = {
 	check: function (f) {
 		var path = f || this.getPath();
 				
-		if(path == this._setPath) {
-			this._setPath = null;
-			return this;
-		}
+//		if(path == this._setPath) {
+//			this._setPath = null;
+//			return this;
+//		}
 		this._setPath = null;
 		
 		for (var i = 0; i < this.routes.length; i++) {
@@ -91,7 +91,15 @@ go.Router = {
 		return this;
 	},
 	goto: function (path) {
-		window.location.hash = path || "";		
+		
+		if(this.getPath() == path) {
+			
+			//rerun route if hash is the same
+			go.Router.check();
+		} else
+		{		
+			window.location.hash = path || "";		
+		}
 		return this;
 	}
 }
