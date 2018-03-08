@@ -391,7 +391,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 *
 	 * @var StringHelper
 	 */
-	public $html_editor_font = "font-size:13px; font-family:Arial, Helvetica, sans-serif;";
+	public $html_editor_font = 'font-size:14px; -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; color: #212121;';
 
 	/**
 	 * The default font to be used in the generated PDF files.
