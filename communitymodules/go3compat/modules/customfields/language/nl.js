@@ -1,0 +1,32 @@
+GO.customfields.lang.customfields = 'Extra velden';
+GO.customfields.lang.category = 'Categorie';
+GO.customfields.lang.categories = 'Extra velden categorieën';
+GO.customfields.lang.manageCategories = 'Beheer categorieën';
+GO.customfields.lang.numberField = '<br />U kunt ieder nummer veld gebruiken. Omring veldnamen met {} en zet een spatie tussen ieder woord (bijv. {Nummer1} + {Nummer2} en niet Nummer1+Nummer2).<br />';
+GO.customfields.lang.selectOptions = 'Selecteer opties';
+GO.customfields.lang.noOptions = 'Er zijn nog geen opties gedefinieerd';
+GO.customfields.lang.enterText = 'Vul a.u.b. de tekst van de optie in:';
+GO.customfields.lang.functionProperties = 'Functie eigenschappen';
+GO.customfields.lang.restart = 'Wijzigingen die hier gemaakt worden zullen pas effect hebben na het opnieuw starten van Group-Office.';
+GO.customfields.lang.noFields = 'Geen extra velden om te tonen';
+GO.customfields.lang.createCategoryFirst='U moet eerst een categorie aanmaken';
+GO.customfields.lang.required='Vereist veld';
+GO.customfields.lang.validationRegexp='Validatie regexp.';
+
+GO.customfields.lang.importText='Upload een CSV bestand met een enkele kolom met de waarde of een tekstbestand met elke waarde op een regel.';
+GO.customfields.lang.multiselect='Multiselect';
+GO.customfields.lang.maxOptions='Maximaal aantal opties';
+GO.customfields.lang.zeroMeansUnlimited='0 betekent ongelimiteerd';
+GO.customfields.lang.multiselectForLastSlaveOnly='Alleen de laatste slave van een treeselect mag een multiselect combo zijn.';
+GO.customfields.lang.clickApplyFirst='Klik eerst op toepassen voordat u gaat importeren a.u.b.';
+GO.customfields.lang.treeImportText='U kunt een CSV bestand importeren waarbij iedere kolom een niveau in de boom representeerd. bv.<br />"optie 1","optie 1.1", "optie 1.1.1"<br />"optie 1","optie 1.2", "optie 1.2.1". Vergeet niet de comma met u persoonlijke instelling te vervangen.';
+GO.customfields.lang.usableOperators='De volgende operators kunnen gebruikt worden: / , * , + en - :<br /><br />';
+GO.customfields.lang.excludeFromGrid='Niet meenemen in grid';
+GO.customfields.lang.height='Hoogte';
+
+GO.customfields.lang.bulkEdit = 'Selectie wijzigen';
+GO.customfields.lang.applyToSelectionInstructions = 'Gebruik de rechter vinkvakjes om de waarde van velden toe te passen op alle geselecteerde bestanden.';
+GO.customfields.lang.applyCategoryChanges = 'Bovenstaande aanpassingen toepassen op de selectie';
+GO.customfields.lang.success = 'Succes';
+GO.customfields.lang.appliedToSelection = 'De aanpassingen zijn toegepast op de geselecteerde bestanden.';
+GO.customfields.lang.noFileSelected = 'Er zijn geen bestanden geselecteerd. Selecteer een aantal bestanden.';

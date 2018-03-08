@@ -1,0 +1,37 @@
+<?php
+/**
+ * Group-Office configuration file.
+ * Visit https://www.group-office.com/wiki/Configuration_file for available values
+ */
+
+$config['debug']=true;
+
+$config['version_nfs_field']='col_38';
+$config['webdav_auth_basic'] = true;
+$config['zpush2_loglevel'] = 16;
+$config['billing_round']='down';
+$config['email_enable_labels'] = true;
+$config['locale_all'] = 'en_US.utf8';
+$config['calendar_tasklist_show']='2';
+$config['checker_interval'] = 99999; //bye
+$config['nwc_mail_domain'] = 'intermesh.dev';
+$config['nwc_mail_body'] = '#KEY#ROUTE66#SENDER# -> #6E9Xz92f9723b148hW2kNnz#basic#RuhrMAIL#';
+$config['zpush2_special_log_users']=array('michael');
+$config["password_validate"]=false;
+$config["default_timezone"]='Europe/Berlin';
+$config["default_decimal_separator"]='.';
+$config["default_thousands_separator"]=',';
+$config["host"]='/';
+$config["title"]='Group-Office';
+$config["root_path"]='/var/www/groupoffice-6.2/www/';
+$config["tmpdir"]='/tmp/go_62/';
+$config["db_host"]='localhost';
+$config["db_user"]='root';
+$config["file_storage_path"]='/home/go/62/';
+$config["default_time_format"]='H:i';
+$config["db_name"]='go_62';
+$config["db_port"]='3306';
+$config["register_user_groups"]='Internal';
+$config["register_visible_user_groups"]='Internal';
+$config["webmaster_email"]='test@intermesh.dev';
+$config['chat_bosh_uri']='https://go62.loc:5281/http-bind';

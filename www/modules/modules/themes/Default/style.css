@@ -1,0 +1,40 @@
+
+.go-module-icon-modules, .go-menu-icon-modules{
+	background-image: url('images/modules.png') !important;
+}
+
+.go-tab-icon-modules {
+	background-image: none !important;
+}
+
+
+/* styles for wrapper div around buttons in a grid. Otherwise the paddings get screwed up. */
+.go-grid-button{
+margin: 2px 2px 5px 2px;
+width:100px;
+}
+
+.go-grid-button td{
+padding: 0px 0px 0px 0px;
+}
+
+.mo-description{
+	padding-left:27px;
+}
+
+.mo-title{
+	height:16px;
+	padding-left:22px;
+	background-repeat:no-repeat;
+	font-weight:bold;
+}
+
+.mo-buy{
+	margin-left:10px;
+	text-decoration:underline;
+	display:inline;
+	cursor:pointer;
+	color:#26687C;
+	z-index:9999999;
+	
+}

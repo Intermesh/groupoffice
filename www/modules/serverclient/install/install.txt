@@ -1,0 +1,22 @@
+Put these config values in config.php:
+
+#GO will connect to this installation to add a mailbox. It is the full url to the Group-Office installation with the postfixadmin module installed.
+$config['serverclient_server_url']='http://localhost/groupoffice/';
+$config['serverclient_username']='administrator';
+$config['serverclient_password']='somepass';
+
+#comma separated list of mailbox domains
+$config['serverclient_domains']='intermeshdev.nl';
+
+#The email account properties that will be added for the user
+$config['serverclient_mbroot'] = '';
+$config['serverclient_use_ssl'] = '0';
+$config['serverclient_novalidate_cert'] = '0';
+$config['serverclient_type']='imap';
+$config['serverclient_host']='localhost';
+$config['serverclient_port']=143;
+$config['serverclient_smtp_host']='localhost';
+$config['serverclient_smtp_port']=25;
+$config['serverclient_smtp_encryption']='';
+$config['serverclient_smtp_username']='';
+$config['serverclient_smtp_password']='';

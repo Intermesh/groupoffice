@@ -1,0 +1,21 @@
+use strict;
+
+# leave this line or Group-Office will overwrite your config
+
+#enable virus checking
+@bypass_virus_checks_maps = (
+   \%bypass_virus_checks, \@bypass_virus_checks_acl, \$bypass_virus_checks_re);
+
+#enable spam checking
+@bypass_spam_checks_maps = (
+   \%bypass_spam_checks, \@bypass_spam_checks_acl, \$bypass_spam_checks_re);
+
+
+#change spam destiny from D_BOUNCE to pass. We use Dovecot sieve to file the
+#spam into the spam folder
+$final_spam_destiny       = D_PASS;
+
+#Don't tag subject because we'll file it into the spam folder
+$sa_spam_subject_tag = '';
+
+1;  # ensure a defined return

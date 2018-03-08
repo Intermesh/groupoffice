@@ -1,0 +1,130 @@
+.go-module-icon-bookmarks , .go-menu-icon-bookmarks{
+	background:url('images/bookmarks.png');
+}
+
+.go-tab-icon-bookmarks {
+	background-image: none !important;
+}
+
+
+.categorie {
+	clear: both;
+	font: 14px Arial, Helvetica, sans-serif;
+  color: #333333;
+	margin-left: 6px;
+	padding-top: 10px;
+	letter-spacing:1px;
+}
+
+.closebutton {
+cursor:pointer;
+
+}
+
+
+.thumbnails {
+	background: transparent;
+	font-size: 11px;
+}
+
+
+
+
+
+.thumbnails .x-panel-body{
+	background: transparent ;
+	font: 11px Arial, Helvetica, sans-serif;
+}
+.thumbnails .thumb{
+	
+	padding: 4px 4px 4px 4px;
+	background: transparent;
+}
+
+.thumbnails .icons{
+	float: left;
+	padding: 2px 2px 2px 2px;
+	background: transparent;
+}
+
+.thumb-name{
+	/*line-height:40px;*/
+	vertical-align:top;
+	padding-bottom:20px;
+	padding-top:4px;
+	padding-left:30px;
+	background-position: 8px 4px;
+	background-repeat:no-repeat;
+}
+
+
+.thumbnails .thumb-wrap{
+	float: left;
+	width:300px;
+	height:100px;
+	cursor:pointer;
+/*	margin: 1px;*/
+}
+
+.thumbnails .thumb-wrap span{
+	display: block;
+	overflow: hidden;
+	text-align: center;
+}
+
+.thumbnails .x-view-over{
+  background: white ;
+}
+
+.thumbnails .x-view-selected .thumb{
+	background: white ;
+}
+
+.thumbnails .textonly {
+	background: transparent;
+	font: normal 12px tahoma,arial,helvetica,sans-serif;color:#000;white-space:nowrap;cursor:pointer;
+}
+
+
+
+.bookmark-column {
+    float:left;
+    width:320px;
+    padding:0px;
+    border-right: 1px solid #2A9AC9;
+    margin: 10px 0 0 0;
+}
+
+.bookmark-column span{
+    display: block;
+}
+
+.bookmark-column span.link{
+    box-sizing: border-box;
+    text-decoration: none;
+    color:inherit;
+    width:100%;
+    padding:5px 10px;
+}
+
+.bookmark-column span.title{
+    /*font-weight: bold;*/
+    color: #333333;
+    letter-spacing:1px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.2em;
+    width:100%;
+    text-align:left;
+    padding:10px;
+}
+
+.bookmark-column span.thumb{
+    background-repeat: no-repeat;
+    padding-left:20px;
+}
+
+.bookmark-column span.link.x-view-over{
+    border:none;
+    margin:0;
+    cursor:pointer;
+}

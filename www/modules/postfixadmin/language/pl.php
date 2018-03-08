@@ -1,0 +1,51 @@
+<?php
+
+
+$l["postfixadmin"]='Domeny e-mail';
+$l["address"]="Address";
+$l["goto_address"]="Goto";
+$l["maxquota"]="Max pojemność skrzynki (MB)";
+$l["transport"]="Transport";
+$l["backupmx"]="Backup MX";
+$l["fetchmailConfig"]="Konfiguracja Fetchmail";
+$l["fetchmailConfigs"]="Konfiguracje Fetchmail";
+$l["srcServer"]="Src server";
+$l["srcAuth"]="Src auth";
+$l["srcUser"]="Src user";
+$l["srcPassword"]="Src password";
+$l["srcFolder"]="Src folder";
+$l["pollTime"]="Poll time";
+$l["fetchall"]="Fetchall";
+$l["keep"]="Keep";
+$l["protocol"]="Protokół";
+$l["extraOptions"]="Dodatkowe opcje";
+$l["returnedText"]="Returned text";
+$l["mda"]="Mda";
+$l["date"]="Data";
+$l["username"]="Nazwa użytkownika";
+$l["password"]="Hasło";
+$l["confirmPassword"]='Powtórz hasło';
+$l["maildir"]="Katalog skrzynki";
+$l["quota"]="Pojemność skrzynki (MB)";
+$l["active"]="Aktywny";
+$l["vacation"]="Automatyczna odpowiedź";
+$l["vacationActive"]="Włącz domyślną odpowiedź";
+$l["email"]="Email";
+$l["subject"]="Temat";
+$l["body"]="Treść";
+$l["cache"]="Cache";
+$l["usage"]="Usage";
+$l["defaultQuota"]='Domyślna pojemność skrzynki (MB)';
+
+$l['name']='Postfix admin';
+$l['description']='Moduł do zarządzania wirtualnymi użytkownikami Postfix\'a w bazie danych {product_name}';
+$l['alias']='Alias';
+$l['aliases']='Aliasy';
+$l['domain']='Domena';
+$l['domains']='Domeny';
+$l['fetchmail_config']='Konfiguracja Fetchmail';
+$l['fetchmail_configs']='Konfiguracje Fetchmail';
+$l['mailbox']='Skrzynka pocztowa';
+$l['mailboxes']='Skrzynki pocztowe';
+$l['vacation_config']='Konfiguracja "Vacation"';
+$l['vacation_configs']='Konfiguracje "Vacation"';

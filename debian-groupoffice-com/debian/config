@@ -1,0 +1,18 @@
+#!/bin/sh
+
+set -e
+
+. /usr/share/debconf/confmodule
+
+db_input high groupoffice/information || true
+db_input high groupoffice/zpush || true
+db_go
+
+if [ -f /usr/share/dbconfig-common/dpkg/config.mysql ]; then
+        . /usr/share/dbconfig-common/dpkg/config.mysql
+        dbc_go groupoffice-com $@
+fi
+
+#DEBHELPER#
+
+exit 0

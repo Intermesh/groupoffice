@@ -1,0 +1,26 @@
+/*
+ * Ext JS Library 2.0.1
+ * Copyright(c) 2006-2008, Ext JS, LLC.
+ * licensing@extjs.com
+ * 
+ * http://extjs.com/license
+ */
+
+.go-module-icon-summary, .go-menu-icon-summary, .go-tab-icon-summary{
+	background-image: url('images/summary.png') !important;	
+}
+
+
+.rss-icon{
+	background-image: url('images/rss.gif') !important;	
+}
+.note-icon{
+	background-image: url('images/note.png') !important;	
+}
+
+.settings {
+    background-image:url( ../../../../views/Extjs3/ext/shared/icons/fam/folder_wrench.png ) !important;
+}
+.nav {
+    background-image:url( ../../../../views/Extjs3/ext/shared/icons/fam/folder_go.png ) !important;
+}

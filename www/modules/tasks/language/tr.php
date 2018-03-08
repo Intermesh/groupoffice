@@ -1,0 +1,46 @@
+<?php
+
+
+$l["noTask"]= 'Görüntülenecek Görev yok';
+$l["tasks"]= 'Görevler';
+$l["addTask"]= 'Görev ekle...';
+$l["tasklist"]= 'Görev Listesi';
+$l["tasklists"]= 'Görev listeleri';
+$l["showCompletedTasks"]= 'Biten görevleri göster';
+$l["filter"]= 'Filtrele';
+$l["dueDate"]= 'Tarihine kadar';
+$l["dueAt"]= 'saatine kadar';
+$l["needsAction"]= 'Uygulama gerekli';
+$l["accepted"]= 'Kabul edilmiş';
+$l["declined"]= 'Red edilmiş';
+$l["tentative"]= 'Müsait olursa';
+$l["delegated"]= 'Delege edilmiş';
+$l["completed"]= 'Bitmiş';
+$l["inProcess"]= 'Devam ediyor';
+$l["repeatEvery"]= 'Tekrar zamanı';
+$l["atDays"]= 'Şu günlerde';
+$l["repeatUntil"]= 'tarihine kadar tekrarla';
+$l["repeatForever"]= 'sürekli tekrarla';
+$l["recurrence"]= 'Tekrarlama';
+$l["remindMe"]= 'Hatırlatıcı';
+$l["options"]= 'Seçenekler';
+$l["createLink"]= 'Bir bağlantı oluştur';
+$l["startsAt"]='Başlama saati';
+$l["showInactiveTasks"]='Aktif olmayan görevleri göster';
+$l["scheduleCall"]='Bir arama kur';
+$l["taskDefaults"]='Görevler için varsayılan ayarlar';
+$l['name']='Görevler';
+$l['description']='Buraya bir açıklama koyunuz';
+$lang['link_type'][12]=$l['task']='Görev';
+$l['status']='Durum';
+$l['scheduled_call']='%s için zamanlanmış çağrı';
+$l['statuses']['NEEDS-ACTION'] = 'yapılması gerekli';
+$l['statuses']['ACCEPTED'] = 'Kabul edilmiş';
+$l['statuses']['DECLINED'] = 'Red edilmiş';
+$l['statuses']['TENTATIVE'] = 'Duruma göre';
+$l['statuses']['DELEGATED'] = 'Delegasyon yapılmış';
+$l['statuses']['COMPLETED'] = 'Bitmiş';
+$l['statuses']['IN-PROCESS'] = 'Sürüyor';
+$l['import_success']='%s görev içeri aktarılmıştır';
+$l['call']='Çağrı';
+$l['dueAtdate']='saat %s göre';

@@ -1,0 +1,7 @@
+.go-module-icon-groups , .go-menu-icon-groups {
+	background:url('images/groups.png');
+}
+
+.go-tab-icon-groups {
+	background-image: none !important;
+}

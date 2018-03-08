@@ -1,0 +1,16 @@
+body{
+	background-color:#f1f1f1;
+	font:12px arial;
+	line-height:18px;
+}
+
+#container{
+	/*width:1000px;*/
+	padding:20px;
+	margin:10px auto;
+	background-color:white;
+	background:white url(images/groupoffice.gif) 20px 20px no-repeat;
+	padding-top:80px;
+	border:1px solid #ddd;
+	border-radius: 6px;
+}

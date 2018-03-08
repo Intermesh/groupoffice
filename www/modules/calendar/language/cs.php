@@ -1,0 +1,284 @@
+<?php
+
+
+$l['name'] = 'Kalendář';
+$l['description'] = 'Modul, který umožňuje přidávat, upravovat a mazat činnosti. Má také možnost prohlížet činnosti od ostatní uživatelů a v případě nutnosti je měnit.';
+$l['groupView'] = 'Skupiny';
+$l['event']='Událost';
+$l['startsAt']='Od';
+$l['endsAt']='Do';
+$l['exceptionNoCalendarID'] = 'CHYBA: Kalendář nemá ID!';
+$l['appointment'] = 'Činnost: ';
+$l['allTogether'] = 'Všichni dohromady';
+$l['location']='Místo';
+$l['invited']='Jste pozváni na následující akce';
+$l['acccept_question']='Chcete přijmout tuto akci?';
+$l['accept']='Přijmout';
+$l['decline']='Odmítnout';
+$l['bad_event']='Akce již neexistuje';
+$l['subject']='Předmět';
+$l['status']='Stav';
+$l['statuses']['NEEDS-ACTION'] = 'Vyžaduje akci';
+$l['statuses']['ACCEPTED'] = 'Přijatý';
+$l['statuses']['DECLINED'] = 'Odmítnutý';
+$l['statuses']['TENTATIVE'] = 'Nezávazný';
+$l['statuses']['DELEGATED'] = 'Delegovaný';
+$l['statuses']['COMPLETED'] = 'Dokončený';
+$l['statuses']['IN-PROCESS'] = 'V procesu';
+$l['statuses']['CONFIRMED'] = 'Potvrzený';
+$l['statuses']['CANCELLED'] = 'Zrušený';
+$l['accept_mail_subject'] = 'Pozvánka pro \'%s\' byla přijata';
+$l['accept_mail_body'] = '%s přijal vaše pozvání na:';
+$l['decline_mail_subject'] = 'Pozvánka na \'%s\' byla odtmítnuta';
+$l['decline_mail_body'] = '%s nepřijal vaše pozvání na:';
+$l['location']='Místo';
+$l['not_invited']='Nebyli jste pozváni na tuto akci. Budete se muset přihlásit jako jiný uživatel.';
+$l['accept_title']='Přijat';
+$l['accept_confirm']='Autor bude obeznámen o Vašem přijmutí akce';
+$l['decline_title']='Odmítnutý';
+$l['decline_confirm']='Autor bude obeznámen o Vašem odmítnutí akce';
+$l['cumulative']='Neplatné opakování. Další činnost nesmí být zahájena dříve, než předchozí skončí.';
+$l['already_accepted']='Již byla potvrzena tato údalost.';
+$l['private']='Osobní';
+$l['import_success']='%s událostí bylo importováno';
+$l['printTimeFormat']='Od %s dp %s';
+$l['printLocationFormat']=' v umístění "%s"';
+$l['printPage']='Strana %s z %s';
+$l['printList']='Seznam událostí';
+$l['printAllDaySingle']='Celý den';
+$l['printAllDayMultiple']='Celý den od %s do %s';
+$l['calendars']='Kalendáře';
+$l['resource_mail_subject']='Prostředek \'%s\' byl zamluven'; //%s is resource name;
+$l['resource_confirmed_mail_body']='%s vytvořil rezervaci pro prostředek \'%s\' a potvrdil rezervaci. Vy jste správcem tohoto prostředku. Použijte odkaz níže, pokud chcete zrušit rezervaci.';
+$l['resource_mail_body']='%s vytvořil rezervaci pro prostředek \'%s\'. Vy jste správcem tohoto prostředku. Prosím, otevřete, zakažte nebo schvalte rezervace.'; //First %s is the name of the person who created the event. Second is the calendar name;
+$l['open_resource']='Otevřená rezervace';
+$l['resource_modified_mail_subject']='Rezervace prostředku \'%s\' byla změněna';//%s is resource name;
+$l['resource_modified_mail_body']='%s změnil rezervace pro prostředek \'%s\'. Vy jste správcem tohoto prostředku. Prosím, otevřete, zakažte nebo schvalte rezervace.'; //First %s is the name of the person who created the event. Second is the calendar name;
+$l['your_resource_modified_mail_subject']='Vaše rezervace pro \'%s\' ve stavu %s byla změněna';
+$l['your_resource_modified_mail_body']='%s byla změněna Vaše rezervace pro prostředek \'%s\'.';
+$l['your_resource_accepted_mail_subject'] = 'Rezervace pro \'%s\' byla přijata';//%s is resource name, status;
+$l['your_resource_accepted_mail_body'] = '%s přijal Vaši rezervaci pro prostředek \'%s\'.'; //First %s is the name of the person who created the event. Second is the calendar name;
+$l['your_resource_declined_mail_subject'] = 'Rezervace pro \'%s\' byla odmítnuta';//%s is resource name;
+$l['your_resource_declined_mail_body'] = '%s odmítnul Vaši rezervaci pro prostředek \'%s\'.'; //First %s is the name of the person who created the event. Second is the calendar name;
+$l['birthday_name']='Narozeniny: {NAME}';
+$l['birthday_desc']='{NAME} oslavil dnes {AGE}';
+$l['unauthorized_participants_write']='Nemáte dostatečná oprávnění k naplánování událostí pro následující uživatele:<br /><br />{NAMES}<br /><br />Můžete poslat pozvánku, aby mohli událost přijmout a naplánovat.';
+$l['noCalSelected'] = 'Nebyly vybráný kalendáře pro tento přehled. Vyberte alespoň jeden kalendář v Administraci.';
+$l['rightClickToCopy']='Klikněte pravým tlačítkem pro zkopírování odkazu';
+$l['invitation']='Pozvánka';
+$l['invitation_update']='Změna pozvánky';
+$l['cancellation']='Zrušení';
+$l['cancelMessage']='Následující událost na kterou jste byli pozvání, byla už zrušena.';
+$l['non_selected'] = 'v nevybraném kalendáři';
+$l['linkIfCalendarNotSupported']='Používejte pouze odkazy níže, pokud Váš e-mailový klient nepodporuje funkce kalendáře.';
+
+$l["addressbook"]='Adresář';
+$l["appointment"]= 'Činnost';
+$l["appointments"]= 'Činnosti';
+$l["recurrence"]= 'Opakování';
+$l["options"]= 'Nastavení';
+$l["repeatForever"]= 'opakovat vždy';
+$l["repeatEvery"]= 'Opakování';
+$l["repeatUntil"]= 'Opakování do';
+$l["busy"]= 'Zobrazit v činnosti';
+$l["allDay"]= 'Celé dny';
+$l["navigation"]= 'Navigace';
+$l["oneDay"]= '1 den';
+$l["fiveDays"]= '5 dnů';
+$l["sevenDays"]= '7 dnů';
+$l["month"]= 'Měsíc';
+$l["recurringEvent"]= 'Opakující se událost';
+$l["deleteRecurringEvent"]= 'Opravdu chcete odstranit jedinou činnost nebo všechny činnosti této opakované události?';
+$l["singleOccurence"]= 'Událost';
+$l["entireSeries"]= 'Celá série';
+$l["calendar"]= 'Kalendář';
+$l["calendars"]= 'Kalendáře';
+$l["views"]= 'Pohledy';
+$l["administration"]= 'Administrace';
+$l["needsAction"]= 'Vyžaduje akci';
+$l["accepted"]= 'Přijatý';
+$l["declined"]= 'Odmítnutý';
+$l["tentative"]= 'Nezávazný';
+$l["delegated"]= 'Delegovaný';
+$l["confirmed"]= 'Potvrzený';
+$l["noRecurrence"]= 'Žádné opakování';
+$l["notRespondedYet"]= 'Dosud neodpověděno';
+$l["days"]= 'Dny';
+$l["weeks"]= 'Týdny';
+$l["monthsByDate"]= 'Měsíce podle data';
+$l["monthsByDay"]= 'Měsíce podle dnů';
+$l["years"]= 'Roky';
+$l["months"]= 'Měsíce';
+$l["atDays"]= 'V dny';
+$l["noReminder"]= 'Nepřipomínat';
+$l["reminder"]='Připomínání';
+$l["participants"]= 'Účastníci';
+$l["checkAvailability"]= 'Ověřit dostupnost';
+$l["sendInvitation"]= 'Poslat pozvánku';
+$l["emailSendingNotConfigured"]= 'Není nakonfigurované odesílání emailu.';
+$l["privateEvent"]= 'Soukromé';
+$l["noInformationAvailable"]= 'Nejsou k dispozici žádné informace';
+$l["noParticipantsToDisplay"]= 'Žádní učastnící k zobrazení';
+$l["previousDay"]= 'Předchozí den';
+$l["nextDay"]= 'Následující den';
+$l["noAppointmentsToDisplay"]= 'Žádné činnosti k zobrazení';
+$l["selectCalendar"]= 'Vyberte kalendář';
+$l["selectCalendarForAppointment"]= 'Vyberte kalendář pro vložení této činnosti';
+$l["closeWindow"]= 'Činnost byla přijata a naplánována. Můžete zavřít toto okno.';
+$l["list"]='Přehled';
+$l["editRecurringEvent"]='Přejete si upravit tuto událost nebo celou sérii?';
+$l["selectIcalendarFile"]='Vyberte icalendar (*.ics) soubor';
+$l["location"]='Umístění';
+$l["startsAt"]='Začátek';
+$l["endsAt"]='Konec';
+$l["eventDefaults"]='Výchozí nastavení událostí';
+$l["importToCalendar"]='Přidat činnost přímo do kalendářů';
+$l["default_calendar"]='Výchozí kalendář';
+$l["status"]='Stav';
+$l["resource_groups"]='Skupiny prostředků';
+$l["resource_group"]='Skupina prostředku';
+$l["resources"]='Prostředky';
+$l["resource"]='Prostředek';
+$l["calendar_group"]='Skupina kalendářů';
+$l["admins"]='Administrátoři';
+$l["no_group_selected"]='Vyskytly se chyby ve formuláři. Musíte vybrat skupinu pro tento prostředek.';
+$l["visibleCalendars"]='Viditelné kalendáře';
+$l["visible"]='Viditelný';
+$l["group"]='Skupina';
+$l["no_status"]='Nový';
+$l["no_custom_fields"]='Nejsou k dispozici žádné další možnosti.';
+$l["show_bdays"]='Zobrazit narozeniny z adresáře';
+$l["show_tasks"]='Zobrazit úkoly z přehledu úkolů';
+$l["myCalendar"]='Můj kalendář';
+$l["merge"]='Sloučit';
+$l["ownColor"]= 'Pro každý kalendář použít vlastní barvu';
+$l["ignoreConflictsTitle"]= 'Ignorovat konflikty?';
+$l["ignoreConflictsMsg"]= 'Tato událost koliduje s jinou událostí ve Vašem kalendáři. Chcete tuto událost i přesto uložit?';
+$l["resourceConflictTitle"]= 'Zdroj konfliktu';
+$l["resourceConflictMsg"]= 'Jeden nebo více zdrojů v této události používá stejný čas:</br>';
+$l["view"]= 'Pohled';
+$l["calendarsPermissions"]='Oprávnění kalendářů';
+$l["resourcesPermissions"]='Oprávnění prostředků';
+$l["categories"]='Kategorie';
+$l["category"]='Kategorie';
+$l["globalCategory"]='Globální kategorie';
+$l["globalCategories"]='Globální kategorie';
+$l["selectCategory"]='Vyberte kategorii';
+$l["duration"]='Doba';
+$l["move"]='Přesunout';
+$l["showInfo"]='Podrobnosti';
+$l["copyEvent"]='Kopírování události';
+$l["moveEvent"]='Přesun události';
+$l["eventInfo"]='Podrobnosti události';
+$l["isOrganizer"]='Organizátor';
+$l["sendInvitationInitial"]='Chcete všem účastníkům poslat oznámení?';
+$l["sendInvitationUpdate"]='Chcete všem účastníkům poslat oznámení o úpravě?';
+$l["sendCancellation"]='Chcete všem účastníkům poslat oznámení o zrušení?';
+$l["forthcomingAppointments"]='Nadcházející události';
+$l["pastAppointments"]='Minulé události';
+$l["quarterShort"]= 'Q';
+
+$l["globalsettings_templatelabel"]= 'Šablona';
+$l["globalsettings_allchangelabel"]= 'Přejmenovat již existující';
+$l["globalsettings_renameall"]= 'Opravdu chcete přejmenovat všechny výchozí uživatelské kalendáře?';
+
+$l["publishICS"]='Publikovat iCalendar soubor pro poslední měsíc a budoucí události. Pozor! Kalendář bude čitelný pro všechny.';
+$l["addTimeRegistration"]='Importovat časovou registraci';
+$l["showNotBusy"]='Nezobrazovat nové rezervace jako zaneprázdněný';
+$l["sendEmailParticipants"]= 'Vytvoři e-mail pro účastníky';
+
+$l['eventAccepted']='Událost byla přijata.';
+$l['eventScheduledIn']='Událost byla naplánována do Vašeho kalendáře s názvem %s se stavem %s.';
+$l['eventDeclined']="Událost byla odmítnuta.";
+$l['eventUpdatedIn']='Událost v kalendáři %s byla změněna se stavem %s';
+
+$l['updateReponses']["ACCEPTED"]='%s přijal událost %s';
+$l['updateReponses']["DECLINED"]='%s odmítnul událost %s';
+$l['updateReponses']["TENTATIVE"]='%s označil událost %s jako předběžnou';
+$l['updateReponses']["NEEDS-ACTION"]='%s označil událost %s jako vyžaduje akci';
+
+$l['directUrl']='Přímá URL';
+
+$l['errorOrganizerOnly'] = 'Nemáte oprávnění upravovat tuto událost, protože nejste organizátor.';
+$l['errorOrganizerOnlyTitle'] = 'Nejste organizátor';
+$l['cantRemoveOrganizer']="Nemůžete odstranit organizátora";
+$l['calendarColor']='Barva kalendáře';
+$l['eventDeleted']="Událost byla smazána z Vašeho kalendáře";
+
+$l['attendance']='Účast';
+$l['organizer']='Organizátor';
+$l['notifyOrganizer']="Informovat organizátora o mém rozhodnutí pomocí e-mailové zprávy";
+
+$l['iWillAttend']="Zúčastním se";
+$l['iMightAttend']="Mohl bych se zúčastnit";
+$l['iWillNotAttend']="Nezúčastním se";
+$l['iWillDecideLater']="Ještě jsem se nerozhodnul";
+
+$l['eventUpdated']="Následující událost byla upravena organizátorem";
+
+$l['notifyCancelParticipants']='Odeslat účastníkům oznámení o zrušení?';
+$l['notifyCancelOrganizer']='Odeslat organizátorovi oznámení o Vaší neúčasti pomocí e-mailové zprávy?';
+$l['notifyParticipants']='Informovat účastníky?';
+$l['sendNotificationTitle']='Odeslaz oznámení?';
+$l['sendNotification']='Odeslat oznámení účastníkům pomocí e-mailové zprávy?';
+$l['sendUpdateNotification']='Odeslat informaci o změnách účastníkům pomocí e-mailové zprávy?';
+
+$l['openCalendar']='Otevřít kalendář';
+$l['createPermission']="Právo zápisu";
+
+$l['show_holidays']="Zobrazit prázdniny";
+$l['participant']='Účastník';
+$l['clickForAttendance']='Klikněte zde pro Váš stav o účasti';
+
+$l['viewDay']='Den';
+$l['viewMorning']='Dopoledne';
+$l['viewAfternoon']='Odpoledne';
+$l['viewEvening']='Večer';
+
+$l['cronEventAndTaskReportMailer']='E-mailový klient pro dnešní události a úkoly';
+$l['cronEventAndTaskReportMailerDescription']='Každému uživateli v cronu se odešle e-mailová zpráva s dnešními událostmi a úkoly';
+$l['cronEventAndTaskReportMailerPdfSubtitle']='Dnešní události a úkoly';
+$l['cronEventAndTaskReportMailerSubject']='Dnešní události a úkoly';
+$l['cronEventAndTaskReportMailerContent']='V přiloženém PDF soubory naleznete seznam dnešních událostí a úkolů.';
+$l['eventPrivateChecked'] = 'Všimněte si, že v případě, že událost je označena jako soukromá, soubory z této události jsou stále přístupné uživatelům, kteří mají oprávnění ke kalendáři této události.';
+
+$l['show_completed_tasks'] = "Zobrazit dokončené úkoly";
+$l['showStatuses']='Zobrazovat stavy v pohledech';
+$l['cantMoveRecurringByDay']="Bohužel, nelze přesunou události, které se opakují všední, do ostatní dnů jako je tento. Vytvořte novou událost a nastavte opakování.";
+
+$l['eventNotSavedSubject'] = 'Událost nebyla uložena v %event kalendáři "%cal"';
+$l['eventNotSavedBody'] = 'This message is from your %goname calendar. %goname attempted to import an event called "%event" with start time %starttime from an external calendar into calendar "%cal", but that could not be done because the event contained errors. The event may still be in the external calendar.'.
+								"\r\n\r\n".'The following is the error message:'."\r\n".'%errormessage';
+
+$l['usedResources'] = 'Použité prostředky';
+
+$l['shareCalendarsCron'] = 'Aktualizace souborů sdílených kalendářů';
+$l['shareCalendarsCronDescription'] = 'Aktualizuje soubory sdílených kalendářů, které jsou publikované';
+
+$l['cmdPrintView'] = 'Vytisknout aktuální pohled';
+$l['cmdPrintCategoryCount'] = 'Vytisknout počet pro každou kategorii';
+$l['startDate'] = 'Začátek';
+$l['endDate'] = 'Konec';
+$l['eventsPerCategoryCount'] = 'Počet událostí pro každou kategorii';
+$l['nextMonth'] = 'Následující měsíc';
+$l['previousMonth'] = 'Předchozí měsíc';
+$l['till'] = 'až do';
+$l['total'] = 'Celkem';
+
+$l['sendNotificationToNewParticipants']='Chcete informovat e-mailem pouze účastníkům, které jste právě přidali?';
+$l['newParticipants']='Nový účastníci';
+$l['allParticipants']='Všichni účastníci';
+$l['noParticipants']='Žádní účastníci';
+$l['cannotHandleInvitation']='Kalendář je propojený s tímto e-mailovým účtem "%s" a do něj nemáte oprávnění zápisu. Protože událost se nachází právě v tomto kalendáři, stav nebyl změněn.';
+$l['cannotHandleInvitation2']='Nelze aktualizovat stav události, protože nemáte dostatečná práva ke kalendáři, který je propojen s e-mailovým účtem (kalendář: "%s"). Protože událost se nachází právě v tomto kalendáři, stav nebyl změněn.';
+
+$l['tooltip'] = 'Text popisku';
+$l['moveEventResourceError'] = 'Událost nemohla být přesunuta, protože následující prostředky nejsou dostupné:';
+
+$l['allTogetherForParticipants']= 'Všichni účastníci dohromady';
+$l['allTogetherForResources']= 'Všechny prostředky dohromady';
+$l['resourceUsedIn']= 'Použité zdroje';
+$l['exportAsIcs']= 'Exportovat jako ICS';
+$l['noDefaultCalendar']= "Nemáte nastaven výchozí kalendář. Prosím vyberte jeden ve vašem nastavení.";
+$l['calNotDeletedDefault']= "Nesmazáno!\nToto je výchozí kalendář uživatele :username";
+$l['last']= 'Poslední';

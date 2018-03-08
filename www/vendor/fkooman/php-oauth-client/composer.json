@@ -1,0 +1,23 @@
+{
+    "authors": [
+        {
+            "email": "fkooman@tuxed.net",
+            "name": "Fran\u00e7ois Kooman",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "fkooman\\OAuth\\Client": "src/"
+        }
+    },
+    "description": "PHP OAuth 2.0 Client",
+    "license": "LGPL-3.0+",
+    "name": "fkooman/oauth-client",
+    "require": {
+        "ext-openssl": "*",
+        "fkooman/oauth-common": "0.5.*",
+        "guzzle/guzzle": "~3.8",
+        "php": ">=5.3.3"
+    }
+}

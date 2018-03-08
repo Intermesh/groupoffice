@@ -1,0 +1,24 @@
+.go-module-icon-tasks , .go-menu-icon-tasks , .go-tab-icon-tasks {
+	background-image: url('images/tasks.png') !important;
+}
+
+.go-link-icon-12 {
+	background-image: url('images/tasks.png') !important;
+	width:16px;
+	height:16px;
+}
+
+#tasks-new-task-icon{
+	background-image: url('images/newtask.png') !important;
+	height:16px;
+	width:16px;
+	margin-left:5px;	 
+}
+
+
+.tasks-complete-icon{
+	background-image: url('images/complete.png') !important;
+	width:16px;
+	height:16px;
+	
+}

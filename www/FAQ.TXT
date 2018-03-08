@@ -1,0 +1,68 @@
+GROUP-OFFICE FAQ
+
+1. Can I upload big files?
+	Yes you can. With the Java upload applet you can upload large files without changing the PHP 
+	configuration. It will send files in 1 MB chunks.
+	
+	For the regular HTTP upload some changes in php.ini are required for this:
+	
+	post_max_size = ??M
+	file_uploads = On
+	upload_max_filesize = ??M
+	
+	for apache's module config: conf.d/php.conf:
+	
+	limit_request_body = ?? 
+	
+	Also if the upload is taking a long time you should set the connection timeout from your webserver 
+	to a higher value. For apache (httpd.conf):
+	
+	Timeout ???
+	
+	Also check for Proxy server limits
+	
+
+2. Can I create folders and filters with POP-3 servers?
+	No you can't. Multiple folders and filters are only supported with IMAP servers.
+	 
+3. Why do I get this error when i use the e-mail module?
+   'Error: the imap extension for PHP is not installed' or 
+   'Fatal error: Call to undefined function: imap_utf7_encode() in ../classes/imap.class.inc on line 33'
+   	
+   	You didn't compile imap in PHP this is required for both IMAP and POP3.
+
+4. Why do I instantly get an access denied error when I open the file manager?
+	Because the home directories from the users are not writable for the webserver. The home directories are located
+	in the path you entered where Group-Office should store files. The default setting is /home/groupoffice.
+	The directory groupoffice should be owned by the webserver user and the directory home should be 
+	accessible (executable).
+
+5. After installation I can't change the ownership of config.php and it won't start. What can I do?
+	You can donwload Group-Office.php with FTP, delete it from the server and upload it back.
+		
+6. Why can' t I connect to Cyrus? It gives me a cross-realm error.
+	Try these settings:
+		allowplaintext:yes;
+		sasl_mech_list: PLAIN
+		sasl_minimum_layer:0
+
+7. I've put my config file in /etc/groupoffice/../.... But when I access Group-Office
+	with different URL's it sometimes doesn't find the config file.
+	
+	You need to set: "UseCanonicalName On" in httpd.conf of apache. This way
+	it always uses the same name.
+
+8. Where can I store my contributions
+https://kjm-server.de/svn/group-office-contrib 
+
+9. How to install PECL fileinfo extension?
+
+On Debian / Ubuntu:
+
+Do not do this on a production machine. This will install development tools that do not belong on a 
+production server.
+
+apt-get install libmagic1-dev php5-dev php-pear
+pecl install Fileinfo
+Add "extension=fileinfo.so" to php.ini (/etc/php5/{cli,cgi}/php.ini)
+ln -s /usr/share/file/magic /etc/magic.mime

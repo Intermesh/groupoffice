@@ -1,0 +1,10 @@
+.go-module-icon-notes , .go-menu-icon-notes , .go-tab-icon-notes {
+	background-image:url('images/notes.png') !important;
+}
+.go-link-icon-4 {
+	background-image: url('images/notes.png') !important;
+}
+
+.no-btn-categories{
+	background-image: url('images/categories.png') !important;
+}

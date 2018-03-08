@@ -1,0 +1,24 @@
+To enable Dropbox for a Group-Office installation a couple of things need to be done.
+
+1. As a user that has "manage" permissions for the dropbox module, go to "Settings"=>"Dropbox sync" and click on the "Settings" button located on that tab.
+
+2. Go to the website "https://www.dropbox.com/developers/apps" and create an app for Group-Office.
+	 - Make sure that you have also provided a correct "Redirect URI" in the app creation screen, otherwise the module will not work.
+   - Also provide a correct "Webhook URI" in the app creation screen. This is used to send notifications about Dropbox changes back to Group-Office.
+
+2. The generated App key and App secret need to be filled in in the "settings" dialog.
+
+3. Save the settings and click on "OK" to close the settings dialog.
+
+4. Group-Office will now reload and the dropbox app will be configured.
+
+========================
+
+Now every user that wants to start syncing to Group-Office will need to login into Group-Office and then click on the "Connect" button that can be found
+in "Settings"=>"Dropbox sync".
+
+Then the user will be redirected to the Dropbox website to login with their dropbox account and when that's finished they need to explicitly grant Group-Office
+to connect with their Dropbox account.
+When that's done, the screen can be closed and Group-Office is connected to Dropbox.
+
+The sync will be handled by a cronjob and the Dropbox folder in the user's file module will be created upon first sync.

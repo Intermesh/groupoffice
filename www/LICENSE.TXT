@@ -1,0 +1,47 @@
+Group-Office groupware license
+
+Copyright (c) 2003-2016, Intermesh
+All rights reserved.
+
+This program is protected by copyright law and the Group-Office license.
+
+If you have any questions about licensing you can send an e-mail to:
+
+info@intermesh.nl
+
+or write to:   
+
+Intermesh B.V.
+Veemarktkade 8
+5222 AE 's-Hertogenbosch
+The Netherlands   
+
+tel. +31 (0) 73 20 46 000
+https://www.group-office.com
+
+
+Open Source License
+------------------------------------------------------------------------------------------
+Group-Office is licensed under the terms of GNU Affero General Public License.
+Some Group-Office modules may have a different license. 
+
+http://www.gnu.org/licenses/agpl.html
+
+
+Professional License
+------------------------------------------------------------------------------------------
+Some modules are encrypted with Ioncube and require a license.
+
+https://www.group-office.com/license-agreement.html for the terms.
+
+
+
+Used components / libraries
+------------------------------------------------------------------------------------------
+Swift: LGPL 3.0 license /usr/share/common-licenses/LGPL
+TCPDF: LGPL 2.0 license /usr/share/common-licenses/LGPL
+TinyMCE: LGPL 2.1 license /usr/share/common-licenses/LGPL
+libwbxml: GPL 2.0 license /usr/share/common-licenses/GPL
+ExtJS: GPL 3.0 license /usr/share/common-licenses/GPL
+SabreDAV BSD license
+PLupload OEM Proprietary license

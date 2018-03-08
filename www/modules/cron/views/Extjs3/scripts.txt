@@ -1,0 +1,10 @@
+modules/cron/views/Extjs3/Stores.js
+modules/cron/views/Extjs3/ParametersPanel.js
+modules/cron/views/Extjs3/CronDialog.js
+
+modules/cron/views/Extjs3/PeriodGrid.js
+
+modules/cron/views/Extjs3/SettingsDialog.js
+modules/cron/views/Extjs3/CronGrid.js
+
+modules/cron/views/Extjs3/MainPanel.js

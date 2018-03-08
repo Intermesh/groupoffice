@@ -1,0 +1,6 @@
+PHP must support openssl functions and you probably want to set the location of 
+the root CA's. This may be a file or directory. eg.:
+
+$config['smime_root_cert_location']='/etc/ssl/certs';
+
+See http://php.net/manual/en/function.openssl-pkcs7-sign.php

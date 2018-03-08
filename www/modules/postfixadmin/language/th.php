@@ -1,0 +1,50 @@
+<?php
+
+
+$l['name']='Postfix admin';
+$l['description']='postfix เป็นการจัดการ  postfix เสมือนสำหรับผู้ใช้งานเพื่อใช้งานฐานข้อมูลบน {product_name}';//A module to manage virtual postfix users in the {product_name} database;
+$l['fetchmail_config']='การตั้งค่าเรียกใช้อีเมล';//Fetchmail config;
+$l['fetchmail_configs']='การตั้งค่าเรียกใช้อีเมล';//Fetchmail configs;
+$l['vacation_config']='การตั้งค่าการปิดใช้งานอีเมล';//Vacation config;
+$l['vacation_configs']='การตั้งค่าการปิดใช้งานอีเมล';//Vacation configs;
+
+$l["postfixadmin"]='อีเมลโดเมน';//E-mail domains;
+$l["alias"]="นามสมมุติ";//Alias;
+$l["address"]="ที่อยู่";//Address;
+$l["goto_address"]="ไปที่";//Goto;
+$l["domains"]="โดเมน";//Domains;
+$l["aliases"]="นามสมมุติ";//Aliases;
+$l["maxquota"]="โควต้าสูงสุด (MB)";//Max quota;
+$l["transport"]="การติดต่อสื่อสาร";//Transport;
+$l["backupmx"]="การสำรองข้อมูล  MX";//Backup;
+$l["fetchmailConfig"]="การตั้งค่าเรียกใช้อีเมล";//Fetchmail config;
+$l["fetchmailConfigs"]="การตั้งค่าเรียกใช้อีเมล";//Fetchmail configs;
+$l["srcServer"]="Src เซิร์ฟเวอร์";//server;
+$l["srcAuth"]="Src auth";
+$l["srcUser"]="Src ผู้ใช้งาน";//user;
+$l["srcPassword"]="Src รหัสผ่าน";//password;
+$l["srcFolder"]="Src โฟลเดอร์";//folder;
+$l["pollTime"]="เวลาในการสำรวจความคิดเห็น";//Poll time;
+$l["fetchall"]="เรียกทั้งหมด";//;
+$l["keep"]="บันทึกที่";//Keep;
+$l["protocol"]="โปรโตคอล";//Protocol;
+$l["extraOptions"]="ตัวเลือกพิเศษ";//Extra options;
+$l["returnedText"]="ส่งคืนข้อความ";//Returned text;
+$l["mda"]="Mda";
+$l["date"]="วัน";//Date;
+$l["mailbox"]="กล่องจดหมาย";//Mailbox;
+$l["mailboxes"]="กล่องจดหมาย";//Mailboxes;
+$l["username"]="ชื่อใช้งาน";//Username;
+$l["password"]="รหัสผ่าน";//Password;
+$l["confirmPassword"]='ยื่นยันรหัสผ่าน';//Confirm password;
+$l["maildir"]="Maildir";
+$l["quota"]="โควต้า (MB)";//Quota;
+$l["active"]="ดำเนินการ";//Active;
+$l["vacation"]="ตอบกลับอัตโนมัติ";//Automatic reply;
+$l["vacationActive"]="เปิดใช้การตอบกลับอัตโนมัติ";//Enable automatic reply;
+$l["email"]="อีเมล";//Email;
+$l["subject"]="หัวข้อ";//Subject;
+$l["body"]="ตัวเอกสาร";//Body;
+$l["cache"]="Cache";
+$l["domain"]="โดเมน";//Domain;
+$l["defaultQuota"]='โควต้าเริ่มต้น (MB)';//Default quota;

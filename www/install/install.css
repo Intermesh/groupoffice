@@ -1,0 +1,149 @@
+
+html{
+	height:100%;
+}
+
+
+body{
+	height:100%;
+	font-family: Verdana, Arial, Sans-serif;
+	font-size:12px;
+	color: black;
+	margin:0px;
+}
+
+
+div, p, td{
+	font-family: Verdana, Arial, Sans-serif;
+	font-size:12px;
+	color: black;
+	line-height:18px;
+}
+
+
+
+div.menu, a.menu:link,a.menu:active,a.menu:visited{
+	display:block;
+	line-height:20px;
+	border-bottom: 1px black dashed;
+	border-right: 1px black dashed;
+	font-size:10px;
+	color:black;
+	text-decoration:none;
+	font-family: Verdana, Arial, Sans-serif;
+	padding-left:5px;
+}
+
+a.menu:hover{
+	background-color:#efeffa;
+}
+
+
+div.menu_active, a.menu_active:link,a.menu_active:active,a.menu_active:visited{
+	display:block;
+	line-height:20px;
+	border-bottom: 1px black dashed;
+	border-right: 1px black dashed;
+	font-size:10px;
+	color:black;
+	text-decoration:none;
+	font-family: Verdana, Arial, Sans-serif;
+	background-color:#f1f1f1;
+	padding-left:5px;
+}
+
+a.menu:hover{
+	background-color:#efeffa;
+}
+
+h1{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size:14px;
+	font-weight:bold;
+	color: black;
+	margin-top:8px;
+	margin-bottom:3px;
+}
+h2{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size:12px;
+	font-weight:bold;
+	color: black;
+	margin-top:8px;
+	margin-bottom:3px;
+}
+h3{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size:10px;
+	font-weight:bold;
+	margin-top:8px;
+	margin-bottom:0px;
+	color: black;
+}
+
+
+input{
+}
+input, textarea, select, file{
+	width:250px;
+
+}
+.textbox{
+	display:block;
+}
+.checkbox{
+	vertical-align: middle;
+}
+.textarea{
+	display:block;
+	height:100px;
+}
+
+.formrow{
+	height:30px;
+}
+
+.formlabel{
+	float:left;
+	width:270px;
+	margin-right:6px;
+}
+
+.radio{
+	width:auto;
+	vertical-align: middle;
+	margin:0px 2px;
+	padding:0px;				
+
+}
+
+.checkLabel{
+
+}
+td{
+	vertical-align:top;
+}
+
+
+div.errortext, p.errortext{
+	border:1px solid red;
+	padding:8px;
+	background-color:#f1f1f1;
+}
+
+.formrow .errortext{
+	border:0 !important;
+	padding:0 !important;
+	background-color:transparent !important;
+	color: red;
+	display: inline;
+	margin-left:10px;
+}
+
+
+.cmd{
+	color:#003399;
+	background-color:#f1f1f1;
+	padding:20px;
+	margin-bottom:10px;
+}

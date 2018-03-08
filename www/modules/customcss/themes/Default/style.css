@@ -1,0 +1,8 @@
+.go-module-icon-customcss , .go-menu-icon-customcss{
+	background-image:url('images/customcss.png') !important;
+}
+
+.go-tab-icon-customcss {
+	background-image: none !important;
+}
+

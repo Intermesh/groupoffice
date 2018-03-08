@@ -1,0 +1,7 @@
+modules/postfixadmin/AliasesGrid.js
+modules/postfixadmin/AliasDialog.js
+modules/postfixadmin/DomainsGrid.js
+modules/postfixadmin/DomainDialog.js
+modules/postfixadmin/MailboxesGrid.js
+modules/postfixadmin/MailboxDialog.js
+modules/postfixadmin/MainPanel.js

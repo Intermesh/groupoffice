@@ -1,0 +1,11 @@
++-------------+          +--------+         +---------------+
+| Your        |  Client  | PHP    |  OAuth  | OAuth         |
+| Application +<-------->+ OAuth  +<------->+ Authorization |
+|             |   API    | Client |         | Server        |
++------+------+          +--------+         +---------------+
+       ^
+       |                                    +----------+
+       |    HTTP/REST                       | OAuth    |
+       +----------------------------------->+ Resource |
+                                            | Server   |
+                                            +----------+

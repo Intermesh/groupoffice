@@ -1,0 +1,10 @@
+modules/summary/AnnouncementDialog.js
+modules/summary/AnnouncementsGrid.js
+modules/summary/AnnouncementsViewGrid.js
+modules/summary/PortalColumn.js
+modules/summary/Portlet.js
+modules/summary/Portal.js
+modules/summary/MainPanel.js
+modules/summary/rssFeedPortlet.js
+modules/summary/Portlets.js
+modules/summary/WebFeedsGrid.js

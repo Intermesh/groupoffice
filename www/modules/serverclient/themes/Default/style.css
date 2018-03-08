@@ -1,0 +1,6 @@
+.go-module-icon-serverclient , .go-menu-icon-serverclient{
+	background:url('images/serverclient.png');	
+}
+.go-tab-icon-serverclient {
+	background-image: none !important;
+}

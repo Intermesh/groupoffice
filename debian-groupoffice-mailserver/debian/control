@@ -1,0 +1,57 @@
+Source: groupoffice-mailserver
+Section: mail
+Priority: extra
+XSBC-Orig-Maintainer: Intermesh BV (Developer key) <info@intermesh.nl>
+Maintainer: Ubuntu MOTU Developers <motu@lists.ubuntu.com> 
+Build-Depends: debhelper (>= 7), po-debconf
+Standards-Version: 3.8.0
+Homepage: http://www.group-office.com
+
+Package: groupoffice-mailserver
+Architecture: all
+Depends: groupoffice-com,
+	sudo,	
+	amavisd-new,	
+	clamav,
+	clamav-base,
+	clamav-daemon,
+	clamav-freshclam,
+	php-cli|php5-cli|php7-cli,
+	postfix,
+	postfix-mysql,
+	dovecot-imapd,
+	dovecot-mysql,
+	dovecot-sieve,
+	dovecot-managesieved,
+	spamassassin,
+	spamc,
+	openssl,
+	pyzor,
+	razor,
+	arj,
+	zip,
+	unzip,
+	bzip2,
+	gzip,
+	cpio,
+	file,
+	lzop,
+	nomarch,
+	zoo,
+	cabextract,
+	${misc:Depends}
+Recommends:	libdigest-sha-perl,
+	libdigest-sha3-perl,
+	libnet-ldap-perl,
+	libauthen-sasl-perl,
+	libio-string-perl,
+	libio-socket-ssl-perl,
+	libnet-ident-perl,
+	libnet-dns-perl,
+	libmail-spf-perl,
+	libgeo-ip-perl,
+	libencode-detect-perl,
+	libnet-patricia-perl
+Description: 
+ The complete mailserver solution for Group-Office.
+ It configures Group-Office with postfix, dovecot and spamassasin

@@ -1,0 +1,46 @@
+Thank you for installing Group-Office! We hope you will enjoy it.
+
+INSTALLATION
+To install Group-Office open a browser and go to the URL where you put the 
+Group-Office files and follow instructions.
+
+Also have a look at: http://www.group-office.com/wiki/Installation_manual
+
+If you are using the Professional version you also need to install the free
+Ioncube loaders. Download them from:
+
+http://www.ioncube.com/loaders.php
+
+
+UPGRADE FROM VERSION 3.x AND HIGHER:
+To upgrade to 4.0 you must upgrade your previous version to at least 3.7.41 first.
+
+DEBIAN PACKAGES:
+Change your apt sources.list and change the Group-Office repository into:
+deb http://repos.groupoffice.eu/ fourzero main
+
+Then run:
+apt-get update
+apt-get dist-upgrade
+
+MANUAL UPGRADE:
+Then remove all the existing Group-Office scripts. Then upload the new sources.
+Do not copy the new files over the existing files!
+
+Then you can run the install script in /install
+
+Also read:
+
+http://www.group-office.com/wiki/Upgrading
+ 
+
+UPGRADING FROM VERSION 2.x:
+You can't upgrade from version 2.0 directly. Upgrade to 3.7 first.
+
+
+SYSTEM REQUIREMENTS
+-Linux, Mac OS X, Windows
+-PHP 5.3 or higher.
+-MySQL 5 or higher
+
+Good luck!

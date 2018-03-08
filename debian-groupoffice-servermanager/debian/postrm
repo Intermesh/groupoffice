@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = "purge" -a -e /usr/share/debconf/confmodule ]; then
+    # Source debconf library.
+    . /usr/share/debconf/confmodule
+    # Remove my changes to the db.
+    db_purge
+
+		rm -f /etc/groupoffice/servermanager.inc.php
+		rm -f /etc/apache2/sites-enabled/000-groupoffice
+fi
+
+#DEBHELPER#
+
+exit 0

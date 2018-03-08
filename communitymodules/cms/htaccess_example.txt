@@ -1,0 +1,8 @@
+RewriteEngine On
+
+#  let the server know that we were reached via /xyz and not
+#  via the physical path prefix /abc/def
+RewriteBase   /groupoffice/www/modules/cms/
+
+#  now the rewriting rules
+RewriteRule ^(.*)$ run.php?site_id=5&path=$1&%{QUERY_STRING}

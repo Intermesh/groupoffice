@@ -1,0 +1,43 @@
+Source: groupoffice-com
+Section: web
+Priority: extra
+XSBC-Orig-Maintainer: Intermesh BV (Developer key) <info@intermesh.nl>
+Maintainer: Ubuntu MOTU Developers <motu@lists.ubuntu.com>
+Build-Depends: debhelper (>= 7), po-debconf
+Standards-Version: 3.8.0
+Homepage: http://www.group-office.com
+
+Package: groupoffice-com
+Architecture: all
+Depends: libapache2-mod-php7.0 | libapache2-mod-php5 (>= 5.6) | libapache2-mod-php,	
+	mysql-server | mariadb-server,
+	php-mysql | php5-mysql | php5-mysqli | php5-mysqlnd,
+	php-gd  | php5-gd,
+	php-cli | php5-cli,
+	php-curl | php5-curl,
+	php-mcrypt | php5-mcrypt,
+	php-xsl | php5-xsl,
+	catdoc,
+	unzip,
+	tar,
+	imagemagick,
+	tesseract-ocr,
+	tesseract-ocr-eng,
+	poppler-utils,
+	exiv2,
+	sudo,
+	${misc:Depends},
+	dbconfig-common,
+	ucf (>= 0.28)
+Recommends: zip, 
+	tnef,
+	libwbxml2-utils | libwbxml2-0
+Conflicts: groupoffice-pro,
+	groupoffice-billing,
+	groupoffice-documents
+Description:
+ Group-Office is a web based groupware and CRM application
+ Take your office online. Share projects, calendars, files and e-mail online 
+ with co-workers and clients. Easy to use and fully customizable, Group-Office 
+ takes online collaboration to the next level.
+

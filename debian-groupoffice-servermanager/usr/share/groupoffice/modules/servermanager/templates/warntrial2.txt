@@ -1,0 +1,27 @@
+Your trial will be deleted in 10 days
+
+{admin_salutation},
+
+You receive this e-mail because you created a 30 day trial installation of Group-Office Professional at http://{name}.
+This is our final warning that your trial installation will be removed in 10 days!
+
+If you want to continue using Group-Office you must pay for the service after this trial period expires. If you don't order within 10 days then we asume you don't want to use Group-Office anymore and your installation will be removed.
+
+You can click on the link below to order the service online:
+
+https://intermesh.group-office.com/groupoffice/modules/dealermanager/pay.php?report={name}
+
+Thank you for using Group-Office!
+
+With kind regards,
+
+
+Intermesh
+
+
+Intermesh
+Reitscheweg 37
+5231 BX 's-Hertogenbosch
+The Netherlands
+tel. +31 73 644 55 08
+http://www.group-office.com

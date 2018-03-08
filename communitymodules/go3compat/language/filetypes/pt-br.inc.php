@@ -1,0 +1,38 @@
+<?php
+require($GLOBALS['GO_LANGUAGE']->get_fallback_base_language_file('filetypes'));
+
+$lang['filetypes']['unknown'] = 'Tipo de arquivo desconhecido';
+$lang['filetypes']['txt'] = 'arquivo de texto';
+$lang['filetypes']['sxw'] = 'Documemto de OpemOffice.Org Writer';
+$lang['filetypes']['doc'] = 'Documemto de Microsoft Word';
+$lang['filetypes']['xls'] = 'Folha de cálculo de Microsoft Excel';
+$lang['filetypes']['mdb'] = 'Base de dados de Microsoft Access';
+$lang['filetypes']['ppt'] = $lang['filetypes']['pps'] = 'Apresemtação de Microsoft Powerpoint';
+$lang['filetypes']['sxc'] = 'Folha de cálculo de OpemOffice.Org Calc';
+$lang['filetypes']['tar'] = 'Arquivo Tar';
+$lang['filetypes']['zip'] = 'Arquivo comprimido ZIP';
+$lang['filetypes']['rar'] = 'Arquivo comprimido RAR';
+$lang['filetypes']['gz'] = $lang['filetypes']['tgz'] = 'Arquivo comprimido GZIP';
+$lang['filetypes']['bz2'] = 'Arquivo comprimido BZIP2'; 
+$lang['filetypes']['pdf'] = 'Documemto PDF';
+$lang['filetypes']['exe'] = 'arquivo execultável do Windows';
+$lang['filetypes']['ttf'] = 'Fonte de letra True type';
+$lang['filetypes']['html'] = $lang['filetypes']['htm'] = 'Documemto HTML';
+$lang['filetypes']['jpg'] = $lang['filetypes']['jpeg'] = 'Imagem';
+$lang['filetypes']['gif'] = 'Imagem';
+$lang['filetypes']['bmp'] = 'Imagem';
+$lang['filetypes']['tif'] = 'Imagem';
+$lang['filetypes']['png'] = 'Imagem';
+$lang['filetypes']['php'] = 'Script em PHP';
+$lang['filetypes']['ics'] = 'Informação de calendário';
+$lang['filetypes']['vcf'] = 'Informação de contacto';
+$lang['filetypes']['wav'] = $lang['filetypes']['ogg'] = $lang['filetypes']['mp3'] = $lang['filetypes']['wma'] = 'arquivo de som';
+$lang['filetypes']['mpg'] = $lang['filetypes']['mpeg'] = $lang['filetypes']['avi'] = $lang['filetypes']['wmv'] = $lang['filetypes']['wmf'] = 'Video clipe';
+$lang['filetypes']['pdf'] = 'Documemto PDF de Adobe Acrobat';
+$lang['filetypes']['doc'] = $lang['filetypes']['dot'] = 'Documemto do Microsoft Word';
+$lang['filetypes']['psd'] = 'arquivo do Adobe Photoshop';
+$lang['filetypes']['rtf'] = 'Formato de Texto enriquecido';
+$lang['filetypes']['swf'] = 'Filme em Macromedia Flash';
+$lang['filetypes']['fla'] = 'Documemto (Fonte) em Macromedia Flash';
+$lang['filetypes']['xls'] = $lang['filetypes']['xlt'] = 'Folha de cálculo do Microsoft Excel';
+$lang['filetypes']['ai'] = 'arquivo de Adobe Illustrator';

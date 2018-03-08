@@ -1,0 +1,66 @@
+.go-module-icon-summary, .go-menu-icon-summary{
+	background-image: url('images/summary.png') !important;
+}
+.go-tab-icon-summary {
+	background-image: none !important;
+}
+
+
+.rss-icon{
+	background-image: url('images/rss.gif') !important;
+}
+.note-icon{
+	background-image: url('images/note.png') !important;	
+}
+
+/*.x-portal .x-column-layout-ct{
+overflow-y:scroll !important;
+}*/
+
+.x-portal .x-panel-dd-spacer {
+    margin-bottom:10px;
+}
+
+.x-portlet {
+    margin-bottom:10px;
+}
+
+/* Clean up the look of the portlets */
+.x-portlet .x-panel-ml {
+    padding-left:2px;
+}
+.x-portlet .x-panel-mr {
+    padding-right:2px;
+}
+.x-portlet .x-panel-bl {
+    padding-left:2px;
+}
+
+.x-portlet .x-panel-br {
+    padding-right:2px;
+}
+.x-portlet .x-panel-body {
+    background:white;
+}
+.x-portlet .x-panel-mc {
+    padding-top:0px;
+}
+.x-portlet .x-panel-bc .x-panel-footer {
+    padding-bottom:2px;
+}
+.x-portlet .x-panel-nofooter .x-panel-bc {
+    height:2px;
+}
+
+.settings {
+    background-image:url( ../../../../views/Extjs3/ext/shared/icons/fam/folder_wrench.png ) !important;
+}
+.nav {
+    background-image:url( ../../../../views/Extjs3/ext/shared/icons/fam/folder_go.png ) !important;
+}
+
+
+
+.x-grid3-row-body .description {
+    padding-left:5px;
+}

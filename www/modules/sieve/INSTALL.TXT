@@ -1,0 +1,8 @@
+
+Make sure sieve is running on port 2000 and you can use this config option to
+rewrite hosts if you use a proxy:
+
+$config['sieve_rewrite_hosts']='localhost=imap.example.com,imapproxy=imap2.example.com';
+$config['sieve_vacation_subject']='Optional globalvacation subject';
+$config['sieve_usetls']=false;
+$config['sieve_port']=4190;

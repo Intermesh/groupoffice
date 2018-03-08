@@ -1,0 +1,32 @@
+.go-module-icon-cms , .go-menu-icon-cms{
+	background:url('images/cms.png');
+}
+.go-tab-icon-cms {
+	background-image: none !important;
+}
+
+.cms-btn-view{
+	background-image:url('images/view.png') !important;
+}
+.cms-btn-copy{
+	background-image:url('images/copy.png') !important;
+}
+.cms-btn-paste{
+	background-image:url('images/paste.png') !important;
+}
+
+.cms-btn-sites{
+	background-image:url('images/sites.png') !important;
+}
+
+.cms-folder-disabled{
+	background-image:url('images/folder_disabled.png') !important;
+}
+
+.cms-folder-properties{
+	background-image:url('images/folder_properties.png') !important;
+}
+
+.cms-file-category{
+	background-image:url('images/category.jpeg') !important;
+}

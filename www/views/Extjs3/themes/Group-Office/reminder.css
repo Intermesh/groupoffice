@@ -1,0 +1,14 @@
+body{
+	font: 14px arial;
+	background-color:#f1f1f1;
+}
+
+#reminderText{
+	background:url('images/32x32/reminder.png') no-repeat top left;
+	padding-left:40px;
+	line-height:32px;
+}
+
+#reminderText p {
+	margin:0px 0px 10px 0px;
+}

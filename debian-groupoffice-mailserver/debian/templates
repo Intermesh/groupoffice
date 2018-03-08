@@ -1,0 +1,3 @@
+Template: groupoffice-mailserver/domain
+Type: string
+_Description: E-mail domain name:

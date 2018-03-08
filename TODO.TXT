@@ -1,0 +1,33 @@
+
+Version in calendars big int
+
+
+
+
+Branch maken
+
+svn cp
+createchangelog.php aanpassen. "fiveone"
+updatesvn.php aanpassen
+go/base/Config.php aanpassen
+
+alle builddeb.sh aanpassen met "poolfiveone"
+
+
+Repo:
+
+cp apt-fivezero-release.conf apt-fiveone-release.conf
+edit apt-ftparchive.conf 
+mkdir -p dists/fiveone/main/binary-i386
+mkdir -p dists/fiveone/main/binary-amd64
+
+
+edit scanpackages.sh
+
+
+Intermesh Group-Office
+Create shop packages based on latest version
+
+
+Tools:
+checkout /root/groupoffice-5.1

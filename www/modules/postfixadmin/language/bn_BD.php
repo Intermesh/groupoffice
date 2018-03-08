@@ -1,0 +1,55 @@
+<?php
+
+// Bangla (Bangladesh) Translation by Shubhra Prakash Paul <shuvro.paul@gmail.com>
+$l["postfixadmin"]='ই-মেইল ডোমেইনগুলো';
+$l['maxAliases'] = 'সর্বোচ্চ ওরফে';
+$l["address"]="ঠিকানা";
+$l["goto_address"]="যাও";
+$l['maxMailboxes'] = 'সর্বোচ্চ বার্তাবাক্স';
+$l["maxquota"]="সর্বোচ্চ কোটা (মে.বা.)";
+$l["transport"]="পরিবহন";
+$l["backupmx"]="ব্যাক-আপ MX";
+$l["fetchmailConfig"]="Fetchmail কনফিগ";
+$l["fetchmailConfigs"]="Fetchmail কনফিগগুলো";
+$l["srcServer"]="Src সার্ভার";
+$l["srcAuth"]="Src যাচাই";
+$l["srcUser"]="Src ব্যবহারকারি";
+$l["srcPassword"]="Src কূঠশব্দ";
+$l["srcFolder"]="Src ফোল্ডার";
+$l["pollTime"]="Poll নির্ঘন্ট";
+$l["fetchall"]="Fetchall";
+$l["keep"]="রাখ";
+$l["protocol"]="প্রোটোকল";
+$l["extraOptions"]="অতিরিক্ত বিকল্পসমূহ";
+$l["returnedText"]="ফিরতি টেক্সট";
+$l["mda"]="Mda";
+$l["date"]="তারিখ";
+$l["username"]="ব্যবহারকারি নাম";
+$l["password"]="কূটশব্দ";
+$l["confirmPassword"]='কূটশব্দ নিশ্চিত ';
+$l["maildir"]="Maildir";
+$l["quota"]="কোটা (মে.বা.)";
+$l["active"]="সক্রিয়";
+$l["vacation"]="স্বয়ংক্রিয় উত্তর";
+$l["vacationActive"]="স্বয়ংক্রিয় উত্তর সক্রিয়";
+$l["email"]="ই-মেইল";
+$l["subject"]="বিষয়";
+$l["body"]="গর্ভাংশ";
+$l["cache"]="ক্যাসে";
+$l["usage"]="ব্যবহার";
+$l["defaultQuota"]='পূর্বনির্ধারিত কোটা(মে.বা.)';
+
+$l['name']='Postfix প্রশাসন';
+$l['description']='{product_name} ডাটাবেজের ভার্চুয়াল postfix ব্যবহারকারিবৃন্দ ব্যবস্থাপনার মডিউল';
+$l['alias']='ওরফে';
+$l['aliases']='ওরফে';
+$l['domain']='ডোমেইন';
+$l['domains']='ডোমেইনগুলো';
+$l['fetchmail_config']='Fetchmail কনফিগ';
+$l['fetchmail_configs']='Fetchmail কনফিগ';
+$l['mailbox']='বার্তাবাক্স';
+$l['mailboxes']='বার্তাবাক্সসমূহ';
+$l['vacation_config']='ছুটি কনফিগ';
+$l['vacation_configs']='ছুটি কনফিগ';
+$l['aliasHelp']="একাধিক প্রাপকের জন্য কমা দিয়ে পৃথককৃত তালিকা তৈরি করুন যেমনঃ alias1@domain.com,alias2@domain.com";
+$l['usedQuota']='ব্যবহৃত কোটা';

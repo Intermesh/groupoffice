@@ -1,0 +1,13 @@
+#!/bin/sh -e
+
+# Use debconf.
+. /usr/share/debconf/confmodule
+
+db_input high groupoffice-servermanager/wildcarddomain || true
+db_go
+
+
+
+#DEBHELPER#
+
+exit 0

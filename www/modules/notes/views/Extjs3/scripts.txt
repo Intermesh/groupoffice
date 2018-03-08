@@ -1,0 +1,8 @@
+modules/notes/views/Extjs3/CategoryDialog.js
+modules/notes/views/Extjs3/NotesGrid.js
+modules/notes/views/Extjs3/NoteDialog.js
+modules/notes/views/Extjs3/NotePanel.js
+modules/notes/views/Extjs3/ManageCategoriesGrid.js
+modules/notes/views/Extjs3/ManageCategoryDialog.js
+modules/notes/views/Extjs3/Stores.js
+modules/notes/views/Extjs3/MainPanel.js

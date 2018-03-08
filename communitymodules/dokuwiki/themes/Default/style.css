@@ -1,0 +1,8 @@
+.go-module-icon-dokuwiki , .go-menu-icon-dokuwiki {
+	background-image: url('images/dokuwiki.png') !important;
+}
+
+.go-tab-icon-dokuwiki {
+	background-image: none !important;
+}
+

@@ -1,0 +1,55 @@
+body.mceContentBody{
+	background:#eaede8;
+	font-family:"georgia";
+	font-size:12px;
+	line-height:20px;
+}
+
+
+a:link, a:active, a:visited{
+	color:#314c75;		
+	text-decoration:none;
+}
+a:hover{	
+}
+
+img {
+	margin:5px;
+	margin-right:10px;
+}
+
+p{
+margin:0px;	
+}
+
+hr{
+	border:0px;
+	border-top:1px solid white;
+	margin:0px;
+	padding:0px;
+	height:0px;
+}
+
+
+h1{
+	
+	color:#E67802;
+	font-size:1.4em;
+	font-style:italic;
+	font-weight:normal;
+	margin:6px 0;
+}
+h2{
+	font-family:georgia;
+	font-weight:normal;
+	font-style: italic;
+	color:#26687c;
+	font-size:1.3em;	
+	margin:4px 0px 10px 0px;
+}
+
+div.subkader-block{
+	background-color:#dfe3df;	
+	padding:5px;
+}
+

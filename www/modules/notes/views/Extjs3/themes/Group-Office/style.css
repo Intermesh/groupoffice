@@ -1,0 +1,15 @@
+.go-module-icon-notes , .go-menu-icon-notes{
+	background:url('images/notes.png');
+}
+
+.go-tab-icon-notes {
+	background-image: none !important;
+}
+
+.go-model-icon-GO_Notes_Model_Note{
+	background-image: url('images/notes.png') !important;
+}
+
+.no-btn-categories{
+	background-image: url('images/gtk-settings.png') !important;
+}

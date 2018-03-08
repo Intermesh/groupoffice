@@ -1,0 +1,87 @@
+.go-module-icon-files , .go-menu-icon-files , .go-tab-icon-files {
+	background-image: url('images/folder.png') !important;
+}
+
+.btn-files {
+	background-image:url('images/folder.png') !important;
+}
+
+
+.btn-up {
+	background-image:url('images/up.png') !important;
+}
+
+.btn-add-folder {
+	background-image:url('images/add.png') !important;
+}
+
+.btn-upload {
+	background-image:url('images/upload.png') !important;
+}
+
+/*
+.btn-download {
+	background-image:url('images/download.png') !important;
+}
+
+.btn-download-gota {
+	background-image:url('images/gota.gif') !important;
+}*/
+
+.btn-copy {
+	background-image:url('images/copy.png') !important;
+}
+
+.btn-cut {
+	background-image:url('images/cut.png') !important;
+}
+
+.btn-paste {
+	background-image:url('images/paste.png') !important;
+}
+
+.btn-properties{
+	background-image:url('images/properties.png') !important;
+}
+
+.btn-templates{
+	background-image:url('images/templates.png') !important;
+}
+
+.btn-compress{
+	background-image:url('images/compress.png') !important;
+}
+.btn-decompress{
+	background-image:url('images/decompress.png') !important;
+}
+
+.btn-thumbnails{
+	background-image:url('images/thumbs.png') !important;
+}
+
+
+
+
+.go-files-location-panel .x-plain-body{
+	padding: 5px 5px 0px 5px;
+	/*background:#D0DEF0 url(../../../../ext/resources/images/default/toolbar/bg.gif);*/
+}
+
+
+.x-tree-node img.folder-default, .x-tree-node-collapsed img.folder-default {
+    background-image:  url("images/folder.png");
+}
+.x-tree-node-expanded img.folder-default
+{
+    background-image:  url("images/folder.png");
+}
+
+.x-tree-node img.folder-home, .x-tree-node-collapsed img.img.folder-home, .x-tree-node-expanded img.folder-home{
+    background-image:  url("images/folder_home.png");
+}
+.folder-shared, .x-tree-node img.folder-shared, .x-tree-node-collapsed img.img.folder-shared, .x-tree-node-expanded img.folder-shared{
+    background-image:  url("images/folder_public.png");
+}
+.x-tree-node img.folder-shares, .x-tree-node-collapsed img.img.folder-shares, .x-tree-node-expanded img.folder-shares{
+    background-image:  url("images/network.png");
+}

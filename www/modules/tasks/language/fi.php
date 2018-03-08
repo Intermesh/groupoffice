@@ -1,0 +1,44 @@
+<?php
+
+
+$l["noTask"]= 'Ei tehtäviä';
+$l["tasks"]= 'Tehtävät';
+$l["addTask"]= 'Lisää tehtävä...';
+$l["tasklist"]= 'Tehtävälista';
+$l["tasklists"]= 'Tehtävälistat';
+$l["showCompletedTasks"]= 'Näytä valmiit tehtävät';
+$l["filter"]= 'Suodatin';
+$l["dueDate"]= 'Määräpäivä';
+$l["dueAt"]= 'Määräaika';
+$l["needsAction"]= 'Toimenpiteitä tarvitaan';
+$l["accepted"]= 'Hyväksytty';
+$l["declined"]= 'Hylätty';
+$l["tentative"]= 'Alustava';
+$l["delegated"]= 'Delegoitu';
+$l["completed"]= 'Valmis';
+$l["inProcess"]= 'Keskeneräinen';
+$l["repeatEvery"]= 'Toista joka';
+$l["atDays"]= 'Päivänä';
+$l["repeatUntil"]= 'Toista kunnes';
+$l["repeatForever"]= 'toista ikuisesti';
+$l["recurrence"]= 'Toistuminen';
+$l["remindMe"]= 'Muistuta minua';
+$l["options"]= 'Valinnat';
+$l["createLink"]= 'Luo linkki';
+$l["startsAt"]='Alkaa';
+$l["showInactiveTasks"]='Näytä ei aktiiviset työt';
+$l["scheduleCall"]='Ajasta puhelu';
+$l['name']='Tehtävät';
+$l['description']='Laita kuvaus tähän';
+$lang['link_type'][12]=$l['task']='Tehtävä';
+$l['status']='Tila';
+$l['scheduled_call']='Ajastettu soitto %s';
+$l['statuses']['NEEDS-ACTION'] = 'Toimenpiteitä tarvitaan';
+$l['statuses']['ACCEPTED'] = 'Hyväksytty';
+$l['statuses']['DECLINED'] = 'Hylätty';
+$l['statuses']['TENTATIVE'] = 'Alustava';
+$l['statuses']['DELEGATED'] = 'Delegoitu';
+$l['statuses']['COMPLETED'] = 'Valmis';
+$l['statuses']['IN-PROCESS'] = 'Keskeneräinen';
+$l['import_success']='%s tehtävät tuotiin';
+$l['call']='Soitto';

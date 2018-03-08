@@ -1,0 +1,7 @@
+{
+    "name": "fkooman/php-drive-client",
+    "require": {
+        "fkooman/guzzle-bearer-auth-plugin": "dev-master",
+        "fkooman/php-oauth-client": "dev-master"
+    }
+}

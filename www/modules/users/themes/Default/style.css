@@ -1,0 +1,20 @@
+.go-module-icon-users, .go-menu-icon-users{
+	background-image:url('images/users.png') !important;
+}
+.go-tab-icon-users {
+	background-image: none !important;
+}
+
+.go-model-icon-GO_Base_Model_User {
+	background-image: url('images/users.png') !important;
+	width:16px;
+	height:16px;
+}
+
+.input-form-setting {
+	padding: 5px 5px 1px 5px;
+}
+
+.user-disabled td{
+	color: red;
+}

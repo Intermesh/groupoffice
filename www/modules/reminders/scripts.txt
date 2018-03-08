@@ -1,0 +1,3 @@
+modules/reminders/ReminderDialog.js
+modules/reminders/RemindersGrid.js
+modules/reminders/MainPanel.js

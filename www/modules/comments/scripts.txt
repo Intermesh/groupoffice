@@ -1,0 +1,11 @@
+modules/comments/CommentPanel.js
+modules/comments/Stores.js
+modules/comments/CommentDialog.js
+modules/comments/CommentsGrid.js
+modules/comments/CommentsTemplate.js
+modules/comments/CommentsBrowser.js
+modules/comments/ManageCategoriesGrid.js
+modules/comments/ManageCategoriesDialog.js
+modules/comments/CategoryDialog.js
+modules/comments/CategoriesComboBox.js
+modules/comments/Settings.js

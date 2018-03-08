@@ -1,0 +1,5 @@
+The postfixadmin module
+
+Please follow the instructions at:
+
+http://www.group-office.com/wiki/Mailserver

@@ -1,0 +1,11 @@
+.go-module-icon-cron , .go-menu-icon-cron{
+	background:url('images/cron.png');
+}
+
+.go-tab-icon-cron {
+	background-image: none !important;
+}
+
+.go-add-icon-cron {
+	background-image:url('images/add-cron.png') !important;
+}

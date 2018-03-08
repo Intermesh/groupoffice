@@ -1,0 +1,20 @@
+{
+    "authors": [
+        {
+            "email": "fkooman@tuxed.net",
+            "name": "Fran\u00e7ois Kooman",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "fkooman\\OAuth\\Common\\": "src/"
+        }
+    },
+    "description": "PHP library for common OAuth classes.",
+    "license": "Apache-2.0",
+    "name": "fkooman/oauth-common",
+    "require": {
+        "php": ">=5.3.3"
+    }
+}

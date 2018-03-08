@@ -1,0 +1,9 @@
+.go-module-icon-users, .go-menu-icon-users, .go-tab-icon-users{
+	background-image:url('images/16x16/icon-users.png') !important;
+}
+
+.go-link-icon-8 {
+	background-image: url('images/16x16/icon-users.png') !important;
+	width:16px;
+	height:16px;
+}

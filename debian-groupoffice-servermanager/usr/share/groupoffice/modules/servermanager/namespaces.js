@@ -1,0 +1,1 @@
+Ext.namespace('GO.servermanager');

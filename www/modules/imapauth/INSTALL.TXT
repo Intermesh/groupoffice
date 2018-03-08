@@ -1,0 +1,3 @@
+Please read this page for installation instructions:
+
+http://www.group-office.com/wiki/IMAP_or_LDAP_authentication

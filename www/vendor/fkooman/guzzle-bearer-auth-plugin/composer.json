@@ -1,0 +1,21 @@
+{
+    "authors": [
+        {
+            "email": "fkooman@tuxed.net",
+            "name": "Fran\u00e7ois Kooman",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "fkooman\\Guzzle\\Plugin\\BearerAuth": "src/"
+        }
+    },
+    "description": "Guzzle Bearer plugin",
+    "license": "MIT",
+    "name": "fkooman/guzzle-bearer-auth-plugin",
+    "require": {
+        "guzzle/guzzle": ">=v3.7.0",
+        "php": ">=5.3.3"
+    }
+}

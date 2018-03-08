@@ -1,0 +1,42 @@
+.go-module-icon-site , .go-menu-icon-site{
+	background:url('images/site.png');
+}
+
+.go-tab-icon-site {
+	background-image: none !important;
+}
+
+.go-model-icon-GO_Site_Model_Site{
+	background-image: url('images/site.png') !important;
+}
+
+.go-model-icon-GO_Site_Model_Content{
+	background-image: url('images/content.png') !important;
+}
+
+.go-model-icon-GO_Site_Model_Menuroot{
+	background-image: url('images/menu.png') !important;
+}
+
+.go-model-icon-GO_Site_Model_Menu{
+	background-image: url('images/menu_blue.png') !important;
+}
+
+.go-model-icon-GO_Site_Model_Menuitem{
+	background-image: url('images/menuitem.png') !important;
+}
+
+.go-icon-layout{
+	background-image: url('images/layout.png') !important;
+}
+
+.site-node-site a span{
+	font-weight:bold !important;
+}
+
+.site-readonly a span{
+	/*color:#009cc5 !important;*/
+	color:#666 !important;
+	/*font-weight:bold !important;*/
+	font-style: italic;
+}

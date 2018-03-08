@@ -1,0 +1,554 @@
+2016/03/23 6.2.1
+This release has support for PHP 7.0 and improved caldav and carddav support.
+Note that you must have at least PHP 5.5 now.
+
+2014/11/11 6.1.1
+This release has no new features but we changed back to the old license file
+method because the new way was confusing people.
+
+2014/09/22 6.0.1
+Group-Office 6.0 comes with a new module manager. In all downloads all modules
+are included by default. You can easily extend your system with new modules that
+you can get from our store.
+We've also added various new features like quota per user support in the files
+module and PDF stationary papers in the billing module. We've also included a
+beta webODF module that lets you edit ODF documents online.
+It's also possible to set Group-Office up with the prosody chat server!
+
+IMPORTANT: When upgrading please note that the projects module has been replaced by the new
+projectsv2. It has been changed a lot so you should migrate to v2 in version 5 first and test
+it.
+
+
+2013/09/10 5.0.5
+Group-Office 5.0 was completely redesigned. It was time to modernize the 
+interface. I think we succeeded in making it very pleasing to the eye and easy
+to use. Apart from the interface updates we've also updated all third party 
+libraries.
+
+2013/06/13 4.2.0
+Version 4.2 comes with a lot of small feature enhancements such as:
+
+Various
+- Send multiple download links at once
+- Permissions on start page announcements so visibility can be controlled
+
+E-mail and contacts:
+- Easy link checkbox to link e-mail conversations to a contact directly
+- Contact photo's are shown in e-mail and can be set much more easily with download URL's.
+- Mail accounts can be shared read only
+
+Tickets
+- Tickets can be created by sending an e-mail
+- Anonymous ticket posting is very simple to setup now.
+- In tickets a mail can also be send automatically when a ticket was just claimed
+
+Enjoy Group-Office 4.2!
+
+2012/11/30 4.1.0
+We're proud to announce version 4.1! This version comes with an enhanced calendar.
+The invitation system has been greatly improved. Now events are scheduled directly
+into the users' calendars and the status of the event is directly visual. This
+provides a much better user experience. The calendar group view and file manager 
+have been improved as well.
+
+2012/07/02 4.0.56
+After long series of beta testing it's finally complete! 
+
+It's important to know that:
+- the CMS module is no longer supported. 
+- We've dropped the Wordpress, PHPBB and formprocessor module.
+- Vacation auto response is now handled by the sieve module. You need to install 
+	the module and make sure that your IMAP server supports the sieve and managesieve protocol.
+	WARNING: Upgrading removes all active vacation auto replies
+- SyncML URL and datastores have been changed to: card, event and task
+
+
+The new features are:
+- Search through the contents of files
+- CardDAV support
+- File locking in the files module
+- Document workflow module
+- Users are stored in the addressbook too.
+- Ticket groups for better permission management.
+- Better file upload component
+- gnupg support dropped. smime still supported.
+- Project tasks have a relation now and have a percentage complete field
+- Photo support in sync.
+- Sync multiple calendars
+- Billing module can create MS word and open-office invoices, quotes and orders.
+- Billing module can handle purchase orders and stock.
+
+
+2012/04/11 4.0.1
+This is a beta release for the upcoming 4.0 version. It is not intended for 
+production use. Please just use it for testing and provide us feedback in the 
+forum. 
+We completely rewrote the PHP framework using the MVC approach. On the interface 
+it may seem like there are not so many changes but under the hood there's a shiny 
+new engine! This get's us ready for the future. It will enable us to create a
+ mobile interface for example. It's also a much more organized and more secure 
+framework. Extensive security testing has been performed by Cigitel.
+There's also a new module for document management. You can search through files 
+and add workflow to documents.
+
+Important:
+
+If you use SyncML clients like funambol you must reconfigure them. When you use
+the debian repository you must connect to /sync instead of /sync.php. If you
+don't use Debian packages you can connect to /modules/syncml/index.php.
+Also make sure the syncml module is installed.
+
+
+10/03/2011 3.7.1
+This release has a lot of enhancements under the hood. Everything has been
+optimized to work well in very large environments such as more then 20.000 users.
+There are also some interesting new features such as Sieve mail filtering
+support, Public icalendar files for calendars, Shared IMAP accounts and better
+LDAP authentication connectivity.
+
+
+2010/12/01 3.6.4
+This release focuses on interoperability with other systems. With WebDAV and
+CalDAV support the filesystem can be mounted like a network drive and you can
+access the calender data directly with a calendar application. It also supports
+meeting requests from other calendar applications now.
+We moved the HTML templates, addresslists and newsletters into the community
+version as we think these features belong to the community version.
+There are lots of other changes too, checkout the full changelog that's included
+with the package.
+
+2010/05/14 3.5.1
+We wrote a new fast IMAP library that doesn't require the php imap extension
+which could be very slow with remote IMAP servers. POP-3 support is no longer
+supported by the library because it's doesn't make much sense to use POP-3 with
+webmail anyway.
+The startup time of Group-Office has been improved, there is support for
+Microsoft Office templates now and we improved the ticket system a lot.
+Customers can also login through the Group-Office interface now.
+
+2009/02/24 3.4.0
+In this release we bring you a lot of small improvements across all modules and
+also Microsoft ActiveSync support so you can sync with any phone that supports
+ActiveSync. This means you can sync with iPhones, Nokia's, Google Android and
+of course Windows Mobile. Setting up synchronization with contacts,
+appointments, tasks and e-mail is really easy now!
+We also improved the link browser and management of newsletters a lot. With the
+new advanced search in the addressbook you can select any dataset from the
+addressbook and save that search.
+Check out the changelog for a full list of changes.
+
+2009/12/01 3.3.0
+We've been working a lot on performance for this release. We're now using
+compression on the files so the startup time of Group-Office is much faster.
+Enhancements on the permissions system deliver a much better overall performance
+on large installations.
+
+We've also added a lot of new features like:
+- Resource management to book meeting rooms for example
+- Enhanced project manager
+- Tickets or Helpdesk module
+- A lot of small enhancements everywhere in the system
+
+Upgrading to this version is recommended for everyone!
+
+2009/08/18 3.2.25
+Fixed some bugs and we enhanced the RSS feeds panel and address formatting
+functions.
+
+2009/08/13 3.2.21
+Moving e-mails between IMAP accounts is now possible and you can select different
+address formats for contacts and companies now.
+We've also updated all the external components to the latest stable versions and
+fixed some small bugs.
+
+2009/08/06 3.2.20
+Fixed some compatibility issues with the latest versions of PHP and libraries
+used by Group-Office. We added custom fields to users, updated a lot of
+translations and fixed some bugs. Upgrading to this version is recommended.
+
+
+2009/06/24 Version 3.02
+A lot of enhancements were made like all the files at contacts, projects and
+companies are now accessible through logical paths in the file manager.
+Multiple sender aliases can be defined in the e-mail module and a lot of new
+features were added to the projects module.
+
+2009/02/16 Version 3.01
+
+Since the initial 3.0 release we have actively been developing new features. The most 
+important new features since the first version are:
+
+-GO can be setup as a complete mail server that handles multiple domains and vacation autoresponse
+-Importing and exporting of custom fields in the addressbook
+-Improved Synchronization. It now supports the Blackberry Funambol and Nexthaus client.
+-New timesheet in projects for easier time registration
+-Support for subprojects and more intutive display of project information
+-Save e-mail as tasks, files, appointments and notes option. When you save an e-mail as 
+an appointment for example it automatically adds the recipients as participants and it 
+saves attachments as files to the appointment.
+
+A lot of transations were made too. Group-Office is currently available in:
+
+-Chinese Simplified
+-Čeština
+-Dansk
+-Deutsch
+-English
+-Español
+-Francais
+-Italiano
+-Nederlands
+-Polski
+-Português - Brazil
+-Русский
+-Romanian
+-Suomi - Finland
+
+Check out the demo now!
+
+
+2008/11/24 Version 3.00 stable
+
+After more then one and a half year of development time and testing it's finally there! 
+We are proud to present Group-Office 3.0, Group-Office needed to be modernized. 
+New web techniques have been developed and are ready to use in a professional platform 
+such as Group-Office. We completely rewrote the interface of Group-Office. It feels much 
+more like a desktop application now with drag and drop features, flexible information panels
+and much more!
+Besides the eye candy and usability enhancements a lot has been improved under the hood too. 
+The database adapter has been rewritten to use the improved MySQLi extension for better security. 
+Data sent to the database is checked for attacks at the lowest level so it's impossible for 
+developers to write insecure database queries when they use the Group-Office framework. A lot 
+more has been done to improve security like insecure image blocking  in the e-mail module. 
+It's impossible to name every change here in this message, you should check out the 
+new version for yourself!
+
+2008/09/03 Version 3.00 unstable
+
+It was time for Group-Office to modernise. New web techniques have been developed and 
+are ready to use in a professional platform such as Group-Office. Techniques such as 
+AJAX, PHP5 and MySQL5. We compared a lot of AJAX frameworks and we came to the 
+conclusion that ExtJS was the best framework for Group-Office. We decided to completely
+rewrite Group-Office with this framework and we are very proud with the result.
+Group-Office looks better, works better and is ready for the future!
+
+
+2007/10/26 Version 2.18
+This version has a new Java Webstart program that makes file management easier for you.
+When you edit a text document on your PC it will automatically save the document in 
+Group-Office for you.
+The mailing lists are now more user friendly and there is a new helpdesk module.
+
+2007/05/07 Version 2.17
+Great improvements on usability have been made. In the top bar there's now a new search
+box that searches through all Group-Office modules. This makes it very easy to quickly
+find any item in Group-Office. The search mechanism is also used for linking items to
+eachother now which makes it much easier.
+The help button takes you to the right page on the new documentation site for
+Group-Office. On this site users can also leave there comments to help the community.
+
+Group-Office 2.17 has full support for Windows servers now (Tested with XAMPP)
+
+IMPORTANT: Themes Professional, Professional 2, Default 2 are removed from Group-Office.
+Please run install.php and not upgrade.php to set the new theme. You can also manualy
+change login_screen and theme in config.php
+
+PROFESSIONAL VERSION
+The professional version of 2.17 of course has all the Community improvements. But on
+top of that it has a new reports module. With the reports module it's possible to
+present data from the addressbook and users. You can easily send newsletters by
+e-mail or regular mail to contacts in these reports.
+
+The synchronization server supports the Nexthaus clients now. Nexthaus offers a very
+good Outlook SyncML client and a Blackberry client. With this addition Group-Office
+supports almost every mobile device for synchronization!
+
+It's now possible to link e-mail to contacts, companies, projects etc... Simply
+select the e-mails you want to link and search for a contact for example and they
+are stored at the contact.
+
+2006/11/01 Version 2.16
+This version has an improved linking interface and in the Professional version it's also 
+possible to store e-mail as files and link them to contacts, companies or projects.
+There's also a new gallery module which you can also put on webpages using the CMS.
+The built in SyncML server was improved and supports latest Symbian phones now.
+
+2006/07/12 Version 2.15-FINAL-9
+Security and bug fixes
+
+2006/06/21 Version 2.15-FINAL-8
+Bug fix release
+
+2006/05/24 Version 2.15-FINAL-7
+This version is only to stay compatible with the Quotes/Invoices module.
+if you don't use sudo to check quota's for email accounts then set
+$config['cmd_quota']=''; in config.php
+
+2006/05/22 Version 2.15-FINAL-6
+This release contains only an updated websites module that uses FCKeditor instead of
+HTMLarea and can have different templates per page.
+
+2006/05/15 Version 2.15-FINAL-5
+We've worked very hard to make 2.15 stable and faster. The synchronisation also
+supports tasks now.
+
+2006/05/04 Version 2.15-FINAL-3
+This version of Group-Office has a lot of performance improvements and bug fixes.
+The professional version now has support for the Synthesis clients and therefore 
+it now also supports Palm OS. All symbian phones are supported now too.
+The graphical user interface is improved at some points too.
+
+2006/03/10 Version 2.15-FINAL-2
+
+WARNING!! IN THIS UPGRADE ALL FILES RELATED TO CONTACTS, COMPANIES, 
+PROJECTS ETC. WILL BE MOVED INTO YOUR HOME DIRECTORY.
+FOR EXAMPLE: AFTER UPGRADING FILES THAT BELONG TO JOHN DOE WILL BE MOVED
+INTO: /<YOUR HOME DIR>/Contacts/John Doe.
+
+PLEASE BACKUP YOUR DATABASE AND FILES STORED ON DISK BEFORE UPGRADING.
+
+
+2005/03/21 Version 2.15
+This version has a lot of new useful functions, such as resource booking, event search, 
+more flexible date formats, multiple email addresses for contacts, FCKEditor 
+integration, display of holidays in the calendar, calendar grid configurable per calendar, 
+email notification on file upload, filtering of closed tasks, and an appointment email 
+reminder daemon. Event owners get an email if somebody else modifies, deletes, 
+accepts, or declines an event.
+Another great new function is multilinking. You can create as many links from one item
+to another that you like.
+
+2005/11/02 Version 2.14
+The Group-Office framework has been greatly improved. Group-Office now features a 
+complete devlopment toolkit to develop applications rapidly from standard controls.
+The calendar and task features are much improved and it's now possible to attach files
+to projects, tasks, companies and contacts. 
+
+2005/05/30 Version 2.13
+The e-mail client is extended with a preview pane and a much better GUI. 
+Reminders can be snoozed and dismissed now administration modules can be 
+easily customized from now on.
+
+2005/03/12 Version 2.12
+This version offers much more stability over previous versions. There are few 
+new features but a lot of bugs have been fixed.
+
+2005/01/24 Version 2.11
+We made many improvements to the CMS module. Also the e-mail client has a n
+ew Save as Draft option and the Filesystem module now as the HTML editor 
+integrated so you can clickly edit or print a document anywhere. 
+Also a lot of bug fixes and a new default theme!
+
+2004/11/11 Version 2.10
+Mainly a bugfix release
+
+2004/11/01 Version 2.09
+After 2.08 there was a major bug discovered in timezone handling. When the
+clock went to winter time all appointments were shifted one hour. A good reason
+for a quick new release.
+ 
+2004/10/28 Version 2.08
+This release contains major feature enhancements. A new Todos module.
+Companies, Contacts and Projects have a new activities page where you can view 
+all related notes, tasks, projects and appointments. The e-mail address fields 
+now autocomplete names and e-mail addresses and there are much more 
+enhancements.
+
+2004/10/04 Version 2.07
+This release is mainly a bugfix release but also comes with some new features 
+in the calendar and e-mail module. Upgrading is advised.
+Also check out the new webshop on Group-Office to add more power to 
+Group-Office 2.07!
+
+2004/09/02 Version 2.06
+After a long time the new version is finally there with improved iCalendar and
+vCard support and more.
+
+2004/05/23 Version 2.05
+Major changes under the hood and a nice new summary module. It's been two months
+since last release but we give you a much more stable and powerfull Group-Office 
+in return. Upgrading is recommended for everybody.
+
+!!Important!! For upgrading you will have to delete your old Group-Office.php
+
+2004/03/24 Version 2.04
+With great help from many contributers this version a lot of improvements
+were made. The application is much more stable with this release.
+Upgrading is recommended.
+
+2004/03/18 Version 2.03 SP1
+Late tired and a rushy release leaded stupid mistakes.
+Just typo's in the sql updates and forgot to remove some files made
+2.03 to a disaster I think. 
+
+!!!IMPORTANT!!!
+If you already installed the first 2.03 then delete all files except for
+Group-Office.php and replace all other by the files from this package.
+
+Now open lib/updates.inc and check all the SQL updates for 2.02 and see
+if your database matches. Look for the ab_custom_... tables and 
+bm_bookmarks tables esspecially.
+
+Sorry for the inconvience!
+
+2004/03/10 Version 2.03
+Just bugfixes in here. Fixed bugs in IMAP client.
+
+2004/03/10 Version 2.02
+There were some installation issues with 2.01, and some people disliked the
+changed IMAP behavior of downloading all folders from the server. This version
+offers an improved mail client and some other small bugfixes. 
+
+2004/03/08 Version 2.01
+This version contains all patches for 2.0 and feautures an improved e-mail 
+client.
+
+2004/02/28 Version 2.0
+After a lot of 1.9x releases 2.0 is finally in stable state.
+
+This only goes for the modules:
+- Addressbook
+- E-mail client
+- Projects
+- Calendar
+- Websites
+- Notes
+- Bookmarks
+
+And languages:
+
+-English
+-Nederlands
+-Deutsch
+
+2004/02/18 Version 1.98
+This release performs better and adds some new functionality.
+
+Modules that are known to work properly:
+- Addressbook
+- E-mail client
+- Projects
+- Calendar
+- Websites
+- Notes
+- Bookmarks
+
+The other ones are in development.
+
+Languages that are known to be complete:
+
+-English
+-Nederlands
+
+
+2004/02/11 Version 1.97
+PLEASE READ IF YOU DON"T WANT TO LOSE DATA!!!
+
+This installer will upgrade your database automatically. This release
+features a new addressbook where contacts and companies are separated.
+The company fields from your contacts will therefore be DELETED.
+Because of this you should export your contacts first to CSV using
+Group-Office. After upgrading you should first import companies from
+that file. After that import the contacts.
+Backup your database too to be extra safe.
+
+This version also features:
+
+- Complete redesigned user interface
+- Automatically checks for reminders and email now and pops up a new window.
+- Bug fixes
+
+2004/02/02 Version 1.96
+After releasing 1.95 some bugs came forward. This version solves these 
+issues.
+
+2004/01/19 Version 1.95
+Making Group-Office to run in an environment without register_globals
+brought a lot of bugs with it. This version brings all the fixes, along 
+with powerfull enhancements to the addressbook, calendar and projects module.
+
+2003/11/22 Version 1.94
+This version no longer require the register_globals setting to be enabled.
+Now it works on all setups and the security is enhanced.
+
+2003/10/25 Version 1.93 (GO2 ALPHA 3)
+Major performance improvements come with this release. Especially when you
+have lots of users. Also the GUI is redesigned to work with a lot of users.
+This release also contains othere new features and some small bugfixes.
+I recommend everybody to upgrade to this version even though it's an alpha
+release.
+
+2003/09/23 VERSION 1.91 (GO2 ALPHA RELEASE)
+This realese only contains bugfixes for the previous version.
+
+2003/09/21 VERSION 1.9 (GO2 ALPHA RELEASE)
+This release is the prelease to Group-Office 2.0. It now features sharable 
+addressbooks and overall increased usability.
+Group-Office now can authenticate users against LDAP or mail servers so 
+implementing Group-Office in your existing user environment was never easier.
+
+Group-Office ships only with the English and Dutch language now. Other 
+langugaes have to be downloaded separately.
+
+See the notes in the file 'INSTALL' on how to migrate to the new addressbook.
+
+
+2003/08/07 VERSION 1.12
+This release contains major bugfixes. It also includes an updated manual,
+a new dutch manual, New themes, languages and more! Autorizing users is 
+simplefied.
+
+These languages are known to be incomplete:
+-Dansk
+-Portugues
+
+2003/07/24 VERSION 1.11
+This release focusses mainly on some bugfixes.
+There is also a great new theme called Nuvola and the scheduler is improved.
+
+2003/07/18 VERSION 1.1
+After a very buggy installer in the last release this one comes with a 
+completely renewed installer that will guide you through the installation 
+process interactively. The email module has unlimited subfolder support now 
+and the scheduler has a reminder function. Administrators might also be happy 
+with new configuration tools. The scheduler module has an improved view and 
+functionality There is a completly new Web site managemnet module.
+Special thanks to all contributers!
+
+2003/06/18 VERSION 1.06
+This release is officially announced as a production stable release!
+The e-mail module has improved functionallity and there is a new theme called 
+crystal. This release also includes additional language support.
+
+2003/06/03 VERSION 1.05
+This release is revolutionary because there were lots of contributions for 
+this release! We now have language support for: German, Danish, Dutch and 
+English. There are also new features, bugfixes and an end user manual.
+
+Special thanks to:
+
+- Casey Ruark for his wonderfull end user manual
+- Georg Lorenz for making the e-mail module work with Cyrus IMAP and the 
+  German translation
+- Allan Hansen for the Danish translation
+
+See the chanelog for more details
+
+
+2003/05/08 VERSION 1.03
+This version is released because the makers of the menu used in the previous 
+versions have changed the license to an incompatible form. Now the program
+is 100% GPL. Also small bug fixes and translations were made.
+
+2003/04/26 VERSION 1.02
+This release has some new features in the modules and the framework.
+It's also a lot more stable. Please read the changelog for details.
+Read the installation instructions when installing and upgrading!!!
+
+2003/04/08 VERSION 1.01
+small bug fixes
+
+2003/03/21 VERSION 1.0
+First release
+

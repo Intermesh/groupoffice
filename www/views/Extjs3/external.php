@@ -1,0 +1,51 @@
+<?php
+extract($data);
+
+$module = isset($m) && preg_match('/[a-z]+/', $m) ? $m : '';
+$function = isset($f) && preg_match('/[a-z]+/i', $m) ? $f : '';
+$funcParams = isset($p) ? $p : '';
+
+//if(strpos($_SERVER['QUERY_STRING'], '<script') || strpos(urldecode($_SERVER['QUERY_STRING']), '<script'))
+//				die('Invalid request');
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<title><?php echo \GO::config()->product_name; ?></title>
+<script type="text/javascript">
+function launchGO(){
+	//var win = window.open('', "groupoffice");
+	
+	var win = window.open('', "<?php echo \GO::getId(); ?>");
+	
+
+
+	if(win.GO && win.GO.<?php echo $module; ?>)
+	{
+		win.GO.<?php echo $module; ?>.<?php echo $function; ?>.call(this, <?php echo json_encode($funcParams); ?>);
+		self.close();
+	}else
+	{
+		win.close();
+		//the parameters will be handled in default_scripts.inc.php
+		<?php
+		\GO::setAfterLoginUrl(\GO::createExternalUrl($module,$function, $funcParams, true));
+		?>
+		self.location.href="<?php echo \GO::config()->host; ?>";
+	}
+
+	//self.close();
+	//win.focus();
+
+}
+</script>
+</head>
+
+<body onload="launchGO();" style="font:12px arial">
+<h1><?php echo \GO::config()->product_name; ?></h1>
+<?php
+echo str_replace('{FUNCTION}', $module.'.'.$function.'()', \GO::t('goAlreadyStarted'));
+?>
+</body>
+
+</html>

@@ -1,0 +1,18 @@
+Source: groupoffice-servermanager
+Section: web
+Priority: extra
+XSBC-Orig-Maintainer: Intermesh BV (Developer key) <info@intermesh.nl>
+Maintainer: Ubuntu MOTU Developers <motu@lists.ubuntu.com> 
+Build-Depends: debhelper (>= 7)
+Standards-Version: 3.8.0
+Homepage: http://www.group-office.com
+
+Package: groupoffice-servermanager
+Architecture: all
+Depends: groupoffice-com,
+	php-cli  (>= 5.6) | php5-cli (>= 5.6),
+	sudo,
+	${misc:Depends}
+Description:
+ Create multiple Group-Office installations. It uses a virtual document root for
+ Apache 2 to create multiple Group-Office domains easily.

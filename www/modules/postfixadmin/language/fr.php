@@ -1,0 +1,52 @@
+<?php
+
+
+$l["postfixadmin"]='Domaines E-mail';
+$l["address"]="Addresse";
+$l["goto_address"]="Envoyé à";
+$l["maxquota"]="Quota Max";
+$l["transport"]="Transport";
+$l["backupmx"]="Backupmx";
+$l["fetchmailConfig"]="Configuration Fetchmail";
+$l["fetchmailConfigs"]="Configurations Fetchmail";
+$l["srcServer"]="Serveur SRC";
+$l["srcAuth"]="Authentification SRC";
+$l["srcUser"]="Utilisateur SRC";
+$l["srcPassword"]="Mot de passe SRC";
+$l["srcFolder"]="Dossier SRC";
+$l["pollTime"]="Temps d\'interrogation";
+$l["fetchall"]="Fetchall";
+$l["keep"]="Conserver";
+$l["protocol"]="Protocole";
+$l["extraOptions"]="Options - Extra";
+$l["returnedText"]="Texte retourné";
+$l["mda"]="Mda";
+$l["date"]="Date";
+$l["username"]="Nom d\'utilisateur";
+$l["password"]="Mot de passe";
+$l["confirmPassword"]='Confirmer le mot de passe';
+$l["maildir"]="Maildir";
+$l["quota"]="Quota";
+$l["active"]="Actif";
+$l["vacation"]="Réponse automatique";
+$l["vacationActive"]="Activer la réponse automatique";
+$l["email"]="E-mail";
+$l["subject"]="Sujet";
+$l["body"]="Corps du message";
+$l["cache"]="Cache";
+$l["defaultQuota"]='Quota par défaut (MB)';
+
+$l['name']='PostfixAdmin';
+$l['description']='<i style="color: green">*** Module Admin *** </i>Gestion du serveur Postfix.';
+$l['alias']='Alias';
+$l['aliases']='Aliases';
+$l['domain']='Domaine';
+$l['domains']='Domaines';
+$l['fetchmail_config']='Configuration Fetchmail';
+$l['fetchmail_configs']='Configurations Fetchmail';
+$l['mailbox']='Boite aux lettres';
+$l['mailboxes']='Boites aux lettres';
+$l['vacation_config']='Gestionnaire d\'absence';
+$l['vacation_configs']='Gestionnaires d\'absence';
+$l['aliasHelp']="Pour des destinataires multiples utilisez une virgule comme séparateur (ex : alias1@domain.com,alias2@domain.com)";
+$l['usedQuota']='Quota utilisé';

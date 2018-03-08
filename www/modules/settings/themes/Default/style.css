@@ -1,0 +1,7 @@
+.go-module-icon-settings , .go-menu-icon-settings{
+	background:url('images/settings.png');
+}
+
+.go-tab-icon-settings {
+	background-image: none !important;
+}

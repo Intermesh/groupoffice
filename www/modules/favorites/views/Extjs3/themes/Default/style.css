@@ -1,0 +1,7 @@
+.go-module-icon-favorites , .go-menu-icon-favorites  {
+	background-image: url('images/favorites.png') !important;
+}
+
+.btn-add-to-favorites{
+	background-image: url('images/favorites.png');
+}

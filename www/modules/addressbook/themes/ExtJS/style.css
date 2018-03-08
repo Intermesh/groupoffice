@@ -1,0 +1,68 @@
+.go-link-icon-2
+{
+	background-image: url('images/16x16/contact.png') !important;
+	width:16px;
+	height:16px;
+}
+
+.go-link-icon-3
+{
+	background-image: url('images/16x16/company.png') !important;
+	width:16px;
+	height:16px;
+}
+
+.go-module-icon-addressbook , .go-menu-icon-addressbook , .go-tab-icon-addressbook {
+	background-image:url('images/16x16/icon-addressbook.png') !important;
+}
+
+.btn-addressbook-add-contact {
+	background-image:url('images/16x16/add-contact.png') !important;
+}
+
+.btn-addressbook-add-company {
+	background-image:url('images/16x16/add-company.png') !important;
+}
+
+.btn-addressbook-contact {
+	background-image:url('images/16x16/contact.png') !important;
+}
+
+.btn-addressbook-manage {
+	background-image:url('images/16x16/manage.png') !important;
+}
+
+.btn-addressbook-company {
+	background-image:url('images/16x16/company.png') !important;
+}
+
+.btn-addressbook-addressbooks {
+	background-image:url('images/16x16/addressbook.png') !important;
+}
+
+
+
+.alphabet-view-selected
+{
+	background: #eff5fb url(images/selected.gif) no-repeat right bottom !important;
+	border: 1px solid #99bbe8 !important;
+	/*font-size: 20px;*/
+	
+}
+	
+.alphabet-view-over
+{
+  border:1px solid #dddddd;
+	margin:0px !important;
+  background: #efefef url(../../../../views/Extjs3/ext/resources/images/default/grid/row-over.gif) repeat-x left top;
+}
+
+.x-form-add-trigger 
+{
+   background-image: url(images/16x16/company-link.png) !important;
+   background-position: center center !important;    
+   cursor: pointer;
+   cursor: hand;    
+   border: 0 !important;    
+   margin-left: 4px;
+ }

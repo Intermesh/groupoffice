@@ -1,0 +1,51 @@
+<?php
+
+
+$l['name']='Postfix admin';
+$l['description']='Un mòdul per gestionar usuaris virtuals de postfix dins la base de dades de {product_name}';
+$l['fetchmail_config']='Configuració Fetchmail';
+$l['fetchmail_configs']='Configuracions Fetchmail';
+$l['vacation_config']='Configuració de vacances';
+$l['vacation_configs']='Configuracions de vacances';
+
+$l["postfixadmin"]='Dominis d\'e-mail';
+$l["alias"]="Àlias";
+$l["address"]="Adreça";
+$l["goto_address"]="Anar a";
+$l["domains"]="Dominis";
+$l["aliases"]="Àlias";
+$l["maxquota"]="Quota màxima (MB)";
+$l["transport"]="Transport";
+$l["backupmx"]="Còpia de seguretat MX";
+$l["fetchmailConfig"]="Configuració Fetchmail";
+$l["fetchmailConfigs"]="Configuracions Fetchmail";
+$l["srcServer"]="Servidor font";
+$l["srcAuth"]="Auth font";
+$l["srcUser"]="Usuari font";
+$l["srcPassword"]="Contrasenya font";
+$l["srcFolder"]="Carpeta font";
+$l["pollTime"]="Temps d\'enquesta";
+$l["fetchall"]="Mapejar tot";
+$l["keep"]="Mantenir";
+$l["protocol"]="Protocol";
+$l["extraOptions"]="Opcions extra";
+$l["returnedText"]="Text retornat";
+$l["mda"]="Mda";
+$l["date"]="Data";
+$l["mailbox"]="Bústia de correu";
+$l["mailboxes"]="Bústies de correu";
+$l["username"]="Nom d\'usuari";
+$l["password"]="Contrasenya";
+$l["confirmPassword"]='Confirmar contrasenya';
+$l["maildir"]="Carpeta de mail";
+$l["quota"]="Quota (MB)";
+$l["active"]="Actiu";
+$l["vacation"]="Resposta automàtica";
+$l["vacationActive"]="Activar resposta automàtica";
+$l["email"]="Email";
+$l["subject"]="Assumpte";
+$l["body"]="Cos";
+$l["cache"]="Cache";
+$l["domain"]="Domini";
+$l["usage"]="Ús";
+$l["defaultQuota"]='Quota per defecte (MB)';

@@ -1,0 +1,33 @@
+#!/bin/sh
+set -e
+
+. /usr/share/debconf/confmodule
+
+. /usr/share/dbconfig-common/dpkg/postinst.mysql
+dbc_generate_include_owner="root:www-data"
+dbc_generate_include_perms="0640"
+dbc_generate_include=php:/etc/groupoffice/config-db.php
+dbc_go groupoffice-com $@
+
+#for testing
+#if [ ! -e /usr/share/groupoffice ]; then
+#	ln -s /var/www/community/trunk/www /usr/share/groupoffice
+#fi
+
+if [ -e /usr/share/groupoffice/modules/z-push/backend/go ]; then
+	cp -R /usr/share/groupoffice/modules/sync/z-push/backend/go /usr/share/groupoffice/modules/z-push/backend/
+fi
+
+#if [ ! -e /usr/share/groupoffice/groupoffice-license.txt ]; then
+#	touch /usr/share/groupoffice/groupoffice-license.txt
+#	chown www-data:www-data /usr/share/groupoffice/groupoffice-license.txt
+#fi
+
+php /usr/share/groupoffice-install-scripts/configure.php
+
+invoke-rc.d apache2 reload > /dev/null || true
+
+#DEBHELPER#
+
+exit 0
+

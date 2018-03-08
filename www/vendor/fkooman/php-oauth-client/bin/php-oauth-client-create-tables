@@ -1,0 +1,16 @@
+#!/usr/bin/php
+<?php
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
+use fkooman\OAuth\Client\PdoStorage;
+
+if($argc > 1) {
+    $prefix = $argv[1];
+} else { 
+    $prefix = '';
+}
+
+$queries = PdoStorage::createTableQueries($prefix);
+foreach($queries as $q) {
+    echo $q . PHP_EOL;
+}
