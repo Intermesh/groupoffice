@@ -151,16 +151,18 @@ use go\core\jmap\State;
 					$oldConfig = $this->findConfigFile('config.php');
 				}
 				require($oldConfig);
+				
+				
 
 				return [
 						"general" => [
-								"dataPath" => !empty($config['file_storage_path']) ? $config['file_storage_path'] : '/home/groupoffice',
+								"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice',
 								"debug" => !empty($config['debug'])
 						],
 						"db" => [
-								"dsn" => 'mysql:host=' . $config['db_host'] . ';dbname=' . $config['db_name'],
-								"username" => $config['db_user'],
-								"password" => $config['db_pass']
+								"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost"). ';dbname=' . ($config['db_name'] ?? "groupoffice"),
+								"username" => $config['db_user'] ?? "groupoffice",
+								"password" => $config['db_pass'] ?? ""
 						]
 				];
 			}

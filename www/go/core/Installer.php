@@ -71,7 +71,8 @@ class Installer {
 				'groups' => [
 						["groupId" => 1],
 						["groupId" => 2],
-						["groupId" => 3]
+						["groupId" => 3],
+						["groupId" => 4] //newly created group for admin
 				]
 		]);
 

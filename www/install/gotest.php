@@ -179,14 +179,6 @@ function test_system(){
 
 	$tests[]=$test;
 
-	$test['name']='pspell support';
-	$test['showSuccessFeedback'] = false;
-	$test['pass']=function_exists('pspell_new');
-	$test['feedback']='Warning: No pspell extension for PHP found. The spellchecker in the e-mail composer won\'t work.';
-	$test['fatal']=false;
-
-	$tests[]=$test;
-
 
 	$test['name']='File upload support';
 	$test['showSuccessFeedback'] = false;
