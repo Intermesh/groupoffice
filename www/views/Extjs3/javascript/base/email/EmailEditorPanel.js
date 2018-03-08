@@ -201,7 +201,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 					this.setOriginalValue();					
 					
 					
-					var pasteEl = doc;
+//					var pasteEl = doc;
 
 //					if(Ext.isChrome){
 //						var paster = new GO.base.upload.Paster({
