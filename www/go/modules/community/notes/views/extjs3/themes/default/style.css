@@ -1,0 +1,7 @@
+.entity.Note::before {
+	content: "description"
+}
+
+.go-module-icon-notes , .go-menu-icon-notes{
+	background:url('images/notes.png');
+}

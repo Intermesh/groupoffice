@@ -1,0 +1,95 @@
+/* main: yourtheme.scss*/
+
+//--------------------------------------------------------------
+// 0. Density independent pixels
+//--------------------------------------------------------------
+$density: 140 !default; // LARGE SCREEN
+$font-scale: 1 !default;
+
+@function dp($width) {
+  @return (($width * $density) / 160) *1px;
+}
+@function sp($size) {
+  @return ceil(dp($size) * $font-scale);
+}
+
+$layout-xs:     600px !default;
+$layout-sm:     960px !default;
+$layout-md:     1280px !default;
+$layout-lg:     1920px !default;
+
+$borderRadius: 2px !default;
+
+/* Bezier easing curve */
+$curve-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
+$curve-deceleration: cubic-bezier(0.0, 0.0, 0.2, 1);
+$curve-acceleration: cubic-bezier(0.4, 0.0, 1, 1);
+$curve-sharp: cubic-bezier(0.4, 0.0, 0.6, 1);
+$curve-sharper: cubic-bezier(.25, .8, .25, 1); //slider
+
+//------------------------------------------------
+// Layouts and backgrounds
+//------------------------------------------------
+%card {
+  @extend .z1;
+  border: 0;
+  background-color:color($background,'card');
+  border-radius: $borderRadius;
+}
+
+%badge {
+	font-size: sp(13);
+	font-weight: 600;
+	color: rgba(white, 0.87);
+	margin-top: dp(1.5);
+	min-width:dp(21);
+	height:dp(21);
+	padding: 0 dp(4);
+	line-height:dp(21);
+	letter-spacing: 0;
+	text-align:center;
+	border-radius: dp(10.5); // only round with 1 char
+	background-color: color($foreground, 'secondary-text');	
+}
+
+%hover {
+	background-color: $cHover;
+	color: $cPrimary;
+}
+
+%ellipsis {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+%hidden {
+    visibility: hidden;
+    position: absolute;
+    opacity:0;
+    overflow:hidden;
+}
+ 
+@mixin rotate($deg) {
+	transform: rotate($deg);
+	-ms-transform: rotate($deg); // IE 9
+	-webkit-transform: rotate($deg); // Safari and Chrome
+}
+
+@mixin transition($transition...) {
+    -webkit-transition: $transition;
+    -moz-transition: $transition;
+    -ms-transition: $transition;
+    -o-transition: $transition;
+    transition: $transition;
+}
+
+@function str-replace($string, $search, $replace: '') {
+  $index: str-index($string, $search);
+  
+  @if $index {
+    @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+  }
+  
+  @return $string;
+}

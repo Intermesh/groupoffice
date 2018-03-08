@@ -1,0 +1,214 @@
+/* main: yourtheme.scss*/
+
+$app-icons: (
+ addressbook: contacts_alt1,
+ calendar: calendar_lg,
+ summary: task_manager_lg,
+ groups: contacts_lg,
+ users: contacts_lg,
+ workflow: photoaffix,
+ tasks: quickmemo_lg,
+ tickets: google_messenger_red,
+ files: explorer,
+ notes: color_note,
+ timeregistration2: clock_lg,
+ leavedays: chronus,
+ bookmarks: browser,
+ site: browser,
+ cron: studio_lg,
+ customfields: instapaper_alt,
+ billing: google_opinion_rewards_alt,
+ modules: google_play_services,
+ tools: settings_lg,
+ projects2: android_for_work,
+ email: email_alt,
+ postfixadmin: boxer_email,
+ filesearch: applicationreader,
+ hoursapproval2: clock_green,
+ admin2userlogin: contacts,
+ voip: dialer_green,
+ announcements: we_chat,
+ reminders: bell,
+ zpushadmin:phone_blue_grey,
+ log: notebook_lg,
+);
+
+
+//#startMenu {
+//	@each $module, $icon in $app-icons {
+//		.go-module-icon-#{$module}, .go-menu-icon-#{$module}{
+//			background-image:url('img/icons/#{$icon}.png') !important;
+//		}
+//	}
+//}
+/*
+#startMenu.x-menu {
+	width: 100%;
+	max-height:100%;
+	height:100%;
+	opacity: 1; 
+	transition: opacity 300ms $curve-sharp;
+	background-color: rgba(#303030, 0.87);
+	&.x-hide-offsets {
+		opacity: 0;
+		ul {
+			transform: scale(.9);
+		}
+	}
+	ul {
+		box-sizing: border-box;
+		padding: dp(32) 20%;
+		transform: scale(1);
+		transition: transform 200ms $curve-sharp;
+		margin: 0 auto;
+		height:auto !important;
+		max-height: 100%;
+		text-align: justify;
+		overflow-y: auto;
+	}
+	a.x-menu-item{
+		padding:0;
+		height: dp(112);
+		width: dp(128);
+		margin:0 !important;
+		cursor: pointer;
+
+	}
+	#x-menu-el-go-start-menu-admin-menu {
+		width: 100%;
+		padding: dp(16) dp(40);
+		margin:0;
+		.menu-title {
+			color: white;
+			text-align:left;
+			padding:0;
+			border-bottom: 1px solid color($foreground-dark, 'divider');
+		}
+	}
+	li {
+		border-radius: 4px;
+		text-align:center;
+		margin: dp(8) dp(24);
+		display:inline-block;
+	}
+	img {
+		cursor: pointer;
+		width: dp(72);
+		height: dp(72);
+		padding: 0;
+		background-position: center center;
+		background-size:contain;
+	}
+	.x-menu-item-text {
+		@extend %font-data;
+		display:block;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
+		color: white;
+		text-shadow: 0px 1px 0px color($foreground, 'unfocused');
+	}
+	.x-menu-scroller {
+		height: 0px;
+	}
+	.x-menu-item-active{
+		background-color: color($foreground, 'unfocused');
+	}
+}
+*/
+
+.go-model-icon{
+	&-GO_Addressbook_Model_Contact {
+		background-image: url('images/16x16/contact.png') !important;
+		width:16px;
+		height:16px;
+	}
+	&-GO_Addressbook_Model_Company
+	{
+		background-image: url('images/16x16/company.png') !important;
+		width:16px;
+		height:16px;
+	}
+	&-GO_Addressbook_Model_Addresslist{
+		background-image: url('images/16x16/templates.png') !important;
+		width:16px;
+		height:16px;
+	}
+}
+
+// TICKETS
+.ti-seen, .ti-unseen, .ti-late {
+	td.x-grid3-td-first_column .x-grid3-cell-inner {
+		padding: 0;
+	}
+}
+
+
+// EMAIL 
+.ml-unseen-row {
+	background-color:white;
+}
+.ml-unseen-from {
+	font-weight: bold;
+}
+.x-tree-node .ml-folder-unseen a span.em-folder-status { // badge
+	@extend %badge;
+	float: right;
+}
+
+.ml-unseen-dot {
+	background-color: $cPrimary;
+	width: dp(8);
+	height: dp(8);
+	margin: dp(4);
+	border-radius: 50%;
+	float: right;
+}
+
+.x-grid3-col-icon {
+	text-overflow: initial;
+	white-space: normal;
+	i {
+		font-size: dp(16);
+		float: right;
+		width: dp(16);
+		height: dp(16);
+		color: color($foreground, 'secondary-text');
+	}
+}
+
+
+.message-header {
+	position: relative;
+	background-color: color($background, "background");
+	border-bottom:1px solid color($foreground, "line");
+	padding: dp(16);
+		
+	b {
+		@extend %font-caption;
+	}
+	
+	.avatar {
+		width: dp(64);
+		height: dp(64);
+		position: absolute;
+		top: dp(16);
+		right: dp(16);
+	}
+	
+	.x-form-checkbox {
+		margin-left: 0;
+	}
+}
+
+
+
+
+//TASK filter
+.x-form-radio-group.x-column-layout-ct {
+	margin-top:dp(16);
+}
+
+.mo-description {
+	padding-left: dp(40);
+}

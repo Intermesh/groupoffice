@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit 
+	bootstrap="bootstrap.php"
+	colors="true"
+	processIsolation="false"
+	backupGlobals="false"
+	backupStaticAttributes="false"
+	convertErrorsToExceptions="true"
+	verbose="true"
+debug="true">
+
+	<testsuites>
+		<testsuite name="core">
+			<directory>./go/core</directory>
+		</testsuite>
+		<testsuite name="modules">
+			<directory>./go/modules</directory>
+		</testsuite>
+		
+	</testsuites>
+
+<!--	<filter>
+		<whitelist>
+			<directory>./</directory>
+			<exclude>
+				<directory>./GO/Utils</directory>
+			</exclude>
+		</whitelist>
+	</filter>-->
+</phpunit>

@@ -1,0 +1,9 @@
+[general]
+dataPath = /home/govhosts/test.localhost/data
+debug = false
+
+[db]
+dsn = "mysql:host=localhost;dbname=groupoffice"
+username = admin
+password = secret
+

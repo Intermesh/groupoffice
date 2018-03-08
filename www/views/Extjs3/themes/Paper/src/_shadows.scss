@@ -1,0 +1,97 @@
+//shadows
+$umbra: rgba(black, .2);
+$penumbra: rgba(black, .14);
+$ambient: rgba(black, .12);
+
+$umbra-elevation: (
+  1: '0 #{dp(2) dp(1) dp(-1)}',
+  2: '0 #{dp(3) dp(1) dp(-2)}',
+  3: '0 #{dp(3) dp(3) dp(-2)}',
+  4: '0 #{dp(2) dp(4) dp(-1)}',
+  5: '0px 3px 5px -1px',
+  6: '0 #{dp(3) dp(5) dp(-1)}',	//fab 
+  7: '0px 4px 5px -2px',
+  8: '0 #{dp(5) dp(5) dp(-3)}', // fab-over
+  9: '0px 5px 6px -3px',
+  10: '0px 6px 6px -3px',
+  11: '0px 6px 7px -4px',
+  12: '0 #{dp(7) dp(8) dp(-4)}', //fab-active
+  13: '0px 7px 8px -4px',
+  14: '0px 7px 9px -4px',
+  15: '0px 8px 9px -5px',
+  16: '0px 8px 10px -5px',
+  17: '0px 8px 11px -5px',
+  18: '0px 9px 11px -5px',
+  19: '0px 9px 12px -6px',
+  20: '0px 10px 13px -6px',
+  21: '0px 10px 13px -6px',
+  22: '0px 10px 14px -6px',
+  23: '0px 11px 14px -7px',
+  24: '#{dp(0) dp(11) dp(15) dp(-7)}'
+);
+
+$penumbra-elevation: (
+  1: '0 #{dp(1) dp(1) dp(0)}',
+  2: '0 #{dp(2) dp(2) dp(0)}',
+  3: '0 #{dp(3) dp(4) dp(0)}',
+  4: '0 #{dp(4) dp(5) dp(0)}',
+  5: '0px 5px 8px 0px',
+  6: '0 #{dp(6) dp(10) dp(0)}',
+  7: '0px 7px 10px 1px',
+  8: '0 #{dp(8) dp(10) dp(-1)}',
+  9: '0px 9px 12px 1px',
+  10: '0px 10px 14px 1px',
+  11: '0px 11px 15px 1px',
+  12: '0 #{dp(12) dp(17) dp(2)}',
+  13: '0px 13px 19px 2px',
+  14: '0px 14px 21px 2px',
+  15: '0px 15px 22px 2px',
+  16: '0px 16px 24px 2px',
+  17: '0px 17px 26px 2px',
+  18: '0px 18px 28px 2px',
+  19: '0px 19px 29px 2px',
+  20: '0px 20px 31px 3px',
+  21: '0px 21px 33px 3px',
+  22: '0px 22px 35px 3px',
+  23: '0px 23px 36px 3px',
+  24: '#{dp(0) dp(24) dp(38) dp(3)}'
+);
+
+$ambient-elevation: (
+  1: '#{dp(0) dp(1) dp(3) dp(0)}',
+  2: '#{dp(0) dp(1) dp(5) dp(0)}',
+  3: '#{dp(0) dp(1) dp(8) dp(0)}',
+  4: '#{dp(0) dp(1) dp(10) dp(0)}',
+  5: '0px 1px 14px 0px',
+  6: '0 #{dp(1) dp(18) dp(0)}',
+  7: '0px 2px 16px 1px',
+  8: '0 #{dp(3) dp(14) dp(2)}',
+  9: '0px 3px 16px 2px',
+  10: '0px 4px 18px 3px',
+  11: '0px 4px 20px 3px',
+  12: '0 #{dp(5) dp(22) dp(4)}',
+  13: '0px 5px 24px 4px',
+  14: '0px 5px 26px 4px',
+  15: '0px 6px 28px 5px',
+  16: '0px 6px 30px 5px',
+  17: '0px 6px 32px 5px',
+  18: '0px 7px 34px 6px',
+  19: '0px 7px 36px 6px',
+  20: '0px 8px 38px 7px',
+  21: '0px 8px 40px 7px',
+  22: '0px 8px 42px 7px',
+  23: '0px 9px 44px 8px',
+  24: '#{dp(0) dp(9) dp(46) dp(8)}'
+);
+
+$i: 0;
+@while $i <= 24 {
+	.z#{$i} {
+	   //will-change: box-shadow;
+		box-shadow:
+			#{map-get($umbra-elevation, $i) $umbra},
+			#{map-get($penumbra-elevation, $i) $penumbra},
+			#{map-get($ambient-elevation, $i) $ambient};
+	}
+	$i: $i + 1;
+}

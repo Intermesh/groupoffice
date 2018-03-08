@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS test_a;
+DROP TABLE IF EXISTS test_b;
+DROP TABLE IF EXISTS test_c;
+DROP TABLE IF EXISTS test_a_has_many;
+DROP TABLE IF EXISTS test_a_has_one;

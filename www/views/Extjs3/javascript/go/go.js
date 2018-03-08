@@ -1,0 +1,14 @@
+Ext.namespace('go');
+Ext.namespace('go.flux');
+Ext.namespace('go.data');
+Ext.namespace('go.grid');
+Ext.namespace('go.form');
+Ext.namespace('go.panels');
+Ext.namespace('go.login');
+Ext.namespace('go.usersettings');
+Ext.namespace('go.links');
+Ext.namespace('go.modules');
+Ext.namespace('go.util');
+Ext.namespace('go.acl');
+Ext.namespace('go.detail');
+Ext.namespace('go.layout');

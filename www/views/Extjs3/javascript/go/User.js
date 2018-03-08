@@ -1,0 +1,1 @@
+go.User = null;
