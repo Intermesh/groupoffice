@@ -50,7 +50,9 @@ GO.tasks.AddTaskBar = function(config){
 Ext.extend(GO.tasks.AddTaskBar, Ext.FormPanel,{
 	populateComboBox : function(records)
 	{
-		this.ntTasklist.setValue(records[0].data.id);
+		if(records.length) {
+			this.ntTasklist.setValue(records[0].data.id);
+		}
 	},
 	afterRender : function()
 	{
