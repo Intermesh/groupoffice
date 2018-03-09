@@ -8146,6 +8146,8 @@ a.x-menu-group-item .x-menu-item-text:before {
 .x-combo-list-inner {
   padding: 8px 0;
   background-color: #fff; }
+  .x-combo-list-inner h4 {
+    padding: 8px 8px 8px 24px; }
 
 .x-combo-list-hd {
   color: rgba(0, 0, 0, 0.87); }

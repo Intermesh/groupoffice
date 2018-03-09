@@ -59,7 +59,11 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 			autoDestroy: true,
 			fields: ['id', 'entityId', 'entity', 'name', 'description', {name: 'modifiedAt', type: 'date'}],
 			entityStore: go.stores.Search,
-			autoLoad: true
+			autoLoad: true,
+			sortInfo: {
+				field: 'modifiedAt',
+				direction: 'DESC'
+			}
 		});
 
 		this.grid = new go.grid.GridPanel({

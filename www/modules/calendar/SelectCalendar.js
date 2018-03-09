@@ -52,7 +52,7 @@ GO.calendar.SelectCalendar = function(config){
             '<tpl for=".">',
             '<tpl if="this.group_name != values.group_name">',
             '<tpl exec="this.group_name = values.group_name"></tpl>',
-            '<h1>{group_name}</h1>',
+            '<h4>{group_name}</h4>',
             '</tpl>',
             '<div class="x-combo-list-item">{name}</div>',
             '</tpl>'

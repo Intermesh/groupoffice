@@ -1983,6 +1983,10 @@ $menuScrollerSize : dp(4);
 .x-combo-list-inner {
 	padding: dp(8) 0;
 	background-color:#fff;
+	
+	h4 {
+		padding: dp(8) dp(8) dp(8) dp(24);
+	}
 }
 
 .x-combo-list-hd {
