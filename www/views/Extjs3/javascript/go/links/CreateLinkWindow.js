@@ -2,13 +2,24 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 	entity: null,
 	entityId: null,
 	stateId: "go-create-link-windows",
-
 	search: function (v) {
+		
+		var filter = [];
+		
+		var entities = [];
+
+		Ext.each(this.entityGrid.getSelectionModel().getSelections(), function (r) {
+			entities.push(r.data.entity);
+		}, this);
+
+		filter.push({entities: entities});
+
+		filter.push({q: this.searchField.getValue()});
+			
+		
 		this.store.load({
 			params: {
-				filter: [{
-						q: v
-					}]
+				filter: filter
 			}
 		});
 	},
@@ -33,12 +44,12 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 			},
 			onTrigger2Click: function () {
 				this.setValue("");
-				me.search("");
+				me.search();
 			},
 			listeners: {
 				specialkey: function (field, e) {
 					if (e.getKey() == Ext.EventObject.ENTER) {
-						this.search(field.getValue());
+						this.search();
 					}
 				},
 				scope: this
@@ -63,6 +74,9 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 			sortInfo: {
 				field: 'modifiedAt',
 				direction: 'DESC'
+			},
+			baseParams: {
+				filter: []
 			}
 		});
 
@@ -91,7 +105,8 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 					header: t('Type'),
 					width: 75,
 					sortable: false,
-					dataIndex: 'entity'
+					dataIndex: 'entity',
+					hidden: true
 				},
 				{
 					id: 'modifiedAt',
@@ -99,18 +114,28 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 					width: 160,
 					sortable: true,
 					dataIndex: 'modifiedAt',
-					renderer: Ext.util.Format.dateRenderer(go.User.dateTimeFormat)
+					renderer: Ext.util.Format.dateRenderer(go.User.dateTimeFormat),
+					hidden: true
 				}
 			],
 			autoExpandColumn: 'name'
 		});
+		
+		this.entityGrid = new go.links.EntityGrid({
+			width: dp(200),
+			region:"west"
+		});
+		
+		this.entityGrid.getSelectionModel().on('selectionchange', function (sm) {
+			this.search();
+		}, this, {buffer: 1}); //add buffer because it clears selection first
 
 		Ext.apply(this, {
 			title: t("Create link", "links"),
-			width: 600,
-			height: 600,
+			width: dp(700),
+			height: dp(600),
 			layout: 'border',
-			items: [search, this.grid],
+			items: [this.entityGrid, search, this.grid],
 			listeners: {
 				render: function () {
 					//this.store.load();

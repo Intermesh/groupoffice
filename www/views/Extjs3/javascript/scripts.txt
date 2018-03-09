@@ -283,6 +283,7 @@ views/Extjs3/javascript/go/login/RecoveryDialog.js
 views/Extjs3/javascript/go/CustomFields.js
 views/Extjs3/javascript/go/Links.js
 views/Extjs3/javascript/go/links/LinkToButton.js
+views/Extjs3/javascript/go/links/EntityGrid.js
 views/Extjs3/javascript/go/links/CreateLinkWindow.js
 views/Extjs3/javascript/go/links/LinkBrowser.js
 views/Extjs3/javascript/go/links/LinksDetailPanel.js

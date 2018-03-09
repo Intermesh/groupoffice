@@ -37,7 +37,7 @@ go.modules.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 				selModel,
 				{
 					id: 'name',
-					header: 'Name',
+					header: t('Name'),
 					sortable: false,
 					dataIndex: 'name',
 					hideable: false,
