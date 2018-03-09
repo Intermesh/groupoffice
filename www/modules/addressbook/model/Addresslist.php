@@ -15,6 +15,7 @@
  * @property int $acl_id
  * @property int $user_id
  * @property int $id
+ * @property int $addresslist_group_id
  * @property int $mtime
  * @property int $ctime
  */
@@ -24,18 +25,7 @@ namespace GO\Addressbook\Model;
 
 
 class Addresslist extends \GO\Base\Db\ActiveRecord {
-	
-	/**
-	 * Returns a static model of itself
-	 * 
-	 * @param String $className
-	 * @return Company 
-	 */
-	public static function model($className=__CLASS__)
-	{	
-		return parent::model($className);
-	}
-	
+
 	// TODO : move language from mailings module to addressbook module
 	protected function getLocalizedName() {
 		return \GO::t('addresslist', 'addressbook');
@@ -45,7 +35,8 @@ class Addresslist extends \GO\Base\Db\ActiveRecord {
 		return array(
 				'contacts' => array('type'=>self::MANY_MANY, 'model'=>'GO\Addressbook\Model\Contact', 'field'=>'addresslist_id', 'linkModel' => 'GO\Addressbook\Model\AddresslistContact'),
 				'companies' => array('type'=>self::MANY_MANY, 'model'=>'GO\Addressbook\Model\Company', 'field'=>'addresslist_id', 'linkModel' => 'GO\Addressbook\Model\AddresslistCompany'),
-				'sentMailings' => array('type'=>self::HAS_MANY, 'model'=>'GO\Addressbook\Model\SentMailing','field'=>'addresslist_id', 'delete'=> self::DELETE_CASCADE)
+				'sentMailings' => array('type'=>self::HAS_MANY, 'model'=>'GO\Addressbook\Model\SentMailing','field'=>'addresslist_id', 'delete'=> self::DELETE_CASCADE),
+				'addresslistGroup' => array('type'=>self::BELONGS_TO, 'model'=>'GO\Addressbook\Model\AddresslistGroup', 'field'=>'addresslist_group_id')
 		);
 	}
 	

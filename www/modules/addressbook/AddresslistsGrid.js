@@ -18,18 +18,24 @@ GO.addressbook.AddresslistsGrid = Ext.extend(GO.grid.GridPanel,{
 	initComponent : function(){
 
 		var fields = {
-			fields:['id', 'name', 'user_name','acl_id'],
+			fields:['id', 'name', 'user_name','acl_id','addresslistGroupName'],
 			columns:[{
 				header: GO.lang.strId,
 				dataIndex: 'id',
+				groupable:false,
 				hidden:true,				
 				width:30
 			},{
 				header: GO.lang.strName,
-				dataIndex: 'name'
+				dataIndex: 'name',
+				groupable:false,
+			},{
+				header: GO.addressbook.lang.addresslistGroup,
+				dataIndex: 'addresslistGroupName'
 			},{
 				header: GO.addressbook.lang.cmdOwner,
-				dataIndex: 'user_name' ,
+				dataIndex: 'user_name',
+				groupable:false,
 				sortable: false
 			}
 		]};
@@ -40,31 +46,57 @@ GO.addressbook.AddresslistsGrid = Ext.extend(GO.grid.GridPanel,{
 			},
 			columns: fields.columns
 		});
-		
+				
 		Ext.apply(this,{
 			id: 'ab-addresslist-grid',
 			title:GO.addressbook.lang.cmdPanelMailings,
 			standardTbar:true,
-			store: new GO.data.JsonStore({
-				url: GO.url('addressbook/addresslist/store'),
-				root: 'results',
-				id: 'id',
-				totalProperty:'total',
-				fields: fields.fields,
+			tbar: [
+				'-'
+				,{
+					iconCls: 'btn-folder',
+					text: GO.addressbook.lang.manageGroups,
+					cls: 'x-btn-text-icon',
+					handler: function(){
+						if(!this.groupDialog)
+						{
+							this.groupDialog = new GO.addressbook.AddresslistGroupGridDialog();
+							this.groupDialog.on('change', function(){this.store.reload();}, this);						
+						}
+						this.groupDialog.show();
+					},
+					scope: this
+				}
+			],
+			store: new Ext.data.GroupingStore({
+				reader: new Ext.data.JsonReader({
+					totalProperty: "total",
+					root: "results",
+					id: "id",
+					fields:fields.fields
+				}),
 				baseParams: {
 					permissionLevel: GO.permissionLevels.write
 				},
-				remoteSort: true,
-				model:"GO\\Addressbook\\Model\\Addresslist"
+				proxy: new Ext.data.HttpProxy({
+					url:GO.url('addressbook/addresslist/store')
+				}),        
+				groupField:'addresslistGroupName',
+				remoteSort:true,
+				remoteGroup:true
+			}),
+			view:new Ext.grid.GroupingView({
+				autoFill:true,
+				forceFit:true,
+		    hideGroupedColumn:true,
+		    groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Items" : "Item"]})',
+		   	emptyText: GO.lang.strNoItems,
+		   	showGroupName:false,
+				startCollapsed:true
 			}),
 			border: false,
 			paging:true,
 			editDialogClass:GO.addressbook.AddresslistDialog,
-			view:new Ext.grid.GridView({
-				emptyText: GO.lang['strNoItems'],
-				autoFill: true,
-				forceFit: true
-			}),
 			cm:this.columnModel
 		});
 		

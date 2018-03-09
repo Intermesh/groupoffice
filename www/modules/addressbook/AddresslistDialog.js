@@ -45,6 +45,12 @@ GO.addressbook.AddresslistDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			  value: GO.addressbook.lang.cmdSalutation+' '+GO.addressbook.lang.cmdSir+'/'+GO.addressbook.lang.cmdMadam
 			};
 		
+		this.selectALGroup = new GO.addressbook.SelectAddresslistGroup({
+			hiddenName:'addresslist_group_id',
+			fieldLabel: GO.addressbook.lang.addresslistGroup,
+			anchor: '100%'
+		});
+		
 		this.selectUser = new GO.form.SelectUser({
 			fieldLabel:GO.lang.strOwner,
 			disabled: !GO.settings.has_admin_permission,
@@ -61,7 +67,8 @@ GO.addressbook.AddresslistDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			cls:'go-form-panel',
 			layout:'form',
 			items:[
-				this.nameField,	
+				this.nameField,
+				this.selectALGroup,
 				new GO.form.HtmlComponent({
 					html: GO.addressbook.lang.defaultSalutationText,
 					style:'padding:10px 0px'

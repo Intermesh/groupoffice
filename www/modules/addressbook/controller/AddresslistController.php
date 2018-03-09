@@ -17,6 +17,42 @@ namespace GO\Addressbook\Controller;
 
 
 class AddresslistController extends \GO\Base\Controller\AbstractModelController {
+	
+	public function actionCreateDummies(){
+		
+		$groups = 50;
+		$lists = 600;
+		
+		$alistGroups = [];
+		for($i=0; $i<=$groups; $i++){
+			$name = 'GROUP '.$i;
+			$alistG = \GO\Addressbook\Model\AddresslistGroup::model()->findSingleByAttribute('name', $name);
+			if(!$alistG){
+				$alistG = new \GO\Addressbook\Model\AddresslistGroup();
+				$alistG->name = $name;
+				$alistG->save();
+			}
+			$alistGroups[] = $alistG;
+		}
+		
+		for($i=0; $i<=$lists; $i++){
+			
+			$name = 'LIST '.$i;
+			
+			$alist = \GO\Addressbook\Model\Addresslist::model()->findSingleByAttribute('name', $name);
+			if(!$alist){
+				$alist = new \GO\Addressbook\Model\Addresslist();
+				$alist->name = $name;
+			}
+			
+			$index = array_rand($alistGroups);
+			$alist->addresslist_group_id = $alistGroups[$index]->id;
+			$alist->save();
+		}
+			
+		echo "DONE";
+	}
+	
 
 	protected $model = 'GO\Addressbook\Model\Addresslist';
 	
@@ -36,9 +72,11 @@ class AddresslistController extends \GO\Base\Controller\AbstractModelController 
 			$multiSel->formatCheckedColumn();
 		}
 		
-		
-		
 		$storeParams->getCriteria()->addCondition('level', $params['permissionLevel'],'>=','go_acl');
+		$storeParams->joinRelation('addresslistGroup','LEFT');
+		$storeParams->order('addresslistGroupName','ASC');
+		$storeParams->select('t.*,addresslistGroup.name AS addresslistGroupName');
+		$storeParams->debugSql();
 	}
 
 	public function formatStoreRecord($record, $model, $store) {

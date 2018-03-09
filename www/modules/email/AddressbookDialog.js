@@ -183,13 +183,22 @@ GO.email.AddressbookDialog = function(config) {
 
 	if (GO.addressbook) {
 		
-		this.mailingsStore = new GO.data.JsonStore({
-				url: GO.url("addressbook/addresslist/store"),
-				baseParams: {
-						permissionLevel: GO.permissionLevels.read
-				},
-				fields: ['id', 'name', 'user_name','acl_id', 'checked'],
-				remoteSort: true
+		this.mailingsStore = new Ext.data.GroupingStore({
+			reader: new Ext.data.JsonReader({
+				totalProperty: "total",
+				root: "results",
+				id: "id",
+				fields: ['id', 'name', 'user_name','acl_id', 'checked','addresslistGroupName']
+			}),
+			baseParams: {
+				permissionLevel: GO.permissionLevels.write
+			},
+			proxy: new Ext.data.HttpProxy({
+				url:GO.url('addressbook/addresslist/store')
+			}),        
+			groupField:'addresslistGroupName',
+			remoteSort:true,
+			remoteGroup:true
 		});
 		
 		this.mailingsSearchField = new GO.form.SearchField({
@@ -215,15 +224,23 @@ GO.email.AddressbookDialog = function(config) {
 			paging : true,
 			border : false,
 			store : this.mailingsStore,
-			view : new Ext.grid.GridView({
-				autoFill : true,
-				forceFit : true
+			view:new Ext.grid.GroupingView({
+				autoFill:true,
+				forceFit:true,
+		    hideGroupedColumn:true,
+		    groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Items" : "Item"]})',
+		   	emptyText: GO.lang.strNoItems,
+		   	showGroupName:false,
+				startCollapsed:true
 			}),
 			columns : [{
 				header : GO.lang['strName'],
 				dataIndex : 'name',
 				css : 'white-space:normal;',
 				sortable : true
+			},{
+				header: GO.addressbook.lang.addresslistGroup,
+				dataIndex: 'addresslistGroupName'
 			}],
 			sm : new Ext.grid.RowSelectionModel(),
 			tbar : [GO.lang['strSearch'] + ': ', ' ', this.mailingsSearchField]

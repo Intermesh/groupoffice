@@ -28,7 +28,7 @@
             "symfony/dependency-injection": "",
             "symfony/http-kernel": ""
         },
-        "time": "2016-10-13T01:43:15+00:00",
+        "time": "2016-10-13 01:43:15",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -117,7 +117,7 @@
         "suggest": {
             "guzzlehttp/guzzle": "Guzzle 5 has moved to a new package name. The package you have installed, Guzzle 3, is deprecated."
         },
-        "time": "2015-03-18T18:23:50+00:00",
+        "time": "2015-03-18 18:23:50",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -178,7 +178,7 @@
             "guzzle/guzzle": ">=v3.7.0",
             "php": ">=5.3.3"
         },
-        "time": "2014-01-15T16:17:58+00:00",
+        "time": "2014-01-15 16:17:58",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -218,7 +218,7 @@
         "require": {
             "php": ">=5.3.3"
         },
-        "time": "2014-08-16T09:22:31+00:00",
+        "time": "2014-08-16 09:22:31",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -261,7 +261,7 @@
             "guzzle/guzzle": "~3.8",
             "php": ">=5.3.3"
         },
-        "time": "2014-09-25T09:38:51+00:00",
+        "time": "2014-09-25 09:38:51",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -304,7 +304,7 @@
         "require-dev": {
             "mockery/mockery": "~0.9.1"
         },
-        "time": "2016-11-24T01:01:23+00:00",
+        "time": "2016-11-24 01:01:23",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -360,7 +360,7 @@
             "phpunit/phpunit": "*",
             "sabre/cs": "~1.0.0"
         },
-        "time": "2016-10-27T04:56:33+00:00",
+        "time": "2016-10-27 04:56:33",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -418,7 +418,7 @@
             "phpunit/phpunit": "*",
             "sabre/cs": "~1.0.0"
         },
-        "time": "2016-10-09T22:57:52+00:00",
+        "time": "2016-10-09 22:57:52",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -483,7 +483,7 @@
         "suggest": {
             "hoa/bench": "If you would like to run the benchmark scripts"
         },
-        "time": "2016-07-15T19:52:17+00:00",
+        "time": "2016-07-15 19:52:17",
         "bin": [
             "bin/vobject",
             "bin/generate_vcards"
@@ -577,7 +577,7 @@
             "phpunit/phpunit": "*",
             "sabre/cs": "~0.0.4"
         },
-        "time": "2015-11-05T20:14:39+00:00",
+        "time": "2015-11-05 20:14:39",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -642,7 +642,7 @@
         "suggest": {
             "ext-curl": " to make http requests with the Client class"
         },
-        "time": "2016-01-06T23:00:08+00:00",
+        "time": "2016-01-06 23:00:08",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -712,7 +712,7 @@
             "ext-curl": "*",
             "ext-pdo": "*"
         },
-        "time": "2016-05-29T00:52:33+00:00",
+        "time": "2016-05-29 00:52:33",
         "bin": [
             "bin/sabredav",
             "bin/naturalselection"
@@ -778,7 +778,7 @@
         "suggest": {
             "ext-libsodium": "Provides a modern crypto API that can be used to generate random bytes."
         },
-        "time": "2017-09-27T21:40:39+00:00",
+        "time": "2017-09-27 21:40:39",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -828,7 +828,7 @@
             "nikic/php-parser": "^2.0|^3.0",
             "phpunit/phpunit": "^4|^5"
         },
-        "time": "2017-05-18T21:28:48+00:00",
+        "time": "2017-05-18 21:28:48",
         "bin": [
             "bin/generate-defuse-key"
         ],

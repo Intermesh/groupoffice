@@ -332,3 +332,7 @@ $l["defaultAddressbook"] = 'Default address book';
 
 $l["files_module"] = "Files module";
 $l["create_folder_contact_or_company"] = "Create folder for on create of a contact or company";
+
+$l["manageGroups"] = "Manage groups";
+$l["addresslistGroup"] = "Addresslist group";
+$l["noPermission"] = "No Permissions";
