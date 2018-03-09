@@ -1,3 +1,5 @@
+- Fixed calendar display of leave days with negative hours
+
 08-03-2018 6.2.85
 - Fixed parse error in german translation
 
