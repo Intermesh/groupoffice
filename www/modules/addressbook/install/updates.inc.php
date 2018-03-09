@@ -546,3 +546,16 @@ $updates['201712061453'][] = "ALTER TABLE `ab_companies`
 	ADD `longitude` DECIMAL(11,8) NULL AFTER `latitude`,
 	ADD `post_latitude` DECIMAL(10,8) NULL AFTER `post_address_no`,
 	ADD `post_longitude` DECIMAL(11,8) NULL AFTER `post_latitude`;";
+
+$updates['201803081042'][] = "CREATE TABLE `ab_addresslist_group` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+$updates['201803081043'][] = "ALTER TABLE `ab_addresslist_group`
+  ADD PRIMARY KEY (`id`);";
+
+$updates['201803081044'][] = "ALTER TABLE `ab_addresslist_group`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;";
+
+$updates['201803081045'][] = "ALTER TABLE `ab_addresslists` ADD `addresslist_group_id` INT NULL AFTER `id`;";

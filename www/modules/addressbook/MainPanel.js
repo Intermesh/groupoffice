@@ -409,12 +409,13 @@ GO.addressbook.MainPanel = function(config) {
 	config.layout='border';
 	config.border=false;
 
-
-	this.mailingsFilterPanel= new GO.addressbook.AddresslistsMultiSelectGrid({
+	this.mailingsFilterPanel= new GO.addressbook.AddresslistsGroupedMultiSelectGrid({
 		id: 'ab-mailingsfilter-panel',
-		split:true,
-		autoHeight: true,
+		region:'center',
+		split:true
 	});
+
+	this.mailingsFilterPanel.getStore().load();
 
 	this.mailingsFilterPanel.on('change', function(grid, addresslist_filter){
 		var panel = this.tabPanel.getActiveTab();

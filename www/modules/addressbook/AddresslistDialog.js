@@ -45,6 +45,12 @@ GO.addressbook.AddresslistDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			  value: t("Dear", "addressbook")+' '+t("sir", "addressbook")+'/'+t("madam", "addressbook")
 			};
 		
+		this.selectALGroup = new GO.addressbook.SelectAddresslistGroup({
+			hiddenName:'addresslist_group_id',
+			fieldLabel: GO.addressbook.lang.addresslistGroup,
+			anchor: '100%'
+		});
+		
 		this.selectUser = new GO.form.SelectUser({
 			fieldLabel:t("Owner"),
 			disabled: !GO.settings.has_admin_permission,
@@ -61,7 +67,8 @@ GO.addressbook.AddresslistDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			cls:'go-form-panel',
 			layout:'form',
 			items:[
-				this.nameField,	
+				this.nameField,
+				this.selectALGroup,
 				new GO.form.HtmlComponent({
 					html: t("Enter a salutation that is used when the salutation for the recipient is unknown", "addressbook"),
 					style:'padding:10px 0px'
