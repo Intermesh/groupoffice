@@ -443,7 +443,7 @@ class MimeDecode
             foreach ($headers as $value) {
                 $hdr_name = substr($value, 0, $pos = strpos($value, ':'));
                 $hdr_value = substr($value, $pos+1);
-                if($hdr_value[0] == ' ')
+                if(isset($hdr_value[0]) && $hdr_value[0] == ' ')
                     $hdr_value = substr($hdr_value, 1);
 
                 $return[] = array(
