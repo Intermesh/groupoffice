@@ -34,7 +34,7 @@ class Disk implements CacheInterface{
 	public function __construct(){
 //		\GO::debug("Using Disk cache");
 		
-		$this->_dir = \GO::config()->tmpdir.'diskcache/';
+		$this->_dir = \GO::config()->file_storage_path.'diskcache/';
 		
 		if(!is_dir($this->_dir))
 			mkdir($this->_dir, 0777, true);
