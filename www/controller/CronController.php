@@ -187,6 +187,12 @@ class CronController extends \GO\Base\Controller\AbstractJsonController{
 		
 		\GO::config()->save_setting('cron_last_run', time());
 	}
+	
+	
+	protected function actionRunById($params) {
+		$job = \GO\Base\Cron\CronJob::model()->findByPk($params['id']);
+		$job->run();
+	}
 
 	/**
 	 * Get all availabe cron files that are selectable when creating a new cron.
