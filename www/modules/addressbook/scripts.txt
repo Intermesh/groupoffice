@@ -48,4 +48,11 @@ modules/addressbook/AddresslistsMultiSelectGrid.js
 
 modules/addressbook/views/Extjs3/Settings.js
 modules/addressbook/views/Extjs3/BirthdaysPortlet.js
+
 modules/addressbook/views/Extjs3/PicturePanel.js
+
+modules/addressbook/views/Extjs3/AddresslistGroupGrid.js
+modules/addressbook/views/Extjs3/AddresslistGroupDialog.js
+modules/addressbook/views/Extjs3/AddresslistGroupGridDialog.js
+modules/addressbook/views/Extjs3/SelectAddresslistGroup.js
+modules/addressbook/views/Extjs3/AddresslistsGroupedMultiSelectGrid.js

@@ -32,6 +32,13 @@ Comments
 - Remove comments from edit dialogs. Always use detail views.
 
 
+- GOLog truncate data when content is longer than 500 chars
+- Remove users from ticket agent selection fields when user is disabled
+- Fixed calendar display of leave days with negative hours
+- Added a group field for address lists and a way to create groups for address lists. (Address book ->Administration -> Address lists -> Manage groups)
+- Changed the address list filter in address book to a Grouped grid
+- Changed the address list grid in email module to Grouped grid (new email ->address book ->address list tab)
+
 08-03-2018 6.2.85
 - Fixed parse error in german translation
 

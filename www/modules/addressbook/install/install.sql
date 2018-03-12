@@ -444,3 +444,18 @@ CREATE TABLE IF NOT EXISTS `go_links_ab_addresslists` (
   KEY `id` (`id`,`folder_id`),
   KEY `ctime` (`ctime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Tabelstructuur voor tabel `ab_addresslist_group`
+--
+
+CREATE TABLE `ab_addresslist_group` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `ab_addresslist_group`
+  ADD PRIMARY KEY (`id`);
+
+ALTER TABLE `ab_addresslist_group`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
