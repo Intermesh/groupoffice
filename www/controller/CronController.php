@@ -23,7 +23,7 @@ namespace GO\Core\Controller;
 class CronController extends \GO\Base\Controller\AbstractJsonController{
 
 	protected function allowGuests() {
-		return array('run', 'runById');
+		return array('run', 'runbyid');
 	}
 	
 	//don't check token in this controller
