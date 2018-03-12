@@ -3382,6 +3382,9 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 	 */
 	public function getLogJSON($action){
 		
+		$cutoffString = ' ..Cut off at 500 chars.';
+		$cutoffLength = 500;
+		
 		switch($action){
 			case \GO\Log\Model\Log::ACTION_DELETE:
 				return $this->getAttributes();
@@ -3390,7 +3393,17 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 				
 				$modifications = array();
 				foreach($oldValues as  $key=>$oldVal){
-					$modifications[$key]=array($oldVal,$this->getAttribute($key));	
+					
+					$newVal = $this->getAttribute($key);
+					if(strlen($newVal) > $cutoffLength){
+						$newVal = substr($newVal,0,$cutoffLength).$cutoffString;
+					}
+					
+					if(strlen($oldVal) > $cutoffLength){
+						$oldVal = substr($oldVal,0,$cutoffLength).$cutoffString;
+					}
+					
+					$modifications[$key]=array($oldVal,$newVal);	
 				}
 				return $modifications;
 			case \GO\Log\Model\Log::ACTION_ADD:
