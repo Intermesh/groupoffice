@@ -430,21 +430,6 @@ class MaintenanceController extends AbstractController {
 	
 	private function _checkCoreModels(){
 		
-		//fix for invalid acl rows.
-//		$sql = "insert ignore into go_acl (acl_id,group_id) SELECT acl_id,group_id FROM `go_acl` WHERE user_id>0 && group_id>0;";
-//		\GO::getDbConnection()->query($sql);
-//		
-//		$sql = "insert ignore into go_acl (acl_id,user_id) SELECT acl_id,user_id FROM `go_acl` WHERE user_id>0 && group_id>0;";
-//		\GO::getDbConnection()->query($sql);		
-//		
-//		$sql = "delete from go_acl where user_id>0 and group_id>0;";
-//		\GO::getDbConnection()->query($sql);
-		
-		
-		$sql = 'insert ignore into go_acl_items (select acl_id, "1", "missing", now() from go_acl);';
-		\GO::getDbConnection()->query($sql);
-		
-		
 		
 		$classes=\GO::findClasses('model');
 		foreach($classes as $model){
