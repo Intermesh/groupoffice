@@ -16,7 +16,7 @@ GO.addressbook.AddresslistGroupGridDialog = Ext.extend(GO.dialog.TabbedFormDialo
 		
 		Ext.apply(this, {
 			goDialogId:'ab-addresslistgroupGridDialog',
-			title:GO.addressbook.lang.addresslistGroup,
+			title: t("Addresslist group", "addressbook"),
 			loadOnNewModel:false,
 			width:600,
 			height:400,
