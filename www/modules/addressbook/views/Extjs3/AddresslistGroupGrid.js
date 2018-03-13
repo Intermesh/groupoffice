@@ -12,10 +12,12 @@
  */
 GO.addressbook.AddresslistGroupGrid = Ext.extend(GO.grid.GridPanel,{
 	
-	noDelete: !(GO.settings.modules.addressbook.permission_level >= GO.permissionLevels.write),
-	standardTbarDisabled : !(GO.settings.modules.addressbook.permission_level >= GO.permissionLevels.write),
 	
 	initComponent : function(){
+		
+		this.noDelete = go.ModuleManager.get('addressbook').permissionLevel < GO.permissionLevels.delete;
+		this.standardTbarDisabled = go.ModuleManager.get('addressbook').permissionLevel < GO.permissionLevels.write;
+	
 
 		var fields = {
 			fields:['id', 'name'],
@@ -25,7 +27,7 @@ GO.addressbook.AddresslistGroupGrid = Ext.extend(GO.grid.GridPanel,{
 				hidden:true,				
 				width:30
 			},{
-				header: GO.lang.strName,
+				header: t("Name"),
 				dataIndex: 'name'
 			}
 		]};
@@ -39,7 +41,7 @@ GO.addressbook.AddresslistGroupGrid = Ext.extend(GO.grid.GridPanel,{
 				
 		Ext.apply(this,{
 			id: 'ab-addresslist-group-grid',
-			title:GO.addressbook.lang.groups,
+			title:t("Groups", "addressbook"),
 			standardTbar:true,
 			store: new GO.data.JsonStore({
 				url: GO.url('addressbook/addresslistgroup/store'),
