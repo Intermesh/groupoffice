@@ -75,8 +75,7 @@ class AddresslistController extends \GO\Base\Controller\AbstractModelController 
 		$storeParams->getCriteria()->addCondition('level', $params['permissionLevel'],'>=','go_acl');
 		$storeParams->joinRelation('addresslistGroup','LEFT');
 		$storeParams->order('addresslistGroupName','ASC');
-		$storeParams->select('t.*,addresslistGroup.name AS addresslistGroupName');
-		$storeParams->debugSql();
+		$storeParams->select('t.*,COALESCE(addresslistGroup.name,"'.\GO::t('strDefault').'") AS addresslistGroupName');
 	}
 
 	public function formatStoreRecord($record, $model, $store) {

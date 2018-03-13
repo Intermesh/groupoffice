@@ -13,7 +13,6 @@
  
 //GO.addressbook.AddresslistsGroupedMultiSelectGrid = Ext.extend(GO.grid.GridPanel , {
 GO.addressbook.AddresslistsGroupedMultiSelectGrid = Ext.extend(GO.grid.MultiSelectGrid , {
-
 	initComponent : function(){
 
 		var fields = {
@@ -53,7 +52,17 @@ GO.addressbook.AddresslistsGroupedMultiSelectGrid = Ext.extend(GO.grid.MultiSele
 			}),        
 			groupField:'addresslistGroupName',
 			remoteSort:true,
-			remoteGroup:true
+			remoteGroup:true,
+			listeners:{
+				load:function(store,records,options){
+					if(this.rendered){
+						this.getView().toggleRowIndex(0,true);
+					} else {
+						this.getView().startCollapsed = false;
+					}
+				},
+				scope:this
+			}
 		});
 		
 		Ext.apply(this, {
@@ -98,11 +107,11 @@ GO.addressbook.AddresslistsGroupedMultiSelectGrid = Ext.extend(GO.grid.MultiSele
 	
 	afterRender : function() {
 		GO.addressbook.AddresslistsGroupedMultiSelectGrid.superclass.afterRender.call(this);
-		
+
 		var DDtarget = new Ext.dd.DropTarget(this.getView().mainBody, {
 			ddGroup : 'AddressBooksDD',
 			notifyDrop : this.onNotifyDrop.createDelegate(this)
-		});	
+		});
 	},
 	
 	onNotifyDrop : function(source, e, data){	
@@ -152,129 +161,3 @@ GO.addressbook.AddresslistsGroupedMultiSelectGrid = Ext.extend(GO.grid.MultiSele
 		});
 	}
 });
-
-
-
-
-
-//GO.addressbook.AddresslistsGroupedMultiSelectGrid = function(config) {
-//	var config = config || {};
-//	
-//	config.title = GO.addressbook.lang.filterMailings;
-//	config.loadMask = true;
-//
-//	config.store = new Ext.data.GroupingStore({
-//				reader: new Ext.data.JsonReader({
-//					totalProperty: "total",
-//					root: "results",
-//					id: "id",
-//					fields:fields.fields
-//				}),
-//				baseParams: {
-//					permissionLevel: GO.permissionLevels.write
-//				},
-//				proxy: new Ext.data.HttpProxy({
-//					url:GO.url('addressbook/addresslist/store')
-//				}),        
-//				groupField:'id',
-//				remoteSort:true,
-//				remoteGroup:true
-//			});
-//			config.view = new Ext.grid.GroupingView({
-//				autoFill:true,
-//				forceFit:true,
-//		    hideGroupedColumn:true,
-//		    groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Items" : "Item"]})',
-//		   	emptyText: GO.lang.strNoItems,
-//		   	showGroupName:false
-//			});
-//	
-//	
-////	config.store = new GO.data.JsonStore({
-////			url: GO.url("addressbook/addresslist/store"),
-////			baseParams: {
-////				permissionLevel: GO.permissionLevels.read
-////			},
-////			fields: ['id', 'name', 'user_name','acl_id', 'checked','addresslistGroupName'],
-////			remoteSort: true
-////	});
-//	config.allowNoSelection = true;
-//	
-//	Ext.applyIf(config,{
-//		region:'center'
-//	});
-//	
-//	Ext.apply(config, {		
-//		bbar: new GO.SmallPagingToolbar({
-//			items:[this.searchField = new GO.form.SearchField({
-//				store: config.store,
-//				width:120,
-//				emptyText: GO.lang.strSearch
-//			})],
-//			store:config.store,
-//			pageSize:GO.settings.config.nav_page_size
-//		})
-//	});
-//	
-//	GO.addressbook.AddresslistsGroupedMultiSelectGrid.superclass.constructor.call(this,config);
-//	
-//};
-//
-//Ext.extend(GO.addressbook.AddresslistsGroupedMultiSelectGrid, GO.grid.MultiSelectGrid, {
-//	afterRender : function() {
-//		GO.addressbook.AddresslistsGroupedMultiSelectGrid.superclass.afterRender.call(this);
-//		
-//		var DDtarget = new Ext.dd.DropTarget(this.getView().mainBody, {
-//			ddGroup : 'AddressBooksDD',
-//			notifyDrop : this.onNotifyDrop.createDelegate(this)
-//		});	
-//	},
-//	
-//	onNotifyDrop : function(source, e, data)
-//	{	
-//		
-//		var selections = source.dragData.selections;
-//		var dropRowIndex = this.getView().findRowIndex(e.target);
-//		var list_id = this.getView().grid.store.data.items[dropRowIndex].id;
-//		var list_name = this.getView().grid.store.data.items[dropRowIndex].data.name;
-//		
-//		var contacts = [];
-//		var companies = [];
-//		
-//		for (var i=0; i<selections.length; i++) {
-//			
-//			var selection = selections[i];
-//			
-//			if ('name2' in selection.data && 'post_address' in selection.data)
-//				companies.push(selection.data.id);
-//			else
-//				contacts.push(selection.data.id);
-//			
-//		}
-//		
-//		Ext.Msg.show({
-//			title: GO.addressbook.lang['addToAddresslist'].replace('%s',list_name),
-//			msg: GO.addressbook.lang['addToAddresslistPrompt'].replace(/%s/g,list_name),
-//			buttons: Ext.Msg.YESNOCANCEL,
-//			scope: this,
-//			fn: function(btn) {
-//				if (btn!='cancel') {
-//					GO.request({
-//						url: 'addressbook/addresslist/add',
-//						params: {
-//							contacts : Ext.encode(contacts),
-//							companies : Ext.encode(companies),
-//							addresslistId : list_id,
-//							move : btn=='yes'
-//						},
-//						success: function(options, response, result)
-//						{
-//							Ext.Msg.alert(GO.lang['strSuccess'],GO.addressbook.lang['addAddresslistSuccess']);
-//						},
-//						scope: this
-//					})
-//				}
-//			}
-//		});
-//	}
-//});
