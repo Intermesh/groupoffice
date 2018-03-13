@@ -703,3 +703,7 @@ $l['addQueryArgument']='Suchargument hinzufügen';
 $l['strId']= 'ID';
 $l['strModule']= 'Modul';
 
+$l['createEventText']= 'Erstelle Termin für {0}';
+$l['moveEventText']= 'Verschiebe Termin nach {0}';
+$l['updateEventText']= 'Aktualisiere Termin zu {0}';
+
