@@ -1,3 +1,4 @@
+- Files: Fixed sorting on filename when searching for files
 - Added extra sort parameter for tasks and completed tasks in the displaypanel so they are ordered on due date and alphabetically on name 
 
 15-03-2018 6.2.86
