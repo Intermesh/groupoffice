@@ -1,5 +1,5 @@
 - Removed Object class and put functionality in Model because Object is 
-  a resvered word in php 7.2
+  a reserved word in php 7.2
 - GOLog truncate data when content is longer than 500 chars
 - Remove users from ticket agent selection fields when user is disabled
 - Fixed calendar display of leave days with negative hours
