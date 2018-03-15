@@ -861,7 +861,6 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 							->mergeWith($aclWhereCriteria)
 					);
 			
-			//sorting on custom fields doesn't work for folders
 			if(isset($params['sort'])){
 				$findParams->order("t.".$params['sort'], $params['dir']);
 			}
