@@ -33,7 +33,7 @@
 namespace GO\Base;
 
 
-abstract class Model extends Object{
+abstract class Model extends Observable {
 	
 	protected $_validationErrors = array();
 	
@@ -43,6 +43,76 @@ abstract class Model extends Object{
 		//just to prevent "model" to be called as constructor by PHP.
 	}
 	
+	/**
+	 * Returns the name of this class.
+	 * @return StringHelper the name of this class.
+	 */
+	public static function className() {
+		return get_called_class();
+	}
+
+	/**
+	 * Magic getter that calls get<NAME> functions in objects
+
+	 * @param StringHelper $name property name
+	 * @return mixed property value
+	 * @throws Exception If the property setter does not exist
+	 */
+	public function __get($name) {
+		$getter = 'get' . $name;
+
+		if (method_exists($this, $getter)) {
+			return $this->$getter();
+		} else {
+			if (\GO::config()->debug)
+				throw new \Exception("Can't get not existing property '$name' in '" . $this->className() . "'");
+			else {
+//				TODO Enable this when we're sure all properties exist
+				trigger_error("Can't get not existing property '$name' in '" . $this->className() . "'", E_USER_NOTICE);
+				return null;
+			}
+		}
+	}
+
+	public function __isset($name) {
+		$getter = 'get' . $name;
+		if (method_exists($this, $getter)) {
+			// property is not null
+			return $this->$getter() !== null;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Magic setter that calls set<NAME> functions in objects
+	 * 
+	 * @param StringHelper $name property name
+	 * @param mixed $value property value
+	 * @throws Exception If the property getter does not exist
+	 */
+	public function __set($name, $value) {
+		$setter = 'set' . $name;
+
+		if (method_exists($this, $setter)) {
+			$this->$setter($value);
+		} else {
+
+			$getter = 'get' . $name;
+			if (method_exists($this, $getter)) {
+				$errorMsg = "Can't set read only property '$name' in '" . $this->className() . "'";
+			} else {
+				$errorMsg = "Can't set not existing property '$name' in '" . $this->className() . "'";
+			}
+
+			if (\GO::config()->debug)
+				throw new \Exception($errorMsg);
+			else {
+				trigger_error($errorMsg, E_USER_NOTICE);
+			}
+		}
+	}
+
 	/**
 	 * Returns the static model of the specified AR class.
 	 * Every child of this class must override it.

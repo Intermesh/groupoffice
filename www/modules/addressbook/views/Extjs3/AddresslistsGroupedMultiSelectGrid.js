@@ -13,7 +13,6 @@
  
 //GO.addressbook.AddresslistsGroupedMultiSelectGrid = Ext.extend(GO.grid.GridPanel , {
 GO.addressbook.AddresslistsGroupedMultiSelectGrid = Ext.extend(GO.grid.MultiSelectGrid , {
-
 	initComponent : function(){
 
 		var fields = {
@@ -53,7 +52,17 @@ GO.addressbook.AddresslistsGroupedMultiSelectGrid = Ext.extend(GO.grid.MultiSele
 			}),        
 			groupField:'addresslistGroupName',
 			remoteSort:true,
-			remoteGroup:true
+			remoteGroup:true,
+			listeners:{
+				load:function(store,records,options){
+					if(this.rendered){
+						this.getView().toggleRowIndex(0,true);
+					} else {
+						this.getView().startCollapsed = false;
+					}
+				},
+				scope:this
+			}
 		});
 		
 		Ext.apply(this, {
@@ -98,11 +107,11 @@ GO.addressbook.AddresslistsGroupedMultiSelectGrid = Ext.extend(GO.grid.MultiSele
 	
 	afterRender : function() {
 		GO.addressbook.AddresslistsGroupedMultiSelectGrid.superclass.afterRender.call(this);
-		
+
 		var DDtarget = new Ext.dd.DropTarget(this.getView().mainBody, {
 			ddGroup : 'AddressBooksDD',
 			notifyDrop : this.onNotifyDrop.createDelegate(this)
-		});	
+		});
 	},
 	
 	onNotifyDrop : function(source, e, data){	
