@@ -3,7 +3,7 @@
 namespace GO\Site\Components;
 
 
-abstract class Widget extends \GO\Base\Object {
+abstract class Widget extends \GO\Base\Model {
 	
 	/**
 	 * @var integer the counter for generating implicit IDs.
