@@ -136,7 +136,7 @@ class CronCollection extends \GO\Base\Model {
 	public function getModuleCronJobClasses($module){
 		$foundCronJobClasses = array();
 		
-		if(!$module)
+		if(!$module || !empty($module->package)) //TODO new modules can't have cron jobs now.
 			return $foundCronJobClasses;
 		
 		$reflectionClasses = array_merge($foundCronJobClasses, $module->moduleManager->findClasses($this->_cronFolder));

@@ -325,7 +325,7 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 				GO::debug("EXCEPTION: ".(string) $e);
 				$failed=true;
 				
-				//GO\Base\Mail\AdminNotifier::sendMail("CronJob ".$this->name." failed", "EXCEPTION: ".(string) $e);
+				\GO\Base\Mail\AdminNotifier::sendMail("CronJob ".$this->name." failed", "EXCEPTION: ".(string) $e);
 				
 				trigger_error("CronJob ".$this->name." failed. EXCEPTION: ".(string) $e, E_USER_WARNING);
 				

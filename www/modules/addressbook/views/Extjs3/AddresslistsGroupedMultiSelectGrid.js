@@ -19,7 +19,7 @@ GO.addressbook.AddresslistsGroupedMultiSelectGrid = Ext.extend(GO.grid.MultiSele
 			fields:['id', 'name', 'user_name','acl_id','addresslistGroupName','checked'],
 			columns:[
 				this.checkColumn,{
-					header:GO.lang.strName,
+					header:t("Name"),
 					
 					dataIndex: 'name',
 					id:'name',
@@ -30,7 +30,7 @@ GO.addressbook.AddresslistsGroupedMultiSelectGrid = Ext.extend(GO.grid.MultiSele
 						return value;
 					}
 				},{
-					header: GO.addressbook.lang.addresslistGroup,
+					header: t("Address list Group", "addressbook"),
 					dataIndex: 'addresslistGroupName',
 					hidden:true
 				}
@@ -68,7 +68,7 @@ GO.addressbook.AddresslistsGroupedMultiSelectGrid = Ext.extend(GO.grid.MultiSele
 		Ext.apply(this, {
 			autoExpandColumn:'name',
 			plugins: [this.checkColumn],
-			title:GO.addressbook.lang.filterMailings,
+			title:t("Address list filter", "addressbook"),
 			loadMask:true,
 			cm:new Ext.grid.ColumnModel({
 				defaults:{
@@ -80,7 +80,7 @@ GO.addressbook.AddresslistsGroupedMultiSelectGrid = Ext.extend(GO.grid.MultiSele
 			view: new Ext.grid.GroupingView({
 		    hideGroupedColumn:true,
 		    groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Items" : "Item"]})',
-		   	emptyText: GO.lang.strNoItems,
+		   	emptyText: t("No items found"),
 		   	showGroupName:false,
 				startCollapsed:true
 			}),
@@ -90,7 +90,7 @@ GO.addressbook.AddresslistsGroupedMultiSelectGrid = Ext.extend(GO.grid.MultiSele
 					this.searchField = new GO.form.SearchField({
 						store: store,
 						width:120,
-						emptyText: GO.lang.strSearch
+						emptyText: t("Search")
 					})
 				],
 				store:store,
@@ -136,8 +136,8 @@ GO.addressbook.AddresslistsGroupedMultiSelectGrid = Ext.extend(GO.grid.MultiSele
 		}
 		
 		Ext.Msg.show({
-			title: GO.addressbook.lang['addToAddresslist'].replace('%s',list_name),
-			msg: GO.addressbook.lang['addToAddresslistPrompt'].replace(/%s/g,list_name),
+			title: t('Add to address list %s', "addressbook").replace('%s',list_name),
+			msg: t('You are about to add the selected items to the address list %s. Do you want these items to exist only in %s?', "addressbook").replace(/%s/g,list_name),
 			buttons: Ext.Msg.YESNOCANCEL,
 			scope: this,
 			fn: function(btn) {
@@ -152,7 +152,7 @@ GO.addressbook.AddresslistsGroupedMultiSelectGrid = Ext.extend(GO.grid.MultiSele
 						},
 						success: function(options, response, result)
 						{
-							Ext.Msg.alert(GO.lang['strSuccess'],GO.addressbook.lang['addAddresslistSuccess']);
+							Ext.Msg.alert(GO.lang['Success'],t("The items have been successfully added to the address list.", "addressbook"));
 						},
 						scope: this
 					});

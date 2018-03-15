@@ -1,3 +1,12 @@
+.entity.File::before {
+	content: "description"
+}
+
+.entity.Folder::before {
+	content: "folder"
+}
+
+
 .fs-img-viewer{
 border:1px solid #d0d0d0;
 display:block;

@@ -23,7 +23,7 @@ namespace GO\Core\Controller;
 class CronController extends \GO\Base\Controller\AbstractJsonController{
 
 	protected function allowGuests() {
-		return array('run');
+		return array('run', 'runbyid');
 	}
 	
 	//don't check token in this controller
@@ -186,6 +186,12 @@ class CronController extends \GO\Base\Controller\AbstractJsonController{
 		\GO::debug('CRONJOB STOP (PID:'.getmypid().')');
 		
 		\GO::config()->save_setting('cron_last_run', time());
+	}
+	
+	
+	protected function actionRunById($params) {
+		$job = \GO\Base\Cron\CronJob::model()->findByPk($params['id']);
+		$job->run();
 	}
 
 	/**

@@ -59,7 +59,7 @@ GO.addressbook.AddresslistsGrid = Ext.extend(GO.grid.GridPanel,{
 				'-'
 				,{
 					iconCls: 'btn-folder',
-					text: GO.addressbook.lang.manageGroups,
+					text: t("Manage groups", "addressbook"),
 					cls: 'x-btn-text-icon',
 					handler: function(){
 						if(!this.groupDialog)

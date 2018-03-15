@@ -47,7 +47,7 @@ GO.addressbook.AddresslistDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		
 		this.selectALGroup = new GO.addressbook.SelectAddresslistGroup({
 			hiddenName:'addresslist_group_id',
-			fieldLabel: GO.addressbook.lang.addresslistGroup,
+			fieldLabel:  t("Addresslist group", "addressbook"),
 			anchor: '100%'
 		});
 		
