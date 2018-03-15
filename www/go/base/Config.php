@@ -1059,12 +1059,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-<<<<<<< HEAD
-	
-	var $version = '6.3.0';
-=======
-	var $version = '6.2.86';
->>>>>>> origin/6.2.x
+	var $version = '6.3.1';
 
 	/**
 	 * Modification date
