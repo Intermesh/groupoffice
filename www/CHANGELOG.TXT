@@ -1,3 +1,5 @@
+- Added extra sort parameter for tasks and completed tasks in the displaypanel so they are ordered on due date and alphabetically on name 
+
 15-03-2018 6.2.86
 - Moved disk cache directory to file_storage_path because tmp is containerized on newer linux versions.
 - Removed Object class and put functionality in Model because Object is 

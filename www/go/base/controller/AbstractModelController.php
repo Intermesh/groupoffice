@@ -792,7 +792,7 @@ class AbstractModelController extends AbstractController {
 		//$startOfDay = \GO\Base\Util\Date::clear_time(time());
 
 		// Process linked tasks that are not completed.
-		$findParams = \GO\Base\Db\FindParams::newInstance()->order('due_time','DESC');
+		$findParams = \GO\Base\Db\FindParams::newInstance()->order(array('due_time','name'),array('DESC','ASC'));
 		//$findParams->getCriteria()->addCondition('start_time', $startOfDay, '<=')->addCondition('status', \GO\Tasks\Model\Task::STATUS_COMPLETED, '!=');						
 		$findParams->getCriteria()->addCondition('status', \GO\Tasks\Model\Task::STATUS_COMPLETED, '!=');						
 
@@ -814,7 +814,7 @@ class AbstractModelController extends AbstractController {
 		$response['data']['tasks']=$data['results'];
 		
 		// Process linked tasks that are completed.
-		$findParams = \GO\Base\Db\FindParams::newInstance()->order('due_time','DESC');
+		$findParams = \GO\Base\Db\FindParams::newInstance()->order(array('due_time','name'),array('DESC','ASC'));
 		//$findParams->getCriteria()->addCondition('start_time', $startOfDay, '<=')->addCondition('status', \GO\Tasks\Model\Task::STATUS_COMPLETED, '!=');						
 		$findParams->getCriteria()->addCondition('status', \GO\Tasks\Model\Task::STATUS_COMPLETED, '=');						
 
