@@ -1,1 +1,0 @@
-* * * * * www-data php /usr/share/groupoffice/groupofficecli.php -r=core/cron/run -c=/etc/groupoffice/config.php -q > /dev/null

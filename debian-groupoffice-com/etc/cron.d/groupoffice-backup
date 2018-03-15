@@ -1,2 +1,0 @@
-#backup runs at midnight
-0 0 * * * root /usr/bin/php /usr/share/groupoffice/modules/backupmanager/cron.php /etc/groupoffice/config.php > /dev/null

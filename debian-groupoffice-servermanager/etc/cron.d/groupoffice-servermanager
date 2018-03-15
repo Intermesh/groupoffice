@@ -1,2 +1,0 @@
-#Creates usage reports in the servermanager. Without this cronjob pro installations will not run!
-1 4 * * * root /usr/share/groupoffice/groupofficecli.php -r=servermanager/installation/report -c=/etc/groupoffice/config.php -q > /dev/null
