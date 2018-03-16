@@ -314,7 +314,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 	onAuthentication: function () {
 		
-		go.userSettingsDialog = new go.usersettings.UserSettingsDialog();
+		
 		
 		go.ModuleManager.init();
 
@@ -578,6 +578,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 							text: t("Settings"),
 							iconCls: 'ic-settings',
 							handler: function () {
+								if(!go.userSettingsDialog) {
+									go.userSettingsDialog = new go.usersettings.UserSettingsDialog();
+								}
 								go.userSettingsDialog.show(GO.settings.user_id);
 
 							},

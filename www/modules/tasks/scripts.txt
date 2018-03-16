@@ -7,7 +7,7 @@ modules/tasks/TasklistDialog.js
 modules/tasks/TaskDialog.js
 modules/tasks/TasksGrid.js
 modules/tasks/SelectTasklist.js
-modules/tasks/MainPanel.js
+
 modules/tasks/Portlet.js
 modules/tasks/Settings.js
 modules/tasks/CategoryDialog.js
@@ -17,3 +17,4 @@ modules/tasks/GlobalSettings.js
 modules/tasks/ScheduleCallMenuItem.js
 modules/tasks/views/Extjs3/StatusProgressField.js
 modules/tasks/views/Extjs3/TasksTpl.js
+modules/tasks/MainPanel.js

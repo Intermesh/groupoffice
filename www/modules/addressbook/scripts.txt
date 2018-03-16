@@ -20,12 +20,13 @@ modules/addressbook/ContactProfilePanel.js
 modules/addressbook/CompanyProfilePanel.js
 modules/addressbook/EmployeesPanel.js
 modules/addressbook/AdvancedSearchWindow.js
+modules/addressbook/Settings.js
 modules/addressbook/MainPanel.js
 modules/addressbook/SelectAddressbook.js
 modules/addressbook/SelectAddresslistsPanel.js
 modules/addressbook/views/Extjs3/AddresslistsSettingspanel.js
 
-modules/addressbook/Settings.js
+
 
 modules/addressbook/GlobalSettings.js
 modules/addressbook/ContextMenu.js

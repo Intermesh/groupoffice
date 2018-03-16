@@ -83,7 +83,3 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 	}
 
 });
-
-GO.mainLayout.onReady(function() {
-	go.userSettingsDialog.addPanel('settings-email',GO.email.SettingsPanel);
-});

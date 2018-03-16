@@ -3,6 +3,25 @@
 		
 		registered: {},
 		
+		/**
+		 * 
+		 * @example
+		 * 
+		 * go.ModuleManager.register('addressbook', {
+		 * 	  mainPanel: GO.addressbook.MainPanel,
+		 * 	  title: t("Address book", "addressbook"),
+		 * 	  iconCls: 'go-tab-icon-addressbook',
+		 * 	  entities: ["Contact", "Company"],
+		 * 	  userSettingsPanels: [GO.addressbook.SettingsPanel],
+		 * 	  systemSettingsPanels: [],
+		 * 	  initModule: function () {	
+		 * 	}
+		 * });
+		 * 
+		 * @param {type} name
+		 * @param {type} config
+		 * @returns {undefined}
+		 */
 		register: function (name, config) {	
 			
 			config = config || {};
@@ -10,7 +29,7 @@
 			this.registered[name] = config;		
 			
 			if(!config.panelConfig) {
-				config.panelConfig = {title: config.title};
+				config.panelConfig = {title: config.title, admin: config.admin};
 			}
 			
 			if(!config.requiredPermissionLevel) {
@@ -61,6 +80,24 @@
 			return false;			
 		},
 		
+		getAll : function() {
+			return go.stores.Module.data;
+		},
+		
+		getAvailable : function() {
+			var available = [];
+			
+			var all = go.stores.Module.data;
+			
+			for(id in all) {
+				if(this.isAvailable(all[id].name)) {
+					available.push(all[id]);
+				}
+			};
+			
+			return available;
+		},
+		
 		//will be called after login
 		init : function() {
 			go.stores.Module.getUpdates(function () {
@@ -109,6 +146,21 @@
 			} else {
 				fn.call(scope || this, this);
 			}
+		},
+		
+		/**
+		 * Call function when module becomes available.
+		 * 
+		 * @param {string} module
+		 * @param {function} fn
+		 * @param {object} scope		 
+		 */
+		onAvailable: function(module, fn, scope) {
+			this.onReady(function() {
+				if(this.isAvailable(module)) {
+					fn.call(scope);
+				}
+			}, this);
 		}
 		
 //		onModuleReady: function(module, fn, scope) {

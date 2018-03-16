@@ -23,16 +23,11 @@ class Settings extends core\Settings {
 		
 		parent::__construct();
 	}
-	
-	protected function getModuleId() {
-		return (new Query)
-			->selectSingleValue('id')
-			->from('core_module')
-			->where(['package' => 'core', 'name' => 'core'])
-			->execute()
-			->fetch();
+
+	public function getModuleName() {
+		return 'core';
 	}
-	
+
 	const SMTP_ENCRYPTION_TLS = 'tls';
 	const SMTP_ENCRYPTION_SSL = 'ssl';
 	
@@ -60,7 +55,7 @@ class Settings extends core\Settings {
 	
 	
 	/**
-	 * SMTP hostname
+	 * SMTP host name
 	 * 
 	 * @var string
 	 */

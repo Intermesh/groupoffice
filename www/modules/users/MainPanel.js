@@ -139,9 +139,9 @@ GO.users.showUserDialog = function(user_id, config){
 }
 
 
-
-GO.moduleManager.addModule('users', GO.users.MainPanel, {
-	title : t("Users"),
-	iconCls : 'go-tab-icon-users',
-	admin :true
+go.ModuleManager.register('users', {
+	mainPanel: GO.users.MainPanel,
+	admin: true,	
+	title: t("Users"),
+	entities:['User']
 });

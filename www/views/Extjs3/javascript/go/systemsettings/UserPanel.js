@@ -30,20 +30,6 @@ go.systemsettings.UserPanel = Ext.extend(Ext.Panel, {
 					name : 'allow_themes',
 					boxLabel: t('Enable theme switching by users')
 				},{
-					xtype: 'xchecgbox',
-					name : 'allow_profile_edit',
-					boxLabel: t('Enable profile editing by every user through the settings dialog')
-				},{
-					xtype: 'allow_duplicate_email',
-					name: 'password_require_uc',
-					value:false,
-					boxLabel: t('Allows email addresses to occur more than once over the user profiles')
-				},{
-					xtype: 'numberfield',
-					name: 'max_users',
-					value: 6,
-					fieldLabel: t('The maximum number of users.')
-				},{
 					xtype: 'numberfield',
 					name: 'limit_usersearch',
 					fieldLabel: t('If set, user queries will only return this maximum number of users. Useful in large environments where you don\'t want users to scroll through all.')

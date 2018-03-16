@@ -60,7 +60,3 @@ GO.addressbook.SettingsPanel = Ext.extend(Ext.Panel, {
 	}
 });
 
-
-GO.mainLayout.onReady(function(){
-	go.userSettingsDialog.addPanel('settings-addressbook', GO.addressbook.SettingsPanel,4,false);
-});

@@ -414,7 +414,4 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 	}
 });
 
-GO.mainLayout.onReady(function(){
-	go.userSettingsDialog.addPanel('settings-lookandfeel', go.usersettings.LookAndFeelPanel,1,false);
-});
 

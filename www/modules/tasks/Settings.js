@@ -108,7 +108,3 @@ GO.tasks.SettingsPanel = Ext.extend(Ext.Panel, {
 	}
 
 });
-
-GO.mainLayout.onReady(function(){
-	go.userSettingsDialog.addPanel('settings-tasks', GO.tasks.SettingsPanel,3,false);
-});

@@ -207,7 +207,3 @@ GO.calendar.SettingsPanel = Ext.extend(Ext.Panel, {
 	}
 
 });
-
-GO.mainLayout.onReady(function () {
-	go.userSettingsDialog.addPanel('settings-calendar', GO.calendar.SettingsPanel, 4, false);
-});

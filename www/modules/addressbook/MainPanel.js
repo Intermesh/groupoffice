@@ -814,16 +814,13 @@ GO.addressbook.searchSender = function(sender, name){
 }
 
 
-//GO.moduleManager.addModule('addressbook', GO.addressbook.MainPanel, {
-//	title : t("Address book", "addressbook"),
-//	iconCls : 'go-tab-icon-addressbook'
-//});
 
 go.ModuleManager.register('addressbook', {
 	mainPanel: GO.addressbook.MainPanel,
 	title: t("Address book", "addressbook"),
 	iconCls: 'go-tab-icon-addressbook',
 	entities: ["Contact", "Company"],
+	userSettingsPanels: [GO.addressbook.SettingsPanel],
 	initModule: function () {	
 		go.Links.registerLinkToWindow("Contact", function() {
 			var win = new GO.addressbook.ContactDialog ();
@@ -836,9 +833,6 @@ go.ModuleManager.register('addressbook', {
 			win.closeAction = "hide";
 			return win;
 		});
-		
-		
-		
 		
 		GO.addressbook.addressbooksStoreFields = new Array('id','name','user_name', 'acl_id','user_id','contactCustomfields','companyCustomfields','default_salutation', 'checked');
 

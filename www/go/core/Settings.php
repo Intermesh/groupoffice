@@ -11,7 +11,16 @@ use go\core\db\Query;
  */
 abstract class Settings extends Singleton {
 
-	abstract protected function getModuleId();
+	protected function getModuleId() {
+		return (new Query)
+			->selectSingleValue('id')
+			->from('core_module')
+			->where(['name' => $this->getModuleName()])
+			->execute()
+			->fetch();
+	}
+	
+	abstract function getModuleName();
 	
 	private $oldData;
 	

@@ -2141,6 +2141,7 @@ go.ModuleManager.register('calendar', {
 	title : t("Calendar", "calendar"),
 	iconCls : 'go-tab-icon-calendar',
 	entities: ["Event"],
+	userSettingsPanels: [GO.calendar.SettingsPanel],
 	initModule: function () {	
 		go.Links.registerLinkToWindow("Event", function() {
 			var win = new GO.calendar.EventDialog();

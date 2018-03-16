@@ -96,10 +96,32 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			'submitComplete' : true
 		});
 		
+		this.addPanel(go.usersettings.AccountSettingsPanel);
+		this.addPanel(go.usersettings.LookAndFeelPanel);
+		
+		this.loadModulePanels();
+		
 		go.usersettings.UserSettingsDialog.superclass.initComponent.call(this);
 		
 		// When the form is loaded, reset the 'modified' state to NOT modified.
 		this.formPanel.getForm().trackResetOnLoad  = true;
+	},
+	
+	loadModulePanels : function() {
+		var available = go.ModuleManager.getAvailable();
+		console.log(available);
+		for(var i = 0, l = available.length; i < l; i++) {
+			
+			var config = go.ModuleManager.registered[available[i].name];
+			
+			if(!config.userSettingsPanels) {
+				continue;
+			}
+			
+			for(var i1 = 0, l2 = config.userSettingsPanels.length; i1 < l2; i1++) {
+				this.addPanel(config.userSettingsPanels[i1]);
+			}
+		}
 	},
 	
 	/**
@@ -356,22 +378,18 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	/**
 	 * Add a panel to the tabpanel of this dialog
 	 * 
-	 * @param string panelID
 	 * @param string panelClass
 	 * @param object panelConfig
 	 * @param int position
 	 * @param boolean passwordProtected
 	 */
-	addPanel : function(panelID, panelClass, position, passwordProtected){
+	addPanel : function(panelClass, position){
 		var cfg = {
 			header: false,
 			loaded:false,
 			submitted:false
 		};
-		Ext.apply(cfg,{
-			id:panelID,
-			passwordProtected:passwordProtected
-		});
+
 		
 		var pnl = new panelClass(cfg);
 		
@@ -426,5 +444,5 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 
 });
 
-// TODO: This needs to be moved to the correct file
-go.EntityManager.register("users", "User");
+
+

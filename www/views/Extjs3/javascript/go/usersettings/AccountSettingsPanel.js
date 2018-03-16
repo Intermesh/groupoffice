@@ -15,6 +15,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 	title:t('Account'),
 	iconCls: 'ic-account-circle',
 	autoScroll:true,
+	passwordProtected: true,
 
 	initComponent: function () {
 			
@@ -109,7 +110,4 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 	}
 });
 
-GO.mainLayout.onReady(function(){
-	go.userSettingsDialog.addPanel('settings-account', go.usersettings.AccountSettingsPanel,0,true);
-});
 
