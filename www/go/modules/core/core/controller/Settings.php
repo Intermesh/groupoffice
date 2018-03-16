@@ -18,6 +18,6 @@ class Settings extends Controller {
 		
 		$success = GO()->getSettings()->save();
 		
-		Response::get()->addResponse(['success' => $succces]);
+		Response::get()->addResponse(['success' => $success]);
 	}
 }

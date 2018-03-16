@@ -303,6 +303,14 @@ class User extends Entity {
 			->from('core_user_group')
 			->where(['groupId' => Group::ID_ADMINS, 'userId' => $this->id])->single() !== false;
 	}
+	
+	/**
+	 * Alias for making isAdmin() a public property
+	 * @return bool
+	 */
+	public function getIsAdmin() {
+		return $this->isAdmin();
+	}
 
 	/**
 	 * Get available authentication methods

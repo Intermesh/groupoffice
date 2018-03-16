@@ -14,7 +14,7 @@ class Settings extends core\Settings {
 		$this->title = \GO::config()->title;		
 		$this->systemEmail = \GO::config()->webmaster_email;
 		
-		$this->smtpEncryption = \GO::config()->smtp_encryption;
+		$this->smtpEncryption = !empty(\GO::config()->smtp_encryption) ? \GO::config()->smtp_encryption : null;
 		$this->smtpHost = \GO::config()->smtp_server;
 		$this->smtpPort = \GO::config()->smtp_port;
 		$this->smtpUsername = \GO::config()->smtp_username;

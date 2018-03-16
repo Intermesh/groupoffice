@@ -61,13 +61,17 @@ go.Jmap = {
 	 * 
 	 * method: jmap method
 	 * params: jmap method parameters
-	 * callback: function to call after request
+	 * callback: function to call after request. Arghuments are options, success, response
 	 * scope: callback function scope
 	 * dispatchAfterCallback: dispatch the response after the callback. Defaults to false.
 	 * 
 	 * @returns {String}
 	 */
 	request: function (options) {
+		
+		if(!options.method) {
+			throw "method is required";
+		}
 
 		var me = this;
 

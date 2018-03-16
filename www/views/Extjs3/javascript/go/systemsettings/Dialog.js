@@ -17,8 +17,7 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 	maximizable:true,
 	iconCls: 'ic-settings',
 	title: t("System settings"),
-	currentUser:null,
-
+	
 	initComponent: function () {
 		
 		this.saveButton = new Ext.Button({
@@ -31,10 +30,9 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		
 		this.tabPanel = new Ext.TabPanel({
 			headerCfg: {cls:'x-hide-display'},
+			region: "center",
 			items: []
 		});
-		
-		this.add(this.tabPanel);
 		
 		
 		this.tabStore = new Ext.data.ArrayStore({
@@ -89,30 +87,37 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 			'submitComplete' : true
 		});
 		
+		this.addPanel(go.systemsettings.GeneralPanel);
+		this.addPanel(go.systemsettings.NotificationsPanel);
+		
 		go.systemsettings.Dialog.superclass.initComponent.call(this);
 	},
 	
-	show: function(userId){
+	show: function(){
 		go.systemsettings.Dialog.superclass.show.call(this);
 		this.selectView.select(this.tabStore.getAt(0));
 		this.load();
 	},
 
-	submit : function(){
-		this.actionStart();
-		this.fireEvent('submitStart',this);
-		
+	submit : function(){		
 		// loop through child panels and call onSubmitStart function if available
-		this.tabPanel.items.each(function(tab) {
-			
-			tab.submit(this.onSubmitComplete, this);
-			
+		this.tabPanel.items.each(function(tab) {			
+			tab.submit(this.onSubmitComplete, this);			
+		},this);	
+	},
+	
+	load: function() {
+		// loop through child panels and call onSubmitStart function if available
+		this.tabPanel.items.each(function(tab) {			
+			tab.load(this.onLoadComplete, this);			
 		},this);
-
-		
 	},
 	
 	onSubmitComplete : function() {
+		
+	},
+	
+	onLoadComplete : function() {
 		
 	},
 	
@@ -125,16 +130,12 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 	 * @param int position
 	 * @param boolean passwordProtected
 	 */
-	addPanel : function(panelID, panelClass, position, passwordProtected){
+	addPanel : function(panelClass, position){
 		var cfg = {
 			header: false,
 			loaded:false,
 			submitted:false
 		};
-		Ext.apply(cfg,{
-			id:panelID,
-			passwordProtected:passwordProtected
-		});
 		
 		var pnl = new panelClass(cfg);
 		
@@ -154,5 +155,3 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 	}
 
 });
-
-go.systemsettingsDialog = new go.systemsettings.Dialog();

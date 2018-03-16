@@ -585,7 +585,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 							},
 							scope: this
-						}, {
+						},
+						{
 							text: t("Help"),
 							iconCls: 'ic-help',
 							menu: helpMenu
@@ -602,6 +603,21 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				clickEvent: 'mousedown',
 				template: new Ext.XTemplate('<span><button></button></span>')
 			});
+			
+			
+			if(go.User.isAdmin) {
+				this.userMenuLink.menu.insert(2, {
+
+					text: t("System settings"),
+					iconCls: 'ic-settings',
+					handler: function() {
+						if(!go.systemsettingsDialog) {
+							go.systemsettingsDialog = new go.systemsettings.Dialog();
+						}
+						go.systemsettingsDialog.show();
+					}
+				});
+			}
 
 
 			GO.checker.init.defer(2000, GO.checker);

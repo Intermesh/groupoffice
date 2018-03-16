@@ -659,6 +659,23 @@ Ext.override(Ext.Panel, {
 	}
 });
 
+
+Ext.override(Ext.form.Field, {
+	origInitComponent : Ext.form.Field.prototype.initComponent,
+	
+	initComponent : function() {
+		
+		if(this.hint) {
+			var fieldHelp = new Ext.ux.FieldHelp(this.hint);
+			this.plugins = this.plugins || [];
+			this.plugins.push(fieldHelp);
+		}
+		
+		
+		this.origInitComponent.call(this);
+	}
+});
+
 Ext.util.Format.dateRenderer = function(format) {
 		return function(v) {
 				return GO.util.dateFormat(v);
