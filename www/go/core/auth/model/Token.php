@@ -257,10 +257,11 @@ class Token extends Entity {
 	/**
 	 * Add the given method to the passed method list.
 	 * 
-	 * @param string $method
+	 * @param Method $method
 	 * @return boolean
 	 */
-	public function addPassedMethod($method){
+	public function addPassedMethod(Method $method){
+		$method = $method->id;
 		$methods = $this->getPassedMethods();
 		
 		if(!in_array($method,$methods)){
@@ -333,15 +334,11 @@ class Token extends Entity {
 			$authenticator = $authMethod->getAuthenticator();
 			$authenticators[$authMethod->id] = $authenticator;
 			if($authenticator->authenticate($this, $methods[$authMethod->id])){
-				$this->addPassedMethod($authMethod->id);
+				$this->addPassedMethod($authMethod);
 			} else
 			{
 				$pending = true;
 			}
-		}
-		
-		if(!$pending) {
-			$this->setAuthenticated();
 		}
 
 		return $authenticators;

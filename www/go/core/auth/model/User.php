@@ -274,28 +274,7 @@ class User extends Entity {
 		return parent::internalValidate();
 	}
 
-	/**
-	 * Login a user
-	 * 
-	 * @param string $username
-	 * @return boolean|Token
-	 * @throws Exception
-	 */
-	public static function login($username) {
-		$user = static::find()->where(['username' => $username])->single();
-		if (!$user) {
-			return false;
-		}
-
-		$token = new Token();
-		$token->userId = $user->id;
-
-		if (!$token->save()) {
-			throw new Exception("Failed to create login token");
-		}
-
-		return $token;
-	}
+	
 
 	public function hasPermissionLevel($level = Acl::LEVEL_READ) {
 		return $this->id == App::get()->getAuthState()->getUser()->id || App::get()->getAuthState()->getUser()->isAdmin();
@@ -335,7 +314,7 @@ class User extends Entity {
 		foreach ($authMethods as $authMethod) {
 			$authenticator = $authMethod->getAuthenticator();
 
-			if ($authenticator && $authenticator::isAvailableFor($this)) {
+			if ($authenticator && $authenticator::isAvailableFor($this->username)) {
 				$methods[] = $authMethod;
 			}
 		}

@@ -305,6 +305,7 @@ views/Extjs3/javascript/go/acl/ShareWindow.js
 
 views/Extjs3/javascript/go/systemsettings/GeneralPanel.js
 views/Extjs3/javascript/go/systemsettings/NotificationsPanel.js
+views/Extjs3/javascript/go/systemsettings/AuthenticationPanel.js
 views/Extjs3/javascript/go/systemsettings/Dialog.js
 
 

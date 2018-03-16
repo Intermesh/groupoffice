@@ -42,7 +42,7 @@ class Method extends Entity {
 	 */
 	public static function findAllAuthenticators() {
 		$classFinder = new \go\core\util\ClassFinder();
-		$authenticators = $classFinder->findByParent(Authenticator::class);
+		$authenticators = $classFinder->findByParent(BaseAuthenticator::class);
 		
 		$arr = [];
 		

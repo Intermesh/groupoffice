@@ -7,7 +7,7 @@ use go\core\db\Query;
 use go\core\module\model\Module;
 use go\core\validate\ValidationTrait;
 
-abstract class BaseAuthenticator implements Authenticator {
+abstract class BaseAuthenticator {
 	
 	use ValidationTrait;
 	
@@ -25,7 +25,7 @@ abstract class BaseAuthenticator implements Authenticator {
 	protected function internalValidate() {
 		
 	}
-	
+
 	/**
 	 * Register the authenticator in the database
 	 * 
@@ -44,4 +44,3 @@ abstract class BaseAuthenticator implements Authenticator {
 		return true;
 	}
 }
-

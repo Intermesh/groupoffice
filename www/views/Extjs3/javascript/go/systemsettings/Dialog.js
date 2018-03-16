@@ -6,9 +6,9 @@
  * 
  * If you have questions write an e-mail to info@intermesh.nl
  * 
- * @version $Id$
  * @copyright Copyright Intermesh
  * @author Michael de Hart <mdhart@intermesh.nl>
+ * @author Merijn Schering <mschering@intermesh.nl>
  */
 go.systemsettings.Dialog = Ext.extend(go.Window, {
 	
@@ -89,6 +89,7 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		
 		this.addPanel(go.systemsettings.GeneralPanel);
 		this.addPanel(go.systemsettings.NotificationsPanel);
+		this.addPanel(go.systemsettings.AuthenticationPanel);
 		
 		go.systemsettings.Dialog.superclass.initComponent.call(this);
 	},

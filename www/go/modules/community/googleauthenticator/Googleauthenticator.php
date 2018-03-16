@@ -2,16 +2,16 @@
 
 namespace go\modules\community\googleauthenticator;
 
-use go\core\auth\BaseAuthenticator;
 use go\core\auth\model\Token;
 use go\core\auth\model\User;
+use go\core\auth\SecondaryAuthenticator;
 use go\core\validate\ErrorCode;
 
-class Googleauthenticator extends BaseAuthenticator {
+class Googleauthenticator extends SecondaryAuthenticator {
 
-	public function authenticate(Token $token, array $params) {
+	public function authenticate(Token $token, array $data) {
 		
-		if(!isset($params['googleauthenticator_code'])){
+		if(!isset($data['googleauthenticator_code'])){
 			$this->setValidationError('googleauthenticator_code', ErrorCode::REQUIRED);
 			return false;
 		}
@@ -22,7 +22,7 @@ class Googleauthenticator extends BaseAuthenticator {
 			return false;
 		}
 		
-		if(!$googleAuthenticator->verifyCode($params['googleauthenticator_code'])){
+		if(!$googleAuthenticator->verifyCode($data['googleauthenticator_code'])){
 			$this->setValidationError('googleauthenticator_code', ErrorCode::INVALID_INPUT);
 			return false;
 		}
@@ -30,7 +30,13 @@ class Googleauthenticator extends BaseAuthenticator {
 		return true;
 	}
 
-	public static function isAvailableFor(User $user) {
+	public static function isAvailableFor($username) {
+		
+		$user = User::find(['id','googleauthenticator'])->where(['username' => $username])->single();
+		if(!$user) {
+			return false;
+		}
+		
 		$googleAuthenticator = $user->googleauthenticator;
 
 		return !empty($googleAuthenticator);

@@ -3,12 +3,14 @@
 require(__DIR__ . "/vendor/autoload.php");
 
 use go\core\App;
-use go\core\auth\BaseAuthenticator;
+use go\core\auth\Method;
 use go\core\auth\model\Token;
 use go\core\auth\model\User;
+use go\core\auth\PrimaryAuthenticator;
 use go\core\http\Request;
 use go\core\http\Response;
 use go\core\jmap\Capabilities;
+use go\core\validate\ErrorCode;
 
 //Create the app with the config.php file
 App::get(); // Initializes App
@@ -38,7 +40,7 @@ if (isset($data['recover'])) {
 									->where('recoveryHash = :hash AND recoverySendAt > :time')
 									->bind([
 											':hash' => $data['hash'],
-											':time' => $oneHourAgo->format(\DateTime::ISO8601)
+											':time' => $oneHourAgo->format(DateTime::ISO8601)
 									])->single();
 	if (empty($user)) {
 		$response = ['success' => false];
@@ -57,35 +59,50 @@ if (isset($data['recover'])) {
 	exit();
 }
 
+/**
+ * 
+ * @param type $username
+ * @param type $password
+ * @return User|boolean
+ */
+function getToken($data) {
+	//loop through all auth methods
+	$authMethods = Method::find()->orderBy(['sortOrder' => 'ASC']);
+	foreach($authMethods as $method) {
+		$authenticator = $method->getAuthenticator();
+		if(!($authenticator instanceof PrimaryAuthenticator)) {
+			continue;
+		}
+		if($user = $authenticator->authenticate($data['username'], $data['password'])){
+			
+			$token = new Token();
+			$token->userId = $user->id;
+			$token->addPassedMethod($method);
+			
+			if(!$token->save()) {
+				throw new Exception("Could not save token");
+			}
+			
+			return $token;			
+		}
+	}
+	return false;
+}
+
 if (!isset($data['loginToken']) && !isset($data['accessToken']) && !empty($data['username'])) {
 	
-	if(!empty($data['password'])) {
-		//easy short hand post for the client. In the future we might require something else then a password.
-		$data['methods'] = ['password' => ['password' => $data['password']]];
-	}	
-	
-	if(!isset($data['methods']['password'])) {
-		Response::get()->setStatus(400, "Password is required");
-		Response::get()->sendHeaders();
-		exit();
-	}
-	
-	// The username is posted, we need to return the possible authenticators
-	$username = $data['username'];
-	$token = User::login($username);
-
+	$token = getToken($data);
 	if (!$token) {
 		Response::get()->setStatus(403, "Bad username or password");
 		Response::get()->sendHeaders();
 		Response::get()->output(json_encode([
 				'errors' => [
-						'username' => ["description" => "Bad username or password", "code" => go\core\validate\ErrorCode::INVALID_INPUT]
+						'username' => ["description" => "Bad username or password", "code" => ErrorCode::INVALID_INPUT]
 				]
 		]));
 		exit();
-	}
+	}	
 } else {
-
 	if (isset($data['accessToken'])) {
 		$token = Token::find()->where(['accessToken' => $data['accessToken']])->single();
 		if($token && $token->isAuthenticated()) {
@@ -106,11 +123,19 @@ if (!isset($data['loginToken']) && !isset($data['accessToken']) && !empty($data[
 // Do the actual authentication for each authentication method where from its data is posted
 if (!empty($data['methods'])) {
 	$authenticators = $token->authenticateMethods($data['methods']);
+} else
+{
+	$authenticators = [];
 }
 
 $methods = array_map(function($o) {
 	return $o->id;
 }, $token->getPendingAuthenticationMethods());
+
+if(empty($methods)) {
+	$token->setAuthenticated();
+	$token->save();
+}
 
 $response = [
 		'loginToken' => $token->loginToken,

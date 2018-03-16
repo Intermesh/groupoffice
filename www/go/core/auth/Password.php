@@ -5,26 +5,25 @@ use go\core\auth\model\Token;
 use go\core\auth\model\User;
 use go\core\validate\ErrorCode;
 
-class Password extends BaseAuthenticator {	
+class Password extends PrimaryAuthenticator {	
+
+	public static function isAvailableFor($username) {
+		return User::find(['id'])->where(['username' => $username])->andWhere('password', '!=', 'null')->single() !== false;
+		
+	}
 	
-	public function authenticate(Token $token, array $params) {
-		if(!isset($params['password'])){
-			$this->setValidationError('password', ErrorCode::REQUIRED);
+	public function authenticate($username, $password) {
+		$user = User::find()->where(['username' => $username])->single();
+		if(!$user) {
 			return false;
 		}
 		
-		if(!$token->getUser()->checkPassword($params['password'])){
-			$this->setValidationError('password', ErrorCode::INVALID_INPUT);
+		if(!$user->checkPassword($password)) {
 			return false;
 		}
 		
-		return true;
+		return $user;
 	}
-
-	public static function isAvailableFor(User $user) {
-		return true;
-	}
-
 	
 
 }
