@@ -1,9 +1,9 @@
 <?php
-namespace go\modules\imapauth\model;
+namespace go\modules\community\imapauthenticator\model;
 
 use go\core\jmap\Entity;
 
-class Server extends \go\core\orm\Property {
+class Domain extends \go\core\orm\Property {
 	
 	public $id;
 	public $serverId;
@@ -11,7 +11,7 @@ class Server extends \go\core\orm\Property {
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
-						->addTable('imapauth_domain');
+						->addTable('imapauth_server_domain');
 						
 	}
 }

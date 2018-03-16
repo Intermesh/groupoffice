@@ -1,5 +1,5 @@
 <?php
-namespace go\modules\imapauth\model;
+namespace go\modules\community\imapauthenticator\model;
 
 use go\core\jmap\Entity;
 
@@ -25,7 +25,7 @@ class Server extends Entity {
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
-						->addTable('imapauth_server')
-						->addRelation("domains", $entityName, ['id' => "serverId"]);
+						->addTable('imapauth_server', 's')
+						->addRelation("domains", Domain::class, ['id' => "serverId"]);
 	}
 }

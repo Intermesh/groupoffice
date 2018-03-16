@@ -29,6 +29,9 @@ class User extends Entity {
 	const ID_SUPER_ADMIN = 1;
 	
 	const PASSWORD_MIN_LENGTH = 8;
+	
+	
+	public $validatePassword = true;
 
 	/**
 	 * The ID
@@ -156,7 +159,7 @@ class User extends Entity {
 	 * 
 	 * @var UserGroup[]
 	 */
-	public $groups;
+	public $groups = [];
 	
 	/**
 	 * Changed to false in setValues() so when the the jmap api is used it needs to be verified
@@ -265,7 +268,7 @@ class User extends Entity {
 			}
 		}
 		
-		if(isset($this->plainPassword)) {
+		if(isset($this->plainPassword) && $this->validatePassword) {
 			if(strlen($this->plainPassword) < self::PASSWORD_MIN_LENGTH) {
 				$this->setValidationError('password', ErrorCode::INVALID_INPUT, "Minimum password length is 8 chars");
 			}

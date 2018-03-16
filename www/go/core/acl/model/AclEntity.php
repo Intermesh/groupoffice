@@ -50,7 +50,7 @@ abstract class AclEntity extends Entity {
 	protected function createAcl() {
 		$acl = new Acl();
 		$acl->usedIn = $this->getMapping()->getColumn('aclId')->table->getName().'.aclId';
-		$acl->ownedBy = App::get()->getInstaller()->isInProgress() ? 1 : App::get()->getAuthState()->getUser()->id;
+		$acl->ownedBy = $this->getCreatedBy();
 
 		if(!$acl->internalSave()) {	
 			return false;

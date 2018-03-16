@@ -73,6 +73,9 @@ function getToken($data) {
 		if(!($authenticator instanceof PrimaryAuthenticator)) {
 			continue;
 		}
+		if(!$authenticator->isAvailableFor($data['username'])) {
+			continue;
+		}
 		if($user = $authenticator->authenticate($data['username'], $data['password'])){
 			
 			$token = new Token();

@@ -527,7 +527,7 @@ abstract class Property extends Model {
 	
 	private function setSaveProps() {
 		if(property_exists($this, "modifiedBy") && !$this->isModified(["modifiedBy"])) {
-			$this->modifiedBy = App::get()->getInstaller()->isInProgress() ? 1 : App::get()->getAuthState()->getUser()->id;
+			$this->modifiedBy = $this->getCreatedBy();
 		}
 		
 		if(property_exists($this, "modifiedAt") && !$this->isModified(["modifiedAt"])) {
@@ -543,8 +543,12 @@ abstract class Property extends Model {
 		}
 		
 		if(property_exists($this, "createdBy") && !$this->isModified(["createdBy"])) {
-			$this->createdBy = App::get()->getInstaller()->isInProgress() ? 1 : App::get()->getAuthState()->getUser()->id;
+			$this->createdBy = $this->getCreatedBy();
 		}
+	}
+	
+	protected function getCreatedBy() {
+		return !App::get()->getAuthState() || !App::get()->getAuthState()->getUser() ? 1 : App::get()->getAuthState()->getUser()->id;
 	}
 
 	/**
@@ -606,15 +610,17 @@ abstract class Property extends Model {
 
 		//copy for overloaded properties because __get can't return by reference because we also return null sometimes.
 		$models = $this->{$relation->name};
-		foreach ($models as &$newProp) {
-			$this->applyRelationKeys($relation, $newProp);
-			if (!$newProp->internalSave()) {
-				return false;
-			}
+		if(isset($models)) {
+			foreach ($models as &$newProp) {
+				$this->applyRelationKeys($relation, $newProp);
+				if (!$newProp->internalSave()) {
+					return false;
+				}
 
-			$this->savedPropertyRelations[] = $newProp;
+				$this->savedPropertyRelations[] = $newProp;
+			}
+			$this->{$relation->name} = $models;
 		}
-		$this->{$relation->name} = $models;
 
 		return true;
 	}
@@ -806,7 +812,14 @@ abstract class Property extends Model {
 		return App::get()->getDbConnection()->delete($primaryTable->getName(), $pk)->execute();
 	}
 
-	private function validateTable(MappedTable $table) {
+	private function validateTable(MappedTable $table) {		
+		
+		if(!$this->tableIsModified($table)) {
+			// table record will not be validated and inserted if it has no modifications at all
+			// todo: perhaps this should be configurable?
+			return true;
+		}
+		
 		foreach ($table->getColumns() as $colName => $column) {
 
 			if (!$this->validateRequired($column)) {
@@ -818,6 +831,10 @@ abstract class Property extends Model {
 				$this->setValidationError($colName, ErrorCode::MALFORMED, 'Length can\'t be greater than ' . $column->length);
 			}
 		}
+	}
+	
+	private function tableIsModified(MappedTable $table) {
+		return $this->isModified(array_keys($table->getColumns()));
 	}
 
 	private function validateRequired(Column $column) {
