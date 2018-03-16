@@ -109,7 +109,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	
 	loadModulePanels : function() {
 		var available = go.ModuleManager.getAvailable();
-		console.log(available);
+		
 		for(var i = 0, l = available.length; i < l; i++) {
 			
 			var config = go.ModuleManager.registered[available[i].name];
@@ -145,6 +145,20 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	 * 
 	 */
 	submit : function(){
+		
+		// loop through child panels and call onSubmitStart function if available
+		var valid = true;
+		this.tabPanel.items.each(function(tab) {
+			if(tab.onValidate){
+				if(!tab.onValidate()) {
+					valid = false;					
+				}
+			}
+		},this);
+		
+		if (!valid || !this.formPanel.getForm().isValid()) {
+			return;
+		}
 		
 		if(this.needCurrentPassword()){
 			
@@ -216,8 +230,16 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 				return;
 			}
 						
-			if((params.create && response.created[id])||(params.update && response.updated[id])){
+			if(response.updated && response.updated[id]){
 				this.submitComplete(response);
+			} else
+			{
+				for(name in response.notUpdated[id].validationErrors) {
+					var field = this.formPanel.getForm().findField(name);
+					if(field) {
+						field.markInvalid(response.notUpdated[id].validationErrors[name].description);
+					}
+				}
 			}
 
 		},this);

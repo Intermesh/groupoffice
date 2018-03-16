@@ -5,24 +5,6 @@ use go\core;
 use go\core\db\Query;
 
 class Settings extends core\Settings {
-	
-	protected function __construct() {
-		
-		//temp workaround
-		
-		$this->language = \GO::config()->language;
-		$this->title = \GO::config()->title;		
-		$this->systemEmail = \GO::config()->webmaster_email;
-		
-		$this->smtpEncryption = !empty(\GO::config()->smtp_encryption) ? \GO::config()->smtp_encryption : null;
-		$this->smtpHost = \GO::config()->smtp_server;
-		$this->smtpPort = \GO::config()->smtp_port;
-		$this->smtpUsername = \GO::config()->smtp_username;
-		$this->smtpPassword = \GO::config()->smtp_password;
-		
-		
-		parent::__construct();
-	}
 
 	public function getModuleName() {
 		return 'core';

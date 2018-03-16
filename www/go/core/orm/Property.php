@@ -453,10 +453,14 @@ abstract class Property extends Model {
 	 * 
 	 * Only database columns and relations are tracked. Not the getters and setters.
 	 * 
-	 * @param array $properties If empty then all properties are checked.
+	 * @param array|string $properties If empty then all properties are checked.
 	 * @return boolean
 	 */
 	public function isModified($properties = []) {
+		
+		if(!is_array($properties)) {
+			$properties = [$properties];
+		}
 
 		foreach ($this->oldProps as $key => $oldValue) {
 			if (!empty($properties) && !in_array($key, $properties)) {

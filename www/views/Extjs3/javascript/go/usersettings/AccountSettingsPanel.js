@@ -53,12 +53,14 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 				this.passwordField1 = new Ext.form.TextField({
 					inputType: 'password',
 					fieldLabel: t("New password", "users"),
-					name: 'password'
+					name: 'password',
+					minLength: 8
 				}),
 				this.passwordField2 = new Ext.form.TextField({
 					inputType: 'password',
 					fieldLabel: t("Confirm password", "users"),
-					name: 'passwordConfirm'
+					name: 'passwordConfirm',
+					minLength: 8
 				})
 			]
 		});
@@ -82,7 +84,19 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 		},this);
 	},
 	
+	onValidate : function() {
+		if(this.passwordField1.getValue() != this.passwordField2.getValue()) {
+			this.passwordField1.markInvalid(t("The passwords didn't match"));
+			return false;
+		}
+		
+		return true;
+	},
+	
 	onSubmitStart : function(values){
+		
+		
+		
 		// Bubble further to child items
 		this.items.each(function(fieldset) {
 			if(fieldset.onSubmitStart){

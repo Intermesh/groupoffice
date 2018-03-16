@@ -291,7 +291,7 @@ use go\core\jmap\State;
 			return Language::get()->t($str, $moduleName, $coreSection);
 		}
 
-		private static function findConfigFile($name = 'config.ini') {
+		public static function findConfigFile($name = 'config.ini') {
 
 			$count = 0;
 			$workingDir = __DIR__;

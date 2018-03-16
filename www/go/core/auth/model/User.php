@@ -27,6 +27,8 @@ class User extends Entity {
 	const DIGEST_REALM = 'Group-Office';
 
 	const ID_SUPER_ADMIN = 1;
+	
+	const PASSWORD_MIN_LENGTH = 8;
 
 	/**
 	 * The ID
@@ -195,8 +197,7 @@ class User extends Entity {
 	 * @param string $password
 	 * @return boolean 
 	 */
-	public function checkPassword($password){
-		
+	public function checkPassword($password) {		
 		$this->passwordVerified = password_verify($password, $this->password);
 		
 		if($this->passwordVerified){
@@ -204,10 +205,12 @@ class User extends Entity {
 		}
 		return $this->passwordVerified;
 	}
+	
+	private $plainPassword;
 
 	public function setPassword($password) {
-		$this->password = password_hash($password, PASSWORD_DEFAULT);
-		$this->updateDigest($password);
+		$this->plainPassword = $password;		
+		
 	}
 
 	private function updateDigest() {
@@ -259,6 +262,12 @@ class User extends Entity {
 		if(!$this->validatePasswordChange()) {
 			if(!$this->hasValidationErrors('currentPassword')) {
 				$this->setValidationError('currentPassword', ErrorCode::REQUIRED);
+			}
+		}
+		
+		if(isset($this->plainPassword)) {
+			if(strlen($this->plainPassword) < self::PASSWORD_MIN_LENGTH) {
+				$this->setValidationError('password', ErrorCode::INVALID_INPUT, "Minimum password length is 8 chars");
 			}
 		}
 		
@@ -353,6 +362,12 @@ class User extends Entity {
 	}
 	
 	protected function internalSave() {
+		
+		if(isset($this->plainPassword)) {
+			$this->password = password_hash($this->plainPassword, PASSWORD_DEFAULT);
+			$this->updateDigest($this->plainPassword);
+		}
+		
 		if(!parent::internalSave()) {
 			return false;
 		}

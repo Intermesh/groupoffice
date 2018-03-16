@@ -1464,6 +1464,10 @@ var $billing_clear_payment_method_on_duplicate = true;
 		foreach($config as $key=>$value) {
 			$this->$key=$value;
 		}
+		
+		
+		$this->loadNewSettings();
+		
 
 //		if($this->info_log=="")
 //			$this->info_log =$this->file_storage_path.'log/info.log';
@@ -1581,6 +1585,17 @@ var $billing_clear_payment_method_on_duplicate = true;
 
 			$this->noreply_email = 'noreply@'.$wmdomain;
 		}
+	}
+	
+	private function loadNewSettings() {
+		$this->title = GO()->getSettings()->title;
+		$this->language = GO()->getSettings()->language;
+		$this->webmaster_email = GO()->getSettings()->systemEmail;
+		$this->smtp_host = GO()->getSettings()->smtpHost;
+		$this->smtp_port = GO()->getSettings()->smtpPort;
+		$this->smtp_username = GO()->getSettings()->smtpUsername;
+		$this->smtp_password = GO()->getSettings()->smtpPassword;
+		$this->smtp_encryption = GO()->getSettings()->smtpEncryption;
 	}
 
 

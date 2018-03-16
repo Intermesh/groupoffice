@@ -162,6 +162,11 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 	clearInvalid: function () {
 
 	},
+	
+	validate : function() {
+		return true;
+	},
+	
 	initRowActions: function () {
 
 		var actions = new Ext.ux.grid.RowActions({
