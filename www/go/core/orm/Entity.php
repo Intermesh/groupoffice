@@ -222,7 +222,7 @@ abstract class Entity extends Property {
 	 * @return int
 	 */
 	public function getPermissionLevel() {
-		return Acl::LEVEL_READ;
+		return GO()->getAuthState() && GO()->getAuthState()->getUser() && GO()->getAuthState()->getUser()->isAdmin() ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ;
 	}
 
 	/**

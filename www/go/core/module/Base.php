@@ -49,6 +49,8 @@ abstract class Base {
 			throw $e;
 		}
 		
+		GO()->getCache()->flush(false);
+		
 		GO()->getDbConnection()->beginTransaction();
 		
 		$model = new Module();
@@ -73,9 +75,7 @@ abstract class Base {
 		
 		if(!GO()->getDbConnection()->commit()) {
 			return false;
-		}
-		
-		GO()->getCache()->flush();
+		}		
 		
 		return $model;
 	}

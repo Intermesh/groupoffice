@@ -3,7 +3,7 @@ namespace go\modules\community\imapauthenticator\model;
 
 use go\core\jmap\Entity;
 
-class Server extends Entity {
+class ImapAuthServer extends Entity {
 	
 	public $id;
 	public $imapHostname;
@@ -13,13 +13,11 @@ class Server extends Entity {
 	public $imapValidateCertificate = true;
 
 	public $removeDomainFromUsername = false;
-	
-	public $createEmailAcount = true;
-	
+
 	public $smtpHostname;
 	public $smtpPort;
 	public $smtpPassword;
-	public $smtpUseImapCredentials = false;
+	public $smtpUseUserCredentials= false;
 	public $smtpValidateCertificate = true;
 	public $smtpEncryption;
 	

@@ -77,6 +77,10 @@ class Authenticator extends PrimaryAuthenticator {
 	
 	private function setEmailAccount($username, $password, $email, Server $server, User $user) {
 		
+		if(!$user->hasModule('email')) {
+			return;
+		}
+		
 		//old framework code here		
 		$accounts = \GO\Email\Model\Account::model()->findByAttributes(array(
 					'host' => $server->imapHostname,
@@ -119,7 +123,7 @@ class Authenticator extends PrimaryAuthenticator {
 			
 			$account->password = $password;			
 			
-			if($server->smtpUseImapCredentials) {				
+			if($server->smtpUseUserCredentials) {				
 				$account->smtp_username = $imapUsername;
 				$account->smtp_password = $password;
 			}

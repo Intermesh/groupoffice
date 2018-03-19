@@ -230,6 +230,11 @@ abstract class EntityController extends ReadOnlyEntityController {
 		
 		$cls = $this->entityClass();
 		
+		if(!($cls instanceof Entity)) {
+			//not jmap entity so we can't calculate
+			throw new CannotCalculateChanges();
+		}
+		
 		$acls = $cls::findAcls();		
 		if($acls && (Acl::findGrantedSince(App::get()->getAuthState()->getUser()->id, $p['sinceState'], $acls)->limit(1)->execute()->fetch() ||
 			Acl::findRevokedSince(App::get()->getAuthState()->getUser()->id, $p['sinceState'], $acls)->limit(1)->execute()->fetch())) {

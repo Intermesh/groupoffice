@@ -72,7 +72,7 @@ class State extends AbstractState {
 	 * @return User
 	 */
 	public function getUser() {
-		return $this->getToken()->getUser();
+		return $this->getToken() ? $this->getToken()->getUser() : null;
 	}
 
 }
