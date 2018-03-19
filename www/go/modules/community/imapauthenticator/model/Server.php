@@ -20,6 +20,8 @@ class Server extends Entity {
 	public $smtpPort;
 	public $smtpPassword;
 	public $smtpUseImapCredentials = false;
+	public $smtpValidateCertificate = true;
+	public $smtpEncryption;
 	
 	public $domains;
 	

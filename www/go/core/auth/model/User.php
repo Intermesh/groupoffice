@@ -350,19 +350,26 @@ class User extends Entity {
 			$this->updateDigest($this->plainPassword);
 		}
 		
+		
+		//create users' group
+		if($this->isNew()) {
+			$group = new Group();
+			$group->name = $this->username;
+			$group->isUserGroupFor = $this->id;
+			if(!$group->save()) {
+				throw new \Exception("Could not create home group");
+			}
+
+			$this->groups[] = (new UserGroup)->setValues(['groupId' => $group->id]);
+			$this->groups[] = (new UserGroup)->setValues(['groupId' => Group::ID_EVERYONE]);
+		}
+		
+		
 		if(!parent::internalSave()) {
 			return false;
 		}
 		
-		//create users' group
-		if(!$this->isNew()) {
-			return true;
-		}
-		
-		$group = new Group();
-		$group->name = $this->username;
-		$group->isUserGroupFor = $this->id;
-		return $group->save();
+		return true;		
 	}
 	
 	

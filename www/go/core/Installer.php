@@ -67,14 +67,8 @@ class Installer {
 			 $admin->recoveryEmail = $admin->email;
 		}
 		
-		$admin->setValues([
-				'groups' => [
-						["groupId" => 1],
-						["groupId" => 2],
-						["groupId" => 3],
-						["groupId" => 4] //newly created group for admin
-				]
-		]);
+		$admin->groups[] = (new auth\model\UserGroup)->setValues(['groupId' => Group::ID_ADMINS]);
+		$admin->groups[] = (new auth\model\UserGroup)->setValues(['groupId' => Group::ID_INTERNAL]);
 
 
 		if (!$admin->save()) {

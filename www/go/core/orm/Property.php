@@ -894,6 +894,26 @@ abstract class Property extends Model {
 		return parent::toArray($properties);
 	}
 
+	/**
+	 * Set public properties with key value array.
+	 * 
+	 * This function should also normalize input when you extend this class.
+	 * 
+	 * For example dates in ISO format should be converted into DateTime objects
+	 * and related models should be converted to an instance of their class.
+	 * 
+	 *
+	 * @Example
+	 * ```````````````````````````````````````````````````````````````````````````
+	 * $model = User::findByIds([1]);
+	 * $model->setValues(['username' => 'admin']);
+	 * $model->save();
+	 * ```````````````````````````````````````````````````````````````````````````
+	 *
+	 * 
+	 * @param array $values  ["propNamne" => "value"]
+	 * @return \static
+	 */
 	public function setValues(array $values) {
 		foreach ($values as $propName => &$value) {
 			$value = $this->normalizeValue($propName, $value);

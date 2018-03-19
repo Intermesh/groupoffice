@@ -481,7 +481,7 @@ class Account extends \GO\Base\Db\ActiveRecord {
 		$a->name=$name;
 		$a->signature=$signature;
 		$a->default=$default;
-		$a->save();
+		$a->save(true);
 
 		return $a;
 	}
