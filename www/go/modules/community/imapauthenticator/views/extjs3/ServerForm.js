@@ -1,17 +1,52 @@
 go.modules.community.imapauthenticator.ServerForm = Ext.extend(go.form.FormWindow, {
 	title: t('Server profile', 'imapauth'),
-	entityStore: go.stores.ImapAuthServer,	
+	entityStore: go.stores.ImapAuthServer,
 	width: dp(400),
 	height: dp(600),
 	autoScroll: true,
 	initFormItems: function () {
+
+		var domainStore = new Ext.data.JsonStore({
+			autoDestroy: true,
+			root: "records",
+			fields: [
+				'id',
+				'name'
+			]
+		});
+
+
+
+
 		return [{
 				title: 'IMAP Server',
 				xtype: 'fieldset',
 				defaults: {
 					anchor: '100%'
 				},
-				items: [
+				items: [{
+						xtype: "gridfield",
+						name: "domains",
+						store: domainStore,
+						fieldLabel: "Domains",
+
+						autoExpandColumn: "name",
+						columns: [
+							{
+								id: 'name',
+								header: t('Name'),
+								sortable: false,
+								dataIndex: 'name',
+								hideable: false,
+								draggable: false,
+								menuDisabled: true,
+								editor: new Ext.form.TextField({
+									allowBlank: false
+								})
+							}
+						],
+					},
+
 					{
 						xtype: 'textfield',
 						name: 'imapHostname',
@@ -21,7 +56,7 @@ go.modules.community.imapauthenticator.ServerForm = Ext.extend(go.form.FormWindo
 						xtype: 'numberfield',
 						decimals: 0,
 						name: 'imapPort',
-						fieldLabel: t("Port", "imapauthenticator"),						
+						fieldLabel: t("Port", "imapauthenticator"),
 						required: true,
 						value: 143
 					}, {
@@ -47,7 +82,7 @@ go.modules.community.imapauthenticator.ServerForm = Ext.extend(go.form.FormWindo
 						hideLabel: true,
 						boxLabel: t('Validate certificate'),
 						name: 'imapValidateCertificate'
-					},{
+					}, {
 						xtype: 'xcheckbox',
 						hideLabel: true,
 						boxLabel: t('Remove domain from username', 'imapauthenticator'),
@@ -70,20 +105,20 @@ go.modules.community.imapauthenticator.ServerForm = Ext.extend(go.form.FormWindo
 						fieldLabel: t('Port'),
 						decimals: 0,
 						value: 587
-					},  {
+					}, {
 						xtype: 'xcheckbox',
 						hideLabel: true,
 						boxLabel: t('Use user credentials', 'imapauthenticator'),
 						name: 'smtpUseUserCredentials',
 						hint: t("Enable this if the SMTP server credentials are identical to the IMAP server.", "imapauthenticator"),
 						listeners: {
-							check: function(checkbox, checked) {
+							check: function (checkbox, checked) {
 								this.formPanel.getForm().findField('smtpUsername').setDisabled(checked);
 								this.formPanel.getForm().findField('smtpPassword').setDisabled(checked);
 							},
 							scope: this
 						}
-					},{
+					}, {
 						xtype: 'textfield',
 						name: 'smtpUsername',
 						fieldLabel: t('Username')

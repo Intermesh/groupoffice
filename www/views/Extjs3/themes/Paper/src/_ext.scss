@@ -1150,7 +1150,7 @@ ul.x-tab-strip-bottom{
 		background-color: rgba(color($orange, 300), .08);
 	}
 	&-body  {
-		min-height: dp(152);
+		/*min-height: dp(152);*/
 		position:relative;
 		
 		.x-grid3-td-expander, 

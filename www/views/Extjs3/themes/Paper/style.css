@@ -7561,7 +7561,7 @@ ul.x-tab-strip-bottom {
     padding-left: 10.5px;
     background-color: rgba(255, 183, 77, 0.08); }
   .x-grid3-body {
-    min-height: 133px;
+    /*min-height: dp(152);*/
     position: relative;
     /*		.x-grid3-check-col-td, .x-grid3-row-checker {
     			padding-left: dp(16) !important;

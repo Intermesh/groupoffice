@@ -135,10 +135,10 @@ go.form.FormWindow = Ext.extend(go.Window, {
 					default:
 						
 						//mark validation errors
-						for(name in response.notSaved[id].validationErrors) {
+						for(name in notSaved[id].validationErrors) {
 							var field = this.formPanel.getForm().findField(name);
 							if(field) {
-								field.markInvalid(response.notUpdated[id].validationErrors[name].description);
+								field.markInvalid(notSaved[id].validationErrors[name].description);
 							}
 						}
 						
