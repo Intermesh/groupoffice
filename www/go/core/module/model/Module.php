@@ -64,7 +64,9 @@ class Module extends AclEntity {
 	public static function findByClass($className) {
 		
 		switch($className) {	
-			//case \go\core\auth\Method::class:
+			case \go\core\auth\model\Group::class:
+				$module = Module::find()->where(['name' => "groups"])->single();				
+				break;
 			case strpos($className, "go\core\auth") === 0:
 				$module = Module::find()->where(['name' => "users"])->single();				
 				break;

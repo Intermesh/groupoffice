@@ -14,6 +14,7 @@ go.form.multiselect.Window = Ext.extend(go.Window, {
 			store: new go.data.Store({
 				fields: ['id', this.field.displayField],
 				entityStore: this.field.entityStore,
+				baseParams: this.field.storeBaseParams,
 				listeners: {
 					load: function() {
 						var ids = this.field.getIds();

@@ -5,6 +5,8 @@ use Exception;
 use go\core\auth\model\User;
 use go\core\auth\PrimaryAuthenticator;
 use go\core\imap\Connection;
+use GO\Email\Model\Account;
+use function GO;
 
 class Authenticator extends PrimaryAuthenticator {
 	
@@ -19,7 +21,7 @@ class Authenticator extends PrimaryAuthenticator {
 	/**
 	 * 
 	 * @param string $email
-	 * @return Server|boolean
+	 * @return ImapAuthServer|boolean
 	 */
 	private static function findServer($email) {
 		$adPos = strpos($email, '@');
@@ -29,7 +31,7 @@ class Authenticator extends PrimaryAuthenticator {
 		
 		$domain = substr($email, $adPos + 1);
 		
-		return Server::find()
+		return ImapAuthServer::find()
 						->join('imapauth_server_domain', 'd', 's.id = d.serverId')
 						->where(['d.name' => $domain])
 						->orWhere(['d.name' => '*'])
@@ -38,6 +40,8 @@ class Authenticator extends PrimaryAuthenticator {
 	
 	public function authenticate($username, $password) {
 		$server = $this->findServer($username);
+		
+		GO()->debug("Attempting IMAP authentication on ".$server->imapHostname);
 		
 		$connection = new Connection();
 		if(!$connection->connect($server->imapHostname, $server->imapPort, $server->imapEncryption == 'ssl')) {
@@ -55,6 +59,15 @@ class Authenticator extends PrimaryAuthenticator {
 			$user = $this->createUser($username);
 		}
 		
+		foreach($server->groups as $group) {
+			$user->addGroup($group->groupId);
+		}
+		if($user->isModified()) {
+			if(!$user->save()) {
+				throw new \Exception("Could not save user");
+			}
+		}
+		
 		
 		$this->setEmailAccount($imapUsername, $password, $username, $server, $user);
 		
@@ -64,7 +77,7 @@ class Authenticator extends PrimaryAuthenticator {
 	
 	private function createUser($email) {
 		$user = new User();
-		$user->displayName = $email;
+		$user->displayName = explode('@', $email)[0];
 		$user->username = $email;
 		$user->email = $user->recoveryEmail = $email;
 		
@@ -75,14 +88,14 @@ class Authenticator extends PrimaryAuthenticator {
 		return $user;
 	}
 	
-	private function setEmailAccount($username, $password, $email, Server $server, User $user) {
+	private function setEmailAccount($username, $password, $email, ImapAuthServer $server, User $user) {
 		
 		if(!$user->hasModule('email')) {
 			return;
 		}
 		
 		//old framework code here		
-		$accounts = \GO\Email\Model\Account::model()->findByAttributes(array(
+		$accounts = Account::model()->findByAttributes(array(
 					'host' => $server->imapHostname,
 					'username' => $username
 							))->fetchAll();
@@ -96,7 +109,7 @@ class Authenticator extends PrimaryAuthenticator {
 		}
 		
 		if(!$foundForUser) {
-			$account = new \GO\Email\Model\Account();
+			$account = new Account();
 			$account->user_id = $user->id;
 			$account->host = $server->imapHostname;
 			$account->port = $server->imapPort;
@@ -124,7 +137,7 @@ class Authenticator extends PrimaryAuthenticator {
 			$account->password = $password;			
 			
 			if($server->smtpUseUserCredentials) {				
-				$account->smtp_username = $imapUsername;
+				$account->smtp_username = $username;
 				$account->smtp_password = $password;
 			}
 			

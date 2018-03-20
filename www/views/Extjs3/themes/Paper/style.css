@@ -193,7 +193,7 @@ small {
   /*letter-spacing: 0.04em;*/
   text-decoration: none; }
 
-.message-header b, .x-form-item, .x-grid3-hd-row td, .x-grid-group-hd div.x-grid-group-title, .menu-title, .x-combo-list-small, .go-detail-view label, .go-display-panel label, .go-display-panel .table_header_links, .go-select-all-checkbox, .ext-cal-monthview .ext-cal-ev > div > span {
+.message-header b, .x-form-item, .x-form-helptext, .x-grid3-hd-row td, .x-grid-group-hd div.x-grid-group-title, .menu-title, .x-combo-list-small, .go-detail-view label, .go-display-panel label, .go-display-panel .table_header_links, .go-select-all-checkbox, .ext-cal-monthview .ext-cal-ev > div > span {
   font-size: 11px;
   font-weight: 400;
   color: rgba(0, 0, 0, 0.54); }
@@ -7151,6 +7151,10 @@ ul.x-tab-strip-bottom {
 .x-form-invalid, .x-form textarea.x-form-invalid {
   border-color: rgba(211, 47, 47, 0.54);
   background-color: #fffbfb; }
+
+.x-form-item + .x-form-helptext {
+  margin-top: -14px;
+  margin-bottom: 14px; }
 
 .x-form-field-wrap {
   line-height: normal; }

@@ -166,6 +166,7 @@ class QueryBuilder {
 		$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName);
 
 		if (is_array($data)) {
+			$updates = [];
 			foreach ($data as $colName => $value) {
 				$paramTag = $this->getParamTag();
 				$updates[] = '`' . $colName . '` = ' . $paramTag;

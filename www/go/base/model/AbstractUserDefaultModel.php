@@ -169,17 +169,12 @@ abstract class AbstractUserDefaultModel extends \GO\Base\Db\ActiveRecord {
 		if(!$user)
 			throw new \Exception(" - ".\GO::t(get_class($this),'settings')." '".$this->name."' ".\GO::t("could not be renamed, because it has no owner to name after", "settings").".<br />");
 	
-		$template = self::getNameTemplate($this->className());
+//		$template = self::getNameTemplate($this->className());
 
 		$attr = $user->getAttributes();
-		if($contact = $user->createContact())
-			$attr = array_merge($attr, $contact->getAttributes());
+//		 array_merge($attr, $contact->getAttributes());
 
-		$this->name = $this->parseUserTemplate($template, $attr);
-		
-		//fallback on username if name template is somehow empty. Can happen with imap auth or invalid template.
-		if(empty($this->name))
-			$this->name = $user->username;
+		$this->name = $user->displayName;
 		
 		$this->makeAttributeUnique('name');
 		

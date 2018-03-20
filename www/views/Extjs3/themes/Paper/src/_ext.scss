@@ -474,7 +474,17 @@ ul.x-tab-strip-bottom{
 		background-color: lighten(color($red,100),9%);
 	}
 	
+	&-helptext {
+		@extend %font-caption;
+	}
+	
 }
+//for gridfield with hint
+.x-form-item + .x-form-helptext {
+	margin-top: dp(-16);
+	margin-bottom: dp(16);
+}
+
 
 .x-form-field-wrap {
 	line-height: normal; //for textarea. Without this it gets extra margin somehow

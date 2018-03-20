@@ -92,18 +92,25 @@ function getToken($data) {
 	return false;
 }
 
+function output($data = [], $status = 200, $statusMsg = null) {
+	Response::get()->setStatus($status, $statusMsg);
+	Response::get()->sendHeaders();
+	
+	$data['debug'] = GO()->getDebugger()->getEntries();
+	Response::get()->output(json_encode($data));
+	
+	exit();
+}
+
 if (!isset($data['loginToken']) && !isset($data['accessToken']) && !empty($data['username'])) {
 	
 	$token = getToken($data);
 	if (!$token) {
-		Response::get()->setStatus(403, "Bad username or password");
-		Response::get()->sendHeaders();
-		Response::get()->output(json_encode([
+		output([
 				'errors' => [
 						'username' => ["description" => "Bad username or password", "code" => ErrorCode::INVALID_INPUT]
 				]
-		]));
-		exit();
+		], 403, "Bad username or password");
 	}	
 } else {
 	if (isset($data['accessToken'])) {
@@ -116,9 +123,7 @@ if (!isset($data['loginToken']) && !isset($data['accessToken']) && !empty($data[
 	}
 
 	if (!$token) {
-		Response::get()->setStatus(400, "Invalid token given");
-		Response::get()->sendHeaders();
-		exit();
+		output([], 400, "Invalid token given");		
 	}
 }
 
@@ -149,10 +154,8 @@ if ($token->isAuthenticated()) {
 	$response['accessToken'] = $token->accessToken;
 	$response['capabilities'] = Capabilities::get();
 	$response['user'] = $token->getUser()->toArray();
-	Response::get()->setStatus(201, "Authentication is complete, access token created.");
-	Response::get()->sendHeaders();
-	Response::get()->output(json_encode($response));
-	exit();
+	output($response, 201, "Authentication is complete, access token created.");
+	
 } 
 
 
@@ -169,13 +172,9 @@ foreach ($authenticators as $methodId => $authenticator) {
 }
 
 if (!empty($validationErrors)) {
-	$response['errors'] = $validationErrors;
-	Response::get()->setStatus(400, "Errors occurred");
+	$response['errors'] = $validationErrors;	
+	output($response, 400, "Validation errors occurred");
 } else
 {
-	Response::get()->setStatus(200, "Success, but more authorization required.");
+	output($response, 200, "Success, but more authorization required.");
 }
-
-
-Response::get()->sendHeaders();
-Response::get()->output(json_encode($response));

@@ -1,5 +1,11 @@
 go.form.GridField = Ext.extend(Ext.grid.EditorGridPanel, {
 
+	autoHeight: true,
+	viewConfig: {
+		scrollOffset: 0,
+		emptyText: t("Empty")
+	},
+	
 	cls: 'go-grid3-hide-headers',
 	clicksToEdit: 1,
 	initComponent: function () {
@@ -28,6 +34,16 @@ go.form.GridField = Ext.extend(Ext.grid.EditorGridPanel, {
 		}];
 
 		go.form.GridField.superclass.initComponent.call(this);
+		
+		if(this.hint) {
+			this.on("added", function(grid, ownerCt, index){
+				ownerCt.insert(index + 1, {
+					xtype:'box',
+					html: this.hint,
+					cls: 'x-form-helptext'
+				});
+			}, this);
+		}
 
 
 	},

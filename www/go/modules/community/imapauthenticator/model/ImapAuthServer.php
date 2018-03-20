@@ -21,11 +21,25 @@ class ImapAuthServer extends Entity {
 	public $smtpValidateCertificate = true;
 	public $smtpEncryption;
 	
+	/**
+	 * Users must login with their full e-mail address. The domain part will be used
+	 * to lookup this server profile.
+	 * 
+	 * @var Domain[]
+	 */
 	public $domains;
+	
+	/**
+	 * New users will be added to these user groups
+	 * 
+	 * @var Group[]
+	 */
+	public $groups;
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable('imapauth_server', 's')
-						->addRelation("domains", Domain::class, ['id' => "serverId"]);
+						->addRelation("domains", Domain::class, ['id' => "serverId"])
+						->addRelation("groups", Group::class, ['id' => "serverId"]);
 	}
 }

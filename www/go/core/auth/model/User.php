@@ -351,6 +351,10 @@ class User extends Entity {
 		}
 		
 		
+		if(!parent::internalSave()) {
+			return false;
+		}
+		
 		//create users' group
 		if($this->isNew()) {
 			$group = new Group();
@@ -360,16 +364,36 @@ class User extends Entity {
 				throw new \Exception("Could not create home group");
 			}
 
-			$this->groups[] = (new UserGroup)->setValues(['groupId' => $group->id]);
-			$this->groups[] = (new UserGroup)->setValues(['groupId' => Group::ID_EVERYONE]);
+			if(!(new UserGroup)->setValues(['groupId' => $group->id, 'userId' => $this->id])->internalSave()) {
+				throw new \Exception("Couldn't add user to group");
+			}
+			if(!(new UserGroup)->setValues(['groupId' => Group::ID_EVERYONE, 'userId' => $this->id])->internalSave()) {
+				throw new \Exception("Couldn't add user to group");
+			}
 		}
 		
-		
-		if(!parent::internalSave()) {
-			return false;
-		}
 		
 		return true;		
+	}
+	
+	/**
+	 * Add user to group if not already in it.
+	 * 
+	 * You need to call save() after this function.
+	 * 
+	 * @param int $groupId
+	 * @return $this
+	 */
+	public function addGroup($groupId) {
+		foreach($this->groups as $group) {
+			if($group->groupId == $groupId) {
+				return $this;
+			}
+		}
+		
+		$this->groups[] = (new UserGroup)->setValues(['groupId' => $groupId]);
+		
+		return $this;
 	}
 	
 	

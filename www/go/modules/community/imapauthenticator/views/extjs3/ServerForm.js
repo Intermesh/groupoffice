@@ -6,18 +6,7 @@ go.modules.community.imapauthenticator.ServerForm = Ext.extend(go.form.FormWindo
 	autoScroll: true,
 	initFormItems: function () {
 
-		var domainStore = new Ext.data.JsonStore({
-			autoDestroy: true,
-			root: "records",
-			fields: [
-				'id',
-				'name'
-			]
-		});
-
-
-
-
+	
 		return [{
 				title: 'IMAP Server',
 				xtype: 'fieldset',
@@ -25,9 +14,18 @@ go.modules.community.imapauthenticator.ServerForm = Ext.extend(go.form.FormWindo
 					anchor: '100%'
 				},
 				items: [{
+
+						hint: t("Enter the domains this imap server should be used to authenticate. Users must login with their e-mail address and if the domain matches this profile it will be used.", "imapauthenticator"),
 						xtype: "gridfield",
 						name: "domains",
-						store: domainStore,
+						store: new Ext.data.JsonStore({
+							autoDestroy: true,
+							root: "records",
+							fields: [
+								'id',
+								'name'
+							]
+						}),
 						fieldLabel: "Domains",
 
 						autoExpandColumn: "name",
@@ -150,6 +148,23 @@ go.modules.community.imapauthenticator.ServerForm = Ext.extend(go.form.FormWindo
 						name: 'smtpValidateCertificate',
 						checked: true
 					}]
+			}, {
+				xtype: 'fieldset',
+				title: t("User options", "imapauthenticator"),
+				items: [
+					new go.form.multiselect.Field({
+						hint: t("Users will automatically be added to these groups", "imapauthenticator"),
+						name: "groups",
+						idField: "groupId",
+						displayField: "name",
+						entityStore: go.stores.Group,
+						
+						fieldLabel: t("Groups"),
+						storeBaseParams:{
+							filter: [{"includeUsers" : false}]
+						}
+					})
+				]
 			}
 		];
 	}

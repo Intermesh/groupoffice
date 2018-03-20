@@ -28,8 +28,19 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 	 */
 	title: null,
 	
+	/**
+	 * Base params of store in select window
+	 */
+	storeBaseParams: null,
 
 	autoHeight: true,
+	
+	viewConfig: {
+		scrollOffset: 0,
+		emptyText: t("Empty")
+	},
+	
+	cls: 'go-grid3-hide-headers',
 
 	constructor: function (config) {
 
@@ -72,9 +83,9 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 		
 		Ext.apply(config, {
 
-			tbar: {
+			bbar: {
 				items: [
-					{xtype: "tbtitle", text: config.title},
+//					{xtype: "tbtitle", text: config.title},
 					"->",
 					{
 						iconCls: "ic-add",
@@ -102,9 +113,20 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 		config.plugins = config.plugins || [];
 		config.plugins.push(actions);
 		
-		delete config.title;
+		
+//		delete config.title;
 
 		go.form.multiselect.Field.superclass.constructor.call(this, config);
+		
+		if(this.hint) {
+			this.on("added", function(grid, ownerCt, index){
+				ownerCt.insert(index + 1, {
+					xtype:'box',
+					html: this.hint,
+					cls: 'x-form-helptext'
+				});
+			}, this);
+		}
 
 
 	},

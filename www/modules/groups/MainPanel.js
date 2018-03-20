@@ -117,11 +117,10 @@ Ext.extend(GO.groups.MainPanel, GO.grid.GridPanel, {
 });
 
 
-/*
- * This will add the module to the main tabpanel filled with all the modules
- */
-GO.moduleManager.addModule('groups', GO.groups.MainPanel, {
-		title : t("name", "groups"),
-		iconCls : 'go-tab-icon-groups',
-		admin :true
+
+go.ModuleManager.register('groups', {
+	mainPanel: GO.groups.MainPanel,
+	admin: true,	
+	title: t("Groups", "groups"),
+	entities:['Group']
 });

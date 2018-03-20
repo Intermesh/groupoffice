@@ -39,7 +39,7 @@ CREATE TABLE `core_auth_method` (
 DROP TABLE IF EXISTS `core_auth_password`;
 CREATE TABLE `core_auth_password` (
   `userId` int(11) NOT NULL,
-  `password` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `digest` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

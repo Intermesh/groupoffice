@@ -598,18 +598,22 @@ abstract class Property extends Model {
 
 	private function saveRelatedHasMany(Relation $relation) {
 		
+		//copy for overloaded properties because __get can't return by reference because we also return null sometimes.
+		$models = $this->{$relation->name};
+		
 		//remove old model if it's replaced
 		$modified = $this->getModified([$relation->name]);
 		if (isset($modified[$relation->name][1])) {			
 			foreach ($modified[$relation->name][1] as $oldProp) {
-				if (!$oldProp->internalDelete()) {
+				
+				//if not in current value then delete it.
+				if (!in_array($oldProp, $models) && !$oldProp->internalDelete()) {
 					return false;
 				}
 			}
 		}
 
-		//copy for overloaded properties because __get can't return by reference because we also return null sometimes.
-		$models = $this->{$relation->name};
+		
 		if(isset($models)) {
 			foreach ($models as &$newProp) {
 				$this->applyRelationKeys($relation, $newProp);
@@ -672,9 +676,12 @@ abstract class Property extends Model {
 		
 		$modifiedForTable = $this->extractModifiedForTable($table, $modified);
 
-		if (empty($modifiedForTable)) {
-			return true;
-		}		
+//		//TODO discuss:
+//		//User has a secondary password table that may be left empty. But this is kind of hacky code:
+//		//if there are no modifications and it's not the primary table then we can skip it.
+//		if (empty($modifiedForTable) && $table != array_shift($this->getMapping()->getTables())) {
+//			return true;
+//		}		
 		
 		try {
 			if ($this->recordIsNew($table)) {				
@@ -695,7 +702,10 @@ abstract class Property extends Model {
 				foreach($table->getKeys() as $from => $to) {
 					$this->primaryKeys[$table->getAlias()][$to] = $this->$from;
 				}
-			} else {				
+			} else {	
+				if (empty($modifiedForTable)) {
+					return true;
+				}
 				$stmt = App::get()->getDbConnection()->update($table->getName(), $modifiedForTable, $this->primaryKeys[$table->getAlias()]);
 				if (!$stmt->execute()) {
 					return false;
