@@ -22,8 +22,15 @@ class CorrectionController extends AbstractController {
 		GO::setMemoryLimit(256);
 		ini_set('display_errors','on');		
 	}
-	
-	// InternalFee/Externalfee for hours registration problem
+		
+	/**
+	 * ?r=correction/TimeregistrationExternalFee
+	 * 
+	 * InternalFee/Externalfee for hours registration problem
+	 * 
+	 * @param array $params
+	 * @return 
+	 */
 	public function actionTimeregistrationExternalFee($params){
 		$this->render('externalHeader');
 		echo "<style type='text/css'>"
