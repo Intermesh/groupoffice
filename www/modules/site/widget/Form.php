@@ -687,7 +687,7 @@ $(function() {
 	}
 	
 	private function getModelName($class) {
-		$parts = explode('\\',$class::class);
+		$parts = explode('\\',get_class($class));
 		return array_pop($parts);
 	}
 	
