@@ -39,13 +39,16 @@ GO.form.ComboBoxMulti = function(config){
 		
 		this.on('render', function() {			
 			this.getEl().on('input', function(e) {				
-				this.el.dom.style.overflowY = 'hidden';
-        this.el.dom.style.height = dp(32) + "px";
-				if(this.el.dom.scrollHeight != this.el.dom.offsetHeight) {
-					
-					this.el.dom.style.height = this.el.dom.scrollHeight + "px";
-					
-					this.fireEvent('grow', this);
+				
+				if(this.el.dom.scrollHeight <= this.maxHeight) {
+					this.el.dom.style.overflowY = 'hidden';
+					this.el.dom.style.height = dp(32) + "px";
+					if(this.el.dom.scrollHeight != this.el.dom.offsetHeight) {
+
+						this.el.dom.style.height = this.el.dom.scrollHeight + "px";
+
+						this.fireEvent('grow', this);
+					}
 				}
       }, this);
 			
@@ -63,6 +66,8 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
 
 		//private
 		focused : false,
+		
+		maxHeight: 100,
 		
 		
 		// private
