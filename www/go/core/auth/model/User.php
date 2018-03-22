@@ -231,7 +231,9 @@ class User extends Entity {
 		if($hash === $this->recoveryHash) {
 			$this->passwordVerified = true;
 			$this->recoveryHash = null;
+			return true;
 		}
+		return false;
 	}
 	
 	private function validatePasswordChange() {		
