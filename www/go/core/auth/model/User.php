@@ -337,7 +337,7 @@ class User extends Entity {
 			->setBody(strtr(GO()->t('recoveryMailBody','core','lostpassword'),[
 				':displayName' => $this->displayName,
 				':username' => $this->username,
-				':resetLink' => \go\core\Environment::get()->getWebClientUrl().'#recover/'.$this->recoveryHash
+				':resetLink' => \go\core\Environment::get()->getWebClientUrl().'resetpassword?hash='.$this->recoveryHash
 			]), 'text/html');
 		
 		return $this->save() && $message->send();
