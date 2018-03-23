@@ -16,6 +16,11 @@ class CorrectionController extends AbstractController {
 		return array();
 	}
 	
+	protected function checkSecurityToken(){
+		return true;
+	}
+	
+	
 	protected function init() {
 		\GO::$disableModelCache=true; //for less memory usage
 		\GO::setMaxExecutionTime(0); //allow long runs		
@@ -77,8 +82,9 @@ class CorrectionController extends AbstractController {
 			}
 		}
 		echo "<p>The records below seems to be affected, please check the records you want to correct automatically and then click on \"CORRECT\".</p>";
-		$affectedEntriesSQL = 'SELECT h.id as ID, from_unixtime(h.ctime) as Created_at, user.username AS Username, ifnull(h.internal_fee,"null") as Timeentry_Internal, ifnull(h.external_fee,"null") as Timeentry_External, ifnull(r.internal_fee,"null") as Employee_Internal, ifnull(r.external_fee,"null") as Employee_External, ifnull(a.external_rate,"-") as Activity_External, ifnull(income_id,"No") as Invoiced ' 
+		$affectedEntriesSQL = 'SELECT h.id as ID, from_unixtime(h.ctime) as Created_at, user.username AS Username, project.name as Project, ifnull(h.internal_fee,"null") as Timeentry_Internal, ifnull(h.external_fee,"null") as Timeentry_External, ifnull(r.internal_fee,"null") as Employee_Internal, ifnull(r.external_fee,"null") as Employee_External, ifnull(a.external_rate,"-") as Activity_External, ifnull(income_id,"No") as Invoiced ' 
 		.'FROM `pr2_hours` h '
+		.'left join pr2_projects project on h.project_id=project.id '
 		.'left join pr2_resource_activity_rate a on a.activity_id=h.standard_task_id and a.employee_id=h.user_id and a.project_id=h.project_id '
 		.'inner join pr2_resources r on h.user_id=r.user_id AND h.project_id=r.project_id '
 		.'inner join go_users user on h.user_id=user.id '
