@@ -1,6 +1,7 @@
 go.links.CreateLinkWindow = Ext.extend(go.Window, {
 	entity: null,
 	entityId: null,
+	modal: true,
 	stateId: "go-create-link-windows",
 	search: function (v) {
 		
@@ -12,12 +13,14 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 			entities.push(r.data.entity);
 		}, this);
 
-		filter.push({entities: entities});
+		if(entities.length) { 
+			filter.push({entities: entities});
+		}
 
 		filter.push({q: this.searchField.getValue()});
 			
 		
-		this.store.load({
+		this.grid.store.load({
 			params: {
 				filter: filter
 			}
@@ -66,21 +69,9 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 				}]
 		});
 
-		this.store = new go.data.Store({
-			autoDestroy: true,
-			fields: ['id', 'entityId', 'entity', 'name', 'description', {name: 'modifiedAt', type: 'date'}],
-			entityStore: go.stores.Search,
-			autoLoad: true,
-			sortInfo: {
-				field: 'modifiedAt',
-				direction: 'DESC'
-			},
-			baseParams: {
-				filter: []
-			}
-		});
+		
 
-		this.grid = new go.grid.GridPanel({
+		this.grid = new go.links.LinkGrid({
 			cls: 'go-search-grid',
 			region: "center",
 			listeners: {
@@ -88,37 +79,7 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 					this.link();
 				},
 				scope: this
-			},
-			store: this.store,
-			columns: [
-				{
-					id: 'name',
-					header: t('Name'),
-					width: 75,
-					sortable: true,
-					dataIndex: 'name',
-					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
-						return '<i class="entity ' + record.data.entity + '"></i>' + value;
-					}
-				}, {
-
-					header: t('Type'),
-					width: 75,
-					sortable: false,
-					dataIndex: 'entity',
-					hidden: true
-				},
-				{
-					id: 'modifiedAt',
-					header: t('Modified at'),
-					width: 160,
-					sortable: true,
-					dataIndex: 'modifiedAt',
-					renderer: Ext.util.Format.dateRenderer(go.User.dateTimeFormat),
-					hidden: true
-				}
-			],
-			autoExpandColumn: 'name'
+			}
 		});
 		
 		this.entityGrid = new go.links.EntityGrid({

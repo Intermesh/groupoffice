@@ -366,14 +366,19 @@ a {
 		border-radius: $borderRadius;
 		transition: opacity 280ms $curve-standard;
 		opacity:1;
+		.x-form-trigger {
+			color: white;
+		}
 		&.x-hide-display {
 			opacity:0;
 			pointer-events: none;
 		}
-		i {
+		.x-btn {
 			position:absolute;
-			top: dp(8);
-			left: dp(8);
+			top: 0;
+			right: 0;
+			padding: 0;
+			margin: 0;
 		}
 		input {
 			width: 100%;
@@ -381,10 +386,15 @@ a {
 			background: none;
 			height: dp(40);
 			border:0;
-			padding:0 0 0 dp(56);
+			padding: 0 0 0 dp(8);
 		}
 	}
 	
+}
+
+.go-search-panel {
+	//border: 1px solid color($foreground, "line");
+	@extend .z24
 }
 
 @keyframes slide-top {
@@ -422,7 +432,7 @@ a {
 .card {
 	background-color: color($background, 'card');
 }
-.go-global-search {
+/*.go-global-search {
 	//width: 65%;
 	height: dp(40);
 	display:inline-block;
@@ -431,12 +441,12 @@ a {
 	right: 240px;
 	background-color: color($background, 'disabled-button');
 	border-radius: $borderRadius;
-	i {
+	.x-btn {
 		position:absolute;
 		top: dp(8);
 		left: dp(8);
 	}
-}
+}*/
 
 .go-paging-tb input {
 	min-height: dp(16);

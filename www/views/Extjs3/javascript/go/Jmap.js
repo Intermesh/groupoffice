@@ -68,7 +68,6 @@ go.Jmap = {
 	 * @returns {String}
 	 */
 	request: function (options) {
-		
 		if(!options.method) {
 			throw "method is required";
 		}

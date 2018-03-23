@@ -1,4 +1,4 @@
-Ext.ns('go.core.search');
+Ext.ns('go.modules.community.search');
 
 go.ModuleManager.register('search', {
 	//mainPanel: GO.notes.MainPanel,
@@ -6,77 +6,87 @@ go.ModuleManager.register('search', {
 	initModule: function () {
 
 		GO.mainLayout.on('render', function () {
-			
-			
-			var resultTpl = new Ext.XTemplate(
-       
-					'<tpl for="."><div class="x-combo-list-item">',
-						'<i class="entity {entity}"></i> <span>{name}</span>',
-        '</div>',
-				'</tpl>'
 
-    );
+			var container, searchField, searchContainer, panel;
+
+			var search = function () {
+				if (!panel) {
+					panel = new go.modules.community.search.Panel();
+					panel.render(Ext.getBody());
+					panel.on("collapse", function() {
+						searchField.setValue("");
+						searchContainer.hide();
+					});
+				}
+				panel.setWidth(searchField.getWidth());
+				panel.getEl().alignTo(searchField.getEl(), "tl-bl");
+				panel.search(searchField.getValue());
+			}
 			
-			new Ext.Container({
+			var dqTask = new Ext.util.DelayedTask(search);
+
+			container = new Ext.Container({
 				id: 'global-search-panel',
 				items: [{
 						xtype: 'button',
 						iconCls: 'ic-search',
 						tooltip: t("Search"),
 						handler: function () {
-							this.searchContainer.show();
-							this.searchField.focus();
+							searchContainer.show();
+							searchField.focus();
 						},
 						scope: this
 					},
-					this.searchContainer = new Ext.Container({
+					searchContainer = new Ext.Container({
 						hidden: true,
 						cls: 'search-field-wrap',
-						items: [{
-								xtype: 'component',
-								html: '<i class="icon">search</i>'
-							},
-							this.searchField = new Ext.form.ComboBox({
-								hideTrigger: true,
-								maxHeight: dp(1000),
-								getParams : function(q) {
-									var p = Ext.form.ComboBox.prototype.getParams.call(this, q);
-									
-									p.filter = [{
-										q: q
-									}]
-									
-									return p;
+						items: [
+							searchField = new Ext.form.TriggerField({
+								emptyText: t("Search"),
+								hideLabel: true,
+								anchor: "100%",
+								validationEvent: false,
+								validateOnBlur: false,
+								//trigger1Class: 'x-form-search-trigger',
+								triggerClass: 'x-form-clear-trigger',
+								enableKeyEvents: true,
+// private
+								
+//								onTrigger1Click: function () {
+//									search();
+//								},
+								onTriggerClick: function () {
+									this.setValue("");
+									search();
 								},
-								typeAHead: true,
-								editable: true,
-								valueField: 'id',
-								displayField: 'name',
-								tpl: resultTpl,
-//								itemSelector: 'div.search-item',
-								store: new go.data.Store({
-									fields: ['name', 'entity', 'entityId', 'modifiedAt'],
-									entityStore: go.stores.Search
-								}),
-								emptyText: t("Search") + '...',
 								listeners: {
-									scope: this,
-									blur: function (field) {
-										field.reset();
-										this.searchContainer.hide();
+									keyup : function() {
+										dqTask.delay(500);
 									},
-									select: function (cb, record, index) {
-										var e = go.entities[record.data.entity];
-										e.goto(record.data.entityId);
-										this.searchField.reset();
-										this.searchContainer.hide();
+									specialkey: function (field, e) {
+										switch (e.getKey()) {
+											case e.ENTER:
+												search();
+												break;
+											case e.DOWN:
+												if (panel.isVisible()) {
+													panel.grid.getSelectionModel().selectRow(0);
+													panel.grid.getView().focusRow(0);
+												}
+												break;
+										}
 									}
 								}
 							})
+
 						]})
 				],
 				renderTo: "search_query"
 			});
+
+
+
+
 		});
 
 	}

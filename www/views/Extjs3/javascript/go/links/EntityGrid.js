@@ -18,10 +18,8 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 		};
 		
 
-		Ext.apply(config, {
-			
-			tbar: [{xtype: "selectallcheckbox"}],
-			
+		Ext.apply(config, {			
+			tbar: [{xtype: "selectallcheckbox"}],			
 			store: new Ext.data.ArrayStore({
 				fields: ['entity', 'name'],
 				data: data

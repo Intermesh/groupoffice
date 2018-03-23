@@ -105,7 +105,7 @@
 .z23 {
   box-shadow: 0px 11px 14px -7px rgba(0, 0, 0, 0.2), 0px 23px 36px 3px rgba(0, 0, 0, 0.14), 0px 9px 44px 8px rgba(0, 0, 0, 0.12); }
 
-.z24, .x-shadow + .x-window, .x-window-proxy + .x-window, .x-panel-ghost, .x-window-proxy {
+.z24, .x-shadow + .x-window, .x-window-proxy + .x-window, .x-panel-ghost, .x-window-proxy, .go-search-panel {
   box-shadow: 0px 11px 15px -7px rgba(0, 0, 0, 0.2), 0px 24px 38px 3px rgba(0, 0, 0, 0.14), 0px 9px 46px 8px rgba(0, 0, 0, 0.12); }
 
 html {
@@ -8757,20 +8757,24 @@ a {
     border-radius: 2px;
     transition: opacity 280ms cubic-bezier(0.4, 0, 0.2, 1);
     opacity: 1; }
+    #search_query .search-field-wrap .x-form-trigger {
+      color: white; }
     #search_query .search-field-wrap.x-hide-display {
       opacity: 0;
       pointer-events: none; }
-    #search_query .search-field-wrap i {
+    #search_query .search-field-wrap .x-btn, #search_query .search-field-wrap .x-date-mp-btns button, .x-date-mp-btns #search_query .search-field-wrap button, #search_query .search-field-wrap .go-display-panel-browse {
       position: absolute;
-      top: 8px;
-      left: 8px; }
+      top: 0;
+      right: 0;
+      padding: 0;
+      margin: 0; }
     #search_query .search-field-wrap input {
       width: 100%;
       color: white;
       background: none;
       height: 40px;
       border: 0;
-      padding: 0 0 0 56px; }
+      padding: 0 0 0 8px; }
 
 @keyframes slide-top {
   0% {
@@ -8804,19 +8808,21 @@ a {
 .card {
   background-color: white; }
 
-.go-global-search {
-  height: 40px;
-  display: inline-block;
-  position: absolute;
-  left: 240px;
-  right: 240px;
-  background-color: rgba(0, 0, 0, 0.12);
-  border-radius: 2px; }
-  .go-global-search i {
-    position: absolute;
-    top: 8px;
-    left: 8px; }
-
+/*.go-global-search {
+	//width: 65%;
+	height: dp(40);
+	display:inline-block;
+	position:absolute;
+	left: 240px;
+	right: 240px;
+	background-color: color($background, 'disabled-button');
+	border-radius: $borderRadius;
+	.x-btn {
+		position:absolute;
+		top: dp(8);
+		left: dp(8);
+	}
+}*/
 .go-paging-tb input {
   min-height: 16px; }
 

@@ -37,6 +37,7 @@ go.data.JmapProxy = Ext.extend(Ext.data.HttpProxy, {
 		
 		// If a currently running read request is found, abort it
 		if (action == Ext.data.Api.actions.read && this.activeRequest[action]) {
+			console.trace();
 				go.Jmap.abort(this.activeRequest[action]);
 		}
 		this.activeRequest[action] = me.getItemList(this.entityStore.entity.name + "/query", params, function (getItemListResponse) {
