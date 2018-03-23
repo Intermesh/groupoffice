@@ -177,11 +177,7 @@ Ext.extend(GO.bookmarks.BookmarksDialog, Ext.Window,{
 				value:'http://',
 				allowBlank: false,
 				validator: function(value) {
-					// The following allows also URLs like 'https://wiki:username@wiki.mydomain.org'
-//					var urlRegexp = /(((^https?)|(^ftp)):\/\/(([\-\w]+\.)+\w{2,3}(\/[%\-\w]+(\.\w{2,})?)*(([\w\-\.\?\\\/+@&#;`~=%!]*)(\.\w{2,})?)*\/?)|([\-\w]+\:)+([\-\w]+\@)+([\-\w]+\.)+\w{2,3}(\/[%\-\w]+(\.\w{2,})?)*(([\w\-\.\?\\\/+@&#;`~=%!]*)(\.\w{2,})?)*\/?)/i;
-					// The following also accepts: http://intranet/foo/bar
-					var urlRegexp = /(((^https?)|(^ftp)):\/\/(\w{2,3}(\/[%\-\w]+(\.\w{2,})?)*(([\w\-\.\?\\\/+@&#;`~=%!]*)(\.\w{2,})?)*\/?)|([\-\w]+\:)+([\-\w]+\@)+([\-\w]+\.)+\w{2,3}(\/[%\-\w]+(\.\w{2,})?)*(([\w\-\.\?\\\/+@&#;`~=%!]*)(\.\w{2,})?)*\/?)/i;
-					
+					var urlRegexp = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/;
 					return urlRegexp.test(value);
 				},
 				listeners:{
