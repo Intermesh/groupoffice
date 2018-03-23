@@ -28,6 +28,7 @@ class UserSettings extends Property {
 	public $reminder;
 	public $show_statuses;
 	public $check_conflict;
+	public $user_id;
 
 	protected static function defineMapping() {
 		return parent::defineMapping()->addTable("cal_settings", "cals");

@@ -26,7 +26,8 @@ class UserSettings extends Property {
 	public $reminder_time;
 	public $remind;
 	public $default_tasklist_id;
-
+	public $user_id;
+	
 	protected static function defineMapping() {
 		return parent::defineMapping()->addTable("ta_settings", "tas");
 	}

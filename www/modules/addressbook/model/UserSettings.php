@@ -18,9 +18,10 @@ use go\core\orm\Property;
  * @copyright Copyright Intermesh BV.
  * @author Michael de Hart mdhart@intermesh.nl
  *
- * @property int $user_id
  */
 class UserSettings extends Property {
+	
+	public $user_id;
 
 	public $default_addressbook_id;
 
