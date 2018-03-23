@@ -60,14 +60,19 @@ go.ModuleManager.register('search', {
 									search();
 								},
 								listeners: {
-									keyup : function() {
-										dqTask.delay(500);
+									keyup : function(field, e) {
+										if(e.getKey() != e.ESC) {
+											dqTask.delay(500);
+										}
 									},
 									specialkey: function (field, e) {
 										switch (e.getKey()) {
-											case e.ENTER:
-												search();
-												break;
+											case e.ESC:
+												panel.collapse();
+//											
+//											case e.ENTER:
+//												search();
+//												break;
 											case e.DOWN:
 												if (panel.isVisible()) {
 													panel.grid.getSelectionModel().selectRow(0);
