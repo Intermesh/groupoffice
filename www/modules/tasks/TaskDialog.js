@@ -27,6 +27,7 @@ GO.tasks.TaskDialog = function() {
 		layout : 'fit',
 		modal : false,
 		resizable : true,
+		stateId: 'task-dialog',
 		width : dp(640),
 		height : dp(560),
 		closeAction : 'hide',
@@ -61,6 +62,9 @@ GO.tasks.TaskDialog = function() {
 
 Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 
+	isVisible : function() {
+		return this.win.isVisible();
+	},
 	
 	show : function(config) {
 
@@ -240,7 +244,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 				GO.dialog.TabbedFormDialog.prototype.refreshActiveDisplayPanels.call(this);
 
 				if (hide) {
-					this.win.hide();
+					this.win[this.win.closeAction]();
 				}
 			},
 			failure : function(form, action) {

@@ -117,7 +117,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			maximizable:true,
 			width : dp(672),
 			height : dp(672),
-			id:'calendar_event_dialog',
+			stateId:'calendar_event_dialog',
 			closeAction : 'hide',
 			title : t("Appointment", "calendar"),
 			items : this.formPanel,
@@ -535,7 +535,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 				if(action.result.feedback){
 					Ext.MessageBox.alert(t("Error"), action.result.feedback);
 				}else	if (hide) {
-					this.win.hide();
+					this.win[this.win.closeAction]();
 				}
 
 				if (config && config.callback) {

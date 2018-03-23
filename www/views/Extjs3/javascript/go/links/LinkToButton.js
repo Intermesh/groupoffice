@@ -69,9 +69,7 @@ go.links.LinkToButton = Ext.extend(Ext.Button, {
 						window.show();
 					}
 					
-					window.on('save', function (window, entity) {
-						
-						console.log(this);
+					window.on('save', function (window, entity) {						
 						
 						//hack for event dialog because save event is different
 						if(i.entity == "Event") {

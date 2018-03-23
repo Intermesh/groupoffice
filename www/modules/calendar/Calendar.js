@@ -2145,7 +2145,7 @@ go.ModuleManager.register('calendar', {
 	initModule: function () {	
 		go.Links.registerLinkToWindow("Event", function() {
 			var win = new GO.calendar.EventDialog();
-			win.closeAction = "close";
+			win.win.closeAction = "close";
 			return win;
 		});
 	}

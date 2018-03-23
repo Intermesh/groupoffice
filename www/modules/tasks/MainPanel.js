@@ -557,7 +557,7 @@ go.ModuleManager.register('tasks', {
 	initModule: function () {	
 		go.Links.registerLinkToWindow("Task", function(entity, entityId) {
 			var win = new GO.tasks.TaskDialog();
-			win.closeAction = "close";
+			win.win.closeAction = "close";
 			return win;
 		});
 	}
