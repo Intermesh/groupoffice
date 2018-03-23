@@ -74,6 +74,8 @@ go.modules.community.search.Panel = Ext.extend(Ext.Panel, {
 
 		filter.push({q: q});
 		
+		this.grid.store.removeAll();
+		
 		this.grid.store.load({
 			params: {
 				filter: filter
