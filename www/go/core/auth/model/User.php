@@ -195,12 +195,14 @@ class User extends Entity {
 	}
 		
 	/**
-	 * Check if the password is correct for this user.
+	 * Checks if the given password matches the password in the core_auth_password table.
+	 * 
+	 * This function should probably be in a "password" property.
 	 * 
 	 * @param string $password
 	 * @return boolean 
 	 */
-	public function checkPassword($password) {		
+	public function checkPasswordTable($password) {		
 		$this->passwordVerified = password_verify($password, $this->password);
 		
 		if($this->passwordVerified){
@@ -209,12 +211,33 @@ class User extends Entity {
 		return $this->passwordVerified;
 	}
 	
+	/**
+	 * Check if the password is correct for this user.
+	 * 
+	 * @param string $password
+	 * @return boolean 
+	 */
+	public function checkPassword($password) {		
+		
+		foreach($this->getAuthenticationMethods() as $method) {
+			$authenticator = $method->getAuthenticator();
+			if (!($authenticator instanceof \go\core\auth\PrimaryAuthenticator)) {
+				continue;
+			}
+			
+			$this->passwordVerified = $authenticator->authenticate($this->username, $password);
+			break;
+		}	
+		
+		return $this->passwordVerified;
+	}
+	
 	private $plainPassword;
 
 	public function setPassword($password) {
 		$this->plainPassword = $password;		
 		
-	}
+	}	
 
 	private function updateDigest() {
 		$digest = md5($this->username . ":" . self::DIGEST_REALM . ":" . $this->password);

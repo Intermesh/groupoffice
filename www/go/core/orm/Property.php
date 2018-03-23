@@ -96,12 +96,19 @@ abstract class Property extends Model {
 		}
 
 		$this->fetchProperties = $fetchProperties;
+		
+		if($this->isNew) {
+			//make sure default values of the database are tracked as modifications. 
+			//Otherwise the save function may think nothing needs to be inserted.
+			$this->trackModifications();
+		}
+		
 		$this->initDatabaseColumns($this->isNew);
+		
 		if (!$this->isNew) {			
 			$this->initRelations();
+			$this->trackModifications();
 		}
-
-		$this->setOldProps();
 
 		$this->init();
 	}
@@ -164,9 +171,9 @@ abstract class Property extends Model {
 	}
 	
 	/**
-	 * Keeps a copy of original values of database properties
+	 * Copies all properties so isModified() can detect changes.
 	 */
-	private function setOldProps() {
+	private function trackModifications() {
 		foreach ($this->getMapping()->getTables() as $table) {
 			foreach ($table->getColumns() as $colName => $column) {
 				if (in_array($colName, static::getPropNames())) {
@@ -676,12 +683,9 @@ abstract class Property extends Model {
 		
 		$modifiedForTable = $this->extractModifiedForTable($table, $modified);
 
-//		//TODO discuss:
-//		//User has a secondary password table that may be left empty. But this is kind of hacky code:
-//		//if there are no modifications and it's not the primary table then we can skip it.
-//		if (empty($modifiedForTable) && $table != array_shift($this->getMapping()->getTables())) {
-//			return true;
-//		}		
+		if (empty($modifiedForTable)) {
+			return true;
+		}		
 		
 		try {
 			if ($this->recordIsNew($table)) {				
@@ -781,7 +785,7 @@ abstract class Property extends Model {
 
 		$this->savedPropertyRelations = [];
 		$this->isNew = false;
-		$this->setOldProps();
+		$this->trackModifications();
 
 
 		return true;

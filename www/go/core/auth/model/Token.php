@@ -268,7 +268,6 @@ class Token extends Entity {
 			$methods[] = $method;
 		
 			$this->passedMethods = trim(implode('|',$methods),'|');
-			return $this->save();
 		}
 		return true;
 	}
