@@ -1,3 +1,8 @@
+- Added tool to recognize external fees on time entries that are probably not correct.
+	The tool can be accessed by going to the url: http(s)://{your_go_url}?r=correction/TimeregistrationExternalFee
+	Note: Only users that are part of the admin group can access this page.
+
+
 22-03-2018 6.2.88
 - Time entry bug with internal fee instead of external fee
 
