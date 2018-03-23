@@ -4,6 +4,7 @@
 - Addressbook: Fixed issue that addresslists where not ordered alphabetically in the grouped list anymore
 - Tickets: Fixed issue that the filter on the external ticket page did not work anymore.
 - Tickets: Fixed problem with loading files for tickets
+- Bookmarks: Changed regular expression to check for a valid URL
 
 22-03-2018 6.2.88
 - Time entry bug with internal fee instead of external fee
