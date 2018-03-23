@@ -291,7 +291,7 @@ abstract class Property extends Model {
 			return $this->$setter($value);
 		}
 		
-		if(static::getMapping()->hasProperty($name)) {
+		if(static::getMapping()->getRelation($name)) {			
 			$this->dynamicProperties[$name] = $value;
 		} else
 		{
