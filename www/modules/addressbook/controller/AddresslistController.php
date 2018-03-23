@@ -38,7 +38,12 @@ class AddresslistController extends \GO\Base\Controller\AbstractModelController 
 		
 		$storeParams->getCriteria()->addCondition('level', $params['permissionLevel'],'>=','go_acl');
 		$storeParams->joinRelation('addresslistGroup','LEFT');
-		$storeParams->order(array('addresslistGroupName','name'),array('ASC','ASC'));
+		
+		// Sorting (First on Group, then on name or posted column
+		$sortColumn = isset($params['sort'])?$params['sort']:'name';
+		$sortDir = isset($params['dir'])?$params['dir']:'ASC';
+		$storeParams->order(array('addresslistGroupName',$sortColumn),array('ASC',$sortDir));
+
 		$storeParams->select('t.*,COALESCE(addresslistGroup.name,"'.\GO::t('strDefault').'") AS addresslistGroupName');
 	}
 
