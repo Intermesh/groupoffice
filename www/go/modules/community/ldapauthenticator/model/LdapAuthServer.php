@@ -15,6 +15,23 @@ class LdapAuthServer extends Entity {
 	public $peopleDN = "";
 	public $groupsDN = "";
 	
+	
+	public $imapHostname;
+	public $imapPort;
+	public $imapEncryption;
+	
+	public $imapValidateCertificate = true;
+
+	public $removeDomainFromUsername = false;
+
+	public $smtpHostname;
+	public $smtpPort;
+	public $smtpPassword;
+	public $smtpUseUserCredentials= false;
+	public $smtpValidateCertificate = true;
+	public $smtpEncryption;
+	
+	
 	/**
 	 * Users must login with their full e-mail address. The domain part will be used
 	 * to lookup this server profile.
@@ -43,5 +60,10 @@ class LdapAuthServer extends Entity {
 		$uri .= $this->hostname . ':' .$this->port;
 		
 		return $uri;
+	}
+	
+	
+	public function hasEmailAccount() {
+		return $this->imapHostname != null;
 	}
 }

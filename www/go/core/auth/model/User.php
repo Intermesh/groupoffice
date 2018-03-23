@@ -120,7 +120,7 @@ class User extends Entity {
 	
 	public $list_separator;
 	public $text_separator;
-	private $files_folder_id;
+	protected $files_folder_id;
 	public $disk_quota;
 	public $disk_usage;
 	
@@ -131,7 +131,7 @@ class User extends Entity {
 	public $sort_email_Addresses_by_time;
 	public $no_reminders;
 	
-	private $last_password_change;
+	protected $last_password_change;
 	public $force_password_change;
 	
 	

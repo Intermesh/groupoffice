@@ -4,6 +4,9 @@ namespace go\modules\community\ldapauthenticator\model;
 use Exception;
 use go\core\auth\model\User;
 use go\core\auth\PrimaryAuthenticator;
+use go\core\ldap\Connection;
+use go\core\ldap\Record;
+use GO\Email\Model\Account;
 
 /**
  * LDAP Authenticator
@@ -47,7 +50,7 @@ class Authenticator extends PrimaryAuthenticator {
 		
 		$server = $this->findServer($username);
 		
-		$connection = new \go\core\ldap\Connection();
+		$connection = new Connection();
 		if(!$connection->connect($server->getUri())) {
 			throw new \Exception("Could not connect to LDAP server");
 		}
@@ -56,8 +59,8 @@ class Authenticator extends PrimaryAuthenticator {
 				throw new \Exception("Couldn't enable TLS");
 			}
 		}
-		
-		$record = \go\core\ldap\Record::find($connection, $server->peopleDN, $server->usernameAttribute . "=" . explode('@', $username)[0])->fetch();
+		$ldapUsername = explode('@', $username)[0];
+		$record = Record::find($connection, $server->peopleDN, $server->usernameAttribute . "=" . $ldapUsername)->fetch();
 		
 		if(!$record) {
 			return false;
@@ -72,11 +75,15 @@ class Authenticator extends PrimaryAuthenticator {
 			$user = $this->createUser($username, $record);
 		}
 		
+		if($server->hasEmailAccount()) {
+			$this->setEmailAccount($ldapUsername, $password, $username, $server, $user);
+		}
+		
 		return $user;
 	
 	}	
 	
-	private function createUser($email, \go\core\ldap\Record $record) {
+	private function createUser($email, Record $record) {
 		$user = new User();
 		$user->displayName = $record->cn[0];
 		$user->username = $email;
@@ -88,6 +95,73 @@ class Authenticator extends PrimaryAuthenticator {
 		}
 		
 		return $user;
+	}
+	
+	
+	private function setEmailAccount($username, $password, $email, LdapAuthServer $server, User $user) {
+		
+		if(!$user->hasModule('email')) {
+			return;
+		}
+		
+		//old framework code here		
+		$accounts = Account::model()->findByAttributes(array(
+					'host' => $server->imapHostname,
+					'username' => $username
+							))->fetchAll();
+		
+		$foundForUser = false;
+		foreach($accounts as $account) {
+			if($account->user_id == $user->id) {
+				$foundForUser = true;
+				break;
+			}
+		}
+		
+		if(!$foundForUser) {
+			$account = new Account();
+			$account->user_id = $user->id;
+			$account->host = $server->imapHostname;
+			$account->port = $server->imapPort;
+			$account->username = $username;
+			$account->password = $password;
+			
+			$account->imap_encryption = $server->imapEncryption;
+			$account->imap_allow_self_signed = !$server->imapValidateCertificate;
+			$account->smtp_allow_self_signed = !$server->imapValidateCertificate;
+			$account->smtp_username = $server->smtpUsername;
+			$account->smtp_password = $server->smtpPassword;
+			$account->smtp_host = $server->smtpHostname;
+			$account->smtp_port = $server->smtpPort;
+			$account->smtp_encryption = $server->smtpEncryption;
+			
+			//$account->mbroot = ??
+			
+			$accounts = [$account];
+			
+		}
+		
+		foreach($accounts as $account) {
+			$account->checkImapConnectionOnSave = false;
+			
+			$account->password = $password;			
+			
+			if($server->smtpUseUserCredentials) {				
+				$account->smtp_username = $username;
+				$account->smtp_password = $password;
+			}
+			
+			$wasNew = $account->getIsNew();
+			
+			if(!$account->save(true)){
+				throw new \Exception("Could not save e-mail account: ".implode("\n", $account->getValidationErrors()));				
+			}
+			
+			if($wasNew) {
+				$account->addAlias($email, $user->displayName);
+			}
+		}
+		
 	}
 
 }
