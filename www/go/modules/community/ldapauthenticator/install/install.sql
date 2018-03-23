@@ -1,24 +1,3 @@
--- phpMyAdmin SQL Dump
--- version 4.6.6deb4
--- https://www.phpmyadmin.net/
---
--- Host: localhost:3306
--- Gegenereerd op: 23 mrt 2018 om 10:38
--- Serverversie: 10.1.26-MariaDB-0+deb9u1
--- PHP-versie: 7.0.27-0+deb9u1
-
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- Database: `intermesh_group_office_com`
---
 
 -- --------------------------------------------------------
 
@@ -34,7 +13,7 @@ CREATE TABLE `ldapauth_server` (
   `usernameAttribute` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'uid',
   `peopleDN` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ou=people,dc=example,dc=com',
   `groupsDN` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT 'ou=groups,dc=example,dc=com',
-	`imapHostname` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `imapHostname` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `imapPort` int(11) NOT NULL DEFAULT '143',
   `imapEncryption` enum('tls','ssl') COLLATE utf8mb4_unicode_ci DEFAULT 'tls',
   `imapValidateCertificate` tinyint(1) NOT NULL DEFAULT '1',
@@ -52,10 +31,7 @@ CREATE TABLE `ldapauth_server` (
 -- Gegevens worden geëxporteerd voor tabel `ldapauth_server`
 --
 
-INSERT INTO `ldapauth_server` (`id`, `hostname`, `port`, `encryption`, `usernameAttribute`, `peopleDN`, `groupsDN`) VALUES
-(1, '10.0.2.2', 32769, NULL, 'uid', 'ou=people,dc=planetexpress,dc=com', '');
-
--- --------------------------------------------------------
+------------------------------------------------------
 
 --
 -- Tabelstructuur voor tabel `ldapauth_server_domain`
@@ -71,8 +47,23 @@ CREATE TABLE `ldapauth_server_domain` (
 -- Gegevens worden geëxporteerd voor tabel `ldapauth_server_domain`
 --
 
-INSERT INTO `ldapauth_server_domain` (`id`, `serverId`, `name`) VALUES
-(1, 1, 'ldap.localhost');
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `ldapauth_server_group`
+--
+
+CREATE TABLE `ldapauth_server_group` (
+  `serverId` int(11) NOT NULL,
+  `groupId` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Gegevens worden geëxporteerd voor tabel `ldapauth_server_group`
+--
+
+
 
 --
 -- Indexen voor geëxporteerde tabellen
@@ -90,6 +81,13 @@ ALTER TABLE `ldapauth_server`
 ALTER TABLE `ldapauth_server_domain`
   ADD PRIMARY KEY (`id`),
   ADD KEY `serverId` (`serverId`);
+
+--
+-- Indexen voor tabel `ldapauth_server_group`
+--
+ALTER TABLE `ldapauth_server_group`
+  ADD PRIMARY KEY (`serverId`,`groupId`),
+  ADD KEY `groupId` (`groupId`);
 
 --
 -- AUTO_INCREMENT voor geëxporteerde tabellen
@@ -114,6 +112,13 @@ ALTER TABLE `ldapauth_server_domain`
 --
 ALTER TABLE `ldapauth_server_domain`
   ADD CONSTRAINT `ldapauth_server_domain_ibfk_1` FOREIGN KEY (`serverId`) REFERENCES `ldapauth_server` (`id`) ON DELETE CASCADE;
+
+--
+-- Beperkingen voor tabel `ldapauth_server_group`
+--
+ALTER TABLE `ldapauth_server_group`
+  ADD CONSTRAINT `ldapauth_server_group_ibfk_1` FOREIGN KEY (`serverId`) REFERENCES `ldapauth_server` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `ldapauth_server_group_ibfk_2` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

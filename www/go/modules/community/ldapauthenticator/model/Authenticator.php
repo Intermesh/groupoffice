@@ -75,6 +75,15 @@ class Authenticator extends PrimaryAuthenticator {
 			$user = $this->createUser($username, $record);
 		}
 		
+		foreach($server->groups as $group) {
+			$user->addGroup($group->groupId);
+		}
+		if($user->isModified()) {
+			if(!$user->save()) {
+				throw new \Exception("Could not save user");
+			}
+		}
+		
 		if($server->hasEmailAccount()) {
 			$this->setEmailAccount($ldapUsername, $password, $username, $server, $user);
 		}

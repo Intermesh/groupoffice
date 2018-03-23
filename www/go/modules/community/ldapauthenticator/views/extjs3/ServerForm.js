@@ -229,7 +229,24 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.FormWindo
 						name: 'smtpValidateCertificate',
 						checked: true
 					}]
-			})
+			}), {
+				xtype: 'fieldset',
+				title: t("User options", "ldapauthenticator"),
+				items: [
+					new go.form.multiselect.Field({
+						hint: t("Users will automatically be added to these groups", "ldapauthenticator"),
+						name: "groups",
+						idField: "groupId",
+						displayField: "name",
+						entityStore: go.stores.Group,
+						
+						fieldLabel: t("Groups"),
+						storeBaseParams:{
+							filter: [{"includeUsers" : false}]
+						}
+					})
+				]
+			}
 		];
 	}
 });
