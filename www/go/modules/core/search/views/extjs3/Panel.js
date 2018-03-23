@@ -1,5 +1,5 @@
 go.modules.community.search.Panel = Ext.extend(Ext.Panel, {
-
+	lastQ: "",
 	initComponent: function () {
 
 
@@ -25,19 +25,16 @@ go.modules.community.search.Panel = Ext.extend(Ext.Panel, {
 		});
 
 		this.entityGrid.getSelectionModel().on('selectionchange', function (sm) {
-			this.search();
+			this.search(this.lastQ);
 		}, this, {buffer: 1}); //add buffer because it clears selection first
 
 		Ext.apply(this, {
 			cls: "go-search-panel",
-
 			layout: 'border',
 			floating: true,
 			frame: true,
 			collapsed: true,
-			items: [this.entityGrid, this.grid]
-			
-			
+			items: [this.entityGrid, this.grid]			
 		});
 
 		go.modules.community.search.Panel.superclass.initComponent.call(this);
@@ -63,6 +60,8 @@ go.modules.community.search.Panel = Ext.extend(Ext.Panel, {
 	},
 	
 	search: function (q) {
+		
+		this.lastQ = q;
 		var filter = [], entities = [];
 		
 		Ext.each(this.entityGrid.getSelectionModel().getSelections(), function (r) {
