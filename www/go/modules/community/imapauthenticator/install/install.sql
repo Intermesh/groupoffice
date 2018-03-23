@@ -94,3 +94,4 @@ ALTER TABLE `imapauth_server_domain`
 ALTER TABLE `imapauth_server_domain`
   ADD CONSTRAINT `imapauth_server_domain_ibfk_1` FOREIGN KEY (`serverId`) REFERENCES `imapauth_server` (`id`) ON DELETE CASCADE;
 
+ALTER TABLE `imapauth_server_group` ADD FOREIGN KEY (`serverId`) REFERENCES `imapauth_server`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT; ALTER TABLE `imapauth_server_group` ADD FOREIGN KEY (`groupId`) REFERENCES `core_group`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
