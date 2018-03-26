@@ -4,7 +4,7 @@ return array (
   'Send' => 'Senden',
   'Login' => 'Einloggen',
   'New password request' => 'Neues Kennwort angefordert',
-  'recoveryMailBody' => '%s,
+  'recoveryMailBody' => 'Sehr geehrter %s,
 Sie haben für %s ein neues Kennwort angefordert? Ihr Benutzername ist "%s".
 Klicken Sie auf den folgenden Link (oder kopieren Sie diesen in die Adresszeile Ihres Browsers), wenn Sie Ihr Kennwort ändern möchten:
 

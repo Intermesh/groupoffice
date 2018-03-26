@@ -4,13 +4,12 @@ return array (
   'Send' => 'Verzenden',
   'Login' => 'Inloggen',
   'New password request' => 'Aanvraag voor nieuw wachtwoord',
-  'recoveryMailBody' => 'Beste :displayName,<br>
-<br>
-U heeft uw gebruikersnaam of wachtwoord voor <b>:username</b> opgevraagd.<br>
-Via onderstaande link kunt u uw wachtwoord herstellen:<br>
-<br>
-<a href=":resetLink">Wachtwoord herstellen</a><br>
-<br>
+  'recoveryMailBody' => 'Beste %s,
+U heeft uw gebruikersnaam of wachtwoord voor %s vanaf ip-address: {ip_address}. Uw gebruikersnaam is "%s".
+Via onderstaande link kunt u uw wachtwoord herstellen:
+
+%s
+
 Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'Could not find the supplied e-mail address.' => 'Kon het opgegeven e-mail adres niet vinden..',
   'An e-mail with instructions has been sent to your e-mail address.' => 'Een e-mail met instructies is naar uw e-mail adres verzonden.',

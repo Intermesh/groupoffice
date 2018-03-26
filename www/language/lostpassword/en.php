@@ -1,6 +1,6 @@
 <?php
 return array (
-	 'recoveryMailBody' => '%s,
+	 'recoveryMailBody' => 'Dear %s,
 You requested a new password for %s from ip-address: {ip_address}. Your username is "%s".
 Click at the link below (or paste it in a browser) to change your password:
 
