@@ -355,14 +355,14 @@ class User extends Entity {
 		$this->recoveryHash = bin2hex(random_bytes(20));
 		$this->recoverySendAt = new \DateTime();
 		
-		$siteTitle=GO::config()->title;
+		$siteTitle=\GO()->getSettings()->title;
 		$url = \go\core\Environment::get()->getWebClientUrl().'resetpassword?hash='.$this->recoveryHash;
-		$emailBody = GO()->t('recoveryMailBody','core','lostpassword');
+		$emailBody = \GO()->t('recoveryMailBody','core','lostpassword');
 		$emailBody = sprintf($emailBody,$this->displayName, $siteTitle, $this->username, $url);
 		$emailBody = str_replace('{ip_address}', \GO\Base\Util\Http::getClientIp() , $emailBody);
 		
-		$message = GO()->getMailer()->compose()	  
-			->setFrom(GO()->getSettings()->systemEmail, GO()->getSettings()->title)
+		$message = \GO()->getMailer()->compose()	  
+			->setFrom(\GO()->getSettings()->systemEmail, $siteTitle)
 			->setTo(!empty($to) ? $to : $this->recoveryEmail, $this->displayName)
 			->setSubject(GO()->t('Lost password','core','lostpassword'))
 			->setBody($emailBody);
