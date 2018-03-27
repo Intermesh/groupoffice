@@ -65,3 +65,5 @@ GO.form.SelectCountry = function(config){
 }
  
 Ext.extend(GO.form.SelectCountry, Ext.form.ComboBox);
+
+Ext.reg("selectcountry", GO.form.SelectCountry);

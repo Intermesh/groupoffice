@@ -52,7 +52,7 @@ go.login.LoginPanel = Ext.extend(Ext.Container, {
 
 				if (GO.settings.config.login_message) {
 					go.notifier.msg({
-						title: t("warning"), description: GO.settings.config.login_message
+						description: GO.settings.config.login_message
 					});
 				}
 			}, 1000); // 1 second delay for groupoffice loading

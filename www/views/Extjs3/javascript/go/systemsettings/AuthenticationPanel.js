@@ -3,7 +3,21 @@ go.systemsettings.AuthenticationPanel = Ext.extend(Ext.Panel, {
 		Ext.apply(this, {
 			title: t('Authentication'),
 			autoScroll: true,
-			iconCls: 'ic-lock'			
+			iconCls: 'ic-lock',
+			items: [{
+					xtype:"fieldset",
+					title: t("Password"),
+					items: [
+						{
+							xtype:"numberfield",
+							fieldLabel: t("Minimum length"),
+							name: "passwordMinLength",
+							decimals: 0,
+							value: 6,
+							width: dp(30)
+						}
+					]
+			}]
 		});
 
 		go.systemsettings.AuthenticationPanel.superclass.initComponent.call(this);

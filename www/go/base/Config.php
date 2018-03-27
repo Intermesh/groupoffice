@@ -53,6 +53,7 @@ class Config extends Observable{
  * By default it is set to true, so then the field will be cleared in the duplicate item.
  * When set to false, the value of the original will be copied to the duplicated version.
  * 
+ * @deprecated
  * @var boolean 
  */
 var $billing_clear_payment_method_on_duplicate = true;	
@@ -60,6 +61,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 /**
  * Enable this Group-Office installation?
  *
+ * @deprecated Block non admin logins
  * @var     StringHelper
  * @access  public
  */
@@ -69,6 +71,8 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * Enable sending system emails with an email account from the email module
 	 * Needs to be the id of the wanted mail account
 	 *
+	 * @deprecated Used in tickets now but perhaps create settings there if needed.
+	 * 
 	 * @var int
 	 */
 	var $smtp_account_id = false;
@@ -78,6 +82,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * Note: this only works when a mailaccount is used to send the system emails
 	 *			 (Please see: $smtp_account_id)
 	 *
+	 * @depcreated Do we need this?
 	 * @var boolean
 	 */
 	var $smtp_account_smime_sign = false;
@@ -93,6 +98,9 @@ var $billing_clear_payment_method_on_duplicate = true;
 	var $smtp_account_smime_password = "";
 
 	/**
+	 * 
+	 * @deprecated We'll cache the headers
+	 * 
 	 * @var Set the client side sort of imap to receive all messages with the DATE or R_DATE flag.
 	 * If set to false (Default) then it will use the sort key 'ARRIVAL'
 	 * Usually done when client_side_sort is used in combination with an Microsoft Exchange Server.
@@ -112,6 +120,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * /home/groupoffice/log/debug.log and will use uncompressed javascripts.
 	 * You can also enable this as admin in Group-Office by pressing CTRL+F7.
 	 *
+	 * @deprecated Is in system settings
 	 * @var     bool
 	 * @access  public
 	 */
@@ -121,6 +130,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Enable display_errors = on for php
 	 *
+	 * @deprecated Never diplay errors
 	 * @var boolean
 	 */
 	public $debug_display_errors=false;
@@ -137,6 +147,8 @@ var $billing_clear_payment_method_on_duplicate = true;
 	
 	/**
 	 * Just enable the debug log.
+	 * 
+	 * @deprecated
 	 * @var bool
 	 */
 	var $debug_log = false;
@@ -144,6 +156,8 @@ var $billing_clear_payment_method_on_duplicate = true;
 	
 	/**
 	 * To show a message on the login page
+	 * 
+	 * @deprecated is in system settings
 	 * @var String 
 	 */
 	var $login_message = false;
@@ -153,6 +167,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * Option to make sure all outgoing emails will be send to the given email address.
 	 * This is useful when debugging Group-Office and when you don't want to send unwanted emails to active customers.
 	 * 
+	 * @deprecated is in system settings
 	 * @var string 
 	 */
 	var $debug_email = "";
@@ -162,6 +177,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * Set the number of days the database log will contain until it will be dumped to a CSV file on disk.
 	 * The log module must be installed.
 	 *
+	 * @deprecated Should be in log module settings
 	 * @var int
 	 */
 	var $log_max_days=14;
@@ -169,6 +185,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Enable FirePhp
 	 *
+	 * @deprecated 
 	 * @var bool
 	 * @access  public
 	 */
@@ -177,6 +194,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Info log location. Disabled when left empty.
 	 *
+	 * @deprecated move to new module
 	 * @var bool
 	 */
 	var $info_log = "";
@@ -201,6 +219,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Default language
 	 *
+	 * @deprecated is in system settings
 	 * @var     StringHelper
 	 * @access  public
 	 */
@@ -209,6 +228,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Default country
 	 *
+	 * @deprecated is in system settings
 	 * @var     StringHelper
 	 * @access  public
 	 */
@@ -218,6 +238,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Default VAT percentage
 	 *
+	 * @deprecated Should move to billing
 	 * @var     StringHelper
 	 * @access  public
 	 */
@@ -226,6 +247,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Default timezone
 	 *
+	 * @deprecated is in system settings
 	 * @var     StringHelper
 	 * @access  public
 	 */
@@ -242,6 +264,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Default date format
 	 *
+	 *  @deprecated is in system settings
 	 * @var     StringHelper
 	 * @access  public
 	 */
@@ -250,6 +273,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Default date separator
 	 *
+	 *  @deprecated is in system settings
 	 * @var     StringHelper
 	 * @access  public
 	 */
@@ -266,6 +290,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Default name formatting and sorting. Can be last_name or first_name
 	 *
+	 * @deprecated Should move to address book
 	 * @var     StringHelper
 	 * @access  public
 	 */
@@ -275,6 +300,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Default first day of the week 0=sunday 1=monday
 	 *
+	 * @deprecated Should move to address book
 	 * @var     StringHelper
 	 * @access  public
 	 */
@@ -495,6 +521,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * Title of Group-Office
 	 *
+	 * @deprecated Is in system settings
 	 * @var     StringHelper
 	 * @access  public
 	 */
@@ -503,6 +530,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * The e-mail of the webmaster
 	 *
+	 * @deprecated Is in system settings
 	 * @var     StringHelper
 	 * @access  public
 	 */
@@ -511,6 +539,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/**
 	 * The no-reply e-mail which will be used to send system messages
 	 *
+	 * @deprecated Is in system settings
 	 * @var     StringHelper
 	 * @access  public
 	 */
@@ -518,7 +547,9 @@ var $billing_clear_payment_method_on_duplicate = true;
 
 	/**
 	 * The path to the root of Group-Office with trailing slash.
-	 *
+	 * 
+	 * @deprecated Auto detected
+	 * 
 	 * @var     StringHelper
 	 * @access  public
 	 */
@@ -1596,6 +1627,11 @@ var $billing_clear_payment_method_on_duplicate = true;
 		$this->smtp_username = GO()->getSettings()->smtpUsername;
 		$this->smtp_password = GO()->getSettings()->smtpPassword;
 		$this->smtp_encryption = GO()->getSettings()->smtpEncryption;
+		$this->debug_email = GO()->getSettings()->debugEmail;
+		
+		$this->password_min_length = GO()->getSettings()->passwordMinLength;
+		
+		$this->login_message = GO()->getSettings()->loginMessage;
 	}
 
 

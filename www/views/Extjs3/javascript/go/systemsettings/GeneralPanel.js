@@ -30,6 +30,24 @@ go.systemsettings.GeneralPanel = Ext.extend(Ext.form.FormPanel, {
 							hint: t("The language is automatically detected from the browser. If the language is not available then this language will be used.")
 						})
 					]
+				},{
+					xtype: "fieldset",
+					items: [
+						{
+							xtype: 'xcheckbox',
+							name: 'maintenanceMode',
+							hideLabel: true,
+							boxLabel: t('Enable maintenance mode'),
+							hint: t("When maintenance mode is enabled only administrators can login")
+						},{
+							xtype: "xhtmleditor",
+							anchor: "100%",
+							height: dp(200),
+							name: 'loginMessage',
+							fieldLabel: t("Login message"),
+							hint:t("This message will show on the login screen")
+						}
+					]
 				}]
 		});
 

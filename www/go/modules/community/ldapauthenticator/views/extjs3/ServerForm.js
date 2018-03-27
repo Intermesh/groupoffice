@@ -6,9 +6,7 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.FormWindo
 	autoScroll: true,
 	
 	actionComplete : function() {
-		
-		console.log(this.formPanel.getForm().findField('imapHostname').getValue());
-		
+				
 		this.createEmailCheckbox.setValue(!GO.util.empty(this.formPanel.getForm().findField('imapHostname').getValue()));
 		
 		go.modules.community.ldapauthenticator.ServerForm.superclass.actionComplete.call(this);

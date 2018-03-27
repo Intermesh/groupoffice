@@ -143,5 +143,6 @@ go.ModuleManager.register('users', {
 	mainPanel: GO.users.MainPanel,
 	admin: true,	
 	title: t("Users"),
-	entities:['User']
+	entities:['User'],
+	systemSettingsPanels: [GO.users.SystemSettingsPanel]
 });

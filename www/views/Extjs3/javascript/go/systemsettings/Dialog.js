@@ -91,7 +91,26 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		this.addPanel(go.systemsettings.NotificationsPanel);
 		this.addPanel(go.systemsettings.AuthenticationPanel);
 		
+		this.loadModulePanels();
+		
 		go.systemsettings.Dialog.superclass.initComponent.call(this);
+	},
+	
+	loadModulePanels : function() {
+		var available = go.ModuleManager.getAvailable();
+		
+		for(var i = 0, l = available.length; i < l; i++) {
+			
+			var config = go.ModuleManager.registered[available[i].name];
+			
+			if(!config.systemSettingsPanels) {
+				continue;
+			}
+			
+			for(var i1 = 0, l2 = config.systemSettingsPanels.length; i1 < l2; i1++) {
+				this.addPanel(config.systemSettingsPanels[i1]);
+			}
+		}
 	},
 	
 	show: function(){

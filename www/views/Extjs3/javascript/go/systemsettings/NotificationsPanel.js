@@ -12,7 +12,7 @@ go.systemsettings.NotificationsPanel = Ext.extend(Ext.form.FormPanel, {
 							xtype: 'textfield',
 							name: 'systemEmail',
 							fieldLabel: t('System e-mail'),
-						},{
+						}, {
 							xtype: 'textfield',
 							name: 'smtpHost',
 							fieldLabel: t('Hostname'),
@@ -47,6 +47,27 @@ go.systemsettings.NotificationsPanel = Ext.extend(Ext.form.FormPanel, {
 							displayField: 'display'
 						}
 					]
+				}, {
+					xtype: "fieldset",
+					title: t('Debug'),
+					items: [{
+							xtype: 'xcheckbox',
+							name: "enableEmailDebug",
+							submit: false,
+							hideLabel: true,
+							boxLabel: t("Send all system notifications to the specified e-mail address"),
+							listeners: {
+								check: function (checkbox, checked) {
+									this.getForm().findField('debugEmail').setDisabled(!checked);
+								},
+								scope: this
+							}
+						}, {
+							xtype: 'textfield',
+							name: 'debugEmail',
+							disabled: true,
+							fieldLabel: t("E-mail")
+						}]
 				}]
 		});
 
@@ -57,7 +78,7 @@ go.systemsettings.NotificationsPanel = Ext.extend(Ext.form.FormPanel, {
 		go.Jmap.request({
 			method: "core/core/Settings/set",
 			params: this.getForm().getFieldValues(),
-			callback: function(options, success, response) {
+			callback: function (options, success, response) {
 				cb.call(scope, success);
 			},
 			scop: scope
@@ -67,9 +88,13 @@ go.systemsettings.NotificationsPanel = Ext.extend(Ext.form.FormPanel, {
 	load: function (cb, scope) {
 		go.Jmap.request({
 			method: "core/core/Settings/get",
-			callback: function(options, success, response) {
-				this.getForm().setValues(response);
+			callback: function (options, success, response) {
 				
+				var f = this.getForm();
+				f.setValues(response);				
+				f.findField("enableEmailDebug").setValue(!GO.util.empty(f.findField('debugEmail').getValue()));
+				
+
 				cb.call(scope, success);
 			},
 			scope: this

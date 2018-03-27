@@ -41,6 +41,16 @@ Ext.override(Ext.Component, {
     }
 });
 
+Ext.override(Ext.form.TextField,{
+	width: dp(200)	
+});
+Ext.override(Ext.form.NumberField,{
+	width: dp(200)	
+});
+Ext.override(Ext.form.ComboBox,{
+	width: dp(200)	
+});
+
 Ext.override(Ext.form.TextArea,{
 	insertAtCursor: function(v) {
 		var document_id = this.getEl().id;
