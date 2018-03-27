@@ -92,10 +92,11 @@ abstract class Model implements ArrayableInterface, \JsonSerializable {
 
 		foreach ($properties as $propName) {
 			try {
-				$arr[$propName] = $this->convertValue(ModelHelper::getValue($this, $propName));
+				$value = ModelHelper::getValue($this, $propName);
+				$arr[$propName] = $this->convertValue($value);
 			} catch (NotArrayable $e) {
 				
-				App::get()->debug("Skipped prop " . static::class . "::" . $propName . " because it's not scalar or ArrayConvertable");
+				App::get()->debug("Skipped prop " . static::class . "::" . $propName . " because type '" . gettype($value) . "' not scalar or ArrayConvertable.");
 			}
 		}
 		

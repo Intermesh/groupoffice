@@ -139,7 +139,7 @@ abstract class AbstractController extends Observable {
 	 */
 	protected function lockAction(){
 		
-		$lockFolder = new GO\Base\Fs\Folder(GO::config()->tmpdir.'locks');
+		$lockFolder = new GO\Base\Fs\Folder(GO::config()->file_storage_path.'locks');
 		$lockFolder->create();
 		
 		$lockFile = $lockFolder->createChild('action_'.str_replace('/','_', GO::router()->getControllerRoute()).'.lock');

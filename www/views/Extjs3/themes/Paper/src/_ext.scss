@@ -1371,10 +1371,10 @@ td.grid-hd-group-cell {
 
 .x-grid-empty {
 	@extend %font-title;
-	position:absolute;
-	left:50%;
+	margin: dp(8) auto;
+/*	left:50%;
 	top: 50%;
-	transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);*/
 	padding: dp(16);
 	text-align:center;
 	color: color($foreground, 'disabled-text');
@@ -1382,6 +1382,12 @@ td.grid-hd-group-cell {
 		@extend %icon;
 		font-size: sp(120) !important;
 		display: block;		
+	}
+	
+	.x-form-element & {
+		@extend %font-caption;
+		margin: dp(4) 0;
+		padding: 0;		
 	}
 }
 

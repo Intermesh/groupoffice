@@ -10,7 +10,8 @@ go.systemsettings.GeneralPanel = Ext.extend(Ext.form.FormPanel, {
 						{
 							xtype: 'textfield',
 							name: 'title',
-							fieldLabel: t('Title')							
+							fieldLabel: t('Title'),
+							hint: t("Used as page title and sender name for notifications")
 						},
 						this.languageCombo = new Ext.form.ComboBox({
 							fieldLabel: t('Language'),

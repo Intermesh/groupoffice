@@ -628,23 +628,14 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 * @return array
 	 */
 	public static function getDefaultGroupIds(){
-		$groupIds=array();
-		if(!empty(GO::config()->register_user_groups)){
-			$groups = explode(',',GO::config()->register_user_groups);
-			foreach($groups as $groupName){
-				$group = GO\Base\Model\Group::model()->findByName(trim($groupName));
-				if($group) {
-					$groupIds[]=$group->id;
-				}
-			}
-		}
-
-		if(!in_array(GO::config()->group_everyone, $groupIds))
-		{
-			$groupIds[]=GO::config()->group_everyone;
+		
+		$groups = [];
+		$s = \go\modules\core\users\model\Settings::get();			
+		foreach($s->getDefaultGroups() as $v) {
+			$groups[] = $v['groupId'];
 		}
 		
-		return $groupIds;
+		return $groups;
 	}
 	
 	
@@ -744,18 +735,21 @@ class User extends \GO\Base\Db\ActiveRecord {
 	public function defaultAttributes() {
 		$attr = parent::defaultAttributes();
 		
-		$attr['language']=GO::config()->language;
-		$attr['date_format']=GO::config()->default_date_format;
+		$s = \go\modules\core\users\model\Settings::get();
+
+		
+		$attr['language']=GO()->getSettings()->language;		
+		$attr['date_format']=$s->defaultDateFormat;		
 		$attr['date_separator']=GO::config()->default_date_separator;
 		$attr['theme']=GO::config()->theme;
-		$attr['timezone']=GO::config()->default_timezone;
-		$attr['first_weekday']=GO::config()->default_first_weekday;
-		$attr['currency']=GO::config()->default_currency;
+		$attr['timezone']=$s->defaultTimezone;
+		$attr['first_weekday']=$s->defaultFirstWeekday;
+		$attr['currency']=$s->defaultCurrency;
 		$attr['decimal_separator']=GO::config()->default_decimal_separator;
 		$attr['thousands_separator']=GO::config()->default_thousands_separator;
 		$attr['text_separator']=GO::config()->default_text_separator;
 		$attr['list_separator']=GO::config()->default_list_separator;
-		$attr['time_format']=GO::config()->default_time_format;
+		$attr['time_format']=$s->defaultTimeFormat;
 		$attr['sort_name']=GO::config()->default_sort_name;
 		$attr['max_rows_list']=GO::config()->default_max_rows_list;
 		$attr['disk_quota']=GO::config()->default_diskquota;

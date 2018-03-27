@@ -14,7 +14,7 @@ go.systemsettings.AuthenticationPanel = Ext.extend(Ext.Panel, {
 							name: "passwordMinLength",
 							decimals: 0,
 							value: 6,
-							width: dp(30)
+							width: dp(48)
 						}
 					]
 			}]
