@@ -1,4 +1,4 @@
-go.systemsettings.AuthenticationPanel = Ext.extend(Ext.Panel, {
+go.systemsettings.AuthenticationPanel = Ext.extend(Ext.form.FormPanel, {
 	initComponent: function () {
 		Ext.apply(this, {
 			title: t('Authentication'),
@@ -24,26 +24,26 @@ go.systemsettings.AuthenticationPanel = Ext.extend(Ext.Panel, {
 	},
 
 	submit: function (cb, scope) {
-//		go.Jmap.request({
-//			method: "core/core/Settings/set",
-//			params: this.getForm().getFieldValues(),
-//			callback: function (options, success, response) {
-//				cb.call(scope, success);
-//			},
-//			scop: scope
-//		});
+		go.Jmap.request({
+			method: "core/core/Settings/set",
+			params: this.getForm().getFieldValues(),
+			callback: function (options, success, response) {
+				cb.call(scope, success);
+			},
+			scop: scope
+		});
 	},
 
 	load: function (cb, scope) {
-//		go.Jmap.request({
-//			method: "core/core/Settings/get",
-//			callback: function (options, success, response) {
-//				this.getForm().setValues(response);
-//
-//				cb.call(scope, success);
-//			},
-//			scope: this
-//		});
+		go.Jmap.request({
+			method: "core/core/Settings/get",
+			callback: function (options, success, response) {
+				this.getForm().setValues(response);
+
+				cb.call(scope, success);
+			},
+			scope: this
+		});
 	}
 
 
