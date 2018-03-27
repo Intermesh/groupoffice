@@ -59,6 +59,8 @@ use go\core\jmap\State;
 		 * @var string eg. "/home/groupoffice" 
 		 */
 		private $dataPath;
+		
+		private $tmpPath;
 
 		protected function __construct() {
 
@@ -119,6 +121,15 @@ use go\core\jmap\State;
 		 */
 		public function getDataFolder() {
 			return new Folder($this->dataPath);
+		}
+		
+		/**
+		 * Get the temporary files folder
+		 * 
+		 * @return Folder
+		 */
+		public function getTmpFolder() {
+			return new Folder($this->tmpPath);
 
 		}
 
@@ -150,13 +161,13 @@ use go\core\jmap\State;
 				{
 					$oldConfig = $this->findConfigFile('config.php');
 				}
+				
 				require($oldConfig);
-				
-				
 
 				return [
 						"general" => [
 								"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice',
+								"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
 								"debug" => !empty($config['debug'])
 						],
 						"db" => [

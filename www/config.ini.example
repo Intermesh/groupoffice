@@ -1,5 +1,6 @@
 [general]
 dataPath = /home/govhosts/test.localhost/data
+tmpPath = /tmp/groupoffice
 debug = false
 
 [db]
