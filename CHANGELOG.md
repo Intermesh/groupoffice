@@ -1,5 +1,4 @@
-CHANGELOG
-
+29-03-2018 6.3.2 (beta)
 
 UPGRADING: make sure custom fields and search module are installed.
 
