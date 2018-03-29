@@ -19,6 +19,7 @@ Core:
 - Improved translation API
 - Frontend Router to make pages directly accessible
 - New global search
+- New installer
 
 Notes
 - Uses new API

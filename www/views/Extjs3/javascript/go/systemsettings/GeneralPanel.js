@@ -6,6 +6,9 @@ go.systemsettings.GeneralPanel = Ext.extend(Ext.form.FormPanel, {
 			iconCls: 'ic-description',
 			items: [{
 					xtype: "fieldset",
+					defaults: {
+						width: dp(240)
+					},
 					items: [
 						{
 							xtype: 'textfield',
