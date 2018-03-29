@@ -1090,7 +1090,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $version = '6.3.1';
+	var $version;
 
 	/**
 	 * Modification date
@@ -1099,7 +1099,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @access  public
 	 */
 	
-	var $mtime = '20180315';
+	var $mtime;
 
 	#group configuration
 	/**
@@ -1625,6 +1625,9 @@ var $billing_clear_payment_method_on_duplicate = true;
 	}
 	
 	private function loadNewSettings() {
+		
+		$this->version = $this->mtime = GO()->getVersion();
+		
 		$this->title = GO()->getSettings()->title;
 		$this->language = GO()->getSettings()->language;
 		$this->webmaster_email = GO()->getSettings()->systemEmail;

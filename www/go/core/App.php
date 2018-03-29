@@ -24,8 +24,6 @@ namespace go\core {
 	 */
 	class App extends Singleton {
 
-		const VERSION = '6.3.0';
-
 		/**
 		 *
 		 * @var Connection
@@ -48,7 +46,6 @@ namespace go\core {
 		 * @var CacheInterface 
 		 */
 		private $cache;
-		private $tmpPath;
 
 		protected function __construct() {
 			date_default_timezone_set("UTC");
@@ -57,6 +54,10 @@ namespace go\core {
 			$this->initCompatibility();
 
 			parent::__construct();
+		}
+		
+		public function getVersion() {
+			return require(Environment::get()->getInstallFolder()->getPath() . '/version.php');
 		}
 
 		private function initCompatibility() {
