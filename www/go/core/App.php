@@ -153,7 +153,8 @@ use go\core\jmap\State;
 		public function getConfig() {
 			$ini = $this->findConfigFile('config.ini');
 			if ($ini) {
-				return parse_ini_file($ini, true);
+				$data =  parse_ini_file($ini, true);				
+				return $data;
 			} else {
 				if(defined('GO_CONFIG_FILE')) {
 					$oldConfig = GO_CONFIG_FILE;
@@ -174,6 +175,11 @@ use go\core\jmap\State;
 								"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost"). ';dbname=' . ($config['db_name'] ?? "groupoffice"),
 								"username" => $config['db_user'] ?? "groupoffice",
 								"password" => $config['db_pass'] ?? ""
+						], 
+						"limits" => [
+								"maxUsers" => 0,
+								"storageQuota" => 0,
+								"allowedModules" => ""
 						]
 				];
 			}

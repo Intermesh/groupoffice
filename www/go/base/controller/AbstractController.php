@@ -128,7 +128,7 @@ abstract class AbstractController extends Observable {
 		
 	}
 	
-	private $lockFp;
+	private $lock;
 	
 	
 	/**
@@ -139,45 +139,9 @@ abstract class AbstractController extends Observable {
 	 */
 	protected function lockAction(){
 		
-		$lockFolder = new GO\Base\Fs\Folder(GO::config()->file_storage_path.'locks');
-		$lockFolder->create();
+		$this->lock = new \go\core\util\Lock('action_'.str_replace('/','_', GO::router()->getControllerRoute()));
 		
-		$lockFile = $lockFolder->createChild('action_'.str_replace('/','_', GO::router()->getControllerRoute()).'.lock');
-		if(!$lockFile->exists()) {
-			$lockFile->touch();
-		}
-		
-		//have to use private otherwise the var will be destroyed and the lock released when the function exits
-		$this->lockFp = fopen($lockFile->path(), 'r');		
-		
-		$wouldblock = false;
-		
-		if (!flock($this->lockFp, LOCK_EX|LOCK_NB, $wouldblock)) {
-				if ($wouldblock) {
-						// another process holds the lock
-						throw new \Exception("Somebody else is already running '".GO::router()->getControllerRoute()."'. Please try again later.");
-				}
-				else {
-					trigger_error("Could not lock route '".GO::router()->getControllerRoute()."'. Maybe your temporary files directory is not writable or doesn't support locks like an NFS mount.", E_USER_WARNING);						
-					return true;
-				}
-		}
-		else {
-			return true;
-		}
-		
-//		$this->_lockedActions[]=$this->_currentAction;;
-//		
-//		$lockedConfig = 'locked_action_'.$this->_currentAction;
-//		
-//		if(\GO::config()->get_setting($lockedConfig)){
-//			throw new \Exception("Action ".$this->_currentAction." locked. Another user is currently running this action.");
-//		}else
-//		{
-//			\GO::config()->save_setting($lockedConfig,1);
-//		}
-//		
-		//\GO::config()->delete_setting('locked_action_'.$this->_currentAction));
+		return $this->lock->lock();
 	}
 	
 	

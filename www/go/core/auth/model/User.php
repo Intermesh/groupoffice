@@ -315,7 +315,23 @@ class User extends Entity {
 			}
 		}
 		
+		if($this->isNew()) {
+			$config = GO()->getConfig();
+			
+			if(!empty($config['limits']['userCount']) && $config['limits']['userCount'] >= self::count()) {
+				throw new \go\core\exception\Forbidden("The maximum number of users have been reached");
+			}
+		}
+		
 		return parent::internalValidate();
+	}
+	
+	private static function count() {
+		return (int) (new Query())
+						->selectSingleValue('count(*)')
+						->from('core_user')
+						->where('deletedAt is null')
+						->single();
 	}
 
 	
