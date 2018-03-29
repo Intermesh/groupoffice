@@ -32,6 +32,11 @@ abstract class Settings extends data\Model {
 	 * @param int $moduleId If null is given the "core" module is used.
 	 */
 	protected function __construct() {
+		
+		if(GO()->getInstaller()->isInProgress()) {
+			return;
+		}
+		
 			$stmt = (new Query)
 							->select('name, value')
 							->from('core_setting')

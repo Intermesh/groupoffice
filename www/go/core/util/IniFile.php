@@ -108,14 +108,10 @@ class IniFile {
 	 * method for write data in the ini file.
 	 *
 	 * @return bool true for a succes
-	 */
-	public function write($path) {
-		
-		$result = file_put_contents($path, (string) $this);
-		if (false === $result) {
-			throw new \Exception(sprintf('Unable to write in the file ini : %s', $this->path));
-		}
-		return ($result !== false) ? true : false;
+	 */	
+	
+	public function write($path) {		
+		return file_put_contents($path, (string) $this);		
 	}
 	
 	

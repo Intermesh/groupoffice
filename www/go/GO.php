@@ -558,7 +558,7 @@ class GO{
 
 					}
 					
-					$filePath = self::config()->root_path.$file;
+					$filePath = \go\core\Environment::get()->getInstallFolder()->getPath() .'/' . $file;
 					
 				}
 			}

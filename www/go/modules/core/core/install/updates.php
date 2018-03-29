@@ -61,8 +61,8 @@ $updates["201803161130"][] = function() {
 			'default_list_separator' => 'defaultListSeparator',
 			'default_text_separator' => 'defaultTextSeparator',
 			'default_thousands_separator' => 'defaultThousandSeparator',
-			'default_decimal_separator' => 'defaultDecimalSeparator',
-			'register_user_groups' => 'defaultGroups'
+			'default_decimal_separator' => 'defaultDecimalSeparator'
+			//'register_user_groups' => 'defaultGroups'
 	];
 
 	foreach ($values as $old => $new) {
