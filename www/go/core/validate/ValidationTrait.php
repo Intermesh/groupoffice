@@ -6,7 +6,7 @@ use go\core\App;
 
 trait ValidationTrait {
 
-	private $validationErrors = null;
+	private $validationErrors = [];
 
 	/**
 	 * You can override this function to implement validation in your model.

@@ -28,8 +28,6 @@ class User extends Entity {
 
 	const ID_SUPER_ADMIN = 1;
 	
-	const PASSWORD_MIN_LENGTH = 8;
-	
 	
 	public $validatePassword = true;
 
@@ -180,6 +178,24 @@ class User extends Entity {
 		return parent::setValues($values);
 	}
 	
+	protected function init() {
+		parent::init();
+		
+		if($this->isNew()) {
+			$s = \go\modules\core\users\model\Settings::get();
+			$this->time_format = $s->defaultTimeFormat;	
+			$this->date_format = $s->defaultDateFormat;
+			$this->timezone = $s->defaultTimezone;
+			$this->first_weekday = $s->defaultFirstWeekday;
+
+			$this->currency = $s->defaultCurrency;
+			
+			foreach($s->getDefaultGroups() as $v) {
+				$this->groups[] = (new UserGroup)->setValues($v);
+			}
+		}
+	}
+	
 	
 
 	public function setPasswordConfirm($passwordConfirm){
@@ -294,12 +310,28 @@ class User extends Entity {
 		}
 		
 		if(isset($this->plainPassword) && $this->validatePassword) {
-			if(strlen($this->plainPassword) < self::PASSWORD_MIN_LENGTH) {
-				$this->setValidationError('password', ErrorCode::INVALID_INPUT, "Minimum password length is 8 chars");
+			if(strlen($this->plainPassword) < GO()->getSettings()->passwordMinLength) {
+				$this->setValidationError('password', ErrorCode::INVALID_INPUT, "Minimum password length is ".GO()->getSettings()->passwordMinLength." chars");
+			}
+		}
+		
+		if($this->isNew()) {
+			$config = GO()->getConfig();
+			
+			if(!empty($config['limits']['userCount']) && $config['limits']['userCount'] >= self::count()) {
+				throw new \go\core\exception\Forbidden("The maximum number of users have been reached");
 			}
 		}
 		
 		return parent::internalValidate();
+	}
+	
+	private static function count() {
+		return (int) (new Query())
+						->selectSingleValue('count(*)')
+						->from('core_user')
+						->where('deletedAt is null')
+						->single();
 	}
 
 	

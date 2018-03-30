@@ -4,11 +4,7 @@ go.notifier = {
 	 * message {title, description, icon, type, showTime, buttons}
 	 */
 	msg: function (msg) {
-		function remove(ct) {
-			ct.el.animate({opacity: {to: 0}}, 0.2, function () {
-				ct.destroy();
-			});
-		}
+	
 
 		html = "";
 
@@ -27,17 +23,25 @@ go.notifier = {
 			renderTo: this.messageCt
 		});
 
+		var me = this;
 		if (msg.time) {
 			setTimeout(function () {
-				remove(msgCtr);
+				me.remove(msgCtr);
 			}, msg.time);
 		} else {
 			msgCtr.el.on('click', function () {
-				remove(msgCtr);
+				me.remove(msgCtr);
 			});
 		}
+		
+		return msgCtr;
 	},
 	toast: function (message) {
 
+	},
+	remove(msg) {
+		msg.el.animate({opacity: {to: 0}}, 0.2, function () {
+			msg.destroy();
+		});
 	}
 };

@@ -1,5 +1,6 @@
 [general]
 dataPath = /home/govhosts/test.localhost/data
+tmpPath = /tmp/groupoffice
 debug = false
 
 [db]
@@ -7,3 +8,7 @@ dsn = "mysql:host=localhost;dbname=groupoffice"
 username = admin
 password = secret
 
+[limits]
+userCount = 10
+storageQuota = 1G
+allowedModules = email,addressbook,users,modules,groups

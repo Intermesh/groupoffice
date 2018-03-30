@@ -22,8 +22,8 @@ class Installer {
 	 */
 	public function isInProgress() {
 		return $this->isInProgress;
-	}
-
+	}	
+	
 	/**
 	 * 
 	 * @param array $adminValues
@@ -72,7 +72,7 @@ class Installer {
 
 
 		if (!$admin->save()) {
-			throw new Exception("Failed to create admin user!");
+			throw new Exception("Failed to create admin user: ".var_export($admin->getValidationErrors(), true));
 		}
 
 		$classFinder = new ClassFinder(false);

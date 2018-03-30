@@ -12,7 +12,7 @@ class TempFolder extends Folder {
 	
 	public function __construct() {
 		
-		$tmp = \go\core\App::get()->getConfig()->getTempFolder()->getFolder(uniqid());
+		$tmp = \GO()->getTempFolder()->getFolder(uniqid());
 		$tmp->create();
 		
 		parent::__construct($tmp->getPath());

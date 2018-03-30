@@ -4,7 +4,6 @@ namespace go\core\data;
 
 use Closure;
 use Exception;
-use go\core\data\Object;
 use IteratorAggregate;
 use Traversable;
 

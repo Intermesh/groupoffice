@@ -1,16 +1,14 @@
 <?php
 
-
-
 namespace go\core {
 
-use go\core\cache\CacheInterface;
-use go\core\cache\Disk;
-use go\core\db\Connection;
-use go\core\db\Database;
-use go\core\mail\Mailer;
-use go\core\fs\Folder;
-use go\core\jmap\State;
+	use go\core\cache\CacheInterface;
+	use go\core\cache\Disk;
+	use go\core\db\Connection;
+	use go\core\db\Database;
+	use go\core\mail\Mailer;
+	use go\core\fs\Folder;
+	use go\core\jmap\State;
 
 	/**
 	 * Application class.
@@ -26,10 +24,6 @@ use go\core\jmap\State;
 	 */
 	class App extends Singleton {
 
-
-		const VERSION = '6.3.0';
-
-
 		/**
 		 *
 		 * @var Connection
@@ -43,74 +37,60 @@ use go\core\jmap\State;
 		private $errorHandler;
 
 		/**
-		* @var Mailer
-		*/
-	  private $mailer;
-	
+		 * @var Mailer
+		 */
+		private $mailer;
+
 		/**
 		 *
 		 * @var CacheInterface 
 		 */
 		private $cache;
 
-		/**
-		 * The path to the folder where data is stored. Defined in config.ini
-		 * 
-		 * @var string eg. "/home/groupoffice" 
-		 */
-		private $dataPath;
-
 		protected function __construct() {
-
-			$config = $this->getConfig();
-
-			$db = $config['db'];
-			$this->dataPath = $config['general']['dataPath'];
-
 			date_default_timezone_set("UTC");
-			$this->dbConnection = new Connection(
-							$db['dsn'], $db['username'], $db['password']
-			);
+
 			$this->errorHandler = new ErrorHandler();
 			$this->initCompatibility();
 
 			parent::__construct();
+		}
+		
+		public function getVersion() {
+			return require(Environment::get()->getInstallFolder()->getPath() . '/version.php');
 		}
 
 		private function initCompatibility() {
 			require(Environment::get()->getInstallFolder()->getPath() . "/go/GO.php");
 			spl_autoload_register(array('GO', 'autoload'));
 		}
-	
-	/**
-	 * The mail object
-	 * ```
-	 * $message = App::getMailer()->compose();
-	 * $message->setTo()->setFrom()->setBody()->send();
-	 * ```
-	 * @return Mailer
-	 */
-	public function getMailer() {
-		if(!isset($this->mailer)) {
-			$this->mailer = new Mailer();
-		}
-		return $this->mailer;
-	}
-	
-	/**
-	 * Get the installer object
-	 * 
-	 * @return Installer
-	 */
-	public function getInstaller() {
-		if(!isset($this->installer)) {
-			$this->installer = new Installer();
-		}
-		return $this->installer;
 
-	}
-	
+		/**
+		 * The mail object
+		 * ```
+		 * $message = App::getMailer()->compose();
+		 * $message->setTo()->setFrom()->setBody()->send();
+		 * ```
+		 * @return Mailer
+		 */
+		public function getMailer() {
+			if (!isset($this->mailer)) {
+				$this->mailer = new Mailer();
+			}
+			return $this->mailer;
+		}
 
+		/**
+		 * Get the installer object
+		 * 
+		 * @return Installer
+		 */
+		public function getInstaller() {
+			if (!isset($this->installer)) {
+				$this->installer = new Installer();
+			}
+			return $this->installer;
+		}
 
 		/**
 		 * Get the data folder
@@ -118,9 +98,19 @@ use go\core\jmap\State;
 		 * @return Folder
 		 */
 		public function getDataFolder() {
-			return new Folder($this->dataPath);
-
+			return new Folder($this->getConfig()['general']['dataPath']);
 		}
+
+		/**
+		 * Get the temporary files folder
+		 * 
+		 * @return Folder
+		 */
+		public function getTmpFolder() {
+			return new Folder($this->getConfig()['general']['tmpPath']);
+		}
+
+		private $config;
 
 		/**
 		 * Get the configuration data
@@ -140,32 +130,42 @@ use go\core\jmap\State;
 		 * @return array
 		 */
 		public function getConfig() {
+
+			if (isset($this->config)) {
+				return $this->config;
+			}
+
 			$ini = $this->findConfigFile('config.ini');
 			if ($ini) {
-				return parse_ini_file($ini, true);
-			} else {
-				if(defined('GO_CONFIG_FILE')) {
-					$oldConfig = GO_CONFIG_FILE;
-				} else
-				{
-					$oldConfig = $this->findConfigFile('config.php');
-				}
-				require($oldConfig);
-				
-				
-
-				return [
-						"general" => [
-								"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice',
-								"debug" => !empty($config['debug'])
-						],
-						"db" => [
-								"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost"). ';dbname=' . ($config['db_name'] ?? "groupoffice"),
-								"username" => $config['db_user'] ?? "groupoffice",
-								"password" => $config['db_pass'] ?? ""
-						]
-				];
+				$this->config = parse_ini_file($ini, true);
+				return $this->config;
 			}
+			if (defined('GO_CONFIG_FILE')) {
+				$oldConfig = GO_CONFIG_FILE;
+			} else {
+				$oldConfig = $this->findConfigFile('config.php');
+			}
+
+			require($oldConfig);
+
+			$this->config = [
+					"general" => [
+							"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice',
+							"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
+							"debug" => !empty($config['debug'])
+					],
+					"db" => [
+							"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . ($config['db_name'] ?? "groupoffice"),
+							"username" => $config['db_user'] ?? "groupoffice",
+							"password" => $config['db_pass'] ?? ""
+					],
+					"limits" => [
+							"maxUsers" => 0,
+							"storageQuota" => 0,
+							"allowedModules" => ""
+					]
+			];
+			return $this->config;
 		}
 
 		/**
@@ -174,6 +174,13 @@ use go\core\jmap\State;
 		 * @return Connection
 		 */
 		public function getDbConnection() {
+
+			if (!isset($this->dbConnection)) {
+				$db = $this->getConfig()['db'];
+				$this->dbConnection = new Connection(
+								$db['dsn'], $db['username'], $db['password']
+				);
+			}
 			return $this->dbConnection;
 		}
 
@@ -258,14 +265,14 @@ use go\core\jmap\State;
 		public function getAuthState() {
 			return $this->authState;
 		}
-		
+
 		/**
 		 * Get the authenticated user
 		 * 
 		 * @return auth\model\User
 		 */
 		public function getUser() {
-			if($this->getAuthState() instanceof \go\core\auth\State) {
+			if ($this->getAuthState() instanceof \go\core\auth\State) {
 				return $this->authState->getUser();
 			}
 			return null;
@@ -331,10 +338,12 @@ use go\core\jmap\State;
 }
 
 namespace {
+
 	/**
 	 * @return App
 	 */
 	function GO() {
 		return \go\core\App::get();
 	}
+
 }
