@@ -239,7 +239,7 @@ GO.email.AddressbookDialog = function(config) {
 				css : 'white-space:normal;',
 				sortable : true
 			},{
-				header: GO.addressbook.lang.addresslistGroup,
+				header: t("Addresslist group", "addressbook"),
 				dataIndex: 'addresslistGroupName'
 			}],
 			sm : new Ext.grid.RowSelectionModel(),
