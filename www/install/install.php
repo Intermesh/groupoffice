@@ -24,9 +24,9 @@ if (!empty($_POST)) {
 				'email' => $_POST['email']
 						];
 		
-		App::get()->getDbConnection()->query("DROP DATABASE 63_test");
-		App::get()->getDbConnection()->query("create DATABASE 63_test");
-		App::get()->getDbConnection()->query("use 63_test");
+//		App::get()->getDbConnection()->query("DROP DATABASE 63_test");
+//		App::get()->getDbConnection()->query("create DATABASE 63_test");
+//		App::get()->getDbConnection()->query("use 63_test");
 
 		App::get()->getInstaller()->install($admin, [new Module(), new Module3()]);
 
