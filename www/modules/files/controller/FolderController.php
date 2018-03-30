@@ -861,7 +861,11 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 							)
 							->mergeWith($aclWhereCriteria)
 					);
-
+			
+			if(isset($params['sort'])){
+				$findParams->order("t.".$params['sort'], $params['dir']);
+			}
+			
 			$filesStmt = \GO\Files\Model\File::model()->find($findParams);
 
 			$response['total'] = $filesStmt->rowCount();
