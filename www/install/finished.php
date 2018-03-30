@@ -1,10 +1,10 @@
 <?php
-require('header.php');
-
 if($_SERVER['REQUEST_METHOD'] == "POST") {
 	header('Location: ../');
 	exit();	
 }
+
+require('header.php');
 ?>
 
 <section>

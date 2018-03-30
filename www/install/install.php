@@ -1,4 +1,5 @@
 <?php
+require('../vendor/autoload.php');
 
 use GO\Base\Cron\CronJob;
 use GO\Base\Model\Module as Module2;
@@ -9,7 +10,7 @@ use go\core\module\Base;
 use go\modules\community\googleauthenticator\Module as Module3;
 use go\modules\community\notes\Module;
 
-require('header.php');
+
 
 if (!empty($_POST)) {
 
@@ -24,9 +25,9 @@ if (!empty($_POST)) {
 				'email' => $_POST['email']
 						];
 		
-//		App::get()->getDbConnection()->query("DROP DATABASE 63_test");
-//		App::get()->getDbConnection()->query("create DATABASE 63_test");
-//		App::get()->getDbConnection()->query("use 63_test");
+		App::get()->getDbConnection()->query("DROP DATABASE groupoffice");
+		App::get()->getDbConnection()->query("create DATABASE groupoffice");
+		App::get()->getDbConnection()->query("use groupoffice");
 
 		App::get()->getInstaller()->install($admin, [new Module(), new Module3()]);
 
@@ -86,6 +87,8 @@ if (!empty($_POST)) {
 		exit();
 	}
 }
+
+require('header.php');
 ?>
 
 <section>

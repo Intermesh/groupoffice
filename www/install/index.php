@@ -1,13 +1,12 @@
 <?php
-
-
-require('header.php');
+require('../vendor/autoload.php');
 
 if(!empty($_POST)) {
 	header('Location: test.php');
 	exit();	
 }
 
+require('header.php');
 ?>
 
 <section>

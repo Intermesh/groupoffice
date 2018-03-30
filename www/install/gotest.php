@@ -155,13 +155,6 @@ function test_system(){
 
 	$tests[]=$test;
 
-	$test['name']='MySQL support';
-	$test['showSuccessFeedback'] = false;
-	$test['pass']=function_exists('mysqli_connect');
-	$test['feedback']='Fatal error: The improved MySQL (MySQLi) extension is required. So is the MySQL server.';
-	$test['fatal']=true;
-
-	$tests[]=$test;
 	
 	$test['name']='PDO support';
 	$test['showSuccessFeedback'] = false;

@@ -1,11 +1,15 @@
 <?php
-
+require('../vendor/autoload.php');
 use go\core\App;
 use go\core\util\IniFile;
 
-require('header.php');
+
 
 $configFile = App::findConfigFile();
+
+if(!$configFile) {
+  $configFile = '/etc/groupffice/config.ini';
+}
 
 if(file_exists($configFile)) {
 	$config = parse_ini_file($configFile, true);	
@@ -30,14 +34,21 @@ if(file_exists($configFile)) {
 	}
 }
 
+
+
 if(!empty($_POST)) {
 	$config['general']['dataPath'] = $_POST['dataPath'];
 	$config['general']['tmpPath'] = $_POST['tmpPath'];
 	$config['db']['dsn'] = 'mysql:host='.$_POST['dbHostname'].';port='.$_POST['dbPort'].';dbname='.$_POST['dbName'];
 	$config['db']['username'] = $_POST['dbUsername'];
 	$config['db']['password'] = $_POST['dbPassword'];
+
+
+	$tmpFolder = new \go\core\fs\Folder($config['general']['tmpPath']);
+	$dataFolder = new \go\core\fs\Folder($config['general']['dataPath']);
 	
-	if(is_writable($config['general']['dataPath']) && is_writable($config['general']['tmpPath']) && dbConnect($config) && dbIsEmpty($config)) {
+
+	if($dataFolder->isWritable() && $tmpFolder->isWritable() && dbConnect($config) && dbIsEmpty($config)) {
 		$ini = new IniFile();
 		$ini->readData($config);
 		if(!$ini->write($configFile)) {
@@ -67,7 +78,7 @@ function dbConnect($config){
 		$pdo = new PDO($config['db']['dsn'], $config['db']['username'], $config['db']['password']);		
 	}
 	catch(Exception $e){
-		$error = "Could not connect to the database. The database returned this error:<br />".$e->getMessage();
+		echo $error = "Could not connect to the database. The database returned this error:<br />".$e->getMessage();
 	}
 	
 	return $pdo;
@@ -83,6 +94,8 @@ function dbIsEmpty($config) {
 	return $stmt->rowCount() == 0;
 }
 
+
+require('header.php');
 ?>
 
 		<?php if(!is_writable($configFile)): ?>
@@ -90,7 +103,7 @@ function dbIsEmpty($config) {
 		<section>
 			<fieldset>
 				<h2>Create config file</h2>
-				<p>Please create a writeable config.ini file here: <?= GO()->findConfigFile(); ?>.</p>
+				<p>Please create a writeable config.ini file here: <?= $configFile; ?>.</p>
 			</fieldset>
 		</section>
 		
@@ -109,7 +122,7 @@ function dbIsEmpty($config) {
 				</p>
 				
 				<?php
-				if(!empty($_POST) && !is_writable($config['general']['dataPath'])) {
+				if(!empty($_POST) && !$dataFolder->isWritable()) {
 					echo '<p class="error">Not writable</p>';
 				}
 				?>
@@ -121,7 +134,7 @@ function dbIsEmpty($config) {
 				
 				
 				<?php
-				if(!empty($_POST) && !is_writable($config['general']['dataPath'])) {
+				if(!empty($_POST) && !$tmpFolder->isWritable()) {
 					echo '<p class="error">Not writable</p>';
 				}
 				?>
@@ -155,7 +168,7 @@ function dbIsEmpty($config) {
 					<label>Database name</label>
 				</p>
 				<p>
-					<input type="text" name="dbHostname" value="<?=$_POST['dbHostname'] ?? localhost;?>"  required />
+					<input type="text" name="dbHostname" value="<?=$_POST['dbHostname'] ?? "localhost";?>"  required />
 					<label>Database hostname</label>
 				</p>
 				<p>
