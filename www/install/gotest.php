@@ -352,9 +352,7 @@ function test_system(){
 	
 	$url = "http".(!empty($_SERVER['HTTPS'])?"s":"")."://".$_SERVER['HTTP_HOST'];
 	
-	if($_SERVER['SERVER_PORT'] != 80 && $_SERVER['SERVER_PORT'] != 443) {
-		$url .= ':'.$_SERVER['SERVER_PORT'];
-	}
+
 	
 	try {
 		$headers = get_headers($url.'/caldav');	
