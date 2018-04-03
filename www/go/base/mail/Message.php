@@ -478,7 +478,7 @@ class Message extends \Swift_Message{
 	}
 	
 	public function countRecipients(){
-		return count($this->getTo()) + count($this->getCc()) + count($this->getBcc());
+		return count($this->getTo() ?? []) + count($this->getCc() ?? []) + count($this->getBcc() ?? []);
 	}
 	
 	/**
