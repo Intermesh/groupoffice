@@ -234,21 +234,23 @@ class Token extends Entity {
 			return;
 		}
 		
-		//without cookie_httponly the cookie can be accessed by malicious scripts 
-		//injected to the site and its value can be stolen. Any information stored in 
-		//session tokens may be stolen and used later for identity theft or
-		//user impersonation.
-		ini_set("session.cookie_httponly",1);
+    if (session_status() == PHP_SESSION_NONE) {
+      //without cookie_httponly the cookie can be accessed by malicious scripts 
+      //injected to the site and its value can be stolen. Any information stored in 
+      //session tokens may be stolen and used later for identity theft or
+      //user impersonation.
+      ini_set("session.cookie_httponly",1);
 
-		//Avoid session id in url's to prevent session hijacking.
-		ini_set('session.use_only_cookies',1);
+      //Avoid session id in url's to prevent session hijacking.
+      ini_set('session.use_only_cookies',1);
 
-		if(\go\core\http\Request::get()->isHttps()) {
-			ini_set('session.cookie_secure',1);
-		}
+      if(\go\core\http\Request::get()->isHttps()) {
+        ini_set('session.cookie_secure',1);
+      }
 
-		session_name('groupoffice');
-		session_start();
+      session_name('groupoffice');
+      session_start();
+    }
 		
 		$_SESSION['GO_SESSION']['user_id'] = $this->userId;
 		$_SESSION['GO_SESSION']['accessToken'] = $this->accessToken;		

@@ -182,5 +182,6 @@ try {
 		output($response, 200, "Success, but more authorization required.");
 	}
 } catch (\Exception $e) {
+  \go\core\ErrorHandler::logException($e);
 	output([], 500, $e->getMessage());
 }

@@ -74,6 +74,15 @@ $settings['show_contact_cf_tabs'] = array();
 $settings['config']['encode_callto_link'] = GO::config()->encode_callto_link;
 $settings['config']['login_message'] = GO::config()->login_message;
 
+
+//TODO: refactor this. It uses the session to find the token when browser is reloaded.
+if(\GO::user() && !GO()->getUser()) {  
+  $token = Token::find()->where(['accessToken' => GO::session()->values['accessToken']])->single();
+  if($token) {
+    GO()->getAuthState()->setToken($token);
+  }
+}
+ 
 $user_id = GO()->getUser() ? GO()->getUser()->id : 0;
 
 
@@ -316,7 +325,7 @@ if (isset($_REQUEST['f'])) {
 ?>
 
 <?php if (GO()->getUser()): ?>
-	go.User = <?php echo json_encode(Token::find()->where(['accessToken' => GO::session()->values['accessToken']])->single()->getUser()->toArray()); ?>;
+	go.User = <?php echo json_encode(GO()->getUser()->toArray()); ?>;
 	Ext.Ajax.defaultHeaders = {'Authorization': 'Bearer <?php echo GO::session()->values['accessToken']; ?>', 'Accept-Language': GO.lang.iso};
 	Ext.state.Manager.setProvider(new GO.state.HttpProvider());
 	
