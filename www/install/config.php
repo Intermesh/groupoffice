@@ -13,6 +13,7 @@ if(!$configFile) {
 
 if(file_exists($configFile)) {
 	$config = parse_ini_file($configFile, true);	
+
 	if(!isset($config['db'])) {
 		$config = [
 					"general" => [
@@ -31,12 +32,23 @@ if(file_exists($configFile)) {
 							"allowedModules" => ""
 					]
 			];
-	}
+	} else if($_SERVER['REQUEST_METHOD'] != 'POST')
+  {
+    $dsn = \go\core\db\Utils::parseDSN($config['db']['dsn']);
+    
+    
+    $_POST['dbPort'] = $dsn['options']['port'];
+    $_POST['dbHostname'] = $dsn['options']['host'];
+    $_POST['dbName'] = $dsn['options']['dbname'];
+    
+    $_POST['dbUsername'] = $config['db']['username'];
+    //$_POST['dbPassword'] = $config['db']['password'];
+  }
 }
 
 
 
-if(!empty($_POST)) {
+if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	$config['general']['dataPath'] = $_POST['dataPath'];
 	$config['general']['tmpPath'] = $_POST['tmpPath'];
 	$config['db']['dsn'] = 'mysql:host='.$_POST['dbHostname'].';port='.$_POST['dbPort'].';dbname='.$_POST['dbName'];
@@ -61,7 +73,7 @@ if(!empty($_POST)) {
 	}
 }
 
-
+$dbConnectError = null;
 $pdo = null;
 /**
  * 
@@ -70,7 +82,7 @@ $pdo = null;
  * @return PDO
  */
 function dbConnect($config){
-	global $pdo;
+	global $pdo, $dbConnectError;
 	if(isset($pdo)) {
 		return $pdo;
 	}
@@ -78,7 +90,7 @@ function dbConnect($config){
 		$pdo = new PDO($config['db']['dsn'], $config['db']['username'], $config['db']['password']);		
 	}
 	catch(Exception $e){
-		echo $error = "Could not connect to the database. The database returned this error:<br />".$e->getMessage();
+		$dbConnectError = "Could not connect to the database. The database returned this error:<br />".$e->getMessage();
 	}
 	
 	return $pdo;
@@ -122,7 +134,7 @@ require('header.php');
 				</p>
 				
 				<?php
-				if(!empty($_POST) && !$dataFolder->isWritable()) {
+				if($_SERVER['REQUEST_METHOD'] == 'POST' && !$dataFolder->isWritable()) {
 					echo '<p class="error">Not writable</p>';
 				}
 				?>
@@ -134,7 +146,7 @@ require('header.php');
 				
 				
 				<?php
-				if(!empty($_POST) && !$tmpFolder->isWritable()) {
+				if($_SERVER['REQUEST_METHOD'] == 'POST' && !$tmpFolder->isWritable()) {
 					echo '<p class="error">Not writable</p>';
 				}
 				?>
@@ -148,9 +160,9 @@ require('header.php');
 				<h2>Configure the database</h2>
 				
 				<?php
-				if(!empty($_POST) && !dbConnect($config)) {
-					echo '<p class="error">Can\'t connect</p>';
-				} elseif(!empty($_POST) && !dbIsEmpty($config)) {
+				if($_SERVER['REQUEST_METHOD'] == 'POST' && !dbConnect($config)) {
+					echo '<p class="error">'.$dbConnectError.'</p>';
+				} elseif($_SERVER['REQUEST_METHOD'] == 'POST' && !dbIsEmpty($config)) {
 					echo '<p class="error">The database must be empty</p>';
 				}
 				?>

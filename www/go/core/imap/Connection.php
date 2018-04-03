@@ -97,7 +97,7 @@ class Connection {
 		$remote = $ssl ? 'ssl://' : '';			
 		$remote .=  $server.":".$port;
 
-		GO()->debug("Connection to ".$remote, 'imap', self::DEBUG_TYPE_IMAP);
+		GO()->debug("Connection to ".$remote, self::DEBUG_TYPE_IMAP);
 
 		try{
 			$this->handle = stream_socket_client($remote, $this->connectErrorNo, $this->connectError, $timeout, STREAM_CLIENT_CONNECT, $streamContext);
