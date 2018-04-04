@@ -100,17 +100,18 @@ class ModelType extends \GO\Base\Db\ActiveRecord {
 		return $this->name;
 	}
 	
-	public function checkDatabase() {
-		
-		//delete if module is no longer installed. This should happen automatically
-		//after module uninstall but in some cases this went wrong.
-		$parts = explode('\\',$this->name);
-		$module = strtolower($parts[1]);
-		if($module!='base' && !\GO::modules()->isInstalled($module)){
-			$this->delete();
-		}else
-		{		
-			return parent::checkDatabase();
-		}
-	}
+//  Database check is no longer valid for 6.3 since name does not contain full namespace anymore.
+//	public function checkDatabase() {
+//		
+//		//delete if module is no longer installed. This should happen automatically
+//		//after module uninstall but in some cases this went wrong.
+//		$parts = explode('\\',$this->name);
+//		$module = strtolower($parts[1]);
+//		if($module!='base' && !\GO::modules()->isInstalled($module)){
+//			$this->delete();
+//		}else
+//		{		
+//			return parent::checkDatabase();
+//		}
+//	}
 }
