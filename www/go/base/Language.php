@@ -58,9 +58,8 @@ class Language{
 		$oldIso = $this->_langIso;
 		
 		if(!$isoCode){
-			if(isset($_REQUEST['SET_LANGUAGE'])){
-        
-				$this->_langIso=$_REQUEST['SET_LANGUAGE'];
+			if(isset($_GET['SET_LANGUAGE'])){ 
+				$this->_langIso=$_GET['SET_LANGUAGE'];
         
         setcookie('SET_LANGUAGE', $this->_langIso);
         
