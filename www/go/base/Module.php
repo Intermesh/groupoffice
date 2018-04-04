@@ -354,39 +354,6 @@ class Module extends Observable {
 		}
 		
 		
-		//delete all models from the Model\ModelType table.
-		//They are used for faster linking and search cache. Each linkable model is mapped to an id in this table.
-		$models = $this->getModels();
-		
-		$modelTypes = array();
-		foreach($models as $model){			
-			$modelType = Model\ModelType::model()->findSingleByAttribute('model_name', $model->getName());			
-			if($modelType){
-				
-				$modelTypes[]=$modelType->id;
-				$modelType->delete();
-			}
-		}
-		
-		if(!empty($modelTypes)){			
-			
-			$sql = "DELETE FROM  `go_search_cache` WHERE model_type_id IN (".implode(',', $modelTypes).")";
-			\GO::getDbConnection()->query($sql);
-			
-			
-			$stmt = GO::getDbConnection()->query('SHOW TABLES');
-			while ($r = $stmt->fetch()) {
-				$tableName = $r[0];
-
-				if (substr($tableName, 0, 9) == 'go_links_' && !is_numeric(substr($tableName, 9, 1))) {			
-					$sql = "DELETE FROM  `$tableName` WHERE model_type_id IN (".implode(',', $modelTypes).")";
-					\GO::getDbConnection()->query($sql);
-				}
-			}
-		}
-		
-		
-		
 		
 		$sqlFile = $this->path().'install/uninstall.sql';
 		
