@@ -15,13 +15,15 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 					tpl: new Ext.XTemplate('<figure style="background-image: url({[this.photo_link(values)]});" \
 					onClick="GO.addressbook.showContactDialog({id}, \\{activeTab:1\\} );"></figure>', {
 						photo_link: function (values) {
-							if (values.photo_url) {
+							if(values.avatarId) {
+								return go.Jmap.downloadUrl(values.avatarId);
+							} else if (values.photo_url) {
 								return values.photo_url.split('&w=120&h=160&zc=1').join('&w=280');
 							}
 						}
 					}),
 					onLoad: function (dv) {
-						this.setVisible(!!dv.data.photo_url);
+						this.setVisible(!!dv.data.photo_url || !!dv.data.avatarId);
 					},
 				}, {
 					xtype:"box",

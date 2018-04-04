@@ -138,7 +138,7 @@ GO.mainLayout.on("boot", function() {
 
 	//default route
 	go.Router.add(function() {	
-		if(go.User) {
+		if(go.User.isLoggedIn()) {
 			
 			if(!go.ModuleManager.isAvailable(GO.settings.start_module)) {
 				console.log(GO.mainLayout.tabPanel.items.first());

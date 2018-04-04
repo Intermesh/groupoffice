@@ -35,3 +35,13 @@ $updates["201803161130"][] = function() {
 		$stmt->execute();
 	}
 };
+
+$updates["201803291155"][] = "CREATE TABLE `core_blob` (
+  `id` binary(40) NOT NULL,
+  `type` varchar(129) NOT NULL,
+  `size` bigint(20) NOT NULL DEFAULT '0',
+  `modified` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `createdAt` DATETIME NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB;";

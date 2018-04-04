@@ -83,17 +83,26 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			dismissDelay: 0,
 			maxWidth: 500
 		});
-		
-//		this.removeLoadMask();
-		
-		if(go.User){
-			this.onAuthentication();
-			this.on('render', function() {
-				this.fireEvent('boot', this);
-			}, this, {single:true});
+		var me = this;
+		Ext.Ajax.defaultHeaders = {'Accept-Language': GO.lang.iso};
+
+		if(go.User.accessToken){
+			Ext.Ajax.defaultHeaders['Authorization'] = 'Bearer '+go.User.accessToken;
+			Ext.state.Manager.setProvider(new GO.state.HttpProvider());
+			go.User.authenticate(function(data, response){
+
+				if(response.status === 200) {
+					me.on('render', function() {
+						me.fireEvent('boot', me);
+					}, me, {single:true});
+					me.onAuthentication(); // <- start Group-Office
+				} else {
+					me.fireEvent("boot", this);
+				}
+			});
 		} else {
-		
-			this.fireEvent("boot", this);
+			this.fireEvent("boot", this); // In the router there is an event attached.
+			GO.mainLayout.login();
 		}
 	},
 
@@ -581,7 +590,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 								if(!go.userSettingsDialog) {
 									go.userSettingsDialog = new go.usersettings.UserSettingsDialog();
 								}
-								go.userSettingsDialog.show(GO.settings.user_id);
+								go.userSettingsDialog.show(go.User.id);
 
 							},
 							scope: this

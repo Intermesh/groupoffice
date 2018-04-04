@@ -128,27 +128,19 @@
 		},
 
 		onAuthenticated: function (result) {
-			this.accessToken = result.accessToken;
 
+			window.localStorage.setItem('accessToken', result.accessToken);
+			
 			if (GO.loginDialog) {
 				GO.loginDialog.close();
 			}
-			go.User = result.user;
+			Ext.applyIf(go.User, result.user);
 
 			var script = document.createElement('script');
-
 			script.setAttribute('src', GO.url('core/moduleScripts'));
-
 			document.body.appendChild(script)
 
-
-			//console.log('tes2t');
-			//var url = GO.settings.config.host;
-			//document.location.href=url;
-			Ext.Ajax.defaultHeaders = {
-				'Authorization': 'Bearer ' + result.accessToken,
-				'Accept-Language': GO.lang.iso
-			};
+			Ext.Ajax.defaultHeaders['Authorization'] = 'Bearer ' + result.accessToken;
 
 
 			this.fireEvent("authenticated", this, result);

@@ -51,6 +51,40 @@ go.Jmap = {
 		
 		return false;
 	},
+	
+	get: function(cb) {
+		Ext.Ajax.request({
+			url: BaseHref + 'jmap.php',
+			method: 'GET',
+			success: function (response, opts) {
+				var data = Ext.decode(response.responseText);
+				cb(data, response, opts);
+			}
+		});
+	},
+	
+	downloadUrl: function(blobId) {
+		if (!blobId) {
+			return '';
+		}
+		return go.User.downloadUrl.replace('{blobId}', blobId);
+	},
+	upload : function(file, cfg) {
+		if(Ext.isEmpty(file))
+			return;
+
+		Ext.Ajax.request({url: go.User.uploadUrl,
+			success: cfg.success || Ext.emptyFn,
+			failure: cfg.failure || Ext.emptyFn,
+			headers: {
+				'X-File-Name': file.name,
+				'Content-Type': file.type,
+				'X-File-LastModifed': Math.round(file['lastModified'] / 1000).toString()
+			},
+			xmlData: file, // just "data" wasn't available in ext
+			scope:cfg.scope || this
+		});
+	},
 
 	/**
 	 * 
