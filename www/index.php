@@ -18,6 +18,7 @@ $root = dirname(__FILE__).'/';
 require_once('GO.php');
 //\GO::init();
 
+GO::language()->setLanguage();
 
 if(!GO::isInstalled()){
 	header('Location: '.\GO::config()->host.'install/');				
