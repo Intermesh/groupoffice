@@ -23,31 +23,17 @@ use GO\Users\Model\CfSettingTab;
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 $settings['pspellSupport'] = function_exists('pspell_new') && !empty(GO::config()->spell_check_enabled);
-
 $settings['max_rows_list'] = 50;
-//
-//require_once(\GO::config()->root_path.'classes/base/theme.class.inc.php');
-//$GLOBALS['GO_THEME'] = new GO_THEME();
-//$settings['modules']=$GLOBALS['GO_MODULES']->modules;
-//$settings['config']['theme_url']=\GO::user()->theme;
+
 $settings['config']['theme'] = GO::config()->theme;
 $settings['config']['product_name'] = GO::config()->product_name;
-
 $settings['config']['host'] = GO::config()->host;
 $settings['config']['title'] = GO::config()->title;
-
-//these were removed for security reasons
-//$settings['config']['product_version']=\GO::config()->version;
-//$settings['config']['webmaster_email']=\GO::config()->webmaster_email;
-
 $settings['config']['full_url'] = GO::config()->full_url;
-
 $settings['config']['allow_password_change'] = GO::config()->allow_password_change;
 $settings['config']['allow_themes'] = GO::config()->allow_themes;
 $settings['config']['allow_profile_edit'] = GO::config()->allow_profile_edit;
-
 $settings['config']['max_users'] = GO::config()->max_users;
-
 $settings['config']['debug'] = GO::config()->debug;
 $settings['config']['max_attachment_size'] = GO::config()->max_attachment_size;
 $settings['config']['max_file_size'] = GO::config()->max_file_size;
@@ -56,68 +42,22 @@ $settings['config']['support_link'] = GO::config()->support_link;
 $settings['config']['report_bug_link'] = GO::config()->report_bug_link;
 $settings['config']['nav_page_size'] = intval(GO::config()->nav_page_size);
 $settings['config']['session_inactivity_timeout'] = intval(GO::config()->session_inactivity_timeout);
-
 $settings['config']['tickets_no_email_required'] = GO::config()->tickets_no_email_required;
-
 $settings['config']['default_country'] = GO::config()->default_country;
 $settings['config']['checker_interval'] = (int) GO::config()->checker_interval;
-
 $settings['config']['remember_login'] = GO::config()->remember_login;
-$settings['state_index'] = 'go';
-$settings['language'] = GO::language()->getLanguage();
-
-$settings['state'] = array();
-
-$settings['show_contact_cf_tabs'] = array();
-
-
 $settings['config']['encode_callto_link'] = GO::config()->encode_callto_link;
 $settings['config']['login_message'] = GO::config()->login_message;
 
+$settings['state_index'] = 'go';
+$settings['language'] = GO::language()->getLanguage();
+$settings['show_contact_cf_tabs'] = array();
 
-//TODO: refactor this. It uses the session to find the token when browser is reloaded.
-if(\GO::user() && !GO()->getUser()) {  
-  $token = Token::find()->where(['accessToken' => GO::session()->values['accessToken']])->single();
-  if($token) {
-    GO()->getAuthState()->setToken($token);
-  }
-}
- 
-$user_id = GO()->getUser() ? GO()->getUser()->id : 0;
+$user_id = GO::user() ? GO::user()->id : 0;
 
+$settings['state'] = State::model()->getFullClientState($user_id);
+$settings['modules'] = GO::view()->exportModules();
 
-if (GO()->getUser()) {
-	
-	$settings['state'] = State::model()->getFullClientState($user_id);
-	$settings['user_id'] = $user_id;
-	$settings['has_admin_permission'] = GO::user()->isAdmin();
-	$settings['username'] = GO::user()->username;
-	$settings['displayName'] = GO::user()->displayName;
-
-	$settings['email'] = GO::user()->email;
-	$settings['thousands_separator'] = GO::user()->thousands_separator;
-	$settings['decimal_separator'] = GO::user()->decimal_separator;
-	$settings['date_format'] = GO::user()->date_format;
-	$settings['time_format'] = GO::user()->time_format;
-	$settings['currency'] = GO::user()->currency;
-	$settings['lastlogin'] = GO::user()->lastlogin;
-	$settings['max_rows_list'] = GO::user()->max_rows_list;
-	$settings['timezone'] = GO::user()->timezone;
-	$settings['start_module'] = GO::user()->start_module;
-	$settings['theme'] = GO::user()->theme;
-	$settings['mute_sound'] = GO::user()->mute_sound;
-	$settings['mute_reminder_sound'] = GO::user()->mute_reminder_sound;
-	$settings['mute_new_mail_sound'] = GO::user()->mute_new_mail_sound;
-	$settings['popup_reminders'] = GO::user()->popup_reminders;
-	$settings['popup_emails'] = GO::user()->popup_emails;
-	$settings['show_smilies'] = GO::user()->show_smilies;
-	$settings['auto_punctuation'] = GO::user()->auto_punctuation;
-	$settings['first_weekday'] = GO::user()->first_weekday;
-	$settings['sort_name'] = GO::user()->sort_name;
-	$settings['list_separator'] = GO::user()->list_separator;
-	$settings['text_separator'] = GO::user()->text_separator;
-	$settings['modules'] = GO::view()->exportModules();
-}
 
 if (GO::modules()->addressbook) {
 	// Add the addresslist tab to the global settings panel
@@ -140,9 +80,6 @@ if (GO::modules()->addressbook) {
 }
 
 $settings['upload_quickselect'] = GO::config()->upload_quickselect;
-
-//if (GO::user()) {
-//state for Ext components
 $settings['html_editor_font'] = GO::config()->html_editor_font;
 
 
@@ -166,8 +103,7 @@ echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' =
   
 if ($cacheFile->exists()) {
 	echo '<script type="text/javascript" src="' . GO::url('core/clientScripts', ['mtime' => GO::config()->mtime, 'lang' => \GO::language()->getLanguage()]) . '"></script>';
-} else
-{
+} else {
 
 	$scripts = array();
 	$load_modules = GO::modules()->getAllModules(true);
@@ -300,8 +236,6 @@ if (GO::user()) {
 
 <script type="text/javascript">
 
-
-
 	//hide mask after 10s to display errors is necessary.
 	setTimeout(function () {
 		var loadMask = document.getElementById('loading-mask');
@@ -317,7 +251,6 @@ if (GO::user()) {
 
 	GO.settings = <?php echo json_encode($settings); ?>;
 	GO.language = "<?php echo GO::config()->language; ?>";
-
 	GO.calltoTemplate = '<?php echo GO::config()->callto_template; ?>';
 
 <?php
@@ -369,15 +302,5 @@ if (isset($_REQUEST['f'])) {
 }
 ?>
 
-<?php if (GO()->getUser()): ?>
-	go.User = <?php echo json_encode(GO()->getUser()->toArray()); ?>;
-	Ext.Ajax.defaultHeaders = {'Authorization': 'Bearer <?php echo GO::session()->values['accessToken']; ?>', 'Accept-Language': GO.lang.iso};
-	Ext.state.Manager.setProvider(new GO.state.HttpProvider());
-	
-<?php else: ?>
-	Ext.Ajax.defaultHeaders = {
-		'Accept-Language': GO.lang.iso
-	};
-<?php endif; ?>
 	Ext.onReady(GO.mainLayout.boot, GO.mainLayout);
 </script>

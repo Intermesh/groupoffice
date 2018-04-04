@@ -108,7 +108,6 @@ GO.addressbook.ContactDialog = function(config)
 		waitMsgTarget:true,
 		baseParams: {},
 		border: false,
-		fileUpload : true, // for picture panel
 		items: [
 		this.tabPanel = new Ext.TabPanel({
 			border: false,
@@ -284,8 +283,11 @@ Ext.extend(GO.addressbook.ContactDialog, GO.Window, {
 				this.afterLoad(action);
 
 				GO.addressbook.ContactDialog.superclass.show.call(this);
-				
-				this.photoPanel.setPhoto(action.result.data.photo_url, action.result.data.original_photo_url);
+				if(action.result.data.avatarId) {
+					this.photoPanel.setPhoto(go.Jmap.downloadUrl(action.result.data.avatarId));
+				} else {
+					this.photoPanel.setPhoto(action.result.data.photo_url, action.result.data.original_photo_url);
+				}
 
 			},
 			scope: this
@@ -296,13 +298,15 @@ Ext.extend(GO.addressbook.ContactDialog, GO.Window, {
 	saveContact : function(hide)
 	{		
 		var company = this.personalPanel.formCompany.getRawValue();
+		var avatarId = this.photoPanel.avatarField.getValue();
 
 		this.formPanel.form.submit({
 			waitMsg:t("Saving..."),
 			url:GO.url('addressbook/contact/submit'),			
 			params: {				
 				id : this.contact_id,
-				company: company
+				company: company,
+				avatarId: avatarId
 			},
 			success:function(form, action){
 				

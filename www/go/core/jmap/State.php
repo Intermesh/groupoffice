@@ -5,6 +5,7 @@ use go\core\auth\State as AbstractState;
 use go\core\auth\model\Token;
 use go\core\auth\model\User;
 use go\core\jmap\Request;
+use go\core\http\Response;
 
 class State extends AbstractState {
 	
@@ -69,6 +70,32 @@ class State extends AbstractState {
 	
 	public function isAuthenticated() {
 		return $this->getToken() !== false;
+	}
+	
+	/**
+	 * Return the JMAP session data.
+	 * Called when the user makes an authenticated GET request
+	 */
+	public function outputSession() {
+		if (!$this->isAuthenticated()) {
+			Response::get()->setStatus(403);
+			exit();
+		}
+		$response = [
+			'username' => $this->getToken()->getUser()->username,
+			'accounts' => ['1'=> [
+				'name'=>'Virtual',
+				'isPrimary' => true,
+				'isReadOnly' => false,
+				'hasDataFor' => []
+			]],
+			'capabilities' => Capabilities::get(),
+			'apiUrl' => GO()->getHostname().'/jmap.php',
+			'downloadUrl' => GO()->getHostname().'/download.php?blob={blobId}',
+			'uploadUrl' => GO()->getHostname().'/upload.php',
+			'user' => $this->getToken()->getUser()->toArray() // added for compatibility
+		];
+		Response::get()->output($response);
 	}
 	
 	/**

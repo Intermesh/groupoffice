@@ -61,13 +61,7 @@ class Response extends \go\core\http\Response {
 		if(isset($data)) {
 			$this->addResponse($data);
 		}
-		
-		$json = json_encode($this->data, JSON_PRETTY_PRINT);
-		
-		if(empty($json)){
-			throw new Exception("JSON encoding error: '".json_last_error_msg()."'.\n\nArray data from server:\n\n" . var_export($this->data, true));
-		}
-		
-		return parent::output($json);
+	
+		return parent::output($this->data);
 	}
 }

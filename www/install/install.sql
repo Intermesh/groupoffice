@@ -651,5 +651,14 @@ ALTER TABLE `core_auth_method` ADD FOREIGN KEY (`moduleId`) REFERENCES `core_mod
 
 ALTER TABLE `core_auth_password` ADD FOREIGN KEY (`userId`) REFERENCES `core_user`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
+CREATE TABLE `core_blob` (
+  `id` BINARY(40) NOT NULL,
+  `type` varchar(129) NOT NULL,
+  `size` bigint(20) NOT NULL DEFAULT '0',
+  `modified` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `createdAt` DATETIME NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
 
 ALTER TABLE `core_search` ADD FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
