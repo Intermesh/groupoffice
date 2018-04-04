@@ -10,7 +10,7 @@ go.links.LinkGrid = Ext.extend(go.grid.GridPanel, {
 				sortable: true,
 				dataIndex: 'name',
 				renderer: function (value, metaData, record, rowIndex, colIndex, store) {
-					return '<i class="entity ' + record.data.entity + '"></i>' + value;
+					return '<i class="entity ' + record.data.entity + '"></i> ' + value;
 				}
 			}, {
 

@@ -12,6 +12,10 @@
 		"ext-pdo": "*",
 		"ext-zip": "*",
 		"ext-soap": "*",
+    "ext-gd": "*",
+    "ext-pdo": "*",
+    "ext-pdo_mysql": "*",
+    "ext-calendar": "*",
 		
 		"fkooman/php-oauth-client": "*",
 		"fkooman/guzzle-bearer-auth-plugin": "*",

@@ -298,7 +298,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		this.actionComplete();
 		
 		//reload group-office
-		document.location = BaseHref;
+		document.location = BaseHref + "?SET_LANGUAGE=" + this.formPanel.getForm().findField('language').getValue();
 	},
 		
 	/**

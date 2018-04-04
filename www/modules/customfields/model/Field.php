@@ -114,7 +114,7 @@ class Field extends \GO\Base\Db\ActiveRecord{
 	}
 	
 	public function getOptions() {
-		return json_decode($this->_attributes['options'], true);
+		return isset($this->_attributes['options']) ? json_decode($this->_attributes['options'], true) : [];
 	}
 	
 	public function getOption($name) {
@@ -140,6 +140,8 @@ class Field extends \GO\Base\Db\ActiveRecord{
 		foreach($this->getOptions() as $key => $value) {
 			$fieldSql = str_replace('%' . $key .'%', $value, $fieldSql);
 		}
+    
+    $fieldSql = str_replace('%maxLength%', $this->customfieldtype->getMaxLength(), $fieldSql);
 					
 		if($wasNew){			
 			$sql = "ALTER TABLE `".$table."` ADD `".$this->databaseName."` ".$fieldSql.";";
@@ -303,6 +305,7 @@ class Field extends \GO\Base\Db\ActiveRecord{
 			$field->setAttributes($createAttributes, false);
 			$field->fieldSetId=$fieldSetId;
 			$field->name=$fieldName;
+      $field->databaseName = \go\core\fs\File::stripInvalidChars($fieldName);
 			$field->save();
 		}
 		return $field;

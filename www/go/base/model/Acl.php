@@ -343,7 +343,9 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 		
 		if($this->usedIn!='readonly'){
 			$this->addGroup(\GO::config()->group_root, Acl::MANAGE_PERMISSION);
-			$this->addUser($this->ownedBy, Acl::MANAGE_PERMISSION);
+			if($this->ownedBy != 1) { //not for admin
+        $this->addGroup(Group::model()->findSingleByAttribute('isUserGroupFor', $this->ownedBy)->id, Acl::MANAGE_PERMISSION);
+      }
 		}
 		
 		return parent::checkDatabase();

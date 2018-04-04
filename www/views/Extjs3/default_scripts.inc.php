@@ -280,9 +280,9 @@ if (isset(GO::session()->values['security_token'])) {
 	echo 'GO.securityToken="' . GO::session()->values['security_token'] . '";';
 }
 
-if (isset($_REQUEST['SET_LANGUAGE']) && preg_match('/[a-z_]/', $_REQUEST['SET_LANGUAGE']))
-	echo 'GO.loginSelectedLanguage="' . $_REQUEST['SET_LANGUAGE'] . '";';
-
+//if (isset($_GET['SET_LANGUAGE']) && preg_match('/[a-z_]/', $_GET['SET_LANGUAGE'])) {
+//	echo 'GO.loginSelectedLanguage = "' . $_GET['SET_LANGUAGE'] . '";';
+//} 
 echo 'window.name="' . GO::getId() . '";';
 ?>
 
