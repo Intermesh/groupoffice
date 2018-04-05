@@ -1916,7 +1916,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 			}
 		}
 
-		if($withCustomFields && GO::modules()->customfields && $this->customfieldsRecord)
+		if($withCustomFields && GO::modules()->customfields && $this->customfieldsRecord  && GO::modules()->customfields->permissionLevel)
 		{
 			$fields = array_merge($fields, $this->customfieldsRecord->getFindSearchQueryParamFields('cf'));
 		}
