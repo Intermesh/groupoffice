@@ -1,6 +1,11 @@
 [general]
-dataPath = /home/govhosts/test.localhost/data
+; Where group-office stores files
+dataPath = /var/lib/groupoffice
+
+; Temporary files path
 tmpPath = /tmp/groupoffice
+
+; Enable debugging mode
 debug = false
 
 [db]
@@ -9,6 +14,11 @@ username = admin
 password = secret
 
 [limits]
-userCount = 10
-storageQuota = 1G
-allowedModules = email,addressbook,users,modules,groups
+; Limit the amount of users that may be created
+userCount = 0
+
+; Limit the amount of files data the installation can use. Use 1G, 100MB etc. 
+storageQuota = 0 
+
+; Limit the modules. Use comma separated string "email,addressbook,users,modules,groups"
+allowedModules = ""
