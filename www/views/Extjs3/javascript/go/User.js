@@ -1,5 +1,5 @@
 go.User = {
-	accessToken: window.localStorage.getItem('accessToken'),
+	accessToken: localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken'),
 	authenticate: function(cb) {
 		if(!this.accessToken) {
 			return;

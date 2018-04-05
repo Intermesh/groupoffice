@@ -9,9 +9,12 @@ require(__DIR__ . "/vendor/autoload.php");
 
 //Create the app with the database connection
 App::get()->setAuthState(new State());
+if (!App::get()->getAuthState()->isAuthenticated()) {
+	throw new \go\core\http\Exception(401);
+}
 
 $input = fopen('php://input', "r");
-$tmpName = GO()->getConfig()['general']['dataPath'] . 'tmp/' . Request::get()->getHeader('X-File-Name') .'-'. microtime() . '.tmp';
+$tmpName = GO()->getDataFolder()->getPath() . '/tmp/' . Request::get()->getHeader('X-File-Name') .'-'. microtime() . '.tmp';
 if (!file_exists(dirname($tmpName))) {
 	mkdir(dirname($tmpName), 0775);
 }

@@ -62,7 +62,7 @@ class Blob extends orm\Entity {
 
 	public function path() {
 		$filePath = substr_replace(substr_replace($this->id,'/',2,0),'/',5,0); // 1st-2 and 2nd-2 chars = dir and subdir
-		return GO()->getConfig()['general']['dataPath'] . 'data/' . $filePath;
+		return GO()->getDataFolder()->getPath() . '/data/' . $filePath;
 	}
 
 }
