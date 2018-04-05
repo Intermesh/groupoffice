@@ -22,10 +22,12 @@ class UsersModule extends \GO\Base\Module{
 		$startModule = \GO\Base\Model\Module::model()->findByPk($user->start_module);
 		$response['data']['start_module_name']=$startModule ? $startModule->moduleManager->name() : '';
 		
-		$company = \GO\Addressbook\Model\Company::model()->findByPk($response['data']['company_id'], false, true);
-		if($company)
-			$response['data']['company_name']=$company->name;
-		
+		if(isset($response['data']['company_id'])){
+			$company = \GO\Addressbook\Model\Company::model()->findByPk($response['data']['company_id'], false, true);
+			if($company){
+				$response['data']['company_name']=$company->name;
+			}		
+		}
 		$response['remoteComboTexts']['holidayset']=\GO::t($user->holidayset);
 		
 		return parent::loadSettings($settingsController, $params, $response, $user);
