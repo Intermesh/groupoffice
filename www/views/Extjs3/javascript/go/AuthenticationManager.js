@@ -183,7 +183,7 @@
 				GO.loginDialog.close();
 			}
 			
-			Ext.applyIf(go.User, result.user);
+			Ext.applyIf(go.User, result.clientSettings);
 
 			var script = document.createElement('script');
 			script.setAttribute('src', GO.url('core/moduleScripts'));
@@ -191,29 +191,14 @@
 
 			Ext.Ajax.defaultHeaders['Authorization'] = 'Bearer ' + result.accessToken;
 
-
 			this.fireEvent("authenticated", this, result);
-
-			//Deprecated settings for old modules not refactored yet.
-			GO.request({
-				url: 'core/clientsettings',
-				success: function (response, options, result) {
-
-					//Apply user settings. Todo, these settings need refactoring.
-					GO.util.mergeObjects(GO, result.GO);
-					
-					//load state
-					Ext.state.Manager.setProvider(new GO.state.HttpProvider());
-
-					GO.mainLayout.onAuthentication();
-
-					GO.mainLayout.on('render', function () {
-						go.Router.goto(go.Router.pathBeforeLogin);
-					}, this, {single: true});
-
-				}
-			});
-
+			
+			//load state
+			Ext.state.Manager.setProvider(new GO.state.HttpProvider());
+			GO.mainLayout.onAuthentication();
+			GO.mainLayout.on('render', function () {
+				go.Router.goto(go.Router.pathBeforeLogin);
+			}, this, {single: true});
 
 		}
 	});

@@ -11,9 +11,10 @@ go.User = {
 			me.apiUrl = data.apiUrl;
 			me.downloadUrl = data.downloadUrl;
 			me.uploadUrl = data.uploadUrl;
-			me.displayName = data.user.displayName;
-			me.id = data.user.id;
-			Ext.applyIf(GO.settings, data.user);
+			me.displayName = data.clientSettings.displayName;
+			me.id = data.clientSettings.id;
+			
+			Ext.apply(GO.settings, data.clientSettings);
 			cb(data, response);
 		});
 		
