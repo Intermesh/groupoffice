@@ -88,7 +88,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		if(go.User.accessToken){
 			Ext.Ajax.defaultHeaders['Authorization'] = 'Bearer '+go.User.accessToken;
-			Ext.state.Manager.setProvider(new GO.state.HttpProvider());
 			go.User.authenticate(function(data, response){
 
 				if(response.status === 200) {
