@@ -28,6 +28,8 @@
 		 * @type {Array} string
 		 */
 		userMethods: [],
+		
+		rememberLogin:false,
 
 		/**
 		 * Register new authenticator
@@ -100,6 +102,22 @@
 				}
 			});
 		},
+		
+		logout: function (first) {
+
+			if (Ext.Ajax.isLoading())
+			{
+				if (first) {
+					Ext.getBody().mask(t("Loading..."));
+				}
+				this.logout.defer(500, this, [true]);
+			} else
+			{
+				window.localStorage.removeItem("accessToken");
+				window.sessionStorage.removeItem("accessToken");
+				document.location = GO.url('auth/logout');
+			}
+		},
 
 		doAuthentication: function (methods, cb, scope) {
 
@@ -128,12 +146,13 @@
 		},
 
 		onAuthenticated: function (result) {
-
-			window.localStorage.setItem('accessToken', result.accessToken);
+			var storage = go.AuthenticationManager.rememberLogin ? 'localStorage' : 'sessionStorage';
+			window[storage].setItem('accessToken', result.accessToken);
 			
 			if (GO.loginDialog) {
 				GO.loginDialog.close();
 			}
+			
 			Ext.applyIf(go.User, result.user);
 
 			var script = document.createElement('script');

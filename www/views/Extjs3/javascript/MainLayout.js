@@ -108,10 +108,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 	login: function () {
 		
-		if(this.checkRemindedLogin()) {
-			return true;
-		}
-		
 		if(!this.loginPanel) {
 			//go.AuthenticationManager.register('password', new go.login.PasswordPanel(), 0);
 			
@@ -123,60 +119,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		this.fireEvent('login', this);
 	},
-	
-	setRememberLogin : function(rememberLogin) {
-		this.rememberLogin = rememberLogin
-	},	
-	
-	rememberLogin : false,
-	
-	checkRemindedLogin : function() {
-		//remember login part
-		go.AuthenticationManager.on('authenticated', function(authMan, result) {
-			
-			if(this.rememberLogin) {
-				window.localStorage.setItem("accessToken", result.accessToken);
-			} 
-		}, this);
-
-		var accessToken = window.localStorage.getItem("accessToken");
-		if(accessToken) {
-			
-			this.rememberLogin = true;
-			go.AuthenticationManager.accessToken = accessToken;
-			
-			go.AuthenticationManager.doAuthentication(null, function(authMan, success, result){
-				if(!success) {
-					this.rememberLogin = false;
-				 	window.localStorage.removeItem("accessToken");
-					this.login();
-				}
-			}, this);
-			
-			return true;
-		} else
-		{
-			return false;
-		}
-	},
 
 	saveState: function () {
 		Ext.state.Manager.getProvider().set('open-modules', this.getOpenModules());
-	},
-
-	logout: function (first) {
-
-		if (Ext.Ajax.isLoading())
-		{
-			if (first) {
-				Ext.getBody().mask(t("Loading..."));
-			}
-			this.logout.defer(500, this, [true]);
-		} else
-		{
-			window.localStorage.removeItem("accessToken");
-			document.location = GO.url('auth/logout');
-		}
 	},
 
 	fireReady: function () {
@@ -602,7 +547,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 						}, {
 							text: t("Logout"),
 							iconCls: 'ic-exit-to-app',
-							handler: GO.mainLayout.logout,
+							handler: go.AuthenticationManager.logout,
 							scope: this
 						}
 					]

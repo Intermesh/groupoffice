@@ -74,8 +74,7 @@ class State extends AbstractState {
 	 */
 	public function outputSession() {
 		if (!$this->isAuthenticated()) {
-			Response::get()->setStatus(403);
-			exit();
+			throw new \go\core\http\Exception(401);
 		}
 		$response = [
 			'username' => $this->getToken()->getUser()->username,
@@ -86,9 +85,9 @@ class State extends AbstractState {
 				'hasDataFor' => []
 			]],
 			'capabilities' => Capabilities::get(),
-			'apiUrl' => GO()->getHostname().'/jmap.php',
-			'downloadUrl' => GO()->getHostname().'/download.php?blob={blobId}',
-			'uploadUrl' => GO()->getHostname().'/upload.php',
+			'apiUrl' => Request::get()->getHostname().'/jmap.php',
+			'downloadUrl' => Request::get()->getHostname().'/download.php?blob={blobId}',
+			'uploadUrl' => Request::get()->getHostname().'/upload.php',
 			'user' => $this->getToken()->getUser()->toArray() // added for compatibility
 		];
 		Response::get()->output($response);

@@ -78,6 +78,13 @@ class Request extends Singleton{
 		$accept = explode(',', strtolower($_SERVER['HTTP_ACCEPT_LANGUAGE']));		
 		return array_map('trim', $accept);				
 	}
+	
+	public function getHostname() {
+		$protocol = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
+		$path = explode('/',$_SERVER['REQUEST_URI']);
+		array_pop($path); // pop filename and querystring
+		return $protocol . $_SERVER['HTTP_HOST'] . implode('/',$path);
+	}
 
 	/**
 	 * Get the request headers as a key value array. The header names are in lower case.
