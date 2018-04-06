@@ -83,6 +83,10 @@ go.form.FormWindow = Ext.extend(go.Window, {
 			this.getFooterToolbar().setDisabled(false);
 		}
 	},
+	
+	getSubmitValues : function() {
+		return this.formPanel.getForm().getFieldValues();
+	},
 
 	submitForm: function () {
 
@@ -90,7 +94,7 @@ go.form.FormWindow = Ext.extend(go.Window, {
 			return;
 		}
 
-		var id, params = {}, values = this.formPanel.getForm().getFieldValues();
+		var id, params = {}, values = this.getSubmitValues();
 		//		//this.id is null when new
 		if (this.currentId) {
 
