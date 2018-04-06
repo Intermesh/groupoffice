@@ -103,6 +103,7 @@ class EntityType {
 			$record = [];
 			$record['moduleId'] = isset($module) ? $module->id : null;
 			$record['name'] = $e->name;
+      $record['clientName'] = $className::getClientName();
 
 			App::get()->getDbConnection()->insert('core_entity', $record)->execute();
 
