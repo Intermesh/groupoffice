@@ -273,6 +273,19 @@ abstract class Entity extends Property {
 	public static function getType() {		
 		return EntityType::findByClassName(static::class);
 	}
+  
+  /**
+   * Return the unique (!) client name for this entity. Each entity must have a unique name for the client.
+   * 
+   * For main entities this is not a problem like "Note", "Contact", "Project" etc.
+   * 
+   * But common names like "Category" or "Folder" should be avoided. Use 
+   * "CommentCategory" for example as client name. By default the class name without namespace is used as clientName().
+   * @return string
+   */
+  public static function getClientName() {
+    return substr($cls, strrpos($cls, '\\') + 1);
+  }
 
 
 }

@@ -28,9 +28,10 @@ GO.files.FileBrowserButton = Ext.extend(Ext.Button, {
 							fb.model_id = this.id;
 							
 							//hack to update entity store
-							if(go.stores[fb.model_name]) {
-								go.stores[fb.model_name].data[this.id].filesFolderId = result.files_folder_id;
-								go.stores[fb.model_name].saveState();
+              var store = go.Stores.get(fb.model_name);
+							if(store) {
+								store.data[this.id].filesFolderId = result.files_folder_id;
+								store.saveState();
 							}
 							
 							fb.on('hide', function() {

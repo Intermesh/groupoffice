@@ -99,7 +99,7 @@ GO.addressbook.ContactDialog = function(config)
 		}
 	}
 
-//	if(go.ModuleManager.isAvailable("comments")){
+//	if(go.Modules.isAvailable("legacy", "comments")){
 //		this.commentsGrid = new GO.comments.CommentsGrid({title:t("Comments", "comments")});
 //		items.push(this.commentsGrid);
 //	}
@@ -169,7 +169,7 @@ GO.addressbook.ContactDialog = function(config)
 		'save':true
 	});
 
-//	if(go.ModuleManager.isAvailable("customfields")) {
+//	if(go.Modules.isAvailable("core", "customfields")) {
 //		this.personalPanel.formAddressBooks.on('select',function(combo,record,index){
 //			var allowed_cf_categories = record.data.allowed_cf_categories.split(',');
 //			this.updateCfTabs(allowed_cf_categories);
@@ -249,7 +249,7 @@ Ext.extend(GO.addressbook.ContactDialog, GO.Window, {
 				
 				
 
-				if(go.ModuleManager.isAvailable("customfields"))
+				if(go.Modules.isAvailable("core", "customfields"))
 					GO.customfields.disableTabs(this.tabPanel, action.result);	
 
 				if (!GO.util.empty(config.contactData)) {

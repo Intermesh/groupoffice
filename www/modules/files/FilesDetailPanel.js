@@ -65,7 +65,7 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 			GO.files.openFolder(this.folderId, record.id);
 		}else
 		{
-			if(go.ModuleManager.isAvailable("files")){
+			if(go.Modules.isAvailable("legacy", "files")){
 				//GO.files.openFile({id:file.id});
 				record.data.handler.call(this);
 			}else

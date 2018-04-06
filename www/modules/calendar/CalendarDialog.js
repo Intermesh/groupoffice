@@ -91,7 +91,7 @@ GO.calendar.CalendarDialog = function(config)
 		]
 	});
 
-	if(go.ModuleManager.isAvailable("tasks"))
+	if(go.Modules.isAvailable("legacy", "tasks"))
 	{
 		this.tasklistsTab = new GO.base.model.multiselect.panel({
       title:t("Visible tasklists", "tasks"),
@@ -261,7 +261,7 @@ GO.calendar.CalendarDialog = function(config)
 
 	var items = [this.propertiesTab];
 	
-	if(go.ModuleManager.isAvailable("tasks"))
+	if(go.Modules.isAvailable("legacy", "tasks"))
 	{
 		items.push(this.tasklistsTab);
 	}
@@ -347,7 +347,7 @@ Ext.extend(GO.calendar.CalendarDialog, GO.Window, {
 		} else {
 			this.selectGroup.store.reload()
 		}
-		if(go.ModuleManager.isAvailable("tasks"))
+		if(go.Modules.isAvailable("legacy", "tasks"))
 		{
 			this.tasklistsTab.setModelId(calendar_id);
 		}
@@ -417,7 +417,7 @@ Ext.extend(GO.calendar.CalendarDialog, GO.Window, {
 	
 	loadCalendar : function(calendar_id)
 	{
-		if(go.ModuleManager.isAvailable("tasks"))
+		if(go.Modules.isAvailable("legacy", "tasks"))
 		{
 			this.tasklistsTab.setModelId(calendar_id);
 //			this.tasklistsTab.store.loaded = false;
@@ -480,7 +480,7 @@ Ext.extend(GO.calendar.CalendarDialog, GO.Window, {
 					//this.loadAccount(this.calendar_id);
 					}
 
-					if(go.ModuleManager.isAvailable("tasks"))
+					if(go.Modules.isAvailable("legacy", "tasks"))
 					{
 						this.tasklistsTab.setModelId(action.result.id);
 						this.tasklistsTab.store.commitChanges();
@@ -520,7 +520,7 @@ Ext.extend(GO.calendar.CalendarDialog, GO.Window, {
 		f = this.formPanel.form.findField('show_bdays');
 		f.container.up('div.x-form-item').setDisplayed(!resource);
 
-		if(go.ModuleManager.isAvailable("tasks"))
+		if(go.Modules.isAvailable("legacy", "tasks"))
 		{
 			if(resource)
 			{
