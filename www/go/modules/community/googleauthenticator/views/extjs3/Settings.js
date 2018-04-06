@@ -139,7 +139,7 @@ Ext.override(go.usersettings.AccountSettingsPanel, {
 						googleauthenticator: {}
 					};					
 					
-					go.stores.User.set(params, function (options,success,response) {								
+					go.Stores.get("community", "get")("community", "User").set(params, function (options,success,response) {								
 						if(!success || GO.util.empty(response.updated)) {
 							return this.enableGoogleAuthenticator();
 						}
@@ -176,7 +176,7 @@ Ext.override(go.usersettings.AccountSettingsPanel, {
 						googleauthenticator:null
 					};					
 					
-					go.stores.User.set(params, function (options,success,response) {								
+					go.Stores.get("community", "get")("community", "User").set(params, function (options,success,response) {								
 						if(success && !GO.util.empty(response.updated)) {
 							this.setQr(false);						
 						} else
