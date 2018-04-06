@@ -417,7 +417,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 *
 	 * @var StringHelper
 	 */
-	public $html_editor_font = 'font-size:14px; -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; color: #212121;';
+	public $html_editor_font = 'font-size:14px;font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; color: #212121;';
 
 	/**
 	 * The default font to be used in the generated PDF files.
@@ -1631,7 +1631,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 		$this->title = GO()->getSettings()->title;
 		$this->language = GO()->getSettings()->language;
 		$this->webmaster_email = GO()->getSettings()->systemEmail;
-		$this->smtp_host = GO()->getSettings()->smtpHost;
+		$this->smtp_server = GO()->getSettings()->smtpHost;
 		$this->smtp_port = GO()->getSettings()->smtpPort;
 		$this->smtp_username = GO()->getSettings()->smtpUsername;
 		$this->smtp_password = GO()->getSettings()->smtpPassword;

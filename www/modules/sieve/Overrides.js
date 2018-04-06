@@ -95,3 +95,5 @@ GO.moduleManager.onModuleReady('email',function(){
 		})
 	});
 });
+
+go.ModuleManager.register('sieve');

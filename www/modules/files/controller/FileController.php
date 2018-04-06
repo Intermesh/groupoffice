@@ -28,18 +28,17 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 
 
 		$joinSearchCacheCriteria = \GO\Base\Db\FindCriteria::newInstance()
-					->addRawCondition('`t`.`id`', '`sc`.`model_id`')
-					->addCondition('model_type_id', \GO\Files\Model\File::model()->modelTypeId(),'=','sc');
+					->addRawCondition('`t`.`id`', '`sc`.`entityId`')
+					->addCondition('entityTypeId', \GO\Files\Model\File::model()->modelTypeId(),'=','sc');
 
 		$findParams->join(\GO\Base\Model\SearchCacheRecord::model()->tableName(), $joinSearchCacheCriteria, 'sc', 'INNER');
 
 
 		$aclJoinCriteria = \GO\Base\Db\FindCriteria::newInstance()
-							->addRawCondition('a.acl_id', 'sc.acl_id','=', false);
+							->addRawCondition('a.aclId', 'sc.aclId','=', false);
 
 		$aclWhereCriteria = \GO\Base\Db\FindCriteria::newInstance()
-						->addCondition('user_id', \GO::user()->id,'=','a', false)
-						->addInCondition("group_id", \GO\Base\Model\User::getGroupIds(\GO::user()->id),"a", false);
+						->addInCondition("groupId", \GO\Base\Model\User::getGroupIds(\GO::user()->id),"a", false);
 
 		$findParams->join(\GO\Base\Model\AclUsersGroups::model()->tableName(), $aclJoinCriteria, 'a', 'INNER');
 

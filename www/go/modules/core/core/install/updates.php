@@ -120,3 +120,6 @@ $updates["201803161130"][] = function() {
 		$file->write($iniFile);
 	}
 };
+
+
+$updates["201804042007"][] = "ALTER TABLE `core_search` ADD FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";

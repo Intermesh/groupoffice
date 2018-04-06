@@ -24,10 +24,6 @@ if (!empty($_POST)) {
 				'password' => $_POST['password'],
 				'email' => $_POST['email']
 						];
-		
-		App::get()->getDbConnection()->query("DROP DATABASE groupoffice");
-		App::get()->getDbConnection()->query("create DATABASE groupoffice");
-		App::get()->getDbConnection()->query("use groupoffice");
 
 		App::get()->getInstaller()->install($admin, [new Module(), new Module3()]);
 
