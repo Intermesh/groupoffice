@@ -16,7 +16,7 @@ go.modules.comments.CategoryCombo = Ext.extend(go.form.ComboBox, {
 		Ext.applyIf(this, {
 			store: new go.data.Store({
 				fields: ['id', 'name'],
-				entityStore: go.stores.CommentCategory
+				entityStore: go.Stores.get("CommentCategory")
 			})
 		});
 		

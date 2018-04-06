@@ -12,4 +12,8 @@ class CommentCategory extends Entity {
 		return parent::defineMapping()
 						->addTable("comments_category");
 	}
+	
+	public static function getClientName() {
+		return "CommentCategory";
+	}
 }

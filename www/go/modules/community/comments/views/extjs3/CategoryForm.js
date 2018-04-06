@@ -1,7 +1,7 @@
 go.modules.comments.CategoryForm = Ext.extend(go.form.FormWindow, {
 	stateId: 'comments-categoryForm',
 	title: t('Category', 'comments'),
-	entityStore: go.stores.CommentCategory,
+	entityStore: go.Stores.get("CommentCategory"),
 	autoHeight: true,
 	initFormItems: function () {
 		return [{

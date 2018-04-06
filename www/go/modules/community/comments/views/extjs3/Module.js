@@ -1,8 +1,8 @@
 Ext.ns('go.modules.comments');
 
-go.ModuleManager.register('comments', {
+go.Modules.register('community', 'comments', {
 	title: t("Comments", "comments"),
-	entities: ["Comment", "Category"],
+	entities: ["Comment", "CommentCategory"],
 	initModule: function () {	
 		
 	}

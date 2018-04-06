@@ -4,7 +4,7 @@ go.modules.comments.CategoryGrid = Ext.extend(go.grid.GridPanel, {
 
 		this.store = new go.data.Store({
 			fields: ['id', 'name'],
-			entityStore: go.stores.CommentsCategory
+			entityStore: go.Stores.get("CommentCategory")
 		});
 
 		Ext.apply(this, {
