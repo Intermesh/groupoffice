@@ -167,11 +167,11 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 
 		this.add(new go.links.LinksDetailPanel());
 
-		if (go.Modules.isAvailable("community", "comments")) {
+		if (go.Modules.isAvailable("legacy", "comments")) {
 			this.add(new go.modules.comments.CommentsDetailPanel());
 		}
 
-		if (go.Modules.isAvailable("community", "files")) {
+		if (go.Modules.isAvailable("legacy", "files")) {
 			this.add(new go.modules.files.FilesDetailPanel());
 		}
 	},

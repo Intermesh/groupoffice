@@ -15,8 +15,8 @@ GO.addressbook.AddresslistGroupGrid = Ext.extend(GO.grid.GridPanel,{
 	
 	initComponent : function(){
 		
-		this.noDelete = go.Modules.get("community", 'addressbook').permissionLevel < GO.permissionLevels.delete;
-		this.standardTbarDisabled = go.Modules.get("community", 'addressbook').permissionLevel < GO.permissionLevels.write;
+		this.noDelete = go.Modules.get("legacy", 'addressbook').permissionLevel < GO.permissionLevels.delete;
+		this.standardTbarDisabled = go.Modules.get("legacy", 'addressbook').permissionLevel < GO.permissionLevels.write;
 	
 
 		var fields = {

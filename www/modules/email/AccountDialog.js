@@ -21,7 +21,7 @@ GO.email.AccountDialog = function(config) {
 		name : 'mbroot'
 	}) ];
     console.log("JAAA");
-	if(go.Modules.isAvailable("community", "sieve")) {
+	if(go.Modules.isAvailable("legacy", "sieve")) {
         console.log("JAAA");
 		advancedItems.push(
 			new Ext.form.NumberField({
@@ -43,7 +43,7 @@ GO.email.AccountDialog = function(config) {
 		);
 	}
 
-	if(go.Modules.isAvailable("community", "addressbook")){
+	if(go.Modules.isAvailable("legacy", "addressbook")){
 				
 		this.templatesCombo = new GO.form.ComboBox({
 			fieldLabel : t("Default e-mail template", "email"),
@@ -196,7 +196,7 @@ GO.email.AccountDialog = function(config) {
 	}
 	];
 
-	if(go.Modules.isAvailable("community", "addressbook"))
+	if(go.Modules.isAvailable("legacy", "addressbook"))
 		properties_items.push(this.templatesCombo);
 
 	this.smtpAllowSelfSignedCheck = new Ext.ux.form.XCheckbox({

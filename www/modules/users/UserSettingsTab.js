@@ -269,7 +269,7 @@ GO.users.UserSettingsTab = function(config)
 			}]
 		}];
 	
-		if(go.Modules.isAvailable("community", "addressbook")){
+		if(go.Modules.isAvailable("legacy", "addressbook")){
 			this.companyFieldset = new Ext.form.FieldSet({
 				title: t("Work"),
 				autoHeight: true,

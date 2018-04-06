@@ -215,7 +215,7 @@ GO.addressbook.ContactsGrid = function(config){
 		]
 	}
 	
-	if(go.Modules.isAvailable("community", "customfields"))
+	if(go.Modules.isAvailable("core", "customfields"))
 		GO.customfields.addColumns("GO\\Addressbook\\Model\\Contact", fields);
 	
 	config.store = new GO.data.JsonStore({

@@ -97,7 +97,7 @@ Ext.extend(GO.addressbook.BirthdaysPanel, GO.grid.GridPanel, {
 
 
 GO.mainLayout.onReady(function(){
-	if(go.Modules.isAvailable("community", "summary"))
+	if(go.Modules.isAvailable("legacy", "summary"))
 	{
 		var birthdaysGrid = new GO.addressbook.BirthdaysPanel();
 		

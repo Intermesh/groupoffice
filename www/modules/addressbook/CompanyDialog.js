@@ -243,7 +243,7 @@ Ext.extend(GO.addressbook.CompanyDialog, GO.Window, {
 					this.photoPanel.setPhoto(action.result.photo_url, action.result.original_photo_url);
 				}
 				
-				if(go.Modules.isAvailable("community", "customfields"))
+				if(go.Modules.isAvailable("core", "customfields"))
 					GO.customfields.disableTabs(this.tabPanel, action.result);	
 				
 				

@@ -11,7 +11,7 @@
      * this will create a global entity and store:
      * 
      * go.Stores.get("name")]
-     * go.entities[name]
+     * go.Entities.get(name)
      * 
      * @param {string} name
      * @param {object} jmapMethods
@@ -33,7 +33,11 @@
     },
 
     get: function (name) {      
-      return entities[package][module][name];      
+      return entities[name];      
+    },
+    
+    getAll() {
+      return entities;
     }
   };
   

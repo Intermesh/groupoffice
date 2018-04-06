@@ -249,7 +249,7 @@ GO.files.FilesContextMenu = function(config)
 	});
 	config['items'].push(this.createDownloadLinkButton);
 
-	if(go.Modules.isAvailable("community", "email")) {
+	if(go.Modules.isAvailable("legacy", "email")) {
 		this.downloadLinkButton = new Ext.menu.Item({
 			iconCls: 'btn-email',
 			text: t("Email download link", "files"),

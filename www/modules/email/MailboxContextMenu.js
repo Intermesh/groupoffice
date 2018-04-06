@@ -232,7 +232,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 									GO.mainLayout.getModulePanel("email").messagesGrid.store.removeAll();
 								}
 
-								if(go.Modules.isAvailable("community", "emailportlet")){
+								if(go.Modules.isAvailable("legacy", "emailportlet")){
 									GO.emailportlet.foldersStore.load();
 								}
 								this.treePanel.mainPanel.refresh(true);

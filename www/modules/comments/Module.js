@@ -1,3 +1,3 @@
-go.Modules.register("community", 'comments', {
+go.Modules.register("legacy", 'comments', {
 
 });

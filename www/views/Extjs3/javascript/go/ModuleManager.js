@@ -76,8 +76,8 @@
 			var all = go.Stores.get("Module").data;
 			
 			for(id in all) {
-				if(all[id].package == package && all[id].name == name) {
-					return all[id];
+				if((package == "legacy" || all[id].package == package) && all[id].name == name) {
+        	return all[id];
 				}
 			};
 			
@@ -104,10 +104,9 @@
 		
 		//will be called after login
 		init : function() {
-			go.Stores.get("Module").getUpdates(function () {
+			go.Stores.get("Module").getUpdates(function () {        
         for(package in this.registered) {
           for(name in this.registered[package]) {
-
             if(!this.isAvailable(package, name)) {
               continue;
             }
@@ -116,7 +115,7 @@
 
             if (config.mainPanel) {
               //todo GO.moduleManager is deprecated
-              GO.moduleManager._addModule(package + "-" + name, config.mainPanel, config.panelConfig, config.subMenuConfig);
+              GO.moduleManager._addModule(name, config.mainPanel, config.panelConfig, config.subMenuConfig);
             }
 
             if(config.initModule)

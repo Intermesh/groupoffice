@@ -69,7 +69,7 @@ GO.site.MainPanel = function(config){
 			]
 	});
 	
-//	if(go.Modules.isAvailable("community", "files")) {
+//	if(go.Modules.isAvailable("legacy", "files")) {
 //		this.fileBrowserButton = new GO.files.FileBrowserButton({
 //			model_name:"GO\\Site\\Model\\Site"
 //		});

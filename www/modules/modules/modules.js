@@ -602,8 +602,10 @@ Ext.extend(GO.modules.MainPanel,Ext.grid.EditorGridPanel, {
 });
 
 
-GO.moduleManager.addModule('modules', GO.modules.MainPanel, {
-	title: t("Modules", "modules"),
+go.Modules.register('core', 'modules' ,{
+  mainPanel: GO.modules.MainPanel,
+  title: t("Modules", "modules"),
 	iconCls: 'go-tab-icon-modules',
-	admin: true
+	admin: true,
+  entities: ["Module"]
 });

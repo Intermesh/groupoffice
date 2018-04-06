@@ -257,7 +257,7 @@ GO.addressbook.AddressbookDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 		
 		this.addPermissionsPanel(new GO.grid.PermissionsPanel());
 		
-		if(go.Modules.isAvailable("community", "customfields")){
+		if(go.Modules.isAvailable("core", "customfields")){
 			this.disableContactsCategoriesPanel = new GO.customfields.DisableCategoriesPanel({
 				title:t("Contacts custom fields", "addressbook")
 			});
@@ -279,7 +279,7 @@ GO.addressbook.AddressbookDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 	
 	setRemoteModelId : function(remoteModelId){
 		
-		if(go.Modules.isAvailable("community", "customfields")){
+		if(go.Modules.isAvailable("core", "customfields")){
 			this.disableContactsCategoriesPanel.setModel(remoteModelId, "GO\\Addressbook\\Model\\Contact");
 			this.disableCompaniesCategoriesPanel.setModel(remoteModelId, "GO\\Addressbook\\Model\\Company");
 			this.enableBlocksPanel.setModel(remoteModelId,"GO\\Addressbook\\Model\\Addressbook");

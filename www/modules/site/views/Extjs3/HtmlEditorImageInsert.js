@@ -55,7 +55,7 @@ Ext.extend(GO.site.HtmlEditorImageInsert, Ext.util.Observable, {
 		};
 		element.overflowText=t("Insert image in the text");
 
-		if(go.Modules.isAvailable("community", "files")){
+		if(go.Modules.isAvailable("legacy", "files")){
 			element.handler = function(){
 				this.showFileBrowser();
 			};

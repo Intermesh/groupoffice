@@ -253,7 +253,7 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 
 
 		
-		if(go.Modules.isAvailable("community", "workflow"))
+		if(go.Modules.isAvailable("legacy", "workflow"))
 			this.template +=GO.workflow.WorkflowTemplate;
 		
 		Ext.apply(this.templateConfig, GO.linksTemplateConfig);

@@ -63,7 +63,7 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 					sortable: true,
 					dataIndex: 'toEntity',
 					renderer: function(v) {
-						return t(v, go.entities[v].module);
+						return t(v, go.Entities.get(v).module);
 					}
 				},
 				{
@@ -80,7 +80,7 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 			listeners: {
 				dblclick: function () {
 					var record = this.grid.getSelectionModel().getSelected();
-					var entity = go.entities[record.data.toEntity];
+					var entity = go.Entities.get(record.data.toEntity);
 
 					if (!entity) {
 						throw record.data.toEntity + " is not a registered entity";

@@ -809,7 +809,7 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 					var theEventData = this._elementToEvent(eventEl);
 					
 					if (theEventData.model_name=='GO\\Tasks\\Model\\Task') {
-						if(go.Modules.isAvailable("community", "tasks")) {
+						if(go.Modules.isAvailable("legacy", "tasks")) {
 							if (!this.taskContextMenu)
 								this.taskContextMenu = new GO.calendar.TaskContextMenu();
 

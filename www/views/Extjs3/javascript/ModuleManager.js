@@ -74,7 +74,7 @@ GO.ModuleManager = Ext.extend(function(){
 	},
 	
 	addModule : function(moduleName, panelClass, panelConfig, subMenuConfig) {
-		go.Modules.register("community", moduleName, {
+		go.Modules.register("legacy", moduleName, {
 			title: panelConfig.title,
 			requiredPermissionLevel: panelConfig.requiredPermissionLevel || GO.permissionLevels.read,
 			mainPanel: panelClass,

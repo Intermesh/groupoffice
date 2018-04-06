@@ -101,7 +101,7 @@ Ext.extend(GO.calendar.GroupDialog, GO.Window, {
 	},
 	setGroupId : function(group_id)
 	{
-		if(go.Modules.isAvailable("community", "customfields"))
+		if(go.Modules.isAvailable("core", "customfields"))
 			this.disableCategoriesPanel.setModel(group_id,"GO\\Calendar\\Model\\Event");
 		
 		this.formPanel.form.baseParams['id'] = group_id;
@@ -180,7 +180,7 @@ Ext.extend(GO.calendar.GroupDialog, GO.Window, {
 
 		items.push(this.groupAdminsPanel);
 		
-		if(go.Modules.isAvailable("community", "customfields")){
+		if(go.Modules.isAvailable("core", "customfields")){
 			this.disableCategoriesPanel = new GO.customfields.DisableCategoriesPanel();
 			items.push(this.disableCategoriesPanel);
 		}

@@ -4,7 +4,7 @@ GO.mainLayout.onReady(function(){
 	GO.moduleManager.addSettingsPanel('look_and_feel', GO.users.LookAndFeelPanel);
 	if(GO.settings.config.allow_profile_edit) {
 		GO.moduleManager.addSettingsPanel('account', GO.users.UserSettingsTab);
-		if(go.Modules.isAvailable("community", "addressbook")) {
+		if(go.Modules.isAvailable("legacy", "addressbook")) {
 			GO.moduleManager.addSettingsPanel('photo', GO.addressbook.PhotoPanel);
 		}
 	}

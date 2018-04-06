@@ -153,14 +153,14 @@ GO.tasks.TasksPanel = function(config)
 			}]
 		};
 
-		if(go.Modules.isAvailable("community", "projects2")){
+		if(go.Modules.isAvailable("legacy", "projects2")){
 			fields.columns.push({
 				header: t("Project", "projects2"),
 				dataIndex: 'project_name',
 				hidden:true,
 				width:150
 			});
-		} else if(go.Modules.isAvailable("community", "projects")){
+		} else if(go.Modules.isAvailable("legacy", "projects")){
 			fields.columns.push({
 				header: t("project", "projects"),
 				dataIndex: 'project_name',
@@ -169,7 +169,7 @@ GO.tasks.TasksPanel = function(config)
 			});
 		}
 
-		if(go.Modules.isAvailable("community", "customfields"))
+		if(go.Modules.isAvailable("core", "customfields"))
 		{
 			GO.customfields.addColumns("GO\\Tasks\\Model\\Task", fields);
 		}
