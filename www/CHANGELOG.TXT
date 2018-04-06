@@ -1,3 +1,4 @@
+- Cron/Systemtasks: Fixed issue that groups could not be deleted anymore for individual system tasks
 - Addressbook: added readable addresslists back to grid (changed permission from write to read)
 
 26-03-2018 6.2.89

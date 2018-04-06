@@ -28,5 +28,9 @@ class CronGroupController extends \GO\Base\Controller\AbstractMultiSelectModelCo
 	 */
 	public function linkModelField() {
 		return 'group_id';
-	}	
+	}
+
+	protected function getRemoteKey() {
+		return 'cronjob_id';
+	}
 }
