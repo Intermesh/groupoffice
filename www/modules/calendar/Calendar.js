@@ -167,7 +167,7 @@ GO.calendar.MainPanel = function(config){
 		}
 	}, this);
 
-//	if(go.ModuleManager.isAvailable("projects")){
+//	if(go.Modules.isAvailable("community", "projects")){
 //		this.projectCalendarsStore.on('load', function(){
 //			this.projectCalendarsList.setVisible(this.projectCalendarsStore.data.length);
 //			this.calendarListPanel.doLayout();
@@ -845,7 +845,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 	afterRender : function(){
 		GO.calendar.MainPanel.superclass.afterRender.call(this);
 
-		if(go.ModuleManager.isAvailable("tasks")){
+		if(go.Modules.isAvailable("community", "tasks")){
 			GO.dialogListeners.add('tasks',{
 				scope:this,
 				save:function(){
@@ -1931,7 +1931,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 				scope:this
 			},'-']
 
-			if(go.ModuleManager.isAvailable("customfields"))
+			if(go.Modules.isAvailable("community", "customfields"))
 			{
 				tbar.push(new Ext.Button({
 					iconCls: 'ic-settings',
@@ -2136,7 +2136,7 @@ GO.calendar.extraToolbarItems = [];
 
 
 
-go.ModuleManager.register('calendar', {
+go.Modules.register("community", 'calendar', {
 	mainPanel: GO.calendar.MainPanel,
 	title : t("Calendar", "calendar"),
 	iconCls : 'go-tab-icon-calendar',
@@ -2211,7 +2211,7 @@ GO.mainLayout.onReady(function(){
 //	});
 
 	//GO.checker is not available in some screens like accept invitation from calendar
-	if(go.ModuleManager.isAvailable("checker")){
+	if(go.Modules.isAvailable("community", "checker")){
 
 		GO.checker.on('check', function(checker, data){
 			var tp = GO.mainLayout.getModulePanel('calendar');

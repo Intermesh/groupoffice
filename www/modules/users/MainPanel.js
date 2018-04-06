@@ -139,7 +139,7 @@ GO.users.showUserDialog = function(user_id, config){
 }
 
 
-go.ModuleManager.register('users', {
+go.Modules.register("community", 'users', {
 	mainPanel: GO.users.MainPanel,
 	admin: true,	
 	title: t("Users"),

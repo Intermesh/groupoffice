@@ -85,7 +85,7 @@ GO.email.AddressContextMenu = function(config)
 	this.searchButton,
 	this.searchMessagesButton];
 	
-	if(go.ModuleManager.isAvailable("addressbook"))
+	if(go.Modules.isAvailable("community", "addressbook"))
 	{
 		this.lookUpButton = new Ext.menu.Item({
 			iconCls: 'btn-addressbook',

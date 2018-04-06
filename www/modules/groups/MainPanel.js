@@ -118,7 +118,7 @@ Ext.extend(GO.groups.MainPanel, GO.grid.GridPanel, {
 
 
 
-go.ModuleManager.register('groups', {
+go.Modules.register("community", 'groups', {
 	mainPanel: GO.groups.MainPanel,
 	admin: true,	
 	title: t("Groups", "groups"),

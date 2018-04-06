@@ -121,7 +121,7 @@ GO.files.FolderPropertiesDialog = function(config){
 		items:[this.propertiesPanel, this.commentsPanel, this.readPermissionsTab]
 	});
 	
-	if(go.ModuleManager.isAvailable("customfields")){
+	if(go.Modules.isAvailable("community", "customfields")){
 		this.disableCategoriesPanel = new GO.customfields.DisableCategoriesPanel();
 		
 		this.recursivePanel = new Ext.Panel({
@@ -161,7 +161,7 @@ GO.files.FolderPropertiesDialog = function(config){
 		}
 	}
 
-//	if(go.ModuleManager.isAvailable("workflow"))
+//	if(go.Modules.isAvailable("community", "workflow"))
 //	{
 //		this.workflowPanel = new GO.workflow.FolderPropertiesPanel();
 //		this.tabPanel.insert(2,this.workflowPanel);
@@ -233,7 +233,7 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 				this.setPermission(action.result.data.is_someones_home_dir, action.result.data.permission_level, action.result.data.readonly);
 
 				this.tabPanel.setActiveTab(0);
-				if(go.ModuleManager.isAvailable("customfields"))
+				if(go.Modules.isAvailable("community", "customfields"))
 					this.disableCategoriesPanel.setModel(folder_id,"GO\\Files\\model\\File");
 				
 				this.notifyCheckBox.addListener('check',this.onNotifyChecked,this);

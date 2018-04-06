@@ -1,3 +1,3 @@
-go.ModuleManager.register('comments', {
+go.Modules.register("community", 'comments', {
 
 });

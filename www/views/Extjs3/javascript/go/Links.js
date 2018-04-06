@@ -27,4 +27,3 @@ go.Links = {
 	}
 };
 
-go.EntityManager.register("links", "Link");

@@ -173,7 +173,7 @@ GO.email.EmailClient = function(config){
 		scope:this
 	}];
 
-	if(go.ModuleManager.isAvailable("addressbook")) {
+	if(go.Modules.isAvailable("community", "addressbook")) {
 		addSendersItems.push({
 			text: t("Address list", "addressbook"),
 			menu: this.addresslistsMenu = new GO.menu.JsonMenu({
@@ -201,7 +201,7 @@ GO.email.EmailClient = function(config){
 
 	var deleteSendersItems = [];
 
-	if(go.ModuleManager.isAvailable("addressbook")) {
+	if(go.Modules.isAvailable("community", "addressbook")) {
 		deleteSendersItems.push({
 			text: t("Address list", "addressbook"),
 			menu: this.addresslistsMenu = new GO.menu.JsonMenu({
@@ -1089,7 +1089,7 @@ this.messagePanel.show();
 
 			this.accountsDialog.accountsGrid.on('delete', function(){
 				this.refresh();
-				if(go.ModuleManager.isAvailable("emailportlet"))
+				if(go.Modules.isAvailable("community", "emailportlet"))
 					GO.emailportlet.foldersStore.load();
 			}, this);
 		}
@@ -1271,7 +1271,7 @@ this.messagePanel.show();
 	},
 
 	deleteSendersFromAddresslist : function(addresslistId) {
-		if(go.ModuleManager.isAvailable("addressbook")) {
+		if(go.Modules.isAvailable("community", "addressbook")) {
 			var records = this.messagesGrid.getSelectionModel().getSelections();
 			var senderEmails = new Array();
 			for (var i=0;i<records.length;i++) {
@@ -1616,7 +1616,7 @@ GO.email.showComposer = function(config){
 
 GO.email.extraTreeContextMenuItems = [];
 
-go.ModuleManager.register('email', {
+go.Modules.register("community", 'email', {
 	mainPanel: GO.email.EmailClient,
 	title: t("E-mail"),
 	userSettingsPanels: [GO.email.SettingsPanel]

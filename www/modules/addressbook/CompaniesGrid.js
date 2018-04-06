@@ -188,7 +188,7 @@ GO.addressbook.CompaniesGrid = function (config) {
 	};
 
 
-	if(go.ModuleManager.isAvailable("customfields"))
+	if(go.Modules.isAvailable("community", "customfields"))
 	{
 		GO.customfields.addColumns("GO\\Addressbook\\Model\\Company", this.fieldDefs);
 	}

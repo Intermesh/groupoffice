@@ -62,7 +62,7 @@ GO.users.UsersGrid = function(config)
     ]
 	};
 
-	if(go.ModuleManager.isAvailable("customfields"))
+	if(go.Modules.isAvailable("community", "customfields"))
 	{
 		GO.customfields.addColumns("GO\\Base\\Model\\User", fields);
 	}

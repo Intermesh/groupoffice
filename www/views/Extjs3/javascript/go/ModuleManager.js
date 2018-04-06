@@ -1,5 +1,5 @@
 (function () {
-	var ModMan = Ext.extend(Ext.util.Observable, {
+	var Modules = Ext.extend(Ext.util.Observable, {
 		
 		registered: {},
 		
@@ -7,7 +7,7 @@
 		 * 
 		 * @example
 		 * 
-		 * go.ModuleManager.register('addressbook', {
+		 * go.Modules.register("community", 'addressbook', {
 		 * 	  mainPanel: GO.addressbook.MainPanel,
 		 * 	  title: t("Address book", "addressbook"),
 		 * 	  iconCls: 'go-tab-icon-addressbook',
@@ -22,11 +22,15 @@
 		 * @param {type} config
 		 * @returns {undefined}
 		 */
-		register: function (name, config) {	
+		register: function (package, name, config) {	
 			
 			config = config || {};
 			
-			this.registered[name] = config;		
+      if(!this.registered[package]) {
+        this.registered[package] = {};
+      }
+      
+			this.registered[package][name] = config;		
 			
 			if(!config.panelConfig) {
 				config.panelConfig = {title: config.title, admin: config.admin};
@@ -44,7 +48,7 @@
 
 			if (config.entities) {
 				config.entities.forEach(function (e) {
-					go.EntityManager.register(name, e);
+					go.Entities.register(package, name, e);
 				});
 			}
 		},
@@ -55,24 +59,24 @@
 		 * @param {string} moduleName
 		 * @returns {boolean}
 		 */
-		isAvailable : function(moduleName) {
+		isAvailable : function(package, name) {
 			
-			if(!this.registered[moduleName]) {
+			if(!this.registered[package] || !this.registered[package][name]) {
 				return false;
 			}
 			
-			var module = this.get(moduleName);
+			var module = this.get(package, name);
 			if(!module) {
 				return false;
 			}
-			return module.permissionLevel >= this.registered[moduleName].requiredPermissionLevel;			
+			return module.permissionLevel >= this.registered[package][name].requiredPermissionLevel;			
 		},
 		
-		get : function(name) {
+		get : function(package, name) {
 			var all = go.stores.Module.data;
 			
 			for(id in all) {
-				if(all[id].name == name) {
+				if(all[id].package == package && all[id].name == name) {
 					return all[id];
 				}
 			};
@@ -90,7 +94,7 @@
 			var all = go.stores.Module.data;
 			
 			for(id in all) {
-				if(this.isAvailable(all[id].name)) {
+				if(this.isAvailable(all[id].package, all[id].name)) {
 					available.push(all[id]);
 				}
 			};
@@ -101,29 +105,29 @@
 		//will be called after login
 		init : function() {
 			go.stores.Module.getUpdates(function () {
-			
-				for(modName in this.registered) {
-					
-					if(!this.isAvailable(modName, this.registered[modName].permissionLevel)) {
-						
-						continue;
-					}
-					
-					var config = this.registered[modName];
-					
-					if (config.mainPanel) {
-						//todo GO.moduleManager is deprecated
-						GO.moduleManager._addModule(modName, config.mainPanel, config.panelConfig, config.subMenuConfig);
-					}
-					
-					if(config.initModule)
-					{
-						config.initModule();
-					}
-					
-				}
+        for(package in this.registered) {
+          for(name in this.registered[package]) {
+
+            if(!this.isAvailable(package, name)) {
+              continue;
+            }
+
+            var config = this.registered[package][name];
+
+            if (config.mainPanel) {
+              //todo GO.moduleManager is deprecated
+              GO.moduleManager._addModule(package + "-" + name, config.mainPanel, config.panelConfig, config.subMenuConfig);
+            }
+
+            if(config.initModule)
+            {
+              config.initModule();
+            }
+
+          }
+        }
 				
-				go.ModuleManager.fireReady();
+				go.Modules.fireReady();
 			}, this);
 		},
 
@@ -148,20 +152,20 @@
 			}
 		},
 		
-		/**
-		 * Call function when module becomes available.
-		 * 
-		 * @param {string} module
-		 * @param {function} fn
-		 * @param {object} scope		 
-		 */
-		onAvailable: function(module, fn, scope) {
-			this.onReady(function() {
-				if(this.isAvailable(module)) {
-					fn.call(scope);
-				}
-			}, this);
-		}
+//		/**
+//		 * Call function when module becomes available.
+//		 * 
+//		 * @param {string} module
+//		 * @param {function} fn
+//		 * @param {object} scope		 
+//		 */
+//		onAvailable: function(package, module, fn, scope) {
+//			this.onReady(function() {
+//				if(this.isAvailable(module)) {
+//					fn.call(scope);
+//				}
+//			}, this);
+//		}
 		
 //		onModuleReady: function(module, fn, scope) {
 //			if(!this.isReady) {
@@ -177,9 +181,6 @@
 //		}
 	});
 
-	go.ModuleManager = new ModMan;
+	go.Modules = new Modules;
 
 })();
-
-
-go.EntityManager.register('modules', 'Module');

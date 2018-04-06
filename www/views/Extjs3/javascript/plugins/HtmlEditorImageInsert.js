@@ -64,7 +64,7 @@ Ext.extend(GO.plugins.HtmlEditorImageInsert, Ext.util.Observable, {
 		this.uploadForm
 		];
 
-		if(go.ModuleManager.isAvailable("files")){
+		if(go.Modules.isAvailable("community", "files")){
 			menuItems.push({
 				iconCls:'btn-groupoffice',
 				text : t("Add from Group-Office", "email").replace('{product_name}', GO.settings.config.product_name),

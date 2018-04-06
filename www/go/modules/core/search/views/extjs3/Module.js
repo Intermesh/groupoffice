@@ -1,6 +1,6 @@
 Ext.ns('go.modules.community.search');
 
-go.ModuleManager.register('search', {
+go.Modules.register("community", 'search', {
 	//mainPanel: GO.notes.MainPanel,
 	entities: ["Search"],
 	initModule: function () {

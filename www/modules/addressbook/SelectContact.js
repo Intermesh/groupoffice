@@ -29,7 +29,7 @@ GO.addressbook.SelectContact = function(config){
 	var customfieldId = config.customfieldId || '';
 
 	var fields = {fields: ['id', 'cf', 'name', 'salutation', 'email', 'first_name', 'middle_name','last_name', 'home_phone', 'work_phone', 'cellular', 'cellular2', 'company_id','company_name','address','address_no','zip','city','state','country','ab_name','go_user_id','department'], columns:[]};
-	if(go.ModuleManager.isAvailable("customfields"))
+	if(go.Modules.isAvailable("community", "customfields"))
 	{
 		GO.customfields.addColumns("GO\\Addressbook\\Model\\Contact", fields);
 	}

@@ -316,10 +316,10 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		
 		
 		
-		go.ModuleManager.init();
+		go.Modules.init();
 
 		//load modules
-		go.ModuleManager.onReady(function () {
+		go.Modules.onReady(function () {
 
 
 			if (this.loginPanel) {

@@ -76,7 +76,7 @@ GO.email.EmailComposer = function(config) {
 		}
 	})];
 						
-//	if(go.ModuleManager.isAvailable("gnupg"))
+//	if(go.Modules.isAvailable("community", "gnupg"))
 //	{
 //		optionsMenuItems.push('-');
 //			
@@ -314,7 +314,7 @@ GO.email.EmailComposer = function(config) {
 
 	tbar.push(this.emailEditor.getAttachmentsButton());
 
-	if(go.ModuleManager.isAvailable("addressbook")) {
+	if(go.Modules.isAvailable("community", "addressbook")) {
 		
 		this.btnAddressbook = new Ext.Button({
 			tooltip : t("Address book", "addressbook"),
@@ -337,7 +337,7 @@ GO.email.EmailComposer = function(config) {
 		
 	}
 	
-	if(go.ModuleManager.isAvailable("addressbook")){
+	if(go.Modules.isAvailable("community", "addressbook")){
 		
 		this.templatesStore = new GO.data.JsonStore({
 			url : GO.url("addressbook/template/emailSelection"),
@@ -504,7 +504,7 @@ GO.email.EmailComposer = function(config) {
 					var record = grid.getStore().getAt(rowIndex);
 //					console.log(record.template_id)
 //					this._changeTemplate(record.get('template_id'));
-					if(go.ModuleManager.isAvailable("addressbook")) {
+					if(go.Modules.isAvailable("community", "addressbook")) {
 						if (this.isVisible()) {
 							if(!this.emailEditor.isDirty() || confirm(t("Changes will be lost. Are you sure?", "email"))) {
 								this._changeTemplate(record.get('template_id'));
@@ -624,7 +624,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 	sendParams : {},
 	
 	_checkLoadTemplate : function(cb,newAccountRecord) {
-		if(go.ModuleManager.isAvailable("addressbook")) {
+		if(go.Modules.isAvailable("community", "addressbook")) {
 //			GO.request({
 //				url: 'addressbook/template/defaultTemplateId',
 //				params:{
@@ -832,7 +832,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 				item.setChecked(true);
 			}
 		}
-		if(go.ModuleManager.isAvailable("addressbook")){
+		if(go.Modules.isAvailable("community", "addressbook")){
 			if(config.disableTemplates){
 				this.templatesBtn.setDisabled(config.disableTemplates);
 			} else {
@@ -888,7 +888,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 				aliases:{r:'email/alias/store','limit':0}
 			};
 			
-			if(go.ModuleManager.isAvailable("addressbook")){
+			if(go.Modules.isAvailable("community", "addressbook")){
 				requests.templates={r:'addressbook/template/emailSelection'};
 				if (!GO.util.empty(config.account_id))
 					requests.templates['account_id'] = config.account_id;
@@ -982,7 +982,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 			if (config.addresslist_id > 0) {
 				this.sendURL = GO.url("addressbook/sentMailing/send");
 
-				if(go.ModuleManager.isAvailable("addressbook")) {
+				if(go.Modules.isAvailable("community", "addressbook")) {
 					// Disable the addressbook button when creating newsletters
 					this.btnAddressbook.setDisabled(true);
 				}
@@ -1000,7 +1000,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 			}else
 			{
 				
-				if(go.ModuleManager.isAvailable("addressbook")) {
+				if(go.Modules.isAvailable("community", "addressbook")) {
 					// Enable the addressbook button when not creating newsletters
 					this.btnAddressbook.setDisabled(false);
 				}

@@ -74,7 +74,7 @@ GO.ModuleManager = Ext.extend(function(){
 	},
 	
 	addModule : function(moduleName, panelClass, panelConfig, subMenuConfig) {
-		go.ModuleManager.register(moduleName, {
+		go.Modules.register("community", moduleName, {
 			title: panelConfig.title,
 			requiredPermissionLevel: panelConfig.requiredPermissionLevel || GO.permissionLevels.read,
 			mainPanel: panelClass,
@@ -197,7 +197,7 @@ GO.ModuleManager = Ext.extend(function(){
 	},
 	
 	userHasModule : function(module){
-		return go.ModuleManager.isAvailable(module);
+		return go.Modules.isAvailable("community", module);
 	},
 	
 	getAllSubmenus : function(){

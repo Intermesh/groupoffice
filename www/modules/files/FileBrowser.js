@@ -204,7 +204,7 @@ GO.files.FileBrowser = function(config){
 		}]
 	};
 
-	if(go.ModuleManager.isAvailable("customfields"))
+	if(go.Modules.isAvailable("community", "customfields"))
 	{
 		GO.customfields.addColumns("GO\\Files\\Model\\File", fields);
 	}
@@ -1133,7 +1133,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 					}
 				}
 				
-				if(go.ModuleManager.isAvailable("documenttemplates"))
+				if(go.Modules.isAvailable("community", "documenttemplates"))
 				{
 					this.newMenu.add('-');
 					this.newOODoc = new GO.documenttemplates.NewOODocumentMenuItem();
@@ -2118,7 +2118,7 @@ GO.files.isContentExpired = function(contentExpireDateString){
 
 
 
-go.ModuleManager.register('files', {
+go.Modules.register("community", 'files', {
 	mainPanel: GO.files.FileBrowser,
 	title: t("Files", "files"),
 	iconCls: 'go-tab-icon-files',

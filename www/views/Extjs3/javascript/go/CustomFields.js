@@ -186,19 +186,3 @@
 })();
 
 
-go.EntityManager.register("customFields", "Field");
-go.EntityManager.register("customFields", "FieldSet");
-
-GO.mainLayout.onReady(function () {
-	go.stores.Field.getUpdates(function (store) {
-		go.CustomFields.fieldsLoaded = true;
-		go.CustomFields.fireReady();
-//		console.log(go.stores.Field);
-	});
-
-	go.stores.FieldSet.getUpdates(function (store) {
-//		console.log(go.stores.FieldSet);
-		go.CustomFields.fieldSetsLoaded = true;
-		go.CustomFields.fireReady();
-	});
-});

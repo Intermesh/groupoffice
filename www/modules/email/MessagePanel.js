@@ -87,7 +87,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			'<tr><td><b>'+t("Attachments", "email")+':</b></td></tr><tr><td id="'+this.attachmentsId+'">'+
 			'<tpl for="attachments">'+
 				'<tpl if="extension==\'vcf\'">';
-				if(go.ModuleManager.isAvailable("addressbook"))
+				if(go.Modules.isAvailable("community", "addressbook"))
 					templateStr += '<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}" onclick="GO.email.readVCard(\'{url}&importVCard=1\');">{name:htmlEncode} ({human_size})</a> ';
 				else
 					templateStr += '<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}">{name:htmlEncode} ({human_size})</a> ';
@@ -131,7 +131,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			
 		'</div>';
 
-		if(go.ModuleManager.isAvailable("calendar")){
+		if(go.Modules.isAvailable("community", "calendar")){
 
 			templateStr += '<tpl if="!GO.util.empty(values.iCalendar)">'+
 				'<tpl if="iCalendar.feedback">'+
@@ -739,7 +739,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 
 GO.email.readVCard = function(url) {
-	if(go.ModuleManager.isAvailable("addressbook"))
+	if(go.Modules.isAvailable("community", "addressbook"))
 		Ext.Ajax.request({
 			url: url,
 			callback: function(options, success, response)

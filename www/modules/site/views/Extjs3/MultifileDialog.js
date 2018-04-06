@@ -30,7 +30,7 @@ GO.site.MultifileDialog = Ext.extend(GO.Window , {
 			text : t("Add"),
 			handler : function()
 			{
-				if(go.ModuleManager.isAvailable("files"))
+				if(go.Modules.isAvailable("community", "files"))
 				{
 					GO.files.createSelectFileBrowser();
 

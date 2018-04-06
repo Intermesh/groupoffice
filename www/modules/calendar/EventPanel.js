@@ -48,27 +48,27 @@ GO.calendar.EventPanel = Ext.extend(GO.DisplayPanel,{
 					'</tr>'+					
 				'</table>';
 
-		if(go.ModuleManager.isAvailable("customfields"))
+		if(go.Modules.isAvailable("community", "customfields"))
 		{
 			this.template +=GO.customfields.displayPanelTemplate;
 		}
 
-		if(go.ModuleManager.isAvailable("tasks"))
+		if(go.Modules.isAvailable("community", "tasks"))
 			this.template +=GO.tasks.TaskTemplate;
 
-		if(go.ModuleManager.isAvailable("workflow")){
+		if(go.Modules.isAvailable("community", "workflow")){
 			this.template +=GO.workflow.WorkflowTemplate;
 		}
 		
-		if(go.ModuleManager.isAvailable("calendar"))
+		if(go.Modules.isAvailable("community", "calendar"))
 			this.template += GO.calendar.EventTemplate;
 
 		this.template +=GO.linksTemplate;		
 		
-		if(go.ModuleManager.isAvailable("lists"))
+		if(go.Modules.isAvailable("community", "lists"))
 			this.template += GO.lists.ListTemplate;
 
-		if(go.ModuleManager.isAvailable("files"))
+		if(go.Modules.isAvailable("community", "files"))
 		{
 			Ext.apply(this.templateConfig, GO.files.filesTemplateConfig);
 			this.template += GO.files.filesTemplate;
@@ -76,7 +76,7 @@ GO.calendar.EventPanel = Ext.extend(GO.DisplayPanel,{
 		Ext.apply(this.templateConfig, GO.linksTemplateConfig);
 
 
-		if(go.ModuleManager.isAvailable("comments"))
+		if(go.Modules.isAvailable("community", "comments"))
 		{
 			this.template += GO.comments.displayPanelTemplate;
 		}

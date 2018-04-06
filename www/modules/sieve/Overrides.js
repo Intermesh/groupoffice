@@ -96,4 +96,4 @@ GO.moduleManager.onModuleReady('email',function(){
 	});
 });
 
-go.ModuleManager.register('sieve');
+go.Modules.register("community", 'sieve');

@@ -1,5 +1,5 @@
 GO.mainLayout.onReady(function(){
-	if(go.ModuleManager.isAvailable("summary"))
+	if(go.Modules.isAvailable("community", "summary"))
 	{
 		GO.summary.portlets['portlet-expired-files']={
 			multiple:true,

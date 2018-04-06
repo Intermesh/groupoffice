@@ -548,7 +548,7 @@ GO.tasks.categoriesStore = new GO.data.JsonStore({
 
 
 
-go.ModuleManager.register('tasks', {
+go.Modules.register("community", 'tasks', {
 	mainPanel: GO.tasks.MainPanel,
 	title: t("Tasks", "tasks"),
 	iconCls: 'go-tab-icon-tasks',

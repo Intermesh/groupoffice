@@ -45,7 +45,7 @@ GO.calendar.EventDialog = function(calendar) {
 		}
 	}
 	
-	if(go.ModuleManager.isAvailable("comments")){
+	if(go.Modules.isAvailable("community", "comments")){
 		this.commentsGrid = new GO.comments.CommentsGrid({title:t("Comments", "comments")});
 		items.push(this.commentsGrid);
 	}
@@ -94,7 +94,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 		}
 		
 		this.fileBrowseButton = '';
-		if(go.ModuleManager.isAvailable("files")) {
+		if(go.Modules.isAvailable("community", "files")) {
 			this.fileBrowseButton = new GO.files.FileBrowserButton({
 				text: t("Files", "files"),
 				iconCls: 'ic-folder',
@@ -274,7 +274,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 						this.recurrencePanel.setDisabled(false);
 					}
 					
-					if(go.ModuleManager.isAvailable("comments")){
+					if(go.Modules.isAvailable("community", "comments")){
 						if(action.result.data['id'] > 0){
 							if (!GO.util.empty(action.result.data['action_date'])) {
 								this.commentsGrid.actionDate = action.result.data['action_date'];
@@ -297,7 +297,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 					
 					this.setPermissionLevel(action.result.data.permission_level);
 					
-					if(go.ModuleManager.isAvailable("customfields"))
+					if(go.Modules.isAvailable("community", "customfields"))
 						GO.customfields.disableTabs(this.tabPanel, action.result);	
 
 					if(action.result.group_id == 1)
@@ -1254,7 +1254,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 				resourceOptions.push(pfieldStatus);
 				this.formPanel.form.add(pfieldStatus);
 
-					if(go.ModuleManager.isAvailable("customfields"))
+					if(go.Modules.isAvailable("community", "customfields"))
 					{
 						var enabled_categories = record.customfields.enabled_categories;
 						var disable_categories = record.customfields.disable_categories;

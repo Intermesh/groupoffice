@@ -8,7 +8,7 @@ GO.addressbook.ContextMenu = function(config){
 
 	config.items=[];
 
-	if(go.ModuleManager.isAvailable("email")) {
+	if(go.Modules.isAvailable("community", "email")) {
 		this.actionCreateMail = new Ext.menu.Item({
 			iconCls: 'btn-email',
 			text:t("Create email for selection", "addressbook"),
@@ -67,7 +67,7 @@ Ext.extend(GO.addressbook.ContextMenu, Ext.menu.Menu, {
 	},
 
 	showCreateMailDialog : function(config) {		
-		if(go.ModuleManager.isAvailable("email")) {
+		if(go.Modules.isAvailable("community", "email")) {
 			
 			if(!config)
 				config = {};

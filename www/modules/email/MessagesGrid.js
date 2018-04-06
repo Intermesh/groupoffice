@@ -250,7 +250,7 @@ GO.email.MessagesGrid = function(config){
 		]
 	});
 
-	if(go.ModuleManager.isAvailable("gnupg")) {
+	if(go.Modules.isAvailable("community", "gnupg")) {
 		this.settingsMenu.add('-');
 		this.settingsMenu.add({
 			iconCls:'gpg-btn-settings',
