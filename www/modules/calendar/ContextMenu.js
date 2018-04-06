@@ -65,7 +65,7 @@ GO.calendar.ContextMenu = function(config){
 	})
 	]
 
-	if(go.ModuleManager.isAvailable("email")) {
+	if(go.Modules.isAvailable("legacy", "email")) {
 		this.actionCreateMail = new Ext.menu.Item({
 			iconCls: 'ic-email',
 			text:t("Create email for participants", "calendar"),
@@ -78,7 +78,7 @@ GO.calendar.ContextMenu = function(config){
 		config.items.splice(1,0,this.actionCreateMail);
 	}
 
-	if(go.ModuleManager.isAvailable("timeregistration"))
+	if(go.Modules.isAvailable("legacy", "timeregistration"))
 	{
 		this.actionAddTimeRegistration = new Ext.menu.Item({
 			text: t("Import into timeregistration", "calendar"),
@@ -143,7 +143,7 @@ Ext.extend(GO.calendar.ContextMenu, Ext.menu.Menu, {
 //		this.actionCopy.setDisabled(this.event.read_only);
 		this.actionCut.setDisabled(this.event.read_only);
 		
-		if(go.ModuleManager.isAvailable("email")) {
+		if(go.Modules.isAvailable("legacy", "email")) {
 		// Disable "Create email for participants" when it's a private event and it's not yours
 			if(this.event.private && this.event.user_id != GO.settings.user_id){
 				this.actionCreateMail.setDisabled(true);
@@ -179,7 +179,7 @@ Ext.extend(GO.calendar.ContextMenu, Ext.menu.Menu, {
 			this.actionAddTimeRegistration.setDisabled(!event.event_id);
 		
 
-//		if(go.ModuleManager.isAvailable("email"))
+//		if(go.Modules.isAvailable("legacy", "email"))
 //			this.actionCreateMail.setDisabled(event.has_other_participants==0);
 
 		this.newMenuItem.setLinkConfig({
@@ -190,7 +190,7 @@ Ext.extend(GO.calendar.ContextMenu, Ext.menu.Menu, {
 	},
 	
 	showCreateMailDialog : function() {
-		if(go.ModuleManager.isAvailable("email")) {
+		if(go.Modules.isAvailable("legacy", "email")) {
 			GO.request({
 				url: 'calendar/event/participantEmailRecipients',
 				params : {

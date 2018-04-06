@@ -1213,7 +1213,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 			if (eventData.model_name=='GO_Tasks_Model_Task') {
 				event.on('contextmenu', function(e, eventEl)
 				{
-					if(go.ModuleManager.isAvailable("tasks")) {
+					if(go.Modules.isAvailable("legacy", "tasks")) {
 						var task = this.elementToEvent(this.clickedEventId);
 						if (!this.taskContextMenu)
 							this.taskContextMenu = new GO.calendar.TaskContextMenu();

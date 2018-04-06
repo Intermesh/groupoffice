@@ -1,5 +1,5 @@
 GO.mainLayout.onReady(function(){
-	if(go.ModuleManager.isAvailable("summary"))
+	if(go.Modules.isAvailable("legacy", "summary"))
 	{
 		this.emailPortlet = new GO.email.PortletPanel();
 		

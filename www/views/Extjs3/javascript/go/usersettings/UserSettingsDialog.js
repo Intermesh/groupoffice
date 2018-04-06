@@ -108,11 +108,12 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	},
 	
 	loadModulePanels : function() {
-		var available = go.ModuleManager.getAvailable();
+    
+		var available = go.Modules.getAvailable();
 		
 		for(var i = 0, l = available.length; i < l; i++) {
 			
-			var config = go.ModuleManager.registered[available[i].name];
+			var config = go.Modules.getConfig(available[i].package, available[i].name);
 			
 			if(!config.userSettingsPanels) {
 				continue;
@@ -223,7 +224,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			params.create[id] = values;
 		}
 
-		go.stores.User.set(params, function(options, success, response){
+		go.Stores.get("User").set(params, function(options, success, response){
 			if(response.notUpdated && response.notUpdated[id] && response.notUpdated[id].validationErrors && response.notUpdated[id].validationErrors.currentPassword){
 				// Current password is incorrect.
 				this.submit();
@@ -314,7 +315,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 		
 		
-		go.stores.User.get([this.currentUser], function(users){
+		go.Stores.get("User").get([this.currentUser], function(users){
 			this.formPanel.getForm().setValues(users[0]);
 			this.loadComplete(users[0]);
 		}, this);

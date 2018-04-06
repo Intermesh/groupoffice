@@ -1,11 +1,21 @@
 <?php
-namespace go\modules\community\imapauthenticator\model;
+namespace go\modules\community\ldapauthenticator\model;
 
 use go\core\jmap\Entity;
 
-class ImapAuthServer extends Entity {
+class Server extends Entity {
 	
 	public $id;
+	public $hostname;
+	public $port = 389;
+	public $encryption = "tls";
+	
+	public $usernameAttribute = "uid";
+	
+	public $peopleDN = "";
+	public $groupsDN = "";
+	
+	
 	public $imapHostname;
 	public $imapPort;
 	public $imapEncryption;
@@ -16,11 +26,11 @@ class ImapAuthServer extends Entity {
 
 	public $smtpHostname;
 	public $smtpPort;
-	public $smtpUsername;
 	public $smtpPassword;
 	public $smtpUseUserCredentials= false;
 	public $smtpValidateCertificate = true;
 	public $smtpEncryption;
+	
 	
 	/**
 	 * Users must login with their full e-mail address. The domain part will be used
@@ -36,11 +46,36 @@ class ImapAuthServer extends Entity {
 	 * @var Group[]
 	 */
 	public $groups;
+
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
-						->addTable('imapauth_server', 's')
+						->addTable('ldapauth_server', 's')
 						->addRelation("domains", Domain::class, ['id' => "serverId"])
 						->addRelation("groups", Group::class, ['id' => "serverId"]);
 	}
+	
+	/**
+	 * Get the URI to connect
+	 * 
+	 * eg. ldap://localhost:389
+	 * 
+	 * @return string
+	 */
+	public function getUri() {
+		$uri = $this->encryption == 'ssl' ? 'ldaps://' : 'ldap://';
+		
+		$uri .= $this->hostname . ':' .$this->port;
+		
+		return $uri;
+	}
+	
+	
+	public function hasEmailAccount() {
+		return $this->imapHostname != null;
+	}
+  
+  public static function getClientName() {
+    return "LdapAuthServer";
+  }
 }

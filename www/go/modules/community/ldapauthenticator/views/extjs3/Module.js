@@ -1,6 +1,6 @@
 Ext.ns('go.modules.community.ldapauthenticator');
 
-go.ModuleManager.register('ldapauthenticator', {	
+go.Modules.register("community", 'ldapauthenticator', {	
 	entities: ["LdapAuthServer"]	
 });
 

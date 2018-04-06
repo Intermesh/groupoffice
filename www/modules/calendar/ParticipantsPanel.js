@@ -75,7 +75,7 @@ GO.calendar.ParticipantsPanel = function(eventDialog, config) {
 		scope : this
 	}];
 
-	if(go.ModuleManager.isAvailable("addressbook")){
+	if(go.Modules.isAvailable("legacy", "addressbook")){
 		this.selectContact = new GO.addressbook.SelectContact ({
 			name: 'quick_add_contact',
 			anchor: '100%',

@@ -78,7 +78,7 @@ GO.files.FolderPanel = Ext.extend(GO.DisplayPanel,{
 				'</table>';
 
 	
-		if(go.ModuleManager.isAvailable("workflow"))
+		if(go.Modules.isAvailable("legacy", "workflow"))
 			this.template +=GO.workflow.WorkflowTemplate;
 		
 		
