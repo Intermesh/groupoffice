@@ -1389,8 +1389,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 			
 			this.compressRecords = records;
 
-			if(!this.compressDialog){
-				this.compressDialog = new GO.files.CompressDialog ({
+			if(!this.downloadCompressedDialog){
+				this.downloadCompressedDialog = new GO.files.CompressDialog ({
 					scope:this,
 					handler:function(win, filename, utf8){
 						this.onDownloadSelected(this.compressRecords, filename, utf8);
@@ -1398,7 +1398,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 				});
 			}
 
-			this.compressDialog.show();
+			this.downloadCompressedDialog.show();
 			
 		} else {
 			
