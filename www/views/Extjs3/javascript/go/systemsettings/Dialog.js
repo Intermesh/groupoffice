@@ -101,7 +101,7 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		
 		for(var i = 0, l = available.length; i < l; i++) {
 			
-			var config = go.Modules.get(available[i].package, available[i].name);
+			var config = go.Modules.getConfig(available[i].package, available[i].name);
 			
 			if(!config.systemSettingsPanels) {
 				continue;

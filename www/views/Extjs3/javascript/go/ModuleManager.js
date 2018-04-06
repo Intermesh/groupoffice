@@ -60,6 +60,10 @@
 		 * @returns {boolean}
 		 */
 		isAvailable : function(package, name) {
+      
+      if(!package) {
+        package = "legacy";
+      }
 			
 			if(!this.registered[package] || !this.registered[package][name]) {
 				return false;
@@ -71,12 +75,31 @@
 			}
 			return module.permissionLevel >= this.registered[package][name].requiredPermissionLevel;			
 		},
+    
+    getConfig : function(package, name) {
+      if(!package) {
+        package = "legacy";
+      }
+      if(!this.registered[package] || !this.registered[package][name]) {
+				return false;
+			}
+      
+      return this.registered[package][name];
+    },
 		
 		get : function(package, name) {
+      
+      if(!package) {
+        package = "legacy";
+      }
+      if(!this.registered[package] || !this.registered[package][name]) {
+				return false;
+			}
+      
 			var all = go.Stores.get("Module").data;
 			
 			for(id in all) {
-				if((package == "legacy" || all[id].package == package) && all[id].name == name) {
+				if((package == "legacy" || all[id].package == package) && all[id].name == name) {          
         	return all[id];
 				}
 			};
