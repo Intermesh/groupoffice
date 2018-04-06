@@ -1,5 +1,5 @@
 go.modules.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
-	entityStore: go.stores.Note,
+	entityStore: go.Stores.get("community", "Note"),
 	stateId: 'no-notes-detail',
 
 	//model_name: "go\\modules\\community\\notes\\model\\Note", //only for backwards compatibility with older panels.

@@ -123,7 +123,7 @@ GO.users.SystemSettingsPanel = Ext.extend(Ext.form.FormPanel, {
 							name: "defaultGroups",
 							idField: "groupId",
 							displayField: "name",
-							entityStore: go.stores.Group,
+							entityStore: go.Stores.get("community", "Group"),
 
 							fieldLabel: t("Groups"),
 							storeBaseParams: {

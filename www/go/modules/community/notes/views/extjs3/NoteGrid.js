@@ -4,7 +4,7 @@ go.modules.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 
 		this.store = new go.data.Store({
 			fields: ['id', 'name', 'content', 'excerpt', {name: 'createdAt', type: 'date'}, {name: 'modifiedAt', type: 'date'}, 'permissionLevel'],
-			entityStore: go.stores.Note
+			entityStore: go.Stores.get("community", "Note")
 		});
 
 		Ext.apply(this, {

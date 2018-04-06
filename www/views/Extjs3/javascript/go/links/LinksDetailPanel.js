@@ -6,7 +6,7 @@ go.links.LinksDetailPanel = Ext.extend(Ext.Panel, {
 				limit: 10
 			},
 			fields: ['id', 'to', 'toId', {name: 'createdAt', type: 'date'}, 'toEntity'],
-			entityStore: go.stores.Link
+			entityStore: go.Stores.get("community", "Link")
 //			listeners: {
 //				load: function () {
 //					//panel.setVisible(store.getCount() > 0);

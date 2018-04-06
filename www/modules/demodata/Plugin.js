@@ -7,7 +7,7 @@ go.Modules.onReady(function(){
 			GO.request({
 				url:'modules/module/delete',
 				params:{
-					id: go.stores.Module.findBy(function(mod) {console.log(mod);return mod.name == 'demodata';}).id
+					id: go.Stores.get("community", "Module").findBy(function(mod) {console.log(mod);return mod.name == 'demodata';}).id
 				}
 			})
 		}

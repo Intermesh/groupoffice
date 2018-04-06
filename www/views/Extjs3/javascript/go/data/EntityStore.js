@@ -172,7 +172,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	 * 
 	 * ```
 	 * 
-	 * go.stores.link.set({
+	 * go.Stores.get("community", "link").set({
 	 *		create: links
 	 *	}, function(options, success, response){}, this);
 	 * 

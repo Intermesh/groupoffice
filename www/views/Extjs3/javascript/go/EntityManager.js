@@ -10,7 +10,7 @@
      * 
      * this will create a global entity and store:
      * 
-     * go.stores[name]
+     * go.Stores.get("community", "name")]
      * go.entities[name]
      * 
      * @param {string} name

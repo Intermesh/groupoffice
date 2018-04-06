@@ -14,7 +14,7 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 			autoDestroy: true,
 			remoteGroup: true,
 			fields: ['id', 'toId', 'toEntity', 'to', 'description', {name: 'modifiedAt', type: 'date'}],
-			entityStore: go.stores.Link,
+			entityStore: go.Stores.get("community", "Link"),
 			sortInfo: {field: 'toEntity', direction: 'DESC'},
 			autoLoad: true,
 			groupOnSort: true,
@@ -125,7 +125,7 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 
 		actions.on({
 			action: function (grid, record, action, row, col, e, target) {
-				go.stores.Link.set({
+				go.Stores.get("community", "Link").set({
 					destroy: [record.id]
 				});
 			}

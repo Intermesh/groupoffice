@@ -8,7 +8,7 @@
 		 */
 		getFieldSets: function (entity) {
 			var r = [],
-							all = go.stores.FieldSet.data;
+							all = go.Stores.get("community", "FieldSet").data;
 
 			for (var id in all) {
 				if (all[id].entity === entity) {
@@ -49,7 +49,7 @@
 		 */
 		getFormFields: function (fieldSetId) {
 			var r = [],
-							all = go.stores.Field.data,
+							all = go.Stores.get("community", "Field").data,
 							field,
 							formField;
 
@@ -74,7 +74,7 @@
 		 */
 		getFields: function (fieldSetId) {
 			var r = [],
-							all = go.stores.Field.data,
+							all = go.Stores.get("community", "Field").data,
 							field,
 							formField;
 
@@ -99,7 +99,7 @@
 		 * @returns {CustomFieldsL#1.CustomFieldsAnonym$0.render.values}
 		 */
 		renderField: function (fieldId, values) {
-			var field = go.stores.Field.data[fieldId];
+			var field = go.Stores.get("community", "Field").data[fieldId];
 
 			if (!GO.customfields.dataTypes[field.datatype].render) {
 				return values[field.databaseName];
@@ -115,7 +115,7 @@
 		 * @returns {String} The material design icon text
 		 */
 		getFieldIcon: function (fieldId) {
-			var field = go.stores.Field.data[fieldId];
+			var field = go.Stores.get("community", "Field").data[fieldId];
 			return GO.customfields.dataTypes[field.datatype].icon || "star";
 		},
 
