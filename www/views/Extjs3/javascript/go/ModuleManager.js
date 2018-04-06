@@ -73,7 +73,7 @@
 		},
 		
 		get : function(package, name) {
-			var all = go.Stores.get("community", "Module").data;
+			var all = go.Stores.get("Module").data;
 			
 			for(id in all) {
 				if(all[id].package == package && all[id].name == name) {
@@ -85,13 +85,13 @@
 		},
 		
 		getAll : function() {
-			return go.Stores.get("community", "Module").data;
+			return go.Stores.get("Module").data;
 		},
 		
 		getAvailable : function() {
 			var available = [];
 			
-			var all = go.Stores.get("community", "Module").data;
+			var all = go.Stores.get("Module").data;
 			
 			for(id in all) {
 				if(this.isAvailable(all[id].package, all[id].name)) {
@@ -104,7 +104,7 @@
 		
 		//will be called after login
 		init : function() {
-			go.Stores.get("community", "Module").getUpdates(function () {
+			go.Stores.get("Module").getUpdates(function () {
         for(package in this.registered) {
           for(name in this.registered[package]) {
 

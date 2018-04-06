@@ -525,7 +525,7 @@ Ext.extend(GO.modules.MainPanel,Ext.grid.EditorGridPanel, {
 				id: record.data.id,
 				enabled: record.data.enabled
 			}];
-			go.Stores.get("community", "Module").set(params, function(options, success, response) {
+			go.Stores.get("Module").set(params, function(options, success, response) {
 
 				if(record.data.enabled && record.isModified("enabled")) {
 					record.set('aclId', response['created'][0].aclId);

@@ -26,7 +26,7 @@ go.modules.community.imapauthenticator.ServerGrid = Ext.extend(go.grid.GridPanel
 			
 			store: new go.data.Store({
 				fields: ['id', 'imapHostname'],
-				entityStore: go.Stores.get("community", "ImapAuthServer")				
+				entityStore: go.Stores.get("ImapAuthServer")				
 			}),
 			autoHeight: true,
 			plugins: [actions],

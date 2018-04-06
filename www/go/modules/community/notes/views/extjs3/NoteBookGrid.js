@@ -29,7 +29,7 @@ go.modules.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 			
 			store: new go.data.Store({
 				fields: ['id', 'name', 'aclId', "permissionLevel"],
-				entityStore: go.Stores.get("community", "NoteBook")
+				entityStore: go.Stores.get("NoteBook")
 			}),
 			selModel: selModel,
 			plugins: [actions],

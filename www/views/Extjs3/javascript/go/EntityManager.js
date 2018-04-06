@@ -10,7 +10,7 @@
      * 
      * this will create a global entity and store:
      * 
-     * go.Stores.get("community", "name")]
+     * go.Stores.get("name")]
      * go.entities[name]
      * 
      * @param {string} name
@@ -18,17 +18,11 @@
      * @returns {undefined}
      */
     register: function (package, module, name) {
-      if(!entities[package]) {
-        entities[package] = {};
-        stores[package] = {};
+      if(entities[name]) {
+        throw "Entity name is already registered by module " +entities[name]['package'] + "/" + entities[name]['name'];
       }
       
-      if(!entities[package][module]) {
-        entities[package][module] = {};
-        stores[package][module] = {};
-      }
-      
-      entities[package][module][name] = {
+      entities[name] = {
         name: name,
         module: module,
         package: package,
@@ -38,42 +32,22 @@
       };     
     },
 
-    get: function (package, module, name) {
-      if(!entities[package]) {
-        throw "Package " + package + " not registered";
-      }
-      
-      if(!entities[package][module]) {
-        throw "Module " + package + " not registered";
-      }
-      
-      if(!entities[package][module][name]) {
-        throw "Entity " + name + " not registered";
-      }
-      
-      return entities[package][module][name];
-      
+    get: function (name) {      
+      return entities[package][module][name];      
     }
   };
   
   
   go.Stores = {
-    get: function (package, module, name) {
-      if(!stores[package]) {
-        stores[package] = {};
-      }
-      
-      if(!stores[package][module]) {
-        stores[package][module] = {};
-      }
-      
-      if(!entities[package][module][name]) {
-        stores[package][module][name] = new go.data.EntityStore({
-          entity: go.Entities.get(package, module, name)
+    get: function (name) {
+     
+      if(!stores[name]) {
+        stores[name] = new go.data.EntityStore({
+          entity: go.Entities.get(name)
         });
-      }     
+      }
       
-      return stores[package][module][name];
+      return stores[name];
     }
   }
 

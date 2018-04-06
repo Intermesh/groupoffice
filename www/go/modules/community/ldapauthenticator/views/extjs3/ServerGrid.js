@@ -26,7 +26,7 @@ go.modules.community.ldapauthenticator.ServerGrid = Ext.extend(go.grid.GridPanel
 			
 			store: new go.data.Store({
 				fields: ['id', 'hostname'],
-				entityStore: go.Stores.get("community", "LdapAuthServer")				
+				entityStore: go.Stores.get("LdapAuthServer")				
 			}),
 			autoHeight: true,
 			plugins: [actions],

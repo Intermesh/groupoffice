@@ -25,6 +25,7 @@ class EntityType {
 	private $id;
 	private $name;
 	private $moduleId;	
+  private $clientName;
 	
 	/**
 	 * The name of the entity for the JMAP client API
@@ -33,7 +34,7 @@ class EntityType {
 	 * @return string
 	 */
 	public function getName() {
-		return $this->name;
+		return $this->clientName;
 	}
 	
 	/**
@@ -87,7 +88,7 @@ class EntityType {
 		$e->name = self::classNameToShortName($className);
 
 		$record = (new Query)
-						->select('id,moduleId')
+						->select('id,moduleId,clientName')
 						->from('core_entity')
 						->where('name', '=', $e->name)
 						->single();
@@ -176,10 +177,10 @@ class EntityType {
 	 */
 	public static function findByName($name) {
 		$record = (new Query)
-						->select('e.id, e.moduleId, e.name, m.name AS moduleName, m.package AS modulePackage')
+						->select('e.id, e.moduleId, e.name, e.clientName, m.name AS moduleName, m.package AS modulePackage')
 						->from('core_entity', 'e')
 						->join('core_module', 'm', 'm.id = e.moduleId')
-						->where('name', '=', $name)
+						->where('clientName', '=', $name)
 						->single();
 		
 		if(!$record) {
@@ -188,11 +189,13 @@ class EntityType {
 		
 		return static::fromRecord($record);
 	}
+  
 
 	private static function fromRecord($record) {
 		$e = new static;
 		$e->id = $record['id'];
 		$e->name = $record['name'];
+    $e->clientName = $record['clientName'];
 		$e->moduleId = $record['moduleId'];
 
 		if (isset($record['modulePackage'])) {

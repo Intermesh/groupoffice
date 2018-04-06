@@ -11,14 +11,14 @@ go.Modules.register("core", 'customfields', {
   requiredPermissionLevel: GO.permissionLevels.write,
   entities: ["FieldSet", "Field"],
   initModule: function () {
-    go.Stores.get("community", "Field").getUpdates(function (store) {
+    go.Stores.get("Field").getUpdates(function (store) {
       go.CustomFields.fieldsLoaded = true;
       go.CustomFields.fireReady();
-//		console.log(go.Stores.get("community", "Field"));
+//		console.log(go.Stores.get("Field"));
     });
 
-    go.Stores.get("community", "FieldSet").getUpdates(function (store) {
-//		console.log(go.Stores.get("community", "FieldSet"));
+    go.Stores.get("FieldSet").getUpdates(function (store) {
+//		console.log(go.Stores.get("FieldSet"));
       go.CustomFields.fieldSetsLoaded = true;
       go.CustomFields.fireReady();
     });

@@ -92,7 +92,7 @@ go.links.LinkToButton = Ext.extend(Ext.Button, {
 							link.toId = entity.id;
 						}
 						
-						go.Stores.get("community", "Link").set({
+						go.Stores.get("Link").set({
 							create: [link]
 						}, function(options, success, result) {
 							if(result.notCreated) {

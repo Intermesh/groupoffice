@@ -138,7 +138,7 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 			links.push(link);
 		});
 
-		go.Stores.get("community", "Link").set({
+		go.Stores.get("Link").set({
 			create: links
 		}, function () {
 			me.close();

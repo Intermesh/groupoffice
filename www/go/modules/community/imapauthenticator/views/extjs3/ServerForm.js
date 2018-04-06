@@ -1,6 +1,6 @@
 go.modules.community.imapauthenticator.ServerForm = Ext.extend(go.form.FormWindow, {
 	title: t('Server profile', 'imapauth'),
-	entityStore: go.Stores.get("community", "ImapAuthServer"),
+	entityStore: go.Stores.get("ImapAuthServer"),
 	width: dp(400),
 	height: dp(600),
 	autoScroll: true,
@@ -157,7 +157,7 @@ go.modules.community.imapauthenticator.ServerForm = Ext.extend(go.form.FormWindo
 						name: "groups",
 						idField: "groupId",
 						displayField: "name",
-						entityStore: go.Stores.get("community", "Group"),
+						entityStore: go.Stores.get("Group"),
 						
 						fieldLabel: t("Groups"),
 						storeBaseParams:{

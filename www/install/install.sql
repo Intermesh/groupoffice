@@ -93,8 +93,23 @@ DROP TABLE IF EXISTS `core_entity`;
 CREATE TABLE `core_entity` (
   `id` int(11) NOT NULL,
   `moduleId` int(11) DEFAULT NULL,
-  `name` varchar(190) NOT NULL
+  `name` varchar(190) NOT NULL,
+  `clientName` varchar(190) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+ALTER TABLE `core_entity`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `model_name` (`name`),
+  ADD UNIQUE KEY `name` (`name`),
+  ADD KEY `moduleId` (`moduleId`);
+
+ALTER TABLE `core_entity`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+
+ALTER TABLE `core_entity`
+  ADD CONSTRAINT `core_entity_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE;
+
 
 DROP TABLE IF EXISTS `core_group`;
 CREATE TABLE `core_group` (
@@ -455,12 +470,6 @@ ALTER TABLE `core_customfields_field_set`
   ADD KEY `aclId` (`aclId`),
   ADD KEY `modSeq` (`modSeq`);
 
-ALTER TABLE `core_entity`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `model_name` (`name`),
-  ADD UNIQUE KEY `name` (`name`),
-  ADD KEY `moduleId` (`moduleId`);
-
 ALTER TABLE `core_group`
   ADD PRIMARY KEY (`id`),
   ADD KEY `isUserGroupFor` (`isUserGroupFor`),
@@ -577,8 +586,6 @@ ALTER TABLE `core_customfields_field`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `core_customfields_field_set`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-ALTER TABLE `core_entity`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `core_group`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `core_link`
@@ -620,9 +627,6 @@ ALTER TABLE `core_customfields_field`
 ALTER TABLE `core_customfields_field_set`
   ADD CONSTRAINT `core_customfields_field_set_ibfk_1` FOREIGN KEY (`entityId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_customfields_field_set_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`);
-
-ALTER TABLE `core_entity`
-  ADD CONSTRAINT `core_entity_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `core_group`
   ADD CONSTRAINT `core_group_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`),
