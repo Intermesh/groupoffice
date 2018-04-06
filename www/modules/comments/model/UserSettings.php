@@ -1,3 +1,0 @@
-
-<?php
-//create table first
