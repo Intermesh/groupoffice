@@ -1389,8 +1389,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 			
 			this.compressRecords = records;
 
-			if(!this.compressDialog){
-				this.compressDialog = new GO.files.CompressDialog ({
+			if(!this.downloadCompressedDialog){
+				this.downloadCompressedDialog = new GO.files.CompressDialog ({
 					scope:this,
 					handler:function(win, filename, utf8){
 						this.onDownloadSelected(this.compressRecords, filename, utf8);
@@ -1398,13 +1398,16 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 				});
 			}
 
-			this.compressDialog.show();
+			this.downloadCompressedDialog.show();
 			
 		} else {
 			
 			params.archive_name=filename;
 			params.utf8=utf8 ? '1' : '0';
 			params.sources=Ext.encode(params.sources);
+      
+      //for safari it must be opened before async request.
+      //var win = window.open();
 			
 			GO.request({
 				timeout:300000,
@@ -1414,8 +1417,11 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 				success:function(response, options, result){
 					
 					if(!GO.util.empty(result.archive)){
-						window.open(GO.url("core/downloadTempFile",{path:result.archive}));
+						document.location = GO.url("core/downloadTempFile",{path:result.archive});
+            //win.close();
+            
 					} else {
+            win.close();
 						GO.message.alert('No archive build','error');
 					}
 
