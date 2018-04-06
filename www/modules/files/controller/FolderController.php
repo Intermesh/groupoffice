@@ -833,11 +833,10 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			$limit = !empty($params['limit']) ? $params['limit'] : 30;
 			$start = !empty($params['start']) ? $params['start'] : 0;
 
-			$aclJoinCriteria = \GO\Base\Db\FindCriteria::newInstance()->addRawCondition('a.acl_id', 'sc.acl_id', '=', false);
+			$aclJoinCriteria = \GO\Base\Db\FindCriteria::newInstance()->addRawCondition('a.aclId', 'sc.aclId', '=', false);
 
 			$aclWhereCriteria = \GO\Base\Db\FindCriteria::newInstance()
-					->addCondition('user_id', \GO::user()->id, '=', 'a', false)
-					->addInCondition("group_id", \GO\Base\Model\User::getGroupIds(\GO::user()->id), "a", false);
+					->addInCondition("groupId", \GO\Base\Model\User::getGroupIds(\GO::user()->id), "a", false);
 
 			$findParams = \GO\Base\Db\FindParams::newInstance()
 					->select('*')
@@ -847,13 +846,13 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 						'model'=>'GO\Base\Model\SearchCacheRecord',
 						'localTableAlias'=>'t',
 						'localField'=>'id',
-						'foreignField'=>'model_id',
+						'foreignField'=>'entityId',
 						'tableAlias'=>'sc'
 					))
 					->join(\GO\Base\Model\AclUsersGroups::model()->tableName(), $aclJoinCriteria, 'a', 'INNER')->debugSql()
 					->criteria(
 						\GO\Base\Db\FindCriteria::newInstance()
-							->addCondition('model_type_id', \GO::getModel('GO\Files\Model\File')->modelTypeId(),  '=', 'sc', true)
+							->addCondition('entityTypeId', \GO::getModel('GO\Files\Model\File')->modelTypeId(),  '=', 'sc', true)
 							->mergeWith(
 								\GO\Base\Db\FindCriteria::newInstance()
 									->addCondition('name', $queryStr, 'LIKE', 'sc', false)
@@ -861,7 +860,11 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 							)
 							->mergeWith($aclWhereCriteria)
 					);
-
+			
+			if(isset($params['sort'])){
+				$findParams->order("t.".$params['sort'], $params['dir']);
+			}
+			
 			$filesStmt = \GO\Files\Model\File::model()->find($findParams);
 
 			$response['total'] = $filesStmt->rowCount();

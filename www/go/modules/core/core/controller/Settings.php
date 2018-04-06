@@ -8,14 +8,11 @@ use go\core\jmap\Response;
 class Settings extends Controller {
 	
 	public function get() {
-		Response::get()->addResponse((array) GO()->getSettings());
+		Response::get()->addResponse(GO()->getSettings()->toArray());
 	}
 	
 	public function set($params) {
-		foreach($params as $key => $value) {
-			GO()->getSettings()->$key = $value;
-		}
-		
+		GO()->getSettings()->setValues($params);
 		$success = GO()->getSettings()->save();
 		
 		Response::get()->addResponse(['success' => $success]);

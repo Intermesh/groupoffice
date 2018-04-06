@@ -646,3 +646,6 @@ ALTER TABLE `core_auth_method` ADD INDEX(`moduleId`);
 ALTER TABLE `core_auth_method` ADD FOREIGN KEY (`moduleId`) REFERENCES `core_module`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
 ALTER TABLE `core_auth_password` ADD FOREIGN KEY (`userId`) REFERENCES `core_user`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+
+
+ALTER TABLE `core_search` ADD FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;

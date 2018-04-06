@@ -74,10 +74,19 @@ $settings['show_contact_cf_tabs'] = array();
 $settings['config']['encode_callto_link'] = GO::config()->encode_callto_link;
 $settings['config']['login_message'] = GO::config()->login_message;
 
-$user_id = GO::user() ? GO::user()->id : 0;
+
+//TODO: refactor this. It uses the session to find the token when browser is reloaded.
+if(\GO::user() && !GO()->getUser()) {  
+  $token = Token::find()->where(['accessToken' => GO::session()->values['accessToken']])->single();
+  if($token) {
+    GO()->getAuthState()->setToken($token);
+  }
+}
+ 
+$user_id = GO()->getUser() ? GO()->getUser()->id : 0;
 
 
-if (GO::user()) {
+if (GO()->getUser()) {
 	
 	$settings['state'] = State::model()->getFullClientState($user_id);
 	$settings['user_id'] = $user_id;
@@ -271,9 +280,9 @@ if (isset(GO::session()->values['security_token'])) {
 	echo 'GO.securityToken="' . GO::session()->values['security_token'] . '";';
 }
 
-if (isset($_REQUEST['SET_LANGUAGE']) && preg_match('/[a-z_]/', $_REQUEST['SET_LANGUAGE']))
-	echo 'GO.loginSelectedLanguage="' . $_REQUEST['SET_LANGUAGE'] . '";';
-
+//if (isset($_GET['SET_LANGUAGE']) && preg_match('/[a-z_]/', $_GET['SET_LANGUAGE'])) {
+//	echo 'GO.loginSelectedLanguage = "' . $_GET['SET_LANGUAGE'] . '";';
+//} 
 echo 'window.name="' . GO::getId() . '";';
 ?>
 
@@ -315,8 +324,8 @@ if (isset($_REQUEST['f'])) {
 }
 ?>
 
-<?php if (GO::user()): ?>
-	go.User = <?php echo json_encode(Token::find()->where(['accessToken' => GO::session()->values['accessToken']])->single()->getUser()->toArray()); ?>;
+<?php if (GO()->getUser()): ?>
+	go.User = <?php echo json_encode(GO()->getUser()->toArray()); ?>;
 	Ext.Ajax.defaultHeaders = {'Authorization': 'Bearer <?php echo GO::session()->values['accessToken']; ?>', 'Accept-Language': GO.lang.iso};
 	Ext.state.Manager.setProvider(new GO.state.HttpProvider());
 	

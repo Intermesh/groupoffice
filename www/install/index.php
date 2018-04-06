@@ -1,28 +1,31 @@
 <?php
+require('../vendor/autoload.php');
+
+if(!empty($_POST)) {
+	header('Location: test.php');
+	exit();	
+}
+
 require('header.php');
-if($_SERVER['REQUEST_METHOD']=='POST'){
-	redirect("license.php");
-}
-
-
-printHead();
-
 ?>
-<h1>Thank you for installing <?php echo \GO::config()->product_name; ?>!</h1>
-<p>This page checks if your system meets the requirements to run <?php echo \GO::config()->product_name; ?>.</p>
-<p>If this page prints errors or warnings, please visit this page for more information: <a target="_blank" href="https://www.group-office.com/wiki/Installation">https://www.group-office.com/wiki/Installation</a></p>
 
-<h2>System test</h2>
+<section>
+	<form method="POST" action="" onsubmit="submitButton.disabled = true;">
+		<fieldset>
+				<h2>Thank you!</h2>
+				<p>For installing Group-Office.</p>
+	
+				<label>
+					<input name="accept" type="checkbox" required />
+					I accept the AGPL license.
+				</label>
+		</fieldset>
+
+		<button name="submitButton" type="submit">Continue</button>
+	</form>
+
+</section>
+
 <?php
+require('footer.php');
 
-require('gotest.php');
-
-if(!output_system_test())
-{
-	echo '<p style="color: red;">Because of a fatal error in your system setup the installation can\'t continue. Please fix the errors above first.</p>';
-}else
-{	
-	echo continueButton();
-}
-
-printFoot();

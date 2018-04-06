@@ -641,8 +641,6 @@ class AbstractModelController extends AbstractController {
 		return $response;
 	}
 	
-		
-	
 	public function formatTaskLinkRecord($record, $model, $cm){
 		
 		$statuses = \GO::t("statuses", "tasks");

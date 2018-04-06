@@ -70,7 +70,8 @@ class GroupAdmin extends \GO\Base\Db\ActiveRecord{
 		 $stmt = $this->group->calendars;
 		 
 		 foreach($stmt as $calendar){
-			 $calendar->acl->addUser($this->user_id, \GO\Base\Model\Acl::DELETE_PERMISSION);
+       $group = \go\core\auth\model\Group::find()->where(['isUserGroupFor' => $this->user_id])->single();
+			 $calendar->acl->addGroup($group->id, \GO\Base\Model\Acl::DELETE_PERMISSION);
 		 }
 		 
 		 return parent::afterSave($wasNew);

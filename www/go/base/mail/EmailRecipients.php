@@ -97,9 +97,13 @@ class EmailRecipients{
 	 * @return array  
 	 */
 	public function getAddress(){
+    if(count($this->_addresses) == 0) {
+      return false;
+    }
 		reset($this->_addresses);
-		$each = each($this->_addresses);
-		return $each ? array('email'=>$each['key'], 'personal'=>empty($each['value']) ? $each['key'] : $each['value']) : false;
+    $email = key($this->_addresses);
+    $personal = current($this->_addresses) ?? $email;
+		return ['email'=>$email, 'personal'=>$personal];
 	}
 	
 //	public function getEmail($index=0){

@@ -137,5 +137,25 @@ class Utils {
 		}
 	}
 	
+  /**
+   * Parse DSN connection string
+   * 
+   * @param string $dsn eg mysql:host=db;port=8306;dbname=groupoffice
+   * @return ['scheme' => 'mysql', 'options' => ['host' => 'db']]
+   */
+  public static function parseDSN($dsn) {
+    $dsn = substr($dsn, 6); //strip mysql:
+    $parts = str_getcsv($dsn, ';');
+    $options = [];
+    foreach($parts as $part) {
+      $is = strpos($part, '=');
+      $options[substr($part,0, $is)] = substr($part, $is + 1);
+    }
+    
+    return [
+        'scheme' => 'mysql',
+        'options' => $options
+    ];
+  }
 
 }

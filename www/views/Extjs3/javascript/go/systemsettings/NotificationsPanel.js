@@ -5,6 +5,9 @@ go.systemsettings.NotificationsPanel = Ext.extend(Ext.form.FormPanel, {
 			autoScroll: true,
 			iconCls: 'ic-notifications',
 			items: [{
+					defaults: {
+						width: dp(240)
+					},
 					xtype: "fieldset",
 					title: t('Outgoing E-mail (SMTP)'),
 					items: [

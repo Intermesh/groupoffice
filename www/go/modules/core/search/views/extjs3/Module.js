@@ -41,7 +41,7 @@ go.ModuleManager.register('search', {
 						hidden: true,
 						cls: 'search-field-wrap',
 						items: [
-							searchField = new Ext.form.TriggerField({
+							searchField = new Ext.form.TriggerField({								
 								emptyText: t("Search"),
 								hideLabel: true,
 								anchor: "100%",

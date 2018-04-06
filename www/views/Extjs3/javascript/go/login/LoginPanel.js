@@ -42,7 +42,7 @@ go.login.LoginPanel = Ext.extend(Ext.Container, {
 			GO.loginDialog = new go.login.LoginDialog();
 			GO.loginDialog.show();
 
-
+			var me = this;
 			setTimeout(function () {
 				if (GO.settings.config.debug) {
 					go.notifier.msg({
@@ -51,9 +51,14 @@ go.login.LoginPanel = Ext.extend(Ext.Container, {
 				}
 
 				if (GO.settings.config.login_message) {
-					go.notifier.msg({
+					var msg = go.notifier.msg({
 						description: GO.settings.config.login_message
 					});
+					
+					me.on("destroy", function() {
+						go.notifier.remove(msg);
+					});
+					
 				}
 			}, 1000); // 1 second delay for groupoffice loading
 

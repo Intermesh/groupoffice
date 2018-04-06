@@ -53,11 +53,36 @@ class Mailbox extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	public $skipPasswordEncryption = false;
+  
+  
+  private function crypt($password){
+        /* To generate the salt, first generate enough random bytes. Because
+         * base64 returns one character for each 6 bits, the we should generate
+         * at least 22*6/8=16.5 bytes, so we generate 17. Then we get the first
+         * 22 base64 characters
+         */
+        $salt=substr(base64_encode(openssl_random_pseudo_bytes(17)),0,22);
+        /* As blowfish takes a salt with the alphabet ./A-Za-z0-9 we have to
+         * replace any '+' in the base64 string with '.'. We don't have to do
+         * anything about the '=', as this only occurs when the b64 string is
+         * padded, which is always after the first 22 characters.
+         */
+        $salt=str_replace("+",".",$salt);
+        /* Next, create a string that will be passed to crypt, containing all
+         * of the settings, separated by dollar signs
+         */
+        $param='$5$rounds=5000$'.
+                $salt; //add the salt
+       
+       
+        //now do the actual hashing
+        return crypt($password,$param);
+}
 
 	protected function beforeSave() {
 
 		if (!$this->skipPasswordEncryption && $this->isModified("password")) {
-			$this->password = '{CRYPT}' . @\crypt($this->password); //disabled depricated error for unsalted crypt
+			$this->password = $this->crypt($this->password); //disabled depricated error for unsalted crypt
 		}
 		$parts = explode('@', $this->username);
 
@@ -96,6 +121,10 @@ class Mailbox extends \GO\Base\Db\ActiveRecord {
 
 	public function validate() {
 
+        
+    if($this->isModified('password') && strlen($this->password) < GO()->getSettings()->passwordMinLength) {
+      $this->setValidationError("password", "Password is to short. Minimal length is ".GO()->getSettings()->passwordMinLength." characters");
+    }
 
 		$this->_checkQuota();
 		

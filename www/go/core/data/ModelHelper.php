@@ -30,4 +30,4 @@ class ModelHelper {
 	public static function getValue(Model $model, $propName) {
 		return $model->$propName;
 	}
-}
+}		

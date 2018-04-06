@@ -80,7 +80,7 @@ GO.addressbook.AddresslistsGrid = Ext.extend(GO.grid.GridPanel,{
 					fields:fields.fields
 				}),
 				baseParams: {
-					permissionLevel: GO.permissionLevels.write
+					permissionLevel: GO.permissionLevels.read
 				},
 				proxy: new Ext.data.HttpProxy({
 					url:GO.url('addressbook/addresslist/store')

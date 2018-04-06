@@ -1916,7 +1916,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 			}
 		}
 
-		if($withCustomFields && GO::modules()->customfields && $this->customfieldsRecord)
+		if($withCustomFields && GO::modules()->customfields && $this->customfieldsRecord  && GO::modules()->customfields->permissionLevel)
 		{
 			$fields = array_merge($fields, $this->customfieldsRecord->getFindSearchQueryParamFields('cf'));
 		}
@@ -3119,6 +3119,10 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 		if(!static::$trimOnSave)
 			return;
 		foreach($this->columns as $field=>$col){
+      
+      if(!isset($col['type'])) {
+        throw new \Exception("Column $field has no type. Does it exist in the database?");
+      }
 			if(isset($this->_attributes[$field]) && $col['type'] == \PDO::PARAM_STR){
 				$this->_attributes[$field] = trim($this->_attributes[$field]);
 			}

@@ -636,8 +636,24 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 			this.rendered = true;
 			this.fireEvent('render');
+			
+			this.welcome();
+			
 
 		}, this);
+	},
+	
+	
+	welcome : function() {
+		if(go.User.id==1 && go.User.logins == 1) {
+			
+			Ext.MessageBox.alert(t("Welcome!"), t("Please complete the installation by running through the system settings. Click OK to continue to the system settings dialog."), function() {
+				go.systemsettingsDialog = new go.systemsettings.Dialog();						
+				go.systemsettingsDialog.show();
+			});
+			
+			
+		}
 	},
 //
 //	search: function (query) {

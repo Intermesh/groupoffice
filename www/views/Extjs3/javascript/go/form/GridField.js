@@ -3,7 +3,8 @@ go.form.GridField = Ext.extend(Ext.grid.EditorGridPanel, {
 	autoHeight: true,
 	viewConfig: {
 		scrollOffset: 0,
-		emptyText: t("Empty")
+		emptyText: t("Empty"),
+		deferEmptyText: false
 	},
 	
 	cls: 'go-grid3-hide-headers',
@@ -44,8 +45,7 @@ go.form.GridField = Ext.extend(Ext.grid.EditorGridPanel, {
 				});
 			}, this);
 		}
-
-
+		
 	},
 
 	
@@ -68,7 +68,6 @@ go.form.GridField = Ext.extend(Ext.grid.EditorGridPanel, {
 
 		var data = {};
 		data[this.store.root] = records;
-
 		this.store.loadData(data);
 	},
 

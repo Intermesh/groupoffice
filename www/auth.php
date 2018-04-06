@@ -77,18 +77,23 @@ try {
 			if (!$authenticator->isAvailableFor($data['username'])) {
 				continue;
 			}
-			if ($user = $authenticator->authenticate($data['username'], $data['password'])) {
-
-				$token = new Token();
-				$token->userId = $user->id;
-				$token->addPassedMethod($method);
-
-				if (!$token->save()) {
-					throw new Exception("Could not save token");
-				}
-
-				return $token;
+			if (!$user = $authenticator->authenticate($data['username'], $data['password'])) {
+				return false;
 			}
+			
+			if(GO()->getSettings()->maintenanceMode && !$user->isAdmin()) {
+				output([], 503, "Service unavailable. Maintenance mode is enabled");
+			}
+
+			$token = new Token();
+			$token->userId = $user->id;
+			$token->addPassedMethod($method);
+
+			if (!$token->save()) {
+				throw new Exception("Could not save token");
+			}
+
+			return $token;
 		}
 		return false;
 	}
@@ -177,5 +182,6 @@ try {
 		output($response, 200, "Success, but more authorization required.");
 	}
 } catch (\Exception $e) {
+  \go\core\ErrorHandler::logException($e);
 	output([], 500, $e->getMessage());
 }

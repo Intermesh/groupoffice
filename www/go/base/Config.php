@@ -417,7 +417,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 *
 	 * @var StringHelper
 	 */
-	public $html_editor_font = 'font-size:14px; -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; color: #212121;';
+	public $html_editor_font = 'font-size:14px;font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; color: #212121;';
 
 	/**
 	 * The default font to be used in the generated PDF files.
@@ -1090,7 +1090,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $version = '6.3.1';
+	var $version;
 
 	/**
 	 * Modification date
@@ -1099,7 +1099,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @access  public
 	 */
 	
-	var $mtime = '20180315';
+	var $mtime;
 
 	#group configuration
 	/**
@@ -1444,28 +1444,34 @@ var $billing_clear_payment_method_on_duplicate = true;
 	}
 	
 //	
-//	private function buildConfig() {
-//		
-//		$db = \go\core\App::get()->getDatabase();
-//		
-//		$data = \go\core\App::get()->getConfig();
-//		
-//
-//		$config['file_storage_path'] = \go\core\App::get()->getDataFolder()->getPath() . '/';
-//		$config['root_path'] = \go\core\Environment::get()->getInstallFolder()->getPath() . '/';
-//		$config['db_name'] = $db->getName();
-//		$user = explode('@', $db->getUser());
-//		$config['db_user'] = $user[0];
-//		$config['db_host'] = $user[1];
-//		$config['db_pass'] = $data['db']['password'];
-//
-//		$config['webmaster_email'] = (new \go\core\db\Query())->selectSingleValue('email')->from('core_user')->where('id=1')->single();
-//		
-//		$config['host'] = dirname($_SERVER['PHP_SELF']);
-//		$config['debug'] = !empty($data['general']['debug']);
-//		
-//		return $config;
-//	}
+	private function buildConfig() {
+		
+		$db = \go\core\App::get()->getDatabase();
+		
+		$data = \go\core\App::get()->getConfig();
+		
+
+		$config['file_storage_path'] = \go\core\App::get()->getDataFolder()->getPath() . '/';
+		$config['root_path'] = \go\core\Environment::get()->getInstallFolder()->getPath() . '/';
+		$config['db_name'] = $db->getName();
+		$user = explode('@', $db->getUser());
+		$config['db_user'] = $user[0];
+		$config['db_host'] = $user[1];
+		$config['db_pass'] = $data['db']['password'];
+
+		//$config['webmaster_email'] = (new \go\core\db\Query())->selectSingleValue('email')->from('core_user')->where('id=1')->single();
+		
+		$config['host'] = trim(dirname($_SERVER['PHP_SELF']), '/') . '/';
+		$config['debug'] = !empty($data['general']['debug']);
+		
+		if(isset($data['limits'])) {
+			$config['allowed_modules'] = empty($data['limits']['allowedModules']) ? $data['limits']['allowedModules'] : "";
+			$config['max_users'] = $data['limits']['userCount'] ?? 0;
+			$config['quota'] = empty($data['limits']['storageQuota']) ? 0 : \go\core\Environment::configToBytes($data['limits']['storageQuota']);
+		}
+		
+		return $config;
+	}
 	
 	/**
 	 * Constructor. Initialises all public variables.
@@ -1478,17 +1484,17 @@ var $billing_clear_payment_method_on_duplicate = true;
 
 		$this->root_path = str_replace('\\','/',dirname(dirname(dirname(__FILE__)))).'/';
 
-		//suppress error for open_basedir warnings etc
-		if(@file_exists('/etc/groupoffice/globalconfig.inc.php')) {
-			require('/etc/groupoffice/globalconfig.inc.php');
-		}		
-
-		$config_file = $this->get_config_file();
-
-		if($config_file)
-			include($config_file);
+//		//suppress error for open_basedir warnings etc
+//		if(@file_exists('/etc/groupoffice/globalconfig.inc.php')) {
+//			require('/etc/groupoffice/globalconfig.inc.php');
+//		}		
+//
+//		$config_file = $this->get_config_file();
+//
+//		if($config_file)
+//			include($config_file);
 		
-//		$config = $this->buildConfig();
+		$config = $this->buildConfig();
 
 		$this->_original_config = $config;
 		
@@ -1619,10 +1625,13 @@ var $billing_clear_payment_method_on_duplicate = true;
 	}
 	
 	private function loadNewSettings() {
+		
+		$this->version = $this->mtime = GO()->getVersion();
+		
 		$this->title = GO()->getSettings()->title;
 		$this->language = GO()->getSettings()->language;
 		$this->webmaster_email = GO()->getSettings()->systemEmail;
-		$this->smtp_host = GO()->getSettings()->smtpHost;
+		$this->smtp_server = GO()->getSettings()->smtpHost;
 		$this->smtp_port = GO()->getSettings()->smtpPort;
 		$this->smtp_username = GO()->getSettings()->smtpUsername;
 		$this->smtp_password = GO()->getSettings()->smtpPassword;

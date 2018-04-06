@@ -155,13 +155,6 @@ function test_system(){
 
 	$tests[]=$test;
 
-	$test['name']='MySQL support';
-	$test['showSuccessFeedback'] = false;
-	$test['pass']=function_exists('mysqli_connect');
-	$test['feedback']='Fatal error: The improved MySQL (MySQLi) extension is required. So is the MySQL server.';
-	$test['fatal']=true;
-
-	$tests[]=$test;
 	
 	$test['name']='PDO support';
 	$test['showSuccessFeedback'] = false;
@@ -264,28 +257,7 @@ function test_system(){
 	$test['feedback']='Warning: PHP error display is enabled in php.ini. It\'s recommended that this feature is disabled because it can cause unnessecary interface crashes.';
 	$test['fatal']=false;*/
 
-	$tests[]=$test;
-	$test['name']='libwbxml';
-	$test['showSuccessFeedback'] = false;
-	if(class_exists('GO'))
-	{
-		$wbxml2xml = whereis('wbxml2xml') ? whereis('wbxml2xml') : \GO::config()->cmd_wbxml2xml;
-		$xml2wbxml = whereis('xml2wbxml') ? whereis('xml2wbxml') : \GO::config()->cmd_xml2wbxml;
-	}else
-	{
-		$wbxml2xml = whereis('wbxml2xml') ? whereis('wbxml2xml') : '/usr/bin/wbxml2xml';
-		$xml2wbxml = whereis('xml2wbxml') ? whereis('xml2wbxml') : '/usr/bin/xml2wbxml';
-	}
-	$test['pass']=@is_executable($wbxml2xml) && @is_executable($xml2wbxml);
-	$test['feedback']='Warning: libwbxml2 is not installed. SyncML sync will not work!';
-	$test['fatal']=false;
-
-	$tests[]=$test;
-	$test['name']='DOM functions';
-	$test['showSuccessFeedback'] = false;
-	$test['pass']=class_exists('DOMDocument', false);
-	$test['feedback']='Warning: DOM functions are not installed. Synchronization with SyncML will not work. Install php-xml';
-	$test['fatal']=false;
+	
 
 	$tests[]=$test;
 	$test['name']='MultiByte string functions';
@@ -380,9 +352,7 @@ function test_system(){
 	
 	$url = "http".(!empty($_SERVER['HTTPS'])?"s":"")."://".$_SERVER['HTTP_HOST'];
 	
-	if($_SERVER['SERVER_PORT'] != 80 && $_SERVER['SERVER_PORT'] != 443) {
-		$url .= ':'.$_SERVER['SERVER_PORT'];
-	}
+
 	
 	try {
 		$headers = get_headers($url.'/caldav');	
@@ -956,11 +926,11 @@ function return_bytes($val) {
 	}
 	return $val;
 }
-
-//check if we are included
-if(!class_exists('GO'))
-{
-	echo '<h1 style="font-family: Arial, Helvetica;font-size: 18px;">'.$product_name.' test script</h1><div style="font-family: Arial, Helvetica;font-size: 12px;"> ';
-	output_system_test();
-	echo "</div>";
-}
+//
+////check if we are included
+//if(!class_exists('GO'))
+//{
+//	echo '<h1 style="font-family: Arial, Helvetica;font-size: 18px;">'.$product_name.' test script</h1><div style="font-family: Arial, Helvetica;font-size: 12px;"> ';
+//	output_system_test();
+//	echo "</div>";
+//}

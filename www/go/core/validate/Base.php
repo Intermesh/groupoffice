@@ -2,7 +2,6 @@
 
 namespace go\core\validate;
 
-use go\core\data\Object;
 use go\core\data\Model;
 
 /**

@@ -86,7 +86,7 @@ class Environment extends Singleton {
 	 *
 	 * @param $val Memory size shorthand notation string
 	 */
-	private function configToBytes($val) {
+	public static function configToBytes($val) {
 		$val = trim($val);
 		$last = strtolower(substr($val,-1));
 		$val = substr($val, 0, -1);
