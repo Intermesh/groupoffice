@@ -124,6 +124,6 @@ $updates["201803161130"][] = function() {
 
 $updates["201804042007"][] = "ALTER TABLE `core_search` ADD FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
 
-$updates["201804062007"][] = "ALTER TABLE `core_entity`  ADD `clientName` VARCHAR(190) NULL DEFAULT NULL  AFTER ;";
+$updates["201804062007"][] = "ALTER TABLE `core_entity`  ADD `clientName` VARCHAR(190) NULL DEFAULT NULL;";
 $updates["201804062007"][] = "update `core_entity` set clientName = name;";
 $updates["201804062007"][] = "ALTER TABLE `core_entity` ADD UNIQUE(`clientName`);";
