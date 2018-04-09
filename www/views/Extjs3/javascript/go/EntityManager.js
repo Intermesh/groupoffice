@@ -22,18 +22,18 @@
         throw "Entity name is already registered by module " +entities[name]['package'] + "/" + entities[name]['name'];
       }
       
-      entities[name] = {
+      entities[name.toLowerCase()] = {
         name: name,
         module: module,
         package: package,
         goto: function (id) {
-          go.Router.goto(this.package + "/" + this.module + "/" + this.name.toLowerCase() + "/" + id);
+          go.Router.goto(this.name.toLowerCase() + "/" + id);
         }
       };     
     },
 
     get: function (name) {      
-      return entities[name];      
+      return entities[name.toLowerCase()];      
     },
     
     getAll() {
@@ -44,6 +44,8 @@
   
   go.Stores = {
     get: function (name) {
+      
+      name = name.toLowerCase();
      
       if(!stores[name]) {
         stores[name] = new go.data.EntityStore({

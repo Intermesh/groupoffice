@@ -768,7 +768,7 @@ GO.addressbook.searchSender = function(sender, name){
 					break;
 				case 1:
 					var r = GO.addressbook.searchSenderStore.getAt(0);
-					go.Router.goto("addressbook/contact/" + r.get('id'));
+					go.Router.goto("contact/" + r.get('id'));
 					break;
 				default:
 					if(!GO.addressbook.searchSenderWin)
@@ -781,7 +781,7 @@ GO.addressbook.searchSender = function(sender, name){
 							var contact_id = dataview.store.data.items[index].id;
 							list.clearSelections();
 							GO.addressbook.searchSenderWin.hide();
-							go.Router.goto("addressbook/contact/" + contact_id);
+							go.Router.goto("contact/" + contact_id);
 						}, this);
 						GO.addressbook.searchSenderWin=new GO.Window({
 							title:t("Select contact", "addressbook"),

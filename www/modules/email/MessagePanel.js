@@ -206,7 +206,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 	lookupContact : function(){
 		if(this.data.sender_contact_id){
-			go.Router.goto("addressbook/contact/" + this.data.sender_contact_id);
+			go.Router.goto("contact/" + this.data.sender_contact_id);
 		}else{
 			GO.addressbook.searchSender(this.data.sender, this.data.from);
 		}
