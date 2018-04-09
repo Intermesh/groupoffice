@@ -210,7 +210,7 @@ Ext.extend(GO.calendar.ListGrid, Ext.grid.GridPanel, {
 				});
 			}else	if(record.data.contact_id)
 			{
-				go.Router.goto("#addressbook/contact/"+record.data.contact_id);
+				go.Router.goto("#contact/"+record.data.contact_id);
 			}
 			
 		}, this);

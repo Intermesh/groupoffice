@@ -1732,7 +1732,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			break;
 			
 			case "GO\\Adressbook\\Model\\Contact":
-				go.Router.goto("addressbook/contact/" + event['contact_id']);
+				go.Router.goto("contact/" + event['contact_id']);
 			break;
 			
 			case "GO\\Calendar\\Model\\Event":

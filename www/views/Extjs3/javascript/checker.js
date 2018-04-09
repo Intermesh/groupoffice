@@ -282,7 +282,7 @@ GO.CheckerPanel = Ext.extend(function(config){
 		var record = selectionModel.getSelected();
 		
 		var parts = record.data.model_name.split("\\");		
-		go.Router.goto(parts[1].toLowerCase()+"/"+parts[3].toLowerCase()+"/"+record.data.model_id);
+		go.Router.goto(parts[3].toLowerCase()+"/"+record.data.model_id);
 		
 	}, this);
 	

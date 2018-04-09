@@ -91,10 +91,10 @@ GO.files.PortletExpiredFilesGrid = Ext.extend(GO.grid.GridPanel, {
 					var record = selectionModel.getSelected();
 					
 					if(record.data.extension == 'folder'){
-						go.Router.goto("#files/folder/" + record.data.id);
+						go.Router.goto("#folder/" + record.data.id);
 						
 					} else {
-						go.Router.goto("#files/file/" + record.data.id);
+						go.Router.goto("#file/" + record.data.id);
 					}
 				},
 				scope:this
