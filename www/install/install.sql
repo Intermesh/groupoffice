@@ -180,6 +180,7 @@ CREATE TABLE `core_user` (
   `id` int(11) NOT NULL,
   `username` varchar(50) NOT NULL,
   `displayName` varchar(190) DEFAULT '',
+	`avatarId` BINARY(40) NULL,
   `enabled` tinyint(1) NOT NULL DEFAULT '1',
   `email` varchar(100) NOT NULL,
   `recoveryEmail` varchar(100) NOT NULL,
@@ -663,3 +664,11 @@ CREATE TABLE `core_blob` (
 
 ALTER TABLE `core_search` ADD FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
+ALTER TABLE `core_user` 
+ADD INDEX `fk_user_avatar_id_idx` (`avatarId` ASC);
+ALTER TABLE `core_user` 
+ADD CONSTRAINT `fk_user_avatar_id`
+  FOREIGN KEY (`avatarId`)
+  REFERENCES `core_blob` (`id`)
+  ON DELETE RESTRICT
+  ON UPDATE NO ACTION;
