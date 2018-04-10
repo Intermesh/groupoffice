@@ -63,6 +63,10 @@ class State extends AbstractState {
 		
 		return $this->token;
 	}
+  
+  public function setToken(Token $token) {
+    $this->token = $token;
+  }
 	
 	public function isAuthenticated() {
 		return $this->getToken() !== false;

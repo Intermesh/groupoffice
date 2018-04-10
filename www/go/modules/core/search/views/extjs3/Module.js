@@ -1,6 +1,6 @@
 Ext.ns('go.modules.community.search');
 
-go.ModuleManager.register('search', {
+go.Modules.register("core", 'search', {
 	//mainPanel: GO.notes.MainPanel,
 	entities: ["Search"],
 	initModule: function () {
@@ -41,7 +41,7 @@ go.ModuleManager.register('search', {
 						hidden: true,
 						cls: 'search-field-wrap',
 						items: [
-							searchField = new Ext.form.TriggerField({
+							searchField = new Ext.form.TriggerField({								
 								emptyText: t("Search"),
 								hideLabel: true,
 								anchor: "100%",

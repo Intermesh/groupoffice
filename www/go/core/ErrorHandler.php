@@ -73,19 +73,15 @@ class ErrorHandler {
 	 */
 	public function exceptionHandler($e) {				
 		$errorString = self::logException($e);
+    
+    if(!headers_sent()) {
+      header('Content-Type: text/plain');
+    }
 
-//		if(PHP_SAPI == 'cli') {
-			echo "[".date(DateTime::FORMAT_API)."] ". $errorString."\n\n";
-			
-			
-			echo (string) $e;
-			
-			echo "\n\nDebug dump: \n\n";
-			
-			var_dump(App::get()->getDebugger()->getEntries());
-//		}else
-//		{				
-//		}
+    echo "[".date(DateTime::FORMAT_API)."] ". $errorString."\n\n";
+    echo (string) $e;			
+    echo "\n\nDebug dump: \n\n";			
+    print_r(App::get()->getDebugger()->getEntries());
 	}
 
 	/**

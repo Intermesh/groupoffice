@@ -49,6 +49,16 @@ $settings['config']['remember_login'] = GO::config()->remember_login;
 $settings['config']['encode_callto_link'] = GO::config()->encode_callto_link;
 $settings['config']['login_message'] = GO::config()->login_message;
 
+
+//TODO: refactor this. It uses the session to find the token when browser is reloaded.
+if(\GO::user() && !GO()->getUser()) {  
+  $token = Token::find()->where(['accessToken' => GO::session()->values['accessToken']])->single();
+  if($token) {
+    GO()->getAuthState()->setToken($token);
+  }
+}
+ 
+$user_id = GO()->getUser() ? GO()->getUser()->id : 0;
 $settings['state_index'] = 'go';
 $settings['language'] = GO::language()->getLanguage();
 $settings['show_contact_cf_tabs'] = array();
@@ -211,9 +221,9 @@ if (isset(GO::session()->values['security_token'])) {
 	echo 'GO.securityToken="' . GO::session()->values['security_token'] . '";';
 }
 
-if (isset($_REQUEST['SET_LANGUAGE']) && preg_match('/[a-z_]/', $_REQUEST['SET_LANGUAGE']))
-	echo 'GO.loginSelectedLanguage="' . $_REQUEST['SET_LANGUAGE'] . '";';
-
+//if (isset($_GET['SET_LANGUAGE']) && preg_match('/[a-z_]/', $_GET['SET_LANGUAGE'])) {
+//	echo 'GO.loginSelectedLanguage = "' . $_GET['SET_LANGUAGE'] . '";';
+//} 
 echo 'window.name="' . GO::getId() . '";';
 ?>
 

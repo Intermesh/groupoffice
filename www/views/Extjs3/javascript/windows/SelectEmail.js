@@ -87,7 +87,7 @@ GO.dialog.SelectEmail = function(config) {
 
 	items.push(this.usersGrid);
 
-	if(go.ModuleManager.isAvailable("addressbook")) {
+	if(go.Modules.isAvailable("community", "addressbook")) {
 		this.contactsStore = new GO.data.JsonStore({
 			url : GO.url("addressbook/contact/searchEmail"),
 			id : 'email',
@@ -192,7 +192,7 @@ GO.dialog.SelectEmail = function(config) {
 		items.push(this.contactsGrid);
 		items.push(this.companyGrid);
 
-		if(go.ModuleManager.isAvailable("addressbook")) {
+		if(go.Modules.isAvailable("community", "addressbook")) {
 			
 			this.addresslistsStore = GO.addressbook.readableAddresslistsStore;
 			

@@ -37,7 +37,7 @@ GO.email.AddressbookDialog = function(config) {
 
 	var items = Array();
 	
-	if(go.ModuleManager.isAvailable("addressbook")) {
+	if(go.Modules.isAvailable("legacy", "addressbook")) {
 		this.contactsGrid = new GO.email.ContactsGrid({
 			title:t("Contacts", "addressbook"),
 			id: 'em-contacts-grid-tab'
@@ -181,7 +181,7 @@ GO.email.AddressbookDialog = function(config) {
 	
 	
 
-	if(go.ModuleManager.isAvailable("addressbook")) {
+	if(go.Modules.isAvailable("legacy", "addressbook")) {
 		
 		this.mailingsStore = new Ext.data.GroupingStore({
 			reader: new Ext.data.JsonReader({
@@ -239,7 +239,7 @@ GO.email.AddressbookDialog = function(config) {
 				css : 'white-space:normal;',
 				sortable : true
 			},{
-				header: GO.addressbook.lang.addresslistGroup,
+				header: t("Addresslist group", "addressbook"),
 				dataIndex: 'addresslistGroupName'
 			}],
 			sm : new Ext.grid.RowSelectionModel(),

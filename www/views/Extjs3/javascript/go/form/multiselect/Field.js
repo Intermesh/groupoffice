@@ -37,7 +37,8 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 	
 	viewConfig: {
 		scrollOffset: 0,
-		emptyText: t("Empty")
+		emptyText: t("Empty"),
+		deferEmptyText: false
 	},
 	
 	cls: 'go-grid3-hide-headers',
@@ -127,8 +128,6 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 				});
 			}, this);
 		}
-
-
 	},
 
 

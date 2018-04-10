@@ -434,7 +434,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 	getAttachmentsButton : function(){
 		
 		
-		if(go.ModuleManager.isAvailable("files"))
+		if(go.Modules.isAvailable("community", "files"))
 		{
 			var uploadItems = [];
 		
@@ -465,7 +465,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 				text : t("Add from Group-Office", "email").replace('{product_name}', GO.settings.config.product_name),
 				handler : function()
 				{
-					if(go.ModuleManager.isAvailable("files"))
+					if(go.Modules.isAvailable("community", "files"))
 					{
 						GO.files.createSelectFileBrowser();
 

@@ -58,10 +58,14 @@ class Language{
 		$oldIso = $this->_langIso;
 		
 		if(!$isoCode){
-			if(isset($_REQUEST['SET_LANGUAGE'])){
-				$this->_langIso=$_REQUEST['SET_LANGUAGE'];
-//			}elseif(GO::user()){
-//				$this->_langIso=GO::user()->language;
+			if(isset($_GET['SET_LANGUAGE'])){ 
+				$this->_langIso=$_GET['SET_LANGUAGE'];
+        
+        setcookie('SET_LANGUAGE', $this->_langIso);
+        
+      } else if(isset($_COOKIE['SET_LANGUAGE'])) {
+        $this->_langIso=$_COOKIE['SET_LANGUAGE'];
+      
 			}else{
 				$this->_langIso=$this->_getDefaultLanguage();
 			}

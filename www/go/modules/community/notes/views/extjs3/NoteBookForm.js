@@ -1,7 +1,7 @@
 go.modules.notes.NoteBookForm = Ext.extend(go.form.FormWindow, {
 	stateId: 'notes-noteBookForm',
 	title: t('Notebook', 'notes'),
-	entityStore: go.stores.NoteBook,
+	entityStore: go.Stores.get("NoteBook"),
 	autoHeight: true,
 	initFormItems: function () {
 		return [{

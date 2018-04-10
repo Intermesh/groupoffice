@@ -217,4 +217,13 @@ class Request extends Singleton{
 	public function isHttps() {
 		return !empty($_SERVER['HTTPS']) && strcasecmp($_SERVER['HTTPS'], 'off');
 	}
+  
+  /**
+   * Check if this request is an XMLHttpRequest
+   *    * 
+   * @return boolean
+   */
+  public function isXHR() {
+    return isset($_SERVER["HTTP_X_REQUESTED_WITH"]) && $_SERVER["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest";
+  }
 }

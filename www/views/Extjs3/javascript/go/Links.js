@@ -16,7 +16,7 @@ go.Links = {
 	registerLinkToWindow: function (entity, openWindowFunction, title) {
 
 		if (!title) {
-			title = t(entity, go.entities[entity].module);
+			title = t(entity, go.Entities.get(entity).module);
 		}
 
 		this.linkToWindows.push({
@@ -27,4 +27,3 @@ go.Links = {
 	}
 };
 
-go.EntityManager.register("links", "Link");

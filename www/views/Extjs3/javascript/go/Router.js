@@ -112,7 +112,7 @@ GO.mainLayout.on("boot", function() {
 	//Add these default routes on boot so they are added as last options for sure.
 	//
 	//default route for entities		
-	go.Router.add(/([a-zA-Z0-9]*)\/([a-zA-Z0-9]*)\/([0-9]*)/, function(module, entity, id) {
+	go.Router.add(/([a-zA-Z0-9]*)\/([a-zA-Z0-9]*)\/([a-zA-Z0-9]*)\/([0-9]*)/, function(package, module, entity, id) {
 		var mainPanel = GO.mainLayout.openModule(module);
 		var detailViewName = entity + "Detail";
 
@@ -140,7 +140,7 @@ GO.mainLayout.on("boot", function() {
 	go.Router.add(function() {	
 		if(go.User.isLoggedIn()) {
 			
-			if(!go.ModuleManager.isAvailable(GO.settings.start_module)) {
+			if(!go.Modules.isAvailable("community", GO.settings.start_module)) {
 				console.log(GO.mainLayout.tabPanel.items.first());
 				GO.settings.start_module = GO.mainLayout.tabPanel.items.first().module;
 			}

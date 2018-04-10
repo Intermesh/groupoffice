@@ -525,7 +525,7 @@ Ext.extend(GO.modules.MainPanel,Ext.grid.EditorGridPanel, {
 				id: record.data.id,
 				enabled: record.data.enabled
 			}];
-			go.stores.Module.set(params, function(options, success, response) {
+			go.Stores.get("Module").set(params, function(options, success, response) {
 
 				if(record.data.enabled && record.isModified("enabled")) {
 					record.set('aclId', response['created'][0].aclId);
@@ -602,8 +602,10 @@ Ext.extend(GO.modules.MainPanel,Ext.grid.EditorGridPanel, {
 });
 
 
-GO.moduleManager.addModule('modules', GO.modules.MainPanel, {
-	title: t("Modules", "modules"),
+go.Modules.register('core', 'modules' ,{
+  mainPanel: GO.modules.MainPanel,
+  title: t("Modules", "modules"),
 	iconCls: 'go-tab-icon-modules',
-	admin: true
+	admin: true,
+  entities: ["Module"]
 });

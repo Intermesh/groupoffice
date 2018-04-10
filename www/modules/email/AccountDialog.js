@@ -20,8 +20,9 @@ GO.email.AccountDialog = function(config) {
 		fieldLabel : t("Root mailbox", "email"),
 		name : 'mbroot'
 	}) ];
-
-	if(go.ModuleManager.isAvailable("sieve")) {
+    console.log("JAAA");
+	if(go.Modules.isAvailable("legacy", "sieve")) {
+        console.log("JAAA");
 		advancedItems.push(
 			new Ext.form.NumberField({
 				fieldLabel : t("Sieve filter port number", "sieve"),
@@ -42,7 +43,7 @@ GO.email.AccountDialog = function(config) {
 		);
 	}
 
-	if(go.ModuleManager.isAvailable("addressbook")){
+	if(go.Modules.isAvailable("legacy", "addressbook")){
 				
 		this.templatesCombo = new GO.form.ComboBox({
 			fieldLabel : t("Default e-mail template", "email"),
@@ -195,7 +196,7 @@ GO.email.AccountDialog = function(config) {
 	}
 	];
 
-	if(go.ModuleManager.isAvailable("addressbook"))
+	if(go.Modules.isAvailable("legacy", "addressbook"))
 		properties_items.push(this.templatesCombo);
 
 	this.smtpAllowSelfSignedCheck = new Ext.ux.form.XCheckbox({

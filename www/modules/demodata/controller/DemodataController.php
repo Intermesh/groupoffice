@@ -202,10 +202,9 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 		if (!$elmer) {
 			$elmer = new \GO\Base\Model\User();
 			$elmer->username = 'elmer';
-			$elmer->first_name = 'Elmer';
-			$elmer->last_name = 'Fudd';
+			$elmer->displayName = 'Elmer Fudd';
 			$elmer->email = 'elmer@acmerpp.demo';
-			$elmer->password='demo';
+			$elmer->password='demopass';
 			if ($elmer->save()) {
 				
 				//make sure he's member of the internal group.
@@ -227,10 +226,9 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 		if (!$demo) {
 			$demo = new \GO\Base\Model\User();
 			$demo->username = 'demo';
-			$demo->first_name = 'Demo';
-			$demo->last_name = 'User';
+			$demo->displayName = 'Demo User';
 			$demo->email = 'demo@acmerpp.demo';
-			$demo->password='demo';
+			$demo->password='demopass';
 			if ($demo->save()) {
 				
 				//make sure he's member of the internal group.
@@ -250,10 +248,9 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 		if (!$linda) {
 			$linda = new \GO\Base\Model\User();
 			$linda->username = 'linda';
-			$linda->first_name = 'Linda';
-			$linda->last_name = 'Smith';
+      $linda->displayName = 'Linda Smith';
 			$linda->email = 'linda@acmerpp.demo';
-			$linda->password='demo';
+			$linda->password='demopass';
 							
 			if ($linda->save()) {
 				
@@ -714,61 +711,61 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 			
 		}
 		
-		
-		if(\GO::modules()->notes){
-			
-			$category = \GO\Notes\Model\Category::model()->findSingleByAttribute('name', \GO::t("General", "notes"));
-			
-			if(!$category){
-				$category = new \GO\Notes\Model\Category();
-				$category->name=\GO::t("General", "notes");
-				$category->save();
-				$category->acl->addGroup(\GO::config()->group_everyone, \GO\Base\Model\Acl::READ_PERMISSION);
-			}
-			
-			
-			$note = new \GO\Notes\Model\Note();
-			$note->user_id=$elmer->id;			
-			
-			//$category = \GO\Notes\Model\Category::model()->getDefault($elmer);
-			
-			$note->category_id=$category->id;
-			
-			$note->name="Laws and rules";
-			$note->content='As in other cartoons, the Road Runner and the coyote follow the laws of cartoon physics. For example, the Road Runner has the ability to enter the painted image of a cave, while the coyote cannot (unless there is an opening through which he can fall). Sometimes, however, this is reversed, and the Road Runner can burst through a painting of a broken bridge and continue on his way, while the Coyote will instead enter the mirage painting and fall down the precipice of the cliff where the bridge is out. Sometimes the coyote is allowed to hang in midair until he realizes that he is about to plummet into a chasm (a process occasionally referred to elsewhere as Road-Runnering or Wile E. Coyote moment). The coyote can overtake rocks (or cannons) which fall earlier than he does, and end up being squashed by them. If a chase sequence happens upon a cliff, the Road Runner is not affected by gravity, whereas the Coyote will realize his error eventually and fall to the ground below. A chase sequence that happens upon railroad tracks will always result in the Coyote being run over by a train. If the Coyote uses an explosive (for instance, dynamite) that is triggered by a mechanism that is supposed to force the explosive in a forward motion toward its target, the actual mechanism itself will always shoot forward, leaving the explosive behind to detonate in the Coyote\'s face. Similarly, a complex apparatus that is supposed to propel an object like a boulder or steel ball forward, or trigger a trap, will not work on the Road Runner, but always will on the Coyote. For instance, the Road Runner can jump up and down on the trigger of a large animal trap and eat bird seed off from it, going completely unharmed and not setting off the trap; when the Coyote places the tiniest droplet of oil on the trigger, the trap snaps shut on him without fail. At certain times, the Coyote may don an exquisite Acme costume or propulsion device that briefly allows him to catch up to the Road Runner. This will always result in him losing track of his proximity to large cliffs or walls, and the Road Runner will dart around an extremely sharp turn on a cliff, but the Coyote will rocket right over the edge and fall to the ground.
-
-In his book Chuck Amuck: The Life and Times Of An Animated Cartoonist,[13] Chuck Jones claimed that he and the artists behind the Road Runner and Wile E. cartoons adhered to some simple but strict rules:
-
-The Road Runner cannot harm the Coyote except by going "beep, beep."
-No outside force can harm the Coyote — only his own ineptitude or the failure of Acme products. Trains and trucks were the exception from time to time.
-The Coyote could stop anytime — if he were not a fanatic. (Repeat: "A fanatic is one who redoubles his effort when he has forgotten his aim." — George Santayana).
-Dialogue must never be used, except "beep, beep" and yowling in pain. (This rule, however, was violated in some cartoons.)
-The Road Runner must stay on the road — for no other reason than that he\'s a roadrunner. This rule was broken in Beep, Beep, in a sequence where Wile E. chased the Road Runner into a cactus mine. And also in Fastest with the Mostestwhen Coyote lures Road Runner to the edge of a cliff.
-All action must be confined to the natural environment of the two characters — the southwest American desert.
-All (or at least almost all) tools, weapons, or mechanical conveniences must be obtained from the Acme Corporation. There were sometimes exceptions when the Coyote obtained other items from the desert such as boulders to use in his attempts.
-Whenever possible, make gravity the Coyote\'s greatest enemy (e.g., falling off a cliff).
-The Coyote is always more humiliated than harmed by his failures.
-The audience\'s sympathy must remain with the Coyote.
-The Coyote is not allowed to catch or eat the Road Runner, unless he escapes from the grasp. (The robot that the Coyote created in The Solid Tin Coyote caught the Road Runner so this does not break this rule. The Coyote does catch the Road Runner in Soup or Sonic but is too small to eat him. There is also two CGI shorts on The Looney Tunes Show were he caught the bird, but was not able to eat him because the Road Runner got away in both shorts.)';
-			
-			$note->save();
-			$note->link($john);
-			
-			
-			$note = new \GO\Notes\Model\Note();
-			$note->user_id=$demo->id;			
-			
-			$note->category_id=$category->id;
-			
-			$note->name="Wile E. Coyote and Bugs Bunny";
-			$note->content='Wile E. Coyote has also unsuccessfully attempted to catch and eat Bugs Bunny in another series of cartoons. In these cartoons, the coyote takes on the guise of a self-described "super genius" and speaks with a smooth, generic upper-class accent provided by Mel Blanc. While he is incredibly intelligent, he is limited by technology and his own short-sighted arrogance, and is thus often easily outsmarted, a somewhat physical symbolism of "street smarts" besting "book smarts".
-
-In one short (Hare-Breadth Hurry, 1963), Bugs Bunny — with the help of "speed pills" — even stands in for Road Runner, who has "sprained a giblet", and carries out the duties of outsmarting the hungry scavenger. That is the only Bugs Bunny/Wile E. Coyote short in which the coyote does not speak. As usual Wile E. Coyote ends up falling down a canyon. In a later, made-for-TV short, which had a young Elmer Fudd chasing a young Bugs Bunny, Elmer also falls down a canyon. On the way down he is overtaken by Wile E. Coyote who shows a sign telling Elmer to get out of the way for someone who is more experienced in falling.';
-			
-			$note->save();
-			
-			$note->link($wile);
-		}
+//		
+//		if(\GO::modules()->notes){
+//			
+//			$category = \GO\Notes\Model\Category::model()->findSingleByAttribute('name', \GO::t("General", "notes"));
+//			
+//			if(!$category){
+//				$category = new \GO\Notes\Model\Category();
+//				$category->name=\GO::t("General", "notes");
+//				$category->save();
+//				$category->acl->addGroup(\GO::config()->group_everyone, \GO\Base\Model\Acl::READ_PERMISSION);
+//			}
+//			
+//			
+//			$note = new \GO\Notes\Model\Note();
+//			$note->user_id=$elmer->id;			
+//			
+//			//$category = \GO\Notes\Model\Category::model()->getDefault($elmer);
+//			
+//			$note->category_id=$category->id;
+//			
+//			$note->name="Laws and rules";
+//			$note->content='As in other cartoons, the Road Runner and the coyote follow the laws of cartoon physics. For example, the Road Runner has the ability to enter the painted image of a cave, while the coyote cannot (unless there is an opening through which he can fall). Sometimes, however, this is reversed, and the Road Runner can burst through a painting of a broken bridge and continue on his way, while the Coyote will instead enter the mirage painting and fall down the precipice of the cliff where the bridge is out. Sometimes the coyote is allowed to hang in midair until he realizes that he is about to plummet into a chasm (a process occasionally referred to elsewhere as Road-Runnering or Wile E. Coyote moment). The coyote can overtake rocks (or cannons) which fall earlier than he does, and end up being squashed by them. If a chase sequence happens upon a cliff, the Road Runner is not affected by gravity, whereas the Coyote will realize his error eventually and fall to the ground below. A chase sequence that happens upon railroad tracks will always result in the Coyote being run over by a train. If the Coyote uses an explosive (for instance, dynamite) that is triggered by a mechanism that is supposed to force the explosive in a forward motion toward its target, the actual mechanism itself will always shoot forward, leaving the explosive behind to detonate in the Coyote\'s face. Similarly, a complex apparatus that is supposed to propel an object like a boulder or steel ball forward, or trigger a trap, will not work on the Road Runner, but always will on the Coyote. For instance, the Road Runner can jump up and down on the trigger of a large animal trap and eat bird seed off from it, going completely unharmed and not setting off the trap; when the Coyote places the tiniest droplet of oil on the trigger, the trap snaps shut on him without fail. At certain times, the Coyote may don an exquisite Acme costume or propulsion device that briefly allows him to catch up to the Road Runner. This will always result in him losing track of his proximity to large cliffs or walls, and the Road Runner will dart around an extremely sharp turn on a cliff, but the Coyote will rocket right over the edge and fall to the ground.
+//
+//In his book Chuck Amuck: The Life and Times Of An Animated Cartoonist,[13] Chuck Jones claimed that he and the artists behind the Road Runner and Wile E. cartoons adhered to some simple but strict rules:
+//
+//The Road Runner cannot harm the Coyote except by going "beep, beep."
+//No outside force can harm the Coyote — only his own ineptitude or the failure of Acme products. Trains and trucks were the exception from time to time.
+//The Coyote could stop anytime — if he were not a fanatic. (Repeat: "A fanatic is one who redoubles his effort when he has forgotten his aim." — George Santayana).
+//Dialogue must never be used, except "beep, beep" and yowling in pain. (This rule, however, was violated in some cartoons.)
+//The Road Runner must stay on the road — for no other reason than that he\'s a roadrunner. This rule was broken in Beep, Beep, in a sequence where Wile E. chased the Road Runner into a cactus mine. And also in Fastest with the Mostestwhen Coyote lures Road Runner to the edge of a cliff.
+//All action must be confined to the natural environment of the two characters — the southwest American desert.
+//All (or at least almost all) tools, weapons, or mechanical conveniences must be obtained from the Acme Corporation. There were sometimes exceptions when the Coyote obtained other items from the desert such as boulders to use in his attempts.
+//Whenever possible, make gravity the Coyote\'s greatest enemy (e.g., falling off a cliff).
+//The Coyote is always more humiliated than harmed by his failures.
+//The audience\'s sympathy must remain with the Coyote.
+//The Coyote is not allowed to catch or eat the Road Runner, unless he escapes from the grasp. (The robot that the Coyote created in The Solid Tin Coyote caught the Road Runner so this does not break this rule. The Coyote does catch the Road Runner in Soup or Sonic but is too small to eat him. There is also two CGI shorts on The Looney Tunes Show were he caught the bird, but was not able to eat him because the Road Runner got away in both shorts.)';
+//			
+//			$note->save();
+//			$note->link($john);
+//			
+//			
+//			$note = new \GO\Notes\Model\Note();
+//			$note->user_id=$demo->id;			
+//			
+//			$note->category_id=$category->id;
+//			
+//			$note->name="Wile E. Coyote and Bugs Bunny";
+//			$note->content='Wile E. Coyote has also unsuccessfully attempted to catch and eat Bugs Bunny in another series of cartoons. In these cartoons, the coyote takes on the guise of a self-described "super genius" and speaks with a smooth, generic upper-class accent provided by Mel Blanc. While he is incredibly intelligent, he is limited by technology and his own short-sighted arrogance, and is thus often easily outsmarted, a somewhat physical symbolism of "street smarts" besting "book smarts".
+//
+//In one short (Hare-Breadth Hurry, 1963), Bugs Bunny — with the help of "speed pills" — even stands in for Road Runner, who has "sprained a giblet", and carries out the duties of outsmarting the hungry scavenger. That is the only Bugs Bunny/Wile E. Coyote short in which the coyote does not speak. As usual Wile E. Coyote ends up falling down a canyon. In a later, made-for-TV short, which had a young Elmer Fudd chasing a young Bugs Bunny, Elmer also falls down a canyon. On the way down he is overtaken by Wile E. Coyote who shows a sign telling Elmer to get out of the way for someone who is more experienced in falling.';
+//			
+//			$note->save();
+//			
+//			$note->link($wile);
+//		}
 		
 		
 		if(\GO::modules()->summary){
@@ -1172,22 +1169,22 @@ In one short (Hare-Breadth Hurry, 1963), Bugs Bunny — with the help of "speed 
 			}
 		}
 		
-		if(\GO::modules()->postfixadmin){
-			
-			
-			$domainModel= \GO\Postfixadmin\Model\Domain::model()->findSingleByAttribute('domain', 'acmerpp.demo');
-			if(!$domainModel){
-				$domainModel = new \GO\Postfixadmin\Model\Domain();
-				$domainModel->domain='acmerpp.demo';
-				$domainModel->save();
-			}
-				
-			$this->_createMailbox($domainModel, $demo);
-			$this->_createMailbox($domainModel, $elmer);
-			$this->_createMailbox($domainModel, $linda);
-			
-			
-		}
+//		if(\GO::modules()->postfixadmin){
+//			
+//			
+//			$domainModel= \GO\Postfixadmin\Model\Domain::model()->findSingleByAttribute('domain', 'acmerpp.demo');
+//			if(!$domainModel){
+//				$domainModel = new \GO\Postfixadmin\Model\Domain();
+//				$domainModel->domain='acmerpp.demo';
+//				$domainModel->save();
+//			}
+//				
+//			$this->_createMailbox($domainModel, $demo);
+//			$this->_createMailbox($domainModel, $elmer);
+//			$this->_createMailbox($domainModel, $linda);
+//			
+//			
+//		}
 		
 		if(\GO::modules()->savemailas){
 			//link some demo mails

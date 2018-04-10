@@ -76,16 +76,33 @@
 					var result = Ext.decode(response.responseText);
 					
 					cb.call(scope || this, this, success, result);
-
-					if (success) {
-						this.userMethods = result.methods;
-						this.loginToken = result.loginToken;
-						this.username = result.username;
-
-						if (result.accessToken) {
-							this.onAuthenticated(result);
+					
+					if(!success) {
+						switch(response.status) {
+							case 503:
+								Ext.MessageBox.alert(t("Maintenance mode"), t("Sorry, maintenance mode is enabled and you can't login right now. Please come back later or contact your system administrator"));
+								break;
+								
+							case 403:
+								//handled by form
+							break;
+								
+							default: 
+								Ext.MessageBox.alert(t("Error"), t("An unknown error has occurred. " + response.statusText));
+							break;
 						}
+						
+						return;
 					}
+
+					this.userMethods = result.methods;
+					this.loginToken = result.loginToken;
+					this.username = result.username;
+
+					if (result.accessToken) {
+						this.onAuthenticated(result);
+					}
+
 					
 
 				},
@@ -133,9 +150,22 @@
 				callback: function (options, success, response) {
 					var result = response.responseText ? Ext.decode(response.responseText) : {};
 
-					cb.call(scope || this, this, success, result);
+					cb.call(scope || this, this, success, result);					
+					
+					if(!success) {
+						switch(response.status) {
+							case 503:
+								Ext.MessageBox.alert(t("Maintenance mode"), t("Sorry, maintenance mode is enabled and you can't login right now. Please come back later or contact your system administrator."));
+								break;								
+							case 500: 
+								Ext.MessageBox.alert(t("Error"), t("An unknown error has occurred. " + reponse.statusText));
+							break;
+						}
+						
+						return;
+					}
 
-					if (success && result.accessToken) {
+					if (result.accessToken) {
 						this.onAuthenticated(result);
 					}
 

@@ -50,7 +50,7 @@ GO.tasks.TaskPanel = Ext.extend(GO.DisplayPanel,{
 						'<td>{status_text}</td>'+
 					'</tr>';
 				
-				if(go.ModuleManager.isAvailable("projects2")){
+				if(go.Modules.isAvailable("legacy", "projects2")){
 					this.template +=
 					'<tpl if="project_name">'+
 						'<tr>'+
@@ -73,7 +73,7 @@ GO.tasks.TaskPanel = Ext.extend(GO.DisplayPanel,{
 				'</table>';																		
 	
 
-		if(go.ModuleManager.isAvailable("workflow")){
+		if(go.Modules.isAvailable("legacy", "workflow")){
 			this.template +=GO.workflow.WorkflowTemplate;
 		}
 

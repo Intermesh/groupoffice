@@ -334,7 +334,7 @@ GO.tasks.ScheduleCallDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			currentNumber = record.data[order[i]];
 			if(!GO.util.empty(currentNumber)){
 				replaceNumbers.push(new Ext.data.Record({'id':order[i],'label':this.createReplaceNumberLabel(order[i],currentNumber),'number':currentNumber},order[i]));
-				foundNumbers.push(new Ext.data.Record({'id':order[i],'number':currentNumber,'label':currentNumber+' '+GO.addressbook.lang['contact'+this.capitalize(order[i])]},order[i]));
+				foundNumbers.push(new Ext.data.Record({'id':order[i],'number':currentNumber,'label':currentNumber+' '+t('contact'+this.capitalize(order[i]), "addressbook")},order[i]));
 			} else {
 				replaceNumbers.push(new Ext.data.Record({'id':order[i],'label':this.createReplaceNumberLabel(order[i],''),'number':''},order[i]));
 			}

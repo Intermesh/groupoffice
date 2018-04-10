@@ -38,7 +38,7 @@ GO.addressbook.TemplatesGrid = function(config)
 	config.store.setDefaultSort('name', 'ASC');
 	if (GO.util.empty(config.noDocumentTemplates)) {
 		config.store.on('load', function(){
-			if(go.ModuleManager.isAvailable("documenttemplates"))
+			if(go.Modules.isAvailable("legacy", "documenttemplates"))
 				GO.documenttemplates.ooTemplatesStore.load();
 		}, this);
 	} else {

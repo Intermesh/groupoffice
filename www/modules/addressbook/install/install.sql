@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS `ab_addressbooks` (
 DROP TABLE IF EXISTS `ab_addresslists`;
 CREATE TABLE IF NOT EXISTS `ab_addresslists` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+	`addresslist_group_id` INT DEFAULT NULL,
   `user_id` int(11) NOT NULL DEFAULT '0',
   `acl_id` int(11) NOT NULL DEFAULT '0',
   `name` varchar(255) DEFAULT NULL,

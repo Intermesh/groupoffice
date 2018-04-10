@@ -9,7 +9,9 @@ use go\core\db\Query;
  * Settings model that can be used for the core and modules to store any string 
  * setting.
  */
-abstract class Settings extends Singleton {
+abstract class Settings extends data\Model {
+	
+	use SingletonTrait;
 
 	protected function getModuleId() {
 		return (new Query)
@@ -30,6 +32,11 @@ abstract class Settings extends Singleton {
 	 * @param int $moduleId If null is given the "core" module is used.
 	 */
 	protected function __construct() {
+		
+		if(GO()->getInstaller()->isInProgress()) {
+			return;
+		}
+		
 			$stmt = (new Query)
 							->select('name, value')
 							->from('core_setting')

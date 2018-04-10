@@ -41,7 +41,7 @@ GO.addressbook.SelectCompany = function(config){
 		this.fieldLabel=t("Company", "addressbook");
 	}
 
-	if(go.ModuleManager.isAvailable("customfields"))
+	if(go.Modules.isAvailable("core", "customfields"))
 	{
 		GO.customfields.addColumns("GO\\Addressbook\\Model\\Company", config.fields);
 	}

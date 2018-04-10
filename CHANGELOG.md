@@ -1,5 +1,4 @@
-CHANGELOG
-
+29-03-2018 6.3.2 (beta)
 
 UPGRADING: make sure custom fields and search module are installed.
 
@@ -19,6 +18,7 @@ Core:
 - Improved translation API
 - Frontend Router to make pages directly accessible
 - New global search
+- New installer
 
 Notes
 - Uses new API
@@ -30,6 +30,9 @@ Address book
 Comments
 - Always use read more links and removed settings
 - Remove comments from edit dialogs. Always use detail views.
+
+ActiveSync
+- Spam folder syncs too now.
 
 
 15-03-2018 6.2.86

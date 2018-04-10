@@ -29,7 +29,7 @@ class Authenticator extends PrimaryAuthenticator {
 	/**
 	 * 
 	 * @param string $email
-	 * @return LdapAuthServer|boolean
+	 * @return Server|boolean
 	 */
 	private static function findServer($email) {
 		$adPos = strpos($email, '@');
@@ -39,7 +39,7 @@ class Authenticator extends PrimaryAuthenticator {
 		
 		$domain = substr($email, $adPos + 1);
 		
-		return LdapAuthServer::find()
+		return Server::find()
 						->join('ldapauth_server_domain', 'd', 's.id = d.serverId')
 						->where(['d.name' => $domain])
 						->orWhere(['d.name' => '*'])
@@ -107,7 +107,7 @@ class Authenticator extends PrimaryAuthenticator {
 	}
 	
 	
-	private function setEmailAccount($username, $password, $email, LdapAuthServer $server, User $user) {
+	private function setEmailAccount($username, $password, $email, Server $server, User $user) {
 		
 		if(!$user->hasModule('email')) {
 			return;

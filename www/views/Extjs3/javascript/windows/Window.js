@@ -59,7 +59,7 @@ GO.Window = Ext.extend(Ext.Window,{
 	},
 		
 	autoSize : function(){
-		if(go.ModuleManager.isAvailable("viewport")){
+		if(go.Modules.isAvailable("community", "viewport")){
 
 			var vpH=GO.viewport.getEl().getHeight();
 			var vpW=GO.viewport.getEl().getWidth();

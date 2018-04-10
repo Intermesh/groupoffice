@@ -4,7 +4,7 @@ GO.moduleManager.onModuleReady('calendar',function(){
 		
 		initComponent : GO.calendar.MainPanel.prototype.initComponent.createSequence(function() {
 			this.exportMenu = new GO.base.ExportMenu({className:'GO\\Calendarexport\\Export\\CurrentView'});
-			this.topToolbar.items.add(
+			this.centerPanel.topToolbar.items.add(
 				this.exportMenu
 			);
 		})

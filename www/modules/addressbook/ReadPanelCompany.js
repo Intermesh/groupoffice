@@ -238,12 +238,12 @@ GO.addressbook.CompanyReadPanel = Ext.extend(GO.DisplayPanel,{
 						'</table>'+
 					'</tpl>';
 
-			if(go.ModuleManager.isAvailable("lists"))
+			if(go.Modules.isAvailable("legacy", "lists"))
 				this.template += GO.lists.ListTemplate;
 
 			
 			
-			if(go.ModuleManager.isAvailable("workflow")){
+			if(go.Modules.isAvailable("legacy", "workflow")){
 				this.template +=GO.workflow.WorkflowTemplate;
 			}
 								

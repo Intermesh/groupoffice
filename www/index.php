@@ -14,26 +14,23 @@
 
 $root = dirname(__FILE__).'/';
 
-//initialize autoloading of library
-require_once('GO.php');
-//\GO::init();
-
-
-if(!GO::isInstalled()){
-	header('Location: '.\GO::config()->host.'install/');				
-	exit();
+try {
+  //initialize autoloading of library
+  require_once('GO.php');
+  //\GO::init();
+} catch(\PDOException $e) {
+  
+  if(!\go\core\http\Request::get()->isXHR()) {
+    header('Location: install/');				
+    exit();
+  } else
+  {
+    throw $e;
+  }
 }
 
-if(empty($_REQUEST['r']) && PHP_SAPI!='cli'){	
-	if(\GO::config()->force_ssl && !\GO\Base\Util\Http::isHttps()){
-		 header("HTTP/1.1 301 Moved Permanently");
-		 header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
-		 exit();
-	}
-}
-
-if(!\GO::user())
-	\GO::session()->loginWithCookies();	
+//to initialize language
+GO::language();
 
 //try with HTTP auth
 if(!\GO::user() && !empty($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_PW'])){
@@ -42,7 +39,6 @@ if(!\GO::user() && !empty($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUT
 		$_REQUEST['security_token'] = \GO::session()->securityToken();
 	}
 }
-
 
 //check if GO is installed
 if(empty($_REQUEST['r']) && PHP_SAPI!='cli'){	

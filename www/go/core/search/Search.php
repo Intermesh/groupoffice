@@ -72,7 +72,7 @@ class Search extends Entity {
 										->addTable('core_search', 's')
 										->setQuery(
 														(new Query())
-														->select("e.name AS entity")
+														->select("e.clientName AS entity")
 														->join('core_entity', 'e', 'e.id = s.entityTypeId')
 		);
 	}

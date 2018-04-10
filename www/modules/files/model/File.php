@@ -730,18 +730,17 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 
 
 		$joinSearchCacheCriteria = \GO\Base\Db\FindCriteria::newInstance()
-					->addRawCondition('`t`.`id`', '`sc`.`model_id`')
-					->addCondition('model_type_id', $this->modelTypeId(),'=','sc');
+					->addRawCondition('`t`.`id`', '`sc`.`entityId`')
+					->addCondition('entityTypeId', $this->modelTypeId(),'=','sc');
 
 		$storeParams->join(\GO\Base\Model\SearchCacheRecord::model()->tableName(), $joinSearchCacheCriteria, 'sc', 'INNER');
 
 
 		$aclJoinCriteria = \GO\Base\Db\FindCriteria::newInstance()
-							->addRawCondition('a.acl_id', 'sc.acl_id','=', false);
+							->addRawCondition('a.aclId', 'sc.aclId','=', false);
 
 		$aclWhereCriteria = \GO\Base\Db\FindCriteria::newInstance()
-						->addCondition('user_id', \GO::user()->id,'=','a', false)
-						->addInCondition("group_id", \GO\Base\Model\User::getGroupIds(\GO::user()->id),"a", false);
+						->addInCondition("groupId", \GO\Base\Model\User::getGroupIds(\GO::user()->id),"a", false);
 
 		$storeParams->join(\GO\Base\Model\AclUsersGroups::model()->tableName(), $aclJoinCriteria, 'a', 'INNER');
 

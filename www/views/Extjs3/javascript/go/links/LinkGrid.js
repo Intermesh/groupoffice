@@ -10,7 +10,7 @@ go.links.LinkGrid = Ext.extend(go.grid.GridPanel, {
 				sortable: true,
 				dataIndex: 'name',
 				renderer: function (value, metaData, record, rowIndex, colIndex, store) {
-					return '<i class="entity ' + record.data.entity + '"></i>' + value;
+					return '<i class="entity ' + record.data.entity + '"></i> ' + value;
 				}
 			}, {
 
@@ -34,7 +34,7 @@ go.links.LinkGrid = Ext.extend(go.grid.GridPanel, {
 		this.store = new go.data.Store({
 			autoDestroy: true,
 			fields: ['id', 'entityId', 'entity', 'name', 'description', {name: 'modifiedAt', type: 'date'}],
-			entityStore: go.stores.Search,
+			entityStore: go.Stores.get("Search"),
 			sortInfo: {
 				field: 'modifiedAt',
 				direction: 'DESC'

@@ -1,6 +1,6 @@
 Ext.ns('go.modules.notes');
 
-go.ModuleManager.register('notes', {
+go.Modules.register("community", 'notes', {
 	mainPanel: "go.modules.notes.MainPanel",
 	title: t("Notes", "notes"),
 	entities: ["Note", "NoteBook"],

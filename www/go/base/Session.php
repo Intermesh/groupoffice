@@ -40,7 +40,8 @@ class Session extends Observable{
 	}
 	
 	public function restart(){
-		$this->values=array();
+    
+		$this->values=['accessToken' => $this->values['accessToken']];
 		$this->start();
 	}
 	
@@ -436,6 +437,14 @@ class Session extends Observable{
 		
 		//for logging
 		\GO::session()->values['username']=\GO::user()->username;
+    
+    if(isset(\GO::session()->values['accessToken'])) {
+      $token = \go\core\auth\model\Token::find()->where(['accessToken' => \GO::session()->values['accessToken']])->single();
+      $token->userId = $user_id;
+      if(!$token->save()) {
+        throw new \Exception("Could not set token");
+      }
+    }
 		
 		
 		if (!empty(\GO::config()->debug_usernames)) {
@@ -461,7 +470,7 @@ class Session extends Observable{
 	
 	public function clear(){
 		\GO::debug('CLEAR THE SESSION');
-		$this->values=array(); //clear session
+		$this->values=['accessToken' => $this->values['accessToken']]; //clear session
 	}
 	
 

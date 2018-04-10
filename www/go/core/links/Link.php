@@ -61,7 +61,7 @@ class Link extends \go\core\jmap\Entity {
 										->addTable('core_link', 'l')
 										->setQuery(
 														(new Query())
-														->select("eFrom.name AS fromEntity, eTo.name AS toEntity, s.name as toName, s.description as toDescription, s.aclId")
+														->select("eFrom.clientName AS fromEntity, eTo.clientName AS toEntity, s.name as toName, s.description as toDescription, s.aclId")
 														->join('core_entity', 'eFrom', 'eFrom.id = l.fromEntityTypeId')
 														->join('core_entity', 'eTo', 'eTo.id = l.toEntityTypeId')
 														->join('core_search', 's', 's.entityId = l.toId AND s.entityTypeId = l.toEntityTypeId')

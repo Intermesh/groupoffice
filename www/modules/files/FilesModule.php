@@ -47,7 +47,7 @@ class FilesModule extends \GO\Base\Module{
 			//$folder = Model\Folder::model()->findByPath('users/'.$user->username, true);
 			
 			//In some cases the acl id of the home folder was copied from the user. We will correct that here.
-			if(!$folder->acl || $folder->acl_id==$user->acl_id){
+			if(!$folder->acl){
 				$folder->setNewAcl($user->id);				
 			}
 			
