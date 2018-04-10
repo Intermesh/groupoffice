@@ -75,7 +75,7 @@ GO.files.RecentFilesGrid = Ext.extend(GO.grid.GridPanel,{
 				var selectionModel = grid.getSelectionModel();
 				var record = selectionModel.getSelected();
 				
-				go.Router.goto("#files/file/" + record.id);
+				go.Router.goto("#file/" + record.id);
 				
 				
 			},

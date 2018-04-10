@@ -134,7 +134,7 @@ go.modules.notes.MainPanel = Ext.extend(Ext.Panel, {
 		});
 
 		this.noteGrid.getSelectionModel().on('rowselect', function (sm, rowIndex, record) {
-			go.Router.goto("notes/note/" + record.id);
+			go.Router.goto("note/" + record.id);
 		}, this);
 
 		this.noteDetail = new go.modules.notes.NoteDetail({

@@ -34,7 +34,7 @@ Ext.extend(GO.calendar.TaskContextMenu, Ext.menu.Menu, {
 	
 	showTaskInfoDialog : function()
 	{		
-		go.Router.goto("#tasks/task/" + this.task.task_id);
+		go.Router.goto("#task/" + this.task.task_id);
 	}
 //	,
 //	menuHandler : function()
