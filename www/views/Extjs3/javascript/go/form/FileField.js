@@ -115,6 +115,7 @@ go.form.FileField = Ext.extend(Ext.form.TextField, {
 					var data = Ext.decode(response.responseText);
 					if (data.blobId) {
 						this.setValue(data.blobId);
+						this.originalValue = '';
 					}
 					this.fireEvent('uploadComplete', data, file, response, options);
 				},

@@ -23,27 +23,54 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 			labelWidth:dp(152),
 			title: t('User'),
 			items:[
-				this.displayNameField = new Ext.form.TextField({
-					fieldLabel: t('Display name'),
-					name: 'displayName',
-					allowBlank:false
-				}),
-				this.emailField = new Ext.form.TextField({
-					fieldLabel: t('Email'),
-					name: 'email',
-					vtype:'emailAddress',
-					allowBlank:false
-				}),
-				this.recoveryEmailField = new Ext.form.TextField({
-					fieldLabel: t("Recovery e-mail"),
-					name: 'recoveryEmail',
-					vtype:'emailAddress',
-					allowBlank:false
-				}),
-				this.recoveryMailText = new Ext.Container({
-					html:t('The recovery e-mail is used to send a forgotten password request to.')+'<br>'+t('Please use an email address that you can access from outside Group-Office.')
-				})
-			]
+				{
+					width: 150,
+					items: [
+						this.avatarComp = new go.form.FileField({
+							buttonOnly: true,
+							name: 'avatarId',
+							height:120,
+							cls: "avatar",
+							autoUpload: true,
+							buttonCfg: {
+								text: '',
+								width: 120
+							},
+							setValue: function(val) {
+								if(this.rendered && !Ext.isEmpty(val)) {
+									this.wrap.setStyle('background-image', 'url('+go.Jmap.downloadUrl(val)+')');
+								}
+								go.form.FileField.prototype.setValue.call(this,val);
+							},
+							accept: 'image/*'
+						})
+					]
+				},{
+					flex:1,
+					layout: 'form',
+					items: [
+					this.displayNameField = new Ext.form.TextField({
+						fieldLabel: t('Display name'),
+						name: 'displayName',
+						allowBlank:false
+					}),
+					this.emailField = new Ext.form.TextField({
+						fieldLabel: t('Email'),
+						name: 'email',
+						vtype:'emailAddress',
+						allowBlank:false
+					}),
+					this.recoveryEmailField = new Ext.form.TextField({
+						fieldLabel: t("Recovery e-mail"),
+						name: 'recoveryEmail',
+						vtype:'emailAddress',
+						allowBlank:false
+					}),
+					this.recoveryMailText = new Ext.Container({
+						html:t('The recovery e-mail is used to send a forgotten password request to.')+'<br>'+t('Please use an email address that you can access from outside Group-Office.')
+					})
+				]
+			}]
 		});
 
 		this.passwordFieldset = new Ext.form.FieldSet({
