@@ -37,16 +37,13 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 								text: '',
 								width: 120
 							},
-							accept: 'image/*',
-							listeners: {
-								change: function(me, newVal, oldVal){
-									console.log(newVal);
-									if(!Ext.isEmpty(newVal)) {
-										this.avatarComp.wrap.setStyle('background-image', 'url('+go.Jmap.downloadUrl(newVal)+')');
-									}
-								},
-								scope:this
-							}
+							setValue: function(val) {
+								if(this.rendered && !Ext.isEmpty(val)) {
+									this.wrap.setStyle('background-image', 'url('+go.Jmap.downloadUrl(val)+')');
+								}
+								go.form.FileField.prototype.setValue.call(this,val);
+							},
+							accept: 'image/*'
 						})
 					]
 				},{

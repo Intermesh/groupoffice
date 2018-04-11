@@ -201,7 +201,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		// If the currentPassword is set, then add it to the posted values
 		if(!Ext.isEmpty(currentPassword)){
 			if(!values.password){
-				values.password = {};
+				delete values.password;
 			}
 			values.currentPassword = currentPassword;
 		}
