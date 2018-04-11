@@ -34,7 +34,7 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		//set loaded to true on load() or loadData();
 		this.on('load', function() {
 			this.loaded = true;
-		}, this)
+		}, this);
 	},
 	receive : function(action) {	
 		
