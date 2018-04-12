@@ -401,7 +401,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					<div id="secondary-menu">\
 						<div id="search_query"></div>\
 						<a id="start-menu-link" ><i class="icon">apps</i></a>\
-						<a id="user-menu" class="user-img">\
+						<a id="user-menu" class="user-img" style="background-image:url('+go.Jmap.downloadUrl(go.User.avatarId)+')">\
 							<span id="reminder-icon" style="display: none;">notifications</span>\
 						</a>\
 					</div>\

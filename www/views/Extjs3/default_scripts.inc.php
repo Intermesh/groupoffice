@@ -51,12 +51,12 @@ $settings['config']['login_message'] = GO::config()->login_message;
 
 
 //TODO: refactor this. It uses the session to find the token when browser is reloaded.
-if(\GO::user() && !GO()->getUser()) {  
-  $token = Token::find()->where(['accessToken' => GO::session()->values['accessToken']])->single();
-  if($token) {
-    GO()->getAuthState()->setToken($token);
-  }
-}
+//if(\GO::user() && !GO()->getUser()) {  
+//  $token = Token::find()->where(['accessToken' => GO::session()->values['accessToken']])->single();
+//  if($token) {
+//    GO()->getAuthState()->setToken($token);
+//  }
+//}
  
 $user_id = GO()->getUser() ? GO()->getUser()->id : 0;
 $settings['state_index'] = 'go';
