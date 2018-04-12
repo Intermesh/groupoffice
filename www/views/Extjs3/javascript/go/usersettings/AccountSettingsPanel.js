@@ -15,6 +15,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 	title:t('Account'),
 	iconCls: 'ic-account-circle',
 	autoScroll:true,
+	id: 'pnl-account-settings',
 	passwordProtected: true,
 
 	initComponent: function () {
@@ -58,11 +59,13 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 						fieldLabel: t('Email'),
 						name: 'email',
 						vtype:'emailAddress',
+						needPasswordForChange: true,
 						allowBlank:false
 					}),
 					this.recoveryEmailField = new Ext.form.TextField({
 						fieldLabel: t("Recovery e-mail"),
 						name: 'recoveryEmail',
+						needPasswordForChange: true,
 						vtype:'emailAddress',
 						allowBlank:false
 					}),
@@ -80,6 +83,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 				this.passwordField1 = new Ext.form.TextField({
 					inputType: 'password',
 					fieldLabel: t("New password", "users"),
+					needPasswordForChange: true,
 					name: 'password',
 					minLength: 8
 				}),
@@ -152,15 +156,6 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 		this.items.each(function(fieldset) {
 			if(fieldset.onSubmitComplete){
 				fieldset.onSubmitComplete(result);
-			}
-		},this);
-	},
-	
-	onBeforeNeedCurrentPasswordCheck : function(){
-		// Bubble further to child items
-		this.items.each(function(fieldset) {
-			if(fieldset.onBeforeNeedCurrentPasswordCheck){
-				fieldset.onBeforeNeedCurrentPasswordCheck();
 			}
 		},this);
 	}

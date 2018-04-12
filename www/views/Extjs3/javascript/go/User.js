@@ -13,6 +13,7 @@ go.User = {
 			me.uploadUrl = data.uploadUrl;
 			me.displayName = data.clientSettings.displayName;
 			me.id = data.clientSettings.user_id;
+			me.avatarId = data.clientSettings.avatarId;
 			
 			Ext.apply(GO.settings, data.clientSettings);
 			cb(data, response);

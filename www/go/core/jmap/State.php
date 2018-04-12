@@ -102,6 +102,7 @@ class State extends AbstractState {
 		return [
 			'state' => \GO\Base\Model\State::model()->getFullClientState($user->id)
 			,'user_id' => $user->id
+			,'avatarId' => $user->avatarId
 			,'has_admin_permission' => $user->isAdmin()
 			,'username' => $user->username
 			,'displayName' => $user->displayName
