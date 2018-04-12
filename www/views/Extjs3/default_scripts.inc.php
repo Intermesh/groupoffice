@@ -151,11 +151,20 @@ $view_root_uri = $root_uri . 'views/Extjs3/';
 $view_root_path = GO::config()->root_path . 'views/Extjs3/';
 
 
-$cacheFile = \go\core\App::get()->getDataFolder()->getFolder('clientscripts')->create()->getFile('all-' .\GO::language()->getLanguage(). '.js');
 
+if(GO::config()->debug) {
+  $cacheFile = \go\core\App::get()->getTmpFolder()->getFile('debug.js');
+  $cacheFile->delete();
+} else
+{
+  $cacheFile = \go\core\App::get()->getDataFolder()->getFolder('clientscripts')->create()->getFile('all-' .\GO::language()->getLanguage(). '.js');
+}
 //echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' => \GO::language()->getLanguage()]) . '"></script>';
-
-if (!GO::config()->debug && $cacheFile->exists()) {
+echo '<script type="text/javascript" src="' . GO::config()->url . 'views/Extjs3/ext/adapter/ext/ext-base-debug.js"></script>';
+echo '<script type="text/javascript" src="' . GO::config()->url . 'views/Extjs3/ext/ext-all-debug.js"></script>';
+echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' => \GO::language()->getLanguage()]) . '"></script>';
+  
+if ($cacheFile->exists()) {
 	echo '<script type="text/javascript" src="' . GO::url('core/clientScripts', ['mtime' => GO::config()->mtime, 'lang' => \GO::language()->getLanguage()]) . '"></script>';
 } else
 {
@@ -165,11 +174,12 @@ if (!GO::config()->debug && $cacheFile->exists()) {
 
 	$scripts[] = "var BaseHref = '" . GO::config()->host . "';";
 
-	$scripts[] = new File(GO::config()->root_path . 'views/Extjs3/ext/adapter/ext/ext-base-debug.js');
-	$scripts[] = new File(GO::config()->root_path . 'views/Extjs3/ext/ext-all-debug.js');
+//	$scripts[] = new File(GO::config()->root_path . 'views/Extjs3/ext/adapter/ext/ext-base-debug.js');
+//	$scripts[] = new File(GO::config()->root_path . 'views/Extjs3/ext/ext-all-debug.js');
 	$scripts[] = new File(GO::config()->root_path . 'views/Extjs3/javascript/namespaces.js');
 
-	$scripts[] = GO::config()->debug ? new \go\core\util\Url(GO::url('core/language', ['lang' => \GO::language()->getLanguage()])) : GO::language()->getScript();
+//	$scripts[] = GO::config()->debug ? new \go\core\util\Url(GO::url('core/language', ['lang' => \GO::language()->getLanguage()])) : GO::language()->getScript();
+//  $scripts[] = GO::language()->getScript();
 
 	$data = file_get_contents(GO::config()->root_path . 'views/Extjs3/javascript/scripts.txt');
 	$lines = explode("\n", $data);
@@ -223,29 +233,64 @@ if (!GO::config()->debug && $cacheFile->exists()) {
 	//$scripts = array_map('trim', $scripts);
 	//	$scripts = array_unique($scripts);
 
-
-	$minify = new \MatthiasMullie\Minify\JS();
+  if(!GO::config()->debug) {
+    $minify = new \MatthiasMullie\Minify\JS();
+  } else
+  {
+    //$fp = $cacheFile->open("w");
+    $js = "";
+  }
 
 	$rootFolder = new Folder(GO::config()->root_path);
 	foreach ($scripts as $script) {
 
 		if (GO::config()->debug) {
 			if (is_string($script)) {
-				echo '<script type="text/javascript">' . $script . '</script>' . "\n";
+        $js .=  $script ."\n;\n";
+				//echo '<script type="text/javascript">' . $script . '</script>' . "\n";
 			} else if ($script instanceof File) {
-				echo '<script type="text/javascript" src="' . $root_uri . $script->getRelativePath($rootFolder) . '"></script>' . "\n";
-			} else if($script instanceof \go\core\util\Url) {
-				echo '<script type="text/javascript" src="'.$script.'"></script>' . "\n";
+        $relPath = $script->getRelativePath($rootFolder);
+        $parts = explode('/', $relPath);
+        $js .= "\n//source: ".$relPath ."\n";
+        if($parts[0] == 'go' && $parts[1] == 'modules') {
+          $js .= "go.module = '".$parts[3]."';";
+          $js .= "go.package = '".$parts[2]."';";
+          $js .= "go.Translate.setModule('" .$parts[3]. "');";   
+        } else if($parts[0] == 'modules')
+        {
+          $js .= "go.module = '".$parts[1]."';";
+          $js .= "go.package = 'legacy';";
+          $js .= "go.Translate.setModule('" .$parts[1]. "');";   
+        }
+        $js .= $script->getContents()."\n;\n";
+				//echo '<script type="text/javascript" src="script.php?source='.$script->getRelativePath($rootFolder) . '"></script>' . "\n";
 			}
-		} else {
+//      else if($script instanceof \go\core\util\Url) {
+//				echo '<script type="text/javascript" src="'.$script.'"></script>' . "\n";
+//			}
+		} else {      
+      
+    if($script instanceof File) {
+      $module = preg_match("/\bmodules\/([^\/]+)/", $script->getPath(), $matches);
+
+      if(isset($matches[1])) {
+        $minify->add("go.Translate.setModule('" .$matches[1]. "');");   
+      }
+    }
 			$minify->add($script);
 		}
 	}
 	
 	if (!GO::config()->debug) {
 		$minify->gzip($cacheFile->getPath());		
-		echo '<script type="text/javascript" src="' . GO::url('core/clientScripts', ['mtime' => GO::config()->mtime, 'lang' => \GO::language()->getLanguage()]) . '"></script>';
-	}
+		
+	} else
+  {
+    $fp = $cacheFile->open('w');
+    fwrite($fp, $js);
+    fclose($fp);
+  }
+  echo '<script type="text/javascript" src="' . GO::url('core/clientScripts', ['mtime' => GO::config()->mtime, 'lang' => \GO::language()->getLanguage()]) . '"></script>';
 }
 
 if (GO::user()) {

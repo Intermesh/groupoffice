@@ -321,7 +321,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		//load modules
 		go.Modules.onReady(function () {
 
-
 			if (this.loginPanel) {
 				this.loginPanel.destroy();
 			}
@@ -359,8 +358,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			var menuItemConfig;
 
 			this.state = Ext.state.Manager.get('open-modules');
-
-			for (var i = 0; i < allPanels.length; i++) {
+      
+			for (var i = 0, l = allPanels.length; i < l; i++) {
 
 				if (this.state && this.state.indexOf(allPanels[i].moduleName) > -1)
 					items.push(GO.moduleManager.getPanel(allPanels[i].moduleName));
@@ -447,7 +446,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				<div class="go-header-right">\
 					<div id="secondary-menu">\
 						<div id="search_query"></div>\
-						<a id="start-menu-link" ><i class="icon">apps</i></a>\
+						<div id="start-menu-link" ></div>\
 						<a id="user-menu" class="user-img">\
 							<span id="reminder-icon" style="display: none;">notifications</span>\
 						</a>\
@@ -466,15 +465,13 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				border: false,
 				items: [topPanel, this.tabPanel]
 			});
-
-			var startBtn = Ext.get('start-menu-link');
-			var startBtnTpl = startBtn.dom.innerHTML;
-			startBtn.dom.innerHTML = '';
+      
+      
 			this.startMenuLink = new Ext.Button({
 				menu: this.startMenu,
 				menuAlign: 'tr-br?',
-				text: startBtnTpl,
-				renderTo: startBtn,
+				text: '<i class="icon">apps</i>',
+				renderTo: 'start-menu-link',
 				clickEvent: 'mousedown',
 				template: new Ext.XTemplate('<span><button></button></span>')
 			});
@@ -565,6 +562,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			});
 
 
+
 			var userBtn = Ext.get('user-menu');
 			var userMenuTpl = userBtn.dom.innerHTML;
 			this.userMenuLink = new Ext.Button({
@@ -619,7 +617,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				});
 			}
 
-
 			GO.checker.init.defer(2000, GO.checker);
 			GO.checker.on('alert', function (data) {
 				if (data.notification_area)
@@ -628,11 +625,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				}
 			}, this);
 
-			/*for(var i=0;i<items.length;i++){
-			 var menuItem = this.startMenu.items.item('go-start-menu-'+items[i].moduleName);
-			 menuItem.hide();
-			 }
-			 this.refreshMenu();*/
+
 
 			this.rendered = true;
 			this.fireEvent('render');

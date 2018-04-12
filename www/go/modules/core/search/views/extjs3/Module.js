@@ -4,7 +4,7 @@ go.Modules.register("core", 'search', {
 	//mainPanel: GO.notes.MainPanel,
 	entities: ["Search"],
 	initModule: function () {
-
+   
 		GO.mainLayout.on('render', function () {
 
 			var container, searchField, searchContainer, panel;

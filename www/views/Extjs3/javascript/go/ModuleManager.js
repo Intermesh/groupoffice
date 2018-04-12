@@ -127,7 +127,8 @@
 		
 		//will be called after login
 		init : function() {
-			go.Stores.get("Module").getUpdates(function () {        
+			go.Stores.get("Module").getUpdates(function () {  
+        
         for(package in this.registered) {
           for(name in this.registered[package]) {
             if(!this.isAvailable(package, name)) {
@@ -149,6 +150,7 @@
           }
         }
 				
+        
 				go.Modules.fireReady();
 			}, this);
 		},

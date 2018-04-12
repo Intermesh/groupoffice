@@ -306,12 +306,38 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 	
 	protected function actionClientScripts($lang) {
 		header('Content-Type: application/javascript');
-		header('Content-Encoding: gzip');
+    if(!GO::config()->debug) {
+      header('Content-Encoding: gzip');
+      $cacheFile = \go\core\App::get()->getDataFolder()->getFolder('clientscripts')->create()->getFile('all-' . $lang . '.js');
+	
+    } else
+    {
+      $cacheFile = \go\core\App::get()->getTmpFolder()->getFile('debug.js');
+    }
 		
-		$cacheFile = \go\core\App::get()->getDataFolder()->getFolder('clientscripts')->create()->getFile('all-' . $lang . '.js');
 		
 		readfile($cacheFile->getPath());
 	}
+  
+  protected function actionClientScript($source) {
+    \GO::session()->closeWriting();    
+    $file = \go\core\Environment::get()->getInstallFolder()->getFile($source);
+    
+    $matches = [];
+    
+    $module = preg_match("/\bmodules\/([^\/]+)/", $source, $matches);
+    
+    header('Content-Type: application/javascript');
+     
+    if(isset($matches[1])) {
+     echo "go.Translate.setModule('" .$matches[1]. "');";
+    }
+    
+   
+       
+    readfile($file->getPath());
+    
+  }
 	
 	protected function actionLanguage($lang) {
 		\GO::language()->setLanguage($lang);

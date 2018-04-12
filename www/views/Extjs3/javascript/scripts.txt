@@ -1,3 +1,6 @@
+views/Extjs3/javascript/go/go.js
+views/Extjs3/javascript/go/Translate.js
+
 views/Extjs3/javascript/common.js
 
 views/Extjs3/javascript/MainLayout.js
@@ -112,7 +115,6 @@ views/Extjs3/javascript/panels/GroupTabPanel.js
 views/Extjs3/javascript/panels/Portal.js
 views/Extjs3/javascript/panels/PortalColumn.js
 views/Extjs3/javascript/panels/Portlet.js
-views/Extjs3/javascript/panels/QuickAddPanel.js
 
 views/Extjs3/javascript/form/UploadPCForm.js
 views/Extjs3/javascript/Export.js
@@ -231,8 +233,6 @@ views/Extjs3/javascript/calendar/EventEditWindow.js
 views/Extjs3/javascript/calendar/EventRecord.js
 views/Extjs3/javascript/calendar/WeekEventRenderer.js
 
-
-views/Extjs3/javascript/go/go.js
 
 
 

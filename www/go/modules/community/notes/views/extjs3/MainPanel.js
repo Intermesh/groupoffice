@@ -17,9 +17,9 @@ go.modules.notes.MainPanel = Ext.extend(Ext.Panel, {
 	layoutConfig: {
 		triggerWidth: 1000
 	},
-	
 
 	initComponent: function () {
+
 
 		this.noteBookGrid = new go.modules.notes.NoteBookGrid({
 			region: 'west',
@@ -28,7 +28,7 @@ go.modules.notes.MainPanel = Ext.extend(Ext.Panel, {
 			split: true,
 			tbar: [{
 					xtype: 'tbtitle',
-					text: t('Notebooks', 'notes')
+					text: t('Notebooks')
 				}, '->', {
 					disabled: go.Modules.get("community", 'notes').permissionLevel < GO.permissionLevels.write,
 					iconCls: 'ic-add',
