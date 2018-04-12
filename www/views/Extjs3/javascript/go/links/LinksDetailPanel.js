@@ -19,7 +19,7 @@ go.links.LinksDetailPanel = Ext.extend(Ext.Panel, {
 		
 		var tpl = new Ext.XTemplate('<div class="icons"><tpl for=".">\
 		<tpl if="toEntity !== this.previousType(xindex)">\
-			<h5>{[t(values.toEntity, go.Entities.get(values.toEntity].module))}</h5><hr>\
+			<h5>{[t(values.toEntity, go.Entities.get(values.toEntity).module)]}</h5><hr>\
 		</tpl>\
 		{[this[values.toEntity] ? this[values.toEntity](values, xindex, xcount) : this.default(values, this.previousType(xindex), xindex, xcount)]}\
 	</tpl><tpl if="this.getTotalCount() &gt; 0"><p class="more">{[this.getMoreStr()]}</p></tpl></div>', {
