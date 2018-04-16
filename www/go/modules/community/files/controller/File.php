@@ -1,8 +1,19 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+namespace go\modules\community\files\controller;
 
+use go\core\jmap\EntityController;
+use go\modules\community\files\model;
+
+
+class File extends EntityController {
+	
+	/**
+	 * The class name of the entity this controller is for.
+	 * 
+	 * @return string
+	 */
+	protected function entityClass() {
+		return model\File::class;
+	}
+}
