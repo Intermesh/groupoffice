@@ -10,8 +10,9 @@ class Blob extends orm\Entity {
 	public $type; // content-type
 	public $name;
 	public $size; // in bytes
-	public $modified; // timestamp
-	public $createdAt;
+	public $fsModifiedAt; // timestamp
+	public $fsCreatedAt; // ts
+	public $createdAt; // blob is created when uploaded for the first time
 	private $tmpFile;
 	private $strContent;
 	
@@ -41,6 +42,14 @@ class Blob extends orm\Entity {
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()->addTable('core_blob', 'b');
+	}
+	
+	/**
+	 * 
+	 * @return \go\core\fs\MetaData
+	 */
+	public function getMetaData() {
+		return new MetaData($this);
 	}
 
 	protected function internalSave() {
