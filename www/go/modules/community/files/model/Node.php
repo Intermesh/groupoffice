@@ -1,8 +1,57 @@
 <?php
+namespace go\modules\community\files\model;
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+use go\core\acl\model;
 
+class Node extends model\AclItemEntity {
+
+	use go\core\orm\CustomFieldsTrait;
+	use go\core\orm\SearchableTrait;
+	
+	public $name;
+	/**
+	 * @var \go\core\util\DateTime
+	 */
+	public $createdAt;
+	/**
+	 * @var \go\core\util\DateTime
+	 */
+	public $modifiedAt;
+	public $ownedBy;
+	public $modifiedBy;
+	public $isDirectory;
+	
+	public $comments;
+	public $bookmarked;
+	/**
+	 * @var \go\core\util\DateTime
+	 */
+	public $touchedAt;
+	public $storageId;
+	public $parentId;
+	
+	protected static function defineMapping() {
+		return parent::defineMapping()->addTable("files_node", "n");
+	}
+	
+	public function getPath() {
+		return $this->parent->getPath().'/'.$this->name;
+	}
+
+	protected static function aclEntityClass() {
+		return Storage::class;
+	}
+
+	protected static function aclEntityKeys() {
+		return ['storageId' => 'id'];
+	}
+
+	protected function getSearchDescription() {
+		return $this->createdAt;
+	}
+
+	protected function getSearchName() {
+		return $this->name;
+	}
+
+}
