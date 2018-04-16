@@ -1,0 +1,11 @@
+.entity.File::before {
+	content: "file"
+}
+
+.entity.Folder::before {
+	content: "folder"
+}
+
+.go-module-icon-files , .go-menu-icon-files{
+	background:url('images/files.png');
+}
