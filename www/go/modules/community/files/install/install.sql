@@ -167,3 +167,16 @@ ALTER TABLE `files_storage`
 ALTER TABLE `files_version`
   ADD CONSTRAINT `fk_files_version_core_blob1` FOREIGN KEY (`blobId`) REFERENCES `core_blob` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_files_version_files_node1` FOREIGN KEY (`id`) REFERENCES `files_node` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+
+CREATE VIEW `files_file` AS
+SELECT `files_node`.*,`core_blob`.`size` as byteSize,`core_blob`.`type` as mimeType, 'test' AS metaData
+FROM `files_node`
+LEFT JOIN `core_blob` ON `files_node`.`blobId` = `core_blob`.`id`
+WHERE `files_node`.`isDirectory` = 0;
+
+CREATE VIEW `files_folder` AS
+SELECT `id`, `storageId`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `comment`, `deletedAt`, `deletedBy`, `bookmarked`, `touchedAt`
+FROM `files_node`
+INNER JOIN `files_node_user` ON `files_node`.`id` = `files_node_user`.`nodeId`
+WHERE `files_node`.`isDirectory` = 1;

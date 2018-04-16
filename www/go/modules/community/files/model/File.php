@@ -11,6 +11,7 @@ class File extends Node {
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
+					->addTable("files_file", "file")
 				  ->addRelation('versions', Version::class, ['id' => 'fileId'], true);
 	}
 	
