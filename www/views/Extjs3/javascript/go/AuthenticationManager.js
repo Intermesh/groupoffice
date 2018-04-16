@@ -184,6 +184,8 @@
 			}
 			
 			Ext.applyIf(go.User, result.clientSettings);
+			
+			Ext.applyIf(GO.settings, result.clientSettings); // Backwards compatible
 
 			var script = document.createElement('script');
 			script.setAttribute('src', GO.url('core/moduleScripts'));
