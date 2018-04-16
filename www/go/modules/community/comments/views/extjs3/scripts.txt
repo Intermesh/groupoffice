@@ -4,3 +4,5 @@ CategoryCombo.js
 CategoryForm.js
 CategoryGrid.js
 CommentForm.js
+CommentDetailSettingsForm.js
+QuickaddForm.js

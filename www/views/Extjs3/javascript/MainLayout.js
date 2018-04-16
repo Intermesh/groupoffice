@@ -581,7 +581,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 								if(!go.userSettingsDialog) {
 									go.userSettingsDialog = new go.usersettings.UserSettingsDialog();
 								}
-								go.userSettingsDialog.show(GO.settings.user_id);
+								go.userSettingsDialog.show(go.User.id);
 
 							},
 							scope: this

@@ -32,6 +32,16 @@ CREATE TABLE `comments_category` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
+-- Tabelstructuur voor tabel `comments_settings`
+--
+
+CREATE TABLE `comments_settings` (
+  `userId` int(11) NOT NULL,
+  `enableQuickAdd` tinyint(1) NOT NULL DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+--
 -- Indexen voor tabel `comments_comment`
 --
 ALTER TABLE `comments_comment`
@@ -48,6 +58,12 @@ ALTER TABLE `comments_category`
   ADD PRIMARY KEY (`id`),
   ADD KEY `modSeq` (`modSeq`),
   ADD KEY `createdBy` (`createdBy`);
+
+--
+-- Indexen voor tabel `comments_settings`
+--
+ALTER TABLE `comments_settings`
+  ADD PRIMARY KEY (`userId`);
 
 --
 -- AUTO_INCREMENT voor een tabel `comments_comment`
@@ -67,3 +83,9 @@ ALTER TABLE `comments_category`
 ALTER TABLE `comments_comment`
   ADD CONSTRAINT `commentsCommentCategoryId` FOREIGN KEY (`categoryId`) REFERENCES `comments_category` (`id`),
   ADD CONSTRAINT `commentsCommentEntity` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`);
+
+--
+-- Beperkingen voor tabel `comments_settings`
+--
+ALTER TABLE `comments_settings`
+  ADD CONSTRAINT `comments_settings_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;

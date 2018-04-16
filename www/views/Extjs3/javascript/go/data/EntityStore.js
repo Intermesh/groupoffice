@@ -54,6 +54,11 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				
 				this.saveState();			
 				
+				go.flux.Dispatcher.dispatch(this.entity.name + "Updated", {
+					state: this.state,
+					list: action.payload.list
+				});
+				
 				break;
 
 			case this.entity.name + "/query":
@@ -151,9 +156,15 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				},
 				scope: this
 			});
-		} else {
+			return false;
+		} 
+		
+		if(callback) {
 			callback.call(scope || this, entities);
 		}
+
+		return entities;
+
 	},
 	
 	findBy : function(fn, scope, startIndex) {

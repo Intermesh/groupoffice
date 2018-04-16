@@ -3,7 +3,7 @@ namespace go\modules\community\comments\model;
 
 use go\core\jmap\Entity;
 
-class CommentCategory extends Entity {
+class Category extends Entity {
 
 	public $name;
 	public $createdBy;

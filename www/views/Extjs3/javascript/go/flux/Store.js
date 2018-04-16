@@ -5,6 +5,7 @@ go.flux.Store = Ext.extend(Ext.util.Observable,{
 		config = config || {};
 		
 		this.data = {};
+		this.scope = this;
 		
 		Ext.apply(this, config);
 		
@@ -16,6 +17,7 @@ go.flux.Store = Ext.extend(Ext.util.Observable,{
 	data: null,
 	
 	entity: null,
+	scope: null,
 	
 	receive: function(action) {},
 	

@@ -54,3 +54,53 @@ ALTER TABLE `comments_comment`
   ADD CONSTRAINT `commentsCommentEntity` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`);
  * 
  */
+
+//
+//
+//-- phpMyAdmin SQL Dump
+//-- version 4.5.4.1deb2ubuntu2
+//-- http://www.phpmyadmin.net
+//--
+//-- Host: localhost
+//-- Gegenereerd op: 11 apr 2018 om 12:11
+//-- Serverversie: 5.7.21-0ubuntu0.16.04.1
+//-- PHP-versie: 7.0.28-0ubuntu0.16.04.1
+//
+//SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+//SET time_zone = "+00:00";
+//
+//--
+//-- Database: `go63_localhost`
+//--
+//
+//-- --------------------------------------------------------
+//
+//--
+//-- Tabelstructuur voor tabel `comments_settings`
+//--
+//
+//CREATE TABLE `comments_settings` (
+//  `userId` int(11) NOT NULL,
+//  `enableQuickAdd` tinyint(1) NOT NULL DEFAULT '1'
+//) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+//
+//--
+//-- Indexen voor geëxporteerde tabellen
+//--
+//
+//--
+//-- Indexen voor tabel `comments_settings`
+//--
+//ALTER TABLE `comments_settings`
+//  ADD PRIMARY KEY (`userId`);
+//
+//--
+//-- Beperkingen voor geëxporteerde tabellen
+//--
+//
+//--
+//-- Beperkingen voor tabel `comments_settings`
+//--
+//ALTER TABLE `comments_settings`
+//  ADD CONSTRAINT `comments_settings_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;
+

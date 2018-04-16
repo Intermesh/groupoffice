@@ -33,9 +33,9 @@ class Comment extends Entity {
 		return parent::defineMapping()
 						->addTable("comments_comment")
 						->setQuery(
-														(new Query())
-														->select("e.name AS entity")
-														->join('core_entity', 'e', 'e.id = t.entityTypeId')
+							(new Query())
+								->select("e.name AS entity")
+								->join('core_entity', 'e', 'e.id = t.entityTypeId')
 		);
 	}
 	
@@ -52,4 +52,18 @@ class Comment extends Entity {
 		$this->entity = $entity->getName();
 		$this->entityTypeId = $entity->getId();
 	}
+//	
+//	public static function filter($data){
+//		
+//		if(isset($data['entityId'])){
+//			$this->query->where('t.entityId', '=', $data['entityId']);
+//		}
+//		
+//		if(isset($data['entity'])){
+//			$this->query->where(['e.name' => $data['entity']]);	
+//		}
+//		
+//		
+//	}
+//	
 }
