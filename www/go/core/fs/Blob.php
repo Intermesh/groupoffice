@@ -10,8 +10,9 @@ class Blob extends orm\Entity {
 	public $type; // content-type
 	public $name;
 	public $size; // in bytes
-	public $fsModifiedAt; // timestamp
-	public $fsCreatedAt; // ts
+//	public $fsModifiedAt; // timestamp
+//	public $fsCreatedAt; // ts
+	public $modified;
 	public $createdAt; // blob is created when uploaded for the first time
 	private $tmpFile;
 	private $strContent;

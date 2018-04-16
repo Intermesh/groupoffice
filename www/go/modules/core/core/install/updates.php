@@ -119,7 +119,13 @@ $updates["201803161130"][] = function() {
 	}
 };
 
-$updates["201803291155"][] = "CREATE TABLE `core_blob` (
+$updates["201804042007"][] = "ALTER TABLE `core_search` ADD FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+
+$updates["201804062007"][] = "ALTER TABLE `core_entity`  ADD `clientName` VARCHAR(190) NULL DEFAULT NULL;";
+$updates["201804062007"][] = "update `core_entity` set clientName = name;";
+$updates["201804062007"][] = "ALTER TABLE `core_entity` ADD UNIQUE(`clientName`);";
+
+$updates["201804062008"][] = "CREATE TABLE `core_blob` (
   `id` binary(40) NOT NULL,
   `type` varchar(129) NOT NULL,
   `size` bigint(20) NOT NULL DEFAULT '0',
@@ -128,13 +134,6 @@ $updates["201803291155"][] = "CREATE TABLE `core_blob` (
   `createdAt` DATETIME NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;";
-
-
-$updates["201804042007"][] = "ALTER TABLE `core_search` ADD FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
-
-$updates["201804062007"][] = "ALTER TABLE `core_entity`  ADD `clientName` VARCHAR(190) NULL DEFAULT NULL;";
-$updates["201804062007"][] = "update `core_entity` set clientName = name;";
-$updates["201804062007"][] = "ALTER TABLE `core_entity` ADD UNIQUE(`clientName`);";
 
 $updates["201804101629"][] = "ALTER TABLE `core_user` 
 ADD COLUMN `avatarId` BINARY(40) NULL AFTER `displayName`,
