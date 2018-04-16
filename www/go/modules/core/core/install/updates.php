@@ -135,3 +135,13 @@ $updates["201804042007"][] = "ALTER TABLE `core_search` ADD FOREIGN KEY (`entity
 $updates["201804062007"][] = "ALTER TABLE `core_entity`  ADD `clientName` VARCHAR(190) NULL DEFAULT NULL;";
 $updates["201804062007"][] = "update `core_entity` set clientName = name;";
 $updates["201804062007"][] = "ALTER TABLE `core_entity` ADD UNIQUE(`clientName`);";
+
+$updates["201804101629"][] = "ALTER TABLE `core_user` 
+ADD COLUMN `avatarId` BINARY(40) NULL AFTER `displayName`,
+ADD INDEX `fk_user_avatar_id_idx` (`avatarId` ASC);
+ALTER TABLE `core_user` 
+ADD CONSTRAINT `fk_user_avatar_id`
+  FOREIGN KEY (`avatarId`)
+  REFERENCES `core_blob` (`id`)
+  ON DELETE RESTRICT
+  ON UPDATE NO ACTION;";

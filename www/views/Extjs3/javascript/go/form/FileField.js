@@ -28,6 +28,8 @@ go.form.FileField = Ext.extend(Ext.form.TextField, {
 	 * @method autoSize
 	 */
 	autoSize: Ext.emptyFn,
+	
+	cls: '',
 
 	autoUpload: false,
 	
@@ -56,7 +58,10 @@ go.form.FileField = Ext.extend(Ext.form.TextField, {
 	onRender: function (ct, position) {
 		go.form.FileField.superclass.onRender.call(this, ct, position);
 
-		this.wrap = this.el.wrap({cls: 'x-form-field-wrap x-form-file-wrap'});
+		this.wrap = this.el.wrap({
+			cls: 'x-form-field-wrap x-form-file-wrap '+this.cls,
+			height: this.height || 'auto'
+		});
 		this.el.addClass('x-form-file-text');
 		this.el.dom.removeAttribute('name');
 		this.createFileInput();
@@ -66,7 +71,8 @@ go.form.FileField = Ext.extend(Ext.form.TextField, {
 		});
 		this.button = new Ext.Button(Ext.apply(btnCfg, {
 			renderTo: this.wrap,
-			cls: 'x-form-file-btn' + (btnCfg.iconCls ? ' x-btn-icon' : '')
+			height: btnCfg.height || this.height || 'auto',
+			cls: btnCfg.cls+' x-form-file-btn' + (btnCfg.iconCls ? ' x-btn-icon' : '')
 		}));
 
 		if (this.buttonOnly) {
@@ -114,6 +120,7 @@ go.form.FileField = Ext.extend(Ext.form.TextField, {
 				success: function(response, file, options) {
 					var data = Ext.decode(response.responseText);
 					if (data.blobId) {
+						this.fireEvent('change', this, data.blobId, this.value);
 						this.setValue(data.blobId);
 						this.originalValue = '';
 					}
@@ -129,12 +136,18 @@ go.form.FileField = Ext.extend(Ext.form.TextField, {
 	},
 
 	createFileInput: function () {
+		var style = {},
+			height = this.buttonCfg.height || this.height;
+		if(height) {
+			var style = {height: height+'px'};
+		}
 		this.fileInput = this.wrap.createChild({
 			id: this.getFileInputId(),
 			name: this.name || this.getId(),
 			cls: 'x-form-file',
 			tag: 'input',
 			type: 'file',
+			style: style,
 			accept: this.accept,
 			size: 1
 		});
