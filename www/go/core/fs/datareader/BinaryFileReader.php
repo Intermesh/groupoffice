@@ -91,9 +91,9 @@ class BinaryFileReader
                 break;
             case self::SIZE_OF:
                 //If the variable is not an integer return false
-                if (!( $tag[1] = $this->$tag[1] )) {
+					 if (!( $tag[1] = $this->{$tag[1]} )) {
                     return false;
-                }
+					 }
             default:
                 //Read as string
                 $this->$key = fread($this->fp, $tag[1]);

@@ -23,6 +23,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 		this.userFieldset = new Ext.form.FieldSet({
 			labelWidth:dp(152),
 			title: t('User'),
+			layout: 'hbox',
 			items:[
 				{
 					width: 150,

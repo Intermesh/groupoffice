@@ -112,6 +112,9 @@ echo '<script type="text/javascript" src="' . GO::config()->url . 'views/Extjs3/
 echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' => \GO::language()->getLanguage()]) . '"></script>';
   
 if ($cacheFile->exists()) {
+//echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' => \GO::language()->getLanguage()]) . '"></script>';
+
+if (!GO::config()->debug && $cacheFile->exists()) {
 	echo '<script type="text/javascript" src="' . GO::url('core/clientScripts', ['mtime' => GO::config()->mtime, 'lang' => \GO::language()->getLanguage()]) . '"></script>';
 } else {
 

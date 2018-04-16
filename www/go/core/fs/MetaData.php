@@ -15,14 +15,16 @@ class MetaData extends \go\core\orm\Property {
 	public $creator;
 	public $date; // (picture taken / document version)
 	public $encoding; // codec / color profile / pdf(GNU Ghostscript 7.05)
+	public $thumbnail; // blobId of cached thumbnail image (resized origional / extracted from ID3)
 	
-	private $data1;
-	private $data2;
-	private $data3;
-	private $data5;
-	private $data6;
-	private $data7;
-	private $data8; //reserved
+	public $data1;
+	public $data2;
+	public $data3;
+	public $data4;
+	public $data5;
+	public $data6;
+	public $data7;
+	public $data8; //reserved
 	
 	private $reader;
 	private $size;
@@ -78,21 +80,39 @@ class MetaData extends \go\core\orm\Property {
 		return $this->reader;
 	}
 	
-	private function extractExif() {
-		
+	public  function extractExif($path) {
+		$exif = exif_read_data($path, 'IFD0');
+		echo $exif===false ? "No header data found.<br />\n" : "Image contains headers<br />\n";
+
+		$exif = exif_read_data($path, 0, true);
+		echo "test.jpg:<br />\n";
+		foreach ($exif as $key => $section) {
+			 foreach ($section as $name => $val) {
+				  echo "$key.$name: $val<br />\n";
+			 }
+		}
 	}
 	
 	public function extractID3($path) {
 
-		$id3 = new Id3TagsReader(fopen($path, "rb"));
+		$biem = \id3_get_tag($path);
+		return $biem;
+		$id3 = new datareader\ID3Reader(fopen($path, "rb"));
 		$id3->readAllTags(); //Calling this is necesarry before others
-		return $id3->getId3Array();
-		$this->copyright = $tag['copyright'];
-		$this->title = $tag['title'];
-		$this->author = $tag['artist'];
-		$this->{self::ALBUM} = $tag['album'];
-		$this->{self::YEAR} = $tag['year'];
-		$this->{self::GENRE} = $tag['genre'];
+		foreach($id3->data as $tag => $value) {
+			if($tag === 'TCOP') $this->copyright = $value;
+			if($tag === 'TIT2') $this->title = $value;
+			if($tag === 'COMM') $this->description = $value;
+			if($tag === 'TPE1') $this->author = $value;
+			if($tag === 'AENC') $this->encoding = $value;
+			if($tag === 'TDAT') $this->date = $value;
+			if($tag === 'WXXX') $this->uri = $value;
+			if($tag === 'TPE3') $this->creator = $value;
+			if($tag === 'TALB') $this->{self::ALBUM} = $value;
+			if($tag === 'TYER') $this->{self::YEAR} = $value;
+			if($tag === 'TCON') $this->{self::GENRE} = $value;
+		}
+		return $this;
 	}
 
 	
