@@ -1,3 +1,4 @@
+- fixed issue were Calendars added to CalDAV synchonisation would still sync when the permissions are taken away
 - Fixed compress and download selected bug
 - Cron/System tasks: Fixed issue that groups could not be deleted anymore for individual system tasks
 - Addressbook: added readable addresslists back to grid (changed permission from write to read)
