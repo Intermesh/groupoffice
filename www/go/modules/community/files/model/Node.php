@@ -31,7 +31,7 @@ class Node extends model\AclItemEntity {
 	public $parentId;
 	
 	protected static function defineMapping() {
-		return parent::defineMapping()->addTable("files_node", "n");
+		return parent::defineMapping();
 	}
 	
 	public function getPath() {

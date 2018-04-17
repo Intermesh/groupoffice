@@ -6,4 +6,9 @@ class Folder extends Node {
 	public $items;
 	public $subscribed;
 	public $canAddItems;
+	
+	protected static function defineMapping() {
+		return parent::defineMapping()
+					->addTable("files_folder", "folder");
+	}
 }
