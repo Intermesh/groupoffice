@@ -39,11 +39,11 @@ class Node extends model\AclItemEntity {
 	}
 
 	protected static function aclEntityClass() {
-		return Storage::class;
+		return Node::class;
 	}
 
 	protected static function aclEntityKeys() {
-		return ['storageId' => 'id'];
+		return ['aclId' => 'id'];
 	}
 
 	protected function getSearchDescription() {

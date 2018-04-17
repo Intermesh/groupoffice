@@ -1,12 +1,10 @@
 <?php
 namespace go\modules\community\files\model;
 
-use go\core\acl\model;
+use go\core\orm;
 
-class Node extends model\AclItemEntity {
+class Storage extends orm\Entity {
 
-	use go\core\orm\CustomFieldsTrait;
-	use go\core\orm\SearchableTrait;
 	
 	public $rootFolderId;
 	/**
@@ -26,12 +24,5 @@ class Node extends model\AclItemEntity {
 	protected static function defineMapping() {
 		return parent::defineMapping()->addTable("files_storage", "s");
 	}
-
-
-	protected static function aclEntityClass() {
-		return Storage::class;
-	}
-
-
 
 }
