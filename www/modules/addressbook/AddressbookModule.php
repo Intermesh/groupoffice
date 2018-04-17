@@ -39,9 +39,9 @@ class AddressbookModule extends \GO\Base\Module{
 			foreach($addresslists as $addresslist){
 				$response['data']['addresslist_'.$addresslist->id]=1;
 			}
+			
+			self::_loadPhoto($response, $contact, $params);
 		}
-		
-		self::_loadPhoto($response, $contact, $params);
 			
 		$settings = Model\Settings::model()->getDefault($user);
 		$response['data']=array_merge($response['data'], $settings->getAttributes());
