@@ -73,15 +73,18 @@ class ErrorHandler {
 	 */
 	public function exceptionHandler($e) {				
 		$errorString = self::logException($e);
-    
-    if(!headers_sent()) {
-      header('Content-Type: text/plain');
-    }
+		
+		if(!headers_sent()) {
+			if($e instanceof http\Exception) {
+				http_response_code($e->code);
+			}
+			header('Content-Type: text/plain');
+		}
 
-    echo "[".date(DateTime::FORMAT_API)."] ". $errorString."\n\n";
-    echo (string) $e;			
-    echo "\n\nDebug dump: \n\n";			
-    print_r(App::get()->getDebugger()->getEntries());
+		echo "[".date(DateTime::FORMAT_API)."] ". $errorString."\n\n";
+		echo (string) $e;			
+		echo "\n\nDebug dump: \n\n";			
+		print_r(App::get()->getDebugger()->getEntries());
 	}
 
 	/**

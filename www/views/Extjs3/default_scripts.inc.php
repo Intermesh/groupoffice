@@ -247,16 +247,16 @@ if (GO::user()) {
 <script type="text/javascript">
 
 	//hide mask after 10s to display errors is necessary.
-	setTimeout(function () {
-		var loadMask = document.getElementById('loading-mask');
-		var loading = document.getElementById('loading');
-		if (loadMask)
-			loadMask.style.display = 'none';
-
-		if (loading)
-			loading.style.display = 'none';
-
-	}, 10000);
+//	setTimeout(function () {
+//		var loadMask = document.getElementById('loading-mask');
+//		var loading = document.getElementById('loading');
+//		if (loadMask)
+//			loadMask.style.display = 'none';
+//
+//		if (loading)
+//			loading.style.display = 'none';
+//
+//	}, 10000);
 
 
 	GO.settings = <?php echo json_encode($settings); ?>;

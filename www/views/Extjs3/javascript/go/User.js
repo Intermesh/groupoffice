@@ -6,16 +6,17 @@ go.User = {
 		}
 		var me = this;
 		go.Jmap.get(function(data, response){
-			
-			me.username = data.username;
-			me.apiUrl = data.apiUrl;
-			me.downloadUrl = data.downloadUrl;
-			me.uploadUrl = data.uploadUrl;
-			me.displayName = data.clientSettings.displayName;
-			me.id = data.clientSettings.user_id;
-			me.avatarId = data.clientSettings.avatarId;
-			
-			Ext.apply(GO.settings, data.clientSettings);
+			if(data) {
+				me.username = data.username;
+				me.apiUrl = data.apiUrl;
+				me.downloadUrl = data.downloadUrl;
+				me.uploadUrl = data.uploadUrl;
+				me.displayName = data.clientSettings.displayName;
+				me.id = data.clientSettings.user_id;
+				me.avatarId = data.clientSettings.avatarId;
+
+				Ext.apply(GO.settings, data.clientSettings);
+			}
 			cb(data, response);
 		});
 		

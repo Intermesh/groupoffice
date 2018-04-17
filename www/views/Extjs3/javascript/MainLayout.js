@@ -97,6 +97,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					me.onAuthentication(); // <- start Group-Office
 				} else {
 					me.fireEvent("boot", this);
+					GO.mainLayout.login();
 				}
 			});
 		} else {

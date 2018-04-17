@@ -12,7 +12,7 @@ use Exception as CoreException;
  */
 class Exception extends CoreException
 {
-	
+	public $code = 200;
 	/**
 	 *  HTTP code error messages
 	 *
@@ -63,7 +63,7 @@ class Exception extends CoreException
 	];
 	
 	public function __construct($code, $message = null) {
-		
+		$this->code = $code;
 		if(empty($message)){
 			$message = self::$codes[$code];
 		}		

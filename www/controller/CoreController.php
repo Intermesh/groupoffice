@@ -19,7 +19,7 @@ use GO\Base\Util\StringHelper;
 class CoreController extends \GO\Base\Controller\AbstractController {
 	
 	protected function allowGuests() {
-		return array('compress','cron','language');
+		return array('compress','cron','language','clientscripts');
 	}
 	
 	protected function ignoreAclPermissions() {
