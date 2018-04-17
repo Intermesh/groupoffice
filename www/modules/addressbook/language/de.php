@@ -326,3 +326,8 @@ $l['create_folder_contact_or_company']= "Ordner für die Erstellung eines Kontak
 
 $l['companyBank_bic']= "Bank BIC Nummer";
 
+$l['manageGroups']= "Gruppen verwalten";
+$l['addresslistGroup']= "Addresslistengruppe";
+$l['noPermission']= "Keine Berechtigungen";
+
+
