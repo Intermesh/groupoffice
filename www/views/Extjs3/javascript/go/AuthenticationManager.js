@@ -183,8 +183,12 @@
 				GO.loginDialog.close();
 			}
 			
+			Ext.applyIf(go.User,{
+				apiUrl: result.apiUrl,
+				downloadUrl: result.downloadUrl,
+				uploadUrl: result.uploadUrl
+			});
 			Ext.applyIf(go.User, result.clientSettings);
-			
 			Ext.applyIf(GO.settings, result.clientSettings); // Backwards compatible
 
 			var script = document.createElement('script');
