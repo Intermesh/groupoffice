@@ -57,7 +57,10 @@ go.Jmap = {
 			url: BaseHref + 'jmap.php',
 			method: 'GET',
 			callback: function (response, opts) {
-				var data = Ext.decode(response.responseText);
+				var data;
+				if(response.tesponseText) {
+					data = Ext.decode(response.responseText);
+				}
 				cb(data, response, opts);
 			}
 		});
