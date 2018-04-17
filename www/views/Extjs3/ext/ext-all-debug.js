@@ -4960,7 +4960,7 @@ Ext.EventManager = function(){
     var docReadyEvent,
         docReadyProcId,
         docReadyState = false,
-        DETECT_NATIVE = Ext.isGecko || Ext.isWebKit || Ext.isSafari || Ext.isIE10p,
+        DETECT_NATIVE = true; //Ext.isGecko || Ext.isWebKit || Ext.isSafari || Ext.isIE10p,
         E = Ext.lib.Event,
         D = Ext.lib.Dom,
         DOC = document,
@@ -5056,9 +5056,7 @@ Ext.EventManager = function(){
     
     function checkReadyState(e){
 
-        if(Ext.isIE9m && doScrollChk()){
-            return true;
-        }
+    
         if(DOC.readyState == COMPLETE){
             fireDocReady();
             return true;
@@ -5093,9 +5091,7 @@ Ext.EventManager = function(){
             if(DETECT_NATIVE) {
                 DOC.removeEventListener(DOMCONTENTLOADED, fireDocReady, false);
             }
-            if(Ext.isIE9m && checkReadyState.bindIE){  
-                DOC.detachEvent('onreadystatechange', checkReadyState);
-            }
+            
             E.un(WINDOW, "load", arguments.callee);
         }
         if(docReadyEvent && !Ext.isReady){
@@ -5108,30 +5104,30 @@ Ext.EventManager = function(){
 
     function initDocReady(){
         docReadyEvent || (docReadyEvent = new Ext.util.Event());
-        if (DETECT_NATIVE) {
+//        if (DETECT_NATIVE) {
             DOC.addEventListener(DOMCONTENTLOADED, fireDocReady, false);
-        }
+//        }
         
-        if (Ext.isIE9m){
-            
-            
-            if(!checkReadyState()){
-                checkReadyState.bindIE = true;
-                DOC.attachEvent('onreadystatechange', checkReadyState);
-            }
-
-        }else if(Ext.isOpera ){
-            
-
-            
-            (DOC.readyState == COMPLETE && checkStyleSheets()) ||
-                DOC.addEventListener(DOMCONTENTLOADED, OperaDOMContentLoaded, false);
-
-        }else if (Ext.isWebKit){
-            
-            checkReadyState();
-        }
-        
+//        if (Ext.isIE9m){
+//            
+//            
+//            if(!checkReadyState()){
+//                checkReadyState.bindIE = true;
+//                DOC.attachEvent('onreadystatechange', checkReadyState);
+//            }
+//
+//        }else if(Ext.isOpera ){
+//            
+//
+//            
+//            (DOC.readyState == COMPLETE && checkStyleSheets()) ||
+//                DOC.addEventListener(DOMCONTENTLOADED, OperaDOMContentLoaded, false);
+//
+//        }else if (Ext.isWebKit){
+//            
+//            checkReadyState();
+//        }
+//        
         E.on(WINDOW, "load", fireDocReady);
     }
 
@@ -5587,7 +5583,7 @@ Ext.EventObject = function(){
             63275 : 35  
         },
         
-        btnMap = Ext.isIE9m ? {1:0,4:1,2:2} : {0:0,1:1,2:2};
+        btnMap = {0:0,1:1,2:2};
 
     Ext.EventObjectImpl = function(e){
         if(e){
@@ -5809,9 +5805,7 @@ Ext.apply(Ext, function(){
         emptyFn : function(){},
 
         
-        BLANK_IMAGE_URL : Ext.isIE6 || Ext.isIE7 || Ext.isAir ?
-                            'http:/' + '/www.extjs.com/s.gif' :
-                            'data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==',
+        BLANK_IMAGE_URL : 'data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==',
 
         extendX : function(supr, fn){
             return Ext.extend(supr, fn(supr.prototype));

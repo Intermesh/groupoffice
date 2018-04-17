@@ -425,13 +425,17 @@ Ext.override(Ext.Component, {
 }); 
 
 
+Ext.encode = Ext.util.JSON.encode = function(json){
+  return JSON.stringify(json);
+}
+
 /*
  * Catch JSON parsing errors and show error dialog
  * @type 
  */
 Ext.decode = Ext.util.JSON.decode = function(jsonStr){
 	try{
-		var json = eval("(" + jsonStr + ')');
+		var json = JSON.parse(jsonStr);//eval("(" + jsonStr + ')');
 		if(json && json.redirectToLogin)
 			document.location.href=BaseHref;
 		
@@ -539,25 +543,25 @@ Ext.override(Ext.form.Checkbox, {
  * @param {HTMLElement} node The node to remove
  * @method
  */
- Ext.removeNode = Ext.isIE && !Ext.isIE8 && !Ext.isIE9 && !Ext.isIE10 ? function() {
-
-	var d;
-	return function(n) {
-		if (n && n.tagName != 'BODY') {
-			(Ext.enableNestedListenerRemoval) ? Ext.EventManager.purgeElement(n, true) : Ext.EventManager.removeAll(n);
-			d = d || document.createElement('div');
-			d.appendChild(n);
-			d.innerHTML = '';
-			delete Ext.elCache[n.id];
-		}
-	};
-}() : function(n) {
-	if (n && n.parentNode && n.tagName != 'BODY') {
-		(Ext.enableNestedListenerRemoval) ? Ext.EventManager.purgeElement(n, true) : Ext.EventManager.removeAll(n);
-		n.parentNode.removeChild(n);
-		delete Ext.elCache[n.id];
-	}
-};
+// Ext.removeNode = Ext.isIE && !Ext.isIE8 && !Ext.isIE9 && !Ext.isIE10 ? function() {
+//
+//	var d;
+//	return function(n) {
+//		if (n && n.tagName != 'BODY') {
+//			(Ext.enableNestedListenerRemoval) ? Ext.EventManager.purgeElement(n, true) : Ext.EventManager.removeAll(n);
+//			d = d || document.createElement('div');
+//			d.appendChild(n);
+//			d.innerHTML = '';
+//			delete Ext.elCache[n.id];
+//		}
+//	};
+//}() : function(n) {
+//	if (n && n.parentNode && n.tagName != 'BODY') {
+//		(Ext.enableNestedListenerRemoval) ? Ext.EventManager.purgeElement(n, true) : Ext.EventManager.removeAll(n);
+//		n.parentNode.removeChild(n);
+//		delete Ext.elCache[n.id];
+//	}
+//};
 
 
 Ext.override(Ext.layout.ToolbarLayout ,{
@@ -708,6 +712,5 @@ Ext.util.Format.dateRenderer = function(format) {
 				return GO.util.dateFormat(v);
 		};
 };
-				
 				
 				

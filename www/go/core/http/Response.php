@@ -38,13 +38,13 @@ use go\core\util\StringUtil;
 class Response extends Singleton{
 	
 	public function __construct() {
-		$this->setHeader('Cache-Control', 'private');
-		$this->removeHeader('Pragma');
-		
-		$this->setHeader('Access-Control-Allow-Origin', '*');
-		$this->setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
-		$this->setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, Authorization, X-XSRFToken');
-		$this->setHeader('Access-Control-Max-Age', "1728000");
+//		$this->setHeader('Cache-Control', 'private');
+//		$this->removeHeader('Pragma');
+//		
+//		$this->setHeader('Access-Control-Allow-Origin', '*');
+//		$this->setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
+//		$this->setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, Authorization, X-XSRFToken');
+//		$this->setHeader('Access-Control-Max-Age', "1728000");
 	}
 
 	/**
