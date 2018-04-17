@@ -407,10 +407,6 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 	
 	onSubmitComplete : function(result){
 
-	},
-	
-	onBeforeNeedCurrentPasswordCheck : function(){
-
 	}
 });
 

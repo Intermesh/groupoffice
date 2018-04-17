@@ -180,6 +180,7 @@ CREATE TABLE `core_user` (
   `id` int(11) NOT NULL,
   `username` varchar(50) NOT NULL,
   `displayName` varchar(190) DEFAULT '',
+	`avatarId` BINARY(40) NULL,
   `enabled` tinyint(1) NOT NULL DEFAULT '1',
   `email` varchar(100) NOT NULL,
   `recoveryEmail` varchar(100) NOT NULL,
@@ -651,5 +652,23 @@ ALTER TABLE `core_auth_method` ADD FOREIGN KEY (`moduleId`) REFERENCES `core_mod
 
 ALTER TABLE `core_auth_password` ADD FOREIGN KEY (`userId`) REFERENCES `core_user`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
+CREATE TABLE `core_blob` (
+  `id` BINARY(40) NOT NULL,
+  `type` varchar(129) NOT NULL,
+  `size` bigint(20) NOT NULL DEFAULT '0',
+  `modified` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `createdAt` DATETIME NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
 
 ALTER TABLE `core_search` ADD FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+
+ALTER TABLE `core_user` 
+ADD INDEX `fk_user_avatar_id_idx` (`avatarId` ASC);
+ALTER TABLE `core_user` 
+ADD CONSTRAINT `fk_user_avatar_id`
+  FOREIGN KEY (`avatarId`)
+  REFERENCES `core_blob` (`id`)
+  ON DELETE RESTRICT
+  ON UPDATE NO ACTION;

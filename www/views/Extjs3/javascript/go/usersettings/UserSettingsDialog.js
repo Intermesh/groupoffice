@@ -201,7 +201,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		// If the currentPassword is set, then add it to the posted values
 		if(!Ext.isEmpty(currentPassword)){
 			if(!values.password){
-				values.password = {};
+				delete values.password;
 			}
 			values.currentPassword = currentPassword;
 		}
@@ -254,28 +254,17 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	 */
 	needCurrentPassword : function(){
 		
-		var needed = false;
-		
-		this.tabPanel.items.each(function(pnl,index,total){
-			
-			if(pnl.onBeforeNeedCurrentPasswordCheck){
-				pnl.onBeforeNeedCurrentPasswordCheck();
-			}
-			
-			if(pnl.passwordProtected){
-				needed = this.checkDirty(pnl.getId());
-				
-				if(needed){
-					return false;
+		var needed = false,
+			accountPanel = this.tabPanel.getItem('pnl-account-settings');
+		accountPanel.findByType('field').forEach(function(item) {
+			if(item.needPasswordForChange) {
+				item.validate();
+				if(item.isDirty()){
+					needed = true;
 				}
-			}			
-		},this);
-		
-		if(!needed){
-			return false;
-		} else {
-			return !this.checkCurrentPasswordSet();
-		}
+			}
+		});
+		return needed ? !this.checkCurrentPasswordSet() : false;
 	},
 	
 	checkCurrentPasswordSet : function(){

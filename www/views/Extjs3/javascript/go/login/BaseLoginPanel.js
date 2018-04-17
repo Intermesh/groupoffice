@@ -34,9 +34,9 @@ go.login.BaseLoginPanel = Ext.extend(Ext.FormPanel, {
 	},
 	
 	submit : function(form) {
+		
 		go.AuthenticationManager.doAuthentication(form.wizard.getLayout().activeItem.getPostData(),function(authMan, success, result){
 			
-
 			var activeItemId = this.wizard.getLayout().activeItem.id;
 
 			if(result.errors && result.errors[activeItemId]){

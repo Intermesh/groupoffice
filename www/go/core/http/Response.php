@@ -3,7 +3,7 @@
 namespace go\core\http;
 
 use DateTime;
-use go\core\HttpException;
+use go\core\http;
 use go\core\Singleton;
 use go\core\util\StringUtil;
 
@@ -136,7 +136,7 @@ class Response extends Singleton{
 	public function setStatus($httpCode, $text = null) {
 
 		if (!isset($text)) {
-			$text = HttpException::$codes[$httpCode];
+			$text = http\Exception::$codes[$httpCode];
 		}
 		
 		header("HTTP/" . $this->httpVersion . " " . $httpCode . " " . $text);
@@ -226,7 +226,16 @@ class Response extends Singleton{
 	 * @param string $data
 	 */
 	public function output($data = null) {
+		
 		if (isset($data)) {
+			if(is_array($data)) {
+				$data = json_encode($data);
+				if(empty($data)){
+					throw new Exception("JSON encoding error: '".json_last_error_msg()."'.\n\nArray data from server:\n\n" . var_export($data, true));
+				}
+				$this->setContentType('application/json; charset=UTF-8');
+			} 
+			$this->sendHeaders();
 			echo $data;
 		}
 	}

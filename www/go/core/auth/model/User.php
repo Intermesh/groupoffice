@@ -49,6 +49,8 @@ class User extends Entity {
 	 * @var string
 	 */
 	public $displayName;
+	
+	public $avatarId;
 
 	public $enabled;
 	/**

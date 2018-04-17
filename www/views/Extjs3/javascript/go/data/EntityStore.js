@@ -127,9 +127,12 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 		for (var i = 0; i < ids.length; i++) {
 			var id = ids[i];
+			if(!id) {
+				throw "Empty ID passed to EntityStore.get()";
+			}
 			this.data[id] ? entities.push(this.data[id]) : unknownIds.push(id);
+			
 		}
-
 		if (unknownIds.length) {
 			go.Jmap.request({
 				method: this.entity.name + "/get",
@@ -145,7 +148,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 						console.log("Item not found", response);
 						return;
 					}
-					this.state = response.state;					
+					this.state = response.state;				
 					this.get(ids, callback, scope);
 					
 				},

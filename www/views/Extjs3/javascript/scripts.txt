@@ -257,6 +257,7 @@ views/Extjs3/javascript/go/form/FormWindow.js
 views/Extjs3/javascript/go/form/FormFieldSet.js
 views/Extjs3/javascript/go/form/BasicForm.js
 views/Extjs3/javascript/go/form/DateField.js
+views/Extjs3/javascript/go/form/FileField.js
 views/Extjs3/javascript/go/form/ComboBox.js
 views/Extjs3/javascript/go/form/multiselect/Field.js
 views/Extjs3/javascript/go/form/multiselect/Window.js
