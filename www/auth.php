@@ -156,10 +156,14 @@ try {
 	];
 
 	if ($token->isAuthenticated()) {
-		$response['accessToken'] = $token->accessToken;
-		$response['capabilities'] = Capabilities::get();
-		$response['user'] = $token->getUser()->toArray();
-		output($response, 201, "Authentication is complete, access token created.");
+		output([
+			'accessToken' => $token->accessToken,
+			'capabilities' => Capabilities::get(),
+			'apiUrl' => Request::get()->getHostname().'/jmap.php',
+			'downloadUrl' => Request::get()->getHostname().'/download.php?blob={blobId}',
+			'uploadUrl' => Request::get()->getHostname().'/upload.php',
+			'clientSettings' => $token->getUser()->toArray()
+		], 201, "Authentication is complete, access token created.");
 	}
 
 
