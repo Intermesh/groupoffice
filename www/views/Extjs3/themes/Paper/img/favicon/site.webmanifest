@@ -1,6 +1,7 @@
 {
-    "name": "",
-    "short_name": "",
+    "name": "Group-Office",
+    "short_name": "Group-Office",
+    "description": "Group-Office groupware",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
