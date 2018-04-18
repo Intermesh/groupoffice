@@ -24,8 +24,8 @@ class Blob extends orm\Entity {
 			$blob = new self();
 			$blob->id = $hash;
 			$blob->size = filesize($path);
-			$blob->tmpFile = $path;
 		}
+		$blob->tmpFile = $path;
 		return $blob;
 	}
 	
@@ -46,7 +46,6 @@ class Blob extends orm\Entity {
 	}
 	
 	/**
-	 * 
 	 * @return \go\core\fs\MetaData
 	 */
 	public function getMetaData() {
@@ -54,9 +53,6 @@ class Blob extends orm\Entity {
 	}
 
 	protected function internalSave() {
-		if(!$this->isNew()) {
-			return true;
-		}
 		if (!is_dir(dirname($this->path()))) {
 			mkdir(dirname($this->path()), 0775, true);
 		}
@@ -67,12 +63,25 @@ class Blob extends orm\Entity {
 				file_put_contents($this->path(), $this->strContent);
 			}
 		}
+		if(!$this->isNew()) {
+			return true;
+		}
 		return parent::internalSave();
+	}
+	
+	protected function internalDelete() {
+		if(parent::internalDelete()) {
+			if(is_file($this->path())) {
+				unlink($this->path());
+			}
+			return true;
+		}
+		return false;
 	}
 
 	public function path() {
-		$filePath = substr_replace(substr_replace($this->id,'/',2,0),'/',5,0); // 1st-2 and 2nd-2 chars = dir and subdir
-		return GO()->getDataFolder()->getPath() . '/data/' . $filePath;
+		$dir = substr($this->id,0,2) . '/' .substr($this->id,2,2). '/';
+		return GO()->getDataFolder()->getPath() . '/data/'.$dir.$this->id;
 	}
 
 }
