@@ -54,7 +54,7 @@ go.modules.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'modifiedAt'
 				},
 				{	
-					hidden: false,
+					hidden: true,
 					header: t('Created by'),
 					width: 160,
 					sortable: true,
@@ -64,7 +64,7 @@ go.modules.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 					}
 				},
 				{	
-					hidden: false,
+					hidden: true,
 					header: t('Modified by'),
 					width: 160,
 					sortable: true,

@@ -7,7 +7,6 @@ use go\core\App;
 use go\core\db\Query;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\orm\Entity;
-use go\core\orm\TextFilter;
 
 abstract class ReadOnlyEntityController extends Controller {	
 	
@@ -63,46 +62,28 @@ abstract class ReadOnlyEntityController extends Controller {
 
 		$query = $cls::find(['id'])
 						->limit($params['limit'])
-						->offset($params['position'])
-						->orderBy($this->transformSort($params['sort']));
+						->offset($params['position']);;
 
-		$filterClass = $this->getFilterClass();
-		$filters = $filterClass::fromArray($params['filter'], $cls, $query);		
+		$cls::sort($query, $this->transformSort($params['sort']));
 		
-		$cls::applyAclToQuery($query, $this->getQueryPermissionLevel($filters));
+		
+		foreach($params['filter'] as $filter) {				
+			if(isset($filter['conditions']) && isset($filter['operator'])) {
+				$subCriteria = new Query();
+				foreach($filter['conditions'] as $condition) {
+					$cls::filter($subCriteria, $filter);	
+				}
+				$query->where($subCriteria, $filter['operator']);
+			} else
+			{			
+				 $cls::filter($query, $filter);			
+			}
+		}
 
 		//we don't need entities here. Just a list of id's.
 		$query->selectSingleValue($query->getTableAlias() . '.id');
 		
 		return $query;
-	}
-	
-	
-	private function getQueryPermissionLevel($filters) {
-		
-		foreach($filters as $filter) {
-			if($filter instanceof \go\core\orm\Filter) {
-				return $filter->getPermissionLevel();
-			}
-		}
-		
-		return Acl::LEVEL_READ;
-		
-	}
-	
-	/**
-	 * Get the class to filter entities
-	 * 
-	 * @return string
-	 */
-	private function getFilterClass() {		
-		$cls = $this->entityClass();
-		$default = $cls . 'Filter';
-		if (class_exists($cls . 'Filter')) {
-			return $default;
-		} else {
-			return TextFilter::class;
-		}
 	}
 	
 	/**
@@ -163,7 +144,7 @@ abstract class ReadOnlyEntityController extends Controller {
 		$totalQuery = clone $idsQuery;
 		$total = (int) $totalQuery
 										->selectSingleValue("count(*)")
-										->orderBy(null)
+										->orderBy([], false)
 										->limit(1)
 										->offset(0)
 										->execute()
