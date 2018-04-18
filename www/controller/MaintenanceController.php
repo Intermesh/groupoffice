@@ -35,6 +35,11 @@ class MaintenanceController extends AbstractController {
 		GO::cache()->set('test','test');
 	}
 	
+	protected function actionCollectGarbage() {
+		$cg = new \go\core\fs\GarbageCollector;
+		$cg->execute();
+	}
+	
 	protected function actionDownloadFromShop($params){
 		$this->requireCli();
 		
