@@ -21,17 +21,18 @@ go.modules.files.MainPanel = Ext.extend(Ext.Panel, {
 	initComponent: function () {
 
 
-		this.folderTree = new go.modules.files.FolderTree({
+		this.sideNav = new go.modules.files.SideNav({
 			region: 'west',
 			cls: 'go-sidenav',
 			width: dp(280),
-			split: true
+			split: true,
+			items: []
 		});
 
-		this.folderTree.getSelectionModel().on('selectionchange', function (sm) {
-			this.nodeGrid.getStore().baseParams.filter = [{parentId: sm.getSelected().id}];
-			this.nodeGrid.getStore().load();
-		}, this);
+//		this.folderTree.getSelectionModel().on('selectionchange', function (sm) {
+//			this.nodeGrid.getStore().baseParams.filter = [{parentId: sm.getSelected().id}];
+//			this.nodeGrid.getStore().load();
+//		}, this);
 
 		this.nodeGrid = new go.modules.files.NodeGrid({
 			region: 'center',
@@ -40,7 +41,7 @@ go.modules.files.MainPanel = Ext.extend(Ext.Panel, {
 					cls: 'go-narrow',
 					iconCls: "ic-menu",
 					handler: function () {
-						this.folderTree.show();
+						this.sideNav.show();
 					},
 					scope: this
 				},
@@ -60,12 +61,12 @@ go.modules.files.MainPanel = Ext.extend(Ext.Panel, {
 			],
 			listeners: {
 				viewready: function (grid) {
-					this.folderTree.getStore().load({
-						callback: function (store) {
-							this.folderTree.getSelectionModel().selectRow(0);
-						},
-						scope: this
-					});
+//					this.folderTree.getStore().load({
+//						callback: function (store) {
+//							this.folderTree.getSelectionModel().selectRow(0);
+//						},
+//						scope: this
+//					});
 				},
 
 				rowdblclick: function (grid, rowIndex, e) {
@@ -91,13 +92,13 @@ go.modules.files.MainPanel = Ext.extend(Ext.Panel, {
 			region: 'center',
 			split: true,
 			tbar: [{
-					cls: 'go-narrow',
-					iconCls: "ic-arrow-back",
-					handler: function () {
-						this.westPanel.show();
-					},
-					scope: this
-				}]
+				cls: 'go-narrow',
+				iconCls: "ic-arrow-back",
+				handler: function () {
+					this.westPanel.show();
+				},
+				scope: this
+			}]
 		});
 
 		this.westPanel = new Ext.Panel({
@@ -109,7 +110,7 @@ go.modules.files.MainPanel = Ext.extend(Ext.Panel, {
 			narrowWidth: dp(400), //this will only work for panels inside another panel with layout=responsive. Not ideal but at the moment the only way I could make it work
 			items: [
 				this.nodeGrid, //first is default in narrow mode
-				this.folderTree			]
+				this.sideNav			]
 		});
 
 		this.items = [

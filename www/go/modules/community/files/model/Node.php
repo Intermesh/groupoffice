@@ -5,8 +5,8 @@ use go\core\acl\model;
 
 class Node extends model\AclItemEntity {
 
-	use go\core\orm\CustomFieldsTrait;
-	use go\core\orm\SearchableTrait;
+	use \go\core\orm\CustomFieldsTrait;
+	use \go\core\orm\SearchableTrait;
 	
 	public $name;
 	/**

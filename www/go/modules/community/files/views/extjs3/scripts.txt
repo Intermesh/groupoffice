@@ -1,0 +1,6 @@
+Module.js
+MainPanel.js
+FilesDetailPanel.js
+SideNav.js
+NodeDetail.js
+NodeGrid.js

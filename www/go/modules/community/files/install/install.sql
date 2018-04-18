@@ -9,7 +9,7 @@ CREATE TABLE `files_node` (
   `storageId` int(11) NOT NULL,
   `blobId` binary(40) DEFAULT NULL COMMENT 'When blobId is NULL then deletedAt OR isDirectory need to be set\n',
   `parentId` int(11) NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(190) NOT NULL,
   `createdAt` datetime NOT NULL,
   `modifiedAt` datetime NOT NULL,
   `ownedBy` int(11) DEFAULT NULL,
@@ -19,8 +19,10 @@ CREATE TABLE `files_node` (
   `deletedBy` int(11) DEFAULT NULL,
   `aclId` int(11) NOT NULL,
   `isLocked` tinyint(11) NOT NULL DEFAULT 0,
-  `isDirectory` tinyint(1) UNSIGNED NOT NULL DEFAULT '1'
-) ENGINE=InnoDB DEFAULT;
+  `isDirectory` tinyint(1) UNSIGNED NOT NULL DEFAULT '1',
+  `token` binary(40) DEFAULT NULL,
+  `tokenExpiresAt` datetime DEFAULT NULL
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -34,21 +36,7 @@ CREATE TABLE `files_node_user` (
   `userId` int(11) NOT NULL,
   `bookmarked` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
   `touchedAt` datetime DEFAULT NULL COMMENT 'Determine the recent touched files'
-) ENGINE=InnoDB DEFAULT;
-
--- --------------------------------------------------------
-
---
--- Tabelstructuur voor tabel `files_share`
---
-
-DROP TABLE IF EXISTS `files_share`;
-CREATE TABLE `files_share` (
-  `id` int(11) NOT NULL,
-  `token` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `tokenPassword` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `tokenExpiresAt` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -62,7 +50,7 @@ CREATE TABLE `files_storage` (
   `quota` int(11) NOT NULL DEFAULT '0',
   `usage` int(11) NOT NULL DEFAULT '0',
   `ownedBy` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -73,10 +61,11 @@ CREATE TABLE `files_storage` (
 DROP TABLE IF EXISTS `files_version`;
 CREATE TABLE `files_version` (
   `id` int(11) NOT NULL,
+  `nodeId` int(11) NOT NULL,
   `blobId` binary(40) NOT NULL,
   `createdAt` datetime NOT NULL,
   `createdBy` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT;
+) ENGINE=InnoDB;
 
 --
 -- Indexen voor geëxporteerde tabellen
@@ -100,39 +89,27 @@ ALTER TABLE `files_node_user`
   ADD KEY `fk_files_node_has_core_user_core_user1_idx` (`userId`),
   ADD KEY `fk_files_node_has_core_user_files_node1_idx` (`nodeId`);
 
---
--- Indexen voor tabel `files_share`
---
-ALTER TABLE `files_share`
-  ADD PRIMARY KEY (`id`);
-
---
 -- Indexen voor tabel `files_storage`
 --
 ALTER TABLE `files_storage`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_files_storage_files_node1_idx` (`id`),
-  ADD KEY `fk_files_storage_core_acl1_idx` (`aclId`);
+  ADD KEY `fk_files_storage_files_node1_idx` (`id`);
 
 --
 -- Indexen voor tabel `files_version`
 --
 ALTER TABLE `files_version`
   ADD PRIMARY KEY (`id`,`blobId`),
-  ADD KEY `fk_files_version_core_blob1_idx` (`blobId`);
+  ADD KEY `fk_files_version_core_blob1_idx` (`blobId`),
+  ADD KEY `fk_files_version_core_node1_idx` (`nodeId`);
 
---
--- AUTO_INCREMENT voor geëxporteerde tabellen
---
-
+ALTER TABLE `files_version`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT voor een tabel `files_node`
 --
 ALTER TABLE `files_node`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
---
--- Beperkingen voor geëxporteerde tabellen
---
 
 --
 -- Beperkingen voor tabel `files_node`
@@ -142,6 +119,8 @@ ALTER TABLE `files_node`
   ADD CONSTRAINT `fk_files_node_files_node1` FOREIGN KEY (`parentId`) REFERENCES `files_node` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_files_node_files_storage1` FOREIGN KEY (`storageId`) REFERENCES `files_storage` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
+ALTER TABLE `files_version`
+  ADD CONSTRAINT `fk_files_node_files_version1` FOREIGN KEY (`nodeId`) REFERENCES `files_node` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 --
 -- Beperkingen voor tabel `files_node_user`
 --
@@ -150,16 +129,9 @@ ALTER TABLE `files_node_user`
   ADD CONSTRAINT `fk_files_node_has_core_user_files_node1` FOREIGN KEY (`nodeId`) REFERENCES `files_node` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
--- Beperkingen voor tabel `files_share`
---
-ALTER TABLE `files_share`
-  ADD CONSTRAINT `fk_files_share_files_node1` FOREIGN KEY (`id`) REFERENCES `files_node` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-
---
 -- Beperkingen voor tabel `files_storage`
 --
 ALTER TABLE `files_storage`
-  ADD CONSTRAINT `fk_files_storage_core_acl1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_files_storage_files_node1` FOREIGN KEY (`id`) REFERENCES `files_node` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
