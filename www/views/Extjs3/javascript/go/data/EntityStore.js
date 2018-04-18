@@ -113,17 +113,20 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	 * Get an entity
 	 * 
 	 * @param {type} ids
-	 * @param {type} callback
+	 * @param {type} cb
 	 * @returns {undefined}
 	 */
-	get: function (ids, callback, scope) {
+	get: function (ids, cb, scope) {
 
 		if(!ids){
 			ids = [];
 		}
+		
+		if(!Ext.isArray(ids)) {
+			throw "ids must be an array";
+		}
 
-		var entities = [],
-						unknownIds = [];
+		var entities = [], unknownIds = [];
 
 		for (var i = 0; i < ids.length; i++) {
 			var id = ids[i];
@@ -149,14 +152,17 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 						return;
 					}
 					this.state = response.state;				
-					this.get(ids, callback, scope);
-					
+					this.get(ids, cb, scope);					
 				},
 				scope: this
 			});
-		} else {
-			callback.call(scope || this, entities);
+			return false;
+		} 
+		
+		if(cb) {		
+			cb.call(scope || this, entities);			
 		}
+		return entities;
 	},
 	
 	findBy : function(fn, scope, startIndex) {

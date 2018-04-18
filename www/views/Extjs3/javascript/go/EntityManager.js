@@ -28,8 +28,24 @@
         package: package,
         goto: function (id) {
           go.Router.goto(this.name.toLowerCase() + "/" + id);
-        }
+        },
+			
       };     
+			
+			
+			go.data.types[name] = {
+				convert: function (v, data) {
+					if(!data[this.key]) {
+						return "-";
+					}
+					
+					var entities = go.Stores.get(name).get([data[this.key]]);					
+					return entities ? entities[0] : '-';	
+				},
+				sortType: Ext.data.SortTypes.none,
+				type: "entity",
+				entity: name
+			}
     },
 
     get: function (name) {      

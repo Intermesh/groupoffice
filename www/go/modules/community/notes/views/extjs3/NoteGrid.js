@@ -3,7 +3,17 @@ go.modules.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 	initComponent: function () {
 
 		this.store = new go.data.Store({
-			fields: ['id', 'name', 'content', 'excerpt', {name: 'createdAt', type: 'date'}, {name: 'modifiedAt', type: 'date'}, 'permissionLevel'],
+			fields: [
+				'id', 
+				'name', 
+				'content', 
+				'excerpt', 
+				{name: 'createdAt', type: 'date'}, 
+				{name: 'modifiedAt', type: 'date'}, 
+				{name: 'creator', type: go.data.types.User, key: 'createdBy'},
+				{name: 'modifier', type: go.data.types.User, key: 'modifiedBy'},
+				'permissionLevel'
+			],
 			entityStore: go.Stores.get("Note")
 		});
 
@@ -42,6 +52,26 @@ go.modules.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 					width: 160,
 					sortable: true,
 					dataIndex: 'modifiedAt'
+				},
+				{	
+					hidden: false,
+					header: t('Created by'),
+					width: 160,
+					sortable: true,
+					dataIndex: 'creator',
+					renderer: function(v) {
+						return v ? v.displayName : "-";
+					}
+				},
+				{	
+					hidden: false,
+					header: t('Modified by'),
+					width: 160,
+					sortable: true,
+					dataIndex: 'modifier',
+					renderer: function(v) {
+						return v ? v.displayName : "-";
+					}
 				}
 			],
 			viewConfig: {

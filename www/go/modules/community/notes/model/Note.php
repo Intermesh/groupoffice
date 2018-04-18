@@ -58,5 +58,22 @@ class Note extends AclItemEntity {
 		$text = preg_replace("/\s+/", " ", strip_tags(str_replace(">", "> ",$this->content)));
 		return StringUtil::cutString($text, 200);
 	}
+	
+	public static function filter(Query $query, array $filter) {
+		if(!empty($filter['q'])) {
+			$query->andWhere(
+					(new Criteria())
+					->where('name','LIKE', '%' . $value . '%')
+					->orWhere('content', 'LIKE', '%' . $value . '%')
+					);
+		}
+		
+		return $query;
+	}
+	
+	public static function sort(Query $query, array $sort) {
+		return $query;
+	}
+	
 
 }
