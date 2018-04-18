@@ -300,7 +300,25 @@ abstract class Entity extends Property {
 	}
 	
 	/**
-	 * Sort entities
+	 * Sort entities.
+	 * 
+	 * By default you can sort on all database columns. But you can override this
+	 * to implement custom logic.
+	 * 
+	 * @example
+	 * ```
+	 * public static function sort(Query $query, array $sort) {
+	 * 		
+	 * 		if(isset($sort['creator'])) {			
+	 * 			$query->join('core_user', 'u', 'n.createdBy = u.id', 'LEFT')->orderBy(['u.displayName' => $sort['creator']]);			
+	 * 		} 
+	 * 
+	 * 		
+	 * 		return parent::sort($query, $sort);
+	 * 		
+	 * 	}
+	 * 
+	 * ```
 	 * 
 	 * @param Query $query
 	 * @param array $sort eg. ['field' => 'ASC']
