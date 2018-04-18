@@ -208,6 +208,15 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		return GO::t($lastPart, $module);
 	}
+  
+  /**
+   * For compatibility with new framework
+   * @return type
+   */
+  public static function getClientName() {
+    $parts = explode('\\',static::class);
+		return array_pop($parts);
+  }
 
 
 	/**
