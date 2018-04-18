@@ -11,23 +11,23 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	},
 	
 	restoreState : function() {
-		if(!window.localStorage.entityStores) {
-			window.localStorage.entityStores = {};
-		}
-		
-		var json = window.localStorage["entityStore-" + this.entity.name];		
-		if(json) {
-			var state = JSON.parse(json);			
-			this.data = state.data;
-			this.state = state.state;			
-		}
+//		if(!window.localStorage.entityStores) {
+//			window.localStorage.entityStores = {};
+//		}
+//		
+//		var json = window.localStorage["entityStore-" + this.entity.name];		
+//		if(json) {
+//			var state = JSON.parse(json);			
+//			this.data = state.data;
+//			this.state = state.state;			
+//		}
 	},
 	
 	saveState : function() {
-		var state = JSON.stringify({
-			state: this.state,
-			data: this.data
-		});
+//		var state = JSON.stringify({
+//			state: this.state,
+//			data: this.data
+//		});
 		
 //		if(!window.localStorage.entityStores) {
 //			window.localStorage.entityStores = {};
@@ -127,9 +127,12 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 		for (var i = 0; i < ids.length; i++) {
 			var id = ids[i];
+			if(!id) {
+				throw "Empty ID passed to EntityStore.get()";
+			}
 			this.data[id] ? entities.push(this.data[id]) : unknownIds.push(id);
+			
 		}
-
 		if (unknownIds.length) {
 			go.Jmap.request({
 				method: this.entity.name + "/get",
@@ -145,7 +148,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 						console.log("Item not found", response);
 						return;
 					}
-					this.state = response.state;					
+					this.state = response.state;				
 					this.get(ids, callback, scope);
 					
 				},
@@ -172,7 +175,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	 * 
 	 * ```
 	 * 
-	 * go.stores.link.set({
+	 * go.Stores.get("link").set({
 	 *		create: links
 	 *	}, function(options, success, response){}, this);
 	 * 

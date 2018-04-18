@@ -194,13 +194,3 @@ GO.customfields.displayPanelBlocksTemplate =
 
 
 
-/*
- * This will add the module to the main tabpanel filled with all the modules
- */
-
-GO.moduleManager.addModule('customfields', GO.customfields.MainPanel, {
-	title : t("Custom fields", "customfields"),
-	iconCls : 'go-tab-icon-customfields',
-	admin :true,
-	requiredPermissionLevel: GO.permissionLevels.write
-});

@@ -66,7 +66,7 @@ GO.ModuleManager = Ext.extend(function(){
 		
 		var panels = [];
 		
-		for(var i=0;i<this.settingsSortOrder.length;i++)
+		for(var i=0,l=this.settingsSortOrder.length;i<l;i++)
 		{
 			panels.push(this.getSettingsPanel(this.settingsSortOrder[i]));	
 		}
@@ -74,7 +74,7 @@ GO.ModuleManager = Ext.extend(function(){
 	},
 	
 	addModule : function(moduleName, panelClass, panelConfig, subMenuConfig) {
-		go.ModuleManager.register(moduleName, {
+		go.Modules.register("legacy", moduleName, {
 			title: panelConfig.title,
 			requiredPermissionLevel: panelConfig.requiredPermissionLevel || GO.permissionLevels.read,
 			mainPanel: panelClass,
@@ -140,7 +140,7 @@ GO.ModuleManager = Ext.extend(function(){
 		this.modules[moduleName]=true;
 		if(this.readyFunctions[moduleName])
 		{
-			for(var i=0;i<this.readyFunctions[moduleName].length;i++)
+			for(var i=0,l=this.readyFunctions[moduleName].length;i<l;i++)
 			{
 				var c = this.readyFunctions[moduleName][i];
 				c.fn.call(c.fn.scope,moduleName,this);
@@ -179,7 +179,7 @@ GO.ModuleManager = Ext.extend(function(){
 		
 		var panels = [];
 		
-		for(var i=0;i<this.sortOrder.length;i++)
+		for(var i=0, l = this.sortOrder.length;i<l;i++)
 		{
 			panels.push(this.getPanel(this.sortOrder[i]));	
 		}
@@ -189,7 +189,7 @@ GO.ModuleManager = Ext.extend(function(){
 	getAllPanelConfigs : function(){
 		var configs = [];
 
-		for(var i=0;i<this.sortOrder.length;i++)
+		for(var i=0, l = this.sortOrder.length;i<l;i++)
 		{
 			configs.push(this.panelConfigs[this.sortOrder[i]]);
 		}
@@ -197,7 +197,7 @@ GO.ModuleManager = Ext.extend(function(){
 	},
 	
 	userHasModule : function(module){
-		return go.ModuleManager.isAvailable(module);
+		return go.Modules.isAvailable("community", module);
 	},
 	
 	getAllSubmenus : function(){

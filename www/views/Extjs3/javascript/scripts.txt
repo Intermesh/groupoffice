@@ -1,3 +1,6 @@
+views/Extjs3/javascript/go/go.js
+views/Extjs3/javascript/go/Translate.js
+
 views/Extjs3/javascript/common.js
 
 views/Extjs3/javascript/MainLayout.js
@@ -112,7 +115,6 @@ views/Extjs3/javascript/panels/GroupTabPanel.js
 views/Extjs3/javascript/panels/Portal.js
 views/Extjs3/javascript/panels/PortalColumn.js
 views/Extjs3/javascript/panels/Portlet.js
-views/Extjs3/javascript/panels/QuickAddPanel.js
 
 views/Extjs3/javascript/form/UploadPCForm.js
 views/Extjs3/javascript/Export.js
@@ -232,8 +234,6 @@ views/Extjs3/javascript/calendar/EventRecord.js
 views/Extjs3/javascript/calendar/WeekEventRenderer.js
 
 
-views/Extjs3/javascript/go/go.js
-
 
 
 views/Extjs3/javascript/go/flux/Dispatcher.js
@@ -257,6 +257,7 @@ views/Extjs3/javascript/go/form/FormWindow.js
 views/Extjs3/javascript/go/form/FormFieldSet.js
 views/Extjs3/javascript/go/form/BasicForm.js
 views/Extjs3/javascript/go/form/DateField.js
+views/Extjs3/javascript/go/form/FileField.js
 views/Extjs3/javascript/go/form/ComboBox.js
 views/Extjs3/javascript/go/form/multiselect/Field.js
 views/Extjs3/javascript/go/form/multiselect/Window.js
@@ -295,7 +296,6 @@ views/Extjs3/javascript/go/usersettings/LookAndFeelPanel.js
 views/Extjs3/javascript/go/usersettings/UserSettingsDialog.js
 
 views/Extjs3/javascript/go/Router.js
-views/Extjs3/javascript/go/Search.js
 views/Extjs3/javascript/go/PasswordPrompt.js
 
 views/Extjs3/javascript/go/User.js

@@ -32,7 +32,7 @@ GO.email.AllAttachmentContextMenu = Ext.extend(Ext.menu.Menu, {
 				
 		mnuItems.push(this.downloadButton);
 		
-		if(go.ModuleManager.isAvailable("files")){
+		if(go.Modules.isAvailable("legacy", "files")){
 			this.saveButton = new Ext.menu.Item({
 				iconCls: 'btn-save',
 				text: t("Save all to personal folder", "email"),

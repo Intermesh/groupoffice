@@ -559,3 +559,13 @@ $updates['201803081044'][] = "ALTER TABLE `ab_addresslist_group`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;";
 
 $updates['201803081045'][] = "ALTER TABLE `ab_addresslists` ADD `addresslist_group_id` INT NULL AFTER `id`;";
+
+$updates["201803291609"][] = "ALTER TABLE `ab_contacts` 
+ADD COLUMN `avatarId` BINARY(40) NULL AFTER `photo`,
+ADD INDEX `fk_contact_avatar_id_idx` (`avatarId` ASC);
+ALTER TABLE `ab_contacts` 
+ADD CONSTRAINT `fk_contact_avatar_id`
+  FOREIGN KEY (`avatarId`)
+  REFERENCES `core_blob` (`id`)
+  ON DELETE RESTRICT
+  ON UPDATE NO ACTION;";

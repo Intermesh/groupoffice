@@ -17,9 +17,9 @@ go.modules.notes.MainPanel = Ext.extend(Ext.Panel, {
 	layoutConfig: {
 		triggerWidth: 1000
 	},
-	
 
 	initComponent: function () {
+
 
 		this.noteBookGrid = new go.modules.notes.NoteBookGrid({
 			region: 'west',
@@ -28,9 +28,9 @@ go.modules.notes.MainPanel = Ext.extend(Ext.Panel, {
 			split: true,
 			tbar: [{
 					xtype: 'tbtitle',
-					text: t('Notebooks', 'notes')
+					text: t('Notebooks')
 				}, '->', {
-					disabled: go.ModuleManager.get('notes').permissionLevel < GO.permissionLevels.write,
+					disabled: go.Modules.get("community", 'notes').permissionLevel < GO.permissionLevels.write,
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
@@ -134,7 +134,7 @@ go.modules.notes.MainPanel = Ext.extend(Ext.Panel, {
 		});
 
 		this.noteGrid.getSelectionModel().on('rowselect', function (sm, rowIndex, record) {
-			go.Router.goto("notes/note/" + record.id);
+			go.Router.goto("note/" + record.id);
 		}, this);
 
 		this.noteDetail = new go.modules.notes.NoteDetail({

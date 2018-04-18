@@ -210,7 +210,7 @@ Ext.extend(GO.calendar.ListGrid, Ext.grid.GridPanel, {
 				});
 			}else	if(record.data.contact_id)
 			{
-				go.Router.goto("#addressbook/contact/"+record.data.contact_id);
+				go.Router.goto("#contact/"+record.data.contact_id);
 			}
 			
 		}, this);
@@ -226,7 +226,7 @@ Ext.extend(GO.calendar.ListGrid, Ext.grid.GridPanel, {
 			var theEventData = grid.getStore().getAt(rowIndex).data;
 			console.log(theEventData);
 			if (theEventData.model_name=='GO\\Tasks\\Model\\Task') {
-				if(go.ModuleManager.isAvailable("tasks")) {
+				if(go.Modules.isAvailable("legacy", "tasks")) {
 					if (!this.taskContextMenu)
 						this.taskContextMenu = new GO.calendar.TaskContextMenu();
 

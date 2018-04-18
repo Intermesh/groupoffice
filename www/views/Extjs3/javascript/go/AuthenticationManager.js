@@ -28,6 +28,8 @@
 		 * @type {Array} string
 		 */
 		userMethods: [],
+		
+		rememberLogin:false,
 
 		/**
 		 * Register new authenticator
@@ -117,6 +119,22 @@
 				}
 			});
 		},
+		
+		logout: function (first) {
+
+			if (Ext.Ajax.isLoading())
+			{
+				if (first) {
+					Ext.getBody().mask(t("Loading..."));
+				}
+				this.logout.defer(500, this, [true]);
+			} else
+			{
+				window.localStorage.removeItem("accessToken");
+				window.sessionStorage.removeItem("accessToken");
+				document.location = GO.url('auth/logout');
+			}
+		},
 
 		doAuthentication: function (methods, cb, scope) {
 
@@ -158,51 +176,35 @@
 		},
 
 		onAuthenticated: function (result) {
-			this.accessToken = result.accessToken;
-
+			var storage = go.AuthenticationManager.rememberLogin ? 'localStorage' : 'sessionStorage';
+			window[storage].setItem('accessToken', result.accessToken);
+			
 			if (GO.loginDialog) {
 				GO.loginDialog.close();
 			}
-			go.User = result.user;
+			
+			Ext.applyIf(go.User,{
+				apiUrl: result.apiUrl,
+				downloadUrl: result.downloadUrl,
+				uploadUrl: result.uploadUrl
+			});
+			Ext.applyIf(go.User, result.clientSettings);
+			Ext.applyIf(GO.settings, result.clientSettings); // Backwards compatible
 
 			var script = document.createElement('script');
-
 			script.setAttribute('src', GO.url('core/moduleScripts'));
-
 			document.body.appendChild(script)
 
-
-			//console.log('tes2t');
-			//var url = GO.settings.config.host;
-			//document.location.href=url;
-			Ext.Ajax.defaultHeaders = {
-				'Authorization': 'Bearer ' + result.accessToken,
-				'Accept-Language': GO.lang.iso
-			};
-
+			Ext.Ajax.defaultHeaders['Authorization'] = 'Bearer ' + result.accessToken;
 
 			this.fireEvent("authenticated", this, result);
-
-			//Deprecated settings for old modules not refactored yet.
-			GO.request({
-				url: 'core/clientsettings',
-				success: function (response, options, result) {
-
-					//Apply user settings. Todo, these settings need refactoring.
-					GO.util.mergeObjects(GO, result.GO);
-					
-					//load state
-					Ext.state.Manager.setProvider(new GO.state.HttpProvider());
-
-					GO.mainLayout.onAuthentication();
-
-					GO.mainLayout.on('render', function () {
-						go.Router.goto(go.Router.pathBeforeLogin);
-					}, this, {single: true});
-
-				}
-			});
-
+			
+			//load state
+			Ext.state.Manager.setProvider(new GO.state.HttpProvider());
+			GO.mainLayout.onAuthentication();
+			GO.mainLayout.on('render', function () {
+				go.Router.goto(go.Router.pathBeforeLogin);
+			}, this, {single: true});
 
 		}
 	});

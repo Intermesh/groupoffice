@@ -13,14 +13,13 @@ namespace GO\Core\Controller;
 use Exception;
 use GO;
 use GO\Base\Language;
-use GO\Base\Model\State;
 use GO\Base\Util\StringHelper;
 
 
 class CoreController extends \GO\Base\Controller\AbstractController {
 	
 	protected function allowGuests() {
-		return array('compress','cron','language', 'clientscripts');
+		return array('compress','cron','language','clientscripts');
 	}
 	
 	protected function ignoreAclPermissions() {
@@ -306,12 +305,38 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 	
 	protected function actionClientScripts($lang) {
 		header('Content-Type: application/javascript');
-		header('Content-Encoding: gzip');
+    if(!GO::config()->debug) {
+      header('Content-Encoding: gzip');
+      $cacheFile = \go\core\App::get()->getDataFolder()->getFolder('clientscripts')->create()->getFile('all-' . $lang . '.js');
+	
+    } else
+    {
+      $cacheFile = \go\core\App::get()->getTmpFolder()->getFile('debug.js');
+    }
 		
-		$cacheFile = \go\core\App::get()->getDataFolder()->getFolder('clientscripts')->create()->getFile('all-' . $lang . '.js');
 		
 		readfile($cacheFile->getPath());
 	}
+  
+  protected function actionClientScript($source) {
+    \GO::session()->closeWriting();    
+    $file = \go\core\Environment::get()->getInstallFolder()->getFile($source);
+    
+    $matches = [];
+    
+    $module = preg_match("/\bmodules\/([^\/]+)/", $source, $matches);
+    
+    header('Content-Type: application/javascript');
+     
+    if(isset($matches[1])) {
+     echo "go.Translate.setModule('" .$matches[1]. "');";
+    }
+    
+   
+       
+    readfile($file->getPath());
+    
+  }
 	
 	protected function actionLanguage($lang) {
 		\GO::language()->setLanguage($lang);
@@ -338,50 +363,6 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		}
 
 		echo $GO_SCRIPTS_JS;
-	}
-	
-	/**
-	 * 
-	 * This loads the client settings for the old modules.
-	 * 
-	 * @deprecated
-	 * @return type
-	 */
-	protected function actionClientSettings() {
-			$user_id  = GO::user()->id;
-			$settings['state'] = State::model()->getFullClientState($user_id);
-			$settings['user_id'] = $user_id;
-			$settings['has_admin_permission'] = GO::user()->isAdmin();
-			$settings['username'] = GO::user()->username;
-			$settings['displayName'] = GO::user()->displayName;
-
-			$settings['email'] = GO::user()->email;
-			$settings['thousands_separator'] = GO::user()->thousands_separator;
-			$settings['decimal_separator'] = GO::user()->decimal_separator;
-			$settings['date_format'] = GO::user()->completeDateFormat;
-			$settings['time_format'] = GO::user()->time_format;
-			$settings['currency'] = GO::user()->currency;
-			$settings['lastlogin'] = GO::user()->lastlogin;
-			$settings['max_rows_list'] = GO::user()->max_rows_list;
-			$settings['timezone'] = GO::user()->timezone;
-			$settings['start_module'] = GO::user()->start_module;
-			$settings['theme'] = GO::user()->theme;
-			$settings['mute_sound'] = GO::user()->mute_sound;
-			$settings['mute_reminder_sound'] = GO::user()->mute_reminder_sound;
-			$settings['mute_new_mail_sound'] = GO::user()->mute_new_mail_sound;
-			$settings['popup_reminders'] = GO::user()->popup_reminders;
-			$settings['popup_emails'] = GO::user()->popup_emails;
-			$settings['show_smilies'] = GO::user()->show_smilies;
-			$settings['auto_punctuation'] = GO::user()->auto_punctuation;
-			$settings['first_weekday'] = GO::user()->first_weekday;
-			$settings['sort_name'] = GO::user()->sort_name;
-			$settings['list_separator'] = GO::user()->list_separator;
-			$settings['text_separator'] = GO::user()->text_separator;
-		$settings['modules'] = GO::view()->exportModules();
-
-		
-		
-		return array('success' => true, 'GO' => ['settings' => $settings]);
 	}
 
 	protected function actionThumb($params) {

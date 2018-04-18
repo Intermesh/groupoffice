@@ -40,7 +40,7 @@
 //			scope: this
 //		})];
 //		
-//		if(go.ModuleManager.isAvailable("files"))
+//		if(go.Modules.isAvailable("legacy", "files"))
 //		{		
 //			this.tbar.push(this.fileBrowseButton = new Ext.Button({
 //				iconCls: 'btn-files',

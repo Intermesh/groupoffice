@@ -45,42 +45,38 @@ GO.util.stringToFunction = function(str) {
   return  fn;
 };
 
-function t(str, module, sub) {
-	
+function t(str, module, package) {
+
 	if(!module) {
-		module = "base";
-		sub = "common";
+		module = go.Translate.module;
+		package = go.Translate.package;
 	}
 	
 	if(!GO.lang[module]) {
-		return str;
+		module = "base";
+    package = "common";
 	}
+  
+  if(package && !GO.lang[module][package]) {
+    package = "common";
+  }
 	
 	var l = GO.lang[module];
 	
-	if(sub) {
-		l = l[sub];
+	if(package) {
+		l = l[package];
 	}
-	
-	return l[str] || str;
-	
-////	var found = (GO[module] && GO[module].lang && GO[module].lang[str]) || t("str");
-////	if(!found) {
-////		if (t.caller && t.caller.name !== 't' && GO.langMap[str]) {
-////			return t(GO.langMap[str], module);
-////		} else
-////		{
-////			found = str;
-////		}
-////	}
-//	var found = str;
-//	
-//	if(replacements) {
-//		for(var key in replacements) {
-//			found = found.replace("{" +key + "}", replacements[key]);
-//		}
-//	}
-//	return found;
+  
+  if(l[str]) {
+    return l[str]
+  }
+  
+  if(module != "base" && package != "common"){
+    return t(str, "base", "common");
+  } else
+  {
+    return str;
+  }
 };
 /**
  * Strpos function for js 

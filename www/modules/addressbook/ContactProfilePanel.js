@@ -601,7 +601,7 @@ Ext.extend(GO.addressbook.ContactProfilePanel, Ext.Panel,{
 		this.formCompany.store.baseParams['addressbook_id'] = addressbook_id;
 		this.formCompany.clearLastSearch();
 
-//		if(go.ModuleManager.isAvailable("customfields")) {
+//		if(go.Modules.isAvailable("core", "customfields")) {
 //			var allowed_cf_categories = this.formAddressBooks.store.getById(addressbook_id).data.allowed_cf_categories.split(',');
 //			GO.addressbook.contactDialog.updateCfTabs(allowed_cf_categories);
 //		}

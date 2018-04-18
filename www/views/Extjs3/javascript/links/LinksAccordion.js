@@ -13,7 +13,7 @@ GO.LinksAccordion = Ext.extend(Ext.Panel, {
 
 
 
-		if(go.ModuleManager.isAvailable("calendar"))
+		if(go.Modules.isAvailable("community", "calendar"))
 		{
 			var eventLinksPanel = new GO.grid.LinksGrid({
 				title:t("Appointments", "calendar"),
@@ -23,7 +23,7 @@ GO.LinksAccordion = Ext.extend(Ext.Panel, {
 			this.items.push(eventLinksPanel);
 		}
 
-		if(go.ModuleManager.isAvailable("tasks"))
+		if(go.Modules.isAvailable("community", "tasks"))
 		{
 			var tasksLinksPanel = new GO.grid.LinksGrid({
 				title:t("Tasks", "tasks"),
@@ -33,7 +33,7 @@ GO.LinksAccordion = Ext.extend(Ext.Panel, {
 			this.items.push(tasksLinksPanel);
 		}
 
-		if(go.ModuleManager.isAvailable("notes"))
+		if(go.Modules.isAvailable("community", "notes"))
 		{
 			var noteLinksPanel = new GO.grid.LinksGrid({
 				title:t("Notes", "notes"),

@@ -144,7 +144,7 @@ GO.site.ContentPanel = Ext.extend(Ext.form.FormPanel, {
 			]
 		});
 
-		if(go.ModuleManager.isAvailable("files")) {
+		if(go.Modules.isAvailable("legacy", "files")) {
 			config.tbar.add(this.fileBrowseButton = new GO.files.FileBrowserButton({
 				model_name: "GO\\Site\\Model\\Site"
 			}));

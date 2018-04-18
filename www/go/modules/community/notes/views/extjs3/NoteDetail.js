@@ -1,5 +1,5 @@
 go.modules.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
-	entityStore: go.stores.Note,
+	entityStore: go.Stores.get("Note"),
 	stateId: 'no-notes-detail',
 
 	//model_name: "go\\modules\\community\\notes\\model\\Note", //only for backwards compatibility with older panels.
@@ -26,11 +26,11 @@ go.modules.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 
 		this.add(new go.links.LinksDetailPanel());
 
-		if (go.ModuleManager.isAvailable("comments")) {
+		if (go.Modules.isAvailable("community", "comments")) {
 			this.add(new go.modules.comments.CommentsDetailPanel());
 		}
 
-		if (go.ModuleManager.isAvailable("files")) {
+		if (go.Modules.isAvailable("community", "files")) {
 			this.add(new go.modules.files.FilesDetailPanel());
 		}
 	},

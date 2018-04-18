@@ -51,8 +51,6 @@ $updates["201803161130"][] = function() {
 		$stmt->execute();
 	}
 
-
-
 	$values = [
 			'default_timezone' => 'defaultTimezone',
 			'default_time_format' => 'defaultTimeFormat',
@@ -124,3 +122,27 @@ $updates["201803161130"][] = function() {
 
 $updates["201804042007"][] = "delete  FROM `core_search` WHERE entityTypeId not in (select id from core_entity);";
 $updates["201804042007"][] = "ALTER TABLE `core_search` ADD FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+
+$updates["201804062007"][] = "ALTER TABLE `core_entity`  ADD `clientName` VARCHAR(190) NULL DEFAULT NULL;";
+$updates["201804062007"][] = "update `core_entity` set clientName = name;";
+$updates["201804062007"][] = "ALTER TABLE `core_entity` ADD UNIQUE(`clientName`);";
+
+$updates["201804062008"][] = "CREATE TABLE `core_blob` (
+  `id` binary(40) NOT NULL,
+  `type` varchar(129) NOT NULL,
+  `size` bigint(20) NOT NULL DEFAULT '0',
+  `modified` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `createdAt` DATETIME NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB;";
+
+$updates["201804101629"][] = "ALTER TABLE `core_user` 
+ADD COLUMN `avatarId` BINARY(40) NULL AFTER `displayName`,
+ADD INDEX `fk_user_avatar_id_idx` (`avatarId` ASC);
+ALTER TABLE `core_user` 
+ADD CONSTRAINT `fk_user_avatar_id`
+  FOREIGN KEY (`avatarId`)
+  REFERENCES `core_blob` (`id`)
+  ON DELETE RESTRICT
+  ON UPDATE NO ACTION;";

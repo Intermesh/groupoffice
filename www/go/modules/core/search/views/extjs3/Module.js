@@ -1,10 +1,10 @@
 Ext.ns('go.modules.community.search');
 
-go.ModuleManager.register('search', {
+go.Modules.register("core", 'search', {
 	//mainPanel: GO.notes.MainPanel,
 	entities: ["Search"],
 	initModule: function () {
-
+   
 		GO.mainLayout.on('render', function () {
 
 			var container, searchField, searchContainer, panel;

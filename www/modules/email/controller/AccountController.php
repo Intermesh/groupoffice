@@ -397,9 +397,9 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 
 			if(!$fetchAllWithSubscribedFlag){
 				if ($mailbox->unseen > 0) {
-					$text .= '&nbsp;<span class="em-folder-status" id="status_' . $nodeId . '">' . $mailbox->unseen . '</span>';
+					$text .= '<span class="em-folder-status" id="status_' . $nodeId . '">' . $mailbox->unseen . '</span>';
 				} else {
-					$text .= '&nbsp;<span class="em-folder-status" id="status_' . $nodeId . '"></span>';
+					$text .= '<span class="em-folder-status" id="status_' . $nodeId . '"></span>';
 				}
 			}
 

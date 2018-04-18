@@ -329,7 +329,7 @@ GO.moduleManager.addModule('summary', GO.summary.MainPanel, {
 
 GO.mainLayout.onReady(function(){
 	
-	if(go.ModuleManager.isAvailable("summary")) {
+	if(go.Modules.isAvailable("legacy", "summary")) {
 		GO.request({
 			url: 'summary/announcement/checkLatestRead',
 			success: function(response,options,result) {

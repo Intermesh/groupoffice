@@ -256,7 +256,7 @@ Ext.extend(GO.addressbook.EmailTemplateDialog, Ext.Window,{
 			})
 		})];
 
-		if(go.ModuleManager.isAvailable("customfields")){
+		if(go.Modules.isAvailable("core", "customfields")){
 			autodata=[];
 
 			if(autodata.length){

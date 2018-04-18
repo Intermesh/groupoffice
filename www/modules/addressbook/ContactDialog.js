@@ -99,7 +99,7 @@ GO.addressbook.ContactDialog = function(config)
 		}
 	}
 
-//	if(go.ModuleManager.isAvailable("comments")){
+//	if(go.Modules.isAvailable("legacy", "comments")){
 //		this.commentsGrid = new GO.comments.CommentsGrid({title:t("Comments", "comments")});
 //		items.push(this.commentsGrid);
 //	}
@@ -108,7 +108,6 @@ GO.addressbook.ContactDialog = function(config)
 		waitMsgTarget:true,
 		baseParams: {},
 		border: false,
-		fileUpload : true, // for picture panel
 		items: [
 		this.tabPanel = new Ext.TabPanel({
 			border: false,
@@ -169,7 +168,7 @@ GO.addressbook.ContactDialog = function(config)
 		'save':true
 	});
 
-//	if(go.ModuleManager.isAvailable("customfields")) {
+//	if(go.Modules.isAvailable("core", "customfields")) {
 //		this.personalPanel.formAddressBooks.on('select',function(combo,record,index){
 //			var allowed_cf_categories = record.data.allowed_cf_categories.split(',');
 //			this.updateCfTabs(allowed_cf_categories);
@@ -249,7 +248,7 @@ Ext.extend(GO.addressbook.ContactDialog, GO.Window, {
 				
 				
 
-				if(go.ModuleManager.isAvailable("customfields"))
+				if(go.Modules.isAvailable("core", "customfields"))
 					GO.customfields.disableTabs(this.tabPanel, action.result);	
 
 				if (!GO.util.empty(config.contactData)) {
@@ -284,8 +283,11 @@ Ext.extend(GO.addressbook.ContactDialog, GO.Window, {
 				this.afterLoad(action);
 
 				GO.addressbook.ContactDialog.superclass.show.call(this);
-				
-				this.photoPanel.setPhoto(action.result.data.photo_url, action.result.data.original_photo_url);
+				if(action.result.data.avatarId) {
+					this.photoPanel.setPhoto(go.Jmap.downloadUrl(action.result.data.avatarId));
+				} else {
+					this.photoPanel.setPhoto(action.result.data.photo_url, action.result.data.original_photo_url);
+				}
 
 			},
 			scope: this
@@ -296,13 +298,15 @@ Ext.extend(GO.addressbook.ContactDialog, GO.Window, {
 	saveContact : function(hide)
 	{		
 		var company = this.personalPanel.formCompany.getRawValue();
+		var avatarId = this.photoPanel.avatarField.getValue();
 
 		this.formPanel.form.submit({
 			waitMsg:t("Saving..."),
 			url:GO.url('addressbook/contact/submit'),			
 			params: {				
 				id : this.contact_id,
-				company: company
+				company: company,
+				avatarId: avatarId
 			},
 			success:function(form, action){
 				

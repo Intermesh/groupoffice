@@ -93,8 +93,23 @@ DROP TABLE IF EXISTS `core_entity`;
 CREATE TABLE `core_entity` (
   `id` int(11) NOT NULL,
   `moduleId` int(11) DEFAULT NULL,
-  `name` varchar(190) NOT NULL
+  `name` varchar(190) NOT NULL,
+  `clientName` varchar(190) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+ALTER TABLE `core_entity`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `model_name` (`name`),
+  ADD UNIQUE KEY `name` (`name`),
+  ADD KEY `moduleId` (`moduleId`);
+
+ALTER TABLE `core_entity`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+
+ALTER TABLE `core_entity`
+  ADD CONSTRAINT `core_entity_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE;
+
 
 DROP TABLE IF EXISTS `core_group`;
 CREATE TABLE `core_group` (
@@ -165,6 +180,7 @@ CREATE TABLE `core_user` (
   `id` int(11) NOT NULL,
   `username` varchar(50) NOT NULL,
   `displayName` varchar(190) DEFAULT '',
+	`avatarId` BINARY(40) NULL,
   `enabled` tinyint(1) NOT NULL DEFAULT '1',
   `email` varchar(100) NOT NULL,
   `recoveryEmail` varchar(100) NOT NULL,
@@ -456,12 +472,6 @@ ALTER TABLE `core_customfields_field_set`
   ADD KEY `aclId` (`aclId`),
   ADD KEY `modSeq` (`modSeq`);
 
-ALTER TABLE `core_entity`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `model_name` (`name`),
-  ADD UNIQUE KEY `name` (`name`),
-  ADD KEY `moduleId` (`moduleId`);
-
 ALTER TABLE `core_group`
   ADD PRIMARY KEY (`id`),
   ADD KEY `isUserGroupFor` (`isUserGroupFor`),
@@ -578,8 +588,6 @@ ALTER TABLE `core_customfields_field`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `core_customfields_field_set`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-ALTER TABLE `core_entity`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `core_group`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `core_link`
@@ -622,9 +630,6 @@ ALTER TABLE `core_customfields_field_set`
   ADD CONSTRAINT `core_customfields_field_set_ibfk_1` FOREIGN KEY (`entityId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_customfields_field_set_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`);
 
-ALTER TABLE `core_entity`
-  ADD CONSTRAINT `core_entity_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE;
-
 ALTER TABLE `core_group`
   ADD CONSTRAINT `core_group_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`),
   ADD CONSTRAINT `core_group_ibfk_2` FOREIGN KEY (`isUserGroupFor`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;
@@ -648,5 +653,23 @@ ALTER TABLE `core_auth_method` ADD FOREIGN KEY (`moduleId`) REFERENCES `core_mod
 
 ALTER TABLE `core_auth_password` ADD FOREIGN KEY (`userId`) REFERENCES `core_user`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
+CREATE TABLE `core_blob` (
+  `id` BINARY(40) NOT NULL,
+  `type` varchar(129) NOT NULL,
+  `size` bigint(20) NOT NULL DEFAULT '0',
+  `modified` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `createdAt` DATETIME NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
 
 ALTER TABLE `core_search` ADD FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+
+ALTER TABLE `core_user` 
+ADD INDEX `fk_user_avatar_id_idx` (`avatarId` ASC);
+ALTER TABLE `core_user` 
+ADD CONSTRAINT `fk_user_avatar_id`
+  FOREIGN KEY (`avatarId`)
+  REFERENCES `core_blob` (`id`)
+  ON DELETE RESTRICT
+  ON UPDATE NO ACTION;

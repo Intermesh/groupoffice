@@ -83,25 +83,30 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			dismissDelay: 0,
 			maxWidth: 500
 		});
-		
-//		this.removeLoadMask();
-		
-		if(go.User){
-			this.onAuthentication();
-			this.on('render', function() {
-				this.fireEvent('boot', this);
-			}, this, {single:true});
+		var me = this;
+		Ext.Ajax.defaultHeaders = {'Accept-Language': GO.lang.iso};
+
+		if(go.User.accessToken){
+			Ext.Ajax.defaultHeaders['Authorization'] = 'Bearer '+go.User.accessToken;
+			go.User.authenticate(function(data, response){
+
+				if(response.status === 200) {
+					me.on('render', function() {
+						me.fireEvent('boot', me);
+					}, me, {single:true});
+					me.onAuthentication(); // <- start Group-Office
+				} else {
+					me.fireEvent("boot", this);
+					GO.mainLayout.login();
+				}
+			});
 		} else {
-		
-			this.fireEvent("boot", this);
+			this.fireEvent("boot", this); // In the router there is an event attached.
+			GO.mainLayout.login();
 		}
 	},
 
 	login: function () {
-		
-		if(this.checkRemindedLogin()) {
-			return true;
-		}
 		
 		if(!this.loginPanel) {
 			//go.AuthenticationManager.register('password', new go.login.PasswordPanel(), 0);
@@ -114,60 +119,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		this.fireEvent('login', this);
 	},
-	
-	setRememberLogin : function(rememberLogin) {
-		this.rememberLogin = rememberLogin
-	},	
-	
-	rememberLogin : false,
-	
-	checkRemindedLogin : function() {
-		//remember login part
-		go.AuthenticationManager.on('authenticated', function(authMan, result) {
-			
-			if(this.rememberLogin) {
-				window.localStorage.setItem("accessToken", result.accessToken);
-			} 
-		}, this);
-
-		var accessToken = window.localStorage.getItem("accessToken");
-		if(accessToken) {
-			
-			this.rememberLogin = true;
-			go.AuthenticationManager.accessToken = accessToken;
-			
-			go.AuthenticationManager.doAuthentication(null, function(authMan, success, result){
-				if(!success) {
-					this.rememberLogin = false;
-				 	window.localStorage.removeItem("accessToken");
-					this.login();
-				}
-			}, this);
-			
-			return true;
-		} else
-		{
-			return false;
-		}
-	},
 
 	saveState: function () {
 		Ext.state.Manager.getProvider().set('open-modules', this.getOpenModules());
-	},
-
-	logout: function (first) {
-
-		if (Ext.Ajax.isLoading())
-		{
-			if (first) {
-				Ext.getBody().mask(t("Loading..."));
-			}
-			this.logout.defer(500, this, [true]);
-		} else
-		{
-			window.localStorage.removeItem("accessToken");
-			document.location = GO.url('auth/logout');
-		}
 	},
 
 	fireReady: function () {
@@ -316,11 +270,10 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		
 		
 		
-		go.ModuleManager.init();
+		go.Modules.init();
 
 		//load modules
-		go.ModuleManager.onReady(function () {
-
+		go.Modules.onReady(function () {
 
 			if (this.loginPanel) {
 				this.loginPanel.destroy();
@@ -359,8 +312,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			var menuItemConfig;
 
 			this.state = Ext.state.Manager.get('open-modules');
-
-			for (var i = 0; i < allPanels.length; i++) {
+      
+			for (var i = 0, l = allPanels.length; i < l; i++) {
 
 				if (this.state && this.state.indexOf(allPanels[i].moduleName) > -1)
 					items.push(GO.moduleManager.getPanel(allPanels[i].moduleName));
@@ -448,7 +401,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					<div id="secondary-menu">\
 						<div id="search_query"></div>\
 						<a id="start-menu-link" ><i class="icon">apps</i></a>\
-						<a id="user-menu" class="user-img">\
+						<a id="user-menu" class="user-img" style="background-image:url('+go.Jmap.downloadUrl(go.User.avatarId)+')">\
 							<span id="reminder-icon" style="display: none;">notifications</span>\
 						</a>\
 					</div>\
@@ -466,15 +419,13 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				border: false,
 				items: [topPanel, this.tabPanel]
 			});
-
-			var startBtn = Ext.get('start-menu-link');
-			var startBtnTpl = startBtn.dom.innerHTML;
-			startBtn.dom.innerHTML = '';
+      
+      
 			this.startMenuLink = new Ext.Button({
 				menu: this.startMenu,
 				menuAlign: 'tr-br?',
-				text: startBtnTpl,
-				renderTo: startBtn,
+				text: '<i class="icon">apps</i>',
+				renderTo: 'start-menu-link',
 				clickEvent: 'mousedown',
 				template: new Ext.XTemplate('<span><button></button></span>')
 			});
@@ -565,6 +516,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			});
 
 
+
 			var userBtn = Ext.get('user-menu');
 			var userMenuTpl = userBtn.dom.innerHTML;
 			this.userMenuLink = new Ext.Button({
@@ -581,7 +533,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 								if(!go.userSettingsDialog) {
 									go.userSettingsDialog = new go.usersettings.UserSettingsDialog();
 								}
-								go.userSettingsDialog.show(GO.settings.user_id);
+								go.userSettingsDialog.show(go.User.id);
 
 							},
 							scope: this
@@ -593,7 +545,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 						}, {
 							text: t("Logout"),
 							iconCls: 'ic-exit-to-app',
-							handler: GO.mainLayout.logout,
+							handler: go.AuthenticationManager.logout,
 							scope: this
 						}
 					]
@@ -619,7 +571,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				});
 			}
 
-
 			GO.checker.init.defer(2000, GO.checker);
 			GO.checker.on('alert', function (data) {
 				if (data.notification_area)
@@ -628,11 +579,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				}
 			}, this);
 
-			/*for(var i=0;i<items.length;i++){
-			 var menuItem = this.startMenu.items.item('go-start-menu-'+items[i].moduleName);
-			 menuItem.hide();
-			 }
-			 this.refreshMenu();*/
+
 
 			this.rendered = true;
 			this.fireEvent('render');

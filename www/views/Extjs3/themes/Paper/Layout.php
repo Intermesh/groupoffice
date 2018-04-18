@@ -41,25 +41,6 @@
 </head>
 <body>
 	<div id="sound"></div>
-	
-<!--	<div id="loading">
-		<div class="loading-indicator">
-			<div class="loading-wave">
-				<b></b>
-				<b></b>
-				<b></b>
-			</div>
-		<span id="load-status"><?php echo \GO::t("Loading..."); ?></span>
-		</div>
-		<div id="copyright">
-			Copyright &copy; <?php
-			if(\GO::config()->product_name!='Group-Office'){
-				echo \GO::config()->product_name;
-			}else{ echo 'Intermesh BV';
-
-			} ?> 2003-<?php echo date('Y'); ?>
-		</div>
-	</div>-->
 
 	<?php require(\GO::config()->root_path.'views/Extjs3/default_scripts.inc.php'); ?>
 

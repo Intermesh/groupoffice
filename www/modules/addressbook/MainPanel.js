@@ -129,7 +129,7 @@ GO.addressbook.MainPanel = function(config) {
 		this.setAdvancedSearchNotification(this.contactsGrid.store);
 	}, this);
 
-	if(go.ModuleManager.isAvailable("email")) {
+	if(go.Modules.isAvailable("legacy", "email")) {
 		this.contactsGrid.on("rowcontextmenu",function(grid,row,e){
 			{
 				if(typeof(this.contactsGrid.contextMenu)=='undefined')
@@ -207,7 +207,7 @@ GO.addressbook.MainPanel = function(config) {
 	});
    this.companiesGrid.applyAddresslistFilters();
 
-	if(go.ModuleManager.isAvailable("email")) {
+	if(go.Modules.isAvailable("legacy", "email")) {
 		this.companiesGrid.on("rowcontextmenu",function(grid,row,e){
 			{
 				if(typeof(this.companiesGrid.contextMenu)=='undefined')
@@ -551,7 +551,7 @@ Ext.extend(GO.addressbook.MainPanel, Ext.Panel,{
 			{
 				GO.addressbook.readableAddressbooksStore.loadData(result.addressbooks);
 //				this.contactsGrid.store.loadData(result.contacts);
-//				if(go.ModuleManager.isAvailable("addressbook"))
+//				if(go.Modules.isAvailable("legacy", "addressbook"))
 //				{
 					GO.addressbook.readableAddresslistsStore.loadData(result.readable_addresslists);
 					GO.addressbook.writableAddresslistsStore.loadData(result.writable_addresslists);
@@ -768,7 +768,7 @@ GO.addressbook.searchSender = function(sender, name){
 					break;
 				case 1:
 					var r = GO.addressbook.searchSenderStore.getAt(0);
-					go.Router.goto("addressbook/contact/" + r.get('id'));
+					go.Router.goto("contact/" + r.get('id'));
 					break;
 				default:
 					if(!GO.addressbook.searchSenderWin)
@@ -781,7 +781,7 @@ GO.addressbook.searchSender = function(sender, name){
 							var contact_id = dataview.store.data.items[index].id;
 							list.clearSelections();
 							GO.addressbook.searchSenderWin.hide();
-							go.Router.goto("addressbook/contact/" + contact_id);
+							go.Router.goto("contact/" + contact_id);
 						}, this);
 						GO.addressbook.searchSenderWin=new GO.Window({
 							title:t("Select contact", "addressbook"),
@@ -815,7 +815,7 @@ GO.addressbook.searchSender = function(sender, name){
 
 
 
-go.ModuleManager.register('addressbook', {
+go.Modules.register("legacy", 'addressbook', {
 	mainPanel: GO.addressbook.MainPanel,
 	title: t("Address book", "addressbook"),
 	iconCls: 'go-tab-icon-addressbook',

@@ -167,6 +167,7 @@ CREATE TABLE IF NOT EXISTS `ab_contacts` (
   `files_folder_id` int(11) NOT NULL DEFAULT '0',
   `go_user_id` int(11) NOT NULL DEFAULT '0',
   `photo` varchar(255) NOT NULL DEFAULT '',
+	`avatarId` BINARY(40) NULL,
   `action_date` int(11) NOT NULL DEFAULT '0',
   `url_linkedin` varchar(100) DEFAULT NULL,
   `url_facebook` varchar(100) DEFAULT NULL,
@@ -460,3 +461,12 @@ ALTER TABLE `ab_addresslist_group`
 
 ALTER TABLE `ab_addresslist_group`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `ab_contacts` 
+ADD INDEX `fk_contact_avatar_id_idx` (`avatarId` ASC);
+ALTER TABLE `ab_contacts` 
+ADD CONSTRAINT `fk_contact_avatar_id`
+  FOREIGN KEY (`avatarId`)
+  REFERENCES `core_blob` (`id`)
+  ON DELETE RESTRICT
+  ON UPDATE NO ACTION;

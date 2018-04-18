@@ -133,7 +133,7 @@ Ext.extend(GO.tasks.SimpleTasksPanel, GO.grid.GridPanel, {
 		}, this);
 
 		this.on("rowclick", function (grid, rowClicked, e) {
-			go.Router.goto('tasks/task/' + grid.selModel.selections.keys[0]);
+			go.Router.goto('task/' + grid.selModel.selections.keys[0]);
 		}, this);
 
 		Ext.TaskMgr.start({
@@ -148,7 +148,7 @@ Ext.extend(GO.tasks.SimpleTasksPanel, GO.grid.GridPanel, {
 
 
 GO.mainLayout.onReady(function () {
-	if (go.ModuleManager.isAvailable("summary"))
+	if (go.Modules.isAvailable("legacy", "summary"))
 	{
 		var tasksGrid = new GO.tasks.SimpleTasksPanel();
 

@@ -23,7 +23,33 @@ function dp(size) {
  *When upgrading extjs don't forget to check htmleditor overrides in E-mail composer
  */
 
-Ext.override(Ext.Component, {
+(function(){
+  
+  //add module and package to components so they are aware of the module they belong to.
+  var origExtend = Ext.extend;
+
+  Ext.extend = function() {
+    var cls = origExtend.apply(this, arguments);
+    //console.log(go.module);
+    cls.prototype.module = go.module;
+    cls.prototype.package = go.package;
+
+    return cls;
+  }
+})();
+
+
+//hack to set translate to module from component in getId because getId() is always called before initComponent in the constructor and there's no way to override the constructor
+Ext.override(Ext.Component, {  
+  componentgetID : Ext.Component.prototype.getId,
+  getId : function(){
+ 
+    if(this.module) {
+      go.Translate.setModule(this.module);
+    }
+    
+    return this.componentgetID();
+  },
 	
 	//Without this override findParentByType doesn't work if you don't Ext.reg() all your components
 	 getXTypes : function(){
@@ -399,13 +425,17 @@ Ext.override(Ext.Component, {
 }); 
 
 
+Ext.encode = Ext.util.JSON.encode = function(json){
+  return JSON.stringify(json);
+}
+
 /*
  * Catch JSON parsing errors and show error dialog
  * @type 
  */
 Ext.decode = Ext.util.JSON.decode = function(jsonStr){
 	try{
-		var json = eval("(" + jsonStr + ')');
+		var json = JSON.parse(jsonStr);//eval("(" + jsonStr + ')');
 		if(json && json.redirectToLogin)
 			document.location.href=BaseHref;
 		
@@ -513,25 +543,25 @@ Ext.override(Ext.form.Checkbox, {
  * @param {HTMLElement} node The node to remove
  * @method
  */
- Ext.removeNode = Ext.isIE && !Ext.isIE8 && !Ext.isIE9 && !Ext.isIE10 ? function() {
-
-	var d;
-	return function(n) {
-		if (n && n.tagName != 'BODY') {
-			(Ext.enableNestedListenerRemoval) ? Ext.EventManager.purgeElement(n, true) : Ext.EventManager.removeAll(n);
-			d = d || document.createElement('div');
-			d.appendChild(n);
-			d.innerHTML = '';
-			delete Ext.elCache[n.id];
-		}
-	};
-}() : function(n) {
-	if (n && n.parentNode && n.tagName != 'BODY') {
-		(Ext.enableNestedListenerRemoval) ? Ext.EventManager.purgeElement(n, true) : Ext.EventManager.removeAll(n);
-		n.parentNode.removeChild(n);
-		delete Ext.elCache[n.id];
-	}
-};
+// Ext.removeNode = Ext.isIE && !Ext.isIE8 && !Ext.isIE9 && !Ext.isIE10 ? function() {
+//
+//	var d;
+//	return function(n) {
+//		if (n && n.tagName != 'BODY') {
+//			(Ext.enableNestedListenerRemoval) ? Ext.EventManager.purgeElement(n, true) : Ext.EventManager.removeAll(n);
+//			d = d || document.createElement('div');
+//			d.appendChild(n);
+//			d.innerHTML = '';
+//			delete Ext.elCache[n.id];
+//		}
+//	};
+//}() : function(n) {
+//	if (n && n.parentNode && n.tagName != 'BODY') {
+//		(Ext.enableNestedListenerRemoval) ? Ext.EventManager.purgeElement(n, true) : Ext.EventManager.removeAll(n);
+//		n.parentNode.removeChild(n);
+//		delete Ext.elCache[n.id];
+//	}
+//};
 
 
 Ext.override(Ext.layout.ToolbarLayout ,{
@@ -647,7 +677,7 @@ Ext.override(Ext.Window, {
 });
 
 Ext.override(Ext.Panel, {
-	origInitComponent : Ext.Panel.prototype.initComponent,
+	panelInitComponent : Ext.Panel.prototype.initComponent,
 	
 	initComponent : function() {
 		
@@ -656,13 +686,13 @@ Ext.override(Ext.Panel, {
 			
 		}
 		
-		this.origInitComponent.call(this);
+		this.panelInitComponent.call(this);
 	}
 });
 
 
 Ext.override(Ext.form.Field, {
-	origInitComponent : Ext.form.Field.prototype.initComponent,
+	fieldInitComponent : Ext.form.Field.prototype.initComponent,
 	
 	initComponent : function() {
 		
@@ -673,7 +703,7 @@ Ext.override(Ext.form.Field, {
 		}
 		
 		
-		this.origInitComponent.call(this);
+		this.fieldInitComponent.call(this);
 	}
 });
 
@@ -682,6 +712,5 @@ Ext.util.Format.dateRenderer = function(format) {
 				return GO.util.dateFormat(v);
 		};
 };
-				
 				
 				

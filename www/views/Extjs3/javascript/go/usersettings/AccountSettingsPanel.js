@@ -15,6 +15,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 	title:t('Account'),
 	iconCls: 'ic-account-circle',
 	autoScroll:true,
+	id: 'pnl-account-settings',
 	passwordProtected: true,
 
 	initComponent: function () {
@@ -22,28 +23,58 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 		this.userFieldset = new Ext.form.FieldSet({
 			labelWidth:dp(152),
 			title: t('User'),
+			layout: 'hbox',
 			items:[
-				this.displayNameField = new Ext.form.TextField({
-					fieldLabel: t('Display name'),
-					name: 'displayName',
-					allowBlank:false
-				}),
-				this.emailField = new Ext.form.TextField({
-					fieldLabel: t('Email'),
-					name: 'email',
-					vtype:'emailAddress',
-					allowBlank:false
-				}),
-				this.recoveryEmailField = new Ext.form.TextField({
-					fieldLabel: t("Recovery e-mail"),
-					name: 'recoveryEmail',
-					vtype:'emailAddress',
-					allowBlank:false
-				}),
-				this.recoveryMailText = new Ext.Container({
-					html:t('The recovery e-mail is used to send a forgotten password request to.')+'<br>'+t('Please use an email address that you can access from outside Group-Office.')
-				})
-			]
+				{
+					width: 150,
+					items: [
+						this.avatarComp = new go.form.FileField({
+							buttonOnly: true,
+							name: 'avatarId',
+							height:120,
+							cls: "avatar",
+							autoUpload: true,
+							buttonCfg: {
+								text: '',
+								width: 120
+							},
+							setValue: function(val) {
+								if(this.rendered && !Ext.isEmpty(val)) {
+									this.wrap.setStyle('background-image', 'url('+go.Jmap.downloadUrl(val)+')');
+								}
+								go.form.FileField.prototype.setValue.call(this,val);
+							},
+							accept: 'image/*'
+						})
+					]
+				},{
+					flex:1,
+					layout: 'form',
+					items: [
+					this.displayNameField = new Ext.form.TextField({
+						fieldLabel: t('Display name'),
+						name: 'displayName',
+						allowBlank:false
+					}),
+					this.emailField = new Ext.form.TextField({
+						fieldLabel: t('Email'),
+						name: 'email',
+						vtype:'emailAddress',
+						needPasswordForChange: true,
+						allowBlank:false
+					}),
+					this.recoveryEmailField = new Ext.form.TextField({
+						fieldLabel: t("Recovery e-mail"),
+						name: 'recoveryEmail',
+						needPasswordForChange: true,
+						vtype:'emailAddress',
+						allowBlank:false
+					}),
+					this.recoveryMailText = new Ext.Container({
+						html:t('The recovery e-mail is used to send a forgotten password request to.')+'<br>'+t('Please use an email address that you can access from outside Group-Office.')
+					})
+				]
+			}]
 		});
 
 		this.passwordFieldset = new Ext.form.FieldSet({
@@ -53,6 +84,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 				this.passwordField1 = new Ext.form.TextField({
 					inputType: 'password',
 					fieldLabel: t("New password", "users"),
+					needPasswordForChange: true,
 					name: 'password',
 					minLength: 8
 				}),
@@ -125,15 +157,6 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 		this.items.each(function(fieldset) {
 			if(fieldset.onSubmitComplete){
 				fieldset.onSubmitComplete(result);
-			}
-		},this);
-	},
-	
-	onBeforeNeedCurrentPasswordCheck : function(){
-		// Bubble further to child items
-		this.items.each(function(fieldset) {
-			if(fieldset.onBeforeNeedCurrentPasswordCheck){
-				fieldset.onBeforeNeedCurrentPasswordCheck();
 			}
 		},this);
 	}
