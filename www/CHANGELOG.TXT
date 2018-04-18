@@ -1,3 +1,4 @@
+- Addressbook: Make readable addresslists visible to the emailcomposer->addressbook->addresslist grid. (only writable where displayed before)
 - Addressbook: Fixed issue with saving user settings when no contact is known attached to the user
 - fixed issue were Calendars added to CalDAV synchonisation would still sync when the permissions are taken away
 - Fixed compress and download selected bug
