@@ -31,7 +31,7 @@ go.modules.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 		}
 
 		if (go.Modules.isAvailable("community", "files")) {
-			this.add(new go.modules.files.FilesDetailPanel());
+			this.add(new go.modules.community.files.FilesDetailPanel());
 		}
 	},
 

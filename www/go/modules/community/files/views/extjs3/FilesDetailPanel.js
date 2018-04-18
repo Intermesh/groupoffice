@@ -1,5 +1,5 @@
 
-go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
+go.modules.community.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 	title: t("Files", "files"),
 	collapsible: true,	
 	titleCollapse: true,
@@ -51,7 +51,7 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 //			});
 //		}, this);
 
-		go.modules.files.FilesDetailPanel.superclass.initComponent.call(this);
+		go.modules.community.files.FilesDetailPanel.superclass.initComponent.call(this);
 
 	},
 	

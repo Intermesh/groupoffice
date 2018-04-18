@@ -11,7 +11,7 @@
  * @author Michael de Hart <mdhart@intermesh.nl>
  */
 
-go.modules.files.MainPanel = Ext.extend(Ext.Panel, {
+go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 
 	layout: 'responsive',
 	layoutConfig: {
@@ -21,7 +21,7 @@ go.modules.files.MainPanel = Ext.extend(Ext.Panel, {
 	initComponent: function () {
 
 
-		this.sideNav = new go.modules.files.SideNav({
+		this.sideNav = new go.modules.community.files.SideNav({
 			region: 'west',
 			cls: 'go-sidenav',
 			width: dp(280),
@@ -34,7 +34,7 @@ go.modules.files.MainPanel = Ext.extend(Ext.Panel, {
 //			this.nodeGrid.getStore().load();
 //		}, this);
 
-		this.nodeGrid = new go.modules.files.NodeGrid({
+		this.nodeGrid = new go.modules.community.files.NodeGrid({
 			region: 'center',
 			tbar: [
 				{
@@ -88,7 +88,7 @@ go.modules.files.MainPanel = Ext.extend(Ext.Panel, {
 			go.Router.goto("files/" + record.id);
 		}, this);
 
-		this.nodeDetail = new go.modules.files.NodeDetail({
+		this.nodeDetail = new go.modules.community.files.NodeDetail({
 			region: 'center',
 			split: true,
 			tbar: [{
@@ -118,7 +118,7 @@ go.modules.files.MainPanel = Ext.extend(Ext.Panel, {
 			this.nodeDetail
 		];
 
-		go.modules.files.MainPanel.superclass.initComponent.call(this);
+		go.modules.community.files.MainPanel.superclass.initComponent.call(this);
 	}
 });
 

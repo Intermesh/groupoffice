@@ -1,4 +1,4 @@
-go.modules.files.NodeDetail = Ext.extend(go.panels.DetailView, {
+go.modules.community.files.NodeDetail = Ext.extend(go.panels.DetailView, {
 	entityStore: go.Stores.get("Folder"),
 	stateId: 'fs-node-detail',
 
@@ -20,7 +20,7 @@ go.modules.files.NodeDetail = Ext.extend(go.panels.DetailView, {
 		});
 
 
-		go.modules.files.NodeDetail.superclass.initComponent.call(this);
+		go.modules.community.files.NodeDetail.superclass.initComponent.call(this);
 
 		go.CustomFields.addDetailPanels(this);
 
@@ -31,7 +31,7 @@ go.modules.files.NodeDetail = Ext.extend(go.panels.DetailView, {
 		}
 
 		if (go.Modules.isAvailable("community", "files")) {
-			this.add(new go.modules.files.FilesDetailPanel());
+			this.add(new go.modules.community.files.FilesDetailPanel());
 		}
 	},
 
@@ -40,7 +40,7 @@ go.modules.files.NodeDetail = Ext.extend(go.panels.DetailView, {
 
 		this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < GO.permissionLevels.write);
 
-		go.modules.files.NodeDetail.superclass.onLoad.call(this);
+		go.modules.community.files.NodeDetail.superclass.onLoad.call(this);
 	},
 
 	initToolbar: function () {
@@ -56,7 +56,7 @@ go.modules.files.NodeDetail = Ext.extend(go.panels.DetailView, {
 					iconCls: 'ic-edit',
 					tooltip: t("Edit"),
 					handler: function (btn, e) {
-						var nodeEdit = new go.modules.files.NodeForm();
+						var nodeEdit = new go.modules.community.files.NodeForm();
 						nodeEdit.show();
 						nodeEdit.load(this.data.id);
 					},

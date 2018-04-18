@@ -211,7 +211,7 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		this.add(new go.links.LinksDetailPanel());
 		
 		if(go.Modules.isAvailable("community", "files")) {
-			this.add(new go.modules.files.FilesDetailPanel());
+			this.add(new go.modules.community.files.FilesDetailPanel());
 		}
 		
 		if(go.Modules.isAvailable("community", "comments") ){

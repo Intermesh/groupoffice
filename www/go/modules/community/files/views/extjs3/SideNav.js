@@ -1,3 +1,3 @@
-go.modules.files.SideNav = Ext.extend(Ext.Panel, {
+go.modules.community.files.SideNav = Ext.extend(Ext.Panel, {
 	
 });

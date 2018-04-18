@@ -1,4 +1,4 @@
-go.modules.files.NodeGrid = Ext.extend(go.grid.GridPanel, {
+go.modules.community.files.NodeGrid = Ext.extend(go.grid.GridPanel, {
 	paging: true,
 	initComponent: function () {
 
@@ -53,7 +53,7 @@ go.modules.files.NodeGrid = Ext.extend(go.grid.GridPanel, {
 			stateId: 'files-grid'
 		});
 
-		go.modules.files.NodeGrid.superclass.initComponent.call(this);
+		go.modules.community.files.NodeGrid.superclass.initComponent.call(this);
 	}
 });
 

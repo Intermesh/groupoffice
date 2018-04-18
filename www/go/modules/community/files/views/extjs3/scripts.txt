@@ -4,3 +4,4 @@ FilesDetailPanel.js
 SideNav.js
 NodeDetail.js
 NodeGrid.js
+FolderTree.js
