@@ -76,6 +76,13 @@ class Note extends AclItemEntity {
 		return parent::filter($query, $filter);		
 	}
 	
+	/**
+	 * Sort by database columns or creator and modifier
+	 * 
+	 * @param Query $query
+	 * @param array $sort
+	 * @return Query
+	 */
 	public static function sort(Query $query, array $sort) {
 		
 		if(isset($sort['creator'])) {			
