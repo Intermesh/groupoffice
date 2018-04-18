@@ -90,7 +90,8 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 		}, this);
 
 		this.nodeDetail = new go.modules.community.files.NodeDetail({
-			region: 'center',
+			region: 'east',
+			width:560,
 			split: true,
 			tbar: [{
 				cls: 'go-narrow',
