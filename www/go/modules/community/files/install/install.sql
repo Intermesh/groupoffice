@@ -17,6 +17,8 @@ CREATE TABLE `files_node` (
   `comment` text COLLATE utf8mb4_unicode_ci,
   `deletedAt` datetime DEFAULT NULL,
   `deletedBy` int(11) DEFAULT NULL,
+  `aclId` int(11) NOT NULL,
+  `isLocked` tinyint(11) NOT NULL DEFAULT 0,
   `isDirectory` tinyint(1) UNSIGNED NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT;
 
@@ -57,7 +59,6 @@ CREATE TABLE `files_share` (
 DROP TABLE IF EXISTS `files_storage`;
 CREATE TABLE `files_storage` (
   `id` int(11) NOT NULL COMMENT 'Only id''s of files_node''s that are "Folders"(blobId is NULL)',
-  `aclId` int(11) NOT NULL,
   `quota` int(11) NOT NULL DEFAULT '0',
   `usage` int(11) NOT NULL DEFAULT '0',
   `ownedBy` int(11) DEFAULT NULL
