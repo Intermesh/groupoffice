@@ -102,8 +102,8 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 			}]
 		});
 
-		this.westPanel = new Ext.Panel({
-			region: "west",
+		this.centerPanel = new Ext.Panel({
+			region: "center",
 			layout: "responsive",
 			stateId: "go-files-west",
 			split: true,
@@ -111,12 +111,13 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 			narrowWidth: dp(400), //this will only work for panels inside another panel with layout=responsive. Not ideal but at the moment the only way I could make it work
 			items: [
 				this.nodeGrid, //first is default in narrow mode
-				this.sideNav			]
+				this.nodeDetail
+			]
 		});
 
 		this.items = [
-			this.westPanel, //first is default in narrow mode
-			this.nodeDetail
+			this.centerPanel, //first is default in narrow mode
+			this.sideNav
 		];
 
 		go.modules.community.files.MainPanel.superclass.initComponent.call(this);

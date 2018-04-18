@@ -1,24 +1,16 @@
 go.modules.community.files.NodeDetail = Ext.extend(go.panels.DetailView, {
 	entityStore: go.Stores.get("Folder"),
 	stateId: 'fs-node-detail',
-
-	//model_name: "go\\modules\\community\\notes\\model\\Note", //only for backwards compatibility with older panels.
-
+	
 	initComponent: function () {
-
 
 		this.tbar = this.initToolbar();
 
 		Ext.apply(this, {
-			items: [{
-					xtype: 'readmore',
-					onLoad: function (detailView) {
-						this.setText("<h3>" + detailView.data.name + "</h3>" + detailView.data.content);
-					}
-				}
+			items: [
+				
 			]
 		});
-
 
 		go.modules.community.files.NodeDetail.superclass.initComponent.call(this);
 
@@ -44,8 +36,6 @@ go.modules.community.files.NodeDetail = Ext.extend(go.panels.DetailView, {
 	},
 
 	initToolbar: function () {
-
-
 
 		var items = this.tbar || [];
 		
