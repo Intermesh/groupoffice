@@ -153,7 +153,6 @@ $app-icons: (
 }
 .x-tree-node .ml-folder-unseen a span.em-folder-status { // badge
 	@extend %badge;
-	float: right;
 }
 
 .ml-unseen-dot {
