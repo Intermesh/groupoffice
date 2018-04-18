@@ -6,7 +6,7 @@ go.login.LoginDialog = Ext.extend(go.Window, {
 	resizable: false,
 	draggable: false,
 
-	methods: [],
+//	methods: [],
 	
 	initComponent: function() {
 
@@ -117,7 +117,7 @@ go.login.LoginDialog = Ext.extend(go.Window, {
 				return;
 			}
 			
-			while(next < this.wizard.items.length && this.methods.indexOf(nextItem.id) == -1) {
+			while(next < this.wizard.items.length && go.AuthenticationManager.userMethods.indexOf(nextItem.id) == -1) {
 				next++;
 			}			
 		}

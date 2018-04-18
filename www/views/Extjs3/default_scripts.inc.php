@@ -217,10 +217,22 @@ if ($cacheFile->exists()) {
 		} else {      
       
     if($script instanceof File) {
-      $module = preg_match("/\bmodules\/([^\/]+)/", $script->getPath(), $matches);
+      $relPath = $script->getRelativePath($rootFolder);
+      $parts = explode('/', $relPath);
+      $js = "";
+      if($parts[0] == 'go' && $parts[1] == 'modules') {
+        $js .= "go.module = '".$parts[3]."';";
+        $js .= "go.package = '".$parts[2]."';";
+        $js .= "go.Translate.setModule('" .$parts[3]. "');";   
+      } else if($parts[0] == 'modules')
+      {
+        $js .= "go.module = '".$parts[1]."';";
+        $js .= "go.package = 'legacy';";
+        $js .= "go.Translate.setModule('" .$parts[1]. "');";   
+      }
 
-      if(isset($matches[1])) {
-        $minify->add("go.Translate.setModule('" .$matches[1]. "');");   
+      if(!empty($js)) {
+        $minify->add($js);   
       }
     }
 			$minify->add($script);

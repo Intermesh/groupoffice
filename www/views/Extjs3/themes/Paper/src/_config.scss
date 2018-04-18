@@ -50,6 +50,11 @@ $curve-sharper: cubic-bezier(.25, .8, .25, 1); //slider
 	text-align:center;
 	border-radius: dp(10.5); // only round with 1 char
 	background-color: color($foreground, 'secondary-text');	
+  
+  .x-tree-node & {
+    position: absolute;
+    right: 8px;
+  }
 }
 
 %hover {

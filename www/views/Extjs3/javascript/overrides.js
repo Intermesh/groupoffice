@@ -435,9 +435,10 @@ Ext.encode = Ext.util.JSON.encode = function(json){
  */
 Ext.decode = Ext.util.JSON.decode = function(jsonStr){
 	try{
-		var json = JSON.parse(jsonStr);//eval("(" + jsonStr + ')');
-		if(json && json.redirectToLogin)
+		var json = eval("(" + jsonStr + ')');
+		if(json && json.redirectToLogin) {      
 			document.location.href=BaseHref;
+    }
 		
 		return json;
 	}
@@ -447,7 +448,7 @@ Ext.decode = Ext.util.JSON.decode = function(jsonStr){
 		switch(json.trim())
 		{
 			case 'NOTLOGGEDIN':
-				document.location=BaseHref;
+				//document.location=BaseHref;
 			break;
 
 			case 'UNAUTHORIZED':

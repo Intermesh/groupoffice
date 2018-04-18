@@ -347,7 +347,8 @@ CREATE TABLE `go_log` (
   `ip` varchar(45) NOT NULL DEFAULT '',
   `controller_route` varchar(255) NOT NULL DEFAULT '',
   `action` varchar(20) NOT NULL DEFAULT '',
-  `message` varchar(255) NOT NULL DEFAULT ''
+  `message` varchar(255) NOT NULL DEFAULT '',
+  `jsonData` text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS `go_mail_counter`;

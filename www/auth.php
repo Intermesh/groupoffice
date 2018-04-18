@@ -14,7 +14,7 @@ use go\core\validate\ErrorCode;
 
 try {
 //Create the app with the config.php file
-	App::get(); // Initializes App
+	App::get();
 
 	if (!Request::get()->isJson()) {
 		Response::get()->setStatus(400, "Only Content-Type: application/json");
@@ -150,21 +150,20 @@ try {
 		$token->save();
 	}
 
-	$response = [
-			'loginToken' => $token->loginToken,
-			'methods' => $methods
-	];
-
-	if ($token->isAuthenticated()) {
-		output([
-			'accessToken' => $token->accessToken,
-			'capabilities' => Capabilities::get(),
-			'apiUrl' => Request::get()->getHostname().'/jmap.php',
-			'downloadUrl' => Request::get()->getHostname().'/download.php?blob={blobId}',
-			'uploadUrl' => Request::get()->getHostname().'/upload.php',
-			'clientSettings' => $token->getUser()->toArray()
-		], 201, "Authentication is complete, access token created.");
-	}
+	if ($token->isAuthenticated()) {    
+    $authState = new \go\core\jmap\State();
+    $authState->setToken($token);
+    $response = $authState->getSession();
+    
+    $response['accessToken'] = $token->accessToken;
+		output($response, 201, "Authentication is complete, access token created.");
+	} 
+  
+  $response = [
+    'loginToken' => $token->loginToken,
+    'methods' => $methods
+  ];
+  
 
 
 	$methods = array_map(function($o) {

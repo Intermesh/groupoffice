@@ -18,6 +18,10 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		else
 			return parent::allowGuests();
 	}
+  
+  protected function allowWithoutModuleAccess() {
+    return ['images'];
+  }
 	
 	protected function actionGetURL($path){
 		
