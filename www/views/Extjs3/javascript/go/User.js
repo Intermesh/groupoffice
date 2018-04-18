@@ -4,23 +4,26 @@ go.User = {
 		if(!this.accessToken) {
 			return;
 		}
-		var me = this;
 		go.Jmap.get(function(data, response){
 			if(data) {
-				me.username = data.username;
-				me.apiUrl = data.apiUrl;
-				me.downloadUrl = data.downloadUrl;
-				me.uploadUrl = data.uploadUrl;
-				me.displayName = data.clientSettings.displayName;
-				me.id = data.clientSettings.user_id;
-				me.avatarId = data.clientSettings.avatarId;
-
-				Ext.apply(GO.settings, data.clientSettings);
+				this.loadSession(data);
 			}
 			cb(data, response);
-		});
-		
+		}, this);		
 	},
+  
+  loadSession : function(session) {
+    this.username = session.username;
+    this.apiUrl = session.apiUrl;
+    this.downloadUrl = session.downloadUrl;
+    this.uploadUrl = session.uploadUrl;
+    this.displayName = session.user.displayName;
+    this.id = session.user.id;
+    this.avatarId = session.user.avatarId;
+
+    Ext.apply(GO.settings, session.oldSettings);
+  },
+  
 	isLoggedIn: function() {
 		return !Ext.isEmpty(this.username);
 	}

@@ -70,18 +70,17 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 		}
 	},
 	
-	submit: function(form) {
+	submit: function(loginDialog) {
 		
-		form.getEl().mask();
+		loginDialog.getEl().mask();
 		
 		go.AuthenticationManager.getAvailableMethods(this.usernameField.getValue(), this.passwordField.getValue(),function(authMan, success, result){
-			form.getEl().unmask();
+			loginDialog.getEl().unmask();
 			if(success){				
-				this.methods = result.methods;
-				this.next();
+				loginDialog.next();
 			} else {
-				this.userNamePanel.setErrors(result.errors);
+				this.setErrors(result.errors);
 			}
-		},form);
+		},this);
 	}
 });

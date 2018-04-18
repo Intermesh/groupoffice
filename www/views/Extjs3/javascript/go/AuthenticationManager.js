@@ -74,6 +74,10 @@
 				jsonData: clientData,
 				callback: function (options, success, response) {
 					var result = Ext.decode(response.responseText);
+          
+          this.userMethods = result.methods || [];
+					this.loginToken = result.loginToken;
+					this.username = result.username;
 					
 					cb.call(scope || this, this, success, result);
 					
@@ -95,9 +99,7 @@
 						return;
 					}
 
-					this.userMethods = result.methods;
-					this.loginToken = result.loginToken;
-					this.username = result.username;
+					
 
 					if (result.accessToken) {
 						this.onAuthenticated(result);
@@ -182,15 +184,9 @@
 			if (GO.loginDialog) {
 				GO.loginDialog.close();
 			}
+      
+      go.User.loadSession(result);
 			
-			Ext.applyIf(go.User,{
-				apiUrl: result.apiUrl,
-				downloadUrl: result.downloadUrl,
-				uploadUrl: result.uploadUrl
-			});
-			Ext.applyIf(go.User, result.clientSettings);
-			Ext.applyIf(GO.settings, result.clientSettings); // Backwards compatible
-
 			var script = document.createElement('script');
 			script.setAttribute('src', GO.url('core/moduleScripts'));
 			document.body.appendChild(script)

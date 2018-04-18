@@ -76,12 +76,17 @@ class State extends AbstractState {
 	 * Return the JMAP session data.
 	 * Called when the user makes an authenticated GET request
 	 */
-	public function outputSession() {
-		if (!$this->isAuthenticated()) {
+	public function outputSession() {		
+		Response::get()->output($this->getSession());
+	}
+  
+  public function getSession() {
+    if (!$this->isAuthenticated()) {
 			throw new \go\core\http\Exception(401);
 		}
+    $user = $this->getToken()->getUser();
 		$response = [
-			'username' => $this->getToken()->getUser()->username,
+			'username' => $user->username,
 			'accounts' => ['1'=> [
 				'name'=>'Virtual',
 				'isPrimary' => true,
@@ -92,10 +97,12 @@ class State extends AbstractState {
 			'apiUrl' => Request::get()->getHostname().'/jmap.php',
 			'downloadUrl' => Request::get()->getHostname().'/download.php?blob={blobId}',
 			'uploadUrl' => Request::get()->getHostname().'/upload.php',
-			'clientSettings' => $this->clientSettings(), // added for compatibility
+      'user' => $user->toArray(['id', 'username', 'email', 'displayName', 'recoveryEmail', 'logins', 'avatarId']), //todo add more props when refactored
+			'oldSettings' => $this->clientSettings(), // added for compatibility
 		];
-		Response::get()->output($response);
-	}
+    
+    return $response;
+  }
 	
 	private function clientSettings() {
 		$user = \GO::user();

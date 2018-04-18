@@ -52,7 +52,7 @@ go.Jmap = {
 		return false;
 	},
 	
-	get: function(cb) {
+	get: function(cb, scope) {
 		Ext.Ajax.request({
 			url: BaseHref + 'jmap.php',
 			method: 'GET',
@@ -61,7 +61,7 @@ go.Jmap = {
 				if(response.responseText) {
 					data = Ext.decode(response.responseText);
 				}
-				cb(data, response, opts);
+				cb.call(scope, data, response, opts);
 			}
 		});
 	},
