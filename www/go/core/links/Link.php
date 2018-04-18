@@ -133,4 +133,17 @@ class Link extends \go\core\jmap\Entity {
 	public function getTo() {
 		return ['name' => $this->toName, 'description' => $this->toDescription];
 	}
+	
+	public static function filter(Query $query, array $filter) {
+		
+		if(!empty($filter['entityId']))	{
+			$query->where('fromId', '=', $filter['entityId']);
+		}
+
+		if(!empty($filter['entity']))	{
+			$query->where(['eFrom.name' => $filter['entity']]);		
+		}		
+	
+		return parent::filter($query, $filter);
+	}
 }

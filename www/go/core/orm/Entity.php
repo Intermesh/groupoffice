@@ -3,14 +3,14 @@
 namespace go\core\orm;
 
 use Exception;
+use GO;
 use go\core\acl\model\Acl;
 use go\core\App;
 use go\core\db\Criteria;
 use go\core\db\Query;
-use go\core\event\EventEmitterTrait;
 use go\core\jmap\EntityController;
 use go\core\module\model\Module;
-use go\core\util\DateTime;
+use go\core\validate\ErrorCode;
 
 /**
  * Entity model
@@ -155,7 +155,7 @@ abstract class Entity extends Property {
 		//See \go\core\orm\CustomFieldsTrait;
 		if(method_exists($this, 'saveCustomFields')) {
 			if(!$this->saveCustomFields()) {
-				$this->setValidationError("customFields", \go\core\validate\ErrorCode::INVALID_INPUT, "Could not save custom fields");
+				$this->setValidationError("customFields", ErrorCode::INVALID_INPUT, "Could not save custom fields");
 				return false;
 			}
 		}
@@ -163,7 +163,7 @@ abstract class Entity extends Property {
 		//See \go\core\orm\SearchableTrait;
 		if(method_exists($this, 'saveSearch')) {
 			if(!$this->saveSearch()) {				
-				$this->setValidationError("search", \go\core\validate\ErrorCode::INVALID_INPUT, "Could not save core_search entry");				
+				$this->setValidationError("search", ErrorCode::INVALID_INPUT, "Could not save core_search entry");				
 				return false;
 			}
 		}		
@@ -286,6 +286,37 @@ abstract class Entity extends Property {
   public static function getClientName() {
     return substr($cls, strrpos($cls, '\\') + 1);
   }
+	
+	
+	/**
+	 * Filter entities See JMAP spec for details on the $filter array.
+	 * 
+	 * @param Query $query
+	 * @param array $filter
+	 * @return Query
+	 */
+	public static function filter(Query $query, array $filter) {		
+		return $query;
+	}
+	
+	/**
+	 * Sort entities
+	 * 
+	 * @param Query $query
+	 * @param array $sort eg. ['field' => 'ASC']
+	 * @return Query
+	 */
+	public static function sort(Query $query, array $sort) {	
+		
+		//filter by columns
+		$query->orderBy(array_filter($sort, function($key) {
+				return static::getMapping()->getColumn($key) !== false;
+			}, ARRAY_FILTER_USE_KEY)
+							, true
+		);
+		
+		return $query;
+	}
 
 
 }
