@@ -68,10 +68,20 @@ class Blob extends orm\Entity {
 		}
 		return parent::internalSave();
 	}
+	
+	protected function internalDelete() {
+		if(parent::internalDelete()) {
+			if(is_file($this->path())) {
+				unlink($this->path());
+			}
+			return true;
+		}
+		return false;
+	}
 
 	public function path() {
-		$dir = substr($this->id,0,2) . '/' .substr($this->id,2,2);
-		return GO()->getDataFolder()->getPath() . '/data/' . $dir. '/'.$this->id;
+		$dir = substr($this->id,0,2) . '/' .substr($this->id,2,2). '/';
+		return GO()->getDataFolder()->getPath() . '/data/'.$dir.$this->id;
 	}
 
 }
