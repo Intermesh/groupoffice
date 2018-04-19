@@ -19,20 +19,21 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 	},
 
 	initComponent: function () {
-
-
+			
+		this.folderTree = new go.modules.community.files.FolderTree();
+	
 		this.sideNav = new go.modules.community.files.SideNav({
 			region: 'west',
 			cls: 'go-sidenav',
 			width: dp(280),
 			split: true,
-			items: []
+			items: [this.folderTree]
 		});
 
-//		this.folderTree.getSelectionModel().on('selectionchange', function (sm) {
+		this.folderTree.getSelectionModel().on('selectionchange', function (sm) {
 //			this.nodeGrid.getStore().baseParams.filter = [{parentId: sm.getSelected().id}];
 //			this.nodeGrid.getStore().load();
-//		}, this);
+		}, this);
 
 		this.nodeGrid = new go.modules.community.files.NodeGrid({
 			region: 'center',

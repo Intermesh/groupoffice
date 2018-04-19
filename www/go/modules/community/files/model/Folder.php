@@ -11,4 +11,12 @@ class Folder extends Node {
 		return parent::defineMapping()
 					->addTable("files_folder", "folder");
 	}
+	
+	public function getHasChildren(){
+		
+		// Select where parent id = this is.
+		//return found?true:false;
+		
+	}
+	
 }
