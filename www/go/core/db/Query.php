@@ -34,9 +34,9 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable {
 	private $tableAlias;
 	private $distinct;
 	private $select = [];
-	private $orderBy;
-	private $groupBy;
-	private $having;
+	private $orderBy = [];
+	private $groupBy = [];
+	private $having = [];
 	private $limit;
 	private $offset = 0;
 	protected $joins = [];
@@ -222,12 +222,12 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable {
 	/**
 	 * Set sort order
 	 *
-	 * @param array $by or ['field1'=>'ASC','field2'=>'DESC', new go\core\db\Expression('ISNULL(column) ASC')] for multiple values	 
+	 * @param array $by eg. ['field1'=>'ASC','field2'=>'DESC', new go\core\db\Expression('ISNULL(column) ASC')] for multiple values	 
 	 * 
 	 * @return static
 	 */
-	public function orderBy($by) {
-		$this->orderBy = $by;
+	public function orderBy(array $by, $append = false) {
+		$this->orderBy = $append ? array_merge($this->orderBy, $by) : $by;
 		return $this;
 	}
 
@@ -237,8 +237,8 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable {
 	 * @param array $columns eg. array('t.id');
 	 * @return static
 	 */
-	public function groupBy(array $columns) {
-		$this->groupBy = $columns;
+	public function groupBy(array $columns, $append = false) {
+		$this->groupBy = $append ? array_merge($this->groupBy, $columns) : $columns;
 		return $this;
 	}
 

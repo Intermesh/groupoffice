@@ -2,8 +2,11 @@
 namespace go\modules\community\notes\model;
 
 use go\core\acl\model\AclItemEntity;
+use go\core\db\Criteria;
+use go\core\db\Query;
 use go\core\orm\CustomFieldsTrait;
 use go\core\orm\SearchableTrait;
+use go\core\util\DateTime;
 use go\core\util\StringUtil;
 
 
@@ -15,13 +18,13 @@ class Note extends AclItemEntity {
 	
 	/**
 	 *
-	 * @var \go\core\util\DateTime
+	 * @var DateTime
 	 */
 	public $createdAt;
 	
 	/**
 	 *
-	 * @var \go\core\util\DateTime
+	 * @var DateTime
 	 */
 	public $modifiedAt;
 	public $createdBy;
@@ -57,6 +60,41 @@ class Note extends AclItemEntity {
 	public function getExcerpt() {
 		$text = preg_replace("/\s+/", " ", strip_tags(str_replace(">", "> ",$this->content)));
 		return StringUtil::cutString($text, 200);
+	}
+	
+	public static function filter(Query $query, array $filter) {
+		
+		if(!empty($filter['q'])) {
+			
+			$query->andWhere(
+					(new Criteria())
+					->where('name','LIKE', '%' . $filter['q'] . '%')
+					->orWhere('content', 'LIKE', '%' . $filter['q'] . '%')
+					);
+		}
+		
+		return parent::filter($query, $filter);		
+	}
+	
+	/**
+	 * Sort by database columns or creator and modifier
+	 * 
+	 * @param Query $query
+	 * @param array $sort
+	 * @return Query
+	 */
+	public static function sort(Query $query, array $sort) {
+		
+		if(isset($sort['creator'])) {			
+			$query->join('core_user', 'u', 'n.createdBy = u.id', 'LEFT')->orderBy(['u.displayName' => $sort['creator']]);			
+		} 
+		
+		if(isset($sort['modifier'])) {			
+			$query->join('core_user', 'u', 'n.createdBy = u.id', 'LEFT')->orderBy(['u.displayName' => $sort['modifier']]);						
+		} 
+		
+		return parent::sort($query, $sort);
+		
 	}
 
 }

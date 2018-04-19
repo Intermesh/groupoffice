@@ -72,3 +72,6 @@ $updates['201801111300'][] = function() {
 
 $updates['201801251511'][] = "ALTER TABLE `notes_note` CHANGE `filesFolderId` `filesFolderId` INT(11) NULL DEFAULT NULL;";
 $updates['201801251511'][] = "update notes_note set filesFolderId = null where filesFolderId = 0 OR filesFolderId not in (select id from fs_folders);";
+
+$updates['201804181402'][] = "ALTER TABLE `notes_note` CHANGE `createdBy` `createdBy` INT(11) NOT NULL;";
+$updates['201804181402'][] = "ALTER TABLE `notes_note` CHANGE `modifiedBy` `modifiedBy` INT(11) NOT NULL; ";

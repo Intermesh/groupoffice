@@ -254,11 +254,14 @@ class User extends Entity {
 
 	public function setPassword($password) {
 		$this->plainPassword = $password;		
-		
-	}	
+	}
+	
+	public function getDigest() {
+		return $this->digest;
+	}
 
 	private function updateDigest() {
-		$digest = md5($this->username . ":" . self::DIGEST_REALM . ":" . $this->password);
+		$digest = md5($this->username . ":" . self::DIGEST_REALM . ":" . $this->plainPassword);
 		if ($digest != $this->digest) {
 			$this->digest = $digest;
 		}

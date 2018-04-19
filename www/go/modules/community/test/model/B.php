@@ -46,4 +46,26 @@ class B extends A {
 		return C::findById($this->cId);
 	}
 	
+	public static function filter(Query $query, array $filter) {
+		
+		if(isset($filter['propA'])) {
+			$query->andWhere('propA', 'LIKE', $filter['propA'] . "%");
+		}
+
+		if(isset($filter['propB'])) {
+			$this->query->andWhere('propB', 'LIKE', $filter['propB'] . "%");
+		}
+
+		if(isset($filter['hasHasMany'])) {
+			$tables = AHasMany::getMapping()->getTables();
+			$firstTable = array_shift($tables);
+
+			$this->query->join($firstTable->getName(), 'hasMany', 'a.id = hasMany.aId')->groupBy(['a.id']);
+
+			$this->query->andWhere('hasMany.propOfHasManyA', "LIKE", "%" . $filter['hasHasMany'] . "%");
+		}
+
+		return parent::filter($query, $filter);
+	}
+	
 }
