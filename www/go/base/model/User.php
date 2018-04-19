@@ -99,8 +99,8 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 */
 	public function getDigest(){
 		$user = \go\core\auth\model\User::findById($this->id);
-		$password = $user->password;
-		return $password->digest;
+		
+		return $user->getDigest();
 	}
 
 	/**

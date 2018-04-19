@@ -25,7 +25,7 @@ class Backend extends AbstractDigest {
 	private $_user;
 	
 	public function __construct() {
-		$this->setRealm('Group-Office');
+		$this->setRealm(\go\core\auth\model\User::DIGEST_REALM);
 	}
 	
 	/**
