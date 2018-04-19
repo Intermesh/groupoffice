@@ -49,7 +49,14 @@
     },
 
     get: function (name) {      
-      return entities[name.toLowerCase()];      
+		
+		name = name.toLowerCase();
+		
+		if(!entities[name]) {
+			throw "Entity " + name + " does not exist";
+		}
+		
+      return entities[name];      
     },
     
     getAll() {
