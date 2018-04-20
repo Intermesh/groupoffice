@@ -381,7 +381,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 //			var_dump($this->acl->description);
 		
 		//If this folder belongs to a contact or project etc. then we only need write permission to delete it.
-		if($level == \GO\Base\Model\Acl::DELETE_PERMISSION && $this->folder->acl->description != 'fs_folders.acl_id') {
+		if($level == \GO\Base\Model\Acl::DELETE_PERMISSION && $this->folder->acl->usedIn != 'fs_folders.acl_id') {
 			$level = \GO\Base\Model\Acl::WRITE_PERMISSION;
 		}
 		
@@ -395,7 +395,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 	
 	public function checkOldPermissionLevel($level) {
 		//If this folder belongs to a contact or project etc. then we only need write permission to delete it.
-		if($level == \GO\Base\Model\Acl::DELETE_PERMISSION && $this->getOldFolder()->acl->description != 'fs_folders.acl_id') {
+		if($level == \GO\Base\Model\Acl::DELETE_PERMISSION && $this->getOldFolder()->acl->usedIn != 'fs_folders.acl_id') {
 			$level = \GO\Base\Model\Acl::WRITE_PERMISSION;
 		}
 		return parent::checkOldPermissionLevel($level);
