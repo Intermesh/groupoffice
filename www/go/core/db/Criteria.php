@@ -10,14 +10,21 @@ namespace go\core\db;
  */
 class Criteria {
 	
-	private $where = [];	
+	/**
+	 *
+	 * Is protected because it's merged in Query::mergeWith()
+	 * @var type 
+	 */
+	protected $where = [];	
 	
 	/**
 	 * Key value array of bind parameters.
 	 * 
+	 * Is protected because it's merged in Query::mergeWith()
+	 * 
 	 * @var array eg. ['paramTag' => ':someTag', 'value' => 'Some value', 'pdoType' => PDO::PARAM_STR]
 	 */
-	private $bindParameters = [];
+	protected $bindParameters = [];
 	
 	/**
 	 * Creates a new Criteria or Query object from different input:
