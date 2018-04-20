@@ -43,7 +43,7 @@ $updates['201711071208'][] = 'ALTER TABLE `notes_note_custom_fields` CHANGE `id`
 $updates['201711071208'][] = 'delete from notes_note_custom_fields where id not in(select id from notes_note);';
 $updates['201711071208'][] = 'ALTER TABLE `notes_note_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `notes_note`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;';
 
-$updates['201711071208'][] = 'update `core_entity` set moduleId = (select id from core_module where name=\'notes\'), name = \'Note\' where name = \'GO\\\\Notes\\\\Model\\\\Note\';';
+$updates['201711071208'][] = 'update `core_entity` set moduleId = (select id from core_module where name=\'notes\'), name = \'Note\', clientName = \'Note\' where name = \'GO\\\\Notes\\\\Model\\\\Note\';';
 
 $updates['201712141425'][] = function() {
 		\go\modules\community\notes\model\NoteBook::getType();

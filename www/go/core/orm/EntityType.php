@@ -136,7 +136,7 @@ class EntityType {
 	 */
 	public static function findAll() {
 		$records = (new Query)
-						->select('e.id, e.moduleId, e.name, m.name AS moduleName, m.package AS modulePackage')
+						->select('e.id, e.moduleId, e.name, e.clientName, m.name AS moduleName, m.package AS modulePackage')
 						->from('core_entity', 'e')
 						->join('core_module', 'm', 'm.id = e.moduleId')						
 						->all();

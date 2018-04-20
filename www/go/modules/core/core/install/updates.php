@@ -9,7 +9,12 @@ $updates["201803161130"][] = function() {
 
 
 	$configFile = App::findConfigFile('config.php');
-	$iniFile = substr($configFile, 0, -3).'ini';
+	if(!$configFile) {
+		echo "No config.php found. Skipping conversion\n";
+		return;
+	}
+	
+	$iniFile = substr($configFile, 0, -3).'ini';		
 
 	if(file_exists($iniFile)) {
 		echo "INI file already exists so skipping conversion\n";
