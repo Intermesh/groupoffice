@@ -1641,6 +1641,8 @@ var $billing_clear_payment_method_on_duplicate = true;
 		$this->password_min_length = GO()->getSettings()->passwordMinLength;
 		
 		$this->login_message = GO()->getSettings()->loginMessage;
+		
+		$this->url = GO()->getSettings()->URL;
 	}
 
 
