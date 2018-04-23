@@ -84,6 +84,9 @@ class State extends AbstractState {
     if (!$this->isAuthenticated()) {
 			throw new \go\core\http\Exception(401);
 		}
+		
+		$settings = \go\modules\core\core\model\Settings::get();
+		
     $user = $this->getToken()->getUser();
 		$response = [
 			'username' => $user->username,
@@ -94,9 +97,9 @@ class State extends AbstractState {
 				'hasDataFor' => []
 			]],
 			'capabilities' => Capabilities::get(),
-			'apiUrl' => Request::get()->getHostname().'/jmap.php',
-			'downloadUrl' => Request::get()->getHostname().'/download.php?blob={blobId}',
-			'uploadUrl' => Request::get()->getHostname().'/upload.php',
+			'apiUrl' => $settings->URL.'/jmap.php',
+			'downloadUrl' => $settings->URL.'/download.php?blob={blobId}',
+			'uploadUrl' => $settings->URL.'/upload.php',
       'user' => $user->toArray(['id', 'username', 'email', 'displayName', 'recoveryEmail', 'logins', 'avatarId', 'isAdmin']), //todo add more props when refactored
 			'oldSettings' => $this->clientSettings(), // added for compatibility
 		];

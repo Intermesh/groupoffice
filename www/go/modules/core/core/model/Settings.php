@@ -9,6 +9,32 @@ class Settings extends core\Settings {
 	public function getModuleName() {
 		return 'core';
 	}
+	
+	protected function __construct() {
+		parent::__construct();
+		
+		if(!isset($this->URL)) {
+			$this->URL = $this->detectURL();
+		}
+	}
+	
+	
+	/**
+	 * Auto detects URL to Group-Office if we're running in a webserver
+	 * 
+	 * @return string
+	 */
+	private function detectURL() {
+		
+		if(!isset($_SERVER['SERVER_NAME'])) {
+			return null;
+		}		
+		
+		$path = trim(dirname($_SERVER['PHP_SELF']), '/') . '/';		
+		$https = (isset($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"] == "on" || $_SERVER["HTTPS"] == "1")) || !empty($_SERVER["HTTP_X_SSL_REQUEST"]);
+		$protocol = $https ? 'https://' : 'http://';		
+		return $protocol . $_SERVER['HTTP_HOST'] . $path;
+	}
 
 	const SMTP_ENCRYPTION_TLS = 'tls';
 	const SMTP_ENCRYPTION_SSL = 'ssl';
@@ -96,6 +122,14 @@ class Settings extends core\Settings {
 	 * @var int
 	 */
 	public $passwordMinLength = 6;
+	
+	
+	/**
+	 * The full url to Group-Office.
+	 * 
+	 * @var string 
+	 */
+	public $URL;
 	
 	
 	
