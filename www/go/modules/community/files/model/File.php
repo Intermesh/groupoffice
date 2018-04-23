@@ -11,9 +11,8 @@ class File extends Node {
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
-					->addTable("files_file", "file")
+			->addTable("files_file", "file", ['id'=>'id']) // key needed, cant be determined for database view
 				  ->addRelation('versions', Version::class, ['id' => 'fileId'], true);
 	}
-	
-	
+
 }

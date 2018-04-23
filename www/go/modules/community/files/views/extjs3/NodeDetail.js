@@ -1,5 +1,5 @@
 go.modules.community.files.NodeDetail = Ext.extend(go.panels.DetailView, {
-	entityStore: go.Stores.get("Folder"),
+	entityStore: go.Stores.get("Node"),
 	stateId: 'fs-node-detail',
 	
 	initComponent: function () {

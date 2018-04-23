@@ -6,7 +6,7 @@ use go\core\jmap\EntityController;
 use go\modules\community\files\model;
 
 
-class File extends EntityController {
+class Node extends EntityController {
 	
 	/**
 	 * The class name of the entity this controller is for.
@@ -14,6 +14,6 @@ class File extends EntityController {
 	 * @return string
 	 */
 	protected function entityClass() {
-		return model\File::class;
+		return model\Node::class;
 	}
 }

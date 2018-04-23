@@ -37,31 +37,9 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 
 		this.nodeGrid = new go.modules.community.files.NodeGrid({
 			region: 'center',
-			tbar: [
-				{
-					cls: 'go-narrow',
-					iconCls: "ic-menu",
-					handler: function () {
-						this.sideNav.show();
-					},
-					scope: this
-				},
-				'->',
-				{
-					xtype: 'tbsearch'
-				},
-				this.addButton = new Ext.Button({
-					disabled: true,
-					iconCls: 'ic-add',
-					tooltip: t('Add'),
-					handler: function (btn) {
-						alert('show menu');
-					},
-					scope: this
-				})
-			],
 			listeners: {
 				viewready: function (grid) {
+					this.nodeGrid.getStore().load();
 //					this.folderTree.getStore().load({
 //						callback: function (store) {
 //							this.folderTree.getSelectionModel().selectRow(0);
