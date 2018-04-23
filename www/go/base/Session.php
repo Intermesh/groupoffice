@@ -330,6 +330,9 @@ class Session extends Observable{
 				
 				$this->clearUserTempFiles();
 			}
+			
+			//Set authentication for new framework
+			\GO()->setAuthState(new \go\core\cli\State($user->id));
 
 			$this->fireEvent('login', array($username, $password, $user, $countLogin));
 			
