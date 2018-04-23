@@ -47,6 +47,14 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		}));
 		go.flux.Dispatcher.register(this);
 		
+		if(!this.baseParams) {
+			this.baseParams = {};
+		}
+		
+		if(!this.baseParams.filter) {
+			this.baseParams.filter = {};
+		}
+		
 		//set loaded to true on load() or loadData();
 		this.on('load', function() {
 			this.loaded = true;

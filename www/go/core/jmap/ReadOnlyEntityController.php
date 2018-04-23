@@ -65,28 +65,33 @@ abstract class ReadOnlyEntityController extends Controller {
 						->offset($params['position']);;
 
 		$cls::sort($query, $this->transformSort($params['sort']));
-		
-		
-		foreach($params['filter'] as $filter) {				
-			if(isset($filter['conditions']) && isset($filter['operator'])) {
-				$subCriteria = new Query();
-				foreach($filter['conditions'] as $condition) {
-					$cls::filter($subCriteria, $filter);	
-				}
-				$query->where($subCriteria, $filter['operator']);
-			} else
-			{			
-				 $cls::filter($query, $filter);			
-			}
-		}
-		
-		//$cls::applyAclToQuery($query, $this->getQueryPermissionLevel($filters));
 
+		$query = $this->applyFilterCondition($params['filter'], $query);
 
 		//we don't need entities here. Just a list of id's.
 		$query->selectSingleValue($query->getTableAlias() . '.id');
 		
 		return $query;
+	}
+	
+	/**
+	 * 
+	 * @param array $filter
+	 * @param Query $query
+	 * @return Query
+	 */
+	private function applyFilterCondition($filter, $query)  {
+		$cls = $this->entityClass();
+		if(isset($filter['conditions']) && isset($filter['operator'])) { // is FilterOperator
+			$subQuery = new Query();
+			foreach($filter['conditions'] as $condition) {
+				$subQuery = $this->applyFilterCondition($condition, $subQuery);
+			}
+			return $query->where($subQuery, $filter['operator']);
+		} else {	
+			// is FilterCondition		
+			return $cls::filter($query, $filter);			
+		}
 	}
 	
 	/**
@@ -131,8 +136,8 @@ abstract class ReadOnlyEntityController extends Controller {
 			$params['accountId'] = null;
 		}
 		
-		if(empty($filter['permissionLevel']) || $filter['permissionLevel'] < Acl::LEVEL_READ) {
-			$params['permissionLevel'] = Acl::LEVEL_READ;
+		if(empty($params['filter']['permissionLevel']) || $params['filter']['permissionLevel'] < Acl::LEVEL_READ) {
+			$params['filter']['permissionLevel'] = Acl::LEVEL_READ;
 		}
 		return $params;
 	}

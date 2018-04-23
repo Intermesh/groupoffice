@@ -240,7 +240,7 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.FormWindo
 						
 						fieldLabel: t("Groups"),
 						storeBaseParams:{
-							filter: [{"includeUsers" : false}]
+							filter: {"includeUsers" : false}
 						}
 					})
 				]
