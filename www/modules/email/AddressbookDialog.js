@@ -191,7 +191,7 @@ GO.email.AddressbookDialog = function(config) {
 				fields: ['id', 'name', 'user_name','acl_id', 'checked','addresslistGroupName']
 			}),
 			baseParams: {
-				permissionLevel: GO.permissionLevels.write
+				permissionLevel: GO.permissionLevels.read
 			},
 			proxy: new Ext.data.HttpProxy({
 				url:GO.url('addressbook/addresslist/store')
