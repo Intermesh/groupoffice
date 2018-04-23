@@ -4,7 +4,7 @@ go.modules.community.files.NodeGrid = Ext.extend(go.grid.GridPanel, {
 
 		this.store = new go.data.Store({
 			fields: ['id', 'name', 'byteSize', {name: 'createdAt', type: 'date'}, {name: 'modifiedAt', type: 'date'}, 'permissionLevel'],
-			baseParams: {filter:{parentId:0}},
+			baseParams: {filter:{parentId:1}},
 			entityStore: go.Stores.get("Node")
 		});
 

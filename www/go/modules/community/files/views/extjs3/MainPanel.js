@@ -64,7 +64,7 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 		});
 
 		this.nodeGrid.getSelectionModel().on('rowselect', function (sm, rowIndex, record) {
-			go.Router.goto("files/" + record.id);
+			go.Router.goto("files/node/" + record.id);
 		}, this);
 
 		this.nodeDetail = new go.modules.community.files.NodeDetail({
