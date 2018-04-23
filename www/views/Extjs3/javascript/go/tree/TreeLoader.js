@@ -28,8 +28,10 @@ go.tree.TreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 			
 
 			if(node.attributes.params) {
-				Ext.apply(p, node.attributes.params);
+				go.util.mergeObjects(p, node.attributes.params);
 			}
+			
+			console.log(p);
 			
 			this.doRequest(p,callback,scope,{node:node});
 			

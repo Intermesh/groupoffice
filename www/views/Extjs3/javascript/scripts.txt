@@ -310,4 +310,5 @@ views/Extjs3/javascript/go/systemsettings/NotificationsPanel.js
 views/Extjs3/javascript/go/systemsettings/AuthenticationPanel.js
 views/Extjs3/javascript/go/systemsettings/Dialog.js
 
+views/Extjs3/javascript/go/util.js
 views/Extjs3/javascript/go/tree/TreeLoader.js
