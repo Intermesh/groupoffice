@@ -97,7 +97,7 @@ class State extends AbstractState {
 			'apiUrl' => Request::get()->getHostname().'/jmap.php',
 			'downloadUrl' => Request::get()->getHostname().'/download.php?blob={blobId}',
 			'uploadUrl' => Request::get()->getHostname().'/upload.php',
-      'user' => $user->toArray(['id', 'username', 'email', 'displayName', 'recoveryEmail', 'logins', 'avatarId']), //todo add more props when refactored
+      'user' => $user->toArray(['id', 'username', 'email', 'displayName', 'recoveryEmail', 'logins', 'avatarId', 'isAdmin']), //todo add more props when refactored
 			'oldSettings' => $this->clientSettings(), // added for compatibility
 		];
     
