@@ -195,8 +195,6 @@
 
 			this.fireEvent("authenticated", this, result);
 			
-			//load state
-			Ext.state.Manager.setProvider(new GO.state.HttpProvider());
 			GO.mainLayout.onAuthentication();
 			GO.mainLayout.on('render', function () {
 				go.Router.goto(go.Router.pathBeforeLogin);

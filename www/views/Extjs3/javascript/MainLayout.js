@@ -268,7 +268,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 	onAuthentication: function () {
 		
-		
+		//load state
+		Ext.state.Manager.setProvider(new GO.state.HttpProvider());
 		
 		go.Modules.init();
 
