@@ -1,3 +1,4 @@
+23-04-2018 6.2.90
 - Set project id on billing invoice when invoicing.
 - Addressbook: Make readable addresslists visible to the emailcomposer->addressbook->addresslist grid. (only writable where displayed before)
 - Addressbook: Fixed issue with saving user settings when no contact is known attached to the user
