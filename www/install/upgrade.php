@@ -146,9 +146,9 @@ try {
 							}
 						}
 					}
-				
-
-
+					
+					flush();
+					
 					echo ($module->package ?? "legacy") . "/" . $module->name . ' updated from '. $module->version .' to ' . $counts[$moduleId] . "\n";
 
 
@@ -161,8 +161,6 @@ try {
 						if ($newBackendUpgrade) {
 							$module->version = $counts[$moduleId] = 0;
 							$aModuleWasUpgradedToNewBackend = true;
-
-							echo "\n\n\nREFACTORED MODULE\n\n\n";
 						} else
 						{
 							$module->version = $counts[$moduleId];
@@ -187,7 +185,7 @@ try {
 	}
 
 	if (!upgrade()) {
-		echo "A module was refactored. Rerunning...\n";
+		echo "\n\nA module was refactored. Rerunning...\n\n";
 		upgrade();
 	}
 
