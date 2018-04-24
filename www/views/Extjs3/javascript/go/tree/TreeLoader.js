@@ -41,7 +41,7 @@ go.tree.TreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 				
 				items.forEach(function(entity) {
 					result.push({
-						id: entity.id,
+//						id: entity.id,
 						entity: entity,
 						leaf: !entity.hasChildren,
 						text: entity.name //TODO this should be 
@@ -67,9 +67,7 @@ go.tree.TreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 			params.sort = [params.sort + " " + params.dir];
 			delete params.dir;
 		}
-		
-		
-		
+
 		return go.Jmap.request({
 			method: method,
 			params: params,
