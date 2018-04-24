@@ -49,7 +49,7 @@ CREATE TABLE `files_storage` (
   `id` int(11) NOT NULL COMMENT 'Only id''s of files_node''s that are "Folders"(blobId is NULL)',
   `quota` int(11) NOT NULL DEFAULT '0',
   `usage` int(11) NOT NULL DEFAULT '0',
-  `groupId` int(11) NOT NULL
+  `userId` int(11) DEFAULT NULL
 ) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
@@ -93,7 +93,8 @@ ALTER TABLE `files_node_user`
 --
 ALTER TABLE `files_storage`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_files_storage_files_node1_idx` (`id`);
+  ADD KEY `fk_files_storage_files_node1_idx` (`id`),
+	ADD UNIQUE KEY `userId_UNIQUE` (`userId`);
 
 --
 -- Indexen voor tabel `files_version`
@@ -133,7 +134,7 @@ ALTER TABLE `files_node_user`
 -- Beperkingen voor tabel `files_storage`
 --
 ALTER TABLE `files_storage`
-  ADD CONSTRAINT `fk_files_storage_core_group1` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_files_storage_core_user1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Beperkingen voor tabel `files_version`
@@ -150,11 +151,14 @@ INSERT INTO `files_node` (`id`, `storageId`, `parentId`, `name`, `createdAt`, `m
 UPDATE `files_node` SET id = 0 WHERE id = -1;
 SET foreign_key_checks = 1;
 
+-- Global storage quota for GO
+INSERT INTO `files_storage` (`id`, `quota`, `usage`, `userId`) VALUES ('1', '1000000', '0', NULL);
+
 -- demo data
-INSERT INTO `files_storage` (`id`, `quota`, `usage`, `groupId`) SELECT '1', '1000000', '0', `id` FROM core_group WHERE `isUserGroupFor`=1;
+INSERT INTO `files_storage` (`id`, `quota`, `usage`, `userId`) VALUES ('2', '1000000', '0', 1);
 INSERT INTO `files_node` (`storageId`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isDirectory`) 
-VALUES ('1', '0', 'Admin home', now(), now(), '1', '1', '1', '1');
-INSERT INTO `files_node` (`storageId`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isLocked`) VALUES ('1', '1', 'first folder', now(), now(), '1', '1', '1', '0');
-INSERT INTO `files_node` (`storageId`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isLocked`) VALUES ('1', '1', 'second folder', now(), now(), '1', '1', '1', '0');
-INSERT INTO `files_node` (`storageId`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isLocked`) VALUES ('1', '1', 'thirth folder', now(), now(), '1', '1', '1', '0');
-INSERT INTO `files_node` (`storageId`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isLocked`) VALUES ('1', '3', 'sub of secondr', now(), now(), '1', '1', '1', '0');
+VALUES ('2', '0', 'Admin home', now(), now(), '1', '1', '1', '1');
+INSERT INTO `files_node` (`storageId`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isLocked`) VALUES ('2', '1', 'first folder', now(), now(), '1', '1', '1', '0');
+INSERT INTO `files_node` (`storageId`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isLocked`) VALUES ('2', '1', 'second folder', now(), now(), '1', '1', '1', '0');
+INSERT INTO `files_node` (`storageId`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isLocked`) VALUES ('2', '1', 'thirth folder', now(), now(), '1', '1', '1', '0');
+INSERT INTO `files_node` (`storageId`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isLocked`) VALUES ('2', '3', 'sub of secondr', now(), now(), '1', '1', '1', '0');

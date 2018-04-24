@@ -3,7 +3,7 @@ namespace go\modules\community\files\model;
 
 use go\core\orm;
 
-class Storage extends orm\Entity {
+class Storage extends orm\Property {
 
 	
 	public $id;
@@ -25,4 +25,8 @@ class Storage extends orm\Entity {
 		return parent::defineMapping()->addTable("files_storage");
 	}
 
+	public function getRootFolder(){
+		return Node::find()->where(['storageId'=>$this->id,'parentId'=>0])->single();
+	}
+	
 }

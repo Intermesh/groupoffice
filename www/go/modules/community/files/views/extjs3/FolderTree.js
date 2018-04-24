@@ -3,6 +3,9 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 	animate: true,
 	enableDD: false,
 	loader: new go.tree.TreeLoader({
+		baseAttrs:{
+			iconCls:'ic-folder'
+		},
 		entityStore: go.Stores.get("Node"),
 		getParams : function(node) {
 
