@@ -6,7 +6,7 @@ use go\core\orm;
 class Storage extends orm\Entity {
 
 	
-	public $rootFolderId;
+	public $id;
 	/**
 	 * @var \go\core\util\DateTime
 	 */
@@ -22,7 +22,7 @@ class Storage extends orm\Entity {
 	public $usage;
 	
 	protected static function defineMapping() {
-		return parent::defineMapping()->addTable("files_storage", "s");
+		return parent::defineMapping()->addTable("files_storage");
 	}
 
 }

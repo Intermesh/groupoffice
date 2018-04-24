@@ -150,8 +150,8 @@ INSERT INTO `files_node` (`id`, `storageId`, `parentId`, `name`, `createdAt`, `m
 UPDATE `files_node` SET id = 0 WHERE id = -1;
 SET foreign_key_checks = 1;
 
---- demo data
-INSERT INTO `files_storage` (`id`, `quota`, `usage`, `groupId`) VALUES ('1', '1000000', '0', '1');
+-- demo data
+INSERT INTO `files_storage` (`id`, `quota`, `usage`, `groupId`) SELECT '1', '1000000', '0', `id` FROM core_group WHERE `isUserGroupFor`=1;
 INSERT INTO `files_node` (`storageId`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isDirectory`) 
 VALUES ('1', '0', 'Admin home', now(), now(), '1', '1', '1', '1');
 INSERT INTO `files_node` (`storageId`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isLocked`) VALUES ('1', '1', 'first folder', now(), now(), '1', '1', '1', '0');
