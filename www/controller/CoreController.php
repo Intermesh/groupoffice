@@ -303,11 +303,11 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		}
 	}
 	
-	protected function actionClientScripts($lang) {
+	protected function actionClientScripts() {
 		header('Content-Type: application/javascript');
     if(!GO::config()->debug) {
       header('Content-Encoding: gzip');
-      $cacheFile = \go\core\App::get()->getDataFolder()->getFolder('clientscripts')->create()->getFile('all-' . $lang . '.js');
+      $cacheFile = \go\core\App::get()->getDataFolder()->getFolder('clientscripts')->create()->getFile('all.js');
 	
     } else
     {

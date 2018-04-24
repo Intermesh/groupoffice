@@ -104,7 +104,7 @@ if(GO::config()->debug) {
   $cacheFile->delete();
 } else
 {
-  $cacheFile = \go\core\App::get()->getDataFolder()->getFolder('clientscripts')->create()->getFile('all-' .\GO::language()->getLanguage(). '.js');
+  $cacheFile = \go\core\App::get()->getDataFolder()->getFolder('clientscripts')->create()->getFile('all.js');
 }
 //echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' => \GO::language()->getLanguage()]) . '"></script>';
 echo '<script type="text/javascript" src="' . GO::config()->url . 'views/Extjs3/ext/adapter/ext/ext-base-debug.js"></script>';
@@ -112,7 +112,7 @@ echo '<script type="text/javascript" src="' . GO::config()->url . 'views/Extjs3/
 echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' => \GO::language()->getLanguage()]) . '"></script>';
   
 if ($cacheFile->exists()) {
-	echo '<script type="text/javascript" src="' . GO::url('core/clientScripts', ['mtime' => GO::config()->mtime, 'lang' => \GO::language()->getLanguage()]) . '"></script>';
+	echo '<script type="text/javascript" src="' . GO::url('core/clientScripts', ['mtime' => GO::config()->mtime]) . '"></script>';
 } else {
 
 	$scripts = array();
@@ -120,13 +120,7 @@ if ($cacheFile->exists()) {
 
 	$scripts[] = "var BaseHref = '" . GO::config()->host . "';";
 
-//	$scripts[] = new File(GO::config()->root_path . 'views/Extjs3/ext/adapter/ext/ext-base-debug.js');
-//	$scripts[] = new File(GO::config()->root_path . 'views/Extjs3/ext/ext-all-debug.js');
 	$scripts[] = new File(GO::config()->root_path . 'views/Extjs3/javascript/namespaces.js');
-
-//	$scripts[] = GO::config()->debug ? new \go\core\util\Url(GO::url('core/language', ['lang' => \GO::language()->getLanguage()])) : GO::language()->getScript();
-//  $scripts[] = GO::language()->getScript();
-
 	$data = file_get_contents(GO::config()->root_path . 'views/Extjs3/javascript/scripts.txt');
 	$lines = explode("\n", $data);
 	foreach ($lines as $line) {
@@ -228,7 +222,7 @@ if ($cacheFile->exists()) {
       {
         $js .= "go.module = '".$parts[1]."';";
         $js .= "go.package = 'legacy';";
-        $js .= "go.Translate.setModule('legacy', " .$parts[1]. "');";   
+        $js .= "go.Translate.setModule('legacy', '" .$parts[1]. "');";   
       }
 
       if(!empty($js)) {
