@@ -180,6 +180,15 @@ class User extends Entity {
 		return parent::setValues($values);
 	}
 	
+	/**
+	 * Get the personal group object of this user
+	 * 
+	 * @return Group
+	 */
+	public function getGroup(){
+		return Group::find()->where(['isUserGroupFor'=>$this->id])->single();
+	}
+	
 	protected function init() {
 		parent::init();
 		
