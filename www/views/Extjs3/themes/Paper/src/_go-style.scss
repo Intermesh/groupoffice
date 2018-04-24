@@ -244,25 +244,24 @@ a {
 		border:0;
 		margin:0;
 		cursor:pointer;
-		&.x-view-selected i {
-			color: $cPrimary;
-		}
 		i {
 			color: color($foreground,'secondary-text');
 			margin-right:dp(16);
-			
-		}
-		&.x-view{
-			&-over {
-				background-color: $cHover;
-			}
-			&-selected {
-				color:$cPrimary;
-				background-color: $cSelected;
-			}
 		}
 
   }
+}
+.x-view{
+	&-over {
+		background-color: $cHover !important;
+	}
+	&-selected {
+		color:$cPrimary !important;
+		background-color: $cSelected !important;
+		> i {
+			color: inherit;
+		}
+	}
 }
 
 #mainNorthPanel {
