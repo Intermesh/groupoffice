@@ -120,46 +120,7 @@ class Language{
 		return $this->_langIso;
 	}
 	
-	public function getScript() {
-
-		$language = $this->_langIso;
-
-		$str = "var GO = GO || {};\n";
-
-		$extjsLang = GO::t("extjs_lang");
-		if ($extjsLang == 'extjs_lang')
-			$extjsLang = $language;
-
-		$view_root_path = GO::config()->root_path . 'views/Extjs3/';
-
-
-		if (file_exists($view_root_path . 'ext/src/locale/ext-lang-' . $extjsLang . '.js')) {
-			$str .= file_get_contents($view_root_path . 'ext/src/locale/ext-lang-' . $extjsLang . '.js');
-		}
-
-		require(GO::config()->root_path . 'language/languages.php');
-		$str .= "GO.Languages=[];\n";
-
-		foreach ($languages as $code => $language) {
-			$str .= 'GO.Languages.push(["' . $code . '","' . $language . '"]);' . "\n";
-		}
-
-		//Put all lang vars in js		
-		$l = $this->getAllLanguage();
-		$l['iso'] = $this->_langIso;
-
-		$str .= 'GO.lang = ' . json_encode($l, JSON_PRETTY_PRINT) . ";\n";
-//		$str .= 'GO.lang.countries=' . json_encode($l['base']['countries'], JSON_PRETTY_PRINT) . ";\n";
-//		unset($l['base']);
-//
-//		foreach ($l as $module => $langVars) {
-//			$str .= 'Ext.ns("GO.' . $module . '");' . "\n";
-//			$str .= 'GO.' . $module . '.lang=' . json_encode($langVars, JSON_PRETTY_PRINT) . ';' . "\n";
-//		}
-
-		return $str;
-	}
-
+	
 	/**
 	 * Check if language is supported
 	 * 
@@ -177,35 +138,11 @@ class Language{
 	 * 
 	 * @param String $name Name of the translation variable
 	 * @param String $module Name of the module to find the translation
-	 * @param String $basesection Only applies if module is set to 'base'
+	 * @param String $package Only applies if module is set to 'base'
 	 * @param boolean $found Pass by reference to determine if the language variable was found in the language file.
 	 */
-	public function getTranslation($name, $module='base',$basesection='common', &$found=false){
-		
-		$this->_loadSection($module, $basesection);		
-		
-		if($module=='base'){
-			if(isset($this->_lang[$module][$basesection][$name])){
-				$found=true;
-				$translation=$this->_lang[$module][$basesection][$name];
-			}else
-			{
-				$found = false;
-				return $name;
-			}
-		}else
-		{
-			if(isset($this->_lang[$module][$name])){
-				$found=true;
-				$translation=$this->_lang[$module][$name];
-			}else
-			{
-				$found = false;
-				$translation=$name;
-			}
-		}
-		
-		return str_replace('{product_name}',GO::config()->product_name,$translation);
+	public function getTranslation($name, $module='core',$package = 'core', &$found=false) {		
+		return GO()->t($name, $package, $module);
 	}
 	
 	private function _replaceProductName($l){

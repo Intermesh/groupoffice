@@ -10,7 +10,11 @@ use function GO;
 
 class Language extends Singleton {
 
-	private $isoCode = "en";
+	/**
+	 *
+	 * @var string eg "en-US".
+	 */
+	private $isoCode;
 	private $data = [];
 
 	protected function __construct() {
@@ -25,6 +29,10 @@ class Language extends Singleton {
 	 */
 	public function getIsoCode() {
 		return $this->isoCode;
+	}
+	
+	public function setLanguage($isoCode) {
+		$this->isoCode = $isoCode;
 	}
 	
 	private function getBrowserLanguage(){
@@ -44,81 +52,71 @@ class Language extends Singleton {
 	 * Translates a language variable name into the local language.
 	 * 
 	 * @param String $str String to translate
-	 * @param String $moduleName Name of the module to find the translation
-	 * @param String $coreSection Only applies if module is set to 'base'
+	 * @param String $module Name of the module to find the translation
+	 * @param String $package Only applies if module is set to 'base'
 	 */
-	public function t($str, $moduleName = 'core', $coreSection = 'common') {
+	public function t($str, $package = 'core', $module = 'core') {
 
-		$this->loadSection($moduleName, $coreSection);
-
-		if ($moduleName == 'core') {
-			if (isset($this->data[$moduleName][$coreSection][$str])) {
-				return $this->data[$moduleName][$coreSection][$str];
-			} 
-			return $str;			
+		$this->loadSection($package, $module);
+		
+		if(!isset($this->data[$package]) || !isset($this->data[$package][$module])) {
+			return t($str);
 		}
 		
-		if (isset($this->data[$moduleName][$str])) {
-			return $this->data[$moduleName][$str];
-		} 
-		
-		return $str;
+		return $this->data[$package][$module][$str] ?? $str;
 	}
 
 
-	private function loadSection($moduleName = 'core', $basesection = 'common') {
-		if (!isset($this->data[$moduleName]) || ($moduleName == 'core' && !isset($this->data[$moduleName][$basesection]))) {
+	private function loadSection($package = 'core', $module = 'core') {
+		if (!isset($this->data[$package])) {
+			$this->data[$package] = [];
+		} 
+		
+		if(!isset($this->data[$package][$module])) {
 
-			$langData = new ArrayObject();
+			$langData = [];
 			//Get english default
-			$file = $this->findLangFile('en', $moduleName, $basesection);
+			$file = $this->findLangFile('en',$package, $module);
 			if ($file->exists()) {
-				$langData->mergeRecurive(require($file));
+				$langData = require($file);
 			}
 
 			//overwirte english with actual language
 			if ($this->isoCode != 'en') {
-				$file = $this->findLangFile($this->isoCode, $moduleName, $basesection);
+				$file = $this->findLangFile($this->isoCode, $package, $module);
 				if ($file->exists()) {
-					$langData->mergeRecurive(require($file));
+					$langData = array_merge($langData, require($file));
 				}
 			}
 
-			$file = $this->findLangOverride($this->isoCode, $moduleName, $basesection);
+			$file = $this->findLangOverride($this->isoCode, $package, $module);
 			if ($file->exists()) {
-				$langData->mergeRecurive(require($file));
+				$langData = array_merge($langData, require($file));
 			}
-
-			if ($moduleName == 'core') {
-				$this->data[$moduleName][$basesection] = $langData;
-			} else {
-				$this->data[$moduleName] = $langData;
-			}
+			
+			$this->data[$package][$module] = $langData;			
 		}
 	}
 	
 	private function hasLanguage($lang) {
-		return $this->findLangFile($lang, 'core', 'common')->exists();
+		return $this->findLangFile($lang, 'core', 'core')->exists();
 	}
 
 	/**
 	 * 
 	 * @param string $lang
-	 * @param string $moduleName
+	 * @param string $module
 	 * @param string $basesection
 	 * @return File
 	 * @throws Exception
 	 */
-	private function findLangFile($lang, $moduleName, $basesection) {
-		if ($moduleName == 'core')
-			$folder = Environment::get()->getInstallFolder()->getFolder('language/' . $basesection );
-		else {
-			$module = Base::findByName($moduleName);
-			if(!$module) {
-				throw new Exception("Module $moduleName not found!");
-			}
-			
-			$folder = $module->getFolder()->getFolder('language');			
+	private function findLangFile($lang, $package, $module) {
+		
+		if($package == "legacy") {
+			$folder = Environment::get()->getInstallFolder()->getFolder('modules/' . $module .'/language');
+		} else
+		{
+			$folder = Environment::get()->getInstallFolder()->getFolder('go/modules/' . $package . '/' . $module .'/language');
 		}
 
 		return $folder->getFile($lang . '.php');
@@ -131,22 +129,11 @@ class Language extends Singleton {
 	 * @param string $basesection
 	 * @return File
 	 */
-	private function findLangOverride($lang, $module, $basesection) {
+	private function findLangOverride($lang, $package, $module) {
 
-		$folder = GO()->getDataFolder()->getFolder('users/admin/lang/' . $lang);
-		$filename = $module == 'core' ? 'core_' . $basesection . '.php' : $module . '.php';
-
-		$file = $folder->getFile($filename);
-
-		if ($file->exists())
-			return $file;
-
-
-		$folder = GO()->getDataFolder()->getFolder('users/admin/lang');
-
-		$file = $folder->getFile($filename);
-
-		return $file;
+		$folder = GO()->getDataFolder()->getFolder('users/admin/language/' . $package . '/' .$module);
+		
+		return $folder->getFile($lang . '.php');
 	}
 
 	
@@ -173,4 +160,46 @@ class Language extends Singleton {
 		return $this->data['core']['countries'];
 	}
 
+	
+	public function getScript() {
+
+		$language = $this->isoCode;
+
+		$str = "var GO = GO || {};\n";
+
+		$extjsLang = $this->t("extjs_lang");
+		if ($extjsLang == 'extjs_lang')
+			$extjsLang = $language;
+
+		$viewRoot = Environment::get()->getInstallFolder()->getFolder('views/Extjs3');
+
+		$extLang = $viewRoot->getFile('ext/src/locale/ext-lang-' . $extjsLang . '.js');
+		if ($extLang->exists()) {
+			$str .= $extLang->getContents();
+		}
+
+		require(Environment::get()->getInstallFolder()->getFile('language/languages.php'));
+		$str .= "GO.Languages=[];\n";
+
+		foreach ($languages as $code => $language) {
+			$str .= 'GO.Languages.push(["' . $code . '","' . $language . '"]);' . "\n";
+		}
+
+		//Put all lang vars in js		
+		$l = $this->getAllLanguage();
+		$l['iso'] = $this->isoCode;
+		
+		$str .= 'GO.lang = ' . json_encode($l) . ";\n";
+
+		return $str;
+	}
+	
+	public function getAllLanguage(){
+		$modules = module\model\Module::find();
+		foreach($modules as $module) {
+			$this->loadSection($module->package  ?? "legacy", $module->name);
+		}
+		
+		return $this->data;
+	}
 }

@@ -2,7 +2,7 @@ Ext.ns('go.modules.notes');
 
 go.Modules.register("community", 'notes', {
 	mainPanel: "go.modules.notes.MainPanel",
-	title: t("Notes", "notes"),
+	title: t("Notes"),
 	entities: ["Note", "NoteBook"],
 	initModule: function () {	
 		go.Links.registerLinkToWindow("Note", function() {

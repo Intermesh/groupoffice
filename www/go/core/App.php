@@ -292,10 +292,10 @@ namespace go\core {
 		 * 
 		 * @param String $str String to translate
 		 * @param String $module Name of the module to find the translation
-		 * @param String $coreSection Only applies if module is set to 'base'
+		 * @param String $package Only applies if module is set to 'base'
 		 */
-		public function t($str, $moduleName, $coreSection = 'common') {
-			return Language::get()->t($str, $moduleName, $coreSection);
+		public function t($str, $package = 'core', $module = 'core') {
+			return Language::get()->t($str, $module, $package);
 		}
 
 		public static function findConfigFile($name = 'config.ini') {

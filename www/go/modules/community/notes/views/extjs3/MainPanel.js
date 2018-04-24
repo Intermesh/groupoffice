@@ -20,7 +20,7 @@ go.modules.notes.MainPanel = Ext.extend(Ext.Panel, {
 
 	initComponent: function () {
 
-
+//		debugger;
 		this.noteBookGrid = new go.modules.notes.NoteBookGrid({
 			region: 'west',
 			cls: 'go-sidenav',

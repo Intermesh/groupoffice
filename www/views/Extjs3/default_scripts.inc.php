@@ -201,12 +201,12 @@ if ($cacheFile->exists()) {
         if($parts[0] == 'go' && $parts[1] == 'modules') {
           $js .= "go.module = '".$parts[3]."';";
           $js .= "go.package = '".$parts[2]."';";
-          $js .= "go.Translate.setModule('" .$parts[3]. "');";   
+          $js .= "go.Translate.setModule('".$parts[2]."', '" .$parts[3]. "');";   
         } else if($parts[0] == 'modules')
         {
           $js .= "go.module = '".$parts[1]."';";
           $js .= "go.package = 'legacy';";
-          $js .= "go.Translate.setModule('" .$parts[1]. "');";   
+          $js .= "go.Translate.setModule('legacy', '" .$parts[1]. "');";   
         }
         $js .= $script->getContents()."\n;\n";
 				//echo '<script type="text/javascript" src="script.php?source='.$script->getRelativePath($rootFolder) . '"></script>' . "\n";
@@ -223,12 +223,12 @@ if ($cacheFile->exists()) {
       if($parts[0] == 'go' && $parts[1] == 'modules') {
         $js .= "go.module = '".$parts[3]."';";
         $js .= "go.package = '".$parts[2]."';";
-        $js .= "go.Translate.setModule('" .$parts[3]. "');";   
+        $js .= "go.Translate.setModule('".$parts[2]."', '" .$parts[3]. "');";   
       } else if($parts[0] == 'modules')
       {
         $js .= "go.module = '".$parts[1]."';";
         $js .= "go.package = 'legacy';";
-        $js .= "go.Translate.setModule('" .$parts[1]. "');";   
+        $js .= "go.Translate.setModule('legacy', " .$parts[1]. "');";   
       }
 
       if(!empty($js)) {

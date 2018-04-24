@@ -132,9 +132,17 @@
 				this.logout.defer(500, this, [true]);
 			} else
 			{
-				window.localStorage.removeItem("accessToken");
-				window.sessionStorage.removeItem("accessToken");
-				document.location = GO.url('auth/logout');
+				Ext.Ajax.request({
+					url: BaseHref + 'auth.php',
+					method: "DELETE",
+					callback: function() {
+						window.localStorage.removeItem("accessToken");
+						window.sessionStorage.removeItem("accessToken");
+						
+						document.location = BaseHref;
+					}
+				})
+				
 			}
 		},
 

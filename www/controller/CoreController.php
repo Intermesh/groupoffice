@@ -326,26 +326,24 @@ class CoreController extends \GO\Base\Controller\AbstractController {
     
     $module = preg_match("/\bmodules\/([^\/]+)/", $source, $matches);
     
-    header('Content-Type: application/javascript');
+    header('Content-Type: application/javascript; charset=utf8');
      
     if(isset($matches[1])) {
      echo "go.Translate.setModule('" .$matches[1]. "');";
     }
-    
-   
-       
-    readfile($file->getPath());
-    
+    readfile($file->getPath());    
   }
 	
 	protected function actionLanguage($lang) {
-		\GO::language()->setLanguage($lang);
+		header('Content-Type: application/javascript; charset=utf8');
 		
-		echo \GO::language()->getScript();
+		\go\core\Language::get()->setLanguage($lang);
+		
+		echo \go\core\Language::get()->getScript();
 	}
 	
 	protected function actionModuleScripts() {
-		header('Content-Type: application/javascript');
+		header('Content-Type: application/javascript; charset=utf8');
 		$load_modules = GO::modules()->getAllModules();
 				
 		$GO_SCRIPTS_JS = "";

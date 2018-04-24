@@ -256,6 +256,18 @@ class Token extends Entity {
 		$_SESSION['GO_SESSION']['accessToken'] = $this->accessToken;		
 	}
 	
+	private function oldLogout() {
+		$this->oldLogin();
+		session_destroy();
+	}
+	
+	protected function internalDelete() {
+		
+		
+		$this->oldLogout();
+		return parent::internalDelete();
+	}
+	
 	/**
 	 * Add the given method to the passed method list.
 	 * 
