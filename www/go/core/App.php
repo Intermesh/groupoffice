@@ -295,7 +295,7 @@ namespace go\core {
 		 * @param String $package Only applies if module is set to 'base'
 		 */
 		public function t($str, $package = 'core', $module = 'core') {
-			return Language::get()->t($str, $module, $package);
+			return Language::get()->t($str, $package, $module);
 		}
 
 		public static function findConfigFile($name = 'config.ini') {

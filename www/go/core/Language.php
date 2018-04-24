@@ -32,7 +32,11 @@ class Language extends Singleton {
 	}
 	
 	public function setLanguage($isoCode) {
-		$this->isoCode = $isoCode;
+		if($isoCode != $this->isoCode) {
+			$this->isoCode = $isoCode;
+			$this->data = [];
+		}
+		
 	}
 	
 	private function getBrowserLanguage(){
@@ -98,7 +102,7 @@ class Language extends Singleton {
 		}
 	}
 	
-	private function hasLanguage($lang) {
+	public function hasLanguage($lang) {
 		return $this->findLangFile($lang, 'core', 'core')->exists();
 	}
 
