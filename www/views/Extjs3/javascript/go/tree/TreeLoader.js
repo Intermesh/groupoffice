@@ -18,23 +18,16 @@ go.tree.TreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 	},
 	
 	requestEntityData : function(node, callback, scope){
-//		console.log(node);
-//		console.log(callback);
-//		console.log(scope);
-		
+
 		if(this.fireEvent("beforeload", this, node, callback) !== false){
 		
 			var p = this.getParams(node);
 			
-
 			if(node.attributes.params) {
 				go.util.mergeObjects(p, node.attributes.params);
 			}
 			
-			console.log(p);
-			
 			this.doRequest(p,callback,scope,{node:node});
-			
 		}
 	},
 
