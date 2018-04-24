@@ -14,9 +14,7 @@
 go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 
 	layout: 'responsive',
-	layoutConfig: {
-		triggerWidth: 1000
-	},
+	layoutConfig: {triggerWidth: 1000},
 
 	initComponent: function () {
 			
@@ -35,37 +33,11 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 //			this.nodeGrid.getStore().load();
 		}, this);
 
-		this.nodeGrid = new go.modules.community.files.NodeGrid({
-			region: 'center',
-			listeners: {
-				viewready: function (grid) {
-					this.nodeGrid.getStore().load();
-//					this.folderTree.getStore().load({
-//						callback: function (store) {
-//							this.folderTree.getSelectionModel().selectRow(0);
-//						},
-//						scope: this
-//					});
-				},
+//		go.Router.add(/files\/node\/([0-9]\/+)/, function(id) {
+//			
+//		});
 
-				rowdblclick: function (grid, rowIndex, e) {
-
-					var record = grid.getStore().getAt(rowIndex);
-					if (record.get('permissionLevel') < GO.permissionLevels.write) {
-						return;
-					}
-
-					var fileRename = new go.modules.files.FileForm();
-					fileRename.load(record.id).show();
-				},
-
-				scope: this
-			}
-		});
-
-		this.nodeGrid.getSelectionModel().on('rowselect', function (sm, rowIndex, record) {
-			go.Router.goto("files/node/" + record.id);
-		}, this);
+		//		rowdblclick: function (grid, rowIndex, e) {
 
 		this.nodeDetail = new go.modules.community.files.NodeDetail({
 			region: 'east',
@@ -83,13 +55,75 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 
 		this.centerPanel = new Ext.Panel({
 			region: "center",
-			layout: "responsive",
-			stateId: "go-files-west",
+			layout: "border",
 			split: true,
-			width: dp(700),
-			narrowWidth: dp(400), //this will only work for panels inside another panel with layout=responsive. Not ideal but at the moment the only way I could make it work
+			//width: dp(700),
+			//narrowWidth: dp(400), //this will only work for panels inside another panel with layout=responsive. Not ideal but at the moment the only way I could make it work
 			items: [
-				this.nodeGrid, //first is default in narrow mode
+				this.cardPanel = new go.modules.community.files.CardPanel({
+					region: 'center',
+					tbar: {                        // configured using the anchor layout
+						xtype : 'container',
+						items :[new Ext.Toolbar({
+							items:[
+							{
+								cls: 'go-narrow',
+								iconCls: "ic-menu",
+								handler: function () {
+									this.sideNav.show();
+								},
+								scope: this
+							},
+							'->',
+							this.addButton = new Ext.Button({
+								disabled: true,
+								iconCls: 'ic-add',
+								tooltip: t('Add'),
+								menu: new Ext.menu.Menu({
+									items: [
+										{
+											iconCls: 'ic-folder',
+											text: t("Folder"),
+											handler: this.newFolder,
+											scope: this
+										}
+									]
+								}),
+								scope: this
+							}),{
+								tooltip: t("Thumbnails", "files"),
+								iconCls: 'ic-view-list',
+								handler: function(item){
+									var view = this.cardPanel.getLayout().activeItem.stateId==="files-grid" ? 'comfy' : 'list';
+									item.setIconClass('ic-view-'+view);
+									this.cardPanel.getLayout().setActiveItem(view === 'list' ? 0 : 1);
+								},
+								scope:this
+							},{
+								xtype: 'tbsearch'
+							}]
+						}),
+						new Ext.Toolbar({
+							layout:'hbox',
+							layoutConfig: {
+								align: 'middle',
+								defaultMargins: {left: dp(4), right: dp(4),bottom:0,top:0}
+							},
+							items:[
+								this.locationTextField = new Ext.form.TextField({
+									fieldLabel:t("Location"),
+									name:'files-location',
+									value: 'Breadcrumbs',
+									readOnly:true,
+									flex:1
+								}),
+								this.searchField = new go.toolbar.SearchButton({
+									store: this.gridStore
+							  })
+							]
+						})
+					]}
+				}), //first is default in narrow mode
 				this.nodeDetail
 			]
 		});

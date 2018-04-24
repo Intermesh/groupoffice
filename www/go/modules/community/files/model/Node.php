@@ -36,7 +36,7 @@ class Node extends model\AclEntity {
 						->addTable('files_node', 'node');
 	}
 	
-	public function getPath() {
+	public function getLocation() {
 		return '/biem/'.$this->name;
 	}
 
