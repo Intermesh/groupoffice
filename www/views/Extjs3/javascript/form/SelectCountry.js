@@ -29,10 +29,12 @@ GO.form.SelectCountry = function(config){
 	if(!GO.countriesStore)
 	{
 		var countries = [];
+		
+		var lang = t("countries");
 
-		for(var c in GO.lang.base.countries)
+		for(var c in lang)
 		{
-			countries.push([c, GO.lang.base.countries[c]]);
+			countries.push([c, lang[c]]);
 		}
 
 		GO.countriesStore = new Ext.data.SimpleStore({
