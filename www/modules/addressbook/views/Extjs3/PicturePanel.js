@@ -66,20 +66,6 @@ GO.addressbook.PicturePanel = Ext.extend(Ext.Panel, {
 					inputName : 'image',
 					iconCls: 'ic-upload-file',
 					max: 1
-				}),this.avatarField = new go.form.FileField({
-					//xtype:'filefield',
-					buttonOnly: true,
-					name: 'avatarId',
-					autoUpload: true,
-					accept: 'image/*',
-					listeners: {
-						uploadComplete: function(data, file, response, options){
-
-							this.contactPhoto.setPhotoSrc(go.Jmap.downloadUrl(data.blobId));
-							
-						},
-						scope:this
-				  }
 				})]
 			}
 			]
