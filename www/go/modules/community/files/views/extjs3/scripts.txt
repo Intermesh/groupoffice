@@ -7,3 +7,7 @@ NodeGrid.js
 NodeTile.js
 CardPanel.js
 FolderTree.js
+UsagePanel.js
+RenameDialog.js
+MoveDialog.js
+ShareDialog.js
