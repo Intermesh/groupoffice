@@ -12,3 +12,4 @@ UsagePanel.js
 RenameDialog.js
 MoveDialog.js
 ShareDialog.js
+KAPOT
