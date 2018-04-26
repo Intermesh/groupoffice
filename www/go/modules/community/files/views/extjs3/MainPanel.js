@@ -78,16 +78,31 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 							},
 							'->',
 							this.addButton = new Ext.Button({
-								disabled: true,
 								iconCls: 'ic-add',
 								tooltip: t('Add'),
 								menu: new Ext.menu.Menu({
 									items: [
 										{
-											iconCls: 'ic-folder',
-											text: t("Folder"),
+											iconCls: 'ic-create-new-folder',
+											text: t("Create folder")+'&hellip;',
 											handler: this.newFolder,
 											scope: this
+										},{
+											iconCls: 'ic-create-new-folder',
+											text: t("Upload files")+'&hellip;',
+											handler: function() {
+												var input = $(document.createElement("input"));
+												input.attr("type", "file");
+												input.onchange = function(files) {
+													this.cardPanel.fileUpload(files);
+												}
+												input.trigger("click"); // opening dialog
+											},
+											scope: this
+										},{
+											disabled: true,
+											text: t('File from template')+'&hellip;',
+											icon: 'ic-insert-drive-file'
 										}
 									]
 								}),

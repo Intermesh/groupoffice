@@ -2416,7 +2416,10 @@ Ext.lib.Ajax = function() {
             }
 
 //            handleReadyState(o, callback)
-
+				//Michael: hook progress event
+				if (pub.progress) {
+					o.conn.upload.onprogress = pub.progress;
+				}
             //Merijn: Use native load event instead of setinterval.
             o.conn.addEventListener('load', function() {
               handleTransactionResponse(o, callback);

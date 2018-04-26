@@ -23,7 +23,7 @@ go.modules.community.files.NodeTile = Ext.extend(Ext.DataView, {
 			'<tpl if="!values.blobId"><div class="fs-thumb folder"></div></tpl>',
 			'<span class="x-editable">{name}</span>'+
 			'<tpl if="values.status==\'queued\'"><progress max="100" value="{progress}"></progress></tpl>'+
-		'</div>',				
+		'</div>',
 	'</tpl>'),
 	initComponent : function(){
 
