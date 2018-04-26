@@ -77,8 +77,14 @@ go.Jmap = {
 			return;
 
 		Ext.Ajax.request({url: go.User.uploadUrl,
-			success: cfg.success || Ext.emptyFn,
+			success: function(response, opts) {
+				if(response.responseText) {
+					data = Ext.decode(response.responseText);
+				}
+				cfg.success && cfg.success.call(this, data, response, opts)
+			},
 			failure: cfg.failure || Ext.emptyFn,
+			progress: cfg.progress || Ext.emptyFn,
 			headers: {
 				'X-File-Name': file.name,
 				'Content-Type': file.type,
