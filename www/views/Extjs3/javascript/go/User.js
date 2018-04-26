@@ -20,6 +20,7 @@ go.User = {
     this.displayName = session.user.displayName;
     this.id = session.user.id;
     this.avatarId = session.user.avatarId;
+		this.isAdmin = session.user.isAdmin;
 
     Ext.apply(GO.settings, session.oldSettings);
   },

@@ -32,7 +32,12 @@ go.systemsettings.GeneralPanel = Ext.extend(Ext.form.FormPanel, {
 							selectOnFocus: true,
 							forceSelection: true,
 							hint: t("The language is automatically detected from the browser. If the language is not available then this language will be used.")
-						})
+						}),{
+							xtype: 'textfield',
+							name: 'URL',
+							fieldLabel: t('URL'),
+							hint: t("The full URL to Group-Office.")
+						}
 					]
 				},{
 					xtype: "fieldset",

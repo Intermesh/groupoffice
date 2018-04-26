@@ -45,7 +45,7 @@ Ext.override(Ext.Component, {
   getId : function(){
  
     if(this.module) {
-      go.Translate.setModule(this.module);
+      go.Translate.setModule(this.package, this.module);
     }
     
     return this.componentgetID();

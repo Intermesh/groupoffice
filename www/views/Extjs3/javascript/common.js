@@ -52,27 +52,23 @@ function t(str, module, package) {
 		package = go.Translate.package;
 	}
 	
-	if(!GO.lang[module]) {
-		module = "base";
-    package = "common";
+	if(!package) {
+		package = "legacy";
 	}
-  
-  if(package && !GO.lang[module][package]) {
-    package = "common";
-  }
+		
 	
-	var l = GO.lang[module];
-	
-	if(package) {
-		l = l[package];
+	if(!GO.lang[package] || !GO.lang[package][module]) {
+		return t(str, "core", "core");
 	}
+	
+	var l = GO.lang[package][module];
   
   if(l[str]) {
     return l[str]
   }
   
-  if(module != "base" && package != "common"){
-    return t(str, "base", "common");
+  if(module != "core" && package != "core"){
+    return t(str, "core", "core");
   } else
   {
     return str;

@@ -1484,7 +1484,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				
 				$entityType = \go\core\orm\EntityType::findById($linkedModel->entityTypeId);
 //				$modelCssClass = 'go-model-icon-'.$entityType->getName().' entity '.$entityType->getName();
-				$route = $entityType->getModule()->name . '/' .strtolower($entityType->getName()) .'/'.$linkedModel->entityId;
+				$route = strtolower($entityType->getName()) .'/'.$linkedModel->entityId;
 				
 				$linkHtml .= '<a class="em-link-link" href="#'.$route.'"><i class="entity '.$entityType->getName().'"></i> <span>'.$linkedModel->name.'</span></a>,';
 			}

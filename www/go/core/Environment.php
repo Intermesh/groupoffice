@@ -30,31 +30,6 @@ class Environment extends Singleton {
 	}
 
 	/**
-	 * Get the hostname of this machine
-	 * 
-	 * @param string
-	 */
-	public function getHostname() {
-		if (isset($_SERVER['HTTP_HOST'])) {
-			return $_SERVER['HTTP_HOST'];
-		} else {
-			return php_uname('n');
-		}
-	}
-	
-	public function getWebClientUrl() {
-		$s = $_SERVER;
-		$ssl = ( ! empty( $s['HTTPS'] ) && $s['HTTPS'] == 'on' );
-		$sp = strtolower( $s['SERVER_PROTOCOL'] );
-		$protocol = substr( $sp, 0, strpos( $sp, '/' ) ) . ( ( $ssl ) ? 's' : '' );
-		$port = $s['SERVER_PORT'];
-		$port = ( ( ! $ssl && $port=='80' ) || ( $ssl && $port=='443' ) ) ? '' : ':'.$port;
-		$host = isset( $s['HTTP_HOST']) ? $s['HTTP_HOST'] : null ;
-		$host = isset( $host ) ? $host : $s['SERVER_NAME'] . $port;
-		return $protocol . '://' . $host;
-	}
-
-	/**
 	 * Get PHP memory limit in bytes
 	 * 
 	 * @return int

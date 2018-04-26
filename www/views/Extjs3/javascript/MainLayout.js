@@ -268,7 +268,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 	onAuthentication: function () {
 		
-		
+		//load state
+		Ext.state.Manager.setProvider(new GO.state.HttpProvider());
 		
 		go.Modules.init();
 
@@ -392,6 +393,13 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			this.createTabPanel(items);
 
 			this.beforeRender();
+			
+			function getUserImgStyle() {
+				if(!go.User.avatarId) {
+					return "";
+				}
+				return 'background-image:url('+go.Jmap.downloadUrl(go.User.avatarId)+');'
+			}
 
 			var topPanel = new Ext.Panel({
 				id:"mainNorthPanel",
@@ -401,7 +409,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					<div id="secondary-menu">\
 						<div id="search_query"></div>\
 						<div id="start-menu-link" ></div>\
-						<a id="user-menu" class="user-img" style="background-image:url('+go.Jmap.downloadUrl(go.User.avatarId)+')">\
+						<a id="user-menu" class="user-img" style="'+getUserImgStyle()+'">\
 							<span id="reminder-icon" style="display: none;">notifications</span>\
 						</a>\
 					</div>\

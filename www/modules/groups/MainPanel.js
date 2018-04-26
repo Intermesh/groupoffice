@@ -121,6 +121,6 @@ Ext.extend(GO.groups.MainPanel, GO.grid.GridPanel, {
 go.Modules.register("legacy", 'groups', {
 	mainPanel: GO.groups.MainPanel,
 	admin: true,	
-	title: t("Groups", "groups"),
+	title: t("Groups"),
 	entities:['Group']
 });

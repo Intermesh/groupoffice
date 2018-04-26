@@ -9,11 +9,11 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 	
 		var selModel = new Ext.grid.CheckboxSelectionModel();
 	
-		var data = [];
+		var data = [], allEntities = go.Entities.getAll();
 		
-		for(entity in go.Entities.getAll()) {
-			if(go.Modules.isAvailable("community", go.Entities.get(entity).module)) {
-				data.push([entity, t(entity, go.Entities.get(entity).module)]);
+		for(entity in allEntities) {
+			if(go.Modules.isAvailable(allEntities[entity].package, allEntities[entity].module)) {
+				data.push([entity, t(entity, allEntities[entity].module, allEntities[entity].package)]);
 			}
 		};
 		

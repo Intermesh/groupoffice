@@ -50,6 +50,7 @@ CREATE TABLE `core_auth_token` (
   `userId` int(11) NOT NULL,
   `createdAt` datetime NOT NULL,
   `expiresAt` datetime NOT NULL,
+	`lastActiveAt` DATETIME NOT NULL,
   `remoteIpAddress` varchar(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
   `userAgent` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `passedMethods` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL

@@ -65,9 +65,20 @@ go.links.LinkToButton = Ext.extend(Ext.Button, {
 						return;
 					}
 					
+					if(window.setLinkEntity) {
+						window.on('show', function() {
+								window.setLinkEntity({
+									entity: this.getEntity(),
+									data: this.detailView.data
+								});
+							}, this, {single: true});
+					}
+					
+					
 					if(!window.isVisible()) {
 						window.show();
 					}
+					
 					
 					window.on('save', function (window, entity) {						
 						

@@ -39,6 +39,14 @@ class Token extends Entity {
 	 * @var DateTime
 	 */
 	public $createdAt;
+	
+	/**
+	 *
+	 * When the user was last active. Updated every 5 minutes.
+	 * 
+	 * @var DateTime
+	 */
+	public $lastActiveAt;
 
 	/**
 	 * The remote IP address of the client connecting to the server
@@ -84,15 +92,20 @@ class Token extends Entity {
 	protected function init() {
 		parent::init();
 		
-		if($this->isNew()) {			
+		if($this->isNew()) {	
+			$this->lastActiveAt = new \DateTime();
 			$this->setClient();
 			$this->setLoginToken();
 //			$this->internalRefresh();
 		}else{
-			//update expiry date on every access		
-			// Only done on GET auth	
-//			$this->setExpiryDate();
-//			$this->update();
+			
+			if($this->lastActiveAt < new \DateTime("-5 mins")) {
+				$this->lastActiveAt = new \DateTime();				
+				
+				//also refresh token
+				$this->setExpiryDate();
+				$this->internalSave();
+			}
 		}
 	}
 	
@@ -254,6 +267,18 @@ class Token extends Entity {
 		
 		$_SESSION['GO_SESSION']['user_id'] = $this->userId;
 		$_SESSION['GO_SESSION']['accessToken'] = $this->accessToken;		
+	}
+	
+	private function oldLogout() {
+		$this->oldLogin();
+		session_destroy();
+	}
+	
+	protected function internalDelete() {
+		
+		
+		$this->oldLogout();
+		return parent::internalDelete();
 	}
 	
 	/**
