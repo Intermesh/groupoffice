@@ -151,3 +151,6 @@ ADD CONSTRAINT `fk_user_avatar_id`
   REFERENCES `core_blob` (`id`)
   ON DELETE RESTRICT
   ON UPDATE NO ACTION;";
+
+
+$updates["201804261506"][] ="ALTER TABLE `core_auth_token` ADD `lastActiveAt` DATETIME NOT NULL AFTER `expiresAt`;";
