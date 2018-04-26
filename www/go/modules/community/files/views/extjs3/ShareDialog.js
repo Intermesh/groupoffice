@@ -20,6 +20,26 @@ go.modules.community.files.ShareDialog = Ext.extend(go.form.FormWindow, {
 			}
 		});
 		
+		this.shareExpireCbx = new Ext.ux.form.XCheckbox({
+			boxLabel: t('Expire link on:'),
+			hideLabel:true,
+			anchor: '100%',
+			listeners:{
+				check: function(cbx,checked){
+
+
+				},
+				scope:this
+			}
+		});
+		
+		this.shareExpireDate = new Ext.form.DateField({
+			name : 'tokenExpiresAt',
+			width : 120,
+			format : GO.settings['date_format'],
+			allowBlank : true
+		});
+		
 		this.shareLinkField = new Ext.form.TriggerField({
 			name: 'link',
 			hideLabel:true,
@@ -39,17 +59,36 @@ go.modules.community.files.ShareDialog = Ext.extend(go.form.FormWindow, {
 			}				
 		});
 		
+		this.aclPanel = new GO.grid.PermissionsPanel();
+		
 		var items = [{
 				xtype: 'fieldset',
-				title: "External users",
+				title: t("External users"),
 				autoHeight: true,
 				items: [
 					this.shareCbx,
-					this.shareLinkField
+					this.shareLinkField,
+					{
+						xtype: 'compositefield',
+						hideLabel:true,
+						items:[
+							this.shareExpireCbx,
+							this.shareExpireDate
+						],
+						anchor: '100%'
+					}
+				]
+			},{
+				xtype: 'fieldset',
+				title:t("Group Office users"),
+				autoHeight: true,
+				items: [
+					this.aclPanel
 				]
 			}
 		];
 
 		return items;
 	}
+		
 });
