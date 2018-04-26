@@ -1,5 +1,6 @@
 Module.js
 MainPanel.js
+ContextMenu.js
 FilesDetailPanel.js
 SideNav.js
 NodeDetail.js

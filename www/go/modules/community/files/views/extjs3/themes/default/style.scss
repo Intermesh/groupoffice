@@ -19,7 +19,7 @@
 	text-align:center;
 	/* define the number of grid columns */
 	grid-gap: 2px;
-	grid-template-columns: repeat( auto-fit, minmax(180px, 1fr) );
+	grid-template-columns: repeat( auto-fill, minmax(180px, 1fr) );
 	> div {
 		height: 160px;
 		background-color: color($background,'card');

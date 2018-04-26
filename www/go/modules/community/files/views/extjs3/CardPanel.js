@@ -28,6 +28,8 @@ go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
 			entityStore: go.Stores.get("Node")
 		});
 		
+		var contextMenu = new go.modules.community.files.ContextMenu();
+		
 		this.nodeGrid = new go.modules.community.files.NodeGrid({
 			store:this.store,
 			listeners: {
@@ -39,6 +41,11 @@ go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
 //						},
 //						scope: this
 //					});
+				},
+				rowcontextmenu: function(grid, index, event){
+					event.stopEvent();
+					var records = grid.getSelectionModel().getSelections();
+					contextMenu.showAt(event.xy, records);
 				},
 				rowdblclick: function (grid, rowIndex, e) {
 
@@ -58,7 +65,16 @@ go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
 			go.Router.goto("node/" + record.id);
 		});
 		
-		this.nodeTile = new go.modules.community.files.NodeTile({store:this.store});
+		this.nodeTile = new go.modules.community.files.NodeTile({
+			store:this.store,
+			listeners: {
+				contextmenu: function(view, index, node,event){
+					event.stopEvent();
+					var records = view.getSelectedRecords();
+					contextMenu.showAt(event.xy, records);
+				},
+			}
+		});
 		
 		this.items = [this.nodeGrid, this.nodeTile];
 	
@@ -67,18 +83,28 @@ go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
 	},
 	
 	afterRender : function(view) {
-
-		view.dom.addEventListener('dragenter', function() {
+		var childCount = 0;
+		this.body.dom.addEventListener('dragenter', function(e) {
+			e.preventDefault();
+			childCount++;
 			this.body.addClass('x-dd-over');
-			return false;
 		}.bind(this));
 		
-		view.dom.addEventListener('dragleave', function() {
-			this.body.removeClass('x-dd-over');
-			return false;
+		this.body.dom.addEventListener('dragleave', function(e) {
+			e.preventDefault();
+			childCount--;
+			if (childCount === 0) {
+				this.body.removeClass('x-dd-over');
+			}
 		}.bind(this));
 		
-		view.dom.addEventListener('drop', function() {
+		this.body.dom.addEventListener('dragover', function(e) {
+			e.preventDefault(); // THIS IS NEEDED
+			e.stopPropagation();
+		});
+		
+		this.body.dom.addEventListener('drop', function(e) {
+			e.stopPropagation();
 			e.preventDefault();
 			this.body.removeClass('x-dd-over');
 			this.fileUpload(e.dataTransfer.files);
@@ -86,33 +112,64 @@ go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
 		
 		go.modules.community.files.CardPanel.superclass.afterRender.call(this, arguments);
 	},
-	
+	activeUploads: 0,
 	fileUpload: function(files) {
-		debugger;
-		var formData = tests.formdata ? new FormData() : null;
+		
+		var countUploads = 0;
 		for (var i = 0; i < files.length; i++) {
-		  if (tests.formdata) formData.append('file', files[i]);
-		  this.appendProgressFile(files[i]);
+			var name = this.solveDuplicate(files[i].name);
+			var record = new this.store.recordType({ name: name, size: files[i].size, status: 'queued' });
+			this.store.add(record);
+			this.activeUploads++;
+			//var progress = this.appendProgressFile(files[i]);
+			go.Jmap.upload(files[i], {
+			  progress: function(e) {
+				  console.log(e);
+					if (e.lengthComputable) {
+						var complete = (e.loaded / e.total * 100 | 0);
+						record.set('progress', complete);
+					}
+			  },
+			  success: function(data) {
+				  this.activeUploads--;
+				  record.set('status', 'done');
+				  record.set('blobId', data.blobId);
+				  record.set('progress', 100);
+				  console.log(record);
+				  if(this.activeUploads === 0) {
+					  this.store.commitChanges();
+				  }
+			  },
+			  failure: function(e) {
+				  record.set('progress', 0);
+				  record.set('status', 'failed');
+			  },
+			  scope:this
+		  });
 		}
-
-		// now post a new XHR request
-		if (tests.formdata) {
-			var xhr = new XMLHttpRequest();
-			xhr.open('POST', '/upload.php');
-			xhr.onload = function() {
-			  progress.value = progress.innerHTML = 100;
-			};
-
-			if (tests.progress) {
-			  xhr.upload.onprogress = function (event) {
-				 if (event.lengthComputable) {
-					var complete = (event.loaded / event.total * 100 | 0);
-					progress.value = progress.innerHTML = complete;
-				 }
-			  }
-			}
-
-		  xhr.send(formData);
+		
+	},
+	
+	solveDuplicate: function(name, action) {
+		var index = this.store.find('name', name);
+		if(index === -1) {
+			return name;
+		}
+		switch(action) {
+			case 'replace':
+				this.store.removeAt(index);
+				return name;
+			case 'cancel':
+				return false;
+			case 'addnumber':
+			default:
+				var newName, nameCount = 0;
+				while(index) {
+					nameCount++;
+					newName = name + '('+number+')';
+					index = this.store.find('name', newName);
+				}
+				return newName;
 		}
 	},
 	
@@ -132,6 +189,9 @@ go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
 			holder.innerHTML += '<p>Uploaded ' + file.name + ' ' + (file.size ? (file.size/1024|0) + 'K' : '');
 			console.log(file);
 		}
+		var progress = document.createElement('progress');
+		holder.appendChild(progress);
 		this.getLayout().activeItem.dom.appendChild(holder);
+		return progress;
 	}
 });
