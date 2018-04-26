@@ -177,7 +177,7 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 	},
 
 	editHandler: function () {
-		GO.addressbook.showContactDialog(this.data.id);
+		GO.addressbook.showContactDialog(this.currentId);
 	},
 
 	initToolbar: function () {

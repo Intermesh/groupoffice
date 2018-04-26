@@ -21,6 +21,7 @@ GO.DetailView = Ext.extend(Ext.Panel,{
 	currentId: null,
 	basePanels: [],
 	
+	isDisplayPanel : true, //for automatic refresh after save
 	entityStore : null,
 	
 	initComponent : function() {
