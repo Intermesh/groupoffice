@@ -6,11 +6,47 @@ go.modules.community.files.ShareDialog = Ext.extend(go.form.FormWindow, {
 	height: 600,
 	
 	initFormItems: function () {
+		
+		this.shareCbx = new Ext.ux.form.XCheckbox({
+			boxLabel: t('Make shareable link available for external users'),
+			hideLabel:true,
+			anchor: '100%',
+			listeners:{
+				check: function(cbx,checked){
+
+
+				},
+				scope:this
+			}
+		});
+		
+		this.shareLinkField = new Ext.form.TriggerField({
+			name: 'link',
+			hideLabel:true,
+			anchor: '100%',
+			style:{
+				"padding-right":"80px"
+			},
+			triggerConfig: {
+				tag: "button", 
+				type: "button", 
+				tabindex: "-1",
+				style:{
+					width:"80px"
+				},
+				cls: "x-form-trigger x-form-text-trigger",
+				html: t("Copy link")
+			}				
+		});
+		
 		var items = [{
 				xtype: 'fieldset',
 				title: "External users",
 				autoHeight: true,
-				items: []
+				items: [
+					this.shareCbx,
+					this.shareLinkField
+				]
 			}
 		];
 

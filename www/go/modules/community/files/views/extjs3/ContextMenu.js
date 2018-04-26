@@ -48,7 +48,7 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 			iconCls: 'ic-content-copy',
 			text: t("Make copy"),
 			handler: function(){
-				this.fireEvent('copy', this, this.records);
+
 			},
 			scope: this
 		}),
@@ -56,7 +56,11 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 			iconCls: 'ic-forward',
 			text: t("Move to")+'&hellip;',
 			handler: function(){
-				this.fireEvent('delete', this, this.records);
+				if(this.records && this.records.length === 1){ // Single select
+					var moveDialog = new go.modules.community.files.MoveDialog();
+					moveDialog.setTitle(t("Move")+ " " +this.records[0].data.name);
+					moveDialog.load(this.records[0].id).show();
+				}
 			},
 			scope: this
 		}),
@@ -64,7 +68,11 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 			iconCls: 'ic-border-color',
 			text: t("Rename"),
 			handler: function(){
-				this.fireEvent('batchEdit', this, this.records);
+				if(this.records && this.records.length === 1){ // Single select
+					var nodeDialog = new go.modules.community.files.NodeDialog();
+					nodeDialog.setTitle(t("Rename")+ " " +this.records[0].data.name);
+					nodeDialog.load(this.records[0].id).show();
+				}
 			},
 			scope: this
 		}),
@@ -72,7 +80,13 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 			iconCls: 'ic-delete',
 			text: t("Delete"),
 			handler: function(){
-				this.fireEvent('delete', this, this.records);
+				if(this.records && this.records.length === 1){ // Single select
+					go.Stores.get("Node").set({destroy: [this.records[0].id]}, function (options, success, response) {
+						if (response.destroyed) {
+							// success
+						}
+					}, this);
+				}
 			},
 			scope: this
 		}),
@@ -81,7 +95,11 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 			iconCls: 'ic-person-add',
 			text: t("Share")+'&hellip;',
 			handler: function(){
-				this.fireEvent('share', this, this.records);
+				if(this.records && this.records.length === 1){ // Single select
+					var shareDialog = new go.modules.community.files.ShareDialog();
+					shareDialog.setTitle(t("Share")+ " " +this.records[0].data.name);
+					shareDialog.load(this.records[0].id).show();
+				}
 			},
 			scope: this
 		}),
@@ -89,7 +107,7 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 			iconCls: 'ic-email',
 			text: t("Email files"),
 			handler: function(){
-				this.fireEvent('email', this, this.records);
+				
 			},
 			scope: this
 		}),
@@ -122,15 +140,6 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 		];
 
 		go.modules.community.files.ContextMenu.superclass.initComponent.call(this, arguments);
-
-		this.addEvents({
-			open: true,
-			delete: true,
-			email: true,
-			bookmark: true,
-			download: true
-		});
-
 	},
 	showAt : function(xy, records) {
 		this.records = records;

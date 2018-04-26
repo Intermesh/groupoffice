@@ -9,6 +9,6 @@ NodeTile.js
 CardPanel.js
 FolderTree.js
 UsagePanel.js
-RenameDialog.js
+NodeDialog.js
 MoveDialog.js
 ShareDialog.js

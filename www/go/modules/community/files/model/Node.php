@@ -41,7 +41,7 @@ class Node extends model\AclEntity {
 	}
 
 	protected function getSearchDescription() {
-		return $this->createdAt;
+		return $this->createdAt->format(\GO()->getUser()->date_format);
 	}
 
 	protected function getSearchName() {

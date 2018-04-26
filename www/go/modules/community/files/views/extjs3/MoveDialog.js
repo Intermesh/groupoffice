@@ -7,7 +7,11 @@ go.modules.community.files.MoveDialog = Ext.extend(go.form.FormWindow, {
 	
 	initFormItems: function () {
 		var items = [];
-
+		
+		this.folderTree = new go.modules.community.files.FolderTree();
+		
+		items.push(this.folderTree);
+		
 		return items;
 	}
 });
