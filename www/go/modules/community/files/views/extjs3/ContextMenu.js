@@ -141,12 +141,12 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 			this.btnOpenWith.hide();
 			this.btnOpen.hide();
 			this.btnEmail.show();
-			for(var r in records) {
-				if(records[r].data.isDirectory) {
+			Ext.each(records, function(r) {
+				if(r.data.isDirectory) {
 					this.btnEmail.hide();
-					break;
+					return;
 				}
-			}
+			}, this);
 
 		}
 		if (records.length === 1) {
@@ -160,7 +160,7 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 				this.btnRename.hide();
 				this.btnEmail.hide();
 				this.btnBookmark.show();
-				return
+				return;
 			}
 			
 			var locked = Ext.isEmpty(this.records[0].data.lockedBy);
@@ -171,11 +171,10 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 			this.btnOpen.show();
 			this.btnOpenWith.show();
 			this.btnDownload.show();
-			this.btnRename();
+			this.btnRename.show();
 			this.btnEmail.show();
 			this.btnBookmark.hide();
-			
-			
+
 			switch(records[0].data.type) {
 				//todo
 			}
