@@ -85,18 +85,24 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 										{
 											iconCls: 'ic-create-new-folder',
 											text: t("Create folder")+'&hellip;',
-											handler: this.newFolder,
+											handler: function() {
+												if(!this.renameDialog) {
+													this.renameDialog = new go.modules.community.files.RenameDialog();
+												}
+												this.renameDialog.show();
+											},
 											scope: this
 										},{
-											iconCls: 'ic-create-new-folder',
+											iconCls: 'ic-file-upload',
 											text: t("Upload files")+'&hellip;',
 											handler: function() {
-												var input = $(document.createElement("input"));
-												input.attr("type", "file");
-												input.onchange = function(files) {
-													this.cardPanel.fileUpload(files);
-												}
-												input.trigger("click"); // opening dialog
+												var input = document.createElement("input"),
+													me = this;
+												input.setAttribute("type", "file");
+												input.onchange = function(e) {
+													me.cardPanel.fileUpload(this.files);
+												};
+												input.click(); // opening dialog
 											},
 											scope: this
 										},{

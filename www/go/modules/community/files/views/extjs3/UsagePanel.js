@@ -36,7 +36,7 @@ go.modules.community.files.UsagePanel = Ext.extend(Ext.Panel, {
 	},
 	
 	updateHtml : function(){
-		var html = t('quotaStr');
+		var html = t('%usage of %quota used');
 		
 //		html = html.replace("%usage", Ext.util.Format.fileSize(this.usage));
 //		html = html.replace("%quota", Ext.util.Format.fileSize(this.quota));
