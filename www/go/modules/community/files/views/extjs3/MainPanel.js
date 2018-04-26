@@ -19,13 +19,15 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 	initComponent: function () {
 			
 		this.folderTree = new go.modules.community.files.FolderTree();
+		this.usagePanel = new go.modules.community.files.UsagePanel();
 	
 		this.sideNav = new go.modules.community.files.SideNav({
 			region: 'west',
 			cls: 'go-sidenav',
 			width: dp(280),
-			split: true,
-			items: [this.folderTree]
+			split:true,
+			items: [this.folderTree],
+			bbar:[this.usagePanel]
 		});
 
 		this.folderTree.getSelectionModel().on('selectionchange', function (sm) {

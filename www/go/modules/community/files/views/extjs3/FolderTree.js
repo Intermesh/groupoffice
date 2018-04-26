@@ -30,7 +30,66 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 
 	rootNodes: [],
 
+	listeners: {
+		
+		'click' : function(node,e){
+			//TODO: OWN LINKUI ELEMENT FOR TREENODE SO IT CAN BE STYLED WITH BUTTONS
+			console.log(node,e);
+			
+			var t = e.getTarget();
+			if (t.className = 'somecls'){
+				// do something
+			}
+		},
+		
+		'mouseover': function(node,event){
+			
+			console.log(node);
+//			node.setCls('WAUWIE');
+			
+		},
+		'mouseout': function(node,event){
+			
+			console.log(node);
+//			node.setCls('WAUWIE');
+			
+		},
+		scope:this
+	},
+
 	initComponent: function () {
+		
+		// Add mouseover event to treenodes (https://www.sencha.com/forum/showthread.php?23479-TreeNode-mouseover-event)
+		var NodeMouseoverPlugin = Ext.extend(Object, {
+			init: function (tree) {
+				if (!tree.rendered) {
+					tree.on('render', function () {
+						this.init(tree);
+					}, this);
+					return;
+				}
+				this.tree = tree;
+				tree.body.on('mouseover', this.onTreeMouseover, this, {delegate: 'a.x-tree-node-anchor'});
+				tree.body.on('mouseout', this.onTreeMouseout, this, {delegate: 'a.x-tree-node-anchor'});
+			},
+
+			onTreeMouseover: function (e, t) {
+
+				var nodeEl = Ext.fly(t).up('div.x-tree-node-el');
+				if (nodeEl) {
+					var nodeId = nodeEl.getAttributeNS('ext', 'tree-node-id');
+					if (nodeId) {
+						this.tree.fireEvent('mouseover', this.tree.getNodeById(nodeId), e);
+					}
+				}
+			},
+
+			onTreeMouseout: function (e, t) {
+				this.tree.fireEvent('mouseout', this.tree, e);
+			}
+		});
+		
+		this.plugins = new NodeMouseoverPlugin();
 		
 		// Add my files
 		this.rootNodes.push({
@@ -79,7 +138,7 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 		go.modules.community.files.FolderTree.superclass.initComponent.call(this);
 
 		this.setRootNode(root);
-		this.getLoader().load(root);
+		this.getLoader().load(root);		
 	}
 
 });

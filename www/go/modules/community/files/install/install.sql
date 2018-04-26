@@ -152,10 +152,10 @@ UPDATE `files_node` SET id = 0 WHERE id = -1;
 SET foreign_key_checks = 1;
 
 -- Global storage quota for GO
-INSERT INTO `files_storage` (`id`, `quota`, `usage`, `userId`) VALUES ('1', '1000000', '0', NULL);
+INSERT INTO `files_storage` (`id`, `quota`, `usage`, `userId`) VALUES ('1', '1073741824', '0', NULL);
 
 -- demo data
-INSERT INTO `files_storage` (`id`, `quota`, `usage`, `userId`) VALUES ('2', '1000000', '0', 1);
+INSERT INTO `files_storage` (`id`, `quota`, `usage`, `userId`) VALUES ('2', '1073741824', '0', 1);
 INSERT INTO `files_node` (`storageId`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isDirectory`) 
 VALUES ('2', '0', 'Admin home', now(), now(), '1', '1', '1', '1');
 INSERT INTO `files_node` (`storageId`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isLocked`) VALUES ('2', '1', 'first folder', now(), now(), '1', '1', '1', '0');

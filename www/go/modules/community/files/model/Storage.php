@@ -18,6 +18,8 @@ class Storage extends orm\Property {
 	public $ownedBy;
 	public $modifiedBy;
 	
+	public $userId;
+	
 	public $quota;
 	public $usage;
 	
