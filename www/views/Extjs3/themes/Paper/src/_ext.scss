@@ -519,6 +519,7 @@ ul.x-tab-strip-bottom{
 			color:black;
 			//background-color: color($background, 'hover');
 		}
+		&.x-form-text-trigger::before {content: '';}
 		&.x-form-clear-trigger::before {content: 'clear'; font-size: sp(18)}
 		&.x-form-search-trigger::before {content: 'search';}
 		&.x-form-date-trigger::before {content: 'event';}
