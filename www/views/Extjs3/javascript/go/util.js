@@ -39,3 +39,22 @@ go.util.humanFileSize = function(bytes, conventionDecimal) {
     } while(Math.abs(bytes) >= thresh && u < units.length - 1);
     return bytes.toFixed(1)+' '+units[u];
 };
+
+/**
+ * Get the class for the content type icon based on mimetype or extension
+ * @param {string} contentType
+ * @param {string} extension
+ * @returns {string} class name used in _icons.scss
+ */
+go.util.contentTypeClass = function(contentType, filename) {
+	var icon, extension = filename.split('.');
+	if(extension.length > 1) {
+		icon = extension[extension.length-1];
+	} else {
+		icon = 'folder';
+	}
+	if(contentType !== null) {
+		// todo: map contentTypes
+	}
+	return icon;
+}
