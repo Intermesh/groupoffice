@@ -17,10 +17,22 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 	layoutConfig: {triggerWidth: 1000},
 
 	initComponent: function () {
-			
-		this.folderTree = new go.modules.community.files.FolderTree();
+
+		
+		this.browser = new go.modules.community.files.Browser({
+			store: new go.data.Store({
+				fields: ['id', 'name', 'byteSize','isDirectory', {name: 'createdAt', type: 'date'}, {name: 'modifiedAt', type: 'date'}, 'permissionLevel'],
+				baseParams: {
+					filter:{isHome:true}
+				},
+				entityStore: go.Stores.get("Node")
+			})
+		});
+		this.folderTree = new go.modules.community.files.FolderTree({
+			browser:this.browser
+		});
 		this.usagePanel = new go.modules.community.files.UsagePanel();
-	
+		
 		this.sideNav = new go.modules.community.files.SideNav({
 			region: 'west',
 			cls: 'go-sidenav',
@@ -35,9 +47,6 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 //			this.nodeGrid.getStore().load();
 		}, this);
 
-//		go.Router.add(/files\/node\/([0-9]\/+)/, function(id) {
-//			
-//		});
 
 		//		rowdblclick: function (grid, rowIndex, e) {
 
@@ -59,12 +68,11 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 			region: "center",
 			layout: "border",
 			split: true,
-			//width: dp(700),
-			//narrowWidth: dp(400), //this will only work for panels inside another panel with layout=responsive. Not ideal but at the moment the only way I could make it work
 			items: [
 				this.cardPanel = new go.modules.community.files.CardPanel({
 					region: 'center',
-					tbar: {                        // configured using the anchor layout
+					browser: this.browser,
+					tbar: {  // configured using the anchor layout
 						xtype : 'container',
 						items :[new Ext.Toolbar({
 							items:[
@@ -81,36 +89,38 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 								iconCls: 'ic-add',
 								tooltip: t('Add'),
 								menu: new Ext.menu.Menu({
-									items: [
-										{
-											iconCls: 'ic-create-new-folder',
-											text: t("Create folder")+'&hellip;',
-											handler: function() {
-												if(!this.renameDialog) {
-													this.renameDialog = new go.modules.community.files.RenameDialog();
-												}
-												this.renameDialog.show();
-											},
-											scope: this
-										},{
-											iconCls: 'ic-file-upload',
-											text: t("Upload files")+'&hellip;',
-											handler: function() {
+									items: [{
+										iconCls: 'ic-create-new-folder',
+										text: t("Create folder")+'&hellip;',
+										handler: function() {
+											if(!this.renameDialog) {
+												this.renameDialog = new go.modules.community.files.RenameDialog();
+											}
+											this.renameDialog.show();
+										},
+										scope: this
+									},{
+										iconCls: 'ic-file-upload',
+										text: t("Upload files")+'&hellip;',
+										handler: function() {
+											if(!this.uploadDialog) {
 												var input = document.createElement("input"),
 													me = this;
 												input.setAttribute("type", "file");
+												input.setAttribute('multiple', true);
 												input.onchange = function(e) {
 													me.cardPanel.fileUpload(this.files);
 												};
-												input.click(); // opening dialog
-											},
-											scope: this
-										},{
-											disabled: true,
-											text: t('File from template')+'&hellip;',
-											icon: 'ic-insert-drive-file'
-										}
-									]
+												this.uploadDialog = input;
+											}
+											this.uploadDialog.click(); // opening dialog
+										},
+										scope: this
+									},{
+										disabled: true,
+										text: t('File from template')+'&hellip;',
+										icon: 'ic-insert-drive-file'
+									}]
 								}),
 								scope: this
 							}),{
@@ -126,30 +136,17 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 								xtype: 'tbsearch'
 							}]
 						}),
-						new Ext.Toolbar({
-							layout:'hbox',
-							layoutConfig: {
-								align: 'middle',
-								defaultMargins: {left: dp(4), right: dp(4),bottom:0,top:0}
-							},
-							items:[
-								this.locationTextField = new Ext.form.TextField({
-									fieldLabel:t("Location"),
-									name:'files-location',
-									value: 'Breadcrumbs',
-									readOnly:true,
-									flex:1
-								}),
-								this.searchField = new go.toolbar.SearchButton({
-									store: this.gridStore
-							  })
-							]
-						})
+						this.breadCrumbs = new go.modules.community.files.BreadCrumbBar()
 					]}
 				}), //first is default in narrow mode
 				this.nodeDetail
 			]
 		});
+		
+		this.browser.on('pathchanged', function(browser) {
+			console.log(browser.path);
+			this.breadCrumbs.redraw(browser);
+		},this)
 
 		this.items = [
 			this.centerPanel, //first is default in narrow mode
@@ -157,6 +154,20 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 		];
 
 		go.modules.community.files.MainPanel.superclass.initComponent.call(this);
+	},
+	
+	goto: function(root, path) {
+		console.log(root);
+		console.log(path);
+		var bread = path.split('/');
+		if(Ext.isEmpty(bread[bread.length-1])) {
+			console.log(bread);
+			//bread.unshift();
+		}
+
+		this.path = bread;
+		
+		this.breadCrumbs.doLayout();
 	}
 });
 
