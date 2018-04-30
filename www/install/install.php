@@ -98,12 +98,12 @@ require('header.php');
 				<label>Username</label>
 			</p>
 			<p>
-				<input type="password" name="password" pattern=".{6,}" value="<?= $_POST['password']; ?>" title="Minimum length is 6 chars" required />				
+				<input type="password" name="password" pattern=".{6,}" value="<?= $_POST['password'] ?? ""; ?>" title="Minimum length is 6 chars" required />				
 				<label>Password</label>
 			</p>
 
 			<p>
-				<input type="password" name="passwordConfirm" value="<?= $_POST['passwordConfirm']; ?>" required />
+				<input type="password" name="passwordConfirm" value="<?= $_POST['passwordConfirm'] ?? ""; ?>" required />
 				<label>Confirm</label>
 			</p>
 		</fieldset>
