@@ -318,7 +318,7 @@ class Table {
 			}
 			
 			if(empty($pk)) {
-				App::get()->debug("WARNING: No primary key defined for database table: ".self::getTableName());
+				App::get()->debug("WARNING: No primary key defined for database table: ".$this->getName());
 			}
 			
 			App::get()->getCache()->set($cacheKey, $pk);

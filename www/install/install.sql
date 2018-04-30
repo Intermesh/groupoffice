@@ -99,17 +99,6 @@ CREATE TABLE `core_entity` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
-ALTER TABLE `core_entity`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `model_name` (`name`),
-  ADD UNIQUE KEY `name` (`name`),
-  ADD KEY `moduleId` (`moduleId`);
-
-ALTER TABLE `core_entity`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
-
-ALTER TABLE `core_entity`
-  ADD CONSTRAINT `core_entity_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE;
 
 
 DROP TABLE IF EXISTS `core_group`;
@@ -488,6 +477,15 @@ ALTER TABLE `core_module`
   ADD UNIQUE KEY `name` (`name`),
   ADD KEY `aclId` (`aclId`);
 
+ALTER TABLE `core_entity`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `model_name` (`name`),
+  ADD UNIQUE KEY `name` (`name`),
+  ADD KEY `moduleId` (`moduleId`);
+
+ALTER TABLE `core_entity`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 ALTER TABLE `core_search`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `entityId` (`entityId`,`entityTypeId`),
@@ -674,3 +672,8 @@ ADD CONSTRAINT `fk_user_avatar_id`
   REFERENCES `core_blob` (`id`)
   ON DELETE RESTRICT
   ON UPDATE NO ACTION;
+
+
+
+ALTER TABLE `core_entity`
+  ADD CONSTRAINT `core_entity_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE;

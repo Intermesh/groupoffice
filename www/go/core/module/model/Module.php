@@ -82,19 +82,25 @@ class Module extends AclEntity {
 			
 			case Module::class:
 				$module = Module::find()->where(['name' => "modules"])->single();				
-			break;
+			break;				
 			
 			default:
 				
-				$classNameParts = explode('\\', $className);
-				
-				if($classNameParts[0] == "GO") {
-					//old framework eg. GO\Projects2\Model\TimeEntry
-					$name = strtolower($classNameParts[1]);
+				if(strstr($className, 'go\core')) {
+					$name = 'core';
 				} else
 				{
-					$name = $classNameParts[3];
-				}				
+				
+					$classNameParts = explode('\\', $className);
+
+					if($classNameParts[0] == "GO") {
+						//old framework eg. GO\Projects2\Model\TimeEntry
+						$name = strtolower($classNameParts[1]);
+					} else
+					{
+						$name = $classNameParts[3];
+					}				
+				}
 				
 				$module = Module::find()->where(['name' => $name])->single();
 		}

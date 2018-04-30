@@ -216,13 +216,21 @@ namespace go\core {
 		 */
 		public function getCache() {
 			if (!isset($this->cache)) {
-
 				$this->cache = new Disk();
-//			if(!$this->cache->isSupported()) {
-//				$this->cache = new cache\None();
-//			}
 			}
 			return $this->cache;
+		}
+		
+		/**
+		 * Set the cache provider
+		 * 
+		 * @param CacheInterface $cache
+		 * @return $this
+		 */
+		public function setCache(CacheInterface $cache) {
+			$this->cache = $cache;
+			
+			return $this;
 		}
 
 		/**
@@ -253,8 +261,16 @@ namespace go\core {
 
 		private $authState;
 
+		/**
+		 * Set the authentication state
+		 * 
+		 * @param \go\core\auth\State $authState
+		 * @return $this
+		 */
 		public function setAuthState(auth\State $authState) {
 			$this->authState = $authState;
+			
+			return $this;
 		}
 
 		/**

@@ -3,9 +3,9 @@
 namespace go\core;
 
 use Exception;
-use go\core\acl\model\AclGroup;
 use go\core\auth\model\Group;
 use go\core\auth\model\User;
+use go\core\auth\model\UserGroup;
 use go\core\db\Utils;
 use go\core\module\Base;
 use go\core\orm\Entity;
@@ -32,6 +32,11 @@ class Installer {
 	 * @throws Exception
 	 */
 	public function install(array $adminValues = [], $installModules = []) {
+		
+		
+		//don't cache on install
+		App::get()->getCache()->flush(false);
+		App::get()->setCache(new \go\core\cache\None());
 		
 		$this->isInProgress = true;
 		
@@ -67,8 +72,8 @@ class Installer {
 			 $admin->recoveryEmail = $admin->email;
 		}
 		
-		$admin->groups[] = (new auth\model\UserGroup)->setValues(['groupId' => Group::ID_ADMINS]);
-		$admin->groups[] = (new auth\model\UserGroup)->setValues(['groupId' => Group::ID_INTERNAL]);
+		$admin->groups[] = (new UserGroup)->setValues(['groupId' => Group::ID_ADMINS]);
+		$admin->groups[] = (new UserGroup)->setValues(['groupId' => Group::ID_INTERNAL]);
 
 
 		if (!$admin->save()) {
@@ -105,9 +110,6 @@ class Installer {
 		foreach($installModules as $installModule) {
 			$installModule->install();
 		}
-		
-		
-		App::get()->getCache()->flush();
 	}
 	
 	public function upgrade() {

@@ -4,6 +4,38 @@ use go\core\App;
 use go\core\util\IniFile;
 
 
+$dbConnectError = null;
+$pdo = null;
+/**
+ * 
+ * @global PDO $pdo
+ * @param type $config
+ * @return PDO
+ */
+function dbConnect($config){
+	global $pdo, $dbConnectError;
+	if(isset($pdo)) {
+		return $pdo;
+	}
+	try{		
+		$pdo = new PDO($config['db']['dsn'], $config['db']['username'], $config['db']['password']);		
+	}
+	catch(Exception $e){
+		$dbConnectError = "Could not connect to the database. The database returned this error:<br />".$e->getMessage();
+	}
+	
+	return $pdo;
+}
+
+function dbIsEmpty($config) {
+	//global $pdo;
+	/* @var $pdo \PDO; */
+	
+	$stmt = dbConnect($config)->query("SHOW TABLES");
+	$stmt->execute();
+	
+	return $stmt->rowCount() == 0;
+}
 
 $configFile = App::findConfigFile();
 
@@ -34,6 +66,17 @@ if(file_exists($configFile)) {
 			];
 	} else if($_SERVER['REQUEST_METHOD'] != 'POST')
   {
+		
+		
+		//check if config.ini is already prefilled with usable data (Docker)
+		$tmpFolder = new \go\core\fs\Folder($config['general']['tmpPath']);
+		$dataFolder = new \go\core\fs\Folder($config['general']['dataPath']);
+		if(dbConnect($config) && dbIsEmpty($config) && $dataFolder->isWritable() && $tmpFolder->isWritable()) {
+			header("Location: install.php");
+			exit();
+		}
+		
+		
     $dsn = \go\core\db\Utils::parseDSN($config['db']['dsn']);
     
     
@@ -73,38 +116,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	}
 }
 
-$dbConnectError = null;
-$pdo = null;
-/**
- * 
- * @global PDO $pdo
- * @param type $config
- * @return PDO
- */
-function dbConnect($config){
-	global $pdo, $dbConnectError;
-	if(isset($pdo)) {
-		return $pdo;
-	}
-	try{		
-		$pdo = new PDO($config['db']['dsn'], $config['db']['username'], $config['db']['password']);		
-	}
-	catch(Exception $e){
-		$dbConnectError = "Could not connect to the database. The database returned this error:<br />".$e->getMessage();
-	}
-	
-	return $pdo;
-}
 
-function dbIsEmpty($config) {
-	//global $pdo;
-	/* @var $pdo \PDO; */
-	
-	$stmt = dbConnect($config)->query("SHOW TABLES");
-	$stmt->execute();
-	
-	return $stmt->rowCount() == 0;
-}
 
 
 require('header.php');
