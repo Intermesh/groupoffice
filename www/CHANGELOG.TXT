@@ -1,3 +1,6 @@
+- Removed hardcoded page size of 20 from links grid
+- Fixed issue that folders with the name "0" could not be created.
+
 23-04-2018 6.2.90
 - Set project id on billing invoice when invoicing.
 - Addressbook: Make readable addresslists visible to the emailcomposer->addressbook->addresslist grid. (only writable where displayed before)

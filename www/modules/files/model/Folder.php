@@ -580,10 +580,10 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		$parts = explode('/', $relpath);
 		$parent_id = 0;
-		while ($folderName = array_shift($parts)) {
 
+		foreach($parts as $index=>$folderName){
+		
 			$cacheKey = $parent_id.'/'.$folderName;
-
 
 			if(!isset($this->_folderCache[$cacheKey])){
 
@@ -604,7 +604,9 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 					$folder->setAttributes($autoCreateAttributes);
 					$folder->name = $folderName;
 					$folder->parent_id = $parent_id;
-					$folder->save();
+					if(!$folder->save()){
+						throw new \Exception('Could not create folder: '.implode('<br>',$folder->getValidationErrors()));
+					}
 				}elseif(!empty($autoCreateAttributes))
 				{
 					//should not apply it to existing folders. this leads to unexpected results.
