@@ -111,6 +111,37 @@ namespace go\core {
 		}
 
 		private $config;
+		
+		/**
+		 * Load configuration
+		 * 
+		 * ```
+		 * "general" => [
+		 * 	  "dataPath" => "/foo/bar"
+		 * 	],
+		 * 
+		 * "db" => [
+		 * 	  "dsn" => 'mysql:host=localhost;dbname=groupoffice,
+		 * 	  "username" => "user",
+		 * 	  "password" => "secret"
+		 *   ]
+		 * "limits" => [
+		 * 		"maxUsers" => 0,
+		 * 		"storageQuota" => 0,
+		 * 		"allowedModules" => ""
+		 * 	 ]
+		 * ]
+		 * 
+		 * ```
+		 * 
+		 * @param array $config
+		 * @return $this;
+		 */
+		public function setConfig(array $config) {
+			$this->config = $config;
+			
+			return $this;
+		}
 
 		/**
 		 * Get the configuration data

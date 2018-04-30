@@ -52,6 +52,8 @@ class EntityTest extends TestCase {
 		$this->assertEquals(true, $success);
 		
 		$array = $entity->toArray(['propA','propB','hasMany', 'createdAt']);
+		
+		var_dump($array);
 		$string = json_encode($array);
 		$string = str_replace("string ", "copy ", $string);
 		$array = json_decode($string, true);
