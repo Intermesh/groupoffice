@@ -15,7 +15,6 @@ Depends: libapache2-mod-php7.0 | libapache2-mod-php5 (>= 5.6) | libapache2-mod-p
 	php-gd  | php5-gd,
 	php-cli | php5-cli,
 	php-curl | php5-curl,
-	php-mcrypt | php5-mcrypt,
 	php-xsl | php5-xsl,
 	catdoc,
 	unzip,
