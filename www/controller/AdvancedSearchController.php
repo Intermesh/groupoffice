@@ -7,6 +7,20 @@ class AdvancedSearchController extends \GO\Base\Controller\AbstractModelControll
 	
 	protected $model = 'GO\Base\Model\AdvancedSearch';
 
+//	protected function formatColumns(\GO\Base\Data\ColumnModel $columnModel) {
+//		
+//		$columnModel->formatColumn('data', '$model->getData()');
+//		
+//		return parent::formatColumns($columnModel);
+//	}
+	
+	public function formatStoreRecord($record, $model, $store) {
+		
+		$record['data'] = $model->getData();
+		
+		return parent::formatStoreRecord($record, $model, $store);
+	}
+	
 	protected function getStoreParams($params) {	
 		
 		$storeParams = \GO\Base\Db\FindParams::newInstance();
@@ -16,4 +30,3 @@ class AdvancedSearchController extends \GO\Base\Controller\AbstractModelControll
 		return $storeParams;
 	}
 }
-?>

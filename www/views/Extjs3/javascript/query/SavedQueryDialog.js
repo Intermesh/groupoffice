@@ -31,7 +31,7 @@ GO.query.SavedQueryDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 	
 	afterSubmit : function(){
 		this.savedQueryGrid.store.load();
-		this.savedQueryGrid.queryPanel.titleField.setValue('<b>'+this.formPanel.form.findField('name').getValue()+'</b>');
+		this.savedQueryGrid.queryPanel.setTitle('<b>'+this.formPanel.form.findField('name').getValue()+'</b>');
 	},
 	
 	buildForm : function () {
