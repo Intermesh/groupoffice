@@ -17,7 +17,7 @@ go.modules.community.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 			entityStore: go.Stores.get("Note")
 		});
 
-		Ext.apply(this, {
+		Ext.apply(this, {		
 		
 			columns: [
 				{

@@ -187,6 +187,16 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	 * 
 	 * ```
 	 * 
+	 * Destroy:
+	 * 
+	 * ```
+	 * this.entityStore.set({destroy: [1,2]}, function (options, success, response) {
+			if (response.destroyed) {
+				this.hide();
+			}
+		}, this);
+		```
+	 * 
 	 * @param {int} id
 	 * @param {object} values Key value object with entity properties
 	 * @param {type} callback A function called with success, values, response, options

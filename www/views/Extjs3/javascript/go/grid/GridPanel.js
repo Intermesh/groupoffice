@@ -7,8 +7,54 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 
 	initComponent: function () {
 		go.grid.GridPanel.superclass.initComponent.call(this);
+		
+		if(!this.keys)
+		{
+			this.keys=[];
+		}
+		this.keys.push({
+			key: Ext.EventObject.DELETE,
+			fn: function(key, e){
+				console.log("DELETE");
+				this.deleteSelected();
+			},
+			scope:this
+		});
 
 		this.on("bodyscroll", this.loadMore, this, {buffer: 100});
+	},
+	
+	deleteSelected : function() {
+	
+		var selectedRecords = this.getSelectionModel().getSelections(), ids = [];
+		
+		selectedRecords.forEach(function(r) {
+			ids.push(r.data.id);
+		});
+		
+		switch(ids.length)
+		{
+			case 0:				
+				return;
+			case 1:
+				var strConfirm = t("Are you sure you want to delete the selected item?");
+			break;
+
+			default:
+				var strConfirm = t("Are you sure you want to delete the {count} items?").replace('{count}', ids.length);
+			break;					
+		}
+		
+		Ext.MessageBox.confirm(t("Confirm delete"), t(strConfirm), function(btn) {
+			
+			if(btn != "yes") {
+				return;
+			}
+			
+			go.Stores.get('Note').set({
+				destroy: ids
+			});
+		});
 	},
 
 	/**
