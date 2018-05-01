@@ -23,7 +23,10 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 			text: t("Open"),
 			iconCls: 'ic-open-in-new',
 			handler: function(){
-				this.records[0].data.handler.call(this);
+				var p = new go.modules.community.files.PreviewLayer();
+				p.show();
+				console.log(this.records[0]);
+				//this.records[0].data.handler.call(this);
 			},
 			scope: this
 		}),
