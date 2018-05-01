@@ -34,14 +34,10 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 		
 		// Add route to routers used by open()
 		var me = this;
-		go.Router.add(/files\/(\w+)\/([0-9/]*)/, function(root, id) {
+		go.Router.add(/files\/(\w+)\/([0-9/]*)/, function(root, path) {
 			me.at = root;
 			me.path = [];
-			var ids = id.replace(/\/$/g, '').split('/');
-			if(ids[0] === '') {
-				ids = [];
-			}
-			me.nav(ids);
+			me.nav(path);
 		});
 	},
 	open: function(id) {
@@ -57,9 +53,11 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 		}
 		go.Router.goto("files/"+this.at+"/" + strPath);
 	},
-	nav: function(ids) {
-		if(!Ext.isArray(ids)){
-			ids = [ids];
+	// private
+	nav: function(path) {
+		var ids = path.replace(/\/$/g, '').split('/');
+		if(ids[0] === '') {
+			ids = [];
 		}
 		this.path = this.path.concat(ids);
 		var filter = Ext.isEmpty(this.path) ? {isHome:true} : {parentId:ids[ids.length-1]} 
