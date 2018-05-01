@@ -1,4 +1,4 @@
-go.modules.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
+go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 	entityStore: go.Stores.get("Note"),
 	stateId: 'no-notes-detail',
 
@@ -20,7 +20,7 @@ go.modules.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 		});
 
 
-		go.modules.notes.NoteDetail.superclass.initComponent.call(this);
+		go.modules.community.notes.NoteDetail.superclass.initComponent.call(this);
 
 		go.CustomFields.addDetailPanels(this);
 
@@ -64,7 +64,7 @@ go.modules.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 
 		this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < GO.permissionLevels.write);
 
-		go.modules.notes.NoteDetail.superclass.onLoad.call(this);
+		go.modules.community.notes.NoteDetail.superclass.onLoad.call(this);
 	},
 
 	initToolbar: function () {
@@ -80,7 +80,7 @@ go.modules.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 					iconCls: 'ic-edit',
 					tooltip: t("Edit"),
 					handler: function (btn, e) {
-						var noteEdit = new go.modules.notes.NoteForm();
+						var noteEdit = new go.modules.community.notes.NoteForm();
 						noteEdit.show();
 						noteEdit.load(this.data.id);
 					},
