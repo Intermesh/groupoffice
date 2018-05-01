@@ -1,3 +1,4 @@
+- Email account passwords can be twice as long (86 characters)
 - Removed hardcoded page size of 20 from links grid
 - Fixed issue that folders with the name "0" could not be created.
 
