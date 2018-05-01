@@ -1482,8 +1482,14 @@ td.grid-hd-group-cell {
 	}
 	&-node {
 		@extend %font-body1;
+		position:relative;
 		.x-tree-selected {background-color: $cSelected;}
-		.x-tree-node-over {background-color: $cHover;}
+		.x-tree-node-over {
+			background-color: $cHover;
+			.tree-button {
+				display:block;
+			}
+		}
 		&-indent span {
 			display:inline-block;
 			width: dp(24);
@@ -1493,6 +1499,12 @@ td.grid-hd-group-cell {
 			span {
 				color: inherit;
 			}
+		}
+		.tree-button{
+			display:none;
+			position:absolute;
+			top:0;
+			right:0;
 		}
 	}
 }
