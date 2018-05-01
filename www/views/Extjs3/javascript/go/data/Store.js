@@ -1,3 +1,19 @@
+
+/**
+ * 
+ * 
+ * //Inserting records will trigger server update too:
+ * var store = this.noteGrid.store;
+						var myRecordDef = Ext.data.Record.create(store.fields);
+
+						store.insert(0, new myRecordDef({
+							name: "New",
+							content: "Testing",
+							noteBookId: this.addNoteBookId
+						}));
+						
+						store.commitChanges();
+ */
 go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	
 	entityStore: null,
@@ -35,6 +51,8 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		this.on('load', function() {
 			this.loaded = true;
 		}, this)
+		
+		this.on('update', this.onUpdate, this);
 	},
 	receive : function(action) {	
 		
@@ -44,13 +62,12 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		
 		switch(action.type) {			
 			
-			//quick and dirty reload of the list when client did a set
+			case this.entityStore.entity.name + "Created":				
 			case this.entityStore.entity.name + "Updated":				
 				
 				//update data when entity store has new data
-				for(var i=0,l=action.payload.list.length;i < l; i++) {
-					var entity = action.payload.list[i];
-					if(!this.updateRecord(entity) ){
+				for(var id in action.payload.list) {
+					if(!this.updateRecord(id, action.payload.list[id]) ){
 						//todo this causes many reloads because every links panel reloads on a new link. 
 						
 						//HOw to determine if it needs to reload?
@@ -77,24 +94,32 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 
 	},
 	
-	updateRecord : function(entity) {
-		var record = this.getById(entity.id);
+	updateRecord : function(id, entity) {
+		
+
+		var record = this.getById(id);
 		if(!record) {
 			return false;
 		}
 		
-		record.beginEdit();
+//		if(record.isModified()) {
+//			alert("Someone modified your record!");
+//		}
 		
+		
+		this.serverUpdate = true;
+		record.beginEdit();
 		this.fields.each(function(field) {
 			record.set(field.name, entity[field.name]);
 		});
 		
-		record.endEdit();
+		record.id = entity.id;
 		
-		//TODO: we don't want record.commit() to fire an update event because then we will going to do unesssary set calls to the server.
-			
+		
+		record.endEdit();
 		record.commit();
 		
+		this.serverUpdate = false;
 		return true;
 	},
 	destroy : function() {	
@@ -113,5 +138,26 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		this.entityStore.get(ids, function (items) {
 			this.loadData(items);
 		}, this);
+	},
+	
+	onUpdate : function(store, record, operation) {
+		
+		if(this.serverUpdate) {
+			return;
+		}
+		
+		
+		if(operation != Ext.data.Record.COMMIT) {
+			return;
+		}
+		
+		var p = {};
+		
+		key = record.phantom ? 'create' : 'update';
+		p[key] = {};
+		p[key][record.id] = record.data;
+		
+		this.entityStore.set(p);
+		
 	}
 });
