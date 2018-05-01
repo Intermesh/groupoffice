@@ -86,4 +86,12 @@ class LogController extends AbstractModelController {
 		
 		return $store->getData();
 	}
+	
+	/**
+	 * Make the given functions available to users that don't have access to the module
+	 * @return array
+	 */
+	protected function allowWithoutModuleAccess() {
+		return array('recordsformodel');
+	}
 }
