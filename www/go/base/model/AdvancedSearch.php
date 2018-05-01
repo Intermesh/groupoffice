@@ -66,6 +66,12 @@ class AdvancedSearch extends \GO\Base\Db\ActiveRecord {
 		return parent::beforeSave();
 	}
 	
+	/**
+	 * Format the data before it is saved and loaded
+	 * Needed to format for example dates to the correct user defined format
+	 * 
+	 * @param boolean $toDb
+	 */
 	private function _formatCustomfield($toDb=true){
 		$decodedData = json_decode($this->data,true);
 
