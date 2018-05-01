@@ -111,6 +111,37 @@ namespace go\core {
 		}
 
 		private $config;
+		
+		/**
+		 * Load configuration
+		 * 
+		 * ```
+		 * "general" => [
+		 * 	  "dataPath" => "/foo/bar"
+		 * 	],
+		 * 
+		 * "db" => [
+		 * 	  "dsn" => 'mysql:host=localhost;dbname=groupoffice,
+		 * 	  "username" => "user",
+		 * 	  "password" => "secret"
+		 *   ]
+		 * "limits" => [
+		 * 		"maxUsers" => 0,
+		 * 		"storageQuota" => 0,
+		 * 		"allowedModules" => ""
+		 * 	 ]
+		 * ]
+		 * 
+		 * ```
+		 * 
+		 * @param array $config
+		 * @return $this;
+		 */
+		public function setConfig(array $config) {
+			$this->config = $config;
+			
+			return $this;
+		}
 
 		/**
 		 * Get the configuration data
@@ -216,13 +247,21 @@ namespace go\core {
 		 */
 		public function getCache() {
 			if (!isset($this->cache)) {
-
 				$this->cache = new Disk();
-//			if(!$this->cache->isSupported()) {
-//				$this->cache = new cache\None();
-//			}
 			}
 			return $this->cache;
+		}
+		
+		/**
+		 * Set the cache provider
+		 * 
+		 * @param CacheInterface $cache
+		 * @return $this
+		 */
+		public function setCache(CacheInterface $cache) {
+			$this->cache = $cache;
+			
+			return $this;
 		}
 
 		/**
@@ -253,8 +292,16 @@ namespace go\core {
 
 		private $authState;
 
+		/**
+		 * Set the authentication state
+		 * 
+		 * @param \go\core\auth\State $authState
+		 * @return $this
+		 */
 		public function setAuthState(auth\State $authState) {
 			$this->authState = $authState;
+			
+			return $this;
 		}
 
 		/**

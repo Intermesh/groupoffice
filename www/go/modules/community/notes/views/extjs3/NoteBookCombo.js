@@ -1,4 +1,4 @@
-go.modules.notes.NoteBookCombo = Ext.extend(go.form.ComboBox, {
+go.modules.community.notes.NoteBookCombo = Ext.extend(go.form.ComboBox, {
 	fieldLabel: t("Notebook", "notes"),
 	hiddenName: 'noteBookId',
 	anchor: '100%',
@@ -24,7 +24,7 @@ go.modules.notes.NoteBookCombo = Ext.extend(go.form.ComboBox, {
 			})
 		});
 		
-		go.modules.notes.NoteBookCombo.superclass.initComponent.call(this);
+		go.modules.community.notes.NoteBookCombo.superclass.initComponent.call(this);
 
 	}
 });

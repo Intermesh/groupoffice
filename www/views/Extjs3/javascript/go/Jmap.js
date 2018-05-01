@@ -56,12 +56,12 @@ go.Jmap = {
 		Ext.Ajax.request({
 			url: BaseHref + 'jmap.php',
 			method: 'GET',
-			success: function (response, opts) {
+			callback: function (opts, success, response) {
 				var data;
-				if(response.responseText) {
+				if(success && response.responseText) {
 					data = Ext.decode(response.responseText);
 				}
-				cb.call(scope, data, response, opts);
+				cb.call(scope, data, opts, success, response);
 			}
 		});
 	},

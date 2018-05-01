@@ -82,7 +82,7 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 		
 		this.folderId = dv.data.files_folder_id == undefined ? dv.data.filesFolderId : dv.data.files_folder_id;
 		
-		this.setVisible(this.folderId != undefined);
+		//this.setVisible(this.folderId != undefined);
 		
 		if(this.folderId) {
 			this.store.load({

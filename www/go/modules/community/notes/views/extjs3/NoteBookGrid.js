@@ -1,4 +1,4 @@
-go.modules.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
+go.modules.community.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 	viewConfig: {
 		forceFit: true,
 		autoFill: true
@@ -51,7 +51,7 @@ go.modules.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 			stateId: 'note-books-grid'
 		});
 
-		go.modules.notes.NoteBookGrid.superclass.constructor.call(this, config);
+		go.modules.community.notes.NoteBookGrid.superclass.constructor.call(this, config);
 	},
 
 	initRowActions: function () {
@@ -91,7 +91,7 @@ go.modules.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 						iconCls: 'ic-edit',
 						text: t("Edit"),
 						handler: function() {
-							var noteBookForm = new go.modules.notes.NoteBookForm();
+							var noteBookForm = new go.modules.community.notes.NoteBookForm();
 							noteBookForm.load(this.moreMenu.record.id).show();
 						},
 						scope: this						

@@ -1,15 +1,21 @@
 go.User = {
 	accessToken: localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken'),
-	authenticate: function(cb) {
+	authenticate: function(cb, scope) {
 		if(!this.accessToken) {
 			return;
 		}
-		go.Jmap.get(function(data, response){
+		go.Jmap.get(function(data, options, success, response){
 			if(data) {
 				this.loadSession(data);
 			}
-			cb(data, response);
+			cb.call(scope, data, options, success, response);
 		}, this);		
+	},
+	
+	clearAccessToken : function() {
+		this.accessToken = null;
+		localStorage.removeItem('accessToken');
+		sessionStorage.removeItem('accessToken');
 	},
   
   loadSession : function(session) {

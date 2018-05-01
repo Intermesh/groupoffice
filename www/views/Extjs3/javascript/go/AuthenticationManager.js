@@ -136,9 +136,7 @@
 					url: BaseHref + 'auth.php',
 					method: "DELETE",
 					callback: function() {
-						window.localStorage.removeItem("accessToken");
-						window.sessionStorage.removeItem("accessToken");
-						
+						go.User.clearAccessToken();
 						document.location = BaseHref;
 					}
 				})

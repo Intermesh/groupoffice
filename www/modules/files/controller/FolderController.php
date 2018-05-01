@@ -1081,10 +1081,13 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 	protected function checkEntityFolder($params) {
 		$cls = $params['model'];
 		
+		$entityType = \go\core\orm\EntityType::findByName($params['model']);
+		$cls = $entityType->getClassName();
+		
 		$entity = $cls::findById($params['id']);
 		
 		if(empty($entity->filesFolderId)) {
-			$filesPath = $entity->getType()->getModule()->name. '/'. $entity->getType()->getName() . '/' . $entity->id;
+			$filesPath = $entityType->getModule()->name. '/'. $entityType->getName() . '/' . $entity->id;
 			$aclId =$entity->findAclId();
 			$folder = \GO\Files\Model\Folder::model()->findByPath($filesPath,true, array('acl_id'=>$aclId,'readonly'=>1));
 
@@ -1120,12 +1123,13 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 	 * @return type
 	 */
 	protected function actionCheckModelFolder($params) {
-		$cls = \GO::getModel($params['model']);
 		
-		if(is_a($cls, \go\core\orm\Entity::class, true)) {
-			$params['model'] = $cls;
+		if(strpos($params['model'], '\\') === false) {
 			return $this->checkEntityFolder($params);
 		}
+		
+		$cls = \GO::getModel($params['model']);
+		
 		
 		$model = $cls->findByPk($params['id'],false, true);
 

@@ -55,6 +55,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	},
 
 	onLoad: function (dv) {
+
 		this.model_id = dv.model_id ? dv.model_id : dv.currentId //model_id is from old display panel
 		this.model_name = dv.model_name || dv.entity || dv.entityStore.entity.name;
 

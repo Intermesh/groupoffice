@@ -30,9 +30,15 @@ class Settings extends core\Settings {
 			return null;
 		}		
 		
-		$path = trim(dirname($_SERVER['PHP_SELF']), '/') . '/';		
+		$path = '/' . trim(dirname($_SERVER['PHP_SELF']), '/');		
 		$https = (isset($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"] == "on" || $_SERVER["HTTPS"] == "1")) || !empty($_SERVER["HTTP_X_SSL_REQUEST"]);
-		$protocol = $https ? 'https://' : 'http://';		
+		$protocol = $https ? 'https://' : 'http://';
+		
+		//trim install folder
+		if(substr($path, -8) == '/install') {
+			$path = substr($path, 0, -8);
+		}
+		
 		return $protocol . $_SERVER['HTTP_HOST'] . $path;
 	}
 

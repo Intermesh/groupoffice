@@ -7,6 +7,7 @@
 /config.ini
 /www/config.ini
 /www/promodules
+/tests/data
 /www/modules/*
 !/www/modules/addressbook
 !/www/modules/admin2userlogin
@@ -54,3 +55,4 @@
 !/www/modules/users
 !/www/modules/webodf
 .DS_Store
+.sass-cache
