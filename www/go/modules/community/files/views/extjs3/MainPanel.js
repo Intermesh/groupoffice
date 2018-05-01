@@ -144,7 +144,6 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 		});
 		
 		this.browser.on('pathchanged', function(browser) {
-			console.log(browser.path);
 			this.breadCrumbs.redraw(browser);
 		},this)
 

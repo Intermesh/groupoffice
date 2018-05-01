@@ -39,7 +39,7 @@ go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
 				rowdblclick: function (grid, rowIndex, e) {
 					var record = grid.getStore().getAt(rowIndex);
 					if(record.data.isDirectory) {
-						go.Router.goto("files/mine/" + this.browser.path.join('/')+'/' + record.id+ '/');
+						this.browser.open(record.id);
 						return;
 					}
 					if (record.get('permissionLevel') < GO.permissionLevels.write) {
@@ -67,7 +67,7 @@ go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
 				dblclick(view, index, node, e) {
 					var record = view.getStore().getAt(index);
 					if(record.data.isDirectory) {
-						go.Router.goto('files/mine/'+this.browser.path.join('/')+'/'+record.id+'/');
+						this.browser.open(record.id);
 					}
 					
 				},
@@ -113,8 +113,7 @@ go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
 	},
 	activeUploads: 0,
 	fileUpload: function(files) {
-		
-		var countUploads = 0;
+
 		for (var i = 0; i < files.length; i++) {
 			var name = this.solveDuplicate(files[i].name);
 			var record = new this.store.recordType({ name: name, size: files[i].size, status: 'queued' });

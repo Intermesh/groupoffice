@@ -24,32 +24,32 @@ go.modules.community.files.BreadCrumbBar = Ext.extend(Ext.Toolbar, {
 		this.addButton({
 			text: browser.rootNames[browser.at],
 			handler: function(btn) {
-				browser.store.setBaseParam('filter',{isHome:true});
-				browser.store.load();
-				browser.nav([]);
+				browser.at = 'mine';
+				browser.path = [];
+				browser.open();
 			},
 			scope:this
 		});
-		go.Stores.get('Node').get(browser.path, function(nodes){
-			Ext.each(nodes, function(node, i, all){
-				var isLast = (i === all.length - 1);
-				this.addButton({
-					directoryId:node.id,
-					text: node.name,
-					handler: function(btn) {
-						this.nav(btn.directoryId);
-					},
-					scope:this
-				});
-				if(isLast) {
-					return;
-				}
-				this.addButton({
-					iconCls:'ic-chevron-right',
-					disabled:true
-				});
-			}, this);
-		},this);
+		if(!Ext.isEmpty(browser.path)) {
+			go.Stores.get('Node').get(browser.path, function(nodes){
+				Ext.each(nodes, function(node, i, all){
+					var isLast = (i === all.length - 1);
+					this.addButton({
+						iconCls:'ic-chevron-right',
+						disabled:true
+					});
+					this.addButton({
+						directoryId:node.id,
+						text: node.name,
+						disabled:isLast,
+						handler: function(btn) {
+							browser.open(btn.directoryId);
+						},
+						scope:this
+					});
+				}, this);
+			},this);
+		}
 		this.doLayout();
 	}
 });

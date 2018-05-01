@@ -10,11 +10,3 @@ go.Modules.register("community", 'files', {
 		});
 	}
 });
-
-go.Router.add(/files\/(\w+)\/([0-9/]+)/, function(root, id) {
-	console.log(root,id);
-	var b = GO.mainLayout.openModule('files').browser;
-	b.at = root;
-	b.path = [];
-	b.nav(id.replace(/\/$/g, '').split('/'));
-});

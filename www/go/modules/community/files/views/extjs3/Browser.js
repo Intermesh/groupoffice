@@ -18,32 +18,52 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 		shared: t('Shared with me'),
 		bookmarked: t('Bookmarked')
 	},
+	/**
+	 * Call open() will change route, will call nav()
+	 * @param {type} config
+	 * @returns {undefined}
+	 */
 	constructor: function(config){
 		this.store = config.store;
-		this.addEvents({"pathchanged" : true});
+		this.addEvents({
+			"pathchanged" : true // post browsing
+		});
 		this.listeners = config.listeners;
+		
 		go.modules.community.files.Browser.superclass.constructor.call(this, config);
+		
+		// Add route to routers used by open()
+		var me = this;
+		go.Router.add(/files\/(\w+)\/([0-9/]*)/, function(root, id) {
+			me.at = root;
+			me.path = [];
+			var ids = id.replace(/\/$/g, '').split('/');
+			if(ids[0] === '') {
+				ids = [];
+			}
+			me.nav(ids);
+		});
 	},
-//	open: function(node) {
-//		if(!node.isDirectory){
-//			return;
-//		}
-//		this.path.push(node.id);
-//		this.store.setBaseParam('filter',{parentId:node.id});
-//		this.store.load();
-//		this.fireEvent('pathchanged', this);
-//	},
+	open: function(id) {
+		// find Id in current path and slide it there
+		for(var i in this.path) {
+			if(this.path[i] == id) {
+				this.path = this.path.slice(0,i);
+			}
+		}
+		var strPath = Ext.isEmpty(this.path) ? '' : this.path.join('/')+'/';
+		if(id){
+			strPath += (id+'/');
+		}
+		go.Router.goto("files/"+this.at+"/" + strPath);
+	},
 	nav: function(ids) {
 		if(!Ext.isArray(ids)){
 			ids = [ids];
 		}
-		for(var i in this.path) {
-			if(this.path[i] === ids[0]) {
-				this.path.slice(0,i);
-			}
-		}
 		this.path = this.path.concat(ids);
-		this.store.setBaseParam('filter',{parentId:ids[ids.length-1]});
+		var filter = Ext.isEmpty(this.path) ? {isHome:true} : {parentId:ids[ids.length-1]} 
+		this.store.setBaseParam('filter',filter);
 		this.store.load();
 		this.fireEvent('pathchanged', this);
 	}
