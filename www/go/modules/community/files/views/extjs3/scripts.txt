@@ -7,6 +7,7 @@ NodeDetail.js
 NodeGrid.js
 NodeTile.js
 CardPanel.js
+FolderTreeNodeUI.js
 FolderTree.js
 UsagePanel.js
 NodeDialog.js

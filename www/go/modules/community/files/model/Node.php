@@ -23,7 +23,7 @@ class Node extends model\AclEntity {
 	public $isDirectory;
 	
 	public $comments;
-	public $bookmarked;
+	public $isBookmarked;
 	/**
 	 * @var \go\core\util\DateTime
 	 */
@@ -31,7 +31,7 @@ class Node extends model\AclEntity {
 	public $storageId;
 	public $parentId;
 	
-	protected static function defineMapping() {
+	protected static function defineMapping() {		
 		return parent::defineMapping()
 						->addTable('files_node', 'node');
 	}
@@ -60,6 +60,8 @@ class Node extends model\AclEntity {
 	
 	public static function filter(Query $query, array $filter) {
 		
+		$query->join('files_node_user', 'nodeUser', 'node.id=nodeUser.nodeId AND nodeUser.userId='.\GO()->getUser()->id.'', 'LEFT');
+		
 		// Add where usergroup is the personal group of the user
 		if(isset($filter['isHome'])){
 			$homeDir = \GO()->getUser()->storage->getRootFolder();
@@ -75,6 +77,10 @@ class Node extends model\AclEntity {
 			}
 		}
 		
+		if(!empty($filter['isBookmarked'])){
+			$query->andWhere('nodeUser.bookmarked','=','1');
+		}
+		
 		$filterableProperties = ['parentId', 'isDirectory'];
 		foreach($filterableProperties as $prop) {
 			if(isset($filter[$prop])) {
@@ -87,7 +93,7 @@ class Node extends model\AclEntity {
 	public function toArray($properties = array()) {
 		$result = parent::toArray($properties);
 		$unset = ($result['isDirectory']) ?
-			['metaData', 'mimeType', 'byteSize', 'bloId', 'versions'] :
+			['metaData', 'mimeType', 'byteSize', 'blobId', 'versions'] :
 			['items', 'subscribed', 'canAddItems'];
 		foreach($unset as $key) { 
 			unset($result[$key]); 
