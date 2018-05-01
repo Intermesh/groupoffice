@@ -1,6 +1,5 @@
-- Log: Make "RecordsForModel" function available to users that don't have specific access to the log module
-
 01-05-2018 6.2.91
+- Log: Make "RecordsForModel" function available to users that don't have specific access to the log module
 - Billing: Fixed pagebreak within item groups
 - Addressbook: Advanced search, Fixed issue with dates when saving the search query
 - Email account passwords can be twice as long (86 characters)
