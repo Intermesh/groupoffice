@@ -75,5 +75,22 @@ go.tree.TreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 				callback.call(this, response);
 			}
 		});
+	},
+	
+	// Fix uiProvider loading when given in the baseAttrs config of nodes
+	createNode: function (attr) {
+		Ext.apply(attr, this.baseAttrs || {});
+
+		if (this.applyLoader !== false) {
+			attr.loader = this;
+		}
+
+		if (typeof attr.uiProvider == 'string') {
+			attr.uiProvider = this.uiProviders[attr.uiProvider] || eval(attr.uiProvider);
+		}
+
+		return(attr.leaf ?
+						new Ext.tree.TreeNode(attr) :
+						new Ext.tree.AsyncTreeNode(attr));
 	}
 });
