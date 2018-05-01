@@ -19,12 +19,16 @@ go.modules.community.files.NodeTile = Ext.extend(Ext.DataView, {
 	itemSelector:'div.tile',
 	tpl: new Ext.XTemplate('<tpl for=".">',
 		'<div class="tile">',
-			'<tpl if="values.blobId"><div class="fs-thumb" style="background-image:url({[go.Jmap.downloadUrl(values.blobId)]});"></div></tpl>',
-			'<tpl if="!values.blobId"><div class="fs-thumb folder"></div></tpl>',
-			'<span class="x-editable">{name}</span>'+
+			'<div class="filetype {[this.icon(values)]}"></div>',
+			'<div class="text">{name}</div>'+
 			'<tpl if="values.status==\'queued\'"><progress max="100" value="{progress}"></progress></tpl>'+
 		'</div>',
-	'</tpl>'),
+	'</tpl>',{
+		icon: function(values) {
+			//todo: find thumb in metadata
+			return go.util.contentTypeClass(values.contentType, values.name);
+		}
+	}),
 	initComponent : function(){
 
      this.addEvents({drop:true});

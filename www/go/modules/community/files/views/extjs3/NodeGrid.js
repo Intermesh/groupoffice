@@ -15,6 +15,10 @@ go.modules.community.files.NodeGrid = Ext.extend(go.grid.GridPanel, {
 				{
 					id: 'name',
 					header: t('Name'),
+					renderer: function(value, store, record) {
+						var icon = go.util.contentTypeClass(record.data.contentType, record.data.name);
+						return '<i class="icon filetype '+icon+'"></i><span>'+value+'</span>';
+					},
 					width: 75,
 					sortable: true,
 					dataIndex: 'name'

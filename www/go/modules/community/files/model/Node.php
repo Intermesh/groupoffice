@@ -21,6 +21,8 @@ class Node extends model\AclEntity {
 	public $ownedBy;
 	public $modifiedBy;
 	public $isDirectory;
+	public $bytesSize;
+	public $contentType;
 	
 	public $comments;
 	public $isBookmarked;
@@ -33,7 +35,7 @@ class Node extends model\AclEntity {
 	
 	protected static function defineMapping() {		
 		return parent::defineMapping()
-						->addTable('files_node', 'node');
+			->addTable('files_nodeview', 'node');
 	}
 	
 	public function getLocation() {
@@ -98,7 +100,6 @@ class Node extends model\AclEntity {
 		foreach($unset as $key) { 
 			unset($result[$key]); 
 		}
-		unset($result['isDirectory']);
 		return $result;
 	}
 

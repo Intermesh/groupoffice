@@ -10,5 +10,3 @@ go.Modules.register("community", 'files', {
 		});
 	}
 });
-
-

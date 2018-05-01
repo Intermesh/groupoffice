@@ -309,12 +309,12 @@ $filetype: (
 @each $img, $extensions in $filetype {
 	@if type-of($extensions) == 'list' {
 		@each $extension in $extensions {
-			.filetype-#{$extension} {
+			.filetype.#{$extension} {
 				background-image:url('img/filetype/#{$img}.svg') !important;
 			}
 		}
 	} @else {
-		.filetype-#{$extensions} {
+		.filetype.#{$extensions} {
 			background-image:url('img/filetype/#{$img}.svg') !important;
 		}
 	}
@@ -322,18 +322,23 @@ $filetype: (
 
 .filetype {
 	background-size: dp(24) dp(24);
+	width: dp(24);
+	height: dp(24);
 	background-image:url(img/filetype/unknown.svg);
 	background-repeat: no-repeat;
+	background-position:center center;
 	&-link {
-		padding-left: dp(24);
-		padding-top: dp(4);
-		padding-bottom: dp(4);
-		padding-right: dp(8);
-		background-repeat: no-repeat;
-		background-position: top left;
-		background-size: dp(24);
+		padding: dp(4) dp(8) dp(4) dp(24);
 		white-space: nowrap;
 		line-height: dp(32);
+	}
+	.tile > & {
+		background-size: dp(100);
+		width: 100%;
+		height: dp(120);
+	}
+	& + span {
+		padding-left: dp(8);
 	}
 }
 

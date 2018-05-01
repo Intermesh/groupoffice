@@ -1,4 +1,6 @@
 Module.js
+Browser.js
+BreadCrumbBar.js
 MainPanel.js
 ContextMenu.js
 FilesDetailPanel.js

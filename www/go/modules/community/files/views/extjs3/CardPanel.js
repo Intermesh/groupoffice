@@ -14,6 +14,7 @@ go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
 	activeItem: 0,
 	deferredRender: false,
 	border: false,
+	browser: null, // set from mainpanel
 	previewTypes: {
       'image/png': true,
       'image/jpeg': true,
@@ -21,26 +22,14 @@ go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
    },
 		
 	initComponent: function () {
-		
-		this.store = new go.data.Store({
-			fields: ['id', 'name', 'byteSize', {name: 'createdAt', type: 'date'}, {name: 'modifiedAt', type: 'date'}, 'permissionLevel'],
-			baseParams: {filter:{parentId:1}},
-			entityStore: go.Stores.get("Node")
-		});
-		
+
 		var contextMenu = new go.modules.community.files.ContextMenu();
 		
 		this.nodeGrid = new go.modules.community.files.NodeGrid({
-			store:this.store,
+			store:this.browser.store,
 			listeners: {
 				viewready: function (grid) {
 					this.nodeGrid.getStore().load();
-//					this.folderTree.getStore().load({
-//						callback: function (store) {
-//							this.folderTree.getSelectionModel().selectRow(0);
-//						},
-//						scope: this
-//					});
 				},
 				rowcontextmenu: function(grid, index, event){
 					event.stopEvent();
@@ -48,8 +37,11 @@ go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
 					contextMenu.showAt(event.xy, records);
 				},
 				rowdblclick: function (grid, rowIndex, e) {
-
 					var record = grid.getStore().getAt(rowIndex);
+					if(record.data.isDirectory) {
+						this.browser.open(record.id);
+						return;
+					}
 					if (record.get('permissionLevel') < GO.permissionLevels.write) {
 						return;
 					}
@@ -61,18 +53,25 @@ go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
 			}
 		});
 		
-		this.nodeGrid.getSelectionModel().on('rowselect', function (sm, rowIndex, record) {
-			go.Router.goto("node/" + record.id);
-		});
+//		this.nodeGrid.getSelectionModel().on('rowselect', function (sm, rowIndex, record) {
+//			go.Router.goto("files/mine/" + this.browser.path.join('/')+ record.id);
+//		},this);
 		
 		this.nodeTile = new go.modules.community.files.NodeTile({
-			store:this.store,
+			store:this.browser.store,
 			listeners: {
-				contextmenu: function(view, index, node,event){
+				contextmenu: function(view, index, node, event){
 					event.stopEvent();
-					var records = view.getSelectedRecords();
-					contextMenu.showAt(event.xy, records);
+					contextMenu.showAt(event.xy, view.getSelectedRecords());
 				},
+				dblclick(view, index, node, e) {
+					var record = view.getStore().getAt(index);
+					if(record.data.isDirectory) {
+						this.browser.open(record.id);
+					}
+					
+				},
+				scope:this
 			}
 		});
 		
@@ -114,8 +113,7 @@ go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
 	},
 	activeUploads: 0,
 	fileUpload: function(files) {
-		
-		var countUploads = 0;
+
 		for (var i = 0; i < files.length; i++) {
 			var name = this.solveDuplicate(files[i].name);
 			var record = new this.store.recordType({ name: name, size: files[i].size, status: 'queued' });
