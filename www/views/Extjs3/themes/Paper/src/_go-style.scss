@@ -1055,6 +1055,13 @@ table[id^="comments-ext"] b {
 
 }
 
+.x-view-tiles {
+	div.text {
+		@extend %ellipsis;
+		padding: 0 dp(8);
+	}
+}
+
 /*.go-layout-responsive-item {
 	float:left;	
 	height: 100%;
