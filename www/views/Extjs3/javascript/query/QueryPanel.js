@@ -144,18 +144,16 @@ GO.query.QueryPanel = Ext.extend(Ext.Panel , {
 				scope: this,
 				clientvalidation: function(form, valid) {
 					
-						var formVal = form.getValues();
-						
-						record.set('andor', formVal.andor);
-						record.set('field', formVal.field);
-						record.set('comparator', formVal.comparator);
-						record.set('value', formVal.value);
-						record.set('start_group', formVal.start_group);
-						record.set('gotype', formVal.gotype);
-						record.set('rawValue', formVal.rawValue);
-						record.set('rawFieldLabel', formVal.rawFieldLabel);
-						
-						
+					var formVal = form.getValues();
+
+					record.set('andor', formVal.andor);
+					record.set('field', formVal.field);
+					record.set('comparator', formVal.comparator);
+					record.set('value', formVal.value);
+					record.set('start_group', formVal.start_group);
+					record.set('gotype', formVal.gotype);
+					record.set('rawValue', formVal.rawValue);
+					record.set('rawFieldLabel', formVal.rawFieldLabel);
 				}
 			}
 		});
@@ -173,7 +171,7 @@ GO.query.QueryPanel = Ext.extend(Ext.Panel , {
 			gotype: record.get('gotype'),
 			rawValue: record.get('rawValue'),
 			rawFieldLabel: record.get('rawFieldLabel')
-		}
+		};
 		
 		criteriaPanel.setValues(values);
 		
@@ -198,9 +196,9 @@ GO.query.QueryPanel = Ext.extend(Ext.Panel , {
 	
 	getData : function(dirtyOnly){
 		
-		var data = []
+		var data = [];
 		this.criteriaStore.each(function(rec) {
-			data.push(rec.data)
+			data.push(rec.data);
 		});
 		
 		
@@ -217,12 +215,11 @@ GO.query.QueryPanel = Ext.extend(Ext.Panel , {
 		this.clear();
 					
 		this.newCriteria();
-		this.setQueryTitel(GO.lang['strNew'])
+		this.setQueryTitel(GO.lang['strNew']);
 	},
 	
 	setQueryTitel: function (value) {
 		this.setTitle(value);
 	}
-	
 	
 });
