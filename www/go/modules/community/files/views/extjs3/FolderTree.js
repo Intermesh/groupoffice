@@ -1,6 +1,9 @@
 go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 	animate: true,
-	enableDD: false,
+	enableDD:true,
+	dropConfig: {
+		appendOnly:true
+	},
 	browser:null,
 	loader: new go.tree.TreeLoader({
 		baseAttrs:{
@@ -42,6 +45,10 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 
 		this.on('click',function(node,e){
 			this.browser.goto(this.getPath(node));
+		},this);
+	
+		this.on('nodedragover',function(dragOverEvent){			
+			console.log(dragOverEvent.target);
 		},this);
 	
 		this.setRootNode(root);

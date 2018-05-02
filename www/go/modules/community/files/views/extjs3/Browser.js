@@ -22,6 +22,7 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 			text: 'My files',
 			iconCls:'ic-home',
 			entityId:'my-files',
+			draggable:false,
 			params: {
 				filter: {
 					isHome: true
@@ -34,6 +35,7 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 			text: 'Shared with me',
 			iconCls:'ic-group',
 			entityId:'shared-with-me',
+			draggable:false,
 			params: {
 				filter: {
 					isHome: false
@@ -46,6 +48,7 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 			text: 'Bookmarks',
 			iconCls:'ic-bookmark',
 			entityId:'bookmarks',
+			draggable:false,
 			params: {
 				filter: {
 					isBookmarked: true
