@@ -98,6 +98,7 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 				if(this.records && this.records.length === 1){ // Single select
 					var shareDialog = new go.modules.community.files.ShareDialog();
 					shareDialog.setTitle(t("Share")+ " " +this.records[0].data.name);
+					shareDialog.setAcl(this.records[0].data.aclId); // TODO: find other way to set
 					shareDialog.load(this.records[0].id).show();
 				}
 			},

@@ -33,6 +33,8 @@ class Node extends model\AclEntity {
 	public $storageId;
 	public $parentId;
 	
+	public $aclId;
+	
 	protected static function defineMapping() {		
 		return parent::defineMapping()
 			->addTable('files_nodeview', 'node');

@@ -89,6 +89,14 @@ go.modules.community.files.ShareDialog = Ext.extend(go.form.FormWindow, {
 		];
 
 		return items;
+	},
+	/**
+	 * Set the acl Id for the permissions panel/grid
+	 * 
+	 * @param int aclId
+	 */
+	setAcl : function(aclId) {
+		this.aclPanel.setAcl(aclId);
 	}
 		
 });

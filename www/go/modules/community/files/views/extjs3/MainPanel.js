@@ -15,13 +15,11 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 
 	layout: 'responsive',
 	layoutConfig: {triggerWidth: 1000},
-
 	initComponent: function () {
 
-		
 		this.browser = new go.modules.community.files.Browser({
 			store: new go.data.Store({
-				fields: ['id', 'name', 'byteSize','isDirectory', {name: 'createdAt', type: 'date'}, {name: 'modifiedAt', type: 'date'}, 'permissionLevel'],
+				fields: ['id', 'name', 'byteSize','isDirectory', {name: 'createdAt', type: 'date'}, {name: 'modifiedAt', type: 'date'}, 'aclId'],
 				baseParams: {
 					filter:{isHome:true}
 				},
@@ -41,14 +39,6 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 			items: [this.folderTree],
 			bbar:[this.usagePanel]
 		});
-
-		this.folderTree.getSelectionModel().on('selectionchange', function (sm) {
-//			this.nodeGrid.getStore().baseParams.filter = [{parentId: sm.getSelected().id}];
-//			this.nodeGrid.getStore().load();
-		}, this);
-
-
-		//		rowdblclick: function (grid, rowIndex, e) {
 
 		this.nodeDetail = new go.modules.community.files.NodeDetail({
 			region: 'east',
@@ -145,6 +135,7 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 		
 		this.browser.on('pathchanged', function(browser) {
 			this.breadCrumbs.redraw(browser);
+			this.folderTree.openPath(browser.getPath(true));
 		},this);
 
 		this.items = [
