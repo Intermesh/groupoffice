@@ -54,7 +54,9 @@ class Language{
 	 * @return StringHelper Old ISO code that was set.
 	 */
 	public function setLanguage($isoCode){		
-		\go\core\Language::get()->setLanguage($isoCode);	
+		if(\go\core\Language::get()->hasLanguage($isoCode)) {
+			\go\core\Language::get()->setLanguage($isoCode);	
+		}
 		
 	}
 	
