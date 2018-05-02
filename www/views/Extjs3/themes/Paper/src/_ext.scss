@@ -1507,6 +1507,11 @@ td.grid-hd-group-cell {
 			right:0;
 		}
 	}
+	&-node-el {
+		.x-dd-drag-ghost & .tree-button {
+			display:none;
+		}
+	}
 }
 .x-tree-node a span, .x-dd-drag-ghost a span {
 	padding: dp(8);
