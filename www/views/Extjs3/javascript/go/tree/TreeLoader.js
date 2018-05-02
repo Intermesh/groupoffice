@@ -42,6 +42,7 @@ go.tree.TreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 				items.forEach(function(entity) {
 					result.push({
 //						id: entity.id,
+						entityId: entity.id||null,
 						entity: entity,
 						leaf: !entity.hasChildren,
 						text: entity.name //TODO this should be 
