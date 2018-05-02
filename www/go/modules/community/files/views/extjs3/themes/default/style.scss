@@ -24,6 +24,17 @@
 	background-color: rgba(0,0,0,.86);
 	z-index:20;
 	text-align:center;
+	transition: all 120ms;
+	.preview-item {
+		transition: all 500ms;
+		transform:scale(1);
+		&.scale-25 {transform:scale(.25);}
+		&.scale-50 {transform:scale(.50);}
+		&.scale-75 {transform:scale(.75);}
+		&.scale-150 {transform:scale(1.5);}
+		&.scale-200 {transform:scale(2.0);}
+		&.scale-400 {transform:scale(4.0);}
+	}
 	button::before{
 		color:white;
 	}
@@ -43,6 +54,14 @@
 		bottom: 0;
 		width: 100%;
 		position: absolute;
+	}
+	&.x-hide-display {
+		display: block !important;
+		opacity: 0;
+		pointer-events:none;
+		.preview-item {
+			transform:scale(.9);
+		}
 	}
 }
 

@@ -23,10 +23,9 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 			text: t("Open"),
 			iconCls: 'ic-open-in-new',
 			handler: function(){
-				var p = new go.modules.community.files.PreviewLayer();
-				p.show();
-				console.log(this.records[0]);
-				//this.records[0].data.handler.call(this);
+				if(!this.records[0])
+					return;
+				go.Preview(this.records[0].json);
 			},
 			scope: this
 		}),
@@ -42,7 +41,7 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 			iconCls: 'ic-file-download',
 			text: t("Download"),
 			handler: function(){
-				window.open(GO.url("files/file/download",{id:this.records[0].data.id,inline:false}));
+				window.open(go.Jmap.downloadUrl(this.records[0].json.blobId));
 			},
 			scope: this
 		}),

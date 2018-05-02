@@ -15,6 +15,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 	deferredRender: false,
 	border: false,
 	browser: null, // set from mainpanel
+	detailView: null, // from mainpanel (for click in centerpanel)
 	previewTypes: {
       'image/png': true,
       'image/jpeg': true,
@@ -41,16 +42,22 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 					if(record.data.isDirectory) {
 						this.browser.open(record.id);
 						return;
+					} else {
+						go.Preview(record.json);
 					}
-					if (record.get('permissionLevel') < GO.permissionLevels.write) {
-						return;
-					}
-
-					var fileRename = new go.modules.files.FileForm();
-					fileRename.load(record.id).show();
 				},
-				scope: this
-			}
+				scope:this
+			},
+			sm: new Ext.grid.RowSelectionModel({
+				singleSelect: true,
+				listeners: {
+					rowselect: function(sm,rowIndex,record){
+						console.log(record);
+						this.detailView.load(parseInt(record.id));
+					},
+					scope: this
+				}
+			})
 		});
 		
 //		this.nodeGrid.getSelectionModel().on('rowselect', function (sm, rowIndex, record) {
@@ -60,6 +67,11 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 		this.nodeTile = new go.modules.community.files.NodeTile({
 			store:this.browser.store,
 			listeners: {
+				click: function(view, index, node, e) {
+					var record = view.getStore().getAt(index);
+					console.log(record);
+					this.detailView.load(parseInt(record.id));
+				},
 				contextmenu: function(view, index, node, event){
 					event.stopEvent();
 					contextMenu.showAt(event.xy, view.getSelectedRecords());
@@ -68,6 +80,8 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 					var record = view.getStore().getAt(index);
 					if(record.data.isDirectory) {
 						this.browser.open(record.id);
+					}else {
+						go.Preview(record.json);
 					}
 					
 				},

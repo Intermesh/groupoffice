@@ -61,6 +61,7 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 			items: [
 				this.centerCardPanel = new go.modules.community.files.CenterPanel({
 					region: 'center',
+					detailView: this.nodeDetail,
 					browser: this.browser,
 					tbar: {  // configured using the anchor layout
 						xtype : 'container',
