@@ -39,7 +39,7 @@ go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
 				rowdblclick: function (grid, rowIndex, e) {
 					var record = grid.getStore().getAt(rowIndex);
 					if(record.data.isDirectory) {
-						this.browser.open(record.id);
+						this.browser.descent(record.id);
 						return;
 					}
 					if (record.get('permissionLevel') < GO.permissionLevels.write) {
@@ -67,7 +67,7 @@ go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
 				dblclick(view, index, node, e) {
 					var record = view.getStore().getAt(index);
 					if(record.data.isDirectory) {
-						this.browser.open(record.id);
+						this.browser.descent(record.id);
 					}
 					
 				},

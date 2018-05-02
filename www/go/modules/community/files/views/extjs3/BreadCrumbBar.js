@@ -16,23 +16,31 @@ go.modules.community.files.BreadCrumbBar = Ext.extend(Ext.Toolbar, {
 			xtype: 'button',
 			text: t('My files')
 		}];
-		go.modules.community.files.BreadCrumbBar.superclass.initComponent.call(this)
+		go.modules.community.files.BreadCrumbBar.superclass.initComponent.call(this);
 	},
 	redraw: function(browser) {
 		this.removeAll();
-		//Root node (mine,shared,etc..)
+		//Root node (my-files, shared-with-me, bookmarks, etc..)
 		this.addButton({
-			text: browser.rootNames[browser.at],
+			text: browser.getRootNode(browser.getCurrentRootNode()).text,
 			handler: function(btn) {
-				browser.at = 'mine';
-				browser.path = [];
-				browser.open();
+				browser.goto([browser.getCurrentRootNode()]);
 			},
 			scope:this
 		});
-		if(!Ext.isEmpty(browser.path)) {
-			go.Stores.get('Node').get(browser.path, function(nodes){
+		
+		var folderPath = browser.getPath();
+		
+		if(!Ext.isEmpty(folderPath)) {
+			go.Stores.get('Node').get(folderPath, function(nodes){
+				
+				var fullButtonPath = [browser.getCurrentRootNode()];
+				
+				// Loop through the nodes to build up the breadcrumb list								
 				Ext.each(nodes, function(node, i, all){
+					
+					fullButtonPath.push(node.id);
+
 					var isLast = (i === all.length - 1);
 					this.addButton({
 						iconCls:'ic-chevron-right',
@@ -40,14 +48,16 @@ go.modules.community.files.BreadCrumbBar = Ext.extend(Ext.Toolbar, {
 					});
 					this.addButton({
 						directoryId:node.id,
+						path:fullButtonPath.slice(0),
 						text: node.name,
 						disabled:isLast,
 						handler: function(btn) {
-							browser.open(btn.directoryId);
+							browser.goto(btn.path);
 						},
 						scope:this
 					});
 				}, this);
+				
 			},this);
 		}
 		this.doLayout();

@@ -1,7 +1,7 @@
 go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
-
 	animate: true,
 	enableDD: false,
+	browser:null,
 	loader: new go.tree.TreeLoader({
 		baseAttrs:{
 			iconCls:'ic-folder',
@@ -9,80 +9,57 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 		},
 		entityStore: go.Stores.get("Node"),
 		getParams : function(node) {
-
+	
 			var filter = {
 				isDirectory:true
 			};
-			
-			if(node.id !== 'my-files' && node.id !== 'shared-with-me' && node.id !== 'bookmarks'){
-				filter.parentId=node.attributes.entity.id;
+
+			if(node.attributes.entity){ // Root nodes don't have an entity set
+				filter.parentId=node.attributes.entityId;
 			}
 			
 			return {
 				filter:filter
 			};
 		}
-	}), // Note: no dataurl, register a TreeLoader to make use of createNode()
+	}),
 	lines: true,
-	selModel: new Ext.tree.MultiSelectionModel(),
 	containerScroll: false,
 
 	rootVisible: false,
 
-	rootNodes: [],
-
 	initComponent: function () {
 
-		// Add my files
-		this.rootNodes.push({
-			text: 'My files',
-			iconCls:'ic-home',
-			id:'my-files',
-			params: {
-				filter: {
-					isHome: true
-				}
-			}
-		});
-		
-		// Add shared with me
-		this.rootNodes.push({
-			text: 'Shared with me',
-			iconCls:'ic-group',
-			id:'shared-with-me',
-			params: {
-				filter: {
-					isHome: false
-				}
-			}
-		});
-		
-		// Add bookmarks
-		this.rootNodes.push({
-			text: 'Bookmarks',
-			iconCls:'ic-bookmark',
-			id:'bookmarks',
-			params: {
-				filter: {
-					isBookmarked: true
-				}
-			}
-		});
-		
 		var root = new Ext.tree.TreeNode({
 			expanded: true,
 			text: 'ROOT',
-			iconCls : 'ic-bookmark',
 			draggable: false,
-			children: this.rootNodes
+			children: this.browser.rootNodes
 		});
 
 		go.modules.community.files.FolderTree.superclass.initComponent.call(this);
 
+		this.on('click',function(node,e){
+			this.openFolder(node,e);			
+		},this);
+	
 		this.setRootNode(root);
 		this.getLoader().load(root);		
+	},
+	
+	openFolder: function(node,e){
+		this.browser.goto(this.getPath(node));
+	},
+	
+	getPath : function(node){
+		var p = node.parentNode;
+    var b = [node.attributes['entityId']];
+		while(p){
+			if(p.attributes['entityId']){
+				b.unshift(p.attributes['entityId']);
+			}
+			p = p.parentNode;
+		}
+		return b;
 	}
-
 });
-
-// Custom treeloader with go.tree.treeloader(entity:....);

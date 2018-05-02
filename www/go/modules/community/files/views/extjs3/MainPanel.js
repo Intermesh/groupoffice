@@ -145,7 +145,7 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 		
 		this.browser.on('pathchanged', function(browser) {
 			this.breadCrumbs.redraw(browser);
-		},this)
+		},this);
 
 		this.items = [
 			this.centerPanel, //first is default in narrow mode
@@ -153,20 +153,6 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 		];
 
 		go.modules.community.files.MainPanel.superclass.initComponent.call(this);
-	},
-	
-	goto: function(root, path) {
-		console.log(root);
-		console.log(path);
-		var bread = path.split('/');
-		if(Ext.isEmpty(bread[bread.length-1])) {
-			console.log(bread);
-			//bread.unshift();
-		}
-
-		this.path = bread;
-		
-		this.breadCrumbs.doLayout();
 	}
 });
 
