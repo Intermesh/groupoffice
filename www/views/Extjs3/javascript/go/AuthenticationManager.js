@@ -193,9 +193,7 @@
       
       go.User.loadSession(result);
 			
-			var script = document.createElement('script');
-			script.setAttribute('src', GO.url('core/moduleScripts'));
-			document.body.appendChild(script)
+			
 
 			Ext.Ajax.defaultHeaders['Authorization'] = 'Bearer ' + result.accessToken;
 

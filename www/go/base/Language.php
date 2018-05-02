@@ -44,7 +44,7 @@ class Language{
 	
 	
 	public function __construct() {
-		$this->setLanguage();
+		//$this->setLanguage();
 	}
 	
 	/**
@@ -53,7 +53,7 @@ class Language{
 	 * @param StringHelper $isoCode Leave empty to set the default user language.
 	 * @return StringHelper Old ISO code that was set.
 	 */
-	public function setLanguage($isoCode=false){		
+	public function setLanguage($isoCode){		
 		\go\core\Language::get()->setLanguage($isoCode);	
 		
 	}

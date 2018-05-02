@@ -19,7 +19,7 @@ class Language extends Singleton {
 
 	protected function __construct() {
 		parent::__construct();
-		$this->isoCode = $this->getBrowserLanguage();		
+		$this->isoCode = $this->getBrowserLanguage();	
 	}
 	
 	/**
@@ -32,6 +32,11 @@ class Language extends Singleton {
 	}
 	
 	public function setLanguage($isoCode) {
+		
+		if(!$this->hasLanguage($isoCode)) {
+			throw new \Exception("Invalid language given ".$isoCode);
+		}
+		
 		if($isoCode != $this->isoCode) {
 			$this->isoCode = $isoCode;
 			$this->data = [];
@@ -40,6 +45,10 @@ class Language extends Singleton {
 	}
 	
 	private function getBrowserLanguage(){
+		
+		if(isset($_GET['SET_LANGUAGE']) && $this->hasLanguage($_GET['SET_LANGUAGE'])) {
+			return $_GET['SET_LANGUAGE'];
+		}
 		
 		$browserLanguages= jmap\Request::get()->getAcceptLanguages();
 		foreach($browserLanguages as $lang){
