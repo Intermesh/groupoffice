@@ -79,6 +79,9 @@ abstract class ReadOnlyEntityController extends Controller {
 				 $cls::filter($query, $filter);			
 			}
 		}
+		
+		//$cls::applyAclToQuery($query, $this->getQueryPermissionLevel($filters));
+
 
 		//we don't need entities here. Just a list of id's.
 		$query->selectSingleValue($query->getTableAlias() . '.id');
@@ -128,6 +131,9 @@ abstract class ReadOnlyEntityController extends Controller {
 			$params['accountId'] = null;
 		}
 		
+		if(empty($filter['permissionLevel']) || $filter['permissionLevel'] < Acl::LEVEL_READ) {
+			$params['permissionLevel'] = Acl::LEVEL_READ;
+		}
 		return $params;
 	}
 
