@@ -23,7 +23,7 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 				fields: [
 					'id', 
 					'name', 
-					{name: 'byteSize', submit: false},
+					{name: 'size', submit: false},
 					{name: 'progress', submit: false},
 					{name: 'status', submit: false},
 					'isDirectory', 

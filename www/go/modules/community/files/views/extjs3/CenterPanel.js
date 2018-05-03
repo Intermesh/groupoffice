@@ -130,7 +130,13 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 	fileUpload: function(files) {
 		for (var i = 0; i < files.length; i++) {
 			var name = this.solveDuplicate(files[i].name);
-			var record = new this.browser.store.recordType({ name: name, parentId:this.browser.store.baseParams.filter.parentId, byteSize: files[i].size, status: 'queued' });
+			var record = new this.browser.store.recordType({
+				name: name, 
+				isDirectory:0,
+				parentId:this.browser.store.baseParams.filter.parentId, 
+				size: files[i].size, 
+				status: 'queued' 
+			});
 			this.browser.store.add(record);
 			this.activeUploads++;
 			//var progress = this.appendProgressFile(files[i]);

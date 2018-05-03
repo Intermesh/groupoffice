@@ -28,7 +28,7 @@ class Storage extends orm\Property {
 	}
 
 	public function getRootFolderId(){
-		$id = Node::find()->selectSingleValue('id')->where(['storageId'=>$this->id,'parentId'=>0])->single();
+		$id = Node::find()->selectSingleValue('node.id')->where(['storageId'=>$this->id,'parentId'=>0])->single();
 		if($id === false) {
 			throw new \Exception('No root folder for storage: '.$this->id);
 		}

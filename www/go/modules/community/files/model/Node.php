@@ -21,9 +21,10 @@ class Node extends model\AclEntity {
 	public $modifiedAt;
 	public $ownedBy;
 	public $modifiedBy;
+	public $modified; // needed because core_blob has this column is column en there is a getModfied() function
 	public $isDirectory;
-	public $byteSize;
-	public $contentType;
+	protected $size;
+	protected $contentType;
 	
 	public $comments;
 	public $isBookmarked;
@@ -39,7 +40,17 @@ class Node extends model\AclEntity {
 	
 	protected static function defineMapping() {		
 		return parent::defineMapping()
-			->addTable('files_nodeview', 'node');
+			->addTable('files_node', 'node')
+		   ->setQuery((new Query)->join('core_blob', 'blob', 'node.blobId=blob.id', 'LEFT')->select('blob.contentType, blob.size'));
+//			->addTable('core_blob', 'blob', ['blobId' => 'id'], ['contentType','size']);
+	}
+	
+	public function getContentType() {
+		return $this->contentType;
+	}
+	
+	public function getSize() {
+		return $this->size;
 	}
 	
 	public function getLocation() {
@@ -107,7 +118,7 @@ class Node extends model\AclEntity {
 	public function toArray($properties = array()) {
 		$result = parent::toArray($properties);
 		$unset = ($result['isDirectory']) ?
-			['metaData', 'mimeType', 'byteSize', 'blobId', 'versions'] :
+			['metaData', 'contentType', 'size', 'blobId', 'versions'] :
 			['items', 'subscribed', 'canAddItems'];
 		foreach($unset as $key) { 
 			unset($result[$key]); 

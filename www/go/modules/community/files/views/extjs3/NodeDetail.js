@@ -10,9 +10,9 @@ go.modules.community.files.NodeDetail = Ext.extend(go.panels.DetailView, {
 			items: [
 				{
 					tpl: '<h3 class="title s8">{name}</h3>\
-<h4 class="title s4 right">{[fm.fileSize(values.byteSize)]}</h4>\
+<h4 class="title s4 right">{[fm.fileSize(values.size)]}</h4>\
 <figure class="contain" style="max-height: 200px;background-image:url({[go.Jmap.downloadUrl(values.blobId)]});">\
-<tpl if="!values.blobId">{byteSize}</tpl>\
+<tpl if="!values.blobId">{size}</tpl>\
 </figure>\
 <hr />\
 <p class="pad">\
