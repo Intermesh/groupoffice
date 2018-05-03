@@ -71,7 +71,7 @@ go.modules.community.notes.MainPanel = Ext.extend(Ext.Panel, {
 
 			this.addButton.setDisabled(!this.addNoteBookId);
 
-			this.noteGrid.getStore().baseParams.filter = [{noteBookId: ids}];
+			this.noteGrid.getStore().baseParams.filter.noteBookId = ids;
 			this.noteGrid.getStore().load();
 		}, this, {buffer: 1}); //add buffer because it clears selection first
 

@@ -20,11 +20,11 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 			groupOnSort: true,
 			groupField: 'toEntity',
 			baseParams: {
-				filter: [
+				filter: 
 					{
 						entity: this.entity,
 						entityId: this.entityId
-					}]
+					}
 			}
 		});
 

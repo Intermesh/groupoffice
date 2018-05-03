@@ -5,7 +5,7 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 	stateId: "go-create-link-windows",
 	search: function (v) {
 		
-		var filter = [];
+		var filter = {};
 		
 		var entities = [];
 
@@ -14,10 +14,10 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 		}, this);
 
 		if(entities.length) { 
-			filter.push({entities: entities});
+			filter.entities = entities;
 		}
 
-		filter.push({q: this.searchField.getValue()});
+		filter.q = this.searchField.getValue();
 			
 		
 		this.grid.store.load({

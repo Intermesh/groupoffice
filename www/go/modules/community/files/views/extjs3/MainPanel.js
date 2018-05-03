@@ -19,7 +19,17 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 
 		this.browser = new go.modules.community.files.Browser({
 			store: new go.data.Store({
-				fields: ['id', 'name', 'byteSize','isDirectory', {name: 'createdAt', type: 'date'}, {name: 'modifiedAt', type: 'date'}, 'aclId'],
+				fields: [
+					'id', 
+					'name', 
+					{name: 'byteSize', submit: false},
+					{name: 'progress', submit: false},
+					{name: 'status', submit: false},
+					'isDirectory', 
+					{name: 'createdAt', type: 'date'}, 
+					{name: 'modifiedAt', type: 'date'}, 
+					'aclId'
+				],
 				baseParams: {
 					filter:{isHome:true}
 				},

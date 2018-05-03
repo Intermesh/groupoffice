@@ -13,52 +13,34 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 	path: [],
 	currentRootNode: 'my-files', // (my-files, shared-with-me, bookmarks, etc..)
 	store: null, // only used by grid
-	rootNodes: [],
-	
-	initComponent : function(){
-		
-		// Add my files
-		this.rootNodes.push({
-			text: 'My files',
-			iconCls:'ic-home',
-			entityId:'my-files',
-			draggable:false,
-			params: {
-				filter: {
-					isHome: true
-				}
+	rootNodes: [{
+		text: t('My files'),
+		iconCls:'ic-home',
+		entityId:'my-files',
+		draggable:false,
+		params:{}
+	},{
+		text: t('Shared with me'),
+		iconCls:'ic-group',
+		entityId:'shared-with-me',
+		draggable:false,
+		params: {
+			filter: {
+				isHome: false
 			}
-		});
-		
-		// Add shared with me
-		this.rootNodes.push({
-			text: 'Shared with me',
-			iconCls:'ic-group',
-			entityId:'shared-with-me',
-			draggable:false,
-			params: {
-				filter: {
-					isHome: false
-				}
+		}
+	},{
+		text: t('Bookmarks'),
+		iconCls:'ic-bookmark',
+		entityId:'bookmarks',
+		draggable:false,
+		params: {
+			filter: {
+				isBookmarked: true
 			}
-		});
-		
-		// Add bookmarks
-		this.rootNodes.push({
-			text: 'Bookmarks',
-			iconCls:'ic-bookmark',
-			entityId:'bookmarks',
-			draggable:false,
-			params: {
-				filter: {
-					isBookmarked: true
-				}
-			}
-		});
-		
-		go.modules.community.files.Browser.superclass.initComponent.call(this);
-	},
-	
+		}
+	}],
+
 	/**
 	 * Call open() will change route, will call nav()
 	 * @param {type} config
@@ -178,7 +160,9 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 			ids = [];
 		}
 		this.path = this.path.concat(ids);
-		var filter = Ext.isEmpty(this.path) ? {isHome:true} : {parentId:ids[ids.length-1]} 
+		
+		var filter = Ext.isEmpty(this.path) && this.rootNodes[this.currentRootNode] && this.rootNodes[this.currentRootNode].params ? this.rootNodes[this.currentRootNode].params.filter : {parentId:ids[ids.length-1]} 
+		
 		this.store.setBaseParam('filter',filter);
 		this.store.load();
 		this.fireEvent('pathchanged', this);

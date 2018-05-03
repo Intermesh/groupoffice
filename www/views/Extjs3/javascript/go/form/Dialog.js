@@ -1,4 +1,4 @@
-go.form.FormWindow = Ext.extend(go.Window, {
+go.form.Dialog = Ext.extend(go.Window, {
 	autoScroll: true,
 	width: 400,
 	modal: true,
@@ -12,8 +12,8 @@ go.form.FormWindow = Ext.extend(go.Window, {
 
 		this.formPanel = new Ext.FormPanel({
 			items: this.initFormItems()
-		});
-
+		});		
+		
 		this.items = [this.formPanel];
 
 		this.buttons = [this.deleteBtn = new Ext.Button({
@@ -28,7 +28,9 @@ go.form.FormWindow = Ext.extend(go.Window, {
 				scope: this
 			}];
 
-		go.form.FormWindow.superclass.initComponent.call(this);
+		go.form.Dialog.superclass.initComponent.call(this);
+		
+		this.entityStore.on('changes',this.onChanges, this);
 
 		if (this.formValues) {
 			this.formPanel.form.setValues(this.formValues);
@@ -36,18 +38,28 @@ go.form.FormWindow = Ext.extend(go.Window, {
 		}
 	},
 
-	load: function (pk) {
-		this.currentId = pk;
+	load: function (id) {
+		this.currentId = id;
 
-		this.actionStart();
-		this.entityStore.get([pk], function (entities) {
-			if (entities[0]) {
-				this.deleteBtn.setDisabled(false);
-				this.formPanel.getForm().setValues(entities[0]);
-				this.actionComplete();
-			}
-		}, this);
-		return this;
+		var entities = this.entityStore.get([id]);
+		
+		if(entities) {
+			this.formPanel.getForm().setValues(entities[0]);
+		} else {
+			//If no entity was returned the entity store will load it and fire the "changes" event. This dialog listens to that event.
+			this.actionStart();
+		}
+	},
+	
+	onChanges : function(entityStore, added, changed, destroyed) {
+		
+		if(changed.indexOf(this.currentId) !== -1){
+			this.deleteBtn.setDisabled(false);
+			this.actionComplete();
+			
+			var entities = this.entityStore.get([this.currentId]);
+			this.formPanel.getForm().setValues(entities[0]);
+		}		
 	},
 
 	delete: function () {
@@ -173,4 +185,3 @@ go.form.FormWindow = Ext.extend(go.Window, {
 		];
 	}
 });
-

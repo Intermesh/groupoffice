@@ -4,6 +4,15 @@ go.data.GroupingStore = Ext.extend(Ext.data.GroupingStore, {
 	
 	autoDestroy: true,
 	
+	/**
+	 * true when load or loaddata has been called.
+	 * 
+	 * @var bool
+	 */
+	loaded : false,
+	
+	loading : false,
+	
 	constructor: function (config) {
 		
 		config = config || {};
@@ -20,10 +29,11 @@ go.data.GroupingStore = Ext.extend(Ext.data.GroupingStore, {
 			reader: new Ext.data.JsonReader(config)
 		}));
 		
-		go.flux.Dispatcher.register(this);
+		this.setup();
 		
 	},
-	receive : go.data.Store.prototype.receive,	
+	setup : go.data.Store.prototype.setup,	
+	onChanges : go.data.Store.prototype.onChanges,	
 	updateRecord : go.data.Store.prototype.updateRecord,
 	destroy : go.data.Store.prototype.destroy
 });

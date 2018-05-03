@@ -40,7 +40,7 @@ go.links.LinkGrid = Ext.extend(go.grid.GridPanel, {
 				direction: 'DESC'
 			},
 			baseParams: {
-				filter: []
+				filter: {}
 			}
 		});
 		

@@ -73,6 +73,10 @@ class Note extends AclItemEntity {
 					);
 		}
 		
+		if(!empty($filter['noteBookId'])) {
+			$query->where(['noteBookId' => $filter['noteBookId']]);
+		}
+		
 		return parent::filter($query, $filter);		
 	}
 	
