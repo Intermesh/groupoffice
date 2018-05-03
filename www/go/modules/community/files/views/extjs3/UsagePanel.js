@@ -28,19 +28,21 @@ go.modules.community.files.UsagePanel = Ext.extend(Ext.Panel, {
 
 		go.modules.community.files.UsagePanel.superclass.initComponent.call(this);
 	},
+	afterRender : function(pnl){
+		this.updateHtml();
+	},
 	
 	setData : function(usage, quota){
 		this.usage = usage;
 		this.quota = quota;
-		this.updateHtml();
+		if(this.rendered){
+			this.updateHtml();
+		}
 	},
 	
 	updateHtml : function(){
 		var html = t('%usage of %quota used');
-		
-//		html = html.replace("%usage", Ext.util.Format.fileSize(this.usage));
-//		html = html.replace("%quota", Ext.util.Format.fileSize(this.quota));
-//		
+
 		html = html.replace("%usage", go.util.humanFileSize(this.usage,true));
 		html = html.replace("%quota", go.util.humanFileSize(this.quota,true));
 		
