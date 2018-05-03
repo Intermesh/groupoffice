@@ -27,6 +27,8 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	 */
 	loaded : false,
 	
+	loading : false,
+	
 	remoteSort : true,
 	
 	
@@ -54,9 +56,17 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 			this.baseParams.filter = {};
 		}
 		
+		this.on('beforeload', function() {			
+			this.loading = true;
+		}, this)
+		
 		//set loaded to true on load() or loadData();
 		this.on('load', function() {
-			this.loaded = true;
+			var me = this;
+			setTimeout(function() {
+				me.loaded = true;
+				me.loading = false;
+			}, 0);
 		}, this)
 		
 		this.on('update', this.onUpdate, this);
@@ -65,19 +75,22 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	},
 	
 	onChanges : function(entityStore, added, changed, destroyed) {		
-		if(!this.loaded) {
-			return;
-		}
 		
-		if(added.length) {
-			this.reload();
+		if(!this.loaded || this.loading) {
 			return;
+		}		
+		
+		for(var i = 0, l = added.length; i < l; i++) {
+			if(!this.updateRecord(added[i]) ){
+				this.reload();
+				return;
+			}
 		}
 		
 		for(var i = 0, l = changed.length; i < l; i++) {
 			if(!this.updateRecord(changed[i]) ){
 				this.reload();
-				break;
+				return;
 			}
 		}
 		
@@ -110,8 +123,6 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		this.fields.each(function(field) {
 			record.set(field.name, entity[field.name]);
 		});
-		
-		record.id = entity.id;
 		
 		
 		record.endEdit();
@@ -155,9 +166,41 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		p[key] = {};
 		p[key][record.id] = record.data;
 		
-		this.entityStore.set(p, function(){
-			//todo handle response
-		});
+		this.entityStore.set(p, function (options, success, response) {
+			
+			var saved = (record.phantom ? response.created : response.updated) || {};
+			if (saved[record.id]) {
+
+				//update client id with server id
+				if(record.phantom) {
+//					record.id = record.data.id = response.created[record.id].id;
+//					console.log(record.id);
+//					record.phantom = false;
+						//remove phanto records as ext doesn't support changinhg record id.
+						this.remove(record);
+				}
+
+			} else
+			{
+				//something went wrong
+				var notSaved = (record.phantom ? response.notCreated : response.notUpdated) || {};
+				if (!notSaved[id]) {
+					notSaved[id] = {type: "unknown"};
+				}
+
+				switch (notSaved[id].type) {
+					case "forbidden":
+						Ext.MessageBox.alert(t("Access denied"), t("Sorry, you don't have permissions to update this item"));
+						break;
+
+					default:
+					
+						
+						Ext.MessageBox.alert(t("Error"), t("Sorry, something went wrong. Please try again."));
+						break;
+				}
+			}
+		}, this);
 		
 	}
 });
