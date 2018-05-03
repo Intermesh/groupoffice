@@ -100,7 +100,7 @@ class State extends AbstractState {
 			'apiUrl' => $settings->URL.'/jmap.php',
 			'downloadUrl' => $settings->URL.'/download.php?blob={blobId}',
 			'uploadUrl' => $settings->URL.'/upload.php',
-      'user' => $user->toArray(['id', 'username', 'email', 'displayName', 'recoveryEmail', 'logins', 'avatarId', 'isAdmin']), //todo add more props when refactored
+      'user' => $user->toArray(), //todo add more props when refactored
 			'oldSettings' => $this->clientSettings(), // added for compatibility
 		];
     
