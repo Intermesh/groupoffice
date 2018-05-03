@@ -40,7 +40,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 				rowdblclick: function (grid, rowIndex, e) {
 					var record = grid.getStore().getAt(rowIndex);
 					if(record.data.isDirectory) {
-						this.browser.open(record.id);
+						this.browser.descent(record.id);
 						return;
 					} else {
 						go.Preview(record.json);
