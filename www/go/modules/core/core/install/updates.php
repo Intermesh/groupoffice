@@ -154,3 +154,4 @@ ADD CONSTRAINT `fk_user_avatar_id`
 
 
 $updates["201804261506"][] ="ALTER TABLE `core_auth_token` ADD `lastActiveAt` DATETIME NOT NULL AFTER `expiresAt`;";
+$updates["201805031611"][] ="ALTER TABLE `core_blob` CHANGE COLUMN `type` `contentType` VARCHAR(129) NOT NULL ;";
