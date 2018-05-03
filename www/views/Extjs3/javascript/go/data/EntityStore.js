@@ -4,10 +4,26 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 	entity: null,
 	
+	
+	changes : null,
+	
 	constructor : function(config) {
 		go.data.EntityStore.superclass.constructor.call(this, config);
 		
-		this.restoreState();		
+		this.addEvents('changes');
+		
+		this.restoreState();
+		this.initChanges();
+		
+		
+	},
+	
+	initChanges : function() {
+		this.changes = {
+			added: [],
+			changed: [],
+			destroyed: []
+		};
 	},
 	
 	restoreState : function() {
@@ -34,6 +50,40 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 //		}		
 		//window.localStorage["entityStore-" + this.entity.name] = state;		
 	},
+	
+	
+	_add : function(entity) {
+		if(this.data[entity.id]) {			
+			this.changes.changed.push(entity.id);
+		} else
+		{
+			this.changes.added.push(entity.id);
+		}		
+		this.data[entity.id] = entity;
+		
+		this._fireChanges();
+	},
+	
+	_destroy : function(id) {		
+		delete this.data[id];
+		this.changes.destroyed.push(id);
+		this._fireChanges();
+	},
+	
+	_fireChanges : function() {
+		var me = this;
+
+		if (me.timeout) {
+			clearTimeout(me.timeout);
+		}
+		
+		//delay fireevent one event loop cycle
+		me.timeout = setTimeout(function () {				
+			me.fireEvent('changes', me, me.changes.added, me.changes.changed, me.changes.destroyed);			
+			me.initChanges();
+			me.timeout = null;
+		}, 0);
+	},
 
 
 	receive: function (action) {		
@@ -47,9 +97,8 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				}
 				
 				//add data from get response
-				for(var i=0,l=action.payload.list.length;i < l; i++) {
-					var entity = action.payload.list[i];
-					this.data[entity.id] = entity;
+				for(var i = 0,l = action.payload.list.length;i < l; i++) {
+					this._add(action.payload.list[i]);
 				};
 				
 				this.saveState();			
@@ -110,11 +159,12 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	},
 
 	/**
-	 * Get an entity
+	 * Get entities
 	 * 
-	 * @param {type} ids
-	 * @param {type} cb
-	 * @returns {undefined}
+	 * @param {array} ids
+	 * @param {function} cb
+	 * @param {object} scope
+	 * @returns {array|boolean} entities or false is data needs to be loaded from server
 	 */
 	get: function (ids, cb, scope) {
 
@@ -212,33 +262,21 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			params: params,
 			scope: this,
 			callback: function (options, success, response) {
+				var entity, clientId;
 				
 				if(response.created) {
-					var list = {};
-					for(var clientId in response.created) {
-						var entity = Ext.apply(params.create[clientId], response.created[clientId]);						
-						this.data[entity.id] = entity;
-						list[clientId] = entity;
+					for(clientId in response.created) {
+						entity = Ext.apply(params.create[clientId], response.created[clientId]);
+						this._add(entity);
 					}
-					
-					go.flux.Dispatcher.dispatch(this.entity.name + "Created", {
-						state: this.state,
-						list: list
-					});	
 				}
 				
 				if(response.updated) {
-					var list = {};
-					for(var serverId in response.updated) {
-						var entity = Ext.apply(params.update[serverId], response.updated[serverId]);
-						this.data[entity.id] = entity;
-						list[entity.id] = entity;
+
+					for(serverId in response.updated) {
+						entity = Ext.apply(params.update[serverId], response.updated[serverId]);
+						this._add(entity);
 					}
-					
-					go.flux.Dispatcher.dispatch(this.entity.name + "Updated", {
-						state: this.state,
-						list: list
-					});	
 				}
 				
 				this.state = response.newState;				
@@ -246,10 +284,9 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				
 				if(response.destroyed) {
 					for(var i =0, l = response.destroyed.length; i < l; i++) {
-						delete this.data[response.destroyed[i]];
+						
+						this._destroy(response.destroyed[i]);
 					}
-				
-					go.flux.Dispatcher.dispatch(this.entity.name + "Destroyed", {list: response.destroyed, state: response.newState});
 				}
 
 				if(cb) {

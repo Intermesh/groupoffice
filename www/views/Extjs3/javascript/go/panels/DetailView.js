@@ -26,39 +26,27 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 	entityStore: null,
 
 	initComponent: function () {
-
-		go.flux.Dispatcher.register(this);
-
-		go.panels.DetailView.superclass.initComponent.call(this, arguments);
+		go.panels.DetailView.superclass.initComponent.call(this, arguments);		
+		
+		this.entityStore.on('changes', function(entityStore, added, changed, destroyed) {
+			
+			if (changed.indexOf(this.currentId) > -1) {
+				var entities = this.entityStore.get([this.currentId]);
+				if(entities) {
+					this.internalLoad(entities[0]);
+				}
+			}
+			
+			if (destroyed.indexOf(this.currentId) > -1) {
+				this.reset();
+			}
+			
+		}, this);
 		
 		this.on('render', function() {
 			this.reset();
 		}, this);
 	},
-
-	receive: function (action) {
-		//console.log(action.type, this.entityStore.entity.methods.get.responseName);
-		switch (action.type) {
-			case this.entityStore.entity.name + "Updated":
-				//reload if data in entity store was updated			
-				if (action.payload.list[this.currentId]) {
-					this.reload();
-				}
-
-				break;
-
-			case this.entityStore.entity.name + "Destroyed":
-				if (action.payload.list.indexOf(this.currentId) > -1) {
-					this.reset();
-				}
-				break;
-		}
-	},
-
-//
-//	printHandler: function () {
-//		this.body.print({title: this.getTitle()});
-//	},
 
 	reset: function () {
 
@@ -98,20 +86,22 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 	reload: function () {
 		this.load(this.currentId);
 	},
+	
+	internalLoad : function(data) {
+		if(this.getTopToolbar()) {
+			this.getTopToolbar().setDisabled(false);
+		}
+		this.data = data;
+		this.onLoad();				
 
-	load: function (pk) {
-		this.currentId = pk;
-		this.entityStore.get([pk], function (entities) {
-			if (entities[0]) {
-				if(this.getTopToolbar()) {
-					this.getTopToolbar().setDisabled(false);
-				}
-				this.data = entities[0];
-				this.onLoad();				
+		this.fireEvent('load', this);
+	},
 
-				this.fireEvent('load', this);
-
-			}
-		}.createDelegate(this));
+	load: function (id) {
+		this.currentId = id;
+		var entities = this.entityStore.get([id]);
+		if(entities) {
+			this.internalLoad(entities[0]);
+		}
 	}
 });

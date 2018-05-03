@@ -23,14 +23,16 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 				scope: this,
 				search: function (tb, v) {	
 					if(this.store instanceof go.data.Store) {
-						this.store.load({
-							params: {filter: [{q: v}]}
-						});
+						
+						this.store.baseParams.filter.q = v;
+						
+						this.store.load();
 						return
 					}
 					this.store.load({params: {query:v}});
 				},
 				reset: function() {
+					delete this.store.baseParams.filter.q;
 					this.store.load();
 				}
 			});

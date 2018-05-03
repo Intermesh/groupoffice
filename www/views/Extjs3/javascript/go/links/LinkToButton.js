@@ -99,7 +99,7 @@ go.links.LinkToButton = Ext.extend(Ext.Button, {
 							link.toId = entity;
 						} else
 						{
-							//in this case it's a go.form.FormWindow							
+							//in this case it's a go.form.Dialog							
 							link.toId = entity.id;
 						}
 						

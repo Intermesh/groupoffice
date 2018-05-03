@@ -29,16 +29,14 @@ try {
   }
 }
 
-//to initialize language
-GO::language();
 
 //try with HTTP auth
-if(!\GO::user() && !empty($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_PW'])){
-	if(\GO::session()->login($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'])) {	
-		//security token not requireed when using basic auth.
-		$_REQUEST['security_token'] = \GO::session()->securityToken();
-	}
-}
+//if(!\GO::user() && !empty($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_PW'])){
+//	if(\GO::session()->login($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'])) {	
+//		//security token not requireed when using basic auth.
+//		$_REQUEST['security_token'] = \GO::session()->securityToken();
+//	}
+//}
 
 //check if GO is installed
 if(empty($_REQUEST['r']) && PHP_SAPI!='cli'){	
