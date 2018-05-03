@@ -48,7 +48,13 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 			proxy: new go.data.JmapProxy(config)
 		}));
 		
-		if(!this.baseParams) {
+		this.setup();
+	
+	},
+	
+	//created this because grouping store must share this.
+	setup : function() {
+			if(!this.baseParams) {
 			this.baseParams = {};
 		}
 		
@@ -69,8 +75,7 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 			}, 0);
 		}, this)
 		
-		this.on('update', this.onUpdate, this);
-		
+		this.on('update', this.onUpdate, this);		
 		this.entityStore.on('changes', this.onChanges, this);
 	},
 	
