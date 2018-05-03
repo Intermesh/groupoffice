@@ -43,23 +43,16 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 			console.log(dragOverEvent.target);
 		},this);
 	
-		go.Stores.get("User").get([go.User.id], function(entities){
-			
-			this.browser.rootNodes[0].params.filter = {parentId : entities[0].storage.rootFolderId};
-			this.browser.rootNodes[0].entityId = entities[0].storage.rootFolderId
-
-			var root = new Ext.tree.TreeNode({
-				expanded: true,
-				text: 'ROOT',
-				entityId:'ROOT', // Needed so it can be handled exactly as other nodes
-				draggable: false,
-				children: this.browser.rootNodes
-			});
-			this.setRootNode(root);
-			this.getLoader().load(root);
-			
-		},this);
-
+		var root = new Ext.tree.TreeNode({
+			expanded: true,
+			text: 'ROOT',
+			entityId:'ROOT', // Needed so it can be handled exactly as other nodes
+			draggable: false,
+			children: this.browser.rootNodes
+		});
+		
+		this.setRootNode(root);
+		this.getLoader().load(root);
 	},
 	
 	/**

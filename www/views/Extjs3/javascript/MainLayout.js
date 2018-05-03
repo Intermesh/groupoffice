@@ -91,10 +91,14 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			go.User.authenticate(function(data, options, success, response){
 				
 				if(success) {
-					me.on('render', function() {
-						me.fireEvent('boot', me);
-					}, me, {single:true});
-					me.onAuthentication(); // <- start Group-Office
+					
+					go.Stores.get("User").get([go.User.id], function(){
+						me.on('render', function() {
+							me.fireEvent('boot', me);
+						}, me, {single:true});
+						me.onAuthentication(); // <- start Group-Office
+					});
+
 				} else {
 					go.User.clearAccessToken();
 					

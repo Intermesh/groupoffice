@@ -13,33 +13,7 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 	path: [],
 	currentRootNode: 'my-files', // (my-files, shared-with-me, bookmarks, etc..)
 	store: null, // only used by grid
-	rootNodes: [{
-		text: t('My files'),
-		iconCls:'ic-home',
-		entityId:'my-files',
-		draggable:false,
-		params:{}
-	},{
-		text: t('Shared with me'),
-		iconCls:'ic-group',
-		entityId:'shared-with-me',
-		draggable:false,
-		params: {
-			filter: {
-				isHome: false
-			}
-		}
-	},{
-		text: t('Bookmarks'),
-		iconCls:'ic-bookmark',
-		entityId:'bookmarks',
-		draggable:false,
-		params: {
-			filter: {
-				isBookmarked: true
-			}
-		}
-	}],
+	rootNodes: [],
 
 	/**
 	 * Call open() will change route, will call nav()
@@ -52,12 +26,44 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 			"pathchanged" : true // post browsing
 		});
 		this.listeners = config.listeners;
+		this.rootNodes.push({
+			text: t('My files'),
+			iconCls:'ic-home',
+			entityId:'my-files',
+			draggable:false,
+			params:{
+				filter: {
+					parentId: go.Stores.get("User").get([go.User.id])[0].storage.rootFolderId
+				}
+			}
+		},{
+			text: t('Shared with me'),
+			iconCls:'ic-group',
+			entityId:'shared-with-me',
+			draggable:false,
+			params: {
+				filter: {
+					isHome: false
+				}
+			}
+		},{
+			text: t('Bookmarks'),
+			iconCls:'ic-bookmark',
+			entityId:'bookmarks',
+			draggable:false,
+			params: {
+				filter: {
+					isBookmarked: true
+				}
+			}
+		});
 		
 		go.modules.community.files.Browser.superclass.constructor.call(this, config);
 		
 		// Add route to routers used by open()
 		var me = this;
 		go.Router.add(/files\/([\w\-]+)\/([0-9\/]*)/, function(root, path) {
+			GO.mainLayout.openModule('files');
 			me.currentRootNode = root;
 			me.path = [];
 			me.nav(path);
@@ -160,8 +166,8 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 			ids = [];
 		}
 		this.path = this.path.concat(ids);
-		
-		var filter = Ext.isEmpty(this.path) && this.rootNodes[this.currentRootNode] && this.rootNodes[this.currentRootNode].params ? this.rootNodes[this.currentRootNode].params.filter : {parentId:ids[ids.length-1]} 
+
+		var filter = Ext.isEmpty(this.path) && this.getRootNode(this.currentRootNode).params ? this.getRootNode(this.currentRootNode).params.filter : {parentId:ids[ids.length-1]} 
 		
 		this.store.setBaseParam('filter',filter);
 		this.store.load();
