@@ -45,7 +45,6 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 			},
 			proxy: new go.data.JmapProxy(config)
 		}));
-		go.flux.Dispatcher.register(this);
 		
 		if(!this.baseParams) {
 			this.baseParams = {};
@@ -61,54 +60,45 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		}, this)
 		
 		this.on('update', this.onUpdate, this);
-	},
-	receive : function(action) {	
 		
+		this.entityStore.on('changes', this.onChanges, this);
+	},
+	
+	onChanges : function(entityStore, added, changed, destroyed) {		
 		if(!this.loaded) {
 			return;
 		}
 		
-		switch(action.type) {			
-			
-			case this.entityStore.entity.name + "Created":				
-			case this.entityStore.entity.name + "Updated":				
-				
-				//update data when entity store has new data
-				for(var id in action.payload.list) {
-					if(!this.updateRecord(id, action.payload.list[id]) ){
-						//todo this causes many reloads because every links panel reloads on a new link. 
-						
-						//HOw to determine if it needs to reload?
-						// 
-						
-						this.reload();
-						break;
-					}
-				};
-			break;
-			
-			case this.entityStore.entity.name + "Destroyed":				
-				
-				//update data when entity store has new data
-				for(var i=0,l=action.payload.list.length;i < l; i++) {
-					var record = this.getById(action.payload.list[i]);
-					
-					if(record) {
-						this.remove(record);
-					}					
-				};
-			break;
+		if(added.length) {
+			this.reload();
+			return;
+		}
+		
+		for(var i = 0, l = changed.length; i < l; i++) {
+			if(!this.updateRecord(changed[i]) ){
+				this.reload();
+				break;
+			}
+		}
+		
+		for(var i = 0, l = destroyed.length; i < l; i++) {
+			var record = this.getById(destroyed[i]);					
+			if(record) {
+				this.remove(record);
+			}
 		}
 
 	},
 	
-	updateRecord : function(id, entity) {
+	updateRecord : function(id) {
 		
 
 		var record = this.getById(id);
 		if(!record) {
 			return false;
 		}
+		
+		var entity = this.entityStore.get([id])[0];
 		
 //		if(record.isModified()) {
 //			alert("Someone modified your record!");
@@ -165,7 +155,9 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		p[key] = {};
 		p[key][record.id] = record.data;
 		
-		this.entityStore.set(p);
+		this.entityStore.set(p, function(){
+			//todo handle response
+		});
 		
 	}
 });
