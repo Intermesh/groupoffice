@@ -81,7 +81,7 @@ go.tree.TreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 	
 	// Fix uiProvider loading when given in the baseAttrs config of nodes
 	createNode: function (attr) {
-		Ext.apply(attr, this.baseAttrs || {});
+		Ext.applyIf(attr, this.baseAttrs || {});
 
 		if (this.applyLoader !== false) {
 			attr.loader = this;
