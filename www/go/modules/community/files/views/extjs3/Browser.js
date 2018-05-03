@@ -33,7 +33,7 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 			draggable:false,
 			params:{
 				filter: {
-					parentId: go.Stores.get("User").get([go.User.id])[0].storage.rootFolderId
+					parentId: go.User.storage.rootFolderId
 				}
 			}
 		},{

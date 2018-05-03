@@ -21,11 +21,7 @@ go.modules.community.files.UsagePanel = Ext.extend(Ext.Panel, {
 	height:dp(48),
 	
 	initComponent: function () {
-		
-		go.Stores.get("User").get([go.User.id], function(entities){
-			this.setData(entities[0].storage.usage,entities[0].storage.quota);
-		},this);
-
+		this.setData(go.User.storage.usage,go.User.storage.quota);
 		go.modules.community.files.UsagePanel.superclass.initComponent.call(this);
 	},
 	afterRender : function(pnl){
