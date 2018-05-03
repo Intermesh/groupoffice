@@ -1,4 +1,4 @@
-go.modules.community.files.MoveDialog = Ext.extend(go.form.FormWindow, {
+go.modules.community.files.MoveDialog = Ext.extend(go.form.Dialog, {
 	stateId: 'files-moveDialog',
 	title: t("Move"),
 	entityStore: go.Stores.get("Node"),

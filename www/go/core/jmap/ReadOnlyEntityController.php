@@ -95,26 +95,6 @@ abstract class ReadOnlyEntityController extends Controller {
 	}
 	
 	/**
-	 * 
-	 * @param array $filter
-	 * @param Query $query
-	 * @return Query
-	 */
-	private function applyFilterCondition($filter, $query)  {
-		$cls = $this->entityClass();
-		if(isset($filter['conditions']) && isset($filter['operator'])) { // is FilterOperator
-			$subQuery = new Query();
-			foreach($filter['conditions'] as $condition) {
-				$subQuery = $this->applyFilterCondition($condition, $subQuery);
-			}
-			return $query->where($subQuery, $filter['operator']);
-		} else {	
-			// is FilterCondition		
-			return $cls::filter($query, $filter);			
-		}
-	}
-	
-	/**
 	 * Takes the request arguments, validates them and fills it with defaults.
 	 * 
 	 * @param array $params

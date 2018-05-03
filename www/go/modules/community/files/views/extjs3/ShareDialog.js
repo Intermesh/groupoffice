@@ -1,4 +1,4 @@
-go.modules.community.files.ShareDialog = Ext.extend(go.form.FormWindow, {
+go.modules.community.files.ShareDialog = Ext.extend(go.form.Dialog, {
 	stateId: 'files-shareDialog',
 	title: t("Share"),
 	entityStore: go.Stores.get("Node"),
