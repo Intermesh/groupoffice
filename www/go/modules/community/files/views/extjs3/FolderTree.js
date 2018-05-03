@@ -20,7 +20,7 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 			if(node.attributes.entity){ // Root nodes don't have an entity set
 				filter.parentId=node.attributes.entityId;
 			}
-			
+
 			return {
 				filter:filter
 			};
@@ -33,14 +33,6 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 
 	initComponent: function () {
 
-		var root = new Ext.tree.TreeNode({
-			expanded: true,
-			text: 'ROOT',
-			entityId:'ROOT', // Needed so it can be handled exactly as other nodes
-			draggable: false,
-			children: this.browser.rootNodes
-		});
-
 		go.modules.community.files.FolderTree.superclass.initComponent.call(this);
 
 		this.on('click',function(node,e){
@@ -51,8 +43,23 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 			console.log(dragOverEvent.target);
 		},this);
 	
-		this.setRootNode(root);
-		this.getLoader().load(root);
+		go.Stores.get("User").get([go.User.id], function(entities){
+			
+			this.browser.rootNodes[0].params.filter = {parentId : entities[0].storage.rootFolderId};
+			this.browser.rootNodes[0].entityId = entities[0].storage.rootFolderId
+
+			var root = new Ext.tree.TreeNode({
+				expanded: true,
+				text: 'ROOT',
+				entityId:'ROOT', // Needed so it can be handled exactly as other nodes
+				draggable: false,
+				children: this.browser.rootNodes
+			});
+			this.setRootNode(root);
+			this.getLoader().load(root);
+			
+		},this);
+
 	},
 	
 	/**

@@ -33,7 +33,7 @@ class Node extends model\AclEntity {
 	 */
 	public $touchedAt;
 	public $storageId;
-	public $parentId;
+	protected $parentId;
 	
 	public $aclId;
 	
@@ -44,6 +44,14 @@ class Node extends model\AclEntity {
 	
 	public function getLocation() {
 		return '/biem/'.$this->name;
+	}
+	
+	public function getParentId(){
+		return $this->parentId;
+	}
+	public function setParentId($val) {
+		$this->parentId = $val;
+		$this->storageId = self::find()->selectSingleValue('storageId')->where(['id'=>$val])->single();
 	}
 
 	protected function getSearchDescription() {
@@ -70,16 +78,16 @@ class Node extends model\AclEntity {
 		
 		// Add where usergroup is the personal group of the user
 		if(isset($filter['isHome'])){
-			$homeDir = \GO()->getUser()->storage->getRootFolder();
+			$homeDirId = \GO()->getUser()->storage->getRootFolderId();
 						
 			if(!empty($filter['isHome'])){
 				// We are querying the "home dir" of the current user
-				$query->andWhere(['parentId' => $homeDir->id]);
+				$query->andWhere(['parentId' => $homeDirId]);
 			} else {
 				// We are querying the "shared with me" dir of the current user
-				$query->andWhere('parentId','!=',$homeDir->id);
+				$query->andWhere('parentId','!=',$homeDirId);
 				$query->andWhere('id','!=',0);
-				$query->andWhere('storageId','!=',$homeDir->storageId);
+				$query->andWhere('storageId','!=',\GO()->getUser()->storage->id);
 			}
 		}
 		

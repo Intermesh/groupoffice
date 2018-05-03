@@ -27,8 +27,12 @@ class Storage extends orm\Property {
 		return parent::defineMapping()->addTable("files_storage");
 	}
 
-	public function getRootFolder(){
-		return Node::find()->where(['storageId'=>$this->id,'parentId'=>0])->single();
+	public function getRootFolderId(){
+		$id = Node::find()->selectSingleValue('id')->where(['storageId'=>$this->id,'parentId'=>0])->single();
+		if($id === false) {
+			throw new \Exception('No root folder for storage: '.$this->id);
+		}
+		return (int) $id;
 	}
 	
 }
