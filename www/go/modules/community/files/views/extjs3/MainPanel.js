@@ -59,8 +59,9 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 			layout: "border",
 			split: true,
 			items: [
-				this.cardPanel = new go.modules.community.files.CardPanel({
+				this.centerCardPanel = new go.modules.community.files.CenterPanel({
 					region: 'center',
+					detailView: this.nodeDetail,
 					browser: this.browser,
 					tbar: {  // configured using the anchor layout
 						xtype : 'container',
@@ -99,7 +100,7 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 												input.setAttribute("type", "file");
 												input.setAttribute('multiple', true);
 												input.onchange = function(e) {
-													me.cardPanel.fileUpload(this.files);
+													me.centerCardPanel.fileUpload(this.files);
 												};
 												this.uploadDialog = input;
 											}
@@ -117,9 +118,9 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 								tooltip: t("Thumbnails", "files"),
 								iconCls: 'ic-view-list',
 								handler: function(item){
-									var view = this.cardPanel.getLayout().activeItem.stateId==="files-grid" ? 'comfy' : 'list';
+									var view = this.centerCardPanel.getLayout().activeItem.stateId==="files-grid" ? 'comfy' : 'list';
 									item.setIconClass('ic-view-'+view);
-									this.cardPanel.getLayout().setActiveItem(view === 'list' ? 0 : 1);
+									this.centerCardPanel.getLayout().setActiveItem(view === 'list' ? 0 : 1);
 								},
 								scope:this
 							},{

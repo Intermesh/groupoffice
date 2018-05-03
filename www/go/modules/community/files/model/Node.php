@@ -10,6 +10,7 @@ class Node extends model\AclEntity {
 	use \go\core\orm\SearchableTrait;
 	
 	public $name;
+	public $blobId;
 	/**
 	 * @var \go\core\util\DateTime
 	 */
@@ -21,11 +22,12 @@ class Node extends model\AclEntity {
 	public $ownedBy;
 	public $modifiedBy;
 	public $isDirectory;
-	public $bytesSize;
+	public $byteSize;
 	public $contentType;
 	
 	public $comments;
 	public $isBookmarked;
+	public $bookmarked;
 	/**
 	 * @var \go\core\util\DateTime
 	 */

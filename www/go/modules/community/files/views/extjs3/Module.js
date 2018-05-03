@@ -10,3 +10,10 @@ go.Modules.register("community", 'files', {
 		});
 	}
 });
+
+go.Preview = function(file) {
+	if(!this.preview) {
+		this.preview = new go.modules.community.files.PreviewLayer();
+	}
+	this.preview.show(file);
+}

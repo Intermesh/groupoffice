@@ -9,12 +9,13 @@
  * @copyright Copyright Intermesh
  * @author Michael de Hart <mdhart@intermesh.nl>
  */
-go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
+go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 	layout:'card',
 	activeItem: 0,
 	deferredRender: false,
 	border: false,
 	browser: null, // set from mainpanel
+	detailView: null, // from mainpanel (for click in centerpanel)
 	previewTypes: {
       'image/png': true,
       'image/jpeg': true,
@@ -39,18 +40,24 @@ go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
 				rowdblclick: function (grid, rowIndex, e) {
 					var record = grid.getStore().getAt(rowIndex);
 					if(record.data.isDirectory) {
-						this.browser.descent(record.id);
+						this.browser.open(record.id);
 						return;
+					} else {
+						go.Preview(record.json);
 					}
-					if (record.get('permissionLevel') < GO.permissionLevels.write) {
-						return;
-					}
-
-					var fileRename = new go.modules.files.FileForm();
-					fileRename.load(record.id).show();
 				},
-				scope: this
-			}
+				scope:this
+			},
+			sm: new Ext.grid.RowSelectionModel({
+				singleSelect: true,
+				listeners: {
+					rowselect: function(sm,rowIndex,record){
+						console.log(record);
+						this.detailView.load(parseInt(record.id));
+					},
+					scope: this
+				}
+			})
 		});
 		
 //		this.nodeGrid.getSelectionModel().on('rowselect', function (sm, rowIndex, record) {
@@ -60,6 +67,11 @@ go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
 		this.nodeTile = new go.modules.community.files.NodeTile({
 			store:this.browser.store,
 			listeners: {
+				click: function(view, index, node, e) {
+					var record = view.getStore().getAt(index);
+					console.log(record);
+					this.detailView.load(parseInt(record.id));
+				},
 				contextmenu: function(view, index, node, event){
 					event.stopEvent();
 					contextMenu.showAt(event.xy, view.getSelectedRecords());
@@ -67,7 +79,9 @@ go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
 				dblclick(view, index, node, e) {
 					var record = view.getStore().getAt(index);
 					if(record.data.isDirectory) {
-						this.browser.descent(record.id);
+						this.browser.open(record.id);
+					}else {
+						go.Preview(record.json);
 					}
 					
 				},
@@ -77,7 +91,7 @@ go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
 		
 		this.items = [this.nodeGrid, this.nodeTile];
 	
-		go.modules.community.files.CardPanel.superclass.initComponent.call(this, arguments);
+		go.modules.community.files.CenterPanel.superclass.initComponent.call(this, arguments);
 
 	},
 	
@@ -109,15 +123,15 @@ go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
 			this.fileUpload(e.dataTransfer.files);
 		}.bind(this));
 		
-		go.modules.community.files.CardPanel.superclass.afterRender.call(this, arguments);
+		go.modules.community.files.CenterPanel.superclass.afterRender.call(this, arguments);
 	},
 	activeUploads: 0,
 	fileUpload: function(files) {
 
 		for (var i = 0; i < files.length; i++) {
 			var name = this.solveDuplicate(files[i].name);
-			var record = new this.store.recordType({ name: name, size: files[i].size, status: 'queued' });
-			this.store.add(record);
+			var record = new this.browser.store.recordType({ name: name, size: files[i].size, status: 'queued' });
+			this.browser.store.add(record);
 			this.activeUploads++;
 			//var progress = this.appendProgressFile(files[i]);
 			go.Jmap.upload(files[i], {
@@ -132,10 +146,11 @@ go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
 				  this.activeUploads--;
 				  record.set('status', 'done');
 				  record.set('blobId', data.blobId);
+				  console.log(data.blobId);
 				  record.set('progress', 100);
 				  console.log(record);
 				  if(this.activeUploads === 0) {
-					  this.store.commitChanges();
+					  this.browser.store.commitChanges();
 				  }
 			  },
 			  failure: function(e) {
@@ -149,13 +164,13 @@ go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
 	},
 	
 	solveDuplicate: function(name, action) {
-		var index = this.store.find('name', name);
+		var index = this.browser.store.find('name', name);
 		if(index === -1) {
 			return name;
 		}
 		switch(action) {
 			case 'replace':
-				this.store.removeAt(index);
+				this.browser.store.removeAt(index);
 				return name;
 			case 'cancel':
 				return false;
@@ -165,7 +180,7 @@ go.modules.community.files.CardPanel = Ext.extend(Ext.Panel, {
 				while(index) {
 					nameCount++;
 					newName = name + '('+number+')';
-					index = this.store.find('name', newName);
+					index = this.browser.store.find('name', newName);
 				}
 				return newName;
 		}

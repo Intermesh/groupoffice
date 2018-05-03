@@ -717,11 +717,15 @@ button.filetype-pdf, button.filetype-doc {
 	
 /*	background-color:color($background, 'card');*/
 	figure {
-		background-image: url(img/default-avatar.svg);
+		clear:both;
 		background-position:center 60%;
 		background-size: cover;
+		background-repeat: no-repeat;
 		position: relative;
 		margin:0;
+		&.contain {
+			background-size: contain;
+		}
 		&:before {
 		  display: block;
 		  content: "";
@@ -731,8 +735,6 @@ button.filetype-pdf, button.filetype-doc {
 	}
 	.x-tool { margin-top: dp(3);}
 
-
-		
 	h3{
 		@extend %font-title;
 	}
@@ -752,8 +754,11 @@ button.filetype-pdf, button.filetype-doc {
 	.more {
 		font-style: italic;
 	}
+	.right {
+		text-align:right;
+	}
 	 //12 column
-	.s1,s2,s3,.s4,.s5,.s6,.s7,.s8,.s9,.s10,.s11,.s12{
+	.s1,.s2,.s3,.s4,.s5,.s6,.s7,.s8,.s9,.s10,.s11,.s12{
 		display:block;
 		float:left;
 	}
@@ -771,14 +776,15 @@ button.filetype-pdf, button.filetype-doc {
 	.s12 {width:100%;}
 	.pad {
 		padding-left: dp(16);
+		padding-right: dp(16);
 		padding-bottom:dp(8)
 	}
 
 	label {
-		@extend %font-caption;
+		@extend %font-subheading-dense;
 		width:100%;
 		display: block;
-		line-height: dp(16);
+		line-height: dp(32);
 	}
 
 	.icons {
@@ -813,20 +819,15 @@ button.filetype-pdf, button.filetype-doc {
 		}
 	}
 	
-	
 	.x-panel-bbar  {
 		.x-toolbar {
 			border-top: 0;
 		}
 	}
-	
-	
-	
 
-	h3.title {
+	.title {
 		padding: dp(16);
 	}
-	
 }
 
 .go-icon-list {
@@ -1052,13 +1053,22 @@ table[id^="comments-ext"] b {
 			display: none !important;
 		}
 	}
-
 }
 
 .x-view-tiles {
+	padding: dp(2);
+	display: grid;
+	text-align:center;
+	/* define the number of grid columns */
+	grid-gap: dp(4);
+	grid-template-columns: repeat( auto-fill, minmax(dp(192), 1fr));
+	> div {
+		height: dp(192);
+		background-color: color($background,'card');
+	}
 	div.text {
 		@extend %ellipsis;
-		padding: 0 dp(8);
+		padding: 0 dp(16);
 	}
 }
 
