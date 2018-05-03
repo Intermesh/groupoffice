@@ -18,6 +18,7 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 	initComponent: function () {
 
 		this.browser = new go.modules.community.files.Browser({
+			useRouter:true,
 			store: new go.data.Store({
 				fields: [
 					'id', 
@@ -137,18 +138,15 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 								xtype: 'tbsearch'
 							}]
 						}),
-						this.breadCrumbs = new go.modules.community.files.BreadCrumbBar()
+						this.breadCrumbs = new go.modules.community.files.BreadCrumbBar({
+							browser:this.browser
+						})
 					]}
 				}), //first is default in narrow mode
 				this.nodeDetail
 			]
 		});
 		
-		this.browser.on('pathchanged', function(browser) {
-			this.breadCrumbs.redraw(browser);
-			this.folderTree.openPath(browser.getPath(true));
-		},this);
-
 		this.items = [
 			this.centerPanel, //first is default in narrow mode
 			this.sideNav

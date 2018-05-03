@@ -10,6 +10,7 @@
  * @author Michael de Hart <mdhart@intermesh.nl>
  */
 go.modules.community.files.Browser = Ext.extend(Ext.Component, {
+	useRouter: false,
 	path: [],
 	currentRootNode: 'my-files', // (my-files, shared-with-me, bookmarks, etc..)
 	store: null, // only used by grid
@@ -61,13 +62,16 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 		go.modules.community.files.Browser.superclass.constructor.call(this, config);
 		
 		// Add route to routers used by open()
-		var me = this;
-		go.Router.add(/files\/([\w\-]+)\/([0-9\/]*)/, function(root, path) {
-			GO.mainLayout.openModule('files');
-			me.currentRootNode = root;
-			me.path = [];
-			me.nav(path);
-		});
+		
+		if(this.useRouter){
+			var me = this;
+			go.Router.add(/files\/([\w\-]+)\/([0-9\/]*)/, function(root, path) {
+				GO.mainLayout.openModule('files');
+				me.currentRootNode = root;
+				me.path = [];
+				me.nav(path);
+			});
+		}
 	},
 	
 	/**
@@ -144,7 +148,13 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 	 */
 	open: function(){
 		var strPath = Ext.isEmpty(this.path) ? '' : this.path.join('/')+'/';
-		go.Router.goto("files/"+this.currentRootNode+"/" + strPath);
+		
+		if(this.useRouter){		
+			go.Router.goto("files/"+this.currentRootNode+"/" + strPath);
+		} else {
+			this.path = [];
+			this.nav(strPath);
+		}
 	},
 //	
 //	/**

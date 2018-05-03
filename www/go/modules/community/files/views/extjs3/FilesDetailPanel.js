@@ -5,15 +5,22 @@ go.modules.community.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 	titleCollapse: true,
 	stateId: "files-detail",
 	initComponent: function () {
+
+//		this.store = new GO.data.JsonStore({
+//			url: GO.url('files/folder/list'),
+//			fields: ['id', 'name', 'mtime', 'extension', "handler"],
+//			remoteSort: true
+//		});
 		
-
-
-		this.store = new GO.data.JsonStore({
-			url: GO.url('files/folder/list'),
-			fields: ['id', 'name', 'mtime', 'extension', "handler"],
-			remoteSort: true
+		this.browseBtn = new Ext.Button({
+			text:t("Browse files..."),
+			tooltip:t("Browse files..."),
+			handler: function(){
+				var browseWindow = new go.modules.community.files.BrowseWindow();
+				browseWindow.show();
+			},
+			scope: this
 		});
-
 
 		var tpl = new Ext.XTemplate('<div class="icons"><tpl for=".">\
 <a>\
@@ -25,31 +32,21 @@ go.modules.community.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 		});
 
 
-		this.items = [new Ext.DataView({
-				store: this.store,
-				tpl: tpl,
-				autoHeight: true,
-				multiSelect: true,
-				itemSelector: 'a',
-				listeners: {
-					click: this.onClick,
-					scope: this
-				}
-			})];
+//		this.items = [new Ext.DataView({
+//				store: this.store,
+//				tpl: tpl,
+//				autoHeight: true,
+//				multiSelect: true,
+//				itemSelector: 'a',
+//				listeners: {
+//					click: this.onClick,
+//					scope: this
+//				}
+//			})];
 
 		this.bbar = [
-			//this.browseBtn = new GO.files.FileBrowserButton()
+			this.browseBtn
 		];
-		
-//		this.browseBtn.on('close', function(btn, folderId) {
-//			this.folderId = folderId;
-//			this.store.load({
-//				params: {
-//					limit: 10,
-//					folder_id: this.folderId
-//				}
-//			});
-//		}, this);
 
 		go.modules.community.files.FilesDetailPanel.superclass.initComponent.call(this);
 
@@ -75,25 +72,22 @@ go.modules.community.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 	},
 
 	onLoad: function (dv) {
-
-		this.browseBtn.model_name = dv.model_name || dv.entity || dv.entityStore.entity.name;
-		this.browseBtn.setId(dv.data.id);
 		
 		this.folderId = dv.data.files_folder_id == undefined ? dv.data.filesFolderId : dv.data.files_folder_id;
 		
 		this.setVisible(this.folderId != undefined);
 		
-		if(this.folderId) {
-			this.store.load({
-				params: {
-					limit: 10,
-					folder_id: this.folderId
-				}
-			});
-		} else
-		{
-			this.store.removeAll();
-		}
+//		if(this.folderId) {
+//			this.store.load({
+//				params: {
+//					limit: 10,
+//					folder_id: this.folderId
+//				}
+//			});
+//		} else
+//		{
+//			this.store.removeAll();
+//		}
 	}
 
 });

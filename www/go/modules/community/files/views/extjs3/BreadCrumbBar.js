@@ -11,30 +11,37 @@
  */
 go.modules.community.files.BreadCrumbBar = Ext.extend(Ext.Toolbar, {
 	
+	browser:null,
+	
 	initComponent: function() {
 		this.items = [{
 			xtype: 'button',
 			text: t('My files')
 		}];
 		go.modules.community.files.BreadCrumbBar.superclass.initComponent.call(this);
+		
+		
+		this.browser.on('pathchanged', function(browser){
+			this.redraw();
+		},this);
 	},
-	redraw: function(browser) {
+	redraw: function() {
 		this.removeAll();
 		//Root node (my-files, shared-with-me, bookmarks, etc..)
 		this.addButton({
-			text: browser.getRootNode(browser.getCurrentRootNode()).text,
+			text: this.browser.getRootNode(this.browser.getCurrentRootNode()).text,
 			handler: function(btn) {
-				browser.goto([browser.getCurrentRootNode()]);
+				this.browser.goto([this.browser.getCurrentRootNode()]);
 			},
 			scope:this
 		});
 		
-		var folderPath = browser.getPath();
+		var folderPath = this.browser.getPath();
 		
 		if(!Ext.isEmpty(folderPath)) {
 			go.Stores.get('Node').get(folderPath, function(nodes){
 				
-				var fullButtonPath = [browser.getCurrentRootNode()];
+				var fullButtonPath = [this.browser.getCurrentRootNode()];
 				
 				// Loop through the nodes to build up the breadcrumb list								
 				Ext.each(nodes, function(node, i, all){
@@ -52,7 +59,7 @@ go.modules.community.files.BreadCrumbBar = Ext.extend(Ext.Toolbar, {
 						text: node.name,
 						disabled:isLast,
 						handler: function(btn) {
-							browser.goto(btn.path);
+							this.browser.goto(btn.path);
 						},
 						scope:this
 					});

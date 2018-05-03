@@ -52,8 +52,9 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 				singleSelect: true,
 				listeners: {
 					rowselect: function(sm,rowIndex,record){
-						console.log(record);
-						this.detailView.load(parseInt(record.id));
+						if(this.detailView){
+							this.detailView.load(parseInt(record.id));
+						}
 					},
 					scope: this
 				}

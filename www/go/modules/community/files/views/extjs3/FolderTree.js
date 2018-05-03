@@ -42,7 +42,11 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 		this.on('nodedragover',function(dragOverEvent){			
 			console.log(dragOverEvent.target);
 		},this);
-	
+		
+		this.browser.on('pathchanged', function(){
+			this.openPath(this.browser.getPath(true));
+		},this);
+		
 		var root = new Ext.tree.TreeNode({
 			expanded: true,
 			text: 'ROOT',

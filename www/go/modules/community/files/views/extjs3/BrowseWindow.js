@@ -1,9 +1,10 @@
 go.modules.community.files.BrowseWindow = Ext.extend(Ext.Window, {
 	
 	title: t("Browse files"),
-	width: 600,
+	width: 900,
 	height: 600,
 	browser:null,
+	layout:'border',
 
 	initComponent: function () {
 		
@@ -19,13 +20,26 @@ go.modules.community.files.BrowseWindow = Ext.extend(Ext.Window, {
 		
 		this.folderTree = new go.modules.community.files.FolderTree({
 			browser:this.browser,
-			region: 'west'
+			region: 'west',
+			width:200
+		});
+		
+		this.breadCrumbs = new go.modules.community.files.BreadCrumbBar({
+			browser:this.browser
 		});
 		
 		this.centerCardPanel = new go.modules.community.files.CenterPanel({
 			region: 'center',
-			browser: this.browser
+			browser: this.browser,
+			tbar:[
+				this.breadCrumbs
+			]
 		});
+		
+		this.items = [
+			this.folderTree,
+			this.centerCardPanel
+		];
 		
 		go.modules.community.files.BrowseWindow.superclass.initComponent.call(this);
 	}	
