@@ -171,6 +171,12 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		p[key] = {};
 		p[key][record.id] = record.data;
 		
+		store.fields.each(function(field){
+			if(field.submit === false) {
+				delete record.data[field.name];
+			}
+		});
+		
 		this.entityStore.set(p, function (options, success, response) {
 			
 			var saved = (record.phantom ? response.created : response.updated) || {};
