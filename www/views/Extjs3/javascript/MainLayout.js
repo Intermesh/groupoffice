@@ -88,14 +88,16 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		if(go.User.accessToken){
 			Ext.Ajax.defaultHeaders['Authorization'] = 'Bearer '+go.User.accessToken;
-			go.User.authenticate(function(data, response){
-
-				if(response.status === 200) {
+			go.User.authenticate(function(data, options, success, response){
+				
+				if(success) {
 					me.on('render', function() {
 						me.fireEvent('boot', me);
 					}, me, {single:true});
 					me.onAuthentication(); // <- start Group-Office
 				} else {
+					go.User.clearAccessToken();
+					
 					me.fireEvent("boot", this);
 					GO.mainLayout.login();
 				}
@@ -268,7 +270,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 	onAuthentication: function () {
 		
-		
+		//load state
+		Ext.state.Manager.setProvider(new GO.state.HttpProvider());
 		
 		go.Modules.init();
 
@@ -392,6 +395,13 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			this.createTabPanel(items);
 
 			this.beforeRender();
+			
+			function getUserImgStyle() {
+				if(!go.User.avatarId) {
+					return "";
+				}
+				return 'background-image:url('+go.Jmap.downloadUrl(go.User.avatarId)+');'
+			}
 
 			var topPanel = new Ext.Panel({
 				id:"mainNorthPanel",
@@ -401,7 +411,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					<div id="secondary-menu">\
 						<div id="search_query"></div>\
 						<div id="start-menu-link" ></div>\
-						<a id="user-menu" class="user-img" style="background-image:url('+go.Jmap.downloadUrl(go.User.avatarId)+')">\
+						<a id="user-menu" class="user-img" style="'+getUserImgStyle()+'">\
 							<span id="reminder-icon" style="display: none;">notifications</span>\
 						</a>\
 					</div>\

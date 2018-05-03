@@ -8,22 +8,25 @@ go.Router = {
 	root: '/',
 	
 	pathBeforeLogin : "",
+	suspendEvent : false,
+	
+	previousPath : null,
+	loadedPath : null,
 	
 	config: function (options) {
 		this.root = options && options.root ? '/' + this.trimSlashes(options.root) + '/' : '/';
 		return this;
 	},
 	getPath: function () {
-//		var path = '';
-//		var match = window.location.href.match(/#(.*)$/);
-//			path = match ? match[1] : '';		
-//		return this.clearSlashes(path);
 		return window.location.hash.substr(1);
 	},
 	
 	setPath : function(path) {
-		this._setPath = path; //to cancel event
-		window.location.hash = path;
+		//this._setPath = path; //to cancel event
+		if(path != window.location.hash) {
+			this.suspendEvent = true;
+			window.location.hash = path;
+		}
 	},
 	
 	trimSlashes: function (path) {
@@ -67,12 +70,15 @@ go.Router = {
 	},
 	check: function (f) {
 		var path = f || this.getPath();
+		
+		this.loadedPath = path;
 				
-//		if(path == this._setPath) {
-//			this._setPath = null;
-//			return this;
-//		}
-		this._setPath = null;
+		if(this.suspendEvent) {
+			this.suspendEvent = false;
+			return this;
+		}
+		
+		
 		
 		for (var i = 0; i < this.routes.length; i++) {
 			var match = path.match(this.routes[i].re);
@@ -95,7 +101,7 @@ go.Router = {
 		if(this.getPath() == path) {
 			
 			//rerun route if hash is the same
-			go.Router.check();
+			//go.Router.check();
 		} else
 		{		
 			window.location.hash = path || "";		
@@ -158,6 +164,7 @@ GO.mainLayout.on("boot", function() {
 });
 
 window.addEventListener('hashchange', function() {	
+	go.Router.previousPath = go.Router.loadedPath;
 	go.Router.check();
 }, false);
 

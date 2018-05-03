@@ -111,6 +111,37 @@ namespace go\core {
 		}
 
 		private $config;
+		
+		/**
+		 * Load configuration
+		 * 
+		 * ```
+		 * "general" => [
+		 * 	  "dataPath" => "/foo/bar"
+		 * 	],
+		 * 
+		 * "db" => [
+		 * 	  "dsn" => 'mysql:host=localhost;dbname=groupoffice,
+		 * 	  "username" => "user",
+		 * 	  "password" => "secret"
+		 *   ]
+		 * "limits" => [
+		 * 		"maxUsers" => 0,
+		 * 		"storageQuota" => 0,
+		 * 		"allowedModules" => ""
+		 * 	 ]
+		 * ]
+		 * 
+		 * ```
+		 * 
+		 * @param array $config
+		 * @return $this;
+		 */
+		public function setConfig(array $config) {
+			$this->config = $config;
+			
+			return $this;
+		}
 
 		/**
 		 * Get the configuration data
@@ -216,13 +247,21 @@ namespace go\core {
 		 */
 		public function getCache() {
 			if (!isset($this->cache)) {
-
 				$this->cache = new Disk();
-//			if(!$this->cache->isSupported()) {
-//				$this->cache = new cache\None();
-//			}
 			}
 			return $this->cache;
+		}
+		
+		/**
+		 * Set the cache provider
+		 * 
+		 * @param CacheInterface $cache
+		 * @return $this
+		 */
+		public function setCache(CacheInterface $cache) {
+			$this->cache = $cache;
+			
+			return $this;
 		}
 
 		/**
@@ -253,8 +292,16 @@ namespace go\core {
 
 		private $authState;
 
+		/**
+		 * Set the authentication state
+		 * 
+		 * @param \go\core\auth\State $authState
+		 * @return $this
+		 */
 		public function setAuthState(auth\State $authState) {
 			$this->authState = $authState;
+			
+			return $this;
 		}
 
 		/**
@@ -292,10 +339,10 @@ namespace go\core {
 		 * 
 		 * @param String $str String to translate
 		 * @param String $module Name of the module to find the translation
-		 * @param String $coreSection Only applies if module is set to 'base'
+		 * @param String $package Only applies if module is set to 'base'
 		 */
-		public function t($str, $moduleName, $coreSection = 'common') {
-			return Language::get()->t($str, $moduleName, $coreSection);
+		public function t($str, $package = 'core', $module = 'core') {
+			return Language::get()->t($str, $package, $module);
 		}
 
 		public static function findConfigFile($name = 'config.ini') {

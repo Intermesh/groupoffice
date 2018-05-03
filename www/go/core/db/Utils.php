@@ -2,9 +2,11 @@
 
 namespace go\core\db;
 
-use PDO;
+use Exception;
 use go\core\App;
 use go\core\fs\File;
+use PDO;
+use PDOException;
 
 class Utils {
 

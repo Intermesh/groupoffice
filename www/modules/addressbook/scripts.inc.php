@@ -1,6 +1,6 @@
 <?php
 
-$GO_SCRIPTS_JS .= 'GO.lang.addressbook.defaultSalutationExpression="'.\GO\Base\Util\StringHelper::escape_javascript(\GO::t("Default salutation", "addressbook")).'";';
+$GO_SCRIPTS_JS .= 'GO.lang.legacy.addressbook.defaultSalutationExpression="'.\GO\Base\Util\StringHelper::escape_javascript(\GO::t("Default salutation", "addressbook")).'";';
 
 
 $export_acl_id = \GO::config()->get_setting('go_addressbook_export', 0);

@@ -1484,18 +1484,18 @@ var $billing_clear_payment_method_on_duplicate = true;
 
 		$this->root_path = str_replace('\\','/',dirname(dirname(dirname(__FILE__)))).'/';
 
-//		//suppress error for open_basedir warnings etc
-//		if(@file_exists('/etc/groupoffice/globalconfig.inc.php')) {
-//			require('/etc/groupoffice/globalconfig.inc.php');
-//		}		
-//
-//		$config_file = $this->get_config_file();
-//
-//		if($config_file)
-//			include($config_file);
-		
-		$config = $this->buildConfig();
+		//suppress error for open_basedir warnings etc
+		if(@file_exists('/etc/groupoffice/globalconfig.inc.php')) {
+			require('/etc/groupoffice/globalconfig.inc.php');
+		}		
 
+		$config_file = $this->get_config_file();
+
+		if($config_file)
+			include($config_file);
+		
+		$config = array_merge($config, $this->buildConfig());
+	
 		$this->_original_config = $config;
 		
 		foreach($config as $key=>$value) {
@@ -1641,6 +1641,8 @@ var $billing_clear_payment_method_on_duplicate = true;
 		$this->password_min_length = GO()->getSettings()->passwordMinLength;
 		
 		$this->login_message = GO()->getSettings()->loginMessage;
+		
+		$this->full_url = GO()->getSettings()->URL;
 	}
 
 

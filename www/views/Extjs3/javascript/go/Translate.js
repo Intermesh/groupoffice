@@ -1,9 +1,9 @@
 go.Translate = {
-  module: "base",
-  section: "common",
+  module: "core",
+  package: "core",
   
-  setModule : function(module, section) {
+  setModule : function(package, module) {
     this.module = module;
-    this.section = section;
+    this.package = package;
   }
 }

@@ -208,6 +208,9 @@ $qs[] = 'ALTER TABLE `core_entity` CHANGE `model_name` `name` VARCHAR(190) CHARA
 $qs[] = 'ALTER TABLE `core_entity` ADD `moduleId` INT NULL DEFAULT NULL AFTER `id`, ADD INDEX (`moduleId`);';
 $qs[] = 'ALTER TABLE `core_entity` ADD INDEX(`name`);';
 
+$qs[] = "ALTER TABLE `core_entity`  ADD `clientName` VARCHAR(190) NULL DEFAULT NULL;";
+$qs[] = "ALTER TABLE `core_entity` ADD UNIQUE(`clientName`);";
+
 
 
 $qs[] = "insert into core_entity (name) select extendsModel from core_customfields_field_set where extendsModel not in (select name from core_entity)";
@@ -239,7 +242,7 @@ $qs[] = function() {
 
 
 			App::get()->getDbConnection()
-							->update('core_entity', ['moduleId' => $module['id'], 'name' => $shortName], ['id' => $record['id']])
+							->update('core_entity', ['moduleId' => $module['id'], 'name' => $shortName, 'clientName' => $shortName], ['id' => $record['id']])
 							->execute();
 		}
 	}
@@ -405,7 +408,6 @@ $qs[] = "ALTER TABLE `core_link`
 $qs[] = "ALTER TABLE `core_link`
   ADD CONSTRAINT `fromEntity` FOREIGN KEY (`fromEntityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `toEntity` FOREIGN KEY (`toEntityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;";
-
 
 $qs[] = function() {
 	

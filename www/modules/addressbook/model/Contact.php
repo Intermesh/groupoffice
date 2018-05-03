@@ -13,12 +13,8 @@
  * @author Wilmar van Beusekom <wilmar@intermesh.nl>
  */
 
-namespace GO\Addressbook\Model;
-use Sabre;
-
 /**
  * @property String $photo Full path to photo
- * @property String $avatarId hash of file
  * @property String $photoURL URL to photo
  * 
  * @property String $name Full name of the contact
@@ -73,6 +69,11 @@ use Sabre;
  * @property int $last_email_time
  * @property string $color
  */
+
+namespace GO\Addressbook\Model;
+use Sabre;
+
+
 class Contact extends \GO\Base\Db\ActiveRecord {
 		
 	/**
@@ -113,6 +114,17 @@ class Contact extends \GO\Base\Db\ActiveRecord {
 	
 	public function getETag() {
 		return '"' . date('Ymd H:i:s', $this->mtime). '-'.$this->id.'"';
+	}
+	
+	/**
+	 * Returns a static model of itself
+	 * 
+	 * @param String $className
+	 * @return Contact 
+	 */
+	public static function model($className=__CLASS__)
+	{	
+		return parent::model($className);
 	}
 
 	public function aclField(){
@@ -461,6 +473,51 @@ class Contact extends \GO\Base\Db\ActiveRecord {
 		
 		return parent::afterSave($wasNew);
 	}
+	
+//	/**
+//	 * Set the photo
+//	 * 
+//	 * @param String $srcFileName The source image file name.
+//	 */
+//	public function setPhoto($srcFileName){
+//		
+//		if(!$this->id)
+//			throw new \Exception("Contact must be saved before you can set a photo");
+//
+//		$destination = \GO::config()->file_storage_path.'contacts/contact_photos/'.$this->id.'.jpg';
+//		
+//		if(empty($srcFileName))
+//		{
+//			$file = new \GO\Base\Fs\File($this->_getPhotoPath());
+//			return !$file->exists() || $file->delete();
+//		}else
+//		{		
+//
+//			$f = new \GO\Base\Fs\Folder(dirname($this->_getPhotoPath()));
+//			$f->create();
+//
+//
+//			$img = new \GO\Base\Util\Image();
+//			if(!$img->load($srcFileName)){
+//				throw new \Exception(\GO::t("The image you uploaded is not supported. Only gif, png and jpg images are supported.", "addressbook"));
+//			}
+//
+//			$img->zoomcrop(90,120);
+//			if(!$img->save($destination, IMAGETYPE_JPEG))
+//				throw new \Exception("Could not save photo at ".$destination." from ".$srcFileName);
+//		}
+//	}
+	
+//	private function _getPhotoPath(){
+//		return \GO::config()->file_storage_path.'contacts/contact_photos/'.$this->id.'.jpg';
+//	}
+//	
+//	protected function getPhoto(){
+//		if(file_exists($this->_getPhotoPath()))
+//			return $this->_getPhotoPath();
+//		else
+//			return '';
+//	}
 	
 	/**
 	 * Get the photo file object. It always returns a file even though it doesn't

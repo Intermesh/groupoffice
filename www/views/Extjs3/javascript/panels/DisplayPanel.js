@@ -214,7 +214,7 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 			this.add(new go.modules.community.files.FilesDetailPanel());
 		}
 		
-		if(go.Modules.isAvailable("community", "comments") ){
+		if(go.Modules.isAvailable("legacy", "comments") ){
 			this.add(new go.modules.comments.CommentsDetailPanel());
 		}
 

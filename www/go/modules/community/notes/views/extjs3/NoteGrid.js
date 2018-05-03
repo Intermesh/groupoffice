@@ -1,4 +1,4 @@
-go.modules.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
+go.modules.community.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 	paging: true,
 	initComponent: function () {
 
@@ -17,7 +17,7 @@ go.modules.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 			entityStore: go.Stores.get("Note")
 		});
 
-		Ext.apply(this, {
+		Ext.apply(this, {		
 		
 			columns: [
 				{
@@ -92,7 +92,7 @@ go.modules.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 			stateId: 'notes-grid'
 		});
 
-		go.modules.notes.NoteGrid.superclass.initComponent.call(this);
+		go.modules.community.notes.NoteGrid.superclass.initComponent.call(this);
 	}
 });
 

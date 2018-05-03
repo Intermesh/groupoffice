@@ -40,17 +40,14 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 		//console.log(action.type, this.entityStore.entity.methods.get.responseName);
 		switch (action.type) {
 			case this.entityStore.entity.name + "Updated":
-
-				//reload if data in entity store was updated
-				for (var i = 0, l = action.payload.list.length; i < l; i++) {
-					if (this.currentId == action.payload.list[i].id) {
-						this.reload();
-					}
+				//reload if data in entity store was updated			
+				if (action.payload.list[this.currentId]) {
+					this.reload();
 				}
+
 				break;
 
 			case this.entityStore.entity.name + "Destroyed":
-				console.log(action.payload.list, this.currentId);
 				if (action.payload.list.indexOf(this.currentId) > -1) {
 					this.reset();
 				}

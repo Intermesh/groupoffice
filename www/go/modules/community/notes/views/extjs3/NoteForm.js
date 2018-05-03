@@ -1,4 +1,4 @@
-go.modules.notes.NoteForm = Ext.extend(go.form.FormWindow, {
+go.modules.community.notes.NoteForm = Ext.extend(go.form.FormWindow, {
 	stateId: 'notes-noteForm',
 	title: t("Note", "notes"),
 	entityStore: go.Stores.get("Note"),
@@ -9,7 +9,7 @@ go.modules.notes.NoteForm = Ext.extend(go.form.FormWindow, {
 		var items = [{
 				xtype: 'fieldset',
 				autoHeight: true,
-				items: [new go.modules.notes.NoteBookCombo(),
+				items: [new go.modules.community.notes.NoteBookCombo(),
 					{
 						xtype: 'textfield',
 						name: 'name',

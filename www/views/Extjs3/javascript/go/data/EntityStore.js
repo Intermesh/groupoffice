@@ -187,10 +187,22 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	 * 
 	 * ```
 	 * 
+	 * Destroy:
+	 * 
+	 * ```
+	 * this.entityStore.set({destroy: [1,2]}, function (options, success, response) {
+			if (response.destroyed) {
+				this.hide();
+			}
+		}, this);
+		```
+	 * 
 	 * @param {int} id
 	 * @param {object} values Key value object with entity properties
 	 * @param {type} callback A function called with success, values, response, options
 	 * @returns {undefined}
+	 * 
+	 * @link http://jmap.io/spec-core.html#/set
 	 */
 	set: function (params, cb, scope) {
 		params.ifInState = this.state;
@@ -201,33 +213,36 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			scope: this,
 			callback: function (options, success, response) {
 				
-				var changes = [];
-				
 				if(response.created) {
+					var list = {};
 					for(var clientId in response.created) {
-						var entity = Ext.apply(params.create[clientId], response.created[clientId]);
-						changes.push(entity);
+						var entity = Ext.apply(params.create[clientId], response.created[clientId]);						
 						this.data[entity.id] = entity;
+						list[clientId] = entity;
 					}
+					
+					go.flux.Dispatcher.dispatch(this.entity.name + "Created", {
+						state: this.state,
+						list: list
+					});	
 				}
 				
 				if(response.updated) {
+					var list = {};
 					for(var serverId in response.updated) {
 						var entity = Ext.apply(params.update[serverId], response.updated[serverId]);
-						changes.push(entity);
 						this.data[entity.id] = entity;
+						list[entity.id] = entity;
 					}
+					
+					go.flux.Dispatcher.dispatch(this.entity.name + "Updated", {
+						state: this.state,
+						list: list
+					});	
 				}
 				
-				this.state = response.newState;
-				
+				this.state = response.newState;				
 				this.saveState();
-								
-				go.flux.Dispatcher.dispatch(this.entity.name + "Updated", {
-					state: this.state,
-					list: changes
-				});				
-				
 				
 				if(response.destroyed) {
 					for(var i =0, l = response.destroyed.length; i < l; i++) {

@@ -12,14 +12,34 @@ use go\core\http\Response;
 use go\core\jmap\Capabilities;
 use go\core\validate\ErrorCode;
 
+function output($data = [], $status = 200, $statusMsg = null) {
+	Response::get()->setStatus($status, $statusMsg);
+	Response::get()->sendHeaders();
+
+	$data['debug'] = GO()->getDebugger()->getEntries();
+	Response::get()->output(json_encode($data));
+
+	exit();
+}
+	
+
 try {
 //Create the app with the config.php file
 	App::get();
+	
+	if(go\core\jmap\Request::get()->getMethod() == "DELETE") {
+		$state = new go\core\jmap\State();
+		$token = $state->getToken();
+		if(!$token) {
+			output([], 404);
+		}
+		$token->delete();
+		
+		output();		
+	}
 
 	if (!Request::get()->isJson()) {
-		Response::get()->setStatus(400, "Only Content-Type: application/json");
-		Response::get()->sendHeaders();
-		exit();
+		output([], 400, "Only Content-Type: application/json");	
 	}
 
 	$data = Request::get()->getBody();
@@ -98,15 +118,7 @@ try {
 		return false;
 	}
 
-	function output($data = [], $status = 200, $statusMsg = null) {
-		Response::get()->setStatus($status, $statusMsg);
-		Response::get()->sendHeaders();
-
-		$data['debug'] = GO()->getDebugger()->getEntries();
-		Response::get()->output(json_encode($data));
-
-		exit();
-	}
+	
 
 	if (!isset($data['loginToken']) && !isset($data['accessToken']) && !empty($data['username'])) {
 

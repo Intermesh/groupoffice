@@ -10,8 +10,6 @@ use go\core\module\Base;
 use go\modules\community\googleauthenticator\Module as Module3;
 use go\modules\community\notes\Module;
 
-
-
 if (!empty($_POST)) {
 
 	if ($_POST['password'] == $_POST['passwordConfirm']) {
@@ -23,7 +21,7 @@ if (!empty($_POST)) {
 				'username' => $_POST['username'],
 				'password' => $_POST['password'],
 				'email' => $_POST['email']
-						];
+		];
 
 		App::get()->getInstaller()->install($admin, [new Module(), new Module3()]);
 
@@ -78,7 +76,7 @@ if (!empty($_POST)) {
 		$cron->save();
 
 		Observable::cacheListeners();
-		
+
 		header("Location: finished.php");
 		exit();
 	}
@@ -100,12 +98,12 @@ require('header.php');
 				<label>Username</label>
 			</p>
 			<p>
-				<input type="password" name="password" pattern=".{6,}" value="<?= $_POST['password']; ?>" title="Minimum length is 6 chars" required />				
+				<input type="password" name="password" pattern=".{6,}" value="<?= $_POST['password'] ?? ""; ?>" title="Minimum length is 6 chars" required />				
 				<label>Password</label>
 			</p>
 
 			<p>
-				<input type="password" name="passwordConfirm" value="<?= $_POST['passwordConfirm']; ?>" required />
+				<input type="password" name="passwordConfirm" value="<?= $_POST['passwordConfirm'] ?? ""; ?>" required />
 				<label>Confirm</label>
 			</p>
 		</fieldset>

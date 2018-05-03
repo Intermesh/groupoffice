@@ -1023,12 +1023,17 @@ class GO{
 	 *
 	 * @param String $name Name of the translation variable
 	 * @param String $module Name of the module to find the translation
-	 * @param String $basesection Only applies if module is set to 'base'
+	 * @param String $package Only applies if module is set to 'base'
 	 * @param boolean $found Pass by reference to determine if the language variable was found in the language file.
 	 */
-	public static function t($name, $module='base', $basesection='common', &$found=false){
+	public static function t($name, $module='core', $package='core', &$found=false){
+		
+		//for backwards compatibility
+		if($module != 'core' && $package == 'core') {
+			$package = 'legacy';
+		}
 
-		return self::language()->getTranslation($name, $module, $basesection, $found);
+		return self::language()->getTranslation($name, $module, $package, $found);
 	}
 
 	/**

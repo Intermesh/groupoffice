@@ -20,7 +20,7 @@ try {
   //\GO::init();
 } catch(\PDOException $e) {
   
-  if(!\go\core\http\Request::get()->isXHR()) {
+  if(!\go\core\http\Request::get()->isXHR() && (empty($_REQUEST['r']) || $_REQUEST['r'] != 'maintenance/upgrade')) {
     header('Location: install/');				
     exit();
   } else
@@ -64,15 +64,15 @@ if(empty($_REQUEST['r']) && PHP_SAPI!='cli'){
 //		exit();
 //	}
 
-	//check for database upgrades
-	$mtime = \GO::config()->get_setting('upgrade_mtime');
-
-	if($mtime!=\GO::config()->mtime)
-	{
-		\GO::infolog("Running system update");
-		header('Location: '.\GO::url('maintenance/upgrade'));
-		exit();
-	}
+//	//check for database upgrades
+//	$mtime = \GO::config()->get_setting('upgrade_mtime');
+//
+//	if($mtime!=\GO::config()->mtime)
+//	{
+//		\GO::infolog("Running system update");
+//		header('Location: '.\GO::url('maintenance/upgrade'));
+//		exit();
+//	}
 }
 
 \GO::router()->runController();

@@ -69,10 +69,15 @@
     get: function (name) {
       
       name = name.toLowerCase();
+			
+			var entity = go.Entities.get(name);
+			if(!entity) {
+				return false;
+			}
      
       if(!stores[name]) {
         stores[name] = new go.data.EntityStore({
-          entity: go.Entities.get(name)
+          entity: entity
         });
       }
       

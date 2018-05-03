@@ -238,7 +238,9 @@ abstract class Property extends Model {
 		
 		//add dynamic relations		
 		foreach(static::getMapping()->getProperties() as $propName => $type) {
-			if(!in_array($propName, $props)) {
+			
+			//do property_exists because otherwise it will add protected properties too.
+			if(!property_exists(static::class, $propName) && !in_array($propName, $props)) {
 				$props[] = $propName;
 			}
 		}		

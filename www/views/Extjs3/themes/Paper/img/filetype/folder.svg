@@ -1,8 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" version="1.1">
- <rect style="opacity:0.2" width="50" height="32" x="7" y="24" rx="2.5" ry="2.5"/>
- <path style="fill:#3f3f3f" d="M 7,44.5 C 7,45.885 8.115,47 9.5,47 H 54.5 C 55.885,47 57,45.885 57,44.5 V 17.5 C 57,16.115 55.885,15 54.5,15 H 29 V 12.5 C 29,11.115 27.885,10 26.5,10 H 9.5 C 8.115,10 7,11.115 7,12.5"/>
- <rect style="opacity:0.2" width="50" height="32" x="7" y="22" rx="2.5" ry="2.5"/>
- <rect style="fill:#dcdcdc" width="44" height="20" x="10" y="18" rx="2.5" ry="2.5"/>
- <rect style="fill:#4f4f4f" width="50" height="32" x="7" y="23" rx="2.5" ry="2.5"/>
- <path style="opacity:0.1;fill:#ffffff" d="M 9.5,10 C 8.115,10 7,11.115 7,12.5 V 13.5 C 7,12.115 8.115,11 9.5,11 H 26.5 C 27.885,11 29,12.115 29,13.5 V 12.5 C 29,11.115 27.885,10 26.5,10 Z M 29,15 V 16 H 54.5 C 55.89,16 57,17.115 57,18.5 V 17.5 C 57,16.115 55.89,15 54.5,15 Z"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="50px" height="46px" viewBox="0 0 50 46" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.3 (51167) - http://www.bohemiancoding.com/sketch -->
+    <title>folder</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="folder" fill-rule="nonzero">
+            <rect id="Rectangle-path" fill="#000000" opacity="0.2" x="0" y="14" width="50" height="32" rx="2.5"></rect>
+            <path d="M0,34.5 C0,35.885 1.115,37 2.5,37 L47.5,37 C48.885,37 50,35.885 50,34.5 L50,7.5 C50,6.115 48.885,5 47.5,5 L22,5 L22,2.5 C22,1.115 20.885,0 19.5,0 L2.5,0 C1.115,0 0,1.115 0,2.5" id="Shape" fill="#797979"></path>
+            <rect id="Rectangle-path" fill="#000000" opacity="0.2" x="0" y="12" width="50" height="32" rx="2.5"></rect>
+            <rect id="Rectangle-path" fill="#D9D9D9" x="3" y="8" width="44" height="20" rx="2.5"></rect>
+            <rect id="Rectangle-path" fill="#797979" x="0" y="13" width="50" height="32" rx="2.5"></rect>
+            <path d="M2.5,0 C1.115,0 0,1.115 0,2.5 L0,3.5 C0,2.115 1.115,1 2.5,1 L19.5,1 C20.885,1 22,2.115 22,3.5 L22,2.5 C22,1.115 20.885,0 19.5,0 L2.5,0 Z M22,5 L22,6 L47.5,6 C48.89,6 50,7.115 50,8.5 L50,7.5 C50,6.115 48.89,5 47.5,5 L22,5 Z" id="Shape" fill="#FFFFFF" opacity="0.1"></path>
+        </g>
+    </g>
 </svg>

@@ -284,7 +284,8 @@ abstract class Entity extends Property {
    * @return string
    */
   public static function getClientName() {
-    return substr(static::class, strrpos(static::class, '\\') + 1);
+		$cls = static::class;
+    return substr($cls, strrpos($cls, '\\') + 1);
   }
 	
 	

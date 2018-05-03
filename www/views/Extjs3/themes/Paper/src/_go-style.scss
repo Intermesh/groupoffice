@@ -123,13 +123,7 @@ a {
 	}	
 }
 
-#user-menu {
-	span + span {
-		display:block;
-		height:dp(40);
-		border-radius: 50%;
-	}
-}
+
 .go-display-name {
 	@extend %font-subheading;
 	margin: dp(8) 0 dp(8) dp(16);
@@ -167,7 +161,7 @@ a {
 .go-header-left {
 	padding-left: dp(16);
 	position: absolute;
-	top: 0;
+	top: dp(12);
 	left: 0;
 }
 .go-header-right {
@@ -266,7 +260,7 @@ a {
 
 #mainNorthPanel {
 	height: dp(64);
-	padding-top:dp(12);
+	
 	position: relative;
 	color: white;
 	background-color: $cPrimary;
@@ -342,11 +336,11 @@ a {
 
 #secondary-menu {
 	padding-right: dp(56);
-	#start-menu-link {
+	#start-menu-link {		
 		display:inline-block;
 		text-decoration: none;
 		height:dp(40);
-		padding: dp(8);
+		padding: dp(20) dp(8) dp(8) dp(8);
 		color:color($primary, 700, 1);
 		&:hover,&:active { color: white; }
 	}
@@ -354,6 +348,7 @@ a {
 #search_query {
 	float:left;
 	display:inline-block;
+	padding-top: dp(12);
 	.search-field-wrap {
 		position:fixed;
 		display: block !important;
@@ -390,6 +385,8 @@ a {
 	}
 	
 }
+
+
 
 .go-search-panel {
 	//border: 1px solid color($foreground, "line");
@@ -476,18 +473,27 @@ button {
 	padding:0;
 	background: url('img/default-avatar.svg') no-repeat center center;
 	background-size:cover;
-	border: 2px solid white;
+	border: 1px solid white;
 	border-radius: 50%;
 }
+
+#user-menu {
+	span + span {
+		display:block;
+		height:dp(48);
+		border-radius: 50%;
+	}
+}
+
 .user-img {
 	@extend .avatar;
 	position:absolute;	
 	right: dp(16);
-	top:0;
+	top: dp(8);
 	z-index:15;
 	
-	width: dp(40);
-	height: dp(40);
+	width: dp(48);
+	height: dp(48);
 	&.login-avatar{
 		top: dp(16);
 	}	
