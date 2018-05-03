@@ -97,7 +97,9 @@ class Token extends Entity {
 			$this->setClient();
 			$this->setLoginToken();
 //			$this->internalRefresh();
-		}else{
+		}else if($this->isAuthenticated ()){
+			
+			$this->oldLogin();
 			
 			if($this->lastActiveAt < new \DateTime("-5 mins")) {
 				$this->lastActiveAt = new \DateTime();				

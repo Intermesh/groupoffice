@@ -62,16 +62,16 @@ go.modules.community.search.Panel = Ext.extend(Ext.Panel, {
 	search: function (q) {
 		
 		this.lastQ = q;
-		var filter = [], entities = [];
+		var filter = {}, entities = [];
 		
 		Ext.each(this.entityGrid.getSelectionModel().getSelections(), function (r) {
 			entities.push(r.data.entity);
 		}, this);
 		if(entities.length) {
-			filter.push({entities: entities});
+			filter.entities = entities;
 		}
 
-		filter.push({q: q});
+		filter.q = q;
 		
 		this.grid.store.removeAll();
 		

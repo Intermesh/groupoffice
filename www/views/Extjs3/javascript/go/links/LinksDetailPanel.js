@@ -110,10 +110,10 @@ go.links.LinksDetailPanel = Ext.extend(Ext.Panel, {
 
 		this.store.load({
 			params: {
-				filter: [{
+				filter: {
 						entity: dv.entity ? dv.entity : dv.entityStore.entity.name, //dv.entity exists on old DetailView or display panels
 						entityId: dv.model_id ? dv.model_id : dv.currentId //model_id is from old display panel
-					}]
+					}
 			}
 		});
 	}

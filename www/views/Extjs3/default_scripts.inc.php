@@ -22,7 +22,6 @@ use GO\Users\Model\CfSettingTab;
  * @version $Id: default_scripts.inc.php 22455 2018-03-06 15:17:33Z mschering $
  * @author Merijn Schering <mschering@intermesh.nl>
  */
-$settings['pspellSupport'] = function_exists('pspell_new') && !empty(GO::config()->spell_check_enabled);
 $settings['max_rows_list'] = 50;
 
 $settings['config']['theme'] = GO::config()->theme;
@@ -49,45 +48,32 @@ $settings['config']['remember_login'] = GO::config()->remember_login;
 $settings['config']['encode_callto_link'] = GO::config()->encode_callto_link;
 $settings['config']['login_message'] = GO::config()->login_message;
 
-
-//TODO: refactor this. It uses the session to find the token when browser is reloaded.
-//if(\GO::user() && !GO()->getUser()) {  
-//  $token = Token::find()->where(['accessToken' => GO::session()->values['accessToken']])->single();
-//  if($token) {
-//    GO()->getAuthState()->setToken($token);
-//  }
-//}
  
-$user_id = GO()->getUser() ? GO()->getUser()->id : 0;
 $settings['state_index'] = 'go';
 $settings['language'] = GO::language()->getLanguage();
 $settings['show_contact_cf_tabs'] = array();
-
-$user_id = GO::user() ? GO::user()->id : 0;
-
-$settings['state'] = State::model()->getFullClientState($user_id);
 $settings['modules'] = GO::view()->exportModules();
 
 
-if (GO::modules()->addressbook) {
-	// Add the addresslist tab to the global settings panel
-	$settings['show_addresslist_tab'] = GO::config()->get_setting('globalsettings_show_tab_addresslist');
-
-	if (GO::modules()->customfields) {
-		$settings['show_contact_cf_tabs'] = array();
-
-		$tabsEnabledStmt = CfSettingTab::model()->find();
-		$tabsEnabled = $tabsEnabledStmt->fetchAll(PDO::FETCH_COLUMN);
-
-		// Add the contact customfield tabs to the global settings panel
-		$contactClassName = Contact::model()->className();
-		$customfieldsCategories = Category::model()->findByModel($contactClassName);
-		foreach ($customfieldsCategories as $cfc) {
-			if (in_array($cfc->id, $tabsEnabled))
-				$settings['show_contact_cf_tabs'][$cfc->id] = true;
-		}
-	}
-}
+//if (GO::modules()->addressbook) {
+//	// Add the addresslist tab to the global settings panel
+//	$settings['show_addresslist_tab'] = GO::config()->get_setting('globalsettings_show_tab_addresslist');
+//
+//	if (GO::modules()->customfields) {
+//		$settings['show_contact_cf_tabs'] = array();
+//
+//		$tabsEnabledStmt = CfSettingTab::model()->find();
+//		$tabsEnabled = $tabsEnabledStmt->fetchAll(PDO::FETCH_COLUMN);
+//
+//		// Add the contact customfield tabs to the global settings panel
+//		$contactClassName = Contact::model()->className();
+//		$customfieldsCategories = Category::model()->findByModel($contactClassName);
+//		foreach ($customfieldsCategories as $cfc) {
+//			if (in_array($cfc->id, $tabsEnabled))
+//				$settings['show_contact_cf_tabs'][$cfc->id] = true;
+//		}
+//	}
+//}
 
 $settings['upload_quickselect'] = GO::config()->upload_quickselect;
 $settings['html_editor_font'] = GO::config()->html_editor_font;
@@ -106,10 +92,11 @@ if(GO::config()->debug) {
 {
   $cacheFile = \go\core\App::get()->getDataFolder()->getFolder('clientscripts')->create()->getFile('all.js');
 }
+
 //echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' => \GO::language()->getLanguage()]) . '"></script>';
 echo '<script type="text/javascript" src="' . GO::config()->url . 'views/Extjs3/ext/adapter/ext/ext-base-debug.js"></script>';
 echo '<script type="text/javascript" src="' . GO::config()->url . 'views/Extjs3/ext/ext-all-debug.js"></script>';
-echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' => \GO::language()->getLanguage()]) . '"></script>';
+echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' => \go\core\Language::get()->getIsoCode()]) . '"></script>';
   
 if ($cacheFile->exists()) {
 	echo '<script type="text/javascript" src="' . GO::url('core/clientScripts', ['mtime' => GO::config()->mtime]) . '"></script>';
@@ -243,10 +230,6 @@ if ($cacheFile->exists()) {
     fclose($fp);
   }
   echo '<script type="text/javascript" src="' . GO::url('core/clientScripts', ['mtime' => GO::config()->mtime, 'lang' => \GO::language()->getLanguage()]) . '"></script>';
-}
-
-if (GO::user()) {
-	echo '<script type="text/javascript" src="' . GO::url('core/moduleScripts') . '"></script>';
 }
 ?>
 

@@ -685,14 +685,16 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			$folder = \GO\Files\Model\Folder::model()->findByPk($params['folder_id']);
 		}
 		
+		if(!$folder)
+			throw new \Exception('No Folder found with id '.$params['folder_id']);
+	
+		
 		
 		// if it is the users folder tha get the shared folders
 		if($folder->name == 'users' && $folder->parent_id == 0) {
 			return $this->_listShares($params);
 		}
 		
-		if(!$folder)
-			throw new \Exception('No Folder found with id '.$params['folder_id']);
 		
 		$user = $folder->quotaUser;
 		$this->_listFolderPermissionLevel=$folder->permissionLevel;
