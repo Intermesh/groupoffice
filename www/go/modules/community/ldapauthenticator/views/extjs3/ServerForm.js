@@ -1,4 +1,4 @@
-go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.FormWindow, {
+go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 	title: t('Server profile', 'ldapauth'),
 	entityStore: go.Stores.get("LdapAuthServer"),
 	width: dp(400),

@@ -1,4 +1,4 @@
-go.modules.community.imapauthenticator.ServerForm = Ext.extend(go.form.FormWindow, {
+go.modules.community.imapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 	title: t('Server profile', 'imapauth'),
 	entityStore: go.Stores.get("ImapAuthServer"),
 	width: dp(400),

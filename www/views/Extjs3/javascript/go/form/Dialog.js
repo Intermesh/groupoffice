@@ -1,4 +1,4 @@
-go.form.FormWindow = Ext.extend(go.Window, {
+go.form.Dialog = Ext.extend(go.Window, {
 	autoScroll: true,
 	width: 400,
 	modal: true,
@@ -28,7 +28,7 @@ go.form.FormWindow = Ext.extend(go.Window, {
 				scope: this
 			}];
 
-		go.form.FormWindow.superclass.initComponent.call(this);
+		go.form.Dialog.superclass.initComponent.call(this);
 
 		if (this.formValues) {
 			this.formPanel.form.setValues(this.formValues);
