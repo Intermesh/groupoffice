@@ -416,7 +416,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				var topPanel = new Ext.Panel({
 					id:"mainNorthPanel",
 					region: 'north',
-					html:  '<div class="go-header-left"><div id="go-logo" title="Group-Office"></div></div>\
+					html:  '<div class="go-header-left"><div id="go-logo" title="'+GO.settings.config.product_name+'"></div></div>\
 					<div class="go-header-right">\
 						<div id="secondary-menu">\
 							<div id="search_query"></div>\
@@ -468,7 +468,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 						iconCls: 'ic-forum',
 						text: t("Community forum"),
 						handler: function () {
-							var win = window.open('http://www.group-office.com/forum/');
+							var win = window.open('https://www.group-office.com/forum/');
 							win.focus();
 						},
 						scope: this
@@ -524,7 +524,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				helpMenu.addItem('-');
 				helpMenu.addItem({
 					iconCls: 'ic-info',
-					text: t("About Group-Office").replace('{product_name}', GO.settings.config.product_name),
+					text: t("About {product_name}").replace('{product_name}', GO.settings.config.product_name),
 					handler: function () {
 						if (!this.aboutDialog)
 						{
