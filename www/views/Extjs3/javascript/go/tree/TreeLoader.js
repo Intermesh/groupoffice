@@ -44,7 +44,8 @@ go.tree.TreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 //						id: entity.id,
 						entityId: entity.id||null,
 						entity: entity,
-						leaf: !entity.hasChildren,
+//						leaf: !entity.hasChildren,
+						expanded: !entity.hasChildren,
 						text: entity.name //TODO this should be 
 					});
 				});
