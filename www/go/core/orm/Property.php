@@ -223,14 +223,18 @@ abstract class Property extends Model {
 	public final static function getMapping() {
 
 		$cls = static::class;
-		if (!isset(self::$mappings[$cls])) {
-			self::$mappings[$cls] = static::defineMapping();			
-			if(!static::fireEvent(self::EVENT_MAPPING, self::$mappings[$cls])) {
+		
+		$mapping = GO()->getCache()->get('mapping-' . $cls);
+		if(!$mapping) {			
+			$mapping = static::defineMapping();			
+			if(!static::fireEvent(self::EVENT_MAPPING, $mapping)) {
 				throw new \Exception("Mapping event failed!");
 			}
+			
+			GO()->getCache()->set('mapping-' . $cls, $mapping);
 		}
 
-		return self::$mappings[$cls];
+		return $mapping;
 	}
 	
 	protected static function getReadableProperties() {

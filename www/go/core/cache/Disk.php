@@ -50,7 +50,6 @@ class Disk implements CacheInterface {
 			return true;
 		}
 
-		$key = File::stripInvalidChars($key, '-');		
 		if($persist) {
 			$file = $this->folder->getFile($key);			
 			if(!$file->putContents(serialize($value))) {
@@ -69,8 +68,6 @@ class Disk implements CacheInterface {
 	 */
 	public function get($key) {
 
-		$key = File::stripInvalidChars($key, '-');
-		
 		if(isset($this->cache[$key])) {
 			return $this->cache[$key];
 		}

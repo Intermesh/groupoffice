@@ -45,6 +45,10 @@ class Router implements RouterInterface {
 		App::get()->getDebugger()->setSection(Debugger::SECTION_ROUTER);
 
 		$body = Request::get()->getBody();
+		
+		if(!is_array($body)) {
+			throw new Exception(400, 'Bad request');
+		}
 
 		App::get()->debug("Body fetched");
 
