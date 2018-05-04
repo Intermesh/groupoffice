@@ -39,8 +39,8 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 			this.browser.goto(this.getPath(node));
 		},this);
 	
-		this.on('nodedragover',function(dragOverEvent){			
-			console.log(dragOverEvent.target);
+		this.on('nodedrop',function(dropEvent){
+			this.moveFolder(dropEvent.dropNode,dropEvent.target);
 		},this);
 		
 		this.browser.on('pathchanged', function(){
@@ -57,6 +57,54 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 		
 		this.setRootNode(root);
 		this.getLoader().load(root);
+	},
+	
+	/**
+	 * 
+	 * @param Ext.tree.AsyncTreeNode nodeToMove
+	 * @param Ext.tree.AsyncTreeNode targetNode
+	 * @return {undefined}
+	 */
+	moveFolder : function(nodeToMove,targetNode){
+		
+		var nodeToUpdateId = nodeToMove.attributes.entityId;
+		
+		var params = {}, me=this, newParentId=targetNode.attributes.entityId;
+		
+		// Workaround for myfiles
+		if(newParentId === 'my-files'){
+			newParentId = go.User.storage.rootFolderId;
+		}
+		
+		params.update = {};
+		params.update[nodeToUpdateId] = {
+			parentId:newParentId
+		};
+
+		go.Stores.get("Node").set(params, function (options, success, response) {
+			
+			var saved = response.updated || {};
+			if (saved[nodeToUpdateId]) {				
+				this.fireEvent("save", this, params.update[nodeToUpdateId]);
+			} else {
+				//something went wrong
+				var notSaved = response.notUpdated || {};
+				if (!notSaved[nodeToUpdateId]) {
+					notSaved[nodeToUpdateId] = {type: "unknown"};
+				}
+
+				switch (notSaved[nodeToUpdateId].type) {
+					case "forbidden":
+						Ext.MessageBox.alert(t("Access denied"), t("Sorry, you don't have permissions to update this item"));
+						break;
+
+					default:
+						Ext.MessageBox.alert(t("Error"), t("Sorry, something went wrong. Please try again."));
+						break;
+				}
+			}
+
+		});
 	},
 	
 	/**
