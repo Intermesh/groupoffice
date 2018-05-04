@@ -166,6 +166,7 @@ try {
 	if ($token->isAuthenticated()) {    
     $authState = new \go\core\jmap\State();
     $authState->setToken($token);
+		GO()->setAuthState($authState);
     $response = $authState->getSession();
     
     $response['accessToken'] = $token->accessToken;
