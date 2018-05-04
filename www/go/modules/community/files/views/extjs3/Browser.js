@@ -11,10 +11,10 @@
  */
 go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 	useRouter: false,
-	path: [],
+	path: null,
 	currentRootNode: 'my-files', // (my-files, shared-with-me, bookmarks, etc..)
 	store: null, // only used by grid
-	rootNodes: [],
+	rootNodes: null,
 
 	/**
 	 * Call open() will change route, will call nav()
@@ -27,6 +27,7 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 			"pathchanged" : true // post browsing
 		});
 		this.listeners = config.listeners;
+		this.rootNodes = [];
 		this.rootNodes.push({
 			text: t('My files'),
 			iconCls:'ic-home',
