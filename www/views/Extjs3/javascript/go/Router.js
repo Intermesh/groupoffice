@@ -148,7 +148,7 @@ GO.mainLayout.on("boot", function() {
 	go.Router.add(function() {	
 		if(go.User.isLoggedIn()) {
 			
-			if(!go.Modules.isAvailable("community", GO.settings.start_module)) {
+			if(!go.Modules.isAvailable("legacy", GO.settings.start_module)) {
 				//console.log(GO.mainLayout.tabPanel.items.first());
 				GO.settings.start_module = GO.mainLayout.tabPanel.items.first().module;
 			}
