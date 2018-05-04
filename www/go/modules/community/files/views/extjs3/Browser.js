@@ -74,6 +74,47 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 		}
 	},
 	
+	
+	/**
+	 * Add a rootNode to the browser
+	 * 
+	 * @param nodeEntity object
+	 * @param boolean clear the current rootNode array
+	 * 
+	 */
+	addRootNodeEntity : function(nodeEntity, clearExisting){
+		
+		var nodeConfig = {
+			iconCls:'ic-folder',
+			text: nodeEntity.name,
+			entityId:nodeEntity.id,
+			draggable:false,
+			params:{
+				filter: {
+					parentId: nodeEntity.id
+				}
+			}
+		};
+
+		this.addRootNode(nodeConfig,clearExisting);
+	},
+	
+	/**
+	 * Add a rootNode to the browser
+	 * 
+	 * @param {} config object of a rootNode
+	 * @param boolean clear the current rootNode array
+	 * 
+	 */
+	addRootNode : function(nodeConfig, clearExisting){
+		
+		if(clearExisting){
+			this.rootNodes = [];
+		}
+		
+		this.rootNodes.push(nodeConfig);
+	},
+	
 	/**
 	 * Set the current Path for this browser
 	 * 

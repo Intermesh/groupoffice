@@ -17,7 +17,7 @@ go.modules.community.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 			tooltip:t("Browse files..."),
 			handler: function(){
 				var browseWindow = new go.modules.community.files.BrowseWindow();
-				browseWindow.show();
+				browseWindow.load(this.folderId).show();
 			},
 			scope: this
 		});

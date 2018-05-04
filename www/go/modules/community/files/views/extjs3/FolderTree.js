@@ -1,6 +1,8 @@
 go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
+	rootNodeEntity:null,
 	animate: true,
 	enableDD:true,
+	folderSelectMode:false, // Mode to make from the tree a folder select component.
 	dropConfig: {
 		appendOnly:true
 	},
@@ -47,13 +49,39 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 			this.openPath(this.browser.getPath(true));
 		},this);
 		
-		var root = new Ext.tree.TreeNode({
-			expanded: true,
-			text: 'ROOT',
-			entityId:'ROOT', // Needed so it can be handled exactly as other nodes
-			draggable: false,
-			children: this.browser.rootNodes
-		});
+		this.initRootNode(this.rootNodeEntity);
+	},
+	
+	initRootNode : function(nodeEntity){
+		
+		var rootNodeConfig = {};
+
+		if(nodeEntity){
+			rootNodeConfig = {
+				iconCls:'ic-folder',
+				text: nodeEntity.name,
+				entityId:nodeEntity.id,
+				draggable:false,
+				params:{
+					filter: {
+						parentId: nodeEntity.id
+					}
+				}
+			};
+			
+			this.rootVisible=true; // Set root visible
+			
+		} else {
+			rootNodeConfig = {
+				expanded: true,
+				text: 'ROOT',
+				entityId:'ROOT', // Needed so it can be handled exactly as other nodes
+				draggable: false,
+				children:this.browser.rootNodes
+			};
+		}
+
+		var root = new Ext.tree.TreeNode(rootNodeConfig);
 		
 		this.setRootNode(root);
 		this.getLoader().load(root);
@@ -132,7 +160,14 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 	 * @param array path
 	 */
 	openPath : function(path){
-		var treePath = this.pathSeparator+'ROOT'+this.pathSeparator+path.join(this.pathSeparator);
+		var treePath = this.pathSeparator;
+		
+		if(this.getRootNode().attributes.entityId === "ROOT"){
+			treePath += 'ROOT'+this.pathSeparator+path.join(this.pathSeparator);
+		} else {
+			treePath += path.join(this.pathSeparator);
+		}
+		
 		this.expandPath(treePath,'entityId');
 	}
 });
