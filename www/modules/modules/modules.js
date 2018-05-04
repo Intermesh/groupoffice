@@ -128,9 +128,9 @@ GO.modules.MainPanel = function(config) {
 						if (result.aclId) {
 							record.set('aclId', result.aclId);
 							record.set('id', result.id);
-							record.set("enabled", true);
+							record.set("enabled", checked);
 
-							if (record.data.enabled) {
+							if (checked) {
 								this.showPermissions(record.data.name, t(record.data.name, record.data.name), record.data.aclId);
 								//this.store.load();
 							}
@@ -170,8 +170,8 @@ GO.modules.MainPanel = function(config) {
 			renderer: function(v) {
 				return v.ucFirst();
 			}
-		},
-		actions
+		}
+//	,	actions
 	]);
 	
 	config.plugins = [actions];
