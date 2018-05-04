@@ -49,6 +49,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 			//If no entity was returned the entity store will load it and fire the "changes" event. This dialog listens to that event.
 			this.actionStart();
 		}
+		
+		return this;
 	},
 	
 	onChanges : function(entityStore, added, changed, destroyed) {
