@@ -1032,6 +1032,10 @@ class GO{
 		if($module != 'core' && $package == 'core') {
 			$package = 'legacy';
 		}
+		
+		if($package == null) {
+			$package = 'legacy';
+		}
 
 		return self::language()->getTranslation($name, $module, $package, $found);
 	}

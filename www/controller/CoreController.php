@@ -981,7 +981,8 @@ All rights reserved.");
 		$modules = GO::modules()->getAllModules(true);
 		
 		foreach($modules as $module){
-			$store->addRecord(array('id'=>$module->name,'name'=>$module->moduleManager->name()));
+			$translated = GO::t("name",  $module->name, $module->package);
+			$store->addRecord(array('id'=>$module->name,'name'=>$translated));
 		}
 		
 		return $store->getData();
