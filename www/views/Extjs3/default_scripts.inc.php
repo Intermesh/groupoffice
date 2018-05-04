@@ -109,7 +109,7 @@ if ($cacheFile->exists()) {
 
 	$scripts[] = new File(GO::config()->root_path . 'views/Extjs3/javascript/namespaces.js');
 	$data = file_get_contents(GO::config()->root_path . 'views/Extjs3/javascript/scripts.txt');
-	$lines = explode("\n", $data);
+	$lines = array_map('trim', explode("\n", $data));
 	foreach ($lines as $line) {
 		if (!empty($line)) {
 			$scripts[] = new File(GO::config()->root_path . $line);
@@ -146,7 +146,7 @@ if ($cacheFile->exists()) {
 
 			if (file_exists($scriptsFile)) {
 				$data = file_get_contents($scriptsFile);
-				$lines = explode("\n", $data);
+				$lines = array_map('trim', explode("\n", $data));
 				foreach ($lines as $line) {
 					if (!empty($line)) {
 						$scripts[] = new File(GO::config()->root_path . $prefix . trim($line));
@@ -169,6 +169,7 @@ if ($cacheFile->exists()) {
   }
 
 	$rootFolder = new Folder(GO::config()->root_path);
+	
 	foreach ($scripts as $script) {
 
 		if (GO::config()->debug) {

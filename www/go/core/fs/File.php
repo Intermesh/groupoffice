@@ -175,6 +175,7 @@ class File extends FileSystemObject {
 	 * @param string
 	 */
 	public function getContents() {
+		
 		return file_get_contents($this->getPath());
 	}
 
