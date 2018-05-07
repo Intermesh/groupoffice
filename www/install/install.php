@@ -10,6 +10,8 @@ use go\core\module\Base;
 use go\modules\community\googleauthenticator\Module as Module3;
 use go\modules\community\notes\Module;
 
+$passwordMatch = true;
+				
 if (!empty($_POST)) {
 
 	if ($_POST['password'] == $_POST['passwordConfirm']) {
@@ -79,6 +81,9 @@ if (!empty($_POST)) {
 
 		header("Location: finished.php");
 		exit();
+	} else
+	{
+		$passwordMatch = false;
 	}
 }
 
@@ -90,21 +95,29 @@ require('header.php');
 		<fieldset>
 			<h2>Create an administrator account</h2>
 			<p>
-				<input type="email" name="email" value="<?= $_POST['email'] ?? ""; ?>" required />
 				<label>E-mail</label>
+				<input type="email" name="email" value="<?= $_POST['email'] ?? ""; ?>" required />
+				
 			</p>
 			<p>
-				<input type="text" name="username" value="<?= $_POST['username'] ?? "admin"; ?>" required />
 				<label>Username</label>
+				<input type="text" name="username" value="<?= $_POST['username'] ?? "admin"; ?>" required />				
 			</p>
+			
+			<?php
+			if(!$passwordMatch) {
+				echo '<p class="error">The passwords didn\'t match</p>';
+			}
+			?>
+			
 			<p>
-				<input type="password" name="password" pattern=".{6,}" value="<?= $_POST['password'] ?? ""; ?>" title="Minimum length is 6 chars" required />				
 				<label>Password</label>
+				<input type="password" name="password" pattern=".{6,}" value="<?= $_POST['password'] ?? ""; ?>" title="Minimum length is 6 chars" required />								
 			</p>
 
 			<p>
-				<input type="password" name="passwordConfirm" value="<?= $_POST['passwordConfirm'] ?? ""; ?>" required />
 				<label>Confirm</label>
+				<input type="password" name="passwordConfirm" pattern=".{6,}" title="Minimum length is 6 chars"  value="<?= $_POST['passwordConfirm'] ?? ""; ?>" required />				
 			</p>
 		</fieldset>
 

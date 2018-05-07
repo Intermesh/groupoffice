@@ -145,7 +145,9 @@ GO.modules.MainPanel = function(config) {
 	
 	var actions = this.initRowActions();
 
-	config.cm = new Ext.grid.ColumnModel([
+
+	
+	var cols = [
 		{
 			header: t("Name"),
 			dataIndex: 'name',
@@ -171,9 +173,13 @@ GO.modules.MainPanel = function(config) {
 				return v.ucFirst();
 			}
 		}
-//	,	actions
-	]);
+	];
 	
+	if(GO.settings.config.debug) {
+		cols.push(actions);
+	}
+	config.cm = new Ext.grid.ColumnModel(cols);
+		
 	config.plugins = [actions];
 	config.clicksToEdit = 1;
 	config.loadMask=true;
@@ -301,7 +307,7 @@ Ext.extend(GO.modules.MainPanel,Ext.grid.EditorGridPanel, {
 					return;
 				}
 				
-				Ext.MessageBox.confirm(t("Delete"), t("Are you sure you want to delete {item}?", null, {item: record.data.name}), function(cmd) {
+				Ext.MessageBox.confirm(t("Delete"), t("All data will be lost! Are you sure you want to delete module '{item}'?").replace('{item}', record.data.name), function(cmd) {
 					console.log(cmd);
 					if(cmd != 'yes') {
 						return;

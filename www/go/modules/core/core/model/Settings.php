@@ -2,7 +2,6 @@
 namespace go\modules\core\core\model;
 
 use go\core;
-use go\core\db\Query;
 
 class Settings extends core\Settings {
 
@@ -15,6 +14,10 @@ class Settings extends core\Settings {
 		
 		if(!isset($this->URL)) {
 			$this->URL = $this->detectURL();
+		}
+		
+		if(!isset($this->language)) {
+			$this->language = core\Language::get()->getIsoCode();
 		}
 	}
 	
@@ -50,7 +53,7 @@ class Settings extends core\Settings {
 	 * 
 	 * @var string  eg. "en"
 	 */
-	public $language = 'en';
+	public $language;
 	
 	/**
 	 * The title of the Group-Office environment

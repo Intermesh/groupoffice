@@ -179,25 +179,24 @@ require('header.php');
 				}
 				?>
 				<p>
-					<input type="text" name="dbUsername" value="<?=$_POST['dbUsername'] ?? "groupoffice"; ?>" required />
 					<label>Database user</label>
+					<input type="text" name="dbUsername" value="<?=$_POST['dbUsername'] ?? "groupoffice"; ?>" required />
 				</p>
 				<p>
-					<input type="password" name="dbPassword" value="<?=$_POST['dbPassword'];?>" required  />
 					<label>Database password</label>
-				
+					<input type="password" name="dbPassword" value="<?=$_POST['dbPassword'];?>" required  />
 				</p>
 				<p>
-					<input type="text" name="dbName" value="<?=$_POST['dbName'] ?? "groupoffice";?>" required />
 					<label>Database name</label>
+					<input type="text" name="dbName" value="<?=$_POST['dbName'] ?? "groupoffice";?>" required />					
 				</p>
 				<p>
-					<input type="text" name="dbHostname" value="<?=$_POST['dbHostname'] ?? "localhost";?>"  required />
 					<label>Database hostname</label>
+					<input type="text" name="dbHostname" value="<?=$_POST['dbHostname'] ?? "localhost";?>"  required />					
 				</p>
 				<p>
-					<input type="text" name="dbPort" value="<?=$_POST['dbPort'] ?? 3306;?>" required />
 					<label>Database port</label>
+					<input type="text" name="dbPort" value="<?=$_POST['dbPort'] ?? 3306;?>" required />					
 				</p>
 			</fieldset>
 
