@@ -49,6 +49,8 @@ class Disk implements CacheInterface {
 		if ($key === false) {
 			return true;
 		}
+		
+		$key = str_replace('\\', '-', $key);
 
 		if($persist) {
 			$file = $this->folder->getFile($key);			
@@ -67,6 +69,8 @@ class Disk implements CacheInterface {
 	 * @return mixed null if it doesn't exist
 	 */
 	public function get($key) {
+		
+		$key = str_replace('\\', '-', $key);
 
 		if(isset($this->cache[$key])) {
 			return $this->cache[$key];

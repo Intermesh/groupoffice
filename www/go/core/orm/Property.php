@@ -224,14 +224,16 @@ abstract class Property extends Model {
 
 		$cls = static::class;
 		
-		$mapping = GO()->getCache()->get('mapping-' . $cls);
+		$cacheKey = 'mapping-' . str_replace('\\', '-', $cls);
+		
+		$mapping = GO()->getCache()->get($cacheKey);
 		if(!$mapping) {			
 			$mapping = static::defineMapping();			
 			if(!static::fireEvent(self::EVENT_MAPPING, $mapping)) {
 				throw new \Exception("Mapping event failed!");
 			}
 			
-			GO()->getCache()->set('mapping-' . $cls, $mapping);
+			GO()->getCache()->set($cacheKey, $mapping);
 		}
 
 		return $mapping;

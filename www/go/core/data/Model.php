@@ -31,7 +31,7 @@ abstract class Model implements ArrayableInterface, \JsonSerializable {
 	 */
 	protected static function getReadableProperties() {
 
-		$cacheKey = static::class . '-getReadableProperties';
+		$cacheKey = 'getReadableProperties-' . str_replace('\\', '-', static::class);
 		
 		$ret = App::get()->getCache()->get($cacheKey);
 		if ($ret) {
