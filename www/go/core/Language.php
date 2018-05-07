@@ -31,7 +31,11 @@ class Language extends Singleton {
 		return $this->isoCode;
 	}
 	
-	public function setLanguage($isoCode) {
+	public function setLanguage($isoCode = null) {
+		
+		if(!isset($isoCode)) {
+			$isoCode = $this->getBrowserLanguage();
+		}
 		
 		if(!$this->hasLanguage($isoCode)) {
 			throw new \Exception("Invalid language given ".$isoCode);

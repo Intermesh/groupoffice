@@ -246,7 +246,7 @@ class ModuleController extends AbstractJsonController{
 				}
 			}
 			
-			$translated = GO::t($module->name, $module->name);
+			$translated = GO::t("name",  $module->name, $module->package);
 			
 			// Module permissions only support read permission and manage permission:
 			if (Acl::hasPermission($permissionLevel,Acl::CREATE_PERMISSION))

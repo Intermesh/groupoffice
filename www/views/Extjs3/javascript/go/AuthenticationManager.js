@@ -199,10 +199,9 @@
 
 			this.fireEvent("authenticated", this, result);
 			
+			
+			
 			GO.mainLayout.onAuthentication();
-			GO.mainLayout.on('render', function () {
-				go.Router.goto(go.Router.pathBeforeLogin);
-			}, this, {single: true});
 
 		}
 	});

@@ -125,9 +125,9 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 				var sm = this.treePanel.getSelectionModel();
 				var node = sm.getSelectedNode();
 
-				var t = new Ext.Template(t("Are you sure you want to mark all messages in folder '{name}' as read?", "email"));
+				var tpl = new Ext.Template(t("Are you sure you want to mark all messages in folder '{name}' as read?", "email"));
 
-				Ext.MessageBox.confirm(t("Confirm"), t.applyTemplate({name:node.attributes.text}), function(btn){
+				Ext.MessageBox.confirm(t("Confirm"), tpl.applyTemplate({name:node.attributes.text}), function(btn){
 					if(btn=='yes')
 					{
 						GO.request({
@@ -244,7 +244,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 				}
 			}
 		}),'-',this.shareBtn = new Ext.menu.Item({
-			iconCls:'em-btn-share-mailbox ',
+			iconCls:'ic-share',
 			text: t("Share", "email"),
 			handler:function(){
 				if(!this.imapAclDialog)

@@ -65,7 +65,9 @@ GO.DetailView = Ext.extend(Ext.Panel,{
 	},
 	
 	reload: function() {
-		this.load(this.currentId);
+		if(this.currentId) {
+			this.load(this.currentId);
+		}
 	},
 	// old way
 	load : function(id, reload)
