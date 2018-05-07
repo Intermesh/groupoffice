@@ -244,7 +244,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 				}
 			}
 		}),'-',this.shareBtn = new Ext.menu.Item({
-			iconCls:'em-btn-share-mailbox ',
+			iconCls:'ic-share',
 			text: t("Share", "email"),
 			handler:function(){
 				if(!this.imapAclDialog)
