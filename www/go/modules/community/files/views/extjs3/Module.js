@@ -17,3 +17,31 @@ go.Preview = function(file) {
 	}
 	this.preview.show(file);
 }
+
+// ### GLOBAL FUNCTIONS ###
+
+
+go.modules.community.files.bookmark = function(nodes){
+	
+	var params = {
+		update:{}
+	};
+	
+//	for()
+//	
+//	params.update[id]
+	
+	
+}
+
+go.modules.community.files.lock = function(nodes){
+	
+}
+
+go.modules.community.files.email = function(nodes){
+	
+}
+
+go.modules.community.files.move = function(nodes, copy){
+	
+}

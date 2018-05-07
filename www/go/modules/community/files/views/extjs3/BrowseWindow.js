@@ -12,7 +12,7 @@ go.modules.community.files.BrowseWindow = Ext.extend(Ext.Window, {
 		
 		this.browser = new go.modules.community.files.Browser({
 			store: new go.data.Store({
-				fields: ['id', 'name', 'size','isDirectory', {name: 'createdAt', type: 'date'}, {name: 'modifiedAt', type: 'date'}, 'aclId'],
+				fields: ['id', 'name', 'size','isDirectory','bookmarked','storageId', {name: 'createdAt', type: 'date'}, {name: 'modifiedAt', type: 'date'}, 'aclId'],
 				baseParams: {
 					filter:{isHome:true}
 				},

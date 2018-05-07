@@ -8,6 +8,7 @@ SideNav.js
 NodeDetail.js
 NodeGrid.js
 NodeTile.js
+FolderTreeNodeUI.js
 CenterPanel.js
 FolderTree.js
 UsagePanel.js

@@ -1,22 +1,25 @@
 <?php
 namespace go\modules\community\files\model;
 
+use GO;
 use go\core\acl\model;
 use go\core\db\Query;
+use go\core\orm\SearchableTrait;
+use go\core\util\DateTime;
 
 class Node extends model\AclEntity {
 
 	//use \go\core\orm\CustomFieldsTrait;
-	use \go\core\orm\SearchableTrait;
+	use SearchableTrait;
 	
 	public $name;
 	public $blobId;
 	/**
-	 * @var \go\core\util\DateTime
+	 * @var DateTime
 	 */
 	public $createdAt;
 	/**
-	 * @var \go\core\util\DateTime
+	 * @var DateTime
 	 */
 	public $modifiedAt;
 	public $ownedBy;
@@ -27,10 +30,9 @@ class Node extends model\AclEntity {
 	protected $contentType;
 	
 	public $comments;
-	public $isBookmarked;
 	public $bookmarked;
 	/**
-	 * @var \go\core\util\DateTime
+	 * @var DateTime
 	 */
 	public $touchedAt;
 	public $storageId;
@@ -41,8 +43,37 @@ class Node extends model\AclEntity {
 	protected static function defineMapping() {		
 		return parent::defineMapping()
 			->addTable('files_node', 'node')
-		   ->setQuery((new Query)->join('core_blob', 'blob', 'node.blobId=blob.id', 'LEFT')->select('blob.contentType, blob.size'));
+		   ->setQuery((new Query)
+							 ->join('core_blob', 'blob', 'node.blobId=blob.id', 'LEFT')
+							 ->join('files_node_user', 'nodeUser', 'node.id=nodeUser.nodeId AND nodeUser.userId='.GO()->getUser()->id.'', 'LEFT')
+							 ->select('blob.contentType, blob.size, nodeUser.bookmarked, nodeUser.touchedAt'));
 //			->addTable('core_blob', 'blob', ['blobId' => 'id'], ['contentType','size']);
+	}
+	
+	/**
+	 * @todo entity should be smart on the joins
+	 */
+	protected function init() {
+		parent::init();
+		
+		
+		if(isset($this->touchedAt)) {
+			$this->touchedAt = new DateTime($this->touchedAt);
+		}
+		
+		$this->bookmarked = boolval($this->bookmarked);
+	}
+	
+	/**
+	 * Set bookmarked for the current user
+	 * 
+	 * @TODO This function should not be needed when the join in "defineMapping" is changed in a "addTable" property.
+	 * 
+	 * @param bool $val
+	 */
+	public function setBookmarked($val) {
+		$this->bookmarked = $val;
+		GO()->getDbConnection()->replace('files_node_user', ['bookmarked' => $this->bookmarked], ['userId' => GO()->getUser()->id, 'nodeId' => $this->nodeId])->execute();
 	}
 	
 	public function getContentType() {
@@ -66,7 +97,7 @@ class Node extends model\AclEntity {
 	}
 
 	protected function getSearchDescription() {
-		return $this->createdAt->format(\GO()->getUser()->date_format);
+		return $this->createdAt->format(GO()->getUser()->date_format);
 	}
 
 	protected function getSearchName() {
@@ -85,11 +116,9 @@ class Node extends model\AclEntity {
 	
 	public static function filter(Query $query, array $filter) {
 		
-		$query->join('files_node_user', 'nodeUser', 'node.id=nodeUser.nodeId AND nodeUser.userId='.\GO()->getUser()->id.'', 'LEFT');
-		
 		// Add where usergroup is the personal group of the user
 		if(isset($filter['isHome'])){
-			$homeDirId = \GO()->getUser()->storage->getRootFolderId();
+			$homeDirId = GO()->getUser()->storage->getRootFolderId();
 						
 			if(!empty($filter['isHome'])){
 				// We are querying the "home dir" of the current user
@@ -98,11 +127,11 @@ class Node extends model\AclEntity {
 				// We are querying the "shared with me" dir of the current user
 				$query->andWhere('parentId','!=',$homeDirId);
 				$query->andWhere('id','!=',0);
-				$query->andWhere('storageId','!=',\GO()->getUser()->storage->id);
+				$query->andWhere('storageId','!=',GO()->getUser()->storage->id);
 			}
 		}
 		
-		if(!empty($filter['isBookmarked'])){
+		if(!empty($filter['bookmarked'])){
 			$query->andWhere('nodeUser.bookmarked','=','1');
 		}
 		

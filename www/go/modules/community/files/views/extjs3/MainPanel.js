@@ -22,7 +22,10 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 			store: new go.data.Store({
 				fields: [
 					'id', 
-					'name', 
+					'name',
+					'bookmarked',
+					'storageId',
+					{name: 'touchedAt', type: 'date'},
 					{name: 'size', submit: false},
 					{name: 'progress', submit: false},
 					{name: 'status', submit: false},

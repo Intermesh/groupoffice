@@ -55,7 +55,7 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 			draggable:false,
 			params: {
 				filter: {
-					isBookmarked: true
+					bookmarked: true
 				}
 			}
 		});
