@@ -34,7 +34,13 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 				},
 				rowcontextmenu: function(grid, index, event){
 					event.stopEvent();
-					var records = grid.getSelectionModel().getSelections();
+					var selections = grid.getSelectionModel().getSelections();
+					
+					var records = [];
+					for(var i=0; i < selections.length; i++){
+						records.push(selections[i].json);
+					};
+					
 					contextMenu.showAt(event.xy, records);
 				},
 				rowdblclick: function (grid, rowIndex, e) {

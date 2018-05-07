@@ -1,5 +1,6 @@
 go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 	rootNodeEntity:null,
+	contextMenu: null,
 	animate: true,
 	enableDD:true,
 	folderSelectMode:false, // Mode to make from the tree a folder select component.
@@ -85,6 +86,13 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 		
 		this.setRootNode(root);
 		this.getLoader().load(root);
+	},
+	
+	getContextMenu : function(){
+		if(!this.contextMenu){
+			this.contextMenu = new go.modules.community.files.ContextMenu();
+		}
+		return this.contextMenu;
 	},
 	
 	/**

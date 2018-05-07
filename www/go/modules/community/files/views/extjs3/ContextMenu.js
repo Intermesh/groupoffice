@@ -17,7 +17,7 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 	records : [],
 
 	initComponent: function() {
-
+		
 		this.items = [
 			this.btnOpen = new Ext.menu.Item({
 				text: t("Open"),
@@ -45,7 +45,7 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 				},
 				scope: this
 			}),
-			'-',
+			this.topSeparator = new Ext.menu.Separator(),
 			this.btnMakeCopy = new Ext.menu.Item({
 				iconCls: 'ic-content-copy',
 				text: t("Make copy"),
@@ -65,7 +65,7 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 					
 					if(this.records && this.records.length === 1){ // Single select
 						var moveDialog = new go.modules.community.files.MoveDialog();
-						moveDialog.setTitle(t("Move")+ " " +this.records[0].data.name);
+						moveDialog.setTitle(t("Move")+ " " +this.records[0].name);
 						moveDialog.load(this.records[0].id).show();
 					}
 				},
@@ -107,15 +107,15 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 				},
 				scope: this
 			}),
-			'-',
+			this.middleSeparator = new Ext.menu.Separator(),
 			this.btnShare = new Ext.menu.Item({
 				iconCls: 'ic-person-add',
 				text: t("Share")+'&hellip;',
 				handler: function(){
 					if(this.records && this.records.length === 1){ // Single select
 						var shareDialog = new go.modules.community.files.ShareDialog();
-						shareDialog.setTitle(t("Share")+ " " +this.records[0].data.name);
-						shareDialog.setAcl(this.records[0].data.aclId); // TODO: find other way to set
+						shareDialog.setTitle(t("Share")+ " " +this.records[0].name);
+						shareDialog.setAcl(this.records[0].aclId); // TODO: find other way to set
 						shareDialog.load(this.records[0].id).show();
 					}
 				},
@@ -130,7 +130,7 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 				},
 				scope: this
 			}),
-			'-',
+			this.bottomSeparator = new Ext.menu.Separator(),
 			this.btnLock = new Ext.menu.Item({
 				iconCls: 'ic-lock-outline',
 				text: t("Lock"),
@@ -155,7 +155,12 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 				text: t("Bookmark"),
 				handler: function(){
 					console.log(this.records);
-					go.modules.community.files.bookmark(this.records);
+//					var data = {};
+//					for(var i=0; i< this.records.length; i++){
+//						data.push({id: this.records[i].id)
+//					}
+//					
+//					go.modules.community.files.bookmark(this.records);
 				},
 				scope:this
 			}),
@@ -164,6 +169,8 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 				text: t("Remove Bookmark"),
 				handler: function(){
 					console.log(this.records);
+					
+					
 					go.modules.community.files.bookmark(this.records);
 				},
 				scope:this
@@ -172,14 +179,18 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 
 		go.modules.community.files.ContextMenu.superclass.initComponent.call(this, arguments);
 	},
-	showAt : function(xy, records) {
+	
+	setRecords : function(records){
 		this.records = records;
 		
+		// Hide all items, the neccesary items will be showed again below
+		this.items.each(function(button)  {
+			button.hide();
+		});
+		
+		// Multiple records selected
 		if (records.length > 1) {
-
-			this.btnDownload.hide();
-			this.btnOpenWith.hide();
-			this.btnOpen.hide();
+			
 			this.btnEmail.show();
 			Ext.each(records, function(r) {
 				if(r.data.isDirectory) {
@@ -187,45 +198,73 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 					return;
 				}
 			}, this);
-
-		}
-		if (records.length === 1) {
 			
+			return;
+		}
+		
+		// Only 1 record selected
+		if (records.length === 1) {
+					
+			// If it's a directory
 			if(records[0].isDirectory) {
-				this.btnLock.hide();
-				this.btnUnlock.hide();
-				this.btnDownload.hide();
-				this.btnOpenWith.hide();
-				this.btnOpen.hide();
-				this.btnRename.hide();
-				this.btnEmail.hide();
+				this.btnMakeCopy.show();
+				this.btnMoveTo.show();
+				this.btnSearchInFolder.show();
+				this.btnRename.show();
+				this.btnDelete.show();
+				
+				this.middleSeparator.show();
+				
+				this.btnShare.show();
+				
+				this.bottomSeparator.show();
+				
+				var bookmarked = this.records[0].bookmarked;
+				this.btnBookmark.setVisible(!bookmarked);
+				this.btnRemoveBookmark.setVisible(bookmarked);
+				
 				return;
 			}
 			
-			var locked = Ext.isEmpty(this.records[0].data.lockedBy);
-			this.btnLock.hide(!locked);
-			this.btnUnlock.hide(locked);
-			
-			var bookmarked = this.records[0].data.bookmarked;
-			
-			console.log(bookmarked);
-			
-			this.btnBookmark.setVisible(!bookmarked);
-			this.btnRemoveBookmark.setVisible(bookmarked);
-			
-			
-			this.btnDownload.show();
+			// Here it's a file
 			this.btnOpen.show();
 			this.btnOpenWith.show();
 			this.btnDownload.show();
-			this.btnRename.show();
-			this.btnEmail.show();
+			
+			this.topSeparator.show();
 
-			switch(records[0].data.type) {
+			this.btnMakeCopy.show();
+			this.btnMoveTo.show();
+			this.btnRename.show();
+			this.btnDelete.show();
+			
+			this.middleSeparator.show();
+			
+			this.btnEmail.show();
+			
+			this.bottomSeparator.show();
+
+			var locked = Ext.isEmpty(this.records[0].lockedBy);
+			this.btnLock.hide(!locked);
+			this.btnUnlock.hide(locked);
+
+			var bookmarked = this.records[0].bookmarked;
+			this.btnBookmark.setVisible(!bookmarked);
+			this.btnRemoveBookmark.setVisible(bookmarked);
+			
+			switch(records[0].type) {
 				//todo
 			}
 		}
-
+		
+	},
+	
+	showAt : function(xy, records) {
+		
+		if(records){
+			this.setRecords(records);
+		}
+		
 		go.modules.community.files.ContextMenu.superclass.showAt.call(this, xy);
 	}
 });
