@@ -45,6 +45,9 @@ try {
 			
 			if(file_exists($config['file_storage_path'].'key.txt'))
 				system('chown www-data:www-data '.$config['file_storage_path'].'key.txt');
+			
+			if(file_exists($config['file_storage_path'].'defuse-crypto.txt'))
+				system('chown www-data:www-data '.$config['file_storage_path'].'defuse-crypto.txt');
 		}
 
 	}
