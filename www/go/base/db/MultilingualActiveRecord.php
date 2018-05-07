@@ -264,7 +264,7 @@ abstract class MultilingualActiveRecord extends ActiveRecord {
 
 						if (!$l) {
 							$l = new $relationModelInstance();
-							$l->$languageRelationArray['field'] = $this->id;
+							$l->{$languageRelationArray['field']} = $this->id;
 							$l->$lColName = $lang->id;
 						}
 
