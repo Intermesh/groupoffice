@@ -76,7 +76,7 @@ CREATE TABLE `files_version` (
 --
 ALTER TABLE `files_node`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `parentId_UNIQUE` (`parentId`,`name`),
+  ADD UNIQUE KEY `parentId_name_UNIQUE` (`parentId`,`name`, `deletedAt`),
   ADD KEY `fk_files_node_core_blob1_idx` (`blobId`),
   ADD KEY `fk_files_node_files_node1_idx` (`parentId`),
   ADD KEY `fk_files_node_files_storage1_idx` (`storageId`);
@@ -162,7 +162,3 @@ INSERT INTO `files_node` (`storageId`, `parentId`, `name`, `createdAt`, `modifie
 INSERT INTO `files_node` (`storageId`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isLocked`) VALUES ('2', '1', 'second folder', now(), now(), '1', '1', '1', '0');
 INSERT INTO `files_node` (`storageId`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isLocked`) VALUES ('2', '1', 'thirth folder', now(), now(), '1', '1', '1', '0');
 INSERT INTO `files_node` (`storageId`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isLocked`) VALUES ('2', '3', 'sub of secondr', now(), now(), '1', '1', '1', '0');
-
-
-CREATE VIEW `files_nodeview` AS
-SELECT n.*, b.size as byteSize, b.type as contentType FROM files_node n LEFT JOIN core_blob b ON n.blobId = b.id; 

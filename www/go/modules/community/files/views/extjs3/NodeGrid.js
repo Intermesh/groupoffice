@@ -22,8 +22,15 @@ go.modules.community.files.NodeGrid = Ext.extend(go.grid.GridPanel, {
 					width: 75,
 					sortable: true,
 					dataIndex: 'name'
-				},
-				{
+				},{
+					header: t('Size'),
+					width: 120,
+					sortable: true,
+					dataIndex: 'size',
+					renderer: function(v) {
+						return v ? Ext.util.Format.fileSize(v) : '';
+					}
+				},{
 					xtype:"datecolumn",
 					id: 'createdAt',
 					header: t('Created at'),

@@ -121,75 +121,89 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 			e.stopPropagation();
 			e.preventDefault();
 			this.body.removeClass('x-dd-over');
-			this.fileUpload(e.dataTransfer.files);
+			this.addFiles(e.dataTransfer.files);
 		}.bind(this));
 		
 		go.modules.community.files.CenterPanel.superclass.afterRender.call(this, arguments);
 	},
 	activeUploads: 0,
-	fileUpload: function(files) {
+	addFiles: function(files) {
 		for (var i = 0; i < files.length; i++) {
-			var name = this.solveDuplicate(files[i].name);
+			var index = this.browser.store.find('name', files[i].name);
+			if(index === -1) { // not found
+				this.fileUpload(files[i]);
+			} else { // already exist
+				this.solveDuplicate(files[i], index);
+			}
+		}
+	},
+	
+	fileUpload: function(file, replaceIndex, newName) {
+		if(replaceIndex || replaceIndex === 0) {
+			var record = this.browser.store.getAt(replaceIndex);
+		} else {
 			var record = new this.browser.store.recordType({
-				name: name, 
+				name: newName || file.name, 
 				isDirectory:0,
 				parentId:this.browser.store.baseParams.filter.parentId, 
-				size: files[i].size, 
+				size: file.size, 
 				status: 'queued' 
 			});
 			this.browser.store.add(record);
-			this.activeUploads++;
-			//var progress = this.appendProgressFile(files[i]);
-			go.Jmap.upload(files[i], {
-			  progress: function(e) {
-				  console.log(e);
-					if (e.lengthComputable) {
-						var complete = (e.loaded / e.total * 100 | 0);
-						record.set('progress', complete);
-					}
-			  },
-			  success: function(data) {
-				  this.activeUploads--;
-				  record.set('status', 'done');
-				  record.set('blobId', data.blobId);
-				  console.log(data.blobId);
-				  record.set('progress', 100);
-				  console.log(record);
-				  if(this.activeUploads === 0) {
-					  this.browser.store.commitChanges();
-				  }
-			  },
-			  failure: function(e) {
-				  record.set('progress', 0);
-				  record.set('status', 'failed');
-			  },
-			  scope:this
-		  });
 		}
-		
+		this.activeUploads++;
+		go.Jmap.upload(file, {
+		  progress: function(e) {
+				if (e.lengthComputable) {
+					var complete = (e.loaded / e.total * 100 | 0);
+					record.set('progress', complete);
+				}
+		  },
+		  success: function(data) {
+			  this.activeUploads--;
+			  record.set('status', 'done');
+			  record.set('blobId', data.blobId);
+			  record.set('progress', 100);
+			  if(this.activeUploads === 0) {
+				  this.browser.store.commitChanges();
+			  }
+		  },
+		  failure: function(e) {
+			  record.set('progress', 0);
+			  record.set('status', 'failed');
+		  },
+		  scope:this
+	  });
 	},
 	
-	solveDuplicate: function(name, action) {
-		var index = this.browser.store.find('name', name);
-		if(index === -1) {
-			return name;
-		}
-		switch(action) {
-			case 'replace':
-				this.browser.store.removeAt(index);
-				return name;
-			case 'cancel':
-				return false;
-			case 'addnumber':
-			default:
-				var newName, nameCount = 0;
-				while(index) {
-					nameCount++;
-					newName = name + '('+number+')';
-					index = this.browser.store.find('name', newName);
+	solveDuplicate: function(file, index) {
+		Ext.Msg.show({
+			title: t('Duplicate file'),
+			msg: t('A file named <b>'+file.name+ '</b> already exists in this folder. <br>What would you like to do?'),
+			buttons: {yes:t('Keep both'), no:t('Replace'), cancel:t('Cancel')},
+			icon: Ext.MessageBox.QUESTION,
+			fn: function(btnId, text) {
+				console.log(btnId);
+				switch(btnId) {
+					case 'no':
+						this.fileUpload(file, index);
+						break;
+					case 'yes':
+						var newName, nameCount = 0,
+							nameExt = file.name.split('.'),
+							extension = nameExt.pop(),
+							name = nameExt.join('.');
+						while(index !== -1) {
+							nameCount++;
+							newName = name + '('+nameCount+')';
+							index = this.browser.store.find('name', newName);
+						}
+						this.fileUpload(file, false, newName+'.'+extension);
 				}
-				return newName;
-		}
+			},
+			scope:this
+		});
+		
 	},
 	
 	appendProgressFile: function(file){

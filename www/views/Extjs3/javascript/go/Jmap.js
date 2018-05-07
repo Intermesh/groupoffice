@@ -76,8 +76,11 @@ go.Jmap = {
 		if(Ext.isEmpty(file))
 			return;
 
-		Ext.Ajax.request({url: go.User.uploadUrl,
+		Ext.Ajax.request({
+			url: go.User.uploadUrl,
+			useDefaultHeader: false,
 			success: function(response, opts) {
+				console.log(response);
 				if(response.responseText) {
 					data = Ext.decode(response.responseText);
 				}

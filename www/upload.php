@@ -29,12 +29,13 @@ fclose($input);
 $blob = Blob::fromTmp($tmpName);
 $blob->name = Request::get()->getHeader('X-File-Name');
 $blob->modified = Request::get()->getHeader('X-File-LastModifed');
-$blob->type = Request::get()->getContentType();
+$blob->contentType = Request::get()->getContentType();
 if ($blob->save()) {
+	Response::get()->setHeader('Cache-Control', 'no-cache');
 	Response::get()->setStatus(201, 'Created');
 	Response::get()->output([
 		'blobId' => $blob->id,
-		'type' => $blob->type,
+		'contentType' => $blob->contentType,
 		'size' => $blob->size
 	]);
 } else {

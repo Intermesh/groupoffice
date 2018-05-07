@@ -11,8 +11,17 @@
 }
 
 .preview {
-	width: 100px;
-	height: 100px;
+	width: 100%;
+	height: 130px;
+	background-size: 80px 80px;
+	background-position: bottom center;
+}
+
+.tile > .filetype {
+	background-size: dp(100);
+	background-position:center center;
+	width: 100%;
+	height: dp(160);
 }
 
 .go-fullscreen {

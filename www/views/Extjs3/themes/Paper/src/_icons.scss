@@ -289,6 +289,7 @@ $filetype: (
 	eml: eml,
 	folder: folder,
 	image: (jpeg, jpg, gif, bmp, tif, png, tiff),
+	playlist: (webm, avi, mkv, mpeg, mov, vob),
 	svg: svg,
 	pdf: pdf,
 	gpg: (asc, gpg),
@@ -332,12 +333,7 @@ $filetype: (
 		white-space: nowrap;
 		line-height: dp(32);
 	}
-	.tile > & {
-		background-size: dp(100);
-		width: 100%;
-		height: dp(120);
-	}
-	& + span {
+	+ span {
 		padding-left: dp(8);
 	}
 }
