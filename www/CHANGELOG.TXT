@@ -1,3 +1,6 @@
+07-05-2018 6.2.92
+- Wrong permissions on defuse-crypto.txt after instalation of mailserver
+
 01-05-2018 6.2.91
 - Log: Make "RecordsForModel" function available to users that don't have specific access to the log module
 - Billing: Fixed pagebreak within item groups
