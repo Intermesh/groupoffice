@@ -30,7 +30,7 @@ class Node extends model\AclEntity {
 	protected $contentType;
 	
 	public $comments;
-	public $bookmarked;
+	protected $bookmarked;
 	/**
 	 * @var DateTime
 	 */
@@ -73,7 +73,16 @@ class Node extends model\AclEntity {
 	 */
 	public function setBookmarked($val) {
 		$this->bookmarked = $val;
-		GO()->getDbConnection()->replace('files_node_user', ['bookmarked' => $this->bookmarked], ['userId' => GO()->getUser()->id, 'nodeId' => $this->nodeId])->execute();
+		GO()->getDbConnection()->replace('files_node_user', ['bookmarked' => $this->bookmarked, 'userId' => GO()->getUser()->id, 'nodeId' => $this->id])->execute();
+	}
+	
+	/**
+	 * Getter for bookmarked property (Needed because we needed to have a setter function
+	 * 
+	 * @return boolean
+	 */
+	public function getBookmarked(){
+		return $this->bookmarked;
 	}
 	
 	public function getContentType() {
