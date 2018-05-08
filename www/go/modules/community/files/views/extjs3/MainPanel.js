@@ -156,7 +156,11 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 						this.advancedSearchBar = new Ext.Toolbar({
 							hidden:true,
 							updateCurrentFolder: function(){
-								var node = go.Stores.get('Node').get([this.browser.getCurrentDir()])[0];
+								var id = this.browser.getCurrentDir();
+								if(!id) {
+									return;
+								}
+								var node = go.Stores.get('Node').get([id])[0];
 								if(node) {
 									var btnCurrentFolder = this.advancedSearchBar.items.get(2);
 									btnCurrentFolder.setText(node.name);
