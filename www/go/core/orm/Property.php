@@ -509,9 +509,12 @@ abstract class Property extends Model {
 	public function getOldValues() {
 		return $this->oldProps;
 	}
-
+	
 	/**
 	 * Saves the model and property relations to the database
+	 * 
+	 * Important: When you override this make sure you call this parent function first so
+	 * that validation takes place!
 	 * 
 	 * @return boolean
 	 */

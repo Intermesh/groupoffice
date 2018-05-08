@@ -1,5 +1,4 @@
 go.modules.community.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
-	paging: true,
 	initComponent: function () {
 
 		this.store = new go.data.Store({
@@ -75,7 +74,7 @@ go.modules.community.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 				}
 			],
 			viewConfig: {
-				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>',
+				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>'
 //				enableRowBody: true,
 //				showPreview: true,
 //				getRowClass: function (record, rowIndex, p, store) {

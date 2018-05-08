@@ -146,6 +146,14 @@ abstract class Entity extends Property {
 		return $this->commit();
 	}
 	
+	/**
+	 * Saves the model and property relations to the database
+	 * 
+	 * Important: When you override this make sure you call this parent function first so
+	 * that validation takes place!
+	 * 
+	 * @return boolean
+	 */
 	protected function internalSave() {
 		if(!parent::internalSave()) {
 			App::get()->debug(static::class."::internalSave() returned false");
