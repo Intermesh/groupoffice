@@ -20,32 +20,38 @@ go.modules.community.files.BreadCrumbBar = Ext.extend(Ext.Toolbar, {
 		}];
 		go.modules.community.files.BreadCrumbBar.superclass.initComponent.call(this);
 		
-		go.Stores.get('Node').on('changes', this.redraw,this);
-		
-		this.on('resize',function(me,adjWidth,adjHeight,rawWidth) {
+		go.Stores.get('Node').on('changes', function(){
 			this.redraw();
-		});
+		},this);
+		this.on('resize',function(me,adjWidth,adjHeight,rawWidth) {
+			console.log(adjWidth);
+			this.redraw();
+		},this);
 		this.browser.on('pathchanged', function(browser){
 			this.redraw();
 		},this);
 	},
 	
-	
-	
 	redraw: function(w) {
-		w = w || this.el.getWidth();
+		var isLast = true,
+			node,
+			pxUsed = dp(250), // for first btn
+			pxPerChar = dp(8), 
+			pxMax = this.el.getWidth(),
+			folderPath = this.browser.getPath();
+
 		this.removeAll();
-		var folderPath = this.browser.getPath();
 		
 		if(!Ext.isEmpty(folderPath)) {
 			var nodes = go.Stores.get('Node').get(folderPath);
 			
 			if(nodes){
 				nodes = nodes.reverse();
-				// Loop through the nodes to build up the breadcrumb list								
-				Ext.each(nodes, function(node, i, all){
-					var isLast = (i === 0);
-					var b = this.insertButton(0,{
+				// Loop through the nodes to build up the breadcrumb list	
+				for(var i = 0; i < nodes.length; i++) {
+					node = nodes[i];
+					pxUsed += (node.name.length * pxPerChar + dp(24) + dp(16));
+					this.insertButton(0,{
 						directoryId:node.id,
 						text: node.name,
 						disabled:isLast,
@@ -54,22 +60,35 @@ go.modules.community.files.BreadCrumbBar = Ext.extend(Ext.Toolbar, {
 						},
 						scope:this
 					});
-					this.insertButton(0,{
-						iconCls:'ic-chevron-right',
-						disabled:true
+					this.insert(0,{
+						xtype:'tbtext',
+						html:'<i class="icon">chevron_right</i>',
+						width: dp(24)
 					});
-				}, this);
+					if(pxUsed > pxMax) {
+						this.insert(0,{
+							xtype:'tbtext',
+							text:'...',
+							width: dp(24)
+						});
+						
+						break;
+					}
+					isLast = false;
+				}
 				
 			}
 		}
-		//Root node (my-files, shared-with-me, bookmarks, etc..)
-		this.insertButton(0, {
-			text: this.browser.getRootNode(this.browser.getCurrentRootNode()).text,
-			handler: function(btn) {
-				this.browser.goto([this.browser.getCurrentRootNode()]);
-			},
-			scope:this
-		});
+		if(pxUsed <= pxMax) {
+			//Root node (my-files, shared-with-me, bookmarks, etc..)
+			this.insertButton(0, {
+				text: this.browser.getRootNode(this.browser.getCurrentRootNode()).text,
+				handler: function(btn) {
+					this.browser.goto([this.browser.getCurrentRootNode()]);
+				},
+				scope:this
+			});
+		}
 		this.doLayout();
 	}
 });
