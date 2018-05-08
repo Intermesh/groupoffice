@@ -108,6 +108,9 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 			}
 			
 			for(var i1 = 0, l2 = config.systemSettingsPanels.length; i1 < l2; i1++) {
+				if(Ext.isString(config.systemSettingsPanels[i1])) {
+					config.systemSettingsPanels[i1] = eval(config.systemSettingsPanels[i1]);
+				}
 				this.addPanel(config.systemSettingsPanels[i1]);
 			}
 		}

@@ -23,14 +23,14 @@ go.modules.community.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 					id: 'id',
 					hidden: true,
 					header: 'ID',
-					width: 40,
+					width: dp(40),
 					sortable: true,
 					dataIndex: 'id'
 				},
 				{
 					id: 'name',
 					header: t('Name'),
-					width: 75,
+					width: dp(75),
 					sortable: true,
 					dataIndex: 'name'
 				},
@@ -38,7 +38,7 @@ go.modules.community.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 					xtype:"datecolumn",
 					id: 'createdAt',
 					header: t('Created at'),
-					width: 160,
+					width: dp(160),
 					sortable: true,
 					dataIndex: 'createdAt',
 					hidden: true
@@ -48,14 +48,14 @@ go.modules.community.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 					hidden: false,
 					id: 'modifiedAt',
 					header: t('Modified at'),
-					width: 160,
+					width: dp(160),
 					sortable: true,
 					dataIndex: 'modifiedAt'
 				},
 				{	
 					hidden: true,
 					header: t('Created by'),
-					width: 160,
+					width: dp(160),
 					sortable: true,
 					dataIndex: 'creator',
 					renderer: function(v) {
@@ -65,7 +65,7 @@ go.modules.community.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 				{	
 					hidden: true,
 					header: t('Modified by'),
-					width: 160,
+					width: dp(160),
 					sortable: true,
 					dataIndex: 'modifier',
 					renderer: function(v) {
