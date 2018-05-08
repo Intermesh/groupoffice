@@ -38,16 +38,13 @@ go.modules.community.files.BreadCrumbBar = Ext.extend(Ext.Toolbar, {
 		var folderPath = this.browser.getPath();
 		
 		if(!Ext.isEmpty(folderPath)) {
-			console.log('width',this.el.getWidth());
 			var nodes = go.Stores.get('Node').get(folderPath);
 			
 			if(nodes){
 				nodes = nodes.reverse();
 				// Loop through the nodes to build up the breadcrumb list								
 				Ext.each(nodes, function(node, i, all){
-
 					var isLast = (i === 0);
-					
 					var b = this.insertButton(0,{
 						directoryId:node.id,
 						text: node.name,
@@ -57,7 +54,6 @@ go.modules.community.files.BreadCrumbBar = Ext.extend(Ext.Toolbar, {
 						},
 						scope:this
 					});
-					console.log(b);
 					this.insertButton(0,{
 						iconCls:'ic-chevron-right',
 						disabled:true

@@ -21,6 +21,9 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
       'image/jpeg': true,
       'image/gif': true
    },
+	
+	activeUploads: 0,
+	pendingDuplicates: {},
 		
 	initComponent: function () {
 
@@ -45,7 +48,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 				},
 				rowdblclick: function (grid, rowIndex, e) {
 					var record = grid.getStore().getAt(rowIndex);
-					if(record.data.isDirectory) {
+					if (record.data.isDirectory) {
 						this.browser.descent(record.id);
 						return;
 					} else {
@@ -87,7 +90,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 					var record = view.getStore().getAt(index);
 					if(record.data.isDirectory) {
 						this.browser.open(record.id);
-					}else {
+					} else {
 						go.Preview(record.json);
 					}
 					
@@ -106,6 +109,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 		var childCount = 0;
 		this.body.dom.addEventListener('dragenter', function(e) {
 			e.preventDefault();
+			e.stopPropagation();
 			childCount++;
 			this.body.addClass('x-dd-over');
 		}.bind(this));
@@ -132,7 +136,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 		
 		go.modules.community.files.CenterPanel.superclass.afterRender.call(this, arguments);
 	},
-	activeUploads: 0,
+	
 	addFiles: function(files) {
 		for (var i = 0; i < files.length; i++) {
 			var index = this.browser.store.find('name', files[i].name);
@@ -147,11 +151,12 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 	fileUpload: function(file, replaceIndex, newName) {
 		if(replaceIndex || replaceIndex === 0) {
 			var record = this.browser.store.getAt(replaceIndex);
+			record.set('status', 'queued');
 		} else {
 			var record = new this.browser.store.recordType({
 				name: newName || file.name, 
-				isDirectory:0,
-				parentId:this.browser.store.baseParams.filter.parentId, 
+				isDirectory: 0,
+				parentId: this.browser.store.baseParams.filter.parentId, 
 				size: file.size, 
 				status: 'queued' 
 			});
@@ -169,9 +174,8 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 			  this.activeUploads--;
 			  record.set('status', 'done');
 			  record.set('blobId', data.blobId);
-			  record.set('progress', 100);
 			  if(this.activeUploads === 0) {
-				  this.browser.store.commitChanges();
+				  //this.browser.store.commitChanges();
 			  }
 		  },
 		  failure: function(e) {
@@ -183,54 +187,45 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 	},
 	
 	solveDuplicate: function(file, index) {
+		this.pendingDuplicates[index] = file;
+		var count = Object.keys(this.pendingDuplicates).length,
+			msg = (count < 2) ? 'A file named <b>'+file.name+ '</b>' : '<b>'+count + '</b> files';
 		Ext.Msg.show({
-			title: t('Duplicate file'),
-			msg: t('A file named <b>'+file.name+ '</b> already exists in this folder. <br>What would you like to do?'),
+			title: t('Duplicate file(s)'),
+			msg: t(msg+' already exists. <br>What would you like to do?'),
 			buttons: {yes:t('Keep both'), no:t('Replace'), cancel:t('Cancel')},
 			icon: Ext.MessageBox.QUESTION,
 			fn: function(btnId, text) {
-				console.log(btnId);
-				switch(btnId) {
-					case 'no':
-						this.fileUpload(file, index);
-						break;
-					case 'yes':
-						var newName, nameCount = 0,
-							nameExt = file.name.split('.'),
-							extension = nameExt.pop(),
-							name = nameExt.join('.');
+				for (var i in this.pendingDuplicates) {
+					if(btnId === 'no') {
+						this.fileUpload(this.pendingDuplicates[i], i);
+						continue;
+					} else if(btnId === 'yes') {
+						var newName, nameCount = 0, index = i,
+							nameExt = this.pendingDuplicates[i].name.split('.'),
+							name, extension = nameExt.pop();
+							if(nameExt.length === 0) {
+								name = extension;
+								extionsion = null;
+							} else {
+								name = nameExt.join('.');
+							}
 						while(index !== -1) {
 							nameCount++;
 							newName = name + '('+nameCount+')';
 							index = this.browser.store.find('name', newName);
 						}
-						this.fileUpload(file, false, newName+'.'+extension);
+						if(extension !== null) {
+							newName += ('.'+extension);
+						}
+						console.log(newName,this.pendingDuplicates[i]);
+						this.fileUpload(this.pendingDuplicates[i], false, newName);
+					}
 				}
+				this.pendingDuplicates = {};
 			},
 			scope:this
 		});
 		
-	},
-	
-	appendProgressFile: function(file){
-		var holder = document.createElement('div');
-		if (this.previewTypes[file.type] === true) {
-			var reader = new FileReader();
-			reader.onload = function (event) {
-			  var image = new Image();
-			  image.src = event.target.result;
-			  image.width = 160;
-			  holder.appendChild(image);
-			};
-
-			reader.readAsDataURL(file);
-		}  else {
-			holder.innerHTML += '<p>Uploaded ' + file.name + ' ' + (file.size ? (file.size/1024|0) + 'K' : '');
-			console.log(file);
-		}
-		var progress = document.createElement('progress');
-		holder.appendChild(progress);
-		this.getLayout().activeItem.dom.appendChild(holder);
-		return progress;
 	}
 });

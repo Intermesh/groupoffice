@@ -10,8 +10,8 @@
  * @author Michael de Hart <mdhart@intermesh.nl>
  */
 go.modules.community.files.Browser = Ext.extend(Ext.Component, {
-	useRouter: false,
-	path: [],
+	useRouter:null,
+	path: null,
 	currentRootNode: 'my-files', // (my-files, shared-with-me, bookmarks, etc..)
 	store: null, // only used by grid
 	rootNodes: null,
@@ -23,6 +23,8 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 	 */
 	constructor: function(config){
 		this.store = config.store;
+		this.useRouter = config.useRouter || false;
+		this.path = [];
 		this.addEvents({
 			"pathchanged" : true // post browsing
 		});

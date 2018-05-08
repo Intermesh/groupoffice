@@ -112,7 +112,9 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 												input.setAttribute("type", "file");
 												input.setAttribute('multiple', true);
 												input.onchange = function(e) {
-													me.centerCardPanel.fileUpload(this.files);
+													for (var i = 0; i < this.files.length; i++) {
+														me.centerCardPanel.fileUpload(this.files[i]);
+													}
 												};
 												this.uploadDialog = input;
 											}
