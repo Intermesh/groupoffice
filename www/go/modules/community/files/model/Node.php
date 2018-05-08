@@ -131,6 +131,10 @@ class Node extends model\AclEntity {
 			}
 		}
 		
+		if(isset($filter['q'])){
+			$query->andWhere('name','LIKE', '%' . $filter['q'] . '%');
+		}
+		
 		if(!empty($filter['bookmarked'])){
 			$query->andWhere('nodeUser.bookmarked','=','1');
 		}
