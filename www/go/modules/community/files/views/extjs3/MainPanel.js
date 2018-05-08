@@ -155,6 +155,23 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 						}),
 						this.advancedSearchBar = new Ext.Toolbar({
 							hidden:true,
+							updateCurrentFolder: function(){
+								var node = go.Stores.get('Node').get([this.browser.getCurrentDir()])[0];
+								if(node) {
+									var btnCurrentFolder = this.advancedSearchBar.items.get(2);
+									btnCurrentFolder.setText(node.name);
+									btnCurrentFolder.parentId = node.id;
+								};
+							},
+							listeners: {
+								afterrender:function(me) {
+									this.browser.on('pathchanged', me.updateCurrentFolder,this);
+								},
+								show: function(me) {
+									me.updateCurrentFolder.apply(this);
+								},
+								scope:this
+							},
 							style: {
 								'border-bottom': 0,
 								'background-color': 'white'
