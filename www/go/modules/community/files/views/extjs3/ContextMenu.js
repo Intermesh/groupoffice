@@ -33,7 +33,7 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 				text: t("Open with"),
 				iconCls: 'ic-open-in-new',
 				handler: function() {
-					GO.files.openFile({id:this.records[0].data.id});
+					GO.files.openFile({id:this.records[0].id});
 				},
 				scope: this
 			}),
@@ -87,7 +87,7 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 				handler: function(){
 					if(this.records && this.records.length === 1){ // Single select
 						var nodeDialog = new go.modules.community.files.NodeDialog();
-						nodeDialog.setTitle(t("Rename")+ " " +this.records[0].data.name);
+						nodeDialog.setTitle(t("Rename")+ " " +this.records[0].name);
 						nodeDialog.load(this.records[0].id).show();
 					}
 				},
@@ -154,13 +154,7 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 				iconCls: 'ic-bookmark',
 				text: t("Bookmark"),
 				handler: function(){
-					console.log(this.records);
-//					var data = {};
-//					for(var i=0; i< this.records.length; i++){
-//						data.push({id: this.records[i].id)
-//					}
-//					
-//					go.modules.community.files.bookmark(this.records);
+					go.modules.community.files.bookmark(this.records);
 				},
 				scope:this
 			}),
@@ -168,10 +162,7 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 				iconCls: 'ic-bookmark',
 				text: t("Remove Bookmark"),
 				handler: function(){
-					console.log(this.records);
-					
-					
-					go.modules.community.files.bookmark(this.records);
+					go.modules.community.files.removeBookmark(this.records);
 				},
 				scope:this
 			})
@@ -193,7 +184,7 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 			
 			this.btnEmail.show();
 			Ext.each(records, function(r) {
-				if(r.data.isDirectory) {
+				if(r.isDirectory) {
 					this.btnEmail.hide();
 					return;
 				}
