@@ -50,7 +50,56 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 			this.openPath(this.browser.getPath(true));
 		},this);
 		
+		// When an entity is updated in the store. We'll need to update the tree too
+		this.getLoader().entityStore.on('changes', function(store, added, changed, destroyed){
+			
+			var bookmarksNeedUpdate = false;
+			
+			for(var i=0; i < changed.length; i++){				
+				var nodesInTree = this.getTreeNodesByEntityId(changed[i]);
+				var updatedNode = store.get([changed[i]]);
+				
+				nodesInTree.forEach(function(nodeInTree){
+			
+					var entity = nodeInTree.attributes.entity?nodeInTree.attributes.entity:false;
+					
+					if(!entity){
+						return;
+					}
+					
+					var diff = go.util.getDiff(entity,updatedNode[0]);
+					
+					if(Ext.isDefined(diff.bookmarked)){
+						bookmarksNeedUpdate = true;
+					}
+
+					console.log(diff);
+				});
+
+			}
+			
+			// Refresh the bookmarks node when there are changes in bookmarked items
+			if(bookmarksNeedUpdate){
+				var bookmarkNodes = this.getTreeNodesByEntityId('bookmarks');
+				if(bookmarkNodes.length === 1){
+					bookmarkNodes[0].reload();
+				}
+			}			
+		},this);
+		
 		this.initRootNode(this.rootNodeEntity);
+	},
+	
+	getTreeNodesByEntityId : function(entityId){
+		
+		var foundNodes = [];
+				
+		for(var i in this.nodeHash){
+			if(this.nodeHash[i].attributes && this.nodeHash[i].attributes.entityId && this.nodeHash[i].attributes.entityId  === entityId){
+				foundNodes.push(this.nodeHash[i]);
+			}
+		}
+		return foundNodes;
 	},
 	
 	initRootNode : function(nodeEntity){
