@@ -10,7 +10,7 @@
  * @author Michael de Hart <mdhart@intermesh.nl>
  */
 go.modules.community.files.NodeTile = Ext.extend(Ext.DataView, {
-	autoHeight:true,
+	//autoHeight:true,
 	autoScroll:true,
 	multiSelect: true,
 	cls: 'x-view-tiles',

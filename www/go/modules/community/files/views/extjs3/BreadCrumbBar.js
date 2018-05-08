@@ -23,11 +23,15 @@ go.modules.community.files.BreadCrumbBar = Ext.extend(Ext.Toolbar, {
 		go.Stores.get('Node').on('changes', function(){
 			this.redraw();
 		},this);
-		this.on('resize',function(me,adjWidth,adjHeight,rawWidth) {
-			console.log(adjWidth);
+		this.browser.on('pathchanged', function(browser){
 			this.redraw();
 		},this);
-		this.browser.on('pathchanged', function(browser){
+	},
+	
+	afterRender: function() {
+		go.modules.community.files.BreadCrumbBar.superclass.afterRender.call(this);
+		this.ownerCt.on('resize',function(me,adjWidth,adjHeight,rawWidth) {
+			console.log(adjWidth);
 			this.redraw();
 		},this);
 	},
@@ -35,8 +39,8 @@ go.modules.community.files.BreadCrumbBar = Ext.extend(Ext.Toolbar, {
 	redraw: function(w) {
 		var isLast = true,
 			node,
-			pxUsed = dp(250), // for first btn
 			pxPerChar = dp(8), 
+			pxUsed = this.browser.getCurrentRootNode().length * pxPerChar + dp(56), // for first btn
 			pxMax = this.el.getWidth(),
 			folderPath = this.browser.getPath();
 
@@ -50,7 +54,7 @@ go.modules.community.files.BreadCrumbBar = Ext.extend(Ext.Toolbar, {
 				// Loop through the nodes to build up the breadcrumb list	
 				for(var i = 0; i < nodes.length; i++) {
 					node = nodes[i];
-					pxUsed += (node.name.length * pxPerChar + dp(24) + dp(16));
+					pxUsed += (node.name.length * pxPerChar + dp(56));
 					this.insertButton(0,{
 						directoryId:node.id,
 						text: node.name,
@@ -68,7 +72,7 @@ go.modules.community.files.BreadCrumbBar = Ext.extend(Ext.Toolbar, {
 					if(pxUsed > pxMax) {
 						this.insert(0,{
 							xtype:'tbtext',
-							text:'...',
+							text:' ...',
 							width: dp(24)
 						});
 						

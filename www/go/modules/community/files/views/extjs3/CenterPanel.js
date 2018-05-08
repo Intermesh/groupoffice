@@ -89,7 +89,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 				dblclick(view, index, node, e) {
 					var record = view.getStore().getAt(index);
 					if(record.data.isDirectory) {
-						this.browser.open(record.id);
+						this.browser.descent(record.id);
 					} else {
 						go.Preview(record.json);
 					}
@@ -175,7 +175,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 			  record.set('status', 'done');
 			  record.set('blobId', data.blobId);
 			  if(this.activeUploads === 0) {
-				  //this.browser.store.commitChanges();
+				  this.browser.store.commitChanges();
 			  }
 		  },
 		  failure: function(e) {

@@ -138,8 +138,73 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 								},
 								scope:this
 							},{
-								xtype: 'tbsearch'
+								xtype: 'tbsearch',
+								store: this.browser.store,
+								listeners: {
+									open: function() {
+										this.breadCrumbs.setVisible(false);
+										this.advancedSearchBar.setVisible(true);
+									},
+									close: function() {
+										this.breadCrumbs.setVisible(false);
+										this.advancedSearchBar.setVisible(false);
+									},
+									scope:this
+								}
 							}]
+						}),
+						this.advancedSearchBar = new Ext.Toolbar({
+							hidden:true,
+							updateCurrentFolder: function(){
+								var node = go.Stores.get('Node').get([this.browser.getCurrentDir()])[0];
+								if(node) {
+									var btnCurrentFolder = this.advancedSearchBar.items.get(2);
+									btnCurrentFolder.setText(node.name);
+									btnCurrentFolder.parentId = node.id;
+								};
+							},
+							listeners: {
+								afterrender:function(me) {
+									this.browser.on('pathchanged', me.updateCurrentFolder,this);
+								},
+								show: function(me) {
+									me.updateCurrentFolder.apply(this);
+								},
+								scope:this
+							},
+							style: {
+								'border-bottom': 0,
+								'background-color': 'white'
+							},
+							defaults: {toggleGroup: 'file-search-filter', enableToggle:true},
+							items:[
+								t('Search in')+':',
+								{
+									text:t('All folders'),
+									toggleHandler:function(btn,state){
+										if(state) {
+											delete this.browser.store.baseParams.filter.parentId;
+											this.browser.store.reload();
+										}
+									},
+									scope:this
+								},
+								{
+									text:'', 
+									pressed:true, //default
+									toggleHandler:function(btn,state){
+										if(state) {
+											this.browser.store.baseParams.filter.parentId = btn.parentId;
+											this.browser.store.reload();
+										}
+										
+										console.log(btn.parentId);
+									},
+									scope:this
+								},
+								{text:t('Shared with me')},
+								{text:t('Bookmarks')}
+							]
 						}),
 						this.breadCrumbs = new go.modules.community.files.BreadCrumbBar({
 							browser:this.browser
@@ -149,6 +214,15 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 				this.nodeDetail
 			]
 		});
+		
+		this.browser.on('pathchanged', function(){
+			var node = go.Stores.get('Node').get([this.browser.getCurrentDir()])[0];
+			if(node) {
+				var btnCurrentFolder = this.advancedSearchBar.items.get(2);
+				btnCurrentFolder.setText(node.name);
+				btnCurrentFolder.parentId = node.id;
+			}
+		},this);
 		
 		this.items = [
 			this.centerPanel, //first is default in narrow mode

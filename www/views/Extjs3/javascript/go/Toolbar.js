@@ -122,6 +122,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 	// search button handler
 	handler: function () {
 		this.searchToolBar.setVisible(true);
+		this.fireEvent('open', this);
 		this.searchToolBar.items.get(1).focus();
 	}
 });
