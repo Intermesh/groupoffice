@@ -28,23 +28,39 @@ go.Preview = function(file) {
 go.modules.community.files.bookmark = function(nodes){
 		
 	if(nodes && nodes.length >= 1){
-		
 		var params = {
 			update:{}
 		};
-		
 		for(var i=0; i< nodes.length; i++){
 			params.update[nodes[i].id] = {bookmarked:true};
 		}
-		
-		console.log(params);
-		
 		go.Stores.get("Node").set(params, function (options, success, response) {
-			
 			if(response.notUpdated){
 				console.log(response.notUpdated);
 			}
-		});	
+		});
+	}	
+};
+
+/**
+ * 
+ * @param array nodes [{id:#int,bookmarked:#boolean},{id:#int,bookmarked:#boolean}]
+ * @return {undefined}
+ */
+go.modules.community.files.removeBookmark = function(nodes){
+		
+	if(nodes && nodes.length >= 1){
+		var params = {
+			update:{}
+		};
+		for(var i=0; i< nodes.length; i++){
+			params.update[nodes[i].id] = {bookmarked:false};
+		}
+		go.Stores.get("Node").set(params, function (options, success, response) {
+			if(response.notUpdated){
+				console.log(response.notUpdated);
+			}
+		});
 	}	
 };
 
