@@ -58,3 +58,65 @@ go.util.contentTypeClass = function(contentType, filename) {
 	}
 	return icon;
 }
+
+/**
+ * PRIVATE
+ * Needed for go.util.getDiff function to compare differences between 2 objects
+ * 
+ * @param {object} a
+ * @param {object} b
+ * @param {type} node
+ * @return {undefined}
+ */
+go.util.recursiveDiff = function(a, b, node) {
+	var checked = [];
+
+	for (var prop in a) {
+		if (typeof b[prop] == 'undefined') {
+			go.util.addNode(prop, '[[removed]]', node);
+		} else if (JSON.stringify(a[prop]) != JSON.stringify(b[prop])) {
+			// if value
+			if (typeof b[prop] != 'object' || b[prop] == null) {
+				go.util.addNode(prop, b[prop], node);
+			} else {
+				// if array
+				if (Ext.isArray(b[prop])) {
+					go.util.addNode(prop, [], node);
+					go.util.recursiveDiff(a[prop], b[prop], node[prop]);
+				}
+				// if object
+				else {
+					go.util.addNode(prop, {}, node);
+					go.util.recursiveDiff(a[prop], b[prop], node[prop]);
+				}
+			}
+		}
+	}
+};
+
+/**
+ * PRIVATE
+ * Needed for above recursiveDiff function
+ * 
+ * @param {type} prop
+ * @param {type} value
+ * @param {type} parent
+ * @return {undefined}
+ */
+go.util.addNode = function(prop, value, parent){
+	parent[prop] = value;
+};
+
+/**
+ * Get the difference between 2 objects
+ * 
+ * @param {object} a
+ * @param {object} b
+ * @return {Array}
+ */
+go.util.getDiff = function(a, b){
+	var diff = (Ext.isArray(a) ? [] : {});
+	go.util.recursiveDiff(a, b, diff);
+	return diff;
+};
+
