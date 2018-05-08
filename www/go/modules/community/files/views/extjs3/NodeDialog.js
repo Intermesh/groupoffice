@@ -22,5 +22,14 @@ go.modules.community.files.NodeDialog = Ext.extend(go.form.Dialog, {
 			}
 		];
 		return items;
+	},
+	
+	show: function(parentId) {
+		
+		this.formPanel.add(new Ext.form.Hidden({
+			name: 'parentId',
+			value: parentId
+		}));
+		go.modules.community.files.NodeDialog.superclass.show.call(this);
 	}
 });

@@ -98,10 +98,8 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 										iconCls: 'ic-create-new-folder',
 										text: t("Create folder")+'&hellip;',
 										handler: function() {
-											if(!this.renameDialog) {
-												this.renameDialog = new go.modules.community.files.RenameDialog();
-											}
-											this.renameDialog.show();
+											this.nodeDialog = new go.modules.community.files.NodeDialog();
+											this.nodeDialog.show(this.browser.getCurrentDir());
 										},
 										scope: this
 									},{

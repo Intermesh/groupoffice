@@ -11,7 +11,7 @@
  */
 go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 	useRouter: false,
-	path: null,
+	path: [],
 	currentRootNode: 'my-files', // (my-files, shared-with-me, bookmarks, etc..)
 	store: null, // only used by grid
 	rootNodes: null,
@@ -122,14 +122,10 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 	 * @param array Path
 	 */
 	setPath : function(path){
-		
-		if(path.length == 1){
-			this.currentRootNode = path[0];
-			this.path = [];
-		} else {
+		if(path[0] && typeof path[0] === 'string') {
 			this.currentRootNode = path.shift();
-			this.path = path;
 		}
+		this.path = path;
 	},
 	
 	/**
@@ -165,12 +161,24 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 		return this.currentRootNode;
 	},
 	
+	getCurrentDir : function() {
+		return this.path[this.path.length-1];
+	},
+	
 	/**
 	 * Go to the given path
 	 * 
 	 * @param array path
 	 */
 	goto : function(path){
+		if(typeof path === 'number') {
+			for(var i = 0; i < this.path.length; i++) {
+				if(this.path[i] == path) {
+					path = this.path.slice(0,i+1);
+					break;
+				}
+			}
+		}
 		this.setPath(path);
 		this.open();
 	},
@@ -217,10 +225,10 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 		if(ids[0] === '') {
 			ids = [];
 		}
+		ids = ids.map(Number);
 		this.path = this.path.concat(ids);
-
 		var filter = Ext.isEmpty(this.path) && this.getRootNode(this.currentRootNode).params ? this.getRootNode(this.currentRootNode).params.filter : {parentId:ids[ids.length-1]} 
-		
+
 		this.store.setBaseParam('filter',filter);
 		this.store.load();
 		this.fireEvent('pathchanged', this);

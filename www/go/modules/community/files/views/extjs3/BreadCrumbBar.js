@@ -20,53 +20,60 @@ go.modules.community.files.BreadCrumbBar = Ext.extend(Ext.Toolbar, {
 		}];
 		go.modules.community.files.BreadCrumbBar.superclass.initComponent.call(this);
 		
+		go.Stores.get('Node').on('changes', this.redraw,this);
 		
+		this.on('resize',function(me,adjWidth,adjHeight,rawWidth) {
+			this.redraw();
+		});
 		this.browser.on('pathchanged', function(browser){
 			this.redraw();
 		},this);
 	},
-	redraw: function() {
+	
+	
+	
+	redraw: function(w) {
+		w = w || this.el.getWidth();
 		this.removeAll();
+		var folderPath = this.browser.getPath();
+		
+		if(!Ext.isEmpty(folderPath)) {
+			console.log('width',this.el.getWidth());
+			var nodes = go.Stores.get('Node').get(folderPath);
+			
+			if(nodes){
+				nodes = nodes.reverse();
+				// Loop through the nodes to build up the breadcrumb list								
+				Ext.each(nodes, function(node, i, all){
+
+					var isLast = (i === 0);
+					
+					var b = this.insertButton(0,{
+						directoryId:node.id,
+						text: node.name,
+						disabled:isLast,
+						handler: function(btn) {
+							this.browser.goto(btn.directoryId);
+						},
+						scope:this
+					});
+					console.log(b);
+					this.insertButton(0,{
+						iconCls:'ic-chevron-right',
+						disabled:true
+					});
+				}, this);
+				
+			}
+		}
 		//Root node (my-files, shared-with-me, bookmarks, etc..)
-		this.addButton({
+		this.insertButton(0, {
 			text: this.browser.getRootNode(this.browser.getCurrentRootNode()).text,
 			handler: function(btn) {
 				this.browser.goto([this.browser.getCurrentRootNode()]);
 			},
 			scope:this
 		});
-		
-		var folderPath = this.browser.getPath();
-		
-		if(!Ext.isEmpty(folderPath)) {
-			go.Stores.get('Node').get(folderPath, function(nodes){
-				
-				var fullButtonPath = [this.browser.getCurrentRootNode()];
-				
-				// Loop through the nodes to build up the breadcrumb list								
-				Ext.each(nodes, function(node, i, all){
-					
-					fullButtonPath.push(node.id);
-
-					var isLast = (i === all.length - 1);
-					this.addButton({
-						iconCls:'ic-chevron-right',
-						disabled:true
-					});
-					this.addButton({
-						directoryId:node.id,
-						path:fullButtonPath.slice(0),
-						text: node.name,
-						disabled:isLast,
-						handler: function(btn) {
-							this.browser.goto(btn.path);
-						},
-						scope:this
-					});
-				}, this);
-				
-			},this);
-		}
 		this.doLayout();
 	}
 });
