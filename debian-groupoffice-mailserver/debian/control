@@ -37,7 +37,6 @@ Depends: groupoffice-com,
 	file,
 	lzop,
 	nomarch,
-	zoo,
 	cabextract,
 	${misc:Depends}
 Recommends:	libdigest-sha-perl,
