@@ -53,49 +53,177 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 		// When an entity is updated in the store. We'll need to update the tree too
 		this.getLoader().entityStore.on('changes', function(store, added, changed, destroyed){
 			
-			var bookmarksNeedUpdate = false;
-			
-			for(var i=0; i < changed.length; i++){				
-				var nodesInTree = this.getTreeNodesByEntityId(changed[i]);
-				var updatedNode = store.get([changed[i]]);
-				
-				nodesInTree.forEach(function(nodeInTree){
-			
-					var entity = nodeInTree.attributes.entity?nodeInTree.attributes.entity:false;
-					
-					if(!entity){
-						return;
-					}
-					
-					var diff = go.util.getDiff(entity,updatedNode[0]);
-					
-					if(Ext.isDefined(diff.bookmarked)){
-						bookmarksNeedUpdate = true;
-					}
+			var nodeMap = this.getChangesNodeMap(added, changed, destroyed);
 
-					console.log(diff);
-				});
-
-			}
+			this.processAddedItems(store,nodeMap.added);
+			this.processChangedItems(store,nodeMap.changed);
+			this.processDestroyedItems(store,nodeMap.destroyed);
 			
-			// Refresh the bookmarks node when there are changes in bookmarked items
-			if(bookmarksNeedUpdate){
-				var bookmarkNodes = this.getTreeNodesByEntityId('bookmarks');
-				if(bookmarkNodes.length === 1){
-					bookmarkNodes[0].reload();
-				}
-			}			
+			
 		},this);
 		
 		this.initRootNode(this.rootNodeEntity);
 	},
+	
+	processAddedItems : function(store,addedItems){
+		
+	},
+	
+	processChangedItems : function(store,changedItems){
+		console.log(changedItems);
+		//	changedItems = object(
+		//		int:entityId => array(treenode,treenode),
+		//		int:entityId => array(treenode,treenode),
+		//		int:entityId => array(treenode,treenode)
+		//	)
+		
+		var bookmarksNeedUpdate = false;
+		var foldersToRefresh = [];
+		
+		for(var entityId in changedItems){
+			var updatedNode = store.get([entityId]);
+			var nodesInTree = changedItems[entityId];
+			
+			nodesInTree.forEach(function(nodeInTree){
+				var entity = nodeInTree.attributes.entity?nodeInTree.attributes.entity:false;
+				if(!entity){
+					return;
+				}
+				var diff = go.util.getDiff(entity,updatedNode[0]);
+				
+				// The bookmarked property of the entity is changed
+				if(Ext.isDefined(diff.bookmarked)){
+					bookmarksNeedUpdate = true;
+				}
+
+				// The entity id moved
+				if(Ext.isDefined(diff.parentId)){
+					// Todo: improve this by removing the node and adding the node manually instead of reloading the full parents
+					foldersToRefresh.push(entity.parentId);
+					foldersToRefresh.push(diff.parentId);
+				}
+			});
+		}
+
+		// Refresh the folder nodes that have changes
+		this.reloadNodes(foldersToRefresh);
+
+		// Refresh the bookmarks node when there are changes in bookmarked items
+		if(bookmarksNeedUpdate){
+			var bookmarkNodes = this.getTreeNodesByEntityId('bookmarks');
+			if(bookmarkNodes.length === 1){
+				bookmarkNodes[0].reload();
+			}
+		}	
+	},
+	
+	processDestroyedItems : function(store,deletedItems){
+		
+	},
+	
+	/**
+	 * Get an object that tells which nodes are added, updated and deleted
+	 * For example:
+	 *	{
+	 *		added:{
+	 *			4:[Ext.tree.AsyncTreeNode,Ext.tree.AsyncTreeNode]
+	 *		},
+	 *		changed:{
+	 *			6:[Ext.tree.AsyncTreeNode,Ext.tree.AsyncTreeNode]
+	 *		},
+	 *		destroyed:{
+	 *			5:[Ext.tree.AsyncTreeNode,Ext.tree.AsyncTreeNode],
+	 *			7:[Ext.tree.AsyncTreeNode]
+	 *		}
+	 *	}
+	 * 
+	 * 
+	 * @param int nodeId[] added
+	 * @param int nodeId[] changed
+	 * @param int nodeId[] destroyed
+	 * @return {FolderTree.getChangesNodeMap.map}
+	 */
+	getChangesNodeMap: function(added, changed, destroyed){
+
+		var map = {
+			added:[],
+			changed:{},
+			destroyed:{}
+		};
+				
+		for(var i in this.nodeHash){
+			if(this.nodeHash[i].attributes && this.nodeHash[i].attributes.entityId){
+				
+				// Check if the item is in the "added" array
+				if(added.length){
+					var found = added.indexOf(this.nodeHash[i].attributes.entityId);
+					if(found !== -1){
+						
+						if(!map.added[added[found]]){
+							map.added[added[found]] = [];
+						}
+						
+						map.added[added[found]].push(this.nodeHash[i]);
+					}
+				}
+				
+				// Check if the item is in the "changed" array
+				if(changed.length){
+					var found = changed.indexOf(this.nodeHash[i].attributes.entityId);
+					if(found !== -1){
+						
+						if(!map.changed[changed[found]]){
+							map.changed[changed[found]] = [];
+						}
+						
+						map.changed[changed[found]].push(this.nodeHash[i]);
+					}
+				}
+				
+				// Check if the item is in the "destroyed" array
+				if(destroyed.length){
+					var found = destroyed.indexOf(this.nodeHash[i].attributes.entityId);
+					if(found !== -1){
+						
+						if(!map.destroyed[destroyed[found]]){
+							map.destroyed[destroyed[found]] = [];
+						}
+						
+						map.destroyed[destroyed[found]].push(this.nodeHash[i]);
+					}
+				}
+			}
+				
+		}
+		return map;
+	},
+	
+	/**
+	 * Reload the given nodes
+	 * 
+	 * @param array(int) nodeIds
+	 */
+	reloadNodes : function(nodeIds){
+		for(var i=0; i < nodeIds.length; i++){
+			console.log(nodeIds[i]);
+			var nodesToReload = this.getTreeNodesByEntityId(nodeIds[i]);
+			if(nodesToReload.length >= 1){
+				for(var j=0; j < nodesToReload.length; j++){
+					console.log('reload');
+					console.log(nodesToReload[j]);
+					nodesToReload[j].reload();
+				}
+			}
+		}
+	},
+	
 	
 	getTreeNodesByEntityId : function(entityId){
 		
 		var foundNodes = [];
 				
 		for(var i in this.nodeHash){
-			if(this.nodeHash[i].attributes && this.nodeHash[i].attributes.entityId && this.nodeHash[i].attributes.entityId  === entityId){
+			if(this.nodeHash[i].attributes && this.nodeHash[i].attributes.entityId && this.nodeHash[i].attributes.entityId  == entityId){
 				foundNodes.push(this.nodeHash[i]);
 			}
 		}
