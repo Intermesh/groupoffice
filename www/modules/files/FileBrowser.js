@@ -109,8 +109,9 @@ GO.files.FileBrowser = function(config){
 		if(!this.folder_id)
 		{
 			this.folder_id=this.treePanel.getRootNode().childNodes[0].id;
+			this.setFolderID(this.folder_id);
 		}
-		this.setFolderID(this.folder_id);
+		
 		
 	}, this);
 	
