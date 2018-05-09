@@ -31,15 +31,24 @@ class Mapping {
 	}
 
 	/**
+	 * Adds a table to the model
 	 * 
-	 * @param string $name
-	 * @param sring $alias
-	 * @param array $keys If empty then it's assumed the key name is identical in this and the last added table. eg. ['id' => 'id']
-	 * @params array $columns Supply all columns that are not defined as properties here and you do want to have in the model.
+	 * @param string $name The table name
+	 * @param sring $alias The table alias to use in the queries
+	 * @param array $keys If null then it's assumed the key name is identical in 
+	 *   this and the last added table. eg. ['id' => 'id']
+	 * @params array $columns Leave this null if you want to automatically build 
+	 *   this based on the properties the model has. If you're extending a model 
+	 *   then this is not possinble and you must supply all columns you do want to 
+	 *   make available in the model.
+	 * @params array $constantValues If the table that is joined needs to have 
+	 *   constant values. For example the keys are ['folderId' => 'folderId'] but 
+	 *   the joined table always needs to have a value 
+	 *   ['userId' => GO()->getUser()->id] then you can set it with this parameter.
 	 * @return $this
 	 */
-	public function addTable($name, $alias = 't', array $keys = null, $columns = []) {
-		$this->tables[$name] = new MappedTable($name, $alias, $keys, empty($columns) ? $this->buildColumns() : $columns);
+	public function addTable($name, $alias = 't', array $keys = null, array $columns = null, array $constantValues = []) {
+		$this->tables[$name] = new MappedTable($name, $alias, $keys, empty($columns) ? $this->buildColumns() : $columns, $constantValues);
 		return $this;
 	}	
 	

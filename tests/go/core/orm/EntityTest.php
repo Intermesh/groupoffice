@@ -245,6 +245,4 @@ class EntityTest extends TestCase {
 		
 		$test = $a->thisPropDoesNotExist;
 	}
-	
-	
 }
