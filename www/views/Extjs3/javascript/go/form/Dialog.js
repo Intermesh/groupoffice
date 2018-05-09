@@ -56,7 +56,6 @@ go.form.Dialog = Ext.extend(go.Window, {
 	onChanges : function(entityStore, added, changed, destroyed) {
 		
 		if(changed.concat(added).indexOf(this.currentId) !== -1) {
-			this.deleteBtn.setDisabled(false);
 			this.actionComplete();
 			
 			var entities = this.entityStore.get([this.currentId]);
