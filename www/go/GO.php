@@ -569,7 +569,7 @@ class GO{
 				throw new \Exception("Invalid PHP file autoloaded!");
 			}
 
-			if(!file_exists($filePath) || is_dir($filePath)){
+			if(!is_file($filePath)){
 				//throw new \Exception('Class '.$orgClassName.' not found! ('.$file.')');
 				return false;
 			}else
@@ -1277,7 +1277,7 @@ class GO{
 	}
 	
 	
-	public static $ioncubeWorks;
+public static $ioncubeChecks = [];
 	
 	/**
 	 * Check if a file is encoded and if so check if it can be decrypted with
@@ -1291,6 +1291,8 @@ class GO{
 //		if(!empty(self::$ioncubeWorks)){
 //			return true;
 //		}
+		
+		
 
 		$majorVersion = GO::config()->getMajorVersion();
 	
@@ -1316,11 +1318,16 @@ class GO{
 //			default:
 //				throw new Exception("Unknown package ".$packagename);
 		}
+		
+		if(isset(self::$ioncubeChecks[$className])) {
+			return self::$ioncubeChecks[$className];
+		}
 
 		$path = GO::config()->root_path.'modules/professional/'.$className.'.php';
 		
 		
 		if(!file_exists($path)){
+			self::$ioncubeChecks[$className] = false;
 			return false;
 		}
 		
@@ -1328,11 +1335,13 @@ class GO{
 
 		//check data for presence of ionCube in code.
 		$data=  file_get_contents($path, false, null, 0, 100);		
-		if(strpos($data, 'ionCube')===false){							
+		if(strpos($data, 'ionCube')===false){		
+			self::$ioncubeChecks[$className] = true;
 			return true;
 		}
 
 		if(!extension_loaded('ionCube Loader')){
+			self::$ioncubeChecks[$className] = false;
 			return false;
 		}
 
@@ -1343,12 +1352,13 @@ class GO{
 		
 		//Empty license file is provided in download so we must check the size.
 		if(!$file->exists()){
+			self::$ioncubeChecks[$className] = false;
 			return false;
 		}
 		
 		$fullClassName = "\\GO\\Professional\\".$className;
 
-		$check =  $fullClassName::check();
+		$check = self::$ioncubeChecks[$className] =  $fullClassName::check();
 		
 //		var_dump($check);
 		

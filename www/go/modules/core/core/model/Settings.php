@@ -15,10 +15,12 @@ class Settings extends core\Settings {
 		
 		if(!isset($this->URL)) {
 			$this->URL = $this->detectURL();
+			$this->save();
 		}
 		
 		if(!isset($this->language)) {
 			$this->language = $this->getDefaultLanguage();
+			$this->save();
 		}
 	}
 	
