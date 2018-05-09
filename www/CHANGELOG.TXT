@@ -1,3 +1,7 @@
+- Files: Don't refresh grid when expanding tree nodes
+- Projects: Fixed reordering of custom tabs in project templates
+- Projects: Don't limit expenses list
+
 07-05-2018 6.2.92
 - Wrong permissions on defuse-crypto.txt after instalation of mailserver
 
