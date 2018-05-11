@@ -31,8 +31,7 @@ use go\core\data\Model;
  */
 class ValidateEmail extends Base {
 
-	private static $regex = "/^[a-z0-9\._\-+\&]+@[a-z0-9\.\-_]+\.[a-z]{2,6}$/i";
-
+	
 	protected function internalValidate(Model $model) {
 
 		//change to lower case
@@ -48,7 +47,7 @@ class ValidateEmail extends Base {
 			return true;
 		}
 
-		return preg_match(self::$regex, $email);
+		return strpos($email, '@') > 0;
 	}
 
 }
