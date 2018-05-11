@@ -177,10 +177,6 @@ class Token extends Entity {
 		
 		$this->internalRefresh();
 		
-		// For backwards compatibility, set the server session for the old code
-		$this->oldLogin();
-			
-		
 		return $this->save();
 	}
 	
@@ -224,8 +220,15 @@ class Token extends Entity {
 			return false;
 		}
 		
+		if(!$this->refresh()) {
+			$this->refresh();
+		}
+		
+		// For backwards compatibility, set the server session for the old code
+		$this->oldLogin();
+		
 		// Create accessToken and set expire time
-		return $this->refresh();						
+		return true;						
 	}
 	
 	/**

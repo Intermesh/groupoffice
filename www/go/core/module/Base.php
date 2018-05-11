@@ -261,6 +261,11 @@ abstract class Base {
 	}
 
 	public static function getPath() {
+		
+		//todo use reflection
+		//
+		//$reflector = new ReflectionClass('Foo');
+		//	echo $reflector->getFileName();
 		return Environment::get()->getInstallFolder() . '/' . dirname(str_replace('\\', '/', static::class));
 	}
 	

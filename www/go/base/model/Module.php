@@ -261,11 +261,11 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		}
 		
 		$ucfirst = ucfirst($this->name);
-		$moduleClassPath = $this->path.'/'.$ucfirst.'Module.php';
-		
-		if(!file_exists($moduleClassPath)){
-			return false;
-		}
+//		$moduleClassPath = $this->path.'/'.$ucfirst.'Module.php';
+//		
+//		if(!file_exists($moduleClassPath)){
+//			return false;
+//		}
 
 		$moduleClass = 'GO\\'.$ucfirst.'\\'.$ucfirst.'Module';
 

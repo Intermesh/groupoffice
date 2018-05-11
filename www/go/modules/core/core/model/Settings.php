@@ -2,6 +2,7 @@
 namespace go\modules\core\core\model;
 
 use go\core;
+use go\core\http\Request;
 
 class Settings extends core\Settings {
 
@@ -14,11 +15,30 @@ class Settings extends core\Settings {
 		
 		if(!isset($this->URL)) {
 			$this->URL = $this->detectURL();
+			$this->save();
 		}
 		
 		if(!isset($this->language)) {
-			$this->language = core\Language::get()->getIsoCode();
+			$this->language = $this->getDefaultLanguage();
+			$this->save();
 		}
+	}
+	
+	private function getDefaultLanguage() {		
+		//can't use Language here because an infite loop will occur as it depends on this model.
+		if(isset($_GET['SET_LANGUAGE']) && $this->hasLanguage($_GET['SET_LANGUAGE'])) {
+			return $_GET['SET_LANGUAGE'];
+		}
+		
+		$browserLanguages= Request::get()->getAcceptLanguages();
+		foreach($browserLanguages as $lang){
+			$lang = str_replace('-','_',explode(';', $lang)[0]);
+			if(core\Environment::get()->getInstallFolder()->getFile('go/modules/core/language/'.$lang.'.php')->exists()){
+				return $lang;
+			}
+		}
+		
+		return "en";
 	}
 	
 	

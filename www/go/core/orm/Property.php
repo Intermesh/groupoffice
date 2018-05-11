@@ -126,6 +126,11 @@ abstract class Property extends Model {
 					$this->$colName = $loadDefault ? $column->castFromDb($column->default) : $column->castFromDb($this->$colName);
 				}
 			}
+			foreach($table->getConstantValues() as $colName => $value) {
+				if (in_array($colName, $this->fetchProperties)) {
+					$this->$colName  = $value;
+				}
+			}
 		}
 	}
 
@@ -299,7 +304,9 @@ abstract class Property extends Model {
 			return $this->$setter($value);
 		}
 		
-		if(static::getMapping()->getRelation($name)) {			
+		//if(static::getMapping()->getRelation($name)) {		
+		//Had to change to hasPropery to make it work for dynamically added tables.
+		if(static::getMapping()->hasProperty($name)) {			
 			$this->dynamicProperties[$name] = $value;
 		} else
 		{
@@ -425,6 +432,10 @@ abstract class Property extends Model {
 				$on .= $fromAlias . "." . $from . ' = ';
 				$on .= $table->getAlias() . "." . $to;
 			}
+			
+			if(!empty($table->getConstantValues())) {
+				$on = \go\core\db\Criteria::normalize($on)->andWhere($table->getConstantValues());
+			}
 			$query->join($table->getName(), $table->getAlias(), $on, "LEFT");
 			unset($on);
 		}
@@ -509,9 +520,12 @@ abstract class Property extends Model {
 	public function getOldValues() {
 		return $this->oldProps;
 	}
-
+	
 	/**
 	 * Saves the model and property relations to the database
+	 * 
+	 * Important: When you override this make sure you call this parent function first so
+	 * that validation takes place!
 	 * 
 	 * @return boolean
 	 */
@@ -529,7 +543,7 @@ abstract class Property extends Model {
 		
 		foreach ($this->getMapping()->getTables() as $table) {			
 			if (!$this->saveTable($table, $modified)) {
-				throw new \Exception("Could not save entity to database tables");
+				throw new \Exception("Could not save entity to database tables: ". var_export($this->getValidationErrors(), true));
 			}
 		}
 
@@ -703,6 +717,10 @@ abstract class Property extends Model {
 					$modifiedForTable[$to] = $this->{$from};
 				}
 				
+				foreach($table->getConstantValues() as $colName => $value) {
+					$modifiedForTable[$colName] = $value;
+				}
+				
 				if (!App::get()->getDbConnection()->insert($table->getName(), $modifiedForTable)->execute()) {
 					return false;
 				}
@@ -843,6 +861,10 @@ abstract class Property extends Model {
 		}
 		
 		foreach ($table->getColumns() as $colName => $column) {
+			//Assume constants are correct, and this makes it unessecary to declare the property
+			if(array_key_exists($colName, $table->getConstantValues())) {
+				continue;
+			}
 
 			if (!$this->validateRequired($column)) {
 				//only one error per column

@@ -184,6 +184,10 @@ class Debugger {
 			}
 		}
 		
+		if(Environment::get()->isCli()) {
+			echo $entry . "\n";
+		}
+		
 		$this->entries[] = $entry;
 		
 	}

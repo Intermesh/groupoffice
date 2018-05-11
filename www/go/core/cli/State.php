@@ -8,13 +8,19 @@ use go\core\Environment;
 class State extends AbstractState {
 	
 	private $userId;
-	
+	private $user;
+
+
 	public function __construct($userId = User::ID_SUPER_ADMIN) {
 		$this->userId = $userId;
 	}
 	
 	public function getUser() {
-		return User::findById($this->userId);
+		if(!$this->user) {
+			$this->user = User::findById($this->userId);
+		}
+		
+		return $this->user;
 	}
 
 	public function isAuthenticated() {

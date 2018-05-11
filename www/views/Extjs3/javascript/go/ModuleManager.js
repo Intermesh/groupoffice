@@ -12,8 +12,8 @@
 		 * 	  title: t("Address book", "addressbook"),
 		 * 	  iconCls: 'go-tab-icon-addressbook',
 		 * 	  entities: ["Contact", "Company"],
-		 * 	  userSettingsPanels: [GO.addressbook.SettingsPanel],
-		 * 	  systemSettingsPanels: [],
+		 * 	  userSettingsPanels: ["GO.addressbook.SettingsPanel"],
+		 * 	  systemSettingsPanels: ["go.modules.commmunity.addressbook.SystemSettingsPanel"],
 		 * 	  initModule: function () {	
 		 * 	}
 		 * });

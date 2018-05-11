@@ -50,9 +50,9 @@ abstract class Settings extends data\Model {
 			$this->oldData = (array) $this;
 	}
 	
-	public function __destruct() {
-		$this->save();
-	}
+//	public function __destruct() {
+//		$this->save();
+//	}
 	
 	public function save() {
 		$new = (array) $this;
@@ -63,7 +63,7 @@ abstract class Settings extends data\Model {
 				continue;
 			}
 			
-			if(!isset($this->oldData[$name]) || $value != $this->oldData[$name]) {
+			if($value != $this->oldData[$name]) {
 				$this->update($name, $value);
 			}
 		}
@@ -72,6 +72,8 @@ abstract class Settings extends data\Model {
 	}
 	
 	private function update($name, $value) {
+		
+		
 		if (!App::get()->getDbConnection()->replace('core_setting', [
 								'moduleId' => $this->getModuleId(),
 								'name' => $name,

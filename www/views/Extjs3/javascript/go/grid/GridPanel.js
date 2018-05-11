@@ -51,10 +51,10 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 				return;
 			}
 			
-			go.Stores.get('Note').set({
+			this.getStore().entityStore.set({
 				destroy: ids
 			});
-		});
+		}, this);
 	},
 
 	/**

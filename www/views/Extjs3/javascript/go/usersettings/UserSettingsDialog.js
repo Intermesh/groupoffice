@@ -120,6 +120,9 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			}
 			
 			for(var i1 = 0, l2 = config.userSettingsPanels.length; i1 < l2; i1++) {
+				if(Ext.isString(config.systemSettingsPanels[i1])) {
+					config.userSettingsPanels[i1] = eval(config.userSettingsPanels[i1]);
+				}
 				this.addPanel(config.userSettingsPanels[i1]);
 			}
 		}
