@@ -29,3 +29,7 @@ ALTER TABLE `multi_instance_instance`
 ALTER TABLE `multi_instance_instance`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
+
+ALTER TABLE `multi_instance_instance` ADD `deletedAt` DATETIME NULL DEFAULT NULL AFTER `createdAt`, ADD `removeAt` DATETIME NULL DEFAULT NULL AFTER `deletedAt`;
+
+

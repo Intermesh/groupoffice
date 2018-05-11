@@ -257,7 +257,7 @@ class File extends FileSystemObject {
 	}
 
 	/**
-	 * Move a file to another folder.
+	 * Move a file to new location
 	 *
 	 * @param File $destination The file may not exist yet.
 	 * @return boolean
