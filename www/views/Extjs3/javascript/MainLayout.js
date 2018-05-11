@@ -575,7 +575,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 							}, {
 								text: t("Logout"),
 								iconCls: 'ic-exit-to-app',
-								handler: go.AuthenticationManager.logout,
+								handler: function() {
+									go.AuthenticationManager.logout();
+								},
 								scope: this
 							}
 						]
