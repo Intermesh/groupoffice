@@ -95,6 +95,10 @@ go.Router = {
 					this.pathBeforeLogin = this.getPath();
 					return this.goto('login');					
 				}
+	
+				for(var n = 0, l = match.length; n < l; n++) {
+					match[n] = decodeURIComponent(match[n]);
+				}
 				
 				this.routes[i].handler.apply({}, match);
 				return this;
