@@ -387,13 +387,13 @@ class User extends Entity {
 		return $methods;
 	}
 	
-	public function sendRecoveryMail($to){
+	public function sendRecoveryMail($to, $redirectUrl = ""){
 		
 		$this->recoveryHash = bin2hex(random_bytes(20));
 		$this->recoverySendAt = new \DateTime();
 		
 		$siteTitle=\GO()->getSettings()->title;
-		$url = \GO()->getSettings()->URL.'/resetpassword?hash='.$this->recoveryHash;
+		$url = \GO()->getSettings()->URL.'#recover/'.$this->recoveryHash .'?redirectUrl' . urlencode($redirectUrl);
 		$emailBody = \GO()->t('recoveryMailBody');
 		$emailBody = sprintf($emailBody,$this->displayName, $siteTitle, $this->username, $url);
 		$emailBody = str_replace('{ip_address}', \GO\Base\Util\Http::getClientIp() , $emailBody);
