@@ -71,7 +71,7 @@ class Instance extends Entity {
 	}
 	
 	private function getConfigFile() {
-		return new File('/etc/groupoffice/' . $this->hostname . '/config.ini');
+		return new File('/etc/groupoffice/multi_instance/' . $this->hostname . '/config.ini');
 	}
 	
 	private function getDataFolder() {
