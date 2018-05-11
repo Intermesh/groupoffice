@@ -393,7 +393,7 @@ class User extends Entity {
 		$this->recoverySendAt = new \DateTime();
 		
 		$siteTitle=\GO()->getSettings()->title;
-		$url = \GO()->getSettings()->URL.'#recover/'.$this->recoveryHash .'?redirectUrl' . urlencode($redirectUrl);
+		$url = \GO()->getSettings()->URL.'#recover/'.$this->recoveryHash . '/' . urlencode($redirectUrl);
 		$emailBody = \GO()->t('recoveryMailBody');
 		$emailBody = sprintf($emailBody,$this->displayName, $siteTitle, $this->username, $url);
 		$emailBody = str_replace('{ip_address}', \GO\Base\Util\Http::getClientIp() , $emailBody);
