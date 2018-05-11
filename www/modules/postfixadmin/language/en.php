@@ -54,3 +54,8 @@ $l['vacation_configs']='Vacation configs';
 $l['aliasHelp']="For multiple recipients use a comma separated list eg. alias1@domain.com,alias2@domain.com";
 $l['usedQuota']='Used quota';
 $l['aliasAddresHelp'] = "Use '*' for a catch all alias (not recommended).";
+
+$l['exportDomain'] = 'Export domain';
+$l['resetPasswords'] = 'Reset the passwords for the accounts';
+$l['resetPasswordsConfirm'] = 'Are you sure you want to reset the passwords for all accounts in this domain? This can cause users to not be able to login to their email anymore.';
+$l['exportDomainText'] = 'Click on the Download button to get a .csv file with all email accounts configured for this domain. To also export the passwords please check the "Reset the passwords for the accounts" checkbox.';

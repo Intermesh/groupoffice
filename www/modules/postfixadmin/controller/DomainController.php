@@ -149,6 +149,26 @@ class DomainController extends \GO\Base\Controller\AbstractModelController {
 		
 		
 	}
+	
+	/**
+	 * Get an export for the email domain accounts
+	 * 
+	 * @param array $params
+	 * @throws \Exception
+	 */
+	protected function actionDomainExport($params){
+
+		if(!isset($params['remoteModelId']) || !isset($params['domain']) || !isset($params['resetPasswords'])){
+			throw new \Exception('Please provide all neccesary parameters');
+		}
+		
+		$export = new \GO\Postfixadmin\Model\DomainExport();
+		
+		$export->remoteModelId = $params['remoteModelId'];
+		$export->domain = $params['domain'];
+		$export->resetPasswords = $params['resetPasswords'];
+		
+		echo $export->download();
+	}
+	
 }
-
-
