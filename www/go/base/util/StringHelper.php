@@ -660,7 +660,8 @@ END;
 	 * @return	StringHelper
 	 */
 	public static function get_email_validation_regex() {
-		return "/^[_a-z0-9\-+\&\']+(\.[_a-z0-9\-+\&\']+)*@[a-z0-9\-]+(\.[a-z0-9\-]+)*(\.[a-z]{2,100})$/i";
+		return "/.*@.*/";
+		//return "/^[_a-z0-9\-+\&\']+(\.[_a-z0-9\-+\&\']+)*@[a-z0-9\-]+(\.[a-z0-9\-]+)*(\.[a-z]{2,100})$/i";
 	}
 
 
