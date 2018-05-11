@@ -394,14 +394,14 @@ class User extends Entity {
 		
 		$siteTitle=\GO()->getSettings()->title;
 		$url = \GO()->getSettings()->URL.'/resetpassword?hash='.$this->recoveryHash;
-		$emailBody = \GO()->t('recoveryMailBody','core','lostpassword');
+		$emailBody = \GO()->t('recoveryMailBody');
 		$emailBody = sprintf($emailBody,$this->displayName, $siteTitle, $this->username, $url);
 		$emailBody = str_replace('{ip_address}', \GO\Base\Util\Http::getClientIp() , $emailBody);
 		
 		$message = \GO()->getMailer()->compose()	  
 			->setFrom(\GO()->getSettings()->systemEmail, $siteTitle)
 			->setTo(!empty($to) ? $to : $this->recoveryEmail, $this->displayName)
-			->setSubject(GO()->t('Lost password','core','lostpassword'))
+			->setSubject(GO()->t('Lost password'))
 			->setBody($emailBody);
 		
 		return $this->save() && $message->send();
