@@ -660,7 +660,7 @@ END;
 	 * @return	StringHelper
 	 */
 	public static function get_email_validation_regex() {
-		return "^[^@]*@[^@]*$";
+		return \go\core\mail\Util::EMAIL_REGEX;
 		//return "/^[_a-z0-9\-+\&\']+(\.[_a-z0-9\-+\&\']+)*@[a-z0-9\-]+(\.[a-z0-9\-]+)*(\.[a-z]{2,100})$/i";
 	}
 
@@ -673,7 +673,7 @@ END;
 	 * @return bool
 	 */
 	public static function validate_email($email) {
-		return Validate::email($email);
+		return \go\core\mail\Util::validateEmail($email);
 	}
 
 	/**
