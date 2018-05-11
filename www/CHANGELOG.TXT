@@ -1,3 +1,4 @@
+11-05-2018 6.2.93
 - Files: Don't refresh grid when expanding tree nodes
 - Projects: Fixed reordering of custom tabs in project templates
 - Projects: Don't limit expenses list
