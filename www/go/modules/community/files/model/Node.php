@@ -38,8 +38,6 @@ class Node extends model\AclEntity {
 	public $storageId;
 	protected $parentId;
 	
-	public $aclId;
-	
 	protected static function defineMapping() {		
 		return parent::defineMapping()
 			->addTable('files_node', 'node')
@@ -55,8 +53,7 @@ class Node extends model\AclEntity {
 	 */
 	protected function init() {
 		parent::init();
-		
-		
+	
 		if(isset($this->touchedAt)) {
 			$this->touchedAt = new DateTime($this->touchedAt);
 		}
@@ -102,7 +99,12 @@ class Node extends model\AclEntity {
 	}
 	public function setParentId($val) {
 		$this->parentId = $val;
-		$this->storageId = self::find()->selectSingleValue('storageId')->where(['id'=>$val])->single();
+		$parent = self::find()->where(['id'=>$val])->single();
+		if(!$parent){
+			throw new Exception("Parent not found, invalid 'parentId' given.");
+		}
+		$this->storageId = $parent->storageId;
+		$this->aclId = $parent->aclId;
 	}
 
 	protected function getSearchDescription() {
