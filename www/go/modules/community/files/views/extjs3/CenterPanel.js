@@ -58,7 +58,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 				scope:this
 			},
 			sm: new Ext.grid.RowSelectionModel({
-				singleSelect: true,
+				singleSelect: false,
 				listeners: {
 					rowselect: function(sm,rowIndex,record){
 						if(this.detailView){

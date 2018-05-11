@@ -146,7 +146,7 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 										this.advancedSearchBar.setVisible(true);
 									},
 									close: function() {
-										this.breadCrumbs.setVisible(false);
+										this.breadCrumbs.setVisible(true);
 										this.advancedSearchBar.setVisible(false);
 									},
 									scope:this
