@@ -11,6 +11,13 @@ go.Modules.register("community", 'files', {
 	}
 });
 
+go.Router.add(/files\/([\w\-]+)\/([0-9\/]*)/, function(root, path) {
+	var mainPanel = GO.mainLayout.openModule('files');
+	mainPanel.browser.currentRootNode = root;
+	mainPanel.browser.path = [];
+	mainPanel.browser.nav(path);
+});
+
 go.Preview = function(file) {
 	if(!this.preview) {
 		this.preview = new go.modules.community.files.PreviewLayer();

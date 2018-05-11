@@ -64,17 +64,7 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 		
 		go.modules.community.files.Browser.superclass.constructor.call(this, config);
 		
-		// Add route to routers used by open()
 		
-		if(this.useRouter){
-			var me = this;
-			go.Router.add(/files\/([\w\-]+)\/([0-9\/]*)/, function(root, path) {
-				GO.mainLayout.openModule('files');
-				me.currentRootNode = root;
-				me.path = [];
-				me.nav(path);
-			});
-		}
 	},
 	
 	
