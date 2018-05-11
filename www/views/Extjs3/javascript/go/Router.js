@@ -127,11 +127,11 @@ GO.mainLayout.on("boot", function() {
 	
 	
 	
-	go.Router.add(/login$/, function() {
+	go.Router.add(/^login$/, function() {
 		GO.mainLayout.login();
 	}, false);
 
-	go.Router.add(/recover\/([a-f0-9]{40})\/(.*)/, function(hash, redirectUrl) {
+	go.Router.add(/^recover\/([a-f0-9]{40})\/(.*)/, function(hash, redirectUrl) {
 		var recoveryPanel = new go.login.RecoveryDialog();
 		recoveryPanel.show(hash, redirectUrl);
 	}, false);
