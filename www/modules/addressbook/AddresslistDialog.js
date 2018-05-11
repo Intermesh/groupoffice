@@ -58,9 +58,7 @@ GO.addressbook.AddresslistDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			anchor: '100%'
 		});
 		
-		this.selectLinkField = new GO.form.SelectLink({
-			anchor:'100%'
-		});
+
 		
 		this.propertiesPanel = new Ext.Panel({
 			title:t("Properties"),			
@@ -74,8 +72,7 @@ GO.addressbook.AddresslistDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 					style:'padding:10px 0px'
 				}),
 				this.defaultSalutationField,
-				this.selectUser,
-				this.selectLinkField
+				this.selectUser
 			]
 		});
 		
