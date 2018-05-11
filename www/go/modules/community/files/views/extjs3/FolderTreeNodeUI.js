@@ -16,14 +16,17 @@ go.modules.community.files.FolderTreeNodeUI = Ext.extend(Ext.tree.TreeNodeUI, {
 			entity=node.attributes.entity;
 			
 			if(entity){
-				menu.setRecords([entity]);
-
 				var tnButton = new Ext.Button({
 					iconCls:"ic-more-vert",
 					cls:"tree-button",
 					entity:entity,
 					renderTo:anchor,
-					menu: menu
+					menu: menu,
+					listeners:{
+						menushow : function(btn,menu){
+							menu.setRecords([btn.entity]);
+						}
+					}
 				});
 			}
 		}
