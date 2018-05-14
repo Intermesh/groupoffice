@@ -38,9 +38,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 					this.nodeGrid.getStore().load();
 				},
 				rowcontextmenu: function(grid, index, event){
-					event.stopEvent();
 					var selections = grid.getSelectionModel().getSelections();
-					
 					var records = [];
 					for(var i=0; i < selections.length; i++){
 						records.push(selections[i].json);
@@ -86,7 +84,16 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 				},
 				contextmenu: function(view, index, node, event){
 					event.stopEvent();
-					contextMenu.showAt(event.xy, view.getSelectedRecords());
+					var selections = view.getSelectedRecords();
+					if(Ext.isEmpty(selections)) {
+						view.select(index);
+						selections = view.getSelectedRecords();
+					}
+					var records = [];
+					for(var i=0; i < selections.length; i++){
+						records.push(selections[i].json);
+					};
+					contextMenu.showAt(event.xy, records);
 				},
 				dblclick(view, index, node, e) {
 					var record = view.getStore().getAt(index);

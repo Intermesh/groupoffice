@@ -22,6 +22,15 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 		});
 
 		this.on("bodyscroll", this.loadMore, this, {buffer: 100});
+		
+		this.on("rowcontextmenu", function(grid, rowIndex, e) {
+			e.stopEvent();
+			var sm =this.getSelectionModel();
+			if(sm.isSelected(rowIndex) !== true) {
+				sm.clearSelections();
+				sm.selectRow(rowIndex);
+			}
+		}, this);
 	},
 	
 	deleteSelected : function() {

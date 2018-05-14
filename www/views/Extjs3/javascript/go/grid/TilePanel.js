@@ -27,7 +27,13 @@ go.grid.TilePanel = Ext.extend(Ext.DataView, {
 			scope:this
 		});
 
-		
+		this.on("contextmenu", function(view, rowIndex, node, e) {
+			e.stopEvent();
+			if(view.isSelected(rowIndex) !== true) {
+				view.clearSelections();
+				view.select(rowIndex);
+			}
+		}, this);
 	},
 	
 	afterRender: function() {
