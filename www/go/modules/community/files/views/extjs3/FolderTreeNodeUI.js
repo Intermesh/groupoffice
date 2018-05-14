@@ -25,6 +25,7 @@ go.modules.community.files.FolderTreeNodeUI = Ext.extend(Ext.tree.TreeNodeUI, {
 					listeners:{
 						menushow : function(btn,menu){
 							menu.setRecords([btn.entity]);
+							menu.doLayout();
 						}
 					}
 				});
