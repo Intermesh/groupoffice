@@ -26,7 +26,7 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 				handler: function(){
 					if(!this.records[0])
 						return;
-					go.Preview(this.records[0].json);
+					go.Preview(this.records[0]);
 				},
 				scope: this
 			}),
@@ -42,7 +42,7 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 				iconCls: 'ic-file-download',
 				text: t("Download"),
 				handler: function(){
-					window.open(go.Jmap.downloadUrl(this.records[0].json.blobId));
+					window.open(go.Jmap.downloadUrl(this.records[0].blobId));
 				},
 				scope: this
 			}),

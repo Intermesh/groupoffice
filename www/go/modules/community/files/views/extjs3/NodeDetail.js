@@ -54,9 +54,7 @@ go.modules.community.files.NodeDetail = Ext.extend(go.panels.DetailView, {
 				tooltip: t("Preview"),
 				itemId: "preview",
 				handler: function (btn, e) {
-					var nodeEdit = new go.modules.community.files.NodeForm();
-					nodeEdit.show();
-					nodeEdit.load(this.data.id);
+					go.Preview(this.data);
 				},
 				scope: this
 			},{
@@ -64,7 +62,7 @@ go.modules.community.files.NodeDetail = Ext.extend(go.panels.DetailView, {
 				tooltip: t("Download"),
 				itemId: "download",
 				handler: function (btn, e) {
-					go.Jmap.downloadUrl(this.data.blobId);
+					window.open(go.Jmap.downloadUrl(this.data.blobId));
 				},
 				scope: this
 			},{
