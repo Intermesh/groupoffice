@@ -49,7 +49,7 @@ if(file_exists($configFile)) {
 	if(!isset($config['db'])) {
 		$config = [
 					"general" => [
-							"dataPath" => '/home/groupoffice',
+							"dataPath" => '/var/lib/groupoffice',
 							"tmpPath" =>  sys_get_temp_dir() . '/groupoffice',
 							"debug" => false
 					],
