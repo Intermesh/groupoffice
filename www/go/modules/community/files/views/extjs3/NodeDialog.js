@@ -11,6 +11,10 @@ go.modules.community.files.NodeDialog = Ext.extend(go.form.Dialog, {
 				xtype: 'fieldset',
 				autoHeight: true,
 				items: [
+					this.txtParentId = new Ext.form.Hidden({
+						name: 'parentId',
+						disabled:true
+					}),
 					{
 						xtype: 'textfield',
 						name: 'name',
@@ -25,11 +29,13 @@ go.modules.community.files.NodeDialog = Ext.extend(go.form.Dialog, {
 	},
 	
 	show: function(parentId) {
-		
-		this.formPanel.add(new Ext.form.Hidden({
-			name: 'parentId',
-			value: parentId
-		}));
+		if(parentId) {
+			this.txtParentId.setValue(parentId);
+			this.txtParentId.setDisabled(false);
+		} else {
+			this.txtParentId.setDisabled(true);
+		}
+
 		go.modules.community.files.NodeDialog.superclass.show.call(this);
 	}
 });

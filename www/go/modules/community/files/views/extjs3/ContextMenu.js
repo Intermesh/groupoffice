@@ -15,6 +15,7 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 
 	minwidth: 180,
 	records : [],
+	store: null,
 
 	initComponent: function() {
 		
@@ -97,13 +98,11 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 				iconCls: 'ic-delete',
 				text: t("Delete"),
 				handler: function(){
-					if(this.records && this.records.length === 1){ // Single select
-						go.Stores.get("Node").set({destroy: [this.records[0].id]}, function (options, success, response) {
-							if (response.destroyed) {
-								// success
-							}
-						}, this);
-					}
+					var ids = [];
+					this.records.forEach(function(r) {
+						ids.push(r.id);
+					});
+					this.store.destroy(ids);
 				},
 				scope: this
 			}),
@@ -183,8 +182,11 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 		if (records.length > 1) {
 			
 			this.btnEmail.show();
+			this.btnDelete.show();
+			this.btnMoveTo.show();
 			Ext.each(records, function(r) {
 				if(r.isDirectory) {
+					this.btnDelete.hide();
 					this.btnEmail.hide();
 					return;
 				}

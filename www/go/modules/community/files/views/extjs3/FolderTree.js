@@ -267,7 +267,9 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 	
 	getContextMenu : function(){
 		if(!this.contextMenu){
-			this.contextMenu = new go.modules.community.files.ContextMenu();
+			this.contextMenu = new go.modules.community.files.ContextMenu({
+				store: this.browser.store
+			});
 		}
 		return this.contextMenu;
 	},

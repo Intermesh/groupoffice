@@ -27,7 +27,9 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 		
 	initComponent: function () {
 
-		var contextMenu = new go.modules.community.files.ContextMenu();
+		var contextMenu = new go.modules.community.files.ContextMenu({
+			store: this.browser.store
+		});
 		
 		this.nodeGrid = new go.modules.community.files.NodeGrid({
 			store:this.browser.store,

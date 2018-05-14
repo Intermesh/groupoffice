@@ -31,7 +31,6 @@ go.modules.community.files.BreadCrumbBar = Ext.extend(Ext.Toolbar, {
 	afterRender: function() {
 		go.modules.community.files.BreadCrumbBar.superclass.afterRender.call(this);
 		this.ownerCt.on('resize',function(me,adjWidth,adjHeight,rawWidth) {
-			console.log(adjWidth);
 			this.redraw();
 		},this);
 	},
@@ -39,8 +38,8 @@ go.modules.community.files.BreadCrumbBar = Ext.extend(Ext.Toolbar, {
 	redraw: function(w) {
 		var isLast = true,
 			node,
-			pxPerChar = dp(8), 
-			pxUsed = this.browser.getCurrentRootNode().length * pxPerChar + dp(56), // for first btn
+			pxPerChar = dp(9), 
+			pxUsed = this.browser.getCurrentRootNode().length * pxPerChar + dp(56), // for first btn and end padding
 			pxMax = this.el.getWidth(),
 			folderPath = this.browser.getPath();
 

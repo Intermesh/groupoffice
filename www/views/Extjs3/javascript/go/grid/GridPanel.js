@@ -32,29 +32,7 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 			ids.push(r.data.id);
 		});
 		
-		switch(ids.length)
-		{
-			case 0:				
-				return;
-			case 1:
-				var strConfirm = t("Are you sure you want to delete the selected item?");
-			break;
-
-			default:
-				var strConfirm = t("Are you sure you want to delete the {count} items?").replace('{count}', ids.length);
-			break;					
-		}
-		
-		Ext.MessageBox.confirm(t("Confirm delete"), t(strConfirm), function(btn) {
-			
-			if(btn != "yes") {
-				return;
-			}
-			
-			go.Stores.get('Note').set({
-				destroy: ids
-			});
-		});
+		this.store.destroy(ids);
 	},
 
 	/**

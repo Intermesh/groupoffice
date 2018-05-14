@@ -84,16 +84,9 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		if(!this.loaded || this.loading) {
 			return;
 		}		
-		
-		for(var i = 0, l = added.length; i < l; i++) {
-			if(!this.updateRecord(added[i]) ){
-				this.reload();
-				return;
-			}
-		}
-		
-		for(var i = 0, l = changed.length; i < l; i++) {
-			if(!this.updateRecord(changed[i]) ){
+		var updated = added.concat(changed);
+		for(var i = 0, l = updated.length; i < l; i++) {
+			if(!this.updateRecord(updated[i]) ){
 				this.reload();
 				return;
 			}
@@ -152,6 +145,33 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		this.entityStore.get(ids, function (items) {
 			this.loadData(items);
 		}, this);
+	},
+	
+	destroy : function(ids) {
+		
+		switch(ids.length)
+		{
+			case 0:				
+				return;
+			case 1:
+				var strConfirm = t("Are you sure you want to delete the selected item?");
+			break;
+
+			default:
+				var strConfirm = t("Are you sure you want to delete the {count} items?").replace('{count}', ids.length);
+			break;					
+		}
+		
+		Ext.MessageBox.confirm(t("Confirm delete"), t(strConfirm), function(btn) {
+			
+			if(btn != "yes") {
+				return;
+			}
+			
+			go.Stores.get('Note').set({
+				destroy: ids
+			});
+		});
 	},
 	
 	onUpdate : function(store, record, operation) {
