@@ -102,6 +102,11 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 					foldersToRefresh.push(entity.parentId);
 					foldersToRefresh.push(diff.parentId);
 				}
+				
+				// Update the button entity when something is changed
+				if(nodeInTree.contextMenuButton){
+					nodeInTree.contextMenuButton.entity = updatedNode[0];
+				}
 			});
 		}
 
@@ -205,12 +210,9 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 	 */
 	reloadNodes : function(nodeIds){
 		for(var i=0; i < nodeIds.length; i++){
-			console.log(nodeIds[i]);
 			var nodesToReload = this.getTreeNodesByEntityId(nodeIds[i]);
 			if(nodesToReload.length >= 1){
 				for(var j=0; j < nodesToReload.length; j++){
-					console.log('reload');
-					console.log(nodesToReload[j]);
 					nodesToReload[j].reload();
 				}
 			}

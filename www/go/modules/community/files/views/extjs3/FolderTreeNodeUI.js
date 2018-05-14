@@ -29,6 +29,8 @@ go.modules.community.files.FolderTreeNodeUI = Ext.extend(Ext.tree.TreeNodeUI, {
 						}
 					}
 				});
+				
+				node.contextMenuButton = tnButton;
 			}
 		}		
 	}
