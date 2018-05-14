@@ -1,12 +1,19 @@
-go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
-	
+go.grid.TilePanel = Ext.extend(Ext.DataView, {
+	//autoHeight:true,
+	autoScroll:true,
+	multiSelect: true,
+	cls: 'x-view-tiles',
+	overClass:'x-view-over',
+	selectedClass:'x-view-selected',
+	itemSelector:'div.tile',
+	tpl: null, // new Ext.XTemplate('<tpl for="."><div class="tile"></div></tpl>')
 	/**
 	 * If the end of the list is within this number of pixels it will request the next page	
 	 */
 	scrollBoundary : 300,
 
 	initComponent: function () {
-		go.grid.GridPanel.superclass.initComponent.call(this);
+		go.grid.TilePanel.superclass.initComponent.call(this);
 		
 		if(!this.keys)
 		{
@@ -15,28 +22,29 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 		this.keys.push({
 			key: Ext.EventObject.DELETE,
 			fn: function(key, e){
-				console.log("DELETE");
 				this.deleteSelected();
 			},
 			scope:this
 		});
 
-		this.on("bodyscroll", this.loadMore, this, {buffer: 100});
-		
-		this.on("rowcontextmenu", function(grid, rowIndex, e) {
+		this.on("contextmenu", function(view, rowIndex, node, e) {
 			e.stopEvent();
-			var sm =this.getSelectionModel();
-			if(sm.isSelected(rowIndex) !== true) {
-				sm.clearSelections();
-				sm.selectRow(rowIndex);
+			if(view.isSelected(rowIndex) !== true) {
+				view.clearSelections();
+				view.select(rowIndex);
 			}
 		}, this);
 	},
 	
+	afterRender: function() {
+		go.grid.TilePanel.superclass.afterRender.call(this);
+		
+		this.el.on("scroll", this.loadMore, this, {buffer: 100});
+	},
+	
 	deleteSelected : function() {
 	
-		var selectedRecords = this.getSelectionModel().getSelections(), ids = [];
-		
+		var selectedRecords = this.getSelectedRecords(), ids = [];
 		selectedRecords.forEach(function(r) {
 			ids.push(r.data.id);
 		});
@@ -59,8 +67,8 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 
 		var limit = store.lastOptions.params.limit || store.getCount(),
 						pos = store.lastOptions.params.position || 0,
-						scroller = this.getView().scroller.dom,
-						body = this.getView().mainBody.dom;
+						scroller = this.el.dom,
+						body = this.ownerCt.el.dom;
 
 
 		if ((scroller.offsetHeight + scroller.scrollTop + this.scrollBoundary) >= body.offsetHeight) {
@@ -77,5 +85,3 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 	}
 
 });
-
-Ext.reg("gogrid", go.grid.GridPanel);

@@ -9,14 +9,7 @@
  * @copyright Copyright Intermesh
  * @author Michael de Hart <mdhart@intermesh.nl>
  */
-go.modules.community.files.NodeTile = Ext.extend(Ext.DataView, {
-	//autoHeight:true,
-	autoScroll:true,
-	multiSelect: true,
-	cls: 'x-view-tiles',
-	overClass:'x-view-over',
-	selectedClass:'x-view-selected',
-	itemSelector:'div.tile',
+go.modules.community.files.NodeTile = Ext.extend(go.grid.TilePanel, {
 	tpl: new Ext.XTemplate('<tpl for=".">',
 		'<div class="tile">',
 			'<div class="filetype {[this.icon(values)]}"></div>',
