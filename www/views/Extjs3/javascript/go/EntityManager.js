@@ -47,6 +47,15 @@
 				entity: name
 			}
     },
+	 
+	 isset: function(name) {
+			name = name.toLowerCase();
+		
+			if(entities[name]) {
+				return true;
+			}
+			return false;
+	 },
 
     get: function (name) {      
 		
