@@ -10,7 +10,7 @@ GO.addressbook.SelectAddresslistWindow = Ext.extend(Ext.Window, {
 				border: false,
 				height: 300,
 				store: GO.addressbook.readableAddresslistsStore,
-				paging: true,
+				paging: GO.settings.addresslists_store_forced_limit?parseInt(GO.settings.addresslists_store_forced_limit):true,
 				view: new Ext.grid.GridView({
 					autoFill: true,
 					forceFit: true,

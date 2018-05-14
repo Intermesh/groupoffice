@@ -98,7 +98,7 @@ GO.addressbook.createAddresslistGrids = function(){
 			});
 
 
-		config.paging=true;
+		config.paging=GO.settings.addresslists_store_forced_limit?parseInt(GO.settings.addresslists_store_forced_limit):true;
 		config.border=false;
 		var contactsColumnModel =  new Ext.grid.ColumnModel({
 		defaults:{
@@ -162,7 +162,7 @@ GO.addressbook.createAddresslistGrids = function(){
 		config.sm=new Ext.grid.RowSelectionModel();
 		config.loadMask=true;
 
-		config.paging = true;
+		config.paging=GO.settings.addresslists_store_forced_limit?parseInt(GO.settings.addresslists_store_forced_limit):true;
 
 		GO.addressbook.AddresslistContactsGrid.superclass.constructor.call(this, config);
 
@@ -181,12 +181,6 @@ GO.addressbook.createAddresslistGrids = function(){
 			this.setDisabled(addresslist_id==0||!addresslist_id);
 		}
 	});
-
-
-
-
-
-
 
 	GO.addressbook.AddresslistCompaniesGrid = Ext.extend(function(config){
 
@@ -273,7 +267,7 @@ GO.addressbook.createAddresslistGrids = function(){
 
 
 		config.border=false;
-		config.paging=true;
+		config.paging=GO.settings.addresslists_store_forced_limit?parseInt(GO.settings.addresslists_store_forced_limit):true;
 
 		var companiesColumnModel =  new Ext.grid.ColumnModel({
 		defaults:{

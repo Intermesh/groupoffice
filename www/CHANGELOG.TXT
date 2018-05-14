@@ -1,3 +1,5 @@
+- Added $config['addresslists_store_forced_limit']=9999; config variable to only increase the addresslist store/grid sizes.
+
 11-05-2018 6.2.93
 - Files: Don't refresh grid when expanding tree nodes
 - Projects: Fixed reordering of custom tabs in project templates
