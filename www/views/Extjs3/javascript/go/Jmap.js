@@ -118,7 +118,7 @@ go.Jmap = {
 							url: go.User.uploadUrl,
 							headers: {'X-BlobId': hex(hash)},
 							method: 'GET',
-							success: function(response) {
+							success: function(response, opts) {
 								if(response.status == 204) {
 									start();
 								}
