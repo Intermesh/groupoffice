@@ -89,6 +89,12 @@ Ext.override(Ext.grid.Column,{
 	}	
 });
 
+Ext.override(Ext.grid.ColumnModel,{
+	getOrgColumnHeader:function(b){
+		return this.config[b].orgHeader||this.config[b].header;
+	}	
+});
+
 Ext.override(Ext.form.TriggerField,{
 	 onRender : function(ct, position){
         this.doc = Ext.isIE ? Ext.getBody() : Ext.getDoc();

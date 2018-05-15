@@ -1040,9 +1040,8 @@ ul.x-tab-strip-bottom{
 			@extend %font-caption;
 			border-left:0;
 			border-right: 1px solid;
-			border-image: linear-gradient(to bottom, transparent, color($foreground, 'divider')) 1 100%;
+			border-image: linear-gradient(to bottom, transparent, color($foreground, 'line')) 1 100%;
 			height: dp(32);
-			
 			&.x-grid3-cell-last {
 				border-right: 0;
 			}
@@ -1410,6 +1409,7 @@ td.grid-hd-group-cell {
 	color:color($foreground, 'text');
 	opacity:1;
 	border:0;
+	min-height:dp(32);
 	padding: 0 dp(8) 0 dp(32);
 	background-color:#fff;
 	a { color:inherit;}
@@ -1435,6 +1435,9 @@ td.grid-hd-group-cell {
 		content: 'done';
       color: color($green, 700);
 	}
+}
+.x-grid-dd-wrap {
+	padding:dp(8) dp(16);
 }
 
 .x-view {

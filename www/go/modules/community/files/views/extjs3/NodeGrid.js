@@ -70,21 +70,45 @@ go.modules.community.files.NodeGrid = Ext.extend(go.grid.GridPanel, {
 		var el =  this.getView().scroller.dom;
 		new Ext.dd.DropTarget(el, {
 			ddGroup: 'files-center-dd',
-			notifyDrop: function(ddSource, e, data){
-				var records = ddSource.dragData.selections,
-					cindex = ddSource.getDragData(e).rowIndex,
-					droppedAt = ddSource.grid.store.getAt(cindex);
-				if(droppedAt.data.isDirectory) {
-					Ext.each(records, function(record) {
-						record.set('parentId', droppedAt.data.id);
-					}, ddSource.grid.store);
-					ddSource.grid.store.commitChanges();
-					Ext.each(records, ddSource.grid.store.remove, ddSource.grid.store);
-				}
-				return true
-			}
+			copy:false,
+			notifyOver : this.onNotifyOver,
+			notifyDrop: this.onNotifyDrop
 		})
 		  
+	},
+	
+	onNotifyDrop : function(ddSource, e, data){
+		var records = ddSource.dragData.selections,
+			i = ddSource.getDragData(e).rowIndex,
+			droppedAt = ddSource.grid.store.getAt(i);
+		if(!droppedAt) {
+			return false;
+		}
+		if(droppedAt.data.isDirectory) {
+			Ext.each(records, function(record) {
+				record.set('parentId', droppedAt.data.id);
+			}, ddSource.grid.store);
+			ddSource.grid.store.commitChanges();
+			//Ext.each(records, ddSource.grid.store.remove, ddSource.grid.store);
+		}
+		return true
+	},
+	
+	onNotifyOver : function(dd, e, data){
+		var dragData = dd.getDragData(e),
+			dropRecord = data.grid && data.grid.store.data.items[dragData.rowIndex];
+		if(!dropRecord) {
+			return false;
+		}
+		if(!dropRecord.data.isDirectory) {
+			return false;
+		}
+		for(var i=0;i<data.selections.length;i++) {
+			if(data.selections[i].data.id==dropRecord.data.id) {
+				return false;
+			}
+		}
+		return this.dropAllowed;
 	}
 });
 

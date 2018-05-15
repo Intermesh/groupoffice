@@ -6,6 +6,7 @@ use go\core\acl\model;
 use go\core\db\Query;
 use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
+use go\core\validate\ErrorCode;
 
 class Node extends model\AclEntity {
 
@@ -101,7 +102,16 @@ class Node extends model\AclEntity {
 		$this->parentId = $val;
 		$parent = self::find()->where(['id'=>$val])->single();
 		if(!$parent){
-			throw new Exception("Parent not found, invalid 'parentId' given.");
+			$this->setValidationError('parentId', ErrorCode::INVALID_INPUT, 'Parent not found');
+			return;
+		}
+		if(!$parent->isDirectory) {
+			$this->setValidationError('parentId', ErrorCode::INVALID_INPUT, 'Parent is not a directory');
+			return;
+		}
+		if($parent->id == $this->id){
+			$this->setValidationError('parentId', ErrorCode::INVALID_INPUT, 'Parent cannot be self');
+			return;
 		}
 		$this->storageId = $parent->storageId;
 		$this->aclId = $parent->aclId;

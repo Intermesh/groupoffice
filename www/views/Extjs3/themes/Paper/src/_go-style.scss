@@ -304,7 +304,34 @@ a {
 		display:none;
 	}
 }
-
+.go-grid {
+	.go-grid-hd-btn {
+		@extend .icon;
+		cursor: pointer;
+		display: block;
+		width: dp(16);
+		height: dp(32);
+		position: absolute;
+		top: 0;
+		right:0;
+		border-left: 1px solid;
+		border-image: linear-gradient(to bottom, transparent, color($foreground, 'line')) 1 100%;
+		&::after {
+			font-size: .7em;
+			content:'more_vert';
+		}
+	}
+	&.x-grid-panel .x-grid3-header {
+		position:relative;
+		padding-right: dp(16);
+		.x-grid3-hd-over .x-grid3-hd-btn {
+			display: none;
+		}
+	}
+	.x-grid3-cell-last {
+		padding-right: dp(16);
+	}
+}
 
 .go-head-tb {
 	border-bottom: 1px solid color($foreground, 'line') !important;
