@@ -44,7 +44,7 @@ class Mapping {
 	 * @params array $constantValues If the table that is joined needs to have 
 	 *   constant values. For example the keys are ['folderId' => 'folderId'] but 
 	 *   the joined table always needs to have a value 
-	 *   ['userId' => GO()->getUser()->id] then you can set it with this parameter.
+	 *   ['userId' => GO()->getUserId()] then you can set it with this parameter.
 	 * @return $this
 	 */
 	public function addTable($name, $alias = 't', array $keys = null, array $columns = null, array $constantValues = []) {

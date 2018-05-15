@@ -313,14 +313,26 @@ namespace go\core {
 			return $this->authState;
 		}
 
+//		/**
+//		 * Get the authenticated user
+//		 * 
+//		 * @return auth\model\User
+//		 */
+//		public function getUser() {
+//			if ($this->getAuthState() instanceof \go\core\auth\State) {
+//				return $this->authState->getUser();
+//			}
+//			return null;
+//		}
+		
 		/**
 		 * Get the authenticated user
 		 * 
 		 * @return auth\model\User
 		 */
-		public function getUser() {
+		public function getUserId() {
 			if ($this->getAuthState() instanceof \go\core\auth\State) {
-				return $this->authState->getUser();
+				return $this->authState->getUserId();
 			}
 			return null;
 		}
