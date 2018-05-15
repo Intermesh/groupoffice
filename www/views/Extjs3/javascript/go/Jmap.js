@@ -124,7 +124,7 @@ go.Jmap = {
 								}
 								if(response.responseText) {
 									data = Ext.decode(response.responseText);
-									cfg.success && cfg.success.call(this, data, response, opts);
+									cfg.success && cfg.success.call(cfg.scope || this, data, response, opts);
 								}
 							}
 						})
