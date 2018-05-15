@@ -4,9 +4,16 @@ namespace go\core\auth;
 
 abstract class State {
 	/**
+	 * Get the ID logged in user
+	 * 
+	 * @return int|null
+	 */
+	abstract function getUserId();
+	
+	/**
 	 * Get the logged in user
 	 * 
-	 * @return model\User|boolean
+	 * @return model\User|null
 	 */
 	abstract function getUser();
 	

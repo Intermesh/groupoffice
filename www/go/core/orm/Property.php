@@ -577,7 +577,7 @@ abstract class Property extends Model {
 	}
 	
 	protected function getCreatedBy() {
-		return !App::get()->getAuthState() || !App::get()->getAuthState()->getUser() ? 1 : App::get()->getAuthState()->getUser()->id;
+		return !App::get()->getAuthState() || !App::get()->getAuthState()->getUserId() ? 1 : App::get()->getAuthState()->getUserId();
 	}
 
 	/**

@@ -27,4 +27,8 @@ class State extends AbstractState {
 		return Environment::get()->isCli();
 	}
 
+	public function getUserId() {
+		return $this->userId;
+	}
+
 }
