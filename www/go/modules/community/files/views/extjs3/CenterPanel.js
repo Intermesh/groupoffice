@@ -49,7 +49,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 				rowdblclick: function (grid, rowIndex, e) {
 					var record = grid.getStore().getAt(rowIndex);
 					if (record.data.isDirectory) {
-						this.browser.descent(record.id);
+						this.browser.descent(record.data.id);
 						return;
 					} else {
 						go.Preview(record.json);
@@ -62,7 +62,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 				listeners: {
 					rowselect: function(sm,rowIndex,record){
 						if(this.detailView){
-							this.detailView.load(parseInt(record.id));
+							this.detailView.load(parseInt(record.data.id));
 						}
 					},
 					scope: this
@@ -71,7 +71,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 		});
 		
 //		this.nodeGrid.getSelectionModel().on('rowselect', function (sm, rowIndex, record) {
-//			go.Router.goto("files/mine/" + this.browser.path.join('/')+ record.id);
+//			go.Router.goto("files/mine/" + this.browser.path.join('/')+ record.data.id);
 //		},this);
 		
 		this.nodeTile = new go.modules.community.files.NodeTile({
@@ -80,7 +80,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 				click: function(view, index, node, e) {
 					var record = view.getStore().getAt(index);
 					console.log(record);
-					this.detailView.load(parseInt(record.id));
+					this.detailView.load(parseInt(record.data.id));
 				},
 				contextmenu: function(view, index, node, event){
 					event.stopEvent();
@@ -98,7 +98,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 				dblclick(view, index, node, e) {
 					var record = view.getStore().getAt(index);
 					if(record.data.isDirectory) {
-						this.browser.descent(record.id);
+						this.browser.descent(record.data.id);
 					} else {
 						go.Preview(record.json);
 					}
@@ -183,6 +183,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 			  this.activeUploads--;
 			  record.set('status', 'done');
 			  record.set('blobId', data.blobId);
+
 			  if(this.activeUploads === 0) {
 				  this.browser.store.commitChanges();
 			  }
