@@ -41,7 +41,8 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 			})
 		});
 		this.folderTree = new go.modules.community.files.FolderTree({
-			browser:this.browser
+			browser:this.browser,
+			anchor:"100% 100%"
 		});
 		this.usagePanel = new go.modules.community.files.UsagePanel();
 		
@@ -49,6 +50,7 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 			region: 'west',
 			cls: 'go-sidenav',
 			width: dp(280),
+			layout:'anchor',
 			split:true,
 			items: [this.folderTree],
 			bbar:[this.usagePanel]

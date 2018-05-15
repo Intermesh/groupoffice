@@ -33,6 +33,7 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 	containerScroll: false,
 
 	rootVisible: false,
+	autoScroll:true,
 
 	initComponent: function () {
 
