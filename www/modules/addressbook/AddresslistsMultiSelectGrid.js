@@ -18,7 +18,7 @@ GO.addressbook.AddresslistsMultiSelectGrid = function(config) {
 				emptyText: GO.lang.strSearch
 			})],
 			store:config.store,
-			pageSize:GO.settings.config.nav_page_size
+			pageSize:GO.settings.addresslists_store_forced_limit?parseInt(GO.settings.addresslists_store_forced_limit):parseInt(GO.settings.config.nav_page_size)
 		})
 	});
 	

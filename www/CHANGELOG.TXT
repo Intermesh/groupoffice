@@ -1,5 +1,8 @@
-- Projcts: Don't book travel distance twice when including break
+- Projects: Don't book travel distance twice when including break
 - Email: Fixed delegated addres not always loading
+- Added $config['addresslists_store_forced_limit']=9999; config variable to only increase the addresslist store/grid sizes.
+- Added This and future support for moving an event
+
 
 11-05-2018 6.2.93
 - Files: Don't refresh grid when expanding tree nodes

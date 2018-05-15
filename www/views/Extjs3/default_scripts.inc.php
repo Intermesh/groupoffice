@@ -110,6 +110,11 @@ if(GO::modules()->addressbook){
 	// Add the addresslist tab to the global settings panel
 	$settings['show_addresslist_tab'] = \GO::config()->get_setting('globalsettings_show_tab_addresslist');
 	
+	$addressListsForcedLimit = \GO::config()->addresslists_store_forced_limit;
+	if($addressListsForcedLimit){
+		$settings['addresslists_store_forced_limit'] = (int)$addressListsForcedLimit;
+	}
+
 	if(\GO::modules()->customfields){
 		$settings['show_contact_cf_tabs'] = array();
 		

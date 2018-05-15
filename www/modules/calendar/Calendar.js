@@ -1874,6 +1874,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 		if(event.repeats && actionData.singleInstance)
 		{			
 			params['exception_date']=actionData.dragDate.format("U");
+			params['thisAndFuture'] = actionData.thisAndFuture || false,
 			params['exception_for_event_id']=event['event_id'];
 			params['repeats']=true;
 		}else

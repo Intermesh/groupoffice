@@ -141,19 +141,34 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			$recurringEvent = \GO\Calendar\Model\Event::model()->findByPk($params['exception_for_event_id']);
 			if(!empty($params['thisAndFuture']) && $params['thisAndFuture'] == 'true') {
 				// Save This and Future
-				$model = new \GO\Calendar\Model\Event();
+				$model = $recurringEvent->duplicate(array('uuid'=>null));
+				//$model = new \GO\Calendar\Model\Event();
 				unset($params['exception_for_event_id']);
 				unset($params['repeat_end_time']);
-
+				$duration = $model->end_time - $model->start_time;
 				$this->_setEventAttributes($model, $params);
-				$model->start_time = $params['exception_date'];
+				
+				if (isset($params['offset'])) {
+					$d = date('Y-m-d', $params['exception_date']);
+					$t = date('G:i', $model->start_time);
+					$start_time = strtotime($d . ' ' . $t);
+					// not pretty, fix in v6.6
+					$model->start_time = \GO\Base\Util\Date::roundQuarters($start_time);
+					$model->end_time = \GO\Base\Util\Date::roundQuarters($model->start_time+ $duration);
+					$untilTime = $model->start_time - $params['offset'] - 1;
+				} else {
+					// exception_date comes incorrectly from client, fix in GO 6.6
+					$model->start_time = $params['exception_date']; 
+					$untilTime = $params['exception_date']-1;
+				}
+				
 				$rRule = new \GO\Base\Util\Icalendar\Rrule();
 				$rRule->readIcalendarRruleString($recurringEvent->start_time, $recurringEvent->rrule);
 				$model->rrule = $rRule->createRrule();
 
-				$rRule->setParams(array('until'=> $params['exception_date']-1));
+				$rRule->setParams(array('until'=> $untilTime));
 				$recurringEvent->rrule = $rRule->createRrule();
-				$recurringEvent->repeat_end_time = $params['exception_date']-1;
+				$recurringEvent->repeat_end_time = $untilTime;
 				$recurringEvent->save(); // CLOSE Recurrence, forget about exceptions (this en future means everything)
 			} else {
 				$model = $recurringEvent->createExceptionEvent($params['exception_date'], array(), true);
