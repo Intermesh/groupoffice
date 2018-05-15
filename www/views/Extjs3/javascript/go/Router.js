@@ -13,6 +13,8 @@ go.Router = {
 	previousPath : null,
 	loadedPath : null,
 	
+	requireAuthentication : false,
+	
 	config: function (options) {
 		this.root = options && options.root ? '/' + this.trimSlashes(options.root) + '/' : '/';
 		return this;
@@ -85,9 +87,17 @@ go.Router = {
 			if (match) {
 				match.shift();
 				
+				this.requireAuthentication = this.routes[i].requireAuthentication;
+				
 				if(!go.User && this.routes[i].requireAuthentication){
+					
+					console.log("redirect", this.routes[i]);
 					this.pathBeforeLogin = this.getPath();
 					return this.goto('login');					
+				}
+	
+				for(var n = 0, l = match.length; n < l; n++) {
+					match[n] = decodeURIComponent(match[n]);
 				}
 				
 				this.routes[i].handler.apply({}, match);
@@ -115,10 +125,28 @@ go.Router.config({mode: 'hash'});
 
 GO.mainLayout.on("boot", function() {		
 	
+	
+	
+	go.Router.add(/^login$/, function() {
+		GO.mainLayout.login();
+	}, false);
+
+	go.Router.add(/^recover\/([a-f0-9]{40})\/(.*)/, function(hash, redirectUrl) {
+		var recoveryPanel = new go.login.RecoveryDialog();
+		recoveryPanel.show(hash, redirectUrl);
+	}, false);
+	
+	
 	//Add these default routes on boot so they are added as last options for sure.
 	//
 	//default route for entities		
 	go.Router.add(/([a-zA-Z0-9]*)\/([0-9]*)/, function(entity, id) {
+		
+		var entity = go.Entities.get(entity);
+		if(!entity) {
+			console.log("Entity ("+entity+") not found in default entity route")
+			return false;
+		}
     
     var module = go.Entities.get(entity).module; 
 		var mainPanel = GO.mainLayout.openModule(module);
@@ -134,15 +162,6 @@ GO.mainLayout.on("boot", function() {
 			console.log(arguments);
 		}
 	});
-	
-	go.Router.add(/login$/, function() {
-		GO.mainLayout.login();
-	}, false);
-
-	go.Router.add(/recover\/([a-f0-9]{40})/, function(hash) {
-		var recoveryPanel = new go.login.RecoveryDialog();
-		recoveryPanel.show(hash);
-	}, false);
 
 	//default route
 	go.Router.add(function() {	
@@ -159,6 +178,9 @@ GO.mainLayout.on("boot", function() {
 		
 	go.Router.check();			
 });
+
+
+
 
 window.addEventListener('hashchange', function() {	
 	go.Router.previousPath = go.Router.loadedPath;

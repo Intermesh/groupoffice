@@ -61,6 +61,11 @@ abstract class Entity  extends \go\core\orm\Entity {
 		return parent::internalSave();
 	}
 	
+	/**
+	 * Implements soft delete
+	 * 
+	 * @return boolean
+	 */
 	protected function internalDelete() {
 		$this->deletedAt = new DateTime();
 

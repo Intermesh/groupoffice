@@ -98,17 +98,19 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				} else {
 					go.User.clearAccessToken();
 					
-					
-					
 					me.fireEvent("boot", this);
-					go.Router.pathBeforeLogin = go.Router.getPath();
-					go.Router.goto("login");
+					if(go.Router.requireAuthentication) {
+						go.Router.pathBeforeLogin = go.Router.getPath();
+						go.Router.goto("login");
+					}
 				}
 			});
 		} else {
 			this.fireEvent("boot", this); // In the router there is an event attached.
-			go.Router.pathBeforeLogin = go.Router.getPath();
-			go.Router.goto("login");
+			if(go.Router.requireAuthentication) {
+				go.Router.pathBeforeLogin = go.Router.getPath();
+				go.Router.goto("login");
+			}
 		}
 	},
 
@@ -575,7 +577,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 							}, {
 								text: t("Logout"),
 								iconCls: 'ic-exit-to-app',
-								handler: go.AuthenticationManager.logout,
+								handler: function() {
+									go.AuthenticationManager.logout();
+								},
 								scope: this
 							}
 						]

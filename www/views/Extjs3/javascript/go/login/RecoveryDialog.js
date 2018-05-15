@@ -1,6 +1,6 @@
 /* global go, Ext */
 
-go.login.RecoveryDialog = Ext.extend(GO.Window, {
+go.login.RecoveryDialog = Ext.extend(go.Window, {
 
 	closable: false,
 	resizable: false,
@@ -26,37 +26,39 @@ go.login.RecoveryDialog = Ext.extend(GO.Window, {
 					}
 				})
 			]
-		},{
-			xtype:'fieldset',
-			items:[this.recoveryText = new Ext.BoxComponent({
-					html: t("Loading"),
-					cls: 'login-text-comp'
-				}),
-				this.displayField = new Ext.form.DisplayField({
-					fieldLabel: t('Username')
-				}),
-				this.hashField = new Ext.form.Hidden({
-					name:'hash'
-				}),
-				this.passwordField = new Ext.form.TextField({
-					xtype:'textfield',
-					inputType: 'password',
-					name:'newPassword',
-					anchor: '0',
-					fieldLabel: t('New password'),
-					allowBlank: false
-				})
-				,
-				this.confirmPasswordField = new Ext.form.TextField({
-					xtype:'textfield',
-					inputType: 'password',
-					name:'confirmPassword',
-					anchor: '0',
-					fieldLabel: t('Confirm password'),
-					allowBlank: false
-				})
-			]
-		}];
+		},this.formPanel = new Ext.form.FormPanel({
+			items:[{
+				xtype:'fieldset',
+				items:[this.recoveryText = new Ext.BoxComponent({
+						html: t("Loading"),
+						cls: 'login-text-comp'
+					}),
+					this.displayField = new Ext.form.DisplayField({
+						fieldLabel: t('Username')
+					}),
+					this.hashField = new Ext.form.Hidden({
+						name:'hash'
+					}),
+					this.passwordField = new Ext.form.TextField({
+						xtype:'textfield',
+						inputType: 'password',
+						name:'password',
+						anchor: '0',
+						fieldLabel: t('New password'),
+						allowBlank: false
+					})
+					,
+					this.confirmPasswordField = new Ext.form.TextField({
+						xtype:'textfield',
+						inputType: 'password',
+						name:'confirmPassword',
+						anchor: '0',
+						fieldLabel: t('Confirm password'),
+						allowBlank: false
+					})
+					]
+				}]
+		})];
 	
 		this.buttons = [{
 			text: t('Change'),
@@ -81,8 +83,25 @@ go.login.RecoveryDialog = Ext.extend(GO.Window, {
 					callback: function(options, success, response){
 						var result = Ext.decode(response.responseText);
 						if(success && result.passwordChanged){ // Password has been change successfully
-							this.close();
-							GO.mainLayout.login();
+							
+							if(this.redirectUrl) {
+								document.location = this.redirectUrl;
+							} else
+							{
+								this.close();
+								GO.mainLayout.login();
+							}
+						} else
+						{
+							//mark validation errors
+							for(name in result.validationErrors) {
+								var field = this.formPanel.getForm().findField(name);
+								if(field) {
+									field.markInvalid(result.validationErrors[name].description);
+								}
+							}
+
+							Ext.MessageBox.alert(t("Error"), t("Sorry, something went wrong. Please try again."));
 						}
 					},
 					scope: this	
@@ -94,8 +113,10 @@ go.login.RecoveryDialog = Ext.extend(GO.Window, {
 		go.login.RecoveryDialog.superclass.initComponent.call(this);
 	},
 	
-	show : function(hash) {
+	show : function(hash, redirectUrl) {
 		go.login.RecoveryDialog.superclass.show.call(this);
+		
+		this.redirectUrl = redirectUrl;
 		
 		Ext.Ajax.request({
 			url:BaseHref+'auth.php',

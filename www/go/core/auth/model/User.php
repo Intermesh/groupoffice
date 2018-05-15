@@ -387,21 +387,21 @@ class User extends Entity {
 		return $methods;
 	}
 	
-	public function sendRecoveryMail($to){
+	public function sendRecoveryMail($to, $redirectUrl = ""){
 		
 		$this->recoveryHash = bin2hex(random_bytes(20));
 		$this->recoverySendAt = new \DateTime();
 		
 		$siteTitle=\GO()->getSettings()->title;
-		$url = \GO()->getSettings()->URL.'/resetpassword?hash='.$this->recoveryHash;
-		$emailBody = \GO()->t('recoveryMailBody','core','lostpassword');
+		$url = \GO()->getSettings()->URL.'#recover/'.$this->recoveryHash . '/' . urlencode($redirectUrl);
+		$emailBody = \GO()->t('recoveryMailBody');
 		$emailBody = sprintf($emailBody,$this->displayName, $siteTitle, $this->username, $url);
 		$emailBody = str_replace('{ip_address}', \GO\Base\Util\Http::getClientIp() , $emailBody);
 		
 		$message = \GO()->getMailer()->compose()	  
 			->setFrom(\GO()->getSettings()->systemEmail, $siteTitle)
 			->setTo(!empty($to) ? $to : $this->recoveryEmail, $this->displayName)
-			->setSubject(GO()->t('Lost password','core','lostpassword'))
+			->setSubject(GO()->t('Lost password'))
 			->setBody($emailBody);
 		
 		return $this->save() && $message->send();

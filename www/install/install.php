@@ -94,6 +94,7 @@ require('header.php');
 	<form method="POST" action="" onsubmit="submitButton.disabled = true;">
 		<fieldset>
 			<h2>Create an administrator account</h2>
+			<p>Please fill in the details for the administrative account and press "Install".</p>
 			<p>
 				<label>E-mail</label>
 				<input type="email" name="email" value="<?= $_POST['email'] ?? ""; ?>" required />

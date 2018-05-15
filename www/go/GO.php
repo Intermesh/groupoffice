@@ -699,9 +699,6 @@ class GO{
 			self::config()->tmpdir = self::config()->getTempFolder()->path().'/';
 		}
 		
-		if(isset(GO::config()->init_script)) {
-			require(GO::config()->init_script);
-		}		
 		
 		GO::config()->fireEvent('init');
 		

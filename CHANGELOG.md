@@ -19,6 +19,17 @@ Core:
 - Frontend Router to make pages directly accessible
 - New global search
 - New installer
+- Removed config "init_script" Use a listener on "init" event instead.
+
+	public static function initListeners() {
+		GO::config()->addListener('init', '\GO\Awesome\AwesomeModule', 'init');
+	}
+
+	public static function init() {
+		//init stuff
+	}
+
+
 
 Notes
 - Uses new API

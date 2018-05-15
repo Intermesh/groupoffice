@@ -366,8 +366,8 @@ namespace go\core {
 				}
 			}
 
-			if (!empty($_SERVER['SERVER_NAME'])) {
-				$workingFile = '/etc/groupoffice/' . $_SERVER['SERVER_NAME'] . '/' . $name;
+			if (!empty($_SERVER['HTTP_HOST'])) {
+				$workingFile = '/etc/groupoffice/multi_instance/' . $_SERVER['HTTP_HOST'] . '/' . $name;
 				if (file_exists($workingFile)) {
 					return $workingFile;
 				}

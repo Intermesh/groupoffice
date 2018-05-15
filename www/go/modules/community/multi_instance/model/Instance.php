@@ -71,7 +71,7 @@ class Instance extends Entity {
 	}
 	
 	private function getConfigFile() {
-		return new File('/etc/groupoffice/' . $this->hostname . '/config.ini');
+		return new File('/etc/groupoffice/multi_instance/' . $this->hostname . '/config.ini');
 	}
 	
 	private function getDataFolder() {
@@ -97,6 +97,17 @@ class Instance extends Entity {
 		}
 		
 		if(!$this->isNew()) {
+			
+			if($this->isModified('deletedAt')) {
+				$bak = $this->getConfigFile()->getFolder()->getFile('config.ini.bak');
+				if($bak->exists())
+				{
+					if(!$bak->rename('config.ini')) {
+						return false;
+					}
+				}
+			}
+			
 			return true;
 		}
 		
@@ -193,6 +204,21 @@ class Instance extends Entity {
 	
 	protected function internalDelete() {
 		
+		if(!parent::internalDelete()) {
+			return false;
+		}
+		
+		//rename config.ini so it's unavailable
+		return $this->getConfigFile()->rename('config.ini.bak');
+	}
+	
+	
+	public function deleteHard() {
+		
+		if(!parent::deleteHard()) {
+			return false;
+		}
+		
 		$this->getTempFolder()->delete();
 		$this->getDataFolder()->delete();
 		$this->getConfigFile()->getFolder()->delete();
@@ -200,7 +226,7 @@ class Instance extends Entity {
 		$this->dropDatabaseUser($this->getDbUser());
 		$this->dropDatabase($this->getDbName());
 		
-		return parent::deleteHard();
+		return true;
 	}
 
 }

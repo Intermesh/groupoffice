@@ -190,7 +190,17 @@ class File extends FileSystemObject {
 	 * @param string
 	 */
 	public function getContentType() {
-		return mime_content_type($this->getPath());
+		
+		//sometimes these fail and are important to always be right
+		switch($this->getExtension()) {
+			case 'css':
+				return 'text/css';
+			case 'js':
+				return 'application/javascript';				
+			default:
+				return mime_content_type($this->getPath());
+		}		
+		
 	}
 
 	/**
@@ -198,27 +208,19 @@ class File extends FileSystemObject {
 	 * @param boolean $sendHeaders
 	 * @param boolean $useCache
 	 */
-	public function output($sendHeaders = true, $useCache = true) {
-//		@ob_end_clean();
-//		@ob_end_flush();
-
-		//readfile somehow caused a memory exhausted error. This stopped when I added
-		//ob_clean and flush above, but the browser hung with presenting the download
-		//dialog until the entire download was completed.
-		//The code below seems to work better.
-		//
-//		readfile($this->getPath());
+	public function output($sendHeaders = true, $useCache = true) {		
+		$r = \go\core\http\Response::get();
 	
 		if($sendHeaders) {
-			App::get()->getResponse()->setHeader('Content-Type', $this->getContentType());
-			App::get()->getResponse()->setHeader('Content-Disposition', 'inline; filename="' . $this->getName() . '"');
-			App::get()->getResponse()->setHeader('Content-Transfer-Encoding', 'binary');
+			$r->setHeader('Content-Type', $this->getContentType());
+			$r->setHeader('Content-Disposition', 'inline; filename="' . $this->getName() . '"');
+			$r->setHeader('Content-Transfer-Encoding', 'binary');
 
 			if ($useCache) {			
-				App::get()->getResponse()->setModifiedAt(new DateTime('@'.$this->getModifiedAt()));
-				App::get()->getResponse()->setETag($this->getMd5Hash());
-				App::get()->getResponse()->abortIfCached();
-			}		
+				$r->setModifiedAt(new DateTime('@'.$this->getModifiedAt()));
+				$r->setETag($this->getMd5Hash());
+				$r->abortIfCached();
+			}				
 		}		
 		
 		if(ob_get_contents() != '') {			
@@ -230,6 +232,8 @@ class File extends FileSystemObject {
 		if (!is_resource($handle)) {
 			throw new Exception("Could not read file");
 		}
+		
+		$r->sendHeaders();
 
 		while (!feof($handle)) {
 			echo fread($handle, 1024);
@@ -253,7 +257,7 @@ class File extends FileSystemObject {
 	}
 
 	/**
-	 * Move a file to another folder.
+	 * Move a file to new location
 	 *
 	 * @param File $destination The file may not exist yet.
 	 * @return boolean

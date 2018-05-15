@@ -1619,7 +1619,7 @@ GO.email.extraTreeContextMenuItems = [];
 go.Modules.register("legacy", 'email', {
 	mainPanel: GO.email.EmailClient,
 	title: t("E-mail"),
-	userSettingsPanels: [GO.email.SettingsPanel]
+	userSettingsPanels: ["GO.email.SettingsPanel"]
 });
 
 //GO.quickAddPanel.addButton(new Ext.Button({
