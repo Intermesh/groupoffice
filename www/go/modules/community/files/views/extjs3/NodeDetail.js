@@ -8,8 +8,7 @@ go.modules.community.files.NodeDetail = Ext.extend(go.panels.DetailView, {
 
 		Ext.apply(this, {
 			items: [
-				{
-					tpl: '<h3 class="title s8">{name}</h3>\
+				{tpl:new Ext.XTemplate('<h3 class="title s8">{name}</h3>\
 <h4 class="title s4 right">{[values.size && fm.fileSize(values.size)]}</h4>\
 <tpl if="values.blobId"><figure class="contain" style="max-height: 200px;background-image:url({[go.Jmap.downloadUrl(values.blobId)]});"></tpl>\
 <tpl if="!values.blobId"><div class="preview filetype folder"></div></tpl>\
@@ -17,9 +16,20 @@ go.modules.community.files.NodeDetail = Ext.extend(go.panels.DetailView, {
 <hr />\
 <p class="pad">\
 <label>Location</label>\
-<span>{location}</span></p>\
+<span>{[this.drawPath(values.location)]}</span></p>\
 <hr>'+go.panels.CreateModifyTpl
-				}
+				,{
+					drawPath: function(location) {
+						var str = '';
+						for(var i = 0; i < location.length; i++) {
+							str += location[i];
+							if(i < location.length-1) {
+								str += ' <i class="icon">chevron_right</i> ';
+							}
+						}
+						return str;
+					}
+				})}
 			]
 		});
 

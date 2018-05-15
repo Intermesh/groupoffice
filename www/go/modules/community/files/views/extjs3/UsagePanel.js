@@ -15,10 +15,8 @@ go.modules.community.files.UsagePanel = Ext.extend(Ext.Panel, {
 
 	usage: 0,
 	quota: 0,
-	
-	padding:dp(16),
 	html:'quota',
-	height:dp(48),
+	height:dp(40),
 	
 	initComponent: function () {
 		this.setData(go.User.storage.usage,go.User.storage.quota);

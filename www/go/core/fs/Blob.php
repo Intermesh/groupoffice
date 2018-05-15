@@ -66,7 +66,15 @@ class Blob extends orm\Entity {
 		if(!$this->isNew()) {
 			return true;
 		}
+		$this->parseMetaData();
 		return parent::internalSave();
+	}
+	
+	private function parseMetaData() {
+		$metaData = new MetaData($this);
+		if($metaData->extract() !== false) {
+			$metaData->save();
+		}
 	}
 	
 	protected function internalDelete() {

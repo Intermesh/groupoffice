@@ -92,7 +92,7 @@ class Node extends model\AclEntity {
 	}
 	
 	public function getLocation() {
-		return '/biem/'.$this->name;
+		return ['biem','jaha',$this->name];
 	}
 	
 	public function getParentId(){
@@ -167,6 +167,16 @@ class Node extends model\AclEntity {
 			}
 		}
 		return parent::filter($query, $filter);		
+	}
+	
+	public static function sort(Query $query, array $sort) {
+		
+		if(isset($sort['size'])) {			
+			$query->orderBy(['blob.size' => $sort['size']]);			
+		} 
+		
+		return parent::sort($query, $sort);
+		
 	}
 	
 	public function toArray($properties = array()) {

@@ -2,8 +2,12 @@
 
 namespace go\core\fs;
 
-class MetaData extends \go\core\orm\Property {
-	
+use go\core\orm;
+
+class MetaData extends orm\Property {
+	/**
+	 * @var Blob
+	 */
 	protected $blob;
 	public $blobId;
 	public $title;
@@ -15,7 +19,7 @@ class MetaData extends \go\core\orm\Property {
 	public $creator;
 	public $date; // (picture taken / document version)
 	public $encoding; // codec / color profile / pdf(GNU Ghostscript 7.05)
-	public $thumbnail; // blobId of cached thumbnail image (resized origional / extracted from ID3)
+	public $thumbnail; // blobId of cached thumbnail image (resized original / extracted from ID3)
 	
 	public $data1;
 	public $data2;
@@ -41,24 +45,29 @@ class MetaData extends \go\core\orm\Property {
 	const WIDTH = 'data3';
 	const HEIGHT = 'data4';
 	//Image
-	const COLOR_PROFILE = 'data1';
+	const CAMERA = 'data1';
 	const ORIENTATION = 'data2';
 	const LATITUDE = 'data5';
 	const LONGITUDE = 'data6';
+	const COMPRESSION = 'data7';
 
 	public function __construct($blob) {
 		$this->blob = $blob;
 	}
 	
-	private function extractMetaData() {
-		switch($this->mimeType) {
+	public function extract() {
+		switch($this->blob->contentType) {
 			case 'image/jpeg':
 			case 'image/png':
 			case 'image/gif':
 				$this->extractExif();
+			case 'image/bmp':
+			case 'image/webp':
+				$this->createThumbnail();
 				break;
 			case 'audio/mp3':
 				$this->extractID3();
+			default: return false;
 		}
 	}
 	
@@ -80,37 +89,88 @@ class MetaData extends \go\core\orm\Property {
 		return $this->reader;
 	}
 	
-	public  function extractExif($path) {
-		$exif = exif_read_data($path, 'IFD0');
-		echo $exif===false ? "No header data found.<br />\n" : "Image contains headers<br />\n";
-
+	private function extractExif() {
+		$path = $this->blob->path(0);
 		$exif = exif_read_data($path, 0, true);
-		echo "test.jpg:<br />\n";
+		if($exif === false) {
+			return;
+		}
+		$camera = [];
 		foreach ($exif as $key => $section) {
-			 foreach ($section as $name => $val) {
-				  echo "$key.$name: $val<br />\n";
-			 }
+			foreach ($section as $name => $val) {
+				switch ($name) {
+					case 'Software': $this->author = $val; break;
+					case 'DateTime': $this->date = $val; break;
+					case 'DateTimeOriginal': $this->date = $val; break;
+					case 'Copyright': $this->copyright = $val; break;
+					case 'MakerNote': $this->description = $val; break;
+					case 'ColorSpace': $this->encoding = $val; break;
+					case 'Software': $this->creator = $val; break;
+					case 'ExifImageWidth': $this->{self::WIDTH} = $val; break;
+					case 'ExifImageHeight': $this->{self::HEIGHT} = $val; break;
+					case 'Orientation': $this->{self::ORIENTATION} = $val; break;
+					case 'Compression': $this->{self::COMPRESSION} = $val; break;
+					//camera
+					case 'Make': $camera['make'] = $val; break;
+					case 'FNumber': $camera['f_number'] = $val; break;
+					case 'MeteringMode': $camera['metering_mode'] = $val; break;
+					case 'FocalLength': $camera['focal_length'] = $val; break;
+					case 'ExposureProgram': $camera['exposure_program'] = $val; break;
+					case 'ExposureTime': $camera['exposure_time'] = $val; break;
+				}
+			}
+		}
+		if(!empty($camera)) {
+			$this->{self::CAMERA} = json_encode($camera);
+		}
+		return $this;
+	}
+	
+	private function createThumbnail($maxw = 240, $maxh = 240) {
+		$path = $this->blob->path();
+		
+		switch($this->blob->contentType) {
+			case 'image/jpeg': $src = imagecreatefromjpeg($path); break;
+			case 'image/png': $src = imagecreatefrompng($path); break;
+			case 'image/gif': $src = imagecreatefromgif($path); break;
+			case 'image/bmp': $src = imagecreatefrombmp($path); break;
+			case 'image/webp': $src = imagecreatefromwebp($path); break;
+		}
+		list($width, $height) = getimagesize($src);
+		$ratio = $width/$height;
+		if ($maxw/$maxh > $ratio) {
+			$maxw = $maxh*$ratio;
+		} else {
+			$maxh = $maxw/$ratio;
+		}
+		$image = imagecreatetruecolor($maxw, $maxh);
+		imagecopyresampled($image, $src, 0, 0, 0, 0, $maxw, $maxh, $width, $height);
+		$dest = GO()->getDataFolder()->getPath() . '/tmp/thumb_'.$this->blob->name;
+		imagejpeg($image, $dest, 60);
+		$blob = Blob::fromTmp($dest);
+		if($blob->save()){
+			$this->thumbnail = $blob->id;
 		}
 	}
 	
-	public function extractID3($path) {
-
-		$biem = \id3_get_tag($path);
-		return $biem;
+	private function extractID3() {
+		$path = $this->blob->path();
 		$id3 = new datareader\ID3Reader(fopen($path, "rb"));
 		$id3->readAllTags(); //Calling this is necesarry before others
 		foreach($id3->data as $tag => $value) {
-			if($tag === 'TCOP') $this->copyright = $value;
-			if($tag === 'TIT2') $this->title = $value;
-			if($tag === 'COMM') $this->description = $value;
-			if($tag === 'TPE1') $this->author = $value;
-			if($tag === 'AENC') $this->encoding = $value;
-			if($tag === 'TDAT') $this->date = $value;
-			if($tag === 'WXXX') $this->uri = $value;
-			if($tag === 'TPE3') $this->creator = $value;
-			if($tag === 'TALB') $this->{self::ALBUM} = $value;
-			if($tag === 'TYER') $this->{self::YEAR} = $value;
-			if($tag === 'TCON') $this->{self::GENRE} = $value;
+			switch($tag) {
+				case 'TCOP': $this->copyright = $value; break;
+				case 'TIT2': $this->title = $value; break;
+				case 'COMM': $this->description = $value; break;
+				case 'TPE1': $this->author = $value; break;
+				case 'AENC': $this->encoding = $value; break;
+				case 'TDAT': $this->date = $value; break;
+				case 'WXXX': $this->uri = $value; break;
+				case 'TPE3': $this->creator = $value; break;
+				case 'TALB': $this->{self::ALBUM} = $value; break;
+				case 'TYER': $this->{self::YEAR} = $value; break;
+				case 'TCON': $this->{self::GENRE} = $value; break;
+			}
 		}
 		return $this;
 	}

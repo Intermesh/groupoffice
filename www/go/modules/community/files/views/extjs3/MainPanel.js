@@ -211,11 +211,12 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 								{text:t('Shared with me')},
 								{text:t('Bookmarks')}
 							]
-						}),
+						})
+					]},
+				bbar: 
 						this.breadCrumbs = new go.modules.community.files.BreadCrumbBar({
 							browser:this.browser
 						})
-					]}
 				}), //first is default in narrow mode
 				this.nodeDetail
 			]
