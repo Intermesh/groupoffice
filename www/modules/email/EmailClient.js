@@ -810,22 +810,14 @@ GO.email.EmailClient = function(config){
 		cls: 'x-btn-text-icon',
 		handler: function(){
 
-			if (!this._permissionDelegated) {
-				GO.email.showComposer({
-					uid: this.messagePanel.uid,
-					task: 'reply',
-					mailbox: this.messagePanel.mailbox,
-					account_id: this.account_id
-				});
-			} else {
-				GO.email.showComposer({
-					uid: this.messagePanel.uid,
-					task: 'reply',
-					mailbox: this.messagePanel.mailbox,
-					account_id: this.account_id,
-					delegated_cc_enabled: true
-				});
-			}
+	
+			GO.email.showComposer({
+				uid: this.messagePanel.uid,
+				task: 'reply',
+				mailbox: this.messagePanel.mailbox,
+				account_id: this.account_id,
+				delegated_cc_enabled: this._permissionDelegated
+			});
 		},
 		scope: this
 	}),this.replyAllButton=new Ext.Button({

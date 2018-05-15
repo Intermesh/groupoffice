@@ -889,7 +889,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		Ext.getBody().mask(GO.lang.waitMsgLoad);
 
 		delete this.link_config;
-
+		
 		this.showConfig=config;
 		
 		if (!this.rendered) {
@@ -1148,22 +1148,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 				}
 			}
 			
-			if (!GO.util.empty(config['delegated_cc_enabled'])) {
-				
-				GO.request({
-					url: 'email/account/loadAddress',
-					params: {
-						id: config.account_id
-					},
-					success: function( options, response, result ) {
-						var name = result.data['name'];
-						var email = result.data['email'];
-						this.ccCombo.setValue('"'+name+'" <'+email+'>');
-					},
-					scope: this
-				});
-				
-			}
+			
 				
 		}
 	},
@@ -1248,6 +1233,26 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		if(this.selectLinkField){
 			this.replaceTemplateLinkTag();
 		}
+		
+		console.log(config);
+		
+		if (config['delegated_cc_enabled']) {
+				
+				GO.request({
+					url: 'email/account/loadAddress',
+					params: {
+						id: config.account_id
+					},
+					success: function( options, response, result ) {
+						console.log(result);
+						var name = result.data['name'];
+						var email = result.data['email'];
+						this.ccCombo.setValue('"'+name+'" <'+email+'>');
+					},
+					scope: this
+				});
+				
+			}
 	},
 	
 
