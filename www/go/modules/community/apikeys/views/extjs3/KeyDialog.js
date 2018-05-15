@@ -10,8 +10,8 @@ go.modules.community.apikeys.KeyDialog = Ext.extend(go.form.Dialog, {
 						xtype: 'textfield',
 						name: 'name',
 						fieldLabel: t("Name"),
-						anchor: '100%',
-						required: true
+						anchor: '100%',						
+						allowBlank: false
 					}]
 			}
 		];

@@ -139,7 +139,9 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 		this.selectView.select(this.tabStore.getAt(0));
 		
-		this.load();
+		if(this.currentUser) {
+			this.load();
+		}
 	},
 	
 	/**
@@ -289,7 +291,12 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		this.actionComplete();
 		
 		//reload group-office
-		document.location = BaseHref + "?SET_LANGUAGE=" + this.formPanel.getForm().findField('language').getValue();
+		if(this.currentUser == go.User.id) {
+			document.location = BaseHref + "?SET_LANGUAGE=" + this.formPanel.getForm().findField('language').getValue();
+		} else
+		{
+			this.close();
+		}
 	},
 		
 	/**

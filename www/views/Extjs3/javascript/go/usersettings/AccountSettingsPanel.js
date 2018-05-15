@@ -50,7 +50,13 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 				},{
 					flex:1,
 					layout: 'form',
-					items: [
+					items: [{
+						xtype: 'textfield',
+						name: 'username',
+						fieldLabel: t("Username"),
+						needPasswordForChange: true,
+						allowBlank: false
+					}, 
 					this.displayNameField = new Ext.form.TextField({
 						fieldLabel: t('Display name'),
 						name: 'displayName',
@@ -81,18 +87,22 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 			labelWidth:dp(152),
 			title: t('Password'),
 			items:[
-				this.passwordField1 = new Ext.form.TextField({
-					inputType: 'password',
-					fieldLabel: t("New password", "users"),
-					needPasswordForChange: true,
-					name: 'password',
-					minLength: 8
+				this.passwordField1 = new go.form.PasswordGeneratorField({						
+					allowBlank: false,
+					listeners: {
+						generated : function(field, pass) {
+							this.passwordField2.setValue(pass);
+						},
+						scope: this
+					},
+					needPasswordForChange: true
+
 				}),
+		
 				this.passwordField2 = new Ext.form.TextField({
 					inputType: 'password',
 					fieldLabel: t("Confirm password", "users"),
-					name: 'passwordConfirm',
-					minLength: 8
+					name: 'passwordConfirm'
 				})
 			]
 		});

@@ -97,10 +97,14 @@ go.form.Dialog = Ext.extend(go.Window, {
 			this.getFooterToolbar().setDisabled(false);
 		}
 	},
+	
+	isValid : function() {
+		return this.formPanel.getForm().isValid()
+	},
 
 	submitForm: function () {
 
-		if (!this.formPanel.getForm().isValid()) {
+		if (!this.isValid()) {
 			return;
 		}
 

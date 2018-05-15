@@ -255,6 +255,7 @@ views/Extjs3/javascript/go/grid/SelectAllCheckBox.js
 views/Extjs3/javascript/go/Window.js
 views/Extjs3/javascript/go/form/Dialog.js
 views/Extjs3/javascript/go/form/FormFieldSet.js
+views/Extjs3/javascript/go/form/PasswordGeneratorField.js
 views/Extjs3/javascript/go/form/BasicForm.js
 views/Extjs3/javascript/go/form/DateField.js
 views/Extjs3/javascript/go/form/FileField.js

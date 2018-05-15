@@ -344,6 +344,21 @@ class User extends Entity {
 	public function hasPermissionLevel($level = Acl::LEVEL_READ) {
 		return $this->id == App::get()->getAuthState()->getUser()->id || App::get()->getAuthState()->getUser()->isAdmin();
 	}
+	
+	public static function filter(Query $query, array $filter) {
+		
+		if(!empty($filter['q'])) {
+			$query->andWhere(
+							(new \go\core\db\Criteria())
+							->where('username', 'LIKE', $filter['q'] . '%')
+							->orWhere('displayName', 'LIKE', $filter['q'] .'%')
+							->orWhere('email', 'LIKE', $filter['q'] .'%')
+							);
+			
+		}
+		
+		return parent::filter($query, $filter);
+	}
 
 	/**
 	 * Check if use is an admin
