@@ -309,27 +309,31 @@ a {
 		@extend .icon;
 		cursor: pointer;
 		display: block;
-		width: dp(16);
+		width: dp(24);
 		height: dp(32);
 		position: absolute;
 		top: 0;
 		right:0;
 		border-left: 1px solid;
 		border-image: linear-gradient(to bottom, transparent, color($foreground, 'line')) 1 100%;
+		&:hover {
+			color: color($primary, 700);
+		}
 		&::after {
+			margin-left:dp(4);
 			font-size: .7em;
 			content:'more_vert';
 		}
 	}
 	&.x-grid-panel .x-grid3-header {
 		position:relative;
-		padding-right: dp(16);
+		padding-right: dp(24);
 		.x-grid3-hd-over .x-grid3-hd-btn {
 			display: none;
 		}
 	}
 	.x-grid3-cell-last {
-		padding-right: dp(16);
+		padding-right: dp(24);
 	}
 }
 

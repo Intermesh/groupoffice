@@ -144,12 +144,14 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 								store: this.browser.store,
 								listeners: {
 									open: function() {
-										this.breadCrumbs.setVisible(false);
+										//this.breadCrumbs.setVisible(false);
 										this.advancedSearchBar.setVisible(true);
+										this.doLayout();
 									},
 									close: function() {
-										this.breadCrumbs.setVisible(true);
+										//this.breadCrumbs.setVisible(true);
 										this.advancedSearchBar.setVisible(false);
+										this.doLayout();
 									},
 									scope:this
 								}
@@ -203,8 +205,6 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 											this.browser.store.baseParams.filter.parentId = btn.parentId;
 											this.browser.store.reload();
 										}
-										
-										console.log(btn.parentId);
 									},
 									scope:this
 								},
@@ -215,7 +215,8 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 					]},
 				bbar: 
 						this.breadCrumbs = new go.modules.community.files.BreadCrumbBar({
-							browser:this.browser
+							browser:this.browser,
+							style: {'background-color':'white'}
 						})
 				}), //first is default in narrow mode
 				this.nodeDetail

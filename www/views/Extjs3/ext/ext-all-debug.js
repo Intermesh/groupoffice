@@ -47905,6 +47905,7 @@ Ext.grid.GridView = Ext.extend(Ext.util.Observable, {
                 value  : colModel.getColumnHeader(i) || '',
                 style  : this.getColumnStyle(i, true),
                 css    : cssCls,
+					 sortable: colModel.isSortable(i) ? 'x-sortable':'x-notsortable',
                 tooltip: this.getColumnTooltip(i)
             };
             

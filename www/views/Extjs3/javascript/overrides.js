@@ -501,6 +501,9 @@ Ext.override(Ext.grid.GridView,{
             } else {
                 cssCls = i == last ? 'x-grid3-cell-last ' : '';
             }
+				if(colModel.isSortable(i)) {
+					cssCls += 'x-grid3-sortable ';
+				}
             
             properties = {
                 id     : colModel.getColumnId(i),
@@ -510,9 +513,8 @@ Ext.override(Ext.grid.GridView,{
                 tooltip: this.getColumnTooltip(i)
             };
             
-						//disable padding right in GO theme because it looks ugly
-            if (GO.settings.theme!='Group-Office' && colModel.config[i].align == 'right') {
-                properties.istyle = 'padding-right: 16px;';
+            if (colModel.config[i].align == 'right') {
+                properties.istyle = 'padding-right: '+dp(16)+';';
             } else {
                 delete properties.istyle;
             }

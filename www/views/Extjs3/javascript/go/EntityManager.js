@@ -62,7 +62,7 @@
 		name = name.toLowerCase();
 		
 		if(!entities[name]) {
-			throw "Entity " + name + " does not exist";
+			return false; //throw "Entity " + name + " does not exist";
 		}
 		
       return entities[name];      

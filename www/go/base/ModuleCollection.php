@@ -218,7 +218,7 @@ class ModuleCollection extends Model\ModelCollection{
 	public function isInstalled($name){
 		$model = $this->model->findByName($name);
 		
-		if(!$model || !$model->enabled || !$this->_isAllowed($model->name))
+		if(!$model || !$model->enabled || !empty($model->package) || !$this->_isAllowed($model->name))
 				return false;
 		
 		return $model;

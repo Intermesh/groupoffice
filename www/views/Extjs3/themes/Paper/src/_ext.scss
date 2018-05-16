@@ -843,6 +843,7 @@ ul.x-tab-strip-bottom{
 	.x-searchbar {
 		background-color: color($background, 'box');
 		opacity:1;
+		padding:0 dp(8);
 		position:absolute;
 		top:0;
 		bottom:0;
@@ -854,8 +855,13 @@ ul.x-tab-strip-bottom{
 		}
 		input {
 			box-shadow: none;
-			min-height: dp(36);
+			min-height: dp(56);
 			border:0;
+			+ .x-form-search-trigger {
+				min-height:dp(56);
+				padding: 0 dp(8) 0 dp(16);
+				width: auto;
+			}
 		}
 	}
 }
@@ -1046,12 +1052,14 @@ ul.x-tab-strip-bottom{
 			&.x-grid3-cell-last {
 				border-right: 0;
 			}
+			&.x-grid3-hd-over.x-grid3-sortable { cursor:pointer; color: color($primary, 700); }
 		}
 		 
 		&-text {
 			color:color($foreground, 'text');
 		}
 		&-inner { position:initial;}
+		
 	}
 	&-header{
 		//margin-top: dp(9); //don't understand why +1 here?
