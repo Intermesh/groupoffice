@@ -1502,7 +1502,7 @@ td.grid-hd-group-cell {
 		.x-tree-node-over {
 			background-color: $cHover;
 			.tree-button {
-				display:block;
+				display:inline-block;
 			}
 		}
 		&-indent span {
@@ -1517,9 +1517,12 @@ td.grid-hd-group-cell {
 		}
 		.tree-button{
 			display:none;
-			position:absolute;
-			top:0;
-			right:0;
+			height:dp(23);
+			width:dp(23);
+			button:before{
+				top:-1px;
+				left:0px;
+			}
 		}
 	}
 	&-node-el {

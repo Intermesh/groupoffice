@@ -1745,6 +1745,7 @@ input.x-tree-node-cb {
 /* Fix for ie rootVisible:false issue */
 .x-tree-root-ct {
 		float:left;
+		min-width:100%;
     zoom:1;
 }
 
