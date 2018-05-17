@@ -41,7 +41,8 @@ go.modules.community.files.NodeDetail = Ext.extend(go.panels.DetailView, {
 					collapsible:true,
 					tpl: new Ext.XTemplate('<tpl if="values.metaData"><div class="pad">\
 <tpl if="values.metaData.encoding"><label>Color profile</label> <span>{values.metaData.encoding}</span></tpl>\
-<tpl if="values.metaData.data2"><label>Alpha channel</label> <span>{values.metaData.data2}</span></tpl>\
+<tpl if="values.metaData.data7"><label>Alpha channel</label> <span>{values.metaData.data7}</span></tpl>\
+<tpl if="values.metaData.data2"><label>Orientation</label> <span>{values.metaData.data2}</span></tpl>\
 <tpl if="values.metaData.date"><label>Last opened</label> <span>{values.metaData.date}</span></tpl>\
 <tpl if="values.metaData.title"><label>Title</label> <span>{values.metaData.title}</span></tpl>\
 <tpl if="values.metaData.author"><label>Author</label> <span>{values.metaData.author}</span></tpl>\
@@ -49,11 +50,10 @@ go.modules.community.files.NodeDetail = Ext.extend(go.panels.DetailView, {
 <tpl if="values.metaData.copyright"><label>Copyright</label> <span>{values.metaData.copyright}</span></tpl>\
 <tpl if="values.metaData.uri"><label>uri</label> <span>{values.metaData.uri}</span></tpl>\
 <tpl if="values.metaData.creator"><label>creator</label> <span>{values.metaData.creator}</span></tpl>\
-<tpl if="values.metaData.date"><label>date</label> <span>{values.metaData.date}</span</tpl>\
+<tpl if="values.metaData.date"><label>Taken at</label> <span>{[fm.date(values.metaData.date)]}</span</tpl>\
 <tpl if="values.metaData.data1"><label>camera</label> <span>{values.metaData.data1}</span></tpl>\
 <tpl if="values.metaData.data3"><label>Resolution</label> <span>{values.metaData.data3} x {values.metaData.data4}</span></tpl>\
 <tpl if="values.metaData.data5"><label>Location</label> <span>{values.metaData.data5} x {values.metaData.data6}</span></tpl>\
-<tpl if="values.metaData.data7"><label>Compression</label> <span>{values.metaData.data7}</span></tpl>\
 </div></tpl>')
 				}
 			]
