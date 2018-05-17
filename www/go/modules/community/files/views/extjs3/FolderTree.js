@@ -3,10 +3,14 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 	contextMenu: null,
 	animate: true,
 	enableDD:true,
-	folderSelectMode:false, // Mode to make from the tree a folder select component.
 	dropConfig: {
-		appendOnly:true
+		appendOnly:true,
+		ddGroup:'files-center-dd'
 	},
+	dragConfig: {
+		ddGroup:'files-center-dd'
+	},
+	folderSelectMode:false, // Mode to make from the tree a folder select component.
 	browser:null,
 	loader: new go.tree.TreeLoader({
 		baseAttrs:{
@@ -43,9 +47,67 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 			this.browser.goto(this.getPath(node));
 		},this);
 	
-		this.on('nodedrop',function(dropEvent){
-			this.moveFolder(dropEvent.dropNode,dropEvent.target);
+		this.on('beforenodedrop', function(dropEvent){
+
+			if(dropEvent.dropNode){
+				// Dragged from tree
+				this.moveFolder(dropEvent.dropNode.attributes.entityId,dropEvent.target.attributes.entityId);
+			} else {
+				// Dragged from grid (Can be multiple items)
+				for(var i=0;i<dropEvent.data.selections.length;i++) {
+					this.moveFolder(dropEvent.data.selections[i].json.id,dropEvent.target.attributes.entityId);
+				}
+			}
+			
 		},this);
+	
+		this.on('nodedragover', function(overEvent){
+			var dropOnEntity = overEvent.target.attributes.entity;
+			var dragEntities = [];
+			
+			if(overEvent.data.node){
+				// It's a tree node
+				dragEntities.push(overEvent.data.node.attributes.entity);
+			} else {
+				// Dragged from grid (Can be multiple items)
+				for(var i=0;i<overEvent.data.selections.length;i++) {
+					dragEntities.push(overEvent.data.selections[i].json);
+				}
+			}
+			
+			for(var j=0;j<dragEntities.length;j++) {
+				if(dragEntities[j].parentId == dropOnEntity.id){
+					// Drop on its parent
+					return false;
+				}
+				
+				if(dragEntities[j].id == dropOnEntity.id){
+					// Drop on itself
+					return false;
+				}
+			}
+			
+			return true;
+			
+		},this);
+	
+		this.on('contextmenu', function(node, event){
+			event.stopEvent();
+
+			var selModel = this.getSelectionModel();
+
+			if(!selModel.isSelected(node)){
+				selModel.clearSelections();
+				selModel.select(node);
+			}
+
+			if(node.attributes && node.attributes.entityId){
+				if(node.attributes.entityId !== 'my-files' && node.attributes.entityId !== 'shared-with-me' && node.attributes.entityId !== 'bookmarks'){
+					var record = node.attributes.entity;
+					this.getContextMenu().showAt(event.getXY(), [record]);
+				}
+			}
+		}, this);
 		
 		this.browser.on('pathchanged', function(){
 			this.openPath(this.browser.getPath(true));
@@ -91,7 +153,7 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 					return;
 				}
 				var diff = go.util.getDiff(entity,updatedNode[0]);
-				
+
 				// The bookmarked property of the entity is changed
 				if(Ext.isDefined(diff.bookmarked)){
 					bookmarksNeedUpdate = true;
@@ -108,6 +170,9 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 				if(nodeInTree.contextMenuButton){
 					nodeInTree.contextMenuButton.entity = updatedNode[0];
 				}
+				
+				//Update the tree entity
+				nodeInTree.attributes.entity = updatedNode[0];
 			});
 		}
 
@@ -118,7 +183,9 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 		if(bookmarksNeedUpdate){
 			var bookmarkNodes = this.getTreeNodesByEntityId('bookmarks');
 			if(bookmarkNodes.length === 1){
-				bookmarkNodes[0].reload();
+				if(bookmarkNodes[0].expanded){ // Only when the node is expanded
+					bookmarkNodes[0].reload();
+				}
 			}
 		}	
 	},
@@ -279,15 +346,13 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 	
 	/**
 	 * 
-	 * @param Ext.tree.AsyncTreeNode nodeToMove
-	 * @param Ext.tree.AsyncTreeNode targetNode
+	 * @param int nodeToUpdateId
+	 * @param int newParentId
 	 * @return {undefined}
 	 */
-	moveFolder : function(nodeToMove,targetNode){
-		
-		var nodeToUpdateId = nodeToMove.attributes.entityId;
-		
-		var params = {}, me=this, newParentId=targetNode.attributes.entityId;
+	moveFolder : function(nodeToUpdateId,newParentId){
+				
+		var params = {};
 		
 		// Workaround for myfiles
 		if(newParentId === 'my-files'){
