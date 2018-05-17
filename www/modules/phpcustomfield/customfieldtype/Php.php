@@ -17,14 +17,15 @@ class Php extends \GO\Customfields\Customfieldtype\AbstractCustomfieldtype{
 		$f = $this->field->extra_options;
 		$old = ini_set("display_errors", "on");
 		$method = function ($cf, $model) use($f) {
-			$ret = eval($f);
 			
-			if($ret===false){
-				
-				$error = $this->php_syntax_error($f);
-				return "Error: ".$error[0].", line: ".$error[1];
+			try{
+				$ret = eval($f);
+			} catch(\Throwable $e){
+				\GO::debug($this->field->id);
+				\GO::debug($e->getMessage());
+				return "Error: ".$this->field->id.", ".$e->getMessage();
 			}
-			
+						
 			return (string) $ret;
 		};
 		if($old!==false)
