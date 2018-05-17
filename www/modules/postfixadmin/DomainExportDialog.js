@@ -28,7 +28,6 @@ GO.postfixadmin.DomainExportDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 			formPanelConfig : {
 				standardSubmit:true
 			},
-			titleField:'domain',
 			title: GO.postfixadmin.lang.exportDomain,
 			formControllerUrl: 'postfixadmin/domain',
 			width:500,

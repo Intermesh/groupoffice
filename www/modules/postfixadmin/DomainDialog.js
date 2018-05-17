@@ -77,26 +77,23 @@ GO.postfixadmin.DomainDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 		
 		
 		var buttons = [];
+	
+		buttons.push(this.buttonExport = new Ext.Button({
+			text: GO.lang['cmdExport'],
+			handler: function(){
+				var domainExportDialog = new GO.postfixadmin.DomainExportDialog();
+
+				var data = {
+					remoteModelId:this.remoteModelId,
+					domain:this.loadData.domain
+				};
+
+				domainExportDialog.show(data);
+			},
+			scope:this
+		}));
 		
-		
-		if(GO.settings.modules.postfixadmin.write_permission){
-			buttons.push(this.buttonExport = new Ext.Button({
-				text: GO.lang['cmdExport'],
-				handler: function(){
-					var domainExportDialog = new GO.postfixadmin.DomainExportDialog();
-					
-					var data = {
-						remoteModelId:this.remoteModelId,
-						domain:this.loadData.domain
-					};
-					
-					domainExportDialog.show(data);
-				},
-				scope:this
-			}));
-			
 			buttons.push('->');
-		}
 		
 		// These three buttons are enabled by default.
 		if (this.enableOkButton)
@@ -146,6 +143,13 @@ GO.postfixadmin.DomainDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 	},
 	
 	afterLoad : function(remoteModelId, config, action){
+		
+		if(action.result.data.permission_level >= GO.permissionLevels.write) {
+			this.buttonExport.setVisible(true);
+		} else {
+			this.buttonExport.setVisible(false);
+		}
+		
 //			GO.postfixadmin.defaultQuota = action.result.data.quota;
 //			GO.postfixadmin.domain=action.result.data.domain;
 		this.setBackupMX(action.result.data.backupmx=='1');
