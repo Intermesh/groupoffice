@@ -12,7 +12,10 @@
 go.modules.community.files.NodeTile = Ext.extend(go.grid.TilePanel, {
 	tpl: new Ext.XTemplate('<tpl for=".">',
 		'<div class="tile">',
-			'<div class="filetype {[this.icon(values)]}"></div>',
+			'<tpl if="values.contentType && values.contentType.substring(0,5) == \'image\'" && values.metaData">\
+				<div class="thumb" style="background-image:url({[go.Jmap.downloadUrl(values.metaData.thumbnail)]})"></div>\
+			</tpl>',
+			'<tpl if="!values.metaData || !values.metaData.thumbnail"><div class="filetype {[this.icon(values)]}"></div></tpl>',
 			'<div class="text">{name}</div>'+
 			'<tpl if="values.status==\'queued\'"><progress max="100" value="{progress}"></progress></tpl>'+
 		'</div>',

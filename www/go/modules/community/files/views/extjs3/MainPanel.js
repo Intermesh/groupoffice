@@ -26,6 +26,8 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 					'bookmarked',
 					'storageId',
 					{name: 'touchedAt', type: 'date'},
+					{name: 'contentType', submit: false},
+					{name: 'metaData', submit: false},
 					{name: 'size', submit: false},
 					{name: 'progress', submit: false},
 					{name: 'status', submit: false},
@@ -60,6 +62,7 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 			region: 'east',
 			width:560,
 			split: true,
+			browser: this.browser,
 			tbar: [{
 				cls: 'go-narrow',
 				iconCls: "ic-arrow-back",
@@ -83,15 +86,14 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 						xtype : 'container',
 						items :[new Ext.Toolbar({
 							items:[
-							{
-								cls: 'go-narrow',
-								iconCls: "ic-menu",
-								handler: function () {
-									this.sideNav.show();
-								},
-								scope: this
-							},
-							'->',
+//							{
+//								cls: 'go-narrow',
+//								iconCls: "ic-menu",
+//								handler: function () {
+//									this.sideNav.show();
+//								},
+//								scope: this
+//							},
 							this.addButton = new Ext.Button({
 								iconCls: 'ic-add',
 								tooltip: t('Add'),
@@ -104,7 +106,7 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 											this.nodeDialog.show(this.browser.getCurrentDir());
 										},
 										scope: this
-									},{
+									},'-',{
 										iconCls: 'ic-file-upload',
 										text: t("Upload files")+'&hellip;',
 										handler: function() {
@@ -124,13 +126,44 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 										},
 										scope: this
 									},{
+										iconCls: 'ic-folder',
+										text: t("Upload folder")+'&hellip;',
+										handler: function() {
+											if(!this.uploadDialog) {
+												var input = document.createElement("input"),
+													me = this;
+												input.setAttribute("type", "file");
+												input.setAttribute('multiple', true);
+												input.setAttribute('webkitdirectory', true);
+												input.setAttribute('directory', true);
+												
+												input.onchange = function(e) {
+													for (var i = 0; i < this.files.length; i++) {
+														var path = this.files[i].webkitRealtivePath.split('/');
+														var record = new this.browser.store.recordType({
+															name: file.name, 
+															isDirectory: 0,
+															parentId: this.browser.store.baseParams.filter.parentId, 
+															size: file.size, 
+															status: 'queued' 
+														});
+														console.log(this.files[i]);
+														//me.centerCardPanel.fileUpload(this.files[i]);
+													}
+												};
+												this.uploadDialog = input;
+											}
+											this.uploadDialog.click(); // opening dialog
+										},
+										scope: this
+									},'-',{
 										disabled: true,
 										text: t('File from template')+'&hellip;',
 										icon: 'ic-insert-drive-file'
 									}]
 								}),
 								scope: this
-							}),{
+							}),'->',{
 								tooltip: t("Thumbnails", "files"),
 								iconCls: 'ic-view-list',
 								handler: function(item){

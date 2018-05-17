@@ -155,3 +155,30 @@ ADD CONSTRAINT `fk_user_avatar_id`
 
 $updates["201804261506"][] ="ALTER TABLE `core_auth_token` ADD `lastActiveAt` DATETIME NOT NULL AFTER `expiresAt`;";
 $updates["201805031611"][] ="ALTER TABLE `core_blob` CHANGE COLUMN `type` `contentType` VARCHAR(129) NOT NULL ;";
+
+$updates["201805161121"][] ="CREATE TABLE `core_blob_metadata` (
+  `blobId` BINARY(40) NOT NULL,
+  `title` VARCHAR(128) NULL,
+  `author` VARCHAR(128) NULL,
+  `description` VARCHAR(256) NULL,
+  `keywords` VARCHAR(256) NULL,
+  `copyright` VARCHAR(128) NULL,
+  `uri` VARCHAR(256) NULL,
+  `creator` VARCHAR(128) NULL,
+  `date` DATETIME NULL,
+  `encoding` VARCHAR(45) NULL,
+  `thumbnail` BINARY(40) NULL,
+  `data1` VARCHAR(512) NULL,
+  `data2` VARCHAR(255) NULL,
+  `data3` VARCHAR(255) NULL,
+  `data4` VARCHAR(255) NULL,
+  `data5` VARCHAR(255) NULL,
+  `data6` VARCHAR(255) NULL,
+  `data7` VARCHAR(255) NULL,
+  `data8` TEXT NULL,
+  PRIMARY KEY (`blobId`),
+  CONSTRAINT `fk_core_blob_blob_idx`
+    FOREIGN KEY (`blobId`)
+    REFERENCES `core_blob` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION);";

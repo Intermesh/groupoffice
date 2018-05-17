@@ -157,7 +157,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 		}
 	},
 	
-	fileUpload: function(file, replaceIndex, newName) {
+	fileUpload: function(file, replaceIndex, newName, parentId) {
 		if(replaceIndex || replaceIndex === 0) {
 			var record = this.browser.store.getAt(replaceIndex);
 			record.set('status', 'queued');

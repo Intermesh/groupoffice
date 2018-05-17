@@ -167,13 +167,15 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	 * @returns {array|boolean} entities or false is data needs to be loaded from server
 	 */
 	get: function (ids, cb, scope) {
-
-		if(!ids){
-			ids = [];
-		}
+		var multiple = true;
 		
-		if(!Ext.isArray(ids)) {
-			throw "ids must be an array";
+		if(ids) {
+			if (!Ext.isArray(ids)) {
+				multiple = false;
+				ids = [ids];
+			} 
+		} else {
+			throw "ids must be set";
 		}
 
 		var entities = [], unknownIds = [];
@@ -208,6 +210,9 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			});
 			return false;
 		} 
+		if(!multiple) {
+			entities = entities[0];
+		}
 		
 		if(cb) {		
 			cb.call(scope || this, entities);			

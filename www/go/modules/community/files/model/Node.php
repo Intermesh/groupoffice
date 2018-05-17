@@ -14,7 +14,7 @@ class Node extends model\AclEntity {
 	use SearchableTrait;
 	
 	public $name;
-	public $blobId;
+	protected $blobId;
 	/**
 	 * @var DateTime
 	 */
@@ -42,10 +42,11 @@ class Node extends model\AclEntity {
 	protected static function defineMapping() {		
 		return parent::defineMapping()
 			->addTable('files_node', 'node')
+			->addRelation('metaData', \go\core\fs\MetaData::class, ['blobId'=>'blobId'], false)
 		   ->setQuery((new Query)
-							 ->join('core_blob', 'blob', 'node.blobId=blob.id', 'LEFT')
-							 ->join('files_node_user', 'nodeUser', 'node.id=nodeUser.nodeId AND nodeUser.userId='.GO()->getUser()->id.'', 'LEFT')
-							 ->select('blob.contentType, blob.size, nodeUser.bookmarked, nodeUser.touchedAt'));
+				->join('core_blob', 'blob', 'node.blobId=blob.id', 'LEFT')
+				->join('files_node_user', 'nodeUser', 'node.id=nodeUser.nodeId AND nodeUser.userId='.GO()->getUser()->id.'', 'LEFT')
+				->select('blob.contentType, blob.size, nodeUser.bookmarked, nodeUser.touchedAt'));
 //			->addTable('core_blob', 'blob', ['blobId' => 'id'], ['contentType','size']);
 	}
 	
@@ -60,6 +61,21 @@ class Node extends model\AclEntity {
 		}
 		
 		$this->bookmarked = boolval($this->bookmarked);
+	}
+	
+	public function setBlobId($blobId) {
+		if($this->isDirectory) {
+			return;
+		}
+		$this->blobId = $blobId;
+		$blob = \go\core\fs\Blob::findById($blobId);
+		$this->contentType = $blob->contentType;
+		$this->size = $blob->size;
+		$this->metaData = $blob->metaData;
+	}
+	
+	public function getBlobId() {
+		return $this->blobId;
 	}
 	
 	/**
@@ -91,13 +107,10 @@ class Node extends model\AclEntity {
 		return $this->size;
 	}
 	
-	public function getLocation() {
-		return ['biem','jaha',$this->name];
-	}
-	
-	public function getParentId(){
+	public function getParentId() {
 		return $this->parentId;
 	}
+	
 	public function setParentId($val) {
 		$this->parentId = $val;
 		$parent = self::find()->where(['id'=>$val])->single();

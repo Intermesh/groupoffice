@@ -310,10 +310,11 @@ a {
 		cursor: pointer;
 		display: block;
 		width: dp(24);
-		height: dp(32);
+		height: dp(31);
 		position: absolute;
 		top: 0;
 		right:0;
+		background-color: color($background, "card");
 		border-left: 1px solid;
 		border-image: linear-gradient(to bottom, transparent, color($foreground, 'line')) 1 100%;
 		&:hover {
@@ -778,9 +779,6 @@ button.filetype-pdf, button.filetype-doc {
 	h5 {		
 		padding: dp(8) 0;
 	}
-	
-
-	
 	hr {
 		clear:both;
 		margin:dp(8) 0 ;
@@ -793,6 +791,9 @@ button.filetype-pdf, button.filetype-doc {
 	}
 	.right {
 		text-align:right;
+	}
+	.center {
+		text-align:center;
 	}
 	 //12 column
 	.s1,.s2,.s3,.s4,.s5,.s6,.s7,.s8,.s9,.s10,.s11,.s12{
@@ -839,6 +840,12 @@ button.filetype-pdf, button.filetype-doc {
 	.icons > p, .icons > a {
 		position:relative;
 		padding-left: dp(64);
+	}
+	.avatar {
+		width:dp(40);
+		height: dp(40);
+		float:left;
+		margin-right: dp(21);
 	}
 	
 	.x-panel-body {
@@ -944,8 +951,8 @@ button.filetype-pdf, button.filetype-doc {
 }
 
 .go-tool-toggle-collapsed:before {
-    content: "expand_more";
-	}
+   content: "expand_more";
+}
 	
 	
 table.display-panel {
@@ -1096,18 +1103,26 @@ table[id^="comments-ext"] b {
 	padding: dp(2);
 	display: grid;
 	text-align:center;
-	align-content: start;	
+	align-content: start;
+	background-color: color($background,'card');	
 	/* define the number of grid columns */
 	grid-gap: dp(4);
 	grid-template-columns: repeat( auto-fill, minmax(dp(192), 1fr));
 	> div {
-		outline: 2px solid color($grey,300);
+		outline: 2px solid color($foreground,'divider');
 		height: dp(192);
 		background-color: color($background,'card');
 	}
 	div.text {
 		@extend %ellipsis;
 		padding: 0 dp(16);
+	}
+	.thumb {
+		margin: dp(16);
+		height: dp(128);
+		background-position: center center;
+		background-repeat: no-repeat;
+		background-size:contain;
 	}
 }
 

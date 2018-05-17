@@ -16,6 +16,8 @@ class Blob extends orm\Entity {
 	public $createdAt; // blob is created when uploaded for the first time
 	private $tmpFile;
 	private $strContent;
+	public $metaData;
+	private $fetchMetaData = true;
 	
 	static function fromTmp($path) {
 		$hash = bin2hex(sha1_file($path, true));
@@ -42,14 +44,19 @@ class Blob extends orm\Entity {
 	}
 	
 	protected static function defineMapping() {
-		return parent::defineMapping()->addTable('core_blob', 'b');
+		return parent::defineMapping()->addTable('core_blob', 'b')
+			->addRelation('metaData', MetaData::class, ['id' => 'blobId'], false);
 	}
 	
-	/**
-	 * @return \go\core\fs\MetaData
-	 */
-	public function getMetaData() {
-		return new MetaData($this);
+	public function disableMetaData(){
+		$this->fetchMetaData = false;
+	}
+	
+	protected function internalValidate() {
+		if($this->isNew() && $this->fetchMetaData) {
+			$this->parseMetaData();
+		}
+		return parent::internalValidate();
 	}
 
 	protected function internalSave() {
@@ -66,14 +73,14 @@ class Blob extends orm\Entity {
 		if(!$this->isNew()) {
 			return true;
 		}
-		$this->parseMetaData();
 		return parent::internalSave();
 	}
 	
 	private function parseMetaData() {
-		$metaData = new MetaData($this);
-		if($metaData->extract() !== false) {
-			$metaData->save();
+		$metaData = new MetaData();
+		if($metaData->extract($this) !== false) {
+			\GO::debug($metaData->toArray());
+			$this->metaData = $metaData;
 		}
 	}
 	

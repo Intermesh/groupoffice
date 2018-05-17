@@ -8,7 +8,7 @@ class MetaData extends orm\Property {
 	/**
 	 * @var Blob
 	 */
-	protected $blob;
+	private $blob;
 	public $blobId;
 	public $title;
 	public $author; // authors | publisher | artists
@@ -30,9 +30,6 @@ class MetaData extends orm\Property {
 	public $data7;
 	public $data8; //reserved
 	
-	private $reader;
-	private $size;
-	
 	//Audio
 	const CODEC = 'data1'; 
 	const DURATION = 'data2';
@@ -51,16 +48,17 @@ class MetaData extends orm\Property {
 	const LONGITUDE = 'data6';
 	const COMPRESSION = 'data7';
 
-	public function __construct($blob) {
-		$this->blob = $blob;
+	protected static function defineMapping() {
+		return parent::defineMapping()->addTable('core_blob_metadata', 'md');
 	}
 	
-	public function extract() {
+	public function extract(Blob $blob) {
+		$this->blob = $blob;
 		switch($this->blob->contentType) {
 			case 'image/jpeg':
+				$this->extractExif();
 			case 'image/png':
 			case 'image/gif':
-				$this->extractExif();
 			case 'image/bmp':
 			case 'image/webp':
 				$this->createThumbnail();
@@ -71,39 +69,39 @@ class MetaData extends orm\Property {
 		}
 	}
 	
-	private function reader() {
-		if(!isset($this->reader)) {
-			if (!file_exists($filename) || !is_readable($filename) || ($fd = fopen($filename, 'rb')) === false) {
-            throw new \Exception('IOError: Unable to open file for reading: ' . $filename);
-			}
-		
-			if (!is_resource($fd) || !in_array(get_resource_type($fd), array('stream'))) {
-				throw new \Exception('IOError: Invalid resource type (only resources of type stream are supported)');
-			}
-			$this->reader = $fd;
-			$offset = ftell($this->reader);
-			fseek($this->reader, 0, SEEK_END);
-			$this->size = ftell($this->reader);
-			fseek($this->reader, $offset);
-		}
-		return $this->reader;
-	}
-	
+//	private function reader() {
+//		if(!isset($this->reader)) {
+//			if (!file_exists($filename) || !is_readable($filename) || ($fd = fopen($filename, 'rb')) === false) {
+//            throw new \Exception('IOError: Unable to open file for reading: ' . $filename);
+//			}
+//		
+//			if (!is_resource($fd) || !in_array(get_resource_type($fd), array('stream'))) {
+//				throw new \Exception('IOError: Invalid resource type (only resources of type stream are supported)');
+//			}
+//			$this->reader = $fd;
+//			$offset = ftell($this->reader);
+//			fseek($this->reader, 0, SEEK_END);
+//			$this->size = ftell($this->reader);
+//			fseek($this->reader, $offset);
+//		}
+//		return $this->reader;
+//	}
+//	
 	private function extractExif() {
-		$path = $this->blob->path(0);
-		$exif = exif_read_data($path, 0, true);
-		if($exif === false) {
+		$path = $this->blob->path();
+		try {$exif = exif_read_data($path,0,true);}
+		catch (\Exception $e) { 
 			return;
 		}
 		$camera = [];
 		foreach ($exif as $key => $section) {
 			foreach ($section as $name => $val) {
 				switch ($name) {
-					case 'Software': $this->author = $val; break;
-					case 'DateTime': $this->date = $val; break;
-					case 'DateTimeOriginal': $this->date = $val; break;
+					case 'OwnerName': $this->author = $val; break;
+					case 'DateTime': $this->date = new \DateTime($val); break;
+					case 'DateTimeOriginal': $this->date = new \DateTime($val); break;
 					case 'Copyright': $this->copyright = $val; break;
-					case 'MakerNote': $this->description = $val; break;
+					//case 'MakerNote': $this->description = $val; break;
 					case 'ColorSpace': $this->encoding = $val; break;
 					case 'Software': $this->creator = $val; break;
 					case 'ExifImageWidth': $this->{self::WIDTH} = $val; break;
@@ -136,7 +134,9 @@ class MetaData extends orm\Property {
 			case 'image/bmp': $src = imagecreatefrombmp($path); break;
 			case 'image/webp': $src = imagecreatefromwebp($path); break;
 		}
-		list($width, $height) = getimagesize($src);
+		list($width, $height) = getimagesize($path);
+		$this->{self::WIDTH} = $width;
+		$this->{self::HEIGHT} = $height;
 		$ratio = $width/$height;
 		if ($maxw/$maxh > $ratio) {
 			$maxw = $maxh*$ratio;
@@ -148,6 +148,10 @@ class MetaData extends orm\Property {
 		$dest = GO()->getDataFolder()->getPath() . '/tmp/thumb_'.$this->blob->name;
 		imagejpeg($image, $dest, 60);
 		$blob = Blob::fromTmp($dest);
+		$blob->contentType = 'image/jpeg';
+		$blob->modified = time();
+		$blob->disableMetaData();
+		$blob->name = 'thumb_'.$this->blob->name;
 		if($blob->save()){
 			$this->thumbnail = $blob->id;
 		}

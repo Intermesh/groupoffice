@@ -127,8 +127,8 @@ ALTER TABLE `files_version`
 -- Beperkingen voor tabel `files_node_user`
 --
 ALTER TABLE `files_node_user`
-  ADD CONSTRAINT `fk_files_node_has_core_user_core_user1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_files_node_has_core_user_files_node1` FOREIGN KEY (`nodeId`) REFERENCES `files_node` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_files_node_has_core_user_core_user1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_files_node_has_core_user_files_node1` FOREIGN KEY (`nodeId`) REFERENCES `files_node` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 --
 -- Beperkingen voor tabel `files_storage`

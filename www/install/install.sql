@@ -673,7 +673,32 @@ ADD CONSTRAINT `fk_user_avatar_id`
   ON DELETE RESTRICT
   ON UPDATE NO ACTION;
 
-
-
 ALTER TABLE `core_entity`
   ADD CONSTRAINT `core_entity_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE;
+
+CREATE TABLE `core_blob_metadata` (
+  `blobId` BINARY(40) NOT NULL,
+  `title` VARCHAR(128) NULL,
+  `author` VARCHAR(128) NULL,
+  `description` VARCHAR(256) NULL,
+  `keywords` VARCHAR(256) NULL,
+  `copyright` VARCHAR(128) NULL,
+  `uri` VARCHAR(256) NULL,
+  `creator` VARCHAR(128) NULL,
+  `date` DATETIME NULL,
+  `encoding` VARCHAR(45) NULL,
+  `thumbnail` BINARY(40) NULL,
+  `data1` VARCHAR(512) NULL,
+  `data2` VARCHAR(255) NULL,
+  `data3` VARCHAR(255) NULL,
+  `data4` VARCHAR(255) NULL,
+  `data5` VARCHAR(255) NULL,
+  `data6` VARCHAR(255) NULL,
+  `data7` VARCHAR(255) NULL,
+  `data8` TEXT NULL,
+  PRIMARY KEY (`blobId`),
+  CONSTRAINT `fk_core_blob_blob_idx`
+    FOREIGN KEY (`blobId`)
+    REFERENCES `core_blob` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION);
