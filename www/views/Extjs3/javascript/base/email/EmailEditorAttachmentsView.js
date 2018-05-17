@@ -20,7 +20,6 @@ GO.base.email.EmailEditorAttachmentsView = function(config){
 		
 		Ext.apply(config, {
 			tpl: new Ext.XTemplate(
-				t("Attachments", "email")+':'+
 				'<div style="overflow-x:hidden" id="'+this.attachmentsId+'" tabindex="0" class="em-attachments-container" >'+
 				'<tpl for=".">',				
 				'<span class="filetype-link filetype-{extension} attachment-wrap x-unselectable" unselectable="on" style="float:left" id="'+'{tmp_name}'+'">{name} ({human_size})</span>'+
