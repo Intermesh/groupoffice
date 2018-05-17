@@ -1649,6 +1649,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 	refresh : function(syncFilesystemWithDatabase){
 		
+		this.getActiveGridStore().baseParams['folder_id'] = null;
+		
 		this.treePanel.setExpandFolderId(this.folder_id);
 		
 		if(syncFilesystemWithDatabase)
@@ -1910,28 +1912,30 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
       
 		this.folder_id = id;
 		//this.gridStore.baseParams['id']=this.thumbsStore.baseParams['id']=id;
-		this.getActiveGridStore().baseParams['folder_id']=id;
+		if(this.getActiveGridStore().baseParams['folder_id'] != id) {
+			this.getActiveGridStore().baseParams['folder_id']=id;
 
-		this.getActiveGridStore().load({
-			callback:function(){
-			
-				if(this.expandTree)
-				{
-					var activeNode = this.treePanel.getNodeById(id);
-						
-					if(activeNode){
-						activeNode.expand();
-						this.updateLocation();
-					}else{						
-						this.treePanel.setExpandFolderId(id);
-						this.treePanel.getRootNode().reload();	
+			this.getActiveGridStore().load({
+				callback:function(){
+
+					if(this.expandTree)
+					{
+						var activeNode = this.treePanel.getNodeById(id);
+
+						if(activeNode){
+							activeNode.expand();
+							this.updateLocation();
+						}else{						
+							this.treePanel.setExpandFolderId(id);
+							this.treePanel.getRootNode().reload();	
+						}
 					}
-				}
-				this.updateLocation();
-				this.focus();
-			},
-			scope:this
-		});
+					this.updateLocation();
+					this.focus();
+				},
+				scope:this
+			});
+		}
 		
 	},
 	
