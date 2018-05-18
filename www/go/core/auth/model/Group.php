@@ -17,7 +17,15 @@ class Group extends AclEntity {
 
 	public $id;
 	public $name;
-	public $isUserGroupFor;
+	
+	/**
+	 * When this is set this group is the personal group for this user. And only
+	 * that user will be member of this group. It's used for granting permissions
+	 * to single users but keeping the database simple.
+	 * 
+	 * @var int
+	 */
+	protected $isUserGroupFor;
 	public $createdBy;
 
 	protected static function defineMapping() {
@@ -37,6 +45,15 @@ class Group extends AclEntity {
 		}
 
 		return parent::filter($query, $filter);
+	}
+	
+	protected function internalDelete() {
+		
+		if(isset($this->isUserGroupFor)) {
+			$this->setValidationError('isUserGroupFor', \go\core\validate\ErrorCode::FORBIDDEN, "You can't delete a user's personal group");
+		}
+		
+		return parent::internalDelete();
 	}
 
 }

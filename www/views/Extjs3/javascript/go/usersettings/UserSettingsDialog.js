@@ -244,6 +244,8 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 						field.markInvalid(response.notUpdated[id].validationErrors[name].description);
 					}
 				}
+				
+				this.actionComplete();
 			}
 
 		},this);

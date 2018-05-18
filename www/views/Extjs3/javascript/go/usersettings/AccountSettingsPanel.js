@@ -74,11 +74,10 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 						name: 'recoveryEmail',
 						needPasswordForChange: true,
 						vtype:'emailAddress',
-						allowBlank:false
-					}),
-					this.recoveryMailText = new Ext.Container({
-						html:t('The recovery e-mail is used to send a forgotten password request to.')+'<br>'+t('Please use an email address that you can access from outside Group-Office.')
+						allowBlank:false,
+						hint: t('The recovery e-mail is used to send a forgotten password request to.')+'<br>'+t('Please use an email address that you can access from outside Group-Office.')
 					})
+
 				]
 			}]
 		});
@@ -88,7 +87,6 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 			title: t('Password'),
 			items:[
 				this.passwordField1 = new go.form.PasswordGeneratorField({						
-					allowBlank: false,
 					listeners: {
 						generated : function(field, pass) {
 							this.passwordField2.setValue(pass);
@@ -110,7 +108,25 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 		Ext.apply(this,{
 			items: [
 				this.userFieldset,
-				this.passwordFieldset
+				this.passwordFieldset,
+				{
+				xtype: 'fieldset',
+				title: t("Groups"),
+				items: [
+					new go.form.multiselect.Field({
+						hint: t("Add the groups this user must be a member of"),
+						name: "groups",
+						idField: "groupId",
+						displayField: "name",
+						entityStore: go.Stores.get("Group"),
+						
+						fieldLabel: t("Groups"),
+						storeBaseParams:{
+							filter: {"includeUsers" : false}
+						}
+					})
+				]
+			}
 			]
 		});
 		

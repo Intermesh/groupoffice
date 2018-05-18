@@ -175,6 +175,15 @@ class User extends Entity {
 			->addRelation("groups", UserGroup::class, ['id' => 'userId']);
 	}
 	
+	/**
+	 * Get the user's personal group used for granting permissions
+	 * 
+	 * @return Group	 
+	 */
+	public function getPersonalGroup() {
+		return Group::find()->where(['isUserGroupFor' => $this->id])->single();
+	}
+	
 	public function setValues(array $values) {
 		$this->passwordVerified = false;
 		return parent::setValues($values);
@@ -302,11 +311,22 @@ class User extends Entity {
 			return false;
 		}						
 		
-		return App::get()->getAuthState()->getUser()->isAdmin();
-		
+		return App::get()->getAuthState()->getUser()->isAdmin();		
 	}
 	
 	protected function internalValidate() {
+		
+		if($this->isModified('groups')) {
+			$groupIds = array_column($this->groups, 'groupId');
+			
+			if(!in_array(Group::ID_EVERYONE, $groupIds)) {
+				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, "You can't remove group everyone");
+			}
+			
+			if(!in_array($this->getPersonalGroup()->id, $groupIds)) {
+				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, "You can't remove the user's personal group");
+			}
+		}
 		
 		if(!$this->validatePasswordChange()) {
 			if(!$this->hasValidationErrors('currentPassword')) {
@@ -434,18 +454,19 @@ class User extends Entity {
 			return false;
 		}
 		
-		//create users' group
+		//create user's personal group
 		if($this->isNew()) {
-			$group = new Group();
-			$group->name = $this->username;
-			$group->isUserGroupFor = $this->id;
-			if(!$group->save()) {
+			$personalGroup = new Group();
+			$personalGroup->name = $this->username;
+			$personalGroup->isUserGroupFor = $this->id;
+			if(!$personalGroup->save()) {
 				throw new \Exception("Could not create home group");
 			}
 
-			if(!(new UserGroup)->setValues(['groupId' => $group->id, 'userId' => $this->id])->internalSave()) {
+			if(!(new UserGroup)->setValues(['groupId' => $personalGroup->id, 'userId' => $this->id])->internalSave()) {
 				throw new \Exception("Couldn't add user to group");
 			}
+			
 			if(!(new UserGroup)->setValues(['groupId' => Group::ID_EVERYONE, 'userId' => $this->id])->internalSave()) {
 				throw new \Exception("Couldn't add user to group");
 			}

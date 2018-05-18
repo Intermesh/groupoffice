@@ -42,10 +42,8 @@ go.modules.core.users.CreateUserDialog = Ext.extend(go.form.Dialog, {
 						needPasswordForChange: true,
 						vtype:'emailAddress',
 						allowBlank:false,
-						anchor: '100%'
-					}),
-					this.recoveryMailText = new Ext.Container({
-						html:t('The recovery e-mail is used to send a forgotten password request to.')+'<br>'+t('Please use an email address that you can access from outside Group-Office.')
+						anchor: '100%',
+						hint:t('The recovery e-mail is used to send a forgotten password request to.')+'<br>'+t('Please use an email address that you can access from outside Group-Office.')
 					})
 				]
 			},{
@@ -71,6 +69,23 @@ go.modules.core.users.CreateUserDialog = Ext.extend(go.form.Dialog, {
 						fieldLabel: t("Confirm password"),
 						name: 'passwordConfirm'
 					})]
+			},{
+				xtype: 'fieldset',
+				title: t("Groups"),
+				items: [
+					new go.form.multiselect.Field({
+						hint: t("Add the groups this user must be a member of"),
+						name: "groups",
+						idField: "groupId",
+						displayField: "name",
+						entityStore: go.Stores.get("Group"),
+						
+						fieldLabel: t("Groups"),
+						storeBaseParams:{
+							filter: {"includeUsers" : false}
+						}
+					})
+				]
 			}
 		];
 	}

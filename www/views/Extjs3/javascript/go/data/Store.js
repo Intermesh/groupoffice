@@ -75,8 +75,10 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 			}, 0);
 		}, this)
 		
-		this.on('update', this.onUpdate, this);		
-		this.entityStore.on('changes', this.onChanges, this);
+		if(this.entityStore) {
+			this.on('update', this.onUpdate, this);		
+			this.entityStore.on('changes', this.onChanges, this);
+		}
 	},
 	
 	onChanges : function(entityStore, added, changed, destroyed) {		

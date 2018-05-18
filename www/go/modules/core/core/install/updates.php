@@ -154,3 +154,11 @@ ADD CONSTRAINT `fk_user_avatar_id`
 
 
 $updates["201804261506"][] ="ALTER TABLE `core_auth_token` ADD `lastActiveAt` DATETIME NOT NULL AFTER `expiresAt`;";
+
+
+//ALTER TABLE `core_user` ADD `groupId` INT NOT NULL COMMENT 'The user\'s own group used for permissions' AFTER `id`;
+//update `core_user` u set groupId = (select id from core_group g where isUserGroupFor = u.id);
+//ALTER TABLE `core_user` ADD UNIQUE(`groupId`);
+//ALTER TABLE `core_user` ADD FOREIGN KEY (`groupId`) REFERENCES `core_group`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+//
+//ALTER TABLE `core_group` DROP FOREIGN KEY `core_group_ibfk_2`;

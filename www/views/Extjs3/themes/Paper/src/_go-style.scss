@@ -1099,3 +1099,15 @@ table[id^="comments-ext"] b {
 		display: none;
 	}
 }
+
+.x-form-element {
+	.x-grid-panel {
+		border-radius: dp(4);
+		border: 1px solid transparent;
+	}
+	.x-grid-panel {	
+		&.x-form-invalid {
+			border-color: rgba(color($red, 700),0.54);
+		}
+	}
+}
