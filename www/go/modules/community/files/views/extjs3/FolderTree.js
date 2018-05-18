@@ -63,6 +63,18 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 	
 		this.on('nodedragover', function(overEvent){
 			var dropOnEntity = overEvent.target.attributes.entity;
+			
+			if(!dropOnEntity){
+				
+				if(overEvent.target.attributes.entityId && overEvent.target.attributes.entityId == 'my-files'){
+					dropOnEntity = {
+						id:go.User.storage.rootFolderId
+					};
+				} else {
+					return false;
+				}
+			}
+			
 			var dragEntities = [];
 			
 			if(overEvent.data.node){
