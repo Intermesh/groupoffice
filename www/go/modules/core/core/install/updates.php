@@ -155,10 +155,22 @@ ADD CONSTRAINT `fk_user_avatar_id`
 
 $updates["201804261506"][] ="ALTER TABLE `core_auth_token` ADD `lastActiveAt` DATETIME NOT NULL AFTER `expiresAt`;";
 
+$updates["201805181006"][] ="ALTER TABLE `core_user` CHANGE `logins` `loginCount` INT(11) NOT NULL DEFAULT '0';";
+$updates["201805181006"][] ="ALTER TABLE `core_user` CHANGE `lastlogin` `_lastlogin` INT(11) NOT NULL DEFAULT '0';";
+$updates["201805181006"][] ="ALTER TABLE `core_user` ADD `lastLogin` DATETIME NULL DEFAULT NULL AFTER `recoverySendAt`, ADD `createdAt` DATETIME NULL DEFAULT NULL AFTER `lastLogin`, ADD `modifiedAt` DATETIME NULL DEFAULT NULL AFTER `createdAt`;";
+$updates["201805181006"][] ="update core_user set lastLogin = from_unixtime(_lastlogin);";
+$updates["201805181006"][] ="update core_user set createdAt = from_unixtime(ctime);";
+$updates["201805181006"][] ="update core_user set modifiedAt = from_unixtime(mtime);";
+$updates["201805181006"][] ="ALTER TABLE `core_user`
+  DROP `_lastlogin`,
+  DROP `ctime`,
+  DROP `mtime`;";
 
-//ALTER TABLE `core_user` ADD `groupId` INT NOT NULL COMMENT 'The user\'s own group used for permissions' AFTER `id`;
-//update `core_user` u set groupId = (select id from core_group g where isUserGroupFor = u.id);
-//ALTER TABLE `core_user` ADD UNIQUE(`groupId`);
-//ALTER TABLE `core_user` ADD FOREIGN KEY (`groupId`) REFERENCES `core_group`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
-//
-//ALTER TABLE `core_group` DROP FOREIGN KEY `core_group_ibfk_2`;
+$updates["201805181006"][] ="ALTER TABLE `core_user` CHANGE `date_format` `dateFormat` VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'd-m-Y';";
+$updates["201805181006"][] ="ALTER TABLE `core_user` CHANGE `time_format` `timeFormat` VARCHAR(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'G:i';";
+
+$updates["201805181006"][] ="ALTER TABLE `core_user` CHANGE `thousands_separator` `thousandsSeparator` VARCHAR(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '.';";
+$updates["201805181006"][] ="ALTER TABLE `core_user` CHANGE `decimal_separator` `decimalSeparator` VARCHAR(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT ',';";
+$updates["201805181006"][] ="ALTER TABLE `core_user` CHANGE `first_weekday` `firstWeekday` TINYINT(4) NOT NULL DEFAULT '0';";
+$updates["201805181006"][] ="ALTER TABLE `core_user` CHANGE `list_separator` `listSeparator` CHAR(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT ';';";
+$updates["201805181006"][] ="ALTER TABLE `core_user` CHANGE `text_separator` `textSeparator` CHAR(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '\"';";

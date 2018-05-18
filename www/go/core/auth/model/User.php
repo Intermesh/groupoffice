@@ -74,34 +74,72 @@ class User extends Entity {
 	 * 
 	 * @var int
 	 */
-	public $logins;
+	public $loginCount;
 	
-	public $lastlogin;
+	/**
+	 * Last login time
+	 * 
+	 * @var \go\core\util\DateTime
+	 */
+	public $lastLogin;
 	
-//	/**
-//	 *
-//	 * @var \go\core\util\DateTime
-//	 */
-//	public $lastLogin;
-//	
-//	/**
-//	 *
-//	 * @var \go\core\util\DateTime
-//	 */
-//	public $modifiedAt;
-//	
-//	/**
-//	 *
-//	 * @var \go\core\util\DateTime
-//	 */
-//	public $createdAt;
+	/**
+	 *
+	 * @var \go\core\util\DateTime
+	 */
+	public $modifiedAt;
 	
+	/**
+	 *
+	 * @var \go\core\util\DateTime
+	 */
+	public $createdAt;
 	
-	public $date_format;
-	public $time_format;
-	public $thousands_seporator;
-	public $decimal_separator;
+	/**
+	 * Date format
+	 * @var string
+	 */
+	public $dateFormat;
+	
+	/**
+	 * Time format
+	 * 
+	 * @var string
+	 */
+	public $timeFormat;
+	
+	/**
+	 * char to separate thousands in numbers
+	 * 
+	 * @var string
+	 */
+	public $thousandsSeparator;
+	
+	/**
+	 * Char to separate decimals in numbers
+	 * @var string
+	 */
+	public $decimalSeparator;
+	
+	/**
+	 * Currency char
+	 * 
+	 * @var string
+	 */
 	public $currency;
+	
+	/**
+	 * Separator for CSV lists. eg. ; or ,
+	 * @var string
+	 */
+	public $listSeparator;
+	
+	/**
+	 * Separator for text in CSV. eg. '"'
+	 * 
+	 * @var string
+	 */
+	public $textSeparator;
 	
 	
 	public $max_rows_list;
@@ -118,8 +156,7 @@ class User extends Entity {
 	public $show_smilies;
 	public $auto_punctuation;
 	
-	public $list_separator;
-	public $text_separator;
+	
 	protected $files_folder_id;
 	public $disk_quota;
 	public $disk_usage;
@@ -135,16 +172,8 @@ class User extends Entity {
 	public $force_password_change;
 	
 	
-	public function getDateFormat() {
-		return $this->date_format;
-	}
-	
-	public function getTimeFormat() {
-		return $this->time_format;
-	}
-	
 	public function getDateTimeFormat() {
-		return $this->getDateFormat() .' '. $this->time_format;
+		return $this->dateFormat . ' ' . $this->timeFormat;
 	}
 
 	/**
@@ -152,6 +181,12 @@ class User extends Entity {
 	 * @var Password
 	 */
 	protected $password;
+	
+	/**
+	 * Used for DIGEST authentication which is required for webdav to work with the Microsoft Windows client.
+	 * 
+	 * @var string
+	 */
 	protected $digest;
 
 	/**
@@ -514,6 +549,16 @@ class User extends Entity {
 		}
 		
 		return true;		
+	}
+	
+	protected function internalDelete() {
+		
+		if($this->id == 1) {
+			$this->setValidationError("id", ErrorCode::FORBIDDEN, "You can't delete the primary administrator");
+			return false;
+		}
+		
+		return parent::internalDelete();
 	}
 
 }

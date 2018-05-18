@@ -85,6 +85,41 @@ class User extends \GO\Base\Db\ActiveRecord {
 	
 	private $password;
 	
+	public function getLastlogin() {
+		return strtotime($this->getAttribute("lastLogin"));
+	}
+	
+	public function getCtime() {
+		return strtotime($this->createdAt);
+	}
+	
+	public function getMtime() {
+		return strtotime($this->createdAt);
+	}
+	
+	public function getLogins() {
+		return $this->loginCount;
+	}
+	
+	public function getList_separator() {
+		return $this->listSeparator;
+	}
+	
+	public function getThousands_separator() {
+		return $this->thousandsSeparator;
+	}
+	
+	public function getDecimal_separator() {
+		return $this->decimalSeparator;
+	}
+	
+	public function gettext_separator() {
+		return $this->textSeparator;
+	}
+	
+	public function getfirst_weekday() {
+		return $this->firstWeekday;
+	}
 	/**
 	 * Get the password hash from the new framework
 	 * @deprecated since version 6.3
@@ -684,13 +719,10 @@ class User extends \GO\Base\Db\ActiveRecord {
 		else
 			return false;
 	}
-	
-	private $_completeDateFormat;
-	
+
 	protected function getCompleteDateFormat(){
-		if(!isset($this->_completeDateFormat))
-			$this->_completeDateFormat=$this->date_format;
-		return $this->_completeDateFormat;
+
+		return $this->dateFormat;
 	}
 	
 	

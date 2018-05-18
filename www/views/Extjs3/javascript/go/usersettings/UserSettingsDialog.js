@@ -68,7 +68,13 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 				columns: [{dataIndex:'name'}],
 				listeners: {
 					selectionchange: function(view, nodes) {					
-						this.tabPanel.setActiveTab(nodes[0].viewIndex);
+						if(nodes.length) {
+							this.tabPanel.setActiveTab(nodes[0].viewIndex);
+						} else
+						{
+							//restore selection if user clicked outside of view
+							view.select(this.tabPanel.items.indexOf(this.tabPanel.getActiveTab()));
+						}
 					},
 					scope:this
 				}

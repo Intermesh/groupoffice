@@ -666,7 +666,7 @@ GO.mainLayout.onReady(function() {
 
 		Ext.override(Ext.grid.DateColumn, {
 			align: "right",
-			format: GO.settings.date_format + " " + GO.settings.time_format
+			format: go.User.dateFormat + " " + go.User.timeFormat
 		});
 	
 });

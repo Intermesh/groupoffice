@@ -51,6 +51,7 @@ class Group extends AclEntity {
 		
 		if(isset($this->isUserGroupFor)) {
 			$this->setValidationError('isUserGroupFor', \go\core\validate\ErrorCode::FORBIDDEN, "You can't delete a user's personal group");
+			return false;
 		}
 		
 		return parent::internalDelete();

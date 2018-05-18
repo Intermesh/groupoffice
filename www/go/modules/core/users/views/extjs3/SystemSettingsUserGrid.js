@@ -25,7 +25,10 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				'id', 
 				'username', 
 				'displayName',
-				{name: 'createdAt', type: 'date'}			
+				'avatarId',
+				'loginCount',
+				{name: 'createdAt', type: 'date'},
+				{name: 'lastLogin', type: 'date'}	
 			],
 			entityStore: go.Stores.get("User")
 		});
@@ -47,17 +50,21 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 			],
 			columns: [
 				{
-					id: 'username',
-					header: t('Username'),
+					id: 'name',
+					header: t('Name'),
 					width: dp(200),
 					sortable: true,
-					dataIndex: 'username'
-				},{
-					id: 'displayName',
-					header: t('Display name'),
-					width: dp(200),
-					sortable: true,
-					dataIndex: 'displayName'
+					dataIndex: 'displayName',
+					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
+						var style = record.get('avatarId') ?  'background-image: url(' + go.Jmap.downloadUrl(record.get("avatarId")) + ')"' : "";
+						
+						return '<div class="user"><div class="avatar" style="'+style+'"></div>' +
+							'<div class="wrap">'+
+								'<div class="displayName">' + record.get('displayName') + '</div>' +
+								'<small class="username">' + record.get('username') + '</small>' +
+							'</div>'+
+							'</div>';
+					}
 				},
 				{
 					xtype:"datecolumn",
@@ -67,7 +74,24 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'createdAt',
 					hidden: false
-				},	
+				},
+				{
+					xtype:"datecolumn",
+					id: 'lastLogin',
+					header: t('Last login'),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'lastLogin',
+					hidden: false
+				},{
+					id: 'loginCount',
+					align: "right",
+					header: t('Logins'),
+					width: dp(100),
+					sortable: true,
+					dataIndex: 'loginCount',
+					hidden: false
+				},
 				actions
 			],
 			viewConfig: {
@@ -129,7 +153,7 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 						scope: this						
 					},{
 						itemId:"delete",
-						iconCls: 'ic-share',
+						iconCls: 'ic-delete',
 						text: t("Delete"),
 						handler: function() {
 							this.getSelectionModel().selectRecords([this.moreMenu.record]);
