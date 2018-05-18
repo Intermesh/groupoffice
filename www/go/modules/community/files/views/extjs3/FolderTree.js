@@ -112,28 +112,29 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 		this.browser.on('pathchanged', function(){
 			this.openPath(this.browser.getPath(true));
 		},this);
-		
+				
 		// When an entity is updated in the store. We'll need to update the tree too
 		this.getLoader().entityStore.on('changes', function(store, added, changed, destroyed){
-			
 			var nodeMap = this.getChangesNodeMap(added, changed, destroyed);
-
 			this.processAddedItems(store,nodeMap.added);
 			this.processChangedItems(store,nodeMap.changed);
-			this.processDestroyedItems(store,nodeMap.destroyed);
-			
-			
+			this.processDestroyedItems(store,nodeMap.destroyed);			
 		},this);
 		
 		this.initRootNode(this.rootNodeEntity);
 	},
 	
 	processAddedItems : function(store,addedItems){
-		
+//		console.log(addedItems);
+		//	addedItems = object(
+		//		int:entityId => array(treenode,treenode),
+		//		int:entityId => array(treenode,treenode),
+		//		int:entityId => array(treenode,treenode)
+		//	)		
 	},
 	
 	processChangedItems : function(store,changedItems){
-		console.log(changedItems);
+//		console.log(changedItems);
 		//	changedItems = object(
 		//		int:entityId => array(treenode,treenode),
 		//		int:entityId => array(treenode,treenode),
@@ -157,6 +158,12 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 				// The bookmarked property of the entity is changed
 				if(Ext.isDefined(diff.bookmarked)){
 					bookmarksNeedUpdate = true;
+					// update the icon
+					if(updatedNode[0].bookmarked){
+						nodeInTree.setIconCls('ic-folder-special');
+					} else {
+						nodeInTree.setIconCls('ic-folder');
+					}
 				}
 
 				// The entity id moved
@@ -191,7 +198,12 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 	},
 	
 	processDestroyedItems : function(store,deletedItems){
-		
+//		console.log(deletedItems);
+		//	deletedItems = object(
+		//		int:entityId => array(treenode,treenode),
+		//		int:entityId => array(treenode,treenode),
+		//		int:entityId => array(treenode,treenode)
+		//	)	
 	},
 	
 	/**
@@ -219,7 +231,7 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 	getChangesNodeMap: function(added, changed, destroyed){
 
 		var map = {
-			added:[],
+			added:{},
 			changed:{},
 			destroyed:{}
 		};
@@ -351,6 +363,8 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 	 * @return {undefined}
 	 */
 	moveFolder : function(nodeToUpdateId,newParentId){
+				
+		// TODO: CHECK IF FOLDERNAME ALREADY EXISTS		
 				
 		var params = {};
 		
