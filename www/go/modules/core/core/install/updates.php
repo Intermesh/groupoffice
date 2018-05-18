@@ -174,3 +174,4 @@ $updates["201805181006"][] ="ALTER TABLE `core_user` CHANGE `decimal_separator` 
 $updates["201805181006"][] ="ALTER TABLE `core_user` CHANGE `first_weekday` `firstWeekday` TINYINT(4) NOT NULL DEFAULT '0';";
 $updates["201805181006"][] ="ALTER TABLE `core_user` CHANGE `list_separator` `listSeparator` CHAR(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT ';';";
 $updates["201805181006"][] ="ALTER TABLE `core_user` CHANGE `text_separator` `textSeparator` CHAR(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '\"';";
+$updates["201805181006"][] ="ALTER TABLE `core_user` ADD UNIQUE(`username`);";

@@ -179,7 +179,17 @@ Ext.override(Ext.FormPanel,{
 				});
 			}
 		});
-	})
+	}),
+	focus : function() {
+		var firstField = this.getForm().items.find(function (item) {
+			if (!item.disabled && item.isVisible() && item.getValue() == "")
+				return true;
+		});
+
+		if (firstField) {
+			firstField.focus();
+		}
+	}
 });
 
 Ext.override(Ext.slider.MultiSlider, {

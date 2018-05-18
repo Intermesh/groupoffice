@@ -96,6 +96,8 @@ class Connection {
 		$this->getPdo()->query("SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci'");
 		$this->getPdo()->query("SET sql_mode='" . self::SQL_MODE . "'");
 		$this->getPdo()->query("SET time_zone = '+00:00'");
+		$this->getPdo()->query("SET lc_messages = 'en_US';"); //unique key error is caught and parsed and relies on english
+		
 		$this->getPdo()->setAttribute(PDO::ATTR_STATEMENT_CLASS, [Statement::class]);
 	}
 

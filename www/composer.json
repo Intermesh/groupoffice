@@ -15,6 +15,7 @@
     "ext-pdo": "*",
     "ext-pdo_mysql": "*",
     "ext-calendar": "*",
+		"ext-xml": "*",
 		"sabre/dav": "3.1.*",
 		"swiftmailer/swiftmailer": "@stable",
 		"michelf/php-markdown": "^1.7",

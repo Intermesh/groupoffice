@@ -5,6 +5,7 @@ namespace go\core\auth\model;
 use go\core\acl\model\AclEntity;
 use go\core\db\Criteria;
 use go\core\db\Query;
+use go\core\validate\ErrorCode;
 
 /**
  * Group model
@@ -27,9 +28,10 @@ class Group extends AclEntity {
 	 */
 	protected $isUserGroupFor;
 	public $createdBy;
-
+	
 	protected static function defineMapping() {
-		return parent::defineMapping()->addTable('core_group');
+		return parent::defineMapping()
+						->addTable('core_group');
 	}
 
 	public static function filter(Query $query, array $filter) {
@@ -50,7 +52,7 @@ class Group extends AclEntity {
 	protected function internalDelete() {
 		
 		if(isset($this->isUserGroupFor)) {
-			$this->setValidationError('isUserGroupFor', \go\core\validate\ErrorCode::FORBIDDEN, "You can't delete a user's personal group");
+			$this->setValidationError('isUserGroupFor', ErrorCode::FORBIDDEN, "You can't delete a user's personal group");
 			return false;
 		}
 		

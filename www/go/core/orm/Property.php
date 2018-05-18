@@ -542,8 +542,8 @@ abstract class Property extends Model {
 		$modified = $this->getModified();
 		
 		foreach ($this->getMapping()->getTables() as $table) {			
-			if (!$this->saveTable($table, $modified)) {
-				throw new \Exception("Could not save entity to database tables: ". var_export($this->getValidationErrors(), true));
+			if (!$this->saveTable($table, $modified)) {				
+				return false;
 			}
 		}
 
@@ -722,7 +722,7 @@ abstract class Property extends Model {
 				}
 				
 				if (!App::get()->getDbConnection()->insert($table->getName(), $modifiedForTable)->execute()) {
-					return false;
+					throw new \Exception("Could not execute insert query");
 				}
 
 				$this->handleAutoIncrement($table, $modified);
@@ -738,7 +738,7 @@ abstract class Property extends Model {
 				}
 				$stmt = App::get()->getDbConnection()->update($table->getName(), $modifiedForTable, $this->primaryKeys[$table->getAlias()]);
 				if (!$stmt->execute()) {
-					return false;
+					throw new \Exception("Could not execute update query");
 				}				
 //				if(!$stmt->rowCount()) {			
 //					
@@ -751,8 +751,16 @@ abstract class Property extends Model {
 
 			//Unique index error = 23000
 			if ($e->getCode() == 23000) {
-				App::get()->debug($e->getMessage());
-				$this->setValidationError('id', ErrorCode::UNIQUE);
+				
+				$msg = $e->getMessage();
+				App::get()->debug($msg);				
+				
+				$key = 'id';
+				if(preg_match("/key '(.*)'/", $msg, $matches)) {
+					$key = $matches[1];
+				}
+				
+				$this->setValidationError($key, ErrorCode::UNIQUE);
 				return false;
 			} else {
 				throw $e;

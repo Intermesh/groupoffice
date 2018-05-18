@@ -147,7 +147,7 @@ class User extends Entity {
 	public $start_module;
 	public $language;
 	public $theme;
-	public $first_weekday;
+	public $firstWeekday;
 	public $sort_name;
 	
 	public $mute_sound;
@@ -229,10 +229,10 @@ class User extends Entity {
 		
 		if($this->isNew()) {
 			$s = \go\modules\core\users\model\Settings::get();
-			$this->time_format = $s->defaultTimeFormat;	
-			$this->date_format = $s->defaultDateFormat;
+			$this->timeFormat = $s->defaultTimeFormat;	
+			$this->dateFormat = $s->defaultDateFormat;
 			$this->timezone = $s->defaultTimezone;
-			$this->first_weekday = $s->defaultFirstWeekday;
+			$this->firstWeekday = $s->defaultFirstWeekday;
 
 			$this->currency = $s->defaultCurrency;
 			

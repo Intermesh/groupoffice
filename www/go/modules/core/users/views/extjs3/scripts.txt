@@ -1,4 +1,6 @@
 Module.js
 SystemSettingsUserDefaults.js
 SystemSettingsUserGrid.js
-CreateUserDialog.js
+CreateUserAccountPanel.js
+CreateUserPasswordPanel.js
+CreateUserWizard.js

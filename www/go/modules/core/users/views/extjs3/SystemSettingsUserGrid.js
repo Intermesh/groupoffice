@@ -42,7 +42,7 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
-						var dlg = new go.modules.core.users.CreateUserDialog();
+						var dlg = new go.modules.core.users.CreateUserWizard();
 						dlg.show();
 					}
 				}
