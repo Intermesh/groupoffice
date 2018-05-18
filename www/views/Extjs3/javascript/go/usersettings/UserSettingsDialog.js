@@ -427,6 +427,10 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			'visible':true
 		});
 		
+		if(pnl.isFormField) {
+			this.formPanel.getForm().add(pnl);
+		}
+		
 		if(Ext.isEmpty(position)){
 			this.tabPanel.add(pnl);
 			this.tabStore.add(menuRec);

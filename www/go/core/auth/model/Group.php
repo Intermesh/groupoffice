@@ -18,7 +18,7 @@ class Group extends AclEntity {
 
 	public $id;
 	public $name;
-	
+
 	/**
 	 * When this is set this group is the personal group for this user. And only
 	 * that user will be member of this group. It's used for granting permissions
@@ -26,17 +26,25 @@ class Group extends AclEntity {
 	 * 
 	 * @var int
 	 */
-	protected $isUserGroupFor;
+	public $isUserGroupFor;
 	public $createdBy;
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
-						->addTable('core_group');
+						->addTable('core_group', 'g');
 	}
 
 	public static function filter(Query $query, array $filter) {
 		if (empty($filter['includeUsers'])) {
 			$query->andWhere(['isUserGroupFor' => null]);
+		}
+		
+		if (!empty($filter['excludeEveryone'])) {
+			$query->andWhere('id', '!=', Group::ID_EVERYONE);
+		}
+		
+		if (!empty($filter['excludeAdmins'])) {
+			$query->andWhere('id', '!=', Group::ID_ADMINS);
 		}
 
 		if (!empty($filter['q'])) {
@@ -45,7 +53,6 @@ class Group extends AclEntity {
 											->where('name', 'LIKE', '%' . $filter['q'] . '%')
 			);
 		}
-
 		return parent::filter($query, $filter);
 	}
 	

@@ -104,7 +104,7 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 			stateId: 'users-grid'
 		});
 
-		go.modules.community.apikeys.KeyGrid.superclass.initComponent.call(this);
+		go.modules.core.users.SystemSettingsUserGrid.superclass.initComponent.call(this);
 		
 		this.on('render', function() {
 			this.store.load();

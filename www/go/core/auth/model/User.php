@@ -412,6 +412,10 @@ class User extends Entity {
 			
 		}
 		
+		if(!empty($filter['groupId'])) {
+			$query->join('core_user_group', 'ug', 'ug.userId = u.id')->andWhere(['ug.groupId' => $filter['groupId']]);
+		}
+		
 		return parent::filter($query, $filter);
 	}
 

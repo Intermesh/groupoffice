@@ -161,14 +161,6 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 		}, this);
 	},
 	
-	getIds : function() {
-		var records = this.store.getRange(), v = [];
-		for(var i = 0, l = records.length; i < l; i++) {
-			v.push(records[i].data[this.idField]);
-		}
-		return v;
-	},
-
 	getValue: function () {		
 		var records = this.store.getRange(), v = [];
 		for(var i = 0, l = records.length; i < l; i++) {
@@ -189,6 +181,16 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 	validate : function() {
 		return true;
 	},
+	
+	getIds : function() {
+		var records = this.store.getRange(), v = [];
+		for(var i = 0, l = records.length; i < l; i++) {
+			v.push(records[i].data[this.idField]);
+		}
+		return v;
+	},
+
+	
 	
 	initRowActions: function () {
 
