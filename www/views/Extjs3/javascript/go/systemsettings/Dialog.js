@@ -129,14 +129,18 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 	submit : function(){		
 		// loop through child panels and call onSubmitStart function if available
 		this.tabPanel.items.each(function(tab) {			
-			tab.submit(this.onSubmitComplete, this);			
+			if(tab.submit) {
+				tab.submit(this.onSubmitComplete, this);			
+			}
 		},this);	
 	},
 	
 	load: function() {
 		// loop through child panels and call onSubmitStart function if available
 		this.tabPanel.items.each(function(tab) {			
-			tab.load(this.onLoadComplete, this);			
+			if(tab.load) {
+				tab.load(this.onLoadComplete, this);			
+			}
 		},this);
 	},
 	

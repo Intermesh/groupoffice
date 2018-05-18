@@ -120,6 +120,15 @@ class User extends \GO\Base\Db\ActiveRecord {
 	public function getfirst_weekday() {
 		return $this->firstWeekday;
 	}
+	
+	public function getdate_format() {
+		return $this->dateFormat;
+	}
+	
+	public function gettime_format() {
+		return $this->timeFormat;
+	}
+	
 	/**
 	 * Get the password hash from the new framework
 	 * @deprecated since version 6.3

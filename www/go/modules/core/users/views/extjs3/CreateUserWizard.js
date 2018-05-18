@@ -8,7 +8,11 @@ go.modules.core.users.CreateUserWizard = Ext.extend(go.Wizard, {
 	
 		this.items = [
 			new go.modules.core.users.CreateUserAccountPanel(),
-			new go.modules.core.users.CreateUserPasswordPanel()
+			this.passwordPanel = new go.modules.core.users.CreateUserPasswordPanel(),
+			this.groupsGrid = new go.modules.core.users.UserGroupGrid({
+				title: null,
+				iconCls: null
+			})
 		]
 		go.modules.core.users.CreateUserWizard.superclass.initComponent.call(this);
 		
@@ -17,17 +21,35 @@ go.modules.core.users.CreateUserWizard = Ext.extend(go.Wizard, {
 			finish: this.onFinish,
 			scope: this
 		});
+		
+		//fetch default groups
+		go.Jmap.request({
+			method: "core/users/Settings/get",
+			callback: function (options, success, response) {				
+				this.groupsGrid.setValue(response.defaultGroups);
+			},
+			scope: this
+		})
 	},
 	
 	onContinue: function(wiz, item, nextItem) {
-		this.user = Ext.apply(this.user, item.getForm().getValues());
-		console.log(this.user);
+		
+		this.applyPanelData(item);
+	},
+	
+	applyPanelData : function(item) {
+		if(item != this.groupsGrid) {
+			this.user = Ext.apply(this.user, item.getForm().getValues());
+		} else
+		{
+			this.user.groups = this.groupsGrid.getValue();
+		}
 	},
 	
 	onFinish: function(wiz, lastItem) {
-		this.user = Ext.apply(this.user, lastItem.getForm().getValues());
+		this.applyPanelData(lastItem);
 		
-		console.log(this.user);
+		
 		
 		var id = Ext.id(), params = {};
 		params.create = {};

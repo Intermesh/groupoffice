@@ -173,5 +173,6 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 	load : function() {
 		console.log("TODO this funciton should be renamed");
 	}
+	
 });
 

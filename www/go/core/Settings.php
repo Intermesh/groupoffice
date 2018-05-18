@@ -63,7 +63,7 @@ abstract class Settings extends data\Model {
 				continue;
 			}
 			
-			if($value != $this->oldData[$name]) {
+			if(!array_key_exists($name, $this->oldData) || $value != $this->oldData[$name]) {
 				$this->update($name, $value);
 			}
 		}
