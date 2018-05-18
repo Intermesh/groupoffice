@@ -24,6 +24,8 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 					'id', 
 					'name',
 					'bookmarked',
+					'internalShared',
+					'externalShared',
 					'storageId',
 					{name: 'touchedAt', type: 'date'},
 					{name: 'contentType', submit: false},

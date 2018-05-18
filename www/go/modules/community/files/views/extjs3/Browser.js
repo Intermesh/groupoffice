@@ -47,7 +47,7 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 			draggable:false,
 			params: {
 				filter: {
-					isHome: false
+					isSharedWithMe: true
 				}
 			}
 		},{

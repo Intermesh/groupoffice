@@ -154,6 +154,7 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 		//	)
 		
 		var bookmarksNeedUpdate = false;
+		var sharedWithMeNeedUpdate = false;
 		var foldersToRefresh = [];
 		
 		for(var entityId in changedItems){
@@ -170,12 +171,11 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 				// The bookmarked property of the entity is changed
 				if(Ext.isDefined(diff.bookmarked)){
 					bookmarksNeedUpdate = true;
-					// update the icon
-					if(updatedNode[0].bookmarked){
-						nodeInTree.setIconCls('ic-folder-special');
-					} else {
-						nodeInTree.setIconCls('ic-folder');
-					}
+				}
+				
+				// The internalShared property of the entity is changed
+				if(Ext.isDefined(diff.internalShared)){
+					sharedWithMeNeedUpdate = true;
 				}
 
 				// The entity id moved
@@ -188,6 +188,11 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 				// Update the button entity when something is changed
 				if(nodeInTree.contextMenuButton){
 					nodeInTree.contextMenuButton.entity = updatedNode[0];
+				}
+				
+				// If there is a bookmark or share update, then update the icon
+				if(bookmarksNeedUpdate || sharedWithMeNeedUpdate){
+					this.updateIcon(nodeInTree, updatedNode[0]);
 				}
 				
 				//Update the tree entity
@@ -207,6 +212,21 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 				}
 			}
 		}	
+	},
+	
+	updateIcon : function(nodeInTree,updatedNode){
+		
+		var iconClass = 'ic-folder';
+		
+		if(updatedNode.bookmarked){
+			iconClass = 'ic-folder-special';
+		}
+		
+		if(updatedNode.internalShared || updatedNode.externalShared){
+			iconClass = 'ic-folder-shared';
+		}
+		
+		nodeInTree.setIconCls(iconClass);
 	},
 	
 	processDestroyedItems : function(store,deletedItems){
@@ -309,6 +329,12 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 				}
 			}
 		}
+		
+			// If the entityId is the root folder id of the current user then we'll to select the my-files root node.
+		if(nodeIds == go.User.storage.rootFolderId){
+			entityId = 'my-files';
+		}
+		
 	},
 	
 	

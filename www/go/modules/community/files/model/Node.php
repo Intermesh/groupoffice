@@ -39,6 +39,8 @@ class Node extends model\AclEntity {
 	public $storageId;
 	protected $parentId;
 	
+	protected $parentAclId;
+	
 	protected static function defineMapping() {		
 		return parent::defineMapping()
 			->addTable('files_node', 'node')
@@ -46,7 +48,8 @@ class Node extends model\AclEntity {
 		   ->setQuery((new Query)
 				->join('core_blob', 'blob', 'node.blobId=blob.id', 'LEFT')
 				->join('files_node_user', 'nodeUser', 'node.id=nodeUser.nodeId AND nodeUser.userId='.GO()->getUser()->id.'', 'LEFT')
-				->select('blob.contentType, blob.size, nodeUser.bookmarked, nodeUser.touchedAt'));
+				->join('files_node', 'parent','node.parentId=parent.id','LEFT')
+				->select('blob.contentType, blob.size, nodeUser.bookmarked, nodeUser.touchedAt, parent.aclId AS parentAclId'));
 //			->addTable('core_blob', 'blob', ['blobId' => 'id'], ['contentType','size']);
 	}
 	
@@ -97,6 +100,33 @@ class Node extends model\AclEntity {
 	 */
 	public function getBookmarked(){
 		return $this->bookmarked;
+	}
+	
+	/**
+	 * Set this folder as internalShared
+	 * 
+	 * @param boolean $val
+	 */
+	public function setInternalShared($val){
+		
+	}
+	
+	/**
+	 * Getter for internalShared property (Needed because we needed to have a setter function
+	 * 
+	 * @return boolean
+	 */
+	public function getInternalShared(){
+		return $this->aclId != $this->parentAclId;
+	}
+	
+	/**
+	 * Getter for externalShared property 
+	 * 
+	 * @return boolean
+	 */
+	public function getExternalShared(){
+		return !empty($this->token);
 	}
 	
 	public function getContentType() {
@@ -151,26 +181,18 @@ class Node extends model\AclEntity {
 	public static function filter(Query $query, array $filter) {
 		
 		// Add where usergroup is the personal group of the user
-		if(isset($filter['isHome'])){
-			$homeDirId = GO()->getUser()->storage->getRootFolderId();
-						
-			if(!empty($filter['isHome'])){
-				// We are querying the "home dir" of the current user
-				$query->andWhere(['parentId' => $homeDirId]);
-			} else {
-				// We are querying the "shared with me" dir of the current user
-				$query->andWhere('parentId','!=',$homeDirId);
-				$query->andWhere('id','!=',0);
-				$query->andWhere('storageId','!=',GO()->getUser()->storage->id);
-			}
-		}
-		
+		$userStorageId = GO()->getUser()->storage?GO()->getUser()->storage->id:null;
+
 		if(isset($filter['q'])){
 			$query->andWhere('name','LIKE', '%' . $filter['q'] . '%');
 		}
 		
 		if(!empty($filter['bookmarked'])){
 			$query->andWhere('nodeUser.bookmarked','=','1');
+		}
+		
+		if(!empty($filter['isSharedWithMe'])){
+			$query->andWhere('storageId','!=',$userStorageId);
 		}
 		
 		$filterableProperties = ['parentId', 'isDirectory'];
