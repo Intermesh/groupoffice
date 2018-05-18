@@ -103,6 +103,7 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 										text: t("Create folder")+'&hellip;',
 										handler: function() {
 											this.nodeDialog = new go.modules.community.files.NodeDialog();
+											this.nodeDialog.setTitle(t("Create new folder"));
 											this.nodeDialog.show(this.browser.getCurrentDir());
 										},
 										scope: this

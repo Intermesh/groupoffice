@@ -154,7 +154,15 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 	},
 	
 	getCurrentDir : function() {
-		return this.path[this.path.length-1];
+		
+		var path = this.getPath(true);
+		var currentDir = path[path.length-1];
+		
+		if(currentDir == 'my-files'){ // Get the correct folderId when in the my-files root folder
+			currentDir = go.User.storage.rootFolderId;
+		}
+
+		return currentDir;
 	},
 	
 	/**
