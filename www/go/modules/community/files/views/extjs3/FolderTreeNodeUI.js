@@ -63,11 +63,7 @@ go.modules.community.files.FolderTreeNodeUI = Ext.extend(Ext.tree.TreeNodeUI, {
 		if(!this.rootNodes.includes(node.id)){
 			entity=node.attributes.entity;
 			if(entity){
-				
-				if(entity.id == 3){
-				console.log(entity);
-			}
-				
+
 				if(entity.bookmarked){
 					a.iconCls = 'ic-folder-special';
 				}
