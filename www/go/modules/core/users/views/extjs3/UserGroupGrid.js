@@ -243,7 +243,7 @@ go.modules.core.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 	
 	validate : function() {
 		return true;
-	},
+	}
 	
 });
 

@@ -1,6 +1,6 @@
 go.form.Dialog = Ext.extend(go.Window, {
 	autoScroll: true,
-	width: 400,
+	width: 500,
 	modal: true,
 	showAnimDuration: 0.16,
 	hideAnimDuration: 0.16,
@@ -8,6 +8,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 	entityStore: null,
 	currentId: null,
 	buttonAlign: 'left',
+	layout: "fit",
 	initComponent: function () {
 
 		this.formPanel = new go.form.EntityPanel({

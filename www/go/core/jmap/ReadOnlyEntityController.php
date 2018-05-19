@@ -166,7 +166,7 @@ abstract class ReadOnlyEntityController extends Controller {
 		Response::get()->addResponse([
 				'accountId' => $p['accountId'],
 				'state' => $state,
-				'ids' => $idsQuery->all(),
+				'ids' => array_map('intval', $idsQuery->all()),
 				'notfound' => [],
 				'total' => $total,
 				'canCalculateUpdates' => false

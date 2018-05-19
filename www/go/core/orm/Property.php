@@ -39,12 +39,6 @@ abstract class Property extends Model {
 	const EVENT_MAPPING = "mapping";
 
 	/**
-	 * Cache variable with Key value array with class name => Mapping. 
-	 * @var array 
-	 */
-	private static $mappings = [];
-
-	/**
 	 * Returns true is the model is new and not saved to the database yet.
 	 * 
 	 * @var boolean 
