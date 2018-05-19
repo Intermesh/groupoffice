@@ -65,11 +65,16 @@ class Router implements RouterInterface {
 			try {
 				$this->callAction($method, $params);
 			} catch (CoreException $e) {
+				$error = ["message" => $e->getMessage()];
+				
+				if(GO()->getDebugger()->enabled) {
+					//only in debug mode, may contain sensitive information
+					$error["debugMessage"] = ErrorHandler::logException($e);
+					$error["trace"] = explode("\n", $e->getTraceAsString());
+				}
+				
 				Response::get()->addResponse([
-						'error', [
-								"message" => ErrorHandler::logException($e),
-								"trace" => explode("\n", $e->getTraceAsString())
-						]
+						'error', $error
 				]);
 			}
 		}

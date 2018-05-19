@@ -108,25 +108,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 		Ext.apply(this,{
 			items: [
 				this.userFieldset,
-				this.passwordFieldset,
-				{
-				xtype: 'fieldset',
-				title: t("Groups"),
-				items: [
-					new go.form.multiselect.Field({
-						hint: t("Add the groups this user must be a member of"),
-						name: "groups",
-						idField: "groupId",
-						displayField: "name",
-						entityStore: go.Stores.get("Group"),
-						
-						fieldLabel: t("Groups"),
-						storeBaseParams:{
-							filter: {"includeUsers" : false}
-						}
-					})
-				]
-			}
+				this.passwordFieldset
 			]
 		});
 		

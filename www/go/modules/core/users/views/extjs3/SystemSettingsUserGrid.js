@@ -109,6 +109,10 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 		this.on('render', function() {
 			this.store.load();
 		}, this);
+		
+		this.on('rowdblclick', function(grid, rowIndex, e) {
+			this.edit(this.store.getAt(rowIndex).id);
+		}); 
 	}, 
 	
 		initRowActions: function () {
@@ -146,12 +150,19 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 						itemId: "view",
 						iconCls: 'ic-edit',
 						text: t("Edit"),
-						handler: function() {
-							var dlg = new go.usersettings.UserSettingsDialog();
-							dlg.show(this.moreMenu.record.id);
-						},
+						handler: function() {this.edit(this.moreMenu.record.id);},
 						scope: this						
 					},{
+						itemId:"loginAs",
+						iconCls: 'ic-swap-horiz',
+						text: t("Login as this user"),
+						handler: function() {
+							alert('TODO');
+						},
+						scope: this						
+					},
+					"-"
+					,{
 						itemId:"delete",
 						iconCls: 'ic-delete',
 						text: t("Delete"),
@@ -172,6 +183,13 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 	
 	load : function() {
 		console.log("TODO this funciton should be renamed");
+	},
+	
+	edit : function(id) {
+
+		var dlg = new go.usersettings.UserSettingsDialog();
+		dlg.show(id);
+						
 	}
 	
 });

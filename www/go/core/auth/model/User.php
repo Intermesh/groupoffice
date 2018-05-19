@@ -351,17 +351,17 @@ class User extends Entity {
 	
 	protected function internalValidate() {
 		
-		if($this->isModified('groups')) {
-			$groupIds = array_column($this->groups, 'groupId');
-			
-			if(!in_array(Group::ID_EVERYONE, $groupIds)) {
-				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, "You can't remove group everyone");
-			}
-			
-			if(!in_array($this->getPersonalGroup()->id, $groupIds)) {
-				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, "You can't remove the user's personal group");
-			}
-		}
+//		if(!$this->isNew() && $this->isModified('groups')) {
+//			$groupIds = array_column($this->groups, 'groupId');
+//			
+//			if(!in_array(Group::ID_EVERYONE, $groupIds)) {
+//				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, "You can't remove group everyone");
+//			}
+//			
+//			if(!in_array($this->getPersonalGroup()->id, $groupIds)) {
+//				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, "You can't remove the user's personal group");
+//			}
+//		}
 		
 		if(!$this->validatePasswordChange()) {
 			if(!$this->hasValidationErrors('currentPassword')) {
@@ -493,26 +493,41 @@ class User extends Entity {
 			return false;
 		}
 		
-		//create user's personal group
-		if($this->isNew()) {
-			$personalGroup = new Group();
-			$personalGroup->name = $this->username;
-			$personalGroup->isUserGroupFor = $this->id;
-			if(!$personalGroup->save()) {
-				throw new \Exception("Could not create home group");
-			}
-
-			if(!(new UserGroup)->setValues(['groupId' => $personalGroup->id, 'userId' => $this->id])->internalSave()) {
-				throw new \Exception("Couldn't add user to group");
-			}
-			
-			if(!(new UserGroup)->setValues(['groupId' => Group::ID_EVERYONE, 'userId' => $this->id])->internalSave()) {
-				throw new \Exception("Couldn't add user to group");
-			}
-		}
+		$this->addSystemGroups();
 		
 		
 		return true;		
+	}
+	
+	private function addSystemGroups() {
+		if($this->isNew() || $this->isModified('groups')) {
+			$groupIds = array_column($this->groups, 'groupId');
+			
+			if(!in_array(Group::ID_EVERYONE, $groupIds)) {
+				$this->groups[] = ['groupId' => Group::ID_EVERYONE];
+			}
+			
+			if($this->isNew()){// !in_array($this->getPersonalGroup()->id, $groupIds)) {
+				$personalGroup = new Group();
+				$personalGroup->name = $this->username;
+				$personalGroup->isUserGroupFor = $this->id;
+				if(!$personalGroup->save()) {
+					throw new \Exception("Could not create home group");
+				}
+			} else
+			{
+				$personalGroup = $this->getPersonalGroup();
+			}
+			
+			
+			if(!in_array($personalGroup->id, $groupIds) && !(new UserGroup)->setValues(['groupId' => $personalGroup->id, 'userId' => $this->id])->internalSave()) {
+				throw new \Exception("Couldn't add user to group");
+			}
+			
+			if(!in_array(Group::ID_EVERYONE, $groupIds) && !(new UserGroup)->setValues(['groupId' => Group::ID_EVERYONE, 'userId' => $this->id])->internalSave()) {
+				throw new \Exception("Couldn't add user to group");
+			}
+		}
 	}
 	
 	/**

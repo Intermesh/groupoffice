@@ -10,6 +10,13 @@ go.systemsettings.NotificationsPanel = Ext.extend(Ext.form.FormPanel, {
 					},
 					xtype: "fieldset",
 					title: t('Outgoing E-mail (SMTP)'),
+					bbar: [
+						{
+							text: t("Send test message"),
+							handler: this.sendTestMessage,
+							scope: this
+						}
+					],
 					items: [
 						{
 							xtype: 'textfield',
@@ -76,6 +83,32 @@ go.systemsettings.NotificationsPanel = Ext.extend(Ext.form.FormPanel, {
 
 		go.systemsettings.NotificationsPanel.superclass.initComponent.call(this);
 	},
+	
+	sendTestMessage : function() {
+		go.Jmap.request({
+			method: "core/core/Settings/sendTestMessage",
+			params: this.getForm().getFieldValues(),
+			callback: function (options, success, response) {
+				if(success) {
+					Ext.MessageBox.alert(
+						t("Success"), 
+						t("A message was sent successfully to {email}").replace('{email}', this.getForm().findField('systemEmail').getValue())
+					);
+				} else
+				{
+					var error = "";
+					if(response[0] == "error") {
+						error = "<br /><br />" + response[1].message;
+					}
+					Ext.MessageBox.alert(
+						t("Failed"), 
+						t("Failed to send message to {email}").replace('{email}', this.getForm().findField('systemEmail').getValue() + error) 
+					);
+				}
+			},
+			scope: this
+		});
+	},
 
 	submit: function (cb, scope) {
 		go.Jmap.request({
@@ -84,7 +117,7 @@ go.systemsettings.NotificationsPanel = Ext.extend(Ext.form.FormPanel, {
 			callback: function (options, success, response) {
 				cb.call(scope, success);
 			},
-			scop: scope
+			scope: scope
 		});
 	},
 

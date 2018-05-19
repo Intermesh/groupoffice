@@ -49,7 +49,7 @@ go.modules.core.users.SystemSettingsUserDefaults = Ext.extend(Ext.form.FormPanel
 							store: new Ext.data.SimpleStore({
 								fields: ['id', 'format'],
 								data: [
-									['H:i', t("24 hour format", "users")],
+									['G:i', t("24 hour format", "users")],
 									['h:i a', t("12 hour format", "users")]
 								]
 							}),
