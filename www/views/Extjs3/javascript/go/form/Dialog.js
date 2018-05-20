@@ -33,6 +33,10 @@ go.form.Dialog = Ext.extend(go.Window, {
 		go.form.Dialog.superclass.initComponent.call(this);
 		
 		this.entityStore.on('changes',this.onChanges, this);
+		
+		this.on('destroy', function() {
+			this.entityStore.un('changes', this.onChanges, this);
+		}, this);
 
 		if (this.formValues) {
 			this.formPanel.form.setValues(this.formValues);

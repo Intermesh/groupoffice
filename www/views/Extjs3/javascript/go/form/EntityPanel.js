@@ -5,6 +5,9 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	initComponent : function() {
 		go.form.EntityPanel.superclass.initComponent.call(this);				
 		this.entityStore.on('changes',this.onChanges, this);
+		this.on('destroy', function() {
+			this.entityStore.un('changes', this.onChanges, this);
+		}, this);
 	},
 	
 	onChanges : function(entityStore, added, changed, destroyed) {

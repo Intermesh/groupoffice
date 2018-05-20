@@ -52,6 +52,11 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	
 	},
 	
+	destroy : function() {
+		this.entityStore.un('changes', this.onChanges, this);
+		return go.data.Store.superclass.destroy.call(this)
+	},
+	
 	//created this because grouping store must share this.
 	setup : function() {
 			if(!this.baseParams) {
