@@ -160,7 +160,7 @@ go.modules.core.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 			this.selectedGroups.push(record.id);
 		} else
 		{
-			this.selectedGroups.splice(this.selectedGroups.indexOf(newValue), 1);
+			this.selectedGroups.splice(this.selectedGroups.indexOf(record.id), 1);
 		}
 		this._isDirty = true;
 	},

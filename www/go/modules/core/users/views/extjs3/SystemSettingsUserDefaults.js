@@ -137,31 +137,29 @@ go.modules.core.users.SystemSettingsUserDefaults = Ext.extend(Ext.form.FormPanel
 		});
 
 		go.modules.core.users.SystemSettingsUserDefaults.superclass.initComponent.call(this);
+		
+		
+		this.on('render', function() {
+			go.Jmap.request({
+				method: "core/users/Settings/get",
+				callback: function (options, success, response) {
+					this.getForm().setValues(response);
+				},
+				scope: this
+			});
+		}, this);
 	},
 
-	submit: function (cb, scope) {
+	onSubmit: function (cb, scope) {
 		go.Jmap.request({
 			method: "core/users/Settings/set",
 			params: this.getForm().getFieldValues(),
 			callback: function (options, success, response) {
-				cb.call(scope, success);
+				cb.call(scope, this, success);
 			},
 			scop: scope
 		});
-	},
-
-	load: function (cb, scope) {
-		go.Jmap.request({
-			method: "core/users/Settings/get",
-			callback: function (options, success, response) {
-				this.getForm().setValues(response);
-
-				cb.call(scope, success);
-			},
-			scope: this
-		});
 	}
-
 
 });
 

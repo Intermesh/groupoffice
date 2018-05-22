@@ -115,7 +115,7 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 		}); 
 	}, 
 	
-		initRowActions: function () {
+	initRowActions: function () {
 
 		var actions = new Ext.ux.grid.RowActions({
 			menuDisabled: true,
@@ -181,15 +181,9 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 		this.moreMenu.showAt(e.getXY());
 	},
 	
-	load : function() {
-		console.log("TODO this funciton should be renamed");
-	},
-	
 	edit : function(id) {
-
 		var dlg = new go.usersettings.UserSettingsDialog();
-		dlg.show(id);
-						
+		dlg.show(id);						
 	}
 	
 });

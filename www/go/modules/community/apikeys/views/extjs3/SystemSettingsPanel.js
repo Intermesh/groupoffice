@@ -2,11 +2,7 @@ go.modules.community.apikeys.SystemSettingsPanel = Ext.extend(Ext.Panel, {
 	iconCls: 'ic-lock',
 	layout: "border",
 	initComponent: function () {
-		
-	
-		
-		this.title = t("API Keys");
-		
+		this.title = t("API Keys");		
 		
 		this.items = [
 			{
@@ -21,9 +17,5 @@ go.modules.community.apikeys.SystemSettingsPanel = Ext.extend(Ext.Panel, {
 		];
 		
 		go.modules.community.apikeys.SystemSettingsPanel.superclass.initComponent.call(this);
-	},
-	
-	load : function() {
-		console.log("TODO this funciton should be renamed");
 	}
 });

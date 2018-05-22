@@ -174,10 +174,6 @@ go.modules.core.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 		this.moreMenu.showAt(e.getXY());
 	},
 
-	load: function () {
-		console.log("TODO this funciton should be renamed");
-	},
-
 	edit: function (id) {
 
 		var dlg = new go.modules.core.groups.GroupDialog();
