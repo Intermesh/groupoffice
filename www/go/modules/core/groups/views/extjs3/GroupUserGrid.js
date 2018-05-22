@@ -18,6 +18,7 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 	
 	initComponent: function () {
 		
+		this.selectedUsers = [];
 		
 		var checkColumn = new GO.grid.CheckColumn({
 			dataIndex: 'selected',
@@ -28,9 +29,9 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 		});
 		
 		var me = this;
-
-
+		
 		this.store = new go.data.Store({
+			remoteSort: false,
 			fields: [
 				'id', 
 				'username', 
@@ -45,9 +46,16 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 						convert: function (v, data) {
 							return me.selectedUsers.indexOf(data.id) > -1;
 						}
+					},
+					sortType:function(checked) {
+						return checked ? 1 : 0;
 					}
 				}
 			],
+			listeners: {
+				scope: this,
+				load: this.onStoreLoad
+			},
 			baseParams: {
 				filter: {
 					selectForGroupId: null
@@ -91,44 +99,56 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>',
 				forceFit: true,
 				autoFill: true
-			},
-			// config options for stateful behavior
-			stateful: true,
-			stateId: 'users-grid'
+			}
+//			// config options for stateful behavior
+//			stateful: true,
+//			stateId: 'users-grid'
 		});
+		
+		this.store.sort([{
+					field: 'selected',
+					direction: 'DESC'
+				},{
+					field: 'displayName',
+					direction: 'ASC'
+				}]);
 
 		go.modules.core.groups.GroupUserGrid.superclass.initComponent.call(this);
 
 	},
 	
-	load : function(id) {
-		
-		this.selectedUsers = [];
-		go.Jmap.request({
-			method: "User/query",
-			params: {
-				filter: {
-					groupId: id
-				}
-			},
-			callback: function(options, success, response) {
-				this.selectedUsers = response.ids;
-				
-//				this.store.baseParams.filter.groupId = id;
-				this.store.load();
-			},
-			scope: this
-		});
-		
-	},
+//	load : function(id) {
+//		
+//		this.selectedUsers = [];
+//		go.Jmap.request({
+//			method: "User/query",
+//			params: {
+//				filter: {
+//					groupId: id
+//				}
+//			},
+//			callback: function(options, success, response) {
+//				this.selectedUsers = response.ids;
+//				
+////				this.store.baseParams.filter.groupId = id;
+//				this.store.load();
+//			},
+//			scope: this
+//		});
+//		
+//	},
 	
 	onCheckChange : function(record, newValue) {
+		console.log(record.id);
 		if(newValue) {
 			this.selectedUsers.push(record.id);
 		} else
 		{
-			this.selectedUsers.splice(this.selectedUsers.indexOf(newValue), 1);
+			this.selectedUsers.splice(this.selectedUsers.indexOf(record.id), 1);
 		}
+		
+		console.log(this.selectedUsers);
+		
 		this._isDirty = true;
 	},
 	
@@ -144,16 +164,21 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 		return this._isDirty || this.store.getModifiedRecords().length > 0;
 	},
 
-//	setValue: function (groups) {
-//		
-//		this._isDirty = false;
-//		
-//		var me = this;
-//		this.selectedGroups = [];
-//		groups.forEach(function(group) {
-//			me.selectedGroups.push(group.groupId);
-//		});		
-//		
+	setValue: function (groups) {
+		
+		this._isDirty = false;
+		
+		var me = this;
+		this.selectedUsers = [];
+		groups.forEach(function(group) {
+			me.selectedUsers.push(group.userId);
+		});		
+		
+		this.store.load();
+		
+		
+		//todo load and exclude selection
+		
 //		if(this.rendered) {
 //			this.store.load();
 //		} else if(!this.loading)
@@ -164,7 +189,23 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 //				this.store.load();
 //			}, this, {single: true});
 //		}
-//	},
+	},
+	
+	onStoreLoad : function() {
+		console.log(this.selectedUsers);
+		
+		//don't add selected on search
+		if(this.store.baseParams.filter.q) {
+			return;
+		}
+		
+		go.Stores.get("User").get(this.selectedUsers, function(entities) {
+			this.store.suspendEvents(false); //to prevent ininiteloop as loadData fires 'load' event.
+			this.store.loadData({records: entities}, true);		
+			this.store.sortData();
+			this.store.resumeEvents();
+		}, this);
+	},
 	
 	getValue: function () {				
 		var users = [];

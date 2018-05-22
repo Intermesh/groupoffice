@@ -19,13 +19,13 @@ go.modules.core.groups.GroupDialog = Ext.extend(go.form.Dialog, {
 				hideLabel: true
 			})
 		];
-	},
-	
-	load : function(id) {
-		
-		this.groupUserGrid.load(id);
-		
-		return go.modules.core.groups.GroupDialog.superclass.load.call(this, id);
 	}
+	
+//	load : function(id) {
+//		
+//		this.groupUserGrid.load(id);
+//		
+//		return go.modules.core.groups.GroupDialog.superclass.load.call(this, id);
+//	}
 });
 

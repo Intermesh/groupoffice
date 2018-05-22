@@ -16,7 +16,16 @@ class Group extends AclEntity {
 	const ID_EVERYONE = 2;
 	const ID_INTERNAL = 3;
 
+	/**
+	 *
+	 * @var int
+	 */
 	public $id;
+	
+	/**
+	 *
+	 * @var string
+	 */
 	public $name;
 
 	/**
@@ -27,11 +36,25 @@ class Group extends AclEntity {
 	 * @var int
 	 */
 	public $isUserGroupFor;
+	
+	/**
+	 * Created by user ID 
+	 * 
+	 * @var int
+	 */
 	public $createdBy;
+	
+	/**
+	 * The users in this group
+	 * 
+	 * @var UserGroup[]
+	 */
+	public $users;
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
-						->addTable('core_group', 'g');
+						->addTable('core_group', 'g')
+						->addRelation('users', UserGroup::class, ['id' => 'groupId']);
 	}
 
 	public static function filter(Query $query, array $filter) {
