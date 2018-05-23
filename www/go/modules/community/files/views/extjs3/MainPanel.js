@@ -33,6 +33,7 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 					{name: 'size', submit: false},
 					{name: 'progress', submit: false},
 					{name: 'status', submit: false},
+					{name: 'blobId', submit: false},
 					'isDirectory', 
 					{name: 'createdAt', type: 'date'}, 
 					{name: 'modifiedAt', type: 'date'}, 
@@ -232,8 +233,7 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 										}
 									},
 									scope:this
-								},
-								{
+								},{
 									text:'', 
 									pressed:true, //default
 									toggleHandler:function(btn,state){
@@ -247,13 +247,13 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 								{text:t('Shared with me')},
 								{text:t('Bookmarks')}
 							]
-						})
-					]},
-				bbar: 
+						}),
 						this.breadCrumbs = new go.modules.community.files.BreadCrumbBar({
 							browser:this.browser,
 							style: {'background-color':'white'}
 						})
+					]}
+						
 				}), //first is default in narrow mode
 				this.nodeDetail
 			]

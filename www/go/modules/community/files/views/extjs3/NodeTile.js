@@ -12,17 +12,19 @@
 go.modules.community.files.NodeTile = Ext.extend(go.grid.TilePanel, {
 	tpl: new Ext.XTemplate('<tpl for=".">',
 		'<div class="tile">',
-			'<tpl if="values.contentType && values.contentType.substring(0,5) == \'image\'" && values.metaData">\
+			'<tpl if="values.metaData && values.metaData.thumbnail">\
 				<div class="thumb" style="background-image:url({[go.Jmap.downloadUrl(values.metaData.thumbnail)]})"></div>\
 			</tpl>',
-			'<tpl if="!values.metaData || !values.metaData.thumbnail"><div class="filetype {[this.icon(values)]}"></div></tpl>',
+			'<tpl if="!values.metaData || !values.metaData.thumbnail">{[this.icon(values)]}</tpl>',
 			'<div class="text">{name}</div>'+
 			'<tpl if="values.status==\'queued\'"><progress max="100" value="{progress}"></progress></tpl>'+
 		'</div>',
 	'</tpl>',{
 		icon: function(values) {
-			//todo: find thumb in metadata
-			return go.util.contentTypeClass(values.contentType, values.name);
+			if(values.contentType === 'image/svg+xml') {
+				return '<div class="thumb" style="background-image:url('+go.Jmap.downloadUrl(values.blobId)+')"></div>';
+			}
+			return '<div class="filetype '+ go.util.contentTypeClass(values.contentType, values.name)+ '"></div>';
 		}
 	}),
 	initComponent : function(){

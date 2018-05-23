@@ -288,7 +288,7 @@ $filetype: (
 	eml: eml,
 	folder: folder,
 	image: (jpeg, jpg, gif, bmp, tif, png, tiff),
-	playlist: (webm, avi, mkv, mpeg, mov, vob, ogv),
+	playlist: (webm, avi, mkv, mpeg, mov, vob, ogv, flv, 3gp, mp4),
 	svg: svg,
 	pdf: pdf,
 	gpg: (asc, gpg),
@@ -1277,15 +1277,6 @@ $material-icons : (
 		content: '#{$icon}' !important;
 	}
 }
-
-
-
-
-
-
-
-
-
 
 .go-icon-ok .x-grid3-cell-inner{
 	&:before {

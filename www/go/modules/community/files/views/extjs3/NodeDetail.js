@@ -9,10 +9,8 @@ go.modules.community.files.NodeDetail = Ext.extend(go.panels.DetailView, {
 		Ext.apply(this, {
 			items: [
 				{tpl:new Ext.XTemplate('<h3 class="title s8">{name}</h3>\
-<h4 class="title s4 right">{[values.size && fm.fileSize(values.size)]}</h4>\
-<tpl if="values.metaData"><figure class="contain" style="max-height: 200px;background-image:url({[go.Jmap.downloadUrl(values.metaData.thumbnail)]});"></tpl>\
-<tpl if="!values.metaData"><div class="preview filetype {[this.icon(values)]}"></div></tpl>\
-</figure>\
+<h4 class="title s4 right">{[values.size && fm.fileSize(values.size)]}</h4>\\n\
+<div class="detail-preview">{[this.preview(values)]}</div>\
 <tpl if="values.metaData && values.metaData.data3"><label class="center">{values.metaData.data3} x {values.metaData.data4}</label></tpl>\
 <hr />\
 <p class="pad">\
@@ -29,9 +27,26 @@ go.modules.community.files.NodeDetail = Ext.extend(go.panels.DetailView, {
 						}
 						return str;
 					},
-					icon: function(values) {
-						//todo: find thumb in metadata
-						return go.util.contentTypeClass(values.contentType, values.name);
+					preview: function(values) {
+						var type = null;
+						if(values.contentType) {
+							type = values.contentType.split('/')[0];
+						}
+						switch(type) {
+							case 'image':
+								if(values.metaData && values.metaData.thumbnail) {
+									return '<figure class="contain" style="background-image:url('+go.Jmap.downloadUrl(values.metaData.thumbnail)+');"></figure>'
+								} else if (values.contentType === 'image/svg+xml') {
+									return '<figure class="contain" style="background-image:url('+go.Jmap.downloadUrl(values.blobId)+');"></figure>'
+								}
+								break;
+							case 'video':
+								return '<video controls><source src="'+go.Jmap.downloadUrl(values.blobId)+'" type="'+values.contentType+'"></video>';
+							case 'audio':
+								return '<audio controls><source src="'+go.Jmap.downloadUrl(values.blobId)+'" type="'+values.contentType+'">Your browser does not support the audio element.</audio>'
+						}
+						return '<div class="preview filetype '+go.util.contentTypeClass(values.contentType, values.name)+'"></div>'
+						
 					},
 					browser:this.browser
 				})},{
@@ -69,7 +84,6 @@ go.modules.community.files.NodeDetail = Ext.extend(go.panels.DetailView, {
 			this.add(new go.modules.comments.CommentsDetailPanel());
 		}
 	},
-
 
 	onLoad: function () {
 
@@ -129,9 +143,7 @@ go.modules.community.files.NodeDetail = Ext.extend(go.panels.DetailView, {
 			items: items
 		};
 
-
 		return new Ext.Toolbar(tbarCfg);
-
 
 	}
 });

@@ -239,6 +239,7 @@ views/Extjs3/javascript/calendar/WeekEventRenderer.js
 views/Extjs3/javascript/go/flux/Dispatcher.js
 views/Extjs3/javascript/go/flux/Store.js
 views/Extjs3/javascript/go/Jmap.js
+views/Extjs3/javascript/go/Blob.js
 
 views/Extjs3/javascript/go/data/JmapProxy.js
 views/Extjs3/javascript/go/data/Store.js
