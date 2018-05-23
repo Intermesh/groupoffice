@@ -275,13 +275,20 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 					var records = av.store.getRange();
 					
 					this.attachments=[];
-					for(var i=0;i<records.length;i++)
-						this.attachments.push({
+					for(var i=0;i<records.length;i++){
+						
+						var att = {
 							tmp_file:records[i].data.tmp_file,
 							from_file_storage: records[i].data.from_file_storage,
 							fileName:records[i].data.name
-						});
-					
+						};
+						
+						if(records[i].json && records[i].json.blobId){
+							att.blobId = records[i].json.blobId;
+						}
+						
+						this.attachments.push(att);
+					}
 					this.hiddenAttachmentsField.setValue(Ext.encode(this.attachments));
 				},
 				scope:this

@@ -606,18 +606,33 @@ body p{
 		if (!empty($params['attachments'])) {
 			$attachments = json_decode($params['attachments']);
 			foreach ($attachments as $att) {
-				$path = empty($att->from_file_storage) ? \GO::config()->tmpdir.$att->tmp_file : \GO::config()->file_storage_path.$att->tmp_file;
-				$tmpFile = new \GO\Base\Fs\File($path);
-				if ($tmpFile->exists()) {
-					$file = \Swift_Attachment::fromPath($tmpFile->path());
-					$file->setContentType($tmpFile->mimeType());
-					$file->setFilename($att->fileName);
-					$this->attach($file);
+				
+				// New framework, include the correct blob file to the email
+				if(!empty($att->blobId)){
 					
-					//$tmpFile->delete();
-				}else
-				{
-					throw new \Exception("Error: attachment missing on server: ".$tmpFile->stripTempPath().".<br /><br />The temporary files folder is cleared on each login. Did you relogin?");
+					$blob = \go\core\fs\Blob::findById($att->blobId);
+					if($blob){
+						$file = \Swift_Attachment::fromPath($blob->path());
+						$file->setContentType($blob->contentType);
+						$file->setFilename($blob->name);
+						$this->attach($file);
+					}
+					
+				} else {
+				
+					$path = empty($att->from_file_storage) ? \GO::config()->tmpdir.$att->tmp_file : \GO::config()->file_storage_path.$att->tmp_file;
+					$tmpFile = new \GO\Base\Fs\File($path);
+					if ($tmpFile->exists()) {
+						$file = \Swift_Attachment::fromPath($tmpFile->path());
+						$file->setContentType($tmpFile->mimeType());
+						$file->setFilename($att->fileName);
+						$this->attach($file);
+
+						//$tmpFile->delete();
+					}else
+					{
+						throw new \Exception("Error: attachment missing on server: ".$tmpFile->stripTempPath().".<br /><br />The temporary files folder is cleared on each login. Did you relogin?");
+					}
 				}
 			}
 		}
