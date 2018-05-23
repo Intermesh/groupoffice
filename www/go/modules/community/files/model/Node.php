@@ -3,7 +3,10 @@ namespace go\modules\community\files\model;
 
 use GO;
 use go\core\acl\model;
+use go\core\auth\model\User;
 use go\core\db\Query;
+use go\core\fs\Blob;
+use go\core\fs\MetaData;
 use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
@@ -44,10 +47,10 @@ class Node extends model\AclEntity {
 	protected static function defineMapping() {		
 		return parent::defineMapping()
 			->addTable('files_node', 'node')
-			->addRelation('metaData', \go\core\fs\MetaData::class, ['blobId'=>'blobId'], false)
+			->addRelation('metaData', MetaData::class, ['blobId'=>'blobId'], false)
 		   ->setQuery((new Query)
 				->join('core_blob', 'blob', 'node.blobId=blob.id', 'LEFT')
-				->join('files_node_user', 'nodeUser', 'node.id=nodeUser.nodeId AND nodeUser.userId='.GO()->getUser()->id.'', 'LEFT')
+				->join('files_node_user', 'nodeUser', 'node.id=nodeUser.nodeId AND nodeUser.userId='.GO()->getUserId().'', 'LEFT')
 				->join('files_node', 'parent','node.parentId=parent.id','LEFT')
 				->select('blob.contentType, blob.size, nodeUser.bookmarked, nodeUser.touchedAt, parent.aclId AS parentAclId'));
 //			->addTable('core_blob', 'blob', ['blobId' => 'id'], ['contentType','size']);
@@ -71,7 +74,7 @@ class Node extends model\AclEntity {
 			return;
 		}
 		$this->blobId = $blobId;
-		$blob = \go\core\fs\Blob::findById($blobId);
+		$blob = Blob::findById($blobId);
 		$this->contentType = $blob->contentType;
 		$this->size = $blob->size;
 		$this->metaData = $blob->metaData;
@@ -181,7 +184,8 @@ class Node extends model\AclEntity {
 	public static function filter(Query $query, array $filter) {
 		
 		// Add where usergroup is the personal group of the user
-		$userStorageId = GO()->getUser()->storage?GO()->getUser()->storage->id:null;
+		$user = User::findById(GO()->getUserId());
+		$userStorageId = $user && $user->storage?$user->storage->id:null;
 
 		if(isset($filter['q'])){
 			$query->andWhere('name','LIKE', '%' . $filter['q'] . '%');
