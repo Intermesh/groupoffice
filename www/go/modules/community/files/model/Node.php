@@ -93,7 +93,7 @@ class Node extends model\AclEntity {
 	 */
 	public function setBookmarked($val) {
 		$this->bookmarked = $val;
-		GO()->getDbConnection()->replace('files_node_user', ['bookmarked' => $this->bookmarked, 'userId' => GO()->getUser()->id, 'nodeId' => $this->id])->execute();
+		GO()->getDbConnection()->replace('files_node_user', ['bookmarked' => $this->bookmarked, 'userId' => GO()->getUserId(), 'nodeId' => $this->id])->execute();
 	}
 	
 	/**
@@ -164,7 +164,9 @@ class Node extends model\AclEntity {
 	}
 
 	protected function getSearchDescription() {
-		return $this->createdAt->format(GO()->getUser()->date_format);
+		$user = User::findById(GO()->getUserId());
+		
+		return $user?$this->createdAt->format($user->date_format):'';
 	}
 
 	protected function getSearchName() {
