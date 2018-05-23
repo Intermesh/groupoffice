@@ -20,12 +20,26 @@ class MappedTable extends Table {
 	
 	private $mappedColumns = [];
 	
+	
+	private $constantValues = [];
+	
 	/**
+	 * Mapped table constructor
 	 * 
-	 * @param string $name
-	 * @param array $columns List the columns that are allowed to be mapped
+	 * @param string $name The table name
+	 * @param sring $alias The table alias to use in the queries
+	 * @param array $keys If empty then it's assumed the key name is identical in 
+	 *   this and the last added table. eg. ['id' => 'id']
+	 * @params array $columns Leave this empty if you want to automatically build 
+	 *   this based on the properties the model has. If you're extending a model 
+	 *   then this is not possinble and you must supply all columns you do want to 
+	 *   make available in the model.
+	 * @params array $constantValues If the table that is joined needs to have 
+	 *   constant values. For example the keys are ['folderId' => 'folderId'] but 
+	 *   the joined table always needs to have a value 
+	 *   ['userId' => GO()->getUserId()] then you can set it with this parameter.
 	 */
-	public function __construct($name, $alias, $keys = null, array $columns = []) {
+	public function __construct($name, $alias, $keys = null, array $columns = [], array $constantValues = []) {
 		parent::__construct($name);
 		
 		$this->alias = $alias;
@@ -34,9 +48,9 @@ class MappedTable extends Table {
 			$keys = $this->buildDefaultKeys();
 		}
 
-		$this->keys = $keys;
-		
+		$this->keys = $keys;		
 		$this->mappedColumns = $columns;
+		$this->constantValues = $constantValues;
 	}
 	
 	
@@ -51,6 +65,11 @@ class MappedTable extends Table {
 		});
 	}
 	
+	public function getColumn($name) {
+		$cols = $this->getMappedColumns();
+		return $cols[$name] ?? null;
+	}
+	
 	private function buildDefaultKeys() {
 		$keys = [];
 		foreach ($this->getPrimaryKey() as $pkName) {
@@ -58,6 +77,17 @@ class MappedTable extends Table {
 		}
 		
 		return $keys;
+	}
+	
+	/**
+	 * Get the constant values.
+	 * 
+	 * @see __construct()
+	 * 
+	 * @return array ['col' => 'value']
+	 */
+	public function getConstantValues() {
+		return $this->constantValues;
 	}
 	
 	/**

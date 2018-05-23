@@ -99,16 +99,25 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					go.User.clearAccessToken();
 					
 					me.fireEvent("boot", this);
-					GO.mainLayout.login();
+					if(go.Router.requireAuthentication) {
+						go.Router.pathBeforeLogin = go.Router.getPath();
+						go.Router.goto("login");
+					}
 				}
 			});
 		} else {
 			this.fireEvent("boot", this); // In the router there is an event attached.
-			GO.mainLayout.login();
+			if(go.Router.requireAuthentication) {
+				go.Router.pathBeforeLogin = go.Router.getPath();
+				go.Router.goto("login");
+			}
 		}
 	},
 
-	login: function () {
+	login: function () {		
+		GO.mainLayout.on('render', function () {
+			go.Router.goto(go.Router.pathBeforeLogin);
+		}, this, {single: true});
 		
 		if(!this.loginPanel) {
 			//go.AuthenticationManager.register('password', new go.login.PasswordPanel(), 0);
@@ -118,6 +127,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				this.loginPanel = null;
 			}, this);
 		}
+		
+		//console.log('ja');
+			
 
 		this.fireEvent('login', this);
 	},
@@ -565,7 +577,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 							}, {
 								text: t("Logout"),
 								iconCls: 'ic-exit-to-app',
-								handler: go.AuthenticationManager.logout,
+								handler: function() {
+									go.AuthenticationManager.logout();
+								},
 								scope: this
 							}
 						]

@@ -109,18 +109,19 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	
 	loadModulePanels : function() {
     
-		var available = go.Modules.getAvailable();
+		var available = go.Modules.getAvailable(), pnl, config, i, i1;
 		
-		for(var i = 0, l = available.length; i < l; i++) {
+		for(i = 0, l = available.length; i < l; i++) {
 			
-			var config = go.Modules.getConfig(available[i].package, available[i].name);
+			config = go.Modules.getConfig(available[i].package, available[i].name);
 			
 			if(!config.userSettingsPanels) {
 				continue;
 			}
 			
-			for(var i1 = 0, l2 = config.userSettingsPanels.length; i1 < l2; i1++) {
-				this.addPanel(config.userSettingsPanels[i1]);
+			for(i1 = 0, l2 = config.userSettingsPanels.length; i1 < l2; i1++) {
+				pnl = eval(config.userSettingsPanels[i1]);				
+				this.addPanel(pnl);
 			}
 		}
 	},

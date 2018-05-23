@@ -18,7 +18,7 @@ class NoteBook extends AclEntity {
 		parent::init();
 		
 		if($this->isNew()) {
-			$this->createdBy = \go\core\App::get()->getAuthState()->getUser()->id;
+			$this->createdBy = \go\core\App::get()->getAuthState()->getUserId();
 		}
 	}
 }

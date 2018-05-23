@@ -36,7 +36,8 @@ class QueryTest extends TestCase {
 
 		$data = [
 				"id" => 1,
-				"propB" => "string 2"
+				"propB" => "string 2",
+				"userId" => 1
 		];
 
 		$result = App::get()->getDbConnection()->replace("test_b", $data)->execute();

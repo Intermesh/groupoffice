@@ -313,14 +313,26 @@ namespace go\core {
 			return $this->authState;
 		}
 
+//		/**
+//		 * Get the authenticated user
+//		 * 
+//		 * @return auth\model\User
+//		 */
+//		public function getUser() {
+//			if ($this->getAuthState() instanceof \go\core\auth\State) {
+//				return $this->authState->getUser();
+//			}
+//			return null;
+//		}
+		
 		/**
 		 * Get the authenticated user
 		 * 
 		 * @return auth\model\User
 		 */
-		public function getUser() {
+		public function getUserId() {
 			if ($this->getAuthState() instanceof \go\core\auth\State) {
-				return $this->authState->getUser();
+				return $this->authState->getUserId();
 			}
 			return null;
 		}
@@ -366,8 +378,8 @@ namespace go\core {
 				}
 			}
 
-			if (!empty($_SERVER['SERVER_NAME'])) {
-				$workingFile = '/etc/groupoffice/' . $_SERVER['SERVER_NAME'] . '/' . $name;
+			if (!empty($_SERVER['HTTP_HOST'])) {
+				$workingFile = '/etc/groupoffice/multi_instance/' . $_SERVER['HTTP_HOST'] . '/' . $name;
 				if (file_exists($workingFile)) {
 					return $workingFile;
 				}

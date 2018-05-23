@@ -7,7 +7,7 @@ ini_set('display_startup_errors', '1');
 use go\core\App;
 use go\core\cli\State;
 
-$installDb = false;
+$installDb = true;
 
 $autoLoader = require(__DIR__ . "/../www/vendor/autoload.php");
 $autoLoader->add('go\\', __DIR__);

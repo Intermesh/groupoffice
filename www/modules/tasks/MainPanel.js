@@ -553,7 +553,7 @@ go.Modules.register("legacy", 'tasks', {
 	title: t("Tasks", "tasks"),
 	iconCls: 'go-tab-icon-tasks',
 	entities: ["Task"],
-	userSettingsPanels: [GO.tasks.SettingsPanel],
+	userSettingsPanels: ["GO.tasks.SettingsPanel"],
 	initModule: function () {	
 		go.Links.registerLinkToWindow("Task", function(entity, entityId) {
 			var win = new GO.tasks.TaskDialog();

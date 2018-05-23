@@ -105,7 +105,7 @@ class Acl extends Property {
 						->where('acl_g.aclId = '.$column)
 						->join('core_user_group', 'acl_u' , 'acl_u.groupId = acl_g.groupId')
 						->andWhere([
-								'acl_u.userId' => App::get()->getAuthState()->getUser()->id								
+								'acl_u.userId' => App::get()->getAuthState()->getUserId()						
 										])
 						->andWhere('acl_g.level', '>=', $level);
 		

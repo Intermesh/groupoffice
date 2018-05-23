@@ -211,7 +211,7 @@ class RecipientList implements ArrayAccess {
 		}
 
 		if (!empty($this->buffer)) {
-			if ($this->strict && !ValidateEmail::check($this->buffer)) {
+			if ($this->strict && !Util::validateEmail($this->buffer)) {
 				throw new Exception("Address " . $this->buffer . " is not valid");
 			} else {
 				$this->recipients[] = new Recipient($this->buffer, Utils::mimeHeaderDecode($this->personal));

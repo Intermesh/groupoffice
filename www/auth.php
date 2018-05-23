@@ -68,7 +68,8 @@ try {
 		} elseif (!empty($data['newPassword'])) {
 			$user->setPassword($data['newPassword']);
 			$user->checkRecoveryHash($data['hash']);
-			$response = ['passwordChanged' => $user->save()];
+			$success = $user->save();
+			$response = ['passwordChanged' => $success, 'validationErrors' => $user->getValidationErrors()];
 		} else {
 			$response = [
 					"username" => $user->username,

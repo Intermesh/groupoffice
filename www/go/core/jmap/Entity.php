@@ -46,6 +46,14 @@ abstract class Entity  extends \go\core\orm\Entity {
 		return StateManager::get()->current(static::class);
 	}
 
+	/**
+	 * Saves the model and property relations to the database
+	 * 
+	 * Important: When you override this make sure you call this parent function first so
+	 * that validation takes place!
+	 * 
+	 * @return boolean
+	 */
 	protected function internalSave() {
 		
 		$this->modSeq = StateManager::get()->next(static::class);
@@ -53,6 +61,11 @@ abstract class Entity  extends \go\core\orm\Entity {
 		return parent::internalSave();
 	}
 	
+	/**
+	 * Implements soft delete
+	 * 
+	 * @return boolean
+	 */
 	protected function internalDelete() {
 		$this->deletedAt = new DateTime();
 

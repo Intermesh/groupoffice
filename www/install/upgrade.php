@@ -17,6 +17,7 @@ if (!$lock->lock()) {
 header("Content-Type: text/plain; charset=utf8");
 
 GO()->getCache()->flush(false);
+GO()->setCache(new \go\core\cache\None());
 
 try {
 	

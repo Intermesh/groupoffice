@@ -53,8 +53,8 @@ class Language{
 	 * @param StringHelper $isoCode Leave empty to set the default user language.
 	 * @return StringHelper Old ISO code that was set.
 	 */
-	public function setLanguage($isoCode){		
-		if(\go\core\Language::get()->hasLanguage($isoCode)) {
+	public function setLanguage($isoCode = null){		
+		if(!isset($isoCode) || \go\core\Language::get()->hasLanguage($isoCode)) {
 			\go\core\Language::get()->setLanguage($isoCode);	
 		}
 		

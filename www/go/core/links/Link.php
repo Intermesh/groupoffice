@@ -112,7 +112,7 @@ class Link extends \go\core\jmap\Entity {
 	 * @return int
 	 */
 	public function getPermissionLevel() {
-		return Acl::getPermissionLevel($this->aclId, App::get()->getAuthState()->getUser()->id);
+		return Acl::getPermissionLevel($this->aclId, App::get()->getAuthState()->getUserId());
 	}
 	
 	/**

@@ -820,7 +820,7 @@ go.Modules.register("legacy", 'addressbook', {
 	title: t("Address book", "addressbook"),
 	iconCls: 'go-tab-icon-addressbook',
 	entities: ["Contact", "Company"],
-	userSettingsPanels: [GO.addressbook.SettingsPanel],
+	userSettingsPanels: ["GO.addressbook.SettingsPanel"],
 	initModule: function () {	
 		go.Links.registerLinkToWindow("Contact", function() {
 			var win = new GO.addressbook.ContactDialog ();

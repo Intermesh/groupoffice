@@ -109,7 +109,7 @@ if ($cacheFile->exists()) {
 
 	$scripts[] = new File(GO::config()->root_path . 'views/Extjs3/javascript/namespaces.js');
 	$data = file_get_contents(GO::config()->root_path . 'views/Extjs3/javascript/scripts.txt');
-	$lines = explode("\n", $data);
+	$lines = array_map('trim', explode("\n", $data));
 	foreach ($lines as $line) {
 		if (!empty($line)) {
 			$scripts[] = new File(GO::config()->root_path . $line);
@@ -146,7 +146,7 @@ if ($cacheFile->exists()) {
 
 			if (file_exists($scriptsFile)) {
 				$data = file_get_contents($scriptsFile);
-				$lines = explode("\n", $data);
+				$lines = array_map('trim', explode("\n", $data));
 				foreach ($lines as $line) {
 					if (!empty($line)) {
 						$scripts[] = new File(GO::config()->root_path . $prefix . trim($line));
@@ -169,16 +169,19 @@ if ($cacheFile->exists()) {
   }
 
 	$rootFolder = new Folder(GO::config()->root_path);
+	
 	foreach ($scripts as $script) {
 
 		if (GO::config()->debug) {
 			if (is_string($script)) {
-        $js .=  $script ."\n;\n";
-				//echo '<script type="text/javascript">' . $script . '</script>' . "\n";
+//        $js .=  $script ."\n;\n";
+				echo '<script type="text/javascript">' . $script . '</script>' . "\n";
 			} else if ($script instanceof File) {
         $relPath = $script->getRelativePath($rootFolder);
         $parts = explode('/', $relPath);
-        $js .= "\n//source: ".$relPath ."\n";
+//        $js .= "\n//source: ".$relPath ."\n";
+				echo '<script type="text/javascript">';
+				$js = "";
         if($parts[0] == 'go' && $parts[1] == 'modules') {
           $js .= "go.module = '".$parts[3]."';";
           $js .= "go.package = '".$parts[2]."';";
@@ -189,47 +192,52 @@ if ($cacheFile->exists()) {
           $js .= "go.package = 'legacy';";
           $js .= "go.Translate.setModule('legacy', '" .$parts[1]. "');";   
         }
-        $js .= $script->getContents()."\n;\n";
-				//echo '<script type="text/javascript" src="script.php?source='.$script->getRelativePath($rootFolder) . '"></script>' . "\n";
+				echo $js;
+				
+				echo "</script>";
+//        $js .= $script->getContents()."\n;\n";
+//        
+//     
+				echo '<script type="text/javascript" src="'.$relPath. '"></script>' . "\n";
 			}
 //      else if($script instanceof \go\core\util\Url) {
 //				echo '<script type="text/javascript" src="'.$script.'"></script>' . "\n";
 //			}
 		} else {      
       
-    if($script instanceof File) {
-      $relPath = $script->getRelativePath($rootFolder);
-      $parts = explode('/', $relPath);
-      $js = "";
-      if($parts[0] == 'go' && $parts[1] == 'modules') {
-        $js .= "go.module = '".$parts[3]."';";
-        $js .= "go.package = '".$parts[2]."';";
-        $js .= "go.Translate.setModule('".$parts[2]."', '" .$parts[3]. "');";   
-      } else if($parts[0] == 'modules')
-      {
-        $js .= "go.module = '".$parts[1]."';";
-        $js .= "go.package = 'legacy';";
-        $js .= "go.Translate.setModule('legacy', '" .$parts[1]. "');";   
-      }
+			if($script instanceof File) {
+				$relPath = $script->getRelativePath($rootFolder);
+				$parts = explode('/', $relPath);
+				$js = "";
+				if($parts[0] == 'go' && $parts[1] == 'modules') {
+					$js .= "go.module = '".$parts[3]."';";
+					$js .= "go.package = '".$parts[2]."';";
+					$js .= "go.Translate.setModule('".$parts[2]."', '" .$parts[3]. "');";   
+				} else if($parts[0] == 'modules')
+				{
+					$js .= "go.module = '".$parts[1]."';";
+					$js .= "go.package = 'legacy';";
+					$js .= "go.Translate.setModule('legacy', '" .$parts[1]. "');";   
+				}
 
-      if(!empty($js)) {
-        $minify->add($js);   
-      }
-    }
+				if(!empty($js)) {
+					$minify->add($js);   
+				}
+			}
 			$minify->add($script);
 		}
 	}
 	
 	if (!GO::config()->debug) {
 		$minify->gzip($cacheFile->getPath());		
-		
+		echo '<script type="text/javascript" src="' . GO::url('core/clientScripts', ['mtime' => GO::config()->mtime, 'lang' => \GO::language()->getLanguage()]) . '"></script>';
 	} else
   {
-    $fp = $cacheFile->open('w');
-    fwrite($fp, $js);
-    fclose($fp);
+//    $fp = $cacheFile->open('w');
+//    fwrite($fp, $js);
+//    fclose($fp);
   }
-  echo '<script type="text/javascript" src="' . GO::url('core/clientScripts', ['mtime' => GO::config()->mtime, 'lang' => \GO::language()->getLanguage()]) . '"></script>';
+//  echo '<script type="text/javascript" src="' . GO::url('core/clientScripts', ['mtime' => GO::config()->mtime, 'lang' => \GO::language()->getLanguage()]) . '"></script>';
 }
 ?>
 
