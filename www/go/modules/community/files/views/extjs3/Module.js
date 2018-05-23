@@ -93,6 +93,20 @@ go.modules.community.files.lock = function(nodes){
 
 go.modules.community.files.email = function(nodes){
 	
+	var blobs = new Array(); // array with relative paths to the files
+	Ext.each(nodes, function(node) {
+
+		var blob = {
+			humanSize:go.util.humanFileSize(node.size,true),
+			extension:go.util.contentTypeClass(node.contentType, node.name),
+			blobId:node.blobId
+		};
+	
+		blobs.push(blob);
+	});
+
+	GO.email.emailBlobs(blobs);
+	
 }
 
 go.modules.community.files.move = function(nodes, copy){

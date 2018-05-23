@@ -1742,6 +1742,23 @@ GO.email.emailFiles = function(files, item) {
 	},this,{single:true});
 }
 
+// New framework, add blobs to email
+GO.email.emailBlobs = function(blobs, item) {
+	if (!Ext.isArray(blobs)) {
+		blobs = new Array(blobs);
+	}
+
+	var composerConfig = GO.email.getTaskShowConfig(item);
+
+	var c = GO.email.showComposer(composerConfig);
+
+	c.on('dialog_ready', function(){
+		c.emailEditor.attachmentsView.afterUpload({
+			addFileStorageBlobs: Ext.encode(blobs)
+		});
+	},this,{single:true});
+}
+
 GO.email.openFolderTree = function(id, folder_id, referenceItem) {
 
 	if (!GO.email.treeFileBrowser) {

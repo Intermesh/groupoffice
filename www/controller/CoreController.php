@@ -748,6 +748,33 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		
 		unset(GO::session()->values['files']['uploadqueue']);
 		
+		// Process Blobs that need to be added as attachment
+		if(isset($params['addFileStorageBlobs'])){
+			$blobs  = json_decode($params['addFileStorageBlobs'],true);
+
+			foreach($blobs as $index=>$blobConfig){
+				if(!$blobConfig['blobId']){
+					//No blobId given, go to next iteration
+					continue;
+				}
+				$blob = \go\core\fs\Blob::findById($blobConfig['blobId']);
+				if(!$blob){
+					// No blob found, continue to the next one
+					continue;
+				}
+				
+				$result = array(						
+						'human_size'=>$blobConfig['humanSize'],
+						'extension'=>$blobConfig['extension'],
+						'size'=>$blob->size,
+						'type'=>$blob->contentType,
+						'name'=>$blob->name,
+						'blobId'=>$blob->id
+				);
+				$response['results'][]=$result;
+			}
+		}
+		
 		return $response;
 	}
 	

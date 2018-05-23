@@ -124,7 +124,6 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 				iconCls: 'ic-email',
 				text: t("Email files"),
 				handler: function(){
-					console.log(this.records);
 					go.modules.community.files.email(this.records);
 				},
 				scope: this
