@@ -230,7 +230,7 @@ GO.addressbook.CompanyReadPanel = Ext.extend(GO.DisplayPanel,{
 											
 						'<tpl for="employees">'+
 							'<tr>'+								
-								'<td><a href="#addressbook/contact/{id}">{name}</a></td>'+
+								'<td><a href="#contact/{id}">{name}</a></td>'+
 								'<td>{function}</td>'+
 								'<td>{[this.mailTo(values.email, values.name)]}</td>'+
 							'</tr>'+							

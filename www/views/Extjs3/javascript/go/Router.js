@@ -142,13 +142,13 @@ GO.mainLayout.on("boot", function() {
 	//default route for entities		
 	go.Router.add(/([a-zA-Z0-9]*)\/([0-9]*)/, function(entity, id) {
 		
-		var entity = go.Entities.get(entity);
-		if(!entity) {
+		var entityObj = go.Entities.get(entity);
+		if(!entityObj) {
 			console.log("Entity ("+entity+") not found in default entity route")
 			return false;
 		}
     
-    var module = go.Entities.get(entity).module; 
+    var module = entityObj.module; 
 		var mainPanel = GO.mainLayout.openModule(module);
 		var detailViewName = entity + "Detail";
 

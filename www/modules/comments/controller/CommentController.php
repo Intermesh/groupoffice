@@ -63,7 +63,9 @@ class CommentController extends \GO\Base\Controller\AbstractModelController{
 	
 	protected function beforeSubmit(&$response, &$model, &$params) {
 		
-		$params['model_type_id']=\GO\Base\Model\ModelType::model()->findByModelName($params['model_name']);
+		$entityType = strpos($params['model_name'], "\\") === false ? \go\core\orm\EntityType::findByName($params['model_name']) : \go\core\orm\EntityType::findByClassName($params['model_name']);
+		
+		$params['model_type_id']=$entityType->getId();
 		
 		return parent::beforeSubmit($response, $model, $params);
 	}

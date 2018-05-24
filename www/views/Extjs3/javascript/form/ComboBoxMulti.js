@@ -32,24 +32,15 @@ GO.form.ComboBoxMulti = function(config){
         tag: "textarea",
         autocomplete: "off"
     };
-    
+		 //config.height = dp(24);
     GO.form.ComboBoxMulti.superclass.constructor.call(this, config);
 		
 		
 		
 		this.on('render', function() {			
-			this.getEl().on('input', function(e) {				
-				
-				if(this.el.dom.scrollHeight <= this.maxHeight) {
-					this.el.dom.style.overflowY = 'hidden';
-					this.el.dom.style.height = dp(32) + "px";
-					if(this.el.dom.scrollHeight != this.el.dom.offsetHeight) {
-
-						this.el.dom.style.height = this.el.dom.scrollHeight + "px";
-
-						this.fireEvent('grow', this);
-					}
-				}
+			//this.syncHeight();
+			this.getEl().on('input', function(e) {								
+				this.syncHeight();
       }, this);
 			
 		}, this);
@@ -68,6 +59,20 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
 		focused : false,
 		
 		maxHeight: 100,
+		
+		
+		syncHeight : function() {
+			if(this.el.dom.scrollHeight <= this.maxHeight) {
+				this.el.dom.style.overflowY = 'hidden';
+				this.el.dom.style.height = dp(32) + "px";
+				if(this.el.dom.scrollHeight != this.el.dom.offsetHeight) {
+
+					this.el.dom.style.height = this.el.dom.scrollHeight + "px";
+
+					this.fireEvent('grow', this);
+				}
+			}
+		},
 		
 		
 		// private
