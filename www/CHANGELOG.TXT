@@ -1,3 +1,6 @@
+- Tickets: Also send note updates to ticket agents
+- Projects: Include all custom fields in projects import example
+
 17-05-2018 6.2.94
 - Projects: Don't book travel distance twice when including break
 - Email: Fixed delegated addres not always loading
