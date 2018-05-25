@@ -58,6 +58,12 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 	editGoDialogId : false,
 
 	loading:false,
+
+	showLinks: true,
+
+	showFiles: true,
+
+	showComments: true,
 	
 	createTopToolbar : function(){
 		
@@ -207,15 +213,20 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 			this.entity = parts[3];
 		}
 		
-		
-		this.add(new go.links.LinksDetailPanel());
-		
+		if (this.showLinks) {
+            this.add(new go.links.LinksDetailPanel());
+		}
+
 		if(go.Modules.isAvailable("legacy", "files")) {
-			this.add(new go.modules.files.FilesDetailPanel());
+			if (this.showFiles) {
+                this.add(new go.modules.files.FilesDetailPanel());
+            }
 		}
 		
 		if(go.Modules.isAvailable("legacy", "comments") ){
-			this.add(new go.modules.comments.CommentsDetailPanel());
+			if (this.showComments) {
+                this.add(new go.modules.comments.CommentsDetailPanel());
+            }
 		}
 
 		if(!this.expandListenObject){
