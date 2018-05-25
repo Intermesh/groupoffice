@@ -3,6 +3,7 @@
 UPGRADING: make sure custom fields and search module are installed.
 
 Core:
+- ActveSync, CalDAV and CardDav are now open source!
 - New JMAP API backend
 - Flux technology in frontend
 - Optimized frontend client building
@@ -10,7 +11,6 @@ Core:
 - Easier theming using SASS
 - Simplified ACL model by using groups only. Every user has a personal group to keep individual permissions.
 - Database optimizations. More clear names and defined foreign key relations
-- Soft delete
 - Two factor authentication using Google Authenticator
 - New UI design for Links
 - Custom fields database name can be defined now
