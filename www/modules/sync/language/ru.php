@@ -1,0 +1,21 @@
+<?php
+return array (
+  '<h1>{product_name} SyncML Server</h1><p>This is the {product_name} SyncML server. Use a SyncML compliant device or software package and connect it to this URL to synchronize with {product_name}.</p>' => '<h1>{product_name} SyncML Server</h1><p>Это сервер синхронизации по протоколу SyncML для {product_name}. Используйте устройстваили программу с поддержкой SyncML,  подключитесь для синхронизации с {product_name} к этому URL</p>',
+  'Set a maximum age of events and tasks. If an event or task is older then that number of days it will not be synchronized. You can also choose to delete older events from the client. This will keep your mobile device clean and fast.' => 'Укажите максимальное количество дней для событий и задач. Если событие или задача назначены на время позже указанного количества дней, то они не будут синхронизироваться. также Вы можете указать - удалять устаревшие события с клиента. Это позволит освободить память на Вашем мобильном устройстве.',
+  'Maximum days old' => 'Максимальное количество дней',
+  'Delete older events and tasks at the client (they will be kept in {product_name})' => 'Удалить старые события и задачи на клиенте (они остануться в {product_name})',
+  'Addressbooks' => 'Адресные книги',
+  'Addressbook' => 'Адресная книга',
+  'Synchronize' => 'Синхронизировать',
+  'Default' => 'По умолчанию',
+  'Please select a default addressbook for synchronization.' => 'ПОжалуйста выберите адресную книгу по умочанию для синхронизации!',
+  'Devices' => 'Устройства',
+  'Device' => 'Устройство',
+  'Manufacturer' => 'Производитель',
+  'Model' => 'Модель',
+  'name' => 'Синхроизация',
+  'description' => 'Модуль для синхронизации с различными мобильными устройствами (сотовые тел./ПДА/коммуникаторы)',
+  '<h1>Group-Office SyncML Server</h1><p>This is the Group-Office SyncML server. Use a SyncML compliant device or software package and connect it to this URL to synchronize with Group-Office.</p>' => '<h1>{product_name} SyncML Server</h1><p>Это сервер синхронизации по протоколу SyncML для {product_name}. Используйте устройстваили программу с поддержкой SyncML,  подключитесь для синхронизации с {product_name} к этому URL</p>',
+  'Synchronization' => 'Синхроизация',
+  'Delete older events and tasks at the client (they will be kept in Group-Office)' => 'Удалить старые события и задачи на клиенте (они остануться в {product_name})',
+);

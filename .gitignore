@@ -9,7 +9,11 @@
 /www/promodules
 /tests/data
 /www/modules/*
-!/www/modules/addressbook
+!/www/modules/sync
+!/www/modules/z-push
+!/www/modules/zpushadmin
+!/www/modules/caldav
+!/www/modules/carddav
 !/www/modules/admin2userlogin
 !/www/modules/bookmarks
 !/www/modules/calendar

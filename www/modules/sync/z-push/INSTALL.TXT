@@ -1,0 +1,3 @@
+Please read the instructions here:
+
+https://www.group-office.com/wiki/Z-push_2.1#Installation
