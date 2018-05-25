@@ -22,51 +22,15 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 	 * @returns {undefined}
 	 */
 	constructor: function(config){
-		this.store = config.store;
-		this.useRouter = config.useRouter || false;
+			this.useRouter = config.useRouter || false;
 		this.path = [];
 		this.addEvents({
-			"pathchanged" : true // post browsing
-		});
-		this.listeners = config.listeners;
-		this.rootNodes = [];
-		this.rootNodes.push({
-			text: t('My files'),
-			iconCls:'ic-home',
-			entityId:'my-files',
-			draggable:false,
-			params:{
-				filter: {
-					parentId: go.User.storage.rootFolderId
-				}
-			}
-		},{
-			text: t('Shared with me'),
-			iconCls:'ic-group',
-			entityId:'shared-with-me',
-			draggable:false,
-			params: {
-				filter: {
-					isSharedWithMe: true
-				}
-			}
-		},{
-			text: t('Bookmarks'),
-			iconCls:'ic-bookmark',
-			entityId:'bookmarks',
-			draggable:false,
-			params: {
-				filter: {
-					bookmarked: true
-				}
-			}
+			"pathchanged" : true, // post browsing
+			"myfilesnodeidchanged" : true
 		});
 		
 		go.modules.community.files.Browser.superclass.constructor.call(this, config);
-		
-		
 	},
-	
 	
 	/**
 	 * Add a rootNode to the browser
@@ -156,12 +120,11 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 	getCurrentDir : function() {
 		
 		var path = this.getPath(true);
+		if(!path.length) {
+			return null;
+		}
 		var currentDir = path[path.length-1];
 		
-		if(currentDir == 'my-files'){ // Get the correct folderId when in the my-files root folder
-			currentDir = go.User.storage.rootFolderId;
-		}
-
 		return currentDir;
 	},
 	
@@ -206,20 +169,12 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 			this.nav(strPath);
 		}
 	},
-//	
-//	/**
-//	 * Find the given id in the full path and cut off the path when it's found
-//	 */
-//	cleanRecursiveness : function(path, id){
-//		for(var i in path) {
-//			if(path[i] === id) {
-//				path = path.slice(0,i);
-//			}
-//		}
-//		return path;
-//	},
-	
-	// private
+
+	/**
+	 * 
+	 * @param {string} path path of id's eg 1/2/3
+	 * @return {undefined}
+	 */
 	nav: function(path) {
 		var ids = path.replace(/\/$/g, '').split('/');
 		if(ids[0] === '') {
@@ -227,11 +182,8 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 		}
 		ids = ids.map(Number);
 		this.path = this.path.concat(ids);
-		var filter = Ext.isEmpty(this.path) && this.getRootNode(this.currentRootNode).params ? this.getRootNode(this.currentRootNode).params.filter : {parentId:ids[ids.length-1]} 
-
-		this.store.setBaseParam('filter',filter);
-		this.store.load();
-		this.fireEvent('pathchanged', this);
+		var filter = Ext.isEmpty(this.path) && this.getRootNode(this.currentRootNode).params ? this.getRootNode(this.currentRootNode).params.filter : {parentId:ids[ids.length-1]};
+		 
+		this.fireEvent('pathchanged', this, this.path, filter);
 	}
-	
 });

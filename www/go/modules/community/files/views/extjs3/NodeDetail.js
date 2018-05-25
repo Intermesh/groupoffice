@@ -4,6 +4,10 @@ go.modules.community.files.NodeDetail = Ext.extend(go.panels.DetailView, {
 	
 	initComponent: function () {
 
+		if(!this.browser){
+			throw "Parameter 'browser' is required!";
+		}
+
 		this.tbar = this.initToolbar();
 
 		Ext.apply(this, {

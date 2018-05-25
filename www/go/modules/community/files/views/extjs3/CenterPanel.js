@@ -26,17 +26,52 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 	pendingDuplicates: {},
 		
 	initComponent: function () {
+		
+		if(!this.browser){
+			throw "Parameter 'browser' is required!";
+		}
+		
+		this.store = new go.data.Store({
+				fields: [
+					'id', 
+					'name',
+					'bookmarked',
+					'internalShared',
+					'externalShared',
+					'storageId',
+					{name: 'touchedAt', type: 'date'},
+					{name: 'contentType', submit: false},
+					{name: 'metaData', submit: false},
+					{name: 'size', submit: false},
+					{name: 'progress', submit: false},
+					{name: 'status', submit: false},
+					'isDirectory', 
+					{name: 'createdAt', type: 'date'}, 
+					{name: 'modifiedAt', type: 'date'}, 
+					'aclId'
+				],
+				baseParams: {
+					filter:{isHome:true}
+				},
+				entityStore: go.Stores.get("Node")
+			});
 
 		var contextMenu = new go.modules.community.files.ContextMenu({
-			store: this.browser.store
+			store: this.store
 		});
 		
+		this.browser.on('pathchanged', function(browser, path, filter) {
+			this.store.setBaseParam('filter',filter);
+			this.store.load();
+		}, this);
+		
 		this.nodeGrid = new go.modules.community.files.NodeGrid({
-			store:this.browser.store,
+			store:this.store,
 			listeners: {
-				viewready: function (grid) {
-					this.nodeGrid.getStore().load();
-				},
+//				MS: Browser is responsible for loading the store
+//				viewready: function (grid) {
+//					this.nodeGrid.getStore().load();
+//				},
 				rowcontextmenu: function(grid, index, event){
 					var selections = grid.getSelectionModel().getSelections();
 					var records = [];
@@ -75,7 +110,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 //		},this);
 		
 		this.nodeTile = new go.modules.community.files.NodeTile({
-			store:this.browser.store,
+			store:this.store,
 			listeners: {
 				click: function(view, index, node, e) {
 					var record = view.getStore().getAt(index);
@@ -109,6 +144,179 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 		});
 		
 		this.items = [this.nodeGrid, this.nodeTile];
+		
+		this.tbar =  {// configured using the anchor layout
+			xtype: 'container',
+			items: [new Ext.Toolbar({
+					items: [
+//							{
+//								cls: 'go-narrow',
+//								iconCls: "ic-menu",
+//								handler: function () {
+//									this.sideNav.show();
+//								},
+//								scope: this
+//							},
+						this.addButton = new Ext.Button({
+							iconCls: 'ic-add',
+							tooltip: t('Add'),
+							menu: new Ext.menu.Menu({
+								items: [{
+										iconCls: 'ic-create-new-folder',
+										text: t("Create folder") + '&hellip;',
+										handler: function () {
+											this.nodeDialog = new go.modules.community.files.NodeDialog();
+											this.nodeDialog.setTitle(t("Create new folder"));
+											this.nodeDialog.show(this.browser.getCurrentDir());
+										},
+										scope: this
+									}, '-', {
+										iconCls: 'ic-file-upload',
+										text: t("Upload files") + '&hellip;',
+										handler: function () {
+											if (!this.uploadDialog) {
+												var input = document.createElement("input"),
+												me = this;
+												input.setAttribute("type", "file");
+												input.setAttribute('multiple', true);
+												input.onchange = function (e) {
+													for (var i = 0; i < this.files.length; i++) {
+														me.fileUpload(this.files[i]);
+													}
+												};
+												this.uploadDialog = input;
+											}
+											this.uploadDialog.click(); // opening dialog
+										},
+										scope: this
+									}, {
+										iconCls: 'ic-folder',
+										text: t("Upload folder") + '&hellip;',
+										handler: function () {
+											if (!this.uploadDialog) {
+												var input = document.createElement("input"),
+																me = this;
+												input.setAttribute("type", "file");
+												input.setAttribute('multiple', true);
+												input.setAttribute('webkitdirectory', true);
+												input.setAttribute('directory', true);
+
+												input.onchange = function (e) {
+													for (var i = 0; i < this.files.length; i++) {
+														var path = this.files[i].webkitRealtivePath.split('/');
+														var record = new this.store.recordType({
+															name: file.name,
+															isDirectory: 0,
+															parentId: this.store.baseParams.filter.parentId,
+															size: file.size,
+															status: 'queued'
+														});
+														console.log(this.files[i]);
+														//me.centerCardPanel.fileUpload(this.files[i]);
+													}
+												};
+												this.uploadDialog = input;
+											}
+											this.uploadDialog.click(); // opening dialog
+										},
+										scope: this
+									}, '-', {
+										disabled: true,
+										text: t('File from template') + '&hellip;',
+										icon: 'ic-insert-drive-file'
+									}]
+							}),
+							scope: this
+						}), '->', {
+							tooltip: t("Thumbnails", "files"),
+							iconCls: 'ic-view-list',
+							handler: function (item) {
+								var view = this.getLayout().activeItem.stateId === "files-grid" ? 'comfy' : 'list';
+								item.setIconClass('ic-view-' + view);
+								this.getLayout().setActiveItem(view === 'list' ? 0 : 1);
+							},
+							scope: this
+						}, {
+							xtype: 'tbsearch',
+							store: this.store,
+							listeners: {
+								open: function () {
+									//this.breadCrumbs.setVisible(false);
+									this.advancedSearchBar.setVisible(true);
+									this.doLayout();
+								},
+								close: function () {
+									//this.breadCrumbs.setVisible(true);
+									this.advancedSearchBar.setVisible(false);
+									this.doLayout();
+								},
+								scope: this
+							}
+						}]
+				}),
+				this.advancedSearchBar = new Ext.Toolbar({
+					hidden: true,
+					updateCurrentFolder: function () {
+						var id = this.browser.getCurrentDir();
+						if (!id) {
+							return;
+						}
+						var node = go.Stores.get('Node').get([id])[0];
+						if (node) {
+							var btnCurrentFolder = this.advancedSearchBar.items.get(2);
+							btnCurrentFolder.setText(node.name);
+							btnCurrentFolder.parentId = node.id;
+						}
+						;
+					},
+					listeners: {
+						afterrender: function (me) {
+							this.browser.on('pathchanged', me.updateCurrentFolder, this);
+						},
+						show: function (me) {
+							me.updateCurrentFolder.apply(this);
+						},
+						scope: this
+					},
+					style: {
+						'border-bottom': 0,
+						'background-color': 'white'
+					},
+					defaults: {toggleGroup: 'file-search-filter', enableToggle: true},
+					items: [
+						t('Search in') + ':',
+						{
+							text: t('All folders'),
+							toggleHandler: function (btn, state) {
+								if (state) {
+									delete this.store.baseParams.filter.parentId;
+									this.store.reload();
+								}
+							},
+							scope: this
+						},
+						{
+							text: '',
+							pressed: true, //default
+							toggleHandler: function (btn, state) {
+								if (state) {
+									this.store.baseParams.filter.parentId = btn.parentId;
+									this.store.reload();
+								}
+							},
+							scope: this
+						},
+						{text: t('Shared with me')},
+						{text: t('Bookmarks')}
+					]
+				})
+			]};
+		
+			this.bbar = new go.modules.community.files.BreadCrumbBar({
+				browser: this.browser,
+				style: {'background-color': 'white'}
+			});
+		
 	
 		go.modules.community.files.CenterPanel.superclass.initComponent.call(this, arguments);
 
@@ -148,7 +356,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 	
 	addFiles: function(files) {
 		for (var i = 0; i < files.length; i++) {
-			var index = this.browser.store.find('name', files[i].name);
+			var index = this.store.find('name', files[i].name);
 			if(index === -1) { // not found
 				this.fileUpload(files[i]);
 			} else { // already exist
@@ -159,17 +367,17 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 	
 	fileUpload: function(file, replaceIndex, newName, parentId) {
 		if(replaceIndex || replaceIndex === 0) {
-			var record = this.browser.store.getAt(replaceIndex);
+			var record = this.store.getAt(replaceIndex);
 			record.set('status', 'queued');
 		} else {
-			var record = new this.browser.store.recordType({
+			var record = new this.store.recordType({
 				name: newName || file.name, 
 				isDirectory: 0,
-				parentId: this.browser.store.baseParams.filter.parentId, 
+				parentId: this.store.baseParams.filter.parentId, 
 				size: file.size, 
 				status: 'queued' 
 			});
-			this.browser.store.add(record);
+			this.store.add(record);
 		}
 		this.activeUploads++;
 		go.Jmap.upload(file, {
@@ -185,7 +393,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 			  record.set('blobId', data.blobId);
 
 			  if(this.activeUploads === 0) {
-				  this.browser.store.commitChanges();
+				  this.store.commitChanges();
 			  }
 		  },
 		  failure: function(e) {
@@ -216,14 +424,14 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 							name, extension = nameExt.pop();
 							if(nameExt.length === 0) {
 								name = extension;
-								extionsion = null;
+								extension = null;
 							} else {
 								name = nameExt.join('.');
 							}
 						while(index !== -1) {
 							nameCount++;
 							newName = name + '('+nameCount+')';
-							index = this.browser.store.find('name', newName);
+							index = this.store.find('name', newName);
 						}
 						if(extension !== null) {
 							newName += ('.'+extension);

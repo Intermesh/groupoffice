@@ -19,7 +19,18 @@ go.modules.community.files.UsagePanel = Ext.extend(Ext.Panel, {
 	height:dp(40),
 	
 	initComponent: function () {
-		this.setData(go.User.storage.usage,go.User.storage.quota);
+		this.setData(0,0);
+		
+		go.Stores.get("Storage").on('changes', function(store, added, changed, destroyed){
+			var storages = store.get(changed.concat(added));
+			for(var i=0;i<storages.length;i++) {
+				if(storages[i].ownedBy == go.User.id){
+					this.setData(storages[i].usage,storages[i].quota);
+					console.log(storages[i]);
+				}
+			}
+		},this);
+		
 		go.modules.community.files.UsagePanel.superclass.initComponent.call(this);
 	},
 	afterRender : function(pnl){
@@ -27,8 +38,8 @@ go.modules.community.files.UsagePanel = Ext.extend(Ext.Panel, {
 	},
 	
 	setData : function(usage, quota){
-		this.usage = usage;
-		this.quota = quota;
+		this.usage = usage?usage:0;
+		this.quota = quota?quota:0;
 		if(this.rendered){
 			this.updateHtml();
 		}

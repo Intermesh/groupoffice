@@ -40,9 +40,15 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 	autoScroll:true,
 
 	initComponent: function () {
-
+		
+		if(!this.browser){
+			throw "Parameter 'browser' is required!";
+		}
+		
+		this.initRootNode(this.rootNodeEntity);
+		
 		go.modules.community.files.FolderTree.superclass.initComponent.call(this);
-
+		
 		this.on('click',function(node,e){
 			this.browser.goto(this.getPath(node));
 		},this);
@@ -66,9 +72,9 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 			
 			if(!dropOnEntity){
 				
-				if(overEvent.target.attributes.entityId && overEvent.target.attributes.entityId == 'my-files'){
+				if(overEvent.target.attributes.entityId){
 					dropOnEntity = {
-						id:go.User.storage.rootFolderId
+						id: overEvent.target.attributes.params.filter.parentId
 					};
 				} else {
 					return false;
@@ -113,11 +119,9 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 				selModel.select(node);
 			}
 
-			if(node.attributes && node.attributes.entityId){
-				if(node.attributes.entityId !== 'my-files' && node.attributes.entityId !== 'shared-with-me' && node.attributes.entityId !== 'bookmarks'){
-					var record = node.attributes.entity;
-					this.getContextMenu().showAt(event.getXY(), [record]);
-				}
+			if(node.attributes && node.attributes.entityId && node.attributes.entity){
+				var record = node.attributes.entity;
+				this.getContextMenu().showAt(event.getXY(), [record]);
 			}
 		}, this);
 		
@@ -133,7 +137,6 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 			this.processDestroyedItems(store,nodeMap.destroyed);			
 		},this);
 		
-		this.initRootNode(this.rootNodeEntity);
 	},
 	
 	processAddedItems : function(store,addedItems){
@@ -156,6 +159,7 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 		var bookmarksNeedUpdate = false;
 		var sharedWithMeNeedUpdate = false;
 		var foldersToRefresh = [];
+		var me = this;
 		
 		for(var entityId in changedItems){
 			var updatedNode = store.get([entityId]);
@@ -192,7 +196,7 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 				
 				// If there is a bookmark or share update, then update the icon
 				if(bookmarksNeedUpdate || sharedWithMeNeedUpdate){
-					this.updateIcon(nodeInTree, updatedNode[0]);
+					me.updateIcon(nodeInTree, updatedNode[0]);
 				}
 				
 				//Update the tree entity
@@ -329,12 +333,6 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 				}
 			}
 		}
-		
-			// If the entityId is the root folder id of the current user then we'll to select the my-files root node.
-		if(nodeIds == go.User.storage.rootFolderId){
-			entityId = 'my-files';
-		}
-		
 	},
 	
 	
@@ -351,8 +349,8 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 	},
 	
 	initRootNode : function(nodeEntity){
-		
-		var rootNodeConfig = {};
+
+		var rootNodeConfig;
 
 		if(nodeEntity){
 			rootNodeConfig = {
@@ -372,17 +370,15 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 		} else {
 			rootNodeConfig = {
 				expanded: true,
-				text: 'ROOT',
 				entityId:'ROOT', // Needed so it can be handled exactly as other nodes
-				draggable: false,
-				children:this.browser.rootNodes
+				children: this.browser.rootNodes,
+				uiProvider:  Ext.tree.RootTreeNodeUI // needed to make "rootVisible" work
 			};
+			
+			this.rootVisible=false; // Set root visible
 		}
 
-		var root = new Ext.tree.TreeNode(rootNodeConfig);
-		
-		this.setRootNode(root);
-		this.getLoader().load(root);
+		this.root = rootNodeConfig;
 	},
 	
 	getContextMenu : function(){
@@ -408,7 +404,7 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 		
 		// Workaround for myfiles
 		if(newParentId === 'my-files'){
-			newParentId = go.User.storage.rootFolderId;
+			newParentId = this.browser.getRootNode('my-files').params.filter.parentId;
 		}
 		
 		params.update = {};

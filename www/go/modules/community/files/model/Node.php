@@ -186,8 +186,8 @@ class Node extends model\AclEntity {
 	public static function filter(Query $query, array $filter) {
 		
 		// Add where usergroup is the personal group of the user
-		$user = User::findById(GO()->getUserId());
-		$userStorageId = $user && $user->storage?$user->storage->id:null;
+		$storage = Storage::find()->where(['ownedBy'=>GO()->getUserId()])->single();
+		$userStorageId = $storage?$storage->id:null;
 
 		if(isset($filter['q'])){
 			$query->andWhere('name','LIKE', '%' . $filter['q'] . '%');
@@ -203,7 +203,7 @@ class Node extends model\AclEntity {
 		
 		$filterableProperties = ['parentId', 'isDirectory'];
 		foreach($filterableProperties as $prop) {
-			if(isset($filter[$prop])) {
+			if(in_array($prop,array_keys($filter))){
 				$query->andWhere([$prop => $filter[$prop]]);
 			}
 		}
@@ -217,7 +217,6 @@ class Node extends model\AclEntity {
 		} 
 		
 		return parent::sort($query, $sort);
-		
 	}
 	
 	public function toArray($properties = array()) {
@@ -230,5 +229,4 @@ class Node extends model\AclEntity {
 		}
 		return $result;
 	}
-
 }

@@ -3,27 +3,11 @@ Ext.ns('go.modules.community.files');
 go.Modules.register("community", 'files', {
 	mainPanel: "go.modules.community.files.MainPanel",
 	title: t("Files", "files"),
-	entities: ["Node"],
+	entities: ["Node","Storage"],
 	initModule: function () {
 		go.Links.registerLinkToWindow("Node", function() {
 			return new go.modules.community.files.FileForm();
 		});
-	
-		// Check if the user is accessing it's files for the first time (No storage is available for the user)
-		if(!go.User.storage){
-			//Make an empty storage object
-			go.User.storage = {
-				createdAt:null,
-				id:null,
-				modifiedAt:null,
-				modifiedBy:null,
-				ownedBy:null,
-				quota:0,
-				rootFolderId:null,
-				usage:0,
-				userId:null
-			};
-		}
 	}
 });
 
