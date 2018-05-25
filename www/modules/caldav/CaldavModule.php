@@ -5,7 +5,7 @@ namespace GO\Caldav;
 use GO\Caldav\Model\DavEvent;
 use GO\Caldav\Model\DavTask;
 
-class CaldavModule extends \GO\Professional\Module {
+class CaldavModule extends \GO\Base\Module {
 	
 	public function depends() {
 		return array("dav","sync","calendar");

@@ -6,7 +6,7 @@ use go\core\auth\model\User;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use GO\Sync\Model\UserNoteBook;
-use GO\Professional\Module;
+use GO\Base\Module;
 use GO\Sync\Model\UserSettings;
 
 
