@@ -2,7 +2,7 @@
 
 namespace GO\Zpushadmin;
 
-class ZpushadminModule extends \GO\Professional\Module {
+class ZpushadminModule extends \GO\Base\Module {
 
 	public function install() {
 
