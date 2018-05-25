@@ -145,6 +145,11 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 		
 		this.items = [this.nodeGrid, this.nodeTile];
 		
+		this.breadCrumbs = new go.modules.community.files.BreadCrumbBar({
+			browser: this.browser,
+			style: {'background-color': 'white'}
+		});
+		
 		this.tbar =  {// configured using the anchor layout
 			xtype: 'container',
 			items: [new Ext.Toolbar({
@@ -241,12 +246,12 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 							store: this.store,
 							listeners: {
 								open: function () {
-									//this.breadCrumbs.setVisible(false);
+									this.breadCrumbs.setVisible(false);
 									this.advancedSearchBar.setVisible(true);
 									this.doLayout();
 								},
 								close: function () {
-									//this.breadCrumbs.setVisible(true);
+									this.breadCrumbs.setVisible(true);
 									this.advancedSearchBar.setVisible(false);
 									this.doLayout();
 								},
@@ -309,14 +314,9 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 						{text: t('Shared with me')},
 						{text: t('Bookmarks')}
 					]
-				})
+				}),
+				this.breadCrumbs
 			]};
-		
-			this.bbar = new go.modules.community.files.BreadCrumbBar({
-				browser: this.browser,
-				style: {'background-color': 'white'}
-			});
-		
 	
 		go.modules.community.files.CenterPanel.superclass.initComponent.call(this, arguments);
 
