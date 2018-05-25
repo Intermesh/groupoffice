@@ -372,7 +372,8 @@ ul.x-tab-strip-bottom{
 	}
 	
 	textarea.x-form-field {
-		height: min-content;
+		/*height: min-content;*/
+		height: dp(32);
 	}
 	//&-empty-field + .x-form-twin-triggers > .x-form-clear-trigger {
 	//	visibility:hidden; // only show clear button when not

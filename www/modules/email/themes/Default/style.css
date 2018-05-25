@@ -219,8 +219,6 @@ margin:5px 2px;
 
 .attachment-wrap {
 	cursor: default;
-	margin:1px;
-	background-position:1px 5px;
 }
 .attachment-wrap.x-view-over{
 	background-color:#ebf1e2;

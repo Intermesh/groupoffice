@@ -45,6 +45,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 		
 		if(entities) {
 			this.formPanel.getForm().setValues(entities[0]);
+			this.deleteBtn.setDisabled(entities[0].permissionLevel < GO.permissionLevels.writeAndDelete);
+		
 		} else {
 			//If no entity was returned the entity store will load it and fire the "changes" event. This dialog listens to that event.
 			this.actionStart();
@@ -60,6 +62,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 			
 			var entities = this.entityStore.get([this.currentId]);
 			this.formPanel.getForm().setValues(entities[0]);
+			this.deleteBtn.setDisabled(entities[0].permissionLevel < GO.permissionLevels.writeAndDelete);
+		
 		}		
 	},
 
@@ -94,6 +98,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 		}
 		if (this.getFooterToolbar()) {
 			this.getFooterToolbar().setDisabled(false);
+			
 		}
 	},
 

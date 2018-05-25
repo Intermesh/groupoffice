@@ -260,6 +260,8 @@ $btn-icon : (
 	//new 
 );
 
+
+
 @each $class, $icon in $btn-icon {
 	.#{$class}:before {
 		content: '#{$icon}';
@@ -321,13 +323,19 @@ $filetype: (
 }
 
 .filetype {
-	background-size: dp(24) dp(24);
-	width: dp(24);
-	height: dp(24);
+	background-size: contain;
 	background-image:url(img/filetype/unknown.svg);
 	background-repeat: no-repeat;
 	background-position:center center;
 	&-link {
+		background-size: contain;
+		background-image:url(img/filetype/unknown.svg);
+		background-repeat: no-repeat;
+		background-position: top left;
+		white-space: nowrap;		
+		padding-left: dp(24);
+		line-height: dp(24);
+		display: inline-block;
 		padding: dp(4) dp(8) dp(4) dp(24);
 		white-space: nowrap;
 		line-height: dp(32);

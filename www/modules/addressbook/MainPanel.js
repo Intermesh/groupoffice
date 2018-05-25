@@ -571,9 +571,11 @@ Ext.extend(GO.addressbook.MainPanel, Ext.Panel,{
 
 		GO.dialogListeners.add('contact',{
 			scope:this,
-			'save':function(){
+			save:function(){
+
 				var panel = this.tabPanel.getActiveTab();
-				if(panel.id=='ab-contacts-grid')
+				console.log(panel.id);
+				if(panel.id=='ab-contacts')
 				{
 					this.contactsGrid.store.reload();
 				}
@@ -582,9 +584,10 @@ Ext.extend(GO.addressbook.MainPanel, Ext.Panel,{
 
 		GO.dialogListeners.add('company',{
 			scope:this,
-			'save':function(){
+			save:function(){
 				var panel = this.tabPanel.getActiveTab();
-				if(panel.id=='ab-company-grid')
+				console.log(panel.id);
+				if(panel.id=='ab-companies')
 				{
 					this.companiesGrid.store.reload();
 				}
