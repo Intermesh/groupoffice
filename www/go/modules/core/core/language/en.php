@@ -1,6 +1,7 @@
 <?php
 return array (
-  'shortDays' => 
+    'product_name' => '{product_name}',
+'shortDays' =>
   array (
     0 => 'Sun',
     1 => 'Mon',
