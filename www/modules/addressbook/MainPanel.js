@@ -188,6 +188,32 @@ GO.addressbook.MainPanel = function(config) {
 					},
 					scope:this
 				}
+        },{
+            iconCls: 'ic-more-vert',
+            menu: [
+                {
+                    iconCls: "ic-settings",
+                    text: t("Settings"),
+                    handler: function () {
+                        var dlg = new GO.addressbook.ManageDialog();
+                        dlg.show();
+                    },
+                    scope: this
+                }
+                , {
+                    iconCls: 'ic-merge-type',
+                    text: t("Newsletters"),
+                    handler: function () {
+                        if(!this.mailingStatusWindow)
+                        {
+                            this.mailingStatusWindow = new GO.addressbook.MailingStatusWindow();
+                        }
+                        return this.mailingStatusWindow.show();
+                    },
+                    scope: this,
+                }
+
+            ]
 			}
 			
 		],
