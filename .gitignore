@@ -1,4 +1,5 @@
 /nbproject
+.idea
 /www/vendor
 /config.php
 /www/config.php
