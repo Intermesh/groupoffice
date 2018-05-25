@@ -10,6 +10,7 @@
 /www/promodules
 /tests/data
 /www/modules/*
+!/www/modules/addressbook
 !/www/modules/sync
 !/www/modules/z-push
 !/www/modules/zpushadmin
