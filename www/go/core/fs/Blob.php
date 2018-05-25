@@ -84,6 +84,59 @@ class Blob extends orm\Entity {
 		}
 	}
 	
+	private function rangeDownload($httpRange) {
+
+		list(, $range) = explode('=', $httpRange, 2);
+		if (strpos($range, ',') !== false) { //no support for multi-range (yet)
+			return false;
+		}
+		if ($range[0] == '-') {
+			$start = $this->size - substr($range, 1);
+		}else{
+			list($start, $end)  = explode('-', $range);
+			$end = (isset($end) && is_numeric($end)) ? $end : $this->size - 1;
+		}
+		$end = min($end, $this->size-1);
+		if ($start > $end) {
+			header('HTTP/1.1 416 Requested Range Not Satisfiable');
+			header("Content-Range: bytes $start-$end/$this->size");
+		}
+
+		header('HTTP/1.1 206 Partial Content');
+		header("Content-Range: bytes $start-$end/$this->size");
+		header('Content-Length: '.($end - $start + 1));
+
+		$buffer = 1024 * 8;
+		$fp = fopen($this->path(), 'rb');
+		
+		fseek($fp, $start);
+		while(!feof($fp) && ($p = ftell($fp)) <= $end) {
+			if ($p + $buffer > $end) {
+					$buffer = $end - $p + 1;
+			  }
+			echo fread($fp, $buffer);
+			flush();
+		}
+		fclose($fp);
+		return true;
+	}
+	
+	public function download() {
+		set_time_limit(0);
+		header('Content-Type: '.$this->contentType);
+		header("Accept-Ranges: bytes");
+		if(isset($_SERVER['HTTP_RANGE'])){
+			$this->rangeDownload($_SERVER['HTTP_RANGE']);
+		} else {
+			header('Content-Disposition: attachment; filename="' . $this->name . '"');
+			header('Expires: 0');
+			header('Cache-Control: must-revalidate');
+			header('Pragma: public');
+			header('Content-Length: ' . $this->size);
+			readfile($this->path());
+		}
+	}
+	
 	protected function internalDelete() {
 		if(parent::internalDelete()) {
 			if(is_file($this->path())) {

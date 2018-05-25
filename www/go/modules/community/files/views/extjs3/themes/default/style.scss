@@ -16,6 +16,10 @@
 	background-size: 80px 80px;
 	background-position: bottom center;
 }
+.detail-preview > * {
+	max-height: dp(240);
+	width:100%;
+}
 
 .tile > .filetype {
 	background-size: dp(100);

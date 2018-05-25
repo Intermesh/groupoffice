@@ -73,67 +73,7 @@ go.Jmap = {
 		return go.User.downloadUrl.replace('{blobId}', blobId);
 	},
 	upload : function(file, cfg) {
-		if(Ext.isEmpty(file))
-			return;
-		function start() {
-			Ext.Ajax.request({
-				url: go.User.uploadUrl,
-				method: 'PUT',
-				useDefaultHeader: false,
-				success: function(response, opts) {
-					if(response.responseText) {
-						data = Ext.decode(response.responseText);
-					}
-					cfg.success && cfg.success.call(this, data, response, opts)
-				},
-				failure: cfg.failure || Ext.emptyFn,
-				progress: cfg.progress || Ext.emptyFn,
-				headers: {
-					'X-File-Name': file.name,
-					'Content-Type': file.type,
-					'X-File-LastModifed': Math.round(file['lastModified'] / 1000).toString()
-				},
-				xmlData: file, // just "data" wasn't available in ext
-				scope:cfg.scope || this
-			});
-		}
-		function hex(buffer) {
-			var hexCodes = [],
-				view = new DataView(buffer);
-			for (var i = 0; i < view.byteLength; i += 4) {
-			  var value = view.getUint32(i),
-			   stringValue = value.toString(16),
-			   padding = '00000000',
-			   paddedValue = (padding + stringValue).slice(-padding.length);
-			  hexCodes.push(paddedValue);
-			}
-			return hexCodes.join("");
-		}
-		var cryptoObj = window.crypto || window.msCrypto;
-		if(cryptoObj && cryptoObj.subtle) {
-			var reader = new FileReader();
-				reader.onloadend = function(e) {
-					cryptoObj.subtle.digest('SHA-1',e.target.result).then(function (hash) {
-						Ext.Ajax.request({
-							url: go.User.uploadUrl,
-							headers: {'X-BlobId': hex(hash)},
-							method: 'GET',
-							success: function(response, opts) {
-								if(response.status == 204) {
-									start();
-								}
-								if(response.responseText) {
-									data = Ext.decode(response.responseText);
-									cfg.success && cfg.success.call(cfg.scope || this, data, response, opts);
-								}
-							}
-						})
-					});
-				};
-			reader.readAsArrayBuffer(file);
-		} else {
-			start();
-		}
+		go.Blob.upload(file,cfg);
 	},
 
 	/**
