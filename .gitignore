@@ -1,5 +1,6 @@
 /nbproject
 .idea
+/www/*-license.txt
 /www/vendor
 /config.php
 /www/config.php
@@ -8,6 +9,7 @@
 /config.ini
 /www/config.ini
 /www/promodules
+/www/go/modules/DJConsultancy
 /tests/data
 /www/modules/*
 !/www/modules/addressbook
