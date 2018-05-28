@@ -162,15 +162,14 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 						delete node.attributes.children;
 	
 						node.reload(function() {
-								me.folderTree.openPath(me.browser.getPath(true));
-							},this);
+							me.folderTree.openPath(me.browser.getPath(true));
+						},this);
 
 					});
 
-				if (this.browser.getCurrentDir() == "my-files") {
+				if(this.browser.getCurrentDir() == "my-files") {
 					this.browser.goto(["my-files", myFilesNodeId]);
 				}
-
 			}
 		}
 	}

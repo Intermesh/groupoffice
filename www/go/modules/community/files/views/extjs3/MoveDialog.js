@@ -14,13 +14,21 @@ go.modules.community.files.MoveDialog = Ext.extend(go.form.Dialog, {
 		});
 		
 		var browser = new go.modules.community.files.Browser({
-			store: new go.data.Store({
-				fields: ['id', 'name', 'size','isDirectory', {name: 'createdAt', type: 'date'}, {name: 'modifiedAt', type: 'date'}, 'aclId'],
-				baseParams: {
-					filter:{isHome:true}
-				},
-				entityStore: this.entityStore
-			})
+			useRouter: false,
+			rootNodes: [
+				{
+					text: t('My files'),
+					iconCls: 'ic-home',
+					entityId: 'my-files',
+					draggable: false,
+					expanded: true,
+					children: [], //to prevent router to load this node before params.filter.parentId is set after fetching the storage
+					params: {
+						filter: {
+							parentId: null
+						}
+					}
+				}]
 		});
 		
 		this.folderTree = new go.modules.community.files.FolderTree({
@@ -31,10 +39,6 @@ go.modules.community.files.MoveDialog = Ext.extend(go.form.Dialog, {
 					
 					if(node.attributes.entity){ // Root nodes don't have an entity set
 						this.parentIdField.setValue(node.attributes.entityId);
-					}
-					
-					if(node.attributes.entityId === 'my-files'){
-						this.parentIdField.setValue(go.User.storage.rootFolderId);
 					}
 				},
 				scope:this

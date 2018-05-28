@@ -170,9 +170,9 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 										iconCls: 'ic-create-new-folder',
 										text: t("Create folder") + '&hellip;',
 										handler: function () {
-											this.nodeDialog = new go.modules.community.files.NodeDialog();
-											this.nodeDialog.setTitle(t("Create new folder"));
-											this.nodeDialog.show(this.browser.getCurrentDir());
+											var nodeDialog = new go.modules.community.files.NodeDialog();
+											nodeDialog.setTitle(t("Create new folder"));
+											nodeDialog.show(this.browser.getCurrentDir());
 										},
 										scope: this
 									}, '-', {

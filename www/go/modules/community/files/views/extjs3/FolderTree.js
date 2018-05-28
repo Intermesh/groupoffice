@@ -131,6 +131,9 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 				
 		// When an entity is updated in the store. We'll need to update the tree too
 		this.getLoader().entityStore.on('changes', function(store, added, changed, destroyed){
+			
+			console.log('changed');
+			
 			var nodeMap = this.getChangesNodeMap(added, changed, destroyed);
 			this.processAddedItems(store,nodeMap.added);
 			this.processChangedItems(store,nodeMap.changed);
@@ -194,6 +197,11 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 					nodeInTree.contextMenuButton.entity = updatedNode[0];
 				}
 				
+				// Update the treenode text (Renamed)
+				if(Ext.isDefined(diff.name)){
+					nodeInTree.setText(diff.name);
+				}
+
 				// If there is a bookmark or share update, then update the icon
 				if(bookmarksNeedUpdate || sharedWithMeNeedUpdate){
 					me.updateIcon(nodeInTree, updatedNode[0]);

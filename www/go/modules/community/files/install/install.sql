@@ -163,7 +163,7 @@ INSERT INTO `files_storage` (`id`,`modSeq`,`modifiedAt`, `quota`, `usage`, `owne
 
 -- Storage for admin user
 INSERT INTO `files_storage` (`id`, `modSeq`,`modifiedAt`, `quota`, `usage`, `ownedBy`) VALUES ('2','2', now(),'1073741824', '0', 1);
-INSERT INTO `files_node` (`storageId`, `modSeq`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isDirectory`) VALUES ('2', '0', '0', 'Admin home', now(), now(), '1', '1', '1', '1');
+INSERT INTO `files_node` (`storageId`, `modSeq`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isLocked`, `isDirectory`) VALUES ('2', '0', '0', 'Admin home', now(), now(), '1', '1', '1', '1', '1');
 INSERT INTO `files_node` (`storageId`, `modSeq`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isDirectory`) VALUES ('2', '1', '1', 'first folder', now(), now(), '1', '1', '1', '1');
 INSERT INTO `files_node` (`storageId`, `modSeq`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isDirectory`) VALUES ('2', '2', '1', 'second folder', now(), now(), '1', '1', '1', '1');
 INSERT INTO `files_node` (`storageId`, `modSeq`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isDirectory`) VALUES ('2', '3', '1', 'thirth folder', now(), now(), '1', '1', '1', '1');
@@ -171,7 +171,7 @@ INSERT INTO `files_node` (`storageId`, `modSeq`, `parentId`, `name`, `createdAt`
 
 -- Storage for 2nd user
 INSERT INTO `files_storage` (`id`, `modSeq`,`modifiedAt`, `quota`, `usage`, `ownedBy`) VALUES ('3','3', now(),'1073741824', '0', 2);
-INSERT INTO `files_node` (`storageId`, `modSeq`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isDirectory`) VALUES ('3', '5', '0', 'User2 home', now(), now(), '1', '2', '1', '1');
+INSERT INTO `files_node` (`storageId`, `modSeq`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isLocked`, `isDirectory`) VALUES ('3', '5', '0', 'User2 home', now(), now(), '1', '2', '1', '1', '1');
 INSERT INTO `files_node` (`storageId`, `modSeq`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isDirectory`) VALUES ('3', '6', '6', 'User2 first folder', now(), now(), '2', '2', '1', '1');
 INSERT INTO `files_node` (`storageId`, `modSeq`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isDirectory`) VALUES ('3', '7', '6', 'User2 second folder', now(), now(), '2', '2', '1', '1');
 INSERT INTO `files_node` (`storageId`, `modSeq`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isDirectory`) VALUES ('3', '8', '6', 'User2 thirth folder', now(), now(), '2', '2', '1', '1');
@@ -179,4 +179,4 @@ INSERT INTO `files_node` (`storageId`, `modSeq`, `parentId`, `name`, `createdAt`
 
 -- Storage for project module
 INSERT INTO `files_storage` (`id`, `modSeq`,`modifiedAt`, `quota`, `usage`, `ownedBy`) VALUES ('4','4', now(),'1073741824', '0', NULL);
-INSERT INTO `files_node` (`storageId`, `modSeq`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isDirectory`) VALUES ('4', '10', '0', 'Projects home', now(), now(), NULL, NULL, '1', '1');
+INSERT INTO `files_node` (`storageId`, `modSeq`, `parentId`, `name`, `createdAt`, `modifiedAt`, `ownedBy`, `modifiedBy`, `aclId`, `isLocked`, `isDirectory`) VALUES ('4', '10', '0', 'Projects home', now(), now(), NULL, NULL, '1', '1', '1');

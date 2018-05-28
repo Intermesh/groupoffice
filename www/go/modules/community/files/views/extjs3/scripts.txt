@@ -17,3 +17,4 @@ MoveDialog.js
 ShareDialog.js
 PreviewLayer.js
 BrowseWindow.js
+OpenWithDialog.js

@@ -2,7 +2,7 @@ go.modules.community.files.NodeDialog = Ext.extend(go.form.Dialog, {
 	stateId: 'files-nodeDialog',
 	title: t("Rename"),
 	entityStore: go.Stores.get("Node"),
-	width: 300,
+	width: 450,
 	height: 150,
 	
 	initFormItems: function () {
@@ -29,6 +29,9 @@ go.modules.community.files.NodeDialog = Ext.extend(go.form.Dialog, {
 	},
 	
 	show: function(parentId) {
+		
+		debugger;
+		
 		if(parentId) {
 			this.txtParentId.setValue(parentId);
 			this.txtParentId.setDisabled(false);

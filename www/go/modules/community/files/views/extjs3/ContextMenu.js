@@ -31,10 +31,14 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 				scope: this
 			}),
 			this.btnOpenWith = new Ext.menu.Item({
-				text: t("Open with"),
+				text: t("Open with")+'&hellip;',
 				iconCls: 'ic-open-in-new',
 				handler: function() {
-					GO.files.openFile({id:this.records[0].id});
+					if(this.records && this.records.length === 1){ // Single select
+						var openWithDialog = new go.modules.community.files.OpenWithDialog();
+						console.log(this.records[0].blobId)
+						openWithDialog.load(this.records[0].blobId).show();
+					}
 				},
 				scope: this
 			}),
@@ -42,14 +46,16 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 				iconCls: 'ic-file-download',
 				text: t("Download"),
 				handler: function(){
-					window.open(go.Jmap.downloadUrl(this.records[0].blobId));
+					if(this.records && this.records.length === 1){ // Single select
+						window.open(go.Jmap.downloadUrl(this.records[0].blobId));
+					}
 				},
 				scope: this
 			}),
 			this.topSeparator = new Ext.menu.Separator(),
 			this.btnMakeCopy = new Ext.menu.Item({
 				iconCls: 'ic-content-copy',
-				text: t("Make copy"),
+				text: t("Make copy")+'&hellip;',
 				handler: function(){
 					console.log(this.records);
 					go.modules.community.files.move(this.records,true);
@@ -84,7 +90,7 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 			}),
 			this.btnRename = new Ext.menu.Item({
 				iconCls: 'ic-border-color',
-				text: t("Rename"),
+				text: t("Rename")+'&hellip;',
 				handler: function(){
 					if(this.records && this.records.length === 1){ // Single select
 						var nodeDialog = new go.modules.community.files.NodeDialog();
@@ -122,7 +128,7 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 			}),
 			this.btnEmail = new Ext.menu.Item({
 				iconCls: 'ic-email',
-				text: t("Email files"),
+				text: t("Email files")+'&hellip;',
 				handler: function(){
 					go.modules.community.files.email(this.records);
 				},
