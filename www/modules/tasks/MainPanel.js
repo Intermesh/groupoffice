@@ -174,6 +174,8 @@ this.gridPanel.store.on('load', function(store, records, options)
 				xtype : 'container',
 				items :[new Ext.Toolbar({
 					items: [{
+						cls:'primary',
+						text: t('Task', "tasks"),
 						grid: this.gridPanel,
 						xtype:'addbutton',
 						handler: function(b){
@@ -195,22 +197,22 @@ this.gridPanel.store.on('load', function(store, records, options)
 							});
 						},
 						scope: this
-					},{
-						iconCls: 'btn-settings',
+					},'-',{
+						iconCls: 'ic-settings',
 						tooltip: t("Administration"),
 						handler: function(){
 							this.showAdminDialog();
 						},
 						scope: this
 					},{
-						iconCls: 'btn-refresh',
+						iconCls: 'ic-refresh',
 						tooltip: t("Refresh"),
 						handler: function(){
 							this.taskListsStore.load();
 							this.gridPanel.store.load();
 						},
 						scope: this
-					},
+					},'-',
 					this.exportMenu = new GO.base.ExportMenu({className:'GO\\Tasks\\Export\\CurrentGrid'}),
 					'->',{
 						xtype: 'tbsearch',
@@ -367,33 +369,31 @@ Ext.extend(GO.tasks.MainPanel, Ext.Panel,{
 				sm: new Ext.grid.RowSelectionModel(),
 				loadMask: true,
 				tbar: [{
-					iconCls: 'btn-add',
-					text: t("Add"),
-					cls: 'x-btn-text-icon',
+					iconCls: 'ic-add',
+					cls:'primary',
+					text: t("Tasklist", 'tasks'),
 					handler: function(){						
 						this.tasklistDialog.show();
 					},
 					disabled: !GO.settings.modules.tasks.write_permission,
 					scope: this
 				},{
-					iconCls: 'btn-delete',
-					text: t("Delete"),
-					cls: 'x-btn-text-icon',
+					iconCls: 'ic-delete',
+					tooltip: t("Delete"),
 					disabled: !GO.settings.modules.tasks.write_permission,
 					handler: function(){
 						this.tasklistsGrid.deleteSelected();
 					},
 					scope:this
-				},'-',new GO.form.SearchField({
-					store: GO.tasks.writableTasklistsStore,
-					width:150
-				})]
+				},'->',{
+					xtype:'tbsearch',
+					store: GO.tasks.writableTasklistsStore
+				}]
 			});
 
 			this.deleteCategoryButton = new Ext.Button({
-				iconCls: 'btn-delete',
-				text: t("Delete"),
-				cls: 'x-btn-text-icon',
+				iconCls: 'ic-delete',
+				tooltip: t("Delete"),
 				//disabled: !GO.settings.modules.tasks.write_permission,
 				handler: function(){
 					this.categoriesGrid.deleteSelected();
@@ -427,9 +427,9 @@ Ext.extend(GO.tasks.MainPanel, Ext.Panel,{
 				sm: new Ext.grid.RowSelectionModel(),
 				loadMask: true,
 				tbar: [{
-					iconCls: 'btn-add',
-					text: t("Add"),
-					cls: 'x-btn-text-icon',
+					iconCls: 'ic-add',
+					cls: 'primary',
+					text: t("Category"),
 					handler: function(){
 						this.categoryDialog.show();
 					},
