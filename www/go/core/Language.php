@@ -110,7 +110,11 @@ class Language extends Singleton {
 			if ($file->exists()) {
 				$langData = array_merge($langData, require($file));
 			}
-			
+
+            foreach ($langData as $key => $translation) {
+                $langData[$key] = str_replace('{product_name}', \GO::config()->product_name, $translation);
+            }
+
 			$this->data[$package][$module] = $langData;			
 		}
 	}
