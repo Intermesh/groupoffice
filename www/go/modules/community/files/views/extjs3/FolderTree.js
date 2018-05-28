@@ -45,7 +45,17 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 			throw "Parameter 'browser' is required!";
 		}
 		
-		this.initRootNode(this.rootNodeEntity);
+		this.root = {
+			expanded: true,
+			entityId:'ROOT', // Needed so it can be handled exactly as other nodes
+//				children: this.browser.rootNodes,
+			children:[],
+			uiProvider:  Ext.tree.RootTreeNodeUI // needed to make "rootVisible" work
+		};
+		
+		this.browser.on("rootNodesChanged", function(browser, rootNodes) {
+			this.initRootNodes(rootNodes);
+		},this);
 		
 		go.modules.community.files.FolderTree.superclass.initComponent.call(this);
 		
@@ -132,12 +142,17 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 		// When an entity is updated in the store. We'll need to update the tree too
 		this.getLoader().entityStore.on('changes', function(store, added, changed, destroyed){
 			
-			console.log('changed');
 			
 			var nodeMap = this.getChangesNodeMap(added, changed, destroyed);
-			this.processAddedItems(store,nodeMap.added);
-			this.processChangedItems(store,nodeMap.changed);
-			this.processDestroyedItems(store,nodeMap.destroyed);			
+			if(nodeMap.added.length){
+				this.processAddedItems(store,nodeMap.added);
+			}
+			if(nodeMap.changed.length){
+				this.processChangedItems(store,nodeMap.changed);
+			}
+			if(nodeMap.destroyed.length){
+				this.processDestroyedItems(store,nodeMap.destroyed);
+			}
 		},this);
 		
 	},
@@ -158,7 +173,6 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 		//		int:entityId => array(treenode,treenode),
 		//		int:entityId => array(treenode,treenode)
 		//	)
-		
 		var bookmarksNeedUpdate = false;
 		var sharedWithMeNeedUpdate = false;
 		var foldersToRefresh = [];
@@ -356,37 +370,18 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 		return foundNodes;
 	},
 	
-	initRootNode : function(nodeEntity){
-
-		var rootNodeConfig;
-
-		if(nodeEntity){
-			rootNodeConfig = {
-				iconCls:'ic-folder',
-				text: nodeEntity.name,
-				entityId:nodeEntity.id,
-				draggable:false,
-				params:{
-					filter: {
-						parentId: nodeEntity.id
-					}
-				}
-			};
-			
-			this.rootVisible=true; // Set root visible
-			
-		} else {
-			rootNodeConfig = {
-				expanded: true,
-				entityId:'ROOT', // Needed so it can be handled exactly as other nodes
-				children: this.browser.rootNodes,
-				uiProvider:  Ext.tree.RootTreeNodeUI // needed to make "rootVisible" work
-			};
-			
-			this.rootVisible=false; // Set root visible
-		}
-
-		this.root = rootNodeConfig;
+	initRootNodes : function(nodes){
+		
+			Ext.each(nodes, function(node) {
+				this.root.appendChild({
+					iconCls: node.iconCls,
+					entity: node.entity,
+					entityId:node.entityId,
+					params: {filter: node.filter},
+					text: node.text //TODO this should be 
+				});
+			},this);
+		
 	},
 	
 	getContextMenu : function(){
@@ -409,11 +404,6 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 		// TODO: CHECK IF FOLDERNAME ALREADY EXISTS		
 				
 		var params = {};
-		
-		// Workaround for myfiles
-		if(newParentId === 'my-files'){
-			newParentId = this.browser.getRootNode('my-files').params.filter.parentId;
-		}
 		
 		params.update = {};
 		params.update[nodeToUpdateId] = {

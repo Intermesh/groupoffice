@@ -14,10 +14,7 @@ go.modules.community.files.BreadCrumbBar = Ext.extend(Ext.Toolbar, {
 	browser:null,
 	
 	initComponent: function() {
-		this.items = [{
-			xtype: 'button',
-			text: t('My files')
-		}];
+		this.items = [];
 		go.modules.community.files.BreadCrumbBar.superclass.initComponent.call(this);
 		
 		go.Stores.get('Node').on('changes', function(){
@@ -39,12 +36,12 @@ go.modules.community.files.BreadCrumbBar = Ext.extend(Ext.Toolbar, {
 		var isLast = true,
 			node,
 			pxPerChar = dp(9), 
-			pxUsed = this.browser.getCurrentRootNode().length * pxPerChar + dp(56), // for first btn and end padding
+			pxUsed = this.browser.getRootNode().text.length * pxPerChar + dp(56), // for first btn and end padding
 			pxMax = this.el.getWidth(),
-			folderPath = this.browser.getPath();
-
+			folderPath = this.browser.getPath().slice(0);
+		pxUsed = pxUsed || 0;
 		this.removeAll();
-		
+		folderPath.shift();
 		if(!Ext.isEmpty(folderPath)) {
 			var nodes = go.Stores.get('Node').get(folderPath);
 			
@@ -82,12 +79,14 @@ go.modules.community.files.BreadCrumbBar = Ext.extend(Ext.Toolbar, {
 				
 			}
 		}
+
 		if(pxUsed <= pxMax) {
+		
 			//Root node (my-files, shared-with-me, bookmarks, etc..)
 			this.insertButton(0, {
-				text: this.browser.getRootNode(this.browser.getCurrentRootNode()).text,
+				text: this.browser.getRootNode().text,
 				handler: function(btn) {
-					this.browser.goto([this.browser.getCurrentRootNode()]);
+					this.browser.goto([this.browser.path[0]]);
 				},
 				scope:this
 			});

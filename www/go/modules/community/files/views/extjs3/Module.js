@@ -11,11 +11,15 @@ go.Modules.register("community", 'files', {
 	}
 });
 
-go.Router.add(/files\/([\w\-]+)\/([0-9\/]*)/, function(root, path) {
+go.Router.add(/files\/([a-z-0-9\/]*)/, function(path) {
 	var mainPanel = GO.mainLayout.openModule('files');
-	mainPanel.browser.currentRootNode = root;
-	mainPanel.browser.path = [];
-	mainPanel.browser.nav(path);
+	if(mainPanel.browser.rootLoaded) {
+		mainPanel.browser.nav(path);
+	} else {
+		mainPanel.browser.on('rootNodesChanged', function(browser){
+			mainPanel.browser.nav(path);
+		});
+	}
 });
 
 go.Preview = function(file) {

@@ -26,7 +26,6 @@ go.modules.community.files.UsagePanel = Ext.extend(Ext.Panel, {
 			for(var i=0;i<storages.length;i++) {
 				if(storages[i].ownedBy == go.User.id){
 					this.setData(storages[i].usage,storages[i].quota);
-					console.log(storages[i]);
 				}
 			}
 		},this);

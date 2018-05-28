@@ -12,24 +12,124 @@
 go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 	useRouter:null,
 	path: null,
-	currentRootNode: 'my-files', // (my-files, shared-with-me, bookmarks, etc..)
-	store: null, // only used by grid
-	rootNodes: null,
-
+	rootConfig: {
+		filters: [],
+		nodeId: null,
+		storages: false
+	},
+	rootLoaded : false,
+	_rootNodes:[],
+	
 	/**
 	 * Call open() will change route, will call nav()
 	 * @param {type} config
 	 * @returns {undefined}
 	 */
-	constructor: function(config){
-			this.useRouter = config.useRouter || false;
+	initComponent: function () {
 		this.path = [];
 		this.addEvents({
 			"pathchanged" : true, // post browsing
-			"myfilesnodeidchanged" : true
+			"myfilesnodeidchanged" : true,
+			"rootNodesChanged": true
 		});
 		
-		go.modules.community.files.Browser.superclass.constructor.call(this, config);
+		if(this.rootConfig.storages) {
+			this.loadStorages();
+		}
+		
+		this.initRootNodes();
+		go.Stores.get('Node').on('changes', this.initRootNodes,this);
+		go.Stores.get('Storage').on('changes', function(store, added, changed, deleted) {
+			
+			this.storages = added.concat(changed);
+			this.initRootNodes();
+		} ,this);
+		
+		go.modules.community.files.Browser.superclass.initComponent.call(this);
+	},
+	
+	loadStorages : function() {
+		var callId = go.Jmap.request({
+				method: 'Storage/query',
+				params: {
+					filter: {
+						ownedBy: go.User.id
+					}
+				}
+			});
+			go.Jmap.request({
+				method: 'Storage/get',
+				params: {
+					"#ids": {
+						resultOf: callId,
+						name: "Storage/query",
+						path: "ids"
+					}
+				}
+		});
+	},
+	
+	initRootNodes : function(){
+		if(this.rootLoaded) {
+			return;
+		}
+		this._rootNodes = [];
+		
+		if(this.rootConfig.storages){
+			// Retreive storages and add
+			if(!this.storages) {
+				return;
+			}
+			
+			Ext.each(this.storages, function(storage){
+				//var rootNode = this.fireEvent('parseStorage', this, storage);
+				//if(!rootNode) {
+				storage = go.Stores.get('Storage').get(storage);
+				var	rootNode = {
+						filter: {
+							parentId: storage.rootFolderId
+						},
+						text: t('My files'),
+						iconCls: 'ic-home',
+						entity: storage,
+						entityId: storage.rootFolderId,
+						type:'storage'
+					};
+				//}
+				this._rootNodes.push(rootNode);
+			},this);
+				
+		}
+		
+		if(this.rootConfig.nodeId){
+			// Retreive nodeId and add
+			var node = go.Stores.get('Node').get(this.rootConfig.nodeId);
+			if(!node) {
+				return;
+			}
+			this._rootNodes.push({
+				filter: {
+					parentId: node.id
+				},
+				text: node.name,
+				iconCls: 'ic-folder',
+				entity: node,
+				entityId: node.id,
+				type:'node'
+			});
+		}
+		
+		if(this.rootConfig.filters){
+			// Retreive filters and add
+			this._rootNodes = this._rootNodes.concat(this.rootConfig.filters);
+		}
+		this.rootLoaded = true;
+		this.fireEvent('rootNodesChanged', this, this._rootNodes);
+		
+	},	
+	
+	getRootNodes: function(){
+		return this._rootNodes;
 	},
 	
 	/**
@@ -73,26 +173,18 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 	},
 	
 	/**
-	 * Set the current Path for this browser
-	 * 
-	 * @param array Path
-	 */
-	setPath : function(path){
-		if(path[0] && typeof path[0] === 'string') {
-			this.currentRootNode = path.shift();
-		}
-		this.path = path;
-	},
-	
-	/**
 	 * Get the rootnode based on entityId
 	 * 
 	 * @param string rootNodeEntityId
 	 * @return array
 	 */
-	getRootNode : function(rootNodeEntityId){
-		var rootNodes = this.rootNodes.filter(function(node){
-			return node.entityId === rootNodeEntityId;
+	getRootNode : function(){
+		if(this.path.length == 0) {
+			return {text: 'loading...'};
+		}
+		var entityId = this.path[0];
+		var rootNodes = this._rootNodes.filter(function(node){
+			return node.entityId == entityId;
 		});
 		return (rootNodes.length >= 1)?rootNodes[0]:false;
 	},
@@ -101,20 +193,8 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 	 * Get the path that is currently set in this browser
 	 * @param boolean withRoot
 	 */
-	getPath : function(withRoot){
-		
-		if(withRoot){
-			return [this.currentRootNode].concat(this.path);
-		}
-		
+	getPath : function(){
 		return this.path;
-	},
-	
-	/**
-	 * Get the currentRootNode that is currently set in this browser
-	 */
-	getCurrentRootNode : function(){
-		return this.currentRootNode;
 	},
 	
 	getCurrentDir : function() {
@@ -134,7 +214,7 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 	 * @param array path
 	 */
 	goto : function(path){
-		if(typeof path === 'number') {
+		if(Number(path) !== 'NaN') {
 			for(var i = 0; i < this.path.length; i++) {
 				if(this.path[i] == path) {
 					path = this.path.slice(0,i+1);
@@ -142,7 +222,7 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 				}
 			}
 		}
-		this.setPath(path);
+		this.path = path;
 		this.open();
 	},
 	
@@ -161,9 +241,8 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 	 */
 	open: function(){
 		var strPath = Ext.isEmpty(this.path) ? '' : this.path.join('/')+'/';
-		
 		if(this.useRouter){		
-			go.Router.goto("files/"+this.currentRootNode+"/" + strPath);
+			go.Router.goto("files/"+strPath);
 		} else {
 			this.path = [];
 			this.nav(strPath);
@@ -176,14 +255,17 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 	 * @return {undefined}
 	 */
 	nav: function(path) {
+
 		var ids = path.replace(/\/$/g, '').split('/');
 		if(ids[0] === '') {
 			ids = [];
 		}
-		ids = ids.map(Number);
-		this.path = this.path.concat(ids);
-		var filter = Ext.isEmpty(this.path) && this.getRootNode(this.currentRootNode).params ? this.getRootNode(this.currentRootNode).params.filter : {parentId:ids[ids.length-1]};
-		 
+		//ids = ids.map(Number);
+  	this.path = ids;
+
+		var rootNode = this.getRootNode();
+		var filter = this.path.length === 1 && rootNode.filter ? rootNode.filter : {parentId:ids[ids.length-1]};
+
 		this.fireEvent('pathchanged', this, this.path, filter);
 	}
 });

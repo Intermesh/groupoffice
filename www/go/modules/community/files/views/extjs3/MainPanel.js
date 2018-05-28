@@ -19,40 +19,29 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 
 		this.browser = new go.modules.community.files.Browser({
 			useRouter: true,
-			rootNodes: [
-				{
-					text: t('My files'),
-					iconCls: 'ic-home',
-					entityId: 'my-files',
-					draggable: false,
-					expanded: true,
-					children: [], //to prevent router to load this node before params.filter.parentId is set after fetching the storage
-					params: {
-						filter: {
-							parentId: null
-						}
-					}
-				}, {
+			rootConfig:{
+				filters: [{
 					text: t('Shared with me'),
 					iconCls: 'ic-group',
 					entityId: 'shared-with-me',
-					draggable: false,
-					params: {
-						filter: {
-							isSharedWithMe: true
-						}
+//					draggable: false,
+					filter: {
+						isSharedWithMe: true
 					}
+					
 				}, {
 					text: t('Bookmarks'),
 					iconCls: 'ic-bookmark',
 					entityId: 'bookmarks',
-					draggable: false,
-					params: {
-						filter: {
-							bookmarked: true
-						}
+//					draggable: false,
+					filter: {
+						bookmarked: true
 					}
-				}]
+					
+				}],
+				nodeId: null,
+				storages: true
+			}
 		});
 
 		this.folderTree = new go.modules.community.files.FolderTree({
@@ -110,67 +99,33 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 
 		go.modules.community.files.MainPanel.superclass.initComponent.call(this);
 
-		// Load the user's home folder
-		this.on('afterrender', function () {
-			var callId = go.Jmap.request({
-				method: 'Storage/query',
-				params: {
-					filter: {
-						ownedBy: go.User.id
-					}
-				}
-			});
-
-			go.Jmap.request({
-				method: 'Storage/get',
-				params: {
-					"#ids": {
-						resultOf: callId,
-						name: "Storage/query",
-						path: "ids"
-					}
-				}
-			});
-
-			go.Stores.get("Storage").on('changes', this.onStorageChanges, this, {single: true}); // single run, only need to be set once
-		}, this);
+//		// Load the user's home folder
+//		this.on('afterrender', function () {
+//			go.Files.onReady(this.onReady, this);
+//		}, this);
 	},
+//	onReady: function (files) {
+//
+//		
+//
+//		this.browser.getRootNode('my-files').params.filter.parentId = files.myFilesFolderId;
+//		var me = this;
+//		this.folderTree.getTreeNodesByEntityId('my-files').forEach(function (node) {
+//			node.attributes.params.filter.parentId = files.myFilesFolderId;
+//			//delete node.childNodes;
+//			node.expanded = true;
+//			delete node.attributes.children;
+//
+//			node.reload(function () {
+//				me.folderTree.openPath(me.browser.getPath(true));
+//			}, this);
+//
+//		});
+//
+//		if (this.browser.getCurrentDir() == "my-files") {
+//			this.browser.goto(["my-files", files.myFilesFolderId]);
+//		}
+//	}
 
-/**
- * When the storage changes, apply the received rootFolderId.
- * 
- * @param {type} store
- * @param {type} added
- * @param {type} changed
- * @param {type} destroyed
- * @return {undefined}
- */
-	onStorageChanges: function (store, added, changed, destroyed) {
 
-		var me = this;
-		var storages = store.get(changed.concat(added));
-		for (var i = 0; i < storages.length; i++) {
-			if (storages[i].ownedBy == go.User.id) {
-				var myFilesNodeId = storages[i].rootFolderId;
-				
-				this.browser.getRootNode('my-files').params.filter.parentId = myFilesNodeId;				
-			
-					this.folderTree.getTreeNodesByEntityId('my-files').forEach(function(node) {
-						node.attributes.params.filter.parentId = myFilesNodeId;				
-						//delete node.childNodes;
-						node.expanded = true;
-						delete node.attributes.children;
-	
-						node.reload(function() {
-							me.folderTree.openPath(me.browser.getPath(true));
-						},this);
-
-					});
-
-				if(this.browser.getCurrentDir() == "my-files") {
-					this.browser.goto(["my-files", myFilesNodeId]);
-				}
-			}
-		}
-	}
 });

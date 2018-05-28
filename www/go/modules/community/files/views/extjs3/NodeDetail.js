@@ -21,8 +21,13 @@ go.modules.community.files.NodeDetail = Ext.extend(go.panels.DetailView, {
 <label>Location</label>\
 <span>{[this.drawPath(values.name)]}</span></p><hr>',{
 					drawPath: function(name) {
-						var str = this.browser.getCurrentRootNode() + ' <i class="icon small">chevron_right</i> ';
-							nodes = go.Stores.get('Node').get(this.browser.getPath());
+						var path = this.browser.getPath().slice(0),
+						  str = this.browser.getRootNode().text;
+							path.shift();
+							if(path.length) {
+								str += ' <i class="icon small">chevron_right</i> ';
+							}
+						var nodes = go.Stores.get('Node').get(path);
 						for(var i = 0; i < nodes.length; i++) {
 							str += nodes[i].name 
 							if(i < nodes.length-1) {
