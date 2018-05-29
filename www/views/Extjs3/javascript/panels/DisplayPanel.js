@@ -241,6 +241,7 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		}, this);
 		
 		this.addEvents({commentAdded:true});
+
 	},
 	
 	modifyTemplate : function(){
@@ -256,7 +257,11 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		if(tbar)
 			tbar.setDisabled(true);
 		
-		this.reset();
+		
+		this.items.each(function (item, index, length) {
+			item.hide();
+		}, this);
+		
 
 		if(this.editGoDialogId){
 			GO.dialogListeners.add(this.editGoDialogId,{
@@ -298,6 +303,7 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 	},
 	
 	reset : function(){
+		
 		if(this.body)
 			this.body.update("");		
 
