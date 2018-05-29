@@ -68,10 +68,6 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 		this.nodeGrid = new go.modules.community.files.NodeGrid({
 			store:this.store,
 			listeners: {
-//				MS: Browser is responsible for loading the store
-//				viewready: function (grid) {
-//					this.nodeGrid.getStore().load();
-//				},
 				rowcontextmenu: function(grid, index, event){
 					var selections = grid.getSelectionModel().getSelections();
 					var records = [];
@@ -104,10 +100,6 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 				}
 			})
 		});
-		
-//		this.nodeGrid.getSelectionModel().on('rowselect', function (sm, rowIndex, record) {
-//			go.Router.goto("files/mine/" + this.browser.path.join('/')+ record.data.id);
-//		},this);
 		
 		this.nodeTile = new go.modules.community.files.NodeTile({
 			store:this.store,
