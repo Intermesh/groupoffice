@@ -4,6 +4,7 @@ UPGRADING: make sure custom fields and search module are installed.
 
 Core:
 - ActveSync, CalDAV and CardDav are now open source!
+- Z-Push 2.4.2 included
 - New JMAP API backend
 - Flux technology in frontend
 - Optimized frontend client building
