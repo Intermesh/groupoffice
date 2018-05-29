@@ -17,6 +17,12 @@ go.links.LinksDetailPanel = Ext.extend(Ext.Panel, {
 		
 		var me = this;
 		
+		
+//		this.tools = [{
+//				id:"add",
+//				tooltip: t("Add link")
+//		}];
+		
 		var tpl = new Ext.XTemplate('<div class="icons"><tpl for=".">\
 		<tpl if="toEntity !== this.previousType(xindex)">\
 			<h5>{[t(values.toEntity, go.Entities.get(values.toEntity).module)]}</h5><hr>\
@@ -46,7 +52,7 @@ go.links.LinksDetailPanel = Ext.extend(Ext.Panel, {
 			</tpl>\
 			<tpl for="to">\
 			<span>{name}</span>\
-			<label>{[fm.date(parent.createdAt, go.User.dateTimeFormat)]}</label>\
+			<label>{[GO.util.dateFormat(parent.createdAt)]}</label>\
 			</tpl>\
 		</a>')).apply(values);
 

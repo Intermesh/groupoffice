@@ -1644,7 +1644,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 		
 		$this->login_message = GO()->getSettings()->loginMessage;
 		
-		$this->full_url = GO()->getSettings()->URL;
+		$this->full_url = rtrim(GO()->getSettings()->URL, '/') . '/';
 	}
 
 
