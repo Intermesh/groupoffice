@@ -27,6 +27,9 @@ go.modules.community.files.NodeTile = Ext.extend(go.grid.TilePanel, {
 			return '<div class="filetype '+ go.util.contentTypeClass(values.contentType, values.name)+ '"></div>';
 		}
 	}),
+	emptyText: '<div class="empty-state"><i class="icon">cloud_upload</i><br>'+
+		 '<h3>'+t('Drop files here')+'</h3>'+
+		 '<small>'+t('Or use the \'+\' button')+'</small></div>',
 	initComponent : function(){
 
      this.addEvents({drop:true});

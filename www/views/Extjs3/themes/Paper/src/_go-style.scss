@@ -1120,11 +1120,12 @@ table[id^="comments-ext"] b {
 	/* define the number of grid columns */
 	grid-gap: dp(4);
 	grid-template-columns: repeat( auto-fill, minmax(dp(192), 1fr));
-	> div {
+	> div.tile {
 		outline: 2px solid color($foreground,'divider');
 		height: dp(192);
 		background-color: color($background,'card');
 	}
+	
 	div.text {
 		@extend %ellipsis;
 		padding: 0 dp(16);

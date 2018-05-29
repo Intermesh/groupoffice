@@ -1381,12 +1381,10 @@ td.grid-hd-group-cell {
 }
 
 .x-grid-empty {
-	@extend %font-title;
-	margin: dp(8) auto;
 /*	left:50%;
 	top: 50%;
 	transform: translate(-50%, -50%);*/
-	padding: dp(16);
+	padding: dp(120) 0;
 	text-align:center;
 	color: color($foreground, 'disabled-text');
 	&::before {
