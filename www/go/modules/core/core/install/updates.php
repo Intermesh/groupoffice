@@ -94,7 +94,7 @@ $updates["201803161130"][] = function() {
 
 	$iniData = [
 			"general" => [
-					"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice',
+					"dataPath" => $config['file_storage_path'] ?? '/var/lib/groupoffice',
 					"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
 					"debug" => !empty($config['debug'])
 			],
