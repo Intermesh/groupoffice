@@ -14,8 +14,8 @@ $lock = new Lock("upgrade");
 if (!$lock->lock()) {
 	exit("Upgrade is already in progress");
 }
-header("Content-Type: text/plain; charset=utf8");
 
+echo "<pre>";
 GO()->getCache()->flush(false);
 GO()->setCache(new \go\core\cache\None());
 
@@ -199,8 +199,15 @@ try {
 
 	echo "Rebuilding listeners\n";
 	Observable::cacheListeners();
+	
+	App::get()->getSettings()->databaseVersion = App::get()->getVersion();
+	App::get()->getSettings()->save();
 
 	echo "Done!\n";
+	
+	echo "</pre>";
+	
+	echo '<a href="../">Continue</a>';
 } catch (\Exception $e) {
 	echo (string) $e;
 }
