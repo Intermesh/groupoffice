@@ -215,12 +215,15 @@ class ModuleCollection extends Model\ModelCollection{
 	 * @param StringHelper $name
 	 * @return Model\Module 
 	 */
-	public function isInstalled($name){
+	public function isInstalled($name, $checkEnabled = true){
 		$model = $this->model->findByName($name);
 		
-		if(!$model || !$model->enabled || !$this->_isAllowed($model->name))
+		if(!$model || !$this->_isAllowed($model->name))
 				return false;
-		
+
+		if ($checkEnabled && !$model->enabled)
+		    return false;
+
 		return $model;
 	}
 	
