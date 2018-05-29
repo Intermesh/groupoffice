@@ -9,7 +9,7 @@
 /config.ini
 /www/config.ini
 /www/promodules
-/www/go/modules/DJConsultancy
+/www/go/modules/djconsultancy
 /tests/data
 /www/modules/*
 !/www/modules/addressbook

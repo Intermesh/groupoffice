@@ -95,9 +95,9 @@ class Debugger {
 	
 	public function __construct() {
 		$this->enabled = !empty(GO()->getConfig()['general']['debug']);
-//		if($this->enabled) {
-//			$this->logPath = GO()->getDataFolder()->getFile('log/debug.log')->touch(true)->getPath();
-//		}
+		if($this->enabled) {
+			$this->logPath = GO()->getDataFolder()->getFile('log/debug.log')->touch(true)->getPath();
+		}
 	}
 
 	/**
