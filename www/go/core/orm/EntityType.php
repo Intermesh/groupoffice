@@ -87,23 +87,24 @@ class EntityType {
 		$e->className = $className;
 		$e->name = self::classNameToShortName($className);
 
-		$record = (new Query)
-						->select('id,moduleId,clientName')
-						->from('core_entity')
-						->where('name', '=', $e->name)
-						->single();
+        $module = Module::findByClass($className);
+
+        if(!$module) {
+            throw new \Exception("No module found for ". $className);
+        }
+
+        $record = (new Query)
+            ->select('id,moduleId,clientName')
+            ->from('core_entity')
+            ->where('name', '=', $e->name)
+            ->where('moduleId', '=', $module->id)
+            ->single();
 
 		if (!$record) {
-			$module = Module::findByClass($className);
-		
-			if(!$module) {
-				throw new \Exception("No module found for ". $className);
-			}
-
 			$record = [];
 			$record['moduleId'] = isset($module) ? $module->id : null;
 			$record['name'] = $e->name;
-      $record['clientName'] = $className::getClientName();
+            $record['clientName'] = $className::getClientName();
 
 			App::get()->getDbConnection()->insert('core_entity', $record)->execute();
 
@@ -112,6 +113,7 @@ class EntityType {
 
 		$e->id = $record['id'];
 		$e->moduleId = $record['moduleId'];
+		$e->clientName = $record['clientName'];
 		
 		return $e;
 	}
