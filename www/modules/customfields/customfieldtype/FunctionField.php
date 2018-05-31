@@ -83,7 +83,7 @@ class FunctionField extends AbstractCustomfieldtype {
 			}			
 		}
 
-		$attributes[$key] = \GO\Base\Util\Number::localize($result_string);
+		$attributes[$key] = $result_string;
 		return $attributes[$key];
 	}
 
