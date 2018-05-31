@@ -142,28 +142,48 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 		// When an entity is updated in the store. We'll need to update the tree too
 		this.getLoader().entityStore.on('changes', function(store, added, changed, destroyed){
 			
-			
 			var nodeMap = this.getChangesNodeMap(added, changed, destroyed);
-			if(nodeMap.added.length){
-				this.processAddedItems(store,nodeMap.added);
-			}
-			if(nodeMap.changed.length){
-				this.processChangedItems(store,nodeMap.changed);
-			}
-			if(nodeMap.destroyed.length){
-				this.processDestroyedItems(store,nodeMap.destroyed);
-			}
+
+			this.processAddedItems(store,nodeMap.added);
+			this.processChangedItems(store,nodeMap.changed);
+			this.processDestroyedItems(store,nodeMap.destroyed);
+			
 		},this);
 		
 	},
 	
 	processAddedItems : function(store,addedItems){
-//		console.log(addedItems);
 		//	addedItems = object(
 		//		int:entityId => array(treenode,treenode),
 		//		int:entityId => array(treenode,treenode),
 		//		int:entityId => array(treenode,treenode)
 		//	)		
+		var nodesToReloadParents = addedItems.filter(function(item){
+			return item == null;
+		});
+		
+		var newItemNodes = store.get([nodesToReloadParents]);
+		
+		
+		
+		for(var entityId in addedItems){
+			 
+			if(addedItems[entityId] == null){
+				nodesToRealodParents
+				
+				
+				
+				console.log(entityId);
+			}
+			
+			
+			
+			
+		}
+		
+		
+		
+		
 	},
 	
 	processChangedItems : function(store,changedItems){
@@ -293,7 +313,7 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 			changed:{},
 			destroyed:{}
 		};
-				
+
 		for(var i in this.nodeHash){
 			if(this.nodeHash[i].attributes && this.nodeHash[i].attributes.entityId){
 				
@@ -338,6 +358,18 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 			}
 				
 		}
+		
+		// Process all new items that where not yet found in the tree
+		var newItems = added.filter(function(add){
+			var result = !(add in map.added);
+			return result;
+		});
+				
+		Ext.each(newItems, function(itemId){
+			if(!map.added[itemId]){
+				map.added[itemId] = null;
+			}
+		});
 		return map;
 	},
 	

@@ -15,20 +15,9 @@ go.modules.community.files.MoveDialog = Ext.extend(go.form.Dialog, {
 		
 		this.browser = new go.modules.community.files.Browser({
 			useRouter: false,
-			rootNodes: [
-				{
-					text: t('My files'),
-					iconCls: 'ic-home',
-					entityId: 'my-files',
-					draggable: false,
-					expanded: true,
-					children: [], //to prevent router to load this node before params.filter.parentId is set after fetching the storage
-					params: {
-						filter: {
-							parentId: null
-						}
-					}
-				}]
+			rootConfig:{
+				storages:true
+			}
 		});
 		
 		this.folderTree = new go.modules.community.files.FolderTree({
@@ -47,27 +36,7 @@ go.modules.community.files.MoveDialog = Ext.extend(go.form.Dialog, {
 		
 		items.push(this.parentIdField);
 		items.push(this.folderTree);
-		
-		this.on('afterrender', function() {
-		go.Files.onReady(function (files) {
-
-				this.browser.getRootNode('my-files').params.filter.parentId = files.myFilesFolderId;
-				var me = this;
-				this.folderTree.getTreeNodesByEntityId('my-files').forEach(function (node) {
-
-					node.attributes.params.filter.parentId = files.myFilesFolderId;
-					//delete node.childNodes;
-					node.expanded = true;
-					delete node.attributes.children;
-
-					node.reload(function () {
-						me.folderTree.openPath(me.browser.getPath(true));
-					}, this);
-
-				});
-			}, this);
-		});
-		
+				
 		return items;
 	}
 });

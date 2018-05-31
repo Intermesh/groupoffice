@@ -30,8 +30,6 @@ go.modules.community.files.NodeDialog = Ext.extend(go.form.Dialog, {
 	
 	show: function(parentId) {
 		
-		debugger;
-		
 		if(parentId) {
 			this.txtParentId.setValue(parentId);
 			this.txtParentId.setDisabled(false);

@@ -11,13 +11,9 @@ go.modules.community.files.BrowseWindow = Ext.extend(Ext.Window, {
 		this.entityStore = go.Stores.get("Node");
 		
 		this.browser = new go.modules.community.files.Browser({
-			store: new go.data.Store({
-				fields: ['id', 'name', 'size','isDirectory','bookmarked','storageId', {name: 'createdAt', type: 'date'}, {name: 'modifiedAt', type: 'date'}, 'aclId'],
-				baseParams: {
-					filter:{isHome:true}
-				},
-				entityStore: this.entityStore
-			})
+			rootConfig:{
+				storages:true
+			}
 		});
 		
 		this.folderTree = new go.modules.community.files.FolderTree({
