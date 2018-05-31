@@ -1,4 +1,5 @@
 /nbproject
+/*-license.txt
 .idea
 /www/*-license.txt
 /www/vendor
@@ -9,8 +10,10 @@
 /config.ini
 /www/config.ini
 /www/promodules
-/www/go/modules/djconsultancy
 /tests/data
+/www/go/modules/*
+!/www/go/modules/community
+!/www/go/modules/core
 /www/modules/*
 !/www/modules/addressbook
 !/www/modules/sync

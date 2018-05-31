@@ -131,7 +131,6 @@
 				var fieldSets = go.CustomFields.getFieldSets(Ext.isString(detailView.entity) ?  detailView.entity : detailView.entityStore.entity.name);
 
 				fieldSets.forEach(function (fieldSet) {
-
 					var tpl = '<tpl for="customFields"><div class="icons">';
 
 					go.CustomFields.getFields(fieldSet.id).forEach(function (field) {

@@ -27,9 +27,7 @@ class Field extends AclItemEntity {
 	public $suffix;
 	
 	public $datatype;
-	
-	//todo move to options
-	public $function;
+
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()->addTable('core_customfields_field', 'f');
