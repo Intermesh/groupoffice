@@ -62,8 +62,8 @@ class FunctionField extends AbstractCustomfieldtype {
 	public function formatFormInput($key, &$attributes, \GO\Customfields\Model\AbstractCustomFieldsRecord $model){
 		$result_string = '';
 
-		if (!empty($this->field->function)) {
-			$f = $this->field->function;
+		$f = $this->field->getOption("function");
+		if (!empty($f)) {
 			foreach ($attributes as $key=>$value) {
 				
 					$f = str_replace('{' . $key . '}', floatval(\GO\Base\Util\Number::unlocalize($value)), $f);
