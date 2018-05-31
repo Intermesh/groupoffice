@@ -161,3 +161,7 @@ $updates['201801191400'][] = 'update em_accounts set `password` = concat("{GOCRY
 $updates['201801191400'][] = 'update em_accounts set `smtp_password` = concat("{GOCRYPT2}", `smtp_password`) where `smtp_password` like "def50200%"';
 
 $updates['201801221524'][] = "ALTER TABLE `em_links` CHANGE `uid` `uid` VARCHAR(255) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '';";
+
+$updates['201805011020'][] = "ALTER TABLE `em_accounts` 
+CHANGE COLUMN `password` `password` VARCHAR(512) NULL DEFAULT NULL ,
+CHANGE COLUMN `smtp_password` `smtp_password` VARCHAR(512) NOT NULL DEFAULT '';";

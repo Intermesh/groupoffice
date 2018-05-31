@@ -2831,8 +2831,8 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 
 			$attributes=$this->columns[$field];
 
-			if(!empty($attributes['required']) && empty($this->_attributes[$field])){
-				$this->setValidationError($field, sprintf(GO::t("Field %s is required"),$this->getAttributeLabel($field)));
+			if(!empty($attributes['required']) && empty($this->_attributes[$field]) && $this->_attributes[$field] !== '0'){
+				$this->setValidationError($field, sprintf(GO::t('attributeRequired'),$this->getAttributeLabel($field)));
 			}elseif(!empty($attributes['length']) && !empty($this->_attributes[$field]) && \GO\Base\Util\StringHelper::length($this->_attributes[$field])>$attributes['length'])
 			{
 				$this->setValidationError($field, sprintf(GO::t("Field %s is longer than the maximum of %s characters"),$this->getAttributeLabel($field),$attributes['length']));

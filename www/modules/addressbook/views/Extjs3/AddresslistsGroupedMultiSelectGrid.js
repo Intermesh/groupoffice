@@ -45,7 +45,7 @@ GO.addressbook.AddresslistsGroupedMultiSelectGrid = Ext.extend(GO.grid.MultiSele
 			}),
 			baseParams: {
 				permissionLevel: GO.permissionLevels.read,
-				limit: GO.settings.config.nav_page_size
+				limit: GO.settings.addresslists_store_forced_limit?parseInt(GO.settings.addresslists_store_forced_limit):parseInt(GO.settings.config.nav_page_size)
 			},
 			proxy: new Ext.data.HttpProxy({
 				url:GO.url('addressbook/addresslist/store')
@@ -94,7 +94,7 @@ GO.addressbook.AddresslistsGroupedMultiSelectGrid = Ext.extend(GO.grid.MultiSele
 					})
 				],
 				store:store,
-				pageSize:GO.settings.config.nav_page_size
+				pageSize:GO.settings.addresslists_store_forced_limit?parseInt(GO.settings.addresslists_store_forced_limit):parseInt(GO.settings.config.nav_page_size)
 			})
 		});
 		

@@ -20,7 +20,7 @@ class CronGroup extends \GO\Base\Db\ActiveRecord {
 	
 	public function relations(){
 		return array(	
-			'cronjob' => array('type'=>self::MANY_MANY, 'model'=>'GO\Base\Cron\CronJob', 'field'=>'group_id', 'linkModel' => 'GO\Base\Model\Group'),
+			'cronjob' => array('type'=>self::BELONGS_TO, 'model'=>'GO\Base\Cron\CronJob', 'field'=>'group_id', 'linkModel' => 'GO\Base\Model\Group'),
     );
 	}
 }
