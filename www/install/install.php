@@ -78,6 +78,9 @@ if (!empty($_POST)) {
 		$cron->save();
 
 		Observable::cacheListeners();
+		
+		App::get()->getSettings()->databaseVersion = App::get()->getVersion();
+		App::get()->getSettings()->save();
 
 		header("Location: finished.php");
 		exit();
