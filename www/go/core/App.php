@@ -365,7 +365,6 @@ namespace go\core {
 			while ($count != 10) {
 				$count++;
 				$workingFile = $workingDir . '/' . $name;
-
 				if (file_exists($workingFile)) {
 					return $workingFile;
 				}

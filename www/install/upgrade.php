@@ -1,5 +1,10 @@
 <?php
 
+if(is_dir("/etc/groupoffice/" . $_SERVER['HTTP_HOST'])) {	
+	echo "Please move all your domain configuration folders from /etc/groupoffice/* into /etc/groupoffice/multi_instance/*. Only move folders, leave /etc/groupoffice/config.php and other files where they are.";
+	exit();
+}
+
 use GO\Base\Observable;
 use go\core\App;
 use go\core\Environment;
@@ -111,7 +116,7 @@ try {
 					} else if (substr($query, 0, 7) == 'script:') {
 						$updateScript = $root->getFile('modules/' . $module->name . '/install/updatescripts/' . substr($query, 7));
 
-						if ($updateScript->exists()) {
+						if (!$updateScript->exists()) {
 							die($updateScript . ' not found!');
 						}
 

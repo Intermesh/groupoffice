@@ -114,7 +114,7 @@ $updates["201803161130"][] = function() {
 	$file->readData($iniData);
 
 
-	if (!is_writable($iniFile)) {
+	if (!(new \go\core\fs\File($iniFile))->isWritable()) {
 		echo "Can't write to INI file " . $iniFile . ". Please create it with the following content and rerun the upgrade: \n\n";
 		$file->update(['db' => ['password' => '[YOURPASSWORDHERE]']]);
 		echo (string) $file;
