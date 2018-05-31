@@ -40,7 +40,7 @@ function dbIsEmpty($config) {
 $configFile = App::findConfigFile();
 
 if(!$configFile) {
-  $configFile = '/etc/groupffice/config.ini';
+  $configFile = '/etc/groupoffice/config.ini';
 }
 
 if(file_exists($configFile)) {
