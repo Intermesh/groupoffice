@@ -16,6 +16,17 @@ class Node extends model\AclEntity {
 	//use \go\core\orm\CustomFieldsTrait;
 	use SearchableTrait;
 	
+	const InvalidNameRegex = "/[\\~#%&*{}\/:<>?|\"]/";
+	const TempFilePatterns = [
+		'/^\._(.*)$/',     // OS/X resource forks
+		'/^.DS_Store$/',   // OS/X custom folder settings
+		'/^desktop.ini$/', // Windows custom folder settings
+		'/^Thumbs.db$/',   // Windows thumbnail cache
+		'/^.(.*).swp$/',   // ViM temporary files
+		'/^\.dat(.*)$/',   // Smultron seems to create these
+		'/^~lock.(.*)#$/', // Windows 7 lockfiles
+   ];
+	
 	public $name;
 	protected $blobId;
 	/**
@@ -121,6 +132,16 @@ class Node extends model\AclEntity {
 	 */
 	public function getInternalShared(){
 		return $this->aclId != $this->parentAclId;
+	}
+	
+	protected function internalValidate() {
+		$this->name = preg_replace(self::InvalidNameRegex, "_", $this->name);
+		foreach (self::TempFilePatterns as $tempFile) {
+			if (preg_match($tempFile, $this->name)) {
+				$this->setValidationError('name', \go\core\validate\ErrorCode::MALFORMED, 'This is a temporary file');
+			}
+		}
+		return parent::internalValidate();
 	}
 	
 	/**

@@ -81,7 +81,7 @@
 .x-dd-over {
 	position:relative;
 	&::after {
-		content: 'Drag files here to upload';
+		content: '';
 		z-index:1;
 		pointer-events : none;
 		position:absolute;

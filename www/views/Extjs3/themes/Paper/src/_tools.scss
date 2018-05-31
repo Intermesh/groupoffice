@@ -57,8 +57,10 @@
 
 .empty-state, .x-grid-empty {
 	@extend %font-body1;
+	user-select: none;
 	color: color($foreground, 'secondary-text');
 	position: absolute;
+	z-index: 2;
 	top: 30%;
 	width: 100%;
 	text-align:center;
