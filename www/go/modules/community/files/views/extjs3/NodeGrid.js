@@ -52,8 +52,10 @@ go.modules.community.files.NodeGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'modifiedAt'
 				}
 			],
-			viewConfig: {
-				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>',
+			viewConfig:{
+				emptyText: '<i class="icon">cloud_upload</i><br>'+
+					 '<h3>'+t('Drop files here')+'</h3>'+
+					 '<small>'+t('Or use the \'+\' button')+'</small>'
 			},
 			autoExpandColumn: 'name',
 			// config options for stateful behavior

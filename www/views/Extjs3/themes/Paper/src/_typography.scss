@@ -27,7 +27,7 @@ body, html {
 }
 h1,h2,h3,h4,h5,h6 {
 	font-family: inherit;
-	color: color($foreground, 'text');
+	//color: color($foreground, 'text');
 	font-weight: bold;
 	line-height: 1;
 }
@@ -39,7 +39,7 @@ h5 { @extend %font-subheading-dense; }
 h6 { @extend %font-data-head; }
 
 strong { color: color($grey, 700); font-weight: $font-weight-m; }
-small { color: color($grey); font-weight: $font-weight-r; font-size:.85em; }
+small { color: color($grey); font-weight: $font-weight-r; font-size:sp(12); }
 /*
 
 
@@ -148,7 +148,7 @@ small { color: color($grey); font-weight: $font-weight-r; font-size:.85em; }
 
 %font-title {
 	font-size: sp(20);
-  line-height: dp(24);
+	line-height: dp(32);
 	font-weight: $font-weight-m;
 }
 

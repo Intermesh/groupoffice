@@ -117,8 +117,7 @@ go.form.FileField = Ext.extend(Ext.form.TextField, {
 			var file = input.files[f];
 			this.fireEvent('uploadStart', this, file);
 			go.Jmap.upload(file, {
-				success: function(response, file, options) {
-					var data = Ext.decode(response.responseText);
+				success: function(data, response, options) {
 					if (data.blobId) {
 						this.fireEvent('change', this, data.blobId, this.value);
 						this.setValue(data.blobId);
@@ -127,7 +126,7 @@ go.form.FileField = Ext.extend(Ext.form.TextField, {
 					this.fireEvent('uploadComplete', data, file, response, options);
 				},
 				failure: function(response, file, options) {
-					this.fireEvent('uploadFailed', response, file, options);
+					this.fireEvent('uploadFailed', data, file, response, options);
 				},
 				scope:this
 			});

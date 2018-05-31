@@ -67,13 +67,13 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 			split: true,
 			browser: this.browser,
 			tbar: [{
-					cls: 'go-narrow',
-					iconCls: "ic-arrow-back",
-					handler: function () {
-						this.westPanel.show();
-					},
-					scope: this
-				}]
+				cls: 'go-narrow',
+				iconCls: "ic-arrow-back",
+				handler: function () {
+					this.westPanel.show();
+				},
+				scope: this
+			}]
 		});
 
 		this.centerCardPanel = new go.modules.community.files.CenterPanel({
@@ -99,33 +99,6 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 
 		go.modules.community.files.MainPanel.superclass.initComponent.call(this);
 
-//		// Load the user's home folder
-//		this.on('afterrender', function () {
-//			go.Files.onReady(this.onReady, this);
-//		}, this);
-	},
-//	onReady: function (files) {
-//
-//		
-//
-//		this.browser.getRootNode('my-files').params.filter.parentId = files.myFilesFolderId;
-//		var me = this;
-//		this.folderTree.getTreeNodesByEntityId('my-files').forEach(function (node) {
-//			node.attributes.params.filter.parentId = files.myFilesFolderId;
-//			//delete node.childNodes;
-//			node.expanded = true;
-//			delete node.attributes.children;
-//
-//			node.reload(function () {
-//				me.folderTree.openPath(me.browser.getPath(true));
-//			}, this);
-//
-//		});
-//
-//		if (this.browser.getCurrentDir() == "my-files") {
-//			this.browser.goto(["my-files", files.myFilesFolderId]);
-//		}
-//	}
-
+	}
 
 });

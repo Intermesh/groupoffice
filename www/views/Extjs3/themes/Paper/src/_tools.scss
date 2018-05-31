@@ -56,19 +56,22 @@
 }
 
 .empty-state, .x-grid-empty {
-	i
-	{
-		@extend %icon;
-		display:block;
-		margin: dp(8) auto;
-		display: block;
-		font-size: dp(48);
-		max-height: dp(48);
-		color: color($foreground, "hint-text");
+	@extend %font-body1;
+	color: color($foreground, 'secondary-text');
+	position: absolute;
+	top: 30%;
+	width: 100%;
+	text-align:center;
+	display:inline-block;
+	.icon {
+		border-radius: 50%;
+		color: white;
+		font-size: 2.2em;
+		width: dp(56);
+		height: dp(56);
+		line-height: dp(56);
+		background-color: color($foreground, 'line');
 	}
-
-}
-.empty-state {
 	p {
 		color: color($foreground, "hint-text");
 		margin: dp(8);

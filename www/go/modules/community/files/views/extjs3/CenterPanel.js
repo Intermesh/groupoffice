@@ -68,10 +68,6 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 		this.nodeGrid = new go.modules.community.files.NodeGrid({
 			store:this.store,
 			listeners: {
-//				MS: Browser is responsible for loading the store
-//				viewready: function (grid) {
-//					this.nodeGrid.getStore().load();
-//				},
 				rowcontextmenu: function(grid, index, event){
 					var selections = grid.getSelectionModel().getSelections();
 					var records = [];
@@ -104,10 +100,6 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 				}
 			})
 		});
-		
-//		this.nodeGrid.getSelectionModel().on('rowselect', function (sm, rowIndex, record) {
-//			go.Router.goto("files/mine/" + this.browser.path.join('/')+ record.data.id);
-//		},this);
 		
 		this.nodeTile = new go.modules.community.files.NodeTile({
 			store:this.store,
@@ -233,15 +225,30 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 							}),
 							scope: this
 						}), '->', {
-							tooltip: t("Thumbnails", "files"),
-							iconCls: 'ic-view-list',
-							handler: function (item) {
-								var view = this.getLayout().activeItem.stateId === "files-grid" ? 'comfy' : 'list';
-								item.setIconClass('ic-view-' + view);
-								this.getLayout().setActiveItem(view === 'list' ? 0 : 1);
-							},
-							scope: this
-						}, {
+								xtype:'buttongroup',
+								items:[{
+									tooltip: t("List", "files"),
+									iconCls: 'ic-view-list',
+									enableToggle:true,
+									allowDepress:false,
+									pressed : true,
+									toggleGroup:'files-view-switcher',
+									handler: function(item){
+										this.getLayout().setActiveItem(0);
+									},
+									scope:this
+								},{
+									tooltip: t("Thumbnails", "files"),
+									toggleGroup:'files-view-switcher',
+									enableToggle:true,
+									allowDepress:false,
+									iconCls: 'ic-view-comfy',
+									handler: function(item){
+										this.getLayout().setActiveItem(1);
+									},
+									scope:this
+								}]
+							}, {
 							xtype: 'tbsearch',
 							store: this.store,
 							listeners: {
@@ -289,8 +296,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 					},
 					defaults: {toggleGroup: 'file-search-filter', enableToggle: true},
 					items: [
-						t('Search in') + ':',
-						{
+						t('Search in') + ':',{
 							text: t('All folders'),
 							toggleHandler: function (btn, state) {
 								if (state) {
@@ -299,20 +305,35 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 								}
 							},
 							scope: this
-						},
-						{
+						},{
 							text: '',
 							pressed: true, //default
 							toggleHandler: function (btn, state) {
 								if (state) {
-									this.store.baseParams.filter.parentId = btn.parentId;
+									this.store.baseParams.filter = {parentId: btn.parentId};
 									this.store.reload();
 								}
 							},
 							scope: this
-						},
-						{text: t('Shared with me')},
-						{text: t('Bookmarks')}
+						},{
+							text: t('Shared with me'),
+							toggleHandler: function(btn, state) {
+								if(state) {
+									this.store.baseParams.filter = {sharedWithMe: true};
+									this.store.reload();
+								}
+							},
+							scope: this
+						},{
+							text: t('Bookmarks'),
+							toggleHandler: function(btn, state) {
+								if(state) {
+									this.store.baseParams.filter = {bookmarked: true};
+									this.store.reload();
+								}
+							},
+							scope: this
+						}
 					]
 				}),
 				this.breadCrumbs

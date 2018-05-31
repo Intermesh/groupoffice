@@ -510,7 +510,8 @@ GO.calendar.MainPanel = function(config){
 			
 	var tbar = [{
 		iconCls: 'ic-add',
-		text: t("Add"),
+		text: t("Event"),
+		cls: 'primary',
 		handler: function(){
 							
 			GO.calendar.showEventDialog({
