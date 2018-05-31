@@ -46,7 +46,7 @@ GO.customfields.CategoryDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 
 		this.addPanel(this.propertiesPanel);	
  
-    this.addPermissionsPanel(new GO.grid.PermissionsPanel({levels:[GO.permissionLevels.read,GO.permissionLevels.write,GO.permissionLevels.manage]}));    
+    this.addPermissionsPanel(new GO.grid.PermissionsPanel({fieldName: 'aclId', levels:[GO.permissionLevels.read,GO.permissionLevels.write,GO.permissionLevels.manage]}));    
 	},	
 	setType : function(extendsModel)
 	{

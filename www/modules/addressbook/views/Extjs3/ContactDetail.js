@@ -164,6 +164,8 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 			]});
 
 		GO.addressbook.ContactDetail.superclass.initComponent.call(this, arguments);
+		
+		go.CustomFields.addDetailPanels(this);
 
 		this.add(new go.links.LinksDetailPanel());
 
