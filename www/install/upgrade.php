@@ -1,5 +1,10 @@
 <?php
 
+if(is_dir("/etc/groupoffice/" . $_SERVER['HTTP_HOST'])) {	
+	echo "Please move all your domain configuration folders from /etc/groupoffice/* into /etc/groupoffice/multi_instance/*. Only move folders, leave /etc/groupoffice/config.php and other files where they are.";
+	exit();
+}
+
 use GO\Base\Observable;
 use go\core\App;
 use go\core\Environment;
@@ -14,8 +19,8 @@ $lock = new Lock("upgrade");
 if (!$lock->lock()) {
 	exit("Upgrade is already in progress");
 }
-header("Content-Type: text/plain; charset=utf8");
 
+echo "<pre>";
 GO()->getCache()->flush(false);
 GO()->setCache(new \go\core\cache\None());
 
@@ -111,7 +116,7 @@ try {
 					} else if (substr($query, 0, 7) == 'script:') {
 						$updateScript = $root->getFile('modules/' . $module->name . '/install/updatescripts/' . substr($query, 7));
 
-						if ($updateScript->exists()) {
+						if (!$updateScript->exists()) {
 							die($updateScript . ' not found!');
 						}
 
@@ -199,8 +204,15 @@ try {
 
 	echo "Rebuilding listeners\n";
 	Observable::cacheListeners();
+	
+	App::get()->getSettings()->databaseVersion = App::get()->getVersion();
+	App::get()->getSettings()->save();
 
 	echo "Done!\n";
+	
+	echo "</pre>";
+	
+	echo '<a href="../">Continue</a>';
 } catch (\Exception $e) {
 	echo (string) $e;
 }

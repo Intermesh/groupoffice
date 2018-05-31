@@ -236,7 +236,12 @@ GO.addressbook.CompanyReadPanel = Ext.extend(GO.DisplayPanel,{
 							'</tr>'+							
 						'</tpl>'+
 						'</table>'+
-					'</tpl>';
+		
+						'</tpl>';
+
+			this.template +=GO.customfields.displayPanelTemplate;
+			this.template +=GO.customfields.displayPanelBlocksTemplate;
+		
 
 			if(go.Modules.isAvailable("legacy", "lists"))
 				this.template += GO.lists.ListTemplate;
@@ -246,6 +251,7 @@ GO.addressbook.CompanyReadPanel = Ext.extend(GO.DisplayPanel,{
 			if(go.Modules.isAvailable("legacy", "workflow")){
 				this.template +=GO.workflow.WorkflowTemplate;
 			}
+								
 								
 			
 			

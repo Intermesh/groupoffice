@@ -94,7 +94,7 @@ $updates["201803161130"][] = function() {
 
 	$iniData = [
 			"general" => [
-					"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice',
+					"dataPath" => $config['file_storage_path'] ?? '/var/lib/groupoffice',
 					"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
 					"debug" => !empty($config['debug'])
 			],
@@ -114,7 +114,7 @@ $updates["201803161130"][] = function() {
 	$file->readData($iniData);
 
 
-	if (!is_writable($iniFile)) {
+	if (!(new \go\core\fs\File($iniFile))->isWritable()) {
 		echo "Can't write to INI file " . $iniFile . ". Please create it with the following content and rerun the upgrade: \n\n";
 		$file->update(['db' => ['password' => '[YOURPASSWORDHERE]']]);
 		echo (string) $file;

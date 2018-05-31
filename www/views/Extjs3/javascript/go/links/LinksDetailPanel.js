@@ -92,7 +92,7 @@ go.links.LinksDetailPanel = Ext.extend(Ext.Panel, {
 				listeners: {
 					scope: this,
 					click: function (dv, index, node, e) {
-
+		
 						var record = this.store.getAt(index);
 						var entity = go.Entities.get(record.data.toEntity);
 
