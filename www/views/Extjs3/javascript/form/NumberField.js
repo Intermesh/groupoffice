@@ -69,7 +69,10 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 	fixPrecision : function(){
 //		console.log(this.getValue());
 		if(this.getValue()!=""){
-			var number = GO.util.unlocalizeNumber(this.getValue());
+			var number = this.getValue();
+			if(this.serverFormats) {
+				number = GO.util.unlocalizeNumber(number);
+			}
 			if(!number && this.minValue!=Number.NEGATIVE_INFINITY){
 				number = this.minValue;
 			}
