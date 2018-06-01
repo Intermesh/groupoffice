@@ -3331,9 +3331,12 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 			//check if other fields than model_id were modified.
 			$modified = $this->_customfieldsRecord->getModifiedAttributes();
 			unset($modified['model_id']);
-
-			if(count($modified))
-				$this->_customfieldsRecord->save();
+			
+			if(count($modified) || $this->_customfieldsRecord->isNew) {
+				if(!$this->_customfieldsRecord->save()) {
+					throw new \Exception("Could not save custom fields ". var_export($this->_customfieldsRecord->getValidationErrors(), true));
+				}
+			}
 
 //			if($this->customfieldsRecord->save())
 //				$this->touch(); // If the customfieldsRecord is saved then set the mtime of this record.
