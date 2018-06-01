@@ -8,6 +8,7 @@
  * @property string $password
  * @property string $name
  * @property string $maildir
+ * @property string $homedir
  * @property int $quota Quota in kilobytes
  * @property int $ctime
  * @property int $mtime
@@ -84,9 +85,13 @@ class Mailbox extends \GO\Base\Db\ActiveRecord {
 		if (!$this->skipPasswordEncryption && $this->isModified("password")) {
 			$this->password = $this->crypt($this->password); //disabled depricated error for unsalted crypt
 		}
-		$parts = explode('@', $this->username);
-
-		$this->maildir = $this->domain->domain . '/' . $parts[0] . '/';
+		
+		if($this->getIsNew()) {
+			$parts = explode('@', $this->username);
+			$this->homedir = $this->domain->domain . '/' . $parts[0] . '/';
+			$this->maildir = $this->domain->domain . '/' . $parts[0] . '/Maildir/';
+		}
+		
 		return parent::beforeSave();
 	}
 /* See ticket #201307437
