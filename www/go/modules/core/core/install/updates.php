@@ -14,12 +14,6 @@ $updates["201803161130"][] = function() {
 		return;
 	}
 	
-	$iniFile = substr($configFile, 0, -3).'ini';		
-
-	if(file_exists($iniFile)) {
-		echo "INI file already exists so skipping conversion\n";
-		return;
-	}
 
 	$globalConfig = [];
 	if (file_exists('/etc/groupoffice/globalconfig.inc.php')) {
@@ -91,37 +85,6 @@ $updates["201803161130"][] = function() {
 		$stmt->execute();
 	}
 
-
-	$iniData = [
-			"general" => [
-					"dataPath" => $config['file_storage_path'] ?? '/var/lib/groupoffice',
-					"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
-					"debug" => !empty($config['debug'])
-			],
-			"db" => [
-					"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';dbname=' . ($config['db_name'] ?? "groupoffice"),
-					"username" => $config['db_user'] ?? "groupoffice",
-					"password" => $config['db_pass'] ?? ""
-			],
-			"limits" => [
-					"maxUsers" => $config['max_users'] ?? 0,
-					"storageQuota" => $config['quota'] ?? 0,
-					"allowedModules" => $config['allowed_modules'] ?? ""
-			]
-	];
-
-	$file = new IniFile();
-	$file->readData($iniData);
-
-
-	if (!(new \go\core\fs\File($iniFile))->isWritable()) {
-		echo "Can't write to INI file " . $iniFile . ". Please create it with the following content and rerun the upgrade: \n\n";
-		$file->update(['db' => ['password' => '[YOURPASSWORDHERE]']]);
-		echo (string) $file;
-		exit();
-	} else {
-		$file->write($iniFile);
-	}
 };
 
 
