@@ -111,12 +111,12 @@ GO.grid.LinksGrid = function(config){
 	//config.autoExpandMax=2500;
 	//config.autoExpandColumn=1;	
 	
-	config.paging=20;
+	config.paging = parseInt(GO.settings['max_rows_list']);
 
 	config.bbar = new Ext.PagingToolbar({
 		cls: 'go-paging-tb',
 		store: config.store,
-		pageSize: 20,//parseInt(GO.settings['max_rows_list']),
+		pageSize: parseInt(GO.settings['max_rows_list']),
 		displayInfo: true,
 		displayMsg: t("Total: {2}"),
 		emptyMsg: t("No items to display")

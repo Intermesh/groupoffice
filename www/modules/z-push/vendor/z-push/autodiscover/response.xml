@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Autodiscover xmlns="http://schemas.microsoft.com/exchange/autodiscover/responseschema/2006" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Response xmlns="http://schemas.microsoft.com/exchange/autodiscover/mobilesync/responseschema/2006">
+<Culture>en:us</Culture>
+<User>
+<DisplayName></DisplayName>
+<EMailAddress></EMailAddress>
+</User>
+<Action>
+<Settings>
+<Server>
+<Type>MobileSync</Type>
+<Url></Url>
+<Name></Name>
+</Server>
+</Settings>
+</Action>
+</Response>
+</Autodiscover>

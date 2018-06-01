@@ -336,11 +336,13 @@ abstract class Entity extends Property {
 	public static function sort(Query $query, array $sort) {	
 		
 		//filter by columns
-		$query->orderBy(array_filter($sort, function($key) {
-				return static::getMapping()->getColumn($key) !== false;
-			}, ARRAY_FILTER_USE_KEY)
-							, true
-		);
+//		$query->orderBy(array_filter($sort, function($key) {
+//				return static::getMapping()->getColumn($key) !== false;
+//			}, ARRAY_FILTER_USE_KEY)
+//							, true
+//		);
+		
+		$query->orderBy($sort, true);
 		
 		return $query;
 	}

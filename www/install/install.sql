@@ -479,8 +479,8 @@ ALTER TABLE `core_module`
 
 ALTER TABLE `core_entity`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `model_name` (`name`),
-  ADD UNIQUE KEY `name` (`name`),
+  ADD UNIQUE KEY `clientName` (`clientName`),
+	ADD UNIQUE KEY `name` (`name`, `moduleId`) USING BTREE,
   ADD KEY `moduleId` (`moduleId`);
 
 ALTER TABLE `core_entity`

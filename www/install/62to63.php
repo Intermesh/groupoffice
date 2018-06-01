@@ -215,6 +215,10 @@ $qs[] = "ALTER TABLE `core_entity` ADD UNIQUE(`clientName`);";
 
 $qs[] = "insert into core_entity (name) select extendsModel from core_customfields_field_set where extendsModel not in (select name from core_entity)";
 $qs[] = 'ALTER TABLE `core_customfields_field_set` ADD `entityId` INT NOT NULL AFTER `id`, ADD INDEX (`entityId`);';
+
+
+//deduplicate core_entity
+$qs[] = "DELETE t1 FROM core_entity t1 INNER JOIN core_entity t2 WHERE t1.id > t2.id AND t1.name = t2.name;";
 $qs[] = 'update `core_customfields_field_set` set entityId = (select id from core_entity where name = extendsModel);';
 $qs[] = 'ALTER TABLE `core_entity` DROP INDEX `name`;';
 $qs[] = 'ALTER TABLE `core_entity` ADD UNIQUE(`name`);';
@@ -324,6 +328,7 @@ $qs[] = "ALTER TABLE `core_setting` ADD CONSTRAINT `module` FOREIGN KEY (`module
 //$qs[] = "insert into core_module (aclId,name,package,version) select max(id),'groups','core','0' from core_acl;";
 
 //links module
+$qs[] = "DELETE FROM core_module where name='links';"; //might be installed in some installations
 $qs[] = "INSERT INTO `core_acl` (`id`, `ownedBy`, `usedIn`, `modifiedAt`) VALUES (NULL, '1', 'core_module.aclId', NOW());";
 $qs[] = "insert into core_acl_group (aclId,groupId, level) select max(id),'1','50' from core_acl;";
 $qs[] = "insert into core_module (aclId,name,package,version) select max(id),'links','core','0' from core_acl;";

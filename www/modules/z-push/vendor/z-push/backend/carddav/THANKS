@@ -1,0 +1,8 @@
+*Drenalina SRL (www.drenalina.com)* sponsored the development of the following features in the BackendCardDAV, any existing bug it's my fault not theirs ;-)
+Thank you very much for helping to improve it!!
+
+
+ - Autodetecting addressbooks within a DAV principal.
+ - Merging multiple addressbooks so the device will see a unique one. Only iOS based devices support multiple addressbooks, so we will merge them for now.
+ - Selecting default addressbook to store new contacts created from the device.
+ - GAL addressbook and GAL search.

@@ -1,4 +1,6 @@
 /nbproject
+/*-license.txt
+.idea
 /www/vendor
 /config.php
 /www/config.php
@@ -8,8 +10,16 @@
 /www/config.ini
 /www/promodules
 /tests/data
+/www/go/modules/*
+!/www/modules/community
+!/www/modules/core
 /www/modules/*
 !/www/modules/addressbook
+!/www/modules/sync
+!/www/modules/z-push
+!/www/modules/zpushadmin
+!/www/modules/caldav
+!/www/modules/carddav
 !/www/modules/admin2userlogin
 !/www/modules/bookmarks
 !/www/modules/calendar

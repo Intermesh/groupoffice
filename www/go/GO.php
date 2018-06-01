@@ -779,7 +779,7 @@ class GO{
 		self::$_lastReportedError = $errno.$errfile.$errline;
 		
 		//log only errors that are in error_reporting
-		$error_reporting = ini_get('error_reporting');
+		$error_reporting = (bool) ini_get('error_reporting');
 		if (!($error_reporting & $errno)) return;
 		
 		$type="Unknown error";

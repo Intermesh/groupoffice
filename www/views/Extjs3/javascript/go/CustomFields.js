@@ -55,8 +55,7 @@
 
 			for (var id in all) {
 				field = all[id];
-				if (field.fieldSetId == fieldSetId) {
-					field.dataname = 'customFields.' + field.databaseName;
+				if (field.fieldSetId == fieldSetId) {					
 					formField = GO.customfields.dataTypes[field.datatype].getFormField(field, {serverFormats: false});
 
 					r.push(formField);
@@ -128,17 +127,17 @@
 		addDetailPanels: function (detailView) {
 
 			go.CustomFields.onReady(function () {
-				var fieldSets = go.CustomFields.getFieldSets(detailView.entityStore.entity.name);
+				
+				var fieldSets = go.CustomFields.getFieldSets(Ext.isString(detailView.entity) ?  detailView.entity : detailView.entityStore.entity.name);
 
 				fieldSets.forEach(function (fieldSet) {
-
 					var tpl = '<tpl for="customFields"><div class="icons">';
 
 					go.CustomFields.getFields(fieldSet.id).forEach(function (field) {
-						tpl += '<p><i class="icon label">' + go.CustomFields.getFieldIcon(field.id) + '</i>\
+						tpl += '<tpl if="!GO.util.empty(go.CustomFields.renderField(\'' + field.id + '\',values))"><p><i class="icon label">' + go.CustomFields.getFieldIcon(field.id) + '</i>\
 					<span>{[go.CustomFields.renderField("' + field.id + '",values)]}</span>\
 						<label>' + t(field.name) + '</label>\
-						</p><hr />';
+						</p><hr /></tpl>';
 					});
 
 					tpl += '</div></tpl>';

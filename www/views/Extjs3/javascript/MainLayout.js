@@ -218,7 +218,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			}
 
 			//update hash if not already set.
-			if (window.location.hash.indexOf(newTab.moduleName) === -1) {
+			if (!go.Router.routing) {
 				window.go.Router.setPath(newTab.moduleName);
 			}
 

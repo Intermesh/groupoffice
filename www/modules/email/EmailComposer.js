@@ -1127,22 +1127,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 				
 			}
 			
-			if (!GO.util.empty(config['delegated_cc_enabled'])) {
-				
-				GO.request({
-					url: 'email/account/loadAddress',
-					params: {
-						id: config.account_id
-					},
-					success: function( options, response, result ) {
-						var name = result.data['name'];
-						var email = result.data['email'];
-						this.ccCombo.setValue('"'+name+'" <'+email+'>');
-					},
-					scope: this
-				});
-				
-			}
+			
 				
 		}
 	},

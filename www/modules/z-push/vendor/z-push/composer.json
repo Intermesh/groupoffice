@@ -1,0 +1,6 @@
+{
+    "autoload": {
+        "classmap": ["autodiscover/", "backend/", "include/", "lib/"],
+        "files": ["version.php", "lib/core/zpushdefs.php", "lib/utils/compat.php"]
+    }
+}

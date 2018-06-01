@@ -24,7 +24,10 @@ GO.addressbook.SelectAddresslistGroup = Ext.extend(GO.form.ComboBoxReset,{ //GO.
 				id: 'id',
 				totalProperty:'total',
 				fields: ['id','name'],
-				remoteSort: true
+				remoteSort: true,
+				baseParams: {
+					limit:GO.settings.addresslists_store_forced_limit?parseInt(GO.settings.addresslists_store_forced_limit):parseInt(GO.settings['max_rows_list'])
+				}
 			}),
 			valueField:'id',
 			displayField:'name',

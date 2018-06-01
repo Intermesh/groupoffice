@@ -112,6 +112,7 @@ class EntityType {
 
 		$e->id = $record['id'];
 		$e->moduleId = $record['moduleId'];
+		$e->clientName = $record['clientName'];
 		
 		return $e;
 	}

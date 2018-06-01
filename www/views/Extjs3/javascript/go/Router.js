@@ -13,6 +13,8 @@ go.Router = {
 	previousPath : null,
 	loadedPath : null,
 	
+	routing: false,
+	
 	requireAuthentication : false,
 	
 	config: function (options) {
@@ -99,8 +101,9 @@ go.Router = {
 				for(var n = 0, l = match.length; n < l; n++) {
 					match[n] = decodeURIComponent(match[n]);
 				}
-				
+				this.routing = true;
 				this.routes[i].handler.apply({}, match);
+				this.routing = false;
 				return this;
 			}
 		}
@@ -141,7 +144,6 @@ GO.mainLayout.on("boot", function() {
 	//
 	//default route for entities		
 	go.Router.add(/([a-zA-Z0-9]*)\/([0-9]*)/, function(entity, id) {
-		
 		var entityObj = go.Entities.get(entity);
 		if(!entityObj) {
 			console.log("Entity ("+entity+") not found in default entity route")
@@ -152,11 +154,11 @@ GO.mainLayout.on("boot", function() {
 		var mainPanel = GO.mainLayout.openModule(module);
 		var detailViewName = entity + "Detail";
 
-		if(mainPanel[detailViewName]) {
+		if (mainPanel.route) {
+			mainPanel.route(parseInt(id), entity);
+		} else if(mainPanel[detailViewName]) {
 			mainPanel[detailViewName].load(parseInt(id));
 			mainPanel[detailViewName].show();
-		} else if (mainPanel.route) {
-			mainPanel.route(parseInt(id), entity);
 		} else {
 			console.log("Default entity route failed because " + detailViewName + " or 'route' function not found in mainpanel of " + module + ":", mainPanel);
 			console.log(arguments);
