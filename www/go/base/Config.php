@@ -1009,6 +1009,22 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * Variables below this should not be changed
 	 *////////////////////////////////////////////////
 
+	/**
+	 * The Group-Office version number
+	 *
+	 * @var     StringHelper
+	 * @access  public
+	 */
+	var $version = '6.2.95';
+
+	/**
+	 * Modification date
+	 *
+	 * @var     StringHelper
+	 * @access  public
+	 */
+	
+	var $mtime = '20180601';
 
 	#group configuration
 	/**
