@@ -5,26 +5,83 @@ if(is_dir("/etc/groupoffice/" . $_SERVER['HTTP_HOST'])) {
 	exit();
 }
 
+
 use GO\Base\Observable;
 use go\core\App;
 use go\core\Environment;
 use go\core\module\model\Module;
 use go\core\util\Lock;
 
-require('../vendor/autoload.php');
-
-App::get();
-
-$lock = new Lock("upgrade");
-if (!$lock->lock()) {
-	exit("Upgrade is already in progress");
+function var_export54($var, $indent="") {
+    switch (gettype($var)) {
+        case "string":
+            return '"' . addcslashes($var, "\\\$\"\r\n\t\v\f") . '"';
+        case "array":
+            $indexed = array_keys($var) === range(0, count($var) - 1);
+            $r = [];
+            foreach ($var as $key => $value) {
+                $r[] = "$indent    "
+                     . ($indexed ? "" : var_export54($key) . " => ")
+                     . var_export54($value, "$indent\t");
+            }
+            return "[\n" . implode(",\n", $r) . "\n" . $indent . "]";
+        case "boolean":
+            return $var ? "true" : "false";
+        default:
+            return var_export($var, true);
+    }
 }
 
-echo "<pre>";
-GO()->getCache()->flush(false);
-GO()->setCache(new \go\core\cache\None());
-
 try {
+	
+	require('../vendor/autoload.php');
+	
+	echo "<pre>";
+	
+	//convert old config.php to new conf.php
+	$configFile = App::findConfigFile();
+	if((!$configFile || file_get_contents($configFile) == "") && ($oldConfFile = App::findConfigFile('config.php'))) {
+		//no new config file but an old one exists.
+		require($oldConfFile);
+		$conf = [
+					"general" => [
+							"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice',
+							"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
+							"debug" => !empty($config['debug'])
+					],
+					"db" => [
+							"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . ($config['db_name'] ?? "groupoffice"),
+							"username" => $config['db_user'] ?? "groupoffice",
+							"password" => $config['db_pass'] ?? ""
+					],
+					"limits" => [
+							"maxUsers" => 0,
+							"storageQuota" => 0,
+							"allowedModules" => ""
+					]
+			];
+		
+		$newConfFile = dirname($oldConfFile) . '/conf.php';
+		
+		if(!is_writable($newConfFile)) {
+			exit("You have an old config file. Please create a new empty file called ". $newConfFile ." and make it writable");
+		} else
+		{
+			file_put_contents($newConfFile, "<?php\n\nreturn " . var_export54($conf) . ";\n");
+		}
+		
+	}
+	
+	
+	App::get();
+
+	$lock = new Lock("upgrade");
+	if (!$lock->lock()) {
+		exit("Upgrade is already in progress");
+	}
+	
+	GO()->getCache()->flush(false);
+	GO()->setCache(new \go\core\cache\None());
 	
 	if (!GO()->getDatabase()->hasTable("core_module")) {
 		//todo: verify this is a valid 6.2 database
