@@ -74,34 +74,32 @@ class EntityType {
 		return Module::findById($this->moduleId);
 	}
 
-	/**
-	 * Find by PHP API class name
-	 * 
-	 * @param string $className
-	 * @return static
-	 */
-    public static function findByClassName($className)
-    {
+    /**
+     * Find by PHP API class name
+     *
+     * @param string $className
+     * @return static
+     */
+    public static function findByClassName($className) {
 
         $e = new static;
 
         $e->className = $className;
         $e->name = self::classNameToShortName($className);
 
-        $module = Module::findByClass($className);
-
-        if (!$module) {
-            throw new \Exception("No module found for " . $className);
-        }
-
         $record = (new Query)
             ->select('id,moduleId,clientName')
             ->from('core_entity')
-            ->where('name', '=', $e->name)
-            ->where('moduleId', '=', $module->id)
+            ->where('clientName', '=', $className::getClientName())
             ->single();
 
         if (!$record) {
+            $module = Module::findByClass($className);
+
+            if(!$module) {
+                throw new \Exception("No module found for ". $className);
+            }
+
             $record = [];
             $record['moduleId'] = isset($module) ? $module->id : null;
             $record['name'] = $e->name;
@@ -118,8 +116,8 @@ class EntityType {
 
         return $e;
     }
-	
-	/**
+
+    /**
 	 * Creates a short name based on the class name.
 	 * 
 	 * This is used to generate response name. 
