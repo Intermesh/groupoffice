@@ -527,10 +527,11 @@ Ext.extend(GO.modules.MainPanel,Ext.grid.EditorGridPanel, {
 		var params = {};
 		
 		if(record.data.id) {
-			params['update'] = [{
+			params.update = {};
+			params.update[record.data.id] = {
 				id: record.data.id,
 				enabled: record.data.enabled
-			}];
+			};
 			go.Stores.get("Module").set(params, function(options, success, response) {
 
 				if(record.data.enabled && record.isModified("enabled")) {

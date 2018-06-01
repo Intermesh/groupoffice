@@ -80,7 +80,7 @@ class ModuleController extends AbstractJsonController{
 			
 			if($module instanceof \go\core\module\Base) {
 			
-			$model = GO::modules()->isInstalled($module->getName());
+			$model = GO::modules()->isInstalled($module->getName(), false);
 			
 			
 			$availableModules[$module->getName()] = array(		
@@ -103,7 +103,7 @@ class ModuleController extends AbstractJsonController{
 			} else
 			{
 				
-				$model = GO::modules()->isInstalled($module->name());
+				$model = GO::modules()->isInstalled($module->name(), false);
 				
 				$availableModules[$module->name()] = array(					
 						'id' => $model ? $model->id : null,

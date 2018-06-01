@@ -80,42 +80,44 @@ class EntityType {
 	 * @param string $className
 	 * @return static
 	 */
-	public static function findByClassName($className) {
+    public static function findByClassName($className)
+    {
 
-		$e = new static;
+        $e = new static;
 
-		$e->className = $className;
-		$e->name = self::classNameToShortName($className);
+        $e->className = $className;
+        $e->name = self::classNameToShortName($className);
 
-		$record = (new Query)
-						->select('id,moduleId,clientName')
-						->from('core_entity')
-						->where('name', '=', $e->name)
-						->single();
+        $module = Module::findByClass($className);
 
-		if (!$record) {
-			$module = Module::findByClass($className);
-		
-			if(!$module) {
-				throw new \Exception("No module found for ". $className);
-			}
+        if (!$module) {
+            throw new \Exception("No module found for " . $className);
+        }
 
-			$record = [];
-			$record['moduleId'] = isset($module) ? $module->id : null;
-			$record['name'] = $e->name;
-      $record['clientName'] = $className::getClientName();
+        $record = (new Query)
+            ->select('id,moduleId,clientName')
+            ->from('core_entity')
+            ->where('name', '=', $e->name)
+            ->where('moduleId', '=', $module->id)
+            ->single();
 
-			App::get()->getDbConnection()->insert('core_entity', $record)->execute();
+        if (!$record) {
+            $record = [];
+            $record['moduleId'] = isset($module) ? $module->id : null;
+            $record['name'] = $e->name;
+            $record['clientName'] = $className::getClientName();
 
-			$record['id'] = App::get()->getDbConnection()->getPDO()->lastInsertId();
-		}
+            App::get()->getDbConnection()->insert('core_entity', $record)->execute();
 
-		$e->id = $record['id'];
-		$e->moduleId = $record['moduleId'];
-		$e->clientName = $record['clientName'];
-		
-		return $e;
-	}
+            $record['id'] = App::get()->getDbConnection()->getPDO()->lastInsertId();
+        }
+
+        $e->id = $record['id'];
+        $e->moduleId = $record['moduleId'];
+        $e->clientName = $record['clientName'];
+
+        return $e;
+    }
 	
 	/**
 	 * Creates a short name based on the class name.

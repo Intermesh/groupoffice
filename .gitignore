@@ -11,8 +11,8 @@
 /www/promodules
 /tests/data
 /www/go/modules/*
-!/www/modules/community
-!/www/modules/core
+!/www/go/modules/community
+!/www/go/modules/core
 /www/modules/*
 !/www/modules/addressbook
 !/www/modules/sync
