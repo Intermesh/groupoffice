@@ -163,7 +163,7 @@ try {
 		$token->save();
 	}
 
-	if ($token->isAuthenticated()) {    
+	if ($token->isAuthenticated()) {
     $authState = new \go\core\jmap\State();
     $authState->setToken($token);
     $response = $authState->getSession();

@@ -1,0 +1,7 @@
+<?php
+$config['db_name'] = "groupoffice";
+$config['db_host'] = "localhost";
+$config['db_user'] = "groupoffice";
+$config['db_pass'] = "secret";
+$config['file_storage_path'] = "/var/lib/groupoffice";
+$config['debug'] = false;

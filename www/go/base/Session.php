@@ -51,7 +51,7 @@ class Session extends Observable{
 		//In some cases it doesn't make sense to use the session because the client is
 		//not capable. (WebDAV for example).
 		if(!defined("GO_NO_SESSION")){
-			if(!isset($_SESSION)) {
+			if (session_status() == PHP_SESSION_NONE) {
 				
 				if(!headers_sent()) {
 					//without cookie_httponly the cookie can be accessed by malicious scripts 

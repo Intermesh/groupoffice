@@ -168,54 +168,37 @@ namespace go\core {
 			
 			$configFile = $this->findConfigFile();
 			if(!$configFile) {
-				throw new \Exception("No conf.php was found. Possible locations: \n\n".
-								'/etc/groupoffice/multi_instance/' . explode(':', $_SERVER['HTTP_HOST'])[0] . "/conf.php\n\n".
-								dirname(dirname(__DIR__)) . "/conf.php\n\n".
-								"/etc/groupoffice/conf.php"
+				throw new \Exception("No config.php was found. Possible locations: \n\n".
+								'/etc/groupoffice/multi_instance/' . explode(':', $_SERVER['HTTP_HOST'])[0] . "/config.php\n\n".
+								dirname(dirname(__DIR__)) . "/config.php\n\n".
+								"/etc/groupoffice/config.php"
 								);
 			}
 			
-			$conf = require($configFile);
+			require($configFile);	
 			
-			if(!isset($conf['general'])) {			
-				throw new \Exception("The contents of the config.php file are invalid");
+			if(!isset($config)) {
+				throw new \Exception("Invalid config.php contents. No \$config array defined.");
 			}
 			
-			$this->config = $conf;
-			
+			$this->config = [
+					"general" => [
+							"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice', //TODO default should be /var/lib/groupoffice
+							"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
+							"debug" => !empty($config['debug'])
+					],
+					"db" => [
+							"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . ($config['db_name'] ?? "groupoffice-com"),
+							"username" => $config['db_user'] ?? "groupoffice",
+							"password" => $config['db_pass'] ?? ""
+					],
+					"limits" => [
+							"maxUsers" => 0,
+							"storageQuota" => 0,
+							"allowedModules" => ""
+					]
+			];
 			return $this->config;
-
-//			$ini = $this->findConfigFile('config.ini');
-//			if ($ini) {
-//				$this->config = parse_ini_file($ini, true);
-//				return $this->config;
-//			}
-//			if (defined('GO_CONFIG_FILE')) {
-//				$oldConfig = GO_CONFIG_FILE;
-//			} else {
-//				$oldConfig = $this->findConfigFile('config.php');
-//			}
-//
-//			require($oldConfig);
-//
-//			$this->config = [
-//					"general" => [
-//							"dataPath" => $config['file_storage_path'] ?? '/var/lib/groupoffice',
-//							"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
-//							"debug" => !empty($config['debug'])
-//					],
-//					"db" => [
-//							"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . ($config['db_name'] ?? "groupoffice"),
-//							"username" => $config['db_user'] ?? "groupoffice",
-//							"password" => $config['db_pass'] ?? ""
-//					],
-//					"limits" => [
-//							"maxUsers" => 0,
-//							"storageQuota" => 0,
-//							"allowedModules" => ""
-//					]
-//			];
-//			return $this->config;
 		}
 
 		/**
@@ -376,7 +359,7 @@ namespace go\core {
 			return Language::get()->t($str, $package, $module);
 		}
 
-		public static function findConfigFile($name = 'conf.php') {
+		public static function findConfigFile($name = 'config.php') {
 			
 			if(defined("GO_CONFIG_FILE")) {
 				return GO_CONFIG_FILE;
