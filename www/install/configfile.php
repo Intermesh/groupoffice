@@ -84,6 +84,7 @@ if($_SERVER['REQUEST_METHOD'] != 'POST')
 	$config['db_name'] =$_POST['dbName'];
 	$config['db_user'] =$_POST['dbUsername'];
 	$config['db_pass'] =$_POST['dbPassword'];
+	$config['db_port'] =$_POST['dbPort'];
 	
 	$tmpFolder = new \go\core\fs\Folder($config['tmpdir']);
 	$dataFolder = new \go\core\fs\Folder($config['file_storage_path']);
