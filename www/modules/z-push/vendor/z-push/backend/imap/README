@@ -1,0 +1,28 @@
+BackendIMAP - NOTES
+===================
+
+This backend support the Search operation in the mailbox.
+Since the IMAP search operation is pretty slow, with a medium/big mailbox, or with a lots of folders,
+the mobile device will timeout the operation before this is completed on server.
+
+I'm using Dovecot + FTS-SOLR plugin so the real search is done against an Apache SOLR server.
+It reduces a 1-2 minutes search to 1-5 seconds, and the response is given to the mobile device in time.
+
+
+CHANGESSINK
+===========
+It supports ChangesSink method that will detect and send faster changes to your device.
+
+
+SMTP
+====
+You can choice between 3 methods for send mails: mail (php mail), sendmail (native binary), smtp (php smtp direct connection).
+Remember to configure it in the config.php
+
+"mail" is a sendmail wrapper in Linux.
+
+
+MBCONVERT
+=========
+A lot of messages come with wrong encoding, to them to look better with any device you can pre-convert them to UTF-8.
+You will need to install the php-mbstring module

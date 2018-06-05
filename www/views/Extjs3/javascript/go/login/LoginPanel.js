@@ -21,17 +21,22 @@ go.login.LoginPanel = Ext.extend(Ext.Container, {
 			]
 		});
 
-		this.items = [
-			this.languageContainer,
-			{
-				xtype: 'box',
-				id: 'go-powered-by',
-				html: 'Powered by Group-Office <a target="_blank" href="http://www.group-office.com">http://www.group-office.com</a>'
-			},{
-				xtype: 'box',
-				id: "bg"
-			}
-		];
+        var htmlText = 'Powered by ' + t('product_name');
+        if (t('product_name') == 'Group-Office') {
+            htmlText = htmlText + ' <a target="_blank" href="http://www.group-office.com">http://www.group-office.com</a>';
+        }
+
+        this.items = [
+            this.languageContainer,
+            {
+                xtype: 'box',
+                id: 'go-powered-by',
+                html: htmlText
+            },{
+                xtype: 'box',
+                id: "bg"
+            }
+        ];
 		
 		
 		go.login.LoginPanel.superclass.initComponent.call(this);
@@ -46,8 +51,7 @@ go.login.LoginPanel = Ext.extend(Ext.Container, {
 			setTimeout(function () {
 				if (GO.settings.config.debug) {
 					go.notifier.msg({
-						title: t("Warning! Debug mode enabled"), icon: 'warning', description: t("Use $config['debug']=true; only with development and problem solving. It slows Group-Office down."), time: 4000
-					});
+                        title: t("Warning! Debug mode enabled"), icon: 'warning', description: t("Use $config['debug']=true; only with development and problem solving. It slows " + t('product_name') + " down."), time: 4000					});
 				}
 
 				if (GO.settings.config.login_message) {

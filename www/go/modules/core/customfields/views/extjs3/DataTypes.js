@@ -19,7 +19,7 @@
 					idValuePair: true,
 					startBlank: true,
 					forceSelection: true,
-					hiddenName: customfield.dataname,
+					hiddenName: 'customFields.' + customfield.databaseName,
 					name: null,
 					anchor: '-20',
 					valueField: 'cf'
@@ -81,7 +81,7 @@
 					xtype: 'numberfield',
 					decimals: customfield.options.numberDecimals,
 					width: 120,
-					name: customfield.dataname,
+					name: 'customFields.' + customfield.databaseName,
 					anchor: null
 				}, config));
 
@@ -115,7 +115,7 @@
 				var f = GO.customfields.dataTypes.getBaseField(customfield, Ext.apply({
 					xtype: 'combo',
 					fieldLabel: customfield.name,
-					hiddenName: customfield.dataname,
+					hiddenName: 'customFields.' + customfield.databaseName,
 					store: new Ext.data.ArrayStore({
 						storeId: 'binaryStore',
 						idIndex: 0,
@@ -211,7 +211,7 @@
 						valueField: 'text',
 						forceSelection: true,
 						valueDelimiter: '|',
-						hiddenName: customfield.dataname,
+						hiddenName:'customFields.' + customfield.databaseName,
 						anchor: '-20',
 						allowBlank: GO.util.empty(customfield.required),
 						queryDelay: 0,
@@ -274,7 +274,7 @@
 						nestingLevel: parseInt(customfield.options.nestingLevel),
 						xtype: 'combo',
 						store: store,
-						hiddenName: customfield.dataname,
+						hiddenName: 'customFields.' + customfield.databaseName,
 						valueField: 'name_with_id',
 						displayField: 'name',
 						mode: 'remote',
@@ -396,7 +396,7 @@
 						valueField: 'name_with_id',
 						forceSelection: true,
 						valueDelimiter: '|',
-						hiddenName: customfield.dataname,
+						hiddenName: 'customFields.' + customfield.databaseName,
 						anchor: '-20',
 						allowBlank: GO.util.empty(customfield.required),
 						queryDelay: 0,
@@ -427,7 +427,7 @@
 			label: 'Function',
 			getFormField: function (customfield, config) {
 				return new Ext.form.Hidden(Ext.apply({
-					name: customfield.dataname
+					name: 'customFields.' + customfield.databaseName
 				}, config));
 //			return false;
 			}
@@ -462,7 +462,7 @@
 
 			return Ext.apply({
 				xtype: 'textfield',
-				name: customfield.dataname,
+				name: 'customFields.' + customfield.databaseName,
 				fieldLabel: fieldLabel,
 				anchor: '-20',
 				allowBlank: GO.util.empty(customfield.required)
@@ -474,11 +474,11 @@
 				return {
 					anchor: '-20',
 					xtype: 'compositefield',
-					fieldLabel: fieldLabel,
+					fieldLabel: field.fieldLabel,
 					items: [field, {
-							xtype: 'plainfield',
-							value: customfield.suffix,
-							hideLabel: true,
+							xtype: 'label',
+							text: customfield.suffix,
+//							hideLabel: true,
 							columnWidth: '.1'
 						}]
 				};
@@ -554,7 +554,7 @@
 					store: store,
 					valueField: 'id',
 					displayField: 'text',
-					hiddenName: customfield.dataname,
+					hiddenName: 'customFields.' + customfield.databaseName,
 					mode: 'local',
 					editable: false,
 					triggerAction: 'all',
@@ -575,7 +575,7 @@
 				return GO.customfields.dataTypes.applySuffix(customfield, Ext.apply(f, {
 					xtype: 'selectgroup',
 					idValuePair: true,
-					hiddenName: customfield.dataname,
+					hiddenName: 'customFields.' + customfield.databaseName,
 					forceSelection: true,
 					valueField: 'cf',
 					customfieldId: customfield.dataname

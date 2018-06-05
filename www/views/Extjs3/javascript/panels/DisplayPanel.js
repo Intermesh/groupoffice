@@ -58,6 +58,12 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 	editGoDialogId : false,
 
 	loading:false,
+
+	showLinks: true,
+
+	showFiles: true,
+
+	showComments: true,
 	
 	createTopToolbar : function(){
 		
@@ -207,15 +213,21 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 			this.entity = parts[3];
 		}
 		
-		
-		this.add(new go.links.LinksDetailPanel());
-		
+		if (this.showLinks) {
+            this.add(new go.links.LinksDetailPanel());
+		}
+
 		if(go.Modules.isAvailable("community", "files")) {
-			this.add(new go.modules.community.files.FilesDetailPanel());
+			if (this.showFiles) {
+                this.add(new go.modules.community.files.FilesDetailPanel());
+            }
+
 		}
 		
 		if(go.Modules.isAvailable("legacy", "comments") ){
-			this.add(new go.modules.comments.CommentsDetailPanel());
+			if (this.showComments) {
+                this.add(new go.modules.comments.CommentsDetailPanel());
+            }
 		}
 
 		if(!this.expandListenObject){
@@ -230,6 +242,7 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		}, this);
 		
 		this.addEvents({commentAdded:true});
+
 	},
 	
 	modifyTemplate : function(){
@@ -245,7 +258,11 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		if(tbar)
 			tbar.setDisabled(true);
 		
-		this.reset();
+		
+		this.items.each(function (item, index, length) {
+			item.hide();
+		}, this);
+		
 
 		if(this.editGoDialogId){
 			GO.dialogListeners.add(this.editGoDialogId,{
@@ -287,6 +304,7 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 	},
 	
 	reset : function(){
+		
 		if(this.body)
 			this.body.update("");		
 

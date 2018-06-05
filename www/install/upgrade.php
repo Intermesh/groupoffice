@@ -1,25 +1,34 @@
 <?php
 
+if(is_dir("/etc/groupoffice/" . $_SERVER['HTTP_HOST'])) {	
+	echo "Please move all your domain configuration fßolders from /etc/groupoffice/* into /etc/groupoffice/multi_instance/*. Only move folders, leave /etc/groupoffice/config.php and other files where they are.";
+	exit();
+}
+
+
 use GO\Base\Observable;
 use go\core\App;
 use go\core\Environment;
 use go\core\module\model\Module;
 use go\core\util\Lock;
 
-require('../vendor/autoload.php');
-
-App::get();
-
-$lock = new Lock("upgrade");
-if (!$lock->lock()) {
-	exit("Upgrade is already in progress");
-}
-header("Content-Type: text/plain; charset=utf8");
-
-GO()->getCache()->flush(false);
-GO()->setCache(new \go\core\cache\None());
 
 try {
+	
+	require('../vendor/autoload.php');
+	
+	echo "<pre>";
+
+	
+	App::get();
+
+	$lock = new Lock("upgrade");
+	if (!$lock->lock()) {
+		exit("Upgrade is already in progress");
+	}
+	
+	GO()->getCache()->flush(false);
+	GO()->setCache(new \go\core\cache\None());
 	
 	if (!GO()->getDatabase()->hasTable("core_module")) {
 		//todo: verify this is a valid 6.2 database
@@ -29,7 +38,6 @@ try {
 //don't be strict
 	GO()->getDbConnection()->query("SET sql_mode=''");
 
-	
 
 	function upgrade() {
 		echo "Upgrading Group-Office\n";
@@ -38,7 +46,6 @@ try {
 		$u = [];
 
 		$modules = Module::find()->all();
-
 		$root = Environment::get()->getInstallFolder();
 
 		$modulesById = [];
@@ -111,7 +118,7 @@ try {
 					} else if (substr($query, 0, 7) == 'script:') {
 						$updateScript = $root->getFile('modules/' . $module->name . '/install/updatescripts/' . substr($query, 7));
 
-						if ($updateScript->exists()) {
+						if (!$updateScript->exists()) {
 							die($updateScript . ' not found!');
 						}
 
@@ -184,14 +191,15 @@ try {
 
 		return !$aModuleWasUpgradedToNewBackend;
 	}
-
+	
+	
 	if (!upgrade()) {
 		echo "\n\nA module was refactored. Rerunning...\n\n";
 		upgrade();
 	}
 
 
-	echo "Flusing cache\n";
+	echo "Flushing cache\n";
 	GO::clearCache(); //legacy
 	App::get()->getCache()->flush(false);
 	App::get()->getDataFolder()->getFolder('clientscripts')->delete();
@@ -199,8 +207,15 @@ try {
 
 	echo "Rebuilding listeners\n";
 	Observable::cacheListeners();
+	
+	App::get()->getSettings()->databaseVersion = App::get()->getVersion();
+	App::get()->getSettings()->save();
 
 	echo "Done!\n";
+	
+	echo "</pre>";
+	
+	echo '<a href="../">Continue</a>';
 } catch (\Exception $e) {
 	echo (string) $e;
 }

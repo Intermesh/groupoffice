@@ -14,12 +14,6 @@ $updates["201803161130"][] = function() {
 		return;
 	}
 	
-	$iniFile = substr($configFile, 0, -3).'ini';		
-
-	if(file_exists($iniFile)) {
-		echo "INI file already exists so skipping conversion\n";
-		return;
-	}
 
 	$globalConfig = [];
 	if (file_exists('/etc/groupoffice/globalconfig.inc.php')) {
@@ -91,37 +85,6 @@ $updates["201803161130"][] = function() {
 		$stmt->execute();
 	}
 
-
-	$iniData = [
-			"general" => [
-					"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice',
-					"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
-					"debug" => !empty($config['debug'])
-			],
-			"db" => [
-					"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';dbname=' . ($config['db_name'] ?? "groupoffice"),
-					"username" => $config['db_user'] ?? "groupoffice",
-					"password" => $config['db_pass'] ?? ""
-			],
-			"limits" => [
-					"maxUsers" => $config['max_users'] ?? 0,
-					"storageQuota" => $config['quota'] ?? 0,
-					"allowedModules" => $config['allowed_modules'] ?? ""
-			]
-	];
-
-	$file = new IniFile();
-	$file->readData($iniData);
-
-
-	if (!is_writable($iniFile)) {
-		echo "Can't write to INI file " . $iniFile . ". Please create it with the following content and rerun the upgrade: \n\n";
-		$file->update(['db' => ['password' => '[YOURPASSWORDHERE]']]);
-		echo (string) $file;
-		exit();
-	} else {
-		$file->write($iniFile);
-	}
 };
 
 
@@ -154,6 +117,7 @@ ADD CONSTRAINT `fk_user_avatar_id`
 
 
 $updates["201804261506"][] ="ALTER TABLE `core_auth_token` ADD `lastActiveAt` DATETIME NOT NULL AFTER `expiresAt`;";
+
 $updates["201805031611"][] ="ALTER TABLE `core_blob` CHANGE COLUMN `type` `contentType` VARCHAR(129) NOT NULL ;";
 
 $updates["201805161121"][] ="CREATE TABLE `core_blob_metadata` (
@@ -182,3 +146,9 @@ $updates["201805161121"][] ="CREATE TABLE `core_blob_metadata` (
     REFERENCES `core_blob` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION);";
+
+$updates["201805311636"][] ="ALTER TABLE `core_entity` ADD UNIQUE( `clientName`);";
+$updates["201805311636"][] ="ALTER TABLE `core_entity` DROP INDEX `name`, ADD UNIQUE `name` (`name`, `moduleId`) USING BTREE;";
+$updates["201805311636"][] ="ALTER TABLE `core_entity` DROP INDEX `model_name`;";
+$updates["201805311636"][] ="ALTER TABLE `core_entity` ADD UNIQUE( `moduleId`, `name`);";
+

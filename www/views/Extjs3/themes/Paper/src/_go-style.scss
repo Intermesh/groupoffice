@@ -729,6 +729,14 @@ button.filetype-pdf, button.filetype-doc {
 	//background-color: color($grey, 100);
 }
 
+
+.x-tool-toggle {
+	float: left;
+	margin-left: dp(-10);
+	margin-right: dp(14);
+}
+
+
 /*%hyperlink {
 	color: color($primary, 700);
 	text-decoration: none;
@@ -783,7 +791,7 @@ button.filetype-pdf, button.filetype-doc {
 		  padding-top: (9 / 16) * 100%;
 		}
 	}
-	.x-tool { margin-top: dp(3);}
+	/*.x-tool { margin-top: dp(3);}*/
 
 	h3{
 		@extend %font-title;

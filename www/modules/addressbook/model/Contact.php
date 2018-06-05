@@ -160,7 +160,7 @@ class Contact extends \GO\Base\Db\ActiveRecord {
 	public function defaultAttributes() {
 		
 		$ab = false;
-		if(\GO::user()){
+		if(\GO::user() && \GO::user()->contact){
 			$ab = Addressbook::model()->getDefault(\GO::user());
 		}
 		

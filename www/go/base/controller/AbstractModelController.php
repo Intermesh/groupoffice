@@ -200,9 +200,12 @@ class AbstractModelController extends AbstractController {
 		$response['data']['write_permission']=true;
 			
 		
-		//todo custom fields should be in a subarray.
 		if(\GO::user()->getModulePermissionLevel('customfields') && $model->customfieldsRecord)
-			$response['data'] = array_merge($response['data'], $model->customfieldsRecord->getAttributes());	
+		{
+			foreach($model->customfieldsRecord->getAttributes() as $key => $value) {
+				$response['data']['customFields.'.$key] = $value;
+			}
+		}
 						
 		$response['success'] = true;
 
@@ -632,6 +635,8 @@ class AbstractModelController extends AbstractController {
 				);				
 			}
 		}
+		//for new panels
+		$response['data']['customFields'] = $customAttributes;
 
 		foreach($categories as $category){
 			if(count($category['fields']))

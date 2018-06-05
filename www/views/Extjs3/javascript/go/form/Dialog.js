@@ -30,7 +30,12 @@ go.form.Dialog = Ext.extend(go.Window, {
 
 		go.form.Dialog.superclass.initComponent.call(this);
 		
-//		this.entityStore.on('changes',this.onChanges, this);
+
+		this.entityStore.on('changes',this.onChanges, this);
+		
+		this.on("destroy", function() {
+			this.entityStore.un("changes", this.onChanges, this);
+		})
 
 		if (this.formValues) {
 			this.formPanel.form.setValues(this.formValues);
@@ -44,6 +49,10 @@ go.form.Dialog = Ext.extend(go.Window, {
 		var entities = this.entityStore.get([id]);
 		
 		if(entities) {
+			if(!this.rendered) {
+				//otherwise form field initValue is called after form is loaded.
+				this.render(Ext.getBody());
+			}
 			this.formPanel.getForm().setValues(entities[0]);
 			this.deleteBtn.setDisabled(entities[0].permissionLevel < GO.permissionLevels.writeAndDelete);
 		
