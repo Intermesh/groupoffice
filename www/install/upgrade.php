@@ -5,26 +5,30 @@ if(is_dir("/etc/groupoffice/" . $_SERVER['HTTP_HOST'])) {
 	exit();
 }
 
+
 use GO\Base\Observable;
 use go\core\App;
 use go\core\Environment;
 use go\core\module\model\Module;
 use go\core\util\Lock;
 
-require('../vendor/autoload.php');
-
-App::get();
-
-$lock = new Lock("upgrade");
-if (!$lock->lock()) {
-	exit("Upgrade is already in progress");
-}
-
-echo "<pre>";
-GO()->getCache()->flush(false);
-GO()->setCache(new \go\core\cache\None());
 
 try {
+	
+	require('../vendor/autoload.php');
+	
+	echo "<pre>";
+	
+	
+	App::get();
+
+	$lock = new Lock("upgrade");
+	if (!$lock->lock()) {
+		exit("Upgrade is already in progress");
+	}
+	
+	GO()->getCache()->flush(false);
+	GO()->setCache(new \go\core\cache\None());
 	
 	if (!GO()->getDatabase()->hasTable("core_module")) {
 		//todo: verify this is a valid 6.2 database
@@ -196,7 +200,7 @@ try {
 	}
 
 
-	echo "Flusing cache\n";
+	echo "Flushing cache\n";
 	GO::clearCache(); //legacy
 	App::get()->getCache()->flush(false);
 	App::get()->getDataFolder()->getFolder('clientscripts')->delete();

@@ -9,39 +9,32 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 			items:[
 			this.sortBySendMailTime = new Ext.form.Checkbox({
 				boxLabel:t("Sort recipient addresses by time of last email sending (requires Address Book module)", "email"),
-				hideLabel:true,
-				checked:GO.email.sortBySendMailTime,
+				hideLabel:true,				
 				name:'emailSettings.sort_email_addresses_by_time'
 			}),
 			this.useHtml = new Ext.form.Checkbox({
 				boxLabel:t("Use HTML markup", "email"),
-				hideLabel:true,
-				checked:GO.email.useHtmlMarkup,
+				hideLabel:true,				
 				name:'emailSettings.use_html_markup'
 			}),this.showCC = new Ext.form.Checkbox({
 				boxLabel:t("Show CC field by default", "email"),
 				hideLabel:true,
-				checked:GO.email.showCCfield,
-				name:'emailSettings.email_show_cc'
+				name:'emailSettings.show_cc'
 			}),this.showBCC = new Ext.form.Checkbox({
 				boxLabel:t("Show BCC field by default", "email"),
 				hideLabel:true,
-				checked:GO.email.showBCCfield,
-				name:'emailSettings.email_show_bcc'
+				name:'emailSettings.show_bcc'
 			}),this.skipUnknownRecipients = new Ext.form.Checkbox({
 				boxLabel:t("Don't show unknown recipients dialog", "email"),
-				hideLabel:true,
-				checked:GO.email.skipUnknownRecipients,
+				hideLabel:true,				
 				name:'emailSettings.skip_unknown_recipients'
 			}),this.alwaysRequestNotification = new Ext.form.Checkbox({
 				boxLabel:t("Always request a read notification", "email"),
-				hideLabel:true,
-				checked:GO.email.alwaysRequestNotification,
+				hideLabel:true,				
 				name:'emailSettings.always_request_notification'
 			}),this.alwaysRespondToNotifications = new Ext.form.Checkbox({
 				boxLabel:t("Always respond to a read notification", "email"),
-				hideLabel:true,
-				checked:GO.email.alwaysRespondToNotifications,
+				hideLabel:true,				
 				name:'emailSettings.always_respond_to_notifications'
 			}),this.fontSize = new GO.form.ComboBox({
 				fieldLabel:t("Default font size", "email"),

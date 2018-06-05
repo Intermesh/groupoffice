@@ -165,28 +165,30 @@ namespace go\core {
 			if (isset($this->config)) {
 				return $this->config;
 			}
-
-			$ini = $this->findConfigFile('config.ini');
-			if ($ini) {
-				$this->config = parse_ini_file($ini, true);
-				return $this->config;
+			
+			$configFile = $this->findConfigFile();
+			if(!$configFile) {
+				throw new \Exception("No config.php was found. Possible locations: \n\n".
+								'/etc/groupoffice/multi_instance/' . explode(':', $_SERVER['HTTP_HOST'])[0] . "/config.php\n\n".
+								dirname(dirname(__DIR__)) . "/config.php\n\n".
+								"/etc/groupoffice/config.php"
+								);
 			}
-			if (defined('GO_CONFIG_FILE')) {
-				$oldConfig = GO_CONFIG_FILE;
-			} else {
-				$oldConfig = $this->findConfigFile('config.php');
+			
+			require($configFile);	
+			
+			if(!isset($config)) {
+				throw new \Exception("Invalid config.php contents. No \$config array defined.");
 			}
-
-			require($oldConfig);
-
+			
 			$this->config = [
 					"general" => [
-							"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice',
+							"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice', //TODO default should be /var/lib/groupoffice
 							"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
 							"debug" => !empty($config['debug'])
 					],
 					"db" => [
-							"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . ($config['db_name'] ?? "groupoffice"),
+							"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . ($config['db_name'] ?? "groupoffice-com"),
 							"username" => $config['db_user'] ?? "groupoffice",
 							"password" => $config['db_pass'] ?? ""
 					],
@@ -357,31 +359,22 @@ namespace go\core {
 			return Language::get()->t($str, $package, $module);
 		}
 
-		public static function findConfigFile($name = 'config.ini') {
-
-			$count = 0;
-			$workingDir = __DIR__;
-
-			while ($count != 10) {
-				$count++;
-				$workingFile = $workingDir . '/' . $name;
-				if (file_exists($workingFile)) {
-					return $workingFile;
-				}
-
-				$workingDir = dirname($workingDir);
-
-				if ($count == 10 || dirname($workingDir) == $workingDir) {
-					//hit max of 10 or root of filesystem
-					break;
-				}
+		public static function findConfigFile($name = 'config.php') {
+			
+			if(defined("GO_CONFIG_FILE")) {
+				return GO_CONFIG_FILE;
 			}
 
 			if (!empty($_SERVER['HTTP_HOST'])) {
-				$workingFile = '/etc/groupoffice/multi_instance/' . $_SERVER['HTTP_HOST'] . '/' . $name;
+				$workingFile = '/etc/groupoffice/multi_instance/' . explode(':', $_SERVER['HTTP_HOST'])[0] . '/' . $name;
 				if (file_exists($workingFile)) {
 					return $workingFile;
 				}
+			}
+			
+			$workingFile = dirname(dirname(__DIR__)) . '/' . $name;
+			if (file_exists($workingFile)) {
+				return $workingFile;
 			}
 
 			$workingFile = '/etc/groupoffice/' . $name;

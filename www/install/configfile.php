@@ -18,7 +18,8 @@ function dbConnect($config){
 		return $pdo;
 	}
 	try{		
-		$pdo = new PDO($config['db']['dsn'], $config['db']['username'], $config['db']['password']);		
+		$dsn = 'mysql:host=' . $config['db_host'] . ';port=' . $config['db_port'] . ';dbname=' . $config['db_name'];
+		$pdo = new PDO($dsn, $config['db_user'], $config['db_pass']);		
 	}
 	catch(Exception $e){
 		$dbConnectError = "Could not connect to the database. The database returned this error:<br />".$e->getMessage();
@@ -38,75 +39,61 @@ function dbIsEmpty($config) {
 }
 
 $configFile = App::findConfigFile();
-
 if(!$configFile) {
-  $configFile = '/etc/groupoffice/config.ini';
-}
-
-if(file_exists($configFile)) {
-	$config = parse_ini_file($configFile, true);	
-
-	if(!isset($config['db'])) {
-		$config = [
-					"general" => [
-							"dataPath" => '/var/lib/groupoffice',
-							"tmpPath" =>  sys_get_temp_dir() . '/groupoffice',
-							"debug" => false
-					],
-					"db" => [
-							"dsn" => 'mysql:host=localhost;port=3306;dbname=groupoffice',
-							"username" => 'groupoffice',
-							"password" => ""
-					],
-					"limits" => [
-							"maxUsers" => 0,
-							"storageQuota" => 0,
-							"allowedModules" => ""
-					]
-			];
-	} else if($_SERVER['REQUEST_METHOD'] != 'POST')
-  {
-		
-		
-		//check if config.ini is already prefilled with usable data (Docker)
-		$tmpFolder = new \go\core\fs\Folder($config['general']['tmpPath']);
-		$dataFolder = new \go\core\fs\Folder($config['general']['dataPath']);
-		if(dbConnect($config) && dbIsEmpty($config) && $dataFolder->isWritable() && $tmpFolder->isWritable()) {
-			header("Location: install.php");
-			exit();
-		}
-		
-		
-    $dsn = \go\core\db\Utils::parseDSN($config['db']['dsn']);
-    
-    
-    $_POST['dbPort'] = $dsn['options']['port'];
-    $_POST['dbHostname'] = $dsn['options']['host'];
-    $_POST['dbName'] = $dsn['options']['dbname'];
-    
-    $_POST['dbUsername'] = $config['db']['username'];
-    //$_POST['dbPassword'] = $config['db']['password'];
-  }
+  $configFile = '/etc/groupoffice/config.php';
+} else
+{
+	require($configFile);
 }
 
 
 
-if($_SERVER['REQUEST_METHOD'] == 'POST') {
-	$config['general']['dataPath'] = $_POST['dataPath'];
-	$config['general']['tmpPath'] = $_POST['tmpPath'];
-	$config['db']['dsn'] = 'mysql:host='.$_POST['dbHostname'].';port='.$_POST['dbPort'].';dbname='.$_POST['dbName'];
-	$config['db']['username'] = $_POST['dbUsername'];
-	$config['db']['password'] = $_POST['dbPassword'];
 
+if($_SERVER['REQUEST_METHOD'] != 'POST')
+{
+	
+	$config['file_storage_path'] = $config['file_storage_path'] ?? "/var/lib/groupoffice";
+	$config['tmpdir'] = $config['tmpdir'] ?? "/tmp/groupoffice";
+	
+	//check if config.ini is already prefilled with usable data (Docker)
+	$tmpFolder = new \go\core\fs\Folder($config['tmpdir']);
+	$dataFolder = new \go\core\fs\Folder($config['file_storage_path']);
+	
+	if(dbConnect($config) && dbIsEmpty($config) && $dataFolder->isWritable() && $tmpFolder->isWritable()) {
+		header("Location: install.php");
+		exit();
+	}
 
-	$tmpFolder = new \go\core\fs\Folder($config['general']['tmpPath']);
-	$dataFolder = new \go\core\fs\Folder($config['general']['dataPath']);
+	$_POST['dbPort'] = $config['db_port'] ?? 3306;
+	$_POST['dbHostname'] = $config['db_host'] ?? 'localhost';
+	$_POST['dbName'] = $config['db_name'] ?? "groupoffice";
+
+	$_POST['dbUsername'] = $config['db_user'] ?? "groupoffice";
+	//$_POST['dbPassword'] = $config['db']['password'];
+} else 
+{
+//	$config['general']['dataPath'] = $_POST['dataPath'];
+//	$config['general']['tmpPath'] = $_POST['tmpPath'];
+//	$config['db']['dsn'] = 'mysql:host='.$_POST['dbHostname'].';port='.$_POST['dbPort'].';dbname='.$_POST['dbName'];
+//	$config['db']['username'] = $_POST['dbUsername'];
+//	$config['db']['password'] = $_POST['dbPassword'];
+	
+	$config['file_storage_path'] = $_POST['dataPath'];
+	$config['tmpdir'] = $_POST['tmpPath'];
+	$config['db_host'] =$_POST['dbHostname'];
+	$config['db_name'] =$_POST['dbName'];
+	$config['db_user'] =$_POST['dbUsername'];
+	$config['db_pass'] =$_POST['dbPassword'];
+	$config['db_port'] =$_POST['dbPort'];
+	
+	$tmpFolder = new \go\core\fs\Folder($config['tmpdir']);
+	$dataFolder = new \go\core\fs\Folder($config['file_storage_path']);
 	
 
 	if($dataFolder->isWritable() && $tmpFolder->isWritable() && dbConnect($config) && dbIsEmpty($config)) {
-		$ini = new IniFile();
-		$ini->readData($config);
-		if(!$ini->write($configFile)) {
+		$cFile = new \go\core\fs\File($configFile);
+		
+		if(!$cFile->putContents("<?php\n\n\$config = ".var_export($config, true) .";\n\n")) {
 			die("Could not write INI");
 		} else
 		{
@@ -127,7 +114,7 @@ require('header.php');
 		<section>
 			<fieldset>
 				<h2>Create config file</h2>
-				<p>Please create a writeable config.ini file here: <?= $configFile; ?>.</p>
+				<p>Please create a writeable config.php file here: <?= $configFile; ?>.</p>
 			</fieldset>
 		</section>
 		
@@ -152,7 +139,7 @@ require('header.php');
 				?>
 				
 				<p>
-					<input type="text" name="dataPath" value="<?=$config['general']['dataPath']?>" placeholder="" required />
+					<input type="text" name="dataPath" value="<?=$config['file_storage_path']?>" placeholder="" required />
 					<label>Data folder</label>
 				</p>
 				
@@ -163,7 +150,7 @@ require('header.php');
 				}
 				?>
 				<p>
-					<input type="text" name="tmpPath" value="<?=$config['general']['tmpPath'];?>" placeholder="Temp folder" required />
+					<input type="text" name="tmpPath" value="<?=$config['tmpdir'];?>" placeholder="Temp folder" required />
 					<label>Temp folder</label>
 				</p>
 			</fieldset>

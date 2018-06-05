@@ -1,6 +1,18 @@
 (function () {
 	var CustomFieldsCls = Ext.extend(Ext.util.Observable, {
-		
+		init : function() {
+			go.Stores.get("Field").getUpdates(function (store) {
+				go.CustomFields.fieldsLoaded = true;
+				go.CustomFields.fireReady();
+	//		console.log(go.Stores.get("Field"));
+			});
+
+			go.Stores.get("FieldSet").getUpdates(function (store) {
+	//		console.log(go.Stores.get("FieldSet"));
+				go.CustomFields.fieldSetsLoaded = true;
+				go.CustomFields.fireReady();
+			});
+		},
 		/**
 		 * Get field set entitiues
 		 * @param {string} entity eg. "note"
@@ -124,7 +136,7 @@
 		 * @param {go.core.DetailView} detailView
 		 * @returns {void}
 		 */
-		addDetailPanels: function (detailView) {
+		addDetailPanels: function (detailView) {			
 
 			go.CustomFields.onReady(function () {
 				
@@ -172,6 +184,10 @@
 		 * @returns {undefined}
 		 */
 		onReady: function (fn, scope) {
+			if(!this.initizalized) {
+				this.initialized = true;
+				this.init();
+			}
 			if (!this.fieldSetsLoaded || !this.fieldsLoaded) {
 				this.on('internalready', fn, scope || this);
 			} else {
