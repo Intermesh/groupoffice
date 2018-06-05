@@ -104,7 +104,11 @@ GO.query.CriteriaFormPanel = Ext.extend(Ext.form.FormPanel , {
 		
 		var formValues = this.getForm( ).getFieldValues()
 		if(typeof formValues.value == "undefined" && typeof this.currentValueEditor != "undefined") {
-			formValues.value = this.currentValueEditor.getValue();
+			formValues.value = this.currentValueEditor.getValue();			
+		}
+		
+		if(Ext.isDate(formValues.value)) {
+			formValues.value = formValues.value.format(GO.settings.date_format);
 		}
 		
 		return formValues;

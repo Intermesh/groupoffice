@@ -262,8 +262,8 @@ abstract class EntityController extends ReadOnlyEntityController {
 		}
 		
 		$acls = $cls::findAcls();		
-		if($acls && (Acl::findGrantedSince(App::get()->getAuthState()->getUser()->id, $p['sinceState'], $acls)->limit(1)->execute()->fetch() ||
-			Acl::findRevokedSince(App::get()->getAuthState()->getUser()->id, $p['sinceState'], $acls)->limit(1)->execute()->fetch())) {
+		if($acls && (Acl::findGrantedSince(App::get()->getAuthState()->getUserId(), $p['sinceState'], $acls)->limit(1)->execute()->fetch() ||
+			Acl::findRevokedSince(App::get()->getAuthState()->getUserId(), $p['sinceState'], $acls)->limit(1)->execute()->fetch())) {
 			throw new CannotCalculateChanges();
 		}			
 

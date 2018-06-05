@@ -397,7 +397,7 @@ class User extends Entity {
 	
 
 	public function hasPermissionLevel($level = Acl::LEVEL_READ) {
-		return $this->id == App::get()->getAuthState()->getUser()->id || App::get()->getAuthState()->getUser()->isAdmin();
+		return $this->id == App::get()->getAuthState()->getUserId() || App::get()->getAuthState()->getUser()->isAdmin();
 	}
 	
 	public static function filter(Query $query, array $filter) {

@@ -33,7 +33,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 		go.form.Dialog.superclass.initComponent.call(this);
 		
 		this.entityStore.on('changes',this.onChanges, this);
-		
+
 		this.on('destroy', function() {
 			this.entityStore.un('changes', this.onChanges, this);
 		}, this);
@@ -58,7 +58,6 @@ go.form.Dialog = Ext.extend(go.Window, {
 	onChanges : function(entityStore, added, changed, destroyed) {
 		
 		if(changed.concat(added).indexOf(this.currentId) !== -1) {
-			this.deleteBtn.setDisabled(false);
 			this.actionComplete();
 		}		
 	},
@@ -93,7 +92,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 			this.getTopToolbar().setDisabled(false);
 		}
 		if (this.getFooterToolbar()) {
-			this.getFooterToolbar().setDisabled(false);
+			this.getFooterToolbar().setDisabled(false);	
 		}
 	},
 	

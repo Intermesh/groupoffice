@@ -119,7 +119,7 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 						this.setVisible(!!dv.data.company_name);
 					},
 					title: t('Company details', 'addressbook'),
-					tpl: '<p class="pad"><a href="#addressbook/company/{company_id}">{company_name}</a></p>\
+					tpl: '<p class="pad"><a href="#company/{company_id}">{company_name}</a></p>\
 					<tpl if="company_name2"><h5 class="pad">{company_name2}</h5></tpl>\
 					<div class="icons">\
 						<tpl if="company_formatted_address">\
@@ -164,6 +164,8 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 			]});
 
 		GO.addressbook.ContactDetail.superclass.initComponent.call(this, arguments);
+		
+		go.CustomFields.addDetailPanels(this);
 
 		this.add(new go.links.LinksDetailPanel());
 

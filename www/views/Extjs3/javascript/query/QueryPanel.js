@@ -134,7 +134,7 @@ GO.query.QueryPanel = Ext.extend(Ext.Panel , {
 			gotype: record.get('gotype'),
 			rawValue: record.get('rawValue'),
 			rawFieldLabel: record.get('rawFieldLabel')
-		}
+		};
 		
 		criteriaPanel.setValues(values);
 		
@@ -159,9 +159,9 @@ GO.query.QueryPanel = Ext.extend(Ext.Panel , {
 	
 	getData : function(dirtyOnly){
 		
-		var data = []
+		var data = [];
 		this.criteriaStore.each(function(rec) {
-			data.push(rec.data)
+			data.push(rec.data);
 		});
 		
 		return data;

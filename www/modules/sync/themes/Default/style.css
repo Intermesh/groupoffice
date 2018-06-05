@@ -1,0 +1,7 @@
+.go-module-icon-sync , .go-menu-icon-sync {
+	background:url('images/sync.png');
+}
+
+.go-tab-icon-sync {
+	background-image: none !important;
+}

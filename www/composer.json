@@ -1,5 +1,5 @@
 {
-	"name": "intermesh/group-office-6",
+	"name": "intermesh/groupoffice",
 	"description": "Group-Office",
 	"require": {
 		"php": ">=7.0.0",

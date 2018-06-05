@@ -188,6 +188,32 @@ GO.addressbook.MainPanel = function(config) {
 					},
 					scope:this
 				}
+        },{
+            iconCls: 'ic-more-vert',
+            menu: [
+                {
+                    iconCls: "ic-settings",
+                    text: t("Settings"),
+                    handler: function () {
+                        var dlg = new GO.addressbook.ManageDialog();
+                        dlg.show();
+                    },
+                    scope: this
+                }
+                , {
+                    iconCls: 'ic-merge-type',
+                    text: t("Newsletters"),
+                    handler: function () {
+                        if(!this.mailingStatusWindow)
+                        {
+                            this.mailingStatusWindow = new GO.addressbook.MailingStatusWindow();
+                        }
+                        return this.mailingStatusWindow.show();
+                    },
+                    scope: this,
+                }
+
+            ]
 			}
 			
 		],
@@ -571,9 +597,11 @@ Ext.extend(GO.addressbook.MainPanel, Ext.Panel,{
 
 		GO.dialogListeners.add('contact',{
 			scope:this,
-			'save':function(){
+			save:function(){
+
 				var panel = this.tabPanel.getActiveTab();
-				if(panel.id=='ab-contacts-grid')
+				console.log(panel.id);
+				if(panel.id=='ab-contacts')
 				{
 					this.contactsGrid.store.reload();
 				}
@@ -582,9 +610,10 @@ Ext.extend(GO.addressbook.MainPanel, Ext.Panel,{
 
 		GO.dialogListeners.add('company',{
 			scope:this,
-			'save':function(){
+			save:function(){
 				var panel = this.tabPanel.getActiveTab();
-				if(panel.id=='ab-company-grid')
+				console.log(panel.id);
+				if(panel.id=='ab-companies')
 				{
 					this.companiesGrid.store.reload();
 				}

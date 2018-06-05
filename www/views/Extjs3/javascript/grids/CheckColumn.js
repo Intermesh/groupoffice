@@ -74,3 +74,4 @@ GO.grid.CheckColumn = Ext.extend(Ext.grid.Column, {
 	// Deprecate use as a plugin. Remove in 4.0
 	init: Ext.emptyFn
 });
+

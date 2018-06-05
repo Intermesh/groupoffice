@@ -143,6 +143,14 @@ class State extends AbstractState {
 	}
 	
 	/**
+	 * Get the user ID
+	 * @return int
+	 */
+	public function getUserId() {
+		return $this->getToken() ? $this->getToken()->userId : null;
+	}
+	
+	/**
 	 * 
 	 * @return User
 	 */

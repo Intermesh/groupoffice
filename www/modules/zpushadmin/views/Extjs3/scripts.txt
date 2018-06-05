@@ -1,0 +1,6 @@
+modules/zpushadmin/views/Extjs3/SettingsDialog.js
+modules/zpushadmin/views/Extjs3/Stores.js
+modules/zpushadmin/views/Extjs3/DeviceDialog.js
+modules/zpushadmin/views/Extjs3/DevicePanel.js
+modules/zpushadmin/views/Extjs3/DevicesGrid.js
+modules/zpushadmin/views/Extjs3/MainPanel.js

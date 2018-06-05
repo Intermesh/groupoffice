@@ -9,6 +9,10 @@ class FunctionField extends AbstractCustomfieldtype {
 	public function name() {
 		return 'Function';
 	}
+	
+	public function fieldSql() {
+		return "DOUBLE NULL";
+	}
 
 //	public function formatFormOutput($column, &$attributes, \GO\Customfields\Model\AbstractCustomFieldsRecord $model) {
 //		$result_string = '';
@@ -58,8 +62,8 @@ class FunctionField extends AbstractCustomfieldtype {
 	public function formatFormInput($key, &$attributes, \GO\Customfields\Model\AbstractCustomFieldsRecord $model){
 		$result_string = '';
 
-		if (!empty($this->field->function)) {
-			$f = $this->field->function;
+		$f = $this->field->getOption("function");
+		if (!empty($f)) {
 			foreach ($attributes as $key=>$value) {
 				
 					$f = str_replace('{' . $key . '}', floatval(\GO\Base\Util\Number::unlocalize($value)), $f);
@@ -79,7 +83,7 @@ class FunctionField extends AbstractCustomfieldtype {
 			}			
 		}
 
-		$attributes[$key] = \GO\Base\Util\Number::localize($result_string);
+		$attributes[$key] = $result_string;
 		return $attributes[$key];
 	}
 

@@ -1461,7 +1461,9 @@ var $billing_clear_payment_method_on_duplicate = true;
 
 		//$config['webmaster_email'] = (new \go\core\db\Query())->selectSingleValue('email')->from('core_user')->where('id=1')->single();
 		
-		$config['host'] = trim(dirname($_SERVER['PHP_SELF']), '/') . '/';
+		$config['host'] = trim(dirname($_SERVER['PHP_SELF']), '/');
+		$config['host'] = empty($config['host']) ? '/' : '/' . $config['host'] . '/';
+		
 		$config['debug'] = !empty($data['general']['debug']);
 		
 		if(isset($data['limits'])) {
@@ -1642,7 +1644,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 		
 		$this->login_message = GO()->getSettings()->loginMessage;
 		
-		$this->full_url = GO()->getSettings()->URL;
+		$this->full_url = rtrim(GO()->getSettings()->URL, '/') . '/';
 	}
 
 

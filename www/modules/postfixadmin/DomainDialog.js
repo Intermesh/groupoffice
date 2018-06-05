@@ -74,7 +74,59 @@ GO.postfixadmin.DomainDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 	enableApplyButton: false,
 	
 	initComponent : function(){
+		
+		
+		var buttons = [];
+	
+		buttons.push(this.buttonExport = new Ext.Button({
+			text: GO.lang['cmdExport'],
+			handler: function(){
+				var domainExportDialog = new GO.postfixadmin.DomainExportDialog();
+
+				var data = {
+					remoteModelId:this.remoteModelId,
+					domain:this.loadData.domain
+				};
+
+				domainExportDialog.show(data);
+			},
+			scope:this
+		}));
+		
+			buttons.push('->');
+		
+		// These three buttons are enabled by default.
+		if (this.enableOkButton)
+			buttons.push(this.buttonOk = new Ext.Button({
+				text: GO.lang['cmdOk'],
+				handler: function(){
+					this.submitForm(true);
+				},
+				scope: this
+			}));
+		if (this.enableApplyButton)
+			buttons.push(this.buttonApply = new Ext.Button({
+				text: GO.lang['cmdApply'],
+				handler: function(){
+					this.submitForm();
+				},
+				scope:this
+			}));
+		if (this.enableCloseButton)
+			buttons.push(this.buttonClose = new Ext.Button({
+				text: GO.lang['cmdClose'],
+				handler: function(){
+					this.hide();
+				},
+				scope:this
+			}));
+		
+		Ext.applyIf(this, {
+			buttons: buttons
+		});
+
 		Ext.apply(this, {
+			buttonAlign:'left',
 			titleField:'domain',
 			title: t("Domain", "postfixadmin"),
 			formControllerUrl: 'postfixadmin/domain',
@@ -94,6 +146,13 @@ GO.postfixadmin.DomainDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 	},
 	
 	afterLoad : function(remoteModelId, config, action){
+		
+		if(action.result.data.permission_level >= GO.permissionLevels.write) {
+			this.buttonExport.setVisible(true);
+		} else {
+			this.buttonExport.setVisible(false);
+		}
+		
 //			GO.postfixadmin.defaultQuota = action.result.data.quota;
 //			GO.postfixadmin.domain=action.result.data.domain;
 		this.setBackupMX(action.result.data.backupmx=='1');

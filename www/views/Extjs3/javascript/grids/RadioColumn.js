@@ -116,3 +116,4 @@ Ext.extend(GO.grid.RadioColumn, Ext.grid.Column, {
 		return '<div class="x-grid3-radio-col'+ on +' x-grid3-cc-'+this.id+'">&#160;</div>';
 	}
 });
+

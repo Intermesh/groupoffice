@@ -48,6 +48,11 @@ if(empty($_REQUEST['r']) && PHP_SAPI!='cli'){
 		exit();
 	}
 	
+	if(GO()->getSettings()->databaseVersion != GO()->getVersion()) {
+		header('Location: '.\GO::config()->host.'install/upgrade.php');				
+		exit();
+	}
+	
 //	$installed=true;
 //	if(!\GO::config()->get_config_file() || empty(\GO::config()->db_user)){			
 //		$installed=false;

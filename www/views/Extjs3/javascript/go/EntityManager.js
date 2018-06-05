@@ -26,8 +26,11 @@
         name: name,
         module: module,
         package: package,
+				getRouterPath : function (id) {
+					return this.name.toLowerCase() + "/" + id
+				},
         goto: function (id) {
-          go.Router.goto(this.name.toLowerCase() + "/" + id);
+          go.Router.goto(this.getRouterPath(id));
         },
 			
       };     

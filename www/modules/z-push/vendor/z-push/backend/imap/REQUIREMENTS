@@ -1,0 +1,7 @@
+REQUIREMENTS:
+php-imap
+php-mbstring (optional but recommended)
+libawl-php
+
+
+IMAP server (Dovecot, Courier...)

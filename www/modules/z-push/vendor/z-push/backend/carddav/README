@@ -1,0 +1,12 @@
+This is a CardDAV backend based in the vcarddir backend.
+
+It supports DAViCal, Sogo, OwnCloud, SabreDav... and should works with any carddav server. So if it doesn't work with your server, please open a issue.
+
+It supports ChangesSink method that will detect and send faster changes to your device.
+
+DAViCal implements the SYNC operation, it's a very fast method to detect changes in your vcards.
+The others servers don't implement it, so the code will fallback to a slower method (suggest your carddav server developers to implement it!!).
+
+This is controlled with a flag in the config.php file.
+
+Also, it can autodetect multiple addressbooks and will present them to the mobile device as an unique addressbook (only iOS supports multiple addressbook).

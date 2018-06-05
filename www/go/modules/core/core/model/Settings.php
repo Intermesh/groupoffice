@@ -154,13 +154,19 @@ class Settings extends core\Settings {
 	
 	
 	/**
-	 * The full url to Group-Office.
+	 * The full URL to Group-Office.
 	 * 
 	 * @var string 
 	 */
 	public $URL;
 	
-	
+	/**
+	 * This variable is checked against the code version.
+	 * If it doesn't match /install/upgrade.php will be executed.
+	 * 
+	 * @var string
+	 */
+	public $databaseVersion;
 	
 	
 }

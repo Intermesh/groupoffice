@@ -56,6 +56,13 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 		return parent::model($className);
 	}
 	
+	protected function defaultAttributes() {
+		$attr = parent::defaultAttributes();
+		$attr['ownedBy'] = \go\core\auth\model\Group::ID_ADMINS;
+		
+		return $attr;
+	}
+	
 	public function getLogMessage($action) {
 		
 //		if($action == 'delete'){

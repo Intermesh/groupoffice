@@ -1,0 +1,54 @@
+REQUIREMENTS:
+1. php-pgsql module
+
+2. An active Postgres server v9.0 or above (developed on 9.6.2; v9.6+ 
+recommended) either on the local machine (preferred) or accessible via 
+the network.  Note that if the connection is remote performance may 
+be impaired and security implications come into play; see Postgres' 
+documentation.
+
+
+
+WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
+===============================================================
+This backend does ZERO authentication of credentials.  With Z-Push the
+Logon process requires that ALL provided backends in the "combined" backend
+succeed, so it is IMPERATIVE that AT LEAST one other back end be defined that
+actually checks passwords.  THIS IS NOT A BACKEND THAT CAN BE RUN STANDALONE 
+AS IT IMPLEMENTS NO SECURITY ON ITS OWN.
+
+This is a design decision as not providing internal authentication removes 
+the need for a privileged (SUID root) "helper" application, OR hijacking 
+the IMAP server's authentication to check passwords.  However, it thus relies
+on at least one other backend (IMAP, CalDav or Carddav) to implement same.
+===============================================================
+WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
+
+
+
+INSTALL:
+
+Create the postgres role account you intend to use ("stickynote" is what's
+in the config files) and grant it login permission.
+
+Edit the create-sticky-tables.sql file to make sure the proper permissions
+are set in the GRANT statements (the role account you create and permit
+to sign in), editing as required.
+
+You must make sure that the connection parameters you intend to use for
+Postgres are in accord with what you set up in the config.php file for
+the hostname (or IP), along with the role and password (if required) for 
+access to the database.  Note that if a password is not required setting 
+one will not hurt (it's ignored if not required for the given role and
+connection.)
+
+Once you have edited the create-sticky-tables.sql file, create the 
+database and schemas with the following command as the Postgres superuser
+(usually psql):
+
+createdb stickynote
+psql stickynote <create-sticky-tables.sql
+
+Then edit config.php (REQUIRED; it will NOT run without modification) 
+as necessary to fit and activate it in the combined backend.
+

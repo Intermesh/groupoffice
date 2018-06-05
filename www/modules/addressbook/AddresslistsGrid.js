@@ -99,7 +99,7 @@ GO.addressbook.AddresslistsGrid = Ext.extend(GO.grid.GridPanel,{
 				startCollapsed:true
 			}),
 			border: false,
-			paging:true,
+			paging:GO.settings.addresslists_store_forced_limit?parseInt(GO.settings.addresslists_store_forced_limit):true,
 			editDialogClass:GO.addressbook.AddresslistDialog,
 			view:new Ext.grid.GridView({
 				emptyText: t("No items to display"),

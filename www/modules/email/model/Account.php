@@ -237,6 +237,15 @@ class Account extends \GO\Base\Db\ActiveRecord {
 		if ($wasNew) {
 			Label::model()->createDefaultLabels($this->id);
 		}
+		
+		if($wasNew) {
+			$user = \go\core\auth\model\User::findById($this->user_id);
+			if($user->isAdmin()) {
+				//add admin group
+				$group = \go\core\auth\model\Group::find()->where(['isUserGroupFor' => $user->id])->single();
+				$this->getAcl()->addGroup($group->id, \go\core\acl\model\Acl::LEVEL_MANAGE);
+			}
+		}
 
 		return parent::afterSave($wasNew);
 	}
