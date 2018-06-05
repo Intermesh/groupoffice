@@ -6,6 +6,7 @@
  * 
  * --c					: Path to the group-office config.php file
  * --host				: The host of the em_accounts where to update the passwords for (Defaults to "localhost")
+ * --username		: The username of the em_accounts where to update the passwords for (Defaults to false, then all from the host are selected)
  * --passwdfile : The location on where to generate the passwordFile to.
  */
 
@@ -24,6 +25,11 @@ if (isset($args['c'])) {
 $host = 'localhost';
 if(isset($args['host'])) {
 	$host = $args['host'];
+}
+
+$username = false;
+if(isset($args['username'])) {
+	$username = $args['username'];
 }
 
 $passwdfile = false;
@@ -71,7 +77,7 @@ class ImapPasswordUpdater {
 	}
 	
 	
-	public function process($host='localhost'){
+	public function process($host='localhost',$username=false){
 		
 		if(!$this->_httpClient){
 			exit('NO HTTPCLIENT SET');
@@ -81,14 +87,26 @@ class ImapPasswordUpdater {
 		echo "Update passwords for mailboxes on ".$host."\n";
 		echo "============================================\n";
 		
-		$this->updateAccounts($host);
+		$this->updateAccounts($host,$username);
+		
+		echo "============================================\n";
+		echo "DONE, please check \"".$this->_passwdfilePath."emailAccounts.csv\" for the generated password file.\n";
+		echo "============================================\n";
 	}
 	
 	
-	public function updateAccounts($host){
+	public function updateAccounts($host, $username=false){
+		
+		if(!$username){
 		$stmt = \GO\Email\Model\Account::model()->findByAttributes(array(
 			'host' => $host
 		));
+		} else {
+			$stmt = \GO\Email\Model\Account::model()->findByAttributes(array(
+			'host' => $host,
+			'username' => $username
+		));
+		}
 		
 		echo "Found ". $stmt->rowCount() ." account(s) to update.\n\n";
 		
@@ -152,4 +170,4 @@ class ImapPasswordUpdater {
 $updater = new ImapPasswordUpdater($passwdfile);
 $httpClient = new ImapHttpClient();
 $updater->setClient($httpClient);
-$updater->process($host);
+$updater->process($host,$username);
