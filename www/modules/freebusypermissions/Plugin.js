@@ -1,6 +1,6 @@
 GO.moduleManager.onModuleReady('calendar',function(){
 	Ext.override(GO.calendar.SettingsPanel, {
-		initComponent : GO.calendar.SettingsPanel.prototype.initComponent.createInterceptor(function(){
+		initComponent : GO.calendar.SettingsPanel.prototype.initComponent.createSequence(function(){
 			this.freeBusyFieldSet = new Ext.form.FieldSet({
 				title:t("Accessrights for free busy info", "freebusypermissions"),
 				closable:true,
@@ -19,7 +19,7 @@ GO.moduleManager.onModuleReady('calendar',function(){
 
 			this.freebusyPermissionsPanel.border=false;
 			
-			this.items.push(this.freeBusyFieldSet);
+			this.add(this.freeBusyFieldSet);
 			
 			this.on('show',function(){
 				this.freebusyPermissionsPanel.loadAcl();
@@ -38,7 +38,7 @@ GO.moduleManager.onModuleReady('calendar',function(){
 		}),
 		
 		onLoadComplete : GO.calendar.SettingsPanel.prototype.onLoadComplete.createSequence(function(action){
-			this.freebusyPermissionsPanel.setAcl(action.result.data.freebusypermissions_acl_id);
+			this.freebusyPermissionsPanel.setAcl(action.freebusySettings.fbAclId);
 		})
 		
 	});
