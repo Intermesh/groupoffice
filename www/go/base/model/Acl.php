@@ -13,6 +13,8 @@
  * @package GO.base.model
  */
 
+namespace GO\Base\Model;
+
 /**
  * The ACL model
  * 
@@ -30,10 +32,6 @@
  * @property int $id
  * @property string $modifiedAt
  */
-
-namespace GO\Base\Model;
-
-
 class Acl extends \GO\Base\Db\ActiveRecord {
 	
 	/**
