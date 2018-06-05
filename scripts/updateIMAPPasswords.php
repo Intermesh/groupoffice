@@ -115,16 +115,22 @@ class ImapPasswordUpdater {
 		fputcsv($filePointer,$headers);
 		
 		while($account = $stmt->fetch()) {	
-			echo "Update password for \"".$account->username."\".\n";
-			echo "Obtaining new random password.\n";
-			$newPassword = $this->_getNewPassword();
-			echo "New password: ".$newPassword."\n";
-			if($this->_updatePassword($account, $newPassword)){
-				echo "Update successfull.\n";
+		
+			try {
+				echo "Update password for \"".$account->username."\".\n";
+				echo "Obtaining new random password.\n";
+				$newPassword = $this->_getNewPassword();
+				echo "New password: ".$newPassword."\n";
+				if($this->_updatePassword($account, $newPassword)){
+					echo "Update successfull.\n";
+				}
+
+				$data = array($account->username,$account->username,$newPassword);
+				fputcsv($filePointer,$data);
+			} catch(\Exception $e){
+				fputcsv($filePointer,array($account->username, 'failed','failed'));
+				continue;
 			}
-			
-			$data = array($account->username,$account->username,$newPassword);
-			fputcsv($filePointer,$data);
 		}
 		
 		fclose($filePointer);
