@@ -686,14 +686,6 @@ button.filetype-pdf, button.filetype-doc {
 	//background-color: color($grey, 100);
 }
 
-
-.x-tool-toggle {
-	float: left;
-	margin-left: dp(-10);
-	margin-right: dp(14);
-}
-
-
 /*%hyperlink {
 	color: color($primary, 700);
 	text-decoration: none;
@@ -873,7 +865,7 @@ button.filetype-pdf, button.filetype-doc {
 }
 .go-icon-list > p, .go-icon-list > a {
 	position:relative;
-	padding-left: dp(64);
+	padding-left: dp(56);
 
 }
 
@@ -919,11 +911,6 @@ button.filetype-pdf, button.filetype-doc {
 		background-color: transparent !important;
 	}
 }
-
-.go-tool-toggle-collapsed:before {
-    content: "expand_more";
-	}
-	
 	
 table.display-panel {
 	width: 100%;
