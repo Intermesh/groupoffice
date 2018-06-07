@@ -9,7 +9,7 @@ GO.files.FileBrowserButton = Ext.extend(Ext.Button, {
 	
 	initComponent : function(){
 		Ext.applyIf(this, {
-				text: t("Browse"),
+				text: t("Files"),
 				handler: function(){			
 					
 

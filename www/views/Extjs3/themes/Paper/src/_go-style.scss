@@ -524,7 +524,7 @@ hr {
 	height: 1px;
 	border:0;
 	margin: dp(15) 0 dp(16) 0;
-	background-color: color($foreground, 'divider');
+	background-color: color($foreground, 'line');
 }
 #go-logged-in-as {
 	text-align:center;
@@ -834,6 +834,10 @@ button.filetype-pdf, button.filetype-doc {
 		padding: dp(16);
 	}
 	
+	
+	.x-panel-header {
+		border-top: 1px solid color($foreground, "line");
+	}
 }
 
 .go-icon-list {
