@@ -241,9 +241,9 @@ class Instance extends Entity {
 						->where('enabled', '=', true)
 						->execute()->fetch();						
 		
-//		if(empty($lastLogin)) {
-//			return null;
-//		}
+		if(empty($lastLogin)) {
+			return null;
+		}
 		
 		return new \go\core\util\DateTime('@'.$lastLogin);
 	}
@@ -252,17 +252,19 @@ class Instance extends Entity {
 		return $this->getLastLogin();
 	}
 	
+	
 	protected function internalDelete() {
 		
 		if(!parent::internalDelete()) {
 			return false;
 		}
 		
-		return $this->deleteInstance();
+		//rename config.php so it's unavailable
+		return $this->getConfigFile()->rename('config.php.bak');
 	}
 	
 	
-	private function deleteInstance() {
+	public function deleteHard() {
 		
 		if(!parent::deleteHard()) {
 			return false;
