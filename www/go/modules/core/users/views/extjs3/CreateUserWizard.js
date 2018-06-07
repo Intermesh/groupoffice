@@ -5,14 +5,21 @@ go.modules.core.users.CreateUserWizard = Ext.extend(go.Wizard, {
 		
 		//store all form data here
 		this.user = {};
+		
+		this.groupsGrid = new go.modules.core.users.UserGroupGrid({
+				title: null,
+				iconCls: null
+			});
+			
+		this.groupsGrid.getTopToolbar().insert(0, {
+			xtype:'tbtitle',
+			text: t("Groups")
+		});
 	
 		this.items = [
 			new go.modules.core.users.CreateUserAccountPanel(),
 			this.passwordPanel = new go.modules.core.users.CreateUserPasswordPanel(),
-			this.groupsGrid = new go.modules.core.users.UserGroupGrid({
-				title: null,
-				iconCls: null
-			})
+			this.groupsGrid
 		]
 		go.modules.core.users.CreateUserWizard.superclass.initComponent.call(this);
 		
