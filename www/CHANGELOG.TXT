@@ -1,4 +1,5 @@
 - Projects: Report saving broken for some project reports
+- Tickets: Fixed SQL error on older mysql servers
 
 01-06-2018 6.2.95
 - Projects: Fixed failed custom fields imports when empty dates we're used.
