@@ -48,7 +48,7 @@
 .icon {
   color:inherit;
   &.small {
-	  color: $cPrimary; // only used in files thumbgrid
+	  color: color($foreground,'secondary-text'); // only used in files thumbgrid
 	  font-size: dp(16);
 	  line-height:inherit
   }

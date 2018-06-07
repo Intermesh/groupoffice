@@ -452,7 +452,9 @@ a {
 	> div {
 		@extend .z4;
 		min-width: dp(280);
-		max-width: dp(400);
+		max-width: 60%;
+		max-height: 95vh;
+		overflow-y: auto;
 		border-radius: $borderRadius;
 		background-color: color($background, 'card');
 		min-height: dp(40);
@@ -467,6 +469,9 @@ a {
 			float: left;
 			margin-right: dp(8); 
 	   }
+		&.error h4 {
+			color:red;
+		}
 	}
 }
 .card {

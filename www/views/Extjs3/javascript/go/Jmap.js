@@ -122,6 +122,15 @@ go.Jmap = {
 				method: 'POST',
 				jsonData: me.requests,
 				success: function (response, opts) {
+					var type = response.getResponseHeader('content-type');
+					if(type.substr(0,16) !== 'application/json') {
+						go.notifier.msg({
+							cls:'error',
+							title:'JSON Error', 
+							description:Ext.util.Format.nl2br(response.responseText)
+						});
+						return;
+					}
 					var responses = JSON.parse(response.responseText);
 
 					responses.forEach(function (response) {

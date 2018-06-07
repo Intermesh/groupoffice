@@ -20,7 +20,8 @@ go.notifier = {
 		var msgCtr = new Ext.Container({
 			title: !GO.util.empty(msg.title) ? msg.title : "",
 			html: html + '<p>' + msg.description + '</p>',
-			renderTo: this.messageCt
+			renderTo: this.messageCt,
+			cls: msg.cls
 		});
 
 		var me = this;
@@ -30,7 +31,10 @@ go.notifier = {
 			}, msg.time);
 		} else {
 			msgCtr.el.on('click', function () {
-				me.remove(msgCtr);
+				var sel = getSelection().toString();
+				if(!sel){ // don't close when selecting text
+					 me.remove(msgCtr);
+				}
 			});
 		}
 		
