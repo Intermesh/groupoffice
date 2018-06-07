@@ -16,7 +16,7 @@ class Instance extends Entity {
 	
 	public $createdAt;
 	
-	public $modifiedAt;
+	public $removedAt;
 
 	protected static function defineMapping() {
 		return parent::defineMapping()
@@ -133,7 +133,7 @@ class Instance extends Entity {
 			$this->createDatabaseUser($dbName, $dbUsername, $dbPassword);
 			$databaseUserCreated = true;
 			
-			if(!$configFile->putContents($this->createIniFile($dbName, $dbUsername, $dbPassword, $tmpFolder->getPath(), $dataFolder->getPath()))) {
+			if(!$configFile->putContents($this->createConfigFile($dbName, $dbUsername, $dbPassword, $tmpFolder->getPath(), $dataFolder->getPath()))) {
 				throw new Exception("Could not write to config file");
 			}
 		} catch(\Exception $e) {
@@ -177,7 +177,7 @@ class Instance extends Entity {
 		GO()->getDbConnection()->query('FLUSH PRIVILEGES');		
 	}
 	
-	private function createIniFile($dbName, $dbUsername, $dbPassword, $tmpPath, $dataPath) {
+	private function createConfigFile($dbName, $dbUsername, $dbPassword, $tmpPath, $dataPath) {
 		
 		$tpl = Module::getFolder()->getFile('config.php.tpl');
 		
@@ -202,18 +202,67 @@ class Instance extends Entity {
 		$tpl->getContents());		
 	}
 	
-//	protected function internalDelete() {
-//		
-//		if(!parent::internalDelete()) {
-//			return false;
+	private $instanceDbConn;
+	
+	/**
+	 * 
+	 * @return \go\core\db\Connection
+	 */
+	private function getInstanceDbConnection() {
+		if(!isset($this->instanceDbConn)) {
+			require($this->getConfigFile()->getPath());
+			$dsn = 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . $config['db_name'];
+			$this->instanceDbConn = new \go\core\db\Connection($dsn, $config['db_user'], $config['db_pass']);
+		}
+		
+		return $this->instanceDbConn;
+	}
+	
+	/**
+	 * Get the number of enabled users
+	 * 
+	 * @return int
+	 */
+	public function getUserCount() {
+		
+		return (int) (new \go\core\db\Query())
+						->setDbConnection($this->getInstanceDbConnection())
+						->selectSingleValue('count(*)')
+						->from('core_user')
+						->where('enabled', '=', true)
+						->execute()->fetch();						
+	}
+	
+	public function getLastLogin() {
+		$lastLogin = (new \go\core\db\Query())
+						->setDbConnection($this->getInstanceDbConnection())
+						->selectSingleValue('max(lastlogin)')
+						->from('core_user')
+						->where('enabled', '=', true)
+						->execute()->fetch();						
+		
+//		if(empty($lastLogin)) {
+//			return null;
 //		}
-//		
-//		//rename config.php so it's unavailable
-//		return $this->getConfigFile()->rename('config.php.bak');
-//	}
+		
+		return new \go\core\util\DateTime('@'.$lastLogin);
+	}
+	
+	public function getModifiedAt() {
+		return $this->getLastLogin();
+	}
+	
+	protected function internalDelete() {
+		
+		if(!parent::internalDelete()) {
+			return false;
+		}
+		
+		return $this->deleteInstance();
+	}
 	
 	
-	public function deleteHard() {
+	private function deleteInstance() {
 		
 		if(!parent::deleteHard()) {
 			return false;
