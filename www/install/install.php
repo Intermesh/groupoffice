@@ -77,10 +77,12 @@ if (!empty($_POST)) {
 
 		$cron->save();
 
-		Observable::cacheListeners();
+		Observable::cacheListeners();	
 		
 		App::get()->getSettings()->databaseVersion = App::get()->getVersion();
 		App::get()->getSettings()->save();
+				
+		\go\core\auth\model\User::findById(1)->checkOldFramework();
 
 		header("Location: finished.php");
 		exit();
