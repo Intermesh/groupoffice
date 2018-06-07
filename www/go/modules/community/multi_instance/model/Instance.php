@@ -23,6 +23,14 @@ class Instance extends Entity {
 						->addTable('multi_instance_instance');
 	}
 	
+	protected function init() {
+		parent::init();
+		
+		if(!$this->isNew()) {
+			$this->getInstanceDbData();
+		}
+	}
+	
 	protected function internalValidate() {
 		
 		if($this->isNew()) {
@@ -209,7 +217,7 @@ class Instance extends Entity {
 	 * @return \go\core\db\Connection
 	 */
 	private function getInstanceDbConnection() {
-		if(!isset($this->instanceDbConn)) {
+		if(!isset($this->instanceDbConn)) {			
 			require($this->getConfigFile()->getPath());
 			$dsn = 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . $config['db_name'];
 			$this->instanceDbConn = new \go\core\db\Connection($dsn, $config['db_user'], $config['db_pass']);
@@ -218,34 +226,39 @@ class Instance extends Entity {
 		return $this->instanceDbConn;
 	}
 	
+	private function getInstanceDbData(){
+		try {
+			$record = (new \go\core\db\Query())
+						->setDbConnection($this->getInstanceDbConnection())
+						->select('count(*) as userCount, max(lastlogin) as lastLogin')
+						->from('core_user')
+						->where('enabled', '=', true)
+						->execute()->fetch();	
+			
+			$this->userCount = (int) $record['userCount'];
+			$this->lastLogin = isset($record['lastLogin']) ? new \go\core\util\DateTime('@'.$record['lastLogin']) : null;
+			
+			
+		}
+		catch(\Exception $e) {
+			//ignore
+		}
+	}
+	
+	private $userCount;
+	private $lastLogin;
+	
 	/**
 	 * Get the number of enabled users
 	 * 
 	 * @return int
 	 */
-	public function getUserCount() {
-		
-		return (int) (new \go\core\db\Query())
-						->setDbConnection($this->getInstanceDbConnection())
-						->selectSingleValue('count(*)')
-						->from('core_user')
-						->where('enabled', '=', true)
-						->execute()->fetch();						
+	public function getUserCount() {		
+		return $this->userCount;
 	}
 	
 	public function getLastLogin() {
-		$lastLogin = (new \go\core\db\Query())
-						->setDbConnection($this->getInstanceDbConnection())
-						->selectSingleValue('max(lastlogin)')
-						->from('core_user')
-						->where('enabled', '=', true)
-						->execute()->fetch();						
-		
-		if(empty($lastLogin)) {
-			return null;
-		}
-		
-		return new \go\core\util\DateTime('@'.$lastLogin);
+		return $this->lastLogin;
 	}
 	
 	public function getModifiedAt() {
