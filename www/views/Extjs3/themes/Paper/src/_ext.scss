@@ -1334,29 +1334,23 @@ td.grid-hd-group-cell {
 	color:#444;
 }
 
-.x-grid-group, .x-grid-group-body, .x-grid-group-hd {
-	zoom:1;
-}
-
 .x-grid-group-hd {
 	border-bottom: 1px solid color($foreground, 'divider');
-}
-
-.x-grid-group-hd div.x-grid-group-title {
-	@extend %font-caption;
-	color:$cPrimary;
-	padding: dp(8) dp(16) dp(8) dp(16);
-	&::before {
-      margin-right: dp(16);
-      @extend %icon;
-      content: 'keyboard_arrow_down';
+	div.x-grid-group-title {
+		@extend %font-caption;
+		color:$cPrimary;
+		padding: dp(8);
+		&::before {
+			@extend %icon;
+			padding: dp(8);
+			content: 'keyboard_arrow_down';
+		}
+		.x-grid-group-collapsed &::before {
+			@extend %icon;
+			content: 'keyboard_arrow_right';
+		}
 	}
-	.x-grid-group-collapsed &::before {
-		@extend %icon;
-		content: 'keyboard_arrow_right';
-	}
 }
-
 
 .x-column {
 	min-height: 1px;
@@ -2040,6 +2034,9 @@ $menuScrollerSize : dp(4);
 .x-portal-column {
 	overflow: visible;
 }
+.x-portlet {
+    margin-bottom:dp(16);
+}
 .x-portlet .x-panel-ml {
 	padding-left: 0px;
 }
@@ -2065,12 +2062,13 @@ $menuScrollerSize : dp(4);
 	&-header {
       border: 0;
 		border-top: 1px solid color($foreground, 'divider');
-      padding: 0 dp(8) 0 dp(16);
+      padding: 0 dp(8) 0 dp(8);
       height: dp(56);
       line-height: dp(56);
       //background-color:$cPrimary;
 		&-text {
 			@extend %font-subheading;
+			padding-left: dp(8);
 		}
       .x-border-panel > & {
 			background-color: transparent;
@@ -2082,7 +2080,6 @@ $menuScrollerSize : dp(4);
 		margin-top: dp(-4);
 	}
 	&-collapsed {
-		
 		.x-window-tl {
 			border-bottom-color:#84a0c4;
 		}
@@ -2116,6 +2113,9 @@ $menuScrollerSize : dp(4);
 	}
 	.x-window-header & {
 
+	}
+	&-toggle {
+		float: left;
 	}
 	&:hover {
 		transition-duration: 85ms;
@@ -2297,22 +2297,20 @@ body.x-body-masked .x-window-plain .x-window-mc {
 	}
 }
 
-
 .x-layout-collapsed {
 	display:none;
 	background-color:color($background, 'app-bar');
 	border:0;
 	width:dp(0);
-   height:dp(16);
+   height:dp(24);
+	&-over{
+		background-color:color($background, 'hover');
+	}
 	.x-tool {
 		margin:0;
 		width:dp(24);
 		height:dp(24);
 	}
-}
-
-.x-layout-collapsed-over{
-	background-color:color($background, 'hover');
 }
 
 $resizerSize : dp(2);
