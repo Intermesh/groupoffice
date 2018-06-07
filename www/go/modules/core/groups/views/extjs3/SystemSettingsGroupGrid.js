@@ -97,10 +97,10 @@ go.modules.core.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 				emptyText: '<i>description</i><p>' + t("No items to display") + '</p>',
 				forceFit: true,
 				autoFill: true
-			},
+			}
 			// config options for stateful behavior
-			stateful: true,
-			stateId: 'groups-grid'
+//			stateful: true,
+//			stateId: 'groups-grid'
 		});
 
 		go.modules.core.groups.SystemSettingsGroupGrid.superclass.initComponent.call(this);

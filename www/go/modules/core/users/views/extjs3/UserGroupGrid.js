@@ -107,10 +107,10 @@ go.modules.core.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>',
 				forceFit: true,
 				autoFill: true
-			},
+			}
 			// config options for stateful behavior
-			stateful: true,
-			stateId: 'users-grid'
+//			stateful: true,
+//			stateId: 'users-grid'
 		});
 
 		go.modules.core.users.UserGroupGrid.superclass.initComponent.call(this);
