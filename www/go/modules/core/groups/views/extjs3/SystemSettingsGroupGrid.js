@@ -100,7 +100,7 @@ go.modules.core.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 			},
 			// config options for stateful behavior
 			stateful: true,
-			stateId: 'users-grid'
+			stateId: 'groups-grid'
 		});
 
 		go.modules.core.groups.SystemSettingsGroupGrid.superclass.initComponent.call(this);

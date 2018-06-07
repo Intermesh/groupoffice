@@ -11,7 +11,7 @@ class User extends EntityController {
 	
 	protected function canUpdate(\go\core\orm\Entity $entity) {
 		
-		if(!GO()->getUser()->isAdmin()) {
+		if(!GO()->getAuthState()->getUser()->isAdmin()) {
 			if($entity->isModified('groups')) {
 				return false;
 			}
@@ -21,7 +21,7 @@ class User extends EntityController {
 	}
 	
 	protected function canCreate() {
-		return GO()->getUser()->isAdmin();
+		return GO()->getAuthState()->getUser()->isAdmin();
 	}
 	
 	/**
