@@ -302,6 +302,7 @@ views/Extjs3/javascript/go/User.js
 views/Extjs3/javascript/go/String.js
 
 views/Extjs3/javascript/go/detail/ReadMore.js
+views/Extjs3/javascript/go/detail/AddButton.js
 
 views/Extjs3/javascript/go/acl/ShareWindow.js
 

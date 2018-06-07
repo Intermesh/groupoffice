@@ -838,16 +838,18 @@ button.filetype-pdf, button.filetype-doc {
 
 .go-icon-list {
 	p, > a {
+		
 		min-height: dp(40);
 		box-sizing: border-box;
 		display:table;
 		text-decoration: none;
 		padding: dp(8) dp(16);
 		width: 100%;
-		span {
+		span, a {
 			display: block;
 			min-height: dp(24);
 		}
+		
 		i.label {			
 			left: dp(16);
 			top:dp(12);
@@ -856,10 +858,22 @@ button.filetype-pdf, button.filetype-doc {
 			position: absolute;
 			color: color($foreground, 'icon') !important;		
 		}
-		&.right {
-			top: dp(8);
-			right: dp(16);
-			position:absolute;
+		
+		&:hover {
+			.show-on-hover {
+				display:block;
+			}
+		}
+		
+	}
+	.right {
+		top: dp(8);
+		right: dp(16);
+		position:absolute;
+		
+		&.show-on-hover {
+			display: none;
+			
 		}
 	}
 }

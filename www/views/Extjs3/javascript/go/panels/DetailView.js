@@ -30,7 +30,8 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 		
 		this.entityStore.on('changes', function(entityStore, added, changed, destroyed) {
 			
-			if (changed.indexOf(this.currentId) > -1) {
+			if (changed.concat(added).indexOf(this.currentId) > -1) {
+				
 				var entities = this.entityStore.get([this.currentId]);
 				if(entities) {
 					this.internalLoad(entities[0]);

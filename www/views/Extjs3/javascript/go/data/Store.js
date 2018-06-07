@@ -100,7 +100,7 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		}
 		
 		for(var i = 0, l = destroyed.length; i < l; i++) {
-			var record = this.getById(destroyed[i]);					
+			var record = this.getById(destroyed[i]);
 			if(record) {
 				this.remove(record);
 			}
@@ -110,7 +110,9 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	
 	updateRecord : function(id) {
 		
-
+		if(!this.data) {
+			return false;
+		}
 		var record = this.getById(id);
 		if(!record) {
 			return false;
