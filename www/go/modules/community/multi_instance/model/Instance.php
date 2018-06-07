@@ -71,7 +71,7 @@ class Instance extends Entity {
 	}
 	
 	private function getConfigFile() {
-		return new File('/etc/groupoffice/multi_instance/' . $this->hostname . '/config.ini');
+		return new File('/etc/groupoffice/multi_instance/' . $this->hostname . '/config.php');
 	}
 	
 	private function getDataFolder() {
@@ -99,10 +99,10 @@ class Instance extends Entity {
 		if(!$this->isNew()) {
 			
 			if($this->isModified('deletedAt')) {
-				$bak = $this->getConfigFile()->getFolder()->getFile('config.ini.bak');
+				$bak = $this->getConfigFile()->getFolder()->getFile('config.php.bak');
 				if($bak->exists())
 				{
-					if(!$bak->rename('config.ini')) {
+					if(!$bak->rename('config.php')) {
 						return false;
 					}
 				}
@@ -179,7 +179,7 @@ class Instance extends Entity {
 	
 	private function createIniFile($dbName, $dbUsername, $dbPassword, $tmpPath, $dataPath) {
 		
-		$tpl = Module::getFolder()->getFile('config.ini.tpl');
+		$tpl = Module::getFolder()->getFile('config.php.tpl');
 		
 		$dsn = \go\core\db\Utils::parseDSN(GO()->getConfig()['db']['dsn']);
 
@@ -202,15 +202,15 @@ class Instance extends Entity {
 		$tpl->getContents());		
 	}
 	
-	protected function internalDelete() {
-		
-		if(!parent::internalDelete()) {
-			return false;
-		}
-		
-		//rename config.ini so it's unavailable
-		return $this->getConfigFile()->rename('config.ini.bak');
-	}
+//	protected function internalDelete() {
+//		
+//		if(!parent::internalDelete()) {
+//			return false;
+//		}
+//		
+//		//rename config.php so it's unavailable
+//		return $this->getConfigFile()->rename('config.php.bak');
+//	}
 	
 	
 	public function deleteHard() {
