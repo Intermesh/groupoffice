@@ -236,7 +236,7 @@ class Instance extends Entity {
 						->execute()->fetch();	
 			
 			$this->userCount = (int) $record['userCount'];
-			$this->lastLogin = isset($record['lastLogin']) ? new \go\core\util\DateTime('@'.$record['lastLogin']) : null;
+			$this->lastLogin = !empty($record['lastLogin']) ? new \go\core\util\DateTime('@'.$record['lastLogin']) : null;
 			
 			
 		}
