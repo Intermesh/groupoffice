@@ -255,13 +255,15 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 	 * @return {undefined}
 	 */
 	nav: function(path) {
-
-		var ids = path.replace(/\/$/g, '').split('/');
+		if(path == 'undefined' || path == '') {
+			path = "/"+this._rootNodes[0].entityId;
+		}
+		var ids = path.substr(1).replace(/\/$/g, '').split('/');
 		if(ids[0] === '') {
 			ids = [];
 		}
 		//ids = ids.map(Number);
-  	this.path = ids;
+		this.path = ids;
 
 		var rootNode = this.getRootNode();
 		var filter = this.path.length === 1 && rootNode.filter ? rootNode.filter : {parentId:ids[ids.length-1]};

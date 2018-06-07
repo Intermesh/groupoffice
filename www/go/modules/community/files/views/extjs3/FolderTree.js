@@ -157,7 +157,10 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 		//		int:entityId => array(treenode,treenode),
 		//		int:entityId => array(treenode,treenode),
 		//		int:entityId => array(treenode,treenode)
-		//	)		
+		//	)	
+		
+		return; // does this funtion do anything?
+		
 		var nodesToReloadParents = addedItems.filter(function(item){
 			return item == null;
 		});

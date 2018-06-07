@@ -44,7 +44,7 @@ go.modules.community.files.NodeDetail = Ext.extend(go.panels.DetailView, {
 						switch(type) {
 							case 'image':
 								if(values.metaData && values.metaData.thumbnail) {
-									return '<figure class="contain" style="background-image:url('+go.Jmap.downloadUrl(values.metaData.thumbnail)+');"></figure>'
+									return '<a onclick="go.Preview({blobId:\''+values.blobId+'\',contentType:\''+values.contentType+'\'})"><figure class="contain" style="background-image:url('+go.Jmap.downloadUrl(values.metaData.thumbnail)+');"></figure></a>'
 								} else if (values.contentType === 'image/svg+xml') {
 									return '<figure class="contain" style="background-image:url('+go.Jmap.downloadUrl(values.blobId)+');"></figure>'
 								}

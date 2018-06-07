@@ -16,7 +16,10 @@ go.modules.community.files.NodeTile = Ext.extend(go.grid.TilePanel, {
 				<div class="thumb" style="background-image:url({[go.Jmap.downloadUrl(values.metaData.thumbnail)]})"></div>\
 			</tpl>',
 			'<tpl if="!values.metaData || !values.metaData.thumbnail">{[this.icon(values)]}</tpl>',
-			'<div class="text">{name}</div>'+
+			'<div class="text">{name}\
+				<tpl if="values.bookmarked"> <i class="icon small">bookmark</i></tpl>\
+				<tpl if="values.internalShared || values.externalShared"> <i class="icon small">group</i></tpl>\
+			</div>'+
 			'<tpl if="values.status==\'queued\'"><progress max="100" value="{progress}"></progress></tpl>'+
 		'</div>',
 	'</tpl>',{

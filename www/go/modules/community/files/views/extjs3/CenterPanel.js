@@ -50,9 +50,6 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 					{name: 'modifiedAt', type: 'date'}, 
 					'aclId'
 				],
-				baseParams: {
-					filter:{isHome:true}
-				},
 				entityStore: go.Stores.get("Node")
 			});
 
@@ -145,7 +142,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 		this.tbar =  {// configured using the anchor layout
 			xtype: 'container',
 			items: [new Ext.Toolbar({
-					items: [
+				items: [
 //							{
 //								cls: 'go-narrow',
 //								iconCls: "ic-menu",
@@ -154,6 +151,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 //								},
 //								scope: this
 //							},
+					'->',
 						this.addButton = new Ext.Button({
 							iconCls: 'ic-add',
 							tooltip: t('Add'),
@@ -224,7 +222,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 									}]
 							}),
 							scope: this
-						}), '->', {
+						}), {
 								xtype:'buttongroup',
 								items:[{
 									tooltip: t("List", "files"),

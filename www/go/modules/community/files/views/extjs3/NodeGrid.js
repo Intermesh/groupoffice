@@ -20,6 +20,12 @@ go.modules.community.files.NodeGrid = Ext.extend(go.grid.GridPanel, {
 					header: t('Name'),
 					renderer: function(value, store, record) {
 						var icon = go.util.contentTypeClass(record.data.contentType, record.data.name);
+						if(record.data.bookmarked) {
+							value += ' <i class="icon small">bookmark</i>';
+						}
+						if(record.data.internalShared || record.data.externalShared) {
+							value += ' <i class="icon small">group</i>';
+						}
 						return '<i class="icon filetype '+icon+'"></i><span>'+value+'</span>';
 					},
 					width: 75,
