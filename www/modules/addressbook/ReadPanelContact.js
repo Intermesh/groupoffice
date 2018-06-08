@@ -526,7 +526,7 @@ GO.addressbook.ContactReadPanel = Ext.extend(GO.DisplayPanel,{
 		
 		GO.addressbook.ContactReadPanel.superclass.initComponent.call(this);
 		
-		if(GO.tasks)
+		if(GO.tasks && GO.tasks.ScheduleCallMenuItem)
 		{
 			this.scheduleCallItem = new GO.tasks.ScheduleCallMenuItem();
 			this.newMenuButton.menu.add(this.scheduleCallItem);

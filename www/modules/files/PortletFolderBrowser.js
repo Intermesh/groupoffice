@@ -1,5 +1,5 @@
 GO.mainLayout.onReady(function(){
-	if(GO.summary)
+	(GO.summary && GO.summary.portlets)
 	{
 		GO.summary.portlets['portlet-folder-browser']={
 			multiple:true,

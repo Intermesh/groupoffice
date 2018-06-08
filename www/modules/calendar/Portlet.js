@@ -152,7 +152,7 @@ Ext.extend(GO.calendar.SummaryGroupPanel, Ext.grid.GridPanel, {
 
 GO.mainLayout.onReady(function(){
 	
-	if(GO.summary)
+	if(GO.summary && GO.summary.portlets)
 	{
 		var calGrid = new GO.calendar.SummaryGroupPanel({
 			//state causes it to load: id: 'summary-calendar-grid'

@@ -1,5 +1,5 @@
 GO.mainLayout.onReady(function(){
-	if(GO.summary)
+	if(GO.summary && GO.summary.portlets)
 	{
 		GO.summary.portlets['portlet-expired-files']={
 			multiple:true,

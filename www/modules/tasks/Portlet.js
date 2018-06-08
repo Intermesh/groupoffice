@@ -147,7 +147,7 @@ Ext.extend(GO.tasks.SimpleTasksPanel, GO.grid.GridPanel, {
 
 
 GO.mainLayout.onReady(function(){
-	if(GO.summary)
+	if(GO.summary && GO.summary.portlets)
 	{
 		var tasksGrid = new GO.tasks.SimpleTasksPanel();
 		

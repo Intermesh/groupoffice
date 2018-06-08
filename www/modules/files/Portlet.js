@@ -1,5 +1,5 @@
 GO.mainLayout.onReady(function(){
-	if(GO.summary)
+	if(GO.summary && GO.summary.portlets)
 	{
 		var recentFilesGrid = new GO.files.RecentFilesGrid();
 
