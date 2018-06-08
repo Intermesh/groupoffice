@@ -1313,10 +1313,8 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			
 			if(!$folder) {
 				error_log("Could not find TopLEvelShare ".$folderName);
-				return false;
-			}
-			
-			if(!$folder->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
+				$folder = false;
+			} elseif(!$folder->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
 				$folder = false;
 			}
 
