@@ -3359,6 +3359,17 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 				foreach($oldValues as  $key=>$oldVal){
 					
 					$newVal = $this->getAttribute($key);
+					
+//					// Check if the value changed from false, to null
+//					if(is_null($newVal) && $oldVal === false){
+//						continue;
+//					}
+//					
+					// Check if the value changed from false, to null
+					if(empty($newVal) && empty($oldVal)){
+						continue;
+					}
+
 					if(strlen($newVal) > $cutoffLength){
 						$newVal = substr($newVal,0,$cutoffLength).$cutoffString;
 					}
