@@ -1,3 +1,5 @@
+- Core: Activerecord history logging: Remove empty changes
+
 08-06-2018 6.2.96
 - Projects: Report saving broken for some project reports
 - Tickets: Fixed SQL error on older mysql servers
