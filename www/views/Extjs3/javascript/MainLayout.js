@@ -489,7 +489,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 							},
 							'-',{
 							iconCls: 'ic-help',
-							text: t("Support"),
+							text: t("Help"),
 							handler: function () {
 								
 								if (Ext.form.VTypes.email(GO.settings.config.support_link)) {
