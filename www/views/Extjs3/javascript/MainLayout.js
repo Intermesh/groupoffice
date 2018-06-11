@@ -463,89 +463,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				});
 
 
-				var helpMenu = new Ext.menu.Menu({
-					id: 'helpMenu',
-					items: [{
-							iconCls: 'ic-help',
-							text: t("Help contents"),
-							handler: function () {
-								GO.openHelp('');
-							},
-							scope: this
-						}]
-				});
-
-				if (GO.settings.config.product_name == 'Group-Office') {
-					helpMenu.addItem({
-						iconCls: 'ic-forum',
-						text: t("Community forum"),
-						handler: function () {
-							var win = window.open('https://www.group-office.com/forum/');
-							win.focus();
-						},
-						scope: this
-
-					});
-					helpMenu.addItem('-');
-
-					if (GO.settings.config.support_link) {
-						helpMenu.addItem({
-							iconCls: 'ic-contact-mail',
-							text: t("Contact support desk"),
-							handler: function () {
-
-								if (Ext.form.VTypes.email(GO.settings.config.support_link)) {
-									if (GO.email && GO.settings.modules.email.read_permission) {
-										GO.email.showComposer({
-											values: {to: GO.settings.config.support_link}
-										});
-									} else {
-										document.location = 'mailto:' + GO.supportLink;
-									}
-								} else {
-									window.open(GO.settings.config.support_link);
-								}
-							},
-							scope: this
-						});
-					}
-					if (GO.settings.config.report_bug_link) {
-						helpMenu.addItem({
-							iconCls: 'ic-bug-report',
-							text: t("Report a bug"),
-							handler: function () {
-
-								if (Ext.form.VTypes.email(GO.settings.config.report_bug_link)) {
-									if (GO.email && GO.settings.modules.email.read_permission) {
-										GO.email.showComposer({
-											values: {to: GO.settings.config.report_bug_link}
-										});
-									} else {
-										document.location = 'mailto:' + GO.settings.config.report_bug_link;
-									}
-								} else {
-									var win = window.open(GO.settings.config.report_bug_link);
-									win.focus();
-								}
-							},
-							scope: this
-						});
-					}
-				}
-
-				helpMenu.addItem('-');
-				helpMenu.addItem({
-					iconCls: 'ic-info',
-					text: t("About {product_name}").replace('{product_name}', GO.settings.config.product_name),
-					handler: function () {
-						if (!this.aboutDialog)
-						{
-							this.aboutDialog = new GO.dialog.AboutDialog();
-						}
-						this.aboutDialog.show();
-					},
-					scope: this
-				});
 
 
 
@@ -570,11 +487,46 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 								},
 								scope: this
 							},
-							{
-								text: t("Help"),
-								iconCls: 'ic-help',
-								menu: helpMenu
-							}, {
+							'-',{
+							iconCls: 'ic-help',
+							text: t("Support"),
+							handler: function () {
+								
+								if (Ext.form.VTypes.email(GO.settings.config.support_link)) {
+									if (GO.email && GO.settings.modules.email.read_permission) {
+										GO.email.showComposer({
+											values: {to: GO.settings.config.support_link}
+										});
+									} else {
+										document.location = 'mailto:' + GO.supportLink;
+									}
+								} else {
+									window.open(GO.settings.config.support_link);
+								}
+							},
+							scope: this
+						}
+//						,{
+//							iconCls: 'ic-connect',
+//							text:t("Connect your device"),
+//							handler: function() {
+//								var cyd;
+//							}
+//						}
+						,{
+							iconCls: 'ic-info',
+							text: t("About {product_name}").replace('{product_name}', GO.settings.config.product_name),
+							handler: function () {
+								if (!this.aboutDialog)
+								{
+									this.aboutDialog = new GO.dialog.AboutDialog();
+								}
+								this.aboutDialog.show();
+							},
+							scope: this
+						},
+						'-',
+						{
 								text: t("Logout"),
 								iconCls: 'ic-exit-to-app',
 								handler: function() {

@@ -1178,14 +1178,6 @@ var $billing_clear_payment_method_on_duplicate = true;
 
 
 	/**
-	 * The link in menu help -> contents
-	 *
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $help_link = 'https://www.group-office.com/wiki/';
-
-	/**
 	 * The link or e-mail address in menu help -> support.
 	 *
 	 * No menu item is generated if left empty.
@@ -1193,7 +1185,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $support_link = false;
+	var $support_link = 'https://www.group-office.com/support/';
 
 	/**
 	 * The link or e-mail address in menu help -> report bug.

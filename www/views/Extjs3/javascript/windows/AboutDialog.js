@@ -38,18 +38,12 @@ GO.dialog.AboutDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 			formControllerUrl:'core',
 			loadAction:'about',
 			layout:'fit',
-			height: 230,
-			width: 480,
+			height: dp(300),
+			width: dp(480),
 			resizable: false,
 			closeAction:'hide',
 			title:t("About Group-Office").replace('{product_name}', GO.settings.config.product_name),
-			buttons: [
-				{				
-					text: t("Close"),
-					handler: function(){this.hide()},
-					scope:this
-				}
-			]
+			buttons: []
     });
 		
 		 
