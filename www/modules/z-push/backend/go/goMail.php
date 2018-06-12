@@ -684,22 +684,25 @@ class goMail extends GoBaseBackendDiff {
 	public function StatMessage($folderid, $id) {
 		
 		ZLog::Write(LOGLEVEL_DEBUG, "StatMessage($folderid, $id)");
-
-		if (!$this->_imapLogon($folderid))
+		$imap = $this->_imapLogon($folderid);
+		if (!$imap)
 			return false;
 
 		$mailbox = $this->_replaceDotWithServerDelimiter($folderid);
 
-		$imapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($this->getImapAccount(), $mailbox, $id);
+		//$imapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($this->getImapAccount(), $mailbox, $id);
 
+		$headers = $imap->get_flags($id);
 		$stat = false;
 		
-		if ($imapMessage) {
+		if (count($headers)) {
 			$stat = array();
-			$stat['mod'] = $imapMessage->udate;
-			$stat['id'] = $imapMessage->uid;
-			$stat["flags"] = $imapMessage->seen ? 1 : 0;
-			$stat["star"] = $imapMessage->flagged  ? 1: 0;
+			$stat["mod"] = $header['date'];
+			$stat["id"] = $header['uid'];
+			// 'flagged' aka 'FollowUp' aka 'starred'
+			$stat["star"] = in_array("\Flagged", $header['flags']);
+			// 'seen' aka 'read' is the only flag we want to know about
+			$stat["flags"] = in_array("\Seen", $header['flags']);
 
 		}
 
@@ -742,7 +745,7 @@ class goMail extends GoBaseBackendDiff {
 				foreach ($headers as $header) {
 					
 					$message = array();
-					$message["mod"] = strtotime($header['date']);
+					$message["mod"] = $header['date'];
 					$message["id"] = $header['uid'];
 					// 'flagged' aka 'FollowUp' aka 'starred'
 					$message["star"] = in_array("\Flagged", $header['flags']);
