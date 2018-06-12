@@ -723,25 +723,24 @@ class goMail extends GoBaseBackendDiff {
 				//Don't fetch all messages with an empty cutoffdate because
 				//this may kill the server. Default to two weeks.
 				if (empty($cutoffdate))
-					$cutoffdate = \GO\Base\Util\Date::date_add(time(), 0, -1);
-				/* Get the actual messages */
-				// $headers = $imap->get_message_headers_set(0, 0, 'ARRIVAL', 0, 'SINCE "' . date("d-M-Y", $cutoffdate) . '"');
-				// Changed according to RFC because strato.de mailserver didn't understand the above query
-				$headers = $imap->get_message_headers_set(0, 0, 'ARRIVAL', 0, 'SINCE ' . date("j-M-Y", $cutoffdate));
-
+				{
+					$headers = $imap->get_flags();
+				} else
+				{
+					$uids = $imap->search('SINCE ' . date("j-M-Y", $cutoffdate));
+					$headers = $imap->get_flags(implode(',', $uids));
+				}
+				
 				/* Create messages array */
 				foreach ($headers as $header) {
 					
-					if($header['deleted'])
-						continue;
-					
 					$message = array();
-					$message["mod"] = $header['udate'];
+					$message["mod"] = $header['date'];
 					$message["id"] = $header['uid'];
 					// 'flagged' aka 'FollowUp' aka 'starred'
-					$message["star"] = (isset($header['flagged']) && $header['flagged']) ? 1: 0;
+					$message["star"] = in_array("\Flagged", $header['flags']);
 					// 'seen' aka 'read' is the only flag we want to know about
-					$message["flags"] = $header['seen'] ? 1 : 0;
+					$message["flags"] = $in_array("\Seen", $header['flags']);
 
 					$messages[] = $message;
 				}

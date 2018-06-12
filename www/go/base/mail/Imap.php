@@ -1686,6 +1686,36 @@ class Imap extends ImapBodyStruct {
 		//\GO::debug($final_headers);
 		return $final_headers;
 	}
+	
+	
+	public function get_flags($uidRange = '1:*') {
+		$command = 'UID FETCH '.$uidRange.' (FLAGS INTERNALDATE)'."\r\n";
+
+		$this->send_command($command);
+		$res = $this->get_response(false, false);
+
+		$status = $this->check_response($res, false);
+		if(!$status) {
+			return false;
+		}
+		
+		$data = [];
+		
+		foreach($res as $message) {
+			//UID 17 FLAGS ( \Flagged \Seen ) INTERNALDATE 24-May-2018 13:02:43 +0000
+			
+			if(preg_match('/UID ([0-9]+) FLAGS \((.*)\) INTERNALDATE ([^\)]+)/', $message, $matches)) {
+				
+				$data[] = [
+						'uid' => (int) $matches[1],
+						'flags' => array_map('trim', explode(' ', trim($matches[2]))),
+						'date' => trim($matches[3])
+				];
+			}
+		}
+		
+		return $data;
+	}
 
 
 	public function get_message_headers_set($start, $limit, $sort_field , $reverse=false, $query='ALL')
