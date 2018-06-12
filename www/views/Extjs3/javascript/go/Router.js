@@ -128,6 +128,7 @@ go.Router.config({mode: 'hash'});
 
 GO.mainLayout.on("boot", function() {		
 	
+	//These default routes are added as last options for sure.
 	
 	
 	go.Router.add(/^login$/, function() {
@@ -140,7 +141,10 @@ GO.mainLayout.on("boot", function() {
 	}, false);
 	
 	
-	//Add these default routes on boot so they are added as last options for sure.
+	go.Router.add(/([\w]+)/, function(moduleName) {
+		GO.mainLayout.openModule(moduleName);
+	});
+
 	//
 	//default route for entities		
 	go.Router.add(/([a-zA-Z0-9]*)\/([0-9]*)/, function(entity, id) {

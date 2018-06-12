@@ -40,11 +40,11 @@
 				config.requiredPermissionLevel = GO.permissionLevels.read;
 			}	
 			
-			if(config.mainPanel) {
-				go.Router.add(new RegExp(name+"$"), function() {
-					GO.mainLayout.openModule(name);
-				});
-			}
+//			if(config.mainPanel) {
+//				go.Router.add(new RegExp(name+"$"), function() {
+//					GO.mainLayout.openModule(name);
+//				});
+//			}
 
 			if (config.entities) {
 				config.entities.forEach(function (e) {
