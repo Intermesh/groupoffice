@@ -728,7 +728,7 @@ class goMail extends GoBaseBackendDiff {
 				} else
 				{
 					$uids = $imap->search('SINCE ' . date("j-M-Y", $cutoffdate));
-					$headers = $imap->get_flags(implode(',', $uids));
+					$headers = $imap->get_flags(min($uids).':*');
 				}
 				
 				/* Create messages array */
@@ -740,7 +740,7 @@ class goMail extends GoBaseBackendDiff {
 					// 'flagged' aka 'FollowUp' aka 'starred'
 					$message["star"] = in_array("\Flagged", $header['flags']);
 					// 'seen' aka 'read' is the only flag we want to know about
-					$message["flags"] = $in_array("\Seen", $header['flags']);
+					$message["flags"] = in_array("\Seen", $header['flags']);
 
 					$messages[] = $message;
 				}
