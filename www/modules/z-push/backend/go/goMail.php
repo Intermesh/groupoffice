@@ -724,12 +724,19 @@ class goMail extends GoBaseBackendDiff {
 				//this may kill the server. Default to two weeks.
 				if (empty($cutoffdate))
 				{
+					ZLog::Write(LOGLEVEL_DEBUG, "empty cutoff");
 					$headers = $imap->get_flags();
 				} else
 				{
+					ZLog::Write(LOGLEVEL_DEBUG, 'Client sent cutoff date for calendar: ' . \GO\Base\Util\Date::get_timestamp($cutoffdate));
 					$uids = $imap->search('SINCE ' . date("j-M-Y", $cutoffdate));
 					$headers = $imap->get_flags(min($uids).':*');
 				}
+				
+				
+				ZLog::Write(LOGLEVEL_DEBUG, "message count:".count($headers));
+					
+				
 				
 				/* Create messages array */
 				foreach ($headers as $header) {
