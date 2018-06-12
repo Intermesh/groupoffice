@@ -1,3 +1,4 @@
+- Calendar: Moving "this and future" will set the until time of the first series to begin of the day in which the next series starts.
 - Core: Activerecord history logging: Remove empty changes
 
 08-06-2018 6.2.96
