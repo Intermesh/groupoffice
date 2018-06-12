@@ -742,7 +742,7 @@ class goMail extends GoBaseBackendDiff {
 				foreach ($headers as $header) {
 					
 					$message = array();
-					$message["mod"] = $header['date'];
+					$message["mod"] = strtotime($header['date']);
 					$message["id"] = $header['uid'];
 					// 'flagged' aka 'FollowUp' aka 'starred'
 					$message["star"] = in_array("\Flagged", $header['flags']);
