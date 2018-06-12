@@ -1,5 +1,7 @@
+12-06-2018 6.2.97
 - Calendar: Moving "this and future" will set the until time of the first series to begin of the day in which the next series starts.
 - Core: Activerecord history logging: Remove empty changes
+- The fixes in 6.2.96 were not present in that package.ß
 
 08-06-2018 6.2.96
 - Projects: Report saving broken for some project reports
