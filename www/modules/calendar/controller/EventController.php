@@ -155,11 +155,11 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 					// not pretty, fix in v6.6
 					$model->start_time = \GO\Base\Util\Date::roundQuarters($start_time);
 					$model->end_time = \GO\Base\Util\Date::roundQuarters($model->start_time+ $duration);
-					$untilTime = $model->start_time - $params['offset'] - 1;
+					$untilTime = strtotime($d);// $model->start_time - $params['offset'] - 1;
 				} else {
 					// exception_date comes incorrectly from client, fix in GO 6.6
 					$model->start_time = $params['exception_date']; 
-					$untilTime = $params['exception_date']-1;
+					$untilTime = strtotime(date('Y-m-d', $params['exception_date']));//$params['exception_date']-1;
 				}
 				
 				$rRule = new \GO\Base\Util\Icalendar\Rrule();
