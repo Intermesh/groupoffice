@@ -695,7 +695,8 @@ class goMail extends GoBaseBackendDiff {
 		$headers = $imap->get_flags($id);
 		$stat = false;
 		
-		if (count($headers)) {
+		if ($header = array_shift($headers)) {
+			
 			$stat = array();
 			$stat["mod"] = $header['date'];
 			$stat["id"] = $header['uid'];
