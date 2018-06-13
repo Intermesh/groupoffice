@@ -477,6 +477,9 @@ foreach($qs as $q) {
 			echo $q ."\n";
 			App::get()->getDbConnection()->query($q);
 		} catch(\Exception $e) {
+			
+			echo "ERROR: A fatal upgrade error occurred. Please report this error message.\n\n";
+			
 			echo $e->getMessage().' Query '. $q;
 			exit();
 		}
