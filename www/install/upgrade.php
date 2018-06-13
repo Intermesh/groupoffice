@@ -1,11 +1,4 @@
 <?php
-
-if(is_dir("/etc/groupoffice/" . $_SERVER['HTTP_HOST'])) {	
-	echo "Please move all your domain configuration folders from /etc/groupoffice/* into /etc/groupoffice/multi_instance/*. Only move folders, leave /etc/groupoffice/config.php and other files where they are.";
-	exit();
-}
-
-
 use GO\Base\Observable;
 use go\core\App;
 use go\core\Environment;
@@ -13,37 +6,63 @@ use go\core\module\model\Module;
 use go\core\util\Lock;
 
 
+
+/**
+ * 
+ * @return int 62 for 6.2 db and 63 for 6.3 or higher.
+ * @throws \Exception
+ */
+function isValidDb() {
+	if(GO()->getDatabase()->hasTable("core_module")) {
+		return 63;
+	}
+	if (!GO()->getDatabase()->hasTable("go_settings")) {
+		throw new \Exception("Your database does not seem to be a Group-Office database");
+	}
+	$mtime = (new \go\core\db\Query)
+					->selectSingleValue('value')
+					->from('go_settings')
+					->where('name', '=', 'upgrade_mtime')
+					->single();
+
+	if($mtime < 20180517) {
+		throw new \Exception("You're database is not on the latest 6.2 version. Please upgrade it to the latest 6.2 first.");
+	}
+	
+	return 62;	
+}
+
 try {
 	
 	require('../vendor/autoload.php');
 	
-	echo "<pre>";
+	if(is_dir("/etc/groupoffice/" . $_SERVER['HTTP_HOST'])) {	
+		throw new \Exception("Please move all your domain configuration folders from /etc/groupoffice/* into /etc/groupoffice/multi_instance/*. Only move folders, leave /etc/groupoffice/config.php and other files where they are.");
+	}
 	
+	require('header.php');
+	
+	echo "<section><div class=\"card\"><h2>Upgrading Group-Office</h2><pre>";
 	
 	App::get();
 
 	$lock = new Lock("upgrade");
 	if (!$lock->lock()) {
-		exit("Upgrade is already in progress");
+		throw new \Exception("Upgrade is already in progress");
 	}
 	
 	GO()->getCache()->flush(false);
 	GO()->setCache(new \go\core\cache\None());
 	
-	if (!GO()->getDatabase()->hasTable("core_module")) {
+	if (isValidDb() == 62) {
 		//todo: verify this is a valid 6.2 database
 		require(Environment::get()->getInstallFolder() . '/install/62to63.php');
 	}
 
-//don't be strict
+	//don't be strict
 	GO()->getDbConnection()->query("SET sql_mode=''");
 
-	
-
 	function upgrade() {
-		echo "Upgrading Group-Office\n";
-
-
 		$u = [];
 
 		$modules = Module::find()->all();
@@ -214,9 +233,17 @@ try {
 
 	echo "Done!\n";
 	
-	echo "</pre>";
+	echo "</pre></div>";
 	
-	echo '<a href="../">Continue</a>';
+	echo '<a class="button" href="../">Continue</a>';
+	
+	echo "</section>";
+	
+	
 } catch (\Exception $e) {
 	echo (string) $e;
+	
+	echo "</pre></div></section>";
 }
+
+require('footer.php');

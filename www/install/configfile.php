@@ -28,15 +28,7 @@ function dbConnect($config){
 	return $pdo;
 }
 
-function dbIsEmpty($config) {
-	//global $pdo;
-	/* @var $pdo \PDO; */
-	
-	$stmt = dbConnect($config)->query("SHOW TABLES");
-	$stmt->execute();
-	
-	return $stmt->rowCount() == 0;
-}
+
 
 $configFile = App::findConfigFile();
 if(!$configFile) {
@@ -59,7 +51,7 @@ if($_SERVER['REQUEST_METHOD'] != 'POST')
 	$tmpFolder = new \go\core\fs\Folder($config['tmpdir']);
 	$dataFolder = new \go\core\fs\Folder($config['file_storage_path']);
 	
-	if(dbConnect($config) && dbIsEmpty($config) && $dataFolder->isWritable() && $tmpFolder->isWritable()) {
+	if(dbConnect($config) && $dataFolder->isWritable() && $tmpFolder->isWritable()) {
 		header("Location: install.php");
 		exit();
 	}
@@ -133,7 +125,7 @@ require('header.php');
 				</p>
 				
 				<?php
-				if($_SERVER['REQUEST_METHOD'] == 'POST' && !$dataFolder->isWritable()) {
+				if(!$dataFolder->isWritable()) {
 					echo '<p class="error">Not writable</p>';
 				}
 				?>
@@ -145,7 +137,7 @@ require('header.php');
 				
 				
 				<?php
-				if($_SERVER['REQUEST_METHOD'] == 'POST' && !$tmpFolder->isWritable()) {
+				if(!$tmpFolder->isWritable()) {
 					echo '<p class="error">Not writable</p>';
 				}
 				?>
@@ -159,10 +151,8 @@ require('header.php');
 				<h2>Configure the database</h2>
 				
 				<?php
-				if($_SERVER['REQUEST_METHOD'] == 'POST' && !dbConnect($config)) {
+				if(!dbConnect($config)) {
 					echo '<p class="error">'.$dbConnectError.'</p>';
-				} elseif($_SERVER['REQUEST_METHOD'] == 'POST' && !dbIsEmpty($config)) {
-					echo '<p class="error">The database must be empty</p>';
 				}
 				?>
 				<p>

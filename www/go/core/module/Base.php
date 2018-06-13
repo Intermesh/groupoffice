@@ -49,7 +49,9 @@ abstract class Base {
 			throw $e;
 		}
 		
-		GO()->getCache()->flush(false);
+		\GO()->getCache()->flush(false);
+		\GO::clearCache(); //legacy
+		\GO()->getDataFolder()->getFolder('clientscripts')->delete();
 		
 		GO()->getDbConnection()->beginTransaction();
 		
