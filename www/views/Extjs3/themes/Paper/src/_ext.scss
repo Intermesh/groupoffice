@@ -327,9 +327,7 @@ ul.x-tab-strip-bottom{
 		}
 		.x-box-inner { //composite
 			overflow:visible;
-			label {
-				line-height: dp(32);
-			}
+
 			.x-btn {
 				top: dp(-2);
 				line-height: dp(32);
@@ -388,7 +386,7 @@ ul.x-tab-strip-bottom{
 	}
 	&-cb-label {
 		display: inline-block;
-		padding: dp(8) 0 dp(8) dp(40);
+		padding: dp(8) 0 dp(8) dp(32);
 	}
 	&-checkbox {
 		
@@ -399,7 +397,7 @@ ul.x-tab-strip-bottom{
 			@extend %checkbox;
 			position: absolute;
 			top: dp(6);
-			left: dp(4);
+			left: dp(-2);
 		}
 		&:checked + label::before {
 			content: 'check_box';
@@ -413,7 +411,7 @@ ul.x-tab-strip-bottom{
 			content: " ";
 			position:absolute;
 			top: 1px;
-			left: 0;
+			left: dp(-6);
 		}
 		&:focus + label::after {
 			background-color: rgba($cPrimary, 0.16);
@@ -431,7 +429,7 @@ ul.x-tab-strip-bottom{
 			content: 'radio_button_unchecked';
 			position: absolute;
 			top: dp(6);
-			left: dp(4);
+			left: dp(-2);
 		}
 		&:checked + label:before {
 			content: 'radio_button_checked';
@@ -445,14 +443,15 @@ ul.x-tab-strip-bottom{
 			content: " ";
 			position:absolute;
 			top: 1px;
-			left: 0;
+			left: dp(-6);
 		}
 		&:focus + label::after {
 			background-color: rgba($cPrimary, 0.16);
 		}
 	}
 	&-radio-group {
-		padding-left: dp(16);
+		padding-left: 0; //dp(16);
+		overflow:visible;
 	}
 	&-item {
 		margin-bottom:dp(4);
@@ -621,6 +620,37 @@ ul.x-tab-strip-bottom{
 			margin: dp(8) 0;
 			display: inline-block;
 		}*/
+		.x-fieldset-header-text {
+			position:relative;
+		}
+
+		input{
+			opacity:0;
+			width:dp(24);
+			height:dp(24);
+			
+			+ .x-fieldset-header-text{
+				padding-left:dp(8);
+				&::before{
+					@extend %checkbox;
+					top:dp(-7);
+					position:absolute;
+					left:dp(-36);
+					width:dp(22);
+					height:dp(22);
+					pointer-events:none;
+					background-color: transparent;
+					border-radius: 50%;
+					padding:dp(5);
+				}
+			}
+			&:checked + .x-fieldset-header-text::before{
+				content: 'check_box';
+			}
+			&:focus + .x-fieldset-header-text::before{
+				background-color: rgba($cPrimary, 0.16);
+			}
+		}
 	}
 }
 
