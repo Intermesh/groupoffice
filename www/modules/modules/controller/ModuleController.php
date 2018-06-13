@@ -59,6 +59,11 @@ class ModuleController extends AbstractJsonController{
 		$module->setAttributes($_POST);		
 		$module->save();
 		
+		
+		GO::clearCache(); //legacy
+		GO()->getCache()->flush(false);
+		GO()->getDataFolder()->getFolder('clientscripts')->delete();
+		
 		echo $this->renderSubmit($module);
 	}
 	
