@@ -74,50 +74,49 @@ class EntityType {
 		return Module::findById($this->moduleId);
 	}
 
-    /**
-     * Find by PHP API class name
-     *
-     * @param string $className
-     * @return static
-     */
-    public static function findByClassName($className) {
+	/**
+	 * Find by PHP API class name
+	 * 
+	 * @param string $className
+	 * @return static
+	 */
+	public static function findByClassName($className) {
 
-        $e = new static;
+		$e = new static;
+		$e->className = $className;
+		
+		$record = (new Query)
+						->select('id,moduleId,clientName,name')
+						->from('core_entity')
+						->where('clientName', '=', $className::getClientName())
+						->single();
 
-        $e->className = $className;
-        $e->name = self::classNameToShortName($className);
+		if (!$record) {
+			$module = Module::findByClass($className);
+		
+			if(!$module) {
+				throw new \Exception("No module found for ". $className);
+			}
 
-        $record = (new Query)
-            ->select('id,moduleId,clientName')
-            ->from('core_entity')
-            ->where('clientName', '=', $className::getClientName())
-            ->single();
+			$record = [];
+			$record['moduleId'] = isset($module) ? $module->id : null;
+			$record['name'] = self::classNameToShortName($className);
+      $record['clientName'] = $className::getClientName();
 
-        if (!$record) {
-            $module = Module::findByClass($className);
+			App::get()->getDbConnection()->insert('core_entity', $record)->execute();
 
-            if(!$module) {
-                throw new \Exception("No module found for ". $className);
-            }
+			$record['id'] = App::get()->getDbConnection()->getPDO()->lastInsertId();
+		}
 
-            $record = [];
-            $record['moduleId'] = isset($module) ? $module->id : null;
-            $record['name'] = $e->name;
-            $record['clientName'] = $className::getClientName();
-
-            App::get()->getDbConnection()->insert('core_entity', $record)->execute();
-
-            $record['id'] = App::get()->getDbConnection()->getPDO()->lastInsertId();
-        }
-
-        $e->id = $record['id'];
-        $e->moduleId = $record['moduleId'];
-        $e->clientName = $record['clientName'];
-
-        return $e;
-    }
-
-    /**
+		$e->id = $record['id'];
+		$e->moduleId = $record['moduleId'];
+		$e->clientName = $record['clientName'];
+		$e->name = $record['name'];
+		
+		return $e;
+	}
+	
+	/**
 	 * Creates a short name based on the class name.
 	 * 
 	 * This is used to generate response name. 

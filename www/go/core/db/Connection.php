@@ -380,7 +380,7 @@ class Connection {
 		$debugQueryString = $this->replaceBindParameters($build['sql'], $build['params']);
 		App::get()->debug($debugQueryString, Debugger::TYPE_SQL);
 
-		$stmt = App::get()->getDbConnection()->getPDO()->prepare($build['sql']);
+		$stmt = $this->getPDO()->prepare($build['sql']);
 		$stmt->debugQueryString = $debugQueryString;
 		foreach ($build['params'] as $p) {
 

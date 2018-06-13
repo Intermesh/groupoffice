@@ -29,7 +29,7 @@ use ReflectionClass;
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
-class Query extends Criteria implements \IteratorAggregate, \JsonSerializable {
+class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \go\core\data\ArrayableInterface {
 
 	private $tableAlias;
 	private $distinct;
@@ -348,6 +348,34 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable {
 		//todo
 		//return $this->createCommand()->toString();
 	}
+	
+	/**
+	 *
+	 * @var Connection
+	 */
+	private $dbConn;
+	
+	/**
+	 * Set database connection.
+	 * 
+	 * Default to App::get()->getDbConnection();
+	 * 
+	 * @param \go\core\db\Connection $conn
+	 * @return $this
+	 */
+	public function setDbConnection(Connection $conn) {
+		$this->dbConn = $conn;
+		
+		return $this;
+	}
+	
+	private function getDbConnection() {
+		if(!isset($this->dbConn)) {
+			$this->dbConn = App::get()->getDbConnection();
+		}
+		
+		return $this->dbConn;
+	}
 
 	/**
 	 * Executes the query and returns the statement
@@ -355,7 +383,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable {
 	 * @return Statement
 	 */
 	public function execute() {
-		$statement = App::get()->getDbConnection()->select($this);
+		$statement = $this->getDbConnection()->select($this);
 		if (!$statement->execute()) {
 			return false;
 		}
@@ -414,7 +442,21 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable {
 	}
 
 	public function jsonSerialize() {
-		return $this->execute()->fetchAll();
+		return $this->toArray();
+	}
+
+	public function toArray($properties = null) {
+		$arr = [];
+		foreach($this->execute() as $entity) {
+			if($entity instanceof \go\core\data\ArrayableInterface) {
+				$arr[] = $entity->toArray($properties);
+			} else
+			{
+				$arr[] = $entity;
+			}
+		}
+		
+		return $arr;
 	}
 
 }

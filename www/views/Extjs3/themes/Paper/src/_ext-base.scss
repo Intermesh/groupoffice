@@ -2635,14 +2635,9 @@ body.ext-ie6.x-body-masked .x-window select {
     top:0;
 }
 
-.x-tool-expand-north, .x-tool-expand-south {
-    float:right;
-    margin:3px;
-}
-
-.x-tool-expand-east, .x-tool-expand-west {
+.x-tool-expand-north, .x-tool-expand-south,.x-tool-expand-east, .x-tool-expand-west {
     float:none;
-    margin:3px 2px;
+    margin:dp(8) dp(16);
 }
 
 .x-accordion-hd {

@@ -558,60 +558,52 @@ class goCalendar extends GoBaseBackendDiff {
 	public function GetMessageList($folderid, $cutoffdate) {
 
 		$messages = array();
-		if (\GO::modules()->calendar) {
-			
-			$maxMonths = isset(\GO::config()->zpush_calendar_max_months) ? intval(\GO::config()->zpush_calendar_max_months) : 6;
-			if(empty($maxMonths))
-				$maxMonths = 6;
+		if (!\GO::modules()->calendar) {
+			return $messages;
+		}
+		
+		$params = \GO\Base\Db\FindParams::newInstance()
+						->ignoreAcl()
+						->select('t.id,t.mtime,t.private,t.calendar_id')
+						->joinModel(array(
+								'model' => 'GO\Sync\Model\UserCalendar',
+								'tableAlias' => 'ua',
+								'localTableAlias' => 't',
+								'localField' => 'calendar_id',
+								'foreignField' => 'calendar_id'
+						))
+						->criteria(
+						\GO\Base\Db\FindCriteria::newInstance()
+						->addCondition('user_id', \GO::user()->id, '=', 'ua')
+						->addCondition('exception_for_event_id', 0)
+										);
 
-			if (empty($cutoffdate)) {
-				$settings = GoSyncUtils::getUserSettings();
-				$cutoffdate = \GO\Base\Util\Date::date_add(time(), 0, $maxMonths * -1);
-				ZLog::Write(LOGLEVEL_DEBUG, 'Client send an empty cutoff date. Using server settings and only syncing events newer then ' . \GO\Base\Util\Date::get_timestamp($cutoffdate));
-			}else
-			{
-				ZLog::Write(LOGLEVEL_DEBUG, 'Client sent cutoff date for calendar: ' . \GO\Base\Util\Date::get_timestamp($cutoffdate));
-			}
+		if (!empty($cutoffdate)) {
+			ZLog::Write(LOGLEVEL_DEBUG, 'Client sent cutoff date for calendar: ' . \GO\Base\Util\Date::get_timestamp($cutoffdate));
 
-
-			$params = \GO\Base\Db\FindParams::newInstance()
-							->ignoreAcl()
-							->select('t.id,t.mtime,t.private,t.calendar_id')
-							->joinModel(array(
-									'model' => 'GO\Sync\Model\UserCalendar',
-									'tableAlias' => 'ua',
-									'localTableAlias' => 't',
-									'localField' => 'calendar_id',
-									'foreignField' => 'calendar_id'
-							))
-							->criteria(
-							\GO\Base\Db\FindCriteria::newInstance()
-							->addCondition('user_id', \GO::user()->id, '=', 'ua')
-							->addCondition('exception_for_event_id', 0)
-							->mergeWith(\GO\Base\Db\FindCriteria::newInstance()
-											->addCondition('end_time', $cutoffdate, '>=')
+			$params->getCriteria()->mergeWith(\GO\Base\Db\FindCriteria::newInstance()
+							->addCondition('end_time', $cutoffdate, '>=')
+							->mergeWith(
+											\GO\Base\Db\FindCriteria::newInstance()
+											->addCondition('rrule', '', '!=')
 											->mergeWith(
 															\GO\Base\Db\FindCriteria::newInstance()
-															->addCondition('rrule', '', '!=')
-															->mergeWith(
-																			\GO\Base\Db\FindCriteria::newInstance()
-																			->addCondition('repeat_end_time', 0)
-																			->addCondition('repeat_end_time', $cutoffdate, '>=', 't', false))
-															, false)
-							)
+															->addCondition('repeat_end_time', 0)
+															->addCondition('repeat_end_time', $cutoffdate, '>=', 't', false))
+											, false)
 			);
+		}
 
-			$stmt = \GO\Calendar\Model\Event::model()->find($params);
+		$stmt = \GO\Calendar\Model\Event::model()->find($params);
 
-			while ($event = $stmt->fetch()) {
-				
-				if(!$event->private || $event->calendar->user_id == \GO::user()->id){
-					$message = array();
-					$message['id'] = $event->id;
-					$message['mod'] = $event->mtime;
-					$message['flags'] = 1;
-					$messages[] = $message;
-				}
+		while ($event = $stmt->fetch()) {
+
+			if(!$event->private || $event->calendar->user_id == \GO::user()->id){
+				$message = array();
+				$message['id'] = $event->id;
+				$message['mod'] = $event->mtime;
+				$message['flags'] = 1;
+				$messages[] = $message;
 			}
 		}
 

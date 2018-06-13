@@ -434,10 +434,23 @@ class User extends Entity {
 			if(!(new UserGroup)->setValues(['groupId' => Group::ID_EVERYONE, 'userId' => $this->id])->internalSave()) {
 				throw new \Exception("Couldn't add user to group");
 			}
+			
+			$this->checkOldFramework();
+			
 		}
 		
 		
 		return true;		
+	}
+	
+	
+	public function checkOldFramework() {
+		//for old framework. Remove when all is refactored!
+		$defaultModels = \GO\Base\Model\AbstractUserDefaultModel::getAllUserDefaultModels($this->id);			
+		$user = \GO\Base\Model\User::model()->findByPk($this->id);
+		foreach($defaultModels as $model){
+			$model->getDefault($user);
+		}
 	}
 	
 	/**
