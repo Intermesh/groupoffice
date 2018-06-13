@@ -86,7 +86,7 @@ class EntityType {
 		$e->className = $className;
 		
 		$record = (new Query)
-						->select('id,moduleId,clientName')
+						->select('id,moduleId,clientName,name')
 						->from('core_entity')
 						->where('clientName', '=', $className::getClientName())
 						->single();
