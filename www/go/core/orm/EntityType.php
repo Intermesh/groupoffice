@@ -83,14 +83,12 @@ class EntityType {
 	public static function findByClassName($className) {
 
 		$e = new static;
-
 		$e->className = $className;
-		$e->name = self::classNameToShortName($className);
-
+		
 		$record = (new Query)
 						->select('id,moduleId,clientName')
 						->from('core_entity')
-						->where('name', '=', $e->name)
+						->where('clientName', '=', $className::getClientName())
 						->single();
 
 		if (!$record) {
@@ -102,7 +100,7 @@ class EntityType {
 
 			$record = [];
 			$record['moduleId'] = isset($module) ? $module->id : null;
-			$record['name'] = $e->name;
+			$record['name'] = self::classNameToShortName($className);
       $record['clientName'] = $className::getClientName();
 
 			App::get()->getDbConnection()->insert('core_entity', $record)->execute();
@@ -113,6 +111,7 @@ class EntityType {
 		$e->id = $record['id'];
 		$e->moduleId = $record['moduleId'];
 		$e->clientName = $record['clientName'];
+		$e->name = $record['name'];
 		
 		return $e;
 	}
