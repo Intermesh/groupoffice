@@ -51,6 +51,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 		this.navMenu = new go.NavMenu({
 			region:'west',
+			width:dp(216),
 			store:this.tabStore,
 			listeners: {
 				selectionchange: function(view, nodes) {					
@@ -407,7 +408,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 			var menuRec = new Ext.data.Record({
 			'name':pnl.title,
-			'icon':pnl.iconCls,
+			'icon':pnl.iconCls.substr(3).replace(/-/g,'_'),
 			'visible':true
 		});
 		
