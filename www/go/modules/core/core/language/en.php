@@ -1,5 +1,8 @@
 <?php
 return array (
+		'name' => 'Group-Office Core',
+		'description' => 'Contains basic functions for Group-Office to function properly.',
+		
     'product_name' => '{product_name}',
 'shortDays' =>
   array (

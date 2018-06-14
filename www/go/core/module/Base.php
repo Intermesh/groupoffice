@@ -296,7 +296,7 @@ abstract class Base {
 	}
 	
 	public static function getTitle() {
-		$title = GO()->t("name", static::getName());
+		$title = GO()->t("name", static::getPackage(), static::getName());
 		if($title == "name") {
 			return self::getName();
 		}
@@ -305,7 +305,7 @@ abstract class Base {
 	}
 	
 	public static function getDescription() {
-		$description = GO()->t("description", static::getName());
+		$description = GO()->t("description", static::getPackage(), static::getName());
 		
 		if($description == "description") {
 			return "";

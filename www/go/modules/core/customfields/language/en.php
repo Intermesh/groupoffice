@@ -1,5 +1,5 @@
 <?php
 return array (
 		'name' => 'Custom fields',
-		"description" => "Custom fields module"
+		"description" => "Add custom fields to other entities like contacts, companies, projects etc."
 );
