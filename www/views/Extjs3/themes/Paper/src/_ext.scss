@@ -151,9 +151,10 @@
 	padding-bottom:0;
    overflow:hidden;
    zoom:1;
+	box-shadow: inset 0px -1px 1px color($foreground,'line');
 	.x-portlet & {
 		background-color: transparent;
-		box-shadow: inset 0px -1px 1px color($foreground,'line');
+		
 	}
 }
 
@@ -318,9 +319,6 @@ ul.x-tab-strip-bottom{
 	> .x-tab-panel {
 		 > .x-tab-panel-bwrap> .x-tab-panel-body > div { // tabbed form dialog
 			background-color:color($background, 'form');
-		}
-		> .x-tab-panel-header {
-			@extend .z2;
 		}
 	}
 	
