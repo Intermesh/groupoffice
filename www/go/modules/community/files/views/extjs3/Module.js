@@ -1,6 +1,5 @@
 Ext.ns('go.modules.community.files');
 
-// Need to be added before module register to intercept router
 go.Router.add(/files(\/?[a-z-0-9\/]*)/, function(path) {
 	var mainPanel = GO.mainLayout.openModule('files');
 	if(mainPanel.browser.rootLoaded) {
@@ -11,15 +10,17 @@ go.Router.add(/files(\/?[a-z-0-9\/]*)/, function(path) {
 		});
 	}
 });
-
+		
 go.Modules.register("community", 'files', {
 	mainPanel: "go.modules.community.files.MainPanel",
 	title: t("Files", "files"),
 	entities: ["Node","Storage"],
+	hasCustomRoute: true,
 	initModule: function () {
 		go.Links.registerLinkToWindow("Node", function() {
 			return new go.modules.community.files.FileForm();
 		});
+		
 	}
 });
 

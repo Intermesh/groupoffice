@@ -4,7 +4,6 @@ BreadCrumbBar.js
 MainPanel.js
 ContextMenu.js
 FilesDetailPanel.js
-SideNav.js
 NodeDetail.js
 NodeGrid.js
 NodeTile.js

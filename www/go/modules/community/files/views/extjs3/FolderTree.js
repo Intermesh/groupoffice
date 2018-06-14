@@ -54,7 +54,7 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 		};
 		
 		this.browser.on("rootNodesChanged", function(browser, rootNodes) {
-			this.initRootNodes(rootNodes);
+			this.initTreeRootNodes(rootNodes);
 		},this);
 		
 		go.modules.community.files.FolderTree.superclass.initComponent.call(this);
@@ -159,7 +159,7 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 		//		int:entityId => array(treenode,treenode)
 		//	)	
 		
-		return; // does this funtion do anything?
+		return; // todo: wesley
 		
 		var nodesToReloadParents = addedItems.filter(function(item){
 			return item == null;
@@ -405,18 +405,26 @@ go.modules.community.files.FolderTree = Ext.extend(Ext.tree.TreePanel, {
 		return foundNodes;
 	},
 	
-	initRootNodes : function(nodes){
-		
-			Ext.each(nodes, function(node) {
-				this.root.appendChild({
-					iconCls: node.iconCls,
-					entity: node.entity,
-					entityId:node.entityId,
-					params: {filter: node.filter},
-					text: node.text //TODO this should be 
-				});
-			},this);
-		
+	initTreeRootNodes : function(nodes){
+		if(this.rendered) {
+			this.addNodes(nodes);
+		} else {
+			this.on('afterRender', function () {
+				this.addNodes(nodes);
+			},this,{single:true});
+		}
+	},
+	
+	addNodes: function (nodes) {
+		Ext.each(nodes, function(node) {
+			this.root.appendChild({
+				iconCls: node.iconCls,
+				entity: node.entity,
+				entityId:node.entityId,
+				params: {filter: node.filter},
+				text: node.text //TODO this should be 
+			});
+		},this);
 	},
 	
 	getContextMenu : function(){

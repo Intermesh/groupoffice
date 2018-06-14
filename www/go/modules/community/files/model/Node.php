@@ -45,7 +45,7 @@ class Node extends model\AclEntity {
 	protected $contentType;
 	
 	public $comments;
-	public $bookmarked;
+	protected $bookmarked;
 	/**
 	 * @var DateTime
 	 */

@@ -51,11 +51,12 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 
 		this.usagePanel = new go.modules.community.files.UsagePanel();
 
-		this.sideNav = new go.modules.community.files.SideNav({
+		this.sideNav = new Ext.Panel({
 			region: 'west',
 			cls: 'go-sidenav',
 			width: dp(280),
 			layout: 'anchor',
+			padding: dp(8)+'px 0 0 0',
 			split: true,
 			items: [this.folderTree],
 			bbar: [this.usagePanel]
