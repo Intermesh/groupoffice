@@ -102,7 +102,7 @@ class ModuleController extends AbstractJsonController{
 					'package'=>$module->getPackage(),
 					'enabled'=>$model && $model->enabled,
 					'isRefactored' => true,
-					//'not_installable'=> $module->appCenter() && !GO::scriptCanBeDecoded($module->package()),
+					'not_installable'=> $model && $model->package == "core",
 					'sort_order' => ($model && $model->sort_order)?$model->sort_order:''
 			);
 			} else
