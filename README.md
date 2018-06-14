@@ -15,4 +15,4 @@ https://github.com/Intermesh/docker-groupoffice-development
 
 To install please visit:
 
-https://www.group-office.com/wiki/Installation_manual
+https://www.group-office.com/documentation.html
