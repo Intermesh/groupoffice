@@ -343,6 +343,14 @@ ul.x-tab-strip-bottom{
 		}
 	}
 	
+	&-composite {
+		div.x-box-item {
+			@extend %font-subheading-dense;
+			padding: dp(4) 0;
+			line-height:dp(24)
+		}
+	}
+	
 	&-display-field {
 		line-height: dp(32);
 	}
