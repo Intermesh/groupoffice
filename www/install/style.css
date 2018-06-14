@@ -5,7 +5,7 @@ body {
   padding: 0;
   margin: 0;
   font-family: Roboto, Helvetica, Arial, sans-serif;
-  line-height: 1.15;
+  line-height: 1.6;
   background-color: rgba(0, 0, 0, 0.05); }
 
 header {
@@ -19,7 +19,6 @@ header {
 
 pre {
 	font-family: Roboto, Helvetica, Arial, sans-serif;
-  line-height: 1.4;
 	overflow: auto;
 	font-size: 12px;
 }
@@ -30,7 +29,7 @@ header img {
 }
 
 section {
-  width: 560px;
+  width: 700px;
   margin: 0 auto; }
 
 .error {

@@ -13,11 +13,11 @@ require('header.php');
 	<form method="POST" action="" onsubmit="submitButton.disabled = true;">
 		<fieldset>
 				<h2>Thank you!</h2>
-				<p>For installing Group-Office.</p>
+				<p>Thank you for installing Group-Office groupware. After reading and accepting the license click "Continue".</p>
 	
 				<label>
 					<input name="accept" type="checkbox" required />
-					I accept the AGPL license.
+					I accept the <a target="_blank" href="../LICENSE.TXT">Group-Office groupware license</a>.
 				</label>
 		</fieldset>
 

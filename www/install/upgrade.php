@@ -26,9 +26,17 @@ function isValidDb() {
 					->single();
 
 	if($mtime < 20180517) {
-		throw new \Exception("You're database is not on the latest 6.2 version. Please upgrade it to the latest 6.2 first.");
+		throw new \Exception("You're database is not on the latest 6.2 version. Please upgrade it to the latest 6.2 first and make sure the modules 'customfields' and 'search' are installed.");
 	}
 	
+	if((new \go\core\db\Query)
+					->selectSingleValue('count(*)')
+					->from('go_modules')
+					->where('id', 'in', ['customfields', 'search'])
+					->single() != 2) {
+		throw new \Exception("You've got a 6.2 database but you must install the modules 'customfields' and 'search' before upgrading.");
+					}
+					
 	return 62;	
 }
 
@@ -245,7 +253,7 @@ try {
 	
 	
 } catch (\Exception $e) {
-	echo (string) $e;
+	echo "<b>Error:</b> ".$e->getMessage();
 	
 	echo "</pre></div></section>";
 }
