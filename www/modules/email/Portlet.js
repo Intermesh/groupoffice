@@ -5,7 +5,6 @@ GO.mainLayout.onReady(function(){
 		
 		GO.summary.portlets['portlet-email']=new GO.summary.Portlet({
 			id: 'portlet-email',
-			iconCls: 'go-module-icon-email',
 			title: t("Email", "email"),
 			layout:'fit',
 			tools: [{

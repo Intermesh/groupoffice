@@ -147,10 +147,14 @@
 	border:0;
 }
 .x-tab-panel-header, .x-tab-panel-footer {
-	background-color:color($background,'app-bar');;
+	background-color:color($background,'app-bar');
 	padding-bottom:0;
    overflow:hidden;
    zoom:1;
+	.x-portlet & {
+		background-color: transparent;
+		box-shadow: inset 0px -1px 1px color($foreground,'line');
+	}
 }
 
 ul.x-tab-strip-top{
@@ -220,7 +224,7 @@ ul.x-tab-strip-bottom{
 	@extend %icon;
 	content: 'close';
 	font-size: 1.1em !important;
-	padding-top: dp(16);
+	//padding-top: dp(16);
 	color: color($foreground, 'icon');
 	//background-image:url(../images/default/tabs/tab-close.gif);
 }
