@@ -115,7 +115,7 @@ class ModuleCollection extends Model\ModelCollection{
 		$ucfirst = ucfirst($moduleId);
 		$moduleClassPath = $folder->path().'/'.$ucfirst.'Module.php';
 		
-		if(!file_exists($moduleClassPath)){// || !\GO::scriptCanBeDecoded($moduleClassPath)){
+		if(!file_exists($moduleClassPath)){
 			return false;
 		}
 
