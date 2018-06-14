@@ -1,10 +1,11 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
-DROP TABLE IF EXISTS `cf_core_user`;
-CREATE TABLE `cf_core_user` (
-  `model_id` int(11) NOT NULL DEFAULT '0'
+DROP TABLE IF EXISTS `core_user_custom_fields`;
+CREATE TABLE `core_user_custom_fields` (
+  `id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 
 DROP TABLE IF EXISTS `core_acl`;
 CREATE TABLE `core_acl` (
@@ -425,8 +426,8 @@ CREATE TABLE `go_working_weeks` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
-ALTER TABLE `cf_core_user`
-  ADD PRIMARY KEY (`model_id`);
+ALTER TABLE `core_user_custom_fields`
+  ADD PRIMARY KEY (`id`);
 
 ALTER TABLE `core_acl`
   ADD PRIMARY KEY (`id`);
@@ -677,3 +678,6 @@ ADD CONSTRAINT `fk_user_avatar_id`
 
 ALTER TABLE `core_entity`
   ADD CONSTRAINT `core_entity_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE `core_user_custom_fields`
+  ADD CONSTRAINT `core_user_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;

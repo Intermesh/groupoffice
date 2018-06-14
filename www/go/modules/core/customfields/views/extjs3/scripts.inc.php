@@ -19,7 +19,7 @@ foreach ($extendableModels as $extendableModel) {
 
 
 				GO.customfields.types["' . StringHelper::escape_javascript($extendableModel) . '"]={
-					name: "' . StringHelper::escape_javascript($extendableModel::getClassName()) . '",
+					name: "' . StringHelper::escape_javascript($extendableModel::getClientName()) . '",
 					panels: []
 				};' . "\n";
 

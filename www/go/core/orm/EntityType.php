@@ -203,8 +203,8 @@ class EntityType {
 
 			switch ($e->name) {
 
-				case 'user':
-					//todo
+				case 'User':
+					$e->className = \go\core\auth\model\User::class;
 					break;
 
 				default:

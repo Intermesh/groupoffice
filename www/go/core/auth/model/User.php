@@ -2,14 +2,23 @@
 
 namespace go\core\auth\model;
 
-use Exception;
+use DateTime;
+use GO;
+use GO\Base\Model\AbstractUserDefaultModel;
+use GO\Base\Model\User as LegacyUser;
+use GO\Base\Util\Http;
 use go\core\acl\model\Acl;
 use go\core\App;
 use go\core\auth\Method;
 use go\core\auth\Password;
+use go\core\auth\PrimaryAuthenticator;
 use go\core\db\Query;
-use go\core\orm\Entity;
+use go\core\exception\Forbidden;
+use go\core\module\model\Module;
+use go\core\orm\CustomFieldsTrait;
+use go\core\jmap\Entity;
 use go\core\validate\ErrorCode;
+use go\modules\core\users\model\Settings;
 
 /**
  * todo
@@ -24,10 +33,11 @@ $qs[] = "ALTER TABLE `core_user`
  */
 class User extends Entity {
 	
+	use CustomFieldsTrait;
+	
 	const DIGEST_REALM = 'Group-Office';
 
 	const ID_SUPER_ADMIN = 1;
-	
 	
 	public $validatePassword = true;
 
@@ -184,7 +194,7 @@ class User extends Entity {
 		parent::init();
 		
 		if($this->isNew()) {
-			$s = \go\modules\core\users\model\Settings::get();
+			$s = Settings::get();
 			$this->time_format = $s->defaultTimeFormat;	
 			$this->date_format = $s->defaultDateFormat;
 			$this->timezone = $s->defaultTimezone;
@@ -239,7 +249,7 @@ class User extends Entity {
 		
 		foreach($this->getAuthenticationMethods() as $method) {
 			$authenticator = $method->getAuthenticator();
-			if (!($authenticator instanceof \go\core\auth\PrimaryAuthenticator)) {
+			if (!($authenticator instanceof PrimaryAuthenticator)) {
 				continue;
 			}
 			
@@ -324,7 +334,7 @@ class User extends Entity {
 			$config = GO()->getConfig();
 			
 			if(!empty($config['limits']['userCount']) && $config['limits']['userCount'] <= self::count()) {
-				throw new \go\core\exception\Forbidden("The maximum number of users have been reached");
+				throw new Forbidden("The maximum number of users have been reached");
 			}
 		}
 		
@@ -390,16 +400,16 @@ class User extends Entity {
 	public function sendRecoveryMail($to, $redirectUrl = ""){
 		
 		$this->recoveryHash = bin2hex(random_bytes(20));
-		$this->recoverySendAt = new \DateTime();
+		$this->recoverySendAt = new DateTime();
 		
-		$siteTitle=\GO()->getSettings()->title;
-		$url = \GO()->getSettings()->URL.'#recover/'.$this->recoveryHash . '/' . urlencode($redirectUrl);
-		$emailBody = \GO()->t('recoveryMailBody');
+		$siteTitle=GO()->getSettings()->title;
+		$url = GO()->getSettings()->URL.'#recover/'.$this->recoveryHash . '/' . urlencode($redirectUrl);
+		$emailBody = GO()->t('recoveryMailBody');
 		$emailBody = sprintf($emailBody,$this->displayName, $siteTitle, $this->username, $url);
-		$emailBody = str_replace('{ip_address}', \GO\Base\Util\Http::getClientIp() , $emailBody);
+		$emailBody = str_replace('{ip_address}', Http::getClientIp() , $emailBody);
 		
-		$message = \GO()->getMailer()->compose()	  
-			->setFrom(\GO()->getSettings()->systemEmail, $siteTitle)
+		$message = GO()->getMailer()->compose()	  
+			->setFrom(GO()->getSettings()->systemEmail, $siteTitle)
 			->setTo(!empty($to) ? $to : $this->recoveryEmail, $this->displayName)
 			->setSubject(GO()->t('Lost password'))
 			->setBody($emailBody);
@@ -446,8 +456,8 @@ class User extends Entity {
 	
 	public function checkOldFramework() {
 		//for old framework. Remove when all is refactored!
-		$defaultModels = \GO\Base\Model\AbstractUserDefaultModel::getAllUserDefaultModels($this->id);			
-		$user = \GO\Base\Model\User::model()->findByPk($this->id);
+		$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels($this->id);			
+		$user = LegacyUser::model()->findByPk($this->id);
 		foreach($defaultModels as $model){
 			$model->getDefault($user);
 		}
@@ -481,7 +491,7 @@ class User extends Entity {
 	 * @return boolean
 	 */
 	public function hasModule($name) {
-		$module = \go\core\module\model\Module::find()->where(['name' => $name])->single();
+		$module = Module::find()->where(['name' => $name])->single();
 		if(!$module) {
 			return false;
 		}
