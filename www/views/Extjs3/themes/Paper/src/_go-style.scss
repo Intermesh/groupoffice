@@ -1058,7 +1058,10 @@ table[id^="comments-ext"] b {
 	//margin-top: dp(8);
 	//border-right: 1px solid color($foreground, "divider");
 	/*background-color: color($background, 'app-bar');*/
-	
+	i {
+		width:dp(24);
+		height:dp(24);
+	}
 	.x-grid3 {
 		background-color: transparent;
 		

@@ -316,7 +316,7 @@ GO.addressbook.MainPanel = function(config) {
 			beforeload: function() {
 				
 				//make sure contacts is selected when routing
-				this.selectView.select(0);
+				this.navMenu.select(0);
 			},
 			scope: this		
 		}
@@ -332,7 +332,7 @@ GO.addressbook.MainPanel = function(config) {
 			beforeload: function() {
 				
 				//make sure companies is selected when routing
-				this.selectView.select(1);
+				this.navMenu.select(1);
 			},
 			scope: this
 		}
@@ -476,13 +476,9 @@ GO.addressbook.MainPanel = function(config) {
 		}
 	}, this);
 
-	this.selectMenu = {xtype:'panel',
+	this.navMenu = new go.NavMenu({
 		region:'north',
-		autoHeight:true,
-		items:[this.selectView = new Ext.DataView({
-		xtype: 'dataview',
-		cls: 'go-nav',
-		store:new Ext.data.ArrayStore({
+		store: new Ext.data.ArrayStore({
 			fields: ['name', 'icon', 'visible'],
 			data: [
 				['Contacts', 'person'],
@@ -491,26 +487,16 @@ GO.addressbook.MainPanel = function(config) {
 //				['Settings', 'settings',GO.addressbook.permission_level == 50]
 			]
 		}),
-
-		singleSelect: true,
-		overClass:'x-view-over',
-		itemSelector:'div',
-		tpl:'<tpl for=".">\
-			<div><i class="icon">{icon}</i>\
-			<span>{name}</span></div>\
-	  </tpl>',
-		columns: [{dataIndex:'name'}],
 		listeners: {
-			selectionchange: function(view, nodes) {
+			selectionchange: function(view, nodes) {					
 				if(nodes[0].viewIndex == 3) {
 					return this.tabPanel.setActiveTab(2);
 				}				
 				this.tabPanel.setActiveTab(nodes[0].viewIndex);
 			},
-			scope:this
+			scope: this
 		}
-	})]};
-
+	});
 
 	this.westPanelContainer = new Ext.Panel({
 		region:'west',
@@ -518,7 +504,7 @@ GO.addressbook.MainPanel = function(config) {
 		width:dp(224),
 		autoScroll:true,
 		split:true,
-		items: [this.selectMenu, this.westPanel,this.mailingsFilterPanel]			
+		items: [this.navMenu, this.westPanel,this.mailingsFilterPanel]			
 	});
 
 	
@@ -531,9 +517,7 @@ GO.addressbook.MainPanel = function(config) {
 			border: true,
 			items: [this.tabPanel]
 		})
-		];
-
-
+	];
 
 	GO.addressbook.MainPanel.superclass.constructor.call(this, config);
 
@@ -582,7 +566,7 @@ Ext.extend(GO.addressbook.MainPanel, Ext.Panel,{
 					GO.addressbook.readableAddresslistsStore.loadData(result.readable_addresslists);
 					GO.addressbook.writableAddresslistsStore.loadData(result.writable_addresslists);
 //				}
-				this.selectView.select(0);
+				this.navMenu.select(0);
 				this.getEl().unmask();
 			},
 			scope:this
