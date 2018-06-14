@@ -591,7 +591,10 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 		$folderPath = str_replace(\GO::config()->file_storage_path,"",$fsFile->parent()->path());
 
 		$folder = Folder::model()->findByPath($folderPath, true);
-		return $folder->hasFile($fsFile->name()) || $folder->addFile($fsFile->name());
+		if(($file = $folder->hasFile($fsFile->name()))) {
+			return $file;
+		}
+		return $folder->addFile($fsFile->name());
 	}
 
 	/**
