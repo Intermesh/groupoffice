@@ -715,3 +715,6 @@ Ext.util.Format.dateRenderer = function(format) {
 };
 				
 				
+Ext.override(Ext.form.CompositeField, {
+	submit: false //don't submit with form.getFieldValue()
+});
