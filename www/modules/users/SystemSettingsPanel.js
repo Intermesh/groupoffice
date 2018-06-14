@@ -14,7 +14,7 @@ GO.users.SystemSettingsPanel = Ext.extend(Ext.form.FormPanel, {
 							name: 'defaultTimezone',
 							store: new Ext.data.SimpleStore({
 								fields: ['timezone'],
-								data: GO.users.TimeZones
+								data: go.TimeZones
 							}),
 							displayField: 'timezone',
 							mode: 'local',

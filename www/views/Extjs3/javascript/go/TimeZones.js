@@ -1,4 +1,4 @@
-GO.users.TimeZones=[
+go.TimeZones=[
 ["Africa/Abidjan"],
 ["Africa/Accra"],
 ["Africa/Addis_Ababa"],

@@ -25,15 +25,7 @@ views/Extjs3/javascript/buttons/QuickEditButton.js
 
 views/Extjs3/javascript/WeekPicker.js
 
-modules/users/TimeZones.js
-
-modules/users/UserSettingsTab.js
-modules/users/RegionalSettingsPanel.js
-modules/users/LookAndFeelPanel.js
-modules/users/PasswordPanel.js
-modules/users/Settings.js
-
-
+views/Extjs3/javascript/go/TimeZones.js
 
 views/Extjs3/javascript/windows/LoginDialog.js
 

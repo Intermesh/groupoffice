@@ -140,7 +140,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 					name: 'timezone',
 					store: new Ext.data.SimpleStore({
 						fields: ['timezone'],
-						data : GO.users.TimeZones
+						data : go.TimeZones
 					}),
 					displayField: 'timezone',
 					mode: 'local',
