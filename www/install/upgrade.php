@@ -25,7 +25,7 @@ function isValidDb() {
 					->where('name', '=', 'upgrade_mtime')
 					->single();
 
-	if($mtime < 20180517) {
+	if($mtime < 20180614) {
 		throw new \Exception("You're database is not on the latest 6.2 version. Please upgrade it to the latest 6.2 first and make sure the modules 'customfields' and 'search' are installed.");
 	}
 	
