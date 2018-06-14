@@ -307,12 +307,15 @@ ul.x-tab-strip-bottom{
 	@extend %icon;
 	content: 'check_box_outline_blank'; // 'check_box' when on
 	position: relative;
-	top: dp(-4);
-	left: dp(-4);
-	width: dp(18);
-	height: dp(18);
 	color:color($foreground, 'icon');
 	display:inline-block;
+	height: dp(32);
+	width: dp(32);
+	left:dp(-4);
+	box-sizing: border-box;
+	background-color: transparent;
+	border-radius: 50%;
+	padding:dp(4);
 }
 
 .x-form{
@@ -396,34 +399,21 @@ ul.x-tab-strip-bottom{
 	}
 	&-cb-label {
 		display: inline-block;
-		padding: dp(8) 0 dp(8) dp(32);
+		height: dp(32);
+	}
+	&-check-wrap {
+		height: dp(32);
 	}
 	&-checkbox {
-		
 		position:absolute;
 		opacity: 0;
-		
 		+ label::before {
 			@extend %checkbox;
-			position: absolute;
-			top: dp(6);
-			left: dp(-2);
 		}
 		&:checked + label::before {
 			content: 'check_box';
 		}
-		
-		+ label::after {
-			height: dp(32);
-			width: dp(32);
-			background-color: transparent;
-			border-radius: 50%;
-			content: " ";
-			position:absolute;
-			top: 1px;
-			left: dp(-6);
-		}
-		&:focus + label::after {
+		&:focus + label::before {
 			background-color: rgba($cPrimary, 0.16);
 		}
 	}
@@ -434,28 +424,13 @@ ul.x-tab-strip-bottom{
 			margin-left: 0;
 		}
 		+ label:before {
-			/*padding-right: dp(16);*/
-			@extend %icon;
-			content: 'radio_button_unchecked';
-			position: absolute;
-			top: dp(6);
-			left: dp(-2);
+			@extend %checkbox; // different icon    |
+			content: 'radio_button_unchecked'; // <--
 		}
 		&:checked + label:before {
 			content: 'radio_button_checked';
 		}
-		
-		+ label::after {
-			height: dp(32);
-			width: dp(32);
-			background-color: transparent;
-			border-radius: 50%;
-			content: " ";
-			position:absolute;
-			top: 1px;
-			left: dp(-6);
-		}
-		&:focus + label::after {
+		&:focus + label::before {
 			background-color: rgba($cPrimary, 0.16);
 		}
 	}
@@ -644,14 +619,8 @@ ul.x-tab-strip-bottom{
 				&::before{
 					@extend %checkbox;
 					top:dp(-7);
-					position:absolute;
 					left:dp(-36);
-					width:dp(22);
-					height:dp(22);
 					pointer-events:none;
-					background-color: transparent;
-					border-radius: 50%;
-					padding:dp(5);
 				}
 			}
 			&:checked + .x-fieldset-header-text::before{
@@ -1101,11 +1070,26 @@ ul.x-tab-strip-bottom{
 			padding-left:0;
 		}
 	}
+	&-cell-inner, &-hd-inner {
+		@extend %ellipsis;
+		min-height: dp(40);
+		padding: dp(10) dp(4) dp(10) dp(16); // 10 top = middle of row line-height 20dp
+		.ux-row-action-cell & {
+			padding: dp(8) 0;
+		}
+		> em {
+			@extend %badge;
+			position: absolute;
+			right: dp(14);
+		}
+	}
 	&-row-checker, &-hd-checker {
+		height:dp(20); // same as line-height of text
 		&::before {
 			@extend %checkbox;
+			padding:0; // grid row has the padding
+			top: -1px; // grid col need 1px up
 		}
-		
 		.x-grid3-row-selected &::before {
 			content: 'check_box';
 		}
@@ -1138,8 +1122,11 @@ ul.x-tab-strip-bottom{
 	&-check-col-td > div {
 		text-overflow: initial;
 		 > div {
+			height:dp(20);
 			&::before{
 				@extend %checkbox;
+				padding:0;
+				top: -1px;
 			}
 			&.x-grid3-check-col-on::before {
 				content: 'check_box';
@@ -1155,9 +1142,6 @@ ul.x-tab-strip-bottom{
 		margin-right: -20px;		
 	}
 	&-cell {
-		&-inner {
-			padding-top: dp(4);
-		}
 		&-first {
 			//padding-left: dp(16) !important;
 			//padding-left: dp(8) !important;
@@ -1177,19 +1161,6 @@ ul.x-tab-strip-bottom{
 	&-row-body {
 		padding: 0 0 dp(8) dp(16);
 		color: color($foreground, "secondary-text");
-	}
-	&-cell-inner, &-hd-inner {
-		@extend %ellipsis;
-		min-height: dp(40);
-		padding: dp(10) dp(4) dp(8) dp(16); // 10 top = middle of row for min row height of 48
-		.ux-row-action-cell & {
-			padding: dp(8) 0;
-		}
-		> em {
-			@extend %badge;
-			position: absolute;
-			right: dp(14);
-		}
 	}
 	&-hd-inner {
 		min-height: dp(20);
@@ -1382,7 +1353,7 @@ td.grid-hd-group-cell {
 		padding: dp(8);
 		&::before {
 			@extend %icon;
-			padding: dp(8);
+			padding: 0 dp(4);
 			content: 'keyboard_arrow_down';
 		}
 		.x-grid-group-collapsed &::before {

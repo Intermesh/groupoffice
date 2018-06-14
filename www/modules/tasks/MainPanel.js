@@ -56,10 +56,12 @@ this.gridPanel.store.on('load', function(store, records, options)
 		autoHeight: true,
 		waitMsgTarget:true,
 		region:'north',
+		padding: '0 0 0 '+dp(16)+'px',
 		border:true,
 		items: [{
 				hideLabel:true,
 				anchor:'100%',
+				
 				xtype:'radiogroup',
 				value:GO.tasks.show,
 				columns: 1,

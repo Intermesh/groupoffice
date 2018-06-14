@@ -972,6 +972,7 @@ table.display-panel {
 	color: color($foreground, 'text');
 	@extend %font-caption;
 	.x-form-checkbox + label:before{
+		margin: 0 dp(6) 0 dp(4);
 		color: color($foreground, "icon");
 	}
 }
