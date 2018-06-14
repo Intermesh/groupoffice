@@ -44,11 +44,19 @@ class Module extends AclEntity {
 	
 	public function isAvailable() {
 		
-		//if module has not been refactored yet package is not set. 
+		
 		if(!isset($this->package)) {
-			return false;
+			//if module has not been refactored yet package is not set. 
+			//handle this with old class
+			$cls = "GO\\" . ucfirst($this->name) . "\\" . ucfirst($this->name) .'Module';
+			if(!class_exists($cls)){
+				return false;
+			}
+			
+			return (new $cls)->isAvailable();
 		}
 		
+		//todo, how to handle licenses for future packages?
 		$cls = $this->getModuleClass();
 		return class_exists($cls);
 	}

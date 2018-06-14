@@ -72,6 +72,12 @@ try {
 		$modulesById = [];
 		/* @var $module Module */
 		foreach ($modules as $module) {
+			
+			if(!$module->isAvailable()) {
+				echo "Skipping module ".$module->name." because it's not available.\n";
+				continue;
+			}
+			
 			$modulesById[$module->id] = $module;
 
 			if ($module->package == null) {
@@ -101,8 +107,6 @@ try {
 		}
 
 		ksort($u);
-
-
 
 		$counts = array();
 
