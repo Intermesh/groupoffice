@@ -120,10 +120,20 @@ class Module extends AclEntity {
 		return $module;
 	}
 	
-	
+	protected function internalValidate() {
+		
+		if($this->package == 'core' && $this->isModified('enabled')) {
+			throw new \Exception("You can't disable core modules");		
+		}
+		
+		return parent::internalValidate();
+	}
 	
 	protected function internalDelete() {
 		
+		if($this->package == "core") {
+			throw new \Exception("You can't delete core modules");
+		}
 	
 		//hard delete!
 		return Entity::internalDelete();
