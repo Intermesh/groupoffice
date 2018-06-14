@@ -290,19 +290,8 @@ html,body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,p,bloc
 }
 
 .x-tab-panel-header, .x-tab-panel-footer {
-	border: 1px solid;
     overflow:hidden;
     zoom:1;
-}
-
-.x-tab-panel-header {
-	border: 1px solid;
-	padding-bottom: 2px;
-}
-
-.x-tab-panel-footer {
-	border: 1px solid;
-	padding-top: 2px;
 }
 
 .x-tab-strip-wrap {
@@ -409,30 +398,6 @@ ul.x-tab-strip li.x-tab-edge {
     overflow:hidden;
 }
 
-.ext-ie .x-tab-strip .x-tab-right {
-    position:relative;
-}
-
-.x-tab-strip-top .x-tab-strip-active .x-tab-right {
-    margin-bottom:-1px;
-}
-
-.x-tab-strip-top .x-tab-strip-active .x-tab-right span.x-tab-strip-text {
-    padding-bottom:5px;
-}
-
-.x-tab-strip-bottom .x-tab-strip-active .x-tab-right {
-    margin-top:-1px;
-}
-
-.x-tab-strip-bottom .x-tab-strip-active .x-tab-right span.x-tab-strip-text {
-    padding-top:5px;
-}
-
-.x-tab-strip-bottom .x-tab-right {
-    padding:0;
-}
-
 .x-tab-strip .x-tab-strip-close {
     display:none;
 }
@@ -442,29 +407,24 @@ ul.x-tab-strip li.x-tab-edge {
 }
 
 .x-tab-strip-closable .x-tab-left {
-    padding-right:19px;
+    padding-right:dp(24);
 }
 
 .x-tab-strip .x-tab-strip-closable a.x-tab-strip-close {
    opacity:.6;
-   -moz-opacity:.6;
    display:block;
-	width:11px;
-   height:11px;
    position:absolute;
-   top:3px;
-   right:3px;
+   top:0;
+   right:dp(8);
    cursor:pointer;
    z-index:2;
 }
 
 .x-tab-strip .x-tab-strip-active a.x-tab-strip-close {
     opacity:.8;
-    -moz-opacity:.8;
 }
 .x-tab-strip .x-tab-strip-closable a.x-tab-strip-close:hover{
     opacity:1;
-    -moz-opacity:1;
 }
 
 .x-tab-panel-body-bottom {
