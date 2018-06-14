@@ -40,7 +40,7 @@ abstract class AclEntity extends Entity {
 	
 	protected function internalSave() {
 		
-		if($this->isNew()) {
+		if($this->isNew() && !isset($this->aclId)) {
 			$this->createAcl();
 		}
 		
