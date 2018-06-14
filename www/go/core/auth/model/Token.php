@@ -214,8 +214,8 @@ class Token extends Entity {
 	public function setAuthenticated(){
 		
 		$user = $this->getUser();
-		$user->lastlogin = time();
-		$user->logins++;
+		$user->lastLogin = new DateTime();
+		$user->loginCount++;
 		if(!$user->save()) {
 			return false;
 		}

@@ -10,6 +10,13 @@ go.systemsettings.NotificationsPanel = Ext.extend(Ext.form.FormPanel, {
 					},
 					xtype: "fieldset",
 					title: t('Outgoing E-mail (SMTP)'),
+					bbar: [
+						{
+							text: t("Send test message"),
+							handler: this.sendTestMessage,
+							scope: this
+						}
+					],
 					items: [
 						{
 							xtype: 'textfield',
@@ -75,32 +82,56 @@ go.systemsettings.NotificationsPanel = Ext.extend(Ext.form.FormPanel, {
 		});
 
 		go.systemsettings.NotificationsPanel.superclass.initComponent.call(this);
+		
+		this.on('render', function() {
+			go.Jmap.request({
+				method: "core/core/Settings/get",
+				callback: function (options, success, response) {
+						var f = this.getForm();
+						f.setValues(response);				
+						f.findField("enableEmailDebug").setValue(!GO.util.empty(f.findField('debugEmail').getValue()));
+				},
+				scope: this
+			});
+		}, this);
+	},
+	
+	sendTestMessage : function() {
+		go.Jmap.request({
+			method: "core/core/Settings/sendTestMessage",
+			params: this.getForm().getFieldValues(),
+			callback: function (options, success, response) {
+				if(success) {
+					Ext.MessageBox.alert(
+						t("Success"), 
+						t("A message was sent successfully to {email}").replace('{email}', this.getForm().findField('systemEmail').getValue())
+					);
+				} else
+				{
+					var error = "";
+					if(response[0] == "error") {
+						error = "<br /><br />" + response[1].message;
+					}
+					Ext.MessageBox.alert(
+						t("Failed"), 
+						t("Failed to send message to {email}").replace('{email}', this.getForm().findField('systemEmail').getValue() + error) 
+					);
+				}
+			},
+			scope: this
+		});
+		
+		
 	},
 
-	submit: function (cb, scope) {
+	onSubmit: function (cb, scope) {
 		go.Jmap.request({
 			method: "core/core/Settings/set",
 			params: this.getForm().getFieldValues(),
 			callback: function (options, success, response) {
-				cb.call(scope, success);
+				cb.call(scope, this, success);
 			},
-			scop: scope
-		});
-	},
-
-	load: function (cb, scope) {
-		go.Jmap.request({
-			method: "core/core/Settings/get",
-			callback: function (options, success, response) {
-				
-				var f = this.getForm();
-				f.setValues(response);				
-				f.findField("enableEmailDebug").setValue(!GO.util.empty(f.findField('debugEmail').getValue()));
-				
-
-				cb.call(scope, success);
-			},
-			scope: this
+			scope: scope
 		});
 	}
 

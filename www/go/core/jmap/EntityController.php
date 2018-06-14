@@ -79,6 +79,11 @@ abstract class EntityController extends ReadOnlyEntityController {
 	private function createEntitites($create, &$result) {
 		foreach ($create as $clientId => $properties) {
 			
+			if(!$this->canCreate()) {
+				$result['notCreated'][$id] = new SetError("forbidden");
+				continue;
+			}
+			
 			$entity = $this->create($properties);
 
 			if (!$entity->hasValidationErrors()) {
@@ -90,6 +95,11 @@ abstract class EntityController extends ReadOnlyEntityController {
 			}
 		}
 	}
+	
+	protected function canCreate() {
+		return true;
+	}
+	
 	/**
 	 * @todo Check permissions
 	 * 
@@ -129,6 +139,10 @@ abstract class EntityController extends ReadOnlyEntityController {
 
 		return empty($diff) ? null : $diff;
 	}
+	
+	protected function canUpdate(Entity $entity) {
+		return $entity->hasPermissionLevel(Acl::LEVEL_WRITE);
+	}
 
 	/**
 	 * 
@@ -143,7 +157,10 @@ abstract class EntityController extends ReadOnlyEntityController {
 				continue;
 			}
 			
-			if(!$entity->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+			//apply new values before canUpdate so this function can check for modified properties too.
+			$entity->setValues($properties);
+			
+			if(!$this->canUpdate($entity)) {
 				$result['notUpdated'][$id] = new SetError("forbidden");
 				continue;
 			}
@@ -161,17 +178,26 @@ abstract class EntityController extends ReadOnlyEntityController {
 	
 	protected function update(Entity $entity, array $properties) {
 		
-		$entity->setValues($properties);
+		
 		$entity->save();
 		
 		return !$entity->hasValidationErrors();
+	}
+	
+	protected function canDestroy(Entity $entity) {
+		return $entity->hasPermissionLevel(Acl::LEVEL_DELETE);
 	}
 
 	private function destroyEntities($destroy, &$result) {
 		foreach ($destroy as $id) {
 			$entity = $this->getEntity($id);
-			if (!$entity || !$entity->hasPermissionLevel(Acl::LEVEL_DELETE)) {
+			if (!$entity) {
 				$result['notDestroyed'][$id] = new SetError('notFound');
+				continue;
+			}
+			
+			if(!$this->canDestroy($entity)) {
+				$result['notDestroyed'][$id] = new SetError("forbidden");
 				continue;
 			}
 

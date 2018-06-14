@@ -58,20 +58,20 @@ class Instance extends Entity {
 			}
 
 			if(!$this->getConfigFile()->isWritable()) {
-				$this->setValidationError('hostname', ErrorCode::UNAUTHORIZED, 'The configuration file is not writable');
+				$this->setValidationError('hostname', ErrorCode::FORBIDDEN, 'The configuration file is not writable');
 			}
 
 			if(!$this->getDataFolder()->isWritable()) {
-				$this->setValidationError('hostname', ErrorCode::UNAUTHORIZED, 'The data folder is not writable');
+				$this->setValidationError('hostname', ErrorCode::FORBIDDEN, 'The data folder is not writable');
 			}
 
 			if(!$this->getTempFolder()->isWritable()) {
-				$this->setValidationError('hostname', ErrorCode::UNAUTHORIZED, 'The temporary files folder is not writable');
+				$this->setValidationError('hostname', ErrorCode::FORBIDDEN, 'The temporary files folder is not writable');
 			}
 		} else {
 		
 			if($this->isModified('hostname')) {
-				$this->setValidationError('hostname', ErrorCode::UNAUTHORIZED, "You can't modify the hostname.");
+				$this->setValidationError('hostname', ErrorCode::FORBIDDEN, "You can't modify the hostname.");
 			}
 		}
 		

@@ -12,13 +12,11 @@
  */
 
 go.modules.community.apikeys.KeyGrid = Ext.extend(go.grid.GridPanel, {
-	iconCls: 'ic-lock',
+
 	initComponent: function () {
 		
 		var actions = this.initRowActions();
-		
-		this.title = t("API Keys");
-
+	
 		this.store = new go.data.Store({
 			fields: [
 				'id', 
@@ -31,15 +29,13 @@ go.modules.community.apikeys.KeyGrid = Ext.extend(go.grid.GridPanel, {
 
 		Ext.apply(this, {		
 			plugins: [actions],
-			tbar: [ '->', {					
-					iconCls: 'ic-add',
-					tooltip: t('Add'),
+			tbar: [  {					
+					text: t('Add key'),
 					handler: function (e, toolEl) {
 						var dlg = new go.modules.community.apikeys.KeyDialog();
 						dlg.show();
 					}
-				}
-				
+				}				
 			],
 			columns: [
 				{
@@ -141,10 +137,6 @@ go.modules.community.apikeys.KeyGrid = Ext.extend(go.grid.GridPanel, {
 		this.moreMenu.record = record;
 		
 		this.moreMenu.showAt(e.getXY());
-	},
-	
-	load : function() {
-		console.log("TODO this funciton should be renamed");
 	}
 });
 

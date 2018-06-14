@@ -88,7 +88,10 @@ class ErrorCode {
 	 */
 	const UNIQUE = 11;
 	
-	const UNAUTHORIZED = 12;
+	/**
+	 * When the user does something that is not allowed
+	 */
+	const FORBIDDEN = 12;
 	
 	
 	private static $descriptions = [
@@ -103,7 +106,7 @@ class ErrorCode {
 			self::CONNECTION_ERROR => 'Error while establishing connection',
 			self::INVALID_INPUT => 'Invalid input',
 			self::UNIQUE => 'The property must be unique',
-			self::UNAUTHORIZED => 'Unauthorized'
+			self::FORBIDDEN => 'Forbidden'
 	];	
 	
 	/**

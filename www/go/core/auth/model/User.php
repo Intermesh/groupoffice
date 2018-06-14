@@ -84,34 +84,72 @@ class User extends Entity {
 	 * 
 	 * @var int
 	 */
-	public $logins;
+	public $loginCount;
 	
-	public $lastlogin;
+	/**
+	 * Last login time
+	 * 
+	 * @var \go\core\util\DateTime
+	 */
+	public $lastLogin;
 	
-//	/**
-//	 *
-//	 * @var \go\core\util\DateTime
-//	 */
-//	public $lastLogin;
-//	
-//	/**
-//	 *
-//	 * @var \go\core\util\DateTime
-//	 */
-//	public $modifiedAt;
-//	
-//	/**
-//	 *
-//	 * @var \go\core\util\DateTime
-//	 */
-//	public $createdAt;
+	/**
+	 *
+	 * @var \go\core\util\DateTime
+	 */
+	public $modifiedAt;
 	
+	/**
+	 *
+	 * @var \go\core\util\DateTime
+	 */
+	public $createdAt;
 	
-	public $date_format;
-	public $time_format;
-	public $thousands_seporator;
-	public $decimal_separator;
+	/**
+	 * Date format
+	 * @var string
+	 */
+	public $dateFormat;
+	
+	/**
+	 * Time format
+	 * 
+	 * @var string
+	 */
+	public $timeFormat;
+	
+	/**
+	 * char to separate thousands in numbers
+	 * 
+	 * @var string
+	 */
+	public $thousandsSeparator;
+	
+	/**
+	 * Char to separate decimals in numbers
+	 * @var string
+	 */
+	public $decimalSeparator;
+	
+	/**
+	 * Currency char
+	 * 
+	 * @var string
+	 */
 	public $currency;
+	
+	/**
+	 * Separator for CSV lists. eg. ; or ,
+	 * @var string
+	 */
+	public $listSeparator;
+	
+	/**
+	 * Separator for text in CSV. eg. '"'
+	 * 
+	 * @var string
+	 */
+	public $textSeparator;
 	
 	
 	public $max_rows_list;
@@ -119,7 +157,7 @@ class User extends Entity {
 	public $start_module;
 	public $language;
 	public $theme;
-	public $first_weekday;
+	public $firstWeekday;
 	public $sort_name;
 	
 	public $mute_sound;
@@ -128,8 +166,7 @@ class User extends Entity {
 	public $show_smilies;
 	public $auto_punctuation;
 	
-	public $list_separator;
-	public $text_separator;
+	
 	protected $files_folder_id;
 	public $disk_quota;
 	public $disk_usage;
@@ -145,16 +182,8 @@ class User extends Entity {
 	public $force_password_change;
 	
 	
-	public function getDateFormat() {
-		return $this->date_format;
-	}
-	
-	public function getTimeFormat() {
-		return $this->time_format;
-	}
-	
 	public function getDateTimeFormat() {
-		return $this->getDateFormat() .' '. $this->time_format;
+		return $this->dateFormat . ' ' . $this->timeFormat;
 	}
 
 	/**
@@ -162,6 +191,12 @@ class User extends Entity {
 	 * @var Password
 	 */
 	protected $password;
+	
+	/**
+	 * Used for DIGEST authentication which is required for webdav to work with the Microsoft Windows client.
+	 * 
+	 * @var string
+	 */
 	protected $digest;
 
 	/**
@@ -185,6 +220,15 @@ class User extends Entity {
 			->addRelation("groups", UserGroup::class, ['id' => 'userId']);
 	}
 	
+	/**
+	 * Get the user's personal group used for granting permissions
+	 * 
+	 * @return Group	 
+	 */
+	public function getPersonalGroup() {
+		return Group::find()->where(['isUserGroupFor' => $this->id])->single();
+	}
+	
 	public function setValues(array $values) {
 		$this->passwordVerified = false;
 		return parent::setValues($values);
@@ -198,7 +242,7 @@ class User extends Entity {
 			$this->time_format = $s->defaultTimeFormat;	
 			$this->date_format = $s->defaultDateFormat;
 			$this->timezone = $s->defaultTimezone;
-			$this->first_weekday = $s->defaultFirstWeekday;
+			$this->firstWeekday = $s->defaultFirstWeekday;
 
 			$this->currency = $s->defaultCurrency;
 			
@@ -312,11 +356,22 @@ class User extends Entity {
 			return false;
 		}						
 		
-		return App::get()->getAuthState()->getUser()->isAdmin();
-		
+		return App::get()->getAuthState()->getUser()->isAdmin();		
 	}
 	
 	protected function internalValidate() {
+		
+//		if(!$this->isNew() && $this->isModified('groups')) {
+//			$groupIds = array_column($this->groups, 'groupId');
+//			
+//			if(!in_array(Group::ID_EVERYONE, $groupIds)) {
+//				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, "You can't remove group everyone");
+//			}
+//			
+//			if(!in_array($this->getPersonalGroup()->id, $groupIds)) {
+//				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, "You can't remove the user's personal group");
+//			}
+//		}
 		
 		if(!$this->validatePasswordChange()) {
 			if(!$this->hasValidationErrors('currentPassword')) {
@@ -353,6 +408,25 @@ class User extends Entity {
 
 	public function hasPermissionLevel($level = Acl::LEVEL_READ) {
 		return $this->id == App::get()->getAuthState()->getUserId() || App::get()->getAuthState()->getUser()->isAdmin();
+	}
+	
+	public static function filter(Query $query, array $filter) {
+		
+		if(!empty($filter['q'])) {
+			$query->andWhere(
+							(new \go\core\db\Criteria())
+							->where('username', 'LIKE', $filter['q'] . '%')
+							->orWhere('displayName', 'LIKE', $filter['q'] .'%')
+							->orWhere('email', 'LIKE', $filter['q'] .'%')
+							);
+			
+		}
+		
+		if(!empty($filter['groupId'])) {
+			$query->join('core_user_group', 'ug', 'ug.userId = u.id')->andWhere(['ug.groupId' => $filter['groupId']]);
+		}
+		
+		return parent::filter($query, $filter);
 	}
 
 	/**
@@ -429,28 +503,44 @@ class User extends Entity {
 			return false;
 		}
 		
-		//create users' group
-		if($this->isNew()) {
-			$group = new Group();
-			$group->name = $this->username;
-			$group->isUserGroupFor = $this->id;
-			if(!$group->save()) {
-				throw new \Exception("Could not create home group");
+		$this->addSystemGroups();
+		
+		
+		return true;		
+	}
+	
+	private function addSystemGroups() {
+		if($this->isNew() || $this->isModified('groups')) {
+			$groupIds = array_column($this->groups, 'groupId');
+			
+			if(!in_array(Group::ID_EVERYONE, $groupIds)) {
+				$this->groups[] = ['groupId' => Group::ID_EVERYONE];
 			}
-
-			if(!(new UserGroup)->setValues(['groupId' => $group->id, 'userId' => $this->id])->internalSave()) {
+			
+			if($this->isNew()){// !in_array($this->getPersonalGroup()->id, $groupIds)) {
+				$personalGroup = new Group();
+				$personalGroup->name = $this->username;
+				$personalGroup->isUserGroupFor = $this->id;
+				if(!$personalGroup->save()) {
+					throw new \Exception("Could not create home group");
+				}
+			} else
+			{
+				$personalGroup = $this->getPersonalGroup();
+			}
+			
+			
+			if(!in_array($personalGroup->id, $groupIds) && !(new UserGroup)->setValues(['groupId' => $personalGroup->id, 'userId' => $this->id])->internalSave()) {
 				throw new \Exception("Couldn't add user to group");
 			}
-			if(!(new UserGroup)->setValues(['groupId' => Group::ID_EVERYONE, 'userId' => $this->id])->internalSave()) {
+			
+			if(!in_array(Group::ID_EVERYONE, $groupIds) && !(new UserGroup)->setValues(['groupId' => Group::ID_EVERYONE, 'userId' => $this->id])->internalSave()) {
 				throw new \Exception("Couldn't add user to group");
 			}
 			
 			$this->checkOldFramework();
 			
 		}
-		
-		
-		return true;		
 	}
 	
 	
@@ -501,6 +591,16 @@ class User extends Entity {
 		}
 		
 		return true;		
+	}
+	
+	protected function internalDelete() {
+		
+		if($this->id == 1) {
+			$this->setValidationError("id", ErrorCode::FORBIDDEN, "You can't delete the primary administrator");
+			return false;
+		}
+		
+		return parent::internalDelete();
 	}
 
 }

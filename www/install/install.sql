@@ -171,47 +171,47 @@ CREATE TABLE `core_user` (
   `id` int(11) NOT NULL,
   `username` varchar(50) NOT NULL,
   `displayName` varchar(190) DEFAULT '',
-	`avatarId` BINARY(40) NULL,
-  `enabled` tinyint(1) NOT NULL DEFAULT '1',
+  `avatarId` binary(40) DEFAULT NULL,
+  `enabled` tinyint(1) NOT NULL DEFAULT 1,
   `email` varchar(100) NOT NULL,
   `recoveryEmail` varchar(100) NOT NULL,
-  `recoveryHash` VARCHAR(40) NULL,
-  `recoverySendAt` DATETIME NULL,
-  `date_format` varchar(20) NOT NULL DEFAULT 'd-m-Y',
-  `time_format` varchar(10) NOT NULL DEFAULT 'G:i',
-  `thousands_separator` varchar(1) NOT NULL DEFAULT '.',
-  `decimal_separator` varchar(1) NOT NULL DEFAULT ',',
+  `recoveryHash` varchar(40) DEFAULT NULL,
+  `recoverySendAt` datetime DEFAULT NULL,
+  `lastLogin` datetime DEFAULT NULL,
+  `createdAt` datetime DEFAULT NULL,
+  `modifiedAt` datetime DEFAULT NULL,
+  `dateFormat` varchar(20) NOT NULL DEFAULT 'd-m-Y',
+  `timeFormat` varchar(10) NOT NULL DEFAULT 'G:i',
+  `thousandsSeparator` varchar(1) NOT NULL DEFAULT '.',
+  `decimalSeparator` varchar(1) NOT NULL DEFAULT ',',
   `currency` char(3) NOT NULL DEFAULT '',
-  `logins` int(11) NOT NULL DEFAULT '0',
-  `lastlogin` int(11) NOT NULL DEFAULT '0',
-  `ctime` int(11) NOT NULL DEFAULT '0',
-  `max_rows_list` tinyint(4) NOT NULL DEFAULT '20',
+  `loginCount` int(11) NOT NULL DEFAULT 0,
+  `max_rows_list` tinyint(4) NOT NULL DEFAULT 20,
   `timezone` varchar(50) NOT NULL DEFAULT 'Europe/Amsterdam',
   `start_module` varchar(50) NOT NULL DEFAULT 'summary',
   `language` varchar(20) NOT NULL DEFAULT 'en',
   `theme` varchar(20) NOT NULL DEFAULT 'Default',
-  `first_weekday` tinyint(4) NOT NULL DEFAULT '0',
+  `firstWeekday` tinyint(4) NOT NULL DEFAULT 0,
   `sort_name` varchar(20) NOT NULL DEFAULT 'first_name',
-  `mtime` int(11) NOT NULL DEFAULT '0',
-  `muser_id` int(11) NOT NULL DEFAULT '0',
-  `mute_sound` tinyint(1) NOT NULL DEFAULT '0',
-  `mute_reminder_sound` tinyint(1) NOT NULL DEFAULT '0',
-  `mute_new_mail_sound` tinyint(1) NOT NULL DEFAULT '0',
-  `show_smilies` tinyint(1) NOT NULL DEFAULT '1',
-  `auto_punctuation` tinyint(1) NOT NULL DEFAULT '0',
-  `list_separator` char(3) NOT NULL DEFAULT ';',
-  `text_separator` char(3) NOT NULL DEFAULT '"',
-  `files_folder_id` int(11) NOT NULL DEFAULT '0',
+  `muser_id` int(11) NOT NULL DEFAULT 0,
+  `mute_sound` tinyint(1) NOT NULL DEFAULT 0,
+  `mute_reminder_sound` tinyint(1) NOT NULL DEFAULT 0,
+  `mute_new_mail_sound` tinyint(1) NOT NULL DEFAULT 0,
+  `show_smilies` tinyint(1) NOT NULL DEFAULT 1,
+  `auto_punctuation` tinyint(1) NOT NULL DEFAULT 0,
+  `listSeparator` char(3) NOT NULL DEFAULT ';',
+  `textSeparator` char(3) NOT NULL DEFAULT '"',
+  `files_folder_id` int(11) NOT NULL DEFAULT 0,
   `disk_quota` bigint(20) DEFAULT NULL,
-  `disk_usage` bigint(20) NOT NULL DEFAULT '0',
-  `mail_reminders` tinyint(1) NOT NULL DEFAULT '0',
-  `popup_reminders` tinyint(1) NOT NULL DEFAULT '0',
-  `popup_emails` tinyint(1) NOT NULL DEFAULT '0',
+  `disk_usage` bigint(20) NOT NULL DEFAULT 0,
+  `mail_reminders` tinyint(1) NOT NULL DEFAULT 0,
+  `popup_reminders` tinyint(1) NOT NULL DEFAULT 0,
+  `popup_emails` tinyint(1) NOT NULL DEFAULT 0,
   `holidayset` varchar(10) DEFAULT NULL,
-  `sort_email_addresses_by_time` tinyint(1) NOT NULL DEFAULT '0',
-  `no_reminders` tinyint(1) NOT NULL DEFAULT '0',
-  `last_password_change` int(11) NOT NULL DEFAULT '0',
-  `force_password_change` tinyint(1) NOT NULL DEFAULT '0'
+  `sort_email_addresses_by_time` tinyint(1) NOT NULL DEFAULT 0,
+  `no_reminders` tinyint(1) NOT NULL DEFAULT 0,
+  `last_password_change` int(11) NOT NULL DEFAULT 0,
+  `force_password_change` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS `core_user_group`;
@@ -428,6 +428,12 @@ CREATE TABLE `go_working_weeks` (
 
 ALTER TABLE `core_user_custom_fields`
   ADD PRIMARY KEY (`id`);
+
+ALTER TABLE `core_user`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`),
+  ADD KEY `fk_user_avatar_id_idx` (`avatarId`);
+
 
 ALTER TABLE `core_acl`
   ADD PRIMARY KEY (`id`);
@@ -665,14 +671,9 @@ CREATE TABLE `core_blob` (
 
 ALTER TABLE `core_search` ADD FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
-ALTER TABLE `core_user` 
-ADD INDEX `fk_user_avatar_id_idx` (`avatarId` ASC);
-ALTER TABLE `core_user` 
-ADD CONSTRAINT `fk_user_avatar_id`
-  FOREIGN KEY (`avatarId`)
-  REFERENCES `core_blob` (`id`)
-  ON DELETE RESTRICT
-  ON UPDATE NO ACTION;
+	
+ALTER TABLE `core_user`
+  ADD CONSTRAINT `fk_user_avatar_id` FOREIGN KEY (`avatarId`) REFERENCES `core_blob` (`id`) ON UPDATE NO ACTION;
 
 
 

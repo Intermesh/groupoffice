@@ -1,6 +1,6 @@
 go.form.Dialog = Ext.extend(go.Window, {
 	autoScroll: true,
-	width: 400,
+	width: 500,
 	modal: true,
 	showAnimDuration: 0.16,
 	hideAnimDuration: 0.16,
@@ -8,9 +8,11 @@ go.form.Dialog = Ext.extend(go.Window, {
 	entityStore: null,
 	currentId: null,
 	buttonAlign: 'left',
+	layout: "fit",
 	initComponent: function () {
 
-		this.formPanel = new Ext.FormPanel({
+		this.formPanel = new go.form.EntityPanel({
+			entityStore: this.entityStore,
 			items: this.initFormItems()
 		});		
 		
@@ -24,17 +26,17 @@ go.form.Dialog = Ext.extend(go.Window, {
 				scope: this
 			}), '->', {
 				text: t("Save"),
-				handler: this.submitForm,
+				handler: this.submit,
 				scope: this
 			}];
 
 		go.form.Dialog.superclass.initComponent.call(this);
 		
 		this.entityStore.on('changes',this.onChanges, this);
-		
-		this.on("destroy", function() {
-			this.entityStore.un("changes", this.onChanges, this);
-		})
+
+		this.on('destroy', function() {
+			this.entityStore.un('changes', this.onChanges, this);
+		}, this);
 
 		if (this.formValues) {
 			this.formPanel.form.setValues(this.formValues);
@@ -45,17 +47,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 	load: function (id) {
 		this.currentId = id;
 
-		var entities = this.entityStore.get([id]);
-		
-		if(entities) {
-			if(!this.rendered) {
-				//otherwise form field initValue is called after form is loaded.
-				this.render(Ext.getBody());
-			}
-			this.formPanel.getForm().setValues(entities[0]);
-			this.deleteBtn.setDisabled(entities[0].permissionLevel < GO.permissionLevels.writeAndDelete);
-		
-		} else {
+		if(!this.formPanel.load(id)) {			
 			//If no entity was returned the entity store will load it and fire the "changes" event. This dialog listens to that event.
 			this.actionStart();
 		}
@@ -67,11 +59,6 @@ go.form.Dialog = Ext.extend(go.Window, {
 		
 		if(changed.concat(added).indexOf(this.currentId) !== -1) {
 			this.actionComplete();
-			
-			var entities = this.entityStore.get([this.currentId]);
-			this.formPanel.getForm().setValues(entities[0]);
-			this.deleteBtn.setDisabled(entities[0].permissionLevel < GO.permissionLevels.writeAndDelete);
-		
 		}		
 	},
 
@@ -105,86 +92,33 @@ go.form.Dialog = Ext.extend(go.Window, {
 			this.getTopToolbar().setDisabled(false);
 		}
 		if (this.getFooterToolbar()) {
-			this.getFooterToolbar().setDisabled(false);
-			
+			this.getFooterToolbar().setDisabled(false);	
 		}
 	},
-
-	submitForm: function () {
-
-		if (!this.formPanel.getForm().isValid()) {
+	
+	isValid : function() {
+		return this.formPanel.isValid();
+	},
+	
+	focus : function() {
+		this.formPanel.focus();
+	},
+	
+	submit : function() {
+		
+		if (!this.isValid()) {
 			return;
 		}
-
-		var id, params = {}, values = this.formPanel.getForm().getFieldValues();
-		//		//this.id is null when new
-		if (this.currentId) {
-
-			id = this.currentId;
-
-			params.update = {};
-			params.update[this.currentId] = values;
-		} else {
-
-			id = Ext.id();
-			params.create = {};
-			params.create[id] = values;
-		}
-
+		
 		this.actionStart();
-		this.entityStore.set(params, function (options, success, response) {
-
+		
+		this.formPanel.submit(function(formPanel, success, serverId) {
 			this.actionComplete();
-
-			var saved = (params.create ? response.created : response.updated) || {};
-			if (saved[id]) {				
-				this.fireEvent("save", this, values);
-
-				var serverId = params.create ? response.created[id].id : response.updated[id].id;
-
+			if(success) {
 				this.entityStore.entity.goto(serverId);
-
 				this.close();
-			} else
-			{
-				//something went wrong
-				var notSaved = (params.create ? response.notCreated : response.notUpdated) || {};
-				if (!notSaved[id]) {
-					notSaved[id] = {type: "unknown"};
-				}
-
-				switch (notSaved[id].type) {
-					case "forbidden":
-						Ext.MessageBox.alert(t("Access denied"), t("Sorry, you don't have permissions to update this item"));
-						break;
-
-					default:
-						
-						//mark validation errors
-						for(name in notSaved[id].validationErrors) {
-							var field = this.formPanel.getForm().findField(name);
-							if(field) {
-								field.markInvalid(notSaved[id].validationErrors[name].description);
-							}
-						}
-						
-						Ext.MessageBox.alert(t("Error"), t("Sorry, something went wrong. Please try again."));
-						break;
-				}
-			}
+			}			
 		}, this);
-
-	},
-
-	focus: function () {
-		var firstField = this.formPanel.form.items.find(function (item) {
-			if (!item.disabled && item.isVisible() && item.getValue() == "")
-				return true;
-		});
-
-		if (firstField) {
-			firstField.focus();
-		}
 	},
 
 	initFormItems: function () {

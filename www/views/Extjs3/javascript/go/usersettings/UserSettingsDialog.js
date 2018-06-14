@@ -68,7 +68,13 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 				columns: [{dataIndex:'name'}],
 				listeners: {
 					selectionchange: function(view, nodes) {					
-						this.tabPanel.setActiveTab(nodes[0].viewIndex);
+						if(nodes.length) {
+							this.tabPanel.setActiveTab(nodes[0].viewIndex);
+						} else
+						{
+							//restore selection if user clicked outside of view
+							view.select(this.tabPanel.items.indexOf(this.tabPanel.getActiveTab()));
+						}
 					},
 					scope:this
 				}
@@ -139,7 +145,9 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 		this.selectView.select(this.tabStore.getAt(0));
 		
-		this.load();
+		if(this.currentUser) {
+			this.load();
+		}
 	},
 	
 	/**
@@ -242,6 +250,8 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 						field.markInvalid(response.notUpdated[id].validationErrors[name].description);
 					}
 				}
+				
+				this.actionComplete();
 			}
 
 		},this);
@@ -289,7 +299,12 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		this.actionComplete();
 		
 		//reload group-office
-		document.location = BaseHref + "?SET_LANGUAGE=" + this.formPanel.getForm().findField('language').getValue();
+		if(this.currentUser == go.User.id) {
+			document.location = BaseHref + "?SET_LANGUAGE=" + this.formPanel.getForm().findField('language').getValue();
+		} else
+		{
+			this.close();
+		}
 	},
 		
 	/**
@@ -411,6 +426,10 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			'icon':pnl.iconCls,
 			'visible':true
 		});
+		
+		if(pnl.isFormField) {
+			this.formPanel.getForm().add(pnl);
+		}
 		
 		if(Ext.isEmpty(position)){
 			this.tabPanel.add(pnl);
