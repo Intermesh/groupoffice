@@ -1,7 +1,7 @@
 <?php
 namespace go\core\cli;
 
-use go\core\auth\model\User;
+use go\modules\core\users\model\User;
 use go\core\auth\State as AbstractState;
 use go\core\Environment;
 

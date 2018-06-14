@@ -132,7 +132,7 @@ class UserController extends \GO\Base\Controller\AbstractModelController {
 			$groupsMember = json_decode($_POST['group_member'], true);
 			
 			
-			$userGroup = \go\core\auth\model\Group::find()->where(['isUserGroupFor' => $model->id])->single();
+			$userGroup = \go\modules\core\groups\model\Group::find()->where(['isUserGroupFor' => $model->id])->single();
 			/**
 			 * Process selected module permissions
 			 */

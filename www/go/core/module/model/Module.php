@@ -4,8 +4,8 @@ namespace go\core\module\model;
 use Exception;
 use go\core\acl\model\AclEntity;
 use go\core\App;
-use go\core\auth\model\Group;
-use go\core\auth\model\User;
+use go\modules\core\groups\model\Group;
+use go\modules\core\users\model\User;
 use go\core\db\Utils;
 use go\core\links\Link;
 use go\core\module\Base;
@@ -72,14 +72,9 @@ class Module extends AclEntity {
 	public static function findByClass($className) {
 		
 		switch($className) {	
-			case \go\core\auth\model\Group::class:
-				$module = Module::find()->where(['name' => "groups"])->single();				
-				break;
+			
 			case strpos($className, "go\core\auth") === 0:
 				$module = Module::find()->where(['name' => "users"])->single();				
-				break;
-			case \go\core\auth\model\Module::class:				
-				$module = Module::find()->where(['name' => "modules"])->single();
 				break;
 			case Link::class:				
 				$module = Module::find()->where(['name' => "links"])->single();

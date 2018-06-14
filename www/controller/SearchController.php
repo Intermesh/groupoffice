@@ -306,7 +306,7 @@ class SearchController extends \GO\Base\Controller\AbstractModelController{
 				
 //			//$stmt = \GO\Addressbook\Model\Contact::model()->findUsers(\GO::user()->id, $findParams);
 //			
-//			$stmt = \go\core\auth\model\User::applyAclToQuery(\go\core\auth\model\User::find());
+//			$stmt = \go\modules\core\users\model\User::applyAclToQuery(\go\modules\core\users\model\User::find());
 //
 //			$userContactIds = array();
 //

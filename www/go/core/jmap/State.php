@@ -3,7 +3,7 @@ namespace go\core\jmap;
 
 use go\core\auth\State as AbstractState;
 use go\core\auth\model\Token;
-use go\core\auth\model\User;
+use go\modules\core\users\model\User;
 use go\core\jmap\Request;
 use go\core\http\Response;
 

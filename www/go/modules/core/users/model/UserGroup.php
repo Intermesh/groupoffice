@@ -1,5 +1,5 @@
 <?php
-namespace go\core\auth\model;
+namespace go\modules\core\users\model;
 
 class UserGroup extends \go\core\orm\Property {
 	

@@ -11,7 +11,7 @@ use GO\Addressbook\Model\Addresslist;
 use GO\Addressbook\Model\UserSettings;
 use GO\Addressbook\Model\Template;
 
-use go\core\auth\model\User;
+use go\modules\core\users\model\User;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 

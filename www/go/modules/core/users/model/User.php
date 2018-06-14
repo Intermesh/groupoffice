@@ -1,8 +1,8 @@
 <?php
 
-namespace go\core\auth\model;
+namespace go\modules\core\users\model;
 
-use DateTime;
+use Exception;
 use GO;
 use GO\Base\Model\AbstractUserDefaultModel;
 use GO\Base\Model\User as LegacyUser;
@@ -12,12 +12,15 @@ use go\core\App;
 use go\core\auth\Method;
 use go\core\auth\Password;
 use go\core\auth\PrimaryAuthenticator;
+use go\core\db\Criteria;
 use go\core\db\Query;
 use go\core\exception\Forbidden;
+use go\core\jmap\Entity;
 use go\core\module\model\Module;
 use go\core\orm\CustomFieldsTrait;
-use go\core\jmap\Entity;
+use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
+use go\modules\core\groups\model\Group;
 use go\modules\core\users\model\Settings;
 
 /**
@@ -89,19 +92,19 @@ class User extends Entity {
 	/**
 	 * Last login time
 	 * 
-	 * @var \go\core\util\DateTime
+	 * @var DateTime
 	 */
 	public $lastLogin;
 	
 	/**
 	 *
-	 * @var \go\core\util\DateTime
+	 * @var DateTime
 	 */
 	public $modifiedAt;
 	
 	/**
 	 *
-	 * @var \go\core\util\DateTime
+	 * @var DateTime
 	 */
 	public $createdAt;
 	
@@ -414,7 +417,7 @@ class User extends Entity {
 		
 		if(!empty($filter['q'])) {
 			$query->andWhere(
-							(new \go\core\db\Criteria())
+							(new Criteria())
 							->where('username', 'LIKE', $filter['q'] . '%')
 							->orWhere('displayName', 'LIKE', $filter['q'] .'%')
 							->orWhere('email', 'LIKE', $filter['q'] .'%')
@@ -522,7 +525,7 @@ class User extends Entity {
 				$personalGroup->name = $this->username;
 				$personalGroup->isUserGroupFor = $this->id;
 				if(!$personalGroup->save()) {
-					throw new \Exception("Could not create home group");
+					throw new Exception("Could not create home group");
 				}
 			} else
 			{
@@ -531,11 +534,11 @@ class User extends Entity {
 			
 			
 			if(!in_array($personalGroup->id, $groupIds) && !(new UserGroup)->setValues(['groupId' => $personalGroup->id, 'userId' => $this->id])->internalSave()) {
-				throw new \Exception("Couldn't add user to group");
+				throw new Exception("Couldn't add user to group");
 			}
 			
 			if(!in_array(Group::ID_EVERYONE, $groupIds) && !(new UserGroup)->setValues(['groupId' => Group::ID_EVERYONE, 'userId' => $this->id])->internalSave()) {
-				throw new \Exception("Couldn't add user to group");
+				throw new Exception("Couldn't add user to group");
 			}
 			
 			$this->checkOldFramework();

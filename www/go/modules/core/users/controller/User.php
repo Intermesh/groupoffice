@@ -2,7 +2,7 @@
 
 namespace go\modules\core\users\controller;
 
-use go\core\auth\model;
+use go\modules\core\users\model;
 use go\core\jmap\EntityController;
 
 

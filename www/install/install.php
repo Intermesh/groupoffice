@@ -98,7 +98,7 @@ if (!empty($_POST)) {
 		App::get()->getSettings()->databaseVersion = App::get()->getVersion();
 		App::get()->getSettings()->save();
 				
-		\go\core\auth\model\User::findById(1)->checkOldFramework();
+		\go\modules\core\users\model\User::findById(1)->checkOldFramework();
 
 		header("Location: finished.php");
 		exit();

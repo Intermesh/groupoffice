@@ -1,11 +1,12 @@
 <?php
 
-namespace go\core\auth\model;
+namespace go\modules\core\groups\model;
 
 use go\core\acl\model\AclEntity;
 use go\core\db\Criteria;
 use go\core\db\Query;
 use go\core\validate\ErrorCode;
+use go\modules\core\users\model\UserGroup;
 
 /**
  * Group model

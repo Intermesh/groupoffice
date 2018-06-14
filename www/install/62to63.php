@@ -448,8 +448,8 @@ $qs[] = function() {
 	
 	\go\core\links\Link::getType();
 	\go\core\search\Search::getType();
-	\go\core\auth\model\User::getType();
-	\go\core\auth\model\Group::getType();
+	\go\modules\core\users\model\User::getType();
+	\go\modules\core\groups\model\Group::getType();
 	
 	\go\core\module\model\Module::getType();
 };

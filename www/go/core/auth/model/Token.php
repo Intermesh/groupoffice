@@ -201,7 +201,7 @@ class Token extends Entity {
 	 */
 	public function getUser() {
 		if(!$this->user) {
-			$this->user = User::findById($this->userId);
+			$this->user = \go\modules\core\users\model\User::findById($this->userId);
 		}
 		return $this->user;
 	}

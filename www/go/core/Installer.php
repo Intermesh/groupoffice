@@ -3,9 +3,9 @@
 namespace go\core;
 
 use Exception;
-use go\core\auth\model\Group;
-use go\core\auth\model\User;
-use go\core\auth\model\UserGroup;
+use go\modules\core\users\groups\Group;
+use go\modules\core\users\model\User;
+use go\modules\core\users\model\UserGroup;
 use go\core\db\Utils;
 use go\core\module\Base;
 use go\core\orm\Entity;

@@ -78,7 +78,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 			return null;
 		}
 		
-		$user = \go\core\auth\model\User::findById($this->id);
+		$user = \go\modules\core\users\model\User::findById($this->id);
 		
 		return $user->password;
 	}
@@ -142,7 +142,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 * @deprecated since version 6.3
 	 */
 	public function getDigest(){
-		$user = \go\core\auth\model\User::findById($this->id);
+		$user = \go\modules\core\users\model\User::findById($this->id);
 		
 		return $user->getDigest();
 	}
@@ -544,7 +544,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 		}
 		
 		if(isset($this->password)) {
-			$user = \go\core\auth\model\User::findById($this->id);		
+			$user = \go\modules\core\users\model\User::findById($this->id);		
 			$user->setPassword($this->password);		
 			if(!$user->save()) {
 				throw new \Exception("Could not set password: ".var_export($user->getValidationErrors(), true));
@@ -743,7 +743,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 */
 	public function checkPassword($password){
 		
-		$user = \go\core\auth\model\User::findById($this->id);
+		$user = \go\modules\core\users\model\User::findById($this->id);
 		return $user->checkPassword($password);
 	}	
 	

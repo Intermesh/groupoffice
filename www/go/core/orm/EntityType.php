@@ -200,16 +200,7 @@ class EntityType {
 		$e->moduleId = $record['moduleId'];
 
 		if (isset($record['modulePackage'])) {
-
-			switch ($e->name) {
-
-				case 'User':
-					$e->className = \go\core\auth\model\User::class;
-					break;
-
-				default:
-					$e->className = 'go\\modules\\' . $record['modulePackage'] . '\\' . $record['moduleName'] . '\\model\\' . ucfirst($e->name);
-			}
+			$e->className = 'go\\modules\\' . $record['modulePackage'] . '\\' . $record['moduleName'] . '\\model\\' . ucfirst($e->name);
 		} else {
 			switch ($e->name) {
 

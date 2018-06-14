@@ -1,14 +1,9 @@
 <?php
 
-use GO\Addressbook\Model\Contact;
-use GO\Base\Model\State;
 use GO\Base\Util\Crypt;
-use go\core\auth\model\Token;
 use go\core\fs\File;
 use go\core\fs\Folder;
 use go\core\module\Base;
-use GO\Customfields\Model\Category;
-use GO\Users\Model\CfSettingTab;
 
 /**
  * Copyright Intermesh
