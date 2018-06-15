@@ -242,8 +242,8 @@ class User extends Entity {
 		
 		if($this->isNew()) {
 			$s = Settings::get();
-			$this->time_format = $s->defaultTimeFormat;	
-			$this->date_format = $s->defaultDateFormat;
+			$this->timeFormat = $s->defaultTimeFormat;	
+			$this->dateFormat = $s->defaultDateFormat;
 			$this->timezone = $s->defaultTimezone;
 			$this->firstWeekday = $s->defaultFirstWeekday;
 
