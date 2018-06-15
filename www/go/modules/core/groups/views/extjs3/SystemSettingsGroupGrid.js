@@ -62,7 +62,7 @@ go.modules.core.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'displayName',
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 						var user = record.get("user");
-						var style = user && user.avatarId ? 'background-image: url(' + go.Jmap.downloadUrl(record.get("user").avatarId) + ')"' : "";
+//						var style = user && user.avatarId ? 'background-image: url(' + go.Jmap.downloadUrl(record.get("user").avatarId) + ')"' : "";
 
 						var memberStr = t("Loading members...");
 
@@ -83,7 +83,7 @@ go.modules.core.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 							}
 						}
 
-						return '<div class="user"><div class="avatar" style="' + style + '"></div>' +
+						return '<div class="user"><div class="avatar group"></div>' +
 										'<div class="wrap">' +
 										'<div class="displayName">' + record.get('name') + '</div>' +
 										'<small class="username">' + memberStr + '</small>' +

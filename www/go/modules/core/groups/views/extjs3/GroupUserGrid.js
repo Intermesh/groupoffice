@@ -83,9 +83,8 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'displayName',
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
-						var style = record.get('avatarId') ?  'background-image: url(' + go.Jmap.downloadUrl(record.get("avatarId")) + ')"' : "";
 						
-						return '<div class="user"><div class="avatar" style="'+style+'"></div>' +
+						return '<div class="user"><div class="avatar group"></div>' +
 							'<div class="wrap">'+
 								'<div class="displayName">' + record.get('displayName') + '</div>' +
 								'<small class="username">' + record.get('username') + '</small>' +
