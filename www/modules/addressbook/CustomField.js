@@ -12,10 +12,10 @@ GO.moduleManager.onModuleReady('customfields', function(){
 				xtype: 'selectcontact',
 				noUserContacts:true,
 				idValuePair:true,
-				hiddenName:customfield.dataname,
+				hiddenName: 'customFields.' + customfield.databaseName,
 				forceSelection:true,				
 				valueField:'cf',
-				customfieldId: customfield.dataname
+				customfieldId: customfield.id
 			});
 		}
 	}
@@ -31,10 +31,10 @@ GO.moduleManager.onModuleReady('customfields', function(){
 			return Ext.apply(f, {
 				xtype: 'selectcompany',
 				idValuePair:true,
-				hiddenName:customfield.dataname,
+				hiddenName: 'customFields.' + customfield.databaseName,
 				forceSelection:true,				
 				valueField:'cf',
-				customfieldId: customfield.dataname
+				customfieldId: customfield.id
 			});
 		}
 	}
