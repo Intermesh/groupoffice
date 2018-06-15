@@ -40,7 +40,7 @@ abstract class Base {
 	 * 
 	 * @return model\Module;
 	 */
-	public function install() {
+	public final function install() {
 
 		try{
 			$this->installDatabase();
@@ -84,7 +84,7 @@ abstract class Base {
 	
 	private function rollBack() {
 		GO()->getDbConnection()->rollBack();
-		$module->uninstallDatabase();
+		$this->uninstallDatabase();
 	}	
 	
 	/**
