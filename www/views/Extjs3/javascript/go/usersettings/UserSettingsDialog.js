@@ -250,6 +250,10 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	 */
 	needCurrentPassword : function(){
 		
+		if(go.User.isAdmin) {
+			return false;
+		}
+		
 		var needed = false,
 			accountPanel = this.tabPanel.getItem('pnl-account-settings');
 		accountPanel.findByType('field').forEach(function(item) {

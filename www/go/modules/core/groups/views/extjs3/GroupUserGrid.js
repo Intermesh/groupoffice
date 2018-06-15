@@ -83,9 +83,8 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'displayName',
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
-						var style = record.get('avatarId') ?  'background-image: url(' + go.Jmap.downloadUrl(record.get("avatarId")) + ')"' : "";
 						
-						return '<div class="user"><div class="avatar" style="'+style+'"></div>' +
+						return '<div class="user"><div class="avatar group"></div>' +
 							'<div class="wrap">'+
 								'<div class="displayName">' + record.get('displayName') + '</div>' +
 								'<small class="username">' + record.get('username') + '</small>' +
@@ -99,6 +98,12 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>',
 				forceFit: true,
 				autoFill: true
+			},
+			listeners: {
+				scope: this,
+				render: function() {
+					this.store.load();
+				}
 			}
 //			// config options for stateful behavior
 //			stateful: true,
@@ -139,15 +144,12 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 //	},
 	
 	onCheckChange : function(record, newValue) {
-		console.log(record.id);
 		if(newValue) {
 			this.selectedUsers.push(record.id);
 		} else
 		{
 			this.selectedUsers.splice(this.selectedUsers.indexOf(record.id), 1);
 		}
-		
-		console.log(this.selectedUsers);
 		
 		this._isDirty = true;
 	},
@@ -172,27 +174,13 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 		this.selectedUsers = [];
 		groups.forEach(function(group) {
 			me.selectedUsers.push(group.userId);
-		});		
+		});
 		
-		this.store.load();
-		
-		
-		//todo load and exclude selection
-		
-//		if(this.rendered) {
-//			this.store.load();
-//		} else if(!this.loading)
-//		{
-//			this.loading = true;
-//			this.on('render', function() {
-//				this.loading = false; 
-//				this.store.load();
-//			}, this, {single: true});
-//		}
+		//Perhaps needed when store not reloaded?
+		//this.getView().render();
 	},
 	
 	onStoreLoad : function() {
-		console.log(this.selectedUsers);
 		
 		//don't add selected on search
 		if(this.store.baseParams.filter.q) {

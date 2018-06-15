@@ -2,14 +2,19 @@
 
 namespace go\modules\core\users\controller;
 
-use go\modules\core\users\model;
+use GO;
+use go\core\exception\Forbidden;
 use go\core\jmap\EntityController;
+use go\core\jmap\exception\InvalidArguments;
+use go\core\jmap\Response;
+use go\core\orm\Entity;
+use go\modules\core\users\model;
 
 
 
 class User extends EntityController {	
 	
-	protected function canUpdate(\go\core\orm\Entity $entity) {
+	protected function canUpdate(Entity $entity) {
 		
 		if(!GO()->getAuthState()->getUser()->isAdmin()) {
 			if($entity->isModified('groups')) {
@@ -31,5 +36,22 @@ class User extends EntityController {
 	 */
 	protected function entityClass() {
 		return model\User::class;
+	}
+	
+	public function loginAs($params) {
+		
+		if(!isset($params['userId'])) {
+			throw new InvalidArguments("Missing parameter userId");
+		}
+		
+		if(!GO()->getAuthState()->getUser()->isAdmin()) {
+			throw new Forbidden();
+		}
+		
+		$token = GO()->getAuthState()->getToken();
+		$token->userId = $params['userId'];
+		$success = $token->setAuthenticated();
+		
+		Response::get()->addResponse(['success' => true]);
 	}
 }

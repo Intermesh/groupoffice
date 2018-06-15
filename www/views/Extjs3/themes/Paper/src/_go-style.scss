@@ -476,6 +476,19 @@ button {
 	background-size:cover;
 	border: 1px solid white;
 	border-radius: 50%;
+	
+	&.group {
+		&::before {
+			width: 100%;
+			height: 100%;
+			color: white;
+			@extend %icon;
+			font-size: dp(28);
+			margin: dp(4);			
+		}
+		@extend .ic-group;
+		background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24));	
+	}
 }
 
 .user {
