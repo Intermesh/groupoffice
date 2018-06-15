@@ -185,6 +185,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		$store = \GO\Base\Data\Store::newInstance(\GO\Base\Model\User::model(), array('password','digest'));
 		$store->setDefaultSortOrder('name', 'ASC');
 
+		$store->getColumnModel()->formatColumn('id', '$model->id', array(), array('t.id'));
 		$store->getColumnModel()->formatColumn('name', '$model->name', array(), array('displayName'));
 		$store->getColumnModel()->formatColumn('cf', '$model->id.":".$model->name'); //special field used by custom fields. They need an id an value in one.
 		

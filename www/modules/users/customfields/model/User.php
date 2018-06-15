@@ -18,4 +18,12 @@ class User extends \GO\Customfields\Model\AbstractCustomFieldsRecord{
 	public function extendsModel() {
 		return "GO\Base\Model\User";
 	}
+	
+	public function primaryKey(){
+			return 'id';
+	}	
+	
+	public function tableName() {
+		return 'core_user_custom_fields';
+	}
 }
