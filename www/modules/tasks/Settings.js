@@ -19,28 +19,7 @@ GO.tasks.SettingsPanel = Ext.extend(Ext.Panel, {
 	labelWidth: 125,
 	
 	onLoadStart: function (userId) {
-		
-		//temporary fix for combo to show address book name. Remove when refactored
-		var userGetRequest = go.Jmap.findRequestByMethod("User/get");
-		if(!userGetRequest) {
-			return;
-		}
-		var userGetRequestId = userGetRequest[2];
-		go.Jmap.request({
-			method: "community/tasks/TaskList/get",
-			params: {
-				"properties": ["name"],
-				"#ids": {
-						"resultOf": userGetRequestId,
-						"name": "User/get",
-						"path": "/list/*/taskSettings/default_tasklist_id"
-				}
-			},
-			callback: function(options, success, result) {
-				this.selectTaskList.setRemoteText(result.list[0].name);
-			},
-			scope: this
-		});
+
 	},
 	
 	initComponent: function() {

@@ -285,12 +285,14 @@ abstract class ReadOnlyEntityController extends Controller {
 			$result['list'] = $query->toArray();
 		} else
 		{
-			$result['list'] = $query->where($query->getTableAlias(). '.id', 'IN', $p['ids'])->toArray();
+			$stmt = $query->where($query->getTableAlias(). '.id', 'IN', $p['ids']);
 			
 			$foundIds = [];
+			$result['list'] = [];
 			
-			foreach($result['list'] as $e) {
-				$foundIds[] = $e['id'];
+			foreach($stmt as $e) {
+				$result['list'][] = $e->toArray(); 
+				$foundIds[] = $e->id;
 			}
 			$result['notFound'] = array_values(array_diff($p['ids'], $foundIds));			
 		}	

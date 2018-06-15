@@ -19,28 +19,7 @@ GO.calendar.SettingsPanel = Ext.extend(Ext.Panel, {
 	iconCls: 'ic-event',
 
 	onLoadStart: function (userId) {
-		
-		//temporary fix for combo to show address book name. Remove when refactored
-		var userGetRequest = go.Jmap.findRequestByMethod("User/get");
-		if(!userGetRequest) {
-			return;
-		}
-		var userGetRequestId = userGetRequest[2];
-		go.Jmap.request({
-			method: "community/calendar/Calendar/get",
-			params: {
-				"properties": ["name"],
-				"#ids": {
-						"resultOf": userGetRequestId,
-						"name": "User/get",
-						"path": "/list/*/calendarSettings/calendar_id"
-				}
-			},
-			callback: function(options, success, result) {
-				this.selectCalendar.setRemoteText(result.list[0].name);
-			},
-			scope: this
-		});
+
 	},
 
 	initComponent: function () {
