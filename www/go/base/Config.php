@@ -1460,6 +1460,8 @@ var $billing_clear_payment_method_on_duplicate = true;
 		//auto host
 		$config['host'] = trim(dirname($_SERVER['PHP_SELF']), '/');
 		$config['host'] = empty($config['host']) ? '/' : '/' . $config['host'] . '/';		
+		$config['root_path'] = \go\core\Environment::get()->getInstallFolder()->getPath() . '/';
+		
 	
 		$this->_original_config = $config;
 		
