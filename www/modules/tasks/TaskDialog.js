@@ -397,7 +397,9 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 				xtype:'textarea',
 				fieldLabel:t("Description"),
 				name : 'description',
-				anchor:'100% '+descAnchor
+				anchor: '100%',
+				grow: true,
+				preventScrollbars: true
 			});
 				
 
