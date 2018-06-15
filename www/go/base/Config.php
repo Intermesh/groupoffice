@@ -1462,7 +1462,6 @@ var $billing_clear_payment_method_on_duplicate = true;
 		$config['host'] = empty($config['host']) ? '/' : '/' . $config['host'] . '/';		
 		$config['root_path'] = \go\core\Environment::get()->getInstallFolder()->getPath() . '/';
 		
-	
 		$this->_original_config = $config;
 		
 		foreach($config as $key=>$value) {
@@ -1736,92 +1735,8 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @return StringHelper Path to configuration file
 	 */
 
-	public function get_config_file() {
-		if(defined('GO_CONFIG_FILE'))
-			return GO_CONFIG_FILE;
-
-
-		if(!empty($_SERVER['GO_CONFIG']))
-			return $_SERVER['GO_CONFIG'];
-
-		//on start page always search for config
-		if(empty($_REQUEST['r']) && isset($_SESSION)){
-			unset($_SESSION['GO_SESSION']['config_file']);
-		}
-
-		if(isset($_SESSION['GO_SESSION']['config_file'])) {
-			$this->session_config_file=true;
-			return $_SESSION['GO_SESSION']['config_file'];
-		}else {
-			$config_dir = $this->root_path;
-			$config_file = $config_dir.'config.php';
-			if(@file_exists($config_file)) {
-				$_SESSION['GO_SESSION']['config_file']=$config_file;
-				return $config_file;
-			}
-
-			$count = 0;
-
-			//use SCRIPT_FILENAME in apache mode because it will use a symlinked
-			//directory
-			$script = php_sapi_name()=='cli' ? __FILE__ : $_SERVER['SCRIPT_FILENAME'];
-
-			$config_dir = dirname($script).'/';
-
-			if($config_dir==$this->root_path.'install/'){
-				$config_dir = $this->root_path;
-			}
-
-			/*
-			 * z-push also has a config.php. Don't detect that.
-			 */
-			$pos = strpos($config_dir, 'modules/z-push');
-			if($pos){
-				$config_dir = substr($config_dir, 0, $pos);
-			}
-
-			//openlog('[Group-Office]['.date('Ymd G:i').']', LOG_PERROR, LOG_USER);
-
-			while(!isset($_SESSION['GO_SESSION']['config_file'])){
-				$count++;
-				$config_file = $config_dir.'config.php';
-				//syslog(LOG_NOTICE,$config_file);
-
-				if(@file_exists($config_file)) {
-					$_SESSION['GO_SESSION']['config_file']=$config_file;
-					return $config_file;
-				}
-				$config_dir=dirname($config_dir);
-
-				if($count==10 || dirname($config_dir) == $config_dir){
-					break;
-				}
-				$config_dir .= '/';
-			}
-
-			/*if(isset($_SERVER['SCRIPT_FILENAME']) && isset($_SERVER['PHP_SELF'])) {
-				$config_file = dirname(substr($_SERVER['SCRIPT_FILENAME'], 0 ,-strlen($_SERVER['PHP_SELF']))).'/config.php';
-				if(@file_exists($config_file)) {
-					$_SESSION['GO_SESSION']['config_file']=$config_file;
-					return $config_file;
-				}
-			}*/
-			if(!empty($_SERVER['SERVER_NAME'])){
-				$config_file = '/etc/groupoffice/'.$_SERVER['SERVER_NAME'].'/config.php';
-				if(@file_exists($config_file)) {
-					$_SESSION['GO_SESSION']['config_file']=$config_file;
-					return $config_file;
-				}
-			}
-			$config_file = '/etc/groupoffice/config.php';
-			if(@file_exists($config_file)) {
-				$_SESSION['GO_SESSION']['config_file']=$config_file;
-				return $config_file;
-			}else
-			{
-				return false;
-			}
-		}
+	public function get_config_file() {		
+		return \go\core\App::findConfigFile();
 	}
 
 	/**
