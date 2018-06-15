@@ -18,30 +18,7 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 	defaultType: 'textfield',
 	
 	onLoadStart: function (userId) {
-		
-		//temporary fix for combo to show address book name. Remove when refactored
-		var userGetRequest = go.Jmap.findRequestByMethod("User/get");
-		if(!userGetRequest) {
-			return;
-		}
-		var userGetRequestId = userGetRequest[2];
-		go.Jmap.request({
-			method: "community/email/Account/get",
-			params: {
-				"properties": ["username"],
-				"#ids": {
-						"resultOf": userGetRequestId,
-						"name": "User/get",
-						"path": "/list/*/syncSettings/account_id"
-				}
-			},
-			callback: function(options, success, result) {
-				if(result.list[0]) {
-					this.selectAccount.setRemoteText(result.list[0].username);
-				}
-			},
-			scope: this
-		});
+	
 	},
 	
 	initComponent: function() {
@@ -50,25 +27,9 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 			title:'E-mail',
 			labelWidth: 170,
 			items: [
-				this.selectAccount = new GO.form.ComboBox({
-					fieldLabel: t("E-mail Account", "email"),
+				this.selectAccount = new GO.email.SelectAccount({
 					hidden: (!GO.settings.modules.email || !GO.settings.modules.email.read_permission),
-					hiddenName:'syncSettings.account_id',
-					anchor:'-20',
-					emptyText:t("Please select..."),
-					store: new GO.data.JsonStore({
-						url: GO.url("email/account/store"),
-						fields: ['id', 'username'],
-						remoteSort: true
-					}),
-					valueField:'id',
-					displayField:'username',
-					typeAhead: true,
-					mode: 'remote',
-					triggerAction: 'all',
-					editable: false,
-					selectOnFocus:true,
-					forceSelection: true
+					hiddenName:'syncSettings.account_id'					
 				})
 			]})
 		];
