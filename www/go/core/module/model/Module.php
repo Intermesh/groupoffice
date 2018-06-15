@@ -7,7 +7,7 @@ use go\core\App;
 use go\modules\core\groups\model\Group;
 use go\modules\core\users\model\User;
 use go\core\db\Utils;
-use go\core\links\Link;
+use go\modules\core\links\model\Link;
 use go\core\module\Base;
 use go\core\orm\Entity;
 use go\core\search\Search;

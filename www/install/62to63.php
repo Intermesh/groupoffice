@@ -446,7 +446,7 @@ $qs[] = function() {
 	\go\modules\core\customfields\model\FieldSet::getType();
 	\go\modules\core\customfields\model\Field::getType();
 	
-	\go\core\links\Link::getType();
+	\go\modules\core\links\model\Link::getType();
 	\go\core\search\Search::getType();
 	\go\modules\core\users\model\User::getType();
 	\go\modules\core\groups\model\Group::getType();

@@ -1,6 +1,6 @@
 <?php
 
-namespace go\core\links;
+namespace go\modules\core\links\model;
 
 use go\core\acl\model\Acl;
 use go\core\acl\model\AclEntity;
