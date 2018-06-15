@@ -3,7 +3,7 @@
 namespace go\modules\core\search\controller;
 
 use go\core\jmap\Controller;
-use go\core\search\Search as S;
+use go\modules\core\search\model\Search as S;
 
 class Search extends \go\core\jmap\ReadOnlyEntityController {
 

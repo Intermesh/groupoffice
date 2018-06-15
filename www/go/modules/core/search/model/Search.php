@@ -1,6 +1,6 @@
 <?php
 
-namespace go\core\search;
+namespace go\modules\core\search\model;
 
 use go\core\acl\model\Acl;
 use go\core\db\Query;

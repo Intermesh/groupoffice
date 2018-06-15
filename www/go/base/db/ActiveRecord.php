@@ -3632,9 +3632,9 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 			return;
 		}
 		
-		$search = \go\core\search\Search::find()->where('entityTypeId','=', static::getType()->getId())->andWhere('entityId', '=', $this->id)->single();
+		$search = \go\modules\core\search\model\Search::find()->where('entityTypeId','=', static::getType()->getId())->andWhere('entityId', '=', $this->id)->single();
 		if(!$search) {
-			$search = new \go\core\search\Search();
+			$search = new \go\modules\core\search\model\Search();
 			$search->setEntity(static::getType());
 		}
 		// GO 6.3 backwards compatible
@@ -4112,7 +4112,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 		$attr = $this->getCacheAttributes();
 
 		if($attr){
-			$model = \go\core\search\Search::find()->where(['entityId' => $this->pk, 'entityTypeId'=>$this->modelTypeId()])->single();
+			$model = \go\modules\core\search\model\Search::find()->where(['entityId' => $this->pk, 'entityTypeId'=>$this->modelTypeId()])->single();
 //			$model = \GO\Base\Model\SearchCacheRecord::model()->findByPk(array('model_id'=>$this->pk, 'model_type_id'=>$this->modelTypeId()),false,true);
 			if($model)
 				$model->delete();

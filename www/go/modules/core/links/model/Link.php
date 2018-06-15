@@ -93,7 +93,7 @@ class Link extends \go\core\jmap\Entity {
 		
 		if($this->isNew()) {			
 			//make sure the description and name are set so they are returned to the client
-			$search = \go\core\search\Search::find()->where(['entityId' => $this->toId, 'entityTypeId' => $this->toEntityTypeId])->single();
+			$search = \go\modules\core\search\model\Search::find()->where(['entityId' => $this->toId, 'entityTypeId' => $this->toEntityTypeId])->single();
 			$this->toDescription = $search->description;
 			$this->toName = $search->name;
 		}

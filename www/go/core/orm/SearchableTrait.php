@@ -35,9 +35,9 @@ trait SearchableTrait {
 	}
 	
 	public function saveSearch($checkExisting = true) {
-		$search = $checkExisting ? \go\core\search\Search::find()->where('entityTypeId','=', static::getType()->getId())->andWhere('entityId', '=', $this->id)->single() : false;
+		$search = $checkExisting ? \go\modules\core\search\model\Search::find()->where('entityTypeId','=', static::getType()->getId())->andWhere('entityId', '=', $this->id)->single() : false;
 		if(!$search) {
-			$search = new \go\core\search\Search();
+			$search = new \go\modules\core\search\model\Search();
 			$search->setEntity(static::getType());
 		}
 		$search->entityId = $this->id;

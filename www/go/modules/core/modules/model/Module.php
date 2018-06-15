@@ -10,7 +10,7 @@ use go\core\db\Utils;
 use go\modules\core\links\model\Link;
 use go\core\module\Base;
 use go\core\orm\Entity;
-use go\core\search\Search;
+use go\modules\core\search\model\Search;
 
 class Module extends AclEntity {
 	public $id;
