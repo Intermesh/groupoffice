@@ -2,7 +2,7 @@
 use GO\Base\Observable;
 use go\core\App;
 use go\core\Environment;
-use go\core\module\model\Module;
+use go\modules\core\modules\model\Module;
 use go\core\util\Lock;
 
 

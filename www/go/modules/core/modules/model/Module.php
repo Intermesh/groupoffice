@@ -1,5 +1,5 @@
 <?php
-namespace go\core\module\model;
+namespace go\modules\core\modules\model;
 
 use Exception;
 use go\core\acl\model\AclEntity;

@@ -4,7 +4,7 @@ namespace go\core\orm;
 
 use go\core\App;
 use go\core\db\Query;
-use go\core\module\model\Module;
+use go\modules\core\modules\model\Module;
 
 /**
  * The EntityType class

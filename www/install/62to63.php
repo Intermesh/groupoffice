@@ -451,7 +451,7 @@ $qs[] = function() {
 	\go\modules\core\users\model\User::getType();
 	\go\modules\core\groups\model\Group::getType();
 	
-	\go\core\module\model\Module::getType();
+	\go\modules\core\modules\model\Module::getType();
 };
 
 $qs[] = "RENAME TABLE `go_users` TO `core_user`;";

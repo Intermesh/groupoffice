@@ -16,7 +16,7 @@ use go\core\db\Criteria;
 use go\core\db\Query;
 use go\core\exception\Forbidden;
 use go\core\jmap\Entity;
-use go\core\module\model\Module;
+use go\modules\core\modules\model\Module;
 use go\core\orm\CustomFieldsTrait;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
