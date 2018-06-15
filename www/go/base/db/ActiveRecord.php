@@ -4725,7 +4725,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 				if(!$this->_customfieldsRecord){
 					//doesn't exist yet. Return a new one
 					$this->_customfieldsRecord = new $customFieldModelName;
-					$this->_customfieldsRecord->model_id=$this->pk;
+					$this->_customfieldsRecord->{$customFieldModelName::model()->primaryKey()}=$this->pk;
 					$this->_customfieldsRecord->clearModifiedAttributes();
 				}
 			}
