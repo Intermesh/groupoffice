@@ -1475,7 +1475,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 
 
 		if($joinCf)
-			$joins .= "\nLEFT JOIN `".$cfModel->tableName()."` cf ON cf.model_id=t.id ";
+			$joins .= "\nLEFT JOIN `".$cfModel->tableName()."` cf ON cf.".$cfModel->primaryKey()."=t.id ";
 
 		if(isset($aclJoinProps) && empty($params['ignoreAcl']))
 			$joins .= $this->_appendAclJoin($params, $aclJoinProps);

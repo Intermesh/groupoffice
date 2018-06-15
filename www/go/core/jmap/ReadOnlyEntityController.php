@@ -259,7 +259,13 @@ abstract class ReadOnlyEntityController extends Controller {
 	protected function getGetQuery($params) {
 		$cls = $this->entityClass();
 		
-		return $cls::find($params['properties']);
+		$query = $cls::find($params['properties']);
+		
+		//filter permissions
+		$cls::filter($query, ['permissionLevel' => Acl::LEVEL_READ]);
+		
+		return $query;
+	
 	}
 
 	
