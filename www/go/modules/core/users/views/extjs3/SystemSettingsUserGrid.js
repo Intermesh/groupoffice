@@ -157,7 +157,19 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 						iconCls: 'ic-swap-horiz',
 						text: t("Login as this user"),
 						handler: function() {
-							alert('TODO');
+							go.Jmap.request({
+								method: "User/loginAs",
+								params: {userId: this.moreMenu.record.id},
+								callback: function(options, success, result) {
+									if(!result.success) {
+										Ext.MessageBox.alert(t("Error"), t("Failed to login as this user"));
+										return;
+									}
+									
+									//reload client
+									document.location = BaseHref;
+								}
+							})
 						},
 						scope: this						
 					},
