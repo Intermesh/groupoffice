@@ -20,6 +20,7 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 			scope: this
 		});
 
+		this.store.on("load", this.loadMore, this); //will auto fill screen
 		this.on("bodyscroll", this.loadMore, this, {buffer: 100});
 	},
 
