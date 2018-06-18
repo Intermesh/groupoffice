@@ -14,7 +14,8 @@ Ext.override(Ext.form.BasicForm, {
 		var o = {},
 						n,
 						key,
-						val;
+						val,
+						me = this;
 
 		var fn = function (f) {
 			if (dirtyOnly !== true || f.isDirty()) {
@@ -32,6 +33,9 @@ Ext.override(Ext.form.BasicForm, {
 				key = o[n];
 				val = f.getValue();
 				
+				if(Ext.isDate(val)) {
+					val = me.serializeDate(val);
+				}				
 
 				if (Ext.isDefined(key)) {
 					if (Ext.isArray(key)) {
@@ -69,6 +73,16 @@ Ext.override(Ext.form.BasicForm, {
 		}
 				
 		return converted;
+	},
+	
+	serializeDate : function(date) {
+		if(date.getHours() == 0 && date.getMinutes() == 0 && date.getSeconds() == 0) {
+			//no time
+			return date.format("Y-m-d");
+		} else
+		{
+			return date.format('c');
+		}
 	},
 	
 	setValues: function (values) {		

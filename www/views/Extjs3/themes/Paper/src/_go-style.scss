@@ -1171,3 +1171,8 @@ table[id^="comments-ext"] b {
 .x-panel.text {
 	padding: dp(16);
 }
+
+
+.x-btn.raised{
+	border: dp(1) solid color($foreground, "line");
+}
