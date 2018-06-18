@@ -124,4 +124,5 @@ Wachtwoord: {password}',
   'Do not create reminders for me' => 'Maak geen herinneringen voor mij aan',
   'Desktop notifications active' => 'Bureaublad meldingen actief',
   'Force password change on next login' => 'Forceer wachtwoord veranderen bij volgende login',
+			"User defaults" => "Standaardwaarden gebruikers",
 );

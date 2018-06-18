@@ -1,5 +1,6 @@
 <?php
 return array (
+	'Groups' => 'Groepen',
   'You can\'t delete the group Admins' => 'U kunt de groep Admins niet verwijderen',
   'You can\'t delete the group Everyone' => 'U kunt de groep Iedereen niet verwijderen',
   'The group you are trying to create already exists' => 'De groep die u probeert te maken bestaat al',

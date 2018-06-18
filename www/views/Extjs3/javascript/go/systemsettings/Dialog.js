@@ -44,7 +44,7 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 			region:'west',
 			cls: 'go-sidenav',
 			layout:'fit',
-			width:dp(220),
+			width:dp(300),
 			items:[this.selectView = new Ext.DataView({
 				xtype: 'dataview',
 				cls: 'go-nav',
