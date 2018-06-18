@@ -140,7 +140,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 					name: 'timezone',
 					store: new Ext.data.SimpleStore({
 						fields: ['timezone'],
-						data : GO.users.TimeZones
+						data : go.TimeZones
 					}),
 					displayField: 'timezone',
 					mode: 'local',
@@ -152,7 +152,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				
 				this.dateFormatCombo = new Ext.form.ComboBox({
 					fieldLabel: t('Date format'),
-					name: 'date_format',
+					name: 'dateFormat',
 					store: new Ext.data.SimpleStore({
 						fields: ['id', 'dateformat'],
 						data : [
@@ -166,12 +166,11 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 					}),
 					displayField: 'dateformat',
 					valueField: 'id',
-					hiddenName: 'date_format',
+					hiddenName: 'dateFormat',
 					mode: 'local',
 					triggerAction: 'all',
 					editable: false,
 					selectOnFocus: true,
-					value: GO.settings.dateformat,
 					forceSelection: true
 				}),
 				
@@ -181,18 +180,17 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 					store: new Ext.data.SimpleStore({
 						fields: ['id', 'time_format'],		
 						data : [
-						['H:i', t('24 hour format')],
+						['G:i', t('24 hour format')],
 						['h:i a', t('12 hour format')]
 						]
 					}),
 					displayField: 'time_format',
 					valueField: 'id',
-					hiddenName: 'time_format',
+					hiddenName: 'timeFormat',
 					mode: 'local',
 					triggerAction: 'all',
 					editable: false,
 					selectOnFocus: true,
-					value: GO.settings.time_format,
 					forceSelection: true
 				}),
 					
@@ -208,7 +206,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 					}),
 					displayField: 'first_weekday',
 					valueField: 'id',
-					hiddenName: 'first_weekday',
+					hiddenName: 'firstWeekday',
 					mode: 'local',
 					triggerAction: 'all',
 					editable: false,
@@ -245,30 +243,25 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				{
 						xtype: 'textfield', 
 						fieldLabel: t("List separator", "users"), 
-						name: 'list_separator',
-						value: GO.settings.list_separator
+						name: 'listSeparator'
 					},{
 						xtype: 'textfield', 
 						fieldLabel: t("Text separator", "users"), 
-						name: 'text_separator',
-						value: GO.settings.text_separator
+						name: 'textSeparator'
 					},{
 						xtype: 'textfield', 
 						fieldLabel: t("Thousand Seperator", "users"), 
-						name: 'thousands_separator',
-						value: GO.settings.thousands_separator
+						name: 'thousandsSeparator'
 					},
 					{
 						xtype: 'textfield', 
 						fieldLabel: t("Decimal Seperator", "users"), 
-						name: 'decimal_separator',
-						value: GO.settings.decimal_separator
+						name: 'decimalSeparator'
 					},
 					{
 						xtype: 'textfield', 
 						fieldLabel: t("Currency", "users"), 
-						name: 'currency',
-						value: GO.settings.currency
+						name: 'currency'
 					}
 			]
 		});

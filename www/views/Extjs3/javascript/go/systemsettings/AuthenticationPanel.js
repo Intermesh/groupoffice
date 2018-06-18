@@ -21,28 +21,26 @@ go.systemsettings.AuthenticationPanel = Ext.extend(Ext.form.FormPanel, {
 		});
 
 		go.systemsettings.AuthenticationPanel.superclass.initComponent.call(this);
+		
+		this.on('render', function() {
+			go.Jmap.request({
+				method: "core/core/Settings/get",
+				callback: function (options, success, response) {
+					this.getForm().setValues(response);
+				},
+				scope: this
+			});
+		}, this);
 	},
 
-	submit: function (cb, scope) {
+	onSubmit: function (cb, scope) {
 		go.Jmap.request({
 			method: "core/core/Settings/set",
 			params: this.getForm().getFieldValues(),
 			callback: function (options, success, response) {
-				cb.call(scope, success);
+				cb.call(scope, this, success);
 			},
 			scop: scope
-		});
-	},
-
-	load: function (cb, scope) {
-		go.Jmap.request({
-			method: "core/core/Settings/get",
-			callback: function (options, success, response) {
-				this.getForm().setValues(response);
-
-				cb.call(scope, success);
-			},
-			scope: this
 		});
 	}
 

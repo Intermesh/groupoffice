@@ -25,7 +25,7 @@ class Backend extends AbstractDigest {
 	private $_user;
 	
 	public function __construct() {
-		$this->setRealm(\go\core\auth\model\User::DIGEST_REALM);
+		$this->setRealm(\go\modules\core\users\model\User::DIGEST_REALM);
 	}
 	
 	/**

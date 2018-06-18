@@ -3,7 +3,7 @@
 namespace go\core\auth;
 
 use go\core\auth\model\Token;
-use go\core\auth\model\User;
+use go\modules\core\users\model\User;
 
 abstract class SecondaryAuthenticator extends BaseAuthenticator {
 	

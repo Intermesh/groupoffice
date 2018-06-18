@@ -19,40 +19,33 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			remoteSort: true
 		});
 
-		this.bbar = [
-//			"->",
-//			{
-//				text: t("Browse"),
-//				scope: this,
-//				handler: function () {
-//					var dlg = GO.comments.browseComments(this.model_id, this.model_name);
-//					dlg.on('hide', function(){
-//						this.store.reload();
-//					}, this, {single: true});
-//				}
-//			},
+		this.addButtonItems = [
 			{
-				text: t("Add"),
+				iconCls: 'ic-comment',
+				text: t("Comment"),
 				scope: this,
-				handler: function () {
-					var dlg = GO.comments.showCommentDialog(0, {
-						link_config: {
-							model_name: this.model_name,
-							model_id: this.model_id
-
-						}
-					});
-					
-					dlg.on('hide', function(){
-						this.onLoad(this);
-					}, this, {single: true});
-				}
+				handler: this.addComment
 			}
-		]
+		];
 
 		go.modules.comments.CommentsDetailPanel.superclass.initComponent.call(this);
 
 	},
+	
+	addComment : function () {
+		var dlg = GO.comments.showCommentDialog(0, {
+			link_config: {
+				model_name: this.model_name,
+				model_id: this.model_id
+
+			}
+		});
+
+		dlg.on('hide', function(){
+			this.onLoad(this);
+		}, this, {single: true});
+	},
+			
 
 	onLoad: function (dv) {
 

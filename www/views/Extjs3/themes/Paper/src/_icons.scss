@@ -160,10 +160,10 @@ define icons with:
 
 .x-tool::before, .ux-row-action-item {
 	@extend %icon;
-	color: $cPrimary;
+	@include var(color, c-primary);
 }
 .ux-row-action-item:hover {
-	color: color($foreground, 'text');
+	color: color($fg, 'text');
 	cursor: pointer;
 }
 @each $class, $icon in $tools {

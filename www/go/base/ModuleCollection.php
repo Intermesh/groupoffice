@@ -115,7 +115,7 @@ class ModuleCollection extends Model\ModelCollection{
 		$ucfirst = ucfirst($moduleId);
 		$moduleClassPath = $folder->path().'/'.$ucfirst.'Module.php';
 		
-		if(!file_exists($moduleClassPath)){// || !\GO::scriptCanBeDecoded($moduleClassPath)){
+		if(!file_exists($moduleClassPath)){
 			return false;
 		}
 
@@ -211,18 +211,24 @@ class ModuleCollection extends Model\ModelCollection{
 	
 	/**
 	 * Check if a module is installed.
+     * Default check if module is enabled an treat a disabled module as not installed. When checking from within moduleController return the model if record is in core_module
 	 * 
 	 * @param StringHelper $name
+     * @param boolean $checkEnabled
 	 * @return Model\Module 
 	 */
-	public function isInstalled($name){
-		$model = $this->model->findByName($name);
-		
-		if(!$model || !$model->enabled || !empty($model->package) || !$this->_isAllowed($model->name))
-				return false;
-		
-		return $model;
-	}
+    public function isInstalled($name, $checkEnabled = true)
+    {
+        $model = $this->model->findByName($name);
+
+        if (!$model || !$this->_isAllowed($model->name))
+            return false;
+
+        if ($checkEnabled && !$model->enabled)
+            return false;
+
+        return $model;
+    }
 	
 	
 	

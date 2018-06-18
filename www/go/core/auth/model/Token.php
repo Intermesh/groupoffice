@@ -158,7 +158,9 @@ class Token extends Entity {
 	}
 		
 	private function internalRefresh() {
-		$this->accessToken = $this->generateToken();
+		if(!isset($this->accessToken)) {
+			$this->accessToken = $this->generateToken();
+		}
 		
 		$this->setExpiryDate();
 	}
@@ -201,7 +203,7 @@ class Token extends Entity {
 	 */
 	public function getUser() {
 		if(!$this->user) {
-			$this->user = User::findById($this->userId);
+			$this->user = \go\modules\core\users\model\User::findById($this->userId);
 		}
 		return $this->user;
 	}
@@ -214,14 +216,14 @@ class Token extends Entity {
 	public function setAuthenticated(){
 		
 		$user = $this->getUser();
-		$user->lastlogin = time();
-		$user->logins++;
+		$user->lastLogin = new DateTime();
+		$user->loginCount++;
 		if(!$user->save()) {
 			return false;
 		}
 		
 		if(!$this->refresh()) {
-			$this->refresh();
+			return false;
 		}
 		
 		// For backwards compatibility, set the server session for the old code
@@ -270,8 +272,7 @@ class Token extends Entity {
       session_start();
     }
 		
-		$_SESSION['GO_SESSION']['user_id'] = $this->userId;
-		$_SESSION['GO_SESSION']['accessToken'] = $this->accessToken;		
+		$_SESSION['GO_SESSION'] = ['user_id' => $this->userId, 'accessToken' => $this->accessToken];		
 	}
 	
 	private function oldLogout() {

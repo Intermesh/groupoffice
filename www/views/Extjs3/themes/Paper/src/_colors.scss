@@ -161,7 +161,7 @@ $primary: (
 	)
 );
 // LIGHT
-$foreground: (
+$fg: (
   base:					black,
   divider:				rgba(black, 0.04),
   line:					rgba(black, 0.12),
@@ -177,7 +177,7 @@ $foreground: (
   icons:					rgba(black, 0.54),
   text:					rgba(black, 0.87)
 );
-$background: (
+$bg: (
   status-bar: color($grey, 200),
   app-bar:    color($grey, 100),
   form:			color($grey, 50),
@@ -198,11 +198,11 @@ $dforeground: (
   line:				 rgba(white, 0.7),
   disabled:        rgba(white, 0.3),
   disabled-button: rgba(white, 0.3),
-  track:					rgba(white, 0.3),
+  track:				 rgba(white, 0.3),
   disabled-text:   rgba(white, 0.3),
   hint-text:       rgba(white, 0.3),
   secondary-text:  rgba(white, 0.7),
-  unfocused:	   rgba(white, 0.7),
+  unfocused:	    rgba(white, 0.7),
   icon:            white,
   icons:           white,
   text:            white
@@ -220,7 +220,8 @@ $dbackground: (
 );
 
 // Colors that have meaning (eg. success/failure)
-$cPrimary:		color($primary, 700);
+$cPrimary:		rgb(36, 58, 128);
+$cPrimaryTp:	rgba(36, 58, 128, 0.16);
 $cSecondary:	rgb(104,159,56);
 $cAccent:		color($orange, A400);
 
@@ -228,7 +229,7 @@ $cSuccess:		color($green, 700);
 $cDanger:		color($red, 700);
 $cWarning:		color($orange, 700);
 
-$cSelected: color($background, 'hover'); // click on menus, tree items, table
+$cSelected: color($bg, 'hover'); // click on menus, tree items, table
 $cHover: rgba(color($primary),.16);
 $cActive: color($grey, 200); // focussed
 $cAnchor: color($primary, 700);

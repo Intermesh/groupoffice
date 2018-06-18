@@ -1487,9 +1487,8 @@ GO.util.HtmlDecode = function HtmlDecode(s) {
 
 
 GO.util.dateFormat = function(v) {
-	
 	if(!v) {
-		return "";
+		return "-";
 	}
 	
 	if (!Ext.isDate(v)) {

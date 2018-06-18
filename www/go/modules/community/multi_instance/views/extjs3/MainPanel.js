@@ -19,7 +19,9 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 			fields: [
 				'id', 
 				'hostname', 
-				{name: 'createdAt', type: 'date'}			
+				'userCount',
+				{name: 'createdAt', type: 'date'}, 
+				{name: 'lastLogin', type: 'date'}		
 			],
 			entityStore: go.Stores.get("Instance")
 		});
@@ -52,13 +54,30 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'hostname'
 				},
 				{
+					id: 'userCount',
+					header: t('User count'),
+					width: 160,
+					sortable: false,
+					dataIndex: 'userCount',
+					hidden: false
+				},
+				{
 					xtype:"datecolumn",
 					id: 'createdAt',
 					header: t('Created at'),
 					width: 160,
 					sortable: true,
 					dataIndex: 'createdAt',
-					hidden: true
+					hidden: false
+				},
+				{
+					xtype:"datecolumn",
+					id: 'lastLogin',
+					header: t('Last login'),
+					width: 160,
+					sortable: false,
+					dataIndex: 'lastLogin',
+					hidden: false
 				}
 			],
 			viewConfig: {

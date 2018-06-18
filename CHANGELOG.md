@@ -5,6 +5,8 @@ UPGRADING: make sure custom fields and search module are installed.
 Core:
 - ActveSync, CalDAV and CardDav are now open source!
 - Z-Push 2.4.2 included
+- ActiveSync has no time limit anymore
+- ActiveSync Spam folder syncs too now.
 - New JMAP API backend
 - Flux technology in frontend
 - Optimized frontend client building
@@ -30,7 +32,8 @@ Core:
 		//init stuff
 	}
 
-
+- Improved User settings dialog
+- New System settings dialog to ease the configuration of Group-Office.
 
 Notes
 - Uses new API
@@ -43,8 +46,7 @@ Comments
 - Always use read more links and removed settings
 - Remove comments from edit dialogs. Always use detail views.
 
-ActiveSync
-- Spam folder syncs too now.
+
 
 
 15-03-2018 6.2.86

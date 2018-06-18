@@ -3,7 +3,7 @@ namespace go\core\jmap;
 
 use go\core\auth\State as AbstractState;
 use go\core\auth\model\Token;
-use go\core\auth\model\User;
+use go\modules\core\users\model\User;
 use go\core\jmap\Request;
 use go\core\http\Response;
 
@@ -117,12 +117,12 @@ class State extends AbstractState {
 			,'username' => $user->username
 			,'displayName' => $user->displayName
 			,'email' => $user->email
-			,'thousands_separator' => $user->thousands_separator
-			,'decimal_separator' => $user->decimal_separator
+			,'thousands_separator' => $user->thousandsSeparator
+			,'decimal_separator' => $user->decimalSeparator
 			,'date_format' => $user->completeDateFormat
-			,'time_format' => $user->time_format
+			,'time_format' => $user->timeFormat
 			,'currency' => $user->currency
-			,'lastlogin' => $user->lastlogin
+			,'lastlogin' => $user->getLastlogin()
 			,'max_rows_list' => $user->max_rows_list
 			,'timezone' => $user->timezone
 			,'start_module' => $user->start_module
@@ -134,10 +134,10 @@ class State extends AbstractState {
 			,'popup_emails' => $user->popup_emails
 			,'show_smilies' => $user->show_smilies
 			,'auto_punctuation' => $user->auto_punctuation
-			,'first_weekday' => $user->first_weekday
+			,'first_weekday' => $user->firstWeekday
 			,'sort_name' => $user->sort_name
-			,'list_separator' => $user->list_separator
-			,'text_separator' => $user->text_separator
+			,'list_separator' => $user->listSeparator
+			,'text_separator' => $user->textSeparator
 			,'modules' => \GO::view()->exportModules()
 		];
 	}

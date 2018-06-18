@@ -17,7 +17,8 @@
 	height: dp(32);
 	width: dp(32);
 	animation: rotate 0.8s infinite $curve-deceleration;
-	border: dp(8) solid $cPrimary;
+	border: dp(8) solid transparent;
+	@include var(border-color, c-primary);
 	border-right-color: transparent;
 	border-radius: 50%;
 }
@@ -68,15 +69,15 @@
 }
 
 .x-item-disabled {
-	color: color($foreground, 'disabled');
+	color: color($fg, 'disabled');
 }
 
 .x-item-disabled * {
-	color: color($foreground, 'disabled');
+	color: color($fg, 'disabled');
 }
 
 .x-splitbar-proxy {
-	background-color: color($foreground, 'line');
+	background-color: color($fg, 'line');
 }
 
 // ###################
@@ -133,7 +134,7 @@
 }
 
 .x-tab-panel {
-	//border: 1px solid color($foreground, 'line');
+	//border: 1px solid color($fg, 'line');
 	&.x-tab-panel-noborder {
 		border:0;
 	}
@@ -141,16 +142,21 @@
 
 .x-tab-panel-header {
 	border:0;
-	border-bottom: 1px solid color($foreground, 'line');
+	border-bottom: 1px solid color($fg, 'line');
 }
 .x-tab-panel-footer{
 	border:0;
 }
 .x-tab-panel-header, .x-tab-panel-footer {
-	background-color:color($background,'app-bar');;
+	background-color:color($bg,'app-bar');
 	padding-bottom:0;
    overflow:hidden;
    zoom:1;
+	box-shadow: inset 0px -1px 1px color($fg,'line');
+	.x-portlet & {
+		background-color: transparent;
+		
+	}
 }
 
 ul.x-tab-strip-top{
@@ -160,7 +166,7 @@ ul.x-tab-strip-top{
 	flex-direction: row;*/
 	height: dp(48);
 	border-bottom: 2px solid transparent;
-	color: $cPrimary;
+	@include var(color, c-primary);
 }
 //Todo
 ul.x-tab-strip-bottom{
@@ -187,23 +193,24 @@ ul.x-tab-strip-bottom{
 
 .x-tab-strip span.x-tab-strip-text {
 	padding:0;
-	color: color($foreground, 'text');
+	color: color($fg, 'text');
 	&.primary {
 		color: rgba(white, 0.7);
 	}
 }
 
 .x-tab-strip-over span.x-tab-strip-text {
-	color:$cPrimary;
+	@include var(color, c-primary);
 	&.primary {
 		color: white;
 	}
 }
 
 .x-tab-strip-active {
-	border-bottom: dp(4) solid $cPrimary;
+	border-bottom: dp(4) solid transparent;
+	@include var(border-color, c-primary)
 	span.x-tab-strip-text {
-		color:$cPrimary;
+		@include var(color, c-primary);
 	}
 }
 
@@ -213,20 +220,20 @@ ul.x-tab-strip-bottom{
 }
 
 .x-tab-strip-disabled .x-tabs-text {
-	color: color($foreground, 'disabled');
+	color: color($fg, 'disabled');
 }
 
 .x-tab-strip .x-tab-strip-closable a.x-tab-strip-close:before {
 	@extend %icon;
 	content: 'close';
 	font-size: 1.1em !important;
-	padding-top: dp(16);
-	color: color($foreground, 'icon');
+	//padding-top: dp(16);
+	color: color($fg, 'icon');
 	//background-image:url(../images/default/tabs/tab-close.gif);
 }
 
 .x-tab-strip .x-tab-strip-closable a.x-tab-strip-close:hover:before{
-	color: $cPrimary;
+	@include var(color, c-primary);
 }
 
 // animate tab panel
@@ -234,7 +241,7 @@ ul.x-tab-strip-bottom{
 	border:0;
 	position: relative;
 	overflow:hidden;
-	background-color:color($background, 'background');
+	background-color:color($bg, 'background');
 	> div {
 		padding: 0;
 		background-color:inherit;
@@ -276,7 +283,7 @@ ul.x-tab-strip-bottom{
 
 	border:0;
 	&-over {
-		color: color($foreground, 'text');
+		color: color($fg, 'text');
 	}
 	&-disabled {
       background-position: -18px 0;
@@ -302,21 +309,21 @@ ul.x-tab-strip-bottom{
 	@extend %icon;
 	content: 'check_box_outline_blank'; // 'check_box' when on
 	position: relative;
-	top: dp(-4);
-	left: dp(-4);
-	width: dp(18);
-	height: dp(18);
-	color:color($foreground, 'icon');
+	color:color($fg, 'icon');
 	display:inline-block;
+	height: dp(32);
+	width: dp(32);
+	left:dp(-4);
+	box-sizing: border-box;
+	background-color: transparent;
+	border-radius: 50%;
+	padding:dp(4);
 }
 
 .x-form{
 	> .x-tab-panel {
 		 > .x-tab-panel-bwrap> .x-tab-panel-body > div { // tabbed form dialog
-			background-color:color($background, 'form');
-		}
-		> .x-tab-panel-header {
-			@extend .z2;
+			background-color:color($bg, 'form');
 		}
 	}
 	
@@ -327,9 +334,7 @@ ul.x-tab-strip-bottom{
 		}
 		.x-box-inner { //composite
 			overflow:visible;
-			label {
-				line-height: dp(32);
-			}
+
 			.x-btn {
 				top: dp(-2);
 				line-height: dp(32);
@@ -345,26 +350,34 @@ ul.x-tab-strip-bottom{
 		}
 	}
 	
+	&-composite {
+		div.x-box-item.text {
+			@extend %font-subheading-dense;
+			padding: dp(4) 0;
+			line-height:dp(24)
+		}
+	}
+	
 	&-display-field {
 		line-height: dp(32);
 	}
 	
 	&-field {
 		@extend %font-data;
-		color: color($foreground, 'text');
+		color: color($fg, 'text');
 		&.x-item-disabled {
-			background-color: color($background, 'background');
+			background-color: color($bg, 'background');
 		}
 		+ .x-form-twin-triggers, + .x-form-trigger {
 			border-radius: 0;
-			border-left: 1px solid color($foreground, 'line');
+			border-left: 1px solid color($fg, 'line');
 		}
 	}
 	&-text, textarea.x-form-field {
 		@extend %font-data;
-		background-color:color($background, 'box');
+		background-color:color($bg, 'box');
 		border-radius: dp(4);
-		border: 1px solid color($foreground, 'line');
+		border: 1px solid color($fg, 'line');
 		display: inline-block;
 		padding: dp(6) dp(8); // missing 2dp because text is not botom aligning
 		min-height: dp(32);
@@ -379,44 +392,33 @@ ul.x-tab-strip-bottom{
 	//	visibility:hidden; // only show clear button when not
 	//}
 	&-select-one {
-      background-color:color($background, 'box');
-      border-color:color($foreground, 'line');
+      background-color:color($bg, 'box');
+      border-color:color($fg, 'line');
 	}
 	&-check-group-label {
       //border-bottom: 1px solid $cBgDark;
-      color: color($foreground, 'text');
+      color: color($fg, 'text');
 	}
 	&-cb-label {
 		display: inline-block;
-		padding: dp(8) 0 dp(8) dp(40);
+		height: dp(32);
 	}
+/*	
+	Merijn: this messed up long labels (login screen) and hint texts (IMAP auth in system settings)
+&-check-wrap {
+		height: dp(32);
+	}*/
 	&-checkbox {
-		
 		position:absolute;
 		opacity: 0;
-		
 		+ label::before {
 			@extend %checkbox;
-			position: absolute;
-			top: dp(6);
-			left: dp(4);
 		}
 		&:checked + label::before {
 			content: 'check_box';
 		}
-		
-		+ label::after {
-			height: dp(32);
-			width: dp(32);
-			background-color: transparent;
-			border-radius: 50%;
-			content: " ";
-			position:absolute;
-			top: 1px;
-			left: 0;
-		}
-		&:focus + label::after {
-			background-color: rgba($cPrimary, 0.16);
+		&:focus + label::before {
+			@include var(background-color, c-primary-tp);
 		}
 	}
 	&-radio {
@@ -426,33 +428,19 @@ ul.x-tab-strip-bottom{
 			margin-left: 0;
 		}
 		+ label:before {
-			/*padding-right: dp(16);*/
-			@extend %icon;
-			content: 'radio_button_unchecked';
-			position: absolute;
-			top: dp(6);
-			left: dp(4);
+			@extend %checkbox; // different icon    |
+			content: 'radio_button_unchecked'; // <--
 		}
 		&:checked + label:before {
 			content: 'radio_button_checked';
 		}
-		
-		+ label::after {
-			height: dp(32);
-			width: dp(32);
-			background-color: transparent;
-			border-radius: 50%;
-			content: " ";
-			position:absolute;
-			top: 1px;
-			left: 0;
-		}
-		&:focus + label::after {
-			background-color: rgba($cPrimary, 0.16);
+		&:focus + label::before {
+			@include var(background-color, c-primary-tp);
 		}
 	}
 	&-radio-group {
-		padding-left: dp(16);
+		padding-left: 0; //dp(16);
+		overflow:visible;
 	}
 	&-item {
 		margin-bottom:dp(4);
@@ -509,7 +497,7 @@ ul.x-tab-strip-bottom{
 		width: dp(32);
 		vertical-align: middle;
 		padding:0;
-		color: color($foreground, 'icon');
+		color: color($fg, 'icon');
 		&::before {
 			max-height: dp(32);
 			max-width: dp(32);
@@ -518,7 +506,7 @@ ul.x-tab-strip-bottom{
 		}
 		&.x-form-trigger-over {
 			color:black;
-			//background-color: color($background, 'hover');
+			//background-color: color($bg, 'hover');
 		}
 		&.x-form-text-trigger::before {content: '';}
 		&.x-form-clear-trigger::before {content: 'clear'; font-size: sp(18)}
@@ -598,10 +586,10 @@ ul.x-tab-strip-bottom{
 .x-fieldset {
 	border:0;
 	padding: dp(8) dp(16);
-	~ .x-fieldset { border-top: 1px solid color($foreground, 'divider'); }
+	~ .x-fieldset { border-top: 1px solid color($fg, 'divider'); }
 	legend {
 		/*@extend %font-caption;*/
-		/*color: color($primary, 900); //color($foreground, 'text');*/
+		/*color: color($primary, 900); //color($fg, 'text');*/
 		
 		@extend %font-subheading; //changed this to be the same as panel headers as they are mixed in forms	
 		float:left;		
@@ -622,6 +610,31 @@ ul.x-tab-strip-bottom{
 			margin: dp(8) 0;
 			display: inline-block;
 		}*/
+		.x-fieldset-header-text {
+			position:relative;
+		}
+
+		input{
+			opacity:0;
+			width:dp(24);
+			height:dp(24);
+			
+			+ .x-fieldset-header-text{
+				padding-left:dp(8);
+				&::before{
+					@extend %checkbox;
+					top:dp(-7);
+					left:dp(-36);
+					pointer-events:none;
+				}
+			}
+			&:checked + .x-fieldset-header-text::before{
+				content: 'check_box';
+			}
+			&:focus + .x-fieldset-header-text::before{
+				@include var(background-color, c-primary-tp);
+			}
+		}
 	}
 }
 
@@ -641,13 +654,13 @@ ul.x-tab-strip-bottom{
 
 	&.x-item-disabled {
 		.x-btn-text {
-			color: color($foreground, "disabled-button");
+			color: color($fg, "disabled-button");
 		}
 	}
 	 
 	&.raised {
 		@extend .z2;
-		background-color:$cPrimary;
+		@include var(background-color, c-primary);
 		color:white;
 		&.x-btn-focus, &.x-btn-over {
 			@extend .z4;
@@ -657,7 +670,7 @@ ul.x-tab-strip-bottom{
 		}
 	}
 	.x-toolbar & {
-		color: $cPrimary;
+		@include var(color, c-primary);
 		box-shadow: none !important;
 	}
 	// transition: background 400ms cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -671,16 +684,16 @@ ul.x-tab-strip-bottom{
 	//  }
 	&.x-btn-focus, &.x-btn-over {
 		transition: background-color 195ms linear, box-shadow 195ms $curve-standard;
-		background-color: rgba($cPrimary, 0.16);
+		@include var(background-color, c-primary-tp);
 	}
 	&.primary {
 		.x-btn-text {
-			color: $cPrimary;
+			@include var(color, c-primary);
 		}
    }
 	&.danger {
 		&.x-btn-focus, &.x-btn-over {
-			background-color: rgba($cPrimary, 0.16);
+			@include var(background-color, c-primary-tp);
 		}
 		.x-btn-text {
 			color: $cDanger;
@@ -701,10 +714,10 @@ ul.x-tab-strip-bottom{
 		}
 	}
    &.x-btn-pressed {
-		background-color: color($background, 'pressed');
+		background-color: color($bg, 'pressed');
    }
    &-click {
-		background-color: color($background, 'pressed') !important;
+		background-color: color($bg, 'pressed') !important;
 		.x-btn-text { color: color($primary, 900) !important;}
    }
    &-icon {
@@ -738,7 +751,7 @@ ul.x-tab-strip-bottom{
 		padding-right: dp(8);
 	}
    &-pressed {
-		//background-color: color($background, 'hover');
+		//background-color: color($bg, 'hover');
 		//box-shadow: none !important;
    }
    &-menu-active {
@@ -775,7 +788,7 @@ ul.x-tab-strip-bottom{
 }
 
 .x-btn-disabled *{
-	color:color($foreground, 'disabled-button') !important;
+	color:color($fg, 'disabled-button') !important;
 }
 
 //.x-btn-mc em.x-btn-split {
@@ -804,7 +817,7 @@ ul.x-tab-strip-bottom{
 	@extend .z1;
 	border-radius: $borderRadius;
 	padding:0;
-	background-color: color($background, 'card');
+	background-color: color($bg, 'card');
 	margin-right: dp(8);
 	&-header{
 		color: inherit;
@@ -842,7 +855,7 @@ ul.x-tab-strip-bottom{
 		padding:0 dp(4);
 	}
 	.x-searchbar {
-		background-color: color($background, 'box');
+		background-color: color($bg, 'box');
 		opacity:1;
 		padding:0 dp(8);
 		position:absolute;
@@ -879,7 +892,7 @@ ul.x-tab-strip-bottom{
 	
 	
 	.x-panel-tbar & {
-		border-bottom: 1px solid color($foreground, 'line');
+		border-bottom: 1px solid color($fg, 'line');
 	}
 	
 	.x-panel-bbar & {
@@ -888,13 +901,13 @@ ul.x-tab-strip-bottom{
 	}
 
 /*	.go-module-panel > div > .x-panel-tbar & {
-		border-bottom: 1px solid color($foreground, 'line');
+		border-bottom: 1px solid color($fg, 'line');
 	}*/
 /*	.x-panel-bbar & {
 		height: dp(48);
 	}*/
 	&.primary {
-		background-color: $cPrimary;
+		@include var(background-color, c-primary);
 	}
 	&.header {
 		border-bottom: 0;
@@ -928,11 +941,11 @@ ul.x-tab-strip-bottom{
 }
 
 .x-toolbar .x-item-disabled {
-	color: color($foreground,'disabled');
+	color: color($fg,'disabled');
 }
 
 .x-toolbar .x-item-disabled * {
-	color: color($foreground,'disabled');
+	color: color($fg,'disabled');
 }
 
 //.x-toolbar .x-btn-mc em.x-btn-split {
@@ -956,7 +969,7 @@ ul.x-tab-strip-bottom{
 //}
 
 .x-toolbar .xtb-sep {
-	background-color: color($foreground, 'line');
+	background-color: color($fg, 'line');
 	margin: 0 dp(8);
 	width: 1px;
 	height: dp(32);
@@ -1026,7 +1039,7 @@ ul.x-tab-strip-bottom{
 //### GRID ### 
 //############
 .x-grid3{
-	background-color: color($background, "card");
+	background-color: color($bg, "card");
 	&-scroller {
 		-webkit-overflow-scrolling: touch;
 	}
@@ -1057,7 +1070,7 @@ ul.x-tab-strip-bottom{
 		}
 		 
 		&-text {
-			color:color($foreground, 'text');
+			color:color($fg, 'text');
 		}
 		&-inner { position:initial;}
 		
@@ -1065,23 +1078,38 @@ ul.x-tab-strip-bottom{
 	&-header{
 		//margin-top: dp(9); //don't understand why +1 here?
 		height:dp(32);
-		border-bottom: 1px solid color($foreground, 'line');
+		border-bottom: 1px solid color($fg, 'line');
 		&-offset {
 			padding-left:0;
 		}
 	}
+	&-cell-inner, &-hd-inner {
+		@extend %ellipsis;
+		min-height: dp(40);
+		padding: dp(10) dp(4) dp(10) dp(16); // 10 top = middle of row line-height 20dp
+		.ux-row-action-cell & {
+			padding: dp(8) 0;
+		}
+		> em {
+			@extend %badge;
+			position: absolute;
+			right: dp(14);
+		}
+	}
 	&-row-checker, &-hd-checker {
+		height:dp(20); // same as line-height of text
 		&::before {
 			@extend %checkbox;
+			padding:0; // grid row has the padding
+			top: -1px; // grid col need 1px up
 		}
-		
 		.x-grid3-row-selected &::before {
 			content: 'check_box';
 		}
 	}
 	&-row {
 		border:0;
-		border-bottom:1px solid color($foreground, 'divider');
+		border-bottom:1px solid color($fg, 'divider');
 		&-selected {
 			background-color: $cSelected;
 			border-bottom-color: transparent;
@@ -1107,8 +1135,11 @@ ul.x-tab-strip-bottom{
 	&-check-col-td > div {
 		text-overflow: initial;
 		 > div {
+			height:dp(20);
 			&::before{
 				@extend %checkbox;
+				padding:0;
+				top: -1px;
 			}
 			&.x-grid3-check-col-on::before {
 				content: 'check_box';
@@ -1124,9 +1155,6 @@ ul.x-tab-strip-bottom{
 		margin-right: -20px;		
 	}
 	&-cell {
-		&-inner {
-			padding-top: dp(4);
-		}
 		&-first {
 			//padding-left: dp(16) !important;
 			//padding-left: dp(8) !important;
@@ -1145,20 +1173,7 @@ ul.x-tab-strip-bottom{
 	}
 	&-row-body {
 		padding: 0 0 dp(8) dp(16);
-		color: color($foreground, "secondary-text");
-	}
-	&-cell-inner, &-hd-inner {
-		@extend %ellipsis;
-		min-height: dp(40);
-		padding: dp(10) dp(4) dp(8) dp(16); // 10 top = middle of row for min row height of 48
-		.ux-row-action-cell & {
-			padding: dp(8) 0;
-		}
-		> em {
-			@extend %badge;
-			position: absolute;
-			right: dp(14);
-		}
+		color: color($fg, "secondary-text");
 	}
 	&-hd-inner {
 		min-height: dp(20);
@@ -1204,12 +1219,12 @@ ul.x-tab-strip-bottom{
 
 
 .x-grid3-radio-col:before {
-	color: color($foreground, 'icon');
+	color: color($fg, 'icon');
 	@extend %icon;
 	content: 'radio_button_unchecked';
 }
 .x-grid3-radio-col-on:before {
-	color: color($foreground, 'icon');
+	color: color($fg, 'icon');
 	@extend %icon;
 	content: 'radio_button_checked';
 }
@@ -1223,7 +1238,7 @@ ul.x-tab-strip-bottom{
 }
 
 .x-grid3-locked td.x-grid3-row-marker div, .x-grid3-locked .x-grid3-row-selected td.x-grid3-row-marker div{
-	color:color($foreground, 'text') !important;
+	color:color($fg, 'text') !important;
 }
 
 .x-grid3-cell-text, .x-grid3-hd-text {
@@ -1252,7 +1267,7 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 	position: relative;
 	&:after{
 		@extend %icon;
-		color: color($foreground, 'hint-text');
+		color: color($fg, 'hint-text');
 		left: dp(14);
 		top: dp(10); 
 		font-size: sp(13);
@@ -1343,29 +1358,23 @@ td.grid-hd-group-cell {
 	color:#444;
 }
 
-.x-grid-group, .x-grid-group-body, .x-grid-group-hd {
-	zoom:1;
-}
-
 .x-grid-group-hd {
-	border-bottom: 1px solid color($foreground, 'divider');
-}
-
-.x-grid-group-hd div.x-grid-group-title {
-	@extend %font-caption;
-	color:$cPrimary;
-	padding: dp(8) dp(16) dp(8) dp(16);
-	&::before {
-      margin-right: dp(16);
-      @extend %icon;
-      content: 'keyboard_arrow_down';
+	border-bottom: 1px solid color($fg, 'divider');
+	div.x-grid-group-title {
+		@extend %font-caption;
+		@include var(color, c-primary);
+		padding: dp(8);
+		&::before {
+			@extend %icon;
+			padding: 0 dp(4);
+			content: 'keyboard_arrow_down';
+		}
+		.x-grid-group-collapsed &::before {
+			@extend %icon;
+			content: 'keyboard_arrow_right';
+		}
 	}
-	.x-grid-group-collapsed &::before {
-		@extend %icon;
-		content: 'keyboard_arrow_right';
-	}
 }
-
 
 .x-column {
 	min-height: 1px;
@@ -1386,7 +1395,7 @@ td.grid-hd-group-cell {
 	transform: translate(-50%, -50%);*/
 	padding: dp(120) 0;
 	text-align:center;
-	color: color($foreground, 'disabled-text');
+	color: color($fg, 'disabled-text');
 	&::before {
 		@extend %icon;
 		font-size: sp(120) !important;
@@ -1414,7 +1423,7 @@ td.grid-hd-group-cell {
 // #####################
 .x-dd-drag-ghost {
 	@extend %font-data;
-	color:color($foreground, 'text');
+	color:color($fg, 'text');
 	opacity:1;
 	border:0;
 	min-height:dp(32);
@@ -1433,7 +1442,7 @@ td.grid-hd-group-cell {
 	@extend %icon;
 	.x-dd-drop-ok-add & {
 		content: 'add';
-		color: $cPrimary;
+		@include var(color, c-primary);
 	}
 	.x-dd-drop-nodrop & {
 		content: 'block';
@@ -1471,7 +1480,7 @@ td.grid-hd-group-cell {
 		display:inline-block;
 		&::before {
 			@extend %icon;
-			color: color($foreground, 'icon');
+			color: color($fg, 'icon');
 		}
 	}
 	&-ec-icon::before {
@@ -1509,7 +1518,7 @@ td.grid-hd-group-cell {
 			width: dp(24);
 		}
 		a, .x-dd-drag-ghost a{
-			color: color($foreground, 'text');
+			color: color($fg, 'text');
 			span {
 				color: inherit;
 			}
@@ -1617,13 +1626,6 @@ td.grid-hd-group-cell {
 			color:inherit;
 		}
 	}
-	// &-middle,&-left,&-right {
-	//   background-color: $cPrimary1;
-	//   color:white;
-	//   a {
-	//     color:white;
-	//   }
-	// }
 	&-bottom {
       border:0;
 	}
@@ -1643,7 +1645,7 @@ td.grid-hd-group-cell {
 			line-height: dp(32);
 			width: dp(32);
 			text-align:center;
-			color:color($foreground, 'text');
+			color:color($fg, 'text');
 			border-radius: 50%;
 		}
 		td {
@@ -1656,10 +1658,10 @@ td.grid-hd-group-cell {
 			border:0;
 			padding:0;
 			font-weight: 700;
-			color: $cPrimary;
+			@include var(color, c-primary);
 		}
 		.x-date-selected a {
-			background-color:$cPrimary;
+			@include var(background-color, c-primary);
 			color:white;
 			border:0;
 			padding:0;
@@ -1724,11 +1726,11 @@ td.grid-hd-group-cell {
 }
 
 .x-date-mp-btns td {
-	border-top-color: color($foreground, 'divider');;
+	border-top-color: color($fg, 'divider');;
 }
 
 td.x-date-mp-month a,td.x-date-mp-year a {
-	color:color($foreground, 'text');
+	color:color($fg, 'text');
 	padding: dp(8) 0;
 }
 
@@ -1739,7 +1741,7 @@ td.x-date-mp-month a:hover,td.x-date-mp-year a:hover {
 
 td.x-date-mp-sel a {
 	border-radius: $borderRadius;
-	background-color: $cPrimary;
+	@include var(background-color, c-primary);
 	color:white;
 	//background-image: url(../images/default/shared/glass-bg.gif);
 	border:0;
@@ -1754,13 +1756,13 @@ td.x-date-mp-sel a {
 		content: 'chevron_right';
 	}
 	&:hover {
-		color: $cPrimary;
+		@include var(color, c-primary);
 	}
 	//background-image:url(../images/default/panel/tool-sprites.gif);
 }
 
 td.x-date-mp-sep {
-   border-right-color:color($foreground, 'divider');
+   border-right-color:color($fg, 'divider');
 }
 
 // ###############
@@ -1820,7 +1822,7 @@ td.x-date-mp-sep {
 // ############
 .x-menu{
 	border-radius: $borderRadius;
-	background-color:color($background,'card');
+	background-color:color($bg,'card');
 	opacity: 1;
 	transition: opacity 90ms $curve-standard, transform 120ms $curve-deceleration;
 	transform-origin: left top 0px;
@@ -1839,7 +1841,7 @@ td.x-date-mp-sep {
 	&-nosep { background-image:none; }
 	&-sep {
 		margin: dp(16) 0 dp(16) 0;
-		background-color: color($foreground, 'divider');
+		background-color: color($fg, 'divider');
 		border:0;
 	}
 	&-list-item {
@@ -1904,7 +1906,7 @@ a.x-menu-group-item .x-menu-item-text:before{
 }
 .menu-title {
 	@extend %font-caption;
-	color: $cPrimary;
+	@include var(color, c-primary);
 	padding: dp(8) dp(16) 0;
 }
 
@@ -1938,10 +1940,10 @@ $menuScrollerSize : dp(4);
 		pointer-events: none;
 	}
 	&-top::before {
-		border-bottom-color: color($foreground,'icon'); 
+		border-bottom-color: color($fg,'icon'); 
 	}
 	&-bottom::before {
-		border-top-color: color($foreground,'icon'); 
+		border-top-color: color($fg,'icon'); 
 	}
 }
 
@@ -2065,6 +2067,9 @@ $menuScrollerSize : dp(4);
 .x-portal-column {
 	overflow: visible;
 }
+.x-portlet {
+    margin-bottom:dp(16);
+}
 .x-portlet .x-panel-ml {
 	padding-left: 0px;
 }
@@ -2077,7 +2082,7 @@ $menuScrollerSize : dp(4);
 // #################
 
 .x-border-panel {
-	border-right: 1px solid color($foreground,'divider');
+	border-right: 1px solid color($fg,'divider');
 	&:last-child {
 		border-right: 0;
 	}
@@ -2089,13 +2094,14 @@ $menuScrollerSize : dp(4);
 	}
 	&-header {
       border: 0;
-		border-top: 1px solid color($foreground, 'divider');
-      padding: 0 dp(8) 0 dp(16);
+		border-top: 1px solid color($fg, 'divider');
+      padding: 0 dp(8) 0 dp(8);
       height: dp(56);
       line-height: dp(56);
       //background-color:$cPrimary;
 		&-text {
 			@extend %font-subheading;
+			padding-left: dp(8);
 		}
       .x-border-panel > & {
 			background-color: transparent;
@@ -2107,20 +2113,19 @@ $menuScrollerSize : dp(4);
 		margin-top: dp(-4);
 	}
 	&-collapsed {
-		
 		.x-window-tl {
 			border-bottom-color:#84a0c4;
 		}
 	}
 	&-floating {
 		@extend .z8;
-		background-color: color($background, 'background');
+		background-color: color($bg, 'background');
 		// see x-panel-collapsed
 	}
 	&-bwrap {
       overflow:visible;
-      //background-color: color($background, 'background');
-      //border: 1px solid color($foreground, 'line');
+      //background-color: color($bg, 'background');
+      //border: 1px solid color($fg, 'line');
 	}
 	&-tbar {
       overflow:visible;
@@ -2142,9 +2147,12 @@ $menuScrollerSize : dp(4);
 	.x-window-header & {
 
 	}
+/*	&-toggle {
+		float: left;
+	}*/
 	&:hover {
 		transition-duration: 85ms;
-		background-color: rgba(0, 0, 0, 0.096);
+		@include var(background-color, c-primary-tp);
 	}
 }
 .x-border-layout-ct {
@@ -2154,7 +2162,7 @@ $menuScrollerSize : dp(4);
 
 .x-panel-tl .x-panel-header {
 	/*padding: 0 dp(8); removed for start page*/
-	color:color($foreground, 'text');
+	color:color($fg, 'text');
 }
 
 .x-panel-tc {
@@ -2189,7 +2197,7 @@ $menuScrollerSize : dp(4);
 .x-panel-fbar td,.x-panel-fbar span,.x-panel-fbar input,.x-panel-fbar div,.x-panel-fbar select,.x-panel-fbar label{
 	@extend %font-data;
 	button {
-		color: $cPrimary;
+		@include var(color, c-primary);
 	}
 }
 
@@ -2197,15 +2205,15 @@ $menuScrollerSize : dp(4);
 // ### WINDOW ###
 // ##############
 .x-window {
-	background-color:color($background,'dialog');
+	background-color:color($bg,'dialog');
 	border-radius: $borderRadius;
-	//border: 1px solid color($foreground, 'line');
+	//border: 1px solid color($fg, 'line');
 	&-footer.x-panel-btns {
 		padding: dp(8);
 	}
 	&-header {
 			@extend %font-title;
-			background-color:color($background,'app-bar');
+			background-color:color($bg,'app-bar');
 			border-radius: $borderRadius;
 			
 			&-text {
@@ -2248,7 +2256,7 @@ $menuScrollerSize : dp(4);
 	}
 	&-bbar .x-toolbar {
 		
-		border-top-color: color($foreground, 'divider');;
+		border-top-color: color($fg, 'divider');;
 	}
 	&-maximized .x-window-tc {
 		background-color:#fff;
@@ -2257,7 +2265,7 @@ $menuScrollerSize : dp(4);
 
 
 .x-panel-ghost .x-window-tl {
-	border-bottom-color: color($foreground, 'divider');
+	border-bottom-color: color($fg, 'divider');
 }
 
 .x-dlg-mask{
@@ -2269,7 +2277,7 @@ $menuScrollerSize : dp(4);
 }
 .x-window-plain .x-window-body {
 	//padding: 0 dp(16) dp(24) dp(16);
-	//border-color: color($background, 'background') #a3bae9 #a3bae9 color($background, 'background');
+	//border-color: color($bg, 'background') #a3bae9 #a3bae9 color($bg, 'background');
 }
 
 body.x-body-masked .x-window-plain .x-window-mc {
@@ -2278,7 +2286,7 @@ body.x-body-masked .x-window-plain .x-window-mc {
 // HTML
 .x-html-editor-wrap {
 	border-radius: dp(4);
-	border:1px solid color($foreground, 'divider');
+	border:1px solid color($fg, 'divider');
 }
 .x-html-editor-tb .x-toolbar {
 	box-shadow:none;
@@ -2299,7 +2307,7 @@ body.x-body-masked .x-window-plain .x-window-mc {
 // ####################
 .x-border-layout-ct {
 	form & {
-		background-color:color($background, 'form');
+		background-color:color($bg, 'form');
 	}
 }
 
@@ -2309,26 +2317,28 @@ body.x-body-masked .x-window-plain .x-window-mc {
 
 .x-accordion-hd {
 	@extend %font-body1;
-	color:color($foreground, 'text');
+	color:color($fg, 'text');
 	border-bottom: 0 !important;
 	&:hover {
 		background-color: color($grey, 200);
 	}
 	.x-panel-collapsed & {
-		border-bottom: 1px solid color($foreground, 'divider') !important;
+		border-bottom: 1px solid color($fg, 'divider') !important;
 	}
 	.x-tool {
-		color: color($foreground, 'icon');
+		color: color($fg, 'icon');
 	}
 }
 
-
 .x-layout-collapsed {
 	display:none;
-	background-color:color($background, 'app-bar');
+	background-color:color($bg, 'app-bar');
 	border:0;
 	width:dp(0);
-   height:dp(16);
+   height:dp(24);
+	&-over{
+		background-color:color($bg, 'hover');
+	}
 	.x-tool {
 		margin:0;
 		width:dp(24);
@@ -2336,13 +2346,9 @@ body.x-body-masked .x-window-plain .x-window-mc {
 	}
 }
 
-.x-layout-collapsed-over{
-	background-color:color($background, 'hover');
-}
-
 $resizerSize : dp(2);
 .x-layout-split {
-	background-color: color($foreground,'divider');
+	background-color: color($fg,'divider');
 	&.x-splitbar {
 		&-h {
 			width:$resizerSize;
@@ -2361,7 +2367,7 @@ $resizerSize : dp(2);
 		}
 	}
 	.x-layout-mini {
-		background-color: color($background, 'status-bar');
+		background-color: color($bg, 'status-bar');
 		opacity: 1;
 	}
 }
@@ -2379,25 +2385,25 @@ $resizerSize : dp(2);
 		height:0;
 		.x-layout-split-west &,
 		.x-layout-cmini-east & {
-			border-right-color: color($foreground,'icon'); 
+			border-right-color: color($fg,'icon'); 
 			right:dp(6); 
 			top:13px;
 		}
 		.x-layout-split-east &,
 		.x-layout-cmini-west & {
-			border-left-color: color($foreground,'icon'); 
+			border-left-color: color($fg,'icon'); 
 			right:0; 
 			top:13px;
 		}
 		.x-layout-split-north &,
 		.x-layout-cmini-south & {
-			border-bottom-color: color($foreground,'icon');
+			border-bottom-color: color($fg,'icon');
 			top:dp(-6); 
 			left: 13px; 
 		}
 		.x-layout-split-south &,
 		.x-layout-cmini-north & {
-			border-top-color: color($foreground,'icon');
+			border-top-color: color($fg,'icon');
 			top:0; left: 13px;
 		}
 	}
@@ -2414,11 +2420,10 @@ $resizerSize : dp(2);
 	}
 	&-inner {
 		height: dp(32);
-
-		background-color:rgba($cPrimary, .12);
+		@include var(background-color, c-primary-tp);
 	}
 	&-bar {
-		background-color:$cPrimary;
+		@include var(background-color, c-primary);
 		border:0;
 	}
 	&-text {
@@ -2427,7 +2432,7 @@ $resizerSize : dp(2);
 		line-height: dp(32);
 		&-back {
 			line-height: dp(32);
-			color:color($foreground, 'text');
+			color:color($fg, 'text');
 		}
 	}
 }
@@ -2454,7 +2459,7 @@ $resizerSize : dp(2);
 }
 
 .x-list-selected {
-	background-color:color($background, 'background');
+	background-color:color($bg, 'background');
 }
 
 .x-list-resizer {
@@ -2475,7 +2480,7 @@ $resizerSize : dp(2);
 	overflow:visible;
 	.x-slider-inner {
 		top: dp(16);
-		background-color: color($foreground, 'track');
+		background-color: color($fg, 'track');
 		border-radius: $borderRadius;
 		height: dp(2);
 	}
@@ -2504,7 +2509,7 @@ $resizerSize : dp(2);
 	}
 }
 input[value="0"] + .x-slider .x-slider-thumb {
-	border-color: color($foreground, 'track');
+	border-color: color($fg, 'track');
 	background-color: white; 
 }
 
@@ -2523,7 +2528,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 // ### DIALOG ###
 // ##############
 .x-window-dlg {
-	background-color: color($background, 'dialog');
+	background-color: color($bg, 'dialog');
 	border-radius: $borderRadius;
 }
 .x-window-dlg .ext-mb-text,

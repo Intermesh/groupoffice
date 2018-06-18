@@ -69,8 +69,6 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 
 	initToolbar: function () {
 
-
-
 		var items = this.tbar || [];
 		
 		items = items.concat([
@@ -86,6 +84,10 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 					},
 					scope: this
 				},
+				
+				new go.detail.addButton({
+					detailPanel: this
+				}),
 
 				{
 					iconCls: 'ic-more-vert',

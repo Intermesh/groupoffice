@@ -246,7 +246,7 @@
 					customfield.options.nestingLevel = 0;
 				}
 
-				GO.customfields.slaves[treeMasterFieldId][parseInt(customfield.options.nestingLevel)] = customfield.dataname;
+				GO.customfields.slaves[treeMasterFieldId][parseInt(customfield.options.nestingLevel)] = customfield.databaseName;
 
 				var f = GO.customfields.dataTypes["GO\\Customfields\\Customfieldtype\\Text"].getFormField(customfield, config);
 
@@ -578,7 +578,7 @@
 					hiddenName: 'customFields.' + customfield.databaseName,
 					forceSelection: true,
 					valueField: 'cf',
-					customfieldId: customfield.dataname
+					customfieldId: customfield.id
 				}));
 			}
 		}

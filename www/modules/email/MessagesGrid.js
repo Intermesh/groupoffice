@@ -264,11 +264,13 @@ GO.email.MessagesGrid = function(config){
 			scope:this
 		});
 	}
-	config.tbar = [];
+	if(!config.hideSearch)
+		config.tbar = [];
 	
 	GO.email.MessagesGrid.superclass.constructor.call(this, config);
 
-	this.getTopToolbar().add({
+	if(!config.hideSearch)
+		this.getTopToolbar().add({
 				cls: 'go-narrow',
 				iconCls: "ic-arrow-back",
 				handler: function () {
@@ -390,7 +392,9 @@ Ext.extend(GO.email.MessagesGrid, GO.grid.GridPanel,{
 		{
 			GO.email.search_type = GO.email.search_type_default;
 		}
-		this.setSearchFields(GO.email.search_type, GO.email.search_query);
+		if(!this.hideSearch) {
+			this.setSearchFields(GO.email.search_type, GO.email.search_query);
+		}
 
 		GO.email.MessagesGrid.superclass.show.call(this);
 	},

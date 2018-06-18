@@ -527,15 +527,14 @@ Ext.extend(GO.modules.MainPanel,Ext.grid.EditorGridPanel, {
 		var params = {};
 		
 		if(record.data.id) {
-			params['update'] = [{
-				id: record.data.id,
+			params.update = {};
+			params.update[record.data.id] = {
 				enabled: record.data.enabled
-			}];
+			};
 			go.Stores.get("Module").set(params, function(options, success, response) {
 
 				if(record.data.enabled && record.isModified("enabled")) {
-					record.set('aclId', response['created'][0].aclId);
-					record.set('id', response['created'][0].id);
+					//record.set('aclId', response['created'][record.data.id].aclId);
 					this.showPermissions(record.data.name, t(record.data.name, record.data.name), record.data.aclId);
 					this.store.load();				
 				}

@@ -117,7 +117,13 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 				handler:this.editHandler, 
 				scope: this,
 				disabled : true
-			}));
+			}), 
+			
+		
+		new go.detail.addButton({			
+			detailPanel: this
+				})
+		);
 
 		this.moreButton = new Ext.Button({
 			iconCls: 'ic-more-vert',

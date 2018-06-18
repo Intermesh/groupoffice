@@ -446,12 +446,12 @@ $qs[] = function() {
 	\go\modules\core\customfields\model\FieldSet::getType();
 	\go\modules\core\customfields\model\Field::getType();
 	
-	\go\core\links\Link::getType();
-	\go\core\search\Search::getType();
-	\go\core\auth\model\User::getType();
-	\go\core\auth\model\Group::getType();
+	\go\modules\core\links\model\Link::getType();
+	\go\modules\core\search\model\Search::getType();
+	\go\modules\core\users\model\User::getType();
+	\go\modules\core\groups\model\Group::getType();
 	
-	\go\core\module\model\Module::getType();
+	\go\modules\core\modules\model\Module::getType();
 };
 
 $qs[] = "RENAME TABLE `go_users` TO `core_user`;";
@@ -477,6 +477,9 @@ foreach($qs as $q) {
 			echo $q ."\n";
 			App::get()->getDbConnection()->query($q);
 		} catch(\Exception $e) {
+			
+			echo "ERROR: A fatal upgrade error occurred. Please report this error message.\n\n";
+			
 			echo $e->getMessage().' Query '. $q;
 			exit();
 		}

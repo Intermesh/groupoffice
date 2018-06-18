@@ -35,7 +35,7 @@
 			
       };     
 			
-			
+			//these datatypes will be prefetched by go.data.JmapProxy.fetchEntities()
 			go.data.types[name] = {
 				convert: function (v, data) {
 					if(!data[this.key]) {

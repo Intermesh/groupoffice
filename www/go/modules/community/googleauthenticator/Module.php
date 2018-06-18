@@ -1,7 +1,7 @@
 <?php
 namespace go\modules\community\googleauthenticator;
 
-use go\core\auth\model\User;
+use go\modules\core\users\model\User;
 use go\core\module\Base;
 use go\core\orm\Mapping;
 use go\core\orm\Property;

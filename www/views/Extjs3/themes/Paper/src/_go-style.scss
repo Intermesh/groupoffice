@@ -3,8 +3,7 @@
 	background:color($grey,200);
 }
 body {
-	background-color: $cPrimary;
-	
+	@include var(background-color, c-primary);
 }
 body * {
 	box-sizing: border-box;
@@ -198,12 +197,12 @@ a {
 	@extend %font-title;
 	//margin-right: dp(56);
 	//width: 245px;
-	color:$cPrimary;
+	@include var(color, c-primary);
 }
 .go-item-wrap {
 	cursor:pointer;
 	padding: dp(8);
-	border-bottom: 1px solid color($foreground, 'divider');
+	border-bottom: 1px solid color($fg, 'divider');
 	&:before {
 		@extend %icon;
 		content: 'keyboard_arrow_right';
@@ -211,14 +210,14 @@ a {
 	}
 	&.go-view-selected {
 		background-color: $cSelected;
-		color: $cPrimary;
+		@include var(color, c-primary);
 	}
 	span {
 		padding: 0 0 0 dp(40) !important;
 	}
 }
 .go-view-over {
-	background-color: color($background,'hover');
+	background-color: color($bg,'hover');
 }
 #go-logo, .go-app-logo {
 	background-image: url('img/logo-white.svg');
@@ -250,9 +249,22 @@ a {
 		border:0;
 		margin:0;
 		cursor:pointer;
+		&.x-view-selected i {
+			@include var(color, c-primary);
+		}
 		i {
-			color: color($foreground,'secondary-text');
+			color: color($fg,'secondary-text');
 			margin-right:dp(16);
+			
+		}
+		&.x-view{
+			&-over {
+				background-color: $cHover;
+			}
+			&-selected {
+				@include var(color, c-primary);
+				background-color: $cSelected;
+			}
 		}
 
   }
@@ -275,9 +287,9 @@ a {
 	height: dp(64);
 	position: relative;
 	color: white;
-	background-color: $cPrimary;
+	@include var(background-color, c-primary);
 	+ .x-tab-panel {
-		background-color: $cPrimary;
+		@include var(background-color, c-primary);
 		> .x-tab-panel-header {
 			position: relative;
 			background-color:rgba(255,255,255,.17);
@@ -301,7 +313,7 @@ a {
 			}
 		}
 		.x-tab-panel-body{
-			background-color: color($background, "background");
+			background-color: color($bg, "background");
 			> .x-hide-display {
 				display:none !important;
 			}
@@ -310,7 +322,7 @@ a {
 }
 .go-grid3-hide-headers {
 	.x-panel-tbar {
-		border-bottom: dp(1) solid color($foreground, "divider");
+		border-bottom: dp(1) solid color($fg, "divider");
 	}
 	.x-grid3-header {
 		display:none;
@@ -351,10 +363,10 @@ a {
 }
 
 .go-head-tb {
-	border-bottom: 1px solid color($foreground, 'line') !important;
+	border-bottom: 1px solid color($fg, 'line') !important;
 	position:relative;
 	z-index: 2;
-	background-color: color($background, 'background') !important;
+	background-color: color($bg, 'background') !important;
 	// /color: $cAccent;
 }
 
@@ -400,7 +412,7 @@ a {
 		left:dp(240);
 		right:dp(240);
 		height: dp(40);
-		background-color: color($background, 'disabled-button');
+		background-color: color($bg, 'disabled-button');
 		border-radius: $borderRadius;
 		transition: opacity 280ms $curve-standard;
 		opacity:1;
@@ -433,7 +445,7 @@ a {
 
 
 .go-search-panel {
-	//border: 1px solid color($foreground, "line");
+	//border: 1px solid color($fg, "line");
 	@extend .z24
 }
 
@@ -456,10 +468,10 @@ a {
 		max-height: 95vh;
 		overflow-y: auto;
 		border-radius: $borderRadius;
-		background-color: color($background, 'card');
+		background-color: color($bg, 'card');
 		min-height: dp(40);
 		padding: dp(16) dp(24);
-		color: color($foreground, 'secondary-text');
+		color: color($fg, 'secondary-text');
 		margin: 0 auto dp(4);
 		animation: slide-top .2s ease-out; 
 		h4 {
@@ -475,7 +487,7 @@ a {
 	}
 }
 .card {
-	background-color: color($background, 'card');
+	background-color: color($bg, 'card');
 }
 /*.go-global-search {
 	//width: 65%;
@@ -484,7 +496,7 @@ a {
 	position:absolute;
 	left: 240px;
 	right: 240px;
-	background-color: color($background, 'disabled-button');
+	background-color: color($bg, 'disabled-button');
 	border-radius: $borderRadius;
 	.x-btn {
 		position:absolute;
@@ -524,6 +536,41 @@ button {
 	background-size:cover;
 	border: 1px solid white;
 	border-radius: 50%;
+	
+	&.group {
+		&::before {
+			width: 100%;
+			height: 100%;
+			color: white;
+			@extend %icon;
+			font-size: dp(28);
+			margin: dp(4);			
+		}
+		@extend .ic-group;
+		background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24));	
+	}
+}
+
+.user {
+	position: relative;
+	padding-left: dp(48);
+	min-height: dp(40);
+	
+	.wrap {
+		padding-top: dp(4);
+	}
+	.avatar {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: dp(40);
+		height: dp(40);
+		vertical-align: middle;
+	}
+	
+	.username, .displayName {
+		display:block;
+	}
 }
 
 #user-menu {
@@ -553,16 +600,16 @@ button {
 		padding-top:dp(48);
 		z-index:14;
 		@extend .z1;
-		color: color($foreground, 'text');
+		color: color($fg, 'text');
 		position:absolute;
 		top: dp(20);
 		right:dp(8);
 		width: dp(256);
-		background-color: color($background, 'card');
+		background-color: color($bg, 'card');
 		button a {
-			color: color($foreground, 'icon');
+			color: color($fg, 'icon');
 			&:hover{
-				color: color($foreground, 'text');
+				color: color($fg, 'text');
 			}
 		}
 	}
@@ -572,14 +619,14 @@ hr {
 	height: 1px;
 	border:0;
 	margin: dp(15) 0 dp(16) 0;
-	background-color: color($foreground, 'divider');
+	background-color: color($fg, 'line');
 }
 #go-logged-in-as {
 	text-align:center;
 }
 
 #go-module-panel-summary > div > div.x-panel-body  {
-	background-color: color($background, 'background');
+	background-color: color($bg, 'background');
 }
 
 .go-tab-notification {
@@ -725,7 +772,7 @@ button.filetype-pdf, button.filetype-doc {
 		width: 16px;
 		text-align: right;
 		padding-right: 2px;
-		a { color: color($foreground, 'icon');}
+		a { color: color($fg, 'icon');}
 	}
 
 }
@@ -733,14 +780,6 @@ button.filetype-pdf, button.filetype-doc {
 .go-border-west {
 	//background-color: color($grey, 100);
 }
-
-
-.x-tool-toggle {
-	float: left;
-	margin-left: dp(-10);
-	margin-right: dp(14);
-}
-
 
 /*%hyperlink {
 	color: color($primary, 700);
@@ -778,7 +817,7 @@ button.filetype-pdf, button.filetype-doc {
 		background-color: color($orange, 700) !important;
 	}*/
 	
-/*	background-color:color($background, 'card');*/
+/*	background-color:color($bg, 'card');*/
 	figure {
 		clear:both;
 		background-position:center 60%;
@@ -874,14 +913,14 @@ button.filetype-pdf, button.filetype-doc {
 	}
 	
 	.x-panel-body {
-		background-color: color($background, "card");
+		background-color: color($bg, "card");
 	}
 	
 	.x-panel-bbar {
 		height: dp(64);
 		padding-left: dp(8);
 		.x-btn{
-			border: dp(1) solid color($foreground, "line");
+			border: dp(1) solid color($fg, "line");
 		}
 		.x-toolbar {
 			border-bottom: 0;
@@ -897,59 +936,67 @@ button.filetype-pdf, button.filetype-doc {
 	.title {
 		padding: dp(16);
 	}
+	
+	
+	.x-panel-header {
+		border-top: 1px solid color($fg, "line");
+	}
 }
 
 .go-icon-list {
 	p, > a {
+		
 		min-height: dp(40);
 		box-sizing: border-box;
 		display:table;
 		text-decoration: none;
 		padding: dp(8) dp(16);
 		width: 100%;
-		span {
+		span, a {
 			display: block;
 			min-height: dp(24);
 		}
+		
 		i.label {			
 			left: dp(16);
 			top:dp(12);
 			width:  dp(24);
 			height: dp(24);
 			position: absolute;
-			color: color($foreground, 'icon') !important;		
+			color: color($fg, 'icon') !important;		
 		}
-		&.right {
-			top: dp(8);
-			right: dp(16);
-			position:absolute;
+		
+		&:hover {
+			.show-on-hover {
+				display:block;
+			}
+		}
+		
+	}
+	.right {
+		top: dp(8);
+		right: dp(16);
+		position:absolute;
+		
+		&.show-on-hover {
+			display: none;
+			
 		}
 	}
 }
 .go-icon-list > p, .go-icon-list > a {
 	position:relative;
-	padding-left: dp(64);
+	padding-left: dp(56);
 
 }
 
 // old detail view compatibility
 .go-display-panel {
 	width: 100%;
-	&-browse {
-		@extend .x-btn;
-		float:right;
-		padding: 0 dp(8);
-		margin-right: dp(8);
-		color: $cPrimary;
-		&:hover, &:active {
-			transition: background-color 195ms linear, box-shadow 195ms $curve-standard;
-			background-color: rgba(14, 156, 197, 0.096);
-		}
-	}
 	&-heading {
 		@extend %font-subheading;
-		/*color: color($foreground, 'secondary-text');*/
-		border-top: 1px solid color($foreground, 'divider');
+		/*color: color($fg, 'secondary-text');*/
+		border-top: 1px solid color($fg, 'divider');
 		padding: dp(8) dp(16);
 		height: dp(56);
 	}
@@ -970,15 +1017,10 @@ button.filetype-pdf, button.filetype-doc {
 		height: dp(40);		
 		overflow: hidden;
 		text-overflow: ellipsis;
-		border-bottom: 1px solid color($foreground, 'line');
+		border-bottom: 1px solid color($fg, 'line');
 		background-color: transparent !important;
 	}
 }
-
-.go-tool-toggle-collapsed:before {
-   content: "expand_more";
-}
-	
 	
 table.display-panel {
 	width: 100%;
@@ -993,7 +1035,7 @@ table.display-panel {
 		}
 	}
 	tr.line, td.line, th.line {
-		border-top: 1px solid color($foreground, 'line');
+		border-top: 1px solid color($fg, 'line');
 	}
 	table { 
 		td:first-child {
@@ -1006,8 +1048,8 @@ table.display-panel {
 }
 .collapsible-display-panel-header {
 	@extend %font-subheading;
-/*	color: color($foreground, 'secondary-text');*/
-	border-top: 1px solid color($foreground, 'divider');
+/*	color: color($fg, 'secondary-text');*/
+	border-top: 1px solid color($fg, 'divider');
 	padding: 0 dp(8) 0 dp(16);
 	height: dp(56);
 	line-height: dp(56);
@@ -1019,10 +1061,14 @@ table.display-panel {
 	background-size: dp(16) dp(16);
 }
 .go-select-all-checkbox {
-	color: color($foreground, 'text');
+	color: color($fg, 'text');
 	@extend %font-caption;
 	.x-form-checkbox + label:before{
-		color: color($foreground, "icon");
+		margin: 0 dp(6) 0 dp(4);
+		color: color($fg, "icon");
+	}
+	.x-form-cb-label {
+		vertical-align: middle;
 	}
 }
 td[id^="comment-td"] {
@@ -1034,13 +1080,13 @@ table[id^="comments-ext"] b {
 .comment-div {
 	padding: dp(8);
 	border-radius: $borderRadius;
-	border: 1px solid color($foreground, 'divider');
+	border: 1px solid color($fg, 'divider');
 }
 // end old display panel
 
 
 .go-border-bottom {
-	border-bottom: 1px solid color($foreground, 'line');
+	border-bottom: 1px solid color($fg, 'line');
 }
 
 .x-window.go-form-panel .x-panel-body, 
@@ -1083,9 +1129,8 @@ table[id^="comments-ext"] b {
 
 .go-sidenav {
 	//margin-top: dp(8);
-	//border-right: 1px solid color($foreground, "divider");
-	/*background-color: color($background, 'app-bar');*/
-	
+	//border-right: 1px solid color($fg, "divider");
+	/*background-color: color($bg, 'app-bar');*/
 	.x-grid3 {
 		background-color: transparent;
 		
@@ -1097,7 +1142,7 @@ table[id^="comments-ext"] b {
 		}
 	}
 	.x-panel-tbar {
-		border-bottom: 1px solid color($foreground, "divider");
+		border-bottom: 1px solid color($fg, "divider");
 	}
 	.x-panel-header-text {
 		//@extend %font-title;

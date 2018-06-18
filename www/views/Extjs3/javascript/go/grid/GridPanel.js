@@ -1,25 +1,24 @@
 go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
-	
+
 	/**
 	 * If the end of the list is within this number of pixels it will request the next page	
 	 */
-	scrollBoundary : 300,
+	scrollBoundary: 300,
 
 	initComponent: function () {
 		
 		go.grid.GridPanel.superclass.initComponent.call(this);
-		
-		if(!this.keys)
+
+		if (!this.keys)
 		{
-			this.keys=[];
+			this.keys = [];
 		}
 		this.keys.push({
 			key: Ext.EventObject.DELETE,
-			fn: function(key, e){
-				console.log("DELETE");
+			fn: function (key, e) {
 				this.deleteSelected();
 			},
-			scope:this
+			scope: this
 		});
 		
 		this.on("bodyscroll", this.loadMore, this, {buffer: 100});
@@ -81,16 +80,38 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 		}
 		this.headerMenu.show(el, "tr-br?")
 	},
-	
-	deleteSelected : function() {
-	
-		var selectedRecords = this.getSelectionModel().getSelections(), ids = [];
-		
-		selectedRecords.forEach(function(r) {
+
+	deleteSelected: function () {
+
+		var selectedRecords = this.getSelectionModel().getSelections(), ids = [], strConfirm;
+
+		selectedRecords.forEach(function (r) {
 			ids.push(r.data.id);
 		});
-		
-		this.store.destroy(ids);
+
+		switch (ids.length)
+		{
+			case 0:
+				return;
+			case 1:
+				strConfirm = t("Are you sure you want to delete the selected item?");
+				break;
+
+			default:
+				strConfirm = t("Are you sure you want to delete the {count} items?").replace('{count}', ids.length);
+				break;
+		}
+
+		Ext.MessageBox.confirm(t("Confirm delete"), t(strConfirm), function (btn) {
+
+			if (btn != "yes") {
+				return;
+			}
+
+			this.getStore().entityStore.set({
+				destroy: ids
+			});
+		}, this);
 	},
 
 	/**

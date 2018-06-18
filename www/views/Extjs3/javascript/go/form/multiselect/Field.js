@@ -33,19 +33,21 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 	 */
 	storeBaseParams: null,
 
-	autoHeight: true,
-	
-	viewConfig: {
-		scrollOffset: 0,
-		emptyText: t("Empty"),
-		deferEmptyText: false
-	},
+	autoHeight: true,	
 	
 	cls: 'go-grid3-hide-headers',
 
 	constructor: function (config) {
 
 		config = config || {};
+		
+		if(!config.viewConfig) {
+			config.viewConfig = {
+				scrollOffset: 0,
+				emptyText: t("Empty"),
+				deferEmptyText: false
+			};
+		}
 
 		var actions = this.initRowActions();
 
@@ -104,8 +106,7 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 				]
 			},
 			store: new go.data.Store({
-				fields: fields,
-				entityStore: config.entityStore
+				fields: fields
 			}),
 			columns: columns,
 			autoExpandColumn: "name"
@@ -147,8 +148,11 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 
 	setValue: function (records) {
 		
-		this._isDirty = false; //todo this is not right but works for our use case
+		if(GO.util.empty(records)) {
+			return;
+		}
 		
+		this._isDirty = false; //todo this is not right but works for our use case
 		var ids = [];
 		records.forEach(function (n) {
 			ids.push(n[this.idField]);
@@ -161,14 +165,6 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 		}, this);
 	},
 	
-	getIds : function() {
-		var records = this.store.getRange(), v = [];
-		for(var i = 0, l = records.length; i < l; i++) {
-			v.push(records[i].data[this.idField]);
-		}
-		return v;
-	},
-
 	getValue: function () {		
 		var records = this.store.getRange(), v = [];
 		for(var i = 0, l = records.length; i < l; i++) {
@@ -177,16 +173,28 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 		return v;
 	},
 
-	markInvalid: function () {
-
+	markInvalid: function (msg) {
+		this.getEl().addClass('x-form-invalid');
+		Ext.form.MessageTargets.qtip.mark(this, msg);
 	},
 	clearInvalid: function () {
-
+		this.getEl().removeClass('x-form-invalid');
+		Ext.form.MessageTargets.qtip.clear(this);
 	},
 	
 	validate : function() {
 		return true;
 	},
+	
+	getIds : function() {
+		var records = this.store.getRange(), v = [];
+		for(var i = 0, l = records.length; i < l; i++) {
+			v.push(records[i].data[this.idField]);
+		}
+		return v;
+	},
+
+	
 	
 	initRowActions: function () {
 

@@ -52,55 +52,28 @@ this.gridPanel.store.on('load', function(store, records, options)
 
 	}, this);
 	
-	var filterPanel = new Ext.form.FormPanel({
-		autoHeight: true,
-		waitMsgTarget:true,
+	var filterPanel = new go.NavMenu({
 		region:'north',
-		border:true,
-		items: [{
-				hideLabel:true,
-				anchor:'100%',
-				xtype:'radiogroup',
-				value:GO.tasks.show,
-				columns: 1,
-				listeners:{
-					change:function(radiogroup, checkedbox){
-						this.gridPanel.store.baseParams['show']=checkedbox.inputValue;
-						this.gridPanel.store.load();
-						//delete this.gridPanel.store.baseParams['show'];
-					},
-					scope:this
-				},
-				items: [{
-					boxLabel:  t("Active", "tasks"),
-					name: 'show',
-					inputValue: 'active'
-				},{
-					boxLabel: t("Due in seven days", "tasks"),
-					name: 'show',
-					inputValue: 'sevendays'
-				},{
-					boxLabel: t("Overdue", "tasks"),
-					name: 'show',
-					inputValue: 'overdue'
-				},{
-					boxLabel: t("Incomplete tasks", "tasks"),
-					name: 'show',
-					inputValue: 'incomplete'
-				},{
-					boxLabel: t("Completed", "tasks"),
-					name: 'show',
-					inputValue: 'completed'
-				},{
-					boxLabel: t("Future tasks", "tasks"),
-					name: 'show',
-					inputValue: 'future'
-				},{
-					boxLabel: t("All", "tasks"),
-					name: 'show',
-					inputValue: 'all'
-				}]
-			}]
+		store: new Ext.data.ArrayStore({
+			fields: ['name', 'icon', 'inputValue'],
+			data: [
+				[t("Active", "tasks"), 'content_paste', 'active'],
+				[t("Due in seven days", "tasks"), 'filter_7', 'sevendays'],
+				[t("Overdue", "tasks"), 'schedule', 'overdue'],
+				[t("Incomplete tasks", "tasks"), 'assignment_late', 'incomplete'],
+				[t("Completed", "tasks"), 'assignment_turned_in', 'completed'],
+				[t("Future tasks", "tasks"), 'assignment_return', 'future'],
+				[t("All", "tasks"), 'assignment', 'all'],
+			]
+		}),
+		listeners: {
+			selectionchange: function(view, nodes) {	
+				var record = view.store.getAt(nodes[0].viewIndex);
+				this.gridPanel.store.baseParams['show']=record.data.inputValue;
+				this.gridPanel.store.load();
+			},
+			scope: this
+		}
 	});
       
 	this.categoriesPanel= new GO.grid.MultiSelectGrid({

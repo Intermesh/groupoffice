@@ -3,7 +3,7 @@
 namespace go\modules\community\googleauthenticator;
 
 use go\core\auth\model\Token;
-use go\core\auth\model\User;
+use go\modules\core\users\model\User;
 use go\core\auth\SecondaryAuthenticator;
 use go\core\validate\ErrorCode;
 

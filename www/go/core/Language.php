@@ -4,9 +4,8 @@ namespace go\core;
 
 use Exception;
 use go\core\fs\File;
-use go\core\module\Base;
-use go\core\util\ArrayObject;
-use function GO;
+use go\core\jmap\Request;
+use go\modules\core\modules\model\Module;
 
 class Language extends Singleton {
 
@@ -54,7 +53,7 @@ class Language extends Singleton {
 			return $_GET['SET_LANGUAGE'];
 		}
 		
-		$browserLanguages= jmap\Request::get()->getAcceptLanguages();
+		$browserLanguages= Request::get()->getAcceptLanguages();
 		foreach($browserLanguages as $lang){
 			$lang = str_replace('-','_',explode(';', $lang)[0]);
 			if($this->hasLanguage($lang)){
@@ -216,7 +215,7 @@ class Language extends Singleton {
 	}
 	
 	public function getAllLanguage(){
-		$modules = module\model\Module::find();
+		$modules = Module::find();
 		foreach($modules as $module) {
 			$this->loadSection($module->package  ?? "legacy", $module->name);
 		}

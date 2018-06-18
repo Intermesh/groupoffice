@@ -4,7 +4,7 @@ namespace go\core\orm;
 
 use go\core\App;
 use go\core\db\Query;
-use go\core\module\model\Module;
+use go\modules\core\modules\model\Module;
 
 /**
  * The EntityType class
@@ -83,14 +83,12 @@ class EntityType {
 	public static function findByClassName($className) {
 
 		$e = new static;
-
 		$e->className = $className;
-		$e->name = self::classNameToShortName($className);
-
+		
 		$record = (new Query)
-						->select('id,moduleId,clientName')
+						->select('id,moduleId,clientName,name')
 						->from('core_entity')
-						->where('name', '=', $e->name)
+						->where('clientName', '=', $className::getClientName())
 						->single();
 
 		if (!$record) {
@@ -102,7 +100,7 @@ class EntityType {
 
 			$record = [];
 			$record['moduleId'] = isset($module) ? $module->id : null;
-			$record['name'] = $e->name;
+			$record['name'] = self::classNameToShortName($className);
       $record['clientName'] = $className::getClientName();
 
 			App::get()->getDbConnection()->insert('core_entity', $record)->execute();
@@ -113,6 +111,7 @@ class EntityType {
 		$e->id = $record['id'];
 		$e->moduleId = $record['moduleId'];
 		$e->clientName = $record['clientName'];
+		$e->name = $record['name'];
 		
 		return $e;
 	}
@@ -201,16 +200,7 @@ class EntityType {
 		$e->moduleId = $record['moduleId'];
 
 		if (isset($record['modulePackage'])) {
-
-			switch ($e->name) {
-
-				case 'user':
-					//todo
-					break;
-
-				default:
-					$e->className = 'go\\modules\\' . $record['modulePackage'] . '\\' . $record['moduleName'] . '\\model\\' . ucfirst($e->name);
-			}
+			$e->className = 'go\\modules\\' . $record['modulePackage'] . '\\' . $record['moduleName'] . '\\model\\' . ucfirst($e->name);
 		} else {
 			switch ($e->name) {
 

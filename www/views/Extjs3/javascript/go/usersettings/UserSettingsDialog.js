@@ -49,31 +49,22 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			data: []
 		});
 		
-		this.selectMenu = new Ext.Panel({
+		this.navMenu = new go.NavMenu({
 			region:'west',
-			cls: 'go-sidenav',
-			layout:'fit',
-			width:dp(220),
-			items:[this.selectView = new Ext.DataView({
-				xtype: 'dataview',
-				cls: 'go-nav',
-				store:this.tabStore,
-				singleSelect: true,
-				overClass:'x-view-over',
-				itemSelector:'div',
-				tpl:'<tpl for=".">\
-					<div><i class="icon {icon}"></i>\
-					<span>{name}</span></div>\
-				</tpl>',
-				columns: [{dataIndex:'name'}],
-				listeners: {
-					selectionchange: function(view, nodes) {					
+			width:dp(216),
+			store:this.tabStore,
+			listeners: {
+				selectionchange: function(view, nodes) {					
+					if(nodes.length) {
 						this.tabPanel.setActiveTab(nodes[0].viewIndex);
-					},
-					scope:this
-				}
-			})]
-		});
+					} else {
+						//restore selection if user clicked outside of view
+						view.select(this.tabPanel.items.indexOf(this.tabPanel.getActiveTab()));
+					}
+				},
+				scope: this
+			}
+		}); 
 		
 		Ext.apply(this,{
 			width:dp(1000),
@@ -81,7 +72,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			layout:'border',
 			closeAction:'hide',
 			items: [
-				this.selectMenu,
+				this.navMenu,
 				this.formPanel
 			],
 			buttons:[
@@ -137,9 +128,11 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 
 		go.usersettings.UserSettingsDialog.superclass.show.call(this);
 		
-		this.selectView.select(this.tabStore.getAt(0));
+		this.navMenu.select(this.tabStore.getAt(0));
 		
-		this.load();
+		if(this.currentUser) {
+			this.load();
+		}
 	},
 	
 	/**
@@ -242,6 +235,8 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 						field.markInvalid(response.notUpdated[id].validationErrors[name].description);
 					}
 				}
+				
+				this.actionComplete();
 			}
 
 		},this);
@@ -254,6 +249,10 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	 * @return boolean
 	 */
 	needCurrentPassword : function(){
+		
+		if(go.User.isAdmin) {
+			return false;
+		}
 		
 		var needed = false,
 			accountPanel = this.tabPanel.getItem('pnl-account-settings');
@@ -289,7 +288,12 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		this.actionComplete();
 		
 		//reload group-office
-		document.location = BaseHref + "?SET_LANGUAGE=" + this.formPanel.getForm().findField('language').getValue();
+		if(this.currentUser == go.User.id) {
+			document.location = BaseHref + "?SET_LANGUAGE=" + this.formPanel.getForm().findField('language').getValue();
+		} else
+		{
+			this.close();
+		}
 	},
 		
 	/**
@@ -408,9 +412,13 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 			var menuRec = new Ext.data.Record({
 			'name':pnl.title,
-			'icon':pnl.iconCls,
+			'icon':pnl.iconCls.substr(3).replace(/-/g,'_'),
 			'visible':true
 		});
+		
+		if(pnl.isFormField) {
+			this.formPanel.getForm().add(pnl);
+		}
 		
 		if(Ext.isEmpty(position)){
 			this.tabPanel.add(pnl);

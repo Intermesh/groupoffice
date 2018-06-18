@@ -96,15 +96,4 @@ abstract class Entity  extends \go\core\orm\Entity {
 		
 	}
 	
-	/**
-	 * Get's the class name without the namespace
-	 * 
-	 * eg. class go\modules\community\notes\model\Note becomes just "note"
-	 * 
-	 * @return string
-	 */
-	public static function getClassName() {
-		$cls = static::class;
-		return substr($cls, strrpos($cls, '\\') + 1);
-	}
 }

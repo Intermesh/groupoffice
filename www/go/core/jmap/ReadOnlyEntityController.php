@@ -166,7 +166,7 @@ abstract class ReadOnlyEntityController extends Controller {
 		Response::get()->addResponse([
 				'accountId' => $p['accountId'],
 				'state' => $state,
-				'ids' => $idsQuery->all(),
+				'ids' => array_map('intval', $idsQuery->all()),
 				'notfound' => [],
 				'total' => $total,
 				'canCalculateUpdates' => false
@@ -259,7 +259,13 @@ abstract class ReadOnlyEntityController extends Controller {
 	protected function getGetQuery($params) {
 		$cls = $this->entityClass();
 		
-		return $cls::find($params['properties']);
+		$query = $cls::find($params['properties']);
+		
+		//filter permissions
+		$cls::filter($query, ['permissionLevel' => Acl::LEVEL_READ]);
+		
+		return $query;
+	
 	}
 
 	
@@ -282,14 +288,16 @@ abstract class ReadOnlyEntityController extends Controller {
 		$query = $this->getGetQuery($p);		
 		
 		if(empty($p['ids'])) {
-			$result['list'] = $query->all();
+			$result['list'] = $query->toArray();
 		} else
 		{
-			$result['list'] = $query->where($query->getTableAlias(). '.id', 'IN', $p['ids'])->all();
+			$stmt = $query->where($query->getTableAlias(). '.id', 'IN', $p['ids']);
 			
 			$foundIds = [];
+			$result['list'] = [];
 			
-			foreach($result['list'] as $e) {
+			foreach($stmt as $e) {
+				$result['list'][] = $e->toArray(); 
 				$foundIds[] = $e->id;
 			}
 			$result['notFound'] = array_values(array_diff($p['ids'], $foundIds));			

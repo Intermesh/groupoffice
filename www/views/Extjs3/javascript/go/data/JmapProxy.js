@@ -119,7 +119,7 @@ go.data.JmapProxy = Ext.extend(Ext.data.HttpProxy, {
 	},
 	
 	
-	//Prefetches all data of type go.data.types.Entity
+	//Prefetches all data of type go.data.types.Entity defined in go.Entities
 	fetchEntities : function(action, o, response) {		
 		
 		var fields = this.getEntityFields(o);

@@ -78,12 +78,56 @@ class User extends \GO\Base\Db\ActiveRecord {
 			return null;
 		}
 		
-		$user = \go\core\auth\model\User::findById($this->id);
+		$user = \go\modules\core\users\model\User::findById($this->id);
 		
 		return $user->password;
 	}
 	
 	private $password;
+	
+	public function getLastlogin() {
+		return strtotime($this->getAttribute("lastLogin"));
+	}
+	
+	public function getCtime() {
+		return strtotime($this->createdAt);
+	}
+	
+	public function getMtime() {
+		return strtotime($this->createdAt);
+	}
+	
+	public function getLogins() {
+		return $this->loginCount;
+	}
+	
+	public function getList_separator() {
+		return $this->listSeparator;
+	}
+	
+	public function getThousands_separator() {
+		return $this->thousandsSeparator;
+	}
+	
+	public function getDecimal_separator() {
+		return $this->decimalSeparator;
+	}
+	
+	public function gettext_separator() {
+		return $this->textSeparator;
+	}
+	
+	public function getfirst_weekday() {
+		return $this->firstWeekday;
+	}
+	
+	public function getdate_format() {
+		return $this->dateFormat;
+	}
+	
+	public function gettime_format() {
+		return $this->timeFormat;
+	}
 	
 	/**
 	 * Get the password hash from the new framework
@@ -98,7 +142,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 * @deprecated since version 6.3
 	 */
 	public function getDigest(){
-		$user = \go\core\auth\model\User::findById($this->id);
+		$user = \go\modules\core\users\model\User::findById($this->id);
 		
 		return $user->getDigest();
 	}
@@ -500,7 +544,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 		}
 		
 		if(isset($this->password)) {
-			$user = \go\core\auth\model\User::findById($this->id);		
+			$user = \go\modules\core\users\model\User::findById($this->id);		
 			$user->setPassword($this->password);		
 			if(!$user->save()) {
 				throw new \Exception("Could not set password: ".var_export($user->getValidationErrors(), true));
@@ -684,13 +728,10 @@ class User extends \GO\Base\Db\ActiveRecord {
 		else
 			return false;
 	}
-	
-	private $_completeDateFormat;
-	
+
 	protected function getCompleteDateFormat(){
-		if(!isset($this->_completeDateFormat))
-			$this->_completeDateFormat=$this->date_format;
-		return $this->_completeDateFormat;
+
+		return $this->dateFormat;
 	}
 	
 	
@@ -702,7 +743,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 */
 	public function checkPassword($password){
 		
-		$user = \go\core\auth\model\User::findById($this->id);
+		$user = \go\modules\core\users\model\User::findById($this->id);
 		return $user->checkPassword($password);
 	}	
 	

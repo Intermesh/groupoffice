@@ -100,7 +100,6 @@ class CustomfieldsModule extends \GO\Base\Module {
 		
 		$cf = new \go\core\util\ClassFinder();
 		$m = array_merge($m, $cf->findByTrait(\go\core\orm\CustomFieldsTrait::class));
-		
 		return $m;
 		
 	}

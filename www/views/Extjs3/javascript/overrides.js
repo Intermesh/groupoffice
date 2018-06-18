@@ -185,7 +185,17 @@ Ext.override(Ext.FormPanel,{
 				});
 			}
 		});
-	})
+	}),
+	focus : function() {
+		var firstField = this.getForm().items.find(function (item) {
+			if (!item.disabled && item.isVisible() && item.getValue() == "")
+				return true;
+		});
+
+		if (firstField) {
+			firstField.focus();
+		}
+	}
 });
 
 Ext.override(Ext.slider.MultiSlider, {
@@ -279,7 +289,7 @@ Ext.override(Ext.grid.GridView, {
 });
 
 Ext.override(Ext.grid.CheckboxSelectionModel, {
-	width: dp(40),
+	width: dp(32),
 });
 
 Ext.override(Ext.layout.ToolbarLayout, {
@@ -674,7 +684,7 @@ GO.mainLayout.onReady(function() {
 
 		Ext.override(Ext.grid.DateColumn, {
 			align: "right",
-			format: GO.settings.date_format + " " + GO.settings.time_format
+			format: go.User.dateFormat + " " + go.User.timeFormat
 		});
 	
 });
@@ -723,3 +733,6 @@ Ext.util.Format.dateRenderer = function(format) {
 };
 				
 				
+Ext.override(Ext.form.CompositeField, {
+	submit: false //don't submit with form.getFieldValue()
+});

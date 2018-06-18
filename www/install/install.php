@@ -10,6 +10,22 @@ use go\core\module\Base;
 use go\modules\community\googleauthenticator\Module as Module3;
 use go\modules\community\notes\Module;
 
+
+function dbIsEmpty() {
+	//global $pdo;
+	/* @var $pdo \PDO; */
+	
+	$stmt = App::get()->getDbConnection()->query("SHOW TABLES");
+	$stmt->execute();
+	
+	return $stmt->rowCount() == 0;
+}
+
+if(!dbIsEmpty()) {
+	header("Location: upgrade.php");
+	exit();
+}
+
 $passwordMatch = true;
 				
 if (!empty($_POST)) {
@@ -77,10 +93,12 @@ if (!empty($_POST)) {
 
 		$cron->save();
 
-		Observable::cacheListeners();
+		Observable::cacheListeners();	
 		
 		App::get()->getSettings()->databaseVersion = App::get()->getVersion();
 		App::get()->getSettings()->save();
+				
+		\go\modules\core\users\model\User::findById(1)->checkOldFramework();
 
 		header("Location: finished.php");
 		exit();

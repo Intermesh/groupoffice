@@ -1,4 +1,0 @@
-modules/presidents/views/Extjs3/PresidentPanel.js
-modules/presidents/views/Extjs3/PresidentsGrid.js
-modules/presidents/views/Extjs3/PresidentDialog.js
-modules/presidents/views/Extjs3/MainPanel.js

@@ -1,5 +1,7 @@
 (function () {
 	var CustomFieldsCls = Ext.extend(Ext.util.Observable, {
+		initialized: false,
+		
 		init : function() {
 			go.Stores.get("Field").getUpdates(function (store) {
 				go.CustomFields.fieldsLoaded = true;
@@ -184,7 +186,7 @@
 		 * @returns {undefined}
 		 */
 		onReady: function (fn, scope) {
-			if(!this.initizalized) {
+			if(!this.initialized) {
 				this.initialized = true;
 				this.init();
 			}

@@ -992,8 +992,7 @@ this.messagePanel.show();
 	},
 
 	getFolderNodeId : function (account_id, mailbox){
-
-		return GO.util.Base64.encode("f_"+account_id+"_"+mailbox);
+		return btoa("f_"+account_id+"_"+mailbox);
 	},
 	/**
 	 * Returns true if the current folder needs to be refreshed in the grid
@@ -1341,7 +1340,6 @@ GO.mainLayout.onReady(function(){
 					for(var i=0;i<result.email_status.unseen.length;i++)
 					{
 						var s = result.email_status.unseen[i];
-
 						var changed = ep.updateFolderStatus(s.mailbox, s.unseen,s.account_id);
 						if(changed && ep.messagesGrid.store.baseParams.mailbox==s.mailbox && ep.messagesGrid.store.baseParams.account_id==s.account_id)
 						{

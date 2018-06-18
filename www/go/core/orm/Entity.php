@@ -9,7 +9,7 @@ use go\core\App;
 use go\core\db\Criteria;
 use go\core\db\Query;
 use go\core\jmap\EntityController;
-use go\core\module\model\Module;
+use go\modules\core\modules\model\Module;
 use go\core\validate\ErrorCode;
 
 /**

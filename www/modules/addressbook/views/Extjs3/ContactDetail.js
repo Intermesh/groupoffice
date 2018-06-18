@@ -197,6 +197,10 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 					handler: this.editHandler,
 					scope: this
 				},
+				
+				new go.detail.addButton({			
+					detailPanel: this
+				}),
 
 				{
 					iconCls: 'ic-more-vert',

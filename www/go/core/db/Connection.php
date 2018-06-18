@@ -93,9 +93,12 @@ class Connection {
 		$this->pdo = new PDO($this->dsn, $this->username, $this->password, $this->options);
 		$this->getPdo()->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		$this->getPdo()->setAttribute(PDO::ATTR_PERSISTENT, true);
+//		$this->getPdo()->setAttribute(PDO::ATTR_EMULATE_PREPARES, false); //for native data types int, bool etc. We can't use this because we need fetch_class
 		$this->getPdo()->query("SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci'");
 		$this->getPdo()->query("SET sql_mode='" . self::SQL_MODE . "'");
 		$this->getPdo()->query("SET time_zone = '+00:00'");
+		$this->getPdo()->query("SET lc_messages = 'en_US';"); //unique key error is caught and parsed and relies on english
+		
 		$this->getPdo()->setAttribute(PDO::ATTR_STATEMENT_CLASS, [Statement::class]);
 	}
 
@@ -380,7 +383,7 @@ class Connection {
 		$debugQueryString = $this->replaceBindParameters($build['sql'], $build['params']);
 		App::get()->debug($debugQueryString, Debugger::TYPE_SQL);
 
-		$stmt = App::get()->getDbConnection()->getPDO()->prepare($build['sql']);
+		$stmt = $this->getPDO()->prepare($build['sql']);
 		$stmt->debugQueryString = $debugQueryString;
 		foreach ($build['params'] as $p) {
 

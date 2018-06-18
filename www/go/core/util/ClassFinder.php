@@ -6,7 +6,7 @@ use Closure;
 use go\core\App;
 use go\core\Environment;
 use go\core\fs\Folder;
-use go\core\module\model\Module;
+use go\modules\core\modules\model\Module;
 use ReflectionClass;
 
 /**
@@ -24,7 +24,7 @@ class ClassFinder {
 			$this->addNamespace('go\\core');		
 			$modules = Module::find();
 			foreach ($modules as $module) {
-				if(!$module->isAvailable()) {
+				if(!isset($module->package) || !$module->isAvailable()) {
 					continue;
 				}
 				$namespace = "go\\modules\\" . $module->package . "\\" . $module->name;
@@ -129,7 +129,7 @@ class ClassFinder {
 
 				$name = $file->getNameWithoutExtension();
 
-				$className = $namespace . '\\' . $name;
+				$className = $namespace . '\\'. $name;
 
 				if (!class_exists($className)) {
 					continue;

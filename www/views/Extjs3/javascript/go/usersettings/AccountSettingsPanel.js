@@ -50,7 +50,13 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 				},{
 					flex:1,
 					layout: 'form',
-					items: [
+					items: [{
+						xtype: 'textfield',
+						name: 'username',
+						fieldLabel: t("Username"),
+						needPasswordForChange: true,
+						allowBlank: false
+					}, 
 					this.displayNameField = new Ext.form.TextField({
 						fieldLabel: t('Display name'),
 						name: 'displayName',
@@ -68,11 +74,10 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 						name: 'recoveryEmail',
 						needPasswordForChange: true,
 						vtype:'emailAddress',
-						allowBlank:false
-					}),
-					this.recoveryMailText = new Ext.Container({
-						html:t('The recovery e-mail is used to send a forgotten password request to.')+'<br>'+t('Please use an email address that you can access from outside Group-Office.')
+						allowBlank:false,
+						hint: t('The recovery e-mail is used to send a forgotten password request to.')+'<br>'+t('Please use an email address that you can access from outside Group-Office.')
 					})
+
 				]
 			}]
 		});
@@ -81,18 +86,21 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 			labelWidth:dp(152),
 			title: t('Password'),
 			items:[
-				this.passwordField1 = new Ext.form.TextField({
-					inputType: 'password',
-					fieldLabel: t("New password", "users"),
-					needPasswordForChange: true,
-					name: 'password',
-					minLength: 8
+				this.passwordField1 = new go.form.PasswordGeneratorField({						
+					listeners: {
+						generated : function(field, pass) {
+							this.passwordField2.setValue(pass);
+						},
+						scope: this
+					},
+					needPasswordForChange: true
+
 				}),
+		
 				this.passwordField2 = new Ext.form.TextField({
 					inputType: 'password',
 					fieldLabel: t("Confirm password", "users"),
-					name: 'passwordConfirm',
-					minLength: 8
+					name: 'passwordConfirm'
 				})
 			]
 		});
@@ -101,7 +109,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 			items: [
 				this.userFieldset,
 				this.passwordFieldset
-			]
+			].concat(go.CustomFields.getFormFieldSets("User"))
 		});
 		
 		go.usersettings.AccountSettingsPanel.superclass.initComponent.call(this);

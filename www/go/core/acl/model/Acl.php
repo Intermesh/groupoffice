@@ -2,8 +2,8 @@
 namespace go\core\acl\model;
 
 use go\core\App;
-use go\core\auth\model\Group;
-use go\core\auth\model\User;
+use go\modules\core\groups\model\Group;
+use go\modules\core\users\model\User;
 use go\core\db\Criteria;
 use go\core\db\Query;
 use go\core\orm\Mapping;

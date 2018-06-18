@@ -16,11 +16,19 @@ class Instance extends Entity {
 	
 	public $createdAt;
 	
-	public $modifiedAt;
+	public $removedAt;
 
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable('multi_instance_instance');
+	}
+	
+	protected function init() {
+		parent::init();
+		
+		if(!$this->isNew()) {
+			$this->getInstanceDbData();
+		}
 	}
 	
 	protected function internalValidate() {
@@ -50,20 +58,20 @@ class Instance extends Entity {
 			}
 
 			if(!$this->getConfigFile()->isWritable()) {
-				$this->setValidationError('hostname', ErrorCode::UNAUTHORIZED, 'The configuration file is not writable');
+				$this->setValidationError('hostname', ErrorCode::FORBIDDEN, 'The configuration file is not writable');
 			}
 
 			if(!$this->getDataFolder()->isWritable()) {
-				$this->setValidationError('hostname', ErrorCode::UNAUTHORIZED, 'The data folder is not writable');
+				$this->setValidationError('hostname', ErrorCode::FORBIDDEN, 'The data folder is not writable');
 			}
 
 			if(!$this->getTempFolder()->isWritable()) {
-				$this->setValidationError('hostname', ErrorCode::UNAUTHORIZED, 'The temporary files folder is not writable');
+				$this->setValidationError('hostname', ErrorCode::FORBIDDEN, 'The temporary files folder is not writable');
 			}
 		} else {
 		
 			if($this->isModified('hostname')) {
-				$this->setValidationError('hostname', ErrorCode::UNAUTHORIZED, "You can't modify the hostname.");
+				$this->setValidationError('hostname', ErrorCode::FORBIDDEN, "You can't modify the hostname.");
 			}
 		}
 		
@@ -71,7 +79,7 @@ class Instance extends Entity {
 	}
 	
 	private function getConfigFile() {
-		return new File('/etc/groupoffice/multi_instance/' . $this->hostname . '/config.ini');
+		return new File('/etc/groupoffice/multi_instance/' . $this->hostname . '/config.php');
 	}
 	
 	private function getDataFolder() {
@@ -99,10 +107,10 @@ class Instance extends Entity {
 		if(!$this->isNew()) {
 			
 			if($this->isModified('deletedAt')) {
-				$bak = $this->getConfigFile()->getFolder()->getFile('config.ini.bak');
+				$bak = $this->getConfigFile()->getFolder()->getFile('config.php.bak');
 				if($bak->exists())
 				{
-					if(!$bak->rename('config.ini')) {
+					if(!$bak->rename('config.php')) {
 						return false;
 					}
 				}
@@ -133,7 +141,7 @@ class Instance extends Entity {
 			$this->createDatabaseUser($dbName, $dbUsername, $dbPassword);
 			$databaseUserCreated = true;
 			
-			if(!$configFile->putContents($this->createIniFile($dbName, $dbUsername, $dbPassword, $tmpFolder->getPath(), $dataFolder->getPath()))) {
+			if(!$configFile->putContents($this->createConfigFile($dbName, $dbUsername, $dbPassword, $tmpFolder->getPath(), $dataFolder->getPath()))) {
 				throw new Exception("Could not write to config file");
 			}
 		} catch(\Exception $e) {
@@ -177,9 +185,9 @@ class Instance extends Entity {
 		GO()->getDbConnection()->query('FLUSH PRIVILEGES');		
 	}
 	
-	private function createIniFile($dbName, $dbUsername, $dbPassword, $tmpPath, $dataPath) {
+	private function createConfigFile($dbName, $dbUsername, $dbPassword, $tmpPath, $dataPath) {
 		
-		$tpl = Module::getFolder()->getFile('config.ini.tpl');
+		$tpl = Module::getFolder()->getFile('config.php.tpl');
 		
 		$dsn = \go\core\db\Utils::parseDSN(GO()->getConfig()['db']['dsn']);
 
@@ -202,14 +210,70 @@ class Instance extends Entity {
 		$tpl->getContents());		
 	}
 	
+	private $instanceDbConn;
+	
+	/**
+	 * 
+	 * @return \go\core\db\Connection
+	 */
+	private function getInstanceDbConnection() {
+		if(!isset($this->instanceDbConn)) {			
+			require($this->getConfigFile()->getPath());
+			$dsn = 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . $config['db_name'];
+			$this->instanceDbConn = new \go\core\db\Connection($dsn, $config['db_user'], $config['db_pass']);
+		}
+		
+		return $this->instanceDbConn;
+	}
+	
+	private function getInstanceDbData(){
+		try {
+			$record = (new \go\core\db\Query())
+						->setDbConnection($this->getInstanceDbConnection())
+						->select('count(*) as userCount, max(lastlogin) as lastLogin')
+						->from('core_user')
+						->where('enabled', '=', true)
+						->execute()->fetch();	
+			
+			$this->userCount = (int) $record['userCount'];
+			$this->lastLogin = !empty($record['lastLogin']) ? new \go\core\util\DateTime('@'.$record['lastLogin']) : null;
+			
+			
+		}
+		catch(\Exception $e) {
+			//ignore
+		}
+	}
+	
+	private $userCount;
+	private $lastLogin;
+	
+	/**
+	 * Get the number of enabled users
+	 * 
+	 * @return int
+	 */
+	public function getUserCount() {		
+		return $this->userCount;
+	}
+	
+	public function getLastLogin() {
+		return $this->lastLogin;
+	}
+	
+	public function getModifiedAt() {
+		return $this->getLastLogin();
+	}
+	
+	
 	protected function internalDelete() {
 		
 		if(!parent::internalDelete()) {
 			return false;
 		}
 		
-		//rename config.ini so it's unavailable
-		return $this->getConfigFile()->rename('config.ini.bak');
+		//rename config.php so it's unavailable
+		return $this->getConfigFile()->rename('config.php.bak');
 	}
 	
 	
