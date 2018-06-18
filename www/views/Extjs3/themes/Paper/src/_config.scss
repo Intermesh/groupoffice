@@ -37,6 +37,7 @@ $vars: (
   --c-primary: #{map-get($vars, c-primary)};
   --c-primary-tp: #{map-get($vars, c-primary-tp)};
 }
+
 @mixin var($property, $varName) {
   #{$property}: map-get($vars, $varName);
   #{$property}: var(--#{$varName}, map-get($vars, $varName));

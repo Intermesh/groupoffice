@@ -129,6 +129,14 @@ class User extends \GO\Base\Db\ActiveRecord {
 		return $this->timeFormat;
 	}
 	
+	public function setLogins($value) {
+		$this->loginCount = $value;
+	}
+	
+	public function setLastLogin($value) {
+		$this->setAttribute("lastLogin", date('Y-m-d H:i:s', $value));
+	}
+	
 	/**
 	 * Get the password hash from the new framework
 	 * @deprecated since version 6.3
@@ -326,7 +334,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 		
 		$this->columns['timezone']['required']=true;
 		
-		$this->columns['lastlogin']['gotype']='unixtimestamp';
+//		$this->columns['lastlogin']['gotype']='unixtimestamp';
 		$this->columns['disk_quota']['gotype']='number';
 		$this->columns['disk_quota']['decimals']=0;
 		return parent::init();

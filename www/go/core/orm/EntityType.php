@@ -201,15 +201,8 @@ class EntityType {
 
 		if (isset($record['modulePackage'])) {
 			$e->className = 'go\\modules\\' . $record['modulePackage'] . '\\' . $record['moduleName'] . '\\model\\' . ucfirst($e->name);
-		} else {
-			switch ($e->name) {
-
-				case 'user':
-					$e->className = "GO\\Base\\Model\\User";
-
-				default:
-					$e->className = 'GO\\' . ucfirst($record['moduleName']) . '\\Model\\' . ucfirst($e->name);
-			}
+		} else {			
+			$e->className = 'GO\\' . ucfirst($record['moduleName']) . '\\Model\\' . ucfirst($e->name);			
 		}
 		
 		return $e;
