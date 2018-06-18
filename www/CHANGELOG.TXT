@@ -1,3 +1,5 @@
+- Project analyze button should show for all users.
+
 14-06-2018 6.2.98
 - File browser button disappeared
 - Custom fields clears database before installing
