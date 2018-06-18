@@ -144,6 +144,7 @@ $grey: (
   )
 );
 
+/*
 $primary: (
 	100: #DFF6FD, // not from spec
 	300: #59add4,
@@ -156,7 +157,7 @@ $primary: (
 		700: white,
 		900: $white-87-opacity
 	)
-);
+);*/
 // LIGHT
 $fg: (
   base:					black,
@@ -227,9 +228,9 @@ $cDanger:		color($red, 700);
 $cWarning:		color($orange, 700);
 
 $cSelected: color($bg, 'hover'); // click on menus, tree items, table
-$cHover: rgba(color($primary),.16);
+$cHover: var(--c-primary-tp);
 $cActive: color($grey, 200); // focussed
-$cAnchor: color($primary, 700);
+$cAnchor: var(--c-primary);
 
 .success { color: $cSuccess !important; }
 .danger { color: $cDanger !important; }
