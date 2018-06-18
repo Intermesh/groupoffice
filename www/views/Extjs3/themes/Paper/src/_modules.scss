@@ -48,7 +48,7 @@ $app-icons: (
 	height:100%;
 	opacity: 1; 
 	transition: opacity 300ms $curve-sharp;
-	background-color: rgba(#303030, 0.87);
+	background-color: color($bg, 'app-bar');
 	&.x-hide-offsets {
 		opacity: 0;
 		ul {
@@ -82,7 +82,7 @@ $app-icons: (
 			color: white;
 			text-align:left;
 			padding:0;
-			border-bottom: 1px solid color($foreground-dark, 'divider');
+			border-bottom: 1px solid color($fg-dark, 'divider');
 		}
 	}
 	li {
@@ -106,13 +106,13 @@ $app-icons: (
 		overflow: hidden;
 		white-space: nowrap;
 		color: white;
-		text-shadow: 0px 1px 0px color($foreground, 'unfocused');
+		text-shadow: 0px 1px 0px color($fg, 'unfocused');
 	}
 	.x-menu-scroller {
 		height: 0px;
 	}
 	.x-menu-item-active{
-		background-color: color($foreground, 'unfocused');
+		background-color: color($fg, 'unfocused');
 	}
 }
 */
@@ -156,7 +156,7 @@ $app-icons: (
 }
 
 .ml-unseen-dot {
-	background-color: $cPrimary;
+	@include var(background-color, c-primary);
 	width: dp(8);
 	height: dp(8);
 	margin: dp(4);
@@ -172,15 +172,15 @@ $app-icons: (
 		float: right;
 		width: dp(16);
 		height: dp(16);
-		color: color($foreground, 'secondary-text');
+		color: color($fg, 'secondary-text');
 	}
 }
 
 
 .message-header {
 	position: relative;
-	background-color: color($background, "background");
-	border-bottom:1px solid color($foreground, "line");
+	background-color: color($bg, "background");
+	border-bottom:1px solid color($fg, "line");
 	padding: dp(16);
 		
 	b {

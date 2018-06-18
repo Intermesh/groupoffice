@@ -44,10 +44,10 @@
 		.x-btn {
 			
 			background-color: color($grey, 50);
-			color: $cPrimary;
+			@include var(color, c-primary);
 			margin: 0 auto;
 			border-style: solid;
-			border-color: color($foreground, "divider");
+			border-color: color($fg, "divider");
 			border-width: dp(1) dp(1) 0;
 			border-radius: $borderRadius;
 		}
@@ -64,13 +64,13 @@
 		display: block;
 		font-size: dp(48);
 		max-height: dp(48);
-		color: color($foreground, "hint-text");
+		color: color($fg, "hint-text");
 	}
 
 }
 .empty-state {
 	p {
-		color: color($foreground, "hint-text");
+		color: color($fg, "hint-text");
 		margin: dp(8);
 		text-align: center;
 		font-size: dp(12);
