@@ -41,7 +41,7 @@ go-yearview {
 		width: 100%;
 		caption{
 			cursor:pointer;
-			color: color($foreground, 'secondary-text');
+			color: color($fg, 'secondary-text');
 			font-size: 1.2em;
 			padding-bottom: 0.8em;
 			&.current{
@@ -80,7 +80,7 @@ go-yearview {
 			}
 		}
 		td.weeknb {
-			color: color($foreground, 'secondary-text');
+			color: color($fg, 'secondary-text');
 		}
 	}
 
@@ -197,7 +197,7 @@ $tagList: (beer, xmas, drinks, xmasparty);
 		width:100%;
   }
 	.ext-cal-body-ct {
-		background: color($background, 'card');
+		background: color($bg, 'card');
 		bottom: 0;
 		left: 0;
 		border: 0;
@@ -238,12 +238,12 @@ $tagList: (beer, xmas, drinks, xmasparty);
 			color:white;
 		}
 		&-prev, &-next {
-			color: color($foreground, 'disabled-text');
+			color: color($fg, 'disabled-text');
 		}
 	} 
 	.ext-cal-week {
 		padding:5px;
-		color: color($foreground, 'text');
+		color: color($fg, 'text');
 		text-align: center;
 		width: dp(32);
 		font-weight: normal;
@@ -251,10 +251,10 @@ $tagList: (beer, xmas, drinks, xmasparty);
 	}
 	.ext-cal-day {
 		vertical-align: top;
-		border-top: 1px solid color($foreground, 'line');
-		background-color: color($background, 'card');
+		border-top: 1px solid color($fg, 'line');
+		background-color: color($bg, 'card');
 		&-prev, &-next {
-			background-color: color($background, 'background');
+			background-color: color($bg, 'background');
 		}
 	}
 	.ext-cal-hd-day {
@@ -262,7 +262,7 @@ $tagList: (beer, xmas, drinks, xmasparty);
 		text-align: left;
 		font-size: .8em;
 		height: 24px;
-		color: color($foreground, 'secondary-text'); 
+		color: color($fg, 'secondary-text'); 
 	}
 	.ext-cal-hd-days-tbl {
 		table-layout: fixed;
@@ -279,8 +279,8 @@ $tagList: (beer, xmas, drinks, xmasparty);
 		left: 0;
 		top: 0;
 		height: 100%;
-		border-top: 1px solid color($foreground, 'line');
-		color: color($foreground, 'disabled-text');
+		border-top: 1px solid color($fg, 'line');
+		color: color($fg, 'disabled-text');
 		padding: 3px 0 0;
 		text-align: center;
 		cursor: pointer;
