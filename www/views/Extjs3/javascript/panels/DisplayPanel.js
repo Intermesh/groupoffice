@@ -102,9 +102,8 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 				scope: this
 			}));
 		}
-		
-		if(GO.files && !this.noFileBrowser)
-		{
+
+		if(GO.files && GO.files.FileBrowserButton && !this.noFileBrowser) {
 			tbar.push(this.fileBrowseButton = new GO.files.FileBrowserButton({
 				model_name:this.model_name
 			}));
