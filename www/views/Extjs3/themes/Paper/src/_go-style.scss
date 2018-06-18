@@ -135,7 +135,7 @@ a {
 /*
 .x-btn.primary {
 	background-color:white;
-	border: 1px solid color($foreground, 'divider');
+	border: 1px solid color($fg, 'divider');
 	&.x-btn-over {
 		background-color: $cHover;
 	}
@@ -338,9 +338,9 @@ a {
 		position: absolute;
 		top: 0;
 		right:0;
-		background-color: color($background, "card");
+		background-color: color($bg, "card");
 		border-left: 1px solid;
-		border-image: linear-gradient(to bottom, transparent, color($foreground, 'line')) 1 100%;
+		border-image: linear-gradient(to bottom, transparent, color($fg, 'line')) 1 100%;
 		&:hover {
 			color: color($primary, 700);
 		}
@@ -1174,14 +1174,14 @@ table[id^="comments-ext"] b {
 	display: grid;
 	text-align:center;
 	align-content: start;
-	background-color: color($background,'card');	
+	background-color: color($bg,'card');	
 	/* define the number of grid columns */
 	grid-gap: dp(4);
 	grid-template-columns: repeat( auto-fill, minmax(dp(192), 1fr));
 	> div.tile {
-		outline: 2px solid color($foreground,'divider');
+		outline: 2px solid color($fg,'divider');
 		height: dp(192);
-		background-color: color($background,'card');
+		background-color: color($bg,'card');
 	}
 	
 	div.text {

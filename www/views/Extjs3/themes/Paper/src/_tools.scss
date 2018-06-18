@@ -58,7 +58,7 @@
 .empty-state, .x-grid-empty {
 	@extend %font-body1;
 	user-select: none;
-	color: color($foreground, 'secondary-text');
+	color: color($fg, 'secondary-text');
 	position: absolute;
 	z-index: 2;
 	top: 30%;
@@ -72,7 +72,7 @@
 		width: dp(56);
 		height: dp(56);
 		line-height: dp(56);
-		background-color: color($foreground, 'line');
+		background-color: color($fg, 'line');
 	}
 	p {
 		color: color($fg, "hint-text");
