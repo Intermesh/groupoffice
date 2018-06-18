@@ -84,7 +84,7 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 						</p>\
 						<tpl if="birthday"><p class="s6">\
 						<i class="icon label">cake</i>\
-						<label>' + t('strBirthday') + '</label>\
+						<label>' + t('Birthday') + '</label>\
 						<span>{birthday}</span>\
 						</p></tpl>\
 					</tpl>\
