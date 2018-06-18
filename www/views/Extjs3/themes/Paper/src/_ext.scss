@@ -456,7 +456,7 @@ ul.x-tab-strip-bottom{
 	
 	&-focus, textarea.x-form-focus {
 		@extend .z2;
-		border-color: color($primary,700);
+		@include var(border-color, c-primary);
 	}	
 	&-invalid, textarea.x-form-invalid {
 		border-color: rgba(color($red, 700),0.54);
@@ -523,8 +523,7 @@ ul.x-tab-strip-bottom{
 	}
 }
 .x-trigger-wrap-focus .x-form-trigger {
-	color: color($primary,700);
-
+	@include var(color, c-primary);
 }
 .x-form-invalid + .x-form-trigger {
 	border-color: color($red, 500);
@@ -717,7 +716,7 @@ ul.x-tab-strip-bottom{
    }
    &-click {
 		background-color: color($bg, 'pressed') !important;
-		.x-btn-text { color: color($primary, 900) !important;}
+		.x-btn-text { @include var(color, c-primary); }
    }
    &-icon {
 		i {width:0}
@@ -1058,6 +1057,10 @@ ul.x-tab-strip-bottom{
 			
 			&.x-grid3-cell-last {
 				border-right: 0;
+			}
+			&.x-grid3-hd-over.x-grid3-sortable { 
+				cursor:pointer; 
+				@include var(color, c-primary); 
 			}
 		}
 		 
@@ -2463,19 +2466,20 @@ $resizerSize : dp(2);
 		height: dp(2);
 		transform-origin: 0 0;
 		width:100%;
-		background-color: color($primary);
+		@include var(background-color, c-primary);
 	}
 	.x-slider-thumb {
 		cursor: -webkit-grab;
 		cursor: grab;
 		top: dp(-9);
-		border: 3px solid color($primary);
+		border: 3px solid transparent;
+		@include var(border-color, c-primary);
 		width:dp(20);
 		height: dp(20);
 		transform: scale(.7);
 		transform: .4s $curve-sharper,background-color .4s $curve-sharper, border-color .4s $curve-sharper;
 		border-radius: 50%;
-		background-color: color($primary);
+		@include var(background-color, c-primary);
 		&.x-slider-thumb-drag {
 			cursor: -webkit-grabbing;
 			cursor: grabbing;
@@ -2519,7 +2523,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 	@extend %icon;
 	content: 'info';
 	font-size:2.2em;
-	color: color($primary, 500);
+	@include var(color, c-primary);
 }
 
 .x-window-dlg .ext-mb-warning:after {
@@ -2533,7 +2537,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 	@extend %icon;
 	content: 'help';
 	font-size:2.2em;
-	color: color($primary, 500);
+	@include var(color, c-primary);
 }
 
 .x-window-dlg .ext-mb-error {
