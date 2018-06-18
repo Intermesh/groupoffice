@@ -401,9 +401,11 @@ ul.x-tab-strip-bottom{
 		display: inline-block;
 		height: dp(32);
 	}
-	&-check-wrap {
+/*	
+	Merijn: this messed up long labels (login screen) and hint texts (IMAP auth in system settings)
+&-check-wrap {
 		height: dp(32);
-	}
+	}*/
 	&-checkbox {
 		position:absolute;
 		opacity: 0;

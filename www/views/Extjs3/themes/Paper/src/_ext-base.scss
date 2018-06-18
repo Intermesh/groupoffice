@@ -820,6 +820,16 @@ fieldset.x-panel-collapsed .x-fieldset-bwrap {
 .x-btn{
 	cursor:pointer;
 	white-space: nowrap;
+	
+	/* background positioning */
+	.x-btn-tr i, .x-btn-tl i, .x-btn-mr i, .x-btn-ml i, .x-btn-br i, .x-btn-bl i{
+		font-size:1px;
+		 line-height:1px;
+		 display:block;
+		 overflow:hidden;
+		 width: 0;
+		 height:0;
+	}
 }
 
 .x-btn button{
@@ -843,13 +853,7 @@ fieldset.x-panel-collapsed .x-fieldset-bwrap {
    padding:0;
 }
 
-/* background positioning */
-.x-btn-tr i, .x-btn-tl i, .x-btn-mr i, .x-btn-ml i, .x-btn-br i, .x-btn-bl i{
-	font-size:1px;
-   line-height:1px;
-   display:block;
-   overflow:hidden;
-}
+
 
 .x-btn-mc{
    vertical-align: middle;

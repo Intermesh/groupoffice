@@ -1010,6 +1010,9 @@ table.display-panel {
 		margin: 0 dp(6) 0 dp(4);
 		color: color($foreground, "icon");
 	}
+	.x-form-cb-label {
+		vertical-align: middle;
+	}
 }
 td[id^="comment-td"] {
 	padding: 0 dp(16) dp(8) !important; //override inline style
