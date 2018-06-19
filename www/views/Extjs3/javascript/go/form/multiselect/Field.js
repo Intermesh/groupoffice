@@ -134,7 +134,7 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 
 	isFormField: true,
 
-	getName() {
+	getName: function() {
 		return this.name;
 	},
 

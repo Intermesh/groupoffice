@@ -1,4 +1,4 @@
-
+Ext.onReady(function() {
 	GO.customfields.dataTypes["GO\\Addressbook\\Customfieldtype\\Contact"]={
 		label : t("Contact", "addressbook"),
 		getFormField : function(customfield, config){
@@ -37,3 +37,4 @@
 			});
 		}
 	}
+});

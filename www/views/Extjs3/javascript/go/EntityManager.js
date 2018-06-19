@@ -71,7 +71,7 @@
       return entities[name];      
     },
     
-    getAll() {
+    getAll: function() {
       return entities;
     }
   };

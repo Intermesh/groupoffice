@@ -20,7 +20,7 @@ class Capabilities extends Singleton {
 	
 	public $maxCallInRequest = 10;
 	
-	public $maxObjectsInGet = 20;
+	public $maxObjectsInGet = 100;
 	
 	public $maxObjectsInSet = 100;
 	
