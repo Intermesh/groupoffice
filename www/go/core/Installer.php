@@ -111,6 +111,14 @@ class Installer {
 		foreach($installModules as $installModule) {
 			$installModule->install();
 		}
+		
+		
+		//for new framework
+		App::get()->getSettings()->databaseVersion = App::get()->getVersion();
+		App::get()->getSettings()->save();
+		
+		App::get()->setCache(new cache\Disk());
+		\go\core\event\Listeners::get()->init();		
 	}
 	
 	public function upgrade() {
