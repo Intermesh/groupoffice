@@ -38,7 +38,8 @@ go.systemsettings.NotificationsPanel = Ext.extend(Ext.form.FormPanel, {
 						}, {
 							xtype: 'textfield',
 							name: 'smtpPassword',
-							fieldLabel: t('Password')
+							fieldLabel: t('Password'),
+							inputType: "password"
 						}, {
 							xtype: 'combo',
 							name: 'smtpEncryption',

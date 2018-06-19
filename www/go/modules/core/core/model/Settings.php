@@ -113,9 +113,19 @@ class Settings extends core\Settings {
 	
 	/**
 	 * SMTP Password
+	 * 
 	 * @var string
 	 */
-	public $smtpPassword = null;
+	protected $smtpPassword = null;
+	
+	
+	public function getSmtpPassword() {
+		return \go\core\util\Crypt::decrypt($this->smtpPassword);
+	}
+	
+	public function setSmtpPassword($value) {
+		$this->smtpPassword = \go\core\util\Crypt::encrypt($value);
+	}
 
 	/**
 	 * Encryption to use for SMTP
@@ -168,5 +178,11 @@ class Settings extends core\Settings {
 	 */
 	public $databaseVersion;
 	
-	
+	public function save() {
+		
+		//for old framework config caching in GO\Base\Config
+		unset($_SESSION['GO_SESSION']['newconfig']);
+		
+		return parent::save();
+	}
 }
