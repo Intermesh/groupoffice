@@ -208,7 +208,7 @@ ul.x-tab-strip-bottom{
 
 .x-tab-strip-active {
 	border-bottom: dp(4) solid transparent;
-	@include var(border-color, c-primary)
+	@include var(border-color, c-primary);
 	span.x-tab-strip-text {
 		@include var(color, c-primary);
 	}

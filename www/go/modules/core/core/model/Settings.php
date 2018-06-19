@@ -185,6 +185,26 @@ class Settings extends core\Settings {
 	 */
 	public $databaseVersion;
 	
+	
+	/**
+	 * Primary color in html notation 000000;
+	 * 
+	 * @var string
+	 */
+	public $primaryColor;
+	
+	
+	/**
+	 * Get's the transparent color based on the primary color.
+	 * 
+	 * @return string
+	 */
+	public function getPrimaryColorTransparent() {
+		list($r, $g, $b) = sscanf($this->primaryColor, "%02x%02x%02x");
+		
+		return "rgba($r, $g, $b, .16)";
+	}
+	
 	public function save() {
 		
 		//for old framework config caching in GO\Base\Config
