@@ -134,6 +134,13 @@ class Settings extends core\Settings {
 	public $smtpEncryption = self::SMTP_ENCRYPTION_TLS;
 	
 	/**
+	 * Set to false to ignore certificate errors. 
+	 * 
+	 * @var boolean
+	 */
+	public $smtpEncryptionVerifyCertificate = true;
+	
+	/**
 	 * If set then all system notifications go to this email address
 	 * 
 	 * @var string 
