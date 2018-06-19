@@ -62,24 +62,32 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 			bbar: [this.usagePanel]
 		});
 
-		this.nodeDetail = new go.modules.community.files.NodeDetail({
+		this.detailView = new Ext.Panel({
 			region: 'east',
-			width: 560,
+			width: dp(560),
 			split: true,
-			browser: this.browser,
-			tbar: [{
-				cls: 'go-narrow',
-				iconCls: "ic-arrow-back",
-				handler: function () {
-					this.westPanel.show();
-				},
-				scope: this
-			}]
-		});
+			layout: 'card',
+			items:[
+				new go.modules.community.files.NodeDetail({
+					browser: this.browser,
+					tbar: [{
+						cls: 'go-narrow',
+						iconCls: "ic-arrow-back",
+						handler: function () {
+							this.westPanel.show();
+						},
+						scope: this
+					}]
+				}),
+				new Ext.Panel({
+					title:'mutliselect'
+				})
+			]
+		})
 
 		this.centerCardPanel = new go.modules.community.files.CenterPanel({
 			region: 'center',
-			detailView: this.nodeDetail,
+			detailView: this.detailView,
 			browser: this.browser
 		});
 
@@ -89,7 +97,7 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 			split: true,
 			items: [
 				this.centerCardPanel, //first is default in narrow mode
-				this.nodeDetail
+				this.detailView
 			]
 		});
 
