@@ -117,7 +117,7 @@ class Module extends AclEntity {
 	
 	protected function internalValidate() {
 		
-		if($this->package == 'core' && $this->isModified('enabled')) {
+		if(!$this->isNew() && $this->package == 'core' && $this->isModified('enabled')) {
 			throw new \Exception("You can't disable core modules");		
 		}
 		

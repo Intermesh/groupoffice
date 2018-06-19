@@ -208,7 +208,9 @@ class Settings extends core\Settings {
 	public function save() {
 		
 		//for old framework config caching in GO\Base\Config
-		unset($_SESSION['GO_SESSION']['newconfig']);
+		if(isset($_SESSION)) {
+			unset($_SESSION['GO_SESSION']['newconfig']);
+		}
 		
 		return parent::save();
 	}
