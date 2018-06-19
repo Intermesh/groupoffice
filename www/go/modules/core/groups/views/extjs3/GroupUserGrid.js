@@ -156,7 +156,7 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 	
 	isFormField: true,
 
-	getName() {
+	getName: function() {
 		return this.name;
 	},
 

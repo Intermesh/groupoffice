@@ -52,7 +52,7 @@ go.form.GridField = Ext.extend(Ext.grid.EditorGridPanel, {
 
 	isFormField: true,
 
-	getName() {
+	getName: function() {
 		return this.name;
 	},
 

@@ -377,7 +377,7 @@ ul.x-tab-strip-bottom{
 		@extend %font-data;
 		background-color:color($bg, 'box');
 		border-radius: dp(4);
-		border: 1px solid color($fg, 'line');
+		border: 1px solid color($fg, 'track');
 		display: inline-block;
 		padding: dp(6) dp(8); // missing 2dp because text is not botom aligning
 		min-height: dp(32);

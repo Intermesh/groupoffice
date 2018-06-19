@@ -190,7 +190,7 @@ go.modules.core.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 	
 	isFormField: true,
 
-	getName() {
+	getName: function() {
 		return this.name;
 	},
 
