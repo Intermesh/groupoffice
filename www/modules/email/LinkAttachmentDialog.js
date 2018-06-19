@@ -96,7 +96,8 @@ GO.email.LinkAttachmentDialog = Ext.extend(GO.dialog.LinksDialog,{
 				uid: this.messagePanel.uid,
 				mailbox: this.messagePanel.mailbox,
 				account_id: this.messagePanel.account_id,
-				folder_id: files_folder_id
+				folder_id: files_folder_id,
+				filepath: this.messagePanel.data.path
 			},
 			success: function(options, response, result){
 				// Successfully saved all attachments
