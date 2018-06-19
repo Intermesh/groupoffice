@@ -55,7 +55,7 @@
       return entities[name.toLowerCase()];      
     },
     
-    getAll() {
+    getAll: function() {
       return entities;
     }
   };

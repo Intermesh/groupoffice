@@ -50,7 +50,7 @@ go.form.FileField = Ext.extend(Ext.form.TextField, {
 				  'fileselected',
 				  
 				  'uploadComplete',
-				  'uploadStart',
+				  'uploadStart'
 				  );
 	},
 

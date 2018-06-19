@@ -39,7 +39,7 @@ go.notifier = {
 	toast: function (message) {
 
 	},
-	remove(msg) {
+	remove: function(msg) {
 		msg.el.animate({opacity: {to: 0}}, 0.2, function () {
 			msg.destroy();
 		});
