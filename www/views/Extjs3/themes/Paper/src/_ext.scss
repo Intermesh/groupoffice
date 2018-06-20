@@ -467,6 +467,7 @@ ul.x-tab-strip-bottom{
 	&-helptext {
 		@extend %font-caption;
 		white-space: pre-wrap;
+		line-height: 1.6em;
 	}
 	
 }
