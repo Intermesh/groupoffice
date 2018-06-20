@@ -208,7 +208,7 @@ ul.x-tab-strip-bottom{
 
 .x-tab-strip-active {
 	border-bottom: dp(4) solid transparent;
-	@include var(border-color, c-primary)
+	@include var(border-color, c-primary);
 	span.x-tab-strip-text {
 		@include var(color, c-primary);
 	}
@@ -379,8 +379,9 @@ ul.x-tab-strip-bottom{
 		border-radius: dp(4);
 		border: 1px solid color($fg, 'track');
 		display: inline-block;
-		padding: dp(6) dp(8); // missing 2dp because text is not botom aligning
+		padding: dp(6) dp(8);
 		min-height: dp(32);
+		line-height: dp(18);
 		transition: border-color 100ms linear, box-shadow 225ms linear;
 	}
 	
@@ -466,6 +467,7 @@ ul.x-tab-strip-bottom{
 	&-helptext {
 		@extend %font-caption;
 		white-space: pre-wrap;
+		line-height: 1.6em;
 	}
 	
 }
@@ -477,7 +479,7 @@ ul.x-tab-strip-bottom{
 
 
 .x-form-field-wrap {
-	line-height: normal; //for textarea. Without this it gets extra margin somehow
+	line-height: 0; //for textarea. Without this it gets extra margin somehow
 	> input {
 		padding-right: dp(32); // for trigger button: todo twintrigger
 	}

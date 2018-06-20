@@ -3,13 +3,14 @@
 namespace go\core;
 
 use Exception;
-use go\modules\core\users\groups\Group;
-use go\modules\core\users\model\User;
-use go\modules\core\users\model\UserGroup;
+use go\core\cache\None;
 use go\core\db\Utils;
 use go\core\module\Base;
 use go\core\orm\Entity;
 use go\core\util\ClassFinder;
+use go\modules\core\groups\model\Group;
+use go\modules\core\users\model\User;
+use go\modules\core\users\model\UserGroup;
 
 class Installer {
 	
@@ -36,7 +37,7 @@ class Installer {
 		
 		//don't cache on install
 		App::get()->getCache()->flush(false);
-		App::get()->setCache(new \go\core\cache\None());
+		App::get()->setCache(new None());
 		
 		$this->isInProgress = true;
 		
@@ -110,6 +111,14 @@ class Installer {
 		foreach($installModules as $installModule) {
 			$installModule->install();
 		}
+		
+		
+		//for new framework
+		App::get()->getSettings()->databaseVersion = App::get()->getVersion();
+		App::get()->getSettings()->save();
+		
+		App::get()->setCache(new cache\Disk());
+		\go\core\event\Listeners::get()->init();		
 	}
 	
 	public function upgrade() {

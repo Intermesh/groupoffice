@@ -136,8 +136,6 @@ class EntityTest extends TestCase {
 		$c->name = "Test name";
 		$success = $c->save();
 		
-		var_dump($c->getValidationErrors());
-		
 		$this->assertEquals(true, $success);
 		
 		$entities = B::find();

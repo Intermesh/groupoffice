@@ -34,6 +34,7 @@ abstract class Settings extends data\Model {
 	protected function __construct() {
 		
 		if(GO()->getInstaller()->isInProgress()) {
+			$this->oldData = [];
 			return;
 		}
 		

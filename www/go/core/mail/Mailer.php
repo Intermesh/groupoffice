@@ -37,6 +37,12 @@ class Mailer {
 			$o->setUsername(GO()->getSettings()->smtpUsername)
 				->setPassword(GO()->getSettings()->smtpPassword);
 		}
+		
+		
+		if(!GO()->getSettings()->smtpEncryptionVerifyCertificate) {
+			$o->setStreamOptions(array('ssl' => array('allow_self_signed' => true, 'verify_peer' => false, 'verify_peer_name'  => false)));
+		}
+		
 		return $o;
 	}
 }

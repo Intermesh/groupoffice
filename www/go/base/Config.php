@@ -153,24 +153,8 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 */
 	var $debug_log = false;
 
-	
-	/**
-	 * To show a message on the login page
-	 * 
-	 * @deprecated is in system settings
-	 * @var String 
-	 */
-	var $login_message = false;
-	
-	/**
-	 *
-	 * Option to make sure all outgoing emails will be send to the given email address.
-	 * This is useful when debugging Group-Office and when you don't want to send unwanted emails to active customers.
-	 * 
-	 * @deprecated is in system settings
-	 * @var string 
-	 */
-	var $debug_email = "";
+
+
 	
 
 	/**
@@ -216,23 +200,9 @@ var $billing_clear_payment_method_on_duplicate = true;
 //
 //	var $log = false;
 
-	/**
-	 * Default language
-	 *
-	 * @deprecated is in system settings
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $language = 'en';
 
-	/**
-	 * Default country
-	 *
-	 * @deprecated is in system settings
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $default_country = "NL";
+
+
 
 
 	/**
@@ -244,22 +214,16 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 */
 	var $default_vat = 21;
 
-	/**
-	 * Default timezone
-	 *
-	 * @deprecated is in system settings
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $default_timezone = 'Europe/Amsterdam';
 
 	/**
-	 * Default language
+	 * Default currency
 	 *
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $default_currency='€';
+	public function getdefault_currency() {
+		return \go\modules\core\users\model\Settings::get()->defaultCurrency;		
+	}
 
 	/**
 	 * Default date format
@@ -268,7 +232,12 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $default_date_format='dmY';
+	public function getDefault_date_format() {
+		$df =  \go\modules\core\users\model\Settings::get()->defaultDateFormat;
+		return $df[0].$df[2].$df[4];
+	}
+	
+	
 
 	/**
 	 * Default date separator
@@ -277,7 +246,10 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $default_date_separator='-';
+	public function getdefault_date_separator() {
+		$df =  \go\modules\core\users\model\Settings::get()->defaultDateFormat;
+		return $df[1];
+	}
 
 	/**
 	 * Default time format
@@ -285,7 +257,10 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $default_time_format='G:i';
+
+	public function getefault_time_format() {
+		return \go\modules\core\users\model\Settings::get()->defaultTimeFormat;
+	}
 
 	/**
 	 * Default name formatting and sorting. Can be last_name or first_name
@@ -304,7 +279,9 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $default_first_weekday=1;
+	public function getDefault_first_weekday() {
+		return \go\modules\core\users\model\Settings::get()->defaultFirstWeekday;
+	}
 
 	/**
 	 * Default decimal separator for numbers
@@ -312,7 +289,9 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $default_decimal_separator=',';
+	public function getdefault_decimal_separator() {
+		return \go\modules\core\users\model\Settings::get()->defaultDecimalSeparator;
+	}
 
 	/**
 	 * Default thousands separator for numbers
@@ -320,7 +299,9 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $default_thousands_separator='.';
+	public function getdefault_thousands_separator() {
+		return \go\modules\core\users\model\Settings::get()->defaultThousandSeparator;
+	}
 	
 	/**
 	 * Default list separator for import and export
@@ -328,7 +309,9 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $default_list_separator=';';
+	public function getdefault_list_separator() {
+		return \go\modules\core\users\model\Settings::get()->defaultListSeparator;
+	}
 	
 	/**
 	 * Default text separator for import and export
@@ -336,7 +319,13 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $default_text_separator='"';
+	public function getdefault_text_separator() {
+		return \go\modules\core\users\model\Settings::get()->defaultTextSeparator;
+	}
+	
+	public function getdefault_timezone() {
+		return \go\modules\core\users\model\Settings::get()->defaultTimezone;			
+	}
 
 	/**
 	 * Default theme
@@ -518,23 +507,6 @@ var $billing_clear_payment_method_on_duplicate = true;
 
 
 
-	/**
-	 * Title of Group-Office
-	 *
-	 * @deprecated Is in system settings
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $title = '';
-
-	/**
-	 * The e-mail of the webmaster
-	 *
-	 * @deprecated Is in system settings
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $webmaster_email = 'webmaster@example.com';
 
 	/**
 	 * The no-reply e-mail which will be used to send system messages
@@ -728,45 +700,6 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     int
 	 * @access  public
 	 */
-	//var $mailer = 'smtp';
-	/**
-	 * The SMTP host to use when using the SMTP mailer
-	 *
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $smtp_server = 'localhost';
-	/**
-	 * The SMTP port to use when using the SMTP mailer
-	 *
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $smtp_port = '25';
-
-	/**
-	 * The SMTP username for authentication (Empty for no authentication)
-	 *
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $smtp_username = '';
-
-	/**
-	 * The SMTP password for authentication
-	 *
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $smtp_password = '';
-
-	/**
-	 * Leave blank or set to tls or ssl
-	 *
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $smtp_encryption = '';
 
 
 	/**
@@ -1026,14 +959,6 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 //////////      Variables that are not touched by the installer   /////////////
 	 //////////////////////////////////////////////////////////////////////////////*/
 
-	/**
-	 * Full URL to reach Group-Office with trailing slash. This value is determined
-	 * automatically if not set in config.php
-	 *
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $full_url = '';
 
 
 	/**
@@ -1084,22 +1009,6 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * Variables below this should not be changed
 	 *////////////////////////////////////////////////
 
-	/**
-	 * The Group-Office version number
-	 *
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $version;
-
-	/**
-	 * Modification date
-	 *
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	
-	var $mtime;
 
 	#group configuration
 	/**
@@ -1432,6 +1341,11 @@ var $billing_clear_payment_method_on_duplicate = true;
 	
 	//ignore errors
 	public function __get($name) {
+		
+		if(method_exists($this, "get" . $name)) {
+			return $this->{"get" . $name}();
+		}
+		
 		return null;
 	}
 	
@@ -1471,7 +1385,6 @@ var $billing_clear_payment_method_on_duplicate = true;
 		$this->file_storage_path = rtrim($this->file_storage_path, '/').'/';
 		$this->tmpdir = rtrim($this->tmpdir, '/').'/';
 		
-		$this->loadNewSettings();
 
 //		if($this->info_log=="")
 //			$this->info_log =$this->file_storage_path.'log/info.log';
@@ -1509,14 +1422,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 			if(empty($config['tmpdir']) && function_exists('sys_get_temp_dir')) {
 				$this->tmpdir = rtrim(str_replace('\\','/', sys_get_temp_dir()),'/').'/groupoffice/';
 			}
-
-			$this->default_timezone=@date_default_timezone_get(); //suppress warning if using system tz
-
-			$lc = localeconv();
-
-			$this->default_currency=empty($lc['currency_symbol']) ? '€' : $lc['currency_symbol'];
-			$this->default_decimal_separator=empty($lc['decimal_point']) ? '.' : $lc['decimal_point'];
-			$this->default_thousands_separator=$this->default_decimal_separator == '.' ? ',' : '.';//$lc['thousands_sep'];
+			
 		}
 
 //		// path to classes
@@ -1566,7 +1472,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 			$this->log=true;
 		}
 
-		$this->set_full_url();
+		//$this->set_full_url();
 
 		if(!$this->support_link && $this->isProVersion()){
 			$this->support_link = "https://www.group-office.com/support";
@@ -1591,27 +1497,61 @@ var $billing_clear_payment_method_on_duplicate = true;
 		}
 	}
 	
-	private function loadNewSettings() {
-		
-		$this->version = $this->mtime = GO()->getVersion();
-		
-		$this->title = GO()->getSettings()->title;
-		$this->language = GO()->getSettings()->language;
-		$this->webmaster_email = GO()->getSettings()->systemEmail;
-		$this->smtp_server = GO()->getSettings()->smtpHost;
-		$this->smtp_port = GO()->getSettings()->smtpPort;
-		$this->smtp_username = GO()->getSettings()->smtpUsername;
-		$this->smtp_password = GO()->getSettings()->smtpPassword;
-		$this->smtp_encryption = GO()->getSettings()->smtpEncryption;
-		$this->debug_email = GO()->getSettings()->debugEmail;
-		
-		$this->password_min_length = GO()->getSettings()->passwordMinLength;
-		
-		$this->login_message = GO()->getSettings()->loginMessage;
-		
-		$this->full_url = rtrim(GO()->getSettings()->URL, '/') . '/';
+	public function getVersion() {
+		return GO()->getVersion();
 	}
-
+	
+	public function getMtime() {
+		return GO()->getVersion();
+	}
+	
+	public function getTitle() {
+		return GO()->getSettings()->title;
+	}
+	
+	public function getlanguage() {
+		return GO()->getSettings()->language;
+	}
+	
+	public function getsystemEmail() {
+		return GO()->getSettings()->systemEmail;
+	}
+	
+	public function getsmtpHost() {
+		return GO()->getSettings()->smtpHost;
+	}
+	
+	public function getsmtpPort() {
+		return GO()->getSettings()->smtpPort;
+	}
+	
+	public function getsmtpUsername() {
+		return GO()->getSettings()->smtpUsername;
+	}
+	
+	public function getsmtpPassword() {
+		return GO()->getSettings()->smtpPassword;
+	}
+	
+	public function getsmtpEncryption() {
+		return GO()->getSettings()->smtpEncryption;
+	}
+	
+	public function getdebugEmail() {
+		return GO()->getSettings()->debugEmail;
+	}
+	
+	public function gepasswordMinLength() {
+		return GO()->getSettings()->passwordMinLength;
+	}
+	
+	public function getloginMessage() {
+		return GO()->getSettings()->loginMessage;
+	}
+	
+	public function getfull_url() {
+		return rtrim(GO()->getSettings()->URL, '/') . '/';
+	}
 
 	public function getMajorVersion(){
 		return substr($this->version,0,3);;

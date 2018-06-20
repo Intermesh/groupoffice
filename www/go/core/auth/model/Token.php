@@ -272,7 +272,9 @@ class Token extends Entity {
       session_start();
     }
 		
-		$_SESSION['GO_SESSION'] = ['user_id' => $this->userId, 'accessToken' => $this->accessToken];		
+		$securityToken = $_SESSION['GO_SESSION']['security_token'] ?? null;
+		
+		$_SESSION['GO_SESSION'] = ['user_id' => $this->userId, 'accessToken' => $this->accessToken, 'security_token' => $securityToken];		
 	}
 	
 	private function oldLogout() {
