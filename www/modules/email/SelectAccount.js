@@ -50,6 +50,7 @@ Ext.extend(GO.email.SelectAccount, GO.form.ComboBox, {
 
 		if (!id) {
 			GO.email.SelectAccount.superclass.setValue.call(this, id);
+			return;
 		}
 		var r = this.findRecord(this.valueField, id);
 

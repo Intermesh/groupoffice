@@ -65,6 +65,7 @@ Ext.extend(GO.calendar.SelectCalendar, GO.form.ComboBoxReset, {
 
 		if (!id) {
 			GO.calendar.SelectCalendar.superclass.setValue.call(this, id);
+			return;
 		}
 		var r = this.findRecord(this.valueField, id);
 
