@@ -53,6 +53,7 @@ Ext.extend(GO.tasks.SelectTasklist, GO.form.ComboBoxReset, {
 
 		if (!id) {
 			GO.tasks.SelectTasklist.superclass.setValue.call(this, id);
+			return;
 		}
 		var r = this.findRecord(this.valueField, id);
 
