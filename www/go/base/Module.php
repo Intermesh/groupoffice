@@ -429,15 +429,22 @@ class Module extends Observable {
 				
 		$models=$this->getModels();
 		
+		$pdo = new \GO\Base\Db\PDO();
+			//to avoid memory errors
+		$pdo->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY,false);
+		
 		
 		foreach($models as $model){	
 			if($model->isSubclassOf("GO\Base\Db\ActiveRecord")){
 				$m = \GO::getModel($model->getName());
+				$m->setDbConnection($pdo);
+				
 				if($m->checkDatabaseSupported()){					
 					
 					echo "Checking ".$model->getName()."\n";
 					flush();
-				
+					
+					//to avoid memory errors
 					$stmt = $m->find(array(
 							'ignoreAcl'=>true
 					));
