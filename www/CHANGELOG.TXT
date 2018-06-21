@@ -1,3 +1,5 @@
+21-06-2018 6.2.99
+- Core: Fixed memory error in check database and build search cache with very large databases
 - Core: Also log customfield changes in the log function of activeRecord
 - Project analyze button should show for all users.
 - Email: Save all attachments to item fixed
