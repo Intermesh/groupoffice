@@ -7,7 +7,7 @@ go.login.LoginPanel = Ext.extend(Ext.Container, {
 			id: 'go-select-language',
 			//renderTo: 'go-select-language',
 			layout: 'form',
-			items: [
+			items: [				
 				this.langCombo = new go.login.LanguageCombobox({
 					listeners: {
 						select: function (cmb) {
@@ -27,6 +27,7 @@ go.login.LoginPanel = Ext.extend(Ext.Container, {
         }
 
         this.items = [
+					this.logoComp = new Ext.BoxComponent({cls: "go-app-logo"}),
             this.languageContainer,
             {
                 xtype: 'box',

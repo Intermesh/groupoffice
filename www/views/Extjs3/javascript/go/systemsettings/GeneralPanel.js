@@ -61,6 +61,26 @@ go.systemsettings.GeneralPanel = Ext.extend(Ext.form.FormPanel, {
 					xtype: "fieldset",
 					title: t("Appearance"),
 					items: [
+						this.logoField = new go.form.FileField({
+							fieldLabel: t("Logo"),
+							buttonOnly: true,
+							name: 'logoId',
+							height:dp(72),
+							cls: "go-settings-logo",
+							autoUpload: true,
+							buttonCfg: {
+								text: '',
+								width: dp(272)
+							},
+							setValue: function(val) {
+								if(this.rendered && !Ext.isEmpty(val)) {
+									this.wrap.setStyle('background-image', 'url('+go.Jmap.downloadUrl(val)+')');
+								}
+								go.form.FileField.prototype.setValue.call(this,val);
+							},
+							accept: 'image/*'
+						}),
+						
 						this.colorField = new GO.form.ColorField({
 							fieldLabel: t("Primary color"),
 							showHexValue: true,
