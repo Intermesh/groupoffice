@@ -83,5 +83,15 @@ class Blob extends orm\Entity {
 		$dir = substr($this->id,0,2) . '/' .substr($this->id,2,2). '/';
 		return GO()->getDataFolder()->getPath() . '/data/'.$dir.$this->id;
 	}
+	
+	/**
+	 * Get a blob URL
+	 * 
+	 * @param string $blobId
+	 * @return string
+	 */
+	public static function url($blobId) {
+		return GO()->getSettings()->URL . 'download.php?blob=' . $blobId;
+	}
 
 }

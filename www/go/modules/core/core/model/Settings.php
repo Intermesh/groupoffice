@@ -193,6 +193,13 @@ class Settings extends core\Settings {
 	 */
 	public $primaryColor;
 	
+	/**
+	 * Blob ID for the logo
+	 * 
+	 * @var string
+	 */
+	public $logoId;
+	
 	
 	/**
 	 * Get's the transparent color based on the primary color.

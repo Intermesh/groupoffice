@@ -36,9 +36,9 @@
 	
 	?>
 	<style>
-		#bg {
+/*		#bg {
 			background-image: url('<?=\GO::view()->getTheme()->getUrl()?>/img/bg/office-desk.jpg');
-		}
+		}*/
 		
 		<?php
 		if(GO()->getSettings()->primaryColor) {
@@ -49,6 +49,10 @@
 					--c-primary-tp: <?php echo GO()->getSettings()->getPrimaryColorTransparent(); ?>;
 			}
 			<?php
+			
+			if(GO()->getSettings()->logoId) {
+				echo ".go-app-logo, #go-logo {background-image: url(".\go\core\fs\Blob::url(GO()->getSettings()->logoId).")}";
+			}
 		}
 		?>
 	</style>

@@ -9,7 +9,7 @@ body * {
 	box-sizing: border-box;
 }
 
-#bg {
+/*#bg {
 	z-index: -1;
 	position: fixed;
 	top:0;left:0;right:0;bottom:0;
@@ -18,7 +18,7 @@ body * {
 	background-repeat: repeat;
 	background-size:cover;
 	filter: blur(5px);
-}
+}*/
 
 @keyframes wave {
 	0%, 60%, 100% {
@@ -133,6 +133,14 @@ a {
 	padding-bottom: dp(16);
 }
 
+#login {
+	.go-app-logo {
+	position:absolute;
+	top: dp(16);
+	left: dp(16);
+}
+}
+
 #go-select-language{
 	position:absolute;
 	top: dp(16);
@@ -215,13 +223,19 @@ a {
 	width: dp(240);
 	@extend %font-title;
 }
-.go-app-logo {
-	margin: dp(16);
-  .x-window & {	
-		background-image: url('img/logo-blue.svg');
-		/*margin-left: dp(16);*/
-	}
+
+.go-settings-logo {
+	background-image: url('img/logo-white.svg');
+	background-size: auto dp(40);
+	background-repeat: no-repeat;
+	background-position: dp(16) dp(16);
+	height: dp(72);
+	width: dp(272);
+	border: 1px solid color($fg, 'border');
+
+	@include var(background-color, c-primary);
 }
+
 //, .go-border-center:not(.x-panel-noborder)
 .x-portlet {
 	@extend %card;
