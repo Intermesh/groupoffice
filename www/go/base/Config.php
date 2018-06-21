@@ -1529,39 +1529,39 @@ var $billing_clear_payment_method_on_duplicate = true;
 		return GO()->getSettings()->language;
 	}
 	
-	public function getsystemEmail() {
+	public function getwebmaster_email() {
 		return GO()->getSettings()->systemEmail;
 	}
 	
-	public function getsmtpHost() {
+	public function getsmtp_server() {
 		return GO()->getSettings()->smtpHost;
 	}
 	
-	public function getsmtpPort() {
+	public function getsmtp_port() {
 		return GO()->getSettings()->smtpPort;
 	}
 	
-	public function getsmtpUsername() {
+	public function getsmtp_username() {
 		return GO()->getSettings()->smtpUsername;
 	}
 	
-	public function getsmtpPassword() {
+	public function getsmtp_password() {
 		return GO()->getSettings()->smtpPassword;
 	}
 	
-	public function getsmtpEncryption() {
+	public function getsmtp_encryption() {
 		return GO()->getSettings()->smtpEncryption;
 	}
 	
-	public function getdebugEmail() {
+	public function getdebug_email() {
 		return GO()->getSettings()->debugEmail;
 	}
 	
-	public function gepasswordMinLength() {
+	public function gepassword_min_length() {
 		return GO()->getSettings()->passwordMinLength;
 	}
 	
-	public function getloginMessage() {
+	public function getlogin_message() {
 		return GO()->getSettings()->loginMessage;
 	}
 	
