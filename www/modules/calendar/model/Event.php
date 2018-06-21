@@ -2700,7 +2700,9 @@ The following is the error message:
 					if($language !== false)
 						\GO::language()->setLanguage($language);
 
-					\GO\Base\Mail\Mailer::newGoInstance()->send($message);
+					if(!\GO\Base\Mail\Mailer::newGoInstance()->send($message)) {
+						throw new \Exception("Failed to send invite");
+					}
 
 					
 				}
