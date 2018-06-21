@@ -384,6 +384,8 @@ class MaintenanceController extends AbstractController {
 		if(!$this->isCli() && !\GO::modules()->tools)
 			throw new \GO\Base\Exception\AccessDenied();
 		
+		 
+		
 		GO::setIgnoreAclPermissions(true);
 		
 		$this->run("upgrade",$params);		
@@ -397,6 +399,8 @@ class MaintenanceController extends AbstractController {
 		if(!$this->isCli()){
 				echo '<pre>';
 		}
+		
+	
 				
 		if(!empty($params['module'])){
 			if($params['module']=='base'){
