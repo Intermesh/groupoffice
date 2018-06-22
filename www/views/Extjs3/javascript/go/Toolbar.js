@@ -30,11 +30,15 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 						return
 					}
 					//params for old framework
-					this.store.load({params: {query:v}});
+					this.store.baseParams.query = v;
+					this.store.load();
 				},
 				reset: function() {
 					if(this.store instanceof go.data.Store) {
 						delete this.store.baseParams.filter.q;
+					} else
+					{
+						delete this.store.baseParams.query;
 					}
 					this.store.load();
 				}
