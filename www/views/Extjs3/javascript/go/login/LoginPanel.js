@@ -23,19 +23,19 @@ go.login.LoginPanel = Ext.extend(Ext.Container, {
 
         var htmlText = 'Powered by ' + t('product_name');
         if (t('product_name') == 'Group-Office') {
-            htmlText = htmlText + ' <a target="_blank" href="http://www.group-office.com">http://www.group-office.com</a>';
+            htmlText = htmlText + ' - <a target="_blank" href="https://www.group-office.com">https://www.group-office.com</a>';
         }
 
-        this.items = [
+        this.items = [{
+                xtype: 'box',
+                id: "go-login-header"
+            },
 					this.logoComp = new Ext.BoxComponent({cls: "go-app-logo"}),
             this.languageContainer,
             {
                 xtype: 'box',
                 id: 'go-powered-by',
                 html: htmlText
-            },{
-                xtype: 'box',
-                id: "bg"
             }
         ];
 		
