@@ -11,11 +11,7 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
  
-GO.LogoComponent = Ext.extend(Ext.BoxComponent, {
-	onRender : function(ct, position){
-		this.el = ct.createChild({tag: 'div', cls: "go-app-logo"});
-	}
-});
+
 
 /**
  * @class GO.dialog.AboutDialog
@@ -42,7 +38,7 @@ GO.dialog.AboutDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 			width: dp(480),
 			resizable: false,
 			closeAction:'hide',
-			title:t("About Group-Office").replace('{product_name}', GO.settings.config.product_name),
+			title:t("About Group-Office").replace('Group-Office', GO.settings.config.product_name),
 			buttons: []
     });
 		
@@ -61,9 +57,9 @@ GO.dialog.AboutDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 	buildForm : function(){		
 		this.addPanel(new Ext.Panel({
 			border:false,
-			padding: '10px',
+			padding: dp(16),
 			items: [
-				new GO.LogoComponent(),
+				{xtype: 'box', cls: "go-about-logo"},
 				new GO.form.PlainField({
 					name:'about',
 					hideLabel: true					
