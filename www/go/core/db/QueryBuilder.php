@@ -403,7 +403,7 @@ class QueryBuilder {
 		$columnParts = $this->splitTableAndColumn($columnName);
 
 		if (empty($columnParts[0])) {
-			throw new \Exception("Invalid column name '" . $columnName . "'");
+			throw new \Exception("Invalid column name '" . $columnName . "'. Not a column of any table: ".var_export(array_values($this->aliasMap), true));
 		}
 
 		$tokens[] = $this->quoteTableName($columnParts[0]) . '.' . $this->quoteColumnName($columnParts[1]); //column name

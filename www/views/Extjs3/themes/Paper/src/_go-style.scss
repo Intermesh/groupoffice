@@ -2,9 +2,14 @@
 	//border: none;
 	background:color($grey,200);
 }
-body {
-	@include var(background-color, c-primary);
+
+html, body {
+	height: 100%;
 }
+body {
+	@include var(background-color, c-primary-tp);	
+}
+
 body * {
 	box-sizing: border-box;
 }
@@ -135,10 +140,20 @@ a {
 
 #login {
 	.go-app-logo {
-	position:absolute;
-	top: dp(16);
-	left: dp(16);
+		position:absolute;
+		top: dp(16);
+		left: dp(16);
+	}
 }
+
+#go-login-header {
+	position:absolute;
+	top:0;
+	left:0;
+	right:0;
+	height: dp(72);
+	@extend .z4;
+	@include var(background-color, c-primary);	
 }
 
 #go-select-language{
@@ -273,7 +288,7 @@ a {
 }
 
 #mainNorthPanel {
-	height: dp(64);
+	height: dp(56);
 	
 	position: relative;
 	color: white;
@@ -282,7 +297,7 @@ a {
 		@include var(background-color, c-primary);
 		> .x-tab-panel-header {
 			position: relative;
-			background-color:rgba(255,255,255,.17);
+			/*background-color:rgba(255,255,255,.17);*/
 			.x-tab-strip-active {
 				border-bottom-color: $cAccent;
 				color:white;
@@ -298,7 +313,7 @@ a {
 			.x-tab-right { padding-left:0;}
 			.x-tab-strip {	border: 0; }
 			.x-tab-strip-text{
-				color:rgba(white, .7);
+				color:rgba(white, .5);
 				padding-left:0;
 			}
 		}
@@ -1164,4 +1179,11 @@ table[id^="comments-ext"] b {
 
 .x-btn.raised{
 	border: dp(1) solid color($fg, "line");
+}
+
+
+.go-links-detail {
+	a {
+		color: color($fg, 'text');
+	}
 }

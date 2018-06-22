@@ -160,7 +160,7 @@ define icons with:
 
 .x-tool::before, .ux-row-action-item {
 	@extend %icon;
-	@include var(color, c-primary);
+	//@include var(color, c-primary);
 }
 .ux-row-action-item:hover {
 	color: color($fg, 'text');

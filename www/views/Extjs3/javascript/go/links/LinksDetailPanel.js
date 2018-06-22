@@ -1,5 +1,6 @@
 go.links.LinksDetailPanel = Ext.extend(Ext.Panel, {
 	addButtonItems : null,
+	cls: 'go-links-detail',
 	initComponent: function () {
 		this.store = new go.data.Store({
 			baseParams: {
