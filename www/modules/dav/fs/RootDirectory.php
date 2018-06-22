@@ -35,15 +35,16 @@ class RootDirectory extends Sabre\DAV\FS\Directory{
 		$children = array();
 		$children[] = new Directory('users/' . GO::user()->username);
 		$children[] = new SharedDirectory();
-		
-		if(GO::modules()->projects)
-			$children[] = new Directory('projects');
+	
 		
 		if(GO::modules()->addressbook)
 			$children[] = new Directory('addressbook');
 
 		if(GO::modules()->projects2)
 			$children[] = new Directory('projects2');
+		
+		if(GO::modules()->tickets)
+			$children[] = new Directory('tickets');
 		
 		return $children;
 	}
