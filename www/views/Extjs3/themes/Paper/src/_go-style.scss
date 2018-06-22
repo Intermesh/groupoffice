@@ -230,7 +230,7 @@ a {
 .go-view-over {
 	background-color: color($bg,'hover');
 }
-#go-logo, .go-app-logo {
+#go-logo, .go-app-logo, .go-about-logo {
 	background-image: url('img/logo-white.svg');
 	background-size: contain;
 	background-repeat: no-repeat;
@@ -239,6 +239,10 @@ a {
 	@extend %font-title;
 }
 
+
+.go-about-logo {
+	background-image: url('img/logo-blue.svg');
+}
 .go-settings-logo {
 	background-image: url('img/logo-white.svg');
 	background-size: auto dp(40);
