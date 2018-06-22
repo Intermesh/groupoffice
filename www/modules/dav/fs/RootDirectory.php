@@ -69,9 +69,14 @@ class RootDirectory extends Sabre\DAV\FS\Directory{
 				case 'Shared':
 						return new SharedDirectory();
 					break;
-				case 'projects':
-					if(GO::modules()->projects)
-						return new Directory('projects');
+				case 'tickets':
+					if(GO::modules()->tickets)
+						return new Directory('tickets');
+					break;
+					
+				case 'billing':
+					if(GO::modules()->tickets)
+						return new Directory('billing');
 					break;
 					
 				case 'projects2':
