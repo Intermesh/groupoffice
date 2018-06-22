@@ -46,6 +46,9 @@ class RootDirectory extends Sabre\DAV\FS\Directory{
 		if(GO::modules()->tickets)
 			$children[] = new Directory('tickets');
 		
+		if(GO::modules()->billing)
+			$children[] = new Directory('billing');
+		
 		return $children;
 	}
 	
