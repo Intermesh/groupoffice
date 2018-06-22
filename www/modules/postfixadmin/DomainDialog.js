@@ -96,30 +96,27 @@ GO.postfixadmin.DomainDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 			buttons.push('->');
 		
 		// These three buttons are enabled by default.
-		if (this.enableOkButton)
+		
 			buttons.push(this.buttonOk = new Ext.Button({
-				text: GO.lang['cmdOk'],
+				text: t("Save"),
 				handler: function(){
 					this.submitForm(true);
 				},
+				disabled :  go.Modules.get('legacy','postfixadmin').permissionLevel < GO.permissionLevels.manage,
 				scope: this
 			}));
-		if (this.enableApplyButton)
+			
 			buttons.push(this.buttonApply = new Ext.Button({
-				text: GO.lang['cmdApply'],
+				disabled :  go.Modules.get('legacy','postfixadmin').permissionLevel < GO.permissionLevels.manage,
+				text: t('Apply'),
 				handler: function(){
 					this.submitForm();
 				},
 				scope:this
 			}));
-		if (this.enableCloseButton)
-			buttons.push(this.buttonClose = new Ext.Button({
-				text: GO.lang['cmdClose'],
-				handler: function(){
-					this.hide();
-				},
-				scope:this
-			}));
+			
+			
+		
 		
 		Ext.applyIf(this, {
 			buttons: buttons
@@ -135,7 +132,6 @@ GO.postfixadmin.DomainDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 			//fileUpload:true
 		});
 		
-		this.enableOkButton = this.enableApplyButton = GO.settings.modules.postfixadmin.write_permission;
 		
 		GO.postfixadmin.DomainDialog.superclass.initComponent.call(this);	
 	},
