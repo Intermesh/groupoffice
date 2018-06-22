@@ -22,7 +22,7 @@ class ZpushadminModule extends \GO\Base\Module {
 		if (!$folder)
 			$folder = self::getModuleFolder();
 
-		return file_exists(\GO::config()->root_path . 'modules/' . $folder . '/lib/utils/zpushadmin.php');
+		return file_exists(\GO::config()->root_path . 'modules/' . $folder . 'vender/z-push/lib/utils/zpushadmin.php');
 	}
 
 	public static function checkZPushVersion($versionToCompare) {
@@ -53,15 +53,17 @@ class ZpushadminModule extends \GO\Base\Module {
 	}
 
 	public static function getModuleFolder() {
-		$folders = array('z-push', 'z-push22', 'z-push21', 'z-push2');
-		$folder = false;
-		foreach ($folders as $f) {
-			if (is_dir(\GO::config()->root_path . 'modules/' . $f)) {
-				$folder = $f;
-				break;
-			}
-		}
-		return $folder;
+		return 'z-push';
+		
+//		$folders = array('z-push', 'z-push22', 'z-push21', 'z-push2');
+//		$folder = false;
+//		foreach ($folders as $f) {
+//			if (is_dir(\GO::config()->root_path . 'modules/' . $f)) {
+//				$folder = $f;
+//				break;
+//			}
+//		}
+//		return $folder;
 	}
 
 	public static function includeZpushFiles() {
@@ -76,7 +78,7 @@ class ZpushadminModule extends \GO\Base\Module {
 
 		if (self::zpushAdminFileExists($moduleFolder)) {
 
-			require_once \GO::config()->root_path . 'modules/' . $moduleFolder . '/vendor/autoload.php';
+			require_once \GO::config()->root_path . 'modules/' . $moduleFolder . '/vendor/z-push/vendor/autoload.php';
 			include_once(\GO::config()->root_path . 'modules/' . $moduleFolder . '/config.php');
 
 
