@@ -135,7 +135,7 @@ GO.form.ColorField =  Ext.extend(function(config){
 	},
 
 	getValue : function(){
-		return this.curColor || "FFFFFF";
+		return this.curColor;
     },
 	/**
    * Sets the value of the color field.  Format as hex value 'FFFFFF'
@@ -165,13 +165,13 @@ GO.form.ColorField =  Ext.extend(function(config){
 		{
 			
 			if(!this.checkHex(hex)){
-				hex = 'FFFFFF';
+				hex = null;
 			}
 			
 			this.curColor = hex;
 
 			this.el.setStyle( {
-				'background-color': '#' + hex,
+				'background-color': hex ? '#' + hex : "transparent",
 				'background-image': 'none'
 			});
 			if(!this.showHexValue) {
@@ -186,7 +186,7 @@ GO.form.ColorField =  Ext.extend(function(config){
 	checkHex : function(hex) {
 		
 		if(!hex){
-			return false;
+			return true;
 		}
 		
 		return hex.match(/^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/);
@@ -213,10 +213,7 @@ GO.form.ColorField =  Ext.extend(function(config){
 				iconCls:'ic-invert-colors-off',
 				text:'Auto',
 				handler: function() {
-					GO.form.ColorField.superclass.setValue.call(this, null);
-					this.el.setStyle( {
-						'background-color': 'transparent'
-					});
+					this.handleSelect(this.menu.palette, null);
 					this.menu.hide();
 				},
 				scope:this
