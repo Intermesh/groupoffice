@@ -82,6 +82,12 @@ go.systemsettings.GeneralPanel = Ext.extend(Ext.form.FormPanel, {
 						}),
 						
 						this.colorField = new GO.form.ColorField({
+							listeners: {
+								scope: this,
+								change: function(field, color) {
+									document.body.style.setProperty('--c-primary', '#' + color);
+								}
+							},
 							fieldLabel: t("Primary color"),
 							showHexValue: true,
 							value: null,
