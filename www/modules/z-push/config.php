@@ -110,7 +110,7 @@ if(!class_exists('GO'))
 		\GO::config()->zpush2_loglevel=LOGLEVEL_OFF;
 	}
     define('LOGBACKEND', 'filelog');
-	define('LOGLEVEL', \GO::config()->zpush2_loglevel);
+	define('LOGLEVEL', LOGLEVEL_OFF);
     define('LOGAUTHFAIL', false);
 
     // To save e.g. WBXML data only for selected users, add the usernames to the array
