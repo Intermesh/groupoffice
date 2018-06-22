@@ -1,37 +1,63 @@
 go.systemsettings.AppearancePanel = Ext.extend(Ext.form.FormPanel, {
 	initComponent: function () {
+		var me = this;
 		Ext.apply(this, {
 			title: t('Appearance'),
 			autoScroll: true,
 			iconCls: 'ic-palette',
-			items: [ {
+			items: [{
 					xtype: "fieldset",
 					items: [
-						this.logoField = new go.form.FileField({
-							fieldLabel: t("Logo"),
-							buttonOnly: true,
-							name: 'logoId',
-							height:dp(72),
-							cls: "go-settings-logo",
-							autoUpload: true,
-							buttonCfg: {
-								text: '',
-								width: dp(272)
-							},
-							setValue: function(val) {
-								if(this.rendered && !Ext.isEmpty(val)) {
-									this.wrap.setStyle('background-image', 'url('+go.Jmap.downloadUrl(val)+')');
-									Ext.get('go-logo').setStyle('background-image', 'url('+go.Jmap.downloadUrl(val)+')');
-								}
-								go.form.FileField.prototype.setValue.call(this,val);
-							},
-							accept: 'image/*'
-						}),
-						
+						{
+							xtype: 'compositefield',
+							items: [
+								this.logoField = new go.form.FileField({
+									fieldLabel: t("Logo"),
+									buttonOnly: true,
+									name: 'logoId',
+									height: dp(72),
+									cls: "go-settings-logo",
+									autoUpload: true,
+									buttonCfg: {
+										text: '',
+										width: dp(272)
+									},
+									setValue: function (val) {
+										if (this.rendered) {
+											me.resetLogoButton.setDisabled(Ext.isEmpty(val));
+											if(!Ext.isEmpty(val)) {
+												this.wrap.setStyle('background-image', 'url(' + go.Jmap.downloadUrl(val) + ')');
+												Ext.get('go-logo').setStyle('background-image', 'url(' + go.Jmap.downloadUrl(val) + ')');
+											} else
+											{
+												this.wrap.dom.style.removeProperty('background-image');
+												Ext.get('go-logo').dom.style.removeProperty('background-image');
+											}
+											
+										}
+										go.form.FileField.prototype.setValue.call(this, val);
+									},
+									accept: 'image/*'
+								}),
+								this.resetLogoButton = new Ext.Button({
+									iconCls: 'ic-delete',
+									disabled: true,
+									tooltip: t("Reset"),
+									handler: function() {
+										this.logoField.setValue(null);
+									},
+									scope: this
+								})
+							]
+						},
+
 						this.colorField = new GO.form.ColorField({
 							listeners: {
 								scope: this,
-								change: function(field, color) {
+								change: function (field, color) {
+									if (!color) {
+										color = "009BC9"; //default color
+									}
 									document.body.style.setProperty('--c-primary', '#' + color);
 								}
 							},
@@ -43,7 +69,7 @@ go.systemsettings.AppearancePanel = Ext.extend(Ext.form.FormPanel, {
 							colors: [
 								'009BC9', //Group-Office blue
 								'0E3B83', //Intermesh blue
-								
+
 								'C62828', //al 800 variants of Material design
 								'AD1457',
 								'6A1B9A',
