@@ -143,7 +143,7 @@ GO.form.ColorField =  Ext.extend(function(config){
 	 *
    * @param {String} hex The color value
    */
-	setValue : function(hex){
+	setValue : function(hex){	
 		GO.form.ColorField.superclass.setValue.call(this, hex);
 		this.setColor(hex);
 	},
@@ -192,26 +192,11 @@ GO.form.ColorField =  Ext.extend(function(config){
 		return hex.match(/^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/);
 	},
 
-	// private
-	menuListeners : {
-		select: function(m, d){
-			this.setValue(d);
-		},
-		show : function(){ // retain focus styling
-			this.onFocus();
-		},
-		hide : function(){
-			this.focus();
-			var ml = this.menuListeners;
-			this.menu.un("select", ml.select,  this);
-			this.menu.un("show", ml.show,  this);
-			this.menu.un("hide", ml.hide,  this);
-		}
-	},
-
 	//private
 	handleSelect : function(palette, selColor) {
+		var old = this.getValue();
 		this.setValue(selColor);
+		this.fireEvent('change', this, selColor, old);
 	},
 
 	// private
@@ -239,7 +224,7 @@ GO.form.ColorField =  Ext.extend(function(config){
 			
 			this.menu.palette.on('select', this.handleSelect, this );
 			this.menu.palette.value=this.curColor;
-			this.menu.on(Ext.apply({}, this.menuListeners, {scope:this} ));
+//			this.menu.on(Ext.apply({}, this.menuListeners, {scope:this} ));
 
 			if(this.colors)
 			{
