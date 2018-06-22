@@ -333,7 +333,6 @@ this.exportCompanyMenu.setColumnModel(this.companiesGrid.getColumnModel());
 		split:true,
 		listeners: {
 			beforeload: function() {
-				
 				//make sure companies is selected when routing
 				this.navMenu.select(1);
 			},
@@ -569,7 +568,9 @@ Ext.extend(GO.addressbook.MainPanel, Ext.Panel,{
 					GO.addressbook.readableAddresslistsStore.loadData(result.readable_addresslists);
 					GO.addressbook.writableAddresslistsStore.loadData(result.writable_addresslists);
 //				}
-				this.navMenu.select(0);
+				if(this.navMenu.getSelectionCount() == 0) {
+					this.navMenu.select(0);
+				}
 				this.getEl().unmask();
 			},
 			scope:this
