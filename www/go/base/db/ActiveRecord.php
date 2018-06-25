@@ -4873,16 +4873,23 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 
 	public function rebuildSearchCache(){
 		
-		$pdo = new \GO\Base\Db\PDO();
-			//to avoid memory errors
-		$pdo->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY,false);
-		$this->setDbConnection($pdo);
 		
+				
 		$rc = new \GO\Base\Util\ReflectionClass($this);
 		$overriddenMethods = $rc->getOverriddenMethods();
 		if(in_array("getCacheAttributes", $overriddenMethods)){
-			$stmt = $this->find(FindParams::newInstance()->ignoreAcl()->select('t.*'));
-			$stmt->callOnEach('cacheSearchRecord', true);
+			
+			$start = 0;
+		
+			//per thousands to keep memory low
+			$stmt = $this->find(FindParams::newInstance()->ignoreAcl()->select('t.*')->limit(1000)->start($start));
+
+			while($stmt->rowCount()) {	
+				$stmt->callOnEach('cacheSearchRecord', true);
+				
+				$stmt = $this->find(FindParams::newInstance()->ignoreAcl()->select('t.*')->limit(1000)->start($start+=1000));				
+			}
+			
 		}
 	}
 
