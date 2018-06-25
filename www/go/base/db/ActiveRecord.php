@@ -3267,6 +3267,10 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 				GO::debug("WARNING: ".$this->className()."::beforeSave returned false or no value");
 				return false;
 			}
+			
+			if($this->hasFiles()){
+				$this->files_folder_id = 0;
+			}
 
 			$this->_dbInsert();
 			$lastInsertId = $this->getDbConnection()->lastInsertId();
