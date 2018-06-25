@@ -168,7 +168,6 @@ GO.ModuleManager = Ext.extend(function(){
 			Ext.reg("module-main-"+moduleName, this.modulePanels[moduleName]);
 			this.panelConfigs[moduleName].xtype = "module-main-"+moduleName;
 			var p = this.panelConfigs[moduleName];
-			this.fireEvent('moduleconstructed', this, moduleName, p);
 			return p;
 		} else {
 			return false;

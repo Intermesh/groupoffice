@@ -13,7 +13,6 @@ modules/tasks/Settings.js
 modules/tasks/CategoryDialog.js
 modules/tasks/TaskListsGrid.js
 modules/tasks/AddTaskBar.js
-modules/tasks/GlobalSettings.js
 modules/tasks/ScheduleCallMenuItem.js
 modules/tasks/views/Extjs3/StatusProgressField.js
 modules/tasks/views/Extjs3/TasksTpl.js
