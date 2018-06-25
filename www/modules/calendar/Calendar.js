@@ -2335,3 +2335,20 @@ GO.calendar.handleMeetingRequest=function(responseResult){
 	}
 }
 
+GO.calendar.showInfo = function (eventId) {
+
+	var eventPanel = new GO.calendar.EventPanel();
+	var win = new go.Window({
+		title: t("Appointment"),
+		collapsible: true,
+		maximizable: true,
+		resizable: true,
+		width: 500,
+		height: 10000,
+		layout:'fit',
+		items:[eventPanel]
+	});
+	win.show();
+	eventPanel.load(eventId);
+	
+}

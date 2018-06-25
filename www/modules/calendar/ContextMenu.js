@@ -234,7 +234,7 @@ Ext.extend(GO.calendar.ContextMenu, Ext.menu.Menu, {
 	},
 	showEventInfoDialog : function()
 	{
-		GO.linkHandlers["GO\\Calendar\\Model\\Event"].call(this, this.event.event_id);
+		GO.calendar.showInfo(this.event.event_id);
 	},
 	menuHandler : function()
 	{
