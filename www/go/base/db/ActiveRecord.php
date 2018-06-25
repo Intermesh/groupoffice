@@ -3261,9 +3261,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 					$this->setNewAcl(GO::user() ? GO::user()->id : 1);
 			}
 
-			if ($this->hasFiles() && GO::modules()->isInstalled('files')) {		
-				$this->checkModelFolder();
-			}
+			
 			
 			if(!$this->beforeSave()){
 				GO::debug("WARNING: ".$this->className()."::beforeSave returned false or no value");
@@ -3287,10 +3285,15 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 					return false;
 				}
 			}			
+			
+			
+			if ($this->hasFiles() && GO::modules()->isInstalled('files')) {		
+				$this->checkModelFolder();				
+			}
 
-			$this->setIsNew(false);
-
-			if($this->_processFileColumns($fileColumns) || $this->afterDbInsert()){
+			$this->setIsNew(false);			
+			$changed  = $this->_processFileColumns($fileColumns);
+			if($changed || $this->afterDbInsert() || $this->isModified('files_folder_id')){
 				$this->_dbUpdate();
 			}
 		}else
