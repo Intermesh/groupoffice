@@ -207,7 +207,7 @@ class DomainController extends \GO\Base\Controller\AbstractModelController {
 				$this->exec("mv ". $home .' '. $tmp);
 				$this->exec("mkdir " . $home);
 				$this->exec("mv " . $tmp . basename($home) .' '.$maildir);
-				exec("mv -f " . $maildir .'.dovecot* '.$maildir.'sieve ' . $home);
+				exec("mv -f  ".$maildir.'sieve ' . $home);
 			}
 			$mailbox->maildir = substr($maildir, strlen($rootDir));
 			if(!$mailbox->save()) {
