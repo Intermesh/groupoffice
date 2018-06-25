@@ -118,7 +118,11 @@ class Log extends \GO\Base\Db\ActiveRecord {
 	 * @param string/array $data
 	 */
 	public static function create($action, $message, $model_name="", $model_id=0, $data=""){
-		
+
+		// jsonData field in go_log might not exist yet during upgrade
+		if(\GO::router()->getControllerRoute() == 'maintenance/upgrade') {
+			return true;
+		}
 		// Check if the given data is already JSON, if not, then we json_encode it.
 		if(!GO\Base\Util\StringHelper::isJSON($data)){
 			$data = json_encode($data);
