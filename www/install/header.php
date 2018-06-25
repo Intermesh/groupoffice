@@ -12,3 +12,11 @@
 			<small>Installation</small>
 			
 		</header>
+		
+		
+		<?php
+		
+		if(is_dir("/etc/groupoffice/" . $_SERVER['HTTP_HOST'])) {	
+			throw new \Exception("A config folder was found in /etc/groupoffice/" . $_SERVER['HTTP_HOST'] .". Please move all your domain configuration folders from /etc/groupoffice/* into /etc/groupoffice/multi_instance/*. Only move folders, leave /etc/groupoffice/config.php and other files where they are.");
+		}
+		?>
