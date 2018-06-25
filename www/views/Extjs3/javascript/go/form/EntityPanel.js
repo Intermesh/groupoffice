@@ -2,6 +2,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	currentId : null, 
 	entityStore: null,
 	buttonAlign: 'left',
+	autoScroll: true,
 	initComponent : function() {
 		go.form.EntityPanel.superclass.initComponent.call(this);				
 		this.entityStore.on('changes',this.onChanges, this);
