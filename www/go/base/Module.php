@@ -465,10 +465,7 @@ class Module extends Observable {
 				
 		$models=$this->getModels();
 		
-		$pdo = new \GO\Base\Db\PDO();
-			//to avoid memory errors
-		$pdo->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY,false);
-		
+			
 		
 		foreach($models as $model){	
 			if($model->isSubclassOf("GO\Base\Db\ActiveRecord")){
@@ -481,11 +478,24 @@ class Module extends Observable {
 					flush();
 					
 					//to avoid memory errors
+					$start = 0;
+					
+					//per thousands to keep memory low
 					$stmt = $m->find(array(
-							'ignoreAcl'=>true
+							'ignoreAcl'=>true,
+							'start' => $start,
+							'limit' => 1000
 					));
 					
-					$stmt->callOnEach('checkDatabase');
+					while($stmt->rowCount()) {					
+						$stmt->callOnEach('checkDatabase');
+						
+						$stmt = $m->find(array(
+								'ignoreAcl'=>true,
+								'start' => $start+=1000,
+								'limit' => 1000
+						));
+					}
 					
 					unset($stmt);
 				}else
