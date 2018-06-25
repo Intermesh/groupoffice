@@ -1391,7 +1391,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 
 		//this can be used in some cases where you don't want the dynamically
 		//determined full URL. This is done in set_full_url below.
-		$this->orig_full_url = $this->full_url;
+		//$this->orig_full_url = $this->full_url;
 
 		$this->orig_tmpdir=$this->tmpdir;
 
@@ -1550,6 +1550,10 @@ var $billing_clear_payment_method_on_duplicate = true;
 	}
 	
 	public function getfull_url() {
+		return rtrim(GO()->getSettings()->URL, '/') . '/';
+	}
+	
+	public function getorig_full_url() {
 		return rtrim(GO()->getSettings()->URL, '/') . '/';
 	}
 
