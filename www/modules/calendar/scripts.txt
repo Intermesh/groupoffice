@@ -23,7 +23,6 @@ modules/calendar/SelectDateDialog.js
 modules/calendar/RecurrenceDialog.js
 modules/calendar/ContextMenu.js
 modules/calendar/SelectCalendarDialog.js
-modules/calendar/GlobalSettings.js
 modules/calendar/ColorPickerDialog.js
 modules/calendar/AttendanceWindow.js
 modules/calendar/Calendar.js
