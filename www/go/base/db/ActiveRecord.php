@@ -3425,7 +3425,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 	 */
 	protected function log($action, $save=true, $modifiedCustomfieldAttrs=false){
 		// jsonData field in go_log might not exist yet during upgrade
-		if($_GET['r'] == 'maintenance/upgrade') {
+		if(\GO::router()->getControllerRoute() == 'maintenance/upgrade') {
 			return true;
 		}
 		$message = $this->getLogMessage($action);
