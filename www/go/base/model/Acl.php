@@ -366,7 +366,7 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 	public function clear(){
 		
 		if (!\GO::user()->isAdmin())
-			throw new AccessDeniedException();
+			throw new \GO\Base\Exception\AccessDenied();
 		
 		$adminGroupRecordExists = false;
 		
