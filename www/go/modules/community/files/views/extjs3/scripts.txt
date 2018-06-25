@@ -5,6 +5,7 @@ MainPanel.js
 ContextMenu.js
 FilesDetailPanel.js
 NodeDetail.js
+EastPanel.js
 NodeGrid.js
 NodeTile.js
 FolderTreeNodeUI.js

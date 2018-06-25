@@ -57,8 +57,12 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 				iconCls: 'ic-content-copy',
 				text: t("Make copy")+'&hellip;',
 				handler: function(){
-					console.log(this.records);
-					go.modules.community.files.move(this.records,true);
+					if(this.records && this.records.length === 1){ // Single select
+						var moveDialog = new go.modules.community.files.MoveDialog();
+						moveDialog.setTitle(t("Move")+ " " +this.records[0].name);
+						moveDialog.copy = true;
+						moveDialog.load(this.records[0].id).show();
+					}
 				},
 				scope: this
 			}),
@@ -66,13 +70,11 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 				iconCls: 'ic-forward',
 				text: t("Move to")+'&hellip;',
 				handler: function(){
-					
-					console.log(this.records);
-					go.modules.community.files.move(this.records,false);
-					
+				
 					if(this.records && this.records.length === 1){ // Single select
 						var moveDialog = new go.modules.community.files.MoveDialog();
 						moveDialog.setTitle(t("Move")+ " " +this.records[0].name);
+						moveDialog.copy = false;
 						moveDialog.load(this.records[0].id).show();
 					}
 				},

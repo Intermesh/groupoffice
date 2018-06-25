@@ -2,6 +2,7 @@ go.modules.community.files.NodeGrid = Ext.extend(go.grid.GridPanel, {
 	paging: true,
 	enableDragDrop:true,
 	multiselect:true,
+	browser: null,
 	ddGroup: 'files-center-dd',
 	initComponent: function () {
 
@@ -79,10 +80,10 @@ go.modules.community.files.NodeGrid = Ext.extend(go.grid.GridPanel, {
 		new Ext.dd.DropTarget(el, {
 			ddGroup: 'files-center-dd',
 			copy:false,
+			browser: this.browser,
 			notifyOver : this.onNotifyOver,
 			notifyDrop: this.onNotifyDrop
-		})
-		  
+		});
 	},
 	
 	onNotifyDrop : function(ddSource, e, data){
@@ -93,10 +94,7 @@ go.modules.community.files.NodeGrid = Ext.extend(go.grid.GridPanel, {
 			return false;
 		}
 		if(droppedAt.data.isDirectory) {
-			Ext.each(records, function(record) {
-				record.set('parentId', droppedAt.data.id);
-			}, ddSource.grid.store);
-			ddSource.grid.store.commitChanges();
+			this.browser.receive(records, go.modules.community.files.move, droppedAt.data.id);
 			//Ext.each(records, ddSource.grid.store.remove, ddSource.grid.store);
 		}
 		return true

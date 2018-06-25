@@ -38,5 +38,11 @@ go.modules.community.files.MoveDialog = Ext.extend(go.form.Dialog, {
 		items.push(this.folderTree);
 				
 		return items;
+	},
+	
+	submit: function() {
+		var folder = go.Stores.get('Node').get(currentId),
+			 callback = this.copy ? go.files.community.copy : go.files.community.move
+		this.browser.receive([folder], callback , this.parentIdField.getValue());
 	}
 });

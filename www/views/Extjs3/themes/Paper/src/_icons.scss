@@ -55,7 +55,7 @@
 	  font-size: dp(16);
 	  line-height:inherit
   }
-  .x-grid3-row & {
+  .x-grid3-row &.filetype {
 	  width: dp(24);
 	  height: dp(24);
   }
@@ -230,8 +230,6 @@ $btn-icon : (
 	btn-right-arrow : keyboard_arrow_right,
 	btn-left-arrow : keyboard_arrow_left,
 
-/*	filetype-doc : description,
-	filetype-pdf : picture_as_pdf,*/
 	bs-btn-catalog : folder,
 	bs-btn-expenses : euro_symbol,
 	bs-btn-batchjob : slow_motion_video,
@@ -313,7 +311,8 @@ $filetype: (
 	php: php,
 	js: js,
 	sql: sql,
-	xml: xml
+	xml: xml,
+	multiple: multiple
 );
 @each $img, $extensions in $filetype {
 	@if type-of($extensions) == 'list' {

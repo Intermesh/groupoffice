@@ -64,6 +64,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 		
 		this.nodeGrid = new go.modules.community.files.NodeGrid({
 			store:this.store,
+			browser:this.browser,
 			listeners: {
 				rowcontextmenu: function(grid, index, event){
 					var selections = grid.getSelectionModel().getSelections();
@@ -95,6 +96,11 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 							this.detailView.items.itemAt(0).load(parseInt(records[0].data.id));
 						} else if (records.length > 1) {
 							this.detailView.getLayout().setActiveItem(1);
+							var ids = [];
+							for(var i = 0; i < records.length; i++) {
+								ids.push(records[i].data.id);
+							}
+							this.detailView.items.itemAt(1).load(ids);
 						}
 					},
 					scope: this
@@ -104,11 +110,22 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 		
 		this.nodeTile = new go.modules.community.files.NodeTile({
 			store:this.store,
+			singleSelect: false,
 			listeners: {
-				click: function(view, index, node, e) {
-					var record = view.getStore().getAt(index);
-					console.log(record);
-					this.detailView.load(parseInt(record.data.id));
+				selectionchange: function(view, records){
+					if(records.length === 1) {
+						this.detailView.getLayout().setActiveItem(0);
+						var record = view.getStore().getAt(records[0].viewIndex);
+						this.detailView.items.itemAt(0).load(parseInt(record.data.id));
+					} else if (records.length > 1) {
+						this.detailView.getLayout().setActiveItem(1);
+						var ids = [];
+						for(var i = 0; i < records.length; i++) {
+							var record = view.getStore().getAt(records[i].viewIndex);
+							ids.push(record.data.id);
+						}
+						this.detailView.items.itemAt(1).load(ids);
+					}
 				},
 				contextmenu: function(view, index, node, event){
 					event.stopEvent();
@@ -227,6 +244,22 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 							}),
 							scope: this
 						}), {
+							xtype: 'tbsearch',
+							store: this.store,
+							listeners: {
+								open: function () {
+									this.breadCrumbs.setVisible(false);
+									this.advancedSearchBar.setVisible(true);
+									this.doLayout();
+								},
+								close: function () {
+									this.breadCrumbs.setVisible(true);
+									this.advancedSearchBar.setVisible(false);
+									this.doLayout();
+								},
+								scope: this
+							}
+						}, {
 								xtype:'buttongroup',
 								items:[{
 									tooltip: t("List", "files"),
@@ -250,23 +283,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 									},
 									scope:this
 								}]
-							}, {
-							xtype: 'tbsearch',
-							store: this.store,
-							listeners: {
-								open: function () {
-									this.breadCrumbs.setVisible(false);
-									this.advancedSearchBar.setVisible(true);
-									this.doLayout();
-								},
-								close: function () {
-									this.breadCrumbs.setVisible(true);
-									this.advancedSearchBar.setVisible(false);
-									this.doLayout();
-								},
-								scope: this
-							}
-						}]
+							}]
 				}),
 				this.advancedSearchBar = new Ext.Toolbar({
 					hidden: true,
@@ -371,21 +388,10 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 			e.stopPropagation();
 			e.preventDefault();
 			this.body.removeClass('x-dd-over');
-			this.addFiles(e.dataTransfer.files);
+			this.browser.receive(e.dataTransfer.files, this.fileUpload, this.browser.getCurrentDir());
 		}.bind(this));
 		
 		go.modules.community.files.CenterPanel.superclass.afterRender.call(this, arguments);
-	},
-	
-	addFiles: function(files) {
-		for (var i = 0; i < files.length; i++) {
-			var index = this.store.find('name', files[i].name);
-			if(index === -1) { // not found
-				this.fileUpload(files[i]);
-			} else { // already exist
-				this.solveDuplicate(files[i], index);
-			}
-		}
 	},
 	
 	fileUpload: function(file, replaceIndex, newName, parentId) {
@@ -394,11 +400,11 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 			record.set('status', 'queued');
 		} else {
 			var record = new this.store.recordType({
-				name: newName || file.name, 
+				name: newName || file.name,
 				isDirectory: 0,
 				parentId: this.store.baseParams.filter.parentId, 
-				size: file.size, 
-				status: 'queued' 
+				size: file.size,
+				status: 'queued'
 			});
 			this.store.add(record);
 		}
@@ -425,48 +431,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 		  },
 		  scope:this
 	  });
-	},
-	
-	solveDuplicate: function(file, index) {
-		this.pendingDuplicates[index] = file;
-		var count = Object.keys(this.pendingDuplicates).length,
-			msg = (count < 2) ? 'A file named <b>'+file.name+ '</b>' : '<b>'+count + '</b> files';
-		Ext.Msg.show({
-			title: t('Duplicate file(s)'),
-			msg: t(msg+' already exists. <br>What would you like to do?'),
-			buttons: {yes:t('Keep both'), no:t('Replace'), cancel:t('Cancel')},
-			icon: Ext.MessageBox.QUESTION,
-			fn: function(btnId, text) {
-				for (var i in this.pendingDuplicates) {
-					if(btnId === 'no') {
-						this.fileUpload(this.pendingDuplicates[i], i);
-						continue;
-					} else if(btnId === 'yes') {
-						var newName, nameCount = 0, index = i,
-							nameExt = this.pendingDuplicates[i].name.split('.'),
-							name, extension = nameExt.pop();
-							if(nameExt.length === 0) {
-								name = extension;
-								extension = null;
-							} else {
-								name = nameExt.join('.');
-							}
-						while(index !== -1) {
-							nameCount++;
-							newName = name + '('+nameCount+')';
-							index = this.store.find('name', newName);
-						}
-						if(extension !== null) {
-							newName += ('.'+extension);
-						}
-						console.log(newName,this.pendingDuplicates[i]);
-						this.fileUpload(this.pendingDuplicates[i], false, newName);
-					}
-				}
-				this.pendingDuplicates = {};
-			},
-			scope:this
-		});
-		
 	}
+	
+	
 });

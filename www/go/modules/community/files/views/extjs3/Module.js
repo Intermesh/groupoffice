@@ -81,17 +81,17 @@ go.modules.community.files.removeBookmark = function(nodes){
 
 go.modules.community.files.lock = function(nodes){
 	
-}
+};
 
 go.modules.community.files.email = function(nodes){
 	
-	var blobs = new Array(); // array with relative paths to the files
+	var blobs = []; // array with relative paths to the files
 	Ext.each(nodes, function(node) {
 
 		var blob = {
-			humanSize:go.util.humanFileSize(node.size,true),
-			extension:go.util.contentTypeClass(node.contentType, node.name),
-			blobId:node.blobId
+			humanSize: go.util.humanFileSize(node.size,true),
+			extension: go.util.contentTypeClass(node.contentType, node.name),
+			blobId: node.blobId
 		};
 	
 		blobs.push(blob);
@@ -99,8 +99,21 @@ go.modules.community.files.email = function(nodes){
 
 	GO.email.emailBlobs(blobs);
 	
-}
+};
 
-go.modules.community.files.move = function(nodes, copy){
-	
-}
+go.modules.community.files.move = function(nodes, targetId){
+	var items = {};
+	Ext.each(nodes, function(record) {
+		items[record.data.id] = {parentId:targetId};
+	});
+	go.Stores.get('Node').set({update:items});
+};
+
+go.modules.community.files.copy = function(nodes, targetId){
+	var items = {};
+	Ext.each(nodes, function(record) {
+		record.data.parentId = tagetId;
+		items[Ext.id(null,'#')] = record.data;
+	});
+	go.Stores.get('Node').set({create:items});
+};

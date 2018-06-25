@@ -62,28 +62,9 @@ go.modules.community.files.MainPanel = Ext.extend(Ext.Panel, {
 			bbar: [this.usagePanel]
 		});
 
-		this.detailView = new Ext.Panel({
-			region: 'east',
-			width: dp(560),
-			split: true,
-			layout: 'card',
-			items:[
-				new go.modules.community.files.NodeDetail({
-					browser: this.browser,
-					tbar: [{
-						cls: 'go-narrow',
-						iconCls: "ic-arrow-back",
-						handler: function () {
-							this.westPanel.show();
-						},
-						scope: this
-					}]
-				}),
-				new Ext.Panel({
-					title:'mutliselect'
-				})
-			]
-		})
+		this.detailView = new go.modules.community.files.EastPanel({
+			browser: this.browser
+		});
 
 		this.centerCardPanel = new go.modules.community.files.CenterPanel({
 			region: 'center',

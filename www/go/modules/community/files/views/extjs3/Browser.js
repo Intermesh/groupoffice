@@ -17,6 +17,7 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 		nodeId: null,
 		storages: false
 	},
+	targetStore: null,
 	rootLoaded : false,
 	_rootNodes:[],
 	
@@ -36,6 +37,29 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 		if(this.rootConfig.storages) {
 			this.loadStorages();
 		}
+		// When processing file into a folder we need to load it
+		// otherwise we can't solve duplicated localy
+		this.targetStore = new go.data.Store({
+			fields: [
+				'id', 
+				'name',
+				'bookmarked',
+				'internalShared',
+				'externalShared',
+				'storageId',
+				{name: 'touchedAt', type: 'date'},
+				{name: 'contentType', submit: false},
+				{name: 'metaData', submit: false},
+				{name: 'size', submit: false},
+				{name: 'progress', submit: false},
+				{name: 'status', submit: false},
+				'isDirectory', 
+				{name: 'createdAt', type: 'date'}, 
+				{name: 'modifiedAt', type: 'date'}, 
+				'aclId'
+			],
+			entityStore: go.Stores.get("Node")
+		});
 		
 		this.initRootNodes();
 		go.Stores.get('Node').on('changes', this.initRootNodes,this);
@@ -50,22 +74,22 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 	
 	loadStorages : function() {
 		var callId = go.Jmap.request({
-				method: 'Storage/query',
-				params: {
-					filter: {
-						ownedBy: go.User.id
-					}
+			method: 'Storage/query',
+			params: {
+				filter: {
+					ownedBy: go.User.id
 				}
-			});
-			go.Jmap.request({
-				method: 'Storage/get',
-				params: {
-					"#ids": {
-						resultOf: callId,
-						name: "Storage/query",
-						path: "ids"
-					}
+			}
+		});
+		go.Jmap.request({
+			method: 'Storage/get',
+			params: {
+				"#ids": {
+					resultOf: callId,
+					name: "Storage/query",
+					path: "ids"
 				}
+			}
 		});
 	},
 	
@@ -137,7 +161,6 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 	 * 
 	 * @param nodeEntity object
 	 * @param boolean clear the current rootNode array
-	 * 
 	 */
 	addRootNodeEntity : function(nodeEntity, clearExisting){
 		
@@ -224,6 +247,72 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 		}
 		this.path = path;
 		this.open();
+	},
+	
+	receive: function(files, callback, targetId) {
+		function internalReceive() {
+			debugger;
+			for (var i = 0; i < files.length; i++) {
+				var node = files[i].data || files[i];
+				var index = this.targetStore.find('name', node.name);
+				if(index === -1) { // not found
+					callback(node); // TODO set params for callback same if in uploadfiles
+				} else { // already exist
+					this._solveDuplicate(node, index, callback);
+				}
+			}
+		}
+		
+		if(targetId && this.targetStore.baseParams.filter && this.targetStore.baseParams.filter.parentId != targetId) {
+			this.targetStore.setBaseParam('filter',{parentId: targetId});
+			this.targetStore.load({callback:internalReceive,scope:this});
+		} else if(this.targetStore.isLoaded) {
+			internalReceive();
+		}
+	},
+	
+	pendingDuplicates : {},
+	
+	_solveDuplicate : function(file, index, callback) {
+		this.pendingDuplicates[index] = file;
+		var count = Object.keys(this.pendingDuplicates).length,
+			msg = (count < 2) ? 'A file named <b>' + file.name + '</b>' : '<b>' + count + '</b> files';
+		Ext.Msg.show({
+			title: t('Duplicate file(s)'),
+			msg: t(msg+' already exists. <br>What would you like to do?'),
+			buttons: {yes:t('Keep both'), no:t('Replace'), cancel:t('Cancel')},
+			icon: Ext.MessageBox.QUESTION,
+			fn: function(btnId, text) {
+				for (var i in this.pendingDuplicates) {
+					if(btnId === 'no') {
+						callback(this.pendingDuplicates[i], i);
+						continue;
+					} else if(btnId === 'yes') {
+						var newName, nameCount = 0, index = i,
+							nameExt = this.pendingDuplicates[i].name.split('.'),
+							name, extension = nameExt.pop();
+						if(nameExt.length === 0) {
+							name = extension;
+							extension = null;
+						} else {
+							name = nameExt.join('.');
+						}
+						while(index !== -1) {
+							nameCount++;
+							newName = name + '('+nameCount+')';
+							index = this.targetStore.find('name', newName);
+						}
+						if(extension !== null) {
+							newName += ('.'+extension);
+						}
+						callback(this.pendingDuplicates[i], false, newName);
+					}
+				}
+				this.pendingDuplicates = {};
+			},
+			scope:this
+		});
+
 	},
 	
 	/**

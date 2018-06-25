@@ -78,6 +78,11 @@
   
   
   go.Stores = {
+	/**
+	 * 
+	 * @param {string} name
+	 * @returns {EntityManagerL#1.stores|go.data.EntityStore|stores|Boolean}
+	 */
     get: function (name) {
       
       name = name.toLowerCase();

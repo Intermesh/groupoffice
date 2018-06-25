@@ -3,7 +3,7 @@ namespace go\modules\community\files\model;
 
 use GO;
 use go\core\acl\model;
-use go\core\auth\model\User;
+use go\modules\core\users\model\User;
 use go\core\db\Query;
 use go\core\fs\Blob;
 use go\core\fs\MetaData;
@@ -187,7 +187,7 @@ class Node extends model\AclEntity {
 	protected function getSearchDescription() {
 		$user = User::findById(GO()->getUserId());
 		
-		return $user?$this->createdAt->format($user->date_format):'';
+		return $user ? $this->createdAt->format('c') : '';
 	}
 
 	protected function getSearchName() {
