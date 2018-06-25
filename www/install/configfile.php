@@ -105,13 +105,13 @@ require('header.php');
 		
 		<section>
 			<fieldset>
-				<h2>Create config file</h2>
-				<p>Please create a writeable config.php file here: <?= $configFile; ?>.</p>
+				<h2>Config file</h2>
+				<p class="error">Please create a writeable config.php file here: <?= $configFile; ?>.</p>
 			</fieldset>
 		</section>
 		
 
-		<?php else: ?>
+		<?php endif ?>
 		
 		<section>
 			<form method="POST" action="" onsubmit="submitButton.disabled = true;">
@@ -181,9 +181,6 @@ require('header.php');
 			</form>
 		</section>
 
-		
-
-		<?php endif; ?>
-
+	
 		
 		<?php require('footer.php'); ?>
