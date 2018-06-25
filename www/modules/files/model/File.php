@@ -540,8 +540,8 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 	 * @param boolean $save unused
 	 * @return boolean if save was successful
 	 */
-	protected function log($action, $save=true) {
-		$log = parent::log($action, false);
+	protected function log($action, $save=true, $modifiedCustomfieldAttrs = false) {
+		$log = parent::log($action, false, $modifiedCustomfieldAttrs);
 		if(empty($log))
 			return false;
 		if($log->action=='update') {
