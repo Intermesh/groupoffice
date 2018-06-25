@@ -3424,7 +3424,10 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 	 * @return boolean|\GO\Log\Model\Log returns the created log or succuss status when save is true
 	 */
 	protected function log($action, $save=true, $modifiedCustomfieldAttrs=false){
-
+		// jsonData field in go_log might not exist yet during upgrade
+		if($_GET['r'] == 'maintenance/upgrade') {
+			return true;
+		}
 		$message = $this->getLogMessage($action);
 		if($message && GO::modules()->isInstalled('log')){
 			
