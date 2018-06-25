@@ -194,7 +194,6 @@ try {
 					//refetch module to see if package was updated
 					if (!$module->package) {
 						$module = Module::findById($moduleId);
-						var_dump($module->package);
 						$newBackendUpgrade = $module->package != null;
 						if ($newBackendUpgrade) {
 							$module->version = $counts[$moduleId] = 0;
