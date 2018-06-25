@@ -1396,7 +1396,8 @@ GO.email.saveAllAttachments = function(panel){
 						uid: panel.uid,
 						mailbox: panel.mailbox,
 						account_id: panel.account_id,
-						folder_id: selectedFolderNode.attributes.id
+						folder_id: selectedFolderNode.attributes.id,
+						filepath:panel.data.path//smime message are cached on disk
 					},
 					success: function(options, response, result){
 						// Successfully saved all attachments

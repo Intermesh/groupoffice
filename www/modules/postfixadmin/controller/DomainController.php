@@ -8,6 +8,7 @@ class DomainController extends \GO\Base\Controller\AbstractModelController {
 
 	protected $model = 'GO\Postfixadmin\Model\Domain';
 	
+	
 	protected function remoteComboFields() {
 		return array('user_id'=>'$model->user->name');
 	}
@@ -109,7 +110,8 @@ class DomainController extends \GO\Base\Controller\AbstractModelController {
 		return array(
 				'getusage', //handled by token
 				'export',
-				'import'
+				'import',
+				'correctmaildirpaths'
 		);
 	}
 	
@@ -171,4 +173,58 @@ class DomainController extends \GO\Base\Controller\AbstractModelController {
 		echo $export->download();
 	}
 	
+	
+	protected function actionCorrectMaildirPaths($domain = null) {
+		
+		if(!$this->isCli()) {
+			throw new \Exception("Only run this as root on CLI");
+		}
+		$findParams = new \GO\Base\Db\FindParams();
+		$findParams->joinRelation('domain');
+		
+		if(isset($domain)) {
+			$findParams->getCriteria()->addCondition('domain', $domain, '=', 'domain');			
+		}
+		
+		$mailboxes = \GO\Postfixadmin\Model\Mailbox::model()->find($findParams);
+		
+		$rootDir = '/home/vmail/';
+		$tmp = $rootDir . "tmp/" . uniqid() .'/';
+		$this->exec("mkdir -p ".$tmp);
+		
+		foreach($mailboxes as $mailbox) {
+			
+			echo "Converting ".$mailbox->username . "\n";
+
+			$parts = explode('@', $mailbox->username);
+			
+			$home = $rootDir . $mailbox->domain->domain . '/' . $parts[0] . '/';			
+			$maildir = $home . 'Maildir/';
+			if(!is_dir($home)) {
+				echo "Maildir does not exist\n";
+			} else {
+
+				$this->exec("mv ". $home .' '. $tmp);
+				$this->exec("mkdir " . $home);
+				$this->exec("mv " . $tmp . basename($home) .' '.$maildir);
+				exec("mv -f  ".$maildir.'sieve ' . $home);
+			}
+			$mailbox->maildir = substr($maildir, strlen($rootDir));
+			if(!$mailbox->save()) {
+				throw new \Exception("Could not save mailbox");
+			}			
+		}
+		$this->exec("service dovecot restart");
+	}
+	
+	private function exec($cmd) {
+		echo "Running " . $cmd . "\n";
+		system($cmd, $return);
+
+		if ($return > 0) {
+			throw new \Exception("Command failed with status " . $return);
+		}
+
+		return $output;
+	}
 }

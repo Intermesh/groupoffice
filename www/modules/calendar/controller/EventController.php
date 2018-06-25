@@ -133,53 +133,57 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			return false;
 		}
 		
-		 if (!empty($params['exception_date'])) {
-			//reset the original attributes other wise create exception can fail
-			$model->resetAttributes();
+		if (!empty($params['exception_date'])) {
+			$recurringEvent = \GO\Calendar\Model\Event::model()->findByPk($params['exception_for_event_id']);
+			
 			//$params['recurrenceExceptionDate'] is a unixtimestamp. We should return this event with an empty id and the exception date.			
 			//this parameter is sent by the view when it wants to edit a single occurence of a repeating event.
-			$recurringEvent = \GO\Calendar\Model\Event::model()->findByPk($params['exception_for_event_id']);
-			if(!empty($params['thisAndFuture']) && $params['thisAndFuture'] == 'true') {
-				// Save This and Future
-				$model = $recurringEvent->duplicate(array('uuid'=>null));
-				//$model = new \GO\Calendar\Model\Event();
-				unset($params['exception_for_event_id']);
-				unset($params['repeat_end_time']);
-				$duration = $model->end_time - $model->start_time;
-				$this->_setEventAttributes($model, $params);
-				
-				if (isset($params['offset'])) {
-					$d = date('Y-m-d', $params['exception_date']);
-					$t = date('G:i', $model->start_time);
-					$start_time = strtotime($d . ' ' . $t);
-					// not pretty, fix in v6.6
-					$model->start_time = \GO\Base\Util\Date::roundQuarters($start_time);
-					$model->end_time = \GO\Base\Util\Date::roundQuarters($model->start_time+ $duration);
-					$untilTime = $model->start_time - $params['offset'] - 1;
+			
+			if($params['exception_date'] != $recurringEvent->start_time) {
+				//reset the original attributes other wise create exception can fail
+				$model->resetAttributes();
+				if(!empty($params['thisAndFuture']) && $params['thisAndFuture'] == 'true') {
+					// Save This and Future
+					$model = $recurringEvent->duplicate(array('uuid'=>null));
+					//$model = new \GO\Calendar\Model\Event();
+					unset($params['exception_for_event_id']);
+					unset($params['repeat_end_time']);
+					$duration = $model->end_time - $model->start_time;
+					$this->_setEventAttributes($model, $params);
+
+					if (isset($params['offset'])) {
+						$d = date('Y-m-d', $params['exception_date']);
+						$t = date('G:i', $model->start_time);
+						$start_time = strtotime($d . ' ' . $t);
+						// not pretty, fix in v6.6
+						$model->start_time = \GO\Base\Util\Date::roundQuarters($start_time);
+						$model->end_time = \GO\Base\Util\Date::roundQuarters($model->start_time+ $duration);
+						$untilTime = strtotime($d. ' 00:00');// $model->start_time - $params['offset'] - 1;
+					} else {
+						// exception_date comes incorrectly from client, fix in GO 6.6
+						$model->start_time = $params['exception_date']; 
+						$untilTime = strtotime(date('Y-m-d', $params['exception_date']). ' 00:00');//$params['exception_date']-1;
+					}
+
+					$rRule = new \GO\Base\Util\Icalendar\Rrule();
+					$rRule->readIcalendarRruleString($recurringEvent->start_time, $recurringEvent->rrule);
+					$model->rrule = $rRule->createRrule();
+
+					$rRule->setParams(array('until'=> $untilTime));
+					$recurringEvent->rrule = $rRule->createRrule();
+					$recurringEvent->repeat_end_time = $untilTime;
+					$recurringEvent->save(); // CLOSE Recurrence, forget about exceptions (this en future means everything)
 				} else {
-					// exception_date comes incorrectly from client, fix in GO 6.6
-					$model->start_time = $params['exception_date']; 
-					$untilTime = $params['exception_date']-1;
+					$model = $recurringEvent->createExceptionEvent($params['exception_date'], array(), true);
+					unset($params['exception_date']);
+					unset($params['id']);
+
+					if(!$model)
+						throw new \Exception("Could not create exception!");
+
+					$this->_setEventAttributes($model, $params);
+
 				}
-				
-				$rRule = new \GO\Base\Util\Icalendar\Rrule();
-				$rRule->readIcalendarRruleString($recurringEvent->start_time, $recurringEvent->rrule);
-				$model->rrule = $rRule->createRrule();
-
-				$rRule->setParams(array('until'=> $untilTime));
-				$recurringEvent->rrule = $rRule->createRrule();
-				$recurringEvent->repeat_end_time = $untilTime;
-				$recurringEvent->save(); // CLOSE Recurrence, forget about exceptions (this en future means everything)
-			} else {
-				$model = $recurringEvent->createExceptionEvent($params['exception_date'], array(), true);
-				unset($params['exception_date']);
-				unset($params['id']);
-
-				if(!$model)
-					throw new \Exception("Could not create exception!");
-
-				$this->_setEventAttributes($model, $params);
-				
 			}
 		}
 				

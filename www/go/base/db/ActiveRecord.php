@@ -3334,15 +3334,18 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 			//check if other fields than model_id were modified.
 			$modified = $this->_customfieldsRecord->getModifiedAttributes();
 			unset($modified['model_id']);
-
-			if(count($modified))
-				$this->_customfieldsRecord->save();
+			
+			if(count($modified) || $this->_customfieldsRecord->isNew) {
+				if(!$this->_customfieldsRecord->save()) {
+					throw new \Exception("Could not save custom fields ". var_export($this->_customfieldsRecord->getValidationErrors(), true));
+				}
+			}
 
 //			if($this->customfieldsRecord->save())
 //				$this->touch(); // If the customfieldsRecord is saved then set the mtime of this record.
 		}
 
-		$this->log($wasNew ? \GO\Log\Model\Log::ACTION_ADD : \GO\Log\Model\Log::ACTION_UPDATE);
+		$this->log($wasNew ? \GO\Log\Model\Log::ACTION_ADD : \GO\Log\Model\Log::ACTION_UPDATE,true,isset($this->_customfieldsRecord) ? $modified : false);
 
 
 
@@ -3398,7 +3401,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 	 * @param string $action
 	 * @return array Data for the JSON string 
 	 */
-	public function getLogJSON($action){
+	public function getLogJSON($action,$modifiedCustomfieldAttrs=false){
 		
 		$cutoffString = ' ..Cut off at 500 chars.';
 		$cutoffLength = 500;
@@ -3408,11 +3411,22 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 				return $this->getAttributes();
 			case \GO\Log\Model\Log::ACTION_UPDATE:
 				$oldValues = $this->getModifiedAttributes();
-				
+								
 				$modifications = array();
 				foreach($oldValues as  $key=>$oldVal){
 					
 					$newVal = $this->getAttribute($key);
+					
+//					// Check if the value changed from false, to null
+//					if(is_null($newVal) && $oldVal === false){
+//						continue;
+//					}
+//					
+					// Check if the value changed from false, to null
+					if(empty($newVal) && empty($oldVal)){
+						continue;
+					}
+
 					if(strlen($newVal) > $cutoffLength){
 						$newVal = substr($newVal,0,$cutoffLength).$cutoffString;
 					}
@@ -3423,6 +3437,31 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 					
 					$modifications[$key]=array($oldVal,$newVal);	
 				}
+				
+				// Also track customfieldsrecord changes
+				if($this->customfieldsRecord && $modifiedCustomfieldAttrs){
+										
+					foreach($modifiedCustomfieldAttrs as  $key=>$oldVal){
+						$newVal = $this->customfieldsRecord->getAttribute($key);
+						if(empty($newVal) && empty($oldVal)){
+						continue;
+					}
+
+					if(strlen($newVal) > $cutoffLength){
+						$newVal = substr($newVal,0,$cutoffLength).$cutoffString;
+					}
+					
+					if(strlen($oldVal) > $cutoffLength){
+						$oldVal = substr($oldVal,0,$cutoffLength).$cutoffString;
+					}
+					
+					$attrLabel = $this->getCustomfieldsRecord()->getAttributeLabelWithoutCategoryName($key);
+					
+					$modifications[$attrLabel.' ('.$key.')']=array($oldVal,$newVal);	
+					}
+				}
+				
+				
 				return $modifications;
 			case \GO\Log\Model\Log::ACTION_ADD:
 				return $this->getAttributes();
@@ -3438,12 +3477,12 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 	 * @param boolean $save set the false to not directly save the create Log record
 	 * @return boolean|\GO\Log\Model\Log returns the created log or succuss status when save is true
 	 */
-	protected function log($action, $save=true){
+	protected function log($action, $save=true, $modifiedCustomfieldAttrs=false){
 
 		$message = $this->getLogMessage($action);
 		if($message && GO::modules()->isInstalled('log')){
 			
-			$data = $this->getLogJSON($action);
+			$data = $this->getLogJSON($action,$modifiedCustomfieldAttrs);
 			
 			$log = new \GO\Log\Model\Log();
 
@@ -4830,6 +4869,11 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 
 
 	public function rebuildSearchCache(){
+		
+		$pdo = new \GO\Base\Db\PDO();
+			//to avoid memory errors
+		$pdo->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY,false);
+		$this->setDbConnection($pdo);
 		
 		$rc = new \GO\Base\Util\ReflectionClass($this);
 		$overriddenMethods = $rc->getOverriddenMethods();
