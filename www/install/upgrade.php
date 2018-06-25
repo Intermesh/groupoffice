@@ -25,7 +25,7 @@ function isValidDb() {
 					->where('name', '=', 'upgrade_mtime')
 					->single();
 
-	if($mtime < 20180614) {
+	if($mtime < 20180511) {
 		throw new \Exception("You're database is not on the latest 6.2 version. Please upgrade it to the latest 6.2 first and make sure the modules 'customfields' and 'search' are installed.");
 	}
 	
@@ -60,8 +60,7 @@ try {
 	GO()->getCache()->flush(false);
 	GO()->setCache(new \go\core\cache\None());
 	
-	if (isValidDb() == 62) {
-		//todo: verify this is a valid 6.2 database
+	if (isValidDb() == 62) {		
 		require(Environment::get()->getInstallFolder() . '/install/62to63.php');
 	}
 
@@ -251,7 +250,9 @@ try {
 	
 	
 } catch (\Exception $e) {
-	echo "<b>Error:</b> ".$e->getMessage();
+	echo "<b>Error:</b> ".$e->getMessage()."\n\n";;
+	
+	echo $e->getTraceAsString();
 	
 	echo "</pre></div></section>";
 }
