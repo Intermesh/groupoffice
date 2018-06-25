@@ -82,11 +82,11 @@ if($_SERVER['REQUEST_METHOD'] != 'POST')
 	$dataFolder = new \go\core\fs\Folder($config['file_storage_path']);
 	
 
-	if($dataFolder->isWritable() && $tmpFolder->isWritable() && dbConnect($config) && dbIsEmpty($config)) {
+	if($dataFolder->isWritable() && $tmpFolder->isWritable() && dbConnect($config)) {
 		$cFile = new \go\core\fs\File($configFile);
 		
 		if(!$cFile->putContents("<?php\n\n\$config = ".var_export($config, true) .";\n\n")) {
-			die("Could not write INI");
+			die("Could not write config.php");
 		} else
 		{
 			header('Location: install.php');
