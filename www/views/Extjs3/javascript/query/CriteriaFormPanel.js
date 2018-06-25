@@ -62,7 +62,7 @@ GO.query.CriteriaFormPanel = Ext.extend(Ext.form.FormPanel , {
 		}),
 		this.fieldComboBox = new GO.form.ComboBox({
 			store: this.fieldStore,
-			fieldLabel: GO.lang.queryField,
+			fieldLabel: t("Field"),
 			hiddenName: 'field',
 			valueField:'name',
 			displayField:'label',

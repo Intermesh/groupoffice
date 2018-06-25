@@ -22,7 +22,7 @@ GO.addressbook.AddresslistGroupGrid = Ext.extend(GO.grid.GridPanel,{
 		var fields = {
 			fields:['id', 'name'],
 			columns:[{
-				header: GO.lang.strId,
+				header: "ID",
 				dataIndex: 'id',
 				hidden:true,				
 				width:30
