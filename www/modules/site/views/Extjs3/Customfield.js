@@ -1,4 +1,4 @@
-GO.moduleManager.onModuleReady('customfields', function(){
+Ext.onReady(function() {
 	
 	GO.customfields.nonGridTypes.push('sitefile');
 	GO.customfields.dataTypes["GO\\Site\\Customfieldtype\\Sitefile"]={
@@ -27,4 +27,4 @@ GO.moduleManager.onModuleReady('customfields', function(){
 		}
 	}
 
-}, this);
+});

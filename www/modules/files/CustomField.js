@@ -1,4 +1,4 @@
-GO.moduleManager.onModuleReady('customfields', function(){
+Ext.onReady(function() {
 	GO.customfields.nonGridTypes.push('file');
 	GO.customfields.dataTypes["GO\\Files\\Customfieldtype\\File"]={
 		label : t("File", "files"),
@@ -12,4 +12,4 @@ GO.moduleManager.onModuleReady('customfields', function(){
 		}
 	}
 
-}, this);
+});
