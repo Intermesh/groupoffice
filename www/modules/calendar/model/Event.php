@@ -218,9 +218,9 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		);
 	}
 	
-	protected function log($action, $save = true) {
+	protected function log($action, $save = true, $modifiedCustomfieldAttrs=false) {
 		if(!$this->updatingRelatedEvent) {
-			return parent::log($action, $save);
+			return parent::log($action, $save, $modifiedCustomfieldAttrs);
 		} else
 		{
 			return true;
