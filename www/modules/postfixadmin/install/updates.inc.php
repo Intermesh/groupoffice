@@ -50,5 +50,5 @@ $updates['201610281650'][] = 'ALTER TABLE `pa_domains` CONVERT TO CHARACTER SET 
 $updates['201610281650'][] = 'ALTER TABLE `pa_mailboxes` ENGINE=InnoDB;';
 $updates['201610281650'][] = 'ALTER TABLE `pa_mailboxes` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;';
 
-$updates['201806010710'][] = 'ALTER TABLE `pa_mailboxes` ADD `homedir` VARCHAR(255) NOT NULL AFTER `maildir`;';
+$updates['201806010710'][] = 'ALTER TABLE `pa_mailboxes` ADD `homedir` VARCHAR(255) DEFAULT NULL AFTER `maildir`;';
 $updates['201806010710'][] = 'update `pa_mailboxes` set homedir = maildir;';
