@@ -26,6 +26,7 @@ class Server extends Entity {
 
 	public $smtpHostname;
 	public $smtpPort;
+	public $smtpUsername;
 	public $smtpPassword;
 	public $smtpUseUserCredentials= false;
 	public $smtpValidateCertificate = true;
