@@ -9,13 +9,19 @@
 	<meta name="robots" content="noindex" />
 	<meta http-equiv="x-ua-compatible" content="IE=edge">
 	<meta name="apple-mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-title" content="Group-Office">
-	
+	<meta name="apple-mobile-web-app-title" content="<?php echo \GO::config()->title; ?>">
+	<?php
+	if(!empty(\GO::config()->favicon)) {
+		echo '<link href="'.\GO::config()->favicon.'" rel="shortcut icon" type="image/x-icon">';
+	} else {
+	?>
 	<link rel="apple-touch-icon" sizes="180x180" href="<?php echo \GO::view()->getUrl().'themes/Paper/img/favicon'; ?>/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="<?php echo \GO::view()->getUrl().'themes/Paper/img/favicon'; ?>/favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="<?php echo \GO::view()->getUrl().'themes/Paper/img/favicon'; ?>/favicon-16x16.png">
 	<link rel="manifest" href="<?php echo \GO::view()->getUrl().'themes/Paper/img/favicon'; ?>/site.webmanifest">
 	<link rel="mask-icon" href="<?php echo \GO::view()->getUrl().'themes/Paper/img/favicon'; ?>/safari-pinned-tab.svg" color="#5bbad5">
+	<?php } ?>
+	
 	<meta name="msapplication-TileColor" content="#2b5797">
 	<meta name="theme-color" content="#ffffff">
 
