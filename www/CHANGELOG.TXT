@@ -1,3 +1,6 @@
+26-06-2018 6.2.100
+- Fixed SQL error in postfixadmin
+
 21-06-2018 6.2.99
 - Core: Fixed memory error in check database and build search cache with very large databases
 - Core: Also log customfield changes in the log function of activeRecord
