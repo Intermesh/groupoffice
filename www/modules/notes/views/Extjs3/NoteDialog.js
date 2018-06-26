@@ -224,8 +224,7 @@ GO.notes.NoteDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			}),
 			this.contentField = new Ext.form.TextArea({
 				name: 'note.content',
-				anchor: '100%',
-				height: 280,
+				anchor: '100% -100',
 				hideLabel:true
 			})]				
 		});

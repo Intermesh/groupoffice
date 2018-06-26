@@ -148,6 +148,9 @@ abstract class AbstractCustomfieldtype extends \GO\Base\Observable{
 
 	protected function getName($cf) {
 		$pos = strpos($cf,':');
+		if(!$pos) {
+			return $cf;
+		}
 		return substr($cf,$pos+1);
 	}
 	
