@@ -3896,7 +3896,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 			$sql .= "DELAYED ";
 
 		$sql .= "INTO `{$this->tableName()}` (`".implode('`,`', $fieldNames)."`) VALUES ".
-					"(:".implode(',:', $fieldNames).")";
+					"(:ins".implode(',:ins', array_keys($fieldNames)).")";
 
 		if($this->_debugSql){
 			$bindParams = array();
@@ -3909,11 +3909,11 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 		try{
 			$stmt = $this->getDbConnection()->prepare($sql);
 
-			foreach($fieldNames as  $field){
+			foreach($fieldNames as $i => $field){
 
 				$attr = $this->columns[$field];
 
-				$stmt->bindParam(':'.$field, $this->_attributes[$field], $attr['type'], empty($attr['length']) ? null : $attr['length']);
+				$stmt->bindParam(':ins'.$i, $this->_attributes[$field], $attr['type'], empty($attr['length']) ? null : $attr['length']);
 			}
 			$ret =  $stmt->execute();
 		}catch(\Exception $e){
@@ -3947,8 +3947,14 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 //			}
 //		}
 //
-		foreach($this->_modifiedAttributes as $field=>$oldValue)
-			$updates[] = "`$field`=:".$field;
+		$i = 0;
+		$paramMap = [];
+		foreach($this->_modifiedAttributes as $field=>$oldValue) {
+			$p[$field] = "upd".$i;
+			$updates[] = "`$field` = :".$p[$field];
+			
+			$i++;
+		}
 
 
 		if(!count($updates))
@@ -3959,24 +3965,27 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 
 		$bindParams=array();
 
-		if(is_array($this->primaryKey())){
+		$pk = $this->primaryKey();
+		if(!is_array($pk)){
+			$pk = [$pk];
+		}
 
-			$first=true;
-			foreach($this->primaryKey() as $field){
-				if(!$first)
-					$sql .= ' AND ';
-				else
-					$first=false;
-
-				$sql .= "`".$field."`=:".$field;
+		$first=true;
+		foreach($pk as $field){
+			if(!$first)
+				$sql .= ' AND ';
+			else
+				$first=false;
+			
+			if(!isset($p[$field])) {
+				$p[$field] = "upd".$i;
+				$i++;
 			}
 
-			$bindParams[$field]=$this->_attributes[$field];
-
-		}else{
-			$sql .= "`".$this->primaryKey()."`=:".$this->primaryKey();
-			$bindParams[$field]=$this->_attributes[$field];
+			$sql .= "`".$field."`=:".$p[$field];
 		}
+
+		$bindParams[$field]=$this->_attributes[$field];
 
 
 
@@ -3989,7 +3998,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 
 				if($this->isModified($field) || in_array($field, $pks)){
 					$bindParams[$field]=$this->_attributes[$field];
-					$stmt->bindParam(':'.$field, $this->_attributes[$field], $attr['type'], empty($attr['length']) ? null : $attr['length']);
+					$stmt->bindParam(':'.$p[$field], $this->_attributes[$field], $attr['type'], empty($attr['length']) ? null : $attr['length']);
 				}
 			}
 

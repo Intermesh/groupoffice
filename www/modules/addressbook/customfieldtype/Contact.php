@@ -23,7 +23,7 @@ class Contact extends \GO\Customfields\Customfieldtype\AbstractCustomfieldtype{
 			$id = $this->getId($attributes[$key]);
 			if(!\GO\Customfields\Model\AbstractCustomFieldsRecord::$formatForExport && !empty($id)){
 				$name = htmlspecialchars($this->getName($attributes[$key]), ENT_COMPAT, 'UTF-8');
-				$html='<a href="#addresbook/contact/{id}'.
+				$html='<a href="#contact/'.
 					$this->getId($attributes[$key]).'" title="'.$name.'">'.
 						$name.'</a>';
 			}else
