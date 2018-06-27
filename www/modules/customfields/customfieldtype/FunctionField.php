@@ -79,12 +79,12 @@ class FunctionField extends AbstractCustomfieldtype {
 			if($result_string=="") {
 				//$result_string=""
 				unset($attributes[$key]);
-				return "";
+				return 0;
 			}			
 		}
 
 		$attributes[$key] = $result_string;
-		return $attributes[$key];
+		return (double) $attributes[$key];
 	}
 
 }

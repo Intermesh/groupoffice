@@ -23,7 +23,7 @@ class Company extends \GO\Customfields\Customfieldtype\AbstractCustomfieldtype{
 
 			if(!\GO\Customfields\Model\AbstractCustomFieldsRecord::$formatForExport){
 				$name = htmlspecialchars($this->getName($attributes[$key]), ENT_COMPAT, 'UTF-8');
-				$html='<a href="#addresbook/company/'.
+				$html='<a href="#company/'.
 					$this->getId($attributes[$key]).'" title="'.$name.'">'.
 						$name.'</a>';
 			}else

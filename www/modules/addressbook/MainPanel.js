@@ -306,7 +306,7 @@ this.exportCompanyMenu.setColumnModel(this.companiesGrid.getColumnModel());
 		}
 	});
 
-	this.contactEastPanel = this.contactDetail = new GO.addressbook.ContactDetail({ //contactDetail added for routing
+	GO.addressbook.contactDetail = this.contactEastPanel = this.contactDetail = new GO.addressbook.ContactDetail({ //contactDetail added for routing
 		id:'ab-contact-panel',
 		border:false,
 		region:'east',
@@ -325,7 +325,7 @@ this.exportCompanyMenu.setColumnModel(this.companiesGrid.getColumnModel());
 		}
 	});
 
-	this.companyEastPanel = this.companyDetail = new GO.addressbook.CompanyReadPanel({
+	GO.addressbook.companyDetail = this.companyEastPanel = this.companyDetail = new GO.addressbook.CompanyReadPanel({
 		id:'ab-company-panel',
 		border:false,
 		region:'east',
