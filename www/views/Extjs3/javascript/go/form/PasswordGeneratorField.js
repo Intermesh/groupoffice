@@ -8,6 +8,10 @@ go.form.PasswordGeneratorField = Ext.extend(Ext.form.TriggerField, {
 		cls: "x-form-trigger ic-refresh",
 		'ext:qtip': t("Generate password")
 	},
+	initComponent: function() {
+		this.defaultAutoCreate.autocomplete = "new-password"; //prevent autocomplete
+		go.form.PasswordGeneratorField.superclass.initComponent.call(this);
+	},
 	onTriggerClick: function () {
 		var pass = this.generatePassword(8);
 		this.setValue(pass);

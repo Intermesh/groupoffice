@@ -477,12 +477,15 @@ ul.x-tab-strip-bottom{
 	margin-bottom: dp(16);
 }
 
-
-.x-form-field-wrap {
-	line-height: 0; //for textarea. Without this it gets extra margin somehow
+.x-form-field-trigger-wrap {
 	> input {
 		padding-right: dp(32); // for trigger button: todo twintrigger
 	}
+}
+
+.x-form-field-wrap {
+	line-height: 0; //for textarea. Without this it gets extra margin somehow
+
 	> span, > button.x-form-trigger { // triggers
 		display:inline-block;
 		position: absolute;
