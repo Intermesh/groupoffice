@@ -93,13 +93,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 			},
 			items:[
 				this.passwordField1 = new go.form.PasswordGeneratorField({
-						listeners: {
-						afterrender: function(field) {
-							//clear browser autofill
-							setTimeout(function(){
-								field.reset();
-							}, 500);							
-						},
+					listeners: {						
 						generated : function(field, pass) {
 							this.passwordField2.setValue(pass);
 						},
@@ -110,14 +104,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 				}),
 		
 				this.passwordField2 = new Ext.form.TextField({
-					listeners: {
-						afterrender: function(field) {							
-							setTimeout(function(){
-								field.reset();
-							}, 1000);							
-						},
-						scope: this
-					},
+					inputType: 'password',
 					fieldLabel: t("Confirm password", "users"),
 					name: 'passwordConfirm'
 				})
