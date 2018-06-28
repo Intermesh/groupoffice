@@ -4893,14 +4893,12 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 		if(in_array("getCacheAttributes", $overriddenMethods)){
 			
 			$start = 0;
-		
+			$limit = 1000;
 			//per thousands to keep memory low
-			$stmt = $this->find(FindParams::newInstance()->ignoreAcl()->select('t.*')->limit(1000)->start($start));
-
+			$stmt = $this->find(FindParams::newInstance()->ignoreAcl()->select('t.*')->limit($limit)->start($start));
 			while($stmt->rowCount()) {	
-				$stmt->callOnEach('cacheSearchRecord', true);
-				
-				$stmt = $this->find(FindParams::newInstance()->ignoreAcl()->select('t.*')->limit(1000)->start($start+=1000));				
+				$stmt->callOnEach('cacheSearchRecord', true);				
+				$stmt = $this->find(FindParams::newInstance()->ignoreAcl()->select('t.*')->limit($limit)->start($start += $limit));		
 			}
 			
 		}
