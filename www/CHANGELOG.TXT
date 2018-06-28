@@ -1,3 +1,6 @@
+28-06-2018 6.2.101
+- Fixed problem in database check
+
 26-06-2018 6.2.100
 - Fixed SQL error in postfixadmin
 
