@@ -230,7 +230,8 @@ try {
 	echo "Flushing cache\n";
 	GO::clearCache(); //legacy
 	App::get()->getCache()->flush(false);
-	App::get()->getDataFolder()->getFolder('clientscripts')->delete();
+	$webclient = new \go\core\webclient\Extjs3();
+	$webclient->flushCache();
 
 
 	echo "Rebuilding listeners\n";
