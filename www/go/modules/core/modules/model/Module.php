@@ -133,4 +133,21 @@ class Module extends AclEntity {
 		//hard delete!
 		return Entity::internalDelete();
 	}
+	
+	/**
+	 * Get all installed and available modules.
+	 * @return self[]
+	 */
+	public static function getInstalled() {
+		$modules = \go\modules\core\modules\model\Module::find()->where(['enabled' => true])->all();
+		
+		$available = [];
+		foreach($modules as $module) {
+			if($module->isAvailable()) {
+				$available[] = $module;
+			}
+		}
+		
+		return $available;
+	}
 }

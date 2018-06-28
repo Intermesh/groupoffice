@@ -181,38 +181,7 @@ class Language extends Singleton {
 	}
 
 	
-	public function getScript() {
-
-		$language = $this->isoCode;
-
-		$str = "var GO = GO || {};\n";
-
-		$extjsLang = $this->t("extjs_lang");
-		if ($extjsLang == 'extjs_lang')
-			$extjsLang = $language;
-
-		$viewRoot = Environment::get()->getInstallFolder()->getFolder('views/Extjs3');
-
-		$extLang = $viewRoot->getFile('ext/src/locale/ext-lang-' . $extjsLang . '.js');
-		if ($extLang->exists()) {
-			$str .= $extLang->getContents();
-		}
-
-		require(Environment::get()->getInstallFolder()->getFile('language/languages.php'));
-		$str .= "GO.Languages=[];\n";
-
-		foreach ($languages as $code => $language) {
-			$str .= 'GO.Languages.push(["' . $code . '","' . $language . '"]);' . "\n";
-		}
-
-		//Put all lang vars in js		
-		$l = $this->getAllLanguage();
-		$l['iso'] = $this->isoCode;
-		
-		$str .= 'GO.lang = ' . json_encode($l) . ";\n";
-
-		return $str;
-	}
+	
 	
 	public function getAllLanguage(){
 		$modules = Module::find();
