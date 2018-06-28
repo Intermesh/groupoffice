@@ -91,10 +91,10 @@ if(GO::config()->debug) {
 //echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' => \GO::language()->getLanguage()]) . '"></script>';
 echo '<script type="text/javascript" src="' . GO::config()->url . 'views/Extjs3/ext/adapter/ext/ext-base-debug.js"></script>';
 echo '<script type="text/javascript" src="' . GO::config()->url . 'views/Extjs3/ext/ext-all-debug.js"></script>';
-echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' => \go\core\Language::get()->getIsoCode()]) . '"></script>';
+echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?lang='.\go\core\Language::get()->getIsoCode() . '&v='.GO()->getVersion().'"></script>';
   
 if ($cacheFile->exists()) {
-	echo '<script type="text/javascript" src="' . GO::url('core/clientScripts', ['mtime' => GO::config()->mtime]) . '"></script>';
+	echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v= '. GO()->getVersion() . '"></script>';
 } else {
 
 	$scripts = array();
@@ -225,7 +225,7 @@ if ($cacheFile->exists()) {
 	
 	if (!GO::config()->debug) {
 		$minify->gzip($cacheFile->getPath());		
-		echo '<script type="text/javascript" src="' . GO::url('core/clientScripts', ['mtime' => GO::config()->mtime, 'lang' => \GO::language()->getLanguage()]) . '"></script>';
+		echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v= '. GO()->getVersion() . '"></script>';
 	} else
   {
 //    $fp = $cacheFile->open('w');
