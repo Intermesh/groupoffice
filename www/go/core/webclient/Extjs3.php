@@ -3,12 +3,18 @@
 namespace go\core\webclient;
 
 use GO;
+use go\core\App;
 use go\core\Environment;
 use go\core\fs\File;
 use go\core\Language;
+use go\modules\core\core\model\Settings;
 use go\modules\core\modules\model\Module;
 
 class Extjs3 {
+	
+	public function flushCache() {
+		return App::get()->getDataFolder()->getFolder('clientscripts')->delete();
+	}
 
 	/**
 	 * 
@@ -17,7 +23,7 @@ class Extjs3 {
 	 */
 	public function getCSSFile($theme = 'Paper') {
 
-		$cacheFile = GO()->getDataFolder()->getFile('clientscript/' . $theme . '/style.css');
+		$cacheFile = GO()->getDataFolder()->getFile('clientscripts/' . $theme . '/style.css');
 
 		if (GO()->getDebugger()->enabled || !$cacheFile->exists()) {
 //		if (!$cacheFile->exists()) {
@@ -64,7 +70,7 @@ class Extjs3 {
 	
 	private function replaceCssUrl($css, File $file){
 		
-		$baseurl = str_replace(Environment::get()->getInstallFolder()->getPath() . '/', \go\modules\core\core\model\Settings::get()->URL, $file->getFolder()->getPath()).'/';
+		$baseurl = str_replace(Environment::get()->getInstallFolder()->getPath() . '/', Settings::get()->URL, $file->getFolder()->getPath()).'/';
 		
 		return preg_replace_callback('/url[\s]*\(([^\)]*)\)/iU', 
 			function($matches) use($baseurl) { 
@@ -83,7 +89,7 @@ class Extjs3 {
 		$iso = Language::get()->getIsoCode();
 	
 		
-		$cacheFile = GO()->getDataFolder()->getFile('clientscript/lang_'.$iso.'.js');
+		$cacheFile = GO()->getDataFolder()->getFile('clientscripts/lang_'.$iso.'.js');
 
 		if (GO()->getDebugger()->enabled || !$cacheFile->exists()) {
 //		if (!$cacheFile->exists()) {
