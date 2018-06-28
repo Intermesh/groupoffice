@@ -26,7 +26,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 			layout: 'hbox',
 			items:[
 				{
-					width: 150,
+					width: 150,					
 					items: [
 						this.avatarComp = new go.form.FileField({
 							buttonOnly: true,
@@ -50,6 +50,9 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 				},{
 					flex:1,
 					layout: 'form',
+					defaults: {
+						width: dp(300)
+					},
 					items: [{
 						xtype: 'textfield',
 						name: 'username',
@@ -85,9 +88,18 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 		this.passwordFieldset = new Ext.form.FieldSet({
 			labelWidth:dp(152),
 			title: t('Password'),
+			defaults: {
+				width: dp(300)
+			},
 			items:[
-				this.passwordField1 = new go.form.PasswordGeneratorField({						
-					listeners: {
+				this.passwordField1 = new go.form.PasswordGeneratorField({
+						listeners: {
+						afterrender: function(field) {
+							//clear browser autofill
+							setTimeout(function(){
+								field.reset();
+							}, 500);							
+						},
 						generated : function(field, pass) {
 							this.passwordField2.setValue(pass);
 						},
@@ -98,7 +110,14 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 				}),
 		
 				this.passwordField2 = new Ext.form.TextField({
-					inputType: 'password',
+					listeners: {
+						afterrender: function(field) {							
+							setTimeout(function(){
+								field.reset();
+							}, 1000);							
+						},
+						scope: this
+					},
 					fieldLabel: t("Confirm password", "users"),
 					name: 'passwordConfirm'
 				})
