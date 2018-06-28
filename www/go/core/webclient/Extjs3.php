@@ -7,7 +7,6 @@ use go\core\Environment;
 use go\core\fs\File;
 use go\core\Language;
 use go\modules\core\modules\model\Module;
-use function GuzzleHttp\json_encode;
 
 class Extjs3 {
 
