@@ -29,12 +29,14 @@ class Extjs3 {
 					$folder = $module->module()->getFolder();
 					$file = $folder->getFile('views/extjs3/themes/default/style.css');
 					if ($file->exists()) {
-						$cacheFile->putContents($file->getContents(), FILE_APPEND);
+						$css = $this->replaceCssUrl($file->getContents(),$file);
+						$cacheFile->putContents($css, FILE_APPEND);
 					}
 
 					$file = $folder->getFile('views/extjs3/themes/' . $theme . '/style.css');
 					if ($file->exists()) {
-						$cacheFile->putContents($file->getContents(), FILE_APPEND);
+						$css = $this->replaceCssUrl($file->getContents(),$file);
+						$cacheFile->putContents($css, FILE_APPEND);
 						continue;
 					}
 				}
@@ -45,16 +47,30 @@ class Extjs3 {
 				$folder = Environment::get()->getInstallFolder()->getFolder('modules/' . $module->name);
 				$file = $folder->getFile('themes/Default/style.css');
 				if ($file->exists()) {
-					$cacheFile->putContents($file->getContents(), FILE_APPEND);
+					$css = $this->replaceCssUrl($file->getContents(),$file);
+					$cacheFile->putContents($css, FILE_APPEND);
 				}
 
 				$file = $folder->getFile('themes/' . $theme . '/style.css');
 				if ($file->exists()) {
-					$cacheFile->putContents($file->getContents(), FILE_APPEND);
+					$css = $this->replaceCssUrl($file->getContents(),$file);
+					$cacheFile->putContents($css, FILE_APPEND);
 				}
 			}
 		}
 		return $cacheFile;
+	}
+	
+	
+	private function replaceCssUrl($css, File $file){
+		
+		$baseurl = str_replace(Environment::get()->getInstallFolder()->getPath() . '/', \go\modules\core\core\model\Settings::get()->URL, $file->getFolder()->getPath()).'/';
+		
+		return preg_replace_callback('/url[\s]*\(([^\)]*)\)/iU', 
+			function($matches) use($baseurl) { 
+				return 'url('.$baseurl.trim(stripslashes($matches[1]),'\'" ').')';
+			}, $css);
+		 //return preg_replace('/url[\s]*\(([^\)]*)\)/ieU', "GO\Base\View\Extjs3::_replaceUrlCallback('$1', \$baseurl)", $css);
 	}
 	
 	

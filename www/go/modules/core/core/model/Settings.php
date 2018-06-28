@@ -219,6 +219,11 @@ class Settings extends core\Settings {
 			unset($_SESSION['GO_SESSION']['newconfig']);
 		}
 		
+		//Make sure URL has trailing slash
+		if(isset($this->URL)) {
+			$this->URL = rtrim($this->URL, '/ ').'/';
+		}
+		
 		return parent::save();
 	}
 }
