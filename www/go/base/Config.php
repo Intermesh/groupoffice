@@ -476,6 +476,10 @@ var $billing_clear_payment_method_on_duplicate = true;
 
 	/**
 	 * Relative hostname with slash on both start and end
+	 * 
+	 * use go\modules\core\core\model\Settings:URL
+	 * 
+	 * @deprecated since 6.3
 	 *
 	 * @var     StringHelper
 	 * @access  public
