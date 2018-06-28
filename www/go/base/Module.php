@@ -470,7 +470,6 @@ class Module extends Observable {
 		foreach($models as $model){	
 			if($model->isSubclassOf("GO\Base\Db\ActiveRecord")){
 				$m = \GO::getModel($model->getName());
-				$m->setDbConnection($pdo);
 				
 				if($m->checkDatabaseSupported()){					
 					
