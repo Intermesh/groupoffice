@@ -223,7 +223,7 @@ $cWarning:		color($orange, 700);
 $cSelected: color($bg, 'hover'); // click on menus, tree items, table
 $cHover: var(--c-primary-tp);
 $cActive: color($grey, 200); // focussed
-$cAnchor: color($fg, "text");
+$cAnchor: rgb(36, 58, 128);
 
 .success { color: $cSuccess !important; }
 .danger { color: $cDanger !important; }

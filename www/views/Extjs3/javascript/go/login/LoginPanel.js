@@ -56,12 +56,12 @@ go.login.LoginPanel = Ext.extend(Ext.Container, {
 				}
 
 				if (GO.settings.config.login_message) {
-					var msg = go.notifier.msg({
+					me.loginMsg = go.notifier.msg({
 						description: GO.settings.config.login_message
 					});
 					
 					me.on("destroy", function() {
-						go.notifier.remove(msg);
+						go.notifier.remove(me.loginMsg);
 					});
 					
 				}

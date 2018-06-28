@@ -35,9 +35,10 @@ body * {
 	}
 }
 
+//default links are black in the UI
 a {
 	cursor: pointer;
-	color: $cAnchor;		
+	color: color($fg, "text");		
 	text-decoration: none;
 /*	&:link, &:active, &:visited {
 		color: inherit;
@@ -49,6 +50,13 @@ a {
 	label {
 		cursor: inherit;
 	}	
+}
+
+//blue links here
+.ext-mb-content {
+	a {
+		color: $cAnchor;
+	}
 }
  
 #loading{
