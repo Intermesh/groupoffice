@@ -196,8 +196,15 @@ namespace go\core {
 							"maxUsers" => 0,
 							"storageQuota" => 0,
 							"allowedModules" => ""
+					],
+					"branding" => [
+							"name" => "GroupOffice"
 					]
 			];
+			
+			if(isset($config['product_name'])) {
+				$this->config['branding']['name'] = $config['product_name'];
+			}
 			return $this->config;
 		}
 

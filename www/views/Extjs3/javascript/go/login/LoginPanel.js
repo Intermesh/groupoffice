@@ -22,7 +22,7 @@ go.login.LoginPanel = Ext.extend(Ext.Container, {
 		});
 
         var htmlText = 'Powered by ' + t('product_name');
-        if (t('product_name') == 'Group-Office') {
+        if (t('product_name') == 'GroupOffice') {
             htmlText = htmlText + ' - <a target="_blank" href="https://www.group-office.com">https://www.group-office.com</a>';
         }
 

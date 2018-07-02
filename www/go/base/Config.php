@@ -985,7 +985,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var StringHelper
 	 */
 
-	var $product_name='Group-Office';
+	var $product_name='GroupOffice';
 
 
 		/* The permissions mode to use when creating files
@@ -1399,7 +1399,9 @@ var $billing_clear_payment_method_on_duplicate = true;
 		$this->_original_config = $config;
 		
 		foreach($config as $key=>$value) {
-			$this->$key=$value;
+			if(!method_exists($this, "get".$key)) {
+				$this->$key=$value;
+			}
 		}
 		
 		$this->file_storage_path = rtrim($this->file_storage_path, '/').'/';

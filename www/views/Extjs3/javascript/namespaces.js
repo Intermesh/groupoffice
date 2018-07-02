@@ -11,7 +11,7 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
  
-Ext.namespace("GO");
+
 Ext.namespace("GO.form");
 Ext.namespace("GO.util");
 Ext.namespace('GO.plugins');
