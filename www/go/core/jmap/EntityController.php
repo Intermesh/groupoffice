@@ -37,6 +37,11 @@ abstract class EntityController extends ReadOnlyEntityController {
 			$params['destroy'] = [];
 		}
 		
+		
+		if(count($params['create']) + count($params['update'])  + count($params['destroy']) > Capabilities::get()->maxObjectsInSet) {
+			throw new InvalidArguments("You can't set more than " . Capabilities::get()->maxObjectsInGet . " objects");
+		}
+		
 		return $params;
 	}
 

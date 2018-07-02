@@ -54,12 +54,16 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	
 	//created this because grouping store must share this.
 	setup : function() {
-			if(!this.baseParams) {
+		if(!this.baseParams) {
 			this.baseParams = {};
 		}
 		
 		if(!this.baseParams.filter) {
 			this.baseParams.filter = {};
+		}
+		
+		if(!this.baseParams) {
+			this.baseParams.limit = 100; //default limit of 100.
 		}
 		
 		this.on('beforeload', function() {			

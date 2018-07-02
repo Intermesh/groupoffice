@@ -1202,4 +1202,14 @@ table[id^="comments-ext"] b {
 	a {
 		color: color($fg, 'text');
 	}
+	
+	.count {
+		float: right;
+		@extend %badge;
+	}
+	
+	a.show-more {
+		font-style: italic;
+		color: $cAnchor;
+	}
 }
