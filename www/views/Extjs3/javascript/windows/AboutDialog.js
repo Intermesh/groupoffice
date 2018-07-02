@@ -38,7 +38,7 @@ GO.dialog.AboutDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 			width: dp(480),
 			resizable: false,
 			closeAction:'hide',
-			title:t("About Group-Office").replace('Group-Office', GO.settings.config.product_name),
+			title:t("About GroupOffice"),
 			buttons: []
     });
 		
@@ -68,7 +68,7 @@ GO.dialog.AboutDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 					hidden:true,
 					style:'margin-top:10px',
 					xtype:'fieldset',
-					title:t("This Group-Office installation is using"),
+					title:t("This instance is using"),
 					items:[
 						new GO.form.PlainField({
 							fieldLabel:t("Files"),

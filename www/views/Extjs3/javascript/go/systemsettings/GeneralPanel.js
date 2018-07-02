@@ -36,7 +36,7 @@ go.systemsettings.GeneralPanel = Ext.extend(Ext.form.FormPanel, {
 							xtype: 'textfield',
 							name: 'URL',
 							fieldLabel: t('URL'),
-							hint: t("The full URL to Group-Office.")
+							hint: t("The full URL to GroupOffice.")
 						}
 					]
 				}, {
