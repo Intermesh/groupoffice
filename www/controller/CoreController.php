@@ -190,7 +190,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		$store->getColumnModel()->formatColumn('cf', '$model->id.":".$model->name'); //special field used by custom fields. They need an id an value in one.
 		
 		//only get users that are enabled
-		$enabledParam = \GO\Base\Db\FindParams::newInstance();
+		$enabledParam = \GO\Base\Db\FindParams::newInstance()->debugSql();
 		if(!empty(\GO::config()->hide_disabled_users)) {
 			$enabledParam->criteria(\GO\Base\Db\FindCriteria::newInstance()->addCondition('enabled', true));
 		}
