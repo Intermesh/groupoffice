@@ -158,6 +158,8 @@ class Instance extends Entity {
 				$this->dropDatabaseUser($dbUsername);
 			}
 			
+			parent::deleteHard();
+			
 			throw $e;
 		}
 		
@@ -218,7 +220,7 @@ class Instance extends Entity {
 	 */
 	private function getInstanceDbConnection() {
 		if(!isset($this->instanceDbConn)) {			
-			require($this->getConfigFile()->getPath());
+			include($this->getConfigFile()->getPath());
 			$dsn = 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . $config['db_name'];
 			$this->instanceDbConn = new \go\core\db\Connection($dsn, $config['db_user'], $config['db_pass']);
 		}

@@ -96,7 +96,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 						break;
 				}
 				if(cb) {
-					cb.call(this, false, null);
+					cb.call(scope, this, false, null);
 				}
 			}
 		}, this);

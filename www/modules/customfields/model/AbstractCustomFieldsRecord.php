@@ -150,21 +150,20 @@ abstract class AbstractCustomFieldsRecord extends \GO\Base\Db\ActiveRecord{
 	 */
 	public function getDefaultFindSelectFields($single=false, $tableAlias='t'){
 		
-		// This is changed so that textarea fields are also returned.
-		// This was needed to make the external api be able to return all data
 		
-		return $tableAlias.'.*';
-//		if($single)
-//			return $tableAlias.'.*';
-//		
-//		$fields=array();
-//		
-//		foreach($this->columns as $name=>$attr){
-//			if($attr['gotype']=='customfield' && !$attr['customfield']->exclude_from_grid && $attr['customfield']->customfieldtype->selectForGrid())
-//				$fields[]=$name;
-//		}		
-//		
-//		return count($fields) ? "`$tableAlias`.`".implode('`, `'.$tableAlias.'`.`', $fields)."`" : "";
+		if($single)
+			return $tableAlias.'.*';
+		
+		$fields=array();
+		
+		foreach($this->columns as $name=>$attr){			
+			if($name == 'id') {
+				continue;
+			}
+			$fields[]=$name;
+		}		
+		
+		return count($fields) ? "`$tableAlias`.`".implode('`, `'.$tableAlias.'`.`', $fields)."`" : "";
 	}
 	
 	public function validate() {
