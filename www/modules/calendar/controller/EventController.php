@@ -1320,10 +1320,12 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 				
 				$resultCount++;
 				
+				$age = (new \DateTime($contact->upcoming))->diff(new \DateTime($contact->birthday));
+				
 				$response['results'][$this->_getIndex($response['results'],strtotime($contact->upcoming.' 00:00'))] = array(
 					'id'=>$response['count']++,
 					'name'=>htmlspecialchars(str_replace('{NAME}',$name,\GO::t("Birthday: {NAME}", "calendar")), ENT_COMPAT, 'UTF-8'),
-					'description'=>htmlspecialchars(str_replace(array('{NAME}','{AGE}'), array($name,$contact->upcoming-$contact->birthday), \GO::t("{NAME} has turned {AGE} today", "calendar")), ENT_COMPAT, 'UTF-8'),
+					'description'=>htmlspecialchars(str_replace(array('{NAME}','{AGE}'), array($name,$age->y), \GO::t("{NAME} has turned {AGE} today", "calendar")), ENT_COMPAT, 'UTF-8'),
 					'time'=>date(\GO::user()->time_format, $start_unixtime),												
 					'start_time'=>$contact->upcoming.' 00:00',
 					'end_time'=>$contact->upcoming.' 23:59',
