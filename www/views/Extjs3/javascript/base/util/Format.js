@@ -26,16 +26,6 @@ GO.util.format = {
 		if(isNaN(val))
 			val = GO.util.unlocalizeNumber(val);
 		return GO.util.numberFormat(val,decimals);
-		// below was made before i know there was a GO.util.numberFormat
-		decimals = decimals || 0;
-		var power = Math.pow(10, decimals);
-		val = Math.round(val*power)/power;
-		var ds = GO.settings.decimal_separator,
-			ts = GO.settings.thousands_separator;
-		if(ds=='.')
-			return val.toLocaleString();
-		
-		return val.toLocaleString().replace('.','%').replace(',',ts).replace('%', ds);
 	},
 	
 	date : function(timestamp) {
