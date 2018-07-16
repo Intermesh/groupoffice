@@ -15,6 +15,7 @@
 GO.notes.NoteDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 	
 	customFieldType : "GO\\Notes\\Model\\Note",
+	stateId: 'no-note-dialog',
 	
 	modelName : "GO\\Notes\\Model\\Note",
 	enableComments: true,
