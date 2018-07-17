@@ -1126,8 +1126,11 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 	 */
 	protected function actionCheckModelFolder($params) {
 		
+		$cls = $params['model'];
 		$entityType = \go\core\orm\EntityType::findByName($params['model']);
-		$cls = $entityType->getClassName();
+		if(!empty($entityType)) {
+			$cls = $entityType->getClassName();
+		}
 		
 		if(strpos($params['model'], '\\') === false && is_a($cls, '\\go\\core\\orm\\Entity', true)) {
 			return $this->checkEntityFolder($params);
