@@ -244,7 +244,10 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 				}
 			}
 		}elseif($this->isModified('ownedBy')){
-			$this->addGroup(Group::model()->findSingleByAttribute('isUserGroupFor', $this->ownedBy)->id, Acl::MANAGE_PERMISSION);
+			$group = Group::model()->findSingleByAttribute('isUserGroupFor', $this->ownedBy);
+			if(!empty($group)) {
+				$this->addGroup($group->id, Acl::MANAGE_PERMISSION);
+			}
 		}
 
 		return parent::afterSave($wasNew);
