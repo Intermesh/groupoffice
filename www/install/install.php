@@ -93,10 +93,8 @@ if (!empty($_POST)) {
 
 		$cron->save();
 
-		Observable::cacheListeners();	
-		
-		App::get()->getSettings()->databaseVersion = App::get()->getVersion();
-		App::get()->getSettings()->save();
+		Observable::cacheListeners();			
+	
 				
 		\go\modules\core\users\model\User::findById(1)->checkOldFramework();
 

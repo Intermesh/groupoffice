@@ -113,15 +113,32 @@ class Settings extends core\Settings {
 	
 	/**
 	 * SMTP Password
+	 * 
 	 * @var string
 	 */
-	public $smtpPassword = null;
+	protected $smtpPassword = null;
+	
+	
+	public function getSmtpPassword() {
+		return \go\core\util\Crypt::decrypt($this->smtpPassword);
+	}
+	
+	public function setSmtpPassword($value) {
+		$this->smtpPassword = \go\core\util\Crypt::encrypt($value);
+	}
 
 	/**
 	 * Encryption to use for SMTP
 	 * @var string|bool
 	 */
 	public $smtpEncryption = self::SMTP_ENCRYPTION_TLS;
+	
+	/**
+	 * Set to false to ignore certificate errors. 
+	 * 
+	 * @var boolean
+	 */
+	public $smtpEncryptionVerifyCertificate = true;
 	
 	/**
 	 * If set then all system notifications go to this email address
@@ -169,4 +186,32 @@ class Settings extends core\Settings {
 	public $databaseVersion;
 	
 	
+	/**
+	 * Primary color in html notation 000000;
+	 * 
+	 * @var string
+	 */
+	public $primaryColor;
+	
+	
+	/**
+	 * Get's the transparent color based on the primary color.
+	 * 
+	 * @return string
+	 */
+	public function getPrimaryColorTransparent() {
+		list($r, $g, $b) = sscanf($this->primaryColor, "%02x%02x%02x");
+		
+		return "rgba($r, $g, $b, .16)";
+	}
+	
+	public function save() {
+		
+		//for old framework config caching in GO\Base\Config
+		if(isset($_SESSION)) {
+			unset($_SESSION['GO_SESSION']['newconfig']);
+		}
+		
+		return parent::save();
+	}
 }

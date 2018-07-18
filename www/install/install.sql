@@ -506,8 +506,6 @@ ALTER TABLE `core_setting`
 ALTER TABLE `core_state`
   ADD PRIMARY KEY (`entityClass`);
 
-ALTER TABLE `core_user`
-  ADD PRIMARY KEY (`id`);
 
 ALTER TABLE `core_user_group`
   ADD PRIMARY KEY (`groupId`,`userId`),

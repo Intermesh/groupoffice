@@ -103,7 +103,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			
 			'<tpl if="attachments.length&gt;1">'+
 //				'<a class="filetype-link btn-menu" id="downloadAllMenu" ></a>'+
-				'<a class="filetype-link btn-more-vert" id="downloadAllMenu-'+this.downloadAllMenuId +'"></a>'+
+				'<i class="icon ic-more-vert" id="downloadAllMenu-'+this.downloadAllMenuId +'"></i>'+
 //				'<a class="filetype-link btn-expand-more" id="downloadAllMenu" ></a>'+
 			'</tpl>'+
 			

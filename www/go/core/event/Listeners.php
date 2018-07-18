@@ -22,8 +22,6 @@ use go\core\Singleton;
  */
 class Listeners extends Singleton {
 
-	private $listeners;
-	
 	protected function __construct() {
 		parent::__construct();
 		
@@ -55,16 +53,6 @@ class Listeners extends Singleton {
 	 * Then stores all these listeners in the cache.
 	 */
 	public function init() {
-		
-		if (isset($this->listeners)) {			
-			return;
-		}
-
-		$this->listeners = App::get()->getCache()->get('listeners');
-
-		if (is_array($this->listeners)) {
-			return;
-		}
 
 		App::get()->debug("Initializing event listeners");
 		

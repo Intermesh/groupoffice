@@ -10,12 +10,33 @@ class Settings extends core\Settings {
 		return 'users';
 	}
 	
+	/**
+	 * Default time zone for users
+	 * 
+	 * @var string
+	 */
 	public $defaultTimezone = "Europe/Amsterdam";
 	
+	/**
+	 * Default date format for users
+	 * 
+	 * @link https://secure.php.net/manual/en/function.date.php
+	 * @var string
+	 */
 	public $defaultDateFormat = "d-m-Y";
 	
+	/**
+	 * Default time format for users
+	 * 
+	 * @link https://secure.php.net/manual/en/function.date.php
+	 * @var string 
+	 */
 	public $defaultTimeFormat = "G:i";
 	
+	/**
+	 * Default currency
+	 * @var string
+	 */
 	public $defaultCurrency = "€";
 	
 	/**
@@ -29,11 +50,31 @@ class Settings extends core\Settings {
 	public $defaultFirstWeekday = 1;
 	
 	
+	/**
+	 * Default list separator for import and export
+	 * 
+	 * @var string
+	 */
 	public $defaultListSeparator = ';';
 	
+	/**
+	 * Default text separator for import and export
+	 * 
+	 * @var string
+	 */
 	public $defaultTextSeparator = '"';
+	
+	/**
+	 * Default thousands separator for numbers
+	 * @var string
+	 */
 	public $defaultThousandSeparator = '.';
 	
+	/**
+	 * Default decimal separator for numbers
+	 * 
+	 * @var string
+	 */
 	public $defaultDecimalSeparator = ',';
 	
 	

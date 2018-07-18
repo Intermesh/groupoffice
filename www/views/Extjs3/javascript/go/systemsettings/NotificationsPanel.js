@@ -38,7 +38,8 @@ go.systemsettings.NotificationsPanel = Ext.extend(Ext.form.FormPanel, {
 						}, {
 							xtype: 'textfield',
 							name: 'smtpPassword',
-							fieldLabel: t('Password')
+							fieldLabel: t('Password'),
+							inputType: "password"
 						}, {
 							xtype: 'combo',
 							name: 'smtpEncryption',
@@ -46,6 +47,7 @@ go.systemsettings.NotificationsPanel = Ext.extend(Ext.form.FormPanel, {
 							mode: 'local',
 							editable: false,
 							triggerAction: 'all',
+							value: "tls",
 							store: new Ext.data.ArrayStore({
 								fields: [
 									'value',
@@ -54,7 +56,20 @@ go.systemsettings.NotificationsPanel = Ext.extend(Ext.form.FormPanel, {
 								data: [['tls', 'TLS'], ['ssl', 'SSL'], [null, 'None']]
 							}),
 							valueField: 'value',
-							displayField: 'display'
+							displayField: 'display',
+							listeners: {
+								change: function (combo, newVal, oldVal) {
+									this.getForm().findField('smtpEncryptionVerifyCertificate').setDisabled(newVal == null);
+								},
+								scope: this
+							}
+						}, {
+							xtype: 'xcheckbox',
+							name: "smtpEncryptionVerifyCertificate",
+							checked: true,
+							hideLabel: true,
+							disabled: false,
+							boxLabel: t("Verify SSL certificate")							
 						}
 					]
 				}, {
@@ -83,12 +98,13 @@ go.systemsettings.NotificationsPanel = Ext.extend(Ext.form.FormPanel, {
 
 		go.systemsettings.NotificationsPanel.superclass.initComponent.call(this);
 		
-		this.on('render', function() {
+		this.on('afterrender', function() {
 			go.Jmap.request({
 				method: "core/core/Settings/get",
 				callback: function (options, success, response) {
 						var f = this.getForm();
 						f.setValues(response);				
+						f.findField('smtpEncryptionVerifyCertificate').setDisabled(response['smtpEncryption'] == null);
 						f.findField("enableEmailDebug").setValue(!GO.util.empty(f.findField('debugEmail').getValue()));
 				},
 				scope: this
@@ -97,10 +113,13 @@ go.systemsettings.NotificationsPanel = Ext.extend(Ext.form.FormPanel, {
 	},
 	
 	sendTestMessage : function() {
+		this.getEl().mask(t("Sending..."));
+		
 		go.Jmap.request({
 			method: "core/core/Settings/sendTestMessage",
 			params: this.getForm().getFieldValues(),
 			callback: function (options, success, response) {
+				this.getEl().unmask();
 				if(success) {
 					Ext.MessageBox.alert(
 						t("Success"), 

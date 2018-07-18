@@ -36,7 +36,21 @@
 	
 	?>
 	<style>
-		#bg {background-image: url('<?=\GO::view()->getTheme()->getUrl()?>/img/bg/office-desk.jpg');}
+		#bg {
+			background-image: url('<?=\GO::view()->getTheme()->getUrl()?>/img/bg/office-desk.jpg');
+		}
+		
+		<?php
+		if(GO()->getSettings()->primaryColor) {
+			?>
+		
+			:root {
+					--c-primary: <?php echo '#'.GO()->getSettings()->primaryColor; ?>;
+					--c-primary-tp: <?php echo GO()->getSettings()->getPrimaryColorTransparent(); ?>;
+			}
+			<?php
+		}
+		?>
 	</style>
 </head>
 <body>
