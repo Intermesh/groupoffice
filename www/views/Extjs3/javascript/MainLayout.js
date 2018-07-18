@@ -290,7 +290,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		//legacy scripts loaded from scripts.inc.php
 		var script = document.createElement('script');
 		script.type = 'text/javascript';
-		script.setAttribute('src', GO.url('core/moduleScripts'));
+		script.setAttribute('src', BaseHref + "views/Extjs3/modulescripts.php");
 		script.charset = 'utf-8';
 		script.id = 'testing';
 		script.defer = true;
@@ -515,7 +515,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 //						}
 						,{
 							iconCls: 'ic-info',
-							text: t("About {product_name}").replace('{product_name}', GO.settings.config.product_name),
+							text: t("About GroupOffice"),
 							handler: function () {
 								if (!this.aboutDialog)
 								{

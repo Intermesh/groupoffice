@@ -103,25 +103,21 @@ abstract class ReadOnlyEntityController extends Controller {
 	 */
 	protected function paramsQuery(array $params) {
 		if(!isset($params['limit'])) {
-			$params['limit'] = Capabilities::get()->maxObjectsInGet;
-		}
-		
-//		if($params['limit'] > self::MAX_LIMIT) {
-//			throw new core\jmap\exception\InvalidArguments('Limit must be lower than ' . self::MAX_LIMIT);
-//		}
-		
-		if ($params['limit'] < 1) {
-			throw new InvalidArguments("Limit MUST be greater than 0");
+			$params['limit'] = 0;
+		}		
+
+		if ($params['limit'] < 0) {
+			throw new InvalidArguments("Limit MUST be positive");
 		}
 		//cap at max of 50
-		$params['limit'] = min([$params['limit'], Capabilities::get()->maxObjectsInGet]);
+		//$params['limit'] = min([$params['limit'], Capabilities::get()->maxObjectsInGet]);
 		
 		if(!isset($params['position'])) {
 			$params['position'] = 0;
 		}
 
 		if ($params['position'] < 0) {
-			throw new InvalidArguments("Position MUST not be negative");
+			throw new InvalidArguments("Position MUST be positive");
 		}
 		
 		if(!isset($params['sort'])) {
@@ -239,6 +235,10 @@ abstract class ReadOnlyEntityController extends Controller {
 	protected function paramsGet(array $params) {
 		if(isset($params['ids']) && !is_array($params['ids'])) {
 			throw new InvalidArguments("ids must be of type array");
+		}
+		
+		if(isset($params['ids']) && count($params['ids']) > Capabilities::get()->maxObjectsInGet) {
+			throw new InvalidArguments("You can't get more than " . Capabilities::get()->maxObjectsInGet . " objects");
 		}
 		
 		if(!isset($params['properties'])) {

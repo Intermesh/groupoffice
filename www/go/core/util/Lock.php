@@ -75,7 +75,9 @@ class Lock {
 		//cleanup lock file if lock() was used
 		if(isset($this->lockFile)) {
 			fclose($this->lockFp);
-			unlink($this->lockFile);			
+			if(file_exists($this->lockFile)) {
+				unlink($this->lockFile);			
+			}
 		}
 	}
 	

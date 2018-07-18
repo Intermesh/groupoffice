@@ -82,11 +82,11 @@ if($_SERVER['REQUEST_METHOD'] != 'POST')
 	$dataFolder = new \go\core\fs\Folder($config['file_storage_path']);
 	
 
-	if($dataFolder->isWritable() && $tmpFolder->isWritable() && dbConnect($config) && dbIsEmpty($config)) {
+	if($dataFolder->isWritable() && $tmpFolder->isWritable() && dbConnect($config)) {
 		$cFile = new \go\core\fs\File($configFile);
 		
 		if(!$cFile->putContents("<?php\n\n\$config = ".var_export($config, true) .";\n\n")) {
-			die("Could not write INI");
+			die("Could not write config.php");
 		} else
 		{
 			header('Location: install.php');
@@ -105,13 +105,13 @@ require('header.php');
 		
 		<section>
 			<fieldset>
-				<h2>Create config file</h2>
-				<p>Please create a writeable config.php file here: <?= $configFile; ?>.</p>
+				<h2>Config file</h2>
+				<p class="error">Please create a writeable config.php file here: <?= $configFile; ?>.</p>
 			</fieldset>
 		</section>
 		
 
-		<?php else: ?>
+		<?php endif ?>
 		
 		<section>
 			<form method="POST" action="" onsubmit="submitButton.disabled = true;">
@@ -181,9 +181,6 @@ require('header.php');
 			</form>
 		</section>
 
-		
-
-		<?php endif; ?>
-
+	
 		
 		<?php require('footer.php'); ?>

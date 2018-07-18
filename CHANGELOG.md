@@ -34,6 +34,8 @@ Core:
 
 - Improved User settings dialog
 - New System settings dialog to ease the configuration of Group-Office.
+- New user and group management in system settings
+- Easy color and logo setting for UI.
 
 Notes
 - Uses new API

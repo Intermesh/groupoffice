@@ -193,6 +193,13 @@ class Settings extends core\Settings {
 	 */
 	public $primaryColor;
 	
+	/**
+	 * Blob ID for the logo
+	 * 
+	 * @var string
+	 */
+	public $logoId;
+	
 	
 	/**
 	 * Get's the transparent color based on the primary color.
@@ -210,6 +217,11 @@ class Settings extends core\Settings {
 		//for old framework config caching in GO\Base\Config
 		if(isset($_SESSION)) {
 			unset($_SESSION['GO_SESSION']['newconfig']);
+		}
+		
+		//Make sure URL has trailing slash
+		if(isset($this->URL)) {
+			$this->URL = rtrim($this->URL, '/ ').'/';
 		}
 		
 		return parent::save();

@@ -78,10 +78,11 @@ GO.customfields.DisableCategoriesPanel = Ext.extend(Ext.Panel, {
 				scope:this,
 				show:function(){
 					this.loadPanel();
-				},
-				render:function(){
-					this.loadPanel();
 				}
+//				render:function(){
+//					console.log('ka1');
+//					this.loadPanel();
+//				}
 			}			
 		});		
 		
@@ -92,7 +93,7 @@ GO.customfields.DisableCategoriesPanel = Ext.extend(Ext.Panel, {
 	},
 	
 	loadPanel : function(){
-		if(this.isVisible()){
+		//if(this.isVisible()){
 			this.categoriesGrid.store.load({
 				scope:this,
 				callback:function(){
@@ -102,7 +103,7 @@ GO.customfields.DisableCategoriesPanel = Ext.extend(Ext.Panel, {
 					//this.enableCB.resumeEvents();
 				}
 			});
-		}
+		//}
 	},
 	
 	/**

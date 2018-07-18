@@ -429,20 +429,36 @@ class Module extends Observable {
 				
 		$models=$this->getModels();
 		
+			
 		
 		foreach($models as $model){	
 			if($model->isSubclassOf("GO\Base\Db\ActiveRecord")){
 				$m = \GO::getModel($model->getName());
+				
 				if($m->checkDatabaseSupported()){					
 					
 					echo "Checking ".$model->getName()."\n";
 					flush();
-				
+					
+					//to avoid memory errors
+					$start = 0;
+					
+					//per thousands to keep memory low
 					$stmt = $m->find(array(
-							'ignoreAcl'=>true
+							'ignoreAcl'=>true,
+							'start' => $start,
+							'limit' => 1000
 					));
 					
-					$stmt->callOnEach('checkDatabase');
+					while($stmt->rowCount()) {					
+						$stmt->callOnEach('checkDatabase');
+						
+						$stmt = $m->find(array(
+								'ignoreAcl'=>true,
+								'start' => $start+=1000,
+								'limit' => 1000
+						));
+					}
 					
 					unset($stmt);
 				}else

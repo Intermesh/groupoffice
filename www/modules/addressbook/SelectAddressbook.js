@@ -47,6 +47,7 @@ Ext.extend(GO.addressbook.SelectAddressbook, GO.form.ComboBox, {
 
 		if (!id) {
 			GO.addressbook.SelectAddressbook.superclass.setValue.call(this, id);
+			return;
 		}
 		var r = this.findRecord(this.valueField, id);
 

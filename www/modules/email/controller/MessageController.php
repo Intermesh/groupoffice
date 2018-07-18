@@ -2000,7 +2000,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	 * @throws \GO\Base\Exception\NotFound
 	 * @throws AccessDenied
 	 */
-	protected function actionSaveAllAttachments($folder_id,$account_id,$mailbox,$uid){
+	protected function actionSaveAllAttachments($folder_id,$account_id,$mailbox,$uid, $filepath = null){
 		$response = array('success'=>true);
 		
 		$folder = \GO\Files\Model\Folder::model()->findByPk($folder_id);
@@ -2014,16 +2014,22 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			throw new \GO\Base\Exception\AccessDenied();
 		}
 		
-		// Search message from imap
-		$account = Account::model()->findByPk($account_id);
 		
-		if(!$account){
-			trigger_error("GO\Email\Controller\Message::actionSaveAllAttachments(".$account_id.") account not found", E_USER_WARNING);
-			throw new \GO\Base\Exception\NotFound("Specified account not found");
+		if(isset($filepath)) {
+			
+			$message = \GO\Email\Model\SavedMessage::model()->createFromMimeFile($filepath);
+		} else {
+		
+			// Search message from imap
+			$account = Account::model()->findByPk($account_id);
+
+			if(!$account){
+				trigger_error("GO\Email\Controller\Message::actionSaveAllAttachments(".$account_id.") account not found", E_USER_WARNING);
+				throw new \GO\Base\Exception\NotFound("Specified account not found");
+			}
+
+			$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $mailbox, $uid);
 		}
-		
-		$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $mailbox, $uid);
-		
 		if(!$message){
 			trigger_error("GO\Email\Controller\Message::actionSaveAllAttachments(". $mailbox." - ". $uid.") message not found", E_USER_WARNING);
 			throw new \GO\Base\Exception\NotFound("Specified message could not be found");

@@ -10,40 +10,40 @@ go.login.LoginDialog = Ext.extend(go.Window, {
 	
 	initComponent: function() {
 
-		this.topPanel = new Ext.Panel({
-			id:'login-top-panel',
-			region: 'north',
-			items:[
-				this.logoComp = new Ext.BoxComponent({cls: "go-app-logo"})
-//				this.welcomeComp = new Ext.BoxComponent({
-//					autoEl: 'p',
-//					cls: "login-user-welcome",
-//					setWelcomeMessage: function(name){
-//						var curHr = (new Date()).getHours();
-//						var html = (curHr < 12) ? t('Good morning') : 
-//								  (curHr < 18) ? t('Good afternoon') : 
-//													t('Good evening');
-//						this.getEl().update(html+' '+name);
-//					},
-//					clearWelcomeMessage: function(){
-//						this.getEl().update('');
-//					}
-//				}),
-//				this.avatarComp = new Ext.BoxComponent({
-//					autoEl: 'img',
-//					cls: "login-avatar user-img",
-//					hidden: true,
-//					setImageUrl: function(url){
-//						// TODO: Enable this when url is OK
-//						//this.getEl().dom.src = url;
-//					},
-//					clearAvatar: function(){
-//						this.setImageUrl('');
-//						this.setVisible(false);
-//					}
-//				})
-			]
-		});
+//		this.topPanel = new Ext.Panel({
+//			id:'login-top-panel',
+//			region: 'north',
+//			items:[
+//				this.logoComp = new Ext.BoxComponent({cls: "go-app-logo"})
+////				this.welcomeComp = new Ext.BoxComponent({
+////					autoEl: 'p',
+////					cls: "login-user-welcome",
+////					setWelcomeMessage: function(name){
+////						var curHr = (new Date()).getHours();
+////						var html = (curHr < 12) ? t('Good morning') : 
+////								  (curHr < 18) ? t('Good afternoon') : 
+////													t('Good evening');
+////						this.getEl().update(html+' '+name);
+////					},
+////					clearWelcomeMessage: function(){
+////						this.getEl().update('');
+////					}
+////				}),
+////				this.avatarComp = new Ext.BoxComponent({
+////					autoEl: 'img',
+////					cls: "login-avatar user-img",
+////					hidden: true,
+////					setImageUrl: function(url){
+////						// TODO: Enable this when url is OK
+////						//this.getEl().dom.src = url;
+////					},
+////					clearAvatar: function(){
+////						this.setImageUrl('');
+////						this.setVisible(false);
+////					}
+////				})
+//			]
+//		});
 
 		this.wizard = new Ext.Panel({
 			//deferredRender:true,
@@ -66,18 +66,14 @@ go.login.LoginDialog = Ext.extend(go.Window, {
 
 		Ext.apply(this,{
 			buttonAlign: 'left',
-			width: 400,
-			height: 300,
-			layout:'border',
-			header:false,
-			headerAsText:false,
-			items: [
-				this.topPanel,
-				new Ext.form.FieldSet({
+			width: dp(480),
+			height: dp(260),
+			layout:'fit',
+			title: t("Login required"),
+			items: [new Ext.form.FieldSet({
 					region:'center',
 					items:[this.wizard]
-				})
-			],
+				})],
 			buttons:[
 				this.resetButton = new Ext.Button({
 					text: t("Cancel"),

@@ -230,7 +230,7 @@ GO.email.AddressbookDialog = function(config) {
 				forceFit:true,
 		    hideGroupedColumn:true,
 		    groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Items" : "Item"]})',
-		   	emptyText: GO.lang.strNoItems,
+		   	emptyText: t("No items found"),
 		   	showGroupName:false,
 				startCollapsed:true
 			}),

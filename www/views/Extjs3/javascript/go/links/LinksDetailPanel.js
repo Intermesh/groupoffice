@@ -1,10 +1,11 @@
 go.links.LinksDetailPanel = Ext.extend(Ext.Panel, {
 	addButtonItems : null,
+	cls: 'go-links-detail',
 	initComponent: function () {
 		this.store = new go.data.Store({
-			baseParams: {
-				limit: 10
-			},
+//			baseParams: {
+//				limit: 20
+//			},
 			fields: ['id', 'to', 'toId', {name: 'createdAt', type: 'date'}, 'toEntity'],
 			entityStore: go.Stores.get("Link")
 //			listeners: {
@@ -18,17 +19,63 @@ go.links.LinksDetailPanel = Ext.extend(Ext.Panel, {
 		var me = this;
 		
 		
+		me.entities = {};	
+		
+		
 //		this.tools = [{
 //				id:"add",
 //				tooltip: t("Add link")
 //		}];
+
+		var max = 4;
 		
-		var tpl = new Ext.XTemplate('<div class="icons"><tpl for=".">\
+		var tpl = new Ext.XTemplate('{[this.init()]}<div class="icons"><tpl for=".">\
 		<tpl if="toEntity !== this.previousType(xindex)">\
-			<h5>{[t(values.toEntity, go.Entities.get(values.toEntity).module)]}</h5><hr>\
+			<h5>{[t(values.toEntity, go.Entities.get(values.toEntity).module)]}<span class="count">{[this.countEntity(values.toEntity)]}</span></h5><hr>\
 		</tpl>\
+		<tpl if="this.shouldPrint(values)">\
 		{[this[values.toEntity] ? this[values.toEntity](values, xindex, xcount) : this.default(values, this.previousType(xindex), xindex, xcount)]}\
-	</tpl><tpl if="this.getTotalCount() &gt; 0"><p class="more">{[this.getMoreStr()]}</p></tpl></div>', {
+		</tpl>\
+		{[this.printMore(values)]}\
+	</tpl>\
+	</div>', {
+			
+			
+			init : function() {
+				
+				for(var key in me.entities) {
+					me.entities[key].count = 0;
+					me.entities[key].showMoreLinkPrinted = false;
+				}
+							
+				return "";
+			},
+			
+			printMore : function(values) {
+				if(me.entities[values.toEntity].showMoreLinkPrinted || me.entities[values.toEntity].showMore || me.entities[values.toEntity].count < max){
+					return "";
+				}
+				
+				me.entities[values.toEntity].showMoreLinkPrinted = true;
+				
+				return "<a class=\"show-more\" data-entity="+values.toEntity+">" + t("Show more...") + "</a>";
+			},
+			
+			//<tpl if="this.getTotalCount() &gt; 0"><a class="more">{[this.getMoreStr()]}</a></tpl></div>'
+			shouldPrint : function(values) {
+				if(!me.entities[values.toEntity]) {
+					me.entities[values.toEntity] = {count: 0, showMore: false, showMoreLinkPrinted: false};					
+				}
+				
+				
+				me.entities[values.toEntity].count++;
+				
+				if(!me.entities[values.toEntity].showMore && me.entities[values.toEntity].count > max) {
+					return false;
+				}
+				
+				return true;
+			},
 
 			previousType: function (xindex) {
 				var previousIndex = xindex - 2;
@@ -37,16 +84,28 @@ go.links.LinksDetailPanel = Ext.extend(Ext.Panel, {
 				}
 				return me.store.getAt(previousIndex).data.toEntity;
 			},
-			getTotalCount: function () {
-				return me.store.getTotalCount() - 10;
-			},
+			countEntity : function(entity) {
+				var count = 0;
+				me.store.each(function(r) {
+					if(r.data.toEntity == entity) {
+						count++;
+					}
+				});
 
-			getMoreStr: function () {
-				return t("{count} items more", "core").replace("{count}", this.getTotalCount());
+				return count;
 			},
+			
+			
+//			getTotalCount: function () {
+//				return me.store.getTotalCount() - 10;
+//			},
+
+//			getMoreStr: function () {
+//				return t("{count} items more", "core").replace("{count}", this.getTotalCount());
+//			},
 			default: function (values, previousType, xindex, xcount) {
 				Ext.apply(values, {xindex: xindex, previousType: previousType, xcount: xcount});
-				return (new Ext.XTemplate('<p>\
+				return (new Ext.XTemplate('<p data-id="{id}">\
 			<tpl if="toEntity !== previousType">\
 				<i class="label entity {toEntity}" ext:qtip="{toEntity}"></i>\
 			</tpl>\
@@ -55,7 +114,8 @@ go.links.LinksDetailPanel = Ext.extend(Ext.Panel, {
 			<label>{[GO.util.dateFormat(parent.createdAt)]}</label>\
 			<a class="right show-on-hover"><i class="icon">delete</i></a>\
 			</tpl>\
-		</p>')).apply(values);
+		</p>'
+		)).apply(values);
 
 //			Event: function (values, xindex, xcount) {
 //				Ext.apply(values, {xindex: xindex, xcount: xcount});
@@ -87,15 +147,23 @@ go.links.LinksDetailPanel = Ext.extend(Ext.Panel, {
 				itemSelector: 'p',
 				listeners: {
 					scope: this,
-					click: function (dv, index, node, e) {
+					containerclick: function(dv, e) {
 		
+						if(e.target.classList.contains("show-more")) {
+							var entity = e.target.getAttribute('data-entity');
+							this.entities[entity].showMore = true;
+							dv.refresh();
+						}
+					},
+					click: function (dv, index, node, e) {
+						
 						var record = this.store.getAt(index);
 						
 						if(e.target.tagName == "I") {							
 							this.delete(record);
-						} else
+						} else 
 						{
-							var record = this.store.getAt(index);
+							var record = this.store.getById(node.getAttribute('data-id'));
 							
 							var entity = go.Entities.get(record.data.toEntity);
 
@@ -129,6 +197,9 @@ go.links.LinksDetailPanel = Ext.extend(Ext.Panel, {
 	onLoad: function (dv) {
 		
 		this.detailView = dv;	
+		
+		
+		this.entities = {};	
 
 		this.store.load({
 			params: {

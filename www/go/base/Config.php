@@ -476,6 +476,10 @@ var $billing_clear_payment_method_on_duplicate = true;
 
 	/**
 	 * Relative hostname with slash on both start and end
+	 * 
+	 * use go\modules\core\core\model\Settings:URL
+	 * 
+	 * @deprecated since 6.3
 	 *
 	 * @var     StringHelper
 	 * @access  public
@@ -981,7 +985,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var StringHelper
 	 */
 
-	var $product_name='Group-Office';
+	var $product_name='GroupOffice';
 
 
 		/* The permissions mode to use when creating files
@@ -1009,6 +1013,22 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * Variables below this should not be changed
 	 *////////////////////////////////////////////////
 
+	/**
+	 * The Group-Office version number
+	 *
+	 * @var     StringHelper
+	 * @access  public
+	 */
+	var $version = '6.2.101';
+
+	/**
+	 * Modification date
+	 *
+	 * @var     StringHelper
+	 * @access  public
+	 */
+	
+	var $mtime = '20180628';
 
 	#group configuration
 	/**
@@ -1379,7 +1399,9 @@ var $billing_clear_payment_method_on_duplicate = true;
 		$this->_original_config = $config;
 		
 		foreach($config as $key=>$value) {
-			$this->$key=$value;
+			if(!method_exists($this, "get".$key)) {
+				$this->$key=$value;
+			}
 		}
 		
 		$this->file_storage_path = rtrim($this->file_storage_path, '/').'/';
@@ -1391,7 +1413,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 
 		//this can be used in some cases where you don't want the dynamically
 		//determined full URL. This is done in set_full_url below.
-		$this->orig_full_url = $this->full_url;
+		//$this->orig_full_url = $this->full_url;
 
 		$this->orig_tmpdir=$this->tmpdir;
 
@@ -1513,43 +1535,47 @@ var $billing_clear_payment_method_on_duplicate = true;
 		return GO()->getSettings()->language;
 	}
 	
-	public function getsystemEmail() {
+	public function getwebmaster_email() {
 		return GO()->getSettings()->systemEmail;
 	}
 	
-	public function getsmtpHost() {
+	public function getsmtp_server() {
 		return GO()->getSettings()->smtpHost;
 	}
 	
-	public function getsmtpPort() {
+	public function getsmtp_port() {
 		return GO()->getSettings()->smtpPort;
 	}
 	
-	public function getsmtpUsername() {
+	public function getsmtp_username() {
 		return GO()->getSettings()->smtpUsername;
 	}
 	
-	public function getsmtpPassword() {
+	public function getsmtp_password() {
 		return GO()->getSettings()->smtpPassword;
 	}
 	
-	public function getsmtpEncryption() {
+	public function getsmtp_encryption() {
 		return GO()->getSettings()->smtpEncryption;
 	}
 	
-	public function getdebugEmail() {
+	public function getdebug_email() {
 		return GO()->getSettings()->debugEmail;
 	}
 	
-	public function gepasswordMinLength() {
+	public function gepassword_min_length() {
 		return GO()->getSettings()->passwordMinLength;
 	}
 	
-	public function getloginMessage() {
+	public function getlogin_message() {
 		return GO()->getSettings()->loginMessage;
 	}
 	
 	public function getfull_url() {
+		return rtrim(GO()->getSettings()->URL, '/') . '/';
+	}
+	
+	public function getorig_full_url() {
 		return rtrim(GO()->getSettings()->URL, '/') . '/';
 	}
 

@@ -78,6 +78,18 @@ class MessageAttachment extends \GO\Base\Model{
 	}
 	
 	/**
+	 * 
+	 * @param \GO\Base\Fs\Folder $targetFolder
+	 * @param string $filename Optional
+	 * @return type
+	 */
+	public function saveToFile(\GO\Base\Fs\Folder $targetFolder, $filename=null){
+		
+		$file = new \GO\Base\Fs\File(\GO::config()->tmpdir . $this->getTempFile());
+		return $file->copy($targetFolder, $filename);
+	}
+	
+	/**
 	 * Set the temporary file 
 	 * 
 	 * @param \GO\Base\Fs\File $file

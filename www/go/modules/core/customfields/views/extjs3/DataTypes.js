@@ -32,7 +32,20 @@
 			icon: 'scheduler',
 			label: 'Date time',
 			render: function (value, data) {
-				return value ? Date.parseDate(value, 'c').format(GO.settings.date_format + " " + GO.settings.time_format) : "";
+				
+				if(!value) {
+					return "";
+				}
+				
+				var date = Date.parseDate(value, 'c');
+				if(date) {
+					return date.format(GO.settings.date_format + " " + GO.settings.time_format)
+				} else
+				{
+					//old framework that has already formatted the date on the server.
+					return value;
+				}
+				
 			},
 			getFormField: function (customfield, config) {
 
@@ -56,7 +69,18 @@
 			icon: 'scheduler',
 			label: 'Date',
 			render: function (value, data) {
-				return value ? Date.parseDate(value, 'c').format(GO.settings.date_format) : "";
+				if(!value) {
+					return "";
+				}
+				
+				var date = Date.parseDate(value, 'c');
+				if(date) {
+					return date.format(GO.settings.date_format + " " + GO.settings.time_format)
+				} else
+				{
+					//old framework that has already formatted the date on the server.
+					return value;
+				}
 			},
 			getFormField: function (customfield, config) {
 

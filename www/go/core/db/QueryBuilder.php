@@ -60,10 +60,10 @@ class QueryBuilder {
 	private static $paramPrefix = ':go';
 
 	/**
-	 * Key value array with [tableAlias => modelClassName]
+	 * Key value array with [tableAlias => Table()]
 	 *
 	 * Used to find the model that belongs to an alias to find column types
-	 * @var array
+	 * @var Table[]
 	 */
 	protected $aliasMap = [];
 
@@ -403,7 +403,11 @@ class QueryBuilder {
 		$columnParts = $this->splitTableAndColumn($columnName);
 
 		if (empty($columnParts[0])) {
-			throw new \Exception("Invalid column name '" . $columnName . "'");
+			$tables = [];
+			foreach($this->aliasMap as $table) {
+				$tables[] = $table->getName();
+			}
+			throw new \Exception("Invalid column name '" . $columnName . "'. Not a column of any table: ".implode(', ', $tables));
 		}
 
 		$tokens[] = $this->quoteTableName($columnParts[0]) . '.' . $this->quoteColumnName($columnParts[1]); //column name

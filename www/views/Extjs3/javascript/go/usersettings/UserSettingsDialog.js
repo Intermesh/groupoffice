@@ -21,6 +21,8 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 
 	initComponent: function () {
 		
+		
+		
 		this.saveButton = new Ext.Button({
 			text: t('Save'),
 			handler: this.submit,
@@ -33,6 +35,8 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			fileUpload: true,
 			baseParams : {}
 		});
+		
+		this.formPanel.bodyCfg.autocomplete = "off";
 		
 		this.tabPanel = new Ext.TabPanel({
 			headerCfg: {cls:'x-hide-display'},

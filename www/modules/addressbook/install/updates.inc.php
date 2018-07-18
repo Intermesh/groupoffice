@@ -559,3 +559,4 @@ $updates['201803081044'][] = "ALTER TABLE `ab_addresslist_group`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;";
 
 $updates['201803081045'][] = "ALTER TABLE `ab_addresslists` ADD `addresslist_group_id` INT NULL AFTER `id`;";
+$updates['201806251632'][] = "ALTER TABLE `ab_contacts` CHANGE `initials` `initials` VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '';";

@@ -2,14 +2,19 @@
 	//border: none;
 	background:color($grey,200);
 }
-body {
-	@include var(background-color, c-primary);
+
+html, body {
+	height: 100%;
 }
+body {
+	@include var(background-color, c-primary-tp);	
+}
+
 body * {
 	box-sizing: border-box;
 }
 
-#bg {
+/*#bg {
 	z-index: -1;
 	position: fixed;
 	top:0;left:0;right:0;bottom:0;
@@ -18,7 +23,7 @@ body * {
 	background-repeat: repeat;
 	background-size:cover;
 	filter: blur(5px);
-}
+}*/
 
 @keyframes wave {
 	0%, 60%, 100% {
@@ -30,9 +35,10 @@ body * {
 	}
 }
 
+//default links are black in the UI
 a {
 	cursor: pointer;
-	color: $cAnchor;		
+	color: color($fg, "text");		
 	text-decoration: none;
 /*	&:link, &:active, &:visited {
 		color: inherit;
@@ -44,6 +50,13 @@ a {
 	label {
 		cursor: inherit;
 	}	
+}
+
+//blue links here
+.ext-mb-content {
+	a {
+		color: $cAnchor;
+	}
 }
  
 #loading{
@@ -145,6 +158,24 @@ a {
 	}
 } */
 
+#login {
+	.go-app-logo {
+		position:absolute;
+		top: dp(16);
+		left: dp(16);
+	}
+}
+
+#go-login-header {
+	position:absolute;
+	top:0;
+	left:0;
+	right:0;
+	height: dp(72);
+	@extend .z4;
+	@include var(background-color, c-primary);	
+}
+
 #go-select-language{
 	position:absolute;
 	top: dp(16);
@@ -219,7 +250,7 @@ a {
 .go-view-over {
 	background-color: color($bg,'hover');
 }
-#go-logo, .go-app-logo {
+#go-logo, .go-app-logo, .go-about-logo {
 	background-image: url('img/logo-white.svg');
 	background-size: contain;
 	background-repeat: no-repeat;
@@ -227,13 +258,23 @@ a {
 	width: dp(240);
 	@extend %font-title;
 }
-.go-app-logo {
-	margin: dp(16);
-  .x-window & {	
-		background-image: url('img/logo-blue.svg');
-		/*margin-left: dp(16);*/
-	}
+
+
+.go-about-logo {
+	background-image: url('img/logo-blue.svg');
 }
+.go-settings-logo {
+	background-image: url('img/logo-white.svg');
+	background-size: auto dp(40);
+	background-repeat: no-repeat;
+	background-position: dp(16) dp(16);
+	height: dp(72);
+	width: dp(272);
+	border: 1px solid color($fg, 'border');
+
+	@include var(background-color, c-primary);
+}
+
 //, .go-border-center:not(.x-panel-noborder)
 .x-portlet {
 	@extend %card;
@@ -292,7 +333,7 @@ a {
 		@include var(background-color, c-primary);
 		> .x-tab-panel-header {
 			position: relative;
-			background-color:rgba(255,255,255,.17);
+			/*background-color:rgba(255,255,255,.17);*/
 			.x-tab-strip-active {
 				border-bottom-color: $cAccent;
 				color:white;
@@ -308,7 +349,7 @@ a {
 			.x-tab-right { padding-left:0;}
 			.x-tab-strip {	border: 0; }
 			.x-tab-strip-text{
-				color:rgba(white, .7);
+				color:rgba(white, .5);
 				padding-left:0;
 			}
 		}
@@ -455,7 +496,7 @@ a {
 }
 #message-ct {
 	position: absolute;
-	z-index: 81;
+	z-index: 100000;
 	top: dp(16);
 	right: 8px;
 	left: 8px;
@@ -1217,11 +1258,32 @@ table[id^="comments-ext"] b {
 			display: none;
 		}
 	}
+	
+	#mainNorthPanel {
+		height: dp(64);
+	}
 
 }
 
 @media screen and (max-width: 1000px) {
 	#go-logo {
 		display: none;
+	}
+}
+
+
+.go-links-detail {
+	a {
+		color: color($fg, 'text');
+	}
+	
+	.count {
+		float: right;
+		@extend %badge;
+	}
+	
+	a.show-more {
+		font-style: italic;
+		color: $cAnchor;
 	}
 }

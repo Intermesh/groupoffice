@@ -71,6 +71,9 @@ function t(str, module, package) {
     return t(str, "core", "core");
   } else
   {
+		str = str.replace("GroupOffice", GO.settings.config.product_name);
+		str = str.replace("Group-Office", GO.settings.config.product_name);
+		str = str.replace("{product_name}", GO.settings.config.product_name);
     return str;
   }
 };

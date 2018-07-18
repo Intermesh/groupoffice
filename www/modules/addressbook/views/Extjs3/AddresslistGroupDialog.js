@@ -33,7 +33,7 @@ GO.addressbook.AddresslistGroupDialog = Ext.extend(GO.dialog.TabbedFormDialog , 
 			  name: 'name',
 				anchor: '100%',
 			  allowBlank:false,
-			  fieldLabel: GO.lang.strName
+			  fieldLabel: t("Name")
 			});
 		
 		this.propertiesPanel = new Ext.Panel({

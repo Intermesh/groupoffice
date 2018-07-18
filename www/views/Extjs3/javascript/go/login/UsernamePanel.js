@@ -2,10 +2,10 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 	
 	initComponent: function() {
 		
-		this.usernameText = new GO.form.HtmlComponent({
-			html: t("Login required"),
-			cls: 'login-text-comp'
-		});
+//		this.usernameText = new GO.form.HtmlComponent({
+//			html: t("Login required"),
+//			cls: 'login-text-comp'
+//		});
 		
 		this.usernameField = new Ext.form.TextField({
 			itemId: 'username',
@@ -27,7 +27,6 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 		Ext.apply(this,{
 			id: 'usernameCheck',
 			items: [
-				this.usernameText,
 				this.usernameField,
 				this.passwordField,
 				{

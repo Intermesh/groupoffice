@@ -8,7 +8,6 @@ App::get()->getCache()->flush(false);
 App::get()->getDatabase()->setUtf8();
 
 
-
 $qs[] = "UPDATE go_settings SET value=0 where name = 'version';";
 $qs[] = "ALTER TABLE `go_modules` ADD `package` VARCHAR(100) NULL DEFAULT NULL AFTER `id`;";
 $qs[] = "ALTER TABLE `go_modules` CHANGE `id` `id` VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '';";

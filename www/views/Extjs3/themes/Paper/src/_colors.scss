@@ -204,8 +204,15 @@ $dbackground: (
 );
 
 // Colors that have meaning (eg. success/failure)
+/*
+ GO 6.2 color:
+$cPrimary:		rgb(0, 155, 201);
+$cPrimaryTp:	rgba(0, 155, 201, 0.16);*/
+
+/* Intermesh blue */
 $cPrimary:		rgb(36, 58, 128);
 $cPrimaryTp:	rgba(36, 58, 128, 0.16);
+
 $cSecondary:	rgb(104,159,56);
 $cAccent:		color($orange, A400);
 
@@ -216,7 +223,7 @@ $cWarning:		color($orange, 700);
 $cSelected: color($bg, 'hover'); // click on menus, tree items, table
 $cHover: var(--c-primary-tp);
 $cActive: color($grey, 200); // focussed
-$cAnchor: var(--c-primary);
+$cAnchor: rgb(36, 58, 128);
 
 .success { color: $cSuccess !important; }
 .danger { color: $cDanger !important; }

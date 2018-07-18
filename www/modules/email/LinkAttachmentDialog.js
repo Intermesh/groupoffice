@@ -1,4 +1,4 @@
-GO.email.LinkAttachmentDialog = Ext.extend(GO.dialog.LinksDialog,{
+GO.email.LinkAttachmentDialog = Ext.extend(go.links.CreateLinkWindow,{
 
 	attachmentItem : null, // If this is set to null, then it saves all attachments of the message.
 	messagePanel : null,
@@ -16,17 +16,15 @@ GO.email.LinkAttachmentDialog = Ext.extend(GO.dialog.LinksDialog,{
 		GO.email.LinkAttachmentDialog.superclass.constructor.call(this,config);
 	},
 	
-	linkItems : function()	{
-		
-		var selectionModel = this.grid.searchGrid.getSelectionModel();
-		var record = selectionModel.getSelected();
+	link : function()	{
+		var record = this.grid.getSelectionModel().getSelected();
 
 		GO.request({
 			url:'files/folder/checkModelFolder',
 			params:{								
 				mustExist:true,
-				model:record.data.model_name,
-				id:record.data.model_id
+				model:record.data.entity,
+				id:record.data.entityId
 			},
 			success:function(response, options, result){
 				
@@ -96,7 +94,8 @@ GO.email.LinkAttachmentDialog = Ext.extend(GO.dialog.LinksDialog,{
 				uid: this.messagePanel.uid,
 				mailbox: this.messagePanel.mailbox,
 				account_id: this.messagePanel.account_id,
-				folder_id: files_folder_id
+				folder_id: files_folder_id,
+				filepath: this.messagePanel.data.path
 			},
 			success: function(options, response, result){
 				// Successfully saved all attachments

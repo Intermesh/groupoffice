@@ -3261,13 +3261,15 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 					$this->setNewAcl(GO::user() ? GO::user()->id : 1);
 			}
 
-			if ($this->hasFiles() && GO::modules()->isInstalled('files')) {		
-				$this->checkModelFolder();
-			}
+			
 			
 			if(!$this->beforeSave()){
 				GO::debug("WARNING: ".$this->className()."::beforeSave returned false or no value");
 				return false;
+			}
+			
+			if($this->hasFiles()){
+				$this->files_folder_id = 0;
 			}
 
 			$this->_dbInsert();
@@ -3287,10 +3289,15 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 					return false;
 				}
 			}			
+			
+			
+			if ($this->hasFiles() && GO::modules()->isInstalled('files')) {		
+				$this->checkModelFolder();				
+			}
 
-			$this->setIsNew(false);
-
-			if($this->_processFileColumns($fileColumns) || $this->afterDbInsert()){
+			$this->setIsNew(false);			
+			$changed  = $this->_processFileColumns($fileColumns);
+			if($changed || $this->afterDbInsert() || $this->isModified('files_folder_id')){
 				$this->_dbUpdate();
 			}
 		}else
@@ -3331,15 +3338,18 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 			//check if other fields than model_id were modified.
 			$modified = $this->_customfieldsRecord->getModifiedAttributes();
 			unset($modified['model_id']);
-
-			if(count($modified))
-				$this->_customfieldsRecord->save();
+			
+			if(count($modified) || $this->_customfieldsRecord->isNew) {
+				if(!$this->_customfieldsRecord->save()) {
+					throw new \Exception("Could not save custom fields ". var_export($this->_customfieldsRecord->getValidationErrors(), true));
+				}
+			}
 
 //			if($this->customfieldsRecord->save())
 //				$this->touch(); // If the customfieldsRecord is saved then set the mtime of this record.
 		}
 
-		$this->log($wasNew ? \GO\Log\Model\Log::ACTION_ADD : \GO\Log\Model\Log::ACTION_UPDATE);
+		$this->log($wasNew ? \GO\Log\Model\Log::ACTION_ADD : \GO\Log\Model\Log::ACTION_UPDATE,true,isset($this->_customfieldsRecord) ? $modified : false);
 
 
 
@@ -3395,7 +3405,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 	 * @param string $action
 	 * @return array Data for the JSON string 
 	 */
-	public function getLogJSON($action){
+	public function getLogJSON($action,$modifiedCustomfieldAttrs=false){
 		
 		$cutoffString = ' ..Cut off at 500 chars.';
 		$cutoffLength = 500;
@@ -3405,11 +3415,22 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 				return $this->getAttributes();
 			case \GO\Log\Model\Log::ACTION_UPDATE:
 				$oldValues = $this->getModifiedAttributes();
-				
+								
 				$modifications = array();
 				foreach($oldValues as  $key=>$oldVal){
 					
 					$newVal = $this->getAttribute($key);
+					
+//					// Check if the value changed from false, to null
+//					if(is_null($newVal) && $oldVal === false){
+//						continue;
+//					}
+//					
+					// Check if the value changed from false, to null
+					if(empty($newVal) && empty($oldVal)){
+						continue;
+					}
+
 					if(strlen($newVal) > $cutoffLength){
 						$newVal = substr($newVal,0,$cutoffLength).$cutoffString;
 					}
@@ -3420,6 +3441,31 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 					
 					$modifications[$key]=array($oldVal,$newVal);	
 				}
+				
+				// Also track customfieldsrecord changes
+				if($this->customfieldsRecord && $modifiedCustomfieldAttrs){
+										
+					foreach($modifiedCustomfieldAttrs as  $key=>$oldVal){
+						$newVal = $this->customfieldsRecord->getAttribute($key);
+						if(empty($newVal) && empty($oldVal)){
+						continue;
+					}
+
+					if(strlen($newVal) > $cutoffLength){
+						$newVal = substr($newVal,0,$cutoffLength).$cutoffString;
+					}
+					
+					if(strlen($oldVal) > $cutoffLength){
+						$oldVal = substr($oldVal,0,$cutoffLength).$cutoffString;
+					}
+					
+					$attrLabel = $this->getCustomfieldsRecord()->getAttributeLabelWithoutCategoryName($key);
+					
+					$modifications[$attrLabel.' ('.$key.')']=array($oldVal,$newVal);	
+					}
+				}
+				
+				
 				return $modifications;
 			case \GO\Log\Model\Log::ACTION_ADD:
 				return $this->getAttributes();
@@ -3435,12 +3481,15 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 	 * @param boolean $save set the false to not directly save the create Log record
 	 * @return boolean|\GO\Log\Model\Log returns the created log or succuss status when save is true
 	 */
-	protected function log($action, $save=true){
-
+	protected function log($action, $save=true, $modifiedCustomfieldAttrs=false){
+		// jsonData field in go_log might not exist yet during upgrade
+		if(\GO::router()->getControllerRoute() == 'maintenance/upgrade') {
+			return true;
+		}
 		$message = $this->getLogMessage($action);
 		if($message && GO::modules()->isInstalled('log')){
 			
-			$data = $this->getLogJSON($action);
+			$data = $this->getLogJSON($action,$modifiedCustomfieldAttrs);
 			
 			$log = new \GO\Log\Model\Log();
 
@@ -3847,7 +3896,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 			$sql .= "DELAYED ";
 
 		$sql .= "INTO `{$this->tableName()}` (`".implode('`,`', $fieldNames)."`) VALUES ".
-					"(:".implode(',:', $fieldNames).")";
+					"(:ins".implode(',:ins', array_keys($fieldNames)).")";
 
 		if($this->_debugSql){
 			$bindParams = array();
@@ -3860,11 +3909,11 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 		try{
 			$stmt = $this->getDbConnection()->prepare($sql);
 
-			foreach($fieldNames as  $field){
+			foreach($fieldNames as $i => $field){
 
 				$attr = $this->columns[$field];
 
-				$stmt->bindParam(':'.$field, $this->_attributes[$field], $attr['type'], empty($attr['length']) ? null : $attr['length']);
+				$stmt->bindParam(':ins'.$i, $this->_attributes[$field], $attr['type'], empty($attr['length']) ? null : $attr['length']);
 			}
 			$ret =  $stmt->execute();
 		}catch(\Exception $e){
@@ -3898,8 +3947,14 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 //			}
 //		}
 //
-		foreach($this->_modifiedAttributes as $field=>$oldValue)
-			$updates[] = "`$field`=:".$field;
+		$i = 0;
+		$paramMap = [];
+		foreach($this->_modifiedAttributes as $field=>$oldValue) {
+			$p[$field] = "upd".$i;
+			$updates[] = "`$field` = :".$p[$field];
+			
+			$i++;
+		}
 
 
 		if(!count($updates))
@@ -3910,24 +3965,27 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 
 		$bindParams=array();
 
-		if(is_array($this->primaryKey())){
+		$pk = $this->primaryKey();
+		if(!is_array($pk)){
+			$pk = [$pk];
+		}
 
-			$first=true;
-			foreach($this->primaryKey() as $field){
-				if(!$first)
-					$sql .= ' AND ';
-				else
-					$first=false;
-
-				$sql .= "`".$field."`=:".$field;
+		$first=true;
+		foreach($pk as $field){
+			if(!$first)
+				$sql .= ' AND ';
+			else
+				$first=false;
+			
+			if(!isset($p[$field])) {
+				$p[$field] = "upd".$i;
+				$i++;
 			}
 
-			$bindParams[$field]=$this->_attributes[$field];
-
-		}else{
-			$sql .= "`".$this->primaryKey()."`=:".$this->primaryKey();
-			$bindParams[$field]=$this->_attributes[$field];
+			$sql .= "`".$field."`=:".$p[$field];
 		}
+
+		$bindParams[$field]=$this->_attributes[$field];
 
 
 
@@ -3940,7 +3998,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 
 				if($this->isModified($field) || in_array($field, $pks)){
 					$bindParams[$field]=$this->_attributes[$field];
-					$stmt->bindParam(':'.$field, $this->_attributes[$field], $attr['type'], empty($attr['length']) ? null : $attr['length']);
+					$stmt->bindParam(':'.$p[$field], $this->_attributes[$field], $attr['type'], empty($attr['length']) ? null : $attr['length']);
 				}
 			}
 
@@ -4828,11 +4886,21 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 
 	public function rebuildSearchCache(){
 		
+		
+				
 		$rc = new \GO\Base\Util\ReflectionClass($this);
 		$overriddenMethods = $rc->getOverriddenMethods();
 		if(in_array("getCacheAttributes", $overriddenMethods)){
-			$stmt = $this->find(FindParams::newInstance()->ignoreAcl()->select('t.*'));
-			$stmt->callOnEach('cacheSearchRecord', true);
+			
+			$start = 0;
+			$limit = 1000;
+			//per thousands to keep memory low
+			$stmt = $this->find(FindParams::newInstance()->ignoreAcl()->select('t.*')->limit($limit)->start($start));
+			while($stmt->rowCount()) {	
+				$stmt->callOnEach('cacheSearchRecord', true);				
+				$stmt = $this->find(FindParams::newInstance()->ignoreAcl()->select('t.*')->limit($limit)->start($start += $limit));		
+			}
+			
 		}
 	}
 

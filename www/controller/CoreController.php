@@ -190,7 +190,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		$store->getColumnModel()->formatColumn('cf', '$model->id.":".$model->name'); //special field used by custom fields. They need an id an value in one.
 		
 		//only get users that are enabled
-		$enabledParam = \GO\Base\Db\FindParams::newInstance();
+		$enabledParam = \GO\Base\Db\FindParams::newInstance()->debugSql();
 		if(!empty(\GO::config()->hide_disabled_users)) {
 			$enabledParam->criteria(\GO\Base\Db\FindCriteria::newInstance()->addCondition('enabled', true));
 		}
@@ -302,66 +302,6 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 
 			ob_end_flush();  // The main one
 		}
-	}
-	
-	protected function actionClientScripts() {
-		header('Content-Type: application/javascript');
-    if(!GO::config()->debug) {
-      header('Content-Encoding: gzip');
-      $cacheFile = \go\core\App::get()->getDataFolder()->getFolder('clientscripts')->create()->getFile('all.js');
-	
-    } else
-    {
-      $cacheFile = \go\core\App::get()->getTmpFolder()->getFile('debug.js');
-    }
-		
-		
-		readfile($cacheFile->getPath());
-	}
-  
-  protected function actionClientScript($source) {
-    \GO::session()->closeWriting();    
-    $file = \go\core\Environment::get()->getInstallFolder()->getFile($source);
-    
-    $matches = [];
-    
-    $module = preg_match("/\bmodules\/([^\/]+)/", $source, $matches);
-    
-    header('Content-Type: application/javascript; charset=utf8');
-     
-    if(isset($matches[1])) {
-     echo "go.Translate.setModule('" .$matches[1]. "');";
-    }
-    readfile($file->getPath());    
-  }
-	
-	protected function actionLanguage($lang) {
-		header('Content-Type: application/javascript; charset=utf8');
-		
-		\go\core\Language::get()->setLanguage($lang);
-		
-		echo \go\core\Language::get()->getScript();
-	}
-	
-	protected function actionModuleScripts() {
-		header('Content-Type: application/javascript; charset=utf8');
-		$load_modules = GO::modules()->getAllModules();
-				
-		$GO_SCRIPTS_JS = "";
-
-		foreach ($load_modules as $module) {		
-			if (file_exists($module->moduleManager->path() . 'scripts.inc.php')) {
-				require($module->moduleManager->path() . 'scripts.inc.php');
-			}
-			if (file_exists($module->moduleManager->path() . 'views/Extjs3/scripts.inc.php')) {
-				require($module->moduleManager->path() . 'views/Extjs3/scripts.inc.php');
-			}
-			if (file_exists($module->moduleManager->path() . 'views/extjs3/scripts.inc.php')) {
-				require($module->moduleManager->path() . 'views/extjs3/scripts.inc.php');
-			}			
-		}
-
-		echo $GO_SCRIPTS_JS;
 	}
 
 	protected function actionThumb($params) {

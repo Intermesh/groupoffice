@@ -94,7 +94,7 @@ GO.addressbook.AddresslistsGrid = Ext.extend(GO.grid.GridPanel,{
 				forceFit:true,
 		    hideGroupedColumn:true,
 		    groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Items" : "Item"]})',
-		   	emptyText: GO.lang.strNoItems,
+		   	emptyText: t("No items found"),
 		   	showGroupName:false,
 				startCollapsed:true
 			}),

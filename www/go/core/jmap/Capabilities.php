@@ -20,9 +20,9 @@ class Capabilities extends Singleton {
 	
 	public $maxCallInRequest = 10;
 	
-	public $maxObjectsInGet = 100;
+	public $maxObjectsInGet = 1000;
 	
-	public $maxObjectsInSet = 100;
+	public $maxObjectsInSet = 1000;
 	
 	public function __construct() {
 		$this->maxSizeUpload = min($this->maxSizeUpload, Environment::get()->getMaxUploadSize());

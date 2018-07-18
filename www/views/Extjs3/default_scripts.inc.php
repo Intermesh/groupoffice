@@ -91,10 +91,55 @@ if(GO::config()->debug) {
 //echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' => \GO::language()->getLanguage()]) . '"></script>';
 echo '<script type="text/javascript" src="' . GO::config()->url . 'views/Extjs3/ext/adapter/ext/ext-base-debug.js"></script>';
 echo '<script type="text/javascript" src="' . GO::config()->url . 'views/Extjs3/ext/ext-all-debug.js"></script>';
-echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' => \go\core\Language::get()->getIsoCode()]) . '"></script>';
+echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?lang='.\go\core\Language::get()->getIsoCode() . '&v='.GO()->getVersion().'"></script>';
+
+?>
+
+<script type="text/javascript">
+
+	//hide mask after 10s to display errors is necessary.
+//	setTimeout(function () {
+//		var loadMask = document.getElementById('loading-mask');
+//		var loading = document.getElementById('loading');
+//		if (loadMask)
+//			loadMask.style.display = 'none';
+//
+//		if (loading)
+//			loading.style.display = 'none';
+//
+//	}, 10000);
+	Ext.namespace("GO");
+
+	GO.settings = <?php echo json_encode($settings); ?>;
+	GO.language = "<?php echo GO::config()->language; ?>";
+	GO.calltoTemplate = '<?php echo GO::config()->callto_template; ?>';
+
+<?php
+if (isset(GO::session()->values['security_token'])) {
+	echo 'GO.securityToken="' . GO::session()->values['security_token'] . '";';
+}
+
+//if (isset($_GET['SET_LANGUAGE']) && preg_match('/[a-z_]/', $_GET['SET_LANGUAGE'])) {
+//	echo 'GO.loginSelectedLanguage = "' . $_GET['SET_LANGUAGE'] . '";';
+//} 
+echo 'window.name="' . GO::getId() . '";';
+?>
+
+
+
+	Ext.BLANK_IMAGE_URL = '<?php echo GO::config()->host; ?>views/Extjs3/ext/resources/images/default/s.gif';
+	
+<?php
+if (isset(GO::session()->values['security_token']))
+	echo 'Ext.Ajax.extraParams={security_token:"' . GO::session()->values['security_token'] . '"};';
+
+GO::router()->getController()->fireEvent('inlinescripts');
+?>
+</script>
+<?php
   
 if ($cacheFile->exists()) {
-	echo '<script type="text/javascript" src="' . GO::url('core/clientScripts', ['mtime' => GO::config()->mtime]) . '"></script>';
+	echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v= '. GO()->getVersion() . '"></script>';
 } else {
 
 	$scripts = array();
@@ -225,7 +270,7 @@ if ($cacheFile->exists()) {
 	
 	if (!GO::config()->debug) {
 		$minify->gzip($cacheFile->getPath());		
-		echo '<script type="text/javascript" src="' . GO::url('core/clientScripts', ['mtime' => GO::config()->mtime, 'lang' => \GO::language()->getLanguage()]) . '"></script>';
+		echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v= '. GO()->getVersion() . '"></script>';
 	} else
   {
 //    $fp = $cacheFile->open('w');
@@ -234,48 +279,7 @@ if ($cacheFile->exists()) {
   }
 //  echo '<script type="text/javascript" src="' . GO::url('core/clientScripts', ['mtime' => GO::config()->mtime, 'lang' => \GO::language()->getLanguage()]) . '"></script>';
 }
-?>
 
-<script type="text/javascript">
-
-	//hide mask after 10s to display errors is necessary.
-//	setTimeout(function () {
-//		var loadMask = document.getElementById('loading-mask');
-//		var loading = document.getElementById('loading');
-//		if (loadMask)
-//			loadMask.style.display = 'none';
-//
-//		if (loading)
-//			loading.style.display = 'none';
-//
-//	}, 10000);
-
-
-	GO.settings = <?php echo json_encode($settings); ?>;
-	GO.language = "<?php echo GO::config()->language; ?>";
-	GO.calltoTemplate = '<?php echo GO::config()->callto_template; ?>';
-
-<?php
-if (isset(GO::session()->values['security_token'])) {
-	echo 'GO.securityToken="' . GO::session()->values['security_token'] . '";';
-}
-
-//if (isset($_GET['SET_LANGUAGE']) && preg_match('/[a-z_]/', $_GET['SET_LANGUAGE'])) {
-//	echo 'GO.loginSelectedLanguage = "' . $_GET['SET_LANGUAGE'] . '";';
-//} 
-echo 'window.name="' . GO::getId() . '";';
-?>
-
-	Ext.BLANK_IMAGE_URL = '<?php echo GO::config()->host; ?>views/Extjs3/ext/resources/images/default/s.gif';
-	
-<?php
-if (isset(GO::session()->values['security_token']))
-	echo 'Ext.Ajax.extraParams={security_token:"' . GO::session()->values['security_token'] . '"};';
-
-GO::router()->getController()->fireEvent('inlinescripts');
-?>
-</script>
-<?php
 if (file_exists(GO::view()->getTheme()->getPath() . 'MainLayout.js')) {
 	echo '<script src="' . GO::view()->getTheme()->getUrl() . 'MainLayout.js" type="text/javascript"></script>';
 	echo "\n";

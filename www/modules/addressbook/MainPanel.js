@@ -16,6 +16,15 @@ GO.addressbook.MainPanel = function(config) {
 	
 
 
+		this.exportCompanyMenu = new GO.base.ExportMenuItem({
+			disabled: !GO.addressbook.exportPermission,
+			className:'GO\\Addressbook\\Export\\CurrentGridCompany', // default
+		});
+		this.exportContactMenu = new GO.base.ExportMenuItem({
+			disabled: !GO.addressbook.exportPermission,
+			className:'GO\\Addressbook\\Export\\CurrentGridContact',
+		});
+		
 
 
 
@@ -28,9 +37,9 @@ GO.addressbook.MainPanel = function(config) {
 		tbar : {
 			enableOverflow: true,
 			items:[
-			{
+			'->',{
 				iconCls: 'ic-add',
-				text: t('Add'),
+				tooltip: t('Add'),
 				handler: function(){
 					this.contactEastPanel.reset();
 					GO.addressbook.showContactDialog(0, {values:{addressbook_id:GO.addressbook.defaultAddressbook.get('id')}});
@@ -59,7 +68,7 @@ GO.addressbook.MainPanel = function(config) {
 						this.contactsGrid.store.load();
 					}
 				}
-			},'->',{
+			},{
 				xtype: 'tbsearch',
 				tools: [{
 					text: t("Advanced search", "addressbook"),
@@ -104,7 +113,8 @@ GO.addressbook.MainPanel = function(config) {
 								return this.mailingStatusWindow.show();
 							},
 							scope: this,
-						}
+						},
+						this.exportContactMenu
 
 					]
 				}
@@ -149,9 +159,9 @@ GO.addressbook.MainPanel = function(config) {
 		headerCfg: {cls:'x-hide-display'},
 		id: 'ab-company-grid',
 		title: t("Companies", "addressbook"),
-		tbar: [{
+		tbar: ['->', {
 			iconCls: 'ic-add',
-			text: t("Add"),
+			tooltip: t("Add"),
 			handler: function(){
 				this.companyEastPanel.reset();
 				GO.addressbook.showCompanyDialog(0,  {values:{addressbook_id:GO.addressbook.defaultAddressbook.get('id')}});
@@ -167,7 +177,7 @@ GO.addressbook.MainPanel = function(config) {
 				});
 			},
 			scope: this
-		},'->',{
+		},{
 				xtype: 'tbsearch',
 				tools: [{
 					text: t("Advanced search", "addressbook"),
@@ -211,7 +221,8 @@ GO.addressbook.MainPanel = function(config) {
                         return this.mailingStatusWindow.show();
                     },
                     scope: this,
-                }
+                },
+								this.exportCompanyMenu
 
             ]
 			}
@@ -251,15 +262,9 @@ GO.addressbook.MainPanel = function(config) {
 		this.setAdvancedSearchNotification(this.companiesGrid.store);
 	}, this);
 
-	if(GO.addressbook.exportPermission == '1')
-	{
-		this.exportCompanyMenu = new GO.base.ExportMenu({
-			className:'GO\\Addressbook\\Export\\CurrentGridCompany', // default
-		});
-		this.exportContactMenu = new GO.base.ExportMenu({
-			className:'GO\\Addressbook\\Export\\CurrentGridContact',
-		});
-		this.exportCompanyMenu.setColumnModel(this.companiesGrid.getColumnModel());
+	
+		
+this.exportCompanyMenu.setColumnModel(this.companiesGrid.getColumnModel());
 		this.exportContactMenu.setColumnModel(this.contactsGrid.getColumnModel());
 
 		// Button to export contacts with companies together
@@ -287,10 +292,8 @@ GO.addressbook.MainPanel = function(config) {
 		this.exportCompanyMenu.insertItem(0,this.contactsWithCompaniesExportButton);
 		this.exportContactMenu.insertItem(0,this.vcardExportButton);
 		this.exportContactMenu.insertItem(0,this.contactsWithCompaniesExportButton);
-
-		this.contactsGrid.getTopToolbar().insertButton(3, this.exportContactMenu);
-		this.companiesGrid.getTopToolbar().insertButton(3, this.exportCompanyMenu);
-	}
+	
+	
 
 	this.searchPanel = new GO.addressbook.SearchPanel({
 		region: 'north',
@@ -303,7 +306,7 @@ GO.addressbook.MainPanel = function(config) {
 		}
 	});
 
-	this.contactEastPanel = this.contactDetail = new GO.addressbook.ContactDetail({ //contactDetail added for routing
+	GO.addressbook.contactDetail = this.contactEastPanel = this.contactDetail = new GO.addressbook.ContactDetail({ //contactDetail added for routing
 		id:'ab-contact-panel',
 		border:false,
 		region:'east',
@@ -322,7 +325,7 @@ GO.addressbook.MainPanel = function(config) {
 		}
 	});
 
-	this.companyEastPanel = this.companyDetail = new GO.addressbook.CompanyReadPanel({
+	GO.addressbook.companyDetail = this.companyEastPanel = this.companyDetail = new GO.addressbook.CompanyReadPanel({
 		id:'ab-company-panel',
 		border:false,
 		region:'east',
@@ -330,7 +333,6 @@ GO.addressbook.MainPanel = function(config) {
 		split:true,
 		listeners: {
 			beforeload: function() {
-				
 				//make sure companies is selected when routing
 				this.navMenu.select(1);
 			},
@@ -566,7 +568,9 @@ Ext.extend(GO.addressbook.MainPanel, Ext.Panel,{
 					GO.addressbook.readableAddresslistsStore.loadData(result.readable_addresslists);
 					GO.addressbook.writableAddresslistsStore.loadData(result.writable_addresslists);
 //				}
-				this.navMenu.select(0);
+				if(this.navMenu.getSelectionCount() == 0) {
+					this.navMenu.select(0);
+				}
 				this.getEl().unmask();
 			},
 			scope:this

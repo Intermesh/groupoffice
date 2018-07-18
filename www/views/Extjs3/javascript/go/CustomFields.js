@@ -158,9 +158,21 @@
 
 					detailView.add({						
 						id: "cf-detail-field-set-" + fieldSet.id,
+						fieldSetId: fieldSet.id,
 						title: fieldSet.name,
 						tpl: tpl,
-						collapsible: true						
+						collapsible: true,
+						onLoad: function(dv) {
+							
+							var vis = false;
+							go.CustomFields.getFields(fieldSet.id).forEach(function (field) {
+								if(!GO.util.empty(dv.data.customFields[field.databaseName])) {
+									vis = true;
+								}
+							});
+							
+							this.setVisible(vis);
+						}
 					});
 
 					if (detailView.rendered) {

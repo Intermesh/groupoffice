@@ -148,11 +148,11 @@
 	border:0;
 }
 .x-tab-panel-header, .x-tab-panel-footer {
-	background-color:color($bg,'app-bar');
+	/*background-color:color($bg,'app-bar');*/
 	padding-bottom:0;
    overflow:hidden;
    zoom:1;
-	box-shadow: inset 0px -1px 1px color($fg,'line');
+	/*box-shadow: inset 0px -1px 1px color($fg,'line');*/
 	.x-portlet & {
 		background-color: transparent;
 		
@@ -477,12 +477,15 @@ ul.x-tab-strip-bottom{
 	margin-bottom: dp(16);
 }
 
-
-.x-form-field-wrap {
-	line-height: 0; //for textarea. Without this it gets extra margin somehow
+.x-form-field-trigger-wrap {
 	> input {
 		padding-right: dp(32); // for trigger button: todo twintrigger
 	}
+}
+
+.x-form-field-wrap {
+	line-height: 0; //for textarea. Without this it gets extra margin somehow
+
 	> span, > button.x-form-trigger { // triggers
 		display:inline-block;
 		position: absolute;
@@ -671,7 +674,8 @@ ul.x-tab-strip-bottom{
 		}
 	}
 	.x-toolbar & {
-		@include var(color, c-primary);
+		
+		//@include var(color, c-primary);
 		box-shadow: none !important;
 	}
 	// transition: background 400ms cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -1366,7 +1370,7 @@ td.grid-hd-group-cell {
 	border-bottom: 1px solid color($fg, 'divider');
 	div.x-grid-group-title {
 		@extend %font-caption;
-		@include var(color, c-primary);
+		/*@include var(color, c-primary);*/
 		padding: dp(8);
 		&::before {
 			@extend %icon;

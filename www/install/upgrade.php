@@ -25,7 +25,7 @@ function isValidDb() {
 					->where('name', '=', 'upgrade_mtime')
 					->single();
 
-	if($mtime < 20180614) {
+	if($mtime < 20180511) {
 		throw new \Exception("You're database is not on the latest 6.2 version. Please upgrade it to the latest 6.2 first and make sure the modules 'customfields' and 'search' are installed.");
 	}
 	
@@ -44,9 +44,7 @@ try {
 	
 	require('../vendor/autoload.php');
 	
-	if(is_dir("/etc/groupoffice/" . $_SERVER['HTTP_HOST'])) {	
-		throw new \Exception("Please move all your domain configuration folders from /etc/groupoffice/* into /etc/groupoffice/multi_instance/*. Only move folders, leave /etc/groupoffice/config.php and other files where they are.");
-	}
+	
 	
 	require('header.php');
 	
@@ -62,8 +60,7 @@ try {
 	GO()->getCache()->flush(false);
 	GO()->setCache(new \go\core\cache\None());
 	
-	if (isValidDb() == 62) {
-		//todo: verify this is a valid 6.2 database
+	if (isValidDb() == 62) {		
 		require(Environment::get()->getInstallFolder() . '/install/62to63.php');
 	}
 
@@ -196,7 +193,6 @@ try {
 					//refetch module to see if package was updated
 					if (!$module->package) {
 						$module = Module::findById($moduleId);
-						var_dump($module->package);
 						$newBackendUpgrade = $module->package != null;
 						if ($newBackendUpgrade) {
 							$module->version = $counts[$moduleId] = 0;
@@ -234,7 +230,8 @@ try {
 	echo "Flushing cache\n";
 	GO::clearCache(); //legacy
 	App::get()->getCache()->flush(false);
-	App::get()->getDataFolder()->getFolder('clientscripts')->delete();
+	$webclient = new \go\core\webclient\Extjs3();
+	$webclient->flushCache();
 
 
 	echo "Rebuilding listeners\n";
@@ -253,7 +250,9 @@ try {
 	
 	
 } catch (\Exception $e) {
-	echo "<b>Error:</b> ".$e->getMessage();
+	echo "<b>Error:</b> ".$e->getMessage()."\n\n";;
+	
+	echo $e->getTraceAsString();
 	
 	echo "</pre></div></section>";
 }

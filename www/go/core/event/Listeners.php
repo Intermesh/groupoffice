@@ -76,7 +76,7 @@ class Listeners extends Singleton {
 					continue;
 				}
 				
-				require_once($file);
+//				require_once($file);
 				
 				$cls = "GO\\" . ucfirst($module->name) . "\\" . ucfirst($module->name).'Module';
 				if(!class_exists($cls)) {
