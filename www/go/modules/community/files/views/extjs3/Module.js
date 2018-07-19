@@ -112,7 +112,7 @@ go.modules.community.files.move = function(nodes, targetId){
 go.modules.community.files.copy = function(nodes, targetId){
 	var items = {};
 	Ext.each(nodes, function(record) {
-		record.data.parentId = tagetId;
+		record.data.parentId = targetId;
 		items[Ext.id(null,'#')] = record.data;
 	});
 	go.Stores.get('Node').set({create:items});

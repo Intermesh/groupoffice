@@ -69,6 +69,19 @@ go.modules.community.files.NodeGrid = Ext.extend(go.grid.GridPanel, {
 			stateful: true,
 			stateId: 'files-grid'
 		});
+		
+		this.store.entityStore.on('changes', function(store, added, changed, destroyed){
+			var stale = false;
+			for(var i = 0; i < changed.length; i++) {
+				if(store.get(changed[i]).parentId !== this.store.baseParams.filter.parentId) {
+					stale = true;
+				}
+			}
+			if(stale) {
+				this.store.reload();
+			}
+
+		},this);
 
 		go.modules.community.files.NodeGrid.superclass.initComponent.call(this);
 	},
@@ -94,7 +107,7 @@ go.modules.community.files.NodeGrid = Ext.extend(go.grid.GridPanel, {
 			return false;
 		}
 		if(droppedAt.data.isDirectory) {
-			this.browser.receive(records, go.modules.community.files.move, droppedAt.data.id);
+			this.browser.receive(records, droppedAt.data.id, 'move');
 			//Ext.each(records, ddSource.grid.store.remove, ddSource.grid.store);
 		}
 		return true

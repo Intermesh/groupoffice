@@ -22,7 +22,6 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
       'image/gif': true
    },
 	
-	activeUploads: 0,
 	pendingDuplicates: {},
 		
 	initComponent: function () {
@@ -388,50 +387,10 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 			e.stopPropagation();
 			e.preventDefault();
 			this.body.removeClass('x-dd-over');
-			this.browser.receive(e.dataTransfer.files, this.fileUpload, this.browser.getCurrentDir());
+			this.browser.receive(e.dataTransfer.files, this.browser.getCurrentDir());
 		}.bind(this));
 		
 		go.modules.community.files.CenterPanel.superclass.afterRender.call(this, arguments);
-	},
-	
-	fileUpload: function(file, replaceIndex, newName, parentId) {
-		if(replaceIndex || replaceIndex === 0) {
-			var record = this.store.getAt(replaceIndex);
-			record.set('status', 'queued');
-		} else {
-			var record = new this.store.recordType({
-				name: newName || file.name,
-				isDirectory: 0,
-				parentId: this.store.baseParams.filter.parentId, 
-				size: file.size,
-				status: 'queued'
-			});
-			this.store.add(record);
-		}
-		this.activeUploads++;
-		go.Jmap.upload(file, {
-		  progress: function(e) {
-				if (e.lengthComputable) {
-					var complete = (e.loaded / e.total * 100 | 0);
-					record.set('progress', complete);
-				}
-		  },
-		  success: function(data) {
-			  this.activeUploads--;
-			  record.set('status', 'done');
-			  record.set('blobId', data.blobId);
-
-			  if(this.activeUploads === 0) {
-				  this.store.commitChanges();
-			  }
-		  },
-		  failure: function(e) {
-			  record.set('progress', 0);
-			  record.set('status', 'failed');
-		  },
-		  scope:this
-	  });
 	}
-	
-	
+
 });

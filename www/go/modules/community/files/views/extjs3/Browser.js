@@ -21,6 +21,9 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 	rootLoaded : false,
 	_rootNodes:[],
 	
+	activeUploads: 0,
+	unprocessedFiles: 0,
+	
 	/**
 	 * Call open() will change route, will call nav()
 	 * @param {type} config
@@ -249,19 +252,22 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 		this.open();
 	},
 	
-	receive: function(files, callback, targetId) {
+	receive: function(files, targetId, action, callback) {
+		action = action || 'fileUpload';
+		
 		function internalReceive() {
-			debugger;
 			for (var i = 0; i < files.length; i++) {
 				var node = files[i].data || files[i];
 				var index = this.targetStore.find('name', node.name);
 				if(index === -1) { // not found
-					callback(node); // TODO set params for callback same if in uploadfiles
+					this[action](node, false, node.name, callback);
 				} else { // already exist
-					this._solveDuplicate(node, index, callback);
+					this._solveDuplicate(node, index, action, callback);
 				}
 			}
 		}
+		
+		this.unprocessedFiles = files.length;
 		
 		if(targetId && this.targetStore.baseParams.filter && this.targetStore.baseParams.filter.parentId != targetId) {
 			this.targetStore.setBaseParam('filter',{parentId: targetId});
@@ -273,7 +279,7 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 	
 	pendingDuplicates : {},
 	
-	_solveDuplicate : function(file, index, callback) {
+	_solveDuplicate : function(file, index, action, callback) {
 		this.pendingDuplicates[index] = file;
 		var count = Object.keys(this.pendingDuplicates).length,
 			msg = (count < 2) ? 'A file named <b>' + file.name + '</b>' : '<b>' + count + '</b> files';
@@ -285,7 +291,7 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 			fn: function(btnId, text) {
 				for (var i in this.pendingDuplicates) {
 					if(btnId === 'no') {
-						callback(this.pendingDuplicates[i], i);
+						this[action](this.pendingDuplicates[i], i, false, callback);
 						continue;
 					} else if(btnId === 'yes') {
 						var newName, nameCount = 0, index = i,
@@ -300,12 +306,12 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 						while(index !== -1) {
 							nameCount++;
 							newName = name + '('+nameCount+')';
-							index = this.targetStore.find('name', newName);
+							index = this.targetStore.find('name', newName, callback);
 						}
 						if(extension !== null) {
 							newName += ('.'+extension);
 						}
-						callback(this.pendingDuplicates[i], false, newName);
+						this[action](this.pendingDuplicates[i], false, newName, callback);
 					}
 				}
 				this.pendingDuplicates = {};
@@ -313,6 +319,62 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 			scope:this
 		});
 
+	},
+	
+	move: function(nodes, replaceIndex, newName){
+		var items = {};
+		Ext.each(nodes, function(record) {
+			items[record.id] = {parentId:this.targetStore.baseParams.filter.parentId};
+			if(newName) {
+				items[record.id].name = newName;
+			}
+		}, this);
+		// TODO: Change in store and commit all at once
+		go.Stores.get('Node').set({update:items});
+		
+		this.unprocessedFiles--;
+		if(this.unprocessedFiles === 0) {
+			this.targetStore.commitChanges();
+		}
+	},
+	
+	fileUpload: function(file, replaceIndex, newName) {
+		var targetStore = this.targetStore;
+		if(replaceIndex || replaceIndex === 0) {
+			var record = targetStore.getAt(replaceIndex);
+			record.set('status', 'queued');
+		} else {
+			var record = new targetStore.recordType({
+				name: newName || file.name,
+				isDirectory: 0,
+				parentId: targetStore.baseParams.filter.parentId, 
+				size: file.size,
+				status: 'queued'
+			});
+			targetStore.add(record);
+		}
+		this.activeUploads++;
+		go.Jmap.upload(file, {
+		  progress: function(e) {
+				if (e.lengthComputable) {
+					var complete = (e.loaded / e.total * 100 | 0);
+					record.set('progress', complete);
+				}
+		  },
+		  success: function(data) {
+			  this.activeUploads--;
+			  record.set('status', 'done');
+			  record.set('blobId', data.blobId);
+			  if(this.activeUploads === 0) {
+					targetStore.commitChanges();
+			  }
+		  },
+		  failure: function(e) {
+			  record.set('progress', 0);
+			  record.set('status', 'failed');
+		  },
+		  scope:this
+	  });
 	},
 	
 	/**
