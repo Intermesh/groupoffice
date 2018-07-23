@@ -416,7 +416,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 */
 	public function equals($record) {
 
-		if(!is_array($record)){
+		if(!is_array($record) && !($record instanceof \Traversable)){
 			$record=array($record);
 		}
 
