@@ -102,6 +102,10 @@ try {
 				return false;
 			}
 			
+			if(!$user->enabled) {				
+				output([], 401, GO()->t("You're account has been disabled."));
+			}
+			
 			if(GO()->getSettings()->maintenanceMode && !$user->isAdmin()) {
 				output([], 503, "Service unavailable. Maintenance mode is enabled");
 			}
