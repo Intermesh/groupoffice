@@ -468,7 +468,8 @@ $qs[] = "ALTER TABLE `core_auth_password` ADD FOREIGN KEY (`userId`) REFERENCES 
 $qs[] = "update core_entity set moduleId = (select id from core_module where name='users') where name='User';";
 
 
-
+//obsolete module
+$qs[] = "delete from core_module where name='admin2userlogin'";
 
 foreach($qs as $q) {
 	if(is_string($q)) {

@@ -40,6 +40,62 @@ function isValidDb() {
 	return 62;	
 }
 
+
+//TODO check all modules for availability and license.
+
+function checkLicenses($is62 = false) {	
+	if($is62) {
+		//disabled modules must be deleted too when upgrading from 6.2 to 6.3
+		$modules = (new \go\core\db\Query)
+					->select('id AS name, "legacy" AS package')
+					->from('go_modules')->all();
+	} else
+	{
+		$modules = (new \go\core\db\Query)
+					->select('name, package')
+					->from('core_module')
+					->where('enabled', '=', true)
+					->all();
+	}
+	
+	$unavailable = [];
+	foreach($modules as $module) {
+		
+		if(in_array($module['name'], ['users', 'groups', 'modules', 'search', 'links', 'admin2userlogin'])) {
+			//ignore refactored modules.
+			continue;
+		}
+		
+		if(isset($module['package']) && $module['package'] != 'legacy') {
+			
+			//SKIP for now as there no encoded refactored moules yet.
+			continue;
+		}
+		
+		
+		$moduleCls = "GO\\" . ucfirst($module['name']). "\\" . ucfirst($module['name']) . "Module";
+		
+		if(!class_exists($moduleCls)) {
+			$unavailable[] = $module['name'];
+			continue;
+		} 
+		
+		$mod = new $moduleCls();
+		
+		if(!$mod->isAvailable()) {
+			$unavailable[] = $module['name'];
+		}		
+	}
+	
+	if(count($unavailable)) {
+		throw new \Exception("The following installed modules are not available because they're missing on disk\nor you've got an invalid or missing license file: \n\n - " . implode("\n - ", $unavailable) . "\n\nPlease install the license files or uninstall these modules before upgrading.");
+	}
+	
+	return true;
+	
+}
+
+
 try {
 	
 	require('../vendor/autoload.php');
@@ -59,8 +115,10 @@ try {
 	
 	GO()->getCache()->flush(false);
 	GO()->setCache(new \go\core\cache\None());
+	$dbValid = isValidDb();
+	checkLicenses($dbValid == 62);
 	
-	if (isValidDb() == 62) {		
+	if ($dbValid == 62) {		
 		require(Environment::get()->getInstallFolder() . '/install/62to63.php');
 	}
 
