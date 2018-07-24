@@ -1131,18 +1131,6 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 						this.newMenu.add(menuItem);
 					}
 				}
-				
-				if(go.Modules.isAvailable("legacy", "documenttemplates"))
-				{
-					this.newMenu.add('-');
-					this.newOODoc = new GO.documenttemplates.NewOODocumentMenuItem();
-					this.newOODoc.fb = this;
-					this.newOODoc.on('create', function(){
-						this.gridStore.reload();
-					}, this);
-
-					this.newMenu.add(this.newOODoc);
-				}
 
 				if(GO.settings.modules.files.write_permission)
 				{
