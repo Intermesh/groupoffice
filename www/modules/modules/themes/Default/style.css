@@ -38,3 +38,14 @@ padding: 0px 0px 0px 0px;
 	z-index:9999999;
 	
 }
+
+.mo-actions-column a span{
+	cursor:pointer;
+	display:inline-block;
+}
+
+.go-icon-mo-delete {
+	background-image:url('images/delete.png') !important;
+	width:16px;
+	height:16px;
+}

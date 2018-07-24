@@ -192,11 +192,12 @@ class ModuleCollection extends Model\ModelCollection{
 	 * @param StringHelper $moduleId
 	 * @return Model\Module 
 	 */
-	public function isInstalled($moduleId){
+	public function isInstalled($moduleId, $checkEnabled = true){
 		$model = $this->model->findByPk($moduleId, false, true);
 		
-		if(!$model || !$model->enabled || !$this->_isAllowed($model->id))
+		if(!$model || ($checkEnabled && !$model->enabled) || !$this->_isAllowed($model->id)){
 				return false;
+		}
 		
 		return $model;
 	}

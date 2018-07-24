@@ -76,7 +76,7 @@ class ModuleController extends AbstractJsonController{
 			
 			$module = new $moduleClass;	
 			
-			$model = GO::modules()->isInstalled($module->id());
+			$model = GO::modules()->isInstalled($module->id(),false);
 			
 			
 			$availableModules[$module->name()] = array(
@@ -86,6 +86,7 @@ class ModuleController extends AbstractJsonController{
 					'description'=>$module->description(),
 					'icon'=>$module->icon(),
 					'acl_id'=>$model ? $model->acl_id : 0,
+					'installed'=>$model?true:false,
 //					'buyEnabled'=>!GO::scriptCanBeDecoded() || 
 //							($module->appCenter() && (\GO\Professional\License::isTrial() || \GO\Professional\License::moduleIsRestricted($module->id())!==false)),
 				

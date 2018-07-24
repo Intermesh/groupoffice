@@ -20,7 +20,7 @@ GO.modules.MainPanel = function(config) {
 	var reader = new Ext.data.JsonReader({
 			root: 'results',
 			totalProperty: 'total',
-			fields: ['name', 'package', 'description', 'id', 'sort_order', 'admin_menu', 'acl_id', 'icon', 'enabled', 'warning', 'buyEnabled','not_installable'],
+			fields: ['name', 'package', 'description', 'id', 'sort_order', 'admin_menu', 'acl_id', 'icon', 'enabled', 'warning', 'buyEnabled','not_installable','installed'],
 			id: 'id'
 		});
 
@@ -158,8 +158,21 @@ GO.modules.MainPanel = function(config) {
 				allowBlank: false,
 				decimals:0
 			})
-		},
-		{
+		},{
+			header:'',
+			dataIndex:'actions',
+			renderer:function(val, meta, record, rowIndex, columnIndex, store){
+				meta.css += 'mo-actions-column';
+				
+				console.log(record.data);
+				
+				if(record.data.installed){
+					return '<a href="#" onclick="GO.moduleManager.deleteModule(\''+record.data.id+'\',\''+record.data.name+'\');"><span class="go-icon-mo-delete"></span></a>';
+				} else {
+					return '';
+				}
+			}
+		},{
 			header: "Package",
 			dataIndex: 'package',
 			id: 'package'
@@ -469,6 +482,28 @@ Ext.extend(GO.modules.MainPanel,Ext.grid.EditorGridPanel, {
 
 });
 
+
+GO.moduleManager.deleteModule = function(moduleId, name){
+	
+	var modulePanel = GO.mainLayout.getModulePanel("modules");
+	
+	Ext.MessageBox.confirm(GO.modules.lang.cmdUninstall,GO.modules.lang.cmdUninstallMessage.replace('{0}',name), function(clickedBtn){
+		if(clickedBtn === 'yes'){			
+			GO.request({
+				maskEl:modulePanel.getEl(),
+				url: 'modules/module/delete',
+				params: {
+					id: moduleId
+				},
+				scope: this,
+				success: function(response, options, result) {
+					Ext.Msg.alert(GO.modules.lang.cmdUninstall, GO.modules.lang.cmdUninstallMessageSuccess.replace('{0}',name));
+					modulePanel.getStore().load();
+				}
+			});
+		}
+	},this);
+};
 
 GO.moduleManager.addModule('modules', GO.modules.MainPanel, {
 	title: GO.modules.lang.modules,

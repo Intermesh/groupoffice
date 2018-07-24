@@ -8,7 +8,7 @@ $l["cmdAvailableModules"]='Verfügbare Module';
 $l["cmdModuleName"]='Name';
 $l["cmdModuleDescription"]='Beschreibung';
 $l["cmdGridColumnModuleName"]='Name';
-$l["cmdUninstallMessage"]='ACHTUNG! Wenn Sie das Modul "{0}" deaktivieren, werden alle zugehörigen Daten gelöscht! Möchten Sie es wirklich deaktivieren?';
+$l["cmdUninstallMessage"]='ACHTUNG!<br>Wenn Sie das Modul "{0}" deaktivieren, werden alle zugehörigen Daten gelöscht!<br>Möchten Sie es wirklich deaktivieren?';
 $l["cmdModulesCannotBeDeleted"]='Dieses Modul kann nicht entfernt werden!';
 
 $l['name']='Module';
