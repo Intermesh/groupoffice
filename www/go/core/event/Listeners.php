@@ -111,8 +111,6 @@ class Listeners extends Singleton {
 	 * @return boolean
 	 */
 	public function fireEvent($calledClass, $traitUser, $event, $args) {	
-		$this->init();
-		
 		if (isset($this->listeners[$calledClass][$event])) {
 			foreach ($this->listeners[$calledClass][$event] as $listener) {	
 				$return = call_user_func_array($listener, $args);

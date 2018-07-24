@@ -67,9 +67,14 @@ abstract class Entity  extends \go\core\orm\Entity {
 	 * @return boolean
 	 */
 	protected function internalDelete() {
-		$this->deletedAt = new DateTime();
-
-		return $this->internalSave();
+		
+		if($this->getMapping()->getColumn('deletedAt')) {
+			$this->deletedAt = new DateTime();
+			return $this->internalSave();
+		} else
+		{
+			return parent::internalDelete();
+		}
 	}
 	
 	/**
