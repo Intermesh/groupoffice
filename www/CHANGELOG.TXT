@@ -1,3 +1,5 @@
+- Modules: Added delete button to completely remove modules.
+
 28-06-2018 6.2.101
 - Fixed problem in database check
 
