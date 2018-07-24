@@ -3333,7 +3333,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 		//use private customfields record so it's accessed only when accessed before
 		if (isset($this->_customfieldsRecord)){
 			//id is not set if this is a new record so we make sure it's set here.
-			$this->_customfieldsRecord->model_id=$this->id;
+			$this->_customfieldsRecord->{$this->_customfieldsRecord->primaryKey()}=$this->id;
 
 			//check if other fields than model_id were modified.
 			$modified = $this->_customfieldsRecord->getModifiedAttributes();
