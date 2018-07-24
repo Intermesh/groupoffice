@@ -184,7 +184,28 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 
 	initToolbar: function () {
 
+		var menu =[{
+				iconCls: "ic-print",
+				text: t("Print"),
+				handler: function () {
+					this.body.print({title: this.data.name});
+				},
+				scope: this
+			},{
+				iconCls: 'ic-merge-type',
+				text: t("Merge"),
+				disabled: true,
+				handler: function () {
+					if (!this.selectMergeLinksWindow) {
+						this.selectMergeLinksWindow = new GO.dialog.MergeWindow({displayPanel: this});
+					}
 
+					this.selectMergeLinksWindow.show();
+				},
+				scope: this,
+			}
+
+		];
 
 		var tbarCfg = {
 			disabled: true,
@@ -204,30 +225,7 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 
 				{
 					iconCls: 'ic-more-vert',
-					menu: [
-						{
-							iconCls: "btn-print",
-							text: t("Print"),
-							handler: function () {
-								this.body.print({title: this.data.name});
-							},
-							scope: this
-						}
-						, {
-							iconCls: 'ic-merge-type',
-							text: t("Merge"),
-							disabled: true,
-							handler: function () {
-								if (!this.selectMergeLinksWindow) {
-									this.selectMergeLinksWindow = new GO.dialog.MergeWindow({displayPanel: this});
-								}
-
-								this.selectMergeLinksWindow.show();
-							},
-							scope: this,
-						}
-
-					]
+					menu: menu
 				}]
 		};
 
