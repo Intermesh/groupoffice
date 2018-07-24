@@ -186,7 +186,7 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 
 		var moreMenuItems = [
 			{
-				iconCls: "btn-print",
+				iconCls: "ic-print",
 				text: t("Print"),
 				handler: function () {
 					this.body.print({title: this.data.name});
@@ -283,7 +283,7 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 
 				{
 					iconCls: 'ic-more-vert',
-					menu: moreMenuItems
+					menu:moreMenuItems
 				}]
 		};
 		

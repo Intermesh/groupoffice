@@ -87,6 +87,10 @@
 								Ext.MessageBox.alert(t("Maintenance mode"), t("Sorry, maintenance mode is enabled and you can't login right now. Please come back later or contact your system administrator"));
 								break;
 								
+							case 401:
+								Ext.MessageBox.alert(t("Account disabled"), t("You're account has been disabled"));
+								break;
+								
 							case 403:
 								//handled by form
 							break;
