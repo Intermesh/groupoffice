@@ -1084,7 +1084,7 @@ class GO{
 			}
 			
 			$modelName = $entityType->getClassName();
-			return $modelName;
+			//return $modelName;
 		} 
 		
 
