@@ -185,7 +185,8 @@ namespace go\core {
 					"general" => [
 							"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice', //TODO default should be /var/lib/groupoffice
 							"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
-							"debug" => !empty($config['debug'])
+							"debug" => !empty($config['debug']),
+							"cache" => Disk::class
 					],
 					"db" => [
 							"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . ($config['db_name'] ?? "groupoffice-com"),
@@ -256,7 +257,8 @@ namespace go\core {
 		 */
 		public function getCache() {
 			if (!isset($this->cache)) {
-				$this->cache = new Disk();
+				$cls = $this->getConfig()['general']['cache'];
+				$this->cache = new $cls;
 			}
 			return $this->cache;
 		}

@@ -59,6 +59,13 @@ class Authenticator extends PrimaryAuthenticator {
 				throw new \Exception("Couldn't enable TLS");
 			}
 		}
+		
+		if (!empty($server->username)) {			
+			if (!$connection->bind($server->username, $server->password)) {
+				throw new \Exception("Failed to bind to LDAP server with RDN: " .$server->username);
+			}
+		}
+		
 		$ldapUsername = explode('@', $username)[0];
 		$record = Record::find($connection, $server->peopleDN, $server->usernameAttribute . "=" . $ldapUsername)->fetch();
 		

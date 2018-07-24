@@ -287,13 +287,18 @@ try {
 
 	echo "Flushing cache\n";
 	GO::clearCache(); //legacy
-	App::get()->getCache()->flush(false);
+	
 	$webclient = new \go\core\webclient\Extjs3();
 	$webclient->flushCache();
+	
+	//reset new cache
+	$cls = GO()->getConfig()['general']['cache'];
+	GO()->setCache(new $cls);
 
 
 	echo "Rebuilding listeners\n";
 	Observable::cacheListeners();
+	\go\core\event\Listeners::get()->init();
 	
 	App::get()->getSettings()->databaseVersion = App::get()->getVersion();
 	App::get()->getSettings()->save();
@@ -303,6 +308,11 @@ try {
 	echo "</pre></div>";
 	
 	echo '<a class="button" href="../">Continue</a>';
+	
+	
+	if(GO()->getDebugger()->enabled) {
+		echo "<div style=\"clear:both;margin-bottom:20px;\"></div><div class=\"card\"><h2>Debugger output</h2><pre>" . implode("\n", GO()->getDebugger()->getEntries()) . "</pre></div>";
+	}
 	
 	echo "</section>";
 	

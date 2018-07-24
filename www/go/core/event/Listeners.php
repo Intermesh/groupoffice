@@ -54,14 +54,12 @@ class Listeners extends Singleton {
 	 */
 	public function init() {
 
-		App::get()->debug("Initializing event listeners");
-		
+
 		//create lock. If another user is already doing this we should not save to cache.
 		$lock = new  \go\core\util\Lock("listeners");
-		$locked = $lock->lock();
+		$lockObtained = $lock->lock();		
 
 		$this->listeners = [];
-
 
 		//disable events to prevent recursion
 		EventEmitterTrait::$disableEvents = true;
@@ -97,7 +95,7 @@ class Listeners extends Singleton {
 		//disable events to prevent recursion
 		EventEmitterTrait::$disableEvents = false;
 		
-		if(!$locked) {
+		if($lockObtained) {
 			App::get()->getCache()->set('listeners', $this->listeners);		
 		}
 	}

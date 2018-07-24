@@ -49,6 +49,20 @@ class Server extends Entity {
 	public $groups;
 
 	
+	/**
+	 * Set username authentication is needed to lookup users / groups.
+	 * 
+	 * @var string
+	 */
+	public $username;
+	
+	/**
+	 * Set password authentication is needed to lookup users / groups.
+	 * 
+	 * @var string
+	 */
+	public $password;
+	
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable('ldapauth_server', 's')
