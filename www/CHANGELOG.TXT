@@ -1,3 +1,4 @@
+- Projects: fixed problem importing project description from CSV
 - Modules: Added delete button to completely remove modules.
 
 28-06-2018 6.2.101
