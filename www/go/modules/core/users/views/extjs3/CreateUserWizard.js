@@ -44,6 +44,16 @@ go.modules.core.users.CreateUserWizard = Ext.extend(go.Wizard, {
 		this.applyPanelData(item);
 	},
 	
+	applyData : function(data){
+		
+		var me = this;
+		this.items.each(function(item,index,length){
+			if(item != me.groupsGrid){
+				item.getForm().setValues(data);
+			}
+		});
+	},
+		
 	applyPanelData : function(item) {
 		if(item != this.groupsGrid) {
 			this.user = Ext.apply(this.user, item.getForm().getValues());
@@ -51,6 +61,10 @@ go.modules.core.users.CreateUserWizard = Ext.extend(go.Wizard, {
 		{
 			this.user.groups = this.groupsGrid.getValue();
 		}
+	},
+	
+	onSaveSuccess : function(response){
+		
 	},
 	
 	onFinish: function(wiz, lastItem) {
@@ -67,8 +81,9 @@ go.modules.core.users.CreateUserWizard = Ext.extend(go.Wizard, {
 			if (response.created && response.created[id]) {				
 				
 				//var serverId = params.create ? response.created[id].id : response.updated[id].id;
-
+				this.onSaveSuccess(response.created[id]);
 				this.close();
+				
 			} else
 			{
 				//something went wrong

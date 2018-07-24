@@ -184,14 +184,15 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 
 	initToolbar: function () {
 
-		var menu =[{
+		var moreMenuItems = [
+			{
 				iconCls: "ic-print",
 				text: t("Print"),
 				handler: function () {
 					this.body.print({title: this.data.name});
 				},
 				scope: this
-			},{
+			}, {
 				iconCls: 'ic-merge-type',
 				text: t("Merge"),
 				disabled: true,
@@ -202,10 +203,67 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 
 					this.selectMergeLinksWindow.show();
 				},
-				scope: this,
+				scope: this
 			}
-
 		];
+		
+		if(go.Modules.isAvailable("core", "users")){
+
+			this.createUserButton = new Ext.menu.Item({
+				iconCls:'btn-add',
+				text: t("Create user"),
+				disabled:true,
+				handler:function(){
+
+					if(GO.util.empty(this.data.go_user_id)){
+
+						var username =this.data.last_name;
+						var arr = this.data.email.split('@');
+						if(arr[0]){
+							username = arr[0];	
+						}
+						
+						var data = {
+							displayName:this.data.name,
+							email:this.data.email,
+							recoveryEmail:this.data.email,
+							username:username
+						};
+
+						var dlg = new go.modules.core.users.CreateUserWizard();
+						
+						var me = this;
+	
+						dlg.onSaveSuccess = function(response){
+
+							if(response && response.id){
+								GO.request({
+									url: 'addressbook/contact/submit',
+									params: {
+										id: me.data.id,
+										go_user_id:response.id
+									},
+									scope: me,
+									success: function(response, options, result) {
+										me.reload();
+									}
+								});			
+							}
+						},
+						
+						dlg.applyData(data);
+						dlg.show();
+						
+					}else	{
+						var dlg = new go.usersettings.UserSettingsDialog();
+						dlg.show(this.data.go_user_id);
+					}
+				},
+				scope:this
+			});
+			
+			moreMenuItems.splice(1,0,this.createUserButton);
+		}
 
 		var tbarCfg = {
 			disabled: true,
@@ -225,11 +283,24 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 
 				{
 					iconCls: 'ic-more-vert',
-					menu: menu
+					menu:moreMenuItems
 				}]
 		};
-
-
+		
 		return new Ext.Toolbar(tbarCfg);
+	},
+	onLoad : function() {
+		
+		if(this.createUserButton){
+			
+			this.createUserButton.setDisabled(false);
+			if(GO.util.empty(this.data.go_user_id)){
+				this.createUserButton.setText(t("Create user"));
+			} else {
+				this.createUserButton.setText(t("Edit user"));
+			}
+		}
+		
+		GO.addressbook.ContactDetail.superclass.onLoad.call(this);
 	}
 });
