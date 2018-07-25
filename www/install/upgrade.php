@@ -61,7 +61,7 @@ function checkLicenses($is62 = false) {
 	$unavailable = [];
 	foreach($modules as $module) {
 		
-		if(in_array($module['name'], ['users', 'groups', 'modules', 'search', 'links', 'admin2userlogin'])) {
+		if(in_array($module['name'], ['users', 'groups', 'modules', 'search', 'links', 'webodf', 'admin2userlogin', 'settings', 'sites', 'syncml', 'dropbox', 'timeregistration', 'projects', 'hoursapproval', 'webodf'])) {
 			//ignore refactored modules.
 			continue;
 		}
@@ -88,7 +88,7 @@ function checkLicenses($is62 = false) {
 	}
 	
 	if(count($unavailable)) {
-		throw new \Exception("The following installed modules are not available because they're missing on disk\nor you've got an invalid or missing license file: \n\n - " . implode("\n - ", $unavailable) . "\n\nPlease install the license files or uninstall these modules before upgrading. If you're unable to uninstall them you could manually remove them from the  go_modules or core_module table.");
+		throw new \Exception("The following installed modules are not available because they're missing on disk\nor you've got an invalid or missing license file: \n\n - " . implode("\n - ", $unavailable) . "\n\nPlease install the license files or uninstall these modules before upgrading.\nIf you're unable to uninstall them you could manually remove them from the 'go_modules' or 'core_module' table.");
 	}
 	
 	return true;
