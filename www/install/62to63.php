@@ -469,7 +469,7 @@ $qs[] = "update core_entity set moduleId = (select id from core_module where nam
 
 
 //obsolete modules
-$qs[] = "delete from core_module where name IN ('admin2userlogin', 'settings', 'sites', 'syncml', 'dropbox', 'timeregistration', 'projects', 'hoursapproval', 'webodf')";
+$qs[] = "delete from core_module where name IN ('admin2userlogin', 'formprocessor', 'settings', 'sites', 'syncml', 'dropbox', 'timeregistration', 'projects', 'hoursapproval', 'webodf','imapauth','ldapauth', 'presidents')";
 
 foreach($qs as $q) {
 	if(is_string($q)) {

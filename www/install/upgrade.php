@@ -66,7 +66,27 @@ function checkLicenses($is62 = false) {
 	$unavailable = [];
 	foreach($modules as $module) {
 		
-		if(in_array($module['name'], ['users', 'groups', 'modules', 'search', 'links', 'webodf', 'admin2userlogin', 'settings', 'sites', 'syncml', 'dropbox', 'timeregistration', 'projects', 'hoursapproval', 'webodf'])) {
+		if(in_array($module['name'], [
+				'users', 
+				'groups',
+				'modules', 
+				'search', 
+				'links', 
+				'webodf', 
+				'admin2userlogin', 
+				'settings', 
+				'sites', 
+				'syncml', 
+				'dropbox', 
+				'timeregistration', 
+				'projects', 
+				'hoursapproval', 
+				'webodf',
+				'imapauth',
+				'ldapauth',
+				'presidents',
+				'chat',
+				'formprocessor'])) {
 			//ignore refactored modules.
 			continue;
 		}
