@@ -6,6 +6,11 @@ use go\modules\core\modules\model\Module;
 use go\core\util\Lock;
 
 
+require("gotest.php");
+if(!systemIsOk()) {
+	header("Location: test.php");
+	exit();
+}
 
 /**
  * 
@@ -99,9 +104,6 @@ function checkLicenses($is62 = false) {
 try {
 	
 	require('../vendor/autoload.php');
-	
-	
-	
 	require('header.php');
 	
 	echo "<section><div class=\"card\"><h2>Upgrading Group-Office</h2><pre>";

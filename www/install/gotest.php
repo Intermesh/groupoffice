@@ -909,6 +909,20 @@ function whereis($cmd)
 	return false;
 }
 
+
+function systemIsOk() {
+	$tests = test_system();
+	
+	foreach($tests as $test)
+	{
+		if(!$test['pass'] && $test['fatal']) {
+			return false;
+		}
+	}
+	
+	return true;
+}
+
 function return_bytes($val) {
 
 	$last = strtolower(substr(trim($val), -1));

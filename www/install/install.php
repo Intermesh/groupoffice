@@ -1,4 +1,10 @@
 <?php
+require("gotest.php");
+if(!systemIsOk()) {
+	header("Location: test.php");
+	exit();
+}
+
 require('../vendor/autoload.php');
 
 use GO\Base\Cron\CronJob;
