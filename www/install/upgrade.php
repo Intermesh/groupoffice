@@ -6,11 +6,7 @@ use go\modules\core\modules\model\Module;
 use go\core\util\Lock;
 
 
-require("gotest.php");
-if(!systemIsOk()) {
-	header("Location: test.php");
-	exit();
-}
+
 
 /**
  * 
@@ -66,31 +62,6 @@ function checkLicenses($is62 = false) {
 	$unavailable = [];
 	foreach($modules as $module) {
 		
-		if(in_array($module['name'], [
-				'users', 
-				'groups',
-				'modules', 
-				'search', 
-				'links', 
-				'webodf', 
-				'admin2userlogin', 
-				'settings', 
-				'sites', 
-				'syncml', 
-				'dropbox', 
-				'timeregistration', 
-				'projects', 
-				'hoursapproval', 
-				'webodf',
-				'imapauth',
-				'ldapauth',
-				'presidents',
-				'chat',
-				'formprocessor'])) {
-			//ignore refactored modules.
-			continue;
-		}
-		
 		if(isset($module['package']) && $module['package'] != 'legacy') {
 			
 			//SKIP for now as there no encoded refactored moules yet.
@@ -124,6 +95,13 @@ function checkLicenses($is62 = false) {
 try {
 	
 	require('../vendor/autoload.php');
+	
+	require("gotest.php");
+	if(!systemIsOk()) {
+		header("Location: test.php");
+		exit();
+	}
+	
 	require('header.php');
 	
 	echo "<section><div class=\"card\"><h2>Upgrading Group-Office</h2><pre>";
@@ -134,6 +112,9 @@ try {
 	if (!$lock->lock()) {
 		throw new \Exception("Upgrade is already in progress");
 	}
+
+	//remove obsolete modules
+	GO()->getDbConnection()->query("delete from core_module where name IN ('admin2userlogin', 'formprocessor', 'settings', 'sites', 'syncml', 'dropbox', 'timeregistration', 'projects', 'hoursapproval', 'webodf','imapauth','ldapauth', 'presidents','ab2users', 'backupmanager', 'calllog', 'emailportlet', 'gnupg', 'language', 'mailings', 'newfiles')");
 	
 	GO()->getCache()->flush(false);
 	GO()->setCache(new \go\core\cache\None());

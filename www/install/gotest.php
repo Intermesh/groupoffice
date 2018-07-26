@@ -942,9 +942,9 @@ function return_bytes($val) {
 }
 //
 ////check if we are included
-//if(!class_exists('GO'))
-//{
-//	echo '<h1 style="font-family: Arial, Helvetica;font-size: 18px;">'.$product_name.' test script</h1><div style="font-family: Arial, Helvetica;font-size: 12px;"> ';
+if(!class_exists("go\core\App"))
+{
+	echo '<h1 style="font-family: Arial, Helvetica;font-size: 18px;">'.$product_name.' test script</h1><div style="font-family: Arial, Helvetica;font-size: 12px;"> ';
 	output_system_test();
-//	echo "</div>";
-//}
+	echo "</div>";
+}

@@ -232,15 +232,23 @@ class Instance extends Entity {
 		try {
 			$record = (new \go\core\db\Query())
 						->setDbConnection($this->getInstanceDbConnection())
-						->select('count(*) as userCount, max(lastlogin) as lastLogin')
+						->select('count(*) as userCount, max(lastLogin) as lastLogin')
 						->from('core_user')
 						->where('enabled', '=', true)
-						->execute()->fetch();	
+						->single();	
 			
 			$this->userCount = (int) $record['userCount'];
-			$this->lastLogin = !empty($record['lastLogin']) ? new \go\core\util\DateTime('@'.$record['lastLogin']) : null;
+			$this->lastLogin = !empty($record['lastLogin']) ? new \go\core\util\DateTime($record['lastLogin']) : null;
 			
+			$record = (new \go\core\db\Query())
+						->setDbConnection($this->getInstanceDbConnection())
+						->select('displayName, email')
+						->from('core_user')
+						->where('id', '=', 1)
+						->single();
 			
+			$this->adminDisplayName = $record['displayName'];
+			$this->adminEmail = $record['email'];
 		}
 		catch(\Exception $e) {
 			//ignore
@@ -249,6 +257,11 @@ class Instance extends Entity {
 	
 	private $userCount;
 	private $lastLogin;
+	
+	
+	private $adminDisplayName;
+	
+	private $adminEmail; 
 	
 	/**
 	 * Get the number of enabled users
@@ -265,6 +278,15 @@ class Instance extends Entity {
 	
 	public function getModifiedAt() {
 		return $this->getLastLogin();
+	}
+	
+	
+	public function getAdminDisplayName() {
+		return $this->adminDisplayName;
+	}
+	
+	public function getAdminEmail() {
+		return $this->adminEmail;
 	}
 	
 	
