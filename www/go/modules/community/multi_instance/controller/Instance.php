@@ -16,4 +16,14 @@ class Instance extends EntityController {
 	protected function entityClass() {
 		return model\Instance::class;
 	}
+	
+	
+	public function login($params) {
+		
+		$instance = model\Instance::findById($params['id']);
+		
+		$accessToken = $instance->createAccessToken();
+		
+		\go\core\jmap\Response::get()->addResponse(['success' => true, 'accessToken' => $accessToken]);
+	}
 }

@@ -29,6 +29,18 @@ try {
   }
 }
 
+if(!empty($_POST['accessToken'])) {
+	//used for direct token login from multi_instance module
+	//this token is used in default_scripts.inc.php too
+	$token = \go\core\auth\model\Token::find()->where('accessToken', '=', $_POST['accessToken'])->single();
+	if($token) {
+		$token->setAuthenticated();
+	} else
+	{
+		unset($_POST['accessToken']);
+	}
+}
+
 
 //try with HTTP auth
 //if(!\GO::user() && !empty($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_PW'])){

@@ -228,6 +228,26 @@ class Instance extends Entity {
 		return $this->instanceDbConn;
 	}
 	
+	
+	public function createAccessToken() {
+		$data = [
+				"loginToken" => uniqid().bin2hex(openssl_random_pseudo_bytes(16)),
+				"accessToken" => uniqid().bin2hex(openssl_random_pseudo_bytes(16)),
+				"expiresAt" => new \DateTime("+1 hour"),
+				"userAgent" => "Multi Instance Module",
+				"userId" => 1,
+				"createdAt" => new \DateTime(),
+				"lastActiveAt" => new \DateTime(),
+				"remoteIpAddress" => $_SERVER['REMOTE_ADDR']
+		];
+		
+		if(!$this->getInstanceDbConnection()->insert('core_auth_token', $data)->execute()) {
+			throw new \Exception("Failed to create access token");
+		}
+		
+		return $data['accessToken'];	
+	}
+	
 	private function getInstanceDbData(){
 		try {
 			$record = (new \go\core\db\Query())
