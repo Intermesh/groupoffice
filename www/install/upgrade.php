@@ -307,21 +307,14 @@ try {
 	}
 
 
-	echo "Flushing cache\n";
-	GO::clearCache(); //legacy
-	
-	$webclient = new \go\core\webclient\Extjs3();
-	$webclient->flushCache();
+	echo "Rebuilding cache\n";
 	
 	//reset new cache
 	$cls = GO()->getConfig()['general']['cache'];
 	GO()->setCache(new $cls);
 
 
-	echo "Rebuilding listeners\n";
-	Observable::cacheListeners();
-	\go\core\event\Listeners::get()->init();
-	
+	GO()->rebuildCache();
 	App::get()->getSettings()->databaseVersion = App::get()->getVersion();
 	App::get()->getSettings()->save();
 

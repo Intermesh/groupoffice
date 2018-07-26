@@ -24,6 +24,8 @@
 		 */
 		register: function (package, name, config) {	
 			
+			Ext.ns('go.modules.' + package + '.' + name);
+			
 			config = config || {};
 			
       if(!this.registered[package]) {

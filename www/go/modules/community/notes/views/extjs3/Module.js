@@ -1,5 +1,3 @@
-Ext.ns('go.modules.community.notes');
-
 go.Modules.register("community", 'notes', {
 	mainPanel: "go.modules.community.notes.MainPanel",
 	title: t("Notes"),

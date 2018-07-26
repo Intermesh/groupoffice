@@ -49,10 +49,7 @@ abstract class Base {
 			throw $e;
 		}
 		
-		\GO()->getCache()->flush(false);
-		\GO::clearCache(); //legacy
-		\GO()->getDataFolder()->getFolder('clientscripts')->delete();
-		
+		GO()->rebuildCache(true);
 		GO()->getDbConnection()->beginTransaction();
 		
 		$model = new Module();

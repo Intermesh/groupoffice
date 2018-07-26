@@ -274,6 +274,32 @@ namespace go\core {
 			
 			return $this;
 		}
+		
+		private $rebuildCacheOnDestruct = false;
+		
+		public function rebuildCache($onDestruct = false) {
+			
+			if($onDestruct) {				
+				$this->rebuildCacheOnDestruct = $onDestruct;
+			}
+			
+			\GO::clearCache(); //legacy
+			
+			GO()->getCache()->flush(false);
+	
+			$webclient = new \go\core\webclient\Extjs3();
+			$webclient->flushCache();
+
+			echo "Rebuilding listeners\n";
+			\GO\Base\Observable::cacheListeners();
+			\go\core\event\Listeners::get()->init();
+		}
+		
+		public function __destruct() {
+			if($this->rebuildCacheOnDestruct) {
+				$this->rebuildCache();
+			}
+		}
 
 		/**
 		 * Get a simple key value caching object

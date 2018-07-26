@@ -107,7 +107,8 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						xtype: 'textfield',
 						name: 'password',
 						disabled: true,
-						fieldLabel: t('Password')
+						fieldLabel: t('Password'),
+						inputType:"password"
 					},
 					
 					]

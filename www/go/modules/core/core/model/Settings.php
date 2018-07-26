@@ -5,10 +5,6 @@ use go\core;
 use go\core\http\Request;
 
 class Settings extends core\Settings {
-
-	public function getModuleName() {
-		return 'core';
-	}
 	
 	protected function __construct() {
 		parent::__construct();

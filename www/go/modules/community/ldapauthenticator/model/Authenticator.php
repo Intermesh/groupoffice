@@ -61,8 +61,15 @@ class Authenticator extends PrimaryAuthenticator {
 		}
 		
 		if (!empty($server->username)) {			
-			if (!$connection->bind($server->username, $server->password)) {
-				throw new \Exception("Failed to bind to LDAP server with RDN: " .$server->username);
+			
+			$record = Record::find($connection, $server->peopleDN, $server->usernameAttribute . "=" . $server->username)->fetch();
+			
+			if(!$record) {
+				throw new \Exception("LDAP User '".$server->username."' does not exist.");
+			}
+			
+			if (!$connection->bind($record->getDn(), $server->password)) {				
+				throw new \Exception("Invalid password given for '".$server->username."'");
 			}
 		}
 		

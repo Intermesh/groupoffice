@@ -61,7 +61,16 @@ class Server extends Entity {
 	 * 
 	 * @var string
 	 */
-	public $password;
+	protected $password;
+	
+	
+	public function getPassword() {
+		return \go\core\util\Crypt::decrypt($this->password);
+	}
+	
+	public function setPassword($value) {
+		$this->password = \go\core\util\Crypt::encrypt($value);
+	}
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()

@@ -17,12 +17,18 @@ abstract class Settings extends data\Model {
 		return (new Query)
 			->selectSingleValue('id')
 			->from('core_module')
-			->where(['name' => $this->getModuleName()])
+			->where(['name' => $this->getModuleName(), 'package' => $this->getModulePackageName()])
 			->execute()
 			->fetch();
 	}
 	
-	abstract function getModuleName();
+	protected function getModuleName() {
+		return explode("\\", static::class)[3];
+	}
+	
+	protected function getModulePackageName() {
+		return explode("\\", static::class)[2];
+	}
 	
 	private $oldData;
 	
