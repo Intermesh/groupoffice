@@ -114,7 +114,7 @@ try {
 	}
 
 	//remove obsolete modules
-	GO()->getDbConnection()->query("delete from core_module where name IN ('admin2userlogin', 'formprocessor', 'settings', 'sites', 'syncml', 'dropbox', 'timeregistration', 'projects', 'hoursapproval', 'webodf','imapauth','ldapauth', 'presidents','ab2users', 'backupmanager', 'calllog', 'emailportlet', 'gnupg', 'language', 'mailings', 'newfiles')");
+	GO()->getDbConnection()->query("delete from core_module where name IN ('servermanager', 'admin2userlogin', 'formprocessor', 'settings', 'sites', 'syncml', 'dropbox', 'timeregistration', 'projects', 'hoursapproval', 'webodf','imapauth','ldapauth', 'presidents','ab2users', 'backupmanager', 'calllog', 'emailportlet', 'gnupg', 'language', 'mailings', 'newfiles')");
 	
 	GO()->getCache()->flush(false);
 	GO()->setCache(new \go\core\cache\None());
