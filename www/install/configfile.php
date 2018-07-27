@@ -89,6 +89,10 @@ if($_SERVER['REQUEST_METHOD'] != 'POST')
 			die("Could not write config.php");
 		} else
 		{
+			if(function_exists("opcache_invalidate")) {
+				opcache_invalidate($cFile->getPath());
+			}
+			
 			header('Location: install.php');
 			exit();
 		}
