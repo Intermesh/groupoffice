@@ -351,7 +351,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 	private function _addQuota(){
 
 		if($this->isModified('size') || $this->isNew) {
-			$sizeDiff = $this->fsFile->size() - $this->getOldAttributeValue('size');
+			$sizeDiff = (int) $this->fsFile->size() - (int) $this->getOldAttributeValue('size');
 
 //			GO::debug("Adding quota: $sizeDiff for ".$this->folder->quotaUser->getName());
 			if($this->folder->quotaUser){
