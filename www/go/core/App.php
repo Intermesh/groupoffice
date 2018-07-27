@@ -399,6 +399,11 @@ namespace go\core {
 			if(defined("GO_CONFIG_FILE")) {
 				return GO_CONFIG_FILE;
 			}
+			
+			//environment variable
+			if(isset($_SERVER['GO_CONFIG_FILE'])) {
+				return $_SERVER['GO_CONFIG_FILE'];
+			}
 
 			if (!empty($_SERVER['HTTP_HOST'])) {
 				$workingFile = '/etc/groupoffice/multi_instance/' . explode(':', $_SERVER['HTTP_HOST'])[0] . '/' . $name;

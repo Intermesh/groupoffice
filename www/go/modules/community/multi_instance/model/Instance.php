@@ -78,7 +78,11 @@ class Instance extends Entity {
 		return parent::internalValidate();
 	}
 	
-	private function getConfigFile() {
+	/**
+	 * Get configuration file
+	 * @return File
+	 */
+	public function getConfigFile() {
 		return new File('/etc/groupoffice/multi_instance/' . $this->hostname . '/config.php');
 	}
 	

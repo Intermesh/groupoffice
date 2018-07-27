@@ -680,3 +680,36 @@ ALTER TABLE `core_entity`
 
 ALTER TABLE `core_user_custom_fields`
   ADD CONSTRAINT `core_user_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;
+
+
+
+
+
+CREATE TABLE `core_cron_job` (
+  `id` int(11) NOT NULL,
+  `moduleId` int(11) NOT NULL,
+  `description` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `expression` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `enabled` tinyint(1) NOT NULL DEFAULT 1,
+  `nextRunAt` datetime DEFAULT NULL,
+  `lastRunAt` datetime DEFAULT NULL,
+  `runningSince` datetime DEFAULT NULL,
+  `lastError` text COLLATE utf8mb4_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+ALTER TABLE `core_cron_job`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `description` (`description`),
+  ADD KEY `moduleId` (`moduleId`);
+
+
+ALTER TABLE `core_cron_job`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+
+ALTER TABLE `core_cron_job`
+  ADD CONSTRAINT `core_cron_job_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE;
+
+
