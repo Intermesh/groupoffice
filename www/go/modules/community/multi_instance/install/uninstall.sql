@@ -1,1 +1,1 @@
-DROP TABLE `multi_instance_instance`;
+-- DROP TABLE `multi_instance_instance`;

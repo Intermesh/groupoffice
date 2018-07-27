@@ -49,11 +49,11 @@ class CronJobSchedule extends Entity {
 		
 		if($this->isModified('name')) {
 			$cls = $this->getCronClass();
-			if(!class_exist($cls)) {
+			if(!class_exists($cls)) {
 				$this->setValidationError('name', ErrorCode::NOT_FOUND);
 			}
 			
-			if(!($cls instanceof CronJob)) {
+			if(!is_a($cls, CronJob::class, true)) {
 				$this->setValidationError('name', ErrorCode::INVALID_INPUT, "The given name is not a CronJob class.");
 			}
 		}

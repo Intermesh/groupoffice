@@ -67,7 +67,7 @@ abstract class Base {
 			return false;
 		}
 		
-		if(!$this->afterInstall()) {
+		if(!$this->afterInstall($model)) {
 			$this->rollBack();
 			return false;
 		}		
@@ -180,7 +180,7 @@ abstract class Base {
 	 * 
 	 * @return boolean
 	 */
-	protected function afterInstall() {
+	protected function afterInstall(Module $model) {
 		return true;
 	}
 	

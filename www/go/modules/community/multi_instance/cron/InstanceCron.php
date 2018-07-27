@@ -11,5 +11,4 @@ class InstanceCron extends CronJob {
 			exec("php " . \go\core\Environment::get()->getInstallFolder()->getFile('cron.php')->getPath() . ' ' . $instance->getConfigFile()->getPath());
 		}
 	}
-
 }

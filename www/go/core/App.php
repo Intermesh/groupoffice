@@ -290,7 +290,6 @@ namespace go\core {
 			$webclient = new \go\core\webclient\Extjs3();
 			$webclient->flushCache();
 
-			echo "Rebuilding listeners\n";
 			\GO\Base\Observable::cacheListeners();
 			\go\core\event\Listeners::get()->init();
 		}
