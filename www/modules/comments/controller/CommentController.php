@@ -40,8 +40,8 @@ class CommentController extends \GO\Base\Controller\AbstractModelController{
 		$model = \GO::getModel($params['model_name']);
 		
 						
-		if(is_a($model, \go\core\orm\Entity::class, true)) {
-			$params['model_name'] = $model;
+		if(is_a($model, \go\core\orm\Entity::class)) {
+			$params['model_name'] = get_class($model);
 			$model = $model::findById($params['model_id']);
 			$response['permisson_level']=$model->getPermissionLevel();
 			$response['write_permission']=$model->hasPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION);

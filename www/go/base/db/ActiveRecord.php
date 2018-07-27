@@ -3224,8 +3224,8 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 					$oldAcl = $this->findRelatedAclModel()->acl;
 					$user_id = !empty($this->user_id) ? $this->user_id : 0;
 					$acl = new \GO\Base\Model\Acl();
-					$acl->description=$this->tableName().'.'.$this->aclOverwrite();
-					$acl->user_id=$user_id;
+					$acl->usedIn=$this->tableName().'.'.$this->aclOverwrite();
+					$acl->ownedBy=$user_id;
 					$acl->save();
 					
 					$oldAcl->copyPermissions($acl);

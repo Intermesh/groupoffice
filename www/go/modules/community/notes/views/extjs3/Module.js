@@ -5,7 +5,7 @@ go.Modules.register("community", 'notes', {
 	initModule: function () {	
 		go.Links.registerLinkToWindow("Note", function() {
 			return new go.modules.community.notes.NoteForm();
-		});
+		}, t('Note'));
 	}
 });
 
