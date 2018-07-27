@@ -22,28 +22,12 @@ abstract class Entity  extends \go\core\orm\Entity {
 	public $id;
 
 	/**
-	 * The modseq when the entity was last modified or deleted.
-	 * 
-	 * It's a global integer that is incremented on any entity update.
-	 * 
-	 * @var int  
-	 */
-	public $modSeq;
-
-	/**
-	 * When an entity is deleted it's not really deleted. Only deletedAt is set to the time when it was deleted.
-	 * The {@see find()} method will add "where deletedAt is null" to the query conditions.
-	 * @var DateTime
-	 */
-	public $deletedAt;
-
-	/**
 	 * Get the current state of this entity
 	 * 
 	 * @return int
 	 */
 	public static function getState() {
-		return StateManager::get()->current(static::class);
+		return static::getType()->highestModSeq;
 	}
 
 	/**
@@ -56,9 +40,14 @@ abstract class Entity  extends \go\core\orm\Entity {
 	 */
 	protected function internalSave() {
 		
-		$this->modSeq = StateManager::get()->next(static::class);
+		if(!parent::internalSave()) {
+			return false;
+		}
 		
-		return parent::internalSave();
+		$this->getType()->change($this);
+		
+		
+		return true;
 	}
 	
 	/**
@@ -68,37 +57,12 @@ abstract class Entity  extends \go\core\orm\Entity {
 	 */
 	protected function internalDelete() {
 		
-		if($this->getMapping()->getColumn('deletedAt')) {
-			$this->deletedAt = new DateTime();
-			return $this->internalSave();
-		} else
-		{
-			return parent::internalDelete();
-		}
-	}
-	
-	/**
-	 * Hard delete the entity
-	 * 
-	 * Don't set "deletedAt" but purge it from the database.
-	 * 
-	 * @return boolean
-	 */
-	public function deleteHard() {
-		return parent::internalDelete();
-	}
-	
-	protected static function internalFind( array $fetchProperties = []) {
-		
-		$query = parent::internalFind($fetchProperties);
-		
-		//for compatibility with old models
-		if(static::getMapping()->getColumn('deletedAt')) {
-			$query->andWhere(['deletedAt' => NULL]);
+		if(!parent::internalDelete()) {
+			return false;
 		}
 		
-		return $query;
+		$this->getType()->change($this);
 		
-	}
-	
+		return true;
+	}	
 }

@@ -162,7 +162,7 @@ class Instance extends Entity {
 				$this->dropDatabaseUser($dbUsername);
 			}
 			
-			parent::deleteHard();
+			$this->deleteHard();
 			
 			throw $e;
 		}

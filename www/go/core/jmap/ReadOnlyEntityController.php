@@ -173,7 +173,7 @@ abstract class ReadOnlyEntityController extends Controller {
 		$cls = $this->entityClass();
 		
 		//entities that don't support syncing can be listed and fetched with the read only controller
-		return method_exists($cls, "getState") ? $cls::getState() : null;
+		return $cls::getState();
 	}
 
 	/**

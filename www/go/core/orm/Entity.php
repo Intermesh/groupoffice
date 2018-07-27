@@ -272,6 +272,8 @@ abstract class Entity extends Property {
 	}
 	
 	
+	private static $typeCache = [];
+	
 	/**
 	 * Gets an ID from the database for this class used in database relations and 
 	 * routing short routes like "Note/get"
@@ -279,7 +281,10 @@ abstract class Entity extends Property {
 	 * @return EntityType
 	 */
 	public static function getType() {		
-		return EntityType::findByClassName(static::class);
+		if(!isset(self::$typeCache[static::class])) {
+			self::$typeCache[static::class] = EntityType::findByClassName(static::class);;
+		}
+		return self::$typeCache[static::class];
 	}
   
   /**
