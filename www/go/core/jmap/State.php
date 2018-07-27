@@ -100,6 +100,7 @@ class State extends AbstractState {
 			'apiUrl' => $settings->URL.'/jmap.php',
 			'downloadUrl' => $settings->URL.'/download.php?blob={blobId}',
 			'uploadUrl' => $settings->URL.'/upload.php',
+			'eventSourceUrl' => $settings->URL.'/sse.php',
       'user' => $user->toArray(),
 			'oldSettings' => $this->clientSettings(), // added for compatibility
 		];

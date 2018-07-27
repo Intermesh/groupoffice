@@ -23,6 +23,7 @@ go.User = {
     this.apiUrl = session.apiUrl;
     this.downloadUrl = session.downloadUrl;
     this.uploadUrl = session.uploadUrl;
+		this.eventSourceUrl = session.eventSourceUrl;
     this.displayName = session.user.displayName;
     this.id = session.user.id;
     this.avatarId = session.user.avatarId;
