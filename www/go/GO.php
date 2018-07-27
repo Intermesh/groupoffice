@@ -1380,7 +1380,7 @@ public static $ioncubeChecks = [];
 	 * @return boolean
 	 */
 	public static function cronIsRunning(){
-		return \GO::config()->get_setting('cron_last_run') > time()-300;
+		return \GO::config()->get_setting('cron_last_run') > gmmktime()-300;
 	}
 	
 	public static function p($name){
