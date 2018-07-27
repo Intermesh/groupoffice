@@ -178,7 +178,7 @@ namespace go\core {
 			require($configFile);	
 			
 			if(!isset($config)) {
-				throw new \Exception("Invalid config.php contents. No \$config array defined.");
+				throw new exception\ConfigurationException();
 			}
 			
 			$this->config = [
