@@ -1353,6 +1353,15 @@ var $billing_clear_payment_method_on_duplicate = true;
 		return null;
 	}
 	
+	public function __isset($name) {
+		if(method_exists($this, "get" . $name)) {
+			$var =  $this->{"get" . $name}();
+			return isset($var);
+		}
+		
+		return false;
+	}
+	
 	
 	/**
 	 * Constructor. Initialises all public variables.
