@@ -113,12 +113,17 @@ try {
 		throw new \Exception("Upgrade is already in progress");
 	}
 
-	//remove obsolete modules
-	GO()->getDbConnection()->query("delete from core_module where name IN ('servermanager', 'admin2userlogin', 'formprocessor', 'settings', 'sites', 'syncml', 'dropbox', 'timeregistration', 'projects', 'hoursapproval', 'webodf','imapauth','ldapauth', 'presidents','ab2users', 'backupmanager', 'calllog', 'emailportlet', 'gnupg', 'language', 'mailings', 'newfiles')");
 	
 	GO()->getCache()->flush(false);
 	GO()->setCache(new \go\core\cache\None());
 	$dbValid = isValidDb();
+	
+	$modulesTable = $dbValid == 62 ? 'go_modules' : 'core_module';	
+	
+	//remove obsolete modules
+	GO()->getDbConnection()->query("delete from " . $modulesTable . " where name IN ('servermanager', 'admin2userlogin', 'formprocessor', 'settings', 'sites', 'syncml', 'dropbox', 'timeregistration', 'projects', 'hoursapproval', 'webodf','imapauth','ldapauth', 'presidents','ab2users', 'backupmanager', 'calllog', 'emailportlet', 'gnupg', 'language', 'mailings', 'newfiles')");
+	
+	
 	checkLicenses($dbValid == 62);
 	
 	if ($dbValid == 62) {		
