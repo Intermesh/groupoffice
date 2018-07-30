@@ -286,6 +286,7 @@ namespace go\core {
 			\GO::clearCache(); //legacy
 			
 			GO()->getCache()->flush(false);
+			db\Table::destroyInstances();
 	
 			$webclient = new \go\core\webclient\Extjs3();
 			$webclient->flushCache();

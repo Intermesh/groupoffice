@@ -97,7 +97,7 @@ function checkLicenses($is62 = false) {
 	} elseif(count($unavailable)) {
 
 		echo "The following modules are not available because they're missing on disk\n"
-		. "or you've got an invalid or missing license file: \n"
+		. "or you've got an <b>invalid or missing license file</b>: \n"
 		. "<ul style=\"font-size:1.5em\"><li>" . implode("</li><li>", $unavailable) . "</li></ul>"
 		. "Please install the license file(s) and refresh this page or disable these modules.\n"
 		. "If you continue the incompatible modules will be disabled.\n\n";

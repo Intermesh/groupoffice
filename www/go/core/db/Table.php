@@ -26,12 +26,15 @@ class Table {
 	 * @return self
 	 */
 	public static function getInstance($name) {
-		
 		if(!isset(self::$cache[$name])) {
 			self::$cache[$name] = new Table($name);
 		}
 		
 		return self::$cache[$name];	
+	}
+	
+	public static function destroyInstances() {
+		self::$cache = [];
 	}
 	
 	private $name;
