@@ -49,7 +49,9 @@ function checkLicenses($is62 = false) {
 		//disabled modules must be deleted too when upgrading from 6.2 to 6.3
 		$modules = (new \go\core\db\Query)
 					->select('id AS name, "legacy" AS package')
-					->from('go_modules')->all();
+					->from('go_modules')
+					->where('enabled', '=', true)
+					->all();
 	} else
 	{
 		$modules = (new \go\core\db\Query)
@@ -71,20 +73,35 @@ function checkLicenses($is62 = false) {
 		
 		$moduleCls = "GO\\" . ucfirst($module['name']). "\\" . ucfirst($module['name']) . "Module";
 		
+		if(is_dir(__DIR__.'/../go/modules/core/'.$module['name']) || is_dir(__DIR__.'/../go/modules/community/'.$module['name'])) {
+			continue;
+		}
+		
 		if(!class_exists($moduleCls)) {
 			$unavailable[] = $module['name'];
 			continue;
 		} 
-		
+			
 		$mod = new $moduleCls();
 		
 		if(!$mod->isAvailable()) {
 			$unavailable[] = $module['name'];
 		}		
 	}
-	
-	if(count($unavailable)) {
-		throw new \Exception("The following installed modules are not available because they're missing on disk\nor you've got an invalid or missing license file: \n\n - " . implode("\n - ", $unavailable) . "\n\nPlease install the license files or uninstall these modules before upgrading.\nIf you're unable to uninstall them you could manually remove them from the 'go_modules' or 'core_module' table.");
+	if(isset($_GET['ignore']) && count($unavailable)) {
+		if($is62) {
+			GO()->getDbConnection()->query("update go_modules set enabled=0 where id IN ('".implode("', '",$unavailable)."')");
+		} else {
+			GO()->getDbConnection()->query("update core_module set enabled=0 where name IN ('".implode("', '",$unavailable)."')");	
+		}
+	} elseif(count($unavailable)) {
+
+		echo "The following modules are not available because they're missing on disk\n"
+		. "or you've got an invalid or missing license file: \n"
+		. "<ul style=\"font-size:1.5em\"><li>" . implode("</li><li>", $unavailable) . "</li></ul>"
+		. "Please install the license file(s) and refresh this page or disable these modules.\n"
+		. "If you continue the incompatible modules will be disabled.\n\n";
+		return false;
 	}
 	
 	return true;
@@ -118,21 +135,13 @@ try {
 	GO()->setCache(new \go\core\cache\None());
 	$dbValid = isValidDb();
 	
-	$modulesTable = $dbValid == 62 ? 'go_modules' : 'core_module';	
-	
 	//remove obsolete modules
-	GO()->getDbConnection()->query("delete from " . $modulesTable . " where name IN ('servermanager', 'admin2userlogin', 'formprocessor', 'settings', 'sites', 'syncml', 'dropbox', 'timeregistration', 'projects', 'hoursapproval', 'webodf','imapauth','ldapauth', 'presidents','ab2users', 'backupmanager', 'calllog', 'emailportlet', 'gnupg', 'language', 'mailings', 'newfiles')");
-	
-	
-	checkLicenses($dbValid == 62);
-	
-	if ($dbValid == 62) {		
-		require(Environment::get()->getInstallFolder() . '/install/62to63.php');
+	if($dbValid == 62) {
+		GO()->getDbConnection()->query("delete from go_modules where id IN ('servermanager', 'admin2userlogin', 'formprocessor', 'settings', 'sites', 'syncml', 'dropbox', 'timeregistration', 'projects', 'hoursapproval', 'webodf','imapauth','ldapauth', 'presidents','ab2users', 'backupmanager', 'calllog', 'emailportlet', 'gnupg', 'language', 'mailings', 'newfiles')");
+	} else {
+		GO()->getDbConnection()->query("delete from core_module where name IN ('servermanager', 'admin2userlogin', 'formprocessor', 'settings', 'sites', 'syncml', 'dropbox', 'timeregistration', 'projects', 'hoursapproval', 'webodf','imapauth','ldapauth', 'presidents','ab2users', 'backupmanager', 'calllog', 'emailportlet', 'gnupg', 'language', 'mailings', 'newfiles')");
 	}
-
-	//don't be strict
-	GO()->getDbConnection()->query("SET sql_mode=''");
-
+	
 	function upgrade() {
 		$u = [];
 
@@ -286,38 +295,50 @@ try {
 
 		return !$aModuleWasUpgradedToNewBackend;
 	}
+	
+	if(checkLicenses($dbValid == 62)) {
+	
+		if ($dbValid == 62) {		
+			require(Environment::get()->getInstallFolder() . '/install/62to63.php');
+		}
 
-	if (!upgrade()) {
-		echo "\n\nA module was refactored. Rerunning...\n\n";
-		upgrade();
+		//don't be strict
+		GO()->getDbConnection()->query("SET sql_mode=''");
+
+		if (!upgrade()) {
+			echo "\n\nA module was refactored. Rerunning...\n\n";
+			upgrade();
+		}
+
+
+		echo "Rebuilding cache\n";
+
+		//reset new cache
+		$cls = GO()->getConfig()['general']['cache'];
+		GO()->setCache(new $cls);
+
+
+		GO()->rebuildCache();
+		App::get()->getSettings()->databaseVersion = App::get()->getVersion();
+		App::get()->getSettings()->save();
+
+		echo "Done!\n";
+
+		echo "</pre></div>";
+
+		echo '<a class="button" href="../">Continue</a>';
+
+
+		if(GO()->getDebugger()->enabled) {
+			echo "<div style=\"clear:both;margin-bottom:20px;\"></div><div class=\"card\"><h2>Debugger output</h2><pre>" . implode("\n", GO()->getDebugger()->getEntries()) . "</pre></div>";
+		}
+
+		echo "</section>";
+
+	} else {
+		echo '<a class="button" href="?ignore=modules">Disable &amp; Continue</a>';
+		echo "</pre></div></section>";
 	}
-
-
-	echo "Rebuilding cache\n";
-	
-	//reset new cache
-	$cls = GO()->getConfig()['general']['cache'];
-	GO()->setCache(new $cls);
-
-
-	GO()->rebuildCache();
-	App::get()->getSettings()->databaseVersion = App::get()->getVersion();
-	App::get()->getSettings()->save();
-
-	echo "Done!\n";
-	
-	echo "</pre></div>";
-	
-	echo '<a class="button" href="../">Continue</a>';
-	
-	
-	if(GO()->getDebugger()->enabled) {
-		echo "<div style=\"clear:both;margin-bottom:20px;\"></div><div class=\"card\"><h2>Debugger output</h2><pre>" . implode("\n", GO()->getDebugger()->getEntries()) . "</pre></div>";
-	}
-	
-	echo "</section>";
-	
-	
 } catch (\Exception $e) {
 	echo "<b>Error:</b> ".$e->getMessage()."\n\n";;
 	
