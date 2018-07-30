@@ -86,10 +86,10 @@ class AclUsersGroups extends ActiveRecord {
 //													'groupId' => $this->groupId, 
 //											]
 //											)->execute();
-		
-		if(!$success) {
-			return false;
-		}
+//		
+//		if(!$success) {
+//			return false;
+//		}
 		
 		return parent::afterDelete();
 	}
@@ -112,9 +112,9 @@ class AclUsersGroups extends ActiveRecord {
 //													'grantModSeq' => StateManager::get()->next()
 //											]
 //											)->execute();
-		if(!$success) {
-			return false;
-		}
+//		if(!$success) {
+//			return false;
+//		}
 		
 		return parent::afterSave($wasNew);
 	}
