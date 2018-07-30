@@ -15,7 +15,6 @@ GO.summary.AnnouncementsViewGrid = function(config){
 	{
 		config = {};
 	}
-	config.cls='go-grid3-hide-headers';
 	config.border=false;
 	//config.layout='fit';
 	config.autoHeight=true;
@@ -43,7 +42,7 @@ GO.summary.AnnouncementsViewGrid = function(config){
 	}
 	]);
 
-	config.cls='go-colored-table';
+	config.cls='go-colored-table go-grid3-hide-headers';
 	
 	config.cm=columnModel;
 	config.view=new Ext.grid.GridView({
