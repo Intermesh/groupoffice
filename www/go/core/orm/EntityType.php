@@ -113,7 +113,7 @@ class EntityType {
 			$record['id'] = App::get()->getDbConnection()->getPDO()->lastInsertId();
 		} else
 		{
-			$e->highestModSeq = (int) $record['highestModSeq'] ?? null;
+			$e->highestModSeq = isset($record['highestModSeq']) ? (int) $record['highestModSeq'] : null;
 		}
 
 		$e->id = $record['id'];
