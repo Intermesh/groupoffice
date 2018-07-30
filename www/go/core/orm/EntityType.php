@@ -92,7 +92,7 @@ class EntityType {
 		$e->className = $className;
 		
 		$record = (new Query)
-						->select('id,moduleId,clientName,name,highestModSeq')
+						->select('*')
 						->from('core_entity')
 						->where('clientName', '=', $className::getClientName())
 						->single();
@@ -145,7 +145,7 @@ class EntityType {
 	 */
 	public static function findAll() {
 		$records = (new Query)
-						->select('e.id, e.moduleId, e.name, e.clientName, m.name AS moduleName, m.package AS modulePackage, e.highestModSeq')
+						->select('e.*, m.name AS moduleName, m.package AS modulePackage')
 						->from('core_entity', 'e')
 						->join('core_module', 'm', 'm.id = e.moduleId')						
 						->all();
@@ -166,7 +166,7 @@ class EntityType {
 	 */
 	public static function findById($id) {
 		$record = (new Query)
-						->select('e.id, e.moduleId, e.name, e.clientName, m.name AS moduleName, m.package AS modulePackage, e.highestModSeq')
+						->select('e.*, m.name AS moduleName, m.package AS modulePackage')
 						->from('core_entity', 'e')
 						->join('core_module', 'm', 'm.id = e.moduleId')
 						->where('id', '=', $id)
@@ -187,7 +187,7 @@ class EntityType {
 	 */
 	public static function findByName($name) {
 		$record = (new Query)
-						->select('e.id, e.moduleId, e.name, e.clientName, m.name AS moduleName, m.package AS modulePackage, e.highestModSeq')
+						->select('e.*, m.name AS moduleName, m.package AS modulePackage')
 						->from('core_entity', 'e')
 						->join('core_module', 'm', 'm.id = e.moduleId')
 						->where('clientName', '=', $name)
