@@ -266,6 +266,19 @@ abstract class EntityController extends ReadOnlyEntityController {
 			throw new CannotCalculateChanges();
 		}
 		
+		//find the old state changelog entry
+		
+//		$change = (new Query())
+//						->select("*")
+//						->from("core_change")
+//						->where(["entityTypeId" => $cls::getType()->id, 'modSeq' => $p['sinceState']])
+//						->single();
+//		
+//		if(!$change) {
+//			//State is too old.
+//			throw new CannotCalculateChanges();
+//		}
+		
 //		TODO!!!!
 //		$acls = $cls::findAcls();		
 //		if($acls && (Acl::findGrantedSince(App::get()->getAuthState()->getUserId(), $p['sinceState'], $acls)->limit(1)->execute()->fetch() ||
