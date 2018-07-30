@@ -1,5 +1,5 @@
 go.modules.community.notes.NoteBookCombo = Ext.extend(go.form.ComboBox, {
-	fieldLabel: t("Notebook", "notes"),
+	fieldLabel: t("Notebook"),
 	hiddenName: 'noteBookId',
 	anchor: '100%',
 	emptyText: t("Please select..."),

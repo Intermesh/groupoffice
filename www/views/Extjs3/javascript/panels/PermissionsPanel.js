@@ -196,12 +196,12 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 	
 		this.items =[];
 		this.overWriteCheckBox = new Ext.ux.form.XCheckbox({
-			style:'margin:4px 0 0 10px',
 			name: 'acl_overwritten',
 			boxLabel: t("Overwrite default permissions for this item (click apply to activate)")
 		});
 		if(this.isOverwritable) {
-			this.items.push(this.overWriteCheckBox);
+			this.aclGroupsGrid.getTopToolbar().insert(0,this.overWriteCheckBox);
+			//this.items.push(this.overWriteCheckBox);
 		}
 		this.items.push(this.aclGroupsGrid);
 		

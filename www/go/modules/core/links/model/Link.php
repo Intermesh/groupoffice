@@ -9,7 +9,7 @@ use go\core\db\Query;
 use go\core\orm\EntityType;
 use go\core\util\DateTime;
 
-class Link extends \go\core\jmap\Entity {
+class Link extends AclEntity {
 
 	protected $fromEntityTypeId;
 	protected $toEntityTypeId;
@@ -19,8 +19,6 @@ class Link extends \go\core\jmap\Entity {
 	
 	protected $toName;
 	protected $toDescription;
-	
-	protected $aclId;
 	
 
 	public function getFromEntity() {

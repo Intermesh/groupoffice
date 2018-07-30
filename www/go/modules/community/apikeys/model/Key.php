@@ -33,7 +33,7 @@ class Key extends \go\core\jmap\Entity {
 		if($token) {
 			$token->delete();
 		}
-		return parent::deleteHard();
+		return parent::internalDelete();
 	}
 }
 

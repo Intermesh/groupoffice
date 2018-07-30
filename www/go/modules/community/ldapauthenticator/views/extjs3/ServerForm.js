@@ -1,15 +1,17 @@
 go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 	title: t('Server profile', 'ldapauth'),
 	entityStore: go.Stores.get("LdapAuthServer"),
-	width: dp(400),
+	width: dp(600),
 	height: dp(600),
 	autoScroll: true,
 	
-	actionComplete : function() {
+	onLoad : function() {
 				
 		this.createEmailCheckbox.setValue(!GO.util.empty(this.formPanel.getForm().findField('imapHostname').getValue()));
+		console.log(this.formPanel.getForm().findField('username').getValue());
+		this.formPanel.getForm().findField('ldapUseAuthentication').setValue(!GO.util.empty(this.formPanel.getForm().findField('username').getValue()));
 		
-		go.modules.community.ldapauthenticator.ServerForm.superclass.actionComplete.call(this);
+		go.modules.community.ldapauthenticator.ServerForm.superclass.onLoad.call(this);
 	},
 	initFormItems: function () {
 
@@ -83,6 +85,37 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						value: 'tls'
 					},
 					{
+						xtype: 'xcheckbox',
+						submit: false,
+						hideLabel: true,
+						boxLabel: t('Use authentication', 'imapauthenticator'),
+						name: 'ldapUseAuthentication',
+						hint: t("Enable this if the LDAP server requires autentication to lookup users or groups"),
+						listeners: {
+							check: function (checkbox, checked) {
+								this.formPanel.getForm().findField('username').setDisabled(!checked);
+								this.formPanel.getForm().findField('password').setDisabled(!checked);
+							},
+							scope: this
+						}
+					}, {
+						xtype: 'textfield',
+						name: 'username',
+						disabled: true,
+						fieldLabel: t('Username')
+					}, {
+						xtype: 'textfield',
+						name: 'password',
+						disabled: true,
+						fieldLabel: t('Password'),
+						inputType:"password"
+					},
+					
+					]
+			}, this.usersFieldSet = new Ext.form.FieldSet({
+				title: t("Users"),
+				items: [
+					{
 						xtype: 'textfield',
 						name: 'usernameAttribute',
 						fieldLabel: t("Username attribute", "ldapauthenticator"),
@@ -113,8 +146,8 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 							scope: this
 						}
 					})
-					]
-			}, this.imapFieldSet = new Ext.form.FieldSet({
+				]
+			}), this.imapFieldSet = new Ext.form.FieldSet({
 				hidden: true,
 				hideMode: "offsets",
 				title: 'IMAP Server',

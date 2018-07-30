@@ -24,11 +24,7 @@ class BookmarkController extends \GO\Base\Controller\AbstractModelController {
 	
 	public function formatStoreRecord($record, $model, $store) {
 		$record['folder_id'] = $model->folder_id;
-		$record['name'] =
-			'<span class="x-tree-node x-tree-node-leaf">'.
-				'<img class="x-tree-node-icon folder-default" unselectable="on" src="'.\GO::config()->host.'views/Extjs3/ext/resources/images/default/s.gif" alt="" style="width:16px;height:16px;">'.
-				'&nbsp;&nbsp;'.$model->folder->name.
-			'</span>';
+		$record['name'] = $model->folder->name;
 		return parent::formatStoreRecord($record, $model, $store);
 	}
 	

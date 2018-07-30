@@ -40,7 +40,7 @@ go.modules.community.notes.MainPanel = Ext.extend(Ext.Panel, {
 				}, {
 					cls: 'go-narrow',
 					iconCls: "ic-arrow-forward",
-					tooltip: t("Notes", "notes"),
+					tooltip: t("Notes"),
 					handler: function () {
 						this.noteGrid.show();
 					},

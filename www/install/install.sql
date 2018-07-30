@@ -96,7 +96,8 @@ CREATE TABLE `core_entity` (
   `id` int(11) NOT NULL,
   `moduleId` int(11) DEFAULT NULL,
   `name` varchar(190) NOT NULL,
-  `clientName` varchar(190) DEFAULT NULL
+  `clientName` varchar(190) DEFAULT NULL,
+  `highestModSeq` INT NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -158,12 +159,6 @@ CREATE TABLE `core_setting` (
   `moduleId` int(11) NOT NULL,
   `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `value` text COLLATE utf8mb4_unicode_ci
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-DROP TABLE IF EXISTS `core_state`;
-CREATE TABLE `core_state` (
-  `entityClass` varchar(192) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-  `highestModSeq` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS `core_user`;
@@ -503,10 +498,6 @@ ALTER TABLE `core_search`
 ALTER TABLE `core_setting`
   ADD PRIMARY KEY (`moduleId`,`name`);
 
-ALTER TABLE `core_state`
-  ADD PRIMARY KEY (`entityClass`);
-
-
 ALTER TABLE `core_user_group`
   ADD PRIMARY KEY (`groupId`,`userId`),
   ADD KEY `userId` (`userId`);
@@ -680,3 +671,56 @@ ALTER TABLE `core_entity`
 
 ALTER TABLE `core_user_custom_fields`
   ADD CONSTRAINT `core_user_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;
+
+
+
+
+
+CREATE TABLE `core_cron_job` (
+  `id` int(11) NOT NULL,
+  `moduleId` int(11) NOT NULL,
+  `description` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `expression` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `enabled` tinyint(1) NOT NULL DEFAULT 1,
+  `nextRunAt` datetime DEFAULT NULL,
+  `lastRunAt` datetime DEFAULT NULL,
+  `runningSince` datetime DEFAULT NULL,
+  `lastError` text COLLATE utf8mb4_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+ALTER TABLE `core_cron_job`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `description` (`description`),
+  ADD KEY `moduleId` (`moduleId`);
+
+
+ALTER TABLE `core_cron_job`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+
+ALTER TABLE `core_cron_job`
+  ADD CONSTRAINT `core_cron_job_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE;
+
+
+CREATE TABLE `core_change` (
+  `entityId` int(11) NOT NULL,
+  `entityTypeId` int(11) NOT NULL,
+  `modSeq` int(11) NOT NULL,
+  `aclId` int(11) DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `destroyed` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+
+
+ALTER TABLE `core_change`
+  ADD PRIMARY KEY (`entityId`,`entityTypeId`),
+  ADD KEY `aclId` (`aclId`),
+  ADD KEY `entityTypeId` (`entityTypeId`);
+
+
+
+ALTER TABLE `core_change`
+  ADD CONSTRAINT `core_change_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `core_change_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE;

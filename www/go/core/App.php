@@ -178,14 +178,15 @@ namespace go\core {
 			require($configFile);	
 			
 			if(!isset($config)) {
-				throw new \Exception("Invalid config.php contents. No \$config array defined.");
+				throw new exception\ConfigurationException();
 			}
 			
 			$this->config = [
 					"general" => [
 							"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice', //TODO default should be /var/lib/groupoffice
 							"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
-							"debug" => !empty($config['debug'])
+							"debug" => !empty($config['debug']),
+							"cache" => Disk::class
 					],
 					"db" => [
 							"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . ($config['db_name'] ?? "groupoffice-com"),
@@ -256,7 +257,8 @@ namespace go\core {
 		 */
 		public function getCache() {
 			if (!isset($this->cache)) {
-				$this->cache = new Disk();
+				$cls = $this->getConfig()['general']['cache'];
+				$this->cache = new $cls;
 			}
 			return $this->cache;
 		}
@@ -271,6 +273,32 @@ namespace go\core {
 			$this->cache = $cache;
 			
 			return $this;
+		}
+		
+		private $rebuildCacheOnDestruct = false;
+		
+		public function rebuildCache($onDestruct = false) {
+			
+			if($onDestruct) {				
+				$this->rebuildCacheOnDestruct = $onDestruct;
+			}
+			
+			\GO::clearCache(); //legacy
+			
+			GO()->getCache()->flush(false);
+			db\Table::destroyInstances();
+	
+			$webclient = new \go\core\webclient\Extjs3();
+			$webclient->flushCache();
+
+			\GO\Base\Observable::cacheListeners();
+			\go\core\event\Listeners::get()->init();
+		}
+		
+		public function __destruct() {
+			if($this->rebuildCacheOnDestruct) {
+				$this->rebuildCache();
+			}
 		}
 
 		/**
@@ -370,6 +398,11 @@ namespace go\core {
 			
 			if(defined("GO_CONFIG_FILE")) {
 				return GO_CONFIG_FILE;
+			}
+			
+			//environment variable
+			if(isset($_SERVER['GO_CONFIG_FILE'])) {
+				return $_SERVER['GO_CONFIG_FILE'];
 			}
 
 			if (!empty($_SERVER['HTTP_HOST'])) {

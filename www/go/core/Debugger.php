@@ -94,9 +94,14 @@ class Debugger {
 	private $entries = [];
 	
 	public function __construct() {
-		$this->enabled = !empty(GO()->getConfig()['general']['debug']);
-		if($this->enabled) {
-			$this->logPath = GO()->getDataFolder()->getFile('log/debug.log')->getPath();
+		try {
+			$this->enabled = !empty(GO()->getConfig()['general']['debug']);
+			if($this->enabled) {
+				$this->logPath = GO()->getDataFolder()->getFile('log/debug.log')->getPath();
+			}
+		} catch (\go\core\exception\ConfigurationException $e) {
+			//GO is not configured / installed yet.
+			$this->enabled = true;
 		}
 	}
 

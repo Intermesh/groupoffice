@@ -152,3 +152,56 @@ $updates['201806141530'][] = "ALTER TABLE `core_user_custom_fields` ADD FOREIGN 
 $updates['201806141530'][] = "ALTER TABLE `core_user_custom_fields` CHANGE `id` `id` INT(11) NOT NULL;";
 
 $updates['201806141530'][] = "update core_entity set moduleId = (select id from core_module where name = 'groups') where name='Group';";
+
+
+$updates['201807271339'][] = "CREATE TABLE `core_cron_job` (
+  `id` int(11) NOT NULL,
+  `moduleId` int(11) NOT NULL,
+  `description` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `expression` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `enabled` tinyint(1) NOT NULL DEFAULT 1,
+  `nextRunAt` datetime DEFAULT NULL,
+  `lastRunAt` datetime DEFAULT NULL,
+  `runningSince` datetime DEFAULT NULL,
+  `lastError` text COLLATE utf8mb4_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+
+$updates['201807271339'][] = "ALTER TABLE `core_cron_job`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `description` (`description`),
+  ADD KEY `moduleId` (`moduleId`);";
+
+
+$updates['201807271339'][] = "ALTER TABLE `core_cron_job`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;";
+
+
+$updates['201807271339'][] = "ALTER TABLE `core_cron_job`
+  ADD CONSTRAINT `core_cron_job_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE;";
+
+$updates['201807271339'][] = "DROP TABLE `core_state`;";
+
+$updates['201807271339'][] = "ALTER TABLE `core_entity` ADD `highestModSeq` INT NULL DEFAULT NULL AFTER `clientName`;";
+
+$updates['201807271339'][] = "CREATE TABLE `core_change` (
+  `entityId` int(11) NOT NULL,
+  `entityTypeId` int(11) NOT NULL,
+  `modSeq` int(11) NOT NULL,
+  `aclId` int(11) DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `destroyed` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;";
+
+
+$updates['201807271339'][] = "ALTER TABLE `core_change`
+  ADD PRIMARY KEY (`entityId`,`entityTypeId`),
+  ADD KEY `aclId` (`aclId`),
+  ADD KEY `entityTypeId` (`entityTypeId`);";
+
+
+
+$updates['201807271339'][] = "ALTER TABLE `core_change`
+  ADD CONSTRAINT `core_change_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `core_change_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE;";

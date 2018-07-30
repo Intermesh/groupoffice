@@ -364,17 +364,17 @@ class User extends Entity {
 	
 	protected function internalValidate() {
 		
-//		if(!$this->isNew() && $this->isModified('groups')) {
-//			$groupIds = array_column($this->groups, 'groupId');
-//			
-//			if(!in_array(Group::ID_EVERYONE, $groupIds)) {
-//				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, "You can't remove group everyone");
-//			}
-//			
-//			if(!in_array($this->getPersonalGroup()->id, $groupIds)) {
-//				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, "You can't remove the user's personal group");
-//			}
-//		}
+		if(!$this->isNew() && $this->isModified('groups')) {
+			$groupIds = array_column($this->groups, 'groupId');
+			
+			if(!in_array(Group::ID_EVERYONE, $groupIds)) {
+				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, "You can't remove group everyone");
+			}
+			
+			if(!in_array($this->getPersonalGroup()->id, $groupIds)) {
+				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, "You can't remove the user's personal group");
+			}
+		}
 		
 		if(!$this->validatePasswordChange()) {
 			if(!$this->hasValidationErrors('currentPassword')) {
@@ -513,12 +513,8 @@ class User extends Entity {
 	}
 	
 	private function addSystemGroups() {
-		if($this->isNew() || $this->isModified('groups')) {
+		if($this->isNew() || $this->isModified('groups')) {						
 			$groupIds = array_column($this->groups, 'groupId');
-			
-			if(!in_array(Group::ID_EVERYONE, $groupIds)) {
-				$this->groups[] = ['groupId' => Group::ID_EVERYONE];
-			}
 			
 			if($this->isNew()){// !in_array($this->getPersonalGroup()->id, $groupIds)) {
 				$personalGroup = new Group();
@@ -532,16 +528,23 @@ class User extends Entity {
 				$personalGroup = $this->getPersonalGroup();
 			}
 			
-			
-			if(!in_array($personalGroup->id, $groupIds) && !(new UserGroup)->setValues(['groupId' => $personalGroup->id, 'userId' => $this->id])->internalSave()) {
-				throw new Exception("Couldn't add user to group");
+			if(!in_array($personalGroup->id, $groupIds)) { 
+				$personalUserGroup = (new UserGroup)->setValues(['groupId' => $personalGroup->id, 'userId' => $this->id]);
+				if(!$personalUserGroup->internalSave()) {
+					throw new Exception("Couldn't add user to group");
+				}
+				$this->groups[] = $personalUserGroup;
 			}
 			
-			if(!in_array(Group::ID_EVERYONE, $groupIds) && !(new UserGroup)->setValues(['groupId' => Group::ID_EVERYONE, 'userId' => $this->id])->internalSave()) {
-				throw new Exception("Couldn't add user to group");
+			if(!in_array(Group::ID_EVERYONE, $groupIds)) { 
+				$everyoneUserGroup = (new UserGroup)->setValues(['groupId' => Group::ID_EVERYONE, 'userId' => $this->id]);
+				if(!$everyoneUserGroup->internalSave()) {
+					throw new Exception("Couldn't add user to group");
+				}
+				$this->groups[] = $everyoneUserGroup;
 			}
 			
-			$this->checkOldFramework();
+			$this->checkOldFramework();			
 			
 		}
 	}

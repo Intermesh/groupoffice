@@ -14,6 +14,8 @@
 go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 
 	initComponent: function () {
+		
+		var actions = this.initRowActions();
 
 		this.store = new go.data.Store({
 			fields: [
@@ -21,12 +23,15 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 				'hostname', 
 				'userCount',
 				{name: 'createdAt', type: 'date'}, 
-				{name: 'lastLogin', type: 'date'}		
+				{name: 'lastLogin', type: 'date'},
+				'adminDisplayName',
+				'adminEmail',
 			],
 			entityStore: go.Stores.get("Instance")
 		});
 
 		Ext.apply(this, {		
+			plugins: [actions],
 			tbar: [ '->', {					
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
@@ -78,10 +83,24 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 					sortable: false,
 					dataIndex: 'lastLogin',
 					hidden: false
-				}
+				},{
+					header: t('Admin name'),
+					width: 160,
+					sortable: true,
+					dataIndex: 'adminDisplayName'
+				},{
+					header: t('Admin E-mail'),
+					width: 160,
+					sortable: true,
+					dataIndex: 'adminEmail'
+				},
+				actions
+				
 			],
 			viewConfig: {
-				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>'
+				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>',
+				forceFit: true,
+				autoFill: true
 			},
 			autoExpandColumn: 'hostname',
 			// config options for stateful behavior
@@ -94,6 +113,84 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 		this.on('render', function() {
 			this.store.load();
 		}, this);
+	},
+	
+	initRowActions: function () {
+
+		var actions = new Ext.ux.grid.RowActions({
+			menuDisabled: true,
+			hideable: false,
+			draggable: false,
+			fixed: true,
+			header: '',
+			hideMode: 'display',
+			keepSelection: true,
+
+			actions: [{
+					iconCls: 'ic-more-vert'
+				}]
+		});
+
+		actions.on({
+			action: function (grid, record, action, row, col, e, target) {
+				this.showMoreMenu(record, e);
+			},
+			scope: this
+		});
+
+		return actions;
+
+	},
+	
+	
+	showMoreMenu : function(record, e) {
+		if(!this.moreMenu) {
+			this.moreMenu = new Ext.menu.Menu({
+				items: [
+					{
+						itemId:"login",
+						iconCls: 'ic-lock-open',
+						text: t("Login as administrator"),
+						handler: function() {
+							
+							var win = window.open("about:blank", "groupoffice_instance");
+							go.Jmap.request({
+								method: "community/multi_instance/Instance/login",
+								params: {
+									id: this.moreMenu.record.get('id')
+								},
+								callback: function(options, success, result) {
+									
+									//POST access token to popup for enhanced security
+									var f = document.createElement("form");
+									f.setAttribute('method',"post");
+									f.setAttribute('target',"groupoffice_instance");
+									f.setAttribute('action',document.location.protocol + "//" + this.moreMenu.record.get('hostname'));
+									
+									var i = document.createElement("input"); //input element, text
+									i.setAttribute('type',"hidden");
+									i.setAttribute('name',"accessToken");
+									i.setAttribute('value',result.accessToken);									
+									f.appendChild(i);
+									
+									var body = document.getElementsByTagName('body')[0];
+									body.appendChild(f);									
+									f.submit();																	
+									body.removeChild(f);									
+									
+								},
+								scope: this
+							});
+						},
+						scope: this						
+					},
+				]
+			})
+		}	
+		
+		this.moreMenu.record = record;
+		
+		this.moreMenu.showAt(e.getXY());
 	}
 });
 

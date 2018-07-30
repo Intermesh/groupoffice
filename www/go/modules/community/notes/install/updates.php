@@ -75,3 +75,6 @@ $updates['201801251511'][] = "update notes_note set filesFolderId = null where f
 
 $updates['201804181402'][] = "ALTER TABLE `notes_note` CHANGE `createdBy` `createdBy` INT(11) NOT NULL;";
 $updates['201804181402'][] = "ALTER TABLE `notes_note` CHANGE `modifiedBy` `modifiedBy` INT(11) NOT NULL; ";
+
+$updates['201804181402'][] = "ALTER TABLE `notes_note` DROP `modSeq`;";
+$updates['201804181402'][] = "ALTER TABLE `notes_note` DROP `deletedAt`;";

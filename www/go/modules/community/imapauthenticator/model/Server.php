@@ -17,7 +17,23 @@ class Server extends Entity {
 	public $smtpHostname;
 	public $smtpPort;
 	public $smtpUsername;
-	public $smtpPassword;
+	
+	/**
+	 * SMTP Password
+	 * 
+	 * @var string
+	 */
+	protected $smtpPassword = null;
+	
+	
+	public function getSmtpPassword() {
+		return \go\core\util\Crypt::decrypt($this->smtpPassword);
+	}
+	
+	public function setSmtpPassword($value) {
+		$this->smtpPassword = \go\core\util\Crypt::encrypt($value);
+	}
+	
 	public $smtpUseUserCredentials= false;
 	public $smtpValidateCertificate = true;
 	public $smtpEncryption;

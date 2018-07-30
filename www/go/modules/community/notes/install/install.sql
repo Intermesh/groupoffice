@@ -6,7 +6,6 @@
 
 CREATE TABLE `notes_note` (
   `id` int(11) NOT NULL,
-  `modSeq` int(11) NOT NULL,
   `noteBookId` int(11) NOT NULL,
   `createdBy` int(11) NOT NULL,
   `modifiedBy` int(11) NOT NULL,
@@ -15,7 +14,6 @@ CREATE TABLE `notes_note` (
   `filesFolderId` int(11) DEFAULT NULL,
   `password` varchar(255) DEFAULT '',
   `createdAt` datetime DEFAULT NULL,
-  `deletedAt` datetime DEFAULT NULL,
   `modifiedAt` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

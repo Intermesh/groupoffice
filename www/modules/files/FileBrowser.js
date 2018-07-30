@@ -487,7 +487,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 				
 				window.open(GO.url('files/jupload/renderJupload'));				
 				
-				Ext.MessageBox.confirm("Uploader", "Please open the upload program and upload your files. Click 'Yes' when the upload is done.",function(btn) {
+				Ext.MessageBox.confirm("Uploader", t("Please open the upload program and upload your files. Click 'Yes' when the upload is done.", 'files'),function(btn) {
 					
 					if(btn == 'yes') {
 						this.sendOverwrite({upload:true});
@@ -1130,18 +1130,6 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 						this.newMenu.add(menuItem);
 					}
-				}
-				
-				if(go.Modules.isAvailable("legacy", "documenttemplates"))
-				{
-					this.newMenu.add('-');
-					this.newOODoc = new GO.documenttemplates.NewOODocumentMenuItem();
-					this.newOODoc.fb = this;
-					this.newOODoc.on('create', function(){
-						this.gridStore.reload();
-					}, this);
-
-					this.newMenu.add(this.newOODoc);
 				}
 
 				if(GO.settings.modules.files.write_permission)

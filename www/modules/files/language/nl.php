@@ -31,6 +31,7 @@ De volgende wijzigingen zijn aangebracht door %s:
   'Manage templates' => 'Beheer sjablonen',
   'Download template' => 'Download sjabloon',
   'Enter a name' => 'Voer een naam in',
+  'Please open the upload program and upload your files. Click \'Yes\' when the upload is done.' => 'Open het upload programma om uw bestanden te uploaden. Klik \'Ja\' als het uploaden klaar is',
   'Please enter a name' => 'Voer a.u.b. een naam in',
   'Please enter a name for the archive' => 'Voer a.u.b. een naam in voor het archief',
   'Start transfer' => 'Start overdracht',

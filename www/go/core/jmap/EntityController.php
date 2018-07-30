@@ -3,7 +3,7 @@
 namespace go\core\jmap;
 
 use go\core\acl\model\Acl;
-use go\core\App;
+use go\core\db\Query;
 use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\exception\StateMismatch;
@@ -261,16 +261,30 @@ abstract class EntityController extends ReadOnlyEntityController {
 		
 		$cls = $this->entityClass();
 		
-		if(!($cls instanceof Entity)) {
+		if(!is_a($cls, Entity::class, true)) {
 			//not jmap entity so we can't calculate
 			throw new CannotCalculateChanges();
 		}
 		
-		$acls = $cls::findAcls();		
-		if($acls && (Acl::findGrantedSince(App::get()->getAuthState()->getUserId(), $p['sinceState'], $acls)->limit(1)->execute()->fetch() ||
-			Acl::findRevokedSince(App::get()->getAuthState()->getUserId(), $p['sinceState'], $acls)->limit(1)->execute()->fetch())) {
-			throw new CannotCalculateChanges();
-		}			
+		//find the old state changelog entry
+		
+//		$change = (new Query())
+//						->select("*")
+//						->from("core_change")
+//						->where(["entityTypeId" => $cls::getType()->id, 'modSeq' => $p['sinceState']])
+//						->single();
+//		
+//		if(!$change) {
+//			//State is too old.
+//			throw new CannotCalculateChanges();
+//		}
+		
+//		TODO!!!!
+//		$acls = $cls::findAcls();		
+//		if($acls && (Acl::findGrantedSince(App::get()->getAuthState()->getUserId(), $p['sinceState'], $acls)->limit(1)->execute()->fetch() ||
+//			Acl::findRevokedSince(App::get()->getAuthState()->getUserId(), $p['sinceState'], $acls)->limit(1)->execute()->fetch())) {
+//			throw new CannotCalculateChanges();
+//		}			
 
 		$result = [
 				'accountId' => $p['accountId'],
@@ -281,28 +295,30 @@ abstract class EntityController extends ReadOnlyEntityController {
 				'removed' => []
 		];
 
-		$tables = $cls::getMapping()->getTables();
-		$firstTable = array_shift($tables);
-
-		$entities = $cls::find()
-						->select([$firstTable->getAlias() . '.id', $firstTable->getAlias() . '.modSeq', $firstTable->getAlias() . '.deletedAt'])
+		
+		$entityType = $cls::getType();
+		
+		$changes = (new Query)->select('entityId,destroyed,modSeq')
+						->from('core_change')
 						->fetchMode(PDO::FETCH_ASSOC)
 						->limit($p['maxChanges'])
 						->orderBy(['modSeq' => 'ASC'])
 						->andWhere('modSeq', '>', $p['sinceState']);
 		
-		$cls::applyAclToQuery($entities);
+		Acl::applyToQuery($changes, "t.aclId");
+						
+					
 		
-		foreach ($entities as $entity) {
+		foreach ($changes as $entity) {
 			if (isset($entity['deletedAt'])) {
-				$result['removed'][] = $entity['id'];
+				$result['removed'][] = $entity['entityId'];
 			} else {
-				$result['changed'][] = $entity['id'];
+				$result['changed'][] = $entity['entityId'];
 			}
 		}
 
 		if(isset($entity)){
-			$result['newState'] = $entity['modSeq'];
+			$result['newState'] = (int) $entity['modSeq'];
 		} else
 		{
 			$result['newState'] = $this->getState();

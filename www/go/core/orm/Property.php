@@ -838,6 +838,12 @@ abstract class Property extends Model {
 
 		return true;
 	}
+	
+	private $isDeleted = false;
+	
+	public function isDeleted() {
+		return $this->isDeleted;
+	}
 
 	/**
 	 * Delete this model
@@ -851,7 +857,13 @@ abstract class Property extends Model {
 		foreach ($primaryTable->getPrimaryKey() as $key) {
 			$pk[$key] = $this->{$key};
 		}
-		return App::get()->getDbConnection()->delete($primaryTable->getName(), $pk)->execute();
+		if(!App::get()->getDbConnection()->delete($primaryTable->getName(), $pk)->execute()) {			
+			return false;
+		}
+		
+		$this->isDeleted = true;
+		
+		return true;
 	}
 
 	private function validateTable(MappedTable $table) {		

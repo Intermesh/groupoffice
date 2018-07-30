@@ -17,13 +17,13 @@ class Module extends Base {
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 	}
 	
-	protected function afterInstall() {
+	protected function afterInstall(\go\modules\core\modules\model\Module $model) {
 		
 		if(!Googleauthenticator::register()) {
 			return false;
 		}
 		
-		return parent::afterInstall();
+		return parent::afterInstall($model);
 	}
 	
 	public static function onMap(Mapping $mapping) {		

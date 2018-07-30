@@ -48,6 +48,12 @@ class User extends EntityController {
 			throw new Forbidden();
 		}
 		
+		$user = model\User::findById($params['userId']);
+		
+		if(!$user->enabled) {
+			throw new Exception("This user is disabled");
+		}
+		
 		$token = GO()->getAuthState()->getToken();
 		$token->userId = $params['userId'];
 		$success = $token->setAuthenticated();

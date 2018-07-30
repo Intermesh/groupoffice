@@ -1,4 +1,4 @@
-29-03-2018 6.3.2 (beta)
+30-07-2018 6.3.25
 
 UPGRADING: make sure custom fields and search module are installed.
 
@@ -47,9 +47,6 @@ Address book
 Comments
 - Always use read more links and removed settings
 - Remove comments from edit dialogs. Always use detail views.
-
-
-
 
 15-03-2018 6.2.86
 - Moved disk cache directory to file_storage_path because tmp is containerized on newer linux versions.

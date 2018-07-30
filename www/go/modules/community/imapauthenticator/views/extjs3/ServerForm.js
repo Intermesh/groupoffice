@@ -26,7 +26,7 @@ go.modules.community.imapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 								'name'
 							]
 						}),
-						fieldLabel: "Domains",
+						fieldLabel: t("Domains"),
 
 						autoExpandColumn: "name",
 						columns: [
@@ -106,7 +106,7 @@ go.modules.community.imapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 					}, {
 						xtype: 'xcheckbox',
 						hideLabel: true,
-						boxLabel: t('Use user credentials', 'imapauthenticator'),
+						boxLabel: t('Use authentication', 'imapauthenticator'),
 						name: 'smtpUseUserCredentials',
 						hint: t("Enable this if the SMTP server credentials are identical to the IMAP server.", "imapauthenticator"),
 						listeners: {
@@ -123,7 +123,8 @@ go.modules.community.imapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 					}, {
 						xtype: 'textfield',
 						name: 'smtpPassword',
-						fieldLabel: t('Password')
+						fieldLabel: t('Password'),
+						inputType:"password"
 					}, {
 						xtype: 'combo',
 						name: 'smtpEncryption',

@@ -18,6 +18,9 @@ GO.files.BookmarksGrid = function(config) {
 	});
 	config.columns = [{
 		header:t("Name"),
+		renderer:function(v, meta, r){
+			return '<i class="icon" style="color: rgba(0, 0, 0, 0.54);">folder</i> &nbsp;'+v;
+		},
 		dataIndex: 'name',
 //					renderer:function(v, metaData,record){
 //						return '<div class="go-grid-icon filetype filetype-'+record.get("extension")+'">'+v+'</div>';
@@ -70,9 +73,8 @@ Ext.extend(GO.files.BookmarksGrid,GO.grid.GridPanel,{
 			shadow : 'frame',
 			minWidth : 180,
 			items : [{
-				iconCls: 'btn-delete',
+				iconCls: 'ic-delete',
 				text: t("Delete"),
-				cls: 'x-btn-text-icon',
 				handler: function(){
 					this._promptDelete(this._clickedBookmarkRecord);
 				},

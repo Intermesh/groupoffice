@@ -1084,7 +1084,7 @@ class GO{
 			}
 			
 			$modelName = $entityType->getClassName();
-			return $modelName;
+			//return $modelName;
 		} 
 		
 
@@ -1380,7 +1380,9 @@ public static $ioncubeChecks = [];
 	 * @return boolean
 	 */
 	public static function cronIsRunning(){
-		return \GO::config()->get_setting('cron_last_run') > time()-300;
+		$utc_str = gmdate("M d Y H:i:s", time());
+		$utc = strtotime($utc_str);
+		return \GO::config()->get_setting('cron_last_run') > $utc-300;
 	}
 	
 	public static function p($name){
