@@ -25,7 +25,6 @@ CREATE TABLE `notes_note` (
 
 CREATE TABLE `notes_note_book` (
   `id` int(11) NOT NULL,
-  `modSeq` int(11) NOT NULL,
   `deletedAt` datetime DEFAULT NULL,
   `createdBy` int(11) NOT NULL,
   `aclId` int(11) NOT NULL,
@@ -53,9 +52,7 @@ CREATE TABLE `notes_note_custom_fields` (
 ALTER TABLE `notes_note`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`createdBy`),
-  ADD KEY `category_id` (`noteBookId`),
-  ADD KEY `modSeq` (`modSeq`);
-
+  ADD KEY `category_id` (`noteBookId`);
 --
 -- Indexen voor tabel `notes_note_book`
 --

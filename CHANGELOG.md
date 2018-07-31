@@ -1,3 +1,6 @@
+31-07-2018 6.3.28
+- Bug in installer made it fail on ACL error.
+
 30-07-2018 6.3.25
 
 UPGRADING: make sure custom fields and search module are installed.
