@@ -10,12 +10,16 @@ use function GO;
 
 class Instance extends Entity {
 	
-	public $id;
-	
-	public $hostname;
-	
+	public $id;	
+	public $hostname;	
 	public $createdAt;
-	
+	public $userCount;
+	public $lastLogin;	
+	public $adminDisplayName;	
+	public $adminEmail; 	
+	public $loginCount;	
+	public $modifiedAt;
+
 	public $removedAt;
 
 	protected static function defineMapping() {
@@ -26,9 +30,16 @@ class Instance extends Entity {
 	protected function init() {
 		parent::init();
 		
-		if(!$this->isNew()) {
-			$this->getInstanceDbData();
-		}
+//		if(!$this->isNew()) {
+//			
+//			//update model from instance db once a day
+//			if(!isset($this->modifiedAt) || $this->modifiedAt <= new \DateTime("-1 day")) {
+				$this->getInstanceDbData();
+				if(!$this->internalSave()) {
+					throw new \Exception("Could not save instance data! ". var_export($this->getValidationErrors(), true));
+				}
+//			}
+//		}
 	}
 	
 	protected function internalValidate() {
@@ -256,11 +267,12 @@ class Instance extends Entity {
 		try {
 			$record = (new \go\core\db\Query())
 						->setDbConnection($this->getInstanceDbConnection())
-						->select('count(*) as userCount, max(lastLogin) as lastLogin')
+						->select('count(*) as userCount, max(lastLogin) as lastLogin, count(loginCount) as loginCount')
 						->from('core_user')
 						->where('enabled', '=', true)
 						->single();	
 			
+			$this->loginCount = (int) $record['loginCount'];
 			$this->userCount = (int) $record['userCount'];
 			$this->lastLogin = !empty($record['lastLogin']) ? new \go\core\util\DateTime($record['lastLogin']) : null;
 			
@@ -279,39 +291,7 @@ class Instance extends Entity {
 		}
 	}
 	
-	private $userCount;
-	private $lastLogin;
 	
-	
-	private $adminDisplayName;
-	
-	private $adminEmail; 
-	
-	/**
-	 * Get the number of enabled users
-	 * 
-	 * @return int
-	 */
-	public function getUserCount() {		
-		return $this->userCount;
-	}
-	
-	public function getLastLogin() {
-		return $this->lastLogin;
-	}
-	
-	public function getModifiedAt() {
-		return $this->getLastLogin();
-	}
-	
-	
-	public function getAdminDisplayName() {
-		return $this->adminDisplayName;
-	}
-	
-	public function getAdminEmail() {
-		return $this->adminEmail;
-	}
 	
 	
 	protected function internalDelete() {

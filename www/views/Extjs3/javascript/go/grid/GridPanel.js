@@ -12,6 +12,13 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 		{
 			this.keys = [];
 		}
+	
+		this.initDeleteKey();		
+
+		this.on("bodyscroll", this.loadMore, this, {buffer: 100});
+	},
+	
+	initDeleteKey : function() {
 		this.keys.push({
 			key: Ext.EventObject.DELETE,
 			fn: function (key, e) {
@@ -19,8 +26,6 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 			},
 			scope: this
 		});
-
-		this.on("bodyscroll", this.loadMore, this, {buffer: 100});
 	},
 
 	deleteSelected: function () {
