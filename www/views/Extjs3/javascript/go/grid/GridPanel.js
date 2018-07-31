@@ -90,6 +90,10 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 				}
 			});
 			store.load(p);
+			
+			//this will make sorting request the first page again
+			store.lastOptions.params.position = 0;
+			store.lastOptions.add = false;
 		}
 	}
 

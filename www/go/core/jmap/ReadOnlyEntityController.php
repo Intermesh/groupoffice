@@ -64,7 +64,14 @@ abstract class ReadOnlyEntityController extends Controller {
 						->limit($params['limit'])
 						->offset($params['position']);;
 
-		$cls::sort($query, $this->transformSort($params['sort']));
+		$sort = $this->transformSort($params['sort']);
+		
+		//always add primary key for a stable sort. (https://dba.stackexchange.com/questions/22609/mysql-group-by-and-order-by-giving-inconsistent-results)
+		if(!isset($sort['id'])) {
+			$sort['id'] = 'ASC';
+		}
+		
+		$cls::sort($query, $sort);
 
 		$query = $this->applyFilterCondition($params['filter'], $query);
 

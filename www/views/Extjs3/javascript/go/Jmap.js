@@ -145,7 +145,7 @@ go.Jmap = {
 		if (me.timeout) {
 			clearTimeout(me.timeout);
 		}
-
+		
 		var clientCallId = "clientCallId-" + this.nextCallId();
 
 		this.requests.push([options.method, options.params || {}, clientCallId]);
