@@ -2065,7 +2065,7 @@ class MessageController extends \GO\Base\Controller\AbstractController {
 		}
 		
 		
-		if(isset($filepath)) {
+		if(!empty($filepath)) {
 			
 			$message = \GO\Email\Model\SavedMessage::model()->createFromMimeFile($filepath);
 		} else {
@@ -2087,7 +2087,7 @@ class MessageController extends \GO\Base\Controller\AbstractController {
 		
 		$atts = $message->getAttachments();
 		$fsFolder = $folder->fsFolder;
-		
+		\GO::debug($atts);
 		while($att=array_shift($atts)){
 			if(empty($att->content_id) || $att->disposition=='attachment'){
 				
