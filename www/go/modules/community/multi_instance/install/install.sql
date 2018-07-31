@@ -32,4 +32,4 @@ ALTER TABLE `multi_instance_instance`
 
 ALTER TABLE `multi_instance_instance` ADD `deletedAt` DATETIME NULL DEFAULT NULL AFTER `createdAt`, ADD `removeAt` DATETIME NULL DEFAULT NULL AFTER `deletedAt`;
 
-ALTER TABLE `multi_instance_instance` ADD `adminDisplayName` VARCHAR(190) NULL DEFAULT NULL AFTER `removeAt`, ADD `adminEmail` VARCHAR(190) NULL DEFAULT NULL AFTER `adminDisplayName`, ADD `userCount` INT NULL DEFAULT NULL AFTER `adminEmail`, ADD `loginCount` INT NULL DEFAULT NULL AFTER `userCount`, ADD `lastLogin` DATETIME NULL DEFAULT NULL AFTER `logins`, ADD `modifiedAt` DATETIME NULL DEFAULT NULL AFTER `lastLogin`;
+ALTER TABLE `multi_instance_instance` ADD `adminDisplayName` VARCHAR(190) NULL DEFAULT NULL AFTER `removeAt`, ADD `adminEmail` VARCHAR(190) NULL DEFAULT NULL AFTER `adminDisplayName`, ADD `userCount` INT NULL DEFAULT NULL AFTER `adminEmail`, ADD `loginCount` INT NULL DEFAULT NULL AFTER `userCount`, ADD `lastLogin` DATETIME NULL DEFAULT NULL AFTER `loginCount`, ADD `modifiedAt` DATETIME NULL DEFAULT NULL AFTER `lastLogin`;
