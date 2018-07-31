@@ -236,9 +236,13 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	 * 
 	 * 
 	 * ```
-	 * 
-	 * go.Stores.get("link").set({
-	 *		create: links
+	 * var update = {};
+		update[this.moreMenu.record.id] = {enabled: !this.moreMenu.record.data.enabled};
+				
+	 * go.Stores.get("Foo").set({
+	 *		create: {"client-id=1" : {name: "test"}},
+	 *		update: update,
+	 *		destroy: [2]
 	 *	}, function(options, success, response){}, this);
 	 * 
 	 * ```

@@ -162,7 +162,7 @@ class Instance extends Entity {
 				$this->dropDatabaseUser($dbUsername);
 			}
 			
-			$this->deleteHard();
+			parent::internalDelete();
 			
 			throw $e;
 		}
@@ -315,22 +315,6 @@ class Instance extends Entity {
 	
 	
 	protected function internalDelete() {
-		
-		if(!parent::internalDelete()) {
-			return false;
-		}
-		
-		//rename config.php so it's unavailable
-		return $this->getConfigFile()->rename('config.php.bak');
-	}
-	
-	
-	public function deleteHard() {
-		
-		if(!parent::deleteHard()) {
-			return false;
-		}
-		
 		$this->getTempFolder()->delete();
 		$this->getDataFolder()->delete();
 		$this->getConfigFile()->getFolder()->delete();
@@ -338,7 +322,24 @@ class Instance extends Entity {
 		$this->dropDatabaseUser($this->getDbUser());
 		$this->dropDatabase($this->getDbName());
 		
-		return true;
+		return parent::internalDelete();
 	}
-
+	
+	
+	public function setEnabled($value) {
+		include($this->getConfigFile()->getPath());
+		$config['enabled'] = $value;
+		
+		$this->getConfigFile()->putContents("<?php\n\$config = " . var_export($config, true) . ";\n");
+		
+		if(function_exists("opcache_invalidate")) {
+			opcache_invalidate($this->getConfigFile()->getPath());
+		}
+	}
+	
+	public function getEnabled() {
+		include($this->getConfigFile()->getPath());
+		
+		return isset($config['enabled']) ? $config['enabled'] : true;
+	}
 }
