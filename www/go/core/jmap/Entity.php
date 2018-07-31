@@ -15,6 +15,14 @@ use go\core\util\DateTime;
 abstract class Entity  extends \go\core\orm\Entity {	
 	
 	/**
+	 * Track changes in the core_change log for the JMAP protocol.
+	 * Disabled during install.
+	 * 
+	 * @var boolean 
+	 */
+	public static $trackChanges = true;
+	
+	/**
 	 * The Entity ID
 	 * 
 	 * @var int
@@ -44,8 +52,9 @@ abstract class Entity  extends \go\core\orm\Entity {
 			return false;
 		}
 		
-		$this->getType()->change($this);
-		
+		if(self::$trackChanges) {
+			$this->getType()->change($this);		
+		}
 		
 		return true;
 	}
