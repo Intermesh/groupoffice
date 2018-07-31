@@ -31,17 +31,14 @@ class Instance extends Entity {
 		parent::init();
 		
 		if(!$this->isNew()) {
-			
-			
-			
-//			//update model from instance db once a day
-//			if(!isset($this->modifiedAt) || $this->modifiedAt <= new \DateTime("-1 day")) {
-//				$this->getInstanceDbData();
-//				
-//				if($this->isModified() && !$this->internalSave()) {
-//					throw new \Exception("Could not save instance data! ". var_export($this->getValidationErrors(), true));
-//				}
-//			}
+			//update model from instance db once a day
+			if(!isset($this->modifiedAt) || $this->modifiedAt <= new \DateTime("-1 day")) {
+				$this->getInstanceDbData();
+				
+				if($this->isModified() && !$this->internalSave()) {
+					throw new \Exception("Could not save instance data! ". var_export($this->getValidationErrors(), true));
+				}
+			}
 		}
 	}
 	
