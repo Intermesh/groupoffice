@@ -318,8 +318,13 @@ class Instance extends Entity {
 	}
 	
 	public function getEnabled() {
-		include($this->getConfigFile()->getPath());
+		if($this->getConfigFile()->exists()) {
+			include($this->getConfigFile()->getPath());
 		
-		return isset($config['enabled']) ? $config['enabled'] : true;
+			return isset($config['enabled']) ? $config['enabled'] : true;
+		} else
+		{
+			return null;
+		}
 	}
 }
