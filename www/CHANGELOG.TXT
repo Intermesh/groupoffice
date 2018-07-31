@@ -1,3 +1,4 @@
+- Email: Fixed save all attachments to personal folder
 - Leavedays: Fixed saving of yearCredits per category when a new yearCredit is made. 
 - Projects: fixed problem importing project description from CSV
 - Modules: Added delete button to completely remove modules.
