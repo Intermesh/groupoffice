@@ -35,44 +35,44 @@ class AclGroup extends Property {
 						->addTable('core_acl_group');						
 	}
 
-	protected function internalSave() {
-		
-		if($this->isNew()) {
-			$success = App::get()->getDbConnection()
-							->replace('core_acl_group_changes', 
-											[
-													'aclId' => $this->aclId, 
-													'groupId' => $this->groupId, 
-													'grantModSeq' => StateManager::get()->next()
-											]
-											)->execute();
-			
-			if(!$success) {
-				return false;
-			}
-		}
-		
-		return parent::internalSave();
-	}
-	
-	protected function internalDelete() {
-		
-		$success = App::get()->getDbConnection()
-							->update('core_acl_group_changes', 
-											[
-													'revokeModSeq' => StateManager::get()->next()
-											],
-											[
-													'aclId' => $this->aclId, 
-													'groupId' => $this->groupId, 
-													'revokeModSeq' => null
-											]
-											)->execute();
-		
-		if(!$success) {
-			return false;
-		}
-		
-		return $this->internalSave();
-	}
+//	protected function internalSave() {
+//		
+//		if($this->isNew()) {
+//			$success = App::get()->getDbConnection()
+//							->replace('core_acl_group_changes', 
+//											[
+//													'aclId' => $this->aclId, 
+//													'groupId' => $this->groupId, 
+//													'grantModSeq' => StateManager::get()->next()
+//											]
+//											)->execute();
+//			
+//			if(!$success) {
+//				return false;
+//			}
+//		}
+//		
+//		return parent::internalSave();
+//	}
+//	
+//	protected function internalDelete() {
+//		
+//		$success = App::get()->getDbConnection()
+//							->update('core_acl_group_changes', 
+//											[
+//													'revokeModSeq' => StateManager::get()->next()
+//											],
+//											[
+//													'aclId' => $this->aclId, 
+//													'groupId' => $this->groupId, 
+//													'revokeModSeq' => null
+//											]
+//											)->execute();
+//		
+//		if(!$success) {
+//			return false;
+//		}
+//		
+//		return $this->internalSave();
+//	}
 }
