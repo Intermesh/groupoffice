@@ -10,13 +10,13 @@ class Module extends Base {
 		return "Intermesh BV";
 	}
 	
-	protected function afterInstall() {
+	protected function afterInstall(\go\modules\core\modules\model\Module $model) {
 		
 		if(!Authenticator::register()) {
 			return false;
 		}
 		
-		return parent::afterInstall();
+		return parent::afterInstall($model);
 	}
 
 }

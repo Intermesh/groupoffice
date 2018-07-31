@@ -51,8 +51,7 @@ class Observable{
 		self::writeListenersFile();
 		
 		
-		//for new framework
-		\go\core\event\Listeners::get()->init();
+		
 	}
 	
 	public static function writeListenersFile(){

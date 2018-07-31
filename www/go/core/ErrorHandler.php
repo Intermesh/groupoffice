@@ -50,7 +50,7 @@ class ErrorHandler {
 	/**
 	 * Log exception to PHP logging system and debug the exception in GO
 	 * 
-	 * @param Exception $e
+	 * @param \Exception $e
 	 * @return string The string that was logged
 	 */
 	public static function logException($e) {
@@ -59,7 +59,8 @@ class ErrorHandler {
 		$errorString = $cls . " in " . $e->getFile() ." at line ". $e->getLine().': '.$e->getMessage();
 		error_log($errorString, 0);
 		
-		foreach(explode("\n", (string) $e) as $line) {
+		App::get()->debug($errorString);
+		foreach(explode("\n", $e->getTraceAsString()) as $line) {
 			App::get()->debug($line);
 		}
 		
@@ -81,8 +82,7 @@ class ErrorHandler {
 			header('Content-Type: text/plain');
 		}
 
-		echo "[".date(DateTime::FORMAT_API)."] ". $errorString."\n\n";
-		echo (string) $e;			
+		echo "[".date(DateTime::FORMAT_API)."] ". $errorString."\n\n";	
 		echo "\n\nDebug dump: \n\n";			
 		print_r(App::get()->getDebugger()->getEntries());
 	}

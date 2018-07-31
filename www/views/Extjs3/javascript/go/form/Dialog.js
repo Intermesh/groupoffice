@@ -51,6 +51,10 @@ go.form.Dialog = Ext.extend(go.Window, {
 		if(!this.formPanel.load(id)) {			
 			//If no entity was returned the entity store will load it and fire the "changes" event. This dialog listens to that event.
 			this.actionStart();
+		} else
+		{
+			//needs to fire because overrides are made to handle logic after form load.
+			this.onLoad();
 		}
 		
 		return this;
@@ -83,6 +87,14 @@ go.form.Dialog = Ext.extend(go.Window, {
 			this.getFooterToolbar().setDisabled(true);
 		}
 	},
+	
+	onLoad : function() {
+		
+	},
+	
+	onSubmit : function() {
+		
+	},
 
 	actionComplete: function () {
 		if (this.getBottomToolbar()) {
@@ -95,6 +107,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 		if (this.getFooterToolbar()) {
 			this.getFooterToolbar().setDisabled(false);	
 		}
+		
+		this.onLoad();
 	},
 	
 	isValid : function() {
@@ -115,6 +129,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 		
 		this.formPanel.submit(function(formPanel, success, serverId) {
 			this.actionComplete();
+			this.onSubmit();
 			if(success) {
 				this.entityStore.entity.goto(serverId);
 				this.close();

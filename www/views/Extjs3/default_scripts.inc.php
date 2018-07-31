@@ -287,6 +287,17 @@ if (file_exists(GO::view()->getTheme()->getPath() . 'MainLayout.js')) {
 ?>
 <script type="text/javascript">
 <?php
+
+//direct login with token
+if(isset($_POST['accessToken'])) { //defined in index.php
+	?>
+	localStorage.removeItem('accessToken');	
+	sessionStorage.setItem('accessToken', '<?= $_POST['accessToken']; ?>');
+	go.User.accessToken ='<?= $_POST['accessToken']; ?>';
+	<?php
+
+}
+
 //these parameter are passed by dialog.php. These are used to directly link to
 //a dialog.
 if (isset($_REQUEST['f'])) {

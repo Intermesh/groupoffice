@@ -110,6 +110,16 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 				})
 			]
 		});
+		
+		
+		if(go.User.isAdmin) {
+			this.passwordFieldset.insert(0, {
+				xtype:"checkbox",
+				hideLabel: true,
+				boxLabel: t("Login enabled"),
+				name: "enabled"
+			});
+		}
 	
 		Ext.apply(this,{
 			items: [

@@ -23,9 +23,11 @@ go.User = {
     this.apiUrl = session.apiUrl;
     this.downloadUrl = session.downloadUrl;
     this.uploadUrl = session.uploadUrl;
-
-		
-		Ext.apply(this, session.user);
+		this.eventSourceUrl = session.eventSourceUrl;
+    this.displayName = session.user.displayName;
+    this.id = session.user.id;
+    this.avatarId = session.user.avatarId;
+		this.isAdmin = session.user.isAdmin;
 
     Ext.apply(GO.settings, session.oldSettings);
   },

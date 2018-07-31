@@ -45,6 +45,7 @@ class Disk implements CacheInterface {
 	 */
 	public function set($key, $value, $persist = true) {
 
+		GO()->debug("CACHE: ". $key);
 		//don't set false values because unserialize returns false on failure.
 		if ($key === false) {
 			return true;
@@ -128,11 +129,15 @@ class Disk implements CacheInterface {
 			return true;
 		}
 		
+		GO()->debug("Flushing cache");
+		
 		$this->cache = [];
 	
 		$this->folder->delete();
 		$this->folder->create();
 		$this->folder->chmod(0777);
+		
+		$this->flushOnDestruct = false;
 		
 		return true;
 	}

@@ -44,11 +44,11 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 //			state: this.state,
 //			data: this.data
 //		});
-		
+//		
 //		if(!window.localStorage.entityStores) {
 //			window.localStorage.entityStores = {};
 //		}		
-		//window.localStorage["entityStore-" + this.entity.name] = state;		
+//		window.localStorage["entityStore-" + this.entity.name] = state;		
 	},
 	
 	
@@ -100,7 +100,6 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				for(var i = 0,l = action.payload.list.length;i < l; i++) {
 					this._add(action.payload.list[i]);
 				};
-				
 				this.saveState();			
 				
 				break;
@@ -109,6 +108,9 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				//if a list call was made then fetch updates if state mismatch
 				if (this.state && action.payload.state !== this.state) {
 					this.getUpdates();
+				} else
+				{
+					this.state = action.payload.state;
 				}
 				break;
 
@@ -125,7 +127,11 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				method: this.entity.name + "/getUpdates",
 				params: {
 					sinceState: this.state
-				}
+				},
+				callback: function(options, success, response) {
+					this.state = response.newState;
+				},
+				scope: this
 			});
 
 			go.Jmap.request({
@@ -136,7 +142,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 						path: '/changed'
 					}
 				},
-				callback: function(options, success, response) {
+				callback: function(options, success, response) {					
 					if(cb) {
 						cb.call(scope || this, this);
 					}
@@ -260,7 +266,8 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	 * @link http://jmap.io/spec-core.html#/set
 	 */
 	set: function (params, cb, scope) {
-		params.ifInState = this.state;
+		
+		//params.ifInState = this.state;
 
 		go.Jmap.request({
 			method: this.entity.name + "/set",

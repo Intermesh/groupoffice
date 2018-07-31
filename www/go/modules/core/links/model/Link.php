@@ -3,13 +3,17 @@
 namespace go\modules\core\links\model;
 
 use go\core\acl\model\Acl;
-use go\core\acl\model\AclEntity;
 use go\core\App;
 use go\core\db\Query;
+use go\core\orm\Entity;
 use go\core\orm\EntityType;
 use go\core\util\DateTime;
+use go\core\validate\ErrorCode;
+use go\modules\core\search\model\Search;
 
-class Link extends \go\core\jmap\Entity {
+class Link extends Entity {
+	
+	public $id;
 
 	protected $fromEntityTypeId;
 	protected $toEntityTypeId;
@@ -73,7 +77,7 @@ class Link extends \go\core\jmap\Entity {
 		parent::internalValidate();
 		
 		if($this->toId == $this->fromId && $this->toEntityTypeId == $this->fromEntityTypeId) {
-			$this->setValidationError("toId", \go\core\validate\ErrorCode::UNIQUE, "You can't link to the same item");
+			$this->setValidationError("toId", ErrorCode::UNIQUE, "You can't link to the same item");
 		}
 	}
 	
@@ -89,11 +93,10 @@ class Link extends \go\core\jmap\Entity {
 		$reverse['fromId'] = $this->toId;		
 		$reverse['description'] = $this->description;
 		$reverse['createdAt'] = $this->createdAt;
-		$reverse['modSeq'] = $this->modSeq;
 		
 		if($this->isNew()) {			
 			//make sure the description and name are set so they are returned to the client
-			$search = \go\modules\core\search\model\Search::find()->where(['entityId' => $this->toId, 'entityTypeId' => $this->toEntityTypeId])->single();
+			$search = Search::find()->where(['entityId' => $this->toId, 'entityTypeId' => $this->toEntityTypeId])->single();
 			$this->toDescription = $search->description;
 			$this->toName = $search->name;
 		}

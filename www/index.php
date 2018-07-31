@@ -1,4 +1,8 @@
 <?php
+
+use go\core\auth\model\Token;
+use go\core\exception\ConfigurationException;
+use go\core\http\Request;
 /**
  * Copyright Intermesh
  *
@@ -18,15 +22,18 @@ try {
   //initialize autoloading of library
   require_once('GO.php');
   //\GO::init();
-} catch(\PDOException $e) {
-  
-  if(!\go\core\http\Request::get()->isXHR() && (empty($_REQUEST['r']) || $_REQUEST['r'] != 'maintenance/upgrade')) {
-    header('Location: install/');				
-    exit();
-  } else
-  {
-    throw $e;
-  }
+
+
+if(!empty($_POST['accessToken'])) {
+	//used for direct token login from multi_instance module
+	//this token is used in default_scripts.inc.php too
+	$token = Token::find()->where('accessToken', '=', $_POST['accessToken'])->single();
+	if($token) {
+		$token->setAuthenticated();
+	} else
+	{
+		unset($_POST['accessToken']);
+	}
 }
 
 
@@ -41,15 +48,15 @@ try {
 //check if GO is installed
 if(empty($_REQUEST['r']) && PHP_SAPI!='cli'){	
 	
-	if(\GO::user() && isset($_SESSION['GO_SESSION']['after_login_url'])){
-		$url = \GO::session()->values['after_login_url'];
-		unset(\GO::session()->values['after_login_url']);
+	if(GO::user() && isset($_SESSION['GO_SESSION']['after_login_url'])){
+		$url = GO::session()->values['after_login_url'];
+		unset(GO::session()->values['after_login_url']);
 		header('Location: '.$url);
 		exit();
 	}
 	
 	if(GO()->getSettings()->databaseVersion != GO()->getVersion()) {
-		header('Location: '.\GO::config()->host.'install/upgrade.php');				
+		header('Location: '.GO::config()->host.'install/upgrade.php');				
 		exit();
 	}
 	
@@ -78,4 +85,15 @@ if(empty($_REQUEST['r']) && PHP_SAPI!='cli'){
 //	}
 }
 
-\GO::router()->runController();
+} catch(Exception $e) {
+  
+  if(($e instanceof PDOException || $e instanceof ConfigurationException) &&  !Request::get()->isXHR() && (empty($_REQUEST['r']) || $_REQUEST['r'] != 'maintenance/upgrade')) {
+    header('Location: install/');				
+    exit();
+  } else
+  {
+    throw $e;
+  }
+}
+
+GO::router()->runController();

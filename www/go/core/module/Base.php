@@ -49,10 +49,7 @@ abstract class Base {
 			throw $e;
 		}
 		
-		\GO()->getCache()->flush(false);
-		\GO::clearCache(); //legacy
-		\GO()->getDataFolder()->getFolder('clientscripts')->delete();
-		
+		GO()->rebuildCache(true);
 		GO()->getDbConnection()->beginTransaction();
 		
 		$model = new Module();
@@ -70,7 +67,7 @@ abstract class Base {
 			return false;
 		}
 		
-		if(!$this->afterInstall()) {
+		if(!$this->afterInstall($model)) {
 			$this->rollBack();
 			return false;
 		}		
@@ -183,7 +180,7 @@ abstract class Base {
 	 * 
 	 * @return boolean
 	 */
-	protected function afterInstall() {
+	protected function afterInstall(Module $model) {
 		return true;
 	}
 	

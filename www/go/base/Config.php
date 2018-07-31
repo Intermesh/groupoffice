@@ -1012,24 +1012,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/*////////////////////////////////////////////////
 	 * Variables below this should not be changed
 	 *////////////////////////////////////////////////
-
-	/**
-	 * The Group-Office version number
-	 *
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $version = '6.2.101';
-
-	/**
-	 * Modification date
-	 *
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	
-	var $mtime = '20180628';
-
+	 //
 	#group configuration
 	/**
 	 * The administrator user group ID
@@ -1367,6 +1350,15 @@ var $billing_clear_payment_method_on_duplicate = true;
 		}
 		
 		return null;
+	}
+	
+	public function __isset($name) {
+		if(method_exists($this, "get" . $name)) {
+			$var =  $this->{"get" . $name}();
+			return isset($var);
+		}
+		
+		return false;
 	}
 	
 	

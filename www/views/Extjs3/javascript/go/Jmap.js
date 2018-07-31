@@ -72,8 +72,39 @@ go.Jmap = {
 		}
 		return go.User.downloadUrl.replace('{blobId}', blobId);
 	},
+	
 	upload : function(file, cfg) {
 		go.Blob.upload(file,cfg);
+	},
+	
+	
+	sse : function() {
+		if (!window.EventSource) {
+			return false;
+		}
+		
+		var source = new EventSource(go.User.eventSourceUrl), me = this;
+		
+		source.addEventListener('state', function(e) {
+			for(var entity in JSON.parse(e.data)) {
+				var store =go.Stores.get(entity);
+				if(store) {
+					store.getUpdates();
+				}
+			}
+		}, false);
+
+		source.addEventListener('open', function(e) {
+			// Connection was opened.
+		}, false);
+
+		source.addEventListener('error', function(e) {
+			if (e.readyState == EventSource.CLOSED) {
+				// Connection was closed.
+				
+				me.sse();
+			}
+		}, false);
 	},
 
 	/**

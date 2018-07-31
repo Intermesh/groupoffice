@@ -1,5 +1,5 @@
 <?php
-namespace go\core\data\Exception;
+namespace go\core\data\exception;
 
 use Exception;
 

@@ -92,7 +92,7 @@ class CronController extends \GO\Base\Controller\AbstractJsonController{
 		
 		$response =  $this->renderStore($store);	
 		if(!\GO::cronIsRunning()){
-			$message = "The main cron job doesn't appear to be running. Please add a cron job: \n\n* * * * * www-data php ".\GO::config()->root_path."groupofficecli.php -c=".\GO::config()->get_config_file()." -r=core/cron/run -q > /dev/null";
+			$message = "The main cron job doesn't appear to be running. Please add a cron job: \n\n* * * * * www-data php ".\GO::config()->root_path."cron.php ".\GO::config()->get_config_file();
 			$response['feedback']=$message;
 			//throw new \GO\Base\Exception\NoCron(); <-- will not load grid
 		}
@@ -163,31 +163,31 @@ class CronController extends \GO\Base\Controller\AbstractJsonController{
 		
 		return \GO\Base\Cron\CronJob::model()->find($findParams);
 	}
-	/**
-	 * This is the function that is called from the server's cron deamon.
-	 * The cron deamon is supposed to call this function every minute.
-	 * 
-	 * TODO: Check if 1 minute doesn't set the server under heavy load.
-	 */
-	protected function actionRun($params){
-		
-//		$this->requireCli();
-		$jobAvailable = false;
-		\GO::debug('CRONJOB START (PID:'.getmypid().')');
-		while($cronToHandle = $this->_findNextCron()){
-			$jobAvailable = true;
-			\GO::debug('CRONJOB FOUND');
-			$cronToHandle->run();
-		}
-		
-		if(!$jobAvailable)
-			\GO::debug('NO CRONJOB FOUND');
-		
-		\GO::debug('CRONJOB STOP (PID:'.getmypid().')');
-		
-		\GO::config()->save_setting('cron_last_run', time());
-	}
-	
+//	/**
+//	 * This is the function that is called from the server's cron deamon.
+//	 * The cron deamon is supposed to call this function every minute.
+//	 * 
+//	 * TODO: Check if 1 minute doesn't set the server under heavy load.
+//	 */
+//	protected function actionRun($params){
+//		
+////		$this->requireCli();
+//		$jobAvailable = false;
+//		\GO::debug('CRONJOB START (PID:'.getmypid().')');
+//		while($cronToHandle = $this->_findNextCron()){
+//			$jobAvailable = true;
+//			\GO::debug('CRONJOB FOUND');
+//			$cronToHandle->run();
+//		}
+//		
+//		if(!$jobAvailable)
+//			\GO::debug('NO CRONJOB FOUND');
+//		
+//		\GO::debug('CRONJOB STOP (PID:'.getmypid().')');
+//		
+//		\GO::config()->save_setting('cron_last_run', time());
+//	}
+//	
 	
 	protected function actionRunById($params) {
 		$job = \GO\Base\Cron\CronJob::model()->findByPk($params['id']);

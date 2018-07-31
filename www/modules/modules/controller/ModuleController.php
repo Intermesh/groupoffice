@@ -123,7 +123,7 @@ class ModuleController extends AbstractJsonController{
 				
 					'package'=>$module->package(),
 					'enabled'=>$model && $model->enabled,
-					'not_installable'=> $module->appCenter() && !GO::scriptCanBeDecoded($module->package()),
+					'not_installable'=> !$module->isInstallable(),
 					'sort_order' => ($model && $model->sort_order)?$model->sort_order:''
 			);
 			}

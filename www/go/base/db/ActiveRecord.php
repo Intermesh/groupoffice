@@ -416,7 +416,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 */
 	public function equals($record) {
 
-		if(!is_array($record)){
+		if(!is_array($record) && !($record instanceof \Traversable)){
 			$record=array($record);
 		}
 
@@ -3224,8 +3224,8 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 					$oldAcl = $this->findRelatedAclModel()->acl;
 					$user_id = !empty($this->user_id) ? $this->user_id : 0;
 					$acl = new \GO\Base\Model\Acl();
-					$acl->description=$this->tableName().'.'.$this->aclOverwrite();
-					$acl->user_id=$user_id;
+					$acl->usedIn=$this->tableName().'.'.$this->aclOverwrite();
+					$acl->ownedBy=$user_id;
 					$acl->save();
 					
 					$oldAcl->copyPermissions($acl);
@@ -3333,7 +3333,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 		//use private customfields record so it's accessed only when accessed before
 		if (isset($this->_customfieldsRecord)){
 			//id is not set if this is a new record so we make sure it's set here.
-			$this->_customfieldsRecord->model_id=$this->id;
+			$this->_customfieldsRecord->{$this->_customfieldsRecord->primaryKey()}=$this->id;
 
 			//check if other fields than model_id were modified.
 			$modified = $this->_customfieldsRecord->getModifiedAttributes();

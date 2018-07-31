@@ -353,7 +353,7 @@ function test_system(){
 	$url = "http".(!empty($_SERVER['HTTPS'])?"s":"")."://".$_SERVER['HTTP_HOST'];
 	
 
-	
+	/*
 	try {
 		$headers = get_headers($url.'/caldav');	
 	}catch(\Exception $e) {
@@ -422,7 +422,7 @@ function test_system(){
 
 	$tests[]=$test;	
 	
-	
+	*/
 	
 	$test['name']='Shared Memory Functions';
 	$test['showSuccessFeedback'] = false;
@@ -909,6 +909,20 @@ function whereis($cmd)
 	return false;
 }
 
+
+function systemIsOk() {
+	$tests = test_system();
+	
+	foreach($tests as $test)
+	{
+		if(!$test['pass'] && $test['fatal']) {
+			return false;
+		}
+	}
+	
+	return true;
+}
+
 function return_bytes($val) {
 
 	$last = strtolower(substr(trim($val), -1));
@@ -928,9 +942,9 @@ function return_bytes($val) {
 }
 //
 ////check if we are included
-//if(!class_exists('GO'))
-//{
-//	echo '<h1 style="font-family: Arial, Helvetica;font-size: 18px;">'.$product_name.' test script</h1><div style="font-family: Arial, Helvetica;font-size: 12px;"> ';
-//	output_system_test();
-//	echo "</div>";
-//}
+if(!class_exists("go\core\App"))
+{
+	echo '<h1 style="font-family: Arial, Helvetica;font-size: 18px;">'.$product_name.' test script</h1><div style="font-family: Arial, Helvetica;font-size: 12px;"> ';
+	output_system_test();
+	echo "</div>";
+}

@@ -2,8 +2,12 @@
 
 namespace go\core\orm;
 
+use DateTime;
+use Exception;
+use GO;
 use go\core\App;
 use go\core\db\Query;
+use go\core\jmap\Entity;
 use go\modules\core\modules\model\Module;
 
 /**
@@ -26,6 +30,8 @@ class EntityType {
 	private $name;
 	private $moduleId;	
   private $clientName;
+	
+	public $highestModSeq;
 	
 	/**
 	 * The name of the entity for the JMAP client API
@@ -86,7 +92,7 @@ class EntityType {
 		$e->className = $className;
 		
 		$record = (new Query)
-						->select('id,moduleId,clientName,name')
+						->select('*')
 						->from('core_entity')
 						->where('clientName', '=', $className::getClientName())
 						->single();
@@ -95,23 +101,26 @@ class EntityType {
 			$module = Module::findByClass($className);
 		
 			if(!$module) {
-				throw new \Exception("No module found for ". $className);
+				throw new Exception("No module found for ". $className);
 			}
 
 			$record = [];
 			$record['moduleId'] = isset($module) ? $module->id : null;
 			$record['name'] = self::classNameToShortName($className);
       $record['clientName'] = $className::getClientName();
-
 			App::get()->getDbConnection()->insert('core_entity', $record)->execute();
 
 			$record['id'] = App::get()->getDbConnection()->getPDO()->lastInsertId();
+		} else
+		{
+			$e->highestModSeq = isset($record['highestModSeq']) ? (int) $record['highestModSeq'] : null;
 		}
 
 		$e->id = $record['id'];
 		$e->moduleId = $record['moduleId'];
 		$e->clientName = $record['clientName'];
 		$e->name = $record['name'];
+		
 		
 		return $e;
 	}
@@ -136,7 +145,7 @@ class EntityType {
 	 */
 	public static function findAll() {
 		$records = (new Query)
-						->select('e.id, e.moduleId, e.name, e.clientName, m.name AS moduleName, m.package AS modulePackage')
+						->select('e.*, m.name AS moduleName, m.package AS modulePackage')
 						->from('core_entity', 'e')
 						->join('core_module', 'm', 'm.id = e.moduleId')						
 						->all();
@@ -157,7 +166,7 @@ class EntityType {
 	 */
 	public static function findById($id) {
 		$record = (new Query)
-						->select('e.id, e.moduleId, e.name, e.clientName, m.name AS moduleName, m.package AS modulePackage')
+						->select('e.*, m.name AS moduleName, m.package AS modulePackage')
 						->from('core_entity', 'e')
 						->join('core_module', 'm', 'm.id = e.moduleId')
 						->where('id', '=', $id)
@@ -178,7 +187,7 @@ class EntityType {
 	 */
 	public static function findByName($name) {
 		$record = (new Query)
-						->select('e.id, e.moduleId, e.name, e.clientName, m.name AS moduleName, m.package AS modulePackage')
+						->select('e.*, m.name AS moduleName, m.package AS modulePackage')
 						->from('core_entity', 'e')
 						->join('core_module', 'm', 'm.id = e.moduleId')
 						->where('clientName', '=', $name)
@@ -198,6 +207,7 @@ class EntityType {
 		$e->name = $record['name'];
     $e->clientName = $record['clientName'];
 		$e->moduleId = $record['moduleId'];
+		$e->highestModSeq = (int) $record['highestModSeq'];
 
 		if (isset($record['modulePackage'])) {
 			$e->className = 'go\\modules\\' . $record['modulePackage'] . '\\' . $record['moduleName'] . '\\model\\' . ucfirst($e->name);
@@ -207,5 +217,69 @@ class EntityType {
 		
 		return $e;
 	}
+	
+	protected $changed = [];
+	
+	public function change(Entity $entity) {
+		$this->changed[] = $entity;		
+	}
+	
+	/**
+	 * Get the next state
+	 * @param string $entityClass
+	 * @return int
+	 */
+	private function nextModSeq() {
+		/*
+		 * START TRANSACTION
+		 * SELECT counter_field FROM child_codes FOR UPDATE;
+		  UPDATE child_codes SET counter_field = counter_field + 1;
+		 * COMMIT
+		 */
+
+
+		$query = (new Query())
+						->selectSingleValue("highestModSeq")
+						->from("core_entity")
+						->where(["id" => $this->id])
+						->forUpdate();
+		$modSeq = (int) $query->execute()->fetch();
+		$modSeq++;
+
+		App::get()->getDbConnection()
+						->update(
+										"core_entity", 
+										['highestModSeq' => $modSeq],
+										["id" => $this->id]
+						)->execute(); //mod seq is a global integer that is incremented on any entity update
+	
+		return $modSeq;
+	}	
+	
+	public function __destruct() {	
+		
+		
+		if(!empty($this->changed)) {
+			
+			$this->highestModSeq = $this->nextModSeq();
+			
+			foreach($this->changed as $change) {
+				$record = [
+						'modSeq' => $this->highestModSeq,
+						'entityTypeId' => $this->id,
+						'entityId' => $change->id,
+						'aclId' => $change->findAclId(),
+						'destroyed' => $change->isDeleted(),
+						'createdAt' => new DateTime()
+								];
+				
+
+				GO()->getDbConnection()->replace('core_change', $record)->execute();
+			}
+			
+		}
+	}
+	
+	
 
 }

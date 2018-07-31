@@ -59,6 +59,20 @@ class Authenticator extends PrimaryAuthenticator {
 				throw new \Exception("Couldn't enable TLS");
 			}
 		}
+		
+		if (!empty($server->username)) {			
+			
+			$record = Record::find($connection, $server->peopleDN, $server->usernameAttribute . "=" . $server->username)->fetch();
+			
+			if(!$record) {
+				throw new \Exception("LDAP User '".$server->username."' does not exist.");
+			}
+			
+			if (!$connection->bind($record->getDn(), $server->password)) {				
+				throw new \Exception("Invalid password given for '".$server->username."'");
+			}
+		}
+		
 		$ldapUsername = explode('@', $username)[0];
 		$record = Record::find($connection, $server->peopleDN, $server->usernameAttribute . "=" . $ldapUsername)->fetch();
 		

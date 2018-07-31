@@ -5,10 +5,6 @@ use go\core;
 use go\core\db\Query;
 
 class Settings extends core\Settings {
-
-	public function getModuleName() {
-		return 'users';
-	}
 	
 	/**
 	 * Default time zone for users

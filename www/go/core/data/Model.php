@@ -5,7 +5,7 @@ namespace go\core\data;
 use Exception;
 use go\core\App;
 use go\core\data\ArrayableInterface;
-use go\core\data\Exception\NotArrayable;
+use go\core\data\exception\NotArrayable;
 use go\core\util\DateTime;
 use ReflectionClass;
 use ReflectionMethod;

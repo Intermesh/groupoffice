@@ -483,8 +483,8 @@ this.exportCompanyMenu.setColumnModel(this.companiesGrid.getColumnModel());
 		store: new Ext.data.ArrayStore({
 			fields: ['name', 'icon', 'visible'],
 			data: [
-				['Contacts', 'person'],
-				['Companies', 'domain']
+				[t("Contacts", "addressbook"), 'person'],
+				[t("Companies", "addressbook"), 'domain']
 //				[t("Newsletters", "addressbook"), 'email', !!GO.email],
 //				['Settings', 'settings',GO.addressbook.permission_level == 50]
 			]

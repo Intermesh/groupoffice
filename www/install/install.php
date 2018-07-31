@@ -1,6 +1,12 @@
 <?php
 require('../vendor/autoload.php');
 
+require("gotest.php");
+if(!systemIsOk()) {
+	header("Location: test.php");
+	exit();
+}
+
 use GO\Base\Cron\CronJob;
 use GO\Base\Model\Module as Module2;
 use GO\Base\Observable;

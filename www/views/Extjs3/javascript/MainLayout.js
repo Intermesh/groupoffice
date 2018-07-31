@@ -571,6 +571,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				this.fireEvent('render');
 
 				this.welcome();
+				
+				
+//				go.Jmap.sse();
 
 
 			}, this);

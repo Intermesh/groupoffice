@@ -413,6 +413,8 @@ $qs[] = "ALTER TABLE `core_link`
   ADD CONSTRAINT `fromEntity` FOREIGN KEY (`fromEntityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `toEntity` FOREIGN KEY (`toEntityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;";
 
+$qs[] = "ALTER TABLE `core_entity` ADD `highestModSeq` INT NULL DEFAULT NULL AFTER `clientName`;";
+
 $qs[] = function() {
 	
 	$entities = \go\core\orm\EntityType::findAll();
@@ -468,7 +470,8 @@ $qs[] = "ALTER TABLE `core_auth_password` ADD FOREIGN KEY (`userId`) REFERENCES 
 $qs[] = "update core_entity set moduleId = (select id from core_module where name='users') where name='User';";
 
 
-
+//obsolete modules
+$qs[] = "delete from core_module where name IN ('servermanager', 'admin2userlogin', 'formprocessor', 'settings', 'sites', 'syncml', 'dropbox', 'timeregistration', 'projects', 'hoursapproval', 'webodf','imapauth','ldapauth', 'presidents','ab2users', 'backupmanager', 'calllog', 'emailportlet', 'gnupg', 'language', 'mailings', 'newfiles')";
 
 foreach($qs as $q) {
 	if(is_string($q)) {
