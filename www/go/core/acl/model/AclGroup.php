@@ -2,9 +2,8 @@
 namespace go\core\acl\model;
 
 use go\core\App;
-use go\core\orm\Mapping;
+use go\core\db\Query;
 use go\core\orm\Property;
-use go\core\orm\StateManager;
 
 /**
  * The AclGroup class
@@ -34,45 +33,45 @@ class AclGroup extends Property {
 		return parent::defineMapping()
 						->addTable('core_acl_group');						
 	}
+	
 
-//	protected function internalSave() {
-//		
-//		if($this->isNew()) {
-//			$success = App::get()->getDbConnection()
-//							->replace('core_acl_group_changes', 
-//											[
-//													'aclId' => $this->aclId, 
-//													'groupId' => $this->groupId, 
-//													'grantModSeq' => StateManager::get()->next()
-//											]
-//											)->execute();
-//			
-//			if(!$success) {
-//				return false;
-//			}
-//		}
-//		
-//		return parent::internalSave();
-//	}
-//	
-//	protected function internalDelete() {
-//		
-//		$success = App::get()->getDbConnection()
-//							->update('core_acl_group_changes', 
-//											[
-//													'revokeModSeq' => StateManager::get()->next()
-//											],
-//											[
-//													'aclId' => $this->aclId, 
-//													'groupId' => $this->groupId, 
-//													'revokeModSeq' => null
-//											]
-//											)->execute();
-//		
-//		if(!$success) {
-//			return false;
-//		}
-//		
-//		return $this->internalSave();
-//	}
+	protected function internalSave() {
+		
+		$success = App::get()->getDbConnection()
+						->insert('core_acl_group_changes', 
+										[
+												'aclId' => $this->aclId, 
+												'groupId' => $this->groupId, 
+												'grantModSeq' => Acl::getType()->nextModSeq(),
+												'revokeModSeq' => null
+										]
+										)->execute();
+
+		if(!$success) {
+			return false;
+		}
+		
+		return parent::internalSave();
+	}
+	
+	protected function internalDelete() {
+		
+		$success = App::get()->getDbConnection()
+						->update('core_acl_group_changes', 
+										[												
+											'revokeModSeq' => Acl::getType()->nextModSeq()											
+										],
+										[
+											'aclId' => $this->aclId, 
+											'groupId' => $this->groupId,
+											'revokeModSeq' => null
+										]
+										)->execute();
+		
+		if(!$success) {
+			return false;
+		}
+		
+		return $this->internalSave();
+	}
 }

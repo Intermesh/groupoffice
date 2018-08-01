@@ -90,7 +90,10 @@ go.Jmap = {
 		});
 	},
 	
-	
+	/**
+	 * Initializes Server Sent Events via EventSource. This function is called in MainLayout.onAuthenticated()
+	 * @returns {Boolean}
+	 */
 	sse : function() {
 		if (!window.EventSource) {
 			return false;

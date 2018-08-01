@@ -76,23 +76,26 @@ class AclUsersGroups extends ActiveRecord {
 			$this->aclItem->touch();
 		}
 		
-//		$success = App::get()->getDbConnection()
-//							->update('core_acl_group_changes', 
-//											[
-//													'revokeModSeq' => StateManager::get()->next()
-//											],
-//											[
-//													'aclId' => $this->aclId, 
-//													'groupId' => $this->groupId, 
-//											]
-//											)->execute();
-//		
-//		if(!$success) {
-//			return false;
-//		}
+		$success = App::get()->getDbConnection()
+							->update('core_acl_group_changes', 
+											[
+													'revokeModSeq' => \go\core\acl\model\Acl::getType()->nextModSeq()
+											],
+											[
+													'aclId' => $this->aclId, 
+													'groupId' => $this->groupId,
+													'revokeModSeq' => null
+											]
+											)->execute();
+		
+		if(!$success) {
+			return false;
+		}
 		
 		return parent::afterDelete();
 	}
+	
+
 	
 	protected function afterSave($wasNew) {
 		if($this->aclItem){
@@ -104,17 +107,17 @@ class AclUsersGroups extends ActiveRecord {
 			$this->aclItem->touch();
 		}
 		
-//		$success = App::get()->getDbConnection()
-//							->replace('core_acl_group_changes', 
-//											[
-//													'aclId' => $this->aclId, 
-//													'groupId' => $this->groupId, 
-//													'grantModSeq' => StateManager::get()->next()
-//											]
-//											)->execute();
-//		if(!$success) {
-//			return false;
-//		}
+		$success = App::get()->getDbConnection()
+							->insert('core_acl_group_changes', 
+											[
+													'aclId' => $this->aclId, 
+													'groupId' => $this->groupId, 
+													'grantModSeq' => \go\core\acl\model\Acl::getType()->nextModSeq()
+											]
+											)->execute();
+		if(!$success) {
+			return false;
+		}
 		
 		return parent::afterSave($wasNew);
 	}

@@ -41,23 +41,27 @@ abstract class AclItemEntity extends Entity {
 	 */
 	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ) {
 
+		self::joinAclEntity($query);
+
+		Acl::applyToQuery($query, 'aclEntity.aclId', $level);
+		
+		return $query;
+	}
+	
+	public static function joinAclEntity(Query $query) {
 		$cls = static::aclEntityClass();
 
 		/* @var $cls Entity */
 
 		$aclColumn = $cls::getMapping()->getColumn('aclId');
-		$toTable = $cls::getMapping()->getTable($aclColumn->table->getName());
+//		$toTable = $cls::getMapping()->getTable($aclColumn->table->getName());
 
 		$keys = [];
 		foreach (static::aclEntityKeys() as $from => $to) {
-			$keys[] = $query->getTableAlias() . '.' . $from . ' = ' . $toTable->getAlias() . '.' . $to;
+			$keys[] = $query->getTableAlias() . '.' . $from . ' = aclEntity.' . $to;
 		}
 
-		$query->join($toTable->getName(), $toTable->getAlias(), implode(' AND ', $keys));
-
-		Acl::applyToQuery($query, $toTable->getAlias().'.aclId', $level);
-		
-		return $query;
+		$query->join($aclColumn->table->getName(), 'aclEntity', implode(' AND ', $keys));
 	}
 	
 	public static function filter(Query $query, array $filter) {

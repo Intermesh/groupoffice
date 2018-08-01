@@ -31,6 +31,11 @@ class EntityType {
 	private $moduleId;	
   private $clientName;
 	
+	/**
+	 * The highest mod sequence used for JMAP data sync
+	 * 
+	 * @var int
+	 */
 	public $highestModSeq;
 	
 	/**
@@ -229,7 +234,7 @@ class EntityType {
 	 * @param string $entityClass
 	 * @return int
 	 */
-	private function nextModSeq() {
+	public function nextModSeq() {
 		/*
 		 * START TRANSACTION
 		 * SELECT counter_field FROM child_codes FOR UPDATE;
@@ -272,9 +277,10 @@ class EntityType {
 						'destroyed' => $change->isDeleted(),
 						'createdAt' => new DateTime()
 								];
-				
 
-				GO()->getDbConnection()->replace('core_change', $record)->execute();
+				if(!GO()->getDbConnection()->insert('core_change', $record)->execute()) {
+					throw new \Exception("Could not save change");
+				}
 			}
 			
 		}

@@ -592,7 +592,7 @@ class User extends Entity {
 			return false;
 		}
 		
-		if(!Acl::getPermissionLevel($module->aclId, $this->id)) {
+		if(!Acl::getUserPermissionLevel($module->aclId, $this->id)) {
 			return false;
 		}
 		

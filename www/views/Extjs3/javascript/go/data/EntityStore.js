@@ -27,28 +27,28 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	},
 	
 	restoreState : function() {
-//		if(!window.localStorage.entityStores) {
-//			window.localStorage.entityStores = {};
-//		}
-//		
-//		var json = window.localStorage["entityStore-" + this.entity.name];		
-//		if(json) {
-//			var state = JSON.parse(json);			
-//			this.data = state.data;
-//			this.state = state.state;			
-//		}
+		if(!window.localStorage.entityStores) {
+			window.localStorage.entityStores = {};
+		}
+		
+		var json = window.localStorage["entityStore-" + this.entity.name];		
+		if(json) {
+			var state = JSON.parse(json);			
+			this.data = state.data;
+			this.state = state.state;			
+		}
 	},
 	
 	saveState : function() {
-//		var state = JSON.stringify({
-//			state: this.state,
-//			data: this.data
-//		});
-//		
-//		if(!window.localStorage.entityStores) {
-//			window.localStorage.entityStores = {};
-//		}		
-//		window.localStorage["entityStore-" + this.entity.name] = state;		
+		var state = JSON.stringify({
+			state: this.state,
+			data: this.data
+		});
+		
+		if(!window.localStorage.entityStores) {
+			window.localStorage.entityStores = {};
+		}		
+		window.localStorage["entityStore-" + this.entity.name] = state;		
 	},
 	
 	
@@ -129,7 +129,14 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					sinceState: this.state
 				},
 				callback: function(options, success, response) {
-					this.state = response.newState;
+					if(success) {
+						this.state = response.newState;
+					} else
+					{
+						this.state = null;
+						this.data = {};
+						this.saveState();
+					}
 				},
 				scope: this
 			});
