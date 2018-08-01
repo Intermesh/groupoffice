@@ -6,7 +6,6 @@
 DROP TABLE IF EXISTS `files_node`;
 CREATE TABLE `files_node` (
   `id` int(11) NOT NULL,
-	`modSeq` int(11) UNSIGNED NOT NULL,
   `storageId` int(11) NOT NULL,
   `blobId` binary(40) DEFAULT NULL COMMENT 'When blobId is NULL then deletedAt OR isDirectory need to be set\n',
   `parentId` int(11) NOT NULL,
@@ -16,8 +15,6 @@ CREATE TABLE `files_node` (
   `ownedBy` int(11) DEFAULT NULL,
   `modifiedBy` int(11) DEFAULT NULL,
   `comment` text COLLATE utf8mb4_unicode_ci,
-  `deletedAt` datetime DEFAULT NULL,
-  `deletedBy` int(11) DEFAULT NULL,
   `aclId` int(11) NOT NULL,
   `isLocked` tinyint(11) NOT NULL DEFAULT 0,
   `isDirectory` tinyint(1) UNSIGNED NOT NULL DEFAULT '1',

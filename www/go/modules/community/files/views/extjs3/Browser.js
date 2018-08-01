@@ -321,7 +321,28 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 
 	},
 	
-	move: function(nodes, replaceIndex, newName){
+	//TODO copy directories recursive
+	copy: function(nodes, replaceIndex, newName, callback){
+		var items = {};
+		Ext.each(nodes, function(record) {
+			items['#'+Ext.id()] = {
+				parentId:this.targetStore.baseParams.filter.parentId,
+				name: newName || record.name,
+				blobId: record.blobId,
+				isDirectory: false
+			};
+		}, this);
+
+		go.Stores.get('Node').set({create:items});
+		
+		this.unprocessedFiles--;
+		if(this.unprocessedFiles === 0) {
+			this.targetStore.commitChanges();
+			callback();
+		}
+	},
+	
+	move: function(nodes, replaceIndex, newName, callback){
 		var items = {};
 		Ext.each(nodes, function(record) {
 			items[record.id] = {parentId:this.targetStore.baseParams.filter.parentId};
@@ -329,12 +350,13 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 				items[record.id].name = newName;
 			}
 		}, this);
-		// TODO: Change in store and commit all at once
+
 		go.Stores.get('Node').set({update:items});
 		
 		this.unprocessedFiles--;
 		if(this.unprocessedFiles === 0) {
 			this.targetStore.commitChanges();
+			callback();
 		}
 	},
 	

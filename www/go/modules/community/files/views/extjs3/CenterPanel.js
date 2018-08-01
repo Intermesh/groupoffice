@@ -327,8 +327,11 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 							text: '',
 							pressed: true, //default
 							toggleHandler: function (btn, state) {
+								if(!state) {
+									delete this.store.baseParams.filter.parentId
+								}
 								if (state) {
-									this.store.baseParams.filter = {parentId: btn.parentId};
+									this.store.baseParams.filter.parentId = btn.parentId;
 									this.store.reload();
 								}
 							},
@@ -336,8 +339,11 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 						},{
 							text: t('Shared with me'),
 							toggleHandler: function(btn, state) {
+								if(!state) {
+									delete this.store.baseParams.filter.sharedWithMe
+								}
 								if(state) {
-									this.store.baseParams.filter = {sharedWithMe: true};
+									this.store.baseParams.filter.sharedWithMe = true;
 									this.store.reload();
 								}
 							},
@@ -345,8 +351,11 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 						},{
 							text: t('Bookmarks'),
 							toggleHandler: function(btn, state) {
+								if(!state) {
+									delete this.store.baseParams.filter.bookmarked
+								}
 								if(state) {
-									this.store.baseParams.filter = {bookmarked: true};
+									this.store.baseParams.filter.bookmarked = true;
 									this.store.reload();
 								}
 							},

@@ -10,7 +10,7 @@ go.modules.community.files.FolderTreeNodeUI = Ext.extend(Ext.tree.TreeNodeUI, {
 		go.modules.community.files.FolderTreeNodeUI.superclass.renderElements.call(this,n, a, targetNode, bulkRender);
 
 		if(!n.getOwnerTree().folderSelectMode){
-			this.applyNodeButton(this.anchor,n);
+			//this.applyNodeButton(this.anchor,n);
 		}
 	},
 	/**

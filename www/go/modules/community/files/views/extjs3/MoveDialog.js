@@ -1,12 +1,23 @@
-go.modules.community.files.MoveDialog = Ext.extend(go.form.Dialog, {
+go.modules.community.files.MoveDialog = Ext.extend(go.Window, {
 	stateId: 'files-moveDialog',
 	title: t("Move"),
 	entityStore: go.Stores.get("Node"),
 	width: 600,
 	height: 600,
-	
+	currentId: null,
+	initComponent: function () {	
+		
+		this.items = this.initFormItems();
+		go.modules.community.files.MoveDialog.superclass.initComponent.call(this);
+	},
 	initFormItems: function () {
 		var items = [];
+		
+		this.buttons = ['->', {
+				text: this.title,
+				handler: this.submit,
+				scope: this
+			}];
 		
 		this.parentIdField = new Ext.form.Hidden({
 			name:'parentId',
@@ -41,8 +52,17 @@ go.modules.community.files.MoveDialog = Ext.extend(go.form.Dialog, {
 	},
 	
 	submit: function() {
-		var folder = go.Stores.get('Node').get(currentId),
-			 callback = this.copy ? go.files.community.copy : go.files.community.move
-		this.browser.receive([folder], callback , this.parentIdField.getValue());
+		var nodes = go.Stores.get('Node').get([this.currentId]),
+			self = this;
+		//this.browser.receive(records, droppedAt.data.id, 'move');
+		this.browser.receive(nodes, this.parentIdField.getValue(), this.copy?'copy':'move', function(){
+			self.close();
+		});
+	},
+	
+	load: function (id) {
+		this.currentId = id;
+
+		return this;
 	}
 });

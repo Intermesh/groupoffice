@@ -110,7 +110,7 @@ go.modules.community.files.ContextMenu = Ext.extend(Ext.menu.Menu,{
 					this.records.forEach(function(r) {
 						ids.push(r.id);
 					});
-					this.store.destroy(ids);
+					this.store.destroyIds(ids);
 				},
 				scope: this
 			}),
