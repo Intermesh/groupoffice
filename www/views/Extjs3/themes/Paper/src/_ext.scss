@@ -900,6 +900,7 @@ ul.x-tab-strip-bottom{
 	}
 	
 	.x-panel-bbar & {
+		height: dp(40);
 		border-top: 1px solid color($fg, 'line');
 	}
 
