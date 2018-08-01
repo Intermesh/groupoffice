@@ -83,35 +83,13 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 
 	deleteSelected: function () {
 
-		var selectedRecords = this.getSelectionModel().getSelections(), ids = [], strConfirm;
+		var selectedRecords = this.getSelectionModel().getSelections(), ids = [];
 
 		selectedRecords.forEach(function (r) {
 			ids.push(r.data.id);
 		});
 
-		switch (ids.length)
-		{
-			case 0:
-				return;
-			case 1:
-				strConfirm = t("Are you sure you want to delete the selected item?");
-				break;
-
-			default:
-				strConfirm = t("Are you sure you want to delete the {count} items?").replace('{count}', ids.length);
-				break;
-		}
-
-		Ext.MessageBox.confirm(t("Confirm delete"), t(strConfirm), function (btn) {
-
-			if (btn != "yes") {
-				return;
-			}
-
-			this.getStore().entityStore.set({
-				destroy: ids
-			});
-		}, this);
+		this.store.destroyIds(ids);
 	},
 
 	/**

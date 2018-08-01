@@ -159,31 +159,29 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		}, this);
 	},
 	
-	destroy : function(ids) {
+	destroyIds : function(ids) {
 		
-		switch(ids.length)
-		{
+		switch(ids.length){
 			case 0:				
 				return;
 			case 1:
 				var strConfirm = t("Are you sure you want to delete the selected item?");
 			break;
-
 			default:
 				var strConfirm = t("Are you sure you want to delete the {count} items?").replace('{count}', ids.length);
 			break;					
 		}
 		
-		Ext.MessageBox.confirm(t("Confirm delete"), t(strConfirm), function(btn) {
+		Ext.MessageBox.confirm(t("Confirm delete"), strConfirm, function(btn) {
 			
 			if(btn != "yes") {
 				return;
 			}
 			
-			go.Stores.get('Note').set({
+			this.entityStore.set({
 				destroy: ids
 			});
-		});
+		}, this);
 	},
 	
 	onUpdate : function(store, record, operation) {

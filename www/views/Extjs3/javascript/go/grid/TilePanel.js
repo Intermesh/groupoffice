@@ -49,7 +49,7 @@ go.grid.TilePanel = Ext.extend(Ext.DataView, {
 			ids.push(r.data.id);
 		});
 		
-		this.store.destroy(ids);
+		this.store.destroyIds(ids);
 	},
 
 	/**
