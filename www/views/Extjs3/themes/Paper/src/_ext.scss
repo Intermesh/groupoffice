@@ -2033,7 +2033,6 @@ $menuScrollerSize : dp(4);
 		@extend %font-caption;
 	}
 	.x-combo-selected {
-		border:0 !important;
 		background-color: color($grey, 100);
 	}
 	.x-toolbar {
@@ -2194,50 +2193,26 @@ $menuScrollerSize : dp(4);
 		padding: dp(8);
 	}
 	&-header {
-			@extend %font-title;
-			background-color:color($bg,'app-bar');
-			border-radius: $borderRadius;
-			
-			&-text {
-				display:inline-block;
-				height: dp(16);
-				line-height: dp(16);
-				margin: dp(20) 0;
-			}
-		}
-	&-br { // bottom-right
-		padding-right: 0;
-	}
-	&-bl { // bottom-right
-		padding-left: 0;
-	}
-	&-mr { //middle-right
-		padding-right: 0;
-	}
-	&-ml { //middle-right
-		padding-left: 0;
-	}
-	&-tr {
-		padding-right: 0;
-	}
-	&-tl {
-		padding-left: 0;
-		.x-window-header { // ext...
-			padding: 0 dp(8) 0 dp(16);
+		@extend %font-title;
+		background-color:color($bg,'app-bar');
+		border-radius: $borderRadius;
+		padding: 0 dp(8) 0 dp(16);
+		&-text {
+			display:inline-block;
+			height: dp(16);
+			line-height: dp(16);
+			margin: dp(20) 0;
 		}
 	}
 	&-mc {
 		@extend %font-body1;
-		border:0;
 	}
 	&-proxy { // ghost when animating
 		@extend .z24;
 		border-radius: $borderRadius;
 		background-color:white;
-		border:0;
 	}
 	&-bbar .x-toolbar {
-		
 		border-top-color: color($fg, 'divider');;
 	}
 	&-maximized .x-window-tc {

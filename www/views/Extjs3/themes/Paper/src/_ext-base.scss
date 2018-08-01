@@ -1667,34 +1667,6 @@ input.x-tree-node-cb {
 	text-decoration:none;
 }
 
-.x-tree-node div.x-tree-drag-insert-below{
- 	 border-bottom:1px dotted;
-}
-
-.x-tree-node div.x-tree-drag-insert-above{
-	 border-top:1px dotted;
-}
-
-.x-tree-dd-underline .x-tree-node div.x-tree-drag-insert-below{
- 	 border-bottom:0 none;
-}
-
-.x-tree-dd-underline .x-tree-node div.x-tree-drag-insert-above{
-	 border-top:0 none;
-}
-
-.x-tree-dd-underline .x-tree-node div.x-tree-drag-insert-below a{
- 	 border-bottom:2px solid;
-}
-
-.x-tree-dd-underline .x-tree-node div.x-tree-drag-insert-above a{
-	 border-top:2px solid;
-}
-
-.x-tree-node .x-tree-drag-append a span{
-	 border:1px dotted;
-}
-
 .x-dd-drag-ghost .x-tree-node-indent, .x-dd-drag-ghost .x-tree-ec-icon{
 	display:none !important;
 }
@@ -1732,23 +1704,12 @@ input.x-tree-node-cb {
    vertical-align:middle;
 }
 
-
-.x-date-right, .x-date-left {
-    width:18px;
-}
-
 .x-date-right{
     text-align:right;
 }
 
-.x-date-middle {
-    padding-top:2px;
-    padding-bottom:2px;
-    width:130px; /* FF3 */
-}
-
 .x-date-right a, .x-date-left a{
-    display:block;
+   display:block;
 	background-position: center;
 	background-repeat: no-repeat;
 	cursor:pointer;
@@ -1770,12 +1731,10 @@ input.x-tree-node-cb {
 }
 
 .x-date-right a {
-    margin-right:2px;
     text-decoration:none !important;
 }
 
 .x-date-left a{
-    margin-left:2px;
     text-decoration:none !important;
 }
 
@@ -1784,19 +1743,12 @@ table.x-date-inner {
     table-layout:fixed;
 }
 
-.ext-webkit table.x-date-inner{
-    /* Fix for webkit browsers */
-    width: 175px;
-}
-
-
 .x-date-inner th {
     width:25px;
 }
 
 .x-date-inner th {
    text-align:right !important;
-	border-bottom: 1px solid;
 	cursor:default;
    padding:0;
    border-collapse:separate;
@@ -1808,7 +1760,6 @@ table.x-date-inner {
 }
 
 .x-date-inner td {
-    border: 1px solid;
 	text-align:right;
     padding:0;
 }
@@ -1843,7 +1794,6 @@ table.x-date-inner {
 }
 
 .x-date-menu .x-menu-item {
-	padding:1px 24px 1px 4px;
 	white-space: nowrap;
 }
 
@@ -1854,10 +1804,6 @@ table.x-date-inner {
 	display:none;
 }
 
-.x-date-mp td {
-    padding:2px;
-}
-
 td.x-date-mp-month,td.x-date-mp-year,td.x-date-mp-ybtn {
     border: 0 none;
 	text-align:center;
@@ -1865,26 +1811,19 @@ td.x-date-mp-month,td.x-date-mp-year,td.x-date-mp-ybtn {
 	width:25%;
 }
 
-.x-date-mp-ok {
-	margin-right:3px;
-}
-
 .x-date-mp-btns button {
 	text-decoration:none;
 	text-align:center;
 	text-decoration:none !important;
-	border:1px solid;
 	cursor:pointer;
 }
 
 .x-date-mp-btns td {
-	border-top: 1px solid;
     text-align:center;
 }
 
 td.x-date-mp-month a,td.x-date-mp-year a {
 	display:block;
-	padding:2px 4px;
 	text-decoration:none;
 	text-align:center;
 }
@@ -1905,10 +1844,7 @@ td.x-date-mp-month a:hover,td.x-date-mp-year a:hover {
 .x-date-mp-ybtn {
    text-align:center;
 }
-
-td.x-date-mp-sep {
-   border-right:1px solid;
-}.x-tip{
+.x-tip{
 	position: absolute;
 	top: 0;
     left:0;
@@ -2187,19 +2123,15 @@ a.x-menu-item {
 }
 
 .x-box-bc {
-	height: 8px;
 	overflow: hidden;
 }
 .x-box-tl, .x-box-bl {
-	padding-left: 8px;
 	overflow: hidden;
 }
 
 .x-box-tr, .x-box-br {
-	padding-right: 8px;
 	overflow: hidden;
 }.x-combo-list {
-    border:1px solid;
     zoom:1;
     overflow:hidden;
 }
@@ -2211,28 +2143,15 @@ a.x-menu-item {
     overflow-x:hidden;
 }
 
-.x-combo-list-hd {
-    border-bottom:1px solid;
-    padding:3px;
-}
-
-.x-resizable-pinned .x-combo-list-inner {
-    border-bottom:1px solid;
-}
-
 .x-combo-list-item {
-    padding:2px;
-    border:1px solid;
     white-space: nowrap;
     overflow:hidden;
     text-overflow: ellipsis;
 }
 
 .x-combo-list .x-combo-selected{
-	border:1px dotted !important;
     cursor:pointer;
 }
-
 
 .x-panel-header {
     overflow:hidden;
@@ -2277,11 +2196,6 @@ a.x-menu-item {
 	overflow:hidden;
 }
 
-/* fix ie7 strict mode bug */
-.ext-strict .ext-ie7 .x-panel-tc {
-    overflow: visible;
-}
-
 .x-panel-tl,
 .x-panel-tr,
 .x-panel-bc,
@@ -2297,16 +2211,10 @@ a.x-menu-item {
     border:0 none;
     padding:0;
     margin:0;
-    padding-top:6px;
 }
 
 .x-panel-mc .x-panel-body {
     border: 0 none;
-}
-
-
-.x-panel-bc .x-panel-footer {
-    padding-bottom:6px;
 }
 
 .x-panel-bwrap {
@@ -2391,12 +2299,7 @@ a.x-menu-item {
 
 /* Buttons */
 .x-panel-btns {
-    padding:5px;
     overflow:hidden;
-}
-
-.x-panel-btns td.x-toolbar-cell{
-	padding:3px;
 }
 
 .x-panel-fbar td,.x-panel-fbar span,.x-panel-fbar input,.x-panel-fbar div,.x-panel-fbar select,.x-panel-fbar label{
@@ -2414,7 +2317,6 @@ a.x-menu-item {
 }
 
 .x-window-proxy {
-    border:1px solid;
     z-index:12000;
     overflow:hidden;
     position:absolute;
@@ -2447,14 +2349,9 @@ a.x-menu-item {
 }
 
 .x-window-tl {
-	padding-left:6px;
     zoom:1;
     z-index:1;
     position:relative;
-}
-
-.x-window-tr {
-	padding-right:6px;
 }
 
 .x-window-bc {
@@ -2462,7 +2359,6 @@ a.x-menu-item {
 }
 
 .x-window-bc .x-window-footer {
-    padding-bottom:6px;
     zoom:1;
     font-size:0;
     line-height:0;
@@ -2476,7 +2372,6 @@ a.x-menu-item {
 }
 
 .x-window-mc {
-    border:1px solid;
     padding:0;
     margin:0;
 }
@@ -2506,14 +2401,6 @@ a.x-menu-item {
 
 .x-window-body {
     background-color:transparent;
-}
-
-.x-panel-ghost .x-window-tl {
-    border-bottom:1px solid;
-}
-
-.x-panel-collapsed .x-window-tl {
-    border-bottom:1px solid;
 }
 
 .x-window-maximized-ct {
