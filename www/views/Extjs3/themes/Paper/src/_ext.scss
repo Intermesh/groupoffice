@@ -861,6 +861,7 @@ ul.x-tab-strip-bottom{
 	.x-searchbar {
 		background-color: color($bg, 'box');
 		opacity:1;
+		padding:0 dp(8);
 		position:absolute;
 		top:0;
 		bottom:0;
@@ -872,8 +873,13 @@ ul.x-tab-strip-bottom{
 		}
 		input {
 			box-shadow: none;
-			min-height: dp(36);
+			min-height: dp(56);
 			border:0;
+			+ .x-form-search-trigger {
+				min-height:dp(56);
+				padding: 0 dp(8) 0 dp(16);
+				width: auto;
+			}
 		}
 	}
 }
