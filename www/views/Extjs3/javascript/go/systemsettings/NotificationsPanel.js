@@ -1,5 +1,8 @@
 go.systemsettings.NotificationsPanel = Ext.extend(Ext.form.FormPanel, {
 	initComponent: function () {
+		
+		var tmpDebugMail;
+		
 		Ext.apply(this, {
 			title: t('Notifications'),
 			autoScroll: true,
@@ -83,14 +86,20 @@ go.systemsettings.NotificationsPanel = Ext.extend(Ext.form.FormPanel, {
 							boxLabel: t("Send all system notifications to the specified e-mail address"),
 							listeners: {
 								check: function (checkbox, checked) {
-									this.getForm().findField('debugEmail').setDisabled(!checked);
+									if(!checked) {
+										tmpDebugMail = this.getForm().findField('debugEmail').getValue();
+										this.getForm().findField('debugEmail').setValue('');
+									} else {
+										this.getForm().findField('debugEmail').setValue(tmpDebugMail);
+									}
+									this.getForm().findField('debugEmail').setReadOnly(!checked);
 								},
 								scope: this
 							}
 						}, {
 							xtype: 'textfield',
 							name: 'debugEmail',
-							disabled: true,
+							readOnly: true,
 							fieldLabel: t("E-mail")
 						}]
 				}]
@@ -103,7 +112,8 @@ go.systemsettings.NotificationsPanel = Ext.extend(Ext.form.FormPanel, {
 				method: "core/core/Settings/get",
 				callback: function (options, success, response) {
 						var f = this.getForm();
-						f.setValues(response);				
+						f.setValues(response);	
+						tmpDebugMail = response.debugEmail || '';
 						f.findField('smtpEncryptionVerifyCertificate').setDisabled(response['smtpEncryption'] == null);
 						f.findField("enableEmailDebug").setValue(!GO.util.empty(f.findField('debugEmail').getValue()));
 				},
