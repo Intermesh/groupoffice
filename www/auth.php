@@ -50,10 +50,17 @@ try {
 
 		$user = User::find()->where(['email' => $data['email']])->orWhere(['recoveryEmail' => $data['email']])->single();
 		if (empty($user)) {
-			exit();
+			GO()->debug("User not found");
+			output([], 200, "Recovery mail sent");	//Don't show if user was found or not for security
 		}
+		
+		if(!($user->getPrimaryAuthenticator() instanceof \go\core\auth\Password)) {
+			GO()->debug("Authenticator doesn't support recovery");
+			output([], 200, "Recovery mail sent");	
+		}
+		
 		$user->sendRecoveryMail($data['email']);
-		exit(); // no response given
+		output([], 200, "Recovery mail sent");	
 	}
 	if (isset($data['recover'])) {
 		$oneHourAgo = (new DateTime())->modify('-1 hour');

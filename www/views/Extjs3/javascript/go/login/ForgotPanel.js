@@ -5,7 +5,7 @@ go.login.ForgotPanel = Ext.extend(go.login.BaseLoginPanel, {
 		this.emailField = new Ext.form.TextField({
 			fieldLabel: t("Email"),
 			name: 'email',			
-			vtype: 'email',
+			vtype: 'emailAddress',
 			allowBlank:false,
 			anchor:'100%'
 		});
@@ -32,10 +32,12 @@ go.login.ForgotPanel = Ext.extend(go.login.BaseLoginPanel, {
 		form.getEl().mask();
 		
 		go.AuthenticationManager.forgotPassword(this.emailField.getValue(),function(authMan, success) {
+			form.getEl().unmask();
 			if(!success) {
 				GO.errorDialog.show(t("A server error occurred."));
 			} else {
 				go.notifier.msg({
+					time: 3000,
 					iconCls: 'ic-email',
 					title: t("Recovery e-mail sent"), 
 					description: t('An e-mail with instructions has been sent to your e-mail address.')

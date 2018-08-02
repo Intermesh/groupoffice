@@ -9,26 +9,10 @@ go.login.RecoveryDialog = Ext.extend(go.Window, {
 
 	initComponent: function() {
 		this.title = t('Reset password');
-		this.items = [{
-			xtype:'container',
-			items: [
-				{xtype:'box',cls: "go-app-logo"},
-				this.avatarComp = new Ext.BoxComponent({
-					autoEl: 'img',
-					cls: "login-avatar user-img",
-					setImageUrl: function(url){
-						// TODO: Enable this when url is OK
-						//this.getEl().dom.src = url;
-					},
-					clearAvatar: function(){
-						this.setImageUrl('');
-						this.setVisible(false);
-					}
-				})
-			]
-		},this.formPanel = new Ext.form.FormPanel({
+		this.items = [this.formPanel = new Ext.form.FormPanel({
 			items:[{
 				xtype:'fieldset',
+				labelWidth: dp(200),
 				items:[this.recoveryText = new Ext.BoxComponent({
 						html: t("Loading"),
 						cls: 'login-text-comp'
@@ -83,13 +67,16 @@ go.login.RecoveryDialog = Ext.extend(go.Window, {
 					callback: function(options, success, response){
 						var result = Ext.decode(response.responseText);
 						if(success && result.passwordChanged){ // Password has been change successfully
+							go.Router.setPath("");
 							
 							if(this.redirectUrl) {
 								document.location = this.redirectUrl;
 							} else
 							{
+								
 								this.close();
 								GO.mainLayout.login();
+								Ext.MessageBox.alert(t("Success"), t("Your password was changed successfully"));
 							}
 						} else
 						{
@@ -131,10 +118,8 @@ go.login.RecoveryDialog = Ext.extend(go.Window, {
 					this.hashField.setValue(hash);
 					this.recoveryText.el.update(result.displayName);
 				} else {
-					this.recoveryText.el.update(t('Cannot recover your password with the given link'));
-					this.passwordField.setVisible(false);
-					this.displayField.setVisible(false);
-					this.getFooterToolbar().setDisabled(true);
+					this.close();
+					Ext.MessageBox.alert(t("Error"), t("This password recovery link is invalid"));
 				}
 			},
 			scope: this	

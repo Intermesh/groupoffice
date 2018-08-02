@@ -1,7 +1,7 @@
 go.notifier = {
 	messageCt: Ext.DomHelper.insertFirst(document.body, {id: 'message-ct'}, true),
 	/**
-	 * message {title, description, icon, type, showTime, buttons}
+	 * message {title, description, iconCls, time (ms)}
 	 */
 	msg: function (msg) {
 	

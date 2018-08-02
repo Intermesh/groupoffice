@@ -294,17 +294,11 @@ class User extends Entity {
 	 */
 	public function checkPassword($password) {		
 		
-		foreach($this->getAuthenticationMethods() as $method) {
-			$authenticator = $method->getAuthenticator();
-			if (!($authenticator instanceof PrimaryAuthenticator)) {
-				continue;
-			}
-			
-			$this->passwordVerified = $authenticator->authenticate($this->username, $password);
-			break;
-		}	
-		
-		return $this->passwordVerified;
+		$authenticator = $this->getPrimaryAuthenticator();
+		if(!isset($authenticator)) {
+			throw new \Exception("No primary authenticator found!");
+		}
+		return $authenticator->authenticate($this->username, $password);		
 	}
 	
 	private $plainPassword;
@@ -480,7 +474,7 @@ class User extends Entity {
 		$this->recoverySendAt = new DateTime();
 		
 		$siteTitle=GO()->getSettings()->title;
-		$url = GO()->getSettings()->URL.'#recover/'.$this->recoveryHash . '/' . urlencode($redirectUrl);
+		$url = GO()->getSettings()->URL.'#recover/'.$this->recoveryHash . '-' . urlencode($redirectUrl);
 		$emailBody = GO()->t('recoveryMailBody');
 		$emailBody = sprintf($emailBody,$this->displayName, $siteTitle, $this->username, $url);
 		$emailBody = str_replace('{ip_address}', Http::getClientIp() , $emailBody);
@@ -510,6 +504,24 @@ class User extends Entity {
 		
 		
 		return true;		
+	}
+	
+	/**
+	 * Gets the user's primary authenticator class. Usually this is 
+	 * \go\core\auth\Password but can also be implemented by the LDAP or 
+	 * IMAP authenticator modules.
+	 * 
+	 * @return PrimaryAuthenticator
+	 */
+	public function getPrimaryAuthenticator() {
+		foreach($this->getAuthenticationMethods() as $method) {
+			$authenticator = $method->getAuthenticator();
+			if ($authenticator instanceof PrimaryAuthenticator) {
+				return $authenticator;
+			}			
+		}	
+		
+		return null;
 	}
 	
 	private function addSystemGroups() {
