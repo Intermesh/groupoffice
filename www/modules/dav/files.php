@@ -56,7 +56,7 @@ $server->on('exception', function($e){
 
 //baseUri can also be /webdav/ with:
 //Alias /webdav/ /path/to/files.php
-$baseUri = strpos($_SERVER['REQUEST_URI'],'files.php') ? \GO::config()->host.'modules/dav/files.php/' : '/webdav/';
+$baseUri = strpos($_SERVER['REQUEST_URI'],'files.php') ? \GO()->getSettings()->URL . 'modules/dav/files.php/' : '/webdav/';
 $server->setBaseUri($baseUri);
 
 

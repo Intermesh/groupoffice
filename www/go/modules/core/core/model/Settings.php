@@ -167,7 +167,9 @@ class Settings extends core\Settings {
 	
 	
 	/**
-	 * The full URL to Group-Office.
+	 * The full URL to Group-Office. With trailing /.
+	 * 
+	 * eg. https://my.groupoffice.net/
 	 * 
 	 * @var string 
 	 */
