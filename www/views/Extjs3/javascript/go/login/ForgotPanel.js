@@ -36,7 +36,7 @@ go.login.ForgotPanel = Ext.extend(go.login.BaseLoginPanel, {
 			if(!success) {
 				GO.errorDialog.show(t("A server error occurred."));
 			} else {
-				go.notifier.msg({
+				go.Notifier.msg({
 					time: 3000,
 					iconCls: 'ic-email',
 					title: t("Recovery e-mail sent"), 

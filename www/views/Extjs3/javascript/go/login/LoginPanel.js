@@ -51,17 +51,17 @@ go.login.LoginPanel = Ext.extend(Ext.Container, {
 			var me = this;
 			setTimeout(function () {
 				if (GO.settings.config.debug) {
-					go.notifier.msg({
+					go.Notifier.msg({
 						title: t("Warning! Debug mode enabled"), icon: 'warning', description: t("Use $config['debug']=true; only with development and problem solving. It slows " + t('product_name') + " down."), time: 4000});
 				}
 
 				if (GO.settings.config.login_message) {
-					me.loginMsg = go.notifier.msg({
+					me.loginMsg = go.Notifier.msg({
 						description: GO.settings.config.login_message
 					});
 
 					me.on("destroy", function () {
-						go.notifier.remove(me.loginMsg);
+						go.Notifier.remove(me.loginMsg);
 					});
 
 				}
