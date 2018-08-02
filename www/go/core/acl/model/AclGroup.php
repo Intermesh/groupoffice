@@ -37,18 +37,20 @@ class AclGroup extends Property {
 
 	protected function internalSave() {
 		
-		$success = App::get()->getDbConnection()
-						->insert('core_acl_group_changes', 
-										[
-												'aclId' => $this->aclId, 
-												'groupId' => $this->groupId, 
-												'grantModSeq' => Acl::getType()->nextModSeq(),
-												'revokeModSeq' => null
-										]
-										)->execute();
+		if(\go\core\jmap\Entity::$trackChanges) {
+			$success = App::get()->getDbConnection()
+							->insert('core_acl_group_changes', 
+											[
+													'aclId' => $this->aclId, 
+													'groupId' => $this->groupId, 
+													'grantModSeq' => Acl::getType()->nextModSeq(),
+													'revokeModSeq' => null
+											]
+											)->execute();
 
-		if(!$success) {
-			return false;
+			if(!$success) {
+				return false;
+			}
 		}
 		
 		return parent::internalSave();

@@ -92,7 +92,8 @@ abstract class EntityController extends ReadOnlyEntityController {
 			$entity = $this->create($properties);
 
 			if (!$entity->hasValidationErrors()) {
-				$result['created'][$clientId] = $this->diff($entity, $properties);
+				$diff = $entity->diff($properties);
+				$result['created'][$clientId] = empty($diff) ? null : $diff;
 			} else {				
 				$result['notCreated'][$clientId] = new SetError("invalidProperties");
 				$result['notCreated'][$clientId]->properties = array_keys($entity->getValidationErrors());
