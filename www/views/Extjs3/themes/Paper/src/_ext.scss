@@ -1117,14 +1117,15 @@ ul.x-tab-strip-bottom{
 	&-row {
 		border:0;
 		border-bottom:1px solid color($fg, 'divider');
+		&-over {
+			background-color:$cHover;
+		}
 		&-selected {
 			background-color: $cSelected;
 			border-bottom-color: transparent;
 			background-image: none;
 		}
-		&-over {
-			background-color:$cHover;
-		}
+		
 		&-alt{ // for strips
 			background-color:$cHover;
 		}		
