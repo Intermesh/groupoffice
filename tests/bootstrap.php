@@ -18,7 +18,7 @@ $dataFolder = new \go\core\fs\Folder(__DIR__ . '/data');
 $config = parse_ini_file(__DIR__ . '/config.ini', true);
 $config['general']['dataPath'] = $dataFolder->getPath();
 $config['general']['tmpPath'] = $dataFolder->getFolder('tmp')->getPath();
-
+$config['general']["cache"] = \go\core\cache\Disk::class;
 
 if($installDb) {
 	$dataFolder->delete();

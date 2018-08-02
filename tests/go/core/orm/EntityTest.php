@@ -53,7 +53,6 @@ class EntityTest extends TestCase {
 		
 		$array = $entity->toArray(['propA','propB','hasMany', 'createdAt']);
 		
-		var_dump($array);
 		$string = json_encode($array);
 		$string = str_replace("string ", "copy ", $string);
 		$array = json_decode($string, true);
@@ -136,7 +135,13 @@ class EntityTest extends TestCase {
 		$c->name = "Test name";
 		$success = $c->save();
 		
+		if(!$success) {
+			var_dump($c->getValidationErrors());
+		}
+		
 		$this->assertEquals(true, $success);
+		
+		
 		
 		$entities = B::find();
 		$entity = $entities->execute()->fetch();	

@@ -20,7 +20,6 @@ class QueryTest extends TestCase {
 
 		$data = [
 				"id" => 1,
-				"modSeq" => 1,
 				"propA" => "string 1",
 				"createdAt" => new \DateTime(),
 				"modifiedAt" => new \DateTime()

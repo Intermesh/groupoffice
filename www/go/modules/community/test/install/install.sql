@@ -5,8 +5,7 @@ CREATE TABLE `test_a` (
   `propA` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `createdAt` datetime NOT NULL,
   `modifiedAt` datetime NOT NULL,
-  `deletedAt` datetime DEFAULT NULL,
-  `modSeq` int(11) DEFAULT NULL
+  `deletedAt` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -54,9 +53,7 @@ CREATE TABLE `test_b` (
 
 CREATE TABLE `test_c` (
   `id` int(11) NOT NULL,
-  `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `modSeq` int(11) NOT NULL,
-  `deletedAt` datetime DEFAULT NULL
+  `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -67,8 +64,7 @@ CREATE TABLE `test_c` (
 -- Indexes for table `test_a`
 --
 ALTER TABLE `test_a`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `updatedModSeq` (`modSeq`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `test_a_has_many`
@@ -96,8 +92,7 @@ ALTER TABLE `test_b`
 -- Indexes for table `test_c`
 --
 ALTER TABLE `test_c`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `modSeq` (`modSeq`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
