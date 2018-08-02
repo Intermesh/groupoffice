@@ -22,13 +22,13 @@ go.login.LanguageCombobox = Ext.extend(Ext.form.ComboBox,{
 			width:dp(192)
  		});
 
-		this.tpl = '<tpl for="."><div class="x-combo-list-item">' +
-		'<table><tbody><tr><td>' +
-			'<div class="flag flag-{'+this.valueField+'}"></div>' +
-		'</td><td>'+
-			'{' + this.displayField + '}'+ 
-		'</td></tr></tbody></table>' +
-		'</div></tpl>';
+//		this.tpl = '<tpl for="."><div class="x-combo-list-item">' +
+//		'<table><tbody><tr><td>' +
+//			'<div class="flag flag-{'+this.valueField+'}"></div>' +
+//		'</td><td>'+
+//			'{' + this.displayField + '}'+ 
+//		'</td></tr></tbody></table>' +
+//		'</div></tpl>';
 		go.login.LanguageCombobox.superclass.initComponent.call(this);
 	}
 });
