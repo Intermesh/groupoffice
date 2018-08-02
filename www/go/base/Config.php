@@ -333,7 +333,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $theme = 'Group-Office';
+	var $theme = 'Paper';
 
 	/**
 	 * Default theme
