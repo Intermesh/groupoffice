@@ -58,7 +58,8 @@ go.modules.community.files.NodeDetail = Ext.extend(go.panels.DetailView, {
 						
 					},
 					browser:this.browser
-				})},{
+				})},//new go.panels.CreateModify(), //////
+				{
 					tpl:go.panels.CreateModifyTpl
 				},{
 					title:t('More info'),

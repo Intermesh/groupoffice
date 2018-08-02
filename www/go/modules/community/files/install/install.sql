@@ -78,7 +78,7 @@ CREATE TABLE `files_version` (
 --
 ALTER TABLE `files_node`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `parentId_name_UNIQUE` (`parentId`,`name`, `deletedAt`),
+  ADD UNIQUE KEY `parentId_name_UNIQUE` (`parentId`,`name`),
   ADD KEY `fk_files_node_core_blob1_idx` (`blobId`),
   ADD KEY `fk_files_node_files_node1_idx` (`parentId`),
   ADD KEY `fk_files_node_files_storage1_idx` (`storageId`),
