@@ -245,7 +245,7 @@ ul.x-tab-strip-bottom{
 	> div {
 		padding: 0;
 		background-color:inherit;
-		position:absolute;
+/*		position:absolute;
 		top:0;
 		left:0;
 		width:100% !important; //offsets override extjs
@@ -267,7 +267,7 @@ ul.x-tab-strip-bottom{
 					  opacity:0;
 					  visibility:hidden;
 			}
-		}
+		}*/
 	}
 }
 
@@ -861,6 +861,7 @@ ul.x-tab-strip-bottom{
 	.x-searchbar {
 		background-color: color($bg, 'box');
 		opacity:1;
+		padding:0 dp(8);
 		position:absolute;
 		top:0;
 		bottom:0;
@@ -872,8 +873,13 @@ ul.x-tab-strip-bottom{
 		}
 		input {
 			box-shadow: none;
-			min-height: dp(36);
+			min-height: dp(56);
 			border:0;
+			+ .x-form-search-trigger {
+				min-height:dp(56);
+				padding: 0 dp(8) 0 dp(16);
+				width: auto;
+			}
 		}
 	}
 }
@@ -894,6 +900,7 @@ ul.x-tab-strip-bottom{
 	}
 	
 	.x-panel-bbar & {
+		height: dp(40);
 		border-top: 1px solid color($fg, 'line');
 	}
 
@@ -1110,14 +1117,15 @@ ul.x-tab-strip-bottom{
 	&-row {
 		border:0;
 		border-bottom:1px solid color($fg, 'divider');
+		&-over {
+			background-color:$cHover;
+		}
 		&-selected {
 			background-color: $cSelected;
 			border-bottom-color: transparent;
 			background-image: none;
 		}
-		&-over {
-			background-color:$cHover;
-		}
+		
 		&-alt{ // for strips
 			background-color:$cHover;
 		}		
@@ -2007,46 +2015,36 @@ $menuScrollerSize : dp(4);
 	border: 0;
 	border-radius: $borderRadius;
 	background-color: color($bg, 'card');
-}
-
-.x-combo-list-inner {
-	padding: dp(8) 0;
-	background-color:#fff;
-	
-	h4 {
+	&-inner {
+		padding: dp(8) 0;
+		background-color:#fff;
+		h4 {
+			padding: dp(8) dp(8) dp(8) dp(24);
+		}
+	}
+	&-hd {
+		@extend %font-body2;
+		color:color($fg, 'text');
+	}
+	&-item {
+		min-height: dp(32);
 		padding: dp(8) dp(8) dp(8) dp(24);
+	}
+	&-small {
+		@extend %font-caption;
+	}
+	.x-combo-selected {
+		background-color: color($grey, 100);
+	}
+	.x-toolbar {
+		height: dp(40);
+		border-top: 1px solid color($fg, 'line');
+		input {min-height: 14px;}
+		.xtb-sep { display:none;}
+		.x-toolbar-cell {padding:0;}
 	}
 }
 
-.x-combo-list-hd {
-	@extend %font-body2;
-	color:color($fg, 'text');
-	//background-image: url(../images/default/layout/panel-title-light-bg.gif);
-}
-
-.x-resizable-pinned .x-combo-list-inner {
-	border:0;
-}
-
-.x-combo-list-item {
-	min-height: dp(32);
-	padding: dp(8) dp(8) dp(8) dp(24);
-	//line-height: dp(16);
-	border:0 !important;
-}
-
-.x-combo-list .x-combo-selected{
-	border:0 !important;
-	background-color: color($grey, 100);
-}
-
-.x-combo-list .x-toolbar {
-	border-top-color:#98c0f4;
-}
-
-.x-combo-list-small {
-	@extend %font-caption;
-}
 // Portlet
 .x-portal-column {
 	overflow: visible;
@@ -2196,50 +2194,26 @@ $menuScrollerSize : dp(4);
 		padding: dp(8);
 	}
 	&-header {
-			@extend %font-title;
-			background-color:color($bg,'app-bar');
-			border-radius: $borderRadius;
-			
-			&-text {
-				display:inline-block;
-				height: dp(16);
-				line-height: dp(16);
-				margin: dp(20) 0;
-			}
-		}
-	&-br { // bottom-right
-		padding-right: 0;
-	}
-	&-bl { // bottom-right
-		padding-left: 0;
-	}
-	&-mr { //middle-right
-		padding-right: 0;
-	}
-	&-ml { //middle-right
-		padding-left: 0;
-	}
-	&-tr {
-		padding-right: 0;
-	}
-	&-tl {
-		padding-left: 0;
-		.x-window-header { // ext...
-			padding: 0 dp(8) 0 dp(16);
+		@extend %font-title;
+		background-color:color($bg,'app-bar');
+		border-radius: $borderRadius;
+		padding: 0 dp(8) 0 dp(16);
+		&-text {
+			display:inline-block;
+			height: dp(16);
+			line-height: dp(16);
+			margin: dp(20) 0;
 		}
 	}
 	&-mc {
 		@extend %font-body1;
-		border:0;
 	}
 	&-proxy { // ghost when animating
 		@extend .z24;
 		border-radius: $borderRadius;
 		background-color:white;
-		border:0;
 	}
 	&-bbar .x-toolbar {
-		
 		border-top-color: color($fg, 'divider');;
 	}
 	&-maximized .x-window-tc {

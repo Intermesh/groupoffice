@@ -77,11 +77,7 @@ GO.tasks.TaskPanel = Ext.extend(GO.DisplayPanel,{
 			this.template +=GO.workflow.WorkflowTemplate;
 		}
 
-		
-		GO.tasks.TaskPanel.superclass.initComponent.call(this);
-	
-		
-		this.moreButton.menu.add({
+		this.buttons = [{
 			iconCls: 'ic-forward',
 			text:t("Continue task", "tasks"),
 			handler:function(){
@@ -104,7 +100,12 @@ GO.tasks.TaskPanel = Ext.extend(GO.DisplayPanel,{
 			},
 			scope:this
 			//disabled:true
-		});
+		}];
+		
+		GO.tasks.TaskPanel.superclass.initComponent.call(this);
+	
+		
+	
 
 	}
 });			

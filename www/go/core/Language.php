@@ -50,7 +50,12 @@ class Language extends Singleton {
 	private function getBrowserLanguage(){
 		
 		if(isset($_GET['SET_LANGUAGE']) && $this->hasLanguage($_GET['SET_LANGUAGE'])) {
+			setcookie('GO_LANGUAGE', $_GET['SET_LANGUAGE']);
 			return $_GET['SET_LANGUAGE'];
+		}
+		
+		if(isset($_COOKIE['GO_LANGUAGE'])) {
+			return $_COOKIE['GO_LANGUAGE'];
 		}
 		
 		$browserLanguages= Request::get()->getAcceptLanguages();

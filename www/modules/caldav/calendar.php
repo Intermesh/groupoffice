@@ -70,7 +70,7 @@ $server->on('exception', function($e){
 
 //baseUri can also be /caldav/ with:
 //Alias /caldav/ /path/to/calendar.php
-$baseUri = strpos($_SERVER['REQUEST_URI'], 'calendar.php') ? \GO::config()->host . 'modules/caldav/calendar.php/' : '/caldav/';
+$baseUri = strpos($_SERVER['REQUEST_URI'], 'calendar.php') ? \GO()->getSettings()->URL . 'modules/caldav/calendar.php/' : '/caldav/';
 $server->setBaseUri($baseUri);
 
 

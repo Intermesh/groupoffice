@@ -398,6 +398,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	this.deleteButton = new Ext.Button({
 		iconCls: 'ic-delete',
 		tooltip: t("Delete"),
+		overflowText:t("Delete"),
 		handler: function(){
 			this.onDelete('grid');
 		},
@@ -407,6 +408,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	this.cutButton= new Ext.Button({
 		iconCls: 'ic-content-cut',
 		tooltip: t("Cut"),
+		overflowText:t("Cut"),
 		handler: function(){
 			var records = this.getSelectedGridRecords();
 			this.onCutCopy('cut', records);
@@ -416,6 +418,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	this.copyButton = new Ext.Button({
 		iconCls: 'ic-content-copy',
 		tooltip: t("Copy"),
+		overflowText:t("Copy"),
 		handler: function(){
 			var records = this.getSelectedGridRecords();
 			this.onCutCopy('copy', records);
@@ -425,6 +428,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	this.pasteButton = new Ext.Button({
 		iconCls: 'ic-content-paste',
 		tooltip: t("Paste"),
+		overflowText:t("Paste"),
 		handler: this.onPaste,
 		scope: this,
 		disabled:true
@@ -523,6 +527,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	tbar.push({
 		iconCls: "ic-refresh",
 		tooltip:t("Refresh"),
+		overflowText:t("Refresh"),
 		handler: function(){          
 			this.refresh(true);
 		},
@@ -567,6 +572,17 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		disabled: true,
 		scope: this
 	}));
+
+	tbar.push('->', {
+		iconCls: 'ic-more',
+		overflowText: t('File info'),
+		tooltip: t('File info'),
+		//hidden: (config.id === "go-module-panel-files"),
+		handler: function(btn) {
+			this.eastPanel.toggleCollapse();
+		},
+		scope:this
+	});
 
 	config.keys=[{
 		ctrl:true,
@@ -656,7 +672,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		tbar : {                        // configured using the anchor layout
 			xtype : 'container',
 			items :[ 
-				new Ext.Toolbar({items: tbar}),
+				new Ext.Toolbar({items: tbar, enableOverflow:true}),
 				new Ext.Toolbar({
 					layout:'hbox',
 					layoutConfig: {
@@ -695,11 +711,11 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		//items:[this.filePanel, this.folderPanel],
 		collapsed:config.filePanelCollapsed,
 		width:450,
-		collapseMode:'mini',
-		collapsible:true,
-		hideCollapseTool:true,
+		//collapseMode:'mini',
+		//collapsible:true,
+		//hideCollapseTool:true,
 		split:true,
-		border:false,
+		//border:false,
 		id: config.id+'fs-east-panel'
 	});
 

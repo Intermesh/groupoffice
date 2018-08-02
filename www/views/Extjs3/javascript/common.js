@@ -295,7 +295,7 @@ GO.playAlarm = function(filename){
 	if(GO.util.empty(GO.settings.mute_sound))
 	{
 		// The folder (From the GO root) in where the soundfiles are stored
-		var soundsfolder = 'sounds/';
+		var soundsfolder = 'views/Extjs3/themes/Paper/sounds/';
 		
 		// Set the default sound when no filename is given
 		if(GO.util.empty(filename)){

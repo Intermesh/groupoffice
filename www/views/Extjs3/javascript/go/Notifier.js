@@ -1,7 +1,7 @@
-go.notifier = {
+go.Notifier = {
 	messageCt: Ext.DomHelper.insertFirst(document.body, {id: 'message-ct'}, true),
 	/**
-	 * message {title, description, icon, type, showTime, buttons}
+	 * message {title, description, iconCls, time (ms)}
 	 */
 	msg: function (msg) {
 	
@@ -40,6 +40,10 @@ go.notifier = {
 
 	},
 	remove: function(msg) {
+		if(msg.destroying || msg.isDestroyed) {
+			return;
+		}
+		msg.destroying = true;
 		msg.el.animate({opacity: {to: 0}}, 0.2, function () {
 			msg.destroy();
 		});
