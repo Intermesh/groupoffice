@@ -43,6 +43,16 @@ class Database {
 		
 		return $t;
 	}
+
+	/**
+	 * Get a database table
+	 * 
+	 * @param string $name
+	 * @return Table
+	 */
+	public function getTable($name) {
+		return Table::getInstance($name);
+	}	
 	
 	/**
 	 * Get database name

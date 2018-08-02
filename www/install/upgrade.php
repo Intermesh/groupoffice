@@ -320,6 +320,10 @@ try {
 		GO()->rebuildCache();
 		App::get()->getSettings()->databaseVersion = App::get()->getVersion();
 		App::get()->getSettings()->save();
+		
+		echo "Resetting state\n";
+		
+		GO()->resetSyncState();
 
 		echo "Done!\n";
 
@@ -342,7 +346,13 @@ try {
 	
 	echo $e->getTraceAsString();
 	
-	echo "</pre></div></section>";
+	echo "</pre></div>";
+	
+	if(GO()->getDebugger()->enabled) {
+		echo "<div style=\"clear:both;margin-bottom:20px;\"></div><div class=\"card\"><h2>Debugger output</h2><pre>" . implode("\n", GO()->getDebugger()->getEntries()) . "</pre></div>";
+	}
+	
+	echo "</section>";
 }
 
 require('footer.php');

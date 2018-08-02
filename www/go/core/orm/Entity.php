@@ -232,6 +232,15 @@ abstract class Entity extends Property {
 	public function getPermissionLevel() {
 		return GO()->getAuthState() && GO()->getAuthState()->getUser() && GO()->getAuthState()->getUser()->isAdmin() ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ;
 	}
+	
+	/**
+	 * Check if the current user is allowed to create new entities
+	 * 
+	 * @return boolean
+	 */
+	public static function canCreate() {
+		return true;
+	}
 
 	/**
 	 * Applies conditions to the query so that only entities with the given permission level are fetched.
@@ -352,5 +361,35 @@ abstract class Entity extends Property {
 		return $query;
 	}
 
+	/**
+	 * Get the current state of this entity
+	 * 
+	 * @return string
+	 */
+	public static function getState () {
+		return null;
+	}
+	
+	
+	/**
+	 * Returns an array with all properties of this entity that are different or 
+	 * not present in the given properties array.
+	 * 
+	 * @param array $properties
+	 * @return array
+	 */
+	public function diff($properties) {
 
+		$diff = [];
+		
+		$entityProps = $this->toArray();
+		
+		foreach ($entityProps as $key => $value) {
+			if (!isset($properties[$key]) || $properties[$key] !== $value) {
+				$diff[$key] = $value;
+			}
+		}
+
+		return $diff;
+	}
 }

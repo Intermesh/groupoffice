@@ -101,8 +101,14 @@ abstract class EntityController extends ReadOnlyEntityController {
 		}
 	}
 	
+	/**
+	 * Override this if you want to implement permissions for creating entities
+	 * 
+	 * @return boolean
+	 */
 	protected function canCreate() {
-		return true;
+		$cls = $this->entityClass();
+		return $cls::canCreate();
 	}
 	
 	/**
@@ -124,27 +130,11 @@ abstract class EntityController extends ReadOnlyEntityController {
 	}
 
 	/**
-	 * The server must return all properties that were changed during a create or update operation for the JMAP spec
+	 * Override this if you want to change the default permissions for updating an entity.
 	 * 
-	 * @param \go\modules\community\notes\controller\notes\Note $entity
-	 * @param type $properties
-	 * @return type
+	 * @param Entity $entity
+	 * @return bool
 	 */
-	private function diff(Entity $entity, $properties) {
-
-		$diff = [];
-		
-		$serverProps = $entity->toArray();
-		
-		foreach ($serverProps as $key => $value) {
-			if (!isset($properties[$key]) || $properties[$key] !== $value) {
-				$diff[$key] = $value;
-			}
-		}
-
-		return empty($diff) ? null : $diff;
-	}
-	
 	protected function canUpdate(Entity $entity) {
 		return $entity->hasPermissionLevel(Acl::LEVEL_WRITE);
 	}
@@ -177,15 +167,14 @@ abstract class EntityController extends ReadOnlyEntityController {
 				continue;
 			}
 			
-			$result['updated'][$entity->id] = $this->diff($entity, $properties);
+			//The server must return all properties that were changed during a create or update operation for the JMAP spec
+			$diff = $entity->diff($properties);
+			$result['updated'][$entity->id] = empty($diff) ? null : $diff;
 		}
 	}
 	
-	protected function update(Entity $entity, array $properties) {
-		
-		
-		$entity->save();
-		
+	protected function update(Entity $entity, array $properties) {		
+		$entity->save();		
 		return !$entity->hasValidationErrors();
 	}
 	
@@ -253,6 +242,8 @@ abstract class EntityController extends ReadOnlyEntityController {
 	 * @throws CannotCalculateChanges
 	 */
 	public function getUpdates($params) {
+		//TODO
+		// test upgrade and install
 		
 		$p = $this->paramsGetUpdates($params);
 		

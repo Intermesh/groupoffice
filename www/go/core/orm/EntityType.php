@@ -225,12 +225,18 @@ class EntityType {
 	
 	protected $changed = [];
 	
+	/**
+	 * Register a change of an entity. When the application ends these changes will be saved in the "core_change" log table.
+	 * 
+	 * @param Entity $entity
+	 */
 	public function change(Entity $entity) {
 		$this->changed[] = $entity;		
 	}
 	
 	/**
-	 * Get the next state
+	 * Get the modification sequence
+	 * 
 	 * @param string $entityClass
 	 * @return int
 	 */
@@ -241,8 +247,6 @@ class EntityType {
 		  UPDATE child_codes SET counter_field = counter_field + 1;
 		 * COMMIT
 		 */
-
-
 		$query = (new Query())
 						->selectSingleValue("highestModSeq")
 						->from("core_entity")
@@ -261,9 +265,9 @@ class EntityType {
 		return $modSeq;
 	}	
 	
-	public function __destruct() {	
-		
-		
+	
+	
+	private function logChanges() {
 		if(!empty($this->changed)) {
 			
 			$this->highestModSeq = $this->nextModSeq();
@@ -281,11 +285,10 @@ class EntityType {
 				if(!GO()->getDbConnection()->insert('core_change', $record)->execute()) {
 					throw new \Exception("Could not save change");
 				}
-			}
-			
+			}			
 		}
 	}
-	
-	
-
+	public function __destruct() {		
+		$this->logChanges();
+	}
 }

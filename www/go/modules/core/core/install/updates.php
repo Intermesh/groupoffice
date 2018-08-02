@@ -213,8 +213,8 @@ $updates['201807271339'][] = "ALTER TABLE `core_entity` CHANGE `highestModSeq` `
 
 $updates['201807271339'][] = "truncate table core_change;";
 
-$updates['201807271339'][] = "DROP TABLE IF EXISTS `core_acl_group_changes`;
-CREATE TABLE IF NOT EXISTS `core_acl_group_changes` (
+$updates['201807271339'][] = "DROP TABLE IF EXISTS `core_acl_group_changes`;";
+$updates['201807271339'][] = "CREATE TABLE IF NOT EXISTS `core_acl_group_changes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `aclId` int(11) NOT NULL,
   `groupId` int(11) NOT NULL,
