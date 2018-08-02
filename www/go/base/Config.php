@@ -509,18 +509,6 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 */
 	var $force_ssl=false;
 
-
-
-
-	/**
-	 * The no-reply e-mail which will be used to send system messages
-	 *
-	 * @deprecated Is in system settings
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $noreply_email = '';
-
 	/**
 	 * The path to the root of Group-Office with trailing slash.
 	 * 
@@ -1493,23 +1481,27 @@ var $billing_clear_payment_method_on_duplicate = true;
 			$this->support_link = "https://www.group-office.com/support";
 		}
 
-		/*
-		 * Check if the noreply_email variable is set in the config.php file.
-		 * If it is not set, then use noreply@ {webmaster_email domain name}
-		 * When the webmaster email is not set, then this will be noreply@example.com
-		 */
-		if(empty($this->noreply_email)){
+	}
+	
+	/**
+	 * The no-reply e-mail which will be used to send system messages
+	 * Check if the noreply_email variable is set in the config.php file.
+	 * If it is not set, then use noreply@ {webmaster_email domain name}
+	 * When the webmaster email is not set, then this will be noreply@example.com
+	 * 
+	 * @return     StringHelper
+	 */
+	public function getNoreply_email(){
 
-			$wmdomain = 'example.com';
+		$wmdomain = 'example.com';
 
-			if(!empty($this->webmaster_email)){
-				$extractedEmail = explode('@',$this->webmaster_email);
-				if(isset($extractedEmail[1]))
-					$wmdomain = $extractedEmail[1];
-			}
-
-			$this->noreply_email = 'noreply@'.$wmdomain;
+		if(!empty($this->webmaster_email)){
+			$extractedEmail = explode('@',$this->webmaster_email);
+			if(isset($extractedEmail[1]))
+				$wmdomain = $extractedEmail[1];
 		}
+
+		return 'noreply@'.$wmdomain;
 	}
 	
 	public function getVersion() {
