@@ -1,3 +1,6 @@
+02-08-2018 6.3.29
+- Fixed various small bugs
+
 31-07-2018 6.3.28
 - Bug in installer made it fail on ACL error.
 
