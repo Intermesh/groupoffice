@@ -445,7 +445,8 @@ ul.x-tab-strip-bottom{
 	}
 	&-item {
 		margin-bottom:dp(4);
-		@extend %font-caption;
+		//Following line made grid in forms appear in disabled like text
+		/*@extend %font-caption;*/
 	}
 
 	&-invalid-icon:before {
@@ -664,9 +665,14 @@ ul.x-tab-strip-bottom{
 	&.raised {
 		@extend .z2;
 		@include var(background-color, c-primary);
-		color:white;
+		button.x-btn-text {
+			color:white;
+		}
 		&.x-btn-focus, &.x-btn-over {
 			@extend .z4;
+			button.x-btn-text {
+				color: $cPrimary;
+			}
 		}
 		&.x-btn-pressed {
 			@extend .z8;
@@ -2252,6 +2258,7 @@ body.x-body-masked .x-window-plain .x-window-mc {
 }
 .x-html-editor-tb .x-btn-text {
 	background-image: none; //url(wysiwyg.gif);
+	color: color($fg, 'secondary-text');
 }
 
 // ##############

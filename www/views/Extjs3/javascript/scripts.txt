@@ -240,7 +240,9 @@ views/Extjs3/javascript/go/data/EntityStore.js
 views/Extjs3/javascript/go/EntityManager.js
 views/Extjs3/javascript/go/ModuleManager.js
 
+views/Extjs3/javascript/go/grid/GridTrait.js
 views/Extjs3/javascript/go/grid/GridPanel.js
+views/Extjs3/javascript/go/grid/EditorGridPanel.js
 views/Extjs3/javascript/go/grid/SelectAllCheckBox.js
 
 
@@ -299,8 +301,6 @@ views/Extjs3/javascript/go/String.js
 
 views/Extjs3/javascript/go/detail/ReadMore.js
 views/Extjs3/javascript/go/detail/AddButton.js
-
-views/Extjs3/javascript/go/acl/ShareWindow.js
 
 views/Extjs3/javascript/go/systemsettings/GeneralPanel.js
 views/Extjs3/javascript/go/systemsettings/AppearancePanel.js

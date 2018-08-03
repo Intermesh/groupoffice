@@ -2,11 +2,11 @@ go.Window = Ext.extend(Ext.Window, {
 	
 	constrainHeader : true,
 	
-//	showAnimDuration: 0.16,
-//	hideAnimDuration: 0.16,
-	
-	
 	initComponent : function(){
+		
+		if(this.animTarget) {
+			console.warn("animTarget on window causes wierd render issues");
+		}
 		
 		go.Window.superclass.initComponent.call(this);
 		

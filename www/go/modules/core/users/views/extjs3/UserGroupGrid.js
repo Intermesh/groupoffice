@@ -32,7 +32,8 @@ go.modules.core.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 		this.store = new go.data.Store({
 			baseParams: {
 				filter: {
-					excludeEveryone: true
+					excludeEveryone: true,
+					hideUsers: true
 				}
 			},
 			fields: [
@@ -76,6 +77,7 @@ go.modules.core.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 						
 						var memberStr = t("Loading members...");
 						
+						//will be processed after storeload by onStoreLoad
 						var members = record.get('members');						
 						if(Ext.isArray(members)) {
 							var users = go.Stores.get('User').get(members); 							
@@ -120,6 +122,7 @@ go.modules.core.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 	
 	onStoreLoad : function() {
 		
+		//fetch members after store load
 		var records = this.store.getRange(), me = this, count = 0;
 		var memberIds = [];
 		

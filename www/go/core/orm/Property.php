@@ -440,6 +440,7 @@ abstract class Property extends Model {
 	 * 
 	 * Only database columns and relations are tracked. Not the getters and setters.
 	 * 
+	 * @param array $properties If given only these properties will be checked for modifications.
 	 * @return array [newval, oldval]
 	 */
 	public function getModified($properties = []) {
@@ -548,6 +549,9 @@ abstract class Property extends Model {
 		return true;
 	}
 	
+	/**
+	 * Sets some default values such as modifiedAt and modifiedBy
+	 */
 	private function setSaveProps() {
 		if(property_exists($this, "modifiedBy") && !$this->isModified(["modifiedBy"])) {
 			$this->modifiedBy = $this->getCreatedBy();
@@ -630,6 +634,7 @@ abstract class Property extends Model {
 			foreach ($modified[$relation->name][1] as $oldProp) {
 				
 				//if not in current value then delete it.
+				//objects are compared by reference. 
 				if (!in_array($oldProp, $models) && !$oldProp->internalDelete()) {
 					return false;
 				}
@@ -1035,7 +1040,7 @@ abstract class Property extends Model {
 	}
 	
 	/**
-	 * Checks if the given record is equal to this record
+	 * Checks if the given property or entity is equal to this
 	 * 
 	 * @param self $property
 	 * @return boolean

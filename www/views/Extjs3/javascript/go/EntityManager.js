@@ -39,7 +39,7 @@
 			go.data.types[name] = {
 				convert: function (v, data) {
 					if(!data[this.key]) {
-						return "-";
+						return null;
 					}
 					
 					var entities = go.Stores.get(name).get([data[this.key]]);					
@@ -64,20 +64,21 @@
   go.Stores = {
     get: function (name) {
       
-      name = name.toLowerCase();
+      lcname = name.toLowerCase();
 			
-			var entity = go.Entities.get(name);
+			var entity = go.Entities.get(lcname);
 			if(!entity) {
+				console.debug("'" + lcname + "' is not a registered store. Registered entities: ", go.Entities.getAll());
 				return false;
 			}
      
-      if(!stores[name]) {
-        stores[name] = new go.data.EntityStore({
+      if(!stores[lcname]) {
+        stores[lcname] = new go.data.EntityStore({
           entity: entity
         });
       }
       
-      return stores[name];
+      return stores[lcname];
     }
   }
 

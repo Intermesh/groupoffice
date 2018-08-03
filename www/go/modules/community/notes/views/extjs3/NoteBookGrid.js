@@ -100,9 +100,8 @@ go.modules.community.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 						iconCls: 'ic-share',
 						text: t("Share"),
 						handler: function() {
-							var shareWindow = new go.acl.ShareWindow({
-								animateTarget: e.target,
-								title: this.moreMenu.record.get('name')
+							var shareWindow = new go.modules.core.core.ShareWindow({
+								title: t("Share") + ": " + this.moreMenu.record.get('name')
 							});
 							
 							shareWindow.load(this.moreMenu.record.get('aclId')).show();

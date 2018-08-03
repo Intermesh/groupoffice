@@ -15,13 +15,13 @@ use go\core\util\DateTime;
  * 
  * Is an Access Control List to restrict access to data.
  */
-class Acl extends \go\core\orm\Entity {
+class Acl extends \go\core\jmap\Entity {
 	
 	const LEVEL_READ = 10;
 	const LEVEL_CREATE = 20;
 	const LEVEL_WRITE = 30;
 	const LEVEL_DELETE = 40;
-	const LEVEL_MANAGE =50;
+	const LEVEL_MANAGE = 50;
 	
 	
 	public $id;
@@ -62,32 +62,116 @@ class Acl extends \go\core\orm\Entity {
 	
 	protected function internalSave() {
 		
-		if($this->isNew() && empty($this->groups)) {			
+		if($this->isNew()) {
+			if(empty($this->groups)) {			
 			
-			$this->groups[] = (new AclGroup())
-						->setValues([
-								'groupId' => Group::ID_ADMINS, 
-								'level' => self::LEVEL_MANAGE
-										]);
-
-			
-			
-			if($this->ownedBy != User::ID_SUPER_ADMIN) {
-				
-				$groupId = Group::find()
-								->where(['isUserGroupFor' => $this->ownedBy])
-								->selectSingleValue('id')
-								->single();
-				
 				$this->groups[] = (new AclGroup())
-								->setValues([
-										'groupId' => $groupId, 
-										'level' => self::LEVEL_MANAGE
-												]);
+							->setValues([
+									'groupId' => Group::ID_ADMINS, 
+									'level' => self::LEVEL_MANAGE
+											]);
+
+				if($this->ownedBy != User::ID_SUPER_ADMIN) {
+
+					$groupId = Group::find()
+									->where(['isUserGroupFor' => $this->ownedBy])
+									->selectSingleValue('id')
+									->single();
+
+					$this->groups[] = (new AclGroup())
+									->setValues([
+											'groupId' => $groupId, 
+											'level' => self::LEVEL_MANAGE
+													]);
+				}
 			}
+		} else {
+			
+			//add admins if removed.
+			if($this->isModified(['groups']) && !$this->hasAdmins()) {
+				$this->groups[] = (new AclGroup())
+							->setValues([
+									'groupId' => Group::ID_ADMINS, 
+									'level' => self::LEVEL_MANAGE
+											]);
+			}
+		}
+	
+		
+		if(!$this->logChanges()) {
+			return false;
 		}
 		
 		return parent::internalSave();
+	}
+	
+	private function hasAdmins() {
+		foreach($this->groups as $group) {
+			if($group->groupId == Group::ID_ADMINS) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+	
+	private function logChanges() {
+		
+		if(!\go\core\jmap\Entity::$trackChanges) {
+			return true;
+		}
+		
+		$modified = $this->getModified(['groups']);
+		
+		if(!isset($modified['groups'])) {
+			return true;
+		}
+		
+		$currentGroupIds = array_column($modified['groups'][0], 'groupId');
+		$oldGroupIds = array_column($modified['groups'][1], 'groupId');
+		
+		$addedGroupIds = array_diff($currentGroupIds, $oldGroupIds);
+		$removedGroupIds = array_diff($oldGroupIds, $currentGroupIds);
+	
+		if(empty($addedGroupIds) && empty($removedGroupIds)) {
+			return true;
+		}
+		
+		$modSeq = Acl::getType()->nextModSeq();
+		
+		foreach($addedGroupIds as $groupId) {
+			$success = App::get()->getDbConnection()
+							->insert('core_acl_group_changes', 
+											[
+													'aclId' => $this->id, 
+													'groupId' => $groupId, 
+													'grantModSeq' => $modSeq,
+													'revokeModSeq' => null
+											]
+											)->execute();
+			if(!$success) {
+				return false;
+			}
+		}
+		
+		foreach ($removedGroupIds as $groupId) {
+			$success = App::get()->getDbConnection()
+						->update('core_acl_group_changes', 
+										[												
+											'revokeModSeq' => $modSeq											
+										],
+										[
+											'aclId' => $this->id, 
+											'groupId' => $groupId,
+											'revokeModSeq' => null
+										]
+										)->execute();
+			if(!$success) {
+				return false;
+			}
+		}
+		
+		return true;		
 	}
 	
 	/**

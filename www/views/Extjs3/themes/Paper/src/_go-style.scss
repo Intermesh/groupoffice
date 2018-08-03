@@ -537,7 +537,7 @@ button {
 	min-height: dp(40);
 	
 	.wrap {
-		padding-top: dp(4);
+		padding-top: dp(3);
 	}
 	.avatar {
 		position: absolute;
@@ -1218,5 +1218,15 @@ table[id^="comments-ext"] b {
 .go-login-dialog {
 	.x-panel-bbar .x-toolbar {
 		border-top: 0;
+	}
+}
+
+
+.x-grid3-cell {
+	.trigger {
+		@extend %icon;
+		position:absolute;
+		right: 1px;top:1px;
+		padding: dp(16) 1px;
 	}
 }
