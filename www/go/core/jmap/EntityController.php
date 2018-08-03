@@ -243,8 +243,6 @@ abstract class EntityController extends ReadOnlyEntityController {
 	 * @throws CannotCalculateChanges
 	 */
 	public function getUpdates($params) {
-		//TODO
-		// test upgrade and install
 		
 		$p = $this->paramsGetUpdates($params);
 		
@@ -278,16 +276,17 @@ abstract class EntityController extends ReadOnlyEntityController {
 		
 		
 		//find the old state changelog entry
-		
-		$sinceChange = (new Query())
-						->select("*")
-						->from("core_change")
-						->where(["entityTypeId" => $cls::getType()->getId()])
-						->andWhere('modSeq', '=', $entityState)
-						->single();
-		
-		if(!$sinceChange) {			
-			throw new CannotCalculateChanges();
+		if($entityState) { //If state == 0 then we don't need to check this
+			$sinceChange = (new Query())
+							->select("*")
+							->from("core_change")
+							->where(["entityTypeId" => $cls::getType()->getId()])
+							->andWhere('modSeq', '=', $entityState)
+							->single();
+
+			if(!$sinceChange) {			
+				throw new CannotCalculateChanges();
+			}
 		}
 		
 		//Detect permission changes for AclItemEntities. For example notes that depend on notebook permissions.
