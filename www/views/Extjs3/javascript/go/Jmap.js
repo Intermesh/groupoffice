@@ -92,6 +92,9 @@ go.Jmap = {
 	
 	/**
 	 * Initializes Server Sent Events via EventSource. This function is called in MainLayout.onAuthenticated()
+	 * 
+	 * Note: disable this if you want to use xdebug because it will crash if you use SSE.
+	 * 
 	 * @returns {Boolean}
 	 */
 	sse : function() {
