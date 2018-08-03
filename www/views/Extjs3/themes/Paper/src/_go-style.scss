@@ -1214,3 +1214,9 @@ table[id^="comments-ext"] b {
 		color: $cAnchor;
 	}
 }
+
+.go-login-dialog {
+	.x-panel-bbar .x-toolbar {
+		border-top: 0;
+	}
+}
