@@ -1,3 +1,11 @@
+/**
+ * 
+ * Typical usage
+ * 
+ * var dlg = new Dlg();
+ * dlg.load(1).show();
+ */
+
 go.form.Dialog = Ext.extend(go.Window, {
 	autoScroll: true,
 	width: 500,

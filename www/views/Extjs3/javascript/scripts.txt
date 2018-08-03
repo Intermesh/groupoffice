@@ -273,7 +273,7 @@ views/Extjs3/javascript/go/AuthenticationManager.js
 views/Extjs3/javascript/go/login/LanguageCombobox.js
 views/Extjs3/javascript/go/login/LoginDialog.js
 views/Extjs3/javascript/go/login/BaseLoginPanel.js
-views/Extjs3/javascript/go/login/ForgotPanel.js
+views/Extjs3/javascript/go/login/ForgotDialog.js
 views/Extjs3/javascript/go/login/UsernamePanel.js
 views/Extjs3/javascript/go/login/LoginPanel.js
 views/Extjs3/javascript/go/login/RecoveryDialog.js

@@ -1,4 +1,10 @@
 go.login.BaseLoginPanel = Ext.extend(Ext.FormPanel, {
+	
+	initComponent : function() {
+		go.login.BaseLoginPanel.superclass.initComponent.call(this);
+		
+		this.addEvents({success: true, cancel: true});
+	},
 
 	/**
 	 * Get the post data for this form
@@ -9,7 +15,7 @@ go.login.BaseLoginPanel = Ext.extend(Ext.FormPanel, {
 		
 		var values = {};
 		
-		values[this.id] = this.getForm().getFieldValues();
+		values[this.getId()] = this.getForm().getFieldValues();
 		
 		return values;
 	},
@@ -33,26 +39,31 @@ go.login.BaseLoginPanel = Ext.extend(Ext.FormPanel, {
 		this.getForm().reset();
 	},
 	
-	submit : function(form) {
-		
-		go.AuthenticationManager.doAuthentication(form.wizard.getLayout().activeItem.getPostData(),function(authMan, success, result){
-			
-			var activeItemId = this.wizard.getLayout().activeItem.id;
-
-			if(result.errors && result.errors[activeItemId]){
-				this.wizard.getLayout().activeItem.setErrors(result.errors[activeItemId]);
+	submit : function() {		
+		go.AuthenticationManager.doAuthentication(this.getPostData(),function(authMan, success, result){
+			if(result.errors && result.errors[this.getId()]){
+				this.setErrors(result.errors[this.getId()]);
 				return
 			}
 
-			this.next();
+			this.onSuccess();
 
-		},form);
+		},this);
 	},
+	
 	focus : function() {
 		var	field = this.getForm().items.find(function(item){
 			if(!item.disabled && item.isVisible())
 				return true;
 			});	
 		field.focus(true);
+	},
+	
+	onSuccess : function() {
+		this.fireEvent('success', this);
+	},
+	
+	cancel : function() {
+		this.fireEvent('cancel', this);
 	}
 });
