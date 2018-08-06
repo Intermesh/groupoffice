@@ -179,11 +179,15 @@ use const GO_CONFIG_FILE;
 			
 			$configFile = $this->findConfigFile();
 			if(!$configFile) {
-				throw new Exception("No config.php was found. Possible locations: \n\n".
-								'/etc/groupoffice/multi_instance/' . explode(':', $_SERVER['HTTP_HOST'])[0] . "/config.php\n\n".
+				
+				$host = isset($_SERVER['HTTP_HOST']) ? explode(':', $_SERVER['HTTP_HOST'])[0] : '<HOSTNAME>';
+				
+				$msg = "No config.php was found. Possible locations: \n\n".
+								'/etc/groupoffice/multi_instance/' . $host . "/config.php\n\n".
 								dirname(dirname(__DIR__)) . "/config.php\n\n".
-								"/etc/groupoffice/config.php"
-								);
+								"/etc/groupoffice/config.php";
+				
+				throw new Exception($msg);
 			}
 			
 			require($configFile);	

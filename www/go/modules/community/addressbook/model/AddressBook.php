@@ -5,12 +5,28 @@ use go\core\acl\model\AclEntity;
 
 class AddressBook extends AclEntity {
 	
+	/**
+	 * @var int
+	 */
 	public $id;
+
+	/**
+	 * @var string
+	 */
 	public $name;
+
+	/**
+	 * @var int
+	 */
+	public $acid;
+
+	/**
+	 * @var int
+	 */
+	public $createdBy;
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
-						->addTable("ab_addressbooks")
-						->setQuery((new \go\core\db\Query)->select('acl_id AS aclId')); //temporary hack
+						->addTable("addressbook_addressbook");
 	}
 }
