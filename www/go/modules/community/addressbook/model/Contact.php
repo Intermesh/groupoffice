@@ -2,6 +2,7 @@
 namespace go\modules\community\addressbook\model;
 
 use go\core\acl\model\AclItemEntity;
+use go\core\orm\CustomFieldsTrait;
 						
 /**
  * Contact model
@@ -12,6 +13,8 @@ use go\core\acl\model\AclItemEntity;
  */
 
 class Contact extends AclItemEntity {
+	
+	use CustomFieldsTrait;
 	
 	/**
 	 * 
@@ -123,12 +126,6 @@ class Contact extends AclItemEntity {
 
 	/**
 	 * 
-	 * @var int
-	 */							
-	public $organizationContactId;
-
-	/**
-	 * 
 	 * @var string
 	 */							
 	public $photoBlobId;
@@ -138,6 +135,43 @@ class Contact extends AclItemEntity {
 	 * @var string
 	 */							
 	public $language;
+	
+	/**
+	 *
+	 * @var EmailAddress[]
+	 */
+	public $emailAddresses = [];
+	
+	/**
+	 *
+	 * @var PhoneNumber[]
+	 */
+	public $phoneNumbers = [];
+	
+	/**
+	 *
+	 * @var Date[];
+	 */
+	public $dates = [];
+	
+	/**
+	 *
+	 * @var Url[]
+	 */
+	public $urls = [];
+	
+	/**
+	 *
+	 * @var ContactOrganization[]
+	 */
+	public $organizations = [];
+	
+	
+	/**
+	 *
+	 * @var Address[]
+	 */
+	public $addresses = [];
 
 	protected static function aclEntityClass(): string {
 		return AddressBook::class;
@@ -149,7 +183,13 @@ class Contact extends AclItemEntity {
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
-						->addTable("addressbook_contact");
+						->addTable("addressbook_contact")
+						->addRelation('dates', Date::class, ['id' => 'contactId'])
+						->addRelation('phoneNumbers', PhoneNumber::class, ['id' => 'contactId'])
+						->addRelation('emailAddresses', EmailAddress::class, ['id' => 'contactId'])
+						->addRelation('addresses', Address::class, ['id' => 'contactId'])
+						->addRelation('organizations', ContactOrganization::class, ['id' => 'contactId'])
+						->addRelation('urls', Url::class, ['id' => 'contactId']);
 	}
 
 }
