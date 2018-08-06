@@ -1,144 +1,134 @@
 <?php
 namespace go\modules\community\addressbook\model;
 
-use go\core\acl\model\AclItemEntity;
-						
 /**
- * Contact model
+ * The Contact model
+ *
  *
  * @copyright (c) 2018, Intermesh BV http://www.intermesh.nl
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
 
-class Contact extends AclItemEntity {
+class Contact extends \go\core\acl\model\AclItemEntity {
+	
+	use \go\core\orm\CustomFieldsTrait;
 	
 	/**
-	 * 
 	 * @var int
-	 */							
+	 */
 	public $id;
 
 	/**
-	 * 
 	 * @var int
-	 */							
+	 */
 	public $addressBookId;
 
 	/**
-	 * 
 	 * @var int
-	 */							
+	 */
 	public $createdBy;
 
 	/**
-	 * 
-	 * @var \IFW\Util\DateTime
-	 */							
+	 * @var \go\core\util\DateTime
+	 */
 	public $createdAt;
 
 	/**
-	 * 
-	 * @var \IFW\Util\DateTime
-	 */							
+	 * @var \go\core\util\DateTime
+	 */
 	public $modifiedAt;
 
 	/**
 	 * Prefixes like 'Sir'
-	 * @var string
-	 */							
-	public $prefixes = '';
+	 * 
+	 *@var string
+	 */
+	public $prefixes;
 
 	/**
-	 * 
 	 * @var string
-	 */							
-	public $firstName = '';
+	 */
+	public $firstName;
 
 	/**
-	 * 
 	 * @var string
-	 */							
-	public $middleName = '';
+	 */
+	public $middleName;
 
 	/**
-	 * 
 	 * @var string
-	 */							
-	public $lastName = '';
+	 */
+	public $lastName;
 
 	/**
 	 * Suffixes like 'Msc.'
-	 * @var string
-	 */							
-	public $suffixes = '';
+	 * 
+	 *@var string
+	 */
+	public $suffixes;
 
 	/**
 	 * M for Male, F for Female or null for unknown
-	 * @var string
-	 */							
+	 * 
+	 *@var string
+	 */
 	public $gender;
 
 	/**
-	 * 
 	 * @var string
-	 */							
+	 */
 	public $notes;
 
 	/**
-	 * 
-	 * @var bool
-	 */							
-	public $isOrganization = false;
+	 * @var boolean
+	 */
+	public $isOrganization;
 
 	/**
 	 * name field for companies and contacts. It should be the display name of first, middle and last name
-	 * @var string
-	 */							
+	 * 
+	 *@var string
+	 */
 	public $name;
 
 	/**
-	 * 
 	 * @var string
-	 */							
-	public $IBAN = '';
+	 */
+	public $IBAN;
 
 	/**
 	 * Company trade registration number
-	 * @var string
-	 */							
-	public $registrationNumber = '';
+	 * 
+	 *@var string
+	 */
+	public $registrationNumber;
 
 	/**
-	 * 
 	 * @var string
-	 */							
+	 */
 	public $vatNo;
 
 	/**
-	 * 
 	 * @var string
-	 */							
+	 */
 	public $debtorNumber;
 
 	/**
-	 * 
 	 * @var int
-	 */							
+	 */
 	public $organizationContactId;
 
 	/**
-	 * 
 	 * @var string
-	 */							
+	 */
 	public $photoBlobId;
 
 	/**
-	 * 
 	 * @var string
-	 */							
+	 */
 	public $language;
-
+	
 	protected static function aclEntityClass(): string {
 		return AddressBook::class;
 	}
@@ -149,7 +139,7 @@ class Contact extends AclItemEntity {
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
-						->addTable("addressbook_contact");
+						->addTable('addressbook_contact');
 	}
 
 }

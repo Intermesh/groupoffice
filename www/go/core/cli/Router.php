@@ -71,7 +71,7 @@ class Router implements RouterInterface {
 		$controllerCls = 'go\\modules\\' . $parts[0] . '\\' . $parts[1] . '\\controller\\' . $parts[2];
 
 		if (!class_exists($controllerCls)) {
-			throw new NotFound("Route: " . $path . "  not found.");
+			throw new NotFound("Route: " . $path . " ( ".$controllerCls.")  not found.");
 		}	
 
 		$ctrl = new $controllerCls;
