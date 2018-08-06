@@ -62,7 +62,7 @@ class Authenticator extends PrimaryAuthenticator {
 		
 		if (!empty($server->username)) {			
 			
-			$record = Record::find($connection, $server->peopleDN, $server->usernameAttribute . "=" . $server->username)->fetch();
+			$record = Record::find($connection, $server->peopleDN, $server->usernameAttribute . "=" . $server->username)->fetch();		
 			
 			if(!$record) {
 				throw new \Exception("LDAP User '".$server->username."' does not exist.");
