@@ -34,8 +34,8 @@ go.modules.community.notes.MainPanel = Ext.extend(Ext.Panel, {
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
-						var noteBookForm = new go.modules.community.notes.NoteBookForm();
-						noteBookForm.show();
+						var dlg = new go.modules.community.notes.NoteBookForm();
+						dlg.show();
 					}
 				}, {
 					cls: 'go-narrow',

@@ -171,7 +171,7 @@ class Contact extends AclItemEntity {
 	 *
 	 * @var Address[]
 	 */
-	public $addresses = [];
+	public $addresses = [];	
 
 	protected static function aclEntityClass(): string {
 		return AddressBook::class;

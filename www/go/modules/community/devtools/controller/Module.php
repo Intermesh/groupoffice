@@ -102,12 +102,15 @@ EOD;
 		$folder->getFolder('install')->create();
 		$folder->getFile('install/install.sql')->touch();
 		$folder->getFile('install/uninstall.sql')->touch();
+		
+		
 		$updatesFile = $folder->getFile('install/updates.php');
 		if(!$updatesFile->exists()) {
 			$updatesFile->putContents("<?php\n\n\$updates = [];\n\n");			
 		}
 		
 		
+		$this->initView($folder, $package, $name);
 		
 		if(!isset($tablePrefix)) {
 			$tablePrefix = $folder->getName();
@@ -124,6 +127,41 @@ EOD;
 				$this->tableToModel($folder, $namespace, $tablePrefix, $record[0]);
 			}
 		}
+	}
+	
+	private function createFile(\go\core\fs\File $file, $text) {
+		if(!$file->exists()) {
+			$file->putContents($text);
+		}
+	}
+	
+	private function initView(Folder $folder, $package, $module) {
+		$folder->getFolder('views/extjs3')->create();
+		$folder->getFile('views/extjs3/themes/default/style.css')->touch(true);
+		
+		$this->createFile($folder->getFile('views/extjs3/scripts.txt'), "module.js\nMainPanel.js\n");
+		$moduleUCFirst = ucfirst($module);
+		$moduleJS = <<<EOD
+go.Modules.register("$package", "$module", {
+	mainPanel: "go.modules.$package.$module.MainPanel",
+	title: t("$moduleUCFirst"),
+	entities: [],
+	initModule: function () {}
+});
+
+EOD;
+		$this->createFile($folder->getFile('views/extjs3/module.js'), $moduleJS);
+		
+		$mainPanelJS = <<<EOD
+go.modules.$package.$module.MainPanel = Ext.extend(Ext.Panel, {
+	html: "Hello world"
+});
+
+EOD;
+		
+		$this->createFile($folder->getFile('views/extjs3/MainPanel.js'), $mainPanelJS);
+		
+		
 	}
 
 

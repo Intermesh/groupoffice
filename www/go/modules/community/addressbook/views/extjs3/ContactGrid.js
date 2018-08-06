@@ -1,0 +1,95 @@
+go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
+	initComponent: function () {
+
+		this.store = new go.data.Store({
+			fields: [
+				'id', 
+				'name', 
+				{name: 'createdAt', type: 'date'}, 
+				{name: 'modifiedAt', type: 'date'}, 
+				{name: 'creator', type: go.data.types.User, key: 'createdBy'},
+				{name: 'modifier', type: go.data.types.User, key: 'modifiedBy'},
+				'permissionLevel'
+			],
+			entityStore: go.Stores.get("Contact")
+		});
+
+		Ext.apply(this, {		
+		
+			columns: [
+				{
+					id: 'id',
+					hidden: true,
+					header: 'ID',
+					width: dp(40),
+					sortable: true,
+					dataIndex: 'id'
+				},
+				{
+					id: 'name',
+					header: t('Name'),
+					width: dp(75),
+					sortable: true,
+					dataIndex: 'name'
+				},
+				{
+					xtype:"datecolumn",
+					id: 'createdAt',
+					header: t('Created at'),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'createdAt',
+					hidden: true
+				},
+				{					
+					xtype:"datecolumn",
+					hidden: false,
+					id: 'modifiedAt',
+					header: t('Modified at'),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'modifiedAt'
+				},
+				{	
+					hidden: true,
+					header: t('Created by'),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'creator',
+					renderer: function(v) {
+						return v ? v.displayName : "-";
+					}
+				},
+				{	
+					hidden: true,
+					header: t('Modified by'),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'modifier',
+					renderer: function(v) {
+						return v ? v.displayName : "-";
+					}
+				}
+			],
+			viewConfig: {
+				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>'
+//				enableRowBody: true,
+//				showPreview: true,
+//				getRowClass: function (record, rowIndex, p, store) {
+//					if (this.showPreview) {
+//						p.body = '<p>' + record.data.excerpt + '</p>';
+//						return 'x-grid3-row-expanded';
+//					}
+//					return 'x-grid3-row-collapsed';
+//				}
+			},
+			autoExpandColumn: 'name',
+			// config options for stateful behavior
+			stateful: true,
+			stateId: 'contact-grid'
+		});
+
+		go.modules.community.addressbook.ContactGrid.superclass.initComponent.call(this);
+	}
+});
+

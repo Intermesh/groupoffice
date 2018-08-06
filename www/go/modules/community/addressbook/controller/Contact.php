@@ -1,5 +1,5 @@
 <?php
-namespace go\modules\community\addressbook;
+namespace go\modules\community\addressbook\controller;
 
 use go\core\jmap\EntityController;
 use go\modules\community\addressbook\model;

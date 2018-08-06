@@ -1,17 +1,17 @@
 <?php
-namespace {namespace}\controller;
+namespace go\modules\community\addressbook\controller;
 
 use go\core\jmap\EntityController;
-use {namespace}\model;
+use go\modules\community\addressbook\model;
 
 /**
- * The controller for the {model} entity
+ * The controller for the Addressbook entity
  *
  * @copyright (c) 2018, Intermesh BV http://www.intermesh.nl
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */ 
-class {model} extends EntityController {
+class AddressBook extends EntityController {
 	
 	/**
 	 * The class name of the entity this controller is for.
@@ -19,7 +19,7 @@ class {model} extends EntityController {
 	 * @return string
 	 */
 	protected function entityClass() {
-		return model\{model}::class;
+		return model\AddressBook::class;
 	}	
 }
 
