@@ -1,3 +1,5 @@
+- Refactored login dialog so that Firefox will prompt to save password.
+
 02-08-2018 6.3.29
 - Fixed various small bugs
 
