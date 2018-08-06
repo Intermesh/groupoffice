@@ -1,3 +1,6 @@
+06-08-2018 6.3.30
+- Small UI improvements
+- LDAP bind login uses full DN
 - Refactored login dialog so that Firefox will prompt to save password.
 
 02-08-2018 6.3.29
