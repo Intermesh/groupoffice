@@ -24,7 +24,6 @@ $updates['201711071208'][] = 'ALTER TABLE `notes_folder` CHANGE `files_folder_id
 
 
 $updates['201711071208'][] = 'ALTER TABLE `notes_note` CHANGE `categoryId` `folderId` INT(11) NOT NULL;';
-$updates['201711071208'][] = 'ALTER TABLE `notes_note` ADD FOREIGN KEY (`folderId`) REFERENCES `notes_folder`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;';
 
 $updates['201711071208'][] = 'ALTER TABLE `notes_folder` ADD FOREIGN KEY (`aclId`) REFERENCES `core_acl`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;';
 $updates['201711071208'][] = 'ALTER TABLE `notes_folder` ADD `modSeq` INT NOT NULL AFTER `id`, ADD `deletedAt` DATETIME NULL DEFAULT NULL AFTER `modSeq`;';
@@ -35,6 +34,7 @@ $updates['201711071208'][] = 'RENAME TABLE `notes_folder` TO `notes_note_book`;'
 $updates['201711071208'][] = 'ALTER TABLE `notes_note` CHANGE `folderId` `noteBookId` INT(11) NOT NULL;';
 
 
+$updates['201711071208'][] = 'ALTER TABLE `notes_note` ADD FOREIGN KEY (`noteBookId`) REFERENCES `notes_folder`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;';
 
 
 $updates['201711071208'][] = 'RENAME TABLE `cf_no_notes` TO `notes_note_custom_fields`;';
