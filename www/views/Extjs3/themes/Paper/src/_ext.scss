@@ -1174,7 +1174,7 @@ ul.x-tab-strip-bottom{
 			//padding-left: dp(8) !important;
 		}
 		&-selected{
-			background-color: $cSelected !important;
+			background-color: $cSelected;
 			color:#000;
 			span{
 				color:#000 !important;

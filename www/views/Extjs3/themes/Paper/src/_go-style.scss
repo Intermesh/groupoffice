@@ -1179,7 +1179,7 @@ table[id^="comments-ext"] b {
 .x-form-element {
 	.x-grid-panel {
 		border-radius: dp(4);
-		border: 1px solid transparent;
+		border: 0;
 	}
 	.x-grid-panel {	
 		&.x-form-invalid {
@@ -1226,7 +1226,78 @@ table[id^="comments-ext"] b {
 	.trigger {
 		@extend %icon;
 		position:absolute;
-		right: 1px;top:1px;
-		padding: dp(16) 1px;
+		right: 1px;
+		top:1px;
+		padding: dp(16) 0 dp(16) dp(4);
 	}
+}
+
+
+.go-grid3-form-field {
+	.go-editable-col {
+		.x-grid3-cell-inner {
+			border: 1px solid color($fg, 'track');
+		border-radius: dp(4);			
+		background-color: color($bg, 'box');		
+		margin-right: dp(4);
+		}
+			
+			
+	}
+	.x-grid3-cell-inner {
+		min-height: dp(32);
+		padding: dp(6) dp(8);	
+		height: dp(32);
+		
+	}	
+	
+	.ux-row-action-cell {
+		.x-grid3-cell-inner {
+			padding: dp(4) 0;
+		}
+	}
+	.x-grid-editor {
+		overflow: hidden !important;
+	}
+	.x-grid-editor .x-form-field {
+		margin: 1px -5px -1px 1px; //correction for extjs positioning.		
+		min-height: auto;
+		height: auto;
+		padding: dp(6) dp(8);
+		padding-left: dp(8);
+		border-radius: dp(4);
+	}
+	
+	.x-grid-editor {
+		.x-form-field-wrap {
+			margin: 1px -5px -1px 1px; //correction for extjs positioning.		
+		}
+	}
+
+	.x-grid3-cell {
+		.trigger {
+			padding: dp(4) 0 dp(4) dp(4);
+			margin-right: dp(4);
+		}
+	}	
+	.x-grid3 {
+		background-color: transparent;
+	}
+	.x-grid3-row {
+		border-bottom: 0;
+		margin-bottom: dp(4);
+	}
+	
+	.x-panel-bbar .x-toolbar {
+		border-top: 0;
+		padding-right: dp(14);
+	}
+	
+	.x-grid3-cell-selected {
+		background-color: color($bg, 'box');
+	}
+	.x-grid3-scroller {
+		overflow: hidden;
+	}
+
 }

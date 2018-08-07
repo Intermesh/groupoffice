@@ -7,7 +7,7 @@ go.form.GridField = Ext.extend(Ext.grid.EditorGridPanel, {
 		deferEmptyText: false
 	},
 	
-	cls: 'go-grid3-hide-headers',
+	cls: 'go-grid3-hide-headers go-grid3-form-field',
 	clicksToEdit: 1,
 	initComponent: function () {
 
@@ -46,6 +46,15 @@ go.form.GridField = Ext.extend(Ext.grid.EditorGridPanel, {
 			}, this);
 		}
 		
+	},
+	
+	startEditing : function(row,  col) {
+		go.form.GridField.superclass.startEditing.call(this, row, col);
+		
+		//expand combo when editing
+		if(this.activeEditor && this.activeEditor.field.onTriggerClick) {
+			this.activeEditor.field.onTriggerClick();
+		}
 	},
 
 	
@@ -100,7 +109,9 @@ go.form.GridField = Ext.extend(Ext.grid.EditorGridPanel, {
 			header: '',
 			hideMode: 'display',
 			keepSelection: true,
-
+			align: "right",
+			autoWidth: false,
+			width: dp(24),
 			actions: [{
 					iconCls: 'ic-delete'
 				}]
