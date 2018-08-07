@@ -195,7 +195,7 @@ class Node extends model\AclEntity {
 	}
 	
 	/**
-	 * Tells if this folder has children.
+	 * Tells if this folder has subfolders.
 	 * 
 	 * @return boolean
 	 */
