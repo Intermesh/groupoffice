@@ -16,6 +16,26 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						xtype: "hidden",
 						name: "addressBookId"
 					},
+					
+					this.avatarComp = new go.form.FileField({
+							buttonOnly: true,
+							name: 'photoBlobId',
+							height:120,
+							cls: "avatar",
+							autoUpload: true,
+							buttonCfg: {
+								text: '',
+								width: 120
+							},
+							setValue: function(val) {
+								if(this.rendered && !Ext.isEmpty(val)) {
+									this.wrap.setStyle('background-image', 'url('+go.Jmap.downloadUrl(val)+')');
+								}
+								go.form.FileField.prototype.setValue.call(this,val);
+							},
+							accept: 'image/*'
+						}),
+					
 					{
 						xtype: 'textfield',
 						name: 'name',
