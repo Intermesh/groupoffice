@@ -2627,14 +2627,11 @@ input[value="0"] + .x-slider .x-slider-thumb {
 		}
 
 		&[disabled] {
-			~ .thumb {
+			~ .thumb::after {
 				background-color: color($grey, 400);
-				&::before {
-					background-color: rgba(black, .12);
-				}
 			}
 			~ .track {
-				background-color: color($fg, 'divider');
+				background-color: color($fg, 'line');
 			}
 		}
 		~ label {
