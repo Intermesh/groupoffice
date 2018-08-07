@@ -2,93 +2,88 @@ go.modules.community.files.ShareDialog = Ext.extend(go.form.Dialog, {
 	stateId: 'files-shareDialog',
 	title: t("Share"),
 	entityStore: go.Stores.get("Node"),
-	width: 600,
+	width: dp(680),
 	height: 600,
 	
+	initComponent: function() {
+		this.buttons = [
+			'->', this.shareBtn = new Ext.Button({
+				cls: "raised",
+				text: t("Share"),
+				handler: this.share,
+				scope: this
+			})];
+		go.modules.community.files.ShareDialog.superclass.initComponent.call(this);
+	},
+	
 	initFormItems: function () {
-		
-		this.shareCbx = new Ext.ux.form.XCheckbox({
-			boxLabel: t('Make shareable link available for external users'),
-			hideLabel:true,
-			anchor: '100%',
-			listeners:{
-				check: function(cbx,checked){
-
-
-				},
-				scope:this
-			}
-		});
-		
-		this.shareExpireCbx = new Ext.ux.form.XCheckbox({
-			boxLabel: t('Expire link on:'),
-			hideLabel:true,
-			anchor: '100%',
-			listeners:{
-				check: function(cbx,checked){
-
-
-				},
-				scope:this
-			}
-		});
-		
-		this.shareExpireDate = new Ext.form.DateField({
-			name : 'tokenExpiresAt',
-			width : 120,
-			format : GO.settings['date_format'],
-			allowBlank : true
-		});
-		
-		this.shareLinkField = new Ext.form.TriggerField({
-			name: 'link',
-			hideLabel:true,
-			anchor: '100%',
-			style:{
-				"padding-right":"80px"
-			},
-			triggerConfig: {
-				tag: "button", 
-				type: "button", 
-				tabindex: "-1",
-				style:{
-					width:"80px"
-				},
-				cls: "x-form-trigger x-form-text-trigger",
-				html: t("Copy link")
-			}				
-		});
-		
-		this.aclPanel = new GO.grid.PermissionsPanel();
-		
-		var items = [{
+	
+		return [{
 				xtype: 'fieldset',
-				title: t("External users"),
 				autoHeight: true,
 				items: [
-					this.shareCbx,
-					this.shareLinkField,
-					{
-						xtype: 'compositefield',
+					this.shareCbx = new go.form.Switch({
+						boxLabel: t('Enable shareable link for public access'),
 						hideLabel:true,
+						anchor: '100%',
+						listeners:{
+							check: function(cbx,checked){
+								this.shareLinkField[checked?'show':'hide']();
+								this.expireField[checked?'show':'hide']();
+								this.doLayout();
+							},
+							scope:this
+						}
+					}),
+					this.shareLinkField = new Ext.form.TriggerField({
+						name: 'link',
+						hideLabel:true,
+						anchor: '100%',
+						hidden:true,
+						style:{
+							"padding-right":"80px"
+						},
+						triggerConfig: {
+							tag: "button", 
+							type: "button", 
+							tabindex: "-1",
+							style:{
+								width:"80px"
+							},
+							cls: "x-form-text-trigger",
+							html: t("Copy link")
+						}				
+					}),
+					this.expireField = new Ext.form.CompositeField({
+						hideLabel:true,
+						hidden:true,
 						items:[
-							this.shareExpireCbx,
-							this.shareExpireDate
+							this.shareExpireCbx = new Ext.ux.form.XCheckbox({
+								boxLabel: t('Expire at:'),
+								hideLabel:true,
+								anchor: '100%',
+								listeners:{
+									check: function(cbx,checked){
+
+
+									},
+									scope:this
+								}
+							}),
+							this.shareExpireDate = new Ext.form.DateField({
+								name : 'tokenExpiresAt',
+								allowBlank : true
+							})
 						],
 						anchor: '100%'
-					}
+					})
 				]
-			},{
-				xtype: 'fieldset',
-				title:t("Group Office users"),
+			},
+			this.sharePanel = new go.modules.core.core.SharePanel({
+				hideLabel: true,
 				autoHeight: true,
-				items: [
-					this.aclPanel
-				]
-			}
+			})
 		];
-
-		return items;
 	},
 	/**
 	 * Set the acl Id for the permissions panel/grid
@@ -96,7 +91,31 @@ go.modules.community.files.ShareDialog = Ext.extend(go.form.Dialog, {
 	 * @param int aclId
 	 */
 	setAcl : function(aclId) {
-		this.aclPanel.setAcl(aclId);
+		this.sharePanel.load(aclId);
+		return this;
+	},
+	
+	share: function() {
+		var node;
+		if(node.isShared) {
+			//just update ACL
+			go.Stores.get('Acl').get(node.aclId).set({groups:this.sharePanel.groups})
+		} else if(this.sharePanel.hasChanges()) {
+			// create new ACL
+			var newAclId = '#'+Ext.id(),
+				 items = {};
+			items[newAclId] = {groups:this.sharePanel.groups};
+			go.Stores.get('Acl').set({create: items});
+			// update node with new ACL ID
+			node.aclId = newAclId;
+		}
+		if(this.shareCbx.getValue() == '1') {
+			// save token
+			node.token = '000000';
+			if(this.shareExpireCbx.getValue() == 1) {
+				node.tokenExpiresAt = this.shareExpireDate.getValue();
+			}
+		}
 	}
 		
 });
