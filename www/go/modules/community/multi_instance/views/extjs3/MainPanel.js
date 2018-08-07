@@ -26,6 +26,8 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 				{name: 'lastLogin', type: 'date'},
 				'adminDisplayName',
 				'adminEmail',
+				'enabled',
+				'loginCount'
 			],
 			entityStore: go.Stores.get("Instance")
 		});
@@ -39,6 +41,29 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 						var dlg = new go.modules.community.multi_instance.InstanceDialog();
 						dlg.show();
 					}
+				}, {
+					iconCls: 'ic-more-vert',
+					menu: [{
+							iconCls: 'ic-email', 
+							text: t("E-mail selected"),
+							handler: function() {
+								var records = this.getSelectionModel().getSelections();
+								
+								console.log(records);
+								
+								var str = "";
+								Ext.each(records, function(r) {
+									if(r.data.adminEmail && str.indexOf(r.data.adminEmail) == -1) {
+										str +=  '"' + r.data.adminDisplayName.replace(/"/g, '\\"') + '" &lt;' + r.data.adminEmail + '&gt;, ';
+									}
+								});
+								
+								console.log(str);
+								
+								Ext.MessageBox.alert("E-mail addresses", str);
+							},
+							scope: this
+					}]
 				}
 				
 			],
@@ -54,18 +79,17 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 				{
 					id: 'hostname',
 					header: t('Hostname'),
-					width: 75,
+					width: 200,
 					sortable: true,
-					dataIndex: 'hostname'
-				},
-				{
-					id: 'userCount',
-					header: t('User count'),
-					width: 160,
-					sortable: false,
-					dataIndex: 'userCount',
-					hidden: false
-				},
+					dataIndex: 'hostname',
+					renderer: function(value, metaData, record, rowIndex, colIndex, store) {
+						if(!record.data.enabled) {
+							metaData.css = "deactivated";
+						}
+						
+						return value;
+					}
+				},				
 				{
 					xtype:"datecolumn",
 					id: 'createdAt',
@@ -80,8 +104,22 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 					id: 'lastLogin',
 					header: t('Last login'),
 					width: 160,
-					sortable: false,
+					sortable: true,
 					dataIndex: 'lastLogin',
+					hidden: false
+				},{
+					id: 'userCount',
+					header: t('User count'),
+					width: 160,
+					sortable: true,
+					dataIndex: 'userCount',
+					hidden: false
+				},{
+					id: 'loginCount',
+					header: t('Login count'),
+					width: 160,
+					sortable: true,
+					dataIndex: 'loginCount',
 					hidden: false
 				},{
 					header: t('Admin name'),
@@ -183,13 +221,39 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 							});
 						},
 						scope: this						
+					}, '-',
+					{
+						itemId:"deactivate",
+						iconCls: 'ic-block',
+						text: t("Deactivate instance"),
+						handler: function() {
+							
+							var update = {};
+							update[this.moreMenu.record.id] = {enabled: !this.moreMenu.record.data.enabled};
+						
+							go.Stores.get("Instance").set({
+								update: update
+							});
+							
+						},
+						scope: this
+					},{
+						itemId: "delete",
+						iconCls: 'ic-delete',
+						text: t("Delete instance"),
+						handler: function() {
+							this.getSelectionModel().selectRecords([this.moreMenu.record]);
+							this.deleteSelected();
+						},
+						scope: this
 					},
+					
 				]
 			})
 		}	
 		
 		this.moreMenu.record = record;
-		
+		this.moreMenu.items.item("deactivate").setText(record.data.enabled ? t("Deactivate instance") : t("Activate instance"));
 		this.moreMenu.showAt(e.getXY());
 	}
 });

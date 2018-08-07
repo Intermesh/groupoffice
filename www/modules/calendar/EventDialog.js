@@ -694,7 +694,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			increment: 15,
 			format:GO.settings.time_format,
 			name:'start_time',
-			width:80,
+			width:dp(120),
 			hideLabel:true,
 			autoSelect :true,			
 			listeners : {
@@ -709,7 +709,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			increment: 15,
 			format:GO.settings.time_format,
 			name:'end_time',
-			width:80,
+			width:dp(120),
 			hideLabel:true,
 			autoSelect :true,			
 			listeners : {

@@ -92,7 +92,8 @@ abstract class EntityController extends ReadOnlyEntityController {
 			$entity = $this->create($properties);
 
 			if (!$entity->hasValidationErrors()) {
-				$result['created'][$clientId] = $this->diff($entity, $properties);
+				$diff = $entity->diff($properties);
+				$result['created'][$clientId] = empty($diff) ? null : $diff;
 			} else {				
 				$result['notCreated'][$clientId] = new SetError("invalidProperties");
 				$result['notCreated'][$clientId]->properties = array_keys($entity->getValidationErrors());
@@ -101,8 +102,14 @@ abstract class EntityController extends ReadOnlyEntityController {
 		}
 	}
 	
+	/**
+	 * Override this if you want to implement permissions for creating entities
+	 * 
+	 * @return boolean
+	 */
 	protected function canCreate() {
-		return true;
+		$cls = $this->entityClass();
+		return $cls::canCreate();
 	}
 	
 	/**
@@ -124,27 +131,11 @@ abstract class EntityController extends ReadOnlyEntityController {
 	}
 
 	/**
-	 * The server must return all properties that were changed during a create or update operation for the JMAP spec
+	 * Override this if you want to change the default permissions for updating an entity.
 	 * 
-	 * @param \go\modules\community\notes\controller\notes\Note $entity
-	 * @param type $properties
-	 * @return type
+	 * @param Entity $entity
+	 * @return bool
 	 */
-	private function diff(Entity $entity, $properties) {
-
-		$diff = [];
-		
-		$serverProps = $entity->toArray();
-		
-		foreach ($serverProps as $key => $value) {
-			if (!isset($properties[$key]) || $properties[$key] !== $value) {
-				$diff[$key] = $value;
-			}
-		}
-
-		return empty($diff) ? null : $diff;
-	}
-	
 	protected function canUpdate(Entity $entity) {
 		return $entity->hasPermissionLevel(Acl::LEVEL_WRITE);
 	}
@@ -177,15 +168,14 @@ abstract class EntityController extends ReadOnlyEntityController {
 				continue;
 			}
 			
-			$result['updated'][$entity->id] = $this->diff($entity, $properties);
+			//The server must return all properties that were changed during a create or update operation for the JMAP spec
+			$diff = $entity->diff($properties);
+			$result['updated'][$entity->id] = empty($diff) ? null : $diff;
 		}
 	}
 	
-	protected function update(Entity $entity, array $properties) {
-		
-		
-		$entity->save();
-		
+	protected function update(Entity $entity, array $properties) {		
+		$entity->save();		
 		return !$entity->hasValidationErrors();
 	}
 	
@@ -266,26 +256,6 @@ abstract class EntityController extends ReadOnlyEntityController {
 			throw new CannotCalculateChanges();
 		}
 		
-		//find the old state changelog entry
-		
-//		$change = (new Query())
-//						->select("*")
-//						->from("core_change")
-//						->where(["entityTypeId" => $cls::getType()->id, 'modSeq' => $p['sinceState']])
-//						->single();
-//		
-//		if(!$change) {
-//			//State is too old.
-//			throw new CannotCalculateChanges();
-//		}
-		
-//		TODO!!!!
-//		$acls = $cls::findAcls();		
-//		if($acls && (Acl::findGrantedSince(App::get()->getAuthState()->getUserId(), $p['sinceState'], $acls)->limit(1)->execute()->fetch() ||
-//			Acl::findRevokedSince(App::get()->getAuthState()->getUserId(), $p['sinceState'], $acls)->limit(1)->execute()->fetch())) {
-//			throw new CannotCalculateChanges();
-//		}			
-
 		$result = [
 				'accountId' => $p['accountId'],
 				'oldState' => $p['sinceState'],
@@ -294,36 +264,85 @@ abstract class EntityController extends ReadOnlyEntityController {
 				'changed' => [],
 				'removed' => []
 		];
+		
+		//state has entity modseq and acl modseq so we can detect permission changes
+		$states = explode(':', $p['sinceState']);
+		if(count($states) != 2) 
+		{
+			throw new CannotCalculateChanges();
+		}
+		$entityState = $states[0];
+		$aclState = $states[1];
+		
+		
+		//find the old state changelog entry
+		if($entityState) { //If state == 0 then we don't need to check this
+			$sinceChange = (new Query())
+							->select("*")
+							->from("core_change")
+							->where(["entityTypeId" => $cls::getType()->getId()])
+							->andWhere('modSeq', '=', $entityState)
+							->single();
+
+			if(!$sinceChange) {			
+				throw new CannotCalculateChanges();
+			}
+		}
+		
+		//Detect permission changes for AclItemEntities. For example notes that depend on notebook permissions.
+		if(is_a($cls, \go\core\acl\model\AclItemEntity::class, true)) {
+			$acls = $cls::findAcls();	
+			if($acls) {
+				$oldAclIds = Acl::wereGranted(GO()->getUserId(), $aclState, $acls)->all();
+				$currentAclIds = Acl::areGranted(GO()->getUserId(), $acls)->all();
+				$changedAcls = array_merge(array_diff($oldAclIds, $currentAclIds), array_diff($currentAclIds, $oldAclIds));	
+			}
+		}
 
 		
 		$entityType = $cls::getType();
 		
-		$changes = (new Query)->select('entityId,destroyed,modSeq')
+		$changes = (new Query)->select('entityId,max(destroyed) AS destroyed, max(modSeq) AS modSeq, max(aclId) AS aclId')
 						->from('core_change')
 						->fetchMode(PDO::FETCH_ASSOC)
 						->limit($p['maxChanges'])
-						->orderBy(['modSeq' => 'ASC'])
-						->andWhere('modSeq', '>', $p['sinceState']);
-		
+						->orderBy(['modSeq' => 'ASC'])						
+						->groupBy(['entityId'])
+						->andWhere('modSeq', '>', $entityState);
 		Acl::applyToQuery($changes, "t.aclId");
-						
-					
 		
-		foreach ($changes as $entity) {
-			if (isset($entity['deletedAt'])) {
-				$result['removed'][] = $entity['entityId'];
+		foreach ($changes as $change) {
+			if ($change['destroyed']) {
+				$result['removed'][] = $change['entityId'];
 			} else {
-				$result['changed'][] = $entity['entityId'];
+					
+				$result['changed'][] = $change['entityId'];
 			}
 		}
+		
+		//add AclItemEntity changes based on permissions		
+		if(!empty($changedAcls)) {
+			$query = $cls::find()->fetchMode(PDO::FETCH_ASSOC)->select('n.id, aclEntity.aclId')->where('aclEntity.aclId', 'in', $changedAcls);			
+			$cls::joinAclEntity($query);
+			
+			//we don't need entities here. Just a list of id's.
+			foreach($query as $entity) {
+				if(in_array($entity['aclId'], $currentAclIds)) {
+					$result['changed'][] = $entity['id'];
+				} else
+				{
+					$result['removed'][] = $entity['id'];
+				}
+			}			
+		}
+		
 
-		if(isset($entity)){
-			$result['newState'] = (int) $entity['modSeq'];
+		if(isset($change)){
+			$result['newState'] = $change['modSeq'] . ':' . Acl::getType()->highestModSeq;
 		} else
 		{
 			$result['newState'] = $this->getState();
 		}
-		
 		$result['hasMoreUpdates'] = $result['newState'] != $this->getState();
 
 		Response::get()->addResponse($result);

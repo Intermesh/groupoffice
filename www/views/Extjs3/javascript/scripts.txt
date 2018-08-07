@@ -240,7 +240,9 @@ views/Extjs3/javascript/go/data/EntityStore.js
 views/Extjs3/javascript/go/EntityManager.js
 views/Extjs3/javascript/go/ModuleManager.js
 
+views/Extjs3/javascript/go/grid/GridTrait.js
 views/Extjs3/javascript/go/grid/GridPanel.js
+views/Extjs3/javascript/go/grid/EditorGridPanel.js
 views/Extjs3/javascript/go/grid/SelectAllCheckBox.js
 
 
@@ -273,7 +275,7 @@ views/Extjs3/javascript/go/AuthenticationManager.js
 views/Extjs3/javascript/go/login/LanguageCombobox.js
 views/Extjs3/javascript/go/login/LoginDialog.js
 views/Extjs3/javascript/go/login/BaseLoginPanel.js
-views/Extjs3/javascript/go/login/ForgotPanel.js
+views/Extjs3/javascript/go/login/ForgotDialog.js
 views/Extjs3/javascript/go/login/UsernamePanel.js
 views/Extjs3/javascript/go/login/LoginPanel.js
 views/Extjs3/javascript/go/login/RecoveryDialog.js
@@ -300,8 +302,6 @@ views/Extjs3/javascript/go/String.js
 views/Extjs3/javascript/go/detail/ReadMore.js
 views/Extjs3/javascript/go/detail/AddButton.js
 
-views/Extjs3/javascript/go/acl/ShareWindow.js
-
 views/Extjs3/javascript/go/systemsettings/GeneralPanel.js
 views/Extjs3/javascript/go/systemsettings/AppearancePanel.js
 views/Extjs3/javascript/go/systemsettings/NotificationsPanel.js
@@ -314,4 +314,5 @@ views/Extjs3/javascript/go/Wizard.js
 views/Extjs3/javascript/go/Blob.js
 views/Extjs3/javascript/go/grid/TilePanel.js
 views/Extjs3/javascript/go/tree/TreeLoader.js
+
 

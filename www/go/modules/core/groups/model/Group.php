@@ -59,7 +59,7 @@ class Group extends AclEntity {
 	}
 
 	public static function filter(Query $query, array $filter) {
-		if (empty($filter['includeUsers'])) {
+		if (!empty($filter['hideUsers'])) {
 			$query->andWhere(['isUserGroupFor' => null]);
 		}
 		

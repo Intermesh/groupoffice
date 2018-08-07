@@ -65,7 +65,7 @@ abstract class AclEntity extends Entity {
 	 * @return int
 	 */
 	public function getPermissionLevel() {
-		return Acl::getPermissionLevel($this->aclId, App::get()->getAuthState()->getUserId());
+		return Acl::getUserPermissionLevel($this->aclId, App::get()->getAuthState()->getUserId());
 	}
 	
 	/**

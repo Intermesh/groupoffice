@@ -59,6 +59,8 @@ class ErrorHandler {
 		$errorString = $cls . " in " . $e->getFile() ." at line ". $e->getLine().': '.$e->getMessage();
 		error_log($errorString, 0);
 		
+//		echo $e->getTraceAsString();
+		
 		App::get()->debug($errorString);
 		foreach(explode("\n", $e->getTraceAsString()) as $line) {
 			App::get()->debug($line);

@@ -2,8 +2,7 @@
 
 namespace go\core\jmap;
 
-use go\core\orm\StateManager;
-use go\core\util\DateTime;
+use go\core\acl\model\Acl;
 
 /**
  * Entity model
@@ -15,6 +14,14 @@ use go\core\util\DateTime;
 abstract class Entity  extends \go\core\orm\Entity {	
 	
 	/**
+	 * Track changes in the core_change log for the JMAP protocol.
+	 * Disabled during install.
+	 * 
+	 * @var boolean 
+	 */
+	public static $trackChanges = true;
+	
+	/**
 	 * The Entity ID
 	 * 
 	 * @var int
@@ -24,10 +31,11 @@ abstract class Entity  extends \go\core\orm\Entity {
 	/**
 	 * Get the current state of this entity
 	 * 
-	 * @return int
+	 * @todo ACL state should be per entity and not global. eg. Notebook should return highest mod seq of acl's used by note books.
+	 * @return string
 	 */
 	public static function getState() {
-		return static::getType()->highestModSeq;
+		return static::getType()->highestModSeq . ':' . Acl::getType()->highestModSeq;
 	}
 
 	/**
@@ -44,8 +52,9 @@ abstract class Entity  extends \go\core\orm\Entity {
 			return false;
 		}
 		
-		$this->getType()->change($this);
-		
+		if(self::$trackChanges) {
+			$this->getType()->change($this);		
+		}
 		
 		return true;
 	}

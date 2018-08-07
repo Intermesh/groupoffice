@@ -167,7 +167,8 @@ $bg: (
   form:			color($grey, 50),
   background: color($grey, 50),
   hover:      rgba(black, 0.04),
-  pressed:	rgba(#999999, .4),
+  pressed:	rgba(black, .08),
+	selected:	rgba(black, .08),
   box:		  white,
   tbar:       white,
   card:       white,
@@ -220,8 +221,8 @@ $cSuccess:		color($green, 700);
 $cDanger:		color($red, 700);
 $cWarning:		color($orange, 700);
 
-$cSelected: color($bg, 'hover'); // click on menus, tree items, table
-$cHover: var(--c-primary-tp);
+$cSelected: color($bg, 'selected'); // click on menus, tree items, table
+$cHover: color($bg, 'hover');
 $cActive: color($grey, 200); // focussed
 $cAnchor: rgb(36, 58, 128);
 

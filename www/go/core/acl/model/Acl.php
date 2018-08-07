@@ -15,13 +15,13 @@ use go\core\util\DateTime;
  * 
  * Is an Access Control List to restrict access to data.
  */
-class Acl extends Property {
+class Acl extends \go\core\jmap\Entity {
 	
 	const LEVEL_READ = 10;
 	const LEVEL_CREATE = 20;
 	const LEVEL_WRITE = 30;
 	const LEVEL_DELETE = 40;
-	const LEVEL_MANAGE =50;
+	const LEVEL_MANAGE = 50;
 	
 	
 	public $id;
@@ -62,32 +62,116 @@ class Acl extends Property {
 	
 	protected function internalSave() {
 		
-		if($this->isNew() && empty($this->groups)) {			
+		if($this->isNew()) {
+			if(empty($this->groups)) {			
 			
-			$this->groups[] = (new AclGroup())
-						->setValues([
-								'groupId' => Group::ID_ADMINS, 
-								'level' => self::LEVEL_MANAGE
-										]);
-
-			
-			
-			if($this->ownedBy != User::ID_SUPER_ADMIN) {
-				
-				$groupId = Group::find()
-								->where(['isUserGroupFor' => $this->ownedBy])
-								->selectSingleValue('id')
-								->single();
-				
 				$this->groups[] = (new AclGroup())
-								->setValues([
-										'groupId' => $groupId, 
-										'level' => self::LEVEL_MANAGE
-												]);
+							->setValues([
+									'groupId' => Group::ID_ADMINS, 
+									'level' => self::LEVEL_MANAGE
+											]);
+
+				if($this->ownedBy != User::ID_SUPER_ADMIN) {
+
+					$groupId = Group::find()
+									->where(['isUserGroupFor' => $this->ownedBy])
+									->selectSingleValue('id')
+									->single();
+
+					$this->groups[] = (new AclGroup())
+									->setValues([
+											'groupId' => $groupId, 
+											'level' => self::LEVEL_MANAGE
+													]);
+				}
 			}
+		} else {
+			
+			//add admins if removed.
+			if($this->isModified(['groups']) && !$this->hasAdmins()) {
+				$this->groups[] = (new AclGroup())
+							->setValues([
+									'groupId' => Group::ID_ADMINS, 
+									'level' => self::LEVEL_MANAGE
+											]);
+			}
+		}
+	
+		
+		if(!$this->logChanges()) {
+			return false;
 		}
 		
 		return parent::internalSave();
+	}
+	
+	private function hasAdmins() {
+		foreach($this->groups as $group) {
+			if($group->groupId == Group::ID_ADMINS) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+	
+	private function logChanges() {
+		
+		if(!\go\core\jmap\Entity::$trackChanges) {
+			return true;
+		}
+		
+		$modified = $this->getModified(['groups']);
+		
+		if(!isset($modified['groups'])) {
+			return true;
+		}
+		
+		$currentGroupIds = array_column($modified['groups'][0], 'groupId');
+		$oldGroupIds = array_column($modified['groups'][1], 'groupId');
+		
+		$addedGroupIds = array_diff($currentGroupIds, $oldGroupIds);
+		$removedGroupIds = array_diff($oldGroupIds, $currentGroupIds);
+	
+		if(empty($addedGroupIds) && empty($removedGroupIds)) {
+			return true;
+		}
+		
+		$modSeq = Acl::getType()->nextModSeq();
+		
+		foreach($addedGroupIds as $groupId) {
+			$success = App::get()->getDbConnection()
+							->insert('core_acl_group_changes', 
+											[
+													'aclId' => $this->id, 
+													'groupId' => $groupId, 
+													'grantModSeq' => $modSeq,
+													'revokeModSeq' => null
+											]
+											)->execute();
+			if(!$success) {
+				return false;
+			}
+		}
+		
+		foreach ($removedGroupIds as $groupId) {
+			$success = App::get()->getDbConnection()
+						->update('core_acl_group_changes', 
+										[												
+											'revokeModSeq' => $modSeq											
+										],
+										[
+											'aclId' => $this->id, 
+											'groupId' => $groupId,
+											'revokeModSeq' => null
+										]
+										)->execute();
+			if(!$success) {
+				return false;
+			}
+		}
+		
+		return true;		
 	}
 	
 	/**
@@ -123,7 +207,7 @@ class Acl extends Property {
 	 * @param int $userId
 	 * @return int See the self::LEVEL_* constants
 	 */
-	public static function getPermissionLevel($aclId, $userId) {
+	public static function getUserPermissionLevel($aclId, $userId) {
 		
 		$cacheKey = $aclId . "-" . $userId;
 		if(!isset(self::$permissionLevelCache[$cacheKey])) {
@@ -146,10 +230,10 @@ class Acl extends Property {
 	 * Get all ACL id's that have been granted since a given state
 	 * 
 	 * @param int $userId 
-	 * @param int $state	 
+	 * @param int $sinceState	 
 	 * @return Query
 	 */
-	public static function findGrantedSince($userId, $state, Query $acls = null) {
+	public static function findGrantedSince($userId, $sinceState, Query $acls = null) {
 		
 		//select ag.aclId from core_acl_group ag 
 		//inner join core_user_group ug on ag.groupId = ug.groupId
@@ -163,18 +247,18 @@ class Acl extends Property {
 		//)
 
 		
-		return self::getCurrentAclGroups($userId, $acls)
-						->andWhere('ag.aclId', 'NOT IN', self::getOldAclGroups($userId, $state, $acls));		
+		return self::areGranted($userId, $acls)
+						->andWhere('ag.aclId', 'NOT IN', self::wereGranted($userId, $sinceState, $acls));		
 	}
 	
 	/**
 	 * Get all ACL id's that have been revoked since a given state
 	 * 
 	 * @param int $userId
-	 * @param int $state
+	 * @param int $sinceState
 	 * @return Query
 	 */
-	public static function findRevokedSince($userId, $state, Query $acls = null) {
+	public static function findRevokedSince($userId, $sinceState, Query $acls = null) {
 		
 		//select agc.aclId from core_acl_group_changes agc 
 		//inner join core_user_group ugc on agc.groupId = ugc.groupId
@@ -186,17 +270,18 @@ class Acl extends Property {
 		//	where ug.userId = 4
 		//)
 		
-		return self::getOldAclGroups($userId, $state, $acls)
-						->andWhere('agc.aclId', 'NOT IN', self::getCurrentAclGroups($userId, $acls));		
+		return self::wereGranted($userId, $sinceState, $acls)
+						->andWhere('agc.aclId', 'NOT IN', self::areGranted($userId, $acls));		
 	}
 	
-	 
+
+	
 	/**
 	 * 
 	 * @param int $userId
 	 * @return Query
 	 */
-	private static function getCurrentAclGroups($userId, Query $acls = null) {
+	public static function areGranted($userId, Query $acls = null) {
 		$query = (new Query())
 						->selectSingleValue('ag.aclId')
 						->from('core_acl_group', 'ag')
@@ -210,17 +295,17 @@ class Acl extends Property {
 		return $query;
 	}
 	
-	private static function getOldAclGroups($userId, $state, Query $acls = null) {
+	public static function wereGranted($userId, $sinceState, Query $acls = null) {
 		$query = (new Query())
 						->selectSingleValue('agc.aclId')
 						->from('core_acl_group_changes', 'agc')
 						->join('core_user_group', 'ugc', 'agc.groupId = ugc.groupId')
 						->where('ugc.userId', '=', $userId)
-						->andWhere('agc.grantModSeq', '<', $state)
+						->andWhere('agc.grantModSeq', '<=', $sinceState)
 						->andWhere(
 										(new Criteria())
 										->where('agc.revokeModSeq', 'IS', NULL)
-										->orWhere('agc.revokeModSeq', '>', $state)
+										->orWhere('agc.revokeModSeq', '>', $sinceState)
 										);
 		
 		if(isset($acls)) {
@@ -228,5 +313,5 @@ class Acl extends Property {
 		}
 		
 		return $query;
-	}
+	}	
 }

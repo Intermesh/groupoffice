@@ -77,7 +77,13 @@ go.Jmap = {
 		go.Blob.upload(file,cfg);
 	},
 	
-	
+	/**
+	 * Initializes Server Sent Events via EventSource. This function is called in MainLayout.onAuthenticated()
+	 * 
+	 * Note: disable this if you want to use xdebug because it will crash if you use SSE.
+	 * 
+	 * @returns {Boolean}
+	 */
 	sse : function() {
 		if (!window.EventSource) {
 			return false;
@@ -132,7 +138,7 @@ go.Jmap = {
 		if (me.timeout) {
 			clearTimeout(me.timeout);
 		}
-
+		
 		var clientCallId = "clientCallId-" + this.nextCallId();
 
 		this.requests.push([options.method, options.params || {}, clientCallId]);

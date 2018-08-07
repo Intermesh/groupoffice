@@ -573,7 +573,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				this.welcome();
 				
 				
-//				go.Jmap.sse();
+				go.Jmap.sse();
 
 
 			}, this);

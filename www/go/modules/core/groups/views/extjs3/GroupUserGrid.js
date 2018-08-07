@@ -13,7 +13,9 @@
  */
 
 go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
-	
+	/**
+	 * The form field name
+	 */
 	name: "users",
 	
 	initComponent: function () {

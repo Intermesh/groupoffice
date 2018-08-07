@@ -31,6 +31,11 @@ class EntityType {
 	private $moduleId;	
   private $clientName;
 	
+	/**
+	 * The highest mod sequence used for JMAP data sync
+	 * 
+	 * @var int
+	 */
 	public $highestModSeq;
 	
 	/**
@@ -220,24 +225,28 @@ class EntityType {
 	
 	protected $changed = [];
 	
+	/**
+	 * Register a change of an entity. When the application ends these changes will be saved in the "core_change" log table.
+	 * 
+	 * @param Entity $entity
+	 */
 	public function change(Entity $entity) {
 		$this->changed[] = $entity;		
 	}
 	
 	/**
-	 * Get the next state
+	 * Get the modification sequence
+	 * 
 	 * @param string $entityClass
 	 * @return int
 	 */
-	private function nextModSeq() {
+	public function nextModSeq() {
 		/*
 		 * START TRANSACTION
 		 * SELECT counter_field FROM child_codes FOR UPDATE;
 		  UPDATE child_codes SET counter_field = counter_field + 1;
 		 * COMMIT
 		 */
-
-
 		$query = (new Query())
 						->selectSingleValue("highestModSeq")
 						->from("core_entity")
@@ -256,9 +265,9 @@ class EntityType {
 		return $modSeq;
 	}	
 	
-	public function __destruct() {	
-		
-		
+	
+	
+	private function logChanges() {
 		if(!empty($this->changed)) {
 			
 			$this->highestModSeq = $this->nextModSeq();
@@ -272,14 +281,14 @@ class EntityType {
 						'destroyed' => $change->isDeleted(),
 						'createdAt' => new DateTime()
 								];
-				
 
-				GO()->getDbConnection()->replace('core_change', $record)->execute();
-			}
-			
+				if(!GO()->getDbConnection()->insert('core_change', $record)->execute()) {
+					throw new \Exception("Could not save change");
+				}
+			}			
 		}
 	}
-	
-	
-
+	public function __destruct() {		
+		$this->logChanges();
+	}
 }

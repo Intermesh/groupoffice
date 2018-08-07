@@ -234,3 +234,29 @@ $updates['201807271339'][] = "ALTER TABLE `core_change`
 $updates['201807271339'][] = "ALTER TABLE `core_change`
   ADD CONSTRAINT `core_change_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_change_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE;";
+
+
+
+$updates['201807271339'][] = "update `core_entity` set highestModSeq=0 where highestModSeq is null;";
+$updates['201807271339'][] = "ALTER TABLE `core_entity` CHANGE `highestModSeq` `highestModSeq` INT(11) NOT NULL DEFAULT '0';";
+
+$updates['201807271339'][] = "truncate table core_change;";
+
+$updates['201807271339'][] = "DROP TABLE IF EXISTS `core_acl_group_changes`;";
+$updates['201807271339'][] = "CREATE TABLE IF NOT EXISTS `core_acl_group_changes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `aclId` int(11) NOT NULL,
+  `groupId` int(11) NOT NULL,
+  `grantModSeq` int(11) NOT NULL,
+  `revokeModSeq` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `aclId` (`aclId`,`groupId`),
+  KEY `group` (`groupId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+
+$updates['201807271339'][] = "ALTER TABLE `core_acl_group_changes`
+  ADD CONSTRAINT `all` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `group` FOREIGN KEY (`groupId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE;";
+
+$updates['201807271339'][] = "insert into core_acl_group_changes select null, aclId, groupId, (select highestModSeq from core_entity where name='Acl'), null from core_acl_group;";

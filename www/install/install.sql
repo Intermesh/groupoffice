@@ -22,13 +22,7 @@ CREATE TABLE `core_acl_group` (
   `level` tinyint(4) NOT NULL DEFAULT '10'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-DROP TABLE IF EXISTS `core_acl_group_changes`;
-CREATE TABLE `core_acl_group_changes` (
-  `aclId` int(11) NOT NULL,
-  `groupId` int(11) NOT NULL,
-  `grantModSeq` int(11) NOT NULL,
-  `revokeModSeq` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 DROP TABLE IF EXISTS `core_auth_method`;
 CREATE TABLE `core_auth_method` (
@@ -97,7 +91,7 @@ CREATE TABLE `core_entity` (
   `moduleId` int(11) DEFAULT NULL,
   `name` varchar(190) NOT NULL,
   `clientName` varchar(190) DEFAULT NULL,
-  `highestModSeq` INT NULL DEFAULT NULL
+  `highestModSeq` INT NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -438,10 +432,6 @@ ALTER TABLE `core_acl_group`
   ADD KEY `level` (`level`),
   ADD KEY `groupId` (`groupId`);
 
-ALTER TABLE `core_acl_group_changes`
-  ADD PRIMARY KEY (`aclId`,`groupId`),
-  ADD KEY `groupId` (`groupId`);
-
 ALTER TABLE `core_auth_method`
   ADD PRIMARY KEY (`id`);
 
@@ -614,9 +604,6 @@ ALTER TABLE `core_acl_group`
   ADD CONSTRAINT `core_acl_group_ibfk_1` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_acl_group_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE;
 
-ALTER TABLE `core_acl_group_changes`
-  ADD CONSTRAINT `core_acl_group_changes_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `core_acl_group_changes_ibfk_2` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `core_customfields_field`
   ADD CONSTRAINT `core_customfields_field_ibfk_1` FOREIGN KEY (`fieldSetId`) REFERENCES `core_customfields_field_set` (`id`) ON DELETE CASCADE;
@@ -722,6 +709,23 @@ ALTER TABLE `core_change`
 ALTER TABLE `core_change`
   ADD CONSTRAINT `core_change_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_change_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE;
+
+
+CREATE TABLE `core_acl_group_changes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `aclId` int(11) NOT NULL,
+  `groupId` int(11) NOT NULL,
+  `grantModSeq` int(11) NOT NULL,
+  `revokeModSeq` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `aclId` (`aclId`,`groupId`),
+  KEY `group` (`groupId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+ALTER TABLE `core_acl_group_changes`
+  ADD CONSTRAINT `all` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `group` FOREIGN KEY (`groupId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE;
 CREATE TABLE `core_blob_metadata` (
   `blobId` BINARY(40) NOT NULL,
   `title` VARCHAR(128) NULL,

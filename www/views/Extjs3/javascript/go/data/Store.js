@@ -185,7 +185,7 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	},
 	
 	onUpdate : function(store, record, operation) {
-		
+		//debugger;
 		if(this.serverUpdate) {
 			return;
 		}

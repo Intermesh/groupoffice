@@ -2,13 +2,24 @@
 
 namespace go\core {
 
-	use go\core\cache\CacheInterface;
-	use go\core\cache\Disk;
-	use go\core\db\Connection;
-	use go\core\db\Database;
-	use go\core\mail\Mailer;
-	use go\core\fs\Folder;
-	use go\core\jmap\State;
+use Exception;
+use GO;
+use GO\Base\Observable;
+use go\core\auth\State as AuthState;
+use go\core\cache\CacheInterface;
+use go\core\cache\Disk;
+use go\core\db\Connection;
+use go\core\db\Database;
+use go\core\db\Query;
+use go\core\db\Table;
+use go\core\event\Listeners;
+use go\core\exception\ConfigurationException;
+use go\core\fs\Folder;
+use go\core\jmap\State;
+use go\core\mail\Mailer;
+use go\core\webclient\Extjs3;
+use go\modules\core\core\model\Settings;
+use const GO_CONFIG_FILE;
 
 	/**
 	 * Application class.
@@ -168,7 +179,7 @@ namespace go\core {
 			
 			$configFile = $this->findConfigFile();
 			if(!$configFile) {
-				throw new \Exception("No config.php was found. Possible locations: \n\n".
+				throw new Exception("No config.php was found. Possible locations: \n\n".
 								'/etc/groupoffice/multi_instance/' . explode(':', $_SERVER['HTTP_HOST'])[0] . "/config.php\n\n".
 								dirname(dirname(__DIR__)) . "/config.php\n\n".
 								"/etc/groupoffice/config.php"
@@ -178,7 +189,7 @@ namespace go\core {
 			require($configFile);	
 			
 			if(!isset($config)) {
-				throw new exception\ConfigurationException();
+				throw new ConfigurationException();
 			}
 			
 			$this->config = [
@@ -283,16 +294,16 @@ namespace go\core {
 				$this->rebuildCacheOnDestruct = $onDestruct;
 			}
 			
-			\GO::clearCache(); //legacy
+			GO::clearCache(); //legacy
 			
 			GO()->getCache()->flush(false);
-			db\Table::destroyInstances();
+			Table::destroyInstances();
 	
-			$webclient = new \go\core\webclient\Extjs3();
+			$webclient = new Extjs3();
 			$webclient->flushCache();
 
-			\GO\Base\Observable::cacheListeners();
-			\go\core\event\Listeners::get()->init();
+			Observable::cacheListeners();
+			Listeners::get()->init();
 		}
 		
 		public function __destruct() {
@@ -332,10 +343,10 @@ namespace go\core {
 		/**
 		 * Set the authentication state
 		 * 
-		 * @param \go\core\auth\State $authState
+		 * @param AuthState $authState
 		 * @return $this
 		 */
-		public function setAuthState(auth\State $authState) {
+		public function setAuthState(AuthState $authState) {
 			$this->authState = $authState;
 			
 			return $this;
@@ -350,25 +361,18 @@ namespace go\core {
 			return $this->authState;
 		}
 
-//		/**
-//		 * Get the authenticated user
-//		 * 
-//		 * @return auth\model\User
-//		 */
-//		public function getUser() {
-//			if ($this->getAuthState() instanceof \go\core\auth\State) {
-//				return $this->authState->getUser();
-//			}
-//			return null;
-//		}
-		
 		/**
-		 * Get the authenticated user
+		 * Get the authenticated user ID
 		 * 
-		 * @return auth\model\User
+		 * If you need to get the full user use:
+		 * 
+		 * ```
+		 * GO()->getAuthState()->getUser();
+		 * ```
+		 * @return int
 		 */
 		public function getUserId() {
-			if ($this->getAuthState() instanceof \go\core\auth\State) {
+			if ($this->getAuthState() instanceof AuthState) {
 				return $this->authState->getUserId();
 			}
 			return null;
@@ -380,7 +384,7 @@ namespace go\core {
 		 * @return AppSettings
 		 */
 		public function getSettings() {
-			return \go\modules\core\core\model\Settings::get();
+			return Settings::get();
 		}
 
 		/**
@@ -394,6 +398,19 @@ namespace go\core {
 			return Language::get()->t($str, $package, $module);
 		}
 
+		/**
+		 * Find the config.php file location.
+		 * 
+		 * It will search for:
+		 * 
+		 * - 'GO_CONFIG_FILE' constant or environment variable ($_SERVER['GO_CONFIG_FILE']).
+		 * - /etc/groupoffice/multi_instance/<HOSTNAME>/config.php
+		 * - <GROUPOFFICEDIR>/config.php
+		 * - /etc/groupoffice/config.php
+		 * 
+		 * @param string $name
+		 * @return boolean|string
+		 */
 		public static function findConfigFile($name = 'config.php') {
 			
 			if(defined("GO_CONFIG_FILE")) {
@@ -423,9 +440,20 @@ namespace go\core {
 			}
 			return false;
 		}
-
+		
+		/**
+		 * Resets all entity state so all clients must resync data.
+		 * 
+		 * @todo resync per entity
+		 */
+		public function resetSyncState() {		
+			//reset all mod seqs
+			GO()->getDbConnection()->update('core_entity', ['highestModSeq' => 0])->execute();
+			GO()->getDatabase()->getTable('core_change')->truncate();
+			GO()->getDatabase()->getTable('core_acl_group_changes')->truncate();
+			GO()->getDbConnection()->insert('core_acl_group_changes', (new Query())->select("null, aclId, groupId, '0', null")->from("core_acl_group"))->execute();
+		}
 	}
-
 }
 
 namespace {

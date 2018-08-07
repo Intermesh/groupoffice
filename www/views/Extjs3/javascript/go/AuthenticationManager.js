@@ -116,15 +116,7 @@
 			});
 		},
 
-		forgotPassword: function (email, callback, scope) {
-			Ext.Ajax.request({
-				url: BaseHref + 'auth.php',
-				jsonData: {forgot: true, email: email},
-				callback: function (options, success, response) {
-					callback.call(scope || this, this, success);
-				}
-			});
-		},
+		
 		
 		logout: function (first) {
 

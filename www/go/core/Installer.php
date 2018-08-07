@@ -41,6 +41,8 @@ class Installer {
 		
 		$this->isInProgress = true;
 		
+		jmap\Entity::$trackChanges = false;
+		
 		$database = App::get()->getDatabase();
 		
 		if (count($database->getTables())) {

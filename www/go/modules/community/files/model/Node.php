@@ -117,21 +117,30 @@ class Node extends model\AclEntity {
 	}
 	
 	/**
-	 * Set this folder as internalShared
+	 * Set this as Shared If the node is an folder, set recursive
 	 * 
 	 * @param boolean $val
 	 */
-	public function setInternalShared($val){
+	public function setShared($val){
 		
 	}
 	
 	/**
-	 * Getter for internalShared property (Needed because we needed to have a setter function
+	 * Getter for isShared property
 	 * 
 	 * @return boolean
 	 */
-	public function getInternalShared(){
+	public function getIsShared(){
 		return $this->aclId != $this->parentAclId;
+	}
+	
+	/**
+	 * Getter for published property 
+	 * 
+	 * @return boolean
+	 */
+	public function getIsPublished(){
+		return !empty($this->token);
 	}
 	
 	protected function internalValidate() {
@@ -142,15 +151,6 @@ class Node extends model\AclEntity {
 			}
 		}
 		return parent::internalValidate();
-	}
-	
-	/**
-	 * Getter for externalShared property 
-	 * 
-	 * @return boolean
-	 */
-	public function getExternalShared(){
-		return !empty($this->token);
 	}
 	
 	public function getContentType() {

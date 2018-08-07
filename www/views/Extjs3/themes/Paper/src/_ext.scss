@@ -245,7 +245,7 @@ ul.x-tab-strip-bottom{
 	> div {
 		padding: 0;
 		background-color:inherit;
-		position:absolute;
+/*		position:absolute;
 		top:0;
 		left:0;
 		width:100% !important; //offsets override extjs
@@ -267,7 +267,7 @@ ul.x-tab-strip-bottom{
 					  opacity:0;
 					  visibility:hidden;
 			}
-		}
+		}*/
 	}
 }
 
@@ -445,7 +445,8 @@ ul.x-tab-strip-bottom{
 	}
 	&-item {
 		margin-bottom:dp(4);
-		@extend %font-caption;
+		//Following line made grid in forms appear in disabled like text
+		/*@extend %font-caption;*/
 	}
 
 	&-invalid-icon:before {
@@ -665,9 +666,14 @@ ul.x-tab-strip-bottom{
 	&.raised {
 		@extend .z2;
 		@include var(background-color, c-primary);
-		color:white;
+		button.x-btn-text {
+			color:white;
+		}
 		&.x-btn-focus, &.x-btn-over {
 			@extend .z4;
+			button.x-btn-text {
+				color: $cPrimary;
+			}
 		}
 		&.x-btn-pressed {
 			@extend .z8;
@@ -1118,14 +1124,15 @@ ul.x-tab-strip-bottom{
 	&-row {
 		border:0;
 		border-bottom:1px solid color($fg, 'divider');
+		&-over {
+			background-color:$cHover;
+		}
 		&-selected {
 			background-color: $cSelected;
 			border-bottom-color: transparent;
 			background-image: none;
 		}
-		&-over {
-			background-color:$cHover;
-		}
+		
 		&-alt{ // for strips
 			background-color:$cHover;
 		}		
@@ -2059,7 +2066,6 @@ $menuScrollerSize : dp(4);
 		@extend %font-caption;
 	}
 	.x-combo-selected {
-		border:0 !important;
 		background-color: color($grey, 100);
 	}
 	.x-toolbar {
@@ -2220,50 +2226,26 @@ $menuScrollerSize : dp(4);
 		padding: dp(8);
 	}
 	&-header {
-			@extend %font-title;
-			background-color:color($bg,'app-bar');
-			border-radius: $borderRadius;
-			
-			&-text {
-				display:inline-block;
-				height: dp(16);
-				line-height: dp(16);
-				margin: dp(20) 0;
-			}
-		}
-	&-br { // bottom-right
-		padding-right: 0;
-	}
-	&-bl { // bottom-right
-		padding-left: 0;
-	}
-	&-mr { //middle-right
-		padding-right: 0;
-	}
-	&-ml { //middle-right
-		padding-left: 0;
-	}
-	&-tr {
-		padding-right: 0;
-	}
-	&-tl {
-		padding-left: 0;
-		.x-window-header { // ext...
-			padding: 0 dp(8) 0 dp(16);
+		@extend %font-title;
+		background-color:color($bg,'app-bar');
+		border-radius: $borderRadius;
+		padding: 0 dp(8) 0 dp(16);
+		&-text {
+			display:inline-block;
+			height: dp(16);
+			line-height: dp(16);
+			margin: dp(20) 0;
 		}
 	}
 	&-mc {
 		@extend %font-body1;
-		border:0;
 	}
 	&-proxy { // ghost when animating
 		@extend .z24;
 		border-radius: $borderRadius;
 		background-color:white;
-		border:0;
 	}
 	&-bbar .x-toolbar {
-		
 		border-top-color: color($fg, 'divider');;
 	}
 	&-maximized .x-window-tc {
@@ -2302,6 +2284,7 @@ body.x-body-masked .x-window-plain .x-window-mc {
 }
 .x-html-editor-tb .x-btn-text {
 	background-image: none; //url(wysiwyg.gif);
+	color: color($fg, 'secondary-text');
 }
 
 // ##############
