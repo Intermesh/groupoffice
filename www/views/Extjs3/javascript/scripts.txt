@@ -314,5 +314,6 @@ views/Extjs3/javascript/go/Wizard.js
 views/Extjs3/javascript/go/Blob.js
 views/Extjs3/javascript/go/grid/TilePanel.js
 views/Extjs3/javascript/go/tree/TreeLoader.js
+views/Extjs3/javascript/go/form/Switch.js
 
 
