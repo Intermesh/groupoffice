@@ -27,28 +27,28 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	},
 	
 	restoreState : function() {
-		if(!window.localStorage.entityStores) {
-			window.localStorage.entityStores = {};
-		}
-		
-		var json = window.localStorage["entityStore-" + this.entity.name];		
-		if(json) {
-			var state = JSON.parse(json);			
-			this.data = state.data;
-			this.state = state.state;			
-		}
+//		if(!window.localStorage.entityStores) {
+//			window.localStorage.entityStores = {};
+//		}
+//		
+//		var json = window.localStorage["entityStore-" + this.entity.name];		
+//		if(json) {
+//			var state = JSON.parse(json);			
+//			this.data = state.data;
+//			this.state = state.state;			
+//		}
 	},
 	
 	saveState : function() {
-		var state = JSON.stringify({
-			state: this.state,
-			data: this.data
-		});
-		
-		if(!window.localStorage.entityStores) {
-			window.localStorage.entityStores = {};
-		}		
-		window.localStorage["entityStore-" + this.entity.name] = state;		
+//		var state = JSON.stringify({
+//			state: this.state,
+//			data: this.data
+//		});
+//		
+//		if(!window.localStorage.entityStores) {
+//			window.localStorage.entityStores = {};
+//		}		
+//		window.localStorage["entityStore-" + this.entity.name] = state;		
 	},
 	
 	
@@ -175,7 +175,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	 * Get entities
 	 * 
 	 * @param {array} ids
-	 * @param {function} cb
+	 * @param {function} cb called with "entitiies[]" and boolean "async"
 	 * @param {object} scope
 	 * @returns {array|boolean} entities or false is data needs to be loaded from server
 	 */
@@ -215,7 +215,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 						return;
 					}
 					this.state = response.state;				
-					this.get(ids, cb, scope);					
+					this.get(ids, cb, scope, true); //passed hidden 4th argument to pass to the callback to track that it was asynchronously called					
 				},
 				scope: this
 			});
@@ -223,7 +223,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		} 
 		
 		if(cb) {		
-			cb.call(scope || this, entities);			
+			cb.call(scope || this, entities, arguments[3]);			
 		}
 		return entities;
 	},

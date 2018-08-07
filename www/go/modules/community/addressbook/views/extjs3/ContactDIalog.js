@@ -8,8 +8,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 	initFormItems: function () {
 
 		var items = [{
-				xtype: 'fieldset',
-				title: t("General"),				
+				xtype: 'fieldset',			
 				layout: "hbox",
 				items: [
 					{

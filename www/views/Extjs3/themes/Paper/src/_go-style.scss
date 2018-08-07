@@ -533,11 +533,17 @@ button {
 
 .user {
 	position: relative;
-	padding-left: dp(48);
+	padding-left: dp(56);
 	min-height: dp(40);
 	
 	.wrap {
 		padding-top: dp(3);
+		&.single {
+			padding-top: dp(10);
+		}
+		> * {
+			display:block;
+		}
 	}
 	.avatar {
 		position: absolute;
@@ -548,9 +554,9 @@ button {
 		vertical-align: middle;
 	}
 	
-	.username, .displayName {
+/*	.username, .displayName {
 		display:block;
-	}
+	}*/
 }
 
 #user-menu {
