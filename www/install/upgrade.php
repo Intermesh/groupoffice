@@ -288,10 +288,17 @@ try {
 					if(!$module->save()) {
 						throw new \Exception("Failed to save module");
 					}
+					
 				}
 
 			}
 			
+		}
+		
+		foreach ($modules as $module) {
+			if(isset($module->package) && $module->isAvailable()) {
+				$module->module()->registerEntities();
+			}
 		}
 
 		return !$aModuleWasUpgradedToNewBackend;

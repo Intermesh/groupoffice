@@ -2,3 +2,6 @@ module.js
 MainPanel.js
 ContactGrid.js
 ContactDialog.js
+ContactDetail.js
+TreeLoader.js
+AddressBookTree.js

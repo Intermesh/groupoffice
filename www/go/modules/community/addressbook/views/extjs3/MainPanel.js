@@ -1,13 +1,32 @@
 go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
-	
+
 	layout: "responsive",
-	
-	addAddressBookId : 1,
+
+	addAddressBookId: 1,
 
 	initComponent: function () {
 
+		this.addressBookTree = new go.modules.community.addressbook.AddressBookTree({
+			tbar: [{
+					xtype: "tbtitle",
+					text: t("Address books")
+				}, '->', {
+					iconCls: 'ic-add'
+				}]
+		});
+
+		this.filterPanel = new Ext.Panel({
+			width: dp(300),
+			region: "west",
+			split: true,
+			items: [
+				this.addressBookTree
+			]
+		});
+
 		this.grid = new go.modules.community.addressbook.ContactGrid({
 			region: 'center',
+			width: dp(500),
 			tbar: [
 				{
 					cls: 'go-narrow',
@@ -58,8 +77,29 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 				scope: this
 			}
 		});
-		
-		this.items = [this.grid];
+
+		this.grid.getSelectionModel().on('rowselect', function (sm, rowIndex, record) {
+			go.Router.goto("contact/" + record.id);
+		}, this);
+
+		this.contactDetail = new go.modules.community.addressbook.ContactDetail({
+			region: "center"
+		});
+
+		this.westPanel = new Ext.Panel({
+			region: "west",
+			layout: "responsive",
+			//stateId: "go-addressbook-west",
+			split: true,
+			width: dp(700),
+			narrowWidth: dp(400), //this will only work for panels inside another panel with layout=responsive. Not ideal but at the moment the only way I could make it work
+			items: [
+				this.grid, //first is default in narrow mode
+				this.filterPanel
+			]
+		});
+
+		this.items = [this.westPanel, this.contactDetail];
 
 		go.modules.community.addressbook.MainPanel.superclass.initComponent.call(this);
 	}

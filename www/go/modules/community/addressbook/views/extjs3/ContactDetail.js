@@ -1,8 +1,6 @@
 go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView, {
-	entityStore: go.Stores.get("Note"),
-	stateId: 'no-notes-detail',
-
-	//model_name: "go\\modules\\community\\notes\\model\\Note", //only for backwards compatibility with older panels.
+	entityStore: go.Stores.get("Contact"),
+	stateId: 'addressbook-contact-detai;',
 
 	initComponent: function () {
 
@@ -13,7 +11,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 			items: [{
 					xtype: 'readmore',
 					onLoad: function (detailView) {
-						this.setText("<h3>" + detailView.data.name + "</h3>" + detailView.data.content);
+						this.setText("<h3>" + detailView.data.name + "</h3>");
 					}
 				}
 			]
@@ -22,7 +20,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 
 		go.modules.community.addressbook.ContactDetail.superclass.initComponent.call(this);
 
-		go.CustomFields.addDetailPanels(this);
+		//go.CustomFields.addDetailPanels(this);
 
 		this.add(new go.links.LinksDetailPanel());
 
@@ -35,32 +33,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 		}
 	},
 
-	decrypt: function () {
-
-		if (!this.data.content || this.data.content.substring(0, 9) != "{GOCRYPT}") {
-			return;
-		}
-		var key = prompt("Enter password to decrypt");
-		var msg = window.atob(this.data.content.substring(9));
-
-		var iv = (msg.substring(0, 32));			 // extract iv
-		var body = (msg.substring(32, msg.length - 32));	 //extract ciphertext
-		var serialized = mcrypt.Decrypt(body, iv, key, "rijndael-256", "ctr");
-		console.log(serialized);
-		//result should be a serialized sting by PHP
-		var match = serialized.match(/.*"([\s\S]*)"/);
-		if (!match) {
-			alert("Incorrect password!");
-			//this.data.content = "Encrypted text";
-			return;
-		}
-
-		this.data.content = Ext.util.Format.nl2br(match[1]);
-	},
-
 	onLoad: function () {
-
-		this.decrypt();
 
 		this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < GO.permissionLevels.write);
 
