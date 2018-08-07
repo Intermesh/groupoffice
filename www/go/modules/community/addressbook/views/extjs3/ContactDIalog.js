@@ -9,40 +9,112 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 
 		var items = [{
 				xtype: 'fieldset',
+				title: t("General"),				
+				layout: "hbox",
+				items: [
+					{
+						flex: 1,
+						layout: "form",
+						items: [
+							{
+								xtype: "switch",
+								boxLabel: t("This is an organization"),
+								name: "isOrganization",
+								hideLabel: true,
+								listeners: {
+									check: function (sw, checked) {
+										this.setOrganization(checked);
+									},
+									scope: this
+								}
+							},
+							{
+								xtype: "hidden",
+								name: "addressBookId"
+							},
+
+							this.nameField = new Ext.form.TextField({
+								xtype: 'textfield',
+								name: 'name',
+								fieldLabel: t("Name"),
+								anchor: '-' + dp(28), //for delete button of gridfields
+								allowBlank: false,
+								hidden: true
+							})
+							,this.contactNameField = new Ext.form.CompositeField({
+								xtype: 'compositefield',
+								
+								fieldLabel: t("Name"),
+								anchor: '-' + dp(28), //for delete button of gridfields
+								allowBlank: false,
+								items: [{
+									xtype: 'textfield',
+									name: 'firstName',
+									emptyText: t("First name"),
+									flex: 2,									
+									listeners: {
+										change: this.buildFullName,
+										scope: this
+									}
+								},{
+									xtype: 'textfield',
+									name: 'middleName',
+									emptyText: t("Middle name"),
+									flex: 1,									
+									listeners: {
+										change: this.buildFullName,
+										scope: this
+									}
+								},{
+									xtype: 'textfield',
+									name: 'lastName',
+									emptyText: t("Last name"),
+									flex: 2,									
+									listeners: {
+										change: this.buildFullName,
+										scope: this
+									}
+								}]
+							}),
+						]
+					},
+					{
+						width: dp(120),
+						
+						layout: "form",
+						items: [
+							this.avatarComp = new go.form.FileField({
+								hideLabel: true,
+								buttonOnly: true,
+								name: 'photoBlobId',
+								height: dp(120),
+								cls: "avatar",
+								autoUpload: true,
+								buttonCfg: {
+									text: '',
+									width: dp(120)
+								},
+								setValue: function (val) {
+									if (this.rendered && !Ext.isEmpty(val)) {
+										this.wrap.setStyle('background-image', 'url(' + go.Jmap.downloadUrl(val) + ')');
+									}
+									go.form.FileField.prototype.setValue.call(this, val);
+								},
+								accept: 'image/*'
+							}),
+						]
+					}
+					//new go.modules.community.addressbook.ContactBookCombo(),
+
+				]
+			},
+
+			{
+				xtype: 'fieldset',
+				title: t("Communication"),
 				autoHeight: true,
 				items: [
-					//new go.modules.community.addressbook.ContactBookCombo(),
 					{
-						xtype: "hidden",
-						name: "addressBookId"
-					},
-					
-					this.avatarComp = new go.form.FileField({
-							buttonOnly: true,
-							name: 'photoBlobId',
-							height:120,
-							cls: "avatar",
-							autoUpload: true,
-							buttonCfg: {
-								text: '',
-								width: 120
-							},
-							setValue: function(val) {
-								if(this.rendered && !Ext.isEmpty(val)) {
-									this.wrap.setStyle('background-image', 'url('+go.Jmap.downloadUrl(val)+')');
-								}
-								go.form.FileField.prototype.setValue.call(this,val);
-							},
-							accept: 'image/*'
-						}),
-					
-					{
-						xtype: 'textfield',
-						name: 'name',
-						fieldLabel: t("Name"),
-						anchor: '-' + dp(28), //for delete button of gridfields
-						allowBlank: false
-					}, {
 						xtype: "gridfield",
 						name: "emailAddresses",
 						store: new Ext.data.JsonStore({
@@ -90,8 +162,8 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 							}
 						]
 					}
-					
-					,{
+
+					, {
 						xtype: "gridfield",
 						name: "phoneNumbers",
 						store: new Ext.data.JsonStore({
@@ -138,12 +210,35 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 							}
 						]
 					}
-				
-				
+
+
 				]
 			}
 		];//.concat(go.CustomFields.getFormFieldSets("Contact"));
 
 		return items;
+	},
+
+	setOrganization: function (isOrganization) {
+		this.contactNameField.setVisible(!isOrganization);
+		this.nameField.setVisible(isOrganization);
+	},
+	
+	buildFullName : function() {
+		var f = this.formPanel.getForm(), name = f.findField('firstName').getValue(),
+			m = f.findField('middleName').getValue(),
+			l = f.findField('lastName').getValue();
+			
+		if(m) {
+			name += " " + m;
+		}
+		
+		if(l) {
+			name += " " + l;
+		}
+		console.log(name);
+		
+		this.nameField.setValue(name);
+		
 	}
 });

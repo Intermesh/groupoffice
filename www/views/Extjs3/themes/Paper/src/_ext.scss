@@ -412,13 +412,13 @@ ul.x-tab-strip-bottom{
 	&-checkbox {
 		position:absolute;
 		opacity: 0;
-		+ label::before {
+		+ .x-form-cb-label::before {
 			@extend %checkbox;
 		}
-		&:checked + label::before {
+		&:checked + .x-form-cb-label::before {
 			content: 'check_box';
 		}
-		&:focus + label::before {
+		&:focus + .x-form-cb-label::before {
 			@include var(background-color, c-primary-tp);
 		}
 	}
@@ -2529,4 +2529,90 @@ input[value="0"] + .x-slider .x-slider-thumb {
 
 .x-window-dlg .ext-mb-error {
 	background-image:url(../images/default/window/icon-error.gif);
+}
+
+// EXTENSION
+
+.x-switch {
+	position: relative;
+	min-height: dp(24);
+	padding-left: dp(4);
+	> .thumb {
+		position: absolute;
+		pointer-events: none;
+		transition: transform linear .06s, background-color linear .08s;
+		height: dp(24);
+		width: dp(24);
+		top: dp(-2);
+		left: dp(0);
+		&::after { // nop
+			@extend .z2;
+			content: '';
+			position:absolute;
+			top:0;
+			height: dp(24);
+			width: dp(24);
+			background-color: color($grey, 50);
+			z-index:1;
+			border-radius: 50%;
+		}
+		&::before { // shade
+			content: "";
+			position:absolute;
+			top: dp(-8);
+			left: dp(-8);
+			bottom: dp(-8);
+			right: dp(-8);
+			background-color: transparent;
+			border-radius: 50%;
+		}
+	}
+	> .track {
+		background-color: color($fg, 'disabled');
+		position:absolute;
+		height: dp(16);
+		top:dp(3); // track in middle of label lineheight
+		width: dp(40);
+		border-radius: dp(8);
+		pointer-events: none;
+		transition: background-color linear .08s;
+	}
+	> input {
+		width: dp(40);
+		height: dp(24);
+		opacity:0;
+		&:checked {
+			~ .thumb {
+				transform: translate(dp(24), 0);
+				&::after { @include var(background-color, c-primary);}
+				&::before {@include var(border-color, c-primary);}
+			}
+			~ .track {
+				@include var(background-color, c-primary-tp);
+			}
+		}
+		&:focus {
+			~ .thumb::before {
+				background-color: rgba(black, .12);
+			}
+			&:checked ~ .thumb::before {
+				background-color: rgba($cPrimary, .2);
+			}
+		}
+
+		&[disabled] {
+			~ .thumb {
+				background-color: color($grey, 400);
+				&::before {
+					background-color: rgba(black, .12);
+				}
+			}
+			~ .track {
+				background-color: color($fg, 'divider');
+			}
+		}
+		~ label {
+			padding-left: dp(56);
+		}
+	}
 }
