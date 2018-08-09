@@ -33,7 +33,6 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				{
 					id: 'name',
 					header: t('Name'),
-					width: dp(75),
 					sortable: true,
 					dataIndex: 'name',
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
@@ -58,7 +57,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					header: t('Organizations'),
 					sortable: false,
 					dataIndex: "organizations",
-					width: dp(200),
+					width: dp(300),
 					renderer: function (v, meta, record) {
 						var orgStr = t("Loading...");
 

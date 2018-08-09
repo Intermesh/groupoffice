@@ -3,7 +3,8 @@
 go.modules.community.addressbook.TreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 
 	entityStore: null,
-
+	
+	
 	load: function (node, callback, scope) {
 		if (this.clearOnLoad) {
 			while (node.firstChild) {
@@ -43,17 +44,19 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 				
 				items.forEach(function(entity) {
 					result.push({
-//						id: entity.id,
+						id: "addressbook-" + entity.id,
 						entityId: entity.id||null,
 						entity: entity,
 						leaf: false,
 						expanded: false,
 						children : [
 							{
+								id: "group-1",
 								iconCls: 'ic-group',
 								text: "Newsletter",
 								leaf: true
 							},{
+								id: "group-2",
 								iconCls: 'ic-group',
 								text: "Release announcements",
 								leaf: true

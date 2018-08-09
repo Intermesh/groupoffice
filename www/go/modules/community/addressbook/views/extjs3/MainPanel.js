@@ -11,7 +11,12 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 					xtype: "tbtitle",
 					text: t("Address books")
 				}, '->', {
-					iconCls: 'ic-add'
+					iconCls: 'ic-add',
+					tooltip: t("Add"),
+					handler: function() {
+						var dlg = new go.modules.community.addressbook.AddressBookDialog();
+						dlg.show();
+					}
 				}]
 		});
 
@@ -19,6 +24,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 			width: dp(300),
 			region: "west",
 			split: true,
+			autoScroll: true,
 			items: [
 				this.addressBookTree
 			]
@@ -26,7 +32,6 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 
 		this.grid = new go.modules.community.addressbook.ContactGrid({
 			region: 'center',
-			width: dp(500),
 			tbar: [
 				{
 					cls: 'go-narrow',
@@ -91,7 +96,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 			layout: "responsive",
 			//stateId: "go-addressbook-west",
 			split: true,
-			width: dp(700),
+			width: dp(900),
 			narrowWidth: dp(400), //this will only work for panels inside another panel with layout=responsive. Not ideal but at the moment the only way I could make it work
 			items: [
 				this.grid, //first is default in narrow mode

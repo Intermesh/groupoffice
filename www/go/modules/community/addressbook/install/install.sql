@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: db
--- Gegenereerd op: 07 aug 2018 om 15:08
+-- Gegenereerd op: 09 aug 2018 om 13:03
 -- Serverversie: 10.3.8-MariaDB-1:10.3.8+maria~jessie
 -- PHP-versie: 7.2.6
 
@@ -19,7 +19,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `addressbook`
+-- Database: `groupoffice`
 --
 
 -- --------------------------------------------------------
@@ -59,18 +59,7 @@ CREATE TABLE `addressbook_addressbook` (
 INSERT INTO `addressbook_addressbook` (`id`, `name`, `aclId`, `createdBy`) VALUES
 (1, 'Prospects', 15, 1),
 (2, 'Suppliers', 16, 1),
-(3, 'Customers', 17, 1),
-(4, 'Users', 81, 1),
-(5, 'test', 91, 2),
-(6, 'Test User 2', 105, 3),
-(7, 'Jan Jansen', 110, 4),
-(8, 'Elmer Fudd', 132, 5),
-(9, 'Demo User', 137, 6),
-(10, 'Linda Smith', 142, 7),
-(11, 'Philip J. Fry', 186, 15),
-(12, 'Bender Bending Rodríguez', 190, 16),
-(13, 'Turanga Leela', 194, 17),
-(14, 'Test User 3', 198, 18);
+(3, 'Customers', 17, 1);
 
 -- --------------------------------------------------------
 
@@ -97,7 +86,7 @@ CREATE TABLE `addressbook_contact` (
   `registrationNumber` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'Company trade registration number',
   `vatNo` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `debtorNumber` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `photoBlobId` char(40) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
+  `photoBlobId` binary(40) DEFAULT NULL,
   `language` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -106,11 +95,11 @@ CREATE TABLE `addressbook_contact` (
 --
 
 INSERT INTO `addressbook_contact` (`id`, `addressBookId`, `createdBy`, `createdAt`, `modifiedAt`, `prefixes`, `firstName`, `middleName`, `lastName`, `suffixes`, `gender`, `notes`, `isOrganization`, `name`, `IBAN`, `registrationNumber`, `vatNo`, `debtorNumber`, `photoBlobId`, `language`) VALUES
-(3, 1, 1, '2018-08-06 15:05:22', '2018-08-07 13:29:46', '', 'Merijn', '', 'Schering', '', NULL, NULL, 0, 'Merijn Schering', '', '', NULL, NULL, 'ebf8260a0a925ad0b773e675f26639f04d5c2d6b', NULL),
-(4, 1, 1, '2018-08-06 15:15:45', '2018-08-07 13:38:19', '', 'Jan', 'van der', 'Steen', '', NULL, NULL, 0, 'Jan van der Steen', '', '', NULL, NULL, '19ec572a23262e8d199e97ffe9773168b4bfe273', NULL),
-(5, 1, 1, '2018-08-07 13:39:44', '2018-08-07 13:48:30', '', '', '', '', '', NULL, NULL, 1, 'Intermesh BV', '', '', NULL, NULL, '', NULL),
-(6, 1, 1, '2018-08-07 13:47:23', '2018-08-07 13:47:23', '', 'Michael', 'de', 'Hart', '', NULL, NULL, 0, 'Michael de Hart', '', '', NULL, NULL, '', NULL),
-(7, 1, 1, '2018-08-07 14:20:11', '2018-08-07 14:20:11', '', '', '', '', '', NULL, NULL, 1, 'Group Office Inc.', '', '', NULL, NULL, '', NULL);
+(3, 1, 1, '2018-08-06 15:05:22', '2018-08-07 13:29:46', '', 'Merijn', '', 'Schering', '', NULL, NULL, 0, 'Merijn Schering', '', '', NULL, NULL, 0x65626638323630613061393235616430623737336536373566323636333966303464356332643662, NULL),
+(4, 1, 1, '2018-08-06 15:15:45', '2018-08-07 13:38:19', '', 'Jan', 'van der', 'Steen', '', NULL, NULL, 0, 'Jan van der Steen', '', '', NULL, NULL, 0x31396563353732613233323632653864313939653937666665393737333136386234626665323733, NULL),
+(5, 1, 1, '2018-08-07 13:39:44', '2018-08-07 13:48:30', '', '', '', '', '', NULL, NULL, 1, 'Intermesh BV', '', '', NULL, NULL, NULL, NULL),
+(6, 1, 1, '2018-08-07 13:47:23', '2018-08-07 13:47:23', '', 'Michael', 'de', 'Hart', '', NULL, NULL, 0, 'Michael de Hart', '', '', NULL, NULL, NULL, NULL),
+(7, 1, 1, '2018-08-07 14:20:11', '2018-08-07 14:20:11', '', '', '', '', '', NULL, NULL, 1, 'Group Office Inc.', '', '', NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -264,7 +253,8 @@ ALTER TABLE `addressbook_date`
 -- Indexen voor tabel `addressbook_email_address`
 --
 ALTER TABLE `addressbook_email_address`
-  ADD PRIMARY KEY (`id`,`contactId`);
+  ADD PRIMARY KEY (`id`,`contactId`),
+  ADD KEY `contactId` (`contactId`);
 
 --
 -- Indexen voor tabel `addressbook_phone_number`
@@ -325,6 +315,66 @@ ALTER TABLE `addressbook_phone_number`
 --
 ALTER TABLE `addressbook_url`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Beperkingen voor geëxporteerde tabellen
+--
+
+--
+-- Beperkingen voor tabel `addressbook_address`
+--
+ALTER TABLE `addressbook_address`
+  ADD CONSTRAINT `addressbook_address_ibfk_1` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
+
+--
+-- Beperkingen voor tabel `addressbook_addressbook`
+--
+ALTER TABLE `addressbook_addressbook`
+  ADD CONSTRAINT `addressbook_addressbook_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`);
+
+--
+-- Beperkingen voor tabel `addressbook_contact`
+--
+ALTER TABLE `addressbook_contact`
+  ADD CONSTRAINT `addressbook_contact_ibfk_1` FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `addressbook_contact_ibfk_2` FOREIGN KEY (`photoBlobId`) REFERENCES `core_blob` (`id`);
+
+--
+-- Beperkingen voor tabel `addressbook_contact_custom_fields`
+--
+ALTER TABLE `addressbook_contact_custom_fields`
+  ADD CONSTRAINT `addressbook_contact_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
+
+--
+-- Beperkingen voor tabel `addressbook_contact_organization`
+--
+ALTER TABLE `addressbook_contact_organization`
+  ADD CONSTRAINT `addressbook_contact_organization_ibfk_1` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `addressbook_contact_organization_ibfk_2` FOREIGN KEY (`organizationContactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
+
+--
+-- Beperkingen voor tabel `addressbook_date`
+--
+ALTER TABLE `addressbook_date`
+  ADD CONSTRAINT `addressbook_date_ibfk_1` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
+
+--
+-- Beperkingen voor tabel `addressbook_email_address`
+--
+ALTER TABLE `addressbook_email_address`
+  ADD CONSTRAINT `addressbook_email_address_ibfk_1` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
+
+--
+-- Beperkingen voor tabel `addressbook_phone_number`
+--
+ALTER TABLE `addressbook_phone_number`
+  ADD CONSTRAINT `addressbook_phone_number_ibfk_1` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
+
+--
+-- Beperkingen voor tabel `addressbook_url`
+--
+ALTER TABLE `addressbook_url`
+  ADD CONSTRAINT `addressbook_url_ibfk_1` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
