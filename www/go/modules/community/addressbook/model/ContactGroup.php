@@ -4,49 +4,30 @@ namespace go\modules\community\addressbook\model;
 use go\core\orm\Property;
 						
 /**
- * Address book model
+ * ContactGroup model
  *
  * @copyright (c) 2018, Intermesh BV http://www.intermesh.nl
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
 
-class AddressBook extends \go\core\acl\model\AclEntity {
+class ContactGroup extends Property {
 	
 	/**
 	 * 
 	 * @var int
 	 */							
-	public $id;
-
-	/**
-	 * 
-	 * @var string
-	 */							
-	public $name;
+	public $contactId;
 
 	/**
 	 * 
 	 * @var int
 	 */							
-	public $aclId;
-
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $createdBy;
-	
-	/**
-	 *
-	 * @var Group[]
-	 */
-	public $groups = [];
+	public $groupId;
 
 	protected static function defineMapping() {
 		return parent::defineMapping()
-						->addTable("addressbook_addressbook")
-						->addRelation('groups', Group::class, ['id' => 'addressBookid']);
+						->addTable("addressbook_contact_group");
 	}
 
 }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: db
--- Gegenereerd op: 09 aug 2018 om 13:03
+-- Gegenereerd op: 09 aug 2018 om 13:10
 -- Serverversie: 10.3.8-MariaDB-1:10.3.8+maria~jessie
 -- PHP-versie: 7.2.6
 
@@ -114,6 +114,17 @@ CREATE TABLE `addressbook_contact_custom_fields` (
 -- --------------------------------------------------------
 
 --
+-- Tabelstructuur voor tabel `addressbook_contact_group`
+--
+
+CREATE TABLE `addressbook_contact_group` (
+  `contactId` int(11) NOT NULL,
+  `groupId` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Tabelstructuur voor tabel `addressbook_contact_organization`
 --
 
@@ -165,6 +176,18 @@ INSERT INTO `addressbook_email_address` (`id`, `contactId`, `type`, `email`) VAL
 (3, 4, 'test', 'piet@intermesh.nl'),
 (4, 3, 'work', 'merijn@intermesh.nl'),
 (5, 5, 'work', 'info@intermesh.nl');
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `addressbook_group`
+--
+
+CREATE TABLE `addressbook_group` (
+  `id` int(11) NOT NULL,
+  `addressBookId` int(11) NOT NULL,
+  `name` varchar(190) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=COMPACT;
 
 -- --------------------------------------------------------
 
@@ -236,6 +259,13 @@ ALTER TABLE `addressbook_contact_custom_fields`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexen voor tabel `addressbook_contact_group`
+--
+ALTER TABLE `addressbook_contact_group`
+  ADD PRIMARY KEY (`contactId`,`groupId`),
+  ADD KEY `groupId` (`groupId`);
+
+--
 -- Indexen voor tabel `addressbook_contact_organization`
 --
 ALTER TABLE `addressbook_contact_organization`
@@ -255,6 +285,13 @@ ALTER TABLE `addressbook_date`
 ALTER TABLE `addressbook_email_address`
   ADD PRIMARY KEY (`id`,`contactId`),
   ADD KEY `contactId` (`contactId`);
+
+--
+-- Indexen voor tabel `addressbook_group`
+--
+ALTER TABLE `addressbook_group`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `addressBookId` (`addressBookId`);
 
 --
 -- Indexen voor tabel `addressbook_phone_number`
@@ -305,6 +342,12 @@ ALTER TABLE `addressbook_email_address`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
+-- AUTO_INCREMENT voor een tabel `addressbook_group`
+--
+ALTER TABLE `addressbook_group`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT voor een tabel `addressbook_phone_number`
 --
 ALTER TABLE `addressbook_phone_number`
@@ -346,6 +389,13 @@ ALTER TABLE `addressbook_contact_custom_fields`
   ADD CONSTRAINT `addressbook_contact_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
 
 --
+-- Beperkingen voor tabel `addressbook_contact_group`
+--
+ALTER TABLE `addressbook_contact_group`
+  ADD CONSTRAINT `addressbook_contact_group_ibfk_1` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `addressbook_contact_group_ibfk_2` FOREIGN KEY (`groupId`) REFERENCES `addressbook_group` (`id`) ON DELETE CASCADE;
+
+--
 -- Beperkingen voor tabel `addressbook_contact_organization`
 --
 ALTER TABLE `addressbook_contact_organization`
@@ -363,6 +413,12 @@ ALTER TABLE `addressbook_date`
 --
 ALTER TABLE `addressbook_email_address`
   ADD CONSTRAINT `addressbook_email_address_ibfk_1` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
+
+--
+-- Beperkingen voor tabel `addressbook_group`
+--
+ALTER TABLE `addressbook_group`
+  ADD CONSTRAINT `addressbook_group_ibfk_1` FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook` (`id`);
 
 --
 -- Beperkingen voor tabel `addressbook_phone_number`
