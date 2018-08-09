@@ -34,7 +34,7 @@ $updates['201711071208'][] = 'RENAME TABLE `notes_folder` TO `notes_note_book`;'
 $updates['201711071208'][] = 'ALTER TABLE `notes_note` CHANGE `folderId` `noteBookId` INT(11) NOT NULL;';
 
 
-$updates['201711071208'][] = 'ALTER TABLE `notes_note` ADD FOREIGN KEY (`noteBookId`) REFERENCES `notes_folder`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;';
+$updates['201711071208'][] = 'ALTER TABLE `notes_note` ADD FOREIGN KEY (`noteBookId`) REFERENCES `notes_note_book`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;';
 
 
 $updates['201711071208'][] = 'RENAME TABLE `cf_no_notes` TO `notes_note_custom_fields`;';
