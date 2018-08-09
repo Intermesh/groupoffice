@@ -1,6 +1,7 @@
 Ext.ns("go.googleauthenticator");
 
 Ext.override(go.usersettings.AccountSettingsPanel, {
+	currentUser : null,
 	
 	initComponent : go.usersettings.AccountSettingsPanel.prototype.initComponent.createSequence(function() {
 
@@ -18,11 +19,6 @@ Ext.override(go.usersettings.AccountSettingsPanel, {
 					anchor: '100%',
 					listeners:{
 						check: function(cbx,checked){
-							
-							// check to not fire the functions below when loading the form
-							if(!go.userSettingsDialog.isVisible()){
-								return;
-							}
 							
 							if(checked){
 								this.enableGoogleAuthenticator();
@@ -76,6 +72,8 @@ Ext.override(go.usersettings.AccountSettingsPanel, {
 
 				// Google authenticator is already configured for this user.
 				me.setEnabled(!!data.googleauthenticator);
+				
+				me.currentUser = data;
 			}
 			
 		});
@@ -134,7 +132,7 @@ Ext.override(go.usersettings.AccountSettingsPanel, {
 				'ok': function(value){
 					
 					var params = {"update": {}};
-					params.update[GO.settings.user_id] = {
+					params.update[this.currentUser.id] = {
 						currentPassword: value,
 						googleauthenticator: {}
 					};					
@@ -144,7 +142,7 @@ Ext.override(go.usersettings.AccountSettingsPanel, {
 							return this.enableGoogleAuthenticator();
 						}
 						
-						var user = response.updated[GO.settings.user_id];
+						var user = response.updated[this.currentUser.id];
 						if(user.googleauthenticator){							
 							this.setQr(true, user.googleauthenticator.secret ,user.googleauthenticator.qrUrl);
 						}
