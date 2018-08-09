@@ -222,17 +222,31 @@ class EntityType {
 		
 		return $e;
 	}
-	
-	protected $changed = [];
-	
+		
 	/**
 	 * Register a change of an entity. When the application ends these changes will be saved in the "core_change" log table.
 	 * 
 	 * @param Entity $entity
 	 */
 	public function change(Entity $entity) {
-		$this->changed[] = $entity;		
+		$this->highestModSeq = $this->nextModSeq();
+			
+		$record = [
+				'modSeq' => $this->highestModSeq,
+				'entityTypeId' => $this->id,
+				'entityId' => $entity->id,
+				'aclId' => $entity->findAclId(),
+				'destroyed' => $entity->isDeleted(),
+				'createdAt' => new DateTime()
+						];
+
+		if(!GO()->getDbConnection()->insert('core_change', $record)->execute()) {
+			throw new \Exception("Could not save change");
+		}
+
 	}
+	
+	private $modSeqIncremented = false;
 	
 	/**
 	 * Get the modification sequence
@@ -241,6 +255,10 @@ class EntityType {
 	 * @return int
 	 */
 	public function nextModSeq() {
+		
+		if($this->modSeqIncremented) {
+			return $this->highestModSeq;
+		}
 		/*
 		 * START TRANSACTION
 		 * SELECT counter_field FROM child_codes FOR UPDATE;
@@ -262,33 +280,13 @@ class EntityType {
 										["id" => $this->id]
 						)->execute(); //mod seq is a global integer that is incremented on any entity update
 	
+		$this->modSeqIncremented = true;
+		
+		$this->highestModSeq = $modSeq;
+		
 		return $modSeq;
 	}	
 	
 	
 	
-	private function logChanges() {
-		if(!empty($this->changed)) {
-			
-			$this->highestModSeq = $this->nextModSeq();
-			
-			foreach($this->changed as $change) {
-				$record = [
-						'modSeq' => $this->highestModSeq,
-						'entityTypeId' => $this->id,
-						'entityId' => $change->id,
-						'aclId' => $change->findAclId(),
-						'destroyed' => $change->isDeleted(),
-						'createdAt' => new DateTime()
-								];
-
-				if(!GO()->getDbConnection()->insert('core_change', $record)->execute()) {
-					throw new \Exception("Could not save change");
-				}
-			}			
-		}
-	}
-	public function __destruct() {		
-		$this->logChanges();
-	}
 }
