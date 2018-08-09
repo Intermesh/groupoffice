@@ -48,6 +48,18 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 						entity: entity,
 						leaf: false,
 						expanded: false,
+						children : [
+							{
+								iconCls: 'ic-group',
+								text: "Newsletter",
+								leaf: true
+							},{
+								iconCls: 'ic-group',
+								text: "Release announcements",
+								leaf: true
+							}
+							
+						],
 						text: entity.name
 					});
 				});
