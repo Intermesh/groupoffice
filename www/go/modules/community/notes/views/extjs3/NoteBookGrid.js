@@ -96,6 +96,19 @@ go.modules.community.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 						},
 						scope: this						
 					},{
+						itemId: "delete",
+						iconCls: 'ic-delete',
+						text: t("Delete"),
+						handler: function() {
+							Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
+								if (btn != "yes") {
+									return;
+								}
+								go.Stores.get("NoteBook").set({destroy: [this.moreMenu.record.id]});
+							}, this);
+						},
+						scope: this						
+					},{
 						itemId:"share",
 						iconCls: 'ic-share',
 						text: t("Share"),
@@ -115,6 +128,7 @@ go.modules.community.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 		
 		this.moreMenu.getComponent("edit").setDisabled(record.get("permissionLevel") < GO.permissionLevels.manage);
 		this.moreMenu.getComponent("share").setDisabled(record.get("permissionLevel") < GO.permissionLevels.manage);
+		this.moreMenu.getComponent("delete").setDisabled(record.get("permissionLevel") < GO.permissionLevels.manage);
 		
 		this.moreMenu.record = record;
 		

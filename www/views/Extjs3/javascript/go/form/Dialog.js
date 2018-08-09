@@ -71,14 +71,22 @@ go.form.Dialog = Ext.extend(go.Window, {
 		
 		if(changed.concat(added).indexOf(this.currentId) !== -1) {
 			this.actionComplete();
+			this.onLoad();
 		}		
 	},
 
 	delete: function () {
-		this.entityStore.set({destroy: [this.currentId]}, function (options, success, response) {
-			if (response.destroyed) {
-				this.hide();
+		
+		Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
+			if (btn != "yes") {
+				return;
 			}
+			
+			this.entityStore.set({destroy: [this.currentId]}, function (options, success, response) {
+				if (response.destroyed) {
+					this.hide();
+				}
+			}, this);
 		}, this);
 	},
 
@@ -96,7 +104,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 	},
 	
 	onLoad : function() {
-		
+		this.deleteBtn.setDisabled(this.formPanel.entity.permissionLevel < GO.permissionLevels.writeAndDelete);
 	},
 	
 	onSubmit : function() {
@@ -114,8 +122,6 @@ go.form.Dialog = Ext.extend(go.Window, {
 		if (this.getFooterToolbar()) {
 			this.getFooterToolbar().setDisabled(false);	
 		}
-		
-		this.onLoad();
 	},
 	
 	isValid : function() {
