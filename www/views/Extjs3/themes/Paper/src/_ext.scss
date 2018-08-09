@@ -1514,8 +1514,10 @@ td.grid-hd-group-cell {
 	}
 	&-node {
 		@extend %font-body1;
-		.x-tree-selected {background-color: $cSelected;}
+		
 		.x-tree-node-over {background-color: $cHover;}
+		.x-tree-selected {background-color: $cSelected;}
+		
 		&-indent span {
 			display:inline-block;
 			width: dp(24);

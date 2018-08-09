@@ -1307,3 +1307,24 @@ table[id^="comments-ext"] b {
 	}
 
 }
+
+//This class on a button will make it fade from gradient to the background color
+//of a tree.
+.go-more-button-over {
+	position: absolute;
+	padding-right: dp(8);
+	background-color: #e6e6e6;
+	&.x-btn.x-btn-over {
+		background-color: #e6e6e6;
+	}
+	&:before {
+		pointer-events: none;
+		position: absolute;
+		content: '';
+		background: linear-gradient(to right, transparent, #e6e6e6);
+		width: dp(24);
+		height: 100%;
+		left: dp(-24);
+		top: 0;
+	}
+}
