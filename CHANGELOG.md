@@ -1,5 +1,8 @@
+09-08-2018 6.3.31
+- Changed install SQL for notes as it failed to rename a column with a key on some systems
 - Delete buttons in dialog work
 - Delete option added in more menu of grid and detail view in notes.
+- Removed old z-push install dir.
 
 06-08-2018 6.3.30
 - Small UI improvements

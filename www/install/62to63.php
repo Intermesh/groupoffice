@@ -232,6 +232,7 @@ $qs[] = function() {
 
 	while ($record = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
+		//this could lead to a "clientName" column having a null value. Which lead to ticket #201816451
 		if (method_exists($record['name'], 'getModule')) {
 
 			$name = $record['name']::getModule();
