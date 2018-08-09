@@ -1,3 +1,6 @@
+- Delete buttons in dialog work
+- Delete option added in more menu of grid and detail view in notes.
+
 06-08-2018 6.3.30
 - Small UI improvements
 - LDAP bind login uses full DN
