@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: db
--- Gegenereerd op: 09 aug 2018 om 13:10
+-- Gegenereerd op: 10 aug 2018 om 15:06
 -- Serverversie: 10.3.8-MariaDB-1:10.3.8+maria~jessie
 -- PHP-versie: 7.2.6
 
@@ -11,12 +11,6 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
 
 --
 -- Database: `groupoffice`
@@ -95,11 +89,13 @@ CREATE TABLE `addressbook_contact` (
 --
 
 INSERT INTO `addressbook_contact` (`id`, `addressBookId`, `createdBy`, `createdAt`, `modifiedAt`, `prefixes`, `firstName`, `middleName`, `lastName`, `suffixes`, `gender`, `notes`, `isOrganization`, `name`, `IBAN`, `registrationNumber`, `vatNo`, `debtorNumber`, `photoBlobId`, `language`) VALUES
-(3, 1, 1, '2018-08-06 15:05:22', '2018-08-07 13:29:46', '', 'Merijn', '', 'Schering', '', NULL, NULL, 0, 'Merijn Schering', '', '', NULL, NULL, 0x65626638323630613061393235616430623737336536373566323636333966303464356332643662, NULL),
-(4, 1, 1, '2018-08-06 15:15:45', '2018-08-07 13:38:19', '', 'Jan', 'van der', 'Steen', '', NULL, NULL, 0, 'Jan van der Steen', '', '', NULL, NULL, 0x31396563353732613233323632653864313939653937666665393737333136386234626665323733, NULL),
-(5, 1, 1, '2018-08-07 13:39:44', '2018-08-07 13:48:30', '', '', '', '', '', NULL, NULL, 1, 'Intermesh BV', '', '', NULL, NULL, NULL, NULL),
-(6, 1, 1, '2018-08-07 13:47:23', '2018-08-07 13:47:23', '', 'Michael', 'de', 'Hart', '', NULL, NULL, 0, 'Michael de Hart', '', '', NULL, NULL, NULL, NULL),
-(7, 1, 1, '2018-08-07 14:20:11', '2018-08-07 14:20:11', '', '', '', '', '', NULL, NULL, 1, 'Group Office Inc.', '', '', NULL, NULL, NULL, NULL);
+(3, 1, 1, '2018-08-06 15:05:22', '2018-08-10 13:04:25', '', 'Merijn', 'van', 'Schering', '', NULL, NULL, 0, 'Merijn van Schering', '', '', NULL, NULL, 0x65626638323630613061393235616430623737336536373566323636333966303464356332643662, NULL),
+(4, 2, 1, '2018-08-06 15:15:45', '2018-08-10 14:57:29', '', 'Jan', 'van der', 'Steen', '', NULL, NULL, 0, 'Jan van der Steen', '', '', NULL, NULL, 0x31396563353732613233323632653864313939653937666665393737333136386234626665323733, NULL),
+(5, 1, 1, '2018-08-07 13:39:44', '2018-08-10 10:47:00', '', '', '', '', '', NULL, NULL, 1, 'Intermesh BV', '', '', NULL, NULL, NULL, NULL),
+(6, 1, 1, '2018-08-07 13:47:23', '2018-08-10 11:14:02', '', 'Michael', 'de', 'Hart', '', NULL, NULL, 0, 'Michael de Hart', '', '', NULL, NULL, NULL, NULL),
+(8, 1, 1, '2018-08-10 15:02:37', '2018-08-10 15:03:42', '', 'Teun', '', 'Schering', '', NULL, NULL, 0, 'Teun Schering', '', '', NULL, NULL, 0x63623162326638363739323765333965363537643637353164653164383636666465313439623131, NULL),
+(9, 1, 1, '2018-08-10 15:03:26', '2018-08-10 15:03:26', '', 'Isa', '', 'Schering', '', NULL, NULL, 0, 'Isa Schering', '', '', NULL, NULL, 0x63666334396261636364623361353137366136363861316438386337333834333966623335353438, NULL),
+(10, 1, 1, '2018-08-10 15:04:54', '2018-08-10 15:04:54', '', 'Linda', '', 'Huijs', '', NULL, NULL, 0, 'Linda Huijs', '', '', NULL, NULL, 0x65623666643737663535383036326263343034663339653030386435653131663131353337383061, NULL);
 
 -- --------------------------------------------------------
 
@@ -122,6 +118,15 @@ CREATE TABLE `addressbook_contact_group` (
   `groupId` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Gegevens worden geëxporteerd voor tabel `addressbook_contact_group`
+--
+
+INSERT INTO `addressbook_contact_group` (`contactId`, `groupId`) VALUES
+(3, 2),
+(4, 13),
+(5, 2);
+
 -- --------------------------------------------------------
 
 --
@@ -138,8 +143,28 @@ CREATE TABLE `addressbook_contact_organization` (
 --
 
 INSERT INTO `addressbook_contact_organization` (`contactId`, `organizationContactId`) VALUES
-(3, 5),
-(3, 7);
+(3, 5);
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `addressbook_contact_star`
+--
+
+CREATE TABLE `addressbook_contact_star` (
+  `contactId` int(11) NOT NULL,
+  `userId` int(11) NOT NULL,
+  `starred` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Gegevens worden geëxporteerd voor tabel `addressbook_contact_star`
+--
+
+INSERT INTO `addressbook_contact_star` (`contactId`, `userId`, `starred`) VALUES
+(3, 1, 1),
+(4, 1, NULL),
+(9, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -175,7 +200,8 @@ INSERT INTO `addressbook_email_address` (`id`, `contactId`, `type`, `email`) VAL
 (1, 3, 'home', 'mschering@intermesh.nl'),
 (3, 4, 'test', 'piet@intermesh.nl'),
 (4, 3, 'work', 'merijn@intermesh.nl'),
-(5, 5, 'work', 'info@intermesh.nl');
+(5, 5, 'work', 'info@intermesh.nl'),
+(6, 4, 'home', 'jan@steen.local');
 
 -- --------------------------------------------------------
 
@@ -188,6 +214,15 @@ CREATE TABLE `addressbook_group` (
   `addressBookId` int(11) NOT NULL,
   `name` varchar(190) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=COMPACT;
+
+--
+-- Gegevens worden geëxporteerd voor tabel `addressbook_group`
+--
+
+INSERT INTO `addressbook_group` (`id`, `addressBookId`, `name`) VALUES
+(2, 1, 'Release announcements'),
+(3, 1, 'Nice guys'),
+(13, 2, 't1');
 
 -- --------------------------------------------------------
 
@@ -273,6 +308,13 @@ ALTER TABLE `addressbook_contact_organization`
   ADD KEY `organizationContactId` (`organizationContactId`);
 
 --
+-- Indexen voor tabel `addressbook_contact_star`
+--
+ALTER TABLE `addressbook_contact_star`
+  ADD PRIMARY KEY (`contactId`,`userId`),
+  ADD KEY `userId` (`userId`);
+
+--
 -- Indexen voor tabel `addressbook_date`
 --
 ALTER TABLE `addressbook_date`
@@ -321,13 +363,13 @@ ALTER TABLE `addressbook_address`
 -- AUTO_INCREMENT voor een tabel `addressbook_addressbook`
 --
 ALTER TABLE `addressbook_addressbook`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT voor een tabel `addressbook_contact`
 --
 ALTER TABLE `addressbook_contact`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT voor een tabel `addressbook_date`
@@ -339,13 +381,13 @@ ALTER TABLE `addressbook_date`
 -- AUTO_INCREMENT voor een tabel `addressbook_email_address`
 --
 ALTER TABLE `addressbook_email_address`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT voor een tabel `addressbook_group`
 --
 ALTER TABLE `addressbook_group`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT voor een tabel `addressbook_phone_number`
@@ -403,6 +445,13 @@ ALTER TABLE `addressbook_contact_organization`
   ADD CONSTRAINT `addressbook_contact_organization_ibfk_2` FOREIGN KEY (`organizationContactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
 
 --
+-- Beperkingen voor tabel `addressbook_contact_star`
+--
+ALTER TABLE `addressbook_contact_star`
+  ADD CONSTRAINT `addressbook_contact_star_ibfk_1` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `addressbook_contact_star_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;
+
+--
 -- Beperkingen voor tabel `addressbook_date`
 --
 ALTER TABLE `addressbook_date`
@@ -432,7 +481,3 @@ ALTER TABLE `addressbook_phone_number`
 ALTER TABLE `addressbook_url`
   ADD CONSTRAINT `addressbook_url_ibfk_1` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
 COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
