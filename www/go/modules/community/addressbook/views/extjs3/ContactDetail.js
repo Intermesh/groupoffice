@@ -9,9 +9,40 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 
 		Ext.apply(this, {
 			items: [{
-					xtype: 'readmore',
+					xtype: 'panel',
+					layout: "hbox",
+					
+					tbar: [
+						this.starButton = new Ext.Button({
+							xtype: "button",
+							iconCls: "ic-star-border",
+							handler: function() {
+								var starred = this.starButton.iconCls == "ic-star", id = this.data.id + "-" + go.User.id;								
+								update = {};
+								update[id] = {starred: !starred};
+								
+								this.starButton.setIconClass(!starred ? 'ic-star' : 'ic-star-border');
+								
+								if(go.Stores.get("ContactStar").data[id]) {
+									go.Stores.get("ContactStar").set({update: update});
+								} else
+								{
+									update[id].contactId = this.data.id;
+									update[id].userId = go.User.id;
+									go.Stores.get("ContactStar").set({create: update});
+								}
+								
+							},
+							scope: this
+						}),
+						this.titleComp = new go.toolbar.TitleItem()
+					],
 					onLoad: function (detailView) {
-						this.setText("<h3>" + detailView.data.name + "</h3>");
+						detailView.titleComp.setText(detailView.data.name);
+						
+						go.Stores.get("ContactStar").get([detailView.data.id + "-" + go.User.id], function(entities) {
+							detailView.starButton.setIconClass(entities[0].starred ? 'ic-star' : 'ic-star-border');
+						}, this);
 					}
 				}
 			]
