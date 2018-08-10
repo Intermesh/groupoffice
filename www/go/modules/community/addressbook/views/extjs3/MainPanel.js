@@ -64,7 +64,27 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 						dlg.show();
 					},
 					scope: this
-				})
+				}),
+				{
+					iconCls: 'ic-more-vert',
+					menu: [{
+						iconCls: 'ic-cloud-upload',
+						text: t("Import")
+					},{
+						iconCls: 'ic-cloud-download',
+						text: t("Export")
+					},					
+					"-",
+					{
+						itemId: "delete",
+						iconCls: 'ic-delete',
+						text: t("Delete"),
+						handler: function () {
+							this.grid.deleteSelected();
+						},
+						scope: this
+					}]
+				}
 
 			],
 			listeners: {
