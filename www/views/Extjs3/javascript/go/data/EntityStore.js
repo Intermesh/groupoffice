@@ -284,8 +284,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			callback: function (options, success, response) {
 				
 				if(!success) {
-					Ext.MessageBox.alert(t("Error"), JSON.stringify(response));					
-					this.fireEvent("error", options, response);					
+					this.fireEvent("error", options, response);
 					return;
 				}
 				

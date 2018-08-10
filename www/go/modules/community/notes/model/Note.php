@@ -12,6 +12,13 @@ use go\core\util\StringUtil;
 
 class Note extends AclItemEntity {
 
+	/**
+	 * The Entity ID
+	 * 
+	 * @var int
+	 */
+	public $id;
+
 	public $name;
 	public $content;
 	public $noteBookId;

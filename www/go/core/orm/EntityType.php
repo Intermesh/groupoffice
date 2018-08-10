@@ -234,7 +234,7 @@ class EntityType {
 		$record = [
 				'modSeq' => $this->highestModSeq,
 				'entityTypeId' => $this->id,
-				'entityId' => $entity->id,
+				'entityId' => $entity->getId(),
 				'aclId' => $entity->findAclId(),
 				'destroyed' => $entity->isDeleted(),
 				'createdAt' => new DateTime()

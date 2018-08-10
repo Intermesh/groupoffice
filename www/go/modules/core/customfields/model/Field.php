@@ -7,7 +7,13 @@ use go\modules\core\customfields\model\FieldSet;
 
 
 class Field extends AclItemEntity {
-	
+	/**
+	 * The Entity ID
+	 * 
+	 * @var int
+	 */
+	public $id;
+
 	public $name;
 	
 	public $fieldSetId;

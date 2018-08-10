@@ -11,6 +11,13 @@ use go\modules\core\modules\model\Module;
 
 class CronJobSchedule extends Entity {
 
+	/**
+	 * The Entity ID
+	 * 
+	 * @var int
+	 */
+	public $id;
+
 	public $moduleId;
 	public $description;
 	public $name;

@@ -692,7 +692,7 @@ ALTER TABLE `core_cron_job`
 
 
 CREATE TABLE `core_change` (
-  `entityId` int(11) NOT NULL,
+  `entityId` VARCHAR(21) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
   `entityTypeId` int(11) NOT NULL,
   `modSeq` int(11) NOT NULL,
   `aclId` int(11) DEFAULT NULL,

@@ -1033,16 +1033,35 @@ abstract class Property extends Model {
 	 * 
 	 * @return array eg ['id' => 1]
 	 */
-	public function id() {
+	public function primaryKeyValues() {
 		
-		if($this->isNew()) {
-			return null;
+		$keys = $this->getPrimaryKey();
+		$v = [];
+		foreach($keys as $key) {			
+			$v[$key] = $this->$key;			
 		}
 		
+		return $v;
+	}
+	
+	/**
+	 * Get the primary key column names.
+	 * 
+	 * @param boolean $withTableAlias 
+	 * @return string[]
+	 */
+	public static function getPrimaryKey($withTableAlias = false) {
 		$tables = static::getMapping()->getTables();
 		$primaryTable = array_shift($tables);
-		
-		return $this->primaryKeys[$primaryTable->getAlias()];
+		$keys = $primaryTable->getPrimaryKey();
+		if(!$withTableAlias) {
+			return $keys;
+		}
+		$keysWithAlias = [];
+		foreach($keys as $key) {
+			$keysWithAlias[] = $primaryTable->getAlias() . '.' . $key;
+		}
+		return $keysWithAlias;
 	}
 	
 	/**
@@ -1060,8 +1079,8 @@ abstract class Property extends Model {
 			return false;
 		}
 		
-		$pk1 = $this->id();
-		$pk2 = $property->id();
+		$pk1 = $this->primaryKeyValues();
+		$pk2 = $property->primaryKeyValues();
 		
 		$diff = array_diff($pk1, $pk2);
 		
