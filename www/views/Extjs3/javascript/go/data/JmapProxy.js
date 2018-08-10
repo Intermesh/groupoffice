@@ -149,7 +149,9 @@ go.data.JmapProxy = Ext.extend(Ext.data.HttpProxy, {
 					types[f.store.entity] = {store: f.store, ids: []};
 				}
 				
-				types[f.store.entity].ids.push(r[f.key]);
+				if(types[f.store.entity].ids.indexOf(r[f.key]) == -1) {
+					types[f.store.entity].ids.push(r[f.key]);
+				}
 			});
 		});
 		

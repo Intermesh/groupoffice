@@ -27,28 +27,28 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	},
 	
 	restoreState : function() {
-//		if(!window.localStorage.entityStores) {
-//			window.localStorage.entityStores = {};
-//		}
-//		
-//		var json = window.localStorage["entityStore-" + this.entity.name];		
-//		if(json) {
-//			var state = JSON.parse(json);			
-//			this.data = state.data;
-//			this.state = state.state;			
-//		}
+		if(!window.localStorage.entityStores) {
+			window.localStorage.entityStores = {};
+		}
+		
+		var json = window.localStorage["entityStore-" + this.entity.name];		
+		if(json) {
+			var state = JSON.parse(json);			
+			this.data = state.data;
+			this.state = state.state;			
+		}
 	},
 	
-	saveState : function() {
-//		var state = JSON.stringify({
-//			state: this.state,
-//			data: this.data
-//		});
-//		
-//		if(!window.localStorage.entityStores) {
-//			window.localStorage.entityStores = {};
-//		}		
-//		window.localStorage["entityStore-" + this.entity.name] = state;		
+	saveState : function() {		
+		var state = JSON.stringify({
+			state: this.state,
+			data: this.data
+		});
+		
+		if(!window.localStorage.entityStores) {
+			window.localStorage.entityStores = {};
+		}		
+		window.localStorage["entityStore-" + this.entity.name] = state;		
 	},
 	
 	
@@ -100,6 +100,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				for(var i = 0,l = action.payload.list.length;i < l; i++) {
 					this._add(action.payload.list[i]);
 				};
+				this.state = action.payload.state;
 				this.saveState();			
 				
 				break;
@@ -135,9 +136,10 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					} else
 					{
 						this.state = null;
-						this.data = {};
-						this.saveState();
+						this.data = {};						
 					}
+					console.log(this.state);
+					this.saveState();
 				},
 				scope: this
 			});
@@ -162,7 +164,9 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			go.Jmap.request({
 				method: this.entity.name + "/get",
 				callback: function (options, success, response) {
+					
 					this.state = response.state;
+					this.saveState();
 					if(cb) {
 						cb.call(scope || this, this);
 					}
@@ -216,7 +220,8 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 						console.log("Item not found", response);
 						return;
 					}
-					this.state = response.state;				
+					this.state = response.state;
+					this.saveState();
 					this.get(ids, cb, scope, true); //passed hidden 4th argument to pass to the callback to track that it was asynchronously called					
 				},
 				scope: this

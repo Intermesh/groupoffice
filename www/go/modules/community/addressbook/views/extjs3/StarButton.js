@@ -24,7 +24,7 @@ go.modules.community.addressbook.StarButton = Ext.extend(Ext.Button, {
 	handler: function() {
 		//var starred = this.starButton.iconCls == "ic-star", id = this.data.id + "-" + go.User.id;								
 		var update = {}, id = this.getEntityId();
-		update[id] = {starred: !this.isStarred()};
+		update[id] = {starred: this.isStarred() ? null : true};
 
 		this.setIconClass(this.isStarred() ? 'ic-star' : 'ic-star-border');
 
@@ -32,7 +32,7 @@ go.modules.community.addressbook.StarButton = Ext.extend(Ext.Button, {
 			go.Stores.get("ContactStar").set({update: update});
 		} else
 		{
-			update[id].contactId = this.data.id;
+			update[id].contactId = this.contactId;
 			update[id].userId = go.User.id;
 			go.Stores.get("ContactStar").set({create: update});
 		}

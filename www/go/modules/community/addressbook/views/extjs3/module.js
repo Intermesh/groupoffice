@@ -4,3 +4,5 @@ go.Modules.register("community", "addressbook", {
 	entities: ["Contact", "AddressBook", "AddressBookGroup", "ContactStar"],
 	initModule: function () {}
 });
+
+go.Stores.get("User");

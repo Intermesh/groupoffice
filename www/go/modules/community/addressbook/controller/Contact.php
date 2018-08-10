@@ -21,5 +21,18 @@ class Contact extends EntityController {
 	protected function entityClass() {
 		return model\Contact::class;
 	}	
+	
+	protected function transformSort($sort) {
+		$sort = parent::transformSort($sort);
+		
+		//merge sort on start to beginning of array
+		return array_merge(['s.starred' => 'DESC'], $sort);
+	}
+	
+	protected function getQueryQuery($params) {		
+		return parent::getQueryQuery($params)
+						->join('addressbook_contact_star', 's', 's.contactId = c.id AND s.userId=:userId', 'LEFT')
+						->bind(['userId' => GO()->getUserId()]);
+	}
 }
 
