@@ -211,5 +211,21 @@ class Contact extends AclItemEntity {
 		
 		return parent::filter($query, $filter);
 	}
+	
+	protected function internalValidate() {
+		
+		if($this->isModified('addressBookId') || $this->isModified('groups')) {
+			//verify groups and address book match
+			
+			foreach($this->groups as $group) {
+				$group = Group::findById($group->groupId);
+				if($group->addressBookId != $this->addressBookId) {
+					$this->setValidationError('groups', \go\core\validate\ErrorCode::INVALID_INPUT, "The contact groups must match with the addressBookId. Group ID: ".$group->id." belongs to ".$group->addressBookId." and the contact belongs to ". $this->addressBookId);
+				}
+			}
+		}
+		
+		return parent::internalValidate();
+	}
 
 }

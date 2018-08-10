@@ -39,7 +39,9 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 					id: "group-" + group.id,
 					iconCls: 'ic-group',
 					text: group.name,
-					leaf: true,
+					//leaf: true, don't use leaf because this doesn't allow dropping contacts anymore
+					children: [],
+					expanded: true,
 					entity: group,
 					isGroup: true
 				});

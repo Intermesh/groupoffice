@@ -7,6 +7,9 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 	initComponent: function () {
 
 		this.addressBookTree = new go.modules.community.addressbook.AddressBookTree({
+			enableDrop: true,
+			ddGroup: "addressbook",
+			ddAppendOnly: true,
 			tbar: [{
 					xtype: "tbtitle",
 					text: t("Address books")
@@ -18,18 +21,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 						dlg.show();
 					}
 				}]			
-		});
-		
-		this.addressBookTree.getSelectionModel().on('selectionchange', function(sm, node){
-			if(node.id == "all") {
-				this.setAddressBookId(null)
-			} else if(node.attributes.isAddressBook) {
-				this.setAddressBookId(node.attributes.entity.id);
-			} else
-			{
-				this.setGroupId(node.attributes.entity.id)
-			}
-		}, this);
+		});		
 
 		this.filterPanel = new Ext.Panel({
 			width: dp(300),
@@ -43,6 +35,8 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 
 		this.grid = new go.modules.community.addressbook.ContactGrid({
 			region: 'center',
+			enableDragDrop: true, //for dragging contacts to address books or groups in the tree
+			ddGroup: "addressbook",
 			tbar: [
 				{
 					cls: 'go-narrow',
@@ -74,11 +68,6 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 
 			],
 			listeners: {
-//				viewready: function (grid) {
-//					//load note books and select the first
-//					this.grid.store.load();
-//				},
-
 				rowdblclick: function (grid, rowIndex, e) {
 
 					var record = grid.getStore().getAt(rowIndex);
@@ -93,10 +82,6 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 				scope: this
 			}
 		});
-
-		this.grid.getSelectionModel().on('rowselect', function (sm, rowIndex, record) {
-			go.Router.goto("contact/" + record.id);
-		}, this);
 
 		this.contactDetail = new go.modules.community.addressbook.ContactDetail({
 			region: "center"
@@ -119,10 +104,35 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 
 		go.modules.community.addressbook.MainPanel.superclass.initComponent.call(this);
 		
+		//because the root node is not visible it will auto expand on render.
 		this.addressBookTree.getRootNode().on('expand', function(node) {	
-			//console.log(node);
+			//when expand is done we'll select the first node. This will trigger a selection change. which will load the grid below.
 			this.addressBookTree.getSelectionModel().select(node.firstChild);
 		}, this);
+		
+		//load the grid on selection change.
+		this.addressBookTree.getSelectionModel().on('selectionchange', function(sm, node){
+			if(node.id == "all") {
+				this.setAddressBookId(null)
+			} else if(node.attributes.isAddressBook) {
+				this.setAddressBookId(node.attributes.entity.id);
+			} else
+			{
+				this.setGroupId(node.attributes.entity.id)
+			}
+		}, this);
+		
+		
+		//Load contact when selecting it in the grid.
+		this.grid.getSelectionModel().on('rowselect', function (sm, rowIndex, record) {
+			go.Router.goto("contact/" + record.id);
+		}, this);
+		
+		
+		//init drag drop
+		this.addressBookTree.on("nodedragover", this.onNodeDragOver, this);
+		this.addressBookTree.on("beforenodedrop", this.onNodeDrop, this);
+
 		
 	},
 	
@@ -142,5 +152,55 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 			groupId: groupId			
 		};
 		s.load();
+	},
+	
+	onNodeDragOver : function(e) {
+		if(e.target.id == "all") {
+			return false;
+		}
+		
+		if(e.target.attributes.entity.permissionLevel < GO.permissionLevels.write) {
+			console.log(e.target.attributes.entity);
+			return false;
+		}
+		
+		return true;
+	},
+	
+	onNodeDrop : function(e) {
+		console.log(e);
+		
+		var updates = {};
+		
+		//loop through dragged grid records
+		e.source.dragData.selections.forEach(function(r) {
+			var contact = {};
+			
+			if(e.target.attributes.isAddressBook) {
+				contact.addressBookId = e.target.attributes.entity.id;
+				contact.groups = []; //clear groups when changing address book
+			} else
+			{				
+				//clear groups when changing address book
+				contact.groups = contact.addressBookId == e.target.attributes.entity.addressBookId ? GO.util.clone(r.json.groups) : [];				
+				contact.addressBookId = e.target.attributes.entity.addressBookId;
+				
+				var groupId = e.target.attributes.entity.id;
+				if(contact.groups.column("groupId").indexOf(groupId) > -1) {
+					return; //already in the groups
+				}
+				contact.groups.push({groupId: groupId});
+			}
+			
+			updates[r.id] = contact;
+		});
+		
+		//console.log(updates);
+		
+		go.Stores.get("Contact").set({
+			update: updates
+		});
+		
 	}
+	
 });

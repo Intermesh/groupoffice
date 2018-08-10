@@ -1,5 +1,6 @@
 go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel, {
-
+	
+	
 	loader: new go.modules.community.addressbook.TreeLoader({
 		baseAttrs: {
 			iconCls: 'ic-account-box'
@@ -18,57 +19,9 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 	initComponent: function () {
 
 		go.modules.community.addressbook.AddressBookTree.superclass.initComponent.call(this);
-
-		this.getSelectionModel().on("selectionchange", function (sm, node) {
-			
-			
-			if(!node || node.id == "all"){
-				if(this.addressBookMoreBtn) {
-					this.addressBookMoreBtn.hide();
-				}
-				
-				if(this.groupMoreBtn) {
-					this.groupMoreBtn.hide();
-				}
-				return;
-			}
-
-			
-			if(node.attributes.isAddressBook) {
-				
-				if (!this.addressBookMoreBtn) {
-					this.initAddressBookMoreBtn();
-				}
-				if(this.groupMoreBtn) {
-					this.groupMoreBtn.hide();
-				}
-				this.addressBookMoreBtn.show();
-				this.currentAddressBookId = node.attributes.entity.id;
-				this.addressBookMoreBtn.getEl().alignTo(node.getUI().getEl(), 'tr-tr');
-				this.addressBookMoreBtn.entity = node.attributes.entity;
-	//			this.moreMenu.getComponent("edit").setDisabled(record.get("permissionLevel") < GO.permissionLevels.manage);
-	//		this.moreMenu.getComponent("share").setDisabled(record.get("permissionLevel") < GO.permissionLevels.manage);
-
-
-				
-			} else
-			{
-				if(this.addressBookMoreBtn) {
-					this.addressBookMoreBtn.hide();
-				}
-				if (!this.groupMoreBtn) {
-					this.initGroupMoreBtn();
-				}
-				this.groupMoreBtn.show();
-				this.groupMoreBtn.getEl().alignTo(node.getUI().getEl(), 'tr-tr');
-				this.groupMoreBtn.entity = node.attributes.entity;
-	//			this.moreMenu.getComponent("edit").setDisabled(record.get("permissionLevel") < GO.permissionLevels.manage);
-	//		this.moreMenu.getComponent("share").setDisabled(record.get("permissionLevel") < GO.permissionLevels.manage);
-
-
-				
-			}
-		}, this);
+		
+		
+		this.getSelectionModel().on("selectionchange", this.onSelectionChange, this);
 		
 		this.getRootNode().on("load", function() {
 			go.Stores.get("AddressBook").on('changes', this.onAddressBookChanges, this);
@@ -79,6 +32,57 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 				go.Stores.get("AddressBookGroup").un('changes', this.onGroupChanges, this);
 			});
 		}, this, {single: true});
+	},
+	
+	
+	onSelectionChange : function (sm, node) {			
+			
+		if(!node || node.id == "all"){
+			if(this.addressBookMoreBtn) {
+				this.addressBookMoreBtn.hide();
+			}
+
+			if(this.groupMoreBtn) {
+				this.groupMoreBtn.hide();
+			}
+			return;
+		}
+
+
+		if(node.attributes.isAddressBook) {
+
+			if (!this.addressBookMoreBtn) {
+				this.initAddressBookMoreBtn();
+			}
+			if(this.groupMoreBtn) {
+				this.groupMoreBtn.hide();
+			}
+			this.addressBookMoreBtn.show();
+			this.currentAddressBookId = node.attributes.entity.id;
+			this.addressBookMoreBtn.getEl().alignTo(node.getUI().getEl(), 'tr-tr');
+			this.addressBookMoreBtn.entity = node.attributes.entity;
+//			this.moreMenu.getComponent("edit").setDisabled(record.get("permissionLevel") < GO.permissionLevels.manage);
+//		this.moreMenu.getComponent("share").setDisabled(record.get("permissionLevel") < GO.permissionLevels.manage);
+
+
+
+		} else
+		{
+			if(this.addressBookMoreBtn) {
+				this.addressBookMoreBtn.hide();
+			}
+			if (!this.groupMoreBtn) {
+				this.initGroupMoreBtn();
+			}
+			this.groupMoreBtn.show();
+			this.groupMoreBtn.getEl().alignTo(node.getUI().getEl(), 'tr-tr');
+			this.groupMoreBtn.entity = node.attributes.entity;
+//			this.moreMenu.getComponent("edit").setDisabled(record.get("permissionLevel") < GO.permissionLevels.manage);
+//		this.moreMenu.getComponent("share").setDisabled(record.get("permissionLevel") < GO.permissionLevels.manage);
+
+
+
+		}
 	},
 	
 

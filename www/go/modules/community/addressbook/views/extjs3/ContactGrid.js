@@ -1,4 +1,5 @@
 go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
+	
 	initComponent: function () {
 
 		this.store = new go.data.Store({
