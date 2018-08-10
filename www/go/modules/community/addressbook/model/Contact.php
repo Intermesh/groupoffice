@@ -172,6 +172,12 @@ class Contact extends AclItemEntity {
 	 * @var Address[]
 	 */
 	public $addresses = [];	
+	
+	/**
+	 *
+	 * @var ContactGroup[] 
+	 */
+	public $groups = [];
 
 	protected static function aclEntityClass(): string {
 		return AddressBook::class;
@@ -183,13 +189,27 @@ class Contact extends AclItemEntity {
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
-						->addTable("addressbook_contact")
+						->addTable("addressbook_contact", 'c')
 						->addRelation('dates', Date::class, ['id' => 'contactId'])
 						->addRelation('phoneNumbers', PhoneNumber::class, ['id' => 'contactId'])
 						->addRelation('emailAddresses', EmailAddress::class, ['id' => 'contactId'])
 						->addRelation('addresses', Address::class, ['id' => 'contactId'])
 						->addRelation('organizations', ContactOrganization::class, ['id' => 'contactId'])
-						->addRelation('urls', Url::class, ['id' => 'contactId']);
+						->addRelation('urls', Url::class, ['id' => 'contactId'])
+						->addRelation('groups', ContactGroup::class, ['id' => 'contactId']);
+	}
+	
+	public static function filter(\go\core\db\Query $query, array $filter) {
+		if (isset($filter['addressBookId'])) {
+			$query->andWhere('addressBookId', '=', $filter['addressBookId']);
+		}
+		
+		if (isset($filter['groupId'])) {
+			$query->join('addressbook_contact_group', 'g', 'g.contactId = c.id')
+							->andWhere('g.groupId', '=', $filter['groupId']);
+		}
+		
+		return parent::filter($query, $filter);
 	}
 
 }

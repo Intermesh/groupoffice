@@ -1,9 +1,10 @@
-//todo remove when files is merged.
+//todo create base component for entities
 
 go.modules.community.addressbook.TreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 
 	entityStore: null,
 	
+	loading : false,
 	
 	load: function (node, callback, scope) {
 		if (this.clearOnLoad) {
@@ -16,8 +17,44 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 		} else if (this.directFn || this.dataUrl || this.url) {
 			this.requestData(node, callback, scope || node);
 		} else if (this.entityStore) {
-			this.requestEntityData(node, callback, scope || node);
+			
+			this.loading = true;
+			
+			if(node.attributes.isAddressBook) {
+				 this.requestGroups(node, callback, scope || node);
+			} else
+			{
+				this.requestEntityData(node, callback, scope || node);
+			}
 		}
+	},
+	
+	requestGroups : function(node, callback, scope) {
+						
+		go.Stores.get("AddressBookGroup").get(node.attributes.entity.groups, function(groups){
+			var result = [];
+			
+			groups.forEach(function(group) {
+				result.push({
+					id: "group-" + group.id,
+					iconCls: 'ic-group',
+					text: group.name,
+					leaf: true,
+					entity: group,
+					isGroup: true
+				});
+			});
+			
+			var response = {
+				argument: {callback: callback, node: node, scope: scope},
+				responseData:result
+			};
+			
+			this.loading = false;
+			this.handleResponse(response);
+		}, this)
+		
+		
 	},
 	
 	requestEntityData : function(node, callback, scope){
@@ -36,34 +73,26 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 
 	doRequest: function (params, callback, scope, options) {
 
-		var me = this;
 		
-		this.result = me.getItemList(this.entityStore.entity.name + "/query", params, function (getItemListResponse) {
-			me.entityStore.get(getItemListResponse.ids, function (items) {
-				var result = [];
+		this.result = this.getItemList(this.entityStore.entity.name + "/query", params, function (getItemListResponse) {
+			this.entityStore.get(getItemListResponse.ids, function (items) {
+				var result = [{
+						leaf: true,
+						iconCls: "ic-star",
+						text: t("All contacts"),
+						id: "all"
+				}];
 				
 				items.forEach(function(entity) {
 					result.push({
 						id: "addressbook-" + entity.id,
 						entityId: entity.id||null,
 						entity: entity,
-						leaf: false,
-						expanded: false,
-						children : [
-							{
-								id: "group-1",
-								iconCls: 'ic-group',
-								text: "Newsletter",
-								leaf: true
-							},{
-								id: "group-2",
-								iconCls: 'ic-group',
-								text: "Release announcements",
-								leaf: true
-							}
-							
-						],
-						text: entity.name
+						isAddressBook: true,
+						expanded: entity.groups.length == 0,						
+						text: entity.name,
+						nodeType: 'async',
+						children: entity.groups.length == 0 ? [] : null
 					});
 				});
 				
@@ -72,14 +101,15 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 					responseData:result
 				};
 
-				me.handleResponse(response);
+				this.loading = false;
+				this.handleResponse(response);
 //				callback.call(scope, options, true, result); //????
-			});
+			},this);
 
-		});
+		}, this);
 	},
 
-	getItemList: function (method, params, callback) {	
+	getItemList: function (method, params, callback, scope) {	
 		
 		//transfort sort parameters to jmap style
 		if(params.sort) {
@@ -92,7 +122,8 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 			params: params,
 			callback: function(options, success, response) {
 				callback.call(this, response);
-			}
+			},
+			scope: scope
 		});
 	},
 	

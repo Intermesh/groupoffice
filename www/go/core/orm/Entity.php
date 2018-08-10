@@ -15,6 +15,9 @@ use go\core\validate\ErrorCode;
 /**
  * Entity model
  * 
+ * Note: when changing database columns you need to run install/upgrade.php to 
+ * rebuild the cache.
+ * 
  * An entity is a model that is saved to the database. An entity can have 
  * multiple database tables. It can be extended with has one related tables and
  * it can also have properties in other tables.

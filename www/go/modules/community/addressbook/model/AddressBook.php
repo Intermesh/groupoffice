@@ -37,16 +37,23 @@ class AddressBook extends \go\core\acl\model\AclEntity {
 	 */							
 	public $createdBy;
 	
-	/**
-	 *
-	 * @var Group[]
-	 */
-	public $groups = [];
-
 	protected static function defineMapping() {
 		return parent::defineMapping()
-						->addTable("addressbook_addressbook")
-						->addRelation('groups', Group::class, ['id' => 'addressBookid']);
+						->addTable("addressbook_addressbook");
+	}
+	
+	/**
+	 * Get the group ID's
+	 * 
+	 * @return int[]
+	 */
+	public function getGroups() {
+		return (new \go\core\db\Query)
+						->selectSingleValue('id')
+						->from("addressbook_group")
+						->where(['addressBookId' => $this->id])
+						->all();
+						
 	}
 
 }

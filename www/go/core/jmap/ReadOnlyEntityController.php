@@ -292,9 +292,15 @@ abstract class ReadOnlyEntityController extends Controller {
 				'notFound' => []
 		];
 		
+		//empty array should return empty result. but ids == null should return all.
+		if(isset($p['ids']) && !count($p['ids'])) {
+			Response::get()->addResponse($result);
+			return;
+		}
+		
 		$query = $this->getGetQuery($p);		
 		
-		if(empty($p['ids'])) {
+		if(!isset($p['ids'])) {
 			$result['list'] = $query->toArray();
 		} else
 		{

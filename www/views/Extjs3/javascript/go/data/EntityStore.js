@@ -72,16 +72,16 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	
 	_fireChanges : function() {
 		var me = this;
-
-		if (me.timeout) {
-			clearTimeout(me.timeout);
-		}
+//
+//		if (me.timeout) {
+//			clearTimeout(me.timeout);
+//		}
 		
 		//delay fireevent one event loop cycle
 //		me.timeout = setTimeout(function () {				
 			me.fireEvent('changes', me, me.changes.added, me.changes.changed, me.changes.destroyed);			
 			me.initChanges();
-			me.timeout = null;
+//			me.timeout = null;
 //		}, 0);
 	},
 
@@ -121,9 +121,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		}
 	},
 
-	getUpdates: function (cb, scope) {
-		
-		console.log("State on getUpdates: ", this.state);
+	getUpdates: function (cb, scope) {		
 		
 		if (this.state) {
 			var clientCallId = go.Jmap.request({
@@ -134,7 +132,6 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				callback: function(options, success, response) {
 					if(success) {
 						this.state = response.newState;
-						console.log("New state on getUpdates: ", this.state);
 					} else
 					{
 						this.state = null;
@@ -166,8 +163,9 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				method: this.entity.name + "/get",
 				callback: function (options, success, response) {
 					this.state = response.state;
-				
-					cb.call(scope || this, this);
+					if(cb) {
+						cb.call(scope || this, this);
+					}
 				},
 				scope: this
 			});
@@ -302,7 +300,6 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				}
 				
 				this.state = response.newState;	
-				console.log("New state on set: ", this.state);
 				this.saveState();
 				
 				if(response.destroyed) {

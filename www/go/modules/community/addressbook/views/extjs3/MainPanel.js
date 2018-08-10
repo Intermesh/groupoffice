@@ -17,8 +17,19 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 						var dlg = new go.modules.community.addressbook.AddressBookDialog();
 						dlg.show();
 					}
-				}]
+				}]			
 		});
+		
+		this.addressBookTree.getSelectionModel().on('selectionchange', function(sm, node){
+			if(node.id == "all") {
+				this.setAddressBookId(null)
+			} else if(node.attributes.isAddressBook) {
+				this.setAddressBookId(node.attributes.entity.id);
+			} else
+			{
+				this.setGroupId(node.attributes.entity.id)
+			}
+		}, this);
 
 		this.filterPanel = new Ext.Panel({
 			width: dp(300),
@@ -37,8 +48,8 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 					cls: 'go-narrow',
 					iconCls: "ic-menu",
 					handler: function () {
-//						this.westPanel.getLayout().setActiveItem(this.noteBookGrid);
-//						this.noteBookGrid.show();
+						this.westPanel.getLayout().setActiveItem(this.addressBookTree);
+						this.addressBookTree.show();
 					},
 					scope: this
 				},
@@ -63,10 +74,10 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 
 			],
 			listeners: {
-				viewready: function (grid) {
-					//load note books and select the first
-					this.grid.store.load();
-				},
+//				viewready: function (grid) {
+//					//load note books and select the first
+//					this.grid.store.load();
+//				},
 
 				rowdblclick: function (grid, rowIndex, e) {
 
@@ -107,5 +118,29 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 		this.items = [this.westPanel, this.contactDetail];
 
 		go.modules.community.addressbook.MainPanel.superclass.initComponent.call(this);
+		
+		this.addressBookTree.getRootNode().on('expand', function(node) {	
+			//console.log(node);
+			this.addressBookTree.getSelectionModel().select(node.firstChild);
+		}, this);
+		
+	},
+	
+	setAddressBookId : function(addressBookId) {
+		var s = this.grid.store;
+		
+		s.baseParams.filter = {
+			addressBookId: addressBookId			
+		};
+		s.load();
+	},
+	
+	setGroupId : function(groupId) {
+		var s = this.grid.store;
+		
+		s.baseParams.filter = {
+			groupId: groupId			
+		};
+		s.load();
 	}
 });
