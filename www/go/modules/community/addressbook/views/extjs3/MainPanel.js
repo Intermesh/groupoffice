@@ -112,6 +112,10 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 		
 		//load the grid on selection change.
 		this.addressBookTree.getSelectionModel().on('selectionchange', function(sm, node){
+			if(!node) {
+				return;
+			}
+			
 			if(node.id == "all") {
 				this.setAddressBookId(null)
 			} else if(node.attributes.isAddressBook) {
@@ -172,17 +176,21 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 		
 		var updates = {};
 		
+		var removeFromGrid = false;
+		
 		//loop through dragged grid records
 		e.source.dragData.selections.forEach(function(r) {
 			var contact = {};
 			
 			if(e.target.attributes.isAddressBook) {
+				removeFromGrid = r.json.addressBookId != e.target.attributes.entity.id;
 				contact.addressBookId = e.target.attributes.entity.id;
 				contact.groups = []; //clear groups when changing address book
 			} else
 			{				
+				removeFromGrid = r.json.addressBookId != e.target.attributes.entity.addressBookId;
 				//clear groups when changing address book
-				contact.groups = contact.addressBookId == e.target.attributes.entity.addressBookId ? GO.util.clone(r.json.groups) : [];				
+				contact.groups = r.json.addressBookId == e.target.attributes.entity.addressBookId ? GO.util.clone(r.json.groups) : [];				
 				contact.addressBookId = e.target.attributes.entity.addressBookId;
 				
 				var groupId = e.target.attributes.entity.id;
@@ -196,6 +204,10 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 		});
 		
 		//console.log(updates);
+		
+		if(removeFromGrid) {
+			this.grid.store.remove(e.source.dragData.selections);
+		}
 		
 		go.Stores.get("Contact").set({
 			update: updates

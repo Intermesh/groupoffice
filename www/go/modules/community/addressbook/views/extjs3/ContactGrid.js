@@ -154,6 +154,67 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 		});
 
 		go.modules.community.addressbook.ContactGrid.superclass.initComponent.call(this);
+	},
+	
+	//when filtering on a group then offer to delete contacts from a group when delting.
+	deleteSelected : function() {
+		console.log(this.store.baseParams.filter);
+		if(!this.store.baseParams.filter.groupId) {
+			return go.modules.community.addressbook.ContactGrid.superclass.deleteSelected.call(this);
+		}
+		
+		var groupId = this.store.baseParams.filter.groupId;
+		
+		var selectedRecords = this.getSelectionModel().getSelections(), ids = selectedRecords.column('id'), strConfirm;
+
+		switch (ids.length)
+		{
+			case 0:
+				return;
+			case 1:
+				strConfirm = t("Are you sure you want to delete the selected item?");
+				break;
+
+			default:
+				strConfirm = t("Are you sure you want to delete the {count} items?").replace('{count}', ids.length);
+				break;
+		}
+		
+		Ext.Msg.show({
+				title:t("Confirm delete"),
+				msg: t(strConfirm),
+				buttons: {ok: t("Remove from group"), yes: t("Delete"), "cancel" : t("Cancel")},
+				fn: function (btn) {
+
+					if (btn == "yes") {
+						this.getStore().entityStore.set({
+							destroy: ids
+						});
+					}
+					
+					if(btn == "ok") {
+						var updates = {};
+						
+						
+						selectedRecords.forEach(function(r) {
+							var groupIndex = r.json.groups.column("groupId").indexOf(groupId);
+//							console.log(groupIndex, groupId, r.json.groups);
+							updates[r.id] = {
+								groups: GO.util.clone(r.json.groups)
+							};
+							updates[r.id].groups.splice(groupIndex, 1);
+						});
+						
+						this.getStore().remove(selectedRecords);
+						
+						this.getStore().entityStore.set({
+							update: updates
+						});
+					}
+				},
+				scope: this,
+				icon: Ext.MessageBox.QUESTION
+		 });
 	}
 });
 

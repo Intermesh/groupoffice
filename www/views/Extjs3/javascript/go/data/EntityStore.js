@@ -10,7 +10,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	constructor : function(config) {
 		go.data.EntityStore.superclass.constructor.call(this, config);
 		
-		this.addEvents('changes');
+		this.addEvents({changes:true, error:true});
 		
 		this.restoreState();
 		this.initChanges();
@@ -282,6 +282,13 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			params: params,
 			scope: this,
 			callback: function (options, success, response) {
+				
+				if(!success) {
+					Ext.MessageBox.alert(t("Error"), JSON.stringify(response));					
+					this.fireEvent("error", options, response);					
+					return;
+				}
+				
 				var entity, clientId;
 				
 				if(response.created) {
@@ -292,7 +299,6 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				}
 				
 				if(response.updated) {
-
 					for(serverId in response.updated) {
 						entity = Ext.apply(params.update[serverId], response.updated[serverId]);
 						this._add(entity);
@@ -303,8 +309,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				this.saveState();
 				
 				if(response.destroyed) {
-					for(var i =0, l = response.destroyed.length; i < l; i++) {
-						
+					for(var i =0, l = response.destroyed.length; i < l; i++) {						
 						this._destroy(response.destroyed[i]);
 					}
 				}

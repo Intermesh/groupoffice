@@ -87,7 +87,7 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 	
 
 	onAddressBookChanges : function(entityStore, added, changed, destroyed) {		
-		debugger;
+
 		if(this.getLoader().loading) {
 			return;
 		}

@@ -82,6 +82,12 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		if(this.entityStore) {
 			this.on('update', this.onUpdate, this);		
 			this.entityStore.on('changes', this.onChanges, this);
+			
+			//reload if something goes wrong in the entity store.
+			this.entityStore.on("error", function() {
+				this.reload();
+			}, this);
+			
 			this.on('destroy', function() {
 			this.entityStore.un('changes', this.onChanges, this);
 		}, this);

@@ -212,7 +212,7 @@ class Contact extends AclItemEntity {
 		return parent::filter($query, $filter);
 	}
 	
-	protected function internalValidate() {
+	protected function internalValidate() {		
 		
 		if($this->isModified('addressBookId') || $this->isModified('groups')) {
 			//verify groups and address book match
