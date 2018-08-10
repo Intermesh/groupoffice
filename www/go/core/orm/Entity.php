@@ -83,8 +83,6 @@ abstract class Entity extends Property {
 		$tables = static::getMapping()->getTables();
 		$primaryTable = array_shift($tables);
 		$pkOfPrimaryTable = $primaryTable->getPrimaryKey();
-
-		$query = static::internalFind($properties);		
 		
 		if (count($pkOfPrimaryTable) > 1) {
 			throw new Exception("Can't find by ids because the primary table has more than one primary key. Entities should have only one primary key field.");//		
