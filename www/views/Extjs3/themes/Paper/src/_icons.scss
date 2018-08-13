@@ -36,6 +36,12 @@
   -moz-osx-font-smoothing: grayscale; // Support for Firefox.
   font-feature-settings: 'liga'; // Support for IE
 }
+i.icon {
+	@extend %icon;
+	background-size: cover;
+	width:dp(24);
+	height: dp(24);
+}
 .email-grid-icon {
 	@extend %icon;
 	background-position: -100px;
