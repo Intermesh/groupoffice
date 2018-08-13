@@ -4551,7 +4551,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 				"fromId" => $from_model_id,
 				"fromEntityTypeId" => $from_model_type_id,
 				"description" => $description,
-				"createdAt" => new \DateTime()
+				"createdAt" => new \DateTime('now',new \DateTimeZone('UTC'))
 				
 		])->execute()){
 			return false;
@@ -4563,7 +4563,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 		$reverse['toId'] = $from_model_id;
 		$reverse['fromId'] = $to_model_id;		
 		$reverse['description'] = $description;
-		$reverse['createdAt'] = new \DateTime();
+		$reverse['createdAt'] = new \DateTime('now',new \DateTimeZone('UTC'));
 	
 		
 		if(!\go\core\App::get()->getDbConnection()->insert('core_link', $reverse)->execute()) {
