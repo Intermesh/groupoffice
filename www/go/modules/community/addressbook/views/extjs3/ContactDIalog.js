@@ -36,7 +36,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 								xtype: 'textfield',
 								name: 'name',
 								fieldLabel: t("Name"),
-								anchor: '-' + dp(28), //for delete button of gridfields
+								anchor: '100%',
 								allowBlank: false,
 								hidden: true
 							})
@@ -44,13 +44,13 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 								xtype: 'compositefield',
 								
 								fieldLabel: t("Name"),
-								anchor: '-' + dp(28), //for delete button of gridfields
+								anchor: '100%', 
 								allowBlank: false,
 								items: [{
 									xtype: 'textfield',
 									name: 'firstName',
 									emptyText: t("First name"),
-									flex: 2,									
+									flex: 3,									
 									listeners: {
 										change: this.buildFullName,
 										scope: this
@@ -59,7 +59,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 									xtype: 'textfield',
 									name: 'middleName',
 									emptyText: t("Middle name"),
-									flex: 1,									
+									flex: 2,									
 									listeners: {
 										change: this.buildFullName,
 										scope: this
@@ -68,18 +68,24 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 									xtype: 'textfield',
 									name: 'lastName',
 									emptyText: t("Last name"),
-									flex: 2,									
+									flex: 3,									
 									listeners: {
 										change: this.buildFullName,
 										scope: this
 									}
 								}]
 							}),
+							{
+								xtype: "textfield",
+								name: "jobTitle",
+								fieldLabel: t("Job title"),
+								anchor: "100%"
+							}
 						]
 					},
 					{
-						width: dp(120),
-						
+						width: dp(152),
+						style: "padding: "+ dp(16) + "px",
 						layout: "form",
 						items: [
 							this.avatarComp = new go.form.FileField({

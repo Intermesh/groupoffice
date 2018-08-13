@@ -1,5 +1,4 @@
-@import "../../../../../../../../../views/Extjs3/themes/Paper/src/_colors.scss";
-@import "../../../../../../../../../views/Extjs3/themes/Paper/src/_config.scss";
+@import "../../../../../../../../../views/Extjs3/themes/Paper/src/_base.scss";
 
 .go-addressbook-star {
 	color: #febf35;
@@ -7,9 +6,22 @@
 
 .go-addressbook-contact-avatar {
 	text-align: center;
-	padding: dp(32);
 	.avatar {
-		height: dp(160);
-		width: dp(160);
+		height: dp(200);
+		width: dp(200);
+	}
+}
+
+.go-addressbook-name-panel {
+	padding: dp(16);
+	.x-panel-tbar {
+		.x-toolbar {
+			border-bottom: 0;
+		}
+	}
+	
+	h4 {
+		top: dp(-16);
+		left: dp(56);
 	}
 }

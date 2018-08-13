@@ -93,6 +93,13 @@ class Contact extends AclItemEntity {
 	 * @var bool
 	 */							
 	public $isOrganization = false;
+	
+	/**
+	 * The job title
+	 * 
+	 * @var string 
+	 */
+	public $jobTitle;
 
 	/**
 	 * name field for companies and contacts. It should be the display name of first, middle and last name

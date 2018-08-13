@@ -1,8 +1,7 @@
 go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView, {
 	entityStore: go.Stores.get("Contact"),
 	stateId: 'addressbook-contact-detail',
-	cls: 'go-addressook-contact-detail',
-
+	
 	initComponent: function () {
 
 
@@ -10,17 +9,23 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 
 		Ext.apply(this, {
 			items: [{
-					xtype: 'panel',
+					xtype: 'container',
 					layout: "hbox",
-					tbar: [
-						this.starButton = new go.modules.community.addressbook.StarButton(),
-						this.titleComp = new go.toolbar.TitleItem()
+					cls: "go-addressbook-name-panel",
+					items: [						
+						this.namePanel = new Ext.BoxComponent({
+							tpl: "<h3>{name}</h3><h4>{jobTitle}</h4>"
+						}),
+						this.starButton = new go.modules.community.addressbook.StarButton()
 					],
-					onLoad: function (detailView) {
-						detailView.titleComp.setText(detailView.data.name);
+					onLoad: function (detailView) {						
+						detailView.namePanel.update(detailView.data);
 						detailView.starButton.setContactId(detailView.data.id);
-					}
-				}, {
+					},
+					
+				}, 
+				
+				{
 					tpl: new Ext.XTemplate('<div class="go-addressbook-contact-avatar">\
 <div class="avatar {[this.getCls(values.isOrganization)]}" style="{[this.getStyle(values.photoBlobId)]}"></div></div>', 
 					{
@@ -31,7 +36,25 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 							return photoBlobId ? 'background-image: url(' + go.Jmap.downloadUrl(photoBlobId) + ')"' : "";
 						}
 					})
-
+				},
+				
+				
+				{
+					xtype: "toolbar",
+					buttonAlign: "center",
+					items: [
+						this.emailButton = new Ext.Button({
+							menu: [],
+							text: t("E-mail"),
+							iconCls: 'ic-email'
+						}),
+						
+						this.callButton = new Ext.Button({
+							menu: [],
+							text: t("Call"),
+							iconCls: 'ic-phone'
+						})
+					]
 				}
 			]
 		});

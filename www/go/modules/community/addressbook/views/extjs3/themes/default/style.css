@@ -2,10 +2,17 @@
   color: #febf35; }
 
 .go-addressbook-contact-avatar {
-  text-align: center;
-  padding: 28px; }
+  text-align: center; }
   .go-addressbook-contact-avatar .avatar {
-    height: 140px;
-    width: 140px; }
+    height: 175px;
+    width: 175px; }
+
+.go-addressbook-name-panel {
+  padding: 14px; }
+  .go-addressbook-name-panel .x-panel-tbar .x-toolbar {
+    border-bottom: 0; }
+  .go-addressbook-name-panel h4 {
+    top: -14px;
+    left: 49px; }
 
 /*# sourceMappingURL=style.css.map */
