@@ -2087,8 +2087,10 @@ class MessageController extends \GO\Base\Controller\AbstractController {
 		
 		$atts = $message->getAttachments();
 		$fsFolder = $folder->fsFolder;
-		\GO::debug($atts);
+		//\GO::debug($atts);
 		while($att=array_shift($atts)){
+			\GO::debug($att->content_id);
+			\GO::debug($att->disposition);
 			if(empty($att->content_id) || $att->disposition=='attachment'){
 				
 				// Check if the file already exists on disk, if so then add a number after it.
@@ -2288,7 +2290,7 @@ class MessageController extends \GO\Base\Controller\AbstractController {
 		$tmpFolder = \GO\Base\Fs\Folder::tempFolder(uniqid(time()));
 		$atts = $message->getAttachments();
 		while($att=array_shift($atts)){
-			if(empty($att->content_id) || $att->disposition=='attachment')
+			if(empty($att->content_id))
 				$att->saveToFile($tmpFolder);
 		}
 
