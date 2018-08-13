@@ -38,7 +38,7 @@
 }
 i.icon {
 	@extend %icon;
-	background-size: cover;
+	background-size: contain;
 	width:dp(24);
 	height: dp(24);
 }
