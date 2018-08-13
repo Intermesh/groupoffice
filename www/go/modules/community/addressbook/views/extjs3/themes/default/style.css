@@ -9,10 +9,10 @@
 
 .go-addressbook-name-panel {
   padding: 14px; }
-  .go-addressbook-name-panel .x-panel-tbar .x-toolbar {
-    border-bottom: 0; }
   .go-addressbook-name-panel h4 {
     top: -14px;
     left: 49px; }
+  .go-addressbook-name-panel .go-addressbook-star {
+    margin-top: -7px; }
 
 /*# sourceMappingURL=style.css.map */

@@ -28,8 +28,28 @@
 			}, function (err) {
 				console.error('Async: Could not copy text: ', err);
 			});
+		},
+		
+		mailto : function(config) {
+			var email = config.email;
+			
+			if(config.name) {
+				email = '"' + config.name.replace(/"/g, '\"') + '" <' + config.email + '>'; 
+			}
+			
+			document.location = "mailto:" + email;
+		},
+		
+		callto : function(config) {
+			document.location = "tel:" + config.number;
+		},
+		
+		streetAddress : function(config) {
+			window.open("https://www.openstreetmap.org/search?query=" + encodeURIComponent(config.street + ", " +config.zipCode + ", " + config.country));
 		}
 
 	};
+	
+
 
 })();

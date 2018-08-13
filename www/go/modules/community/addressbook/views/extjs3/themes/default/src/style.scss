@@ -13,15 +13,13 @@
 }
 
 .go-addressbook-name-panel {
-	padding: dp(16);
-	.x-panel-tbar {
-		.x-toolbar {
-			border-bottom: 0;
-		}
-	}
-	
+	padding: dp(16);	
 	h4 {
 		top: dp(-16);
 		left: dp(56);
+	}
+	
+	.go-addressbook-star {
+		margin-top: dp(-8);
 	}
 }

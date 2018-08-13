@@ -50,7 +50,7 @@ go.modules.community.addressbook.StarButton = Ext.extend(Ext.Button, {
 		this.contactId = id;
 		
 		var entities = go.Stores.get("ContactStar").get([this.getEntityId()])
-		var starred = entities && entities[0].starred;
+		var starred = entities && entities[0] && entities[0].starred;
 		this.setIconClass(starred ? 'ic-star' : 'ic-star-border');
 	}
 });

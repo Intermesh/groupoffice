@@ -143,7 +143,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 										'value',
 										'display'
 									],
-									data: [['work', t("Work")], ['home', t("Home")]]
+									data: [['work', t("emailTypes")["work"]], ['private', t("emailTypes")['private']]]
 								}),
 								id: 'type',
 								sortable: false,
@@ -192,7 +192,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 										'value',
 										'display'
 									],
-									data: [['mobile', t("Mobile")], ['work', t("Work")], ['home', t("Home")]]
+									data: [['mobile', t("phoneTypes")["mobile"]], ['work', t("phoneTypes")["work"]], ['private', t("phoneTypes")['private']]]
 								}),
 								id: 'type',
 								sortable: false,

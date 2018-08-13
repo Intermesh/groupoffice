@@ -73,6 +73,9 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 	},
 
 	onLoad: function () {
+		
+		go.Translate.setModule(this.package, this.module);
+		
 		this.items.each(function (item, index, length) {
 			
 			item.show();

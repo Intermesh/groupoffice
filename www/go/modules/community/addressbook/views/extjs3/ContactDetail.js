@@ -18,7 +18,9 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 						}),
 						this.starButton = new go.modules.community.addressbook.StarButton()
 					],
-					onLoad: function (detailView) {						
+					onLoad: function (detailView) {
+						detailView.data.jobTitle = detailView.data.jobTitle || "";
+						
 						detailView.namePanel.update(detailView.data);
 						detailView.starButton.setContactId(detailView.data.id);
 					},
@@ -40,21 +42,79 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 				
 				
 				{
+					onLoad: function(dv) {
+						dv.emailButton.menu.removeAll();						
+						dv.data.emailAddresses.forEach(function(a) {
+							dv.emailButton.menu.addMenuItem({
+								text: "<div>" + a.email + "</div><small>" + t("emailTypes")[a.type] + "</small></div>",
+								handler: function() {
+									go.util.mailto({
+										email: a.email,
+										name: dv.name
+									});
+								}
+							});
+						});
+						
+						
+						dv.callButton.menu.removeAll();						
+						dv.data.phoneNumbers.forEach(function(a) {
+							dv.callButton.menu.addMenuItem({
+								text: "<div>" + a.number + "</div><small>" + t("phoneTypes")[a.type] + "</small></div>",
+								handler: function() {
+									go.util.callto({
+										number: a.number,
+										name: dv.name
+									});
+								}
+							});
+						});
+						
+					},
 					xtype: "toolbar",
+					cls: "actions",
 					buttonAlign: "center",
 					items: [
 						this.emailButton = new Ext.Button({
-							menu: [],
+							menu: {cls: "x-menu-no-icons", items: []},
 							text: t("E-mail"),
 							iconCls: 'ic-email'
 						}),
 						
 						this.callButton = new Ext.Button({
-							menu: [],
+							menu: {cls: "x-menu-no-icons", items: []},
 							text: t("Call"),
 							iconCls: 'ic-phone'
 						})
 					]
+				},{
+					xtype: "box",
+					listeners: {
+						scope: this,
+						afterrender: function(box) {
+							
+							box.getEl().on('click', function(e){								
+								var container = box.getEl().dom.firstChild, 
+								item = e.getTarget("a", box.getEl()),
+								i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);
+								
+								go.util.streetAddress(this.data.addresses[i]);
+							}, this);
+						}
+					},
+					tpl: '<div class="icons">\
+					<tpl for="addresses">\
+						<hr class="indent">\
+						<a class="s6"><i class="icon label">location_on</i>\
+							<label>{[t("addressTypes")[values.type]]}</label>\
+							<span>{street}<br>\
+							<tpl if="zipCode">{zipCode}<br></tpl>\
+							<tpl if="city">{city}<br></tpl>\
+							<tpl if="state">{state}<br></tpl>\
+							<tpl if="country">{country}</tpl></span>\
+						</a>\
+					</tpl>\
+					</div>'
 				}
 			]
 		});

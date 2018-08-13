@@ -931,13 +931,22 @@ button.filetype-pdf, button.filetype-doc {
 		height: dp(64);
 		padding-left: dp(8);
 		.x-btn{
-			border: dp(1) solid color($fg, "line");
+			border: 1px solid color($fg, "line");
 		}
 		.x-toolbar {
 			border-bottom: 0;
 		}
 	}
 	
+	.x-toolbar.actions {
+		padding: dp(16);
+		padding-bottom: dp(24);
+		height: dp(72);
+		.x-btn{
+			color: $cPrimary;
+			border: 1px solid color($fg, "line");
+		}
+	}
 	
 	.x-panel-bbar  {
 		.x-toolbar {
@@ -1372,3 +1381,5 @@ table[id^="comments-ext"] b {
 		top: 0;
 	}
 }
+
+

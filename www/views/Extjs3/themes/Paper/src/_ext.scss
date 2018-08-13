@@ -646,7 +646,7 @@ ul.x-tab-strip-bottom{
 	@extend %font-button;
 	letter-spacing: 0; // for button icons
 	height: dp(36); // 32 for dense
-	line-height: dp(36); // 32 for dense
+	line-height: dp(36) - 2; // 32 for dense
 	border-radius: $borderRadius;
 	vertical-align: middle;
 	white-space: nowrap;
@@ -686,8 +686,8 @@ ul.x-tab-strip-bottom{
 	// transition: background 400ms cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
    & button, & em {
 		@extend %font-button;
-		color: inherit;
-   }
+		color: inherit;		
+   }	 
 	//  &-click {
 	//    @extend .z2;
 	//    background-color: color($grey, 200);
@@ -759,6 +759,7 @@ ul.x-tab-strip-bottom{
 	&-text-icon button::before{
 		@extend %icon;
 		padding-right: dp(8);
+		margin-top: dp(-4);
 	}
    &-pressed {
 		//background-color: color($bg, 'hover');
@@ -769,7 +770,7 @@ ul.x-tab-strip-bottom{
    }
 	
 	&-mc em.x-btn-arrow > button {
-		padding-right: dp(8);
+		/*padding-right: dp(8);*/
 		&:after {
 			@extend %icon;
 			content: 'arrow_drop_down';
@@ -1819,6 +1820,13 @@ td.x-date-mp-sep {
 	transform-origin: left top 0px;
 	transform: scale(1);
 	will-change: transform, opacity;
+	
+	&.x-menu-no-icons {
+		.x-menu-item-icon {
+			display: none;
+		}		
+	}
+	
 	&.x-hide-offsets {
 		opacity: 0;
 		transform: scale(0.6);
