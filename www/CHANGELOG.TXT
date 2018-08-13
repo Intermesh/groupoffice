@@ -1,3 +1,5 @@
+- Email: Save all attachments to personal folder function would also save inline attachments
+
 06-08-2018 6.2.102
 - Core: don't send empty string feedback: '' when success: true.
 - CalDAV: Fix re-opening tasks with CalDAV
