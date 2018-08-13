@@ -1,6 +1,7 @@
 go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView, {
 	entityStore: go.Stores.get("Contact"),
-	stateId: 'addressbook-contact-detai;',
+	stateId: 'addressbook-contact-detail',
+	cls: 'go-addressook-contact-detail',
 
 	initComponent: function () {
 
@@ -11,7 +12,6 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 			items: [{
 					xtype: 'panel',
 					layout: "hbox",
-					
 					tbar: [
 						this.starButton = new go.modules.community.addressbook.StarButton(),
 						this.titleComp = new go.toolbar.TitleItem()
@@ -20,6 +20,18 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 						detailView.titleComp.setText(detailView.data.name);
 						detailView.starButton.setContactId(detailView.data.id);
 					}
+				}, {
+					tpl: new Ext.XTemplate('<div class="go-addressbook-contact-avatar">\
+<div class="avatar {[this.getCls(values.isOrganization)]}" style="{[this.getStyle(values.photoBlobId)]}"></div></div>', 
+					{
+						getCls: function (isOrganization) {
+							return isOrganization ? "group" : "";
+						},
+						getStyle: function (photoBlobId) {
+							return photoBlobId ? 'background-image: url(' + go.Jmap.downloadUrl(photoBlobId) + ')"' : "";
+						}
+					})
+
 				}
 			]
 		});
@@ -50,39 +62,39 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 	initToolbar: function () {
 
 		var items = this.tbar || [];
-		
+
 		items = items.concat([
-				'->',
-				{
-					itemId: "edit",
-					iconCls: 'ic-edit',
-					tooltip: t("Edit"),
-					handler: function (btn, e) {
-						var noteEdit = new go.modules.community.addressbook.ContactForm();
-						noteEdit.show();
-						noteEdit.load(this.data.id);
-					},
-					scope: this
+			'->',
+			{
+				itemId: "edit",
+				iconCls: 'ic-edit',
+				tooltip: t("Edit"),
+				handler: function (btn, e) {
+					var dlg = new go.modules.community.addressbook.ContactDialog();
+					dlg.show();
+					dlg.load(this.data.id);
 				},
-				
-				new go.detail.addButton({
-					detailPanel: this
-				}),
+				scope: this
+			},
 
-				{
-					iconCls: 'ic-more-vert',
-					menu: [
-						{
-							iconCls: "btn-print",
-							text: t("Print"),
-							handler: function () {
-								this.body.print({title: this.data.name});
-							},
-							scope: this
-						}
+			new go.detail.addButton({
+				detailPanel: this
+			}),
 
-					]
-				}]);
+			{
+				iconCls: 'ic-more-vert',
+				menu: [
+					{
+						iconCls: "btn-print",
+						text: t("Print"),
+						handler: function () {
+							this.body.print({title: this.data.name});
+						},
+						scope: this
+					}
+
+				]
+			}]);
 
 		var tbarCfg = {
 			disabled: true,

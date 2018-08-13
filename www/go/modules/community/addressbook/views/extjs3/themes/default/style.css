@@ -1,3 +1,11 @@
 .go-addressbook-star {
-	color: #febf35;
-}
+  color: #febf35; }
+
+.go-addressbook-contact-avatar {
+  text-align: center;
+  padding: 28px; }
+  .go-addressbook-contact-avatar .avatar {
+    height: 140px;
+    width: 140px; }
+
+/*# sourceMappingURL=style.css.map */

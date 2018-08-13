@@ -1,0 +1,15 @@
+@import "../../../../../../../../../views/Extjs3/themes/Paper/src/_colors.scss";
+@import "../../../../../../../../../views/Extjs3/themes/Paper/src/_config.scss";
+
+.go-addressbook-star {
+	color: #febf35;
+}
+
+.go-addressbook-contact-avatar {
+	text-align: center;
+	padding: dp(32);
+	.avatar {
+		height: dp(160);
+		width: dp(160);
+	}
+}

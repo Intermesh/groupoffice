@@ -1,5 +1,3 @@
-/* main: yourtheme.scss*/
-
 //--------------------------------------------------------------
 // 0. Density independent pixels
 //--------------------------------------------------------------
@@ -20,7 +18,7 @@ $layout-lg:     1920px !default;
 
 $borderRadius: 2px !default;
 
-/* Bezier easing curve */
+// Bezier easing curve 
 $curve-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
 $curve-deceleration: cubic-bezier(0.0, 0.0, 0.2, 1);
 $curve-acceleration: cubic-bezier(0.4, 0.0, 1, 1);
@@ -34,10 +32,7 @@ $vars: (
   c-primary: $cPrimary,
   c-primary-tp: $cPrimaryTp,
 );
-:root {
-  --c-primary: #{map-get($vars, c-primary)};
-  --c-primary-tp: #{map-get($vars, c-primary-tp)};
-}
+
 
 @mixin var($property, $varName) {
   #{$property}: map-get($vars, $varName);
@@ -47,12 +42,6 @@ $vars: (
 //------------------------------------------------
 // Layouts and backgrounds
 //------------------------------------------------
-%card {
-  @extend .z1;
-  border: 0;
-  background-color:color($bg,'card');
-  border-radius: $borderRadius;
-}
 
 %badge {
 	font-size: sp(13);

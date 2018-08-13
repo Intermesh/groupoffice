@@ -205,12 +205,11 @@ $dbackground: (
 );
 
 // Colors that have meaning (eg. success/failure)
-/*
- GO 6.2 color:
-$cPrimary:		rgb(0, 155, 201);
-$cPrimaryTp:	rgba(0, 155, 201, 0.16);*/
+// GO 6.2 color:
+// $cPrimary:		rgb(0, 155, 201);
+// $cPrimaryTp:	rgba(0, 155, 201, 0.16);
 
-/* Intermesh blue */
+//Intermesh blue 
 $cPrimary:		rgb(36, 58, 128);
 $cPrimaryTp:	rgba(36, 58, 128, 0.16);
 
@@ -226,6 +225,3 @@ $cHover: color($bg, 'hover');
 $cActive: color($grey, 200); // focussed
 $cAnchor: rgb(36, 58, 128);
 
-.success { color: $cSuccess !important; }
-.danger { color: $cDanger !important; }
-.warning { color: $cWarning !important; }

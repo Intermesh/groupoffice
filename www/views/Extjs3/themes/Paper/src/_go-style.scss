@@ -1,3 +1,8 @@
+:root {
+  --c-primary: #{map-get($vars, c-primary)};
+  --c-primary-tp: #{map-get($vars, c-primary-tp)};
+}
+
 ::-webkit-scrollbar-thumb {
 	//border: none;
 	background:color($grey,200);
@@ -13,6 +18,11 @@ body {
 body * {
 	box-sizing: border-box;
 }
+
+
+.success { color: $cSuccess !important; }
+.danger { color: $cDanger !important; }
+.warning { color: $cWarning !important; }
 
 /*#bg {
 	z-index: -1;
@@ -265,7 +275,10 @@ a {
 
 //, .go-border-center:not(.x-panel-noborder)
 .x-portlet {
-	@extend %card;
+	@extend .z1;
+  border: 0;
+  background-color:color($bg,'card');
+  border-radius: $borderRadius;
 }
 #go-module-panel-files-card-panel, #email-message-panel, #em-pnl-west {
 	//@extend %card;
