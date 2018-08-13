@@ -16,6 +16,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				"isOrganization",
 				"organizations"
 			],
+			sortInfo :{field: "name", direction: "ASC"},
 			entityStore: go.Stores.get("Contact")
 		});
 
@@ -25,15 +26,29 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 
 			columns: [
 				{
+					width: dp(48),
 					id: "index",
 					dataIndex: "star",
 					sortable: false,
 					draggable: false,
 					hideable: false,
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
-						var cls = value && value.starred ? 'ic-star' : 'ic-star-border';
+						if(rowIndex == 0 && value && value.starred) {							
+							return '<div class="icon ic-star go-addressbook-star"></div>';
+						} else
+						{
+							if(value && value.starred) {
+								return "";
+							}
+							
+							var lastRecord = rowIndex > 0 ? grid.store.getAt(rowIndex - 1) : false;
+							var char = record.data.name.substr(0, 1);
+							if(!lastRecord || lastRecord.data.name.substr(0, 1) != char) {
+								return "<h3>" + char.toUpperCase() + "</h3>";
+							}
+						}
 						
-						return '<div class="icon '+cls+'"></div>';
+						return "";
 					}
 				},
 				{
@@ -149,16 +164,12 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				}
 			],
 			viewConfig: {
-				emptyText: '<i>description</i><p>' + t("No items to display") + '</p>'
+				emptyText: '<i>description</i><p>' + t("No items to display") + '</p>',
 //				enableRowBody: true,
 //				showPreview: true,
-//				getRowClass: function (record, rowIndex, p, store) {
-//					if (this.showPreview) {
-//						p.body = '<p>' + record.data.excerpt + '</p>';
-//						return 'x-grid3-row-expanded';
-//					}
-//					return 'x-grid3-row-collapsed';
-//				}
+				getRowClass: function (record, rowIndex, p, store) {					
+					return '';
+				}
 			},
 			autoExpandColumn: 'name',
 			// config options for stateful behavior

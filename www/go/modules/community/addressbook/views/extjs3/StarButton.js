@@ -1,6 +1,6 @@
 go.modules.community.addressbook.StarButton = Ext.extend(Ext.Button, {
 	iconCls: "ic-star-border",
-	cls: 'go-addressbook-star-button',
+	cls: 'go-addressbook-star',
 	contactId: null,
 	
 	initComponent: function() {
