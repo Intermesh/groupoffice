@@ -2089,8 +2089,7 @@ class MessageController extends \GO\Base\Controller\AbstractController {
 		$fsFolder = $folder->fsFolder;
 		//\GO::debug($atts);
 		while($att=array_shift($atts)){
-			\GO::debug($att->content_id);
-			\GO::debug($att->disposition);
+
 			if(empty($att->content_id) || $att->disposition=='attachment'){
 				
 				// Check if the file already exists on disk, if so then add a number after it.
