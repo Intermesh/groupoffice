@@ -36,14 +36,31 @@
       };     
 			
 			//these datatypes will be prefetched by go.data.JmapProxy.fetchEntities()
+			// Key can also be a function that is called with the record data.
 			go.data.types[name] = {
 				convert: function (v, data) {
-					if(!data[this.key]) {
-						return "-";
+
+					var key = this.type.getKey.call(this, data);
+					
+					if(!key) {
+						return null;
 					}
 					
-					var entities = go.Stores.get(name).get([data[this.key]]);					
-					return entities ? entities[0] : '-';	
+					var entities = go.Stores.get(name).get([key]);
+					return entities ? entities[0] : null;	
+				},
+				
+				getKey : function(data) {
+					if(typeof(this.key) == "function") {
+						return this.key.call(this, data);
+					} else
+					{
+						if(!this.key) {
+							throw "Key is undefined";
+						}	
+
+						return data[this.key];
+					}
 				},
 				sortType: Ext.data.SortTypes.none,
 				type: "entity",

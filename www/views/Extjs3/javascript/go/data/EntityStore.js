@@ -1,16 +1,23 @@
 go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 	state: null,
-
-	entity: null,
 	
+	data : null,
+	
+	notFound: null,
+
+	entity: null,	
 	
 	changes : null,
 	
 	constructor : function(config) {
 		go.data.EntityStore.superclass.constructor.call(this, config);
 		
-		this.addEvents('changes');
+		this.addEvents({changes:true, error:true});
+		
+		this.notFound = [];
+		this.data = {};
+		this.state = null;
 		
 		this.restoreState();
 		this.initChanges();
@@ -60,6 +67,12 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			this.changes.added.push(entity.id);
 		}		
 		this.data[entity.id] = entity;
+		
+		//remove from not found.
+		var i = this.notFound.indexOf(entity.id);
+		if(i > -1) {
+			this.notFound.splice(i, 1);
+		}
 		
 		this._fireChanges();
 	},
@@ -189,8 +202,14 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			if(!id) {
 				throw "Empty ID passed to EntityStore.get()";
 			}
-			this.data[id] ? entities.push(this.data[id]) : unknownIds.push(id);
-			
+			if(this.data[id]) {
+				entities.push(this.data[id]);
+			} else if(this.notFound.indexOf(id) > -1) {
+				entities.push(null);
+			} else
+			{
+				unknownIds.push(id);
+			}			
 		}
 		if (unknownIds.length) {
 			go.Jmap.request({
@@ -204,11 +223,13 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					}
 					
 					if(!GO.util.empty(response.notFound)) {
-						console.log("Item not found", response);
-						return;
+						this.notFound = this.notFound.concat(response.notFound);
+						console.log("Item not found", response);						
 					}
-					this.state = response.state;				
-					this.get(ids, cb, scope);					
+					
+					this.state = response.state;
+					this.saveState();
+					this.get(ids, cb, scope, true); //passed hidden 4th argument to pass to the callback to track that it was asynchronously called					
 				},
 				scope: this
 			});
