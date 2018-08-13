@@ -140,7 +140,7 @@ abstract class Entity extends Property {
 		
 		foreach($ids as $id) {
 			$idParts = explode('-', $id);
-			if(count($idPart) != $keyCount) {
+			if(count($idParts) != $keyCount) {
 				throw new \Exception("Given id is invalid (" . $id . ")");
 			}
 			for($i = 0; $i < $keyCount; $i++) {			
@@ -151,6 +151,8 @@ abstract class Entity extends Property {
 		for($i = 0; $i < $keyCount; $i++) {			
 			$query->where($keys[$i], 'IN', $idArr[$i]);
 		}
+		
+		return $query;
 	}
 	
 //	

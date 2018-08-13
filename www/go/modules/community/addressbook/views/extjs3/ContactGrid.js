@@ -1,5 +1,5 @@
 go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
-	
+
 	initComponent: function () {
 
 		this.store = new go.data.Store({
@@ -10,6 +10,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				{name: 'modifiedAt', type: 'date'},
 				{name: 'creator', type: go.data.types.User, key: 'createdBy'},
 				{name: 'modifier', type: go.data.types.User, key: 'modifiedBy'},
+				{name: 'star', type: go.data.types.ContactStar, key: function(r) {return r.id + "-" + go.User.id}},
 				'permissionLevel',
 				'photoBlobId',
 				"isOrganization",
@@ -17,12 +18,24 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 			],
 			entityStore: go.Stores.get("Contact")
 		});
-		
+
 		var grid = this;
 
 		Ext.apply(this, {
 
 			columns: [
+				{
+					id: "index",
+					dataIndex: "star",
+					sortable: false,
+					draggable: false,
+					hideable: false,
+					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
+						var cls = value && value.starred ? 'ic-star' : 'ic-star-border';
+						
+						return '<div class="icon '+cls+'"></div>';
+					}
+				},
 				{
 					id: 'id',
 					hidden: true,
@@ -76,9 +89,9 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 
 
 						var organizations = go.Stores.get('Contact').get(ids, function (entities, async) {
-							if(async) {
+							if (async) {
 								grid.getView().refresh();
-							}							
+							}
 						}, this);
 
 
@@ -155,15 +168,15 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 
 		go.modules.community.addressbook.ContactGrid.superclass.initComponent.call(this);
 	},
-	
+
 	//when filtering on a group then offer to delete contacts from a group when delting.
-	deleteSelected : function() {
-		if(!this.store.baseParams.filter.groupId) {
+	deleteSelected: function () {
+		if (!this.store.baseParams.filter.groupId) {
 			return go.grid.GridTrait.deleteSelected.call(this);
 		}
-		
+
 		var groupId = this.store.baseParams.filter.groupId;
-		
+
 		var selectedRecords = this.getSelectionModel().getSelections(), ids = selectedRecords.column('id'), strConfirm;
 
 		switch (ids.length)
@@ -178,42 +191,42 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				strConfirm = t("Are you sure you want to delete the {count} items?").replace('{count}', ids.length);
 				break;
 		}
-		
-		Ext.Msg.show({
-				title:t("Confirm delete"),
-				msg: t(strConfirm),
-				buttons: {ok: t("Remove from group"), yes: t("Delete"), "cancel" : t("Cancel")},
-				fn: function (btn) {
 
-					if (btn == "yes") {
-						this.getStore().entityStore.set({
-							destroy: ids
-						});
-					}
-					
-					if(btn == "ok") {
-						var updates = {};
-						
-						
-						selectedRecords.forEach(function(r) {
-							var groupIndex = r.json.groups.column("groupId").indexOf(groupId);
+		Ext.Msg.show({
+			title: t("Confirm delete"),
+			msg: t(strConfirm),
+			buttons: {ok: t("Remove from group"), yes: t("Delete"), "cancel": t("Cancel")},
+			fn: function (btn) {
+
+				if (btn == "yes") {
+					this.getStore().entityStore.set({
+						destroy: ids
+					});
+				}
+
+				if (btn == "ok") {
+					var updates = {};
+
+
+					selectedRecords.forEach(function (r) {
+						var groupIndex = r.json.groups.column("groupId").indexOf(groupId);
 //							console.log(groupIndex, groupId, r.json.groups);
-							updates[r.id] = {
-								groups: GO.util.clone(r.json.groups)
-							};
-							updates[r.id].groups.splice(groupIndex, 1);
-						});
-						
-						this.getStore().remove(selectedRecords);
-						
-						this.getStore().entityStore.set({
-							update: updates
-						});
-					}
-				},
-				scope: this,
-				icon: Ext.MessageBox.QUESTION
-		 });
+						updates[r.id] = {
+							groups: GO.util.clone(r.json.groups)
+						};
+						updates[r.id].groups.splice(groupIndex, 1);
+					});
+
+					this.getStore().remove(selectedRecords);
+
+					this.getStore().entityStore.set({
+						update: updates
+					});
+				}
+			},
+			scope: this,
+			icon: Ext.MessageBox.QUESTION
+		});
 	}
 });
 
