@@ -8,3 +8,4 @@ AddressBookTree.js
 AddressBookDialog.js
 GroupDialog.js
 StarButton.js
+ContactCombo.js

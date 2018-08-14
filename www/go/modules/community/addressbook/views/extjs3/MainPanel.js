@@ -142,7 +142,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 				this.setAddressBookId(node.attributes.entity.id);
 			} else
 			{
-				this.setGroupId(node.attributes.entity.id)
+				this.setGroupId(node.attributes.entity.id, node.attributes.entity.addressBookId)
 			}
 		}, this);
 		
@@ -163,14 +163,31 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 	setAddressBookId : function(addressBookId) {
 		var s = this.grid.store;
 		
+		this.addButton.setDisabled(false);
+		if(addressBookId) {
+			this.addAddressBookId = addressBookId;
+		} else
+		{
+			var firstAbNode = this.addressBookTree.getRootNode().childNodes[1];
+			if(firstAbNode) {
+				this.addAddressBookId = firstAbNode.attributes.entity.id;
+			} else
+			{
+				this.addButton.setDisabled(true);
+			}
+		}
+		
 		s.baseParams.filter = {
 			addressBookId: addressBookId			
 		};
 		s.load();
 	},
 	
-	setGroupId : function(groupId) {
+	setGroupId : function(groupId, addressBookId) {
 		var s = this.grid.store;
+		
+		this.addAddressBookId = addressBookId;
+		this.addButton.setDisabled(false);
 		
 		s.baseParams.filter = {
 			groupId: groupId			

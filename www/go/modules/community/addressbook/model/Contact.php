@@ -216,6 +216,10 @@ class Contact extends AclItemEntity {
 							->andWhere('g.groupId', '=', $filter['groupId']);
 		}
 		
+		if (isset($filter['isOrganization'])) {
+			$query->andWhere('isOrganization', '=', $filter['isOrganization']);
+		}
+		
 		if(isset($filter['q'])) {
 			$query->where(
 							(new \go\core\db\Criteria())
