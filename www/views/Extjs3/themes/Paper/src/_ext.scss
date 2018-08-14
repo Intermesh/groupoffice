@@ -1052,7 +1052,7 @@ ul.x-tab-strip-bottom{
 		position:relative;
 		&-btn {
 			color: inherit;
-			right: dp(16);
+			right: dp(-2);
 			//top:dp(10);
 			line-height: dp(32);
 			&:after {
@@ -1185,7 +1185,7 @@ ul.x-tab-strip-bottom{
 	}
 	&-hd-inner {
 		min-height: dp(20);
-		padding: dp(2) dp(8) dp(2) dp(16);
+		padding: dp(2) dp(16) dp(2) dp(16);
 	}
 	&-dirty-cell > div {
 		border-radius: $borderRadius;
