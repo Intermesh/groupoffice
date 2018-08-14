@@ -58,10 +58,9 @@ go.modules.community.files.NodeDetail = Ext.extend(go.panels.DetailView, {
 						
 					},
 					browser:this.browser
-				})},//new go.panels.CreateModify(), //////
+				})},
+				new go.panels.CreateModifyTpl(),
 				{
-					tpl:go.panels.CreateModifyTpl
-				},{
 					title:t('More info'),
 					collapsible:true,
 					tpl: new Ext.XTemplate('<tpl if="values.metaData"><div class="pad">\

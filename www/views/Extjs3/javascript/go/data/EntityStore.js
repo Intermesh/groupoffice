@@ -27,6 +27,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	},
 	
 	restoreState : function() {
+		return;
 		if(!window.localStorage.entityStores) {
 			window.localStorage.entityStores = {};
 		}
@@ -40,6 +41,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	},
 	
 	saveState : function() {
+		return;
 		var state = JSON.stringify({
 			state: this.state,
 			data: this.data
