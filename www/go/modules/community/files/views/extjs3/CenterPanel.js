@@ -110,6 +110,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 		
 		this.nodeTile = new go.modules.community.files.NodeTile({
 			store:this.store,
+			browser:this.browser,
 			singleSelect: false,
 			listeners: {
 				selectionchange: function(view, records){

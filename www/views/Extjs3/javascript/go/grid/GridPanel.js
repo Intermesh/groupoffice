@@ -4,7 +4,7 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 		
 		go.grid.GridPanel.superclass.initComponent.call(this);
 		
-		Ext.apply(this, go.grid.GridTrait);
+		Ext.applyIf(this, go.grid.GridTrait);
 		this.initGridTrait();
 	}
 

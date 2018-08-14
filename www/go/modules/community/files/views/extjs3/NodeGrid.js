@@ -96,7 +96,7 @@ go.modules.community.files.NodeGrid = Ext.extend(go.grid.GridPanel, {
 	
 	afterRender: function() {
 		go.modules.community.files.NodeGrid.superclass.afterRender.call(this);
-		
+
 		var el =  this.getView().scroller.dom;
 		new Ext.dd.DropTarget(el, {
 			ddGroup: 'files-center-dd',
@@ -124,6 +124,7 @@ go.modules.community.files.NodeGrid = Ext.extend(go.grid.GridPanel, {
 	onNotifyOver : function(dd, e, data){
 		var dragData = dd.getDragData(e),
 			dropRecord = data.grid && data.grid.store.data.items[dragData.rowIndex];
+	  console.log(dropRecord);
 		if(!dropRecord) {
 			return false;
 		}

@@ -13,6 +13,18 @@ go.grid.GridTrait = {
 		this.initDeleteKey();		
 
 		this.on("bodyscroll", this.loadMore, this, {buffer: 100});
+		// Dots for header columns
+		this.on('render', function() {
+			this.addClass("go-grid");
+			this.headerBtnWrap = this.el.child(".x-grid3-header");
+			if (this.headerBtnWrap && this.enableHdMenu) {
+				this.headerBtn = new Ext.Component({
+					cls: "go-grid-hd-btn",
+					renderTo: this.headerBtnWrap
+				});
+				this.headerBtn.el.on("click", this.onHeaderBtnClick, this);
+			}
+		}, this);
 	},
 	
 	initDeleteKey : function() {
@@ -94,19 +106,6 @@ go.grid.GridTrait = {
 		}
 	},
 	
-	// Dots for header columns
-	afterRender: function() {
-		go.grid.GridPanel.superclass.afterRender.call(this);
-		this.addClass("go-grid");
-		this.headerBtnWrap = this.el.child(".x-grid3-header");
-		if (this.headerBtnWrap && this.enableHdMenu) {
-			this.headerBtn = new Ext.Component({
-				cls: "go-grid-hd-btn",
-				renderTo: this.headerBtnWrap
-			});
-			this.headerBtn.el.on("click", this.onHeaderBtnClick, this);
-		}
-	},
 	handleHdMenuItemClick: function(item) {
 		var cm = this.getColumnModel()
 		  , id = item.getItemId()

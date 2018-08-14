@@ -342,7 +342,7 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 		this.unprocessedFiles--;
 		if(this.unprocessedFiles === 0) {
 			this.targetStore.commitChanges();
-			callback();
+			callback && callback();
 		}
 	},
 	
@@ -360,7 +360,7 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 		this.unprocessedFiles--;
 		if(this.unprocessedFiles === 0) {
 			this.targetStore.commitChanges();
-			callback();
+			callback && callback();
 		}
 	},
 	
