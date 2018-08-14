@@ -1,6 +1,6 @@
 go.modules.community.files.EastPanel = Ext.extend(Ext.Panel, {
 	region: 'east',
-	width: dp(560),
+	width: dp(448),
 	split: true,
 	layout: 'card',
 	initComponent: function() {

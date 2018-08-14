@@ -861,6 +861,7 @@ button.filetype-pdf, button.filetype-doc {
 		margin:0 auto;
 		&.contain {
 			background-size: contain;
+			margin: 0 14px;
 		}
 		&:before {
 		  display: block;

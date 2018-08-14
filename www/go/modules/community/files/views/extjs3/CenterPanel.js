@@ -66,6 +66,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 			browser:this.browser,
 			listeners: {
 				rowcontextmenu: function(grid, index, event){
+					event.stopEvent();
 					var selections = grid.getSelectionModel().getSelections();
 					var records = [];
 					for(var i=0; i < selections.length; i++){
@@ -396,7 +397,7 @@ go.modules.community.files.CenterPanel = Ext.extend(Ext.Panel, {
 			e.stopPropagation();
 			e.preventDefault();
 			this.body.removeClass('x-dd-over');
-			this.browser.receive(e.dataTransfer.files, this.browser.getCurrentDir());
+			this.browser.receive(e.dataTransfer.files, this.store);
 		}.bind(this));
 		
 		go.modules.community.files.CenterPanel.superclass.afterRender.call(this, arguments);

@@ -11,7 +11,7 @@
  */
 go.modules.community.files.NodeTile = Ext.extend(go.grid.TilePanel, {
 	tpl: new Ext.XTemplate('<tpl for=".">',
-		'<div class="tile">',
+		'<div class="tile x-unselectable">',
 			'<tpl if="values.metaData && values.metaData.thumbnail">\
 				<div class="thumb" style="background-image:url({[go.Jmap.downloadUrl(values.metaData.thumbnail)]})"></div>\
 			</tpl>',

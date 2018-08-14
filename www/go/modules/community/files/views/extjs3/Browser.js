@@ -269,11 +269,15 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 		
 		this.unprocessedFiles = files.length;
 		
-		if(targetId && this.targetStore.baseParams.filter && this.targetStore.baseParams.filter.parentId != targetId) {
+		if(targetId instanceof go.data.Store) {
+			this.targetStore = targetId;
+		}
+		if(Number.isInteger(targetId) && this.targetStore.baseParams.filter && this.targetStore.baseParams.filter.parentId != targetId) {
 			this.targetStore.setBaseParam('filter',{parentId: targetId});
 			this.targetStore.load({callback:internalReceive,scope:this});
-		} else if(this.targetStore.isLoaded) {
-			internalReceive();
+		} else if(this.targetStore.loaded) {
+			console.log(this.targetStore);
+			internalReceive.call(this);
 		}
 	},
 	

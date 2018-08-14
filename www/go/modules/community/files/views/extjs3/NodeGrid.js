@@ -62,7 +62,15 @@ go.modules.community.files.NodeGrid = Ext.extend(go.grid.GridPanel, {
 			viewConfig:{
 				emptyText: '<i class="icon">cloud_upload</i><br>'+
 					 '<h3>'+t('Drop files here')+'</h3>'+
-					 '<small>'+t('Or use the \'+\' button')+'</small>'
+					 '<small>'+t('Or use the \'+\' button')+'</small>',
+				enableRowBody:true,
+				getRowClass: function(record, rowIndex, rp, ds){ // rp = rowParams
+					if(record.data.status=='queued'){
+						rp.body = '<progress max="100" value="'+record.data.progress+'"></progress>'
+						return 'x-grid3-row-expanded';
+					}
+					return 'x-grid3-row-collapsed';
+			  }
 			},
 			autoExpandColumn: 'name',
 			// config options for stateful behavior

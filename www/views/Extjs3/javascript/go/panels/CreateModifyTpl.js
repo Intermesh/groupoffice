@@ -19,7 +19,7 @@ go.panels.CreateModifyTpl = Ext.extend(Ext.Panel, {
 		}
 	}),
 	initComponent: function () {
-		go.panels.CreateModify.superclass.initComponent.call(this, arguments);		
+		go.panels.CreateModifyTpl.superclass.initComponent.call(this, arguments);		
 
 		go.Stores.get('User').on('changes', function() { this.update(this.ownerCt.data); }, this);
 

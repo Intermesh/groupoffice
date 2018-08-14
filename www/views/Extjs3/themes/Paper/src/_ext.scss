@@ -1187,8 +1187,16 @@ ul.x-tab-strip-bottom{
 		//padding: dp(8) dp(16) dp(0) dp(32);
 	}
 	&-row-body {
-		padding: 0 0 dp(8) dp(16);
+		position: absolute;
+		padding: 0;
+		width: 100%;
+		bottom: 0;
 		color: color($fg, "secondary-text");
+		progress {
+			width: 100%;
+			position: absolute;
+			top: dp(-8);
+		}
 	}
 	&-hd-inner {
 		min-height: dp(20);
