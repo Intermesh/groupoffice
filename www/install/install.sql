@@ -691,28 +691,6 @@ ALTER TABLE `core_cron_job`
   ADD CONSTRAINT `core_cron_job_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE;
 
 
-CREATE TABLE `core_change` (
-  `entityId` VARCHAR(21) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-  `entityTypeId` int(11) NOT NULL,
-  `modSeq` int(11) NOT NULL,
-  `aclId` int(11) DEFAULT NULL,
-  `createdAt` datetime NOT NULL,
-  `destroyed` tinyint(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
-
-
-ALTER TABLE `core_change`
-  ADD PRIMARY KEY (`entityId`,`entityTypeId`),
-  ADD KEY `aclId` (`aclId`),
-  ADD KEY `entityTypeId` (`entityTypeId`);
-
-
-
-ALTER TABLE `core_change`
-  ADD CONSTRAINT `core_change_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `core_change_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE;
-
-
 CREATE TABLE `core_acl_group_changes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `aclId` int(11) NOT NULL,
@@ -728,3 +706,23 @@ CREATE TABLE `core_acl_group_changes` (
 ALTER TABLE `core_acl_group_changes`
   ADD CONSTRAINT `all` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `group` FOREIGN KEY (`groupId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE;
+
+
+DROP TABLE IF EXISTS `core_change`;
+CREATE TABLE IF NOT EXISTS `core_change` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `entityId` varchar(21) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `entityTypeId` int(11) NOT NULL,
+  `modSeq` int(11) NOT NULL,
+  `aclId` int(11) DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `destroyed` tinyint(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  KEY `aclId` (`aclId`),
+  KEY `entityTypeId` (`entityTypeId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+
+
+ALTER TABLE `core_change`
+  ADD CONSTRAINT `core_change_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `core_change_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE;
