@@ -231,3 +231,8 @@ $updates['201807271339'][] = "ALTER TABLE `core_acl_group_changes`
   ADD CONSTRAINT `group` FOREIGN KEY (`groupId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE;";
 
 $updates['201807271339'][] = "insert into core_acl_group_changes select null, aclId, groupId, (select highestModSeq from core_entity where name='Acl'), null from core_acl_group;";
+
+$updates['201807271339'][] = "ALTER TABLE `core_change`
+ADD COLUMN `id` INT NOT NULL AUTO_INCREMENT FIRST,
+DROP PRIMARY KEY,
+ADD PRIMARY KEY (`id`);";
