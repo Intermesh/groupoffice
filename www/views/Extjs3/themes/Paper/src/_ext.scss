@@ -335,7 +335,9 @@ ul.x-tab-strip-bottom{
 		.x-box-inner { //composite
 			overflow:visible;
 
-			.x-btn {
+	
+//	Merijn: This didn't play nice with formgroup
+/*		.x-btn {
 				top: dp(-2);
 				line-height: dp(32);
 				height: dp(32);
@@ -346,7 +348,8 @@ ul.x-tab-strip-bottom{
 						left:dp(4);
 					}
 				}
-			} 
+			}
+*/
 		}
 	}
 	

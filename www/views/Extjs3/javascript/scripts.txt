@@ -260,6 +260,7 @@ views/Extjs3/javascript/go/form/multiselect/Window.js
 views/Extjs3/javascript/go/form/GridField.js
 views/Extjs3/javascript/go/form/RadioGroup.js
 views/Extjs3/javascript/go/form/Switch.js
+views/Extjs3/javascript/go/form/FormGroup.js
 
 views/Extjs3/javascript/go/panels/CreateModifyTpl.js
 views/Extjs3/javascript/go/panels/LinksTpl.js

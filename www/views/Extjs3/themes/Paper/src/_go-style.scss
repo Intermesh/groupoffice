@@ -1383,3 +1383,8 @@ table[id^="comments-ext"] b {
 }
 
 
+.go-form-group {
+	.x-panel-bbar .x-toolbar {
+		border-top: 0;
+	}
+}

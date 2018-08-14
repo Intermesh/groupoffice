@@ -8,7 +8,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 	initFormItems: function () {
 
 		var items = [{
-				xtype: 'fieldset',			
+				xtype: 'fieldset',
 				layout: "hbox",
 				items: [
 					{
@@ -40,41 +40,41 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 								allowBlank: false,
 								hidden: true
 							})
-							,this.contactNameField = new Ext.form.CompositeField({
-								xtype: 'compositefield',
-								
-								fieldLabel: t("Name"),
-								anchor: '100%', 
-								allowBlank: false,
-								items: [{
-									xtype: 'textfield',
-									name: 'firstName',
-									emptyText: t("First name"),
-									flex: 3,									
-									listeners: {
-										change: this.buildFullName,
-										scope: this
-									}
-								},{
-									xtype: 'textfield',
-									name: 'middleName',
-									emptyText: t("Middle name"),
-									flex: 2,									
-									listeners: {
-										change: this.buildFullName,
-										scope: this
-									}
-								},{
-									xtype: 'textfield',
-									name: 'lastName',
-									emptyText: t("Last name"),
-									flex: 3,									
-									listeners: {
-										change: this.buildFullName,
-										scope: this
-									}
-								}]
-							}),
+											, this.contactNameField = new Ext.form.CompositeField({
+												xtype: 'compositefield',
+
+												fieldLabel: t("Name"),
+												anchor: '100%',
+												allowBlank: false,
+												items: [{
+														xtype: 'textfield',
+														name: 'firstName',
+														emptyText: t("First name"),
+														flex: 3,
+														listeners: {
+															change: this.buildFullName,
+															scope: this
+														}
+													}, {
+														xtype: 'textfield',
+														name: 'middleName',
+														emptyText: t("Middle name"),
+														flex: 2,
+														listeners: {
+															change: this.buildFullName,
+															scope: this
+														}
+													}, {
+														xtype: 'textfield',
+														name: 'lastName',
+														emptyText: t("Last name"),
+														flex: 3,
+														listeners: {
+															change: this.buildFullName,
+															scope: this
+														}
+													}]
+											}),
 							{
 								xtype: "textfield",
 								name: "jobTitle",
@@ -85,7 +85,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 					},
 					{
 						width: dp(152),
-						style: "padding: "+ dp(16) + "px",
+						style: "padding: " + dp(16) + "px",
 						layout: "form",
 						items: [
 							this.avatarComp = new go.form.FileField({
@@ -120,103 +120,136 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 				autoHeight: true,
 				items: [
 					{
-						xtype: "gridfield",
+						xtype: "formgroup",
 						name: "emailAddresses",
-						store: new Ext.data.JsonStore({
-							autoDestroy: true,
-							root: "records",
-							fields: [
-								'id',
-								'type',
-								'email'
-							]
-						}),
 						fieldLabel: t("E-mail addresses"),
-
-						autoExpandColumn: "email",
-						columns: [
-							{
-								xtype: "combocolumn",
-								store: new Ext.data.ArrayStore({
-									id: 0,
-									fields: [
-										'value',
-										'display'
-									],
-									data: [['work', t("emailTypes")["work"]], ['private', t("emailTypes")['private']]]
-								}),
-								id: 'type',
-								sortable: false,
-								dataIndex: 'type',
-								hideable: false,
-								draggable: false,
-								menuDisabled: true,
-								width: dp(100)
-
-							}, {
-								id: 'email',
-								sortable: false,
-								dataIndex: 'email',
-								hideable: false,
-								draggable: false,
-								menuDisabled: true,
-								editor: new Ext.form.TextField({
-									allowBlank: false,
-									vtype: 'emailAddress'
-								})
-							}
-						]
-					}
-
-					, {
-						xtype: "gridfield",
+						itemCfg: {							
+							layout: "form",
+							items: [{
+								xtype: "compositefield",
+								hideLabel: true,
+								items: [{
+										xtype: 'combo',
+										name: 'type',
+										mode: 'local',
+										editable: false,
+										triggerAction: 'all',
+										store: new Ext.data.ArrayStore({
+											id: 0,
+											fields: [
+												'value',
+												'display'
+											],
+											data: [['work', t("emailTypes")["work"]], ['private', t("emailTypes")['private']]]
+										}),
+										valueField: 'value',
+										displayField: 'display',
+										width: dp(100)
+									},{
+										flex: 1,
+										xtype: "textfield",
+										allowBlank: false,
+										vtype: 'emailAddress',
+										name: "email"
+									}]
+							}]
+						}
+				}
+				,
+				
+				{
+						xtype: "formgroup",
 						name: "phoneNumbers",
-						store: new Ext.data.JsonStore({
-							autoDestroy: true,
-							root: "records",
-							fields: [
-								'id',
-								'type',
-								'number'
-							]
-						}),
 						fieldLabel: t("Phone numbers"),
-
-						autoExpandColumn: "number",
-						columns: [
-							{
-								xtype: "combocolumn",
-								store: new Ext.data.ArrayStore({
-									id: 0,
-									fields: [
-										'value',
-										'display'
-									],
-									data: [['mobile', t("phoneTypes")["mobile"]], ['work', t("phoneTypes")["work"]], ['private', t("phoneTypes")['private']]]
-								}),
-								id: 'type',
-								sortable: false,
-								dataIndex: 'type',
-								hideable: false,
-								draggable: false,
-								menuDisabled: true,
-								width: dp(100)
-
-							}, {
-								id: 'number',
-								sortable: false,
-								dataIndex: 'number',
-								hideable: false,
-								draggable: false,
-								menuDisabled: true,
-								editor: new Ext.form.TextField({
-									allowBlank: false
-								})
-							}
-						]
+						itemCfg: {							
+							layout: "form",
+							items: [{
+								xtype: "compositefield",
+								hideLabel: true,
+								items: [{
+										xtype: 'combo',
+										name: 'type',
+										mode: 'local',
+										editable: false,
+										triggerAction: 'all',
+										store: new Ext.data.ArrayStore({
+											id: 0,
+											fields: [
+												'value',
+												'display'
+											],
+											data: [['work', t("phoneTypes")["work"]], ['private', t("phoneTypes")['private']]]
+										}),
+										valueField: 'value',
+										displayField: 'display',
+										width: dp(100)
+									},{
+										flex: 1,
+										xtype: "textfield",
+										allowBlank: false,
+										name: "number"
+									}]
+							}]
+						}
+				}
+				]
+			}, {
+				xtype: "fieldset",
+				title: t("Street addresses"),
+				items: [{
+						hideLabel: true,
+						xtype: "formgroup",
+						name: "addresses",
+						itemCfg: {
+							xtype: "panel",
+							layout: "form",
+							pad: true,
+							items: [{
+									anchor: "100%",
+									fieldLabel: t("Type"),
+									xtype: 'combo',
+									name: 'type',
+									mode: 'local',
+									editable: false,
+									triggerAction: 'all',
+									store: new Ext.data.ArrayStore({
+										id: 0,
+										fields: [
+											'value',
+											'display'
+										],
+										data: [['work', t("addressTypes")["work"]], ['private', t("addressTypes")['private']]]
+									}),
+									valueField: 'value',
+									displayField: 'display'
+								}, {
+									xtype: "textfield",
+									fieldLabel: t("Street"),
+									name: "street",
+									anchor: "100%"
+								}, {
+									xtype: "textfield",
+									fieldLabel: t("ZIP code"),
+									name: "zipCode",
+									anchor: "100%"
+								}, {
+									xtype: "textfield",
+									fieldLabel: t("City"),
+									name: "city",
+									anchor: "100%"
+								}, {
+									xtype: "textfield",
+									fieldLabel: t("State"),
+									name: "state",
+									anchor: "100%"
+								}, {
+									xtype: "textfield",
+									fieldLabel: t("Country"),
+									name: "country",
+									anchor: "100%"
+								}]
+						}
 					}
-
-
 				]
 			}
 		];//.concat(go.CustomFields.getFormFieldSets("Contact"));
@@ -228,22 +261,22 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 		this.contactNameField.setVisible(!isOrganization);
 		this.nameField.setVisible(isOrganization);
 	},
-	
-	buildFullName : function() {
+
+	buildFullName: function () {
 		var f = this.formPanel.getForm(), name = f.findField('firstName').getValue(),
-			m = f.findField('middleName').getValue(),
-			l = f.findField('lastName').getValue();
-			
-		if(m) {
+						m = f.findField('middleName').getValue(),
+						l = f.findField('lastName').getValue();
+
+		if (m) {
 			name += " " + m;
 		}
-		
-		if(l) {
+
+		if (l) {
 			name += " " + l;
 		}
 		console.log(name);
-		
+
 		this.nameField.setValue(name);
-		
+
 	}
 });
