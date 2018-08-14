@@ -16,12 +16,18 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 						this.namePanel = new Ext.BoxComponent({
 							tpl: "<h3>{name}</h3><h4>{jobTitle}</h4>"
 						}),
-						this.starButton = new go.modules.community.addressbook.StarButton()
+						this.starButton = new go.modules.community.addressbook.StarButton(), 
+						this.urlPanel = new Ext.BoxComponent({
+							flex: 1,
+							cls: 'go-addressbook-url-panel',
+							xtype: "box",
+							tpl: '<tpl for=".">&nbsp;&nbsp;<a target="_blank" href="{url}" class="go-addressbook-url {type}"></a></tpl>'
+						})
 					],
 					onLoad: function (detailView) {
-						detailView.data.jobTitle = detailView.data.jobTitle || "";
-						
+						detailView.data.jobTitle = detailView.data.jobTitle || "";						
 						detailView.namePanel.update(detailView.data);
+						detailView.urlPanel.update(detailView.data.urls);
 						detailView.starButton.setContactId(detailView.data.id);
 					},
 					
@@ -55,6 +61,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 								}
 							});
 						});
+						dv.emailButton.setDisabled(dv.data.emailAddresses.length == 0);
 						
 						
 						dv.callButton.menu.removeAll();						
@@ -69,6 +76,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 								}
 							});
 						});
+						dv.callButton.setDisabled(dv.data.phoneNumbers.length == 0);
 						
 					},
 					xtype: "toolbar",
@@ -78,13 +86,15 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 						this.emailButton = new Ext.Button({
 							menu: {cls: "x-menu-no-icons", items: []},
 							text: t("E-mail"),
-							iconCls: 'ic-email'
+							iconCls: 'ic-email',
+							disabled: true
 						}),
 						
 						this.callButton = new Ext.Button({
 							menu: {cls: "x-menu-no-icons", items: []},
 							text: t("Call"),
-							iconCls: 'ic-phone'
+							iconCls: 'ic-phone',
+							disabled: true
 						})
 					]
 				},{
@@ -106,12 +116,36 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 					<tpl for="addresses">\
 						<hr class="indent">\
 						<a class="s6"><i class="icon label">location_on</i>\
-							<label>{[t("addressTypes")[values.type]]}</label>\
 							<span>{street}<br>\
 							<tpl if="zipCode">{zipCode}<br></tpl>\
 							<tpl if="city">{city}<br></tpl>\
 							<tpl if="state">{state}<br></tpl>\
 							<tpl if="country">{country}</tpl></span>\
+							<label>{[t("addressTypes")[values.type]]}</label>\
+						</a>\
+					</tpl>\
+					</div>'
+				}, {
+					xtype: "box",
+					listeners: {
+						scope: this,
+						afterrender: function(box) {
+							
+							box.getEl().on('click', function(e){								
+								var container = box.getEl().dom.firstChild, 
+								item = e.getTarget("a", box.getEl()),
+								i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);
+								
+								go.util.showDate(this.data.dates[i]);
+							}, this);
+						}
+					},
+					tpl: '<div class="icons">\
+					<tpl for="dates">\
+						<hr class="indent">\
+						<a class="s6"><i class="icon label">cake</i>\
+							<span>{[GO.util.dateFormat(values.date)]}</span>\
+							<label>{[t("dateTypes")[values.type]]}</label>\
 						</a>\
 					</tpl>\
 					</div>'

@@ -144,7 +144,8 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 										}),
 										valueField: 'value',
 										displayField: 'display',
-										width: dp(100)
+										width: dp(120),
+										value: "work"
 									},{
 										flex: 1,
 										xtype: "textfield",
@@ -182,7 +183,8 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 										}),
 										valueField: 'value',
 										displayField: 'display',
-										width: dp(100)
+										width: dp(120),
+										value: "work"
 									},{
 										flex: 1,
 										xtype: "textfield",
@@ -221,7 +223,8 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 										data: [['work', t("addressTypes")["work"]], ['private', t("addressTypes")['private']]]
 									}),
 									valueField: 'value',
-									displayField: 'display'
+									displayField: 'display',
+									value: "work"
 								}, {
 									xtype: "textfield",
 									fieldLabel: t("Street"),
@@ -251,6 +254,86 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						}
 					}
 				]
+			}, {
+				xtype: "fieldset",
+				title: t("Other"),
+				items: [{
+						xtype: "formgroup",
+						fieldLabel: t("Dates"),
+						name: "dates",
+						itemCfg: {							
+							layout: "form",
+							items: [{
+								xtype: "compositefield",
+								hideLabel: true,
+								items: [{
+										xtype: 'combo',
+										name: 'type',
+										mode: 'local',
+										editable: false,
+										triggerAction: 'all',
+										store: new Ext.data.ArrayStore({
+											id: 0,
+											fields: [
+												'value',
+												'display'
+											],
+											data: [['birthday', t("dateTypes")["birthday"]], ['anniversary', t("dateTypes")['anniversary']]]
+										}),
+										valueField: 'value',
+										displayField: 'display',
+										width: dp(120),
+										value: "birthday"
+									},{
+										flex: 1,
+										xtype: "datefield",
+										allowBlank: false,
+										name: "date"
+									}]
+							}]
+						}
+				},
+			{
+						xtype: "formgroup",
+						fieldLabel: t("Online"),
+						name: "urls",
+						itemCfg: {							
+							layout: "form",
+							items: [{
+								xtype: "compositefield",
+								hideLabel: true,
+								items: [{
+										xtype: 'combo',
+										name: 'type',
+										mode: 'local',
+										editable: false,
+										triggerAction: 'all',
+										store: new Ext.data.ArrayStore({
+											id: 0,
+											fields: [
+												'value',
+												'display'
+											],
+											data: [
+												['homepage', t("urlTypes")["homepage"]],
+												['twitter', t("urlTypes")["twitter"]],
+												['facebook', t("urlTypes")["facebook"]], 
+												['linkedin', t("urlTypes")['linkedin']]
+											]
+										}),
+										valueField: 'value',
+										displayField: 'display',
+										width: dp(120),
+										value: "homepage"
+									},{
+										flex: 1,
+										xtype: "textfield",
+										allowBlank: false,
+										name: "url"
+									}]
+							}]
+						}
+				}]
 			}
 		];//.concat(go.CustomFields.getFormFieldSets("Contact"));
 

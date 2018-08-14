@@ -909,9 +909,13 @@ button.filetype-pdf, button.filetype-doc {
 	.icons {
 		@extend .go-icon-list;
 		
-		h5, hr {
+		h5 {
 			margin-left: dp(16);
 			margin-right: dp(16);
+		}
+		
+		hr {
+			margin: dp(16);
 		}
 		
 		h5:not(:first-child) {
@@ -968,13 +972,12 @@ button.filetype-pdf, button.filetype-doc {
 }
 
 .go-icon-list {
-	p, > a {
-		
+	p, > a {		
 		min-height: dp(40);
 		box-sizing: border-box;
 		display:table;
 		text-decoration: none;
-		padding: dp(8) dp(16);
+		padding: dp(8) dp(16) dp(16) dp(8);
 		width: 100%;
 		span, a {
 			display: block;

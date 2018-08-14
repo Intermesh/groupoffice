@@ -39,5 +39,20 @@ Ext.apply(Date.prototype, {
 			result = '-'+result;
 
 		return result;
-	}
+	},
+	
+	/**
+	 * Serialize the date to send to API
+	 * 
+	 * @returns {DateAnonym$0@call;format}
+	 */
+	serialize : function() {
+		if(this.getHours() == 0 && this.getMinutes() == 0 && this.getSeconds() == 0) {
+			//no time
+			return this.format("Y-m-d");
+		} else
+		{
+			return this.format('c');
+		}
+	},
 });

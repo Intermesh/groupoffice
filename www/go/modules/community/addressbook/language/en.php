@@ -12,5 +12,15 @@ return [
 		"addressTypes" => [
 				"work" => "Work",
 				"private" => "Private"				
+		],
+		"dateTypes" => [
+				"birthday" => "Birthday",
+				"anniversary" => "Anniversary"
+		],
+		"urlTypes" => [
+				"homepage" => "Homepage",
+				"facebook" => "Facebook",
+				"twitter" => "Twitter",
+				"linkedin" => "LinkedIn"
 		]
 ];

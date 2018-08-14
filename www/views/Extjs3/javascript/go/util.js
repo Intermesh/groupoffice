@@ -46,6 +46,10 @@
 		
 		streetAddress : function(config) {
 			window.open("https://www.openstreetmap.org/search?query=" + encodeURIComponent(config.street + ", " +config.zipCode + ", " + config.country));
+		},
+		
+		showDate : function(date) {
+			console.log("No date handler");
 		}
 
 	};

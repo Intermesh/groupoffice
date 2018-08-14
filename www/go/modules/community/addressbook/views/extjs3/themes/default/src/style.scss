@@ -18,8 +18,46 @@
 		top: dp(-16);
 		left: dp(56);
 	}
-	
+
 	.go-addressbook-star {
 		margin-top: dp(-8);
 	}
+}
+
+.go-addressbook-url-panel {
+	text-align: right;
+}
+
+.go-addressbook-url{
+	
+	height: dp(24);
+	width: dp(24);
+	background-repeat: none;
+	background-position: center;
+	background-size: contain;
+	display: inline-block;
+	border-radius: 3px;
+	&.linkedin {
+		background-image: url("resources/linkedin.png");		
+	}
+
+	&.facebook {
+		background-image: url("resources/facebook.png");		
+	}
+
+	&.twitter {
+		background-image: url("resources/twitter.png");		
+	}
+
+	&.homepage {
+		&:before {
+			border-radius: 3px;
+			@extend %icon;
+			content: "home";
+			vertical-align: baseline;
+			color: white;
+			background-color: $cPrimary;
+		}
+	}
+
 }

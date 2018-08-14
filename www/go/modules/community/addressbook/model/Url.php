@@ -24,6 +24,12 @@ class Url extends Property {
 	 * @var int
 	 */							
 	public $contactId;
+	
+	/**
+	 *
+	 * @var string
+	 */
+	public $type;
 
 	/**
 	 * 
@@ -34,6 +40,6 @@ class Url extends Property {
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable("addressbook_url");
-	}
+	}	
 
 }

@@ -113,23 +113,30 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	getValue: function () {
 		var v = [];
 		this.items.each(function(i) {
-			v.push(this.getPanelValue(i));
+			v.push(this.getPanelValue(i.formPanel));
 		}, this);
 		
 		return v;
 	},
 	
-	getPanelValue : function(panel) {
-		var v = {}
-		panel.formPanel.items.each(function(i) {
+	getPanelValue : function(panel, v) {
+		v = v || {};
+		panel.items.each(function(i) {
 			if(!i.isFormField) {
 				return;
 			}
 			
-			var name = i.getName();
-			
-			v[name] = i.getValue();
-		});
+			if(i.getXType() == 'compositefield') {				
+				this.getPanelValue(i, v);				
+			} else
+			{			
+				var name = i.getName();
+				v[name] = i.getValue();
+				if(Ext.isDate(v[name])) {
+					v[name] = v[name].serialize();
+				}
+			}
+		}, this);
 		
 		return v;
 	},
