@@ -726,7 +726,6 @@ CREATE TABLE `core_acl_group_changes` (
 ALTER TABLE `core_acl_group_changes`
   ADD CONSTRAINT `all` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `group` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;
-  ADD CONSTRAINT `group` FOREIGN KEY (`groupId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE;
 CREATE TABLE `core_blob_metadata` (
   `blobId` BINARY(40) NOT NULL,
   `title` VARCHAR(128) NULL,
