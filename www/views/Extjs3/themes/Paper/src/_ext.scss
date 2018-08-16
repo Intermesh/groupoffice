@@ -1062,7 +1062,7 @@ ul.x-tab-strip-bottom{
 		position:relative;
 		&-btn {
 			color: inherit;
-			right: dp(16);
+			right: dp(-2);
 			//top:dp(10);
 			line-height: dp(32);
 			&:after {
@@ -1195,7 +1195,7 @@ ul.x-tab-strip-bottom{
 	}
 	&-hd-inner {
 		min-height: dp(20);
-		padding: dp(2) dp(8) dp(2) dp(16);
+		padding: dp(2) dp(16) dp(2) dp(16);
 	}
 	&-dirty-cell > div {
 		border-radius: $borderRadius;
@@ -2559,25 +2559,25 @@ input[value="0"] + .x-slider .x-slider-thumb {
 		top: dp(-2);
 		left: dp(0);
 		&::after { // nop
-			@extend .z2;
-			content: '';
-			position:absolute;
-			top:0;
-			height: dp(24);
-			width: dp(24);
-			background-color: color($grey, 50);
-			z-index:1;
-			border-radius: 50%;
+							 @extend .z2;
+							 content: '';
+							 position:absolute;
+							 top:0;
+							 height: dp(24);
+							 width: dp(24);
+							 background-color: color($grey, 50);
+							 z-index:1;
+							 border-radius: 50%;
 		}
 		&::before { // shade
-			content: "";
-			position:absolute;
-			top: dp(-8);
-			left: dp(-8);
-			bottom: dp(-8);
-			right: dp(-8);
-			background-color: transparent;
-			border-radius: 50%;
+								content: "";
+								position:absolute;
+								top: dp(-8);
+								left: dp(-8);
+								bottom: dp(-8);
+								right: dp(-8);
+								background-color: transparent;
+								border-radius: 50%;
 		}
 	}
 	> .track {
@@ -2626,6 +2626,88 @@ input[value="0"] + .x-slider .x-slider-thumb {
 		}
 		~ label {
 			padding-left: dp(56);
+		}
+	}
+}
+
+// superbox extension
+.x-superboxselect {
+	position:relative; 
+	height: auto; 
+	overflow: hidden; 
+	padding: 0; 
+	display:block;
+	input[disabled] { background-color: transparent; }
+	&-input {
+		padding-left: dp(8);
+		input {
+			appearance: none;
+			border: 0;
+			background-color: transparent;
+			box-shadow:none !important;
+		}
+	}
+	ul { 
+		overflow: hidden; 
+		cursor: text; 
+	}
+	li { 
+		float: left; 
+		margin: dp(3) dp(2) dp(3); 
+		line-height: dp(24);
+	}
+	&-stacked li { float: none !important;}
+	&-display-btns { padding-right: dp(64); }
+	&-btns {
+		border-left: 1px solid color($fg, 'divider');
+		position: absolute; 
+		right: 0; 
+		top: 0; 
+		bottom:0;
+		overflow:hidden; 
+		padding: 0 dp(4);
+		div {
+			float: left; 
+			margin-top:dp(7);
+			width: dp(24); 
+			height: dp(24);
+			
+		}
+	}
+	&-btn {
+		&-clear:before { @extend %icon; content: 'clear'; font-size:dp(18);width: dp(24);text-align: center }
+		&-expand:before { @extend %icon; content: 'arrow_drop_down'; line-height:dp(18); }
+		&-over { color: black; }
+		&-hide { display:none; }
+	}
+	&-item {
+		position: relative; 
+		border-radius: $borderRadius;
+		@include var(background-color, c-primary-tp);
+		padding: 0px dp(32) 0px dp(8); 
+		&-hover { background-color: $cHover; }
+		&-focus {background-color: $cSelected; color: white;}
+		&-close {
+			height: dp(24);
+			position: absolute; 
+			right: dp(4); 
+			top: 0; 
+			display:block;
+			cursor:pointer;
+			&:before {
+				@extend %icon;
+				content: 'clear';
+				font-size: 1em;
+			}
+			&:hover, &:active {
+				color: black;
+			}
+			.x-superboxselect-item-focus & {
+				color:white;
+			}
+			.x-item-disabled & {
+				color: color($fg, 'disabled');
+			}
 		}
 	}
 }

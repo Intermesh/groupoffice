@@ -5,3 +5,7 @@
 .go-module-icon-users, .go-menu-icon-users{
 	background-image:url('images/users.png') !important;
 }
+
+.go-module-icon-password { /* for auth methods */
+	background-image:url('images/key.png') !important;
+}

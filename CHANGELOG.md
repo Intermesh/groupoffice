@@ -1,3 +1,17 @@
+- Dokuwiki module compatible with 6.3
+- Users grid has disabled filter and shows disabled users lighter
+
+09-08-2018 6.3.31
+- Changed install SQL for notes as it failed to rename a column with a key on some systems
+- Delete buttons in dialog work
+- Delete option added in more menu of grid and detail view in notes.
+- Removed old z-push install dir.
+
+06-08-2018 6.3.30
+- Small UI improvements
+- LDAP bind login uses full DN
+- Refactored login dialog so that Firefox will prompt to save password.
+
 02-08-2018 6.3.29
 - Fixed various small bugs
 

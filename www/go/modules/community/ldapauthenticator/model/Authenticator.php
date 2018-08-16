@@ -32,7 +32,7 @@ class Authenticator extends PrimaryAuthenticator {
 	 * @return Server|boolean
 	 */
 	private static function findServer($email) {
-		$adPos = strpos($email, '@');
+		$adPos = strrpos($email, '@');
 		if(!$adPos) {
 			return false;
 		}

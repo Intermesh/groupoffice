@@ -212,7 +212,7 @@ class ContactController extends \GO\Base\Controller\AbstractModelController{
 			}
 			
 		}
-		
+		$response['data']['panelId'] = 'ab-contact-detail'; // backward compat for CF
 		
 		return parent::afterDisplay($response, $model, $params);
 	}

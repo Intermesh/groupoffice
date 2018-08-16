@@ -2039,7 +2039,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$fsFolder = $folder->fsFolder;
 		
 		while($att=array_shift($atts)){
-			if(empty($att->content_id) || $att->disposition=='attachment'){
+			if(empty($att->content_id)){
 				
 				// Check if the file already exists on disk, if so then add a number after it.
 				$fileName = null;

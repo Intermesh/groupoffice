@@ -105,7 +105,20 @@ go.modules.community.notes.MainPanel = Ext.extend(Ext.Panel, {
 						noteForm.show();
 					},
 					scope: this
-				})
+				}),{
+				iconCls: 'ic-more-vert',
+				menu: [
+					{
+						itemId: "delete",
+						iconCls: 'ic-delete',
+						text: t("Delete"),
+						handler: function () {
+							this.noteGrid.deleteSelected();
+						},
+						scope: this
+					}
+				]
+			}
 				
 //				,{
 //					disabled: go.Modules.get("community", 'notes').permissionLevel < GO.permissionLevels.write,
