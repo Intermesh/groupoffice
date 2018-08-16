@@ -1,6 +1,6 @@
 <?php
 
-namespace go\modules\community\devtools\controller;
+namespace go\modules\community\dev\controller;
 
 use Exception;
 use GO;
@@ -105,7 +105,7 @@ EOD;
 		
 		
 		$updatesFile = $folder->getFile('install/updates.php');
-		if(!$updatesFile->exists()) {
+		if(!$updatesFile->exists()) {			
 			$updatesFile->putContents("<?php\n\n\$updates = [];\n\n");			
 		}
 		
@@ -127,6 +127,8 @@ EOD;
 				$this->tableToModel($folder, $namespace, $tablePrefix, $record[0]);
 			}
 		}
+		
+		echo "Done\n";
 	}
 	
 	private function createFile(\go\core\fs\File $file, $text) {
@@ -171,6 +173,8 @@ EOD;
 
 
 		if (!$file->exists()) {
+			
+			echo "Generating controller/$modelName.php\n";
 
 			$replacements = [
 					'namespace' => $namespace,
@@ -194,6 +198,8 @@ EOD;
 		$file = $folder->getFolder('model')->getFile($modelName . '.php');
 
 		if (!$file->exists()) {
+			echo "Generating model/$modelName.php\n";
+			
 			$year = date('Y');
 
 			$data = <<<EOD
@@ -231,8 +237,6 @@ EOD;
 	}
 
 	protected function convertClass($className, $file) {
-		
-		echo "Converting $className\n";
 
 		$columns = [];
 		
@@ -266,6 +270,12 @@ EOD;
 
 EOD;
 		}
+		
+		if(empty($vars)) {
+			return;
+		}
+		
+		echo "Updating ".$className." with new properties\n";
 
 		//find position to insert properties
 		preg_match('/class .*\{\s*\n/', $source, $matches, PREG_OFFSET_CAPTURE);
