@@ -129,6 +129,8 @@ $qs[] = 'RENAME TABLE `cf_categories` TO `core_customfields_field_set`;';
 $qs[] = 'ALTER TABLE `core_customfields_field_set` CHANGE `extends_model` `extendsModel` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;';
 $qs[] = 'ALTER TABLE `core_customfields_field_set` CHANGE `acl_id` `aclId` INT(11) NOT NULL;';
 $qs[] = 'ALTER TABLE `core_customfields_field_set` CHANGE `sort_index` `sortOrder` TINYINT(4) NOT NULL DEFAULT \'0\';';
+// Next query may fail but some databases are not successfully upgraded in 2014
+$qs[] = 'ALTER TABLE `cf_fields` ADD `prefix` VARCHAR( 32 ) NOT NULL DEFAULT \'\', ADD `suffix` VARCHAR( 32 ) NOT NULL DEFAULT \'\';';
 $qs[] = 'RENAME TABLE `cf_fields` TO `core_customfields_field`;';
 $qs[] = 'ALTER TABLE `core_customfields_field` CHANGE `category_id` `fieldSetId` INT(11) NOT NULL;';
 $qs[] = 'ALTER TABLE `core_customfields_field` CHANGE `sort_index` `sortOrder` INT(11) NOT NULL DEFAULT \'0\';';
@@ -481,10 +483,13 @@ foreach($qs as $q) {
 			App::get()->getDbConnection()->query($q);
 		} catch(\Exception $e) {
 			
-			echo "ERROR: A fatal upgrade error occurred. Please report this error message.\n\n";
-			
-			echo $e->getMessage().' Query '. $q;
-			exit();
+			echo 'ERROR: '. $e->getMessage().' Query '. $q;
+			if ($e->getCode() == 42000 || $e->getCode() == '42S21' || $e->getCode() == '42S01' || $e->getCode() == '42S22') {
+				//duplicate and drop errors. Ignore those on updates
+			} else {
+				echo "ERROR: A fatal upgrade error occurred. You will not be able to continue upgrading this database! Please report this error message.\n\n";
+				exit();
+			}
 		}
 	} else
 	{
