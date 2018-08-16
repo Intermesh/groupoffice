@@ -308,7 +308,9 @@ abstract class EntityController extends ReadOnlyEntityController {
 						->limit($p['maxChanges'])
 						->orderBy(['modSeq' => 'ASC'])						
 						->groupBy(['entityId'])
+						->where(["entityTypeId" => $cls::getType()->getId()])
 						->andWhere('modSeq', '>', $entityState);
+		
 		Acl::applyToQuery($changes, "t.aclId");
 		
 		foreach ($changes as $change) {

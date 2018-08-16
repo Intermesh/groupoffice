@@ -27,12 +27,8 @@ go.grid.GridTrait = {
 
 	deleteSelected: function () {
 
-		var selectedRecords = this.getSelectionModel().getSelections(), ids = [], strConfirm;
-
-		selectedRecords.forEach(function (r) {
-			ids.push(r.data.id);
-		});
-
+		var selectedRecords = this.getSelectionModel().getSelections(), ids = selectedRecords.column("id"), strConfirm;
+		
 		switch (ids.length)
 		{
 			case 0:

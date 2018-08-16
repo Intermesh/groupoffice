@@ -510,7 +510,7 @@ ul.x-tab-strip li.x-tab-edge {
 	}
 }
 
-.ext-webkit *:focus{
+*:focus{
     outline: none !important;
 }
 
@@ -793,11 +793,12 @@ fieldset.x-panel-collapsed .x-fieldset-bwrap {
     margin-left:-3px;
 }
 
-.x-hide-label label.x-form-item-label {
+//MS: Added > for nested form fields in formgroup
+.x-hide-label > label.x-form-item-label {
      display:none;
 }
 
-.x-hide-label .x-form-element {
+.x-hide-label > .x-form-element {
     padding-left: 0 !important;
 }
 

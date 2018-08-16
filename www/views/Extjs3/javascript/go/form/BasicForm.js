@@ -34,7 +34,7 @@ Ext.override(Ext.form.BasicForm, {
 				val = f.getValue();
 				
 				if(Ext.isDate(val)) {
-					val = me.serializeDate(val);
+					val = val.serialize();
 				}				
 
 				if (Ext.isDefined(key)) {
@@ -73,16 +73,6 @@ Ext.override(Ext.form.BasicForm, {
 		}
 				
 		return converted;
-	},
-	
-	serializeDate : function(date) {
-		if(date.getHours() == 0 && date.getMinutes() == 0 && date.getSeconds() == 0) {
-			//no time
-			return date.format("Y-m-d");
-		} else
-		{
-			return date.format('c');
-		}
 	},
 	
 	setValues: function (values) {		

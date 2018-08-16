@@ -140,22 +140,27 @@ go.data.JmapProxy = Ext.extend(Ext.data.HttpProxy, {
 		var types = {};
 		
 		response.records.forEach(function(r) {
-			fields.forEach(function(f) {
-				if(!r[f.key]) {
-					return true;
-				}	
+			fields.forEach(function(f) {	
 				
-				if(!types[f.store.entity]) {
-					types[f.store.entity] = {store: f.store, ids: []};
+				var key = f.type.getKey.call(f, r);				
+				if(!key) {
+					return true;
+				}				
+				
+				if(!types[f.type.entity]) {
+					types[f.type.entity] = [];
 				}
 				
-				types[f.store.entity].ids.push(r[f.key]);
+				if(types[f.type.entity].indexOf(key) == -1) {
+					types[f.type.entity].push(key);
+				}
 			});
 		});
 		
 		for(var entity in types) {
 			count++; //count number of requests and check if an equal number of callbacks has been called before proceeding with onRead.
-			types[entity].store.get(types[entity].ids, callback);
+			var store = go.Stores.get(entity);
+			store.get(types[entity], callback);
 		}
 		
 		return count > 0;
@@ -168,7 +173,7 @@ go.data.JmapProxy = Ext.extend(Ext.data.HttpProxy, {
 		
 		fields.each(function(field) {
 			if(field.type.entity) {				
-				f.push({key: field.key, store: go.Stores.get(field.type.entity)});				
+				f.push(field);				
 			}
 		});
 		

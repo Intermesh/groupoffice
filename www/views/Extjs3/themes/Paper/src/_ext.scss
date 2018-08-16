@@ -335,7 +335,9 @@ ul.x-tab-strip-bottom{
 		.x-box-inner { //composite
 			overflow:visible;
 
-			.x-btn {
+	
+//	Merijn: This didn't play nice with formgroup
+/*		.x-btn {
 				top: dp(-2);
 				line-height: dp(32);
 				height: dp(32);
@@ -346,7 +348,8 @@ ul.x-tab-strip-bottom{
 						left:dp(4);
 					}
 				}
-			} 
+			}
+*/
 		}
 	}
 	
@@ -412,13 +415,13 @@ ul.x-tab-strip-bottom{
 	&-checkbox {
 		position:absolute;
 		opacity: 0;
-		+ label::before {
+		+ .x-form-cb-label::before {
 			@extend %checkbox;
 		}
-		&:checked + label::before {
+		&:checked + .x-form-cb-label::before {
 			content: 'check_box';
 		}
-		&:focus + label::before {
+		&:focus + .x-form-cb-label::before {
 			@include var(background-color, c-primary-tp);
 		}
 	}
@@ -646,7 +649,7 @@ ul.x-tab-strip-bottom{
 	@extend %font-button;
 	letter-spacing: 0; // for button icons
 	height: dp(36); // 32 for dense
-	line-height: dp(36); // 32 for dense
+	line-height: dp(36) - 2; // 32 for dense
 	border-radius: $borderRadius;
 	vertical-align: middle;
 	white-space: nowrap;
@@ -686,8 +689,8 @@ ul.x-tab-strip-bottom{
 	// transition: background 400ms cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
    & button, & em {
 		@extend %font-button;
-		color: inherit;
-   }
+		color: inherit;		
+   }	 
 	//  &-click {
 	//    @extend .z2;
 	//    background-color: color($grey, 200);
@@ -759,6 +762,7 @@ ul.x-tab-strip-bottom{
 	&-text-icon button::before{
 		@extend %icon;
 		padding-right: dp(8);
+		margin-top: dp(-4);
 	}
    &-pressed {
 		//background-color: color($bg, 'hover');
@@ -769,7 +773,7 @@ ul.x-tab-strip-bottom{
    }
 	
 	&-mc em.x-btn-arrow > button {
-		padding-right: dp(8);
+		/*padding-right: dp(8);*/
 		&:after {
 			@extend %icon;
 			content: 'arrow_drop_down';
@@ -1174,7 +1178,7 @@ ul.x-tab-strip-bottom{
 			//padding-left: dp(8) !important;
 		}
 		&-selected{
-			background-color: $cSelected !important;
+			background-color: $cSelected;
 			color:#000;
 			span{
 				color:#000 !important;
@@ -1514,8 +1518,10 @@ td.grid-hd-group-cell {
 	}
 	&-node {
 		@extend %font-body1;
-		.x-tree-selected {background-color: $cSelected;}
+		
 		.x-tree-node-over {background-color: $cHover;}
+		.x-tree-selected {background-color: $cSelected;}
+		
 		&-indent span {
 			display:inline-block;
 			width: dp(24);
@@ -1817,6 +1823,13 @@ td.x-date-mp-sep {
 	transform-origin: left top 0px;
 	transform: scale(1);
 	will-change: transform, opacity;
+	
+	&.x-menu-no-icons {
+		.x-menu-item-icon {
+			display: none;
+		}		
+	}
+	
 	&.x-hide-offsets {
 		opacity: 0;
 		transform: scale(0.6);
@@ -2529,4 +2542,90 @@ input[value="0"] + .x-slider .x-slider-thumb {
 
 .x-window-dlg .ext-mb-error {
 	background-image:url(../images/default/window/icon-error.gif);
+}
+
+// EXTENSION
+
+.x-switch {
+	position: relative;
+	min-height: dp(24);
+	padding-left: dp(4);
+	> .thumb {
+		position: absolute;
+		pointer-events: none;
+		transition: transform linear .06s, background-color linear .08s;
+		height: dp(24);
+		width: dp(24);
+		top: dp(-2);
+		left: dp(0);
+		&::after { // nop
+			@extend .z2;
+			content: '';
+			position:absolute;
+			top:0;
+			height: dp(24);
+			width: dp(24);
+			background-color: color($grey, 50);
+			z-index:1;
+			border-radius: 50%;
+		}
+		&::before { // shade
+			content: "";
+			position:absolute;
+			top: dp(-8);
+			left: dp(-8);
+			bottom: dp(-8);
+			right: dp(-8);
+			background-color: transparent;
+			border-radius: 50%;
+		}
+	}
+	> .track {
+		background-color: color($fg, 'disabled');
+		position:absolute;
+		height: dp(16);
+		top:dp(3); // track in middle of label lineheight
+		width: dp(40);
+		border-radius: dp(8);
+		pointer-events: none;
+		transition: background-color linear .08s;
+	}
+	> input {
+		width: dp(40);
+		height: dp(24);
+		opacity:0;
+		&:checked {
+			~ .thumb {
+				transform: translate(dp(24), 0);
+				&::after { @include var(background-color, c-primary);}
+				&::before {@include var(border-color, c-primary);}
+			}
+			~ .track {
+				@include var(background-color, c-primary-tp);
+			}
+		}
+		&:focus {
+			~ .thumb::before {
+				background-color: rgba(black, .12);
+			}
+			&:checked ~ .thumb::before {
+				background-color: rgba($cPrimary, .2);
+			}
+		}
+
+		&[disabled] {
+			~ .thumb {
+				background-color: color($grey, 400);
+				&::before {
+					background-color: rgba(black, .12);
+				}
+			}
+			~ .track {
+				background-color: color($fg, 'divider');
+			}
+		}
+		~ label {
+			padding-left: dp(56);
+		}
+	}
 }

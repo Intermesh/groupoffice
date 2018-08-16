@@ -27,6 +27,8 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 
 	initComponent: function () {
 		go.panels.DetailView.superclass.initComponent.call(this, arguments);		
+		
+		this.cls += " go-detail-view-" + this.entityStore.entity.name.toLowerCase();
 
 		this.entityStore.on('changes', this.onChanges, this);
 		
@@ -71,6 +73,9 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 	},
 
 	onLoad: function () {
+		
+		go.Translate.setModule(this.package, this.module);
+		
 		this.items.each(function (item, index, length) {
 			
 			item.show();

@@ -13,29 +13,7 @@
 // #################
 // ##### ICONS #####
 // #################
-%icon {
-	display: inline-block;
-  font-family: 'Material Icons';
-  font-weight: normal;
-  font-style: normal;
-  font-size: dp(24);  /* Preferred icon size */
-/*	max-width: dp(24);
-	max-height: dp(24);*/
-	color:inherit;
-  width: auto;
-  height: auto;
-  line-height: 1;
-  text-transform: none;
-  letter-spacing: normal;
-  vertical-align:middle;
-  word-wrap: normal;
-  white-space: nowrap;
-  direction: ltr;
-  -webkit-font-smoothing: antialiased; // Support for all WebKit browsers.
-  text-rendering: optimizeLegibility; // Support for Safari and Chrome.
-  -moz-osx-font-smoothing: grayscale; // Support for Firefox.
-  font-feature-settings: 'liga'; // Support for IE
-}
+
 .email-grid-icon {
 	@extend %icon;
 	background-position: -100px;

@@ -19,6 +19,9 @@ use ReflectionClass;
 /**
  * Property model
  * 
+ * Note: when changing database columns you need to run install/upgrade.php to 
+ * rebuild the cache.
+ * 
  * A property belongs to a {@see Entity}
  * 
  * It can only be saved, deleted or found through an {@see Entity}
@@ -193,7 +196,10 @@ abstract class Property extends Model {
 	}
 
 	/**
-	 * List of tables this entiy uses
+	 * List of tables this entity uses
+	 * 
+	 * Note: When making changes to the mapping you need to run install/upgrade.php
+	 * to rebuild the cache!
 	 * 
 	 * All tables must have identical primary keys.
 	 * eg 
@@ -337,14 +343,14 @@ abstract class Property extends Model {
 		$tables = self::getMapping()->getTables();
 
 		$mainTableName = array_keys($tables)[0];
+		
+		if (empty($fetchProperties)) {
+			$fetchProperties = static::getDefaultFetchProperties();
+		}
 
 		$query = (new Query())
 						->from($tables[$mainTableName]->getName(), $tables[$mainTableName]->getAlias())
 						->fetchMode(PDO::FETCH_CLASS, static::class, [false, $fetchProperties]);
-
-		if (empty($fetchProperties)) {
-			$fetchProperties = static::getDefaultFetchProperties();
-		}
 
 		self::joinAdditionalTables($tables, $query);
 		self::buildSelect($query, $fetchProperties);
@@ -1027,16 +1033,35 @@ abstract class Property extends Model {
 	 * 
 	 * @return array eg ['id' => 1]
 	 */
-	public function id() {
+	public function primaryKeyValues() {
 		
-		if($this->isNew()) {
-			return null;
+		$keys = $this->getPrimaryKey();
+		$v = [];
+		foreach($keys as $key) {			
+			$v[$key] = $this->$key;			
 		}
 		
+		return $v;
+	}
+	
+	/**
+	 * Get the primary key column names.
+	 * 
+	 * @param boolean $withTableAlias 
+	 * @return string[]
+	 */
+	public static function getPrimaryKey($withTableAlias = false) {
 		$tables = static::getMapping()->getTables();
 		$primaryTable = array_shift($tables);
-		
-		return $this->primaryKeys[$primaryTable->getAlias()];
+		$keys = $primaryTable->getPrimaryKey();
+		if(!$withTableAlias) {
+			return $keys;
+		}
+		$keysWithAlias = [];
+		foreach($keys as $key) {
+			$keysWithAlias[] = $primaryTable->getAlias() . '.' . $key;
+		}
+		return $keysWithAlias;
 	}
 	
 	/**
@@ -1054,8 +1079,8 @@ abstract class Property extends Model {
 			return false;
 		}
 		
-		$pk1 = $this->id();
-		$pk2 = $property->id();
+		$pk1 = $this->primaryKeyValues();
+		$pk2 = $property->primaryKeyValues();
 		
 		$diff = array_diff($pk1, $pk2);
 		

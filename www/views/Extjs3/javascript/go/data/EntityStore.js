@@ -1,16 +1,23 @@
 go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 	state: null,
-
-	entity: null,
 	
+	data : null,
+	
+	notFound: null,
+
+	entity: null,	
 	
 	changes : null,
 	
 	constructor : function(config) {
 		go.data.EntityStore.superclass.constructor.call(this, config);
 		
-		this.addEvents('changes');
+		this.addEvents({changes:true, error:true});
+		
+		this.notFound = [];
+		this.data = {};
+		this.state = null;
 		
 		this.restoreState();
 		this.initChanges();
@@ -35,14 +42,16 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		if(json) {
 			var state = JSON.parse(json);			
 			this.data = state.data;
-			this.state = state.state;			
+			this.state = state.state;		
+			this.notFound = state.notFound;
 		}
 	},
 	
-	saveState : function() {
+	saveState : function() {		
 		var state = JSON.stringify({
 			state: this.state,
-			data: this.data
+			data: this.data,
+			notFound: this.notFound
 		});
 		
 		if(!window.localStorage.entityStores) {
@@ -61,6 +70,12 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		}		
 		this.data[entity.id] = entity;
 		
+		//remove from not found.
+		var i = this.notFound.indexOf(entity.id);
+		if(i > -1) {
+			this.notFound.splice(i, 1);
+		}
+		
 		this._fireChanges();
 	},
 	
@@ -72,17 +87,17 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	
 	_fireChanges : function() {
 		var me = this;
-
-		if (me.timeout) {
-			clearTimeout(me.timeout);
-		}
+//
+//		if (me.timeout) {
+//			clearTimeout(me.timeout);
+//		}
 		
 		//delay fireevent one event loop cycle
-		me.timeout = setTimeout(function () {				
+//		me.timeout = setTimeout(function () {				
 			me.fireEvent('changes', me, me.changes.added, me.changes.changed, me.changes.destroyed);			
 			me.initChanges();
-			me.timeout = null;
-		}, 0);
+//			me.timeout = null;
+//		}, 0);
 	},
 
 
@@ -100,6 +115,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				for(var i = 0,l = action.payload.list.length;i < l; i++) {
 					this._add(action.payload.list[i]);
 				};
+				this.state = action.payload.state;
 				this.saveState();			
 				
 				break;
@@ -121,7 +137,8 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		}
 	},
 
-	getUpdates: function (cb, scope) {
+	getUpdates: function (cb, scope) {		
+		
 		if (this.state) {
 			var clientCallId = go.Jmap.request({
 				method: this.entity.name + "/getUpdates",
@@ -134,9 +151,10 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					} else
 					{
 						this.state = null;
-						this.data = {};
-						this.saveState();
+						this.data = {};						
 					}
+					console.log(this.state);
+					this.saveState();
 				},
 				scope: this
 			});
@@ -161,9 +179,12 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			go.Jmap.request({
 				method: this.entity.name + "/get",
 				callback: function (options, success, response) {
+					
 					this.state = response.state;
-				
-					cb.call(scope || this, this);
+					this.saveState();
+					if(cb) {
+						cb.call(scope || this, this);
+					}
 				},
 				scope: this
 			});
@@ -175,7 +196,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	 * Get entities
 	 * 
 	 * @param {array} ids
-	 * @param {function} cb
+	 * @param {function} cb called with "entitiies[]" and boolean "async"
 	 * @param {object} scope
 	 * @returns {array|boolean} entities or false is data needs to be loaded from server
 	 */
@@ -196,8 +217,14 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			if(!id) {
 				throw "Empty ID passed to EntityStore.get()";
 			}
-			this.data[id] ? entities.push(this.data[id]) : unknownIds.push(id);
-			
+			if(this.data[id]) {
+				entities.push(this.data[id]);
+			} else if(this.notFound.indexOf(id) > -1) {
+				entities.push(null);
+			} else
+			{
+				unknownIds.push(id);
+			}			
 		}
 		if (unknownIds.length) {
 			go.Jmap.request({
@@ -211,11 +238,13 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					}
 					
 					if(!GO.util.empty(response.notFound)) {
-						console.log("Item not found", response);
-						return;
+						this.notFound = this.notFound.concat(response.notFound);
+						console.log("Item not found", response);						
 					}
-					this.state = response.state;				
-					this.get(ids, cb, scope);					
+					
+					this.state = response.state;
+					this.saveState();
+					this.get(ids, cb, scope, true); //passed hidden 4th argument to pass to the callback to track that it was asynchronously called					
 				},
 				scope: this
 			});
@@ -223,7 +252,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		} 
 		
 		if(cb) {		
-			cb.call(scope || this, entities);			
+			cb.call(scope || this, entities, arguments[3]);			
 		}
 		return entities;
 	},
@@ -280,6 +309,12 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			params: params,
 			scope: this,
 			callback: function (options, success, response) {
+				
+				if(!success) {
+					this.fireEvent("error", options, response);
+					return;
+				}
+				
 				var entity, clientId;
 				
 				if(response.created) {
@@ -290,19 +325,17 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				}
 				
 				if(response.updated) {
-
 					for(serverId in response.updated) {
 						entity = Ext.apply(params.update[serverId], response.updated[serverId]);
 						this._add(entity);
 					}
 				}
 				
-				this.state = response.newState;				
+				this.state = response.newState;	
 				this.saveState();
 				
 				if(response.destroyed) {
-					for(var i =0, l = response.destroyed.length; i < l; i++) {
-						
+					for(var i =0, l = response.destroyed.length; i < l; i++) {						
 						this._destroy(response.destroyed[i]);
 					}
 				}

@@ -161,6 +161,10 @@ go.form.FileField = Ext.extend(Ext.form.TextField, {
 		}
 		go.form.FileField.superclass.reset.call(this);
 	},
+	getValue : function() {
+		var v = go.form.FileField.superclass.getValue.call(this);
+		return v ? v : null;
+	},
 
 	// private
 	getFileInputId: function () {

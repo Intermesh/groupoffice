@@ -26,7 +26,9 @@ class Extjs3 {
 		$cacheFile = GO()->getDataFolder()->getFile('clientscripts/' . $theme . '/style.css');
 
 		if (GO()->getDebugger()->enabled || !$cacheFile->exists()) {
-//		if (!$cacheFile->exists()) {
+			if ($cacheFile->exists()) {
+				$cacheFile->delete();
+			}
 			$modules = Module::getInstalled();
 
 			foreach ($modules as $module) {

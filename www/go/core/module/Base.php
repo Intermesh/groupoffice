@@ -13,6 +13,13 @@ use go\core\orm\Entity;
 use go\core\util\ClassFinder;
 use function GO;
 
+/**
+ * Base module class
+ * 
+ * @copyright (c) 2014, Intermesh BV http://www.intermesh.nl
+ * @author Merijn Schering <mschering@intermesh.nl>
+ * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
+ */
 abstract class Base {
 	
 	/**
@@ -122,7 +129,7 @@ abstract class Base {
 	 * De-registration is not necessary when the module is uninstalled because they 
 	 * will be deleted by Mysql because of a cascading relation.
 	 */
-	private function registerEntities() {
+	public function registerEntities() {
 		$entities = $this->getClassFinder()->findByParent(Entity::class);
 		
 		foreach($entities as $entity) {
@@ -240,12 +247,27 @@ abstract class Base {
 	public function defineListeners() {		
 	}
 
+	/**
+	 * Get the author
+	 * 
+	 * @return string eg. "Intermesh BV <info@intermesh.nl>";
+	 */
 	abstract function getAuthor();
 
+	/**
+	 * Get dependent modules.
+	 * 
+	 * @return string[] eg. ["community/notes"]
+	 */
 	public function getDependencies() {
 		return [];
 	}
 
+	/**
+	 * get conflicting modules.
+	 * 
+	 * @return string[] eg. ["community/notes"]
+	 */
 	public function getConflicts() {
 		return [];
 	}
@@ -259,6 +281,11 @@ abstract class Base {
 		return $this->getPath() . '/';
 	}
 
+	/**
+	 * Get the filesystem path to the module
+	 * 
+	 * @return string
+	 */
 	public static function getPath() {
 		
 		//todo use reflection
@@ -277,21 +304,46 @@ abstract class Base {
 		return new Folder(static::getPath());
 	}
 	
+	/**
+	 * 
+	 * Get the name of this module
+	 * 
+	 * @return type
+	 */
 	public static function getName() {
 		$parts = explode("\\", static::class);
 		
 		return $parts[3];
 	}
-	// backwards compatible 6.2
+	
+	/**
+	 * // backwards compatible 6.2
+	 * 
+	 * @deprecated since version number
+	 * @return type
+	 */
 	public static function name() {
 		return self::getName();
 	}
 	
+	/**
+	 * Get package name 
+	 * 
+	 * The package is a group of modules that belong to each other. It is used 
+	 * to group modules per type or per customer.
+	 * 
+	 * @return string
+	 */
 	public static function getPackage() {
 		$parts = explode("\\", static::class);		
 		return $parts[2];
 	}
 	
+	/**
+	 * Get localized module title
+	 * 
+	 * @return string
+	 */
 	public static function getTitle() {
 		$title = GO()->t("name", static::getPackage(), static::getName());
 		if($title == "name") {
@@ -301,6 +353,12 @@ abstract class Base {
 		return $title;
 	}
 	
+	
+	/**
+	 * Get localized module description
+	 * 
+	 * @return string
+	 */
 	public static function getDescription() {
 		$description = GO()->t("description", static::getPackage(), static::getName());
 		
@@ -311,6 +369,11 @@ abstract class Base {
 		return $description;
 	}
 	
+	/**
+	 * Get icon URI
+	 * 
+	 * @return string
+	 */
 	public static function getIcon() {
 		$icon = static::getFolder()->getFile('icon.png');
 		

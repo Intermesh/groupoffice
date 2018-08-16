@@ -7,39 +7,6 @@ $font-weight-m: 600;
 $font-weight-l: 100;
 
 
-html {
-   font-size: 100%;
-	letter-spacing: normal;
-	-moz-osx-font-smoothing: grayscale;
-   -webkit-font-smoothing: antialiased;
-	-ms-text-size-adjust: 100%;
-   -webkit-text-size-adjust: 100%;
-}
-button, html, input, select, textarea {
-    font-family: $font-family;
-}
-body, html {
-	@extend %font-body1;
-	color: color($fg, 'text');
-	text-rendering: optimizeLegibility;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-}
-h1,h2,h3,h4,h5,h6 {
-	font-family: inherit;
-	color: color($fg, 'text');
-	font-weight: bold;
-	line-height: 1;
-}
-h1 { @extend %font-display1; }
-h2 { @extend %font-headline; }
-h3 { @extend %font-title; }
-h4 { @extend %font-subheading; }
-h5 { @extend %font-subheading-dense; }
-h6 { @extend %font-data-head; }
-
-strong { color: color($grey, 700); font-weight: $font-weight-m; }
-small { color: color($grey); font-weight: $font-weight-r; font-size:.85em; line-height: 1.2; }
 
 %font-button {
 	font-size: sp(14);

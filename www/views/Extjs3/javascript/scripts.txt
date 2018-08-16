@@ -259,6 +259,8 @@ views/Extjs3/javascript/go/form/multiselect/Field.js
 views/Extjs3/javascript/go/form/multiselect/Window.js
 views/Extjs3/javascript/go/form/GridField.js
 views/Extjs3/javascript/go/form/RadioGroup.js
+views/Extjs3/javascript/go/form/Switch.js
+views/Extjs3/javascript/go/form/FormGroup.js
 
 views/Extjs3/javascript/go/panels/CreateModifyTpl.js
 views/Extjs3/javascript/go/panels/LinksTpl.js
@@ -310,6 +312,7 @@ views/Extjs3/javascript/go/systemsettings/Dialog.js
 views/Extjs3/javascript/go/util.js
 
 views/Extjs3/javascript/go/Wizard.js
+views/Extjs3/javascript/go/Array.js
 
 
-
+views/Extjs3/javascript/go/grid/editor/ComboColumn.js

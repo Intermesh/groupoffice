@@ -1,0 +1,73 @@
+.go-addressbook-url.homepage:before {
+  display: inline-block;
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 21px;
+  /* Preferred icon size */
+  /*	max-width: dp(24);
+  	max-height: dp(24);*/
+  color: inherit;
+  width: auto;
+  height: auto;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  vertical-align: middle;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'liga'; }
+
+.go-addressbook-star {
+  color: #febf35; }
+
+.go-addressbook-contact-avatar {
+  text-align: center; }
+  .go-addressbook-contact-avatar .avatar {
+    font-size: 134.75px;
+    line-height: 175px;
+    height: 175px;
+    width: 175px; }
+
+.go-addressbook-name-panel {
+  padding: 14px; }
+  .go-addressbook-name-panel h4 {
+    top: -14px;
+    left: 49px; }
+  .go-addressbook-name-panel .go-addressbook-star {
+    margin-top: -7px; }
+
+.go-addressbook-url-panel {
+  text-align: right; }
+
+.go-addressbook-url {
+  height: 21px;
+  width: 21px;
+  background-repeat: none;
+  background-position: center;
+  background-size: contain;
+  display: inline-block;
+  border-radius: 3px; }
+  .go-addressbook-url.linkedin {
+    background-image: url("resources/linkedin.png"); }
+  .go-addressbook-url.facebook {
+    background-image: url("resources/facebook.png"); }
+  .go-addressbook-url.twitter {
+    background-image: url("resources/twitter.png"); }
+  .go-addressbook-url.homepage:before {
+    border-radius: 3px;
+    content: "home";
+    vertical-align: baseline;
+    color: white;
+    background-color: #243a80; }
+
+.avatar.organization {
+  background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24)); }
+  .avatar.organization::before {
+    content: "business"; }
+
+/*# sourceMappingURL=style.css.map */

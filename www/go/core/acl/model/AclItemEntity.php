@@ -54,6 +54,9 @@ abstract class AclItemEntity extends Entity {
 		/* @var $cls Entity */
 
 		$aclColumn = $cls::getMapping()->getColumn('aclId');
+		if(!$aclColumn) {
+			throw new \Exception("Column 'aclId' is required for AclEntity '$cls'");
+		}
 //		$toTable = $cls::getMapping()->getTable($aclColumn->table->getName());
 
 		$keys = [];
