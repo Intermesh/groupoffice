@@ -38,7 +38,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 <div class="avatar {[this.getCls(values.isOrganization)]}" style="{[this.getStyle(values.photoBlobId)]}"></div></div>', 
 					{
 						getCls: function (isOrganization) {
-							return isOrganization ? "group" : "";
+							return isOrganization ? "organization" : "";
 						},
 						getStyle: function (photoBlobId) {
 							return photoBlobId ? 'background-image: url(' + go.Jmap.downloadUrl(photoBlobId) + ')"' : "";
@@ -140,15 +140,42 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 							}, this);
 						}
 					},
-					tpl: '<div class="icons">\
-					<tpl for="dates">\
+					tpl: '<tpl if="dates.length">\
+						<div class="icons">\
 						<hr class="indent">\
-						<a class="s6"><i class="icon label">cake</i>\
+						<tpl for="dates"><a class="s6"><tpl if="xindex == 1"><i class="icon label">cake</i></tpl>\
 							<span>{[GO.util.dateFormat(values.date)]}</span>\
 							<label>{[t("dateTypes")[values.type]]}</label>\
+						</a></tpl>\
+					</div>\
+					</tpl>'
+				}, {
+					collapsible: true,
+					title: t("Organizations"),
+					xtype: "panel",
+					onLoad : function(dv) {
+						this.setVisible(dv.data.organizations.length);
+						if(!dv.data.organizations.length) {							
+							return;
+						}
+						
+						if(!this.template) {
+							this.template = new Ext.XTemplate('<div class="icons">\
+					<tpl for=".">\
+						<a class="s6" href="#contact/{id}"><tpl if="xindex == 1"><i class="icon label">domain</i></tpl>\
+							<span>{name}</span>\
+							<label>{[values.jobTitle || "-"]}</label>\
 						</a>\
 					</tpl>\
-					</div>'
+					</div>').compile();
+						}
+						
+						var ids = dv.data.organizations.column('organizationContactId');
+						
+						go.Stores.get("Contact").get(ids, function(organizations) {
+							this.update(this.template.apply(organizations));
+						}, this);
+					}
 				}
 			]
 		});

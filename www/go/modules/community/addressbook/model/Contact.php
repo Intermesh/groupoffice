@@ -145,6 +145,12 @@ class Contact extends AclItemEntity {
 	
 	/**
 	 *
+	 * @var int
+	 */
+	public $filesFolderId;
+	
+	/**
+	 *
 	 * @var EmailAddress[]
 	 */
 	public $emailAddresses = [];
@@ -176,6 +182,13 @@ class Contact extends AclItemEntity {
 	
 	/**
 	 *
+	 * @var ContactOrganization[]
+	 */
+	public $employees = [];
+	
+	
+	/**
+	 *
 	 * @var Address[]
 	 */
 	public $addresses = [];	
@@ -202,6 +215,7 @@ class Contact extends AclItemEntity {
 						->addRelation('emailAddresses', EmailAddress::class, ['id' => 'contactId'])
 						->addRelation('addresses', Address::class, ['id' => 'contactId'])
 						->addRelation('organizations', ContactOrganization::class, ['id' => 'contactId'])
+						->addRelation('employees', ContactOrganization::class, ['id' => 'organizationContactId'])
 						->addRelation('urls', Url::class, ['id' => 'contactId'])
 						->addRelation('groups', ContactGroup::class, ['id' => 'contactId']);
 	}

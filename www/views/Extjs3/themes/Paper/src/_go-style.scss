@@ -559,17 +559,23 @@ button {
 	background-size:cover;
 	border: 1px solid white;
 	border-radius: 50%;
+	height: dp(40);
+	width: dp(40);
+	font-size: dp(28);
+	line-height: dp(40);
+	text-align: center;
+	&::before {
+			color: white;
+			@extend %icon;
+			font-size: inherit;			
+			height: 100%;
+			width: 100%;
+	}
 	
 	&.group {
 		&::before {
-			width: 100%;
-			height: 100%;
-			color: white;
-			@extend %icon;
-			font-size: dp(28);
-			margin: dp(4);			
+			content: "group";			
 		}
-		@extend .ic-group;
 		background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24));	
 	}
 }
@@ -592,8 +598,6 @@ button {
 		position: absolute;
 		top: 0;
 		left: 0;
-		width: dp(40);
-		height: dp(40);
 		vertical-align: middle;
 	}
 	

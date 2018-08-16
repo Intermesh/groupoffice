@@ -45,7 +45,7 @@
 		},
 		
 		streetAddress : function(config) {
-			window.open("https://www.openstreetmap.org/search?query=" + encodeURIComponent(config.street + ", " +config.zipCode + ", " + config.country));
+			window.open("https://www.openstreetmap.org/search?query=" + encodeURIComponent(config.street + ", " +config.zipCode.replace(/ /g, '') + ", " + config.country));
 		},
 		
 		showDate : function(date) {

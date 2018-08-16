@@ -28,6 +28,8 @@
 .go-addressbook-contact-avatar {
   text-align: center; }
   .go-addressbook-contact-avatar .avatar {
+    font-size: 134.75px;
+    line-height: 175px;
     height: 175px;
     width: 175px; }
 
@@ -62,5 +64,10 @@
     vertical-align: baseline;
     color: white;
     background-color: #243a80; }
+
+.avatar.organization {
+  background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24)); }
+  .avatar.organization::before {
+    content: "business"; }
 
 /*# sourceMappingURL=style.css.map */

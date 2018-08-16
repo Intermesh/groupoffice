@@ -73,7 +73,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 							style = 'background-image: url(' + go.Jmap.downloadUrl(record.data.photoBlobId) + ')"';
 						} else
 						{
-							cls = record.data.isOrganization ? "group" : "";
+							cls = record.data.isOrganization ? "organization" : "";
 						}
 
 						return '<div class="user"><div class="avatar ' + cls + '" style="' + style + '"></div>' +

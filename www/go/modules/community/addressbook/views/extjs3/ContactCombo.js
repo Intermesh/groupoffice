@@ -1,3 +1,7 @@
+/**
+ * 
+ * @type |||
+ */
 go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 	fieldLabel: t("Contact"),
 	hiddenName: 'contactId',
@@ -11,6 +15,10 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 	selectOnFocus: true,
 	forceSelection: true,
 	allowBlank: false,
+	/**
+	 * Set to true to show organizations, set to null to show both.
+	 */
+	isOrganization : false,
 	initComponent: function () {
 		Ext.applyIf(this, {
 			store: new go.data.Store({
@@ -25,7 +33,7 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 			})
 		});
 		
-		if(this.isOranization) {
+		if(this.isOrganization) {
 			this.store.baseParams.isOrganization = true;
 		}
 
