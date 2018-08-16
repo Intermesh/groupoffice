@@ -1,3 +1,6 @@
+- Dokuwiki module compatible with 6.3
+- Users grid has disabled filter and shows disabled users lighter
+
 09-08-2018 6.3.31
 - Changed install SQL for notes as it failed to rename a column with a key on some systems
 - Delete buttons in dialog work
