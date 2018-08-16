@@ -31,12 +31,26 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				{name: 'createdAt', type: 'date'},
 				{name: 'lastLogin', type: 'date'}	
 			],
+			baseParams: {filter: {enabled: true}},
 			entityStore: go.Stores.get("User")
 		});
 
-		Ext.apply(this, {		
+		Ext.apply(this, {
 			plugins: [actions],
-			tbar: [ '->', 
+			tbar: [{
+					iconCls: 'ic-people-outline',
+					text: t('Show disabled'),
+					enableToggle:true,
+					toggleHandler: function(btn, state) {
+						if(!state) {
+							this.store.baseParams.filter = {enabled: true};
+						} else {
+							delete this.store.baseParams.filter;
+						}
+						this.store.reload();
+					},
+					scope:this
+			}, '->', 
 				{
 					xtype: 'tbsearch'
 				},{					
@@ -112,7 +126,11 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 			viewConfig: {
 				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>',
 				forceFit: true,
-				autoFill: true
+				autoFill: true,
+				getRowClass: function(record) {
+					if(!record.json.enabled)
+						return 'x-item-disabled';
+				}
 			},
 			// config options for stateful behavior
 			stateful: true,
