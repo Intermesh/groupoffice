@@ -88,9 +88,8 @@ class Artist extends Entity {
 		if(!empty($filter['genres'])) {
 			//filter artists on their album genres
 			$query->join('music_album', 'a', 'a.artistId = t.id')
-					->join('music_album_genre', 'g', 'a.id = g.albumId')
 					->groupBy(['t.id']) // group the results by id to filter out duplicates because of the join
-					->where(['g.genreId' => $filter['genres']]);			
+					->where(['a.genreId' => $filter['genres']]);			
 		}
 		
 		//Always return parent filter function because it may implement core filters.

@@ -78,7 +78,11 @@ go.modules.community.music.ArtistDialog = Ext.extend(go.form.Dialog, {
 									xtype: "datefield",
 									fieldLabel: t("Release date"),
 									name: "releaseDate"
-								}							
+								},
+								
+								{
+									xtype: "genrecombo"
+								}
 							]
 						}
 					}

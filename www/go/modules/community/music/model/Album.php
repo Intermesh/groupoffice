@@ -38,16 +38,15 @@ class Album extends Property {
 	public $releaseDate;
 	
 	/**
-	 * The album genres
+	 * The Album genre
 	 * 
-	 * @var AlbumGenre[]
+	 * @var int 
 	 */
-	public $genres;	
+	public $genreId;
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
-						->addTable("music_album")
-						->addRelation('genres', AlbumGenre::class, ['id' => 'albumId']);
+						->addTable("music_album");
 	}
 
 }

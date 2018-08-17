@@ -1,3 +1,11 @@
+/**
+ * Combo box
+ * 
+ * This will automatically load entities if a go.data.Store is used so it can 
+ * display the text.
+ * 
+ * @type |||
+ */
 go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 	setValue: function (value) {
 		var me = this;
