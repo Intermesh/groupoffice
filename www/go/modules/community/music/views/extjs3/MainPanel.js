@@ -28,8 +28,28 @@ go.modules.community.music.MainPanel = Ext.extend(Ext.Panel, {
 				'->',
 				{					
 					xtype: 'tbsearch'
-				}
-			]
+				},
+				
+				// add button for creating new artists
+				this.addButton = new Ext.Button({					
+					iconCls: 'ic-add',
+					tooltip: t('Add'),
+					handler: function (btn) {
+						var dlg = new go.modules.community.music.ArtistDialog({
+							formValues: {
+								// you can pass form values like this 
+							}
+						});
+						dlg.show();
+					},
+					scope: this
+				})
+			],
+			
+			listeners: {				
+				rowdblclick: this.onGridDblClick,
+				scope: this
+			}
 		});
 		
 		//add the components to the main panel's items.
@@ -61,5 +81,20 @@ go.modules.community.music.MainPanel = Ext.extend(Ext.Panel, {
 		// when this panel renders, load the genres and artists.
 		this.genreFilter.store.load();
 		this.artistGrid.store.load();		
+	},
+	
+	
+	// Fires when an artist is double clicked in the grid.
+	onGridDblClick : function (grid, rowIndex, e) {
+
+		//check permissions
+		var record = grid.getStore().getAt(rowIndex);
+		if (record.get('permissionLevel') < GO.permissionLevels.write) {
+			return;
+		}
+
+		// Show dialog
+		var dlg = new go.modules.community.music.ArtistDialog();
+		dlg.load(record.id).show();
 	}
 });

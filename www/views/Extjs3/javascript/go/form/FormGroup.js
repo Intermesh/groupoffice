@@ -3,6 +3,9 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	
 	cls: "go-form-group",
 	
+	// Set to true to add padding between rows
+	pad: false,
+	
 	initComponent : function() {		
 		
 		
@@ -79,7 +82,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			]
 		};
 		
-		if(this.itemCfg.pad) {
+		if(this.pad) {
 			wrap.style = "padding-top: " + dp(16) + "px";
 		}
 		

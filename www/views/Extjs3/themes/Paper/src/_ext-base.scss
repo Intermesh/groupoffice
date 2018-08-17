@@ -766,8 +766,8 @@ fieldset.x-panel-collapsed .x-fieldset-bwrap {
     padding-left: 0 !important;
 }
 
-.x-hide-label label.x-form-item-label,
-.x-form-label-top .x-hide-label label.x-form-item-label{
+.x-hide-label > label.x-form-item-label,
+.x-form-label-top .x-hide-label > label.x-form-item-label{
     display: none;
 }
 

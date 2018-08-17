@@ -1,7 +1,7 @@
 <?php
 namespace go\modules\community\music\model;
 
-use go\core\orm\Entity;
+use go\core\jmap\Entity;
 						
 /**
  * Artist model
