@@ -48,14 +48,20 @@ class Artist extends Entity {
 	 * @var int
 	 */							
 	public $modifiedBy;
-	
-	
+		
 	/**
 	 * The albums created by the artist
 	 * 
 	 * @var Album[]
 	 */
-	public $albums;
+	public $albums;	
+	
+	/**
+	 * The photo of the artist (BLOB ID)
+	 * 
+	 * @var string
+	 */
+	public $photo;
 
 	protected static function defineMapping() {
 		return parent::defineMapping()
@@ -78,12 +84,13 @@ class Artist extends Entity {
 			$query->where('name','LIKE', $filter['q'] .'%');
 		}
 		
-		if(isset($filter['genre'])) {
+		//An array of Genre ID's can be passed
+		if(!empty($filter['genres'])) {
 			//filter artists on their album genres
-			$query->join('core_album', 'a', 'a.artistId = t.id')
-					->join('core_album_genre', 'g', 'a.id = g.albumId')
+			$query->join('music_album', 'a', 'a.artistId = t.id')
+					->join('music_album_genre', 'g', 'a.id = g.albumId')
 					->groupBy(['t.id']) // group the results by id to filter out duplicates because of the join
-					->where(['g.genreId' => $filter['genre']]);			
+					->where(['g.genreId' => $filter['genres']]);			
 		}
 		
 		//Always return parent filter function because it may implement core filters.
