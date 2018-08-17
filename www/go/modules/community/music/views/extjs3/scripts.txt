@@ -4,3 +4,4 @@ GenreFilter.js
 ArtistGrid.js
 ArtistDialog.js
 GenreCombo.js
+ArtistDetail.js
