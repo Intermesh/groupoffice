@@ -818,6 +818,22 @@ button.filetype-pdf, button.filetype-doc {
 //detail view
 .go-detail-view, .go-display-panel {
 	
+	
+	.go-detail-view-avatar {
+		text-align: center;
+		.avatar {
+			font-size: dp(154);
+			line-height: dp(200);
+
+			height: dp(200);
+			width: dp(200);
+		}
+	}
+	
+	.content {
+		padding: dp(16);
+	}
+	
 	@extend %font-body1;
 	/*.x-btn.fab {
 		@extend .z6;

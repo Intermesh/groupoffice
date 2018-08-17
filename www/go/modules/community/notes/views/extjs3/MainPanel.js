@@ -37,7 +37,8 @@ go.modules.community.notes.MainPanel = Ext.extend(Ext.Panel, {
 						var dlg = new go.modules.community.notes.NoteBookForm();
 						dlg.show();
 					}
-				}, {
+				}, 
+				{
 					cls: 'go-narrow',
 					iconCls: "ic-arrow-forward",
 					tooltip: t("Notes"),

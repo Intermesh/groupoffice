@@ -63,6 +63,7 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 		this.decrypt();
 
 		this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < GO.permissionLevels.write);
+		this.deleteItem.setDisabled(this.data.permissionLevel < GO.permissionLevels.writeAndDelete);
 
 		go.modules.community.notes.NoteDetail.superclass.onLoad.call(this);
 	},
@@ -100,7 +101,7 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 						},
 						scope: this
 					}, "-",
-					{
+					this.deleteItem = new Ext.menu.TextItem({
 						itemId: "delete",
 						iconCls: 'ic-delete',
 						text: t("Delete"),
@@ -109,11 +110,11 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 								if (btn != "yes") {
 									return;
 								}
-								go.Stores.get("Note").set({destroy: [this.currentId]});
+								this.entityStore.set({destroy: [this.currentId]});
 							}, this);
 						},
 						scope: this
-					}
+					})
 				]
 			}]);
 
