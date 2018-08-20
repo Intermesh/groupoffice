@@ -274,6 +274,7 @@ class User extends Entity {
 	 * 
 	 * This function should probably be in a "password" property.
 	 * 
+	 * @deprecated This function should be put in the password authenticator.
 	 * @param string $password
 	 * @return boolean 
 	 */
