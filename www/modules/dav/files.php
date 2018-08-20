@@ -23,13 +23,7 @@ require('../../GO.php');
 
 
 // Authentication backend
-
-if(empty(\GO::config()->webdav_auth_basic)) {	
-	$authBackend = new \GO\Dav\Auth\Backend();
-}else
-{
-	$authBackend = new \GO\Dav\Auth\BasicBackend();
-}
+$authBackend = new \GO\Dav\Auth\BasicBackend();
 
 
 if (!\GO::modules()->isInstalled('dav')){
