@@ -1,3 +1,7 @@
+- Users: added disabled filter and color to show disabled users
+- User: added column to see which authentication methods are configured
+- Goolge authenticator enable/disable fixed when logged in as Admin
+- Framework Customfield:getAttributeByName() function fixed
 - Dokuwiki module compatible with 6.3
 - Users grid has disabled filter and shows disabled users lighter
 
