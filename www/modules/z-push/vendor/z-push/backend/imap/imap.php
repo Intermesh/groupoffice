@@ -957,7 +957,7 @@ class BackendIMAP extends BackendDiff implements ISearchProvider {
         ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendIMAP->GetMessageList(): searching with sequence '%s'", $sequence));
         $overviews = @imap_fetch_overview($this->mbox, $sequence);
 
-        if (!is_array($overviews)) {
+        if (!is_array($overviews) || count($overviews) == 0) {
             $error = imap_last_error();
             if (strlen($error) > 0 && imap_num_msg($this->mbox) > 0) {
                 ZLog::Write(LOGLEVEL_WARN, sprintf("BackendIMAP->GetMessageList('%s','%s'): Failed to retrieve overview: %s", $folderid, $cutoffdate, imap_last_error()));
@@ -1603,7 +1603,7 @@ class BackendIMAP extends BackendDiff implements ISearchProvider {
             // read message flags
             $overview = @imap_fetch_overview($this->mbox, $id, FT_UID);
 
-            if (!is_array($overview)) {
+            if (!is_array($overview) || count($overview) == 0) {
                 throw new StatusException(sprintf("BackendIMAP->MoveMessage('%s','%s','%s'): Error, unable to retrieve overview of source message: %s", $folderid, $id, $newfolderid, imap_last_error()), SYNC_MOVEITEMSSTATUS_INVALIDSOURCEID);
             }
             else {
@@ -1701,8 +1701,7 @@ class BackendIMAP extends BackendDiff implements ISearchProvider {
 
                 if (is_calendar($part)) {
                     ZLog::Write(LOGLEVEL_DEBUG, "BackendIMAP->MeetingResponse - text/calendar part found, trying to reply");
-                    // FIXME: here we should use the user email address, that could not be username
-                    $body_part = reply_meeting_calendar($part, $response, $this->username);
+                    $body_part = reply_meeting_calendar($part, $response, GetUserDetails($this->username)['emailaddress']);
                 }
             }
             unset($mparts);
@@ -2089,30 +2088,18 @@ class BackendIMAP extends BackendDiff implements ISearchProvider {
             $this->GetFolderList();
         }
 
-        if ($case_sensitive) {
-            if (isset($this->permanentStorage->fmFimapFid[$imapid])) {
+        if ($case_sensitive && isset($this->permanentStorage->fmFimapFid[$imapid])) {
                 $folderid = $this->permanentStorage->fmFimapFid[$imapid];
                 ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendIMAP->getFolderIdFromImapId('%s') = %s", $imapid, $folderid));
                 return $folderid;
-            }
-            else {
-                ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendIMAP->getFolderIdFromImapId('%s') = %s", $imapid, 'not found'));
-                return false;
-            }
         }
-        else {
-            if (isset($this->permanentStorage->fmFimapFidLowercase[strtolower($imapid)])) {
+
+        if (!$case_sensitive && isset($this->permanentStorage->fmFimapFidLowercase[strtolower($imapid)])) {
                 $folderid = $this->permanentStorage->fmFimapFidLowercase[strtolower($imapid)];
                 ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendIMAP->getFolderIdFromImapId('%s', false) = %s", $imapid, $folderid));
                 return $folderid;
-            }
-            else {
-                ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendIMAP->getFolderIdFromImapId('%s', false) = %s", $imapid, 'not found'));
-                return false;
-            }
         }
-
-        ZLog::Write(LOGLEVEL_WARN, sprintf("BackendIMAP->getFolderIdFromImapId('%s') = %s", $imapid, 'not initialized!'));
+        ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendIMAP->getFolderIdFromImapId('%s', '%s') = %s", $imapid, Utils::PrintAsString($case_sensitive), 'not found'));
         return false;
     }
 

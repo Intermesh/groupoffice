@@ -897,7 +897,7 @@
                     continue;
 
                 array_push($items, $this->getExceptionProperties($exception));
-                if($limit && (count($items) == $limit))
+                if((count($items) == $limit))
                     break;
                 }
         }

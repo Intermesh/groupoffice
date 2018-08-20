@@ -371,6 +371,11 @@ class ItemOperations extends RequestProcessor {
                         self::$topCollector->AnnounceInformation("Streaming data");
 
                         self::$encoder->startTag(SYNC_ITEMOPERATIONS_PROPERTIES);
+                        if (isset($operation['range'])) {
+                            self::$encoder->startTag(SYNC_ITEMOPERATIONS_RANGE);
+                            self::$encoder->content($operation['range']);
+                            self::$encoder->endTag(); // SYNC_ITEMOPERATIONS_RANGE
+                        }
                         $data->Encode(self::$encoder);
                         self::$encoder->endTag(); //SYNC_ITEMOPERATIONS_PROPERTIES
                     }

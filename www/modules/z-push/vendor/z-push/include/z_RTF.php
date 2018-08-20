@@ -422,8 +422,7 @@ class rtf {
     }
 
     function checkHtmlSpanContent($command) {
-        reset($this->fontmodifier_table);
-        while(list($rtf, $html) = each($this->fontmodifier_table)) {
+        foreach ($this->fontmodifier_table as $rtf => $html) {
             if($this->flags[$rtf] == true) {
                 if($command == "start")
                     $this->out .= "<".$html.">";
@@ -456,7 +455,7 @@ class rtf {
                     $this->out.= "<plain>".$this->queue."</plain>";
                 else if($this->wantHTML) {
                     // only output html if a valid (for now, just numeric;) fonttable is given
-					if (!isset($this->flags["fonttbl_current_read"])) $this->flags["fonttbl_current_read"] = "";
+                    if (!isset($this->flags["fonttbl_current_read"])) $this->flags["fonttbl_current_read"] = "";
                     if(preg_match("/^[0-9]+$/", $this->flags["fonttbl_current_read"])) {
                         if($this->flags["beginparagraph"] == true) {
                             $this->flags["beginparagraph"] = false;
@@ -487,7 +486,7 @@ class rtf {
                         /* close modifiers */
                         $this->checkHtmlSpanContent("stop");
                         /* close span */
-                        "</span>";
+                        $this->out .= "</span>";
                     }
                 }
                 $this->queue = "";
@@ -556,7 +555,7 @@ class rtf {
         if(count($this->err) > 0) {
             if($this->wantXML) {
                 $this->out .= "<errors>";
-                while(list($num,$value) = each($this->err)) {
+                foreach ($this->err as $value) {
                     $this->out .= "<message>".$value."</message>";
                 }
                 $this->out .= "</errors>";
@@ -566,8 +565,7 @@ class rtf {
 
     function makeStyles() {
         $this->outstyles = "<style type=\"text/css\"><!--\n";
-        reset($this->styles);
-        while(list($stylename, $styleattrib) = each($this->styles)) {
+        foreach ($this->styles as $stylename => $styleattrib) {
             $this->outstyles .= ".".$stylename." { ".$styleattrib." }\n";
         }
         $this->outstyles .= "--></style>\n";

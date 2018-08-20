@@ -143,9 +143,10 @@ class FolderSync extends RequestProcessor {
         // no incoming changes
         else {
             // check for a potential process loop like described in Issue ZP-5
-            if ($synckey != "0" && self::$deviceManager->IsHierarchyFullResyncRequired())
+            if ($synckey != "0" && self::$deviceManager->IsHierarchyFullResyncRequired()) {
                 $status = SYNC_FSSTATUS_SYNCKEYERROR;
                 self::$deviceManager->AnnounceProcessStatus(false, $status);
+            }
         }
 
         if(!self::$decoder->getElementEndTag())
