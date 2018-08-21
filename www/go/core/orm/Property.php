@@ -956,8 +956,9 @@ abstract class Property extends Model {
 	}
 
 	public function toArray($properties = []) {
-		if (empty($properties)) {
-			$properties = $this->fetchProperties;
+		if (empty($properties)) {			
+			//remove primary key for properties
+			$properties = array_diff($this->fetchProperties, $this->getPrimaryKey());
 		}
 
 		return parent::toArray($properties);

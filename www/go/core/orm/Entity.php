@@ -421,5 +421,5 @@ abstract class Entity extends Property {
 	public static function getState () {
 		return null;
 	}
-
+	
 }

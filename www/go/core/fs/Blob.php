@@ -17,19 +17,22 @@ class Blob extends orm\Entity {
 	private $tmpFile;
 	private $strContent;
 	
-	static function fromTmp($path) {
-		$hash = bin2hex(sha1_file($path, true));
+	public static function fromTmp(File $file) {
+		$hash = bin2hex(sha1_file($file->getPath(), true));
 		$blob = self::findById($hash);
 		if (empty($blob)) {
 			$blob = new self();
 			$blob->id = $hash;
-			$blob->size = filesize($path);
+			$blob->size = $file->getSize();
 		}
-		$blob->tmpFile = $path;
+		$blob->name = $file->getName();
+		$blob->tmpFile = $file->getPath();
+		$blob->type = $file->getContentType();
+		$blob->modified = $file->getModifiedAt()->format("U");
 		return $blob;
 	}
 	
-	static function fromString($string) {
+	public static function fromString($string) {
 		$hash = bin2hex(sha1($string, true));
 		$blob = self::findById($hash);
 		if (empty($blob)) {
@@ -82,6 +85,14 @@ class Blob extends orm\Entity {
 	public function path() {
 		$dir = substr($this->id,0,2) . '/' .substr($this->id,2,2). '/';
 		return GO()->getDataFolder()->getPath() . '/data/'.$dir.$this->id;
+	}
+	
+	/**
+	 * 
+	 * @return \go\core\fs\File
+	 */
+	public function getFile() {
+		return new File($this->path());
 	}
 	
 	/**

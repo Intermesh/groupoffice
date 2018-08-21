@@ -19,6 +19,16 @@ use go\core\util\StringUtil;
 class File extends FileSystemObject {
 	
 
+	/**
+	 * Get a temporary file
+	 * 
+	 * @param string $extension
+	 * @return statuc
+	 */
+	public static function tempFile($extension) {
+		 return GO()->getTmpFolder()->getFile(uniqid(time()) . '.' . $extension);
+	}
+
 	
 	/**
 	 * Get the parent folder object
@@ -196,7 +206,9 @@ class File extends FileSystemObject {
 			case 'css':
 				return 'text/css';
 			case 'js':
-				return 'application/javascript';				
+				return 'application/javascript';
+			case 'json':
+				return 'application/json';
 			default:
 				return mime_content_type($this->getPath());
 		}		
@@ -207,8 +219,9 @@ class File extends FileSystemObject {
 	 * Send download headers and output the contents of this file to standard out (browser).
 	 * @param boolean $sendHeaders
 	 * @param boolean $useCache
+	 * @param array $headers key value array of http headers to send
 	 */
-	public function output($sendHeaders = true, $useCache = true) {		
+	public function output($sendHeaders = true, $useCache = true, $headers = []) {		
 		$r = \go\core\http\Response::get();
 	
 		if($sendHeaders) {
@@ -217,10 +230,14 @@ class File extends FileSystemObject {
 			$r->setHeader('Content-Transfer-Encoding', 'binary');
 
 			if ($useCache) {			
-				$r->setModifiedAt(new DateTime('@'.$this->getModifiedAt()));
+				$r->setModifiedAt($this->getModifiedAt());
 				$r->setETag($this->getMd5Hash());
 				$r->abortIfCached();
-			}				
+			}		
+			
+			foreach($headers as $name => $value) {
+				$r->setHeader($name, $value);
+			}
 		}		
 		
 		if(ob_get_contents() != '') {			
