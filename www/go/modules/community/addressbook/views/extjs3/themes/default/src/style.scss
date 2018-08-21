@@ -29,17 +29,18 @@
 
 .go-addressbook-url-panel {
 	text-align: right;
+	line-height: dp(20);
 }
 
 .go-addressbook-url{
 	
-	height: dp(24);
-	width: dp(24);
+	height: dp(20);
+	width: dp(20);
 	background-repeat: none;
 	background-position: center;
 	background-size: contain;
 	display: inline-block;
-	border-radius: 3px;
+	border-radius: 1px;
 	&.linkedin {
 		background-image: url("resources/linkedin.png");		
 	}
@@ -53,13 +54,16 @@
 	}
 
 	&.homepage {
+		background-color: $cPrimary;
+		border-radius: 2px;				
+		
 		&:before {
-			border-radius: 3px;
+			font-size: dp(20);			
 			@extend %icon;
-			content: "home";
+			content: "home";					
 			vertical-align: baseline;
-			color: white;
-			background-color: $cPrimary;
+			line-height: inherit;
+			color: white;			
 		}
 	}
 

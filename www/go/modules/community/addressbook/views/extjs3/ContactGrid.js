@@ -19,6 +19,11 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 			sortInfo :{field: "name", direction: "ASC"},
 			entityStore: go.Stores.get("Contact")
 		});
+		
+		//reload store when user changes stars
+		go.Stores.get("ContactStar").on("changes", function() {
+			this.store.reload();
+		}, this);
 
 		var grid = this;
 
@@ -176,6 +181,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 //			stateful: true,
 //			stateId: 'contact-grid'
 		});
+		
 
 		go.modules.community.addressbook.ContactGrid.superclass.initComponent.call(this);
 	},
