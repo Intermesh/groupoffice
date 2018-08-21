@@ -123,3 +123,6 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 		}
 	}
 });
+
+
+Ext.reg("detailview", go.panels.DetailView);
