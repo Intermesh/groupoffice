@@ -363,5 +363,66 @@ abstract class EntityController extends ReadOnlyEntityController {
 
 		Response::get()->addResponse($result);
 	}
+	
+	
+	protected function paramsExport($params){
+		
+		if(!isset($params['convertor'])) {
+			throw new InvalidArguments("'convertor' parameter is required");
+		}
+		
+		return $this->paramsGet($params);
+	}
+	
+	
+	
+	public function export($params) {
+		
+		$params = $this->paramsExport($params);
+		
+		$cls = $this->entityClass();
+		$module = $cls::getType()->getModule();
+		
+		//check in module
+		$convertorCls = "go\\modules\\" . $module->package . "\\" . $module->name . "\\convert\\" . $params['convertor'];
+		if(!class_exists($convertorCls)) {
+			$convertorCls = "go\\core\\data\\convert\\" . $params['convertor'];
+			if(!class_exists($convertorCls)) {
+				throw new InvalidArguments("Convertor '" . $params['convertor'] .'" is not found');
+			}
+		}
+		
+		$convertor = new $convertorCls;
+		
+		$entities = $this->getGetQuery($params)->all();
+		
+		$tempFile = \go\core\fs\File::tempFile($convertor->getFileExtension());
+		$fp = $tempFile->open('w+');
+		
+		fputs($fp, $convertor->getStart());
+		foreach($entities as $entity) {
+			$properties = $entity->toArray();
+			
+			$str = $convertor->to($properties);
+			
+			fputs($fp, $str);
+			
+			if(next($entities)) {
+				fputs($fp, $convertor->getBetween());	
+			}
+		}
+
+		fputs($fp, $convertor->getEnd());		
+		
+		fclose($fp);
+		
+		$blob = \go\core\fs\Blob::fromTmp($tempFile);
+		if(!$blob->save()) {
+			throw new \Exception("Couldn't save blob: " . var_export($blob->getValidationErrors(), true));
+		}
+		
+		Response::get()->addResponse(['blobId' => $blob->id]);
+		
+	}
 
 }
