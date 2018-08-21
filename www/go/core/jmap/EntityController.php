@@ -324,16 +324,19 @@ abstract class EntityController extends ReadOnlyEntityController {
 		
 		//add AclItemEntity changes based on permissions		
 		if(!empty($changedAcls)) {
-			$query = $cls::find()->fetchMode(PDO::FETCH_ASSOC)->select('n.id, aclEntity.aclId')->where('aclEntity.aclId', 'in', $changedAcls);			
+			$query = $cls::find()->fetchMode(PDO::FETCH_ASSOC)->select('aclEntity.aclId')->select($cls::getPrimaryKey(true), true)->where('aclEntity.aclId', 'in', $changedAcls);			
 			$cls::joinAclEntity($query);
 			
 			//we don't need entities here. Just a list of id's.
 			foreach($query as $entity) {
-				if(in_array($entity['aclId'], $currentAclIds)) {
-					$result['changed'][] = $entity['id'];
+				$aclId = $entity['aclId'];
+				unset($entity['aclId']);
+				$id = implode("-", $entity);
+				if(in_array($aclId, $currentAclIds)) {
+					$result['changed'][] = $id;
 				} else
 				{
-					$result['removed'][] = $entity['id'];
+					$result['removed'][] = $id;
 				}
 			}			
 		}
