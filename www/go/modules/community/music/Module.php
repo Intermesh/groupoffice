@@ -1,5 +1,5 @@
 <?php
-namespace go\modules\community\addressbook;
+namespace go\modules\community\music;
 							
 use go\core\module\Base;
 							

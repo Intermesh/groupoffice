@@ -59,7 +59,7 @@ Ext.extend(GO.customfields.CustomFormPanel, Ext.Panel,{
 				var index = this.items.findIndex('name', this.customfields[i].dataname);
 				if (index<0)
 					index = this.items.findIndex('hiddenName', this.customfields[i].dataname);
-				if(index){
+				if(index>=0){
 					this.setAllowBlank(this.items.itemAt(index), false);
 					
 				}

@@ -365,8 +365,9 @@ abstract class Entity extends Property {
 	/**
 	 * Filter entities See JMAP spec for details on the $filter array.
 	 * 
+	 * @link https://jmap.io/spec-core.html#/query
 	 * @param Query $query
-	 * @param array $filter
+	 * @param array $filter key value array eg. ["q" => "foo"]
 	 * @return Query
 	 */
 	public static function filter(Query $query, array $filter) {		

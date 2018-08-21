@@ -13,6 +13,13 @@
 
 
 
+/**
+ * 
+ * Detail view panel
+ * 
+ * All panel items are updated automatically if they have a "tpl" (Ext.XTemplate) property or an "onLoad" function. The panel is passed as argument.
+ * @type |||
+ */
 go.panels.DetailView = Ext.extend(Ext.Panel, {
 
 	cls: 'go-detail-view',
@@ -118,4 +125,5 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 });
 
 
+Ext.reg("detailview", go.panels.DetailView);
 Ext.reg("detailview", go.panels.DetailView);

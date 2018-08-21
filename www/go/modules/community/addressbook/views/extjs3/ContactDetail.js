@@ -34,7 +34,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 				}, 
 				
 				{
-					tpl: new Ext.XTemplate('<div class="go-addressbook-contact-avatar">\
+					tpl: new Ext.XTemplate('<div class="go-detail-view-avatar">\
 <div class="avatar {[this.getCls(values.isOrganization)]}" style="{[this.getStyle(values.photoBlobId)]}"></div></div>', 
 					{
 						getCls: function (isOrganization) {

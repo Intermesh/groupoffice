@@ -3,6 +3,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	entityStore: null,
 	buttonAlign: 'left',
 	autoScroll: true,
+	entity: null,
 	initComponent : function() {
 		go.form.EntityPanel.superclass.initComponent.call(this);				
 		this.entityStore.on('changes',this.onChanges, this);
@@ -15,6 +16,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		
 		if(changed.concat(added).indexOf(this.currentId) !== -1) {			
 			var entities = this.entityStore.get([this.currentId]);
+			this.entity = entities[0];
 			this.getForm().setValues(entities[0]);
 		}		
 	},
@@ -30,6 +32,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		
 		if(entities) {
 			this.getForm().setValues(entities[0]);
+			this.entity = entities[0];
 			return entities[0];
 		} else {
 			return false;

@@ -12,7 +12,7 @@ go.modules.community.addressbook.AddressBookDialog = Ext.extend(go.form.Dialog, 
 						name: 'name',
 						fieldLabel: t("Name"),
 						anchor: '100%',
-						required: true
+						allowBlank: false
 					}]
 			}
 		];

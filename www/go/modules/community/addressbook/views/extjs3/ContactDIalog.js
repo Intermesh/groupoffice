@@ -111,7 +111,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 										accept: 'image/*'
 									})
 								]
-							},
+							}
 						]
 					},
 
@@ -223,10 +223,10 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						hideLabel: true,
 						xtype: "formgroup",
 						name: "addresses",
+						pad: true,
 						itemCfg: {
 							xtype: "panel",
-							layout: "form",
-							pad: true,
+							layout: "form",							
 							items: [{
 									anchor: "100%",
 									fieldLabel: t("Type"),

@@ -818,6 +818,22 @@ button.filetype-pdf, button.filetype-doc {
 //detail view
 .go-detail-view, .go-display-panel {
 	
+	
+	.go-detail-view-avatar {
+		text-align: center;
+		.avatar {
+			font-size: dp(154);
+			line-height: dp(200);
+
+			height: dp(200);
+			width: dp(200);
+		}
+	}
+	
+	.content {
+		padding: dp(16);
+	}
+	
 	@extend %font-body1;
 	/*.x-btn.fab {
 		@extend .z6;
@@ -1058,6 +1074,7 @@ table.display-panel {
 	clear: both;
 	td, th {
 		padding: dp(8);
+		white-space: nowrap;
 		&:first-child {
 			padding-left: dp(16);
 		}
@@ -1065,8 +1082,11 @@ table.display-panel {
 			padding-right: dp(16);
 		}
 	}
+	th {
+		@extend %font-data-head;
+	}
 	tr.line, td.line, th.line {
-		border-top: 1px solid color($fg, 'line');
+		border-bottom: 1px solid color($fg, 'line');
 	}
 	table { 
 		td:first-child {
