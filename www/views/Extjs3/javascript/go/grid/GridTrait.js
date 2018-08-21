@@ -10,9 +10,41 @@ go.grid.GridTrait = {
 			this.keys = [];
 		}
 	
-		this.initDeleteKey();		
-
+		this.initDeleteKey();				
+		this.initNav();
+		
 		this.on("bodyscroll", this.loadMore, this, {buffer: 100});
+	},
+	
+	//The navigate can be used in modules to track row selections for navigation.
+	//It buffers keyboard actions and it doesn't fire when ctrl or shift is used for multiselection
+	initNav : function() {
+		this.addEvents({navigate: true});
+		this.on('rowclick', function(grid, rowIndex, e){
+			var record = this.getSelectionModel().getSelected();
+
+			if(!e.ctrlKey && !e.shiftKey && record)
+			{
+				this.fireEvent('navigate', this, rowIndex, record);				
+			}
+		
+			if(record) {
+				this.rowClicked=true;
+			}
+			
+		}, this);
+		
+		
+		this.getSelectionModel().on("rowselect",function(sm, rowIndex, r){
+			if(!this.rowClicked)
+			{
+				this.fireEvent('navigate', this, rowIndex, r);
+			}
+			
+			this.rowClicked = false;
+		}, this, {
+			buffer: 300
+		});
 	},
 	
 	initDeleteKey : function() {
