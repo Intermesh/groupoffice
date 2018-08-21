@@ -175,7 +175,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 
 
 		//Load contact when selecting it in the grid.
-		this.grid.getSelectionModel().on('rowselect', function (sm, rowIndex, record) {
+		this.grid.on('navigate', function (sm, rowIndex, record) {
 			go.Router.goto("contact/" + record.id);
 		}, this);
 
