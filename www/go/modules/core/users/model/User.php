@@ -414,7 +414,7 @@ class User extends Entity {
 			$query->andWhere(
 							(new Criteria())
 							->where('username', 'LIKE', $filter['q'] . '%')
-							->orWhere('displayName', 'LIKE', $filter['q'] .'%')
+							->orWhere('displayName', 'LIKE', '%'. $filter['q'] .'%')
 							->orWhere('email', 'LIKE', $filter['q'] .'%')
 							);
 			
