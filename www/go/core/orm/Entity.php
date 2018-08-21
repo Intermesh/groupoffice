@@ -420,27 +420,5 @@ abstract class Entity extends Property {
 	public static function getState () {
 		return null;
 	}
-	
-	
-	/**
-	 * Returns an array with all properties of this entity that are different or 
-	 * not present in the given properties array.
-	 * 
-	 * @param array $properties
-	 * @return array
-	 */
-	public function diff($properties) {
 
-		$diff = [];
-		
-		$entityProps = $this->toArray();
-		
-		foreach ($entityProps as $key => $value) {
-			if (!isset($properties[$key]) || $properties[$key] !== $value) {
-				$diff[$key] = $value;
-			}
-		}
-
-		return $diff;
-	}
 }

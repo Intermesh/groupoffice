@@ -69,4 +69,10 @@ abstract class Entity  extends \go\core\orm\Entity {
 		
 		return true;
 	}	
+	
+	public function toArray($properties = array()) {
+		$arr = parent::toArray($properties);
+		$arr['id'] = $this->getId();
+		return $arr;
+	}
 }
