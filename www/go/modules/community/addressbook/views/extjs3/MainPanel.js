@@ -72,12 +72,11 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (btn) {
-						var dlg = new go.modules.community.addressbook.ContactDialog({
-							formValues: {
-								addressBookId: this.addAddressBookId
-							}
-						});
+						var dlg = new go.modules.community.addressbook.ContactDialog();
 						dlg.show();
+						dlg.setValues({
+							addressBookId: this.addAddressBookId
+						});
 					},
 					scope: this
 				}),
