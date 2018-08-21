@@ -140,7 +140,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 					dirty = true;
 					return false;
 				}
-			} elseif(i.isDirty())
+			} else if(i.isDirty())
 			{			
 				dirty = true;
 				return false;
