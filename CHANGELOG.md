@@ -1,3 +1,6 @@
+21-08-2018 6.3.34
+- Updated Z-push to 2.4.4
+- ActiveSync, Cal-,Card- and WebDAV use new framework for authentication so that IMAP and LDAP authentication work
 - Users: added disabled filter and color to show disabled users
 - User: added column to see which authentication methods are configured
 - Goolge authenticator enable/disable fixed when logged in as Admin
