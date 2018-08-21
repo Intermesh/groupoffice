@@ -25,6 +25,11 @@
 .go-addressbook-star {
   color: #febf35; }
 
+.go-addressbook-index-row {
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  margin-top: 7px;
+  padding-top: 7px; }
+
 .go-addressbook-contact-avatar {
   text-align: center; }
   .go-addressbook-contact-avatar .avatar {

@@ -1,5 +1,5 @@
 go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
-
+	cls: 'x-grid3-no-row-borders',
 	initComponent: function () {
 
 		this.store = new go.data.Store({
@@ -173,7 +173,22 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 //				enableRowBody: true,
 //				showPreview: true,
 				getRowClass: function (record, rowIndex, p, store) {					
-					return '';
+					var value = record.get("star");
+					if(rowIndex == 0 && value && value.starred) {							
+						return '';
+					} else
+					{
+						if(value && value.starred) {
+							return "";
+						}
+
+						var lastRecord = rowIndex > 0 ? grid.store.getAt(rowIndex - 1) : false;
+						var char = record.data.name.substr(0, 1);
+						if(!lastRecord || lastRecord.data.name.substr(0, 1) != char) {
+							return 'go-addressbook-index-row';
+						}
+						return "";
+					}
 				}
 			},
 			autoExpandColumn: 'name',

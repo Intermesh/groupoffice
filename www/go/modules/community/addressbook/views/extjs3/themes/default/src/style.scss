@@ -4,6 +4,12 @@
 	color: #febf35;
 }
 
+.go-addressbook-index-row {
+	border-top: 1px solid color($fg, 'line');
+	margin-top: dp(8);
+	padding-top: dp(8);
+}
+
 .go-addressbook-contact-avatar {
 	text-align: center;
 	.avatar {
