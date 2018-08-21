@@ -11,7 +11,7 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
-go.modules.community.notes.MainPanel = Ext.extend(Ext.Panel, {
+go.modules.community.notes.MainPanel = Ext.extend(Ext.panels.ModulePanel, {
 
 	layout: 'responsive',
 	layoutConfig: {
