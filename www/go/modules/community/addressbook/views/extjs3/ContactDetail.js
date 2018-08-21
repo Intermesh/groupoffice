@@ -235,7 +235,22 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 							this.body.print({title: this.data.name});
 						},
 						scope: this
-					}
+					},
+					'-',
+					this.deleteItem = new Ext.menu.TextItem({
+						itemId: "delete",
+						iconCls: 'ic-delete',
+						text: t("Delete"),
+						handler: function () {
+							Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
+								if (btn != "yes") {
+									return;
+								}
+								this.entityStore.set({destroy: [this.currentId]});
+							}, this);
+						},
+						scope: this
+					})
 
 				]
 			}]);

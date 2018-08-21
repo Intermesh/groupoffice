@@ -34,7 +34,7 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 		});
 		
 		if(this.isOrganization) {
-			this.store.baseParams.isOrganization = true;
+			this.store.baseParams.filter.isOrganization = true;
 		}
 
 		go.modules.community.addressbook.ContactCombo.superclass.initComponent.call(this);
