@@ -460,7 +460,7 @@ class User extends Entity {
 
 		$methods = [];
 
-		$authMethods = Method::find()->orderBy(['sortOrder' => 'ASC']);
+		$authMethods = Method::find()->orderBy(['sortOrder' => 'DESC']);
 
 		foreach ($authMethods as $authMethod) {
 			$authenticator = $authMethod->getAuthenticator();
@@ -473,6 +473,13 @@ class User extends Entity {
 		return $methods;
 	}
 	
+	/**
+	 * Send a password recovery link
+	 * 
+	 * @param string $to
+	 * @param string $redirectUrl If given GroupOffice will redirect to this URL after creating a new password.
+	 * @return boolean
+	 */
 	public function sendRecoveryMail($to, $redirectUrl = ""){
 		
 		$this->recoveryHash = bin2hex(random_bytes(20));
