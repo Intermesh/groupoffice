@@ -85,14 +85,17 @@ abstract class EntityController extends ReadOnlyEntityController {
 		foreach ($create as $clientId => $properties) {
 			
 			if(!$this->canCreate()) {
-				$result['notCreated'][$id] = new SetError("forbidden");
+				$result['notCreated'][$clientId] = new SetError("forbidden");
 				continue;
 			}
 			
 			$entity = $this->create($properties);
 
 			if (!$entity->hasValidationErrors()) {
-				$diff = $entity->diff($properties);
+				$entityProps = new \go\core\util\ArrayObject($entity->toArray());
+				$diff = $entityProps->diff($properties);
+				$diff['id'] = $entity->getId();
+				
 				$result['created'][$clientId] = empty($diff) ? null : $diff;
 			} else {				
 				$result['notCreated'][$clientId] = new SetError("invalidProperties");
@@ -153,8 +156,12 @@ abstract class EntityController extends ReadOnlyEntityController {
 				continue;
 			}
 			
+			//create snapshot of props client should be aware of
+			$clientProps = array_merge($entity->toArray(), $properties);
+			
 			//apply new values before canUpdate so this function can check for modified properties too.
 			$entity->setValues($properties);
+			
 			
 			if(!$this->canUpdate($entity)) {
 				$result['notUpdated'][$id] = new SetError("forbidden");
@@ -169,10 +176,14 @@ abstract class EntityController extends ReadOnlyEntityController {
 			}
 			
 			//The server must return all properties that were changed during a create or update operation for the JMAP spec
-			$diff = $entity->diff($properties);
-			$result['updated'][$entity->id] = empty($diff) ? null : $diff;
+			$entityProps = new \go\core\util\ArrayObject($entity->toArray());			
+			$diff = $entityProps->diff($clientProps);
+			
+			$result['updated'][$id] = empty($diff) ? null : $diff;
 		}
 	}
+	
+	
 	
 	protected function update(Entity $entity, array $properties) {		
 		$entity->save();		

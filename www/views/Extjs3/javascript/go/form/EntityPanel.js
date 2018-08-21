@@ -67,7 +67,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 			if (saved[id]) {				
 				this.fireEvent("save", this, values);
 
-				var serverId = params.create ? response.created[id].id : response.updated[id].id;
+				var serverId = params.create ? response.created[id].id : id;
 
 				if(cb) {
 					cb.call(scope, this, true, serverId);

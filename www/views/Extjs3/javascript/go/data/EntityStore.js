@@ -327,6 +327,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				if(response.updated) {
 					for(serverId in response.updated) {
 						entity = Ext.apply(params.update[serverId], response.updated[serverId]);
+						entity.id = serverId;
 						this._add(entity);
 					}
 				}
