@@ -47,10 +47,17 @@ go.form.Dialog = Ext.extend(go.Window, {
 			this.entityStore.un('changes', this.onChanges, this);
 		}, this);
 
+		//deprecated
 		if (this.formValues) {
 			this.formPanel.form.setValues(this.formValues);
 			delete this.formValues;
 		}
+	},
+	
+	setValues : function(v) {
+		this.formPanel.form.setValues(v);
+		
+		return this;
 	},
 
 	load: function (id) {

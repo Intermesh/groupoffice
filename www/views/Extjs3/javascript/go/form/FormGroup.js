@@ -98,7 +98,16 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 	
 	isDirty: function () {
-		return true;
+		var dirty = false;
+		this.items.each(function(i) {
+			if(this.panelIsDirty(i.formPanel)) {
+				dirty = true;
+				//stops iteration
+				return false;
+			}
+		}, this);
+		
+		return dirty;
 	},
 
 	setValue: function (records) {	
@@ -122,11 +131,33 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		return v;
 	},
 	
+	panelIsDirty : function(panel) {
+		var dirty = false;
+		panel.items.each(function(i) {
+			if(!i.isFormField) {
+				return true;
+			}
+			
+			if(i.getXType() == 'compositefield') {				
+				if(this.panelIsDirty(panel)) {
+					dirty = true;
+					return false;
+				}
+			} elseif(i.isDirty())
+			{			
+				dirty = true;
+				return false;
+			}
+		}, this);
+		
+		return dirty;
+	},
+	
 	getPanelValue : function(panel, v) {
 		v = v || {};
 		panel.items.each(function(i) {
 			if(!i.isFormField) {
-				return;
+				return true;
 			}
 			
 			if(i.getXType() == 'compositefield') {				
