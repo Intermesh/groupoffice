@@ -3,6 +3,7 @@ namespace go\core\auth\model;
 
 use DateInterval;
 use go\core\App;
+use go\core\Environment;
 use go\core\auth\Method;
 use go\core\orm\Entity;
 use go\core\orm\Mapping;
@@ -138,8 +139,10 @@ class Token extends Entity {
 
 		if(isset($_SERVER['HTTP_USER_AGENT'])) {
 			$this->userAgent = $_SERVER['HTTP_USER_AGENT'];
-		}else if(App::get()->getEnvironment()->isCli()) {
+		}else if(Environment::get()->isCli()) {
 			$this->userAgent = 'cli';
+		} else {
+			$this->userAgent = 'Unknown';
 		}
 	}
 	
