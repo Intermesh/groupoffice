@@ -153,7 +153,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 						this.state = null;
 						this.data = {};						
 					}
-					console.log(this.state);
+					
 					this.saveState();
 				},
 				scope: this
