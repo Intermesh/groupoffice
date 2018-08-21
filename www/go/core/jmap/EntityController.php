@@ -210,7 +210,7 @@ abstract class EntityController extends ReadOnlyEntityController {
 			$success = $entity->delete();
 			
 			if ($success) {
-				$result['destroyed'][] = $entity->id; //todo map of properties changed during save
+				$result['destroyed'][] = $id;
 			} else {
 				$result['notDestroyed'][] = $entity->getValidationErrors();
 			}
