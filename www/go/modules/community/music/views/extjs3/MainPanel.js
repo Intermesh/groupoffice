@@ -95,7 +95,7 @@ go.modules.community.music.MainPanel = Ext.extend(go.panels.ModulePanel, {
 		});
 
 		// Every entity automatically configures a route. Route to the entity when selecting it in the grid.
-		this.artistGrid.getSelectionModel().on('rowselect', function (sm, rowIndex, record) {
+		this.artistGrid.on('navigate', function (grid, rowIndex, record) {
 			go.Router.goto("artist/" + record.id);
 		}, this);
 

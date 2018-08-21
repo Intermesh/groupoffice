@@ -11,7 +11,7 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
-go.modules.community.notes.MainPanel = Ext.extend(Ext.panels.ModulePanel, {
+go.modules.community.notes.MainPanel = Ext.extend(go.panels.ModulePanel, {
 
 	layout: 'responsive',
 	layoutConfig: {
@@ -131,7 +131,7 @@ go.modules.community.notes.MainPanel = Ext.extend(Ext.panels.ModulePanel, {
 			}
 		});
 
-		this.noteGrid.getSelectionModel().on('rowselect', function (sm, rowIndex, record) {
+		this.noteGrid.on('navigate', function (grid, rowIndex, record) {
 			go.Router.goto("note/" + record.id);
 		}, this);
 
