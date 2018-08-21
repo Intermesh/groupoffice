@@ -1,4 +1,4 @@
-go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
+go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 
 	layout: "responsive",
 
@@ -8,7 +8,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 	},
 
 	addAddressBookId: 1,
-
+	
 	initComponent: function () {
 
 		this.addressBookTree = new go.modules.community.addressbook.AddressBookTree({
