@@ -1052,6 +1052,13 @@ ul.x-tab-strip-bottom{
 //############
 //### GRID ### 
 //############
+
+.x-grid3-no-row-borders{
+	.x-grid3-row{
+		border-bottom: 0px;
+	}
+}
+
 .x-grid3{
 	background-color: color($bg, "card");
 	&-scroller {
@@ -1124,6 +1131,9 @@ ul.x-tab-strip-bottom{
 			content: 'check_box';
 		}
 	}
+	
+	
+	
 	&-row {
 		border:0;
 		border-bottom:1px solid color($fg, 'divider');
