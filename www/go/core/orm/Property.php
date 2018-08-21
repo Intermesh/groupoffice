@@ -101,9 +101,9 @@ abstract class Property extends Model {
 		}
 		
 		$this->initDatabaseColumns($this->isNew);
+		$this->initRelations();
 		
 		if (!$this->isNew) {			
-			$this->initRelations();
 			$this->trackModifications();
 		}
 
@@ -163,9 +163,9 @@ abstract class Property extends Model {
 			}			
 
 			if ($relation->many) {
-				$props = $cls::internalFind()->andWhere($where)->all();
+				$props = $this->isNew() ? [] : $cls::internalFind()->andWhere($where)->all();
 				$this->{$relation->name} = $props;
-			} else {
+			} else if(!$this->isNew()){
 				$prop = $cls::internalFind()->andWhere($where)->single();				
 				$this->{$relation->name} = $prop ? $prop : null;
 			}

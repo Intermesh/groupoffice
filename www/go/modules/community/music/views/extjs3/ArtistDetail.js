@@ -117,7 +117,7 @@ go.modules.community.music.ArtistDetail = Ext.extend(go.panels.DetailView, {
 						scope: this
 					}, 
 					'-',
-					this.deleteItem = new Ext.menu.TextItem({
+					this.deleteItem = new Ext.menu.Item({
 						itemId: "delete",
 						iconCls: 'ic-delete',
 						text: t("Delete"),
