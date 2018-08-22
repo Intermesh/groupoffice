@@ -8,7 +8,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 	},
 
 	addAddressBookId: 1,
-	
+
 	initComponent: function () {
 
 		this.addressBookTree = new go.modules.community.addressbook.AddressBookTree({
@@ -87,7 +87,9 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 							text: t("Import")
 						}, {
 							iconCls: 'ic-cloud-download',
-							text: t("Export")
+							text: t("Export"),
+							handler: this.onExport,
+							scope: this
 						},
 						"-",
 						{
@@ -276,6 +278,32 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 			update: updates
 		});
 
+	},
+
+	onExport: function () {
+		
+		var win = window.open("about:blank");
+		
+		var callId = go.Jmap.request({
+			method: "Contact/query",
+			params: Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0}),
+			callback: function (options, success, response) {
+			}
+		});
+		
+		go.Jmap.request({
+			method: "Contact/export",
+			params: {
+				convertor: "json",
+				"#ids": {
+					resultOf: callId,
+					path: "/ids"
+				}
+			},
+			callback: function (options, success, response) {
+				win.location = go.Jmap.downloadUrl(response.blobId);
+			}
+		});
 	}
 
 });

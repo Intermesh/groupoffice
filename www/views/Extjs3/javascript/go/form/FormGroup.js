@@ -139,7 +139,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			}
 			
 			if(i.getXType() == 'compositefield') {				
-				if(this.panelIsDirty(panel)) {
+				if(this.panelIsDirty(i)) {
 					dirty = true;
 					return false;
 				}
