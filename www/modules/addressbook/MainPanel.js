@@ -438,9 +438,8 @@ this.exportCompanyMenu.setColumnModel(this.companiesGrid.getColumnModel());
 	config.border=false;
 
 	this.mailingsFilterPanel= new GO.addressbook.AddresslistsGroupedMultiSelectGrid({
-		id: 'ab-mailingsfilter-panel',
-		region:'center',
-		split:true
+		//id: 'ab-mailingsfilter-panel',
+		autoHeight:true
 	});
 
 	this.mailingsFilterPanel.getStore().load();
@@ -461,10 +460,8 @@ this.exportCompanyMenu.setColumnModel(this.companiesGrid.getColumnModel());
 	}, this);
 
 	this.westPanel = new Ext.Panel({
-		//layout:'accordion',
+		layout:'fit',
 		//layoutConfig:{hideCollapseTool:true},
-		border:false,
-		split:true,
 		autoHeight:true,
 		items:[this.addressbooksGrid],
 		id: 'ab-west-panel'
@@ -659,9 +656,8 @@ Ext.extend(GO.addressbook.MainPanel, Ext.Panel,{
 		
 		// Button to export contacts with companies together
 		this.contactsWithCompaniesExportButton = new Ext.menu.Item({
-			iconCls: 'btn-export',
+			iconCls: 'ic-import-export',
 			text: t("Contacts with companies", "addressbook"),
-			cls: 'x-btn-text-icon',
 			handler:function(){
 				window.open(GO.url("addressbook/exportContactsWithCompanies/export"))
 			},

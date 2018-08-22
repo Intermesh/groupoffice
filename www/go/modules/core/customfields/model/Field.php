@@ -41,6 +41,14 @@ class Field extends AclItemEntity {
 		return ['fieldSetId' => 'id'];
 	}
 	
+	/**
+	 * LEGACY. $field->multiselect is used many times.
+	 * fix before removing a property
+	 */
+	public function getMultiselect() {
+		return $this->getOptions('multiselect');
+	}
+	
 	public function getOptions() {
 		return json_decode($this->options, true);
 	}

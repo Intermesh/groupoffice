@@ -137,7 +137,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 
 					if($cfType instanceof \GO\Customfields\Customfieldtype\Select){
 
-						$isMultiSelect = $cfType->getField()->getAttribute('multiselect');
+						$isMultiSelect = $cfType->getField()->getOption('multiselect');
 
 						if($isMultiSelect && isset($attributes[$cfColName])){
 							$attributes[$cfColName] = str_replace('|', ', ', $attributes[$cfColName]);

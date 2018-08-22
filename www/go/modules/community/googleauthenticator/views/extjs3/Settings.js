@@ -124,38 +124,45 @@ Ext.override(go.usersettings.AccountSettingsPanel, {
 	
 	enableGoogleAuthenticator : function(){
 		
-		var passwordPrompt = new go.PasswordPrompt({
-			width: dp(450),
-			text: t("When enabling Google autenticator you'll need to scan the QR code with the Google authenticator app otherwise you cannot login to Group-Office anymore.",'googleauthenticator')+"<br><br>"+t("Provide your current password to enable Google authenticator.",'googleauthenticator'),
-			title: t('Enable Google authenticator','googleauthenticator'),
-			listeners:{
-				'ok': function(value){
+		function execute(value){
 					
-					var params = {"update": {}};
-					params.update[this.currentUser.id] = {
-						currentPassword: value,
-						googleauthenticator: {}
-					};					
-					
-					go.Stores.get("User").set(params, function (options,success,response) {								
-						if(!success || GO.util.empty(response.updated)) {
-							return this.enableGoogleAuthenticator();
-						}
-						
-						var user = response.updated[this.currentUser.id];
-						if(user.googleauthenticator){							
-							this.setQr(true, user.googleauthenticator.secret ,user.googleauthenticator.qrUrl);
-						}
-					}, this);
-				},
-				'cancel': function(){
-					this.setEnabled(false);
-				},
-				scope:this
-			}
-		});
+			var params = {"update": {}};
+			params.update[this.currentUser.id] = {
+				currentPassword: value,
+				googleauthenticator: {}
+			};					
 
-		passwordPrompt.show();
+			go.Stores.get("User").set(params, function (options,success,response) {								
+				if(!success || GO.util.empty(response.updated)) {
+					return this.enableGoogleAuthenticator();
+				}
+
+				var user = response.updated[this.currentUser.id];
+				if(user.googleauthenticator){							
+					this.setQr(true, user.googleauthenticator.secret ,user.googleauthenticator.qrUrl);
+				}
+			}, this);
+		}
+		
+		if(go.User.isAdmin) {
+			execute.call(this);
+		} else {
+
+			var passwordPrompt = new go.PasswordPrompt({
+				width: dp(450),
+				text: t("When enabling Google autenticator you'll need to scan the QR code with the Google authenticator app otherwise you cannot login to Group-Office anymore.",'googleauthenticator')+"<br><br>"+t("Provide your current password to enable Google authenticator.",'googleauthenticator'),
+				title: t('Enable Google authenticator','googleauthenticator'),
+				listeners:{
+					'ok': execute,
+					'cancel': function(){
+						this.setEnabled(false);
+					},
+					scope:this
+				}
+			});
+
+			passwordPrompt.show();
+		}
 	},
 	
 	disableGoogleAuthenticator : function(){
