@@ -64,7 +64,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		this.entityStore.set(params, function (options, success, response) {
 
 			var saved = (params.create ? response.created : response.updated) || {};
-			if (saved[id]) {				
+			if (id in saved) {				
 				this.fireEvent("save", this, values);
 
 				var serverId = params.create ? response.created[id].id : id;

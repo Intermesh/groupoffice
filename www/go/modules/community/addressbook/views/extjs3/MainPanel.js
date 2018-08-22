@@ -69,9 +69,11 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 					menu: [{
 						iconCls: 'ic-cloud-upload',
 						text: t("Import")
-					},{
+					}, {
 						iconCls: 'ic-cloud-download',
-						text: t("Export")
+						text: t("Export"),
+						handler: this.onExport,
+						scope: this
 					},					
 					"-",
 					{
@@ -247,6 +249,33 @@ go.modules.community.addressbook.MainPanel = Ext.extend(Ext.Panel, {
 		
 		go.Stores.get("Contact").set({
 			update: updates
+		});
+
+	},
+
+	onExport: function () {
+		
+		var win = window.open("about:blank");
+		
+		var callId = go.Jmap.request({
+			method: "Contact/query",
+			params: Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0}),
+			callback: function (options, success, response) {
+			}
+		});
+		
+		go.Jmap.request({
+			method: "Contact/export",
+			params: {
+				convertor: "json",
+				"#ids": {
+					resultOf: callId,
+					path: "/ids"
+				}
+			},
+			callback: function (options, success, response) {
+				win.location = go.Jmap.downloadUrl(response.blobId);
+			}
 		});
 		
 	}
