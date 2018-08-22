@@ -83,6 +83,15 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 										name: "jobTitle",
 										fieldLabel: t("Job title"),
 										anchor: "100%"
+									}, {
+										xtype: 'radiogroup',
+										fieldLabel: t("Gender"),
+										name:"gender",
+										items: [
+											{boxLabel: t("Unknown"), inputValue: null},
+											{boxLabel: t("Male"), inputValue: 'M'},
+											{boxLabel: t("Female"), inputValue: 'F'}
+										]
 									}
 								]
 							},
@@ -226,7 +235,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						pad: true,
 						itemCfg: {
 							xtype: "panel",
-							layout: "form",							
+							layout: "form",
 							items: [{
 									anchor: "100%",
 									fieldLabel: t("Type"),
