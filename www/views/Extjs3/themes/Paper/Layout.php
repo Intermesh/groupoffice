@@ -1,5 +1,6 @@
+<?php $lang = GO::language()->getLanguage(); ?>
 <!DOCTYPE html>
-<html>
+<htm lang="<?php echo $lang; ?>">
 <head>
 	<?php GO::router()->getController()->fireEvent('headstart'); ?>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
