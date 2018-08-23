@@ -62,6 +62,12 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	
 	
 	_add : function(entity) {
+		
+		if(!entity.id) {
+			console.error(entity);
+			throw "Entity doesn't have an 'id' property";
+		}
+		
 		if(this.data[entity.id]) {			
 			this.changes.changed.push(entity.id);
 		} else
