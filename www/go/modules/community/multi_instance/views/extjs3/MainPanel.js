@@ -48,18 +48,14 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 							text: t("E-mail selected"),
 							handler: function() {
 								var records = this.getSelectionModel().getSelections();
-								
-								console.log(records);
-								
+						
 								var str = "";
 								Ext.each(records, function(r) {
 									if(r.data.adminEmail && str.indexOf(r.data.adminEmail) == -1) {
 										str +=  '"' + r.data.adminDisplayName.replace(/"/g, '\\"') + '" &lt;' + r.data.adminEmail + '&gt;, ';
 									}
 								});
-								
-								console.log(str);
-								
+																
 								Ext.MessageBox.alert("E-mail addresses", str);
 							},
 							scope: this
@@ -203,7 +199,7 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 									var f = document.createElement("form");
 									f.setAttribute('method',"post");
 									f.setAttribute('target',"groupoffice_instance");
-									f.setAttribute('action',document.location.protocol + "//" + this.moreMenu.record.get('hostname'));
+									f.setAttribute('action',document.location.protocol + "//" + this.moreMenu.record.get('hostname') + ':' + document.location.port);
 									
 									var i = document.createElement("input"); //input element, text
 									i.setAttribute('type',"hidden");
