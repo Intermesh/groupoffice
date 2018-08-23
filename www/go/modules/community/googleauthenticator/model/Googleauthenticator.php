@@ -25,9 +25,13 @@ class Googleauthenticator extends Property {
 		return parent::defineMapping()->addTable("googleauth_secret");
 	}
 	
+	public function getSecret() {
+		return $this->secret;
+	}
+	
 	protected function internalSave(){
 		
-		if(empty($this->secret)){
+		if(empty($this->secret)) {
 			$this->secret = $this->createSecret();
 		}
 		

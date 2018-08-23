@@ -20,7 +20,6 @@ GO.addressbook.AddresslistsGroupedMultiSelectGrid = Ext.extend(GO.grid.MultiSele
 			columns:[
 				this.checkColumn,{
 					header:t("Name"),
-					
 					dataIndex: 'name',
 					id:'name',
 					renderer:function(value, p, record){
@@ -89,17 +88,13 @@ GO.addressbook.AddresslistsGroupedMultiSelectGrid = Ext.extend(GO.grid.MultiSele
 				items:[
 					this.searchField = new GO.form.SearchField({
 						store: store,
-						width:120,
+						//width:120,
 						emptyText: t("Search")
 					})
 				],
 				store:store,
 				pageSize:GO.settings.addresslists_store_forced_limit?parseInt(GO.settings.addresslists_store_forced_limit):parseInt(GO.settings.config.nav_page_size)
 			})
-		});
-		
-		Ext.applyIf(this,{
-			region:'center'
 		});
 		
 		GO.addressbook.AddresslistsGroupedMultiSelectGrid.superclass.initComponent.call(this);

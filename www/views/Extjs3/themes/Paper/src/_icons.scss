@@ -1308,7 +1308,7 @@ $material-icons : (
 .go-icon-cross .x-grid3-cell-inner{
 	&:before {
 		@extend %icon;
-		content: 'delete';
+		content: 'close';
 		margin-right: dp(8);
 	}
 }
