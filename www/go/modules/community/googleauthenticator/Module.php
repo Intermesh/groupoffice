@@ -17,6 +17,11 @@ class Module extends Base {
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 	}
 	
+	public static function onMap(Mapping $mapping) {		
+		$mapping->addRelation("googleauthenticator", model\Googleauthenticator::class, ['id' => 'userId'], false);		
+		return true;
+	}
+
 	protected function afterInstall(\go\modules\core\modules\model\Module $model) {
 		
 		if(!Googleauthenticator::register()) {
@@ -25,10 +30,4 @@ class Module extends Base {
 		
 		return parent::afterInstall($model);
 	}
-	
-	public static function onMap(Mapping $mapping) {		
-		$mapping->addRelation("googleauthenticator", model\Googleauthenticator::class, ['id' => 'userId'], false);		
-		return true;
-	}
-
 }
