@@ -77,8 +77,8 @@ GO.addressbook.AddresslistsGroupedMultiSelectGrid = Ext.extend(GO.grid.MultiSele
 			}),
 			store: store,
 			view: new Ext.grid.GroupingView({
-		    hideGroupedColumn:true,
-		    groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Items" : "Item"]})',
+				hideGroupedColumn:true,
+				groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Items" : "Item"]})',
 		   	emptyText: t("No items found"),
 		   	showGroupName:false,
 				startCollapsed:true

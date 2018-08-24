@@ -10,25 +10,16 @@
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
-
 GO.moduleManager.onModuleReady('addressbook',function(){
 	
 	Ext.override(GO.addressbook.MainPanel, {	
 		
 		initComponent : GO.addressbook.MainPanel.prototype.initComponent.createSequence(function(){
-//			this.addressbookFavoritesList = new GO.favorites.AddressbookFavoritesList(
-//			{
-//				id:'addressbookFavoritesList'
-//			});
-			
-			this.addressbookFavoritesList = new GO.favorites.AddressbookFavoritesList(
-			{
-				id:'addressbookFavoritesList',
-					stateEvents: ['collapse', 'expand'],
-					getState: function () {                              
-							return {
-									collapsed: !this.addressbooksGrid.collapsed
-							}
+
+			this.addressbookFavoritesList = new GO.favorites.AddressbookFavoritesList({
+				stateEvents: ['collapse', 'expand'],
+				getState: function () { 
+					return { collapsed: !this.addressbooksGrid.collapsed }
 				}.createDelegate(this)
 			});
 						
@@ -64,8 +55,8 @@ GO.moduleManager.onModuleReady('addressbook',function(){
 				this.addressbookFavoritesList.applyFilter([],true);
 			}, this);
 
-			this.westPanel.insert(0,this.addressbookFavoritesList);
-
+			this.westPanelContainer.insert(1,this.addressbookFavoritesList);
+			
 			this.addressbooksGrid.stateEvents = ['collapse', 'expand'];
 			this.addressbooksGrid.getState= function () {                              
 				return {
