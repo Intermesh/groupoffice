@@ -9,6 +9,11 @@ use go\core\RouterInterface;
 use ReflectionMethod;
 use function str_split;
 
+/**
+ * CLI Router
+ * 
+ * Usage: cli.php package/modulename/controller/method --arg1=foo
+ */
 class Router implements RouterInterface {
 
 	/**
