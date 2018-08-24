@@ -236,3 +236,8 @@ $updates['201807271339'][] = "ALTER TABLE `core_change`
 ADD COLUMN `id` INT NOT NULL AUTO_INCREMENT FIRST,
 DROP PRIMARY KEY,
 ADD PRIMARY KEY (`id`);";
+
+
+$updates['201808241650'][] = "ALTER TABLE `core_blob` ADD `modifiedAt` DATETIME NULL DEFAULT NULL AFTER `createdAt`, ADD `staleAt` DATETIME NULL DEFAULT NULL AFTER `modifiedAt`;";
+$updates['201808241650'][] = "ALTER TABLE `core_blob` ADD INDEX(`staleAt`);
+UPDATE `core_blob` set modifiedAt = from_unixtime(modified)";

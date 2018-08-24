@@ -25,4 +25,9 @@ try {
 	
 }catch (Exception $e) {
 	echo "Error: ". $e->getMessage() ."\n\n";
+	
+	if(GO()->getDebugger()->enabled) {
+		echo "\n\nDEBUGGER:\n\n";
+		echo implode("\n", GO()->getDebugger()->getEntries()) ."\n\n";
+	}
 }

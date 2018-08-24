@@ -221,7 +221,7 @@ class File extends FileSystemObject {
 	 * @param boolean $useCache
 	 * @param array $headers key value array of http headers to send
 	 */
-	public function output($sendHeaders = true, $useCache = true, $headers = []) {		
+	public function output($sendHeaders = true, $useCache = true, array $headers = []) {		
 		$r = \go\core\http\Response::get();
 	
 		if($sendHeaders) {
