@@ -383,13 +383,13 @@ class Connection {
 	 */
 	private function createStatement($build) {
 	
-		$debugQueryString = $this->replaceBindParameters($build['sql'], $build['params']);
-		App::get()->debug($debugQueryString, Debugger::TYPE_SQL);
-
+		if(isset($build['debug'])) {
+			App::get()->debug($build['debug'], Debugger::TYPE_SQL);
+		}
+		
 		$stmt = $this->getPDO()->prepare($build['sql']);
-		$stmt->debugQueryString = $debugQueryString;
-		foreach ($build['params'] as $p) {
 
+		foreach ($build['params'] as $p) {
 			if (isset($p['value']) && !is_scalar($p['value'])) {
 				throw new Exception("Invalid value " . var_export($p['value'], true));
 			}
@@ -398,30 +398,5 @@ class Connection {
 		return $stmt;
 	}
 
-	/**
-	 * Will replace all :paramName tags with the values. Used for debugging the SQL string.
-	 *
-	 * @param string $sql
-	 * @param string
-	 */
-	private function replaceBindParameters($sql, $bindParams) {
-		$binds = [];
-		foreach ($bindParams as $p) {
-			if (is_string($p['value']) && !mb_check_encoding($p['value'], 'utf8')) {
-				$queryValue = "[NON UTF8 VALUE]";
-			} else {
-				$queryValue = var_export($p['value'], true);
-			}
-			$binds[$p['paramTag']] = $queryValue;
-		}
 
-		//sort so $binds :param1 does not replace :param11 first.
-		krsort($binds);
-
-		foreach ($binds as $tag => $value) {
-			$sql = str_replace($tag, $value, $sql);
-		}
-
-		return $sql;
-	}
 }

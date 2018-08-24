@@ -22,6 +22,4 @@ class Statement extends \PDOStatement implements \JsonSerializable {
 		return $this->query;
 	}
 	
-	public $debugQueryString;
-
 }

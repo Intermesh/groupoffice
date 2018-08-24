@@ -72,6 +72,12 @@ class QueryBuilder {
 	 * @var Table 
 	 */
 	private $table;
+	
+	public $debug = false;
+	
+	public function __construct() {
+		$this->debug = GO()->getDebugger()->enabled;
+	}
 
 	/**
 	 * Constructor
@@ -152,7 +158,7 @@ class QueryBuilder {
 			$sql .= " (\n\t`" . implode("`,\n\t`", array_keys($data)) . "`\n)\n" .
 							"VALUES (\n\t" . implode(",\n\t", $tags) . "\n)";
 		}
-		return ['sql' => $sql, 'params' => $this->buildBindParameters];
+		return ['sql' => $sql, 'params' => $this->buildBindParameters, 'debug' => GO()->getDebugger()->enabled ? $this->replaceBindParameters($sql, $this->buildBindParameters) : null];
 	}
 
 	public function buildUpdate($tableName, $data, Query $query) {
@@ -186,7 +192,7 @@ class QueryBuilder {
 			$sql .= "\nWHERE " . $where;
 		}
 
-		return ['sql' => $sql, 'params' => $this->buildBindParameters];
+		return ['sql' => $sql, 'params' => $this->buildBindParameters, 'debug' => $this->debug ? $this->replaceBindParameters($sql, $this->buildBindParameters) : null];
 	}
 
 	public function buildDelete($tableName, Criteria $query) {
@@ -205,7 +211,7 @@ class QueryBuilder {
 			$sql .= "\nWHERE " . $where;
 		}
 
-		return ['sql' => $sql, 'params' => $this->buildBindParameters];
+		return ['sql' => $sql, 'params' => $this->buildBindParameters, 'debug' => $this->debug ? $this->replaceBindParameters($sql, $this->buildBindParameters) : null];
 	}
 
 	private function reset() {
@@ -258,7 +264,34 @@ class QueryBuilder {
 			$sql .= "\n" . $prefix . "FOR UPDATE";
 		}
 
-		return ['sql' => $sql, 'params' => $this->buildBindParameters];
+		return ['sql' => $sql, 'params' => $this->buildBindParameters, 'debug' => $this->debug ? $this->replaceBindParameters($sql, $this->buildBindParameters) : null];
+	}
+	
+		/**
+	 * Will replace all :paramName tags with the values. Used for debugging the SQL string.
+	 *
+	 * @param string $sql
+	 * @param string
+	 */
+	private function replaceBindParameters($sql, $bindParams) {
+		$binds = [];
+		foreach ($bindParams as $p) {
+			if (is_string($p['value']) && !mb_check_encoding($p['value'], 'utf8')) {
+				$queryValue = "[NON UTF8 VALUE]";
+			} else {
+				$queryValue = var_export($p['value'], true);
+			}
+			$binds[$p['paramTag']] = $queryValue;
+		}
+
+		//sort so $binds :param1 does not replace :param11 first.
+		krsort($binds);
+
+		foreach ($binds as $tag => $value) {
+			$sql = str_replace($tag, $value, $sql);
+		}
+
+		return $sql;
 	}
 
 	protected function buildSelectFields() {
