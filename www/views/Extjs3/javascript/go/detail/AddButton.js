@@ -1,3 +1,11 @@
+/**
+ * 
+ * A add menu button for detail views. 
+ * 
+ * Each detailview panel component can have a property "addMenuItems". These
+ * will be added to this menu button.
+ */
+
 go.detail.addButton = Ext.extend(Ext.Button, {
 	tooltip: t('Add'),
 	iconCls: 'ic-add',
