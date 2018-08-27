@@ -60,9 +60,7 @@ class ModuleController extends AbstractJsonController{
 		$module->save();
 		
 		
-		GO::clearCache(); //legacy
-		GO()->getCache()->flush(false);
-		GO()->getDataFolder()->getFolder('clientscripts')->delete();
+		GO()->rebuildCache(true);
 		
 		echo $this->renderSubmit($module);
 	}

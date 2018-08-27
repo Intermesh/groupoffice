@@ -459,14 +459,6 @@ this.exportCompanyMenu.setColumnModel(this.companiesGrid.getColumnModel());
 		}
 	}, this);
 
-	this.westPanel = new Ext.Panel({
-		layout:'fit',
-		//layoutConfig:{hideCollapseTool:true},
-		autoHeight:true,
-		items:[this.addressbooksGrid],
-		id: 'ab-west-panel'
-	});
-
 	//This is an accordion panel only for the favorites module. If there's only
 	//one item then this will disable the collapsing.
 	this.addressbooksGrid.on('beforecollapse',function(){
@@ -476,7 +468,8 @@ this.exportCompanyMenu.setColumnModel(this.companiesGrid.getColumnModel());
 	}, this);
 
 	this.navMenu = new go.NavMenu({
-		region:'north',
+		//region:'north',
+		autoHeight:true,
 		store: new Ext.data.ArrayStore({
 			fields: ['name', 'icon', 'visible'],
 			data: [
@@ -497,18 +490,21 @@ this.exportCompanyMenu.setColumnModel(this.companiesGrid.getColumnModel());
 		}
 	});
 
-	this.westPanelContainer = new Ext.Panel({
+	this.westPanelContainer = new Ext.Container({
 		region:'west',
 		cls: 'go-sidenav',
-		width:dp(224),
+		layout:'form',
+		width:dp(280),
 		autoScroll:true,
+		style: {'padding-right': '15px'}, // scroll offset
 		split:true,
-		items: [this.navMenu, this.westPanel,this.mailingsFilterPanel]			
+		items: [this.navMenu, this.addressbooksGrid,this.mailingsFilterPanel]			
 	});
 
 	
 	config.items= [
 		//this.searchPanel,
+		
 		this.westPanelContainer,
 		new Ext.Panel({
 			layout: 'fit',
@@ -519,7 +515,6 @@ this.exportCompanyMenu.setColumnModel(this.companiesGrid.getColumnModel());
 	];
 
 	GO.addressbook.MainPanel.superclass.constructor.call(this, config);
-
 };
 
 Ext.extend(GO.addressbook.MainPanel, Ext.Panel,{
@@ -551,8 +546,8 @@ Ext.extend(GO.addressbook.MainPanel, Ext.Panel,{
 				requests:Ext.encode({
 //					contacts:{r:"addressbook/contact/store"},
 //					companies:{r:"addressbook/company/store"},
-					addressbooks:{r:"addressbook/addressbook/store", limit: 0},
-					writable_addresslists:{r:"addressbook/addresslist/store",permissionLevel: GO.permissionLevels.write, limit: 0},
+					addressbooks:{r:"addressbook/addressbook/store", limit: GO.settings.config.nav_page_size},
+					writable_addresslists:{r:"addressbook/addresslist/store",permissionLevel: GO.permissionLevels.write, limit: GO.settings.config.nav_page_size},
 					readable_addresslists:{r:"addressbook/addresslist/store",permissionLevel: GO.permissionLevels.read, limit: GO.settings.config.nav_page_size}
 				})
 			},

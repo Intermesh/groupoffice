@@ -1206,6 +1206,10 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		if (!$destinationFolder->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION))
 			throw new \GO\Base\Exception\AccessDenied();
+		
+		if(!isset(\GO::session()->values['files']['uploadqueue'])) {
+			throw new \Exception("Nothing to process");
+		}
 
 
 		while ($tmpfile = array_shift(\GO::session()->values['files']['uploadqueue'])) {

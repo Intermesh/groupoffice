@@ -7,6 +7,9 @@ go.login.LoginDialog = Ext.extend(go.Window, {
 	draggable: false,
 	cls: "go-login-dialog",
 	
+	minWidth : 40,
+	minHeight: 40,
+	
 	initComponent: function() {
 
 		Ext.apply(this,{
@@ -75,16 +78,16 @@ go.login.LoginDialog = Ext.extend(go.Window, {
 	},
 		
 	focus: function() {
-		// If it's the username panel then set the username field active
-		var i = this.getLayout().activeItem;
-		if(i.rendered) {
-			i.focus();
-		} else
-		{
-			i.on('render', function() {
-				i.focus();
-			}, this, {single: true});
-		}
+//		// If it's the username panel then set the username field active
+//		var i = this.getLayout().activeItem;
+//		if(i.rendered) {
+//			i.focus();
+//		} else
+//		{
+//			i.on('render', function() {
+//				i.focus();
+//			}, this, {single: true});
+//		}
 		
 	}
 	
