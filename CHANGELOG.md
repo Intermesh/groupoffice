@@ -1,3 +1,6 @@
+- added natural sort to project name
+- added expression support to ActiveRecord order clause
+
 23-08-2018 6.3.34
 - Fixed broken XLS export
 - Updated Z-push to 2.4.4

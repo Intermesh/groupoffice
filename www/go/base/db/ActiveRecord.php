@@ -1626,11 +1626,16 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 				if($i>0)
 					$order .= ',';
 
-				$order .= $this->_quoteColumnName($params['order'][$i]).' ';
-				if(isset($params['orderDirection'][$i])){
-					$order .= strtoupper($params['orderDirection'][$i])=='ASC' ? 'ASC ' : 'DESC ';
-				}else{
-					$order .= strtoupper($params['orderDirection'][0])=='ASC' ? 'ASC ' : 'DESC ';
+				if ($params['order'][$i] instanceof \go\core\db\Expression) {
+				//if(strpos($params['order'][$i], '(')!==false) {
+					$order .= $params['order'][$i].' ';
+				} else {
+					$order .= $this->_quoteColumnName($params['order'][$i]).' ';
+					if(isset($params['orderDirection'][$i])){
+						$order .= strtoupper($params['orderDirection'][$i])=='ASC' ? 'ASC ' : 'DESC ';
+					}else{
+						$order .= strtoupper($params['orderDirection'][0])=='ASC' ? 'ASC ' : 'DESC ';
+					}
 				}
 			}
 		}
