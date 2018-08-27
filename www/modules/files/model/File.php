@@ -729,8 +729,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 
 
 	public function findRecent($start=false,$limit=false){
-		$storeParams = \GO\Base\Db\FindParams::newInstance()->ignoreAcl();
-
+		$storeParams = \GO\Base\Db\FindParams::newInstance();
 
 		$joinSearchCacheCriteria = \GO\Base\Db\FindCriteria::newInstance()
 					->addRawCondition('`t`.`id`', '`sc`.`entityId`')

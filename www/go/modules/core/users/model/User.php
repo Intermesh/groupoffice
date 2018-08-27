@@ -266,27 +266,9 @@ class User extends Entity {
 		
 		if(!$this->checkPassword($currentPassword)) {
 			$this->setValidationError("currentPassword", ErrorCode::INVALID_INPUT);
-		}
+		} 
 	}
-		
-	/**
-	 * Checks if the given password matches the password in the core_auth_password table.
-	 * 
-	 * This function should probably be in a "password" property.
-	 * 
-	 * @deprecated This function should be put in the password authenticator.
-	 * @param string $password
-	 * @return boolean 
-	 */
-	public function checkPasswordTable($password) {		
-		$this->passwordVerified = password_verify($password, $this->password);
-		
-		if($this->passwordVerified){
-			$this->updateDigest($password);
-		}
-		return $this->passwordVerified;
-	}
-	
+
 	/**
 	 * Check if the password is correct for this user.
 	 * 
@@ -299,13 +281,26 @@ class User extends Entity {
 		if(!isset($authenticator)) {
 			throw new \Exception("No primary authenticator found!");
 		}
-		return $authenticator->authenticate($this->username, $password);		
+		$success = $authenticator->authenticate($this->username, $password);		
+		if($success) {
+			$this->passwordVerified = true;
+		}
+		return $success;
+	}
+	
+	/**
+	 * needed because password is protected
+	 * @param string $password
+	 * @return boolean
+	 */
+	public function passwordVerify($password) {
+		return password_verify($password, $this->password);
 	}
 	
 	private $plainPassword;
 
 	public function setPassword($password) {
-		$this->plainPassword = $password;		
+		$this->plainPassword = $password;
 	}
 	
 	public function getDigest() {
@@ -380,6 +375,8 @@ class User extends Entity {
 		if(isset($this->plainPassword) && $this->validatePassword) {
 			if(strlen($this->plainPassword) < GO()->getSettings()->passwordMinLength) {
 				$this->setValidationError('password', ErrorCode::INVALID_INPUT, "Minimum password length is ".GO()->getSettings()->passwordMinLength." chars");
+			} else {
+				$this->updateDigest();
 			}
 		}
 		
@@ -422,6 +419,8 @@ class User extends Entity {
 		
 		if(!empty($filter['enabled'])) {
 			$query->andWhere('enabled', '=', $filter['enabled']);
+		} else {
+			$query->andWhere('enabled', '=', 1);
 		}
 		
 		if(!empty($filter['groupId'])) {
