@@ -121,6 +121,11 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 			if(!$user->checkPassword($password)) {
 				return false;
 			}
+			
+			if(!GO::modules()->sync) {
+				ZLog::Write(LOGLEVEL_INFO, 'User '. $user->username .' logged on but has no access to the sync module');
+				return false;
+			}
 
 			$state = new go\core\auth\TemporaryState();
 			$state->setUser($user);		
