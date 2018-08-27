@@ -137,7 +137,7 @@
 			getFormField: function (customfield, config) {
 
 				var f = GO.customfields.dataTypes.getBaseField(customfield, Ext.apply({
-					xtype: 'combo',
+					xtype: 'comboboxreset',
 					fieldLabel: customfield.name,
 					hiddenName: 'customFields.' + customfield.databaseName,
 					store: new Ext.data.ArrayStore({
@@ -211,7 +211,7 @@
 
 				if (GO.util.empty(customfield.options.multiselect)) {
 					return Ext.apply(f, {
-						xtype: 'combo',
+						xtype: 'comboboxreset',
 						store: store,
 						valueField: 'text',
 						displayField: 'text',

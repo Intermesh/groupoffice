@@ -154,20 +154,13 @@ class ModuleCollection extends Model\ModelCollection{
 		
 		foreach($modules as $module)
 		{	
-//			if($this->_isAllowed($module->name)){
-				$file = $module->path.ucfirst($module->name).'Module.php';
-				//todo load listeners
-				//if(file_exists($file)){
-					//require_once($file);
-					$class='GO\\'.ucfirst($module->name).'\\'.ucfirst($module->name).'Module';
-				if(class_exists($class)) {
-					$object = new $class;
-					if(method_exists($object, $method)){					
+				$object = $module->moduleManager;
+				if(method_exists($object, $method)){					
 //						\GO::debug('Calling '.$class.'::'.$method);
-						call_user_func_array(array($object, $method), $params);
-						//$object->$method($params);
-					}
+					call_user_func_array(array($object, $method), $params);
+					//$object->$method($params);
 				}
+				
 //			}
 		}
 		
