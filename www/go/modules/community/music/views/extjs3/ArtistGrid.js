@@ -102,7 +102,7 @@ go.modules.community.music.ArtistGrid = Ext.extend(go.grid.GridPanel, {
 
 			// Change to true to remember grid state
 			stateful: false,
-			stateId: 'music-arist-grid'
+			stateId: 'music-artist-grid'
 		});
 
 		go.modules.community.music.ArtistGrid.superclass.initComponent.call(this);

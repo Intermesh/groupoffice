@@ -76,7 +76,7 @@ go.modules.community.music.MainPanel = Ext.extend(go.panels.ModulePanel, {
 							iconCls: 'ic-delete',
 							text: t("Delete"),
 							handler: function () {
-								this.aristGrid.deleteSelected();
+								this.artistGrid.deleteSelected();
 							},
 							scope: this
 						}
