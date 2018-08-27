@@ -1,3 +1,4 @@
+- billing: Billing report filter didn't work
 - sync: Require sync module access for activesync
 - projects: added natural sort to project name
 - core: added expression support to ActiveRecord order clause
