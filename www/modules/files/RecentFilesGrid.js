@@ -2,14 +2,7 @@ GO.files.RecentFilesGrid = Ext.extend(GO.grid.GridPanel,{
 	constructor : function(config){
 		
 		config=config||{};
-		
-		config.store = new GO.data.JsonStore({
-			url:GO.url("files/file/recent"),
-			id: 'id',
-			fields:["id","path","name"],
-			remoteSort:true
-		});
-		
+
 		var reader = new Ext.data.JsonReader({
 			root: 'results',
 			totalProperty: 'total',
