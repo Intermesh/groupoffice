@@ -1,5 +1,6 @@
-- added natural sort to project name
-- added expression support to ActiveRecord order clause
+- sync: Require sync module access for activesync
+- projects: added natural sort to project name
+- core: added expression support to ActiveRecord order clause
 
 23-08-2018 6.3.34
 - Fixed broken XLS export
