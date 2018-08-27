@@ -120,7 +120,7 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 			}), 
 			
 		
-		this.addButton = new go.detail.addButton({			
+		this.addButton = this.newMenuButton = new go.detail.addButton({			
 			detailPanel: this
 				})
 		);
