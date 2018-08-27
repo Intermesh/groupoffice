@@ -1,6 +1,7 @@
 - dav: Performance optimizations
 - core: User icon didn't show when selecting a contact / user.
 - billing: Billing report filter didn't work
+- files: fix acl in recent files portlet
 - sync: Require sync module access for activesync
 - projects: added natural sort to project name
 - core: added expression support to ActiveRecord order clause
