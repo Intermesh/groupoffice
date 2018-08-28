@@ -417,9 +417,7 @@ class User extends Entity {
 			
 		}
 		
-		if(!empty($filter['enabled'])) {
-			$query->andWhere('enabled', '=', $filter['enabled']);
-		} else {
+		if(!isset($filter['showDisabled']) || $filter['showDisabled'] !== true) {
 			$query->andWhere('enabled', '=', 1);
 		}
 		
