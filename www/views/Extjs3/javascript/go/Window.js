@@ -12,7 +12,7 @@ go.Window = Ext.extend(Ext.Window, {
 			this.width = window.innerWidth - dp(32);
 		}		
 		if(this.height && this.height > window.innerHeight) {
-			this.height = window.innerHeight  - dp(32);
+			this.height = window.innerHeight	- dp(32);
 		}
 		
 		go.Window.superclass.initComponent.call(this);
@@ -50,8 +50,8 @@ go.Window = Ext.extend(Ext.Window, {
 	autoSize : function(){
 		if(!this.maximized){
 
-			var vpH = window.innerWidth || document.body.clientWidth;
-			var vpW = window.innerHeight || document.body.clientHeight;
+			var vpW = window.innerWidth;
+			var vpH = window.innerHeight;
 
 			if (this.getHeight() > vpH){
 				this.setHeight(vpH * .9);
