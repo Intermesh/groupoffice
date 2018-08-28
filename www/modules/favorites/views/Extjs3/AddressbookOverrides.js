@@ -16,6 +16,10 @@ GO.moduleManager.onModuleReady('addressbook',function(){
 		
 		initComponent : GO.addressbook.MainPanel.prototype.initComponent.createSequence(function(){
 
+			if(!go.Modules.isAvailable("legacy", "favorites")) {
+				return;
+			}
+
 			this.addressbookFavoritesList = new GO.favorites.AddressbookFavoritesList({
 				stateEvents: ['collapse', 'expand'],
 				getState: function () { 
