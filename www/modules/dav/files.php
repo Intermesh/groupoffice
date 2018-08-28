@@ -55,7 +55,7 @@ $server->setBaseUri($baseUri);
 
 
 $tmpDir = \GO::config()->getTempFolder()->createChild('dav',false);
-
+$tmpDir->create();
 
 $locksDir = $tmpDir->createChild('locksdb', false);
 $locksDir->create();
