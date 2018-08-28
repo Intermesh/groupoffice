@@ -673,8 +673,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		if (!empty($params['query']))
 				return $this->_searchFiles($params);
             
-		if ($params['folder_id'] == 'shared')
-			return $this->_listShares($params);
+		
 		
 		//get the folder that contains the files and folders to list.
 		//This will check permissions too.
@@ -682,6 +681,9 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			$folder = \GO\Files\Model\Folder::model()->findHomeFolder (GO::user());
 		}else
 		{			
+			if ($params['folder_id'] == 'shared') {
+				return $this->_listShares($params);
+			}
 			$folder = \GO\Files\Model\Folder::model()->findByPk($params['folder_id']);
 		}
 		
