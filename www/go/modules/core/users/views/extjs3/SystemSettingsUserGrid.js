@@ -113,8 +113,7 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					renderer: function(v) {
 						var result = '';
 						
-						for(var i = 0, method; method = v[i]; i++) {
-							console.log(method);
+						for(var i = 0, method; method = v[i]; i++) {							
 							result += '<i title="'+method.name+'" class="icon go-module-icon-'+method.id+'"></i> ';
 						}
 						return result;
