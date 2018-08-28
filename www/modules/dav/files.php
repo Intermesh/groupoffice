@@ -60,7 +60,7 @@ $baseUri = strpos($_SERVER['REQUEST_URI'],'files.php') ? \GO()->getSettings()->U
 $server->setBaseUri($baseUri);
 
 
-$tmpDir = \GO::config()->getTempFolder()->createChild('dav',false);
+$tmpDir = \GO::config()->getTempFolder()->createChild('dav',false)->create();
 
 
 $locksDir = $tmpDir->createChild('locksdb', false);
