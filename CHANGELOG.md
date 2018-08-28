@@ -1,3 +1,5 @@
+- users: the list filters disabled users by default.
+- users: searching while filtering will work together
 - favorites: will not be rendered when there is no permission.
 - dav: Performance optimizations
 - core: User icon didn't show when selecting a contact / user.
