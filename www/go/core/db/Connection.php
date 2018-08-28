@@ -384,6 +384,11 @@ class Connection {
 	private function createStatement($build) {
 	
 		$debugQueryString = $this->replaceBindParameters($build['sql'], $build['params']);
+		
+//		Code is useful to find where a query was made.
+//		if(strpos($debugQueryString, "SELECT t.userId, t.secret, t.createdAt, t.userId AS `t.userId") === 0 ) {
+//			GO()->getDebugger()->debugCalledFrom();
+//		}
 		App::get()->debug($debugQueryString, Debugger::TYPE_SQL);
 
 		$stmt = $this->getPDO()->prepare($build['sql']);

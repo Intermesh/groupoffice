@@ -14,6 +14,29 @@ use ReflectionClass;
  * 
  */
 class ClassFinder {
+	
+	
+	public static function getDefaultNamespaces() {
+		
+		$ns = GO()->getCache()->get("class-finder-default-namespaces");
+		
+		if(!$ns) {
+			$ns = ['go\\core'];		
+			
+			$modules = Module::find();
+			foreach ($modules as $module) {
+				if(!isset($module->package) || !$module->isAvailable()) {
+					continue;
+				}
+				$namespace = "go\\modules\\" . $module->package . "\\" . $module->name;
+				$ns[] = $namespace;
+			}
+			
+			GO()->getCache()->set("class-finder-default-namespaces", $ns);
+		}
+		
+		return $ns;
+	}
 
 	/**
 	 * 
@@ -21,13 +44,7 @@ class ClassFinder {
 	 */
 	public function __construct($useDefaultNamespaces = true) {
 		if($useDefaultNamespaces) {			
-			$this->addNamespace('go\\core');		
-			$modules = Module::find();
-			foreach ($modules as $module) {
-				if(!isset($module->package) || !$module->isAvailable()) {
-					continue;
-				}
-				$namespace = "go\\modules\\" . $module->package . "\\" . $module->name;
+			foreach(self::getDefaultNamespaces() as $namespace){
 				$this->addNamespace($namespace);
 			}
 		}

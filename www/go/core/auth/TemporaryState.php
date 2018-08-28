@@ -14,22 +14,31 @@ use go\modules\core\users\model\User;
 class TemporaryState extends AbstractState {
 	
 	private $user;
-
-	public function setUser(User $user) {
-		$this->user = $user;
-	}
+	private $userId;	
 	
-	public function getUser() {		
+	public function getUser() {
+		if(!$this->user) {
+			$this->user = User::findById($this->userId);
+		}
+		
 		return $this->user;
 	}
 
 	public function isAuthenticated() {
-		return isset($this->user);
+		return !empty($this->userId);
 	}
 
 	public function getUserId() {
-		return isset($this->user) ? $this->user->id : null;
+		return $this->userId;
+	}
+	
+	public function setUserId($userId) {
+		$this->userId = $userId;
 	}
 
+	public function setUser(User $user) {
+		$this->user = $user;
+		$this->userId = $user->id;
+	}
 }
 

@@ -239,16 +239,26 @@ abstract class Property extends Model {
 	}
 	
 	protected static function getReadableProperties() {
-		$props = parent::getReadableProperties();
 		
-		//add dynamic relations		
-		foreach(static::getMapping()->getProperties() as $propName => $type) {
+		$cacheKey = 'property-getReadableProperties-' . str_replace('\\', '-', static::class);
+		
+		$props = GO()->getCache()->get($cacheKey);
+		
+		if(!$props) {
+		
+			$props = parent::getReadableProperties();
+
+			//add dynamic relations		
+			foreach(static::getMapping()->getProperties() as $propName => $type) {
+
+				//do property_exists because otherwise it will add protected properties too.
+				if(!property_exists(static::class, $propName) && !in_array($propName, $props)) {
+					$props[] = $propName;
+				}
+			}		
 			
-			//do property_exists because otherwise it will add protected properties too.
-			if(!property_exists(static::class, $propName) && !in_array($propName, $props)) {
-				$props[] = $propName;
-			}
-		}		
+			GO()->getCache()->set($cacheKey, $props);
+		}
 		return $props;
 	}
 	
@@ -323,9 +333,27 @@ abstract class Property extends Model {
 	}
 
 	protected static function getDefaultFetchProperties() {
-		return array_filter(static::getReadableProperties(), function($propName) {
-			return !in_array($propName, ['modified', 'oldValues', 'validationErrors']);
-		});
+		
+		$cacheKey = 'property-getDefaultFetchProperties-' . str_replace('\\', '-', static::class);
+		
+		$props = GO()->getCache()->get($cacheKey);
+		
+		if(!$props) {
+			$props = array_filter(static::getReadableProperties(), function($propName) {
+				return !in_array($propName, ['modified', 'oldValues', 'validationErrors']);
+			});
+
+			//add dynamic relations		
+			foreach(static::getMapping()->getProperties() as $propName => $type) {			
+				//Add protected props
+				if(!in_array($propName, $props)) {
+					$props[] = $propName;
+				}
+			}		
+			
+			GO()->getCache()->set($cacheKey, $props);
+		}
+		return $props;
 	}	
 
 	/**
@@ -341,7 +369,7 @@ abstract class Property extends Model {
 		$query = (new Query())
 						->from($tables[$mainTableName]->getName(), $tables[$mainTableName]->getAlias())
 						->fetchMode(PDO::FETCH_CLASS, static::class, [false, $fetchProperties]);
-
+		
 		if (empty($fetchProperties)) {
 			$fetchProperties = static::getDefaultFetchProperties();
 		}
@@ -384,8 +412,10 @@ abstract class Property extends Model {
 	private static function buildSelect(Query $query, array $fetchProperties) {
 
 		foreach (self::getMapping()->getTables() as $table) {
-			foreach($table->getMappedColumns() as $column) {				
-				$query->select($table->getAlias() . "." . $column->name, true);				
+			foreach($table->getMappedColumns() as $column) {		
+				if($column->primary || in_array($column->name, $fetchProperties)) {
+					$query->select($table->getAlias() . "." . $column->name, true);				
+				}
 			}
 			
 			//also select primary key values separately to check if tables were new when saving. They are stored in $this->primaryKeys when they go through the __set function.

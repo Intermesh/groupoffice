@@ -210,7 +210,7 @@ class Debugger {
 		return intval(($this->getMicroTime() - $_SERVER["REQUEST_TIME_FLOAT"])*1000) . 'ms';
 	}
 
-	public function debugCalledFrom($limit = 5) {
+	public function debugCalledFrom($limit = 10) {
 
 		$this->debug("START BACKTRACE");
 		$trace = debug_backtrace();

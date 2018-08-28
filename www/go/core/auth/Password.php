@@ -8,7 +8,7 @@ use go\core\validate\ErrorCode;
 class Password extends PrimaryAuthenticator {	
 	
 	public static function isAvailableFor($username) {
-		return User::find(['id'])->where(['username' => $username])->andWhere('password', '!=', 'null')->single() !== false;
+		return User::find()->selectSingleValue('id')->where(['username' => $username])->andWhere('password', '!=', 'null')->single() !== false;
 		
 	}
 	
@@ -19,7 +19,7 @@ class Password extends PrimaryAuthenticator {
 	 * @return boolean 
 	 */
 	public function authenticate($username, $password) {		
-		$user = User::find()->where(['username' => $username])->single();
+		$user = User::find(['id', 'username', 'password', 'enabled'])->where(['username' => $username])->single();
 		if(!$user) {
 			return false;
 		}

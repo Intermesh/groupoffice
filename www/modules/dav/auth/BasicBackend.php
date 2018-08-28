@@ -49,10 +49,10 @@ class BasicBackend extends AbstractBasic {
 //	For basic auth
 	protected function validateUserPass($username, $password) {
 		
-		$user = User::find()->where(['username' => $username])->single();
+		$user = User::find(['id', 'username', 'password'])->where(['username' => $username, 'enabled' => true])->single();
 		/* @var $user User */
 		
-		if(!$user || !$user->enabled) {
+		if(!$user) {
 			return false;
 		}
 		
@@ -61,10 +61,10 @@ class BasicBackend extends AbstractBasic {
 		}
 		
 		$state = new TemporaryState();
-		$state->setUser($user);		
-		GO()->setAuthState($state);		
+		$state->setUserId($user->id);		
+		GO()->setAuthState($state);
 		
-		$this->oldLogin($user);		
+		$this->oldLogin($user->id);		
 		$this->user = $user;
 		
 		$davModule = Module::model()->findByName($this->checkModuleAccess, false, true);
@@ -83,10 +83,10 @@ class BasicBackend extends AbstractBasic {
 	 * 
 	 * @param \GO\Dav\Auth\User $user
 	 */
-	private function oldLogin(User $user) {
+	private function oldLogin($userId) {
 		if(!defined('GO_NO_SESSION')) {
 			define("GO_NO_SESSION", true);
 		}
-		$_SESSION['GO_SESSION'] = ['user_id' => $user->id];
+		$_SESSION['GO_SESSION'] = ['user_id' => $userId];
 	}
 }
