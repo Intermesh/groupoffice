@@ -82,8 +82,11 @@ $tempFF = new Sabre\DAV\TemporaryFileFilterPlugin($tmpDir->path());
 $server->addPlugin($tempFF);
 
 // And off we go!
-$server->on("exception", function($e) {
-	\go\core\ErrorHandler::logException($e);
-});
+
+if(GO()->getDebugger()->enabled) {
+	$server->on("exception", function($e) {
+		\go\core\ErrorHandler::logException($e);
+	});
+}
 
 $server->exec();
