@@ -19,17 +19,6 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 		this.initDeleteKey();		
 
 		this.on("bodyscroll", this.loadMore, this, {buffer: 100});
-		
-		this.on("sortchange", function() {
-			//this will make sorting request the first page again
-			var store = this.getStore();
-			
-			if(!store.lastOptions) {
-					return;
-				}
-			
-			
-		}, this);
 
 		this.store.baseParams.limit = this.pageSize;
 	},

@@ -68,7 +68,7 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	
 	sort : function(fieldName, dir) {
 		//Reload first page data set on sort
-		if(this.lastOptions.params) {
+		if(this.lastOptions && this.lastOptions.params) {
 			this.lastOptions.params.position = 0;
 			this.lastOptions.add = false;
 		}
