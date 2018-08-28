@@ -1,3 +1,4 @@
+- favorites: will not be rendered when there is no permission.
 - dav: Performance optimizations
 - core: User icon didn't show when selecting a contact / user.
 - billing: Billing report filter didn't work
