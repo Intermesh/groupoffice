@@ -629,32 +629,33 @@ class GO{
 		if ( !empty(\GO::config()->locale_all) ){
 			setlocale(LC_CTYPE, \GO::config()->locale_all);
 			putenv('LC_ALL='.\GO::config()->locale_all);
-		}else{
-			//for escape shell arg
-			if(!isset(\GO::session()->values['locale_all'])){
-				$currentlocale = \GO::session()->values['locale_all']= setlocale(LC_CTYPE, "0");
-
-				if(stripos($currentlocale,'utf')==false && function_exists('exec')){
-					@exec('locale -a', $output);
-//					var_dump($output);
-					if(isset($output) && is_array($output)){
-						foreach($output as $locale){
-							if(stripos($locale,'utf')!==false){
-								setlocale(LC_CTYPE, $locale);
-
-								\GO::session()->values['locale_all']=$locale;
-								break;
-							}
-						}
-					}
-					\GO::debug("WARNING: could not find UTF8 locale. Run locale -a and set \$config['locale_all']. See https://www.group-office.com/wiki/Configuration_file#Localization_settings_list");					
-
-				}
-			}
-//			exit(\GO::session()->values['locale_all']);
-			setlocale(LC_CTYPE, \GO::session()->values['locale_all']);
-			putenv('LC_ALL='.\GO::session()->values['locale_all']);
 		}
+//		}else{
+//			//for escape shell arg
+//			if(!isset(\GO::session()->values['locale_all'])){
+//				$currentlocale = \GO::session()->values['locale_all']= setlocale(LC_CTYPE, "0");
+//
+//				if(stripos($currentlocale,'utf')==false && function_exists('exec')){
+//					@exec('locale -a', $output);
+////					var_dump($output);
+//					if(isset($output) && is_array($output)){
+//						foreach($output as $locale){
+//							if(stripos($locale,'utf')!==false){
+//								setlocale(LC_CTYPE, $locale);
+//
+//								\GO::session()->values['locale_all']=$locale;
+//								break;
+//							}
+//						}
+//					}
+//					\GO::debug("WARNING: could not find UTF8 locale. Run locale -a and set \$config['locale_all']. See https://www.group-office.com/wiki/Configuration_file#Localization_settings_list");					
+//
+//				}
+//			}
+////			exit(\GO::session()->values['locale_all']);
+//			setlocale(LC_CTYPE, \GO::session()->values['locale_all']);
+//			putenv('LC_ALL='.\GO::session()->values['locale_all']);
+//		}
 		
 		
 		if(!empty(\GO::session()->values['debug']))
@@ -684,14 +685,13 @@ class GO{
 
 		if(!defined('GO_LOADED')){ //check if old Group-Office.php was loaded
 			
-			self::_undoMagicQuotes();
+//			self::_undoMagicQuotes();
 
 			//set umask to 0 so we can create new files with mask defined in \GO::config()->file_create_mode
 			umask(0);
 			
 			//We use UTF8 by default.
-			if (function_exists('mb_internal_encoding'))
-				mb_internal_encoding("UTF-8");
+			mb_internal_encoding("UTF-8");
 		}
 
 		//Every logged on user get's a personal temp dir.
