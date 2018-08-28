@@ -52,6 +52,30 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	
 	},
 	
+	loadData : function(o, append){
+		this.loading = true;
+		
+		
+		var ret = go.data.Store.superclass.loadData.call(this, o, append);				
+		
+		var me = this;
+		setTimeout(function(){
+			me.loading = false;
+		}, 0);	
+		
+		return ret;
+	},
+	
+	sort : function(fieldName, dir) {
+		//Reload first page data set on sort
+		if(this.lastOptions.params) {
+			this.lastOptions.params.position = 0;
+			this.lastOptions.add = false;
+		}
+		
+		return go.data.Store.superclass.sort.call(this, fieldName, dir);
+	},
+	
 	//created this because grouping store must share this.
 	setup : function() {
 		if(!this.baseParams) {
@@ -61,11 +85,7 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		if(!this.baseParams.filter) {
 			this.baseParams.filter = {};
 		}
-		
-		if(!this.baseParams.limit) {
-			this.baseParams.limit = 100; //default limit of 100.
-		}
-		
+
 		this.on('beforeload', function() {			
 			this.loading = true;
 		}, this)
@@ -168,7 +188,7 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	
 	onUpdate : function(store, record, operation) {
 		//debugger;
-		if(this.serverUpdate) {
+		if(this.serverUpdate || this.loading) {
 			return;
 		}
 		
