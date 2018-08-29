@@ -5,7 +5,7 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 	 */
 	scrollBoundary: 300,
 	
-	pageSize: 10,
+	pageSize: 20,
 	
 	initComponent: function () {
 		go.grid.GridPanel.superclass.initComponent.call(this);
@@ -22,9 +22,12 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 		this.store.baseParams.limit = this.pageSize;
 		
 		this.store.on("load", function(store, records, o){
-				if(o.paging) {
-					this.allRecordsLoaded = !records.length;
-				}
+				//if(o.paging) {
+				this.allRecordsLoaded = !records.length;
+				//} 
+					
+				this.loadMore();
+			
 			}, this);
 	},
 	
@@ -79,7 +82,7 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 	loadMore: function () {
 		var store = this.getStore();
 
-		if (this.allRecordsLoaded || store.loading){
+		if (this.allRecordsLoaded){
 			return;
 		}
 
@@ -87,8 +90,7 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 		var	scroller = this.getView().scroller.dom,
 						body = this.getView().mainBody.dom;
 
-
-		if ((scroller.offsetHeight + scroller.scrollTop + this.scrollBoundary) >= body.offsetHeight) {
+		if (scroller.offsetHeight >= body.offsetHeight || (scroller.offsetHeight + scroller.scrollTop + this.scrollBoundary) >= body.offsetHeight) {
 
 			var o = GO.util.clone(store.lastOptions);
 			o.add = true;
