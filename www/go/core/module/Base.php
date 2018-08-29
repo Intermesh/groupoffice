@@ -116,7 +116,7 @@ abstract class Base {
 			return false;
 		}
 		
-		GO()->getCache()->flush();
+		GO()->rebuildCache(true);
 		
 		return true;
 	}

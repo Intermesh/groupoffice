@@ -291,7 +291,7 @@ abstract class ReadOnlyEntityController extends Controller {
 		}
 		
 		//filter permissions
-		$cls::filter($query, ['permissionLevel' => Acl::LEVEL_READ]);
+		$cls::applyAclToQuery($query, Acl::LEVEL_READ);
 		
 		return $query;
 	

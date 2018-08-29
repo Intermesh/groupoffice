@@ -31,7 +31,7 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				{name: 'createdAt', type: 'date'},
 				{name: 'lastLogin', type: 'date'}	
 			],
-			baseParams: {filter: {enabled: true}},
+			baseParams: {filter: {}},
 			entityStore: go.Stores.get("User")
 		});
 
@@ -42,10 +42,10 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					text: t('Show disabled'),
 					enableToggle:true,
 					toggleHandler: function(btn, state) {
-						if(!state) {
-							this.store.baseParams.filter = {enabled: true};
+						if(state) {
+							this.store.baseParams.filter.showDisabled = true;
 						} else {
-							delete this.store.baseParams.filter;
+							delete this.store.baseParams.filter.showDisabled;
 						}
 						this.store.reload();
 					},
@@ -113,8 +113,7 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					renderer: function(v) {
 						var result = '';
 						
-						for(var i = 0, method; method = v[i]; i++) {
-							console.log(method);
+						for(var i = 0, method; method = v[i]; i++) {							
 							result += '<i title="'+method.name+'" class="icon go-module-icon-'+method.id+'"></i> ';
 						}
 						return result;

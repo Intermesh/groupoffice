@@ -1,11 +1,24 @@
 go.Window = Ext.extend(Ext.Window, {
 	
-	constrainHeader : true,
+	constrainHeader : true,	
+	resizable : !GO.util.isMobileOrTablet(),
+	draggable: !GO.util.isMobileOrTablet(),
+	maximized: GO.util.isMobileOrTablet(),
 	
 	initComponent : function(){
 		
+		
 		if(this.animTarget) {
 			console.warn("animTarget on window causes wierd render issues");
+		}
+		
+		//make sure window fits screen
+		if(this.width && this.width > window.innerWidth) {
+			this.width = window.innerWidth - dp(32);
+		}		
+		if(this.height && this.height > window.innerHeight) {
+			this.height = window.innerHeight	- dp(32);
+
 		}
 		
 		go.Window.superclass.initComponent.call(this);
@@ -41,10 +54,10 @@ go.Window = Ext.extend(Ext.Window, {
   },
 		
 	autoSize : function(){
-		if(!this.maximized && GO.viewport){
+		if(!this.maximized){
 
-			var vpH=GO.viewport.getEl().getHeight();
-			var vpW=GO.viewport.getEl().getWidth();
+			var vpW = window.innerWidth;
+			var vpH = window.innerHeight;
 
 			if (this.getHeight() > vpH){
 				this.setHeight(vpH * .9);

@@ -1,3 +1,5 @@
+go.Modules.register("legacy", "favorites");
+
 GO.favorites.favoritesCalendarStore = new GO.data.JsonStore({
 	url: GO.url('favorites/favorites/calendarStore'),		
 	root: 'results',

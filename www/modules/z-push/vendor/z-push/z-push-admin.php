@@ -83,6 +83,9 @@ class ZPushAdminCLI {
     const COMMAND_RESYNCHIERARCHY = 11;
     const COMMAND_ADDSHARED = 12;
     const COMMAND_REMOVESHARED = 13;
+    const COMMAND_LISTALLSHARES = 14;
+    const COMMAND_LISTSTORESHARES = 15;
+    const COMMAND_LISTFOLDERSHARES = 16;
 
     const TYPE_OPTION_EMAIL = "email";
     const TYPE_OPTION_CALENDAR = "calendar";
@@ -114,7 +117,7 @@ class ZPushAdminCLI {
      */
     static public function UsageInstructions() {
         return  "Usage:\n\tz-push-admin.php -a ACTION [options]\n\n" .
-                "Parameters:\n\t-a list/lastsync/wipe/remove/resync/clearloop/fixstates/addshared\n\t[-u] username\n\t[-d] deviceid\n" .
+                "Parameters:\n\t-a list/lastsync/wipe/remove/resync/clearloop/fixstates/addshared/removeshared/listshares\n\t[-u] username\n\t[-d] deviceid\n" .
                 "\t[-t] type\tthe following types are available: '".self::TYPE_OPTION_EMAIL."', '".self::TYPE_OPTION_CALENDAR."', '".self::TYPE_OPTION_CONTACT."', '".self::TYPE_OPTION_TASK."', '".self::TYPE_OPTION_NOTE."', '".self::TYPE_OPTION_HIERARCHY."' of '".self::TYPE_OPTION_GAB."' (for KOE) or a folder id.\n" .
                 "\t[--shared|-s]\tshow detailed information about shared folders of a user in list.\n".
                 "\t[--days-old] n\tshow or remove profiles older than n days with lastsync or remove. n must be a positive integer.\n\n".
@@ -150,6 +153,12 @@ class ZPushAdminCLI {
                         "\t\t\t\t\t\t Removes a shared folder for a user.\n" .
                         "\t\t\t\t\t\t USER is required. If no DEVICE is given, the shared folder will be removed from all of the devices of the user.\n" .
                         "\t\t\t\t\t\t FOLDERID is the id of shared folder.\n" .
+                "\tlistshares -o STORE -f FOLDERID\n".
+                        "\t\t\t\t\t\t Lists opened shared folders and who opened them on which device.\n" .
+                        "\t\t\t\t\t\t STORE and FOLDERID are optional. If they're not provided then the script will display all open shares.\n" .
+                        "\t\t\t\t\t\t STORE - whose shared folders to list, e.g. \"SYSTEM\" (for public folders) or a username.\n" .
+                        "\t\t\t\t\t\t FOLDERID - list who opened the shared folder.\n" .
+                        "\t\t\t\t\t\t If both STORE and FOLDERID are provided the script will only list who opened the folder ignoring the STORE parameter.\n" .
                 "\n";
     }
 
@@ -391,6 +400,17 @@ class ZPushAdminCLI {
                 self::$command = self::COMMAND_REMOVESHARED;
                 break;
 
+            case "listshares":
+                if (self::$store === false && self::$device === false)
+                    self::$command = self::COMMAND_LISTALLSHARES;
+
+                if (self::$store !== false)
+                    self::$command = self::COMMAND_LISTSTORESHARES;
+
+                if (self::$folderid !== false)
+                    self::$command = self::COMMAND_LISTFOLDERSHARES;
+                break;
+
             case "help":
                 break;
 
@@ -513,6 +533,12 @@ class ZPushAdminCLI {
 
             case self::COMMAND_REMOVESHARED:
                 self::CommandRemoveShared();
+                break;
+
+            case self::COMMAND_LISTALLSHARES:
+            case self::COMMAND_LISTSTORESHARES:
+            case self::COMMAND_LISTFOLDERSHARES:
+                self::CommandListShares();
                 break;
         }
         echo "\n";
@@ -822,6 +848,71 @@ class ZPushAdminCLI {
             }
         }
 
+    }
+
+    /**
+     * Command to list all configured shares.
+     *
+     * @access public
+     * @return void
+     */
+    static public function CommandListShares() {
+        $devicelist = ZPushAdmin::ListDevices();
+        if (empty($devicelist)) {
+                echo "\tno devices/users found\n";
+                return true;
+        }
+        $shares = array();
+        $folderToStore = array();
+
+        // It's necessary to always get all users and devices and then the shares of the device
+        // as the shares are only available in the device.
+        foreach ($devicelist as $deviceId) {
+            $users = ZPushAdmin::ListUsers($deviceId);
+            foreach ($users as $user) {
+                $device = ZPushAdmin::GetDeviceDetails($deviceId, $user);
+                if ($device instanceof ASDevice) {
+                    $sharedFolders = $device->GetAdditionalFolders();
+                    if (!empty($sharedFolders)) {
+                        foreach ($sharedFolders as $sharedFolder) {
+                            if (!isset($sharedFolder['store'], $sharedFolder['folderid'], $sharedFolder['name'])) {
+                                printf("User '%s' has a shared folder configured on device '%s', but store, folderid, or name of this share are not set: %s", $user, $deviceId, print_r($sharedFolder, 1));
+                                continue;
+                            }
+                            $folderToStore[$sharedFolder['folderid']] = strtolower($sharedFolder['store']);
+                            $shares[strtolower($sharedFolder['store'])][$sharedFolder['folderid']][] = array('user' => $user, 'deviceId' => $deviceId, 'name' => $sharedFolder['name']);
+                        }
+                    }
+                }
+            }
+        }
+
+
+        if (empty($shares)) {
+            print("There currently aren't any opened shares.\n");
+            return;
+        }
+
+        if (self::$command == self::COMMAND_LISTFOLDERSHARES) {
+            if (!isset($folderToStore[self::$folderid])) {
+                printf("The folder with the requested id '%s' isn't currently opened by anyone.\n", self::$folderid);
+                return;
+            }
+            printf("Displaying opened shares for folderid %s.\n", self::$folderid);
+            self::printShares(array($folderToStore[self::$folderid] => array(self::$folderid => $shares[$folderToStore[self::$folderid]][self::$folderid])));
+        }
+        elseif (self::$command == self::COMMAND_LISTSTORESHARES) {
+            $store = strtolower(self::$store);
+            if (!isset($shares[$store])) {
+                printf("None of the folders of the requested store '%s' is currently opened.\n", self::$store);
+                return;
+            }
+            self::printShares(array($store => $shares[$store]));
+        }
+        else {
+            print("Displaying opened shares of all users.\n");
+            self::printShares($shares);
+        }
     }
 
     /**
@@ -1265,5 +1356,31 @@ class ZPushAdminCLI {
             print("There are some messages which need attention because they could not be synchronized. Run z-push-admin without -s or --shared.\n");
         }
 
+    }
+
+    /**
+     * Prints information about opened shares.
+     *
+     * @param array $shares
+     *
+     * @access private
+     * @return void
+     */
+    static private function printShares($shares) {
+        $dashes = str_repeat('-', 145);
+        foreach ($shares as $user => $userShares) {
+            printf("Shares of user %s\n\n", $user);
+
+            printf("%s\n%-30s %-48s %-30s Device id\n%s", $dashes, "Foldername", "Folder id", "Username", $dashes);
+            foreach ($userShares as $folderid => $folderShares) {
+                foreach ($folderShares as $share) {
+                    if (strlen($share['name']) > 26) {
+                       $share['name'] = substr($share['name'], 0, 26) . '...';
+                    }
+                    printf("\n%-30s %-48s %-30s %-10s", $share['name'], $folderid, $share['user'], $share['deviceId']);
+                }
+            }
+            printf("\n%s\n\n", $dashes);
+        }
     }
 }

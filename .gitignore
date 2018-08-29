@@ -9,6 +9,7 @@
 /config.ini
 /www/config.ini
 /www/promodules
+/www/duurzaamgebouw
 /tests/data
 /www/go/modules/*
 !/www/go/modules/community

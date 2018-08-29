@@ -349,8 +349,10 @@ abstract class AbstractCustomFieldsRecord extends \GO\Base\Db\ActiveRecord{
 	 */
 	public function getAttributeByName($categoryName, $fieldName, $outputType='raw'){
 
+		$extendsModel = $this->extendsModel();
+		$entityId = $extendsModel::getType()->getId();
 		$category = Category::model()->findSingleByAttributes(array(
-				'extendsModel'=>$this->extendsModel(),
+				'entityId'=>$entityId,
 				'name'=>$categoryName
 		));
 		

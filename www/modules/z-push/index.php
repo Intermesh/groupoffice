@@ -1,5 +1,5 @@
 <?php
-define("ZPUSH_VERSION", "2.4.2");
+define("ZPUSH_VERSION", "2.4.4");
 define("ZPUSH_DIR", __DIR__ . "/vendor/z-push/");
 
 require(ZPUSH_DIR . 'vendor/autoload.php');

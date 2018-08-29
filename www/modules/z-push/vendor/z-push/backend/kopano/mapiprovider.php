@@ -288,10 +288,14 @@ class MAPIProvider {
 
             //set attendee's status and type if they're available and if we are the organizer
             $storeprops = $this->GetStoreProps();
-            if (isset($row[PR_RECIPIENT_TRACKSTATUS]) && isset($messageprops[$appointmentprops["representingentryid"]]) && $messageprops[$appointmentprops["representingentryid"]] == $storeprops[PR_MAILBOX_OWNER_ENTRYID])
+            if (isset($row[PR_RECIPIENT_TRACKSTATUS], $messageprops[$appointmentprops["representingentryid"]], $storeprops[PR_MAILBOX_OWNER_ENTRYID]) &&
+                    $messageprops[$appointmentprops["representingentryid"]] == $storeprops[PR_MAILBOX_OWNER_ENTRYID]) {
+
                 $attendee->attendeestatus = $row[PR_RECIPIENT_TRACKSTATUS];
-            if (isset($row[PR_RECIPIENT_TYPE]))
+            }
+            if (isset($row[PR_RECIPIENT_TYPE])) {
                 $attendee->attendeetype = $row[PR_RECIPIENT_TYPE];
+            }
             // Some attendees have no email or name (eg resources), and if you
             // don't send one of those fields, the phone will give an error ... so
             // we don't send it in that case.
@@ -1315,9 +1319,6 @@ class MAPIProvider {
         //appointment specific properties to be set
         $props = array();
 
-        //we also have to set the responsestatus and not only meetingstatus, so we use another mapi tag
-        $props[$appointmentprops["responsestatus"]] = (isset($appointment->responsestatus)) ? $appointment->responsestatus : olResponseNone;
-
         //sensitivity is not enough to mark an appointment as private, so we use another mapi tag
         $private = (isset($appointment->sensitivity) && $appointment->sensitivity >= SENSITIVITY_PRIVATE) ? true : false;
 
@@ -1383,19 +1384,18 @@ class MAPIProvider {
             if(isset($appointment->exceptions)) {
                 foreach($appointment->exceptions as $exception) {
                     // we always need the base date
-                    if(!isset($exception->exceptionstarttime))
+                    if(!isset($exception->exceptionstarttime)) {
                         continue;
+                    }
 
+                    $basedate = $this->getDayStartOfTimestamp($exception->exceptionstarttime);
                     if(isset($exception->deleted) && $exception->deleted) {
+                        $noexceptions = false;
                         // Delete exception
-                        if(!isset($recur["deleted_occurences"]))
-                            $recur["deleted_occurences"] = array();
-
-                        array_push($recur["deleted_occurences"], $this->getDayStartOfTimestamp($this->getLocaltimeByTZ($exception->exceptionstarttime, $tz)));
+                        $recurrence->createException(array(), $basedate, true);
                     }
                     else {
                         // Change exception
-                        $basedate = $this->getDayStartOfTimestamp($exception->exceptionstarttime);
                         $mapiexception = array("basedate" => $basedate);
                         //other exception properties which are not handled in recurrence
                         $exceptionprops = array();
@@ -1462,7 +1462,7 @@ class MAPIProvider {
 
         //always set the PR_SENT_REPRESENTING_* props so that the attendee status update also works with the webaccess
         $p = array( $appointmentprops["representingentryid"], $appointmentprops["representingname"], $appointmentprops["sentrepresentingaddt"],
-                    $appointmentprops["sentrepresentingemail"], $appointmentprops["sentrepresentinsrchk"]);
+                    $appointmentprops["sentrepresentingemail"], $appointmentprops["sentrepresentinsrchk"], $appointmentprops["responsestatus"]);
         $representingprops = $this->getProps($mapimessage, $p);
 
         if (!isset($representingprops[$appointmentprops["representingentryid"]])) {
@@ -1484,6 +1484,16 @@ class MAPIProvider {
                 $props[$appointmentprops["mrwassent"]] = true;
                 $props[$appointmentprops["responsestatus"]] = olResponseOrganized;
                 $props[$appointmentprops["meetingstatus"]] = olMeeting;
+            }
+        }
+        //we also have to set the responsestatus and not only meetingstatus, so we use another mapi tag
+        if (!isset($props[$appointmentprops["responsestatus"]])) {
+            if (isset($appointment->responsetype)) {
+                $props[$appointmentprops["responsestatus"]] = $appointment->responsetype;
+            }
+            // only set responsestatus to none if it is not set on the server
+            elseif (!isset($representingprops[$appointmentprops["responsestatus"]])) {
+                $props[$appointmentprops["responsestatus"]] = olResponseNone;
             }
         }
 
@@ -1520,6 +1530,7 @@ class MAPIProvider {
                     $recip[PR_ENTRYID] = $userinfo[0][PR_ENTRYID];
                     $recip[PR_RECIPIENT_TYPE] = isset($attendee->attendeetype) ? $attendee->attendeetype : MAPI_TO;
                     $recip[PR_RECIPIENT_FLAGS] = recipSendable;
+                    $recip[PR_RECIPIENT_TRACKSTATUS] = isset($attendee->attendeestatus) ? $attendee->attendeestatus : olResponseNone;
                 }
                 else {
                     $recip[PR_DISPLAY_NAME] = u2w($attendee->name);

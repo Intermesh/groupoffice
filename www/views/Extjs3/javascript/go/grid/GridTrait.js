@@ -4,6 +4,8 @@ go.grid.GridTrait = {
 	 */
 	scrollBoundary: 300,
 	
+	pageSize: 20,
+	
 	initGridTrait : function() {
 		if (!this.keys)
 		{
@@ -14,6 +16,17 @@ go.grid.GridTrait = {
 		this.initNav();
 		
 		this.on("bodyscroll", this.loadMore, this, {buffer: 100});
+		
+		this.store.baseParams.limit = this.pageSize;
+		
+		this.store.on("load", function(store, records, o){
+				//if(o.paging) {
+				this.allRecordsLoaded = !records.length;
+				//} 
+					
+				this.loadMore();
+			
+			}, this);
 	},
 	
 	//The navigate can be used in modules to track row selections for navigation.
@@ -86,6 +99,7 @@ go.grid.GridTrait = {
 		}, this);
 	},
 
+	allRecordsLoaded : false,
 	/**
 	 * Loads more data if the end off the scroll area is reached
 	 * @returns {undefined}
@@ -93,32 +107,26 @@ go.grid.GridTrait = {
 	loadMore: function () {
 		var store = this.getStore();
 
-		if (store.getCount() == store.getTotalCount()) {
+		if (this.allRecordsLoaded){
 			return;
 		}
 
-		store.lastOptions.params = store.lastOptions.params || {};
 
-		var limit = store.lastOptions.params.limit || store.getCount(),
-						pos = store.lastOptions.params.position || 0,
-						scroller = this.getView().scroller.dom,
+		var	scroller = this.getView().scroller.dom,
 						body = this.getView().mainBody.dom;
 
+		if (scroller.offsetHeight >= body.offsetHeight || (scroller.offsetHeight + scroller.scrollTop + this.scrollBoundary) >= body.offsetHeight) {
 
-		if ((scroller.offsetHeight + scroller.scrollTop + this.scrollBoundary) >= body.offsetHeight) {
-
-			var p = Ext.apply(store.lastOptions, {
-				add: true,
-				params: {
-					limit: limit,
-					position: pos + limit
-				}
-			});
-			store.load(p);
+			var o = GO.util.clone(store.lastOptions);
+			o.add = true;
+			o.params = o.params || {};
 			
-			//this will make sorting request the first page again
-			store.lastOptions.params.position = 0;
-			store.lastOptions.add = false;
+			o.params.position = o.params.position || 0;
+			o.params.position += this.pageSize;
+			o.paging = true;
+			
+			store.load(o);
+			
 		}
 	}
 }

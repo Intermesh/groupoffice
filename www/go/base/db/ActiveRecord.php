@@ -1289,95 +1289,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$joinRelationSelectFields='';
 		$joinRelationjoins='';
 		if(!empty($params['joinRelations'])){
-			/*
-			 * Relational attributes are fetch as relationname@attribute or
-			 *
-			 * relation1@relation2@attribute.
-			 *
-			 * In the ActiveRecord constructor these attributes are filtered into a relatedCache array.
-			 *
-			 * example query with joinRelation('order.book') on a \GO\Billing\Model\Item:
-			 *
-			 * SELECT `t`.`id`, `t`.`order_id`, `t`.`product_id`, `t`.`unit_cost`, `t`.`unit_price`, `t`.`unit_list`, `t`.`unit_total`, `t`.`amount`, `t`.`vat`, `t`.`discount`, `t`.`sort_order`, `t`.`cost_code`, `t`.`markup`, `t`.`order_at_supplier`, `t`.`order_at_supplier_company_id`, `t`.`amount_delivered`, `t`.`unit`, `t`.`item_group_id`, `t`.`extra_cost_status_id` ,
-`order`.`id` AS `order@id`,
-`order`.`project_id` AS `order@project_id`,
-`order`.`status_id` AS `order@status_id`,
-`order`.`book_id` AS `order@book_id`,
-`order`.`language_id` AS `order@language_id`,
-`order`.`user_id` AS `order@user_id`,
-`order`.`order_id` AS `order@order_id`,
-`order`.`po_id` AS `order@po_id`,
-`order`.`company_id` AS `order@company_id`,
-`order`.`contact_id` AS `order@contact_id`,
-`order`.`ctime` AS `order@ctime`,
-`order`.`mtime` AS `order@mtime`,
-`order`.`btime` AS `order@btime`,
-`order`.`ptime` AS `order@ptime`,
-`order`.`costs` AS `order@costs`,
-`order`.`subtotal` AS `order@subtotal`,
-`order`.`vat` AS `order@vat`,
-`order`.`total` AS `order@total`,
-`order`.`authcode` AS `order@authcode`,
-`order`.`frontpage_text` AS `order@frontpage_text`,
-`order`.`customer_name` AS `order@customer_name`,
-`order`.`customer_to` AS `order@customer_to`,
-`order`.`customer_salutation` AS `order@customer_salutation`,
-`order`.`customer_contact_name` AS `order@customer_contact_name`,
-`order`.`customer_address` AS `order@customer_address`,
-`order`.`customer_address_no` AS `order@customer_address_no`,
-`order`.`customer_zip` AS `order@customer_zip`,
-`order`.`customer_city` AS `order@customer_city`,
-`order`.`customer_state` AS `order@customer_state`,
-`order`.`customer_country` AS `order@customer_country`,
-`order`.`customer_vat_no` AS `order@customer_vat_no`,
-`order`.`customer_crn` AS `order@customer_crn`,
-`order`.`customer_email` AS `order@customer_email`,
-`order`.`customer_extra` AS `order@customer_extra`,
-`order`.`webshop_id` AS `order@webshop_id`,
-`order`.`recur_type` AS `order@recur_type`,
-`order`.`payment_method` AS `order@payment_method`,
-`order`.`recurred_order_id` AS `order@recurred_order_id`,
-`order`.`reference` AS `order@reference`,
-`order`.`order_bonus_points` AS `order@order_bonus_points`,
-`order`.`pagebreak` AS `order@pagebreak`,
-`order`.`files_folder_id` AS `order@files_folder_id`,
-`order`.`cost_code` AS `order@cost_code`,
-`order`.`for_warehouse` AS `order@for_warehouse`,
-`order`.`dtime` AS `order@dtime`,
-`book`.`id` AS `order@book@id`,
-`book`.`user_id` AS `order@book@user_id`,
-`book`.`name` AS `order@book@name`,
-`book`.`acl_id` AS `order@book@acl_id`,
-`book`.`order_id_prefix` AS `order@book@order_id_prefix`,
-`book`.`show_statuses` AS `order@book@show_statuses`,
-`book`.`next_id` AS `order@book@next_id`,
-`book`.`default_vat` AS `order@book@default_vat`,
-`book`.`currency` AS `order@book@currency`,
-`book`.`order_csv_template` AS `order@book@order_csv_template`,
-`book`.`item_csv_template` AS `order@book@item_csv_template`,
-`book`.`country` AS `order@book@country`,
-`book`.`bcc` AS `order@book@bcc`,
-`book`.`call_after_days` AS `order@book@call_after_days`,
-`book`.`sender_email` AS `order@book@sender_email`,
-`book`.`sender_name` AS `order@book@sender_name`,
-`book`.`is_purchase_orders_book` AS `order@book@is_purchase_orders_book`,
-`book`.`backorder_status_id` AS `order@book@backorder_status_id`,
-`book`.`delivered_status_id` AS `order@book@delivered_status_id`,
-`book`.`reversal_status_id` AS `order@book@reversal_status_id`,
-`book`.`addressbook_id` AS `order@book@addressbook_id`,
-`book`.`files_folder_id` AS `order@book@files_folder_id`,
-`book`.`import_status_id` AS `order@book@import_status_id`,
-`book`.`import_notify_customer` AS `order@book@import_notify_customer`,
-`book`.`import_duplicate_to_book` AS `order@book@import_duplicate_to_book`,
-`book`.`import_duplicate_status_id` AS `order@book@import_duplicate_status_id`
-FROM `bs_items` t
-INNER JOIN `bs_orders` `order` ON (`order`.`id`=`t`.`order_id`)
-INNER JOIN `bs_books` `book` ON (`book`.`id`=`order`.`book_id`)
-WHERE 1
-AND `t`.`product_id` = "426" AND `order`.`btime` < "1369143782" AND `order`.`btime` > "0"
-ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
-			 *
-			 */
 
 			foreach($params['joinRelations'] as $joinRelation){
 
@@ -1439,9 +1350,6 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 			}
 		}
 
-
-
-
 		$joinCf = !empty($params['joinCustomFields']) && $this->customfieldsModel() && GO::modules()->customfields && GO::modules()->customfields->permissionLevel;
 
 		if($joinCf){
@@ -1483,44 +1391,13 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 		if(isset($params['join']))
 			$joins .= "\n".$params['join'];
 
-
-
-		//testing with subquery
-//		if($this->aclField() && empty($params['ignoreAcl'])){
-//			//quick and dirty way to use and in next sql build blocks
-//			$sql .= "\nWHERE ";
-//
-//			$sql .= "\nEXISTS (SELECT level FROM core_acl_group WHERE `".$aclJoin['table']."`.`".$aclJoin['aclField']."` = core_acl_group.acl_id";
-//			if(isset($params['permissionLevel']) && $params['permissionLevel']>\GO\Base\Model\Acl::READ_PERMISSION){
-//				$sql .= " AND core_acl_group.level>=".intval($params['permissionLevel']);
-//			}
-//
-//			$groupIds = \GO\Base\Model\User::getGroupIds($params['userId']);
-//
-//			if(!empty($params['ignoreAdminGroup'])){
-//				$key = array_search(GO::config()->group_root, $groupIds);
-//				if($key!==false)
-//					unset($groupIds[$key]);
-//			}
-//
-//
-//			$sql .= " AND (core_acl_group.user_id=".intval($params['userId'])." OR core_acl_group.group_id IN (".implode(',',$groupIds)."))) ";
-//		}else
-//		{
 			$where = "\nWHERE 1 ";
-//		}
-
-
-
 
 		if(isset($params['criteriaObject'])){
 			$conditionSql = $params['criteriaObject']->getCondition();
 			if(!empty($conditionSql))
 				$where .= "\nAND".$conditionSql;
 		}
-
-//		if(!empty($params['criteriaSql']))
-//			$sql .= $params['criteriaSql'];
 
 		$where = self::_appendByParamsToSQL($where, $params);
 
@@ -1626,11 +1503,16 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 				if($i>0)
 					$order .= ',';
 
-				$order .= $this->_quoteColumnName($params['order'][$i]).' ';
-				if(isset($params['orderDirection'][$i])){
-					$order .= strtoupper($params['orderDirection'][$i])=='ASC' ? 'ASC ' : 'DESC ';
-				}else{
-					$order .= strtoupper($params['orderDirection'][0])=='ASC' ? 'ASC ' : 'DESC ';
+				if ($params['order'][$i] instanceof \go\core\db\Expression) {
+				//if(strpos($params['order'][$i], '(')!==false) {
+					$order .= $params['order'][$i].' ';
+				} else {
+					$order .= $this->_quoteColumnName($params['order'][$i]).' ';
+					if(isset($params['orderDirection'][$i])){
+						$order .= strtoupper($params['orderDirection'][$i])=='ASC' ? 'ASC ' : 'DESC ';
+					}else{
+						$order .= strtoupper($params['orderDirection'][0])=='ASC' ? 'ASC ' : 'DESC ';
+					}
 				}
 			}
 		}

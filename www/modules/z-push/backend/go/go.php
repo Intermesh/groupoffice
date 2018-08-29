@@ -105,16 +105,33 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 		
 		
 		ZLog::Write(LOGLEVEL_INFO, 'ZPUSH2::Logon(GO version: ' . \GO::config()->version . ', backend version: ' . BackendGoConfig::GOBACKENDVERSION . ', user: ' . $username . ', domain: ' . $domain . ')');
-
-//		if(!empty($domain)){
-//			$username .= '@'.$domain;
-//			ZLog::Write(LOGLEVEL_INFO, 'Domain is given, added it to the username. New full username is: '.$username);
-//		}
-
+		
+		
 		try {
 
 			//attempt login using security class inherited from index.php
-			$user = \GO::session()->login($username, $password, false);
+			
+			$user = \go\modules\core\users\model\User::find()->where(['username' => $username])->single();
+			/* @var $user User */
+
+			if(!$user || !$user->enabled) {
+				return false;
+			}
+
+			if(!$user->checkPassword($password)) {
+				return false;
+			}
+			
+			if(!GO::modules()->sync) {
+				ZLog::Write(LOGLEVEL_INFO, 'User '. $user->username .' logged on but has no access to the sync module');
+				return false;
+			}
+
+			$state = new go\core\auth\TemporaryState();
+			$state->setUser($user);		
+			\GO()->setAuthState($state);		
+
+			$this->oldLogin($user);		
 
 			if (!$user) {
 				ZLog::Write(LOGLEVEL_INFO, 'ZPUSH2::ERROR::Username and/or password incorrect.');
@@ -122,11 +139,6 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 				return false;
 			} else {
 				
-				if(!GO\Professional\License::userHasModule(GO::user()->username, 'sync')){
-					ZLog::Write(LOGLEVEL_INFO, 'The user "'.GO::user()->username.'" is not licensed to use sync.');
-					return false;
-				}
-
 				if (\GO::modules()->isInstalled("zpushadmin")) {
 					ZLog::Write(LOGLEVEL_INFO, 'The zpushadmin module is installed, checking access for device.');
 
@@ -160,6 +172,19 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 		}
 		return true;
 	}
+	
+	
+		/**
+	 * for old framework to work in GO::session()
+	 * 
+	 * @param \GO\Dav\Auth\User $user
+	 */
+	private function oldLogin(\go\modules\core\users\model\User $user) {
+		if(!defined('GO_NO_SESSION')) {
+			define("GO_NO_SESSION", true);
+		}
+		$_SESSION['GO_SESSION'] = ['user_id' => $user->id];
+	}
 
 	/**
 	 * Logout from Group-Office
@@ -168,7 +193,6 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 		foreach ($this->backends as $i => $b) {
 			$b->Logoff();
 		}
-		\GO::session()->logout();
 	}
 
 	/**

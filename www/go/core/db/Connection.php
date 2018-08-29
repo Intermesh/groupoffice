@@ -382,11 +382,15 @@ class Connection {
 	 * @throws PDOException
 	 */
 	private function createStatement($build) {
-	
 		if(isset($build['debug'])) {
 			App::get()->debug($build['debug'], Debugger::TYPE_SQL);
 		}
-		
+
+//		Code is useful to find where a query was made.
+//		if(strpos($debugQueryString, "SELECT t.userId, t.secret, t.createdAt, t.userId AS `t.userId") === 0 ) {
+//			GO()->getDebugger()->debugCalledFrom();
+//		}
+
 		$stmt = $this->getPDO()->prepare($build['sql']);
 
 		foreach ($build['params'] as $p) {
