@@ -99,6 +99,12 @@ go.Jmap = {
 	 */
 	sse : function() {
 		if (!window.EventSource) {
+			console.debug("Browser doesn't support EventSource");
+			return false;
+		}
+		
+		if(!go.User.eventSourceUrl) {
+			console.debug("Not starting EventSource when xdebug is running");
 			return false;
 		}
 		
