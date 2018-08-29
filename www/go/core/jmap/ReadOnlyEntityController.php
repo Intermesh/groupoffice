@@ -329,7 +329,7 @@ abstract class ReadOnlyEntityController extends Controller {
 			$result['list'][] = $e->toArray(); 
 			$foundIds[] = $e->getId();
 		}
-		$result['found'] = $foundIds;
+//		$result['found'] = $foundIds;
 		if(isset($p['ids'])) {
 			$result['notFound'] = array_values(array_diff($p['ids'], $foundIds));			
 		}
