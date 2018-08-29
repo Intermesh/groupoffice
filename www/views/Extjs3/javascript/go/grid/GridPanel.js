@@ -6,8 +6,7 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 	scrollBoundary: 300,
 	
 	pageSize: 10,
-	pagePosition : 0,
-
+	
 	initComponent: function () {
 		go.grid.GridPanel.superclass.initComponent.call(this);
 
@@ -19,8 +18,14 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 		this.initDeleteKey();		
 
 		this.on("bodyscroll", this.loadMore, this, {buffer: 100});
-
+		
 		this.store.baseParams.limit = this.pageSize;
+		
+		this.store.on("load", function(store, records, o){
+				if(o.paging) {
+					this.allRecordsLoaded = !records.length;
+				}
+			}, this);
 	},
 	
 	initDeleteKey : function() {
@@ -66,6 +71,7 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 		}, this);
 	},
 
+	allRecordsLoaded : false,
 	/**
 	 * Loads more data if the end off the scroll area is reached
 	 * @returns {undefined}
@@ -73,7 +79,7 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 	loadMore: function () {
 		var store = this.getStore();
 
-		if (store.getCount() == store.getTotalCount()) {
+		if (this.allRecordsLoaded || store.loading){
 			return;
 		}
 
@@ -90,8 +96,10 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 			
 			o.params.position = o.params.position || 0;
 			o.params.position += this.pageSize;
+			o.paging = true;
 			
-			store.load(o);			
+			store.load(o);
+			
 		}
 	}
 

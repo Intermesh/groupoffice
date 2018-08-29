@@ -31,7 +31,6 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 		var me = this;
 		
 		this.store = new go.data.Store({
-			remoteSort: false,
 			fields: [
 				'id', 
 				'username', 
@@ -43,7 +42,7 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 				{
 					name: 'selected', 
 					type: {
-						convert: function (v, data) {
+						convert: function (v, data) {							
 							return me.selectedUsers.indexOf(data.id) > -1;
 						}
 					},
@@ -52,14 +51,14 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 					}
 				}
 			],
-			listeners: {
-				scope: this,
-				load: this.onStoreLoad
-			},
 			baseParams: {
 				filter: {
 					selectForGroupId: null
 				}
+			},
+			sortInfo: {
+				field: 'displayName',
+				direction: 'ASC'
 			},
 			entityStore: go.Stores.get("User")
 		});
@@ -101,7 +100,7 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 			},
 			listeners: {
 				scope: this,
-				render: function() {
+				afterrender: function() {
 					this.store.load();
 				}
 			}
@@ -110,38 +109,13 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 //			stateId: 'users-grid'
 		});
 		
-		this.store.sort([{
-					field: 'selected',
-					direction: 'DESC'
-				},{
-					field: 'displayName',
-					direction: 'ASC'
-				}]);
+	
+		this.store.on("beforeload", this.onBeforeStoreLoad, this);
 
 		go.modules.core.groups.GroupUserGrid.superclass.initComponent.call(this);
 
 	},
-	
-//	load : function(id) {
-//		
-//		this.selectedUsers = [];
-//		go.Jmap.request({
-//			method: "User/query",
-//			params: {
-//				filter: {
-//					groupId: id
-//				}
-//			},
-//			callback: function(options, success, response) {
-//				this.selectedUsers = response.ids;
-//				
-////				this.store.baseParams.filter.groupId = id;
-//				this.store.load();
-//			},
-//			scope: this
-//		});
-//		
-//	},
+
 	
 	onCheckChange : function(record, newValue) {
 		if(newValue) {
@@ -175,25 +149,30 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 		groups.forEach(function(group) {
 			me.selectedUsers.push(group.userId);
 		});
-		
-		//Perhaps needed when store not reloaded?
-		//this.getView().render();
 	},
 	
-	onStoreLoad : function() {
-		
+	onBeforeStoreLoad : function(store, options) {
 		//don't add selected on search
-		if(this.store.baseParams.filter.q) {
-			return;
+		if(store.baseParams.filter.q || options.selectedLoaded) {
+			return true;
 		}
 		
-		go.Stores.get("User").get(this.selectedUsers, function(entities) {
-			this.store.suspendEvents(false); //to prevent ininiteloop as loadData fires 'load' event.
-			this.store.loadData({records: entities}, true);		
+		go.Stores.get("User").get(this.selectedUsers, function(entities) {			
+			this.store.loadData({records: entities}, true);
 			this.store.sortData();
-			this.store.resumeEvents();
+			this.store.load({
+				add: true,
+				selectedLoaded: true,
+				params: {filter: {exclude: this.selectedUsers}}
+			});
 		}, this);
+		
+		return false;
 	},
+	
+//	onStoreLoad : function() {
+//		this.store.sortData();
+//	},
 	
 	getValue: function () {				
 		var users = [];

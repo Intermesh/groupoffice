@@ -100,7 +100,7 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		}, this)
 		
 		if(this.entityStore) {
-			this.on('update', this.onUpdate, this);		
+//			this.on('update', this.onUpdate, this);		
 			this.entityStore.on('changes', this.onChanges, this);
 			this.on('destroy', function() {
 			this.entityStore.un('changes', this.onChanges, this);
@@ -184,66 +184,65 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		this.entityStore.get(ids, function (items) {
 			this.loadData(items);
 		}, this);
-	},
-	
-	onUpdate : function(store, record, operation) {
-		//debugger;
-		if(this.serverUpdate || this.loading) {
-			return;
-		}
-		
-		
-		if(operation != Ext.data.Record.COMMIT) {
-			return;
-		}
-		
-		var p = {};
-		
-		key = record.phantom ? 'create' : 'update';
-		p[key] = {};
-		p[key][record.id] = record.data;
-		
-		store.fields.each(function(field){
-			if(field.submit === false) {
-				delete record.data[field.name];
-			}
-		});
-		
-		this.entityStore.set(p, function (options, success, response) {
-			
-			var saved = (record.phantom ? response.created : response.updated) || {};
-			if (saved[record.id]) {
-
-				//update client id with server id
-				if(record.phantom) {
-//					record.id = record.data.id = response.created[record.id].id;
-//					console.log(record.id);
-//					record.phantom = false;
-						//remove phanto records as ext doesn't support changinhg record id.
-						this.remove(record);
-				}
-
-			} else
-			{
-				//something went wrong
-				var notSaved = (record.phantom ? response.notCreated : response.notUpdated) || {};
-				if (!notSaved[id]) {
-					notSaved[id] = {type: "unknown"};
-				}
-
-				switch (notSaved[id].type) {
-					case "forbidden":
-						Ext.MessageBox.alert(t("Access denied"), t("Sorry, you don't have permissions to update this item"));
-						break;
-
-					default:
-					
-						
-						Ext.MessageBox.alert(t("Error"), t("Sorry, something went wrong. Please try again."));
-						break;
-				}
-			}
-		}, this);
-		
 	}
+	
+//	onUpdate : function(store, record, operation) {
+//		//debugger;
+//		if(this.serverUpdate || this.loading) {
+//			return;
+//		}
+//	
+//		if(operation != Ext.data.Record.COMMIT) {
+//			return;
+//		}
+//		
+//		var p = {};
+//		
+//		key = record.phantom ? 'create' : 'update';
+//		p[key] = {};
+//		p[key][record.id] = record.data;
+//		
+//		store.fields.each(function(field){
+//			if(field.submit === false) {
+//				delete record.data[field.name];
+//			}
+//		});
+//		
+//		this.entityStore.set(p, function (options, success, response) {
+//			
+//			var saved = (record.phantom ? response.created : response.updated) || {};
+//			if (saved[record.id]) {
+//
+//				//update client id with server id
+//				if(record.phantom) {
+////					record.id = record.data.id = response.created[record.id].id;
+////					console.log(record.id);
+////					record.phantom = false;
+//						//remove phanto records as ext doesn't support changinhg record id.
+//						this.remove(record);
+//				}
+//
+//			} else
+//			{
+//				//something went wrong
+//				var notSaved = (record.phantom ? response.notCreated : response.notUpdated) || {};
+//				if (!notSaved[id]) {
+//					notSaved[id] = {type: "unknown"};
+//				}
+//
+//				switch (notSaved[id].type) {
+//					case "forbidden":
+//						Ext.MessageBox.alert(t("Access denied"), t("Sorry, you don't have permissions to update this item"));
+//						break;
+//
+//					default:
+//					
+//						
+//						Ext.MessageBox.alert(t("Error"), t("Sorry, something went wrong. Please try again."));
+//						break;
+//				}
+//			}
+//		}, this);
+//		
+//	}
 });
