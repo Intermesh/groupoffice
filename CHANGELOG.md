@@ -1,3 +1,4 @@
+- files: shared root folder will be seen when there parent is not accessible by the current user
 - users: the list filters disabled users by default.
 - users: searching while filtering will work together
 - favorites: will not be rendered when there is no permission.
@@ -8,7 +9,7 @@
 - sync: Require sync module access for activesync
 - projects: added natural sort to project name
 - core: added expression support to ActiveRecord order clause
-- adressbook: fixed advance search with custom fields
+- addressbook: fixed advance search with custom fields
 - core: fixed change password in user settings
 
 23-08-2018 6.3.34
