@@ -1,3 +1,4 @@
+- files: shared root folder will be seen when there parent is not accessible by the current user
 - users: the list filters disabled users by default.
 - users: searching while filtering will work together
 - favorites: will not be rendered when there is no permission.
