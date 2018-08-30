@@ -27,7 +27,9 @@ fclose($input);
 
 $blob = Blob::fromTmp($tmpFile);
 $blob->name = Request::get()->getHeader('X-File-Name');
-$blob->modified = Request::get()->getHeader('X-File-LastModifed');
+
+// Local modified at?
+$blob->modifiedAt = new \go\core\util\DateTime('@' . Request::get()->getHeader('X-File-LastModifed'));
 $blob->type = Request::get()->getContentType();
 if ($blob->save()) {
 	Response::get()->setStatus(201, 'Created');
@@ -38,4 +40,6 @@ if ($blob->save()) {
 	]);
 } else {
 	echo 'Could not save '.$blob->id;
+	
+	var_dump(GO()->getDebugger()->getEntries());
 }

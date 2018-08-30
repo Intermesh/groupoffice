@@ -195,7 +195,7 @@ class QueryBuilder {
 		return ['sql' => $sql, 'params' => $this->buildBindParameters, 'debug' => $this->debug ? $this->replaceBindParameters($sql, $this->buildBindParameters) : null];
 	}
 
-	public function buildDelete($tableName, Criteria $query) {
+	public function buildDelete($tableName, Query $query) {
 
 		$this->setTableName($tableName);
 		$this->reset();

@@ -6,8 +6,10 @@ use Exception;
 use go\core\App;
 use go\core\data\Model;
 use go\core\db\Column;
+use go\core\db\Criteria;
 use go\core\db\Query;
 use go\core\event\EventEmitterTrait;
+use go\core\fs\Blob;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
@@ -15,6 +17,7 @@ use go\core\validate\ValidationTrait;
 use PDO;
 use PDOException;
 use ReflectionClass;
+use function GO;
 
 /**
  * Property model
@@ -464,7 +467,7 @@ abstract class Property extends Model {
 			}
 			
 			if(!empty($table->getConstantValues())) {
-				$on = \go\core\db\Criteria::normalize($on)->andWhere($table->getConstantValues());
+				$on = Criteria::normalize($on)->andWhere($table->getConstantValues());
 			}
 			$query->join($table->getName(), $table->getAlias(), $on, "LEFT");
 			unset($on);
@@ -477,7 +480,7 @@ abstract class Property extends Model {
 	 * Only database columns and relations are tracked. Not the getters and setters.
 	 * 
 	 * @param array $properties If given only these properties will be checked for modifications.
-	 * @return array [newval, oldval]
+	 * @return array ["propName" => [newval, oldval]]
 	 */
 	public function getModified($properties = []) {
 
@@ -571,18 +574,70 @@ abstract class Property extends Model {
 		}
 		
 		$modified = $this->getModified();
-		
 		foreach ($this->getMapping()->getTables() as $table) {			
 			if (!$this->saveTable($table, $modified)) {				
 				return false;
 			}
 		}
+		
+		$this->checkBlobs();
 
 		if (!$this->saveRelatedProperties()) {
 			return false;
 		}
 
 		return true;
+	}
+	
+	/**
+	 * Get all columns containing blob id's
+	 * 
+	 * @return Column[]
+	 */
+	private function getBlobColumns() {
+		
+		$refs = Blob::getReferences();
+		$cols = [];
+		foreach($this->getMapping()->getTables() as $table) {
+			foreach($table->getMappedColumns() as $col) {
+				foreach($refs as $r) {
+					if($r['table'] == $table->getName() && $r['column'] == $col->name) {
+						$cols[] = $col;
+					}
+				}
+			}
+		}
+		
+		return $cols;
+	}
+	
+	private function checkBlobs() {
+		$blobs = [];
+		foreach($this->getBlobColumns() as $col) {
+			if($this->isDeleted) {
+				$blobId = $this->{$col->name};
+				
+				if(isset($blobId)) {
+					$blobs[] = $blobId;
+				}
+				
+			} else if($this->isModified([$col->name])) {				
+				
+				$mod = array_values($this->getModified([$col->name]))[0];
+				
+				if(isset($mod[0])) {
+					$blobs[] = $mod[0];
+				}
+				
+				if(isset($mod[1])) {
+					$blobs[] = $mod[1];
+				}
+			}
+		}
+		
+		foreach($blobs as $id) {
+			Blob::findById($id)->setStaleIfUnused();
+		}
 	}
 	
 	/**
@@ -904,6 +959,8 @@ abstract class Property extends Model {
 		
 		$this->isDeleted = true;
 		
+		$this->checkBlobs();
+		
 		return true;
 	}
 
@@ -925,9 +982,20 @@ abstract class Property extends Model {
 				//only one error per column
 				continue;
 			}
+			
+			if(empty($this->$colName)) {
+				continue;
+			}
+			
+			if(!is_scalar($this->$colName) && (!is_object($this->$colName) || method_exists($this->$colName, '__toString'))) {
+				$this->setValidationError($colName, ErrorCode::MALFORMED, "Non scalar value given");
+				continue;
+			}
 
-			if (!empty($column->length) && !empty($this->$colName) && StringUtil::length($this->$colName) > $column->length) {
-				$this->setValidationError($colName, ErrorCode::MALFORMED, 'Length can\'t be greater than ' . $column->length);
+			if (!empty($column->length)){				
+				if(StringUtil::length($this->$colName) > $column->length) {
+					$this->setValidationError($colName, ErrorCode::MALFORMED, 'Length can\'t be greater than ' . $column->length);
+				}
 			}
 		}
 	}

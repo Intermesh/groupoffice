@@ -251,6 +251,13 @@ class Debugger {
 	}
 	
 	/**
+	 * Print all entries
+	 */
+	public function printEntries() {
+		echo implode("\n", $this->entries);
+	}
+	
+	/**
 	 * Returns the type of a given variable.
 	 * 
 	 * @param mixed $var

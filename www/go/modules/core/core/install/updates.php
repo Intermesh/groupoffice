@@ -241,3 +241,4 @@ ADD PRIMARY KEY (`id`);";
 $updates['201808241650'][] = "ALTER TABLE `core_blob` ADD `modifiedAt` DATETIME NULL DEFAULT NULL AFTER `createdAt`, ADD `staleAt` DATETIME NULL DEFAULT NULL AFTER `modifiedAt`;";
 $updates['201808241650'][] = "ALTER TABLE `core_blob` ADD INDEX(`staleAt`);
 UPDATE `core_blob` set modifiedAt = from_unixtime(modified)";
+$updates['201808241650'][] = "ALTER TABLE `core_blob` DROP `modified`";

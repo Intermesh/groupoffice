@@ -639,7 +639,6 @@ CREATE TABLE IF NOT EXISTS `core_blob` (
   `id` binary(40) NOT NULL,
   `type` varchar(129) COLLATE utf8mb4_unicode_ci NOT NULL,
   `size` bigint(20) NOT NULL DEFAULT 0,
-  `modified` int(11) NOT NULL,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `createdAt` datetime NOT NULL,
   `modifiedAt` datetime DEFAULT NULL,
