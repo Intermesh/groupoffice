@@ -114,10 +114,14 @@ class Language extends Singleton {
 			if ($file->exists()) {
 				$langData = array_merge($langData, require($file));
 			}
+			
+			if(!is_array($langData)){
+				throw new \Exception("Invalid language file encounted for module " . $package .'/'. $module.'. Language: '. $this->isoCode);
+			};
 
-            foreach ($langData as $key => $translation) {
-                $langData[$key] = str_replace('{product_name}', \GO::config()->product_name, $translation);
-            }
+			foreach ($langData as $key => $translation) {
+					$langData[$key] = str_replace('{product_name}', \GO::config()->product_name, $translation);
+			}
 
 			$this->data[$package][$module] = $langData;			
 		}
