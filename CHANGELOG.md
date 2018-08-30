@@ -1,3 +1,6 @@
+30-08-2018 6.3.36
+- Fixed loading error in group edit dialog
+
 30-08-2018 6.3.35
 - addressbook: fixed merge dialog
 - files: shared root folder will be seen when there parent is not accessible by the current user
