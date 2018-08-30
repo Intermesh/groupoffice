@@ -1,3 +1,4 @@
+30-08-2018 6.3.35
 - addressbook: fixed merge dialog
 - files: shared root folder will be seen when there parent is not accessible by the current user
 - users: the list filters disabled users by default.
