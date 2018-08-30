@@ -14,7 +14,7 @@ https://github.com/Intermesh/docker-groupoffice-development
 
 ## Manual from source
 
-1. clone this repository
+1. Clone this repository
 2. Change into the "www" directory.
 3. run: 
    ```
