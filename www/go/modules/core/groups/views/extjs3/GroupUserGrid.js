@@ -152,8 +152,8 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 	},
 	
 	onBeforeStoreLoad : function(store, options) {
-		//don't add selected on search
-		if(store.baseParams.filter.q || options.selectedLoaded) {
+		//don't add selected on search, or when they are already loaded or when gridpanel is trying to fill the page.
+		if(store.baseParams.filter.q || options.selectedLoaded || options.paging) {
 			return true;
 		}
 		
