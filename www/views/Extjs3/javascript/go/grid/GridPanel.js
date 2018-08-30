@@ -17,18 +17,17 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 	
 		this.initDeleteKey();		
 
-		this.on("bodyscroll", this.loadMore, this, {buffer: 100});
-		
-		this.store.baseParams.limit = this.pageSize;
-		
-		this.store.on("load", function(store, records, o){
-				//if(o.paging) {
-				this.allRecordsLoaded = !records.length;
-				//} 
-					
-				this.loadMore();
-			
-			}, this);
+		//setup auto load more for go.data.Store's only
+		if(this.store instanceof go.data.Store) {
+			this.on("bodyscroll", this.loadMore, this, {buffer: 100});
+
+			this.store.baseParams.limit = this.pageSize;
+
+			this.store.on("load", function(store, records, o){
+					this.allRecordsLoaded = !records.length;
+					this.loadMore();
+				}, this);
+		}
 	},
 	
 	initDeleteKey : function() {
@@ -92,7 +91,7 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 
 		if (scroller.offsetHeight >= body.offsetHeight || (scroller.offsetHeight + scroller.scrollTop + this.scrollBoundary) >= body.offsetHeight) {
 
-			var o = GO.util.clone(store.lastOptions);
+			var o = store.lastOptions ? GO.util.clone(store.lastOptions) : {};
 			o.add = true;
 			o.params = o.params || {};
 			
