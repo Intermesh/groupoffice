@@ -1768,8 +1768,14 @@ td.x-date-mp-sep {
 	.x-tip-mc { @extend %font-body2;}
 }
 
-.x-form-invalid-tip .x-tip-tc, .x-form-invalid-tip .x-tip-tl, .x-form-invalid-tip .x-tip-tr, .x-form-invalid-tip .x-tip-bc,
-.x-form-invalid-tip .x-tip-bl, .x-form-invalid-tip .x-tip-br, .x-form-invalid-tip .x-tip-ml, .x-form-invalid-tip .x-tip-mr
+.x-form-invalid-tip .x-tip-tc, 
+.x-form-invalid-tip .x-tip-tl, 
+.x-form-invalid-tip .x-tip-tr, 
+.x-form-invalid-tip .x-tip-bc,
+.x-form-invalid-tip .x-tip-bl, 
+.x-form-invalid-tip .x-tip-br, 
+.x-form-invalid-tip .x-tip-ml, 
+.x-form-invalid-tip .x-tip-mr
 {
 	background-image: url(../images/default/form/error-tip-corners.gif);
 }
