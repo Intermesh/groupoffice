@@ -16,7 +16,7 @@ https://github.com/Intermesh/docker-groupoffice-development
 
 1. Clone this repository
 2. Change into the "www" directory.
-3. run: 
+3. Install composer libraries: 
    ```
    "composer install"
    ```
