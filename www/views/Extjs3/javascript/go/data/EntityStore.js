@@ -318,7 +318,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			throw "'update' must be an object with client ID's as key. Not an array.";
 		}
 		
-		if(params.destroy && Ext.isArray(params.destroy)) 
+		if(params.destroy && !Ext.isArray(params.destroy)) 
 		{
 			throw "'destroy' must be an array.";
 		}
