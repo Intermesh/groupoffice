@@ -12,21 +12,20 @@ go.grid.GridTrait = {
 			this.keys = [];
 		}
 	
-		this.initDeleteKey();				
+		this.initDeleteKey();		
 		this.initNav();
-		
-		this.on("bodyscroll", this.loadMore, this, {buffer: 100});
-		
-		this.store.baseParams.limit = this.pageSize;
-		
-		this.store.on("load", function(store, records, o){
-				//if(o.paging) {
+
+		//setup auto load more for go.data.Store's only
+		if(this.store instanceof go.data.Store) {
+			this.on("bodyscroll", this.loadMore, this, {buffer: 100});
+
+			this.store.baseParams.limit = this.pageSize;
+
+			this.store.on("load", function(store, records, o){
 				this.allRecordsLoaded = !records.length;
-				//} 
-					
-				this.loadMore();
-			
+				this.loadMore();			
 			}, this);
+		}
 	},
 	
 	//The navigate can be used in modules to track row selections for navigation.
@@ -39,7 +38,7 @@ go.grid.GridTrait = {
 			if(!e.ctrlKey && !e.shiftKey && record)
 			{
 				this.fireEvent('navigate', this, rowIndex, record);				
-			}
+		}
 		
 			if(record) {
 				this.rowClicked=true;
@@ -73,7 +72,7 @@ go.grid.GridTrait = {
 	deleteSelected: function () {
 
 		var selectedRecords = this.getSelectionModel().getSelections(), ids = selectedRecords.column("id"), strConfirm;
-		
+
 		switch (ids.length)
 		{
 			case 0:
@@ -117,7 +116,7 @@ go.grid.GridTrait = {
 
 		if (scroller.offsetHeight >= body.offsetHeight || (scroller.offsetHeight + scroller.scrollTop + this.scrollBoundary) >= body.offsetHeight) {
 
-			var o = GO.util.clone(store.lastOptions);
+			var o = store.lastOptions ? GO.util.clone(store.lastOptions) : {};
 			o.add = true;
 			o.params = o.params || {};
 			

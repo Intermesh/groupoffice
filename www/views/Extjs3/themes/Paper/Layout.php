@@ -27,12 +27,11 @@
 	<meta name="theme-color" content="#ffffff">
 
 	<title><?php echo \GO::config()->title; ?></title>
+	
 	<link href="<?=\GO::view()->getUrl()?>themes/Paper/style.css" media="screen and (min-device-width:1201px)" type="text/css" rel="stylesheet" />
-	<link href="<?=\GO::view()->getUrl()?>themes/Paper/flags/flags.min.css" media="screen and (min-device-width:1201px)" type="text/css" rel="stylesheet" />
 	<link rel="stylesheet" type="text/css" media="screen and (max-device-width:1200px)" href="<?=\GO::view()->getUrl()?>themes/Paper/style-mobile.css" />
-	
-	
 	<link href="<?=\GO::view()->getUrl()?>css.php" type="text/css" rel="stylesheet" />
+	
 	<?php
 	if(!empty(\GO::config()->custom_css_url))
 		echo '<link href="'.\GO::config()->custom_css_url.'" type="text/css" rel="stylesheet" />';

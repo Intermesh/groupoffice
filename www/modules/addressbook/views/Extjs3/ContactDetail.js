@@ -269,19 +269,19 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 					this.body.print({title: this.data.name});
 				},
 				scope: this
-			}, {
+			}, this.mergeButton = new Ext.menu.Item({
 				iconCls: 'ic-merge-type',
 				text: t("Merge"),
 				disabled: true,
 				handler: function () {
 					if (!this.selectMergeLinksWindow) {
-						this.selectMergeLinksWindow = new GO.dialog.MergeWindow({displayPanel: this});
+						this.selectMergeLinksWindow = new GO.dialog.MergeWindow({displayPanel: this,entity: "Contact"});
 					}
 
 					this.selectMergeLinksWindow.show();
 				},
 				scope: this
-			}
+			})
 		];
 		
 		if(go.Modules.isAvailable("core", "users")){
@@ -383,6 +383,8 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 				this.createUserButton.setText(t("Edit user"));
 			}
 		}
+		
+		this.mergeButton.setDisabled(this.data.permissionLevel < GO.permissionLevels.write);
 		
 		GO.addressbook.ContactDetail.superclass.onLoad.call(this);
 	}

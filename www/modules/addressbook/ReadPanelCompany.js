@@ -402,6 +402,7 @@ GO.addressbook.CompanyReadPanel = Ext.extend(GO.DisplayPanel,{
 				if(!this.selectMergeLinksWindow)
 				{
 					this.selectMergeLinksWindow = new GO.dialog.MergeWindow({
+						entity: "Company",
 						displayPanel:this
 					});
 				}			
