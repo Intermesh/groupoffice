@@ -132,108 +132,93 @@
 .x-spotlight {
 	background-color: #ccc;
 }
-
+// #################
+// ### TAB PANEL ###
+// #################
 .x-tab-panel {
-	//border: 1px solid color($fg, 'line');
-	&.x-tab-panel-noborder {
+	&-noborder, &-header-noborder {
+		border-width: 0 0 0 0;
+	}
+	&-header {
+		//border-bottom: 1px solid color($fg, 'line');
+		.x-window-body form > .x-tab-panel > &, .x-window-body > .x-tab-panel > & {
+			background-color: color($bg, 'app-bar');
+		}
+	}
+	&-footer{
 		border:0;
 	}
-}
-
-.x-tab-panel-header {
-	border:0;
-	border-bottom: 1px solid color($fg, 'line');
-}
-.x-tab-panel-footer{
-	border:0;
-}
-.x-tab-panel-header, .x-tab-panel-footer {
-	/*background-color:color($bg,'app-bar');*/
-	padding-bottom:0;
-   overflow:hidden;
-   zoom:1;
-	/*box-shadow: inset 0px -1px 1px color($fg,'line');*/
-	.x-portlet & {
-		background-color: transparent;
-		
+	&-header, &-footer {
+		padding-bottom:0;
+		overflow:hidden;
+		.x-portlet & {
+			background-color: transparent;
+		}
 	}
+	
 }
-
-ul.x-tab-strip-top{
-/*	width:100%; 
-	display: flex;
-	justify-content: center; // turn on to center tabs wont work with overflow
-	flex-direction: row;*/
-	height: dp(48);
-	border-bottom: 2px solid transparent;
-	@include var(color, c-primary);
-}
-//Todo
-ul.x-tab-strip-bottom{
-	background-color:#cedff5;
-	border-top-color:#8db2e3;
-}
-
-// .x-tab-panel-header-plain .x-tab-strip-spacer,
-// .x-tab-panel-footer-plain .x-tab-strip-spacer {
-//     border-color:#8db2e3;
-//     background-color: #deecfd;
-// }
-.x-tab-strip-wrap {
-	padding: 0 dp(4);
-}
-.x-tab-strip > li {
-	min-width: dp(72);
-	max-width: dp(264);
-	height: dp(48);
-	text-align:center;
-	line-height: dp(48);
-	padding: 0 dp(12);
-}
-
-.x-tab-strip span.x-tab-strip-text {
-	padding:0;
-	color: color($fg, 'text');
-	&.primary {
-		color: rgba(white, 0.7);
-	}
-}
-
-.x-tab-strip-over span.x-tab-strip-text {
-	@include var(color, c-primary);
-	&.primary {
-		color: white;
-	}
-}
-
-.x-tab-strip-active {
-	border-bottom: dp(4) solid transparent;
-	@include var(border-color, c-primary);
-	span.x-tab-strip-text {
+.x-tab-strip { 
+	&-top{
+		//width:100%; 
+		//display: flex;
+		//justify-content: center; // turn on to center tabs wont work with overflow
+		//flex-direction: row;
+		height: dp(48);
+		border-bottom: 2px solid transparent;
 		@include var(color, c-primary);
 	}
-}
-
-.x-tab-strip-text {
-	//@extend %font-subheading;
-	@extend %font-button;
-}
-
-.x-tab-strip-disabled .x-tabs-text {
-	color: color($fg, 'disabled');
-}
-
-.x-tab-strip .x-tab-strip-closable a.x-tab-strip-close:before {
-	@extend %icon;
-	content: 'close';
-	font-size: 1.1em !important;
-	//padding-top: dp(16);
-	color: color($fg, 'icon');
-	//background-image:url(../images/default/tabs/tab-close.gif);
-}
-
-.x-tab-strip .x-tab-strip-closable a.x-tab-strip-close:hover:before{
-	@include var(color, c-primary);
+	&-bottom{
+		background-color:#cedff5;
+		border-top-color:#8db2e3;
+	}
+	&-wrap {
+		padding: 0 dp(4);
+	}
+	&-active {
+		border-bottom: dp(4) solid transparent;
+		@include var(border-color, c-primary);
+		span.x-tab-strip-text {
+			@include var(color, c-primary);
+		}
+	}
+	&-text {
+		@extend %font-button;
+	}
+	&-disabled .x-tabs-text {
+		color: color($fg, 'disabled');
+	}
+	> li {
+		min-width: dp(72);
+		max-width: dp(264);
+		height: dp(48);
+		text-align:center;
+		line-height: dp(48);
+		padding: 0 dp(12);
+	}
+	span.x-tab-strip-text {
+		padding:0;
+		color: color($fg, 'text');
+		&.primary {
+			color: rgba(white, 0.7);
+		}
+	}
+	&-over span.x-tab-strip-text {
+		@include var(color, c-primary);
+		&.primary {
+			color: white;
+		}
+	}
+	.x-tab-strip-closable a.x-tab-strip-close {
+		&:before {
+			@extend %icon;
+			content: 'close';
+			font-size: 1.1em !important;
+			color: color($fg, 'icon');
+		}
+		&:hover:before{
+			@include var(color, c-primary);
+		}
+	}
 }
 
 // animate tab panel
@@ -242,6 +227,12 @@ ul.x-tab-strip-bottom{
 	position: relative;
 	overflow:hidden;
 	background-color:color($bg, 'background');
+	&-top {
+		border-top: 0 none;
+	}
+	&-bottom {
+		border-bottom: 0 none;
+	}
 	> div {
 		padding: 0;
 		background-color:inherit;
@@ -270,15 +261,6 @@ ul.x-tab-strip-bottom{
 		}*/
 	}
 }
-
-.x-tab-panel-body-top {
-	border-top: 0 none;
-}
-
-.x-tab-panel-body-bottom {
-	border-bottom: 0 none;
-}
-
 .x-tab-scroller-left, .x-tab-scroller-right{
 
 	border:0;
@@ -2186,7 +2168,7 @@ $menuScrollerSize : dp(4);
 // ##############
 // ### WINDOW ###
 // ##############
-.x-window {
+.x-window{
 	background-color:color($bg,'dialog');
 	border-radius: $borderRadius;
 	//border: 1px solid color($fg, 'line');
@@ -2254,12 +2236,6 @@ body.x-body-masked .x-window-plain .x-window-mc {
 	background-image: none; //url(wysiwyg.gif);
 }
 
-// ##############
-// ### PANELS ###
-// ##############
-.x-tab-panel-noborder .x-tab-panel-header-noborder {
-	border-width: 0 0 0 0;
-}
 // ####################
 // ### BORDERLAYOUT ###
 // ####################
