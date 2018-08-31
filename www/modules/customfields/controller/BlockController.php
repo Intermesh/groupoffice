@@ -31,20 +31,20 @@ class BlockController extends \GO\Base\Controller\AbstractJsonController{
 				'type'=>'INNER'
 			))
 			->join(
-				'go_acl',
-				\GO\Base\Db\FindCriteria::newInstance()->addRawCondition('a.acl_id', 'cfcat.acl_id'),
+				'core_acl_group',
+				\GO\Base\Db\FindCriteria::newInstance()->addRawCondition('a.aclId', 'cfcat.aclId'),
 				'a'
 				)
 			->join(
 				'core_user_group',
-				\GO\Base\Db\FindCriteria::newInstance()->addRawCondition('a.group_id', 'ug.group_id'),
+				\GO\Base\Db\FindCriteria::newInstance()->addRawCondition('a.groupId', 'ug.groupId'),
 				'ug',
 				'LEFT'
 			)
 			->criteria(
 				\GO\Base\Db\FindCriteria::newInstance()
-					->addCondition('user_id', \GO::user()->id, '=', 'a', false)
-					->addCondition('user_id', \GO::user()->id, '=', 'ug', false)
+					//->addCondition('userId', \GO::user()->id, '=', 'a', false)
+					->addCondition('userId', \GO::user()->id, '=', 'ug', false)
 			);
 		
 		$store = new \GO\Base\Data\DbStore('GO\Customfields\Model\Block', $columnModel, $params, $findParams);

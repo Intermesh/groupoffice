@@ -8,28 +8,29 @@ class BlockFieldController extends \GO\Base\Controller\AbstractJsonController{
 	protected function actionSelectStore($params) {
 		
 		$columnModel = new \GO\Base\Data\ColumnModel(\GO\Customfields\Model\Field::model());
-		$columnModel->formatColumn('extendsModel', '$model->category->extendsModel', array(), 'category_id');
+		$columnModel->formatColumn('extendsModel', '$model->category->getExtendsModel()', array(), 'category_id');
 		$columnModel->formatColumn('full_info','"[".\GO::t($model->category->extendsModel,"customfields")."] ".$model->category->name." : ".$model->name." (".$model->databaseName.")"', array(), 'category_id');
 		
 		$findParams = \GO\Base\Db\FindParams::newInstance()
 			->joinModel(array(
 				'model'=>'GO\Customfields\Model\Category',
 				'localTableAlias'=>'t',
-				'localField'=>'category_id',
+				'localField'=>'fieldSetId',
 				'foreignField'=>'id',
 				'tableAlias'=>'c'
 			))
+			->join('core_entity', \GO\Base\Db\FindCriteria::newInstance()->addRawCondition('ce.id', 'c.entityId'), 'ce')
 			->criteria(
 				\GO\Base\Db\FindCriteria::newInstance()
 					->addInCondition(
-						'extendsModel',
+						'name',
 						array(
-							'GO\Addressbook\Model\Contact',
-							'GO\Addressbook\Model\Company',
-							'GO\Projects2\Model\Project',
-							'GO\Base\Model\User'
+							'Contact',
+							'Company',
+							'Project',
+							'User'
 						),
-						'c'
+						'ce'
 					)
 					->addInCondition(
 						'datatype',
