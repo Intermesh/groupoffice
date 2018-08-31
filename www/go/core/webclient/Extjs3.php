@@ -30,7 +30,11 @@ class Extjs3 {
 			$modules = Module::getInstalled();
 
 			foreach ($modules as $module) {
-
+				
+				if(empty($module->package) && GO()->getConfig()['general']['disableLegacy']) {
+					continue;
+				}
+				
 				if (isset($module->package)) {
 					$folder = $module->module()->getFolder();
 					$file = $folder->getFile('views/extjs3/themes/default/style.css');
@@ -46,8 +50,8 @@ class Extjs3 {
 						continue;
 					}
 				}
-
-
+				
+				
 				//old path
 
 				$folder = Environment::get()->getInstallFolder()->getFolder('modules/' . $module->name);

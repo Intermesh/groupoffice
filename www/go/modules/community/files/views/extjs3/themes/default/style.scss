@@ -1,3 +1,5 @@
+$path : "../../../../go/modules/community/files/views/extjs3/themes/default/";
+
 .entity.File::before {
 	content: "file"
 }
@@ -7,7 +9,7 @@
 }
 
 .go-module-icon-files , .go-menu-icon-files{
-	background:url('images/files.png');
+	background-image: url('#{$path}images/files.png');
 }
 
 .preview {

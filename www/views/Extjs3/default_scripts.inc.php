@@ -171,17 +171,19 @@ if ($cacheFile->exists()) {
 				
 				
 			}
+
+			if(!empty($module->package) || !GO()->getConfig()['general']['disableLegacy']) {
+				$scripts[] = 'Ext.ns("GO.' . $module->name  . '");';
+
+				if (!$scriptsFile || !file_exists($scriptsFile)) {
+					$scriptsFile = $modulePath . 'scripts.txt';
+					if (!file_exists($scriptsFile))
+						$scriptsFile = $modulePath . 'views/Extjs3/scripts.txt';
+
+					$prefix = "";
+				}
 			
-			$scripts[] = 'Ext.ns("GO.' . $module->name  . '");';
-
-			if (!$scriptsFile || !file_exists($scriptsFile)) {
-				$scriptsFile = $modulePath . 'scripts.txt';
-				if (!file_exists($scriptsFile))
-					$scriptsFile = $modulePath . 'views/Extjs3/scripts.txt';
-
-				$prefix = "";
 			}
-			
 			
 
 			if (file_exists($scriptsFile)) {

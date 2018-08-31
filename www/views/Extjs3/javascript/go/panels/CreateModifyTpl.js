@@ -11,11 +11,17 @@ go.panels.CreateModifyTpl = Ext.extend(Ext.Panel, {
 	<span>{[fm.date(values.modifiedAt)]}{mtime}</span><br>\
 	<small>'+t("by")+' <a href="#">{[this.user(values.modifiedBy).displayName]}</a></small>\
 	</p>',{
-		avatar: function(userId) {
-			return 'background-image: url('+go.Jmap.downloadUrl(this.user(userId).avatarId)+')';
+		avatar: function(id) {
+			if(!id) {
+				return '';
+			}
+			return 'background-image: url('+go.Jmap.downloadUrl(this.user(id).avatarId)+')';
 		},
-		user : function(userId) {
-			return go.Stores.get('User').get(userId);
+		user : function(id) {
+			if(!id) {
+				return {avatarId:''};
+			}
+			return go.Stores.get('User').get(id);
 		}
 	}),
 	initComponent: function () {

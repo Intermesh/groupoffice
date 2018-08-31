@@ -128,7 +128,10 @@ go.modules.community.files.NodeDetail = Ext.extend(go.panels.DetailView, {
 				iconCls: 'ic-person-add',
 				tooltip: t("Share"),
 				handler: function (btn, e) {
-					alert('todo');
+					if(!this.shareDialog) {
+						this.shareDialog = new go.modules.community.files.ShareDialog();
+					}
+					this.shareDialog.load(this.currentId).show();
 				},
 				scope: this
 			},{
