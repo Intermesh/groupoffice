@@ -1,3 +1,5 @@
+- Support newer encryption library in notes
+
 30-08-2018 6.3.36
 - Fixed loading error in group edit dialog
 
