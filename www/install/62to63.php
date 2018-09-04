@@ -245,10 +245,11 @@ $qs[] = function() {
 			
 			
 			$shortName = substr($record['name'], strrpos($record['name'], '\\') + 1);
+			$clientName = $record['name']::getClientName();
 
 
 			App::get()->getDbConnection()
-							->update('core_entity', ['moduleId' => $module['id'], 'name' => $shortName, 'clientName' => $shortName], ['id' => $record['id']])
+							->update('core_entity', ['moduleId' => $module['id'], 'name' => $shortName, 'clientName' => $clientName], ['id' => $record['id']])
 							->execute();
 		}
 	}
