@@ -21,18 +21,21 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 		var me = this;
 		
 		this.store = new go.data.Store({
-			remoteSort: false,
+			sortInfo: {
+				field: 'name',
+				direction: 'ASC'
+			},
 			fields: [
 				'id', 
 				'name', 
 				{name: 'user', type: go.data.types.User, key: 'isUserGroupFor'}, //fetches entity from store
-				'members', //used in renderer
-				'memberCount', //used in renderer
+				'users', //used in renderer
+				'userCount', //used in renderer
 				{
 					name: 'level', 
 					type: {
 						convert: function (v, data) {
-							var index = me.getSelectedGroupIds().indexOf(data.id)
+							var index = me.getSelectedGroupIds().indexOf(parseInt(data.id));
 							if(index == -1) {
 								return null;
 							}
@@ -53,10 +56,7 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 					}
 				}
 			],
-			listeners: {
-				scope: this,
-				load: this.onStoreLoad
-			},
+
 			baseParams: {
 			},
 			entityStore: go.Stores.get("Group")
@@ -90,7 +90,7 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 						var memberStr = t("Loading members...");						
 						
 						//will be processed after storeload by onStoreLoad
-						var members = record.get('members');						
+						var members = record.get('users').column('userId');						
 						if(Ext.isArray(members)) {
 							var users = go.Stores.get('User').get(members); 							
 							memberStr = "";
@@ -101,10 +101,10 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 								memberStr += user.displayName;
 							});
 								
-							var more = record.get('memberCount') - members.length;
-							if(more > 0) {
-								memberStr += t(" and {count} more").replace('{count}', more);
-							}
+//							var more = record.get('memberCount') - members.length;
+//							if(more > 0) {
+//								memberStr += t(" and {count} more").replace('{count}', more);
+//							}
 						}
 						
 						return '<div class="user"><div class="' + cls + '" style="' + style + '"></div>' +
@@ -136,9 +136,6 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 			autoExpandColumn: 'name',
 			listeners: {
 				scope: this,
-				render: function() {
-					this.store.load();
-				},
 				afteredit : this.afterEdit
 			}
 //			// config options for stateful behavior
@@ -146,14 +143,8 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 //			stateId: 'users-grid'
 		});
 		
-		this.store.sort([{
-					field: 'selected',
-					direction: 'DESC'
-				},{
-					field: 'name',
-					direction: 'ASC'
-				}]);
-
+		this.store.on("beforeload", this.onBeforeStoreLoad, this);
+		this.store.on("load", this.onStoreLoad, this);
 		go.modules.core.core.SharePanel.superclass.initComponent.call(this);
 
 	},
@@ -276,64 +267,56 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 
 	setValue: function (groups) {		
 		this._isDirty = false;		
-		this.selectedGroups = groups;		
+		this.selectedGroups = groups;
+		this.store.load();
 	},
+	
 	getSelectedGroupIds : function() {
-		var ids = [];
+		return this.selectedGroups.column("groupId");
+	},
+	
+	onBeforeStoreLoad : function(store, options) {
+
+		//don't add selected on search
+		if(store.baseParams.filter.q || options.selectedLoaded || options.paging) {
+			return true;
+		}
 		
-		this.selectedGroups.forEach(function(g) {
-			ids.push(g.groupId);
-		});
+		go.Stores.get("Group").get(this.getSelectedGroupIds(), function(entities) {			
+			this.store.loadData({records: entities}, true);
+			this.store.sortData();
+			this.store.load({
+				add: true,
+				selectedLoaded: true,
+				params: {filter: {exclude: this.getSelectedGroupIds()}}
+			});
+		}, this);
 		
-		return ids;
+		return false;
 	},
 	onStoreLoad : function() {
 		
 		//don't add selected on search
 		if(this.store.baseParams.filter.q) {
 			return;
-		}
-		
-		go.Stores.get("Group").get(this.getSelectedGroupIds(), function(entities) {
-			this.store.suspendEvents(false); //to prevent ininiteloop as loadData fires 'load' event.
-			this.store.loadData({records: entities}, true);		
-			this.store.sortData();
-			this.store.resumeEvents();
-		}, this);
-		
+		}		
 		
 		//fetch group members
-		var records = this.store.getRange(), me = this, count = 0;
+		var records = this.store.getRange(), me = this;
 		var memberIds = [];
 		
 		records.forEach(function(record) {
-			count++;
-			go.Jmap.request({
-				method: 'User/query',
-				params: {
-					limit: 3,
-					filter: {
-						groupId: record.id						
-					}
-				},
-				callback:function(options, success, response) {
-					record.data.members = response.ids;
-					record.data.memberCount = response.total;
-					memberIds = memberIds.concat(response.ids);
-					count--;
-					
-					if(count == 0) {						
-						//all members filled.						
-						var unique = memberIds.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
+			memberIds = memberIds.concat(record.data.users.column("userId"));			
+		});
+		
+		var unique = memberIds.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
 						
-						go.Stores.get('User').get(unique, function() {	
-							//all data is fetched now. Refresh grid ui.	
-							me.getView().refresh();														
-						});
-					}
-				}				
-			});
-		})
+		go.Stores.get('User').get(unique, function(entities, async) {	
+			//all data is fetched now. Refresh grid ui.	
+			if(async && me.rendered) {
+				me.getView().refresh();														
+			}
+		});
 	},
 	
 	getValue: function () {				

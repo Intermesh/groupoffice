@@ -142,15 +142,10 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 		return this._isDirty || this.store.getModifiedRecords().length > 0;
 	},
 
-	setValue: function (groups) {
+	setValue: function (users) {
 		
 		this._isDirty = false;
-		
-		var me = this;
-		this.selectedUsers = [];
-		groups.forEach(function(group) {
-			me.selectedUsers.push(group.userId);
-		});
+		this.selectedUsers = users.column("userId");
 	},
 	
 	onBeforeStoreLoad : function(store, options) {

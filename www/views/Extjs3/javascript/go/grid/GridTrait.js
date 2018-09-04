@@ -12,8 +12,11 @@ go.grid.GridTrait = {
 			this.keys = [];
 		}
 	
+		
 		this.initDeleteKey();		
-		this.initNav();
+		if(this.getSelectionModel().getSelected) {
+			this.initNav();
+		}
 
 		//setup auto load more for go.data.Store's only
 		if(this.store instanceof go.data.Store) {
@@ -22,8 +25,16 @@ go.grid.GridTrait = {
 			this.store.baseParams.limit = this.pageSize;
 
 			this.store.on("load", function(store, records, o){
-				this.allRecordsLoaded = !records.length;
-				this.loadMore();			
+				this.allRecordsLoaded = records.length < this.pageSize;
+				
+				if(this.rendered) {
+					this.loadMore();			
+				} else
+				{
+					this.on("afterrender", function() {
+						this.loadMore();
+					}, this, {single: true});
+				}
 			}, this);
 		}
 	},

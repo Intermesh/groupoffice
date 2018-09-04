@@ -13,7 +13,6 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	},
 	
 	onChanges : function(entityStore, added, changed, destroyed) {
-		
 		if(changed.concat(added).indexOf(this.currentId) !== -1) {			
 			var entities = this.entityStore.get([this.currentId]);
 			this.entity = entities[0];

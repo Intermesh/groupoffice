@@ -53,14 +53,14 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	},
 	
 	loadData : function(o, append){
+		var old = this.loading;
 		this.loading = true;
-		
-		
+			
 		var ret = go.data.Store.superclass.loadData.call(this, o, append);				
 		
 		var me = this;
 		setTimeout(function(){
-			me.loading = false;
+			me.loading = old;
 		}, 0);	
 		
 		return ret;
@@ -116,7 +116,6 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	},
 	
 	onChanges : function(entityStore, added, changed, destroyed) {		
-		
 		if(!this.loaded || this.loading) {
 			return;
 		}		

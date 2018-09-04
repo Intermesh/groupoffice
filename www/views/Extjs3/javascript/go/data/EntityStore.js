@@ -34,30 +34,30 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	},
 	
 	restoreState : function() {
-		if(!window.localStorage.entityStores) {
-			window.localStorage.entityStores = {};
-		}
-		
-		var json = window.localStorage["entityStore-" + this.entity.name];		
-		if(json) {
-			var state = JSON.parse(json);			
-			this.data = state.data;
-			this.state = state.state;		
-			this.notFound = state.notFound;
-		}
+//		if(!window.localStorage.entityStores) {
+//			window.localStorage.entityStores = {};
+//		}
+//		
+//		var json = window.localStorage["entityStore-" + this.entity.name];		
+//		if(json) {
+//			var state = JSON.parse(json);			
+//			this.data = state.data;
+//			this.state = state.state;		
+//			this.notFound = state.notFound;
+//		}
 	},
 	
 	saveState : function() {		
-		var state = JSON.stringify({
-			state: this.state,
-			data: this.data,
-			notFound: this.notFound
-		});
-		
-		if(!window.localStorage.entityStores) {
-			window.localStorage.entityStores = {};
-		}		
-		window.localStorage["entityStore-" + this.entity.name] = state;		
+//		var state = JSON.stringify({
+//			state: this.state,
+//			data: this.data,
+//			notFound: this.notFound
+//		});
+//		
+//		if(!window.localStorage.entityStores) {
+//			window.localStorage.entityStores = {};
+//		}		
+//		window.localStorage["entityStore-" + this.entity.name] = state;		
 	},
 	
 	
