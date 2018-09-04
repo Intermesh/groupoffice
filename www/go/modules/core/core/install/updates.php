@@ -242,3 +242,6 @@ $updates['201808241650'][] = "ALTER TABLE `core_blob` ADD `modifiedAt` DATETIME 
 $updates['201808241650'][] = "ALTER TABLE `core_blob` ADD INDEX(`staleAt`);
 UPDATE `core_blob` set modifiedAt = from_unixtime(modified)";
 $updates['201808241650'][] = "ALTER TABLE `core_blob` DROP `modified`";
+
+
+$updates['201808241650'][] = "insert into core_cron_job (moduleId,name, expression, description) values ((select id from core_module where name='core'), 'GarbageCollection', '0 * * * *', 'Garbage collection')";
