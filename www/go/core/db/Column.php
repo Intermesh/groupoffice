@@ -2,10 +2,11 @@
 
 namespace go\core\db;
 
+use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
-use go\core\util\DateTime;
+use go\core\util\DateTime as GoDateTime;
 
 /**
  * Represents a Record database column attribute.
@@ -163,7 +164,7 @@ class Column {
 				if ($value instanceof DateTime || $value instanceof DateTimeImmutable) {
 					return $value;
 				} else {
-					$dt = new DateTime($value);
+					$dt = new GoDateTime($value);
 					$dt->setTimezone(new DateTimeZone(date_default_timezone_get())); //UTC
 					return $dt;
 				}
@@ -173,7 +174,7 @@ class Column {
 				if ($value instanceof DateTime || $value instanceof DateTimeImmutable) {
 					return $value;
 				} else {
-					return new DateTime($value);
+					return new GoDateTime($value);
 				}
 				
 			default:
@@ -239,7 +240,7 @@ class Column {
 
 			case 'date':
 			case 'datetime':
-				return $value instanceof DateTime ? $value: new DateTime($value);
+				return $value instanceof GoDateTime ? $value: new GoDateTime($value);
 				
 			default:
 				return $value;
