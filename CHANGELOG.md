@@ -1,3 +1,4 @@
+- Fixed google authenticator barcode for ios
 - Support newer encryption library in notes
 
 30-08-2018 6.3.36
