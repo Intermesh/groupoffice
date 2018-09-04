@@ -83,29 +83,29 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 					dataIndex: 'name',
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 						
-						var user = record.get("user");
-						var style = user && user.avatarId ?  'background-image: url(' + go.Jmap.downloadUrl(record.get("user").avatarId) + ')"' : "";
+						var user = record.get("user"),
+										style = user && user.avatarId ?  'background-image: url(' + go.Jmap.downloadUrl(record.get("user").avatarId) + ')"' : "";
+										cls = user ? "avatar" : "avatar group",
+										memberStr = t("Loading members..."),
+										members = record.get('users').column('userId'),
+										users = go.Stores.get('User').get(members),
+										max = 5;
 						
-						var cls = user ? "avatar" : "avatar group";
-						var memberStr = t("Loading members...");						
-						
-						//will be processed after storeload by onStoreLoad
-						var members = record.get('users').column('userId');						
-						if(Ext.isArray(members)) {
-							var users = go.Stores.get('User').get(members); 							
+						if(users) {
 							memberStr = "";
-							users.forEach(function(user){
+							users.slice(0, max).forEach(function(user){
 								if(memberStr != "") {
 									memberStr += ", "
 								}
 								memberStr += user.displayName;
 							});
-								
-//							var more = record.get('memberCount') - members.length;
-//							if(more > 0) {
-//								memberStr += t(" and {count} more").replace('{count}', more);
-//							}
 						}
+								
+							var more = members.length - max;
+							if(more > 0) {
+								memberStr += t(" and {count} more").replace('{count}', more);
+							}
+						
 						
 						return '<div class="user"><div class="' + cls + '" style="' + style + '"></div>' +
 							'<div class="wrap">'+
