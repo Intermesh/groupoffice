@@ -78,6 +78,9 @@ class Lock {
 			if(file_exists($this->lockFile)) {
 				unlink($this->lockFile);			
 			}
+			
+			$this->lockFp = null;
+			$this->lockFile = null;
 		}
 	}
 	
