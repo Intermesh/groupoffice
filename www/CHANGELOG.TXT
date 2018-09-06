@@ -1,5 +1,3 @@
-- Addressbook: Batch edit problem in address book
-- Leavedays: Sort on employee in holidays module
 - Projects: Fixed decimals in activity type rates
 - Billing: Amounts can be searched in local format.
 - Email: Save all attachments to personal folder function would also save inline attachments
