@@ -4,7 +4,6 @@ namespace go\core {
 
 use Exception;
 use GO;
-use GO\Base\Observable;
 use go\core\auth\State as AuthState;
 use go\core\cache\CacheInterface;
 use go\core\cache\Disk;
@@ -17,6 +16,7 @@ use go\core\exception\ConfigurationException;
 use go\core\fs\Folder;
 use go\core\jmap\State;
 use go\core\mail\Mailer;
+use go\core\util\Lock;
 use go\core\webclient\Extjs3;
 use go\modules\core\core\model\Settings;
 use const GO_CONFIG_FILE;
@@ -298,18 +298,18 @@ use const GO_CONFIG_FILE;
 				$this->rebuildCacheOnDestruct = $onDestruct;
 			}
 			
-			$lock = new util\Lock("rebuildCache");
+			$lock = new Lock("rebuildCache");
 			if($lock->lock()) {
 				\GO::clearCache(); //legacy
 
 				GO()->getCache()->flush(false);
-				db\Table::destroyInstances();
+				Table::destroyInstances();
 
-				$webclient = new \go\core\webclient\Extjs3();
+				$webclient = new Extjs3();
 				$webclient->flushCache();
 
 				\GO\Base\Observable::cacheListeners();
-				\go\core\event\Listeners::get()->init();
+				Listeners::get()->init();
 			}
 		}
 		
