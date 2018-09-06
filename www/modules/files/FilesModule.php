@@ -157,7 +157,7 @@ class FilesModule extends \GO\Base\Module{
 	}
 	
 	
-	public static function afterBatchEditStore(&$controller, &$response, &$tmpModel, &$params) {
+	public static function afterBatchEditStore($controller, &$response, &$tmpModel, &$params) {
 		$countCustomfield = 0;
 		$countCustomfieldCategory = array();
 		
