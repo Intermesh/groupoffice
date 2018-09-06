@@ -75,7 +75,7 @@ class Field extends AclItemEntity {
 	}
 	
 	private function getDataType() {
-		$dataType = \go\core\customfields\datatype\Base::findByName($this->datatype);
+		$dataType = \go\modules\core\customfields\datatype\Base::findByName($this->datatype);
 		return (new $dataType($this));
 	}
 	

@@ -1,5 +1,5 @@
 <?php
-namespace go\core\customfields\datatype;
+namespace go\modules\core\customfields\datatype;
 
 use go\core\util\ClassFinder;
 use go\modules\core\customfields\model\Field;
@@ -47,7 +47,7 @@ abstract class Base {
 	/**
 	 * Get all field types
 	 * 
-	 * @return string[] eg ['functionField' => "go\core\customfields\datatype\FunctionField"];
+	 * @return string[] eg ['functionField' => "go\modules\core\customfields\datatype\FunctionField"];
 	 */
 	public static function findAll() {
 		$classFinder = new ClassFinder();
