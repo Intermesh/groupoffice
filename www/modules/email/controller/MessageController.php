@@ -2015,7 +2015,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 		
 		
-		if(isset($filepath)) {
+		if(!empty($filepath)) {
 			
 			$message = \GO\Email\Model\SavedMessage::model()->createFromMimeFile($filepath);
 		} else {
@@ -2037,10 +2037,10 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		
 		$atts = $message->getAttachments();
 		$fsFolder = $folder->fsFolder;
-		
+		//\GO::debug($atts);
 		while($att=array_shift($atts)){
-			if(empty($att->content_id)){
-				
+			if(empty($att->content_id) || $att->disposition=='attachment'){
+		
 				// Check if the file already exists on disk, if so then add a number after it.
 				$fileName = null;
 				$file = $fsFolder->child($att->name);
@@ -2238,7 +2238,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$tmpFolder = \GO\Base\Fs\Folder::tempFolder(uniqid(time()));
 		$atts = $message->getAttachments();
 		while($att=array_shift($atts)){
-			if(empty($att->content_id) || $att->disposition=='attachment')
+			if(empty($att->content_id))
 				$att->saveToFile($tmpFolder);
 		}
 

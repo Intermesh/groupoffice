@@ -34,34 +34,40 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	},
 	
 	restoreState : function() {
-		if(!window.localStorage.entityStores) {
-			window.localStorage.entityStores = {};
-		}
-		
-		var json = window.localStorage["entityStore-" + this.entity.name];		
-		if(json) {
-			var state = JSON.parse(json);			
-			this.data = state.data;
-			this.state = state.state;		
-			this.notFound = state.notFound;
-		}
+//		if(!window.localStorage.entityStores) {
+//			window.localStorage.entityStores = {};
+//		}
+//		
+//		var json = window.localStorage["entityStore-" + this.entity.name];		
+//		if(json) {
+//			var state = JSON.parse(json);			
+//			this.data = state.data;
+//			this.state = state.state;		
+//			this.notFound = state.notFound;
+//		}
 	},
 	
 	saveState : function() {		
-		var state = JSON.stringify({
-			state: this.state,
-			data: this.data,
-			notFound: this.notFound
-		});
-		
-		if(!window.localStorage.entityStores) {
-			window.localStorage.entityStores = {};
-		}		
-		window.localStorage["entityStore-" + this.entity.name] = state;		
+//		var state = JSON.stringify({
+//			state: this.state,
+//			data: this.data,
+//			notFound: this.notFound
+//		});
+//		
+//		if(!window.localStorage.entityStores) {
+//			window.localStorage.entityStores = {};
+//		}		
+//		window.localStorage["entityStore-" + this.entity.name] = state;		
 	},
 	
 	
 	_add : function(entity) {
+		
+		if(!entity.id) {
+			console.error(entity);
+			throw "Entity doesn't have an 'id' property";
+		}
+		
 		if(this.data[entity.id]) {			
 			this.changes.changed.push(entity.id);
 		} else
@@ -276,7 +282,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		update[this.moreMenu.record.id] = {enabled: !this.moreMenu.record.data.enabled};
 				
 	 * go.Stores.get("Foo").set({
-	 *		create: {"client-id=1" : {name: "test"}},
+	 *		create: {"client-id-1" : {name: "test"}},
 	 *		update: update,
 	 *		destroy: [2]
 	 *	}, function(options, success, response){}, this);
@@ -303,6 +309,19 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	set: function (params, cb, scope) {
 		
 		//params.ifInState = this.state;
+		
+		if(params.create && Ext.isArray(params.create)) {
+			throw "'create' must be an object with client ID's as key. Not an array.";
+		}
+		
+		if(params.update && Ext.isArray(params.update)) {
+			throw "'update' must be an object with client ID's as key. Not an array.";
+		}
+		
+		if(params.destroy && !Ext.isArray(params.destroy)) 
+		{
+			throw "'destroy' must be an array.";
+		}
 
 		go.Jmap.request({
 			method: this.entity.name + "/set",

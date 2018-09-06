@@ -73,7 +73,14 @@ abstract class Entity extends Property {
 	 */
 	public function getId() {		
 		$keys = $this->primaryKeyValues();
-		return implode("-", array_values($keys));
+		return count($keys) > 1 ? implode("-", array_values($keys)) : array_values($keys)[0];
+	}
+	
+	
+	public function toArray($properties = array()) {
+		$arr = parent::toArray($properties);
+		$arr['id'] = $this->getId();
+		return $arr;
 	}
 
 

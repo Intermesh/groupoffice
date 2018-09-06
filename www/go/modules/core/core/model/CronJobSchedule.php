@@ -152,7 +152,7 @@ class CronJobSchedule extends Entity {
 	public static function runNext() {
 
 		$job = self::find()->where('enabled', '=', true)
-						->andWhere('nextRunAt', '<=', new DateTime())
+						->andWhere('nextRunAt', '<=', new DateTime())->orWhere('nextRunAt', 'IS', null)
 						->orderBy(['nextRunAt' => 'ASC'])->single();
 
 		if ($job) {

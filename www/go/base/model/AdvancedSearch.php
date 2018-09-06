@@ -77,7 +77,7 @@ class AdvancedSearch extends \GO\Base\Db\ActiveRecord {
 
 			foreach($decodedData as $key=>$data){
 
-				if($data && $data['gotype'] && $data['field'] && $data['gotype']=="customfield"){
+				if($data && !empty($data['gotype']) && $data['field'] && $data['gotype']=="customfield"){
 					$pos = strrpos($data['field'], '_'); // search last _
 					$customfieldId = $pos === false ? $data['field'] : substr($data['field'], $pos + 1);
 

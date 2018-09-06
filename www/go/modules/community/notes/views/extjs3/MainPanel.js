@@ -82,12 +82,11 @@ go.modules.community.notes.MainPanel = Ext.extend(go.panels.ModulePanel, {
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (btn) {
-						var noteForm = new go.modules.community.notes.NoteForm({
-							formValues: {
-								noteBookId: this.addNoteBookId
-							}
-						});
+						var noteForm = new go.modules.community.notes.NoteForm();
 						noteForm.show();
+						noteForm.setValues({
+								noteBookId: this.addNoteBookId
+							});
 					},
 					scope: this
 				}),

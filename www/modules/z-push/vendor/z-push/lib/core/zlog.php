@@ -174,7 +174,7 @@ class ZLog {
  */
 
 // TODO review error handler
-function zpush_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
+function zpush_error_handler($errno, $errstr, $errfile, $errline) {
     if (defined('LOG_ERROR_MASK')) $errno &= LOG_ERROR_MASK;
 
     switch ($errno) {

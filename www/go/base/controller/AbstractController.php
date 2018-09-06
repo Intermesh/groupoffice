@@ -291,9 +291,7 @@ abstract class AbstractController extends Observable {
 		
 		if(!in_array($action, $allowGuests) && !in_array('*', $allowGuests)){			
 			//check for logged in user
-			if(!GO::user()){
-				\GO\Base\Util\Http::basicAuth();
-				
+			if(!GO::user()){					
 				return false;	
 			}
 			

@@ -43,7 +43,10 @@ function sendMessage($type, $data) {
 	echo 'data: ' . json_encode($data);
 	echo "\n\n";
 	
-	ob_flush();
+	if(ob_get_level() > 0) {
+		ob_flush();
+	}
+	
 	flush();	
 }
 

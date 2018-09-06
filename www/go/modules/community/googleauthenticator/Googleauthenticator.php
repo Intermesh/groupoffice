@@ -3,9 +3,10 @@
 namespace go\modules\community\googleauthenticator;
 
 use go\core\auth\model\Token;
-use go\modules\core\users\model\User;
 use go\core\auth\SecondaryAuthenticator;
+use go\core\db\Query;
 use go\core\validate\ErrorCode;
+use go\modules\core\users\model\User;
 
 class Googleauthenticator extends SecondaryAuthenticator {
 
@@ -32,13 +33,12 @@ class Googleauthenticator extends SecondaryAuthenticator {
 
 	public static function isAvailableFor($username) {
 		
-		$user = User::find(['id','googleauthenticator'])->where(['username' => $username])->single();
-		if(!$user) {
-			return false;
-		}
+		$id = (new Query)
+						->selectSingleValue('id')
+						->from("googleauth_secret", "s")
+						->join("core_user", "u", "u.id = s.userId")
+						->where(['username' => $username])->single();
 		
-		$googleAuthenticator = $user->googleauthenticator;
-
-		return !empty($googleAuthenticator);
+		return !empty($id);
 	}
 }

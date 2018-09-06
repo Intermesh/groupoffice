@@ -60,9 +60,9 @@ abstract class ReadOnlyEntityController extends Controller {
 	protected function getQueryQuery($params) {
 		$cls = $this->entityClass();
 
-		$query = $cls::find()
+		$query = $cls::find($cls::getPrimaryKey(false))
 						->limit($params['limit'])
-						->offset($params['position']);;
+						->offset($params['position']);
 
 		$sort = $this->transformSort($params['sort']);
 		
@@ -74,7 +74,7 @@ abstract class ReadOnlyEntityController extends Controller {
 
 		//we don't need entities here. Just a list of id's.
 		
-		$query->fetchMode(\PDO::FETCH_ASSOC)->select($cls::getPrimaryKey(true));
+		//$query->fetchMode(\PDO::FETCH_ASSOC)->select($cls::getPrimaryKey(true));
 		
 		return $query;
 	}
@@ -164,10 +164,9 @@ abstract class ReadOnlyEntityController extends Controller {
 
 		$state = $this->getState();
 		
-		$ids = [];
-		
+		$ids = [];		
 		foreach($idsQuery as $record) {
-			$ids[] = implode("-", $record);
+			$ids[] = $record->getId();
 		}
 
 		Response::get()->addResponse([
@@ -291,7 +290,7 @@ abstract class ReadOnlyEntityController extends Controller {
 		}
 		
 		//filter permissions
-		$cls::filter($query, ['permissionLevel' => Acl::LEVEL_READ]);
+		$cls::applyAclToQuery($query, Acl::LEVEL_READ);
 		
 		return $query;
 	
@@ -329,7 +328,7 @@ abstract class ReadOnlyEntityController extends Controller {
 			$result['list'][] = $e->toArray(); 
 			$foundIds[] = $e->getId();
 		}
-		$result['found'] = $foundIds;
+//		$result['found'] = $foundIds;
 		if(isset($p['ids'])) {
 			$result['notFound'] = array_values(array_diff($p['ids'], $foundIds));			
 		}

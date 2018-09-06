@@ -344,14 +344,6 @@ class Contact extends \GO\Base\Db\ActiveRecord {
 		if (empty($this->color))
 			$this->color = "000000";
 		
-		if($this->getIsNew() && $this->addressbook->create_folder) {
-			
-			$c = new \GO\Files\Controller\FolderController();
-			$c->checkModelFolder($this, false, true);
-			
-		}
-		
-		
 		if($this->isModified('location') && !empty(\GO::config()->google_api_key)) {
 			$this->fetchCoords();
 		}
@@ -452,6 +444,13 @@ class Contact extends \GO\Base\Db\ActiveRecord {
 	
 	protected function afterSave($wasNew) {
 	
+		if($wasNew && $this->addressbook->create_folder) {
+			
+			$c = new \GO\Files\Controller\FolderController();
+			$c->checkModelFolder($this, false, true);
+			
+		}
+		
 		if(!$wasNew && $this->isModified('addressbook_id') && ($company=$this->company)){
 			//make sure company is in the same addressbook.
 			$company->addressbook_id=$this->addressbook_id;

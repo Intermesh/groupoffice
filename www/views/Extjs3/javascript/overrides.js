@@ -681,12 +681,6 @@ GO.mainLayout.onReady(function() {
 	
 });
 
-Ext.override(Ext.Window, {
-	resizable : !GO.util.isMobileOrTablet(),
-	draggable: !GO.util.isMobileOrTablet(),
-	maximized: GO.util.isMobileOrTablet(),
-});
-
 Ext.override(Ext.Panel, {
 	panelInitComponent : Ext.Panel.prototype.initComponent,
 	

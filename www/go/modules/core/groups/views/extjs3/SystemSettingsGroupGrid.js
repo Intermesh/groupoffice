@@ -31,7 +31,7 @@ go.modules.core.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 				'id',
 				'name',
 				'isUserGroupFor',
-				'members',
+				'users',
 				'memberCount'
 			],
 			entityStore: go.Stores.get("Group")
@@ -62,27 +62,27 @@ go.modules.core.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'displayName',
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
-						var user = record.get("user");
-//						var style = user && user.avatarId ? 'background-image: url(' + go.Jmap.downloadUrl(record.get("user").avatarId) + ')"' : "";
-
-						var memberStr = t("Loading members...");
-
-						var members = record.get('members');
-						if (Ext.isArray(members)) {
-							var users = go.Stores.get('User').get(members);
+						
+						var memberStr = t("Loading members..."),
+										members = record.get('users').column('userId'),
+										users = go.Stores.get('User').get(members),
+										max = 5;
+						
+						if(users) {
 							memberStr = "";
-							users.forEach(function (user) {
+							users.slice(0, max).forEach(function (user) {
 								if (memberStr != "") {
 									memberStr += ", "
 								}
 								memberStr += user.displayName;
 							});
-
-							var more = record.get('memberCount') - members.length;
-							if (more > 0) {
-								memberStr += t(" and {count} more").replace('{count}', more);
-							}
 						}
+
+						var more = members.length - max;
+						if (more > 0) {
+							memberStr += t(" and {count} more").replace('{count}', more);
+						}
+						
 
 						return '<div class="user"><div class="avatar group"></div>' +
 										'<div class="wrap">' +
@@ -186,38 +186,19 @@ go.modules.core.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 
 		var records = this.store.getRange(), me = this, count = 0;
 		var memberIds = [];
-
-		records.forEach(function (record) {
-			count++;
-			go.Jmap.request({
-				method: 'User/query',
-				params: {
-					limit: 3,
-					filter: {
-						groupId: record.id
-					}
-				},
-				callback: function (options, success, response) {
-					record.data.members = response.ids;
-					record.data.memberCount = response.total;
-					memberIds = memberIds.concat(response.ids);
-					count--;
-
-					if (count == 0) {
-						//all members filled.						
-						var unique = memberIds.filter(function (item, i, ar) {
-							return ar.indexOf(item) === i;
-						});
-
-						go.Stores.get('User').get(unique, function () {
-							//all data is fetched now. Refresh grid ui.	
-							me.getView().refresh();
-						});
-					}
-				}
-			});
-		})
-
+		
+		records.forEach(function(record) {
+			memberIds = memberIds.concat(record.data.users.column("userId"));			
+		});
+		
+		var unique = memberIds.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
+						
+		go.Stores.get('User').get(unique, function(entities, async) {	
+			//all data is fetched now. Refresh grid ui.	
+			if(async && me.rendered) {
+				me.getView().refresh();														
+			}
+		});
 
 	}
 

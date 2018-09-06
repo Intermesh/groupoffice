@@ -113,22 +113,19 @@ class SharedRootFolder extends \GO\Base\Db\ActiveRecord {
 				//sort by path and only list top level shares		
 				$shares[$folder->path] = $folder;
 			}
-			ksort($shares);
+			//ksort($shares);
 
 			foreach ($shares as $path => $folder) {
-				$isSubDir = isset($lastPath) && strpos($path . '/', $lastPath . '/') === 0;
-				
+				$isParentShared = isset($shares[dirname($path)]);
 				$isInHome = strpos($path . '/', $homeFolder . '/') === 0;
 
-				if (!$isSubDir && !$isInHome) {
+				if (!$isInHome && !$isParentShared) {
 
 
 					$sharedRoot = new SharedRootFolder();
 					$sharedRoot->user_id = $user_id;
 					$sharedRoot->folder_id = $folder->id;
 					$sharedRoot->save();
-
-					$lastPath = $path;
 				}
 			}
 			

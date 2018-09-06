@@ -1,5 +1,5 @@
 GO.form.TimeField = Ext.extend(Ext.form.TimeField, {
-	width: 80,
+	width: dp(100),
 	
 	
 	initComponent: function () {

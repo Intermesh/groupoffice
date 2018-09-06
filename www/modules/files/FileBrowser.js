@@ -1708,8 +1708,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 								this.overwriteDialog.render(Ext.getBody());
 							}
 
-							var t = new Ext.Template(t("Do you wish to overwrite the file '{file}'?"));
-							t.overwrite(this.overwriteDialog.body, {
+							var tpl = new Ext.Template(t("Do you wish to overwrite the file '{file}'?"));
+							tpl.overwrite(this.overwriteDialog.body, {
 								file: responseParams.fileExists
 							});
 							this.overwriteDialog.show();

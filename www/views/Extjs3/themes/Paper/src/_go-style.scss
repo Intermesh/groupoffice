@@ -352,6 +352,7 @@ a {
 		@include var(background-color, c-primary);
 		> .x-tab-panel-header {
 			position: relative;
+			border-width: 0 0 0 0;
 			/*background-color:rgba(255,255,255,.17);*/
 			.x-tab-strip-active {
 				border-bottom-color: $cAccent;
@@ -489,6 +490,7 @@ a {
 	left: 8px;
 	list-style: none;
 	overflow: visible;
+	pointer-events:none;
 	> div {
 		@extend .z4;
 		min-width: dp(280);

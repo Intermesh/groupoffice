@@ -66,7 +66,7 @@ class Observable{
 			$content = "<?php\n// Build date: ".date('d-m-Y H:i:s')."\n";
 			
 			foreach($listeners as $listener){
-				$content .= '$listeners["'.$listener[1].'"][]=array("'.$listener[0].'", "'.$listener[2].'");'."\n";
+				$content .= '$listeners["'.$listener[1].'"][]=array('.var_export($listener[0], true).', "'.$listener[2].'");'."\n";
 			}	
 			
 			file_put_contents($file, $content);		

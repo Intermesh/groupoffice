@@ -26,9 +26,9 @@ GO.files.SaveAsDialog = Ext.extend(GO.Window, {
 							{
 								if(files[i].data.extension!='folder' && files[i].data.name==this.nameField.getValue())
 								{
-									var t = new Ext.Template(t("{filename} already exists, do you want to overwrite the file?", "files"));
+									var tpl = new Ext.Template(t("{filename} already exists, do you want to overwrite the file?", "files"));
 
-									if(!confirm(t.apply({filename: files[i].data.name})))
+									if(!confirm(tpl.apply({filename: files[i].data.name})))
 									{
 										return false;
 									}

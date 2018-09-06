@@ -1,3 +1,38 @@
+- Merged 6.2.x branch
+- Addressbook: Batch edit problem in address book
+- Addressbook: Drag and drop contacts didn't work
+- Leavedays: Sort on employee in holidays module
+- Fixed google authenticator barcode for ios
+- Support newer encryption library in notes
+- Fixed custom php field
+
+30-08-2018 6.3.36
+- Fixed loading error in group edit dialog
+
+30-08-2018 6.3.35
+- addressbook: fixed merge dialog
+- files: shared root folder will be seen when there parent is not accessible by the current user
+- users: the list filters disabled users by default.
+- users: searching while filtering will work together
+- favorites: will not be rendered when there is no permission.
+- dav: Performance optimizations
+- core: User icon didn't show when selecting a contact / user.
+- billing: Billing report filter didn't work
+- files: fix acl in recent files portlet
+- sync: Require sync module access for activesync
+- projects: added natural sort to project name
+- core: added expression support to ActiveRecord order clause
+- addressbook: fixed advance search with custom fields
+- core: fixed change password in user settings
+
+23-08-2018 6.3.34
+- Fixed broken XLS export
+- Updated Z-push to 2.4.4
+- ActiveSync, Cal-,Card- and WebDAV use new framework for authentication so that IMAP and LDAP authentication work
+- Users: added disabled filter and color to show disabled users
+- User: added column to see which authentication methods are configured
+- Goolge authenticator enable/disable fixed when logged in as Admin
+- Framework Customfield:getAttributeByName() function fixed
 - Dokuwiki module compatible with 6.3
 - Users grid has disabled filter and shows disabled users lighter
 

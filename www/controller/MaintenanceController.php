@@ -439,6 +439,8 @@ class MaintenanceController extends AbstractController {
 	
 	private function _checkCoreModels(){
 		
+		$sql = "delete from go_acl where acl_id = 0;";
+		\GO::getDbConnection()->query($sql);	
 		
 		$classes=\GO::findClasses('model');
 		foreach($classes as $model){

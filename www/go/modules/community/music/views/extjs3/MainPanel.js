@@ -63,11 +63,7 @@ go.modules.community.music.MainPanel = Ext.extend(go.panels.ModulePanel, {
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (btn) {
-						var dlg = new go.modules.community.music.ArtistDialog({
-							formValues: {
-								// you can pass form values like this 
-							}
-						});
+						var dlg = new go.modules.community.music.ArtistDialog();
 						dlg.show();
 					},
 					scope: this
@@ -80,7 +76,7 @@ go.modules.community.music.MainPanel = Ext.extend(go.panels.ModulePanel, {
 							iconCls: 'ic-delete',
 							text: t("Delete"),
 							handler: function () {
-								this.aristGrid.deleteSelected();
+								this.artistGrid.deleteSelected();
 							},
 							scope: this
 						}

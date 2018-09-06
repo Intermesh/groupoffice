@@ -27,14 +27,14 @@
 class WebserviceInfo {
 
     /**
-     * Returns a list of folders of the Request::GetGETUser().
+     * Returns a list of folders of the requested user.
      * If the user has not enough permissions an empty result is returned.
      *
      * @access public
      * @return array
      */
     public function ListUserFolders() {
-        $user = Request::GetGETUser();
+        $user = Request::GetImpersonatedUser() ? Request::GetImpersonatedUser() : Request::GetGETUser();
         $output = array();
         $hasRights = ZPush::GetBackend()->Setup($user);
         ZLog::Write(LOGLEVEL_INFO, sprintf("WebserviceInfo::ListUserFolders(): permissions to open store '%s': %s", $user, Utils::PrintAsString($hasRights)));
@@ -54,13 +54,13 @@ class WebserviceInfo {
     }
 
     /**
-     * Returns signatures saved for the Request::GetGETUser().
+     * Returns signatures saved for the requested user.
      *
      * @access public
      * @return KoeSignatures
      */
     public function GetSignatures() {
-        $user = Request::GetGETUser();
+        $user = Request::GetImpersonatedUser() ? Request::GetImpersonatedUser() : Request::GetGETUser();
         $sigs = null;
 
         $hasRights = ZPush::GetBackend()->Setup($user);

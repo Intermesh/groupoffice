@@ -1,6 +1,6 @@
 <?php
 /***********************************************
-* File      :   ipcwincache.php
+* File      :   ipcwincacheprovider.php
 * Project   :   Z-Push
 * Descr     :   IPC Provider for PHP wincache extension
 *

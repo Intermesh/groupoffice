@@ -22,24 +22,22 @@ $font-weight-l: 100;
 }
 
 %font-body1 {
-	font-size: sp(14); //14 for device
+	font-size: sp(14);
 	color: color($fg, 'text');
 	font-weight: $font-weight-r;
-	line-height: dp(20);
+	line-height: dp(24);
 	.primary & { color: white; }
 }
 
 %font-body2 {
 	font-size: sp(14); //14 for big screen | device
-	line-height: dp(24);
+	line-height: dp(20);
 	font-weight: $font-weight-m;
 }
 
 %font-data {
-	font-size: sp(14);
+	font-size: sp(16);
 	font-weight: $font-weight-r;
-	
-	//color: color($fg, 'text');
 }
 %font-data-head {
 	font-size: sp(12);
@@ -48,7 +46,7 @@ $font-weight-l: 100;
 }
 
 %font-subheading {
-	font-size: sp(15); //16 for device
+	font-size: sp(16);
 	line-height: dp(24);
 	color: color($fg, 'secondary-text');
 	font-weight: $font-weight-r;
