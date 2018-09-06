@@ -168,10 +168,7 @@ GO.modules.MainPanel = function(config) {
 			header:'',
 			dataIndex:'actions',
 			renderer:function(val, meta, record, rowIndex, columnIndex, store){
-				meta.css += 'mo-actions-column';
-				
-				console.log(record.data);
-				
+				meta.css += 'mo-actions-column';			
 				if(record.data.installed){
 					return '<a href="#" onclick="GO.moduleManager.deleteModule(\''+record.data.id+'\',\''+record.data.name+'\');"><span class="go-icon-mo-delete"></span></a>';
 				} else {
@@ -642,8 +639,9 @@ GO.moduleManager.deleteModule = function(moduleId, name){
 	},this);
 };
 
-GO.moduleManager.addModule('modules', GO.modules.MainPanel, {
-	title: GO.modules.lang.modules,
+go.Modules.register('core', 'modules' ,{
+  mainPanel: GO.modules.MainPanel,
+  title: t("Modules", "modules"),
 	iconCls: 'go-tab-icon-modules',
 	admin: true,
   entities: ["Module"]
