@@ -1,3 +1,5 @@
+- Addressbook: Batch edit problem in address book
+- Leavedays: Sort on employee in holidays module
 - Fixed google authenticator barcode for ios
 - Support newer encryption library in notes
 - Fixed custom php field
