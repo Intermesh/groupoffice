@@ -127,10 +127,20 @@ abstract class ReadOnlyEntityController extends Controller {
 		
 		if(!isset($params['sort'])) {
 			$params['sort'] = [];
+		} else
+		{
+			if(!is_array($params['sort'])) {
+				throw new InvalidArguments("Parameter 'sort' must be an array");
+			}
 		}
 		
 		if(!isset($params['filter'])) {
 			$params['filter'] = [];
+		} else
+		{
+			if(!is_array($params['filter'])) {
+				throw new InvalidArguments("Parameter 'filter' must be an array");
+			}
 		}
 		
 		if(!isset($params['accountId'])) {
@@ -192,7 +202,7 @@ abstract class ReadOnlyEntityController extends Controller {
 	 * @param string[] $sort
 	 * @return array[]
 	 */
-	protected function transformSort($sort) {
+	protected function transformSort($sort) {		
 		if(empty($sort)) {
 			return [];
 		}
