@@ -1,4 +1,5 @@
-- Billing: Amounts can be seareched in local format.
+- Projects: Fixed decimals in activity type rates
+- Billing: Amounts can be searched in local format.
 - Email: Save all attachments to personal folder function would also save inline attachments
 
 06-08-2018 6.2.102
