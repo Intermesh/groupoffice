@@ -125,11 +125,7 @@ GO.addressbook.MainPanel = function(config) {
 			},
 			rowdblclick: function(){
 				this.contactEastPanel.editHandler();
-			},
-			show: function(){
-				this.setAdvancedSearchNotification(this.contactsGrid.store);
-				this.addressbooksGrid.setType('contact');
-			},
+			},			
 			scope:this
 		}
 	});
@@ -234,10 +230,6 @@ GO.addressbook.MainPanel = function(config) {
 			},
 			rowdblclick: function(){
 				this.companyEastPanel.editHandler();
-			},
-			show: function(){
-				this.setAdvancedSearchNotification(this.companiesGrid.store);
-				this.addressbooksGrid.setType('company');
 			},
 			scope:this
 		}
@@ -422,14 +414,28 @@ this.exportCompanyMenu.setColumnModel(this.companiesGrid.getColumnModel());
 			items:[
 				this.contactsGrid,
 				this.contactEastPanel
-			]
+			],
+			listeners: {
+				scope: this,
+				show: function(){
+					this.setAdvancedSearchNotification(this.contactsGrid.store);
+					this.addressbooksGrid.setType('contact');
+				}
+			}
 		},{
 			id: 'ab-companies',
 			layout: 'border',
 			items:[
 				this.companiesGrid,
 				this.companyEastPanel
-			]
+			],
+			listeners: {
+				scope: this,
+				show: function(){
+					this.setAdvancedSearchNotification(this.companiesGrid.store);
+					this.addressbooksGrid.setType('company');
+				}
+			}
 		}
 		]
 	});
