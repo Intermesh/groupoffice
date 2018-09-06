@@ -3,7 +3,6 @@ namespace go\core\util;
 
 use Exception;
 use go\core\fs\File;
-use go\core\http\Exception as Exception2;
 use function GO;
 
 /**
@@ -74,10 +73,14 @@ class Lock {
 	public function unlock() {
 		//cleanup lock file if lock() was used
 		if(isset($this->lockFile)) {
+			flock($this->lockFp, LOCK_UN);
 			fclose($this->lockFp);
 			if(file_exists($this->lockFile)) {
 				unlink($this->lockFile);			
 			}
+			
+			$this->lockFp = null;
+			$this->lockFile = null;
 		}
 	}
 	

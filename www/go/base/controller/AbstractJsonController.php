@@ -137,7 +137,7 @@ abstract class AbstractJsonController extends AbstractController {
 	 */
 	public function renderSubmit($model) {
 
-		$response = array('feedback' => '', 'success' => true);
+		$response = array('success' => true);
 		//$ret = $this->beforeSubmit($response, $model, $params);
 		//$modifiedAttributes = $model->getModifiedAttributes();
 		if (!$model->hasValidationErrors() && !$model->isNew) { //model was saved
