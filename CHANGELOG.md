@@ -1,3 +1,4 @@
+- Merged 6.2.x branch
 - Addressbook: Batch edit problem in address book
 - Addressbook: Drag and drop contacts didn't work
 - Leavedays: Sort on employee in holidays module
