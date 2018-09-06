@@ -521,11 +521,14 @@ class Task extends \GO\Base\Db\ActiveRecord {
 			}
 		}
 		
-		if((string) $vobject->completed!=''){
+		if(!empty($vobject->completed)){
 			$this->completion_time=$vobject->completed->getDateTime()->format('U');
 			$this->status='COMPLETED';
 		}else
 		{
+			if(empty($vobject->status)) {
+				$this->status = self::STATUS_NEEDS_ACTION;
+			}
 			$this->completion_time=0;
 		}
 		

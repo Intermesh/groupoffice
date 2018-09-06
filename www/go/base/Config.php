@@ -1000,7 +1000,6 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/*////////////////////////////////////////////////
 	 * Variables below this should not be changed
 	 *////////////////////////////////////////////////
-	
 
 	#group configuration
 	/**
