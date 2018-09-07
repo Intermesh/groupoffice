@@ -82,9 +82,9 @@ go.grid.GridTrait = {
 
 	deleteSelected: function () {
 
-		var selectedRecords = this.getSelectionModel().getSelections(), ids = selectedRecords.column("id"), strConfirm;
+		var selectedRecords = this.getSelectionModel().getSelections(), count = selectedRecords.length, strConfirm;
 
-		switch (ids.length)
+		switch (count)
 		{
 			case 0:
 				return;
@@ -93,7 +93,7 @@ go.grid.GridTrait = {
 				break;
 
 			default:
-				strConfirm = t("Are you sure you want to delete the {count} items?").replace('{count}', ids.length);
+				strConfirm = t("Are you sure you want to delete the {count} items?").replace('{count}', count);
 				break;
 		}
 
@@ -102,11 +102,17 @@ go.grid.GridTrait = {
 			if (btn != "yes") {
 				return;
 			}
-
-			this.getStore().entityStore.set({
-				destroy: ids
-			});
+			
+			this.doDelete(selectedRecords);
+			
 		}, this);
+	},
+	
+	
+	doDelete : function(selectedRecords) {
+		this.getStore().entityStore.set({
+			destroy:  selectedRecords.column("id")
+		});
 	},
 
 	allRecordsLoaded : false,
