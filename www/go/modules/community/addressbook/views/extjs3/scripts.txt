@@ -9,3 +9,5 @@ AddressBookDialog.js
 GroupDialog.js
 StarButton.js
 ContactCombo.js
+CustomFieldCategoryPanel.js
+SystemSettingsPanel.js

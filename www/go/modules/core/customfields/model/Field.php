@@ -87,4 +87,13 @@ class Field extends AclItemEntity {
 	public function dbToApi($value, $values) {		
 		return $this->getDataType()->dbToApi($value, $values);
 	}
+	
+	public static function filter(\go\core\db\Query $query, array $filter) {
+		
+		if(!empty($filter['fieldSetId'])) {
+			$query->andWhere(['fieldSetId' => $filter['fieldSetId']]);
+		}
+		
+		return parent::filter($query, $filter);
+	}
 }

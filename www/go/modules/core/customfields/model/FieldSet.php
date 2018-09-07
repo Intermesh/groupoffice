@@ -21,6 +21,8 @@ class FieldSet extends AclEntity {
 	
 	protected $entity;
 	
+	public $enableCondition;
+	
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable('core_customfields_field_set', 'fs')
@@ -29,6 +31,18 @@ class FieldSet extends AclEntity {
 	
 	public function getEntity() {
 		return $this->entity;
+	}
+	
+	public static function filter(Query $query, array $filter) {
+		
+		if(!empty($filter['entities'])) {
+			
+			$ids = \go\core\orm\EntityType::namesToIds($filter['entities']);
+			
+			$query->andWhere('entityId', 'IN', $ids);
+		}
+		
+		return parent::filter($query, $filter);
 	}
 
 }
