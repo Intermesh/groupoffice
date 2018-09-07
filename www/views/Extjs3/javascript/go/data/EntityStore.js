@@ -367,5 +367,22 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 			}
 		});
+	},
+	
+	/**
+	 * Query the API for a sorted / filtered list of entity id's
+	 * 
+	 * @param {object} params
+	 * @param {function} callback
+	 * @param {object} scope
+	 * @returns {String} Client call ID
+	 */
+	query : function(params, callback, scope) {
+		return go.Jmap.request({
+			method: this.entity.name + "/query",
+			params: params,
+			callback: callback,
+			scope: scope || this
+		});
 	}
 });

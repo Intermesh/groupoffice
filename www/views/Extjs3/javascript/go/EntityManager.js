@@ -67,20 +67,57 @@
 			}
     },
 
+		/**
+		 * Get entity object
+		 * 
+		 * An entiy has these properties:
+		 * 
+		 * name: "Contact"
+		 * module: "addressbook",
+		 * package: "community"
+		 * 
+		 * Functions:
+		 * 
+		 * getRouterPath : "contact/1"
+		 * goto: Navigates to the contact
+		 * 
+		 * @param {string} name
+		 * @returns {entities|EntityManagerL#1.entities}
+		 */
     get: function (name) {      
       return entities[name.toLowerCase()];      
     },
     
+		/**
+		 * Get all entity objects
+		 * 
+		 * @see get(); 
+		 * @returns {Object[]}
+		 */
     getAll: function() {
-      return entities;
+			var e = [];
+      for(entity in entities) {
+				if(go.Modules.isAvailable(entities[entity].package, entities[entity].module)) {
+					e.push(entities[entity]);
+				}
+			}
+			
+			return e;
     }
   };
   
   
   go.Stores = {
-    get: function (name) {
+		
+		/**
+		 * Get EntityStore by entity name
+		 * 
+		 * @param {string} entityName eg. "Contact"
+		 * @returns {Boolean|EntityManagerL#1.stores|stores}
+		 */
+    get: function (entityName) {
       
-      lcname = name.toLowerCase();
+      lcname = entityName.toLowerCase();
 			
 			var entity = go.Entities.get(lcname);
 			if(!entity) {
