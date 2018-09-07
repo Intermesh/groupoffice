@@ -108,7 +108,13 @@ go.Jmap = {
 			return false;
 		}
 		
-		var source = new EventSource(go.User.eventSourceUrl), me = this;
+		//filter out legacy modules
+		var entities = go.Entities.getAll().filter(function(e) {return e.package != "legacy";});
+		
+		var url = go.User.eventSourceUrl + '?types=' + 
+						entities.column("name").join(',');
+		
+		var source = new EventSource(url), me = this;
 		
 		source.addEventListener('state', function(e) {
 			for(var entity in JSON.parse(e.data)) {
@@ -145,7 +151,7 @@ go.Jmap = {
 	 * scope: callback function scope
 	 * dispatchAfterCallback: dispatch the response after the callback. Defaults to false.
 	 * 
-	 * @returns {String}
+	 * @returns {String} Client call ID.
 	 */
 	request: function (options) {
 		if(!options.method) {
