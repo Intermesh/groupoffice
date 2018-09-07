@@ -33,6 +33,12 @@ class FieldSet extends AclEntity {
 		return $this->entity;
 	}
 	
+	public function setEntity($name) {
+		$this->entity = $name;
+		$e = \go\core\orm\EntityType::findByName($name);
+		$this->entityId = $e->getId();
+	}
+	
 	public static function filter(Query $query, array $filter) {
 		
 		if(!empty($filter['entities'])) {

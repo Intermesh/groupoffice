@@ -15,9 +15,6 @@ go.modules.community.addressbook.CustomFieldCategoryPanel = Ext.extend(go.grid.G
 
 	autoHeight: true,
 	initComponent: function () {
-
-		this.title = t("Custom fields");
-
 		
 		this.store = new Ext.data.ArrayStore({
 			fields: [				
@@ -29,16 +26,28 @@ go.modules.community.addressbook.CustomFieldCategoryPanel = Ext.extend(go.grid.G
 				'isFieldSet'
 			]
 		});
+		
+		go.Stores.get("FieldSet").on("changes", function(store, added, changed, destoyed) {
+			if(!this.loading) {
+				this.load();
+			}
+		}, this);
 
 
 		Ext.apply(this, {
 			//plugins: [actions],
-			tbar: ["->", {
+			tbar: [
+				{
+					xtype: "tbtitle",
+					text: t('Custom fields')
+				},
+				"->", 
+				{
 					iconCls: 'ic-add',
 					tooltip: t('Add field set'),
 					handler: function (e, toolEl) {
-//						var dlg = new go.modules.community.apikeys.KeyDialog();
-//						dlg.show();
+						var dlg = new go.modules.community.addressbook.CustomFieldSetDialog();
+						dlg.show();
 					}
 				}
 			],
@@ -151,16 +160,23 @@ go.modules.community.addressbook.CustomFieldCategoryPanel = Ext.extend(go.grid.G
 			this.moreMenu = new Ext.menu.Menu({
 				items: [
 					{
-						itemId: "view",
-						iconCls: 'ic-search',
-						text: t("View access token"),
+						itemId: "edit",
+						iconCls: 'ic-edit',
+						text: t("Edit"),
 						handler: function () {
-							alert(this.moreMenu.record.get('accessToken'));
+							
+							if(this.moreMenu.record.data.isFieldSet) {
+								var dlg = new go.modules.community.addressbook.CustomFieldSetDialog();
+								dlg.load(this.moreMenu.record.data.fieldSetId).show();
+							} else
+							{
+								alert("TODO!");
+							}
 						},
 						scope: this
 					}, {
 						itemId: "delete",
-						iconCls: 'ic-share',
+						iconCls: 'ic-delete',
 						text: t("Delete"),
 						handler: function () {
 							this.getSelectionModel().selectRecords([this.moreMenu.record]);
@@ -176,8 +192,36 @@ go.modules.community.addressbook.CustomFieldCategoryPanel = Ext.extend(go.grid.G
 
 		this.moreMenu.showAt(e.getXY());
 	},
+	
+	doDelete : function(selectedRecords) {
+		
+		var fieldSetIds = [], fieldIds = [];
+		selectedRecords.forEach(function(r) {
+			if(r.data.isFieldSet) {
+				fieldSetIds.push(r.data.fieldSetId); 
+			} else
+			{
+				fieldIds.push(r.data.fieldId); 
+			}
+		})
+		
+		if(fieldSetIds.length) {
+			go.Stores.get("FieldSet").set({
+				destroy:  fieldSetIds
+			});
+		}
+		
+		if(fieldIds.length) {
+			go.Stores.get("Field").set({
+				destroy:  fieldIds
+			});
+		}
+	},
 
 	load: function () {
+		
+		this.loading = true;
+		this.store.removeAll();
 
 		go.Stores.get("FieldSet").query({
 			sort: ["name ASC"],
@@ -232,7 +276,7 @@ go.modules.community.addressbook.CustomFieldCategoryPanel = Ext.extend(go.grid.G
 						{field: 'isFieldSet', direction: 'DESC'},
 						{field: 'name', direction: 'ASC'}
 					]);
-					
+					this.loading = false;
 				}, this);
 			}, this);
 
