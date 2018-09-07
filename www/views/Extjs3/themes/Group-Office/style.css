@@ -19,6 +19,15 @@
 	background:url('images/16x16/celledit.png') no-repeat top right !important;
 }
 
+.x-grid3-row td.go-grid-col-icon > div > div { 
+	width:16px;
+	height:16px;
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: cover;
+	box-sizing: border-box;
+}
+
 #beta { 
     font-size: 9px;
     font-weight: bold;
