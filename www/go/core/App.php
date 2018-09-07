@@ -168,11 +168,17 @@ namespace go\core {
 			
 			$configFile = $this->findConfigFile();
 			if(!$configFile) {
-				throw new \Exception("No config.php was found. Possible locations: \n\n".
-								'/etc/groupoffice/multi_instance/' . explode(':', $_SERVER['HTTP_HOST'])[0] . "/config.php\n\n".
-								dirname(dirname(__DIR__)) . "/config.php\n\n".
-								"/etc/groupoffice/config.php"
-								);
+				
+				$msg = "No config.php was found. Possible locations: \n\n";
+				
+				if(isset($_SERVER['HTTP_HOST'])) {
+								$msg .= '/etc/groupoffice/multi_instance/' . explode(':', $_SERVER['HTTP_HOST'])[0] . "/config.php\n\n";
+				}
+				
+				$msg .= dirname(dirname(__DIR__)) . "/config.php\n\n".
+								"/etc/groupoffice/config.php";
+				
+				throw new \Exception($msg);
 			}
 			
 			require($configFile);	
