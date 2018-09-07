@@ -5,7 +5,7 @@ go.Modules.register("community", "music", {
 	title: t("Music"),
 	
 	//All module entities must be defined here. Stores will be created for them.
-	entities: ["Genre", "Album", "Artist"],
+	entities: ["Genre", "Artist"],
 	
 	//Put code to initialize the module here.
 	initModule: function () {}
