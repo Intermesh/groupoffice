@@ -4566,6 +4566,9 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 	 * @return boolean
 	 */
 	public function unlink($model, $unlinkBack=true){
+		
+		$this->fireEvent('beforeUnlink',array(&$this, &$model, $unlinkBack));
+		
 		$sql = "DELETE FROM `go_links_{$this->tableName()}` WHERE id=:id AND model_type_id=:model_type_id AND model_id=:model_id";
 
 		$values=array(
