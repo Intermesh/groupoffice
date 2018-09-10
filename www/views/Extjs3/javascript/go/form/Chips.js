@@ -38,8 +38,10 @@ go.form.Chips = Ext.extend(Ext.Container, {
 			this.comboBox.store.baseParams.filter.exclude = this.dataView.store.getRange().column("id");			
 		}, this);
 		
-		this.items = [
-			this.createComboBox(),
+		this.items = [{
+				layout: "form",				
+				items: [this.createComboBox()]
+			},
 			this.dataView
 		];
 
