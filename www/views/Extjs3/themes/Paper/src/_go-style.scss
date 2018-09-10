@@ -994,7 +994,6 @@ table.display-panel {
 	clear: both;
 	td, th {
 		padding: dp(8);
-		white-space: nowrap;
 		&:first-child {
 			padding-left: dp(16);
 		}
