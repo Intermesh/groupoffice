@@ -18,8 +18,7 @@ class Search extends \go\core\acl\model\AclEntity {
 	 */
 	protected $entity;
 	protected $moduleId;
-	protected $aclId;
-
+	
 	public function getEntity() {
 		return $this->entity;
 	}
