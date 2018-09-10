@@ -471,7 +471,7 @@ abstract class ImapBase {
 				$p .= $u7;
 		}
 
-		return $p;
+		return str_replace(array('\\\\','\"'), array('\\','"'), $p);
 	}
 
 
@@ -583,7 +583,7 @@ abstract class ImapBase {
 			$p .= '-';
 		}
 
-		return $p;
+		return str_replace(array('\\','"'), array('\\\\','\"'), $p);
 	}
 
 

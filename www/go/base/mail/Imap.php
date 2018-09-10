@@ -870,7 +870,7 @@ class Imap extends ImapBodyStruct {
 			$this->touched_folders[]=$mailbox_name;
 
 
-		$box = $this->utf7_encode($this->_escape( $mailbox_name));
+		$box = $this->utf7_encode($mailbox_name);
 		$this->clean($box, 'mailbox');
 
 		\GO::debug("Selecting IMAP mailbox $box");
