@@ -2110,6 +2110,9 @@ class MessageController extends \GO\Base\Controller\AbstractController {
 			$response['feedback']='Could not save all files to the selected folder';
 		}
 		
+		// Call syncFilesystem on the folder because otherwise the files are not yet visible in the database.
+		$folder->syncFilesystem();
+		
 		return $response;
 	}
 
