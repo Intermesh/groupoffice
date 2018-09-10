@@ -147,13 +147,21 @@ go.form.Dialog = Ext.extend(go.Window, {
 	focus: function () {
 		this.formPanel.focus();
 	},
+	
+	onBeforeSubmit: function() {
+		return true;
+	},
 
 	submit: function () {
+		
+		if(!this.onBeforeSubmit()) {
+			return;
+		}
 
 		if (!this.isValid()) {
 			return;
 		}
-
+		
 		this.actionStart();
 
 		this.formPanel.submit(function (formPanel, success, serverId) {
