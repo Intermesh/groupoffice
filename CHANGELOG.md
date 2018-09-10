@@ -1,3 +1,5 @@
+- File search: File index aborted on error
+- Files: fixed search returning invalid id's and file property dialog from search
 - Merged 6.2.x branch
 - Addressbook: Batch edit problem in address book
 - Addressbook: Drag and drop contacts didn't work
