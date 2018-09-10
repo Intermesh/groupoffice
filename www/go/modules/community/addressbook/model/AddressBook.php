@@ -55,5 +55,13 @@ class AddressBook extends \go\core\acl\model\AclEntity {
 						->all();
 						
 	}
+	
+	public static function filter(\go\core\db\Query $query, array $filter) {
+		if(!empty($filter['q'])) {
+			$query->andWhere("name", "LIKE", $filter['q'] . "%");			
+		}
+		
+		return parent::filter($query, $filter);
+	}
 
 }

@@ -425,10 +425,6 @@ class User extends Entity {
 			$query->join('core_user_group', 'ug', 'ug.userId = u.id')->andWhere(['ug.groupId' => $filter['groupId']]);
 		}
 		
-		if(!empty($filter['exclude'])) {
-			$query->andWhere('id', 'NOT IN', $filter['exclude']);
-		}
-		
 		return parent::filter($query, $filter);
 	}
 

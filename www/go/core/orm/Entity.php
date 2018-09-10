@@ -377,7 +377,12 @@ abstract class Entity extends Property {
 	 * @param array $filter key value array eg. ["q" => "foo"]
 	 * @return Query
 	 */
-	public static function filter(Query $query, array $filter) {		
+	public static function filter(Query $query, array $filter) {	
+		
+		if(!empty($filter['exclude'])) {
+			$query->andWhere('id', 'NOT IN', $filter['exclude']);
+		}
+		
 		return $query;
 	}
 	
