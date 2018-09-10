@@ -32,34 +32,31 @@ go.modules.community.addressbook.CustomFieldSetDialog = Ext.extend(go.form.Dialo
 							scope: this,
 							change: this.onEnableForChange
 						}
-					},{
-						xtype: "hidden",
-						name: "enableCondition",
-						value: ""
 					}]
 			}
 		];
 	},
 	
 	onEnableForChange : function(field, radioBtn) {
-		var c;
+		
+		if(!this.formPanel.values.filter) {
+			this.formPanel.values.filter = {};
+		}
 		
 		switch(radioBtn.inputValue) {
 			case 'contacts':
-				c = "isOrganization = false";
+				this.formPanel.values.filter.isOrganization = false;
 				break;
 				
 			case 'organizations':
-				c = "isOrganization = true";
+				this.formPanel.values.filter.isOrganization = true;
 				break;
 				
 			default:				
-				c = "";
+				delete this.formPanel.values.filter.isOrganization;
 				break;
 				
 		}
-				
-		this.formPanel.getForm().findField('enableCondition').setValue(c);
 	},
 	
 	onLoad : function() {
@@ -69,22 +66,20 @@ go.modules.community.addressbook.CustomFieldSetDialog = Ext.extend(go.form.Dialo
 	},
 	
 	evalEnableFor : function() {
-		var pattern = /isOrganization = (true|false)/, 
-						c = this.formPanel.getForm().findField('enableCondition').getValue(),
-						enableFor = this.formPanel.getForm().findField('enableFor');
-		
-		match = pattern.exec(c);
-		
-		if(!match) {
-			enableFor.setValue("all");
-			return
-		}
-		if(match[1] == "true") {
-			enableFor.setValue("organizations");
-		} else
-		{
-			enableFor.setValue("contacts");
-		}
+		var enableFor = this.formPanel.getForm().findField('enableFor');
+		console.log(this.formPanel.entity);
+		switch(this.formPanel.entity.filter.isOrganization) {
+			case true:
+				enableFor.setValue("organizations");
+				break;
+				
+			case false:
+				enableFor.setValue("contacts");
+				break;
+				
+			default:
+				enableFor.setValue("all");
+		}		
 	}
 });
 

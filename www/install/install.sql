@@ -82,7 +82,8 @@ CREATE TABLE `core_customfields_field_set` (
   `entityId` int(11) NOT NULL,
   `aclId` int(11) NOT NULL,
   `name` varchar(50) DEFAULT NULL,
-  `sortOrder` tinyint(4) NOT NULL DEFAULT '0'
+  `sortOrder` tinyint(4) NOT NULL DEFAULT '0',
+	`filter` TEXT NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS `core_entity`;

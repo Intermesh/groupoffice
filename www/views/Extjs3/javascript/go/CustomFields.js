@@ -69,7 +69,13 @@
 
 			for (var id in all) {
 				field = all[id];
-				if (field.fieldSetId == fieldSetId) {					
+				if (field.fieldSetId == fieldSetId) {		
+					
+					if(!GO.customfields.dataTypes[field.datatype]) {
+						console.error("Custom field type " + field.datatype + " not found");
+						continue;
+					}
+					
 					formField = GO.customfields.dataTypes[field.datatype].getFormField(field, {serverFormats: false});
 
 					r.push(formField);
@@ -148,6 +154,12 @@
 					var tpl = '<tpl for="customFields"><div class="icons">';
 
 					go.CustomFields.getFields(fieldSet.id).forEach(function (field) {
+						
+						if(!GO.customfields.dataTypes[field.datatype]) {
+							console.error("Custom field type " + field.datatype + " not found");
+							return;
+						}
+						
 						tpl += '<tpl if="!GO.util.empty(go.CustomFields.renderField(\'' + field.id + '\',values))"><p><i class="icon label">' + go.CustomFields.getFieldIcon(field.id) + '</i>\
 					<span>{[go.CustomFields.renderField("' + field.id + '",values)]}</span>\
 						<label>' + t(field.name) + '</label>\
@@ -164,7 +176,7 @@
 						collapsible: true,
 						onLoad: function(dv) {
 							
-							var vis = false;
+							var vis = false;							
 							go.CustomFields.getFields(fieldSet.id).forEach(function (field) {
 								if(!GO.util.empty(dv.data.customFields[field.databaseName])) {
 									vis = true;

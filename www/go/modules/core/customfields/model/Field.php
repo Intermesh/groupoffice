@@ -56,7 +56,7 @@ class Field extends AclItemEntity {
 	}
 	
 	public function getOptions() {
-		return json_decode($this->options, true);
+		return empty($this->options) ? [] : json_decode($this->options, true);
 	}
 	
 	public function setOptions($options) {

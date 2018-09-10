@@ -226,7 +226,7 @@ go.modules.community.addressbook.CustomFieldCategoryPanel = Ext.extend(go.grid.G
 		go.Stores.get("FieldSet").query({
 			sort: ["name ASC"],
 			filter: {
-				entities: ["Contact", "Company"]
+				entities: ["Contact"]
 			}
 		}, function (options, success, response) {
 

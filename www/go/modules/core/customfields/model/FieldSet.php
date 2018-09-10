@@ -21,7 +21,15 @@ class FieldSet extends AclEntity {
 	
 	protected $entity;
 	
-	public $enableCondition;
+	protected $filter;	
+	
+	public function getFilter() {
+		return empty($this->filter) ? [] : json_decode($this->filter , true);
+	}
+	
+	public function setFilter($filter) {
+		$this->filter = json_encode($filter);
+	}
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()

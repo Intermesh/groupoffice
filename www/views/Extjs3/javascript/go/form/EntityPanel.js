@@ -4,8 +4,13 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	buttonAlign: 'left',
 	autoScroll: true,
 	entity: null,
+	values : null,
 	initComponent : function() {
-		go.form.EntityPanel.superclass.initComponent.call(this);				
+		go.form.EntityPanel.superclass.initComponent.call(this);	
+		
+		this.entity = {};
+		this.values = {};
+		
 		this.entityStore.on('changes',this.onChanges, this);
 		this.on('destroy', function() {
 			this.entityStore.un('changes', this.onChanges, this);
@@ -37,15 +42,20 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 			return false;
 		}		
 	},
+	
+	getValues : function () {
+		//get only modified values on existing items, otherwise get all values.
+		var v = Ext.apply(this.values, this.getForm().getFieldValues(!!this.currentId));
+		return v;
+	},
 
 	submit: function (cb, scope) {
 
 		if (!this.isValid()) {
 			return;
-		}
+		}		
 		
-		//get only modified values on existing items, otherwise get all values.
-		var id, params = {}, values = this.getForm().getFieldValues(!!this.currentId);
+		var id, params = {}, values = this.getValues();
 		
 		if (this.currentId) {
 
