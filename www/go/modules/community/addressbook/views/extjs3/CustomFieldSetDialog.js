@@ -92,7 +92,7 @@ go.modules.community.addressbook.CustomFieldSetDialog = Ext.extend(go.form.Dialo
 			delete this.formPanel.values.filter.addressBooks;
 		} else
 		{
-			this.formPanel.values.filter.addressBooks = this.formPanel.getForm().findField("addressBooks").getValue().column("id");
+			this.formPanel.values.filter.addressBookId = this.formPanel.getForm().findField("addressBooks").getValue().column("id");
 		}
 		
 		return go.modules.community.addressbook.CustomFieldSetDialog.superclass.onBeforeSubmit.call(this);
@@ -102,9 +102,9 @@ go.modules.community.addressbook.CustomFieldSetDialog = Ext.extend(go.form.Dialo
 	evalEnableFor : function() {
 		var enableFor = this.formPanel.getForm().findField('enableFor');
 		
-		this.formPanel.getForm().findField("enableAddressBookFilter").setValue(!!this.formPanel.entity.filter.addressBooks);
+		this.formPanel.getForm().findField("enableAddressBookFilter").setValue(!!this.formPanel.entity.filter.addressBookId);
 		
-		go.Stores.get("AddressBook").get(this.formPanel.entity.filter.addressBooks, function(addressBooks) {
+		go.Stores.get("AddressBook").get(this.formPanel.entity.filter.addressBookId, function(addressBooks) {
 			this.formPanel.getForm().findField("addressBooks").setValue(addressBooks);
 		}, this);
 		
