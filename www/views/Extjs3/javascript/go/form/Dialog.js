@@ -52,17 +52,12 @@ go.form.Dialog = Ext.extend(go.Window, {
 			this.formPanel.form.setValues(this.formValues);
 			delete this.formValues;
 		}
+		
+		this.addEvents({load: true, submit: true});
 	},
 	
-	setValues : function(v) {
-		this.formPanel.form.setValues(v);
-		
-		return this;
-	},
-	
-	setValues : function(v) {
-		this.formPanel.form.setValues(v);
-		
+	setValues : function(v) {		
+		this.formPanel.setValues(v);
 		return this;
 	},
 
@@ -118,6 +113,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 	},
 	
 	onLoad : function() {
+		this.fireEvent("load", this);
 //		this.deleteBtn.setDisabled(this.formPanel.entity.permissionLevel < GO.permissionLevels.writeAndDelete);
 	},
 
@@ -167,6 +163,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 		this.formPanel.submit(function (formPanel, success, serverId) {
 			this.actionComplete();
 			this.onSubmit(success, serverId);
+			this.fireEvent("submit", this, success, serverId);
 			if (success) {
 				this.close();
 			}
@@ -185,3 +182,5 @@ go.form.Dialog = Ext.extend(go.Window, {
 		];
 	}
 });
+
+Ext.reg("formdialog", go.form.Dialog);

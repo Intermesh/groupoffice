@@ -124,6 +124,9 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 	getValue: function () {
 		var v = [];
+		if(!this.items) {
+			return v;
+		}
 		this.items.each(function(i) {
 			v.push(this.getPanelValue(i.formPanel));
 		}, this);

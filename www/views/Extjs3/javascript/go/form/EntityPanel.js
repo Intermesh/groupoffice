@@ -35,7 +35,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		var entities = this.entityStore.get([id]);
 		
 		if(entities) {
-			this.getForm().setValues(entities[0]);
+			this.setValues(entities[0]);
 			this.entity = entities[0];
 			return entities[0];
 		} else {
@@ -43,10 +43,30 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		}		
 	},
 	
-	getValues : function () {
-		//get only modified values on existing items, otherwise get all values.
-		var v = Ext.apply(this.values, this.getForm().getFieldValues(!!this.currentId));
+	getValues : function (dirtyOnly) {	
+		var v = {};		
+		for(var name in this.values) {
+			if(!dirtyOnly || this.entity[name] != this.values[name]) {
+				v[name] = this.values[name];
+			}
+		}
+		
+		Ext.apply(v, this.getForm().getFieldValues(dirtyOnly));
 		return v;
+	},
+	
+	setValues : function(v) {
+		var field, name;
+		for(name in v) {		
+			field = this.getForm().findField(name);
+			if(field) {
+				field.setValue(v[name]);
+			} else
+			{
+				this.values[name] = v[name];
+			}
+		}
+		return this;
 	},
 
 	submit: function (cb, scope) {
@@ -54,8 +74,8 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		if (!this.isValid()) {
 			return;
 		}		
-		
-		var id, params = {}, values = this.getValues();
+		//get only modified values on existing items, otherwise get all values.
+		var id, params = {}, values = this.getValues(!!this.currentId);
 		
 		if (this.currentId) {
 
