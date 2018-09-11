@@ -24,7 +24,7 @@ class FieldSet extends AclEntity {
 	protected $filter;	
 	
 	public function getFilter() {
-		return empty($this->filter) ? [] : json_decode($this->filter , true);
+		return empty($this->filter) || $this->filter == '[]'  ? new \stdClass() : json_decode($this->filter, true);
 	}
 	
 	public function setFilter($filter) {

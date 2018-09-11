@@ -71,13 +71,32 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 					//disabled: true,
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
-					handler: function (btn) {
-						var dlg = new go.modules.community.addressbook.ContactDialog();
-						dlg.show();
-						dlg.setValues({
-							addressBookId: this.addAddressBookId
-						});
-					},
+					menu: [
+						{
+							iconCls: 'ic-account-box',
+							text: t("Contact"),
+							handler: function (btn) {
+								var dlg = new go.modules.community.addressbook.ContactDialog();
+								dlg.setValues({
+									addressBookId: this.addAddressBookId
+								});
+								dlg.show();
+
+							}
+						},{
+							iconCls: 'ic-business',
+							text: t("Organization"),
+							handler: function (btn) {
+								var dlg = new go.modules.community.addressbook.ContactDialog();
+								dlg.setValues({
+									addressBookId: this.addAddressBookId,
+									isOrganization: true
+								});
+								dlg.show();
+
+							}
+						}
+					],					
 					scope: this
 				}),
 				{

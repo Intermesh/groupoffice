@@ -17,4 +17,6 @@ ManageBlockDialog.js
 ManageBlocksGrid.js
 EnableBlocksPanel.js
 CustomfieldsTpl.js
+
 Module.js
+FormFieldSet.js
