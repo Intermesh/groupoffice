@@ -1,3 +1,4 @@
+11-09-2018 6.3.37
 - Start page: RSS date was not showing
 - Core: Fixed errors in check database and rebuild search index.
 - Core: Global search sometimes didn't give results.
