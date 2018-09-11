@@ -310,9 +310,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 		this.actionStart();
 		this.fireEvent('loadstart',this, this.currentUser);
-		
-		
-		
+
 		go.Stores.get("User").get([this.currentUser], function(users){
 			this.formPanel.getForm().setValues(users[0]);
 			this.loadComplete(users[0]);

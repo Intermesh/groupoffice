@@ -25,7 +25,14 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 
 			this.store.on("load", function(store, records, o){
 					this.allRecordsLoaded = !records.length;
-					this.loadMore();
+					if(this.rendered) {
+						this.loadMore();			
+					} else
+					{
+						this.on("afterrender", function() {
+							this.loadMore();
+						}, this, {single: true});
+					}
 				}, this);
 		}
 	},
