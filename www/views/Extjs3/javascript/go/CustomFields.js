@@ -43,14 +43,7 @@
 			var fieldSets = this.getFieldSets(entity), formFieldSets = [];
 
 			for (var i = 0, l = fieldSets.length; i < l; i++) {
-				formFieldSets.push({
-					stateId: 'cf-form-field-set-' + fieldSets[i].id,
-					stateful: true,
-					collapsible: true,
-					xtype: "fieldset",
-					title: fieldSets[i].name,
-					items: this.getFormFields(fieldSets[i].id)
-				});
+				formFieldSets.push(new go.modules.core.customfields.FormFieldSet({fieldSet: fieldSets[i]}));				
 			}
 			return formFieldSets;
 		},
