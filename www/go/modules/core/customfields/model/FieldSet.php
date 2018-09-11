@@ -7,7 +7,7 @@ use go\core\db\Query;
 
 class FieldSet extends AclEntity {
 /**
-	 * The Entity ID
+	 * The ID
 	 * 
 	 * @var int
 	 */
@@ -57,6 +57,17 @@ class FieldSet extends AclEntity {
 		}
 		
 		return parent::filter($query, $filter);
+	}
+	
+	protected function internalDelete() {
+		
+		foreach(Field::find()->where(['fieldSetId' => $this->id]) as $field) {
+			if(!$field->delete()) {
+				return false;
+			}
+		}
+		
+		return parent::internalDelete();
 	}
 
 }

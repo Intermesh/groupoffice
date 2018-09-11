@@ -74,8 +74,8 @@ trait CustomFieldsTrait {
 						->replace($this->customFieldsTableName(), $this->customFieldsData)->execute();
 	}
 
-	public function customFieldsTableName() {
-		$tables = $this->getMapping()->getTables();		
+	public static function customFieldsTableName() {
+		$tables = static::getMapping()->getTables();		
 		$mainTableName = array_keys($tables)[0];
 		
 		return $mainTableName.'_custom_fields';

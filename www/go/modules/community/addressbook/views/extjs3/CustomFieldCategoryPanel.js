@@ -99,7 +99,7 @@ go.modules.community.addressbook.CustomFieldCategoryPanel = Ext.extend(go.grid.G
 							break;						
 							
 						case 'add':
-							
+							this.showAddFieldMenu(record, e);
 							break;
 					}
 				}
@@ -116,44 +116,44 @@ go.modules.community.addressbook.CustomFieldCategoryPanel = Ext.extend(go.grid.G
 		}, this);
 	},
 
-	initRowActions: function () {
-
-		var actions = new Ext.ux.grid.RowActions({
-			menuDisabled: true,
-			hideable: false,
-			draggable: false,
-			fixed: true,
-			header: '',
-			hideMode: 'display',
-			keepSelection: true,
-
-			actions: [{
-					iconCls: 'ic-add'
-				}, {
-					iconCls: 'ic-more-vert'
-				}]
-		});
-
-		actions.on({
-			action: function (grid, record, action, row, col, e, target) {
-				console.log(arguments);
-				switch (action) {
-
-					case 'ic-add':
-						console.log("todo");
-						break;
-
-					case 'ic-more-vert':
-						this.showMoreMenu(record, e);
-						break;
-				}
-			},
-			scope: this
-		});
-
-		return actions;
-
-	},
+//	initRowActions: function () {
+//
+//		var actions = new Ext.ux.grid.RowActions({
+//			menuDisabled: true,
+//			hideable: false,
+//			draggable: false,
+//			fixed: true,
+//			header: '',
+//			hideMode: 'display',
+//			keepSelection: true,
+//
+//			actions: [{
+//					iconCls: 'ic-add'
+//				}, {
+//					iconCls: 'ic-more-vert'
+//				}]
+//		});
+//
+//		actions.on({
+//			action: function (grid, record, action, row, col, e, target) {
+//				console.log(arguments);
+//				switch (action) {
+//
+//					case 'ic-add':
+//						console.log("todo");
+//						break;
+//
+//					case 'ic-more-vert':
+//						this.showMoreMenu(record, e);
+//						break;
+//				}
+//			},
+//			scope: this
+//		});
+//
+//		return actions;
+//
+//	},
 
 	showMoreMenu: function (record, e) {
 		if (!this.moreMenu) {
@@ -183,7 +183,7 @@ go.modules.community.addressbook.CustomFieldCategoryPanel = Ext.extend(go.grid.G
 							this.deleteSelected();
 						},
 						scope: this
-					},
+					}
 				]
 			})
 		}
@@ -191,6 +191,39 @@ go.modules.community.addressbook.CustomFieldCategoryPanel = Ext.extend(go.grid.G
 		this.moreMenu.record = record;
 
 		this.moreMenu.showAt(e.getXY());
+	},
+	
+	showAddFieldMenu: function (record, e) {
+		if (!this.addFieldMenu) {
+			
+			var items = [], types = go.CustomFields.getTypes();
+			
+			for(var name in types) {
+				items.push({
+					iconCls: types[name].iconCls,
+					text: types[name].label,
+					type: types[name],
+					handler: function(item) {
+						var dlg = item.type.getDialog();
+						dlg.setValues({
+							fieldSetId: this.addFieldMenu.record.data.fieldSetId,
+							type: item.type.name
+						});
+						
+						dlg.show();
+					},
+					scope: this
+				});
+			}
+			
+			this.addFieldMenu = new Ext.menu.Menu({
+				items: items
+			})
+		}
+
+		this.addFieldMenu.record = record;
+
+		this.addFieldMenu.showAt(e.getXY());
 	},
 	
 	doDelete : function(selectedRecords) {

@@ -17,8 +17,8 @@ abstract class Base {
 	 * 
 	 * @return string
 	 */
-	public function createColumn() {
-		return "VARCHAR(".$this->field->getOption('maxLength').") DEFAULT NULL";
+	public function getFieldSQL() {
+		return "VARCHAR(".($this->field->getOption('maxLength') || 190).") DEFAULT NULL";
 	}
 	
 	/**

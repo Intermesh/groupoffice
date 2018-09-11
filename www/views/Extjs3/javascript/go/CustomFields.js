@@ -1,4 +1,5 @@
 (function () {
+	var types = {};
 	var CustomFieldsCls = Ext.extend(Ext.util.Observable, {
 		initialized: false,
 		
@@ -15,6 +16,20 @@
 				go.CustomFields.fireReady();
 			});
 		},
+		
+		registerType : function(type) {
+			types[type.name] = type;
+		},
+		
+		getType : function(name) {
+			return types[name] || null;
+		},
+		
+		
+		getTypes : function() {
+			return types;
+		},
+		
 		/**
 		 * Get field set entitiues
 		 * @param {string} entity eg. "note"
@@ -58,19 +73,19 @@
 			var r = [],
 							all = go.Stores.get("Field").data,
 							field,
-							formField;
+							formField, 
+							type;
 
 			for (var id in all) {
 				field = all[id];
 				if (field.fieldSetId == fieldSetId) {		
-					
-					if(!GO.customfields.dataTypes[field.datatype]) {
-						console.error("Custom field type " + field.datatype + " not found");
+					type = this.getType(field.type);
+					if(!type) {
+						console.error("Custom field type " + field.type + " not found");
 						continue;
 					}
 					
-					formField = GO.customfields.dataTypes[field.datatype].getFormField(field, {serverFormats: false});
-
+					formField = type.renderFormField(field);
 					r.push(formField);
 				}
 			}
@@ -87,14 +102,10 @@
 		getFields: function (fieldSetId) {
 			var r = [],
 							all = go.Stores.get("Field").data,
-							field,
-							formField;
+							field;
 
 			for (var id in all) {
 				field = all[id];
-
-
-
 				if (field.fieldSetId == fieldSetId) {
 					r.push(field);
 				}
@@ -113,11 +124,13 @@
 		renderField: function (fieldId, values) {
 			var field = go.Stores.get("Field").data[fieldId];
 
-			if (!GO.customfields.dataTypes[field.datatype].render) {
-				return values[field.databaseName];
+			type = this.getType(field.type);
+			if(!type) {							
+				console.error("Custom field type " + field.type + " not found");
+				return "";
 			}
 
-			return GO.customfields.dataTypes[field.datatype].render(values[field.databaseName], values);
+			return type.renderDetailView(values[field.databaseName], values, field);			
 		},
 
 		/**
@@ -128,7 +141,14 @@
 		 */
 		getFieldIcon: function (fieldId) {
 			var field = go.Stores.get("Field").data[fieldId];
-			return GO.customfields.dataTypes[field.datatype].icon || "star";
+			
+			type = this.getType(field.type);
+			if(!type) {							
+				console.error("Custom field type " + field.type + " not found");
+				return "";
+			}
+
+			return type.iconCls;
 		},
 
 		/**
@@ -148,12 +168,9 @@
 
 					go.CustomFields.getFields(fieldSet.id).forEach(function (field) {
 						
-						if(!GO.customfields.dataTypes[field.datatype]) {
-							console.error("Custom field type " + field.datatype + " not found");
-							return;
-						}
 						
-						tpl += '<tpl if="!GO.util.empty(go.CustomFields.renderField(\'' + field.id + '\',values))"><p><i class="icon label">' + go.CustomFields.getFieldIcon(field.id) + '</i>\
+						
+						tpl += '<tpl if="!GO.util.empty(go.CustomFields.renderField(\'' + field.id + '\',values))"><p><i class="icon label ' + go.CustomFields.getFieldIcon(field.id) + '"></i>\
 					<span>{[go.CustomFields.renderField("' + field.id + '",values)]}</span>\
 						<label>' + t(field.name) + '</label>\
 						</p><hr /></tpl>';
