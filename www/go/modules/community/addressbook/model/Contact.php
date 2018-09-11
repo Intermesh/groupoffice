@@ -238,7 +238,7 @@ class Contact extends AclItemEntity {
 			$query->where(
 							(new \go\core\db\Criteria())
 								->where('name', 'like', $filter['q'].'%')
-								->orWhere('lastName', 'LIKE', $filter['q'])
+								->orWhere('lastName', 'LIKE', $filter['q']."%")
 							);
 		}
 		

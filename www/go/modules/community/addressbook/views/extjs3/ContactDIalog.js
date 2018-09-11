@@ -16,24 +16,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 							{
 								flex: 1,
 								layout: "form",
-								items: [
-									{
-										xtype: "switch",
-										boxLabel: t("This is an organization"),
-										name: "isOrganization",
-										hideLabel: true,
-										listeners: {
-											check: function (sw, checked) {
-												this.setOrganization(checked);
-											},
-											scope: this
-										}
-									},
-									{
-										xtype: "hidden",
-										name: "addressBookId"
-									},
-
+								items: [			
 									this.nameField = new Ext.form.TextField({
 										xtype: 'textfield',
 										name: 'name',
@@ -367,7 +350,13 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 			}
 		].concat(go.CustomFields.getFormFieldSets("Contact"));
 
-		return items;
+		return items;	
+	},
+	
+	show : function() {
+		this.setOrganization(this.formPanel.getValues()["isOrganization"]);
+		
+		return go.modules.community.addressbook.ContactDialog.superclass.show.call(this);
 	},
 
 	setOrganization: function (isOrganization) {
