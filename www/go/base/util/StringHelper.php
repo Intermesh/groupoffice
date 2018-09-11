@@ -1013,9 +1013,9 @@ END;
 		"'<embed[^>]*>.*?</embed>'usi",
 		"'<applet[^>]*>.*?</applet>'usi",
 		"'<form[^>]*>'usi",
-		"'<input[^>]*>'usi",
-		"'<select[^>]*>.*?</select>'usi",
-		"'<textarea[^>]*>.*?</textarea>'usi",
+		//"'<input[^>]*>'usi",
+		//"'<select[^>]*>.*?</select>'usi",
+		//"'<textarea[^>]*>.*?</textarea>'usi",
 		"'</form>'usi"
 		);
 
