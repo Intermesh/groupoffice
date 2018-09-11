@@ -1,10 +1,13 @@
+- Start page: RSS date was not showing
+- Core: Fixed errors in check database and rebuild search index.
+- Core: Global search sometimes didn't give results.
 - File search: File index aborted on error
 - Files: fixed search returning invalid id's and file property dialog from search
 - Merged 6.2.x branch
-- Addressbook: Batch edit problem in address book
-- Addressbook: Drag and drop contacts didn't work
+- Address book: Batch edit problem in address book
+- Address book: Drag and drop contacts didn't work
 - Leavedays: Sort on employee in holidays module
-- Fixed google authenticator barcode for ios
+- Fixed google authenticator barcode for iOS
 - Support newer encryption library in notes
 - Fixed custom php field
 
