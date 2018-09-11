@@ -293,13 +293,11 @@ class GO{
 	 */
 	public static function clearCache(){
 		
-//		\GO::config()->getCacheFolder(false)->delete();		
-//		
-//		\GO::cache()->flush();
-//
-//		\GO\Base\Model::clearCache();
+		\GO::config()->getCacheFolder(false)->delete();		
 		
-		\GO()->rebuildCache(true);
+		\GO::cache()->flush();
+
+		\GO\Base\Model::clearCache();
 	}
 	
 	
