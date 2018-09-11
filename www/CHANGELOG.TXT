@@ -1,3 +1,5 @@
+11-09-2018 6.2.103
+- Email: Fixed problem with backslash in mail folder
 - Projects: Fixed decimals in activity type rates
 - Billing: Amounts can be searched in local format.
 - Email: Save all attachments to personal folder function would also save inline attachments
