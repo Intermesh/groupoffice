@@ -1330,3 +1330,8 @@ table[id^="comments-ext"] b {
 .go-html-formatted a:visted{
 	color:purple;
 }
+
+.normal-link {
+	text-decoration:underline;
+	color: $cAnchor;
+}
