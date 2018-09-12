@@ -116,10 +116,9 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 
 	load: function (id) {
 		this.currentId = id;
-		var entities = this.entityStore.get([id]);
-		if(entities) {
+		this.entityStore.get([id], function(entities) {
 			this.internalLoad(entities[0]);
-		}
+		}, this);
 	}
 });
 
