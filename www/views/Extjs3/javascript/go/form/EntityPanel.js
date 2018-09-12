@@ -57,12 +57,13 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	
 	setValues : function(v) {
 		var field, name;
+		
+		this.getForm().setValues(v);
+		
+		//set all non form values.
 		for(name in v) {		
 			field = this.getForm().findField(name);
-			if(field) {
-				field.setValue(v[name]);
-			} else
-			{
+			if(!field) {
 				this.values[name] = v[name];
 			}
 		}
