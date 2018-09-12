@@ -15,8 +15,8 @@ go.modules.core.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	renderDetailView: function (value, data, customfield) {
 		return value;
 	},
-
-	renderFormField: function (customfield, config) {
+	
+	createFormFieldConfig : function( customfield, config) {
 		config = config || {};
 
 		if (!GO.util.empty(customfield.options.validationRegex)) {
@@ -44,20 +44,29 @@ go.modules.core.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			config.maxLength = customfield.options.maxLength;
 		}
 
-		var field = Ext.apply({			
+		return Ext.apply({			
 			xtype: 'textfield',
 			name: 'customFields.' + customfield.databaseName,
 			fieldLabel: fieldLabel,
 			anchor: '-20',
-			allowBlank: !customfield.required
+			allowBlank: !customfield.required,
+			value: customfield.default
 		}, config);
-		
+	},
+
+	renderFormField: function (customfield, config) {		
+		var field = this.createFormFieldConfig(customfield, config);
 		return this.applySuffix(customfield, field);
 	},
 	
 	applySuffix: function (customfield, field) {
 		if (!GO.util.empty(customfield.suffix)) {
+			field.flex = 1;
+			delete field.anchor;
+			var hint = field.hint;
+			delete field.hint;
 			return {
+				hint: hint,
 				anchor: '-20',
 				xtype: 'compositefield',
 				fieldLabel: field.fieldLabel,

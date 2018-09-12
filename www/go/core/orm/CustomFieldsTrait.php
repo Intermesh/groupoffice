@@ -3,6 +3,11 @@ namespace go\core\orm;
 
 use go\core\App;
 use go\core\db\Query;
+use go\core\db\Table;
+use go\core\db\Utils;
+use go\core\validate\ErrorCode;
+use go\modules\core\customfields\model\Field;
+use PDOException;
 
 /**
  * Entities can use this trait to enable a customFields property that can be 
@@ -38,20 +43,20 @@ trait CustomFieldsTrait {
 	}
 	
 	public function setCustomFields($data) {		
-		$this->customFieldsData = $this->normalizeCustomFieldsInput($data);
+		$this->customFieldsData = array_merge($this->getCustomFields(), $this->normalizeCustomFieldsInput($data));
 		$this->customFieldsModified = true;
 	}
 	
 	
 	private function normalizeCustomFieldsInput($data) {
-		$columns = \go\core\db\Table::getInstance(static::customFieldsTableName())->getColumns();		
+		$columns = Table::getInstance(static::customFieldsTableName())->getColumns();		
 		foreach($columns as $name => $column) {
 			if(isset($data[$name])) {
 				$data[$name] = $column->normalizeInput($data[$name]);
 			}
 		}
 		
-		$fields = \go\modules\core\customfields\model\Field::find()
+		$fields = Field::find()
 						->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId')
 						->where(['fs.entityId' => static::getType()->getId()]);
 		
@@ -67,11 +72,28 @@ trait CustomFieldsTrait {
 			return true;
 		}
 		
-		$this->customFieldsData['id'] = $this->id;
-		
-		return App::get()
-						->getDbConnection()
-						->replace($this->customFieldsTableName(), $this->customFieldsData)->execute();
+		try {
+			if(!isset($this->customFieldsData['id'])) {
+				$this->customFieldsData['id'] = $this->id;
+
+				return App::get()
+								->getDbConnection()
+								->insert($this->customFieldsTableName(), $this->customFieldsData)->execute();
+			} else
+			{
+				return App::get()
+								->getDbConnection()
+								->update($this->customFieldsTableName(), $this->customFieldsData, ['id' => $this->customFieldsData['id']])->execute();
+			}
+		} catch(PDOException $e) {
+			$uniqueKey = Utils::isUniqueKeyException($e);
+			if ($uniqueKey) {				
+				$this->setValidationError('customFields.' . $uniqueKey, ErrorCode::UNIQUE);				
+				return false;
+			} else {
+				throw $e;
+			}
+		}
 	}
 
 	public static function customFieldsTableName() {

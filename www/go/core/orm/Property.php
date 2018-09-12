@@ -837,20 +837,9 @@ abstract class Property extends Model {
 			}
 		} catch (PDOException $e) {
 			
-//			var_dump(App::get()->getDebugger()->getEntries());
-
-			//Unique index error = 23000
-			if ($e->getCode() == 23000) {
-				
-				$msg = $e->getMessage();
-				App::get()->debug($msg);				
-				
-				$key = 'id';
-				if(preg_match("/key '(.*)'/", $msg, $matches)) {
-					$key = $matches[1];
-				}
-				
-				$this->setValidationError($key, ErrorCode::UNIQUE);
+			$uniqueKey = \go\core\db\Utils::isUniqueKeyException($e);
+			if ($uniqueKey) {				
+				$this->setValidationError($uniqueKey, ErrorCode::UNIQUE);				
 				return false;
 			} else {
 				throw $e;

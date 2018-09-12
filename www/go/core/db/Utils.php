@@ -173,5 +173,26 @@ class Utils {
 	public static function quoteColumnName($name) {
 		return self::quoteTableName($name);
 	}
+	
+	
+	public static function isUniqueKeyException(\PDOException $e) {
+		//Unique index error = 23000
+		if ($e->getCode() != 23000) {
+			return false;
+		}
+
+		$msg = $e->getMessage();
+		App::get()->debug($msg);				
+
+		$key = 'id';
+		if(preg_match("/key '(.*)'/", $msg, $matches)) {
+			$key = $matches[1];
+		}
+
+		return $key;
+			
+
+		
+	}
 
 }
