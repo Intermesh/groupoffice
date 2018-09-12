@@ -49,7 +49,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 
 		//deprecated
 		if (this.formValues) {
-			this.formPanel.form.setValues(this.formValues);
+			this.formPanel.setValues(this.formValues);
 			delete this.formValues;
 		}
 		
