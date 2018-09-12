@@ -18,6 +18,31 @@ go.modules.core.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 						fieldLabel: t("Database name"),
 						anchor: '100%',
 						allowBlank: false
+					},{
+						xtype: "textfield",
+						name: "hint",
+						fieldLabel: t("Hint text"),
+						anchor: "100%"
+					},{
+						xtype: "textfield",
+						name: "prefix",
+						fieldLabel: t("Prefix"),
+						anchor: "100%"
+					},{
+						xtype: "textfield",
+						name: "suffix",
+						fieldLabel: t("suffix"),
+						anchor: "100%"
+					},{
+						xtype: "textfield",
+						name: "default",
+						fieldLabel: t("Default value"),
+						anchor: "100%"
+					},{
+						xtype: "checkbox",
+						name: "unique",
+						boxLabel: t("Unique values"),
+						hideLabel: true
 					}
 				]
 			}

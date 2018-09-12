@@ -525,13 +525,7 @@ class QueryBuilder {
 	 * @throws Exception
 	 */
 	protected function quoteTableName($tableName) {
-
-		//disallow \ ` and \00  : http://stackoverflow.com/questions/1542627/escaping-field-names-in-pdo-statements
-		if (preg_match("/[`\\\\\\000\(\),]/", $tableName)) {
-			throw new Exception("Invalid characters found in column name: " . $tableName);
-		}
-
-		return '`' . str_replace('`', '``', $tableName) . '`';
+		return Utils::quoteTableName($tableName);
 	}
 
 	/**

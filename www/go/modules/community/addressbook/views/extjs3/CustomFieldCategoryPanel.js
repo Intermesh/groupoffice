@@ -32,6 +32,12 @@ go.modules.community.addressbook.CustomFieldCategoryPanel = Ext.extend(go.grid.G
 				this.load();
 			}
 		}, this);
+		
+		go.Stores.get("Field").on("changes", function(store, added, changed, destoyed) {
+			if(!this.loading) {
+				this.load();
+			}
+		}, this);
 
 
 		Ext.apply(this, {
@@ -170,7 +176,8 @@ go.modules.community.addressbook.CustomFieldCategoryPanel = Ext.extend(go.grid.G
 								dlg.load(this.moreMenu.record.data.fieldSetId).show();
 							} else
 							{
-								alert("TODO!");
+								var dlg = go.CustomFields.getType(this.moreMenu.record.data.type).getDialog();													
+								dlg.load(this.moreMenu.record.data.fieldId).show();
 							}
 						},
 						scope: this

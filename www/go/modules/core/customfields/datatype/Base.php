@@ -18,7 +18,7 @@ abstract class Base {
 	 * @return string
 	 */
 	public function getFieldSQL() {
-		return "VARCHAR(".($this->field->getOption('maxLength') || 190).") DEFAULT NULL";
+		return "VARCHAR(".($this->field->getOption('maxLength') ?? 190).") DEFAULT " . GO()->getDbConnection()->getPDO()->quote($this->field->getDefault() ?? "NULL");
 	}
 	
 	/**

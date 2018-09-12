@@ -30,9 +30,7 @@ go.modules.core.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 	},
 
 	filter: function (entity) {
-		console.log(entity, this.fieldSet.filter);
 		for (var name in this.fieldSet.filter) {
-
 			var v = this.fieldSet.filter[name];
 
 			if (Ext.isArray(v)) {

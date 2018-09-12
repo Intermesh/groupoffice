@@ -27,8 +27,8 @@ go.modules.core.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 				config.regex = new RegExp(customfield.options.validationRegex);
 		}
 
-		if (!GO.util.empty(customfield.helptext)) {
-			config.hint = customfield.helptext;
+		if (!GO.util.empty(customfield.hint)) {
+			config.hint = customfield.hint;
 		}
 
 		var fieldLabel = customfield.name;

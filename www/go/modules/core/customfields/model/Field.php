@@ -6,10 +6,12 @@ use Exception;
 use GO;
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Query;
+use go\core\db\Table;
+use go\core\db\Utils;
+use go\core\ErrorHandler;
 use go\core\orm\EntityType;
 use go\modules\core\customfields\datatype\Base;
 use go\modules\core\customfields\model\FieldSet;
-use stdClass;
 use function GuzzleHttp\json_decode;
 use function GuzzleHttp\json_encode;
 
@@ -27,13 +29,16 @@ class Field extends AclItemEntity {
 	protected $options;
 	public $databaseName;
 	public $required;
-	public $helptext;
+	public $hint;
 	public $prefix;
 	public $suffix;
 	public $type;
 	public $modifiedAt;
 	public $createdAt;
-	public $default = "";
+	private $default;
+	private $defaultModified = false;
+	private $unique;
+	private $uniqueModified = false;
 
 	protected static function defineMapping() {
 		return parent::defineMapping()->addTable('core_customfields_field', 'f');
@@ -73,6 +78,49 @@ class Field extends AclItemEntity {
 		$o[$name] = $value;
 		$this->setOptions($o);
 	}
+	
+	
+	public function getDefault() {
+		if($this->defaultModified || $this->isNew()) {
+			return $this->default;
+		}
+		
+		$c = Table::getInstance($this->getTableName())->getColumn($this->databaseName);
+		
+		if(!$c) {
+			GO()->debug("Column for custom field ".$this->databaseName." not found in ". $this->getTableName());
+			return null;
+		}
+		
+		return $c->default;
+	}
+	
+	public function setDefault($v) {
+		$this->default = $v;
+		$this->defaultModified = true;
+	}
+	
+	
+	public function getUnique() {
+		if($this->uniqueModified || $this->isNew()) {
+			return $this->unique;
+		}
+		
+		$c = Table::getInstance($this->getTableName())->getColumn($this->databaseName);
+		
+		if(!$c) {
+			GO()->debug("Column for custom field ".$this->databaseName." not found in ". $this->getTableName());
+			return null;
+		}
+		
+		return !!$c->unique;
+						
+	}
+	
+	public function setUnique($v) {
+		$this->unique = $v;
+		$this->uniqueModified = true;
+	}
 
 	/**
 	 * 
@@ -108,28 +156,44 @@ class Field extends AclItemEntity {
 		
 		$table = $this->getTableName();
 		$fieldSql = $this->getDataType()->getFieldSQL();
+		
+		$quotedDbName = Utils::quoteColumnName($this->databaseName);
+	
 		if ($this->isNew()) {
-			$sql = "ALTER TABLE `" . $table . "` ADD `" . $this->databaseName . "` " . $fieldSql . ";";
+			$sql = "ALTER TABLE `" . $table . "` ADD " . $quotedDbName . " " . $fieldSql . ";";
+			GO()->getDbConnection()->query($sql);
+			if($this->getUnique()) {
+				$sql = "ALTER TABLE `" . $table . "` ADD UNIQUE(". $quotedDbName  . ");";
+				GO()->getDbConnection()->query($sql);
+			}			
 		} else {
 			$oldName = $this->isModified('databaseName') ? $this->getOldValue("databaseName") : $this->databaseName;
-			$sql = "ALTER TABLE `" . $table . "` CHANGE `" . $oldName . "` `" . $this->databaseName . "` " . $fieldSql;
+			$sql = "ALTER TABLE `" . $table . "` CHANGE " . Utils::quoteColumnName($oldName) . " " . $quotedDbName . " " . $fieldSql;
+			GO()->getDbConnection()->query($sql);
+			
+			if($this->getUnique() && !Table::getInstance($table)->getColumn($this->databaseName)->unique) {
+				$sql = "ALTER TABLE `" . $table . "` ADD UNIQUE(". $quotedDbName  . ");";
+				GO()->getDbConnection()->query($sql);
+			} else if(!$this->getUnique() && Table::getInstance($table)->getColumn($this->databaseName)->unique) {
+				$sql = "ALTER TABLE `" . $table . "` DROP INDEX " . $quotedDbName;
+				GO()->getDbConnection()->query($sql);
+			}
 		}
 		
-		try {
-			GO()->getDbConnection()->query($sql);
-		} catch (Exception $e) {
-			\go\core\ErrorHandler::logException($e);
-		}
+		Table::getInstance($table)->clearCache();
 	}
 
 	private function dropColumn() {
-		$sql = "ALTER TABLE `" . $this->getTableName() . "` DROP `" . $this->databaseName . "`";
+		$table = $this->getTableName();
+		$sql = "ALTER TABLE `" . $table . "` DROP " . Utils::quoteColumnName($this->databaseName) ;
 
 		try {
 			GO()->getDbConnection()->query($sql);
 		} catch (Exception $e) {
-			\go\core\ErrorHandler::logException($e);
+			ErrorHandler::logException($e);
 		}
+		
+		Table::getInstance($table)->clearCache();
 	}
 
 	public function apiToDb($value, $values) {

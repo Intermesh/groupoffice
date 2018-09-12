@@ -399,6 +399,16 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * @return bool
 	 */
 	public function customfieldsModel(){return false;}
+	
+	
+	public static function customFieldsTableName() {
+		$model = static::model()->customfieldsModel();
+		if(!$model) {
+			return false;
+		}
+		
+		return $model::model()->tableName();
+	}
 
 	/**
 	 *

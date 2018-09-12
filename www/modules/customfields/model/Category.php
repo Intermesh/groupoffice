@@ -73,7 +73,7 @@ class Category extends ActiveRecord{
 		return is_a($this->extendsModel, Entity::class, true);
 	}
 	
-	public function customfieldsTableName() {		
+	public function _customfieldsTableName() {		
 		if($this->isForEntity()) {
 			$cls = $this->extendsModel;
 			return $cls::customFieldsTableName();
