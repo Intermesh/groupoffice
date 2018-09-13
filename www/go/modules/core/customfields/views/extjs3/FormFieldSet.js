@@ -1,3 +1,5 @@
+/* global Ext, go */
+
 go.modules.core.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 	fieldSet: null,
 	initComponent: function () {
@@ -34,13 +36,13 @@ go.modules.core.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			var v = this.fieldSet.filter[name];
 
 			if (Ext.isArray(v)) {
-				if (v.indexOf(entity[name]) == -1) {
+				if (v.indexOf(entity[name]) === -1) {
 					this.setVisible(false);
 					return;
 				}
 			} else
 			{
-				if (v != entity[name]) {
+				if (v !== entity[name]) {
 					this.setVisible(false);
 					return;
 				}

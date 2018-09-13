@@ -1,3 +1,5 @@
+/* global go, Ext, GO */
+
 go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 
 	layout: "responsive",
@@ -78,11 +80,12 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 							handler: function (btn) {
 								var dlg = new go.modules.community.addressbook.ContactDialog();
 								dlg.setValues({
-									addressBookId: this.addAddressBookId
+									addressBookId: this.addAddressBookId,
+									isOrganization: false
 								});
 								dlg.show();
-
-							}
+							},
+							scope: this
 						},{
 							iconCls: 'ic-business',
 							text: t("Organization"),
@@ -93,8 +96,8 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 									isOrganization: true
 								});
 								dlg.show();
-
-							}
+							},
+							scope: this
 						}
 					],					
 					scope: this
@@ -183,13 +186,13 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 				return;
 			}
 
-			if (node.id == "all") {
-				this.setAddressBookId(null)
+			if (node.id === "all") {
+				this.setAddressBookId(null);
 			} else if (node.attributes.isAddressBook) {
 				this.setAddressBookId(node.attributes.entity.id);
 			} else
 			{
-				this.setGroupId(node.attributes.entity.id, node.attributes.entity.addressBookId)
+				this.setGroupId(node.attributes.entity.id, node.attributes.entity.addressBookId);
 			}
 		}, this);
 
@@ -243,7 +246,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 	},
 
 	onNodeDragOver: function (e) {
-		if (e.target.id == "all") {
+		if (e.target.id === "all") {
 			return false;
 		}
 
@@ -256,8 +259,6 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 	},
 
 	onNodeDrop: function (e) {
-		console.log(e);
-
 		var updates = {};
 
 		var removeFromGrid = false;
@@ -267,14 +268,14 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 			var contact = {};
 
 			if (e.target.attributes.isAddressBook) {
-				removeFromGrid = r.json.addressBookId != e.target.attributes.entity.id;
+				removeFromGrid = r.json.addressBookId !== e.target.attributes.entity.id;
 				contact.addressBookId = e.target.attributes.entity.id;
 				contact.groups = []; //clear groups when changing address book
 			} else
 			{
-				removeFromGrid = r.json.addressBookId != e.target.attributes.entity.addressBookId;
+				removeFromGrid = r.json.addressBookId !== e.target.attributes.entity.addressBookId;
 				//clear groups when changing address book
-				contact.groups = r.json.addressBookId == e.target.attributes.entity.addressBookId ? GO.util.clone(r.json.groups) : [];
+				contact.groups = r.json.addressBookId === e.target.attributes.entity.addressBookId ? GO.util.clone(r.json.groups) : [];
 				contact.addressBookId = e.target.attributes.entity.addressBookId;
 
 				var groupId = e.target.attributes.entity.id;

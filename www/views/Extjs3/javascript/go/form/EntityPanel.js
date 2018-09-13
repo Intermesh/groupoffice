@@ -1,3 +1,5 @@
+/* global Ext, go */
+
 go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	currentId : null, 
 	entityStore: null,
@@ -46,7 +48,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	getValues : function (dirtyOnly) {	
 		var v = {};		
 		for(var name in this.values) {
-			if(!dirtyOnly || this.entity[name] != this.values[name]) {
+			if(!dirtyOnly || this.entity[name] !== this.values[name]) {
 				v[name] = this.values[name];
 			}
 		}
