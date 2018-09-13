@@ -3570,9 +3570,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 		// GO 6.3 backwards compatible
 		if(!empty($attr['mtime'])) {
-			$attr['modifiedAt'] = '@'.$attr['mtime'];
-			unset($attr['mtime']);
+			$attr['modifiedAt'] = '@'.$attr['mtime'];			
 		}
+		
+		unset($attr['mtime']);
 
 		// Always unset ctime, we don't use it anymore in the searchcache table
 		unset($attr['ctime']);
