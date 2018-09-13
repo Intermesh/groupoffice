@@ -150,9 +150,9 @@ class Store extends AbstractStore {
 							Throw new \Exception('Failed to run delete from model!');
 						}
         }
-		  if($this->response['deleteSuccess'] !== false) {
-			$this->response['deleteSuccess'] = true;
-		  }
+				if(!isset($this->response['deleteSuccess']) || $this->response['deleteSuccess'] !== false) {
+					$this->response['deleteSuccess'] = true;
+				}
       } catch (\Exception $e) {
         $this->response['deleteSuccess'] = false;
         $this->response['deleteFeedback'] = $e->getMessage();
