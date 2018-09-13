@@ -1,3 +1,6 @@
+- Core: Better error message when language is invalid and fixed Norwegian
+- Core: Make sure customfields and search module are installed and enabled before upgrade
+
 11-09-2018 6.3.37
 - Start page: RSS date was not showing
 - Core: Fixed errors in check database and rebuild search index.
