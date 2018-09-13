@@ -189,6 +189,30 @@ Ext.override(Ext.FormPanel,{
 		if (firstField) {
 			firstField.focus();
 		}
+	},
+	
+	// prevents adding form fields that are part of custom form field components like the combobox of go.form.Chips for example.
+	processAdd : function(c){
+        
+			if(this.isField(c)){
+					this.form.add(c);
+
+			}else if(c.findBy){
+					this.applySettings(c);
+					this.form.add.apply(this.form, this.findFieldsInComponent(c));
+			}
+	},
+	
+	findFieldsInComponent : function(comp) {
+		var m = [];
+		comp.cascade(function(c){
+				if(this.isField(c)) {
+						m.push(c);
+						//don't cascade into form fields.
+						return (c.getXType() == 'compositefield' || c.getXType() == 'checkboxgroup' || c.getXType() == "radiogroup"); //don't cascade into form fields
+				}
+		}, this);
+		return m;
 	}
 });
 

@@ -4,6 +4,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	valueField: "id",
 	entityStore: null,
 	autoHeight: true,
+	
 	initComponent: function () {
 
 
