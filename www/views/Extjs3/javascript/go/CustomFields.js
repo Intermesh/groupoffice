@@ -3,17 +3,17 @@
 	var CustomFieldsCls = Ext.extend(Ext.util.Observable, {
 		initialized: false,
 		
+		
+		//init is called in GO.MainLayout.onAuthneticatiojn so custom fields are 
+		//always available when modules render.
 		init : function() {
+
 			go.Stores.get("Field").getUpdates(function (store) {
-				go.CustomFields.fieldsLoaded = true;
-				go.CustomFields.fireReady();
-	//		console.log(go.Stores.get("Field"));
+
 			});
 
 			go.Stores.get("FieldSet").getUpdates(function (store) {
-	//		console.log(go.Stores.get("FieldSet"));
-				go.CustomFields.fieldSetsLoaded = true;
-				go.CustomFields.fireReady();
+
 			});
 		},
 		
@@ -159,7 +159,6 @@
 		 */
 		addDetailPanels: function (detailView) {			
 
-			go.CustomFields.onReady(function () {
 				
 				var fieldSets = go.CustomFields.getFieldSets(Ext.isString(detailView.entity) ?  detailView.entity : detailView.entityStore.entity.name);
 
@@ -202,34 +201,33 @@
 					}
 				});
 
-			});
-		},
-
-		fieldSetsLoaded: false,
-		fieldsLoaded: false,
-		fireReady: function () { //internal
-			if (this.fieldSetsLoaded && this.fieldsLoaded) {
-				this.fireEvent('internalready', this);
-			}
-		},
-		/**
-		 * Use this to do stuff after the custom fields data has been loaded
-		 * 
-		 * @param {type} fn
-		 * @param {type} scope
-		 * @returns {undefined}
-		 */
-		onReady: function (fn, scope) {
-			if(!this.initialized) {
-				this.initialized = true;
-				this.init();
-			}
-			if (!this.fieldSetsLoaded || !this.fieldsLoaded) {
-				this.on('internalready', fn, scope || this);
-			} else {
-				fn.call(scope || this, this);
-			}
 		}
+
+//		fieldSetsLoaded: false,
+//		fieldsLoaded: false,
+//		fireReady: function () { //internal
+//			if (this.fieldSetsLoaded && this.fieldsLoaded) {
+//				this.fireEvent('internalready', this);
+//			}
+//		},
+//		/**
+//		 * Use this to do stuff after the custom fields data has been loaded
+//		 * 
+//		 * @param {type} fn
+//		 * @param {type} scope
+//		 * @returns {undefined}
+//		 */
+//		onReady: function (fn, scope) {
+//			if(!this.initialized) {
+//				this.initialized = true;
+//				this.init();
+//			}
+//			if (!this.fieldSetsLoaded || !this.fieldsLoaded) {
+//				this.on('internalready', fn, scope || this);
+//			} else {
+//				fn.call(scope || this, this);
+//			}
+//		}
 	});
 
 	go.CustomFields = new CustomFieldsCls;

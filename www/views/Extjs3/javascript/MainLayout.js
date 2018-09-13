@@ -286,6 +286,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		Ext.state.Manager.setProvider(new GO.state.HttpProvider());
 		
 		go.Modules.init();
+		go.CustomFields.init();
 		
 		//legacy scripts loaded from scripts.inc.php
 		var script = document.createElement('script');
