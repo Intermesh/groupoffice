@@ -1,3 +1,5 @@
+- Files: Fixed undefinded index "deleteSuccess" error.
+- Files: Add "Browse x files" button in detail views
 - Core: Better error message when language is invalid and fixed Norwegian
 - Core: Make sure customfields and search module are installed and enabled before upgrade
 
