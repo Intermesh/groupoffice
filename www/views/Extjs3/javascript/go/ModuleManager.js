@@ -1,3 +1,5 @@
+/* global GO, go, Ext */
+
 (function () {
 	var Modules = Ext.extend(Ext.util.Observable, {
 
@@ -18,6 +20,7 @@
 		 * 	}
 		 * });
 		 * 
+		 * @param {type} package
 		 * @param {type} name
 		 * @param {type} config
 		 * @returns {undefined}
@@ -58,7 +61,8 @@
 		/**
 		 * Check if the current user has thie module
 		 * 
-		 * @param {string} moduleName
+		 * @param {string} package
+		 * @param {string} name
 		 * @returns {boolean}
 		 */
 		isAvailable: function (package, name) {
@@ -98,14 +102,13 @@
 				return false;
 			}
 
-			var all = go.Stores.get("Module").data;
+			var all = go.Stores.get("Module").data, id;
 
 			for (id in all) {
-				if ((package == "legacy" || all[id].package == package) && all[id].name == name) {
+				if ((package === "legacy" || all[id].package == package) && all[id].name === name) {
 					return all[id];
 				}
 			}
-			;
 
 			return false;
 		},
@@ -115,9 +118,7 @@
 		},
 
 		getAvailable: function () {
-			var available = [];
-
-			var all = go.Stores.get("Module").data;
+			var available = [],all = go.Stores.get("Module").data, id;
 
 			for (id in all) {
 				if (this.isAvailable(all[id].package, all[id].name)) {
@@ -130,6 +131,8 @@
 
 		//will be called after login
 		init: function () {
+			var package, name;
+			
 			go.Stores.get("Module").getUpdates(function () {
 
 				for (package in this.registered) {
@@ -178,7 +181,7 @@
 			} else {
 				fn.call(scope || this, this);
 			}
-		},
+		}
 
 //		/**
 //		 * Call function when module becomes available.
