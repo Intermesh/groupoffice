@@ -420,6 +420,15 @@ abstract class Entity extends Property {
 //							, true
 //		);
 		
+		
+		//Enable sorting on customfields with ['customFields.fieldName' => 'DESC']
+		foreach($sort as $field => $dir) {
+			if(substr($field, 0, 13) == "customFields.") {
+				$query->join(static::customFieldsTableName(), 'customFields', 'customFields.id = '.$query->getTableAlias().'.id', 'LEFT');
+				break;
+			}
+		}
+		
 		$query->orderBy($sort, true);
 		
 		return $query;
