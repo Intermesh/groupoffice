@@ -284,7 +284,6 @@ views/Extjs3/javascript/go/login/UsernamePanel.js
 views/Extjs3/javascript/go/login/LoginPanel.js
 views/Extjs3/javascript/go/login/RecoveryDialog.js
 
-views/Extjs3/javascript/go/CustomFields.js
 views/Extjs3/javascript/go/Links.js
 views/Extjs3/javascript/go/links/LinkToButton.js
 views/Extjs3/javascript/go/links/EntityGrid.js
