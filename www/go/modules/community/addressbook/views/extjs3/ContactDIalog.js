@@ -348,7 +348,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						}
 					}]
 			}
-		].concat(go.CustomFields.getFormFieldSets("Contact"));
+		].concat(go.modules.core.customfields.CustomFields.getFormFieldSets("Contact"));
 
 		return items;	
 	},

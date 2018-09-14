@@ -14,8 +14,8 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				'permissionLevel',
 				'photoBlobId',
 				"isOrganization",
-				"organizations"
-			],
+				"organizations"				
+			].concat(go.modules.core.customfields.CustomFields.getFieldDefinitions("Contact")),
 			sortInfo :{field: "name", direction: "ASC"},
 			entityStore: go.Stores.get("Contact")
 		});
@@ -167,7 +167,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 						return v ? v.displayName : "-";
 					}
 				}
-			],
+			].concat(go.modules.core.customfields.CustomFields.getColumns("Contact")),
 			viewConfig: {
 				emptyText: '<i>description</i><p>' + t("No items to display") + '</p>',
 //				enableRowBody: true,

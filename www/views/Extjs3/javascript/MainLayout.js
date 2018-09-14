@@ -285,8 +285,10 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		//load state
 		Ext.state.Manager.setProvider(new GO.state.HttpProvider());
 		
+		this.fireEvent('authenticated', this);
+		go.modules.core.customfields.CustomFields.init();
 		go.Modules.init();
-		go.CustomFields.init();
+		
 		
 		//legacy scripts loaded from scripts.inc.php
 		var script = document.createElement('script');
@@ -306,10 +308,10 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				}
 				GO.checker = new GO.Checker();
 
-
+				
 				this.fireReady();
 
-				this.fireEvent('authenticated', this);
+				
 
 				//Ext need to know where this charting swf file is in order to draw charts
 	//		Ext.chart.Chart.CHART_URL = 'views/Extjs3/ext/resources/charts.swf';

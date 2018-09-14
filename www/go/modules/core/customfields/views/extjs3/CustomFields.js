@@ -47,6 +47,48 @@
 
 			return r;
 		},
+		
+		/**
+		 * Get all Ext.data.Store field definitions for an entity's custom fields
+		 * 
+		 * @param {string} entity eg. "Contact"
+		 * @returns {Array}
+		 */
+		getFieldDefinitions : function(entity) {
+			
+			var defs = [], me = this, type;
+			
+			this.getFieldSets(entity).forEach(function(fs) {
+				me.getFields(fs.id).forEach(function(field) {					
+					type = me.getType(field.type);
+					defs.push(type.getFieldDefinition(field));
+				});
+			});
+			return defs;
+		},
+		
+		/**
+		 * Get all Ext.grid.Column definitions for an entity's custom fields
+		 * @param {string} entity eg. "Contact"
+		 * @returns {Array}
+		 */
+		getColumns : function(entity) {
+			var cols = [];
+			
+			this.getFieldDefinitions(entity).forEach(function(def) {
+				cols.push({
+					dataIndex: def.name,
+					header: def.customField.name,
+					hidden: true,
+					id: "custom-field-" + encodeURIComponent(def.customField.databaseName),
+					sortable: true,
+					hideable: true,
+					draggable: true
+				})
+			});
+			
+			return cols;
+		},
 
 		/**
 		 * Get form fieldsets
@@ -160,17 +202,17 @@
 		addDetailPanels: function (detailView) {			
 
 				
-				var fieldSets = go.CustomFields.getFieldSets(Ext.isString(detailView.entity) ?  detailView.entity : detailView.entityStore.entity.name);
+				var fieldSets = go.modules.core.customfields.CustomFields.getFieldSets(Ext.isString(detailView.entity) ?  detailView.entity : detailView.entityStore.entity.name);
 
 				fieldSets.forEach(function (fieldSet) {
 					var tpl = '<tpl for="customFields"><div class="icons">';
 
-					go.CustomFields.getFields(fieldSet.id).forEach(function (field) {
+					go.modules.core.customfields.CustomFields.getFields(fieldSet.id).forEach(function (field) {
 						
 						
 						
-						tpl += '<tpl if="!GO.util.empty(go.CustomFields.renderField(\'' + field.id + '\',values))"><p><i class="icon label ' + go.CustomFields.getFieldIcon(field.id) + '"></i>\
-					<span>{[go.CustomFields.renderField("' + field.id + '",values)]}</span>\
+						tpl += '<tpl if="!GO.util.empty(go.modules.core.customfields.CustomFields.renderField(\'' + field.id + '\',values))"><p><i class="icon label ' + go.modules.core.customfields.CustomFields.getFieldIcon(field.id) + '"></i>\
+					<span>{[go.modules.core.customfields.CustomFields.renderField("' + field.id + '",values)]}</span>\
 						<label>' + t(field.name) + '</label>\
 						</p><hr /></tpl>';
 					});
@@ -186,7 +228,7 @@
 						onLoad: function(dv) {
 							
 							var vis = false;							
-							go.CustomFields.getFields(fieldSet.id).forEach(function (field) {
+							go.modules.core.customfields.CustomFields.getFields(fieldSet.id).forEach(function (field) {
 								if(!GO.util.empty(dv.data.customFields[field.databaseName])) {
 									vis = true;
 								}
@@ -230,7 +272,7 @@
 //		}
 	});
 
-	go.CustomFields = new CustomFieldsCls;
+	go.modules.core.customfields.CustomFields = new CustomFieldsCls;
 
 })();
 

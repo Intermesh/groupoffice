@@ -5,7 +5,7 @@ go.modules.core.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 	initComponent: function () {
 		Ext.apply(this, {
 			title: this.fieldSet.name,
-			items: go.CustomFields.getFormFields(this.fieldSet.id),
+			items: go.modules.core.customfields.CustomFields.getFormFields(this.fieldSet.id),
 			stateId: 'cf-form-field-set-' + this.fieldSet.id,
 			stateful: true,
 			collapsible: true

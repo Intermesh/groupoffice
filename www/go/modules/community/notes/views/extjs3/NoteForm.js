@@ -27,7 +27,7 @@ go.modules.community.notes.NoteForm = Ext.extend(go.form.Dialog, {
 						allowBlank: false
 					}]
 			}
-		].concat(go.CustomFields.getFormFieldSets("Note"));
+		].concat(go.modules.core.customfields.CustomFields.getFormFieldSets("Note"));
 
 		return items;
 	}

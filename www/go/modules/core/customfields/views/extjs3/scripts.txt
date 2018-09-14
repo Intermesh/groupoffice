@@ -1,4 +1,5 @@
 Module.js
 FormFieldSet.js
 FieldDialog.js
+CustomFields.js
 type/Text.js

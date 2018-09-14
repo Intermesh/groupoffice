@@ -183,7 +183,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 
 		go.modules.community.addressbook.ContactDetail.superclass.initComponent.call(this);
 
-		go.CustomFields.addDetailPanels(this);
+		go.modules.core.customfields.CustomFields.addDetailPanels(this);
 
 		this.add(new go.links.LinksDetailPanel());
 

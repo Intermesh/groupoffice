@@ -22,7 +22,7 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 
 		go.modules.community.notes.NoteDetail.superclass.initComponent.call(this);
 
-		go.CustomFields.addDetailPanels(this);
+		go.modules.core.customfields.CustomFields.addDetailPanels(this);
 
 		this.add(new go.links.LinksDetailPanel());
 

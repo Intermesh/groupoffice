@@ -176,7 +176,7 @@ go.modules.community.addressbook.CustomFieldCategoryPanel = Ext.extend(go.grid.G
 								dlg.load(this.moreMenu.record.data.fieldSetId).show();
 							} else
 							{
-								var dlg = go.CustomFields.getType(this.moreMenu.record.data.type).getDialog();													
+								var dlg = go.modules.core.customfields.CustomFields.getType(this.moreMenu.record.data.type).getDialog();													
 								dlg.load(this.moreMenu.record.data.fieldId).show();
 							}
 						},
@@ -203,7 +203,7 @@ go.modules.community.addressbook.CustomFieldCategoryPanel = Ext.extend(go.grid.G
 	showAddFieldMenu: function (record, e) {
 		if (!this.addFieldMenu) {
 			
-			var items = [], types = go.CustomFields.getTypes();
+			var items = [], types = go.modules.core.customfields.CustomFields.getTypes();
 			
 			for(var name in types) {
 				items.push({
