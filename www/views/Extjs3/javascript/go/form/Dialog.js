@@ -8,7 +8,7 @@
 
 go.form.Dialog = Ext.extend(go.Window, {
 	autoScroll: true,
-	width: 500,
+	width: dp(500),
 	modal: true,
 	entityStore: null,
 	currentId: null,
@@ -41,11 +41,11 @@ go.form.Dialog = Ext.extend(go.Window, {
 
 		go.form.Dialog.superclass.initComponent.call(this);
 
-		this.entityStore.on('changes', this.onChanges, this);
+//		this.entityStore.on('changes', this.onChanges, this);
 
-		this.on('destroy', function () {
-			this.entityStore.un('changes', this.onChanges, this);
-		}, this);
+//		this.on('destroy', function () {
+//			this.entityStore.un('changes', this.onChanges, this);
+//		}, this);
 
 		//deprecated
 		if (this.formValues) {
@@ -64,25 +64,25 @@ go.form.Dialog = Ext.extend(go.Window, {
 	load: function (id) {
 		this.currentId = id;
 
-		if (!this.formPanel.load(id)) {
-			//If no entity was returned the entity store will load it and fire the "changes" event. This dialog listens to that event.
-			this.actionStart();
-		} else
-		{
+		this.actionStart();
+		this.formPanel.load(id, function(entities, async) {
+			
 			//needs to fire because overrides are made to handle logic after form load.
+			this.actionComplete();
 			this.onLoad();
-		}
+			
+		}, this);
 
 		return this;
 	},
 
-	onChanges: function (entityStore, added, changed, destroyed) {
-
-		if (changed.concat(added).indexOf(this.currentId) !== -1) {
-			this.actionComplete();
-			this.onLoad();
-		}
-	},
+//	onChanges: function (entityStore, added, changed, destroyed) {
+//
+//		if (changed.concat(added).indexOf(this.currentId) !== -1) {
+//			this.actionComplete();
+//			this.onLoad();
+//		}
+//	},
 
 	delete: function () {
 		
