@@ -213,5 +213,15 @@ class Field extends AclItemEntity {
 
 		return parent::filter($query, $filter);
 	}
+	
+	/**
+	 * Find all fields for an entity
+	 * 
+	 * @param int $enityId
+	 * @return Query
+	 */
+	public static function findByEntity($entityId) {
+		return static::find()->where(['fs.entityId' => $entityId])->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId');
+	}
 
 }

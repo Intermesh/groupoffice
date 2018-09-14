@@ -66,6 +66,7 @@ go.modules.core.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 
 		return Ext.apply({			
 			xtype: 'textfield',
+			serverFormats: false, //for backwars compatibility with old framework. Can be removed when all is refactored.
 			name: 'customFields.' + customfield.databaseName,
 			fieldLabel: fieldLabel,
 			anchor: '-20',
@@ -108,6 +109,11 @@ go.modules.core.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			return field;
 		}
 	},
+	
+	getFieldType : function() {
+		return "string";
+	},
+	
 	/**
 	 * Get the field definition for creating Ext.data.Store's
 	 * 
@@ -119,7 +125,7 @@ go.modules.core.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	getFieldDefinition : function(field) {
 		return {
 			name: "customFields." + field.databaseName,
-			type: "string",
+			type: this.getFieldType(),
 			customField: field,
 			customFieldType: this
 		};

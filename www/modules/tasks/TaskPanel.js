@@ -72,6 +72,7 @@ GO.tasks.TaskPanel = Ext.extend(GO.DisplayPanel,{
 									
 				'</table>';																		
 	
+				
 
 		if(go.Modules.isAvailable("legacy", "workflow")){
 			this.template +=GO.workflow.WorkflowTemplate;
@@ -105,7 +106,7 @@ GO.tasks.TaskPanel = Ext.extend(GO.DisplayPanel,{
 		GO.tasks.TaskPanel.superclass.initComponent.call(this);
 	
 		
-	
+		this.add(go.modules.core.customfields.CustomFields.getDetailPanels("Task"));
 
 	}
 });			

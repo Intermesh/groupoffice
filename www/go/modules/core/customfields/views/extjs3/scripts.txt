@@ -4,4 +4,8 @@ FieldDialog.js
 CustomFields.js
 SystemSettingsPanel.js
 FieldSetDialog.js
+
 type/Text.js
+type/TextDialog.js
+type/NumberDialog.js
+type/Number.js

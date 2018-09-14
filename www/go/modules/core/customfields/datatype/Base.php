@@ -41,7 +41,7 @@ abstract class Base {
 	
 	public static function getName() {
 		$cls = static::class;
-		return lcfirst(substr($cls, strrpos($cls, '\\') + 1));
+		return substr($cls, strrpos($cls, '\\') + 1);
 	}
 	
 	/**
@@ -72,8 +72,16 @@ abstract class Base {
 		
 		//for compatibility with old version
 		//TODO remove when refactored completely
-		$name = lcfirst(substr($name, strrpos($name, '\\') + 1));
+		$pos = strrpos($name, '\\');
+		if($pos !== false) {
+			$name = lcfirst(substr($name, $pos + 1));
+		}
 		$all = static::findAll();
-		return isset($all[$name]) ? $all[$name] : Text::class;
+
+		if(!isset($all[$name])) {
+			throw new \Exception("Custom field type '$name' not found");
+		}
+		
+		return $all[$name];
 	}
 }

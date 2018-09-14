@@ -401,7 +401,9 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 				grow: true,
 				preventScrollbars: true
 			});
-				
+			
+		propertiesPanel.add(go.modules.core.customfields.CustomFields.getFormFieldSets("Task"));
+			
 
 		// Start of recurrence tab
 		this.repeatEvery = new GO.form.NumberField({
@@ -584,15 +586,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 		});
 
 		var items = [propertiesPanel, this.recurrencePanel, optionsPanel];
-
-
-		if(GO.customfields && GO.customfields.types["GO\\Tasks\\Model\\Task"])
-		{
-			for(var i=0;i<GO.customfields.types["GO\\Tasks\\Model\\Task"].panels.length;i++)
-			{
-				items.push(GO.customfields.types["GO\\Tasks\\Model\\Task"].panels[i]);
-			}
-		}
+						
 		
 		
 		

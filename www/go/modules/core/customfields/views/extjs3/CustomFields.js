@@ -222,7 +222,6 @@
 					tpl: tpl,
 					collapsible: true,
 					onLoad: function(dv) {
-
 						var vis = false;							
 						go.modules.core.customfields.CustomFields.getFields(fieldSet.id).forEach(function (field) {
 							if(!GO.util.empty(dv.data.customFields[field.databaseName])) {

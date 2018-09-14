@@ -17,3 +17,4 @@ modules/tasks/ScheduleCallMenuItem.js
 modules/tasks/views/Extjs3/StatusProgressField.js
 modules/tasks/views/Extjs3/TasksTpl.js
 modules/tasks/MainPanel.js
+modules/tasks/SystemSettingsPanel.js

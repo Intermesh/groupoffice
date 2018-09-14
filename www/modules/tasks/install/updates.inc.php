@@ -103,3 +103,8 @@ $updates['201610281650'][] = 'ALTER TABLE `ta_tasks` CONVERT TO CHARACTER SET ut
 
 
 $updates['201610281659'][] = 'SET foreign_key_checks = 1;';
+
+
+
+//ALTER TABLE `cf_ta_tasks` CHANGE `model_id` `id` INT(11) NULL DEFAULT NULL;
+// RENAME TABLE `cf_ta_tasks` TO `ta_task_custom_fields`;

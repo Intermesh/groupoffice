@@ -97,8 +97,16 @@ trait CustomFieldsTrait {
 	}
 
 	public static function customFieldsTableName() {
-		$tables = static::getMapping()->getTables();		
-		$mainTableName = array_keys($tables)[0];
+		
+		if(is_a(static::class, Entity::class, true)) {
+		
+			$tables = static::getMapping()->getTables();		
+			$mainTableName = array_keys($tables)[0];
+		} else
+		{
+			//ActiveRecord
+			$mainTableName = static::model()->tableName();
+		}
 		
 		return $mainTableName.'_custom_fields';
 	}
