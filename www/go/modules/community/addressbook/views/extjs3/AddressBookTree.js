@@ -1,6 +1,5 @@
 go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel, {
 	
-	
 	loader: new go.modules.community.addressbook.TreeLoader({
 		baseAttrs: {
 			iconCls: 'ic-account-box'
@@ -85,15 +84,37 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 		}
 	},
 	
+	
+	findAddressbookNode : function(id) {
+		var rootNode = this.getRootNode(), found = false;
+		
+		rootNode.findChildBy(function(node) {
+			if(node.attributes.entity && node.attributes.entity.id == id) {
+				found = node;
+				return false;
+			}
+		});
 
-	onAddressBookChanges : function(entityStore, added, changed, destroyed) {		
+		return found;
+	},
+	
 
-		if(this.getLoader().loading) {
-			return;
-		}
-		if(added.length) {
-			this.getRootNode().reload();
-			return;
+	onAddressBookChanges : function(entityStore, added, changed, destroyed) {	
+		
+		if(added.length) {			
+			//reload if added address book is not present in tree yet.
+			var me = this, reload = false;
+			added.forEach(function(id) {				
+				if(!me.findAddressbookNode(id)) {
+					reload = true;
+					return false;
+				}
+			});			
+			
+			if(reload) {
+				me.getRootNode().reload();
+				return;
+			}
 		}
 		
 		var me = this;

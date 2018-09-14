@@ -20,10 +20,8 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 			entityStore: go.Stores.get("Contact")
 		});
 		
-		//reload store when user changes stars
-		go.Stores.get("ContactStar").on("changes", function() {
-			this.store.reload();
-		}, this);
+//		//reload store when user changes stars
+		go.Stores.get("ContactStar").on("changes", this.onStarChanges, this);
 
 		var grid = this;
 
@@ -199,6 +197,33 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 		
 
 		go.modules.community.addressbook.ContactGrid.superclass.initComponent.call(this);
+	},
+	
+	onStarChanges: function(store, added, changed, destroyed) {
+		
+		if(!this.store.loaded) {
+			return;
+		}
+		
+		//changes should always reload list
+		if(changed.length) {
+			this.store.reload();
+		}
+		
+		if(!added.length) {
+			return;
+		}
+		
+		go.Stores.get("ContactStar").get(added, function(stars) {			
+			var starContactIds = stars.column("contactId")
+			var storeContactIds = this.store.getRange().column('id');
+			
+			//if there are new stars not present in the store then reload.
+			if(starContactIds.diff(storeContactIds).length) {				
+				this.store.reload();
+			}
+		}, this);
+
 	},
 
 	//when filtering on a group then offer to delete contacts from a group when delting.

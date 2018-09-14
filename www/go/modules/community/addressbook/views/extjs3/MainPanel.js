@@ -182,6 +182,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 
 		//load the grid on selection change.
 		this.addressBookTree.getSelectionModel().on('selectionchange', function (sm, node) {
+			
 			if (!node) {
 				return;
 			}

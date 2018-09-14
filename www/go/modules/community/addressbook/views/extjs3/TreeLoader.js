@@ -50,10 +50,11 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 			var response = {
 				argument: {callback: callback, node: node, scope: scope},
 				responseData:result
-			};
+			};			
+			
+			this.handleResponse(response);
 			
 			this.loading = false;
-			this.handleResponse(response);
 		}, this)
 		
 		
@@ -102,9 +103,10 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 					argument: {callback: callback, node: options.node, scope: scope},
 					responseData:result
 				};
-
-				this.loading = false;
+				
 				this.handleResponse(response);
+				
+				this.loading = false;
 //				callback.call(scope, options, true, result); //????
 			},this);
 
