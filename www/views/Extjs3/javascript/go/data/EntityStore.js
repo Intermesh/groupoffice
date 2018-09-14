@@ -1,3 +1,21 @@
+
+/* global Ext, go */
+
+/**
+ * Entity store
+ * 
+ * The entity store is a single source of truth for all the entities.
+ * It's kept up to date with flux when go.Jmap.request() calls are made.
+ * Then it fires a "changes" event that other view stores or components can
+ * subscribe to. The changes event will fire at the end of an event cycle.
+ * It will pass:
+ * 
+ * store: the entity store
+ * added: int[]|string[] array of ids's
+ * changed: int[]|string[] array of ids's
+ * detroyed: int[]|string[] array of ids's
+ * 
+ */
 go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 	state: null,
@@ -20,9 +38,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		this.state = null;
 		
 		this.restoreState();
-		this.initChanges();
-		
-		
+		this.initChanges();		
 	},
 	
 	initChanges : function() {
@@ -68,7 +84,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			throw "Entity doesn't have an 'id' property";
 		}
 		
-		if(this.data[entity.id]) {			
+		if(this.data[entity.id]) {
 			this.changes.changed.push(entity.id);
 		} else
 		{
@@ -93,17 +109,17 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	
 	_fireChanges : function() {
 		var me = this;
-//
-//		if (me.timeout) {
-//			clearTimeout(me.timeout);
-//		}
+
+		if (me.timeout) {
+			clearTimeout(me.timeout);
+		}
 		
 		//delay fireevent one event loop cycle
-//		me.timeout = setTimeout(function () {				
+		me.timeout = setTimeout(function () {				
 			me.fireEvent('changes', me, me.changes.added, me.changes.changed, me.changes.destroyed);			
 			me.initChanges();
-//			me.timeout = null;
-//		}, 0);
+			me.timeout = null;
+		}, 0);
 	},
 
 
@@ -243,7 +259,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 						return;
 					}
 					
-					if(!GO.util.empty(response.notFound)) {
+					if(!go.util.empty(response.notFound)) {
 						this.notFound = this.notFound.concat(response.notFound);
 						console.log("Item not found", response);						
 					}
@@ -299,10 +315,11 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		}, this);
 		```
 	 * 
-	 * @param {int} id
-	 * @param {object} values Key value object with entity properties
-	 * @param {type} callback A function called with success, values, response, options
-	 * @returns {undefined}
+	 * @param {object} params	 
+	 * @param {function} cb A function called with success, values, response, options
+	 * @param {object} scope
+	 * 	 
+	 * @returns {string} Client request ID
 	 * 
 	 * @link http://jmap.io/spec-core.html#/set
 	 */
@@ -323,7 +340,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			throw "'destroy' must be an array.";
 		}
 
-		go.Jmap.request({
+		return go.Jmap.request({
 			method: this.entity.name + "/set",
 			params: params,
 			scope: this,
@@ -345,7 +362,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				}
 				
 				if(response.updated) {
-					for(serverId in response.updated) {
+					for(var serverId in response.updated) {
 						//merge existing data, with updates from client and server
 						entity = Ext.apply(this.data[serverId], params.update[serverId], response.updated[serverId]);												
 						this._add(entity);

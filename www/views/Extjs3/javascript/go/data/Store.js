@@ -56,12 +56,8 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		var old = this.loading;
 		this.loading = true;
 			
-		var ret = go.data.Store.superclass.loadData.call(this, o, append);				
-		
-		var me = this;
-		setTimeout(function(){
-			me.loading = old;
-		}, 0);	
+		var ret = go.data.Store.superclass.loadData.call(this, o, append);	
+		me.loading = old;
 		
 		return ret;
 	},
@@ -84,20 +80,7 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		
 		if(!this.baseParams.filter) {
 			this.baseParams.filter = {};
-		}
-
-		this.on('beforeload', function() {			
-			this.loading = true;
-		}, this)
-		
-		//set loaded to true on load() or loadData();
-		this.on('load', function() {
-			var me = this;
-			setTimeout(function() {
-				me.loaded = true;
-				me.loading = false;
-			}, 0);
-		}, this)
+		}		
 		
 		if(this.entityStore) {
 //			this.on('update', this.onUpdate, this);		
@@ -109,13 +92,29 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 			}, this);
 			
 			this.on('destroy', function() {
-			this.entityStore.un('changes', this.onChanges, this);
-		}, this);
+				this.entityStore.un('changes', this.onChanges, this);
+			}, this);
 		
 		}
 	},
 	
-	onChanges : function(entityStore, added, changed, destroyed) {		
+	
+	load : function(params) {
+		this.loading = true;
+		
+		this.on("load", function() {
+			this.loading = false;
+			this.loaded = true;
+		}, this, {single: true});
+		
+		return go.data.Store.superclass.load.call(this, params);		
+		
+	},
+	
+	onChanges : function(entityStore, added, changed, destroyed) {
+		
+		//when loading the store changes will fire too.
+		//Possibly this may cause missing an update by someone else who
 		if(!this.loaded || this.loading) {
 			return;
 		}		
