@@ -1,3 +1,5 @@
+/* global go */
+
 (function () {
 	function fallbackCopyTextToClipboard(text) {
 		var textArea = document.createElement("textarea");
@@ -18,6 +20,36 @@
 	}
 
 	go.util = {
+
+		empty: function (v) {
+
+			if (!v)
+			{
+				return true;
+			}
+			if (v == '')
+			{
+				return true;
+			}
+
+			if (v == '0')
+			{
+				return true;
+			}
+
+			if (v == 'undefined')
+			{
+				return true;
+			}
+
+			if (v == 'null')
+			{
+				return true;
+			}
+			return false;
+
+		},
+
 		copyTextToClipboard: function (text) {
 			if (!navigator.clipboard) {
 				fallbackCopyTextToClipboard(text);
@@ -29,31 +61,31 @@
 				console.error('Async: Could not copy text: ', err);
 			});
 		},
-		
-		mailto : function(config) {
+
+		mailto: function (config) {
 			var email = config.email;
-			
-			if(config.name) {
-				email = '"' + config.name.replace(/"/g, '\"') + '" <' + config.email + '>'; 
+
+			if (config.name) {
+				email = '"' + config.name.replace(/"/g, '\"') + '" <' + config.email + '>';
 			}
-			
+
 			document.location = "mailto:" + email;
 		},
-		
-		callto : function(config) {
+
+		callto: function (config) {
 			document.location = "tel:" + config.number;
 		},
-		
-		streetAddress : function(config) {
-			window.open("https://www.openstreetmap.org/search?query=" + encodeURIComponent(config.street + ", " +config.zipCode.replace(/ /g, '') + ", " + config.country));
+
+		streetAddress: function (config) {
+			window.open("https://www.openstreetmap.org/search?query=" + encodeURIComponent(config.street + ", " + config.zipCode.replace(/ /g, '') + ", " + config.country));
 		},
-		
-		showDate : function(date) {
+
+		showDate: function (date) {
 			console.log("No date handler");
 		}
 
 	};
-	
+
 
 
 })();
