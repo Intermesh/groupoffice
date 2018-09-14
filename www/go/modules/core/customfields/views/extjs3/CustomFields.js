@@ -196,80 +196,47 @@
 		/**
 		 * Add panels to detail view
 		 * 
-		 * @param {go.core.DetailView} detailView
-		 * @returns {void}
+		 * @param {string} entity eg. "Contact"
+		 * @returns {Array}
 		 */
-		addDetailPanels: function (detailView) {			
+		getDetailPanels: function (entity) {
+			
+			var fieldSets = go.modules.core.customfields.CustomFields.getFieldSets(entity), panels = [];
 
-				
-				var fieldSets = go.modules.core.customfields.CustomFields.getFieldSets(Ext.isString(detailView.entity) ?  detailView.entity : detailView.entityStore.entity.name);
+			fieldSets.forEach(function (fieldSet) {
+				var tpl = '<tpl for="customFields"><div class="icons">';
 
-				fieldSets.forEach(function (fieldSet) {
-					var tpl = '<tpl for="customFields"><div class="icons">';
-
-					go.modules.core.customfields.CustomFields.getFields(fieldSet.id).forEach(function (field) {
-						
-						
-						
-						tpl += '<tpl if="!GO.util.empty(go.modules.core.customfields.CustomFields.renderField(\'' + field.id + '\',values))"><p><i class="icon label ' + go.modules.core.customfields.CustomFields.getFieldIcon(field.id) + '"></i>\
-					<span>{[go.modules.core.customfields.CustomFields.renderField("' + field.id + '",values)]}</span>\
-						<label>' + t(field.name) + '</label>\
-						</p><hr /></tpl>';
-					});
-
-					tpl += '</div></tpl>';
-
-					detailView.add({						
-						id: "cf-detail-field-set-" + fieldSet.id,
-						fieldSetId: fieldSet.id,
-						title: fieldSet.name,
-						tpl: tpl,
-						collapsible: true,
-						onLoad: function(dv) {
-							
-							var vis = false;							
-							go.modules.core.customfields.CustomFields.getFields(fieldSet.id).forEach(function (field) {
-								if(!GO.util.empty(dv.data.customFields[field.databaseName])) {
-									vis = true;
-								}
-							});
-							
-							this.setVisible(vis);
-						}
-					});
-
-					if (detailView.rendered) {
-						detailView.doLayout();
-					}
+				go.modules.core.customfields.CustomFields.getFields(fieldSet.id).forEach(function (field) {
+					tpl += '<tpl if="!GO.util.empty(go.modules.core.customfields.CustomFields.renderField(\'' + field.id + '\',values))"><p><i class="icon label ' + go.modules.core.customfields.CustomFields.getFieldIcon(field.id) + '"></i>\
+				<span>{[go.modules.core.customfields.CustomFields.renderField("' + field.id + '",values)]}</span>\
+					<label>' + t(field.name) + '</label>\
+					</p><hr /></tpl>';
 				});
 
-		}
+				tpl += '</div></tpl>';
 
-//		fieldSetsLoaded: false,
-//		fieldsLoaded: false,
-//		fireReady: function () { //internal
-//			if (this.fieldSetsLoaded && this.fieldsLoaded) {
-//				this.fireEvent('internalready', this);
-//			}
-//		},
-//		/**
-//		 * Use this to do stuff after the custom fields data has been loaded
-//		 * 
-//		 * @param {type} fn
-//		 * @param {type} scope
-//		 * @returns {undefined}
-//		 */
-//		onReady: function (fn, scope) {
-//			if(!this.initialized) {
-//				this.initialized = true;
-//				this.init();
-//			}
-//			if (!this.fieldSetsLoaded || !this.fieldsLoaded) {
-//				this.on('internalready', fn, scope || this);
-//			} else {
-//				fn.call(scope || this, this);
-//			}
-//		}
+				panels.push({						
+					id: "cf-detail-field-set-" + fieldSet.id,
+					fieldSetId: fieldSet.id,
+					title: fieldSet.name,
+					tpl: tpl,
+					collapsible: true,
+					onLoad: function(dv) {
+
+						var vis = false;							
+						go.modules.core.customfields.CustomFields.getFields(fieldSet.id).forEach(function (field) {
+							if(!GO.util.empty(dv.data.customFields[field.databaseName])) {
+								vis = true;
+							}
+						});
+
+						this.setVisible(vis);
+					}
+				});
+			});			
+			
+			return panels;
+		}
 	});
 
 	go.modules.core.customfields.CustomFields = new CustomFieldsCls;
