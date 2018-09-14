@@ -6,4 +6,4 @@ go.Modules.register("community", "addressbook", {
 	initModule: function () {}
 });
 
-go.Stores.get("User");
+//go.Stores.get("User");

@@ -18,6 +18,8 @@
 		 * 	}
 		 * });
 		 * 
+
+		 * 
 		 * @param {type} name
 		 * @param {type} config
 		 * @returns {undefined}

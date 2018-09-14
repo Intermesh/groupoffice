@@ -2,4 +2,6 @@ Module.js
 FormFieldSet.js
 FieldDialog.js
 CustomFields.js
+SystemSettingsPanel.js
+FieldSetDialog.js
 type/Text.js

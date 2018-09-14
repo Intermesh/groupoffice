@@ -1,3 +1,5 @@
+/* global go, Ext */
+
 /** 
  * Copyright Intermesh
  * 
@@ -11,9 +13,16 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
-go.modules.community.addressbook.CustomFieldCategoryPanel = Ext.extend(go.grid.GridPanel, {
+go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel, {
 
 	autoHeight: true,
+	
+	entity: null,
+	
+	createFieldSetDialog : function() {
+		return new go.modules.core.customfields.FieldSetDialog();
+	},
+	
 	initComponent: function () {
 		
 		this.store = new Ext.data.ArrayStore({
@@ -52,9 +61,10 @@ go.modules.community.addressbook.CustomFieldCategoryPanel = Ext.extend(go.grid.G
 					iconCls: 'ic-add',
 					tooltip: t('Add field set'),
 					handler: function (e, toolEl) {
-						var dlg = new go.modules.community.addressbook.CustomFieldSetDialog();
+						var dlg = this.createFieldSetDialog();
 						dlg.show();
-					}
+					},
+					scope: this
 				}
 			],
 			columns: [
@@ -93,7 +103,7 @@ go.modules.community.addressbook.CustomFieldCategoryPanel = Ext.extend(go.grid.G
 			listeners: {
 				scope: this,
 				rowclick: function(grid, rowIndex, e) {
-					if(e.target.tagName != "BUTTON") {
+					if(e.target.tagName !== "BUTTON") {
 						return false;
 					}
 					
@@ -115,51 +125,12 @@ go.modules.community.addressbook.CustomFieldCategoryPanel = Ext.extend(go.grid.G
 //			stateId: 'apikeys-grid'
 		});
 
-		go.modules.community.addressbook.CustomFieldCategoryPanel.superclass.initComponent.call(this);
+		go.modules.core.customfields.SystemSettingsPanel.superclass.initComponent.call(this);
 
 		this.on('render', function () {
 			this.load();
 		}, this);
 	},
-
-//	initRowActions: function () {
-//
-//		var actions = new Ext.ux.grid.RowActions({
-//			menuDisabled: true,
-//			hideable: false,
-//			draggable: false,
-//			fixed: true,
-//			header: '',
-//			hideMode: 'display',
-//			keepSelection: true,
-//
-//			actions: [{
-//					iconCls: 'ic-add'
-//				}, {
-//					iconCls: 'ic-more-vert'
-//				}]
-//		});
-//
-//		actions.on({
-//			action: function (grid, record, action, row, col, e, target) {
-//				console.log(arguments);
-//				switch (action) {
-//
-//					case 'ic-add':
-//						console.log("todo");
-//						break;
-//
-//					case 'ic-more-vert':
-//						this.showMoreMenu(record, e);
-//						break;
-//				}
-//			},
-//			scope: this
-//		});
-//
-//		return actions;
-//
-//	},
 
 	showMoreMenu: function (record, e) {
 		if (!this.moreMenu) {
@@ -172,7 +143,7 @@ go.modules.community.addressbook.CustomFieldCategoryPanel = Ext.extend(go.grid.G
 						handler: function () {
 							
 							if(this.moreMenu.record.data.isFieldSet) {
-								var dlg = new go.modules.community.addressbook.CustomFieldSetDialog();
+								var dlg = this.createFieldSetDialog();
 								dlg.load(this.moreMenu.record.data.fieldSetId).show();
 							} else
 							{
@@ -192,7 +163,7 @@ go.modules.community.addressbook.CustomFieldCategoryPanel = Ext.extend(go.grid.G
 						scope: this
 					}
 				]
-			})
+			});
 		}
 
 		this.moreMenu.record = record;
@@ -225,7 +196,7 @@ go.modules.community.addressbook.CustomFieldCategoryPanel = Ext.extend(go.grid.G
 			
 			this.addFieldMenu = new Ext.menu.Menu({
 				items: items
-			})
+			});
 		}
 
 		this.addFieldMenu.record = record;
@@ -243,7 +214,7 @@ go.modules.community.addressbook.CustomFieldCategoryPanel = Ext.extend(go.grid.G
 			{
 				fieldIds.push(r.data.fieldId); 
 			}
-		})
+		});
 		
 		if(fieldSetIds.length) {
 			go.Stores.get("FieldSet").set({
@@ -266,7 +237,7 @@ go.modules.community.addressbook.CustomFieldCategoryPanel = Ext.extend(go.grid.G
 		go.Stores.get("FieldSet").query({
 			sort: ["name ASC"],
 			filter: {
-				entities: ["Contact"]
+				entities: [this.entity]
 			}
 		}, function (options, success, response) {
 
@@ -326,5 +297,6 @@ go.modules.community.addressbook.CustomFieldCategoryPanel = Ext.extend(go.grid.G
 
 	}
 });
+
 
 
