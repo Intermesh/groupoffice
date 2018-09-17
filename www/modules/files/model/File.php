@@ -544,6 +544,11 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 		$log = parent::log($action, false, $modifiedCustomfieldAttrs);
 		if(empty($log))
 			return false;
+		
+		if($log === true) {
+			return true;
+		}
+		
 		if($log->action=='update') {
 			$log->action = 'propedit';
 			if($log->object->isModified('folder_id'))
@@ -553,7 +558,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 				$log->message = $log->object->getOldAttributeValue('name') . ' > ' . $log->message;
 			}
 		}
-		return $log->save();
+		return $save ? $log->save() : $log;
 	}
 
 	/**
