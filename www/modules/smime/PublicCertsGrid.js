@@ -105,19 +105,35 @@ GO.smime.PublicCertsGrid = function(config){
 Ext.extend(GO.smime.PublicCertsGrid, GO.grid.GridPanel,{
 	
 	uploadCert : function() {
+		var complete = false, email = '';
+		
 		go.util.openFileDialog({
 			multiple:true,
 			autoUpload:true,
 			accept: '.cer, .pem',
 			listeners: {
 				select: function(files) {
+					email = window.prompt('Email address');
 					console.log('files selected:',files);
 				},
 				upload: function(response) {
 					console.log('get blob from server', response);
+					GO.request({
+						url:'smime/certificate/ImportCertificate',
+						params:{
+							blobId: response.blobId,
+							email: email
+						},
+						success:function(){
+							if(complete) {
+								this.store.reload();
+							}
+						},
+						scope:this
+					});
 				},
 				uploadComplete() {
-					this.store.reload();
+					complete = true;
 				},
 				scope: this
 			}
