@@ -114,10 +114,8 @@ Ext.extend(GO.smime.PublicCertsGrid, GO.grid.GridPanel,{
 			listeners: {
 				select: function(files) {
 					email = window.prompt('Email address');
-					console.log('files selected:',files);
 				},
 				upload: function(response) {
-					console.log('get blob from server', response);
 					GO.request({
 						url:'smime/certificate/ImportCertificate',
 						params:{
