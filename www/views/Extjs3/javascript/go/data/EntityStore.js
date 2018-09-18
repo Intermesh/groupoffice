@@ -205,7 +205,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			if(this.data[id]) {
 				entities.push(this.data[id]);
 			} else if(this.notFound.indexOf(id) > -1) {
-				entities.push(null);
+				//entities.push(null);
 			} else
 			{
 				unknownIds.push(id);
