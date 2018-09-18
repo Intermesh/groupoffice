@@ -40,6 +40,14 @@ trait CustomFieldsTrait {
 					}
 				}
 				
+				$fields = Field::find()
+						->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId')
+						->where(['fs.entityId' => static::getType()->getId()]);
+		
+				foreach($fields as $field) {
+					$record[$field->databaseName] = $field->dbToApi(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record);			
+				}
+				
 				$this->customFieldsData = $record;
 				
 			} else

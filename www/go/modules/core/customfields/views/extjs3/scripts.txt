@@ -8,6 +8,9 @@ FieldSetDialog.js
 type/Text.js
 type/TextDialog.js
 
+type/TextArea.js
+type/TextAreaDialog.js
+
 type/NumberDialog.js
 type/Number.js
 

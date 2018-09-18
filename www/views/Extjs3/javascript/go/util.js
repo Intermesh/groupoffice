@@ -136,6 +136,10 @@
 			}
 			
 			this.uploadDialog.click();
+		},
+		
+		textToHtml : function(text) {
+			return Ext.util.Format.nl2br(text);
 		}
 
 	};
