@@ -57,6 +57,11 @@ class ErrorHandler {
 		$cls = get_class($e);
 		
 		$errorString = $cls . " in " . $e->getFile() ." at line ". $e->getLine().': '.$e->getMessage();
+		
+		if(Environment::get()->isCli()) {
+			echo $errorString . "\n";
+		}
+		
 		error_log($errorString, 0);
 		
 //		echo $e->getTraceAsString();

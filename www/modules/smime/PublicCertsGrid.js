@@ -24,12 +24,10 @@ GO.smime.PublicCertsGrid = function(config){
 		defaults:{
 			sortable:true
 		},
-		columns:[
-		{
-			header: 'email', 
+		columns:[{
+			header: 'Email', 
 			dataIndex:  'email'
-		}
-		]
+		}]
 	});
 	
 	config.cm=columnModel;
@@ -49,14 +47,20 @@ GO.smime.PublicCertsGrid = function(config){
 	});
 		    	
 	config.tbar = [{
-		iconCls: 'btn-delete',
+		iconCls: 'ic-file-upload',
+		text: t("Import"),
+		handler: function(){
+			this.uploadCert();
+		},
+		scope:this
+	},{
+		iconCls: 'ic-delete',
 		text: t("Delete"),
-		cls: 'x-btn-text-icon',
 		handler: function(){
 			this.deleteSelected();
 		},
 		scope: this
-	},'-',t("Search") + ':', this.searchField];
+	},'->',{xtype:'tbsearch', store: config.store}];
 	
 	
 	config.listeners={
@@ -100,7 +104,39 @@ GO.smime.PublicCertsGrid = function(config){
 
 Ext.extend(GO.smime.PublicCertsGrid, GO.grid.GridPanel,{
 	
-
+	uploadCert : function() {
+		var complete = false, email = '';
+		
+		go.util.openFileDialog({
+			multiple:true,
+			autoUpload:true,
+			accept: '.cer, .pem',
+			listeners: {
+				select: function(files) {
+					email = window.prompt('Email address');
+				},
+				upload: function(response) {
+					GO.request({
+						url:'smime/certificate/ImportCertificate',
+						params:{
+							blobId: response.blobId,
+							email: email
+						},
+						success:function(){
+							if(complete) {
+								this.store.reload();
+							}
+						},
+						scope:this
+					});
+				},
+				uploadComplete() {
+					complete = true;
+				},
+				scope: this
+			}
+		});
+	}
 });
 
 
@@ -108,20 +144,12 @@ GO.smime.PublicCertsWindow = Ext.extend(GO.Window, {
 	initComponent : function(){
 		
 		this.title=t("Public SMIME certificates", "smime");
-		this.width=400;
+		this.width=11*dp(56);
 		this.height=400;
 		this.layout='fit';
 		this.grid=new GO.smime.PublicCertsGrid();
 		this.items=this.grid
 		this.closeAction='hide';
-		
-		this.buttons=[{
-			text:t("Close"),
-			handler:function(){
-				this.hide();
-			},
-			scope:this
-		}]
 		
 		GO.smime.PublicCertsWindow.superclass.initComponent.call(this);
 	},

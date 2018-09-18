@@ -78,15 +78,24 @@ go.Jmap = {
 			return;
 
 		Ext.Ajax.request({url: go.User.uploadUrl,
-			success: cfg.success || Ext.emptyFn,
-			failure: cfg.failure || Ext.emptyFn,
+			success: function(response) {
+				if(cfg.success && response.responseText) {
+					data = Ext.decode(response.responseText);
+					cfg.success.call(cfg.scope || this,data);
+				}
+			},
+			failure: function(response) {
+				if(cfg.failure && response.responseText) {
+					data = Ext.decode(response.responseText);
+					cfg.failure.call(cfg.scope || this,data);
+				}
+			},
 			headers: {
 				'X-File-Name': file.name,
 				'Content-Type': file.type,
 				'X-File-LastModifed': Math.round(file['lastModified'] / 1000).toString()
 			},
-			xmlData: file, // just "data" wasn't available in ext
-			scope:cfg.scope || this
+			xmlData: file // just "data" wasn't available in ext
 		});
 	},
 	

@@ -53,7 +53,8 @@ GO.portlets.rssFeedPortlet = function(config) {
 		header: t("Date"),
 		dataIndex: 'pubDate',
 		width: 150,
-		renderer:  this.formatDate,
+		xtype:"datecolumn",
+		//renderer:  this.formatDate,
 		sortable:true
 	}];
 
