@@ -1,3 +1,6 @@
+18-09-2018 6.2.104
+- Core: Events added to support custom modules
+
 11-09-2018 6.2.103
 - Email: Fixed problem with backslash in mail folder
 - Projects: Fixed decimals in activity type rates
