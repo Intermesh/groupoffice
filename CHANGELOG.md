@@ -1,9 +1,11 @@
+18-09-2018 6.3.38
 - Core: Links didn't show when you didn't have access to one of them.
 - Projects: Fixed double icon in tree
 - Files: Fixed undefinded index "deleteSuccess" error.
 - Files: Add "Browse x files" button in detail views
 - Core: Better error message when language is invalid and fixed Norwegian
 - Core: Make sure customfields and search module are installed and enabled before upgrade
+- Core: Merged 6.2.104
 
 11-09-2018 6.3.37
 - Start page: RSS date was not showing
