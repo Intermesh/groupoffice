@@ -18,7 +18,7 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 		
 		this.detailPanel.on('load', function(dv) {			
 			this.setDisabled(dv.data.permissionLevel < GO.permissionLevels.write);
-		})
+		}, this);
 	},
 	
 	addMenuItems : function(detailPanel, comp) {		
