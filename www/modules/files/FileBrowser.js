@@ -1904,6 +1904,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 	showPropertiesDialog : function(record)
 	{
+		console.log(record);
 		if(record.data.extension=='folder')
 		{
 			GO.files.showFolderPropertiesDialog(record.data.id);

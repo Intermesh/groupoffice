@@ -99,25 +99,23 @@ class Language extends Singleton {
 			//Get english default
 			$file = $this->findLangFile('en',$package, $module);
 			if ($file->exists()) {
-				$langData = require($file);
+				$langData = $this->loadFile($file);
 			}
 
 			//overwirte english with actual language
 			if ($this->isoCode != 'en') {
 				$file = $this->findLangFile($this->isoCode, $package, $module);
 				if ($file->exists()) {
-					$langData = array_merge($langData, require($file));
+					$langData = array_merge($langData, $this->loadFile($file));
 				}
 			}
 
 			$file = $this->findLangOverride($this->isoCode, $package, $module);
 			if ($file->exists()) {
-				$langData = array_merge($langData, require($file));
+				$langData = array_merge($langData, $this->loadFile($file));
 			}
 			
-			if(!is_array($langData)){
-				throw new \Exception("Invalid language file encounted for module " . $package .'/'. $module.'. Language: '. $this->isoCode);
-			};
+		
 
 			foreach ($langData as $key => $translation) {
 					$langData[$key] = str_replace('{product_name}', \GO::config()->product_name, $translation);
@@ -125,6 +123,16 @@ class Language extends Singleton {
 
 			$this->data[$package][$module] = $langData;			
 		}
+	}
+	
+	private function loadFile($file) {
+		
+		$langData = require($file);
+		if(!is_array($langData)){
+			throw new \Exception("Invalid language file  " . $file);
+		}
+		
+		return $langData;
 	}
 	
 	public function hasLanguage($lang) {

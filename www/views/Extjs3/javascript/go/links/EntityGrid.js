@@ -14,7 +14,6 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 		allEntities.forEach(function(e){
 			data.push([e.name, t(e.name, e.module, e.package)]);
 		});			
-		
 
 		Ext.apply(config, {			
 			tbar: [{xtype: "selectallcheckbox"}],			

@@ -847,7 +847,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 					->addInCondition("groupId", \GO\Base\Model\User::getGroupIds(\GO::user()->id), "a", false);
 
 			$findParams = \GO\Base\Db\FindParams::newInstance()
-					->select('*')
+					->select('t.*,cf.*')
 					->ignoreAcl()
 					->joinCustomFields()
 					->joinModel(array(

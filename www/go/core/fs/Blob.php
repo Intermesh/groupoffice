@@ -22,7 +22,7 @@ class Blob extends orm\Entity {
 	 * @var string eg. text/plain
 	 */
 	public $type;
-	
+
 	/**
 	 * File name of the hash (first upload)
 	 * 

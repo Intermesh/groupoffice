@@ -14,6 +14,17 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 			fields: ['id', 'name', 'mtime', 'extension', "handler"],
 			remoteSort: true
 		});
+		
+		
+		this.store.on("load", function() {
+			var count = this.store.getTotalCount();
+			if(count) {
+				this.browseBtn.setText(t("Browse {total} files").replace("{total}", count));
+			} else
+			{
+				this.browseBtn.setText(t("Browse files"));
+			}
+		}, this);
 
 
 		var tpl = new Ext.XTemplate('<div class="icons"><tpl for=".">\
@@ -44,6 +55,21 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 				handler: this.browse,
 				scope: this
 			}];
+		
+		
+		this.bbar = [
+			this.browseBtn = new GO.files.FileBrowserButton()
+		];
+		
+		this.browseBtn.on('close', function(btn, folderId) {
+			this.folderId = folderId;
+			this.store.load({
+				params: {
+					limit: 10,
+					folder_id: this.folderId
+				}
+			});
+		}, this);
 
 
 		go.modules.files.FilesDetailPanel.superclass.initComponent.call(this);
@@ -123,8 +149,9 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 
 	onLoad: function (dv) {
 
-//		this.browseBtn.model_name = dv.model_name || dv.entity || dv.entityStore.entity.name;
-//		this.browseBtn.setId(dv.data.id);
+		this.browseBtn.model_name = dv.model_name || dv.entity || dv.entityStore.entity.name;
+		this.browseBtn.setId(dv.data.id);
+		
 
 		this.detailView = dv;
 

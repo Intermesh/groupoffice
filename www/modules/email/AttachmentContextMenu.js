@@ -20,9 +20,8 @@ GO.email.AttachmentContextMenu = function(config)
 	config['minWidth']=180;
 	
 	this.downloadButton = new Ext.menu.Item({
-					iconCls: 'btn-download',
+					iconCls: 'ic-file-download',
 					text: t("Download"),
-					cls: 'x-btn-text-icon',
 					handler: function(){						
 						GO.email.openAttachment(
 							this.attachment,
@@ -35,9 +34,8 @@ GO.email.AttachmentContextMenu = function(config)
 	if(GO.files && !config.removeSaveButton)
 	{
 		this.saveButton = new Ext.menu.Item({
-					iconCls: 'btn-save',
+					iconCls: 'ic-save',
 					text: t("Save to personal folder", "email"),
-					cls: 'x-btn-text-icon',
 					handler: function(){
 						GO.email.saveAttachment(this.attachment,this.messagePanel);
 					},
@@ -48,9 +46,8 @@ GO.email.AttachmentContextMenu = function(config)
 		// Save to item button.
 		// Shows the link dialog so you can select an item to add the attachment to.
 		this.saveToItemButton = new Ext.menu.Item({
-			iconCls: 'btn-save',
+			iconCls: 'ic-save',
 			text: t("Save to item", "email"),
-			cls: 'x-btn-text-icon',
 			handler: function(){
 
 				if(!GO.email.linkAttachmentDialog){

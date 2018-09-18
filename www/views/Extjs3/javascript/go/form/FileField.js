@@ -100,34 +100,31 @@ go.form.FileField = Ext.extend(Ext.form.TextField, {
 				this.button.removeClass(['x-btn-over', 'x-btn-focus', 'x-btn-click'])
 			},
 			change: function () {
-				var v = this.fileInput.dom.value;
+				var v = this.fileInput.dom.files;
 				//this.setValue(v);
 				this.fireEvent('fileselected', this, v);
 				if (v && this.autoUpload) {
-					this.startUpload();
+					this.startUpload(v);
 				}
 			}
 		});
 	},
 
-	startUpload: function () {
-
-		var input = this.fileInput.dom;
-		for (var f in input.files) {
-			var file = input.files[f];
+	startUpload: function (files) {
+		for (var f in files) {
+			var file = files[f];
 			this.fireEvent('uploadStart', this, file);
 			go.Jmap.upload(file, {
-				success: function(response, file, options) {
-					var data = Ext.decode(response.responseText);
+				success: function(data, file, options) {
 					if (data.blobId) {
 						this.fireEvent('change', this, data.blobId, this.value);
 						this.setValue(data.blobId);
 						this.originalValue = '';
 					}
-					this.fireEvent('uploadComplete', data, file, response, options);
+					this.fireEvent('uploadComplete', data, file, options);
 				},
-				failure: function(response, file, options) {
-					this.fireEvent('uploadFailed', response, file, options);
+				failure: function(data, file, options) {
+					this.fireEvent('uploadFailed', data, file, options);
 				},
 				scope:this
 			});

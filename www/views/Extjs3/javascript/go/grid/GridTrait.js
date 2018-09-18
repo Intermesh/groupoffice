@@ -19,7 +19,7 @@ go.grid.GridTrait = {
 		}
 
 		//setup auto load more for go.data.Store's only
-		if(this.store instanceof go.data.Store) {
+		if(this.store instanceof go.data.Store  && this.store.entityStore) {
 			this.on("bodyscroll", this.loadMore, this, {buffer: 100});
 
 			this.store.baseParams.limit = this.pageSize;

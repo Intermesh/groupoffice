@@ -68,11 +68,14 @@ trait SearchableTrait {
 		foreach($entities as $cls) {
 			echo $cls."\n";
 			$stmt = $cls::find();
-			foreach($stmt as $e) {
-				
-				echo ".";
-				
-				$e->saveSearch(false);
+			foreach($stmt as $e) {				
+				try {
+					$e->saveSearch(false);
+					echo ".";
+				} catch(\Exception $e) {
+					\go\core\ErrorHandler::logException($e);
+					echo "E";
+				}
 			}
 			
 			echo "\nDone\n\n";

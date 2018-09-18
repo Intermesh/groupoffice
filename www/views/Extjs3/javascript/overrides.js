@@ -680,9 +680,10 @@ Ext.layout.MenuLayout.prototype.itemTpl = new Ext.XTemplate(
 	'</li>'
 );
 
-Ext.override(Ext.data.Field, {
-	dateFormat: "c" //from server
-});
+// Not needed and breaks rss feed reader
+//Ext.override(Ext.data.Field, {
+//	dateFormat: "c" //from server
+//});
 
 GO.mainLayout.onReady(function() {
 

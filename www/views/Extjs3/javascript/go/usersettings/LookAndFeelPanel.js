@@ -13,6 +13,20 @@
 go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 
 	initComponent: function () {
+		
+		var panels = GO.moduleManager.getAllPanels(), data = [];
+		
+		panels.forEach(function(p){
+			data.push([p.moduleName, p.title]);
+		});
+		var moduleStore = new Ext.data.ArrayStore({
+			fields: ['id', 'name'],
+			idField: 'id',
+			data: data
+		});
+		
+		
+		
 		this.globalFieldset = new Ext.form.FieldSet({
 			title: t('Global'),
 			labelWidth:dp(160),
@@ -43,15 +57,10 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 					fieldLabel: t("Start in module", "users"),
 					name: 'start_module_name',
 					hiddenName: 'start_module',
-					store: new GO.data.JsonStore({
-						url: GO.url('core/modules'),
-						baseParams: {user_id:0},
-						fields:['id','name'],
-						remoteSort: true
-					}),
+					store: moduleStore,
 					displayField:'name',
 					valueField: 'id',
-					mode:'remote',
+					mode:'local',
 					triggerAction:'all',
 					editable: false,
 					selectOnFocus:true,

@@ -1,8 +1,19 @@
+- Files: Fixed undefinded index "deleteSuccess" error.
+- Files: Add "Browse x files" button in detail views
+- Core: Better error message when language is invalid and fixed Norwegian
+- Core: Make sure customfields and search module are installed and enabled before upgrade
+
+11-09-2018 6.3.37
+- Start page: RSS date was not showing
+- Core: Fixed errors in check database and rebuild search index.
+- Core: Global search sometimes didn't give results.
+- File search: File index aborted on error
+- Files: fixed search returning invalid id's and file property dialog from search
 - Merged 6.2.x branch
-- Addressbook: Batch edit problem in address book
-- Addressbook: Drag and drop contacts didn't work
+- Address book: Batch edit problem in address book
+- Address book: Drag and drop contacts didn't work
 - Leavedays: Sort on employee in holidays module
-- Fixed google authenticator barcode for ios
+- Fixed google authenticator barcode for iOS
 - Support newer encryption library in notes
 - Fixed custom php field
 
