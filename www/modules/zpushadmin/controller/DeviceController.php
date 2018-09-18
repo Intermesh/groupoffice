@@ -31,14 +31,7 @@ class DeviceController extends \GO\Professional\Controller\AbstractModelControll
 		$model->loadDetails();
 		return parent::beforeDisplay($response, $model, $params);
 	}
-	
-	protected function afterLoad(&$response, &$model, &$params) {
 		
-		$response['zpushAdminFound'] = \GO\Zpushadmin\ZpushadminModule::zpushAdminFileExists();
-		
-		return $response;
-	}
-	
 	protected function beforeStoreStatement(array &$response, array &$params, \GO\Base\Data\AbstractStore &$store, \GO\Base\Db\FindParams $storeParams) {
 		
 		$storeParams->select('*');

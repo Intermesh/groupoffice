@@ -138,7 +138,7 @@ GO.zpushadmin.DeviceDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 	},
 	afterLoad : function(remoteModelId, config, action){
 		
-		this.resyncButton.setDisabled(!action.result.zpushAdminFound);
-		//this.wipeDeviceButton.setDisabled(!action.result.zpushAdminFound);
+//		this.resyncButton.setDisabled(!action.result.zpushAdminFound);
+//		//this.wipeDeviceButton.setDisabled(!action.result.zpushAdminFound);
 	}
 });
