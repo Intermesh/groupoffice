@@ -47,9 +47,7 @@ go.modules.core.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 					return;
 				}
 			}
-		}
-
-
+		}		
 		this.setVisible(true);
 	}
 });

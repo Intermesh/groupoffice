@@ -9,9 +9,8 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	values : null,
 	
 	initComponent : function() {
-		go.form.EntityPanel.superclass.initComponent.call(this);	
+		go.form.EntityPanel.superclass.initComponent.call(this);			
 		
-		this.entity = {};
 		this.values = {};
 		
 		this.getForm().trackResetOnLoad = true;

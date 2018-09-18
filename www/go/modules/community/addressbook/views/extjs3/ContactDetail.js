@@ -215,8 +215,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 				tooltip: t("Edit"),
 				handler: function (btn, e) {
 					var dlg = new go.modules.community.addressbook.ContactDialog();
-					dlg.show();
-					dlg.load(this.data.id);
+					dlg.load(this.data.id).show();
 				},
 				scope: this
 			},

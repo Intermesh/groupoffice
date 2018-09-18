@@ -12,6 +12,9 @@ class Number extends Base {
 	public function getFieldSQL() {
 		$d = $this->field->getDefault();
 		$d = isset($d) && $d != "" ? number_format($d, 4) : "NULL";
-		return "decimal(19,4) DEFAULT " . $d;
+		
+		$decimals = $this->field->getOption('numberDecimals') + 2;
+		
+		return "decimal(19,$decimals) DEFAULT " . $d;
 	}
 }

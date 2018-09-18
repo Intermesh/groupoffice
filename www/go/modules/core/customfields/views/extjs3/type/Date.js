@@ -1,12 +1,12 @@
 Ext.ns("go.modules.core.customfields.type");
 
-go.modules.core.customfields.type.Number = Ext.extend(go.modules.core.customfields.type.Text, {
+go.modules.core.customfields.type.Date = Ext.extend(go.modules.core.customfields.type.Text, {
 
-	name: "Number",
+	name: "Date",
 
-	label: t("Number"),
+	label: t("Date"),
 
-	iconCls: "ic-format-list-numbered",
+	iconCls: "ic-schedule",
 
 	/**
 	 * Return dialog to edit this type of field
@@ -14,7 +14,7 @@ go.modules.core.customfields.type.Number = Ext.extend(go.modules.core.customfiel
 	 * @returns {go.modules.core.customfields.FieldDialog}
 	 */
 	getDialog: function () {
-		return new go.modules.core.customfields.type.NumberDialog();
+		return new go.modules.core.customfields.type.DateDialog();
 	},
 
 	/**
@@ -26,7 +26,7 @@ go.modules.core.customfields.type.Number = Ext.extend(go.modules.core.customfiel
 	 * @returns {unresolved}
 	 */
 	renderDetailView: function (value, data, customfield) {
-		return value !== null ? GO.util.numberFormat(value, customfield.options.numberDecimals) : null;
+		return GO.util.dateFormat(value);
 	},
 
 	/**
@@ -37,12 +37,13 @@ go.modules.core.customfields.type.Number = Ext.extend(go.modules.core.customfiel
 	 * @returns {Object}
 	 */
 	createFormFieldConfig: function (customfield, config) {
-		var config = go.modules.core.customfields.type.Number.superclass.createFormFieldConfig.call(this, customfield, config);
+		var config = go.modules.core.customfields.type.Date.superclass.createFormFieldConfig.call(this, customfield, config);
 
 		delete config.anchor;
-		config.width = dp(200);
-		config.xtype = "numberfield";
-		config.decimals = customfield.options.numberDecimals;
+		config.width = dp(140);
+		config.xtype = "datefield";
+		
+		console.log(config);
 
 		return config;
 	},
@@ -54,4 +55,5 @@ go.modules.core.customfields.type.Number = Ext.extend(go.modules.core.customfiel
 
 });
 
-go.modules.core.customfields.CustomFields.registerType(new go.modules.core.customfields.type.Number());
+go.modules.core.customfields.CustomFields.registerType(new go.modules.core.customfields.type.Date());
+

@@ -14,7 +14,7 @@ go.modules.core.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	 * @returns {go.modules.core.customfields.FieldDialog}
 	 */
 	getDialog : function() {
-		return new go.modules.core.customfields.FieldDialog();
+		return new go.modules.core.customfields.type.TextDialog();
 	},
 	
 	/**

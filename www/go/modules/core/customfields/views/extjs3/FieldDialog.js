@@ -34,11 +34,6 @@ go.modules.core.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 						fieldLabel: t("suffix"),
 						anchor: "100%"
 					},{
-						xtype: "textfield",
-						name: "default",
-						fieldLabel: t("Default value"),
-						anchor: "100%"
-					},{
 						xtype: "checkbox",
 						name: "unique",
 						boxLabel: t("Unique values"),

@@ -7,5 +7,9 @@ FieldSetDialog.js
 
 type/Text.js
 type/TextDialog.js
+
 type/NumberDialog.js
 type/Number.js
+
+type/DateDialog.js
+type/Date.js
