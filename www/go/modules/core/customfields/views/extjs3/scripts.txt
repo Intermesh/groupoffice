@@ -13,3 +13,6 @@ type/Number.js
 
 type/DateDialog.js
 type/Date.js
+
+type/DateTimeDialog.js
+type/DateTime.js

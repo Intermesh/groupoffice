@@ -31,13 +31,13 @@ abstract class Base {
 		$this->field = $field;
 	}
 					
-	public function apiToDb($value, $values) {
-		return $value;
-	}
-	
-	public function dbToApi($value, $values) {
-		return $value;
-	}
+//	public function apiToDb($value, $values) {
+//		return $value;
+//	}
+//	
+//	public function dbToApi($value, $values) {
+//		return $value;
+//	}
 	
 	public static function getName() {
 		$cls = static::class;

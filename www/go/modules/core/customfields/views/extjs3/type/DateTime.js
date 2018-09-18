@@ -1,12 +1,12 @@
 Ext.ns("go.modules.core.customfields.type");
 
-go.modules.core.customfields.type.Date = Ext.extend(go.modules.core.customfields.type.Text, {
+go.modules.core.customfields.type.DateTime = Ext.extend(go.modules.core.customfields.type.Text, {
 
-	name: "Date",
+	name: "DateTime",
 
-	label: t("Date"),
+	label: t("Date and time"),
 
-	iconCls: "ic-event",
+	iconCls: "ic-schedule",
 
 	/**
 	 * Return dialog to edit this type of field
@@ -14,7 +14,7 @@ go.modules.core.customfields.type.Date = Ext.extend(go.modules.core.customfields
 	 * @returns {go.modules.core.customfields.FieldDialog}
 	 */
 	getDialog: function () {
-		return new go.modules.core.customfields.type.DateDialog();
+		return new go.modules.core.customfields.type.DateTimeDialog();
 	},
 
 	/**
@@ -26,6 +26,7 @@ go.modules.core.customfields.type.Date = Ext.extend(go.modules.core.customfields
 	 * @returns {unresolved}
 	 */
 	renderDetailView: function (value, data, customfield) {
+		console.log(value);
 		return GO.util.dateFormat(value);
 	},
 
@@ -40,8 +41,8 @@ go.modules.core.customfields.type.Date = Ext.extend(go.modules.core.customfields
 		var config = go.modules.core.customfields.type.Date.superclass.createFormFieldConfig.call(this, customfield, config);
 
 		delete config.anchor;
-		config.width = dp(140);
-		config.xtype = "datefield";
+		config.width = dp(340);
+		config.xtype = "datetimefield";
 		
 		return config;
 	},
@@ -53,5 +54,5 @@ go.modules.core.customfields.type.Date = Ext.extend(go.modules.core.customfields
 
 });
 
-go.modules.core.customfields.CustomFields.registerType(new go.modules.core.customfields.type.Date());
+go.modules.core.customfields.CustomFields.registerType(new go.modules.core.customfields.type.DateTime());
 

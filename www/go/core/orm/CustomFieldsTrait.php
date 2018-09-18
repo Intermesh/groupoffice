@@ -31,8 +31,17 @@ trait CustomFieldsTrait {
 							->from($this->customFieldsTableName(), 'cf')
 							->where(['id' => $this->id])->execute()->fetch();
 							
-			if($record) {
+			if($record) {			
+				
+				$columns = Table::getInstance(static::customFieldsTableName())->getColumns();		
+				foreach($columns as $name => $column) {
+					if(isset($record[$name])) {
+						$record[$name] = $column->castFromDb($record[$name]);
+					}
+				}
+				
 				$this->customFieldsData = $record;
+				
 			} else
 			{
 				$this->customFieldsData = [];
