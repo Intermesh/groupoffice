@@ -11,6 +11,9 @@ type/TextDialog.js
 type/TextArea.js
 type/TextAreaDialog.js
 
+type/Html.js
+type/HtmlDialog.js
+
 type/NumberDialog.js
 type/Number.js
 
