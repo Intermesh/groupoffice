@@ -7,7 +7,7 @@ use go\core\orm;
 class Blob extends orm\Entity {
 
 	public $id;
-	public $type; // content-type
+	public $contentType; // content-type
 	public $name;
 	public $size; // in bytes
 //	public $fsModifiedAt; // timestamp

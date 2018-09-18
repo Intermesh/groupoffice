@@ -69,7 +69,7 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
 				this.el.dom.style.height = dp(32) + "px";
 				changed = true;
 			}
-			console.log(this.el.dom);
+
 			var height = Math.min(this.el.dom.scrollHeight, this.maxHeight);
 			if(height > dp(32)) {
 				this.el.dom.style.height = height + "px";

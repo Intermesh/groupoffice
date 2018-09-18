@@ -188,9 +188,31 @@ class CertificateController extends \GO\Base\Controller\AbstractController {
 
 		return $response;
 	}
+	
+	public function actionImportCertificate($params) {
+		if(empty($params['blobId']) || empty($params['email'])) {
+			throw new \InvalidArgumentException('Invalid parameter posted');
+		}
+		
+		$blob = \go\core\fs\Blob::findById($params['blobId']);
+		$success = $this->_savePublicCertificate(file_get_contents($blob->path()), array($params['email']));
+		return ['success' => $success];
+	}
+	
+	public function actionImportAttachment($params) {
+		// account_id mailbox uid number encoding sender
+		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
+		$imap = $account->openImapConnection($params['mailbox']);
+		$success = true;
+
+		$certData = $imap->get_message_part_decoded($params['uid'], $params['number'], $params['encoding']);
+		
+		$success = $success && $this->_savePublicCertificate($certData, array($params['sender']));
+		return ['success' => $success];
+	}
 
 	private function _savePublicCertificate($certData, $emails) {
-
+		$success = true;
 		foreach($emails as $email) {
 			$findParams = \GO\Base\Db\FindParams::newInstance()->single();
 			$findParams->getCriteria()
@@ -204,8 +226,9 @@ class CertificateController extends \GO\Base\Controller\AbstractController {
 				$cert->user_id = \GO::user()->id;
 			}
 			$cert->cert = $certData;
-			$cert->save();
+			$success = $cert->save() && $success;
 		}
+		return $success;
 	}
 
 	private function _getRootCertificates() {
