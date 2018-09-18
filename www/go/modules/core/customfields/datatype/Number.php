@@ -9,7 +9,7 @@ class Number extends Base {
 	 * 
 	 * @return string
 	 */
-	public function getFieldSQL() {
+	protected function getFieldSQL() {
 		$d = $this->field->getDefault();
 		$d = isset($d) && $d != "" ? number_format($d, 4) : "NULL";
 		

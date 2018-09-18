@@ -249,3 +249,11 @@ $updates['201809071645'][] = "ALTER TABLE `core_customfields_field_set` ADD `fil
 
 //ALTER TABLE `core_customfields_field` CHANGE `datatype` `type` VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Text';
 //ALTER TABLE `core_customfields_field` CHANGE `helptext` `hint` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
+
+
+//RENAME TABLE `cf_select_options` TO `core_customfields_select_options`;
+
+//ALTER TABLE `core_customfields_select_options` CHANGE `field_id` `fieldId` INT(11) NOT NULL;
+//ALTER TABLE `core_customfields_select_options` CHANGE `sort_order` `sortOrder` INT(11) NOT NULL;
+//ALTER TABLE `core_customfields_select_options` ADD FOREIGN KEY (`fieldId`) REFERENCES `core_customfields_field`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+

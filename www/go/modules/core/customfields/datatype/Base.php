@@ -1,8 +1,15 @@
 <?php
 namespace go\modules\core\customfields\datatype;
 
+use Exception;
+use GO;
+use go\core\data\Model;
+use go\core\db\Table;
+use go\core\db\Utils;
+use go\core\ErrorHandler;
 use go\core\util\ClassFinder;
 use go\modules\core\customfields\model\Field;
+
 
 /**
  * Abstract data type class
@@ -10,16 +17,7 @@ use go\modules\core\customfields\model\Field;
  * @todo Implement all types when all of custom fields will be refactored
  * 
  */
-abstract class Base {
-	
-	/**
-	 * Get column definition for SQL
-	 * 
-	 * @return string
-	 */
-	public function getFieldSQL() {
-		return "VARCHAR(".($this->field->getOption('maxLength') ?? 190).") DEFAULT " . GO()->getDbConnection()->getPDO()->quote($this->field->getDefault() ?? "NULL");
-	}
+abstract class Base extends Model {
 	
 	/**
 	 *
@@ -29,6 +27,59 @@ abstract class Base {
 	
 	public function __construct(Field $field) {
 		$this->field = $field;
+	}
+	
+	/**
+	 * Get column definition for SQL
+	 * 
+	 * @return string
+	 */
+	protected function getFieldSQL() {
+		return "VARCHAR(".($this->field->getOption('maxLength') ?? 190).") DEFAULT " . GO()->getDbConnection()->getPDO()->quote($this->field->getDefault() ?? "NULL");
+	}
+	
+	public function onFieldSave() {
+		
+		$table = $this->field->tableName();
+		$fieldSql = $this->getFieldSQL();
+		
+		$quotedDbName = Utils::quoteColumnName($this->field->databaseName);
+	
+		if ($this->field->isNew()) {
+			$sql = "ALTER TABLE `" . $table . "` ADD " . $quotedDbName . " " . $fieldSql . ";";
+			GO()->getDbConnection()->query($sql);
+			if($this->field->getUnique()) {
+				$sql = "ALTER TABLE `" . $table . "` ADD UNIQUE(". $quotedDbName  . ");";
+				GO()->getDbConnection()->query($sql);
+			}			
+		} else {
+			$oldName = $this->field->isModified('databaseName') ? $this->field->getOldValue("databaseName") : $this->field->databaseName;
+			$sql = "ALTER TABLE `" . $table . "` CHANGE " . Utils::quoteColumnName($oldName) . " " . $quotedDbName . " " . $fieldSql;
+			GO()->getDbConnection()->query($sql);
+			
+			if($this->getUnique() && !Table::getInstance($table)->getColumn($this->field->databaseName)->unique) {
+				$sql = "ALTER TABLE `" . $table . "` ADD UNIQUE(". $quotedDbName  . ");";
+				GO()->getDbConnection()->query($sql);
+			} else if(!$this->getUnique() && Table::getInstance($table)->getColumn($this->field->databaseName)->unique) {
+				$sql = "ALTER TABLE `" . $table . "` DROP INDEX " . $quotedDbName;
+				GO()->getDbConnection()->query($sql);
+			}
+		}
+		
+		Table::getInstance($table)->clearCache();
+	}
+
+	public function onFieldDelete() {
+		$table = $this->field->tableName();
+		$sql = "ALTER TABLE `" . $table . "` DROP " . Utils::quoteColumnName($this->field->databaseName) ;
+
+		try {
+			GO()->getDbConnection()->query($sql);
+		} catch (Exception $e) {
+			ErrorHandler::logException($e);
+		}
+		
+		Table::getInstance($table)->clearCache();
 	}
 					
 	public function apiToDb($value, $values) {
@@ -79,7 +130,7 @@ abstract class Base {
 		$all = static::findAll();
 
 		if(!isset($all[$name])) {
-			throw new \Exception("Custom field type '$name' not found");
+			throw new Exception("Custom field type '$name' not found");
 		}
 		
 		return $all[$name];

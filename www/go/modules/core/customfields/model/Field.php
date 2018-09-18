@@ -85,10 +85,10 @@ class Field extends AclItemEntity {
 			return $this->default;
 		}
 		
-		$c = Table::getInstance($this->getTableName())->getColumn($this->databaseName);
+		$c = Table::getInstance($this->tableName())->getColumn($this->databaseName);
 		
 		if(!$c) {
-			GO()->debug("Column for custom field ".$this->databaseName." not found in ". $this->getTableName());
+			GO()->debug("Column for custom field ".$this->databaseName." not found in ". $this->tableName());
 			return null;
 		}
 		
@@ -106,10 +106,10 @@ class Field extends AclItemEntity {
 			return $this->unique;
 		}
 		
-		$c = Table::getInstance($this->getTableName())->getColumn($this->databaseName);
+		$c = Table::getInstance($this->tableName())->getColumn($this->databaseName);
 		
 		if(!$c) {
-			GO()->debug("Column for custom field ".$this->databaseName." not found in ". $this->getTableName());
+			GO()->debug("Column for custom field ".$this->databaseName." not found in ". $this->tableName());
 			return null;
 		}
 		
@@ -126,74 +126,30 @@ class Field extends AclItemEntity {
 	 * 
 	 * @return Base
 	 */
-	private function getDataType() {
+	public function getDataType() {
 		$dataType = Base::findByName($this->type);
 		return (new $dataType($this));
 	}
 
 	protected function internalSave() {
 
-		$this->alterColumn();
+		$this->getDataType()->onFieldSave();
 
 		return parent::internalSave();
 	}
 
 	protected function internalDelete() {
 
-		$this->dropColumn();
+		$this->getDataType()->onFieldDelete();
 
 		return parent::internalDelete();
 	}
 
-	private function getTableName() {
+	public function tableName() {
 		$fieldSet = FieldSet::findById($this->fieldSetId);
 		$entityType = EntityType::findByName($fieldSet->getEntity());
 		$entityCls = $entityType->getClassName();
 		return $entityCls::customFieldsTableName(); //From customfieldstrait
-	}
-
-	private function alterColumn() {
-		
-		$table = $this->getTableName();
-		$fieldSql = $this->getDataType()->getFieldSQL();
-		
-		$quotedDbName = Utils::quoteColumnName($this->databaseName);
-	
-		if ($this->isNew()) {
-			$sql = "ALTER TABLE `" . $table . "` ADD " . $quotedDbName . " " . $fieldSql . ";";
-			GO()->getDbConnection()->query($sql);
-			if($this->getUnique()) {
-				$sql = "ALTER TABLE `" . $table . "` ADD UNIQUE(". $quotedDbName  . ");";
-				GO()->getDbConnection()->query($sql);
-			}			
-		} else {
-			$oldName = $this->isModified('databaseName') ? $this->getOldValue("databaseName") : $this->databaseName;
-			$sql = "ALTER TABLE `" . $table . "` CHANGE " . Utils::quoteColumnName($oldName) . " " . $quotedDbName . " " . $fieldSql;
-			GO()->getDbConnection()->query($sql);
-			
-			if($this->getUnique() && !Table::getInstance($table)->getColumn($this->databaseName)->unique) {
-				$sql = "ALTER TABLE `" . $table . "` ADD UNIQUE(". $quotedDbName  . ");";
-				GO()->getDbConnection()->query($sql);
-			} else if(!$this->getUnique() && Table::getInstance($table)->getColumn($this->databaseName)->unique) {
-				$sql = "ALTER TABLE `" . $table . "` DROP INDEX " . $quotedDbName;
-				GO()->getDbConnection()->query($sql);
-			}
-		}
-		
-		Table::getInstance($table)->clearCache();
-	}
-
-	private function dropColumn() {
-		$table = $this->getTableName();
-		$sql = "ALTER TABLE `" . $table . "` DROP " . Utils::quoteColumnName($this->databaseName) ;
-
-		try {
-			GO()->getDbConnection()->query($sql);
-		} catch (Exception $e) {
-			ErrorHandler::logException($e);
-		}
-		
-		Table::getInstance($table)->clearCache();
 	}
 
 	public function apiToDb($value, $values) {

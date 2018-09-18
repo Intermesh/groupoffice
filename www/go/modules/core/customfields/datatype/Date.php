@@ -9,7 +9,7 @@ class Date extends Base {
 	 * 
 	 * @return string
 	 */
-	public function getFieldSQL() {
+	protected function getFieldSQL() {
 		$d = $this->field->getDefault();
 		$d = isset($d) && $d != "" ? GO()->getDbConnection()->getPDO()->quote($d) : "NULL";
 		return "DATE DEFAULT " . $d;

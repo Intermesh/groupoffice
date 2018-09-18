@@ -8,7 +8,7 @@ class Html extends Base {
 	 * 
 	 * @return string
 	 */
-	public function getFieldSQL() {
+	protected function getFieldSQL() {
 		return "TEXT NULL";
 	}
 	
