@@ -703,7 +703,4 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 GO.mainLayout = new GO.MainLayout();
 
 // needed in pre v6.4
-GO.mainLayout.on('callTo', function(phone) {
-	document.location = GO.calltoTemplate.replace('{phone}', phone.replace('(0)','').replace(/[^0-9+]/g,''));
-	return false;
-});
+GO.mainLayout.on('callto', GO.util.callToHandler);
