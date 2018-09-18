@@ -122,9 +122,8 @@ GO.openHelp = function(page){
 
 
 GO.util.callToLink = function(phone){
-		return '<a onclick="GO.mainLayout.fireEvent(\'callto\', \''+phone+'\');">'+phone+'</a>';	
+		return '<a onclick="GO.util.callToHandler(\''+phone+'\');">'+phone+'</a>';	
 }
-
 
 GO.util.callToHandler = function(phone) {	
 	document.location = GO.calltoTemplate.replace('{phone}', phone.replace('(0)','').replace(/[^0-9+]/g,''));
