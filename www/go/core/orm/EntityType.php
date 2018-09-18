@@ -273,8 +273,12 @@ class EntityType {
 						'createdAt' => new DateTime()
 								];
 				
-
-				GO()->getDbConnection()->replace('core_change', $record)->execute();
+				try {
+					GO()->getDbConnection()->replace('core_change', $record)->execute();
+				} catch(\PDOException $e) {
+					error_log("Failed to save change for ". var_export($record, true));
+					\go\core\ErrorHandler::logException($e);
+				}
 			}
 			
 		}
