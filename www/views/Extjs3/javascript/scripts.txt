@@ -240,6 +240,7 @@ views/Extjs3/javascript/go/data/EntityStore.js
 views/Extjs3/javascript/go/EntityManager.js
 views/Extjs3/javascript/go/ModuleManager.js
 
+views/Extjs3/javascript/go/grid/GridTrait.js
 views/Extjs3/javascript/go/grid/GridPanel.js
 views/Extjs3/javascript/go/grid/SelectAllCheckBox.js
 
