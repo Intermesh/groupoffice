@@ -1,4 +1,5 @@
 go.form.DateField = Ext.extend(Ext.form.DateField, {
+	width: dp(140),
 	
 	initComponent : function(){
 		this.altFormats =  "Y-m-d|c|" + GO.settings.date_format.replace("Y","y");

@@ -152,24 +152,21 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 			return false;
 		}
 		
-		var entity = this.entityStore.get([id])[0];
+		this.entityStore.get([id], function(entities) {
+			
+			this.serverUpdate = true;
+			record.beginEdit();
+			this.fields.each(function(field) {
+				record.set(field.name, entities[0][field.name]);
+			});
+
+
+			record.endEdit();
+			record.commit();
+
+			this.serverUpdate = false;
+		}, this);
 		
-//		if(record.isModified()) {
-//			alert("Someone modified your record!");
-//		}
-		
-		
-		this.serverUpdate = true;
-		record.beginEdit();
-		this.fields.each(function(field) {
-			record.set(field.name, entity[field.name]);
-		});
-		
-		
-		record.endEdit();
-		record.commit();
-		
-		this.serverUpdate = false;
 		return true;
 	},
 	destroy : function() {	

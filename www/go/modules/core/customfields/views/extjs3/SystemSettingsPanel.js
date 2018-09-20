@@ -16,39 +16,102 @@
 go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel, {
 
 	autoHeight: true,
-	
+
 	entity: null,
-	
-	createFieldSetDialog : function() {
+
+	createFieldSetDialog: function () {
 		return new go.modules.core.customfields.FieldSetDialog();
 	},
-	
-	initComponent: function () {		
-		
-		this.plugins = [new go.grid.plugin.Sortable(this.onSort, this, this.isDropAllowed)];	
-		
+
+	initComponent: function () {
+
+		this.plugins = [new go.grid.plugin.Sortable(this.onSort, this, this.isDropAllowed)];
+
 		this.store = new Ext.data.ArrayStore({
-			fields: [				
+			fields: [
 				'name',
 				'databaseName',
-				'type',				
+				'type',
 				'fieldId',
 				'fieldSetId',
 				{name: 'isFieldSet', type: "boolean"},
 				{name: 'sortOrder', type: "int"}
 			]
 		});
-		
-		go.Stores.get("FieldSet").on("changes", function(store, added, changed, destoyed) {
-			if(!this.loading) {
-				this.load();
+
+		go.Stores.get("FieldSet").on("changes", function (store, added, changed, destoyed) {
+			if (this.loading || !this.rendered) {
+				return;
 			}
+			var me = this;
+
+			store.get(added.concat(changed), function (entities) {			
+				
+				entities.forEach(function (e) {
+					
+					//change for another entity. Skip it.
+					if(e.entity != me.entity) {						
+						return;
+					}
+
+					var record = me.store.getAt(me.store.findBy(function (record) {
+						if (record.data.isFieldSet && record.data.fieldSetId === e.id) {
+							return true;
+						}
+					}));
+
+					if (!record) {
+						me.load();
+					} else
+					{
+						record.beginEdit();
+						record.set("name", e.name);
+						record.set("sortOrder", e.sortOrder);
+						record.endEdit();
+						record.commit();
+					}
+				});
+			}, this);
 		}, this);
-		
-		go.Stores.get("Field").on("changes", function(store, added, changed, destoyed) {
-			if(!this.loading) {
-				this.load();
+
+		go.Stores.get("Field").on("changes", function (store, added, changed, destoyed) {
+			if (this.loading || !this.rendered) {
+				return;
 			}
+
+			var me = this;
+			store.get(added.concat(changed), function (entities) {
+				entities.forEach(function (e) {					
+					
+					if(me.store.findBy(function (record) {
+						if (record.data.isFieldSet && record.data.fieldSetId === e.fieldSetId) {
+							return true;
+						}
+					}) === -1) {
+						//fieldset not part of this panel
+						return;
+					}
+					
+					var record = me.store.getAt(me.store.findBy(function (record) {
+						if (record.data.fieldId === e.id) {
+							return true;
+						}
+					}));
+
+					if (!record) {
+						me.load();
+					} else
+					{
+						record.beginEdit();
+						record.set("name", e.name);
+						record.set("databaseName", e.databaseName);
+						record.set("sortOrder", e.sortOrder);
+						record.endEdit();
+						record.commit();
+					}
+				});
+			}, this);
+
 		}, this);
 
 
@@ -59,7 +122,7 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 					xtype: "tbtitle",
 					text: t('Custom fields')
 				},
-				"->", 
+				"->",
 				{
 					iconCls: 'ic-add',
 					tooltip: t('Add field set'),
@@ -77,7 +140,7 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 					width: dp(200),
 					sortable: false,
 					dataIndex: 'name',
-					renderer: function(v, meta, record) {
+					renderer: function (v, meta, record) {
 						return record.data.isFieldSet ? "<h3>" + v + "</h3>" : v;
 					}
 				},
@@ -85,12 +148,12 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 					width: dp(80),
 					menuDisabled: true,
 					draggable: false,
-					hidable:false,
+					hidable: false,
 					align: "right",
 					sortable: false,
 					dataIndex: "databaseName",
-					renderer: function(v, meta, record) {
-						if(record.data.isFieldSet) {
+					renderer: function (v, meta, record) {
+						if (record.data.isFieldSet) {
 							return '<button class="icon" ext:qtip="' + t("Add field") + '">add</button><button class="icon">more_vert</button>';
 						} else
 						{
@@ -106,18 +169,18 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 			},
 			listeners: {
 				scope: this,
-				rowclick: function(grid, rowIndex, e) {
-					if(e.target.tagName !== "BUTTON") {
+				rowclick: function (grid, rowIndex, e) {
+					if (e.target.tagName !== "BUTTON") {
 						return false;
 					}
-					
+
 					var record = this.store.getAt(rowIndex);
-					
-					switch(e.target.innerHTML) {
+
+					switch (e.target.innerHTML) {
 						case 'more_vert':
 							this.showMoreMenu(record, e);
-							break;						
-							
+							break;
+
 						case 'add':
 							this.showAddFieldMenu(record, e);
 							break;
@@ -135,75 +198,80 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 			this.load();
 		}, this);
 	},
-	
-	onSort : function(sortable, selections, dragData, dd) {
-		var isFieldSet = !!selections.find(function(r) {
-			if(r.data.isFieldSet) {
+
+	onSort: function (sortable, selections, dragData, dd) {
+		var isFieldSet = !!selections.find(function (r) {
+			if (r.data.isFieldSet) {
 				return true;
 			}
 		});
-		
-		if(isFieldSet) {
-			var fieldSetRecords = this.store.getRange().filter(function(r){
+
+		if (isFieldSet) {
+			var fieldSetRecords = this.store.getRange().filter(function (r) {
 				return r.data.isFieldSet;
 			});
-			
+
 			var update = {};
-			for(var i = 0, l = fieldSetRecords.length; i < l; i++) {
+			for (var i = 0, l = fieldSetRecords.length; i < l; i++) {
 				update[fieldSetRecords[i].data.fieldSetId] = {sortOrder: i};
 			}
-			
+
 			go.Stores.get("FieldSet").set({
 				update: update
-			});
+			}, function() {
+				//Quick and dirty way: reload on fieldset reorder so fields are moved.
+				this.load();
+			}, this);
+			
+			
 		} else
-		{			
-			var fieldRecords = this.store.getRange().filter(function(r){
+		{
+			var fieldRecords = this.store.getRange().filter(function (r) {
 				return !r.data.isFieldSet;
 			});
-			
+
 			var update = {};
-			for(var i = 0, l = fieldRecords.length; i < l; i++) {
+			for (var i = 0, l = fieldRecords.length; i < l; i++) {
 				update[fieldRecords[i].data.fieldId] = {sortOrder: i};
-				if(selections.column("id").indexOf(fieldRecords[i].id) > -1) {
+				if (selections.column("id").indexOf(fieldRecords[i].id) > -1) {
 					update[fieldRecords[i].data.fieldId].fieldSetId = dragData.dropRecord.data.fieldSetId;
 				}
 			}
-			
+
 			go.Stores.get("Field").set({
 				update: update
 			});
 		}
 	},
-	
-	isDropAllowed : function(selections, overRecord) {		
 
-		var isFieldSet = !!selections.find(function(r) {
-			if(r.data.isFieldSet) {
+	isDropAllowed: function (selections, overRecord) {
+
+		var isFieldSet = !!selections.find(function (r) {
+			if (r.data.isFieldSet) {
 				return true;
 			}
 		});
-		
-		var isField = !!selections.find(function(r) {
-			if(!r.data.isFieldSet) {
+
+		var isField = !!selections.find(function (r) {
+			if (!r.data.isFieldSet) {
 				return true;
 			}
 		});
-		
+
 		//Don't allow mix
-		if(isField && isFieldSet) {
+		if (isField && isFieldSet) {
 			return false;
 		}
-		
-		if(isFieldSet && !overRecord.data.isFieldSet) {			
+
+		if (isFieldSet && !overRecord.data.isFieldSet) {
 			//Only allow fieldsets to be dropped on other fieldsets
 			return false;
 		}
-		
+
 //		if(isField && overRecord.data.isFieldSet) {
 //			return false;
 //		}
-		
+
 		return true;
 	},
 
@@ -216,13 +284,13 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 						iconCls: 'ic-edit',
 						text: t("Edit"),
 						handler: function () {
-							
-							if(this.moreMenu.record.data.isFieldSet) {
+
+							if (this.moreMenu.record.data.isFieldSet) {
 								var dlg = this.createFieldSetDialog();
 								dlg.load(this.moreMenu.record.data.fieldSetId).show();
 							} else
 							{
-								var dlg = go.modules.core.customfields.CustomFields.getType(this.moreMenu.record.data.type).getDialog();													
+								var dlg = go.modules.core.customfields.CustomFields.getType(this.moreMenu.record.data.type).getDialog();
 								dlg.load(this.moreMenu.record.data.fieldId).show();
 							}
 						},
@@ -245,30 +313,30 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 
 		this.moreMenu.showAt(e.getXY());
 	},
-	
+
 	showAddFieldMenu: function (record, e) {
 		if (!this.addFieldMenu) {
-			
+
 			var items = [], types = go.modules.core.customfields.CustomFields.getTypes();
-			
-			for(var name in types) {
+
+			for (var name in types) {
 				items.push({
 					iconCls: types[name].iconCls,
 					text: types[name].label,
 					type: types[name],
-					handler: function(item) {
+					handler: function (item) {
 						var dlg = item.type.getDialog();
 						dlg.setValues({
 							fieldSetId: this.addFieldMenu.record.data.fieldSetId,
 							type: item.type.name
 						});
-						
+
 						dlg.show();
 					},
 					scope: this
 				});
 			}
-			
+
 			this.addFieldMenu = new Ext.menu.Menu({
 				items: items
 			});
@@ -278,37 +346,37 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 
 		this.addFieldMenu.showAt(e.getXY());
 	},
-	
-	doDelete : function(selectedRecords) {
-		
+
+	doDelete: function (selectedRecords) {
+
 		var fieldSetIds = [], fieldIds = [];
-		selectedRecords.forEach(function(r) {
-			if(r.data.isFieldSet) {
-				fieldSetIds.push(r.data.fieldSetId); 
+		selectedRecords.forEach(function (r) {
+			if (r.data.isFieldSet) {
+				fieldSetIds.push(r.data.fieldSetId);
 			} else
 			{
-				fieldIds.push(r.data.fieldId); 
+				fieldIds.push(r.data.fieldId);
 			}
 		});
-		
-		if(fieldSetIds.length) {
+
+		if (fieldSetIds.length) {
 			go.Stores.get("FieldSet").set({
-				destroy:  fieldSetIds
+				destroy: fieldSetIds
 			});
 		}
-		
-		if(fieldIds.length) {
+
+		if (fieldIds.length) {
 			go.Stores.get("Field").set({
-				destroy:  fieldIds
+				destroy: fieldIds
 			});
 		}
 	},
 
 	load: function () {
-		
+
 		this.loading = true;
 		this.store.removeAll();
-		
+
 		var fsSortOrderMap = {};
 
 		go.Stores.get("FieldSet").query({
@@ -320,27 +388,27 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 
 			go.Stores.get("FieldSet").get(response.ids, function (fieldSets) {
 				fieldSetsLoaded = true;
-				
+
 				var storeData = [];
-				fieldSets.forEach(function(fs){
+				fieldSets.forEach(function (fs) {
 					storeData.push([
 						fs.name,
 						null,
 						null,
 						null,
-						fs.id,						
+						fs.id,
 						true,
 						fs.sortOrder * 100000
 					]);
-					
+
 					fsSortOrderMap[fs.id] = fs.sortOrder * 100000;
-					
+
 				});
-				
-				
-				
+
+
+
 				this.store.loadData(storeData, true);
-				
+
 			}, this);
 
 			go.Stores.get("Field").query({
@@ -351,28 +419,26 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 			}, function (options, success, response) {
 				go.Stores.get("Field").get(response.ids, function (fields) {
 					var storeData = [];
-					fields.forEach(function(f){
+					fields.forEach(function (f) {
 						storeData.push([
 							f.name,
 							f.dataName,
-							f.type,							
+							f.type,
 							f.id,
 							f.fieldSetId,
 							false,
 							f.sortOrder + fsSortOrderMap[f.fieldSetId]
 						]);
 					});
-				
+
 					this.store.loadData(storeData, true);
 
-					this.store.multiSort([						
+					this.store.multiSort([
 //						//{field: 'fieldSetId', direction: 'ASC'},
 //						{field: 'isFieldSet', direction: 'DESC'},
 						{field: 'sortOrder', direction: 'ASC'}
 					]);
 					this.loading = false;
-					
-					console.log(this.store.getRange());
 				}, this);
 			}, this);
 

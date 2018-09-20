@@ -40,7 +40,7 @@ go.modules.core.customfields.type.Date = Ext.extend(go.modules.core.customfields
 		var config = go.modules.core.customfields.type.Date.superclass.createFormFieldConfig.call(this, customfield, config);
 
 		delete config.anchor;
-		config.width = dp(140);
+		
 		config.xtype = "datefield";
 		
 		return config;
