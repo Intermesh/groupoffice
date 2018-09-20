@@ -4,7 +4,8 @@ go.modules.community.files.MoveDialog = Ext.extend(go.Window, {
 	entityStore: go.Stores.get("Node"),
 	width: 600,
 	height: 600,
-	currentId: null,
+	copy: false,
+	currentId: null, // id of Node to move
 	initComponent: function () {	
 		
 		this.items = this.initFormItems();
@@ -14,7 +15,7 @@ go.modules.community.files.MoveDialog = Ext.extend(go.Window, {
 		var items = [];
 		
 		this.buttons = ['->', {
-				text: this.title,
+				text: t("Move"), // or copy?
 				handler: this.submit,
 				scope: this
 			}];
@@ -54,15 +55,16 @@ go.modules.community.files.MoveDialog = Ext.extend(go.Window, {
 	submit: function() {
 		var nodes = go.Stores.get('Node').get([this.currentId]),
 			self = this;
+
 		//this.browser.receive(records, droppedAt.data.id, 'move');
 		this.browser.receive(nodes, this.parentIdField.getValue(), this.copy?'copy':'move', function(){
+			console.log('biem');
 			self.close();
 		});
 	},
 	
 	load: function (id) {
 		this.currentId = id;
-
 		return this;
 	}
 });

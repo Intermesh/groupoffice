@@ -52,6 +52,7 @@ class Node extends model\AclEntity {
 	public $touchedAt;
 	public $storageId;
 	protected $parentId;
+	protected $copyFromId;
 	
 	protected $parentAclId;
 	
@@ -93,6 +94,15 @@ class Node extends model\AclEntity {
 	
 	public function getBlobId() {
 		return $this->blobId;
+	}
+	
+	/**
+	 * Set this to copy all children from the given id as children for this node
+	 * Recursive copy a folder
+	 * @param type $id
+	 */
+	public function setCopyFromId($id) {
+		$this->copyFromId = $id;
 	}
 	
 	/**
@@ -151,6 +161,24 @@ class Node extends model\AclEntity {
 			}
 		}
 		return parent::internalValidate();
+	}
+	
+	protected function internalSave() {
+		$success = parent::internalSave();
+		
+		//copy recursive
+		if($this->isDirectory && !empty($this->copyFromId)) {
+			$children = Node::find(['parentId' =>$this->copyFromId]);
+			foreach($children as $child) {
+				$child->isNew = true;
+				$id = $child->id;
+				$child->id = null;
+				$child->parentId = $this->id;
+				$child->copyFromId = $id; // recursive
+				$success = $success && $child->save();
+			}
+		}
+		return $success;
 	}
 	
 	public function getContentType() {

@@ -272,11 +272,11 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 		if(targetId instanceof go.data.Store) {
 			this.targetStore = targetId;
 		}
-		if(Number.isInteger(targetId) && this.targetStore.baseParams.filter && this.targetStore.baseParams.filter.parentId != targetId) {
+
+		if(!isNaN(targetId) && this.targetStore.baseParams.filter.parentId != targetId) {
 			this.targetStore.setBaseParam('filter',{parentId: targetId});
 			this.targetStore.load({callback:internalReceive,scope:this});
 		} else if(this.targetStore.loaded) {
-			console.log(this.targetStore);
 			internalReceive.call(this);
 		}
 	},
@@ -328,17 +328,21 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 	//TODO copy directories recursive
 	copy: function(nodes, replaceIndex, newName, callback){
 		var items = {};
+		debugger;
 		Ext.each(nodes, function(record) {
+			
 			items['#'+Ext.id()] = {
 				parentId:this.targetStore.baseParams.filter.parentId,
 				name: newName || record.name,
+				copyFromId: record.id,
+				isDirectory: Ext.empty(record.blobId),
 				blobId: record.blobId,
 				isDirectory: false
 			};
 		}, this);
 
 		go.Stores.get('Node').set({create:items});
-		
+
 		this.unprocessedFiles--;
 		if(this.unprocessedFiles === 0) {
 			this.targetStore.commitChanges();
