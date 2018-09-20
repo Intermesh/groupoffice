@@ -44,8 +44,14 @@
 					r.push(all[id]);
 				}
 			}
-
-			return r;
+			
+			return r.sort(function(a, b) {
+				if (a.sortOrder === b.sortOrder) {
+					return 0;
+				}	else {
+						return (a.sortOrder < b.sortOrder) ? -1 : 1;
+				}
+			});
 		},
 		
 		/**
@@ -113,24 +119,18 @@
 		 */
 		getFormFields: function (fieldSetId) {
 			var r = [],
-							all = go.Stores.get("Field").data,
-							field,
-							formField, 
-							type;
+							fields = this.getFields(fieldSetId),
+							me = this;
 
-			for (var id in all) {
-				field = all[id];
-				if (field.fieldSetId == fieldSetId) {		
-					type = this.getType(field.type);
-					if(!type) {
-						console.error("Custom field type " + field.type + " not found");
-						continue;
-					}
-					
-					formField = type.renderFormField(field);
-					r.push(formField);
+			fields.forEach(function(field){
+				var type = me.getType(field.type);
+				if(!type) {
+					console.error("Custom field type " + field.type + " not found");
+					return;
 				}
-			}
+				var formField = type.renderFormField(field);
+				r.push(formField);						
+			});
 
 			return r;
 		},
@@ -153,7 +153,13 @@
 				}
 			}
 
-			return r;
+			return r.sort(function(a, b) {
+				if (a.sortOrder === b.sortOrder) {
+					return 0;
+				}	else {
+						return (a.sortOrder < b.sortOrder) ? -1 : 1;
+				}
+			});
 		},
 
 		/**
@@ -201,7 +207,7 @@
 		 */
 		getDetailPanels: function (entity) {
 			
-			var fieldSets = go.modules.core.customfields.CustomFields.getFieldSets(entity), panels = [];
+			var fieldSets = this.getFieldSets(entity), panels = [];
 
 			fieldSets.forEach(function (fieldSet) {
 				var tpl = '<tpl for="customFields"><div class="icons">';

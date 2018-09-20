@@ -26,7 +26,6 @@ go.modules.core.customfields.type.DateTime = Ext.extend(go.modules.core.customfi
 	 * @returns {unresolved}
 	 */
 	renderDetailView: function (value, data, customfield) {
-		console.log(value);
 		return GO.util.dateFormat(value);
 	},
 

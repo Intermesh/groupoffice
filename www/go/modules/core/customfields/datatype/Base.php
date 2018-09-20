@@ -57,16 +57,18 @@ abstract class Base extends Model {
 			$sql = "ALTER TABLE `" . $table . "` CHANGE " . Utils::quoteColumnName($oldName) . " " . $quotedDbName . " " . $fieldSql;
 			GO()->getDbConnection()->query($sql);
 			
-			if($this->getUnique() && !Table::getInstance($table)->getColumn($this->field->databaseName)->unique) {
+			if($this->field->getUnique() && !Table::getInstance($table)->getColumn($this->field->databaseName)->unique) {
 				$sql = "ALTER TABLE `" . $table . "` ADD UNIQUE(". $quotedDbName  . ");";
 				GO()->getDbConnection()->query($sql);
-			} else if(!$this->getUnique() && Table::getInstance($table)->getColumn($this->field->databaseName)->unique) {
+			} else if(!$this->field->getUnique() && Table::getInstance($table)->getColumn($this->field->databaseName)->unique) {
 				$sql = "ALTER TABLE `" . $table . "` DROP INDEX " . $quotedDbName;
 				GO()->getDbConnection()->query($sql);
 			}
 		}
 		
 		Table::getInstance($table)->clearCache();
+		
+		return true;
 	}
 
 	public function onFieldDelete() {
@@ -80,6 +82,8 @@ abstract class Base extends Model {
 		}
 		
 		Table::getInstance($table)->clearCache();
+		
+		return true;
 	}
 					
 	public function apiToDb($value, $values) {

@@ -22,3 +22,6 @@ type/Date.js
 
 type/DateTimeDialog.js
 type/DateTime.js
+
+type/SelectDialog.js
+type/Select.js

@@ -23,7 +23,9 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 		return new go.modules.core.customfields.FieldSetDialog();
 	},
 	
-	initComponent: function () {
+	initComponent: function () {		
+		
+		this.plugins = [new go.grid.plugin.Sortable(this.onSort, this, this.isDropAllowed)];	
 		
 		this.store = new Ext.data.ArrayStore({
 			fields: [				
@@ -32,7 +34,8 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 				'type',				
 				'fieldId',
 				'fieldSetId',
-				'isFieldSet'
+				{name: 'isFieldSet', type: "boolean"},
+				{name: 'sortOrder', type: "int"}
 			]
 		});
 		
@@ -72,7 +75,7 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 					id: 'name',
 					header: t('Name'),
 					width: dp(200),
-					sortable: true,
+					sortable: false,
 					dataIndex: 'name',
 					renderer: function(v, meta, record) {
 						return record.data.isFieldSet ? "<h3>" + v + "</h3>" : v;
@@ -84,6 +87,7 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 					draggable: false,
 					hidable:false,
 					align: "right",
+					sortable: false,
 					dataIndex: "databaseName",
 					renderer: function(v, meta, record) {
 						if(record.data.isFieldSet) {
@@ -130,6 +134,77 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 		this.on('render', function () {
 			this.load();
 		}, this);
+	},
+	
+	onSort : function(sortable, selections, dragData, dd) {
+		var isFieldSet = !!selections.find(function(r) {
+			if(r.data.isFieldSet) {
+				return true;
+			}
+		});
+		
+		if(isFieldSet) {
+			var fieldSetRecords = this.store.getRange().filter(function(r){
+				return r.data.isFieldSet;
+			});
+			
+			var update = {};
+			for(var i = 0, l = fieldSetRecords.length; i < l; i++) {
+				update[fieldSetRecords[i].data.fieldSetId] = {sortOrder: i};
+			}
+			
+			go.Stores.get("FieldSet").set({
+				update: update
+			});
+		} else
+		{			
+			var fieldRecords = this.store.getRange().filter(function(r){
+				return !r.data.isFieldSet;
+			});
+			
+			var update = {};
+			for(var i = 0, l = fieldRecords.length; i < l; i++) {
+				update[fieldRecords[i].data.fieldId] = {sortOrder: i};
+				if(selections.column("id").indexOf(fieldRecords[i].id) > -1) {
+					update[fieldRecords[i].data.fieldId].fieldSetId = dragData.dropRecord.data.fieldSetId;
+				}
+			}
+			
+			go.Stores.get("Field").set({
+				update: update
+			});
+		}
+	},
+	
+	isDropAllowed : function(selections, overRecord) {		
+
+		var isFieldSet = !!selections.find(function(r) {
+			if(r.data.isFieldSet) {
+				return true;
+			}
+		});
+		
+		var isField = !!selections.find(function(r) {
+			if(!r.data.isFieldSet) {
+				return true;
+			}
+		});
+		
+		//Don't allow mix
+		if(isField && isFieldSet) {
+			return false;
+		}
+		
+		if(isFieldSet && !overRecord.data.isFieldSet) {			
+			//Only allow fieldsets to be dropped on other fieldsets
+			return false;
+		}
+		
+//		if(isField && overRecord.data.isFieldSet) {
+//			return false;
+//		}
+		
+		return true;
 	},
 
 	showMoreMenu: function (record, e) {
@@ -233,9 +308,11 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 		
 		this.loading = true;
 		this.store.removeAll();
+		
+		var fsSortOrderMap = {};
 
 		go.Stores.get("FieldSet").query({
-			sort: ["name ASC"],
+			sort: ["sortOrder ASC"],
 			filter: {
 				entities: [this.entity]
 			}
@@ -252,16 +329,22 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 						null,
 						null,
 						fs.id,						
-						true
+						true,
+						fs.sortOrder * 100000
 					]);
+					
+					fsSortOrderMap[fs.id] = fs.sortOrder * 100000;
+					
 				});
+				
+				
 				
 				this.store.loadData(storeData, true);
 				
 			}, this);
 
 			go.Stores.get("Field").query({
-				sort: ["name ASC"],
+				sort: ["sortOrder ASC"],
 				filter: {
 					fieldSetId: response.ids
 				}
@@ -275,19 +358,21 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 							f.type,							
 							f.id,
 							f.fieldSetId,
-							false
+							false,
+							f.sortOrder + fsSortOrderMap[f.fieldSetId]
 						]);
 					});
 				
 					this.store.loadData(storeData, true);
 
-					this.store.multiSort(
-									[
-						{field: 'fieldSetId', direction: 'ASC'},
-						{field: 'isFieldSet', direction: 'DESC'},
-						{field: 'name', direction: 'ASC'}
+					this.store.multiSort([						
+//						//{field: 'fieldSetId', direction: 'ASC'},
+//						{field: 'isFieldSet', direction: 'DESC'},
+						{field: 'sortOrder', direction: 'ASC'}
 					]);
 					this.loading = false;
+					
+					console.log(this.store.getRange());
 				}, this);
 			}, this);
 

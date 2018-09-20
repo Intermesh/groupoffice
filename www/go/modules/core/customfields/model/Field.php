@@ -39,7 +39,7 @@ class Field extends AclItemEntity {
 	private $defaultModified = false;
 	private $unique;
 	private $uniqueModified = false;
-
+	private $dataType;
 	protected static function defineMapping() {
 		return parent::defineMapping()->addTable('core_customfields_field', 'f');
 	}
@@ -127,22 +127,30 @@ class Field extends AclItemEntity {
 	 * @return Base
 	 */
 	public function getDataType() {
-		$dataType = Base::findByName($this->type);
-		return (new $dataType($this));
+		
+		if(!isset($this->dataType)) {
+			$dataType = Base::findByName($this->type);
+			$this->dataType = (new $dataType($this));
+		}		
+		return $this->dataType;
+	}
+	
+	public function setDataType($values) {
+		$this->getDataType()->setValues($values);
 	}
 
 	protected function internalSave() {
-
-		$this->getDataType()->onFieldSave();
-
-		return parent::internalSave();
+		if(!parent::internalSave()) {
+			return false;
+		}
+		return $this->getDataType()->onFieldSave();
 	}
 
 	protected function internalDelete() {
-
-		$this->getDataType()->onFieldDelete();
-
-		return parent::internalDelete();
+		if(!parent::internalDelete()) {
+			return false;
+		}
+		return $this->getDataType()->onFieldDelete();
 	}
 
 	public function tableName() {
