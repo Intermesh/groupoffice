@@ -159,7 +159,7 @@ go.links.LinksDetailPanel = Ext.extend(Ext.Panel, {
 						
 						var record = this.store.getAt(index);
 						
-						if(e.target.tagName == "I") {							
+						if(e.target.tagName === "I" && e.target.innerHTML === 'delete') {							
 							this.delete(record);
 						} else 
 						{
