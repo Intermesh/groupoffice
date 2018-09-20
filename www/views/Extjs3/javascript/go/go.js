@@ -4,6 +4,7 @@ Ext.namespace('go.data');
 Ext.namespace('go.data.types');
 Ext.namespace('go.grid');
 Ext.namespace('go.grid.editor');
+Ext.namespace('go.grid.plugin');
 Ext.namespace('go.form');
 Ext.namespace('go.panels');
 Ext.namespace('go.login');
