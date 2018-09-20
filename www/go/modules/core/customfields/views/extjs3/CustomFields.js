@@ -216,7 +216,7 @@
 					tpl += '<tpl if="!GO.util.empty(go.modules.core.customfields.CustomFields.renderField(\'' + field.id + '\',values))"><p><i class="icon label ' + go.modules.core.customfields.CustomFields.getFieldIcon(field.id) + '"></i>\
 				<span>{[go.modules.core.customfields.CustomFields.renderField("' + field.id + '",values)]}</span>\
 					<label>' + t(field.name) + '</label>\
-					</p><hr /></tpl>';
+					</p></tpl>';
 				});
 
 				tpl += '</div></tpl>';

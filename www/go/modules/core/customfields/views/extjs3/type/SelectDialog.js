@@ -16,22 +16,25 @@ go.modules.core.customfields.type.SelectDialog = Ext.extend(go.modules.core.cust
 //			}]);
 
 
-		items.push(new go.form.FormGroup({
-			name: "dataType.options",
-			fieldLabel: t("Options"),
-			itemCfg: {
-				layout: "form",
-				items: [{
-						xtype: "hidden",
-						name: "id"
-					}, {
-						hideLabel: true,
-						xtype: "textfield",
-						name: "text",
-						anchor: "100%"
-					}]
-			}
-		}))
+		items.push({
+			xtype: "fieldset",
+			items: [new go.form.FormGroup({
+					name: "dataType.options",
+					fieldLabel: t("Options"),
+					itemCfg: {
+						layout: "form",
+						items: [{
+								xtype: "hidden",
+								name: "id"
+							}, {
+								hideLabel: true,
+								xtype: "textfield",
+								name: "text",
+								anchor: "100%"
+							}]
+					}
+				})]
+		});
 
 		return items;
 	}

@@ -50,7 +50,7 @@ go.modules.core.customfields.type.Select = Ext.extend(go.modules.core.customfiel
 				data: customfield.dataType,
 				id: 'id',
 				root: "options",
-				fields:['id','text'],
+				fields:[{name: 'id', type: "int"}, 'text'],
 				remoteSort:true
 			});
 		

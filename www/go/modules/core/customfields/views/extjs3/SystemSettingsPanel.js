@@ -39,7 +39,7 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 			]
 		});
 
-		go.Stores.get("FieldSet").on("changes", function (store, added, changed, destoyed) {
+		go.Stores.get("FieldSet").on("changes", function (store, added, changed, destroyed) {
 			if (this.loading || !this.rendered) {
 				return;
 			}
@@ -72,9 +72,15 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 					}
 				});
 			}, this);
+			
+			if(destroyed.length) {
+				this.store.remove(this.store.getRange().filter(function(r) {
+					return r.data.isFieldSet && destroyed.indexOf(r.data.fieldSetId) > -1;
+				}));
+			}
 		}, this);
 
-		go.Stores.get("Field").on("changes", function (store, added, changed, destoyed) {
+		go.Stores.get("Field").on("changes", function (store, added, changed, destroyed) {
 			if (this.loading || !this.rendered) {
 				return;
 			}
@@ -111,6 +117,12 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 					}
 				});
 			}, this);
+			
+			if(destroyed.length) {
+				this.store.remove(this.store.getRange().filter(function(r) {
+					return destroyed.indexOf(r.data.fieldId) > -1;
+				}));
+			}
 
 		}, this);
 
@@ -197,6 +209,12 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 		this.on('render', function () {
 			this.load();
 		}, this);
+		
+		this.on('rowdblclick', this.onRowDblClick, this);
+	},
+	
+	onRowDblClick : function(grid, rowIndex, e) {
+		this.edit(this.store.getAt(rowIndex));
 	},
 
 	onSort: function (sortable, selections, dragData, dd) {
@@ -284,15 +302,7 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 						iconCls: 'ic-edit',
 						text: t("Edit"),
 						handler: function () {
-
-							if (this.moreMenu.record.data.isFieldSet) {
-								var dlg = this.createFieldSetDialog();
-								dlg.load(this.moreMenu.record.data.fieldSetId).show();
-							} else
-							{
-								var dlg = go.modules.core.customfields.CustomFields.getType(this.moreMenu.record.data.type).getDialog();
-								dlg.load(this.moreMenu.record.data.fieldId).show();
-							}
+							this.edit(this.moreMenu.record);
 						},
 						scope: this
 					}, {
@@ -312,6 +322,17 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 		this.moreMenu.record = record;
 
 		this.moreMenu.showAt(e.getXY());
+	},
+	
+	edit: function (record) {
+		if (record.data.isFieldSet) {
+			var dlg = this.createFieldSetDialog();
+			dlg.load(record.data.fieldSetId).show();
+		} else
+		{
+			var dlg = go.modules.core.customfields.CustomFields.getType(record.data.type).getDialog();
+			dlg.load(record.data.fieldId).show();
+		}
 	},
 
 	showAddFieldMenu: function (record, e) {

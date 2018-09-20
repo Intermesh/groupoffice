@@ -29,15 +29,13 @@ trait CustomFieldsTrait {
 			$record = (new Query())
 							->select('*')
 							->from($this->customFieldsTableName(), 'cf')
-							->where(['id' => $this->id])->execute()->fetch();
+							->where(['id' => $this->id])->single();
 							
 			if($record) {			
 				
 				$columns = Table::getInstance(static::customFieldsTableName())->getColumns();		
-				foreach($columns as $name => $column) {
-					if(isset($record[$name])) {
-						$record[$name] = $column->castFromDb($record[$name]);
-					}
+				foreach($columns as $name => $column) {					
+					$record[$name] = $column->castFromDb($record[$name]);					
 				}
 				
 				$fields = Field::find()
@@ -60,7 +58,8 @@ trait CustomFieldsTrait {
 	}
 	
 	public function setCustomFields($data) {		
-		$this->customFieldsData = array_merge($this->getCustomFields(), $this->normalizeCustomFieldsInput($data));
+		$this->customFieldsData = array_merge($this->getCustomFields(), $this->normalizeCustomFieldsInput($data));		
+		
 		$this->customFieldsModified = true;
 	}
 	
@@ -68,7 +67,7 @@ trait CustomFieldsTrait {
 	private function normalizeCustomFieldsInput($data) {
 		$columns = Table::getInstance(static::customFieldsTableName())->getColumns();		
 		foreach($columns as $name => $column) {
-			if(isset($data[$name])) {
+			if(array_key_exists($name, $data)) {
 				$data[$name] = $column->normalizeInput($data[$name]);
 			}
 		}
@@ -78,9 +77,12 @@ trait CustomFieldsTrait {
 						->where(['fs.entityId' => static::getType()->getId()]);
 		
 		foreach($fields as $field) {	
-
-			$data[$field->databaseName] = $field->apiToDb(isset($data[$field->databaseName]) ? $data[$field->databaseName] : null, $data);			
+			//if client didn't post value then skip it
+			if(array_key_exists($field->databaseName, $data)) {
+				$data[$field->databaseName] = $field->apiToDb(isset($data[$field->databaseName]) ? $data[$field->databaseName] : null, $data);			
+			}
 		}
+		
 		return $data;
 	}
 	
