@@ -22,6 +22,9 @@ go.modules.core.customfields.type.SelectDialog = Ext.extend(go.modules.core.cust
 			itemCfg: {
 				layout: "form",
 				items: [{
+						xtype: "hidden",
+						name: "id"
+					}, {
 						hideLabel: true,
 						xtype: "textfield",
 						name: "text",
