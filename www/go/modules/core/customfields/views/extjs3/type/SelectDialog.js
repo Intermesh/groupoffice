@@ -21,11 +21,12 @@ go.modules.core.customfields.type.SelectDialog = Ext.extend(go.modules.core.cust
 
 		items.push({
 			xtype: "fieldset",
+			title: t("Options"),
 			items: [
 				
 				new go.modules.core.customfields.type.SelectOptionsTree({
 					name: "dataType.options",
-					fieldLabel: t("Options"),
+					hideLabel: true
 				})
 				
 //				new go.form.FormGroup({
