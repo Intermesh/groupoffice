@@ -33,3 +33,6 @@ type/FunctionField.js
 
 type/CheckboxDialog.js
 type/Checkbox.js
+
+type/YesNoDialog.js
+type/YesNo.js

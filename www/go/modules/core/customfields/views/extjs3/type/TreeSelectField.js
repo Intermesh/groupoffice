@@ -109,7 +109,7 @@ go.modules.core.customfields.TreeSelectField = Ext.extend(Ext.Panel, {
 			v = this.items.itemAt(this.items.getCount() -2).getValue();
 		}
 		
-		return v;
+		return go.util.empty(v) ? null : v;
 	},
 	markInvalid: function () {
 
