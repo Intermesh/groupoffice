@@ -3,9 +3,22 @@
 go.modules.core.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 	fieldSet: null,
 	initComponent: function () {
+		
+		var items = [];
+		
+		if(this.fieldSet.description) {
+			items.push({
+				xtype: "box",
+				autoEl: "p",
+				html: go.util.textToHtml(this.fieldSet.description)
+			});
+		}
+		
+		items = items.concat(go.modules.core.customfields.CustomFields.getFormFields(this.fieldSet.id));
+		
 		Ext.apply(this, {
 			title: this.fieldSet.name,
-			items: go.modules.core.customfields.CustomFields.getFormFields(this.fieldSet.id),
+			items: items,
 			stateId: 'cf-form-field-set-' + this.fieldSet.id,
 			stateful: true,
 			collapsible: true

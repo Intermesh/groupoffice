@@ -258,3 +258,4 @@ $updates['201809071645'][] = "ALTER TABLE `core_customfields_field_set` ADD `fil
 //ALTER TABLE `core_customfields_select_option` ADD FOREIGN KEY (`fieldId`) REFERENCES `core_customfields_field`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 //ALTER TABLE `core_customfields_select_option` ADD FOREIGN KEY (`fieldId`) REFERENCES `core_customfields_field`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
+//ALTER TABLE `core_customfields_field_set` ADD `description` TEXT NOT NULL AFTER `name`;

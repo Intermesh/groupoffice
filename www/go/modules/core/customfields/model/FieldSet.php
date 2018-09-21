@@ -15,6 +15,8 @@ class FieldSet extends AclEntity {
 
 	public $name;
 	
+	public $description;
+	
 	protected $entityId;
 	
 	public $sortOrder;

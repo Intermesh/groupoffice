@@ -140,6 +140,7 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 					tooltip: t('Add field set'),
 					handler: function (e, toolEl) {
 						var dlg = this.createFieldSetDialog();
+						dlg.setValues({entity: this.entity});
 						dlg.show();
 					},
 					scope: this

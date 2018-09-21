@@ -25,3 +25,9 @@ type/DateTime.js
 
 type/SelectDialog.js
 type/Select.js
+
+type/FunctionFieldDialog.js
+type/FunctionField.js
+
+type/CheckboxDialog.js
+type/Checkbox.js

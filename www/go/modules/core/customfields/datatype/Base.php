@@ -53,14 +53,18 @@ abstract class Base extends Model {
 				GO()->getDbConnection()->query($sql);
 			}			
 		} else {
+			
+			
 			$oldName = $this->field->isModified('databaseName') ? $this->field->getOldValue("databaseName") : $this->field->databaseName;
+			$col = Table::getInstance($table)->getColumn($oldName);
+			
 			$sql = "ALTER TABLE `" . $table . "` CHANGE " . Utils::quoteColumnName($oldName) . " " . $quotedDbName . " " . $fieldSql;
 			GO()->getDbConnection()->query($sql);
 			
-			if($this->field->getUnique() && !Table::getInstance($table)->getColumn($this->field->databaseName)->unique) {
+			if($this->field->getUnique() && !$col->unique) {
 				$sql = "ALTER TABLE `" . $table . "` ADD UNIQUE(". $quotedDbName  . ");";
 				GO()->getDbConnection()->query($sql);
-			} else if(!$this->field->getUnique() && Table::getInstance($table)->getColumn($this->field->databaseName)->unique) {
+			} else if(!$this->field->getUnique() && $col->unique) {
 				$sql = "ALTER TABLE `" . $table . "` DROP INDEX " . $quotedDbName;
 				GO()->getDbConnection()->query($sql);
 			}

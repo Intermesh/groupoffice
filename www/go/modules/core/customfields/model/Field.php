@@ -65,7 +65,7 @@ class Field extends AclItemEntity {
 	}
 
 	public function setOptions($options) {
-		$this->options = json_encode($options);
+		$this->options = json_encode(array_merge($this->getOptions(), $options));
 	}
 
 	public function getOption($name) {
