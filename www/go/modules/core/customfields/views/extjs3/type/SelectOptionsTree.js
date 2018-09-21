@@ -19,7 +19,7 @@ go.modules.core.customfields.type.SelectOptionsTree = function(config){
 			var node = this.selModel.getSelectedNode();
 			if(!node)
 			{
-				node=this.rootNode;
+				node = this.getRootNode();
 			}
 
 			var newNode = new Ext.tree.AsyncTreeNode({
@@ -93,7 +93,7 @@ Ext.extend(go.modules.core.customfields.type.SelectOptionsTree, Ext.tree.TreePan
 	apiToTree : function(options) {
 		var me = this;
 		options.forEach(function(o) {
-			o.expanded = !o.children.length;
+			o.expanded = true; //always expand or they won't be submitted and thus deleted on the server!
 			o.children = me.apiToTree(o.children);
 			o.serverId = o.id;
 			delete o.id;
