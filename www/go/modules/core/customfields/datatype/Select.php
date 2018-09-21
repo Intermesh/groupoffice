@@ -16,17 +16,27 @@ class Select extends Base {
 	}
 
 	public function getOptions() {
-		return (new Query())
-										->select("*")
-										->from('core_customfields_select_option')
-										->where(['fieldId' => $this->field->id])
-										->all();
+		return $this->internalGetOptions();
 	}
 
 	private $options;
 
 	public function setOptions(array $options) {
 		$this->options = $options;
+	}
+	
+	private function internalGetOptions($parentId = null) {
+		$options = (new Query())
+										->select("*")
+										->from('core_customfields_select_option')
+										->where(['fieldId' => $this->field->id, 'parentId' => $parentId])
+										->all();
+		
+		foreach($options as &$o) {
+			$o['children'] = $this->internalGetOptions($o['id']);
+		}
+		
+		return $options;		
 	}
 
 	public function onFieldSave() {
@@ -44,30 +54,44 @@ class Select extends Base {
 				throw new \Exception("Couldn't add contraint");
 			}
 		}
+		
+		$this->savedOptionIds = [];
+		$this->internalSaveOptions($this->options);		
+		
+		if (!empty($this->savedOptionIds)) {
+			GO()->getDbConnection()->delete('core_customfields_select_option', (new Query)
+											->where(['fieldId' => $this->field->id])
+											->andWhere('id', 'not in', $this->savedOptionIds)
+			)->execute();
+		}
+		$this->options = null;
 
-		$ids = [];
-		foreach ($this->options as $o) {
+		return true;
+	}
+	
+	private $savedOptionIds = [];
+	
+	private function internalSaveOptions($options, $parentId = null) {
+		
+		foreach ($options as $o) {
 
-			if (!empty($o['id'])) {
-				$ids[] = $o['id'];
-			}
-
+			$o['parentId'] = $parentId;
 			$o['fieldId'] = $this->field->id;
+			
+			$children = $o['children'] ?? [];
+			unset($o['children']);
 			if (!GO()->getDbConnection()->replace('core_customfields_select_option', $o)->execute()) {
 				throw new Exception("could not save select option");
 			}
+			
+			if(empty($o['id'])) {
+				$o['id'] = GO()->getDbConnection()->getPDO()->lastInsertId();
+			}
+			
+			$this->savedOptionIds[] = $o['id'];
+			
+			$this->internalSaveOptions($children, $o['id']);
 		}
-
-		if (!empty($ids)) {
-			GO()->getDbConnection()->delete('core_customfields_select_option', (new Query)
-											->where(['fieldId' => $this->field->id])
-											->andWhere('id', 'not in', $ids)
-			)->execute();
-		}
-
-
-
-		return true;
 	}
 	
 	public function onFieldDelete() {		
