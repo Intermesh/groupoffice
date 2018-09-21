@@ -7,7 +7,7 @@ use go\core\fs\File;
 use go\core\jmap\Request;
 use go\modules\core\modules\model\Module;
 
-class Language extends Singleton {
+class Language {
 
 	/**
 	 *
@@ -16,8 +16,7 @@ class Language extends Singleton {
 	private $isoCode;
 	private $data = [];
 
-	protected function __construct() {
-		parent::__construct();
+	public function __construct() {
 		$this->isoCode = $this->getBrowserLanguage();	
 	}
 	
@@ -80,11 +79,18 @@ class Language extends Singleton {
 
 		$this->loadSection($package, $module);
 		
-		if(!isset($this->data[$package]) || !isset($this->data[$package][$module])) {
-			return t($str);
+		//fallback on core lang
+		if(!isset($this->data[$package]) || !isset($this->data[$package][$module]) || ($package != "core" && $module != "core" && !isset($this->data[$package][$module][$str]))) {
+			return $this->t($str);
 		}
 		
 		return $this->data[$package][$module][$str] ?? $str;
+	}
+	
+	public function translationExists($str, $package = 'core', $module = 'core') {
+		$this->loadSection($package, $module);
+		
+		return isset($this->data[$package]) && isset($this->data[$package][$module]) && isset($this->data[$package][$module][$str]);
 	}
 
 

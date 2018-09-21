@@ -86,7 +86,7 @@ class Extjs3 {
 	 */
 	public function getLanguageJS() {
 		
-		$iso = Language::get()->getIsoCode();
+		$iso = \GO()->getLanguage()->getIsoCode();
 	
 		
 		$cacheFile = GO()->getDataFolder()->getFile('clientscripts/lang_'.$iso.'.js');
@@ -96,7 +96,7 @@ class Extjs3 {
 
 			$str = "var GO = GO || {};\n";
 
-			$extjsLang = Language::get()->t("extjs_lang");
+			$extjsLang = \GO()->getLanguage()->t("extjs_lang");
 			if ($extjsLang == 'extjs_lang')
 				$extjsLang = $iso;
 
@@ -115,7 +115,7 @@ class Extjs3 {
 			}
 
 			//Put all lang vars in js		
-			$l = Language::get()->getAllLanguage();
+			$l = \GO()->getLanguage()->getAllLanguage();
 			$l['iso'] = $iso;
 
 			$str .= 'GO.lang = ' . json_encode($l) . ";\n";

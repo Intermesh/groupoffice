@@ -400,7 +400,21 @@ namespace go\core {
 		 * @param String $package Only applies if module is set to 'base'
 		 */
 		public function t($str, $package = 'core', $module = 'core') {
-			return Language::get()->t($str, $package, $module);
+			return $this->getLanguage()->t($str, $package, $module);
+		}
+		
+		private $language;
+		
+		/**
+		 * 
+		 * @return Language
+		 */
+		public function getLanguage() {
+			if(!isset($this->language)) {
+				$this->language = new Language();
+			}
+			
+			return $this->language;
 		}
 
 		public static function findConfigFile($name = 'config.php') {
