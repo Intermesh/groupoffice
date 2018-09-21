@@ -26,6 +26,7 @@ type/DateTime.js
 type/SelectOptionsTree.js
 type/SelectDialog.js
 type/Select.js
+type/TreeSelectField.js
 
 type/FunctionFieldDialog.js
 type/FunctionField.js

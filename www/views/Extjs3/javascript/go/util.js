@@ -46,6 +46,10 @@
 			{
 				return true;
 			}
+			
+			if(Ext.isArray(v) && !v.length) {
+				return true;
+			}
 			return false;
 
 		},

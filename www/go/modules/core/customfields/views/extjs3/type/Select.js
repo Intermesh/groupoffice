@@ -43,30 +43,10 @@ go.modules.core.customfields.type.Select = Ext.extend(go.modules.core.customfiel
 	 */
 	createFormFieldConfig: function (customfield, config) {
 		var c = go.modules.core.customfields.type.Date.superclass.createFormFieldConfig.call(this, customfield, config);
-		
-		
 
-		var store = new Ext.data.JsonStore({
-				data: customfield.dataType,
-				id: 'id',
-				root: "options",
-				fields:[{name: 'id', type: "int"}, 'text'],
-				remoteSort:true
-			});
-		
-		return Ext.apply(c, {
-					xtype:'combo',
-					store: store,
-					valueField:'id',
-					displayField:'text',
-					mode: 'local',
-					triggerAction: 'all',
-					editable: true,
-					selectOnFocus:true,
-					forceSelection:true
-				}, config);
-		
-		return config;
+		c.xtype = "treeselectfield";
+		c.customfield = customfield;
+		return c;
 	},
 
 	getFieldType: function () {
