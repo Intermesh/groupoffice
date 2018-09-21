@@ -3671,6 +3671,8 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 
 			if($attr['description']==null)
 				$attr['description']="";
+			
+			$this->fireEvent('beforeSaveCacheSearchRecord',array($this, $model, &$attr));
 
 			$model->setAttributes($attr, false);
 			$model->cutAttributeLengths();
@@ -3684,8 +3686,8 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 		}
 		return false;
 	}
-
-
+	
+	
 	/**
 	 * Cut all attributes to their maximum lengths. Useful when importing stuff.
 	 */
@@ -4555,7 +4557,14 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 			" WHERE model_type_id=".$model->modelTypeId()." AND model_id=".$model->id;
 
 		$result = $this->getDbConnection()->prepare($sql);
-		return $result->execute($bindParams);
+		
+		$this->fireEvent('beforeUpdateLink',array(&$this, &$model, $attributes));
+		
+		$success = $result->execute($bindParams);
+		
+		$this->fireEvent('afterUpdateLink',array(&$this, &$model, $attributes, $success));
+		
+		return $success;
 	}
 
 	/**
@@ -4592,7 +4601,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 	}
 
 	protected function afterUnlink(ActiveRecord $model){
-
+		$this->fireEvent('afterUnlink',array(&$this, &$model));
 		return true;
 	}
 
