@@ -8,17 +8,16 @@ use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\jmap\Response;
 use go\core\Language as LangModel;
-
 use function GO;
 
 class Language extends Controller {
-	
+
 	private $handle;
 	private $en;
 	private $nl;
 
 	public function export($params) {
-		GO()->getLanguage()->setLanguage("nl");
+		GO()->getLanguage()->setLanguage($params['language']);
 
 //for checking arrays() in english translation
 		$this->en = new LangModel();
@@ -31,11 +30,11 @@ class Language extends Controller {
 		$rootFolder = Environment::get()->getInstallFolder();
 
 		$coreFiles = $rootFolder->getFolder("views/Extjs3/javascript")->find('/.*\.js/', false);
-		
+
 		$csvFile = File::tempFile('csv');
 
 		$this->handle = $csvFile->open('w+');
-		
+
 		fputcsv($this->handle, [
 				"package",
 				"module",
@@ -85,14 +84,14 @@ class Language extends Controller {
 		}
 
 		$this->writeStrings("core", "core", $core, "*");
-		
+
 		//todo, this is refsactored in master
 		$blob = Blob::fromTmp($csvFile->getPath());
 		$blob->type = "text/csv";
 		$blob->name = "lang.csv";
 		$blob->modified = time();
 		$blob->save();
-		
+
 		Response::get()->addResponse(["blobId" => $blob->id]);
 	}
 
@@ -105,7 +104,7 @@ class Language extends Controller {
 		return array_map('stripslashes', $matches[1]);
 	}
 
-	function writeStrings($package, $module, $strings, $relPath) {		
+	function writeStrings($package, $module, $strings, $relPath) {
 
 		foreach ($strings as $string) {
 			$enTranslation = $this->en->t($string, $package, $module);
@@ -134,6 +133,80 @@ class Language extends Controller {
 				];
 
 				fputcsv($this->handle, $fields);
+			}
+		}
+	}
+
+	public function import($params) {
+		$file = new File($params['path']);
+
+		if (!$file->exists()) {
+			throw new \Exception("File not found " . $params['path']);
+		}
+		$this->handle = $file->open("r");
+
+		if (!$this->handle) {
+			throw new \Exception("Could not open " . $params['path']);
+		}
+
+		$headers = fgetcsv($this->handle);
+
+
+		if (!$headers) {
+			throw new \Exception("Could not read CSV");
+		}
+		if (count($headers) != 5) {
+			throw new \Exception("Invalid CSV file (Header count != 5)");
+		}
+
+		$lang = $headers[3];
+
+		$data = [];
+
+		while ($record = fgetcsv($this->handle)) {
+			list($package, $module, $en, $translation, $source) = $record;
+
+			if (empty($translation)) {
+				continue;
+			}
+
+			if (!isset($data[$package])) {
+				$data[$package] = [];
+			}
+
+			if (!isset($data[$package][$module])) {
+				$data[$package][$module] = [];
+			}
+
+			if (preg_match("/(.*)\[(.*)\]/", $en, $matches)) {
+				$data[$package][$module][$matches[1]][$matches[2]] = $translation;
+			} else {
+				$data[$package][$module][$en] = $translation;
+			}
+		}
+		
+		$rootFolder = Environment::get()->getInstallFolder();
+
+		foreach ($data as $package => $modules) {
+
+			foreach ($modules as $module => $translations) {
+				if ($package == "legacy") {
+					$langFilePath = "modules/" . $module . "/language/" . $lang . ".php";
+				} else {
+					$langFilePath = "go/modules/" . $package . "/" . $module . "/language/" . $lang . ".php";
+				}
+				
+				
+				$file = $rootFolder->getFile($langFilePath);
+				
+				if ($file->exists()) {
+					$existingTranslations = require($file->getPath());
+					
+					$translations = array_merge($existingTranslations, $translations);
+				}
+				echo "Writing: ".$langFilePath."\n";
+				
+				$file->putContents("<?php\nreturn ".var_export($translations, true).";\n");
 			}
 		}
 	}

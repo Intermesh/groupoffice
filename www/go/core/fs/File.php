@@ -260,7 +260,7 @@ class File extends FileSystemObject {
 	 */
 	public function open($mode){
 		
-		$this->create();
+		//$this->create();
 		
 		return fopen($this->getPath(), $mode);
 	}
