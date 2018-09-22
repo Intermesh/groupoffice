@@ -19,21 +19,7 @@ GO.base.SavedExportDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		GO.base.SavedExportDialog.superclass.initComponent.call(this);
 	},
 	buildForm : function () {
-
-//		this.columnsPanel= new GO.grid.MultiSelectGrid({
-//			title: t("Columns"),
-//			extraColumns : [{
-//				header: t("strLabel"),
-//				dataIndex: "label",
-//				id: "label",
-//				width: 250
-//			}],
-//			region:'center',
-//			loadMask:true,
-//			allowNoSelection : true,
-//			store: new Ext.data.JsonStore({fields: ['name','label']})
-//		});
-
+		
 		this.columnsPanel = new GO.base.ColumnSelectPanel({
 			region:'center'
 		});

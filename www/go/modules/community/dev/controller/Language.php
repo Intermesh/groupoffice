@@ -15,6 +15,9 @@ class Language extends Controller {
 	private $handle;
 	private $en;
 	private $nl;
+	
+	const DELIMITER = ';';
+	const ENCLOSURE = '"';
 
 	public function export($params) {
 		GO()->getLanguage()->setLanguage($params['language']);
@@ -41,7 +44,7 @@ class Language extends Controller {
 				"EN",
 				GO()->getLanguage()->getIsoCode(),
 				"source"
-		]);
+		], self::DELIMITER, self::ENCLOSURE);
 
 		$core = [];
 		foreach ($coreFiles as $file) {
@@ -121,7 +124,7 @@ class Language extends Controller {
 							$translatedItem == $stringItem ? "" : $translatedItem,
 							$relPath
 					];
-					fputcsv($this->handle, $fields);
+					fputcsv($this->handle, $fields, self::DELIMITER, self::ENCLOSURE);
 				}
 			} else {
 				$fields = [
@@ -132,7 +135,7 @@ class Language extends Controller {
 						$relPath
 				];
 
-				fputcsv($this->handle, $fields);
+				fputcsv($this->handle, $fields, self::DELIMITER, self::ENCLOSURE);
 			}
 		}
 	}
@@ -149,7 +152,7 @@ class Language extends Controller {
 			throw new \Exception("Could not open " . $params['path']);
 		}
 
-		$headers = fgetcsv($this->handle);
+		$headers = fgetcsv($this->handle,0, self::DELIMITER, self::ENCLOSURE);
 
 
 		if (!$headers) {
@@ -163,7 +166,7 @@ class Language extends Controller {
 
 		$data = [];
 
-		while ($record = fgetcsv($this->handle)) {
+		while ($record = fgetcsv($this->handle, 0, self::DELIMITER, self::ENCLOSURE)) {
 			list($package, $module, $en, $translation, $source) = $record;
 
 			if (empty($translation)) {
