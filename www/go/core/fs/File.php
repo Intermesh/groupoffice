@@ -18,6 +18,15 @@ use go\core\util\StringUtil;
  */
 class File extends FileSystemObject {
 	
+	/**
+	 * Get a temporary file
+	 * 
+	 * @param string $extension
+	 * @return statuc
+	 */
+	public static function tempFile($extension) {
+		 return GO()->getTmpFolder()->getFile(uniqid(time()) . '.' . $extension);
+	}
 
 	
 	/**
