@@ -517,7 +517,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 //						}
 						,{
 							iconCls: 'ic-info',
-							text: t("About GroupOffice"),
+							text: t("About {product_name}"),
 							handler: function () {
 								if (!this.aboutDialog)
 								{
