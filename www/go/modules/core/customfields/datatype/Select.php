@@ -25,7 +25,7 @@ class Select extends Base {
 		$this->options = $options;
 	}
 	
-	private function internalGetOptions($parentId = null) {
+	protected function internalGetOptions($parentId = null) {
 		$options = (new Query())
 										->select("*")
 										->from('core_customfields_select_option')
@@ -42,36 +42,40 @@ class Select extends Base {
 	public function onFieldSave() {
 		if (!parent::onFieldSave()) {
 			return false;
-		}
-
-		if (!isset($this->options)) {
-			return true;
-		}
+		}		
 
 		if ($this->field->isNew()) {
 			$sql = "ALTER TABLE `" . $this->field->tableName() . "` ADD CONSTRAINT `" . $this->field->tableName() . "_ibfk_" . $this->field->id . "` FOREIGN KEY (" . Utils::quoteColumnName($this->field->databaseName) . ") REFERENCES `core_customfields_select_option`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";			
 			if(!GO()->getDbConnection()->query($sql)) {
 				throw new \Exception("Couldn't add contraint");
 			}
-		}
+		}			
 		
-		$this->savedOptionIds = [];
-		$this->internalSaveOptions($this->options);		
-		
-		if (!empty($this->savedOptionIds)) {
-			GO()->getDbConnection()->delete('core_customfields_select_option', (new Query)
-											->where(['fieldId' => $this->field->id])
-											->andWhere('id', 'not in', $this->savedOptionIds)
-			)->execute();
-		}
-		$this->options = null;
+		$this->saveOptions();	
 
 		return true;
 	}
 	
-	private $savedOptionIds = [];
+	protected function saveOptions() {
+		
+		if (!isset($this->options)) {
+			return true;
+		}
+		$this->savedOptionIds = [];
+		$this->internalSaveOptions($this->options);				
+		
+		$query  = (new Query)->where(['fieldId' => $this->field->id]);
+		if (!empty($this->savedOptionIds)) {	 
+			 $query->andWhere('id', 'not in', $this->savedOptionIds);
+		}
+		$deleteCmd = GO()->getDbConnection()->delete('core_customfields_select_option', $query)->execute();
+		
+		$this->options = null;
+	}
 	
-	private function internalSaveOptions($options, $parentId = null) {
+	protected $savedOptionIds = [];
+	
+	protected function internalSaveOptions($options, $parentId = null) {
 		
 		foreach ($options as $o) {
 
@@ -97,7 +101,7 @@ class Select extends Base {
 	public function onFieldDelete() {		
 		$sql = "ALTER TABLE `" . $this->field->tableName() . "` DROP FOREIGN KEY " . $this->field->tableName() . "_ibfk_" . $this->field->id;			
 		if(!GO()->getDbConnection()->query($sql)) {
-			throw new \Excpetion("Couldn't drop foreign key");
+			throw new \Exception("Couldn't drop foreign key");
 		}
 			
 		return parent::onFieldDelete();

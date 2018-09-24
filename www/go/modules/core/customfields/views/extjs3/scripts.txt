@@ -28,6 +28,9 @@ type/SelectDialog.js
 type/Select.js
 type/TreeSelectField.js
 
+type/MultiSelectDialog.js
+type/MultiSelect.js
+
 type/FunctionFieldDialog.js
 type/FunctionField.js
 

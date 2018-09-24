@@ -160,15 +160,6 @@ class Field extends AclItemEntity {
 		return $entityCls::customFieldsTableName(); //From customfieldstrait
 	}
 
-	public function apiToDb($value, $values) {
-
-		return $this->getDataType()->apiToDb($value, $values);
-	}
-
-	public function dbToApi($value, $values) {
-		return $this->getDataType()->dbToApi($value, $values);
-	}
-
 	public static function filter(Query $query, array $filter) {
 
 		if (!empty($filter['fieldSetId'])) {

@@ -27,7 +27,7 @@ class FunctionField extends Base {
 		return "decimal(19,$decimals) DEFAULT " . $d;
 	}
 
-	public function dbToApi($dummy, $values) {
+	public function dbToApi($dummy, &$values) {
 		$f = $this->field->getOption("function");
 		
 		foreach ($values as $key => $value) {
@@ -43,14 +43,8 @@ class FunctionField extends Base {
 			return null;
 		}
 
-		$result = null;
-
-		
-		
-		
-		eval("\$result = " . $f . ";");
-		
-		
+		$result = null;		
+		eval("\$result = " . $f . ";");		
 		return $result;
 	}
 }

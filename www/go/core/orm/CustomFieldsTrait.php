@@ -38,12 +38,9 @@ trait CustomFieldsTrait {
 					$record[$name] = $column->castFromDb($record[$name]);					
 				}
 				
-				$fields = Field::find()
-						->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId')
-						->where(['fs.entityId' => static::getType()->getId()]);
-		
-				foreach($fields as $field) {
-					$record[$field->databaseName] = $field->dbToApi(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record);			
+				
+				foreach(self::getCustomFieldModels() as $field) {
+					$record[$field->databaseName] = $field->getDataType()->dbToApi(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record);			
 				}
 				
 				$this->customFieldsData = $record;
@@ -63,6 +60,23 @@ trait CustomFieldsTrait {
 		$this->customFieldsModified = true;
 	}
 	
+	private static $customFields;
+	
+	/**
+	 * Get all custom fields for this entity
+	 * 
+	 * @return Field
+	 */
+	public static function getCustomFieldModels() {
+		if(!isset(self::$customFields)) {
+			self::$customFields = Field::find()
+						->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId')
+						->where(['fs.entityId' => static::getType()->getId()])->all();
+		}
+		
+		return self::$customFields;
+	}
+	
 	
 	private function normalizeCustomFieldsInput($data) {
 		$columns = Table::getInstance(static::customFieldsTableName())->getColumns();		
@@ -71,15 +85,11 @@ trait CustomFieldsTrait {
 				$data[$name] = $column->normalizeInput($data[$name]);
 			}
 		}
-		
-		$fields = Field::find()
-						->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId')
-						->where(['fs.entityId' => static::getType()->getId()]);
-		
-		foreach($fields as $field) {	
+			
+		foreach(self::getCustomFieldModels() as $field) {	
 			//if client didn't post value then skip it
 			if(array_key_exists($field->databaseName, $data)) {
-				$data[$field->databaseName] = $field->apiToDb(isset($data[$field->databaseName]) ? $data[$field->databaseName] : null, $data);			
+				$data[$field->databaseName] = $field->getDataType()->apiToDb(isset($data[$field->databaseName]) ? $data[$field->databaseName] : null,  $data);			
 			}
 		}
 		
@@ -92,18 +102,40 @@ trait CustomFieldsTrait {
 		}
 		
 		try {
-			if(!isset($this->customFieldsData['id'])) {
-				$this->customFieldsData['id'] = $this->id;
+			
+			$record = $this->customFieldsData;
+			
+			foreach(self::getCustomFieldModels() as $field) {
+				if(!$field->getDataType()->beforeSave(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record)) {
+					return false;
+				}
+			}
+				
+			if(!isset($record['id'])) {
+				$record['id'] = $this->id;	
 
-				return App::get()
+				if(!App::get()
 								->getDbConnection()
-								->insert($this->customFieldsTableName(), $this->customFieldsData)->execute();
+								->insert($this->customFieldsTableName(), $record)->execute()){
+								return false;
+				}
 			} else
 			{
-				return App::get()
+				unset($record['id']);
+				if(!App::get()
 								->getDbConnection()
-								->update($this->customFieldsTableName(), $this->customFieldsData, ['id' => $this->customFieldsData['id']])->execute();
+								->update($this->customFieldsTableName(), $record, ['id' => $this->customFieldsData['id']])->execute()) {
+					return false;
+				}
 			}
+			
+			foreach(self::getCustomFieldModels() as $field) {
+				if(!$field->getDataType()->afterSave(isset($this->customFieldsData[$field->databaseName]) ? $this->customFieldsData[$field->databaseName] : null, $this->customFieldsData)) {
+					return false;
+				}
+			}
+			
+			return true;
 		} catch(PDOException $e) {
 			$uniqueKey = Utils::isUniqueKeyException($e);
 			if ($uniqueKey) {				

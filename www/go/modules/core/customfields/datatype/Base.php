@@ -38,6 +38,11 @@ abstract class Base extends Model {
 		return "VARCHAR(".($this->field->getOption('maxLength') ?? 190).") DEFAULT " . GO()->getDbConnection()->getPDO()->quote($this->field->getDefault() ?? "NULL");
 	}
 	
+	/**
+	 * Called when the field is saved
+	 * 
+	 * @return boolean
+	 */
 	public function onFieldSave() {
 		
 		$table = $this->field->tableName();
@@ -75,6 +80,11 @@ abstract class Base extends Model {
 		return true;
 	}
 
+	/**
+	 * Called when a field is deleted
+	 * 
+	 * @return boolean
+	 */
 	public function onFieldDelete() {
 		$table = $this->field->tableName();
 		$sql = "ALTER TABLE `" . $table . "` DROP " . Utils::quoteColumnName($this->field->databaseName) ;
@@ -89,15 +99,66 @@ abstract class Base extends Model {
 		
 		return true;
 	}
-					
-	public function apiToDb($value, $values) {
+	
+	/**
+	 * Format data from API to model
+	 * 
+	 * This function is called when the API data is applied to the model with setValues();
+	 * 
+	 * @see MultiSelect for an advaced example
+	 * @param mixed $value The value for this field
+	 * @param array $values The values to be saved in the custom fields table
+	 * @return mixed
+	 */
+	public function apiToDb($value, &$values) {
 		return $value;
 	}
 	
-	public function dbToApi($value, $values) {
+	/**
+	 * Format data from model to API
+	 * 
+	 * This function is called when the data is serialized to JSON
+	 * 
+	 * @see MultiSelect for an advaced example
+	 * @param mixed $value The value for this field
+	 * @param array $values All the values of the custom fields to be returned to the API
+	 * @return mixed
+	 */
+	public function dbToApi($value, &$values) {
 		return $value;
 	}
 	
+	/**
+	 * Called after the data is saved to API.
+	 * 
+	 * @see MultiSelect for an advaced example
+	 * @param mixed $value The value for this field
+	 * @param array $values The values inserted in the database
+	 * @return boolean
+	 */
+	public function afterSave($value, &$values) {
+		
+		return true;
+	}
+	
+	/**
+	 * Called before the data is saved to API.
+	 * 
+	 * @see MultiSelect for an advaced example
+	 * @param mixed $value The value for this field
+	 * @param array $values The values inserted in the database
+	 * @return boolean
+	 */
+	public function beforeSave($value, &$values) {
+		
+		return true;
+	}
+	
+	/**
+	 * Get the name of this data type
+	 * 
+	 * @return string
+	 */
 	public static function getName() {
 		$cls = static::class;
 		return substr($cls, strrpos($cls, '\\') + 1);

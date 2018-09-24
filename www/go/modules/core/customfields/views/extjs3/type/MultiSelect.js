@@ -1,10 +1,10 @@
 Ext.ns("go.modules.core.customfields.type");
 
-go.modules.core.customfields.type.Select = Ext.extend(go.modules.core.customfields.type.Text, {
+go.modules.core.customfields.type.MultiSelect = Ext.extend(go.modules.core.customfields.type.Text, {
 	
-	name : "Select",
+	name : "MultiSelect",
 	
-	label: t("Select"),
+	label: t("Multi Select"),
 	
 	iconCls: "ic-list",	
 	
@@ -14,7 +14,7 @@ go.modules.core.customfields.type.Select = Ext.extend(go.modules.core.customfiel
 	 * @returns {go.modules.core.customfields.FieldDialog}
 	 */
 	getDialog : function() {
-		return new go.modules.core.customfields.type.SelectDialog();
+		return new go.modules.core.customfields.type.MultiSelectDialog();
 	},
 	
 	/**
@@ -25,13 +25,23 @@ go.modules.core.customfields.type.Select = Ext.extend(go.modules.core.customfiel
 	 * @param {object} customfield Field entity from custom fields
 	 * @returns {unresolved}
 	 */
-	renderDetailView: function (value, data, customfield) {
+	renderDetailView: function (values, data, customfield) {
+		if(!values) {
+			return "";
+		}
 		
-		var opt = customfield.dataType.options.find(function(o) {
-			return o.id == value;
-		});
+		var options = []
+		values.forEach(function(value){
+			var opt = customfield.dataType.options.find(function(o) {
+				return o.id == value;
+			});
+			
+			if(opt) {
+				options.push(opt.text);
+			}
+		})
 		
-		return opt ? opt.text : null;
+		return options.join(", ");
 	},
 	
 	/**
@@ -42,15 +52,23 @@ go.modules.core.customfields.type.Select = Ext.extend(go.modules.core.customfiel
 	 * @returns {Object}
 	 */
 	createFormFieldConfig: function (customfield, config) {
-		var c = go.modules.core.customfields.type.Select.superclass.createFormFieldConfig.call(this, customfield, config);
+		var c = go.modules.core.customfields.type.MultiSelect.superclass.createFormFieldConfig.call(this, customfield, config);
 
-		c.xtype = "treeselectfield";
-		c.customfield = customfield;
+		c.xtype = "chips";
+		c.valueField = 'id';
+		c.displayField = 'text';		
+		c.comboStore = new Ext.data.JsonStore({
+			data: customfield.dataType,
+			id: 'id',
+			root: "options",
+			fields:['id','text'],
+			remoteSort:true
+		});
 		return c;
 	},
 
 	getFieldType: function () {
-		return "int";
+		return "auto";
 	},
 	
 	/**
@@ -63,7 +81,7 @@ go.modules.core.customfields.type.Select = Ext.extend(go.modules.core.customfiel
 	 */
 	getFieldDefinition : function(field) {
 		
-		var c = go.modules.core.customfields.type.Select.superclass.getFieldDefinition.call(this, field);
+		var c = go.modules.core.customfields.type.MultiSelect.superclass.getFieldDefinition.call(this, field);
 		
 		c.convert = function(v, record) {
 			return this.customFieldType.renderDetailView(v, record.data, this.customField);
@@ -75,4 +93,4 @@ go.modules.core.customfields.type.Select = Ext.extend(go.modules.core.customfiel
 	
 });
 
-go.modules.core.customfields.CustomFields.registerType(new go.modules.core.customfields.type.Select());
+go.modules.core.customfields.CustomFields.registerType(new go.modules.core.customfields.type.MultiSelect());

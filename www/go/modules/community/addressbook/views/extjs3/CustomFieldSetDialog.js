@@ -36,10 +36,9 @@ go.modules.community.addressbook.CustomFieldSetDialog = Ext.extend(go.modules.co
 				anchor: '100%',
 				disabled: true,
 				xtype: "chips",
-				submit: false,
 				entityStore: go.Stores.get("AddressBook"),
 				displayField: "name",
-				name: "addressBooks",
+				name: "filter.addressBookId",
 				fieldLabel: t("Address books")
 			}
 		]);
@@ -80,7 +79,7 @@ go.modules.community.addressbook.CustomFieldSetDialog = Ext.extend(go.modules.co
 			delete this.formPanel.values.filter.addressBooks;
 		} else
 		{
-			this.formPanel.values.filter.addressBookId = this.formPanel.getForm().findField("addressBooks").getValue().column("id");
+			//this.formPanel.values.filter.addressBookId = this.formPanel.getForm().findField("addressBooks").getValue().column("id");
 		}
 
 		return go.modules.community.addressbook.CustomFieldSetDialog.superclass.onBeforeSubmit.call(this);
@@ -91,9 +90,9 @@ go.modules.community.addressbook.CustomFieldSetDialog = Ext.extend(go.modules.co
 
 		this.formPanel.getForm().findField("enableAddressBookFilter").setValue(!!this.formPanel.entity.filter.addressBookId);
 
-		go.Stores.get("AddressBook").get(this.formPanel.entity.filter.addressBookId, function (addressBooks) {
-			this.formPanel.getForm().findField("addressBooks").setValue(addressBooks);
-		}, this);
+		//go.Stores.get("AddressBook").get(this.formPanel.entity.filter.addressBookId, function (addressBooks) {
+			//this.formPanel.getForm().findField("addressBooks").setValue(this.formPanel.entity.filter.addressBookId);
+		//}, this);
 
 		switch (this.formPanel.entity.filter.isOrganization) {
 			case true:
