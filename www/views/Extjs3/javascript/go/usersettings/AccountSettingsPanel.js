@@ -66,7 +66,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 						allowBlank:false
 					}),
 					this.emailField = new Ext.form.TextField({
-						fieldLabel: t('Email'),
+						fieldLabel: t('E-mail'),
 						name: 'email',
 						vtype:'emailAddress',
 						needPasswordForChange: true,

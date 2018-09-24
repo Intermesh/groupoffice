@@ -158,8 +158,8 @@ class Language extends Controller {
 		if (!$headers) {
 			throw new \Exception("Could not read CSV");
 		}
-		if (count($headers) != 5) {
-			throw new \Exception("Invalid CSV file (Header count != 5)");
+		if (count($headers) < 5) {
+			throw new \Exception("Invalid CSV file (Header count != 5): First record: ".var_export($headers, true));
 		}
 
 		$lang = $headers[3];

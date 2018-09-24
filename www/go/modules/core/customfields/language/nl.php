@@ -54,4 +54,8 @@ return array (
   'Only from these addressbooks (IDs)' => 'Alleen uit deze adresboeken (IDs)',
   'Prefix' => 'Voorvoegsel',
   'Suffix' => 'Achtervoegsel',
+  'Custom field' => 'Extra veld',
+  'Custom field\'s data type' => 'Data type van het extra veld',
+  'Custom field used in' => 'Extra veld wordt gebruikt in',
+  'Multiselect' => 'Multiselect',
 );
