@@ -121,10 +121,25 @@ class Language {
 				$langData = array_merge($langData, $this->loadFile($file));
 			}
 			
-		
+			$productName = GO()->getConfig()['branding']['name'];
 
 			foreach ($langData as $key => $translation) {
-					$langData[$key] = str_replace('{product_name}', \GO::config()->product_name, $translation);
+			
+					//branding
+					$langData[$key]  = str_replace(
+									[
+											"{product_name}",
+											"GroupOffice",
+											"Group-Office",
+											"Group Office"
+									], 
+									[
+											$productName,
+											$productName,
+											$productName,
+											$productName
+									
+									], $langData[$key]);
 			}
 
 			$this->data[$package][$module] = $langData;			

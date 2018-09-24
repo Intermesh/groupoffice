@@ -8,6 +8,8 @@ go.Modules.register("core", 'users', {
 		"go.modules.core.users.SystemSettingsUserGrid"
 	],
 	userSettingsPanels: [
+		"go.modules.core.users.AccountSettingsPanel",
+		"go.modules.core.users.LookAndFeelPanel",
 		"go.modules.core.users.UserGroupGrid"
 	]
 });

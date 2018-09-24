@@ -45,10 +45,30 @@ GO.util.stringToFunction = function(str) {
   return  fn;
 };
 
+/**
+ * Translate a string
+ * 
+ * Module and package can be omitted in most cases. It will auto detect these.
+ * 
+ * go.module and go.package are set at:
+ * 
+ * 1. Before each module scripts are loaded
+ * 2. An override on Ext.extend() will set "module" and "package" on each 
+ *    components. A second override on Ext.Component will set 
+ *    go.Translate.module and package on getId() (getId() was the only way to 
+ *    make it happen always and on time)
+ * 
+ * @param {string} str
+ * @param {string} module
+ * @param {string} package
+ * @returns {t.l|GO..lang}
+ */
 function t(str, module, package) {
-
+		
 	if(!module) {
-		module = go.Translate.module;
+		module = go.Translate.module;		
+	}
+	if(!package) {
 		package = go.Translate.package;
 	}
 	
@@ -67,7 +87,7 @@ function t(str, module, package) {
     return l[str]
   }
   
-  if(module != "core" && package != "core"){
+  if(module != "core" || package != "core"){
     return t(str, "core", "core");
   } else
   {

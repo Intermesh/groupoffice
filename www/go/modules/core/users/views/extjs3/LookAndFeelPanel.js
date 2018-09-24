@@ -10,7 +10,7 @@
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
-go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
+go.modules.core.users.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 
 	initComponent: function () {
 		
@@ -35,7 +35,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 			},
 			items:[
 				this.themeCombo = new Ext.form.ComboBox({
-					fieldLabel: t("Theme", "users"),
+					fieldLabel: t("Theme"),
 					name: 'theme',
 					store: new GO.data.JsonStore({
 						url: GO.url('core/themes'),
@@ -54,7 +54,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 					value: GO.settings.config.theme
 				}),
 				this.startModuleField = new GO.form.ComboBox({
-					fieldLabel: t("Start in module", "users"),
+					fieldLabel: t("Start in module"),
 					name: 'start_module_name',
 					hiddenName: 'start_module',
 					store: moduleStore,
@@ -68,7 +68,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 					value: GO.settings.start_module
 				}),{
 					xtype:'combo',
-					fieldLabel: t("Maximum number of rows in lists", "users"),
+					fieldLabel: t("Maximum number of rows in lists"),
 					store: new Ext.data.SimpleStore({
 						fields: ['value'],
 						data : [
@@ -91,12 +91,12 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 					value: 20
 				},{
 					xtype:'combo',
-					fieldLabel: t("Sort names by", "users"),
+					fieldLabel: t("Sort names by"),
 					store: new Ext.data.SimpleStore({
 						fields: ['value', 'text'],
 						data : [
-						['first_name',t("First name", "users")],
-						['last_name',t("Last name", "users")]
+						['first_name',t("First name")],
+						['last_name',t("Last name")]
 						]
 					}),
 					displayField:'text',
@@ -111,12 +111,12 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				},{
 					xtype:'xcheckbox',
 					hideLabel: true,
-					boxLabel: t("Show smilies", "users"),
+					boxLabel: t("Show smilies"),
 					name: 'show_smilies'
 				},{
 					xtype:'xcheckbox',
 					hideLabel: true,
-					boxLabel: t("Capital after punctuation", "users"),
+					boxLabel: t("Capital after punctuation"),
 					name: 'auto_punctuation'
 				}
 			]
@@ -165,12 +165,12 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 					store: new Ext.data.SimpleStore({
 						fields: ['id', 'dateformat'],
 						data : [
-						['d-m-Y', t("Day-Month-Year", "users")],
-						['m/d/Y', t("Month/Day/Year", "users")],
-						['d/m/Y', t("Day/Month/Year", "users")],
-						['d.m.Y', t("Day.Month.Year", "users")],
-						['Y-m-d', t("Year-Month-Day", "users")],
-						['Y.m.d', t("Year.Month.Day", "users")]
+						['d-m-Y', t("Day-Month-Year")],
+						['m/d/Y', t("Month/Day/Year")],
+						['d/m/Y', t("Day/Month/Year")],
+						['d.m.Y', t("Day.Month.Year")],
+						['Y-m-d', t("Year-Month-Day")],
+						['Y.m.d', t("Year.Month.Day")]
 						]
 					}),
 					displayField: 'dateformat',
@@ -251,25 +251,25 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 			items:[
 				{
 						xtype: 'textfield', 
-						fieldLabel: t("List separator", "users"), 
+						fieldLabel: t("List separator"), 
 						name: 'listSeparator'
 					},{
 						xtype: 'textfield', 
-						fieldLabel: t("Text separator", "users"), 
+						fieldLabel: t("Text separator"), 
 						name: 'textSeparator'
 					},{
 						xtype: 'textfield', 
-						fieldLabel: t("Thousand Seperator", "users"), 
+						fieldLabel: t("Thousand Seperator"), 
 						name: 'thousandsSeparator'
 					},
 					{
 						xtype: 'textfield', 
-						fieldLabel: t("Decimal Seperator", "users"), 
+						fieldLabel: t("Decimal Seperator"), 
 						name: 'decimalSeparator'
 					},
 					{
 						xtype: 'textfield', 
-						fieldLabel: t("Currency", "users"), 
+						fieldLabel: t("Currency"), 
 						name: 'currency'
 					}
 			]
@@ -282,7 +282,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				
 				this.cbMuteAll = new Ext.ux.form.XCheckbox({
 					hideLabel: true,
-					boxLabel: t("Mute all sounds", "users"),
+					boxLabel: t("Mute all sounds"),
 					name: 'mute_sound',
 					listeners:{
 						check: function(cb, val){
@@ -299,13 +299,13 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				
 				this.cbMuteReminderSound = new Ext.ux.form.XCheckbox({
 					hideLabel:true,
-					boxLabel: t("Mute reminder sounds", "users"),
+					boxLabel: t("Mute reminder sounds"),
 					name: 'mute_reminder_sound'
 				}),
 
 				this.cbMuteNewMailSound = new Ext.ux.form.XCheckbox({
 					hideLabel: true,
-					boxLabel: t("Mute new mail sounds", "users"),
+					boxLabel: t("Mute new mail sounds"),
 					name: 'mute_new_mail_sound'
 				})
 			]
@@ -317,13 +317,13 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 			items:[
 				this.cbPopupReminders = new Ext.ux.form.XCheckbox({
 					hideLabel: true,
-					boxLabel: t("Show a popup window when a reminder becomes active", "users"),
+					boxLabel: t("Show a popup window when a reminder becomes active"),
 					name: 'popup_reminders',
 					listeners: {
 						check: function(cb,checked) {
 							if(checked) {
 								var options = {
-									body: t("Desktop notifications active", "users"),
+									body: t("Desktop notifications active"),
 									icon: 'views/Extjs3/themes/Group-Office/images/groupoffice.ico'
 								}
 								// Let's check if the browser supports notifications
@@ -333,7 +333,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 									Notification.requestPermission(function (permission) {
 									// If the user accepts, let's create a notification
 									if (permission === "granted") {
-										 var notification = new Notification(t("Desktop notifications active", "users"),options);
+										 var notification = new Notification(t("Desktop notifications active"),options);
 									} else {
 										cb.setValue(false);
 									}
@@ -345,13 +345,13 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				}),
 				this.cbPopupEmailNotifications = new Ext.ux.form.XCheckbox({
 					hideLabel: true,
-					boxLabel: t("Show a popup window when an e-mail arrives", "users"),
+					boxLabel: t("Show a popup window when an e-mail arrives"),
 					name: 'popup_emails',
 					listeners: {
 						check: function (cb, checked) {
 							if (checked) {
 								var options = {
-									body: t("Desktop notifications active", "users"),
+									body: t("Desktop notifications active"),
 									icon: 'views/Extjs3/themes/Group-Office/images/groupoffice.ico'
 								}
 								// Let's check if the browser supports notifications
@@ -361,7 +361,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 									Notification.requestPermission(function (permission) {
 										// If the user accepts, let's create a notification
 										if (permission === "granted") {
-											var notification = new Notification(t("Desktop notifications active", "users"), options);
+											var notification = new Notification(t("Desktop notifications active"), options);
 										} else {
 											cb.setValue(false);
 										}
@@ -373,7 +373,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				}),
 				this.cbEmailReminders = new Ext.ux.form.XCheckbox({
 					hideLabel: true,
-					boxLabel: t("Mail reminders", "users"),
+					boxLabel: t("Mail reminders"),
 					name: 'mail_reminders'
 				})
 				
@@ -396,7 +396,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 			]
 		});
 		
-		go.usersettings.LookAndFeelPanel.superclass.initComponent.call(this);
+		go.modules.core.users.LookAndFeelPanel.superclass.initComponent.call(this);
 	},
 	
 	onLoadComplete : function(data){

@@ -120,12 +120,6 @@ class Extjs3 {
 
 			$str .= 'GO.lang = ' . json_encode($l) . ";\n";
 			
-			//branding
-			$str = str_replace("{product_name}", GO()->getConfig()['branding']['name'], $str);
-			$str = str_replace("GroupOffice", GO()->getConfig()['branding']['name'], $str);
-			$str = str_replace("Group Office", GO()->getConfig()['branding']['name'], $str);
-			$str = str_replace("Group-Office", GO()->getConfig()['branding']['name'], $str);
-
 			$cacheFile->putContents($str);
 		}
 		

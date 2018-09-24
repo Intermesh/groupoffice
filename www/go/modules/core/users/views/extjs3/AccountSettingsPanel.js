@@ -10,7 +10,7 @@
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
-go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
+go.modules.core.users.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 
 	title:t('Account'),
 	iconCls: 'ic-account-circle',
@@ -128,7 +128,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 			].concat(go.CustomFields.getFormFieldSets("User"))
 		});
 		
-		go.usersettings.AccountSettingsPanel.superclass.initComponent.call(this);
+		go.modules.core.users.AccountSettingsPanel.superclass.initComponent.call(this);
 	},
 	
 	onLoadComplete : function(data){

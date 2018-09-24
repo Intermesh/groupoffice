@@ -91,9 +91,6 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			'submitComplete' : true
 		});
 		
-		this.addPanel(go.usersettings.AccountSettingsPanel);
-		this.addPanel(go.usersettings.LookAndFeelPanel);
-		
 		this.loadModulePanels();
 		
 		go.usersettings.UserSettingsDialog.superclass.initComponent.call(this);

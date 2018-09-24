@@ -5,3 +5,6 @@ CreateUserAccountPanel.js
 CreateUserPasswordPanel.js
 CreateUserWizard.js
 UserGroupGrid.js
+AccountSettingsPanel.js
+LookAndFeelPanel.js
+

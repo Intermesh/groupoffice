@@ -88,8 +88,7 @@ Wachtwoord: {password}',
   'Download sample CSV' => 'Download voorbeeld CSV',
   'You can import users using a CSV file. To know how the CSV file should be formatted, download the sample file.<br />The first line must contain the column names. The following fields are required for each user:<br /><br />username, password, first_name, last_name, email' => 'U kunt gebruikers importeren met een CSV bestand. Om te zien hoe dit bestand eruit moet zien kunt u het voorbeeldbestand downloaden.<br />De eerste regel moet de kollomnamen bevatten en de volgende velden zijn vereist voor elke gebruiker:<br /><br />username, password, first_name, last_name, email',
   'Number format' => 'Nummerformaat',
-  'List separator' => 'Lijstscheidingsteken',
-  'Text separator' => 'Tekstschedingsteken',
+  
   'WARNING!!! All of the user data including addressbooks, projects, calendars etc. will be deleted!' => 'WAARSCHUWING!!! Alle gegevens van de gebruiker inclusief adresboeken, agenda\'s en projecten worden verwijderd!',
   'Last name' => 'Achternaam',
   'First name' => 'Voornaam',
@@ -135,7 +134,5 @@ Wachtwoord: {password}',
   'Date format' => 'Datum formaat',
   'Formatting' => 'Opmaak',
   'Users will automatically be added to these groups' => 'Gebruikers worden automatisch aan deze groepen toegevoegd',
-  'Display name' => 'Weergave naam',
-  'The recovery e-mail is used to send a forgotten password request to.' => 'Het herstel e-mail adres wordt gebruikt om een vergeten wachtwoord toe te zenden.',
-  'Please use an email address that you can access from outside Group-Office.' => 'Gebruik aub. een e-mail adres dat u zonder Group-Office kunt gebruiken.',
+  'Display name' => 'Weergave naam'
 );
