@@ -314,7 +314,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 //		$newParticipantIds = !empty(\GO::session()->values['new_participant_ids']) ? \GO::session()->values['new_participant_ids'] : array();
 //		$oldParticipantsIds = array_diff($allParticipantIds,$newParticipantIds);
 //		if (!empty($newParticipantIds) && !empty($oldParticipantsIds))
-		if ($this->newParticipants && count($allParticipantIds) > 1) {
+		if ($this->newParticipants && count($allParticipantIds) > 1 && !$isNewEvent) {
 			$response['askForMeetingRequestForNewParticipants'] = true;
 		}
 		

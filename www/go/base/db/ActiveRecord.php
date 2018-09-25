@@ -3656,8 +3656,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 //		}
 //		return false;
 	}
-
-
+	
+	
 	/**
 	 * Cut all attributes to their maximum lengths. Useful when importing stuff.
 	 */
@@ -4487,7 +4487,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			$to_model_id = $model->id;
 			$to_model_type_id = $model->getType()->getId();
 		}
-
+		
 		if(!$to_model_id)
 			return false;
 
