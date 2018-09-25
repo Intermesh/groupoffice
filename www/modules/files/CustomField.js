@@ -6,7 +6,7 @@ Ext.onReady(function() {
 			return {
 				xtype: 'selectfile',
        	fieldLabel: customfield.name,
-        name:customfield.dataname,
+        name: 'customFields.' + customfield.databaseName,
         anchor:'-20'
 			}
 		}
