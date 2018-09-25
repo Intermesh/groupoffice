@@ -1,3 +1,5 @@
+25-09-2018 6.3.39
+- Core: merged 6.2.105
 - Files: File custom field didn't load and save
 - Core: Translations can be exported and imported as CSV file
 - Core: Cron jobs don't deactivate on error anymore
