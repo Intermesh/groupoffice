@@ -25,7 +25,7 @@ go.modules.core.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	 * @param {object} customfield Field entity from custom fields
 	 * @returns {unresolved}
 	 */
-	renderDetailView: function (value, data, customfield) {
+	renderDetailView: function (value, data, customfield, detailComponent) {
 		return value;
 	},
 	
@@ -86,6 +86,14 @@ go.modules.core.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 		var field = this.createFormFieldConfig(customfield, config);
 		return this.applySuffix(customfield, field);
 	},
+	
+	getDetailField: function(customfield, config) {
+		return new go.detail.Property({
+			itemId: customfield.databaseName,
+			label: customfield.name,
+			icon: this.iconCls
+		});
+	}, 
 	
 	applySuffix: function (customfield, field) {
 		if (!GO.util.empty(customfield.suffix)) {

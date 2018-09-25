@@ -207,35 +207,51 @@
 		 */
 		getDetailPanels: function (entity) {
 			
-			var fieldSets = this.getFieldSets(entity), panels = [];
+			var fieldSets = this.getFieldSets(entity), panels = [], me = this;
 
 			fieldSets.forEach(function (fieldSet) {
-				var tpl = '<tpl for="customFields"><div class="icons">';
-
+				
+				var items = [];
+				
+				
 				go.modules.core.customfields.CustomFields.getFields(fieldSet.id).forEach(function (field) {
-					tpl += '<tpl if="!GO.util.empty(go.modules.core.customfields.CustomFields.renderField(\'' + field.id + '\',values))"><p><i class="icon label ' + go.modules.core.customfields.CustomFields.getFieldIcon(field.id) + '"></i>\
-				<span>{[go.modules.core.customfields.CustomFields.renderField("' + field.id + '",values)]}</span>\
-					<label>' + t(field.name) + '</label>\
-					</p></tpl>';
+					
+					var cmp = me.getType(field.type).getDetailField(field);					
+					items.push(cmp);
+					
+//					tpl += '<tpl if="!GO.util.empty(go.modules.core.customfields.CustomFields.renderField(\'' + field.id + '\',values))"><p><i class="icon label ' + go.modules.core.customfields.CustomFields.getFieldIcon(field.id) + '"></i>\
+//				<span>{[go.modules.core.customfields.CustomFields.renderField("' + field.id + '",values)]}</span>\
+//					<label>' + t(field.name) + '</label>\
+//					</p></tpl>';
 				});
 
-				tpl += '</div></tpl>';
+//				tpl += '</div></tpl>';
 
-				panels.push({						
+				panels.push({				
+					xtype: "panel",
 					id: "cf-detail-field-set-" + fieldSet.id,
 					fieldSetId: fieldSet.id,
 					title: fieldSet.name,
-					tpl: tpl,
+					bodyCssClass: 'icons',
+					items: items,
 					collapsible: true,
 					onLoad: function(dv) {
-						var vis = false;							
+						var vis = false, panel = this;							
 						go.modules.core.customfields.CustomFields.getFields(fieldSet.id).forEach(function (field) {
 							if(!GO.util.empty(dv.data.customFields[field.databaseName])) {
 								vis = true;
 							}
+							
+							var cmp = panel.getComponent(field.databaseName), type = me.getType(field.type);
+							
+							if(cmp) {
+								var v = type.renderDetailView(dv.data.customFields[field.databaseName], dv.data.customFields, field, cmp);
+								cmp.setValue(v);
+								cmp.setVisible(!!v);
+							}
 						});
 
-						this.setVisible(vis);
+						this.setVisible(vis);				
 					}
 				});
 			});			

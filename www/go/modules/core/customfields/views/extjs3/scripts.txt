@@ -39,3 +39,7 @@ type/Checkbox.js
 
 type/YesNoDialog.js
 type/YesNo.js
+
+
+type/UserDialog.js
+type/User.js

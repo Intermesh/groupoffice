@@ -26,9 +26,6 @@ class User extends Base {
 				throw new \Exception("Couldn't add contraint");
 			}
 		}			
-		
-		$this->saveOptions();	
-
 		return true;
 	}
 }
