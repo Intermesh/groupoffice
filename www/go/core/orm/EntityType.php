@@ -222,6 +222,22 @@ class EntityType {
 		
 		return $e;
 	}
+	
+	/**
+	 * Convert array of entity names to ids
+	 * 
+	 * @param string $names eg ['Contact', 'Note']
+	 * @return int[] eg. [1,2]
+	 */
+	public static function namesToIds($names) {
+		return array_map(function($name) {
+			$e = static::findByName($name);
+			if(!$e) {
+				throw new \Exception("Entity '$name'  not found");
+			}
+			return $e->getId();
+		}, $names);	
+	}
 		
 	/**
 	 * Register a change of an entity. When the application ends these changes will be saved in the "core_change" log table.
