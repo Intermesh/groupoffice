@@ -1,3 +1,6 @@
+25-09-2018 6.2.105
+- Billing: Fixed search query to work with amounts and numbers in regular fields
+
 18-09-2018 6.2.104
 - Core: Events added to support custom modules
 
