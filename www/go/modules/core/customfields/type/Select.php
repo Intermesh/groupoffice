@@ -1,6 +1,6 @@
 <?php
 
-namespace go\modules\core\customfields\datatype;
+namespace go\modules\core\customfields\type;
 
 use Exception;
 use GO;
@@ -45,7 +45,7 @@ class Select extends Base {
 		}		
 
 		if ($this->field->isNew()) {
-			$sql = "ALTER TABLE `" . $this->field->tableName() . "` ADD CONSTRAINT `" . $this->field->tableName() . "_ibfk_" . $this->field->id . "` FOREIGN KEY (" . Utils::quoteColumnName($this->field->databaseName) . ") REFERENCES `core_customfields_select_option`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";			
+			$sql = "ALTER TABLE `" . $this->field->tableName() . "` ADD CONSTRAINT `" . $this->getConstraintName() . "` FOREIGN KEY (" . Utils::quoteColumnName($this->field->databaseName) . ") REFERENCES `core_customfields_select_option`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";			
 			if(!GO()->getDbConnection()->query($sql)) {
 				throw new \Exception("Couldn't add contraint");
 			}
@@ -54,6 +54,10 @@ class Select extends Base {
 		$this->saveOptions();	
 
 		return true;
+	}
+	
+	private function getConstraintName() {
+		return $this->field->tableName() . "_ibfk_" . $this->field->id;
 	}
 	
 	protected function saveOptions() {
@@ -99,7 +103,7 @@ class Select extends Base {
 	}
 	
 	public function onFieldDelete() {		
-		$sql = "ALTER TABLE `" . $this->field->tableName() . "` DROP FOREIGN KEY " . $this->field->tableName() . "_ibfk_" . $this->field->id;			
+		$sql = "ALTER TABLE `" . $this->field->tableName() . "` DROP FOREIGN KEY " . $this->getConstraintName();
 		if(!GO()->getDbConnection()->query($sql)) {
 			throw new \Exception("Couldn't drop foreign key");
 		}

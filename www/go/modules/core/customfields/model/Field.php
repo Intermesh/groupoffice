@@ -10,7 +10,7 @@ use go\core\db\Table;
 use go\core\db\Utils;
 use go\core\ErrorHandler;
 use go\core\orm\EntityType;
-use go\modules\core\customfields\datatype\Base;
+use go\modules\core\customfields\type\Base;
 use go\modules\core\customfields\model\FieldSet;
 use function GuzzleHttp\json_decode;
 use function GuzzleHttp\json_encode;

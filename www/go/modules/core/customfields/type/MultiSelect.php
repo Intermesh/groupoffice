@@ -1,6 +1,6 @@
 <?php
 
-namespace go\modules\core\customfields\datatype;
+namespace go\modules\core\customfields\type;
 
 use Exception;
 use GO;
@@ -12,9 +12,6 @@ class MultiSelect extends Select {
 	private $optionsToSave;
 
 	public function onFieldSave() {
-		if (!parent::onFieldSave()) {
-			return false;
-		}
 
 		if ($this->field->isNew()) {
 			$this->createMultiSelectTable();
