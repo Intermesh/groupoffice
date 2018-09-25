@@ -6,7 +6,7 @@ class JSON extends AbstractConverter {
 		return json_decode($data, true);
 	}
 
-	public function to($properties) {
+	public function to(array $properties) {
 		return json_encode($properties, JSON_PRETTY_PRINT);
 	}
 
