@@ -1,3 +1,8 @@
+- Files: File custom field didn't load and save
+- Core: Translations can be exported and imported as CSV file
+- Core: Cron jobs don't deactivate on error anymore
+- Billing: Fixed search query to work with amounts and numbers in regular fields
+
 18-09-2018 6.3.38
 - Core: Links didn't show when you didn't have access to one of them.
 - Projects: Fixed double icon in tree
