@@ -26,7 +26,7 @@ class Node extends model\AclEntity {
 		'/^\.dat(.*)$/',   // Smultron seems to create these
 		'/^~lock.(.*)#$/', // Windows 7 lockfiles
    ];
-	
+	public $id;
 	public $name;
 	protected $blobId;
 	/**
@@ -171,11 +171,13 @@ class Node extends model\AclEntity {
 		if($this->isDirectory && !empty($this->copyFromId)) {
 			$children = Node::find()->where(['parentId' =>$this->copyFromId]);
 			foreach($children as $child) { /* @var $child Node */
-				$node = $child->copy();
-				$node->parentId = $this->id;
-				$node->copyFromId = $child->id; // recursive
+				$node = new Node();
+				$node->setParentId($this->id);
+				$node->copyFromId = $child->id;
+				$node->name = $child->name;
+				$node->isDirectory = $child->isDirectory;
+				$node->blobId = $child->blobId;
 				$success = $success && $node->save();
-				var_dump($node->getValidationErrors());
 			}
 		}
 		return $success;

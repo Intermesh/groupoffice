@@ -1,7 +1,7 @@
 go.modules.community.files.OpenWithDialog = Ext.extend(go.form.Dialog, {
 	stateId: 'files-openWithDialog',
 	title: t("Open with"),
-	entityStore: go.Stores.get("Blob"),
+	entityStore: go.Stores.get("Node"),
 	width: 450,
 	height: 150,
 	
