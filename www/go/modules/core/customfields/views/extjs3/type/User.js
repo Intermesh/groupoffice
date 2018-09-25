@@ -23,6 +23,7 @@ go.modules.core.customfields.type.User = Ext.extend(go.modules.core.customfields
 	 * @param {mixed} value
 	 * @param {object} data Complete entity
 	 * @param {object} customfield Field entity from custom fields
+	 * @param {go.detail.Property} cmp The property component that renders the value
 	 * @returns {unresolved}
 	 */
 	renderDetailView: function (value, data, customfield, cmp) {		

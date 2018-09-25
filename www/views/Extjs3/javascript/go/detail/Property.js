@@ -3,6 +3,8 @@
  * 
  * Used in groupoffice/www/go/modules/core/customfields/views/extjs3/CustomFields.js
  * 
+ * Panel / Container must use bodyCssClass= icons.
+ * 
  */
 go.detail.Property = Ext.extend(Ext.Container, {
 	autoEl: "p",

@@ -23,6 +23,7 @@ go.modules.core.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	 * @param {mixed} value
 	 * @param {object} data Complete entity
 	 * @param {object} customfield Field entity from custom fields
+	 * @param {go.detail.Property} detailComponent The property component that renders the value
 	 * @returns {unresolved}
 	 */
 	renderDetailView: function (value, data, customfield, detailComponent) {
