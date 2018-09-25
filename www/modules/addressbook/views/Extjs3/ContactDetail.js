@@ -5,6 +5,8 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 	stateId: 'ab-contact-detail',
 	id: 'ab-contact-detail',
 	loadUrl: ('addressbook/contact/display'),
+	collapsibleSections: {},
+	hiddenSections : [],
 	initComponent: function () {
 
 		this.tbar = this.initToolbar();
@@ -165,7 +167,27 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 
 		GO.addressbook.ContactDetail.superclass.initComponent.call(this, arguments);
 		
-		go.CustomFields.addDetailPanels(this);
+		if(GO.customfields){
+			this.add({
+				onLoad: function (dv) {
+					dv.data.panelId = dv.id;
+				},
+				tpl: new Ext.XTemplate(GO.customfields.displayPanelTemplate+GO.customfields.displayPanelBlocksTemplate,
+				{
+					collapsibleSectionHeader: function(title, id, dataKey,extraClassName){
+						this.panel.collapsibleSections[id]=dataKey;
+
+						var extraclassname = '';
+
+						if(typeof(extraClassName)!='undefined')
+							extraclassname = extraClassName;
+
+						return '<div class="collapsible-display-panel-header '+extraclassname+'"><div style="float:left">'+title+'</div><div class="x-tool x-tool-toggle" style="float:right;margin:0px;padding:0px;cursor:pointer" id="toggle-'+id+'">&nbsp;</div></div>';
+					},
+					panel: this
+				})
+			});
+		}
 
 		this.add(new go.links.LinksDetailPanel());
 
@@ -176,6 +198,61 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 		if (go.Modules.isAvailable("legacy", "files")) {
 			this.add(new go.modules.files.FilesDetailPanel());
 		}
+	},
+	
+	onBodyClick :  function(e, target){
+
+		if(target.id.substring(0,6)=='toggle'){
+			var toggleId = target.id.substring(7,target.id.length);
+
+			this.toggleSection(toggleId);
+		}
+	},
+	
+	toggleSection : function(toggleId, collapse){
+
+		var el = Ext.get(toggleId);
+		var toggleBtn = Ext.get('toggle-'+toggleId);
+
+		if(!toggleBtn)
+			return false;
+		
+		var saveState=false;
+		if(typeof(collapse)=='undefined'){
+			collapse = !toggleBtn.hasClass('go-tool-toggle-collapsed');// toggleBtn.dom.innerHTML=='-';
+			saveState=true;
+		}
+
+		
+		if(collapse){
+			//data not loaded yet			
+
+			if(this.hiddenSections.indexOf(this.collapsibleSections[toggleId])==-1)
+				this.hiddenSections.push(this.collapsibleSections[toggleId]);
+		}else
+		{
+			var index = this.hiddenSections.indexOf(this.collapsibleSections[toggleId]);
+			if(index>-1)
+				this.hiddenSections.splice(index,1);
+		}
+
+		if(!el && !collapse){
+			this.reload();
+		}else
+		{
+			if(el)
+				el.setDisplayed(!collapse);
+
+			if(collapse){
+				toggleBtn.addClass('go-tool-toggle-collapsed');
+			}else
+			{
+				toggleBtn.removeClass('go-tool-toggle-collapsed');
+			}
+			//dom.innerHTML = collapse ? '+' : '-';
+		}
+		if(saveState)
+			this.saveState();
 	},
 
 	editHandler: function () {
@@ -192,19 +269,19 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 					this.body.print({title: this.data.name});
 				},
 				scope: this
-			}, {
+			}, this.mergeButton = new Ext.menu.Item({
 				iconCls: 'ic-merge-type',
 				text: t("Merge"),
 				disabled: true,
 				handler: function () {
 					if (!this.selectMergeLinksWindow) {
-						this.selectMergeLinksWindow = new GO.dialog.MergeWindow({displayPanel: this});
+						this.selectMergeLinksWindow = new GO.dialog.MergeWindow({displayPanel: this,entity: "Contact"});
 					}
 
 					this.selectMergeLinksWindow.show();
 				},
 				scope: this
-			}
+			})
 		];
 		
 		if(go.Modules.isAvailable("core", "users")){
@@ -289,6 +366,12 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 		
 		return new Ext.Toolbar(tbarCfg);
 	},
+	
+	afterRender: function() {
+		GO.addressbook.ContactDetail.superclass.afterRender.call(this);
+		this.body.on('click', this.onBodyClick, this);
+	},
+	
 	onLoad : function() {
 		
 		if(this.createUserButton){
@@ -300,6 +383,8 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 				this.createUserButton.setText(t("Edit user"));
 			}
 		}
+		
+		this.mergeButton.setDisabled(this.data.permissionLevel < GO.permissionLevels.write);
 		
 		GO.addressbook.ContactDetail.superclass.onLoad.call(this);
 	}

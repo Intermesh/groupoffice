@@ -73,8 +73,11 @@ class JsonView extends AbstractView{
 				foreach($r as $relationName=>$options){
 					if(isset($options['labelAttribute'])){
 						$label = call_user_func($options['labelAttribute'], $model);
-
-						$response['data'][$modelName]['relatedLabels'][$options['field']]=$label;
+						$field = $options['field'];
+						if($options['type'] === \GO\Base\Db\ActiveRecord::MANY_MANY) {
+							$field = $options['remoteField'];
+						}
+						$response['data'][$modelName]['relatedLabels'][$field]=$label;
 					}
 				}
 
@@ -200,8 +203,11 @@ class JsonView extends AbstractView{
 				foreach($r as $relationName=>$options){
 					if(isset($options['labelAttribute'])){
 						$label = call_user_func($options['labelAttribute'], $model);
-
-						$response['data'][$modelName]['relatedLabels'][$options['field']]=$label;
+						$field = $options['field'];
+						if($options['type'] === \GO\Base\Db\ActiveRecord::MANY_MANY) {
+							$field = $options['remoteField'];
+						}
+						$response['data'][$modelName]['relatedLabels'][$field]=$label;
 					}
 				}
 

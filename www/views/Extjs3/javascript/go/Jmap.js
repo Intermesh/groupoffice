@@ -74,7 +74,29 @@ go.Jmap = {
 	},
 	
 	upload : function(file, cfg) {
-		go.Blob.upload(file,cfg);
+		if(Ext.isEmpty(file))
+			return;
+
+		Ext.Ajax.request({url: go.User.uploadUrl,
+			success: function(response) {
+				if(cfg.success && response.responseText) {
+					data = Ext.decode(response.responseText);
+					cfg.success.call(cfg.scope || this,data);
+				}
+			},
+			failure: function(response) {
+				if(cfg.failure && response.responseText) {
+					data = Ext.decode(response.responseText);
+					cfg.failure.call(cfg.scope || this,data);
+				}
+			},
+			headers: {
+				'X-File-Name': file.name,
+				'Content-Type': file.type,
+				'X-File-LastModifed': Math.round(file['lastModified'] / 1000).toString()
+			},
+			xmlData: file // just "data" wasn't available in ext
+		});
 	},
 	
 	/**
@@ -86,10 +108,22 @@ go.Jmap = {
 	 */
 	sse : function() {
 		if (!window.EventSource) {
+			console.debug("Browser doesn't support EventSource");
 			return false;
 		}
 		
-		var source = new EventSource(go.User.eventSourceUrl), me = this;
+		if(!go.User.eventSourceUrl) {
+			console.debug("Not starting EventSource when xdebug is running");
+			return false;
+		}
+		
+		//filter out legacy modules
+		var entities = go.Entities.getAll().filter(function(e) {return e.package != "legacy";});
+		
+		var url = go.User.eventSourceUrl + '?types=' + 
+						entities.column("name").join(',');
+		
+		var source = new EventSource(url), me = this;
 		
 		source.addEventListener('state', function(e) {
 			for(var entity in JSON.parse(e.data)) {
@@ -126,7 +160,7 @@ go.Jmap = {
 	 * scope: callback function scope
 	 * dispatchAfterCallback: dispatch the response after the callback. Defaults to false.
 	 * 
-	 * @returns {String}
+	 * @returns {String} Client call ID.
 	 */
 	request: function (options) {
 		if(!options.method) {
@@ -179,7 +213,9 @@ go.Jmap = {
 							return true;
 						}
 						if (response[1][0] == "error") {
-							console.log('server-side JMAP failure', response);							
+							console.log('server-side JMAP failure', response);			
+							Ext.MessageBox.alert(t("Error"), response[1][1].message);					
+							
 						}
 
 						go.flux.Dispatcher.dispatch(response[0], response[1]);

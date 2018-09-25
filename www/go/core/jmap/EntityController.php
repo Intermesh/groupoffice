@@ -85,14 +85,17 @@ abstract class EntityController extends ReadOnlyEntityController {
 		foreach ($create as $clientId => $properties) {
 			
 			if(!$this->canCreate()) {
-				$result['notCreated'][$id] = new SetError("forbidden");
+				$result['notCreated'][$clientId] = new SetError("forbidden");
 				continue;
 			}
 			
 			$entity = $this->create($properties);
 
 			if (!$entity->hasValidationErrors()) {
-				$diff = $entity->diff($properties);
+				$entityProps = new \go\core\util\ArrayObject($entity->toArray());
+				$diff = $entityProps->diff($properties);
+				$diff['id'] = $entity->getId();
+				
 				$result['created'][$clientId] = empty($diff) ? null : $diff;
 			} else {				
 				$result['notCreated'][$clientId] = new SetError("invalidProperties");
@@ -153,8 +156,12 @@ abstract class EntityController extends ReadOnlyEntityController {
 				continue;
 			}
 			
+			//create snapshot of props client should be aware of
+			$clientProps = array_merge($entity->toArray(), $properties);
+			
 			//apply new values before canUpdate so this function can check for modified properties too.
 			$entity->setValues($properties);
+			
 			
 			if(!$this->canUpdate($entity)) {
 				$result['notUpdated'][$id] = new SetError("forbidden");
@@ -169,10 +176,14 @@ abstract class EntityController extends ReadOnlyEntityController {
 			}
 			
 			//The server must return all properties that were changed during a create or update operation for the JMAP spec
-			$diff = $entity->diff($properties);
-			$result['updated'][$entity->id] = empty($diff) ? null : $diff;
+			$entityProps = new \go\core\util\ArrayObject($entity->toArray());			
+			$diff = $entityProps->diff($clientProps);
+			
+			$result['updated'][$id] = empty($diff) ? null : $diff;
 		}
 	}
+	
+	
 	
 	protected function update(Entity $entity, array $properties) {		
 		$entity->save();		
@@ -199,7 +210,7 @@ abstract class EntityController extends ReadOnlyEntityController {
 			$success = $entity->delete();
 			
 			if ($success) {
-				$result['destroyed'][] = $entity->id; //todo map of properties changed during save
+				$result['destroyed'][] = $id;
 			} else {
 				$result['notDestroyed'][] = $entity->getValidationErrors();
 			}
@@ -308,7 +319,9 @@ abstract class EntityController extends ReadOnlyEntityController {
 						->limit($p['maxChanges'])
 						->orderBy(['modSeq' => 'ASC'])						
 						->groupBy(['entityId'])
+						->where(["entityTypeId" => $cls::getType()->getId()])
 						->andWhere('modSeq', '>', $entityState);
+		
 		Acl::applyToQuery($changes, "t.aclId");
 		
 		foreach ($changes as $change) {
@@ -322,16 +335,19 @@ abstract class EntityController extends ReadOnlyEntityController {
 		
 		//add AclItemEntity changes based on permissions		
 		if(!empty($changedAcls)) {
-			$query = $cls::find()->fetchMode(PDO::FETCH_ASSOC)->select('n.id, aclEntity.aclId')->where('aclEntity.aclId', 'in', $changedAcls);			
+			$query = $cls::find()->fetchMode(PDO::FETCH_ASSOC)->select('aclEntity.aclId')->select($cls::getPrimaryKey(true), true)->where('aclEntity.aclId', 'in', $changedAcls);			
 			$cls::joinAclEntity($query);
 			
 			//we don't need entities here. Just a list of id's.
 			foreach($query as $entity) {
-				if(in_array($entity['aclId'], $currentAclIds)) {
-					$result['changed'][] = $entity['id'];
+				$aclId = $entity['aclId'];
+				unset($entity['aclId']);
+				$id = implode("-", $entity);
+				if(in_array($aclId, $currentAclIds)) {
+					$result['changed'][] = $id;
 				} else
 				{
-					$result['removed'][] = $entity['id'];
+					$result['removed'][] = $id;
 				}
 			}			
 		}
@@ -346,6 +362,67 @@ abstract class EntityController extends ReadOnlyEntityController {
 		$result['hasMoreUpdates'] = $result['newState'] != $this->getState();
 
 		Response::get()->addResponse($result);
+	}
+	
+	
+	protected function paramsExport($params){
+		
+		if(!isset($params['convertor'])) {
+			throw new InvalidArguments("'convertor' parameter is required");
+		}
+		
+		return $this->paramsGet($params);
+	}
+	
+	
+	
+	public function export($params) {
+		
+		$params = $this->paramsExport($params);
+		
+		$cls = $this->entityClass();
+		$module = $cls::getType()->getModule();
+		
+		//check in module
+		$convertorCls = "go\\modules\\" . $module->package . "\\" . $module->name . "\\convert\\" . $params['convertor'];
+		if(!class_exists($convertorCls)) {
+			$convertorCls = "go\\core\\data\\convert\\" . $params['convertor'];
+			if(!class_exists($convertorCls)) {
+				throw new InvalidArguments("Convertor '" . $params['convertor'] .'" is not found');
+			}
+		}
+		
+		$convertor = new $convertorCls;
+		
+		$entities = $this->getGetQuery($params)->all();
+		
+		$tempFile = \go\core\fs\File::tempFile($convertor->getFileExtension());
+		$fp = $tempFile->open('w+');
+		
+		fputs($fp, $convertor->getStart());
+		foreach($entities as $entity) {
+			$properties = $entity->toArray();
+			
+			$str = $convertor->to($properties);
+			
+			fputs($fp, $str);
+			
+			if(next($entities)) {
+				fputs($fp, $convertor->getBetween());	
+			}
+		}
+
+		fputs($fp, $convertor->getEnd());		
+		
+		fclose($fp);
+		
+		$blob = \go\core\fs\Blob::fromTmp($tempFile);
+		if(!$blob->save()) {
+			throw new \Exception("Couldn't save blob: " . var_export($blob->getValidationErrors(), true));
+		}
+		
+		Response::get()->addResponse(['blobId' => $blob->id]);
+		
 	}
 
 }

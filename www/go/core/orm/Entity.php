@@ -15,6 +15,9 @@ use go\core\validate\ErrorCode;
 /**
  * Entity model
  * 
+ * Note: when changing database columns you need to run install/upgrade.php to 
+ * rebuild the cache.
+ * 
  * An entity is a model that is saved to the database. An entity can have 
  * multiple database tables. It can be extended with has one related tables and
  * it can also have properties in other tables.
@@ -62,6 +65,24 @@ abstract class Entity extends Property {
 		}
 		return static::internalFind($properties);
 	}
+	
+	/**
+	 * Get ID which is are the primary keys combined with a "-".
+	 * 
+	 * @return string eg. "1" or with multiple keys: "1-2"
+	 */
+	public function getId() {		
+		$keys = $this->primaryKeyValues();
+		return count($keys) > 1 ? implode("-", array_values($keys)) : array_values($keys)[0];
+	}
+	
+	
+	public function toArray($properties = array()) {
+		$arr = parent::toArray($properties);
+		$arr['id'] = $this->getId();
+		return $arr;
+	}
+
 
 	/**
 	 * Find by ID's. 
@@ -71,9 +92,12 @@ abstract class Entity extends Property {
 	 * @exanple
 	 * ```
 	 * $note = Note::findById(1);
+	 * 
+	 * //If a key has more than one column they can be combined with a "-". eg. "1-2"
+	 * $models = ModelWithDoublePK::findById("1-1");
 	 * ```
 	 * 
-	 * @param string|int $id
+	 * @param string $id 
 	 * @param string[] $properties
 	 * @return static
 	 * @throws Exception
@@ -82,26 +106,60 @@ abstract class Entity extends Property {
 
 		$tables = static::getMapping()->getTables();
 		$primaryTable = array_shift($tables);
-		$pkOfPrimaryTable = $primaryTable->getPrimaryKey();
-
-		$query = static::internalFind($properties);		
-		
-		if (count($pkOfPrimaryTable) > 1) {
-			throw new Exception("Can't find by ids because the primary table has more than one primary key. Entities should have only one primary key field.");//		
-		}
+		$keys = $primaryTable->getPrimaryKey();
 		
 		$query = static::internalFind($properties);		
-		$query->where([$pkOfPrimaryTable[0] => $id]);
-	
 		
-//		$ids = explode('-', $id);
-//
-//		$where = [];
-//		foreach($pkOfPrimaryTable as $key) {
-//			$where[$key] = array_shift($ids);
-//		}
+		$ids = explode('-', $id);
+		$keys = array_combine($keys, $ids);
+		$query->where($keys);
 		
 		return $query->single();
+	}
+	
+	/**
+	 * Find entities by ids.
+	 * 
+	 * @exanple
+	 * ```
+	 * $notes = Note::findByIds([1, 2, 3]);
+	 * ```
+	 * @exanple
+	 * ```
+	 * $models = ModelWithDoublePK::findByIds(["1-1", "2-1", "3-3"]);
+	 * ```
+	 * @param array $ids
+	 * @param array $properties
+	 * @throws Exception
+	 */
+	public static final function findByIds(array $ids, array $properties = []) {
+		$tables = static::getMapping()->getTables();
+		$primaryTable = array_shift($tables);
+		$keys = $primaryTable->getPrimaryKey();
+		$keyCount = count($keys);
+		
+		$query = static::internalFind($properties);
+		
+		$idArr = [];
+		for($i = 0; $i < $keyCount; $i++) {			
+			$idArr[$i] = [];
+		}
+		
+		foreach($ids as $id) {
+			$idParts = explode('-', $id);
+			if(count($idParts) != $keyCount) {
+				throw new \Exception("Given id is invalid (" . $id . ")");
+			}
+			for($i = 0; $i < $keyCount; $i++) {			
+				$idArr[$i][] = $idParts[$i];
+			}
+		}
+		
+		for($i = 0; $i < $keyCount; $i++) {			
+			$query->where($keys[$i], 'IN', $idArr[$i]);
+		}
+		
+		return $query;
 	}
 	
 //	
@@ -314,8 +372,9 @@ abstract class Entity extends Property {
 	/**
 	 * Filter entities See JMAP spec for details on the $filter array.
 	 * 
+	 * @link https://jmap.io/spec-core.html#/query
 	 * @param Query $query
-	 * @param array $filter
+	 * @param array $filter key value array eg. ["q" => "foo"]
 	 * @return Query
 	 */
 	public static function filter(Query $query, array $filter) {		
@@ -370,26 +429,4 @@ abstract class Entity extends Property {
 		return null;
 	}
 	
-	
-	/**
-	 * Returns an array with all properties of this entity that are different or 
-	 * not present in the given properties array.
-	 * 
-	 * @param array $properties
-	 * @return array
-	 */
-	public function diff($properties) {
-
-		$diff = [];
-		
-		$entityProps = $this->toArray();
-		
-		foreach ($entityProps as $key => $value) {
-			if (!isset($properties[$key]) || $properties[$key] !== $value) {
-				$diff[$key] = $value;
-			}
-		}
-
-		return $diff;
-	}
 }

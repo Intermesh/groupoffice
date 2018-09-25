@@ -14,4 +14,7 @@ if(Request::get()->getMethod() === 'POST') {
 	$router->run();
 } elseif (Request::get()->getMethod() === 'GET') {
 	App::get()->getAuthState()->outputSession();
+} else
+{
+	echo "Method " . Request::get()->getMethod() . " not supported";
 }

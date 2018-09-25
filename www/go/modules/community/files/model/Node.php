@@ -164,18 +164,18 @@ class Node extends model\AclEntity {
 	}
 	
 	protected function internalSave() {
+		
 		$success = parent::internalSave();
 		
 		//copy recursive
 		if($this->isDirectory && !empty($this->copyFromId)) {
-			$children = Node::find(['parentId' =>$this->copyFromId]);
-			foreach($children as $child) {
-				$child->isNew = true;
-				$id = $child->id;
-				$child->id = null;
-				$child->parentId = $this->id;
-				$child->copyFromId = $id; // recursive
-				$success = $success && $child->save();
+			$children = Node::find()->where(['parentId' =>$this->copyFromId]);
+			foreach($children as $child) { /* @var $child Node */
+				$node = $child->copy();
+				$node->parentId = $this->id;
+				$node->copyFromId = $child->id; // recursive
+				$success = $success && $node->save();
+				var_dump($node->getValidationErrors());
 			}
 		}
 		return $success;

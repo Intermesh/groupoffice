@@ -203,7 +203,7 @@ class Request {
             self::$memoryLimit = false;
         }
         else {
-            (int)preg_replace_callback('/(\-?\d+)(.?)/',
+            preg_replace_callback('/(\-?\d+)(.?)/',
                     function ($m) {
                         self::$memoryLimit = $m[1] * pow(1024, strpos('BKMG', $m[2])) * self::MAXMEMORYUSAGE;
                     },
@@ -271,6 +271,11 @@ class Request {
             $apacheHeader = str_replace("_", "-", $apacheHeader);
             if (isset(self::$headers[$header]) || isset(self::$headers[$apacheHeader])) {
                 $remoteIP = isset(self::$headers[$header]) ? self::$headers[$header] : self::$headers[$apacheHeader];
+                // X-Forwarded-For may contain multiple IPs separated by comma: client, proxy1, proxy2.
+                // In such case we will only check the client IP. See https://jira.z-hub.io/browse/ZP-1434.
+                if (strpos($remoteIP, ',') !== false) {
+                    $remoteIP = trim(explode(',', $remoteIP)[0]);
+                }
                 $remoteIP = self::filterIP($remoteIP);
                 if ($remoteIP) {
                     ZLog::Write(LOGLEVEL_DEBUG, sprintf("Using custom header '%s' to determine remote IP: %s - connect is coming from IP: %s", USE_CUSTOM_REMOTE_IP_HEADER, $remoteIP, self::$remoteAddr));

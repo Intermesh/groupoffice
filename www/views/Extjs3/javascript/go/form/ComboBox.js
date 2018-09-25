@@ -1,3 +1,11 @@
+/**
+ * Combo box
+ * 
+ * This will automatically load entities if a go.data.Store is used so it can 
+ * display the text.
+ * 
+ * @type |||
+ */
 go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 	setValue: function (value) {
 		var me = this;
@@ -20,5 +28,13 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 		{
 			go.form.ComboBox.superclass.setValue.call(this, value);
 		}
+	},
+	
+	getParams : function(q) {
+		//override to add q filter for JMAP API
+		this.store.baseParams.filter = this.store.baseParams.filter || {};		
+		this.store.baseParams.filter.q = q;
+		
+		return go.form.ComboBox.superclass.getParams.call(this, q);
 	}
 });

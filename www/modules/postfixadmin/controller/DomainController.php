@@ -200,6 +200,12 @@ class DomainController extends \GO\Base\Controller\AbstractModelController {
 			
 			$home = $rootDir . $mailbox->domain->domain . '/' . $parts[0] . '/';			
 			$maildir = $home . 'Maildir/';
+			
+			if(is_dir($maildir)) {
+				echo "Already converted.\n";
+				continue;
+			}
+			
 			if(!is_dir($home)) {
 				echo "Maildir does not exist\n";
 			} else {
@@ -207,7 +213,7 @@ class DomainController extends \GO\Base\Controller\AbstractModelController {
 				$this->exec("mv ". $home .' '. $tmp);
 				$this->exec("mkdir " . $home);
 				$this->exec("mv " . $tmp . basename($home) .' '.$maildir);
-				exec("mv -f  ".$maildir.'sieve ' . $home);
+				exec('mv -f  '.$maildir.'sieve ' . $maildir.'.dovecot.sieve* ' . $maildir . '.dovecot.lda-dupes* ' .$maildir . '.dovecot.svbin ' . $maildir. '.customflags ' . $home);
 			}
 			$mailbox->maildir = substr($maildir, strlen($rootDir));
 			if(!$mailbox->save()) {

@@ -371,15 +371,15 @@ class Http {
 		return $url;
 	}	
 	
-	
-	public static function basicAuth(){
-		if (!isset($_SERVER['PHP_AUTH_USER']) && !Http::isAjaxRequest() && PHP_SAPI != 'cli') {
-			header('WWW-Authenticate: Basic realm="'.\GO::config()->product_name.'"');
-			header('HTTP/1.0 401 Unauthorized');
-			
-			
-			throw new \GO\Base\Exception\AccessDenied();
-			exit;
-		}
-	}
+//	Basic auth interferes with new framework because it uses the same Authorization header.
+//	public static function basicAuth(){
+//		if (!isset($_SERVER['PHP_AUTH_USER']) && !Http::isAjaxRequest() && PHP_SAPI != 'cli') {
+//			header('WWW-Authenticate: Basic realm="'.\GO::config()->product_name.'"');
+//			header('HTTP/1.0 401 Unauthorized');
+//			
+//			
+//			throw new \GO\Base\Exception\AccessDenied();
+//			exit;
+//		}
+//	}
 }

@@ -20,9 +20,12 @@ use ReflectionClass;
  * 					->offset(0)
  * 					->orderBy(['id' => 'ASC']);
  * 
- * 	$stmt = $query->execute();
+ * // Query objects can be stringified for debugging:
+ * echo $query;
  * 
- * 	$record = $stmt->fetch();
+ * $stmt = $query->execute();
+ * 
+ * $record = $stmt->fetch();
  * ```
  * 
  * @copyright (c) 2014, Intermesh BV http://www.intermesh.nl
@@ -345,8 +348,11 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	}
 
 	public function __toString() {
-		//todo
-		//return $this->createCommand()->toString();
+		$queryBuilder = new QueryBuilder();
+		$queryBuilder->debug = true;
+		$build = $queryBuilder->buildSelect($this);
+		
+		return $build['debug'];
 	}
 	
 	/**

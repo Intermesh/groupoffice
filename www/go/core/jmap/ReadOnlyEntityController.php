@@ -60,23 +60,21 @@ abstract class ReadOnlyEntityController extends Controller {
 	protected function getQueryQuery($params) {
 		$cls = $this->entityClass();
 
-		$query = $cls::find(['id'])
+		$query = $cls::find($cls::getPrimaryKey(false))
 						->limit($params['limit'])
-						->offset($params['position']);;
+						->offset($params['position']);
 
 		$sort = $this->transformSort($params['sort']);
 		
-		//always add primary key for a stable sort. (https://dba.stackexchange.com/questions/22609/mysql-group-by-and-order-by-giving-inconsistent-results)
-		if(!isset($sort['id'])) {
-			$sort['id'] = 'ASC';
-		}
+		
 		
 		$cls::sort($query, $sort);
 
 		$query = $this->applyFilterCondition($params['filter'], $query);
 
 		//we don't need entities here. Just a list of id's.
-		$query->selectSingleValue($query->getTableAlias() . '.id');
+		
+		//$query->fetchMode(\PDO::FETCH_ASSOC)->select($cls::getPrimaryKey(true));
 		
 		return $query;
 	}
@@ -129,10 +127,20 @@ abstract class ReadOnlyEntityController extends Controller {
 		
 		if(!isset($params['sort'])) {
 			$params['sort'] = [];
+		} else
+		{
+			if(!is_array($params['sort'])) {
+				throw new InvalidArguments("Parameter 'sort' must be an array");
+			}
 		}
 		
 		if(!isset($params['filter'])) {
 			$params['filter'] = [];
+		} else
+		{
+			if(!is_array($params['filter'])) {
+				throw new InvalidArguments("Parameter 'filter' must be an array");
+			}
 		}
 		
 		if(!isset($params['accountId'])) {
@@ -165,11 +173,16 @@ abstract class ReadOnlyEntityController extends Controller {
 										->fetch();
 
 		$state = $this->getState();
+		
+		$ids = [];		
+		foreach($idsQuery as $record) {
+			$ids[] = $record->getId();
+		}
 
 		Response::get()->addResponse([
 				'accountId' => $p['accountId'],
 				'state' => $state,
-				'ids' => array_map('intval', $idsQuery->all()),
+				'ids' => $ids,
 				'notfound' => [],
 				'total' => $total,
 				'canCalculateUpdates' => false
@@ -189,7 +202,11 @@ abstract class ReadOnlyEntityController extends Controller {
 	 * @param string[] $sort
 	 * @return array[]
 	 */
-	protected function transformSort($sort) {
+	protected function transformSort($sort) {		
+		if(empty($sort)) {
+			return [];
+		}
+		
 		$transformed = [];
 
 		foreach ($sort as $s) {
@@ -197,14 +214,23 @@ abstract class ReadOnlyEntityController extends Controller {
 			$transformed[$column] = $direction;
 		}
 
-		return $transformed;
+		//always add primary key for a stable sort. (https://dba.stackexchange.com/questions/22609/mysql-group-by-and-order-by-giving-inconsistent-results)		
+		$cls = $this->entityClass();
+		$keys = $cls::getPrimaryKey();
+		foreach($keys as $key) {
+			if(!isset($transformed[$key])) {
+				$transformed[$key] = 'ASC';
+			}
+		}
+		
+		return $transformed;		
 	}
 	
 	
 
 	/**
 	 * 
-	 * @param int $id
+	 * @param string $id
 	 * @return boolean|Entity
 	 */
 	protected function getEntity($id, array $properties = []) {
@@ -266,10 +292,15 @@ abstract class ReadOnlyEntityController extends Controller {
 	protected function getGetQuery($params) {
 		$cls = $this->entityClass();
 		
-		$query = $cls::find($params['properties']);
+		if(!isset($params['ids'])) {
+			$query = $cls::find($params['properties']);
+		} else
+		{
+			$query = $cls::findByIds($params['ids'], $params['properties']);
+		}
 		
 		//filter permissions
-		$cls::filter($query, ['permissionLevel' => Acl::LEVEL_READ]);
+		$cls::applyAclToQuery($query, Acl::LEVEL_READ);
 		
 		return $query;
 	
@@ -292,24 +323,27 @@ abstract class ReadOnlyEntityController extends Controller {
 				'notFound' => []
 		];
 		
-		$query = $this->getGetQuery($p);		
+		//empty array should return empty result. but ids == null should return all.
+		if(isset($p['ids']) && !count($p['ids'])) {
+			Response::get()->addResponse($result);
+			return;
+		}
 		
-		if(empty($p['ids'])) {
-			$result['list'] = $query->toArray();
-		} else
-		{
-			$stmt = $query->where($query->getTableAlias(). '.id', 'IN', $p['ids']);
+		$query = $this->getGetQuery($p);		
 			
-			$foundIds = [];
-			$result['list'] = [];
-			
-			foreach($stmt as $e) {
-				$result['list'][] = $e->toArray(); 
-				$foundIds[] = $e->id;
-			}
+		$foundIds = [];
+		$result['list'] = [];
+
+		foreach($query as $e) {
+			$result['list'][] = $e->toArray(); 
+			$foundIds[] = $e->getId();
+		}
+//		$result['found'] = $foundIds;
+		if(isset($p['ids'])) {
 			$result['notFound'] = array_values(array_diff($p['ids'], $foundIds));			
-		}	
+		}
 
 		Response::get()->addResponse($result);
 	}
+	
 }

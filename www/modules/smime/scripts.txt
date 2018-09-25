@@ -2,3 +2,4 @@ modules/smime/PluginMessagePanel.js
 modules/smime/PluginAccountDialog.js
 modules/smime/PluginEmailComposer.js
 modules/smime/PublicCertsGrid.js
+modules/smime/AttachmentContextMenuOverride.js

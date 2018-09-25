@@ -77,6 +77,11 @@ class Group extends AclEntity {
 											->where('name', 'LIKE', '%' . $filter['q'] . '%')
 			);
 		}
+		
+		if(!empty($filter['exclude'])) {
+			$query->andWhere('id', 'NOT IN', $filter['exclude']);
+		}
+		
 		return parent::filter($query, $filter);
 	}
 	

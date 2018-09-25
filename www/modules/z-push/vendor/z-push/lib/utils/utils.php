@@ -957,12 +957,26 @@ class Utils {
     public static function SafePutContents($filename, $data) {
         //put the 'tmp' as a prefix (and not suffix) so all glob call will not see temp files
         $tmp = dirname($filename).DIRECTORY_SEPARATOR.'tmp-'.getmypid().'-'.basename($filename);
-        if (($res = file_put_contents($tmp, $data)) !== false) {
-            self::FixFileOwner($tmp);
-            if (rename($tmp, $filename) !== true)
-                $res = false;
-        }
 
+        //number of attempts
+        $attempts = (defined('FILE_STATE_WRITE_ATTEMPTS') ? FILE_STATE_WRITE_ATTEMPTS : 3);
+        //ms to sleep between attempts
+        $sleep_time = (defined('FILE_STATE_WRITE_SLEEP') ? FILE_STATE_WRITE_SLEEP : 100);
+        $i = 1;
+        while (($i <= $attempts) && (($res = file_put_contents($tmp, $data)) === false)) {
+            ZLog::Write(LOGLEVEL_WARN, sprintf("Utils->SafePutContents: Failed on writing data in tmp - attempt: %d - filename: %s", $i, $tmp));
+            $i++;
+            usleep($sleep_time * 1000);
+        }
+        if ($res !== false){
+            self::FixFileOwner($tmp);
+            $i = 1;
+            while (($i <= $attempts) && (($res = rename($tmp, $filename)) !== true)) {
+                ZLog::Write(LOGLEVEL_WARN, sprintf("Utils->SafePutContents: Failed on rename - attempt: %d - filename: %s", $i, $tmp));
+                $i++;
+                usleep($sleep_time * 1000);
+            }      
+        }
         return $res;
     }
 

@@ -326,21 +326,18 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 	},
 	
 	//TODO copy directories recursive
-	copy: function(nodes, replaceIndex, newName, callback){
+	copy: function(node, replaceIndex, newName, callback){
 		var items = {};
-		debugger;
-		Ext.each(nodes, function(record) {
-			
-			items['#'+Ext.id()] = {
-				parentId:this.targetStore.baseParams.filter.parentId,
-				name: newName || record.name,
-				copyFromId: record.id,
-				isDirectory: Ext.empty(record.blobId),
-				blobId: record.blobId,
-				isDirectory: false
-			};
-		}, this);
+		
+		items['#'+Ext.id()] = {
+			parentId:this.targetStore.baseParams.filter.parentId,
+			name: newName || node.name,
+			copyFromId: node.id,
+			isDirectory: node.isDirectory,
+			blobId: node.blobId
+		};
 
+		//TODO the targetStore commitChanges should be delaying the send to server action
 		go.Stores.get('Node').set({create:items});
 
 		this.unprocessedFiles--;
@@ -350,14 +347,13 @@ go.modules.community.files.Browser = Ext.extend(Ext.Component, {
 		}
 	},
 	
-	move: function(nodes, replaceIndex, newName, callback){
+	move: function(node, replaceIndex, newName, callback){
 		var items = {};
-		Ext.each(nodes, function(record) {
-			items[record.id] = {parentId:this.targetStore.baseParams.filter.parentId};
-			if(newName) {
-				items[record.id].name = newName;
-			}
-		}, this);
+
+		items[node.id] = {parentId:this.targetStore.baseParams.filter.parentId};
+		if(newName) {
+			items[node.id].name = newName;
+		}
 
 		go.Stores.get('Node').set({update:items});
 		

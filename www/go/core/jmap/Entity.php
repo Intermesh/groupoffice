@@ -21,13 +21,7 @@ abstract class Entity  extends \go\core\orm\Entity {
 	 */
 	public static $trackChanges = true;
 	
-	/**
-	 * The Entity ID
-	 * 
-	 * @var int
-	 */
-	public $id;
-
+	
 	/**
 	 * Get the current state of this entity
 	 * 
@@ -37,7 +31,8 @@ abstract class Entity  extends \go\core\orm\Entity {
 	public static function getState() {
 		return static::getType()->highestModSeq . ':' . Acl::getType()->highestModSeq;
 	}
-
+	
+	
 	/**
 	 * Saves the model and property relations to the database
 	 * 
@@ -74,4 +69,6 @@ abstract class Entity  extends \go\core\orm\Entity {
 		
 		return true;
 	}	
+	
+	
 }

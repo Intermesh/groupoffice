@@ -1,0 +1,1 @@
+insert into addressbook_addressbook select id, name, acl_id, user_id from ab_addressbooks;

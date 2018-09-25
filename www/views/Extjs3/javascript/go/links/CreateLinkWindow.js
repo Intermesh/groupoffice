@@ -123,9 +123,8 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 	},
 
 	link: function () {
-		var selections = this.grid.getSelectionModel().getSelections();
-		var me = this;
-		var links = [];
+		var selections = this.grid.getSelectionModel().getSelections(),
+						me = this, links = {}, i = 0;
 
 		selections.forEach(function (record) {
 			var link = {
@@ -134,8 +133,8 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 				toEntity: record.get('entity'),
 				toId: record.get('entityId')
 			}
-
-			links.push(link);
+			i++;
+			links['clientId-' + i ] = link;
 		});
 
 		go.Stores.get("Link").set({

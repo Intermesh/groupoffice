@@ -118,7 +118,7 @@ class ASDevice extends StateObject {
 
                 // another user has a required action on this device
                 if (isset($asuserdata->wipeStatus) && $asuserdata->wipeStatus > SYNC_PROVISION_RWSTATUS_OK) {
-                    ZLog::Write(LOGLEVEL_INFO, sprintf("User '%s' has requested a remote wipe for this device on '%s'", $asuserdata->wipeRequestBy, strftime("%Y-%m-%d %H:%M", $asuserdata->wipeRequstOn)));
+                    ZLog::Write(LOGLEVEL_INFO, sprintf("User '%s' has requested a remote wipe for this device on '%s'", $asuserdata->wipeRequestBy, strftime("%Y-%m-%d %H:%M", $asuserdata->wipeRequestOn)));
 
                     // reset status to PENDING if wipe was executed before
                     $this->wipeStatus =  ($asuserdata->wipeStatus & SYNC_PROVISION_RWSTATUS_WIPED)?SYNC_PROVISION_RWSTATUS_PENDING:$asuserdata->wipeStatus;

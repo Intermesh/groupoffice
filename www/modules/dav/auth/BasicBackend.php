@@ -17,6 +17,8 @@ namespace GO\Dav\Auth;
 
 use GO;
 use GO\Base\Model\Module;
+use go\core\auth\TemporaryState;
+use go\modules\core\users\model\User;
 use Sabre\DAV\Auth\Backend\AbstractBasic;
 use Sabre\DAV\Exception\Forbidden;
 use Sabre\HTTP\RequestInterface;
@@ -24,7 +26,7 @@ use Sabre\HTTP\ResponseInterface;
 
 class BasicBackend extends AbstractBasic {
 	
-	private $_user;
+	private $user;
 	public $checkModuleAccess='dav';
 	
 	public function __construct() {
@@ -36,9 +38,9 @@ class BasicBackend extends AbstractBasic {
 		
 		if($result[0]==true) {
 			
-			GO::debug("Login basicauth successfull as ".$this->_user->username);
+			GO::debug("Login basicauth successfull as ".$this->user->username);
 			
-			GO::session()->setCurrentUser($this->_user);
+			GO::session()->setCurrentUser($this->user->id);
 		}
 		
 		return $result;
@@ -46,20 +48,45 @@ class BasicBackend extends AbstractBasic {
 
 //	For basic auth
 	protected function validateUserPass($username, $password) {
-		$this->_user = GO::session()->login($username, $password, false);
 		
-		if(!$this->_user) {
+		$user = User::find(['id', 'username', 'password'])->where(['username' => $username, 'enabled' => true])->single();
+		/* @var $user User */
+		
+		if(!$user) {
 			return false;
 		}
-
+		
+		if(!$user->checkPassword($password)) {
+			return false;
+		}
+		
+		$state = new TemporaryState();
+		$state->setUserId($user->id);		
+		GO()->setAuthState($state);
+		
+		$this->oldLogin($user->id);		
+		$this->user = $user;
+		
 		$davModule = Module::model()->findByName($this->checkModuleAccess, false, true);
-		if(!$davModule || !\GO\Base\Model\Acl::getUserPermissionLevel($davModule->aclId, $this->_user->id))
+		if(!$davModule || !\GO\Base\Model\Acl::getUserPermissionLevel($davModule->aclId, $this->user->id))
 		{
-			$errorMsg = "No '".$this->checkModuleAccess."' module access for user '".$this->_user->username."'";
+			$errorMsg = "No '".$this->checkModuleAccess."' module access for user '".$this->user->username."'";
 			\GO::debug($errorMsg);
 			throw new Forbidden($errorMsg);
 		}
 
 		return true;
+	}
+	
+	/**
+	 * for old framework to work in GO::session()
+	 * 
+	 * @param \GO\Dav\Auth\User $user
+	 */
+	private function oldLogin($userId) {
+		if(!defined('GO_NO_SESSION')) {
+			define("GO_NO_SESSION", true);
+		}
+		$_SESSION['GO_SESSION'] = ['user_id' => $userId];
 	}
 }

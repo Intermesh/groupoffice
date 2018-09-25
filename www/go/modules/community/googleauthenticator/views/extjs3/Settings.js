@@ -1,6 +1,7 @@
 Ext.ns("go.googleauthenticator");
 
 Ext.override(go.usersettings.AccountSettingsPanel, {
+	currentUser : null,
 	
 	initComponent : go.usersettings.AccountSettingsPanel.prototype.initComponent.createSequence(function() {
 
@@ -18,11 +19,6 @@ Ext.override(go.usersettings.AccountSettingsPanel, {
 					anchor: '100%',
 					listeners:{
 						check: function(cbx,checked){
-							
-							// check to not fire the functions below when loading the form
-							if(!go.userSettingsDialog.isVisible()){
-								return;
-							}
 							
 							if(checked){
 								this.enableGoogleAuthenticator();
@@ -76,6 +72,8 @@ Ext.override(go.usersettings.AccountSettingsPanel, {
 
 				// Google authenticator is already configured for this user.
 				me.setEnabled(!!data.googleauthenticator);
+				
+				me.currentUser = data;
 			}
 			
 		});
@@ -126,73 +124,92 @@ Ext.override(go.usersettings.AccountSettingsPanel, {
 	
 	enableGoogleAuthenticator : function(){
 		
-		var passwordPrompt = new go.PasswordPrompt({
-			width: dp(450),
-			text: t("When enabling Google autenticator you'll need to scan the QR code with the Google authenticator app otherwise you cannot login to Group-Office anymore.",'googleauthenticator')+"<br><br>"+t("Provide your current password to enable Google authenticator.",'googleauthenticator'),
-			title: t('Enable Google authenticator','googleauthenticator'),
-			listeners:{
-				'ok': function(value){
+		function execute(value){
 					
-					var params = {"update": {}};
-					params.update[GO.settings.user_id] = {
-						currentPassword: value,
-						googleauthenticator: {}
-					};					
-					
-					go.Stores.get("User").set(params, function (options,success,response) {								
-						if(!success || GO.util.empty(response.updated)) {
-							return this.enableGoogleAuthenticator();
-						}
-						
-						var user = response.updated[GO.settings.user_id];
-						if(user.googleauthenticator){							
-							this.setQr(true, user.googleauthenticator.secret ,user.googleauthenticator.qrUrl);
-						}
-					}, this);
-				},
-				'cancel': function(){
-					this.setEnabled(false);
-				},
-				scope:this
-			}
-		});
+			var params = {"update": {}};
+			params.update[this.currentUser.id] = {
+				currentPassword: value,
+				googleauthenticator: {}
+			};					
 
-		passwordPrompt.show();
+			go.Stores.get("User").set(params, function (options,success,response) {								
+				if(!success || GO.util.empty(response.updated)) {
+					return this.enableGoogleAuthenticator();
+				}
+
+				var user = response.updated[this.currentUser.id];
+				if(user.googleauthenticator){							
+					this.setQr(true, user.googleauthenticator.secret ,user.googleauthenticator.qrUrl);
+				}
+			}, this);
+		}
+		
+		if(go.User.isAdmin) {
+			execute.call(this);
+		} else {
+
+			var passwordPrompt = new go.PasswordPrompt({
+				width: dp(450),
+				text: t("When enabling Google autenticator you'll need to scan the QR code with the Google authenticator app otherwise you cannot login to Group-Office anymore.",'googleauthenticator')+"<br><br>"+t("Provide your current password to enable Google authenticator.",'googleauthenticator'),
+				title: t('Enable Google authenticator','googleauthenticator'),
+				listeners:{
+					'ok': execute,
+					'cancel': function(){
+						this.setEnabled(false);
+					},
+					scope:this
+				}
+			});
+
+			passwordPrompt.show();
+		}
 	},
 	
 	disableGoogleAuthenticator : function(){
 		
-		var passwordPrompt = new go.PasswordPrompt({
-			width: dp(450),
-			text: t("When disabling Google autenticator this step will be removed from the login process.",'googleauthenticator')+"<br><br>"+t("Provide your current password to disable Google authenticator.",'googleauthenticator'),
-			title: t('Disable Google authenticator','googleauthenticator'),
-			listeners:{
-				'ok': function(value){
-					
-				
-					var params = {"update": {}};
-					params.update[GO.settings.user_id] = {
-						currentPassword: value,
-						googleauthenticator:null
-					};					
-					
-					go.Stores.get("User").set(params, function (options,success,response) {								
-						if(success && !GO.util.empty(response.updated)) {
-							this.setQr(false);						
-						} else
-						{
-							this.disableGoogleAuthenticator();				
-						}
-						
-					}, this);
-				},
-				'cancel': function(){
-					this.setEnabled(true);
-				},
-				scope:this
+		function execute(currentPassword) {
+			var params = {"update": {}},
+				 data = {
+				googleauthenticator:null
+			};
+			if(currentPassword) {
+				data.currentPassword = currentPassword;
 			}
-		});
+			params.update[this.currentUser.id] = data;					
 
-		passwordPrompt.show();
+			go.Stores.get("User").set(params, function (options,success,response) {								
+				if(success && !GO.util.empty(response.updated)) {
+					this.setQr(false);						
+				} else
+				{
+					this.disableGoogleAuthenticator();				
+				}
+
+			}, this);
+		}
+			
+		if(go.User.isAdmin) {
+			execute.call(this);
+		} else {
+			
+			var passwordPrompt = new go.PasswordPrompt({
+				width: dp(450),
+				text: t("When disabling Google autenticator this step will be removed from the login process.",'googleauthenticator')+"<br><br>"+t("Provide your current password to disable Google authenticator.",'googleauthenticator'),
+				title: t('Disable Google authenticator','googleauthenticator'),
+				listeners:{
+					'ok': function(value){
+
+						execute.call(this,value);
+
+					},
+					'cancel': function(){
+						this.setEnabled(true);
+					},
+					scope:this
+				}
+			});
+
+			passwordPrompt.show();
+		}
 	}
 });

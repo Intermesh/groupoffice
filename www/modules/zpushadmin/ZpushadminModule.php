@@ -65,13 +65,14 @@ class ZpushadminModule extends \GO\Base\Module {
 			return;
 		}
 
+			
+		require_once \GO::config()->root_path . 'modules/z-push/vendor/z-push/vendor/autoload.php';
+		require_once(\GO::config()->root_path . 'modules/z-push/backend/go/autoload.php');
+		require_once(\GO::config()->root_path . 'modules/z-push/config.php');
 
-			require_once \GO::config()->root_path . 'modules/z-push/vendor/z-push/vendor/autoload.php';
-			include_once(\GO::config()->root_path . 'modules/z-push/config.php');
 
-
-			set_include_path(get_include_path() . PATH_SEPARATOR . BASE_PATH);
-			\ZPush::CheckConfig();
+		set_include_path(get_include_path() . PATH_SEPARATOR . BASE_PATH);
+		\ZPush::CheckConfig();
 	}
 
 }

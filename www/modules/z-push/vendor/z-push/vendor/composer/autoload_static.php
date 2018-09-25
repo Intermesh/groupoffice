@@ -80,7 +80,7 @@ class ComposerStaticInit153a56a781a72686b71399955d98204f
         'InterProcessData' => __DIR__ . '/../..' . '/lib/core/interprocessdata.php',
         'IpcMemcachedProvider' => __DIR__ . '/../..' . '/backend/ipcmemcached/ipcmemcachedprovider.php',
         'IpcSharedMemoryProvider' => __DIR__ . '/../..' . '/backend/ipcsharedmemory/ipcsharedmemoryprovider.php',
-        'IpcWincacheProvider' => __DIR__ . '/../..' . '/backend/ipcwincache/ipcwincache.php',
+        'IpcWincacheProvider' => __DIR__ . '/../..' . '/backend/ipcwincache/ipcwincacheprovider.php',
         'ItemOperations' => __DIR__ . '/../..' . '/lib/request/itemoperations.php',
         'KoeSignature' => __DIR__ . '/../..' . '/lib/core/koesignatures.php',
         'KoeSignatures' => __DIR__ . '/../..' . '/lib/core/koesignatures.php',

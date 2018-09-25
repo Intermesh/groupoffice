@@ -36,14 +36,30 @@
       };     
 			
 			//these datatypes will be prefetched by go.data.JmapProxy.fetchEntities()
+			// Key can also be a function that is called with the record data.
 			go.data.types[name] = {
 				convert: function (v, data) {
-					if(!data[this.key]) {
+					var key = this.type.getKey.call(this, data);
+					
+					if(!key) {
 						return null;
 					}
 					
-					var entities = go.Stores.get(name).get([data[this.key]]);					
-					return entities ? entities[0] : '-';	
+					var entities = go.Stores.get(name).get([key]);
+					return entities ? entities[0] : null;	
+				},
+				
+				getKey : function(data) {
+					if(typeof(this.key) == "function") {
+						return this.key.call(this, data);
+					} else
+					{
+						if(!this.key) {
+							throw "Key is undefined";
+						}	
+
+						return data[this.key];
+					}
 				},
 				sortType: Ext.data.SortTypes.none,
 				type: "entity",
@@ -60,6 +76,23 @@
 			return false;
 	 },
 
+		/**
+		 * Get entity object
+		 * 
+		 * An entiy has these properties:
+		 * 
+		 * name: "Contact"
+		 * module: "addressbook",
+		 * package: "community"
+		 * 
+		 * Functions:
+		 * 
+		 * getRouterPath : "contact/1"
+		 * goto: Navigates to the contact
+		 * 
+		 * @param {string} name
+		 * @returns {entities|EntityManagerL#1.entities}
+		 */
     get: function (name) {      
 		
 		name = name.toLowerCase();
@@ -71,21 +104,36 @@
       return entities[name];      
     },
     
+		/**
+		 * Get all entity objects
+		 * 
+		 * @see get(); 
+		 * @returns {Object[]}
+		 */
     getAll: function() {
-      return entities;
+			var e = [];
+      for(entity in entities) {
+				if(go.Modules.isAvailable(entities[entity].package, entities[entity].module)) {
+					e.push(entities[entity]);
+				}
+			}
+			
+			return e;
     }
   };
   
   
   go.Stores = {
-	/**
-	 * 
-	 * @param {string} name
-	 * @returns {EntityManagerL#1.stores|go.data.EntityStore|stores|Boolean}
-	 */
-    get: function (name) {
+		
+		/**
+		 * Get EntityStore by entity name
+		 * 
+		 * @param {string} entityName eg. "Contact"
+		 * @returns {Boolean|EntityManagerL#1.stores|stores}
+		 */
+    get: function (entityName) {
       
-      lcname = name.toLowerCase();
+      lcname = entityName.toLowerCase();
 			
 			var entity = go.Entities.get(lcname);
 			if(!entity) {

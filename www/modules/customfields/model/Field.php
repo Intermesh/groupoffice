@@ -124,6 +124,14 @@ class Field extends \GO\Base\Db\ActiveRecord{
 		
 	}
 	
+	public function getExtra_options() {
+	
+		return $this->getOption('extraOptions');
+	}
+	
+	public function setExtra_options($v) {
+		$this->setOptions(['extraOptions' => $v]);
+	}
 	protected function afterDuplicate(&$duplicate) {
 		
 		$this->duplicateRelation('selectOptions', $duplicate);
@@ -377,6 +385,7 @@ class Field extends \GO\Base\Db\ActiveRecord{
 	public function getAttributes($outputType = null) {
 		$attr = parent::getAttributes($outputType);
 		$attr['options'] = $this->getOptions();
+		$attr['extra_options'] = $this->getExtra_options();
 		
 		return $attr;
 	}

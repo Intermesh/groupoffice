@@ -19,7 +19,8 @@ go.modules.core.core.ShareWindow = Ext.extend(go.form.Dialog, {
 		return [
 			this.sharePanel = new go.modules.core.core.SharePanel({
 				anchor: '100% -' + dp(32),
-				hideLabel: true			
+				hideLabel: true,
+				name: "groups"
 			})
 		];
 	},

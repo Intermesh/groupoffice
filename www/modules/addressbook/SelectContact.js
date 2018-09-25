@@ -24,7 +24,7 @@ GO.addressbook.SelectContact = function(config){
 		config.valueField='id';
 
 	if(!config.tpl)
-		config.tpl = '<tpl for="."><div class="x-combo-list-item">{' + config.displayField + '} ({ab_name}) <tpl if="department">({department})</tpl> <tpl if="go_user_id&gt;0"><div class="go-model-icon-GO_Base_Model_User" style="width:16px;height:16px;display:inline-block;vertical-align:middle"></div></tpl></div></tpl>';
+		config.tpl = '<tpl for="."><div class="x-combo-list-item">{' + config.displayField + '} ({ab_name}) <tpl if="department">({department})</tpl> <tpl if="go_user_id&gt;0"><i class="icon">account_box</i></tpl></div></tpl>';
 
 	var customfieldId = config.customfieldId || '';
 

@@ -189,9 +189,9 @@ class Debugger {
 			}
 		}
 		
-		if(Environment::get()->isCli()) {
-			echo $entry . "\n";
-		}
+//		if(Environment::get()->isCli()) {
+//			echo $entry . "\n";
+//		}
 		
 		$this->entries[] = $entry;
 		
@@ -210,7 +210,7 @@ class Debugger {
 		return intval(($this->getMicroTime() - $_SERVER["REQUEST_TIME_FLOAT"])*1000) . 'ms';
 	}
 
-	public function debugCalledFrom($limit = 5) {
+	public function debugCalledFrom($limit = 10) {
 
 		$this->debug("START BACKTRACE");
 		$trace = debug_backtrace();
@@ -248,6 +248,13 @@ class Debugger {
 	 */
 	public function getEntries() {
 		return $this->entries;
+	}
+	
+	/**
+	 * Print all entries
+	 */
+	public function printEntries() {
+		echo implode("\n", $this->entries);
 	}
 	
 	/**

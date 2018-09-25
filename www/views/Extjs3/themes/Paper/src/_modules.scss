@@ -151,6 +151,11 @@ $app-icons: (
 .ml-unseen-from {
 	font-weight: bold;
 }
+
+.ml-seen-subject, .ml-unseen-subject {
+	@extend %font-body2;
+}
+
 .x-tree-node .ml-folder-unseen a span.em-folder-status { // badge
 	@extend %badge;
 }

@@ -260,7 +260,6 @@ class SyncProvisioning extends SyncObject {
         $this->alphanumpwreq = 0;
         $this->devencenabled = 0;
         $this->pwrecoveryenabled = 0;
-        $this->docbrowseenabled;
         $this->attenabled = 1;
         $this->mindevpwlenngth = 4;
         $this->maxinacttimedevlock = 900;

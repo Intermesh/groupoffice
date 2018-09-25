@@ -7,10 +7,10 @@ use go\core\fs\Blob;
 App::get();
 
 $blob = Blob::findById($_GET['blob']);
-if (empty($blob) || !file_exists($blob->path())) {
-	echo $blob->path() . ' not found';
+if (!$blob) {
+	echo "Not found";
 	http_response_code(404);
 	exit();
 }
 
-$blob->download();
+$blob->getFile()->output(true, true, ['Content-Type' => $blob->type]);

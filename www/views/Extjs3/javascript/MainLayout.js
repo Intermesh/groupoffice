@@ -1,3 +1,5 @@
+/* global GO, Ext, go */
+
 /** 
  * Copyright Intermesh
  * 
@@ -185,7 +187,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		this.tabPanel.items.each(function (p) {
 			var tabEl = this.tabPanel.getTabEl(p);
 
-			if (tabEl.style.display != 'none') {
+			if (tabEl.style.display !== 'none') {
 				openModules.push(p.moduleName);
 			}
 		}, this);
@@ -223,7 +225,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			}
 
 			if (document.activeElement && typeof document.activeElement.blur === 'function')
-				if (document.activeElement.tagName == 'TEXTAREA' || document.activeElement.tagName == 'INPUT') {
+				if (document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'INPUT') {
 					document.activeElement.blur();
 				}
 		}, this);
@@ -699,3 +701,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 });
 
 GO.mainLayout = new GO.MainLayout();
+
+// needed in pre v6.4
+GO.mainLayout.on('callTo', function(phone) {
+	document.location = GO.calltoTemplate.replace('{phone}', phone.replace('(0)','').replace(/[^0-9+]/g,''));
+	return false;
+});

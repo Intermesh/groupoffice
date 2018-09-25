@@ -154,20 +154,13 @@ class ModuleCollection extends Model\ModelCollection{
 		
 		foreach($modules as $module)
 		{	
-//			if($this->_isAllowed($module->name)){
-				$file = $module->path.ucfirst($module->name).'Module.php';
-				//todo load listeners
-				//if(file_exists($file)){
-					//require_once($file);
-					$class='GO\\'.ucfirst($module->name).'\\'.ucfirst($module->name).'Module';
-				if(class_exists($class)) {
-					$object = new $class;
-					if(method_exists($object, $method)){					
+				$object = $module->moduleManager;
+				if(method_exists($object, $method)){					
 //						\GO::debug('Calling '.$class.'::'.$method);
-						call_user_func_array(array($object, $method), $params);
-						//$object->$method($params);
-					}
+					call_user_func_array(array($object, $method), $params);
+					//$object->$method($params);
 				}
+				
 //			}
 		}
 		
@@ -211,26 +204,24 @@ class ModuleCollection extends Model\ModelCollection{
 	
 	/**
 	 * Check if a module is installed.
-     * Default check if module is enabled an treat a disabled module as not installed. When checking from within moduleController return the model if record is in core_module
+   * Default check if module is enabled an treat a disabled module as not installed. When checking from within moduleController return the model if record is in core_module
 	 * 
 	 * @param StringHelper $name
-     * @param boolean $checkEnabled
+   * @param boolean $checkEnabled
 	 * @return Model\Module 
 	 */
-    public function isInstalled($name, $checkEnabled = true)
-    {
-        $model = $this->model->findByName($name);
+	public function isInstalled($name, $checkEnabled = true)
+	{
+			$model = $this->model->findByName($name);
 
-        if (!$model || !$this->_isAllowed($model->name))
-            return false;
+			if (!$model || !$this->_isAllowed($model->name))
+					return false;
 
-        if ($checkEnabled && !$model->enabled)
-            return false;
+			if ($checkEnabled && !$model->enabled)
+					return false;
 
-        return $model;
-    }
-	
-	
+			return $model;
+	}
 	
 	
 	public function __isset($name){

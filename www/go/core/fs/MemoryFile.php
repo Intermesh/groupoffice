@@ -1,6 +1,9 @@
 <?php
 namespace go\core\fs;
 
+use DateTime;
+use Exception;
+
 /**
  * A file which only exists in memory. Just a variable with data.
  * 
@@ -41,11 +44,11 @@ class MemoryFile extends File{
 	}
 	
 	public function getModifiedAt() {
-		return time();
+		return new DateTime();
 	}
 	
 	public function getCreatedAt() {
-		return time();
+		return new DateTime();
 	}
 	
 	public function exists() {
@@ -146,7 +149,7 @@ class MemoryFile extends File{
 		return $this->path;
 	}
 	
-	public function output($sendHeaders = true, $useCache = true) {
+	public function output($sendHeaders = true, $useCache = true, array $headers = []) {
 		echo $this->data;
 	}
 	

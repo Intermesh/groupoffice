@@ -5,6 +5,9 @@ namespace go\core\event;
 /**
  * Enable events for an object
  * 
+ * Note: When adding / removing event listeners you need to run 
+ * install/upgrade.php to rebuild the cache.
+ * 
  * All objects that implement {@see EventListenerInterface} within the 
  *  application are searched for a static method called 
  * "defineEvents()". In this function you can call

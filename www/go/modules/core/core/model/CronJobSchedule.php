@@ -11,6 +11,13 @@ use go\modules\core\modules\model\Module;
 
 class CronJobSchedule extends Entity {
 
+	/**
+	 * The Entity ID
+	 * 
+	 * @var int
+	 */
+	public $id;
+
 	public $moduleId;
 	public $description;
 	public $name;
@@ -145,7 +152,7 @@ class CronJobSchedule extends Entity {
 	public static function runNext() {
 
 		$job = self::find()->where('enabled', '=', true)
-						->andWhere('nextRunAt', '<=', new DateTime())
+						->andWhere('nextRunAt', '<=', new DateTime())->orWhere('nextRunAt', 'IS', null)
 						->orderBy(['nextRunAt' => 'ASC'])->single();
 
 		if ($job) {

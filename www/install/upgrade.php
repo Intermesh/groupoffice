@@ -34,8 +34,9 @@ function isValidDb() {
 					->selectSingleValue('count(*)')
 					->from('go_modules')
 					->where('id', 'in', ['customfields', 'search'])
+					->andWhere('enabled', '=', true)
 					->single() != 2) {
-		throw new \Exception("You've got a 6.2 database but you must install the modules 'customfields' and 'search' before upgrading.");
+		throw new \Exception("You've got a 6.2 database but you must install / enable the modules 'customfields' and 'search' before upgrading.");
 					}
 					
 	return 62;	
@@ -287,10 +288,17 @@ try {
 					if(!$module->save()) {
 						throw new \Exception("Failed to save module");
 					}
+					
 				}
 
 			}
 			
+		}
+		
+		foreach ($modules as $module) {
+			if(isset($module->package) && $module->isAvailable()) {
+				$module->module()->registerEntities();
+			}
 		}
 
 		return !$aModuleWasUpgradedToNewBackend;

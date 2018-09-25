@@ -7,7 +7,13 @@ use go\modules\core\customfields\model\FieldSet;
 
 
 class Field extends AclItemEntity {
-	
+	/**
+	 * The Entity ID
+	 * 
+	 * @var int
+	 */
+	public $id;
+
 	public $name;
 	
 	public $fieldSetId;
@@ -39,6 +45,14 @@ class Field extends AclItemEntity {
 
 	protected static function aclEntityKeys() {
 		return ['fieldSetId' => 'id'];
+	}
+	
+	/**
+	 * LEGACY. $field->multiselect is used many times.
+	 * fix before removing a property
+	 */
+	public function getMultiselect() {
+		return $this->getOptions('multiselect');
 	}
 	
 	public function getOptions() {

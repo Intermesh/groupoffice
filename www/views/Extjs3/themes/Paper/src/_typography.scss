@@ -7,39 +7,6 @@ $font-weight-m: 600;
 $font-weight-l: 100;
 
 
-html {
-   font-size: 100%;
-	letter-spacing: normal;
-	-moz-osx-font-smoothing: grayscale;
-   -webkit-font-smoothing: antialiased;
-	-ms-text-size-adjust: 100%;
-   -webkit-text-size-adjust: 100%;
-}
-button, html, input, select, textarea {
-    font-family: $font-family;
-}
-body, html {
-	@extend %font-body1;
-	color: color($fg, 'text');
-	text-rendering: optimizeLegibility;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-}
-h1,h2,h3,h4,h5,h6 {
-	font-family: inherit;
-	color: color($fg, 'text');
-	font-weight: bold;
-	line-height: 1;
-}
-h1 { @extend %font-display1; }
-h2 { @extend %font-headline; }
-h3 { @extend %font-title; }
-h4 { @extend %font-subheading; }
-h5 { @extend %font-subheading-dense; }
-h6 { @extend %font-data-head; }
-
-strong { color: color($grey, 700); font-weight: $font-weight-m; }
-small { color: color($grey); font-weight: $font-weight-r; font-size:.85em; line-height: 1.2; }
 
 %font-button {
 	font-size: sp(14);
@@ -55,24 +22,22 @@ small { color: color($grey); font-weight: $font-weight-r; font-size:.85em; line-
 }
 
 %font-body1 {
-	font-size: sp(14); //14 for device
+	font-size: sp(14);
 	color: color($fg, 'text');
 	font-weight: $font-weight-r;
-	line-height: dp(20);
+	line-height: dp(24);
 	.primary & { color: white; }
 }
 
 %font-body2 {
 	font-size: sp(14); //14 for big screen | device
-	line-height: dp(24);
+	line-height: dp(20);
 	font-weight: $font-weight-m;
 }
 
 %font-data {
-	font-size: sp(14);
+	font-size: sp(16);
 	font-weight: $font-weight-r;
-	
-	//color: color($fg, 'text');
 }
 %font-data-head {
 	font-size: sp(12);
@@ -81,7 +46,7 @@ small { color: color($grey); font-weight: $font-weight-r; font-size:.85em; line-
 }
 
 %font-subheading {
-	font-size: sp(15); //16 for device
+	font-size: sp(16);
 	line-height: dp(24);
 	color: color($fg, 'secondary-text');
 	font-weight: $font-weight-r;

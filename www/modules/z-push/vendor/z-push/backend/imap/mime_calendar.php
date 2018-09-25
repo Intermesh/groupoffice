@@ -348,7 +348,7 @@ function parse_meeting_calendar($part, &$output, $is_sent_folder) {
  * @param $condition_value  string
  * @return string MIME text/calendar
  */
-function reply_meeting_calendar($part, $response, $username) {
+function reply_meeting_calendar($part, $response, $emailaddress) {
     $status_attendee = "ACCEPTED"; // 1 or default is ACCEPTED
     $status_event = "CONFIRMED";
     switch ($response) {
@@ -372,8 +372,8 @@ function reply_meeting_calendar($part, $response, $username) {
     $ical->SetPValue("METHOD", "REPLY");
     $ical->SetCPParameterValue("VEVENT", "STATUS", $status_event, null);
     // Update my information as attendee, but only mine
-    $ical->SetCPParameterValue("VEVENT", "ATTENDEE", "PARTSTAT", $status_attendee, sprintf("MAILTO:%s", $username));
-    $ical->SetCPParameterValue("VEVENT", "ATTENDEE", "RSVP", null, sprintf("MAILTO:%s", $username));
+    $ical->SetCPParameterValue("VEVENT", "ATTENDEE", "PARTSTAT", $status_attendee, sprintf("MAILTO:%s", $emailaddress));
+    $ical->SetCPParameterValue("VEVENT", "ATTENDEE", "RSVP", null, sprintf("MAILTO:%s", $emailaddress));
 
     return $ical->Render();
 }

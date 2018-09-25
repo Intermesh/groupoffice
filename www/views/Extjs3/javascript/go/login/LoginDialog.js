@@ -7,6 +7,9 @@ go.login.LoginDialog = Ext.extend(go.Window, {
 	draggable: false,
 	cls: "go-login-dialog",
 	
+	minWidth : 40,
+	minHeight: 40,
+	
 	initComponent: function() {
 
 		Ext.apply(this,{

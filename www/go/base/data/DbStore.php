@@ -260,8 +260,7 @@ class DbStore extends AbstractStore {
 	 * @return \GO\Base\Db\ActiveStatement the PDO statement
 	 */
 	protected function createStatement() {
-	
-		
+
 		$params = $this->getFindParams();
 		$modelFinder = \GO::getModel($this->_modelClass);
 		return $modelFinder->find($params);
@@ -354,69 +353,6 @@ class DbStore extends AbstractStore {
 
 		return $findParams;
 	}
-
-//	public function createDefaultParams() {
-//		$sort = !empty($requestParams['sort']) ? $requestParams['sort'] : $this->_defaultSortOrder;
-//		$dir = !empty($requestParams['dir']) ? $requestParams['dir'] : $this->_defaultSortDirection;
-//
-//		if (!is_array($sort))
-//			$sort = empty($sort) ? array() : array($sort);
-//
-//		if (isset($requestParams['groupBy']))
-//			array_unshift($sort, $requestParams['groupBy']);
-//
-//		if (!is_array($dir))
-//			$dir = count($sort) ? array($dir) : array();
-//
-//		if (isset($requestParams['groupDir']))
-//			array_unshift($dir, $requestParams['groupDir']);
-//
-//		$sort = $this->getColumnModel()->getSortColumns($sort);
-//
-//		$sortCount = count($sort);
-//		$dirCount = count($dir);
-//		for ($i = 0; $i < $sortCount - $dirCount; $i++) {
-//			$dir[] = $dir[0];
-//		}
-//
-//		$sort = array_merge($sort, $this->_extraSortColumnNames);
-//		$dir = array_merge($dir, $this->_extraSortDirections);
-//
-////		for($i=0;$i<count($sort);$i++){
-////			$sort[$i] = $this->getColumnModel()->getSortColumn($sort[$i]);
-////		}
-//
-//		$findParams = \GO\Base\Db\FindParams::newInstance()
-//						->joinCustomFields()
-//						->order($sort, $dir);
-//
-//		if (empty($requestParams['dont_calculate_total'])) {
-//			$findParams->calcFoundRows();
-//		}
-//
-//		//do not prefix search query with a wildcard by default. 
-//		//When you start a query with a wildcard mysql can't use indexes.
-//		//Correction: users can't live without the wildcard at the start.
-//
-//		if (!empty($requestParams['query']))
-//			$findParams->searchQuery('%' . preg_replace('/[\s*]+/', '%', $requestParams['query']) . '%');
-//
-//		if (isset($requestParams['limit']))
-//			$findParams->limit($requestParams['limit']);
-//		else
-//			$findParams->limit = 0; //(\GO::user()->max_rows_list);
-//
-//		if (!empty($requestParams['start']))
-//			$findParams->start($requestParams['start']);
-//
-//		if (isset($requestParams['permissionLevel']))
-//			$findParams->permissionLevel($requestParams['permissionLevel']);
-//
-//		if ($extraFindParams)
-//			$findParams->mergeWith($extraFindParams);
-//
-//		return $findParams;
-//	}
 
 	/**
 	 * This method will be called internally before getData().

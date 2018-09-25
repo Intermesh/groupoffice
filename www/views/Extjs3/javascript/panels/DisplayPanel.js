@@ -66,12 +66,12 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 	showComments: true,
 	
 	createTopToolbar : function(){
-		
-		this.newMenuButton = new GO.NewMenuButton({
-			panel:this
-		});
-		
-		
+//		
+//		this.newMenuButton = new GO.NewMenuButton({
+//			panel:this
+//		});
+//		
+//		
 		
 		var tbar=['->'];
 		
@@ -120,7 +120,7 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 			}), 
 			
 		
-		new go.detail.addButton({			
+		this.addButton = this.newMenuButton = new go.detail.addButton({			
 			detailPanel: this
 				})
 		);

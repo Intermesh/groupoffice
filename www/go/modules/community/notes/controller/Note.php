@@ -16,4 +16,18 @@ class Note extends EntityController {
 	protected function entityClass() {
 		return model\Note::class;
 	}
+	
+	public function decrypt($params) {
+		$note = $this->getEntity($params['id']);
+		
+		$descrypted = \go\core\util\Crypt::decrypt($note->content, $params['password']);
+		
+		if(!$descrypted) {
+			throw new \Exception("Invalid password");
+		}
+		
+		\go\core\jmap\Response::get()->addResponse([
+				'content' => $descrypted
+		]);
+	}
 }

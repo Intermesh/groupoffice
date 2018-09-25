@@ -260,3 +260,17 @@ $updates['201807271339'][] = "ALTER TABLE `core_acl_group_changes`
   ADD CONSTRAINT `group` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;";
 
 $updates['201807271339'][] = "insert into core_acl_group_changes select null, aclId, groupId, COALESCE((select highestModSeq from core_entity where name='Acl'), 0), null from core_acl_group;";
+
+$updates['201807271339'][] = "ALTER TABLE `core_change`
+ADD COLUMN `id` INT NOT NULL AUTO_INCREMENT FIRST,
+DROP PRIMARY KEY,
+ADD PRIMARY KEY (`id`);";
+
+
+$updates['201808241650'][] = "ALTER TABLE `core_blob` ADD `modifiedAt` DATETIME NULL DEFAULT NULL AFTER `createdAt`, ADD `staleAt` DATETIME NULL DEFAULT NULL AFTER `modifiedAt`;";
+$updates['201808241650'][] = "ALTER TABLE `core_blob` ADD INDEX(`staleAt`);
+UPDATE `core_blob` set modifiedAt = from_unixtime(modified)";
+$updates['201808241650'][] = "ALTER TABLE `core_blob` DROP `modified`";
+
+
+$updates['201808241650'][] = "insert into core_cron_job (moduleId,name, expression, description) values ((select id from core_module where name='core'), 'GarbageCollection', '0 * * * *', 'Garbage collection')";

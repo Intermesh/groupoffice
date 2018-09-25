@@ -97,10 +97,11 @@ class State extends AbstractState {
 				'hasDataFor' => []
 			]],
 			'capabilities' => Capabilities::get(),
-			'apiUrl' => $settings->URL.'jmap.php',
-			'downloadUrl' => $settings->URL.'download.php?blob={blobId}',
-			'uploadUrl' => $settings->URL.'upload.php',
-			'user' => $user->toArray(), //todo add more props when refactored
+			'apiUrl' => $settings->URL.'/jmap.php',
+			'downloadUrl' => $settings->URL.'/download.php?blob={blobId}',
+			'uploadUrl' => $settings->URL.'/upload.php',
+			'eventSourceUrl' => function_exists("xdebug_is_debugger_active") && xdebug_is_debugger_active() ? null : $settings->URL.'/sse.php',
+      'user' => $user->toArray(),
 			'oldSettings' => $this->clientSettings(), // added for compatibility
 		];
     

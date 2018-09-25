@@ -5,7 +5,7 @@ namespace go\modules\core\links\model;
 use go\core\acl\model\Acl;
 use go\core\App;
 use go\core\db\Query;
-use go\core\orm\Entity;
+use go\core\jmap\Entity;
 use go\core\orm\EntityType;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
@@ -148,5 +148,9 @@ class Link extends Entity {
 		}		
 	
 		return parent::filter($query, $filter);
+	}
+	
+	public function toArray($properties = array()) {
+		return parent::toArray($properties);
 	}
 }

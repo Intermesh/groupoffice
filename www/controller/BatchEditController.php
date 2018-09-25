@@ -202,7 +202,6 @@ class BatchEditController extends \GO\Base\Controller\AbstractController {
 					$row['mergeable'] = false;
 				}
 				
-
 				$rows[] = $row;
 			}
 		}
@@ -226,11 +225,11 @@ class BatchEditController extends \GO\Base\Controller\AbstractController {
 					$row['category_id']=$value['customfield']->category->id;
 					$row['category_name']=$value['customfield']->category->name;
 					$row['customfieldtype']=$value['customfield']->datatype;
-					$row['multiselect']=$value['customfield']->multiselect;
+					$row['multiselect']=$value['customfield']->getOption('multiselect');
 					
 					$row['has_data'] = false;
 					
-					if($value['customfield']->multiselect || in_array($value['customfield']->datatype , array('GO\Customfields\Customfieldtype\Textarea', 'GO\Customfields\Customfieldtype\Text'))) {
+					if($value['customfield']->getOption('multiselect') || in_array($value['customfield']->datatype , array('GO\Customfields\Customfieldtype\Textarea', 'GO\Customfields\Customfieldtype\Text'))) {
 						$row['mergeable'] = true;
 					} else {
 						$row['mergeable'] = false;

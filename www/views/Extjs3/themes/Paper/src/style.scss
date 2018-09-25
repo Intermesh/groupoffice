@@ -1,7 +1,5 @@
-@import 'colors';
-@import 'config';
+@import 'base';
 @import 'shadows';
-@import 'typography';
 @import "icons";
 @import 'ext-base';
 @import 'modules';
@@ -9,5 +7,6 @@
 @import 'go-style';
 @import 'tools';
 @import 'calendar';
+@import 'flags/flags.min.css';
 // Todo generate these lines for existing scss files in modules?
 @import '../../../../../go/modules/community/files/views/extjs3/themes/default/style.scss';

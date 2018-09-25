@@ -96,13 +96,12 @@ class Acl extends \go\core\jmap\Entity {
 											]);
 			}
 		}
-	
 		
-		if(!$this->logChanges()) {
+		if(!parent::internalSave()) {
 			return false;
 		}
 		
-		return parent::internalSave();
+		return $this->logChanges();		
 	}
 	
 	private function hasAdmins() {

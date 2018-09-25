@@ -1,11 +1,22 @@
+:root {
+  --c-primary: #{map-get($vars, c-primary)};
+  --c-primary-tp: #{map-get($vars, c-primary-tp)};
+}
+
 ::-webkit-scrollbar-thumb {
 	//border: none;
 	background:color($grey,200);
 }
 
-html, body {
-	height: 100%;
+html {
+   font-size: 100%;
+	letter-spacing: normal;
+	-moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+	-ms-text-size-adjust: 100%;
+   -webkit-text-size-adjust: 100%;
 }
+
 body {
 	@include var(background-color, c-primary-tp);	
 }
@@ -13,6 +24,35 @@ body {
 body * {
 	box-sizing: border-box;
 }
+
+body, html {
+	@extend %font-body1;
+	color: color($fg, 'text');
+	text-rendering: optimizeLegibility;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+	height: 100%;
+}
+
+button, html, input, select, textarea {
+    font-family: $font-family;
+}
+
+h1 { @extend %font-display1; }
+h2 { @extend %font-headline; }
+h3 { @extend %font-title; }
+h4 { @extend %font-subheading; }
+h5 { @extend %font-subheading-dense; }
+h6 { @extend %font-data-head; }
+
+strong { color: color($grey, 700); font-weight: $font-weight-m; }
+small { color: color($grey); font-weight: $font-weight-r; font-size:.85em; line-height: 1.2; }
+
+
+
+.success { color: $cSuccess !important; }
+.danger { color: $cDanger !important; }
+.warning { color: $cWarning !important; }
 
 /*#bg {
 	z-index: -1;
@@ -277,7 +317,10 @@ a {
 
 //, .go-border-center:not(.x-panel-noborder)
 .x-portlet {
-	@extend %card;
+	@extend .z1;
+  border: 0;
+  background-color:color($bg,'card');
+  border-radius: $borderRadius;
 }
 #go-module-panel-files-card-panel, #email-message-panel, #em-pnl-west {
 	//@extend %card;
@@ -333,6 +376,7 @@ a {
 		@include var(background-color, c-primary);
 		> .x-tab-panel-header {
 			position: relative;
+			border-width: 0 0 0 0;
 			/*background-color:rgba(255,255,255,.17);*/
 			.x-tab-strip-active {
 				border-bottom-color: $cAccent;
@@ -502,6 +546,7 @@ a {
 	left: 8px;
 	list-style: none;
 	overflow: visible;
+	pointer-events:none;
 	> div {
 		@extend .z4;
 		min-width: dp(280);
@@ -577,41 +622,51 @@ button {
 	background-size:cover;
 	border: 1px solid white;
 	border-radius: 50%;
+	height: dp(40);
+	width: dp(40);
+	font-size: dp(28);
+	line-height: dp(40);
+	text-align: center;
+	&::before {
+			color: white;
+			@extend %icon;
+			font-size: inherit;			
+			height: 100%;
+			width: 100%;
+	}
 	
 	&.group {
 		&::before {
-			width: 100%;
-			height: 100%;
-			color: white;
-			@extend %icon;
-			font-size: dp(28);
-			margin: dp(4);			
+			content: "group";			
 		}
-		@extend .ic-group;
 		background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24));	
 	}
 }
 
 .user {
 	position: relative;
-	padding-left: dp(48);
+	padding-left: dp(56);
 	min-height: dp(40);
 	
 	.wrap {
 		padding-top: dp(3);
+		&.single {
+			padding-top: dp(10);
+		}
+		> * {
+			display:block;
+		}
 	}
 	.avatar {
 		position: absolute;
 		top: 0;
 		left: 0;
-		width: dp(40);
-		height: dp(40);
 		vertical-align: middle;
 	}
 	
-	.username, .displayName {
+/*	.username, .displayName {
 		display:block;
-	}
+	}*/
 }
 
 #user-menu {
@@ -826,6 +881,22 @@ button.filetype-pdf, button.filetype-doc {
 //detail view
 .go-detail-view, .go-display-panel {
 	
+	
+	.go-detail-view-avatar {
+		text-align: center;
+		.avatar {
+			font-size: dp(154);
+			line-height: dp(200);
+
+			height: dp(200);
+			width: dp(200);
+		}
+	}
+	
+	.content {
+		padding: dp(16);
+	}
+	
 	@extend %font-body1;
 	/*.x-btn.fab {
 		@extend .z6;
@@ -872,7 +943,10 @@ button.filetype-pdf, button.filetype-doc {
 	}
 	/*.x-tool { margin-top: dp(3);}*/
 
-	h3{
+
+		
+	h3, .xtb-title {
+		color: color($fg, 'text');
 		@extend %font-title;
 	}
 	h5 {		
@@ -927,9 +1001,13 @@ button.filetype-pdf, button.filetype-doc {
 	.icons {
 		@extend .go-icon-list;
 		
-		h5, hr {
+		h5 {
 			margin-left: dp(16);
 			margin-right: dp(16);
+		}
+		
+		hr {
+			margin: dp(16);
 		}
 		
 		h5:not(:first-child) {
@@ -955,10 +1033,20 @@ button.filetype-pdf, button.filetype-doc {
 		height: dp(64);
 		padding-left: dp(8);
 		.x-btn{
-			border: dp(1) solid color($fg, "line");
+			border: 1px solid color($fg, "line");
 		}
 		.x-toolbar {
 			border-bottom: 0;
+		}
+	}
+	
+	.x-toolbar.actions {
+		padding: dp(16);
+		padding-bottom: dp(24);
+		height: dp(72);
+		.x-btn{
+			color: $cPrimary;
+			border: 1px solid color($fg, "line");
 		}
 	}
 	
@@ -979,13 +1067,12 @@ button.filetype-pdf, button.filetype-doc {
 }
 
 .go-icon-list {
-	p, > a {
-		
+	p, > a {		
 		min-height: dp(40);
 		box-sizing: border-box;
 		display:table;
 		text-decoration: none;
-		padding: dp(8) dp(16);
+		padding: dp(8) dp(16) dp(16) dp(8);
 		width: 100%;
 		span, a {
 			display: block;
@@ -1069,8 +1156,11 @@ table.display-panel {
 			padding-right: dp(16);
 		}
 	}
+	th {
+		@extend %font-data-head;
+	}
 	tr.line, td.line, th.line {
-		border-top: 1px solid color($fg, 'line');
+		border-bottom: 1px solid color($fg, 'line');
 	}
 	table { 
 		td:first-child {
@@ -1273,6 +1363,28 @@ table[id^="comments-ext"] b {
 	}
 }
 
+.x-form-element {
+	.x-grid-panel {
+		border-radius: dp(4);
+		border: 0;
+	}
+	.x-grid-panel {	
+		&.x-form-invalid {
+			border-color: rgba(color($red, 700),0.54);
+		}
+	}
+}
+
+
+.x-panel.text {
+	padding: dp(16);
+}
+
+
+.x-btn.raised{
+	border: dp(1) solid color($fg, "line");
+}
+
 
 .go-links-detail {
 	a {
@@ -1301,7 +1413,215 @@ table[id^="comments-ext"] b {
 	.trigger {
 		@extend %icon;
 		position:absolute;
-		right: 1px;top:1px;
-		padding: dp(16) 1px;
+		right: 1px;
+		top:1px;
+		padding: dp(16) 0 dp(16) dp(4);
 	}
+}
+
+
+.go-grid3-form-field {
+	.go-editable-col {
+		.x-grid3-cell-inner {
+			border: 1px solid color($fg, 'track');
+		border-radius: dp(4);			
+		background-color: color($bg, 'box');		
+		margin-right: dp(4);
+		}
+			
+			
+	}
+	.x-grid3-cell-inner {
+		min-height: dp(32);
+		padding: dp(6) dp(8);	
+		height: dp(32);
+		
+	}	
+	
+	.ux-row-action-cell {
+		.x-grid3-cell-inner {
+			padding: dp(4) 0;
+		}
+	}
+	.x-grid-editor {
+		overflow: hidden !important;
+	}
+	.x-grid-editor .x-form-field {
+		margin: 1px -5px -1px 1px; //correction for extjs positioning.		
+		min-height: auto;
+		height: auto;
+		padding: dp(6) dp(8);
+		padding-left: dp(8);
+		border-radius: dp(4);
+	}
+	
+	.x-grid-editor {
+		.x-form-field-wrap {
+			margin: 1px -5px -1px 1px; //correction for extjs positioning.		
+		}
+	}
+
+	.x-grid3-cell {
+		.trigger {
+			padding: dp(4) 0 dp(4) dp(4);
+			margin-right: dp(4);
+		}
+	}	
+	.x-grid3 {
+		background-color: transparent;
+	}
+	.x-grid3-row {
+		border-bottom: 0;
+		margin-bottom: dp(4);
+	}
+	
+	.x-panel-bbar .x-toolbar {
+		border-top: 0;
+		padding-right: dp(14);
+	}
+	
+	.x-grid3-cell-selected {
+		background-color: color($bg, 'box');
+	}
+	.x-grid3-scroller {
+		overflow: hidden;
+	}
+
+}
+
+//This class on a button will make it fade from gradient to the background color
+//of a tree.
+.go-more-button-over {
+	position: absolute;
+	padding-right: dp(8);
+	background-color: #e6e6e6;
+	&.x-btn.x-btn-over {
+		background-color: #e6e6e6;
+	}
+	&:before {
+		pointer-events: none;
+		position: absolute;
+		content: '';
+		background: linear-gradient(to right, transparent, #e6e6e6);
+		width: dp(24);
+		height: 100%;
+		left: dp(-24);
+		top: 0;
+	}
+}
+
+
+.go-form-group {
+	.x-panel-bbar .x-toolbar {
+		border-top: 0;
+	}
+}
+
+
+
+
+.go-html-formatted {
+	
+}
+
+.go-html-formatted div, .go-html-formatted dl, .go-html-formatted dt, .go-html-formatted dd, .go-html-formatted ul, .go-html-formatted ol, .go-html-formatted li, .go-html-formatted h1, .go-html-formatted h2, .go-html-formatted h3, .go-html-formatted h4, .go-html-formatted h5, .go-html-formatted h6, .go-html-formatted pre, .go-html-formatted form, .go-html-formatted fieldset, .go-html-formatted input, .go-html-formatted p, .go-html-formatted blockquote, .go-html-formatted th, .go-html-formatted td, .go-html-formatted span {
+    font: inherit;
+}
+
+.go-html-formatted  blockquote {  
+  display: block;  
+  margin: 1em 40px;  
+  padding:0px 10px;
+}
+
+
+.go-html-formatted h1 {  
+  display: block;  
+  font-size: 2em;  
+  font-weight: bold;  
+  margin: .67em 0;  
+}  
+   
+.go-html-formatted h2 {  
+  display: block;  
+  font-size: 1.5em;  
+  font-weight: bold;  
+  margin: .83em 0;  
+}  
+   
+.go-html-formatted h3 {  
+  display: block;  
+  font-size: 1.17em;  
+  font-weight: bold;  
+  margin: 1em 0;  
+}  
+   
+.go-html-formatted h4 {  
+  display: block;  
+  font-weight: bold;  
+  margin: 1.33em 0;  
+}  
+  
+.go-html-formatted h5 {  
+  display: block;  
+  font-size: 0.83em;  
+  font-weight: bold;  
+  margin: 1.67em 0;  
+}  
+   
+.go-html-formatted h6 {  
+  display: block;  
+  font-size: 0.67em;  
+  font-weight: bold;  
+  margin: 2.33em 0;  
+}
+
+
+.go-html-formatted td {   
+   display: table-cell;  
+/*   vertical-align: inherit;  
+   text-align: inherit; */
+ }  
+   
+.go-html-formatted th {  
+   display: table-cell;  
+   vertical-align: inherit;  
+   font-weight: bold;  
+   padding: 1px;  
+ }
+
+   
+.go-html-formatted ul,.go-html-formatted  menu, .go-html-formatted dir {  
+   display: block;  
+   list-style-type: disc;  
+   margin: 1em 2em;
+   /*-moz-padding-start: 40px;  */
+ }  
+   
+.go-html-formatted ol {  
+   display: block;  
+   list-style-type: decimal;  
+   margin: 1em 2em;
+   /*-moz-padding-start: 40px;  */
+ }  
+   
+.go-html-formatted li {  
+   display: list-item;  
+ }
+ 
+.go-html-formatted p {  
+   margin:10px 0px;  
+ }
+
+.go-html-formatted a:link, .go-html-formatted a:visited, .go-html-formatted a:active{
+	text-decoration:underline;
+	color: $cAnchor;
+}
+.go-html-formatted a:visted{
+	color:purple;
+}
+
+.normal-link {
+	text-decoration:underline;
+	color: $cAnchor;
 }

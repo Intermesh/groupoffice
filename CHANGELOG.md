@@ -1,3 +1,63 @@
+- Files: Fixed undefinded index "deleteSuccess" error.
+- Files: Add "Browse x files" button in detail views
+- Core: Better error message when language is invalid and fixed Norwegian
+- Core: Make sure customfields and search module are installed and enabled before upgrade
+
+11-09-2018 6.3.37
+- Start page: RSS date was not showing
+- Core: Fixed errors in check database and rebuild search index.
+- Core: Global search sometimes didn't give results.
+- File search: File index aborted on error
+- Files: fixed search returning invalid id's and file property dialog from search
+- Merged 6.2.x branch
+- Address book: Batch edit problem in address book
+- Address book: Drag and drop contacts didn't work
+- Leavedays: Sort on employee in holidays module
+- Fixed google authenticator barcode for iOS
+- Support newer encryption library in notes
+- Fixed custom php field
+
+30-08-2018 6.3.36
+- Fixed loading error in group edit dialog
+
+30-08-2018 6.3.35
+- addressbook: fixed merge dialog
+- files: shared root folder will be seen when there parent is not accessible by the current user
+- users: the list filters disabled users by default.
+- users: searching while filtering will work together
+- favorites: will not be rendered when there is no permission.
+- dav: Performance optimizations
+- core: User icon didn't show when selecting a contact / user.
+- billing: Billing report filter didn't work
+- files: fix acl in recent files portlet
+- sync: Require sync module access for activesync
+- projects: added natural sort to project name
+- core: added expression support to ActiveRecord order clause
+- addressbook: fixed advance search with custom fields
+- core: fixed change password in user settings
+
+23-08-2018 6.3.34
+- Fixed broken XLS export
+- Updated Z-push to 2.4.4
+- ActiveSync, Cal-,Card- and WebDAV use new framework for authentication so that IMAP and LDAP authentication work
+- Users: added disabled filter and color to show disabled users
+- User: added column to see which authentication methods are configured
+- Goolge authenticator enable/disable fixed when logged in as Admin
+- Framework Customfield:getAttributeByName() function fixed
+- Dokuwiki module compatible with 6.3
+- Users grid has disabled filter and shows disabled users lighter
+
+09-08-2018 6.3.31
+- Changed install SQL for notes as it failed to rename a column with a key on some systems
+- Delete buttons in dialog work
+- Delete option added in more menu of grid and detail view in notes.
+- Removed old z-push install dir.
+
+06-08-2018 6.3.30
+- Small UI improvements
+- LDAP bind login uses full DN
+- Refactored login dialog so that Firefox will prompt to save password.
+
 02-08-2018 6.3.29
 - Fixed various small bugs
 

@@ -664,9 +664,10 @@ Ext.layout.MenuLayout.prototype.itemTpl = new Ext.XTemplate(
 	'</li>'
 );
 
-Ext.override(Ext.data.Field, {
-	dateFormat: "c" //from server
-});
+// Not needed and breaks rss feed reader
+//Ext.override(Ext.data.Field, {
+//	dateFormat: "c" //from server
+//});
 
 GO.mainLayout.onReady(function() {
 
@@ -687,12 +688,6 @@ GO.mainLayout.onReady(function() {
 			format: go.User.dateFormat + " " + go.User.timeFormat
 		});
 	
-});
-
-Ext.override(Ext.Window, {
-	resizable : !GO.util.isMobileOrTablet(),
-	draggable: !GO.util.isMobileOrTablet(),
-	maximized: GO.util.isMobileOrTablet(),
 });
 
 Ext.override(Ext.Panel, {

@@ -15,7 +15,9 @@ class Method extends Entity {
 	public $id;
 		
 	/**
-	 * The sort order of the authenticators
+	 * The sort order of the authenticators. 
+	 * 
+	 * Higher value means higher priority!
 	 * 
 	 * @var string 
 	 */

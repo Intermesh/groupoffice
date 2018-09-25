@@ -3,6 +3,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	entityStore: null,
 	buttonAlign: 'left',
 	autoScroll: true,
+	entity: null,
 	initComponent : function() {
 		go.form.EntityPanel.superclass.initComponent.call(this);				
 		this.entityStore.on('changes',this.onChanges, this);
@@ -12,9 +13,9 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	},
 	
 	onChanges : function(entityStore, added, changed, destroyed) {
-		
 		if(changed.concat(added).indexOf(this.currentId) !== -1) {			
 			var entities = this.entityStore.get([this.currentId]);
+			this.entity = entities[0];
 			this.getForm().setValues(entities[0]);
 		}		
 	},
@@ -30,6 +31,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		
 		if(entities) {
 			this.getForm().setValues(entities[0]);
+			this.entity = entities[0];
 			return entities[0];
 		} else {
 			return false;
@@ -42,7 +44,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 			return;
 		}
 
-		var id, params = {}, values = this.getForm().getFieldValues();
+		var id, params = {}, values = this.getForm().getFieldValues(true);
 		//		//this.id is null when new
 		if (this.currentId) {
 
@@ -61,10 +63,10 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		this.entityStore.set(params, function (options, success, response) {
 
 			var saved = (params.create ? response.created : response.updated) || {};
-			if (saved[id]) {				
+			if (id in saved) {				
 				this.fireEvent("save", this, values);
 
-				var serverId = params.create ? response.created[id].id : response.updated[id].id;
+				var serverId = params.create ? response.created[id].id : id;
 
 				if(cb) {
 					cb.call(scope, this, true, serverId);

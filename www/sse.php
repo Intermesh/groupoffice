@@ -1,5 +1,11 @@
 <?php
-
+/**
+ * EventSource endpoint
+ * 
+ * For details visit the link below
+ * 
+ * @link https://jmap.io/spec-core.html#event-source
+ */
 use go\core\App;
 use go\core\db\Query;
 use go\core\jmap\State;
@@ -23,13 +29,29 @@ const MAX_LIFE_TIME = 120;
 $ping = $_GET['ping'] ?? 10;
 $sleeping = 0;
 
+//Client may specify 
+if(isset($_GET['types'])) {
+	$entityNames = explode(",", $_GET['types']);
+	$types = \go\core\orm\EntityType::namesToIds($entityNames);
+} else
+{
+	$types = [];
+}
+
 function checkChanges() {
-	$state = [];
-	foreach ((new Query)
+	global $types;
+	
+	$entities = (new Query)
 						->select('clientName,highestModSeq')
 						->from('core_entity')
-						->where('highestModSeq', '!=', null)
-						as $r) {
+						->where('highestModSeq', '!=', null);
+	
+	if(!empty($types)) {
+		$entities->andWhere('id', 'IN', $types);
+	}
+	
+	$state = [];
+	foreach ($entities as $r) {
 		$state[$r['clientName']] = (int) $r['highestModSeq'];
 	}
 	
@@ -43,7 +65,10 @@ function sendMessage($type, $data) {
 	echo 'data: ' . json_encode($data);
 	echo "\n\n";
 	
-	ob_flush();
+	if(ob_get_level() > 0) {
+		ob_flush();
+	}
+	
 	flush();	
 }
 

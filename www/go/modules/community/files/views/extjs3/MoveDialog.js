@@ -5,7 +5,7 @@ go.modules.community.files.MoveDialog = Ext.extend(go.Window, {
 	width: 600,
 	height: 600,
 	copy: false,
-	currentId: null, // id of Node to move
+	currentIds: [], // ids of Nodes to move
 	initComponent: function () {	
 		
 		this.items = this.initFormItems();
@@ -14,11 +14,11 @@ go.modules.community.files.MoveDialog = Ext.extend(go.Window, {
 	initFormItems: function () {
 		var items = [];
 		
-		this.buttons = ['->', {
+		this.buttons = ['->', this.submitButton = new Ext.Button({
 				text: t("Move"), // or copy?
 				handler: this.submit,
 				scope: this
-			}];
+			})];
 		
 		this.parentIdField = new Ext.form.Hidden({
 			name:'parentId',
@@ -53,18 +53,43 @@ go.modules.community.files.MoveDialog = Ext.extend(go.Window, {
 	},
 	
 	submit: function() {
-		var nodes = go.Stores.get('Node').get([this.currentId]),
-			self = this;
-
-		//this.browser.receive(records, droppedAt.data.id, 'move');
-		this.browser.receive(nodes, this.parentIdField.getValue(), this.copy?'copy':'move', function(){
-			console.log('biem');
-			self.close();
-		});
+		self = this;
+		go.Stores.get('Node').get(this.currentIds, function(nodes) {
+			this.browser.receive(nodes, this.parentIdField.getValue(), this.copy?'copy':'move', function(){
+				self.close();
+			});
+		}, this);
+			
+		
 	},
 	
-	load: function (id) {
-		this.currentId = id;
+	copy: function(copy) {
+		this.copy = copy;
+		return this;
+	},
+	
+	load: function (records) {
+		var ids = [];
+		for(var i = 0,record; record = records[i];i++) {
+			ids.push(record.id);
+		}
+		this.currentIds = ids;
+		
+		if(this.copy) { 
+			if(ids.length === 1) {
+				this.setTitle(t("Copy")+ " " +records[0].name);
+			} else {
+				this.setTitle(t("Copy")+ " " +records.length + ' ' + t('files'));
+			}
+			this.submitButton.setText(t("Copy"));
+		} else {
+			if(this.records.length === 1) {
+				this.setTitle(t("Move")+ " " +this.records[0].name);
+			} else {
+				this.setTitle(t("Move")+ " " +this.records.length + ' ' + t('files'));
+			}
+			this.submitButton.setText(t("Move"));
+		}
 		return this;
 	}
 });

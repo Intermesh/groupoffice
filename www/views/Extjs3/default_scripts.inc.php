@@ -123,13 +123,7 @@ if (isset(GO::session()->values['security_token'])) {
 //	echo 'GO.loginSelectedLanguage = "' . $_GET['SET_LANGUAGE'] . '";';
 //} 
 echo 'window.name="' . GO::getId() . '";';
-?>
 
-
-
-	Ext.BLANK_IMAGE_URL = '<?php echo GO::config()->host; ?>views/Extjs3/ext/resources/images/default/s.gif';
-	
-<?php
 if (isset(GO::session()->values['security_token']))
 	echo 'Ext.Ajax.extraParams={security_token:"' . GO::session()->values['security_token'] . '"};';
 

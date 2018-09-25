@@ -35,11 +35,9 @@ if($blobId) {
 
 $input = fopen('php://input', "r");
 
-$tmpName = GO()->getDataFolder()->getPath() . '/tmp/' . Request::get()->getHeader('X-File-Name') .'-'. microtime() . '.tmp';
-if (!file_exists(dirname($tmpName))) {
-	mkdir(dirname($tmpName), 0775);
-}
-$fp = fopen($tmpName, "w+");
+$tmpFile = \go\core\fs\File::tempFile('tmp');
+
+$fp = $tmpFile->open("w+");
 
 while ($data = fread($input, 4096)) { // 4kb at the time
 	fwrite($fp, $data);
@@ -47,10 +45,12 @@ while ($data = fread($input, 4096)) { // 4kb at the time
 fclose($fp);
 fclose($input);
 
-$blob = Blob::fromTmp($tmpName);
+$blob = Blob::fromTmp($tmpFile);
 $blob->name = Request::get()->getHeader('X-File-Name');
-$blob->modified = Request::get()->getHeader('X-File-LastModifed');
-$blob->contentType = Request::get()->getContentType();
+
+// Local modified at?
+$blob->modifiedAt = new \go\core\util\DateTime('@' . Request::get()->getHeader('X-File-LastModifed'));
+$blob->type = Request::get()->getContentType();
 if ($blob->save()) {
 	Response::get()->setStatus(201, 'Created');
 	Response::get()->output([
@@ -60,4 +60,6 @@ if ($blob->save()) {
 	]);
 } else {
 	echo 'Could not save '.$blob->id;
+	
+	var_dump(GO()->getDebugger()->getEntries());
 }

@@ -27,15 +27,30 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				'displayName',
 				'avatarId',
 				'loginCount',
+				'authenticationMethods',
 				{name: 'createdAt', type: 'date'},
 				{name: 'lastLogin', type: 'date'}	
 			],
+			baseParams: {filter: {}},
 			entityStore: go.Stores.get("User")
 		});
 
-		Ext.apply(this, {		
+		Ext.apply(this, {
 			plugins: [actions],
-			tbar: [ '->', 
+			tbar: [{
+					iconCls: 'ic-people-outline',
+					text: t('Show disabled'),
+					enableToggle:true,
+					toggleHandler: function(btn, state) {
+						if(state) {
+							this.store.baseParams.filter.showDisabled = true;
+						} else {
+							delete this.store.baseParams.filter.showDisabled;
+						}
+						this.store.reload();
+					},
+					scope:this
+			}, '->', 
 				{
 					xtype: 'tbsearch'
 				},{					
@@ -91,13 +106,30 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'loginCount',
 					hidden: false
+				},{
+					header: t('Authentication'),
+					width: dp(100),
+					sortable: false,
+					renderer: function(v) {
+						var result = '';
+						
+						for(var i = 0, method; method = v[i]; i++) {							
+							result += '<i title="'+method.name+'" class="icon go-module-icon-'+method.id+'"></i> ';
+						}
+						return result;
+					},
+					dataIndex: 'authenticationMethods'
 				},
 				actions
 			],
 			viewConfig: {
 				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>',
 				forceFit: true,
-				autoFill: true
+				autoFill: true,
+				getRowClass: function(record) {
+					if(!record.json.enabled)
+						return 'x-item-disabled';
+				}
 			},
 			// config options for stateful behavior
 			stateful: true,

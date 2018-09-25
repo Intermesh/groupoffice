@@ -4,7 +4,6 @@ namespace go\core {
 
 use Exception;
 use GO;
-use GO\Base\Observable;
 use go\core\auth\State as AuthState;
 use go\core\cache\CacheInterface;
 use go\core\cache\Disk;
@@ -17,6 +16,7 @@ use go\core\exception\ConfigurationException;
 use go\core\fs\Folder;
 use go\core\jmap\State;
 use go\core\mail\Mailer;
+use go\core\util\Lock;
 use go\core\webclient\Extjs3;
 use go\modules\core\core\model\Settings;
 use const GO_CONFIG_FILE;
@@ -179,11 +179,15 @@ use const GO_CONFIG_FILE;
 			
 			$configFile = $this->findConfigFile();
 			if(!$configFile) {
-				throw new Exception("No config.php was found. Possible locations: \n\n".
-								'/etc/groupoffice/multi_instance/' . explode(':', $_SERVER['HTTP_HOST'])[0] . "/config.php\n\n".
+				
+				$host = isset($_SERVER['HTTP_HOST']) ? explode(':', $_SERVER['HTTP_HOST'])[0] : '<HOSTNAME>';
+				
+				$msg = "No config.php was found. Possible locations: \n\n".
+								'/etc/groupoffice/multi_instance/' . $host . "/config.php\n\n".
 								dirname(dirname(__DIR__)) . "/config.php\n\n".
-								"/etc/groupoffice/config.php"
-								);
+								"/etc/groupoffice/config.php";
+				
+				throw new Exception($msg);
 			}
 			
 			require($configFile);	
@@ -295,16 +299,19 @@ use const GO_CONFIG_FILE;
 				$this->rebuildCacheOnDestruct = $onDestruct;
 			}
 			
-			GO::clearCache(); //legacy
-			
-			GO()->getCache()->flush(false);
-			Table::destroyInstances();
-	
-			$webclient = new Extjs3();
-			$webclient->flushCache();
+			$lock = new Lock("rebuildCache");
+			if($lock->lock()) {
+				\GO::clearCache(); //legacy
 
-			Observable::cacheListeners();
-			Listeners::get()->init();
+				GO()->getCache()->flush(false);
+				Table::destroyInstances();
+
+				$webclient = new Extjs3();
+				$webclient->flushCache();
+
+				\GO\Base\Observable::cacheListeners();
+				Listeners::get()->init();
+			}
 		}
 		
 		public function __destruct() {

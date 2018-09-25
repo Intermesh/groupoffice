@@ -4,27 +4,70 @@ go.grid.GridTrait = {
 	 */
 	scrollBoundary: 300,
 	
+	pageSize: 20,
+	
 	initGridTrait : function() {
 		if (!this.keys)
 		{
 			this.keys = [];
 		}
 	
+		
 		this.initDeleteKey();		
+		if(this.getSelectionModel().getSelected) {
+			this.initNav();
+		}
 
-		this.on("bodyscroll", this.loadMore, this, {buffer: 100});
-		// Dots for header columns
-		this.on('render', function() {
-			this.addClass("go-grid");
-			this.headerBtnWrap = this.el.child(".x-grid3-header");
-			if (this.headerBtnWrap && this.enableHdMenu) {
-				this.headerBtn = new Ext.Component({
-					cls: "go-grid-hd-btn",
-					renderTo: this.headerBtnWrap
-				});
-				this.headerBtn.el.on("click", this.onHeaderBtnClick, this);
+		//setup auto load more for go.data.Store's only
+		if(this.store instanceof go.data.Store  && this.store.entityStore) {
+			this.on("bodyscroll", this.loadMore, this, {buffer: 100});
+
+			this.store.baseParams.limit = this.pageSize;
+
+			this.store.on("load", function(store, records, o){
+				this.allRecordsLoaded = records.length < this.pageSize;
+				
+				if(this.rendered) {
+					this.loadMore();			
+				} else
+				{
+					this.on("afterrender", function() {
+						this.loadMore();
+					}, this, {single: true});
+				}
+			}, this);
+		}
+	},
+	
+	//The navigate can be used in modules to track row selections for navigation.
+	//It buffers keyboard actions and it doesn't fire when ctrl or shift is used for multiselection
+	initNav : function() {
+		this.addEvents({navigate: true});
+		this.on('rowclick', function(grid, rowIndex, e){
+			var record = this.getSelectionModel().getSelected();
+
+			if(!e.ctrlKey && !e.shiftKey && record)
+			{
+				this.fireEvent('navigate', this, rowIndex, record);				
+		}
+		
+			if(record) {
+				this.rowClicked=true;
 			}
+			
 		}, this);
+		
+		
+		this.getSelectionModel().on("rowselect",function(sm, rowIndex, r){
+			if(!this.rowClicked)
+			{
+				this.fireEvent('navigate', this, rowIndex, r);
+			}
+			
+			this.rowClicked = false;
+		}, this, {
+			buffer: 300
+		});
 	},
 	
 	initDeleteKey : function() {
@@ -39,11 +82,7 @@ go.grid.GridTrait = {
 
 	deleteSelected: function () {
 
-		var selectedRecords = this.getSelectionModel().getSelections(), ids = [], strConfirm;
-
-		selectedRecords.forEach(function (r) {
-			ids.push(r.data.id);
-		});
+		var selectedRecords = this.getSelectionModel().getSelections(), ids = selectedRecords.column("id"), strConfirm;
 
 		switch (ids.length)
 		{
@@ -70,6 +109,7 @@ go.grid.GridTrait = {
 		}, this);
 	},
 
+	allRecordsLoaded : false,
 	/**
 	 * Loads more data if the end off the scroll area is reached
 	 * @returns {undefined}
@@ -77,32 +117,26 @@ go.grid.GridTrait = {
 	loadMore: function () {
 		var store = this.getStore();
 
-		if (store.getCount() == store.getTotalCount()) {
+		if (this.allRecordsLoaded){
 			return;
 		}
 
-		store.lastOptions.params = store.lastOptions.params || {};
 
-		var limit = store.lastOptions.params.limit || store.getCount(),
-						pos = store.lastOptions.params.position || 0,
-						scroller = this.getView().scroller.dom,
+		var	scroller = this.getView().scroller.dom,
 						body = this.getView().mainBody.dom;
 
+		if (scroller.offsetHeight >= body.offsetHeight || (scroller.offsetHeight + scroller.scrollTop + this.scrollBoundary) >= body.offsetHeight) {
 
-		if ((scroller.offsetHeight + scroller.scrollTop + this.scrollBoundary) >= body.offsetHeight) {
-
-			var p = Ext.apply(store.lastOptions, {
-				add: true,
-				params: {
-					limit: limit,
-					position: pos + limit
-				}
-			});
-			store.load(p);
+			var o = store.lastOptions ? GO.util.clone(store.lastOptions) : {};
+			o.add = true;
+			o.params = o.params || {};
 			
-			//this will make sorting request the first page again
-			store.lastOptions.params.position = 0;
-			store.lastOptions.add = false;
+			o.params.position = o.params.position || 0;
+			o.params.position += this.pageSize;
+			o.paging = true;
+			
+			store.load(o);
+			
 		}
 	},
 	

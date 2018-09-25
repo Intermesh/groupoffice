@@ -159,9 +159,9 @@ GO.mainLayout.on("boot", function() {
 		var detailViewName = entity + "Detail";
 
 		if (mainPanel.route) {
-			mainPanel.route(parseInt(id), entity);
+			mainPanel.route(id, entityObj);
 		} else if(mainPanel[detailViewName]) {
-			mainPanel[detailViewName].load(parseInt(id));
+			mainPanel[detailViewName].load(id);
 			mainPanel[detailViewName].show();
 		} else {
 			console.log("Default entity route failed because " + detailViewName + " or 'route' function not found in mainpanel of " + module + ":", mainPanel);

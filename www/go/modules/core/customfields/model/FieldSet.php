@@ -6,6 +6,12 @@ use go\core\acl\model\AclEntity;
 use go\core\db\Query;
 
 class FieldSet extends AclEntity {
+/**
+	 * The Entity ID
+	 * 
+	 * @var int
+	 */
+	public $id;
 
 	public $name;
 	

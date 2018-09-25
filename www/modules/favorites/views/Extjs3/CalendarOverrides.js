@@ -20,6 +20,11 @@ GO.moduleManager.onModuleReady('calendar',function(){
 		}),
 		
 		initComponent : GO.calendar.MainPanel.prototype.initComponent.createSequence(function(){
+			
+			if(!go.Modules.isAvailable("legacy", "favorites")) {
+				return;
+			}
+			
 			this.calendarFavoritesList = new GO.favorites.CalendarFavoritesList({	
 				stateEvents: ['collapse', 'expand'],
 				getState: function () {                              

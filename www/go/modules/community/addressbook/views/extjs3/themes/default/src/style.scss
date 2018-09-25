@@ -1,0 +1,76 @@
+@import "../../../../../../../../../views/Extjs3/themes/Paper/src/_base.scss";
+
+.go-addressbook-star {
+	color: #febf35;
+}
+
+/*.go-addressbook-contact-avatar {
+	text-align: center;
+	.avatar {
+		font-size: dp(154);
+		line-height: dp(200);
+		
+		height: dp(200);
+		width: dp(200);
+	}
+}*/
+
+.go-addressbook-name-panel {
+	padding: dp(16);	
+	h4 {
+		top: dp(-16);
+		left: dp(56);
+	}
+
+	.go-addressbook-star {
+		margin-top: dp(-8);
+	}
+}
+
+.go-addressbook-url-panel {
+	text-align: right;
+}
+
+.go-addressbook-url{
+	
+	height: dp(24);
+	width: dp(24);
+	background-repeat: none;
+	background-position: center;
+	background-size: contain;
+	display: inline-block;
+	border-radius: 3px;
+	&.linkedin {
+		background-image: url("resources/linkedin.png");		
+	}
+
+	&.facebook {
+		background-image: url("resources/facebook.png");		
+	}
+
+	&.twitter {
+		background-image: url("resources/twitter.png");		
+	}
+
+	&.homepage {
+		&:before {
+			border-radius: 3px;
+			@extend %icon;
+			content: "home";
+			vertical-align: baseline;
+			color: white;
+			background-color: $cPrimary;
+		}
+	}
+
+}
+
+
+.avatar {
+	&.organization {
+		&::before {
+			content: "business";
+		}		
+		background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24));	
+	}
+}

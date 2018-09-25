@@ -107,6 +107,9 @@ class Store extends AbstractStore {
 		if (isset($params['delete_keys'])) {
       try {
         $deleteIds = json_decode($params['delete_keys']);
+		  if(empty($deleteIds)) {
+			  return;
+		  }
         foreach ($deleteIds as $modelPk) {
 
 //          $deleteModelName = $this->_stmt->model->className();
@@ -147,7 +150,9 @@ class Store extends AbstractStore {
 							Throw new \Exception('Failed to run delete from model!');
 						}
         }
-        $this->response['deleteSuccess'] = true;
+				if(!isset($this->response['deleteSuccess']) || $this->response['deleteSuccess'] !== false) {
+					$this->response['deleteSuccess'] = true;
+				}
       } catch (\Exception $e) {
         $this->response['deleteSuccess'] = false;
         $this->response['deleteFeedback'] = $e->getMessage();

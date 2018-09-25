@@ -13,6 +13,13 @@
 
 
 
+/**
+ * 
+ * Detail view panel
+ * 
+ * All panel items are updated automatically if they have a "tpl" (Ext.XTemplate) property or an "onLoad" function. The panel is passed as argument.
+ * @type |||
+ */
 go.panels.DetailView = Ext.extend(Ext.Panel, {
 
 	cls: 'go-detail-view',
@@ -27,6 +34,8 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 
 	initComponent: function () {
 		go.panels.DetailView.superclass.initComponent.call(this, arguments);		
+		
+		this.cls += " go-detail-view-" + this.entityStore.entity.name.toLowerCase();
 
 		this.entityStore.on('changes', this.onChanges, this);
 		
@@ -40,7 +49,6 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 	},
 	
 	onChanges : function(entityStore, added, changed, destroyed) {
-			
 		if (changed.concat(added).indexOf(this.currentId) > -1) {
 			var entities = this.entityStore.get([this.currentId]);
 			if(entities) {
@@ -71,6 +79,9 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 	},
 
 	onLoad: function () {
+		
+		go.Translate.setModule(this.package, this.module);
+		
 		this.items.each(function (item, index, length) {
 			
 			item.show();
@@ -111,3 +122,6 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 		}
 	}
 });
+
+
+Ext.reg("detailview", go.panels.DetailView);
