@@ -567,3 +567,5 @@ $updates["201704241630"][]="UPDATE `go_users` SET `recovery_email`=`email` WHERE
 $updates["201707111530"][]="ALTER TABLE `go_modules` CHANGE `id` `id` VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '';";
 
 $updates["201802281015"][]="ALTER TABLE `go_log` ADD `jsonData` TEXT NULL AFTER `message`;";
+
+$updates["201809211500"][]="ALTER TABLE `go_search_cache` CHANGE `keywords` `keywords` VARCHAR(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '';";

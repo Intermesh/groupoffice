@@ -1,4 +1,6 @@
 25-09-2018 6.2.105
+- Calendar: New event creation will not ask if you want to send "new" or "all" participant an email (just Yes or No)
+- Enlarged keywords field for searchcache records from varchar(255) to varchar(512)
 - Billing: Fixed search query to work with amounts and numbers in regular fields
 
 18-09-2018 6.2.104
