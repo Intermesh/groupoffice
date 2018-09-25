@@ -36,8 +36,7 @@ trait CustomFieldsTrait {
 				$columns = Table::getInstance(static::customFieldsTableName())->getColumns();		
 				foreach($columns as $name => $column) {					
 					$record[$name] = $column->castFromDb($record[$name]);					
-				}
-				
+				}				
 				
 				foreach(self::getCustomFieldModels() as $field) {
 					$record[$field->databaseName] = $field->getDataType()->dbToApi(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record);			

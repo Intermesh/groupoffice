@@ -12,12 +12,17 @@ use ReflectionClass;
 /**
  * Finds classes within Group-Office
  * 
+ * Warning: Using this is expensive. Caching the results is recommended.
+ * 
  */
-class ClassFinder {
+class ClassFinder {	
 	
-	
-	public static function getDefaultNamespaces() {
-		
+	/**
+	 * Get all the Group-Office namespaces to search in.
+	 * 
+	 * @return string[]
+	 */
+	public static function getDefaultNamespaces() {		
 		$ns = GO()->getCache()->get("class-finder-default-namespaces");
 		
 		if(!$ns) {

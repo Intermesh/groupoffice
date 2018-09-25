@@ -170,13 +170,20 @@ abstract class Base extends Model {
 	 * @return string[] eg ['functionField' => "go\modules\core\customfields\datatype\FunctionField"];
 	 */
 	public static function findAll() {
-		$classFinder = new ClassFinder();
-		$classes = $classFinder->findByParent(self::class);
 		
-		$types = [];
+		$types = GO()->getCache()->get("customfield-types");
 		
-		foreach($classes as $class) {
-			$types[$class::getName()] = $class;
+		if(!$types) {
+			$classFinder = new ClassFinder();
+			$classes = $classFinder->findByParent(self::class);
+
+			$types = [];
+
+			foreach($classes as $class) {
+				$types[$class::getName()] = $class;
+			}
+			
+			GO()->getCache()->set("customfield-types", $types);
 		}
 		
 		return $types;		
