@@ -106,6 +106,18 @@ abstract class Property extends Model {
 
 		$this->init();
 	}
+	
+	/**
+	 * Create new record with same values except PK
+	 * @return Property
+	 */
+	public function copy() {
+		$new = clone $this;
+		$new->isNew = true;
+		unset($new->aclId);
+		unset($new->id);
+		return $new;
+	}
 
 
 	/**
