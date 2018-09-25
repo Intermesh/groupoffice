@@ -24,6 +24,11 @@ trait CustomFieldsTrait {
 	private $customFieldsData;
 	private $customFieldsModified = false;
 	
+	/**
+	 * Get all custom fields data for an entity
+	 * 
+	 * @return array
+	 */
 	public function getCustomFields() {
 		if(!isset($this->customFieldsData)) {
 			$record = (new Query())
@@ -53,6 +58,11 @@ trait CustomFieldsTrait {
 		return $this->customFieldsData;
 	}
 	
+	
+	/**
+	 * Set custom field data
+	 * @param array $data
+	 */
 	public function setCustomFields($data) {		
 		$this->customFieldsData = array_merge($this->getCustomFields(), $this->normalizeCustomFieldsInput($data));		
 		
@@ -95,6 +105,12 @@ trait CustomFieldsTrait {
 		return $data;
 	}
 	
+	/**
+	 * Saves custom fields to the database. Is called by Entity::internalSave()
+	 * 
+	 * @return boolean
+	 * @throws PDOException
+	 */
 	protected function saveCustomFields() {
 		if(!$this->customFieldsModified) {
 			return true;
@@ -146,6 +162,11 @@ trait CustomFieldsTrait {
 		}
 	}
 
+	/**
+	 * Get table name for custom fields data
+	 * 
+	 * @return string
+	 */
 	public static function customFieldsTableName() {
 		
 		if(is_a(static::class, Entity::class, true)) {
