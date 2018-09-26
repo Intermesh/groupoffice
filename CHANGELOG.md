@@ -1,3 +1,5 @@
+- Customfields: removed maxlength of 190 characters on textareas
+
 25-09-2018 6.3.39
 - Core: merged 6.2.105
 - Files: File custom field didn't load and save
