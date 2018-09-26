@@ -20,11 +20,16 @@ go.modules.core.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	/**
 	 * Render's the custom field value for the detail views
 	 * 
+	 * If nothing is returned then you must manage the value in the function itself
+	 * by calling detailComponent.setValue();
+	 * 
+	 * See User.js for an asynchronous example.
+	 * 
 	 * @param {mixed} value
 	 * @param {object} data Complete entity
 	 * @param {object} customfield Field entity from custom fields
 	 * @param {go.detail.Property} detailComponent The property component that renders the value
-	 * @returns {unresolved}
+	 * @returns {string}|undefined
 	 */
 	renderDetailView: function (value, data, customfield, detailComponent) {
 		return value;

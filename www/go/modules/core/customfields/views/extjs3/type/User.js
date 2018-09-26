@@ -31,12 +31,12 @@ go.modules.core.customfields.type.User = Ext.extend(go.modules.core.customfields
 		if(!value) {
 			return "";
 		}
+		
 		go.Stores.get("User").get([value], function(users) {
-			console.log(cmp, users);
 			cmp.setValue(users[0].displayName);
+			cmp.setVisible(true);
 		});
 		
-		return t("Loading...");
 	},
 	
 	/**
