@@ -220,7 +220,6 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	 * @param {array} ids
 	 * @param {function} cb called with "entitiies[]" and boolean "async"
 	 * @param {object} scope
-	 * @returns {array|boolean} entities or false is data needs to be loaded from server
 	 */
 	get: function (ids, cb, scope) {
 
@@ -266,7 +265,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					
 					this.state = response.state;
 					this.saveState();
-					this.get(ids, cb, scope, true); //passed hidden 4th argument to pass to the callback to track that it was asynchronously called					
+					this.get(ids, cb, scope); //passed hidden 4th argument to pass to the callback to track that it was asynchronously called					
 				},
 				scope: this
 			});
@@ -274,9 +273,8 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		} 
 		
 		if(cb) {		
-			cb.call(scope || this, entities, arguments[3]);			
+			cb.call(scope || this, entities, this);			
 		}
-		return entities;
 	},
 	
 	findBy : function(fn, scope, startIndex) {

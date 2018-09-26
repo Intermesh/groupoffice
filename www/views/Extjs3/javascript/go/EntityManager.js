@@ -45,8 +45,17 @@
 						return null;
 					}
 					
-					var entities = go.Stores.get(name).get([key]);
-					return entities ? entities[0] : null;	
+					if(Ext.isArray(key)) {
+						var e = [];
+						key.forEach(function(k) {
+							e.push(go.Stores.get(name).data[k]);
+						});
+						
+						return e;
+					} else
+					{
+						return go.Stores.get(name).data[key];	
+					}
 				},
 				
 				getKey : function(data) {
@@ -57,8 +66,27 @@
 						if(!this.key) {
 							throw "Key is undefined";
 						}	
-
-						return data[this.key];
+						
+						var parts = this.key.split(".");
+						
+						parts.forEach(function(p) {
+							if(Ext.isArray(data)) {
+								var arr = [];
+								data.forEach(function(i) {
+									arr.push(i[p]);
+								});
+								data = arr;
+							} else
+							{
+								data = data[p];
+							}
+							if(!data) {
+								return false;
+							}
+						});
+						
+						return data;
+						
 					}
 				},
 				sortType: Ext.data.SortTypes.none,

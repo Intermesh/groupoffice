@@ -9,9 +9,9 @@ go.modules.community.addressbook.StarButton = Ext.extend(Ext.Button, {
 		//listen for changes in store
 		go.Stores.get("ContactStar").on('changes', function(store, added, changed, destroyed) {
 			if(added.concat(changed).indexOf(this.getEntityId()) > -1) {
-				var starred = go.Stores.get("ContactStar").get([this.getEntityId()])[0].starred;
-				
-				this.setIconClass(starred ? 'ic-star' : 'ic-star-border');
+				go.Stores.get("ContactStar").get([this.getEntityId()], function(stars){
+					this.setIconClass(stars[0] ? 'ic-star' : 'ic-star-border');
+				}, this);
 			}
 			
 			if(destroyed.indexOf(this.getEntityId()) > -1) {
@@ -49,8 +49,9 @@ go.modules.community.addressbook.StarButton = Ext.extend(Ext.Button, {
 	setContactId : function(id) {
 		this.contactId = id;
 		
-		var entities = go.Stores.get("ContactStar").get([this.getEntityId()])
-		var starred = entities && entities[0] && entities[0].starred;
-		this.setIconClass(starred ? 'ic-star' : 'ic-star-border');
+		go.Stores.get("ContactStar").get([this.getEntityId()], function(entities) {
+			var starred = entities && entities[0] && entities[0].starred;
+			this.setIconClass(starred ? 'ic-star' : 'ic-star-border');
+		}, this);
 	}
 });

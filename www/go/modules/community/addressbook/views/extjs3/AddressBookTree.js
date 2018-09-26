@@ -120,15 +120,17 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 		var me = this;
 		
 		changed.forEach(function(id) {
-			var ab = go.Stores.get("AddressBook").data[id], 
-			nodeId = "addressbook-" + ab.id, 
-			node = me.getNodeById(nodeId);
-			
-			if(node) {
-				node.attributes.entity = ab;
-				delete node.attributes.children;
-				node.reload();
-			}
+			go.Stores.get("AddressBook").get([id], function(abs) {
+				
+				nodeId = "addressbook-" + abs[0].id, 
+				node = me.getNodeById(nodeId);
+
+				if(node) {
+					node.attributes.entity = abs[0];
+					delete node.attributes.children;
+					node.reload();
+				}
+			}, this);
 		});
 		
 		destroyed.forEach(function(id) {

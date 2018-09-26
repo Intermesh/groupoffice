@@ -54,9 +54,10 @@ go.modules.community.search.Panel = Ext.extend(Ext.Panel, {
 			return;
 		}
 		
-		var e = go.Entities.get(record.data.entity);
-		e.goto(record.data.entityId);
-		this.collapse();
+		go.Entities.get(record.data.entity, function(e) {
+			e.goto(record.data.entityId);
+			this.collapse();
+		}, this);
 	},
 	
 	search: function (q) {

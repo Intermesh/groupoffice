@@ -14,7 +14,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				'permissionLevel',
 				'photoBlobId',
 				"isOrganization",
-				"organizations"				
+				{name: 'organizations', type: go.data.types.Contact, key: 'organizations.organizationContactId'},			
 			].concat(go.modules.core.customfields.CustomFields.getFieldDefinitions("Contact")),
 			sortInfo :{field: "name", direction: "ASC"},
 			entityStore: go.Stores.get("Contact")
@@ -90,40 +90,8 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: false,
 					dataIndex: "organizations",
 					width: dp(300),
-					renderer: function (v, meta, record) {
-						var orgStr = t("Loading...");
-
-						//will be processed after storeload by onStoreLoad
-						var contactOrganizations = record.get('organizations');
-						if (!contactOrganizations.length) {
-							return "-";
-						}
-
-						var ids = [];
-						contactOrganizations.forEach(function (o) {
-							ids.push(o.organizationContactId);
-						});
-
-
-
-						var organizations = go.Stores.get('Contact').get(ids, function (entities, async) {
-							if (async) {
-								grid.getView().refresh();
-							}
-						}, this);
-
-
-						orgStr = "";
-						organizations.forEach(function (org) {
-							if (orgStr != "") {
-								orgStr += ", "
-							}
-							orgStr += org.name;
-						});
-
-
-						return orgStr;
-
+					renderer: function (organizations, meta, record) {
+						return organizations.column("name").join(", ");
 					}
 				},
 				{

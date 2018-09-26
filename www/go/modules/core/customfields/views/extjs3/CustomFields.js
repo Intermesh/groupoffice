@@ -246,7 +246,7 @@
 							
 							if(cmp) {
 								var v = type.renderDetailView(dv.data.customFields[field.databaseName], dv.data.customFields, field, cmp);
-								console.log(typeof(v));
+					
 								if(typeof(v) !== "undefined") {
 									cmp.setValue(v);
 									cmp.setVisible(!!v);
