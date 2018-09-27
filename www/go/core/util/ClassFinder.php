@@ -77,6 +77,9 @@ class ClassFinder {
 	 * @param string[] Full class name without leading "\" eg. ["IFW\App"]
 	 */
 	public function find() {
+		
+		GO()->debug("ClassFinder find() used.");
+		
 		$this->allClasses = [];
 		foreach ($this->namespaces as $namespace => $folder) {
 
