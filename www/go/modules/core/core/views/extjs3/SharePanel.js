@@ -29,8 +29,7 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 				'id', 
 				'name', 
 				{name: 'user', type: go.data.types.User, key: 'isUserGroupFor'}, //fetches entity from store
-				'users', //used in renderer
-				'userCount', //used in renderer
+				{name: 'members', type: go.data.types.User, key: 'users.userId'},
 				{
 					name: 'level', 
 					type: {
@@ -85,21 +84,11 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 						
 						var user = record.get("user"),
 										style = user && user.avatarId ?  'background-image: url(' + go.Jmap.downloadUrl(record.get("user").avatarId) + ')"' : "";
-										cls = user ? "avatar" : "avatar group",
-										memberStr = t("Loading members..."),
-										members = record.get('users').column('userId'),
-										users = go.Stores.get('User').get(members),
-										max = 5;
+										cls = user ? "avatar" : "avatar group",										
+										max = 5,
+										members = record.get('members').slice(0, max).column('displayName');
 						
-						if(users) {
-							memberStr = "";
-							users.slice(0, max).forEach(function(user){
-								if(memberStr != "") {
-									memberStr += ", "
-								}
-								memberStr += user.displayName;
-							});
-						}
+							memberStr = members.join(", ");
 								
 							var more = members.length - max;
 							if(more > 0) {
@@ -144,7 +133,7 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 		});
 		
 		this.store.on("beforeload", this.onBeforeStoreLoad, this);
-		this.store.on("load", this.onStoreLoad, this);
+		
 		go.modules.core.core.SharePanel.superclass.initComponent.call(this);
 
 	},
@@ -282,7 +271,7 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 			return true;
 		}
 		
-		go.Stores.get("Group").get(this.getSelectedGroupIds(), function(entities) {			
+		go.Stores.get("Group").get(this.getSelectedGroupIds(), function(entities) {
 			this.store.loadData({records: entities}, true);
 			this.store.sortData();
 			this.store.load({
@@ -293,31 +282,7 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 		}, this);
 		
 		return false;
-	},
-	onStoreLoad : function() {
-		
-		//don't add selected on search
-		if(this.store.baseParams.filter.q) {
-			return;
-		}		
-		
-		//fetch group members
-		var records = this.store.getRange(), me = this;
-		var memberIds = [];
-		
-		records.forEach(function(record) {
-			memberIds = memberIds.concat(record.data.users.column("userId"));			
-		});
-		
-		var unique = memberIds.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
-						
-		go.Stores.get('User').get(unique, function(entities, async) {	
-			//all data is fetched now. Refresh grid ui.	
-			if(async && me.rendered) {
-				me.getView().refresh();														
-			}
-		});
-	},
+	},	
 	
 	getValue: function () {				
 		return this.selectedGroups;

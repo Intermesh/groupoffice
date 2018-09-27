@@ -22,10 +22,13 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	},
 	
 	onChanges : function(entityStore, added, changed, destroyed) {
-		if(changed.concat(added).indexOf(this.currentId) !== -1) {			
-			var entities = this.entityStore.get([this.currentId]);
-			this.entity = entities[0];
-			this.getForm().setValues(entities[0]);
+		if(changed.indexOf(this.currentId) !== -1) {			
+			
+			//TODO, This will bluntly overwrite user's modification when modified.
+			this.entityStore.get([this.currentId], function(entities) {
+				this.entity = entities[0];
+				this.getForm().setValues(entities[0]);
+			}, this);			
 		}		
 	},
 	
@@ -36,11 +39,11 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	load: function (id, callback, scope) {
 		this.currentId = id;
 
-		this.entityStore.get([id], function(entities, async) {
+		this.entityStore.get([id], function(entities) {
 			this.setValues(entities[0]);
 			this.entity = entities[0];
 			
-			callback.call(scope || this, entities[0], async);
+			callback.call(scope || this, entities[0]);
 		}, this);
 	},
 	
