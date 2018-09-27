@@ -288,6 +288,8 @@ views/Extjs3/javascript/go/links/CreateLinkWindow.js
 views/Extjs3/javascript/go/links/LinkBrowser.js
 views/Extjs3/javascript/go/links/LinksDetailPanel.js
 
+views/Extjs3/javascript/go/usersettings/AccountSettingsPanel.js
+views/Extjs3/javascript/go/usersettings/LookAndFeelPanel.js
 views/Extjs3/javascript/go/usersettings/UserSettingsDialog.js
 
 views/Extjs3/javascript/go/Router.js

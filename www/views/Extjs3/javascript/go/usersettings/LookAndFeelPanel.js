@@ -10,7 +10,7 @@
  * @copyright Copyright Intermesh
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
-go.modules.core.users.LookAndFeelPanel = Ext.extend(Ext.Panel, {
+go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 
 	initComponent: function () {
 		
@@ -28,7 +28,7 @@ go.modules.core.users.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 		
 		
 		this.globalFieldset = new Ext.form.FieldSet({
-			title: t('Global'),
+			title: t('Global','users','core'),
 			labelWidth:dp(160),
 			defaults: { 
 				width:dp(200),
@@ -125,10 +125,10 @@ go.modules.core.users.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 		this.regionFieldset = new Ext.form.FieldSet({
 			labelWidth:dp(160),
 			defaults: { width:dp(200) },
-			title: t('Regional'),
+			title: t('Regional','users','core'),
 			items:[
 				this.languageCombo = new Ext.form.ComboBox({
-					fieldLabel: t('Language'),
+					fieldLabel: t('Language','users','core'),
 					name: 'language_id',
 					store:  new Ext.data.SimpleStore({
 						fields: ['id', 'language'],
@@ -145,7 +145,7 @@ go.modules.core.users.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				}),
 				
 				this.timezoneCombo = new Ext.form.ComboBox({
-					fieldLabel: t('Timezone'),
+					fieldLabel: t('Timezone','users','core'),
 					name: 'timezone',
 					store: new Ext.data.SimpleStore({
 						fields: ['timezone'],
@@ -160,7 +160,7 @@ go.modules.core.users.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				}),
 				
 				this.dateFormatCombo = new Ext.form.ComboBox({
-					fieldLabel: t('Date format'),
+					fieldLabel: t('Date format','users','core'),
 					name: 'dateFormat',
 					store: new Ext.data.SimpleStore({
 						fields: ['id', 'dateformat'],
@@ -184,13 +184,13 @@ go.modules.core.users.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				}),
 				
 				this.timeFormatCombo = new Ext.form.ComboBox({
-					fieldLabel: t('Time format'),
+					fieldLabel: t('Time format','users','core'),
 					name: 'time_format_name',
 					store: new Ext.data.SimpleStore({
 						fields: ['id', 'time_format'],		
 						data : [
-						['G:i', t('24 hour format')],
-						['h:i a', t('12 hour format')]
+						['G:i', t('24 hour format','users','core')],
+						['h:i a', t('12 hour format','users','core')]
 						]
 					}),
 					displayField: 'time_format',
@@ -204,13 +204,13 @@ go.modules.core.users.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				}),
 					
 				this.firstWeekdayCombo = new Ext.form.ComboBox({
-					fieldLabel: t('First day of week'),
+					fieldLabel: t('First day of week','users','core'),
 					name: 'first_weekday_name',
 					store: new Ext.data.SimpleStore({
 						fields: ['id', 'first_weekday'],		
 						data : [
-							['0', t('Sunday')],
-							['1', t('Monday')]
+							['0', t('Sunday','users','core')],
+							['1', t('Monday','users','core')]
 						]
 					}),
 					displayField: 'first_weekday',
@@ -225,7 +225,7 @@ go.modules.core.users.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				}),
 				
 				this.holidaysetCombo = new GO.form.ComboBox({
-					fieldLabel: t('Holidays'),
+					fieldLabel: t('Holidays','users','core'),
 					name: 'holidayset',
 					store:  new GO.data.JsonStore({
 						url: GO.url("core/holidays"),
@@ -247,7 +247,7 @@ go.modules.core.users.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 		this.formattingFieldset = new Ext.form.FieldSet({
 			labelWidth:dp(160),
 			defaults: { width:dp(50) },
-			title: t('Formatting'),
+			title: t('Formatting','users','core'),
 			items:[
 				{
 						xtype: 'textfield', 
@@ -277,7 +277,7 @@ go.modules.core.users.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 		
 		this.soundsFieldset = new Ext.form.FieldSet({
 			labelWidth:dp(160),
-			title: t('Sounds'),
+			title: t('Sounds','users','core'),
 			items:[
 				
 				this.cbMuteAll = new Ext.ux.form.XCheckbox({
@@ -313,7 +313,7 @@ go.modules.core.users.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 		
 		this.notificationsFieldset = new Ext.form.FieldSet({
 			labelWidth:dp(160),
-			title: t('Notifications'),
+			title: t('Notifications','users','core'),
 			items:[
 				this.cbPopupReminders = new Ext.ux.form.XCheckbox({
 					hideLabel: true,
@@ -381,7 +381,7 @@ go.modules.core.users.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 		});
 	
 		Ext.apply(this,{
-			title:t('Look & feel'),
+			title:t('Look & feel','users','core'),
 			autoScroll:true,
 			iconCls: 'ic-style',
 			layout:'column',
@@ -396,7 +396,7 @@ go.modules.core.users.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 			]
 		});
 		
-		go.modules.core.users.LookAndFeelPanel.superclass.initComponent.call(this);
+		go.usersettings.LookAndFeelPanel.superclass.initComponent.call(this);
 	},
 	
 	onLoadComplete : function(data){

@@ -1,10 +1,10 @@
 Ext.ns("go.googleauthenticator");
 
 Ext.onReady(function () {
-	Ext.override(go.modules.core.users.AccountSettingsPanel, {
+	Ext.override(go.usersettings.AccountSettingsPanel, {
 		currentUser: null,
 
-		initComponent: go.modules.core.users.AccountSettingsPanel.prototype.initComponent.createSequence(function () {
+		initComponent: go.usersettings.AccountSettingsPanel.prototype.initComponent.createSequence(function () {
 
 			var me = this;
 			this.googleAuthenticatorFieldset = new Ext.form.FieldSet({
