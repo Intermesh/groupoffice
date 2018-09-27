@@ -7,39 +7,29 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  */
- 
-/**
- * @property int $user_id
- * @property double $mo_work_hours
- * @property double $tu_work_hours
- * @property double $we_work_hours
- * @property double $th_work_hours
- * @property double $fr_work_hours
- * @property double $sa_work_hours
- * @property double $su_work_hours
- */
-
 
 namespace GO\Base\Model;
 
+use go\core\orm\Property;
 
-class WorkingWeek extends \GO\Base\Db\ActiveRecord {
-	
-	public static function model($className=__CLASS__)
-	{	
-		return parent::model($className);
-	}
+class WorkingWeek extends Property {
+
+	public $user_id;
+	public $mo_work_hours;
+	public $tu_work_hours;
+	public $we_work_hours;
+	public $th_work_hours;
+	public $fr_work_hours;
+	public $sa_work_hours;
+	public $su_work_hours;
+
 	
 	public function primaryKey() {
 		return 'user_id';
 	}
-	
-	protected function getLocalizedName() {
-		return \GO::t("workingWeek");
-	}
 
-	public function tableName() {
-		return 'go_working_weeks';
+	protected static function defineMapping() {
+		return parent::defineMapping()->addTable("go_working_weeks", "ww");
 	}
 	
 	public function getHoursForDay($time){
