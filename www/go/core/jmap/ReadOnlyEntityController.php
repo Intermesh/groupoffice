@@ -336,7 +336,7 @@ abstract class ReadOnlyEntityController extends Controller {
 
 		foreach($query as $e) {
 			$arr = $e->toArray();
-			$arr['id'] = $this->getId();
+			$arr['id'] = $e->getId();
 			$result['list'][] = $arr; 
 			$foundIds[] = $arr['id'];
 		}
