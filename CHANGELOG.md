@@ -1,3 +1,5 @@
+- Core: Translation in some parts were not working correctly.
+- Core: Convert tables to InnoDB before upgrade if necessary
 - Customfields: removed maxlength of 190 characters on textareas
 
 25-09-2018 6.3.39
