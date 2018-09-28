@@ -1,3 +1,6 @@
+views/Extjs3/javascript/vendor/localforage.nopromises.js
+views/Extjs3/javascript/vendor/localforage.getitems.js
+
 views/Extjs3/javascript/go/go.js
 views/Extjs3/javascript/go/Translate.js
 
@@ -321,3 +324,5 @@ views/Extjs3/javascript/go/Array.js
 
 
 views/Extjs3/javascript/go/grid/editor/ComboColumn.js
+
+

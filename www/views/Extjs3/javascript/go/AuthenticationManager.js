@@ -128,14 +128,20 @@
 				this.logout.defer(500, this, [true]);
 			} else
 			{
-				Ext.Ajax.request({
-					url: BaseHref + 'auth.php',
-					method: "DELETE",
-					callback: function() {
-						go.User.clearAccessToken();
-						document.location = BaseHref;
-					}
-				})
+				localforage.dropInstance({
+					name: "groupoffice"
+				}, function() {
+					Ext.Ajax.request({
+						url: BaseHref + 'auth.php',
+						method: "DELETE",
+						callback: function() {
+							go.User.clearAccessToken();
+							document.location = BaseHref;
+						}
+					});
+				});
+				
+				
 				
 			}
 		},

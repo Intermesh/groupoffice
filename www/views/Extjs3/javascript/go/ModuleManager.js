@@ -101,12 +101,10 @@
 			if (!this.registered[package] || !this.registered[package][name]) {
 				return false;
 			}
-
-			var all = go.Stores.get("Module").data, id;
-
-			for (id in all) {
-				if ((package === "legacy" || all[id].package == package) && all[id].name === name) {
-					return all[id];
+			
+			for (id in this.entities) {
+				if ((package === "legacy" || this.entities[id].package == package) && this.entities[id].name === name) {
+					return this.entities[id];
 				}
 			}
 
@@ -114,11 +112,11 @@
 		},
 
 		getAll: function () {
-			return go.Stores.get("Module").data;
+			return this.entities;
 		},
 
 		getAvailable: function () {
-			var available = [],all = go.Stores.get("Module").data, id;
+			var available = [],all = this.entities, id;
 
 			for (id in all) {
 				if (this.isAvailable(all[id].package, all[id].name)) {
@@ -133,7 +131,9 @@
 		init: function () {
 			var package, name;
 			
-			go.Stores.get("Module").getUpdates(function () {
+			go.Stores.get("Module").all(function (entities) {
+
+				this.entities = entities;
 
 				for (package in this.registered) {
 					for (name in this.registered[package]) {

@@ -1,4 +1,5 @@
-go.User = {
+go.User = new (Ext.extend(Ext.util.Observable, {
+	loaded : false,
 	accessToken: localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken'),
 	authenticate: function(cb, scope) {
 		if(!this.accessToken) {
@@ -28,11 +29,15 @@ go.User = {
     this.id = session.user.id;
     this.avatarId = session.user.avatarId;
 		this.isAdmin = session.user.isAdmin;
+		
+		this.loaded = true;
 
     Ext.apply(GO.settings, session.oldSettings);
+		
+		this.fireEvent("load", this);
   },
   
 	isLoggedIn: function() {
 		return !Ext.isEmpty(this.username);
 	}
-};
+}));
