@@ -11,3 +11,4 @@ StarButton.js
 ContactCombo.js
 SystemSettingsPanel.js
 CustomFieldSetDialog.js
+customfield/Contact.js
