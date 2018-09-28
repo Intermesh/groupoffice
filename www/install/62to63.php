@@ -7,6 +7,26 @@ App::get()->getCache()->flush(false);
 
 App::get()->getDatabase()->setUtf8();
 
+$qs[] = function () {
+	$stmt = GO()->getDbConnection()->query("SHOW TABLE STATUS");	
+	
+	foreach($stmt as $record){
+		
+		if($record['Engine'] != 'InnoDB' && $record["Name"] != 'fs_filesearch' && $record["Name"] != 'cms_files') {
+			echo "Converting ". $record["Name"] . " to InnoDB\n";
+			flush();
+			$sql = "ALTER TABLE `".$record["Name"]."` ENGINE=InnoDB;";
+			GO()->getDbConnection()->query($sql);	
+		}
+		
+		if($record["Collation"] != "utf8mb4_unicode_ci" ) {
+			echo "Converting ". $record["Name"] . " to utf8mb4\n";
+			flush();
+			$sql = "ALTER TABLE `".$record["Name"]."` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
+			GO()->getDbConnection()->query($sql);	
+		}	
+	}
+};
 
 $qs[] = "UPDATE go_settings SET value=0 where name = 'version';";
 $qs[] = "ALTER TABLE `go_modules` ADD `package` VARCHAR(100) NULL DEFAULT NULL AFTER `id`;";
