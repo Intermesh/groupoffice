@@ -1,3 +1,5 @@
+/* global Ext, go */
+
 go.links.LinksDetailPanel = Ext.extend(Ext.Panel, {
 	addButtonItems : null,
 	cls: 'go-links-detail',
@@ -87,7 +89,7 @@ go.links.LinksDetailPanel = Ext.extend(Ext.Panel, {
 			countEntity : function(entity) {
 				var count = 0;
 				me.store.each(function(r) {
-					if(r.data.toEntity == entity) {
+					if(r.data.toEntity === entity) {
 						count++;
 					}
 				});
@@ -185,12 +187,12 @@ go.links.LinksDetailPanel = Ext.extend(Ext.Panel, {
 	
 	delete : function(record) {
 		Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function(btn) {
-			if(btn == 'yes') {
+			if(btn === 'yes') {
 				go.Stores.get("Link").set({
 					destroy: [record.id]
 				});
 			}
-		}, this)
+		}, this);
 		
 	},
 
@@ -246,7 +248,7 @@ go.links.LinksDetailPanel = Ext.extend(Ext.Panel, {
 		
 		go.Links.linkToWindows.sort(function(a, b) {
 			return a.title.localeCompare(b.title);
-		})
+		});
 		
 		go.Links.linkToWindows.forEach(function (i) {			
 			
@@ -260,6 +262,10 @@ go.links.LinksDetailPanel = Ext.extend(Ext.Panel, {
 						return;
 					}
 					
+					//If go.form.Dialog turn off redirect to detail view.
+					window.redirectOnSave = false;
+					
+					//Windows may implement setLinkEntity() so they can do stuff on linking.
 					if(window.setLinkEntity) {
 						window.on('show', function() {
 								window.setLinkEntity({
@@ -267,27 +273,25 @@ go.links.LinksDetailPanel = Ext.extend(Ext.Panel, {
 									data: this.detailView.data
 								});
 							}, this, {single: true});
-					}
-					
+					}					
 					
 					if(!window.isVisible()) {
 						window.show();
-					}
+					}					
 					
-					
-					window.on('save', function (window, entity) {						
+					window.on('save', function (window, entity) {
 						
 						//hack for event dialog because save event is different
-						if(i.entity == "Event") {
+						if(i.entity === "Event") {
 							entity = arguments[2].result.id;
 						}
 						
 						var link = {
-									fromEntity: this.getEntity(),
-									fromId: this.getEntityId(),
-									toEntity: i.entity,
-									toId: null
-								}
+							fromEntity: this.getEntity(),
+							fromId: this.getEntityId(),
+							toEntity: i.entity,
+							toId: null
+						};
 						
 						if(!Ext.isObject(entity)) {
 							//old modules just pass ID
