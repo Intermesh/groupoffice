@@ -335,10 +335,12 @@ abstract class ReadOnlyEntityController extends Controller {
 		$result['list'] = [];
 
 		foreach($query as $e) {
-			$result['list'][] = $e->toArray(); 
-			$foundIds[] = $e->getId();
+			$arr = $e->toArray();
+			$arr['id'] = $this->getId();
+			$result['list'][] = $arr; 
+			$foundIds[] = $arr['id'];
 		}
-//		$result['found'] = $foundIds;
+		
 		if(isset($p['ids'])) {
 			$result['notFound'] = array_values(array_diff($p['ids'], $foundIds));			
 		}

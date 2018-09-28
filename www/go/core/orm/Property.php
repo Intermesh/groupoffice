@@ -1189,5 +1189,25 @@ abstract class Property extends Model {
 			}
 		}
 	}
+	
+	/**
+	 * Copy the property.
+	 * 
+	 * The property will not be saved to the database.
+	 * The primary key values will not be copied.
+	 * 
+	 * @return \static
+	 */
+	protected function internalCopy() {
+		$copy = new static;
+		$v = $this->toArray();
+		$pk = $this->getPrimaryKey();
+		foreach($pk as $field) {
+			unset($v[$field]);
+		}
+		
+		$copy->setValues($v);
 
+		return $copy;
+	}
 }

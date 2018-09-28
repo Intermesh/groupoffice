@@ -75,14 +75,6 @@ abstract class Entity extends Property {
 		$keys = $this->primaryKeyValues();
 		return count($keys) > 1 ? implode("-", array_values($keys)) : array_values($keys)[0];
 	}
-	
-	
-	public function toArray($properties = array()) {
-		$arr = parent::toArray($properties);
-		$arr['id'] = $this->getId();
-		return $arr;
-	}
-
 
 	/**
 	 * Find by ID's. 
@@ -443,4 +435,12 @@ abstract class Entity extends Property {
 		return null;
 	}
 	
+	/**
+	 * Copy the entity
+	 *
+	 * @return static
+	 */	
+	public function copy() {
+		return $this->internalCopy();
+	}
 }
