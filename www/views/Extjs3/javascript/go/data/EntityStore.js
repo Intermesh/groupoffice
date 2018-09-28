@@ -85,17 +85,8 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		this.state = null;
 		this.data = {};	
 
-		localforage.dropInstance({
-			name: "groupoffice",
-			storeName: this.entity.name + "-entities"
-		});
-		
-		localforage.dropInstance({
-			name: "groupoffice",
-			storeName: this.entity.name + "-meta"
-		});
-		
-		//this.initState();
+		this.metaStore.clear();
+		this.stateStore.clear();
 	},
 	
 	_add : function(entity) {
@@ -248,6 +239,13 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 	},
 	
+	/**
+	 * Get all entities
+	 * 
+	 * @param {function} cb
+	 * @param {object} scope
+	 * @returns {void}
+	 */
 	all : function(cb, scope) {
 		this.initState(function() {
 			if(this.isComplete) {

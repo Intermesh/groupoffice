@@ -3,17 +3,41 @@
 	var CustomFieldsCls = Ext.extend(Ext.util.Observable, {
 		initialized: false,
 		
+		fieldSets: null,
+		fields: null,
 		
 		//init is called in GO.MainLayout.onAuthneticatiojn so custom fields are 
 		//always available when modules render.
-		init : function() {
+		init : function(cb, scope) {
+			
+			var me = this, scope = scope || me;
+			
+			return new Promise(function(resolve, reject){
+			
+				scope = scope || me;
 
-			go.Stores.get("Field").getUpdates(function (store) {
+				go.Stores.get("Field").all(function (fields) {
+					me.fields = fields
 
-			});
+					if(me.fieldSets) {
+						if(cb) {
+							cb.call(scope);
+						}
+						resolve(me);
+					}				
+				}, me);
 
-			go.Stores.get("FieldSet").getUpdates(function (store) {
+				go.Stores.get("FieldSet").all(function (fieldSets) {
+					me.fieldSets = fieldSets
+					if(me.fields) {
+						if(cb) {
+							cb.call(scope);
+						}
 
+						resolve(me);
+					}
+				}, me);
+			
 			});
 		},
 		
@@ -36,12 +60,11 @@
 		 * @returns {Array}
 		 */
 		getFieldSets: function (entity) {
-			var r = [],
-							all = go.Stores.get("FieldSet").data;
+			var r = [];
 
-			for (var id in all) {
-				if (all[id].entity === entity) {
-					r.push(all[id]);
+			for (var id in this.fieldSets) {
+				if (this.fieldSets[id].entity === entity) {
+					r.push(this.fieldSets[id]);
 				}
 			}
 			
@@ -142,12 +165,10 @@
 		 * @returns {Array}
 		 */
 		getFields: function (fieldSetId) {
-			var r = [],
-							all = go.Stores.get("Field").data,
-							field;
+			var r = [],	field;
 
-			for (var id in all) {
-				field = all[id];
+			for (var id in this.fields) {
+				field = this.fields[id];
 				if (field.fieldSetId == fieldSetId) {
 					r.push(field);
 				}
@@ -170,7 +191,7 @@
 		 * @returns {CustomFieldsL#1.CustomFieldsAnonym$0.render.values}
 		 */
 		renderField: function (fieldId, values) {
-			var field = go.Stores.get("Field").data[fieldId];
+			var field = this.fields[fieldId];
 
 			type = this.getType(field.type);
 			if(!type) {							
@@ -188,7 +209,7 @@
 		 * @returns {String} The material design icon text
 		 */
 		getFieldIcon: function (fieldId) {
-			var field = go.Stores.get("Field").data[fieldId];
+			var field = this.fields[fieldId];
 			
 			type = this.getType(field.type);
 			if(!type) {							
@@ -211,22 +232,14 @@
 
 			fieldSets.forEach(function (fieldSet) {
 				
-				var items = [];
+				var items = [];		
 				
 				
-				go.modules.core.customfields.CustomFields.getFields(fieldSet.id).forEach(function (field) {
-					
+				go.modules.core.customfields.CustomFields.getFields(fieldSet.id).forEach(function (field) {					
 					var cmp = me.getType(field.type).getDetailField(field);					
 					items.push(cmp);
-					
-//					tpl += '<tpl if="!GO.util.empty(go.modules.core.customfields.CustomFields.renderField(\'' + field.id + '\',values))"><p><i class="icon label ' + go.modules.core.customfields.CustomFields.getFieldIcon(field.id) + '"></i>\
-//				<span>{[go.modules.core.customfields.CustomFields.renderField("' + field.id + '",values)]}</span>\
-//					<label>' + t(field.name) + '</label>\
-//					</p></tpl>';
 				});
-
-//				tpl += '</div></tpl>';
-
+				
 				panels.push({				
 					xtype: "panel",
 					id: "cf-detail-field-set-" + fieldSet.id,
