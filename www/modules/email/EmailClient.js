@@ -13,12 +13,9 @@
 
 Ext.namespace("GO.email");
 
-GO.email.EmailClient = function(config){
+GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
-	if(!config)
-	{
-		config = {};
-	}
+	initComponent : function() {
 
 	this.messagesStore = new GO.data.JsonStore({
 		url: GO.url("email/message/store"),
@@ -226,7 +223,7 @@ GO.email.EmailClient = function(config){
 			scope: this
 		});
 	}
-
+	
 	var contextItems = [
 	this.contextMenuMarkAsRead = new Ext.menu.Item({
 		text: t("Mark as read", "email"),
@@ -596,8 +593,8 @@ GO.email.EmailClient = function(config){
 		this.messagesGrid.show();
 	}, this);
 
-	config.layout='responsive';
-	config.layoutConfig = {
+	this.layout='responsive';
+	this.layoutConfig = {
 			triggerWidth: 1000
 		};
 
@@ -723,7 +720,7 @@ GO.email.EmailClient = function(config){
 		]
 	})
 
-	config.items=[
+	this.items=[
 		this.westPanel,
 		this.messagePanel
 	];
@@ -816,12 +813,10 @@ GO.email.EmailClient = function(config){
 	}
 	GO.email.searchSender = GO.email.searchSender.createDelegate(this);
 
-	GO.email.EmailClient.superclass.constructor.call(this, config);
+	GO.email.EmailClient.superclass.initComponent.call(this);
 	
 	GO.email.emailClient = this;
-};
-
-Ext.extend(GO.email.EmailClient, Ext.Panel,{
+	},
 
 	_permissionDelegated : false,
 
