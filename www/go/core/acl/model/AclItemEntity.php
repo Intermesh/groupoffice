@@ -18,7 +18,7 @@ use go\core\jmap\Entity;
  * 
  * @see AclOwnerEntity
  */
-abstract class AclItemEntity extends Entity {
+abstract class AclItemEntity extends AclEntity {
 
 	/**
 	 * Get the {@see AclEntity} class name that holds the acl

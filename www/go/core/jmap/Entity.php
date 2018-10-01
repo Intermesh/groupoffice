@@ -2,7 +2,10 @@
 
 namespace go\core\jmap;
 
-use go\core\acl\model\Acl;
+use go\core\db\Query;
+use go\core\jmap\exception\CannotCalculateChanges;
+use go\core\orm\Entity as OrmEntity;
+use PDO;
 
 /**
  * Entity model
@@ -11,7 +14,7 @@ use go\core\acl\model\Acl;
  * multiple database tables. It can be extended with has one related tables and
  * it can also have properties in other tables.
  */
-abstract class Entity  extends \go\core\orm\Entity {	
+abstract class Entity  extends OrmEntity {	
 	
 	/**
 	 * Track changes in the core_change log for the JMAP protocol.
@@ -29,7 +32,7 @@ abstract class Entity  extends \go\core\orm\Entity {
 	 * @return string
 	 */
 	public static function getState() {
-		return static::getType()->highestModSeq . ':' . Acl::getType()->highestModSeq;
+		return static::getType()->highestModSeq;
 	}
 	
 	
@@ -70,5 +73,71 @@ abstract class Entity  extends \go\core\orm\Entity {
 		return true;
 	}	
 	
+	
+	/**
+	 * 
+	 * @param string $sinceState
+	 * @param int $maxChanges
+	 * @return array ['entityId' => 'destroyed' => boolean, modSeq => int]
+	 * @throws CannotCalculateChanges
+	 */
+	public static function getChanges($sinceState, $maxChanges) {
+		
+		$entityType = static::getType();
+		
+		//find the old state changelog entry
+		if($sinceState) { //If state == 0 then we don't need to check this
+			$sinceChange = (new Query())
+							->select("*")
+							->from("core_change")
+							->where(["entityTypeId" => $entityType->getId()])
+							->andWhere('modSeq', '=', $sinceState)
+							->single();
+
+			if(!$sinceChange) {			
+				throw new CannotCalculateChanges();
+			}
+		}	
+		
+		$result = [				
+			'oldState' => $sinceState,
+			'newState' => null,
+			'hasMoreUpdates' => false,
+			'changed' => [],
+			'removed' => []
+		];
+		
+		$changes = static::getChangesQuery($sinceState, $maxChanges);
+		
+		foreach ($changes as $change) {
+			if ($change['destroyed']) {
+				$result['removed'][] = $change['entityId'];
+			} else {					
+				$result['changed'][] = $change['entityId'];
+			}
+		}
+		
+		if(isset($change)){
+			$result['newState'] = $change['modSeq'];
+		} else
+		{
+			$result['newState'] = static::getState();
+		}
+		
+		$result['hasMoreUpdates'] = $result['newState'] != static::getState();
+		
+		return $result;		
+	}
+	
+	protected static function getChangesQuery($sinceState, $maxChanges) {
+		return (new Query)->select('entityId,max(destroyed) AS destroyed, max(modSeq) AS modSeq')
+						->from('core_change')
+						->fetchMode(PDO::FETCH_ASSOC)
+						->limit($maxChanges)
+						->orderBy(['modSeq' => 'ASC'])						
+						->groupBy(['entityId'])
+						->where(["entityTypeId" => static::getType()->getId()])
+						->andWhere('modSeq', '>', $sinceState);
+	}
 	
 }
