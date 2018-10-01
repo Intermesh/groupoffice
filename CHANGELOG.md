@@ -1,3 +1,4 @@
+- Files: Changed "public folder" icon in grid.
 - Core: Fixed tabs in user settings menu
 - Core: Fixed issue with generating XLS file reports in Projects2
 - Core: Translation in some parts were not working correctly.
