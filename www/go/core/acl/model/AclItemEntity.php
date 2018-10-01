@@ -16,7 +16,7 @@ use go\core\jmap\Entity;
  * It's main purpose is to provide the {@see applyAclToQuery()} function so you 
  * can easily query items which a user has read permissions for.
  * 
- * @see AclEntity
+ * @see AclOwnerEntity
  */
 abstract class AclItemEntity extends Entity {
 

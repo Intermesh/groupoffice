@@ -2,7 +2,7 @@
 
 namespace go\modules\core\groups\model;
 
-use go\core\acl\model\AclEntity;
+use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
 use go\core\db\Query;
 use go\core\validate\ErrorCode;
@@ -11,7 +11,7 @@ use go\modules\core\users\model\UserGroup;
 /**
  * Group model
  */
-class Group extends AclEntity {
+class Group extends AclOwnerEntity {
 
 	const ID_ADMINS = 1;
 	const ID_EVERYONE = 2;

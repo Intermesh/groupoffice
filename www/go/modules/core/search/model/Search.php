@@ -8,7 +8,7 @@ use go\core\orm\Entity;
 use go\core\orm\EntityType;
 use go\core\util\DateTime;
 
-class Search extends \go\core\acl\model\AclEntity {
+class Search extends \go\core\acl\model\AclOwnerEntity {
 
 	public $id;
 	public $entityId;

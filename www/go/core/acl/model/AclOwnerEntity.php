@@ -16,7 +16,7 @@ use go\core\orm\Mapping;
  * 
  * @see Acl
  */
-abstract class AclEntity extends Entity {
+abstract class AclOwnerEntity extends Entity {
 	
 	/**
 	 * The ID of the {@see Acl}

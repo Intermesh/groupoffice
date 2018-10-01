@@ -1,9 +1,9 @@
 <?php
 namespace go\modules\community\notes\model;
 
-use go\core\acl\model\AclEntity;
+use go\core\acl\model\AclOwnerEntity;
 
-class NoteBook extends AclEntity {
+class NoteBook extends AclOwnerEntity {
 	
 	public $id;
 	public $createdBy;

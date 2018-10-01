@@ -2,7 +2,7 @@
 namespace go\modules\core\modules\model;
 
 use Exception;
-use go\core\acl\model\AclEntity;
+use go\core\acl\model\AclOwnerEntity;
 use go\core\App;
 use go\modules\core\groups\model\Group;
 use go\modules\core\users\model\User;
@@ -12,7 +12,7 @@ use go\core\module\Base;
 use go\core\orm\Entity;
 use go\modules\core\search\model\Search;
 
-class Module extends AclEntity {
+class Module extends AclOwnerEntity {
 	public $id;
 	public $name;
 	public $package;

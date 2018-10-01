@@ -2,10 +2,10 @@
 
 namespace go\modules\core\customfields\model;
 
-use go\core\acl\model\AclEntity;
+use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Query;
 
-class FieldSet extends AclEntity {
+class FieldSet extends AclOwnerEntity {
 /**
 	 * The ID
 	 * 
