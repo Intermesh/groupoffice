@@ -312,9 +312,15 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		$url = GO::config()->host . 'views/Extjs3/themes/Paper/img/filetype/';
 		$file = new \GO\Base\Fs\File(GO::config()->file_storage_path . $params['src']);
 		
-		if (is_dir(GO::config()->file_storage_path . $params['src'])) {
-			$src = $dir . 'folder.svg';
+		
+		if(isset($params['foldericon'])){
+			
+			$src = $dir . $params['foldericon'].'.svg';
 		} else {
+		
+//		if (is_dir(GO::config()->file_storage_path . $params['src'])) {
+//			$src = $dir . 'folder.svg';
+//		} else {
 
 			switch (strtolower($file->extension())) {
 
