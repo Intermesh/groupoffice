@@ -1,3 +1,4 @@
+- Tickets: Fixed issue that a ticket agent did not get a correct formatted message.
 - Files: Changed "public folder" icon in grid.
 - Core: Fixed tabs in user settings menu
 - Core: Fixed issue with generating XLS file reports in Projects2
