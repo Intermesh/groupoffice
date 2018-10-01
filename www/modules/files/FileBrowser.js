@@ -203,10 +203,10 @@ GO.files.FileBrowser = function(config){
 		}]
 	};
 
-	if(go.Modules.isAvailable("core", "customfields"))
-	{
-		GO.customfields.addColumns("GO\\Files\\Model\\File", fields);
-	}
+//	if(go.Modules.isAvailable("core", "customfields"))
+//	{
+//		GO.customfields.addColumns("GO\\Files\\Model\\File", fields);
+//	}
 
 	this.gridStore = new GO.data.JsonStore({
 //		url: GO.settings.modules.files.url+'json.php',
@@ -2144,3 +2144,15 @@ go.Modules.register("legacy", 'files', {
 
 GO.files.pasteSelections = new Array();
 GO.files.pasteMode = 'copy';
+
+
+GO.files.launchFile = function(config) {
+	GO.request({
+		url: 'files/file/open',
+		params: config,
+		success: function(response, options, result) {
+			result.handler.call();
+		},
+		scope: this
+	})
+};

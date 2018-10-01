@@ -183,6 +183,10 @@ abstract class Base extends Model {
 				$types[$class::getName()] = $class;
 			}
 			
+			if(GO()->getModule(null, "files")) {
+				$types['File'] = \GO\Files\Customfield\File::class;
+			}
+			
 			GO()->getCache()->set("customfield-types", $types);
 		}
 		

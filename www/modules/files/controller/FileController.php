@@ -321,6 +321,28 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		return array('success'=>empty($params['cls']) ? $fh->delete() : $fh->save());
 	}
 	
+	
+	protected function actionOpen($params) {
+		if(!empty($params['path'])) {
+			$file = \GO\Files\Model\File::model()->findByPath($params['path']);
+		} else
+		{
+			$file = \GO\Files\Model\File::model()->findByPath($params['id']);
+		}
+
+		if(!$file){
+			throw new \Exception("File not found");
+		}
+		
+		$response = [
+				'success' => true,
+				'file' => $file->getAttributes(),
+				'handler' => 'startjs:function(){'.$file->getDefaultHandler()->getHandler($file).'}:endjs'
+		];
+		
+		return $response;
+	}
+	
 
 	protected function actionDownload($params) {
 		\GO::session()->closeWriting();

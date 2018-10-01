@@ -1,5 +1,6 @@
 For old framework:
 
+replace all GO.customfields.addColumns
 old dialogs send raw dom and not json with correct formatting.
 advanced search
 cascade delete

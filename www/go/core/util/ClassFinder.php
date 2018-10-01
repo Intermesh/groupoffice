@@ -10,7 +10,9 @@ use go\modules\core\modules\model\Module;
 use ReflectionClass;
 
 /**
- * Finds classes within Group-Office
+ * Finds classes within Group-Office.
+ * 
+ * This only finds classes in the new framwwork under "go/*".
  * 
  * Warning: Using this is expensive. Caching the results is recommended.
  * 

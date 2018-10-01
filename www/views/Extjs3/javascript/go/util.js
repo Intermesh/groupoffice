@@ -144,6 +144,10 @@
 		
 		textToHtml : function(text) {
 			return Ext.util.Format.nl2br(text);
+		},
+		
+		addSlashes : function( str ) {
+			return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
 		}
 
 	};

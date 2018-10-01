@@ -278,6 +278,25 @@ use const GO_CONFIG_FILE;
 			return $this->cache;
 		}
 		
+		
+		/**
+		 * Get a module
+		 * 
+		 * return the module if it's installed and available.
+		 * 
+		 * @param string $package Set to null for legacy modules
+		 * @param string $name
+		 * @return boolean
+		 */
+		public function getModule($package, $name) {
+			$model = \go\modules\core\modules\model\Module::find()->where(['package' => $package, 'name' => $name, 'enabled' => true])->single();
+			if(!$model || !$model->isAvailable()) {
+				return false;
+			}
+			
+			return $model;
+		}
+		
 		/**
 		 * Set the cache provider
 		 * 
