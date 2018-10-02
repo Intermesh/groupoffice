@@ -150,9 +150,15 @@ class QueryBuilder {
 
 			$tags = [];
 			foreach ($data as $colName => $value) {
-				$paramTag = $this->getParamTag();
-				$tags[] = $paramTag;
-				$this->addBuildBindParameter($paramTag, $value, $this->tableName, $colName);
+				
+				if($value instanceof Expression) {
+					$tags[] = (string) $value;
+				} else
+				{				
+					$paramTag = $this->getParamTag();
+					$tags[] = $paramTag;
+					$this->addBuildBindParameter($paramTag, $value, $this->tableName, $colName);
+				}
 			}
 
 			$sql .= " (\n\t`" . implode("`,\n\t`", array_keys($data)) . "`\n)\n" .
@@ -174,10 +180,15 @@ class QueryBuilder {
 		if (is_array($data)) {
 			$updates = [];
 			foreach ($data as $colName => $value) {
-				$paramTag = $this->getParamTag();
-				$updates[] = '`' . $colName . '` = ' . $paramTag;
-
-				$this->addBuildBindParameter($paramTag, $value, $this->tableAlias, $colName);
+				
+				if($value instanceof Expression) {
+					$updates[] = '`' . $colName . '` = ' . $value;
+				} else
+				{				
+					$paramTag = $this->getParamTag();
+					$updates[] = '`' . $colName . '` = ' . $paramTag;
+					$this->addBuildBindParameter($paramTag, $value, $this->tableAlias, $colName);
+				}
 			}
 			$set = implode(",\n\t", $updates);
 		} else if ($data instanceof Expression) {
@@ -363,9 +374,7 @@ class QueryBuilder {
 	 * @param string
 	 */
 	protected function buildWhere(array $conditions, $prefix = "") {
-
-
-
+		
 		if (isset($conditions[0])) {
 			$conditions[0][1] = "";
 		}
