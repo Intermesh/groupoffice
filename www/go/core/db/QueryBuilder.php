@@ -85,6 +85,11 @@ class QueryBuilder {
 	 * @param string $tableName The table to operate on
 	 */
 	public function setTableName($tableName) {
+		
+		if(!isset($tableName)) {
+			throw new \Exception("No from() table set for the select query");
+			
+		}
 		$this->tableName = $tableName;
 		$this->table = Table::getInstance($tableName);
 	}
@@ -237,10 +242,45 @@ class QueryBuilder {
 	 * @param boolean $replaceBindParameters Will replace all :paramName tags with the values. Used for debugging the SQL string.
 	 * @return string
 	 */
-	public function buildSelect(Query $query = null, $prefix = '') {
+	public function buildSelect(Query $query = null) {
 
-		$this->setTableName($query->getFrom());
+		$unions = $query->getUnions();
+		
+		$r = $this->internalBuildSelect($query, empty($unions) ? "" : "\t");
+		
+		$unions = $query->getUnions();
+		if(empty($unions)) {
+			return $r;
+		}
+		
+		$r['sql'] = "(\n" . $r['sql'];
+		
+		foreach($unions as $q) {
+			$u = $this->internalBuildSelect($q, "\t");
+			$r['sql'] .=  "\n) UNION (\n" . $u['sql'];
+			$r['params'] = array_merge($r['params'], $u['params']);
+		}
+		
+		$r['sql'] .= "\n)";		
+		
+		$orderBy = $this->buildOrderBy(true);
+		if(!empty($orderBy)) {
+			$r['sql'] .= "\n" . $orderBy;
+		}
+		
+		if ($query->getUnionLimit() > 0) {
+			$r['sql'] .= "\nLIMIT " . $query->getUnionOffset() . ',' . $query->getUnionLimit();
+		}
+		
+		$r['debug'] = $this->debug ? $this->replaceBindParameters($r['sql'], $r['params']) : null;
+		
+		return $r;
+		
+	}
+	
+	protected function internalBuildSelect(Query $query, $prefix = '') {
 		$this->reset();
+		$this->setTableName($query->getFrom());		
 		$this->tableAlias = $query->getTableAlias();
 		$this->query = $query;
 		$this->buildBindParameters = $query->getBindParameters();
@@ -252,7 +292,7 @@ class QueryBuilder {
 			$joins .= "\n" . $prefix . $this->join($join, $prefix);
 		}
 
-		$select = "\n" . $prefix . $this->buildSelectFields();
+		$select = $prefix . $this->buildSelectFields();
 		$select .= "\n" . $prefix . "FROM `" . $this->tableName . '` `' . $this->tableAlias . "`";
 
 		$where = $this->buildWhere($this->query->getWhere(), $prefix);
@@ -260,16 +300,26 @@ class QueryBuilder {
 		if (!empty($where)) {
 			$where = "\n" . $prefix . "WHERE " . $where;
 		}
-		$group = "\n" . $prefix . $this->buildGroupBy();
-		$having = "\n" . $prefix . $this->buildHaving();
-		$orderBy = "\n" . $prefix . $this->buildOrderBy();
+		$group = $this->buildGroupBy();		
+		if(!empty($group)) {
+			$group = "\n" . $prefix . $group;
+		}
+		
+		$having = $this->buildHaving();
+		if(!empty($having)) {
+			$having = "\n" . $prefix . $having;
+		}
+		$orderBy = $this->buildOrderBy();
+		if(!empty($orderBy)) {
+			$orderBy = "\n" . $prefix . $orderBy;
+		}
 
 		$limit = "";
 		if ($this->query->getLimit() > 0) {
 			$limit .= "\n" . $prefix . "LIMIT " . $this->query->getOffset() . ',' . $this->query->getLimit();
 		}
 
-		$sql = trim($prefix . $select . $joins . $where . $group . $having . $orderBy . $limit);
+		$sql = $select . $joins . $where . $group . $having . $orderBy . $limit;
 
 		if ($this->query->getForUpdate()) {
 			$sql .= "\n" . $prefix . "FOR UPDATE";
@@ -384,7 +434,7 @@ class QueryBuilder {
 			$where .= $prefix . $this->buildCondition($condition, $prefix) . "\n";
 		}
 
-		return trim($where);
+		return rtrim($where);
 	}
 
 	/**
@@ -587,8 +637,8 @@ class QueryBuilder {
 		return $str;
 	}
 
-	private function buildOrderBy() {
-		$oBy = $this->query->getOrderBy();
+	private function buildOrderBy($forUnion = false) {
+		$oBy = $forUnion ? $this->query->getUnionOrderBy() : $this->query->getOrderBy();
 		if (empty($oBy)) {
 			return '';
 		}
