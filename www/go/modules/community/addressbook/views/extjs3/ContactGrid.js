@@ -1,3 +1,5 @@
+/* global go, t, Ext, GO */
+
 go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 	cls: 'x-grid3-no-row-borders',
 	initComponent: function () {
@@ -10,19 +12,16 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				{name: 'modifiedAt', type: 'date'},
 				{name: 'creator', type: go.data.types.User, key: 'createdBy'},
 				{name: 'modifier', type: go.data.types.User, key: 'modifiedBy'},
-				{name: 'star', type: go.data.types.ContactStar, key: function(r) {return r.id + "-" + go.User.id}},
+				'starred',
 				'permissionLevel',
 				'photoBlobId',
 				"isOrganization",
-				{name: 'organizations', type: go.data.types.Contact, key: 'organizations.organizationContactId'},			
+				{name: 'organizations', type: go.data.types.Contact, key: 'organizations.organizationContactId'}
 			].concat(go.modules.core.customfields.CustomFields.getFieldDefinitions("Contact")),
 			sortInfo :{field: "name", direction: "ASC"},
 			entityStore: go.Stores.get("Contact")
 		});
 		
-//		//reload store when user changes stars
-		go.Stores.get("ContactStar").on("changes", this.onStarChanges, this);
-
 		var grid = this;
 
 		Ext.apply(this, {
@@ -31,22 +30,22 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				{
 					width: dp(48),
 					id: "index",
-					dataIndex: "star",
+					dataIndex: "starred",
 					sortable: false,
 					draggable: false,
 					hideable: false,
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
-						if(rowIndex == 0 && value && value.starred) {							
+						if(rowIndex === 0 && value) {							
 							return '<div class="icon ic-star go-addressbook-star"></div>';
 						} else
 						{
-							if(value && value.starred) {
+							if(value) {
 								return "";
 							}
 							
 							var lastRecord = rowIndex > 0 ? grid.store.getAt(rowIndex - 1) : false;
 							var char = record.data.name.substr(0, 1);
-							if(!lastRecord || lastRecord.data.name.substr(0, 1) != char) {
+							if(!lastRecord || lastRecord.data.name.substr(0, 1) !== char) {
 								return "<h3>" + char.toUpperCase() + "</h3>";
 							}
 						}
@@ -110,8 +109,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					header: t('Modified at'),
 					width: dp(160),
 					sortable: true,
-					dataIndex: 'modifiedAt',
-					hidden: true
+					dataIndex: 'modifiedAt'
 				},
 				{
 					hidden: true,
@@ -139,25 +137,25 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 //				enableRowBody: true,
 //				showPreview: true,
 				getRowClass: function (record, rowIndex, p, store) {					
-					var value = record.get("star");
-					if(rowIndex == 0 && value && value.starred) {							
+					
+					if(rowIndex === 0 && record.get("starred")) {							
 						return '';
 					} else
 					{
-						if(value && value.starred) {
+						if(record.get("starred")) {
 							return "";
 						}
 
 						var lastRecord = rowIndex > 0 ? grid.store.getAt(rowIndex - 1) : false;
 						var char = record.data.name.substr(0, 1);
-						if(!lastRecord || lastRecord.data.name.substr(0, 1) != char) {
+						if(!lastRecord || lastRecord.data.name.substr(0, 1) !== char) {
 							return 'go-addressbook-index-row';
 						}
 						return "";
 					}
 				}
 			},
-			autoExpandColumn: 'name',
+			autoExpandColumn: 'name'
 			// config options for stateful behavior
 //			stateful: true,
 //			stateId: 'contact-grid'
@@ -167,32 +165,6 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 		go.modules.community.addressbook.ContactGrid.superclass.initComponent.call(this);
 	},
 	
-	onStarChanges: function(store, added, changed, destroyed) {
-		
-		if(!this.store.loaded) {
-			return;
-		}
-		
-		//changes should always reload list
-		if(changed.length) {
-			this.store.reload();
-		}
-		
-		if(!added.length) {
-			return;
-		}
-		
-		go.Stores.get("ContactStar").get(added, function(stars) {			
-			var starContactIds = stars.column("contactId")
-			var storeContactIds = this.store.getRange().column('id');
-			
-			//if there are new stars not present in the store then reload.
-			if(starContactIds.diff(storeContactIds).length) {				
-				this.store.reload();
-			}
-		}, this);
-
-	},
 
 	//when filtering on a group then offer to delete contacts from a group when delting.
 	deleteSelected: function () {
@@ -223,13 +195,13 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 			buttons: {ok: t("Remove from group"), yes: t("Delete"), "cancel": t("Cancel")},
 			fn: function (btn) {
 
-				if (btn == "yes") {
+				if (btn === "yes") {
 					this.getStore().entityStore.set({
 						destroy: ids
 					});
 				}
 
-				if (btn == "ok") {
+				if (btn ==="ok") {
 					var updates = {};
 
 

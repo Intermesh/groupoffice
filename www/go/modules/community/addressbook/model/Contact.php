@@ -198,6 +198,9 @@ class Contact extends AclItemEntity {
 	 * @var ContactGroup[] 
 	 */
 	public $groups = [];
+	
+	
+	public $starred = false;
 
 	protected static function aclEntityClass(): string {
 		return AddressBook::class;
@@ -210,6 +213,7 @@ class Contact extends AclItemEntity {
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable("addressbook_contact", 'c')
+						->addUserTable("addressbook_contact_star", "s", ['id' => 'contactId'])
 						->addRelation('dates', Date::class, ['id' => 'contactId'])
 						->addRelation('phoneNumbers', PhoneNumber::class, ['id' => 'contactId'])
 						->addRelation('emailAddresses', EmailAddress::class, ['id' => 'contactId'])

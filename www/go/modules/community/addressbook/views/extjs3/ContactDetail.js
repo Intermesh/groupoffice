@@ -1,12 +1,13 @@
+/* global Ext, go, GO */
+
 go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView, {
 	entityStore: go.Stores.get("Contact"),
 	stateId: 'addressbook-contact-detail',
 	
 	initComponent: function () {
-
-
+		
 		this.tbar = this.initToolbar();
-
+		
 		Ext.apply(this, {
 			items: [{
 					xtype: 'container',
@@ -15,8 +16,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 					items: [						
 						this.namePanel = new Ext.BoxComponent({
 							tpl: "<h3>{name}</h3><h4>{jobTitle}</h4>"
-						}),
-						this.starButton = new go.modules.community.addressbook.StarButton(), 
+						}),						
 						this.urlPanel = new Ext.BoxComponent({
 							flex: 1,
 							cls: 'go-addressbook-url-panel',
@@ -28,8 +28,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 						detailView.data.jobTitle = detailView.data.jobTitle || "";						
 						detailView.namePanel.update(detailView.data);
 						detailView.urlPanel.update(detailView.data.urls);
-						detailView.starButton.setContactId(detailView.data.id);
-					},
+					}
 					
 				}, 
 				
@@ -61,7 +60,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 								}
 							});
 						});
-						dv.emailButton.setDisabled(dv.data.emailAddresses.length == 0);
+						dv.emailButton.setDisabled(dv.data.emailAddresses.length === 0);
 						
 						
 						dv.callButton.menu.removeAll();						
@@ -76,7 +75,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 								}
 							});
 						});
-						dv.callButton.setDisabled(dv.data.phoneNumbers.length == 0);
+						dv.callButton.setDisabled(dv.data.phoneNumbers.length === 0);
 						
 					},
 					xtype: "toolbar",
@@ -200,6 +199,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 
 		this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < GO.permissionLevels.write);
 
+		this.starItem.setIconClass(this.data.starred ? "ic-star" : "ic-star-border");
 		go.modules.community.addressbook.ContactDetail.superclass.onLoad.call(this);
 	},
 
@@ -227,6 +227,19 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 			{
 				iconCls: 'ic-more-vert',
 				menu: [
+					this.starItem = new Ext.menu.Item({
+						iconCls: "ic-star",
+						text: t("Star"),
+						handler: function () {
+							var update = {};
+							update[this.currentId] = {starred: !this.data.starred};
+							
+							go.Stores.get("Contact").set({
+								update: update
+							});
+						},
+						scope: this
+					}),
 					{
 						iconCls: "btn-print",
 						text: t("Print"),
@@ -242,7 +255,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 						text: t("Delete"),
 						handler: function () {
 							Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
-								if (btn != "yes") {
+								if (btn !== "yes") {
 									return;
 								}
 								this.entityStore.set({destroy: [this.currentId]});
