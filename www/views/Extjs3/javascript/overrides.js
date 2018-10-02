@@ -662,16 +662,32 @@ Ext.override(Ext.layout.ToolbarLayout ,{
 	}
 );
 
-Ext.menu.Item.prototype.itemTpl = new Ext.XTemplate(
-	'<a id="{id}" class="{cls} x-unselectable" hidefocus="true" unselectable="on" href="{href}"',
-		 '<tpl if="hrefTarget">',
-			  ' target="{hrefTarget}"',
-		 '</tpl>',
-	 '>',
-		  '<span class="x-menu-item-icon {iconCls}"></span>',
-		  '<span class="x-menu-item-text">{text}</span>',
-	 '</a>'
-);
+Ext.override(Ext.menu.Item, {
+	 onRender : function(container, position){
+        if (!this.itemTpl) {
+            this.itemTpl = Ext.menu.Item.prototype.itemTpl = new Ext.XTemplate(
+							'<a id="{id}" class="{cls} x-unselectable" hidefocus="true" unselectable="on" href="{href}"',
+								 '<tpl if="hrefTarget">',
+										' target="{hrefTarget}"',
+								 '</tpl>',
+							 '>',
+									'<span class="x-menu-item-icon {iconCls}"></span>',
+									'<span class="x-menu-item-text">{text}</span>',
+							 '</a>'
+						);
+        }
+        var a = this.getTemplateArgs();
+        this.el = position ? this.itemTpl.insertBefore(position, a, true) : this.itemTpl.append(container, a, true);
+        this.iconEl = this.el.child('span.x-menu-item-icon');
+        this.textEl = this.el.child('.x-menu-item-text');
+        if(!this.href) { // if no link defined, prevent the default anchor event
+            this.mon(this.el, 'click', Ext.emptyFn, null, { preventDefault: true });
+        }
+        Ext.menu.Item.superclass.onRender.call(this, container, position);
+    }
+});
+
+
 Ext.layout.MenuLayout.prototype.itemTpl = new Ext.XTemplate(
 	'<li id="{itemId}" class="{itemCls}">',
 		 '<tpl if="needsIcon">',
