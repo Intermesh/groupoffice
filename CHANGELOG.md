@@ -1,3 +1,4 @@
+- Core: Don't redirect to entity detail view after creating new link
 - Core: Translation in some parts were not working correctly.
 - Core: Convert tables to InnoDB before upgrade if necessary
 - Customfields: removed maxlength of 190 characters on textareas
