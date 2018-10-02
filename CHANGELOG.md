@@ -1,4 +1,8 @@
 - Core: Don't redirect to entity detail view after creating new link
+- Tickets: Fixed issue that a ticket agent did not get a correct formatted message.
+- Files: Changed "public folder" icon in grid.
+- Core: Fixed tabs in user settings menu
+- Core: Fixed issue with generating XLS file reports in Projects2
 - Core: Translation in some parts were not working correctly.
 - Core: Convert tables to InnoDB before upgrade if necessary
 - Customfields: removed maxlength of 190 characters on textareas
