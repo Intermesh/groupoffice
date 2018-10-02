@@ -245,21 +245,93 @@ class EntityType {
 	 * @param Entity $entity
 	 */
 	public function change(Entity $entity) {
-		$this->highestModSeq = $this->nextModSeq();
-			
-		$record = [
-				'modSeq' => $this->highestModSeq,
-				'entityTypeId' => $this->id,
-				'entityId' => $entity->getId(),
-				'aclId' => $entity->findAclId(),
-				'destroyed' => $entity->isDeleted(),
-				'createdAt' => new DateTime()
-						];
+		
+		if(!$entity->isDeleted()) {
+			$modifiedPropnames = array_keys($entity->getModified());		
+			$userPropNames = $entity->getUserProperties();
 
-		if(!GO()->getDbConnection()->insert('core_change', $record)->execute()) {
-			throw new \Exception("Could not save change");
+			$entityModified = !empty(array_diff($modifiedPropnames, $userPropNames));
+			$userPropsModified = !empty(array_intersect($userPropNames, $modifiedPropnames));
+		} else
+		{
+			$entityModified = true;
+			$userPropsModified = false;
 		}
+		
+		
+		if($entityModified) {
+			$this->highestModSeq = $this->nextModSeq();
 
+			$record = [
+					'modSeq' => $this->highestModSeq,
+					'entityTypeId' => $this->id,
+					'entityId' => $entity->getId(),
+					'aclId' => $entity->findAclId(),
+					'destroyed' => $entity->isDeleted(),
+					'createdAt' => new DateTime()
+							];
+
+			if(!GO()->getDbConnection()->insert('core_change', $record)->execute()) {
+				throw new \Exception("Could not save change");
+			}
+		}
+		
+		if($userPropsModified) {
+			$data = [
+					'modSeq' => new \go\core\db\Expression('modSeq + 1'),					
+							];
+			
+			$where = [
+					'entityTypeId' => $this->id,
+					'entityId' => $entity->getId(),
+					'userId' => GO()->getUserId()
+							];
+							
+			$stmt = GO()->getDbConnection()->update('core_change_user', $data, $where);
+			if(!$stmt->execute()) {
+				throw new \Exception("Could not save user change");
+			}
+			
+			if(!$stmt->rowCount()) {
+				$where['modSeq'] = 1;
+				if(!GO()->getDbConnection()->insert('core_change_user', $where)->execute()) {
+					throw new \Exception("Could not save user change");
+				}
+			}
+		}
+		
+		if($entity->isDeleted()) {
+			
+			$where = [
+					'entityTypeId' => $this->id,
+					'entityId' => $entity->getId(),
+					'userId' => GO()->getUserId()
+							];
+			
+			$stmt = GO()->getDbConnection()->delete('core_change_user', $where);
+			if(!$stmt->execute()) {
+				throw new \Exception("Could not delete user change");
+			}
+		}
+	}
+	
+	/**
+	 * Get the modSeq for the user specific properties.
+	 * 
+	 * @return string
+	 */
+	public function getUserModSeq() {
+		$cls = $this->className;
+		
+		if(!$cls::hasUserProperties()) {
+			return "0";
+		}
+		
+		return (int) (new Query())
+						->selectSingleValue('max(modSeq)')->from("core_change_user")->where([
+					'entityTypeId' => $this->id,
+					'userId' => GO()->getUserId()
+							])->single();		
 	}
 	
 	private $modSeqIncremented = false;

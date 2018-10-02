@@ -18,10 +18,16 @@ class MappedTable extends Table {
 	 */
 	private $keys;
 	
-	private $mappedColumns = [];
-	
+	private $mappedColumns = [];	
 	
 	private $constantValues = [];
+	
+	/**
+	 * When set to true this table will be joined with AND userId = <CURRENTUSERID>
+	 * 
+	 * @var boolean 
+	 */
+	public $isUserTable = false;
 	
 	/**
 	 * Mapped table constructor
@@ -37,7 +43,7 @@ class MappedTable extends Table {
 	 * @params array $constantValues If the table that is joined needs to have 
 	 *   constant values. For example the keys are ['folderId' => 'folderId'] but 
 	 *   the joined table always needs to have a value 
-	 *   ['userId' => GO()->getUserId()] then you can set it with this parameter.
+	 *   ['type' => "foo"] then you can set it with this parameter.
 	 */
 	public function __construct($name, $alias, $keys = null, array $columns = [], array $constantValues = []) {
 		parent::__construct($name);

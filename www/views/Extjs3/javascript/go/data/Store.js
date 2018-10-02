@@ -121,19 +121,24 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 			return;
 		}		
 		
-		for(var i = 0, l = added.length; i < l; i++) {
-			if(!this.updateRecord(added[i]) ){
-				this.reload();
-				return;
-			}
+		if(added.length || changed.length) {
+			//we must reload because we don't know how to sort partial data.
+			this.reload();
 		}
 		
-		for(var i = 0, l = changed.length; i < l; i++) {
-			if(!this.updateRecord(changed[i]) ){
-				this.reload();
-				return;
-			}
-		}
+//		for(var i = 0, l = added.length; i < l; i++) {
+//			if(!this.updateRecord(added[i]) ){
+//				this.reload();
+//				return;
+//			}
+//		}
+//		
+//		for(var i = 0, l = changed.length; i < l; i++) {
+//			if(!this.updateRecord(changed[i]) ){
+//				this.reload();
+//				return;
+//			}
+//		}
 		
 		for(var i = 0, l = destroyed.length; i < l; i++) {
 			var record = this.getById(destroyed[i]);

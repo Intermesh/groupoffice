@@ -450,28 +450,35 @@ abstract class Property extends Model {
 	private static function joinAdditionalTables(array $tables, Query $query) {
 		$first = array_shift($tables);
 
-		foreach ($tables as $table) {
-			foreach ($table->getKeys() as $from => $to) {
-				if (!isset($on)) {
-					$on = "";
-				} else {
-					$on .= " AND ";
-				}
-				
-				//find the alias. The default table in the column is not a mapped table
-				$fromTableName = static::getMapping()->getColumn($from)->getTable()->getName();				
-				//So we fetch the mapped table to get the alias
-				$fromAlias = static::getMapping()->getTable($fromTableName)->getAlias();
-				$on .= $fromAlias . "." . $from . ' = ';
-				$on .= $table->getAlias() . "." . $to;
-			}
-			
-			if(!empty($table->getConstantValues())) {
-				$on = Criteria::normalize($on)->andWhere($table->getConstantValues());
-			}
-			$query->join($table->getName(), $table->getAlias(), $on, "LEFT");
-			unset($on);
+		foreach ($tables as $joinedTable) {
+			static::joinTable($joinedTable, $query);
 		}
+	}
+	
+	private static function joinTable(MappedTable $joinedTable, Query $query) {
+		foreach ($joinedTable->getKeys() as $from => $to) {
+			if (!isset($on)) {
+				$on = "";
+			} else {
+				$on .= " AND ";
+			}
+
+			//find the alias. The default table in the column is not a mapped table
+			$fromTableName = static::getMapping()->getColumn($from)->getTable()->getName();				
+			//So we fetch the mapped table to get the alias
+			$fromAlias = static::getMapping()->getTable($fromTableName)->getAlias();
+			$on .= $fromAlias . "." . $from . ' = ';
+			$on .= $joinedTable->getAlias() . "." . $to;
+		}
+
+		if($joinedTable->isUserTable) {
+			$on .= " AND " . $joinedTable->getAlias() . ".userId = " . GO()->getUserId();
+		}
+
+		if(!empty($joinedTable->getConstantValues())) {
+			$on = Criteria::normalize($on)->andWhere($joinedTable->getConstantValues());
+		}
+		$query->join($joinedTable->getName(), $joinedTable->getAlias(), $on, "LEFT");
 	}
 
 	/**
@@ -568,10 +575,6 @@ abstract class Property extends Model {
 		if (!$this->validate()) {
 			return false;
 		}
-
-		if($this->isNew() || $this->isModified()){
-			$this->setSaveProps();		
-		}
 		
 		$modified = $this->getModified();
 		foreach ($this->getMapping()->getTables() as $table) {			
@@ -643,26 +646,33 @@ abstract class Property extends Model {
 	/**
 	 * Sets some default values such as modifiedAt and modifiedBy
 	 */
-	private function setSaveProps() {
-		if(property_exists($this, "modifiedBy") && !$this->isModified(["modifiedBy"])) {
-			$this->modifiedBy = $this->getCreatedBy();
+	private function setSaveProps(\go\core\db\Table $table, $modifiedForTable) {
+		
+		if (!$this->recordIsNew($table) && empty($modifiedForTable)) {
+			return $modifiedForTable;
 		}
 		
-		if(property_exists($this, "modifiedAt") && !$this->isModified(["modifiedAt"])) {
-			$this->modifiedAt = new DateTime();
+		if($table->getColumn("modifiedBy") && !isset($modifiedForTable["modifiedBy"])) {
+			$this->modifiedBy = $modifiedForTable['modifiedBy'] = $this->getCreatedBy();
+		}
+		
+		if($table->getColumn("modifiedAt") && !isset($modifiedForTable["modifiedAt"])) {
+			$this->modifiedAt = $modifiedForTable['modifiedAt'] = new DateTime();
 		}
 		
 		if(!$this->isNew()) {
-			return;
+			return $modifiedForTable;
 		}
 		
-		if(property_exists($this, "createdAt") && !$this->isModified(["createdAt"])) {
-			$this->createdAt = new DateTime();
+		if($table->getColumn("createdAt") && !isset($modifiedForTable["createdAt"])) {
+			$this->createdAt = $modifiedForTable['createdAt'] = new DateTime();
 		}
 		
-		if(property_exists($this, "createdBy") && !$this->isModified(["createdBy"])) {
-			$this->createdBy = $this->getCreatedBy();
+		if($table->getColumn("createdBy") && !isset($modifiedForTable["createdBy"])) {
+			$this->createdBy = $modifiedForTable['createdBy']= $this->getCreatedBy();
 		}
+		
+		return $modifiedForTable;
 	}
 	
 	protected function getCreatedBy() {
@@ -792,8 +802,10 @@ abstract class Property extends Model {
 	 * @throws Exception
 	 */
 	private function saveTable(MappedTable $table, array &$modified) {
-		
+				
 		$modifiedForTable = $this->extractModifiedForTable($table, $modified);
+		
+		$modifiedForTable = $this->setSaveProps($table, $modifiedForTable);
 
 		if (empty($modifiedForTable)) {
 			return true;
@@ -805,6 +817,10 @@ abstract class Property extends Model {
 				//For example Password extends User but the ket "userId" of password is not part of the properties
 				foreach($table->getKeys() as $from => $to) {
 					$modifiedForTable[$to] = $this->{$from};
+				}		
+				
+				if($table->isUserTable) {
+					$modifiedForTable["userId"] = GO()->getUserId();
 				}
 				
 				foreach($table->getConstantValues() as $colName => $value) {
@@ -826,7 +842,13 @@ abstract class Property extends Model {
 				if (empty($modifiedForTable)) {
 					return true;
 				}
-				$stmt = App::get()->getDbConnection()->update($table->getName(), $modifiedForTable, $this->primaryKeys[$table->getAlias()]);
+				
+				$keys = $this->primaryKeys[$table->getAlias()];
+				if($table->isUserTable) {
+					$keys['userId'] = GO()->getUserId();
+				}
+				
+				$stmt = App::get()->getDbConnection()->update($table->getName(), $modifiedForTable, $keys);
 				if (!$stmt->execute()) {
 					throw new \Exception("Could not execute update query");
 				}				

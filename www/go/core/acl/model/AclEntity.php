@@ -13,38 +13,29 @@ abstract class AclEntity extends Entity {
 	 * @todo ACL state should be per entity and not global. eg. Notebook should return highest mod seq of acl's used by note books.
 	 * @return string
 	 */
-	public static function getState() {
-		return static::getType()->highestModSeq . ':' . Acl::getType()->highestModSeq;
+	public static function getState($entityState = null) {
+		return parent::getState($entityState) . ':' . Acl::getType()->highestModSeq;
 	}
 	
 	
-	protected static function getChangesQuery($sinceState, $maxChanges) {
-		$changes = parent::getChangesQuery($sinceState, $maxChanges);
+	protected static function getChangesQuery($sinceModSeq) {
+		$changes = parent::getChangesQuery($sinceModSeq);
 		
 		//apply permissions to changes query
-		Acl::applyToQuery($changes, "t.aclId");
+		Acl::applyToQuery($changes, "change.aclId");
 		
 		return $changes;
 	}
 	
 	public static function getChanges($sinceState, $maxChanges) {
 		//state has entity modseq and acl modseq so we can detect permission changes
-		$states = explode(':', $sinceState);
-		if(count($states) != 2) 
-		{
-			throw new CannotCalculateChanges();
-		}
-		$entityState = $states[0];
-		//Acl changes can cause a lot of changes. We need to include a paging in the state,
-		$aclStateAndPage = explode('-', $states[1]);
-		$aclState = $aclStateAndPage[0];
-		$aclPage = $aclStateAndPage[1] ?? 0;		
+		$states = static::parseState($sinceState);
 		
-		$result = parent::getChanges($entityState, $maxChanges);	
 		
+		$result = parent::getChanges($sinceState, $maxChanges);	
+		$result['oldState'] = $sinceState;
 		
 		if($result['hasMoreUpdates']) {			
-			$result['newState'] .= ':'. Acl::getType()->highestModSeq;
 			//allready at max
 			return $result;
 		}
@@ -55,7 +46,7 @@ abstract class AclEntity extends Entity {
 		//Detect permission changes for AclItemEntities. For example notes that depend on notebook permissions.		
 		$acls = static::findAcls();	
 		if($acls) {
-			$oldAclIds = Acl::wereGranted(GO()->getUserId(), $aclState, $acls)->all();
+			$oldAclIds = Acl::wereGranted(GO()->getUserId(), $states[2]['modSeq'], $acls)->all();
 			$currentAclIds = Acl::areGranted(GO()->getUserId(), $acls)->all();
 			$changedAcls = array_merge(array_diff($oldAclIds, $currentAclIds), array_diff($currentAclIds, $oldAclIds));	
 		}
@@ -78,13 +69,15 @@ abstract class AclEntity extends Entity {
 						->select($aclTableAlias . '.aclId')
 						->select(static::getPrimaryKey(true), true)
 						->where($aclTableAlias . '.aclId', 'in', $changedAcls)
-						->offset($aclPage)
+						->offset($states[2]['offset'])
 						->limit($maxChanges + 1);
 
 
 		if($isAclItem) {
 			static::joinAclEntity($query);
 		}
+		
+		$query = $query->execute();
 
 
 		//we don't need entities here. Just a list of id's.
@@ -108,11 +101,17 @@ abstract class AclEntity extends Entity {
 
 			$i++;
 
-			if($i == $maxChanges) {
-				$result['newState'] += '-' . ($aclPage + $maxChanges);
-				$result['hasMoreUpdates'] = true;
+			if($i == $maxChanges) {				
 				break;
 			}
+			
+			
+		}
+		
+		if($query->rowCount() > $maxChanges) {
+			$states[2]['offset'] += $maxChanges;
+			$result['hasMoreUpdates'] = true;
+			$result['newState'] = static::intermediateState($states);
 		}
 		
 		return $result;

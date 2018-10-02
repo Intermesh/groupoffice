@@ -1,5 +1,5 @@
 
-/* global Ext, go */
+/* global Ext, go, localforage */
 
 /**
  * Entity store
@@ -111,7 +111,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			this.metaStore.setItem("notfound", this.notFound);
 		}
 		
-		this.stateStore.setItem(entity.id+"", entity);
+		this.stateStore.setItem(entity.id + "", entity);
 		
 		this._fireChanges();
 	},
@@ -137,9 +137,14 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		}, 0);
 	},
 	
-	setState : function(state) {
+	setState : function(state, cb, scope) {
 		this.state = state;
-		this.metaStore.setItem("state", state);	
+		scope = scope || this;
+		this.metaStore.setItem("state", state, function() {
+			if(cb) {
+				cb.call(scope);
+			}
+		});	
 	},
 	
 	
@@ -195,7 +200,17 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					},
 					callback: function(options, success, response) {
 						if(success) {
-							this.setState(response.newState);
+							this.setState(response.newState, function(){
+								if(response.hasMoreUpdates) {
+									this.getUpdates(cb, scope);
+								} else
+								{
+									if(cb) {
+										cb.call(scope || this, this);
+									}
+								}
+							}, this);
+							
 						} else
 						{					
 							this.clearState();
@@ -214,9 +229,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 						}
 					},
 					callback: function(options, success, response) {					
-						if(cb) {
-							cb.call(scope || this, this);
-						}
+						
 					},
 					scope: this
 				});
@@ -320,7 +333,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				this.stateStore.getItems(unknownIds, function(err,entities) {
 					unknownIds = unknownIds.filter(function(id){
 						return !entities[id+""];
-					})
+					});
 
 					for(var key in entities) {					
 						if(entities[key]) {
@@ -452,7 +465,6 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					for(var serverId in response.updated) {
 						//merge existing data, with updates from client and server
 						entity = Ext.apply(this.data[serverId], params.update[serverId], response.updated[serverId]);					
-						console.log(entity);
 						this._add(entity);
 					}
 				}

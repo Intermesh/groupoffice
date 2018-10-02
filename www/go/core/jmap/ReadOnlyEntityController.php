@@ -270,9 +270,9 @@ abstract class ReadOnlyEntityController extends Controller {
 			throw new InvalidArguments("ids must be of type array");
 		}
 		
-		if(isset($params['ids']) && count($params['ids']) > Capabilities::get()->maxObjectsInGet) {
-			throw new InvalidArguments("You can't get more than " . Capabilities::get()->maxObjectsInGet . " objects");
-		}
+//		if(isset($params['ids']) && count($params['ids']) > Capabilities::get()->maxObjectsInGet) {
+//			throw new InvalidArguments("You can't get more than " . Capabilities::get()->maxObjectsInGet . " objects");
+//		}
 		
 		if(!isset($params['properties'])) {
 			$params['properties'] = [];

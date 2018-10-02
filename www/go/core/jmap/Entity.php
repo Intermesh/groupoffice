@@ -28,13 +28,17 @@ abstract class Entity  extends OrmEntity {
 	/**
 	 * Get the current state of this entity
 	 * 
+	 * This is the modSeq of the main entity joined with a ":" char with user 
+	 * table states {@see Mapping::addUserTable()}
+	 * 
+	 * eg."1:2"
+	 * 
 	 * @todo ACL state should be per entity and not global. eg. Notebook should return highest mod seq of acl's used by note books.
 	 * @return string
 	 */
-	public static function getState() {
-		return static::getType()->highestModSeq;
+	public static function getState($entityState = null) {
+		return ($entityState ?? static::getType()->highestModSeq) . ':' . static::getType()->getUserModSeq();		
 	}
-	
 	
 	/**
 	 * Saves the model and property relations to the database
@@ -73,8 +77,44 @@ abstract class Entity  extends OrmEntity {
 		return true;
 	}	
 	
+	/**
+	 * A state contains:
+	 * 
+	 * <Entity modSeq>|<offset>:<User modSeq>|<offset>
+	 * 
+	 * This functon will return:
+	 * 
+	 * [
+	 *	['modSeq' => (int), 'offset' => (int)]
+	 * ]
+	 * 
+	 * The offset is use for intermediate state when paging is needed. This happens
+	 * when there are more changes than the maximum allowed.
+	 * 
+	 * @param string $state
+	 * @return array
+	 */
+	protected static function parseState($state) {
+		return array_map(function($s) {
+			
+			$modSeqAndOffset = explode("|", $s);
+			
+			return ['modSeq' => (int) $modSeqAndOffset[0], 'offset' => (int) ($modSeqAndOffset[1] ?? 0)];
+			
+		}, explode(':', $state));
+		
+	}
+	
+	protected static function intermediateState($stateArray) {
+		return implode(":", array_map(function($s) {	
+			return $s['modSeq'] . '|' . $s['offset'];			
+		},$stateArray));
+	}
+	
 	
 	/**
+	 * 
+	 * $entityModSeq:$userModSeq-$offset
 	 * 
 	 * @param string $sinceState
 	 * @param int $maxChanges
@@ -85,16 +125,21 @@ abstract class Entity  extends OrmEntity {
 		
 		$entityType = static::getType();
 		
+		
+		//states are the main entity state combined with user table states. {@see Mapping::addUserTable()}
+		$states = static::parseState($sinceState);
+
 		//find the old state changelog entry
-		if($sinceState) { //If state == 0 then we don't need to check this
-			$sinceChange = (new Query())
-							->select("*")
+		if($states[0]['modSeq']) { //If state == 0 then we don't need to check this
+			
+			$change = (new Query())
+							->select("modSeq")
 							->from("core_change")
 							->where(["entityTypeId" => $entityType->getId()])
-							->andWhere('modSeq', '=', $sinceState)
+							->andWhere('modSeq', '=', $states[0]['modSeq'])
 							->single();
 
-			if(!$sinceChange) {			
+			if(!$change) {			
 				throw new CannotCalculateChanges();
 			}
 		}	
@@ -107,18 +152,35 @@ abstract class Entity  extends OrmEntity {
 			'removed' => []
 		];
 		
-		$changes = static::getChangesQuery($sinceState, $maxChanges);
+		$changes = static::getEntityChangesQuery($states[0]['modSeq']);
 		
+		$userChanges = static::getUserChangesQuery($states[1]['modSeq']);
+			
+		$changes = $changes->union($userChanges)
+						->offset($states[1]['offset'])
+						->limit($maxChanges + 1)
+						->execute();
+		
+		$count = 0;
 		foreach ($changes as $change) {
+			$count++;
 			if ($change['destroyed']) {
 				$result['removed'][] = $change['entityId'];
 			} else {					
 				$result['changed'][] = $change['entityId'];
 			}
+			
+			if($count == $maxChanges) {
+				break;
+			}
 		}
 		
-		if(isset($change)){
-			$result['newState'] = $change['modSeq'];
+		if($changes->rowCount() > $maxChanges){
+			
+			$states[1]['offset'] += $maxChanges;
+			
+			$result['hasMoreUpdates'] = true;
+			$result['newState'] = static::intermediateState($states);
 		} else
 		{
 			$result['newState'] = static::getState();
@@ -129,15 +191,67 @@ abstract class Entity  extends OrmEntity {
 		return $result;		
 	}
 	
-	protected static function getChangesQuery($sinceState, $maxChanges) {
-		return (new Query)->select('entityId,max(destroyed) AS destroyed, max(modSeq) AS modSeq')
-						->from('core_change')
-						->fetchMode(PDO::FETCH_ASSOC)
-						->limit($maxChanges)
-						->orderBy(['modSeq' => 'ASC'])						
+	/**
+	 * Check if this entities has user properties
+	 * 
+	 * User properties can vary between users. For example "starred" of a contact
+	 * can be different between users.
+	 * 
+	 * @return boolean
+	 */
+	public static function hasUserProperties() {
+		foreach(static::getMapping()->getTables() as $table) {
+			if($table->isUserTable) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Get all user property names.
+	 * 
+	 * User properties can vary between users. For example "starred" of a contact
+	 * can be different between users.
+	 * 
+	 * @return string[]
+	 */
+	public static function getUserProperties() {
+		$p = [];
+		foreach(static::getMapping()->getTables() as $table) {
+			if($table->isUserTable) {
+				$p = array_merge($p, $table->getColumnNames());
+			}
+		}
+		
+		return $p;
+	}
+	
+	protected static function getUserChangesQuery($sinceModSeq) {
+		return  (new Query())
+						->select('entityId, "0" AS destroyed')
+						->from("core_change_user", "change_user")
+						->where([
+								"userId" => GO()->getUserId(),
+								"entityTypeId" => static::getType()->getId()
+						])
+						->andWhere('modSeq', '>', $sinceModSeq);
+	}
+	
+	
+	protected static function getEntityChangesQuery($sinceModSeq) {
+		$changes = (new Query)
+						->select('entityId,max(destroyed) AS destroyed')
+						->from('core_change', 'change')
+						->fetchMode(PDO::FETCH_ASSOC)						
 						->groupBy(['entityId'])
 						->where(["entityTypeId" => static::getType()->getId()])
-						->andWhere('modSeq', '>', $sinceState);
+						->andWhere('modSeq', '>', $sinceModSeq);
+		
+	
+		return $changes;
 	}
+	
+	
 	
 }

@@ -6,6 +6,12 @@ use go\core\db\Column;
 use go\core\db\Query;
 use ReflectionClass;
 
+/**
+ * Mapping object 
+ * 
+ * It maps tables to objects properties.
+ * The mapping object is cached. So when you make changes you need to run /install/upgrade.php
+ */
 class Mapping {
 	
 	
@@ -44,7 +50,7 @@ class Mapping {
 	 * @params array $constantValues If the table that is joined needs to have 
 	 *   constant values. For example the keys are ['folderId' => 'folderId'] but 
 	 *   the joined table always needs to have a value 
-	 *   ['userId' => GO()->getUserId()] then you can set it with this parameter.
+	 *   ['type' => "foo"] then you can set it with this parameter.
 	 * @return $this
 	 */
 	public function addTable($name, $alias = 't', array $keys = null, array $columns = null, array $constantValues = []) {
@@ -52,13 +58,42 @@ class Mapping {
 		return $this;
 	}	
 	
+	/**
+	 * Add a user table to the model
+	 * 
+	 * A user table will be joined with AND userId = <CURRENTUSER>
+	 * 
+	 * A user table must have an userId (int) and modSeq (int) column.
+	 * 
+	 * The modSeq value will be used in the Entity::getState().
+	 * 
+	 * @param string $name
+	 * @param string $alias
+	 * @param string[] $keys
+	 * @param string[] $columns
+	 * @param string[] $constantValues
+	 */
+	public function addUserTable($name, $alias, array $keys = null, array $columns = null, array $constantValues = []) {
+		$this->tables[$name] = new MappedTable($name, $alias, $keys, empty($columns) ? $this->buildColumns() : $columns, $constantValues);
+		$this->tables[$name]->isUserTable = true;
+		if(!\go\core\db\Table::getInstance($name)->getColumn('modSeq')) {
+			throw new \Exception("The table ".$name." must have a 'modSeq' column of type INT");
+		}
+		
+		if(!\go\core\db\Table::getInstance($name)->getColumn('userId')) {
+			throw new \Exception("The table ".$name." must have a 'userId' column of type INT");
+		}
+		
+		return $this;
+	}
+	
 	private function buildColumns() {
 		$reflectionClass = new ReflectionClass($this->for);
 		$rProps = $reflectionClass->getProperties();
 		$props = [];
 		foreach ($rProps as $prop) {
 			$props[] = $prop->getName();
-		}
+		}		
 		
 		return $props;
 	}
