@@ -729,3 +729,19 @@ CREATE TABLE IF NOT EXISTS `core_change` (
 ALTER TABLE `core_change`
   ADD CONSTRAINT `core_change_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_change_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE;
+
+
+DROP TABLE IF EXISTS `core_change_user`;
+CREATE TABLE IF NOT EXISTS `core_change_user` (
+  `userId` int(11) NOT NULL,
+  `entityId` varchar(21) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `entityTypeId` int(11) NOT NULL,
+  `modSeq` int(11) NOT NULL,
+  PRIMARY KEY (`userId`,`entityId`,`entityTypeId`),
+  KEY `entityTypeId` (`entityTypeId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+
+
+ALTER TABLE `core_change_user`
+  ADD CONSTRAINT `core_change_user_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `core_change_user_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;

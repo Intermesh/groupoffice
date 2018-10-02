@@ -247,17 +247,35 @@ $updates['201808241650'][] = "ALTER TABLE `core_blob` DROP `modified`";
 $updates['201808241650'][] = "insert into core_cron_job (moduleId,name, expression, description) values ((select id from core_module where name='core'), 'GarbageCollection', '0 * * * *', 'Garbage collection')";
 $updates['201809071645'][] = "ALTER TABLE `core_customfields_field_set` ADD `filter` TEXT NULL DEFAULT NULL;";
 
-//ALTER TABLE `core_customfields_field` CHANGE `datatype` `type` VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Text';
-//ALTER TABLE `core_customfields_field` CHANGE `helptext` `hint` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
+//TODO update install.sql from here
+
+$updates['2018010022124'][] = "ALTER TABLE `core_customfields_field` CHANGE `datatype` `type` VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Text';";
+$updates['2018010022124'][] = "ALTER TABLE `core_customfields_field` CHANGE `helptext` `hint` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;";
 
 
-//RENAME TABLE `cf_select_options` TO `core_customfields_select_option`;
+$updates['2018010022124'][] = "RENAME TABLE `cf_select_options` TO `core_customfields_select_option`;";
 
-//ALTER TABLE `core_customfields_select_option` CHANGE `field_id` `fieldId` INT(11) NOT NULL;
-//ALTER TABLE `core_customfields_select_option` CHANGE `sort_order` `sortOrder` INT(11) NOT NULL;
-//ALTER TABLE `core_customfields_select_option` ADD FOREIGN KEY (`fieldId`) REFERENCES `core_customfields_field`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
-//ALTER TABLE `core_customfields_select_option` ADD FOREIGN KEY (`fieldId`) REFERENCES `core_customfields_field`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+$updates['2018010022124'][] = "ALTER TABLE `core_customfields_select_option` CHANGE `field_id` `fieldId` INT(11) NOT NULL;";
+$updates['2018010022124'][] = "ALTER TABLE `core_customfields_select_option` CHANGE `sort_order` `sortOrder` INT(11) NOT NULL;";
+$updates['2018010022124'][] = "ALTER TABLE `core_customfields_select_option` ADD FOREIGN KEY (`fieldId`) REFERENCES `core_customfields_field`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+$updates['2018010022124'][] = "ALTER TABLE `core_customfields_select_option` ADD FOREIGN KEY (`fieldId`) REFERENCES `core_customfields_field`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
 
-//ALTER TABLE `core_customfields_field_set` ADD `description` TEXT NOT NULL AFTER `name`;
-//ALTER TABLE `core_customfields_select_option` ADD `parentId` INT NULL DEFAULT NULL AFTER `fieldId`, ADD INDEX (`parentId`);
-//ALTER TABLE `core_customfields_select_option` ADD FOREIGN KEY (`parentId`) REFERENCES `core_customfields_select_option`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+$updates['2018010022124'][] = "ALTER TABLE `core_customfields_field_set` ADD `description` TEXT NOT NULL AFTER `name`;";
+$updates['2018010022124'][] = "ALTER TABLE `core_customfields_select_option` ADD `parentId` INT NULL DEFAULT NULL AFTER `fieldId`, ADD INDEX (`parentId`);";
+$updates['2018010022124'][] = "ALTER TABLE `core_customfields_select_option` ADD FOREIGN KEY (`parentId`) REFERENCES `core_customfields_select_option`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+
+
+
+$updates['2018010022124'][] = "CREATE TABLE IF NOT EXISTS `core_change_user` (
+  `userId` int(11) NOT NULL,
+  `entityId` varchar(21) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `entityTypeId` int(11) NOT NULL,
+  `modSeq` int(11) NOT NULL,
+  PRIMARY KEY (`userId`,`entityId`,`entityTypeId`),
+  KEY `entityTypeId` (`entityTypeId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT";
+
+
+$updates['2018010022124'][] = "ALTER TABLE `core_change_user`
+  ADD CONSTRAINT `core_change_user_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `core_change_user_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;";
