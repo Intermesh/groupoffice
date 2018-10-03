@@ -1,3 +1,4 @@
+- Core: Added a more detailed error message to the Lock->lock() function in case the .lock file cannot be created
 - Core: Don't redirect to entity detail view after creating new link
 - Tickets: Fixed issue that a ticket agent did not get a correct formatted message.
 - Files: Changed "public folder" icon in grid.
