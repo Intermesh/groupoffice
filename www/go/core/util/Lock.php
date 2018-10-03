@@ -51,6 +51,10 @@ class Lock {
 		//needs to be put in a private variable otherwise the lock is released outside the function scope
 		$this->lockFp = $this->lockFile->open('w+');
 		
+		if(!$this->lockFp){
+			throw new Exception("Could not create or open the file for writing.\rPlease check if the folder permissions are correct so the webserver can create and open files in it.\rPath: '" . $this->lockFile->getPath() . "'");
+		}
+		
 		if (!flock($this->lockFp, LOCK_EX|LOCK_NB, $wouldblock)) {
 			
 			//unset it because otherwise __destruct will destroy the lock
