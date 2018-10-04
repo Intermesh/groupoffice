@@ -46,7 +46,7 @@ class Lock {
 		
 		$name = File::stripInvalidChars($this->name);
 
-		$this->lockFile = $lockFolder->getFile($name . '.lock');
+		$this->lockFile = $lockFolder->getFile($name . '.lock')->touch(true);
 		
 		//needs to be put in a private variable otherwise the lock is released outside the function scope
 		$this->lockFp = $this->lockFile->open('w+');
@@ -58,7 +58,13 @@ class Lock {
 		if (!flock($this->lockFp, LOCK_EX|LOCK_NB, $wouldblock)) {
 			
 			//unset it because otherwise __destruct will destroy the lock
-			unset($this->lockFile, $this->lockFp);
+			$this->lockFile = null;
+			
+			if(is_resource($this->lockFp)) {
+				fclose($this->lockFp);
+			}
+			
+			$this->lockFp = null;
 			
 			if ($wouldblock) {
 				// another process holds the lock
@@ -76,15 +82,13 @@ class Lock {
 	 */
 	public function unlock() {
 		//cleanup lock file if lock() was used
-		if(isset($this->lockFile)) {
-			flock($this->lockFp, LOCK_UN);
-			fclose($this->lockFp);
-			if(file_exists($this->lockFile)) {
-				unlink($this->lockFile);			
-			}
-			
-			$this->lockFp = null;
-			$this->lockFile = null;
+		if(isset($this->lockFile)) {			
+			$this->lockFile = null;			
+			if(is_resource($this->lockFp)) {
+				flock($this->lockFp, LOCK_UN);
+				fclose($this->lockFp);
+			}			
+			$this->lockFp = null;			
 		}
 	}
 	
