@@ -2,13 +2,22 @@
 
 namespace go\core {
 
-	use go\core\cache\CacheInterface;
-	use go\core\cache\Disk;
-	use go\core\db\Connection;
-	use go\core\db\Database;
-	use go\core\mail\Mailer;
-	use go\core\fs\Folder;
-	use go\core\jmap\State;
+use Exception;
+use GO\Base\Observable;
+use go\core\auth\State as AuthState;
+use go\core\cache\CacheInterface;
+use go\core\cache\Disk;
+use go\core\db\Connection;
+use go\core\db\Database;
+use go\core\db\Table;
+use go\core\event\Listeners;
+use go\core\exception\ConfigurationException;
+use go\core\fs\Folder;
+use go\core\jmap\State;
+use go\core\mail\Mailer;
+use go\core\util\Lock;
+use go\core\webclient\Extjs3;
+use go\modules\core\core\model\Settings;
 
 	/**
 	 * Application class.
@@ -178,13 +187,13 @@ namespace go\core {
 				$msg .= dirname(dirname(__DIR__)) . "/config.php\n\n".
 								"/etc/groupoffice/config.php";
 				
-				throw new \Exception($msg);
+				throw new Exception($msg);
 			}
 			
 			require($configFile);	
 			
 			if(!isset($config)) {
-				throw new exception\ConfigurationException();
+				throw new ConfigurationException();
 			}
 			
 			$this->config = [
@@ -289,18 +298,18 @@ namespace go\core {
 				$this->rebuildCacheOnDestruct = $onDestruct;
 			}
 			
-			$lock = new util\Lock("rebuildCache");
+			$lock = new Lock("rebuildCache");
 			if($lock->lock()) {
-				\GO::clearCache(); //legacy
+				GO::clearCache(); //legacy
 
 				GO()->getCache()->flush(false);
-				db\Table::destroyInstances();
+				Table::destroyInstances();
 
-				$webclient = new \go\core\webclient\Extjs3();
+				$webclient = new Extjs3();
 				$webclient->flushCache();
 
-				\GO\Base\Observable::cacheListeners();
-				\go\core\event\Listeners::get()->init();
+				Observable::cacheListeners();
+				Listeners::get()->init();
 			}
 		}
 		
@@ -341,10 +350,10 @@ namespace go\core {
 		/**
 		 * Set the authentication state
 		 * 
-		 * @param \go\core\auth\State $authState
+		 * @param AuthState $authState
 		 * @return $this
 		 */
-		public function setAuthState(auth\State $authState) {
+		public function setAuthState(AuthState $authState) {
 			$this->authState = $authState;
 			
 			return $this;
@@ -377,7 +386,7 @@ namespace go\core {
 		 * @return auth\model\User
 		 */
 		public function getUserId() {
-			if ($this->getAuthState() instanceof \go\core\auth\State) {
+			if ($this->getAuthState() instanceof AuthState) {
 				return $this->authState->getUserId();
 			}
 			return null;
@@ -389,7 +398,7 @@ namespace go\core {
 		 * @return AppSettings
 		 */
 		public function getSettings() {
-			return \go\modules\core\core\model\Settings::get();
+			return Settings::get();
 		}
 
 		/**
