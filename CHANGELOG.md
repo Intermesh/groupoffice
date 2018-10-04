@@ -1,3 +1,4 @@
+- Core: Added "Edit contact" in more menu at System settings -> Users to connect a contact to a user.
 - Core: Remove non existing groups from ACL on upgrade
 - Core: Added a more detailed error message to the Lock->lock() function in case the .lock file cannot be created
 - Core: Don't redirect to entity detail view after creating new link
