@@ -1,6 +1,5 @@
 <?php
-return array (
-  'Users' => 'Gebruikers',
+return ['Users' => 'Gebruikers',
   'Admin module. Managing system users.' => 'Beheren van de gebruikers',
   'You can\'t delete the primary administrator' => 'U kunt de primaire Administrator niet verwijderen',
   'You can\'t delete yourself' => 'U kunt zichzelf niet verwijderen',
@@ -134,5 +133,6 @@ Wachtwoord: {password}',
   'Date format' => 'Datum formaat',
   'Formatting' => 'Opmaak',
   'Users will automatically be added to these groups' => 'Gebruikers worden automatisch aan deze groepen toegevoegd',
-  'Display name' => 'Weergave naam'
-);
+  'Display name' => 'Weergave naam',
+	'Edit contact' => 'Bewerk contactpersoon'
+ ];

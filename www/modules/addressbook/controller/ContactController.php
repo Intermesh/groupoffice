@@ -27,6 +27,12 @@ class ContactController extends \GO\Base\Controller\AbstractModelController{
 	protected function allowGuests() {
 		return array('photo');
 	}
+	
+	protected function actionFindForUser($params) {
+		$contact = GO\Addressbook\Model\Contact::model()->findSingleByAttribute('go_user_id', $params['user_id']);
+		
+		return ['success' => true, 'contact_id' => $contact ? $contact->id : 0];
+	}
 		
 	protected function beforeSubmit(&$response, &$model, &$params) {	
 		
