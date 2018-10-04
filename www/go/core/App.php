@@ -300,7 +300,7 @@ use go\modules\core\core\model\Settings;
 			
 			$lock = new Lock("rebuildCache");
 			if($lock->lock()) {
-				GO::clearCache(); //legacy
+				\GO::clearCache(); //legacy
 
 				GO()->getCache()->flush(false);
 				Table::destroyInstances();

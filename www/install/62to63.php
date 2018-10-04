@@ -86,15 +86,13 @@ $qs[] = "update `go_acl_items` set modifiedAt = from_unixtime(mtime);";
 
 $qs[] = "ALTER TABLE `go_acl_items` DROP `mtime`;";
 
+$qs[] = "delete from go_acl where user_id > 0 AND user_id not in (select id from go_users)";
+$qs[] = "delete from go_acl where group_id > 0 AND group_id not in (select id from go_groups)";
+
 $qs[] = "ALTER TABLE `go_acl` CHANGE `group_id` `groupId` INT(11) NOT NULL DEFAULT '0';";
 
 $qs[] = "ALTER TABLE `go_acl` CHANGE `acl_id` `aclId` INT(11) NOT NULL;";
-
-
-
 $qs[] = "ALTER TABLE `go_groups` CHANGE `name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;";
-
-
 
 $qs[] = "DROP TRIGGER IF EXISTS `Create ACL`;";
 $qs[] = "CREATE TRIGGER `Create ACL` BEFORE INSERT ON `go_groups` FOR EACH ROW BEGIN INSERT INTO `go_acl_items` (`ownedBy`, `description`) VALUES (NEW.createdBy, 'go_groups.aclId'); set NEW.aclId = (SELECT last_insert_id()); END";
@@ -106,7 +104,6 @@ $qs[] = "ALTER TABLE `go_acl` DROP PRIMARY KEY;";
 $qs[] = "insert into `go_acl` (groupId, aclId, level) select id,aclId,50 from go_groups where isUserGroupFor is not null;";
 $qs[] = "insert into `go_acl` (groupId, aclId, level) select '1',aclId,50 from go_groups where isUserGroupFor is not null;";
 $qs[] = "ALTER TABLE `go_groups` CHANGE `createdBy` `createdBy` INT(11) NOT NULL;";
-$qs[] = "delete from go_acl where user_id > 0 AND user_id not in (select id from go_users)";
 $qs[] = "update `go_acl` a set groupId = (select id from go_groups where isUserGroupFor = a.user_id) where user_id > 0; ";
 $qs[] = "ALTER TABLE `go_acl` DROP `user_id`;";
 $qs[] = "delete from go_acl where aclId not in (select id from go_acl_items);";
