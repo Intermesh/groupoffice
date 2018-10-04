@@ -1,3 +1,7 @@
+04-10-2018 6.3.41
+- Core: Error in lock function
+
+04-10-2018 6.3.40
 - Core: Added "Edit contact" in more menu at System settings -> Users to connect a contact to a user.
 - Core: Remove non existing groups from ACL on upgrade
 - Core: Added a more detailed error message to the Lock->lock() function in case the .lock file cannot be created
