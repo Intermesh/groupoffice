@@ -321,7 +321,8 @@ class Connection {
 	 * @example
 	 * ```
 	 * $data = [
-	 * 		"propA" => "string 3"
+	 * 		"propA" => "string 3",
+	 *		"count" => new \go\core\db\Expression('count + 1'),		//Example for expression
 	 * ];
 	 * 
 	 * $stmt = App::get()->getDbConnection()->update("test_a", $data, ['id' => 1]);
