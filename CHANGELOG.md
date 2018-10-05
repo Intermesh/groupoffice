@@ -1,3 +1,4 @@
+- Updated German translation
 - Core: added icon to permissions panel to distinguish users and groups
 
 04-10-2018 6.3.41
