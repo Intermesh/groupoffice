@@ -1,3 +1,5 @@
+- Updated German translation
+- Fixed inconsistent participant status in calendar
 - Files: Fix for deleting files with write permission on the item it belongs to
 when it had older versions
 - Tickets: Fixed issue that a ticket agent did not get a correct formatted message.
