@@ -43,8 +43,16 @@ class ModuleCollection extends Model\ModelCollection{
 	
 	private function _isAllowed($name){
 		
-		if(!isset($this->_allowedModules))
-			$this->_allowedModules=empty(\GO::config()->allowed_modules) ? array() : explode(',', \GO::config()->allowed_modules);
+		if(!isset($this->_allowedModules)) {
+			if(!empty(\GO::config()->allowed_modules)) {
+				$this->_allowedModules=  explode(',', \GO::config()->allowed_modules);		
+				$this->_allowedModules = array_merge($this->_allowedModules, ['links', 'search', 'users', 'modules', 'groups', 'customfields']);
+				
+			} else
+			{
+				$this->_allowedModules = [];
+			}
+		}
 		
 		return empty($this->_allowedModules) || in_array($name, $this->_allowedModules);			
 	}
