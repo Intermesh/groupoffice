@@ -24,12 +24,6 @@ class Lock {
 	private $lockFp;
 	
 	/**
-	 * The lock file name.
-	 * Stored to cleanup after the script ends
-	 */
-	private $lockFile;
-	
-	/**
 	 * Lock an action
 	 * 
 	 * Call this to make sure it can only be executed by one user at the same time.
@@ -46,10 +40,10 @@ class Lock {
 		
 		$name = File::stripInvalidChars($this->name);
 
-		$this->lockFile = $lockFolder->getFile($name . '.lock')->touch(true);
+		$lockFile = $lockFolder->getFile($name . '.lock')->touch(true);
 		
 		//needs to be put in a private variable otherwise the lock is released outside the function scope
-		$this->lockFp = $this->lockFile->open('w+');
+		$this->lockFp = $lockFile->open('w+');
 		
 		if(!$this->lockFp){
 			throw new Exception("Could not create or open the file for writing.\rPlease check if the folder permissions are correct so the webserver can create and open files in it.\rPath: '" . $this->lockFile->getPath() . "'");
@@ -57,9 +51,7 @@ class Lock {
 		
 		if (!flock($this->lockFp, LOCK_EX|LOCK_NB, $wouldblock)) {
 			
-			//unset it because otherwise __destruct will destroy the lock
-			$this->lockFile = null;
-			
+			//unset it because otherwise __destruct will destroy the lock		
 			if(is_resource($this->lockFp)) {
 				fclose($this->lockFp);
 			}
@@ -82,12 +74,9 @@ class Lock {
 	 */
 	public function unlock() {
 		//cleanup lock file if lock() was used
-		if(isset($this->lockFile)) {			
-			$this->lockFile = null;			
-			if(is_resource($this->lockFp)) {
-				flock($this->lockFp, LOCK_UN);
-				fclose($this->lockFp);
-			}			
+		if(is_resource($this->lockFp)) {			
+			flock($this->lockFp, LOCK_UN);
+			fclose($this->lockFp);
 			$this->lockFp = null;			
 		}
 	}
