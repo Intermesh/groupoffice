@@ -1,5 +1,6 @@
 - Files: Fix for deleting files with write permission on the item it belongs to
 when it had older versions
+- Tickets: Fixed issue that a ticket agent did not get a correct formatted message.
 
 25-09-2018 6.2.105
 - Calendar: New event creation will not ask if you want to send "new" or "all" participant an email (just Yes or No)
