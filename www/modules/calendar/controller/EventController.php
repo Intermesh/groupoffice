@@ -1598,6 +1598,12 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			
 		//notify orgnizer
 		$participant = $event->getParticipantOfCalendar();
+		
+		//update participant statuses from main event if possible
+		$organizerEvent = $event->getOrganizerEvent();
+		if($organizerEvent) {
+			\GO::getDbConnection()->query("UPDATE cal_participants p1 INNER JOIN cal_participants p2 ON (p2.email=p1.email and p2.event_id = ".$organizerEvent->id.") SET p1.status=p2.status WHERE p1.event_id = ".$event->id);
+		}
 
 //		if(!$participant)
 //		{
