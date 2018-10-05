@@ -48,4 +48,5 @@ return array (
   '(1-12)' => '(1-12)',
   '(0-6)' => '(0-6)',
   '(2013-2015)' => '(2013-2015)',
+  'System task scheduler' => 'Systemaufgaben Planer',
 );

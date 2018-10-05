@@ -86,4 +86,9 @@ return array (
   'Status' => 'Status',
   'Name' => 'Name',
   'ID' => 'ID',
+  'project' => 'Projekt',
+  'Ok' => 'OK',
+  'Remove duplicates' => 'Doppelte Einträge entfernen',
+  'Contact' => 'Kontakt',
+  'Add Contact' => 'Kontakt hinzufügen',
 );

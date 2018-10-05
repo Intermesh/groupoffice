@@ -19,4 +19,5 @@ return array (
   'name' => 'Module',
   'description' => 'Modul zum Verwalten aktiver/inaktiver Module',
   'Modules' => 'Module',
+  'Ok' => 'OK',
 );

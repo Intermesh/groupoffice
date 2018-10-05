@@ -11,4 +11,4 @@ GO()->setAuthState(new \go\core\cli\State());
 
 $ctrl = new \go\modules\community\dev\controller\Language();
 
-$ctrl->import(["path" => "lang-2.csv"]);
+$ctrl->import(["path" => "lang.csv"]);

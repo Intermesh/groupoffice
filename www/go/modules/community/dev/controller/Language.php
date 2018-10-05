@@ -166,8 +166,15 @@ class Language extends Controller {
 
 		$data = [];
 
+		
 		while ($record = fgetcsv($this->handle, 0, self::DELIMITER, self::ENCLOSURE)) {
-			list($package, $module, $en, $translation, $source) = $record;
+			
+			try {
+				list($package, $module, $en, $translation, $source) = $record;
+			} catch(\Exception $e) {
+				echo "ERROR: Could not read record: ". var_export($record, true) ."\n\n";
+			}
+			
 
 			if (empty($translation)) {
 				continue;
@@ -212,6 +219,7 @@ class Language extends Controller {
 				$file->putContents("<?php\nreturn ".var_export($translations, true).";\n");
 			}
 		}
+		
 	}
 
 }
