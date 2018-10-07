@@ -7,6 +7,7 @@ App::get()->getCache()->flush(false);
 
 App::get()->getDatabase()->setUtf8();
 
+$qs[] = "DROP TABLE IF EXISTS `go_mail_counter`;";
 $qs[] = function () {
 	$stmt = GO()->getDbConnection()->query("SHOW TABLE STATUS");	
 	

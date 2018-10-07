@@ -205,3 +205,4 @@ $updates['201807271339'][] = "ALTER TABLE `core_change`
 $updates['201807271339'][] = "ALTER TABLE `core_change`
   ADD CONSTRAINT `core_change_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_change_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE;";
+$updates["201810071410"][]="DROP TABLE IF EXISTS `go_mail_counter`;";
