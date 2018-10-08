@@ -54,7 +54,7 @@ trait SearchableTrait {
 		$search->setKeywords($keywords);
 		
 		if(!$search->internalSave()) {
-			throw new \Exception("Could not save search cache!");
+			throw new \Exception("Could not save search cache: " . var_export($search->getValidationErrors(), true));
 		}
 		
 		return true;
@@ -68,7 +68,7 @@ trait SearchableTrait {
 		foreach($entities as $cls) {
 			echo $cls."\n";
 			$query = $cls::find();
-			$query->join("core_search", "search", "search.entityTypeId = ".$query->getTableAlias() . ".id AND search.entityTypeId = " . $cls::getType()->getId(), "LEFT");
+			$query->join("core_search", "search", "search.entityId = ".$query->getTableAlias() . ".id AND search.entityTypeId = " . $cls::getType()->getId(), "LEFT");
 			$query->andWhere('search.id IS NULL');
 			
 			foreach($query as $e) {				

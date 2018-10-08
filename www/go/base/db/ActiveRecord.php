@@ -3556,11 +3556,11 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		//don't do this on datbase checks.
 		if(GO::router()->getControllerAction()=='checkdatabase')
-			return;
+			return false;
 
 		$attr = $this->getCacheAttributes();
-		if(!$attr) {
-			return;
+		if(!$attr) {		
+			return false;
 		}
 		
 		$search = \go\modules\core\search\model\Search::find()->where('entityTypeId','=', static::getType()->getId())->andWhere('entityId', '=', $this->id)->single();
@@ -3655,6 +3655,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 //
 //		}
 //		return false;
+		
+		return true;
 	}
 	
 	
@@ -4773,10 +4775,12 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$overriddenMethods = $rc->getOverriddenMethods();
 		if(in_array("getCacheAttributes", $overriddenMethods)){
 			
+			echo "Processing ".static::class ."\n";
+			
 			$entityTypeId = static::getType()->getId();
 			
 			$start = 0;
-			$limit = 1000;
+			$limit = 100;
 			
 			$findParams = FindParams::newInstance()
 							->ignoreAcl()
@@ -4795,17 +4799,24 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				while ($m = $stmt->fetch()) {
 				
 					try {
-						echo ".";
 						flush();
 						
-						$m->cacheSearchRecord();
+						if($m->cacheSearchRecord()) {
+							echo ".";
+						} else
+						{
+							echo "S";
+						}
+						
 					} catch (\Exception $e) {
 						\go\core\ErrorHandler::logException($e);
 						echo "E";
 					}
 				}
+				echo "\n";
 				
 				$stmt = $this->find($findParams->start($start += $limit));		
+
 				
 			}
 			

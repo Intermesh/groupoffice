@@ -320,11 +320,17 @@ class MaintenanceController extends AbstractController {
 		
 		GO::setIgnoreAclPermissions(true);
 		
-		$this->lockAction();
+		if(!$this->lockAction()) {
+			exit("Already running!");
+		}
 		
 		if(!$this->isCli()){
 			echo '<pre>';
 		}
+		
+		echo "Checking search cache\n\n";
+		echo ".: Record cached, E: Error while occurred, S: Record skipped (probably normal)\n"
+		.    "==============================================================================\n\n";
 		
 		\GO::session()->closeWriting(); //close writing otherwise concurrent requests are blocked.
 		
@@ -339,8 +345,6 @@ class MaintenanceController extends AbstractController {
 		
 		foreach($models as $model){
 			if($model->isSubclassOf("GO\Base\Db\ActiveRecord") && !$model->isAbstract()){
-				echo "Processing ".$model->getName()."\n";
-				flush();
 				$stmt = \GO::getModel($model->getName())->rebuildSearchCache();			
 			}
 		}
