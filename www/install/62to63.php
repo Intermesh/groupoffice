@@ -503,7 +503,10 @@ foreach($qs as $q) {
 		} catch(\Exception $e) {
 			
 			echo 'ERROR: '. $e->getMessage().' Query '. $q;
-			if ($e->getCode() == 42000 || $e->getCode() == '42S21' || $e->getCode() == '42S01' || $e->getCode() == '42S22') {
+			
+			//MS: remove $e->getCode() == 42000 because that should not be ignored?
+			
+			if ($e->getCode() == '42S21' || $e->getCode() == '42S01' || $e->getCode() == '42S22') {
 				//duplicate and drop errors. Ignore those on updates
 			} else {
 				echo "ERROR: A fatal upgrade error occurred. You will not be able to continue upgrading this database! Please report this error message.\n\n";
