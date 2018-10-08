@@ -23,6 +23,8 @@ class Lock {
 	 */
 	private $lockFp;
 	
+	private $unlock = false;
+	
 	/**
 	 * Lock an action
 	 * 
@@ -52,11 +54,11 @@ class Lock {
 		if (!flock($this->lockFp, LOCK_EX|LOCK_NB, $wouldblock)) {
 			
 			//unset it because otherwise __destruct will destroy the lock		
-			if(is_resource($this->lockFp)) {
-				fclose($this->lockFp);
-			}
-			
-			$this->lockFp = null;
+//			if(is_resource($this->lockFp)) {
+//				fclose($this->lockFp);
+//			}
+//			
+//			$this->lockFp = null;
 			
 			if ($wouldblock) {
 				// another process holds the lock
@@ -65,6 +67,8 @@ class Lock {
 				throw new Exception("Could not lock controller action '" . $this->name . "'");
 			}
 		} 
+		
+		$this->unlock = true;
 		
 		return true;
 	}
@@ -82,6 +86,8 @@ class Lock {
 	}
 	
 	public function __destruct() {
-		$this->unlock();		
+		if($this->unlock) {
+			$this->unlock();		
+		}
 	}
 }
