@@ -4765,7 +4765,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	}
 
 
-	public function rebuildSearchCache(){
+	public function rebuildSearchCache() {		
 		
 		
 				
@@ -4773,14 +4773,43 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$overriddenMethods = $rc->getOverriddenMethods();
 		if(in_array("getCacheAttributes", $overriddenMethods)){
 			
+			$entityTypeId = static::getType()->getId();
+			
 			$start = 0;
 			$limit = 1000;
+			
+			$findParams = FindParams::newInstance()
+							->ignoreAcl()
+							->debugSql()
+							->select('t.*')
+							->limit($limit)
+							->start($start)
+							->join('core_search', FindCriteria::newInstance()->addRawCondition('search.entityId', 't.id')->addRawCondition("search.entityTypeId", $entityTypeId), 'search', 'LEFT');
+			
+			$findParams->getCriteria()->addCondition('entityId',null, 'IS', 'search');							
+			
 			//per thousands to keep memory low
-			$stmt = $this->find(FindParams::newInstance()->ignoreAcl()->select('t.*')->limit($limit)->start($start));
+			$stmt = $this->find($findParams);
 			while($stmt->rowCount()) {	
-				$stmt->callOnEach('cacheSearchRecord', true);				
-				$stmt = $this->find(FindParams::newInstance()->ignoreAcl()->select('t.*')->limit($limit)->start($start += $limit));		
+	
+				while ($m = $stmt->fetch()) {
+				
+					try {
+						echo ".";
+						flush();
+						
+						$m->cacheSearchRecord();
+					} catch (\Exception $e) {
+						\go\core\ErrorHandler::logException($e);
+						echo "E";
+					}
+				}
+				
+				$stmt = $this->find($findParams->start($start += $limit));		
+				
 			}
+			
+			echo "\nDone\n\n";
 			
 		}
 	}
