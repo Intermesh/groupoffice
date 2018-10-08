@@ -54,11 +54,11 @@ class Lock {
 		if (!flock($this->lockFp, LOCK_EX|LOCK_NB, $wouldblock)) {
 			
 			//unset it because otherwise __destruct will destroy the lock		
-//			if(is_resource($this->lockFp)) {
-//				fclose($this->lockFp);
-//			}
-//			
-//			$this->lockFp = null;
+			if(is_resource($this->lockFp)) {
+				fclose($this->lockFp);
+			}
+			
+			$this->lockFp = null;
 			
 			if ($wouldblock) {
 				// another process holds the lock
