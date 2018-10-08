@@ -157,7 +157,7 @@
 					tpl += '</div></tpl>';
 
 					detailView.add({						
-						id: "cf-detail-field-set-" + fieldSet.id,
+						stateId: "cf-detail-field-set-" + fieldSet.id,
 						fieldSetId: fieldSet.id,
 						title: fieldSet.name,
 						tpl: tpl,

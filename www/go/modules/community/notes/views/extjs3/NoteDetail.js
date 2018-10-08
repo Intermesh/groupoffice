@@ -122,6 +122,12 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 				iconCls: 'ic-more-vert',
 				menu: [
 					{
+						xtype: "linkbrowsermenuitem"
+					},{
+						xtype: "filebrowsermenuitem"
+					},
+					'-',
+					{
 						iconCls: "btn-print",
 						text: t("Print"),
 						handler: function () {

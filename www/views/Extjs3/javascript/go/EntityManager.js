@@ -1,3 +1,5 @@
+/* global go, Ext */
+
 (function () {
   
   var entities = {};
@@ -17,27 +19,40 @@
      * @param {object} jmapMethods
      * @returns {undefined}
      */
-    register: function (package, module, name) {
-      if(entities[name]) {
+    register: function (package, module, config) {
+			
+			if(!Ext.isObject(config)) {
+				config = {
+					name: config,
+					linkable: false,
+					searchable: false
+				}
+			}
+			
+			if(!config.name) {
+				throw "Invalid entity registered. 'name' property is required."
+			}
+			
+      if(entities[config.name]) {
         throw "Entity name is already registered by module " +entities[name]['package'] + "/" + entities[name]['name'];
       }
       
-      entities[name.toLowerCase()] = {
-        name: name,
+      entities[config.name.toLowerCase()] = Ext.applyIf(config, {        
         module: module,
         package: package,
+				title: t(config.name),
 				getRouterPath : function (id) {
-					return this.name.toLowerCase() + "/" + id
+					return this.name.toLowerCase() + "/" + id;
 				},
         goto: function (id) {
           go.Router.goto(this.getRouterPath(id));
-        },
+        }
 			
-      };     
+      });     
 			
 			//these datatypes will be prefetched by go.data.JmapProxy.fetchEntities()
 			// Key can also be a function that is called with the record data.
-			go.data.types[name] = {
+			go.data.types[config.name] = {
 				convert: function (v, data) {
 
 					var key = this.type.getKey.call(this, data);
@@ -46,7 +61,7 @@
 						return null;
 					}
 					
-					var entities = go.Stores.get(name).get([key]);
+					var entities = go.Stores.get(config.name).get([key]);
 					return entities ? entities[0] : null;	
 				},
 				
@@ -64,7 +79,7 @@
 				},
 				sortType: Ext.data.SortTypes.none,
 				type: "entity",
-				entity: name
+				entity: config.name
 			}
     },
 

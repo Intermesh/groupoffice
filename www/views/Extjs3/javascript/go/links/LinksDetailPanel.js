@@ -237,8 +237,23 @@ go.links.LinksDetailPanel = Ext.extend(Ext.Panel, {
 				scope: this
 			}
 		];
+		
+		//TODO refactor in MASTER
+		var all = [], allObj = go.Entities.getAll();
+		
+		for(var i in allObj) {
+			all.push(allObj[i]);
+		}
 
-		if (!go.Links.linkToWindows.length) {
+		var linkableEntitities = all.filter(function(e) {
+			if(!go.Modules.isAvailable(e.package, e.module) ){
+				return false;
+			}
+			
+			return !!e.linkWindow;
+		});
+		
+		if(!linkableEntitities.length) {
 			return items;
 		}
 
@@ -246,17 +261,17 @@ go.links.LinksDetailPanel = Ext.extend(Ext.Panel, {
 
 		var me = this;
 		
-		go.Links.linkToWindows.sort(function(a, b) {
+		linkableEntitities.sort(function(a, b) {
 			return a.title.localeCompare(b.title);
 		});
 		
-		go.Links.linkToWindows.forEach(function (i) {			
+		linkableEntitities.forEach(function (e) {			
 			
 			items.push({
-				iconCls: 'entity ' + i.entity,
-				text: i.title,
+				iconCls: 'entity ' + e.name,
+				text: e.title,
 				handler: function () {
-					var window = i.openWindowFunction.call(i.scope, this.getEntity(), this.getEntityId());					
+					var window = e.linkWindow.call(e.scope, this.getEntity(), this.getEntityId());					
 					
 					if(!window) {
 						return;
@@ -282,14 +297,14 @@ go.links.LinksDetailPanel = Ext.extend(Ext.Panel, {
 					window.on('save', function (window, entity) {
 						
 						//hack for event dialog because save event is different
-						if(i.entity === "Event") {
+						if(e.entity === "Event") {
 							entity = arguments[2].result.id;
 						}
 						
 						var link = {
 							fromEntity: this.getEntity(),
 							fromId: this.getEntityId(),
-							toEntity: i.entity,
+							toEntity: e.name,
 							toId: null
 						};
 						
