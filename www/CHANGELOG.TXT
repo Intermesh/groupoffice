@@ -1,4 +1,5 @@
-- Updated German translation
+08-10-2018 6.2.106
+- GOTA: Signed with new certificate
 - Fixed inconsistent participant status in calendar
 - Files: Fix for deleting files with write permission on the item it belongs to
 when it had older versions
