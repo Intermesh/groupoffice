@@ -443,7 +443,7 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 		}
 		
 		if(!$this->runonce){
-			$this->active = !$failed;
+			$this->active = true;
 			if($failed){
 				GO::debug('CRONJOB ('.$this->name.') FAILED');
 			}

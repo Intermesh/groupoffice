@@ -408,7 +408,4 @@ class EntityType {
 		
 		return $modSeq;
 	}	
-	
-	
-	
 }

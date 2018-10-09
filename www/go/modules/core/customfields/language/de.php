@@ -70,4 +70,5 @@ return array (
   'Invoice/Quote' => 'Rechnung/Angebot',
   'Content' => 'Inhalt',
   'Only from these addressbooks (IDs)' => 'Nur von diesen Adressbüchern (IDs)',
+  'SelectOptions' => 'Optionen wählen',
 );

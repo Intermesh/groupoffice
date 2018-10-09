@@ -45,10 +45,30 @@ GO.util.stringToFunction = function(str) {
   return  fn;
 };
 
+/**
+ * Translate a string
+ * 
+ * Module and package can be omitted in most cases. It will auto detect these.
+ * 
+ * go.module and go.package are set at:
+ * 
+ * 1. Before each module scripts are loaded
+ * 2. An override on Ext.extend() will set "module" and "package" on each 
+ *    components. A second override on Ext.Component will set 
+ *    go.Translate.module and package on getId() (getId() was the only way to 
+ *    make it happen always and on time)
+ * 
+ * @param {string} str
+ * @param {string} module
+ * @param {string} package
+ * @returns {t.l|GO..lang}
+ */
 function t(str, module, package) {
-
+		
 	if(!module) {
-		module = go.Translate.module;
+		module = go.Translate.module;		
+	}
+	if(!package) {
 		package = go.Translate.package;
 	}
 	
@@ -67,7 +87,7 @@ function t(str, module, package) {
     return l[str]
   }
   
-  if(module != "core" && package != "core"){
+  if(module != "core" || package != "core"){
     return t(str, "core", "core");
   } else
   {
@@ -122,12 +142,12 @@ GO.openHelp = function(page){
 
 
 GO.util.callToLink = function(phone){
+		return '<a onclick="GO.util.callToHandler(\''+phone+'\');">'+phone+'</a>';	
+}
 
-	if(GO.util.empty(GO.settings.config.encode_callto_link)){
-		return '<a onclick="GO.mainLayout.fireEvent(\'callto\', \''+phone+'\');" href="'+GO.calltoTemplate.replace('{phone}', phone.replace('(0)','').replace(/[^0-9+]/g,''))+'">'+phone+'</a>';
-	} else {
-		return '<a onclick="GO.mainLayout.fireEvent(\'callto\', \''+phone+'\');" href="'+GO.calltoTemplate.replace('{phone}', encodeURIComponent(phone.replace('(0)','').replace(/[^0-9+]/g,'')))+'">'+phone+'</a>';		
-	}
+GO.util.callToHandler = function(phone) {	
+	document.location = GO.calltoTemplate.replace('{phone}', phone.replace('(0)','').replace(/[^0-9+]/g,''));
+	return false;
 }
 
 GO.url = function(relativeUrl, params){
@@ -1475,19 +1495,18 @@ GO.util.dateFormat = function(v) {
 			v = new Date(Date.parse(v));
 	}
 
-	var elapsed = v.getElapsed() / 1000;
-
-	if(elapsed < 86400) {
+	var month = v.getFullYear()+v.getMonth();
+	var now = new Date();
+	var nowMonth = now.getFullYear()+now.getMonth();
+	
+	if(month === nowMonth) {
+		if(now.getDay() === v.getDay()) {
+			return Ext.util.Format.date(v, GO.settings.time_format);
+		}
 		
-		return Ext.util.Format.date(v, GO.settings.time_format);	
+		if(now.getDay() - 1  === v.getDay()) {
+			return t('Yesterday');
+		}
 	}
-	
-	if(elapsed < 172800) {		
-		return t('Yesterday');
-	}
-		
-	return Ext.util.Format.date(v, GO.settings.date_format);
-	
-
-	
+	return Ext.util.Format.date(v, GO.settings.date_format);	
 }

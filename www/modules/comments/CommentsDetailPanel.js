@@ -19,33 +19,11 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			remoteSort: true
 		});
 
-		this.addButtonItems = [
-			{
-				iconCls: 'ic-comment',
-				text: t("Comment"),
-				scope: this,
-				handler: this.addComment
-			}
-		];
-
 		go.modules.comments.CommentsDetailPanel.superclass.initComponent.call(this);
 
 	},
 	
-	addComment : function () {
-		var dlg = GO.comments.showCommentDialog(0, {
-			link_config: {
-				model_name: this.model_name,
-				model_id: this.model_id
-
-			}
-		});
-
-		dlg.on('hide', function(){
-			this.onLoad(this);
-		}, this, {single: true});
-	},
-			
+	
 
 	onLoad: function (dv) {
 
@@ -60,18 +38,76 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			},
 			callback: function() {
 				
-				this.store.each(function(r) {
+				var me = this;
+				this.store.each(function(record) {
 					var readMore = new go.detail.ReadMore();
-					readMore.setText(r.get('comments'));
+					readMore.setText(record.get('comments'));
 					this.add({
-						xtype:"container",												
-						items: [
+						xtype:"panel",
+						tbarCfg:{
+							style:'border-bottom:none;border-top:1px solid #E0E0E0;'
+						},
+						tbar:[
 							{
-								xtype:'box',
-								autoEl: 'h5',					
-								cls:'pad',
-								html: t('{author} wrote at {date}').replace('{author}', r.get('user_name')).replace('{date}', r.get('ctime'))
+								xtype:"tbtitle",
+								style:'font-size:'+dp(16)+'px; height:'+dp(14)+'px;',
+								text:t('{author} wrote at {date}').replace('{author}', record.get('user_name')).replace('{date}', record.get('ctime'))
 							},
+							'->',
+							{
+								iconCls: 'ic-more-vert',
+								menu:[
+									{
+										iconCls: "ic-edit",
+										text: t("Edit"),
+										handler: function () {
+											var dlg = GO.comments.showCommentDialog(record.get('id'), {
+												link_config: {
+													model_name: me.model_name,
+													model_id: me.model_id
+												}
+											});
+
+											dlg.on('hide', function(){
+												me.onLoad(me);
+											}, this, {single: true});
+										},
+										scope: this
+									},{
+										iconCls: "ic-delete",
+										text: t("Delete"),
+										handler: function () {
+											
+											Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function(btn) {
+												if(btn == 'yes') {
+													GO.request({
+														url:'comments/comment/delete',
+														params:{					
+															id:record.get('id')				
+														},
+														success: function(response, options, result){
+															if(!result.success){
+																alert(result.feedback);
+															}
+															me.onLoad(me);
+														},
+														scope:this
+													});
+												}
+											});
+										},
+										scope: this
+									}
+								]
+							}
+						],
+						items: [
+//							{
+//								xtype:'box',
+//								autoEl: 'h5',					
+//								cls:'pad',
+//								html: '<div class="icons">'++'<a class="right show-on-hover"><i class="icon">delete</i></a></div>'
+//							},
 							readMore
 						]
 					});

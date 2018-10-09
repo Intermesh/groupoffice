@@ -10,4 +10,5 @@ return array (
   'Model' => 'Model',
   'ID' => 'ID',
   'Controller' => 'Controller',
+  'Activity log' => 'Aktivitätslog',
 );

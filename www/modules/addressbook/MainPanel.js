@@ -1,3 +1,5 @@
+/* global go, GO */
+
 /**
  * Copyright Intermesh
  *
@@ -833,21 +835,30 @@ go.Modules.register("legacy", 'addressbook', {
 	mainPanel: GO.addressbook.MainPanel,
 	title: t("Address book", "addressbook"),
 	iconCls: 'go-tab-icon-addressbook',
-	entities: ["Contact", "Company"],
+	entities: [{
+			name: "Contact",
+			linkWindow: function() {
+				var win = new GO.addressbook.ContactDialog ();
+					win.closeAction = "hide";
+					return win;
+			},
+			linkDetail: function() {
+				return new GO.addressbook.ContactDetail();
+			}	
+	}, {
+			name: "Company",
+			linkWindow: function() {
+				var win = new GO.addressbook.CompanyDialog ();
+				win.closeAction = "hide";
+				return win;
+			},
+			linkDetail: function() {
+				return new GO.addressbook.CompanyReadPanel ();
+			}	
+		}],
 	userSettingsPanels: ["GO.addressbook.SettingsPanel"],
 	initModule: function () {	
-		go.Links.registerLinkToWindow("Contact", function() {
-			var win = new GO.addressbook.ContactDialog ();
-			win.closeAction = "hide";
-			return win;
-		});
-		
-		go.Links.registerLinkToWindow("Company", function() {
-			var win = new GO.addressbook.CompanyDialog ();
-			win.closeAction = "hide";
-			return win;
-		});
-		
+				
 		GO.addressbook.addressbooksStoreFields = new Array('id','name','user_name', 'acl_id','user_id','contactCustomfields','companyCustomfields','default_salutation', 'checked');
 
 

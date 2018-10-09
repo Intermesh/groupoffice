@@ -26,6 +26,7 @@ function dp(size) {
 (function(){
   
   //add module and package to components so they are aware of the module they belong to.
+	//go.module and go.package are defined in default_scripts.inc.php 
   var origExtend = Ext.extend;
 
   Ext.extend = function() {
@@ -45,11 +46,21 @@ Ext.override(Ext.Component, {
   getId : function(){
  
     if(this.module) {
+			this.lastTranslationModule = go.Translate.module;
+			this.lastTranslationPackage = go.Translate.packate;
       go.Translate.setModule(this.package, this.module);
     }
     
     return this.componentgetID();
   },
+	
+	origInitComponent : Ext.Component.prototype.initComponent,
+	
+	initComponent : function() {
+		this.origInitComponent();
+		
+		go.Translate.setModule(this.lastTranslationPackage, this.lastTranslationModule);
+	},
 	
 	//Without this override findParentByType doesn't work if you don't Ext.reg() all your components
 	 getXTypes : function(){

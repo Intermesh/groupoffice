@@ -44,7 +44,8 @@ class Bookmark extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	protected function init() {
-		$this->columns['content']['gotype']='text';
+		$this->columns['content']['gotype']='raw';
+//		$this->columns['content']['gotype']='html';
 		return parent::init();
 	}
 

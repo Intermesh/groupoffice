@@ -1,3 +1,5 @@
+/* global go, Ext */
+
 /**
  * Copyright Intermesh
  *
@@ -120,7 +122,6 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 		}, this);
 	}
 });
-
 
 Ext.reg("detailview", go.panels.DetailView);
 Ext.reg("detailview", go.panels.DetailView);

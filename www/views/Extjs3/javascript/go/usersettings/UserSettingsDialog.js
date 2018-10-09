@@ -17,7 +17,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	maximizable:true,
 	iconCls: 'ic-settings',
 	title: t("Settings"),
-	currentUser:null,
+	currentUserId:null,
 
 	initComponent: function () {
 		
@@ -91,6 +91,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			'submitComplete' : true
 		});
 		
+		
 		this.addPanel(go.usersettings.AccountSettingsPanel);
 		this.addPanel(go.usersettings.LookAndFeelPanel);
 		
@@ -128,13 +129,13 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	 * @param int userId
 	 */
 	show: function(userId){
-		this.currentUser = userId;
+		this.currentUserId = userId;
 
 		go.usersettings.UserSettingsDialog.superclass.show.call(this);
 		
 		this.navMenu.select(this.tabStore.getAt(0));
 		
-		if(this.currentUser) {
+		if(this.currentUserId) {
 			this.load();
 		}
 	},
@@ -212,10 +213,10 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		},this);
 
 		//		//this.id is null when new
-		if(this.currentUser) {
-			id = this.currentUser;
+		if(this.currentUserId) {
+			id = this.currentUserId;
 			params.update = {};
-			params.update[this.currentUser] = values;
+			params.update[this.currentUserId] = values;
 		} else {			
 			id = Ext.id();
 			params.create = {};
@@ -229,7 +230,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 				return;
 			}
 						
-			if(response.updated && response.updated[id]){
+			if(response.updated && id in response.updated){
 				this.submitComplete(response);
 			} else
 			{
@@ -292,7 +293,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		this.actionComplete();
 		
 		//reload group-office
-		if(this.currentUser == go.User.id) {
+		if(this.currentUserId == go.User.id) {
 			document.location = BaseHref + "?SET_LANGUAGE=" + this.formPanel.getForm().findField('language').getValue();
 		} else
 		{
@@ -306,12 +307,12 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	 * @param int userId (Optional)
 	 */
 	load : function(userId){
-		this.currentUser = userId ? userId : this.currentUser;
+		this.currentUserId = userId ? userId : this.currentUserId;
 		
 		this.actionStart();
-		this.fireEvent('loadstart',this, this.currentUser);
+		this.fireEvent('loadstart',this, this.currentUserId);
 
-		go.Stores.get("User").get([this.currentUser], function(users){
+		go.Stores.get("User").get([this.currentUserId], function(users){
 			this.formPanel.getForm().setValues(users[0]);
 			this.loadComplete(users[0]);
 		}, this);

@@ -36,7 +36,7 @@ class UserSettings extends Property {
 		if(!$this->font_size) {
 			$this->font_size = "14px";
 		}
-		$this->sort_email_addresses_by_time = !!\GO::config()->get_setting("sort_email_addresses_by_time", $this->id);
+		$this->sort_email_addresses_by_time = !!\GO::config()->get_setting("email_sort_email_addresses_by_time", $this->id);
 		
 	}
 	

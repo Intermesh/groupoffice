@@ -34,7 +34,9 @@ GO.moduleManager.onModuleReady('tasks',function(){
 			
 			this.accordionPanel.insert(0,this.tasklistFavoritesList);
 			
-			GO.favorites.favoritesTasklistStore.load();
+			this.on("afterrender", function() {
+				GO.favorites.favoritesTasklistStore.load();
+			}, this);
 
 			this.tasklistFavoritesList.on('change', function(grid, tasklists, records){
 				this.tasklist_ids = tasklists;

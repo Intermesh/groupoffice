@@ -14,13 +14,23 @@ go.form.Dialog = Ext.extend(go.Window, {
 	currentId: null,
 	buttonAlign: 'left',
 	layout: "fit",
+	
+	/**
+	 * Redirect to the entity detail view after save.
+	 */
+	redirectOnSave: true,
+	
 	initComponent: function () {
 
 		this.formPanel = new go.form.EntityPanel({
 			entityStore: this.entityStore,
 			items: this.initFormItems()
 		});
-
+		
+		this.formPanel.on("save", function(fp, entity) {
+			this.fireEvent("save", this, entity);
+		}, this);
+		
 		this.items = [this.formPanel];
 
 		if (!this.buttons) {
@@ -162,11 +172,18 @@ go.form.Dialog = Ext.extend(go.Window, {
 
 		this.formPanel.submit(function (formPanel, success, serverId) {
 			this.actionComplete();
+ 
 			this.onSubmit(success, serverId);
 			this.fireEvent("submit", this, success, serverId);
-			if (success) {
-				this.close();
+
+			if(!success) {
+				return;
 			}
+			if(this.redirectOnSave) {
+				this.entityStore.entity.goto(serverId);
+			}
+			this.close();
+						
 		}, this);
 	},
 

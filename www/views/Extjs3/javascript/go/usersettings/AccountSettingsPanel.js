@@ -12,7 +12,7 @@
  */
 go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 
-	title:t('Account'),
+	title:t('Account','users','core'),
 	iconCls: 'ic-account-circle',
 	autoScroll:true,
 	id: 'pnl-account-settings',
@@ -22,7 +22,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 			
 		this.userFieldset = new Ext.form.FieldSet({
 			labelWidth:dp(152),
-			title: t('User'),
+			title: t('User','users','core'),
 			layout: 'hbox',
 			items:[
 				{
@@ -61,24 +61,24 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 						allowBlank: false
 					}, 
 					this.displayNameField = new Ext.form.TextField({
-						fieldLabel: t('Display name'),
+						fieldLabel: t('Display name','users','core'),
 						name: 'displayName',
 						allowBlank:false
 					}),
 					this.emailField = new Ext.form.TextField({
-						fieldLabel: t('Email'),
+						fieldLabel: t('E-mail','users','core'),
 						name: 'email',
 						vtype:'emailAddress',
 						needPasswordForChange: true,
 						allowBlank:false
 					}),
 					this.recoveryEmailField = new Ext.form.TextField({
-						fieldLabel: t("Recovery e-mail"),
+						fieldLabel: t("Recovery e-mail",'users','core'),
 						name: 'recoveryEmail',
 						needPasswordForChange: true,
 						vtype:'emailAddress',
 						allowBlank:false,
-						hint: t('The recovery e-mail is used to send a forgotten password request to.')+'<br>'+t('Please use an email address that you can access from outside Group-Office.')
+						hint: t('The recovery e-mail is used to send a forgotten password request to.','users','core')+'<br>'+t('Please use an email address that you can access from outside Group-Office.','users','core')
 					})
 
 				]
@@ -87,7 +87,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 
 		this.passwordFieldset = new Ext.form.FieldSet({
 			labelWidth:dp(152),
-			title: t('Password'),
+			title: t('Password','users','core'),
 			defaults: {
 				width: dp(300)
 			},

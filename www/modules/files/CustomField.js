@@ -1,3 +1,5 @@
+/* global Ext, go */
+
 Ext.ns("go.modules.community.files.customfield");
 
 go.modules.community.files.customfield.File = Ext.extend(go.modules.core.customfields.type.Text, {

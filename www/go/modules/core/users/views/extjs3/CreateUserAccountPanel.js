@@ -8,7 +8,6 @@ go.modules.core.users.CreateUserAccountPanel = Ext.extend(Ext.form.FormPanel, {
 	initComponent: function () {
 		this.items = [{
 				xtype: 'fieldset',
-				title: t('User'),
 				items: [
 					{
 						xtype: 'textfield',
@@ -24,7 +23,7 @@ go.modules.core.users.CreateUserAccountPanel = Ext.extend(Ext.form.FormPanel, {
 						allowBlank: false
 					},
 					this.emailField = new Ext.form.TextField({
-						fieldLabel: t('Email'),
+						fieldLabel: t('E-mail'),
 						name: 'email',
 						vtype:'emailAddress',
 						needPasswordForChange: true,
@@ -46,7 +45,7 @@ go.modules.core.users.CreateUserAccountPanel = Ext.extend(Ext.form.FormPanel, {
 						vtype:'emailAddress',
 						allowBlank:false,
 						anchor: '100%',
-						hint:t('The recovery e-mail is used to send a forgotten password request to.')+'<br>'+t('Please use an email address that you can access from outside Group-Office.')
+						hint:t('The recovery e-mail is used to send a forgotten password request to.<br />Please use an email address that you can access from outside Group-Office.')
 					})
 				]
 			}

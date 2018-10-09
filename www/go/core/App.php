@@ -4,6 +4,7 @@ namespace go\core {
 
 use Exception;
 use GO;
+use GO\Base\Observable;
 use go\core\auth\State as AuthState;
 use go\core\cache\CacheInterface;
 use go\core\cache\Disk;
@@ -327,7 +328,8 @@ use const GO_CONFIG_FILE;
 				$webclient = new Extjs3();
 				$webclient->flushCache();
 
-				\GO\Base\Observable::cacheListeners();
+				Observable::cacheListeners();
+
 				Listeners::get()->init();
 			}
 		}
@@ -421,7 +423,21 @@ use const GO_CONFIG_FILE;
 		 * @param String $package Only applies if module is set to 'base'
 		 */
 		public function t($str, $package = 'core', $module = 'core') {
-			return Language::get()->t($str, $package, $module);
+			return $this->getLanguage()->t($str, $package, $module);
+		}
+		
+		private $language;
+		
+		/**
+		 * 
+		 * @return Language
+		 */
+		public function getLanguage() {
+			if(!isset($this->language)) {
+				$this->language = new Language();
+			}
+			
+			return $this->language;
 		}
 
 		/**
