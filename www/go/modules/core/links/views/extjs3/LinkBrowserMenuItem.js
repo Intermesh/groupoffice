@@ -1,6 +1,6 @@
 go.modules.core.links.LinkBrowserMenuItem = Ext.extend(Ext.menu.Item, {	
 	iconCls: "ic-link",
-	text: t("Link browser"),
+	text: t("Links"),
 	handler: function(btn) {
 		
 		var dv = this.findParentByType("detailview"), entityId, entity;
@@ -12,7 +12,8 @@ go.modules.core.links.LinkBrowserMenuItem = Ext.extend(Ext.menu.Item, {
 			//for legacy modules
 			var dp = this.findParentByType("displaypanel") || this.findParentByType("tmpdetailview");
 			entity = dp.entity;
-			entityId = dp.model_id
+			entityId = dp.model_id || dp.currentId
+			
 		}
 		
 		

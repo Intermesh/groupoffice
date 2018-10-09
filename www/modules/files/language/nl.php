@@ -41,7 +41,7 @@ De volgende wijzigingen zijn aangebracht door %s:
   'Notify me about changes in this folder' => 'Stel me op de hoogte van veranderingen in deze map',
   'Comments' => 'Opmerkingen',
   'Download with GOTA' => 'Download met GOTA',
-  'File browser' => 'Bestands verkenner',
+  'File browser' => 'Bestandsverkenner',
   'Thumbnails' => 'Pictogrammen',
   'Save file' => 'Bestand opslaan',
   '{filename} already exists, do you want to overwrite the file?' => '{filename} bestaat al, wilt u dit bestand overschrijven?',

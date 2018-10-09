@@ -1,7 +1,7 @@
 GO.files.FileBrowserMenuItem = Ext.extend(Ext.menu.Item, {
 
 	iconCls: 'ic-folder',
-	text: t("File browser"),
+	text: t("Files"),
 
 	handler: function () {
 		
