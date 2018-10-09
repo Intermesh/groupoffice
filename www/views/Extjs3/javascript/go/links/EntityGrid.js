@@ -23,7 +23,8 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 			tbar: [{xtype: "selectallcheckbox"}],
 			store: new Ext.data.ArrayStore({
 				fields: ['entity', 'name'],
-				data: data
+				data: data,
+				idIndex: 0
 			}),
 			selModel: selModel,
 			columns: [
@@ -69,6 +70,7 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 
 	loadSelection: function (name) {
 		var ids = Ext.state.Manager.get("entity-grid-selected-" + name);
+		console.log(ids);
 		if (!ids) {
 			return;
 		}
@@ -81,6 +83,8 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 				records.push(record);
 			}
 		});
+		
+		console.log(records);
 		
 		this.getSelectionModel().suspendEvents(false);
 		this.getSelectionModel().selectRecords(records, true);

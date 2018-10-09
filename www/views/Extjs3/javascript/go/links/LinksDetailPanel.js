@@ -39,8 +39,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 		{[this.printMore(values)]}\
 		</div>', {			
 			
-			printMore : function(values) {			
-				console.log(store.getCount(), store.getTotalCount());
+			printMore : function(values) {
 				if(store.getCount() < store.getTotalCount()) {
 					return "<a class=\"show-more\">" + t("Show more...") + "</a>";
 				} else
