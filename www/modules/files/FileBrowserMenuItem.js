@@ -9,7 +9,7 @@ GO.files.FileBrowserMenuItem = Ext.extend(Ext.menu.Item, {
 		if(!dv) {
 		
 			//for legacy modules
-			dv = this.findParentByType("displaypanel");
+			dv = this.findParentByType("displaypanel") || this.findParentByType("tmpdetailview");
 
 		}
 

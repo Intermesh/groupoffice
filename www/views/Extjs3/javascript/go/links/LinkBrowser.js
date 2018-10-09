@@ -8,6 +8,8 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 	stateId: "go-link-browser",
 	
 	layout: "border",
+	maximizable: true,
+	
 
 	initComponent: function () {
 
@@ -108,18 +110,19 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 						this.previewPanel.getLayout().setActiveItem(pnl);
 					}
 				},
-				dblclick: function () {
-					var record = this.grid.getSelectionModel().getSelected();
-					var entity = go.Entities.get(record.data.toEntity);
-
-					if (!entity) {
-						throw record.data.toEntity + " is not a registered entity";
-					}
-					
-					entity.goto(record.data.toId);
-					
-					this.close();
-				},
+				
+//				dblclick: function () {
+//					var record = this.grid.getSelectionModel().getSelected();
+//					var entity = go.Entities.get(record.data.toEntity);
+//
+//					if (!entity) {
+//						throw record.data.toEntity + " is not a registered entity";
+//					}
+//					
+//					entity.goto(record.data.toId);
+//					
+//					this.close();
+//				},
 				scope: this
 			},
 			autoExpandColumn: 'name'			

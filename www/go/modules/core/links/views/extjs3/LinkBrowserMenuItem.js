@@ -10,7 +10,7 @@ go.modules.core.links.LinkBrowserMenuItem = Ext.extend(Ext.menu.Item, {
 		} else
 		{
 			//for legacy modules
-			var dp = this.findParentByType("displaypanel");
+			var dp = this.findParentByType("displaypanel") || this.findParentByType("tmpdetailview");
 			entity = dp.entity;
 			entityId = dp.model_id
 		}

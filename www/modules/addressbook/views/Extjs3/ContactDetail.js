@@ -189,7 +189,7 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 			});
 		}
 
-		this.add(new go.links.LinksDetailPanel());
+		this.add(go.links.getDetailPanels());
 
 		if (go.Modules.isAvailable("legacy", "comments")) {
 			this.add(new go.modules.comments.CommentsDetailPanel());
@@ -263,6 +263,11 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 
 		var moreMenuItems = [
 			{
+				xtype: "linkbrowsermenuitem"
+			},{
+				xtype: "filebrowsermenuitem"
+			},
+			'-',{
 				iconCls: "ic-print",
 				text: t("Print"),
 				handler: function () {
@@ -339,7 +344,7 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 				scope:this
 			});
 			
-			moreMenuItems.splice(1,0,this.createUserButton);
+			moreMenuItems.splice(3,0,this.createUserButton);
 		}
 
 		var tbarCfg = {
@@ -355,7 +360,7 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 				},
 				
 				new go.detail.addButton({			
-					detailPanel: this
+					detailView: this
 				}),
 
 				{

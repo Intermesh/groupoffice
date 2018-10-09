@@ -19,33 +19,11 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			remoteSort: true
 		});
 
-		this.addButtonItems = [
-			{
-				iconCls: 'ic-comment',
-				text: t("Comment"),
-				scope: this,
-				handler: this.addComment
-			}
-		];
-
 		go.modules.comments.CommentsDetailPanel.superclass.initComponent.call(this);
 
 	},
 	
-	addComment : function () {
-		var dlg = GO.comments.showCommentDialog(0, {
-			link_config: {
-				model_name: this.model_name,
-				model_id: this.model_id
-
-			}
-		});
-
-		dlg.on('hide', function(){
-			this.onLoad(this);
-		}, this, {single: true});
-	},
-			
+	
 
 	onLoad: function (dv) {
 

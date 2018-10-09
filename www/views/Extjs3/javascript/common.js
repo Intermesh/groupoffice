@@ -1518,19 +1518,18 @@ GO.util.dateFormat = function(v) {
 			v = new Date(Date.parse(v));
 	}
 
-	var elapsed = v.getElapsed() / 1000;
-
-	if(elapsed < 86400) {
+	var month = v.getFullYear()+v.getMonth();
+	var now = new Date();
+	var nowMonth = now.getFullYear()+now.getMonth();
+	
+	if(month === nowMonth) {
+		if(now.getDay() === v.getDay()) {
+			return Ext.util.Format.date(v, GO.settings.time_format);
+		}
 		
-		return Ext.util.Format.date(v, GO.settings.time_format);	
+		if(now.getDay() - 1  === v.getDay()) {
+			return t('Yesterday');
+		}
 	}
-	
-	if(elapsed < 172800) {		
-		return t('Yesterday');
-	}
-		
-	return Ext.util.Format.date(v, GO.settings.date_format);
-	
-
-	
+	return Ext.util.Format.date(v, GO.settings.date_format);	
 }
