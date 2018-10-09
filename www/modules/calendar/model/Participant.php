@@ -381,27 +381,26 @@ class Participant extends \GO\Base\Db\ActiveRecord {
 				$newEvent = $this->event->createCopyForParticipant($this);					
 			}
 			
-			
-			if(empty($newEvent)) {
-				$stmt = $this->event->getRelatedParticipantEvents();
-			
-				foreach($stmt as $event){
-//					if($event->id!=$newEvent->id){
+	
+			$stmt = $this->event->getRelatedParticipantEvents();
 
-						$p = Participant::model()->findSingleByAttributes(array(
-								'event_id'=>$event->id,
-								'email'=>$this->email
-						));
-						if(!$p){
-							$p = new Participant();
-							$p->setAttributes($this->getAttributes('raw'), false);
-							$p->event_id=$event->id;
-							$p->id=null;
-							$p->save();
-						}
-//					}
+			foreach($stmt as $event){
+				if($event->id!=$newEvent->id){
+
+					$p = Participant::model()->findSingleByAttributes(array(
+							'event_id'=>$event->id,
+							'email'=>$this->email
+					));
+					if(!$p){
+						$p = new Participant();
+						$p->setAttributes($this->getAttributes('raw'), false);
+						$p->event_id=$event->id;
+						$p->id=null;
+						$p->save();
+					}
 				}
 			}
+			
 			
 			
 			if(!$this->is_organizer && $this->contact_id && \GO::config()->calendar_autolink_participants){
