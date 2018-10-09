@@ -34,7 +34,10 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'name',
 					hideable: false,
 					draggable: false,
-					menuDisabled: true
+					menuDisabled: true,
+					renderer: function(v, meta, record) {
+						return '<i class="label entity '+record.data.entity+'"></i> ' + v;
+					}
 				}
 			]
 		});
