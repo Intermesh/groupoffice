@@ -1,3 +1,7 @@
+09-10-2018 6.3.42
+- Core: Search index script will index only missing results.
+- Core: Brought back the Link browser. Improved links display.
+- Core: Prevent core modules from being disabled with config['allowed_modules']
 - Updated German translation
 - Core: added icon to permissions panel to distinguish users and groups
 
