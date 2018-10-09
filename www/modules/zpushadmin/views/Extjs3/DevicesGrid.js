@@ -106,7 +106,9 @@ GO.zpushadmin.DevicesGrid = Ext.extend(GO.grid.GridPanel,{
 		
 		GO.zpushadmin.DevicesGrid.superclass.initComponent.call(this);
 		
-		GO.zpushadmin.deviceStore.load();
+		this.on("afterrender", function() {
+			GO.zpushadmin.deviceStore.load();
+		}, this);
 	},
 	
 	dblClick : function(grid, record, rowIndex){
