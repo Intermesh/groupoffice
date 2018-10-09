@@ -23,9 +23,11 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 		go.modules.community.notes.NoteDetail.superclass.initComponent.call(this);
 
 		go.CustomFields.addDetailPanels(this);
+		
+		this.add(go.links.getDetailPanels());
 
-		this.add(new go.links.LinksDetailPanel());
-
+		//this.add(new go.links.LinksDetailPanel());
+		
 		if (go.Modules.isAvailable("legacy", "comments")) {
 			this.add(new go.modules.comments.CommentsDetailPanel());
 		}
@@ -116,12 +118,18 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 			},
 
 			new go.detail.addButton({
-				detailPanel: this
+				detailView: this
 			}),
 
 			{
 				iconCls: 'ic-more-vert',
 				menu: [
+					{
+						xtype: "linkbrowsermenuitem"
+					},{
+						xtype: "filebrowsermenuitem"
+					},
+					'-',
 					{
 						iconCls: "btn-print",
 						text: t("Print"),

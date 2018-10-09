@@ -3556,11 +3556,11 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		//don't do this on datbase checks.
 		if(GO::router()->getControllerAction()=='checkdatabase')
-			return;
+			return false;
 
 		$attr = $this->getCacheAttributes();
-		if(!$attr) {
-			return;
+		if(!$attr) {		
+			return false;
 		}
 		
 		$search = \go\modules\core\search\model\Search::find()->where('entityTypeId','=', static::getType()->getId())->andWhere('entityId', '=', $this->id)->single();
@@ -3655,9 +3655,11 @@ abstract class ActiveRecord extends \GO\Base\Model{
 //
 //		}
 //		return false;
+		
+		return true;
 	}
-
-
+	
+	
 	/**
 	 * Cut all attributes to their maximum lengths. Useful when importing stuff.
 	 */
@@ -4487,7 +4489,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			$to_model_id = $model->id;
 			$to_model_type_id = $model->getType()->getId();
 		}
-
+		
 		if(!$to_model_id)
 			return false;
 
@@ -4765,7 +4767,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	}
 
 
-	public function rebuildSearchCache(){
+	public function rebuildSearchCache() {		
 		
 		
 				
@@ -4773,14 +4775,52 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$overriddenMethods = $rc->getOverriddenMethods();
 		if(in_array("getCacheAttributes", $overriddenMethods)){
 			
+			echo "Processing ".static::class ."\n";
+			
+			$entityTypeId = static::getType()->getId();
+			
 			$start = 0;
-			$limit = 1000;
+			$limit = 100;
+			
+			$findParams = FindParams::newInstance()
+							->ignoreAcl()
+							->debugSql()
+							->select('t.*')
+							->limit($limit)
+							->start($start)
+							->join('core_search', FindCriteria::newInstance()->addRawCondition('search.entityId', 't.id')->addRawCondition("search.entityTypeId", $entityTypeId), 'search', 'LEFT');
+			
+			$findParams->getCriteria()->addCondition('entityId',null, 'IS', 'search');							
+			
 			//per thousands to keep memory low
-			$stmt = $this->find(FindParams::newInstance()->ignoreAcl()->select('t.*')->limit($limit)->start($start));
+			$stmt = $this->find($findParams);
 			while($stmt->rowCount()) {	
-				$stmt->callOnEach('cacheSearchRecord', true);				
-				$stmt = $this->find(FindParams::newInstance()->ignoreAcl()->select('t.*')->limit($limit)->start($start += $limit));		
+	
+				while ($m = $stmt->fetch()) {
+				
+					try {
+						flush();
+						
+						if($m->cacheSearchRecord()) {
+							echo ".";
+						} else
+						{
+							echo "S";
+						}
+						
+					} catch (\Exception $e) {
+						\go\core\ErrorHandler::logException($e);
+						echo "E";
+					}
+				}
+				echo "\n";
+				
+				$stmt = $this->find($findParams->start($start += $limit));		
+
+				
 			}
+			
+			echo "\nDone\n\n";
 			
 		}
 	}

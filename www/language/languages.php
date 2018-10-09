@@ -1,6 +1,6 @@
 <?php
 $languages['ar']='عربي (Arabic)';
-$languages['bn_BD']='বাংলা (Bangladesh)';
+$languages['bn_bd']='বাংলা (Bangladesh)';
 $languages['ko']='한국어';
 $languages['ca']='Català';
 $languages['cn']='Chinese Simplified';
@@ -9,7 +9,7 @@ $languages['cs']='Čeština';
 $languages['da']='Dansk';
 $languages['de']='Deutsch';
 $languages['en']='English/American';
-$languages['en_UK']='English/British';
+$languages['en_uk']='English/British';
 $languages['es']='Español';
 $languages['et']='Estonian';
 $languages['el']='Ελληνικά';
@@ -20,7 +20,7 @@ $languages['hu']='Magyar';
 $languages['nl']='Nederlands';
 $languages['nb']='Norsk bokmål';
 $languages['pl']='Polski';
-$languages['pt_BR']='Português - Brazil';
+$languages['pt_br']='Português - Brazil';
 $languages['ru']='Русский';
 $languages['ro']='Romanian';
 $languages['fi']='Suomi - Finland';

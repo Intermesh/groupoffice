@@ -68,7 +68,7 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 					<tpl for="[home_phone,cellular,cellular2,fax,work_phone,work_fax]"><tpl if="values">\
 						<p>\
 							<tpl if="xindex == 1"><i class="icon label">phone</i></tpl>\n\
-							<a onclick="GO.mainLayout.fireEvent(\'callto\', \'{.}\');">{.}</a><label>{[this.phoneLabels[xindex-1]]}</label>\
+							<a onclick="GO.util.callToHandler(\'{.}\');">{.}</a><label>{[this.phoneLabels[xindex-1]]}</label>\
 						</p>\
 					</tpl></tpl>\
 					</div>\
@@ -147,7 +147,7 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 						</tpl>\
 						<tpl if="company_phone">\
 							<div class="s6 icons">\
-								<p><i class="icon label">phone</i><span>{company_phone}</span></p>\
+								<p><i class="icon label">phone</i><a onclick="GO.util.callToHandler(\'{.}\');">{company_phone}</a></p>\
 							<div>\
 						</tpl>\
 					</tpl>'
@@ -189,7 +189,7 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 			});
 		}
 
-		this.add(new go.links.LinksDetailPanel());
+		this.add(go.links.getDetailPanels());
 
 		if (go.Modules.isAvailable("legacy", "comments")) {
 			this.add(new go.modules.comments.CommentsDetailPanel());
@@ -263,6 +263,11 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 
 		var moreMenuItems = [
 			{
+				xtype: "linkbrowsermenuitem"
+			},{
+				xtype: "filebrowsermenuitem"
+			},
+			'-',{
 				iconCls: "ic-print",
 				text: t("Print"),
 				handler: function () {
@@ -339,7 +344,7 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 				scope:this
 			});
 			
-			moreMenuItems.splice(1,0,this.createUserButton);
+			moreMenuItems.splice(3,0,this.createUserButton);
 		}
 
 		var tbarCfg = {
@@ -355,7 +360,7 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 				},
 				
 				new go.detail.addButton({			
-					detailPanel: this
+					detailView: this
 				}),
 
 				{

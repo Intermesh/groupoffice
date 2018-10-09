@@ -284,9 +284,13 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	public function isAllowed(){
-		$allowedModules=empty(\GO::config()->allowed_modules) ? array() : explode(',', \GO::config()->allowed_modules);
+		if(empty(\GO::config()->allowed_modules)) {
+			return true;
+		}
+		$allowedModules=explode(',', \GO::config()->allowed_modules);		
+		$allowedModules = array_merge($allowedModules, ['links', 'search', 'users', 'modules', 'groups', 'customfields']);
 		
-		return empty($allowedModules) || in_array($this->name, $allowedModules);
+		return in_array($this->name, $allowedModules);
 	}
 	
 	/**

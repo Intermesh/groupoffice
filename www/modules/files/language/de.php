@@ -135,4 +135,9 @@ The following changes were made by %s:
   'Ver.' => 'Ver.',
   'ID' => 'ID',
   'Name' => 'Name',
+  'Download' => 'Herunterladen',
+  'Ok' => 'OK',
+  'File info' => 'Dateiinfo',
+  'Browse {total} files' => ' {total} Dateien durchsuchen',
+  'Browse files' => 'Dateien durchsuchen',
 );

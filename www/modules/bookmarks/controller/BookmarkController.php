@@ -119,7 +119,7 @@ class BookmarkController extends \GO\Base\Controller\AbstractModelController {
 		$columnModel->formatColumn('category_name', '$model->category_name');
 		$columnModel->formatColumn('thumb', '$model->thumbURL');
 		$columnModel->formatColumn('permissionLevel', '$model->permissionLevel');
-		$columnModel->formatColumn('content', 'urldecode($model->content)');
+		
 	}
 
 	protected function remoteComboFields() {

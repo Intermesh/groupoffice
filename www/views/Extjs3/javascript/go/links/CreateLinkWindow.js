@@ -84,7 +84,8 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 		
 		this.entityGrid = new go.links.EntityGrid({
 			width: dp(200),
-			region:"west"
+			region:"west",
+			savedSelection: "link"
 		});
 		
 		this.entityGrid.getSelectionModel().on('selectionchange', function (sm) {

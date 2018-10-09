@@ -145,7 +145,17 @@ class Link extends Entity {
 
 		if(!empty($filter['entity']))	{
 			$query->where(['eFrom.name' => $filter['entity']]);		
-		}		
+		}	
+		
+		
+		if(!empty($filter['entities']))	{
+			$query->where(['eTo.name' => $filter['entities']]);		
+		}
+		
+		
+		if(!empty($filter['q'])) {
+			$query->where('s.keywords', 'LIKE', '%' . $filter['q'] .'%');
+		}
 	
 		return parent::filter($query, $filter);
 	}

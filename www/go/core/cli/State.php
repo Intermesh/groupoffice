@@ -12,6 +12,6 @@ class State extends TemporaryState {
 	}
 
 	public function isAuthenticated() {
-		return parent::isAuthenticated() && Environment::get()->isCli();
+		return parent::isAuthenticated();// && Environment::get()->isCli();
 	}
 }

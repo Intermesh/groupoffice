@@ -206,15 +206,18 @@ $updates['201807271339'][] = "ALTER TABLE `core_change`
   ADD CONSTRAINT `core_change_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_change_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE;";
 
+$updates["201810071410"][]="DROP TABLE IF EXISTS `go_mail_counter`;";
+
+$updates["201810091544"][]="update core_user set theme='Paper' where theme='Group-Office' or theme='Default' or theme = 'ExtJS'";
 
 
-$updates['201807271339'][] = "update `core_entity` set highestModSeq=0 where highestModSeq is null;";
-$updates['201807271339'][] = "ALTER TABLE `core_entity` CHANGE `highestModSeq` `highestModSeq` INT(11) NOT NULL DEFAULT '0';";
+$updates['201810091544'][] = "update `core_entity` set highestModSeq=0 where highestModSeq is null;";
+$updates['201810091544'][] = "ALTER TABLE `core_entity` CHANGE `highestModSeq` `highestModSeq` INT(11) NOT NULL DEFAULT '0';";
 
-$updates['201807271339'][] = "truncate table core_change;";
+$updates['201810091544'][] = "truncate table core_change;";
 
-$updates['201807271339'][] = "DROP TABLE IF EXISTS `core_acl_group_changes`;";
-$updates['201807271339'][] = "CREATE TABLE IF NOT EXISTS `core_acl_group_changes` (
+$updates['201810091544'][] = "DROP TABLE IF EXISTS `core_acl_group_changes`;";
+$updates['201810091544'][] = "CREATE TABLE IF NOT EXISTS `core_acl_group_changes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `aclId` int(11) NOT NULL,
   `groupId` int(11) NOT NULL,
@@ -226,22 +229,22 @@ $updates['201807271339'][] = "CREATE TABLE IF NOT EXISTS `core_acl_group_changes
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
 
-$updates['201807271339'][] = "ALTER TABLE `core_acl_group_changes`
+$updates['201810091544'][] = "ALTER TABLE `core_acl_group_changes`
   ADD CONSTRAINT `all` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `group` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;";
 
-$updates['201807271339'][] = "insert into core_acl_group_changes select null, aclId, groupId, COALESCE((select highestModSeq from core_entity where name='Acl'), 0), null from core_acl_group;";
+$updates['201810091544'][] = "insert into core_acl_group_changes select null, aclId, groupId, COALESCE((select highestModSeq from core_entity where name='Acl'), 0), null from core_acl_group;";
 
-$updates['201807271339'][] = "ALTER TABLE `core_change`
+$updates['201810091544'][] = "ALTER TABLE `core_change`
 ADD COLUMN `id` INT NOT NULL AUTO_INCREMENT FIRST,
 DROP PRIMARY KEY,
 ADD PRIMARY KEY (`id`);";
 
 
-$updates['201808241650'][] = "ALTER TABLE `core_blob` ADD `modifiedAt` DATETIME NULL DEFAULT NULL AFTER `createdAt`, ADD `staleAt` DATETIME NULL DEFAULT NULL AFTER `modifiedAt`;";
-$updates['201808241650'][] = "ALTER TABLE `core_blob` ADD INDEX(`staleAt`);
+$updates['201810091544'][] = "ALTER TABLE `core_blob` ADD `modifiedAt` DATETIME NULL DEFAULT NULL AFTER `createdAt`, ADD `staleAt` DATETIME NULL DEFAULT NULL AFTER `modifiedAt`;";
+$updates['201810091544'][] = "ALTER TABLE `core_blob` ADD INDEX(`staleAt`);
 UPDATE `core_blob` set modifiedAt = from_unixtime(modified)";
-$updates['201808241650'][] = "ALTER TABLE `core_blob` DROP `modified`";
+$updates['201810091544'][] = "ALTER TABLE `core_blob` DROP `modified`";
 
 
-$updates['201808241650'][] = "insert into core_cron_job (moduleId,name, expression, description) values ((select id from core_module where name='core'), 'GarbageCollection', '0 * * * *', 'Garbage collection')";
+$updates['201810091544'][] = "insert into core_cron_job (moduleId,name, expression, description) values ((select id from core_module where name='core'), 'GarbageCollection', '0 * * * *', 'Garbage collection')";

@@ -1116,7 +1116,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		$params = array(
 				'src'=>$this->path,
-				'foldericon'=> $this->acl_id ? 'folder_public.png' : 'folder.png',
+				'foldericon'=> $this->acl_id ? 'folder_shared' : 'folder',
 				'lw'=>100,
 				'ph'=>100,
 				'zc'=>1,

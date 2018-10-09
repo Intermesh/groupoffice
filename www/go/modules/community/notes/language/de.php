@@ -12,4 +12,6 @@ return array (
   'Multiple note books selected' => 'Mehrere Notizbücher ausgewählt',
   'Note' => 'Notiz',
   'Content is encrypted' => 'Inhalt ist verschlüsselt',
+  'Add test' => 'Test hinzufügen',
+  'Invalid password' => 'Ungültiges Passwort',
 );

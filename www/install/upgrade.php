@@ -42,9 +42,6 @@ function isValidDb() {
 	return 62;	
 }
 
-
-//TODO check all modules for availability and license.
-
 function checkLicenses($is62 = false) {	
 	if($is62) {
 		//disabled modules must be deleted too when upgrading from 6.2 to 6.3
@@ -307,7 +304,7 @@ try {
 	
 	if(checkLicenses($dbValid == 62)) {
 	
-		if ($dbValid == 62) {		
+		if ($dbValid == 62) {					
 			require(Environment::get()->getInstallFolder() . '/install/62to63.php');
 		}
 

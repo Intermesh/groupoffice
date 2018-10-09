@@ -1,4 +1,3 @@
-
 Ext.applyIf(Array.prototype, {
 	/**
 	 * Turn an array of objects into an array of object property values.
@@ -12,12 +11,8 @@ Ext.applyIf(Array.prototype, {
 	 * @param {type} name
 	 * @returns {Array}
 	 */
+
 	column : function(name) {
-		var r = [];
-		for(var i = 0, l = this.length; i < l; i++) {
-			r.push(this[i][name]);
-		}
-		
-		return r;
+		return this.map(rec=>rec[name]);
 	}
 });

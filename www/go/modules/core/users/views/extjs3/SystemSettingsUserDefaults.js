@@ -10,7 +10,7 @@ go.modules.core.users.SystemSettingsUserDefaults = Ext.extend(Ext.form.FormPanel
 					labelWidth: dp(160),
 					items: [
 						new Ext.form.ComboBox({
-							fieldLabel: t("Timezone", "users"),
+							fieldLabel: t("Timezone"),
 							name: 'defaultTimezone',
 							store: new Ext.data.SimpleStore({
 								fields: ['timezone'],
@@ -27,12 +27,12 @@ go.modules.core.users.SystemSettingsUserDefaults = Ext.extend(Ext.form.FormPanel
 							store: new Ext.data.SimpleStore({
 								fields: ['id', 'dateformat'],
 								data: [
-									['d-m-Y', t("Day-Month-Year", "users")],
-									['m/d/Y', t("Month/Day/Year", "users")],
-									['d/m/Y', t("Day/Month/Year", "users")],
-									['d.m.Y', t("Day.Month.Year", "users")],
-									['Y-m-d', t("Year-Month-Day", "users")],
-									['Y.m.d', t("Year.Month.Day", "users")]
+									['d-m-Y', t("Day-Month-Year")],
+									['m/d/Y', t("Month/Day/Year")],
+									['d/m/Y', t("Day/Month/Year")],
+									['d.m.Y', t("Day.Month.Year")],
+									['Y-m-d', t("Year-Month-Day")],
+									['Y.m.d', t("Year.Month.Day")]
 								]
 							}),
 							displayField: 'dateformat',
@@ -45,12 +45,12 @@ go.modules.core.users.SystemSettingsUserDefaults = Ext.extend(Ext.form.FormPanel
 							forceSelection: true
 						}),
 						new Ext.form.ComboBox({
-							fieldLabel: t("Time Format", "users"),
+							fieldLabel: t("Time Format"),
 							store: new Ext.data.SimpleStore({
 								fields: ['id', 'format'],
 								data: [
-									['G:i', t("24 hour format", "users")],
-									['h:i a', t("12 hour format", "users")]
+									['G:i', t("24 hour format")],
+									['h:i a', t("12 hour format")]
 								]
 							}),
 							displayField: 'format',
@@ -63,12 +63,12 @@ go.modules.core.users.SystemSettingsUserDefaults = Ext.extend(Ext.form.FormPanel
 							forceSelection: true
 						}),
 						new Ext.form.ComboBox({
-							fieldLabel: t("First weekday", "users"),
+							fieldLabel: t("First weekday"),
 							store: new Ext.data.SimpleStore({
 								fields: ['id', 'day'],
 								data: [
-									[0, t("Sunday", "users")],
-									[1, t("Monday", "users")]
+									[0, t("Sunday")],
+									[1, t("Monday")]
 								]
 							}),
 							displayField: 'day',
@@ -92,20 +92,20 @@ go.modules.core.users.SystemSettingsUserDefaults = Ext.extend(Ext.form.FormPanel
 					items: [
 						{
 							xtype: 'textfield',
-							fieldLabel: t("List separator", "users"),
+							fieldLabel: t("List separator"),
 							name: 'defaultListSeparator',							
 						}, {
 							xtype: 'textfield',
-							fieldLabel: t("Text separator", "users"),
+							fieldLabel: t("Text separator"),
 							name: 'defaultTextSeparator'
 						}, {
 							xtype: 'textfield',
-							fieldLabel: t("Thousand Seperator", "users"),
+							fieldLabel: t("Thousand Seperator"),
 							name: 'defaultThousandSeparator'
 						},
 						{
 							xtype: 'textfield',
-							fieldLabel: t("Decimal Seperator", "users"),
+							fieldLabel: t("Decimal Seperator"),
 							name: 'defaultDecimalSeparator'
 						}, {
 							xtype: "textfield",
@@ -119,7 +119,7 @@ go.modules.core.users.SystemSettingsUserDefaults = Ext.extend(Ext.form.FormPanel
 					xtype: "fieldset",
 					items: [
 						new go.form.multiselect.Field({
-							hint: t("Users will automatically be added to these groups", "users"),
+							hint: t("Users will automatically be added to these groups"),
 							name: "defaultGroups",
 							idField: "groupId",
 							displayField: "name",

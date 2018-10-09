@@ -1,4 +1,6 @@
 
+/* global Ext, go, BaseHref, GO */
+
 /** 
  * Copyright Intermesh
  * 
@@ -201,7 +203,7 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 									//reload client
 									document.location = BaseHref;
 								}
-							})
+							});
 						},
 						scope: this						
 					},
@@ -215,10 +217,52 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 							this.deleteSelected();
 						},
 						scope: this						
-					},
+					}
 				]
-			})
+			});
+			
+			
+			if(go.Modules.isAvailable("legacy", "addressbook")) {
+				this.moreMenu.insert(1, {
+					iconCls: "ic-contacts",
+					text: t("Edit contact"),
+					scope: this,
+					handler: function() {
+						GO.request({
+							url: 'addressbook/contact/findForUser',
+							params: {
+								user_id: this.moreMenu.record.id
+							},
+							scope: this,
+							success: function(response, success, result) {
+								if(result.contact_id) {
+									GO.addressbook.showContactDialog(result.contact_id);
+								} else
+								{
+									var u = this.moreMenu.record.data;
+									
+									GO.addressbook.showContactDialog(0, {
+										values: {
+											first_name: u.displayName,
+											email: u.email
+										}
+									});
+									
+									GO.addressbook.contactDialog.formPanel.baseParams.go_user_id = u.id;
+									
+									GO.addressbook.contactDialog.on("hide", function() {
+										delete GO.addressbook.contactDialog.formPanel.baseParams.go_user_id;
+									}, {single: true});
+									
+									
+								}
+							}						
+						});
+					}
+				});
+			}
 		}
+		
 		
 		this.moreMenu.record = record;
 		

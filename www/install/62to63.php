@@ -7,6 +7,27 @@ App::get()->getCache()->flush(false);
 
 App::get()->getDatabase()->setUtf8();
 
+$qs[] = "DROP TABLE IF EXISTS `go_mail_counter`;";
+$qs[] = function () {
+	$stmt = GO()->getDbConnection()->query("SHOW TABLE STATUS");	
+	
+	foreach($stmt as $record){
+		
+		if($record['Engine'] != 'InnoDB' && $record["Name"] != 'fs_filesearch' && $record["Name"] != 'cms_files') {
+			echo "Converting ". $record["Name"] . " to InnoDB\n";
+			flush();
+			$sql = "ALTER TABLE `".$record["Name"]."` ENGINE=InnoDB;";
+			GO()->getDbConnection()->query($sql);	
+		}
+		
+		if($record["Collation"] != "utf8mb4_unicode_ci" ) {
+			echo "Converting ". $record["Name"] . " to utf8mb4\n";
+			flush();
+			$sql = "ALTER TABLE `".$record["Name"]."` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
+			GO()->getDbConnection()->query($sql);	
+		}	
+	}
+};
 
 $qs[] = "UPDATE go_settings SET value=0 where name = 'version';";
 $qs[] = "ALTER TABLE `go_modules` ADD `package` VARCHAR(100) NULL DEFAULT NULL AFTER `id`;";
@@ -66,15 +87,13 @@ $qs[] = "update `go_acl_items` set modifiedAt = from_unixtime(mtime);";
 
 $qs[] = "ALTER TABLE `go_acl_items` DROP `mtime`;";
 
+$qs[] = "delete from go_acl where user_id > 0 AND user_id not in (select id from go_users)";
+$qs[] = "delete from go_acl where group_id > 0 AND group_id not in (select id from go_groups)";
+
 $qs[] = "ALTER TABLE `go_acl` CHANGE `group_id` `groupId` INT(11) NOT NULL DEFAULT '0';";
 
 $qs[] = "ALTER TABLE `go_acl` CHANGE `acl_id` `aclId` INT(11) NOT NULL;";
-
-
-
 $qs[] = "ALTER TABLE `go_groups` CHANGE `name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;";
-
-
 
 $qs[] = "DROP TRIGGER IF EXISTS `Create ACL`;";
 $qs[] = "CREATE TRIGGER `Create ACL` BEFORE INSERT ON `go_groups` FOR EACH ROW BEGIN INSERT INTO `go_acl_items` (`ownedBy`, `description`) VALUES (NEW.createdBy, 'go_groups.aclId'); set NEW.aclId = (SELECT last_insert_id()); END";
@@ -86,7 +105,6 @@ $qs[] = "ALTER TABLE `go_acl` DROP PRIMARY KEY;";
 $qs[] = "insert into `go_acl` (groupId, aclId, level) select id,aclId,50 from go_groups where isUserGroupFor is not null;";
 $qs[] = "insert into `go_acl` (groupId, aclId, level) select '1',aclId,50 from go_groups where isUserGroupFor is not null;";
 $qs[] = "ALTER TABLE `go_groups` CHANGE `createdBy` `createdBy` INT(11) NOT NULL;";
-$qs[] = "delete from go_acl where user_id > 0 AND user_id not in (select id from go_users)";
 $qs[] = "update `go_acl` a set groupId = (select id from go_groups where isUserGroupFor = a.user_id) where user_id > 0; ";
 $qs[] = "ALTER TABLE `go_acl` DROP `user_id`;";
 $qs[] = "delete from go_acl where aclId not in (select id from go_acl_items);";
@@ -485,7 +503,10 @@ foreach($qs as $q) {
 		} catch(\Exception $e) {
 			
 			echo 'ERROR: '. $e->getMessage().' Query '. $q;
-			if ($e->getCode() == 42000 || $e->getCode() == '42S21' || $e->getCode() == '42S01' || $e->getCode() == '42S22') {
+			
+			//MS: remove $e->getCode() == 42000 because that should not be ignored?
+			
+			if ($e->getCode() == '42S21' || $e->getCode() == '42S01' || $e->getCode() == '42S22') {
 				//duplicate and drop errors. Ignore those on updates
 			} else {
 				echo "ERROR: A fatal upgrade error occurred. You will not be able to continue upgrading this database! Please report this error message.\n\n";

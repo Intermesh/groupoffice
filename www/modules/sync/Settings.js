@@ -16,9 +16,17 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 	title : t("Synchronization", "sync"),
 	iconCls: 'ic-sync',
 	defaultType: 'textfield',
-	
+
 	onLoadStart: function (userId) {
-	
+		
+		if(this.panelAddressbook)
+			this.panelAddressbook.setModelId(userId);
+
+		if(this.panelTasklist)
+			this.panelTasklist.setModelId(userId);
+
+		if(this.panelCalendar)
+			this.panelCalendar.setModelId(userId);
 	},
 	
 	initComponent: function() {
@@ -103,7 +111,7 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 				title: t("Notebooks", "notes"),
 				extraColumns: [defaultCol],
 				extraFields: [{name: "isDefault", type: "boolean"}],
-				plugins: [defaultCol],
+				plugins: [defaultCol]
 			}));
 		}
 	
@@ -113,15 +121,11 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 
 			if(this.panelTasklist)
 				this.panelTasklist.store.load();
-
+		
 			if(this.panelCalendar)
 				this.panelCalendar.store.load();
 
-			//if(this.panelNoteCategories)
-				//this.panelNoteCategories.store.load();
 
-			if(this.devicesGrid)
-				this.devicesGrid.store.load()
 		},this);
 		
 		GO.sync.SettingsPanel.superclass.initComponent.call(this);

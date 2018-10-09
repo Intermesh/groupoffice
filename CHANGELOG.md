@@ -1,7 +1,41 @@
+09-10-2018 6.3.42
+- Core: Search index script will index only missing results.
+- Core: Brought back the Link browser. Improved links display.
+- Core: Prevent core modules from being disabled with config['allowed_modules']
+- Updated German translation
+- Core: added icon to permissions panel to distinguish users and groups
+
+04-10-2018 6.3.41
+- Core: Error in lock function
+
+04-10-2018 6.3.40
+- Core: Added "Edit contact" in more menu at System settings -> Users to connect a contact to a user.
+- Core: Remove non existing groups from ACL on upgrade
+- Core: Added a more detailed error message to the Lock->lock() function in case the .lock file cannot be created
+- Core: Don't redirect to entity detail view after creating new link
+- Tickets: Fixed issue that a ticket agent did not get a correct formatted message.
+- Files: Changed "public folder" icon in grid.
+- Core: Fixed tabs in user settings menu
+- Core: Fixed issue with generating XLS file reports in Projects2
+- Core: Translation in some parts were not working correctly.
+- Core: Convert tables to InnoDB before upgrade if necessary
+- Customfields: removed maxlength of 190 characters on textareas
+
+25-09-2018 6.3.39
+- Core: merged 6.2.105
+- Files: File custom field didn't load and save
+- Core: Translations can be exported and imported as CSV file
+- Core: Cron jobs don't deactivate on error anymore
+- Billing: Fixed search query to work with amounts and numbers in regular fields
+
+18-09-2018 6.3.38
+- Core: Links didn't show when you didn't have access to one of them.
+- Projects: Fixed double icon in tree
 - Files: Fixed undefinded index "deleteSuccess" error.
 - Files: Add "Browse x files" button in detail views
 - Core: Better error message when language is invalid and fixed Norwegian
 - Core: Make sure customfields and search module are installed and enabled before upgrade
+- Core: Merged 6.2.104
 
 11-09-2018 6.3.37
 - Start page: RSS date was not showing

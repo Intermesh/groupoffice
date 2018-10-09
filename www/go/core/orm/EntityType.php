@@ -301,8 +301,6 @@ class EntityType {
 		$this->highestModSeq = $modSeq;
 		
 		return $modSeq;
-	}	
-	
-	
+	}		
 	
 }

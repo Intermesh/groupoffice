@@ -97,3 +97,5 @@ GO.DetailView = Ext.extend(Ext.Panel,{
 		
 	}
 });
+
+Ext.reg("tmpdetailview", GO.DetailView);

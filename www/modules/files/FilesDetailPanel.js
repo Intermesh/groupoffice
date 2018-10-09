@@ -48,13 +48,6 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 					scope: this
 				}
 			})];
-
-		this.addButtonItems = [{
-				iconCls: 'ic-folder',
-				text: t("Files"),
-				handler: this.browse,
-				scope: this
-			}];
 		
 		
 		this.bbar = [
@@ -76,58 +69,7 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 
 	},
 
-	browse: function () {
-
-
-		GO.request({
-			url: 'files/folder/checkModelFolder',
-			maskEl: this.ownerCt.ownerCt.getEl(),
-			jsonData: {},
-			params: {
-				mustExist: true,
-				model: this.detailView.model_name || this.detailView.entity || this.detailView.entityStore.entity.name,
-				id: this.detailView.data.id
-			},
-			success: function (response, options, result) {
-				var fb = GO.files.openFolder(result.files_folder_id);
-				fb.model_name = this.detailView.model_name || this.detailView.entity || this.detailView.entityStore.entity.name;
-				fb.model_id = this.detailView.data.id;
-
-				this.folderId = result.files_folder_id;
-				
-				//hack to update entity store
-				var store = go.Stores.get(fb.model_name);
-				if (store) {
-					store.data[fb.model_id].filesFolderId = result.files_folder_id;
-					store.saveState();
-				}
-
-				fb.on('hide', function () {
-					fb.model_id = null;
-					fb.model = null;
-
-				}, {single: true});
-
-				//reload display panel on close
-
-				GO.files.fileBrowserWin.on('hide', function () {
-					//this.fireEvent('close', this, result.files_folder_id);
-					
-					this.store.load({
-						params: {
-							limit: 10,
-							folder_id: this.folderId
-						}
-					});
-				}, this, {single: true});
-			},
-			scope: this
-
-		});
-
-
-	},
-
+	
 	onClick: function (dataview, index, node, e) {
 
 		var record = this.store.getAt(index);
@@ -146,12 +88,10 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 			}
 		}
 	},
-
 	onLoad: function (dv) {
 
 		this.browseBtn.model_name = dv.model_name || dv.entity || dv.entityStore.entity.name;
-		this.browseBtn.setId(dv.data.id);
-		
+		this.browseBtn.setId(dv.data.id);		
 
 		this.detailView = dv;
 
@@ -169,6 +109,7 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 		} else
 		{
 			this.store.removeAll();
+			this.browseBtn.setText(t("Create folder"));
 		}
 	}
 

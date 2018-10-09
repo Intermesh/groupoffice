@@ -14,37 +14,15 @@ class FunctionField extends AbstractCustomfieldtype {
 		return "DOUBLE NULL";
 	}
 
-//	public function formatFormOutput($column, &$attributes, \GO\Customfields\Model\AbstractCustomFieldsRecord $model) {
-//		$result_string = '';
-//
-//		$function = $this->field->getOption("function");
-//		
-//		if (!empty($function)) {
-//			
-//			$this->fireEvent('formatformoutput',array($this, $column, &$attributes, $model, &$function));
-//			
-//			preg_match_all('/\{([^}]*)\}/',$function,$matches);
-//			if (!empty($matches[1])) {
-//				foreach ($matches[1] as $key) {		
-//					if(!isset($attributes[$key])||$attributes[$key]==='')
-//						return null;
-//					else
-//						$value = $attributes[$key];
-//					$function = str_replace('{' . $key . '}', floatval($value), $function);				
-//				}
-//			}
-//			$function = preg_replace('/\{[^}]*\}/', '0',$function);
-//			
-//			eval("\$result_string=" . $function . ";");
-//			
-////			\GO::debug("Function ($column): ".$this->field->function.' => '.$f.' = '.$result_string);
-//		}
-//		
-//
-//		$attributes[$column] = \GO\Base\Util\Number::localize($result_string);
-//		return $attributes[$column];
-//	}
+	public function formatFormOutput($column, &$attributes, \GO\Customfields\Model\AbstractCustomFieldsRecord $model) {
 
+		if (!empty($this->field->function)) {	
+			$function = $this->field->function;	
+			$this->fireEvent('formatformoutput',array($this, $column, &$attributes, $model, &$function));
+		}
+
+		return $attributes[$column];
+	}
 	
 	public function formatDisplay($key, &$attributes, \GO\Customfields\Model\AbstractCustomFieldsRecord $model) {
 		// recalculate on display will fail sum of col1 and col2 + col3 as the sum would already be localized

@@ -331,13 +331,6 @@ CREATE TABLE `go_log` (
   `jsonData` text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-DROP TABLE IF EXISTS `go_mail_counter`;
-CREATE TABLE `go_mail_counter` (
-  `host` varchar(100) NOT NULL DEFAULT '',
-  `date` date NOT NULL,
-  `count` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
 DROP TABLE IF EXISTS `go_reminders`;
 CREATE TABLE `go_reminders` (
   `id` int(11) NOT NULL,

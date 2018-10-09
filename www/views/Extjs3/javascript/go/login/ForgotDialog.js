@@ -6,7 +6,7 @@ go.login.ForgotDialog = Ext.extend(go.Window, {
 	initComponent: function () {
 
 		this.emailField = new Ext.form.TextField({
-			fieldLabel: t("Email"),
+			fieldLabel: t("E-mail"),
 			name: 'email',
 			vtype: 'emailAddress',
 			allowBlank: false,

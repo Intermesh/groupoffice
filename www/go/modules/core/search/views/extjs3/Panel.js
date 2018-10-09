@@ -1,9 +1,7 @@
 go.modules.community.search.Panel = Ext.extend(Ext.Panel, {
 	lastQ: "",
+	height: dp(500),
 	initComponent: function () {
-
-
-
 		this.grid = new go.links.LinkGrid({
 			cls: 'go-grid3-hide-headers',
 			region: "center",
@@ -21,12 +19,14 @@ go.modules.community.search.Panel = Ext.extend(Ext.Panel, {
 		this.entityGrid = new go.links.EntityGrid({
 			width: dp(200),
 			region: "east",
-			split: true
+			split: true,
+			savedSelection: "search"
 		});
 
+		
 		this.entityGrid.getSelectionModel().on('selectionchange', function (sm) {
 			this.search(this.lastQ);
-		}, this, {buffer: 1}); //add buffer because it clears selection first
+		}, this, {buffer: 1}); //add buffer because it clears selection first	
 
 		Ext.apply(this, {
 			cls: "go-search-panel",
@@ -61,6 +61,15 @@ go.modules.community.search.Panel = Ext.extend(Ext.Panel, {
 	
 	search: function (q) {
 		
+//
+//		
+//		if(!this.entityGrid.viewReady) {
+//			this.entityGrid.on("viewready", function() {
+//				this.search(q);
+//			}, this, {single: true});
+//			return;
+//		}
+//		
 		this.lastQ = q;
 		var filter = {}, entities = [];
 		
@@ -85,12 +94,12 @@ go.modules.community.search.Panel = Ext.extend(Ext.Panel, {
 			scope: this
 		});
 		
-		this.setHeight(dp(600));
+		//this.setHeight(dp(600));
 		this.expand();
 	},
 	// private
 	collapseIf : function(e){
-		if(!e.within(this.getEl())){
+		if(!e.within(this.getEl()) && !e.within(this.searchContainer.getEl())){
 				this.collapse();
 		}
 	}
