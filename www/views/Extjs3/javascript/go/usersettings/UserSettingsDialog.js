@@ -230,7 +230,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 				return;
 			}
 						
-			if(response.updated && response.updated[id]){
+			if(response.updated && id in response.updated){
 				this.submitComplete(response);
 			} else
 			{
