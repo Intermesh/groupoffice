@@ -115,18 +115,7 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 			}
 		];
 
-		//TODO refactor in MASTER
-		var all = [], allObj = go.Entities.getAll();
-
-		for (var i in allObj) {
-			all.push(allObj[i]);
-		}
-
-		var linkableEntitities = all.filter(function (e) {
-			if (!go.Modules.isAvailable(e.package, e.module)) {
-				return false;
-			}
-
+		var linkableEntitities = go.Entities.getAll().filter(function (e) {
 			return !!e.linkWindow;
 		});
 

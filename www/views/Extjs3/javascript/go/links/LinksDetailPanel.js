@@ -122,19 +122,10 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 });
 
 go.links.getDetailPanels = function() {
-	var all = [], allObj = go.Entities.getAll();
-	
-	for(var i in allObj) {
-		all.push(allObj[i]);
-	}
-	
-	var panels = [];
-	var linkableEntitities = all.filter(function(e) {
-		if(!go.Modules.isAvailable(e.package, e.module) ){
-			return false;
-		}
 
-		return !!e.linkWindow;
+	var panels = [];
+	var linkableEntitities = go.Entities.getAll().filter(function(e) {
+			return e.linkable;
 	});
 				
 	linkableEntitities.sort(function(a, b) {

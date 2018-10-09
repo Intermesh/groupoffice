@@ -17,16 +17,6 @@ use go\core\util\StringUtil;
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
 class File extends FileSystemObject {
-	
-	/**
-	 * Get a temporary file
-	 * 
-	 * @param string $extension
-	 * @return statuc
-	 */
-	public static function tempFile($extension) {
-		 return GO()->getTmpFolder()->getFile(uniqid(time()) . '.' . $extension);
-	}
 
 	/**
 	 * Get a temporary file

@@ -1,3 +1,5 @@
+/* global go, Ext */
+
 /**
  * Copyright Intermesh
  *
