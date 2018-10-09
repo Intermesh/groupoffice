@@ -68,7 +68,9 @@ GO.moduleManager.onModuleReady('addressbook',function(){
 				}
 			}.createDelegate(this);
 
-			GO.favorites.favoritesAddressbookStore.load();
+			this.on("afterrender", function() {
+				GO.favorites.favoritesAddressbookStore.load();
+			}, this);
 		})
 	});
 });
