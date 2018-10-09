@@ -63,6 +63,13 @@ class Language {
 			if($this->hasLanguage($lang)){
 				return $lang;
 			}
+			
+			if(($pos = strpos($lang, "_"))) {
+				$lang = substr($lang, 0, $pos);
+				if($this->hasLanguage($lang)){
+					return $lang;
+				}
+			}
 		}
 		
 		return GO()->getSettings()->language; // from settings if we cant determine
