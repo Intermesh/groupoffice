@@ -31,7 +31,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 				</tpl>\
 				<tpl for="to">\
 				<a>{name}</a>\
-				<label>{[GO.util.dateFormat(parent.createdAt)]}</label>\
+				<label>{[GO.util.dateFormat(parent.createdAt)]}<br />{description}</label>\
 				<a class="right show-on-hover"><i class="icon">delete</i></a>\
 				</tpl>\
 			</p>\

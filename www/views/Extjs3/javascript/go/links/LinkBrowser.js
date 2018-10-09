@@ -71,7 +71,7 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 					dataIndex: 'name',
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 
-						var str = record.data.to.name;
+						var str = record.data.to.name + " <br /><label>" + record.data.to.description + "</label>";
 
 						if (rowIndex === 0 || store.getAt(rowIndex - 1).data.toEntity !== record.data.toEntity) {
 							str = '<i class="entity ' + record.data.toEntity + '"></i>' + str;
