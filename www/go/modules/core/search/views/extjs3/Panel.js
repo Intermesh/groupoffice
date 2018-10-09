@@ -90,7 +90,7 @@ go.modules.community.search.Panel = Ext.extend(Ext.Panel, {
 	},
 	// private
 	collapseIf : function(e){
-		if(!e.within(this.getEl())){
+		if(!e.within(this.getEl()) && !e.within(this.searchContainer.getEl())){
 				this.collapse();
 		}
 	}

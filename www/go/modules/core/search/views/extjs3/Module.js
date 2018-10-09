@@ -11,7 +11,9 @@ go.Modules.register("core", 'search', {
 
 			var search = function () {
 				if (!panel) {
-					panel = new go.modules.community.search.Panel();
+					panel = new go.modules.community.search.Panel({
+						searchContainer : searchContainer
+					});
 					panel.render(Ext.getBody());
 					panel.on("collapse", function() {
 						searchField.setValue("");
