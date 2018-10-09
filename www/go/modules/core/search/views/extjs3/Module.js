@@ -10,19 +10,11 @@ go.Modules.register("core", 'search', {
 			var container, searchField, searchContainer, panel;
 
 			var search = function () {
-				if (!panel) {
-					panel = new go.modules.community.search.Panel({
-						searchContainer : searchContainer
-					});
-					panel.render(Ext.getBody());
-					panel.on("collapse", function() {
-						searchField.setValue("");
-						searchContainer.hide();
-					});
-				}
-				panel.setWidth(searchField.getWidth());
-				panel.getEl().alignTo(searchField.getEl(), "tl-bl");
-				panel.search(searchField.getValue());
+					
+					panel.setWidth(searchField.getWidth());
+					panel.setHeight(dp(500));
+					panel.getEl().alignTo(searchField.getEl(), "tl-bl");
+					panel.search(searchField.getValue());
 			}
 			
 			var dqTask = new Ext.util.DelayedTask(search);
@@ -35,7 +27,18 @@ go.Modules.register("core", 'search', {
 						tooltip: t("Search"),
 						handler: function () {
 							searchContainer.show();
-							searchField.focus();
+							searchField.focus();	
+							
+							if (!panel) {
+								panel = new go.modules.community.search.Panel({
+									searchContainer : searchContainer
+								});
+								panel.render(Ext.getBody());
+								panel.on("collapse", function() {
+									searchField.setValue("");
+									searchContainer.hide();
+								});
+							}
 						},
 						scope: this
 					},
