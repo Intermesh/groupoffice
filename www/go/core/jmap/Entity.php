@@ -37,7 +37,7 @@ abstract class Entity  extends OrmEntity {
 	 * @return string
 	 */
 	public static function getState($entityState = null) {
-		return ($entityState ?? static::getType()->highestModSeq) . ':' . static::getType()->getUserModSeq();		
+		return ($entityState ?? static::getType()->highestModSeq) . ':' . static::getType()->getHighestUserModSeq();		
 	}
 	
 	/**
@@ -105,6 +105,12 @@ abstract class Entity  extends OrmEntity {
 		
 	}
 	
+	/**
+	 * The opposite of parseState()
+	 * 
+	 * @param array $stateArray
+	 * @return string
+	 */
 	protected static function intermediateState($stateArray) {
 		return implode(":", array_map(function($s) {	
 			return $s['modSeq'] . '|' . $s['offset'];			
@@ -115,6 +121,10 @@ abstract class Entity  extends OrmEntity {
 	/**
 	 * 
 	 * $entityModSeq:$userModSeq-$offset
+	 * 
+	 * @todo Paging with intermediateState() might not be necessary here. It's 
+	 *  required for ACL changes but we could just return the current modseq?
+	 *  Changes should be sent in reversed order. Newest first but this complicates paging.
 	 * 
 	 * @param string $sinceState
 	 * @param int $maxChanges
@@ -150,13 +160,12 @@ abstract class Entity  extends OrmEntity {
 			'hasMoreUpdates' => false,
 			'changed' => [],
 			'removed' => []
-		];
-		
-		$changes = static::getEntityChangesQuery($states[0]['modSeq']);
-		
+		];		
+			
 		$userChanges = static::getUserChangesQuery($states[1]['modSeq']);
 			
-		$changes = $changes->union($userChanges)
+		$changes = static::getEntityChangesQuery($states[0]['modSeq'])
+						->union($userChanges)
 						->offset($states[1]['offset'])
 						->limit($maxChanges + 1)
 						->execute();

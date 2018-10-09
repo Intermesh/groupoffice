@@ -38,6 +38,12 @@ class EntityType {
 	 */
 	public $highestModSeq;
 	
+	private $highestUserModSeq;
+	
+	private $modSeqIncremented = false;
+	
+	private $userModSeqIncremented = false;
+	
 	/**
 	 * The name of the entity for the JMAP client API
 	 * 
@@ -278,7 +284,7 @@ class EntityType {
 		
 		if($userPropsModified) {
 			$data = [
-					'modSeq' => new \go\core\db\Expression('modSeq + 1'),					
+					'modSeq' => $this->nextUserModSeq()			
 							];
 			
 			$where = [
@@ -320,21 +326,17 @@ class EntityType {
 	 * 
 	 * @return string
 	 */
-	public function getUserModSeq() {
-		$cls = $this->className;
-		
-		if(!$cls::hasUserProperties()) {
-			return "0";
+	public function getHighestUserModSeq() {
+		if(!isset($this->highestUserModSeq)) {
+		$this->highestUserModSeq = (int) (new Query())
+						->selectSingleValue("highestModSeq")
+						->from("core_change_user_modseq")
+						->where(["entityTypeId" => $this->id, "userId" => GO()->getUserId()])
+						->forUpdate()->single();
 		}
-		
-		return (int) (new Query())
-						->selectSingleValue('max(modSeq)')->from("core_change_user")->where([
-					'entityTypeId' => $this->id,
-					'userId' => GO()->getUserId()
-							])->single();		
+		return $this->highestUserModSeq;
 	}
 	
-	private $modSeqIncremented = false;
 	
 	/**
 	 * Get the modification sequence
@@ -353,12 +355,12 @@ class EntityType {
 		  UPDATE child_codes SET counter_field = counter_field + 1;
 		 * COMMIT
 		 */
-		$query = (new Query())
+		$modSeq = (new Query())
 						->selectSingleValue("highestModSeq")
 						->from("core_entity")
 						->where(["id" => $this->id])
-						->forUpdate();
-		$modSeq = (int) $query->execute()->fetch();
+						->forUpdate()
+						->single();
 		$modSeq++;
 
 		App::get()->getDbConnection()
@@ -371,6 +373,38 @@ class EntityType {
 		$this->modSeqIncremented = true;
 		
 		$this->highestModSeq = $modSeq;
+		
+		return $modSeq;
+	}	
+	
+	/**
+	 * Get the modification sequence
+	 * 
+	 * @param string $entityClass
+	 * @return int
+	 */
+	public function nextUserModSeq() {
+		
+		if($this->userModSeqIncremented) {
+			return $this->getHighestUserModSeq();
+		}
+		
+		$modSeq = $this->getHighestUserModSeq();
+		$modSeq++;
+
+		App::get()->getDbConnection()
+						->replace(
+										"core_change_user_modseq", 
+										[
+												'highestModSeq' => $modSeq,
+												"entityTypeId" => $this->id,
+												"userId" => GO()->getUserId()
+										]
+						)->execute(); //mod seq is a global integer that is incremented on any entity update
+	
+		$this->userModSeqIncremented = true;
+		
+		$this->highestUserModSeq = $modSeq;
 		
 		return $modSeq;
 	}	
