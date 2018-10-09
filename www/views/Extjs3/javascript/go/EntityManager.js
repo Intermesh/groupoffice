@@ -24,8 +24,7 @@
 			if(!Ext.isObject(config)) {
 				config = {
 					name: config,
-					linkable: false,
-					searchable: false
+					linkable: false
 				}
 			}
 			
@@ -36,6 +35,10 @@
       if(entities[config.name]) {
         throw "Entity name is already registered by module " +entities[name]['package'] + "/" + entities[name]['name'];
       }
+			
+			if(!config.linkable && config.linkWindow) {
+				config.linkable = true;
+			}
       
       entities[config.name.toLowerCase()] = Ext.applyIf(config, {        
         module: module,
@@ -46,9 +49,10 @@
 				},
         goto: function (id) {
           go.Router.goto(this.getRouterPath(id));
-        }
+        }			
+      });
 			
-      });     
+			
 			
 			//these datatypes will be prefetched by go.data.JmapProxy.fetchEntities()
 			// Key can also be a function that is called with the record data.

@@ -1002,13 +1002,14 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 			this.upButton.setDisabled(false);
 		}
 
-		if(this.filePanel.model_id>0 && !store.getById('f:'+this.filePanel.model_id)){
-			this.filePanel.reset();
-		}
-
-		if(this.folderPanel.model_id>0 && !store.getById('d:'+this.folderPanel.model_id)){
-			this.folderPanel.reset();
-		}
+//Don't reset because direct routes won't work anymore.
+//		if(this.filePanel.model_id>0 && !store.getById('f:'+this.filePanel.model_id)){
+//			this.filePanel.reset();
+//		}
+//
+//		if(this.folderPanel.model_id>0 && !store.getById('d:'+this.folderPanel.model_id)){
+//			this.folderPanel.reset();
+//		}
 
 	},
 
@@ -1904,7 +1905,6 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 	showPropertiesDialog : function(record)
 	{
-		console.log(record);
 		if(record.data.extension=='folder')
 		{
 			GO.files.showFolderPropertiesDialog(record.data.id);
@@ -2136,7 +2136,13 @@ go.Modules.register("legacy", 'files', {
 	mainPanel: GO.files.FileBrowser,
 	title: t("Files", "files"),
 	iconCls: 'go-tab-icon-files',
-	entities: ["File", "Folder"],
+	entities: [{
+			name: "File",
+			linkable: true
+	}, {
+		name: "Folder",
+		linkable: true
+	}],
 	initModule: function () {	
 		
 	}

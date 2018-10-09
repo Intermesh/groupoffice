@@ -12,7 +12,7 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 		var data = [], allEntities = go.Entities.getAll();
 		
 		for(entity in allEntities) {
-			if(allEntities[entity].linkWindow && go.Modules.isAvailable(allEntities[entity].package, allEntities[entity].module)) {
+			if(allEntities[entity].linkable && go.Modules.isAvailable(allEntities[entity].package, allEntities[entity].module)) {
 				data.push([allEntities[entity].name, allEntities[entity].title]);
 			}
 		};
