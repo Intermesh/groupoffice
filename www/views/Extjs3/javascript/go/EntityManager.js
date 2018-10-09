@@ -68,8 +68,8 @@
 					if(Ext.isArray(key)) {
 						var e = [];
 						key.forEach(function(k) {
-							if(go.Stores.get(name).data[k]) {
-								e.push(go.Stores.get(name).data[k]);
+							if(go.Stores.get(config.name).data[k]) {
+								e.push(go.Stores.get(config.name).data[k]);
 							} else
 							{
 								console.error("Key " + k + " not found in store " + name);
@@ -79,7 +79,7 @@
 						return e;
 					} else
 					{
-						return go.Stores.get(name).data[key];	
+						return go.Stores.get(config.name).data[key];	
 					}
 
 				},

@@ -184,7 +184,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 
 		this.add(go.modules.core.customfields.CustomFields.getDetailPanels("Contact"));
 
-		this.add(new go.links.LinksDetailPanel());
+		this.add(new go.links.getDetailPanels());
 
 		if (go.Modules.isAvailable("legacy", "comments")) {
 			this.add(new go.modules.comments.CommentsDetailPanel());
@@ -221,7 +221,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 			},
 
 			new go.detail.addButton({
-				detailPanel: this
+				detailView: this
 			}),
 
 			{
