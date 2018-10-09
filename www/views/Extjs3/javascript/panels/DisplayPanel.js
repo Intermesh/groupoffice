@@ -130,8 +130,6 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 			menu:[
 				{
 					xtype: "linkbrowsermenuitem"
-				},{
-					xtype: "filebrowsermenuitem"
 				},
 				'-',
 				{            
@@ -150,6 +148,13 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 				}
 			]
 		});
+		
+		
+		if(go.Modules.isAvailable("legacy", "files")) {
+			this.moreButton.menu.insert(1,{
+				xtype: "filebrowsermenuitem"
+			});
+		}
 		
 		tbar.push(this.moreButton);
 

@@ -1,3 +1,5 @@
+/* global go, Ext, GO, mcrypt */
+
 go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 	entityStore: go.Stores.get("Note"),
 	stateId: 'no-notes-detail',
@@ -39,13 +41,13 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 
 	decrypt: function () {
 
-		if (!this.data.content || this.data.content.substring(0, 8) != "{GOCRYPT") {
+		if (!this.data.content || this.data.content.substring(0, 8) !== "{GOCRYPT") {
 			return;
 		}
 		
 		var key = prompt("Enter password to decrypt");
 
-		if(this.data.content.substring(0, 9) == "{GOCRYPT}") {
+		if(this.data.content.substring(0, 9) === "{GOCRYPT}") {
 
 			var msg = window.atob(this.data.content.substring(9));
 
@@ -84,7 +86,7 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 					}
 				},
 				scope: this
-			})
+			});
 		}
 		
 	},
@@ -120,13 +122,11 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 				detailView: this
 			}),
 
-			{
+			this.moreMenu = {
 				iconCls: 'ic-more-vert',
 				menu: [
 					{
 						xtype: "linkbrowsermenuitem"
-					},{
-						xtype: "filebrowsermenuitem"
 					},
 					'-',
 					{
@@ -143,7 +143,7 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 						text: t("Delete"),
 						handler: function () {
 							Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
-								if (btn != "yes") {
+								if (btn !== "yes") {
 									return;
 								}
 								go.Stores.get("Note").set({destroy: [this.currentId]});
@@ -153,6 +153,12 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 					}
 				]
 			}]);
+		
+		if(go.Modules.isAvailable("legacy", "files")) {
+			this.moreMenu.menu.splice(1,0,{
+				xtype: "filebrowsermenuitem"
+			});
+		}
 
 		var tbarCfg = {
 			disabled: true,
