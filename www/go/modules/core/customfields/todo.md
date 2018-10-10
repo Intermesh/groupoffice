@@ -10,6 +10,7 @@ duplicate
 mergeWith
 Search Cache
 Export
+Disabled categories for: ticket type, project template, calendar resource groups, folder dialog
 
 
 For new:

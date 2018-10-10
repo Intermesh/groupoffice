@@ -27,7 +27,7 @@ go.modules.community.addressbook.CustomFieldSetDialog = Ext.extend(go.modules.co
 				submit: false,
 				listeners: {
 					check: function (f, checked) {
-						this.formPanel.getForm().findField("addressBooks").setDisabled(!checked);
+						this.formPanel.getForm().findField("filter.addressBookId").setDisabled(!checked);
 					},
 					scope: this
 				}

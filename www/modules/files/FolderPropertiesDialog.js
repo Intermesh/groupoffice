@@ -121,45 +121,45 @@ GO.files.FolderPropertiesDialog = function(config){
 		items:[this.propertiesPanel, this.commentsPanel, this.readPermissionsTab]
 	});
 	
-	if(go.Modules.isAvailable("core", "customfields")){
-		this.disableCategoriesPanel = new GO.customfields.DisableCategoriesPanel();
-		
-		this.recursivePanel = new Ext.Panel({
-			region:'south',
-			items: [
-				{
-					xtype: 'button',
-					name: 'recursiveApplyCustomFieldCategories',
-					text: 'Apply',
-					listeners: {
-						click: function() {
-							this.formPanel.baseParams.recursiveApplyCustomFieldCategories = true;
-							this.save();
-							//this.formPanel.baseParams.recursiveApplyCustomFieldCategories = false;
-						},
-						scope:this
-					}
-				},{
-					type:'displayfield',
-					html: t("Apply these custom field settings to current folder and it's sub folders recursively", "files")
-				}
-			]
-		});
-
-		this.disableCategoriesPanel.add(this.recursivePanel);
-		
-		
-		this.tabPanel.add(this.disableCategoriesPanel);
-		
-		
-		if(GO.customfields && GO.customfields.types["GO\\Files\\Model\\Folder"])
-		{
-			for(var i=0;i<GO.customfields.types["GO\\Files\\Model\\Folder"].panels.length;i++)
-			{
-				this.tabPanel.add(GO.customfields.types["GO\\Files\\Model\\Folder"].panels[i]);
-			}
-		}
-	}
+//	if(go.Modules.isAvailable("core", "customfields")){
+//		this.disableCategoriesPanel = new GO.customfields.DisableCategoriesPanel();
+//		
+//		this.recursivePanel = new Ext.Panel({
+//			region:'south',
+//			items: [
+//				{
+//					xtype: 'button',
+//					name: 'recursiveApplyCustomFieldCategories',
+//					text: 'Apply',
+//					listeners: {
+//						click: function() {
+//							this.formPanel.baseParams.recursiveApplyCustomFieldCategories = true;
+//							this.save();
+//							//this.formPanel.baseParams.recursiveApplyCustomFieldCategories = false;
+//						},
+//						scope:this
+//					}
+//				},{
+//					type:'displayfield',
+//					html: t("Apply these custom field settings to current folder and it's sub folders recursively", "files")
+//				}
+//			]
+//		});
+//
+//		this.disableCategoriesPanel.add(this.recursivePanel);
+//		
+//		
+//		this.tabPanel.add(this.disableCategoriesPanel);
+//		
+//		
+//		if(GO.customfields && GO.customfields.types["GO\\Files\\Model\\Folder"])
+//		{
+//			for(var i=0;i<GO.customfields.types["GO\\Files\\Model\\Folder"].panels.length;i++)
+//			{
+//				this.tabPanel.add(GO.customfields.types["GO\\Files\\Model\\Folder"].panels[i]);
+//			}
+//		}
+//	}
 
 //	if(go.Modules.isAvailable("legacy", "workflow"))
 //	{
@@ -233,8 +233,8 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 				this.setPermission(action.result.data.is_someones_home_dir, action.result.data.permission_level, action.result.data.readonly);
 
 				this.tabPanel.setActiveTab(0);
-				if(go.Modules.isAvailable("core", "customfields"))
-					this.disableCategoriesPanel.setModel(folder_id,"GO\\Files\\model\\File");
+//				if(go.Modules.isAvailable("core", "customfields"))
+//					this.disableCategoriesPanel.setModel(folder_id,"GO\\Files\\model\\File");
 				
 				this.notifyCheckBox.addListener('check',this.onNotifyChecked,this);
 				
