@@ -25,20 +25,41 @@ go.modules.core.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 		});
 
 		this.on("afterrender", function() {
-			var dlg = this.findParentByType("formdialog");
+			//find entity panel
+			var form = this.findParentByType("form");
 			
-			if(!dlg) {
-				console.error("No go.form.Dialog found for filtering");
+			if(!form) {
+				console.error("No go.form.EntityPanel found for filtering");
 				return;
 			}
 
-			dlg.on("load", function () {
-				this.filter(dlg.formPanel.getValues());
+			form.on("load", function () {
+				this.filter(form.getValues());
 			}, this);
 			
-			if(dlg.formPanel.entity) {
-				this.filter(dlg.formPanel.getValues());
+			if(form.entity) {
+				this.filter(form.getValues());
 			}
+			
+			//Add a beforeaction event listener that will send the custom field data JSON encoded.
+			//The old framework will use this to save custom fields.
+			if(!form.legacyParamAdded) {
+				form.getForm().on("beforeaction", function(form, action) {	
+					if(action.type !== "submit") {
+						return true;
+					}
+
+					var v = form.getFieldValues();
+					if(v.customFields) {
+						action.options.params = {customFieldsJSON: Ext.encode(v.customFields)};
+					}
+
+					return true;
+				});
+				form.legacyParamAdded = true;
+			}
+			
+			
 		}, this);
 
 		go.modules.core.customfields.FormFieldSet.superclass.initComponent.call(this);

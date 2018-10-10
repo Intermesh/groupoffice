@@ -46,17 +46,17 @@ class AbstractModelController extends AbstractController {
 	}
 	
 	
-	private function _extractCustomfieldValues(&$attributes){
-		$v = [];
-		foreach($attributes as $key=>$value)
-		{
-			if(substr($key,0,13)=='customFields_'){
-				$v[substr($key,13)] = $attributes[$key];
-				unset($attributes[$key]);
-			}
-		}
-		return $v;
-	}
+//	private function _extractCustomfieldValues(&$attributes){
+//		$v = [];
+//		foreach($attributes as $key=>$value)
+//		{
+//			if(substr($key,0,13)=='customFields_'){
+//				$v[substr($key,13)] = $attributes[$key];
+//				unset($attributes[$key]);
+//			}
+//		}
+//		return $v;
+//	}
 	
 
 	/**
@@ -82,13 +82,13 @@ class AbstractModelController extends AbstractController {
 		if($ret!==false)
 		{		
 			
-			$customFields = $this->_extractCustomfieldValues($params);
+			//$customFields = $this->_extractCustomfieldValues($params);
 //			var_dump($customFields);
 			$model->setAttributes($params);
 			
-			if(!empty($customFields)) {
-				$model->setCustomFields($customFields);
-			}
+//			if(!empty($customFields)) {
+//				$model->setCustomFields($customFields);
+//			}
 
 			$modifiedAttributes = $model->getModifiedAttributes();
 			if($model->save() ){

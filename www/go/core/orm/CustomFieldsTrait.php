@@ -58,6 +58,11 @@ trait CustomFieldsTrait {
 		return $this->customFieldsData;
 	}
 	
+	//for legacy modules
+	public function setCustomFieldsJSON($json) {
+		$data = json_decode($json, true);
+		$this->setCustomFields($data);
+	}
 	
 	/**
 	 * Set custom field data
