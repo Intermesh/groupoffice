@@ -119,6 +119,7 @@ go.modules.core.users.SystemSettingsUserDefaults = Ext.extend(Ext.form.FormPanel
 					xtype: "fieldset",
 					items: [
 						new go.form.multiselect.Field({
+							valueIsId: true,
 							hint: t("Users will automatically be added to these groups"),
 							name: "defaultGroups",
 							idField: "groupId",

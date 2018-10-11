@@ -208,3 +208,24 @@ $updates['201807271339'][] = "ALTER TABLE `core_change`
 $updates["201810071410"][]="DROP TABLE IF EXISTS `go_mail_counter`;";
 
 $updates["201810091544"][]="update core_user set theme='Paper' where theme='Group-Office' or theme='Default' or theme = 'ExtJS'";
+
+$updates["201810111129"][]="DELETE FROM `core_setting` WHERE `name` = 'defaultGroups'";
+
+$updates["201810111129"][]="CREATE TABLE IF NOT EXISTS `core_user_default_group` (
+  `groupId` int(11) NOT NULL,
+  PRIMARY KEY (`groupId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+
+$updates["201810111129"][]="ALTER TABLE `core_user_default_group`
+  ADD CONSTRAINT `core_user_default_group_ibfk_1` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;";
+
+$updates["201810111129"][]="CREATE TABLE IF NOT EXISTS `core_group_default_group` (
+  `groupId` int(11) NOT NULL,
+  PRIMARY KEY (`groupId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+
+$updates["201810111129"][]="ALTER TABLE `core_group_default_group`
+  ADD CONSTRAINT `core_group_default_group_ibfk_1` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;";
+

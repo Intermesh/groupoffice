@@ -302,5 +302,14 @@ class Table {
 	public function getPrimaryKey() {		
 		return $this->pk;
 	}
+	
+	/**
+	 * Truncate the table
+	 * 
+	 * @return boolean
+	 */
+	public function truncate() {
+		return GO()->getDbConnection()->query("TRUNCATE TABLE ".$this->getName())->execute();
+	}
 
 }
