@@ -569,13 +569,13 @@ class User extends Entity {
 				$this->groups[] = $everyoneUserGroup;
 			}
 			
-			$this->checkOldFramework();			
+			$this->legacyOnSave();			
 			
 		}
 	}
 	
 	
-	public function checkOldFramework() {
+	public function legacyOnSave() {
 		//for old framework. Remove when all is refactored!
 		$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels($this->id);			
 		$user = LegacyUser::model()->findByPk($this->id);
@@ -583,6 +583,8 @@ class User extends Entity {
 			$model->getDefault($user);
 		}
 	}
+	
+
 	
 	/**
 	 * Add user to group if not already in it.
@@ -630,8 +632,23 @@ class User extends Entity {
 			$this->setValidationError("id", ErrorCode::FORBIDDEN, "You can't delete the primary administrator");
 			return false;
 		}
-		
+		$this->legacyOnDelete();
 		return parent::internalDelete();
 	}
+	
+	
+		public function legacyOnDelete() {
+			$user = LegacyUser::model()->findByPk($this->id);
+			LegacyUser::model()->fireEvent("beforedelete", [$user, true]);
+			//delete all acl records		
+			$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels();
+			
+			foreach($defaultModels as $model){
+				$model->deleteByAttribute('user_id',$this->id);
+			}
+
+			
+			LegacyUser::model()->fireEvent("delete", [$user, true]);
+		}
 
 }
