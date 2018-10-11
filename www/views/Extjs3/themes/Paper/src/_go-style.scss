@@ -14,6 +14,10 @@ body * {
 	box-sizing: border-box;
 }
 
+p {
+	margin: dp(16) 0;
+}
+
 /*#bg {
 	z-index: -1;
 	position: fixed;

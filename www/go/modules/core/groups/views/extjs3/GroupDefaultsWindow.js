@@ -6,16 +6,19 @@ go.modules.core.groups.GroupDefaultsWindow = Ext.extend(go.Window, {
 	autoScroll: true,
 	modal: true,
 	width: dp(400),
-	height: dp(400),
+	height: dp(600),
 	initComponent: function () {
 		
 		this.formPanel = new Ext.form.FormPanel({
 			items: [{
 					xtype: "fieldset",
-					items: [
+					items: [{
+						xtype: "box",
+						autoEl: "p",
+						html: t("Members of the groups below can access a new group when it is created. These groups can share items with users and user groups that they are not members of.")
+					},
 						new go.form.multiselect.Field({
-							valueIsId: true,
-							hint: t("In addition to members, these groups can also share with all groups and users."),
+							valueIsId: true,							
 							name: "defaultGroups",
 							idField: "groupId",
 							displayField: "name",
@@ -24,10 +27,15 @@ go.modules.core.groups.GroupDefaultsWindow = Ext.extend(go.Window, {
 							storeBaseParams: {
 								filter: [{"includeUsers": false}]
 							}
-					}), {
+					}), 
+					{
+						xtype: "box",
+						autoEl: "p",
+						html: t("Use the button below to apply the above to existing groups. WARNING: This will erase all custom permissions on groups.")
+					},
+						{
 						xtype: "button",
 						text: t("Apply to all"),
-						cls: "raised",
 						scope: this,
 						handler: function() {
 							Ext.MessageBox.confirm(t("Confirm"), t("Are you sure you want to reset all group permissions? This can't be undone."), function(btn) {
