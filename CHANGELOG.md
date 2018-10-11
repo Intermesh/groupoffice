@@ -1,3 +1,7 @@
+- ATTENTION: System settings need attention for default user groups and group visibility.
+- Core: Group and user defaults are sub dialogs in system settings. 
+- Core: Group visibility defaults can be configured and reset.
+
 09-10-2018 6.3.42
 - Core: Search index script will index only missing results.
 - Core: Brought back the Link browser. Improved links display.
