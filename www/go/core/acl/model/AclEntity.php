@@ -70,7 +70,7 @@ abstract class AclEntity extends Entity {
 	 * 
 	 * @return Acl
 	 */
-	protected function getAcl() {
+	public function findAcl() {
 		if(empty($this->aclId)) {
 			return null;
 		}

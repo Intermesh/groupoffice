@@ -50,6 +50,13 @@ go.modules.core.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 						var dlg = new go.modules.core.groups.GroupDialog();
 						dlg.show();
 					}
+				}, {
+					iconCls: 'ic-settings',
+					tooltip: t("Group defaults"),
+					handler: function() {
+						var dlg = new go.modules.core.groups.GroupDefaultsWindow();
+						dlg.show();
+					}
 				}
 
 			],

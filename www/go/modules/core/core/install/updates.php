@@ -229,3 +229,5 @@ $updates["201810111129"][]="CREATE TABLE IF NOT EXISTS `core_group_default_group
 $updates["201810111129"][]="ALTER TABLE `core_group_default_group`
   ADD CONSTRAINT `core_group_default_group_ibfk_1` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;";
 
+$updates["201810111129"][] = "INSERT INTO `core_group_default_group` (`groupId`) VALUES (2);";
+

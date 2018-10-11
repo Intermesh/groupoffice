@@ -94,7 +94,7 @@ class Group extends AclEntity {
 	}
 	
 	private function setDefaultPermissions() {
-		$acl = $this->getAcl();
+		$acl = $this->findAcl();
 		//Share group with itself. So members of this group can share with eachother.
 		$acl->groups[] = (new \go\core\acl\model\AclGroup)->setValues(['groupId' => $this->id]);		
 		

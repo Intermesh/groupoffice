@@ -76,12 +76,17 @@ class Installer {
 		}
 		
 		$admin->groups[] = (new UserGroup)->setValues(['groupId' => Group::ID_ADMINS]);
-		$admin->groups[] = (new UserGroup)->setValues(['groupId' => Group::ID_INTERNAL]);
+		//$admin->groups[] = (new UserGroup)->setValues(['groupId' => Group::ID_INTERNAL]);
 
 
 		if (!$admin->save()) {
 			throw new Exception("Failed to create admin user: ".var_export($admin->getValidationErrors(), true));
 		}
+		
+		//By default everyone can share with any group
+		\go\modules\core\groups\model\Settings::get()->setDefaultGroups([Group::ID_EVERYONE]);		
+		
+		
 
 		$classFinder = new ClassFinder(false);
 		$classFinder->addNamespace("go\\modules\\core");

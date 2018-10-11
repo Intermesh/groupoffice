@@ -229,4 +229,15 @@ class Acl extends Property {
 		
 		return $query;
 	}
+	
+		
+	
+	
+	/**
+	 * @todo TEMPORARY HACK REMOVE IN MASTER
+	 * @return type
+	 */
+	public function save() {
+		return $this->internalSave();
+	}
 }
