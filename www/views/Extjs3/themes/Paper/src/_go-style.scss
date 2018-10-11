@@ -528,6 +528,10 @@ button {
 	border: 1px solid white;
 	border-radius: 50%;
 	
+	.x-btn {
+		border: 0;
+	}
+	
 	&.group {
 		&::before {
 			width: 100%;

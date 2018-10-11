@@ -29,12 +29,12 @@ fclose($input);
 $blob = Blob::fromTmp($tmpName);
 $blob->name = Request::get()->getHeader('X-File-Name');
 $blob->modified = Request::get()->getHeader('X-File-LastModifed');
-$blob->contentType = Request::get()->getContentType();
+$blob->type = Request::get()->getContentType();
 if ($blob->save()) {
 	Response::get()->setStatus(201, 'Created');
 	Response::get()->output([
 		'blobId' => $blob->id,
-		'type' => $blob->contentType,
+		'type' => $blob->type,
 		'size' => $blob->size
 	]);
 } else {
