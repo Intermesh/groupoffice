@@ -197,19 +197,20 @@ GO.addressbook.ContactsGrid = function(config){
 			sortable:true
 		},
 		{
+			xtype: "datecolumn",
 			header: t("Modified at"),
 			dataIndex:'mtime',
-			hidden:true,
-			width: dp(140)
+			hidden:true
 		},{
+			xtype: "datecolumn",
 			header: t("Created at"),
 			dataIndex:'ctime',
-			hidden:true,
-			width: dp(140)
+			hidden:true			
 		},{
+			xtype: "datecolumn",
+			dateOnly: true,
 			header: t("Action date", "addressbook"),
 			dataIndex:'action_date',
-			width:100,
 			hidden:true
 		}
 		]

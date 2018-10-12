@@ -162,8 +162,13 @@ class Date {
 //		if(!isset($date_separator)){
 //			$date_separator=\GO::user() ? \GO::user()->date_separator : \GO::config()->default_date_separator;
 //		}
+		
+		$dayIndex = strpos(\GO::user()->date_format, 'd');
+		if($dayIndex === false) {
+			$dayIndex = strpos(\GO::user()->date_format, 'j');
+		}
 
-		if(\GO::user() && \GO::user()->date_format=='mdY')
+		if(\GO::user() && $dayIndex > strpos(\GO::user()->date_format, 'm'))
 			$date_string = str_replace(array('-','.'),array('/','/'),$date_string);
 		else
 			$date_string = str_replace(array('/','.'),array('-','-'),$date_string);

@@ -672,41 +672,18 @@ Ext.layout.MenuLayout.prototype.itemTpl = new Ext.XTemplate(
 //	dateFormat: "c" //from server
 //});
 
-GO.mainLayout.onReady(function() {
-
-		//Override this when authenticated and mainlayout initializes
-		Ext.override(Ext.DatePicker, {
-			startDay: parseInt(GO.settings.first_weekday)
-		});
-
-		Ext.override(Ext.form.DateField, {
-			format: GO.settings.date_format,
-			startDay: parseInt(GO.settings.first_weekday),
-			altFormats: "Y-m-d|c|" + GO.settings.date_format.replace("Y","y"),
-			dtSeparator:' '
-		});
-
-		Ext.override(Ext.grid.DateColumn, {
-			align: "right",
-			format: go.User.dateFormat + " " + go.User.timeFormat
-		});
-	
-});
-
 Ext.override(Ext.Panel, {
 	panelInitComponent : Ext.Panel.prototype.initComponent,
 	
 	initComponent : function() {
 		
 		if(GO.util.isMobileOrTablet()) {
-			this.split = false;
-			
+			this.split = false;			
 		}
 		
 		this.panelInitComponent.call(this);
 	}
 });
-
 
 Ext.override(Ext.form.Field, {
 	fieldInitComponent : Ext.form.Field.prototype.initComponent,

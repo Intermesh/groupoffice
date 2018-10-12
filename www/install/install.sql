@@ -176,6 +176,7 @@ CREATE TABLE `core_user` (
   `createdAt` datetime DEFAULT NULL,
   `modifiedAt` datetime DEFAULT NULL,
   `dateFormat` varchar(20) NOT NULL DEFAULT 'd-m-Y',
+	`shortDateInList` BOOLEAN NOT NULL DEFAULT TRUE,
   `timeFormat` varchar(10) NOT NULL DEFAULT 'G:i',
   `thousandsSeparator` varchar(1) NOT NULL DEFAULT '.',
   `decimalSeparator` varchar(1) NOT NULL DEFAULT ',',

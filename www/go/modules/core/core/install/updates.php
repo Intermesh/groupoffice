@@ -231,3 +231,6 @@ $updates["201810111129"][]="ALTER TABLE `core_group_default_group`
 
 $updates["201810111129"][] = "INSERT INTO `core_group_default_group` (`groupId`) VALUES (2);";
 
+$updates["201810111129"][] = "ALTER TABLE `core_user` ADD `shortDateInList` BOOLEAN NOT NULL DEFAULT TRUE AFTER `dateFormat`;";
+
+

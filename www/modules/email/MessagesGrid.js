@@ -70,18 +70,14 @@ GO.email.MessagesGrid = function(config){
 				},
 				width:200
 			},{
+				xtype: "datecolumn",
 				header: t("Date"),
 				dataIndex: 'internal_udate',
-				width:120,
-				renderer:GO.util.format.smartDate,
-				align:'right',
-				hidden:true
+					hidden:true
 			},{
+				xtype: "datecolumn",
 				header: t("Date sent", "email"),
 				dataIndex: 'udate',
-				width:120,
-				renderer:GO.util.format.smartDate,
-				align:'right'
 			},{
 				header: t("Size"),
 				dataIndex: 'size',
@@ -129,17 +125,13 @@ GO.email.MessagesGrid = function(config){
 			id:'arrival',
 			header: t("Date"),
 			dataIndex:'internal_udate',
-			renderer: GO.util.format.smartDate,
-			width:dp(100),
-			align:'right',
+			xtype: "datecolumn",
 			hidden:true
 		},{
 			id:'date',
 			header: t("Date sent", "email"),
 			dataIndex:'udate',
-			renderer: GO.util.format.smartDate,
-			width:dp(108),
-			align:'right'
+			xtype: "datecolumn"
 		},{
 			id:'size',
 			header: t("Size"),

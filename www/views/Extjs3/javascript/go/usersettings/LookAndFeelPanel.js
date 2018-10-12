@@ -35,7 +35,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 			},
 			items:[
 				this.themeCombo = new Ext.form.ComboBox({
-					fieldLabel: t("Theme"),
+					fieldLabel: t("Theme", "users", "core"),
 					name: 'theme',
 					store: new GO.data.JsonStore({
 						url: GO.url('core/themes'),
@@ -54,7 +54,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 					value: GO.settings.config.theme
 				}),
 				this.startModuleField = new GO.form.ComboBox({
-					fieldLabel: t("Start in module"),
+					fieldLabel: t("Start in module", "users", "core"),
 					name: 'start_module_name',
 					hiddenName: 'start_module',
 					store: moduleStore,
@@ -68,7 +68,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 					value: GO.settings.start_module
 				}),{
 					xtype:'combo',
-					fieldLabel: t("Maximum number of rows in lists"),
+					fieldLabel: t("Maximum number of rows in lists", "users", "core"),
 					store: new Ext.data.SimpleStore({
 						fields: ['value'],
 						data : [
@@ -162,19 +162,9 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				this.dateFormatCombo = new Ext.form.ComboBox({
 					fieldLabel: t('Date format','users','core'),
 					name: 'dateFormat',
-					store: new Ext.data.SimpleStore({
-						fields: ['id', 'dateformat'],
-						data : [
-						['d-m-Y', t("Day-Month-Year")],
-						['m/d/Y', t("Month/Day/Year")],
-						['d/m/Y', t("Day/Month/Year")],
-						['d.m.Y', t("Day.Month.Year")],
-						['Y-m-d', t("Year-Month-Day")],
-						['Y.m.d', t("Year.Month.Day")]
-						]
-					}),
-					displayField: 'dateformat',
-					valueField: 'id',
+					store: go.util.Format.dateFormats,
+					displayField: 'label',
+					valueField: 'format',
 					hiddenName: 'dateFormat',
 					mode: 'local',
 					triggerAction: 'all',
@@ -186,15 +176,9 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				this.timeFormatCombo = new Ext.form.ComboBox({
 					fieldLabel: t('Time format','users','core'),
 					name: 'time_format_name',
-					store: new Ext.data.SimpleStore({
-						fields: ['id', 'time_format'],		
-						data : [
-						['G:i', t('24 hour format','users','core')],
-						['h:i a', t('12 hour format','users','core')]
-						]
-					}),
-					displayField: 'time_format',
-					valueField: 'id',
+					store: go.util.Format.timeFormats,
+					displayField: 'label',
+					valueField: 'format',
 					hiddenName: 'timeFormat',
 					mode: 'local',
 					triggerAction: 'all',
@@ -202,6 +186,14 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 					selectOnFocus: true,
 					forceSelection: true
 				}),
+				{
+					xtype: "xcheckbox",
+					name: "shortDateInList",
+					checked: true,
+					hideLabel: true,
+					boxLabel: t("Use short format for date and time in lists",'users','core'),
+					anchor: "100%"
+				},
 					
 				this.firstWeekdayCombo = new Ext.form.ComboBox({
 					fieldLabel: t('First day of week','users','core'),
@@ -251,25 +243,25 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 			items:[
 				{
 						xtype: 'textfield', 
-						fieldLabel: t("List separator"), 
+						fieldLabel: t("List separator", "users", "core"), 
 						name: 'listSeparator'
 					},{
 						xtype: 'textfield', 
-						fieldLabel: t("Text separator"), 
+						fieldLabel: t("Text separator", "users", "core"), 
 						name: 'textSeparator'
 					},{
 						xtype: 'textfield', 
-						fieldLabel: t("Thousand Seperator"), 
+						fieldLabel: t("Thousand Seperator", "users", "core"), 
 						name: 'thousandsSeparator'
 					},
 					{
 						xtype: 'textfield', 
-						fieldLabel: t("Decimal Seperator"), 
+						fieldLabel: t("Decimal Seperator", "users", "core"), 
 						name: 'decimalSeparator'
 					},
 					{
 						xtype: 'textfield', 
-						fieldLabel: t("Currency"), 
+						fieldLabel: t("Currency", "users", "core"), 
 						name: 'currency'
 					}
 			]
@@ -282,7 +274,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				
 				this.cbMuteAll = new Ext.ux.form.XCheckbox({
 					hideLabel: true,
-					boxLabel: t("Mute all sounds"),
+					boxLabel: t("Mute all sounds", "users", "core"),
 					name: 'mute_sound',
 					listeners:{
 						check: function(cb, val){
@@ -299,13 +291,13 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				
 				this.cbMuteReminderSound = new Ext.ux.form.XCheckbox({
 					hideLabel:true,
-					boxLabel: t("Mute reminder sounds"),
+					boxLabel: t("Mute reminder sounds", "users", "core"),
 					name: 'mute_reminder_sound'
 				}),
 
 				this.cbMuteNewMailSound = new Ext.ux.form.XCheckbox({
 					hideLabel: true,
-					boxLabel: t("Mute new mail sounds"),
+					boxLabel: t("Mute new mail sounds", "users", "core"),
 					name: 'mute_new_mail_sound'
 				})
 			]
@@ -317,7 +309,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 			items:[
 				this.cbPopupReminders = new Ext.ux.form.XCheckbox({
 					hideLabel: true,
-					boxLabel: t("Show a popup window when a reminder becomes active"),
+					boxLabel: t("Show a popup window when a reminder becomes active", "users", "core"),
 					name: 'popup_reminders',
 					listeners: {
 						check: function(cb,checked) {
@@ -345,7 +337,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				}),
 				this.cbPopupEmailNotifications = new Ext.ux.form.XCheckbox({
 					hideLabel: true,
-					boxLabel: t("Show a popup window when an e-mail arrives"),
+					boxLabel: t("Show a popup window when an e-mail arrives", "users", "core"),
 					name: 'popup_emails',
 					listeners: {
 						check: function (cb, checked) {
@@ -373,7 +365,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				}),
 				this.cbEmailReminders = new Ext.ux.form.XCheckbox({
 					hideLabel: true,
-					boxLabel: t("Mail reminders"),
+					boxLabel: t("Mail reminders", "users", "core"),
 					name: 'mail_reminders'
 				})
 				

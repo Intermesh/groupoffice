@@ -33,21 +33,11 @@ go.modules.core.users.UserDefaultsWindow = Ext.extend(go.Window, {
 									selectOnFocus: true,
 									forceSelection: true
 								}), new Ext.form.ComboBox({
-									fieldLabel: t('Date format'),
+									fieldLabel: t('Date format', "users", "core"),
 
-									store: new Ext.data.SimpleStore({
-										fields: ['id', 'dateformat'],
-										data: [
-											['d-m-Y', t("Day-Month-Year")],
-											['m/d/Y', t("Month/Day/Year")],
-											['d/m/Y', t("Day/Month/Year")],
-											['d.m.Y', t("Day.Month.Year")],
-											['Y-m-d', t("Year-Month-Day")],
-											['Y.m.d', t("Year.Month.Day")]
-										]
-									}),
-									displayField: 'dateformat',
-									valueField: 'id',
+									store: go.util.Format.dateFormats,
+									displayField: 'label',
+									valueField: 'format',
 									hiddenName: 'defaultDateFormat',
 									mode: 'local',
 									triggerAction: 'all',
@@ -56,16 +46,10 @@ go.modules.core.users.UserDefaultsWindow = Ext.extend(go.Window, {
 									forceSelection: true
 								}),
 								new Ext.form.ComboBox({
-									fieldLabel: t("Time Format"),
-									store: new Ext.data.SimpleStore({
-										fields: ['id', 'format'],
-										data: [
-											['G:i', t("24 hour format")],
-											['h:i a', t("12 hour format")]
-										]
-									}),
-									displayField: 'format',
-									valueField: 'id',
+									fieldLabel: t("Time Format", "users", "core"),
+									store: go.util.Format.timeFormats,
+									displayField: 'label',
+									valueField: 'format',
 									hiddenName: 'defaultTimeFormat',
 									mode: 'local',
 									triggerAction: 'all',
@@ -73,8 +57,15 @@ go.modules.core.users.UserDefaultsWindow = Ext.extend(go.Window, {
 									selectOnFocus: true,
 									forceSelection: true
 								}),
+								{
+									xtype: "xcheckbox",
+									name: "shortDateInList",
+									checked: true,
+									hideLabel: true,
+									boxLabel: t("Use short format for date and time in lists",'users','core')
+								},
 								new Ext.form.ComboBox({
-									fieldLabel: t("First weekday"),
+									fieldLabel: t("First weekday", "users", "core"),
 									store: new Ext.data.SimpleStore({
 										fields: ['id', 'day'],
 										data: [
@@ -104,26 +95,26 @@ go.modules.core.users.UserDefaultsWindow = Ext.extend(go.Window, {
 							items: [
 								{
 									xtype: 'textfield',
-									fieldLabel: t("List separator"),
+									fieldLabel: t("List separator", "users", "core"),
 									name: 'defaultListSeparator'
 								}, {
 									xtype: 'textfield',
-									fieldLabel: t("Text separator"),
+									fieldLabel: t("Text separator", "users", "core"),
 									name: 'defaultTextSeparator'
 								}, {
 									xtype: 'textfield',
-									fieldLabel: t("Thousand Seperator"),
+									fieldLabel: t("Thousand Seperator", "users", "core"),
 									name: 'defaultThousandSeparator'
 								},
 								{
 									xtype: 'textfield',
-									fieldLabel: t("Decimal Seperator"),
+									fieldLabel: t("Decimal Seperator", "users", "core"),
 									name: 'defaultDecimalSeparator'
 								}, {
 									xtype: "textfield",
 									name: "defaultCurrency",
 									value: "€",
-									fieldLabel: t("Currency")
+									fieldLabel: t("Currency", "users", "core")
 								}
 
 							]
@@ -138,7 +129,7 @@ go.modules.core.users.UserDefaultsWindow = Ext.extend(go.Window, {
 					items: [
 						new go.form.multiselect.Field({
 							valueIsId: true,
-							hint: t("Users will automatically be added to these users"),
+							hint: t("Users will automatically be added to these groups", "users", "core"),
 							name: "defaultGroups",
 							idField: "groupId",
 							displayField: "name",

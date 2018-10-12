@@ -115,6 +115,13 @@ class User extends Entity {
 	public $dateFormat;
 	
 	/**
+	 * Display dates short in lists.
+	 * 
+	 * @var boolean
+	 */
+	public $shortDateInList = true;
+	
+	/**
 	 * Time format
 	 * 
 	 * @var string
