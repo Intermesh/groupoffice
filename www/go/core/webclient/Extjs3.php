@@ -24,44 +24,41 @@ class Extjs3 {
 	public function getCSSFile($theme = 'Paper') {
 
 		$cacheFile = GO()->getDataFolder()->getFile('clientscripts/' . $theme . '/style.css');
-
+		
+		
 		if (GO()->getDebugger()->enabled || !$cacheFile->exists()) {
 //		if (!$cacheFile->exists()) {
 			$modules = Module::getInstalled();
-
+			$css = "";
 			foreach ($modules as $module) {
 
 				if (isset($module->package)) {
 					$folder = $module->module()->getFolder();
 					$file = $folder->getFile('views/extjs3/themes/default/style.css');
 					if ($file->exists()) {
-						$css = $this->replaceCssUrl($file->getContents(),$file);
-						$cacheFile->putContents($css."\n", FILE_APPEND);
+						$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";						
 					}
 
 					$file = $folder->getFile('views/extjs3/themes/' . $theme . '/style.css');
 					if ($file->exists()) {
-						$css = $this->replaceCssUrl($file->getContents(),$file);
-						$cacheFile->putContents($css ."\n", FILE_APPEND);
+						$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";						
 					}
 				}
 
-
 				//old path
-
 				$folder = Environment::get()->getInstallFolder()->getFolder('modules/' . $module->name);
 				$file = $folder->getFile('themes/Default/style.css');
 				if ($file->exists()) {
-					$css = $this->replaceCssUrl($file->getContents(),$file);
-					$cacheFile->putContents($css."\n", FILE_APPEND);
+					$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";
 				}
 
 				$file = $folder->getFile('themes/' . $theme . '/style.css');
 				if ($file->exists()) {
-					$css = $this->replaceCssUrl($file->getContents(),$file);
-					$cacheFile->putContents($css."\n", FILE_APPEND);
+					$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";					
 				}
 			}
+			
+			$cacheFile->putContents($css);
 		}
 		return $cacheFile;
 	}
