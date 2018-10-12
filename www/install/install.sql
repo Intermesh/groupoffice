@@ -540,10 +540,6 @@ ALTER TABLE `go_link_folders`
 ALTER TABLE `go_log`
   ADD PRIMARY KEY (`id`);
 
-ALTER TABLE `go_mail_counter`
-  ADD PRIMARY KEY (`host`),
-  ADD KEY `date` (`date`);
-
 ALTER TABLE `go_reminders`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`);
