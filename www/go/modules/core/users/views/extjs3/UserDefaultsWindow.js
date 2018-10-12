@@ -59,7 +59,7 @@ go.modules.core.users.UserDefaultsWindow = Ext.extend(go.Window, {
 								}),
 								{
 									xtype: "xcheckbox",
-									name: "shortDateInList",
+									name: "defaultShortDateInList",
 									checked: true,
 									hideLabel: true,
 									boxLabel: t("Use short format for date and time in lists",'users','core')

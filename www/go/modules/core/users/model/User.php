@@ -253,8 +253,12 @@ class User extends Entity {
 			$this->dateFormat = $s->defaultDateFormat;
 			$this->timezone = $s->defaultTimezone;
 			$this->firstWeekday = $s->defaultFirstWeekday;
-
 			$this->currency = $s->defaultCurrency;
+			$this->shortDateInList = $s->defaultShortDateInList;
+			$this->listSeparator = $s->defaultListSeparator;
+			$this->textSeparator = $s->defaultTextSeparator;
+			$this->thousandsSeparator = $s->defaultThousandSeparator;
+			$this->decimalSeparator = $s->defaultDecimalSeparator;
 			
 			foreach($s->getDefaultGroups() as $v) {
 				$this->groups[] = (new UserGroup)->setValues($v);

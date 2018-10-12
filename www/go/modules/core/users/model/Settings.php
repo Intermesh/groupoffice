@@ -74,6 +74,12 @@ class Settings extends core\Settings {
 	public $defaultDecimalSeparator = ',';	
 	
 	/**
+	 * Default setting for users to have short date and times in lists.
+	 * @var boolean
+	 */
+	public $defaultShortDateInList = true;
+	
+	/**
 	 * New users will be member of these default groups
 	 * 
 	 * @return int[]
