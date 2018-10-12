@@ -126,7 +126,7 @@ GO.addressbook.ContactDialog = function(config)
 	//this.downloadDocumentButton = new Ext.Button();
 
 	this.collapsible=true;
-	this.id= 'addressbook-window-new-contact';
+	this.stateId= 'addressbook-window-new-contact';
 	this.layout= 'fit';
 	this.modal=false;
 	this.shadow= false;
