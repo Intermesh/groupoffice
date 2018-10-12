@@ -1520,6 +1520,7 @@ td.grid-hd-group-cell {
 .x-tree-node .x-tree-node-inline-icon:not(.go-icon) {
 	display: inline-block;
    background-image: none;
+	 background-size: contain;
 }
 
 .x-tree-node-loading a span{
