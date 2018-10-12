@@ -96,11 +96,15 @@ class Group extends AclEntity {
 	private function setDefaultPermissions() {
 		$acl = $this->findAcl();
 		//Share group with itself. So members of this group can share with eachother.
-		$acl->groups[] = (new \go\core\acl\model\AclGroup)->setValues(['groupId' => $this->id]);		
+		if($this->id !== Group::ID_ADMINS) {
+			$acl->groups[] = (new \go\core\acl\model\AclGroup)->setValues(['groupId' => $this->id]);		
+		}
 		
 		foreach(\go\modules\core\groups\model\Settings::get()->getDefaultGroups() as $groupId) {		
 			//Share group with everyone. So that everyone can share with all groups. TODO this should be configurable.		
-			$acl->groups[] = (new \go\core\acl\model\AclGroup)->setValues(['groupId' => $groupId]);
+			if($groupId !== Group::ID_ADMINS) {
+				$acl->groups[] = (new \go\core\acl\model\AclGroup)->setValues(['groupId' => $groupId]);
+			}
 		}
 		
 		return $acl->internalSave();

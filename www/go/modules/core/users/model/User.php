@@ -258,10 +258,9 @@ class User extends Entity {
 			$this->listSeparator = $s->defaultListSeparator;
 			$this->textSeparator = $s->defaultTextSeparator;
 			$this->thousandsSeparator = $s->defaultThousandSeparator;
-			$this->decimalSeparator = $s->defaultDecimalSeparator;
-			
-			foreach($s->getDefaultGroups() as $v) {
-				$this->groups[] = (new UserGroup)->setValues($v);
+			$this->decimalSeparator = $s->defaultDecimalSeparator;			
+			foreach($s->getDefaultGroups() as $groupId) {
+				$this->groups[] = (new UserGroup)->setValues(['groupId' => $groupId]);
 			}
 		}
 	}
