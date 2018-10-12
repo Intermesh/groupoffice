@@ -2,6 +2,9 @@
 - Core: Group and user defaults are sub dialogs in system settings. 
 - Core: Group visibility defaults can be configured and reset.
 - Core: Cleanup user data in old framework when user is deleted
+- Core: Added new preference to show long or short dates in lists.
+- Core: Fixed URL detection when server is behind proxy or rewriting rules.
+- Core: Small UI enhancements
 
 09-10-2018 6.3.42
 - Core: Search index script will index only missing results.
