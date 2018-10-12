@@ -89,8 +89,8 @@ if(GO::config()->debug) {
 }
 
 //echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' => \GO::language()->getLanguage()]) . '"></script>';
-echo '<script type="text/javascript" src="' . GO::config()->url . 'views/Extjs3/ext/adapter/ext/ext-base-debug.js"></script>';
-echo '<script type="text/javascript" src="' . GO::config()->url . 'views/Extjs3/ext/ext-all-debug.js"></script>';
+echo '<script type="text/javascript" src="views/Extjs3/ext/adapter/ext/ext-base-debug.js"></script>';
+echo '<script type="text/javascript" src="views/Extjs3/ext/ext-all-debug.js"></script>';
 echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?lang='.\GO()->getLanguage()->getIsoCode() . '&v='.GO()->getVersion().'"></script>';
 
 ?>
@@ -139,7 +139,7 @@ if ($cacheFile->exists()) {
 	$scripts = array();
 	$load_modules = GO::modules()->getAllModules(true);
 
-	$scripts[] = "var BaseHref = '" . GO::config()->host . "';";
+	$scripts[] = "var BaseHref = '';";
 
 	$scripts[] = new File(GO::config()->root_path . 'views/Extjs3/javascript/namespaces.js');
 	

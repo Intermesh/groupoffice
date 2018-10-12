@@ -30,7 +30,7 @@ class Extjs3{
 	}
 	
 	public function getUrl(){
-		return \GO::config()->host.'views/Extjs3/';
+		return 'views/Extjs3/';
 	}
 	
 	private $_stylesheets=array();
