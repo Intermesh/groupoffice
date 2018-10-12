@@ -219,15 +219,15 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				this.holidaysetCombo = new GO.form.ComboBox({
 					fieldLabel: t('Holidays','users','core'),
 					name: 'holidayset',
-					store:  new GO.data.JsonStore({
-						url: GO.url("core/holidays"),
-						fields: ['filename', 'label'],
+					store:  new Ext.data.JsonStore({
+						data: GO.lang.holidaySets,
+						fields: ['iso', 'label'],
 						remoteSort: true
 					}),
 					displayField:'label',
-					valueField: 'filename',
+					valueField: 'iso',
 					hiddenName:'holidayset',
-					mode:'remote',
+					mode:'local',
 					triggerAction:'all',
 					editable: false,
 					selectOnFocus:true,
@@ -235,6 +235,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				})
 			]
 		});
+		
 				
 		this.formattingFieldset = new Ext.form.FieldSet({
 			labelWidth:dp(160),

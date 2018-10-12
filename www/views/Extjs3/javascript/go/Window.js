@@ -66,5 +66,13 @@ go.Window = Ext.extend(Ext.Window, {
 			if(pos[0]<0 || pos[0]+this.width>vpW || pos[1]<0 || pos[1]+this.height>vpH)
 				this.center();
 		}
+	},
+	
+	show : function(animateTarget, cb, scope){
+		if(!this.rendered){
+				this.render(Ext.get("window-container"));
+		}
+		
+		go.Window.superclass.show.call(this, animateTarget, cb, scope);
 	}
 });
