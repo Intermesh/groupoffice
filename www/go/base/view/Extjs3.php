@@ -164,7 +164,7 @@ class Extjs3{
 			$arr[$module->name]=$module->getAttributes();
 			
 			$arr[$module->name]['url']=\GO::config()->host.'modules/'.$module->name.'/';
-			$arr[$module->name]['path']=\GO::config()->root_path.'modules/'.$module->name.'/';
+			//$arr[$module->name]['path']=\GO::config()->root_path.'modules/'.$module->name.'/';
 			$arr[$module->name]['full_url']=\GO::config()->full_url.'modules/'.$module->name.'/';
 			
 			$arr[$module->name]['permission_level']=$module->permissionLevel;
