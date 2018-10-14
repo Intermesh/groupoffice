@@ -116,27 +116,29 @@ GO.customfields.TypePanel = Ext.extend(GO.grid.GridPanel, {
 				},
 				scope: this
 				
-			},new Ext.Button({
-				iconCls: 'btn-settings',
-				text: t("Manage blocks", "customfields"),
-				cls: 'x-btn-text-icon',
-				handler: function(){
-					if (!GO.customfields.manageBlocksWindow) {
-						GO.customfields.manageBlocksWindow = new GO.Window({
-							title : t("Manage blocks", "customfields"),
-							items: [this.manageBlocksGrid = new GO.customfields.ManageBlocksGrid({layout:'fit',height:490})],
-							width: 800,
-							height: 600,
-							layout: 'fit'
-						});
-						GO.customfields.manageBlocksWindow.on('show',function(){
-							this.manageBlocksGrid.store.load();
-						},this);
-					}
-					GO.customfields.manageBlocksWindow.show();
-				},
-				scope: this
-			})
+			}
+			
+//			,new Ext.Button({
+//				iconCls: 'btn-settings',
+//				text: t("Manage blocks", "customfields"),
+//				cls: 'x-btn-text-icon',
+//				handler: function(){
+//					if (!GO.customfields.manageBlocksWindow) {
+//						GO.customfields.manageBlocksWindow = new GO.Window({
+//							title : t("Manage blocks", "customfields"),
+//							items: [this.manageBlocksGrid = new GO.customfields.ManageBlocksGrid({layout:'fit',height:490})],
+//							width: 800,
+//							height: 600,
+//							layout: 'fit'
+//						});
+//						GO.customfields.manageBlocksWindow.on('show',function(){
+//							this.manageBlocksGrid.store.load();
+//						},this);
+//					}
+//					GO.customfields.manageBlocksWindow.show();
+//				},
+//				scope: this
+//			})
 		]);
 		
 		this.fieldDialog = new GO.customfields.FieldDialog();
