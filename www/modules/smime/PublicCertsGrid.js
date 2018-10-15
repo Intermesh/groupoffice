@@ -174,7 +174,7 @@ GO.moduleManager.onModuleReady('email',function(){
 					
 					this.pubCertsWin.show();
 				}
-			})
+			});
 		})
-	})
+	});
 });
