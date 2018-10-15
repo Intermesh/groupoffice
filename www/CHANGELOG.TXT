@@ -1,3 +1,5 @@
+- Fixed bug where attachments with same file name always open the same file when linked.
+
 08-10-2018 6.2.106
 - GOTA: Signed with new certificate
 - Fixed inconsistent participant status in calendar
