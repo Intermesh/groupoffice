@@ -62,6 +62,15 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 						var dlg = new go.modules.core.users.CreateUserWizard();
 						dlg.show();
 					}
+				},
+				
+				{
+					iconCls: 'ic-settings',
+					tooltip: t("User defaults"),
+					handler: function() {
+						var dlg = new go.modules.core.users.UserDefaultsWindow();
+						dlg.show();
+					}
 				}
 				
 			],

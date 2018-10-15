@@ -86,11 +86,18 @@ GO.Window = Ext.extend(Ext.Window,{
 				this.center();
 		}
 	},
+	
+	render : function(container, position){
+		container = Ext.get("window-container");
+		return GO.Window.superclass.render.call(this, container, position);
+	},
 
-	show : function(){		
+
+	show : function(animateTarget, cb, scope){
+	
 		GO.dialogListeners.apply(this);
 		
-		GO.Window.superclass.show.call(this);
+		GO.Window.superclass.show.call(this, animateTarget, cb, scope);
 	},
 	
 	removeTempListeners : function() {

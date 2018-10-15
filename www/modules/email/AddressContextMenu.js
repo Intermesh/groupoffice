@@ -60,13 +60,9 @@ GO.email.AddressContextMenu = function(config)
 		text: t("Search through Group-Office", "email").replace('{product_name}', GO.settings.config.product_name),
 		cls: 'x-btn-text-icon',
 		handler: function(){
-			var searchPanel = new GO.grid.SearchPanel(
-			{
-				query: this.address
-				}
-			);
-			GO.mainLayout.tabPanel.add(searchPanel);
-			searchPanel.show();
+			
+			go.util.search(this.address);
+			
 		},
 		scope: this
 	});

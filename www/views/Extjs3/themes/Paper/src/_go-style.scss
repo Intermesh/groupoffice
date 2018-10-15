@@ -60,6 +60,22 @@ small { color: color($grey); font-weight: $font-weight-r; font-size:.85em; line-
 .danger { color: $cDanger !important; }
 .warning { color: $cWarning !important; }
 
+p {
+	margin: dp(16) 0;
+}
+
+
+#window-container, #viewport {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	overflow: hidden;
+	visibility: hidden;
+}
+
+
 /*#bg {
 	z-index: -1;
 	position: fixed;
@@ -386,6 +402,8 @@ a {
 			}
 		}
 	}
+
+	
 }
 .go-grid3-hide-headers {
 	.x-panel-tbar {
@@ -579,6 +597,10 @@ button {
 			font-size: inherit;			
 			height: 100%;
 			width: 100%;
+	}
+	
+	.x-btn {
+		border: 0;
 	}
 	
 	&.group {
@@ -1006,7 +1028,8 @@ button.filetype-pdf, button.filetype-doc {
 		box-sizing: border-box;
 		display:table;
 		text-decoration: none;
-		padding: dp(8) dp(16) dp(16) dp(8);
+		padding: dp(8) dp(16);
+		margin: 0;
 		width: 100%;
 		span, a {
 			display: block;

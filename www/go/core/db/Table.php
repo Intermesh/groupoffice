@@ -313,10 +313,10 @@ class Table {
 	/**
 	 * Truncate the table
 	 * 
-	 * @return bool
+	 * @return boolean
 	 */
 	public function truncate() {
-		return GO()->getDbConnection()->query("TRUNCATE TABLE `" . $this->name . "`");
+		return GO()->getDbConnection()->query("TRUNCATE TABLE ".$this->getName())->execute();
 	}
 
 }

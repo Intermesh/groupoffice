@@ -156,6 +156,10 @@ go.modules.core.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 		var me = this;
 		this.selectedGroups =[];
 		groups.forEach(function(group) {
+			
+			if(!group.groupId) {
+				throw "Invalid value given";
+			}
 			me.selectedGroups.push(group.groupId);
 		});		
 		

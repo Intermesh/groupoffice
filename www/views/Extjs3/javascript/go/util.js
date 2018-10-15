@@ -149,6 +149,15 @@
 		addSlashes : function( str ) {
 			return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
 		}
+		
+		
+		/*
+		 * Search through group-office. 
+		 * 
+		 * Code can be found in go/modules/core/search/views/extjs3/Module.js
+		 * @method search
+		 * @param {string} query
+		 */
 
 	};
 

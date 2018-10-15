@@ -20,16 +20,10 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 	},
   
   loadSession : function(session) {
-    this.username = session.username;
     this.apiUrl = session.apiUrl;
     this.downloadUrl = session.downloadUrl;
     this.uploadUrl = session.uploadUrl;
-		this.eventSourceUrl = session.eventSourceUrl;
-    this.displayName = session.user.displayName;
-    this.id = session.user.id;
-    this.avatarId = session.user.avatarId;
-		this.isAdmin = session.user.isAdmin;
-		
+		this.eventSourceUrl = session.eventSourceUrl;		
 		this.loaded = true;
 
     Ext.apply(GO.settings, session.oldSettings);

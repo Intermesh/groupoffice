@@ -4458,35 +4458,59 @@ abstract class ActiveRecord extends \GO\Base\Model{
 //		return $result->execute($bindParams);
 //	}
 //
-//	/**
-//	 * Unlink a model from this model
-//	 *
-//	 * @param ActiveRecord $model
-//	 * @param boolean $unlinkBack For private use only
-//	 * @return boolean
-//	 */
-//	public function unlink($model, $unlinkBack=true){
-//		$sql = "DELETE FROM `go_links_{$this->tableName()}` WHERE id=:id AND model_type_id=:model_type_id AND model_id=:model_id";
-//
-//		$values=array(
-//				':id'=>$this->id,
-//				':model_type_id'=>$model->modelTypeId(),
-//				':model_id'=>$model->id
-//		);
-//
-//		$result = $this->getDbConnection()->prepare($sql);
-//		$success = $result->execute($values);
-//
-//		if($success){
-//
-//			$this->afterUnlink($model);
-//
-//			return !$unlinkBack || $model->unlink($this, false);
-//		}else
-//		{
-//			return false;
-//		}
-//	}
+	/**
+	 * Unlink a model from this model
+	 *
+	 * @param ActiveRecord $model
+	 * @param boolean $unlinkBack For private use only
+	 * @return boolean
+	 */
+	public function unlink($model){
+		
+		$isSearchCacheModel = ($this instanceof \GO\Base\Model\SearchCacheRecord);
+
+		if(!$this->hasLinks() && !$isSearchCacheModel)
+			throw new \Exception("Links not supported by ".$this->className ());
+
+
+		if($model instanceof \GO\Base\Model\SearchCacheRecord){
+			$to_model_id = $model->entityId;
+			$to_model_type_id = $model->entityTypeId;
+		}else
+		{
+			$to_model_id = $model->id;
+			$to_model_type_id = $model->getType()->getId();
+		}
+		
+		
+
+		$from_model_type_id = $isSearchCacheModel ? $this->entityTypeId : $this->modelTypeId();
+
+		$from_model_id = $isSearchCacheModel ? $this->model_id : $this->id;
+		
+		
+		
+		
+		if(!\go\core\App::get()->getDbConnection()->delete('core_link', [
+				"toId" => $to_model_id,
+				"toEntityTypeId" => $to_model_type_id,
+				"fromId" => $from_model_id,
+				"fromEntityTypeId" => $from_model_type_id				
+		])->execute()){
+			return false;
+		}
+		
+		
+		
+		$reverse = [];
+		$reverse['fromEntityTypeId'] = $to_model_type_id;
+		$reverse['toEntityTypeId'] = $from_model_type_id;
+		$reverse['toId'] = $from_model_id;
+		$reverse['fromId'] = $to_model_id;		
+		
+		
+		return \go\core\App::get()->getDbConnection()->delete('core_link', $reverse)->execute();
+	}
 //
 //	protected function afterUnlink(ActiveRecord $model){
 //

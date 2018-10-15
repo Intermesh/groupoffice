@@ -15,8 +15,41 @@
      * go.Stores.get("name")]
      * go.Entities.get(name)
      * 
-     * @param {string} name
-     * @param {object} jmapMethods
+     * @param {string} package
+     * @param {string} module
+		 * @param {string|object} config
+		 * 
+		 * You can pass just a string as config for the name of the entity. 
+		 * If you need linking then you can pass a config object:
+		 * 
+		 * 
+		 * @example
+		 * 
+		 *		 /**
+		 *			 * Entity name
+		 *			 *
+		 *			name: "Note",
+		 *			
+		 *			/**
+		 *			 * Opens a dialog to create a new linked item
+		 *			 * 
+		 *			 * @param {string} entity eg. "Note"
+		 *			 * @param {string|int} entityId
+		 *			 * @returns {go.form.Dialog}
+		 *			 *
+		 *			linkWindow: function(entity, entityId) {
+		 *				return new go.modules.community.notes.NoteForm();
+		 *			},
+		 *			
+		 *			/**
+		 *			 * Return component for the detail view
+		 *			 * 
+		 *			 * @returns {go.panels.DetailView}
+		 *			 *
+		 *			linkDetail: function() {
+		 *				return new go.modules.community.notes.NoteDetail();
+		 *			}	
+		 * 
      * @returns {undefined}
      */
     register: function (package, module, config) {

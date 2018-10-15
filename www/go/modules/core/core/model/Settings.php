@@ -45,20 +45,31 @@ class Settings extends core\Settings {
 	 */
 	private function detectURL() {
 		
-		if(!isset($_SERVER['SERVER_NAME'])) {
+		if(!isset($_SERVER['REQUEST_URI'])) {
 			return null;
 		}		
 		
-		$path = '/' . trim(dirname($_SERVER['PHP_SELF']), '/');		
-		$https = (isset($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"] == "on" || $_SERVER["HTTPS"] == "1")) || !empty($_SERVER["HTTP_X_SSL_REQUEST"]);
+		$path = $_SERVER['REQUEST_URI'];
+
+		$scriptName = basename($_SERVER['SCRIPT_NAME']);
+		$lastSlash = strrpos($path, $scriptName);
+		if($lastSlash !== false) {
+			$path = substr($path, 0, $lastSlash);
+		}
+		//replace double slashes as they also resolve
+		$path = preg_replace('/\/+/', '/', $path);
+		
+			//trim install folder
+		if(substr($path, -9) == '/install/') {
+			$path = substr($path, 0, -8);
+		}		
+		
+		$https = (isset($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"] == "on" || $_SERVER["HTTPS"] == "1")) || !empty($_SERVER["HTTP_X_SSL_REQUEST"]) || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on');
 		$protocol = $https ? 'https://' : 'http://';
 		
-		//trim install folder
-		if(substr($path, -8) == '/install') {
-			$path = substr($path, 0, -8);
-		}
+		$url = $protocol . $_SERVER['HTTP_HOST'] . $path;
 		
-		return $protocol . $_SERVER['HTTP_HOST'] . $path;
+		return $url;
 	}
 
 	const SMTP_ENCRYPTION_TLS = 'tls';

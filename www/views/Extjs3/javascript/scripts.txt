@@ -248,6 +248,7 @@ views/Extjs3/javascript/go/grid/plugin/Sortable.js
 views/Extjs3/javascript/go/grid/GridPanel.js
 views/Extjs3/javascript/go/grid/EditorGridPanel.js
 views/Extjs3/javascript/go/grid/SelectAllCheckBox.js
+views/Extjs3/javascript/go/grid/DateColumn.js
 
 
 views/Extjs3/javascript/go/Window.js
@@ -290,7 +291,6 @@ views/Extjs3/javascript/go/login/LoginPanel.js
 views/Extjs3/javascript/go/login/RecoveryDialog.js
 
 views/Extjs3/javascript/go/Links.js
-views/Extjs3/javascript/go/links/LinkToButton.js
 views/Extjs3/javascript/go/links/EntityGrid.js
 views/Extjs3/javascript/go/links/LinkGrid.js
 views/Extjs3/javascript/go/links/CreateLinkWindow.js
@@ -318,6 +318,7 @@ views/Extjs3/javascript/go/systemsettings/NotificationsPanel.js
 views/Extjs3/javascript/go/systemsettings/AuthenticationPanel.js
 views/Extjs3/javascript/go/systemsettings/Dialog.js
 views/Extjs3/javascript/go/util.js
+views/Extjs3/javascript/go/util/Format.js
 
 views/Extjs3/javascript/go/Wizard.js
 views/Extjs3/javascript/go/Array.js

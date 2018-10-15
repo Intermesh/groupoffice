@@ -115,6 +115,13 @@ class User extends Entity {
 	public $dateFormat;
 	
 	/**
+	 * Display dates short in lists.
+	 * 
+	 * @var boolean
+	 */
+	public $shortDateInList = true;
+	
+	/**
 	 * Time format
 	 * 
 	 * @var string
@@ -246,11 +253,14 @@ class User extends Entity {
 			$this->dateFormat = $s->defaultDateFormat;
 			$this->timezone = $s->defaultTimezone;
 			$this->firstWeekday = $s->defaultFirstWeekday;
-
 			$this->currency = $s->defaultCurrency;
-			
-			foreach($s->getDefaultGroups() as $v) {
-				$this->groups[] = (new UserGroup)->setValues($v);
+			$this->shortDateInList = $s->defaultShortDateInList;
+			$this->listSeparator = $s->defaultListSeparator;
+			$this->textSeparator = $s->defaultTextSeparator;
+			$this->thousandsSeparator = $s->defaultThousandSeparator;
+			$this->decimalSeparator = $s->defaultDecimalSeparator;			
+			foreach($s->getDefaultGroups() as $groupId) {
+				$this->groups[] = (new UserGroup)->setValues(['groupId' => $groupId]);
 			}
 		}
 	}
@@ -565,13 +575,13 @@ class User extends Entity {
 				$this->groups[] = $everyoneUserGroup;
 			}
 			
-			$this->checkOldFramework();			
+			$this->legacyOnSave();			
 			
 		}
 	}
 	
 	
-	public function checkOldFramework() {
+	public function legacyOnSave() {
 		//for old framework. Remove when all is refactored!
 		$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels($this->id);			
 		$user = LegacyUser::model()->findByPk($this->id);
@@ -579,6 +589,8 @@ class User extends Entity {
 			$model->getDefault($user);
 		}
 	}
+	
+
 	
 	/**
 	 * Add user to group if not already in it.
@@ -626,8 +638,23 @@ class User extends Entity {
 			$this->setValidationError("id", ErrorCode::FORBIDDEN, "You can't delete the primary administrator");
 			return false;
 		}
-		
+		$this->legacyOnDelete();
 		return parent::internalDelete();
 	}
+	
+	
+		public function legacyOnDelete() {
+			$user = LegacyUser::model()->findByPk($this->id);
+			LegacyUser::model()->fireEvent("beforedelete", [$user, true]);
+			//delete all acl records		
+			$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels();
+			
+			foreach($defaultModels as $model){
+				$model->deleteByAttribute('user_id',$this->id);
+			}
+
+			
+			LegacyUser::model()->fireEvent("delete", [$user, true]);
+		}
 
 }

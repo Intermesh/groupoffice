@@ -1,3 +1,5 @@
+/* global GO, Ext, go */
+
 GO.smime.PublicCertsGrid = function(config){
 	
 	if(!config)
@@ -97,7 +99,7 @@ GO.smime.PublicCertsGrid = function(config){
 				}							
 			});
 		}
-	}
+	};
 	
 	GO.smime.PublicCertsGrid.superclass.constructor.call(this, config);
 };
@@ -130,7 +132,7 @@ Ext.extend(GO.smime.PublicCertsGrid, GO.grid.GridPanel,{
 						scope:this
 					});
 				},
-				uploadComplete() {
+				uploadComplete: function() {
 					complete = true;
 				},
 				scope: this
@@ -148,7 +150,7 @@ GO.smime.PublicCertsWindow = Ext.extend(GO.Window, {
 		this.height=400;
 		this.layout='fit';
 		this.grid=new GO.smime.PublicCertsGrid();
-		this.items=this.grid
+		this.items=this.grid;
 		this.closeAction='hide';
 		
 		GO.smime.PublicCertsWindow.superclass.initComponent.call(this);
@@ -174,7 +176,7 @@ GO.moduleManager.onModuleReady('email',function(){
 					
 					this.pubCertsWin.show();
 				}
-			})
+			});
 		})
-	})
+	});
 });

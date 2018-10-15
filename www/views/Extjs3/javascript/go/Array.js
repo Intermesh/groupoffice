@@ -1,22 +1,4 @@
 Ext.applyIf(Array.prototype, {
-	/**
-	 * Turn an array of objects into an array of object property values.
-	 * 
-	 * eg. 
-	 * 
-	 * var arr = [{foo: 1}, {foo: 2}]
-	 * 
-	 * arr.column("foo") == [1, 2]
-	 * 
-	 * @param {type} name
-	 * @returns {Array}
-	 */
-
-	column : function(name) {		
-		return this.map(function(i) {
-			return i[name];
-		});
-	},
 	
 	/**
 	 * Return new array with unique values
@@ -38,6 +20,24 @@ Ext.applyIf(Array.prototype, {
 	diff : function(a) {
     return this.filter(function(i) {
 			return a.indexOf(i) === -1;
+		});
+	},
+	
+	/**
+	 * Turn an array of objects into an array of object property values.
+	 * 
+	 * eg. 
+	 * 
+	 * var arr = [{foo: 1}, {foo: 2}]
+	 * 
+	 * arr.column("foo") == [1, 2]
+	 * 
+	 * @param {type} name
+	 * @returns {Array}
+	 */
+	column : function(name) {
+		return this.map(function(i) {
+			return i[name];
 		});
 	}
 });

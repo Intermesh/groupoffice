@@ -33,7 +33,7 @@ go.modules.core.users.CreateUserWizard = Ext.extend(go.Wizard, {
 		go.Jmap.request({
 			method: "core/users/Settings/get",
 			callback: function (options, success, response) {				
-				this.groupsGrid.setValue(response.defaultGroups);
+				this.groupsGrid.setValue(response.defaultGroups.map(function(groupId){return {groupId: groupId};}));
 			},
 			scope: this
 		})

@@ -18,6 +18,8 @@ GO.email.LinkAttachmentDialog = Ext.extend(go.links.CreateLinkWindow,{
 	
 	link : function()	{
 		var record = this.grid.getSelectionModel().getSelected();
+		
+		this.getEl().mask();
 
 		GO.request({
 			url:'files/folder/checkModelFolder',
@@ -49,6 +51,8 @@ GO.email.LinkAttachmentDialog = Ext.extend(go.links.CreateLinkWindow,{
 		if(!GO.files.saveAsDialog){
 			GO.files.saveAsDialog = new GO.files.SaveAsDialog();
 		}
+		
+		this.getEl().unmask();
 
 		GO.files.saveAsDialog.show({
 			folder_id : files_folder_id,
@@ -76,6 +80,7 @@ GO.email.LinkAttachmentDialog = Ext.extend(go.links.CreateLinkWindow,{
 					},
 					success: function(options, response, result)
 					{
+						
 						dialog.hide();
 						this.hide();
 					},
@@ -99,6 +104,7 @@ GO.email.LinkAttachmentDialog = Ext.extend(go.links.CreateLinkWindow,{
 			},
 			success: function(options, response, result){
 				// Successfully saved all attachments
+				this.getEl().unmask();
 				this.hide();
 			},
 			scope:this

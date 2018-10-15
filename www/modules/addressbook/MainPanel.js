@@ -839,7 +839,7 @@ go.Modules.register("legacy", 'addressbook', {
 			name: "Contact",
 			linkWindow: function() {
 				var win = new GO.addressbook.ContactDialog ();
-					win.closeAction = "hide";
+					win.closeAction = "close";
 					return win;
 			},
 			linkDetail: function() {
@@ -849,7 +849,7 @@ go.Modules.register("legacy", 'addressbook', {
 			name: "Company",
 			linkWindow: function() {
 				var win = new GO.addressbook.CompanyDialog ();
-				win.closeAction = "hide";
+				win.closeAction = "close";
 				return win;
 			},
 			linkDetail: function() {

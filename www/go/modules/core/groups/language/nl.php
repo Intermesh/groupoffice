@@ -18,4 +18,5 @@ return array (
   'Use' => 'Gebruiken',
   'name' => 'Groepen',
   'description' => 'Admin module; Beheren van gebruikersgroepen.',
+	"Members of the groups below can access a new group when it is created. These groups can share items with users and user groups that they are not members of." => "Leden van onderstaande groepen krijgen toegang wanneer er een nieuwe groep wordt aangemaakt. Deze groepen kunnen items delen met gebruikers en gebruikersgroepen waar zij geen lid van zijn. "
 );

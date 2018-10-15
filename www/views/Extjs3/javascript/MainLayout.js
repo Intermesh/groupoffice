@@ -451,86 +451,85 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			return 'background-image:url('+go.Jmap.downloadUrl(go.User.avatarId)+');'
 		}
 
-		var topPanel = new Ext.Panel({
-			id:"mainNorthPanel",
-			region: 'north',
-			html:  '<div class="go-header-left"><div id="go-logo" title="'+GO.settings.config.product_name+'"></div></div>\
-			<div class="go-header-right">\
-				<div id="secondary-menu">\
-					<div id="search_query"></div>\
-					<div id="start-menu-link" ></div>\
-					<a id="user-menu" class="user-img" style="'+getUserImgStyle()+'">\
-						<span id="reminder-icon" style="display: none;">notifications</span>\
-					</a>\
-				</div>\
-			</div>',
-			height: dp(64),
-			titlebar: false,
-			border: false
-		});
+				var topPanel = new Ext.Panel({
+					id:"mainNorthPanel",
+					region: 'north',
+					html:  '<div class="go-header-left"><div id="go-logo" title="'+GO.settings.config.product_name+'"></div></div>\
+					<div class="go-header-right">\
+						<div id="secondary-menu">\
+							<div id="search_query"></div>\
+							<div id="start-menu-link" ></div>\
+							<a id="user-menu" class="user-img" style="'+getUserImgStyle()+'">\
+								<span id="reminder-icon" style="display: none;">notifications</span>\
+							</a>\
+						</div>\
+					</div>',
+					height: dp(64),
+					titlebar: false,
+					border: false
+				});
 
-//			var winSize = [window.scrollWidth , window.scrollHeight];
+	//			var winSize = [window.scrollWidth , window.scrollHeight];
 
-		GO.viewport = new Ext.Viewport({
-			renderTo: 'viewport',
-			layout: 'border',
-			border: false,
-			items: [topPanel, this.tabPanel]
-		});
+				GO.viewport = new Ext.Viewport({
+					layout: 'border',
+					border: false,
+					items: [topPanel, this.tabPanel]
+				});
 
 
-		this.startMenuLink = new Ext.Button({
-			menu: this.startMenu,
-			menuAlign: 'tr-br?',
-			text: '<i class="icon">apps</i>',
-			renderTo: 'start-menu-link',
-			clickEvent: 'mousedown',
-			template: new Ext.XTemplate('<span><button></button></span>')
-		});
-
+				this.startMenuLink = new Ext.Button({
+					menu: this.startMenu,
+					menuAlign: 'tr-br?',
+					text: '<i class="icon">apps</i>',
+					renderTo: 'start-menu-link',
+					clickEvent: 'mousedown',
+					template: new Ext.XTemplate('<span><button></button></span>')
+				});
 
 
 
 
-		var userBtn = Ext.get('user-menu');
-		var userMenuTpl = userBtn.dom.innerHTML;
-		this.userMenuLink = new Ext.Button({
-			menu: new Ext.menu.Menu({
-				items: [
-					{
-						xtype: 'menutextitem',
-						text: go.User.displayName,
-						cls: 'go-display-name'
-					}, '-', {
-						text: t("Settings"),
-						iconCls: 'ic-settings',
-						handler: function () {
-							if(!go.userSettingsDialog) {
-								go.userSettingsDialog = new go.usersettings.UserSettingsDialog();
-							}
-							go.userSettingsDialog.show(go.User.id);
 
-						},
-						scope: this
-					},
-					'-',{
-					iconCls: 'ic-help',
-					text: t("Help"),
-					handler: function () {
+				var userBtn = Ext.get('user-menu');
+				var userMenuTpl = userBtn.dom.innerHTML;
+				this.userMenuLink = new Ext.Button({
+					menu: new Ext.menu.Menu({
+						items: [
+							{
+								xtype: 'menutextitem',
+								text: go.User.displayName,
+								cls: 'go-display-name'
+							}, '-', {
+								text: t("Settings"),
+								iconCls: 'ic-settings',
+								handler: function () {
+									if(!go.userSettingsDialog) {
+										go.userSettingsDialog = new go.usersettings.UserSettingsDialog();
+									}
+									go.userSettingsDialog.show(go.User.id);
 
-						if (Ext.form.VTypes.email(GO.settings.config.support_link)) {
-							if (GO.email && GO.settings.modules.email.read_permission) {
-								GO.email.showComposer({
-									values: {to: GO.settings.config.support_link}
-								});
-							} else {
-								document.location = 'mailto:' + GO.supportLink;
-							}
-						} else {
-							window.open(GO.settings.config.support_link);
-						}
-					},
-					scope: this
+								},
+								scope: this
+							},
+							'-',{
+							iconCls: 'ic-help',
+							text: t("Help"),
+							handler: function () {
+								
+								if (Ext.form.VTypes.email(GO.settings.config.support_link)) {
+									if (GO.email && GO.settings.modules.email.read_permission) {
+										GO.email.showComposer({
+											values: {to: GO.settings.config.support_link}
+										});
+									} else {
+										document.location = 'mailto:' + GO.supportLink;
+									}
+								} else {
+									window.open(GO.settings.config.support_link);
+								}
+							},
+							scope: this
 				}
 //						,{
 //							iconCls: 'ic-connect',

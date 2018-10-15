@@ -15,6 +15,22 @@ go.Modules.register("core", 'search', {
 					panel.setHeight(dp(500));
 					panel.getEl().alignTo(searchField.getEl(), "tl-bl");
 					panel.search(searchField.getValue());
+			},
+			
+			enableSearch = function() {
+				searchContainer.show();
+				searchField.focus();	
+
+				if (!panel) {
+					panel = new go.modules.community.search.Panel({
+						searchContainer : searchContainer
+					});
+					panel.render(Ext.getBody());
+					panel.on("collapse", function() {
+						searchField.setValue("");
+						searchContainer.hide();
+					});
+				};
 			}
 			
 			var dqTask = new Ext.util.DelayedTask(search);
@@ -26,19 +42,7 @@ go.Modules.register("core", 'search', {
 						iconCls: 'ic-search',
 						tooltip: t("Search"),
 						handler: function () {
-							searchContainer.show();
-							searchField.focus();	
-							
-							if (!panel) {
-								panel = new go.modules.community.search.Panel({
-									searchContainer : searchContainer
-								});
-								panel.render(Ext.getBody());
-								panel.on("collapse", function() {
-									searchField.setValue("");
-									searchContainer.hide();
-								});
-							}
+							enableSearch();
 						},
 						scope: this
 					},
@@ -65,11 +69,11 @@ go.Modules.register("core", 'search', {
 									search();
 								},
 								listeners: {
-									keyup : function(field, e) {
-										if(e.getKey() != e.ESC) {
-											dqTask.delay(500);
-										}
-									},
+//									keyup : function(field, e) {
+//										if(e.getKey() != e.ESC) {
+//											dqTask.delay(500);
+//										}
+//									},
 									specialkey: function (field, e) {
 										switch (e.getKey()) {
 											case e.ESC:
@@ -93,6 +97,19 @@ go.Modules.register("core", 'search', {
 				],
 				renderTo: "search_query"
 			});
+			
+			
+			searchField.getEl().on("input", function() {
+				dqTask.delay(500);	
+			});
+			
+			
+			//Global accessor to search with go.searchField.setValue("test");
+			go.util.search = function(query) {
+				enableSearch();
+				searchField.setValue(query);
+				search();
+			}
 
 
 

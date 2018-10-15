@@ -6,61 +6,9 @@ GO.base.ExportMenu = Ext.extend(Ext.Button,{
 	constructor : function(config){
 		
 		this.className = config.className;
-		
-//		this.hiddenExportWindow = new GO.Window({
-//			width: 1,
-//			height: 1,
-//			items: [
-				this.hiddenExportForm = new Ext.FormPanel({
-					hidden: true,
-					url:GO.url("core/export/export"),
-					standardSubmit: true,
-					baseParams: {},
-					items: [
-						{
-							xtype: 'hidden',
-							name: 'class_name'
-						},
-						{
-							xtype: 'hidden',
-							name: 'export_columns'
-						},
-						{
-							xtype: 'hidden',
-							name: 'include_column_names'
-						},
-						{
-							xtype: 'hidden',
-							name: 'orientation'
-						},
-						{
-							xtype: 'hidden',
-							name: 'use_db_column_names'
-						},
-						{
-							xtype: 'hidden',
-							name: 'view'
-						},
-						{
-							xtype: 'hidden',
-							name: 'id'
-						}
-					]
-				});
-//			]
-//		});
-				
 		GO.base.ExportMenu.superclass.constructor.call(this);	
+
 		
-		Ext.onReady(function(){
-			this.hiddenExportForm.render(Ext.getBody());
-			this.hiddenExportForm.form.getEl().dom.target='_blank';
-		},this);	
-		
-	},
-	
-	render: function(container, position) {
-		GO.base.ExportMenu.superclass.render.call(this,container,position);
 	},
 	
 	/**
@@ -244,63 +192,12 @@ GO.base.ExportMenuItem = Ext.extend(Ext.menu.Item,{
 	
 	constructor : function(config){
 		
-		this.className = config.className;
-		
-//		this.hiddenExportWindow = new GO.Window({
-//			width: 1,
-//			height: 1,
-//			items: [
-				this.hiddenExportForm = new Ext.FormPanel({
-					hidden: true,
-					url:GO.url("core/export/export"),
-					standardSubmit: true,
-					baseParams: {},
-					items: [
-						{
-							xtype: 'hidden',
-							name: 'class_name'
-						},
-						{
-							xtype: 'hidden',
-							name: 'export_columns'
-						},
-						{
-							xtype: 'hidden',
-							name: 'include_column_names'
-						},
-						{
-							xtype: 'hidden',
-							name: 'orientation'
-						},
-						{
-							xtype: 'hidden',
-							name: 'use_db_column_names'
-						},
-						{
-							xtype: 'hidden',
-							name: 'view'
-						},
-						{
-							xtype: 'hidden',
-							name: 'id'
-						}
-					]
-				});
-//			]
-//		});
+		this.className = config.className;		
 				
-		GO.base.ExportMenuItem.superclass.constructor.call(this);	
-		
-		Ext.onReady(function(){
-			this.hiddenExportForm.render(Ext.getBody());
-			this.hiddenExportForm.form.getEl().dom.target='_blank';
-		},this);	
-		
+		GO.base.ExportMenuItem.superclass.constructor.call(this);			
+
 	},
 	
-	render: function(container, position) {
-		GO.base.ExportMenuItem.superclass.render.call(this,container,position);
-	},
 	
 	/**
 	 * Use this function to change the className after the menu is created.

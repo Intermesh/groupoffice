@@ -102,7 +102,7 @@ if (!empty($_POST)) {
 		Observable::cacheListeners();			
 	
 				
-		\go\modules\core\users\model\User::findById(1)->checkOldFramework();
+		\go\modules\core\users\model\User::findById(1)->legacyOnSave();
 
 		header("Location: finished.php");
 		exit();

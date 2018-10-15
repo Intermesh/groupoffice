@@ -171,6 +171,7 @@ CREATE TABLE `core_user` (
   `createdAt` datetime DEFAULT NULL,
   `modifiedAt` datetime DEFAULT NULL,
   `dateFormat` varchar(20) NOT NULL DEFAULT 'd-m-Y',
+	`shortDateInList` BOOLEAN NOT NULL DEFAULT TRUE,
   `timeFormat` varchar(10) NOT NULL DEFAULT 'G:i',
   `thousandsSeparator` varchar(1) NOT NULL DEFAULT '.',
   `decimalSeparator` varchar(1) NOT NULL DEFAULT ',',
@@ -530,10 +531,6 @@ ALTER TABLE `go_link_folders`
 ALTER TABLE `go_log`
   ADD PRIMARY KEY (`id`);
 
-ALTER TABLE `go_mail_counter`
-  ADD PRIMARY KEY (`host`),
-  ADD KEY `date` (`date`);
-
 ALTER TABLE `go_reminders`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`);
@@ -738,3 +735,24 @@ CREATE TABLE IF NOT EXISTS `core_change_user` (
 ALTER TABLE `core_change_user`
   ADD CONSTRAINT `core_change_user_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_change_user_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;
+
+
+DROP TABLE IF EXISTS `core_user_default_group`;
+CREATE TABLE IF NOT EXISTS `core_user_default_group` (
+  `groupId` int(11) NOT NULL,
+  PRIMARY KEY (`groupId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+ALTER TABLE `core_user_default_group`
+  ADD CONSTRAINT `core_user_default_group_ibfk_1` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;
+
+DROP TABLE IF EXISTS `core_group_default_group`;
+CREATE TABLE IF NOT EXISTS `core_group_default_group` (
+  `groupId` int(11) NOT NULL,
+  PRIMARY KEY (`groupId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+ALTER TABLE `core_group_default_group`
+  ADD CONSTRAINT `core_group_default_group_ibfk_1` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;
