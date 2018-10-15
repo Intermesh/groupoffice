@@ -1,3 +1,5 @@
+/* global GO, Ext, go */
+
 GO.smime.PublicCertsGrid = function(config){
 	
 	if(!config)
@@ -97,7 +99,7 @@ GO.smime.PublicCertsGrid = function(config){
 				}							
 			});
 		}
-	}
+	};
 	
 	GO.smime.PublicCertsGrid.superclass.constructor.call(this, config);
 };

@@ -1,3 +1,5 @@
+/* global GO, Ext */
+
 GO.moduleManager.onModuleReady('email',function(){
 	Ext.override(GO.email.AttachmentContextMenu, {
 		
