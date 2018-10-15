@@ -676,11 +676,14 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 	},
 	getRowNumberByY : function(y)
 	{
-		var snap = this.getSnap();
+		//var snap = this.getSnap();
 
 		var gridPosition = this.gridTable.getXY();
-
-		return Math.floor((y-gridPosition[1])/snap["y"]);
+		var gridSize = this.gridTable.getSize();
+		var gridY = y-gridPosition[1];
+		
+		var rowIndex = gridY / gridSize['height'];
+		return Math.floor(rowIndex * 24 * 4);
 	},
 	getDayByX : function(x)
 	{
@@ -693,7 +696,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 		//check if we are not dragging an event, check for left button		
 		if(this.permissionLevel>GO.permissionLevels.read && !this.dragEvent && (e.button == '0'))
 		{
-			var coords = e.getXY();
+			var coords = Ext.get(e.target).getXY();
 
 			this.clickedDay = this.getDayByX(coords[0]);
 			this.clickedRow = this.getRowNumberByY(coords[1]);
@@ -706,9 +709,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 
 				if(this.selectorStartRow)
 				{
-
-					var columnsContainerY = this.gridTable.getY();
-					var position = [this.selectorStartRow.xy[0],this.selectorStartRow.xy[1]+columnsContainerY];
+					var position = this.selectorStartRow.getXY();
 
 
 					//create an overlay to track the mousemovement
@@ -729,7 +730,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 
 					this.selector.setXY(position);
 					//substract double border
-					this.selector.setSize(this.snapCol['x']-3, this.snapCol['y']);
+					this.selector.setSize(this.snapCol['x'], this.snapCol['y']);
 					this.selector.setVisible(true,false);
 				}
 			}

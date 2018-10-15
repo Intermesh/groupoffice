@@ -13,6 +13,8 @@ Ext.applyIf(Array.prototype, {
 	 */
 
 	column : function(name) {
-		return this.map(rec=>rec[name]);
+		return this.map(function(i) {
+			return i[name];
+		});
 	}
 });
