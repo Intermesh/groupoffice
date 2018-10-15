@@ -106,7 +106,7 @@ class Acl extends \go\core\jmap\Entity {
 	
 	private function hasAdmins() {
 		foreach($this->groups as $group) {
-			if($group->groupId == Group::ID_ADMINS) {
+			if($group->groupId == Group::ID_ADMINS) {				
 				return true;
 			}
 		}
