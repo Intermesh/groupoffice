@@ -148,7 +148,7 @@ GO.smime.PublicCertsWindow = Ext.extend(GO.Window, {
 		this.height=400;
 		this.layout='fit';
 		this.grid=new GO.smime.PublicCertsGrid();
-		this.items=this.grid
+		this.items=this.grid;
 		this.closeAction='hide';
 		
 		GO.smime.PublicCertsWindow.superclass.initComponent.call(this);
