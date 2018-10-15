@@ -26,6 +26,9 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 		this.eventSourceUrl = session.eventSourceUrl;		
 		this.loaded = true;
 
+		Ext.apply(this, session.user);
+		this.firstWeekDay = parseInt(session.user.firstWeekday);
+		
     Ext.apply(GO.settings, session.oldSettings);
 		
 		this.fireEvent("load", this);
