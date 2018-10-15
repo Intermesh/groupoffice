@@ -123,7 +123,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			items : this.formPanel,
 			focus : focusSubject.createDelegate(this),
 			buttonAlign:'left',
-			buttons : [this.linkBrowseButton = new go.links.LinkToButton({
+			buttons : [this.linkBrowseButton = new go.detail.addButton({
 				iconCls : 'ic-link',
 				text : t("Links"),
 				disabled : true,

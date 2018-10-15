@@ -167,16 +167,16 @@ GO.addressbook.CompaniesGrid = function (config) {
 				hidden: true,
 				id: 'invoice_email'
 			}, {
+				xtype: "datecolumn",
 				header: t("Modified at"),
 				dataIndex: 'mtime',
 				hidden: true,
-				width: dp(140),
 				id: 'mtime'
 			}, {
+				xtype: "datecolumn",
 				header: t("Created at"),
 				dataIndex: 'ctime',
-				hidden: true,
-				width: dp(140),
+				hidden: true,				
 				id: 'ctime'
 			}, {
 				header: t("Address book", "addressbook"),

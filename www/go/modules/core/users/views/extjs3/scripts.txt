@@ -1,5 +1,5 @@
 Module.js
-SystemSettingsUserDefaults.js
+UserDefaultsWindow.js
 SystemSettingsUserGrid.js
 CreateUserAccountPanel.js
 CreateUserPasswordPanel.js

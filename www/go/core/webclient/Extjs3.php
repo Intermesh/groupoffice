@@ -24,47 +24,43 @@ class Extjs3 {
 	public function getCSSFile($theme = 'Paper') {
 
 		$cacheFile = GO()->getDataFolder()->getFile('clientscripts/' . $theme . '/style.css');
-
+		
+		
 		if (GO()->getDebugger()->enabled || !$cacheFile->exists()) {
 			if ($cacheFile->exists()) {
 				$cacheFile->delete();
 			}
 			$modules = Module::getInstalled();
-
+			$css = "";
 			foreach ($modules as $module) {
 
 				if (isset($module->package)) {
 					$folder = $module->module()->getFolder();
 					$file = $folder->getFile('views/extjs3/themes/default/style.css');
 					if ($file->exists()) {
-						$css = $this->replaceCssUrl($file->getContents(),$file);
-						$cacheFile->putContents($css, FILE_APPEND);
+						$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";						
 					}
 
 					$file = $folder->getFile('views/extjs3/themes/' . $theme . '/style.css');
 					if ($file->exists()) {
-						$css = $this->replaceCssUrl($file->getContents(),$file);
-						$cacheFile->putContents($css, FILE_APPEND);
-						continue;
+						$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";						
 					}
 				}
 
-
 				//old path
-
 				$folder = Environment::get()->getInstallFolder()->getFolder('modules/' . $module->name);
 				$file = $folder->getFile('themes/Default/style.css');
 				if ($file->exists()) {
-					$css = $this->replaceCssUrl($file->getContents(),$file);
-					$cacheFile->putContents($css, FILE_APPEND);
+					$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";
 				}
 
 				$file = $folder->getFile('themes/' . $theme . '/style.css');
 				if ($file->exists()) {
-					$css = $this->replaceCssUrl($file->getContents(),$file);
-					$cacheFile->putContents($css, FILE_APPEND);
+					$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";					
 				}
 			}
+			
+			$cacheFile->putContents($css);
 		}
 		return $cacheFile;
 	}
@@ -121,6 +117,8 @@ class Extjs3 {
 			$l['iso'] = $iso;
 
 			$str .= 'GO.lang = ' . json_encode($l) . ";\n";
+			
+			$str .= "GO.lang.holidaySets = " . json_encode(\GO\Base\Model\Holiday::getAvailableHolidayFiles()) .";\n";
 			
 			$cacheFile->putContents($str);
 		}

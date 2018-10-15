@@ -312,5 +312,5 @@ class Acl extends \go\core\jmap\Entity {
 		}
 		
 		return $query;
-	}	
+	}
 }

@@ -13,17 +13,17 @@
 		 * 	  mainPanel: GO.addressbook.MainPanel,
 		 * 	  title: t("Address book", "addressbook"),
 		 * 	  iconCls: 'go-tab-icon-addressbook',
-		 * 	  entities: ["Contact", "Company"],
+		 * 	  entities: ["Contact", "Company"], //String or config object. See go.Entities class for details.
 		 * 	  userSettingsPanels: ["GO.addressbook.SettingsPanel"],
 		 * 	  systemSettingsPanels: ["go.modules.commmunity.addressbook.SystemSettingsPanel"],
 		 * 	  initModule: function () {	
 		 * 	}
 		 * });
 		 * 
-		 * @param {type} package
-		 * @param {type} name
-		 * @param {type} config
-		 * @returns {undefined}
+		 * @param {string} package
+		 * @param {string} name
+		 * @param {object} config
+		 * @returns {void}
 		 */
 		register: function (package, name, config) {	
 			

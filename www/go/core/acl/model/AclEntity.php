@@ -25,6 +25,12 @@ abstract class AclEntity extends Entity {
 	 */
 	public $aclId;
 	
+	/**
+	 * The acl entity
+	 * @var Acl 
+	 */
+	private $acl;
+	
 //	Disabled for performance reasons. How should we handle this?
 //	/**
 //	 * The groups in the ACL with their level
@@ -48,15 +54,31 @@ abstract class AclEntity extends Entity {
 	}
 	
 	protected function createAcl() {
-		$acl = new Acl();
-		$acl->usedIn = $this->getMapping()->getColumn('aclId')->table->getName().'.aclId';
-		$acl->ownedBy = $this->getCreatedBy();
+		$this->acl = new Acl();
+		$this->acl->usedIn = $this->getMapping()->getColumn('aclId')->table->getName().'.aclId';
+		$this->acl->ownedBy = $this->getCreatedBy();
 
-		if(!$acl->internalSave()) {	
+		if(!$this->acl->internalSave()) {	
 			return false;
 		}
 
-		$this->aclId = $acl->id;
+		$this->aclId = $this->acl->id;
+	}
+	
+	/**
+	 * Get the ACL entity
+	 * 
+	 * @return Acl
+	 */
+	public function findAcl() {
+		if(empty($this->aclId)) {
+			return null;
+		}
+		if(!isset($this->acl)) {
+			$this->acl = Acl::internalFind()->where(['id' => $this->aclId])->single();
+		}
+		
+		return $this->acl;
 	}
 	
 	/**

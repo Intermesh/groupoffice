@@ -1,3 +1,5 @@
+/* global GO, Ext */
+
 /**
  * Copyright Intermesh
  *
@@ -78,7 +80,7 @@ GO.moduleManager.onModuleReady('email',function(){
 							
 							var record = this.fromCombo.store.getById(this.fromCombo.getValue());
 					
-							if(btn=="cancel")
+							if(btn==="cancel")
 								return false;
 
 							GO.request({
@@ -136,6 +138,6 @@ GO.moduleManager.onModuleReady('email',function(){
 			}
 		}
 	}
-	)
+	);
 });
         

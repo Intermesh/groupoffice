@@ -13,8 +13,9 @@
 go.systemsettings.Dialog = Ext.extend(go.Window, {
 	
 	modal:true,
-	resizable:true,
-	maximizable:true,
+	resizable:false,
+	maximizable:false,
+	maximized: true,
 	iconCls: 'ic-settings',
 	title: t("System settings"),
 	

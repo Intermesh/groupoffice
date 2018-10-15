@@ -5,9 +5,17 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 	 * The name of the field in the linking table that holds the id of the entities you want to select
 	 * 
 	 * eg. "noteBookId"
-	 * property {string} 
+	 * @property {string} 
 	 */
 	idField: null,
+	
+	/**
+	 * If set to true then the field will expect and return id's as value. Otherwise
+	 * it will use full record data.
+	 * 
+	 * @property {boolean}
+	 */
+	valueIsId: false,
 	
 	/**
 	 * The entity property to display in the grids
@@ -153,10 +161,23 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 		}
 		
 		this._isDirty = false; //todo this is not right but works for our use case
-		var ids = [];
-		records.forEach(function (n) {
-			ids.push(n[this.idField]);
-		}, this);
+		var ids;
+		if(this.valueIsId) {
+			ids = records;
+			
+			records = [];
+			ids.forEach(function (id) {
+				var record = {};
+				record[this.idField] = id;
+				records.push(record);
+			}, this);
+		} else
+		{
+			ids = [];
+			records.forEach(function (n) {
+				ids.push(n[this.idField]);
+			}, this);
+		}
 	
 		//we must preload the notebooks so notebook select can use it in a renderer
 		this.entityStore.get(ids, function () {
@@ -168,7 +189,12 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 	getValue: function () {		
 		var records = this.store.getRange(), v = [];
 		for(var i = 0, l = records.length; i < l; i++) {
-			v.push(records[i].data);
+			if(this.valueIsId) {
+				v.push(records[i].data[this.idField]);
+			} else
+			{
+				v.push(records[i].data);
+			}
 		}
 		return v;
 	},

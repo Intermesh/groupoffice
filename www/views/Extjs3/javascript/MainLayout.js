@@ -448,7 +448,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	//			var winSize = [window.scrollWidth , window.scrollHeight];
 
 				GO.viewport = new Ext.Viewport({
-					renderTo: 'viewport',
 					layout: 'border',
 					border: false,
 					items: [topPanel, this.tabPanel]

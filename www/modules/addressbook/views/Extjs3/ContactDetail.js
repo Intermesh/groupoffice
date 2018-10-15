@@ -264,8 +264,6 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 		var moreMenuItems = [
 			{
 				xtype: "linkbrowsermenuitem"
-			},{
-				xtype: "filebrowsermenuitem"
 			},
 			'-',{
 				iconCls: "ic-print",
@@ -288,6 +286,12 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 				scope: this
 			})
 		];
+		
+		if(go.Modules.isAvailable("legacy", "files")) {
+			moreMenuItems.splice(1,0,{
+				xtype: "filebrowsermenuitem"
+			});
+		}
 		
 		if(go.Modules.isAvailable("core", "users")){
 

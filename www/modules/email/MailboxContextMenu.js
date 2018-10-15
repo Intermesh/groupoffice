@@ -171,7 +171,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 
 				var template = new Ext.Template(t("Are you sure you want to EMPTY '{name}'?", "email"));
 
-				Ext.MessageBox.confirm(t("Confirm"), template.applyTemplate({name:node.attributes.text}), function(btn){
+				Ext.MessageBox.confirm(t("Confirm"), template.applyTemplate({name:node.attributes.name}), function(btn){
 					if(btn=='yes')
 					{
 						GO.request({

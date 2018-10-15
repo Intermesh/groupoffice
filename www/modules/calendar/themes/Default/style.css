@@ -3,36 +3,28 @@
 }
 
 
-.cal-has-links{
-	background:url(../../../../views/Extjs3/themes/Default/images/attach.gif) no-repeat center 3px;
-	padding:8px !important;
-	float:right;
-}
+
 
 .cal-has-reminders{
 	background:url(images/16x16/reminder.png) no-repeat 0 1px;
 	padding:8px !important;
 	float:right;
-	margin-top: 3px;
 }
 
 .cal-is-private{
 	background:url(images/16x16/private.png) no-repeat 0 1px;
 	padding:8px !important;
 	float:right;
-	margin-top: 3px;
 }
 .cal-recurring{
 	background:url(images/16x16/recurring.png) no-repeat 0 1px;
 	padding:8px !important;
 	float:right;
-	margin-top: 3px;
 }
 .cal-resources{
 	background:url(images/16x16/resources.png) no-repeat 0 1px;
 	padding:8px !important;
 	float:right;
-	margin-top: 3px;
 }
 
 .cal-comment{

@@ -134,5 +134,7 @@ Wachtwoord: {password}',
   'Formatting' => 'Opmaak',
   'Users will automatically be added to these groups' => 'Gebruikers worden automatisch aan deze groepen toegevoegd',
   'Display name' => 'Weergave naam',
-	'Edit contact' => 'Bewerk contactpersoon'
+	'Edit contact' => 'Bewerk contactpersoon',
+	"Use short format for date and time in lists" => "Gebruik kort formaat voor datum en tijd in lijsten",
+	"Holidays" => "Feestdagen"
  ];

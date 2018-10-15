@@ -376,13 +376,26 @@ GO.email.EmailComposer = function(config) {
 										var fromAccountRecord = this.fromCombo.store.getById(this.fromCombo.getValue());
 										this.templatesStore.baseParams.account_id = fromAccountRecord['data']['account_id'];
 									}
-									this.templatesStore.load();
-									delete this.templatesStore.baseParams.default_template_id;
-									delete this.templatesStore.baseParams.type;
-									delete this.templatesStore.baseParams.account_id;
-									var fromComboValue = this.fromCombo.getValue();
-									this.fromCombo.store.load();
-									this.fromCombo.setValue(fromComboValue);
+									
+									this.getEl().mask();
+									this.templatesStore.load({
+										callback: function() {
+											delete this.templatesStore.baseParams.default_template_id;
+											delete this.templatesStore.baseParams.type;
+											delete this.templatesStore.baseParams.account_id;
+											var fromComboValue = this.fromCombo.getValue();
+											this.fromCombo.store.load({
+												scope: this,
+												callback: function() {
+													this.fromCombo.setValue(fromComboValue);
+													this.getEl().unmask();
+												}
+											});										
+											
+										},
+										scope: this
+									});
+									
 								}else if(!this.emailEditor.isDirty() || confirm(t("Changes will be lost. Are you sure?", "email")))
 								{							
 									this._changeTemplate(item.template_id);			

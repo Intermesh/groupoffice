@@ -1372,7 +1372,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 			include($config_file);
 		
 		//auto host
-		$config['host'] = trim(dirname($_SERVER['PHP_SELF']), '/');
+		$config['host'] = trim(dirname($_SERVER['SCRIPT_NAME']), '/');
 		$config['host'] = empty($config['host']) ? '/' : '/' . $config['host'] . '/';		
 		$config['root_path'] = \go\core\Environment::get()->getInstallFolder()->getPath() . '/';
 		
@@ -1399,7 +1399,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 
 		if(empty($this->db_user)) {
 		//Detect some default values for installation if root_path is not set yet
-			$this->host = dirname($_SERVER['PHP_SELF']);
+			$this->host = dirname($_SERVER['SCRIPT_NAME']);
 			if(basename($this->host)=='install')
 				$this->host = dirname($this->host);
 

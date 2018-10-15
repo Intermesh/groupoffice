@@ -29,53 +29,61 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 		}
 		
 		//TODO refactor
-		if(go.Modules.isAvailable("legacy", "documenttemplates")) {
 		
-			this.menu.add(	{
-				iconCls: 'ic-mail', 
-				text:  t("E-mail from template","documenttemplates", "legacy"),
-				scope: this,
-				handler: function() {
-					if(!GO.documenttemplates.emailTemplateDialog){
-						GO.documenttemplates.emailTemplateDialog = new GO.documenttemplates.EmailTemplateDialog();
+		if(!this.noFiles) { //noFiles is used in GO.email.LinkedMessagePanel
+			if(go.Modules.isAvailable("legacy", "documenttemplates")) {
+
+				this.menu.add(	{
+					iconCls: 'ic-mail', 
+					text:  t("E-mail from template","documenttemplates", "legacy"),
+					scope: this,
+					handler: function() {
+						if(!GO.documenttemplates.emailTemplateDialog){
+							GO.documenttemplates.emailTemplateDialog = new GO.documenttemplates.EmailTemplateDialog();
+						}
+
+						var dv = this.detailView;
+
+						GO.documenttemplates.emailTemplateDialog.entity = dv.model_name || dv.entity || dv.entityStore.entity.name;
+						GO.documenttemplates.emailTemplateDialog.entityId = dv.model_id ? dv.model_id : dv.currentId;
+
+						GO.documenttemplates.emailTemplateDialog.show();
+
+						GO.documenttemplates.emailTemplateDialog.on('hide', function(){
+							this.detailView.reload();
+						}, this, {single: true});
 					}
-					
-					var dv = this.detailView;
+				});
 
-					GO.documenttemplates.emailTemplateDialog.entity = dv.model_name || dv.entity || dv.entityStore.entity.name;
-					GO.documenttemplates.emailTemplateDialog.entityId = dv.model_id ? dv.model_id : dv.currentId;
+				this.menu.add(	{
+					iconCls: 'ic-mail', 
+					text:  t("Document from template", "documenttemplates", "legacy"),
+					scope: this,
+					handler: function() {
+						if(!GO.documenttemplates.templateDocumentDialog){
+							GO.documenttemplates.templateDocumentDialog = new GO.documenttemplates.TemplateDocumentDialog();
+						}
 
-					GO.documenttemplates.emailTemplateDialog.show();
-					
-					GO.documenttemplates.emailTemplateDialog.on('hide', function(){
-						this.detailView.reload();
-					}, this, {single: true});
-				}
-			});
-			
-			this.menu.add(	{
-				iconCls: 'ic-mail', 
-				text:  t("Document from template", "documenttemplates", "legacy"),
-				scope: this,
-				handler: function() {
-					if(!GO.documenttemplates.templateDocumentDialog){
-						GO.documenttemplates.templateDocumentDialog = new GO.documenttemplates.TemplateDocumentDialog();
+						var dv = this.detailView;
+
+						GO.documenttemplates.templateDocumentDialog.entity = dv.model_name || dv.entity || dv.entityStore.entity.name;
+						GO.documenttemplates.templateDocumentDialog.entityId = dv.model_id ? dv.model_id : dv.currentId;
+
+						GO.documenttemplates.templateDocumentDialog.show();//.show(this.entityId, this.entity);
+
+						GO.documenttemplates.templateDocumentDialog.on('hide', function(){
+							this.detailView.reload();
+						}, this, {single: true});
 					}
-					
-					var dv = this.detailView;
-
-					GO.documenttemplates.templateDocumentDialog.entity = dv.model_name || dv.entity || dv.entityStore.entity.name;
-					GO.documenttemplates.templateDocumentDialog.entityId = dv.model_id ? dv.model_id : dv.currentId;
-
-					GO.documenttemplates.templateDocumentDialog.show();//.show(this.entityId, this.entity);
-					
-					GO.documenttemplates.templateDocumentDialog.on('hide', function(){
-						this.detailView.reload();
-					}, this, {single: true});
-				}
-			});
+				});
+			}
 		}
 
+		this.on("afterrender", this.onAfterRender, this);
+		
+	},
+	
+	onAfterRender : function() {
 		this.detailView.on('load', function (dv) {
 			this.setDisabled(dv.data.permissionLevel < GO.permissionLevels.write);
 		}, this);

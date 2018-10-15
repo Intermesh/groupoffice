@@ -216,3 +216,15 @@ $app-icons: (
 .mo-description {
 	padding-left: dp(40);
 }
+
+
+
+.cal-has-links{
+	//background:url(../../../../views/Extjs3/themes/Default/images/attach.gif) no-repeat center 3px;
+	@extend %icon;
+	font-size: dp(16);
+	&:before {
+		content: "link";
+	}
+	float:right;
+}

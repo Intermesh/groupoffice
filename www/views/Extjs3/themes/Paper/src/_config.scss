@@ -55,8 +55,8 @@ $vars: (
 	letter-spacing: 0;
 	text-align:center;
 	border-radius: dp(10.5); // only round with 1 char
-	background-color: color($fg, 'secondary-text');	
-  
+	background-color: #727272; //color($fg, 'secondary-text');
+	
   .x-tree-node & {
     position: absolute;
     right: 8px;

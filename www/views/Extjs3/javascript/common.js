@@ -977,8 +977,8 @@ if(GO.settings && GO.settings.time_format){
 		minutes:[]
 	};
 
-	if (GO.settings.time_format.substr(0, 1) == 'G') {
-			var timeformat = 'G';
+	if (GO.settings.time_format.substr(0, 1) == 'H' || GO.settings.time_format.substr(0, 1) == 'h') {
+			var timeformat = 'H';
 	} else {			
 			var timeformat = 'g a';
 	}
@@ -1509,27 +1509,6 @@ GO.util.HtmlDecode = function HtmlDecode(s) {
 
 
 
-GO.util.dateFormat = function(v) {
-	if(!v) {
-		return "-";
-	}
-	
-	if (!Ext.isDate(v)) {
-			v = new Date(Date.parse(v));
-	}
-
-	var month = v.getFullYear()+v.getMonth();
-	var now = new Date();
-	var nowMonth = now.getFullYear()+now.getMonth();
-	
-	if(month === nowMonth) {
-		if(now.getDay() === v.getDay()) {
-			return Ext.util.Format.date(v, GO.settings.time_format);
-		}
-		
-		if(now.getDay() - 1  === v.getDay()) {
-			return t('Yesterday');
-		}
-	}
-	return Ext.util.Format.date(v, GO.settings.date_format);	
-}
+GO.util.dateFormat = function(v) {	
+	return go.util.Format.dateTime(v);	
+};
