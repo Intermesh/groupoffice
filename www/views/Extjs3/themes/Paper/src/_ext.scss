@@ -2159,6 +2159,7 @@ $menuScrollerSize : dp(4);
 
 .x-panel-ghost {
 	@extend .z24;
+	visibility:visible;
 	background-color:white;
 }
 
