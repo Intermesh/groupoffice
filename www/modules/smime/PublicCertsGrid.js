@@ -132,7 +132,7 @@ Ext.extend(GO.smime.PublicCertsGrid, GO.grid.GridPanel,{
 						scope:this
 					});
 				},
-				uploadComplete() {
+				uploadComplete: function() {
 					complete = true;
 				},
 				scope: this
