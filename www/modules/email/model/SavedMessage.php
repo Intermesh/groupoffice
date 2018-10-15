@@ -125,9 +125,15 @@ class SavedMessage extends ComposerMessage {
 	}
 	
 	private function _getTempDir(){
-		$this->_tmpDir=\GO::config()->tmpdir.'saved_messages/'.md5(serialize($this->attributes)).'/';
-		if(!is_dir($this->_tmpDir))
-			mkdir($this->_tmpDir, 0755, true);
+		
+		if(!isset($this->_tmpDir)) {
+			$this->_tmpDir=\GO::config()->tmpdir.'saved_messages/'.md5(serialize($this->attributes)).'/';
+
+			$dir = new \GO\Base\Fs\Folder($this->_tmpDir);
+			$dir->delete();
+			$dir->create();
+		}
+		
 		return $this->_tmpDir;
 	}
 	
@@ -227,11 +233,11 @@ class SavedMessage extends ComposerMessage {
 					$a->content_id=$content_id;
 					$a->mime=$mime_type;
 					
-					$tmp_file = new \GO\Base\Fs\File($this->_getTempDir().$filename);
+					//$tmp_file = new \GO\Base\Fs\File($this->_getTempDir().$filename);
 					if(!empty($part->body)){
 						$tmp_file = new \GO\Base\Fs\File($this->_getTempDir().$filename);
-						if(!$tmp_file->exists())
-							$tmp_file->putContents($part->body);
+						$tmp_file->appendNumberToNameIfExists();						
+						$tmp_file->putContents($part->body);
 						
 						$a->setTempFile($tmp_file);
 					}					
