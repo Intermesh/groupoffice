@@ -189,10 +189,10 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 						{
 							//in this case it's a go.form.Dialog							
 							link.toId = entity.id;
-						}
+						}			
 
 						go.Stores.get("Link").set({
-							create: [link]
+							create: {"clientId" : link},
 						}, function (options, success, result) {
 							if (result.notCreated) {
 								throw "Could not create link";
