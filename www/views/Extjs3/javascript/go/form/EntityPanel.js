@@ -155,3 +155,5 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 //		}
 //	}
 });
+
+Ext.reg("entityform", go.form.EntityPanel);

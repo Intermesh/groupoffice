@@ -32,31 +32,42 @@ go.modules.core.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 				console.error("No go.form.EntityPanel found for filtering");
 				return;
 			}
+						
+			if(form.getXType() == "entityform") {
+				form.on("load", function () {
+					this.filter(form.getValues());
+				}, this);
 
-			form.on("load", function () {
-				this.filter(form.getValues());
-			}, this);
-			
-			if(form.entity) {
-				this.filter(form.getValues());
-			}
-			
-			//Add a beforeaction event listener that will send the custom field data JSON encoded.
-			//The old framework will use this to save custom fields.
-			if(!form.legacyParamAdded) {
-				form.getForm().on("beforeaction", function(form, action) {	
-					if(action.type !== "submit") {
+				if(form.entity) {
+					this.filter(form.getValues());
+				}
+			} else
+			{
+				//Legacy code
+				
+				//Add a beforeaction event listener that will send the custom field data JSON encoded.
+				//The old framework will use this to save custom fields.
+				if(!form.legacyParamAdded) {
+					form.getForm().on("beforeaction", function(form, action) {	
+						if(action.type !== "submit") {
+							return true;
+						}
+
+						var v = form.getFieldValues();
+						if(v.customFields) {
+							action.options.params = {customFieldsJSON: Ext.encode(v.customFields)};
+						}
+
 						return true;
+					});
+					form.legacyParamAdded = true;
+				}
+				
+				form.getForm().on("actioncomplete", function(f, action) {
+					if(action.type === "load") {
+						this.filter(f.getFieldValues());
 					}
-
-					var v = form.getFieldValues();
-					if(v.customFields) {
-						action.options.params = {customFieldsJSON: Ext.encode(v.customFields)};
-					}
-
-					return true;
-				});
-				form.legacyParamAdded = true;
+				}, this);
 			}
 			
 			
@@ -65,7 +76,14 @@ go.modules.core.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 		go.modules.core.customfields.FormFieldSet.superclass.initComponent.call(this);
 	},
 
+	/**
+	 * Show this fieldset by filtering the entity values.
+	 * 
+	 * @param {object} entity
+	 * @returns {undefined}
+	 */
 	filter: function (entity) {
+		
 		for (var name in this.fieldSet.filter) {
 			var v = this.fieldSet.filter[name];
 
@@ -85,3 +103,5 @@ go.modules.core.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 		this.setVisible(true);
 	}
 });
+
+Ext.reg("customformfieldset", go.modules.core.customfields.FormFieldSet);

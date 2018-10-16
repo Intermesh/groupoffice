@@ -1,7 +1,8 @@
 go.modules.community.addressbook.CustomFieldSetDialog = Ext.extend(go.modules.core.customfields.FieldSetDialog, {
 	stateId: 'addressbook-custom-field-set-dialog',
-	title: t('Field set'),
-	entityStore: go.Stores.get("FieldSet"),
+	
+	autoHeight: false,
+	autoScroll: true,
 	height: dp(400),
 	initFormItems: function () {
 		var items = go.modules.community.addressbook.CustomFieldSetDialog.superclass.initFormItems.call(this);
@@ -76,7 +77,7 @@ go.modules.community.addressbook.CustomFieldSetDialog = Ext.extend(go.modules.co
 		var enableAbFilter = this.formPanel.getForm().findField("enableAddressBookFilter").getValue();
 
 		if (!enableAbFilter) {
-			delete this.formPanel.values.filter.addressBooks;
+			delete this.formPanel.values.filter.addressBookId;
 		} else
 		{
 			//this.formPanel.values.filter.addressBookId = this.formPanel.getForm().findField("addressBooks").getValue().column("id");
