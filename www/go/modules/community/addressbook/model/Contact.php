@@ -2,7 +2,11 @@
 namespace go\modules\community\addressbook\model;
 
 use go\core\acl\model\AclItemEntity;
+use go\core\db\Criteria;
+use go\core\db\Query;
 use go\core\orm\CustomFieldsTrait;
+use go\core\orm\SearchableTrait;
+use go\core\validate\ErrorCode;
 						
 /**
  * Contact model
@@ -15,6 +19,8 @@ use go\core\orm\CustomFieldsTrait;
 class Contact extends AclItemEntity {
 	
 	use CustomFieldsTrait;
+	
+	use SearchableTrait;
 	
 	/**
 	 * 
@@ -224,7 +230,7 @@ class Contact extends AclItemEntity {
 						->addRelation('groups', ContactGroup::class, ['id' => 'contactId']);
 	}
 	
-	public static function filter(\go\core\db\Query $query, array $filter) {
+	public static function filter(Query $query, array $filter) {
 		if (isset($filter['addressBookId'])) {
 			$query->andWhere('addressBookId', '=', $filter['addressBookId']);
 		}
@@ -240,7 +246,7 @@ class Contact extends AclItemEntity {
 		
 		if(isset($filter['q'])) {
 			$query->where(
-							(new \go\core\db\Criteria())
+							(new Criteria())
 								->where('name', 'like', $filter['q'].'%')
 								->orWhere('lastName', 'LIKE', $filter['q']."%")
 							);
@@ -257,12 +263,22 @@ class Contact extends AclItemEntity {
 			foreach($this->groups as $group) {
 				$group = Group::findById($group->groupId);
 				if($group->addressBookId != $this->addressBookId) {
-					$this->setValidationError('groups', \go\core\validate\ErrorCode::INVALID_INPUT, "The contact groups must match with the addressBookId. Group ID: ".$group->id." belongs to ".$group->addressBookId." and the contact belongs to ". $this->addressBookId);
+					$this->setValidationError('groups', ErrorCode::INVALID_INPUT, "The contact groups must match with the addressBookId. Group ID: ".$group->id." belongs to ".$group->addressBookId." and the contact belongs to ". $this->addressBookId);
 				}
 			}
 		}
 		
 		return parent::internalValidate();
+	}
+
+	protected function getSearchDescription() {
+		$addressBook = AddressBook::findById($this->addressBookId);
+		$organizationIds = array_column($this->organizations, 'organizationContactId');	
+		return $addressBook->name.': '.implode(', ', Contact::find()->selectSingleValue('name')->where(['id' => $organizationIds])->all());
+	}
+
+	protected function getSearchName() {
+		return $this->name;
 	}
 
 }
