@@ -1476,17 +1476,6 @@ td.grid-hd-group-cell {
 	}
 	&-node-anchor {
 		width:auto;
-		> span {
-			width: 100%;
-			display: table;
-			table-layout: fixed;
-			> div { 
-				display: table-cell;
-				+ div:last-child {
-					text-align:right;
-				}
-			}
-		}
 	}
 	&-ec-icon {
 		z-index:1;
@@ -1513,7 +1502,7 @@ td.grid-hd-group-cell {
 		.x-tree-elbow-end-minus,
 		.x-tree-elbow-end-plus,
 		.x-tree-elbow-line {
-			width: dp(24);
+			min-width: dp(24);
 		}
 	}
 	&-node {
@@ -1534,6 +1523,7 @@ td.grid-hd-group-cell {
 }
 .x-tree-node a span, .x-dd-drag-ghost a span {
 	padding: 0 dp(8);
+	display:block;
 }
 .x-tree-node .x-tree-drag-append a span {
     background-color: $cHover;

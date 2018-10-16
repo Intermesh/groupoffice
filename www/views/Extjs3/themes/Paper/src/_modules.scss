@@ -157,7 +157,10 @@ $app-icons: (
 
 .x-tree-node .ml-folder-unseen a .em-folder-status { // badge
 	@extend %badge;
-	display: inline-block;
+	
+}
+.em-folder-status {
+	float:right;
 }
 
 .ml-unseen-dot {
