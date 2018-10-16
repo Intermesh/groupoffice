@@ -121,9 +121,7 @@ trait CustomFieldsTrait {
 			return true;
 		}
 		
-		try {
-			$this->customFieldsData['id'] = $this->id;
-			
+		try {			
 			$record = $this->customFieldsData;			
 			
 			foreach(self::getCustomFieldModels() as $field) {
@@ -150,6 +148,9 @@ trait CustomFieldsTrait {
 					return false;
 				}
 			}
+			
+			//After save might need this.
+			$this->customFieldsData['id'] = $this->id;
 		
 			
 			foreach(self::getCustomFieldModels() as $field) {

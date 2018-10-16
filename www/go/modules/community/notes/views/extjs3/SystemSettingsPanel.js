@@ -1,7 +1,7 @@
 /* global go, Ext */
 
 go.modules.community.notes.SystemSettingsPanel = Ext.extend(Ext.Panel, {
-	iconCls: 'ic-notes',
+	iconCls: 'ic-note',
 	autoScroll: true,
 	initComponent: function () {
 		this.title = t("Notes");		

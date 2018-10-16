@@ -1,5 +1,5 @@
 GO.tasks.SystemSettingsPanel = Ext.extend(Ext.Panel, {
-	iconCls: 'ic-done',
+	iconCls: 'ic-check',
 	autoScroll: true,
 	initComponent: function () {
 		this.title = t("Tasks");		

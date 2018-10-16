@@ -10,7 +10,7 @@ mergeWith
 Search Cache
 Export
 Disabled categories for: ticket type, project template, calendar resource groups, folder dialog
-
+modules/projects2/views/Extjs3/AddressbookOverrides.js
 
 For new:
 
@@ -32,6 +32,10 @@ Project
 Ticket
 Gebruiker
 
+
+PHP Model:
+
+use \go\core\orm\CustomFieldsTrait;
 
 Detail panel:
 
