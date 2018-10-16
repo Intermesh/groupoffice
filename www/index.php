@@ -87,7 +87,7 @@ if(empty($_REQUEST['r']) && PHP_SAPI!='cli'){
 
 } catch(Exception $e) {
   
-  if(($e instanceof PDOException || $e instanceof ConfigurationException) &&  !Request::get()->isXHR() && (empty($_REQUEST['r']) || $_REQUEST['r'] != 'maintenance/upgrade')) {
+  if(!GO()->getDebugger()->enabled && ($e instanceof PDOException || $e instanceof ConfigurationException) &&  !Request::get()->isXHR() && (empty($_REQUEST['r']) || $_REQUEST['r'] != 'maintenance/upgrade')) {
     header('Location: install/');				
     exit();
   } else
