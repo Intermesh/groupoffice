@@ -28,7 +28,6 @@ Calendar
 Bestand
 Map
 TimeEntry
-Project
 Ticket
 Gebruiker
 
