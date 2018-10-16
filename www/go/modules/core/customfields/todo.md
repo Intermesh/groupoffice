@@ -1,7 +1,6 @@
 For old framework:
 
 replace all GO.customfields.addColumns
-old dialogs send raw dom and not json with correct formatting.
 advanced search
 cascade delete
 blocks module
@@ -18,3 +17,55 @@ For new:
 Search Cache
 
 
+
+
+CF:
+
+Product
+Factuur/Offerte
+Afspraak
+Calendar
+Bestand
+Map
+TimeEntry
+Project
+Ticket
+Gebruiker
+
+
+Detail panel:
+
+this.add(go.modules.core.customfields.CustomFields.getDetailPanels("Task"));
+
+Store fields:
+
+.concat(go.modules.core.customfields.CustomFields.getFieldDefinitions("Task"))
+
+Grid columns:
+
+.concat(go.modules.core.customfields.CustomFields.getColumns("Task"))
+
+
+Dialog:
+
+propertiesPanel.add(go.modules.core.customfields.CustomFields.getFormFieldSets("Task"));
+
+
+System settings
+GO.tasks.SystemSettingsPanel = Ext.extend(Ext.Panel, {
+	iconCls: 'ic-done',
+	autoScroll: true,
+	initComponent: function () {
+		this.title = t("Tasks");		
+		
+		this.items = [new go.modules.core.customfields.SystemSettingsPanel({
+				entity: "Task"
+//				createFieldSetDialog : function() {
+//					return new go.modules.community.addressbook.CustomFieldSetDialog();
+//				}
+		})];
+		
+		
+		GO.tasks.SystemSettingsPanel.superclass.initComponent.call(this);
+	}
+});

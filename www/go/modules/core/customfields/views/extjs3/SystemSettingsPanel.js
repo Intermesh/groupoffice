@@ -50,7 +50,7 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 				entities.forEach(function (e) {
 					
 					//change for another entity. Skip it.
-					if(e.entity != me.entity) {						
+					if(e.entity !== me.entity) {						
 						return;
 					}
 
@@ -407,6 +407,11 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 				entities: [this.entity]
 			}
 		}, function (options, success, response) {
+			
+			if(!response.ids.length) {
+				this.store.loadData([], false);
+				return;
+			}
 
 			go.Stores.get("FieldSet").get(response.ids, function (fieldSets) {
 				fieldSetsLoaded = true;

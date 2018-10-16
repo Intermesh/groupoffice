@@ -1,17 +1,19 @@
-GO.tasks.SystemSettingsPanel = Ext.extend(Ext.Panel, {
-	iconCls: 'ic-done',
+/* global go, Ext */
+
+go.modules.community.notes.SystemSettingsPanel = Ext.extend(Ext.Panel, {
+	iconCls: 'ic-notes',
 	autoScroll: true,
 	initComponent: function () {
-		this.title = t("Tasks");		
+		this.title = t("Notes");		
 		
 		this.items = [new go.modules.core.customfields.SystemSettingsPanel({
-				entity: "Task"
+				entity: "Note"
 //				createFieldSetDialog : function() {
 //					return new go.modules.community.addressbook.CustomFieldSetDialog();
 //				}
 		})];
 		
 		
-		GO.tasks.SystemSettingsPanel.superclass.initComponent.call(this);
+		go.modules.community.notes.SystemSettingsPanel.superclass.initComponent.call(this);
 	}
 });

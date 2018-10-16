@@ -122,32 +122,35 @@ trait CustomFieldsTrait {
 		}
 		
 		try {
+			$this->customFieldsData['id'] = $this->id;
 			
-			$record = $this->customFieldsData;
+			$record = $this->customFieldsData;			
 			
 			foreach(self::getCustomFieldModels() as $field) {
 				if(!$field->getDataType()->beforeSave(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record)) {
 					return false;
 				}
 			}
-				
+			
 			if(!isset($record['id'])) {
-				$record['id'] = $this->id;	
-
-				if(!App::get()
-								->getDbConnection()
-								->insert($this->customFieldsTableName(), $record)->execute()){
-								return false;
+				if(!empty($record)) {			
+					$record['id'] = $this->id;	
+					if(!App::get()
+									->getDbConnection()
+									->insert($this->customFieldsTableName(), $record)->execute()){
+									return false;
+					}
 				}
 			} else
 			{
 				unset($record['id']);
-				if(!App::get()
+				if(!empty($record) && !App::get()
 								->getDbConnection()
 								->update($this->customFieldsTableName(), $record, ['id' => $this->customFieldsData['id']])->execute()) {
 					return false;
 				}
 			}
+		
 			
 			foreach(self::getCustomFieldModels() as $field) {
 				if(!$field->getDataType()->afterSave(isset($this->customFieldsData[$field->databaseName]) ? $this->customFieldsData[$field->databaseName] : null, $this->customFieldsData)) {

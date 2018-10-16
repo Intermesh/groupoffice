@@ -28,7 +28,9 @@ go.Modules.register("community", 'notes', {
 			linkDetail: function() {
 				return new go.modules.community.notes.NoteDetail();
 			}	
-		}, "NoteBook"]
+		}, "NoteBook"],
+	
+	systemSettingsPanels: ["go.modules.community.notes.SystemSettingsPanel"]
 });
 
 
