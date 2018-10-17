@@ -90,6 +90,13 @@ go.form.Chips = Ext.extend(Ext.Container, {
 			},
 			this.dataView
 		];
+		
+		//adds back removed records from static stores.
+		this.on("beforedestroy", function() {
+			this.dataView.store.each(function(r) {
+				this.dataView.store.remove(r);
+			}, this);
+		}, this);
 
 		go.form.Chips.superclass.initComponent.call(this);
 	},
@@ -150,6 +157,18 @@ go.form.Chips = Ext.extend(Ext.Container, {
 					}
 				}
 			});
+		} else
+		{
+			//clone the store.
+//			var records = [];
+//			this.comboStore.each(function(r){
+//				records.push(r.copy());
+//			});
+//			
+//			this.comboStore = new Ext.data.Store({
+//				recordType: this.comboStore.recordType
+//			});
+//			this.comboStore.add(records);
 		}
 		
 		this.comboBox = new go.form.ComboBox({
