@@ -85,6 +85,7 @@ html,body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,p,bloc
     opacity: .6;
     -moz-opacity: .6;
     filter: alpha(opacity=60);
+		pointer-events: none;
 }
 
 .x-item-disabled * {
