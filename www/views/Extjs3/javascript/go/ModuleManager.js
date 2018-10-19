@@ -13,7 +13,38 @@
 		 * 	  mainPanel: GO.addressbook.MainPanel,
 		 * 	  title: t("Address book", "addressbook"),
 		 * 	  iconCls: 'go-tab-icon-addressbook',
-		 * 	  entities: ["Contact", "Company"], //String or config object. See go.Entities class for details.
+		 * 	  entities: ["Contact", "Company"],
+		 * 	  links: [{
+		 *			/**
+		 *			 * Entity name
+		 *			 *
+		 *			entity: "Contact",
+		 *			
+		 *			/**
+		 *			 * For advanced usage only when search results need to be filtered.
+		 *			 *
+		 *			filter: "isContact",
+		 *			
+		 *			/**
+		 *			 * Opens a dialog to create a new linked item
+		 *			 * 
+		 *			 * @param {string} entity eg. "Note"
+		 *			 * @param {string|int} entityId
+		 *			 * @returns {go.form.Dialog}
+		 *			 *
+		 *			linkWindow: function(entity, entityId) {
+		 *				return new go.modules.community.addressbook.ContactDialog();
+		 *			},
+		 *			
+		 *			/**
+		 *			 * Return component for the detail view
+		 *			 * 
+		 *			 * @returns {go.panels.DetailView}
+		 *			 *
+		 *			linkDetail: function() {
+		 *				return new go.modules.community.addressbook.ContactDetail();
+		 *			}	
+		 *		}],
 		 * 	  userSettingsPanels: ["GO.addressbook.SettingsPanel"],
 		 * 	  systemSettingsPanels: ["go.modules.commmunity.addressbook.SystemSettingsPanel"],
 		 * 	  initModule: function () {	

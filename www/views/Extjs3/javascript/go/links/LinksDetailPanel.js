@@ -16,7 +16,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 			fields: ['id', 'to', 'toId', {name: 'createdAt', type: 'date'}, 'toEntity'],
 			entityStore: go.Stores.get("Link"),
 			listeners: {
-				load: function () {
+				datachanged: function () {
 					this.setVisible(this.store.getCount() > 0);
 				},
 				scope: this

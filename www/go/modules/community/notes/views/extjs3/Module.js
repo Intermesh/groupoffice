@@ -3,11 +3,12 @@
 go.Modules.register("community", 'notes', {
 	mainPanel: "go.modules.community.notes.MainPanel",
 	title: t("Notes"),
-	entities: [{
+	entities: ["Note", "NoteBook"],
+	links: [{
 			/**
 			 * Entity name
 			 */
-			name: "Note",
+			entity: "Note",
 			
 			/**
 			 * Opens a dialog to create a new linked item
@@ -28,7 +29,7 @@ go.Modules.register("community", 'notes', {
 			linkDetail: function() {
 				return new go.modules.community.notes.NoteDetail();
 			}	
-		}, "NoteBook"],
+		}],
 	
 	systemSettingsPanels: ["go.modules.community.notes.SystemSettingsPanel"]
 });

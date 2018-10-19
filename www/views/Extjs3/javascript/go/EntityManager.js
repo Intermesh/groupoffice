@@ -17,79 +17,36 @@
      * 
      * @param {string} package
      * @param {string} module
-		 * @param {string|object} config
-		 * 
-		 * You can pass just a string as config for the name of the entity. 
-		 * If you need linking then you can pass a config object:
-		 * 
-		 * 
-		 * @example
-		 * 
-		 *		 /**
-		 *			 * Entity name
-		 *			 *
-		 *			name: "Note",
-		 *			
-		 *			/**
-		 *			 * Opens a dialog to create a new linked item
-		 *			 * 
-		 *			 * @param {string} entity eg. "Note"
-		 *			 * @param {string|int} entityId
-		 *			 * @returns {go.form.Dialog}
-		 *			 *
-		 *			linkWindow: function(entity, entityId) {
-		 *				return new go.modules.community.notes.NoteForm();
-		 *			},
-		 *			
-		 *			/**
-		 *			 * Return component for the detail view
-		 *			 * 
-		 *			 * @returns {go.panels.DetailView}
-		 *			 *
-		 *			linkDetail: function() {
-		 *				return new go.modules.community.notes.NoteDetail();
-		 *			}	
+		 * @param {string} name
 		 * 
      * @returns {undefined}
      */
-    register: function (package, module, config) {
-			
-			if(!Ext.isObject(config)) {
-				config = {
-					name: config,
-					linkable: false
-				}
+    register: function (package, module, name) {	
+						
+			if(!name) {
+				throw "Invalid entity registered. 'name' property is required.";
 			}
 			
-			if(!config.name) {
-				throw "Invalid entity registered. 'name' property is required."
-			}
-			
-      if(entities[config.name]) {
+      if(entities[name]) {
         throw "Entity name is already registered by module " +entities[name]['package'] + "/" + entities[name]['name'];
       }
-			
-			if(!config.linkable && config.linkWindow) {
-				config.linkable = true;
-			}
       
-      entities[config.name.toLowerCase()] = Ext.applyIf(config, {        
+      entities[name.toLowerCase()] = {     
+				name: name,
         module: module,
         package: package,
-				title: t(config.name),
+				title: t(name),
 				getRouterPath : function (id) {
 					return this.name.toLowerCase() + "/" + id;
 				},
         goto: function (id) {
           go.Router.goto(this.getRouterPath(id));
         }			
-      });
-			
-			
+      };
 			
 			//these datatypes will be prefetched by go.data.JmapProxy.fetchEntities()
 			// Key can also be a function that is called with the record data.
-			go.data.types[config.name] = {
+			go.data.types[name] = {
 				convert: function (v, data) {
 					var key = this.type.getKey.call(this, data);
 					
@@ -101,8 +58,8 @@
 					if(Ext.isArray(key)) {
 						var e = [];
 						key.forEach(function(k) {
-							if(go.Stores.get(config.name).data[k]) {
-								e.push(go.Stores.get(config.name).data[k]);
+							if(go.Stores.get(name).data[k]) {
+								e.push(go.Stores.get(name).data[k]);
 							} else
 							{
 								console.error("Key " + k + " not found in store " + name);
@@ -112,13 +69,13 @@
 						return e;
 					} else
 					{
-						return go.Stores.get(config.name).data[key];	
+						return go.Stores.get(name).data[key];	
 					}
 
 				},
 				
 				getKey : function(data) {
-					if(typeof(this.key) == "function") {
+					if(typeof(this.key) === "function") {
 						return this.key.call(this, data);
 					} else
 					{
@@ -150,8 +107,8 @@
 				},
 				sortType: Ext.data.SortTypes.none,
 				type: "entity",
-				entity: config.name
-			}
+				entity: name.name
+			};
     },
 
 		/**
@@ -182,7 +139,7 @@
 		 * @returns {Object[]}
 		 */
     getAll: function() {
-			var e = [];
+			var e = [], entity;
       for(entity in entities) {
 				if(go.Modules.isAvailable(entities[entity].package, entities[entity].module)) {
 					e.push(entities[entity]);
@@ -220,6 +177,6 @@
       
       return stores[lcname];
     }
-  }
+  };
 
 })();
