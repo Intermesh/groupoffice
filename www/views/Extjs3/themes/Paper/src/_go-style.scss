@@ -1001,11 +1001,10 @@ button.filetype-pdf, button.filetype-doc {
 	} */
 	.table_header_links {
 		@extend %font-caption;
+		@extend .ellipsis;
 		padding: dp(8);
 		vertical-align: middle;
-		height: dp(40);		
-		overflow: hidden;
-		text-overflow: ellipsis;
+		height: dp(40);
 		border-bottom: 1px solid color($fg, 'line');
 		background-color: transparent !important;
 	}
