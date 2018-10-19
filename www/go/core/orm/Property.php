@@ -472,6 +472,9 @@ abstract class Property extends Model {
 		}
 
 		if($joinedTable->isUserTable) {
+			if(!GO()->getUserId()) {
+				throw new \Exception("Can't join user table when not authenticated");
+			}
 			$on .= " AND " . $joinedTable->getAlias() . ".userId = " . GO()->getUserId();
 		}
 
