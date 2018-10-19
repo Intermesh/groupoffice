@@ -164,26 +164,27 @@ class Criteria {
 		return $this->andWhere($condition, $operator, $value);
 	}
 	
-	protected function internalWhere($condition, $comparisonOperator, $value, $logicalOperator) {				
+	protected function internalWhere($condition, $comparisonOperator, $value, $logicalOperator) {			
+		
+		if(is_array($condition)) {
+			$sub = new Criteria();
+			foreach($condition as $colName => $value) {
+				$sub->andWhere($colName, '=', $value);				
+			}			
+			$condition = $sub;			
+		} 
+		
 		if(!isset($comparisonOperator) && (is_string($condition) || $condition instanceof Criteria)) {
 			//condition is raw string
 			$this->where[] = ["tokens", $logicalOperator, $condition];
 			return $this;
-		}		
-		
-		if(is_array($condition)) {
-			foreach($condition as $colName => $value) {
-				if(!isset($comparisonOperator)) {
-					$comparisonOperator = is_array($value) ? 'IN' : '=';
-				}
-				$this->where[] = ["column", $logicalOperator, $colName, $comparisonOperator, $value];
-			}			
-		} else {
-			if(!isset($comparisonOperator)) {
-				$comparisonOperator = is_array($value) ? 'IN' : '=';
-			}
-			$this->where[] = ["column", $logicalOperator, $condition, $comparisonOperator, $value];
 		}
+		
+		if(!isset($comparisonOperator)) {
+			$comparisonOperator = '=';
+		}
+		$this->where[] = ["column", $logicalOperator, $condition, $comparisonOperator, $value];
+		
 		
 		return $this;
 	}

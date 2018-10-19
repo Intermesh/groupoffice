@@ -513,7 +513,7 @@ class QueryBuilder {
 				throw new Exception('Null value not possible with comparator ' . $tokens[3]);
 			}
 		} else if (is_array($value)) {
-			$tokens[] = $comparisonOperator;
+			$tokens[] = $comparisonOperator == "=" ? "IN" : $comparisonOperator;
 			$tokens[] = $this->buildInValues($columnParts, $value);
 		} else if ($value instanceof \go\core\db\Query) {
 			$tokens[] = $comparisonOperator;
