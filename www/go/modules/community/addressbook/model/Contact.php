@@ -280,7 +280,7 @@ class Contact extends AclItemEntity {
 		$orgStr = "";
 		
 		if(!$this->isOrganization) {
-			$organizationIds = $this->findOrganizationIds();
+			$organizationIds = $this->getOrganizationIds();
 			
 			if(!empty($organizationIds)) {
 				$orgStr = ': '.implode(', ', Contact::find()->selectSingleValue('name')->where(['id' => $organizationIds])->all());

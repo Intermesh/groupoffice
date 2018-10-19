@@ -3,12 +3,12 @@
 namespace go\modules\core\search\controller;
 
 use go\core\jmap\Controller;
-use go\modules\core\search\model\Search as S;
+use go\modules\core\search\model;
 
-class Search extends \go\core\jmap\ReadOnlyEntityController {
+class Search extends \go\core\jmap\EntityController {
 
 	protected function entityClass() {
-		return S::class;
+		return model\Search::class;
 	}
 
 }
