@@ -2,10 +2,13 @@
 
 namespace go\modules\core\links\model;
 
+use GO\Base\Db\ActiveRecord;
 use go\core\acl\model\Acl;
 use go\core\App;
+use go\core\db\Criteria;
 use go\core\db\Query;
 use go\core\jmap\Entity;
+use go\core\orm\Entity as Entity2;
 use go\core\orm\EntityType;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
@@ -72,6 +75,49 @@ class Link extends Entity {
 		);
 	}
 	
+	
+	/**
+	 * Create a link between two entities
+	 * 
+	 * @param Entity|ActiveRecord $a
+	 * @param Entity|ActiveRecord $b
+	 * @param string $description
+	 * @return Link
+	 */
+	public static function create($a, $b, $description = null) {
+				
+		if(static::exists($a, $b)) {
+			return true;
+		}
+		
+		$link = new Link();
+		$link->fromId = $a->id;
+		$link->fromEntityTypeId = $a->getType()->getId();
+		$link->toId = $b->id;
+		$link->toEntityTypeId = $b->getType()->getId();
+		$link->description = $description;		
+		
+		if(!$link->save()) {
+			throw new \Exception("Couldn't create link: ". var_export($link->getValidationErrors(), true));
+		}
+	}
+	
+	/**
+	 * Check if a link exists.
+	 * 
+	 * @param Entity|ActiveRecord $a
+	 * @param Entity|ActiveRecord  $b
+	 * @return boolean
+	 */
+	public static function exists($a, $b) {
+		return Link::find()->where([
+				'fromEntityTypeId' => $a->getType()->getId(),
+				'fromId' => $a->id,
+				'toEntityTypeId' => $b->getType()->getId(),
+				'toId' => $b->id,
+		])->single() !== false;
+	}
+	
 	protected function internalValidate() {
 		
 		parent::internalValidate();
@@ -102,6 +148,20 @@ class Link extends Entity {
 		}
 		
 		return App::get()->getDbConnection()->insertIgnore('core_link', $reverse)->execute();
+	}
+	
+	protected function internalDelete() {		
+		if(!parent::internalDelete()) {
+			return false;
+		}
+		
+		$reverse = [];
+		$reverse['fromEntityTypeId'] = $this->toEntityTypeId;
+		$reverse['toEntityTypeId'] = $this->fromEntityTypeId;
+		$reverse['toId'] = $this->fromId;
+		$reverse['fromId'] = $this->toId;
+		
+		return GO()->getDbConnection()->delete('core_link', $reverse)->execute();
 	}
 	
 	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ) {
@@ -149,7 +209,7 @@ class Link extends Entity {
 		
 		// Entity filter consist out of name => "Contact" and an optional "filter" => "isOrganization"
 		if(!empty($filter['entities']))	{			
-			$sub = (new \go\core\db\Criteria);
+			$sub = (new Criteria);
 			
 			foreach($filter['entities'] as $e) {
 				$w = ['eTo.name' => $e['name']];
@@ -161,8 +221,7 @@ class Link extends Entity {
 			}
 			
 			$query->where($sub);		
-		}
-		
+		}		
 		
 		if(!empty($filter['q'])) {
 			$query->where('s.keywords', 'LIKE', '%' . $filter['q'] .'%');
