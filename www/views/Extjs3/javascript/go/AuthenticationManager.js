@@ -193,11 +193,12 @@
 				GO.loginDialog.close();
 			}
       
-      go.User.loadSession(result);
-			
+      go.User.loadSession(result);			
 			
 
 			Ext.Ajax.defaultHeaders['Authorization'] = 'Bearer ' + result.accessToken;
+			
+			document.cookie = "accessToken" + result.accessToken;
 
 			this.fireEvent("authenticated", this, result);
 			

@@ -23,6 +23,17 @@ class State extends AbstractState {
 		return $matches[1];
 	}
 	
+	private function getFromCookie() {
+		if(\go\core\http\Request::get()->getMethod() != "GET") {
+			return false;
+		}
+		
+		if(!isset($_COOKIE['accessToken'])) {
+			return false;
+		}
+		return $_COOKIE['accessToken'];
+	}
+	
 	/**
 	 *
 	 * @var Token 
@@ -35,22 +46,20 @@ class State extends AbstractState {
 	 * @return boolean|Token 
 	 */
 	public function getToken() {
-
 		
 		if(!isset($this->token)) {
 						
 			$tokenStr = $this->getFromHeader();
-//			if(!$tokenStr && GO()->getRequest()->getMethod() == 'GET' && isset($_COOKIE['accessToken'])) {
-//				$tokenStr = $_COOKIE['accessToken'];
-//			}
-			
+			if(!$tokenStr) {
+				$tokenStr = $this->getFromCookie();
+			}
 
 			if(!$tokenStr) {
 				return false;
 			}
 		
 			$this->token = Token::find()->where(['accessToken' => $tokenStr])->single();
-
+			
 			if(!$this->token) {
 				return false;
 			}		
