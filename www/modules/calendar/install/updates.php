@@ -313,3 +313,5 @@ $updates['201706011015'][] = 'UPDATE `cal_settings` SET `reminder` = NULL WHERE 
 $updates['201707131221'][] = 'ALTER TABLE `cal_settings` ADD `chack_conflict` BOOLEAN NOT NULL DEFAULT TRUE;';
 $updates['201708151100'][] = 'ALTER TABLE `cal_settings` CHANGE `chack_conflict` `check_conflict` BOOLEAN NOT NULL DEFAULT TRUE;';
 $updates['201809171650'][] = 'ALTER TABLE `cal_events_declined` CHANGE `uid` `uid` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;';
+
+$updates['201810191230'][] = "ALTER TABLE `cal_settings` CHANGE `reminder` `reminder` INT(11) NULL DEFAULT NULL;";
