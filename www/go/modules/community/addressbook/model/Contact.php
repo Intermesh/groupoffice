@@ -271,7 +271,7 @@ class Contact extends AclItemEntity {
 						['name' => "Contact", "filter" => "isOrganization"]
 				]
 		]);
-		return $query->all();
+		return array_map("intval", $query->all());
 	}
 
 	protected function getSearchDescription() {
