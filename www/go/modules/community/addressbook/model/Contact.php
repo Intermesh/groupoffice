@@ -274,11 +274,18 @@ class Contact extends AclItemEntity {
 	protected function getSearchDescription() {
 		$addressBook = AddressBook::findById($this->addressBookId);
 		$organizationIds = array_column($this->organizations, 'organizationContactId');	
-		return $addressBook->name.': '.implode(', ', Contact::find()->selectSingleValue('name')->where(['id' => $organizationIds])->all());
+		$orgStr = "";
+		if(!empty($organizationIds)) {
+			$orgStr = ': '.implode(', ', Contact::find()->selectSingleValue('name')->where(['id' => $organizationIds])->all());
+		}
+		return $addressBook->name . $orgStr;
 	}
 
 	protected function getSearchName() {
 		return $this->name;
 	}
 
+	protected function getSearchFilter() {
+		return $this->isOrganization ? 'isOrganization' : 'isContact';
+	}
 }

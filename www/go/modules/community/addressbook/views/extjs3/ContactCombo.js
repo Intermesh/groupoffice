@@ -1,3 +1,5 @@
+/* global Ext, go, GO */
+
 /**
  * 
  * @type |||
@@ -33,8 +35,8 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 			})
 		});
 		
-		if(this.isOrganization) {
-			this.store.baseParams.filter.isOrganization = true;
+		if(Ext.isDefined(this.isOrganization)) {
+			this.store.baseParams.filter.isOrganization = this.isOrganization;
 		}
 
 		go.modules.community.addressbook.ContactCombo.superclass.initComponent.call(this);

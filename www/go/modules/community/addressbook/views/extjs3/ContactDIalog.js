@@ -1,3 +1,5 @@
+/* global Ext, go, GO */
+
 go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 	stateId: 'addressbook-contact-dialog',
 	title: t("Contact"),
@@ -66,7 +68,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 										name: "jobTitle",
 										fieldLabel: t("Job title"),
 										anchor: "100%"
-									}, {
+									}, this.genderField = new go.form.RadioGroup({
 										xtype: 'radiogroup',
 										fieldLabel: t("Gender"),
 										name:"gender",
@@ -75,7 +77,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 											{boxLabel: t("Male"), inputValue: 'M'},
 											{boxLabel: t("Female"), inputValue: 'F'}
 										]
-									}
+									})
 								]
 							},
 							{
@@ -362,7 +364,8 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 	setOrganization: function (isOrganization) {
 		this.contactNameField.setVisible(!isOrganization);
 		this.nameField.setVisible(isOrganization);
-		this.organizationsField.setVisible(!isOrganization);
+		this.organizationsField.setVisible(!isOrganization);		
+		this.genderField.setVisible(!isOrganization);
 	},
 
 	buildFullName: function () {
