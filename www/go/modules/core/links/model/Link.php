@@ -147,9 +147,20 @@ class Link extends Entity {
 			$query->where(['eFrom.name' => $filter['entity']]);		
 		}	
 		
-		
-		if(!empty($filter['entities']))	{
-			$query->where(['eTo.name' => $filter['entities']]);		
+		// Entity filter consist out of name => "Contact" and an optional "filter" => "isOrganization"
+		if(!empty($filter['entities']))	{			
+			$sub = (new \go\core\db\Criteria);
+			
+			foreach($filter['entities'] as $e) {
+				$w = ['eTo.name' => $e['name']];
+				if(isset($e['filter'])) {
+					$w['filter'] = $e['filter'];
+				}
+				
+				$sub->orWhere($w);
+			}
+			
+			$query->where($sub);		
 		}
 		
 		

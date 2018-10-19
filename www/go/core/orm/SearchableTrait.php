@@ -34,6 +34,15 @@ trait SearchableTrait {
 		return null;
 	}
 	
+	/**
+	 * You can return an optional search filter here.
+	 * 
+	 * @return string
+	 */
+	protected function getSearchFilter() {
+		return null;
+	}
+	
 	public function saveSearch($checkExisting = true) {
 		$search = $checkExisting ? \go\modules\core\search\model\Search::find()->where('entityTypeId','=', static::getType()->getId())->andWhere('entityId', '=', $this->id)->single() : false;
 		if(!$search) {
@@ -44,7 +53,9 @@ trait SearchableTrait {
 		$search->setAclId($this->findAclId());
 		$search->name = $this->getSearchName();
 		$search->description = $this->getSearchDescription();
+		$search->filter = $this->getSearchFilter();
 		$search->modifiedAt = $this->modifiedAt;
+		
 //		$search->createdAt = $this->createdAt;
 		
 		$keywords = $this->getSearchKeywords();
@@ -70,7 +81,7 @@ trait SearchableTrait {
 			$query = $cls::find();
 			$query->join("core_search", "search", "search.entityId = ".$query->getTableAlias() . ".id AND search.entityTypeId = " . $cls::getType()->getId(), "LEFT");
 			$query->andWhere('search.id IS NULL');
-			
+		
 			foreach($query as $e) {				
 				try {
 					$e->saveSearch(false);

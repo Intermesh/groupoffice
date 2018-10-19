@@ -11,18 +11,20 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 
 		var selModel = new Ext.grid.CheckboxSelectionModel();
 
-		var data = [], allEntities = go.Entities.getAll();
+		var data = [], allEntities = go.modules.core.links.Links.getAll(), id;
 		
-		allEntities.forEach(function(e){
-			if(e.linkable) {
-				data.push([e.name, t(e.name, e.module, e.package)]);
+		allEntities.forEach(function(link){			
+			id = link.entity;
+			if(link.filter) {
+				id += "-" + link.filter;
 			}
+			data.push([id, link.entity, link.title, link.filter, link.iconCls]);
 		});
 
 		Ext.apply(config, {
 			tbar: [{xtype: "selectallcheckbox"}],
 			store: new Ext.data.ArrayStore({
-				fields: ['entity', 'name'],
+				fields: ['id', 'entity', 'name', 'filter', 'iconCls'],
 				data: data,
 				idIndex: 0
 			}),
@@ -38,7 +40,7 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 					draggable: false,
 					menuDisabled: true,
 					renderer: function (v, meta, record) {
-						return '<i class="label entity ' + record.data.entity + '"></i> ' + v;
+						return '<i class="label ' + record.data.iconCls + '"></i> ' + v;
 					}
 				}
 			]

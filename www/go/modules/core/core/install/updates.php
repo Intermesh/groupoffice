@@ -316,3 +316,5 @@ $updates['201810151544'][] = "ALTER TABLE `core_change_user`
   ADD CONSTRAINT `core_change_user_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_change_user_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;";
 
+$updates['201810191544'][] = "ALTER TABLE `core_search` ADD `filter` VARCHAR(50) NULL DEFAULT NULL AFTER `keywords`;";
+$updates['201810191544'][] = "ALTER TABLE `core_search` ADD INDEX(`filter`);";

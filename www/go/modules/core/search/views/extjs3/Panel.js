@@ -73,7 +73,11 @@ go.modules.community.search.Panel = Ext.extend(Ext.Panel, {
 		var filter = {}, entities = [];
 		
 		Ext.each(this.entityGrid.getSelectionModel().getSelections(), function (r) {
-			entities.push(r.data.entity);
+			entities.push({
+				name: r.data.entity,
+				filter: r.data.filter
+			});
+			
 		}, this);
 		if(entities.length) {
 			filter.entities = entities;

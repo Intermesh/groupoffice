@@ -102,8 +102,8 @@
 				return false;
 			}
 			
-			for (id in this.entities) {
-				if ((package === "legacy" || this.entities[id].package == package) && this.entities[id].name === name) {
+			for (var id in this.entities) {
+				if ((package === "legacy" || this.entities[id].package === package) && this.entities[id].name === name) {
 					return this.entities[id];
 				}
 			}

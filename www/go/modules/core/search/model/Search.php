@@ -45,6 +45,7 @@ class Search extends \go\core\acl\model\AclOwnerEntity {
 
 	public $name;
 	public $description;
+	public $filter;
 	protected $keywords;
 
 	public function setKeywords($keywords) {
@@ -94,8 +95,20 @@ class Search extends \go\core\acl\model\AclOwnerEntity {
 			$query->where('keywords', 'LIKE', "%" . $filter['q'] . "%");
 		}	
 
-		if (!empty($filter['entities'])) {
-			$query->where('e.name', 'IN', $filter['entities']);		
+		// Entity filter consist out of name => "Contact" and an optional "filter" => "isOrganization"
+		if(!empty($filter['entities']))	{			
+			$sub = (new \go\core\db\Criteria);
+			
+			foreach($filter['entities'] as $e) {
+				$w = ['e.name' => $e['name']];
+				if(isset($e['filter'])) {
+					$w['filter'] = $e['filter'];
+				}
+				
+				$sub->orWhere($w);
+			}
+			
+			$query->where($sub);		
 		}
 		
 		return parent::filter($query, $filter);
