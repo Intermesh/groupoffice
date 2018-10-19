@@ -242,7 +242,7 @@
 				
 				panels.push({				
 					xtype: "panel",
-					id: "cf-detail-field-set-" + fieldSet.id,
+					stateId: "cf-detail-field-set-" + fieldSet.id,
 					fieldSetId: fieldSet.id,
 					title: fieldSet.name,
 					bodyCssClass: 'icons',
