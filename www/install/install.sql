@@ -145,6 +145,7 @@ CREATE TABLE `core_search` (
   `description` varchar(255) NOT NULL DEFAULT '',
   `entityTypeId` int(11) NOT NULL,
   `keywords` varchar(255) NOT NULL DEFAULT '',
+	`filter` VARCHAR(50) NULL DEFAULT NULL,
   `modifiedAt` datetime DEFAULT NULL,
   `aclId` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -756,3 +757,4 @@ CREATE TABLE IF NOT EXISTS `core_group_default_group` (
 
 ALTER TABLE `core_group_default_group`
   ADD CONSTRAINT `core_group_default_group_ibfk_1` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;
+ALTER TABLE `core_search` ADD INDEX(`filter`);
