@@ -12,6 +12,9 @@ Export
 Disabled categories for: ticket type, project template, calendar resource groups, folder dialog
 modules/projects2/views/Extjs3/AddressbookOverrides.js
 
+calendar participants / address book
+E-mail composer address book
+
 For new:
 
 Search Cache

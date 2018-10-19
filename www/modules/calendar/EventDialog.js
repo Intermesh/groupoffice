@@ -301,8 +301,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 					
 					this.setPermissionLevel(action.result.data.permission_level);
 					
-					if(go.Modules.isAvailable("core", "customfields"))
-						GO.customfields.disableTabs(this.tabPanel, action.result);	
+				
 
 					if(action.result.group_id == 1)
 					{

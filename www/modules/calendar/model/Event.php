@@ -2319,12 +2319,7 @@ The following is the error message:
 		
 		$participant = new Participant();
 		$participant->event_id=$this->id;
-		$participant->user_id=$user->id;
-		
-		$contact = $user->createContact();
-		
-		if($contact)
-			$participant->contact_id=$contact->id;
+		$participant->user_id=$user->id;		
 		
 		$participant->name=$user->name;
 		$participant->email=$user->email;

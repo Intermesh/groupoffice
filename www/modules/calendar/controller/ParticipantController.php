@@ -151,10 +151,7 @@ class ParticipantController extends \GO\Base\Controller\AbstractModelController 
 			$participant->name=$user->name;
 			$participant->email=$user->email;
 			$participant->is_organizer=!empty($params['is_organizer']);
-			
-			$contact = $user->createContact();
-			if($contact)
-				$participant->contact_id=$contact->id;
+		
 
 			$store->addRecord($participant->toJsonArray($params['start_time'], $params['end_time']));
 		}
