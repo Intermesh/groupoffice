@@ -933,7 +933,9 @@ class Folder extends \GO\Base\Db\ActiveRecord {
     * @param type $arg2
     */
     public function notifyUsers($folder_id, $type, $arg1, $arg2 = '') {
+			if(GO::user()) {
         FolderNotification::model()->storeNotification($folder_id, $type, $arg1, $arg2);
+			}
     }
 
 
