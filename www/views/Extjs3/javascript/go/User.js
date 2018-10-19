@@ -7,6 +7,7 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 		}
 		go.Jmap.get(function(data, options, success, response){
 			if(data) {
+				document.cookie = "accessToken=" + this.accessToken;
 				this.loadSession(data);
 			}
 			cb.call(scope, data, options, success, response);
