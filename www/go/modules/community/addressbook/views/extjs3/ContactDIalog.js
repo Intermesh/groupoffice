@@ -107,24 +107,24 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 								]
 							}
 						]
-					},
+					}
 
 					//new go.modules.community.addressbook.ContactBookCombo(),
 
-					this.organizationsField = new go.form.FormGroup({
-						name: "organizations",
-						fieldLabel: t("Organizations"),
-						itemCfg: {
-							layout: "form",
-							items: [{
-									hideLabel: true,
-									xtype: "contactcombo",
-									hiddenName: "organizationContactId",
-									permissionLevel: GO.permissionLevels.write,
-									isOrganization: true
-								}]
-						}
-					})
+//					this.organizationsField = new go.form.FormGroup({
+//						name: "organizations",
+//						fieldLabel: t("Organizations"),
+//						itemCfg: {
+//							layout: "form",
+//							items: [{
+//									hideLabel: true,
+//									xtype: "contactcombo",
+//									hiddenName: "organizationContactId",
+//									permissionLevel: GO.permissionLevels.write,
+//									isOrganization: true
+//								}]
+//						}
+//					})
 
 				]
 			},
@@ -364,7 +364,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 	setOrganization: function (isOrganization) {
 		this.contactNameField.setVisible(!isOrganization);
 		this.nameField.setVisible(isOrganization);
-		this.organizationsField.setVisible(!isOrganization);		
+//		this.organizationsField.setVisible(!isOrganization);		
 		this.genderField.setVisible(!isOrganization);
 	},
 

@@ -16,7 +16,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				'permissionLevel',
 				'photoBlobId',
 				"isOrganization",
-				{name: 'organizations', type: go.data.types.Contact, key: 'organizations.organizationContactId'}
+				{name: 'organizations', type: go.data.types.Contact, key: 'organizationIds'}
 			].concat(go.modules.core.customfields.CustomFields.getFieldDefinitions("Contact")),
 			sortInfo :{field: "name", direction: "ASC"},
 			entityStore: go.Stores.get("Contact")

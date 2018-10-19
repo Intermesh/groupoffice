@@ -148,33 +148,6 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 						</a></tpl>\
 					</div>\
 					</tpl>'
-				}, {
-					collapsible: true,
-					title: t("Organizations"),
-					xtype: "panel",
-					onLoad : function(dv) {
-						this.setVisible(dv.data.organizations.length);
-						if(!dv.data.organizations.length) {							
-							return;
-						}
-						
-						if(!this.template) {
-							this.template = new Ext.XTemplate('<div class="icons">\
-					<tpl for=".">\
-						<a class="s6" href="#contact/{id}"><tpl if="xindex == 1"><i class="icon label">domain</i></tpl>\
-							<span>{name}</span>\
-							<label>{[values.jobTitle || "-"]}</label>\
-						</a>\
-					</tpl>\
-					</div>').compile();
-						}
-						
-						var ids = dv.data.organizations.column('organizationContactId');
-						
-						go.Stores.get("Contact").get(ids, function(organizations) {
-							this.update(this.template.apply(organizations));
-						}, this);
-					}
 				}
 			]
 		});

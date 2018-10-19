@@ -177,14 +177,7 @@ class Contact extends AclItemEntity {
 	 *
 	 * @var Url[]
 	 */
-	public $urls = [];
-	
-	/**
-	 *
-	 * @var ContactOrganization[]
-	 */
-	public $organizations = [];
-	
+	public $urls = [];	
 	
 	/**
 	 *
@@ -224,8 +217,6 @@ class Contact extends AclItemEntity {
 						->addRelation('phoneNumbers', PhoneNumber::class, ['id' => 'contactId'])
 						->addRelation('emailAddresses', EmailAddress::class, ['id' => 'contactId'])
 						->addRelation('addresses', Address::class, ['id' => 'contactId'])
-						->addRelation('organizations', ContactOrganization::class, ['id' => 'contactId'])
-						->addRelation('employees', ContactOrganization::class, ['id' => 'organizationContactId'])
 						->addRelation('urls', Url::class, ['id' => 'contactId'])
 						->addRelation('groups', ContactGroup::class, ['id' => 'contactId']);
 	}
@@ -270,13 +261,30 @@ class Contact extends AclItemEntity {
 		
 		return parent::internalValidate();
 	}
+	
+	public function getOrganizationIds() {
+		$query = \go\modules\core\links\model\Link::find()->selectSingleValue('toId');
+		\go\modules\core\links\model\Link::filter($query, [
+				'entityId' => $this->id,
+				'entity' => "Contact",
+				'entities' => [
+						['name' => "Contact", "filter" => "isOrganization"]
+				]
+		]);
+		return $query->all();
+	}
 
 	protected function getSearchDescription() {
 		$addressBook = AddressBook::findById($this->addressBookId);
-		$organizationIds = array_column($this->organizations, 'organizationContactId');	
+		
 		$orgStr = "";
-		if(!empty($organizationIds)) {
-			$orgStr = ': '.implode(', ', Contact::find()->selectSingleValue('name')->where(['id' => $organizationIds])->all());
+		
+		if(!$this->isOrganization) {
+			$organizationIds = $this->findOrganizationIds();
+			
+			if(!empty($organizationIds)) {
+				$orgStr = ': '.implode(', ', Contact::find()->selectSingleValue('name')->where(['id' => $organizationIds])->all());
+			}
 		}
 		return $addressBook->name . $orgStr;
 	}
