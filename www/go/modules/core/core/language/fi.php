@@ -157,7 +157,7 @@ return array (
   'Week' => 'Viikko',
   'Weeks' => 'Viikkoa',
   'Month' => 'Kuukausi',
-  'months' => 
+  'full_months' => 
   array (
     1 => 'Tammikuu',
     2 => 'Helmikuu',

@@ -171,7 +171,7 @@ return array (
   'Week' => 'Седмица',
   'Weeks' => 'Седмици',
   'Month' => 'Месец',
-  'months' => 
+  'full_months' => 
   array (
     1 => 'Януари',
     2 => 'Февруари',
