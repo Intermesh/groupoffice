@@ -437,7 +437,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	/**
 	 * Executes the query and returns the statement
 	 * 
-	 * @return Statement
+	 * @return Statement Returns false on failure.
 	 */
 	public function execute() {
 		$statement = $this->getDbConnection()->select($this);
@@ -450,7 +450,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	/**
 	 * Executes the query and returns a single object
 	 * 
-	 * @return mixed
+	 * @return mixed The queries record, column or object. Returns false when nothing is found
 	 */
 	public function single() {		
 		return $this->offset(0)
