@@ -50,6 +50,11 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 //			}, this, {single: true});
 //			return;
 //		}
+
+		if(this.initialized) {
+			cb.call(this);
+			return;
+		}
 		
 		this.stateStore = localforage.createInstance({
 			name: "groupoffice",
@@ -66,6 +71,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			me.notFound = r.notFound || [];
 			me.state = r.state;
 			me.isComplete = r.isComplete;
+			me.initialized = true;
 			
 			cb.call(me, this);
 		});
@@ -326,8 +332,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			}			
 		}
 		
-		if (unknownIds.length) {
-
+		if (unknownIds.length) {		
 			this.initState(function() {
 				
 				this.stateStore.getItems(unknownIds, function(err,entities) {

@@ -39,11 +39,12 @@ go.data.JmapProxy = Ext.extend(Ext.data.HttpProxy, {
 		var me = this;
 
 		// If a currently running read request is found, abort it
-		if (action === Ext.data.Api.actions.read && this.activeRequest[action]) {
-			//console.trace();
-			go.Jmap.abort(this.activeRequest[action]);
-		}
-		this.activeRequest[action] = me.getItemList(this.entityStore.entity.name + "/query", params, function (getItemListResponse) {
+//		if (action === Ext.data.Api.actions.read && this.activeRequest[action]) {
+//			//console.trace();
+//			go.Jmap.abort(this.activeRequest[action]);
+//		}
+//		this.activeRequest[action] = 
+		me.getItemList(this.entityStore.entity.name + "/query", params, function (getItemListResponse) {
 			me.entityStore.get(getItemListResponse.ids, function (items) {
 				var data = {
 					total: getItemListResponse.total,
