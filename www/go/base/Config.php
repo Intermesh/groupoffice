@@ -666,7 +666,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $max_file_size = '10000000';
+	var $max_file_size = 100 * 1024 * 1024;
 
 	/**
 	 * The maximum file size of an image to be allowed for thumbnailing in MBs
@@ -750,7 +750,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     int
 	 * @access  public
 	 */
-	var $max_attachment_size = 20971520;
+	var $max_attachment_size = 50 * 1024 * 1024;
 
 
 	//External programs
