@@ -111,8 +111,8 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 	buildMenu: function () {
 		var items = [
 			{
-				iconCls: 'ic-link',
-				text: t("Link", "links"),
+				iconCls: 'ic-search',
+				text: t("Existing item"),
 				handler: function () {
 					var linkWindow = new go.links.CreateLinkWindow({
 						entityId: this.getEntityId(),
@@ -122,7 +122,9 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 					linkWindow.show();
 				},
 				scope: this
-			}
+			},
+			
+			'-'
 		];
 
 		go.modules.core.links.Links.getAll().forEach(function (l) {
