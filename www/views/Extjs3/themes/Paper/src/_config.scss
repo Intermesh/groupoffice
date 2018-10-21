@@ -69,8 +69,8 @@ $vars: (
 	background-color: #727272; //color($fg, 'secondary-text');
 	
   .x-tree-node & {
-    position: absolute;
-    right: 8px;
+    //position: absolute;
+    //right: 8px;
   }
 }
 
@@ -79,7 +79,7 @@ $vars: (
 	@include var(color, c-primary);
 }
 
-%ellipsis {
+.ellipsis {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;

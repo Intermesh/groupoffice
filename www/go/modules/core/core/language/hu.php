@@ -158,7 +158,7 @@ return array (
   'Week' => 'Hét',
   'Weeks' => 'Hetek',
   'Month' => 'Hónap',
-  'months' => 
+  'full_months' => 
   array (
     1 => 'Január',
     2 => 'Február',

@@ -127,6 +127,10 @@ class Language extends Controller {
 					fputcsv($this->handle, $fields, self::DELIMITER, self::ENCLOSURE);
 				}
 			} else {
+				
+				if(!is_scalar($translated)) {
+					throw new \Exception("Invalid language in ".$package."/".$module.": ".$string);
+				}
 				$fields = [
 						$package,
 						$module,

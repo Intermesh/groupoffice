@@ -146,7 +146,7 @@ return array (
   'Week' => '周',
   'Weeks' => '周',
   'Month' => '月',
-  'months' => 
+  'full_months' => 
   array (
     1 => 'January',
     2 => 'February',

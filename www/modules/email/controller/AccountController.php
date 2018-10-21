@@ -393,15 +393,17 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 
 			$nodeId = base64_encode('f_' . $mailbox->getAccount()->id . '_' . $mailbox->name);
 
-			$text = $mailbox->getDisplayName();
-
+			
+			$text = '';
 			if(!$fetchAllWithSubscribedFlag){
 				if ($mailbox->unseen > 0) {
-					$text .= '<span class="em-folder-status" id="status_' . $nodeId . '">' . $mailbox->unseen . '</span>';
+					$width = strlen((string) $mailbox->unseen)*6+10;
+					$text .= '<div  class="em-folder-status" id="status_' . $nodeId . '">' . $mailbox->unseen . '</div>';
 				} else {
-					$text .= '<span class="em-folder-status" id="status_' . $nodeId . '"></span>';
+					$text .= '<div class="em-folder-status" id="status_' . $nodeId . '"></div>';
 				}
 			}
+			$text .= '<div class="ellipsis">'.$mailbox->getDisplayName().'</div>';
 
 //			\GO::debug($mailbox);
 

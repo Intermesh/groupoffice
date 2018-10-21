@@ -131,7 +131,7 @@ class Language {
 			$productName = GO()->getConfig()['branding']['name'];
 
 			foreach ($langData as $key => $translation) {
-			
+							
 					//branding
 					$langData[$key]  = str_replace(
 									[

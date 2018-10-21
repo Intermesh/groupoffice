@@ -1,3 +1,5 @@
+- Projects2: Fixed display and format of the external rates. Caused issues when default rates were set.
+
 15-10-2018 6.3.43
 - ATTENTION: System settings need attention for default user groups and group visibility.
 - Core: Group and user defaults are sub dialogs in system settings. 
