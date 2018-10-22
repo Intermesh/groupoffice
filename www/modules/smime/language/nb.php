@@ -10,7 +10,6 @@ return array (
   'Valid certificate but the e-mail of the certificate does not match the sender address of the e-mail.' => 'Sertfikatet er gyldig, men e-postadressen sertifikatet gjelder for er forskjellig fra denne e-postens avsenderadresse.',
   'SMIME Decryption of this message failed.' => 'Feil ved SMIME dekryptering.',
   'Please enter the password of your SMIME certificate.' => 'Oppgi passordet for ditt SMIME sertifikat.',
-  'This message was sent to you encrypted.' => 'Denne meldingen er sendt deg kryptert.',
   'This message is digitally signed. Click here to verify the signature and import the certificate.' => 'Denne meldingen er digitalt signert. Trykk her for å kontrollere signaturen og importere sertfikatet.',
   'SMIME Certificate' => 'SMIME sertifikat',
   'Sign with SMIME' => 'Signere med SMIME',
