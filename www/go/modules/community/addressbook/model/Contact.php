@@ -33,6 +33,13 @@ class Contact extends AclItemEntity {
 	 * @var int
 	 */							
 	public $addressBookId;
+	
+	/**
+	 * If this contact belongs to a user then this is set to the user ID.
+	 * 
+	 * @var int 
+	 */
+	public $goUserId;
 
 	/**
 	 * 
