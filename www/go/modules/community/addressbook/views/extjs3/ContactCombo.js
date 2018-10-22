@@ -22,7 +22,6 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 	 */
 	isOrganization : false,
 	initComponent: function () {
-		console.log(go.data.types);
 		Ext.applyIf(this, {
 			store: new go.data.Store({
 				fields: ['id', 'name', "photoBlobId", {name: 'organizations', type: go.data.types.Contact, key: 'organizationIds'}],
