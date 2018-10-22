@@ -20,6 +20,8 @@
  * @param {Object} config Configuration options
  */
 GO.form.ComboBoxMulti = function(config){
+	
+	config = config || {};
    
     // this option will interfere will expected operation
     config.typeAhead = false;
@@ -58,8 +60,18 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
 		//private
 		focused : false,
 		
-		maxHeight: 100,
+		//maxHeight: 100,
 		
+		getParams : function(q) {
+			//override to add q filter for JMAP API
+			this.store.baseParams.filter = this.store.baseParams.filter || {};		
+			this.store.baseParams.filter.q = q;
+
+			var p = GO.form.ComboBoxMulti.superclass.getParams.call(this, q);
+			//delete p[this.queryParam];
+
+			return p;
+		},
 		
 		syncHeight : function() {
 			
@@ -70,7 +82,7 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
 				changed = true;
 			}
 
-			var height = Math.min(this.el.dom.scrollHeight, this.maxHeight);
+			var height = Math.min(this.el.dom.scrollHeight, dp(120));
 			if(height > dp(32)) {
 				this.el.dom.style.height = height + "px";
 				changed = true;
