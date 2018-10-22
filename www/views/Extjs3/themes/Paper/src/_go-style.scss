@@ -617,7 +617,7 @@ button {
 	min-height: dp(40);
 	
 	.wrap {
-		padding-top: dp(3);
+		//padding-top: dp(3);
 		&.single {
 			padding-top: dp(10);
 		}
@@ -627,8 +627,8 @@ button {
 	}
 	.avatar {
 		position: absolute;
-		top: 0;
-		left: 0;
+		top: dp(4);
+		left: dp(4);
 		vertical-align: middle;
 	}
 	

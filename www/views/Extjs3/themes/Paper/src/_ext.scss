@@ -2051,7 +2051,7 @@ $menuScrollerSize : dp(4);
 	}
 	&-item {
 		min-height: dp(32);
-		padding: dp(8) dp(8) dp(8) dp(24);
+		padding: dp(8);
 	}
 	&-small {
 		@extend %font-caption;
