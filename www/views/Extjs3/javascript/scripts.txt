@@ -236,6 +236,7 @@ views/Extjs3/javascript/go/flux/Store.js
 views/Extjs3/javascript/go/Jmap.js
 
 views/Extjs3/javascript/go/data/JmapProxy.js
+views/Extjs3/javascript/go/data/EntityStoreProxy.js
 views/Extjs3/javascript/go/data/Store.js
 views/Extjs3/javascript/go/data/GroupingStore.js
 

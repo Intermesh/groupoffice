@@ -1,6 +1,6 @@
 /* global Ext, go, BaseHref */
 
-go.data.JmapProxy = Ext.extend(Ext.data.HttpProxy, {
+go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 
 	constructor: function (config) {
 		config = config || {};
@@ -9,7 +9,7 @@ go.data.JmapProxy = Ext.extend(Ext.data.HttpProxy, {
 
 		this.fields = config.fields;
 
-		go.data.JmapProxy.superclass.constructor.call(this, Ext.apply(config, {
+		go.data.EntityStoreProxy.superclass.constructor.call(this, Ext.apply(config, {
 			url: BaseHref + 'jmap.php' //we don't need this url but ext complains about it if it's missing
 		}));
 

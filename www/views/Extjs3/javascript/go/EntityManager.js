@@ -44,7 +44,7 @@
         }			
       };
 			
-			//these datatypes will be prefetched by go.data.JmapProxy.fetchEntities()
+			//these datatypes will be prefetched by go.data.EntityStoreProxy.fetchEntities()
 			// Key can also be a function that is called with the record data.
 			go.data.types[name] = {
 				convert: function (v, data) {
