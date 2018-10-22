@@ -20,7 +20,7 @@ class Search extends EntityController {
 		$q = $params['filter']['q'] ?? null;
 
 		$query = new Query();
-		$query->select('u.id, "User" as entity, u.email, "" as type, u.displayName AS name')
+		$query->select('u.id, "User" as entity, u.email, "" as type, u.displayName AS name, u.avatarId AS photoBlobId')
 						->from('core_user', 'u')
 						->join('core_group', 'g', 'u.id = g.isUserGroupFor');
 
@@ -35,7 +35,7 @@ class Search extends EntityController {
 		if (Module::isAvailableFor("community", "addressbook")) {
 
 			$contactsQuery = (new Query)
-							->select('c.id, "Contact" as entity, e.email, e.type, c.name')
+							->select('c.id, "Contact" as entity, e.email, e.type, c.name, c.photoBlobId')
 							->from("addressbook_contact", "c")
 							->join("addressbook_email_address", "e", "e.contactId=c.id");
 
