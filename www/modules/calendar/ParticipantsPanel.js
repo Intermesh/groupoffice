@@ -57,9 +57,48 @@ GO.calendar.ParticipantsPanel = function(eventDialog, config) {
 		fields : ['id', 'name', 'email', 'available','status', 'user_id', 'contact_id','is_organizer','create_permission']
 	});
 		
-	var tbar = [{
+	var tbar = [
+		{
+			xtype: "searchemailcombo",
+			listeners: {
+				select: function(c, record) {
+					if(record.data.entity == "User") {
+						GO.request({
+							url: "calendar/participant/getUsers",
+							params: {
+								users: Ext.encode([record.data.id]),
+								start_time: this.eventDialog.getStartDate().format('U'),
+								end_time: this.eventDialog.getEndDate().format('U')
+							},
+							success: function (response, options, result) {
+								this.addParticipants(result);
+							},
+							scope: this
+						});
+					} else
+					{
+						GO.request({
+							url: "calendar/participant/getContacts",
+							params: {
+								contacts: Ext.encode([record.data]),
+								start_time: this.eventDialog.getStartDate().format('U'),
+								end_time: this.eventDialog.getEndDate().format('U')
+							},
+							success: function (response, options, result) {
+								this.addParticipants(result);
+							},
+							scope: this
+						});
+					}
+					c.reset();
+				},
+				scope: this
+			}
+		},
+		"->",
+	{
 		iconCls : 'btn-add',
-		text : t("Add"),
+		tooltip : t("Add"),
 		cls : 'x-btn-text-icon',
 		handler : function() {
 			this.showAddParticipantsDialog();
@@ -67,7 +106,7 @@ GO.calendar.ParticipantsPanel = function(eventDialog, config) {
 		scope : this
 	}, {
 		iconCls : 'btn-delete',
-		text : t("Delete"),
+		tooltip : t("Delete"),
 		cls : 'x-btn-text-icon',
 		handler : function() {
 			this.gridPanel.deleteSelected();
@@ -353,7 +392,7 @@ Ext.extend(GO.calendar.ParticipantsPanel, Ext.Panel, {
 								GO.request({
 									url:"calendar/participant/getCompanies",
 									params:{
-										companies: Ext.encode(ids),
+										companies: Ext.encode(selections.map(function(r){return r.data})),
 										start_time : this.eventDialog.getStartDate().format('U'),
 										end_time : this.eventDialog.getEndDate().format('U')
 									},
@@ -364,20 +403,7 @@ Ext.extend(GO.calendar.ParticipantsPanel, Ext.Panel, {
 								});	
 								break;
 								
-							case 'mailings':
-								GO.request({
-									url:"calendar/participant/getAddresslists",
-									params:{
-										addresslists: Ext.encode(ids),
-										start_time : this.eventDialog.getStartDate().format('U'),
-										end_time : this.eventDialog.getEndDate().format('U')
-									},
-									success:function(response, options, result){
-										this.addParticipants(result);
-									},
-									scope:this
-								});	
-								break;							
+					
 								
 							case 'usergroups':
 								GO.request({

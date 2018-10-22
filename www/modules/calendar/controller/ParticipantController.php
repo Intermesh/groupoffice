@@ -88,24 +88,19 @@ class ParticipantController extends \GO\Base\Controller\AbstractModelController 
 	}
 
 	public function actionGetContacts($params){
-		$ids = json_decode($params['contacts']);
+		$contacts = json_decode($params['contacts'], true);
 
 		$store = new \GO\Base\Data\ArrayStore();
 
-		foreach($ids as $contact_id){
+		foreach($contacts as $contact){
 
-			$contact=\GO\Addressbook\Model\Contact::model()->findByPk($contact_id);
-
+			$contactEntity = \go\modules\community\addressbook\model\Contact::findById($contact['id']);
+			
 			$participant = new \GO\Calendar\Model\Participant();
-			$participant->contact_id=$contact->id;
-			if(($user = $contact->goUser)){				
-				$participant->user_id=$user->id;
-				$participant->name=$user->name;
-				$participant->email=$user->email;
-			}else{
-				$participant->name=$contact->name;
-				$participant->email=$contact->email;
-			}
+			$participant->contact_id=$contact['id'];
+			$participant->user_id=$contactEntity->goUserId;
+			$participant->name=$contact['name'];
+			$participant->email=$contact['email'];
 
 			$store->addRecord($participant->toJsonArray($params['start_time'], $params['end_time']));
 		}
