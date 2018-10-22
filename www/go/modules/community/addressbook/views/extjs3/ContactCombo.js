@@ -22,9 +22,10 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 	 */
 	isOrganization : false,
 	initComponent: function () {
+		console.log(go.data.types);
 		Ext.applyIf(this, {
 			store: new go.data.Store({
-				fields: ['id', 'name', 'organizationIds'],
+				fields: ['id', 'name', "photoBlobId", {name: 'organizations', type: go.data.types.Contact, key: 'organizationIds'}],
 				entityStore: go.Stores.get("Contact"),
 				baseParams: {
 					filter: {
@@ -38,6 +39,18 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 		if(Ext.isDefined(this.isOrganization)) {
 			this.store.baseParams.filter.isOrganization = this.isOrganization;
 		}
+		
+		this.tpl = new Ext.XTemplate(
+				'<tpl for=".">',
+				'<div class="x-combo-list-item"><div class="user">\
+					 <tpl if="!photoBlobId"><div class="avatar"></div></tpl>\\n\
+					 <tpl if="photoBlobId"><div class="avatar" style="background-image:url({[go.Jmap.downloadUrl(values.photoBlobId)]})"></div></tpl>\
+					 <div class="wrap">\
+						 <div>{name}</div><small style="color:#333;">{[values.organizations ? values.organizations.column("name").join(", ") : ""]}</small>\
+					 </div>\
+				 </div></div>',
+				'</tpl>'
+		 );
 
 		go.modules.community.addressbook.ContactCombo.superclass.initComponent.call(this);
 
