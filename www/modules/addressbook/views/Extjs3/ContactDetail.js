@@ -195,7 +195,7 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 					},
 					title: t("Remark", "addressbook"),
 					tpl: '<p class="pad">{comment}</p>'
-				}
+				}, new go.panels.CreateModifyTpl()
 //			,{
 //				tpl:'<p class="s6 pad"><label>ID</label><span>{id}</span></p> \
 //					<p class="s6"><label>'+t("Address book", "addressbook")+'</label><span>{addressbook_name}</span></p>'
