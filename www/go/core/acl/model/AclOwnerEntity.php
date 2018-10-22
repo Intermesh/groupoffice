@@ -96,11 +96,11 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * @param Query $query
 	 * @param int $level
 	 */
-	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ) {			
+	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null) {			
 		$tables = static::getMapping()->getTables();
 		$firstTable = array_shift($tables);
 		$tableAlias = $firstTable->getAlias();
-		Acl::applyToQuery($query, $tableAlias . '.aclId', $level);
+		Acl::applyToQuery($query, $tableAlias . '.aclId', $level, $userId);
 		
 		return $query;
 	}

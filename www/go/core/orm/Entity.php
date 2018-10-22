@@ -297,9 +297,10 @@ abstract class Entity extends Property {
 	 * 
 	 * @param Query $query
 	 * @param int $level
+	 * @param int $userId Leave to null for the current user
 	 * @return Query $query;
 	 */
-	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ) {
+	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null) {
 		
 		return $query;
 	}

@@ -179,8 +179,9 @@ class Acl extends \go\core\jmap\Entity {
 	 * @param Query $query
 	 * @param string $column eg. t.aclId
 	 * @param int $level The required permission level
+	 * @param int $userId If null then the current user is used.
 	 */
-	public static function applyToQuery(Query $query, $column, $level = self::LEVEL_READ) {
+	public static function applyToQuery(Query $query, $column, $level = self::LEVEL_READ, $userId = null) {
 		
 		$subQuery = (new Query)
 						->select('aclId')
@@ -188,7 +189,7 @@ class Acl extends \go\core\jmap\Entity {
 						->where('acl_g.aclId = '.$column)
 						->join('core_user_group', 'acl_u' , 'acl_u.groupId = acl_g.groupId')
 						->andWhere([
-								'acl_u.userId' => App::get()->getAuthState()->getUserId()						
+								'acl_u.userId' => isset($userId) ? $userId : App::get()->getAuthState()->getUserId()						
 										])
 						->andWhere('acl_g.level', '>=', $level);
 		

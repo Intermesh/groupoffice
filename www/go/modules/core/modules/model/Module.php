@@ -150,4 +150,20 @@ class Module extends AclOwnerEntity {
 		
 		return $available;
 	}
+	
+	/**
+	 * Check if a module is available
+	 * 
+	 * @param string $package
+	 * @param string $name
+	 * @param int $userId
+	 * @param int $level
+	 * @return boolean
+	 */
+	public static function isAvailableFor($package, $name, $userId = null, $level = \go\core\acl\model\Acl::LEVEL_READ) {
+		$query = static::find()->where(['package' => $package, 'name' => $name]);
+		static::applyAclToQuery($query, $level, $userId);
+		
+		return $query->single() !== false;
+	}
 }

@@ -164,8 +164,8 @@ class Link extends Entity {
 		return GO()->getDbConnection()->delete('core_link', $reverse)->execute();
 	}
 	
-	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ) {
-		Acl::applyToQuery($query, 's.aclId', $level);
+	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null) {
+		Acl::applyToQuery($query, 's.aclId', $level, $userId);
 		
 		return $query;
 	}

@@ -83,8 +83,8 @@ class Search extends \go\core\acl\model\AclOwnerEntity {
 	 * @param Query $query
 	 * @param int $level
 	 */
-	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ) {
-		Acl::applyToQuery($query, 's.aclId', $level);
+	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null) {
+		Acl::applyToQuery($query, 's.aclId', $level, $userId);
 		
 		return $query;
 	}
