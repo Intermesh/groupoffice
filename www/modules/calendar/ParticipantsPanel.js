@@ -59,6 +59,7 @@ GO.calendar.ParticipantsPanel = function(eventDialog, config) {
 		
 	var tbar = [
 		{
+			width: dp(300),
 			xtype: "searchemailcombo",
 			listeners: {
 				select: function(c, record) {
