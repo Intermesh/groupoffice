@@ -1,3 +1,5 @@
+- Core: added CreatedModifiedBy display panel template.
+- Contacts: added created/modified koloms to contact and company grid
 - Projects2: Fixed display and format of the external rates. Caused issues when default rates were set.
 
 15-10-2018 6.3.43
