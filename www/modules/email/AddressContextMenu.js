@@ -81,20 +81,20 @@ GO.email.AddressContextMenu = function(config)
 	this.searchButton,
 	this.searchMessagesButton];
 	
-	if(go.Modules.isAvailable("legacy", "addressbook"))
-	{
-		this.lookUpButton = new Ext.menu.Item({
-			iconCls: 'btn-addressbook',
-			text: t("Lookup in address book", "addressbook"),
-			cls: 'x-btn-text-icon',
-			handler: function(){
-				GO.addressbook.searchSender(this.address, this.personal);
-			},
-			scope: this
-		});
-	
-		config.items.push(this.lookUpButton);
-	}
+//	if(go.Modules.isAvailable("legacy", "addressbook"))
+//	{
+//		this.lookUpButton = new Ext.menu.Item({
+//			iconCls: 'btn-addressbook',
+//			text: t("Lookup in address book", "addressbook"),
+//			cls: 'x-btn-text-icon',
+//			handler: function(){
+//				GO.addressbook.searchSender(this.address, this.personal);
+//			},
+//			scope: this
+//		});
+//	
+//		config.items.push(this.lookUpButton);
+//	}
 
 					
 	GO.email.AddressContextMenu.superclass.constructor.call(this, config);	

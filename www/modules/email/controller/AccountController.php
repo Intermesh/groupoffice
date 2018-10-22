@@ -84,14 +84,14 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 		$response['data']['name'] = $alias->name;
 		$response['data']['signature'] = $alias->signature;
 
-		if (\GO::modules()->isInstalled('addressbook')) {
-			$defaultTemplateModel = \GO\Addressbook\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
-			if ($defaultTemplateModel) {
-				$response['data']['default_account_template_id'] = $defaultTemplateModel->template_id;
-			} else {
-				$response['data']['default_account_template_id'] = '';
-			}
-		}
+//		if (\GO::modules()->isInstalled('addressbook')) {
+//			$defaultTemplateModel = \GO\Addressbook\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
+//			if ($defaultTemplateModel) {
+//				$response['data']['default_account_template_id'] = $defaultTemplateModel->template_id;
+//			} else {
+//				$response['data']['default_account_template_id'] = '';
+//			}
+//		}
 
 		return parent::afterLoad($response, $model, $params);
 	}
@@ -128,22 +128,22 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 			$alias->signature = $params['signature'];
 			$alias->save();
 		}
-
-		if (\GO::modules()->addressbook && isset($params['default_account_template_id'])) {
-			if ($params['default_account_template_id']==-1 || empty($params['default_account_template_id'])) {
-				$defaultTemplateModel = \GO\Addressbook\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
-				if ($defaultTemplateModel)
-					$defaultTemplateModel->delete();
-			} elseif ($params['default_account_template_id']>0) {
-				$defaultTemplateModel = \GO\Addressbook\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
-				if (!$defaultTemplateModel) {
-					$defaultTemplateModel = new \GO\Addressbook\Model\DefaultTemplateForAccount();
-					$defaultTemplateModel->account_id = $model->id;
-				}
-				$defaultTemplateModel->template_id = $params['default_account_template_id'];
-				$defaultTemplateModel->save();
-			}
-		}
+//
+//		if (\GO::modules()->addressbook && isset($params['default_account_template_id'])) {
+//			if ($params['default_account_template_id']==-1 || empty($params['default_account_template_id'])) {
+//				$defaultTemplateModel = \GO\Addressbook\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
+//				if ($defaultTemplateModel)
+//					$defaultTemplateModel->delete();
+//			} elseif ($params['default_account_template_id']>0) {
+//				$defaultTemplateModel = \GO\Addressbook\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
+//				if (!$defaultTemplateModel) {
+//					$defaultTemplateModel = new \GO\Addressbook\Model\DefaultTemplateForAccount();
+//					$defaultTemplateModel->account_id = $model->id;
+//				}
+//				$defaultTemplateModel->template_id = $params['default_account_template_id'];
+//				$defaultTemplateModel->save();
+//			}
+//		}
 
 		return parent::afterSubmit($response, $model, $params, $modifiedAttributes);
 	}

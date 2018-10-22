@@ -447,48 +447,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	}
 
 
-	private function _findUnknownRecipients($params) {
-
-		$unknown = array();
-
-		if (GO::modules()->addressbook && !GO::config()->get_setting('email_skip_unknown_recipients', GO::user()->id)) {
-
-			$recipients = new \GO\Base\Mail\EmailRecipients($params['to']);
-			$recipients->addString($params['cc']);
-			$recipients->addString($params['bcc']);
-
-			foreach ($recipients->getAddresses() as $email => $personal) {
-				$contacts = \GO\Addressbook\Model\Contact::model()->findByEmail($email, GO\Base\Db\FindParams::newInstance()->ignoreAcl());
-				foreach($contacts as $contact){
-					
-					if($contact->checkPermissionLevel(Acl::READ_PERMISSION) || $contact->goUser && $contact->goUser->checkPermissionLevel(Acl::READ_PERMISSION)){
-						continue 2;
-					}
-				}
-
-				$company = \GO\Addressbook\Model\Company::model()->findSingleByAttribute('email', $email);
-				if ($company)
-					continue;
-				
-
-				$recipient = \GO\Base\Util\StringHelper::split_name($personal);
-				if ($recipient['first_name'] == '' && $recipient['last_name'] == '') {
-					$recipient['first_name'] = $email;
-				}
-				$recipient['email'] = $email;
-				$recipient['name'] = (string) \GO\Base\Mail\EmailRecipients::createSingle($email, $personal);
-
-				$unknown[] = $recipient;
-			}
-		}
-
-		return $unknown;
-	}
-	
-
 
 	private function _link($params, \GO\Base\Mail\Message $message, $tags=array()) {
-			$autoLinkContacts = GO::modules()->addressbook && GO::modules()->savemailas && !empty(GO::config()->email_autolink_contacts);
+		$autoLinkContacts = false;// GO::modules()->addressbook && GO::modules()->savemailas && !empty(GO::config()->email_autolink_contacts);
 		
 
 		if (!empty($params['link']) || $autoLinkContacts || count($tags)) {
@@ -742,50 +703,50 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$success = $mailer->send($message, $failedRecipients);		
 
 		// Update "last mailed" time of the emailed contacts.
-		if ($success && GO::modules()->addressbook) {
-
-			$toAddresses = $message->getTo();
-			if (empty($toAddresses))
-				$toAddresses = array();
-			$ccAddresses = $message->getCc();
-			if (empty($ccAddresses))
-				$ccAddresses = array();
-			$bccAddresses = $message->getBcc();
-			if (empty($bccAddresses))
-				$bccAddresses = array();
-			$emailAddresses = array_merge($toAddresses,$ccAddresses);
-			$emailAddresses = array_merge($emailAddresses,$bccAddresses);
-
-			foreach ($emailAddresses as $emailAddress => $fullName) {
-				$findCriteria = \GO\Base\Db\FindCriteria::newInstance()
-						->addCondition('email',$emailAddress,'=','t',false)
-						->addCondition('email2',$emailAddress,'=','t',false)
-						->addCondition('email3',$emailAddress,'=','t',false);
-
-				$findParams = \GO\Base\Db\FindParams::newInstance()
-					->criteria($findCriteria);
-				$contactsStmt = \GO\Addressbook\Model\Contact::model()->find($findParams);
-				if ($contactsStmt) {
-					foreach ($contactsStmt as $contactModel) {
-						if ($contactModel->name == $fullName) {
-
-							$contactLastMailTimeModel = \GO\Email\Model\ContactMailTime::model()->findSingleByAttributes(array(
-								'contact_id' => $contactModel->id,
-								'user_id' => GO::user()->id
-							));
-							if (!$contactLastMailTimeModel) {
-								$contactLastMailTimeModel = new \GO\Email\Model\ContactMailTime();
-								$contactLastMailTimeModel->contact_id = $contactModel->id;
-								$contactLastMailTimeModel->user_id = GO::user()->id;
-							}
-
-							$contactLastMailTimeModel->last_mail_time = time();
-							$contactLastMailTimeModel->save();
-						}
-					}
-				}
-			}
-		}
+//		if ($success && GO::modules()->addressbook) {
+//
+//			$toAddresses = $message->getTo();
+//			if (empty($toAddresses))
+//				$toAddresses = array();
+//			$ccAddresses = $message->getCc();
+//			if (empty($ccAddresses))
+//				$ccAddresses = array();
+//			$bccAddresses = $message->getBcc();
+//			if (empty($bccAddresses))
+//				$bccAddresses = array();
+//			$emailAddresses = array_merge($toAddresses,$ccAddresses);
+//			$emailAddresses = array_merge($emailAddresses,$bccAddresses);
+//
+//			foreach ($emailAddresses as $emailAddress => $fullName) {
+//				$findCriteria = \GO\Base\Db\FindCriteria::newInstance()
+//						->addCondition('email',$emailAddress,'=','t',false)
+//						->addCondition('email2',$emailAddress,'=','t',false)
+//						->addCondition('email3',$emailAddress,'=','t',false);
+//
+//				$findParams = \GO\Base\Db\FindParams::newInstance()
+//					->criteria($findCriteria);
+//				$contactsStmt = \GO\Addressbook\Model\Contact::model()->find($findParams);
+//				if ($contactsStmt) {
+//					foreach ($contactsStmt as $contactModel) {
+//						if ($contactModel->name == $fullName) {
+//
+//							$contactLastMailTimeModel = \GO\Email\Model\ContactMailTime::model()->findSingleByAttributes(array(
+//								'contact_id' => $contactModel->id,
+//								'user_id' => GO::user()->id
+//							));
+//							if (!$contactLastMailTimeModel) {
+//								$contactLastMailTimeModel = new \GO\Email\Model\ContactMailTime();
+//								$contactLastMailTimeModel->contact_id = $contactModel->id;
+//								$contactLastMailTimeModel->user_id = GO::user()->id;
+//							}
+//
+//							$contactLastMailTimeModel->last_mail_time = time();
+//							$contactLastMailTimeModel->save();
+//						}
+//					}
+//				}
+//			}
+//		}
 
 		if (!empty($params['reply_uid'])) {
 			//set \Answered flag on IMAP message
@@ -847,7 +808,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		
 		$this->_link($params, $message, $tags);
 
-		$response['unknown_recipients'] = $this->_findUnknownRecipients($params);
+//		$response['unknown_recipients'] = $this->_findUnknownRecipients($params);
 
 
 		return $response;
@@ -883,7 +844,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		
 		$unsetSubject = true;
 		
-		if (GO::modules()->addressbook && !empty($params['template_id'])) {
+		if (false && GO::modules()->addressbook && !empty($params['template_id'])) {
 			try {
 				$template = \GO\Addressbook\Model\Template::model()->findByPk($params['template_id']);
 				$templateContent = $template ? $template->content : '';
@@ -1246,7 +1207,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 			//We need to link the contact if a manual link was made of the message to the sender.
 			//Otherwise the new sent message may not be linked if an autolink tag is not present.
-			if(GO::modules()->savemailas){
+			if(false && GO::modules()->savemailas){
 
 				$from = $message->from->getAddress();
 
@@ -1553,6 +1514,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		$useQL = GO::config()->allow_quicklink;
 		$response['allow_quicklink']=$useQL?1:0;
+		
+		return $response;
 
 		$contact = \GO\Addressbook\Model\Contact::model()->findSingleByEmail($response['sender']);
 		if(!empty($contact)){
@@ -1776,7 +1739,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	 */
 	private function _handleAutoContactLinkFromSender(\GO\Email\Model\ImapMessage $imapMessage, $linkedModels) {
 
-		if(GO::modules()->addressbook && GO::modules()->savemailas && !empty(GO::config()->email_autolink_contacts)){
+		if(false && GO::modules()->addressbook && GO::modules()->savemailas && !empty(GO::config()->email_autolink_contacts)){
 
 			$from = $imapMessage->from->getAddress();
 
@@ -1812,7 +1775,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	 * @return type
 	 */
 	private function _blockImages($params, $response) {
-		if (empty($params['unblock']) && !\GO\Addressbook\Model\Contact::model()->findSingleByEmail($response['sender'])) {
+		if (empty($params['unblock'])){// && !\GO\Addressbook\Model\Contact::model()->findSingleByEmail($response['sender'])) {
 			$blockUrl = 'about:blank';
 			$response['htmlbody'] = preg_replace("/<([^a]{1})([^>]*)(https?:[^>'\"]*)/iu", "<$1$2" . $blockUrl, $response['htmlbody'], -1, $response['blocked_images']);
 		}

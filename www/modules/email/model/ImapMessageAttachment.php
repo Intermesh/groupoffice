@@ -128,8 +128,8 @@ class ImapMessageAttachment extends MessageAttachment{
 		
 		$nameArr = explode('.',$this->name);
 		
-		if (\GO::modules()->isInstalled('addressbook') && $nameArr[count($nameArr)-1]=='vcf')
-			return \GO::url('addressbook/contact/handleAttachedVCard', $params);
+//		if (\GO::modules()->isInstalled('addressbook') && $nameArr[count($nameArr)-1]=='vcf')
+//			return \GO::url('addressbook/contact/handleAttachedVCard', $params);
 		
 		return \GO::url('email/message/attachment', $params);
 	}
