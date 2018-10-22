@@ -45,6 +45,7 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 //		}
 //		this.activeRequest[action] = 
 		me.getItemList(this.entityStore.entity.name + "/query", params, function (getItemListResponse) {
+
 			me.entityStore.get(getItemListResponse.ids, function (items) {
 				var data = {
 					total: getItemListResponse.total,
@@ -155,6 +156,10 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 				if (!Ext.isArray(keys)) {
 					keys = [keys];
 				}
+				
+				if(!keys.length) {
+					return true;
+				}
 
 				if (!types[f.type.entity]) {
 					types[f.type.entity] = [];
@@ -174,7 +179,9 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 			store.get(types[entity], callback, this);
 		}
 
-		return count > 0;
+		if(!count) {
+			cb.call(scope);
+		}
 	},
 
 	getEntityFields: function () {
