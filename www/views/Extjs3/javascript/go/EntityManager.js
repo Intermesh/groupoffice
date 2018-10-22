@@ -27,17 +27,19 @@
 				throw "Invalid entity registered. 'name' property is required.";
 			}
 			
-      if(entities[name]) {
-        throw "Entity name is already registered by module " +entities[name]['package'] + "/" + entities[name]['name'];
+			var lcName = name.toLowerCase();
+			
+      if(entities[lcName]) {
+        throw "Entity name is already registered by module " +entities[lcName]['package'] + "/" + entities[lcName]['name'];
       }
       
-      entities[name.toLowerCase()] = {     
+      entities[lcName] = {     
 				name: name,
         module: module,
         package: package,
 				title: t(name),
 				getRouterPath : function (id) {
-					return this.name.toLowerCase() + "/" + id;
+					return lcName + "/" + id;
 				},
         goto: function (id) {
           go.Router.goto(this.getRouterPath(id));
@@ -107,7 +109,7 @@
 				},
 				sortType: Ext.data.SortTypes.none,
 				type: "entity",
-				entity: name.name
+				entity: name
 			};
     },
 
