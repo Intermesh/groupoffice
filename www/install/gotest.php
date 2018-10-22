@@ -494,7 +494,7 @@ function test_system(){
 			$test['name']='Cronjob';
 			$test['showSuccessFeedback'] = false;
 			$test['pass']=GO::cronIsRunning();
-			$test['feedback']="Warning: The main cron job doesn't appear to be running. Please add a cron job: \n\n* * * * * www-data php ".\GO::config()->root_path."groupofficecli.php -c=".\GO::config()->get_config_file()." -r=core/cron/run -q > /dev/null";
+			$test['feedback']="Warning: The main cron job doesn't appear to be running. Please add a cron job: \n\n* * * * * www-data php ".\GO::config()->root_path."cron.php ".\GO::config()->get_config_file();
 			$test['fatal']=false;
 			$tests[]=$test;	
 		}	
