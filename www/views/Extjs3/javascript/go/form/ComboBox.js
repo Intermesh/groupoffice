@@ -6,7 +6,7 @@
  * 
  * @type |||
  */
-go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
+go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {	
 	setValue: function (value) {
 		var me = this;
 		
@@ -35,6 +35,9 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 		this.store.baseParams.filter = this.store.baseParams.filter || {};		
 		this.store.baseParams.filter.q = q;
 		
-		return go.form.ComboBox.superclass.getParams.call(this, q);
+		var p = go.form.ComboBox.superclass.getParams.call(this, q);
+		delete p[this.queryParam];
+		
+		return p;
 	}
 });

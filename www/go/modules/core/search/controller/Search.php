@@ -16,16 +16,18 @@ class Search extends EntityController {
 	}
 
 	public function email($params) {
+		
+		$q = $params['filter']['q'] ?? null;
 
 		$query = new Query();
 		$query->select('u.id, "User" as entity, u.email, "" as type, u.displayName AS name')
 						->from('core_user', 'u')
 						->join('core_group', 'g', 'u.id = g.isUserGroupFor');
 
-		if (isset($params['q'])) {
+		if (!empty($q)) {
 			$query
-							->where('email', 'LIKE', $params['q'] . '%')
-							->orWhere('displayName', 'LIKE', $params['q'] . '%');
+							->where('email', 'LIKE', $q . '%')
+							->orWhere('displayName', 'LIKE', $q . '%');
 		}
 
 		Acl::applyToQuery($query, 'g.aclId');
@@ -39,10 +41,10 @@ class Search extends EntityController {
 
 			Contact::applyAclToQuery($contactsQuery);
 
-			if (isset($params['q'])) {
+			if (!empty($q)) {
 				$contactsQuery
-								->where('e.email', 'LIKE', $params['q'] . '%')
-								->orWhere('c.name', 'LIKE', $params['q'] . '%');
+								->where('e.email', 'LIKE', $q . '%')
+								->orWhere('c.name', 'LIKE', $q . '%');
 			}
 
 			$query->union($contactsQuery)
