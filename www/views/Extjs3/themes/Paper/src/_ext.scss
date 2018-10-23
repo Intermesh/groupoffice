@@ -1531,6 +1531,9 @@ td.grid-hd-group-cell {
 	left:0;
 	right:0;
 	position:absolute;
+	> * {
+		pointer-events: none;
+	}
 }
 .x-tree-node .x-tree-drag-append a span {
     background-color: $cHover;
