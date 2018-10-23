@@ -1474,6 +1474,7 @@ td.grid-hd-group-cell {
 	}
 	&-ec-icon, &-node-indent,&-ec-icon,&-node-icon, &-node-anchor {
 		display:table-cell;
+		vertical-align: top; //required for Firefox
 	}
 	&-node-anchor {
 		width:auto;
