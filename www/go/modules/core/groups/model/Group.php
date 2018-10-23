@@ -70,19 +70,16 @@ class Group extends AclOwnerEntity {
 		if (!empty($filter['excludeAdmins'])) {
 			$query->andWhere('id', '!=', Group::ID_ADMINS);
 		}
-
-		if (!empty($filter['q'])) {
-			$query->andWhere(
-							(new Criteria())
-											->where('name', 'LIKE', '%' . $filter['q'] . '%')
-			);
-		}
 		
 		if(!empty($filter['exclude'])) {
 			$query->andWhere('id', 'NOT IN', $filter['exclude']);
-		}
-		
+		}		
+
 		return parent::filter($query, $filter);
+	}
+	
+	protected static function searchColumns() {
+		return ['name'];
 	}
 	
 	protected function internalSave() {

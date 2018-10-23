@@ -89,7 +89,7 @@ class Search extends \go\core\acl\model\AclOwnerEntity {
 		return $query;
 	}
 	
-	public static function filter(Query $query, array $filter) {
+	public static function filter(Query $query, array $filter) {		
 		
 		if (!empty($filter['q'])) {
 			$query->where('keywords', 'LIKE', "%" . $filter['q'] . "%");
@@ -108,10 +108,14 @@ class Search extends \go\core\acl\model\AclOwnerEntity {
 				$sub->orWhere($w);
 			}
 			
-			$query->where($sub);		
+			$query->where($sub);	
 		}
 		
 		return parent::filter($query, $filter);
+	}
+	
+	protected static function searchColumns() {
+		return ['keywords'];
 	}
 	
 }

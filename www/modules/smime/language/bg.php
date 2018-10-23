@@ -1,7 +1,6 @@
 <?php
 return array (
   'Please enter the password of your SMIME certificate.' => 'Моля, въведете паролата за Вашия SMIME сертификат.',
-  'This message was sent to you encrypted.' => 'Това съобщение бе изпратено в криптиран вид към вас.',
   'This message is digitally signed. Click here to verify the signature and import the certificate.' => 'Това съобшение има цифров подпис. Кликнете тук, за да се уверите в подписа и да импортирате сертификата.',
   'SMIME Certificate' => 'SMIME сертификат',
   'Sign with SMIME' => 'Подпис със SMIME',

@@ -9,8 +9,9 @@ use go\core\App;
 use go\core\db\Criteria;
 use go\core\db\Query;
 use go\core\jmap\EntityController;
-use go\modules\core\modules\model\Module;
+use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
+use go\modules\core\modules\model\Module;
 
 /**
  * Entity model
@@ -365,17 +366,82 @@ abstract class Entity extends Property {
 	/**
 	 * Filter entities See JMAP spec for details on the $filter array.
 	 * 
-	 * @link https://jmap.io/spec-core.html#/query
+	 * By default these filters are implemented:
+	 * 
+	 * q: Will search on multiple fields defined in {@see searchColumns()}
+	 * exclude: Exclude this array of id's
+	 * 
+	 * @link https://jmap.io/spec-core.html#/query	 
 	 * @param Query $query
 	 * @param array $filter key value array eg. ["q" => "foo"]
 	 * @return Query
 	 */
-	public static function filter(Query $query, array $filter) {	
+
+	public static function filter(Query $query, array $filter) {
+
+		if(!empty($filter['q'])) {
+			static::search($query, $filter['q']);			
+		}
 		
 		if(!empty($filter['exclude'])) {
 			$query->andWhere('id', 'NOT IN', $filter['exclude']);
 		}
 		
+		return $query;
+	}
+	
+	/**
+	 * Return columns to search on with the "q" filter. {@see filter()}
+	 * 
+	 * @return string[]
+	 */
+	protected static function searchColumns() {
+		return [];
+	}
+	
+	/**
+	 * Applies a search expression to the given database query
+	 * 
+	 * @param Query $query
+	 * @param string $expression
+	 * @return Query
+	 */
+	protected static function search(Query $query, $expression) {
+		
+		$columns = static::searchColumns();
+		
+		if(!empty($columns)) {
+			//Explode string into tokens and wrap in wildcard signs to search within the texts.
+			$tokens = StringUtil::explodeSearchExpression($expression);
+			
+			$tokensWithWildcard = array_map(
+											function($t){
+												return '%' . $t . '%';
+											}, 
+											$tokens
+											);
+
+			$searchConditions = (new Criteria());
+
+			foreach($columns as $column) {
+				foreach($tokensWithWildcard as $token) {
+					$searchConditions->orWhere($column, 'LIKE', $token);
+				}
+			}		
+		}
+		
+		//Search on the "id" field if the search phrase is an int.
+		if(static::getMapping()->getColumn('id')){
+			foreach($tokens as $token) {
+				$int = (int) $token;
+				if((string) $int === $token) {
+					$searchConditions->orWhere('id', '=', $int);
+				}
+			}
+		}
+
+		$query->andWhere($searchConditions);
+
 		return $query;
 	}
 	

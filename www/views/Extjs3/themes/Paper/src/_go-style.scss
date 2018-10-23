@@ -598,6 +598,14 @@ button {
 			height: 100%;
 			width: 100%;
 	}
+
+	.go-detail-view & {
+		width:dp(40);
+		height: dp(40);
+		float:left;
+		margin-top:dp(4);
+		margin-right: dp(16);
+	}
 	
 	.x-btn {
 		border: 0;
@@ -1091,11 +1099,10 @@ button.filetype-pdf, button.filetype-doc {
 	} */
 	.table_header_links {
 		@extend %font-caption;
+		@extend .ellipsis;
 		padding: dp(8);
 		vertical-align: middle;
-		height: dp(40);		
-		overflow: hidden;
-		text-overflow: ellipsis;
+		height: dp(40);
 		border-bottom: 1px solid color($fg, 'line');
 		background-color: transparent !important;
 	}

@@ -164,7 +164,7 @@ return array (
   'Week' => 'Hafta',
   'Weeks' => 'Haftalar',
   'Month' => 'Ay',
-  'months' => 
+  'full_months' => 
   array (
     1 => 'Ocak',
     2 => 'Şubat',

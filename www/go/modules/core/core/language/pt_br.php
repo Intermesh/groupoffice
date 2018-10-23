@@ -164,7 +164,7 @@ return array (
   'Week' => 'Semana',
   'Weeks' => 'Semanas',
   'Month' => 'Mês',
-  'months' => 
+  'full_months' => 
   array (
     1 => 'Janeiro',
     2 => 'Fevereiro',

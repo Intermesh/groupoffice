@@ -1095,7 +1095,7 @@
 		}
 	}
 	&-cell-inner, &-hd-inner {
-		@extend %ellipsis;
+		@extend .ellipsis;
 		min-height: dp(40);
 		padding: dp(10) dp(4) dp(10) dp(16); // 10 top = middle of row line-height 20dp
 		.ux-row-action-cell & {
@@ -1484,13 +1484,28 @@ td.grid-hd-group-cell {
 .x-tree{
 	&-node-el {
 		padding: dp(8);
+		padding-right: 0;
+		display: table;
+		width: 100%;
+	}
+	&-node-indent {
+		width:0.01%;
+		white-space:nowrap;
+	}
+	&-ec-icon, &-node-indent,&-ec-icon,&-node-icon, &-node-anchor {
+		display:table-cell;
+	}
+	&-node-anchor {
+		width:auto;
+		overflow:hidden;
+		position:relative;
 	}
 	&-ec-icon {
 		z-index:1;
 	}
 	&-ec-icon, &-node-icon {
 		position:relative;
-		display:inline-block;
+		//display:inline-block;
 		&::before {
 			@extend %icon;
 			color: color($fg, 'icon');
@@ -1510,7 +1525,7 @@ td.grid-hd-group-cell {
 		.x-tree-elbow-end-minus,
 		.x-tree-elbow-end-plus,
 		.x-tree-elbow-line {
-			width: dp(24);
+			min-width: dp(24);
 		}
 	}
 	&-node {
@@ -1532,7 +1547,15 @@ td.grid-hd-group-cell {
 	}
 }
 .x-tree-node a span, .x-dd-drag-ghost a span {
-	padding: dp(8);
+	@extend .ellipsis;
+	padding: 0 dp(8);
+	display:block;
+	left:0;
+	right:0;
+	position:absolute;
+	> * {
+		pointer-events: none;
+	}
 }
 .x-tree-node .x-tree-drag-append a span {
     background-color: $cHover;
@@ -1540,7 +1563,6 @@ td.grid-hd-group-cell {
 }
 
 .x-tree-node .x-tree-node-inline-icon:not(.go-icon) {
-	display: inline-block;
    background-image: none;
 	 background-size: contain;
 }
