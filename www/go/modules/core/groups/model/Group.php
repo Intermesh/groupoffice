@@ -71,13 +71,11 @@ class Group extends AclEntity {
 			$query->andWhere('id', '!=', Group::ID_ADMINS);
 		}
 
-		if (!empty($filter['q'])) {
-			$query->andWhere(
-							(new Criteria())
-											->where('name', 'LIKE', '%' . $filter['q'] . '%')
-			);
-		}
 		return parent::filter($query, $filter);
+	}
+	
+	protected static function searchColumns() {
+		return ['name'];
 	}
 	
 	protected function internalSave() {
