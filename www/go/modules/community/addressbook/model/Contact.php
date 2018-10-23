@@ -240,17 +240,13 @@ class Contact extends AclItemEntity {
 		
 		if (isset($filter['isOrganization'])) {
 			$query->andWhere('isOrganization', '=', $filter['isOrganization']);
-		}
-		
-		if(isset($filter['q'])) {
-			$query->where(
-							(new Criteria())
-								->where('name', 'like', $filter['q'].'%')
-								->orWhere('lastName', 'LIKE', $filter['q']."%")
-							);
-		}
+		}	
 		
 		return parent::filter($query, $filter);
+	}
+	
+	protected static function searchColumns() {
+		return ['name'];
 	}
 	
 	protected function internalValidate() {		

@@ -28,3 +28,5 @@ go.modules.community.addressbook.AddresBookCombo = Ext.extend(go.form.ComboBox, 
 
 	}
 });
+
+Ext.reg("addressbookcombo", go.modules.community.addressbook.AddresBookCombo);
