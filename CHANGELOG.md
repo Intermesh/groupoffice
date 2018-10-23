@@ -1,3 +1,6 @@
+- Core: Improved search algorithm for new entities (Notes, Users and groups)
+- Core: Find user groups on display name
+- Core: Set cookie with far future expiry date to remember language after browser close
 - Projects2: Fixed display and format of the external rates. Caused issues when default rates were set.
 
 15-10-2018 6.3.43
