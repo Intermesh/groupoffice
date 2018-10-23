@@ -47,7 +47,7 @@ Ext.override(Ext.Component, {
  
     if(this.module) {
 			this.lastTranslationModule = go.Translate.module;
-			this.lastTranslationPackage = go.Translate.packate;
+			this.lastTranslationPackage = go.Translate.package;
       go.Translate.setModule(this.package, this.module);
     }
     
@@ -59,7 +59,9 @@ Ext.override(Ext.Component, {
 	initComponent : function() {
 		this.origInitComponent();
 		
-		go.Translate.setModule(this.lastTranslationPackage, this.lastTranslationModule);
+		if(this.lastTranslationModule) {
+			go.Translate.setModule(this.lastTranslationPackage, this.lastTranslationModule);
+		}
 	},
 	
 	//Without this override findParentByType doesn't work if you don't Ext.reg() all your components
@@ -698,7 +700,15 @@ Ext.override(Ext.form.Field, {
 		
 		
 		this.fieldInitComponent.call(this);
-	}
+	},
+	
+	setFieldLabel: function(label){
+		if(this.rendered){
+			this.label.update(label+':');
+		} else {
+			this.label = label;
+		}
+	}		
 });
 
 Ext.util.Format.dateRenderer = function(format) {
