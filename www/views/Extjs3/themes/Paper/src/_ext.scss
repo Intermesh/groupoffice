@@ -1464,6 +1464,7 @@ td.grid-hd-group-cell {
 .x-tree{
 	&-node-el {
 		padding: dp(8);
+		padding-right: 0;
 		display: table;
 		width: 100%;
 	}
@@ -1476,6 +1477,7 @@ td.grid-hd-group-cell {
 	}
 	&-node-anchor {
 		width:auto;
+		overflow:hidden;
 		position:relative;
 	}
 	&-ec-icon {
@@ -1523,6 +1525,7 @@ td.grid-hd-group-cell {
 	}
 }
 .x-tree-node a span, .x-dd-drag-ghost a span {
+	@extend .ellipsis;
 	padding: 0 dp(8);
 	display:block;
 	left:0;
