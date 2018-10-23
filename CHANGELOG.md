@@ -1,3 +1,4 @@
+- Projects: added default columns that are on screen to time registration export
 - Core: Improved search algorithm for new entities (Notes, Users and groups)
 - Core: Find user groups on display name
 - Core: Set cookie with far future expiry date to remember language after browser close
