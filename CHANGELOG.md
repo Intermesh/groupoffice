@@ -1,3 +1,6 @@
+23-10-2018 6.3.46
+- Core: Fixed tree view for Firefox
+
 23-10-2018 6.3.45
 - Debian package uses apache maintainer scripts for enabling and disabling the config.
 
