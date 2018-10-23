@@ -415,18 +415,12 @@ class User extends Entity {
 		return $this->id == App::get()->getAuthState()->getUserId() || App::get()->getAuthState()->getUser()->isAdmin();
 	}
 	
+	protected static function searchColumns() {
+		return ['username', 'displayName', 'email'];
+	}
+	
 	public static function filter(Query $query, array $filter) {
-		
-		if(!empty($filter['q'])) {
-			$query->andWhere(
-							(new Criteria())
-							->where('username', 'LIKE', $filter['q'] . '%')
-							->orWhere('displayName', 'LIKE', '%'. $filter['q'] .'%')
-							->orWhere('email', 'LIKE', $filter['q'] .'%')
-							);
-			
-		}
-		
+				
 		if(!isset($filter['showDisabled']) || $filter['showDisabled'] !== true) {
 			$query->andWhere('enabled', '=', 1);
 		}

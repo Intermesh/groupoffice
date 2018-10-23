@@ -10,7 +10,7 @@ GO.base.upload.PluploadPanel = Ext.extend(Ext.ux.PluploadPanel, {
 			url: GO.url('core/plupload'),
 			//the only required parameter
 
-			runtimes: 'html5,gears,html4',
+			runtimes: 'html5,html4',
 			// first available runtime will be used
 
 			multipart: true,

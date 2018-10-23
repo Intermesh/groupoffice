@@ -164,7 +164,7 @@ return array (
   'Week' => 'Εβδομάδα',
   'Weeks' => 'Εβδομάδες',
   'Month' => 'Μήνας',
-  'months' => 
+  'full_months' => 
   array (
     1 => 'Ιανουάριος',
     2 => 'Φεβρουάριος',

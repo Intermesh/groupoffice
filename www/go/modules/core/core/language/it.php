@@ -153,7 +153,7 @@ return array (
   'Week' => 'Settimana',
   'Weeks' => 'Settimane',
   'Month' => 'Mese',
-  'months' => 
+  'full_months' => 
   array (
     1 => 'Gennaio',
     2 => 'Febbraio',

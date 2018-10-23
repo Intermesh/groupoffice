@@ -144,7 +144,7 @@ return array (
   'Week' => 'Uge',
   'Weeks' => 'Uger',
   'Month' => 'Måned',
-  'months' => 
+  'full_months' => 
   array (
     1 => 'Januar',
     2 => 'Februar',

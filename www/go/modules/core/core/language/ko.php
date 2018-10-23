@@ -249,7 +249,7 @@ All rights reserved.<br />
   'Tomorrow' => '내일',
   'All fields' => '모든 필드',
   'results' => '결과',
-  'months' => 
+  'full_months' => 
   array (
     1 => '1월',
     2 => '2월',

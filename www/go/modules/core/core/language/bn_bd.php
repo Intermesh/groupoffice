@@ -173,7 +173,7 @@ return array (
   'Week' => 'সপ্তাহ',
   'Weeks' => 'সপ্তাহ',
   'Month' => 'মাস',
-  'months' => 
+  'full_months' => 
   array (
     1 => 'জানুয়ারি',
     2 => 'ফেব্রুয়ারি',

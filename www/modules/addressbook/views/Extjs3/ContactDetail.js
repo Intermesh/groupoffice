@@ -29,7 +29,44 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 					xtype:"box",
 					autoEl: "h3",
 					cls: "title",
-					tpl: '{initials} {title} {name} {suffix}'
+					tpl: new Ext.XTemplate('\
+							{initials} {title} {name} {suffix}\
+							{[this.subheader(values.company_id,values.company_name,values.department,values.function)]}\
+					',{
+						subheader: function (company_id,company_name,department,jobtitle) {
+	
+							// If empty, return nothing
+							if(!company_name && !department && !jobtitle){
+								return '';
+							}
+							
+							var str = '<br><small>';
+							
+							if(jobtitle){
+								str+=jobtitle;
+							}
+							
+							if(company_name){
+								if(!jobtitle){
+									str+='<a href="#company/'+company_id+'">'+company_name+'</a>';
+								} else {
+									str+=' @ <a href="#company/'+company_id+'">'+company_name+'</a>';
+								}
+							}
+							
+							if(department){
+								if(!jobtitle && !company_name){
+									str+='('+department+')';
+								} else {
+									str+=' ('+department+')';
+								}
+							}
+							
+							str+='</small>';
+							
+							return str;
+						}
+					})
 				}, 
 //				
 //				{
@@ -158,7 +195,7 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 					},
 					title: t("Remark", "addressbook"),
 					tpl: '<p class="pad">{comment}</p>'
-				}
+				}, new go.panels.CreateModifyTpl()
 //			,{
 //				tpl:'<p class="s6 pad"><label>ID</label><span>{id}</span></p> \
 //					<p class="s6"><label>'+t("Address book", "addressbook")+'</label><span>{addressbook_name}</span></p>'
