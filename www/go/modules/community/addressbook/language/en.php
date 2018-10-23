@@ -2,7 +2,8 @@
 return [
 		"emailTypes" => [
 				"work" => "Work",
-				"private" => "Private"
+				"private" => "Private",
+				"billing" => "Billing"
 		],
 		"phoneTypes" => [
 				"work" => "Work",
@@ -10,8 +11,10 @@ return [
 				"mobile" => "Mobile"
 		],
 		"addressTypes" => [
+				"visit" => "Visit",
+				"postal" => "Postal",
 				"work" => "Work",
-				"private" => "Private"				
+				"private" => "Private"
 		],
 		"dateTypes" => [
 				"birthday" => "Birthday",

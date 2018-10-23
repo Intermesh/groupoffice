@@ -8,7 +8,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 	height: 600,
 
 	initFormItems: function () {
-
+	
 		var items = [{
 				xtype: 'fieldset',
 				items: [
@@ -149,13 +149,13 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 											mode: 'local',
 											editable: false,
 											triggerAction: 'all',
-											store: new Ext.data.ArrayStore({
-												id: 0,
+											store: test = new Ext.data.ArrayStore({
+												idIndex: 0,
 												fields: [
 													'value',
 													'display'
 												],
-												data: [['work', t("emailTypes")["work"]], ['private', t("emailTypes")['private']]]
+												data: [['work', t("emailTypes")["work"]], ['private', t("emailTypes")['private']], ['other', t("Other")]]
 											}),
 											valueField: 'value',
 											displayField: 'display',
@@ -189,12 +189,12 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 											editable: false,
 											triggerAction: 'all',
 											store: new Ext.data.ArrayStore({
-												id: 0,
+												idIndex: 0,
 												fields: [
 													'value',
 													'display'
 												],
-												data: [['work', t("phoneTypes")["work"]], ['private', t("phoneTypes")['private']]]
+												data: [['work', t("phoneTypes")["work"]], ['private', t("phoneTypes")['private'], ['other', t("Other")]]]
 											}),
 											valueField: 'value',
 											displayField: 'display',
@@ -235,7 +235,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 											'value',
 											'display'
 										],
-										data: [['work', t("addressTypes")["work"]], ['private', t("addressTypes")['private']]]
+										data: [['work', t("addressTypes")["work"]], ['private', t("addressTypes")['private']], ['other', t("Other")]]
 									}),
 									valueField: 'value',
 									displayField: 'display',
@@ -293,7 +293,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 													'value',
 													'display'
 												],
-												data: [['birthday', t("dateTypes")["birthday"]], ['anniversary', t("dateTypes")['anniversary']]]
+												data: [['birthday', t("dateTypes")["birthday"]], ['anniversary', t("dateTypes")['anniversary']], ['other', t("Other")]]
 											}),
 											valueField: 'value',
 											displayField: 'display',
