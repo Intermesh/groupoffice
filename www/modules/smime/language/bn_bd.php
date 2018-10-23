@@ -1,7 +1,6 @@
 <?php
 return array (
   'Please enter the password of your SMIME certificate.' => 'দয়া করে আপনার SMIME সনদের কূটশব্দটি প্রদান করুন ।',
-  'This message was sent to you encrypted.' => 'এই বার্তাটি সংকেতায়িত করে আপনাকে পাঠানো হয়েছে।',
   'This message is digitally signed. Click here to verify the signature and import the certificate.' => 'বার্তাটি ডিজিট্যালি স্বাক্ষরকৃত। স্বাক্ষর যাচাই করতে এবং সনদপত্র আমদানি করতে এখানে ক্লিক করুন।',
   'SMIME Certificate' => 'SMIME সনদ',
   'Sign with SMIME' => 'SMIME দিয়ে স্বাক্ষর করুন',

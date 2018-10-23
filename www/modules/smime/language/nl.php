@@ -9,7 +9,7 @@ return array (
   'Valid certificate' => 'Geldig certificaat',
   'Valid certificate but the e-mail of the certificate does not match the sender address of the e-mail.' => 'Geldig certificaat maar het e-mail adres van het certificaat komt niet overeen met de afzender van deze e-mail.',
   'SMIME Decryption of this message failed.' => 'SMIME decodering van dit bericht is mislukt.',
-  'This message was sent to you encrypted.' => 'Dit bericht is versleuteld aan u verstuurd.',
+  'This message is encrypted.' => 'Dit bericht is versleuteld.',
   'This message is digitally signed. Click here to verify the signature and import the certificate.' => 'Dit bericht is digitaal ondertekend. Klik hier om de handtekening te verifiëren en het publieke certificaat te importeren.',
   'SMIME Certificate' => 'SMIME Certificaat',
   'Sign with SMIME' => 'Onderteken met SMIME',

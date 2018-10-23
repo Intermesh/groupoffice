@@ -1,7 +1,6 @@
 <?php
 return array (
   'Please enter the password of your SMIME certificate.' => 'Por favor, introduce la contraseña de tu certificado SMIME.',
-  'This message was sent to you encrypted.' => 'Este mensaje se envió cifrado.',
   'This message is digitally signed. Click here to verify the signature and import the certificate.' => 'Este mensaje está firmado digitalmente. Pincha aquí para verificar la firma e importar el certificado.',
   'SMIME Certificate' => 'Certificado SMIME',
   'Sign with SMIME' => 'Firma con SMIME',

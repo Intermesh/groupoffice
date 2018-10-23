@@ -535,7 +535,13 @@ button {
 	background-size:cover;
 	border: 1px solid white;
 	border-radius: 50%;
-	
+	.go-detail-view & {
+		width:dp(40);
+		height: dp(40);
+		float:left;
+		margin-top:dp(4);
+		margin-right: dp(16);
+	}
 	.x-btn {
 		border: 0;
 	}

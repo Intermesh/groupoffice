@@ -3,7 +3,6 @@ return array (
   'SMIME settings' => 'SMIME setttings',
   'To upload a new PKCS12 certificate you must enter your {product_name} password. The {product_name} password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.' => 'To upload a new PCSK12 certificate you must enter your {product_name} password. This password may not match the password of your PCSK12 certificate for security reasons. No password is also prohibited.',
   'Please enter the password of your SMIME certificate.' => 'Please enter the password of your SMIME certificate.',
-  'This message was sent to you encrypted.' => 'This message was sent to you encrypted.',
   'This message is digitally signed. Click here to verify the signature and import the certificate.' => 'This message is digitally signed. Click here to verify the signature and import the certificate.',
   'SMIME Certificate' => 'SMIME Certificate',
   'Sign with SMIME' => 'Sign with SMIME',
