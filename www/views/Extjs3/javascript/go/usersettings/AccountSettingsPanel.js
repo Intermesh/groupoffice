@@ -80,11 +80,37 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 						allowBlank:false,
 						hint: t('The recovery e-mail is used to send a forgotten password request to.','users','core')+'<br>'+t('Please use an email address that you can access from outside Group-Office.','users','core')
 					})
-
-				]
+					]
+				
 			}]
 		});
 
+		this.quotaFieldset = new Ext.form.FieldSet({
+			hidden: !go.User.isAdmin,
+			title: t('Disk space'),
+			items: [{
+				xtype: 'compositefield',
+				items: [{
+						xtype: 'numberfield',
+						name: 'disk_quota',
+						fieldLabel: t('Disk quota'),
+						decimals: 0
+					},{
+						xtype: 'displayfield',
+						value: 'MB'
+				}]
+			},
+			{
+				xtype: 'displayfield',
+				name: 'disk_usage',
+				fieldLabel: t('Space used'),
+				setValue: function(v) {
+					this.setRawValue(Math.round(v/1024/1024*100)/100+'MB');
+					return this;
+				}
+			}
+		]});
+	
 		this.passwordFieldset = new Ext.form.FieldSet({
 			labelWidth:dp(152),
 			title: t('Password','users','core'),
@@ -124,6 +150,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 		Ext.apply(this,{
 			items: [
 				this.userFieldset,
+				this.quotaFieldset,
 				this.passwordFieldset
 			].concat(go.CustomFields.getFormFieldSets("User"))
 		});
