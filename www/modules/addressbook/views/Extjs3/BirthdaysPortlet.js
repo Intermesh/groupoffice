@@ -44,9 +44,9 @@ GO.addressbook.BirthdaysPanel = function(config)
 			dataIndex: 'photo_url',
 			renderer: function (value, metaData, record) {
 				if(!value){
-					return '<div class="user"><div class="avatar"></div></div>';
+					return '<div class="avatar"></div>';
 				}
-				return '<img class="avatar" src="'+value+'" height="'+dp(40)+'"/>';
+				return '<img class="avatar" src="'+value+'">';
 			}
 		},{
 			id:'birthday-portlet-name-col',
