@@ -66,7 +66,7 @@ go.grid.GridTrait = {
 			
 			this.rowClicked = false;
 		}, this, {
-			buffer: 300
+			buffer: 100
 		});
 	},
 	
