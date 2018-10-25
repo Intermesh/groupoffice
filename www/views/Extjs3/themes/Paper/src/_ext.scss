@@ -1472,6 +1472,11 @@ td.grid-hd-group-cell {
 		width:0.01%;
 		white-space:nowrap;
 	}
+	&-node-icon {
+		background-size: contain;
+		background-repeat: no-repeat;
+		background-position: center center;	
+	}
 	&-ec-icon, &-node-indent,&-ec-icon,&-node-icon, &-node-anchor {
 		display:table-cell;
 		vertical-align: top; //required for Firefox
@@ -1543,7 +1548,6 @@ td.grid-hd-group-cell {
 
 .x-tree-node .x-tree-node-inline-icon:not(.go-icon) {
    background-image: none;
-	 background-size: contain;
 }
 
 .x-tree-node-loading a span{

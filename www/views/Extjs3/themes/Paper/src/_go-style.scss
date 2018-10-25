@@ -529,15 +529,17 @@ button {
 }
 
 .avatar {
+	position:relative;
 	display:inline-block;
 	padding:0;
 	background: url('img/default-avatar.svg') no-repeat center center;
 	background-size:cover;
-	border: 1px solid white;
+	
 	border-radius: 50%;
+	width:dp(40);
+	height: dp(40);
+	
 	.go-detail-view & {
-		width:dp(40);
-		height: dp(40);
 		float:left;
 		margin-top:dp(4);
 		margin-right: dp(16);
@@ -572,8 +574,6 @@ button {
 		position: absolute;
 		top: 0;
 		left: 0;
-		width: dp(40);
-		height: dp(40);
 		vertical-align: middle;
 	}
 	
@@ -596,7 +596,7 @@ button {
 	right: dp(16);
 	top: dp(8);
 	z-index:15;
-	
+	border: 1px solid white;
 	width: dp(48);
 	height: dp(48);
 	&.login-avatar{
