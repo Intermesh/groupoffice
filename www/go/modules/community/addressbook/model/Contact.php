@@ -137,6 +137,13 @@ class Contact extends AclItemEntity {
 	 * @var string
 	 */							
 	public $vatNo;
+	
+	/**
+	 * Don't charge VAT in sender country
+	 * 
+	 * @var boolean
+	 */							
+	public $vatReverseCharge = false;
 
 	/**
 	 * 

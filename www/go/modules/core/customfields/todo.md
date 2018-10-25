@@ -12,6 +12,9 @@ Export
 Disabled categories for: ticket type, project template, calendar resource groups, folder dialog
 modules/projects2/views/Extjs3/AddressbookOverrides.js
 
+Refactor e-mail and document templates
+Linking in email
+
 calendar participants / address book
 E-mail composer address book
 

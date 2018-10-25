@@ -247,6 +247,11 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 									anchor: "100%"
 								}, {
 									xtype: "textfield",
+									fieldLabel: t("Street 2"),
+									name: "street2",
+									anchor: "100%"
+								},{
+									xtype: "textfield",
 									fieldLabel: t("ZIP code"),
 									name: "zipCode",
 									anchor: "100%"

@@ -115,7 +115,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 					<tpl for="addresses">\
 						<hr class="indent">\
 						<a class="s6"><i class="icon label">location_on</i>\
-							<span>{street}<br>\
+							<span>{street} {street2}<br>\
 							<tpl if="zipCode">{zipCode}<br></tpl>\
 							<tpl if="city">{city}<br></tpl>\
 							<tpl if="state">{state}<br></tpl>\

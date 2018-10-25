@@ -69,16 +69,19 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 
 
-						var style = "", cls = "";
+						var style = "", cls = "", content = "";
 
 						if (record.data.photoBlobId) {
 							style = 'background-image: url(' + go.Jmap.downloadUrl(record.data.photoBlobId) + ')"';
 						} else
 						{
 							cls = record.data.isOrganization ? "organization" : "";
+							if(record.data.isOrganization) {
+								content = '<i class="icon">business</i>';
+							}
 						}
 
-						return '<div class="user"><div class="avatar ' + cls + '" style="' + style + '"></div>' +
+						return '<div class="user"><div class="avatar ' + cls + '" style="' + style + '">'+content+'</div>' +
 										'<div class="wrap single">' + record.get('name') + '</div>' +
 										'</div>';
 					}

@@ -67,9 +67,6 @@
 
 .avatar {
 	&.organization {
-		&::before {
-			content: "business";
-		}		
 		background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24));	
 	}
 }

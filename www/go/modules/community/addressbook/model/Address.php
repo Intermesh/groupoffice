@@ -36,6 +36,12 @@ class Address extends Property {
 	 * @var string
 	 */							
 	public $street = '';
+	
+	/**
+	 * 
+	 * @var string
+	 */							
+	public $street2 = '';
 
 	/**
 	 * 
