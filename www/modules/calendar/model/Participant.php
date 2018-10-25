@@ -385,7 +385,7 @@ class Participant extends \GO\Base\Db\ActiveRecord {
 			$stmt = $this->event->getRelatedParticipantEvents();
 
 			foreach($stmt as $event){
-				if($event->id!=$newEvent->id){
+				if(!isset($newEvent) || $event->id!=$newEvent->id){
 
 					$p = Participant::model()->findSingleByAttributes(array(
 							'event_id'=>$event->id,
