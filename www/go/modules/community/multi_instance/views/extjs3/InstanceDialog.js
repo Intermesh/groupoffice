@@ -1,7 +1,7 @@
 go.modules.community.multi_instance.InstanceDialog = Ext.extend(go.form.Dialog, {
 	stateId: 'multi_instance-InstanceDialog',
 	title: t('Instance'),
-	entityStore: go.Stores.get("Instance"),
+	entityStore: "Instance",
 	autoHeight: true,
 	initFormItems: function () {
 		return [{

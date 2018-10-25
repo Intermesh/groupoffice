@@ -15,7 +15,7 @@ go.modules.community.notes.NoteBookCombo = Ext.extend(go.form.ComboBox, {
 		Ext.applyIf(this, {
 			store: new go.data.Store({
 				fields: ['id', 'name'],
-				entityStore: go.Stores.get("NoteBook"),
+				entityStore: "NoteBook",
 				baseParams: {
 					filter: {
 							permissionLevel: GO.permissionLevels.write

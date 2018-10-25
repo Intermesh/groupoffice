@@ -267,7 +267,7 @@ class Instance extends Entity {
 		try {
 			$record = (new \go\core\db\Query())
 						->setDbConnection($this->getInstanceDbConnection())
-						->select('count(*) as userCount, max(lastLogin) as lastLogin, count(loginCount) as loginCount')
+						->select('count(*) as userCount, max(lastLogin) as lastLogin, sum(loginCount) as loginCount')
 						->from('core_user')
 						->where('enabled', '=', true)
 						->single();	

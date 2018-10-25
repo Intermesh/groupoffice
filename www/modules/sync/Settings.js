@@ -107,7 +107,7 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 				name: "syncNoteBooks",
 				idField: "noteBookId",
 				displayField: "name",
-				entityStore: go.Stores.get("NoteBook"),
+				entityStore: "NoteBook",
 				title: t("Notebooks", "notes"),
 				extraColumns: [defaultCol],
 				extraFields: [{name: "isDefault", type: "boolean"}],

@@ -33,6 +33,7 @@ go.data.GroupingStore = Ext.extend(Ext.data.GroupingStore, {
 		
 	},
 	setup : go.data.Store.prototype.setup,	
+	initEntityStore : go.data.Store.prototype.initEntityStore,	
 	onChanges : go.data.Store.prototype.onChanges,	
 	updateRecord : go.data.Store.prototype.updateRecord,
 	destroy : go.data.Store.prototype.destroy

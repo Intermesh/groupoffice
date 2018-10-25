@@ -29,7 +29,7 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 				'enabled',
 				'loginCount'
 			],
-			entityStore: go.Stores.get("Instance")
+			entityStore: "Instance"
 		});
 
 		Ext.apply(this, {		
