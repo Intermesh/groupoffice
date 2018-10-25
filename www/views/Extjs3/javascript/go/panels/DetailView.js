@@ -27,8 +27,6 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 
 	initComponent: function () {
 		go.panels.DetailView.superclass.initComponent.call(this, arguments);		
-
-		this.entityStore.on('changes', this.onChanges, this);
 		
 		this.on('destroy', function() {
 			this.entityStore.un('changes', this.onChanges, this);
@@ -36,6 +34,7 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 		
 		this.on('render', function() {
 			this.reset();
+			this.entityStore.on('changes', this.onChanges, this);
 		}, this);
 	},
 	
