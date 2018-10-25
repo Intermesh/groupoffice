@@ -53,8 +53,7 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	},
 	
 	loadData : function(o, append){
-		this.loading = true;
-		
+		this.loading = true;		
 		
 		var ret = go.data.Store.superclass.loadData.call(this, o, append);				
 		
@@ -99,30 +98,39 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 			}, 0);
 		}, this)
 		
-		if(this.entityStore) {
-//			this.on('update', this.onUpdate, this);		
-			this.entityStore.on('changes', this.onChanges, this);
-			this.on('destroy', function() {
-			this.entityStore.un('changes', this.onChanges, this);
-		}, this);
-		
+		if(this.entityStore) {			
+			this.initEntityStore();
 		}
 	},
 	
-	onChanges : function(entityStore, added, changed, destroyed) {		
+	initEntityStore : function() {
+		if(Ext.isString(this.entityStore)) {
+			this.entityStore = go.Stores.get(this.entityStore);
+			if(!this.entityStore) {
+				throw "Invalid 'entityStore' property given to component"; 
+			}
+		}
+		this.entityStore.on('changes',this.onChanges, this);		
+
+		this.on('beforedestroy', function() {
+			this.entityStore.un('changes', this.onChanges, this);
+		}, this);
+	},
+	
+	onChanges : function(entityStore, added, changed, destroyed) {
 		
 		if(!this.loaded || this.loading) {
 			return;
 		}		
 		
-		for(var i = 0, l = added.length; i < l; i++) {
+		for(var i in added) {
 			if(!this.updateRecord(added[i]) ){
 				this.reload();
 				return;
 			}
 		}
-		
-		for(var i = 0, l = changed.length; i < l; i++) {
+				
+		for(var i in changed) {
 			if(!this.updateRecord(changed[i]) ){
 				this.reload();
 				return;
@@ -138,17 +146,15 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 
 	},
 	
-	updateRecord : function(id) {
+	updateRecord : function(entity) {
 		
 		if(!this.data) {
 			return false;
 		}
-		var record = this.getById(id);
+		var record = this.getById(entity.id);
 		if(!record) {
 			return false;
 		}
-		
-		var entity = this.entityStore.get([id])[0];
 		
 //		if(record.isModified()) {
 //			alert("Someone modified your record!");

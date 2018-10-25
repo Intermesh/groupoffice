@@ -1,6 +1,6 @@
 go.modules.community.apikeys.KeyDialog = Ext.extend(go.form.Dialog, {
 	title: t('API Key'),
-	entityStore: go.Stores.get("Key"),
+	entityStore: "Key",
 	autoHeight: true,
 	initFormItems: function () {
 		return [{

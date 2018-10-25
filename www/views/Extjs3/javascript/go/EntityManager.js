@@ -148,6 +148,6 @@
       
       return stores[name];
     }
-  }
+  };
 
 })();

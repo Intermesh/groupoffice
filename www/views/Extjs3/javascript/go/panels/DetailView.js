@@ -28,23 +28,17 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 	initComponent: function () {
 		go.panels.DetailView.superclass.initComponent.call(this, arguments);		
 		
-		this.on('destroy', function() {
-			this.entityStore.un('changes', this.onChanges, this);
-		}, this);
-		
-		this.on('render', function() {
-			this.reset();
-			this.entityStore.on('changes', this.onChanges, this);
+		this.on('afterrender', function() {
+			this.reset();			
 		}, this);
 	},
 	
 	onChanges : function(entityStore, added, changed, destroyed) {
+		
+		var entity = added[this.currentId] || changed[this.currentId] || false;
 			
-		if (changed.concat(added).indexOf(this.currentId) > -1) {
-			var entities = this.entityStore.get([this.currentId]);
-			if(entities) {
-				this.internalLoad(entities[0]);
-			}
+		if(entity) {
+			this.internalLoad(entity);			
 		}
 
 		if (destroyed.indexOf(this.currentId) > -1) {

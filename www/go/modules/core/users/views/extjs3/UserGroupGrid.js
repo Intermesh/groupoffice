@@ -51,7 +51,7 @@ go.modules.core.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 				}
 //				{name: 'user', type: go.data.types.User, key: 'isUserGroupFor'},
 			],
-			entityStore: go.Stores.get("Group")
+			entityStore: "Group"
 		});
 		
 		this.store.on('load', this.onStoreLoad, this);

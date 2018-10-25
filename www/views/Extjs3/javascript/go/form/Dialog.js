@@ -48,14 +48,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 				scope: this
 			}];
 
-		go.form.Dialog.superclass.initComponent.call(this);
+		go.form.Dialog.superclass.initComponent.call(this);		
 		
-		this.entityStore.on('changes',this.onChanges, this);
-		
-
-		this.on('destroy', function() {
-			this.entityStore.un('changes', this.onChanges, this);
-		}, this);
 
 		if (this.formValues) {
 			this.formPanel.form.setValues(this.formValues);
@@ -80,7 +74,9 @@ go.form.Dialog = Ext.extend(go.Window, {
 	
 	onChanges : function(entityStore, added, changed, destroyed) {
 		
-		if(changed.concat(added).indexOf(this.currentId) !== -1) {
+		var entity = added[this.currentId] || changed[this.currentId] || false;
+		
+		if(entity) {
 			this.actionComplete();
 			this.onLoad();
 		}		
@@ -89,7 +85,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 	delete: function () {
 		
 		Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
-			if (btn != "yes") {
+			if (btn !== "yes") {
 				return;
 			}
 			

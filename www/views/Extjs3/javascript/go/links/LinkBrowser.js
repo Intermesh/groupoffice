@@ -31,7 +31,7 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 			autoDestroy: true,
 			remoteGroup: true,
 			fields: ['id', 'toId', 'toEntity', 'to', 'description', {name: 'modifiedAt', type: 'date'}],
-			entityStore: go.Stores.get("Link"),
+			entityStore: "Link",
 			sortInfo: {field: 'toEntity', direction: 'DESC'},
 			autoLoad: true,
 			groupOnSort: true,

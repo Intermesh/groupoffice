@@ -133,7 +133,7 @@ go.modules.core.users.UserDefaultsWindow = Ext.extend(go.Window, {
 							name: "defaultGroups",
 							idField: "groupId",
 							displayField: "name",
-							entityStore: go.Stores.get("Group"),
+							entityStore: "Group",
 
 							fieldLabel: t("Groups"),
 							storeBaseParams: {

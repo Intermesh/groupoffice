@@ -40,46 +40,86 @@ function dp(size) {
 })();
 
 
-//hack to set translate to module from component in getId because getId() is always called before initComponent in the constructor and there's no way to override the constructor
-Ext.override(Ext.Component, {  
-  componentgetID : Ext.Component.prototype.getId,
-  getId : function(){
- 
-    if(this.module) {
-			this.lastTranslationModule = go.Translate.module;
-			this.lastTranslationPackage = go.Translate.package;
-      go.Translate.setModule(this.package, this.module);
-    }
-    
-    return this.componentgetID();
-  },
+(function() {
 	
-	origInitComponent : Ext.Component.prototype.initComponent,
+	var componentGetID = Ext.Component.prototype.getId,
+		componentInitComponent = Ext.Component.prototype.initComponent;
 	
-	initComponent : function() {
-		this.origInitComponent();
+	Ext.override(Ext.Component, {  
 		
-		if(this.lastTranslationModule) {
-			go.Translate.setModule(this.lastTranslationPackage, this.lastTranslationModule);
-		}
-	},
-	
-	//Without this override findParentByType doesn't work if you don't Ext.reg() all your components
-	 getXTypes : function(){
-        var tc = this.constructor;
-        if(!tc.xtypes){
-            var c = [], sc = this;
-            while(sc){
-                c.unshift(sc.constructor.xtype);
-                sc = sc.constructor.superclass;
-            }
-            tc.xtypeChain = c;
-            tc.xtypes = c.join('/');
-        }
-        return tc.xtypes;
-    }
-});
 
+		//hack to set translate to module from component in getId because getId() is 
+		//always called before initComponent in the constructor and there's no way 
+		//to override the constructor
+		getId : function(){
+
+			if(this.module) {
+				this.lastTranslationModule = go.Translate.module;
+				this.lastTranslationPackage = go.Translate.package;
+				go.Translate.setModule(this.package, this.module);
+			}
+
+			return componentGetID.call(this);
+		},		
+
+		initComponent : function() {
+			componentInitComponent.call(this);
+
+			if(this.lastTranslationModule) {
+				go.Translate.setModule(this.lastTranslationPackage, this.lastTranslationModule);
+			}
+
+			if(this.entityStore) {
+				this.initEntityStore();
+			}
+		},
+		
+		initEntityStore : function() {
+			if(Ext.isString(this.entityStore)) {
+				this.entityStore = go.Stores.get(this.entityStore);
+				if(!this.entityStore) {
+					throw "Invalid 'entityStore' property given to component"; 
+				}
+			}
+			
+			this.on("afterrender", function() {
+				this.entityStore.on('changes',this.onChanges, this);		
+			});
+
+			this.on('beforedestroy', function() {
+				this.entityStore.un('changes', this.onChanges, this);
+			}, this);
+		},
+
+		/**
+		 * Fires when items are added, changed or destroyed in the entitystore.
+		 * 
+		 * @param {go.data.EntityStore} entityStore
+		 * @param {Object[]} added
+		 * @param {Object[]} changed
+		 * @param {int[]} destroyed
+		 * @returns {void}
+		 */
+		onChanges : function(entityStore, added, changed, destroyed) {		
+
+		},
+
+		//Without this override findParentByType doesn't work if you don't Ext.reg() all your components
+		 getXTypes : function(){
+					var tc = this.constructor;
+					if(!tc.xtypes){
+							var c = [], sc = this;
+							while(sc){
+									c.unshift(sc.constructor.xtype);
+									sc = sc.constructor.superclass;
+							}
+							tc.xtypeChain = c;
+							tc.xtypes = c.join('/');
+					}
+					return tc.xtypes;
+			}
+	});
+})();
 
 Ext.override(Ext.form.TextArea,{
 	insertAtCursor: function(v) {

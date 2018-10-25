@@ -33,7 +33,7 @@ go.modules.core.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 				'members',
 				'memberCount'
 			],
-			entityStore: go.Stores.get("Group")
+			entityStore: "Group"
 		});
 
 		this.store.on('load', this.onStoreLoad, this);

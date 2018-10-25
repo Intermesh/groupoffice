@@ -3,7 +3,7 @@ go.data.JmapProxy = Ext.extend(Ext.data.HttpProxy, {
 	constructor: function (config) {
 		config = config || {};
 		
-		this.entityStore = config.entityStore;
+		this.entityStore = Ext.isString(config.entityStore) ? go.Stores.get(config.entityStore) : config.entityStore;
 		
 		
 		go.data.JmapProxy.superclass.constructor.call(this, Ext.apply(config, {
