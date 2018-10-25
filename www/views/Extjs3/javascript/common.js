@@ -56,7 +56,9 @@ GO.util.stringToFunction = function(str) {
  * 2. An override on Ext.extend() will set "module" and "package" on each 
  *    components. A second override on Ext.Component will set 
  *    go.Translate.module and package on getId() (getId() was the only way to 
- *    make it happen always and on time)
+ *    make it happen always and on time) This override was made on ext-all-debug.js
+ *    because it had to do something before and after initcomponent and 
+ *    overriding constructors is not possible.
  * 
  * @param {string} str
  * @param {string} module

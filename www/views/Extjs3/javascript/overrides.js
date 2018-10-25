@@ -42,32 +42,13 @@ function dp(size) {
 
 (function() {
 	
-	var componentGetID = Ext.Component.prototype.getId,
-		componentInitComponent = Ext.Component.prototype.initComponent;
-	
+	var componentInitComponent = Ext.Component.prototype.initComponent;
+
 	Ext.override(Ext.Component, {  
-		
-
-		//hack to set translate to module from component in getId because getId() is 
-		//always called before initComponent in the constructor and there's no way 
-		//to override the constructor
-		getId : function(){
-
-			if(this.module) {
-				this.lastTranslationModule = go.Translate.module;
-				this.lastTranslationPackage = go.Translate.package;
-				go.Translate.setModule(this.package, this.module);
-			}
-
-			return componentGetID.call(this);
-		},		
+			
 
 		initComponent : function() {
-			componentInitComponent.call(this);
-
-			if(this.lastTranslationModule) {
-				go.Translate.setModule(this.lastTranslationPackage, this.lastTranslationModule);
-			}
+			componentInitComponent.call(this);			
 
 			if(this.entityStore) {
 				this.initEntityStore();
