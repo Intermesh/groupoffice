@@ -1534,6 +1534,7 @@ td.grid-hd-group-cell {
 	@extend .ellipsis;
 	padding: 0 dp(8);
 	display:block;
+	top:0;
 	left:0;
 	right:0;
 	position:absolute;
