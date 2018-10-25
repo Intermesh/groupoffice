@@ -588,6 +588,16 @@ button {
 	border-radius: 50%;
 	width:dp(40);
 	height: dp(40);
+	font-size: dp(28);	
+	text-align: center;	
+	
+	.icon {
+		color: white;
+		line-height: dp(40);
+		font-size: inherit;			
+		height: 100%;
+		width: 100%;
+	}
 
 	.go-detail-view & {
 		float:left;
