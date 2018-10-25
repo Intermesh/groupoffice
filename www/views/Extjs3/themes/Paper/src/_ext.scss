@@ -1464,6 +1464,7 @@ td.grid-hd-group-cell {
 .x-tree{
 	&-node-el {
 		padding: dp(8);
+		padding-right: 0;
 		display: table;
 		width: 100%;
 	}
@@ -1471,11 +1472,19 @@ td.grid-hd-group-cell {
 		width:0.01%;
 		white-space:nowrap;
 	}
+	&-node-icon {
+		background-size: contain;
+		background-repeat: no-repeat;
+		background-position: center center;	
+	}
 	&-ec-icon, &-node-indent,&-ec-icon,&-node-icon, &-node-anchor {
 		display:table-cell;
+		vertical-align: top; //required for Firefox
 	}
 	&-node-anchor {
 		width:auto;
+		overflow:hidden;
+		position:relative;
 	}
 	&-ec-icon {
 		z-index:1;
@@ -1522,8 +1531,15 @@ td.grid-hd-group-cell {
 	}
 }
 .x-tree-node a span, .x-dd-drag-ghost a span {
+	@extend .ellipsis;
 	padding: 0 dp(8);
 	display:block;
+	left:0;
+	right:0;
+	position:absolute;
+	> * {
+		pointer-events: none;
+	}
 }
 .x-tree-node .x-tree-drag-append a span {
     background-color: $cHover;
@@ -1531,9 +1547,7 @@ td.grid-hd-group-cell {
 }
 
 .x-tree-node .x-tree-node-inline-icon:not(.go-icon) {
-	display: inline-block;
    background-image: none;
-	 background-size: contain;
 }
 
 .x-tree-node-loading a span{

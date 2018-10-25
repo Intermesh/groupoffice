@@ -88,17 +88,17 @@ class Search extends \go\core\acl\model\AclEntity {
 		return $query;
 	}
 	
-	public static function filter(Query $query, array $filter) {
+	public static function filter(Query $query, array $filter) {		
 		
-		if (!empty($filter['q'])) {
-			$query->where('keywords', 'LIKE', "%" . $filter['q'] . "%");
-		}	
-
 		if (!empty($filter['entities'])) {
 			$query->where('e.name', 'IN', $filter['entities']);		
 		}
 		
 		return parent::filter($query, $filter);
+	}
+	
+	protected static function searchColumns() {
+		return ['keywords'];
 	}
 	
 }

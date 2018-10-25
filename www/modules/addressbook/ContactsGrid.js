@@ -9,7 +9,7 @@ GO.addressbook.ContactsGrid = function(config){
 	config.border=false;
 	
 	var fields ={
-		fields : ['id','uuid','name','company_name','first_name','middle_name','last_name','title','initials','sex','birthday','age','email','email2','email3','home_phone','work_phone','work_fax','cellular','cellular2','fax','address','address_no','zip','city','state','country','function','department','salutation','ab_name','ctime','mtime','action_date','suffix','color'],
+		fields : ['id','uuid','name','company_name','first_name','middle_name','last_name','title','initials','sex','birthday','age','email','email2','email3','home_phone','work_phone','work_fax','cellular','cellular2','fax','address','address_no','zip','city','state','country','function','department','salutation','ab_name','musername','username' ,'ctime','mtime','action_date','suffix','color'],
 		columns : [
 		{
 			header: t("ID", "addressbook"),
@@ -195,6 +195,15 @@ GO.addressbook.ContactsGrid = function(config){
 			dataIndex: 'ab_name',
 			hidden:true,
 			sortable:true
+		},{
+			header: t("Created by"),
+			dataIndex: 'username',
+			hidden:true
+		},
+		{
+			header: t("Modified by"),
+			dataIndex: 'musername',
+			hidden:true
 		},
 		{
 			xtype: "datecolumn",

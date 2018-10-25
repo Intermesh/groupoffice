@@ -49,7 +49,7 @@ class Language {
 	private function getBrowserLanguage(){
 		
 		if(isset($_GET['SET_LANGUAGE']) && $this->hasLanguage($_GET['SET_LANGUAGE'])) {
-			setcookie('GO_LANGUAGE', $_GET['SET_LANGUAGE']);
+			setcookie('GO_LANGUAGE', $_GET['SET_LANGUAGE'], time() + (10 * 365 * 24 * 60 * 60));
 			return $_GET['SET_LANGUAGE'];
 		}
 		

@@ -10,7 +10,7 @@ GO.addressbook.CompaniesGrid = function (config) {
 	config.autoExpandColumn = 'name';
 
 	this.fieldDefs = {
-		fields: ['id', 'name', 'name2', 'homepage', 'email', 'phone', 'fax', 'address', 'address_no', 'zip', 'city', 'state', 'country', 'post_address', 'post_address_no', 'post_city', 'post_state', 'post_country', 'post_zip', 'bank_no', 'vat_no', 'invoice_email', 'ctime', 'mtime', 'iban', 'crn', 'ab_name', 'color'],
+		fields: ['id', 'name', 'name2', 'homepage', 'email', 'phone', 'fax', 'address', 'address_no', 'zip', 'city', 'state', 'country', 'post_address', 'post_address_no', 'post_city', 'post_state', 'post_country', 'post_zip', 'bank_no', 'vat_no', 'invoice_email','username','musername' , 'ctime', 'mtime', 'iban', 'crn', 'ab_name', 'color'],
 		columns: [
 			{
 				header: t("ID", "addressbook"),
@@ -166,6 +166,15 @@ GO.addressbook.CompaniesGrid = function (config) {
 				dataIndex: 'invoice_email',
 				hidden: true,
 				id: 'invoice_email'
+			},{
+				header: t("Created by"),
+				dataIndex: 'username',
+				hidden:true
+			},
+			{
+				header: t("Modified by"),
+				dataIndex: 'musername',
+				hidden:true
 			}, {
 				xtype: "datecolumn",
 				header: t("Modified at"),

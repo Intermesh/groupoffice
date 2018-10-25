@@ -62,17 +62,17 @@ class Note extends AclItemEntity {
 		return StringUtil::cutString($text, 200);
 	}
 	
-	public static function filter(Query $query, array $filter) {
-		
-		if(!empty($filter['q'])) {
-			
-			$query->andWhere(
-					(new Criteria())
-					->where('name','LIKE', '%' . $filter['q'] . '%')
-					->orWhere('content', 'LIKE', '%' . $filter['q'] . '%')
-					);
-		}
-		
+	
+	/**
+	 * Return columns to search on with the "q" filter. {@see filter()}
+	 * 
+	 * @return string[]
+	 */
+	protected static function searchColumns() {
+		return ['name', 'content'];
+	}
+	
+	public static function filter(Query $query, array $filter) {		
 		if(!empty($filter['noteBookId'])) {
 			$query->where(['noteBookId' => $filter['noteBookId']]);
 		}

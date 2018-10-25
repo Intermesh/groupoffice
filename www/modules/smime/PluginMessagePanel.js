@@ -47,7 +47,7 @@ GO.moduleManager.onModuleReady('email',function(){
 									
 				if(data.smime_encrypted){
 					var el = this.body.down(".message-header").createChild({													
-						html:t("This message was sent to you encrypted.", "smime"),													
+						html:t("This message is encrypted.", "smime"),													
 						cls:'smi-encrypt-notification'
 					});
 				}

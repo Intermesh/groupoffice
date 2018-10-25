@@ -152,11 +152,10 @@ class Link extends Entity {
 			$query->where(['eTo.name' => $filter['entities']]);		
 		}
 		
-		
-		if(!empty($filter['q'])) {
-			$query->where('s.keywords', 'LIKE', '%' . $filter['q'] .'%');
-		}
-	
 		return parent::filter($query, $filter);
+	}
+	
+	protected static function searchColumns() {
+		return ['s.keywords'];
 	}
 }
