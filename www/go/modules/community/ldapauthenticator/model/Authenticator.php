@@ -96,7 +96,7 @@ class Authenticator extends PrimaryAuthenticator {
 		}
 		
 		if($server->hasEmailAccount()) {
-			$this->setEmailAccount($ldapUsername, $password, $username, $server, $user);
+			$this->setEmailAccount($ldapUsername, $password, $record->mail[0], $server, $user);
 		}
 		
 		return $user;
