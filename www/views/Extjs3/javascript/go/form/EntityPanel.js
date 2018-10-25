@@ -14,21 +14,14 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		this.values = {};
 		
 		this.getForm().trackResetOnLoad = true;
-		
-		this.entityStore.on('changes',this.onChanges, this);
-		this.on('destroy', function() {
-			this.entityStore.un('changes', this.onChanges, this);
-		}, this);
-	},
+	},	
 	
-	onChanges : function(entityStore, added, changed, destroyed) {
-		if(changed.indexOf(this.currentId) !== -1) {			
-			
+	onChanges : function(entityStore, added, changed, destroyed) {		
+		var entity = added[this.currentId] || changed[this.currentId] || false;
+		if(entity) {			
+			this.entity = entity;
 			//TODO, This will bluntly overwrite user's modification when modified.
-			this.entityStore.get([this.currentId], function(entities) {
-				this.entity = entities[0];
-				this.getForm().setValues(entities[0]);
-			}, this);			
+			this.getForm().setValues(entity);
 		}		
 	},
 	

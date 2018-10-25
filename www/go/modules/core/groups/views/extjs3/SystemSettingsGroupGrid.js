@@ -34,7 +34,7 @@ go.modules.core.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 				{name: 'members', type: go.data.types.User, key: 'users.userId'}
 				
 			],
-			entityStore: go.Stores.get("Group")
+			entityStore: "Group"
 		});
 
 		Ext.apply(this, {

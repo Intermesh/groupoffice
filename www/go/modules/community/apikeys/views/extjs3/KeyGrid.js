@@ -24,7 +24,7 @@ go.modules.community.apikeys.KeyGrid = Ext.extend(go.grid.GridPanel, {
 				'accessToken',
 				{name: 'createdAt', type: 'date'}			
 			],
-			entityStore: go.Stores.get("Key")
+			entityStore: "Key"
 		});
 
 		Ext.apply(this, {		

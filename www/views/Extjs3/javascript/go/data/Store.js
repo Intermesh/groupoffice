@@ -84,19 +84,8 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 			this.baseParams.filter = {};
 		}		
 		
-		if(this.entityStore) {
-//			this.on('update', this.onUpdate, this);		
-			this.entityStore.on('changes', this.onChanges, this);
-			
-			//reload if something goes wrong in the entity store.
-			this.entityStore.on("error", function() {
-				this.reload();
-			}, this);
-			
-			this.on('destroy', function() {
-				this.entityStore.un('changes', this.onChanges, this);
-			}, this);
-		
+		if(this.entityStore) {			
+			this.initEntityStore();
 		}
 	},
 	
@@ -113,27 +102,48 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		
 	},
 	
-	onChanges : function(entityStore, added, changed, destroyed) {
+	initEntityStore : function() {
+		if(Ext.isString(this.entityStore)) {
+			this.entityStore = go.Stores.get(this.entityStore);
+			if(!this.entityStore) {
+				throw "Invalid 'entityStore' property given to component"; 
+			}
+		}
+		this.entityStore.on('changes',this.onChanges, this);		
 		
-		//when loading the store changes will fire too.
-		//Possibly this may cause missing an update by someone else who
+		//reload if something goes wrong in the entity store.
+		this.entityStore.on("error", this.onError, this);
+
+		this.on('beforedestroy', function() {
+			this.entityStore.un('changes', this.onChanges, this);
+			this.entityStore.un("error", this.onError, this);
+		}, this);
+	},
+	
+	onError : function() {
+		this.reload();
+	},
+
+	onChanges : function(entityStore, added, changed, destroyed) {		
+
 		if(!this.loaded || this.loading) {
 			return;
 		}		
 		
-		if(added.length || changed.length) {
+
+		if(Object.keys(added).length || Object.keys(changed).length) {
 			//we must reload because we don't know how to sort partial data.
 			this.reload();
 		}
 		
-//		for(var i = 0, l = added.length; i < l; i++) {
+//		for(var i in added) {
 //			if(!this.updateRecord(added[i]) ){
 //				this.reload();
 //				return;
 //			}
 //		}
-//		
-//		for(var i = 0, l = changed.length; i < l; i++) {
+//				
+//		for(var i in changed) {
 //			if(!this.updateRecord(changed[i]) ){
 //				this.reload();
 //				return;
@@ -149,30 +159,28 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 
 	},
 	
-	updateRecord : function(id) {
+	updateRecord : function(entity) {
 		
 		if(!this.data) {
 			return false;
 		}
-		var record = this.getById(id);
+		var record = this.getById(entity.id);
 		if(!record) {
 			return false;
 		}
 		
-		this.entityStore.get([id], function(entities) {
-			
-			this.serverUpdate = true;
-			record.beginEdit();
-			this.fields.each(function(field) {
-				record.set(field.name, entities[0][field.name]);
-			});
 
-
-			record.endEdit();
-			record.commit();
-
-			this.serverUpdate = false;
-		}, this);
+//		if(record.isModified()) {
+//			alert("Someone modified your record!");
+//		}
+		
+		record.beginEdit();
+		this.fields.each(function(field) {
+			record.set(field.name, entity[field.name]);
+		});		
+		
+		record.endEdit();
+		record.commit();
 		
 		return true;
 	},

@@ -13,7 +13,7 @@ go.modules.community.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 				{name: 'modifier', type: go.data.types.User, key: 'modifiedBy'},
 				'permissionLevel'
 			].concat(go.modules.core.customfields.CustomFields.getFieldDefinitions("Note")),
-			entityStore: go.Stores.get("Note")
+			entityStore: "Note"
 		});
 
 		Ext.apply(this, {		

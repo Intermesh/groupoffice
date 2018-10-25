@@ -9,7 +9,7 @@ go.data.JmapProxy = Ext.extend(Ext.data.HttpProxy, {
 
 		this.fields = config.fields;
 		this.method = config.method;
-
+		
 		go.data.JmapProxy.superclass.constructor.call(this, Ext.apply(config, {
 			url: BaseHref + 'jmap.php' //we don't need this url but ext complains about it if it's missing
 		}));

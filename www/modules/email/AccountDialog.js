@@ -20,9 +20,9 @@ GO.email.AccountDialog = function(config) {
 		fieldLabel : t("Root mailbox", "email"),
 		name : 'mbroot'
 	}) ];
-    console.log("JAAA");
+
 	if(go.Modules.isAvailable("legacy", "sieve")) {
-        console.log("JAAA");
+
 		advancedItems.push(
 			new Ext.form.NumberField({
 				fieldLabel : t("Sieve filter port number", "sieve"),

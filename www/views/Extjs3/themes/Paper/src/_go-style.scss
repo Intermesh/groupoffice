@@ -580,32 +580,20 @@ button {
 }
 
 .avatar {
+	position:relative;
 	display:inline-block;
 	padding:0;
 	background: url('img/default-avatar.svg') no-repeat center center;
-	background-size:cover;
-	border: 1px solid white;
+	background-size:cover;	
 	border-radius: 50%;
+	width:dp(40);
 	height: dp(40);
-	width: dp(40);
-	font-size: dp(28);
-	line-height: dp(40);
-	text-align: center;
-	&::before {
-			color: white;
-			@extend %icon;
-			font-size: inherit;			
-			height: 100%;
-			width: 100%;
-	}
 
-/*	.go-detail-view & {
-		width:dp(40);
-		height: dp(40);
+	.go-detail-view & {
 		float:left;
 		margin-top:dp(4);
 		margin-right: dp(16);
-	}*/
+	}
 	
 	.x-btn {
 		border: 0;
@@ -659,7 +647,7 @@ button {
 	right: dp(16);
 	top: dp(8);
 	z-index:15;
-	
+	border: 1px solid white;
 	width: dp(48);
 	height: dp(48);
 	&.login-avatar{

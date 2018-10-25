@@ -88,19 +88,23 @@
 
 			var now = new Date(),
 							nowYmd = parseInt(now.format("Ymd")),
-							vYmd = parseInt(v.format("Ymd"));
-
-			if (nowYmd === vYmd) {
-				return Ext.util.Format.date(v, GO.settings.time_format.replace(/g/, "G").replace(/h/, "H"));
+							vYmd = parseInt(v.format("Ymd")),
+							diff = vYmd - nowYmd;
+			
+			switch(diff) {
+				case 0:
+					return Ext.util.Format.date(v, GO.settings.time_format.replace(/g/, "G").replace(/h/, "H"));
+				
+				case -1:
+					return t('Yesterday');
+					
+				case 1:
+					return t('Tomorrow');								
 			}
 
-			if (nowYmd - 1 === vYmd) {
-				return t('Yesterday');
-			}
-
-			if (nowYmd + 1 === vYmd) {
-				return t('Tomorrow');
-			}
+			if(diff > -6) {
+				return t('full_days')[v.getDay()];
+			}			
 
 			if (now.getFullYear() === v.getFullYear()) {
 				var dayIndex = GO.settings.date_format.indexOf('d'),

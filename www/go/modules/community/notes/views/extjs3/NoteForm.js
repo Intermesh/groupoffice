@@ -1,7 +1,7 @@
 go.modules.community.notes.NoteForm = Ext.extend(go.form.Dialog, {
 	stateId: 'notes-noteForm',
 	title: t("Note"),
-	entityStore: go.Stores.get("Note"),
+	entityStore: "Note",
 	width: 600,
 	height: 600,
 	
