@@ -477,8 +477,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 								text: go.User.displayName,
 								cls: 'go-display-name'
 							}, '-', {
-								text: t("Settings"),
-								iconCls: 'ic-settings',
+								text: t("My Account"),
+								iconCls: 'ic-account-circle',
 								handler: function () {
 									if(!go.userSettingsDialog) {
 										go.userSettingsDialog = new go.usersettings.UserSettingsDialog();
@@ -545,7 +545,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 
 				if(go.User.isAdmin) {
-					this.userMenuLink.menu.insert(2, {
+					this.userMenuLink.menu.insert(3, {
 
 						text: t("System settings"),
 						iconCls: 'ic-settings',
