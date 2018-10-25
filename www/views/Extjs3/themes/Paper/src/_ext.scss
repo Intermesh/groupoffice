@@ -2270,8 +2270,15 @@ body.x-body-masked .x-window-plain .x-window-mc {
 	border:1px solid color($fg, 'divider');
 }
 .x-html-editor-tb .x-toolbar {
-	box-shadow:none;
+	height: dp(40);
 	background-color: transparent;
+	.x-toolbar-cell {
+		padding:0;
+	}
+	.x-btn {
+		font-size:.8em;
+	}
+	
 }
 .x-html-editor-tb .x-btn-text {
 	background-image: none; //url(wysiwyg.gif);
