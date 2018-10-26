@@ -11282,7 +11282,9 @@ Ext.Component = function(config){
         this.baseAction.addComponent(this);
     }
 
+		this.setTranslationModule();
     this.initComponent();
+		this.resetTranslationModule();
 
     if(this.plugins){
         if(Ext.isArray(this.plugins)){
@@ -11312,13 +11314,21 @@ Ext.Component.AUTO_ID = 1000;
 
 Ext.extend(Ext.Component, Ext.util.Observable, {
     
-    
-    
-    
-    
-    
-    
-
+		//GO override
+    setTranslationModule : function() {
+			if(this.module) {
+				this.lastTranslationModule = go.Translate.module;
+				this.lastTranslationPackage = go.Translate.package;
+				go.Translate.setModule(this.package, this.module);
+			}
+		},
+		
+		//GO override
+		resetTranslationModule : function() {
+			if(this.lastTranslationModule) {
+				go.Translate.setModule(this.lastTranslationPackage, this.lastTranslationModule);
+			}
+		},
     
     
     

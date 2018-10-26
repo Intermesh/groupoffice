@@ -1,4 +1,6 @@
 <?php
+// See https://nl.wikipedia.org/wiki/Lijst_van_ISO_639-codes
+
 $languages['ar']='عربي (Arabic)';
 $languages['bn_bd']='বাংলা (Bangladesh)';
 $languages['ko']='한국어';
@@ -19,6 +21,7 @@ $languages['el']='Ελληνικά';
 $languages['fr']='Francais';
 $languages['hr']='Hrvatski';
 $languages['it']='Italiano';
+$languages['id']='Bahasa Indonesia';
 $languages['hu']='Magyar';
 $languages['nl']='Nederlands';
 $languages['nb']='Norsk bokmål';

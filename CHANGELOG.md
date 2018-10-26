@@ -1,4 +1,6 @@
 - Core: Short date format also use days of the week in text for last week
+- Core: Fix for some components not translating
+- Core: Updated languages Magyar and Bahasa Indonesia
 
 23-10-2018 6.3.46
 - Core: Fixed tree view for Firefox
