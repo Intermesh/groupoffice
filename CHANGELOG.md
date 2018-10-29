@@ -1,3 +1,4 @@
+- Core: All search terms must match instead of any
 - Core: Short date format also use days of the week in text for last week
 - Core: Fix for some components not translating
 - Core: Updated languages Magyar and Bahasa Indonesia
