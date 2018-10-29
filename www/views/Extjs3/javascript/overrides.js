@@ -65,7 +65,7 @@ function dp(size) {
 			
 			this.on("afterrender", function() {
 				this.entityStore.on('changes',this.onChanges, this);		
-			});
+			}, this);
 
 			this.on('beforedestroy', function() {
 				this.entityStore.un('changes', this.onChanges, this);
