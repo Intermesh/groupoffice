@@ -125,19 +125,10 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	/**
 	 * The show function of this dialog.
 	 * This immediately starts loading all tabpanels in this dialog.
-	 * 
-	 * @param int userId
 	 */
-	show: function(userId){
-		this.currentUserId = userId;
-
+	show: function(){
 		go.usersettings.UserSettingsDialog.superclass.show.call(this);
-		
 		this.navMenu.select(this.tabStore.getAt(0));
-		
-		if(this.currentUserId) {
-			this.load();
-		}
 	},
 	
 	/**
@@ -314,6 +305,13 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 
 		go.Stores.get("User").get([this.currentUserId], function(users){
 			this.formPanel.getForm().setValues(users[0]);
+			
+			this.findBy(function(cmp,cont){
+				if(typeof cmp.onLoad === 'function') {
+					cmp.onLoad(users[0]);
+				}
+			},this);
+			
 			this.loadComplete(users[0]);
 		}, this);
 		
@@ -325,6 +323,8 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			}
 			
 		},this);
+		
+		return this;
 	},
 	
 	/**

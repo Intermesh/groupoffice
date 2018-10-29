@@ -2,21 +2,24 @@ Ext.ns("go.googleauthenticator");
 
 Ext.onReady(function () {
 	Ext.override(go.usersettings.AccountSettingsPanel, {
-
 		initComponent: go.usersettings.AccountSettingsPanel.prototype.initComponent.createSequence(function () {
-			
 			this.googleAuthenticatorFieldset = new go.googleauthenticator.AuthenticatorSettingsFieldset();
 			this.add(this.googleAuthenticatorFieldset);
 			})
-			
 		});
 	});
 	
-	
 	go.googleauthenticator.AuthenticatorSettingsFieldset = Ext.extend(Ext.form.FieldSet, {
-		currentUserId: null,
+		entityStore:"User",
+		currentUser: null,
 		labelWidth: dp(152),
 		title: t('Google authenticator', 'googleauthenticator'),
+		
+		onChanges : function(entityStore, added, changed, destroyed) {
+			if(this.currentUser && changed[this.currentUser.id] && ("googleauthenticator" in changed[this.currentUser.id])){
+				this.onLoad(changed[this.currentUser.id]);
+			}
+		},
 		
 		initComponent: function() {
 			this.enableAuthenticatorBtn = new Ext.Button({
@@ -24,16 +27,9 @@ Ext.onReady(function () {
 				hidden:false,
 				handler:function(){	
 					var me = this;
-					this.requestSecret(this.currentUserId, function(userId){						
+					me.requestSecret(me.currentUser, function(userId){						
 						var enableDialog = new go.googleauthenticator.EnableAuthenticatorDialog();
 						enableDialog.load(userId).show();
-						
-						// TODO: THIS IS TEMPORARY CODE BECAUSE THE ACCOUNT WINDOW IS NOT LISTENING TO THE USER CHANGES CORRECTY
-						// THE CODE BELOW SHOULD NOT BE NECCESARY WHEN THE ACCOUNT WINDOW NOTICES THE CHANGE ON THE googleauthenticator PROPERTY 
-						enableDialog.on('save', function(dialog,entity){
-							me.updateButtons(userId);
-						});
-						
 					});
 				},
 				scope: this
@@ -44,12 +40,8 @@ Ext.onReady(function () {
 				hidden:true,
 				handler:function(){
 					var me = this;
-					this.disableAuthenticator(this.currentUserId, function(userId){
+					me.disableAuthenticator(me.currentUser, function(userId){
 						// When this is called all went well and the authenticator is disabled
-						
-						// TODO: THIS IS TEMPORARY CODE BECAUSE THE ACCOUNT WINDOW IS NOT LISTENING TO THE USER CHANGES CORRECTY
-						// THE CODE BELOW SHOULD NOT BE NECCESARY WHEN THE ACCOUNT WINDOW NOTICES THE CHANGE ON THE googleauthenticator PROPERTY 
-						me.updateButtons(userId);
 					});
 				},
 				scope: this
@@ -63,13 +55,16 @@ Ext.onReady(function () {
 			go.googleauthenticator.AuthenticatorSettingsFieldset.superclass.initComponent.call(this);
 		},
 		
-		onLoadComplete : function(data){
-			this.enableAuthenticatorBtn.setVisible(!data.googleauthenticator);
-			this.disableAuthenticatorBtn.setVisible(data.googleauthenticator);
-			this.currentUserId = data.id;
+		onLoad : function(user){
+			
+			var isActive = (user.googleauthenticator && user.googleauthenticator.isEnabled);
+			
+			this.enableAuthenticatorBtn.setVisible(!isActive);
+			this.disableAuthenticatorBtn.setVisible(isActive);
+			this.currentUser = user;
 		},
 		
-		disableAuthenticator : function(userId, callback){
+		disableAuthenticator : function(user, callback){
 			var me = this;
 			
 			function execute(currentPassword){
@@ -80,20 +75,20 @@ Ext.onReady(function () {
 				if(currentPassword) {
 					data.currentPassword = currentPassword;
 				}
-				params.update[userId] = data;
+				params.update[user.id] = data;
 
 				go.Stores.get("User").set(params, function (options, success, response) {
 					if (success && !GO.util.empty(response.updated)) {
-						callback.call(this,userId);
+						callback.call(this,user.id);
 					} else {
 						// When the password is not correct, call itself again to try again
-						me.disableAuthenticator(userId, callback);
+						me.disableAuthenticator(user, callback);
 					}
 				});
 			}
 			
 			// If the user is an admin then no password needs to be given (Except when the admin is changing it's own account
-			if (go.User.isAdmin && userId != go.User.id) {
+			if (go.User.isAdmin && user.id != go.User.id) {
 				execute.call(this);
 				return;
 			} else {
@@ -116,7 +111,7 @@ Ext.onReady(function () {
 			}
 		},
 
-		requestSecret : function(userId, callback){
+		requestSecret : function(user, callback){
 				var me = this;
 			
 				var passwordPrompt = new go.PasswordPrompt({
@@ -127,7 +122,7 @@ Ext.onReady(function () {
 					listeners: {
 						'ok': function(value){
 							var params = {"update": {}};
-							params.update[userId] = {
+							params.update[user.id] = {
 								currentPassword: value,
 								googleauthenticator: {
 									requestSecret:true
@@ -137,10 +132,10 @@ Ext.onReady(function () {
 							go.Stores.get("User").set(params, function (options, success, response) {
 								if (success && !GO.util.empty(response.updated)) {
 									// When password is checked successfully, then show the QR dialog
-									callback.call(this,userId);
+									callback.call(this,user.id);
 								} else {
 									// When the password is not correct, call itself again to try again
-									me.requestSecret(userId, callback);
+									me.requestSecret(user.id, callback);
 								}
 							});
 						},
@@ -150,22 +145,7 @@ Ext.onReady(function () {
 						scope: this
 					}
 				});
-
 				passwordPrompt.show();
-		},
-		
-		// TODO: THIS IS TEMPORARY CODE BECAUSE THE ACCOUNT WINDOW IS NOT LISTENING TO THE USER CHANGES CORRECTY
-		// THE CODE BELOW SHOULD NOT BE NECCESARY WHEN THE ACCOUNT WINDOW NOTICES THE CHANGE ON THE googleauthenticator PROPERTY 
-		updateButtons: function(userId){
-			var me = this;
-			go.Stores.get("User").get([userId], function(entities){
-				
-				if(entities[0]){
-					var enabled = entities[0].googleauthenticator && entities[0].googleauthenticator.isEnabled;
-					me.disableAuthenticatorBtn.setVisible(enabled);
-					me.enableAuthenticatorBtn.setVisible(!enabled);
-				}
-
-			});
 		}
 	});
+	
