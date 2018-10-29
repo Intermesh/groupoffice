@@ -5,3 +5,4 @@ CreateUserAccountPanel.js
 CreateUserPasswordPanel.js
 CreateUserWizard.js
 UserGroupGrid.js
+UserSettingsWorkingWeek.js

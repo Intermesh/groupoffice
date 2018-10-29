@@ -66,6 +66,10 @@ GO.util.stringToFunction = function(str) {
  * @returns {t.l|GO..lang}
  */
 function t(str, module, package) {
+	
+	if(module && !package) {
+		package = "legacy";
+	}
 		
 	if(!module) {
 		module = go.Translate.module;		
@@ -73,11 +77,6 @@ function t(str, module, package) {
 	if(!package) {
 		package = go.Translate.package;
 	}
-	
-	if(!package) {
-		package = "legacy";
-	}
-		
 	
 	if(!GO.lang[package] || !GO.lang[package][module]) {
 		return t(str, "core", "core");

@@ -1,4 +1,5 @@
 <?php
+//TODO this must be a CLI controller in 6.4
 require(__DIR__ . "/vendor/autoload.php");
 
 use go\core\App;
