@@ -106,7 +106,7 @@ class Googleauthenticator extends Property {
 	}
 	
 	public function getIsEnabled() {
-		return isset($this->secret);
+		return isset($this->secret)&& isset($this->createdAt);
 	}
 
 	/**
