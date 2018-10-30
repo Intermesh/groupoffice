@@ -3,7 +3,10 @@ go.modules.community.pages.PageDialog = Ext.extend(go.form.Dialog, {
 	entityStore: go.Stores.get("Page"),
 	width: 600,
 	height: 600,
-	siteId: '',
+	//maximized: true,
+	maximizable: true,
+	siteId: '_',
+	sortOrder: 0,
 	initFormItems: function () {
 		var items = [{
 				xtype: 'fieldset',
@@ -22,8 +25,16 @@ go.modules.community.pages.PageDialog = Ext.extend(go.form.Dialog, {
 						fieldLabel: "",
 						hideLabel: true,
 						anchor: '100%',
-						height: 300,
 						allowBlank: true
+					},
+					{
+						xtype: 'hidden',
+						name: 'siteId',
+						value: this.siteId
+					},{
+						xtype: 'hidden',
+						name: 'sortOrder',
+						value: this.sortOrder
 					}]
 			}
 		]
@@ -41,8 +52,7 @@ go.modules.community.pages.PageDialog = Ext.extend(go.form.Dialog, {
 	    slug = this.generateSlug(this.formPanel);
 	    console.log("current slug: " + slug);
 	    console.log("current siteId: " + this.siteId);
-	    console.log("sortOrder = pagecount for siteId: "+this.siteId+", +1");
-	    
+	    //check if form has dirty fields.
 	    go.modules.community.pages.PageDialog.superclass.submit.call(this);
 	}
 });

@@ -44,7 +44,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 			return;
 		}
 
-		var id, params = {}, values = this.getForm().getFieldValues(true);
+		var id, params = {}, values = this.getForm().getFieldValues(this.currentId ? true : false);
 		//		//this.id is null when new
 		if (this.currentId) {
 

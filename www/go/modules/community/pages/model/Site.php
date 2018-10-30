@@ -25,7 +25,7 @@ class Site extends AclEntity {
 	 * 
 	 * @var string
 	 */							
-	public $siteName;
+	protected $siteName;
 
 	/**
 	 * 
@@ -73,7 +73,7 @@ class Site extends AclEntity {
 	 * 
 	 * @var string
 	 */							
-	public $slug;
+	protected $slug;
 
 	protected static function defineMapping() {
 		return parent::defineMapping()
@@ -93,5 +93,16 @@ class Site extends AclEntity {
 		}
 		return parent::filter($query, $filter);
 	}
+	public function getSiteName(){
+	    return $this->siteName;
+	}
+	
+	public function setSiteName($name){
+	    $this->siteName = $name;
+	    if(empty($this->slug)) {
+		$this->slug = strtolower(preg_replace('/[ \&\#\(\)\[\]\{\}\$\+\,\.\/\\\:\;\=\?\@\^\<\>\!\*\|\%]/', '_', $name));
+	    }
+	}
+	
 
 }

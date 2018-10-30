@@ -21,19 +21,5 @@ class Page extends EntityController {
 	protected function entityClass() {
 		return model\Page::class;
 	}
-
-	private function createEntitites($create, &$result) {
-//	    foreach ($create as $clientId) {
-//		if($clientId['pageName']){
-//		    $create[$clientId]['slug'] = $clientId['pageName'];
-//		}
-//		if($clientId['content']){
-//		    $create[$clientId]['plainContent'] = $clientId['content'];
-//		}
-//		$create[$clientId]['pageName'] = "test";
-//	    }
-	    parent::createEntitites();
-		
-	}	
-}
+	}
 

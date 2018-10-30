@@ -9,7 +9,7 @@ go.modules.community.pages.SitePropertiesForm = Ext.extend(Ext.form.FormPanel, {
 	    
 		this.items = [{
 				xtype: 'fieldset',
-				title: t('Site'),
+				title: t('Site properties'),
 				items: [
 					{
 						xtype: 'textfield',
@@ -17,7 +17,6 @@ go.modules.community.pages.SitePropertiesForm = Ext.extend(Ext.form.FormPanel, {
 						fieldLabel: t("site name"),
 						anchor: '100%',
 						allowBlank: false,
-						value: "abc"
 					}, {
 					    xtype: 'combo',
 						name: 'documentFormat',
@@ -37,7 +36,8 @@ go.modules.community.pages.SitePropertiesForm = Ext.extend(Ext.form.FormPanel, {
 			}
 		];
 		 go.modules.community.pages.SitePropertiesForm.superclass.initComponent.call(this);
-	}
+	},
+	
 });
 
 

@@ -29,12 +29,6 @@ class Page extends AclItemEntity {
 	 * 
 	 * @var int
 	 */							
-	public $SiteId;
-
-	/**
-	 * 
-	 * @var int
-	 */							
 	public $createdBy;
 
 	/**
@@ -59,13 +53,13 @@ class Page extends AclItemEntity {
 	 * 
 	 * @var string
 	 */							
-	public $pageName = 'page';
+	protected $pageName = 'page';
 
 	/**
 	 * 
 	 * @var string
 	 */							
-	public $content;
+	protected $content;
 
 	/**
 	 * 
@@ -95,5 +89,26 @@ class Page extends AclItemEntity {
 
 	protected static function aclEntityKeys() {
 		return ['siteId' => 'id'];
+	}
+	
+	public function getPageName() {
+	    return $this->pageName;
+	}
+	
+	public function setPageName($name){
+	    $this->pageName = $name;
+	    if(empty($this->slug)) {
+		$this->slug = strtolower(preg_replace('/[ \&\#\(\)\[\]\{\}\$\+\,\.\/\\\:\;\=\?\@\^\<\>\!\*\|\%]/', '_', $name));
+	    }
+	}
+	public function getContent() {
+	    return $this->content;
+	}
+	
+	public function setContent($content){
+	    $this->content = $content;
+	    if(empty($this->plainContent)) {
+		$this->plainContent = strip_tags($content, '<h1><h2>');
+	    }
 	}
 }

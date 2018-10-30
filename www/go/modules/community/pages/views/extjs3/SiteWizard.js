@@ -1,20 +1,19 @@
 go.modules.community.pages.SiteWizard = Ext.extend(go.Wizard, {
-	title: t('Create user'),
-	site : null,
+	title: t('Create site'),
+	height: dp(500),
 	initComponent : function() {
 		
-		//store all form data here
-		this.site = {};
 		
 		this.propForm = new go.modules.community.pages.SitePropertiesForm({
 			});
-		this.sharePanel = new go.form.EntityPanel({
-			entityStore: go.Stores.get("Group"),
+		this.shareEntityPanel = new go.form.EntityPanel({
+			entityStore: go.Stores.get("Acl"),
 			items: [
 			    new go.modules.core.core.SharePanel({
 				anchor: '100% -' + dp(32),
 				hideLabel: true,
-				name: "groups"
+				name: "groups",
+				title: 'Site permissions'
 			})]
 			
 		});
@@ -22,11 +21,10 @@ go.modules.community.pages.SiteWizard = Ext.extend(go.Wizard, {
 	
 		this.items = [
 			this.propForm,
-			this.sharePanel
+			this.shareEntityPanel
 		]
 		go.modules.community.pages.SiteWizard.superclass.initComponent.call(this);
 		this.on({
-			continue: this.onContinue,
 			finish: this.onFinish,
 			afterrender: this.onAfterRender,
 			scope: this
@@ -34,35 +32,21 @@ go.modules.community.pages.SiteWizard = Ext.extend(go.Wizard, {
 		
 	},
 	onAfterRender: function(){
-	    this.sharePanel.items.first().store.load();
-	},
-	onContinue: function(wiz, item, nextItem) {
-		
-		this.applyPanelData(item);
-	},
-		
-	applyPanelData : function(item) {
-		if(item == this.propForm) {
-			this.site = Ext.apply(this.site, item.getForm().getValues());
-		}
+	    this.shareEntityPanel.items.first().store.load();
+	    this.shareEntityPanel.items.first().setValue([{groupId: 1, level: 50}]);//,{isUserGroupFor: go.User.id, level: 50}]);
 	},
 	
 	onSaveSuccess : function(response){
-		
+		this.shareEntityPanel.currentId = response.aclId;
 	},
 	
 	onFinish: function(wiz, lastItem) {
-		this.applyPanelData(lastItem);
-		
-		
-		
+	    
 		var id = Ext.id(), params = {};
 		params.create = {};
-		params.create[id] = this.site;
-		
+		params.create[id] = this.propForm.getForm().getValues();
 		
 		go.Stores.get("Site").set(params, function (options, success, response) {
-			console.log(response);
 			if (response.created && response.created[id]) {				
 				
 				this.onSaveSuccess(response.created[id]);
@@ -99,9 +83,10 @@ go.modules.community.pages.SiteWizard = Ext.extend(go.Wizard, {
 			}
 			
 		}, this);
+		if(this.shareEntityPanel.currentId){
+		this.shareEntityPanel.submit();
+		}
 		
-		this.sharePanel.currentId = id;
-		this.sharePanel.submit(function(){},this);
 		
 	},
 	

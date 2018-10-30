@@ -39,11 +39,10 @@ go.Wizard = Ext.extend(go.Window, {
 	setActiveItem: function(item) {
 		this.getLayout().setActiveItem(item);	
 		item = this.getLayout().activeItem;
-		
 		var index = this.items.indexOf(item);
 		this.nextItem = this.items.itemAt(index + 1);
 		this.previousItem = this.items.itemAt(index - 1);
-		this.backButton.setDisabled(!this.previouItem);		
+		this.backButton.setDisabled(!this.previousItem);		
 		this.continueButton.setText(this.nextItem ? t("Continue") : t("Finish"));
 		this.focus();
 	},
