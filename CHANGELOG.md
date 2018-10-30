@@ -1,7 +1,18 @@
+- Files: Added quota panel to user settings.
+- Projects: Fix in working week for calculating task due dates.
+- Core: Removed double slash in API endpoints
+- Email: Fixed email folder subscribtion treeview
+- Notes: Textarea high will grow when resizing the dialog
+- Core: Language fix for legacy modules
+- Core: Fixed treeview for Internet Explorer
+- Core: HTMLEditor button are small so more would fit on screen
 - Core: All search terms must match instead of any
 - Core: Short date format also use days of the week in text for last week
 - Core: Fix for some components not translating
 - Core: Updated languages Magyar and Bahasa Indonesia
+- Projects: Bug in jobs fixed where save didn't work
+- Core: core/email: Fixed bug in creating ZIP files with utf-8 characters
+- Core: More human friendly error messages
 
 23-10-2018 6.3.46
 - Core: Fixed tree view for Firefox
