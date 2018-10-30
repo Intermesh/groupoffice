@@ -265,6 +265,7 @@ views/Extjs3/javascript/go/panels/LinksTpl.js
 views/Extjs3/javascript/go/panels/DetailView.js
 views/Extjs3/javascript/go/panels/Panel.js
 views/Extjs3/javascript/go/Toolbar.js
+views/Extjs3/javascript/go/SearchField.js
 views/Extjs3/javascript/go/NavMenu.js
 views/Extjs3/javascript/go/Notifier.js
 

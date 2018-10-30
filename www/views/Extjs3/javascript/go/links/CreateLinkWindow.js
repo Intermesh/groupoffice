@@ -29,34 +29,12 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 
 	initComponent: function () {
 
-		var me = this;
-
-		this.searchField = new Ext.form.TwinTriggerField({
-			emptyText: t("Search"),
-			hideLabel: true,
-			xtype: "twintrigger",
+		this.searchField = new go.SearchField({
 			anchor: "100%",
-			validationEvent: false,
-			validateOnBlur: false,
-			trigger1Class: 'x-form-search-trigger',
-			trigger2Class: 'x-form-clear-trigger',
-//							enableKeyEvents: true,
-
-			onTrigger1Click: function () {
-				me.search(this.getValue());
+			handler: function(field, v){
+				this.search(v);
 			},
-			onTrigger2Click: function () {
-				this.setValue("");
-				me.search();
-			},
-			listeners: {
-				specialkey: function (field, e) {
-					if (e.getKey() == Ext.EventObject.ENTER) {
-						this.search();
-					}
-				},
-				scope: this
-			}
+			scope: this
 		});
 
 		var search = new Ext.Panel({
@@ -67,9 +45,7 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 					xtype: "fieldset",
 					items: [this.searchField]
 				}]
-		});
-
-		
+		});		
 
 		this.grid = new go.links.LinkGrid({
 			cls: 'go-search-grid',
