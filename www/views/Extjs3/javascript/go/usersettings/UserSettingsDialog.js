@@ -71,7 +71,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		}); 
 		
 		Ext.apply(this,{
-			width:dp(1000),
+			width:dp(1100),
 			height:dp(800),
 			layout:'border',
 			closeAction:'hide',

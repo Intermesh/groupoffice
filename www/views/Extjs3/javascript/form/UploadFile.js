@@ -104,10 +104,6 @@ Ext.extend(GO.form.UploadFile, Ext.BoxComponent, {
 		});
 		inp.on('change', this.onFileAdded, this);
 		this.inputs.add(inp);
-		
-		console.log(inp);
-		console.log(this);
-		
 		return inp;
 	},
 	

@@ -1477,9 +1477,12 @@ td.grid-hd-group-cell {
 		background-repeat: no-repeat;
 		background-position: center center;	
 	}
-	&-ec-icon, &-node-indent,&-ec-icon,&-node-icon, &-node-anchor {
+	&-ec-icon, &-node-indent,&-ec-icon,&-node-icon, &-node-anchor, &-node-cb {
 		display:table-cell;
 		vertical-align: top; //required for Firefox
+	}
+	&-node-cb {
+		padding: 0 dp(4);
 	}
 	&-node-anchor {
 		width:auto;

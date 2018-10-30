@@ -1,3 +1,11 @@
+- Files: Added quota panel to user settings.
+- Projects: Fix in working week for calculating task due dates.
+- Core: Removed double slash in API endpoints
+- Email: Fixed email folder subscribtion treeview
+- Notes: Textarea high will grow when resizing the dialog
+- Core: Language fix for legacy modules
+- Core: Fixed treeview for Internet Explorer
+- Core: HTMLEditor button are small so more would fit on screen
 - Core: Rebuild search cache skipped every 100 records.
 - Core: All search terms must match instead of any
 - Core: Short date format also use days of the week in text for last week
