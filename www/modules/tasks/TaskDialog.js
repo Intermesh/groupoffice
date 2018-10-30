@@ -30,25 +30,28 @@ GO.tasks.TaskDialog = function() {
 		stateId: 'task-dialog',
 		width : dp(640),
 		height : dp(560),
-		closeAction : 'hide',
+		closeAction : 'close',
 		collapsible: true,
 		title : t("Task", "tasks"),
 		items : this.formPanel,
 		focus : focusName.createDelegate(this),
-		buttons : [{
-			text : t("Apply"),
-			handler : function() {
-				this.submitForm();
-			},
-			scope : this
-		},{
-			text : t("Save"),
-			handler : function() {
-				this.submitForm(true);
+		bbar : [
+			this.createLinkButton = new go.modules.core.links.CreateLinkButton(),		
+			"->",
+			{
+				text : t("Apply"),
+				handler : function() {
+					this.submitForm();
+				},
+				scope : this
+			},{
+				text : t("Save"),
+				handler : function() {
+					this.submitForm(true);
 
-			},
-			scope : this
-		}]
+				},
+				scope : this
+			}]
 	/*
  * , keys: [{ key: Ext.TaskObject.ENTER, fn: function(){ this.submitForm();
  * this.win.hide(); }, scope:this }]
@@ -71,6 +74,8 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 		if (!config) {
 			config = {};
 		}
+		
+		this.createLinkButton.reset();
 		
 		this.showConfig=config;
 
@@ -201,6 +206,9 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 	setTaskId : function(task_id) {
 		this.formPanel.form.baseParams['id'] = task_id;
 		this.task_id = task_id;
+		if(task_id) {
+			this.createLinkButton.setEntity("Task", task_id);
+		}
 	},
 
 	setCurrentDate : function() {
@@ -228,6 +236,8 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 
 				if (action.result.id) {
 					this.setTaskId(action.result.id);
+					
+					this.createLinkButton.save();
 				}
 
 				if (this.link_config && this.link_config.callback) {
