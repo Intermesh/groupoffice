@@ -4803,6 +4803,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			
 			$entityTypeId = static::getType()->getId();
 		
+			$start = 0;
 			$limit = 100;
 			
 			$findParams = FindParams::newInstance()
@@ -4810,7 +4811,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 							->debugSql()
 							->select('t.*')
 							->limit($limit)
-							->start(0)
+							->start($start)
 							->join('core_search', FindCriteria::newInstance()->addRawCondition('search.entityId', 't.id')->addRawCondition("search.entityTypeId", $entityTypeId), 'search', 'LEFT');
 			
 			$findParams->getCriteria()->addCondition('entityId',null, 'IS', 'search');							
@@ -4829,6 +4830,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 						} else
 						{
 							echo "S";
+							$start++;
 						}
 						
 					} catch (\Exception $e) {
@@ -4838,7 +4840,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				}
 				echo "\n";
 				
-				$stmt = $this->find();				
+				$stmt = $this->find($findParams->start($start));				
 			}
 			
 			echo "\nDone\n\n";
