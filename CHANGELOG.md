@@ -1,3 +1,4 @@
+30-10-2018 6.3.47
 - Files: Added quota panel to user settings.
 - Projects: Fix in working week for calculating task due dates.
 - Core: Removed double slash in API endpoints
