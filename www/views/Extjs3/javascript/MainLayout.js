@@ -480,11 +480,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 								text: t("My Account"),
 								iconCls: 'ic-account-circle',
 								handler: function () {
-									if(!go.userSettingsDialog) {
-										go.userSettingsDialog = new go.usersettings.UserSettingsDialog();
-									}
-									go.userSettingsDialog.load(go.User.id).show();
-
+									var dlg = new go.usersettings.UserSettingsDialog();
+									dlg.load(go.User.id).show();
 								},
 								scope: this
 							},
