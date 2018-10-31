@@ -58,15 +58,26 @@ go.form.Dialog = Ext.extend(go.Window, {
 	},
 
 	load: function (id) {
-		this.currentId = id;
+		
+		var me = this;
+		
+		function innerLoad(){
+			me.currentId = id;
 
-		if(!this.formPanel.load(id)) {			
-			//If no entity was returned the entity store will load it and fire the "changes" event. This dialog listens to that event.
-			this.actionStart();
-		} else
-		{
-			//needs to fire because overrides are made to handle logic after form load.
-			this.onLoad();
+			if(!me.formPanel.load(id)) {			
+				//If no entity was returned the entity store will load it and fire the "changes" event. This dialog listens to that event.
+				me.actionStart();
+			} else {
+				//needs to fire because overrides are made to handle logic after form load.
+				me.onLoad();
+			}
+		}
+		
+		// The form needs to be rendered before the data can be set
+		if(!this.rendered){
+			this.on('afterrender',innerLoad,this,{single:true});
+		} else {
+			innerLoad.call(this);
 		}
 		
 		return this;
