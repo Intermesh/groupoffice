@@ -69,6 +69,7 @@ go.Window = Ext.extend(Ext.Window, {
 	},
 	
 	render : function(container, position){
+		// Fix for chrome inspector
 		container = Ext.get("window-container");
 		return go.Window.superclass.render.call(this, container, position);
 	}
