@@ -1,3 +1,6 @@
+- Core: Fixed issue with form loading while it was not yet rendered. 
+				(Fixes loading of the user settings dialog when accessing it from the users grid.)
+
 30-10-2018 6.3.47
 - Googleauthenticator: Improved setup of authenticator
 - Files: Added quota panel to user settings.
