@@ -298,32 +298,41 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	 * @param int userId (Optional)
 	 */
 	load : function(userId){
-		this.currentUserId = userId ? userId : this.currentUserId;
+		var me = this;
 		
-		this.actionStart();
-		this.fireEvent('loadstart',this, this.currentUserId);
+		function innerLoad(){
+			me.currentUserId = userId ? userId : me.currentUserId;
+		
+			me.actionStart();
+			me.fireEvent('loadstart',me, me.currentUserId);
 
-		go.Stores.get("User").get([this.currentUserId], function(users){
-			this.formPanel.getForm().setValues(users[0]);
-			
-			this.findBy(function(cmp,cont){
-				if(typeof cmp.onLoad === 'function') {
-					cmp.onLoad(users[0]);
+			go.Stores.get("User").get([me.currentUserId], function(users){
+				me.formPanel.getForm().setValues(users[0]);
+
+				me.findBy(function(cmp,cont){
+					if(typeof cmp.onLoad === 'function') {
+						cmp.onLoad(users[0]);
+					}
+				},me);
+
+				me.loadComplete(users[0]);
+			}, me);
+
+			// loop through child panels and call onLoadComplete function if available
+			me.tabPanel.items.each(function(tab) {
+				if(tab.onLoadStart){
+					tab.onLoadStart(me.currentUserId);
 				}
-			},this);
-			
-			this.loadComplete(users[0]);
-		}, this);
+			},me);
+		}
 		
-		// loop through child panels and call onLoadComplete function if available
-		this.tabPanel.items.each(function(tab) {
+		// The form needs to be rendered before the data can be set
+		if(!this.rendered){
+			this.on('afterrender',innerLoad,this,{single:true});
+		} else {
+			innerLoad.call(this);
+		}
 
-			if(tab.onLoadStart){
-				tab.onLoadStart(this.currentUserId);
-			}
-			
-		},this);
-		
 		return this;
 	},
 	
