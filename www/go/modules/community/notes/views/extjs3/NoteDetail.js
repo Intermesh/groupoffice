@@ -112,8 +112,7 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 				tooltip: t("Edit"),
 				handler: function (btn, e) {
 					var noteEdit = new go.modules.community.notes.NoteForm();
-					noteEdit.show();
-					noteEdit.load(this.data.id);
+					noteEdit.load(this.data.id).show();
 				},
 				scope: this
 			},
