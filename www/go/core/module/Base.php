@@ -122,7 +122,7 @@ abstract class Base {
 	 * De-registration is not necessary when the module is uninstalled because they 
 	 * will be deleted by Mysql because of a cascading relation.
 	 */
-	private function registerEntities() {
+	public function registerEntities() {
 		$entities = $this->getClassFinder()->findByParent(Entity::class);
 		
 		foreach($entities as $entity) {
