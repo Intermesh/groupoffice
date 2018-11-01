@@ -645,8 +645,18 @@ hr {
 	position:absolute;
 	right:dp(-4);
 	top:dp(4);	
-
 }
+
+.go-create-link-btn {
+	.x-btn-mc em.x-btn-arrow > button:after {
+		content: '';
+	}
+	.badge {
+		@extend %badge;
+		display: inline-block;	
+	}
+}
+
 .x-tab-with-icon {
 	position:relative;
 }

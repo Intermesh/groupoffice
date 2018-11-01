@@ -36,13 +36,9 @@ go.form.Dialog = Ext.extend(go.Window, {
 		
 		this.items = [this.formPanel];
 
-		this.buttons = [this.deleteBtn = new Ext.Button({
-				text: t("Delete"),
-				cls: 'danger',
-				handler: this.delete,
-				disabled: true,
-				scope: this
-			}), '->', {
+		this.buttons = [
+			'->', 
+			{
 				text: t("Save"),
 				handler: this.submit,
 				scope: this

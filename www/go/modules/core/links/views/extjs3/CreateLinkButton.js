@@ -1,9 +1,56 @@
 /* global Ext, go */
 
 go.modules.core.links.CreateLinkButton = Ext.extend(Ext.Button, {
-	iconCls: 'ic-add',
-	tooltip: t("Add"),
+	//iconCls: 'ic-link',
+	text: t("Links"),
 	newLinks : [],
+	cls: "go-create-link-btn",
+	totalCount: 0,
+	addLink : function(entity, entityId) {	
+		
+		this.newLinks.push({						
+						toEntity: entity,
+						toId: entityId
+					});
+					
+		var callId = go.Jmap.request({
+			method: "Search/query",
+			params: {
+				filter: {
+					entities: [entity],
+					entityId: entityId
+				}
+			}
+		});
+		
+		go.Jmap.request({
+			method: "Search/get",
+			params: {
+				"#ids": {
+					resultOf: callId,
+					path: "ids"
+				}
+			},
+			scope: this,
+			callback: function(options, success, result) {
+				
+					
+				this.linkGrid.store.loadData({"records" :[{
+					"toId": entityId,
+					"toEntity": entity,
+					to: {
+						name: result.list[0].name,
+						description: "" 
+					}
+				}]});
+		
+				this.totalCount++;
+				this.setCount();
+			}
+		});
+		
+	},
+					
 	initComponent: function () {
 
 		this.searchField = new go.modules.core.search.SearchCombo({
@@ -26,6 +73,9 @@ go.modules.core.links.CreateLinkButton = Ext.extend(Ext.Button, {
 						toEntity: record.get('entity'),
 						toId: record.get('entityId')
 					});
+					
+					this.totalCount++;
+					this.setCount();
 				}
 			},
 			getListParent: function () {
@@ -84,10 +134,11 @@ go.modules.core.links.CreateLinkButton = Ext.extend(Ext.Button, {
 					if (e.target.tagName !== "BUTTON") {
 						return false;
 					}
-
+					
 					var record = grid.store.getAt(rowIndex);
 					grid.store.remove(record);
-					
+					this.totalCount--;
+					this.setCount();
 					
 					var i = this.newLinks.findIndex(function(l) {
 						return l.toId === record.get('toId') && l.toEntity === record.get('toEntity');
@@ -114,31 +165,47 @@ go.modules.core.links.CreateLinkButton = Ext.extend(Ext.Button, {
 			items: [this.linkGrid],
 			doFocus: function () {
 				me.searchField.focus();
-			},
-			listeners: {
-				scope: this,	
-				show: function() {
-					if(this.linkGrid.store.baseParams.filter.entityId) {
-						this.linkGrid.store.load();
-					}
-				}
 			}
+//			listeners: {
+//				scope: this,	
+//				show: function() {
+//					if(this.linkGrid.store.baseParams.filter.entityId) {
+//						
+//					}
+//				}
+//			}
 		});
 
 		go.modules.core.links.CreateLinkButton.superclass.initComponent.call(this);
+		
+		this.origText = this.text;
+
+	},
+	
+	setCount : function() {		
+		this.setText(this.origText + " <span class='badge'>" + (this.totalCount) + "</span>");
 	},
 	
 	setEntity : function(entity, entityId) {
 		this.linkGrid.store.baseParams.filter.entity = entity;
 		this.linkGrid.store.baseParams.filter.entityId = entityId;		
-		this.menu.on("show", this.load, this, {single: true});
+		this.linkGrid.store.load({
+			scope: this,
+			callback: function() {
+				this.totalCount = this.linkGrid.store.getTotalCount();				
+				this.setCount();			
+			}
+		});
+		//this.menu.on("show", this.load, this, {single: true});
 	},
 	
 	reset : function() {
 		this.linkGrid.store.removeAll();
 		this.linkGrid.store.baseParams.filter.entity = null;
 		this.linkGrid.store.baseParams.filter.entityId = null;	
-		this.menu.un("show", this.load);
+		this.totalCount = 0;
+		this.setCount();
+		//this.menu.un("show", this.load);
 	},
 	
 	load: function() {
@@ -167,7 +234,10 @@ go.modules.core.links.CreateLinkButton = Ext.extend(Ext.Button, {
 		go.Stores.get("Link").set({
 			create: this.getNewLinks()
 		}, function() {
-			this.newLinks = [];
+			this.reset();
 		}, this);
 	}
 });
+
+
+Ext.reg("createlinkbutton", go.modules.core.links.CreateLinkButton);
