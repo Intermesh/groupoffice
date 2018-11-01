@@ -2,15 +2,34 @@
 	//border: none;
 	background:color($grey,200);
 }
-body {
-	background-color: $cPrimary;
-	
+
+html, body {
+	height: 100%;
 }
+body {
+	@include var(background-color, c-primary-tp);	
+}
+
 body * {
 	box-sizing: border-box;
 }
 
-#bg {
+p {
+	margin: dp(16) 0;
+}
+
+
+#window-container, #viewport {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	overflow: hidden;
+	visibility: hidden;
+}
+
+/*#bg {
 	z-index: -1;
 	position: fixed;
 	top:0;left:0;right:0;bottom:0;
@@ -19,7 +38,7 @@ body * {
 	background-repeat: repeat;
 	background-size:cover;
 	filter: blur(5px);
-}
+}*/
 
 @keyframes wave {
 	0%, 60%, 100% {
@@ -31,9 +50,10 @@ body * {
 	}
 }
 
+//default links are black in the UI
 a {
 	cursor: pointer;
-	color: $cAnchor;		
+	color: color($fg, "text");		
 	text-decoration: none;
 /*	&:link, &:active, &:visited {
 		color: inherit;
@@ -45,6 +65,13 @@ a {
 	label {
 		cursor: inherit;
 	}	
+}
+
+//blue links here
+.ext-mb-content {
+	a {
+		color: $cAnchor;
+	}
 }
  
 #loading{
@@ -123,13 +150,7 @@ a {
 	}	
 }
 
-#user-menu {
-	span + span {
-		display:block;
-		height:dp(40);
-		border-radius: 50%;
-	}
-}
+
 .go-display-name {
 	@extend %font-subheading;
 	margin: dp(8) 0 dp(8) dp(16);
@@ -138,6 +159,24 @@ a {
 
 .login-text-comp {
 	padding-bottom: dp(16);
+}
+
+#login {
+	.go-app-logo {
+		position:absolute;
+		top: dp(16);
+		left: dp(16);
+	}
+}
+
+#go-login-header {
+	position:absolute;
+	top:0;
+	left:0;
+	right:0;
+	height: dp(72);
+	@extend .z4;
+	@include var(background-color, c-primary);	
 }
 
 #go-select-language{
@@ -167,7 +206,7 @@ a {
 .go-header-left {
 	padding-left: dp(16);
 	position: absolute;
-	top: 0;
+	top: dp(12);
 	left: 0;
 }
 .go-header-right {
@@ -192,12 +231,12 @@ a {
 	@extend %font-title;
 	//margin-right: dp(56);
 	//width: 245px;
-	color:$cPrimary;
+	@include var(color, c-primary);
 }
 .go-item-wrap {
 	cursor:pointer;
 	padding: dp(8);
-	border-bottom: 1px solid color($foreground, 'divider');
+	border-bottom: 1px solid color($fg, 'divider');
 	&:before {
 		@extend %icon;
 		content: 'keyboard_arrow_right';
@@ -205,16 +244,16 @@ a {
 	}
 	&.go-view-selected {
 		background-color: $cSelected;
-		color: $cPrimary;
+		@include var(color, c-primary);
 	}
 	span {
 		padding: 0 0 0 dp(40) !important;
 	}
 }
 .go-view-over {
-	background-color: color($background,'hover');
+	background-color: color($bg,'hover');
 }
-#go-logo, .go-app-logo {
+#go-logo, .go-app-logo, .go-about-logo {
 	background-image: url('img/logo-white.svg');
 	background-size: contain;
 	background-repeat: no-repeat;
@@ -222,13 +261,23 @@ a {
 	width: dp(240);
 	@extend %font-title;
 }
-.go-app-logo {
-	margin: dp(16);
-  .x-window & {	
-		background-image: url('img/logo-blue.svg');
-		/*margin-left: dp(16);*/
-	}
+
+
+.go-about-logo {
+	background-image: url('img/logo-blue.svg');
 }
+.go-settings-logo {
+	background-image: url('img/logo-white.svg');
+	background-size: auto dp(40);
+	background-repeat: no-repeat;
+	background-position: dp(16) dp(16);
+	height: dp(72);
+	width: dp(272);
+	border: 1px solid color($fg, 'border');
+
+	@include var(background-color, c-primary);
+}
+
 //, .go-border-center:not(.x-panel-noborder)
 .x-portlet {
 	@extend %card;
@@ -245,10 +294,10 @@ a {
 		margin:0;
 		cursor:pointer;
 		&.x-view-selected i {
-			color: $cPrimary;
+			@include var(color, c-primary);
 		}
 		i {
-			color: color($foreground,'secondary-text');
+			color: color($fg,'secondary-text');
 			margin-right:dp(16);
 			
 		}
@@ -257,7 +306,7 @@ a {
 				background-color: $cHover;
 			}
 			&-selected {
-				color:$cPrimary;
+				@include var(color, c-primary);
 				background-color: $cSelected;
 			}
 		}
@@ -266,16 +315,17 @@ a {
 }
 
 #mainNorthPanel {
-	height: dp(64);
-	padding-top:dp(12);
+	height: dp(56);
+	
 	position: relative;
 	color: white;
-	background-color: $cPrimary;
+	@include var(background-color, c-primary);
 	+ .x-tab-panel {
-		background-color: $cPrimary;
+		@include var(background-color, c-primary);
 		> .x-tab-panel-header {
 			position: relative;
-			background-color:rgba(255,255,255,.17);
+			border-width: 0 0 0 0;
+			/*background-color:rgba(255,255,255,.17);*/
 			.x-tab-strip-active {
 				border-bottom-color: $cAccent;
 				color:white;
@@ -283,29 +333,31 @@ a {
 			}
 			.x-tab-strip-wrap { border: 0; }
 			.x-tab-scroller-right, .x-tab-scroller-left {
-				color:color($primary, 700, true);
+				color: white;
 			}
 			.x-tab-scroller-right-over, .x-tab-scroller-left-over {
-				color:white;
+				color: white;
 			}
 			.x-tab-right { padding-left:0;}
 			.x-tab-strip {	border: 0; }
 			.x-tab-strip-text{
-				color:rgba(white, .7);
+				color:rgba(white, .5);
 				padding-left:0;
 			}
 		}
 		.x-tab-panel-body{
-			background-color: color($background, "background");
+			background-color: color($bg, "background");
 			> .x-hide-display {
 				display:none !important;
 			}
 		}
 	}
+
+	
 }
 .go-grid3-hide-headers {
 	.x-panel-tbar {
-		border-bottom: dp(1) solid color($foreground, "divider");
+		border-bottom: dp(1) solid color($fg, "divider");
 	}
 	.x-grid3-header {
 		display:none;
@@ -314,10 +366,10 @@ a {
 
 
 .go-head-tb {
-	border-bottom: 1px solid color($foreground, 'line') !important;
+	border-bottom: 1px solid color($fg, 'line') !important;
 	position:relative;
 	z-index: 2;
-	background-color: color($background, 'background') !important;
+	background-color: color($bg, 'background') !important;
 	// /color: $cAccent;
 }
 
@@ -343,18 +395,19 @@ a {
 
 #secondary-menu {
 	padding-right: dp(56);
-	#start-menu-link {
+	#start-menu-link {		
 		display:inline-block;
 		text-decoration: none;
 		height:dp(40);
-		padding: dp(8);
-		color:color($primary, 700, 1);
+		padding: dp(20) dp(8) dp(8) dp(8);
+		color: white;
 		&:hover,&:active { color: white; }
 	}
 }
 #search_query {
 	float:left;
 	display:inline-block;
+	padding-top: dp(12);
 	.search-field-wrap {
 		position:fixed;
 		display: block !important;
@@ -362,7 +415,7 @@ a {
 		left:dp(240);
 		right:dp(240);
 		height: dp(40);
-		background-color: color($background, 'disabled-button');
+		background-color: color($bg, 'disabled-button');
 		border-radius: $borderRadius;
 		transition: opacity 280ms $curve-standard;
 		opacity:1;
@@ -392,8 +445,10 @@ a {
 	
 }
 
+
+
 .go-search-panel {
-	//border: 1px solid color($foreground, "line");
+	//border: 1px solid color($fg, "line");
 	@extend .z24
 }
 
@@ -403,21 +458,22 @@ a {
 }
 #message-ct {
 	position: absolute;
-	z-index: 81;
+	z-index: 100000;
 	top: dp(16);
 	right: 8px;
 	left: 8px;
 	list-style: none;
 	overflow: visible;
+	pointer-events:none;
 	> div {
 		@extend .z4;
 		min-width: dp(280);
 		max-width: dp(400);
 		border-radius: $borderRadius;
-		background-color: color($background, 'card');
+		background-color: color($bg, 'card');
 		min-height: dp(40);
 		padding: dp(16) dp(24);
-		color: color($foreground, 'secondary-text');
+		color: color($fg, 'secondary-text');
 		margin: 0 auto dp(4);
 		animation: slide-top .2s ease-out; 
 		h4 {
@@ -430,7 +486,7 @@ a {
 	}
 }
 .card {
-	background-color: color($background, 'card');
+	background-color: color($bg, 'card');
 }
 /*.go-global-search {
 	//width: 65%;
@@ -439,7 +495,7 @@ a {
 	position:absolute;
 	left: 240px;
 	right: 240px;
-	background-color: color($background, 'disabled-button');
+	background-color: color($bg, 'disabled-button');
 	border-radius: $borderRadius;
 	.x-btn {
 		position:absolute;
@@ -473,22 +529,76 @@ button {
 }
 
 .avatar {
+	position:relative;
 	display:inline-block;
 	padding:0;
 	background: url('img/default-avatar.svg') no-repeat center center;
 	background-size:cover;
-	border: 2px solid white;
+	
 	border-radius: 50%;
+	width:dp(40);
+	height: dp(40);
+	
+	.go-detail-view & {
+		float:left;
+		margin-top:dp(4);
+		margin-right: dp(16);
+	}
+	.x-btn {
+		border: 0;
+	}
+	
+	&.group {
+		&::before {
+			width: 100%;
+			height: 100%;
+			color: white;
+			@extend %icon;
+			font-size: dp(28);
+			margin: dp(4);			
+		}
+		@extend .ic-group;
+		background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24));	
+	}
 }
+
+.user {
+	position: relative;
+	padding-left: dp(48);
+	min-height: dp(40);
+	
+	.wrap {
+		padding-top: dp(4);
+	}
+	.avatar {
+		position: absolute;
+		top: 0;
+		left: 0;
+		vertical-align: middle;
+	}
+	
+	.username, .displayName {
+		display:block;
+	}
+}
+
+#user-menu {
+	span + span {
+		display:block;
+		height:dp(48);
+		border-radius: 50%;
+	}
+}
+
 .user-img {
 	@extend .avatar;
 	position:absolute;	
 	right: dp(16);
-	top:0;
+	top: dp(8);
 	z-index:15;
-	
-	width: dp(40);
-	height: dp(40);
+	border: 1px solid white;
+	width: dp(48);
+	height: dp(48);
 	&.login-avatar{
 		top: dp(16);
 	}	
@@ -499,16 +609,16 @@ button {
 		padding-top:dp(48);
 		z-index:14;
 		@extend .z1;
-		color: color($foreground, 'text');
+		color: color($fg, 'text');
 		position:absolute;
 		top: dp(20);
 		right:dp(8);
 		width: dp(256);
-		background-color: color($background, 'card');
+		background-color: color($bg, 'card');
 		button a {
-			color: color($foreground, 'icon');
+			color: color($fg, 'icon');
 			&:hover{
-				color: color($foreground, 'text');
+				color: color($fg, 'text');
 			}
 		}
 	}
@@ -518,14 +628,14 @@ hr {
 	height: 1px;
 	border:0;
 	margin: dp(15) 0 dp(16) 0;
-	background-color: color($foreground, 'divider');
+	background-color: color($fg, 'line');
 }
 #go-logged-in-as {
 	text-align:center;
 }
 
 #go-module-panel-summary > div > div.x-panel-body  {
-	background-color: color($background, 'background');
+	background-color: color($bg, 'background');
 }
 
 .go-tab-notification {
@@ -568,6 +678,7 @@ button.filetype-pdf, button.filetype-doc {
 }
 .go-grid-icon { // icon in field
 	background-repeat: no-repeat;
+	background-position: 0 center;
    padding-left: dp(40) !important;
 	display: block;
 	width:auto !important;
@@ -671,7 +782,7 @@ button.filetype-pdf, button.filetype-doc {
 		width: 16px;
 		text-align: right;
 		padding-right: 2px;
-		a { color: color($foreground, 'icon');}
+		a { color: color($fg, 'icon');}
 	}
 
 }
@@ -680,14 +791,6 @@ button.filetype-pdf, button.filetype-doc {
 	//background-color: color($grey, 100);
 }
 
-/*%hyperlink {
-	color: color($primary, 700);
-	text-decoration: none;
-	&:hover {
-		color: color($primary, 900);
-		background-color: transparent;
-	}
-}*/
 //detail view
 .go-detail-view, .go-display-panel {
 	
@@ -716,7 +819,7 @@ button.filetype-pdf, button.filetype-doc {
 		background-color: color($orange, 700) !important;
 	}*/
 	
-/*	background-color:color($background, 'card');*/
+/*	background-color:color($bg, 'card');*/
 	figure {
 		background-image: url(img/default-avatar.svg);
 		background-position:center 60%;
@@ -730,7 +833,7 @@ button.filetype-pdf, button.filetype-doc {
 		  padding-top: (9 / 16) * 100%;
 		}
 	}
-	.x-tool { margin-top: dp(3);}
+	/*.x-tool { margin-top: dp(3);}*/
 
 
 		
@@ -800,14 +903,14 @@ button.filetype-pdf, button.filetype-doc {
 	}
 	
 	.x-panel-body {
-		background-color: color($background, "card");
+		background-color: color($bg, "card");
 	}
 	
 	.x-panel-bbar {
 		height: dp(64);
 		padding-left: dp(8);
 		.x-btn{
-			border: dp(1) solid color($foreground, "line");
+			border: dp(1) solid color($fg, "line");
 		}
 		.x-toolbar {
 			border-bottom: 0;
@@ -828,59 +931,67 @@ button.filetype-pdf, button.filetype-doc {
 		padding: dp(16);
 	}
 	
+	
+	.x-panel-header {
+		border-top: 1px solid color($fg, "line");
+	}
 }
 
 .go-icon-list {
 	p, > a {
+		
 		min-height: dp(40);
 		box-sizing: border-box;
 		display:table;
 		text-decoration: none;
 		padding: dp(8) dp(16);
+		margin: 0;
 		width: 100%;
-		span {
+		span, a {
 			display: block;
 			min-height: dp(24);
 		}
+		
 		i.label {			
 			left: dp(16);
 			top:dp(12);
 			width:  dp(24);
 			height: dp(24);
 			position: absolute;
-			color: color($foreground, 'icon') !important;		
+			color: color($fg, 'icon') !important;		
 		}
-		&.right {
-			top: dp(8);
-			right: dp(16);
-			position:absolute;
+		
+		&:hover {
+			.show-on-hover {
+				display:block;
+			}
+		}
+		
+	}
+	.right {
+		top: dp(8);
+		right: dp(16);
+		position:absolute;
+		
+		&.show-on-hover {
+			display: none;
+			
 		}
 	}
 }
 .go-icon-list > p, .go-icon-list > a {
 	position:relative;
-	padding-left: dp(64);
+	padding-left: dp(56);
 
 }
 
 // old detail view compatibility
 .go-display-panel {
 	width: 100%;
-	&-browse {
-		@extend .x-btn;
-		float:right;
-		padding: 0 dp(8);
-		margin-right: dp(8);
-		color: $cPrimary;
-		&:hover, &:active {
-			transition: background-color 195ms linear, box-shadow 195ms $curve-standard;
-			background-color: rgba(14, 156, 197, 0.096);
-		}
-	}
 	&-heading {
 		@extend %font-subheading;
-		/*color: color($foreground, 'secondary-text');*/
-		border-top: 1px solid color($foreground, 'divider');
+		/*color: color($fg, 'secondary-text');*/
+		border-top: 1px solid color($fg, 'divider');
 		padding: dp(8) dp(16);
 		height: dp(56);
 	}
@@ -896,20 +1007,14 @@ button.filetype-pdf, button.filetype-doc {
 	} */
 	.table_header_links {
 		@extend %font-caption;
+		@extend .ellipsis;
 		padding: dp(8);
 		vertical-align: middle;
-		height: dp(40);		
-		overflow: hidden;
-		text-overflow: ellipsis;
-		border-bottom: 1px solid color($foreground, 'line');
+		height: dp(40);
+		border-bottom: 1px solid color($fg, 'line');
 		background-color: transparent !important;
 	}
 }
-
-.go-tool-toggle-collapsed:before {
-    content: "expand_more";
-	}
-	
 	
 table.display-panel {
 	width: 100%;
@@ -923,8 +1028,11 @@ table.display-panel {
 			padding-right: dp(16);
 		}
 	}
+	th {
+		@extend %font-data-head;
+	}
 	tr.line, td.line, th.line {
-		border-top: 1px solid color($foreground, 'line');
+		border-bottom: 1px solid color($fg, 'line');
 	}
 	table { 
 		td:first-child {
@@ -937,8 +1045,8 @@ table.display-panel {
 }
 .collapsible-display-panel-header {
 	@extend %font-subheading;
-/*	color: color($foreground, 'secondary-text');*/
-	border-top: 1px solid color($foreground, 'divider');
+/*	color: color($fg, 'secondary-text');*/
+	border-top: 1px solid color($fg, 'divider');
 	padding: 0 dp(8) 0 dp(16);
 	height: dp(56);
 	line-height: dp(56);
@@ -950,10 +1058,14 @@ table.display-panel {
 	background-size: dp(16) dp(16);
 }
 .go-select-all-checkbox {
-	color: color($foreground, 'text');
+	color: color($fg, 'text');
 	@extend %font-caption;
 	.x-form-checkbox + label:before{
-		color: color($foreground, "icon");
+		margin: 0 dp(6) 0 dp(4);
+		color: color($fg, "icon");
+	}
+	.x-form-cb-label {
+		vertical-align: middle;
 	}
 }
 td[id^="comment-td"] {
@@ -965,13 +1077,13 @@ table[id^="comments-ext"] b {
 .comment-div {
 	padding: dp(8);
 	border-radius: $borderRadius;
-	border: 1px solid color($foreground, 'divider');
+	border: 1px solid color($fg, 'divider');
 }
 // end old display panel
 
 
 .go-border-bottom {
-	border-bottom: 1px solid color($foreground, 'line');
+	border-bottom: 1px solid color($fg, 'line');
 }
 
 .x-window.go-form-panel .x-panel-body, 
@@ -992,7 +1104,6 @@ table[id^="comments-ext"] b {
 	padding: dp(16);
 	font-size: 10px;
 	border-radius: dp(4);
-	background-color: color($primary, 300);
 	h1 {
 		@extend %font-title;
 	}
@@ -1014,9 +1125,8 @@ table[id^="comments-ext"] b {
 
 .go-sidenav {
 	//margin-top: dp(8);
-	//border-right: 1px solid color($foreground, "divider");
-	/*background-color: color($background, 'app-bar');*/
-	
+	//border-right: 1px solid color($fg, "divider");
+	/*background-color: color($bg, 'app-bar');*/
 	.x-grid3 {
 		background-color: transparent;
 		
@@ -1028,7 +1138,7 @@ table[id^="comments-ext"] b {
 		}
 	}
 	.x-panel-tbar {
-		border-bottom: 1px solid color($foreground, "divider");
+		border-bottom: 1px solid color($fg, "divider");
 	}
 	.x-panel-header-text {
 		//@extend %font-title;
@@ -1085,6 +1195,10 @@ table[id^="comments-ext"] b {
 			display: none;
 		}
 	}
+	
+	#mainNorthPanel {
+		height: dp(64);
+	}
 
 }
 
@@ -1092,4 +1206,159 @@ table[id^="comments-ext"] b {
 	#go-logo {
 		display: none;
 	}
+}
+
+.x-form-element {
+	.x-grid-panel {
+		border-radius: dp(4);
+		border: 1px solid transparent;
+	}
+	.x-grid-panel {	
+		&.x-form-invalid {
+			border-color: rgba(color($red, 700),0.54);
+		}
+	}
+}
+
+
+.x-panel.text {
+	padding: dp(16);
+}
+
+
+.x-btn.raised{
+	border: dp(1) solid color($fg, "line");
+}
+
+
+.go-links-detail {
+	a {
+		color: color($fg, 'text');
+	}
+	
+	.count {
+		float: right;
+		@extend %badge;
+	}
+	
+	a.show-more {
+		font-style: italic;
+		color: $cAnchor;
+	}
+}
+
+.go-login-dialog {
+	.x-panel-bbar .x-toolbar {
+		border-top: 0;
+	}
+}
+
+
+
+
+
+.go-html-formatted {
+	
+}
+
+.go-html-formatted div, .go-html-formatted dl, .go-html-formatted dt, .go-html-formatted dd, .go-html-formatted ul, .go-html-formatted ol, .go-html-formatted li, .go-html-formatted h1, .go-html-formatted h2, .go-html-formatted h3, .go-html-formatted h4, .go-html-formatted h5, .go-html-formatted h6, .go-html-formatted pre, .go-html-formatted form, .go-html-formatted fieldset, .go-html-formatted input, .go-html-formatted p, .go-html-formatted blockquote, .go-html-formatted th, .go-html-formatted td, .go-html-formatted span {
+    font: inherit;
+}
+
+.go-html-formatted  blockquote {  
+  display: block;  
+  margin: 1em 40px;  
+  padding:0px 10px;
+}
+
+
+.go-html-formatted h1 {  
+  display: block;  
+  font-size: 2em;  
+  font-weight: bold;  
+  margin: .67em 0;  
+}  
+   
+.go-html-formatted h2 {  
+  display: block;  
+  font-size: 1.5em;  
+  font-weight: bold;  
+  margin: .83em 0;  
+}  
+   
+.go-html-formatted h3 {  
+  display: block;  
+  font-size: 1.17em;  
+  font-weight: bold;  
+  margin: 1em 0;  
+}  
+   
+.go-html-formatted h4 {  
+  display: block;  
+  font-weight: bold;  
+  margin: 1.33em 0;  
+}  
+  
+.go-html-formatted h5 {  
+  display: block;  
+  font-size: 0.83em;  
+  font-weight: bold;  
+  margin: 1.67em 0;  
+}  
+   
+.go-html-formatted h6 {  
+  display: block;  
+  font-size: 0.67em;  
+  font-weight: bold;  
+  margin: 2.33em 0;  
+}
+
+
+.go-html-formatted td {   
+   display: table-cell;  
+/*   vertical-align: inherit;  
+   text-align: inherit; */
+ }  
+   
+.go-html-formatted th {  
+   display: table-cell;  
+   vertical-align: inherit;  
+   font-weight: bold;  
+   padding: 1px;  
+ }
+
+   
+.go-html-formatted ul,.go-html-formatted  menu, .go-html-formatted dir {  
+   display: block;  
+   list-style-type: disc;  
+   margin: 1em 2em;
+   /*-moz-padding-start: 40px;  */
+ }  
+   
+.go-html-formatted ol {  
+   display: block;  
+   list-style-type: decimal;  
+   margin: 1em 2em;
+   /*-moz-padding-start: 40px;  */
+ }  
+   
+.go-html-formatted li {  
+   display: list-item;  
+ }
+ 
+.go-html-formatted p {  
+   margin:10px 0px;  
+ }
+
+.go-html-formatted a:link, .go-html-formatted a:visited, .go-html-formatted a:active{
+	text-decoration:underline;
+	color: $cAnchor;
+}
+.go-html-formatted a:visted{
+	color:purple;
+}
+
+.normal-link {
+	text-decoration:underline;
+	color: $cAnchor;
 }

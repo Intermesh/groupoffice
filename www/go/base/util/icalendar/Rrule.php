@@ -89,7 +89,7 @@ class Rrule extends \GO\Base\Util\Date\RecurrencePattern
 		$parameters['byday']=array();
 		
 		foreach($this->_days as $day){
-			if(isset($json[$day])){
+			if(!empty($json[$day])){
 				$day = $day;
 //				if(!empty($json['bysetpos']))
 //					$day = $json['bysetpos'].$day;

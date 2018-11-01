@@ -21,16 +21,25 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 		if(this.store) {
 			this.on({
 				scope: this,
-				search: function (tb, v) {	
-					if(this.store instanceof go.data.Store) {
-						this.store.load({
-							params: {filter: [{q: v}]}
-						});
-						return
+				search: function (tb, v) {
+					if(this.store instanceof go.data.Store || this.store instanceof go.data.GroupingStore) {
+						this.store.baseParams.filter.q = v;
+					} else {
+						//params for old framework
+						this.store.baseParams.query = v;
 					}
-					this.store.load({params: {query:v}});
+					
+					this.updateView();
+					this.store.load();
 				},
 				reset: function() {
+					if(this.store instanceof go.data.Store) {
+						delete this.store.baseParams.filter.q;
+					} else {
+						delete this.store.baseParams.query;
+					}
+					
+					this.updateView();
 					this.store.load();
 				}
 			});
@@ -60,25 +69,65 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 		});
 	},
 	
+	/**
+	 * Set correct class and update tooltip
+	 */
+	updateView : function(){
+		if(this.hasActiveSearch()){
+			this.addClass('raised');
+			this.setTooltip(t("Change search condition"));
+		} else {
+			this.removeClass('raised');
+			this.setTooltip(t("Search"));
+		}
+	},
+	
+	/**
+	 * Check if there currently is an active search going on
+	 * 
+	 * @return {Boolean}
+	 */
+	hasActiveSearch : function(){
+		
+		var isActive = false;
+		
+		if(this.store instanceof go.data.Store || this.store instanceof go.data.GroupingStore) {
+			isActive = !GO.util.empty(this.store.baseParams.filter.q);
+		} else {
+			isActive = !GO.util.empty(this.store.baseParams.query);
+		}
+
+		return isActive;
+	},
+	
+	/**
+	 * Close the search toolbar
+	 * 
+	 * @param {Button} b
+	 */
+	back : function(b){
+		b.findParentByType('toolbar').setVisible(false);
+		this.fireEvent('close', this);
+	},
+	
 	onRender : function(ct, position) {
 		var items = this.initialConfig.tools || [];
 		
 		items.unshift({
 			iconCls: 'ic-arrow-back',
 			handler: function (b) {
-				b.findParentByType('toolbar').setVisible(false);
-				this.reset();
-				this.fireEvent('close', this);
+				this.back(b);
 			},
 			scope: this
 		}, 
 		this.triggerField);
-		
+				
 		items.push(this.resetButton = new Ext.Button({
 			iconCls: 'ic-close',
 			disabled: true,
 			handler: function (b) {
 				this.reset();
+				this.back(b);
 			},
 			scope: this
 		}));

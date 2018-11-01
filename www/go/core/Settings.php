@@ -17,12 +17,18 @@ abstract class Settings extends data\Model {
 		return (new Query)
 			->selectSingleValue('id')
 			->from('core_module')
-			->where(['name' => $this->getModuleName()])
+			->where(['name' => $this->getModuleName(), 'package' => $this->getModulePackageName()])
 			->execute()
 			->fetch();
 	}
 	
-	abstract function getModuleName();
+	protected function getModuleName() {
+		return explode("\\", static::class)[3];
+	}
+	
+	protected function getModulePackageName() {
+		return explode("\\", static::class)[2];
+	}
 	
 	private $oldData;
 	
@@ -34,6 +40,7 @@ abstract class Settings extends data\Model {
 	protected function __construct() {
 		
 		if(GO()->getInstaller()->isInProgress()) {
+			$this->oldData = [];
 			return;
 		}
 		
@@ -50,9 +57,9 @@ abstract class Settings extends data\Model {
 			$this->oldData = (array) $this;
 	}
 	
-	public function __destruct() {
-		$this->save();
-	}
+//	public function __destruct() {
+//		$this->save();
+//	}
 	
 	public function save() {
 		$new = (array) $this;
@@ -63,7 +70,7 @@ abstract class Settings extends data\Model {
 				continue;
 			}
 			
-			if(!isset($this->oldData[$name]) || $value != $this->oldData[$name]) {
+			if(!array_key_exists($name, $this->oldData) || $value != $this->oldData[$name]) {
 				$this->update($name, $value);
 			}
 		}
@@ -72,6 +79,8 @@ abstract class Settings extends data\Model {
 	}
 	
 	private function update($name, $value) {
+		
+		
 		if (!App::get()->getDbConnection()->replace('core_setting', [
 								'moduleId' => $this->getModuleId(),
 								'name' => $name,

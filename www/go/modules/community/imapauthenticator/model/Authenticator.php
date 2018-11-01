@@ -2,7 +2,7 @@
 namespace go\modules\community\imapauthenticator\model;
 
 use Exception;
-use go\core\auth\model\User;
+use go\modules\core\users\model\User;
 use go\core\auth\PrimaryAuthenticator;
 use go\core\imap\Connection;
 use GO\Email\Model\Account;

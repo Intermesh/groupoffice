@@ -543,4 +543,36 @@ END;
 			return $str;
 		}
 	}
+	
+	/**
+	 * Explode a search expression in to tokens
+	 * 
+	 * For example:
+	 * 
+	 * $expression = "apple bear \"Tom Cruise\" or 'Mickey Mouse' another word";
+	 * 
+	 * $tokens = StringUtil::explodeSearchExpression($expression);
+	 * 
+	 * The result will be:
+	 * Array
+	 * (
+	 *     [0] => apple
+	 *     [1] => bear
+	 *     [2] => Tom Cruise
+	 *     [3] => or
+	 *     [4] => Mickey Mouse
+	 *     [5] => another
+	 *     [6] => word
+	 * )
+	 * 
+	 * 1. Accepted delimiters: white spaces (space, tab, new line etc.) and commas.
+	 * 
+	 * 2. You can use either simple (') or double (") quotes for expressions which contains more than one word.
+	 * 
+	 * @param string $expression
+	 * @return string[]
+	 */
+	public static function explodeSearchExpression($expression) {
+		return preg_split("/[\s,]*\\\"([^\\\"]+)\\\"[\s,]*|" . "[\s,]*'([^']+)'[\s,]*|" . "[\s,]+/", $expression, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+	}
 }

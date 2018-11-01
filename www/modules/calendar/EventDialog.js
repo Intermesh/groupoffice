@@ -123,7 +123,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			items : this.formPanel,
 			focus : focusSubject.createDelegate(this),
 			buttonAlign:'left',
-			buttons : [this.linkBrowseButton = new go.links.LinkToButton({
+			buttons : [this.linkBrowseButton = new go.detail.addButton({
 				iconCls : 'ic-link',
 				text : t("Links"),
 				disabled : true,
@@ -257,6 +257,10 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 					} else {
 						this.reminderComposite.setDisabled(true);
 					}
+					var days = ['SU','MO','TU','WE','TH','FR','SA'];
+					Ext.each(this.dayButtons, function(btn) {
+						btn.toggle(!!action.result.data[days[btn.day]]);
+					});
 					
 
 					// If this is a recurrence and the following is true (action.result.data.exception_for_event_id and action.result.data.exception_date are set and not empty)
@@ -690,7 +694,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			increment: 15,
 			format:GO.settings.time_format,
 			name:'start_time',
-			width:80,
+			width:dp(120),
 			hideLabel:true,
 			autoSelect :true,			
 			listeners : {
@@ -705,7 +709,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			increment: 15,
 			format:GO.settings.time_format,
 			name:'end_time',
-			width:80,
+			width:dp(120),
 			hideLabel:true,
 			autoSelect :true,			
 			listeners : {
@@ -982,15 +986,23 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 		var days = ['SU','MO','TU','WE','TH','FR','SA'];
 
 		this.cb = [];
+		this.dayButtons = [];
 		for (var day = 0; day < 7; day++) {
-			this.cb[day] = new Ext.form.Checkbox({
-				boxLabel : t("short_days")[day],
+			this.cb[day] = new Ext.form.Hidden({
 				name : days[day],
-				disabled : true,
-				checked : false,
-				width : 'auto',
-				hideLabel : true,
-				labelSeperator : ''
+				value : 0,
+			});
+			this.dayButtons[day] = new Ext.Button({
+				text : t("short_days")[day],
+				day:day,
+				enableToggle: true,
+				pressed : false,
+				listeners: {
+					toggle:function(btn,pressed) {
+						this.cb[btn.day].setValue(pressed?1:0);
+					},
+					scope:this
+				}
 			});
 		}
 
@@ -1105,11 +1117,14 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 				fieldLabel : t("Repeat every", "calendar"),
 				xtype : 'compositefield',
 				items : [this.repeatEvery,this.repeatType,this.monthTime]
-			}, {
-				xtype : 'compositefield',
+			}, this.daysGroup = new Ext.ButtonGroup({
+				disabled:true,
 				fieldLabel : t("At days", "calendar"),
-				items : [this.cb[1],this.cb[2],this.cb[3],this.cb[4],this.cb[5],this.cb[6],this.cb[0]]
-			},
+				items : [
+					this.cb[1],this.cb[2],this.cb[3],this.cb[4],this.cb[5],this.cb[6],this.cb[0],
+					this.dayButtons[1],this.dayButtons[2],this.dayButtons[3],this.dayButtons[4],this.dayButtons[5],this.dayButtons[6],this.dayButtons[0]
+				]
+			}),
 			this.repeatForeverXCheckbox, 
 			{
 				hideLabel: true,
@@ -1446,11 +1461,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 		}
 	},
 	disableDays : function(disabled) {
-		var days = ['SU','MO','TU','WE','TH','FR','SA'];
-		for (var day = 0; day < 7; day++) {
-			this.formPanel.form.findField(days[day])
-			.setDisabled(disabled);
-		}
+		this.daysGroup.setDisabled(disabled);;
 	},
 	
 	getResourceIds : function() {

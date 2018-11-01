@@ -19,28 +19,7 @@ GO.calendar.SettingsPanel = Ext.extend(Ext.Panel, {
 	iconCls: 'ic-event',
 
 	onLoadStart: function (userId) {
-		
-		//temporary fix for combo to show address book name. Remove when refactored
-		var userGetRequest = go.Jmap.findRequestByMethod("User/get");
-		if(!userGetRequest) {
-			return;
-		}
-		var userGetRequestId = userGetRequest[2];
-		go.Jmap.request({
-			method: "community/calendar/Calendar/get",
-			params: {
-				"properties": ["name"],
-				"#ids": {
-						"resultOf": userGetRequestId,
-						"name": "User/get",
-						"path": "/list/*/calendarSettings/calendar_id"
-				}
-			},
-			callback: function(options, success, result) {
-				this.selectCalendar.setRemoteText(result.list[0].name);
-			},
-			scope: this
-		});
+
 	},
 
 	initComponent: function () {
@@ -132,29 +111,11 @@ GO.calendar.SettingsPanel = Ext.extend(Ext.Panel, {
 						value: 'EBF1E2',
 						name: 'calendarSettings.background'
 					}),
-					this.selectCalendar = new GO.form.ComboBox({
+					this.selectCalendar = new GO.calendar.SelectCalendar({
 						fieldLabel: t("Default calendar", "calendar"),
 						hiddenName: 'calendarSettings.calendar_id',
 						anchor: '-20',
-						emptyText: t("Please select..."),
-						store: new GO.data.JsonStore({
-							url: GO.url("calendar/calendar/store"),
-							baseParams: {
-								permissionLevel: GO.permissionLevels.write
-							},
-							fields: ['id', 'name'],
-							remoteSort: true
-						}),
-						pageSize: parseInt(GO.settings.max_rows_list),
-						valueField: 'id',
-						displayField: 'name',
-						typeAhead: true,
-						mode: 'remote',
-						triggerAction: 'all',
-						editable: false,
-						selectOnFocus: true,
-						forceSelection: true,
-						allowBlank: false
+						emptyText: t("Please select...")						
 					}), {
 						xtype: 'xcheckbox',
 						name: 'calendarSettings.show_statuses',

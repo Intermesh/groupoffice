@@ -72,6 +72,7 @@ CREATE TABLE IF NOT EXISTS `pa_mailboxes` (
   `password` varchar(255) NOT NULL DEFAULT '',
   `name` varchar(255) NOT NULL DEFAULT '',
   `maildir` varchar(255) default NULL,
+	`homedir` VARCHAR(255) default NULL,
   `quota` bigint(20) NOT NULL default '0',
   `ctime` int(11) NOT NULL,
   `mtime` int(11) NOT NULL,

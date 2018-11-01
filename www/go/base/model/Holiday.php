@@ -176,13 +176,17 @@ class Holiday extends \GO\Base\Db\ActiveRecord {
 	 */
 	public static function getAvailableHolidayFiles(){
 		$holidays = array();
+		
+		$lang = GO()->getLanguage()->getLanguages();
+		
 		$folderPath = \GO::config()->root_path.'language/holidays/';
 		$folder = new \GO\Base\Fs\Folder($folderPath);
 		
 		$children = $folder->ls();
 		foreach($children as $child){
-			$label = \GO::t($child->nameWithoutExtension());
-			$holidays[$label] = array('filename'=>$child->nameWithoutExtension(),'label'=>$label);
+			$iso = $child->nameWithoutExtension();
+			$label = $lang[$iso] ?? $iso;
+			$holidays[$label] = array('iso'=>$child->nameWithoutExtension(),'label'=>$label);
 		}
 		ksort($holidays);
 		return array_values($holidays);

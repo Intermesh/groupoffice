@@ -11,36 +11,36 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
-go.modules.notes.MainPanel = Ext.extend(Ext.Panel, {
+go.modules.community.notes.MainPanel = Ext.extend(Ext.Panel, {
 
 	layout: 'responsive',
 	layoutConfig: {
 		triggerWidth: 1000
 	},
-	
 
 	initComponent: function () {
 
-		this.noteBookGrid = new go.modules.notes.NoteBookGrid({
+//		debugger;
+		this.noteBookGrid = new go.modules.community.notes.NoteBookGrid({
 			region: 'west',
 			cls: 'go-sidenav',
 			width: dp(280),
 			split: true,
 			tbar: [{
 					xtype: 'tbtitle',
-					text: t('Notebooks', 'notes')
+					text: t('Notebooks')
 				}, '->', {
 					disabled: go.Modules.get("community", 'notes').permissionLevel < GO.permissionLevels.write,
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
-						var noteBookForm = new go.modules.notes.NoteBookForm();
+						var noteBookForm = new go.modules.community.notes.NoteBookForm();
 						noteBookForm.show();
 					}
 				}, {
 					cls: 'go-narrow',
 					iconCls: "ic-arrow-forward",
-					tooltip: t("Notes", "notes"),
+					tooltip: t("Notes"),
 					handler: function () {
 						this.noteGrid.show();
 					},
@@ -71,12 +71,12 @@ go.modules.notes.MainPanel = Ext.extend(Ext.Panel, {
 
 			this.addButton.setDisabled(!this.addNoteBookId);
 
-			this.noteGrid.getStore().baseParams.filter = [{noteBookId: ids}];
+			this.noteGrid.getStore().baseParams.filter.noteBookId = ids;
 			this.noteGrid.getStore().load();
 		}, this, {buffer: 1}); //add buffer because it clears selection first
 
 
-		this.noteGrid = new go.modules.notes.NoteGrid({
+		this.noteGrid = new go.modules.community.notes.NoteGrid({
 			region: 'center',
 			tbar: [
 				{
@@ -97,7 +97,7 @@ go.modules.notes.MainPanel = Ext.extend(Ext.Panel, {
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (btn) {
-						var noteForm = new go.modules.notes.NoteForm({
+						var noteForm = new go.modules.community.notes.NoteForm({
 							formValues: {
 								noteBookId: this.addNoteBookId
 							}
@@ -105,7 +105,39 @@ go.modules.notes.MainPanel = Ext.extend(Ext.Panel, {
 						noteForm.show();
 					},
 					scope: this
-				})
+				}),{
+				iconCls: 'ic-more-vert',
+				menu: [
+					{
+						itemId: "delete",
+						iconCls: 'ic-delete',
+						text: t("Delete"),
+						handler: function () {
+							this.noteGrid.deleteSelected();
+						},
+						scope: this
+					}
+				]
+			}
+				
+//				,{
+//					disabled: go.Modules.get("community", 'notes').permissionLevel < GO.permissionLevels.write,
+//					iconCls: 'ic-add',
+//					tooltip: t('Add test'),
+//					handler: function (e, toolEl) {
+//						var store = this.noteGrid.store;
+//						var myRecordDef = Ext.data.Record.create(store.fields);
+//
+//						store.insert(0, new myRecordDef({
+//							name: "New",
+//							content: "Testing",
+//							noteBookId: this.addNoteBookId
+//						}));
+//						
+//						store.commitChanges();
+//					},
+//					scope: this
+//				}
 			],
 			listeners: {
 				viewready: function (grid) {
@@ -125,7 +157,7 @@ go.modules.notes.MainPanel = Ext.extend(Ext.Panel, {
 						return;
 					}
 
-					var noteEdit = new go.modules.notes.NoteForm();
+					var noteEdit = new go.modules.community.notes.NoteForm();
 					noteEdit.load(record.id).show();
 				},
 
@@ -137,7 +169,7 @@ go.modules.notes.MainPanel = Ext.extend(Ext.Panel, {
 			go.Router.goto("note/" + record.id);
 		}, this);
 
-		this.noteDetail = new go.modules.notes.NoteDetail({
+		this.noteDetail = new go.modules.community.notes.NoteDetail({
 			region: 'center',
 			split: true,
 			tbar: [{
@@ -168,7 +200,7 @@ go.modules.notes.MainPanel = Ext.extend(Ext.Panel, {
 			this.noteDetail
 		];
 
-		go.modules.notes.MainPanel.superclass.initComponent.call(this);
+		go.modules.community.notes.MainPanel.superclass.initComponent.call(this);
 	}
 });
 

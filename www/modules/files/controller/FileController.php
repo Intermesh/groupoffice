@@ -16,6 +16,19 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		return array('correctquotauser');
 	}
 	
+	protected function actionTest($params) {
+
+		$md = new \go\core\fs\MetaData($this);
+		$tag = $md->extractID3(__DIR__.'/test.mp3');
+		var_dump($tag->toArray());
+	}
+	protected function actionExif(){
+		
+		$md = new \go\core\fs\MetaData($this);
+		$exif = $md->extractExif(__DIR__.'/test.jpg');
+		
+	}
+	
 	
 	protected function actionExpiredList($params){
 				

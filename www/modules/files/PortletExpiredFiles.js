@@ -1,6 +1,5 @@
 GO.mainLayout.onReady(function(){
-	if(go.Modules.isAvailable("legacy", "summary"))
-	{
+	if(go.Modules.isAvailable("legacy", "summary")) {
 		GO.summary.portlets['portlet-expired-files']={
 			multiple:true,
 			portletType: 'portlet-expired-files',

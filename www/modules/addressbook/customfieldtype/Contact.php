@@ -20,11 +20,11 @@ class Contact extends \GO\Customfields\Customfieldtype\AbstractCustomfieldtype{
 	public function formatDisplay($key, &$attributes, \GO\Customfields\Model\AbstractCustomFieldsRecord $model) {
 		$html="";
 		if(!empty($attributes[$key])) {
-
-			if(!\GO\Customfields\Model\AbstractCustomFieldsRecord::$formatForExport){
+			$id = $this->getId($attributes[$key]);
+			if(!\GO\Customfields\Model\AbstractCustomFieldsRecord::$formatForExport && !empty($id)){
 				$name = htmlspecialchars($this->getName($attributes[$key]), ENT_COMPAT, 'UTF-8');
-				$html='<a href="#addresbook/contact/{id}'.
-					$this->getId($attributes[$key]).'" title="'.$name.'">'.
+				$html='<a href="#contact/'.
+					$id.'" title="'.$name.'">'.
 						$name.'</a>';
 			}else
 			{

@@ -6,7 +6,7 @@ use go\core\exception\NotFound;
 use go\core\jmap\EntityController;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\Response;
-use go\core\module\model;
+use go\modules\core\modules\model;
 
 
 class Module extends EntityController {

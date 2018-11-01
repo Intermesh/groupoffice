@@ -7,7 +7,6 @@ use go\core\App;
 use go\core\db\Query;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\orm\Entity;
-use go\core\orm\TextFilter;
 
 abstract class ReadOnlyEntityController extends Controller {	
 	
@@ -63,13 +62,18 @@ abstract class ReadOnlyEntityController extends Controller {
 
 		$query = $cls::find(['id'])
 						->limit($params['limit'])
-						->offset($params['position'])
-						->orderBy($this->transformSort($params['sort']));
+						->offset($params['position']);;
 
-		$filterClass = $this->getFilterClass();
-		$filters = $filterClass::fromArray($params['filter'], $cls, $query);		
+		$sort = $this->transformSort($params['sort']);
 		
-		$cls::applyAclToQuery($query, $this->getQueryPermissionLevel($filters));
+		//always add primary key for a stable sort. (https://dba.stackexchange.com/questions/22609/mysql-group-by-and-order-by-giving-inconsistent-results)
+		if(!isset($sort['id'])) {
+			$sort['id'] = 'ASC';
+		}
+		
+		$cls::sort($query, $sort);
+
+		$query = $this->applyFilterCondition($params['filter'], $query);
 
 		//we don't need entities here. Just a list of id's.
 		$query->selectSingleValue($query->getTableAlias() . '.id');
@@ -77,31 +81,23 @@ abstract class ReadOnlyEntityController extends Controller {
 		return $query;
 	}
 	
-	
-	private function getQueryPermissionLevel($filters) {
-		
-		foreach($filters as $filter) {
-			if($filter instanceof \go\core\orm\Filter) {
-				return $filter->getPermissionLevel();
-			}
-		}
-		
-		return Acl::LEVEL_READ;
-		
-	}
-	
 	/**
-	 * Get the class to filter entities
 	 * 
-	 * @return string
+	 * @param array $filter
+	 * @param Query $query
+	 * @return Query
 	 */
-	private function getFilterClass() {		
+	private function applyFilterCondition($filter, $query)  {
 		$cls = $this->entityClass();
-		$default = $cls . 'Filter';
-		if (class_exists($cls . 'Filter')) {
-			return $default;
-		} else {
-			return TextFilter::class;
+		if(isset($filter['conditions']) && isset($filter['operator'])) { // is FilterOperator
+			$subQuery = new Query();
+			foreach($filter['conditions'] as $condition) {
+				$subQuery = $this->applyFilterCondition($condition, $subQuery);
+			}
+			return $query->where($subQuery, $filter['operator']);
+		} else {	
+			// is FilterCondition		
+			return $cls::filter($query, $filter);			
 		}
 	}
 	
@@ -114,25 +110,21 @@ abstract class ReadOnlyEntityController extends Controller {
 	 */
 	protected function paramsQuery(array $params) {
 		if(!isset($params['limit'])) {
-			$params['limit'] = Capabilities::get()->maxObjectsInGet;
-		}
-		
-//		if($params['limit'] > self::MAX_LIMIT) {
-//			throw new core\jmap\exception\InvalidArguments('Limit must be lower than ' . self::MAX_LIMIT);
-//		}
-		
-		if ($params['limit'] < 1) {
-			throw new InvalidArguments("Limit MUST be greater than 0");
+			$params['limit'] = 0;
+		}		
+
+		if ($params['limit'] < 0) {
+			throw new InvalidArguments("Limit MUST be positive");
 		}
 		//cap at max of 50
-		$params['limit'] = min([$params['limit'], Capabilities::get()->maxObjectsInGet]);
+		//$params['limit'] = min([$params['limit'], Capabilities::get()->maxObjectsInGet]);
 		
 		if(!isset($params['position'])) {
 			$params['position'] = 0;
 		}
 
 		if ($params['position'] < 0) {
-			throw new InvalidArguments("Position MUST not be negative");
+			throw new InvalidArguments("Position MUST be positive");
 		}
 		
 		if(!isset($params['sort'])) {
@@ -147,6 +139,9 @@ abstract class ReadOnlyEntityController extends Controller {
 			$params['accountId'] = null;
 		}
 		
+		if(empty($params['filter']['permissionLevel']) || $params['filter']['permissionLevel'] < Acl::LEVEL_READ) {
+			$params['filter']['permissionLevel'] = Acl::LEVEL_READ;
+		}
 		return $params;
 	}
 
@@ -163,7 +158,7 @@ abstract class ReadOnlyEntityController extends Controller {
 		$totalQuery = clone $idsQuery;
 		$total = (int) $totalQuery
 										->selectSingleValue("count(*)")
-										->orderBy(null)
+										->orderBy([], false)
 										->limit(1)
 										->offset(0)
 										->execute()
@@ -174,7 +169,7 @@ abstract class ReadOnlyEntityController extends Controller {
 		Response::get()->addResponse([
 				'accountId' => $p['accountId'],
 				'state' => $state,
-				'ids' => $idsQuery->all(),
+				'ids' => array_map('intval', $idsQuery->all()),
 				'notfound' => [],
 				'total' => $total,
 				'canCalculateUpdates' => false
@@ -249,6 +244,10 @@ abstract class ReadOnlyEntityController extends Controller {
 			throw new InvalidArguments("ids must be of type array");
 		}
 		
+		if(isset($params['ids']) && count($params['ids']) > Capabilities::get()->maxObjectsInGet) {
+			throw new InvalidArguments("You can't get more than " . Capabilities::get()->maxObjectsInGet . " objects");
+		}
+		
 		if(!isset($params['properties'])) {
 			$params['properties'] = [];
 		}
@@ -267,7 +266,13 @@ abstract class ReadOnlyEntityController extends Controller {
 	protected function getGetQuery($params) {
 		$cls = $this->entityClass();
 		
-		return $cls::find($params['properties']);
+		$query = $cls::find($params['properties']);
+		
+		//filter permissions
+		$cls::applyAclToQuery($query, Acl::LEVEL_READ);
+		
+		return $query;
+	
 	}
 
 	
@@ -290,14 +295,16 @@ abstract class ReadOnlyEntityController extends Controller {
 		$query = $this->getGetQuery($p);		
 		
 		if(empty($p['ids'])) {
-			$result['list'] = $query->all();
+			$result['list'] = $query->toArray();
 		} else
 		{
-			$result['list'] = $query->where($query->getTableAlias(). '.id', 'IN', $p['ids'])->all();
+			$stmt = $query->where($query->getTableAlias(). '.id', 'IN', $p['ids']);
 			
 			$foundIds = [];
+			$result['list'] = [];
 			
-			foreach($result['list'] as $e) {
+			foreach($stmt as $e) {
+				$result['list'][] = $e->toArray(); 
 				$foundIds[] = $e->id;
 			}
 			$result['notFound'] = array_values(array_diff($p['ids'], $foundIds));			

@@ -1,8 +1,9 @@
 <?php
 
-
 namespace GO\Freebusypermissions;
 
+use go\modules\core\users\model\User;
+use go\core\orm;
 
 class FreebusypermissionsModule extends \GO\Base\Module{
 	
@@ -13,8 +14,17 @@ class FreebusypermissionsModule extends \GO\Base\Module{
 		\GO\Calendar\Model\Event::model()->addListener('load', 'GO\Freebusypermissions\FreebusypermissionsModule', 'has_freebusy_access');
 	}
 	
+	public static function defineListeners() {
+		User::on(orm\Property::EVENT_MAPPING, static::class, 'onMap');
+	}
+	
 	public function autoInstall() {
 		return false;
+	}
+	
+	public static function onMap(orm\Mapping $mapping) {
+		$mapping->addRelation('freebusySettings', model\UserSettings::class, ['id' => 'id'], false);
+		return true;
 	}
 	
 	public static function hasFreebusyAccess($request_user_id, $target_user_id){

@@ -13,12 +13,9 @@
 
 Ext.namespace("GO.email");
 
-GO.email.EmailClient = function(config){
+GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
-	if(!config)
-	{
-		config = {};
-	}
+	initComponent : function() {
 
 	this.messagesStore = new GO.data.JsonStore({
 		url: GO.url("email/message/store"),
@@ -226,7 +223,7 @@ GO.email.EmailClient = function(config){
 			scope: this
 		});
 	}
-
+	
 	var contextItems = [
 	this.contextMenuMarkAsRead = new Ext.menu.Item({
 		text: t("Mark as read", "email"),
@@ -596,8 +593,8 @@ GO.email.EmailClient = function(config){
 		this.messagesGrid.show();
 	}, this);
 
-	config.layout='responsive';
-	config.layoutConfig = {
+	this.layout='responsive';
+	this.layoutConfig = {
 			triggerWidth: 1000
 		};
 
@@ -723,7 +720,7 @@ GO.email.EmailClient = function(config){
 		]
 	})
 
-	config.items=[
+	this.items=[
 		this.westPanel,
 		this.messagePanel
 	];
@@ -816,12 +813,10 @@ GO.email.EmailClient = function(config){
 	}
 	GO.email.searchSender = GO.email.searchSender.createDelegate(this);
 
-	GO.email.EmailClient.superclass.constructor.call(this, config);
+	GO.email.EmailClient.superclass.initComponent.call(this);
 	
 	GO.email.emailClient = this;
-};
-
-Ext.extend(GO.email.EmailClient, Ext.Panel,{
+	},
 
 	_permissionDelegated : false,
 
@@ -992,8 +987,7 @@ this.messagePanel.show();
 	},
 
 	getFolderNodeId : function (account_id, mailbox){
-
-		return GO.util.Base64.encode("f_"+account_id+"_"+mailbox);
+		return btoa("f_"+account_id+"_"+mailbox);
 	},
 	/**
 	 * Returns true if the current folder needs to be refreshed in the grid
@@ -1341,7 +1335,6 @@ GO.mainLayout.onReady(function(){
 					for(var i=0;i<result.email_status.unseen.length;i++)
 					{
 						var s = result.email_status.unseen[i];
-
 						var changed = ep.updateFolderStatus(s.mailbox, s.unseen,s.account_id);
 						if(changed && ep.messagesGrid.store.baseParams.mailbox==s.mailbox && ep.messagesGrid.store.baseParams.account_id==s.account_id)
 						{
@@ -1398,7 +1391,8 @@ GO.email.saveAllAttachments = function(panel){
 						uid: panel.uid,
 						mailbox: panel.mailbox,
 						account_id: panel.account_id,
-						folder_id: selectedFolderNode.attributes.id
+						folder_id: selectedFolderNode.attributes.id,
+						filepath:panel.data.path//smime message are cached on disk
 					},
 					success: function(options, response, result){
 						// Successfully saved all attachments
@@ -1619,7 +1613,7 @@ GO.email.extraTreeContextMenuItems = [];
 go.Modules.register("legacy", 'email', {
 	mainPanel: GO.email.EmailClient,
 	title: t("E-mail"),
-	userSettingsPanels: [GO.email.SettingsPanel]
+	userSettingsPanels: ["GO.email.SettingsPanel"]
 });
 
 //GO.quickAddPanel.addButton(new Ext.Button({
@@ -1877,7 +1871,7 @@ GO.email.moveToSpam = function(mailUid,mailboxName,fromAccountId) {
 						mail_uid: mailUid
 					},
 					success: function() {
-						GO.email.emailClient.topMessagesGrid.store.load();
+//						GO.email.emailClient.topMessagesGrid.store.load();
 						GO.email.emailClient.leftMessagesGrid.store.load();
 					},
 					failure: function(response,options,result) {

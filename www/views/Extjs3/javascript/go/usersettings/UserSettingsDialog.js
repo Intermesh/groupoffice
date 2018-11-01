@@ -17,9 +17,11 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	maximizable:true,
 	iconCls: 'ic-settings',
 	title: t("Settings"),
-	currentUser:null,
+	currentUserId:null,
 
 	initComponent: function () {
+		
+		
 		
 		this.saveButton = new Ext.Button({
 			text: t('Save'),
@@ -33,6 +35,8 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			fileUpload: true,
 			baseParams : {}
 		});
+		
+		this.formPanel.bodyCfg.autocomplete = "off";
 		
 		this.tabPanel = new Ext.TabPanel({
 			headerCfg: {cls:'x-hide-display'},
@@ -49,39 +53,30 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			data: []
 		});
 		
-		this.selectMenu = new Ext.Panel({
+		this.navMenu = new go.NavMenu({
 			region:'west',
-			cls: 'go-sidenav',
-			layout:'fit',
-			width:dp(220),
-			items:[this.selectView = new Ext.DataView({
-				xtype: 'dataview',
-				cls: 'go-nav',
-				store:this.tabStore,
-				singleSelect: true,
-				overClass:'x-view-over',
-				itemSelector:'div',
-				tpl:'<tpl for=".">\
-					<div><i class="icon {icon}"></i>\
-					<span>{name}</span></div>\
-				</tpl>',
-				columns: [{dataIndex:'name'}],
-				listeners: {
-					selectionchange: function(view, nodes) {					
+			width:dp(216),
+			store:this.tabStore,
+			listeners: {
+				selectionchange: function(view, nodes) {					
+					if(nodes.length) {
 						this.tabPanel.setActiveTab(nodes[0].viewIndex);
-					},
-					scope:this
-				}
-			})]
-		});
+					} else {
+						//restore selection if user clicked outside of view
+						view.select(this.tabPanel.items.indexOf(this.tabPanel.getActiveTab()));
+					}
+				},
+				scope: this
+			}
+		}); 
 		
 		Ext.apply(this,{
-			width:dp(1000),
+			width:dp(1100),
 			height:dp(800),
 			layout:'border',
 			closeAction:'hide',
 			items: [
-				this.selectMenu,
+				this.navMenu,
 				this.formPanel
 			],
 			buttons:[
@@ -96,6 +91,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			'submitComplete' : true
 		});
 		
+		
 		this.addPanel(go.usersettings.AccountSettingsPanel);
 		this.addPanel(go.usersettings.LookAndFeelPanel);
 		
@@ -109,18 +105,19 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	
 	loadModulePanels : function() {
     
-		var available = go.Modules.getAvailable();
+		var available = go.Modules.getAvailable(), pnl, config, i, i1;
 		
-		for(var i = 0, l = available.length; i < l; i++) {
+		for(i = 0, l = available.length; i < l; i++) {
 			
-			var config = go.Modules.getConfig(available[i].package, available[i].name);
+			config = go.Modules.getConfig(available[i].package, available[i].name);
 			
 			if(!config.userSettingsPanels) {
 				continue;
 			}
 			
-			for(var i1 = 0, l2 = config.userSettingsPanels.length; i1 < l2; i1++) {
-				this.addPanel(config.userSettingsPanels[i1]);
+			for(i1 = 0, l2 = config.userSettingsPanels.length; i1 < l2; i1++) {
+				pnl = eval(config.userSettingsPanels[i1]);				
+				this.addPanel(pnl);
 			}
 		}
 	},
@@ -128,17 +125,10 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	/**
 	 * The show function of this dialog.
 	 * This immediately starts loading all tabpanels in this dialog.
-	 * 
-	 * @param int userId
 	 */
-	show: function(userId){
-		this.currentUser = userId;
-
+	show: function(){
 		go.usersettings.UserSettingsDialog.superclass.show.call(this);
-		
-		this.selectView.select(this.tabStore.getAt(0));
-		
-		this.load();
+		this.navMenu.select(this.tabStore.getAt(0));
 	},
 	
 	/**
@@ -201,7 +191,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		// If the currentPassword is set, then add it to the posted values
 		if(!Ext.isEmpty(currentPassword)){
 			if(!values.password){
-				values.password = {};
+				delete values.password;
 			}
 			values.currentPassword = currentPassword;
 		}
@@ -214,10 +204,10 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		},this);
 
 		//		//this.id is null when new
-		if(this.currentUser) {
-			id = this.currentUser;
+		if(this.currentUserId) {
+			id = this.currentUserId;
 			params.update = {};
-			params.update[this.currentUser] = values;
+			params.update[this.currentUserId] = values;
 		} else {			
 			id = Ext.id();
 			params.create = {};
@@ -241,6 +231,8 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 						field.markInvalid(response.notUpdated[id].validationErrors[name].description);
 					}
 				}
+				
+				this.actionComplete();
 			}
 
 		},this);
@@ -254,28 +246,21 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	 */
 	needCurrentPassword : function(){
 		
-		var needed = false;
-		
-		this.tabPanel.items.each(function(pnl,index,total){
-			
-			if(pnl.onBeforeNeedCurrentPasswordCheck){
-				pnl.onBeforeNeedCurrentPasswordCheck();
-			}
-			
-			if(pnl.passwordProtected){
-				needed = this.checkDirty(pnl.getId());
-				
-				if(needed){
-					return false;
-				}
-			}			
-		},this);
-		
-		if(!needed){
+		if(go.User.isAdmin) {
 			return false;
-		} else {
-			return !this.checkCurrentPasswordSet();
 		}
+		
+		var needed = false,
+			accountPanel = this.tabPanel.getItem('pnl-account-settings');
+		accountPanel.findByType('field').forEach(function(item) {
+			if(item.needPasswordForChange) {
+				item.validate();
+				if(item.isDirty()){
+					needed = true;
+				}
+			}
+		});
+		return needed ? !this.checkCurrentPasswordSet() : false;
 	},
 	
 	checkCurrentPasswordSet : function(){
@@ -299,7 +284,12 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		this.actionComplete();
 		
 		//reload group-office
-		document.location = BaseHref + "?SET_LANGUAGE=" + this.formPanel.getForm().findField('language').getValue();
+		if(this.currentUserId == go.User.id) {
+			document.location = BaseHref + "?SET_LANGUAGE=" + this.formPanel.getForm().findField('language').getValue();
+		} else
+		{
+			this.close();
+		}
 	},
 		
 	/**
@@ -308,26 +298,42 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	 * @param int userId (Optional)
 	 */
 	load : function(userId){
-		this.currentUser = userId ? userId : this.currentUser;
+		var me = this;
 		
-		this.actionStart();
-		this.fireEvent('loadstart',this, this.currentUser);
+		function innerLoad(){
+			me.currentUserId = userId ? userId : me.currentUserId;
 		
-		
-		
-		go.Stores.get("User").get([this.currentUser], function(users){
-			this.formPanel.getForm().setValues(users[0]);
-			this.loadComplete(users[0]);
-		}, this);
-		
-		// loop through child panels and call onLoadComplete function if available
-		this.tabPanel.items.each(function(tab) {
+			me.actionStart();
+			me.fireEvent('loadstart',me, me.currentUserId);
 
-			if(tab.onLoadStart){
-				tab.onLoadStart(this.currentUserId);
-			}
-			
-		},this);
+			go.Stores.get("User").get([me.currentUserId], function(users){
+				me.formPanel.getForm().setValues(users[0]);
+
+				me.findBy(function(cmp,cont){
+					if(typeof cmp.onLoad === 'function') {
+						cmp.onLoad(users[0]);
+					}
+				},me);
+
+				me.loadComplete(users[0]);
+			}, me);
+
+			// loop through child panels and call onLoadComplete function if available
+			me.tabPanel.items.each(function(tab) {
+				if(tab.onLoadStart){
+					tab.onLoadStart(me.currentUserId);
+				}
+			},me);
+		}
+		
+		// The form needs to be rendered before the data can be set
+		if(!this.rendered){
+			this.on('afterrender',innerLoad,this,{single:true});
+		} else {
+			innerLoad.call(this);
+		}
+
+		return this;
 	},
 	
 	/**
@@ -418,9 +424,13 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 			var menuRec = new Ext.data.Record({
 			'name':pnl.title,
-			'icon':pnl.iconCls,
+			'icon':pnl.iconCls.substr(3).replace(/-/g,'_'),
 			'visible':true
 		});
+		
+		if(pnl.isFormField) {
+			this.formPanel.getForm().add(pnl);
+		}
 		
 		if(Ext.isEmpty(position)){
 			this.tabPanel.add(pnl);

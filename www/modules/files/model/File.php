@@ -179,7 +179,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 
 	public function getJsonData() {
 			$data =  array(
-					'id' => $this->model_id,
+					'id' => $this->id,
 					'name' => $this->path,
 					'ctime' => \GO\Base\Util\Date::get_timestamp($this->ctime),
 					'mtime' => \GO\Base\Util\Date::get_timestamp($this->mtime),
@@ -351,7 +351,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 	private function _addQuota(){
 
 		if($this->isModified('size') || $this->isNew) {
-			$sizeDiff = $this->fsFile->size() - $this->getOldAttributeValue('size');
+			$sizeDiff = (int) $this->fsFile->size() - (int) $this->getOldAttributeValue('size');
 
 //			GO::debug("Adding quota: $sizeDiff for ".$this->folder->quotaUser->getName());
 			if($this->folder->quotaUser){
@@ -381,7 +381,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 //			var_dump($this->acl->description);
 		
 		//If this folder belongs to a contact or project etc. then we only need write permission to delete it.
-		if($level == \GO\Base\Model\Acl::DELETE_PERMISSION && $this->folder->acl->description != 'fs_folders.acl_id') {
+		if($level == \GO\Base\Model\Acl::DELETE_PERMISSION && $this->folder->acl->usedIn != 'fs_folders.acl_id') {
 			$level = \GO\Base\Model\Acl::WRITE_PERMISSION;
 		}
 		
@@ -395,7 +395,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 	
 	public function checkOldPermissionLevel($level) {
 		//If this folder belongs to a contact or project etc. then we only need write permission to delete it.
-		if($level == \GO\Base\Model\Acl::DELETE_PERMISSION && $this->getOldFolder()->acl->description != 'fs_folders.acl_id') {
+		if($level == \GO\Base\Model\Acl::DELETE_PERMISSION && $this->getOldFolder()->acl->usedIn != 'fs_folders.acl_id') {
 			$level = \GO\Base\Model\Acl::WRITE_PERMISSION;
 		}
 		return parent::checkOldPermissionLevel($level);
@@ -540,10 +540,15 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 	 * @param boolean $save unused
 	 * @return boolean if save was successful
 	 */
-	protected function log($action, $save=true) {
-		$log = parent::log($action, false);
+	protected function log($action, $save=true, $modifiedCustomfieldAttrs = false) {
+		$log = parent::log($action, false, $modifiedCustomfieldAttrs);
 		if(empty($log))
 			return false;
+		
+		if($log === true) {
+			return true;
+		}
+		
 		if($log->action=='update') {
 			$log->action = 'propedit';
 			if($log->object->isModified('folder_id'))
@@ -553,7 +558,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 				$log->message = $log->object->getOldAttributeValue('name') . ' > ' . $log->message;
 			}
 		}
-		return $log->save();
+		return $save ? $log->save() : $log;
 	}
 
 	/**
@@ -591,7 +596,10 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 		$folderPath = str_replace(\GO::config()->file_storage_path,"",$fsFile->parent()->path());
 
 		$folder = Folder::model()->findByPath($folderPath, true);
-		return $folder->hasFile($fsFile->name()) || $folder->addFile($fsFile->name());
+		if(($file = $folder->hasFile($fsFile->name()))) {
+			return $file;
+		}
+		return $folder->addFile($fsFile->name());
 	}
 
 	/**
@@ -726,8 +734,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 
 
 	public function findRecent($start=false,$limit=false){
-		$storeParams = \GO\Base\Db\FindParams::newInstance()->ignoreAcl();
-
+		$storeParams = \GO\Base\Db\FindParams::newInstance();
 
 		$joinSearchCacheCriteria = \GO\Base\Db\FindCriteria::newInstance()
 					->addRawCondition('`t`.`id`', '`sc`.`entityId`')

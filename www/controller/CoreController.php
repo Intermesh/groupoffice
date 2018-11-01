@@ -13,14 +13,13 @@ namespace GO\Core\Controller;
 use Exception;
 use GO;
 use GO\Base\Language;
-use GO\Base\Model\State;
 use GO\Base\Util\StringHelper;
 
 
 class CoreController extends \GO\Base\Controller\AbstractController {
 	
 	protected function allowGuests() {
-		return array('compress','cron','language', 'clientscripts');
+		return array('compress','cron','language','clientscripts');
 	}
 	
 	protected function ignoreAclPermissions() {
@@ -186,11 +185,12 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		$store = \GO\Base\Data\Store::newInstance(\GO\Base\Model\User::model(), array('password','digest'));
 		$store->setDefaultSortOrder('name', 'ASC');
 
+		$store->getColumnModel()->formatColumn('id', '$model->id', array(), array('t.id'));
 		$store->getColumnModel()->formatColumn('name', '$model->name', array(), array('displayName'));
 		$store->getColumnModel()->formatColumn('cf', '$model->id.":".$model->name'); //special field used by custom fields. They need an id an value in one.
 		
 		//only get users that are enabled
-		$enabledParam = \GO\Base\Db\FindParams::newInstance();
+		$enabledParam = \GO\Base\Db\FindParams::newInstance()->debugSql();
 		if(!empty(\GO::config()->hide_disabled_users)) {
 			$enabledParam->criteria(\GO\Base\Db\FindCriteria::newInstance()->addCondition('enabled', true));
 		}
@@ -303,86 +303,6 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 			ob_end_flush();  // The main one
 		}
 	}
-	
-	protected function actionClientScripts($lang) {
-		header('Content-Type: application/javascript');
-		header('Content-Encoding: gzip');
-		
-		$cacheFile = \go\core\App::get()->getDataFolder()->getFolder('clientscripts')->create()->getFile('all-' . $lang . '.js');
-		
-		readfile($cacheFile->getPath());
-	}
-	
-	protected function actionLanguage($lang) {
-		\GO::language()->setLanguage($lang);
-		
-		echo \GO::language()->getScript();
-	}
-	
-	protected function actionModuleScripts() {
-		header('Content-Type: application/javascript');
-		$load_modules = GO::modules()->getAllModules();
-				
-		$GO_SCRIPTS_JS = "";
-
-		foreach ($load_modules as $module) {		
-			if (file_exists($module->moduleManager->path() . 'scripts.inc.php')) {
-				require($module->moduleManager->path() . 'scripts.inc.php');
-			}
-			if (file_exists($module->moduleManager->path() . 'views/Extjs3/scripts.inc.php')) {
-				require($module->moduleManager->path() . 'views/Extjs3/scripts.inc.php');
-			}
-			if (file_exists($module->moduleManager->path() . 'views/extjs3/scripts.inc.php')) {
-				require($module->moduleManager->path() . 'views/extjs3/scripts.inc.php');
-			}			
-		}
-
-		echo $GO_SCRIPTS_JS;
-	}
-	
-	/**
-	 * 
-	 * This loads the client settings for the old modules.
-	 * 
-	 * @deprecated
-	 * @return type
-	 */
-	protected function actionClientSettings() {
-			$user_id  = GO::user()->id;
-			$settings['state'] = State::model()->getFullClientState($user_id);
-			$settings['user_id'] = $user_id;
-			$settings['has_admin_permission'] = GO::user()->isAdmin();
-			$settings['username'] = GO::user()->username;
-			$settings['displayName'] = GO::user()->displayName;
-
-			$settings['email'] = GO::user()->email;
-			$settings['thousands_separator'] = GO::user()->thousands_separator;
-			$settings['decimal_separator'] = GO::user()->decimal_separator;
-			$settings['date_format'] = GO::user()->completeDateFormat;
-			$settings['time_format'] = GO::user()->time_format;
-			$settings['currency'] = GO::user()->currency;
-			$settings['lastlogin'] = GO::user()->lastlogin;
-			$settings['max_rows_list'] = GO::user()->max_rows_list;
-			$settings['timezone'] = GO::user()->timezone;
-			$settings['start_module'] = GO::user()->start_module;
-			$settings['theme'] = GO::user()->theme;
-			$settings['mute_sound'] = GO::user()->mute_sound;
-			$settings['mute_reminder_sound'] = GO::user()->mute_reminder_sound;
-			$settings['mute_new_mail_sound'] = GO::user()->mute_new_mail_sound;
-			$settings['popup_reminders'] = GO::user()->popup_reminders;
-			$settings['popup_emails'] = GO::user()->popup_emails;
-			$settings['show_smilies'] = GO::user()->show_smilies;
-			$settings['auto_punctuation'] = GO::user()->auto_punctuation;
-			$settings['first_weekday'] = GO::user()->first_weekday;
-			$settings['sort_name'] = GO::user()->sort_name;
-			$settings['list_separator'] = GO::user()->list_separator;
-			$settings['text_separator'] = GO::user()->text_separator;
-		$settings['modules'] = GO::view()->exportModules();
-
-		
-		
-		return array('success' => true, 'GO' => ['settings' => $settings]);
-	}
 
 	protected function actionThumb($params) {
 
@@ -392,9 +312,15 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		$url = GO::config()->host . 'views/Extjs3/themes/Paper/img/filetype/';
 		$file = new \GO\Base\Fs\File(GO::config()->file_storage_path . $params['src']);
 		
-		if (is_dir(GO::config()->file_storage_path . $params['src'])) {
-			$src = $dir . 'folder.svg';
+		
+		if(isset($params['foldericon'])){
+			
+			$src = $dir . $params['foldericon'].'.svg';
 		} else {
+		
+//		if (is_dir(GO::config()->file_storage_path . $params['src'])) {
+//			$src = $dir . 'folder.svg';
+//		} else {
 
 			switch (strtolower($file->extension())) {
 
@@ -1002,7 +928,8 @@ All rights reserved.");
 		$modules = GO::modules()->getAllModules(true);
 		
 		foreach($modules as $module){
-			$store->addRecord(array('id'=>$module->name,'name'=>$module->moduleManager->name()));
+			$translated = GO::t("name",  $module->name, $module->package);
+			$store->addRecord(array('id'=>$module->name,'name'=>$translated));
 		}
 		
 		return $store->getData();

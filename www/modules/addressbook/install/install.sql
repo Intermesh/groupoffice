@@ -132,7 +132,7 @@ CREATE TABLE IF NOT EXISTS `ab_contacts` (
   `first_name` varchar(50) NOT NULL DEFAULT '',
   `middle_name` varchar(50) NOT NULL DEFAULT '',
   `last_name` varchar(50) NOT NULL DEFAULT '',
-  `initials` varchar(10) NOT NULL DEFAULT '',
+  `initials` varchar(50) NOT NULL DEFAULT '',
   `title` varchar(50) NOT NULL DEFAULT '',
   `suffix` varchar(50) NOT NULL DEFAULT '',
   `sex` enum('M','F') NOT NULL DEFAULT 'M',

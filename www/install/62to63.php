@@ -7,7 +7,37 @@ App::get()->getCache()->flush(false);
 
 App::get()->getDatabase()->setUtf8();
 
+$qs[] = "DROP TABLE IF EXISTS `go_mail_counter`;";
+$qs[] = function () {
+	$stmt = GO()->getDbConnection()->query("SHOW TABLE STATUS");	
+	
+	foreach($stmt as $record){
+		
+		if($record['Engine'] != 'InnoDB' && $record["Name"] != 'fs_filesearch' && $record["Name"] != 'cms_files') {
+			echo "Converting ". $record["Name"] . " to InnoDB\n";
+			flush();
+			$sql = "ALTER TABLE `".$record["Name"]."` ENGINE=InnoDB;";
+			GO()->getDbConnection()->query($sql);	
+		}
+		
+		if($record["Collation"] != "utf8mb4_unicode_ci" ) {
+			echo "Converting ". $record["Name"] . " to utf8mb4\n";
+			flush();
+			
+			if($record['Name'] === 'em_links') {
+				GO()->getDbConnection()->query("ALTER TABLE `em_links` DROP INDEX `uid`");
+			}			
+			$sql = "ALTER TABLE `".$record["Name"]."` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
+			GO()->getDbConnection()->query($sql);	
+			
+			if($record['Name'] === 'em_links') {
+				GO()->getDbConnection()->query("ALTER TABLE `em_links` CHANGE `uid` `uid` VARCHAR(255) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '';");
+				GO()->getDbConnection()->query("ALTER TABLE `em_links` ADD INDEX(`uid`);");
+			}
 
+		}	
+	}
+};
 
 $qs[] = "UPDATE go_settings SET value=0 where name = 'version';";
 $qs[] = "ALTER TABLE `go_modules` ADD `package` VARCHAR(100) NULL DEFAULT NULL AFTER `id`;";
@@ -67,15 +97,13 @@ $qs[] = "update `go_acl_items` set modifiedAt = from_unixtime(mtime);";
 
 $qs[] = "ALTER TABLE `go_acl_items` DROP `mtime`;";
 
+$qs[] = "delete from go_acl where user_id > 0 AND user_id not in (select id from go_users)";
+$qs[] = "delete from go_acl where group_id > 0 AND group_id not in (select id from go_groups)";
+
 $qs[] = "ALTER TABLE `go_acl` CHANGE `group_id` `groupId` INT(11) NOT NULL DEFAULT '0';";
 
 $qs[] = "ALTER TABLE `go_acl` CHANGE `acl_id` `aclId` INT(11) NOT NULL;";
-
-
-
 $qs[] = "ALTER TABLE `go_groups` CHANGE `name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;";
-
-
 
 $qs[] = "DROP TRIGGER IF EXISTS `Create ACL`;";
 $qs[] = "CREATE TRIGGER `Create ACL` BEFORE INSERT ON `go_groups` FOR EACH ROW BEGIN INSERT INTO `go_acl_items` (`ownedBy`, `description`) VALUES (NEW.createdBy, 'go_groups.aclId'); set NEW.aclId = (SELECT last_insert_id()); END";
@@ -87,7 +115,6 @@ $qs[] = "ALTER TABLE `go_acl` DROP PRIMARY KEY;";
 $qs[] = "insert into `go_acl` (groupId, aclId, level) select id,aclId,50 from go_groups where isUserGroupFor is not null;";
 $qs[] = "insert into `go_acl` (groupId, aclId, level) select '1',aclId,50 from go_groups where isUserGroupFor is not null;";
 $qs[] = "ALTER TABLE `go_groups` CHANGE `createdBy` `createdBy` INT(11) NOT NULL;";
-$qs[] = "delete from go_acl where user_id > 0 AND user_id not in (select id from go_users)";
 $qs[] = "update `go_acl` a set groupId = (select id from go_groups where isUserGroupFor = a.user_id) where user_id > 0; ";
 $qs[] = "ALTER TABLE `go_acl` DROP `user_id`;";
 $qs[] = "delete from go_acl where aclId not in (select id from go_acl_items);";
@@ -130,6 +157,8 @@ $qs[] = 'RENAME TABLE `cf_categories` TO `core_customfields_field_set`;';
 $qs[] = 'ALTER TABLE `core_customfields_field_set` CHANGE `extends_model` `extendsModel` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;';
 $qs[] = 'ALTER TABLE `core_customfields_field_set` CHANGE `acl_id` `aclId` INT(11) NOT NULL;';
 $qs[] = 'ALTER TABLE `core_customfields_field_set` CHANGE `sort_index` `sortOrder` TINYINT(4) NOT NULL DEFAULT \'0\';';
+// Next query may fail but some databases are not successfully upgraded in 2014
+$qs[] = 'ALTER TABLE `cf_fields` ADD `prefix` VARCHAR( 32 ) NOT NULL DEFAULT \'\', ADD `suffix` VARCHAR( 32 ) NOT NULL DEFAULT \'\';';
 $qs[] = 'RENAME TABLE `cf_fields` TO `core_customfields_field`;';
 $qs[] = 'ALTER TABLE `core_customfields_field` CHANGE `category_id` `fieldSetId` INT(11) NOT NULL;';
 $qs[] = 'ALTER TABLE `core_customfields_field` CHANGE `sort_index` `sortOrder` INT(11) NOT NULL DEFAULT \'0\';';
@@ -208,10 +237,17 @@ $qs[] = 'ALTER TABLE `core_entity` CHANGE `model_name` `name` VARCHAR(190) CHARA
 $qs[] = 'ALTER TABLE `core_entity` ADD `moduleId` INT NULL DEFAULT NULL AFTER `id`, ADD INDEX (`moduleId`);';
 $qs[] = 'ALTER TABLE `core_entity` ADD INDEX(`name`);';
 
+$qs[] = "ALTER TABLE `core_entity`  ADD `clientName` VARCHAR(190) NULL DEFAULT NULL;";
+$qs[] = "ALTER TABLE `core_entity` ADD UNIQUE(`clientName`);";
+
 
 
 $qs[] = "insert into core_entity (name) select extendsModel from core_customfields_field_set where extendsModel not in (select name from core_entity)";
 $qs[] = 'ALTER TABLE `core_customfields_field_set` ADD `entityId` INT NOT NULL AFTER `id`, ADD INDEX (`entityId`);';
+
+
+//deduplicate core_entity
+$qs[] = "DELETE t1 FROM core_entity t1 INNER JOIN core_entity t2 WHERE t1.id > t2.id AND t1.name = t2.name;";
 $qs[] = 'update `core_customfields_field_set` set entityId = (select id from core_entity where name = extendsModel);';
 $qs[] = 'ALTER TABLE `core_entity` DROP INDEX `name`;';
 $qs[] = 'ALTER TABLE `core_entity` ADD UNIQUE(`name`);';
@@ -226,6 +262,7 @@ $qs[] = function() {
 
 	while ($record = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
+		//this could lead to a "clientName" column having a null value. Which lead to ticket #201816451
 		if (method_exists($record['name'], 'getModule')) {
 
 			$name = $record['name']::getModule();
@@ -236,10 +273,11 @@ $qs[] = function() {
 			
 			
 			$shortName = substr($record['name'], strrpos($record['name'], '\\') + 1);
+			$clientName = $record['name']::getClientName();
 
 
 			App::get()->getDbConnection()
-							->update('core_entity', ['moduleId' => $module['id'], 'name' => $shortName], ['id' => $record['id']])
+							->update('core_entity', ['moduleId' => $module['id'], 'name' => $shortName, 'clientName' => $clientName], ['id' => $record['id']])
 							->execute();
 		}
 	}
@@ -321,6 +359,7 @@ $qs[] = "ALTER TABLE `core_setting` ADD CONSTRAINT `module` FOREIGN KEY (`module
 //$qs[] = "insert into core_module (aclId,name,package,version) select max(id),'groups','core','0' from core_acl;";
 
 //links module
+$qs[] = "DELETE FROM core_module where name='links';"; //might be installed in some installations
 $qs[] = "INSERT INTO `core_acl` (`id`, `ownedBy`, `usedIn`, `modifiedAt`) VALUES (NULL, '1', 'core_module.aclId', NOW());";
 $qs[] = "insert into core_acl_group (aclId,groupId, level) select max(id),'1','50' from core_acl;";
 $qs[] = "insert into core_module (aclId,name,package,version) select max(id),'links','core','0' from core_acl;";
@@ -406,6 +445,7 @@ $qs[] = "ALTER TABLE `core_link`
   ADD CONSTRAINT `fromEntity` FOREIGN KEY (`fromEntityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `toEntity` FOREIGN KEY (`toEntityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;";
 
+$qs[] = "ALTER TABLE `core_entity` ADD `highestModSeq` INT NULL DEFAULT NULL AFTER `clientName`;";
 
 $qs[] = function() {
 	
@@ -439,12 +479,12 @@ $qs[] = function() {
 	\go\modules\core\customfields\model\FieldSet::getType();
 	\go\modules\core\customfields\model\Field::getType();
 	
-	\go\core\links\Link::getType();
-	\go\core\search\Search::getType();
-	\go\core\auth\model\User::getType();
-	\go\core\auth\model\Group::getType();
+	\go\modules\core\links\model\Link::getType();
+	\go\modules\core\search\model\Search::getType();
+	\go\modules\core\users\model\User::getType();
+	\go\modules\core\groups\model\Group::getType();
 	
-	\go\core\module\model\Module::getType();
+	\go\modules\core\modules\model\Module::getType();
 };
 
 $qs[] = "RENAME TABLE `go_users` TO `core_user`;";
@@ -462,7 +502,8 @@ $qs[] = "ALTER TABLE `core_auth_password` ADD FOREIGN KEY (`userId`) REFERENCES 
 $qs[] = "update core_entity set moduleId = (select id from core_module where name='users') where name='User';";
 
 
-
+//obsolete modules
+$qs[] = "delete from core_module where name IN ('servermanager', 'admin2userlogin', 'formprocessor', 'settings', 'sites', 'syncml', 'dropbox', 'timeregistration', 'projects', 'hoursapproval', 'webodf','imapauth','ldapauth', 'presidents','ab2users', 'backupmanager', 'calllog', 'emailportlet', 'gnupg', 'language', 'mailings', 'newfiles')";
 
 foreach($qs as $q) {
 	if(is_string($q)) {
@@ -470,8 +511,17 @@ foreach($qs as $q) {
 			echo $q ."\n";
 			App::get()->getDbConnection()->query($q);
 		} catch(\Exception $e) {
-			echo $e->getMessage().' Query '. $q;
-			exit();
+			
+			echo 'ERROR: '. $e->getMessage().' Query '. $q;
+			
+			//MS: remove $e->getCode() == 42000 because that should not be ignored?
+			
+			if ($e->getCode() == '42S21' || $e->getCode() == '42S01' || $e->getCode() == '42S22') {
+				//duplicate and drop errors. Ignore those on updates
+			} else {
+				echo "ERROR: A fatal upgrade error occurred. You will not be able to continue upgrading this database! Please report this error message.\n\n";
+				exit();
+			}
 		}
 	} else
 	{

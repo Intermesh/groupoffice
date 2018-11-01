@@ -1,5 +1,5 @@
-go.modules.notes.NoteBookCombo = Ext.extend(go.form.ComboBox, {
-	fieldLabel: t("Notebook", "notes"),
+go.modules.community.notes.NoteBookCombo = Ext.extend(go.form.ComboBox, {
+	fieldLabel: t("Notebook"),
 	hiddenName: 'noteBookId',
 	anchor: '100%',
 	emptyText: t("Please select..."),
@@ -15,16 +15,16 @@ go.modules.notes.NoteBookCombo = Ext.extend(go.form.ComboBox, {
 		Ext.applyIf(this, {
 			store: new go.data.Store({
 				fields: ['id', 'name'],
-				entityStore: go.Stores.get("NoteBook"),
+				entityStore: "NoteBook",
 				baseParams: {
-					filter: [{
+					filter: {
 							permissionLevel: GO.permissionLevels.write
-					}]
+					}
 				}
 			})
 		});
 		
-		go.modules.notes.NoteBookCombo.superclass.initComponent.call(this);
+		go.modules.community.notes.NoteBookCombo.superclass.initComponent.call(this);
 
 	}
 });

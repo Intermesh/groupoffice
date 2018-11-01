@@ -1,3 +1,5 @@
+/* global GO, Ext, go */
+
 /** 
  * Copyright Intermesh
  * 
@@ -83,25 +85,41 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			dismissDelay: 0,
 			maxWidth: 500
 		});
-		
-//		this.removeLoadMask();
-		
-		if(go.User){
-			this.onAuthentication();
-			this.on('render', function() {
-				this.fireEvent('boot', this);
-			}, this, {single:true});
+		var me = this;
+		Ext.Ajax.defaultHeaders = {'Accept-Language': GO.lang.iso};
+
+		if(go.User.accessToken){
+			Ext.Ajax.defaultHeaders['Authorization'] = 'Bearer '+go.User.accessToken;
+			go.User.authenticate(function(data, options, success, response){
+				
+				if(success) {
+					me.on('render', function() {
+						me.fireEvent('boot', me);
+					}, me, {single:true});
+					me.onAuthentication(); // <- start Group-Office
+				} else {
+					go.User.clearAccessToken();
+					
+					me.fireEvent("boot", this);
+					if(go.Router.requireAuthentication) {
+						go.Router.pathBeforeLogin = go.Router.getPath();
+						go.Router.goto("login");
+					}
+				}
+			});
 		} else {
-		
-			this.fireEvent("boot", this);
+			this.fireEvent("boot", this); // In the router there is an event attached.
+			if(go.Router.requireAuthentication) {
+				go.Router.pathBeforeLogin = go.Router.getPath();
+				go.Router.goto("login");
+			}
 		}
 	},
 
-	login: function () {
-		
-		if(this.checkRemindedLogin()) {
-			return true;
-		}
+	login: function () {		
+		GO.mainLayout.on('render', function () {
+			go.Router.goto(go.Router.pathBeforeLogin);
+		}, this, {single: true});
 		
 		if(!this.loginPanel) {
 			//go.AuthenticationManager.register('password', new go.login.PasswordPanel(), 0);
@@ -111,63 +129,15 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				this.loginPanel = null;
 			}, this);
 		}
+		
+		//console.log('ja');
+			
 
 		this.fireEvent('login', this);
-	},
-	
-	setRememberLogin : function(rememberLogin) {
-		this.rememberLogin = rememberLogin
-	},	
-	
-	rememberLogin : false,
-	
-	checkRemindedLogin : function() {
-		//remember login part
-		go.AuthenticationManager.on('authenticated', function(authMan, result) {
-			
-			if(this.rememberLogin) {
-				window.localStorage.setItem("accessToken", result.accessToken);
-			} 
-		}, this);
-
-		var accessToken = window.localStorage.getItem("accessToken");
-		if(accessToken) {
-			
-			this.rememberLogin = true;
-			go.AuthenticationManager.accessToken = accessToken;
-			
-			go.AuthenticationManager.doAuthentication(null, function(authMan, success, result){
-				if(!success) {
-					this.rememberLogin = false;
-				 	window.localStorage.removeItem("accessToken");
-					this.login();
-				}
-			}, this);
-			
-			return true;
-		} else
-		{
-			return false;
-		}
 	},
 
 	saveState: function () {
 		Ext.state.Manager.getProvider().set('open-modules', this.getOpenModules());
-	},
-
-	logout: function (first) {
-
-		if (Ext.Ajax.isLoading())
-		{
-			if (first) {
-				Ext.getBody().mask(t("Loading..."));
-			}
-			this.logout.defer(500, this, [true]);
-		} else
-		{
-			window.localStorage.removeItem("accessToken");
-			document.location = GO.url('auth/logout');
-		}
 	},
 
 	fireReady: function () {
@@ -217,7 +187,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		this.tabPanel.items.each(function (p) {
 			var tabEl = this.tabPanel.getTabEl(p);
 
-			if (tabEl.style.display != 'none') {
+			if (tabEl.style.display !== 'none') {
 				openModules.push(p.moduleName);
 			}
 		}, this);
@@ -250,12 +220,12 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			}
 
 			//update hash if not already set.
-			if (window.location.hash.indexOf(newTab.moduleName) === -1) {
+			if (!go.Router.routing) {
 				window.go.Router.setPath(newTab.moduleName);
 			}
 
 			if (document.activeElement && typeof document.activeElement.blur === 'function')
-				if (document.activeElement.tagName == 'TEXTAREA' || document.activeElement.tagName == 'INPUT') {
+				if (document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'INPUT') {
 					document.activeElement.blur();
 				}
 		}, this);
@@ -314,333 +284,303 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 	onAuthentication: function () {
 		
-		
+		//load state
+		Ext.state.Manager.setProvider(new GO.state.HttpProvider());
 		
 		go.Modules.init();
-
-		//load modules
-		go.Modules.onReady(function () {
-
-
-			if (this.loginPanel) {
-				this.loginPanel.destroy();
-			}
-			GO.checker = new GO.Checker();
+		
+		//legacy scripts loaded from scripts.inc.php
+		var script = document.createElement('script');
+		script.type = 'text/javascript';
+		script.setAttribute('src', BaseHref + "views/Extjs3/modulescripts.php");
+		script.charset = 'utf-8';
+		script.id = 'testing';
+		script.defer = true;
+		script.async = true;
+		script.onload = function () {
 			
+			//load modules
+			go.Modules.onReady(function () {
 
-			this.fireReady();
-			
-			this.fireEvent('authenticated', this);
-			
-			//Ext need to know where this charting swf file is in order to draw charts
-//		Ext.chart.Chart.CHART_URL = 'views/Extjs3/ext/resources/charts.swf';
+				if (this.loginPanel) {
+					this.loginPanel.destroy();
+				}
+				GO.checker = new GO.Checker();
 
-			var allPanels = GO.moduleManager.getAllPanelConfigs();
 
-			var items = [];
+				this.fireReady();
 
-			this.startMenu = new Ext.menu.Menu({
-				id: 'startMenu',
-				hideOnClick: true
-			});
+				this.fireEvent('authenticated', this);
 
-			if (allPanels.length == 0) {
-				items = new Ext.Panel({
-					id: 'go-module-panel-' + GO.settings.start_module,
-					region: 'center',
-					border: false,
-					cls: 'go-form-panel',
-					title: 'No modules',
-					html: '<h1>No modules available</h1>You have a valid account but you don\'t have access to any of the modules. Please contact the administrator if you feel this is an error.'
+				//Ext need to know where this charting swf file is in order to draw charts
+	//		Ext.chart.Chart.CHART_URL = 'views/Extjs3/ext/resources/charts.swf';
+
+				var allPanels = GO.moduleManager.getAllPanelConfigs();
+
+				var items = [];
+
+				this.startMenu = new Ext.menu.Menu({
+					id: 'startMenu',
+					hideOnClick: true
 				});
-			}
 
-			var adminMenuItems = [];
-			var menuItemConfig;
+				if (allPanels.length == 0) {
+					items = new Ext.Panel({
+						id: 'go-module-panel-' + GO.settings.start_module,
+						region: 'center',
+						border: false,
+						cls: 'go-form-panel',
+						title: 'No modules',
+						html: '<h1>No modules available</h1>You have a valid account but you don\'t have access to any of the modules. Please contact the administrator if you feel this is an error.'
+					});
+				}
 
-			this.state = Ext.state.Manager.get('open-modules');
+				var adminMenuItems = [];
+				var menuItemConfig;
 
-			for (var i = 0; i < allPanels.length; i++) {
+				this.state = Ext.state.Manager.get('open-modules');
 
-				if (this.state && this.state.indexOf(allPanels[i].moduleName) > -1)
-					items.push(GO.moduleManager.getPanel(allPanels[i].moduleName));
+				for (var i = 0, l = allPanels.length; i < l; i++) {
 
-				menuItemConfig = {
-					id: 'go-start-menu-' + allPanels[i].moduleName,
-					moduleName: allPanels[i].moduleName,
-					text: allPanels[i].title,
-					iconCls: 'go-menu-icon-' + allPanels[i].moduleName,
-					handler: function (item, e) {
-						this.openModule(item.moduleName);
-					},
-					scope: this
-				};
-
-				if (!allPanels[i].admin) {
-					if (!this.state)
+					if (this.state && this.state.indexOf(allPanels[i].moduleName) > -1)
 						items.push(GO.moduleManager.getPanel(allPanels[i].moduleName));
 
-					// Check the subMenu property, if it is a submenu then don't add this item to the start menu
-					if (!allPanels[i].inSubmenu) {
-						this.startMenu.add(menuItemConfig);
-					}
-				} else
-				{
-					adminMenuItems.push(menuItemConfig);
-				}
-			}
-
-			var subMenus = GO.moduleManager.getAllSubmenus();
-
-			for (var key in subMenus) {
-
-				var subMenuItems = [];
-				var subItems = subMenus[key].items;
-
-				for (var i = 0; i < subItems.length; i++) {
-					if (!GO.util.empty(subItems[i])) {
-						subMenuItems.push({
-							id: 'go-start-menu-' + subItems[i].moduleName,
-							moduleName: subItems[i].moduleName,
-							text: subItems[i].title,
-							iconCls: 'go-menu-icon-' + subItems[i].moduleName,
-							handler: function (item, e) {
-								this.openModule(item.moduleName);
-							},
-							scope: this
-						});
-					}
-				}
-
-				var subMenu = new Ext.menu.Menu({
-					items: subMenuItems,
-					cls: 'startmenu-submenu'
-				});
-
-				var subitemConfig = {
-					text: key,
-					menu: subMenu
-				};
-
-				Ext.apply(subitemConfig, subMenus[key].subMenuConfig);
-
-				this.startMenu.add(new Ext.menu.Item(subitemConfig));
-			}
-
-			if (adminMenuItems.length) {
-
-				this.startMenu.add(new Ext.menu.TextItem({id: 'go-start-menu-admin-menu', text: '<div class="menu-title">' + t("Admin menu") + '</div>'}));
-
-				for (var i = 0; i < adminMenuItems.length; i++) {
-					this.startMenu.add(adminMenuItems[i]);
-				}
-			}
-
-			this.createTabPanel(items);
-
-			this.beforeRender();
-
-			var topPanel = new Ext.Panel({
-				id:"mainNorthPanel",
-				region: 'north',
-				html:  '<div class="go-header-left"><div id="go-logo" title="Group-Office"></div></div>\
-				<div class="go-header-right">\
-					<div id="secondary-menu">\
-						<div id="search_query"></div>\
-						<a id="start-menu-link" ><i class="icon">apps</i></a>\
-						<a id="user-menu" class="user-img">\
-							<span id="reminder-icon" style="display: none;">notifications</span>\
-						</a>\
-					</div>\
-				</div>',
-				height: dp(64),
-				titlebar: false,
-				border: false
-			});
-			
-//			var winSize = [window.scrollWidth , window.scrollHeight];
-
-			GO.viewport = new Ext.Viewport({
-				renderTo: 'viewport',
-				layout: 'border',
-				border: false,
-				items: [topPanel, this.tabPanel]
-			});
-
-			var startBtn = Ext.get('start-menu-link');
-			var startBtnTpl = startBtn.dom.innerHTML;
-			startBtn.dom.innerHTML = '';
-			this.startMenuLink = new Ext.Button({
-				menu: this.startMenu,
-				menuAlign: 'tr-br?',
-				text: startBtnTpl,
-				renderTo: startBtn,
-				clickEvent: 'mousedown',
-				template: new Ext.XTemplate('<span><button></button></span>')
-			});
-
-
-			var helpMenu = new Ext.menu.Menu({
-				id: 'helpMenu',
-				items: [{
-						iconCls: 'ic-help',
-						text: t("Help contents"),
-						handler: function () {
-							GO.openHelp('');
+					menuItemConfig = {
+						id: 'go-start-menu-' + allPanels[i].moduleName,
+						moduleName: allPanels[i].moduleName,
+						text: allPanels[i].title,
+						iconCls: 'go-menu-icon-' + allPanels[i].moduleName,
+						handler: function (item, e) {
+							this.openModule(item.moduleName);
 						},
 						scope: this
-					}]
-			});
+					};
 
-			if (GO.settings.config.product_name == 'Group-Office') {
-				helpMenu.addItem({
-					iconCls: 'ic-forum',
-					text: t("Community forum"),
-					handler: function () {
-						var win = window.open('http://www.group-office.com/forum/');
-						win.focus();
-					},
-					scope: this
+					if (!allPanels[i].admin) {
+						if (!this.state)
+							items.push(GO.moduleManager.getPanel(allPanels[i].moduleName));
 
-				});
-				helpMenu.addItem('-');
-
-				if (GO.settings.config.support_link) {
-					helpMenu.addItem({
-						iconCls: 'ic-contact-mail',
-						text: t("Contact support desk"),
-						handler: function () {
-
-							if (Ext.form.VTypes.email(GO.settings.config.support_link)) {
-								if (GO.email && GO.settings.modules.email.read_permission) {
-									GO.email.showComposer({
-										values: {to: GO.settings.config.support_link}
-									});
-								} else {
-									document.location = 'mailto:' + GO.supportLink;
-								}
-							} else {
-								window.open(GO.settings.config.support_link);
-							}
-						},
-						scope: this
-					});
-				}
-				if (GO.settings.config.report_bug_link) {
-					helpMenu.addItem({
-						iconCls: 'ic-bug-report',
-						text: t("Report a bug"),
-						handler: function () {
-
-							if (Ext.form.VTypes.email(GO.settings.config.report_bug_link)) {
-								if (GO.email && GO.settings.modules.email.read_permission) {
-									GO.email.showComposer({
-										values: {to: GO.settings.config.report_bug_link}
-									});
-								} else {
-									document.location = 'mailto:' + GO.settings.config.report_bug_link;
-								}
-							} else {
-								var win = window.open(GO.settings.config.report_bug_link);
-								win.focus();
-							}
-						},
-						scope: this
-					});
-				}
-			}
-
-			helpMenu.addItem('-');
-			helpMenu.addItem({
-				iconCls: 'ic-info',
-				text: t("About Group-Office").replace('{product_name}', GO.settings.config.product_name),
-				handler: function () {
-					if (!this.aboutDialog)
+						// Check the subMenu property, if it is a submenu then don't add this item to the start menu
+						if (!allPanels[i].inSubmenu) {
+							this.startMenu.add(menuItemConfig);
+						}
+					} else
 					{
-						this.aboutDialog = new GO.dialog.AboutDialog();
+						adminMenuItems.push(menuItemConfig);
 					}
-					this.aboutDialog.show();
-				},
-				scope: this
-			});
+				}
+
+				var subMenus = GO.moduleManager.getAllSubmenus();
+
+				for (var key in subMenus) {
+
+					var subMenuItems = [];
+					var subItems = subMenus[key].items;
+
+					for (var i = 0; i < subItems.length; i++) {
+						if (!GO.util.empty(subItems[i])) {
+							subMenuItems.push({
+								id: 'go-start-menu-' + subItems[i].moduleName,
+								moduleName: subItems[i].moduleName,
+								text: subItems[i].title,
+								iconCls: 'go-menu-icon-' + subItems[i].moduleName,
+								handler: function (item, e) {
+									this.openModule(item.moduleName);
+								},
+								scope: this
+							});
+						}
+					}
+
+					var subMenu = new Ext.menu.Menu({
+						items: subMenuItems,
+						cls: 'startmenu-submenu'
+					});
+
+					var subitemConfig = {
+						text: key,
+						menu: subMenu
+					};
+
+					Ext.apply(subitemConfig, subMenus[key].subMenuConfig);
+
+					this.startMenu.add(new Ext.menu.Item(subitemConfig));
+				}
+
+				if (adminMenuItems.length) {
+
+					this.startMenu.add(new Ext.menu.TextItem({id: 'go-start-menu-admin-menu', text: '<div class="menu-title">' + t("Admin menu") + '</div>'}));
+
+					for (var i = 0; i < adminMenuItems.length; i++) {
+						this.startMenu.add(adminMenuItems[i]);
+					}
+				}
+
+				this.createTabPanel(items);
+
+				this.beforeRender();
+
+				function getUserImgStyle() {
+					if(!go.User.avatarId) {
+						return "";
+					}
+					return 'background-image:url('+go.Jmap.downloadUrl(go.User.avatarId)+');'
+				}
+
+				var topPanel = new Ext.Panel({
+					id:"mainNorthPanel",
+					region: 'north',
+					html:  '<div class="go-header-left"><div id="go-logo" title="'+GO.settings.config.product_name+'"></div></div>\
+					<div class="go-header-right">\
+						<div id="secondary-menu">\
+							<div id="search_query"></div>\
+							<div id="start-menu-link" ></div>\
+							<a id="user-menu" class="user-img" style="'+getUserImgStyle()+'">\
+								<span id="reminder-icon" style="display: none;">notifications</span>\
+							</a>\
+						</div>\
+					</div>',
+					height: dp(64),
+					titlebar: false,
+					border: false
+				});
+
+	//			var winSize = [window.scrollWidth , window.scrollHeight];
+
+				GO.viewport = new Ext.Viewport({
+					layout: 'border',
+					border: false,
+					items: [topPanel, this.tabPanel]
+				});
 
 
-			var userBtn = Ext.get('user-menu');
-			var userMenuTpl = userBtn.dom.innerHTML;
-			this.userMenuLink = new Ext.Button({
-				menu: new Ext.menu.Menu({
-					items: [
-						{
-							xtype: 'menutextitem',
-							text: go.User.displayName,
-							cls: 'go-display-name'
-						}, '-', {
-							text: t("Settings"),
-							iconCls: 'ic-settings',
+				this.startMenuLink = new Ext.Button({
+					menu: this.startMenu,
+					menuAlign: 'tr-br?',
+					text: '<i class="icon">apps</i>',
+					renderTo: 'start-menu-link',
+					clickEvent: 'mousedown',
+					template: new Ext.XTemplate('<span><button></button></span>')
+				});
+
+
+
+
+
+				var userBtn = Ext.get('user-menu');
+				var userMenuTpl = userBtn.dom.innerHTML;
+				this.userMenuLink = new Ext.Button({
+					menu: new Ext.menu.Menu({
+						items: [
+							{
+								xtype: 'menutextitem',
+								text: go.User.displayName,
+								cls: 'go-display-name'
+							}, '-', {
+								text: t("My Account"),
+								iconCls: 'ic-account-circle',
+								handler: function () {
+									var dlg = new go.usersettings.UserSettingsDialog();
+									dlg.load(go.User.id).show();
+								},
+								scope: this
+							},
+							'-',{
+							iconCls: 'ic-help',
+							text: t("Help"),
 							handler: function () {
-								if(!go.userSettingsDialog) {
-									go.userSettingsDialog = new go.usersettings.UserSettingsDialog();
+								
+								if (Ext.form.VTypes.email(GO.settings.config.support_link)) {
+									if (GO.email && GO.settings.modules.email.read_permission) {
+										GO.email.showComposer({
+											values: {to: GO.settings.config.support_link}
+										});
+									} else {
+										document.location = 'mailto:' + GO.supportLink;
+									}
+								} else {
+									window.open(GO.settings.config.support_link);
 								}
-								go.userSettingsDialog.show(go.User.id);
-
+							},
+							scope: this
+						}
+//						,{
+//							iconCls: 'ic-connect',
+//							text:t("Connect your device"),
+//							handler: function() {
+//								var cyd;
+//							}
+//						}
+						,{
+							iconCls: 'ic-info',
+							text: t("About {product_name}"),
+							handler: function () {
+								if (!this.aboutDialog)
+								{
+									this.aboutDialog = new GO.dialog.AboutDialog();
+								}
+								this.aboutDialog.show();
 							},
 							scope: this
 						},
+						'-',
 						{
-							text: t("Help"),
-							iconCls: 'ic-help',
-							menu: helpMenu
-						}, {
-							text: t("Logout"),
-							iconCls: 'ic-exit-to-app',
-							handler: GO.mainLayout.logout,
-							scope: this
-						}
-					]
-				}),
-				text: userMenuTpl,
-				renderTo: userBtn,
-				clickEvent: 'mousedown',
-				template: new Ext.XTemplate('<span><button></button></span>')
-			});
-			
-			
-			if(go.User.isAdmin) {
-				this.userMenuLink.menu.insert(2, {
-
-					text: t("System settings"),
-					iconCls: 'ic-settings',
-					handler: function() {
-						if(!go.systemsettingsDialog) {
-							go.systemsettingsDialog = new go.systemsettings.Dialog();
-						}
-						go.systemsettingsDialog.show();
-					}
+								text: t("Logout"),
+								iconCls: 'ic-exit-to-app',
+								handler: function() {
+									go.AuthenticationManager.logout();
+								},
+								scope: this
+							}
+						]
+					}),
+					text: userMenuTpl,
+					renderTo: userBtn,
+					clickEvent: 'mousedown',
+					template: new Ext.XTemplate('<span><button></button></span>')
 				});
-			}
 
 
-			GO.checker.init.defer(2000, GO.checker);
-			GO.checker.on('alert', function (data) {
-				if (data.notification_area)
-				{
-					Ext.get('notification-area').update(data.notification_area);
+				if(go.User.isAdmin) {
+					this.userMenuLink.menu.insert(3, {
+
+						text: t("System settings"),
+						iconCls: 'ic-settings',
+						handler: function() {
+							if(!go.systemsettingsDialog) {
+								go.systemsettingsDialog = new go.systemsettings.Dialog();
+							}
+							go.systemsettingsDialog.show();
+						}
+					});
 				}
+
+				GO.checker.init.defer(2000, GO.checker);
+				GO.checker.on('alert', function (data) {
+					if (data.notification_area)
+					{
+						Ext.get('notification-area').update(data.notification_area);
+					}
+				}, this);
+
+
+
+				this.rendered = true;
+				this.fireEvent('render');
+
+				this.welcome();
+				
+				
+//				go.Jmap.sse();
+
+
 			}, this);
-
-			/*for(var i=0;i<items.length;i++){
-			 var menuItem = this.startMenu.items.item('go-start-menu-'+items[i].moduleName);
-			 menuItem.hide();
-			 }
-			 this.refreshMenu();*/
-
-			this.rendered = true;
-			this.fireEvent('render');
-			
-			this.welcome();
-			
-
-		}, this);
+		
+		}.createDelegate(this);
+		
+		document.body.appendChild(script);
+		
+		
 	},
 	
 	
@@ -757,3 +697,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 });
 
 GO.mainLayout = new GO.MainLayout();
+
+// needed in pre v6.4
+GO.mainLayout.on('callto', GO.util.callToHandler);

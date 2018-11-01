@@ -11,7 +11,7 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
  
-Ext.namespace("GO");
+
 Ext.namespace("GO.form");
 Ext.namespace("GO.util");
 Ext.namespace('GO.plugins');
@@ -33,6 +33,7 @@ Ext.namespace("GO.base.tree");
 Ext.namespace("GO.base.util");
 Ext.namespace("GO.portlets");
 Ext.namespace("GO.panels");
+Ext.namespace("go");
 
 //An object of functions that open a particular link.
 //the index is the link type and the function gets the id as a parameter

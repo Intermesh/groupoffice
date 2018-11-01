@@ -13,8 +13,9 @@
 go.systemsettings.Dialog = Ext.extend(go.Window, {
 	
 	modal:true,
-	resizable:true,
-	maximizable:true,
+	resizable:false,
+	maximizable:false,
+	maximized: true,
 	iconCls: 'ic-settings',
 	title: t("System settings"),
 	
@@ -44,7 +45,7 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 			region:'west',
 			cls: 'go-sidenav',
 			layout:'fit',
-			width:dp(220),
+			width:dp(300),
 			items:[this.selectView = new Ext.DataView({
 				xtype: 'dataview',
 				cls: 'go-nav',
@@ -58,8 +59,14 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 				</tpl>',
 				columns: [{dataIndex:'name'}],
 				listeners: {
-					selectionchange: function(view, nodes) {					
-						this.tabPanel.setActiveTab(nodes[0].viewIndex);
+					selectionchange: function(view, nodes) {		
+						if(nodes.length) {
+							this.tabPanel.setActiveTab(nodes[0].viewIndex);
+						} else
+						{
+							//restore selection if user clicked outside of view
+							view.select(this.tabPanel.items.indexOf(this.tabPanel.getActiveTab()));
+						}
 					},
 					scope:this
 				}
@@ -88,6 +95,7 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		});
 		
 		this.addPanel(go.systemsettings.GeneralPanel);
+		this.addPanel(go.systemsettings.AppearancePanel);
 		this.addPanel(go.systemsettings.NotificationsPanel);
 		this.addPanel(go.systemsettings.AuthenticationPanel);
 		
@@ -97,18 +105,19 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 	},
 	
 	loadModulePanels : function() {
-		var available = go.Modules.getAvailable();
+		var available = go.Modules.getAvailable(), config, pnl, i, i1;
 		
-		for(var i = 0, l = available.length; i < l; i++) {
+		for(i = 0, l = available.length; i < l; i++) {
 			
-			var config = go.Modules.getConfig(available[i].package, available[i].name);
+			config = go.Modules.getConfig(available[i].package, available[i].name);
 			
 			if(!config.systemSettingsPanels) {
 				continue;
 			}
 			
-			for(var i1 = 0, l2 = config.systemSettingsPanels.length; i1 < l2; i1++) {
-				this.addPanel(config.systemSettingsPanels[i1]);
+			for(i1 = 0, l2 = config.systemSettingsPanels.length; i1 < l2; i1++) {
+				pnl = eval(config.systemSettingsPanels[i1]);				
+				this.addPanel(pnl);
 			}
 		}
 	},
@@ -120,21 +129,33 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 	},
 
 	submit : function(){		
+		
+		this.submitCount = 0;
 		// loop through child panels and call onSubmitStart function if available
 		this.tabPanel.items.each(function(tab) {			
-			tab.submit(this.onSubmitComplete, this);			
+			if(tab.rendered && tab.onSubmit) {
+				this.submitCount++;
+				tab.onSubmit(this.onSubmitComplete, this);			
+			}
 		},this);	
 	},
 	
 	load: function() {
 		// loop through child panels and call onSubmitStart function if available
 		this.tabPanel.items.each(function(tab) {			
-			tab.load(this.onLoadComplete, this);			
+			if(tab.onLoad) {
+				tab.onLoad(this.onLoadComplete, this);			
+			}
 		},this);
 	},
 	
-	onSubmitComplete : function() {
-		
+	onSubmitComplete : function(tab, success) {
+		if(success) {
+			this.submitCount--;
+			if(this.submitCount == 0) {
+				this.hide();
+			}
+		}
 	},
 	
 	onLoadComplete : function() {

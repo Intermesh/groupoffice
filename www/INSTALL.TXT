@@ -1,4 +1,7 @@
-Thank you for installing Group-Office! We hope you will enjoy it.
+Thank you for installing Group-Office! 
+======================================
 
-Visit http://www.group-office.com/wiki/Installation_manual for the lastest
-installation instructions.
+We hope you will enjoy it.
+
+Visit https://www.group-office.com/documentation.html for the latest installation 
+instructions.

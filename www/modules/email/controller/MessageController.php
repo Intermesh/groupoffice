@@ -1484,7 +1484,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				
 				$entityType = \go\core\orm\EntityType::findById($linkedModel->entityTypeId);
 //				$modelCssClass = 'go-model-icon-'.$entityType->getName().' entity '.$entityType->getName();
-				$route = $entityType->getModule()->name . '/' .strtolower($entityType->getName()) .'/'.$linkedModel->entityId;
+				$route = strtolower($entityType->getName()) .'/'.$linkedModel->entityId;
 				
 				$linkHtml .= '<a class="em-link-link" href="#'.$route.'"><i class="entity '.$entityType->getName().'"></i> <span>'.$linkedModel->name.'</span></a>,';
 			}
@@ -2000,7 +2000,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	 * @throws \GO\Base\Exception\NotFound
 	 * @throws AccessDenied
 	 */
-	protected function actionSaveAllAttachments($folder_id,$account_id,$mailbox,$uid){
+	protected function actionSaveAllAttachments($folder_id,$account_id,$mailbox,$uid, $filepath = null){
 		$response = array('success'=>true);
 		
 		$folder = \GO\Files\Model\Folder::model()->findByPk($folder_id);
@@ -2014,16 +2014,22 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			throw new \GO\Base\Exception\AccessDenied();
 		}
 		
-		// Search message from imap
-		$account = Account::model()->findByPk($account_id);
 		
-		if(!$account){
-			trigger_error("GO\Email\Controller\Message::actionSaveAllAttachments(".$account_id.") account not found", E_USER_WARNING);
-			throw new \GO\Base\Exception\NotFound("Specified account not found");
+		if(!empty($filepath)) {
+			
+			$message = \GO\Email\Model\SavedMessage::model()->createFromMimeFile($filepath);
+		} else {
+		
+			// Search message from imap
+			$account = Account::model()->findByPk($account_id);
+
+			if(!$account){
+				trigger_error("GO\Email\Controller\Message::actionSaveAllAttachments(".$account_id.") account not found", E_USER_WARNING);
+				throw new \GO\Base\Exception\NotFound("Specified account not found");
+			}
+
+			$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $mailbox, $uid);
 		}
-		
-		$message = \GO\Email\Model\ImapMessage::model()->findByUid($account, $mailbox, $uid);
-		
 		if(!$message){
 			trigger_error("GO\Email\Controller\Message::actionSaveAllAttachments(". $mailbox." - ". $uid.") message not found", E_USER_WARNING);
 			throw new \GO\Base\Exception\NotFound("Specified message could not be found");
@@ -2031,10 +2037,10 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		
 		$atts = $message->getAttachments();
 		$fsFolder = $folder->fsFolder;
-		
+		//\GO::debug($atts);
 		while($att=array_shift($atts)){
 			if(empty($att->content_id) || $att->disposition=='attachment'){
-				
+		
 				// Check if the file already exists on disk, if so then add a number after it.
 				$fileName = null;
 				$file = $fsFolder->child($att->name);
@@ -2052,6 +2058,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if(!$response['success']){
 			$response['feedback']='Could not save all files to the selected folder';
 		}
+		
+		// Call syncFilesystem on the folder because otherwise the files are not yet visible in the database.
+		$folder->syncFilesystem();
 		
 		return $response;
 	}
@@ -2232,7 +2241,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$tmpFolder = \GO\Base\Fs\Folder::tempFolder(uniqid(time()));
 		$atts = $message->getAttachments();
 		while($att=array_shift($atts)){
-			if(empty($att->content_id) || $att->disposition=='attachment')
+			if(empty($att->content_id))
 				$att->saveToFile($tmpFolder);
 		}
 

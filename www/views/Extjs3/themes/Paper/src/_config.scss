@@ -27,13 +27,30 @@ $curve-acceleration: cubic-bezier(0.4, 0.0, 1, 1);
 $curve-sharp: cubic-bezier(0.4, 0.0, 0.6, 1);
 $curve-sharper: cubic-bezier(.25, .8, .25, 1); //slider
 
+// for providing a fallback for browser not supporting css variables
+// used for developemnt in PHP replace "var(--c-primary)" with actual configured color for IE support
+// If not replaced IE will default to the color set in $cPrimary
+$vars: (
+  c-primary: $cPrimary,
+  c-primary-tp: $cPrimaryTp,
+);
+:root {
+  --c-primary: #{map-get($vars, c-primary)};
+  --c-primary-tp: #{map-get($vars, c-primary-tp)};
+}
+
+@mixin var($property, $varName) {
+  #{$property}: map-get($vars, $varName);
+  #{$property}: var(--#{$varName}, map-get($vars, $varName));
+}
+
 //------------------------------------------------
 // Layouts and backgrounds
 //------------------------------------------------
 %card {
   @extend .z1;
   border: 0;
-  background-color:color($background,'card');
+  background-color:color($bg,'card');
   border-radius: $borderRadius;
 }
 
@@ -49,15 +66,20 @@ $curve-sharper: cubic-bezier(.25, .8, .25, 1); //slider
 	letter-spacing: 0;
 	text-align:center;
 	border-radius: dp(10.5); // only round with 1 char
-	background-color: color($foreground, 'secondary-text');	
+	background-color: #727272; //color($fg, 'secondary-text');
+	
+  .x-tree-node & {
+    //position: absolute;
+    //right: 8px;
+  }
 }
 
 %hover {
 	background-color: $cHover;
-	color: $cPrimary;
+	@include var(color, c-primary);
 }
 
-%ellipsis {
+.ellipsis {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -70,20 +92,6 @@ $curve-sharper: cubic-bezier(.25, .8, .25, 1); //slider
     overflow:hidden;
 }
  
-@mixin rotate($deg) {
-	transform: rotate($deg);
-	-ms-transform: rotate($deg); // IE 9
-	-webkit-transform: rotate($deg); // Safari and Chrome
-}
-
-@mixin transition($transition...) {
-    -webkit-transition: $transition;
-    -moz-transition: $transition;
-    -ms-transition: $transition;
-    -o-transition: $transition;
-    transition: $transition;
-}
-
 @function str-replace($string, $search, $replace: '') {
   $index: str-index($string, $search);
   

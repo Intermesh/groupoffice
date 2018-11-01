@@ -26,6 +26,7 @@ class Server extends Entity {
 
 	public $smtpHostname;
 	public $smtpPort;
+	public $smtpUsername;
 	public $smtpPassword;
 	public $smtpUseUserCredentials= false;
 	public $smtpValidateCertificate = true;
@@ -47,6 +48,29 @@ class Server extends Entity {
 	 */
 	public $groups;
 
+	
+	/**
+	 * Set username authentication is needed to lookup users / groups.
+	 * 
+	 * @var string
+	 */
+	public $username;
+	
+	/**
+	 * Set password authentication is needed to lookup users / groups.
+	 * 
+	 * @var string
+	 */
+	protected $password;
+	
+	
+	public function getPassword() {
+		return \go\core\util\Crypt::decrypt($this->password);
+	}
+	
+	public function setPassword($value) {
+		$this->password = \go\core\util\Crypt::encrypt($value);
+	}
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()

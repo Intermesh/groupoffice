@@ -3,7 +3,7 @@ go.data.JmapProxy = Ext.extend(Ext.data.HttpProxy, {
 	constructor: function (config) {
 		config = config || {};
 		
-		this.entityStore = config.entityStore;
+		this.entityStore = Ext.isString(config.entityStore) ? go.Stores.get(config.entityStore) : config.entityStore;
 		
 		
 		go.data.JmapProxy.superclass.constructor.call(this, Ext.apply(config, {
@@ -37,8 +37,8 @@ go.data.JmapProxy = Ext.extend(Ext.data.HttpProxy, {
 		
 		// If a currently running read request is found, abort it
 		if (action == Ext.data.Api.actions.read && this.activeRequest[action]) {
-//			console.trace();
-				go.Jmap.abort(this.activeRequest[action]);
+			//console.trace();
+			go.Jmap.abort(this.activeRequest[action]);
 		}
 		this.activeRequest[action] = me.getItemList(this.entityStore.entity.name + "/query", params, function (getItemListResponse) {
 			me.entityStore.get(getItemListResponse.ids, function (items) {
@@ -63,10 +63,13 @@ go.data.JmapProxy = Ext.extend(Ext.data.HttpProxy, {
 	},
 	
 //exact copy from httpproxy only it uses o.reader.readRecords instead.
-	onRead: function (action, o, response) {
+	onRead: function (action, o, response, entitiesFetched) {
 		
 		var result;
 		try {
+			if(!entitiesFetched && this.fetchEntities(action, o, response)) {
+				return;
+			}
 			result = o.reader.readRecords(response);			
 		} catch (e) {
 			// @deprecated: fire old loadexception for backwards-compat.
@@ -113,5 +116,67 @@ go.data.JmapProxy = Ext.extend(Ext.data.HttpProxy, {
 				callback.call(this, response);
 			}
 		});
+	},
+	
+	
+	//Prefetches all data of type go.data.types.Entity defined in go.Entities
+	fetchEntities : function(action, o, response) {		
+		
+		var fields = this.getEntityFields(o);
+		if(!fields.length) {				
+		 return false;
+		}	
+		
+		var count = 0, called = 0, me = this;
+		
+		function callback(options, success, result) {
+			called++;			
+			if(count == called) {				
+				me.onRead.call(me, action, o, response, true)
+			}
+		}
+		
+		//group entities by type so one single request can be made
+		var types = {};
+		
+		response.records.forEach(function(r) {
+			fields.forEach(function(f) {	
+				
+				var key = f.type.getKey.call(f, r);				
+				if(!key) {
+					return true;
+				}				
+				
+				if(!types[f.type.entity]) {
+					types[f.type.entity] = [];
+				}
+				
+				if(types[f.type.entity].indexOf(key) == -1) {
+					types[f.type.entity].push(key);
+				}
+			});
+		});
+		
+		for(var entity in types) {
+			count++; //count number of requests and check if an equal number of callbacks has been called before proceeding with onRead.
+			var store = go.Stores.get(entity);
+			store.get(types[entity], callback);
+		}
+		
+		return count > 0;
+	},
+	
+	getEntityFields : function(o) {
+		
+		var f = [],  Record = o.reader.recordType,
+            fields = Record.prototype.fields;
+		
+		fields.each(function(field) {
+			if(field.type.entity) {				
+				f.push(field);				
+			}
+		});
+		
+		return f;
 	}
 });

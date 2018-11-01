@@ -5,21 +5,41 @@ require(__DIR__ . "/vendor/autoload.php");
 use go\core\App;
 use go\core\auth\Method;
 use go\core\auth\model\Token;
-use go\core\auth\model\User;
+use go\modules\core\users\model\User;
 use go\core\auth\PrimaryAuthenticator;
 use go\core\http\Request;
 use go\core\http\Response;
 use go\core\jmap\Capabilities;
 use go\core\validate\ErrorCode;
 
+function output($data = [], $status = 200, $statusMsg = null) {
+	Response::get()->setStatus($status, $statusMsg);
+	Response::get()->sendHeaders();
+
+	$data['debug'] = GO()->getDebugger()->getEntries();
+	Response::get()->output(json_encode($data));
+
+	exit();
+}
+	
+
 try {
 //Create the app with the config.php file
-	App::get(); // Initializes App
+	App::get();
+	
+	if(go\core\jmap\Request::get()->getMethod() == "DELETE") {
+		$state = new go\core\jmap\State();
+		$token = $state->getToken();
+		if(!$token) {
+			output([], 404);
+		}
+		$token->delete();
+		
+		output();		
+	}
 
 	if (!Request::get()->isJson()) {
-		Response::get()->setStatus(400, "Only Content-Type: application/json");
-		Response::get()->sendHeaders();
-		exit();
+		output([], 400, "Only Content-Type: application/json");	
 	}
 
 	$data = Request::get()->getBody();
@@ -30,10 +50,17 @@ try {
 
 		$user = User::find()->where(['email' => $data['email']])->orWhere(['recoveryEmail' => $data['email']])->single();
 		if (empty($user)) {
-			exit();
+			GO()->debug("User not found");
+			output([], 200, "Recovery mail sent");	//Don't show if user was found or not for security
 		}
+		
+		if(!($user->getPrimaryAuthenticator() instanceof \go\core\auth\Password)) {
+			GO()->debug("Authenticator doesn't support recovery");
+			output([], 200, "Recovery mail sent");	
+		}
+		
 		$user->sendRecoveryMail($data['email']);
-		exit(); // no response given
+		output([], 200, "Recovery mail sent");	
 	}
 	if (isset($data['recover'])) {
 		$oneHourAgo = (new DateTime())->modify('-1 hour');
@@ -48,7 +75,8 @@ try {
 		} elseif (!empty($data['newPassword'])) {
 			$user->setPassword($data['newPassword']);
 			$user->checkRecoveryHash($data['hash']);
-			$response = ['passwordChanged' => $user->save()];
+			$success = $user->save();
+			$response = ['passwordChanged' => $success, 'validationErrors' => $user->getValidationErrors()];
 		} else {
 			$response = [
 					"username" => $user->username,
@@ -81,6 +109,10 @@ try {
 				return false;
 			}
 			
+			if(!$user->enabled) {				
+				output([], 401, GO()->t("You're account has been disabled."));
+			}
+			
 			if(GO()->getSettings()->maintenanceMode && !$user->isAdmin()) {
 				output([], 503, "Service unavailable. Maintenance mode is enabled");
 			}
@@ -98,15 +130,7 @@ try {
 		return false;
 	}
 
-	function output($data = [], $status = 200, $statusMsg = null) {
-		Response::get()->setStatus($status, $statusMsg);
-		Response::get()->sendHeaders();
-
-		$data['debug'] = GO()->getDebugger()->getEntries();
-		Response::get()->output(json_encode($data));
-
-		exit();
-	}
+	
 
 	if (!isset($data['loginToken']) && !isset($data['accessToken']) && !empty($data['username'])) {
 
@@ -147,20 +171,26 @@ try {
 
 	if (empty($methods) && !$token->isAuthenticated()) {
 		$token->setAuthenticated();
-		$token->save();
+		if(!$token->save()) {
+			throw new \Exception("Could not save token: ". var_export($token->getValidationErrors(), true));
+		}
 	}
-
-	$response = [
-			'loginToken' => $token->loginToken,
-			'methods' => $methods
-	];
 
 	if ($token->isAuthenticated()) {
-		$response['accessToken'] = $token->accessToken;
-		$response['capabilities'] = Capabilities::get();
-		$response['user'] = $token->getUser()->toArray();
+    $authState = new \go\core\jmap\State();
+    $authState->setToken($token);
+		GO()->setAuthState($authState);
+    $response = $authState->getSession();
+    
+    $response['accessToken'] = $token->accessToken;
 		output($response, 201, "Authentication is complete, access token created.");
-	}
+	} 
+  
+  $response = [
+    'loginToken' => $token->loginToken,
+    'methods' => $methods
+  ];
+  
 
 
 	$methods = array_map(function($o) {

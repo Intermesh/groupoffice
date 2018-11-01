@@ -78,7 +78,6 @@ GO.files.FileBrowser = function(config){
 	this.treePanel.getLoader().on('load', function()
 	{		
 		
-		
 		if(!this.folder_id)
 		{
 			this.folder_id=this.treePanel.getRootNode().childNodes[0].id;
@@ -174,7 +173,7 @@ GO.files.FileBrowser = function(config){
 			header:t("Name"),
 			dataIndex: 'name',
 			renderer:function(v, meta, r){
-				var cls = r.get('acl_id')>0 && r.get('readonly')==0 ? 'folder-shared' : 'filetype filetype-'+r.get('extension');
+				var cls = r.get('acl_id')>0 && r.get('readonly')==0 ? 'filetype filetype-folder-shared' : 'filetype filetype-'+r.get('extension');
 				if(r.get('locked_user_id')>0)
 					v = '<div class="fs-grid-locked">'+v+'</div>';
 
@@ -399,6 +398,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	this.deleteButton = new Ext.Button({
 		iconCls: 'ic-delete',
 		tooltip: t("Delete"),
+		overflowText:t("Delete"),
 		handler: function(){
 			this.onDelete('grid');
 		},
@@ -408,6 +408,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	this.cutButton= new Ext.Button({
 		iconCls: 'ic-content-cut',
 		tooltip: t("Cut"),
+		overflowText:t("Cut"),
 		handler: function(){
 			var records = this.getSelectedGridRecords();
 			this.onCutCopy('cut', records);
@@ -417,6 +418,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	this.copyButton = new Ext.Button({
 		iconCls: 'ic-content-copy',
 		tooltip: t("Copy"),
+		overflowText:t("Copy"),
 		handler: function(){
 			var records = this.getSelectedGridRecords();
 			this.onCutCopy('copy', records);
@@ -426,6 +428,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	this.pasteButton = new Ext.Button({
 		iconCls: 'ic-content-paste',
 		tooltip: t("Paste"),
+		overflowText:t("Paste"),
 		handler: this.onPaste,
 		scope: this,
 		disabled:true
@@ -488,7 +491,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 				
 				window.open(GO.url('files/jupload/renderJupload'));				
 				
-				Ext.MessageBox.confirm("Uploader", "Please open the upload program and upload your files. Click 'Yes' when the upload is done.",function(btn) {
+				Ext.MessageBox.confirm("Uploader", t("Please open the upload program and upload your files. Click 'Yes' when the upload is done.", 'files'),function(btn) {
 					
 					if(btn == 'yes') {
 						this.sendOverwrite({upload:true});
@@ -524,6 +527,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	tbar.push({
 		iconCls: "ic-refresh",
 		tooltip:t("Refresh"),
+		overflowText:t("Refresh"),
 		handler: function(){          
 			this.refresh(true);
 		},
@@ -568,6 +572,17 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		disabled: true,
 		scope: this
 	}));
+
+	tbar.push('->', {
+		iconCls: 'ic-more',
+		overflowText: t('File info'),
+		tooltip: t('File info'),
+		//hidden: (config.id === "go-module-panel-files"),
+		handler: function(btn) {
+			this.eastPanel.toggleCollapse();
+		},
+		scope:this
+	});
 
 	config.keys=[{
 		ctrl:true,
@@ -657,7 +672,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		tbar : {                        // configured using the anchor layout
 			xtype : 'container',
 			items :[ 
-				new Ext.Toolbar({items: tbar}),
+				new Ext.Toolbar({items: tbar, enableOverflow:true}),
 				new Ext.Toolbar({
 					layout:'hbox',
 					layoutConfig: {
@@ -696,11 +711,11 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		//items:[this.filePanel, this.folderPanel],
 		collapsed:config.filePanelCollapsed,
 		width:450,
-		collapseMode:'mini',
-		collapsible:true,
-		hideCollapseTool:true,
+		//collapseMode:'mini',
+		//collapsible:true,
+		//hideCollapseTool:true,
 		split:true,
-		border:false,
+		//border:false,
 		id: config.id+'fs-east-panel'
 	});
 
@@ -987,13 +1002,14 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 			this.upButton.setDisabled(false);
 		}
 
-		if(this.filePanel.model_id>0 && !store.getById('f:'+this.filePanel.model_id)){
-			this.filePanel.reset();
-		}
-
-		if(this.folderPanel.model_id>0 && !store.getById('d:'+this.folderPanel.model_id)){
-			this.folderPanel.reset();
-		}
+//Don't reset because direct routes won't work anymore.
+//		if(this.filePanel.model_id>0 && !store.getById('f:'+this.filePanel.model_id)){
+//			this.filePanel.reset();
+//		}
+//
+//		if(this.folderPanel.model_id>0 && !store.getById('d:'+this.folderPanel.model_id)){
+//			this.folderPanel.reset();
+//		}
 
 	},
 
@@ -1131,18 +1147,6 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 						this.newMenu.add(menuItem);
 					}
-				}
-				
-				if(go.Modules.isAvailable("legacy", "documenttemplates"))
-				{
-					this.newMenu.add('-');
-					this.newOODoc = new GO.documenttemplates.NewOODocumentMenuItem();
-					this.newOODoc.fb = this;
-					this.newOODoc.on('create', function(){
-						this.gridStore.reload();
-					}, this);
-
-					this.newMenu.add(this.newOODoc);
 				}
 
 				if(GO.settings.modules.files.write_permission)
@@ -1319,8 +1323,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 			
 			this.compressRecords = records;
 
-			if(!this.compressDialog){
-				this.compressDialog = new GO.files.CompressDialog ({
+			if(!this.downloadCompressedDialog){
+				this.downloadCompressedDialog = new GO.files.CompressDialog ({
 					scope:this,
 					handler:function(win, filename, utf8){
 						this.onDownloadSelected(this.compressRecords, filename, utf8);
@@ -1328,13 +1332,16 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 				});
 			}
 
-			this.compressDialog.show();
+			this.downloadCompressedDialog.show();
 			
 		} else {
 			
 			params.archive_name=filename;
 			params.utf8=utf8 ? '1' : '0';
 			params.sources=Ext.encode(params.sources);
+      
+      //for safari it must be opened before async request.
+      //var win = window.open();
 			
 			GO.request({
 				timeout:300000,
@@ -1344,8 +1351,11 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 				success:function(response, options, result){
 					
 					if(!GO.util.empty(result.archive)){
-						window.open(GO.url("core/downloadTempFile",{path:result.archive}));
+						document.location = GO.url("core/downloadTempFile",{path:result.archive});
+            //win.close();
+            
 					} else {
+            win.close();
 						GO.message.alert('No archive build','error');
 					}
 
@@ -1574,6 +1584,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 	refresh : function(syncFilesystemWithDatabase){
 		
+		this.getActiveGridStore().baseParams['folder_id'] = null;
+		
 		this.treePanel.setExpandFolderId(this.folder_id);
 		
 		if(syncFilesystemWithDatabase)
@@ -1697,8 +1709,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 								this.overwriteDialog.render(Ext.getBody());
 							}
 
-							var t = new Ext.Template(t("Do you wish to overwrite the file '{file}'?"));
-							t.overwrite(this.overwriteDialog.body, {
+							var tpl = new Ext.Template(t("Do you wish to overwrite the file '{file}'?"));
+							tpl.overwrite(this.overwriteDialog.body, {
 								file: responseParams.fileExists
 							});
 							this.overwriteDialog.show();
@@ -1835,28 +1847,30 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
       
 		this.folder_id = id;
 		//this.gridStore.baseParams['id']=this.thumbsStore.baseParams['id']=id;
-		this.getActiveGridStore().baseParams['folder_id']=id;
+		if(this.getActiveGridStore().baseParams['folder_id'] != id) {
+			this.getActiveGridStore().baseParams['folder_id']=id;
 
-		this.getActiveGridStore().load({
-			callback:function(){
-			
-				if(this.expandTree)
-				{
-					var activeNode = this.treePanel.getNodeById(id);
-						
-					if(activeNode){
-						activeNode.expand();
-						this.updateLocation();
-					}else{						
-						this.treePanel.setExpandFolderId(id);
-						this.treePanel.getRootNode().reload();	
+			this.getActiveGridStore().load({
+				callback:function(){
+
+					if(this.expandTree)
+					{
+						var activeNode = this.treePanel.getNodeById(id);
+
+						if(activeNode){
+							activeNode.expand();
+							this.updateLocation();
+						}else{						
+							this.treePanel.setExpandFolderId(id);
+							this.treePanel.getRootNode().reload();	
+						}
 					}
-				}
-				this.updateLocation();
-				this.focus();
-			},
-			scope:this
-		});
+					this.updateLocation();
+					this.focus();
+				},
+				scope:this
+			});
+		}
 		
 	},
 	
@@ -2122,7 +2136,13 @@ go.Modules.register("legacy", 'files', {
 	mainPanel: GO.files.FileBrowser,
 	title: t("Files", "files"),
 	iconCls: 'go-tab-icon-files',
-	entities: ["File", "Folder"],
+	entities: [{
+			name: "File",
+			linkable: true
+	}, {
+		name: "Folder",
+		linkable: true
+	}],
 	initModule: function () {	
 		
 	}

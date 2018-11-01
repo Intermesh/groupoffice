@@ -20,7 +20,7 @@ GO.modules.MainPanel = function(config) {
 	var reader = new Ext.data.JsonReader({
 			root: 'results',
 			totalProperty: 'total',
-			fields: ['name', 'package', 'localizedName',  'description', 'id', 'sort_order', 'admin_menu', 'aclId', 'icon', 'enabled', 'warning', 'buyEnabled','not_installable', 'isRefactored'],
+			fields: ['name', 'package', 'localizedName',  'description', 'id', 'sort_order', 'admin_menu', 'aclId', 'icon', 'enabled', 'warning', 'buyEnabled','not_installable', 'isRefactored','installed'],
 			id: 'name'
 		});
 
@@ -128,9 +128,9 @@ GO.modules.MainPanel = function(config) {
 						if (result.aclId) {
 							record.set('aclId', result.aclId);
 							record.set('id', result.id);
-							record.set("enabled", true);
+							record.set("enabled", checked);
 
-							if (record.data.enabled) {
+							if (checked) {
 								this.showPermissions(record.data.name, t(record.data.name, record.data.name), record.data.aclId);
 								//this.store.load();
 							}
@@ -145,7 +145,9 @@ GO.modules.MainPanel = function(config) {
 	
 	var actions = this.initRowActions();
 
-	config.cm = new Ext.grid.ColumnModel([
+
+	
+	var cols = [
 		{
 			header: t("Name"),
 			dataIndex: 'name',
@@ -162,18 +164,32 @@ GO.modules.MainPanel = function(config) {
 				allowBlank: false,
 				decimals:0
 			})
-		},
-		{
+		},{
+			header:'',
+			dataIndex:'actions',
+			renderer:function(val, meta, record, rowIndex, columnIndex, store){
+				meta.css += 'mo-actions-column';			
+				if(record.data.installed){
+					return '<a href="#" onclick="GO.moduleManager.deleteModule(\''+record.data.id+'\',\''+record.data.name+'\');"><span class="go-icon-mo-delete"></span></a>';
+				} else {
+					return '';
+				}
+			}
+		},{
 			header: "Package",
 			dataIndex: 'package',
 			id: 'package',
 			renderer: function(v) {
 				return v.ucFirst();
 			}
-		},
-		actions
-	]);
+		}
+	];
 	
+	if(GO.settings.config.debug) {
+		cols.push(actions);
+	}
+	config.cm = new Ext.grid.ColumnModel(cols);
+		
 	config.plugins = [actions];
 	config.clicksToEdit = 1;
 	config.loadMask=true;
@@ -301,7 +317,7 @@ Ext.extend(GO.modules.MainPanel,Ext.grid.EditorGridPanel, {
 					return;
 				}
 				
-				Ext.MessageBox.confirm(t("Delete"), t("Are you sure you want to delete {item}?", null, {item: record.data.name}), function(cmd) {
+				Ext.MessageBox.confirm(t("Delete"), t("All data will be lost! Are you sure you want to delete module '{item}'?").replace('{item}', record.data.name), function(cmd) {
 					console.log(cmd);
 					if(cmd != 'yes') {
 						return;
@@ -521,15 +537,14 @@ Ext.extend(GO.modules.MainPanel,Ext.grid.EditorGridPanel, {
 		var params = {};
 		
 		if(record.data.id) {
-			params['update'] = [{
-				id: record.data.id,
+			params.update = {};
+			params.update[record.data.id] = {
 				enabled: record.data.enabled
-			}];
+			};
 			go.Stores.get("Module").set(params, function(options, success, response) {
 
 				if(record.data.enabled && record.isModified("enabled")) {
-					record.set('aclId', response['created'][0].aclId);
-					record.set('id', response['created'][0].id);
+					//record.set('aclId', response['created'][record.data.id].aclId);
 					this.showPermissions(record.data.name, t(record.data.name, record.data.name), record.data.aclId);
 					this.store.load();				
 				}
@@ -601,6 +616,28 @@ Ext.extend(GO.modules.MainPanel,Ext.grid.EditorGridPanel, {
 
 });
 
+
+GO.moduleManager.deleteModule = function(moduleId, name){
+	
+	var modulePanel = GO.mainLayout.getModulePanel("modules");
+	
+	Ext.MessageBox.confirm(GO.modules.lang.cmdUninstall,GO.modules.lang.cmdUninstallMessage.replace('{0}',name), function(clickedBtn){
+		if(clickedBtn === 'yes'){			
+			GO.request({
+				maskEl:modulePanel.getEl(),
+				url: 'modules/module/delete',
+				params: {
+					id: moduleId
+				},
+				scope: this,
+				success: function(response, options, result) {
+					Ext.Msg.alert(GO.modules.lang.cmdUninstall, GO.modules.lang.cmdUninstallMessageSuccess.replace('{0}',name));
+					modulePanel.getStore().load();
+				}
+			});
+		}
+	},this);
+};
 
 go.Modules.register('core', 'modules' ,{
   mainPanel: GO.modules.MainPanel,

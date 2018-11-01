@@ -1,6 +1,5 @@
 Ext.override(Ext.form.BasicForm, {
 	
-	getFieldValuesOrig: Ext.form.BasicForm.prototype.getFieldValues,
 	setValuesOrig: Ext.form.BasicForm.prototype.setValues,
 	/**
 	 * Retrieves the fields in the form as a set of key/value pairs, using the {@link Ext.form.Field#getValue getValue()} method.
@@ -12,18 +11,54 @@ Ext.override(Ext.form.BasicForm, {
 	 * @return {Object} The values in the form
 	 */
 	getFieldValues: function (dirtyOnly) {
-		var v = this.getFieldValuesOrig(dirtyOnly);
-		
-		//fix for submitValue not working in getFieldValues()
-		this.items.each(function(f) {
-			if(f.submit === false) {
-				delete v[f.getName()];
+		var o = {},
+						n,
+						key,
+						val,
+						me = this;
+
+		var fn = function (f) {
+			if (dirtyOnly !== true || f.isDirty()) {
+			
+				if (f.getXType() == 'compositefield' || f.getXType() == 'checkboxgroup') {
+					f.items.each(fn);
+					return true;
+				}
+
+				if(f.submit === false) {
+					return true;
+				}
+
+				n = f.getName();
+				key = o[n];
+				if (f.getXType() == 'numberfield') {
+					f.serverFormats = false; // this will post number as number
+				} 
+				val = f.getValue();
+				
+				
+				if(Ext.isDate(val)) {
+					val = me.serializeDate(val);
+				}				
+
+				if (Ext.isDefined(key)) {
+					if (Ext.isArray(key)) {
+						o[n].push(val);
+					} else {
+						o[n] = [key, val];
+					}
+				} else {
+					o[n] = val;
+				}
 			}
-		});
+		};
+		
+		this.items.each(fn);
+  
 
 		var keys, converted = {}, currentJSONlevel;
 
-		for (var key in v) {
+		for (var key in o) {
 
 			keys = key.split('.');
 
@@ -31,7 +66,7 @@ Ext.override(Ext.form.BasicForm, {
 
 			for (var i = 0; i < keys.length; i++) {
 				if (i === (keys.length - 1)) {
-					currentJSONlevel[keys[i]] = v[key];
+					currentJSONlevel[keys[i]] = o[key];
 				} else
 				{
 					currentJSONlevel[keys[i]] = currentJSONlevel[keys[i]] || {};
@@ -42,6 +77,16 @@ Ext.override(Ext.form.BasicForm, {
 		}
 				
 		return converted;
+	},
+	
+	serializeDate : function(date) {
+		if(date.getHours() == 0 && date.getMinutes() == 0 && date.getSeconds() == 0) {
+			//no time
+			return date.format("Y-m-d");
+		} else
+		{
+			return date.format('c');
+		}
 	},
 	
 	setValues: function (values) {		

@@ -45,12 +45,14 @@ class Disk implements CacheInterface {
 	 */
 	public function set($key, $value, $persist = true) {
 
+		GO()->debug("CACHE: ". $key);
 		//don't set false values because unserialize returns false on failure.
 		if ($key === false) {
 			return true;
 		}
+		
+		$key = str_replace('\\', '-', $key);
 
-		$key = File::stripInvalidChars($key, '-');		
 		if($persist) {
 			$file = $this->folder->getFile($key);			
 			if(!$file->putContents(serialize($value))) {
@@ -68,9 +70,9 @@ class Disk implements CacheInterface {
 	 * @return mixed null if it doesn't exist
 	 */
 	public function get($key) {
-
-		$key = File::stripInvalidChars($key, '-');
 		
+		$key = str_replace('\\', '-', $key);
+
 		if(isset($this->cache[$key])) {
 			return $this->cache[$key];
 		}
@@ -127,11 +129,15 @@ class Disk implements CacheInterface {
 			return true;
 		}
 		
+		GO()->debug("Flushing cache");
+		
 		$this->cache = [];
 	
 		$this->folder->delete();
 		$this->folder->create();
 		$this->folder->chmod(0777);
+		
+		$this->flushOnDestruct = false;
 		
 		return true;
 	}

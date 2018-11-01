@@ -1,9 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" version="1">
- <path style="opacity:0.2" d="m 14.5,8.0000001 c -1.385,0 -2.5,1.115 -2.5,2.4999999 v 45 c 0,1.385 1.115,2.5 2.5,2.5 h 35 C 50.885,58 52,56.885 52,55.5 V 23 L 38.25,21.75 37,8.0000001 Z"/>
- <path fill="#3e50b4" d="m14.5 7c-1.385 0-2.5 1.115-2.5 2.5v45c0 1.385 1.115 2.5 2.5 2.5h35c1.385 0 2.5-1.115 2.5-2.5v-32.5l-13.75-1.25-1.25-13.75z"/>
- <path style="opacity:0.2" d="M 37,8.0000001 V 20.5 c 0,1.3808 1.1193,2.5 2.5,2.5 H 52 Z"/>
- <path fill="#7482d0" d="m37 7v12.5c0 1.3808 1.1193 2.5 2.5 2.5h12.5l-15-15z"/>
- <path style="opacity:0.2" d="m 21,30 v 3 h 22 v -3 z m 0,6 v 3 h 22 v -3 z m 0,6 v 3 h 22 v -3 z m 0,6 v 3 h 16 v -3 z"/>
- <path fill="#fff" d="m21 29v3h22v-3h-22zm0 6v3h22v-3h-22zm0 6v3h22v-3h-22zm0 6v3h16v-3h-16z"/>
- <path style="opacity:0.1;fill:#ffffff" d="m 14.5,7.0000001 c -1.385,0 -2.5,1.115 -2.5,2.5 V 10.5 C 12,9.1150001 13.115,8.0000001 14.5,8.0000001 H 37 c 0,-1 0,0 0,-1 z"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="40px" height="51px" viewBox="0 0 40 51" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.3 (51167) - http://www.bohemiancoding.com/sketch -->
+    <title>doc</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="doc" fill-rule="nonzero">
+            <path d="M2.5,1.0000001 C1.115,1.0000001 0,2.1150001 0,3.5 L0,48.5000001 C0,49.8850001 1.115,51.0000001 2.5,51.0000001 L37.5,51.0000001 C38.885,51.0000001 40,49.8850001 40,48.5000001 L40,16 L26.25,14.75 L25,1.0000001 L2.5,1.0000001 Z" id="Shape" fill="#000000" opacity="0.2"></path>
+            <path d="M2.5,0 C1.115,0 0,1.115 0,2.5 L0,47.5 C0,48.885 1.115,50 2.5,50 L37.5,50 C38.885,50 40,48.885 40,47.5 L40,15 L26.25,13.75 L25,0 L2.5,0 Z" id="Shape" fill="#6675A6"></path>
+            <path d="M25,1.0000001 L25,13.5000001 C25,14.8808001 26.1193,16.0000001 27.5,16.0000001 L40,16.0000001 L25,1.0000001 Z" id="Shape" fill="#000000" opacity="0.2"></path>
+            <path d="M25,0 L25,12.5 C25,13.8808 26.1193,15 27.5,15 L40,15 L25,0 Z" id="Shape" fill="#929CBF"></path>
+            <path d="M9,23 L9,26 L31,26 L31,23 L9,23 Z M9,29 L9,32 L31,32 L31,29 L9,29 Z M9,35 L9,38 L31,38 L31,35 L9,35 Z M9,41 L9,44 L25,44 L25,41 L9,41 Z" id="Shape" fill="#000000" opacity="0.2"></path>
+            <path d="M9,22 L9,25 L31,25 L31,22 L9,22 Z M9,28 L9,31 L31,31 L31,28 L9,28 Z M9,34 L9,37 L31,37 L31,34 L9,34 Z M9,40 L9,43 L25,43 L25,40 L9,40 Z" id="Shape" fill="#FFFFFF"></path>
+            <path d="M2.5,1e-07 C1.115,1e-07 0,1.1150001 0,2.5000001 L0,3.5 C0,2.1150001 1.115,1.0000001 2.5,1.0000001 L25,1.0000001 C25,9.99999994e-08 25,1.0000001 25,9.99999994e-08 L2.5,1e-07 Z" id="Shape" fill="#FFFFFF" opacity="0.1"></path>
+        </g>
+    </g>
 </svg>

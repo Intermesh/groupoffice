@@ -200,9 +200,12 @@ class AbstractModelController extends AbstractController {
 		$response['data']['write_permission']=true;
 			
 		
-		//todo custom fields should be in a subarray.
 		if(\GO::user()->getModulePermissionLevel('customfields') && $model->customfieldsRecord)
-			$response['data'] = array_merge($response['data'], $model->customfieldsRecord->getAttributes());	
+		{
+			foreach($model->customfieldsRecord->getAttributes() as $key => $value) {
+				$response['data']['customFields.'.$key] = $value;
+			}
+		}
 						
 		$response['success'] = true;
 
@@ -632,6 +635,8 @@ class AbstractModelController extends AbstractController {
 				);				
 			}
 		}
+		//for new panels
+		$response['data']['customFields'] = $customAttributes;
 
 		foreach($categories as $category){
 			if(count($category['fields']))
@@ -1293,12 +1298,18 @@ class AbstractModelController extends AbstractController {
 	 * @param type $params 
 	 */
 	public function actionMerge($params){
-		$mergeModels = json_decode($params['merge_models']);
+		
+		if(isset($params['entity'])) {
+			$entityType = \go\core\orm\EntityType::findByName($params['entity']);
+			$params['model_name'] = $entityType->getClassName();
+		}
+		
+		$mergeModels = json_decode($params['merge_models'], true);
 		
 		$targetModel = \GO::getModel($params['model_name'])->findByPk($params['target_model_id']);
 		
-		foreach($mergeModels as $mergeModelProps){
-			$mergeModel = \GO::getModel($mergeModelProps->model_name)->findByPk($mergeModelProps->model_id);
+		foreach($mergeModels as $id){
+			$mergeModel = \GO::getModel($params['model_name'])->findByPk($id);
 			$targetModel->mergeWith($mergeModel, !empty($params['merge_attributes']), !empty($params['delete_merge_models']));			
 		}
 		

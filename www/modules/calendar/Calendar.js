@@ -1799,6 +1799,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 		if(event.repeats && actionData.singleInstance)
 		{			
 			params['exception_date']=actionData.dragDate.format("U");
+			params['thisAndFuture'] = actionData.thisAndFuture || false,
 			params['exception_for_event_id']=event['event_id'];
 			params['repeats']=true;
 		}else
@@ -2140,15 +2141,19 @@ go.Modules.register("legacy", 'calendar', {
 	mainPanel: GO.calendar.MainPanel,
 	title : t("Calendar", "calendar"),
 	iconCls : 'go-tab-icon-calendar',
-	entities: ["Event"],
-	userSettingsPanels: [GO.calendar.SettingsPanel],
-	initModule: function () {	
-		go.Links.registerLinkToWindow("Event", function() {
-			var win = new GO.calendar.EventDialog();
-			win.win.closeAction = "close";
-			return win;
-		});
-	}
+	entities: [{
+			name: "Event",			
+			linkWindow: function() {
+				var win = new GO.calendar.EventDialog();
+				win.win.closeAction = "close";
+				return win;
+			},
+			linkDetail: function() {
+				return new GO.calendar.EventPanel();
+			}	
+	}],
+	userSettingsPanels: ["GO.calendar.SettingsPanel"]
+	
 });
 
 
@@ -2334,3 +2339,20 @@ GO.calendar.handleMeetingRequest=function(responseResult){
 	}
 }
 
+GO.calendar.showInfo = function (eventId) {
+
+	var eventPanel = new GO.calendar.EventPanel();
+	var win = new go.Window({
+		title: t("Appointment"),
+		collapsible: true,
+		maximizable: true,
+		resizable: true,
+		width: 500,
+		height: 10000,
+		layout:'fit',
+		items:[eventPanel]
+	});
+	win.show();
+	eventPanel.load(eventId);
+	
+}

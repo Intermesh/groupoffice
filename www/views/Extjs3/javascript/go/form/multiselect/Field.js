@@ -5,9 +5,17 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 	 * The name of the field in the linking table that holds the id of the entities you want to select
 	 * 
 	 * eg. "noteBookId"
-	 * property {string} 
+	 * @property {string} 
 	 */
 	idField: null,
+	
+	/**
+	 * If set to true then the field will expect and return id's as value. Otherwise
+	 * it will use full record data.
+	 * 
+	 * @property {boolean}
+	 */
+	valueIsId: false,
 	
 	/**
 	 * The entity property to display in the grids
@@ -33,19 +41,21 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 	 */
 	storeBaseParams: null,
 
-	autoHeight: true,
-	
-	viewConfig: {
-		scrollOffset: 0,
-		emptyText: t("Empty"),
-		deferEmptyText: false
-	},
+	autoHeight: true,	
 	
 	cls: 'go-grid3-hide-headers',
 
 	constructor: function (config) {
 
 		config = config || {};
+		
+		if(!config.viewConfig) {
+			config.viewConfig = {
+				scrollOffset: 0,
+				emptyText: t("Empty"),
+				deferEmptyText: false
+			};
+		}
 
 		var actions = this.initRowActions();
 
@@ -104,8 +114,7 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 				]
 			},
 			store: new go.data.Store({
-				fields: fields,
-				entityStore: config.entityStore
+				fields: fields
 			}),
 			columns: columns,
 			autoExpandColumn: "name"
@@ -133,7 +142,7 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 
 	isFormField: true,
 
-	getName() {
+	getName: function() {
 		return this.name;
 	},
 
@@ -147,18 +156,60 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 
 	setValue: function (records) {
 		
-		this._isDirty = false; //todo this is not right but works for our use case
+		if(GO.util.empty(records)) {
+			return;
+		}
 		
-		var ids = [];
-		records.forEach(function (n) {
-			ids.push(n[this.idField]);
-		}, this);
+		this._isDirty = false; //todo this is not right but works for our use case
+		var ids;
+		if(this.valueIsId) {
+			ids = records;
+			
+			records = [];
+			ids.forEach(function (id) {
+				var record = {};
+				record[this.idField] = id;
+				records.push(record);
+			}, this);
+		} else
+		{
+			ids = [];
+			records.forEach(function (n) {
+				ids.push(n[this.idField]);
+			}, this);
+		}
 	
 		//we must preload the notebooks so notebook select can use it in a renderer
 		this.entityStore.get(ids, function () {
 
 			this.store.loadData({records: records});
 		}, this);
+	},
+	
+	getValue: function () {		
+		var records = this.store.getRange(), v = [];
+		for(var i = 0, l = records.length; i < l; i++) {
+			if(this.valueIsId) {
+				v.push(records[i].data[this.idField]);
+			} else
+			{
+				v.push(records[i].data);
+			}
+		}
+		return v;
+	},
+
+	markInvalid: function (msg) {
+		this.getEl().addClass('x-form-invalid');
+		Ext.form.MessageTargets.qtip.mark(this, msg);
+	},
+	clearInvalid: function () {
+		this.getEl().removeClass('x-form-invalid');
+		Ext.form.MessageTargets.qtip.clear(this);
+	},
+	
+	validate : function() {
+		return true;
 	},
 	
 	getIds : function() {
@@ -169,24 +220,7 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 		return v;
 	},
 
-	getValue: function () {		
-		var records = this.store.getRange(), v = [];
-		for(var i = 0, l = records.length; i < l; i++) {
-			v.push(records[i].data);
-		}
-		return v;
-	},
-
-	markInvalid: function () {
-
-	},
-	clearInvalid: function () {
-
-	},
 	
-	validate : function() {
-		return true;
-	},
 	
 	initRowActions: function () {
 

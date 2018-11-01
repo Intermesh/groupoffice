@@ -43,13 +43,19 @@ GO.addressbook.BirthdaysPanel = function(config)
 			header: '',
 			dataIndex: 'photo_url',
 			renderer: function (value, metaData, record) {
-				return '<img src="'+value+'" height="50"/>';
+				if(!value){
+					return '<div class="avatar"></div>';
+				}
+				return '<img class="avatar" src="'+value+'">';
 			}
 		},{
 			id:'birthday-portlet-name-col',
 			header:t("Name"),
 			dataIndex: 'name',
-			sortable:true
+			sortable:true,
+			renderer: function (value, metaData, record) {
+				return '<a href="#contact/'+record.json.id+'">'+value+'</a>';
+			}
 		},{
 			header:t("Address book", "addressbook"),
 			dataIndex: 'addressbook_id',
@@ -92,7 +98,6 @@ Ext.extend(GO.addressbook.BirthdaysPanel, GO.grid.GridPanel, {
 			interval:960000
 		});
 	}
-	
 });
 
 

@@ -3,9 +3,12 @@
 	font-family: 'Material Icons';
 	font-style: normal;
 	font-weight: 400;
-	src: url(./fonts/MaterialIcons-Regular.eot);
-	/* For IE6-8 */
-	src: local("Material Icons"), local("MaterialIcons-Regular"), url(./fonts/MaterialIcons-Regular.woff2) format("woff2"), url(./fonts/MaterialIcons-Regular.woff) format("woff"), url(./fonts/MaterialIcons-Regular.ttf) format("truetype");
+	src: url(./fonts/MaterialIcons-Regular.eot);// IE9 compat modes
+	src: local("Material Icons"), 
+		local("MaterialIcons-Regular"), 
+		url(./fonts/MaterialIcons-Regular.woff2) format("woff2"), // Super Modern
+		url(./fonts/MaterialIcons-Regular.woff) format("woff"),  // Pretty Modern
+		url(./fonts/MaterialIcons-Regular.ttf) format("truetype"); // Android, Safari, iOS
 }
 // #################
 // ##### ICONS #####
@@ -33,6 +36,12 @@
   -moz-osx-font-smoothing: grayscale; // Support for Firefox.
   font-feature-settings: 'liga'; // Support for IE
 }
+i.icon {
+	@extend %icon;
+	background-size: contain;
+	width:dp(24);
+	height: dp(24);
+}
 .email-grid-icon {
 	@extend %icon;
 	background-position: -100px;
@@ -48,7 +57,7 @@
 .icon {
   color:inherit;
   &.s6 {
-	  color: $cPrimary; // only used in files thumbgrid
+	  @include var(color, c-primary); // only used in files thumbgrid
 	  font-size: 6em;
 	  max-height: dp(6*24);
 	  max-width: dp(6*24);
@@ -157,10 +166,10 @@ define icons with:
 
 .x-tool::before, .ux-row-action-item {
 	@extend %icon;
-	color: $cPrimary;
+	//@include var(color, c-primary);
 }
 .ux-row-action-item:hover {
-	color: color($foreground, 'text');
+	color: color($fg, 'text');
 	cursor: pointer;
 }
 @each $class, $icon in $tools {
@@ -261,6 +270,8 @@ $btn-icon : (
 	//new 
 );
 
+
+
 @each $class, $icon in $btn-icon {
 	.#{$class}:before {
 		content: '#{$icon}';
@@ -288,6 +299,8 @@ $filetype: (
 	null: link,
 	eml: eml,
 	folder: folder,
+	folder_shared: folder-shared,
+	folder_special: folder-special,
 	image: (jpeg, jpg, gif, bmp, tif, png, tiff),
 	svg: svg,
 	pdf: pdf,
@@ -321,19 +334,19 @@ $filetype: (
 }
 
 .filetype {
-	background-size: dp(24) dp(24);
+	background-size: contain;
 	background-image:url(img/filetype/unknown.svg);
 	background-repeat: no-repeat;
 	&-link {
-		padding-left: dp(24);
-		padding-top: dp(4);
-		padding-bottom: dp(4);
-		padding-right: dp(8);
+		background-size: contain;
+		background-image:url(img/filetype/unknown.svg);
 		background-repeat: no-repeat;
 		background-position: top left;
-		background-size: dp(24);
-		white-space: nowrap;
-		line-height: dp(32);
+		white-space: nowrap;		
+		padding-left: dp(24);
+		line-height: dp(24);
+		margin: dp(8) 0;
+		display: inline-block;
 	}
 }
 
@@ -1298,7 +1311,7 @@ $material-icons : (
 .go-icon-cross .x-grid3-cell-inner{
 	&:before {
 		@extend %icon;
-		content: 'delete';
+		content: 'close';
 		margin-right: dp(8);
 	}
 }

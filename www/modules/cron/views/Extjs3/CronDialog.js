@@ -8,8 +8,9 @@ GO.cron.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			formControllerUrl: 'core/cron',
 			updateAction : 'update',
 			createAction : 'create',
-			height:395,
-			width:350,
+			height:dp(600),
+			autoScroll: true,
+			width:dp(500),
 			tools: [{
 				id:'help',
 				qtip: t("Please use one of these formats (eg. hour, no spaces):", "cron")+
@@ -115,7 +116,8 @@ GO.cron.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			anchor: '100%',
 			maxLength: 100,
 //			allowBlank:false,
-			boxLabel: t("Enabled", "cron")
+			boxLabel: t("Enabled", "cron"),
+			hideLabel: true
 		});
 		
 		this.runOnceCheckbox = new Ext.ux.form.XCheckbox({
@@ -124,7 +126,8 @@ GO.cron.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			anchor: '100%',
 			maxLength: 100,
 //			allowBlank:false,
-			boxLabel: t("Run only once", "cron")
+			boxLabel: t("Run only once", "cron"),
+			hideLabel: true
 		});
 		
 		this.jobCombo = new GO.form.ComboBox({

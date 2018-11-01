@@ -9,7 +9,7 @@ CREATE TABLE `imapauth_server` (
   `smtpHostname` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `smtpPort` int(11) NOT NULL DEFAULT '587',
   `smtpUsername` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `smtpPassword` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `smtpPassword` varchar(512) COLLATE ascii_bin DEFAULT NULL,
   `smtpUseUserCredentials` tinyint(1) NOT NULL DEFAULT '0',
   `smtpEncryption` enum('tls','ssl') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `smtpValidateCertificate` tinyint(1) NOT NULL DEFAULT '1'

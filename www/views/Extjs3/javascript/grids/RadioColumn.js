@@ -27,7 +27,7 @@ GO.grid.RadioColumn = function(config){
 	this.renderer = this.renderer.createDelegate(this);
 };
 
-GO.grid.RadioColumn.prototype = {
+Ext.extend(GO.grid.RadioColumn, Ext.grid.Column, {
 	value : false,
 	
 	horizontal : false,
@@ -115,4 +115,5 @@ GO.grid.RadioColumn.prototype = {
 
 		return '<div class="x-grid3-radio-col'+ on +' x-grid3-cc-'+this.id+'">&#160;</div>';
 	}
-};
+});
+

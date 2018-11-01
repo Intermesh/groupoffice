@@ -2,13 +2,22 @@
 
 namespace go\core {
 
-	use go\core\cache\CacheInterface;
-	use go\core\cache\Disk;
-	use go\core\db\Connection;
-	use go\core\db\Database;
-	use go\core\mail\Mailer;
-	use go\core\fs\Folder;
-	use go\core\jmap\State;
+use Exception;
+use GO\Base\Observable;
+use go\core\auth\State as AuthState;
+use go\core\cache\CacheInterface;
+use go\core\cache\Disk;
+use go\core\db\Connection;
+use go\core\db\Database;
+use go\core\db\Table;
+use go\core\event\Listeners;
+use go\core\exception\ConfigurationException;
+use go\core\fs\Folder;
+use go\core\jmap\State;
+use go\core\mail\Mailer;
+use go\core\util\Lock;
+use go\core\webclient\Extjs3;
+use go\modules\core\core\model\Settings;
 
 	/**
 	 * Application class.
@@ -111,6 +120,37 @@ namespace go\core {
 		}
 
 		private $config;
+		
+		/**
+		 * Load configuration
+		 * 
+		 * ```
+		 * "general" => [
+		 * 	  "dataPath" => "/foo/bar"
+		 * 	],
+		 * 
+		 * "db" => [
+		 * 	  "dsn" => 'mysql:host=localhost;dbname=groupoffice,
+		 * 	  "username" => "user",
+		 * 	  "password" => "secret"
+		 *   ]
+		 * "limits" => [
+		 * 		"maxUsers" => 0,
+		 * 		"storageQuota" => 0,
+		 * 		"allowedModules" => ""
+		 * 	 ]
+		 * ]
+		 * 
+		 * ```
+		 * 
+		 * @param array $config
+		 * @return $this;
+		 */
+		public function setConfig(array $config) {
+			$this->config = $config;
+			
+			return $this;
+		}
 
 		/**
 		 * Get the configuration data
@@ -134,28 +174,37 @@ namespace go\core {
 			if (isset($this->config)) {
 				return $this->config;
 			}
-
-			$ini = $this->findConfigFile('config.ini');
-			if ($ini) {
-				$this->config = parse_ini_file($ini, true);
-				return $this->config;
+			
+			$configFile = $this->findConfigFile();
+			if(!$configFile) {
+				
+				$msg = "No config.php was found. Possible locations: \n\n";
+				
+				if(isset($_SERVER['HTTP_HOST'])) {
+								$msg .= '/etc/groupoffice/multi_instance/' . explode(':', $_SERVER['HTTP_HOST'])[0] . "/config.php\n\n";
+				}
+				
+				$msg .= dirname(dirname(__DIR__)) . "/config.php\n\n".
+								"/etc/groupoffice/config.php";
+				
+				throw new Exception($msg);
 			}
-			if (defined('GO_CONFIG_FILE')) {
-				$oldConfig = GO_CONFIG_FILE;
-			} else {
-				$oldConfig = $this->findConfigFile('config.php');
+			
+			require($configFile);	
+			
+			if(!isset($config)) {
+				throw new ConfigurationException();
 			}
-
-			require($oldConfig);
-
+			
 			$this->config = [
 					"general" => [
-							"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice',
+							"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice', //TODO default should be /var/lib/groupoffice
 							"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
-							"debug" => !empty($config['debug'])
+							"debug" => !empty($config['debug']),
+							"cache" => Disk::class
 					],
 					"db" => [
-							"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . ($config['db_name'] ?? "groupoffice"),
+							"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . ($config['db_name'] ?? "groupoffice-com"),
 							"username" => $config['db_user'] ?? "groupoffice",
 							"password" => $config['db_pass'] ?? ""
 					],
@@ -163,8 +212,15 @@ namespace go\core {
 							"maxUsers" => 0,
 							"storageQuota" => 0,
 							"allowedModules" => ""
+					],
+					"branding" => [
+							"name" => "GroupOffice"
 					]
 			];
+			
+			if(isset($config['product_name'])) {
+				$this->config['branding']['name'] = $config['product_name'];
+			}
 			return $this->config;
 		}
 
@@ -216,13 +272,51 @@ namespace go\core {
 		 */
 		public function getCache() {
 			if (!isset($this->cache)) {
-
-				$this->cache = new Disk();
-//			if(!$this->cache->isSupported()) {
-//				$this->cache = new cache\None();
-//			}
+				$cls = $this->getConfig()['general']['cache'];
+				$this->cache = new $cls;
 			}
 			return $this->cache;
+		}
+		
+		/**
+		 * Set the cache provider
+		 * 
+		 * @param CacheInterface $cache
+		 * @return $this
+		 */
+		public function setCache(CacheInterface $cache) {
+			$this->cache = $cache;
+			
+			return $this;
+		}
+		
+		private $rebuildCacheOnDestruct = false;
+		
+		public function rebuildCache($onDestruct = false) {
+			
+			if($onDestruct) {				
+				$this->rebuildCacheOnDestruct = $onDestruct;
+			}
+			
+			$lock = new Lock("rebuildCache");
+			if($lock->lock()) {
+				\GO::clearCache(); //legacy
+
+				GO()->getCache()->flush(false);
+				Table::destroyInstances();
+
+				$webclient = new Extjs3();
+				$webclient->flushCache();
+
+				Observable::cacheListeners();
+				Listeners::get()->init();
+			}
+		}
+		
+		public function __destruct() {
+			if($this->rebuildCacheOnDestruct) {
+				$this->rebuildCache();
+			}
 		}
 
 		/**
@@ -253,8 +347,16 @@ namespace go\core {
 
 		private $authState;
 
-		public function setAuthState(auth\State $authState) {
+		/**
+		 * Set the authentication state
+		 * 
+		 * @param AuthState $authState
+		 * @return $this
+		 */
+		public function setAuthState(AuthState $authState) {
 			$this->authState = $authState;
+			
+			return $this;
 		}
 
 		/**
@@ -266,14 +368,26 @@ namespace go\core {
 			return $this->authState;
 		}
 
+//		/**
+//		 * Get the authenticated user
+//		 * 
+//		 * @return auth\model\User
+//		 */
+//		public function getUser() {
+//			if ($this->getAuthState() instanceof \go\core\auth\State) {
+//				return $this->authState->getUser();
+//			}
+//			return null;
+//		}
+		
 		/**
 		 * Get the authenticated user
 		 * 
 		 * @return auth\model\User
 		 */
-		public function getUser() {
-			if ($this->getAuthState() instanceof \go\core\auth\State) {
-				return $this->authState->getUser();
+		public function getUserId() {
+			if ($this->getAuthState() instanceof AuthState) {
+				return $this->authState->getUserId();
 			}
 			return null;
 		}
@@ -284,7 +398,7 @@ namespace go\core {
 		 * @return AppSettings
 		 */
 		public function getSettings() {
-			return \go\modules\core\core\model\Settings::get();
+			return Settings::get();
 		}
 
 		/**
@@ -292,38 +406,47 @@ namespace go\core {
 		 * 
 		 * @param String $str String to translate
 		 * @param String $module Name of the module to find the translation
-		 * @param String $coreSection Only applies if module is set to 'base'
+		 * @param String $package Only applies if module is set to 'base'
 		 */
-		public function t($str, $moduleName, $coreSection = 'common') {
-			return Language::get()->t($str, $moduleName, $coreSection);
+		public function t($str, $package = 'core', $module = 'core') {
+			return $this->getLanguage()->t($str, $package, $module);
+		}
+		
+		private $language;
+		
+		/**
+		 * 
+		 * @return Language
+		 */
+		public function getLanguage() {
+			if(!isset($this->language)) {
+				$this->language = new Language();
+			}
+			
+			return $this->language;
 		}
 
-		public static function findConfigFile($name = 'config.ini') {
-
-			$count = 0;
-			$workingDir = __DIR__;
-
-			while ($count != 10) {
-				$count++;
-				$workingFile = $workingDir . '/' . $name;
-
-				if (file_exists($workingFile)) {
-					return $workingFile;
-				}
-
-				$workingDir = dirname($workingDir);
-
-				if ($count == 10 || dirname($workingDir) == $workingDir) {
-					//hit max of 10 or root of filesystem
-					break;
-				}
+		public static function findConfigFile($name = 'config.php') {
+			
+			if(defined("GO_CONFIG_FILE")) {
+				return GO_CONFIG_FILE;
+			}
+			
+			//environment variable
+			if(isset($_SERVER['GO_CONFIG_FILE'])) {
+				return $_SERVER['GO_CONFIG_FILE'];
 			}
 
-			if (!empty($_SERVER['SERVER_NAME'])) {
-				$workingFile = '/etc/groupoffice/' . $_SERVER['SERVER_NAME'] . '/' . $name;
+			if (!empty($_SERVER['HTTP_HOST'])) {
+				$workingFile = '/etc/groupoffice/multi_instance/' . explode(':', $_SERVER['HTTP_HOST'])[0] . '/' . $name;
 				if (file_exists($workingFile)) {
 					return $workingFile;
 				}
+			}
+			
+			$workingFile = dirname(dirname(__DIR__)) . '/' . $name;
+			if (file_exists($workingFile)) {
+				return $workingFile;
 			}
 
 			$workingFile = '/etc/groupoffice/' . $name;

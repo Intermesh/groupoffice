@@ -1,7 +1,7 @@
-go.modules.notes.NoteBookForm = Ext.extend(go.form.FormWindow, {
+go.modules.community.notes.NoteBookForm = Ext.extend(go.form.Dialog, {
 	stateId: 'notes-noteBookForm',
-	title: t('Notebook', 'notes'),
-	entityStore: go.Stores.get("NoteBook"),
+	title: t('Notebook'),
+	entityStore: "NoteBook",
 	autoHeight: true,
 	initFormItems: function () {
 		return [{

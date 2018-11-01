@@ -28,7 +28,6 @@ modules/addressbook/views/Extjs3/AddresslistsSettingspanel.js
 
 
 
-modules/addressbook/GlobalSettings.js
 modules/addressbook/ContextMenu.js
 modules/addressbook/TemplatesGrid.js
 modules/addressbook/EmailTemplateDialog.js

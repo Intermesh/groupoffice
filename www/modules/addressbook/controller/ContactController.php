@@ -27,6 +27,12 @@ class ContactController extends \GO\Base\Controller\AbstractModelController{
 	protected function allowGuests() {
 		return array('photo');
 	}
+	
+	protected function actionFindForUser($params) {
+		$contact = GO\Addressbook\Model\Contact::model()->findSingleByAttribute('go_user_id', $params['user_id']);
+		
+		return ['success' => true, 'contact_id' => $contact ? $contact->id : 0];
+	}
 		
 	protected function beforeSubmit(&$response, &$model, &$params) {	
 		
@@ -212,7 +218,7 @@ class ContactController extends \GO\Base\Controller\AbstractModelController{
 			}
 			
 		}
-		
+		$response['data']['panelId'] = 'ab-contact-detail'; // backward compat for CF
 		
 		return parent::afterDisplay($response, $model, $params);
 	}
@@ -227,6 +233,8 @@ class ContactController extends \GO\Base\Controller\AbstractModelController{
 		$columnModel->formatColumn('ab_name','$model->ab_name', array(),'', \GO::t("Address book", "addressbook"));
 		$columnModel->formatColumn('age', '$model->age', array(), 'birthday');
 		$columnModel->formatColumn('action_date', '$model->getActionDate()', array(), 'action_date');
+		$columnModel->formatColumn('username', '$model->user->displayName', array(), 'user_id');
+		$columnModel->formatColumn('musername', '$model->mUser->displayName', array(), 'muser_id');
 		
 		$columnModel->formatColumn('cf', '$model->id.":".$model->name');//special field used by custom fields. They need an id an value in one.)
 		return parent::formatColumns($columnModel);

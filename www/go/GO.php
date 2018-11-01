@@ -569,7 +569,7 @@ class GO{
 				throw new \Exception("Invalid PHP file autoloaded!");
 			}
 
-			if(!file_exists($filePath) || is_dir($filePath)){
+			if(!is_file($filePath)){
 				//throw new \Exception('Class '.$orgClassName.' not found! ('.$file.')');
 				return false;
 			}else
@@ -629,32 +629,33 @@ class GO{
 		if ( !empty(\GO::config()->locale_all) ){
 			setlocale(LC_CTYPE, \GO::config()->locale_all);
 			putenv('LC_ALL='.\GO::config()->locale_all);
-		}else{
-			//for escape shell arg
-			if(!isset(\GO::session()->values['locale_all'])){
-				$currentlocale = \GO::session()->values['locale_all']= setlocale(LC_CTYPE, "0");
-
-				if(stripos($currentlocale,'utf')==false && function_exists('exec')){
-					@exec('locale -a', $output);
-//					var_dump($output);
-					if(isset($output) && is_array($output)){
-						foreach($output as $locale){
-							if(stripos($locale,'utf')!==false){
-								setlocale(LC_CTYPE, $locale);
-
-								\GO::session()->values['locale_all']=$locale;
-								break;
-							}
-						}
-					}
-					\GO::debug("WARNING: could not find UTF8 locale. Run locale -a and set \$config['locale_all']. See https://www.group-office.com/wiki/Configuration_file#Localization_settings_list");					
-
-				}
-			}
-//			exit(\GO::session()->values['locale_all']);
-			setlocale(LC_CTYPE, \GO::session()->values['locale_all']);
-			putenv('LC_ALL='.\GO::session()->values['locale_all']);
 		}
+//		}else{
+//			//for escape shell arg
+//			if(!isset(\GO::session()->values['locale_all'])){
+//				$currentlocale = \GO::session()->values['locale_all']= setlocale(LC_CTYPE, "0");
+//
+//				if(stripos($currentlocale,'utf')==false && function_exists('exec')){
+//					@exec('locale -a', $output);
+////					var_dump($output);
+//					if(isset($output) && is_array($output)){
+//						foreach($output as $locale){
+//							if(stripos($locale,'utf')!==false){
+//								setlocale(LC_CTYPE, $locale);
+//
+//								\GO::session()->values['locale_all']=$locale;
+//								break;
+//							}
+//						}
+//					}
+//					\GO::debug("WARNING: could not find UTF8 locale. Run locale -a and set \$config['locale_all']. See https://www.group-office.com/wiki/Configuration_file#Localization_settings_list");					
+//
+//				}
+//			}
+////			exit(\GO::session()->values['locale_all']);
+//			setlocale(LC_CTYPE, \GO::session()->values['locale_all']);
+//			putenv('LC_ALL='.\GO::session()->values['locale_all']);
+//		}
 		
 		
 		if(!empty(\GO::session()->values['debug']))
@@ -684,14 +685,13 @@ class GO{
 
 		if(!defined('GO_LOADED')){ //check if old Group-Office.php was loaded
 			
-			self::_undoMagicQuotes();
+//			self::_undoMagicQuotes();
 
 			//set umask to 0 so we can create new files with mask defined in \GO::config()->file_create_mode
 			umask(0);
 			
 			//We use UTF8 by default.
-			if (function_exists('mb_internal_encoding'))
-				mb_internal_encoding("UTF-8");
+			mb_internal_encoding("UTF-8");
 		}
 
 		//Every logged on user get's a personal temp dir.
@@ -699,9 +699,6 @@ class GO{
 			self::config()->tmpdir = self::config()->getTempFolder()->path().'/';
 		}
 		
-		if(isset(GO::config()->init_script)) {
-			require(GO::config()->init_script);
-		}		
 		
 		GO::config()->fireEvent('init');
 		
@@ -782,7 +779,7 @@ class GO{
 		self::$_lastReportedError = $errno.$errfile.$errline;
 		
 		//log only errors that are in error_reporting
-		$error_reporting = ini_get('error_reporting');
+		$error_reporting = (bool) ini_get('error_reporting');
 		if (!($error_reporting & $errno)) return;
 		
 		$type="Unknown error";
@@ -1023,12 +1020,21 @@ class GO{
 	 *
 	 * @param String $name Name of the translation variable
 	 * @param String $module Name of the module to find the translation
-	 * @param String $basesection Only applies if module is set to 'base'
+	 * @param String $package Only applies if module is set to 'base'
 	 * @param boolean $found Pass by reference to determine if the language variable was found in the language file.
 	 */
-	public static function t($name, $module='base', $basesection='common', &$found=false){
+	public static function t($name, $module='core', $package='core', &$found=false){
+		
+		//for backwards compatibility
+		if($module != 'core' && $package == 'core') {
+			$package = 'legacy';
+		}
+		
+		if($package == null) {
+			$package = 'legacy';
+		}
 
-		return self::language()->getTranslation($name, $module, $basesection, $found);
+		return self::language()->getTranslation($name, $module, $package, $found);
 	}
 
 	/**
@@ -1078,7 +1084,7 @@ class GO{
 			}
 			
 			$modelName = $entityType->getClassName();
-			return $modelName;
+			//return $modelName;
 		} 
 		
 
@@ -1268,7 +1274,7 @@ class GO{
 	}
 	
 	
-	public static $ioncubeWorks;
+public static $ioncubeChecks = [];
 	
 	/**
 	 * Check if a file is encoded and if so check if it can be decrypted with
@@ -1282,6 +1288,8 @@ class GO{
 //		if(!empty(self::$ioncubeWorks)){
 //			return true;
 //		}
+		
+		
 
 		$majorVersion = GO::config()->getMajorVersion();
 	
@@ -1307,11 +1315,16 @@ class GO{
 //			default:
 //				throw new Exception("Unknown package ".$packagename);
 		}
+		
+		if(isset(self::$ioncubeChecks[$className])) {
+			return self::$ioncubeChecks[$className];
+		}
 
 		$path = GO::config()->root_path.'modules/professional/'.$className.'.php';
 		
 		
 		if(!file_exists($path)){
+			self::$ioncubeChecks[$className] = false;
 			return false;
 		}
 		
@@ -1319,11 +1332,13 @@ class GO{
 
 		//check data for presence of ionCube in code.
 		$data=  file_get_contents($path, false, null, 0, 100);		
-		if(strpos($data, 'ionCube')===false){							
+		if(strpos($data, 'ionCube')===false){		
+			self::$ioncubeChecks[$className] = true;
 			return true;
 		}
 
 		if(!extension_loaded('ionCube Loader')){
+			self::$ioncubeChecks[$className] = false;
 			return false;
 		}
 
@@ -1334,12 +1349,13 @@ class GO{
 		
 		//Empty license file is provided in download so we must check the size.
 		if(!$file->exists()){
+			self::$ioncubeChecks[$className] = false;
 			return false;
 		}
 		
 		$fullClassName = "\\GO\\Professional\\".$className;
 
-		$check =  $fullClassName::check();
+		$check = self::$ioncubeChecks[$className] =  $fullClassName::check();
 		
 //		var_dump($check);
 		
@@ -1364,7 +1380,9 @@ class GO{
 	 * @return boolean
 	 */
 	public static function cronIsRunning(){
-		return \GO::config()->get_setting('cron_last_run') > time()-300;
+		$utc_str = gmdate("M d Y H:i:s", time());
+		$utc = strtotime($utc_str);
+		return \GO::config()->get_setting('cron_last_run') > $utc-300;
 	}
 	
 	public static function p($name){

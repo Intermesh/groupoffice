@@ -26,42 +26,26 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 	entityStore: null,
 
 	initComponent: function () {
-
-		go.flux.Dispatcher.register(this);
-
-		go.panels.DetailView.superclass.initComponent.call(this, arguments);
+		go.panels.DetailView.superclass.initComponent.call(this, arguments);		
 		
-		this.on('render', function() {
-			this.reset();
+		this.on('afterrender', function() {
+			this.reset();			
 		}, this);
 	},
-
-	receive: function (action) {
-		//console.log(action.type, this.entityStore.entity.methods.get.responseName);
-		switch (action.type) {
-			case this.entityStore.entity.name + "Updated":
-
-				//reload if data in entity store was updated
-				for (var i = 0, l = action.payload.list.length; i < l; i++) {
-					if (this.currentId == action.payload.list[i].id) {
-						this.reload();
-					}
-				}
-				break;
-
-			case this.entityStore.entity.name + "Destroyed":
-				console.log(action.payload.list, this.currentId);
-				if (action.payload.list.indexOf(this.currentId) > -1) {
-					this.reset();
-				}
-				break;
+	
+	onChanges : function(entityStore, added, changed, destroyed) {
+		
+		var entity = added[this.currentId] || changed[this.currentId] || false;
+			
+		if(entity) {
+			this.internalLoad(entity);			
 		}
-	},
 
-//
-//	printHandler: function () {
-//		this.body.print({title: this.getTitle()});
-//	},
+		if (destroyed.indexOf(this.currentId) > -1) {
+			this.reset();
+		}
+
+	},
 
 	reset: function () {
 
@@ -101,20 +85,24 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 	reload: function () {
 		this.load(this.currentId);
 	},
+	
+	internalLoad : function(data) {
+		if(this.getTopToolbar()) {
+			this.getTopToolbar().setDisabled(false);
+		}
+		this.data = data;
+		this.onLoad();				
 
-	load: function (pk) {
-		this.currentId = pk;
-		this.entityStore.get([pk], function (entities) {
-			if (entities[0]) {
-				if(this.getTopToolbar()) {
-					this.getTopToolbar().setDisabled(false);
-				}
-				this.data = entities[0];
-				this.onLoad();				
+		this.fireEvent('load', this);
+	},
 
-				this.fireEvent('load', this);
-
-			}
-		}.createDelegate(this));
+	load: function (id) {
+		this.currentId = id;
+		var entities = this.entityStore.get([id]);
+		if(entities) {
+			this.internalLoad(entities[0]);
+		}
 	}
 });
+
+Ext.reg("detailview", go.panels.DetailView);

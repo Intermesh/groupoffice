@@ -3,12 +3,14 @@
 }
 
 .go-module-icon-googleauthenticator , .go-menu-icon-googleauthenticator{
-	background-image:url('images/googleauthenticator.png') !important;	
+	background-image:url('images/icon.png') !important;	
 }
 
 
 img.googleauthenticator-qr {
 	width:200px;
 	height:200px;
-	border:1px solid #000;
+	/*border:1px solid #000;*/
+	margin:20px auto;
+	display:block;
 }

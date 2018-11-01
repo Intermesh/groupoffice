@@ -3,13 +3,14 @@
 namespace go\core;
 
 use Exception;
-use go\core\acl\model\AclGroup;
-use go\core\auth\model\Group;
-use go\core\auth\model\User;
+use go\core\cache\None;
 use go\core\db\Utils;
 use go\core\module\Base;
 use go\core\orm\Entity;
 use go\core\util\ClassFinder;
+use go\modules\core\groups\model\Group;
+use go\modules\core\users\model\User;
+use go\modules\core\users\model\UserGroup;
 
 class Installer {
 	
@@ -33,7 +34,14 @@ class Installer {
 	 */
 	public function install(array $adminValues = [], $installModules = []) {
 		
+		
+		//don't cache on install
+		App::get()->getCache()->flush(false);
+		App::get()->setCache(new None());
+		
 		$this->isInProgress = true;
+		
+		jmap\Entity::$trackChanges = false;
 		
 		$database = App::get()->getDatabase();
 		
@@ -67,13 +75,18 @@ class Installer {
 			 $admin->recoveryEmail = $admin->email;
 		}
 		
-		$admin->groups[] = (new auth\model\UserGroup)->setValues(['groupId' => Group::ID_ADMINS]);
-		$admin->groups[] = (new auth\model\UserGroup)->setValues(['groupId' => Group::ID_INTERNAL]);
+		$admin->groups[] = (new UserGroup)->setValues(['groupId' => Group::ID_ADMINS]);
+		//$admin->groups[] = (new UserGroup)->setValues(['groupId' => Group::ID_INTERNAL]);
 
 
 		if (!$admin->save()) {
 			throw new Exception("Failed to create admin user: ".var_export($admin->getValidationErrors(), true));
 		}
+		
+		//By default everyone can share with any group
+		\go\modules\core\groups\model\Settings::get()->setDefaultGroups([Group::ID_EVERYONE]);		
+		
+		
 
 		$classFinder = new ClassFinder(false);
 		$classFinder->addNamespace("go\\modules\\core");
@@ -107,7 +120,12 @@ class Installer {
 		}
 		
 		
-		App::get()->getCache()->flush();
+		//for new framework
+		App::get()->getSettings()->databaseVersion = App::get()->getVersion();
+		App::get()->getSettings()->save();
+		
+		App::get()->setCache(new cache\Disk());
+		\go\core\event\Listeners::get()->init();		
 	}
 	
 	public function upgrade() {

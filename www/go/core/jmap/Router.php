@@ -45,6 +45,10 @@ class Router implements RouterInterface {
 		App::get()->getDebugger()->setSection(Debugger::SECTION_ROUTER);
 
 		$body = Request::get()->getBody();
+		
+		if(!is_array($body)) {
+			throw new Exception(400, 'Bad request');
+		}
 
 		App::get()->debug("Body fetched");
 
@@ -61,11 +65,16 @@ class Router implements RouterInterface {
 			try {
 				$this->callAction($method, $params);
 			} catch (CoreException $e) {
+				$error = ["message" => $e->getMessage()];
+				
+				if(GO()->getDebugger()->enabled) {
+					//only in debug mode, may contain sensitive information
+					$error["debugMessage"] = ErrorHandler::logException($e);
+					$error["trace"] = explode("\n", $e->getTraceAsString());
+				}
+				
 				Response::get()->addResponse([
-						'error', [
-								"message" => ErrorHandler::logException($e),
-								"trace" => explode("\n", $e->getTraceAsString())
-						]
+						'error', $error
 				]);
 			}
 		}

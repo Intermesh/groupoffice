@@ -5,17 +5,34 @@ use go\core;
 use go\core\db\Query;
 
 class Settings extends core\Settings {
-
-	public function getModuleName() {
-		return 'users';
-	}
 	
+	/**
+	 * Default time zone for users
+	 * 
+	 * @var string
+	 */
 	public $defaultTimezone = "Europe/Amsterdam";
 	
+	/**
+	 * Default date format for users
+	 * 
+	 * @link https://secure.php.net/manual/en/function.date.php
+	 * @var string
+	 */
 	public $defaultDateFormat = "d-m-Y";
 	
+	/**
+	 * Default time format for users
+	 * 
+	 * @link https://secure.php.net/manual/en/function.date.php
+	 * @var string 
+	 */
 	public $defaultTimeFormat = "G:i";
 	
+	/**
+	 * Default currency
+	 * @var string
+	 */
 	public $defaultCurrency = "€";
 	
 	/**
@@ -29,24 +46,64 @@ class Settings extends core\Settings {
 	public $defaultFirstWeekday = 1;
 	
 	
+	/**
+	 * Default list separator for import and export
+	 * 
+	 * @var string
+	 */
 	public $defaultListSeparator = ';';
 	
+	/**
+	 * Default text separator for import and export
+	 * 
+	 * @var string
+	 */
 	public $defaultTextSeparator = '"';
+	
+	/**
+	 * Default thousands separator for numbers
+	 * @var string
+	 */
 	public $defaultThousandSeparator = '.';
 	
-	public $defaultDecimalSeparator = ',';
+	/**
+	 * Default decimal separator for numbers
+	 * 
+	 * @var string
+	 */
+	public $defaultDecimalSeparator = ',';	
 	
+	/**
+	 * Default setting for users to have short date and times in lists.
+	 * @var boolean
+	 */
+	public $defaultShortDateInList = true;
 	
-	
-	protected $defaultGroups;
-	
+	/**
+	 * New users will be member of these default groups
+	 * 
+	 * @return int[]
+	 */
 	public function getDefaultGroups() {		
-		return empty($this->defaultGroups) ? [] : json_decode($this->defaultGroups, true);
+		return array_map("intval", (new core\db\Query)
+						->selectSingleValue('groupId')
+						->from("core_user_default_group")
+						->all());
 	}
 	
-	public function setDefaultGroups($groups) {
-	
-		$this->defaultGroups = json_encode($groups);
+	/**
+	 * Set default groups for new users
+	 * 
+	 * @param int[]
+	 */
+	public function setDefaultGroups($groups) {	
+		core\db\Table::getInstance("core_user_default_group")->truncate();
+		
+		foreach($groups as $groupId) {
+			if(!GO()->getDbConnection()->insert("core_user_default_group", ['groupId' => $groupId])->execute()) {
+				throw new Exception("Could not save group id ".$groupId);
+			}
+		}
 	}
 	
 }

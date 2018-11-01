@@ -13,6 +13,8 @@
  * @package GO.base.model
  */
 
+namespace GO\Base\Model;
+
 /**
  * The ACL model
  * 
@@ -30,10 +32,6 @@
  * @property int $id
  * @property string $modifiedAt
  */
-
-namespace GO\Base\Model;
-
-
 class Acl extends \GO\Base\Db\ActiveRecord {
 	
 	/**
@@ -54,6 +52,13 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 	public static function model($className=__CLASS__)
 	{	
 		return parent::model($className);
+	}
+	
+	protected function defaultAttributes() {
+		$attr = parent::defaultAttributes();
+		$attr['ownedBy'] = \go\modules\core\groups\model\Group::ID_ADMINS;
+		
+		return $attr;
 	}
 	
 	public function getLogMessage($action) {
@@ -239,7 +244,10 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 				}
 			}
 		}elseif($this->isModified('ownedBy')){
-			$this->addGroup(Group::model()->findSingleByAttribute('isUserGroupFor', $this->ownedBy)->id, Acl::MANAGE_PERMISSION);
+			$group = Group::model()->findSingleByAttribute('isUserGroupFor', $this->ownedBy);
+			if(!empty($group)) {
+				$this->addGroup($group->id, Acl::MANAGE_PERMISSION);
+			}
 		}
 
 		return parent::afterSave($wasNew);
@@ -344,8 +352,14 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 		if($this->usedIn!='readonly'){
 			$this->addGroup(\GO::config()->group_root, Acl::MANAGE_PERMISSION);
 			if($this->ownedBy != 1) { //not for admin
-        $this->addGroup(Group::model()->findSingleByAttribute('isUserGroupFor', $this->ownedBy)->id, Acl::MANAGE_PERMISSION);
-      }
+				$group = Group::model()->findSingleByAttribute('isUserGroupFor', $this->ownedBy);
+				if(empty($group)) {
+					$this->ownedBy = 1;
+					$this->save();
+				} else {
+					$this->addGroup($group->id, Acl::MANAGE_PERMISSION);
+				}
+			}
 		}
 		
 		return parent::checkDatabase();
@@ -361,7 +375,7 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 	public function clear(){
 		
 		if (!\GO::user()->isAdmin())
-			throw new AccessDeniedException();
+			throw new \GO\Base\Exception\AccessDenied();
 		
 		$adminGroupRecordExists = false;
 		

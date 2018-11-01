@@ -580,10 +580,10 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		$parts = explode('/', $relpath);
 		$parent_id = 0;
-		while ($folderName = array_shift($parts)) {
 
+		foreach($parts as $index=>$folderName){
+		
 			$cacheKey = $parent_id.'/'.$folderName;
-
 
 			if(!isset($this->_folderCache[$cacheKey])){
 
@@ -604,7 +604,9 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 					$folder->setAttributes($autoCreateAttributes);
 					$folder->name = $folderName;
 					$folder->parent_id = $parent_id;
-					$folder->save();
+					if(!$folder->save()){
+						throw new \Exception('Could not create folder: '.var_export($folder->getValidationErrors(), true));
+					}
 				}elseif(!empty($autoCreateAttributes))
 				{
 					//should not apply it to existing folders. this leads to unexpected results.
@@ -931,7 +933,9 @@ class Folder extends \GO\Base\Db\ActiveRecord {
     * @param type $arg2
     */
     public function notifyUsers($folder_id, $type, $arg1, $arg2 = '') {
+			if(GO::user()) {
         FolderNotification::model()->storeNotification($folder_id, $type, $arg1, $arg2);
+			}
     }
 
 
@@ -1114,7 +1118,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		$params = array(
 				'src'=>$this->path,
-				'foldericon'=> $this->acl_id ? 'folder_public.png' : 'folder.png',
+				'foldericon'=> $this->acl_id ? 'folder_shared' : 'folder',
 				'lw'=>100,
 				'ph'=>100,
 				'zc'=>1,
@@ -1309,7 +1313,10 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 			$folder=$this->find($findParams);
 			
-			if(!$folder->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
+			if(!$folder) {
+				error_log("Could not find TopLEvelShare ".$folderName);
+				$folder = false;
+			} elseif(!$folder->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
 				$folder = false;
 			}
 

@@ -191,7 +191,8 @@ GO.email.AddressbookDialog = function(config) {
 				fields: ['id', 'name', 'user_name','acl_id', 'checked','addresslistGroupName']
 			}),
 			baseParams: {
-				permissionLevel: GO.permissionLevels.write
+				permissionLevel: GO.permissionLevels.read,
+				limit:GO.settings.addresslists_store_forced_limit?parseInt(GO.settings.addresslists_store_forced_limit):parseInt(GO.settings['max_rows_list'])
 			},
 			proxy: new Ext.data.HttpProxy({
 				url:GO.url('addressbook/addresslist/store')
@@ -221,7 +222,7 @@ GO.email.AddressbookDialog = function(config) {
 		this.mailingsGrid = new GO.grid.GridPanel({
 			title : t("Address lists", "addressbook"),
 			id: 'em-addresslists-grid-tab',
-			paging : true,
+			paging : GO.settings.addresslists_store_forced_limit?parseInt(GO.settings.addresslists_store_forced_limit):true,
 			border : false,
 			store : this.mailingsStore,
 			view:new Ext.grid.GroupingView({
@@ -229,7 +230,7 @@ GO.email.AddressbookDialog = function(config) {
 				forceFit:true,
 		    hideGroupedColumn:true,
 		    groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Items" : "Item"]})',
-		   	emptyText: GO.lang.strNoItems,
+		   	emptyText: t("No items found"),
 		   	showGroupName:false,
 				startCollapsed:true
 			}),

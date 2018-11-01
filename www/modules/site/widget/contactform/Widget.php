@@ -30,7 +30,8 @@ class Widget extends \GO\Site\Components\Widget {
 	{
 		$result = '';
 		//URL field is for anti spam. bots fill in all the fields. It must be a hidden field in the view.
-		if(isset($_POST['ContactForm']) && empty($_POST['ContactForm']['url']) ) {
+
+		if(isset($_POST['ContactForm']) && is_numeric($_POST['ContactForm']['url']) && $_POST['ContactForm']['url'] > strtotime("-1 hours") && $_POST['ContactForm']['url'] < time() - 5 ) {
 			$this->formModel->email=$_POST['ContactForm']['email'];
 			$this->formModel->message=$_POST['ContactForm']['message'];
 			if($this->formModel->send()) {
@@ -47,7 +48,9 @@ class Widget extends \GO\Site\Components\Widget {
 		$result .= $this->form->error($this->formModel, 'email');
 		$result .= $this->fieldSeparator;
 		
-		$result .= '<div class="contact-form-url">This field must be empty';
+		$this->formModel->url = time(); //will be checked for 5 secs
+		
+		$result .= '<div class="contact-form-url">';
 		$result .= $this->form->textField($this->formModel, 'url', array());		
 		$result .= '</div>';
 		

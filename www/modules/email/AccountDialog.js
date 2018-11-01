@@ -20,9 +20,9 @@ GO.email.AccountDialog = function(config) {
 		fieldLabel : t("Root mailbox", "email"),
 		name : 'mbroot'
 	}) ];
-    console.log("JAAA");
+
 	if(go.Modules.isAvailable("legacy", "sieve")) {
-        console.log("JAAA");
+
 		advancedItems.push(
 			new Ext.form.NumberField({
 				fieldLabel : t("Sieve filter port number", "sieve"),
@@ -470,6 +470,7 @@ GO.email.AccountDialog = function(config) {
 		items : [this.tabPanel = new Ext.TabPanel({
 			hideLabel : true,
 			deferredRender : false,
+			layoutOnTabChange: true,
 			activeTab : 0,
 			border : false,
 			anchor : '100% 100%',
@@ -525,8 +526,8 @@ GO.email.AccountDialog = function(config) {
 	GO.email.AccountDialog.superclass.constructor.call(this, {
 		layout : 'fit',
 		modal : false,
-		height: dp(550),
-		width : dp(958),
+		height: dp(616),
+		width : dp(1008),
 		closeAction : 'hide',
 		title : t("E-mail Account", "email"),
 

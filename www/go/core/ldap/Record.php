@@ -93,7 +93,7 @@ class Record {
 	 */
 	public static function find(Connection $connection, $dn, $query) {
 		
-		GO()->debug('Find '.$dn.', ' . $query);
+		GO()->debug('Find DN: "'.$dn.'", Query: "' . $query . '"');
 		
 		$searchId = ldap_search($connection->getLink(), $dn, $query);
 		

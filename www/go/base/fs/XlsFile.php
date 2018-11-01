@@ -124,7 +124,6 @@ class XlsFile extends File{
 	}
 	
 	protected function init($readSheetNr=0) {
-		require_once \GO::config()->root_path.'go/vendor/PHPExcel/PHPExcel/IOFactory.php';
 		if (is_file($this->path)) {
 			$this->filetype = \PHPExcel_IOFactory::identify($this->path);
 			$xlsReader = \PHPExcel_IOFactory::createReader($this->filetype);

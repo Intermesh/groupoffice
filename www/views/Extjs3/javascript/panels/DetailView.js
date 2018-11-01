@@ -21,6 +21,7 @@ GO.DetailView = Ext.extend(Ext.Panel,{
 	currentId: null,
 	basePanels: [],
 	
+	isDisplayPanel : true, //for automatic refresh after save
 	entityStore : null,
 	
 	initComponent : function() {
@@ -64,7 +65,9 @@ GO.DetailView = Ext.extend(Ext.Panel,{
 	},
 	
 	reload: function() {
-		this.load(this.currentId);
+		if(this.currentId) {
+			this.load(this.currentId);
+		}
 	},
 	// old way
 	load : function(id, reload)
@@ -94,3 +97,5 @@ GO.DetailView = Ext.extend(Ext.Panel,{
 		
 	}
 });
+
+Ext.reg("tmpdetailview", GO.DetailView);

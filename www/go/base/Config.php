@@ -153,24 +153,8 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 */
 	var $debug_log = false;
 
-	
-	/**
-	 * To show a message on the login page
-	 * 
-	 * @deprecated is in system settings
-	 * @var String 
-	 */
-	var $login_message = false;
-	
-	/**
-	 *
-	 * Option to make sure all outgoing emails will be send to the given email address.
-	 * This is useful when debugging Group-Office and when you don't want to send unwanted emails to active customers.
-	 * 
-	 * @deprecated is in system settings
-	 * @var string 
-	 */
-	var $debug_email = "";
+
+
 	
 
 	/**
@@ -216,23 +200,9 @@ var $billing_clear_payment_method_on_duplicate = true;
 //
 //	var $log = false;
 
-	/**
-	 * Default language
-	 *
-	 * @deprecated is in system settings
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $language = 'en';
 
-	/**
-	 * Default country
-	 *
-	 * @deprecated is in system settings
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $default_country = "NL";
+
+
 
 
 	/**
@@ -244,22 +214,16 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 */
 	var $default_vat = 21;
 
-	/**
-	 * Default timezone
-	 *
-	 * @deprecated is in system settings
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $default_timezone = 'Europe/Amsterdam';
 
 	/**
-	 * Default language
+	 * Default currency
 	 *
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $default_currency='€';
+	public function getdefault_currency() {
+		return \go\modules\core\users\model\Settings::get()->defaultCurrency;		
+	}
 
 	/**
 	 * Default date format
@@ -268,7 +232,12 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $default_date_format='dmY';
+	public function getDefault_date_format() {
+		$df =  \go\modules\core\users\model\Settings::get()->defaultDateFormat;
+		return $df[0].$df[2].$df[4];
+	}
+	
+	
 
 	/**
 	 * Default date separator
@@ -277,7 +246,10 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $default_date_separator='-';
+	public function getdefault_date_separator() {
+		$df =  \go\modules\core\users\model\Settings::get()->defaultDateFormat;
+		return $df[1];
+	}
 
 	/**
 	 * Default time format
@@ -285,7 +257,10 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $default_time_format='G:i';
+
+	public function getefault_time_format() {
+		return \go\modules\core\users\model\Settings::get()->defaultTimeFormat;
+	}
 
 	/**
 	 * Default name formatting and sorting. Can be last_name or first_name
@@ -304,7 +279,9 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $default_first_weekday=1;
+	public function getDefault_first_weekday() {
+		return \go\modules\core\users\model\Settings::get()->defaultFirstWeekday;
+	}
 
 	/**
 	 * Default decimal separator for numbers
@@ -312,7 +289,9 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $default_decimal_separator=',';
+	public function getdefault_decimal_separator() {
+		return \go\modules\core\users\model\Settings::get()->defaultDecimalSeparator;
+	}
 
 	/**
 	 * Default thousands separator for numbers
@@ -320,7 +299,9 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $default_thousands_separator='.';
+	public function getdefault_thousands_separator() {
+		return \go\modules\core\users\model\Settings::get()->defaultThousandSeparator;
+	}
 	
 	/**
 	 * Default list separator for import and export
@@ -328,7 +309,9 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $default_list_separator=';';
+	public function getdefault_list_separator() {
+		return \go\modules\core\users\model\Settings::get()->defaultListSeparator;
+	}
 	
 	/**
 	 * Default text separator for import and export
@@ -336,7 +319,13 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $default_text_separator='"';
+	public function getdefault_text_separator() {
+		return \go\modules\core\users\model\Settings::get()->defaultTextSeparator;
+	}
+	
+	public function getdefault_timezone() {
+		return \go\modules\core\users\model\Settings::get()->defaultTimezone;			
+	}
 
 	/**
 	 * Default theme
@@ -344,7 +333,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $theme = 'Group-Office';
+	var $theme = 'Paper';
 
 	/**
 	 * Default theme
@@ -487,6 +476,10 @@ var $billing_clear_payment_method_on_duplicate = true;
 
 	/**
 	 * Relative hostname with slash on both start and end
+	 * 
+	 * use go\modules\core\core\model\Settings:URL
+	 * 
+	 * @deprecated since 6.3
 	 *
 	 * @var     StringHelper
 	 * @access  public
@@ -515,35 +508,6 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var boolean
 	 */
 	var $force_ssl=false;
-
-
-
-	/**
-	 * Title of Group-Office
-	 *
-	 * @deprecated Is in system settings
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $title = '';
-
-	/**
-	 * The e-mail of the webmaster
-	 *
-	 * @deprecated Is in system settings
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $webmaster_email = 'webmaster@example.com';
-
-	/**
-	 * The no-reply e-mail which will be used to send system messages
-	 *
-	 * @deprecated Is in system settings
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $noreply_email = '';
 
 	/**
 	 * The path to the root of Group-Office with trailing slash.
@@ -702,7 +666,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $max_file_size = '10000000';
+	var $max_file_size = 100 * 1024 * 1024;
 
 	/**
 	 * The maximum file size of an image to be allowed for thumbnailing in MBs
@@ -728,45 +692,6 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     int
 	 * @access  public
 	 */
-	//var $mailer = 'smtp';
-	/**
-	 * The SMTP host to use when using the SMTP mailer
-	 *
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $smtp_server = 'localhost';
-	/**
-	 * The SMTP port to use when using the SMTP mailer
-	 *
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $smtp_port = '25';
-
-	/**
-	 * The SMTP username for authentication (Empty for no authentication)
-	 *
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $smtp_username = '';
-
-	/**
-	 * The SMTP password for authentication
-	 *
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $smtp_password = '';
-
-	/**
-	 * Leave blank or set to tls or ssl
-	 *
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $smtp_encryption = '';
 
 
 	/**
@@ -825,7 +750,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     int
 	 * @access  public
 	 */
-	var $max_attachment_size = 20971520;
+	var $max_attachment_size = 50 * 1024 * 1024;
 
 
 	//External programs
@@ -1026,14 +951,6 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 //////////      Variables that are not touched by the installer   /////////////
 	 //////////////////////////////////////////////////////////////////////////////*/
 
-	/**
-	 * Full URL to reach Group-Office with trailing slash. This value is determined
-	 * automatically if not set in config.php
-	 *
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $full_url = '';
 
 
 	/**
@@ -1056,7 +973,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var StringHelper
 	 */
 
-	var $product_name='Group-Office';
+	var $product_name='GroupOffice';
 
 
 		/* The permissions mode to use when creating files
@@ -1083,23 +1000,6 @@ var $billing_clear_payment_method_on_duplicate = true;
 	/*////////////////////////////////////////////////
 	 * Variables below this should not be changed
 	 *////////////////////////////////////////////////
-
-	/**
-	 * The Group-Office version number
-	 *
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $version;
-
-	/**
-	 * Modification date
-	 *
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	
-	var $mtime;
 
 	#group configuration
 	/**
@@ -1178,14 +1078,6 @@ var $billing_clear_payment_method_on_duplicate = true;
 
 
 	/**
-	 * The link in menu help -> contents
-	 *
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $help_link = 'https://www.group-office.com/wiki/';
-
-	/**
 	 * The link or e-mail address in menu help -> support.
 	 *
 	 * No menu item is generated if left empty.
@@ -1193,7 +1085,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $support_link = false;
+	var $support_link = 'https://www.group-office.com/support/';
 
 	/**
 	 * The link or e-mail address in menu help -> report bug.
@@ -1440,38 +1332,23 @@ var $billing_clear_payment_method_on_duplicate = true;
 	
 	//ignore errors
 	public function __get($name) {
+		
+		if(method_exists($this, "get" . $name)) {
+			return $this->{"get" . $name}();
+		}
+		
 		return null;
 	}
 	
-//	
-	private function buildConfig() {
-		
-		$db = \go\core\App::get()->getDatabase();
-		
-		$data = \go\core\App::get()->getConfig();
-		
-
-		$config['file_storage_path'] = \go\core\App::get()->getDataFolder()->getPath() . '/';
-		$config['root_path'] = \go\core\Environment::get()->getInstallFolder()->getPath() . '/';
-		$config['db_name'] = $db->getName();
-		$user = explode('@', $db->getUser());
-		$config['db_user'] = $user[0];
-		$config['db_host'] = $user[1];
-		$config['db_pass'] = $data['db']['password'];
-
-		//$config['webmaster_email'] = (new \go\core\db\Query())->selectSingleValue('email')->from('core_user')->where('id=1')->single();
-		
-		$config['host'] = trim(dirname($_SERVER['PHP_SELF']), '/') . '/';
-		$config['debug'] = !empty($data['general']['debug']);
-		
-		if(isset($data['limits'])) {
-			$config['allowed_modules'] = empty($data['limits']['allowedModules']) ? $data['limits']['allowedModules'] : "";
-			$config['max_users'] = $data['limits']['userCount'] ?? 0;
-			$config['quota'] = empty($data['limits']['storageQuota']) ? 0 : \go\core\Environment::configToBytes($data['limits']['storageQuota']);
+	public function __isset($name) {
+		if(method_exists($this, "get" . $name)) {
+			$var =  $this->{"get" . $name}();
+			return isset($var);
 		}
 		
-		return $config;
+		return false;
 	}
+	
 	
 	/**
 	 * Constructor. Initialises all public variables.
@@ -1484,26 +1361,31 @@ var $billing_clear_payment_method_on_duplicate = true;
 
 		$this->root_path = str_replace('\\','/',dirname(dirname(dirname(__FILE__)))).'/';
 
-//		//suppress error for open_basedir warnings etc
-//		if(@file_exists('/etc/groupoffice/globalconfig.inc.php')) {
-//			require('/etc/groupoffice/globalconfig.inc.php');
-//		}		
-//
-//		$config_file = $this->get_config_file();
-//
-//		if($config_file)
-//			include($config_file);
-		
-		$config = $this->buildConfig();
+		//suppress error for open_basedir warnings etc
+		if(file_exists('/etc/groupoffice/globalconfig.inc.php')) {
+			require('/etc/groupoffice/globalconfig.inc.php');
+		}		
 
+		$config_file = $this->get_config_file();
+
+		if($config_file)
+			include($config_file);
+		
+		//auto host
+		$config['host'] = trim(dirname($_SERVER['SCRIPT_NAME']), '/');
+		$config['host'] = empty($config['host']) ? '/' : '/' . $config['host'] . '/';		
+		$config['root_path'] = \go\core\Environment::get()->getInstallFolder()->getPath() . '/';
+		
 		$this->_original_config = $config;
 		
 		foreach($config as $key=>$value) {
-			$this->$key=$value;
+			if(!method_exists($this, "get".$key)) {
+				$this->$key=$value;
+			}
 		}
 		
-		
-		$this->loadNewSettings();
+		$this->file_storage_path = rtrim($this->file_storage_path, '/').'/';
+		$this->tmpdir = rtrim($this->tmpdir, '/').'/';
 		
 
 //		if($this->info_log=="")
@@ -1511,13 +1393,13 @@ var $billing_clear_payment_method_on_duplicate = true;
 
 		//this can be used in some cases where you don't want the dynamically
 		//determined full URL. This is done in set_full_url below.
-		$this->orig_full_url = $this->full_url;
+		//$this->orig_full_url = $this->full_url;
 
 		$this->orig_tmpdir=$this->tmpdir;
 
 		if(empty($this->db_user)) {
 		//Detect some default values for installation if root_path is not set yet
-			$this->host = dirname($_SERVER['PHP_SELF']);
+			$this->host = dirname($_SERVER['SCRIPT_NAME']);
 			if(basename($this->host)=='install')
 				$this->host = dirname($this->host);
 
@@ -1542,14 +1424,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 			if(empty($config['tmpdir']) && function_exists('sys_get_temp_dir')) {
 				$this->tmpdir = rtrim(str_replace('\\','/', sys_get_temp_dir()),'/').'/groupoffice/';
 			}
-
-			$this->default_timezone=@date_default_timezone_get(); //suppress warning if using system tz
-
-			$lc = localeconv();
-
-			$this->default_currency=empty($lc['currency_symbol']) ? '€' : $lc['currency_symbol'];
-			$this->default_decimal_separator=empty($lc['decimal_point']) ? '.' : $lc['decimal_point'];
-			$this->default_thousands_separator=$this->default_decimal_separator == '.' ? ',' : '.';//$lc['thousands_sep'];
+			
 		}
 
 //		// path to classes
@@ -1599,50 +1474,94 @@ var $billing_clear_payment_method_on_duplicate = true;
 			$this->log=true;
 		}
 
-		$this->set_full_url();
+		//$this->set_full_url();
 
 		if(!$this->support_link && $this->isProVersion()){
 			$this->support_link = "https://www.group-office.com/support";
 		}
 
-		/*
-		 * Check if the noreply_email variable is set in the config.php file.
-		 * If it is not set, then use noreply@ {webmaster_email domain name}
-		 * When the webmaster email is not set, then this will be noreply@example.com
-		 */
-		if(empty($this->noreply_email)){
-
-			$wmdomain = 'example.com';
-
-			if(!empty($this->webmaster_email)){
-				$extractedEmail = explode('@',$this->webmaster_email);
-				if(isset($extractedEmail[1]))
-					$wmdomain = $extractedEmail[1];
-			}
-
-			$this->noreply_email = 'noreply@'.$wmdomain;
-		}
 	}
 	
-	private function loadNewSettings() {
-		
-		$this->version = $this->mtime = GO()->getVersion();
-		
-		$this->title = GO()->getSettings()->title;
-		$this->language = GO()->getSettings()->language;
-		$this->webmaster_email = GO()->getSettings()->systemEmail;
-		$this->smtp_server = GO()->getSettings()->smtpHost;
-		$this->smtp_port = GO()->getSettings()->smtpPort;
-		$this->smtp_username = GO()->getSettings()->smtpUsername;
-		$this->smtp_password = GO()->getSettings()->smtpPassword;
-		$this->smtp_encryption = GO()->getSettings()->smtpEncryption;
-		$this->debug_email = GO()->getSettings()->debugEmail;
-		
-		$this->password_min_length = GO()->getSettings()->passwordMinLength;
-		
-		$this->login_message = GO()->getSettings()->loginMessage;
-	}
+	/**
+	 * The no-reply e-mail which will be used to send system messages
+	 * Check if the noreply_email variable is set in the config.php file.
+	 * If it is not set, then use noreply@ {webmaster_email domain name}
+	 * When the webmaster email is not set, then this will be noreply@example.com
+	 * 
+	 * @return     StringHelper
+	 */
+	public function getNoreply_email(){
 
+		$wmdomain = 'example.com';
+
+		if(!empty($this->webmaster_email)){
+			$extractedEmail = explode('@',$this->webmaster_email);
+			if(isset($extractedEmail[1]))
+				$wmdomain = $extractedEmail[1];
+		}
+
+		return 'noreply@'.$wmdomain;
+	}
+	
+	public function getVersion() {
+		return GO()->getVersion();
+	}
+	
+	public function getMtime() {
+		return GO()->getVersion();
+	}
+	
+	public function getTitle() {
+		return GO()->getSettings()->title;
+	}
+	
+	public function getlanguage() {
+		return GO()->getSettings()->language;
+	}
+	
+	public function getwebmaster_email() {
+		return GO()->getSettings()->systemEmail;
+	}
+	
+	public function getsmtp_server() {
+		return GO()->getSettings()->smtpHost;
+	}
+	
+	public function getsmtp_port() {
+		return GO()->getSettings()->smtpPort;
+	}
+	
+	public function getsmtp_username() {
+		return GO()->getSettings()->smtpUsername;
+	}
+	
+	public function getsmtp_password() {
+		return GO()->getSettings()->smtpPassword;
+	}
+	
+	public function getsmtp_encryption() {
+		return GO()->getSettings()->smtpEncryption;
+	}
+	
+	public function getdebug_email() {
+		return GO()->getSettings()->debugEmail;
+	}
+	
+	public function gepassword_min_length() {
+		return GO()->getSettings()->passwordMinLength;
+	}
+	
+	public function getlogin_message() {
+		return GO()->getSettings()->loginMessage;
+	}
+	
+	public function getfull_url() {
+		return rtrim(GO()->getSettings()->URL, '/') . '/';
+	}
+	
+	public function getorig_full_url() {
+		return rtrim(GO()->getSettings()->URL, '/') . '/';
+	}
 
 	public function getMajorVersion(){
 		return substr($this->version,0,3);;
@@ -1766,92 +1685,8 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @return StringHelper Path to configuration file
 	 */
 
-	public function get_config_file() {
-		if(defined('GO_CONFIG_FILE'))
-			return GO_CONFIG_FILE;
-
-
-		if(!empty($_SERVER['GO_CONFIG']))
-			return $_SERVER['GO_CONFIG'];
-
-		//on start page always search for config
-		if(empty($_REQUEST['r']) && isset($_SESSION)){
-			unset($_SESSION['GO_SESSION']['config_file']);
-		}
-
-		if(isset($_SESSION['GO_SESSION']['config_file'])) {
-			$this->session_config_file=true;
-			return $_SESSION['GO_SESSION']['config_file'];
-		}else {
-			$config_dir = $this->root_path;
-			$config_file = $config_dir.'config.php';
-			if(@file_exists($config_file)) {
-				$_SESSION['GO_SESSION']['config_file']=$config_file;
-				return $config_file;
-			}
-
-			$count = 0;
-
-			//use SCRIPT_FILENAME in apache mode because it will use a symlinked
-			//directory
-			$script = php_sapi_name()=='cli' ? __FILE__ : $_SERVER['SCRIPT_FILENAME'];
-
-			$config_dir = dirname($script).'/';
-
-			if($config_dir==$this->root_path.'install/'){
-				$config_dir = $this->root_path;
-			}
-
-			/*
-			 * z-push also has a config.php. Don't detect that.
-			 */
-			$pos = strpos($config_dir, 'modules/z-push');
-			if($pos){
-				$config_dir = substr($config_dir, 0, $pos);
-			}
-
-			//openlog('[Group-Office]['.date('Ymd G:i').']', LOG_PERROR, LOG_USER);
-
-			while(!isset($_SESSION['GO_SESSION']['config_file'])){
-				$count++;
-				$config_file = $config_dir.'config.php';
-				//syslog(LOG_NOTICE,$config_file);
-
-				if(@file_exists($config_file)) {
-					$_SESSION['GO_SESSION']['config_file']=$config_file;
-					return $config_file;
-				}
-				$config_dir=dirname($config_dir);
-
-				if($count==10 || dirname($config_dir) == $config_dir){
-					break;
-				}
-				$config_dir .= '/';
-			}
-
-			/*if(isset($_SERVER['SCRIPT_FILENAME']) && isset($_SERVER['PHP_SELF'])) {
-				$config_file = dirname(substr($_SERVER['SCRIPT_FILENAME'], 0 ,-strlen($_SERVER['PHP_SELF']))).'/config.php';
-				if(@file_exists($config_file)) {
-					$_SESSION['GO_SESSION']['config_file']=$config_file;
-					return $config_file;
-				}
-			}*/
-			if(!empty($_SERVER['SERVER_NAME'])){
-				$config_file = '/etc/groupoffice/'.$_SERVER['SERVER_NAME'].'/config.php';
-				if(@file_exists($config_file)) {
-					$_SESSION['GO_SESSION']['config_file']=$config_file;
-					return $config_file;
-				}
-			}
-			$config_file = '/etc/groupoffice/config.php';
-			if(@file_exists($config_file)) {
-				$_SESSION['GO_SESSION']['config_file']=$config_file;
-				return $config_file;
-			}else
-			{
-				return false;
-			}
-		}
+	public function get_config_file() {		
+		return \go\core\App::findConfigFile();
 	}
 
 	/**

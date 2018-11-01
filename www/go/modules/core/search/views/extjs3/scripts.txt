@@ -1,2 +1,3 @@
 Module.js
 Panel.js
+SearchCombo.js

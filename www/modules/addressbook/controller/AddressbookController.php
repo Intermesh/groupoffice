@@ -5,6 +5,95 @@ namespace GO\Addressbook\Controller;
 
 class AddressbookController extends \GO\Base\Controller\AbstractModelController{
 	
+	protected function checkSecurityToken() {
+		return false;
+		parent::checkSecurityToken();
+	}
+	
+	protected function actionCleanupContacts($params) {
+		
+		header('Content-Type: text/html;charset=utf-8');
+		$this->render('externalHeader');
+		
+		echo "<script language='javascript'>"
+			."function toggle(source) {"
+			."	checkboxes = document.getElementsByClassName('checkbox');"
+			."	for(var i=0, n=checkboxes.length;i<n;i++) {"
+			."		checkboxes[i].checked = source.checked;"
+			."  }"
+			."}"
+			."</script>";
+		
+		echo '<form method="POST" action="'.\GO::url('addressbook/addressbook/cleanupContacts').'">';
+		
+		echo '<input type="hidden" name="addressbook_id" value="'.$params['addressbook_id'].'" />';
+		
+		echo '<div class="row"><input type="checkbox" name="nolinks" id="nolinks" '.(!empty($_POST['nolinks']) ? "checked" : "").' /><label for="nolinks">No links</label></div>';
+		echo '<div class="row"><input type="checkbox" name="noinvoice" id="noinvoice" '.(!empty($_POST['noinvoice']) ? "checked" : "").' /><label for="noinvoice">No invoice or company with invoice.</label></div>';
+		echo '<div class="row"><input type="checkbox" name="noproject" id="noproject" '.(!empty($_POST['noproject']) ? "checked" : "").' /><label for="noproject">No project or company with project.</label></div>';
+		echo '<div class="row"><input type="checkbox" name="nouser" id="nouser" '.(!empty($_POST['nouser']) ? "checked" : "").' /><label for="nouser">No project or company with project.</label></div>';
+		
+		echo '<input type="submit" value="OK" />';
+		
+		$entityTypeId = \GO\Addressbook\Model\Contact::model()->getType()->getId();
+		
+		if($_SERVER['REQUEST_METHOD'] == "POST") {
+			
+			
+			$fp = (new \GO\Base\Db\FindParams())->order('mtime', 'DESC');
+			$c = $fp->getCriteria();//->addCondition('addressbook_id', $_POST['addressbook_id']);
+			
+			if(!empty($_POST['nolinks'])) {
+				$c->addRawCondition('not exists(select toId from core_link where toEntityTypeId=:entityTypeId and toId=t.id)')
+					->addRawCondition('not exists(select fromId from core_link where fromEntityTypeId=:entityTypeId and fromId=t.id)')			
+								->addBindParameter(':entityTypeId', $entityTypeId);
+			}
+			
+			if(!empty($_POST['noinvoice'])) {
+				$c->addRawCondition('not exists (select * from bs_orders o where o.contact_id=t.id or o.company_id=t.company_id and o.company_id > 0)');
+			}
+			
+			if(!empty($_POST['noproject'])) {
+				$c->addRawCondition('not exists (select * from pr2_projects o where o.contact_id=t.id or o.company_id=t.company_id and o.company_id > 0)');
+			}
+			
+			
+			
+			if(!empty($_POST['nouser'])) {
+				$c->addRawCondition('go_user_id = 0');
+			}
+			
+			$contacts  = \GO\Addressbook\Model\Contact::model()->find($fp);
+			
+			echo '<p>'. $contacts->rowCount().' contacts found</p>';
+			
+			echo '<table>';
+			
+			foreach($contacts as $contact) {
+				echo '<tr>';
+				echo '<td><input type="checkbox" name="selected[]" value="'.$contact->id.'" /></td>';
+				echo '<td>'. $contact->getName() .'</td>';
+				echo '<td>'. ($contact->company ? $contact->company->name : '-') .'</td>';
+				echo '<td>'. \GO\Base\Util\Date::get_timestamp($contact->mtime) .'</td>';
+				echo '</tr>';
+			}
+			
+			
+			echo '</table>';
+			
+		}
+		
+		
+		
+		echo '</form>';
+		
+		
+		
+		
+		$this->render('externalFooter');
+	}
+	
+	
 	protected function beforeStoreStatement(array &$response, array &$params, \GO\Base\Data\AbstractStore &$store, \GO\Base\Db\FindParams $storeParams) {
 		
 		$multiSel = new \GO\Base\Component\MultiSelectGrid(

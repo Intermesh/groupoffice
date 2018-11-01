@@ -15,7 +15,9 @@ class Method extends Entity {
 	public $id;
 		
 	/**
-	 * The sort order of the authenticators
+	 * The sort order of the authenticators. 
+	 * 
+	 * Higher value means higher priority!
 	 * 
 	 * @var string 
 	 */
@@ -32,7 +34,11 @@ class Method extends Entity {
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
-		->addTable('core_auth_method');
+		->addTable('core_auth_method', 'am')
+		->setQuery(
+						(new \go\core\db\Query)
+						->join('core_module', 'mod', 'am.moduleId = mod.id AND mod.enabled = true')
+						); //always join enabled modules so disabled modules are not used.
 	}
 	
 	/**

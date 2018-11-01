@@ -91,7 +91,8 @@ class CompanyController extends \GO\Base\Controller\AbstractModelController {
 	protected function formatColumns(\GO\Base\Data\ColumnModel $columnModel) {
 		
 		$columnModel->formatColumn('ab_name','$model->addressbook_name', array(),'addressbook_name', \GO::t('addressbook','addressbook'));
-
+$columnModel->formatColumn('username', '$model->user->displayName', array(), 'user_id');
+		$columnModel->formatColumn('musername', '$model->mUser->displayName', array(), 'muser_id');
 		return parent::formatColumns($columnModel);
 	}
 

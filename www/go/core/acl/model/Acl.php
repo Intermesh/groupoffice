@@ -2,8 +2,8 @@
 namespace go\core\acl\model;
 
 use go\core\App;
-use go\core\auth\model\Group;
-use go\core\auth\model\User;
+use go\modules\core\groups\model\Group;
+use go\modules\core\users\model\User;
 use go\core\db\Criteria;
 use go\core\db\Query;
 use go\core\orm\Mapping;
@@ -105,7 +105,7 @@ class Acl extends Property {
 						->where('acl_g.aclId = '.$column)
 						->join('core_user_group', 'acl_u' , 'acl_u.groupId = acl_g.groupId')
 						->andWhere([
-								'acl_u.userId' => App::get()->getAuthState()->getUser()->id								
+								'acl_u.userId' => App::get()->getAuthState()->getUserId()						
 										])
 						->andWhere('acl_g.level', '>=', $level);
 		
@@ -228,5 +228,16 @@ class Acl extends Property {
 		}
 		
 		return $query;
+	}
+	
+		
+	
+	
+	/**
+	 * @todo TEMPORARY HACK REMOVE IN MASTER
+	 * @return type
+	 */
+	public function save() {
+		return $this->internalSave();
 	}
 }

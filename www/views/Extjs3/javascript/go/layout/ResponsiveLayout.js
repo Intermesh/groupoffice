@@ -44,9 +44,12 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 			go.layout.ResponsiveLayout.superclass.onLayout.call(this, ct, target);
 		}
 		
-		this.setChildWidths(ct);
+		var willBeWide =window.innerWidth > this.triggerWidth;
+		var isWide = this.mode == 'wide';
+		
+		this.setChildWidths(ct, willBeWide != isWide);
 
-		if (window.innerWidth > this.triggerWidth) {
+		if (willBeWide) {
 			this.setWideLayout(ct, target);
 		} else
 		{
@@ -61,7 +64,7 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 		return window.innerWidth <= this.triggerWidth
 	},
 	
-	getItemWidth : function(i) {
+	getItemWidth : function(i, modeSwitched) {
 		if(typeof i.getLayout().isNarrow == "function" && i.getLayout().isNarrow()) {
 			return i.initialConfig.narrowWidth || i.initialConfig.width;
 		} else
@@ -69,8 +72,7 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 			if(!i.rendered) {
 				return i.initialConfig.width;
 			}	
-			
-			return i.wideWidth || i.getWidth();
+			return modeSwitched ? i.wideWidth : i.getWidth();
 		}
 			
 	},
@@ -119,7 +121,7 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 		
 	},
 	
-	setChildWidths : function(ct) {
+	setChildWidths : function(ct, modeSwitched) {
 		ct.items.each(function (i) {			
 			if(i.rendered && typeof i.getLayout().isNarrow == "function" && i.getLayout().mode == "wide") {
 				i.wideWidth = i.getWidth();
@@ -127,7 +129,7 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 			{
 				i.wideWidth = i.initialConfig.width;
 			}
-			i.setWidth(this.getItemWidth(i));
+			i.setWidth(this.getItemWidth(i, modeSwitched));
 		}, this);
 	},
 

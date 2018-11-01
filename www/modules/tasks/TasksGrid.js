@@ -97,19 +97,21 @@ GO.tasks.TasksPanel = function(config)
 			},
 			{
 				header:t("Due date", "tasks"),
-				dataIndex: 'due_time',
-				width: dp(120)
+				dataIndex: 'due_time',	
+				xtype: "datecolumn",
+				dateOnly: true
 			},{
+				xtype: "datecolumn",
+				dateOnly: true,
 				header: t("Starts at", "tasks"),
 				dataIndex: 'start_time',
 				hidden:true,
-				width: dp(120),
 				hidden:true
 			},{
+				xtype: "datecolumn",
 				header: t("Completed at", "tasks"),
 				dataIndex: 'completion_time',
 				hidden:true,
-				width: dp(120)
 			},{
 				header: t("Status"),
 				dataIndex: 'status',
@@ -135,15 +137,16 @@ GO.tasks.TasksPanel = function(config)
 				width:150,
 				sortable:false
 			},{
+				xtype: "datecolumn",
 				header: t("Created at"),
 				dataIndex: 'ctime',
 				hidden:true,
-				width: dp(140)
+				
 			},{
+				xtype: "datecolumn",
 				header: t("Modified at"),
 				dataIndex: 'mtime',
 				hidden:true,
-				width: dp(140)
 			},{
 				id:'id',
 				width:200,

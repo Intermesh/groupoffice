@@ -41,7 +41,7 @@ class Zip {
 	 */
 	public static function create(File $archiveFile, Folder $workingFolder, $sources, $utf8=false) {
 	
-		if (class_exists("\ZipArchive") && !$utf8) {
+		if (class_exists("ZipArchive") && !$utf8) {
 		
 			\GO::debug("Using PHP ZipArchive");
 			$zip = new \ZipArchive();
@@ -68,24 +68,31 @@ class Zip {
 		} else {
 			
 			\GO::debug("Using zip exec");
-		
-			if (!\GO\Base\Util\Common::isWindows())
-				putenv('LANG=en_US.UTF-8');
 
+//			setlocale(LC_CTYPE, "C.UTF-8");
 			chdir($workingFolder->path());
+			
+			//Work with temp file to avoid issues with utf-8 on command line.
+			$tempFile = File::tempFile("", "zip");
 
 			$cmdSources = array();
 			for ($i = 0; $i < count($sources); $i++) {
 				$cmdSources[$i] = escapeshellarg(str_replace($workingFolder->path() . '/', '', $sources[$i]->path()));
-			}
+			}			
 
-			$cmd = \GO::config()->cmd_zip . ' -r ' . escapeshellarg($archiveFile->path()) . ' ' . implode(' ', $cmdSources);
+			$cmd = \GO::config()->cmd_zip . ' -r ' . escapeshellarg($tempFile->path()) . ' ' . implode(' ', $cmdSources);
 
 			exec($cmd, $output, $ret);
 
-			if ($ret!=0 || !$archiveFile->exists()) {
+			if ($ret!=0) {
 				throw new \Exception('Command failed: ' . $cmd . "<br /><br />" . implode("<br />", $output));
 			}
+			
+			if(!$tempFile->exists()) {
+				throw new \Exception("File does not exist");
+			}
+			
+			$tempFile->move($archiveFile);
 			
 			return true;
 		}

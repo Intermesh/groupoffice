@@ -15,6 +15,14 @@ use go\core\util\DateTime;
 abstract class Entity  extends \go\core\orm\Entity {	
 	
 	/**
+	 * Track changes in the core_change log for the JMAP protocol.
+	 * Disabled during install.
+	 * 
+	 * @var boolean 
+	 */
+	public static $trackChanges = true;
+	
+	/**
 	 * The Entity ID
 	 * 
 	 * @var int
@@ -22,76 +30,48 @@ abstract class Entity  extends \go\core\orm\Entity {
 	public $id;
 
 	/**
-	 * The modseq when the entity was last modified or deleted.
-	 * 
-	 * It's a global integer that is incremented on any entity update.
-	 * 
-	 * @var int  
-	 */
-	public $modSeq;
-
-	/**
-	 * When an entity is deleted it's not really deleted. Only deletedAt is set to the time when it was deleted.
-	 * The {@see find()} method will add "where deletedAt is null" to the query conditions.
-	 * @var DateTime
-	 */
-	public $deletedAt;
-
-	/**
 	 * Get the current state of this entity
 	 * 
 	 * @return int
 	 */
 	public static function getState() {
-		return StateManager::get()->current(static::class);
+		return static::getType()->highestModSeq;
 	}
 
-	protected function internalSave() {
-		
-		$this->modSeq = StateManager::get()->next(static::class);
-		
-		return parent::internalSave();
-	}
-	
-	protected function internalDelete() {
-		$this->deletedAt = new DateTime();
-
-		return $this->internalSave();
-	}
-	
 	/**
-	 * Hard delete the entity
+	 * Saves the model and property relations to the database
 	 * 
-	 * Don't set "deletedAt" but purge it from the database.
+	 * Important: When you override this make sure you call this parent function first so
+	 * that validation takes place!
 	 * 
 	 * @return boolean
 	 */
-	public function deleteHard() {
-		return parent::internalDelete();
-	}
-	
-	protected static function internalFind( array $fetchProperties = []) {
+	protected function internalSave() {
 		
-		$query = parent::internalFind($fetchProperties);
-		
-		//for compatibility with old models
-		if(static::getMapping()->getColumn('deletedAt')) {
-			$query->andWhere(['deletedAt' => NULL]);
+		if(!parent::internalSave()) {
+			return false;
 		}
 		
-		return $query;
+		if(self::$trackChanges) {
+			$this->getType()->change($this);		
+		}
 		
+		return true;
 	}
 	
 	/**
-	 * Get's the class name without the namespace
+	 * Implements soft delete
 	 * 
-	 * eg. class go\modules\community\notes\model\Note becomes just "note"
-	 * 
-	 * @return string
+	 * @return boolean
 	 */
-	public static function getClassName() {
-		$cls = static::class;
-		return substr($cls, strrpos($cls, '\\') + 1);
-	}
+	protected function internalDelete() {
+		
+		if(!parent::internalDelete()) {
+			return false;
+		}
+		
+		$this->getType()->change($this);
+		
+		return true;
+	}	
 }

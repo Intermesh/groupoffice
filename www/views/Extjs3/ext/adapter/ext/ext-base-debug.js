@@ -1745,14 +1745,11 @@ Ext.TaskMgr = new Ext.util.TaskRunner();(function(){
         },
 
         getViewportHeight: function(){
-	        return Ext.isIE9m ? 
-	        	   (Ext.isStrict ? doc.documentElement.clientHeight : doc.body.clientHeight) :
-	        	   self.innerHeight;
+	        return self.innerHeight;
         },
 
         getViewportWidth : function() {
-	        return !Ext.isStrict && !Ext.isOpera ? doc.body.clientWidth :
-	        	   Ext.isIE9m ? doc.documentElement.clientWidth : self.innerWidth;
+	        return !Ext.isStrict && !Ext.isOpera ? doc.body.clientWidth :self.innerWidth;
         },
         
         getY : function(el) {
@@ -2167,11 +2164,7 @@ Ext.TaskMgr = new Ext.util.TaskRunner();(function(){
         _load : function(e) {
             loadComplete = true;
             
-            if (Ext.isIE9m && e !== true) {
-                // IE8 complains that _load is null or not an object
-                // so lets remove self via arguments.callee
-                doRemove(win, "load", arguments.callee);
-            }
+            
         },
 
         _unload : function(e) {
@@ -2370,38 +2363,38 @@ Ext.lib.Ajax = function() {
         responseObject = null;
     }
     
-    function checkResponse(o, callback, conn, tId, poll, cbTimeout){
-        if (conn && conn.readyState == 4) {
-            clearInterval(poll[tId]);
-            poll[tId] = null;
-
-            if (cbTimeout) {
-                clearTimeout(pub.timeout[tId]);
-                pub.timeout[tId] = null;
-            }
-            handleTransactionResponse(o, callback);
-        }
-    }
+//    function checkResponse(o, callback, conn, tId, poll, cbTimeout){
+//        if (conn && conn.readyState == 4) {
+//            clearInterval(poll[tId]);
+//            poll[tId] = null;
+//
+//            if (cbTimeout) {
+//                clearTimeout(pub.timeout[tId]);
+//                pub.timeout[tId] = null;
+//            }
+//            handleTransactionResponse(o, callback);
+//        }
+//    }
     
-    function checkTimeout(o, callback){
-        pub.abort(o, callback, true);
-    }
+//    function checkTimeout(o, callback){
+//        pub.abort(o, callback, true);
+//    }
     
 
     // private
-    function handleReadyState(o, callback){
-        callback = callback || {};
-        var conn = o.conn,
-            tId = o.tId,
-            poll = pub.poll,
-            cbTimeout = callback.timeout || null;
-
-        if (cbTimeout) {
-            pub.conn[tId] = conn;
-            pub.timeout[tId] = setTimeout(checkTimeout.createCallback(o, callback), cbTimeout);
-        }
-        poll[tId] = setInterval(checkResponse.createCallback(o, callback, conn, tId, poll, cbTimeout), pub.pollInterval);
-    }
+//    function handleReadyState(o, callback){
+//        callback = callback || {};
+//        var conn = o.conn,
+//            tId = o.tId,
+//            poll = pub.poll,
+//            cbTimeout = callback.timeout || null;
+//
+//        if (cbTimeout) {
+//            pub.conn[tId] = conn;
+//            pub.timeout[tId] = setTimeout(checkTimeout.createCallback(o, callback), cbTimeout);
+//        }
+//        poll[tId] = setInterval(checkResponse.createCallback(o, callback, conn, tId, poll, cbTimeout), pub.pollInterval);
+//    }
 
     // private
     function asyncRequest(method, uri, callback, postData) {
@@ -2422,7 +2415,13 @@ Ext.lib.Ajax = function() {
                 setHeader(o);
             }
 
-            handleReadyState(o, callback);
+//            handleReadyState(o, callback)
+
+            //Merijn: Use native load event instead of setinterval.
+            o.conn.addEventListener('load', function() {
+              handleTransactionResponse(o, callback);
+            });
+            
             o.conn.send(postData || null);
         }
         return o;
@@ -2443,21 +2442,8 @@ Ext.lib.Ajax = function() {
     }
 
     // private
-    function createXhrObject(transactionId) {
-        var http;
-
-        try {
-            http = new XMLHttpRequest();
-        } catch(e) {
-            for (var i = Ext.isIE6 ? 1 : 0; i < activeX.length; ++i) {
-                try {
-                    http = new ActiveXObject(activeX[i]);
-                    break;
-                } catch(e) {}
-            }
-        } finally {
-            return {conn : http, tId : transactionId};
-        }
+    function createXhrObject(transactionId) {        
+        return {conn : new XMLHttpRequest(), tId : transactionId};
     }
 
     var pub = {
@@ -3340,17 +3326,17 @@ Ext.lib.Ajax = function() {
         }
     });
 })();	
-	if (Ext.isIE9m) {
-        function fnCleanUp() {
-            var p = Function.prototype;
-            delete p.createSequence;
-            delete p.defer;
-            delete p.createDelegate;
-            delete p.createCallback;
-            delete p.createInterceptor;
-
-            window.detachEvent("onunload", fnCleanUp);
-        }
-        window.attachEvent("onunload", fnCleanUp);
-    }
+//	if (Ext.isIE9m) {
+//        function fnCleanUp() {
+//            var p = Function.prototype;
+//            delete p.createSequence;
+//            delete p.defer;
+//            delete p.createDelegate;
+//            delete p.createCallback;
+//            delete p.createInterceptor;
+//
+//            window.detachEvent("onunload", fnCleanUp);
+//        }
+//        window.attachEvent("onunload", fnCleanUp);
+//    }
 })();

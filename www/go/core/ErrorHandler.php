@@ -50,16 +50,24 @@ class ErrorHandler {
 	/**
 	 * Log exception to PHP logging system and debug the exception in GO
 	 * 
-	 * @param Exception $e
+	 * @param \Exception $e
 	 * @return string The string that was logged
 	 */
 	public static function logException($e) {
 		$cls = get_class($e);
 		
 		$errorString = $cls . " in " . $e->getFile() ." at line ". $e->getLine().': '.$e->getMessage();
+		
+		if(Environment::get()->isCli()) {
+			echo $errorString . "\n";
+		}
+		
 		error_log($errorString, 0);
 		
-		foreach(explode("\n", (string) $e) as $line) {
+//		echo $e->getTraceAsString();
+		
+		App::get()->debug($errorString);
+		foreach(explode("\n", $e->getTraceAsString()) as $line) {
 			App::get()->debug($line);
 		}
 		
@@ -73,15 +81,17 @@ class ErrorHandler {
 	 */
 	public function exceptionHandler($e) {				
 		$errorString = self::logException($e);
-    
-    if(!headers_sent()) {
-      header('Content-Type: text/plain');
-    }
+		
+		if(!headers_sent()) {
+			if($e instanceof http\Exception) {
+				http_response_code($e->code);
+			}
+			header('Content-Type: text/plain');
+		}
 
-    echo "[".date(DateTime::FORMAT_API)."] ". $errorString."\n\n";
-    echo (string) $e;			
-    echo "\n\nDebug dump: \n\n";			
-    print_r(App::get()->getDebugger()->getEntries());
+		echo "[".date(DateTime::FORMAT_API)."] ". $errorString."\n\n";	
+		echo "\n\nDebug dump: \n\n";			
+		print_r(App::get()->getDebugger()->getEntries());
 	}
 
 	/**

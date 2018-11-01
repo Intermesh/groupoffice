@@ -1,15 +1,19 @@
-go.modules.notes.NoteForm = Ext.extend(go.form.FormWindow, {
+go.modules.community.notes.NoteForm = Ext.extend(go.form.Dialog, {
 	stateId: 'notes-noteForm',
-	title: t("Note", "notes"),
-	entityStore: go.Stores.get("Note"),
+	title: t("Note"),
+	entityStore: "Note",
 	width: 600,
 	height: 600,
 	
 	initFormItems: function () {
+		
+		var formFieldSets = go.CustomFields.getFormFieldSets("Note"),
+			 fieldSetAnchor = formFieldSets.length ? '100% 80%' : '100% 100%';
+		
 		var items = [{
 				xtype: 'fieldset',
-				autoHeight: true,
-				items: [new go.modules.notes.NoteBookCombo(),
+				anchor: fieldSetAnchor,
+				items: [new go.modules.community.notes.NoteBookCombo(),
 					{
 						xtype: 'textfield',
 						name: 'name',
@@ -22,12 +26,11 @@ go.modules.notes.NoteForm = Ext.extend(go.form.FormWindow, {
 						name: 'content',
 						fieldLabel: "",
 						hideLabel: true,
-						anchor: '100%',
-						height: 300,
+						anchor: '0 -90',
 						allowBlank: false
 					}]
 			}
-		].concat(go.CustomFields.getFormFieldSets("Note"));
+		].concat(formFieldSets);
 
 		return items;
 	}

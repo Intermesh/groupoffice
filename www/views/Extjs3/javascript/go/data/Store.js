@@ -1,3 +1,19 @@
+
+/**
+ * 
+ * 
+ * //Inserting records will trigger server update too:
+ * var store = this.noteGrid.store;
+						var myRecordDef = Ext.data.Record.create(store.fields);
+
+						store.insert(0, new myRecordDef({
+							name: "New",
+							content: "Testing",
+							noteBookId: this.addNoteBookId
+						}));
+						
+						store.commitChanges();
+ */
 go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	
 	entityStore: null,
@@ -10,6 +26,8 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	 * @var bool
 	 */
 	loaded : false,
+	
+	loading : false,
 	
 	remoteSort : true,
 	
@@ -29,72 +47,131 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 			},
 			proxy: new go.data.JmapProxy(config)
 		}));
-		go.flux.Dispatcher.register(this);
+		
+		this.setup();
+	
+	},
+	
+	loadData : function(o, append){
+		this.loading = true;		
+		
+		var ret = go.data.Store.superclass.loadData.call(this, o, append);				
+		
+		var me = this;
+		setTimeout(function(){
+			me.loading = false;
+		}, 0);	
+		
+		return ret;
+	},
+	
+	sort : function(fieldName, dir) {
+		//Reload first page data set on sort
+		if(this.lastOptions && this.lastOptions.params) {
+			this.lastOptions.params.position = 0;
+			this.lastOptions.add = false;
+		}
+		
+		return go.data.Store.superclass.sort.call(this, fieldName, dir);
+	},
+	
+	//created this because grouping store must share this.
+	setup : function() {
+		if(!this.baseParams) {
+			this.baseParams = {};
+		}
+		
+		if(!this.baseParams.filter) {
+			this.baseParams.filter = {};
+		}
+
+		this.on('beforeload', function() {			
+			this.loading = true;
+		}, this)
 		
 		//set loaded to true on load() or loadData();
 		this.on('load', function() {
-			this.loaded = true;
+			var me = this;
+			setTimeout(function() {
+				me.loaded = true;
+				me.loading = false;
+			}, 0);
+		}, this)
+		
+		if(this.entityStore) {			
+			this.initEntityStore();
+		}
+	},
+	
+	initEntityStore : function() {
+		if(Ext.isString(this.entityStore)) {
+			this.entityStore = go.Stores.get(this.entityStore);
+			if(!this.entityStore) {
+				throw "Invalid 'entityStore' property given to component"; 
+			}
+		}
+		this.entityStore.on('changes',this.onChanges, this);		
+
+		this.on('beforedestroy', function() {
+			this.entityStore.un('changes', this.onChanges, this);
 		}, this);
 	},
-	receive : function(action) {	
+	
+	onChanges : function(entityStore, added, changed, destroyed) {
 		
-		if(!this.loaded) {
+		if(!this.loaded || this.loading) {
 			return;
+		}		
+		
+		for(var i in added) {
+			if(!this.updateRecord(added[i]) ){
+				this.reload();
+				return;
+			}
+		}
+				
+		for(var i in changed) {
+			if(!this.updateRecord(changed[i]) ){
+				this.reload();
+				return;
+			}
 		}
 		
-		switch(action.type) {			
-			
-			//quick and dirty reload of the list when client did a set
-			case this.entityStore.entity.name + "Updated":				
-				
-				//update data when entity store has new data
-				for(var i=0,l=action.payload.list.length;i < l; i++) {
-					var entity = action.payload.list[i];
-					if(!this.updateRecord(entity) ){
-						//todo this causes many reloads because every links panel reloads on a new link. 
-						
-						//HOw to determine if it needs to reload?
-						// 
-						
-						this.reload();
-						break;
-					}
-				};
-			break;
-			
-			case this.entityStore.entity.name + "Destroyed":				
-				
-				//update data when entity store has new data
-				for(var i=0,l=action.payload.list.length;i < l; i++) {
-					var record = this.getById(action.payload.list[i]);
-					
-					if(record) {
-						this.remove(record);
-					}					
-				};
-			break;
+		for(var i = 0, l = destroyed.length; i < l; i++) {
+			var record = this.getById(destroyed[i]);
+			if(record) {
+				this.remove(record);
+			}
 		}
 
 	},
 	
 	updateRecord : function(entity) {
+		
+		if(!this.data) {
+			return false;
+		}
 		var record = this.getById(entity.id);
 		if(!record) {
 			return false;
 		}
 		
-		record.beginEdit();
+//		if(record.isModified()) {
+//			alert("Someone modified your record!");
+//		}
 		
+		
+		this.serverUpdate = true;
+		record.beginEdit();
 		this.fields.each(function(field) {
 			record.set(field.name, entity[field.name]);
 		});
 		
-		record.endEdit();
 		
-		//TODO: we don't want record.commit() to fire an update event because then we will going to do unesssary set calls to the server.
-			
+		record.endEdit();
 		record.commit();
 		
+		this.serverUpdate = false;
 		return true;
 	},
 	destroy : function() {	
@@ -114,4 +191,64 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 			this.loadData(items);
 		}, this);
 	}
+	
+//	onUpdate : function(store, record, operation) {
+//		//debugger;
+//		if(this.serverUpdate || this.loading) {
+//			return;
+//		}
+//	
+//		if(operation != Ext.data.Record.COMMIT) {
+//			return;
+//		}
+//		
+//		var p = {};
+//		
+//		key = record.phantom ? 'create' : 'update';
+//		p[key] = {};
+//		p[key][record.id] = record.data;
+//		
+//		store.fields.each(function(field){
+//			if(field.submit === false) {
+//				delete record.data[field.name];
+//			}
+//		});
+//		
+//		this.entityStore.set(p, function (options, success, response) {
+//			
+//			var saved = (record.phantom ? response.created : response.updated) || {};
+//			if (saved[record.id]) {
+//
+//				//update client id with server id
+//				if(record.phantom) {
+////					record.id = record.data.id = response.created[record.id].id;
+////					console.log(record.id);
+////					record.phantom = false;
+//						//remove phanto records as ext doesn't support changinhg record id.
+//						this.remove(record);
+//				}
+//
+//			} else
+//			{
+//				//something went wrong
+//				var notSaved = (record.phantom ? response.notCreated : response.notUpdated) || {};
+//				if (!notSaved[id]) {
+//					notSaved[id] = {type: "unknown"};
+//				}
+//
+//				switch (notSaved[id].type) {
+//					case "forbidden":
+//						Ext.MessageBox.alert(t("Access denied"), t("Sorry, you don't have permissions to update this item"));
+//						break;
+//
+//					default:
+//					
+//						
+//						Ext.MessageBox.alert(t("Error"), t("Sorry, something went wrong. Please try again."));
+//						break;
+//				}
+//			}
+//		}, this);
+//		
+//	}
 });

@@ -6,16 +6,14 @@
 
 CREATE TABLE `notes_note` (
   `id` int(11) NOT NULL,
-  `modSeq` int(11) NOT NULL,
   `noteBookId` int(11) NOT NULL,
-  `createdBy` int(11) NOT NULL DEFAULT '0',
-  `modifiedBy` int(11) NOT NULL DEFAULT '0',
+  `createdBy` int(11) NOT NULL,
+  `modifiedBy` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
   `content` text,
   `filesFolderId` int(11) DEFAULT NULL,
   `password` varchar(255) DEFAULT '',
   `createdAt` datetime DEFAULT NULL,
-  `deletedAt` datetime DEFAULT NULL,
   `modifiedAt` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -27,7 +25,6 @@ CREATE TABLE `notes_note` (
 
 CREATE TABLE `notes_note_book` (
   `id` int(11) NOT NULL,
-  `modSeq` int(11) NOT NULL,
   `deletedAt` datetime DEFAULT NULL,
   `createdBy` int(11) NOT NULL,
   `aclId` int(11) NOT NULL,
@@ -55,9 +52,7 @@ CREATE TABLE `notes_note_custom_fields` (
 ALTER TABLE `notes_note`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`createdBy`),
-  ADD KEY `category_id` (`noteBookId`),
-  ADD KEY `modSeq` (`modSeq`);
-
+  ADD KEY `category_id` (`noteBookId`);
 --
 -- Indexen voor tabel `notes_note_book`
 --

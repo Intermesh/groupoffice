@@ -9,38 +9,20 @@ class FunctionField extends AbstractCustomfieldtype {
 	public function name() {
 		return 'Function';
 	}
+	
+	public function fieldSql() {
+		return "DOUBLE NULL";
+	}
 
-//	public function formatFormOutput($column, &$attributes, \GO\Customfields\Model\AbstractCustomFieldsRecord $model) {
-//		$result_string = '';
-//
-//		$function = $this->field->getOption("function");
-//		
-//		if (!empty($function)) {
-//			
-//			$this->fireEvent('formatformoutput',array($this, $column, &$attributes, $model, &$function));
-//			
-//			preg_match_all('/\{([^}]*)\}/',$function,$matches);
-//			if (!empty($matches[1])) {
-//				foreach ($matches[1] as $key) {		
-//					if(!isset($attributes[$key])||$attributes[$key]==='')
-//						return null;
-//					else
-//						$value = $attributes[$key];
-//					$function = str_replace('{' . $key . '}', floatval($value), $function);				
-//				}
-//			}
-//			$function = preg_replace('/\{[^}]*\}/', '0',$function);
-//			
-//			eval("\$result_string=" . $function . ";");
-//			
-////			\GO::debug("Function ($column): ".$this->field->function.' => '.$f.' = '.$result_string);
-//		}
-//		
-//
-//		$attributes[$column] = \GO\Base\Util\Number::localize($result_string);
-//		return $attributes[$column];
-//	}
+	public function formatFormOutput($column, &$attributes, \GO\Customfields\Model\AbstractCustomFieldsRecord $model) {
 
+		if (!empty($this->field->function)) {	
+			$function = $this->field->function;	
+			$this->fireEvent('formatformoutput',array($this, $column, &$attributes, $model, &$function));
+		}
+
+		return $attributes[$column];
+	}
 	
 	public function formatDisplay($key, &$attributes, \GO\Customfields\Model\AbstractCustomFieldsRecord $model) {
 		// recalculate on display will fail sum of col1 and col2 + col3 as the sum would already be localized
@@ -58,8 +40,8 @@ class FunctionField extends AbstractCustomfieldtype {
 	public function formatFormInput($key, &$attributes, \GO\Customfields\Model\AbstractCustomFieldsRecord $model){
 		$result_string = '';
 
-		if (!empty($this->field->function)) {
-			$f = $this->field->function;
+		$f = $this->field->getOption("function");
+		if (!empty($f)) {
 			foreach ($attributes as $key=>$value) {
 				
 					$f = str_replace('{' . $key . '}', floatval(\GO\Base\Util\Number::unlocalize($value)), $f);
@@ -75,12 +57,12 @@ class FunctionField extends AbstractCustomfieldtype {
 			if($result_string=="") {
 				//$result_string=""
 				unset($attributes[$key]);
-				return "";
+				return 0;
 			}			
 		}
 
-		$attributes[$key] = \GO\Base\Util\Number::localize($result_string);
-		return $attributes[$key];
+		$attributes[$key] = $result_string;
+		return (double) $attributes[$key];
 	}
 
 }

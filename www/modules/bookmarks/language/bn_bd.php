@@ -1,0 +1,22 @@
+<?php
+return array (
+  'Bookmark' => 'ঠিকা',
+  'Category' => 'ক্যাটেগরি',
+  'Title' => 'শিরোনাম',
+  'Logo' => 'লোগো',
+  'Open in new browser tab' => 'ব্রাউজারের নতুন ট্যাবে খোল',
+  'Administrate categories' => 'ক্যাটেগরি প্রশাসন',
+  'Thumbnails' => 'অঙ্গুলিবীক্ষণ',
+  'Choose icon for bookmark' => 'ঠিকার জন্য আইকন নির্বাচন করুন',
+  'Clear Logo' => 'লোগো মুছে ফেল',
+  'Upload Logo' => 'লোগো আপলোড কর',
+  'Show all' => 'সবগুলো প্রদর্শন কর',
+  'Shared category' => 'ভাগাভাগি করা ক্যাটেগরিগুলো',
+  'Behave as a module (Browser reload required)' => 'মডিউল হিসাবে আচরণ করবে  (ব্রাউজার রিলোড করা আবশ্যক)',
+  'Are you sure you want to delete this bookmark?' => 'আপনি কি এই ঠিকাটি মুছে ফেলতে বদ্ধপরিকর ?',
+  'General' => 'সাধারণ',
+  'Search the web' => 'ওয়েবে অনুসন্ধান করুন',
+  'name' => 'ঠিকা',
+  'description' => 'ওয়েবসাইটের বিবরণ',
+  'Bookmarks' => 'ঠিকা',
+);

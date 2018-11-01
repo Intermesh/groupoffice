@@ -45,42 +45,58 @@ GO.util.stringToFunction = function(str) {
   return  fn;
 };
 
-function t(str, module, sub) {
+/**
+ * Translate a string
+ * 
+ * Module and package can be omitted in most cases. It will auto detect these.
+ * 
+ * go.module and go.package are set at:
+ * 
+ * 1. Before each module scripts are loaded
+ * 2. An override on Ext.extend() will set "module" and "package" on each 
+ *    components. A second override on Ext.Component will set 
+ *    go.Translate.module and package on getId() (getId() was the only way to 
+ *    make it happen always and on time) This override was made on ext-all-debug.js
+ *    because it had to do something before and after initcomponent and 
+ *    overriding constructors is not possible.
+ * 
+ * @param {string} str
+ * @param {string} module
+ * @param {string} package
+ * @returns {t.l|GO..lang}
+ */
+function t(str, module, package) {
 	
+	if(module && !package) {
+		package = "legacy";
+	}
+		
 	if(!module) {
-		module = "base";
-		sub = "common";
+		module = go.Translate.module;		
+	}
+	if(!package) {
+		package = go.Translate.package;
 	}
 	
-	if(!GO.lang[module]) {
-		return str;
+	if(!GO.lang[package] || !GO.lang[package][module]) {
+		return t(str, "core", "core");
 	}
 	
-	var l = GO.lang[module];
-	
-	if(sub) {
-		l = l[sub];
-	}
-	
-	return l[str] || str;
-	
-////	var found = (GO[module] && GO[module].lang && GO[module].lang[str]) || t("str");
-////	if(!found) {
-////		if (t.caller && t.caller.name !== 't' && GO.langMap[str]) {
-////			return t(GO.langMap[str], module);
-////		} else
-////		{
-////			found = str;
-////		}
-////	}
-//	var found = str;
-//	
-//	if(replacements) {
-//		for(var key in replacements) {
-//			found = found.replace("{" +key + "}", replacements[key]);
-//		}
-//	}
-//	return found;
+	var l = GO.lang[package][module];
+  
+  if(l[str]) {
+    return l[str]
+  }
+  
+  if(module != "core" || package != "core"){
+    return t(str, "core", "core");
+  } else
+  {
+		str = str.replace("GroupOffice", GO.settings.config.product_name);
+		str = str.replace("Group-Office", GO.settings.config.product_name);
+		str = str.replace("{product_name}", GO.settings.config.product_name);
+    return str;
+  }
 };
 /**
  * Strpos function for js 
@@ -127,12 +143,12 @@ GO.openHelp = function(page){
 
 
 GO.util.callToLink = function(phone){
+		return '<a onclick="GO.util.callToHandler(\''+phone+'\');">'+phone+'</a>';	
+}
 
-	if(GO.util.empty(GO.settings.config.encode_callto_link)){
-		return '<a onclick="GO.mainLayout.fireEvent(\'callto\', \''+phone+'\');" href="'+GO.calltoTemplate.replace('{phone}', phone.replace('(0)','').replace(/[^0-9+]/g,''))+'">'+phone+'</a>';
-	} else {
-		return '<a onclick="GO.mainLayout.fireEvent(\'callto\', \''+phone+'\');" href="'+GO.calltoTemplate.replace('{phone}', encodeURIComponent(phone.replace('(0)','').replace(/[^0-9+]/g,'')))+'">'+phone+'</a>';		
-	}
+GO.util.callToHandler = function(phone) {	
+	document.location = GO.calltoTemplate.replace('{phone}', phone.replace('(0)','').replace(/[^0-9+]/g,''));
+	return false;
 }
 
 GO.url = function(relativeUrl, params){
@@ -300,7 +316,7 @@ GO.playAlarm = function(filename){
 	if(GO.util.empty(GO.settings.mute_sound))
 	{
 		// The folder (From the GO root) in where the soundfiles are stored
-		var soundsfolder = 'sounds/';
+		var soundsfolder = 'views/Extjs3/themes/Paper/sounds/';
 		
 		// Set the default sound when no filename is given
 		if(GO.util.empty(filename)){
@@ -962,8 +978,8 @@ if(GO.settings && GO.settings.time_format){
 		minutes:[]
 	};
 
-	if (GO.settings.time_format.substr(0, 1) == 'G') {
-			var timeformat = 'G';
+	if (GO.settings.time_format.substr(0, 1) == 'H' || GO.settings.time_format.substr(0, 1) == 'h') {
+			var timeformat = 'H';
 	} else {			
 			var timeformat = 'g a';
 	}
@@ -1494,29 +1510,6 @@ GO.util.HtmlDecode = function HtmlDecode(s) {
 
 
 
-GO.util.dateFormat = function(v) {
-	
-	if(!v) {
-		return "";
-	}
-	
-	if (!Ext.isDate(v)) {
-			v = new Date(Date.parse(v));
-	}
-
-	var elapsed = v.getElapsed() / 1000;
-
-	if(elapsed < 86400) {
-		
-		return Ext.util.Format.date(v, GO.settings.time_format);	
-	}
-	
-	if(elapsed < 172800) {		
-		return t('Yesterday');
-	}
-		
-	return Ext.util.Format.date(v, GO.settings.date_format);
-	
-
-	
-}
+GO.util.dateFormat = function(v) {	
+	return go.util.Format.dateTime(v);	
+};

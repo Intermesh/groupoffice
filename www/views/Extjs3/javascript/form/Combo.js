@@ -103,6 +103,22 @@ GO.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 		if(!GO.util.empty(this.lastSelectionText))
 			this.setRawValue(this.lastSelectionText);
 	},
+	
+	setValue: function(v) {
+		
+		GO.form.ComboBox.superclass.setValue.call(this, v);
+		
+		if(this.idValuePair){
+			if(!GO.util.empty(v)){
+				v=v.split(':');
+				if(v.length==2){
+					this.setRawValue(v[1]);					
+				}
+			}
+		} 
+		
+		
+	},
 
 	/**
 	 * Selects the first record of the associated store

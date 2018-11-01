@@ -76,20 +76,20 @@ class AclUsersGroups extends ActiveRecord {
 			$this->aclItem->touch();
 		}
 		
-		$success = App::get()->getDbConnection()
-							->update('core_acl_group_changes', 
-											[
-													'revokeModSeq' => StateManager::get()->next()
-											],
-											[
-													'aclId' => $this->aclId, 
-													'groupId' => $this->groupId, 
-											]
-											)->execute();
-		
-		if(!$success) {
-			return false;
-		}
+//		$success = App::get()->getDbConnection()
+//							->update('core_acl_group_changes', 
+//											[
+//													'revokeModSeq' => StateManager::get()->next()
+//											],
+//											[
+//													'aclId' => $this->aclId, 
+//													'groupId' => $this->groupId, 
+//											]
+//											)->execute();
+//		
+//		if(!$success) {
+//			return false;
+//		}
 		
 		return parent::afterDelete();
 	}
@@ -104,17 +104,17 @@ class AclUsersGroups extends ActiveRecord {
 			$this->aclItem->touch();
 		}
 		
-		$success = App::get()->getDbConnection()
-							->replace('core_acl_group_changes', 
-											[
-													'aclId' => $this->aclId, 
-													'groupId' => $this->groupId, 
-													'grantModSeq' => StateManager::get()->next()
-											]
-											)->execute();
-		if(!$success) {
-			return false;
-		}
+//		$success = App::get()->getDbConnection()
+//							->replace('core_acl_group_changes', 
+//											[
+//													'aclId' => $this->aclId, 
+//													'groupId' => $this->groupId, 
+//													'grantModSeq' => StateManager::get()->next()
+//											]
+//											)->execute();
+//		if(!$success) {
+//			return false;
+//		}
 		
 		return parent::afterSave($wasNew);
 	}

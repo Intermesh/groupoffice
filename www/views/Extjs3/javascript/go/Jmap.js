@@ -51,6 +51,83 @@ go.Jmap = {
 		
 		return false;
 	},
+	
+	get: function(cb, scope) {
+		Ext.Ajax.request({
+			url: BaseHref + 'jmap.php',
+			method: 'GET',
+			callback: function (opts, success, response) {
+				var data;
+				if(success && response.responseText) {
+					data = Ext.decode(response.responseText);
+				}
+				cb.call(scope, data, opts, success, response);
+			}
+		});
+	},
+	
+	downloadUrl: function(blobId) {
+		if (!blobId) {
+			return '';
+		}
+		return go.User.downloadUrl.replace('{blobId}', blobId);
+	},
+	
+	upload : function(file, cfg) {
+		if(Ext.isEmpty(file))
+			return;
+
+		Ext.Ajax.request({url: go.User.uploadUrl,
+			success: function(response) {
+				if(cfg.success && response.responseText) {
+					data = Ext.decode(response.responseText);
+					cfg.success.call(cfg.scope || this,data);
+				}
+			},
+			failure: function(response) {
+				if(cfg.failure && response.responseText) {
+					data = Ext.decode(response.responseText);
+					cfg.failure.call(cfg.scope || this,data);
+				}
+			},
+			headers: {
+				'X-File-Name': file.name,
+				'Content-Type': file.type,
+				'X-File-LastModifed': Math.round(file['lastModified'] / 1000).toString()
+			},
+			xmlData: file // just "data" wasn't available in ext
+		});
+	},
+	
+	
+	sse : function() {
+		if (!window.EventSource) {
+			return false;
+		}
+		
+		var source = new EventSource(go.User.eventSourceUrl), me = this;
+		
+		source.addEventListener('state', function(e) {
+			for(var entity in JSON.parse(e.data)) {
+				var store =go.Stores.get(entity);
+				if(store) {
+					store.getUpdates();
+				}
+			}
+		}, false);
+
+		source.addEventListener('open', function(e) {
+			// Connection was opened.
+		}, false);
+
+		source.addEventListener('error', function(e) {
+			if (e.readyState == EventSource.CLOSED) {
+				// Connection was closed.
+				
+				me.sse();
+			}
+		}, false);
+	},
 
 	/**
 	 * 
@@ -77,7 +154,7 @@ go.Jmap = {
 		if (me.timeout) {
 			clearTimeout(me.timeout);
 		}
-
+		
 		var clientCallId = "clientCallId-" + this.nextCallId();
 
 		this.requests.push([options.method, options.params || {}, clientCallId]);

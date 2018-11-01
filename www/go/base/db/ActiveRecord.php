@@ -208,6 +208,15 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		return GO::t($lastPart, $module);
 	}
+  
+  /**
+   * For compatibility with new framework
+   * @return type
+   */
+  public static function getClientName() {
+    $parts = explode('\\',static::class);
+		return array_pop($parts);
+  }
 
 
 	/**
@@ -407,7 +416,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 */
 	public function equals($record) {
 
-		if(!is_array($record)){
+		if(!is_array($record) && !($record instanceof \Traversable)){
 			$record=array($record);
 		}
 
@@ -1280,95 +1289,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$joinRelationSelectFields='';
 		$joinRelationjoins='';
 		if(!empty($params['joinRelations'])){
-			/*
-			 * Relational attributes are fetch as relationname@attribute or
-			 *
-			 * relation1@relation2@attribute.
-			 *
-			 * In the ActiveRecord constructor these attributes are filtered into a relatedCache array.
-			 *
-			 * example query with joinRelation('order.book') on a \GO\Billing\Model\Item:
-			 *
-			 * SELECT `t`.`id`, `t`.`order_id`, `t`.`product_id`, `t`.`unit_cost`, `t`.`unit_price`, `t`.`unit_list`, `t`.`unit_total`, `t`.`amount`, `t`.`vat`, `t`.`discount`, `t`.`sort_order`, `t`.`cost_code`, `t`.`markup`, `t`.`order_at_supplier`, `t`.`order_at_supplier_company_id`, `t`.`amount_delivered`, `t`.`unit`, `t`.`item_group_id`, `t`.`extra_cost_status_id` ,
-`order`.`id` AS `order@id`,
-`order`.`project_id` AS `order@project_id`,
-`order`.`status_id` AS `order@status_id`,
-`order`.`book_id` AS `order@book_id`,
-`order`.`language_id` AS `order@language_id`,
-`order`.`user_id` AS `order@user_id`,
-`order`.`order_id` AS `order@order_id`,
-`order`.`po_id` AS `order@po_id`,
-`order`.`company_id` AS `order@company_id`,
-`order`.`contact_id` AS `order@contact_id`,
-`order`.`ctime` AS `order@ctime`,
-`order`.`mtime` AS `order@mtime`,
-`order`.`btime` AS `order@btime`,
-`order`.`ptime` AS `order@ptime`,
-`order`.`costs` AS `order@costs`,
-`order`.`subtotal` AS `order@subtotal`,
-`order`.`vat` AS `order@vat`,
-`order`.`total` AS `order@total`,
-`order`.`authcode` AS `order@authcode`,
-`order`.`frontpage_text` AS `order@frontpage_text`,
-`order`.`customer_name` AS `order@customer_name`,
-`order`.`customer_to` AS `order@customer_to`,
-`order`.`customer_salutation` AS `order@customer_salutation`,
-`order`.`customer_contact_name` AS `order@customer_contact_name`,
-`order`.`customer_address` AS `order@customer_address`,
-`order`.`customer_address_no` AS `order@customer_address_no`,
-`order`.`customer_zip` AS `order@customer_zip`,
-`order`.`customer_city` AS `order@customer_city`,
-`order`.`customer_state` AS `order@customer_state`,
-`order`.`customer_country` AS `order@customer_country`,
-`order`.`customer_vat_no` AS `order@customer_vat_no`,
-`order`.`customer_crn` AS `order@customer_crn`,
-`order`.`customer_email` AS `order@customer_email`,
-`order`.`customer_extra` AS `order@customer_extra`,
-`order`.`webshop_id` AS `order@webshop_id`,
-`order`.`recur_type` AS `order@recur_type`,
-`order`.`payment_method` AS `order@payment_method`,
-`order`.`recurred_order_id` AS `order@recurred_order_id`,
-`order`.`reference` AS `order@reference`,
-`order`.`order_bonus_points` AS `order@order_bonus_points`,
-`order`.`pagebreak` AS `order@pagebreak`,
-`order`.`files_folder_id` AS `order@files_folder_id`,
-`order`.`cost_code` AS `order@cost_code`,
-`order`.`for_warehouse` AS `order@for_warehouse`,
-`order`.`dtime` AS `order@dtime`,
-`book`.`id` AS `order@book@id`,
-`book`.`user_id` AS `order@book@user_id`,
-`book`.`name` AS `order@book@name`,
-`book`.`acl_id` AS `order@book@acl_id`,
-`book`.`order_id_prefix` AS `order@book@order_id_prefix`,
-`book`.`show_statuses` AS `order@book@show_statuses`,
-`book`.`next_id` AS `order@book@next_id`,
-`book`.`default_vat` AS `order@book@default_vat`,
-`book`.`currency` AS `order@book@currency`,
-`book`.`order_csv_template` AS `order@book@order_csv_template`,
-`book`.`item_csv_template` AS `order@book@item_csv_template`,
-`book`.`country` AS `order@book@country`,
-`book`.`bcc` AS `order@book@bcc`,
-`book`.`call_after_days` AS `order@book@call_after_days`,
-`book`.`sender_email` AS `order@book@sender_email`,
-`book`.`sender_name` AS `order@book@sender_name`,
-`book`.`is_purchase_orders_book` AS `order@book@is_purchase_orders_book`,
-`book`.`backorder_status_id` AS `order@book@backorder_status_id`,
-`book`.`delivered_status_id` AS `order@book@delivered_status_id`,
-`book`.`reversal_status_id` AS `order@book@reversal_status_id`,
-`book`.`addressbook_id` AS `order@book@addressbook_id`,
-`book`.`files_folder_id` AS `order@book@files_folder_id`,
-`book`.`import_status_id` AS `order@book@import_status_id`,
-`book`.`import_notify_customer` AS `order@book@import_notify_customer`,
-`book`.`import_duplicate_to_book` AS `order@book@import_duplicate_to_book`,
-`book`.`import_duplicate_status_id` AS `order@book@import_duplicate_status_id`
-FROM `bs_items` t
-INNER JOIN `bs_orders` `order` ON (`order`.`id`=`t`.`order_id`)
-INNER JOIN `bs_books` `book` ON (`book`.`id`=`order`.`book_id`)
-WHERE 1
-AND `t`.`product_id` = "426" AND `order`.`btime` < "1369143782" AND `order`.`btime` > "0"
-ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
-			 *
-			 */
 
 			foreach($params['joinRelations'] as $joinRelation){
 
@@ -1430,9 +1350,6 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 			}
 		}
 
-
-
-
 		$joinCf = !empty($params['joinCustomFields']) && $this->customfieldsModel() && GO::modules()->customfields && GO::modules()->customfields->permissionLevel;
 
 		if($joinCf){
@@ -1466,7 +1383,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 
 
 		if($joinCf)
-			$joins .= "\nLEFT JOIN `".$cfModel->tableName()."` cf ON cf.model_id=t.id ";
+			$joins .= "\nLEFT JOIN `".$cfModel->tableName()."` cf ON cf.".$cfModel->primaryKey()."=t.id ";
 
 		if(isset($aclJoinProps) && empty($params['ignoreAcl']))
 			$joins .= $this->_appendAclJoin($params, $aclJoinProps);
@@ -1474,44 +1391,13 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 		if(isset($params['join']))
 			$joins .= "\n".$params['join'];
 
-
-
-		//testing with subquery
-//		if($this->aclField() && empty($params['ignoreAcl'])){
-//			//quick and dirty way to use and in next sql build blocks
-//			$sql .= "\nWHERE ";
-//
-//			$sql .= "\nEXISTS (SELECT level FROM core_acl_group WHERE `".$aclJoin['table']."`.`".$aclJoin['aclField']."` = core_acl_group.acl_id";
-//			if(isset($params['permissionLevel']) && $params['permissionLevel']>\GO\Base\Model\Acl::READ_PERMISSION){
-//				$sql .= " AND core_acl_group.level>=".intval($params['permissionLevel']);
-//			}
-//
-//			$groupIds = \GO\Base\Model\User::getGroupIds($params['userId']);
-//
-//			if(!empty($params['ignoreAdminGroup'])){
-//				$key = array_search(GO::config()->group_root, $groupIds);
-//				if($key!==false)
-//					unset($groupIds[$key]);
-//			}
-//
-//
-//			$sql .= " AND (core_acl_group.user_id=".intval($params['userId'])." OR core_acl_group.group_id IN (".implode(',',$groupIds)."))) ";
-//		}else
-//		{
 			$where = "\nWHERE 1 ";
-//		}
-
-
-
 
 		if(isset($params['criteriaObject'])){
 			$conditionSql = $params['criteriaObject']->getCondition();
 			if(!empty($conditionSql))
 				$where .= "\nAND".$conditionSql;
 		}
-
-//		if(!empty($params['criteriaSql']))
-//			$sql .= $params['criteriaSql'];
 
 		$where = self::_appendByParamsToSQL($where, $params);
 
@@ -1617,11 +1503,16 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 				if($i>0)
 					$order .= ',';
 
-				$order .= $this->_quoteColumnName($params['order'][$i]).' ';
-				if(isset($params['orderDirection'][$i])){
-					$order .= strtoupper($params['orderDirection'][$i])=='ASC' ? 'ASC ' : 'DESC ';
-				}else{
-					$order .= strtoupper($params['orderDirection'][0])=='ASC' ? 'ASC ' : 'DESC ';
+				if ($params['order'][$i] instanceof \go\core\db\Expression) {
+				//if(strpos($params['order'][$i], '(')!==false) {
+					$order .= $params['order'][$i].' ';
+				} else {
+					$order .= $this->_quoteColumnName($params['order'][$i]).' ';
+					if(isset($params['orderDirection'][$i])){
+						$order .= strtoupper($params['orderDirection'][$i])=='ASC' ? 'ASC ' : 'DESC ';
+					}else{
+						$order .= strtoupper($params['orderDirection'][0])=='ASC' ? 'ASC ' : 'DESC ';
+					}
 				}
 			}
 		}
@@ -2485,14 +2376,16 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 	}
 
 
-	private function _hasCustomfieldValue($attributes){
+	private function _extractCustomfieldValues($attributes){
+		$v = [];
 		foreach($attributes as $key=>$value)
 		{
-			if(substr($key,0,4)=='col_'){
-				return true;
+			if(substr($key,0,13)=='customFields_'){
+				$v[substr($key,13)] = $attributes[$key];
+				unset($attributes[$key]);
 			}
 		}
-		return false;
+		return $v;
 	}
 
 	/**
@@ -2517,9 +2410,9 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 		}
 
 		//GO::debug($this->className().'::setAttributes(); '.$this->pk);
-		
-		if($this->_hasCustomfieldValue($attributes) && $this->customfieldsRecord)
-			$this->customfieldsRecord->setAttributes($attributes, $format);
+		$v = $this->_extractCustomfieldValues($attributes);
+		if(!empty($v) && $this->customfieldsRecord)
+			$this->customfieldsRecord->setAttributes($v, $format);
 			
 		if($format)
 			$attributes = $this->formatInputValues($attributes);
@@ -2822,8 +2715,8 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 
 			$attributes=$this->columns[$field];
 
-			if(!empty($attributes['required']) && empty($this->_attributes[$field])){
-				$this->setValidationError($field, sprintf(GO::t("Field %s is required"),$this->getAttributeLabel($field)));
+			if(!empty($attributes['required']) && empty($this->_attributes[$field]) && $this->_attributes[$field] !== '0'){
+				$this->setValidationError($field, sprintf(GO::t("Field '%s' is required"),$this->getAttributeLabel($field)));
 			}elseif(!empty($attributes['length']) && !empty($this->_attributes[$field]) && \GO\Base\Util\StringHelper::length($this->_attributes[$field])>$attributes['length'])
 			{
 				$this->setValidationError($field, sprintf(GO::t("Field %s is longer than the maximum of %s characters"),$this->getAttributeLabel($field),$attributes['length']));
@@ -3213,8 +3106,8 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 					$oldAcl = $this->findRelatedAclModel()->acl;
 					$user_id = !empty($this->user_id) ? $this->user_id : 0;
 					$acl = new \GO\Base\Model\Acl();
-					$acl->description=$this->tableName().'.'.$this->aclOverwrite();
-					$acl->user_id=$user_id;
+					$acl->usedIn=$this->tableName().'.'.$this->aclOverwrite();
+					$acl->ownedBy=$user_id;
 					$acl->save();
 					
 					$oldAcl->copyPermissions($acl);
@@ -3250,13 +3143,15 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 					$this->setNewAcl(GO::user() ? GO::user()->id : 1);
 			}
 
-			if ($this->hasFiles() && GO::modules()->isInstalled('files')) {		
-				$this->checkModelFolder();
-			}
+			
 			
 			if(!$this->beforeSave()){
 				GO::debug("WARNING: ".$this->className()."::beforeSave returned false or no value");
 				return false;
+			}
+			
+			if($this->hasFiles()){
+				$this->files_folder_id = 0;
 			}
 
 			$this->_dbInsert();
@@ -3276,10 +3171,15 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 					return false;
 				}
 			}			
+			
+			
+			if ($this->hasFiles() && GO::modules()->isInstalled('files')) {		
+				$this->checkModelFolder();				
+			}
 
-			$this->setIsNew(false);
-
-			if($this->_processFileColumns($fileColumns) || $this->afterDbInsert()){
+			$this->setIsNew(false);			
+			$changed  = $this->_processFileColumns($fileColumns);
+			if($changed || $this->afterDbInsert() || $this->isModified('files_folder_id')){
 				$this->_dbUpdate();
 			}
 		}else
@@ -3315,20 +3215,23 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 		//use private customfields record so it's accessed only when accessed before
 		if (isset($this->_customfieldsRecord)){
 			//id is not set if this is a new record so we make sure it's set here.
-			$this->_customfieldsRecord->model_id=$this->id;
+			$this->_customfieldsRecord->{$this->_customfieldsRecord->primaryKey()}=$this->id;
 
 			//check if other fields than model_id were modified.
 			$modified = $this->_customfieldsRecord->getModifiedAttributes();
 			unset($modified['model_id']);
-
-			if(count($modified))
-				$this->_customfieldsRecord->save();
+			
+			if(count($modified) || $this->_customfieldsRecord->isNew) {
+				if(!$this->_customfieldsRecord->save()) {
+					throw new \Exception("Could not save custom fields ". var_export($this->_customfieldsRecord->getValidationErrors(), true));
+				}
+			}
 
 //			if($this->customfieldsRecord->save())
 //				$this->touch(); // If the customfieldsRecord is saved then set the mtime of this record.
 		}
 
-		$this->log($wasNew ? \GO\Log\Model\Log::ACTION_ADD : \GO\Log\Model\Log::ACTION_UPDATE);
+		$this->log($wasNew ? \GO\Log\Model\Log::ACTION_ADD : \GO\Log\Model\Log::ACTION_UPDATE,true,isset($this->_customfieldsRecord) ? $modified : false);
 
 
 
@@ -3384,7 +3287,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 	 * @param string $action
 	 * @return array Data for the JSON string 
 	 */
-	public function getLogJSON($action){
+	public function getLogJSON($action,$modifiedCustomfieldAttrs=false){
 		
 		$cutoffString = ' ..Cut off at 500 chars.';
 		$cutoffLength = 500;
@@ -3394,11 +3297,22 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 				return $this->getAttributes();
 			case \GO\Log\Model\Log::ACTION_UPDATE:
 				$oldValues = $this->getModifiedAttributes();
-				
+								
 				$modifications = array();
 				foreach($oldValues as  $key=>$oldVal){
 					
 					$newVal = $this->getAttribute($key);
+					
+//					// Check if the value changed from false, to null
+//					if(is_null($newVal) && $oldVal === false){
+//						continue;
+//					}
+//					
+					// Check if the value changed from false, to null
+					if(empty($newVal) && empty($oldVal)){
+						continue;
+					}
+
 					if(strlen($newVal) > $cutoffLength){
 						$newVal = substr($newVal,0,$cutoffLength).$cutoffString;
 					}
@@ -3409,6 +3323,31 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 					
 					$modifications[$key]=array($oldVal,$newVal);	
 				}
+				
+				// Also track customfieldsrecord changes
+				if($this->customfieldsRecord && $modifiedCustomfieldAttrs){
+										
+					foreach($modifiedCustomfieldAttrs as  $key=>$oldVal){
+						$newVal = $this->customfieldsRecord->getAttribute($key);
+						if(empty($newVal) && empty($oldVal)){
+						continue;
+					}
+
+					if(strlen($newVal) > $cutoffLength){
+						$newVal = substr($newVal,0,$cutoffLength).$cutoffString;
+					}
+					
+					if(strlen($oldVal) > $cutoffLength){
+						$oldVal = substr($oldVal,0,$cutoffLength).$cutoffString;
+					}
+					
+					$attrLabel = $this->getCustomfieldsRecord()->getAttributeLabelWithoutCategoryName($key);
+					
+					$modifications[$attrLabel.' ('.$key.')']=array($oldVal,$newVal);	
+					}
+				}
+				
+				
 				return $modifications;
 			case \GO\Log\Model\Log::ACTION_ADD:
 				return $this->getAttributes();
@@ -3424,12 +3363,15 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 	 * @param boolean $save set the false to not directly save the create Log record
 	 * @return boolean|\GO\Log\Model\Log returns the created log or succuss status when save is true
 	 */
-	protected function log($action, $save=true){
-
+	protected function log($action, $save=true, $modifiedCustomfieldAttrs=false){
+		// jsonData field in go_log might not exist yet during upgrade
+		if(\GO::router()->getControllerRoute() == 'maintenance/upgrade') {
+			return true;
+		}
 		$message = $this->getLogMessage($action);
 		if($message && GO::modules()->isInstalled('log')){
 			
-			$data = $this->getLogJSON($action);
+			$data = $this->getLogJSON($action,$modifiedCustomfieldAttrs);
 			
 			$log = new \GO\Log\Model\Log();
 
@@ -3614,29 +3556,28 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 
 		//don't do this on datbase checks.
 		if(GO::router()->getControllerAction()=='checkdatabase')
-			return;
+			return false;
 
 		$attr = $this->getCacheAttributes();
-		if(!$attr) {
-			return;
+		if(!$attr) {		
+			return false;
 		}
 		
-		$search = \go\core\search\Search::find()->where('entityTypeId','=', static::getType()->getId())->andWhere('entityId', '=', $this->id)->single();
+		$search = \go\modules\core\search\model\Search::find()->where('entityTypeId','=', static::getType()->getId())->andWhere('entityId', '=', $this->id)->single();
 		if(!$search) {
-			$search = new \go\core\search\Search();
+			$search = new \go\modules\core\search\model\Search();
 			$search->setEntity(static::getType());
 		}
 		// GO 6.3 backwards compatible
 		if(!empty($attr['mtime'])) {
-			$attr['modifiedAt'] = '@'.$attr['mtime'];
-			unset($attr['mtime']);
+			$attr['modifiedAt'] = '@'.$attr['mtime'];			
 		}
 		
-		if(!empty($attr['ctime'])) {
-//			$attr['createdAt'] = '@'.$attr['ctime'];
-			unset($attr['ctime']);
-		}
-		
+		unset($attr['mtime']);
+
+		// Always unset ctime, we don't use it anymore in the searchcache table
+		unset($attr['ctime']);
+
 		if(!isset($attr['description'])) {
 			$attr['description'] = '';
 		}
@@ -3714,9 +3655,11 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 //
 //		}
 //		return false;
+		
+		return true;
 	}
-
-
+	
+	
 	/**
 	 * Cut all attributes to their maximum lengths. Useful when importing stuff.
 	 */
@@ -3836,7 +3779,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 			$sql .= "DELAYED ";
 
 		$sql .= "INTO `{$this->tableName()}` (`".implode('`,`', $fieldNames)."`) VALUES ".
-					"(:".implode(',:', $fieldNames).")";
+					"(:ins".implode(',:ins', array_keys($fieldNames)).")";
 
 		if($this->_debugSql){
 			$bindParams = array();
@@ -3849,11 +3792,11 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 		try{
 			$stmt = $this->getDbConnection()->prepare($sql);
 
-			foreach($fieldNames as  $field){
+			foreach($fieldNames as $i => $field){
 
 				$attr = $this->columns[$field];
 
-				$stmt->bindParam(':'.$field, $this->_attributes[$field], $attr['type'], empty($attr['length']) ? null : $attr['length']);
+				$stmt->bindParam(':ins'.$i, $this->_attributes[$field], $attr['type'], empty($attr['length']) ? null : $attr['length']);
 			}
 			$ret =  $stmt->execute();
 		}catch(\Exception $e){
@@ -3887,8 +3830,14 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 //			}
 //		}
 //
-		foreach($this->_modifiedAttributes as $field=>$oldValue)
-			$updates[] = "`$field`=:".$field;
+		$i = 0;
+		$paramMap = [];
+		foreach($this->_modifiedAttributes as $field=>$oldValue) {
+			$p[$field] = "upd".$i;
+			$updates[] = "`$field` = :".$p[$field];
+			
+			$i++;
+		}
 
 
 		if(!count($updates))
@@ -3899,24 +3848,27 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 
 		$bindParams=array();
 
-		if(is_array($this->primaryKey())){
+		$pk = $this->primaryKey();
+		if(!is_array($pk)){
+			$pk = [$pk];
+		}
 
-			$first=true;
-			foreach($this->primaryKey() as $field){
-				if(!$first)
-					$sql .= ' AND ';
-				else
-					$first=false;
-
-				$sql .= "`".$field."`=:".$field;
+		$first=true;
+		foreach($pk as $field){
+			if(!$first)
+				$sql .= ' AND ';
+			else
+				$first=false;
+			
+			if(!isset($p[$field])) {
+				$p[$field] = "upd".$i;
+				$i++;
 			}
 
-			$bindParams[$field]=$this->_attributes[$field];
-
-		}else{
-			$sql .= "`".$this->primaryKey()."`=:".$this->primaryKey();
-			$bindParams[$field]=$this->_attributes[$field];
+			$sql .= "`".$field."`=:".$p[$field];
 		}
+
+		$bindParams[$field]=$this->_attributes[$field];
 
 
 
@@ -3929,7 +3881,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 
 				if($this->isModified($field) || in_array($field, $pks)){
 					$bindParams[$field]=$this->_attributes[$field];
-					$stmt->bindParam(':'.$field, $this->_attributes[$field], $attr['type'], empty($attr['length']) ? null : $attr['length']);
+					$stmt->bindParam(':'.$p[$field], $this->_attributes[$field], $attr['type'], empty($attr['length']) ? null : $attr['length']);
 				}
 			}
 
@@ -4101,7 +4053,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 		$attr = $this->getCacheAttributes();
 
 		if($attr){
-			$model = \go\core\search\Search::find()->where(['entityId' => $this->pk, 'entityTypeId'=>$this->modelTypeId()])->single();
+			$model = \go\modules\core\search\model\Search::find()->where(['entityId' => $this->pk, 'entityTypeId'=>$this->modelTypeId()])->single();
 //			$model = \GO\Base\Model\SearchCacheRecord::model()->findByPk(array('model_id'=>$this->pk, 'model_type_id'=>$this->modelTypeId()),false,true);
 			if($model)
 				$model->delete();
@@ -4482,7 +4434,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 				"fromId" => $from_model_id,
 				"fromEntityTypeId" => $from_model_type_id,
 				"description" => $description,
-				"createdAt" => new \DateTime()
+				"createdAt" => new \DateTime('now',new \DateTimeZone('UTC'))
 				
 		])->execute()){
 			return false;
@@ -4494,7 +4446,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 		$reverse['toId'] = $from_model_id;
 		$reverse['fromId'] = $to_model_id;		
 		$reverse['description'] = $description;
-		$reverse['createdAt'] = new \DateTime();
+		$reverse['createdAt'] = new \DateTime('now',new \DateTimeZone('UTC'));
 	
 		
 		if(!\go\core\App::get()->getDbConnection()->insert('core_link', $reverse)->execute()) {
@@ -4537,7 +4489,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 			$to_model_id = $model->id;
 			$to_model_type_id = $model->getType()->getId();
 		}
-
+		
 		if(!$to_model_id)
 			return false;
 
@@ -4575,35 +4527,59 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 //		return $result->execute($bindParams);
 //	}
 //
-//	/**
-//	 * Unlink a model from this model
-//	 *
-//	 * @param ActiveRecord $model
-//	 * @param boolean $unlinkBack For private use only
-//	 * @return boolean
-//	 */
-//	public function unlink($model, $unlinkBack=true){
-//		$sql = "DELETE FROM `go_links_{$this->tableName()}` WHERE id=:id AND model_type_id=:model_type_id AND model_id=:model_id";
-//
-//		$values=array(
-//				':id'=>$this->id,
-//				':model_type_id'=>$model->modelTypeId(),
-//				':model_id'=>$model->id
-//		);
-//
-//		$result = $this->getDbConnection()->prepare($sql);
-//		$success = $result->execute($values);
-//
-//		if($success){
-//
-//			$this->afterUnlink($model);
-//
-//			return !$unlinkBack || $model->unlink($this, false);
-//		}else
-//		{
-//			return false;
-//		}
-//	}
+	/**
+	 * Unlink a model from this model
+	 *
+	 * @param ActiveRecord $model
+	 * @param boolean $unlinkBack For private use only
+	 * @return boolean
+	 */
+	public function unlink($model){
+		
+		$isSearchCacheModel = ($this instanceof \GO\Base\Model\SearchCacheRecord);
+
+		if(!$this->hasLinks() && !$isSearchCacheModel)
+			throw new \Exception("Links not supported by ".$this->className ());
+
+
+		if($model instanceof \GO\Base\Model\SearchCacheRecord){
+			$to_model_id = $model->entityId;
+			$to_model_type_id = $model->entityTypeId;
+		}else
+		{
+			$to_model_id = $model->id;
+			$to_model_type_id = $model->getType()->getId();
+		}
+		
+		
+
+		$from_model_type_id = $isSearchCacheModel ? $this->entityTypeId : $this->modelTypeId();
+
+		$from_model_id = $isSearchCacheModel ? $this->model_id : $this->id;
+		
+		
+		
+		
+		if(!\go\core\App::get()->getDbConnection()->delete('core_link', [
+				"toId" => $to_model_id,
+				"toEntityTypeId" => $to_model_type_id,
+				"fromId" => $from_model_id,
+				"fromEntityTypeId" => $from_model_type_id				
+		])->execute()){
+			return false;
+		}
+		
+		
+		
+		$reverse = [];
+		$reverse['fromEntityTypeId'] = $to_model_type_id;
+		$reverse['toEntityTypeId'] = $from_model_type_id;
+		$reverse['toId'] = $from_model_id;
+		$reverse['fromId'] = $to_model_id;		
+		
+		
+		return \go\core\App::get()->getDbConnection()->delete('core_link', $reverse)->execute();
+	}
 //
 //	protected function afterUnlink(ActiveRecord $model){
 //
@@ -4714,7 +4690,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 				if(!$this->_customfieldsRecord){
 					//doesn't exist yet. Return a new one
 					$this->_customfieldsRecord = new $customFieldModelName;
-					$this->_customfieldsRecord->model_id=$this->pk;
+					$this->_customfieldsRecord->{$customFieldModelName::model()->primaryKey()}=$this->pk;
 					$this->_customfieldsRecord->clearModifiedAttributes();
 				}
 			}
@@ -4815,13 +4791,60 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 	}
 
 
-	public function rebuildSearchCache(){
+	public function rebuildSearchCache() {		
 		
+		
+				
 		$rc = new \GO\Base\Util\ReflectionClass($this);
 		$overriddenMethods = $rc->getOverriddenMethods();
 		if(in_array("getCacheAttributes", $overriddenMethods)){
-			$stmt = $this->find(FindParams::newInstance()->ignoreAcl()->select('t.*'));
-			$stmt->callOnEach('cacheSearchRecord', true);
+			
+			echo "Processing ".static::class ."\n";
+			
+			$entityTypeId = static::getType()->getId();
+		
+			$start = 0;
+			$limit = 100;
+			
+			$findParams = FindParams::newInstance()
+							->ignoreAcl()
+							->debugSql()
+							->select('t.*')
+							->limit($limit)
+							->start($start)
+							->join('core_search', FindCriteria::newInstance()->addRawCondition('search.entityId', 't.id')->addRawCondition("search.entityTypeId", $entityTypeId), 'search', 'LEFT');
+			
+			$findParams->getCriteria()->addCondition('entityId',null, 'IS', 'search');							
+			
+			//In small batches to keep memory low
+			$stmt = $this->find($findParams);
+			while($stmt->rowCount()) {	
+	
+				while ($m = $stmt->fetch()) {
+				
+					try {
+						flush();
+						
+						if($m->cacheSearchRecord()) {
+							echo ".";
+						} else
+						{
+							echo "S";
+							$start++;
+						}
+						
+					} catch (\Exception $e) {
+						\go\core\ErrorHandler::logException($e);
+						echo "E";
+					}
+				}
+				echo "\n";
+				
+				$stmt = $this->find($findParams->start($start));				
+			}
+			
+			echo "\nDone\n\n";
+			
 		}
 	}
 

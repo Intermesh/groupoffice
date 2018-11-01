@@ -24,7 +24,6 @@ $updates['201711071208'][] = 'ALTER TABLE `notes_folder` CHANGE `files_folder_id
 
 
 $updates['201711071208'][] = 'ALTER TABLE `notes_note` CHANGE `categoryId` `folderId` INT(11) NOT NULL;';
-$updates['201711071208'][] = 'ALTER TABLE `notes_note` ADD FOREIGN KEY (`folderId`) REFERENCES `notes_folder`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;';
 
 $updates['201711071208'][] = 'ALTER TABLE `notes_folder` ADD FOREIGN KEY (`aclId`) REFERENCES `core_acl`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;';
 $updates['201711071208'][] = 'ALTER TABLE `notes_folder` ADD `modSeq` INT NOT NULL AFTER `id`, ADD `deletedAt` DATETIME NULL DEFAULT NULL AFTER `modSeq`;';
@@ -35,6 +34,7 @@ $updates['201711071208'][] = 'RENAME TABLE `notes_folder` TO `notes_note_book`;'
 $updates['201711071208'][] = 'ALTER TABLE `notes_note` CHANGE `folderId` `noteBookId` INT(11) NOT NULL;';
 
 
+$updates['201711071208'][] = 'ALTER TABLE `notes_note` ADD FOREIGN KEY (`noteBookId`) REFERENCES `notes_note_book`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;';
 
 
 $updates['201711071208'][] = 'RENAME TABLE `cf_no_notes` TO `notes_note_custom_fields`;';
@@ -43,7 +43,7 @@ $updates['201711071208'][] = 'ALTER TABLE `notes_note_custom_fields` CHANGE `id`
 $updates['201711071208'][] = 'delete from notes_note_custom_fields where id not in(select id from notes_note);';
 $updates['201711071208'][] = 'ALTER TABLE `notes_note_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `notes_note`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;';
 
-$updates['201711071208'][] = 'update `core_entity` set moduleId = (select id from core_module where name=\'notes\'), name = \'Note\' where name = \'GO\\\\Notes\\\\Model\\\\Note\';';
+$updates['201711071208'][] = 'update `core_entity` set moduleId = (select id from core_module where name=\'notes\'), name = \'Note\', clientName = \'Note\' where name = \'GO\\\\Notes\\\\Model\\\\Note\';';
 
 $updates['201712141425'][] = function() {
 		\go\modules\community\notes\model\NoteBook::getType();
@@ -72,3 +72,12 @@ $updates['201801111300'][] = function() {
 
 $updates['201801251511'][] = "ALTER TABLE `notes_note` CHANGE `filesFolderId` `filesFolderId` INT(11) NULL DEFAULT NULL;";
 $updates['201801251511'][] = "update notes_note set filesFolderId = null where filesFolderId = 0 OR filesFolderId not in (select id from fs_folders);";
+
+$updates['201804181402'][] = "ALTER TABLE `notes_note` CHANGE `createdBy` `createdBy` INT(11) NOT NULL;";
+$updates['201804181402'][] = "ALTER TABLE `notes_note` CHANGE `modifiedBy` `modifiedBy` INT(11) NOT NULL; ";
+
+$updates['201804181402'][] = "ALTER TABLE `notes_note` DROP `modSeq`;";
+$updates['201804181402'][] = "ALTER TABLE `notes_note` DROP `deletedAt`;";
+
+
+$updates['201804181402'][] = "ALTER TABLE `notes_note_book` DROP `modSeq`;";

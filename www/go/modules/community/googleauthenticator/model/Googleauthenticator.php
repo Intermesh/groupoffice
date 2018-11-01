@@ -8,10 +8,13 @@ use go\core\orm\Property;
 
 
 class Googleauthenticator extends Property {
-
+		
 	public $userId;
 	protected $secret;
 	public $createdAt;
+	
+	private $verify = false;
+	private $requestSecret = false;
 
 	/**
 	 * We only publish the secret when it was just created
@@ -25,12 +28,43 @@ class Googleauthenticator extends Property {
 		return parent::defineMapping()->addTable("googleauth_secret");
 	}
 	
+	public function getSecret() {
+		return $this->secret;
+	}
+	
+	public function setRequestSecret($value){
+		$this->requestSecret = $value;
+	}
+	
+	public function setVerify($code){
+		$this->verify = $code;
+	}
+	
+	public function setSecret($secret) {
+		$this->secret = $secret;
+	}
+		
+	protected function internalValidate() {
+		
+		// When saving the new secret, the code needs to be verified first
+		if(!empty($this->verify) && !$this->verifyCode($this->verify)){
+			$this->setValidationError('verify', \go\core\validate\ErrorCode::INVALID_INPUT, "The verify code is not correct.");
+		}
+		
+		return parent::internalValidate();
+	}
+	
 	protected function internalSave(){
 		
-		if(empty($this->secret)){
+		if(empty($this->secret)) {
 			$this->secret = $this->createSecret();
 		}
 		
+		// Don't actually save when only the secret is requested
+		if($this->requestSecret){
+			return true;
+		}
+				
 		return parent::internalSave();
 	}
 	
@@ -72,7 +106,7 @@ class Googleauthenticator extends Property {
 	}
 	
 	public function getIsEnabled() {
-		return isset($this->secret);
+		return isset($this->secret)&& isset($this->createdAt);
 	}
 
 	/**
@@ -143,7 +177,7 @@ class Googleauthenticator extends Property {
 		$height = !empty($params['height']) && (int) $params['height'] > 0 ? (int) $params['height'] : 200;
 		$level = !empty($params['level']) && array_search($params['level'], array('L', 'M', 'Q', 'H')) !== false ? $params['level'] : 'M';
 
-		$urlencoded = urlencode('otpauth://totp/' . $name . '?secret=' . $secret . '');
+		$urlencoded = urlencode('otpauth://totp/' . rawurlencode($name) . '?secret=' . $secret . '');
 		if (isset($title)) {
 			$urlencoded .= urlencode('&issuer=' . urlencode($title));
 		}

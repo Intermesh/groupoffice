@@ -1,27 +1,36 @@
-go.modules.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
-	paging: true,
+go.modules.community.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 	initComponent: function () {
 
 		this.store = new go.data.Store({
-			fields: ['id', 'name', 'content', 'excerpt', {name: 'createdAt', type: 'date'}, {name: 'modifiedAt', type: 'date'}, 'permissionLevel'],
-			entityStore: go.Stores.get("Note")
+			fields: [
+				'id', 
+				'name', 
+				'content', 
+				'excerpt', 
+				{name: 'createdAt', type: 'date'}, 
+				{name: 'modifiedAt', type: 'date'}, 
+				{name: 'creator', type: go.data.types.User, key: 'createdBy'},
+				{name: 'modifier', type: go.data.types.User, key: 'modifiedBy'},
+				'permissionLevel'
+			],
+			entityStore: "Note"
 		});
 
-		Ext.apply(this, {
+		Ext.apply(this, {		
 		
 			columns: [
 				{
 					id: 'id',
 					hidden: true,
 					header: 'ID',
-					width: 40,
+					width: dp(40),
 					sortable: true,
 					dataIndex: 'id'
 				},
 				{
 					id: 'name',
 					header: t('Name'),
-					width: 75,
+					width: dp(75),
 					sortable: true,
 					dataIndex: 'name'
 				},
@@ -29,7 +38,7 @@ go.modules.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 					xtype:"datecolumn",
 					id: 'createdAt',
 					header: t('Created at'),
-					width: 160,
+					width: dp(160),
 					sortable: true,
 					dataIndex: 'createdAt',
 					hidden: true
@@ -39,13 +48,33 @@ go.modules.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 					hidden: false,
 					id: 'modifiedAt',
 					header: t('Modified at'),
-					width: 160,
+					width: dp(160),
 					sortable: true,
 					dataIndex: 'modifiedAt'
+				},
+				{	
+					hidden: true,
+					header: t('Created by'),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'creator',
+					renderer: function(v) {
+						return v ? v.displayName : "-";
+					}
+				},
+				{	
+					hidden: true,
+					header: t('Modified by'),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'modifier',
+					renderer: function(v) {
+						return v ? v.displayName : "-";
+					}
 				}
 			],
 			viewConfig: {
-				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>',
+				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>'
 //				enableRowBody: true,
 //				showPreview: true,
 //				getRowClass: function (record, rowIndex, p, store) {
@@ -62,7 +91,7 @@ go.modules.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 			stateId: 'notes-grid'
 		});
 
-		go.modules.notes.NoteGrid.superclass.initComponent.call(this);
+		go.modules.community.notes.NoteGrid.superclass.initComponent.call(this);
 	}
 });
 

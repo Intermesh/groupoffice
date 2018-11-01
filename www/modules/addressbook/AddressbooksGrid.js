@@ -6,26 +6,25 @@ GO.addressbook.AddresbooksGrid = function(config){
 	}
 	
 	config.title = t("Address books", "addressbook");
-	config.layout='fit';
-	config.split=true;
+	//config.layout='fit';
+	//config.split=true;
 	if(!config.store)
 		config.store = GO.addressbook.readableAddressbooksStore;
 
 	Ext.apply(config, {
 		viewConfig: {
-			scrollOffset: 0,
+			//scrollOffset: 0,
 			emptyText: t("No items to display")
 		},
 		allowNoSelection:true,
-//		bbar: new GO.SmallPagingToolbar({
-//			items:[this.searchField = new GO.form.SearchField({
-//				store: config.store,
-//				width:120,
-//				emptyText: t("Search")
-//			})],
-//			store:config.store,
-//			pageSize:GO.settings.config.nav_page_size
-//		})
+		bbar: new GO.SmallPagingToolbar({
+			items:[this.searchField = new GO.form.SearchField({
+				store: config.store,
+				emptyText: t("Search")
+			})],
+			store:config.store,
+			pageSize:GO.settings.config.nav_page_size
+		})
 	});
 	
 	GO.addressbook.AddresbooksGrid.superclass.constructor.call(this, config);
@@ -85,8 +84,7 @@ Ext.extend(GO.addressbook.AddresbooksGrid, GO.grid.MultiSelectGrid, {
 			this.fireEvent('drop', this.type);
 			
 			return true;
-		}else
-		{
+		} else {
 			return false;
 		}	
 	}

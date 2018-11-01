@@ -25,11 +25,16 @@ namespace GO\Base\Mail;
 class Transport extends \Swift_SmtpTransport{
 	
 	public static function newGoInstance(){
+		
 		$o = new static (\GO::config()->smtp_server, \GO::config()->smtp_port, strtolower(\GO::config()->smtp_encryption));
 		
 		if(!empty(\GO::config()->smtp_username)){
 			$o->setUsername(\GO::config()->smtp_username)
 				->setPassword(\GO::config()->smtp_password);
+		}
+		
+		if(!GO()->getSettings()->smtpEncryptionVerifyCertificate) {
+			$o->setStreamOptions(array('ssl' => array('allow_self_signed' => true, 'verify_peer' => false, 'verify_peer_name'  => false)));
 		}
 		return $o;
 	}	

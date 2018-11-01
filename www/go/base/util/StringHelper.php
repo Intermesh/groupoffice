@@ -660,7 +660,8 @@ END;
 	 * @return	StringHelper
 	 */
 	public static function get_email_validation_regex() {
-		return "/^[_a-z0-9\-+\&\']+(\.[_a-z0-9\-+\&\']+)*@[a-z0-9\-]+(\.[a-z0-9\-]+)*(\.[a-z]{2,100})$/i";
+		return \go\core\mail\Util::EMAIL_REGEX;
+		//return "/^[_a-z0-9\-+\&\']+(\.[_a-z0-9\-+\&\']+)*@[a-z0-9\-]+(\.[a-z0-9\-]+)*(\.[a-z]{2,100})$/i";
 	}
 
 
@@ -672,7 +673,7 @@ END;
 	 * @return bool
 	 */
 	public static function validate_email($email) {
-		return Validate::email($email);
+		return \go\core\mail\Util::validateEmail($email);
 	}
 
 	/**
@@ -1012,9 +1013,9 @@ END;
 		"'<embed[^>]*>.*?</embed>'usi",
 		"'<applet[^>]*>.*?</applet>'usi",
 		"'<form[^>]*>'usi",
-		"'<input[^>]*>'usi",
-		"'<select[^>]*>.*?</select>'usi",
-		"'<textarea[^>]*>.*?</textarea>'usi",
+		//"'<input[^>]*>'usi",
+		//"'<select[^>]*>.*?</select>'usi",
+		//"'<textarea[^>]*>.*?</textarea>'usi",
 		"'</form>'usi"
 		);
 
@@ -1333,7 +1334,7 @@ END;
 				$array_allow[] = $characters_allow[$i];
 			}
 		}
-
+		
 		// Generate array of disallowed characters.
 		$characters_disallow = explode(',', $characters_disallow);
 
@@ -1354,11 +1355,10 @@ END;
 		// Generate array of allowed characters by removing disallowed
 		// characters from array.
 		$array_allow = array_diff($array_allow, $array_disallow);
-
 		// Resets the keys since they won't be consecutive after
 		// removing the disallowed characters.
 		reset($array_allow);
-    $array_allow = array_keys($array_allow);
+    $array_allow = array_values($array_allow);
 		
 		$password = '';
 		while (strlen($password) < $password_length) {

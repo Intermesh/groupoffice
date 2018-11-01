@@ -3,6 +3,7 @@ namespace go\core\auth\model;
 
 use DateInterval;
 use go\core\App;
+use go\core\Environment;
 use go\core\auth\Method;
 use go\core\orm\Entity;
 use go\core\orm\Mapping;
@@ -39,6 +40,14 @@ class Token extends Entity {
 	 * @var DateTime
 	 */
 	public $createdAt;
+	
+	/**
+	 *
+	 * When the user was last active. Updated every 5 minutes.
+	 * 
+	 * @var DateTime
+	 */
+	public $lastActiveAt;
 
 	/**
 	 * The remote IP address of the client connecting to the server
@@ -84,15 +93,22 @@ class Token extends Entity {
 	protected function init() {
 		parent::init();
 		
-		if($this->isNew()) {			
+		if($this->isNew()) {	
+			$this->lastActiveAt = new \DateTime();
 			$this->setClient();
 			$this->setLoginToken();
 //			$this->internalRefresh();
-		}else{
-			//update expiry date on every access		
-			// Only done on GET auth	
-//			$this->setExpiryDate();
-//			$this->update();
+		}else if($this->isAuthenticated ()){
+			
+			$this->oldLogin();
+			
+			if($this->lastActiveAt < new \DateTime("-5 mins")) {
+				$this->lastActiveAt = new \DateTime();				
+				
+				//also refresh token
+				$this->setExpiryDate();
+				$this->internalSave();
+			}
 		}
 	}
 	
@@ -123,8 +139,10 @@ class Token extends Entity {
 
 		if(isset($_SERVER['HTTP_USER_AGENT'])) {
 			$this->userAgent = $_SERVER['HTTP_USER_AGENT'];
-		}else if(App::get()->getEnvironment()->isCli()) {
+		}else if(Environment::get()->isCli()) {
 			$this->userAgent = 'cli';
+		} else {
+			$this->userAgent = 'Unknown';
 		}
 	}
 	
@@ -143,7 +161,9 @@ class Token extends Entity {
 	}
 		
 	private function internalRefresh() {
-		$this->accessToken = $this->generateToken();
+		if(!isset($this->accessToken)) {
+			$this->accessToken = $this->generateToken();
+		}
 		
 		$this->setExpiryDate();
 	}
@@ -161,10 +181,6 @@ class Token extends Entity {
 	public function refresh() {
 		
 		$this->internalRefresh();
-		
-		// For backwards compatibility, set the server session for the old code
-		$this->oldLogin();
-			
 		
 		return $this->save();
 	}
@@ -190,7 +206,7 @@ class Token extends Entity {
 	 */
 	public function getUser() {
 		if(!$this->user) {
-			$this->user = User::findById($this->userId);
+			$this->user = \go\modules\core\users\model\User::findById($this->userId);
 		}
 		return $this->user;
 	}
@@ -203,14 +219,21 @@ class Token extends Entity {
 	public function setAuthenticated(){
 		
 		$user = $this->getUser();
-		$user->lastlogin = time();
-		$user->logins++;
+		$user->lastLogin = new DateTime();
+		$user->loginCount++;
 		if(!$user->save()) {
 			return false;
 		}
 		
+		if(!$this->refresh()) {
+			return false;
+		}
+		
+		// For backwards compatibility, set the server session for the old code
+		$this->oldLogin();
+		
 		// Create accessToken and set expire time
-		return $this->refresh();						
+		return true;						
 	}
 	
 	/**
@@ -252,8 +275,21 @@ class Token extends Entity {
       session_start();
     }
 		
-		$_SESSION['GO_SESSION']['user_id'] = $this->userId;
-		$_SESSION['GO_SESSION']['accessToken'] = $this->accessToken;		
+		$securityToken = $_SESSION['GO_SESSION']['security_token'] ?? null;
+		
+		$_SESSION['GO_SESSION'] = ['user_id' => $this->userId, 'accessToken' => $this->accessToken, 'security_token' => $securityToken];		
+	}
+	
+	private function oldLogout() {
+		$this->oldLogin();
+		session_destroy();
+	}
+	
+	protected function internalDelete() {
+		
+		
+		$this->oldLogout();
+		return parent::internalDelete();
 	}
 	
 	/**

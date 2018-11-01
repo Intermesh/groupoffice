@@ -20,7 +20,12 @@
 
 
 namespace GO\Email;
+
 use GO;
+use go\modules\core\users\model\User;
+use go\core\orm\Mapping;
+use go\core\orm\Property;
+use GO\Email\Model\Account;
 
 class EmailModule extends \GO\Base\Module{	
 
@@ -39,6 +44,15 @@ class EmailModule extends \GO\Base\Module{
 	public function autoInstall() {
 		return true;
 	}
+	
+	public static function defineListeners() {
+
+		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
+	}
+
+	public static function onMap(Mapping $mapping) {
+		$mapping->addRelation('emailSettings', \GO\Email\Model\UserSettings::class, ['id' => 'id'], false);
+	}
 
 	public static function head(){
 
@@ -54,7 +68,7 @@ class EmailModule extends \GO\Base\Module{
 
 
 	public static function deleteUser($user) {
-		Model\Account::model()->deleteByAttribute('user_id', $user->id);
+		Account::model()->deleteByAttribute('user_id', $user->id);
 	}
 
 	public static function reminderDisplay($controller, &$html, $params){

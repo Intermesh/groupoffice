@@ -1,6 +1,7 @@
 Ext.namespace('go');
 Ext.namespace('go.flux');
 Ext.namespace('go.data');
+Ext.namespace('go.data.types');
 Ext.namespace('go.grid');
 Ext.namespace('go.form');
 Ext.namespace('go.panels');

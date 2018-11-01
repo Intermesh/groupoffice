@@ -1,4 +1,4 @@
-go.modules.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
+go.modules.community.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 	viewConfig: {
 		forceFit: true,
 		autoFill: true
@@ -29,7 +29,7 @@ go.modules.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 			
 			store: new go.data.Store({
 				fields: ['id', 'name', 'aclId', "permissionLevel"],
-				entityStore: go.Stores.get("NoteBook")
+				entityStore: "NoteBook"
 			}),
 			selModel: selModel,
 			plugins: [actions],
@@ -51,7 +51,7 @@ go.modules.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 			stateId: 'note-books-grid'
 		});
 
-		go.modules.notes.NoteBookGrid.superclass.constructor.call(this, config);
+		go.modules.community.notes.NoteBookGrid.superclass.constructor.call(this, config);
 	},
 
 	initRowActions: function () {
@@ -91,8 +91,21 @@ go.modules.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 						iconCls: 'ic-edit',
 						text: t("Edit"),
 						handler: function() {
-							var noteBookForm = new go.modules.notes.NoteBookForm();
+							var noteBookForm = new go.modules.community.notes.NoteBookForm();
 							noteBookForm.load(this.moreMenu.record.id).show();
+						},
+						scope: this						
+					},{
+						itemId: "delete",
+						iconCls: 'ic-delete',
+						text: t("Delete"),
+						handler: function() {
+							Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
+								if (btn != "yes") {
+									return;
+								}
+								go.Stores.get("NoteBook").set({destroy: [this.moreMenu.record.id]});
+							}, this);
 						},
 						scope: this						
 					},{
@@ -115,6 +128,7 @@ go.modules.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 		
 		this.moreMenu.getComponent("edit").setDisabled(record.get("permissionLevel") < GO.permissionLevels.manage);
 		this.moreMenu.getComponent("share").setDisabled(record.get("permissionLevel") < GO.permissionLevels.manage);
+		this.moreMenu.getComponent("delete").setDisabled(record.get("permissionLevel") < GO.permissionLevels.manage);
 		
 		this.moreMenu.record = record;
 		

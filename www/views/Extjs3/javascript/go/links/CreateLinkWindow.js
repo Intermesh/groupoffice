@@ -5,7 +5,7 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 	stateId: "go-create-link-windows",
 	search: function (v) {
 		
-		var filter = [];
+		var filter = {};
 		
 		var entities = [];
 
@@ -14,10 +14,10 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 		}, this);
 
 		if(entities.length) { 
-			filter.push({entities: entities});
+			filter.entities = entities;
 		}
 
-		filter.push({q: this.searchField.getValue()});
+		filter.q = this.searchField.getValue();
 			
 		
 		this.grid.store.load({
@@ -29,34 +29,12 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 
 	initComponent: function () {
 
-		var me = this;
-
-		this.searchField = new Ext.form.TwinTriggerField({
-			emptyText: t("Search"),
-			hideLabel: true,
-			xtype: "twintrigger",
+		this.searchField = new go.SearchField({
 			anchor: "100%",
-			validationEvent: false,
-			validateOnBlur: false,
-			trigger1Class: 'x-form-search-trigger',
-			trigger2Class: 'x-form-clear-trigger',
-//							enableKeyEvents: true,
-
-			onTrigger1Click: function () {
-				me.search(this.getValue());
+			handler: function(field, v){
+				this.search(v);
 			},
-			onTrigger2Click: function () {
-				this.setValue("");
-				me.search();
-			},
-			listeners: {
-				specialkey: function (field, e) {
-					if (e.getKey() == Ext.EventObject.ENTER) {
-						this.search();
-					}
-				},
-				scope: this
-			}
+			scope: this
 		});
 
 		var search = new Ext.Panel({
@@ -67,9 +45,7 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 					xtype: "fieldset",
 					items: [this.searchField]
 				}]
-		});
-
-		
+		});		
 
 		this.grid = new go.links.LinkGrid({
 			cls: 'go-search-grid',
@@ -84,7 +60,8 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 		
 		this.entityGrid = new go.links.EntityGrid({
 			width: dp(200),
-			region:"west"
+			region:"west",
+			savedSelection: "link"
 		});
 		
 		this.entityGrid.getSelectionModel().on('selectionchange', function (sm) {

@@ -8,7 +8,7 @@ use go\core\Environment;
 use go\core\exception\NotFound;
 use go\core\fs\File;
 use go\core\fs\Folder;
-use go\core\module\model\Module;
+use go\modules\core\modules\model\Module;
 use go\core\orm\Entity;
 use go\core\util\ClassFinder;
 use function GO;
@@ -40,7 +40,7 @@ abstract class Base {
 	 * 
 	 * @return model\Module;
 	 */
-	public function install() {
+	public final function install() {
 
 		try{
 			$this->installDatabase();
@@ -49,8 +49,7 @@ abstract class Base {
 			throw $e;
 		}
 		
-		GO()->getCache()->flush(false);
-		
+		GO()->rebuildCache(true);
 		GO()->getDbConnection()->beginTransaction();
 		
 		$model = new Module();
@@ -68,7 +67,7 @@ abstract class Base {
 			return false;
 		}
 		
-		if(!$this->afterInstall()) {
+		if(!$this->afterInstall($model)) {
 			$this->rollBack();
 			return false;
 		}		
@@ -82,7 +81,7 @@ abstract class Base {
 	
 	private function rollBack() {
 		GO()->getDbConnection()->rollBack();
-		$module->uninstallDatabase();
+		$this->uninstallDatabase();
 	}	
 	
 	/**
@@ -110,7 +109,7 @@ abstract class Base {
 			return false;
 		}
 		
-		GO()->getCache()->flush();
+		GO()->rebuildCache(true);
 		
 		return true;
 	}
@@ -181,7 +180,7 @@ abstract class Base {
 	 * 
 	 * @return boolean
 	 */
-	protected function afterInstall() {
+	protected function afterInstall(Module $model) {
 		return true;
 	}
 	
@@ -261,6 +260,11 @@ abstract class Base {
 	}
 
 	public static function getPath() {
+		
+		//todo use reflection
+		//
+		//$reflector = new ReflectionClass('Foo');
+		//	echo $reflector->getFileName();
 		return Environment::get()->getInstallFolder() . '/' . dirname(str_replace('\\', '/', static::class));
 	}
 	
@@ -289,7 +293,7 @@ abstract class Base {
 	}
 	
 	public static function getTitle() {
-		$title = GO()->t("name", static::getName());
+		$title = GO()->t("name", static::getPackage(), static::getName());
 		if($title == "name") {
 			return self::getName();
 		}
@@ -298,7 +302,7 @@ abstract class Base {
 	}
 	
 	public static function getDescription() {
-		$description = GO()->t("description", static::getName());
+		$description = GO()->t("description", static::getPackage(), static::getName());
 		
 		if($description == "description") {
 			return "";

@@ -218,9 +218,9 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		);
 	}
 	
-	protected function log($action, $save = true) {
+	protected function log($action, $save = true, $modifiedCustomfieldAttrs=false) {
 		if(!$this->updatingRelatedEvent) {
-			return parent::log($action, $save);
+			return parent::log($action, $save, $modifiedCustomfieldAttrs);
 		} else
 		{
 			return true;
@@ -2700,7 +2700,9 @@ The following is the error message:
 					if($language !== false)
 						\GO::language()->setLanguage($language);
 
-					\GO\Base\Mail\Mailer::newGoInstance()->send($message);
+					if(!\GO\Base\Mail\Mailer::newGoInstance()->send($message)) {
+						throw new \Exception("Failed to send invite");
+					}
 
 					
 				}

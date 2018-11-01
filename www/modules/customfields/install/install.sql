@@ -2,7 +2,7 @@
 -- Tabelstructuur voor tabel `cf_categories`
 --
 
--- DROP TABLE IF EXISTS `cf_categories`;
+DROP TABLE IF EXISTS `cf_categories`;
 CREATE TABLE IF NOT EXISTS `cf_categories` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `extends_model` varchar(50) NOT NULL DEFAULT '0',
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS `cf_categories` (
 -- Tabelstructuur voor tabel `cf_disable_categories`
 --
 
--- DROP TABLE IF EXISTS `cf_disable_categories`;
+DROP TABLE IF EXISTS `cf_disable_categories`;
 CREATE TABLE IF NOT EXISTS `cf_disable_categories` (
   `model_id` int(11) NOT NULL,
   `model_name` varchar(100) NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `cf_disable_categories` (
 -- Tabelstructuur voor tabel `cf_enabled_categories`
 --
 
--- DROP TABLE IF EXISTS `cf_enabled_categories`;
+DROP TABLE IF EXISTS `cf_enabled_categories`;
 CREATE TABLE IF NOT EXISTS `cf_enabled_categories` (
   `model_id` int(11) NOT NULL,
   `model_name` varchar(100) NOT NULL,
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `cf_enabled_categories` (
 -- Tabelstructuur voor tabel `cf_fields`
 --
 
--- DROP TABLE IF EXISTS `cf_fields`;
+DROP TABLE IF EXISTS `cf_fields`;
 CREATE TABLE IF NOT EXISTS `cf_fields` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `category_id` int(11) NOT NULL DEFAULT '0',
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `cf_fields` (
 -- Tabelstructuur voor tabel `cf_select_options`
 --
 
--- DROP TABLE IF EXISTS `cf_select_options`;
+DROP TABLE IF EXISTS `cf_select_options`;
 CREATE TABLE IF NOT EXISTS `cf_select_options` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `field_id` int(11) NOT NULL DEFAULT '0',
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS `cf_select_options` (
 -- Tabelstructuur voor tabel `cf_select_tree_options`
 --
 
--- DROP TABLE IF EXISTS `cf_select_tree_options`;
+DROP TABLE IF EXISTS `cf_select_tree_options`;
 CREATE TABLE IF NOT EXISTS `cf_select_tree_options` (
   `id` int(11) NOT NULL,
   `parent_id` int(11) NOT NULL,
@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS `cf_select_tree_options` (
 -- Tabelstructuur voor tabel `cf_tree_select_options`
 --
 
--- DROP TABLE IF EXISTS `cf_tree_select_options`;
+DROP TABLE IF EXISTS `cf_tree_select_options`;
 CREATE TABLE IF NOT EXISTS `cf_tree_select_options` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `parent_id` int(11) NOT NULL,
@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS `cf_tree_select_options` (
 
 -- --------------------------------------------------------
 
--- DROP TABLE IF EXISTS `cf_blocks`;
+DROP TABLE IF EXISTS `cf_blocks`;
 CREATE TABLE IF NOT EXISTS `cf_blocks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL DEFAULT '',
@@ -137,7 +137,7 @@ CREATE TABLE IF NOT EXISTS `cf_blocks` (
 
 -- --------------------------------------------------------
 
--- DROP TABLE IF EXISTS `cf_enabled_blocks`;
+DROP TABLE IF EXISTS `cf_enabled_blocks`;
 CREATE TABLE IF NOT EXISTS `cf_enabled_blocks` (
 	`block_id` int(11) NOT NULL DEFAULT 0,
 	`model_id` int(11) NOT NULL DEFAULT 0,

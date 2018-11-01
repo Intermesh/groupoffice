@@ -283,7 +283,7 @@ abstract class FileSystemObject {
 	 * @param string $name
 	 * @return boolean
 	 */
-	public function setName($name) {		
+	public function rename($name) {		
 				
 		$oldPath = $this->path;
 		$newPath = dirname($this->path) . '/' . $name;

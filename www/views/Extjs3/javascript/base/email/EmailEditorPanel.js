@@ -175,7 +175,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		config.items.push(this.hiddenAttachmentsField);
 		config.items.push(this.hiddenInlineImagesField);
 		
-		var anchorHeight = config.enableSubjectField ? "-20" : "100%";
+		var anchorHeight = config.enableSubjectField ? "-" + dp(24) : "100%";
 
 
 		this.htmlEditor = new GO.form.HtmlEditor({
@@ -347,15 +347,17 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		attachmentsEl.setHeight("auto");
 		var attachmentsElHeight = attachmentsEl.getHeight();
 		
-		if(attachmentsElHeight > 89)
+		if(attachmentsElHeight > dp(89))
 		{
-			attachmentsElHeight = 89;
+			attachmentsElHeight = dp(89);
 			this.attachmentsView.getEl().setHeight(attachmentsElHeight);
 		}			
-		height += attachmentsElHeight+attachmentsEl.getMargins('tb');
+		height += attachmentsElHeight+attachmentsEl.getMargins('tb')  + dp(16);
 		
 		if(this.enableSubjectField)
-			height+=30;
+			height+=dp(32);
+		
+	
 		
 		var newAnchor = "100% -"+height;
 		
@@ -434,7 +436,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 	getAttachmentsButton : function(){
 		
 		
-		if(go.Modules.isAvailable("community", "files"))
+		if(go.Modules.isAvailable("legacy", "files"))
 		{
 			var uploadItems = [];
 		
@@ -465,7 +467,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 				text : t("Add from Group-Office", "email").replace('{product_name}', GO.settings.config.product_name),
 				handler : function()
 				{
-					if(go.Modules.isAvailable("community", "files"))
+					if(go.Modules.isAvailable("legacy", "files"))
 					{
 						GO.files.createSelectFileBrowser();
 

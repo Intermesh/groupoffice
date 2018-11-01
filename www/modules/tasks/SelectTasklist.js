@@ -49,6 +49,52 @@ GO.tasks.SelectTasklist = function(config){
 }
 Ext.extend(GO.tasks.SelectTasklist, GO.form.ComboBoxReset, {
 	
+	setValue: function (id) {
+
+		if (!id) {
+			GO.tasks.SelectTasklist.superclass.setValue.call(this, id);
+			return;
+		}
+		var r = this.findRecord(this.valueField, id);
+
+		if (!r)
+		{
+			GO.request({
+				url: 'tasks/tasklist/load',
+				params: {id: id},
+				success: function (response, options, result) {
+
+					var comboRecord = Ext.data.Record.create([{
+							name: this.valueField
+						}, {
+							name: this.displayField
+						}]);
+
+					var recordData = {};
+
+					if (this.store.fields && this.store.fields.keys) {
+						for (var i = 0; i < this.store.fields.keys.length; i++) {
+							recordData[this.store.fields.keys[i]] = "";
+						}
+					}
+
+					recordData[this.valueField] = id;
+					recordData[this.displayField] = result.data.name;
+
+					var currentRecord = new comboRecord(recordData);
+					this.store.add(currentRecord);
+					GO.tasks.SelectTasklist.superclass.setValue.call(this, id);
+				},
+				scope: this
+			});
+		} else
+		{
+			GO.tasks.SelectTasklist.superclass.setValue.call(this, id);
+		}
+
+
+	}
+	
 	/*afterRender : function(){
 		
 		

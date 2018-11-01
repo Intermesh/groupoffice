@@ -26,12 +26,15 @@ class Table {
 	 * @return self
 	 */
 	public static function getInstance($name) {
-		
 		if(!isset(self::$cache[$name])) {
 			self::$cache[$name] = new Table($name);
 		}
 		
 		return self::$cache[$name];	
+	}
+	
+	public static function destroyInstances() {
+		self::$cache = [];
 	}
 	
 	private $name;
@@ -40,7 +43,7 @@ class Table {
 	public function __construct($name) {
 		$this->name = $name;
 		
-		$this->createFromDatabase();
+		$this->init();
 	}	
 	
 	/**
@@ -62,12 +65,7 @@ class Table {
 		App::get()->getCache()->delete($this->getCacheKey());
 	}
 
-	/**
-	 * Get all columns of a model
-	 *
-	 * @return Column[] Array with column name as key
-	 */
-	private function createFromDatabase() {
+	private function init() {
 		
 		if (isset($this->columns)) {
 			return $this->columns;
@@ -75,15 +73,12 @@ class Table {
 		
 		$cacheKey = $this->getCacheKey();
 
-		if (($columns = App::get()->getCache()->get($cacheKey))) {
-			$this->columns = $columns;
-			return $this->columns;
+		if (($cache = App::get()->getCache()->get($cacheKey))) {
+			$this->columns = $cache['columns'];
+			$this->pk = $cache['pk'];
+			return;
 		}	
-
-//		if (!Utils::tableExists($this->tableName)) {
-//			throw new Exception("Table '".$this->tableName."' does not exist!");
-//		}	
-//		
+		
 		$this->columns = [];
 
 		$sql = "SHOW FULL COLUMNS FROM `" . $this->name . "`;";
@@ -96,10 +91,10 @@ class Table {
 
 		$this->processIndexes($this->name);
 
-		App::get()->getCache()->set($cacheKey, $this->columns);
+		App::get()->getCache()->set($cacheKey, ['columns' => $this->columns, 'pk' => $this->pk]);
 
 
-		return $this->columns;
+		return;
 	}
 	
 	/**
@@ -117,6 +112,8 @@ class Table {
 			throw new \Exception("The name '$fieldName' is reserved. Please choose another column name.");
 		}
 	}
+	
+	private $pk = [];
 
 	private function createColumn($field) {
 		
@@ -211,7 +208,7 @@ class Table {
 			if ($index['Key_name'] === 'PRIMARY') {
 
 				$this->columns[$index['Column_name']]->primary = true;
-
+				$this->pk[] = $index['Column_name'];
 				//don't validate uniqueness on primary key
 				continue;
 			}
@@ -302,29 +299,17 @@ class Table {
 	 *
 	 * @return string[] eg. ['id']
 	 */
-	public function getPrimaryKey() {
-		
-		$cacheKey = $this->name.'::pk';
-		
-		$pk = App::get()->getCache()->get($cacheKey);
-		
-		if(!$pk) {
-			$pk = [];
-			foreach($this->getColumns() as $column) {
-				
-				if($column->primary) {				
-					$pk[] = $column->name;
-				}
-			}
-			
-			if(empty($pk)) {
-				App::get()->debug("WARNING: No primary key defined for database table: ".self::getTableName());
-			}
-			
-			App::get()->getCache()->set($cacheKey, $pk);
-		}
-		
-		return $pk;
+	public function getPrimaryKey() {		
+		return $this->pk;
+	}
+	
+	/**
+	 * Truncate the table
+	 * 
+	 * @return boolean
+	 */
+	public function truncate() {
+		return GO()->getDbConnection()->query("TRUNCATE TABLE ".$this->getName())->execute();
 	}
 
 }

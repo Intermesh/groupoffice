@@ -23,13 +23,7 @@ require('../../GO.php');
 
 
 // Authentication backend
-
-if(empty(\GO::config()->webdav_auth_basic)) {	
-	$authBackend = new \GO\Dav\Auth\Backend();
-}else
-{
-	$authBackend = new \GO\Dav\Auth\BasicBackend();
-}
+$authBackend = new \GO\Dav\Auth\BasicBackend();
 
 
 if (!\GO::modules()->isInstalled('dav')){
@@ -56,12 +50,11 @@ $server->on('exception', function($e){
 
 //baseUri can also be /webdav/ with:
 //Alias /webdav/ /path/to/files.php
-$baseUri = strpos($_SERVER['REQUEST_URI'],'files.php') ? \GO::config()->host.'modules/dav/files.php/' : '/webdav/';
+$baseUri = strpos($_SERVER['REQUEST_URI'],'files.php') ? \GO()->getSettings()->URL . 'modules/dav/files.php/' : '/webdav/';
 $server->setBaseUri($baseUri);
 
 
-$tmpDir = \GO::config()->getTempFolder()->createChild('dav',false);
-
+$tmpDir = \GO::config()->getTempFolder()->parent()->createChild('dav',false);
 
 $locksDir = $tmpDir->createChild('locksdb', false);
 $locksDir->create();
@@ -88,4 +81,11 @@ $tempFF = new Sabre\DAV\TemporaryFileFilterPlugin($tmpDir->path());
 $server->addPlugin($tempFF);
 
 // And off we go!
+
+if(GO()->getDebugger()->enabled) {
+	$server->on("exception", function($e) {
+		\go\core\ErrorHandler::logException($e);
+	});
+}
+
 $server->exec();

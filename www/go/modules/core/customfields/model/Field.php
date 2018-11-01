@@ -27,9 +27,7 @@ class Field extends AclItemEntity {
 	public $suffix;
 	
 	public $datatype;
-	
-	//todo move to options
-	public $function;
+
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()->addTable('core_customfields_field', 'f');
@@ -41,6 +39,14 @@ class Field extends AclItemEntity {
 
 	protected static function aclEntityKeys() {
 		return ['fieldSetId' => 'id'];
+	}
+	
+	/**
+	 * LEGACY. $field->multiselect is used many times.
+	 * fix before removing a property
+	 */
+	public function getMultiselect() {
+		return $this->getOptions('multiselect');
 	}
 	
 	public function getOptions() {

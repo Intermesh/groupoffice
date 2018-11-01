@@ -94,9 +94,14 @@ class Debugger {
 	private $entries = [];
 	
 	public function __construct() {
-		$this->enabled = !empty(GO()->getConfig()['general']['debug']);
-		if($this->enabled) {
-			$this->logPath = GO()->getDataFolder()->getFile('log/debug.log')->touch(true)->getPath();
+		try {
+			$this->enabled = !empty(GO()->getConfig()['general']['debug']);
+			if($this->enabled) {
+				$this->logPath = GO()->getDataFolder()->getFile('log/debug.log')->getPath();
+			}
+		} catch (\go\core\exception\ConfigurationException $e) {
+			//GO is not configured / installed yet.
+			$this->enabled = true;
 		}
 	}
 
@@ -184,6 +189,10 @@ class Debugger {
 			}
 		}
 		
+		if(Environment::get()->isCli()) {
+			echo $entry . "\n";
+		}
+		
 		$this->entries[] = $entry;
 		
 	}
@@ -201,7 +210,7 @@ class Debugger {
 		return intval(($this->getMicroTime() - $_SERVER["REQUEST_TIME_FLOAT"])*1000) . 'ms';
 	}
 
-	public function debugCalledFrom($limit = 5) {
+	public function debugCalledFrom($limit = 10) {
 
 		$this->debug("START BACKTRACE");
 		$trace = debug_backtrace();

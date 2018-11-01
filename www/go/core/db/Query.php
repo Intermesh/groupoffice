@@ -29,14 +29,14 @@ use ReflectionClass;
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
-class Query extends Criteria implements \IteratorAggregate, \JsonSerializable {
+class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \go\core\data\ArrayableInterface {
 
 	private $tableAlias;
 	private $distinct;
 	private $select = [];
-	private $orderBy;
-	private $groupBy;
-	private $having;
+	private $orderBy = [];
+	private $groupBy = [];
+	private $having = [];
 	private $limit;
 	private $offset = 0;
 	protected $joins = [];
@@ -222,12 +222,12 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable {
 	/**
 	 * Set sort order
 	 *
-	 * @param array $by or ['field1'=>'ASC','field2'=>'DESC', new go\core\db\Expression('ISNULL(column) ASC')] for multiple values	 
+	 * @param array $by eg. ['field1'=>'ASC','field2'=>'DESC', new go\core\db\Expression('ISNULL(column) ASC')] for multiple values	 
 	 * 
 	 * @return static
 	 */
-	public function orderBy($by) {
-		$this->orderBy = $by;
+	public function orderBy(array $by, $append = false) {
+		$this->orderBy = $append ? array_merge($this->orderBy, $by) : $by;
 		return $this;
 	}
 
@@ -237,8 +237,8 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable {
 	 * @param array $columns eg. array('t.id');
 	 * @return static
 	 */
-	public function groupBy(array $columns) {
-		$this->groupBy = $columns;
+	public function groupBy(array $columns, $append = false) {
+		$this->groupBy = $append ? array_merge($this->groupBy, $columns) : $columns;
 		return $this;
 	}
 
@@ -348,6 +348,34 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable {
 		//todo
 		//return $this->createCommand()->toString();
 	}
+	
+	/**
+	 *
+	 * @var Connection
+	 */
+	private $dbConn;
+	
+	/**
+	 * Set database connection.
+	 * 
+	 * Default to App::get()->getDbConnection();
+	 * 
+	 * @param \go\core\db\Connection $conn
+	 * @return $this
+	 */
+	public function setDbConnection(Connection $conn) {
+		$this->dbConn = $conn;
+		
+		return $this;
+	}
+	
+	private function getDbConnection() {
+		if(!isset($this->dbConn)) {
+			$this->dbConn = App::get()->getDbConnection();
+		}
+		
+		return $this->dbConn;
+	}
 
 	/**
 	 * Executes the query and returns the statement
@@ -355,7 +383,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable {
 	 * @return Statement
 	 */
 	public function execute() {
-		$statement = App::get()->getDbConnection()->select($this);
+		$statement = $this->getDbConnection()->select($this);
 		if (!$statement->execute()) {
 			return false;
 		}
@@ -414,7 +442,21 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable {
 	}
 
 	public function jsonSerialize() {
-		return $this->execute()->fetchAll();
+		return $this->toArray();
+	}
+
+	public function toArray($properties = null) {
+		$arr = [];
+		foreach($this->execute() as $entity) {
+			if($entity instanceof \go\core\data\ArrayableInterface) {
+				$arr[] = $entity->toArray($properties);
+			} else
+			{
+				$arr[] = $entity;
+			}
+		}
+		
+		return $arr;
 	}
 
 }

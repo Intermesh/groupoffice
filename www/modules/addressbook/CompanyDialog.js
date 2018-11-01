@@ -92,7 +92,7 @@ GO.addressbook.CompanyDialog = function(config)
 		]
 	});				
   
-	this.id= 'addressbook-window-new-company';
+	this.stateId= 'addressbook-window-new-company';
 	this.layout= 'fit';
 	this.modal= false;
 	this.shadow= false;

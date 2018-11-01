@@ -3,7 +3,7 @@
 namespace go\core\jmap;
 
 use go\core\acl\model\Acl;
-use go\core\App;
+use go\core\db\Query;
 use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\exception\StateMismatch;
@@ -35,6 +35,11 @@ abstract class EntityController extends ReadOnlyEntityController {
 		
 		if(!isset($params['destroy'])) {
 			$params['destroy'] = [];
+		}
+		
+		
+		if(count($params['create']) + count($params['update'])  + count($params['destroy']) > Capabilities::get()->maxObjectsInSet) {
+			throw new InvalidArguments("You can't set more than " . Capabilities::get()->maxObjectsInGet . " objects");
 		}
 		
 		return $params;
@@ -79,6 +84,11 @@ abstract class EntityController extends ReadOnlyEntityController {
 	private function createEntitites($create, &$result) {
 		foreach ($create as $clientId => $properties) {
 			
+			if(!$this->canCreate()) {
+				$result['notCreated'][$id] = new SetError("forbidden");
+				continue;
+			}
+			
 			$entity = $this->create($properties);
 
 			if (!$entity->hasValidationErrors()) {
@@ -90,6 +100,11 @@ abstract class EntityController extends ReadOnlyEntityController {
 			}
 		}
 	}
+	
+	protected function canCreate() {
+		return true;
+	}
+	
 	/**
 	 * @todo Check permissions
 	 * 
@@ -129,6 +144,10 @@ abstract class EntityController extends ReadOnlyEntityController {
 
 		return empty($diff) ? null : $diff;
 	}
+	
+	protected function canUpdate(Entity $entity) {
+		return $entity->hasPermissionLevel(Acl::LEVEL_WRITE);
+	}
 
 	/**
 	 * 
@@ -143,7 +162,10 @@ abstract class EntityController extends ReadOnlyEntityController {
 				continue;
 			}
 			
-			if(!$entity->hasPermissionLevel(Acl::LEVEL_WRITE)) {
+			//apply new values before canUpdate so this function can check for modified properties too.
+			$entity->setValues($properties);
+			
+			if(!$this->canUpdate($entity)) {
 				$result['notUpdated'][$id] = new SetError("forbidden");
 				continue;
 			}
@@ -161,17 +183,26 @@ abstract class EntityController extends ReadOnlyEntityController {
 	
 	protected function update(Entity $entity, array $properties) {
 		
-		$entity->setValues($properties);
+		
 		$entity->save();
 		
 		return !$entity->hasValidationErrors();
+	}
+	
+	protected function canDestroy(Entity $entity) {
+		return $entity->hasPermissionLevel(Acl::LEVEL_DELETE);
 	}
 
 	private function destroyEntities($destroy, &$result) {
 		foreach ($destroy as $id) {
 			$entity = $this->getEntity($id);
-			if (!$entity || !$entity->hasPermissionLevel(Acl::LEVEL_DELETE)) {
+			if (!$entity) {
 				$result['notDestroyed'][$id] = new SetError('notFound');
+				continue;
+			}
+			
+			if(!$this->canDestroy($entity)) {
+				$result['notDestroyed'][$id] = new SetError("forbidden");
 				continue;
 			}
 
@@ -230,16 +261,30 @@ abstract class EntityController extends ReadOnlyEntityController {
 		
 		$cls = $this->entityClass();
 		
-		if(!($cls instanceof Entity)) {
+		if(!is_a($cls, Entity::class, true)) {
 			//not jmap entity so we can't calculate
 			throw new CannotCalculateChanges();
 		}
 		
-		$acls = $cls::findAcls();		
-		if($acls && (Acl::findGrantedSince(App::get()->getAuthState()->getUser()->id, $p['sinceState'], $acls)->limit(1)->execute()->fetch() ||
-			Acl::findRevokedSince(App::get()->getAuthState()->getUser()->id, $p['sinceState'], $acls)->limit(1)->execute()->fetch())) {
-			throw new CannotCalculateChanges();
-		}			
+		//find the old state changelog entry
+		
+//		$change = (new Query())
+//						->select("*")
+//						->from("core_change")
+//						->where(["entityTypeId" => $cls::getType()->id, 'modSeq' => $p['sinceState']])
+//						->single();
+//		
+//		if(!$change) {
+//			//State is too old.
+//			throw new CannotCalculateChanges();
+//		}
+		
+//		TODO!!!!
+//		$acls = $cls::findAcls();		
+//		if($acls && (Acl::findGrantedSince(App::get()->getAuthState()->getUserId(), $p['sinceState'], $acls)->limit(1)->execute()->fetch() ||
+//			Acl::findRevokedSince(App::get()->getAuthState()->getUserId(), $p['sinceState'], $acls)->limit(1)->execute()->fetch())) {
+//			throw new CannotCalculateChanges();
+//		}			
 
 		$result = [
 				'accountId' => $p['accountId'],
@@ -250,28 +295,30 @@ abstract class EntityController extends ReadOnlyEntityController {
 				'removed' => []
 		];
 
-		$tables = $cls::getMapping()->getTables();
-		$firstTable = array_shift($tables);
-
-		$entities = $cls::find()
-						->select([$firstTable->getAlias() . '.id', $firstTable->getAlias() . '.modSeq', $firstTable->getAlias() . '.deletedAt'])
+		
+		$entityType = $cls::getType();
+		
+		$changes = (new Query)->select('entityId,destroyed,modSeq')
+						->from('core_change')
 						->fetchMode(PDO::FETCH_ASSOC)
 						->limit($p['maxChanges'])
 						->orderBy(['modSeq' => 'ASC'])
 						->andWhere('modSeq', '>', $p['sinceState']);
 		
-		$cls::applyAclToQuery($entities);
+		Acl::applyToQuery($changes, "t.aclId");
+						
+					
 		
-		foreach ($entities as $entity) {
+		foreach ($changes as $entity) {
 			if (isset($entity['deletedAt'])) {
-				$result['removed'][] = $entity['id'];
+				$result['removed'][] = $entity['entityId'];
 			} else {
-				$result['changed'][] = $entity['id'];
+				$result['changed'][] = $entity['entityId'];
 			}
 		}
 
 		if(isset($entity)){
-			$result['newState'] = $entity['modSeq'];
+			$result['newState'] = (int) $entity['modSeq'];
 		} else
 		{
 			$result['newState'] = $this->getState();

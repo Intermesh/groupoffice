@@ -1,15 +1,67 @@
 <?php
-
 namespace go\core\util;
 
 use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Key;
-use IFW;
+use Exception;
+use GO;
+use go\core\fs\File;
 
 class Crypt {
-	
-	private static $tag = '{ifw1}';
-	
+
+	/** Encryption Procedure
+	 *
+	 * 	@param   mixed    msg      message/data
+	 * 	@param   string   k        encryption key
+	 * 	@param   boolean  base64   base64 encode result
+	 *
+	 * 	@return  string   ciphertext or
+	 *           boolean  false on error
+	 */
+	public static function encrypt($plaintext, $password = null) {
+
+		if (!isset($password)) {
+			$key = self::getKey();
+			return "{GOCRYPT2}" . Crypto::encrypt($plaintext, $key);
+		} else {
+			return "{GOCRYPT2}" . Crypto::encryptWithPassword($plaintext, $password);
+		}
+	}
+
+	/** Decryption Procedure
+	 *
+	 * 	@param   string   msg      output from encrypt()
+	 * 	@param   string   k        encryption key
+	 * 	@param   boolean  base64   base64 decode msg
+	 *
+	 * 	@return  string   original message/data or
+	 *           boolean  false on error
+	 */
+	public static function decrypt($ciphertext, $password = null) {
+
+		if (empty($ciphertext)) {
+			return "";
+		}
+
+		if (substr($ciphertext, 0, 9) == '{GOCRYPT}') {
+			return self::decrypt1($ciphertext, $password);
+		} else if (substr($ciphertext, 0, 10) == '{GOCRYPT2}') {
+			try {
+				if (empty($password)) {
+					$k = self::getKey();
+					$plaintext = Crypto::decrypt(substr($ciphertext, 10), $k);
+				} else {
+					$plaintext = Crypto::decryptWithPassword(substr($ciphertext, 10), $password);
+				}
+			} catch (\Exception $ex) {
+				$plaintext = '';
+			}
+			return $plaintext;
+		} else {
+			return $ciphertext;
+		}
+	}
+
 	private static $key;
 
 	/**
@@ -17,12 +69,11 @@ class Crypt {
 	 * @return Key
 	 */
 	private static function getKey() {
-		
-		if(!isset(self::$key)) {
-			$file = \go\core\App::get()->getConfig()->getDataFolder()->getFile('crypt/key.txt');
 
-			if (!$file->exists()) {				
-				$file->getFolder()->create();
+		if (!isset(self::$key)) {
+			$file = GO()->getDataFolder()->getFile('defuse-crypto.txt');
+
+			if (!$file->exists()) {
 				self::$key = Key::createNewRandomKey();
 				$file->putContents(self::$key->saveToAsciiSafeString());
 				$file->chmod(0600);
@@ -34,43 +85,105 @@ class Crypt {
 
 		return self::$key;
 	}
-	
+
 	/**
-	 * Encrypt data reversible using the server key
+	 * Old deprecated mcrypt base decrypt.
 	 * 
-	 * @param string $secretData
-	 * @return string Cypher text
+	 * @param type $msg
+	 * @param type $k
+	 * @param type $base64
+	 * @return boolean
+	 * @throws Exception
 	 */
-	public function encrypt($secretData) {
-		if(empty($secretData)) {
-			return "";
+	private static function decrypt1($msg, $k, $base64 = true) {
+
+		//Check if mcrypt is supported. mbstring.func_overload will mess up substring with this function
+		if (!function_exists('mcrypt_module_open') || ini_get('mbstring.func_overload') > 0)
+			return false;
+
+		$msg = str_replace("{GOCRYPT}", "", $msg, $count);
+
+		if ($count != 1)
+			return false;
+
+		if (empty($k)) {
+			$k = self::getKey1();
+			if (empty($k)) {
+				throw new Exception('Could not generate private key');
+			}
 		}
-		return self::$tag.Crypto::encrypt($secretData, $this->getKey());
+
+		if ($base64)
+			$msg = base64_decode($msg);# base64 decode?
+		# open cipher module (do not change cipher/mode)
+		if (!$td = mcrypt_module_open('rijndael-256', '', 'ctr', ''))
+			return false;
+
+		$iv = substr($msg, 0, 32);		# extract iv
+		$mo = strlen($msg) - 32;		# mac offset
+		$em = substr($msg, $mo);		# extract mac
+		$msg = substr($msg, 32, strlen($msg) - 64);	# extract ciphertext
+		$mac = self::pbkdf2($iv . $msg, $k, 1000, 32); # create mac
+
+		if ($em !== $mac)		 # authenticate mac
+			return false;
+
+		if (mcrypt_generic_init($td, $k, $iv) !== 0) # initialize buffers
+			return false;
+
+		$msg = mdecrypt_generic($td, $msg);	 # decrypt
+		$msg = unserialize($msg);		# unserialize
+
+		mcrypt_generic_deinit($td);		# clear buffers
+		mcrypt_module_close($td);		# close cipher module
+
+		return $msg;		 # return original msg
 	}
-	
-	/**
-	 * Decrypt data
-	 * 
-	 * @param string $ciphertext
-	 * @return string Decrypted text
+
+	/** PBKDF2 Implementation (as described in RFC 2898);
+	 *
+	 * 	@param   string  p   password
+	 * 	@param   string  s   salt
+	 * 	@param   int     c   iteration count (use 1000 or higher)
+	 * 	@param   int     kl  derived key length
+	 * 	@param   string  a   hash algorithm
+	 *
+	 * 	@return  string  derived key
 	 */
-	public function decrypt($ciphertext) {
-		
-		if(empty($ciphertext)) {
-			return "";
+	private static function pbkdf2($p, $s, $c, $kl, $a = 'sha256') {
+
+		$hl = strlen(hash($a, null, true)); # Hash length
+		$kb = ceil($kl / $hl);	# Key blocks to compute
+		$dk = '';		# Derived key
+		# Create key
+		for ($block = 1; $block <= $kb; $block++) {
+
+			# Initial hash for this block
+			$ib = $b = hash_hmac($a, $s . pack('N', $block), $p, true);
+
+			# Perform block iterations
+			for ($i = 1; $i < $c; $i++)
+
+			# XOR each iterate
+				$ib ^= ($b = hash_hmac($a, $b, $p, true));
+
+			$dk .= $ib; # Append iterated block
 		}
-		
-		if(!$this->isEncrypted($ciphertext)) {
-			throw new \Exception("Not encrypted with this utility");
-		}
-		
-		$ciphertext = substr($ciphertext, strlen(self::$tag));
-		
-		return Crypto::decrypt($ciphertext, $this->getKey());		
+
+		# Return derived key of correct length
+		return substr($dk, 0, $kl);
 	}
-	
-	public function isEncrypted($ciphertext) {
-		return strpos($ciphertext, self::$tag) === 0;
+
+	private static function getKey1() {
+
+		$key_file = GO()->getDataFolder()->getFile('key.txt');
+
+		if ($key_file->exists()) {
+			$key = $key_file->getContents();
+		} else {
+			throw new \Exception("Encryoption key for old method not found!");
+		}
+		return $key;
 	}
 
 }

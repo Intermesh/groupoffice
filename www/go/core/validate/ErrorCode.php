@@ -88,6 +88,11 @@ class ErrorCode {
 	 */
 	const UNIQUE = 11;
 	
+	/**
+	 * When the user does something that is not allowed
+	 */
+	const FORBIDDEN = 12;
+	
 	
 	private static $descriptions = [
 			self::REQUIRED => 'Property is required',
@@ -100,7 +105,8 @@ class ErrorCode {
 			self::DEPENDENCY_NOT_SATISFIED => 'Dependency not satisfied',
 			self::CONNECTION_ERROR => 'Error while establishing connection',
 			self::INVALID_INPUT => 'Invalid input',
-			self::UNIQUE => 'The property must be unique'
+			self::UNIQUE => 'The property must be unique',
+			self::FORBIDDEN => 'Forbidden'
 	];	
 	
 	/**

@@ -4,6 +4,14 @@ GO.Window = function(config)
 		{
 			config={};
 		}
+		
+		//make sure window fits screen
+		if(config.width && config.width > window.innerWidth) {
+			config.width = window.innerWidth - dp(32);
+		}		
+		if(config.height && config.height > window.innerHeight) {
+			config.height = window.innerHeight	- dp(32);
+		}
 	
 		Ext.applyIf(config,{
 			keys:[],
@@ -59,16 +67,16 @@ GO.Window = Ext.extend(Ext.Window,{
 	},
 		
 	autoSize : function(){
-		if(go.Modules.isAvailable("community", "viewport")){
+		if(!this.maximized){
 
-			var vpH=GO.viewport.getEl().getHeight();
-			var vpW=GO.viewport.getEl().getWidth();
+			var vpW = window.innerWidth;
+			var vpH = window.innerHeight;
 
 			if (this.getHeight() > vpH){
-				this.setHeight(vpH);
+				this.setHeight(vpH * .9);
 			}
 			if(this.getWidth() > vpW) {
-				this.setWidth(vpW);
+				this.setWidth(vpW * .9);
 			}
 
 			var pos = this.getPosition();
@@ -78,11 +86,18 @@ GO.Window = Ext.extend(Ext.Window,{
 				this.center();
 		}
 	},
+	
+	render : function(container, position){
+		container = Ext.get("window-container");
+		return GO.Window.superclass.render.call(this, container, position);
+	},
 
-	show : function(){		
+
+	show : function(animateTarget, cb, scope){
+	
 		GO.dialogListeners.apply(this);
 		
-		GO.Window.superclass.show.call(this);
+		GO.Window.superclass.show.call(this, animateTarget, cb, scope);
 	},
 	
 	removeTempListeners : function() {

@@ -83,7 +83,7 @@ GO.customfields.FieldDialog = function(config){
 
 
 	this.maxLengthField = new GO.form.NumberField({
-		name: 'max_length',
+		name: 'options.maxLength',
 		value: 50,
 		fieldLabel: t("Max. number of characters", "customfields"),
 		minValue: 0,
@@ -114,7 +114,7 @@ GO.customfields.FieldDialog = function(config){
 	});
 
 	this.functionField = new Ext.form.TextField({
-		name: 'function',
+		name: 'options.function',
 		anchor:'-20',
 		allowBlank:true,
 		fieldLabel: t("Function")
@@ -194,14 +194,14 @@ GO.customfields.FieldDialog = function(config){
 		}),
 		this.categoryField,
 		this.decimalsField = new GO.form.NumberField({
-			name:'number_decimals',
+			name:'numberDecimals',
 			decimals:0,
 			width:40,
 			value:2,
 			fieldLabel:t("Number of decimals", "customfields")
 		}),
 		this.addressbookIdsField = new Ext.form.TextField({
-			name:'addressbook_ids',
+			name:'addressbookIds',
 			maxLength:255,
 			fieldLabel:t("Only from these addressbooks (IDs)", "customfields"),
 			hidden: true,
@@ -225,7 +225,7 @@ GO.customfields.FieldDialog = function(config){
 		}),
 		this.regexField = new Ext.form.TextField({
 			disabled:true,
-			name:'validation_regex',
+			name:'validationRegex',
 			fieldLabel:t("Validation regexp.", "customfields"),
 			anchor:'-20'
 		}),this.helptextField = new Ext.form.TextField({
@@ -486,7 +486,8 @@ Ext.extend(GO.customfields.FieldDialog, Ext.Window,{
 					"maxLength" : this.maxLengthField.getValue(),
 					"height": this.heightField.getValue(),
 					"multiselect": this.multiSelectCB.getValue(),
-					"numberDecimals": this.decimalsField.getValue()
+					"numberDecimals": this.decimalsField.getValue(),
+					"function": this.functionField.getValue()
 					
 				}),
 				'select_options' : Ext.encode(this.optionsGrid.getGridData())

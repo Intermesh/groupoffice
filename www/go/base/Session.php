@@ -51,29 +51,31 @@ class Session extends Observable{
 		//In some cases it doesn't make sense to use the session because the client is
 		//not capable. (WebDAV for example).
 		if(!defined("GO_NO_SESSION")){
-			if(!isset($_SESSION)) {
+			if (session_status() == PHP_SESSION_NONE) {
 				
-				//without cookie_httponly the cookie can be accessed by malicious scripts 
-				//injected to the site and its value can be stolen. Any information stored in 
-				//session tokens may be stolen and used later for identity theft or
-				//user impersonation.
-				ini_set("session.cookie_httponly",1);
-				
-				//Avoid session id in url's to prevent session hijacking.
-				ini_set('session.use_only_cookies',1);
-				
-				if(Util\Http::isHttps()) {
-					ini_set('session.cookie_secure',1);
-				}
-								
-								
-				if(isset($_REQUEST['GOSID'])){
-					session_id($_REQUEST['GOSID']);				
-				}
-				
+				if(!headers_sent()) {
+					//without cookie_httponly the cookie can be accessed by malicious scripts 
+					//injected to the site and its value can be stolen. Any information stored in 
+					//session tokens may be stolen and used later for identity theft or
+					//user impersonation.
+					ini_set("session.cookie_httponly",1);
+
+					//Avoid session id in url's to prevent session hijacking.
+					ini_set('session.use_only_cookies',1);
+
+					if(Util\Http::isHttps()) {
+						ini_set('session.cookie_secure',1);
+					}
+
+
+					if(isset($_REQUEST['GOSID'])){
+						session_id($_REQUEST['GOSID']);				
+					}
 			
-				session_name('groupoffice');
-				session_start();				
+					session_name('groupoffice');
+
+					session_start();				
+				}
 			
 				if(isset($_REQUEST['GOSID'])){
 					if(!isset($_REQUEST['security_token']) || $_SESSION['GO_SESSION']['security_token']!=$_REQUEST['security_token']){
@@ -213,6 +215,12 @@ class Session extends Observable{
 	 */
 	public function user(){
 		if(empty($this->values['user_id'])){
+			// Check Bearer token before returning null
+			$state = new \go\core\jmap\State();
+			if(!empty($state->getUserId())) {
+				$this->values['user_id'] = $state->getUserId();
+				return Model\User::model()->findByPk($state->getUserId(), array(), true);
+			}
 			return null;
 		}else{		
 			
@@ -322,6 +330,9 @@ class Session extends Observable{
 				
 				$this->clearUserTempFiles();
 			}
+			
+			//Set authentication for new framework
+			\GO()->setAuthState(new \go\core\cli\State($user->id));
 
 			$this->fireEvent('login', array($username, $password, $user, $countLogin));
 			

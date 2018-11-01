@@ -1,10 +1,11 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
-DROP TABLE IF EXISTS `cf_core_user`;
-CREATE TABLE `cf_core_user` (
-  `model_id` int(11) NOT NULL DEFAULT '0'
+DROP TABLE IF EXISTS `core_user_custom_fields`;
+CREATE TABLE `core_user_custom_fields` (
+  `id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 
 DROP TABLE IF EXISTS `core_acl`;
 CREATE TABLE `core_acl` (
@@ -50,6 +51,7 @@ CREATE TABLE `core_auth_token` (
   `userId` int(11) NOT NULL,
   `createdAt` datetime NOT NULL,
   `expiresAt` datetime NOT NULL,
+	`lastActiveAt` DATETIME NOT NULL,
   `remoteIpAddress` varchar(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
   `userAgent` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `passedMethods` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL
@@ -94,21 +96,11 @@ CREATE TABLE `core_entity` (
   `id` int(11) NOT NULL,
   `moduleId` int(11) DEFAULT NULL,
   `name` varchar(190) NOT NULL,
-  `clientName` varchar(190) DEFAULT NULL
+  `clientName` varchar(190) DEFAULT NULL,
+  `highestModSeq` INT NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
-ALTER TABLE `core_entity`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `model_name` (`name`),
-  ADD UNIQUE KEY `name` (`name`),
-  ADD KEY `moduleId` (`moduleId`);
-
-ALTER TABLE `core_entity`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
-
-ALTER TABLE `core_entity`
-  ADD CONSTRAINT `core_entity_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE;
 
 
 DROP TABLE IF EXISTS `core_group`;
@@ -169,57 +161,53 @@ CREATE TABLE `core_setting` (
   `value` text COLLATE utf8mb4_unicode_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `core_state`;
-CREATE TABLE `core_state` (
-  `entityClass` varchar(192) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-  `highestModSeq` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 DROP TABLE IF EXISTS `core_user`;
 CREATE TABLE `core_user` (
   `id` int(11) NOT NULL,
   `username` varchar(50) NOT NULL,
   `displayName` varchar(190) DEFAULT '',
-  `enabled` tinyint(1) NOT NULL DEFAULT '1',
+  `avatarId` binary(40) DEFAULT NULL,
+  `enabled` tinyint(1) NOT NULL DEFAULT 1,
   `email` varchar(100) NOT NULL,
   `recoveryEmail` varchar(100) NOT NULL,
-  `recoveryHash` VARCHAR(40) NULL,
-  `recoverySendAt` DATETIME NULL,
-  `date_format` varchar(20) NOT NULL DEFAULT 'd-m-Y',
-  `time_format` varchar(10) NOT NULL DEFAULT 'G:i',
-  `thousands_separator` varchar(1) NOT NULL DEFAULT '.',
-  `decimal_separator` varchar(1) NOT NULL DEFAULT ',',
+  `recoveryHash` varchar(40) DEFAULT NULL,
+  `recoverySendAt` datetime DEFAULT NULL,
+  `lastLogin` datetime DEFAULT NULL,
+  `createdAt` datetime DEFAULT NULL,
+  `modifiedAt` datetime DEFAULT NULL,
+  `dateFormat` varchar(20) NOT NULL DEFAULT 'd-m-Y',
+	`shortDateInList` BOOLEAN NOT NULL DEFAULT TRUE,
+  `timeFormat` varchar(10) NOT NULL DEFAULT 'G:i',
+  `thousandsSeparator` varchar(1) NOT NULL DEFAULT '.',
+  `decimalSeparator` varchar(1) NOT NULL DEFAULT ',',
   `currency` char(3) NOT NULL DEFAULT '',
-  `logins` int(11) NOT NULL DEFAULT '0',
-  `lastlogin` int(11) NOT NULL DEFAULT '0',
-  `ctime` int(11) NOT NULL DEFAULT '0',
-  `max_rows_list` tinyint(4) NOT NULL DEFAULT '20',
+  `loginCount` int(11) NOT NULL DEFAULT 0,
+  `max_rows_list` tinyint(4) NOT NULL DEFAULT 20,
   `timezone` varchar(50) NOT NULL DEFAULT 'Europe/Amsterdam',
   `start_module` varchar(50) NOT NULL DEFAULT 'summary',
   `language` varchar(20) NOT NULL DEFAULT 'en',
   `theme` varchar(20) NOT NULL DEFAULT 'Default',
-  `first_weekday` tinyint(4) NOT NULL DEFAULT '0',
+  `firstWeekday` tinyint(4) NOT NULL DEFAULT 0,
   `sort_name` varchar(20) NOT NULL DEFAULT 'first_name',
-  `mtime` int(11) NOT NULL DEFAULT '0',
-  `muser_id` int(11) NOT NULL DEFAULT '0',
-  `mute_sound` tinyint(1) NOT NULL DEFAULT '0',
-  `mute_reminder_sound` tinyint(1) NOT NULL DEFAULT '0',
-  `mute_new_mail_sound` tinyint(1) NOT NULL DEFAULT '0',
-  `show_smilies` tinyint(1) NOT NULL DEFAULT '1',
-  `auto_punctuation` tinyint(1) NOT NULL DEFAULT '0',
-  `list_separator` char(3) NOT NULL DEFAULT ';',
-  `text_separator` char(3) NOT NULL DEFAULT '"',
-  `files_folder_id` int(11) NOT NULL DEFAULT '0',
+  `muser_id` int(11) NOT NULL DEFAULT 0,
+  `mute_sound` tinyint(1) NOT NULL DEFAULT 0,
+  `mute_reminder_sound` tinyint(1) NOT NULL DEFAULT 0,
+  `mute_new_mail_sound` tinyint(1) NOT NULL DEFAULT 0,
+  `show_smilies` tinyint(1) NOT NULL DEFAULT 1,
+  `auto_punctuation` tinyint(1) NOT NULL DEFAULT 0,
+  `listSeparator` char(3) NOT NULL DEFAULT ';',
+  `textSeparator` char(3) NOT NULL DEFAULT '"',
+  `files_folder_id` int(11) NOT NULL DEFAULT 0,
   `disk_quota` bigint(20) DEFAULT NULL,
-  `disk_usage` bigint(20) NOT NULL DEFAULT '0',
-  `mail_reminders` tinyint(1) NOT NULL DEFAULT '0',
-  `popup_reminders` tinyint(1) NOT NULL DEFAULT '0',
-  `popup_emails` tinyint(1) NOT NULL DEFAULT '0',
+  `disk_usage` bigint(20) NOT NULL DEFAULT 0,
+  `mail_reminders` tinyint(1) NOT NULL DEFAULT 0,
+  `popup_reminders` tinyint(1) NOT NULL DEFAULT 0,
+  `popup_emails` tinyint(1) NOT NULL DEFAULT 0,
   `holidayset` varchar(10) DEFAULT NULL,
-  `sort_email_addresses_by_time` tinyint(1) NOT NULL DEFAULT '0',
-  `no_reminders` tinyint(1) NOT NULL DEFAULT '0',
-  `last_password_change` int(11) NOT NULL DEFAULT '0',
-  `force_password_change` tinyint(1) NOT NULL DEFAULT '0'
+  `sort_email_addresses_by_time` tinyint(1) NOT NULL DEFAULT 0,
+  `no_reminders` tinyint(1) NOT NULL DEFAULT 0,
+  `last_password_change` int(11) NOT NULL DEFAULT 0,
+  `force_password_change` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS `core_user_group`;
@@ -346,14 +334,8 @@ CREATE TABLE `go_log` (
   `ip` varchar(45) NOT NULL DEFAULT '',
   `controller_route` varchar(255) NOT NULL DEFAULT '',
   `action` varchar(20) NOT NULL DEFAULT '',
-  `message` varchar(255) NOT NULL DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-DROP TABLE IF EXISTS `go_mail_counter`;
-CREATE TABLE `go_mail_counter` (
-  `host` varchar(100) NOT NULL DEFAULT '',
-  `date` date NOT NULL,
-  `count` int(11) NOT NULL
+  `message` varchar(255) NOT NULL DEFAULT '',
+  `jsonData` text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS `go_reminders`;
@@ -433,8 +415,14 @@ CREATE TABLE `go_working_weeks` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
-ALTER TABLE `cf_core_user`
-  ADD PRIMARY KEY (`model_id`);
+ALTER TABLE `core_user_custom_fields`
+  ADD PRIMARY KEY (`id`);
+
+ALTER TABLE `core_user`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`),
+  ADD KEY `fk_user_avatar_id_idx` (`avatarId`);
+
 
 ALTER TABLE `core_acl`
   ADD PRIMARY KEY (`id`);
@@ -485,6 +473,15 @@ ALTER TABLE `core_module`
   ADD UNIQUE KEY `name` (`name`),
   ADD KEY `aclId` (`aclId`);
 
+ALTER TABLE `core_entity`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `clientName` (`clientName`),
+	ADD UNIQUE KEY `name` (`name`, `moduleId`) USING BTREE,
+  ADD KEY `moduleId` (`moduleId`);
+
+ALTER TABLE `core_entity`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 ALTER TABLE `core_search`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `entityId` (`entityId`,`entityTypeId`),
@@ -494,12 +491,6 @@ ALTER TABLE `core_search`
 
 ALTER TABLE `core_setting`
   ADD PRIMARY KEY (`moduleId`,`name`);
-
-ALTER TABLE `core_state`
-  ADD PRIMARY KEY (`entityClass`);
-
-ALTER TABLE `core_user`
-  ADD PRIMARY KEY (`id`);
 
 ALTER TABLE `core_user_group`
   ADD PRIMARY KEY (`groupId`,`userId`),
@@ -548,10 +539,6 @@ ALTER TABLE `go_link_folders`
 
 ALTER TABLE `go_log`
   ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `go_mail_counter`
-  ADD PRIMARY KEY (`host`),
-  ADD KEY `date` (`date`);
 
 ALTER TABLE `go_reminders`
   ADD PRIMARY KEY (`id`),
@@ -651,5 +638,100 @@ ALTER TABLE `core_auth_method` ADD FOREIGN KEY (`moduleId`) REFERENCES `core_mod
 
 ALTER TABLE `core_auth_password` ADD FOREIGN KEY (`userId`) REFERENCES `core_user`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
+CREATE TABLE `core_blob` (
+  `id` BINARY(40) NOT NULL,
+  `type` varchar(129) NOT NULL,
+  `size` bigint(20) NOT NULL DEFAULT '0',
+  `modified` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `createdAt` DATETIME NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
 
 ALTER TABLE `core_search` ADD FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+
+	
+ALTER TABLE `core_user`
+  ADD CONSTRAINT `fk_user_avatar_id` FOREIGN KEY (`avatarId`) REFERENCES `core_blob` (`id`) ON UPDATE NO ACTION;
+
+
+
+ALTER TABLE `core_entity`
+  ADD CONSTRAINT `core_entity_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE `core_user_custom_fields`
+  ADD CONSTRAINT `core_user_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;
+
+
+
+
+
+CREATE TABLE `core_cron_job` (
+  `id` int(11) NOT NULL,
+  `moduleId` int(11) NOT NULL,
+  `description` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `expression` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `enabled` tinyint(1) NOT NULL DEFAULT 1,
+  `nextRunAt` datetime DEFAULT NULL,
+  `lastRunAt` datetime DEFAULT NULL,
+  `runningSince` datetime DEFAULT NULL,
+  `lastError` text COLLATE utf8mb4_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+ALTER TABLE `core_cron_job`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `description` (`description`),
+  ADD KEY `moduleId` (`moduleId`);
+
+
+ALTER TABLE `core_cron_job`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+
+ALTER TABLE `core_cron_job`
+  ADD CONSTRAINT `core_cron_job_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE;
+
+
+CREATE TABLE `core_change` (
+  `entityId` int(11) NOT NULL,
+  `entityTypeId` int(11) NOT NULL,
+  `modSeq` int(11) NOT NULL,
+  `aclId` int(11) DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `destroyed` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+
+
+ALTER TABLE `core_change`
+  ADD PRIMARY KEY (`entityId`,`entityTypeId`),
+  ADD KEY `aclId` (`aclId`),
+  ADD KEY `entityTypeId` (`entityTypeId`);
+
+
+
+ALTER TABLE `core_change`
+  ADD CONSTRAINT `core_change_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `core_change_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE;
+
+
+DROP TABLE IF EXISTS `core_user_default_group`;
+CREATE TABLE IF NOT EXISTS `core_user_default_group` (
+  `groupId` int(11) NOT NULL,
+  PRIMARY KEY (`groupId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+ALTER TABLE `core_user_default_group`
+  ADD CONSTRAINT `core_user_default_group_ibfk_1` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;
+
+DROP TABLE IF EXISTS `core_group_default_group`;
+CREATE TABLE IF NOT EXISTS `core_group_default_group` (
+  `groupId` int(11) NOT NULL,
+  PRIMARY KEY (`groupId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+ALTER TABLE `core_group_default_group`
+  ADD CONSTRAINT `core_group_default_group_ibfk_1` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;

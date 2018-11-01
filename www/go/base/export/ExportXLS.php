@@ -19,7 +19,7 @@ class ExportXLS extends AbstractExport {
 
 	private function _setupExcel() {
 		// Include PHPExcel
-		require_once \GO::config()->root_path.'go/vendor/PHPExcel/PHPExcel.php';
+		//require_once \GO::config()->root_path.'go/vendor/PHPExcel/PHPExcel.php';
 		// Create new PHPExcel object
 		$this->phpExcel = new PHPExcel();
 

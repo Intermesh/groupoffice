@@ -67,8 +67,12 @@ abstract class AbstractJsonController extends AbstractController {
 		$response['data']['write_permission'] = true;
 
 		//Add the customerfields to the data array
-		if (\GO::user()->getModulePermissionLevel('customfields') && $model->customfieldsRecord)
-			$response['data'] = array_merge($response['data'], $model->customfieldsRecord->getAttributes());
+		if(\GO::user()->getModulePermissionLevel('customfields') && $model->customfieldsRecord)
+		{
+			foreach($model->customfieldsRecord->getAttributes() as $key => $value) {
+				$response['data']['customFields.'.$key] = $value;
+			}
+		}
 
 		if (!empty($remoteComboFields))
 			$response = $this->_loadComboTexts($model, $remoteComboFields, $response);
@@ -133,7 +137,7 @@ abstract class AbstractJsonController extends AbstractController {
 	 */
 	public function renderSubmit($model) {
 
-		$response = array('feedback' => '', 'success' => true);
+		$response = array('success' => true);
 		//$ret = $this->beforeSubmit($response, $model, $params);
 		//$modifiedAttributes = $model->getModifiedAttributes();
 		if (!$model->hasValidationErrors() && !$model->isNew) { //model was saved

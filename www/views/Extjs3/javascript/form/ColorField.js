@@ -29,7 +29,7 @@ var cf = new Ext.form.ColorField({
 
 GO.form.ColorField =  Ext.extend(function(config){
 
-	config.colors = config.color || [
+	config.colors = config.colors || [
 		'B71C1C','C62828','D32F2F','E53935','F44336','EF5350','E57373','EF9A9A','FFCDD2', // Red
 		'880E4F','AD1457','C2185B','D81B60','E91E63','EC407A','F06292','F48FB1','F8BBD0', // Pink
 		'4A148C','6A1B9A','7B1FA2','8E24AA','9C27B0','AB47BC','BA68C8','CE93D8','E1BEE7', // Purple
@@ -135,7 +135,7 @@ GO.form.ColorField =  Ext.extend(function(config){
 	},
 
 	getValue : function(){
-		return this.curColor || "FFFFFF";
+		return this.curColor;
     },
 	/**
    * Sets the value of the color field.  Format as hex value 'FFFFFF'
@@ -143,7 +143,7 @@ GO.form.ColorField =  Ext.extend(function(config){
 	 *
    * @param {String} hex The color value
    */
-	setValue : function(hex){
+	setValue : function(hex){	
 		GO.form.ColorField.superclass.setValue.call(this, hex);
 		this.setColor(hex);
 	},
@@ -165,13 +165,13 @@ GO.form.ColorField =  Ext.extend(function(config){
 		{
 			
 			if(!this.checkHex(hex)){
-				hex = 'FFFFFF';
+				hex = null;
 			}
 			
 			this.curColor = hex;
 
 			this.el.setStyle( {
-				'background-color': '#' + hex,
+				'background-color': hex ? '#' + hex : "transparent",
 				'background-image': 'none'
 			});
 			if(!this.showHexValue) {
@@ -186,32 +186,17 @@ GO.form.ColorField =  Ext.extend(function(config){
 	checkHex : function(hex) {
 		
 		if(!hex){
-			return false;
+			return true;
 		}
 		
 		return hex.match(/^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/);
 	},
 
-	// private
-	menuListeners : {
-		select: function(m, d){
-			this.setValue(d);
-		},
-		show : function(){ // retain focus styling
-			this.onFocus();
-		},
-		hide : function(){
-			this.focus();
-			var ml = this.menuListeners;
-			this.menu.un("select", ml.select,  this);
-			this.menu.un("show", ml.show,  this);
-			this.menu.un("hide", ml.hide,  this);
-		}
-	},
-
 	//private
 	handleSelect : function(palette, selColor) {
+		var old = this.getValue();
 		this.setValue(selColor);
+		this.fireEvent('change', this, selColor, old);
 	},
 
 	// private
@@ -228,10 +213,7 @@ GO.form.ColorField =  Ext.extend(function(config){
 				iconCls:'ic-invert-colors-off',
 				text:'Auto',
 				handler: function() {
-					GO.form.ColorField.superclass.setValue.call(this, null);
-					this.el.setStyle( {
-						'background-color': 'transparent'
-					});
+					this.handleSelect(this.menu.palette, null);
 					this.menu.hide();
 				},
 				scope:this
@@ -239,7 +221,7 @@ GO.form.ColorField =  Ext.extend(function(config){
 			
 			this.menu.palette.on('select', this.handleSelect, this );
 			this.menu.palette.value=this.curColor;
-			this.menu.on(Ext.apply({}, this.menuListeners, {scope:this} ));
+//			this.menu.on(Ext.apply({}, this.menuListeners, {scope:this} ));
 
 			if(this.colors)
 			{

@@ -1,6 +1,5 @@
 GO.mainLayout.onReady(function(){
-	if(go.Modules.isAvailable("legacy", "summary"))
-	{
+	if(go.Modules.isAvailable("legacy", "summary")) {
 		var recentFilesGrid = new GO.files.RecentFilesGrid();
 
 		GO.summary.portlets['portlet-files']=new GO.summary.Portlet({

@@ -16,28 +16,7 @@ GO.addressbook.SettingsPanel = Ext.extend(Ext.Panel, {
 	iconCls: 'ic-perm-contact-calendar',
 	
 	onLoadStart: function (userId) {
-		
-		//temporary fix for combo to show address book name. Remove when refactored
-		var userGetRequest = go.Jmap.findRequestByMethod("User/get");
-		if(!userGetRequest) {
-			return;
-		}
-		var userGetRequestId = userGetRequest[2];
-		go.Jmap.request({
-			method: "community/addressbook/AddressBook/get",
-			params: {
-				"properties": ["name"],
-				"#ids": {
-						"resultOf": userGetRequestId,
-						"name": "User/get",
-						"path": "/list/*/addressbookSettings/default_addressbook_id"
-				}
-			},
-			callback: function(options, success, result) {
-				this.selectAddressbook.setRemoteText(result.list[0].name);
-			},
-			scope: this
-		});
+
 	},
 	initComponent: function() {
 

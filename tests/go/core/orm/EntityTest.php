@@ -52,6 +52,7 @@ class EntityTest extends TestCase {
 		$this->assertEquals(true, $success);
 		
 		$array = $entity->toArray(['propA','propB','hasMany', 'createdAt']);
+		
 		$string = json_encode($array);
 		$string = str_replace("string ", "copy ", $string);
 		$array = json_decode($string, true);
@@ -134,9 +135,13 @@ class EntityTest extends TestCase {
 		$c->name = "Test name";
 		$success = $c->save();
 		
-		var_dump($c->getValidationErrors());
+		if(!$success) {
+			var_dump($c->getValidationErrors());
+		}
 		
 		$this->assertEquals(true, $success);
+		
+		
 		
 		$entities = B::find();
 		$entity = $entities->execute()->fetch();	
@@ -243,6 +248,4 @@ class EntityTest extends TestCase {
 		
 		$test = $a->thisPropDoesNotExist;
 	}
-	
-	
 }

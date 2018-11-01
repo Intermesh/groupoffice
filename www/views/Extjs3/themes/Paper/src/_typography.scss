@@ -1,6 +1,6 @@
 
 
-$font-family:  -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+$font-family:  -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 //Lato, sans-serif !default;
 $font-weight-r: 400;
 $font-weight-m: 600;
@@ -20,14 +20,14 @@ button, html, input, select, textarea {
 }
 body, html {
 	@extend %font-body1;
-	color: color($foreground, 'text');
+	color: color($fg, 'text');
 	text-rendering: optimizeLegibility;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
 }
 h1,h2,h3,h4,h5,h6 {
 	font-family: inherit;
-	color: color($foreground, 'text');
+	color: color($fg, 'text');
 	font-weight: bold;
 	line-height: 1;
 }
@@ -39,58 +39,10 @@ h5 { @extend %font-subheading-dense; }
 h6 { @extend %font-data-head; }
 
 strong { color: color($grey, 700); font-weight: $font-weight-m; }
-small { color: color($grey); font-weight: $font-weight-r; font-size:.85em; }
-/*
-
-
-// Webfont: Lato
-@font-face {
-    font-family: 'Lato';
-    src: url('fonts/Lato-Bold.woff2') format('woff2'),
-         url('fonts/Lato-Bold.woff') format('woff');
-    font-style: normal;
-    font-weight: $font-weight-m;
-    text-rendering: optimizeLegibility;
-}
-@font-face {
-    font-family: 'Lato';
-    src: local('Lato-Light'),
-		   url('fonts/Lato-Light.woff2') format('woff2'),
-         url('fonts/Lato-Light.woff') format('woff');
-    font-style: normal;
-    font-weight: $font-weight-l;
-    text-rendering: optimizeLegibility;
-}
-@font-face {
-    font-family: 'Lato';
-    src: url('fonts/Lato-Medium.woff2') format('woff2'),
-         url('fonts/Lato-Medium.woff') format('woff');
-    font-style: normal;
-    font-weight: 500;
-    text-rendering: optimizeLegibility;
-}
-@font-face {
-    font-family: 'Lato';
-    src: local('Lato-Regular'),
-		   url('fonts/Lato-Regular.woff2') format('woff2'),
-         url('fonts/Lato-Regular.woff') format('woff');
-    font-style: normal;
-    font-weight: $font-weight-r;
-    text-rendering: optimizeLegibility;
-}
-@font-face {
-    font-family: 'Lato';
-    src: local('Lato-Semibold'),
-		   url('fonts/Lato-Semibold.woff2') format('woff2'),
-         url('fonts/Lato-Semibold.woff') format('woff');
-    font-style: normal;
-    font-weight: $font-weight-m;
-    text-rendering: optimizeLegibility;
-}*/
+small, label { @extend %font-caption }
 
 %font-button {
 	font-size: sp(14);
-	//text-transform: uppercase;
 	font-weight: $font-weight-m;
 	/*letter-spacing: 0.04em;*/
 	text-decoration: none;
@@ -99,50 +51,49 @@ small { color: color($grey); font-weight: $font-weight-r; font-size:.85em; }
 %font-caption {
 	font-size: sp(12);
 	font-weight: $font-weight-r;
-	color: color($foreground, 'secondary-text');
+	color: color($fg, 'secondary-text');
 }
 
 %font-body1 {
-	font-size: sp(14); //14 for device
-	color: color($foreground, 'text');
+	font-size: sp(14);
+	color: color($fg, 'text');
 	font-weight: $font-weight-r;
-	line-height: dp(20);
+	line-height: dp(24);
 	.primary & { color: white; }
 }
 
 %font-body2 {
 	font-size: sp(14); //14 for big screen | device
-	line-height: dp(24);
+	line-height: dp(20);
 	font-weight: $font-weight-m;
 }
 
 %font-data {
-	font-size: sp(14);
+	font-size: sp(16);
 	font-weight: $font-weight-r;
-	//color: color($foreground, 'text');
 }
 %font-data-head {
 	font-size: sp(12);
 	font-weight: $font-weight-m;
-	color: color($foreground, 'secondary-text');
+	color: color($fg, 'secondary-text');
 }
 
 %font-subheading {
-	font-size: sp(15); //16 for device
+	font-size: sp(16);
 	line-height: dp(24);
-	color: color($foreground, 'secondary-text');
+	color: color($fg, 'secondary-text');
 	font-weight: $font-weight-r;
 }
 
 %font-label {
 	font-size: sp(12);
-	color: color($foreground, 'secondary-text');
+	color: color($fg, 'secondary-text');
 	font-weight: $font-weight-r;
 }
 
 %font-subheading-dense {
 	font-size: sp(13);
-	color: color($foreground, 'secondary-text');
+	color: color($fg, 'secondary-text');
 	font-weight: $font-weight-r;
 }
 

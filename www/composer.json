@@ -1,5 +1,5 @@
 {
-	"name": "intermesh/group-office-6",
+	"name": "intermesh/groupoffice",
 	"description": "Group-Office",
 	"require": {
 		"php": ">=7.0.0",
@@ -9,16 +9,13 @@
 		"ext-date": "*",
 		"ext-iconv": "*",
 		"ext-curl": "*",
-		"ext-pdo": "*",
 		"ext-zip": "*",
 		"ext-soap": "*",
     "ext-gd": "*",
     "ext-pdo": "*",
     "ext-pdo_mysql": "*",
     "ext-calendar": "*",
-		
-		"fkooman/php-oauth-client": "*",
-		"fkooman/guzzle-bearer-auth-plugin": "*",
+		"ext-xml": "*",
 		"sabre/dav": "3.1.*",
 		"swiftmailer/swiftmailer": "@stable",
 		"michelf/php-markdown": "^1.7",
@@ -29,7 +26,8 @@
 		"setasign/fpdi-tcpdf": "^1.6",
 		"matthiasmullie/minify": "^1.3",
 		"defuse/php-encryption": "^2.1",
-		"html2text/html2text": "^4.1"
+		"html2text/html2text": "^4.1",
+		"guzzlehttp/guzzle": "^6.3"
 	},
 	"license": "AGPL",
 	"authors": [

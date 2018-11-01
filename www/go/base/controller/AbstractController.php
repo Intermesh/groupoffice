@@ -291,9 +291,7 @@ abstract class AbstractController extends Observable {
 		
 		if(!in_array($action, $allowGuests) && !in_array('*', $allowGuests)){			
 			//check for logged in user
-			if(!GO::user()){
-				\GO\Base\Util\Http::basicAuth();
-				
+			if(!GO::user()){					
 				return false;	
 			}
 			
@@ -412,12 +410,14 @@ abstract class AbstractController extends Observable {
 			
 			GO::debug("EXCEPTION: ".(string) $e);
 			
+			\go\core\ErrorHandler::logException($e);
+			
 			$response = new JsonResponse();
 			
 			$response['success'] = false;
 			
 			$response['feedback'] = !empty($response['feedback']) ? $response['feedback']."\r\n\r\n" : '';
-			$response['feedback'] .= \go\core\ErrorHandler::logException($e);	
+			$response['feedback'] .= $e->getMessage();	
 			
 			$response['exceptionCode'] = $e->getCode();
 					

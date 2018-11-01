@@ -133,39 +133,58 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			return false;
 		}
 		
-		 if (!empty($params['exception_date'])) {
-			//reset the original attributes other wise create exception can fail
-			$model->resetAttributes();
+		if (!empty($params['exception_date'])) {
+			$recurringEvent = \GO\Calendar\Model\Event::model()->findByPk($params['exception_for_event_id']);
+			
 			//$params['recurrenceExceptionDate'] is a unixtimestamp. We should return this event with an empty id and the exception date.			
 			//this parameter is sent by the view when it wants to edit a single occurence of a repeating event.
-			$recurringEvent = \GO\Calendar\Model\Event::model()->findByPk($params['exception_for_event_id']);
-			if(!empty($params['thisAndFuture']) && $params['thisAndFuture'] == 'true') {
-				// Save This and Future
-				$model = new \GO\Calendar\Model\Event();
-				unset($params['exception_for_event_id']);
-				unset($params['repeat_end_time']);
+			
+			//if($params['exception_date'] != $recurringEvent->start_time) {
+				//reset the original attributes other wise create exception can fail
+				$model->resetAttributes();
+				if(!empty($params['thisAndFuture']) && $params['thisAndFuture'] == 'true') {
+					// Save This and Future
+					$model = $recurringEvent->duplicate(array('uuid'=>null));
+					//$model = new \GO\Calendar\Model\Event();
+					unset($params['exception_for_event_id']);
+					unset($params['repeat_end_time']);
+					$duration = $model->end_time - $model->start_time;
+					$this->_setEventAttributes($model, $params);
 
-				$this->_setEventAttributes($model, $params);
-				$model->start_time = $params['exception_date'];
-				$rRule = new \GO\Base\Util\Icalendar\Rrule();
-				$rRule->readIcalendarRruleString($recurringEvent->start_time, $recurringEvent->rrule);
-				$model->rrule = $rRule->createRrule();
+					if (isset($params['offset'])) {
+						$d = date('Y-m-d', $params['exception_date']);
+						$t = date('G:i', $model->start_time);
+						$start_time = strtotime($d . ' ' . $t);
+						// not pretty, fix in v6.6
+						$model->start_time = \GO\Base\Util\Date::roundQuarters($start_time);
+						$model->end_time = \GO\Base\Util\Date::roundQuarters($model->start_time+ $duration);
+						$untilTime = strtotime($d. ' 00:00');// $model->start_time - $params['offset'] - 1;
+					} else {
+						// exception_date comes incorrectly from client, fix in GO 6.6
+						$model->start_time = $params['exception_date']; 
+						$untilTime = strtotime(date('Y-m-d', $params['exception_date']). ' 00:00');//$params['exception_date']-1;
+					}
 
-				$rRule->setParams(array('until'=> $params['exception_date']-1));
-				$recurringEvent->rrule = $rRule->createRrule();
-				$recurringEvent->repeat_end_time = $params['exception_date']-1;
-				$recurringEvent->save(); // CLOSE Recurrence, forget about exceptions (this en future means everything)
-			} else {
-				$model = $recurringEvent->createExceptionEvent($params['exception_date'], array(), true);
-				unset($params['exception_date']);
-				unset($params['id']);
+					$rRule = new \GO\Base\Util\Icalendar\Rrule();
+					$rRule->readIcalendarRruleString($recurringEvent->start_time, $recurringEvent->rrule);
+					$model->rrule = $rRule->createRrule();
 
-				if(!$model)
-					throw new \Exception("Could not create exception!");
+					$rRule->setParams(array('until'=> $untilTime));
+					$recurringEvent->rrule = $rRule->createRrule();
+					$recurringEvent->repeat_end_time = $untilTime;
+					$recurringEvent->save(); // CLOSE Recurrence, forget about exceptions (this en future means everything)
+				} else {
+					$model = $recurringEvent->createExceptionEvent($params['exception_date'], array(), true);
+					unset($params['exception_date']);
+					unset($params['id']);
 
-				$this->_setEventAttributes($model, $params);
-				
-			}
+					if(!$model)
+						throw new \Exception("Could not create exception!");
+
+					$this->_setEventAttributes($model, $params);
+
+				}
+			//}
 		}
 				
 		return parent::beforeSubmit($response, $model, $params);
@@ -295,7 +314,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 //		$newParticipantIds = !empty(\GO::session()->values['new_participant_ids']) ? \GO::session()->values['new_participant_ids'] : array();
 //		$oldParticipantsIds = array_diff($allParticipantIds,$newParticipantIds);
 //		if (!empty($newParticipantIds) && !empty($oldParticipantsIds))
-		if ($this->newParticipants && count($allParticipantIds) > 1) {
+		if ($this->newParticipants && count($allParticipantIds) > 1 && !$isNewEvent) {
 			$response['askForMeetingRequestForNewParticipants'] = true;
 		}
 		
@@ -1301,10 +1320,12 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 				
 				$resultCount++;
 				
+				$age = (new \DateTime($contact->upcoming))->diff(new \DateTime($contact->birthday));
+				
 				$response['results'][$this->_getIndex($response['results'],strtotime($contact->upcoming.' 00:00'))] = array(
 					'id'=>$response['count']++,
 					'name'=>htmlspecialchars(str_replace('{NAME}',$name,\GO::t("Birthday: {NAME}", "calendar")), ENT_COMPAT, 'UTF-8'),
-					'description'=>htmlspecialchars(str_replace(array('{NAME}','{AGE}'), array($name,$contact->upcoming-$contact->birthday), \GO::t("{NAME} has turned {AGE} today", "calendar")), ENT_COMPAT, 'UTF-8'),
+					'description'=>htmlspecialchars(str_replace(array('{NAME}','{AGE}'), array($name,$age->y), \GO::t("{NAME} has turned {AGE} today", "calendar")), ENT_COMPAT, 'UTF-8'),
 					'time'=>date(\GO::user()->time_format, $start_unixtime),												
 					'start_time'=>$contact->upcoming.' 00:00',
 					'end_time'=>$contact->upcoming.' 23:59',
@@ -1579,6 +1600,12 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			
 		//notify orgnizer
 		$participant = $event->getParticipantOfCalendar();
+		
+		//update participant statuses from main event if possible
+		$organizerEvent = $event->getOrganizerEvent();
+		if($organizerEvent) {
+			\GO::getDbConnection()->query("UPDATE cal_participants p1 INNER JOIN cal_participants p2 ON (p2.email=p1.email and p2.event_id = ".$organizerEvent->id.") SET p1.status=p2.status WHERE p1.event_id = ".$event->id);
+		}
 
 //		if(!$participant)
 //		{

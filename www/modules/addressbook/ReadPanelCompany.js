@@ -230,13 +230,18 @@ GO.addressbook.CompanyReadPanel = Ext.extend(GO.DisplayPanel,{
 											
 						'<tpl for="employees">'+
 							'<tr>'+								
-								'<td><a href="#addressbook/contact/{id}">{name}</a></td>'+
+								'<td><a href="#contact/{id}">{name}</a></td>'+
 								'<td>{function}</td>'+
 								'<td>{[this.mailTo(values.email, values.name)]}</td>'+
 							'</tr>'+							
 						'</tpl>'+
 						'</table>'+
-					'</tpl>';
+		
+						'</tpl>';
+
+			this.template +=GO.customfields.displayPanelTemplate;
+//			this.template +=GO.customfields.displayPanelBlocksTemplate;
+		
 
 			if(go.Modules.isAvailable("legacy", "lists"))
 				this.template += GO.lists.ListTemplate;
@@ -246,6 +251,7 @@ GO.addressbook.CompanyReadPanel = Ext.extend(GO.DisplayPanel,{
 			if(go.Modules.isAvailable("legacy", "workflow")){
 				this.template +=GO.workflow.WorkflowTemplate;
 			}
+								
 								
 			
 			
@@ -396,6 +402,7 @@ GO.addressbook.CompanyReadPanel = Ext.extend(GO.DisplayPanel,{
 				if(!this.selectMergeLinksWindow)
 				{
 					this.selectMergeLinksWindow = new GO.dialog.MergeWindow({
+						entity: "Company",
 						displayPanel:this
 					});
 				}			

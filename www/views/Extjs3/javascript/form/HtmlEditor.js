@@ -29,10 +29,10 @@ GO.form.HtmlEditor = function (config) {
 		config.plugins.unshift(spellcheckInsertPlugin);
 
 	config.plugins.unshift(
-					wordPastePlugin,
-					hrPlugin,
 					ioDentPlugin,
 					rmFormatPlugin,
+					wordPastePlugin,
+					hrPlugin,
 					ssScriptPlugin
 					);
 
@@ -294,7 +294,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 					e.stopEvent();
 					this.execCmd('InsertText', '\t');
 					this.deferFocus();
-				} else if (k == e.ENTER) {
+				}/* Testen in latest chrome and safari with lists else if (k == e.ENTER) {
 					e.stopEvent();
 					var doc = this.getDoc();
 					if (doc.queryCommandState('insertorderedlist') ||
@@ -305,7 +305,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 						this.execCmd('delete');
 					}
 					this.deferFocus();
-				}
+				}*/
 			};
 		}
 	}(),

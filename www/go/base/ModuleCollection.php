@@ -43,8 +43,16 @@ class ModuleCollection extends Model\ModelCollection{
 	
 	private function _isAllowed($name){
 		
-		if(!isset($this->_allowedModules))
-			$this->_allowedModules=empty(\GO::config()->allowed_modules) ? array() : explode(',', \GO::config()->allowed_modules);
+		if(!isset($this->_allowedModules)) {
+			if(!empty(\GO::config()->allowed_modules)) {
+				$this->_allowedModules=  explode(',', \GO::config()->allowed_modules);		
+				$this->_allowedModules = array_merge($this->_allowedModules, ['links', 'search', 'users', 'modules', 'groups', 'customfields']);
+				
+			} else
+			{
+				$this->_allowedModules = [];
+			}
+		}
 		
 		return empty($this->_allowedModules) || in_array($name, $this->_allowedModules);			
 	}
@@ -115,7 +123,7 @@ class ModuleCollection extends Model\ModelCollection{
 		$ucfirst = ucfirst($moduleId);
 		$moduleClassPath = $folder->path().'/'.$ucfirst.'Module.php';
 		
-		if(!file_exists($moduleClassPath)){// || !\GO::scriptCanBeDecoded($moduleClassPath)){
+		if(!file_exists($moduleClassPath)){
 			return false;
 		}
 
@@ -154,20 +162,13 @@ class ModuleCollection extends Model\ModelCollection{
 		
 		foreach($modules as $module)
 		{	
-//			if($this->_isAllowed($module->name)){
-				$file = $module->path.ucfirst($module->name).'Module.php';
-				//todo load listeners
-				if(file_exists($file)){
-					//require_once($file);
-					$class='GO\\'.ucfirst($module->name).'\\'.ucfirst($module->name).'Module';
-
-					$object = new $class;
-					if(method_exists($object, $method)){					
+				$object = $module->moduleManager;
+				if(method_exists($object, $method)){					
 //						\GO::debug('Calling '.$class.'::'.$method);
-						call_user_func_array(array($object, $method), $params);
-						//$object->$method($params);
-					}
+					call_user_func_array(array($object, $method), $params);
+					//$object->$method($params);
 				}
+				
 //			}
 		}
 		
@@ -211,20 +212,24 @@ class ModuleCollection extends Model\ModelCollection{
 	
 	/**
 	 * Check if a module is installed.
+   * Default check if module is enabled an treat a disabled module as not installed. When checking from within moduleController return the model if record is in core_module
 	 * 
 	 * @param StringHelper $name
+   * @param boolean $checkEnabled
 	 * @return Model\Module 
 	 */
-	public function isInstalled($name){
-		$model = $this->model->findByName($name);
-		
-		if(!$model || !$model->enabled || !$this->_isAllowed($model->name))
-				return false;
-		
-		return $model;
+	public function isInstalled($name, $checkEnabled = true)
+	{
+			$model = $this->model->findByName($name);
+
+			if (!$model || !$this->_isAllowed($model->name))
+					return false;
+
+			if ($checkEnabled && !$model->enabled)
+					return false;
+
+			return $model;
 	}
-	
-	
 	
 	
 	public function __isset($name){

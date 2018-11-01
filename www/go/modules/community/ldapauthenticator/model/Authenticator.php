@@ -2,7 +2,7 @@
 namespace go\modules\community\ldapauthenticator\model;
 
 use Exception;
-use go\core\auth\model\User;
+use go\modules\core\users\model\User;
 use go\core\auth\PrimaryAuthenticator;
 use go\core\ldap\Connection;
 use go\core\ldap\Record;
@@ -32,7 +32,7 @@ class Authenticator extends PrimaryAuthenticator {
 	 * @return Server|boolean
 	 */
 	private static function findServer($email) {
-		$adPos = strpos($email, '@');
+		$adPos = strrpos($email, '@');
 		if(!$adPos) {
 			return false;
 		}
@@ -59,6 +59,17 @@ class Authenticator extends PrimaryAuthenticator {
 				throw new \Exception("Couldn't enable TLS");
 			}
 		}
+		
+		if (!empty($server->username)) {			
+			
+			if (!$connection->bind($server->username, $server->password)) {				
+				throw new \Exception("Invalid password given for '".$server->username."'");
+			} else
+			{
+				GO()->debug("Authenticated with user '" . $server->username . '"');
+			}
+		}
+		
 		$ldapUsername = explode('@', $username)[0];
 		$record = Record::find($connection, $server->peopleDN, $server->usernameAttribute . "=" . $ldapUsername)->fetch();
 		
@@ -85,7 +96,7 @@ class Authenticator extends PrimaryAuthenticator {
 		}
 		
 		if($server->hasEmailAccount()) {
-			$this->setEmailAccount($ldapUsername, $password, $username, $server, $user);
+			$this->setEmailAccount($ldapUsername, $password, $record->mail[0], $server, $user);
 		}
 		
 		return $user;

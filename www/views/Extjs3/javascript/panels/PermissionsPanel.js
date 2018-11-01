@@ -118,7 +118,11 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 			header : t("Name"),
 			dataIndex : 'name',
 			menuDisabled:true,
-			sortable: true
+			sortable: true,
+			renderer: function(name, meta, record) {
+				var icon = record.data.isUserGroupFor ? 'person' : 'people';
+				return '<i class="icon">' + icon + '</i>&nbsp;&nbsp;' + name;
+			}
 		}];
 		if(this.showLevel)
 		{
@@ -163,7 +167,7 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 				menuDisabled:true,
 				sortable: true
 			}],
-			fields:['id','name','level'],
+			fields:['id','name','level','isUserGroupFor'],
 			model_id: this.acl_id//GO.settings.user_id
 		});
 
@@ -196,12 +200,12 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 	
 		this.items =[];
 		this.overWriteCheckBox = new Ext.ux.form.XCheckbox({
-			style:'margin:4px 0 0 10px',
 			name: 'acl_overwritten',
 			boxLabel: t("Overwrite default permissions for this item (click apply to activate)")
 		});
 		if(this.isOverwritable) {
-			this.items.push(this.overWriteCheckBox);
+			this.aclGroupsGrid.getTopToolbar().insert(0,this.overWriteCheckBox);
+			//this.items.push(this.overWriteCheckBox);
 		}
 		this.items.push(this.aclGroupsGrid);
 		

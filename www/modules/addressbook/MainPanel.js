@@ -1,3 +1,5 @@
+/* global go, GO */
+
 /**
  * Copyright Intermesh
  *
@@ -16,6 +18,15 @@ GO.addressbook.MainPanel = function(config) {
 	
 
 
+		this.exportCompanyMenu = new GO.base.ExportMenuItem({
+			disabled: !GO.addressbook.exportPermission,
+			className:'GO\\Addressbook\\Export\\CurrentGridCompany', // default
+		});
+		this.exportContactMenu = new GO.base.ExportMenuItem({
+			disabled: !GO.addressbook.exportPermission,
+			className:'GO\\Addressbook\\Export\\CurrentGridContact',
+		});
+		
 
 
 
@@ -28,9 +39,9 @@ GO.addressbook.MainPanel = function(config) {
 		tbar : {
 			enableOverflow: true,
 			items:[
-			{
+			'->',{
 				iconCls: 'ic-add',
-				text: t('Add'),
+				tooltip: t('Add'),
 				handler: function(){
 					this.contactEastPanel.reset();
 					GO.addressbook.showContactDialog(0, {values:{addressbook_id:GO.addressbook.defaultAddressbook.get('id')}});
@@ -59,7 +70,7 @@ GO.addressbook.MainPanel = function(config) {
 						this.contactsGrid.store.load();
 					}
 				}
-			},'->',{
+			},{
 				xtype: 'tbsearch',
 				tools: [{
 					text: t("Advanced search", "addressbook"),
@@ -104,7 +115,8 @@ GO.addressbook.MainPanel = function(config) {
 								return this.mailingStatusWindow.show();
 							},
 							scope: this,
-						}
+						},
+						this.exportContactMenu
 
 					]
 				}
@@ -115,11 +127,7 @@ GO.addressbook.MainPanel = function(config) {
 			},
 			rowdblclick: function(){
 				this.contactEastPanel.editHandler();
-			},
-			show: function(){
-				this.setAdvancedSearchNotification(this.contactsGrid.store);
-				this.addressbooksGrid.setType('contact');
-			},
+			},			
 			scope:this
 		}
 	});
@@ -149,9 +157,9 @@ GO.addressbook.MainPanel = function(config) {
 		headerCfg: {cls:'x-hide-display'},
 		id: 'ab-company-grid',
 		title: t("Companies", "addressbook"),
-		tbar: [{
+		tbar: ['->', {
 			iconCls: 'ic-add',
-			text: t("Add"),
+			tooltip: t("Add"),
 			handler: function(){
 				this.companyEastPanel.reset();
 				GO.addressbook.showCompanyDialog(0,  {values:{addressbook_id:GO.addressbook.defaultAddressbook.get('id')}});
@@ -167,7 +175,7 @@ GO.addressbook.MainPanel = function(config) {
 				});
 			},
 			scope: this
-		},'->',{
+		},{
 				xtype: 'tbsearch',
 				tools: [{
 					text: t("Advanced search", "addressbook"),
@@ -188,6 +196,33 @@ GO.addressbook.MainPanel = function(config) {
 					},
 					scope:this
 				}
+        },{
+            iconCls: 'ic-more-vert',
+            menu: [
+                {
+                    iconCls: "ic-settings",
+                    text: t("Settings"),
+                    handler: function () {
+                        var dlg = new GO.addressbook.ManageDialog();
+                        dlg.show();
+                    },
+                    scope: this
+                }
+                , {
+                    iconCls: 'ic-merge-type',
+                    text: t("Newsletters"),
+                    handler: function () {
+                        if(!this.mailingStatusWindow)
+                        {
+                            this.mailingStatusWindow = new GO.addressbook.MailingStatusWindow();
+                        }
+                        return this.mailingStatusWindow.show();
+                    },
+                    scope: this,
+                },
+								this.exportCompanyMenu
+
+            ]
 			}
 			
 		],
@@ -197,10 +232,6 @@ GO.addressbook.MainPanel = function(config) {
 			},
 			rowdblclick: function(){
 				this.companyEastPanel.editHandler();
-			},
-			show: function(){
-				this.setAdvancedSearchNotification(this.companiesGrid.store);
-				this.addressbooksGrid.setType('company');
 			},
 			scope:this
 		}
@@ -225,15 +256,9 @@ GO.addressbook.MainPanel = function(config) {
 		this.setAdvancedSearchNotification(this.companiesGrid.store);
 	}, this);
 
-	if(GO.addressbook.exportPermission == '1')
-	{
-		this.exportCompanyMenu = new GO.base.ExportMenu({
-			className:'GO\\Addressbook\\Export\\CurrentGridCompany', // default
-		});
-		this.exportContactMenu = new GO.base.ExportMenu({
-			className:'GO\\Addressbook\\Export\\CurrentGridContact',
-		});
-		this.exportCompanyMenu.setColumnModel(this.companiesGrid.getColumnModel());
+	
+		
+this.exportCompanyMenu.setColumnModel(this.companiesGrid.getColumnModel());
 		this.exportContactMenu.setColumnModel(this.contactsGrid.getColumnModel());
 
 		// Button to export contacts with companies together
@@ -261,10 +286,8 @@ GO.addressbook.MainPanel = function(config) {
 		this.exportCompanyMenu.insertItem(0,this.contactsWithCompaniesExportButton);
 		this.exportContactMenu.insertItem(0,this.vcardExportButton);
 		this.exportContactMenu.insertItem(0,this.contactsWithCompaniesExportButton);
-
-		this.contactsGrid.getTopToolbar().insertButton(3, this.exportContactMenu);
-		this.companiesGrid.getTopToolbar().insertButton(3, this.exportCompanyMenu);
-	}
+	
+	
 
 	this.searchPanel = new GO.addressbook.SearchPanel({
 		region: 'north',
@@ -277,7 +300,7 @@ GO.addressbook.MainPanel = function(config) {
 		}
 	});
 
-	this.contactEastPanel = this.contactDetail = new GO.addressbook.ContactDetail({ //contactDetail added for routing
+	GO.addressbook.contactDetail = this.contactEastPanel = this.contactDetail = new GO.addressbook.ContactDetail({ //contactDetail added for routing
 		id:'ab-contact-panel',
 		border:false,
 		region:'east',
@@ -290,13 +313,13 @@ GO.addressbook.MainPanel = function(config) {
 			beforeload: function() {
 				
 				//make sure contacts is selected when routing
-				this.selectView.select(0);
+				this.navMenu.select(0);
 			},
 			scope: this		
 		}
 	});
 
-	this.companyEastPanel = this.companyDetail = new GO.addressbook.CompanyReadPanel({
+	GO.addressbook.companyDetail = this.companyEastPanel = this.companyDetail = new GO.addressbook.CompanyReadPanel({
 		id:'ab-company-panel',
 		border:false,
 		region:'east',
@@ -304,9 +327,8 @@ GO.addressbook.MainPanel = function(config) {
 		split:true,
 		listeners: {
 			beforeload: function() {
-				
 				//make sure companies is selected when routing
-				this.selectView.select(1);
+				this.navMenu.select(1);
 			},
 			scope: this
 		}
@@ -394,14 +416,28 @@ GO.addressbook.MainPanel = function(config) {
 			items:[
 				this.contactsGrid,
 				this.contactEastPanel
-			]
+			],
+			listeners: {
+				scope: this,
+				show: function(){
+					this.setAdvancedSearchNotification(this.contactsGrid.store);
+					this.addressbooksGrid.setType('contact');
+				}
+			}
 		},{
 			id: 'ab-companies',
 			layout: 'border',
 			items:[
 				this.companiesGrid,
 				this.companyEastPanel
-			]
+			],
+			listeners: {
+				scope: this,
+				show: function(){
+					this.setAdvancedSearchNotification(this.companiesGrid.store);
+					this.addressbooksGrid.setType('company');
+				}
+			}
 		}
 		]
 	});
@@ -410,9 +446,8 @@ GO.addressbook.MainPanel = function(config) {
 	config.border=false;
 
 	this.mailingsFilterPanel= new GO.addressbook.AddresslistsGroupedMultiSelectGrid({
-		id: 'ab-mailingsfilter-panel',
-		region:'center',
-		split:true
+		//id: 'ab-mailingsfilter-panel',
+		autoHeight:true
 	});
 
 	this.mailingsFilterPanel.getStore().load();
@@ -432,16 +467,6 @@ GO.addressbook.MainPanel = function(config) {
 		}
 	}, this);
 
-	this.westPanel = new Ext.Panel({
-		//layout:'accordion',
-		//layoutConfig:{hideCollapseTool:true},
-		border:false,
-		split:true,
-		autoHeight:true,
-		items:[this.addressbooksGrid],
-		id: 'ab-west-panel'
-	});
-
 	//This is an accordion panel only for the favorites module. If there's only
 	//one item then this will disable the collapsing.
 	this.addressbooksGrid.on('beforecollapse',function(){
@@ -450,54 +475,44 @@ GO.addressbook.MainPanel = function(config) {
 		}
 	}, this);
 
-	this.selectMenu = {xtype:'panel',
-		region:'north',
+	this.navMenu = new go.NavMenu({
+		//region:'north',
 		autoHeight:true,
-		items:[this.selectView = new Ext.DataView({
-		xtype: 'dataview',
-		cls: 'go-nav',
-		store:new Ext.data.ArrayStore({
+		store: new Ext.data.ArrayStore({
 			fields: ['name', 'icon', 'visible'],
 			data: [
-				['Contacts', 'person'],
-				['Companies', 'domain']
+				[t("Contacts", "addressbook"), 'person'],
+				[t("Companies", "addressbook"), 'domain']
 //				[t("Newsletters", "addressbook"), 'email', !!GO.email],
 //				['Settings', 'settings',GO.addressbook.permission_level == 50]
 			]
 		}),
-
-		singleSelect: true,
-		overClass:'x-view-over',
-		itemSelector:'div',
-		tpl:'<tpl for=".">\
-			<div><i class="icon">{icon}</i>\
-			<span>{name}</span></div>\
-	  </tpl>',
-		columns: [{dataIndex:'name'}],
 		listeners: {
-			selectionchange: function(view, nodes) {
+			selectionchange: function(view, nodes) {					
 				if(nodes[0].viewIndex == 3) {
 					return this.tabPanel.setActiveTab(2);
 				}				
 				this.tabPanel.setActiveTab(nodes[0].viewIndex);
 			},
-			scope:this
+			scope: this
 		}
-	})]};
+	});
 
-
-	this.westPanelContainer = new Ext.Panel({
+	this.westPanelContainer = new Ext.Container({
 		region:'west',
 		cls: 'go-sidenav',
-		width:dp(224),
+		layout:'form',
+		width:dp(280),
 		autoScroll:true,
+		style: {'padding-right': '15px'}, // scroll offset
 		split:true,
-		items: [this.selectMenu, this.westPanel,this.mailingsFilterPanel]			
+		items: [this.navMenu, this.addressbooksGrid,this.mailingsFilterPanel]			
 	});
 
 	
 	config.items= [
 		//this.searchPanel,
+		
 		this.westPanelContainer,
 		new Ext.Panel({
 			layout: 'fit',
@@ -505,12 +520,9 @@ GO.addressbook.MainPanel = function(config) {
 			border: true,
 			items: [this.tabPanel]
 		})
-		];
-
-
+	];
 
 	GO.addressbook.MainPanel.superclass.constructor.call(this, config);
-
 };
 
 Ext.extend(GO.addressbook.MainPanel, Ext.Panel,{
@@ -542,8 +554,8 @@ Ext.extend(GO.addressbook.MainPanel, Ext.Panel,{
 				requests:Ext.encode({
 //					contacts:{r:"addressbook/contact/store"},
 //					companies:{r:"addressbook/company/store"},
-					addressbooks:{r:"addressbook/addressbook/store", limit: 0},
-					writable_addresslists:{r:"addressbook/addresslist/store",permissionLevel: GO.permissionLevels.write, limit: 0},
+					addressbooks:{r:"addressbook/addressbook/store", limit: GO.settings.config.nav_page_size},
+					writable_addresslists:{r:"addressbook/addresslist/store",permissionLevel: GO.permissionLevels.write, limit: GO.settings.config.nav_page_size},
 					readable_addresslists:{r:"addressbook/addresslist/store",permissionLevel: GO.permissionLevels.read, limit: GO.settings.config.nav_page_size}
 				})
 			},
@@ -556,7 +568,9 @@ Ext.extend(GO.addressbook.MainPanel, Ext.Panel,{
 					GO.addressbook.readableAddresslistsStore.loadData(result.readable_addresslists);
 					GO.addressbook.writableAddresslistsStore.loadData(result.writable_addresslists);
 //				}
-				this.selectView.select(0);
+				if(this.navMenu.getSelectionCount() == 0) {
+					this.navMenu.select(0);
+				}
 				this.getEl().unmask();
 			},
 			scope:this
@@ -571,9 +585,11 @@ Ext.extend(GO.addressbook.MainPanel, Ext.Panel,{
 
 		GO.dialogListeners.add('contact',{
 			scope:this,
-			'save':function(){
+			save:function(){
+
 				var panel = this.tabPanel.getActiveTab();
-				if(panel.id=='ab-contacts-grid')
+				console.log(panel.id);
+				if(panel.id=='ab-contacts')
 				{
 					this.contactsGrid.store.reload();
 				}
@@ -582,9 +598,10 @@ Ext.extend(GO.addressbook.MainPanel, Ext.Panel,{
 
 		GO.dialogListeners.add('company',{
 			scope:this,
-			'save':function(){
+			save:function(){
 				var panel = this.tabPanel.getActiveTab();
-				if(panel.id=='ab-company-grid')
+				console.log(panel.id);
+				if(panel.id=='ab-companies')
 				{
 					this.companiesGrid.store.reload();
 				}
@@ -642,9 +659,8 @@ Ext.extend(GO.addressbook.MainPanel, Ext.Panel,{
 		
 		// Button to export contacts with companies together
 		this.contactsWithCompaniesExportButton = new Ext.menu.Item({
-			iconCls: 'btn-export',
+			iconCls: 'ic-import-export',
 			text: t("Contacts with companies", "addressbook"),
-			cls: 'x-btn-text-icon',
 			handler:function(){
 				window.open(GO.url("addressbook/exportContactsWithCompanies/export"))
 			},
@@ -819,21 +835,30 @@ go.Modules.register("legacy", 'addressbook', {
 	mainPanel: GO.addressbook.MainPanel,
 	title: t("Address book", "addressbook"),
 	iconCls: 'go-tab-icon-addressbook',
-	entities: ["Contact", "Company"],
-	userSettingsPanels: [GO.addressbook.SettingsPanel],
+	entities: [{
+			name: "Contact",
+			linkWindow: function() {
+				var win = new GO.addressbook.ContactDialog ();
+					win.closeAction = "close";
+					return win;
+			},
+			linkDetail: function() {
+				return new GO.addressbook.ContactDetail();
+			}	
+	}, {
+			name: "Company",
+			linkWindow: function() {
+				var win = new GO.addressbook.CompanyDialog ();
+				win.closeAction = "close";
+				return win;
+			},
+			linkDetail: function() {
+				return new GO.addressbook.CompanyReadPanel ();
+			}	
+		}],
+	userSettingsPanels: ["GO.addressbook.SettingsPanel"],
 	initModule: function () {	
-		go.Links.registerLinkToWindow("Contact", function() {
-			var win = new GO.addressbook.ContactDialog ();
-			win.closeAction = "hide";
-			return win;
-		});
-		
-		go.Links.registerLinkToWindow("Company", function() {
-			var win = new GO.addressbook.CompanyDialog ();
-			win.closeAction = "hide";
-			return win;
-		});
-		
+				
 		GO.addressbook.addressbooksStoreFields = new Array('id','name','user_name', 'acl_id','user_id','contactCustomfields','companyCustomfields','default_salutation', 'checked');
 
 

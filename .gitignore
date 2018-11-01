@@ -1,4 +1,6 @@
-/nbproject/private
+/nbproject
+/*-license.txt
+.idea
 /www/vendor
 /config.php
 /www/config.php
@@ -7,8 +9,18 @@
 /config.ini
 /www/config.ini
 /www/promodules
+/www/duurzaamgebouw
+/tests/data
+/www/go/modules/*
+!/www/go/modules/community
+!/www/go/modules/core
 /www/modules/*
 !/www/modules/addressbook
+!/www/modules/sync
+!/www/modules/z-push
+!/www/modules/zpushadmin
+!/www/modules/caldav
+!/www/modules/carddav
 !/www/modules/admin2userlogin
 !/www/modules/bookmarks
 !/www/modules/calendar
@@ -53,3 +65,5 @@
 !/www/modules/tools
 !/www/modules/users
 !/www/modules/webodf
+.DS_Store
+.sass-cache

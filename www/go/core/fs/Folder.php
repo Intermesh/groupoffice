@@ -377,5 +377,29 @@ class Folder extends FileSystemObject {
 			return false;
 		}
 	}
+	
+	/**
+	 * Find files and folder matching a regular expression pattern
+	 * 
+	 * @param string $regex
+	 * @param boolean $findFolders
+	 * @param boolean $findFiles
+	 * @return FileSystemObject[]
+	 */
+	public function find($regex, $findFolders = true, $findFiles = true) {
+		$result = [];
+		
+		foreach($this->getChildren($findFiles, true) as $child) {
+			$isFolder = $child->isFolder();
+			if(($findFolders || !$isFolder) && preg_match($regex, $child->getName())) {
+				$result[] = $child;
+			}
+			if($isFolder) {
+				$result = array_merge($result, $child->find($regex, $findFolders, $findFiles));
+			}
+		}
+		
+		return $result;
+	}
 
 }

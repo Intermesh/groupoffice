@@ -1,3 +1,10 @@
+2018/07/30 6.3.25
+
+Please read the release notes here:
+
+http://groupoffice.blogspot.com/2018/07/group-office-63-released.html
+
+
 2016/03/23 6.2.1
 This release has support for PHP 7.0 and improved caldav and carddav support.
 Note that you must have at least PHP 5.5 now.

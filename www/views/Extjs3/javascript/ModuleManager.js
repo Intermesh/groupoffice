@@ -66,7 +66,7 @@ GO.ModuleManager = Ext.extend(function(){
 		
 		var panels = [];
 		
-		for(var i=0;i<this.settingsSortOrder.length;i++)
+		for(var i=0,l=this.settingsSortOrder.length;i<l;i++)
 		{
 			panels.push(this.getSettingsPanel(this.settingsSortOrder[i]));	
 		}
@@ -140,7 +140,7 @@ GO.ModuleManager = Ext.extend(function(){
 		this.modules[moduleName]=true;
 		if(this.readyFunctions[moduleName])
 		{
-			for(var i=0;i<this.readyFunctions[moduleName].length;i++)
+			for(var i=0,l=this.readyFunctions[moduleName].length;i<l;i++)
 			{
 				var c = this.readyFunctions[moduleName][i];
 				c.fn.call(c.fn.scope,moduleName,this);
@@ -168,7 +168,6 @@ GO.ModuleManager = Ext.extend(function(){
 			Ext.reg("module-main-"+moduleName, this.modulePanels[moduleName]);
 			this.panelConfigs[moduleName].xtype = "module-main-"+moduleName;
 			var p = this.panelConfigs[moduleName];
-			this.fireEvent('moduleconstructed', this, moduleName, p);
 			return p;
 		} else {
 			return false;
@@ -179,7 +178,7 @@ GO.ModuleManager = Ext.extend(function(){
 		
 		var panels = [];
 		
-		for(var i=0;i<this.sortOrder.length;i++)
+		for(var i=0, l = this.sortOrder.length;i<l;i++)
 		{
 			panels.push(this.getPanel(this.sortOrder[i]));	
 		}
@@ -189,7 +188,7 @@ GO.ModuleManager = Ext.extend(function(){
 	getAllPanelConfigs : function(){
 		var configs = [];
 
-		for(var i=0;i<this.sortOrder.length;i++)
+		for(var i=0, l = this.sortOrder.length;i<l;i++)
 		{
 			configs.push(this.panelConfigs[this.sortOrder[i]]);
 		}

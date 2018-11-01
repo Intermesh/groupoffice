@@ -18,6 +18,10 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		else
 			return parent::allowGuests();
 	}
+  
+  protected function allowWithoutModuleAccess() {
+    return ['images'];
+  }
 	
 	protected function actionGetURL($path){
 		
@@ -669,8 +673,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		if (!empty($params['query']))
 				return $this->_searchFiles($params);
             
-		if ($params['folder_id'] == 'shared')
-			return $this->_listShares($params);
+		
 		
 		//get the folder that contains the files and folders to list.
 		//This will check permissions too.
@@ -678,8 +681,15 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			$folder = \GO\Files\Model\Folder::model()->findHomeFolder (GO::user());
 		}else
 		{			
+			if ($params['folder_id'] == 'shared') {
+				return $this->_listShares($params);
+			}
 			$folder = \GO\Files\Model\Folder::model()->findByPk($params['folder_id']);
 		}
+		
+		if(!$folder)
+			throw new \Exception('No Folder found with id '.$params['folder_id']);
+	
 		
 		
 		// if it is the users folder tha get the shared folders
@@ -687,8 +697,6 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			return $this->_listShares($params);
 		}
 		
-		if(!$folder)
-			throw new \Exception('No Folder found with id '.$params['folder_id']);
 		
 		$user = $folder->quotaUser;
 		$this->_listFolderPermissionLevel=$folder->permissionLevel;
@@ -839,7 +847,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 					->addInCondition("groupId", \GO\Base\Model\User::getGroupIds(\GO::user()->id), "a", false);
 
 			$findParams = \GO\Base\Db\FindParams::newInstance()
-					->select('*')
+					->select('t.*,cf.*')
 					->ignoreAcl()
 					->joinCustomFields()
 					->joinModel(array(
@@ -1077,10 +1085,13 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 	protected function checkEntityFolder($params) {
 		$cls = $params['model'];
 		
+		$entityType = \go\core\orm\EntityType::findByName($params['model']);
+		$cls = $entityType->getClassName();
+		
 		$entity = $cls::findById($params['id']);
 		
 		if(empty($entity->filesFolderId)) {
-			$filesPath = $entity->getType()->getModule()->name. '/'. $entity->getType()->getName() . '/' . $entity->id;
+			$filesPath = $entityType->getModule()->name. '/'. $entityType->getName() . '/' . $entity->id;
 			$aclId =$entity->findAclId();
 			$folder = \GO\Files\Model\Folder::model()->findByPath($filesPath,true, array('acl_id'=>$aclId,'readonly'=>1));
 
@@ -1116,14 +1127,19 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 	 * @return type
 	 */
 	protected function actionCheckModelFolder($params) {
-		$cls = \GO::getModel($params['model']);
 		
-		if(is_a($cls, \go\core\orm\Entity::class, true)) {
-			$params['model'] = $cls;
+		$cls = $params['model'];
+		$entityType = \go\core\orm\EntityType::findByName($params['model']);
+		if(!empty($entityType)) {
+			$cls = $entityType->getClassName();
+		}
+		
+		if(strpos($params['model'], '\\') === false && is_a($cls, '\\go\\core\\orm\\Entity', true)) {
 			return $this->checkEntityFolder($params);
 		}
 		
-		$model = $cls->findByPk($params['id'],false, true);
+		$obj = new $cls(false);
+		$model = $obj->findByPk($params['id'],false, true);
 
 		$response['success'] = true;
 		$response['files_folder_id'] = $this->checkModelFolder($model, true, !empty($params['mustExist']));
@@ -1192,6 +1208,10 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		if (!$destinationFolder->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION))
 			throw new \GO\Base\Exception\AccessDenied();
+		
+		if(!isset(\GO::session()->values['files']['uploadqueue'])) {
+			throw new \Exception("Nothing to process");
+		}
 
 
 		while ($tmpfile = array_shift(\GO::session()->values['files']['uploadqueue'])) {

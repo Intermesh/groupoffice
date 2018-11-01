@@ -23,24 +23,84 @@ function dp(size) {
  *When upgrading extjs don't forget to check htmleditor overrides in E-mail composer
  */
 
-Ext.override(Ext.Component, {
-	
-	//Without this override findParentByType doesn't work if you don't Ext.reg() all your components
-	 getXTypes : function(){
-        var tc = this.constructor;
-        if(!tc.xtypes){
-            var c = [], sc = this;
-            while(sc){
-                c.unshift(sc.constructor.xtype);
-                sc = sc.constructor.superclass;
-            }
-            tc.xtypeChain = c;
-            tc.xtypes = c.join('/');
-        }
-        return tc.xtypes;
-    }
-});
+(function(){
+  
+  //add module and package to components so they are aware of the module they belong to.
+	//go.module and go.package are defined in default_scripts.inc.php 
+  var origExtend = Ext.extend;
 
+  Ext.extend = function() {
+    var cls = origExtend.apply(this, arguments);
+    //console.log(go.module);
+    cls.prototype.module = go.module;
+    cls.prototype.package = go.package;
+
+    return cls;
+  }
+})();
+
+
+(function() {
+	
+	var componentInitComponent = Ext.Component.prototype.initComponent;
+
+	Ext.override(Ext.Component, {  
+			
+
+		initComponent : function() {
+			componentInitComponent.call(this);			
+
+			if(this.entityStore) {
+				this.initEntityStore();
+			}
+		},
+		
+		initEntityStore : function() {
+			if(Ext.isString(this.entityStore)) {
+				this.entityStore = go.Stores.get(this.entityStore);
+				if(!this.entityStore) {
+					throw "Invalid 'entityStore' property given to component"; 
+				}
+			}
+			
+			this.on("afterrender", function() {
+				this.entityStore.on('changes',this.onChanges, this);		
+			}, this);
+
+			this.on('beforedestroy', function() {
+				this.entityStore.un('changes', this.onChanges, this);
+			}, this);
+		},
+
+		/**
+		 * Fires when items are added, changed or destroyed in the entitystore.
+		 * 
+		 * @param {go.data.EntityStore} entityStore
+		 * @param {Object[]} added
+		 * @param {Object[]} changed
+		 * @param {int[]} destroyed
+		 * @returns {void}
+		 */
+		onChanges : function(entityStore, added, changed, destroyed) {		
+
+		},
+
+		//Without this override findParentByType doesn't work if you don't Ext.reg() all your components
+		 getXTypes : function(){
+					var tc = this.constructor;
+					if(!tc.xtypes){
+							var c = [], sc = this;
+							while(sc){
+									c.unshift(sc.constructor.xtype);
+									sc = sc.constructor.superclass;
+							}
+							tc.xtypeChain = c;
+							tc.xtypes = c.join('/');
+					}
+					return tc.xtypes;
+			}
+	});
+})();
 
 Ext.override(Ext.form.TextArea,{
 	insertAtCursor: function(v) {
@@ -153,7 +213,17 @@ Ext.override(Ext.FormPanel,{
 				});
 			}
 		});
-	})
+	}),
+	focus : function() {
+		var firstField = this.getForm().items.find(function (item) {
+			if (!item.disabled && item.isVisible() && item.getValue() == "")
+				return true;
+		});
+
+		if (firstField) {
+			firstField.focus();
+		}
+	}
 });
 
 Ext.override(Ext.slider.MultiSlider, {
@@ -182,7 +252,7 @@ Ext.override(Ext.tree.TreeNodeUI, {
             '<span class="x-tree-node-indent">',this.indentMarkup,"</span>",
             '<span class="x-tree-ec-icon x-tree-elbow"></span>',
             '<span style="background-image:url(', a.icon || this.emptyIcon, ');" class="x-tree-node-icon',(a.icon ? " x-tree-node-inline-icon" : ""),(a.iconCls ? " "+a.iconCls : ""),'" unselectable="on"></span>',
-            cb ? ('<input class="x-tree-node-cb" type="checkbox" ' + (a.checked ? 'checked="checked" />' : '/>')) : '',
+            cb ? ('<span class="x-tree-node-cb"><input type="checkbox" ' + (a.checked ? 'checked="checked" /></span>' : '/></span>')) : '',
             '<a hidefocus="on" class="x-tree-node-anchor" href="',href,'" tabIndex="1" ',
              a.hrefTarget ? ' target="'+a.hrefTarget+'"' : "", '><span unselectable="on">',n.text,"</span></a></div>",
             '<ul class="x-tree-node-ct" style="display:none;"></ul>',
@@ -247,7 +317,7 @@ Ext.override(Ext.grid.GridView, {
 });
 
 Ext.override(Ext.grid.CheckboxSelectionModel, {
-	width: dp(40),
+	width: dp(32),
 });
 
 Ext.override(Ext.layout.ToolbarLayout, {
@@ -399,6 +469,10 @@ Ext.override(Ext.Component, {
 }); 
 
 
+Ext.encode = Ext.util.JSON.encode = function(json){
+  return JSON.stringify(json);
+}
+
 /*
  * Catch JSON parsing errors and show error dialog
  * @type 
@@ -406,8 +480,9 @@ Ext.override(Ext.Component, {
 Ext.decode = Ext.util.JSON.decode = function(jsonStr){
 	try{
 		var json = eval("(" + jsonStr + ')');
-		if(json && json.redirectToLogin)
+		if(json && json.redirectToLogin) {      
 			document.location.href=BaseHref;
+    }
 		
 		return json;
 	}
@@ -417,7 +492,7 @@ Ext.decode = Ext.util.JSON.decode = function(jsonStr){
 		switch(json.trim())
 		{
 			case 'NOTLOGGEDIN':
-				document.location=BaseHref;
+				//document.location=BaseHref;
 			break;
 
 			case 'UNAUTHORIZED':
@@ -513,25 +588,25 @@ Ext.override(Ext.form.Checkbox, {
  * @param {HTMLElement} node The node to remove
  * @method
  */
- Ext.removeNode = Ext.isIE && !Ext.isIE8 && !Ext.isIE9 && !Ext.isIE10 ? function() {
-
-	var d;
-	return function(n) {
-		if (n && n.tagName != 'BODY') {
-			(Ext.enableNestedListenerRemoval) ? Ext.EventManager.purgeElement(n, true) : Ext.EventManager.removeAll(n);
-			d = d || document.createElement('div');
-			d.appendChild(n);
-			d.innerHTML = '';
-			delete Ext.elCache[n.id];
-		}
-	};
-}() : function(n) {
-	if (n && n.parentNode && n.tagName != 'BODY') {
-		(Ext.enableNestedListenerRemoval) ? Ext.EventManager.purgeElement(n, true) : Ext.EventManager.removeAll(n);
-		n.parentNode.removeChild(n);
-		delete Ext.elCache[n.id];
-	}
-};
+// Ext.removeNode = Ext.isIE && !Ext.isIE8 && !Ext.isIE9 && !Ext.isIE10 ? function() {
+//
+//	var d;
+//	return function(n) {
+//		if (n && n.tagName != 'BODY') {
+//			(Ext.enableNestedListenerRemoval) ? Ext.EventManager.purgeElement(n, true) : Ext.EventManager.removeAll(n);
+//			d = d || document.createElement('div');
+//			d.appendChild(n);
+//			d.innerHTML = '';
+//			delete Ext.elCache[n.id];
+//		}
+//	};
+//}() : function(n) {
+//	if (n && n.parentNode && n.tagName != 'BODY') {
+//		(Ext.enableNestedListenerRemoval) ? Ext.EventManager.purgeElement(n, true) : Ext.EventManager.removeAll(n);
+//		n.parentNode.removeChild(n);
+//		delete Ext.elCache[n.id];
+//	}
+//};
 
 
 Ext.override(Ext.layout.ToolbarLayout ,{
@@ -615,54 +690,26 @@ Ext.layout.MenuLayout.prototype.itemTpl = new Ext.XTemplate(
 	'</li>'
 );
 
-Ext.override(Ext.data.Field, {
-	dateFormat: "c" //from server
-});
-
-GO.mainLayout.onReady(function() {
-
-		//Override this when authenticated and mainlayout initializes
-		Ext.override(Ext.DatePicker, {
-			startDay: parseInt(GO.settings.first_weekday)
-		});
-
-		Ext.override(Ext.form.DateField, {
-			format: GO.settings.date_format,
-			startDay: parseInt(GO.settings.first_weekday),
-			altFormats: "Y-m-d|c|" + GO.settings.date_format.replace("Y","y"),
-			dtSeparator:' '
-		});
-
-		Ext.override(Ext.grid.DateColumn, {
-			align: "right",
-			format: GO.settings.date_format + " " + GO.settings.time_format
-		});
-	
-});
-
-Ext.override(Ext.Window, {
-	resizable : !GO.util.isMobileOrTablet(),
-	draggable: !GO.util.isMobileOrTablet(),
-	maximized: GO.util.isMobileOrTablet(),
-});
+// Not needed and breaks rss feed reader
+//Ext.override(Ext.data.Field, {
+//	dateFormat: "c" //from server
+//});
 
 Ext.override(Ext.Panel, {
-	origInitComponent : Ext.Panel.prototype.initComponent,
+	panelInitComponent : Ext.Panel.prototype.initComponent,
 	
 	initComponent : function() {
 		
 		if(GO.util.isMobileOrTablet()) {
-			this.split = false;
-			
+			this.split = false;			
 		}
 		
-		this.origInitComponent.call(this);
+		this.panelInitComponent.call(this);
 	}
 });
 
-
 Ext.override(Ext.form.Field, {
-	origInitComponent : Ext.form.Field.prototype.initComponent,
+	fieldInitComponent : Ext.form.Field.prototype.initComponent,
 	
 	initComponent : function() {
 		
@@ -673,8 +720,16 @@ Ext.override(Ext.form.Field, {
 		}
 		
 		
-		this.origInitComponent.call(this);
-	}
+		this.fieldInitComponent.call(this);
+	},
+	
+	setFieldLabel: function(label){
+		if(this.rendered){
+			this.label.update(label+':');
+		} else {
+			this.label = label;
+		}
+	}		
 });
 
 Ext.util.Format.dateRenderer = function(format) {
@@ -684,4 +739,6 @@ Ext.util.Format.dateRenderer = function(format) {
 };
 				
 				
-				
+Ext.override(Ext.form.CompositeField, {
+	submit: false //don't submit with form.getFieldValue()
+});

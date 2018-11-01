@@ -5,7 +5,7 @@ namespace go\core\data;
 use Exception;
 use go\core\App;
 use go\core\data\ArrayableInterface;
-use go\core\data\Exception\NotArrayable;
+use go\core\data\exception\NotArrayable;
 use go\core\util\DateTime;
 use ReflectionClass;
 use ReflectionMethod;
@@ -31,7 +31,7 @@ abstract class Model implements ArrayableInterface, \JsonSerializable {
 	 */
 	protected static function getReadableProperties() {
 
-		$cacheKey = static::class . '-getReadableProperties';
+		$cacheKey = 'getReadableProperties-' . str_replace('\\', '-', static::class);
 		
 		$ret = App::get()->getCache()->get($cacheKey);
 		if ($ret) {
@@ -239,5 +239,17 @@ abstract class Model implements ArrayableInterface, \JsonSerializable {
 	
 	public function jsonSerialize() {
 		return $this->toArray();
+	}
+	
+	/**
+	 * Get's the class name without the namespace
+	 * 
+	 * eg. class go\modules\community\notes\model\Note becomes just "note"
+	 * 
+	 * @return string
+	 */
+	public static function getClassName() {
+		$cls = static::class;
+		return substr($cls, strrpos($cls, '\\') + 1);
 	}
 }

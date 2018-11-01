@@ -250,7 +250,7 @@ abstract class MultilingualActiveRecord extends ActiveRecord {
 		$lColName = $this->languageIdColumnName;
 		$lColValue = $this->languageValueColumnName;
 		$relationModelInstance = $this->_getRelationModelInstance();
-		$languageRelationArray = $this->_getRelationArray();
+		$languageRelationArray = $this->_getRelationArray();		
 		$activeLanguages = $this->activeLanguages();
 
 
@@ -264,7 +264,7 @@ abstract class MultilingualActiveRecord extends ActiveRecord {
 
 						if (!$l) {
 							$l = new $relationModelInstance();
-							$l->$languageRelationArray['field'] = $this->id;
+							$l->{$languageRelationArray['field']} = $this->id;
 							$l->$lColName = $lang->id;
 						}
 

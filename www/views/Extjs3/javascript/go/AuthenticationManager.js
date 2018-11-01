@@ -28,6 +28,8 @@
 		 * @type {Array} string
 		 */
 		userMethods: [],
+		
+		rememberLogin:false,
 
 		/**
 		 * Register new authenticator
@@ -72,6 +74,10 @@
 				jsonData: clientData,
 				callback: function (options, success, response) {
 					var result = Ext.decode(response.responseText);
+          
+          this.userMethods = result.methods || [];
+					this.loginToken = result.loginToken;
+					this.username = result.username;
 					
 					cb.call(scope || this, this, success, result);
 					
@@ -79,6 +85,10 @@
 						switch(response.status) {
 							case 503:
 								Ext.MessageBox.alert(t("Maintenance mode"), t("Sorry, maintenance mode is enabled and you can't login right now. Please come back later or contact your system administrator"));
+								break;
+								
+							case 401:
+								Ext.MessageBox.alert(t("Account disabled"), t("You're account has been disabled"));
 								break;
 								
 							case 403:
@@ -93,9 +103,7 @@
 						return;
 					}
 
-					this.userMethods = result.methods;
-					this.loginToken = result.loginToken;
-					this.username = result.username;
+					
 
 					if (result.accessToken) {
 						this.onAuthenticated(result);
@@ -108,14 +116,28 @@
 			});
 		},
 
-		forgotPassword: function (email, callback, scope) {
-			Ext.Ajax.request({
-				url: BaseHref + 'auth.php',
-				jsonData: {forgot: true, email: email},
-				callback: function (options, success, response) {
-					callback.call(scope || this, this, success);
+		
+		
+		logout: function (first) {
+
+			if (Ext.Ajax.isLoading())
+			{
+				if (first) {
+					Ext.getBody().mask(t("Loading..."));
 				}
-			});
+				this.logout.defer(500, this, [true]);
+			} else
+			{
+				Ext.Ajax.request({
+					url: BaseHref + 'auth.php',
+					method: "DELETE",
+					callback: function() {
+						go.User.clearAccessToken();
+						document.location = BaseHref;
+					}
+				})
+				
+			}
 		},
 
 		doAuthentication: function (methods, cb, scope) {
@@ -158,51 +180,24 @@
 		},
 
 		onAuthenticated: function (result) {
-			this.accessToken = result.accessToken;
-
+			var storage = go.AuthenticationManager.rememberLogin ? 'localStorage' : 'sessionStorage';
+			window[storage].setItem('accessToken', result.accessToken);
+			
 			if (GO.loginDialog) {
 				GO.loginDialog.close();
 			}
-			go.User = result.user;
+      
+      go.User.loadSession(result);
+			
+			
 
-			var script = document.createElement('script');
-
-			script.setAttribute('src', GO.url('core/moduleScripts'));
-
-			document.body.appendChild(script)
-
-
-			//console.log('tes2t');
-			//var url = GO.settings.config.host;
-			//document.location.href=url;
-			Ext.Ajax.defaultHeaders = {
-				'Authorization': 'Bearer ' + result.accessToken,
-				'Accept-Language': GO.lang.iso
-			};
-
+			Ext.Ajax.defaultHeaders['Authorization'] = 'Bearer ' + result.accessToken;
 
 			this.fireEvent("authenticated", this, result);
-
-			//Deprecated settings for old modules not refactored yet.
-			GO.request({
-				url: 'core/clientsettings',
-				success: function (response, options, result) {
-
-					//Apply user settings. Todo, these settings need refactoring.
-					GO.util.mergeObjects(GO, result.GO);
-					
-					//load state
-					Ext.state.Manager.setProvider(new GO.state.HttpProvider());
-
-					GO.mainLayout.onAuthentication();
-
-					GO.mainLayout.on('render', function () {
-						go.Router.goto(go.Router.pathBeforeLogin);
-					}, this, {single: true});
-
-				}
-			});
-
+			
+			
+			
+			GO.mainLayout.onAuthentication();
 
 		}
 	});

@@ -1,5 +1,5 @@
 <?php
-namespace IFW\Exception;
+namespace go\core\exception;
 
 /**
  * Throw when an operation was forbidden.

@@ -1,24 +1,17 @@
 <?php
 namespace go\core\cli;
 
-use go\core\auth\model\User;
-use go\core\auth\State as AbstractState;
+use go\core\auth\TemporaryState;
 use go\core\Environment;
+use go\modules\core\users\model\User;
 
-class State extends AbstractState {
-	
-	private $userId;
-	
+class State extends TemporaryState {
+
 	public function __construct($userId = User::ID_SUPER_ADMIN) {
-		$this->userId = $userId;
-	}
-	
-	public function getUser() {
-		return User::findById($this->userId);
+		$this->setUserId($userId);
 	}
 
 	public function isAuthenticated() {
-		return Environment::get()->isCli();
+		return parent::isAuthenticated();// && Environment::get()->isCli();
 	}
-
 }

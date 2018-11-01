@@ -10,18 +10,20 @@ CREATE TABLE `ldapauth_server` (
   `hostname` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `port` int(11) NOT NULL DEFAULT '389',
   `encryption` enum('ssl','tls') COLLATE utf8mb4_unicode_ci DEFAULT 'tls',
+  `username` VARCHAR(190) NULL DEFAULT NULL,
+  `password` VARCHAR(512) NULL COLLATE ascii_bin DEFAULT NULL,
   `usernameAttribute` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'uid',
   `peopleDN` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ou=people,dc=example,dc=com',
   `groupsDN` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT 'ou=groups,dc=example,dc=com',
-  `imapHostname` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `imapHostname` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `imapPort` int(11) NOT NULL DEFAULT '143',
   `imapEncryption` enum('tls','ssl') COLLATE utf8mb4_unicode_ci DEFAULT 'tls',
   `imapValidateCertificate` tinyint(1) NOT NULL DEFAULT '1',
   `removeDomainFromUsername` tinyint(1) NOT NULL DEFAULT '0',
-  `smtpHostname` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `smtpHostname` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `smtpPort` int(11) NOT NULL DEFAULT '587',
   `smtpUsername` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `smtpPassword` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `smtpPassword` varchar(512) COLLATE ascii_bin DEFAULT NULL,
   `smtpUseUserCredentials` tinyint(1) NOT NULL DEFAULT '0',
   `smtpEncryption` enum('tls','ssl') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `smtpValidateCertificate` tinyint(1) NOT NULL DEFAULT '1'
@@ -119,7 +121,3 @@ ALTER TABLE `ldapauth_server_domain`
 ALTER TABLE `ldapauth_server_group`
   ADD CONSTRAINT `ldapauth_server_group_ibfk_1` FOREIGN KEY (`serverId`) REFERENCES `ldapauth_server` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `ldapauth_server_group_ibfk_2` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

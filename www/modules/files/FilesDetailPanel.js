@@ -2,11 +2,11 @@ Ext.namespace('go.modules.files');
 
 go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 	title: t("Files", "files"),
-	collapsible: true,	
+	collapsible: true,
 	titleCollapse: true,
 	stateId: "files-detail",
 	initComponent: function () {
-		
+
 
 
 		this.store = new GO.data.JsonStore({
@@ -14,6 +14,17 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 			fields: ['id', 'name', 'mtime', 'extension', "handler"],
 			remoteSort: true
 		});
+		
+		
+		this.store.on("load", function() {
+			var count = this.store.getTotalCount();
+			if(count) {
+				this.browseBtn.setText(t("Browse {total} files").replace("{total}", count));
+			} else
+			{
+				this.browseBtn.setText(t("Browse files"));
+			}
+		}, this);
 
 
 		var tpl = new Ext.XTemplate('<div class="icons"><tpl for=".">\
@@ -37,7 +48,8 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 					scope: this
 				}
 			})];
-
+		
+		
 		this.bbar = [
 			this.browseBtn = new GO.files.FileBrowserButton()
 		];
@@ -52,39 +64,42 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 			});
 		}, this);
 
+
 		go.modules.files.FilesDetailPanel.superclass.initComponent.call(this);
 
 	},
+
 	
-	onClick : function(dataview, index, node, e) {
-		
+	onClick: function (dataview, index, node, e) {
+
 		var record = this.store.getAt(index);
-		
-		if(record.data.extension=='folder')
+
+		if (record.data.extension == 'folder')
 		{
 			GO.files.openFolder(this.folderId, record.id);
-		}else
+		} else
 		{
-			if(go.Modules.isAvailable("legacy", "files")){
+			if (go.Modules.isAvailable("legacy", "files")) {
 				//GO.files.openFile({id:file.id});
 				record.data.handler.call(this);
-			}else
+			} else
 			{
-				window.open(GO.url("files/file/download",{id:record.data.id}));
+				window.open(GO.url("files/file/download", {id: record.data.id}));
 			}
 		}
 	},
-
 	onLoad: function (dv) {
 
 		this.browseBtn.model_name = dv.model_name || dv.entity || dv.entityStore.entity.name;
-		this.browseBtn.setId(dv.data.id);
-		
+		this.browseBtn.setId(dv.data.id);		
+
+		this.detailView = dv;
+
 		this.folderId = dv.data.files_folder_id == undefined ? dv.data.filesFolderId : dv.data.files_folder_id;
-		
-		this.setVisible(this.folderId != undefined);
-		
-		if(this.folderId) {
+
+		//this.setVisible(this.folderId != undefined);
+
+		if (this.folderId) {
 			this.store.load({
 				params: {
 					limit: 10,
@@ -94,6 +109,7 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 		} else
 		{
 			this.store.removeAll();
+			this.browseBtn.setText(t("Create folder"));
 		}
 	}
 

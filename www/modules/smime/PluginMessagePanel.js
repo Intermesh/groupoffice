@@ -1,3 +1,5 @@
+/* global GO, Ext */
+
 /**
  * Copyright Intermesh
  *
@@ -26,7 +28,7 @@ GO.moduleManager.onModuleReady('email',function(){
 				{
 					this.messagePanel.body.print();
 				}
-			}
+			};
 		})
 	});
 	
@@ -45,7 +47,7 @@ GO.moduleManager.onModuleReady('email',function(){
 									
 				if(data.smime_encrypted){
 					var el = this.body.down(".message-header").createChild({													
-						html:t("This message was sent to you encrypted.", "smime"),													
+						html:t("This message is encrypted.", "smime"),													
 						cls:'smi-encrypt-notification'
 					});
 				}
@@ -57,9 +59,9 @@ GO.moduleManager.onModuleReady('email',function(){
 													
 					});
 											
-					this.smimeLink.on('click', function(){this.checkCert()}, this)
+					this.smimeLink.on('click', function(){this.checkCert();}, this);
 				}
-			})
+			});
 		}),
 		
 		checkCert : function (hideDialog, callback, scope){
@@ -110,6 +112,6 @@ GO.moduleManager.onModuleReady('email',function(){
 				});
 			}
 		}	
-	})
+	});
 });
         

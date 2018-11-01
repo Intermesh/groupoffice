@@ -2,11 +2,7 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 	
 	initComponent: function() {
 		
-		this.usernameText = new GO.form.HtmlComponent({
-			html: t("Login required"),
-			cls: 'login-text-comp'
-		});
-		
+
 		this.usernameField = new Ext.form.TextField({
 			itemId: 'username',
 			fieldLabel: t("Username"),
@@ -23,26 +19,49 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 			allowBlank:false,
 			anchor:'100%'
 		});
-				
-		Ext.apply(this,{
+		
+		//nested panel is required so that submit button is inside form. 
+		//Otherwise firefox won't prompt to save password and all browsers won't handle "enter" to submit
+		var panel = new Ext.Panel({
 			id: 'usernameCheck',
-			items: [
-				this.usernameText,
-				this.usernameField,
-				this.passwordField,
-				{
-					xtype: "xcheckbox",
-					name: "remind",
-					value: false,
-					boxLabel: "Remember my login on this computer until I press logout",
-					listeners: {
-						check : function(checked) {
-							GO.mainLayout.setRememberLogin(checked);
+			bbar: [
+				this.forgotBtn = new Ext.Button({
+					text: t("Forgot username?"),
+					handler: this.showForgot,
+					scope:this
+				}),
+				'->',
+				this.nextButton = new Ext.Button({
+					type: "submit",
+					text: t("Next"),
+					handler: this.submit,
+					scope:this
+				})
+			],
+			items: [{
+					xtype: "fieldset",
+					items:[			
+						this.usernameField,
+						this.passwordField,
+						{
+							hideLabel: true,
+							xtype: "xcheckbox",
+							name: "remind",
+							value: false,
+							boxLabel: "Remember my login on this computer until I press logout",
+							listeners: {
+								check : function(checked) {
+									go.AuthenticationManager.rememberLogin = checked;
+								}
+							}
 						}
-					}
+					]
 				}
 			]
 		});
+		
+		this.items = [panel];
+		this.layout="fit";
 	
 		go.login.UsernamePanel.superclass.initComponent.call(this);
 	},
@@ -70,18 +89,26 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 		}
 	},
 	
-	submit: function(form) {
+	showForgot : function() {
+		var forgotDlg = new go.login.ForgotDialog();
+		forgotDlg.show();
+	},
+	
+	submit: function() {
 		
-		form.getEl().mask();
+		if(!this.getForm().isValid()){
+			return;
+		}
+		
+		this.getEl().mask();
 		
 		go.AuthenticationManager.getAvailableMethods(this.usernameField.getValue(), this.passwordField.getValue(),function(authMan, success, result){
-			form.getEl().unmask();
+			this.getEl().unmask();
 			if(success){				
-				this.methods = result.methods;
-				this.next();
+				this.onSuccess();
 			} else {
-				this.userNamePanel.setErrors(result.errors);
+				this.setErrors(result.errors);
 			}
-		},form);
+		},this);
 	}
 });

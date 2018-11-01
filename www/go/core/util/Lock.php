@@ -3,7 +3,6 @@ namespace go\core\util;
 
 use Exception;
 use go\core\fs\File;
-use go\core\http\Exception as Exception2;
 use function GO;
 
 /**
@@ -24,11 +23,7 @@ class Lock {
 	 */
 	private $lockFp;
 	
-	/**
-	 * The lock file name.
-	 * Stored to cleanup after the script ends
-	 */
-	private $lockFile;
+	private $unlock = false;
 	
 	/**
 	 * Lock an action
@@ -47,15 +42,23 @@ class Lock {
 		
 		$name = File::stripInvalidChars($this->name);
 
-		$this->lockFile = $lockFolder->getFile($name . '.lock');
+		$lockFile = $lockFolder->getFile($name . '.lock')->touch(true);
 		
 		//needs to be put in a private variable otherwise the lock is released outside the function scope
-		$this->lockFp = $this->lockFile->open('w+');
+		$this->lockFp = $lockFile->open('w+');
+		
+		if(!$this->lockFp){
+			throw new Exception("Could not create or open the file for writing.\rPlease check if the folder permissions are correct so the webserver can create and open files in it.\rPath: '" . $this->lockFile->getPath() . "'");
+		}
 		
 		if (!flock($this->lockFp, LOCK_EX|LOCK_NB, $wouldblock)) {
 			
-			//unset it because otherwise __destruct will destroy the lock
-			unset($this->lockFile, $this->lockFp);
+			//unset it because otherwise __destruct will destroy the lock		
+			if(is_resource($this->lockFp)) {
+				fclose($this->lockFp);
+			}
+			
+			$this->lockFp = null;
 			
 			if ($wouldblock) {
 				// another process holds the lock
@@ -65,6 +68,8 @@ class Lock {
 			}
 		} 
 		
+		$this->unlock = true;
+		
 		return true;
 	}
 	
@@ -73,13 +78,16 @@ class Lock {
 	 */
 	public function unlock() {
 		//cleanup lock file if lock() was used
-		if(isset($this->lockFile)) {
+		if(is_resource($this->lockFp)) {			
+			flock($this->lockFp, LOCK_UN);
 			fclose($this->lockFp);
-			unlink($this->lockFile);			
+			$this->lockFp = null;			
 		}
 	}
 	
 	public function __destruct() {
-		$this->unlock();		
+		if($this->unlock) {
+			$this->unlock();		
+		}
 	}
 }
