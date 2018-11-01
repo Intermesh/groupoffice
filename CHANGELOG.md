@@ -1,3 +1,4 @@
+- Core: Added Create link button to email composer, task, note and event dialog.
 - Core: Fixed issue with form loading while it was not yet rendered. 
 				(Fixes loading of the user settings dialog when accessing it from the users grid.)
 
