@@ -105,6 +105,22 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 		}, this, {single: true});
 	},
 			
+			
+	findCreateLinkButton : function(window) {
+		
+		var tbars = [window.getFooterToolbar(), window.getBottomToolbar(), window.getTopToolbar()];
+		for(var i = 0, l = tbars.length; i < l; i++) {
+			if(!tbars[i]) {
+				continue;
+			}
+			
+			var btn = tbars[i].findByType("createlinkbutton");
+			if(btn[0]) {
+				return btn[0];
+			}			
+		}
+		return false;
+	},
 
 	buildMenu: function () {
 		var items = [
@@ -180,7 +196,7 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 						//}, this, {single: true});
 					}
 					var win = window.win || window; //for some old dialogs that have a "win" prop (TaskDialog and EventDialog)
-					var createLinkButton = win.getBottomToolbar().findByType("createlinkbutton")[0] || win.getTopToolbar().findByType("createlinkbutton")[0];
+					var createLinkButton = this.findCreateLinkButton(win);
 					
 					if(createLinkButton) {
 						//if window has a create link button then use this. Otherwise add a save listener.
