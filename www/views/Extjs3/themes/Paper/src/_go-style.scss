@@ -19,7 +19,7 @@ p {
 }
 
 
-#window-container, #viewport {
+/*#window-container, #viewport {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -27,7 +27,10 @@ p {
 	right: 0;
 	overflow: hidden;
 	visibility: hidden;
-}
+	> * {
+		visibility: visible;
+	}
+}*/
 
 /*#bg {
 	z-index: -1;
