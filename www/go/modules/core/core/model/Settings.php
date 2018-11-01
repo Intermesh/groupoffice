@@ -133,6 +133,48 @@ class Settings extends core\Settings {
 	public function setSmtpPassword($value) {
 		$this->smtpPassword = \go\core\util\Crypt::encrypt($value);
 	}
+	
+	
+	protected $locale;
+	
+	/**
+	 * Get locale for the system. We need a UTF8 locale so command line functions
+	 * work with UTF8.
+	 * 
+	 * @return string
+	 */
+	public function getLocale() {
+		
+		if(isset($this->locale)) {
+			return $this->locale;
+		}
+		
+		try {
+			exec('locale -a', $output);
+
+			if(isset($output) && is_array($output)){
+				foreach($output as $locale){
+					if(stripos($locale,'utf')!==false){
+						$this->locale = $locale;
+						$this->save();
+						return $this->locale;
+					}
+				}
+			}
+		} catch(\Exception $e) {
+			GO()->debug("Could not determine locale");
+		}
+
+		//This locale is often installed so try to fallback on C.UTF8
+		$this->locale = "C.UTF8";
+		$this->save();
+		
+		return $this->locale;
+	}
+	
+	public function setLocale($locale) {
+		$this->locale = $locale;
+	}
 
 	/**
 	 * Encryption to use for SMTP
