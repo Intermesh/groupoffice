@@ -62,11 +62,13 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	_add : function(entity) {
 		if(this.data[entity.id]) {			
 			this.changes.changed[entity.id] = entity;
+			Ext.apply(this.data[entity.id], entity);
 		} else
 		{
 			this.changes.added[entity.id] = entity;
+			this.data[entity.id] = entity;
 		}		
-		this.data[entity.id] = entity;
+		
 		
 		//remove from not found.
 		var i = this.notFound.indexOf(entity.id);
