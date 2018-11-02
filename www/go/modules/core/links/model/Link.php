@@ -16,34 +16,65 @@ use go\modules\core\search\model\Search;
 
 class Link extends Entity {
 	
+	/**
+	 * The auto increment primary key
+	 * 
+	 * @var int 
+	 */
 	public $id;
 
 	protected $fromEntityTypeId;
 	protected $toEntityTypeId;
 	protected $toEntity;
-	protected $fromEntity;
-	public $fromId;
-	
+	protected $fromEntity;	
 	protected $toName;
 	protected $toDescription;
 	
 	protected $aclId;
 	
 
+	/**
+	 * The id of the entity it links from
+	 * 
+	 * The entity type can be fetched with {@see getFromEntity()}
+	 * 
+	 * @var int
+	 */
+	public $fromId;
+	
+	/**
+	 * The entity type of the entity it links from
+	 * 
+	 * @return string eg. "Contact"
+	 */
 	public function getFromEntity() {
 		return $this->fromEntity;
 	}
+	
 	public function setFromEntity($entityName) {
 		$e = EntityType::findByName($entityName);
 		$this->fromEntity = $e->getName();
 		$this->fromEntityTypeId = $e->getId();
 	}
 
+	/**
+	 * The id of the entity it links to
+	 * 
+	 * The entity type can be fetched with {@see Link::getToEntity()}
+	 * 
+	 * @var int
+	 */
 	public $toId;
 
+	/**
+	 * The entity type of the entity it links to
+	 * 
+	 * @return string eg. "Contact"
+	 */
 	public function getToEntity() {
 		return $this->toEntity;
 	}
+	
 	public function setToEntity($entityName) {
 		$e = EntityType::findByName($entityName);
 		$this->toEntity = $e->getName();
@@ -58,7 +89,8 @@ class Link extends Entity {
 	public $description;
 
 	/**
-	 *
+	 * The date the link was created
+	 * 
 	 * @var DateTime
 	 */
 	public $createdAt;
@@ -191,7 +223,7 @@ class Link extends Entity {
 	/**
 	 * The to properties
 	 * 	
-	 * @return array
+	 * @return array ['name' => string, 'description' => 'description']
 	 */
 	public function getTo() {
 		return ['name' => $this->toName, 'description' => $this->toDescription];
@@ -232,10 +264,6 @@ class Link extends Entity {
 	
 	protected static function searchColumns() {
 		return ['s.keywords'];
-	}
-
-	public function toArray($properties = array()) {
-		return parent::toArray($properties);
 	}
 	
 }
