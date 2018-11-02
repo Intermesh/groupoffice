@@ -1,3 +1,5 @@
+/* global go, Ext */
+
 //todo create base component for entities
 
 go.modules.community.addressbook.TreeLoader = Ext.extend(Ext.tree.TreeLoader, {
@@ -29,6 +31,26 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 		}
 	},
 	
+	constructor : function(config) {		
+		go.modules.community.addressbook.TreeLoader.superclass.constructor.call(this, config);
+		this.initEntityStore();
+	},
+	
+	initEntityStore : function() {
+		if(Ext.isString(this.entityStore)) {
+			this.entityStore = go.Stores.get(this.entityStore);
+			if(!this.entityStore) {
+				throw "Invalid 'entityStore' property given to component"; 
+			}
+		}
+//		this.entityStore.on('changes',this.onChanges, this);		
+//
+//		this.on('beforedestroy', function() {
+//			this.entityStore.un('changes', this.onChanges, this);
+//		}, this);
+	},
+
+	
 	requestGroups : function(node, callback, scope) {
 						
 		go.Stores.get("AddressBookGroup").get(node.attributes.entity.groups, function(groups){
@@ -55,7 +77,7 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 			this.handleResponse(response);
 			
 			this.loading = false;
-		}, this)
+		}, this);
 		
 		
 	},
@@ -92,10 +114,10 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 						entityId: entity.id||null,
 						entity: entity,
 						isAddressBook: true,
-						expanded: entity.groups.length == 0,						
+						expanded: entity.groups.length === 0,						
 						text: entity.name,
 						nodeType: 'async',
-						children: entity.groups.length == 0 ? [] : null
+						children: entity.groups.length === 0 ? [] : null
 					});
 				});
 				
@@ -139,7 +161,7 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 			attr.loader = this;
 		}
 
-		if (typeof attr.uiProvider == 'string') {
+		if (typeof attr.uiProvider === 'string') {
 			attr.uiProvider = this.uiProviders[attr.uiProvider] || eval(attr.uiProvider);
 		}
 

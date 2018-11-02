@@ -8,13 +8,13 @@ go.modules.community.addressbook.StarButton = Ext.extend(Ext.Button, {
 		
 		//listen for changes in store
 		go.Stores.get("Contact").on('changes', function(store, added, changed, destroyed) {
-			if(added.concat(changed).indexOf(this.getEntityId()) > -1) {
-				go.Stores.get("Contact").get([this.getEntityId()], function(contacts){
-					this.setIconClass(contacts[0].starred ? 'ic-star' : 'ic-star-border');
-				}, this);
+			var id = this.getEntityId(), change = changed[id] || added[id];
+			
+			if(change && "starred" in change) {
+				this.setIconClass(change.starred ? 'ic-star' : 'ic-star-border');				
 			}
 			
-			if(destroyed.indexOf(this.getEntityId()) > -1) {
+			if(destroyed.indexOf(id) > -1) {
 				this.setIconClass('ic-star-border');
 			}
 		}, this);

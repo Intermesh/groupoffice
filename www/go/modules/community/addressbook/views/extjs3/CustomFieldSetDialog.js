@@ -37,7 +37,7 @@ go.modules.community.addressbook.CustomFieldSetDialog = Ext.extend(go.modules.co
 				anchor: '100%',
 				disabled: true,
 				xtype: "chips",
-				entityStore: go.Stores.get("AddressBook"),
+				entityStore: "AddressBook",
 				displayField: "name",
 				name: "filter.addressBookId",
 				fieldLabel: t("Address books")

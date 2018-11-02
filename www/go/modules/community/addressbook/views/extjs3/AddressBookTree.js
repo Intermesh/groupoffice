@@ -1,10 +1,12 @@
+/* global go, Ext */
+
 go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel, {
 	
 	loader: new go.modules.community.addressbook.TreeLoader({
 		baseAttrs: {
 			iconCls: 'ic-account-box'
 		},
-		entityStore: go.Stores.get("Addressbook")
+		entityStore: "Addressbook"
 	}),
 	root: {
 		nodeType: 'async',
@@ -36,7 +38,7 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 	
 	onSelectionChange : function (sm, node) {			
 			
-		if(!node || node.id == "all"){
+		if(!node || node.id === "all"){
 			if(this.addressBookMoreBtn) {
 				this.addressBookMoreBtn.hide();
 			}
@@ -89,7 +91,7 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 		var rootNode = this.getRootNode(), found = false;
 		
 		rootNode.findChildBy(function(node) {
-			if(node.attributes.entity && node.attributes.entity.id == id) {
+			if(node.attributes.entity && node.attributes.entity.id === id) {
 				found = node;
 				return false;
 			}
@@ -101,25 +103,22 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 
 	onAddressBookChanges : function(entityStore, added, changed, destroyed) {	
 		
-		if(added.length) {			
 			//reload if added address book is not present in tree yet.
-			var me = this, reload = false;
-			added.forEach(function(id) {				
-				if(!me.findAddressbookNode(id)) {
-					reload = true;
-					return false;
-				}
-			});			
-			
-			if(reload) {
-				me.getRootNode().reload();
-				return;
+		var me = this, reload = false, id;
+		for(id in added){				
+			if(!me.findAddressbookNode(id)) {
+				reload = true;
+				return false;
 			}
+		};			
+
+		if(reload) {
+			me.getRootNode().reload();
+			return;
 		}
 		
-		var me = this;
-		
-		changed.forEach(function(id) {
+				
+		for(id in changed) {
 			go.Stores.get("AddressBook").get([id], function(abs) {
 				
 				nodeId = "addressbook-" + abs[0].id, 
@@ -131,7 +130,7 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 					node.reload();
 				}
 			}, this);
-		});
+		}
 		
 		destroyed.forEach(function(id) {
 			var node = me.getNodeById("addressbook-" + id);
@@ -180,7 +179,7 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 					text: t("Delete"),
 					handler: function () {
 						Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
-							if (btn != "yes") {
+							if (btn !== "yes") {
 								return;
 							}
 							go.Stores.get("AddressBook").set({destroy: [this.addressBookMoreBtn.entity.id]});
@@ -235,7 +234,7 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 					text: t("Delete"),
 					handler: function () {
 						Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
-							if (btn != "yes") {
+							if (btn !== "yes") {
 								return;
 							}
 							go.Stores.get("AddressBookGroup").set({destroy: [this.groupMoreBtn.entity.id]});

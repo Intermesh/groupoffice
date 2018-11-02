@@ -3,7 +3,7 @@
 go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 	stateId: 'addressbook-contact-dialog',
 	title: t("Contact"),
-	entityStore: go.Stores.get("Contact"),
+	entityStore: "Contact",
 	width: 600,
 	height: 600,
 
