@@ -168,6 +168,7 @@ try {
 				}
 			} else {
 				$upgradefile = $module->module()->getFolder()->getFile('install/updates.php');
+				$module->module()->registerEntities();
 			}
 
 			if (!$upgradefile->exists()) {

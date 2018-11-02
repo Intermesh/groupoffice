@@ -1,3 +1,5 @@
+/* global go */
+
 /**
  * 
  * Typical usage
@@ -36,13 +38,9 @@ go.form.Dialog = Ext.extend(go.Window, {
 		
 		this.items = [this.formPanel];
 
-		this.buttons = [this.deleteBtn = new Ext.Button({
-				text: t("Delete"),
-				cls: 'danger',
-				handler: this.delete,
-				disabled: true,
-				scope: this
-			}), '->', {
+		this.buttons = [
+			'->', 
+			{
 				text: t("Save"),
 				handler: this.submit,
 				scope: this
@@ -50,11 +48,36 @@ go.form.Dialog = Ext.extend(go.Window, {
 
 		go.form.Dialog.superclass.initComponent.call(this);		
 		
+		if(this.entityStore.entity.linkable) {
+			this.addCreateLinkButton();
+		}		
 
 		if (this.formValues) {
 			this.formPanel.form.setValues(this.formValues);
 			delete this.formValues;
 		}
+	},
+	
+	
+	addCreateLinkButton : function() {
+		
+		this.getFooterToolbar().insert(0, this.createLinkButton = new go.modules.core.links.CreateLinkButton());	
+		
+		this.on("load", function() {
+			this.createLinkButton.setEntity(this.entityStore.entity.name, this.currentId);
+		}, this);
+
+		this.on("show", function() {
+			if(!this.currentId) {
+				this.createLinkButton.reset();
+			}
+		}, this);
+
+		this.on("submit", function(dlg, success, serverId) {			
+			this.createLinkButton.setEntity(this.entityStore.entity.name, serverId);
+			this.createLinkButton.save();
+		}, this);
+	
 	},
 
 	load: function (id) {
@@ -122,7 +145,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 	},
 	
 	onLoad : function() {
-		this.deleteBtn.setDisabled(this.formPanel.entity.permissionLevel < GO.permissionLevels.writeAndDelete);
+		this.fireEvent("load", this);
+//		this.deleteBtn.setDisabled(this.formPanel.entity.permissionLevel < GO.permissionLevels.writeAndDelete);
 	},
 	
 	onSubmit : function() {
@@ -161,6 +185,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 		this.formPanel.submit(function(formPanel, success, serverId) {
 			this.actionComplete();
 			this.onSubmit();
+			this.fireEvent("submit", this, success, serverId);
+			
 			if(!success) {
 				return;
 			}

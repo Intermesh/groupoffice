@@ -39,12 +39,6 @@ GO.tasks.TaskDialog = function() {
 			this.createLinkButton = new go.modules.core.links.CreateLinkButton(),		
 			"->",
 			{
-				text : t("Apply"),
-				handler : function() {
-					this.submitForm();
-				},
-				scope : this
-			},{
 				text : t("Save"),
 				handler : function() {
 					this.submitForm(true);

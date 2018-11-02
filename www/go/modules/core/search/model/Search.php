@@ -94,6 +94,10 @@ class Search extends \go\core\acl\model\AclEntity {
 			$query->where('e.name', 'IN', $filter['entities']);		
 		}
 		
+		if(!empty($filter['entityId'])) {
+			$query->where('entityId', '=', $filter['entityId']);
+		}
+		
 		return parent::filter($query, $filter);
 	}
 	

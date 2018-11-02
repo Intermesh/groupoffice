@@ -86,12 +86,6 @@ GO.Window = Ext.extend(Ext.Window,{
 				this.center();
 		}
 	},
-	
-	render : function(container, position){
-		container = Ext.get("window-container");
-		return GO.Window.superclass.render.call(this, container, position);
-	},
-
 
 	show : function(animateTarget, cb, scope){
 	

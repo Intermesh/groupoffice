@@ -625,11 +625,8 @@ class GO{
 		
 		date_default_timezone_set(\GO::user() ? \GO::user()->timezone : \GO::config()->default_timezone);
 		
-		//set local to utf-8 so functions will behave consistently
-		if ( !empty(\GO::config()->locale_all) ){
-			setlocale(LC_CTYPE, \GO::config()->locale_all);
-			putenv('LC_ALL='.\GO::config()->locale_all);
-		}
+		setlocale(LC_ALL, GO()->getSettings()->getLocale());
+		
 //		}else{
 //			//for escape shell arg
 //			if(!isset(\GO::session()->values['locale_all'])){

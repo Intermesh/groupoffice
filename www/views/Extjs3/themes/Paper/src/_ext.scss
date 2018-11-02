@@ -636,6 +636,10 @@
 	border: 1px solid color($fg, "line");
 	color: inherit;
 	transition: background-color 225ms linear, box-shadow 225ms $curve-standard;
+	
+	button {
+		min-height: dp(32);
+	}
 
 	&.x-item-disabled {
 		.x-btn-text {

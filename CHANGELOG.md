@@ -1,3 +1,8 @@
+30-10-2018 6.3.48
+- Demodata: Fixed demo data module that kept asking to add data
+- Calendar: Fixed bug when clicking on grid created appointment on the wrong day
+- Core: Fixed ZIP file bug with utf8 characters in filenames
+- Core: Added Create link button to email composer, task, note and event dialog.
 - Core: Fixed issue with form loading while it was not yet rendered. 
 				(Fixes loading of the user settings dialog when accessing it from the users grid.)
 

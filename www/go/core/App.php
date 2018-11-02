@@ -395,7 +395,7 @@ use go\modules\core\core\model\Settings;
 		/**
 		 * Get the application settings
 		 * 
-		 * @return AppSettings
+		 * @return Settings
 		 */
 		public function getSettings() {
 			return Settings::get();
