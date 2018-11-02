@@ -55,7 +55,7 @@ abstract class Entity  extends OrmEntity {
 		}
 		
 		if(self::$trackChanges) {
-			$this->getType()->change($this);		
+			$this->getType()->checkChange($this);
 		}
 		
 		return true;
@@ -72,7 +72,9 @@ abstract class Entity  extends OrmEntity {
 			return false;
 		}
 		
-		$this->getType()->change($this);
+		if(self::$trackChanges) {
+			$this->getType()->checkChange($this);
+		}
 		
 		return true;
 	}	

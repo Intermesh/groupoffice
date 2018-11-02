@@ -244,13 +244,63 @@ class EntityType {
 		
 		return $e;
 	}
-		
+	
 	/**
-	 * Register a change of an entity. When the application ends these changes will be saved in the "core_change" log table.
+	 * Register multiple changes for JMAP
+	 * 
+	 * This function increments the entity type's modSeq so the JMAP sync API 
+	 * can detect this change for clients.
+	 * 
+	 * It writes the changes into the 'core_change' table.
+	 * 	 
+	 * @param Query $changedEntities A query object that provides "entityId", "aclId" and "destroyed" in this order!.
+	 */
+	public function changes(Query $changedEntities) {		
+		$this->highestModSeq = $this->nextModSeq();		
+		
+		$changedEntities->select('"' . $this->getId() . '", "'. $this->highestModSeq .'", NOW()', true);		
+		
+		if(!GO()->getDbConnection()->insert('core_change', $changedEntities, ['entityId', 'aclId', 'destroyed', 'entityTypeId', 'modSeq', 'createdAt'])->execute()) {
+			throw new \Exception("Could not save change");
+		}		
+	}
+	
+	/**
+	 * Register a change for JMAP
+	 * 
+	 * This function increments the entity type's modSeq so the JMAP sync API 
+	 * can detect this change for clients.
+	 * 
+	 * It writes the changes into the 'core_change' table.
+	 * 
+	 * It also writes user specific changes 'core_user_change' table ({@see \go\core\orm\Mapping::addUserTable()). 
 	 * 
 	 * @param Entity $entity
 	 */
 	public function change(Entity $entity) {
+		$this->highestModSeq = $this->nextModSeq();
+
+		$record = [
+				'modSeq' => $this->highestModSeq,
+				'entityTypeId' => $this->id,
+				'entityId' => $entity->getId(),
+				'aclId' => $entity->findAclId(),
+				'destroyed' => $entity->isDeleted(),
+				'createdAt' => new DateTime()
+						];
+
+		if(!GO()->getDbConnection()->insert('core_change', $record)->execute()) {
+			throw new \Exception("Could not save change");
+		}
+	}
+		
+	/**
+	 * Checks if a saved entity needs changes for the JMAP API with change() and userChange()
+	 * 
+	 * @param Entity $entity
+	 * @throws Exception
+	 */
+	public function checkChange(Entity $entity) {
 		
 		if(!$entity->isDeleted()) {
 			$modifiedPropnames = array_keys($entity->getModified());		
@@ -266,44 +316,11 @@ class EntityType {
 		
 		
 		if($entityModified) {
-			$this->highestModSeq = $this->nextModSeq();
-
-			$record = [
-					'modSeq' => $this->highestModSeq,
-					'entityTypeId' => $this->id,
-					'entityId' => $entity->getId(),
-					'aclId' => $entity->findAclId(),
-					'destroyed' => $entity->isDeleted(),
-					'createdAt' => new DateTime()
-							];
-
-			if(!GO()->getDbConnection()->insert('core_change', $record)->execute()) {
-				throw new \Exception("Could not save change");
-			}
+			$this->change($entity);
 		}
 		
 		if($userPropsModified) {
-			$data = [
-					'modSeq' => $this->nextUserModSeq()			
-							];
-			
-			$where = [
-					'entityTypeId' => $this->id,
-					'entityId' => $entity->getId(),
-					'userId' => GO()->getUserId()
-							];
-							
-			$stmt = GO()->getDbConnection()->update('core_change_user', $data, $where);
-			if(!$stmt->execute()) {
-				throw new \Exception("Could not save user change");
-			}
-			
-			if(!$stmt->rowCount()) {
-				$where['modSeq'] = 1;
-				if(!GO()->getDbConnection()->insert('core_change_user', $where)->execute()) {
-					throw new \Exception("Could not save user change");
-				}
-			}
+			$this->userChange($entity);
 		}
 		
 		if($entity->isDeleted()) {
@@ -317,6 +334,30 @@ class EntityType {
 			$stmt = GO()->getDbConnection()->delete('core_change_user', $where);
 			if(!$stmt->execute()) {
 				throw new \Exception("Could not delete user change");
+			}
+		}
+	}
+	
+	private function userChange(Entity $entity) {
+		$data = [
+				'modSeq' => $this->nextUserModSeq()			
+						];
+
+		$where = [
+				'entityTypeId' => $this->id,
+				'entityId' => $entity->getId(),
+				'userId' => GO()->getUserId()
+						];
+
+		$stmt = GO()->getDbConnection()->update('core_change_user', $data, $where);
+		if(!$stmt->execute()) {
+			throw new \Exception("Could not save user change");
+		}
+
+		if(!$stmt->rowCount()) {
+			$where['modSeq'] = 1;
+			if(!GO()->getDbConnection()->insert('core_change_user', $where)->execute()) {
+				throw new \Exception("Could not save user change");
 			}
 		}
 	}
