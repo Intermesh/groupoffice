@@ -125,6 +125,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	_destroy : function(id) {		
 		delete this.data[id];
 		this.changes.destroyed.push(id);
+		this.stateStore.removeItem(id + "");
 		this._fireChanges();
 	},
 	
