@@ -101,11 +101,47 @@ class Field extends \GO\Base\Db\ActiveRecord{
 		return parent::validate();
 	}
 	
-	protected function afterSave($wasNew) {
+	protected function beforeSave() {
 		
-		$this->alterDatabase($wasNew);
-				
-		return parent::afterSave($wasNew);
+		if(!$this->customfieldtype->hasLength()){
+			//user may not set length so take the default
+			$this->setOptions(['maxLength' => $this->customfieldtype->getMaxLength()]);
+		}
+		
+		if($this->isNew){
+			$this->sortOrder=$this->count();		
+		}
+	
+		try{	
+			$this->alterDatabase($this->isNew);
+		} catch(\Exception $e){
+			$this->setValidationError('databaseName', $e->getMessage());
+			return false;
+		}
+		
+		return parent::beforeSave();
+	}
+
+	public function save($ignoreAcl = false) {
+		$wasNew = $this->getIsNew();
+		$success = false;
+		
+		try{
+			$success = parent::save($ignoreAcl);
+			
+		} catch (Exception $e) {
+			$success = false;
+		}
+		
+		if(!$success && !$wasNew){
+			if($this->isModified('databaseName')){
+				$oldDatabaseNameValue = $this->getOldAttributeValue('databaseName');
+				$this->databaseName = $oldDatabaseNameValue;
+				$this->alterDatabase($wasNew);
+			}			
+		}
+		
+		return $success;
 	}
 	
 	public function setOptions($value) {
@@ -165,18 +201,7 @@ class Field extends \GO\Base\Db\ActiveRecord{
 		
 		if(!$this->getDbConnection()->query($sql))
 			throw new \Exception("Could not create custom field");
-		
-//		if ($this->isModified('unique_values')) {
-//			
-//			if (!empty($this->unique_values))
-//				$sqlUnique = "ALTER TABLE `".$table."` ADD UNIQUE INDEX ".$this->columnName()."_unique(".$this->columnName().")";
-//			else
-//				$sqlUnique = "ALTER TABLE `".$table."` DROP INDEX ".$this->columnName()."_unique";
-//			
-//			if (!$this->getDbConnection()->query($sqlUnique))
-//				throw new \Exception("Could not change custom field uniqueness.");
-//		}
-		
+
 		$this->_clearColumnCache();
 	}
 	
@@ -211,7 +236,11 @@ class Field extends \GO\Base\Db\ActiveRecord{
 	}
 	
 	protected function afterDelete() {
-		
+		$this->dropColumn();
+		return parent::afterDelete();
+	}
+	
+	private function dropColumn(){
 		//don't be strict in upgrade process
 		\GO::getDbConnection()->query("SET sql_mode=''");	
 		
@@ -224,10 +253,7 @@ class Field extends \GO\Base\Db\ActiveRecord{
 		}
 			
 		$this->_clearColumnCache();
-		
-		return parent::afterDelete();
 	}
-	
 	
 	public function getTreeSelectNestingLevel($parentOptionId=0, $nestingLevel=0){
 		$stmt= FieldTreeSelectOption::model()->find(array(
@@ -278,26 +304,7 @@ class Field extends \GO\Base\Db\ActiveRecord{
 		
 		return false;
 	}
-	
-	protected function beforeSave() {
-		
-		if(!$this->customfieldtype->hasLength()){
-			//user may not set length so take the default
-			$this->setOptions(['maxLength' => $this->customfieldtype->getMaxLength()]);
-		}
-		
-		if($this->isNew)
-			$this->sortOrder=$this->count();		
-		
-//		$this->addressbook_ids = preg_replace('/[^\d^,]/','',$this->addressbook_ids);
-//		if (strlen($this->addressbook_ids)>0 && $this->addressbook_ids[0]==',')
-//			$this->addressbook_ids = substr($this->addressbook_ids,1);
-//		if (strlen($this->addressbook_ids)>0 && $this->addressbook_ids[strlen($this->addressbook_ids)-1]==',')
-//			$this->addressbook_ids = substr($this->addressbook_ids,0,-1);
-		
-		
-		return parent::beforeSave();
-	}
+
 	
 	/**
 	 * Get or create field if not exists

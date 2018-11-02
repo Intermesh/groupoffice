@@ -24,15 +24,13 @@ GO.customfields.FieldDialog = function(config){
 		anchor:'-20',
 		allowBlank:false,
 		fieldLabel: t("Name")
-		
 	});
 
 	this.databaseNameField = new Ext.form.TextField({
 		name: 'databaseName',
 		anchor:'-20',
 		allowBlank:false,
-		fieldLabel: "Database name",
-		allowBlank:false
+		fieldLabel: t("Database column name")
 	});
 
 	this.categoryField = new GO.form.ComboBox({
