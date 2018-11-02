@@ -125,7 +125,7 @@ class QueryBuilder {
 	/**
 	 * @return bool
 	 */
-	public function buildInsert($tableName, $data, $command = "INSERT") {
+	public function buildInsert($tableName, $data, $columns = [], $command = "INSERT") {
 
 		$this->reset();
 		$this->setTableName($tableName);
@@ -135,22 +135,15 @@ class QueryBuilder {
 
 		$sql .= "INTO `{$this->tableName}` ";
 
-		if ($data instanceof \go\core\db\Query) {
+		if ($data instanceof \go\core\db\Query) {			
+			if(!empty($columns)) {
+				$sql .= " (`" . implode("`, `", $columns ) . "`)\n";
+			}
+			
 			$build = $data->build();
 
 			$sql .= ' ' . $build['sql'];
-			$this->buildBindParameters = array_merge($this->buildBindParameters, $data->getBindParameters());
-		} else if ($data instanceof \go\core\orm\Store) { //TODO
-			$builder = $data->getQuery()->getBuilder($data->getRecordClassName());
-			$builder->mergeAliasMap($this->aliasMap);
-
-			$build = $builder->buildSelect($data->getQuery());
-
-			$sql .= ' ' . $build['sql'];
-			//import subquery bind params
-			foreach ($build['params'] as $v) {
-				$this->buildBindParameters[] = $v;
-			}
+			$this->buildBindParameters = array_merge($this->buildBindParameters, $build['params']);
 		} else {
 
 			$tags = [];

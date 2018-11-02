@@ -289,20 +289,24 @@ class Connection {
 	 * 
 	 * @param string $tableName
 	 * @param array|Query $data Key value array or select query
+	 * @param string[] $columns If $data is a query object then you can supply the 
+	 *	selected columns with this parameter. If not given all columns must be 
+	 *	selected in the correct order.
+	 * 
 	 * @return Statement
 	 */
-	public function insert($tableName, $data) {
+	public function insert($tableName, $data, $columns = []) {
 
 		$queryBuilder = new QueryBuilder();
-		$build = $queryBuilder->buildInsert($tableName, $data);
+		$build = $queryBuilder->buildInsert($tableName, $data, $columns);
 
 		return $this->createStatement($build);
 	}
 	
-	public function insertIgnore($tableName, $data) {
+	public function insertIgnore($tableName, $data, $columns = []) {
 
 		$queryBuilder = new QueryBuilder();
-		$build = $queryBuilder->buildInsert($tableName, $data, "INSERT IGNORE");
+		$build = $queryBuilder->buildInsert($tableName, $data, $columns, "INSERT IGNORE");
 
 		return $this->createStatement($build);
 	}
