@@ -171,7 +171,9 @@ try {
 
 	if (empty($methods) && !$token->isAuthenticated()) {
 		$token->setAuthenticated();
-		$token->save();
+		if(!$token->save()) {
+			throw new \Exception("Could not save token: ". var_export($token->getValidationErrors(), true));
+		}
 	}
 
 	if ($token->isAuthenticated()) {

@@ -42,32 +42,13 @@ function dp(size) {
 
 (function() {
 	
-	var componentGetID = Ext.Component.prototype.getId,
-		componentInitComponent = Ext.Component.prototype.initComponent;
-	
+	var componentInitComponent = Ext.Component.prototype.initComponent;
+
 	Ext.override(Ext.Component, {  
-		
-
-		//hack to set translate to module from component in getId because getId() is 
-		//always called before initComponent in the constructor and there's no way 
-		//to override the constructor
-		getId : function(){
-
-			if(this.module) {
-				this.lastTranslationModule = go.Translate.module;
-				this.lastTranslationPackage = go.Translate.package;
-				go.Translate.setModule(this.package, this.module);
-			}
-
-			return componentGetID.call(this);
-		},		
+			
 
 		initComponent : function() {
-			componentInitComponent.call(this);
-
-			if(this.lastTranslationModule) {
-				go.Translate.setModule(this.lastTranslationPackage, this.lastTranslationModule);
-			}
+			componentInitComponent.call(this);			
 
 			if(this.entityStore) {
 				this.initEntityStore();
@@ -84,7 +65,7 @@ function dp(size) {
 			
 			this.on("afterrender", function() {
 				this.entityStore.on('changes',this.onChanges, this);		
-			});
+			}, this);
 
 			this.on('beforedestroy', function() {
 				this.entityStore.un('changes', this.onChanges, this);
@@ -271,7 +252,7 @@ Ext.override(Ext.tree.TreeNodeUI, {
             '<span class="x-tree-node-indent">',this.indentMarkup,"</span>",
             '<span class="x-tree-ec-icon x-tree-elbow"></span>',
             '<span style="background-image:url(', a.icon || this.emptyIcon, ');" class="x-tree-node-icon',(a.icon ? " x-tree-node-inline-icon" : ""),(a.iconCls ? " "+a.iconCls : ""),'" unselectable="on"></span>',
-            cb ? ('<input class="x-tree-node-cb" type="checkbox" ' + (a.checked ? 'checked="checked" />' : '/>')) : '',
+            cb ? ('<span class="x-tree-node-cb"><input type="checkbox" ' + (a.checked ? 'checked="checked" /></span>' : '/></span>')) : '',
             '<a hidefocus="on" class="x-tree-node-anchor" href="',href,'" tabIndex="1" ',
              a.hrefTarget ? ' target="'+a.hrefTarget+'"' : "", '><span unselectable="on">',n.text,"</span></a></div>",
             '<ul class="x-tree-node-ct" style="display:none;"></ul>',

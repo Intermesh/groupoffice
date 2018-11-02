@@ -221,13 +221,21 @@ class User extends Entity {
 	 * @var bool 
 	 */
 	private $passwordVerified = true;
+	
+	/**
+	 * The working week
+	 * 
+	 * @var WorkingWeek
+	 */
+	public $workingWeek;
 
 	protected static function defineMapping() {
 		return parent::defineMapping()
 			->addTable('core_user', 'u')
 			->addTable('core_auth_password', 'p', ['id' => 'userId'])
 //			->addRelation('password', Password::class, ['id' => 'userId'], false)
-			->addRelation("groups", UserGroup::class, ['id' => 'userId']);
+			->addRelation("groups", UserGroup::class, ['id' => 'userId'])
+			->addRelation('workingWeek', WorkingWeek::class, ['id' => 'user_id'], false);
 	}
 	
 	/**

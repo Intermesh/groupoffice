@@ -127,47 +127,8 @@ GO.email.FoldersDialog = function(config) {
 		items : this.foldersTree,
 
 		tbar : [{
-			iconCls : 'btn-delete',
-			text : t("Delete"),
-			cls : 'x-btn-text-icon',
-			scope : this,
-			handler : function() {
-				var sm = this.foldersTree.getSelectionModel();
-				var node = sm.getSelectedNode();
-
-				if(!node|| node.attributes.folder_id<1)
-				{
-					Ext.MessageBox.alert(t("Error"), t("Select a folder to delete please", "email"));
-				}else if(node.attributes.mailbox=='INBOX')
-				{
-					Ext.MessageBox.alert(t("Error"), t("You can't delete the INBOX folder", "email"));
-				}else
-				{
-					GO.deleteItems({
-						url: GO.url("email/folder/delete"),
-						params: {						
-							account_id:this.account_id,
-							mailbox: node.attributes.mailbox
-						},
-						callback: function(responseParams)
-						{
-							if(responseParams.success)
-							{
-								node.remove();								
-							}else
-							{
-								Ext.MessageBox.alert(t("Error"),responseParams.feedback);
-							}
-						},
-						count: 1,
-						scope: this
-					});
-				}
-			}
-		}, {
-			iconCls : 'btn-add',
+			iconCls : 'ic-add',
 			text : t("Add"),
-			cls : 'x-btn-text-icon',
 			handler : function() {
 
 				var sm = this.foldersTree.getSelectionModel();
@@ -206,11 +167,46 @@ GO.email.FoldersDialog = function(config) {
 				}
 			},
 			scope : this
-		}, {
-			iconCls : 'btn-refresh',
-			text : t("Refresh"),
+		},{
+			iconCls : 'ic-delete',
+			tooltip : t("Delete"),
+			scope : this,
+			handler : function() {
+				var sm = this.foldersTree.getSelectionModel();
+				var node = sm.getSelectedNode();
 
-			cls : 'x-btn-text-icon',
+				if(!node|| node.attributes.folder_id<1)
+				{
+					Ext.MessageBox.alert(t("Error"), t("Select a folder to delete please", "email"));
+				}else if(node.attributes.mailbox=='INBOX')
+				{
+					Ext.MessageBox.alert(t("Error"), t("You can't delete the INBOX folder", "email"));
+				}else
+				{
+					GO.deleteItems({
+						url: GO.url("email/folder/delete"),
+						params: {						
+							account_id:this.account_id,
+							mailbox: node.attributes.mailbox
+						},
+						callback: function(responseParams)
+						{
+							if(responseParams.success)
+							{
+								node.remove();								
+							}else
+							{
+								Ext.MessageBox.alert(t("Error"),responseParams.feedback);
+							}
+						},
+						count: 1,
+						scope: this
+					});
+				}
+			}
+		}, '-', {
+			iconCls : 'ic-refresh',
+			tooltip : t("Refresh"),
 			handler : function() {
 				this.rootNode.reload();
 			},
@@ -218,9 +214,8 @@ GO.email.FoldersDialog = function(config) {
 		},
 		'->' 
 		,{
-			iconCls : 'btn-add',
+			iconCls : 'ic-add-circle',
 			text : t("Select all"),
-			cls : 'x-btn-text-icon',
 			handler : function() {
 
 				var list = this.treeToMailboxList(this.rootNode);
@@ -249,9 +244,8 @@ GO.email.FoldersDialog = function(config) {
 			},
 			scope : this
 		},{
-			iconCls : 'btn-add',
+			iconCls : 'ic-remove-circle',
 			text : t("Deselect all"),
-			cls : 'x-btn-text-icon',
 			handler : function() {
 				
 				var list = this.treeToMailboxList(this.rootNode);
@@ -280,14 +274,7 @@ GO.email.FoldersDialog = function(config) {
 			scope : this
 		}
 
-		],
-		buttons : [{
-			text : t("Close"),
-			handler : function() {
-				this.hide();
-			},
-			scope : this
-		}]
+		]
 	});
 }
 

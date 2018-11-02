@@ -1,2 +1,3 @@
 Settings.js
+EnableAuthenticatorDialog.js
 GoogleauthenticatorPanel.js

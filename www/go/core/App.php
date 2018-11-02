@@ -390,7 +390,7 @@ use const GO_CONFIG_FILE;
 		/**
 		 * Get the application settings
 		 * 
-		 * @return AppSettings
+		 * @return Settings
 		 */
 		public function getSettings() {
 			return Settings::get();

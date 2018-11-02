@@ -1,3 +1,5 @@
+/* global Ext, go */
+
 go.links.LinkGrid = Ext.extend(go.grid.GridPanel, {
 
 	initComponent: function () {

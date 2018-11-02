@@ -57,8 +57,10 @@
 </head>
 <body>
 	<div id="sound"></div>
-	<div id="window-container"></div>
-	<?php require(\GO::config()->root_path.'views/Extjs3/default_scripts.inc.php'); ?>
-	<script type="text/javascript">GO.util.density = GO.util.isMobileOrTablet() ? 160 : 140;</script>
+	<!--Putting scripts in div will speed up developer tools because they don't have to show all those nodes-->
+	<div id="scripts-container">
+		<?php require(\GO::config()->root_path.'views/Extjs3/default_scripts.inc.php'); ?>
+		<script type="text/javascript">GO.util.density = GO.util.isMobileOrTablet() ? 160 : 140;</script>
+	</div>
 </body>
 </html>

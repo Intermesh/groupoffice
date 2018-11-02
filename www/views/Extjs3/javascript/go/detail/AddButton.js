@@ -105,6 +105,22 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 		}, this, {single: true});
 	},
 			
+			
+	findCreateLinkButton : function(window) {
+		
+		var tbars = [window.getFooterToolbar(), window.getBottomToolbar(), window.getTopToolbar()];
+		for(var i = 0, l = tbars.length; i < l; i++) {
+			if(!tbars[i]) {
+				continue;
+			}
+			
+			var btn = tbars[i].findByType("createlinkbutton");
+			if(btn[0]) {
+				return btn[0];
+			}			
+		}
+		return false;
+	},
 
 	buildMenu: function () {
 		var items = [
@@ -145,7 +161,7 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 				iconCls: 'entity ' + e.name,
 				text: e.title,
 				handler: function () {
-					var window = e.linkWindow.call(e.scope, this.getEntity(), this.getEntityId());
+					var window = e.linkWindow.call(e.scope, this.getEntity(), this.getEntityId(), this.detailView.data);
 
 					if (!window) {
 						return;
@@ -154,53 +170,62 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 					//If go.form.Dialog turn off redirect to detail view.
 					window.redirectOnSave = false;
 
-					//Windows may implement setLinkEntity() so they can do stuff on linking.
-					if (window.setLinkEntity) {
-						window.on('show', function () {
-							window.setLinkEntity({
-								entity: this.getEntity(),
-								data: this.detailView.data
-							});
-						}, this, {single: true});
-					}
-
 					if (!window.isVisible()) {
 						window.show();
 					}
+					
+					//Windows may implement setLinkEntity() so they can do stuff on linking.
+					if (window.setLinkEntity) {
+						//window.on('show', function () {
+							window.setLinkEntity({
+								entity: this.getEntity(),
+								entityId: this.getEntityId(),
+								data: this.detailView.data
+							});
+						//}, this, {single: true});
+					}
+					var win = window.win || window; //for some old dialogs that have a "win" prop (TaskDialog and EventDialog)
+					var createLinkButton = this.findCreateLinkButton(win);
+					
+					if(createLinkButton) {
+						//if window has a create link button then use this. Otherwise add a save listener.
+						createLinkButton.addLink(this.getEntity(), this.getEntityId());
+					} else
+					{
+						window.on('save', function (window, entity) {
 
-					window.on('save', function (window, entity) {
-
-						//hack for event dialog because save event is different
-						if (e.entity === "Event") {
-							entity = arguments[2].result.id;
-						}
-
-						var link = {
-							fromEntity: this.getEntity(),
-							fromId: this.getEntityId(),
-							toEntity: e.name,
-							toId: null
-						};
-
-						if (!Ext.isObject(entity)) {
-							//old modules just pass ID
-							link.toId = entity;
-						} else
-						{
-							//in this case it's a go.form.Dialog							
-							link.toId = entity.id;
-						}
-
-						go.Stores.get("Link").set({
-							create: [link]
-						}, function (options, success, result) {
-							if (result.notCreated) {
-								throw "Could not create link";
+							//hack for event dialog because save event is different
+							if (e.entity === "Event") {
+								entity = arguments[2].result.id;
 							}
-						});
 
-					}, this, {single: true});
+							var link = {
+								fromEntity: this.getEntity(),
+								fromId: this.getEntityId(),
+								toEntity: e.name,
+								toId: null
+							};
 
+							if (!Ext.isObject(entity)) {
+								//old modules just pass ID
+								link.toId = entity;
+							} else
+							{
+								//in this case it's a go.form.Dialog							
+								link.toId = entity.id;
+							}
+
+							go.Stores.get("Link").set({
+								create: [link]
+							}, function (options, success, result) {
+								if (result.notCreated) {
+									throw "Could not create link";
+								}
+							});
+
+						}, this, {single: true});
+
+					}
 				},
 				scope: me
 			});

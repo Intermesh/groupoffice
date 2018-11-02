@@ -166,7 +166,7 @@ class Language extends Controller {
 			throw new \Exception("Invalid CSV file (Header count != 5): First record: ".var_export($headers, true));
 		}
 
-		$lang = $headers[3];
+		$lang = strtolower($headers[3]);
 
 		$data = [];
 

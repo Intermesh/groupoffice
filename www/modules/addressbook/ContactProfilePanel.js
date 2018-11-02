@@ -216,13 +216,13 @@ GO.addressbook.ContactProfilePanel = function(config)
 
 		this.formWorkPhone = new Ext.form.TextField(
 		{
-			fieldLabel: t("Phone (work)"),
+			fieldLabel: t("Phone (Work)", "addressbook"),
 			name: 'work_phone'
 		});	
 
 		this.formWorkFax = new Ext.form.TextField(
 		{
-			fieldLabel: t("Fax (work)"),
+			fieldLabel: t("Fax (Work)", "addressbook"),
 			name: 'work_fax'
 		});
 
