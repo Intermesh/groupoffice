@@ -36,7 +36,9 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 			this.setValues(entities[0]);
 			this.entity = entities[0];
 			
-			callback.call(scope || this, entities[0]);
+			if(callback) {
+				callback.call(scope || this, entities[0]);
+			}
 			
 			this.fireEvent("load", this);
 		}, this);
