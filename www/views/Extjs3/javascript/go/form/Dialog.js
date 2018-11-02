@@ -1,4 +1,4 @@
-/* global go */
+/* global go, Ext */
 
 /**
  * 
@@ -78,6 +78,12 @@ go.form.Dialog = Ext.extend(go.Window, {
 			this.createLinkButton.save();
 		}, this);
 	
+	},
+	
+	setValues : function(v) {
+		this.formPanel.setValues(v);
+		
+		return this;
 	},
 
 	load: function (id) {
