@@ -286,7 +286,6 @@ $updates['201811020837'][] = "insert into core_cron_job (moduleId,name, expressi
 
 //Address book
 
-$updates['201810151544'][] = "insert into core_cron_job (moduleId,name, expression, description) values ((select id from core_module where name='core'), 'GarbageCollection', '0 * * * *', 'Garbage collection')";
 $updates['201810151544'][] = "ALTER TABLE `core_customfields_field_set` ADD `filter` TEXT NULL DEFAULT NULL;";
 
 //TODO update install.sql from here
