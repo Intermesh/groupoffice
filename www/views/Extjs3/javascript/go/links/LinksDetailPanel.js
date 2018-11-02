@@ -87,7 +87,11 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 						var record = this.store.getAt(index);
 						
 						if(e.target.tagName === "I" && e.target.innerHTML === 'delete') {							
-							this.delete(record);
+							//this.delete(record);
+							
+							go.Stores.get("Link").set({
+								destroy: [record.id]
+							});
 						} else 
 						{
 							var record = this.store.getById(node.getAttribute('data-id'));
