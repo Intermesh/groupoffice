@@ -51,8 +51,8 @@ class Group extends \go\core\acl\model\AclItemEntity {
 	protected function internalSave() {
 		
 		//modseq increase because groups is a property too.
-		if($this->isNew() && !AddressBook::findById($this->addressBookId)->save()) {
-			return false;
+		if($this->isNew()) {
+			AddressBook::getType()->change(AddressBook::findById($this->addressBookId));
 		}
 		
 		return parent::internalSave();
@@ -60,9 +60,17 @@ class Group extends \go\core\acl\model\AclItemEntity {
 	
 	protected function internalDelete() {
 		//modseq increase because groups is a property too.
-		if(!AddressBook::findById($this->addressBookId)->save()) {
-			return false;
-		}
+		AddressBook::getType()->change(AddressBook::findById($this->addressBookId));
+		
+		//mark contact as changed
+		Contact::getType()->changes(
+					(new \go\core\db\Query)
+					->select('c.id AS entityId, a.aclId, "0" AS destroyed')
+					->from('addressbook_contact', 'c')
+					->join('addressbook_addressbook', 'a', 'a.id = c.addressBookId')
+					->join('addressbook_contact_group', 'g', 'c.id = g.contactId')
+					->where('g.groupId', '=', $this->id)
+					);
 		
 		return parent::internalDelete();
 	}
