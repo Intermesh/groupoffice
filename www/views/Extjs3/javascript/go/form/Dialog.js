@@ -86,14 +86,11 @@ go.form.Dialog = Ext.extend(go.Window, {
 		
 		function innerLoad(){
 			me.currentId = id;
-
-			if(!me.formPanel.load(id)) {			
-				//If no entity was returned the entity store will load it and fire the "changes" event. This dialog listens to that event.
-				me.actionStart();
-			} else {
-				//needs to fire because overrides are made to handle logic after form load.
+			me.actionStart();
+			me.formPanel.load(id, function() {
 				me.onLoad();
-			}
+				me.actionComplete();
+			}, this);
 		}
 		
 		// The form needs to be rendered before the data can be set
@@ -106,16 +103,6 @@ go.form.Dialog = Ext.extend(go.Window, {
 		return this;
 	},
 	
-	onChanges : function(entityStore, added, changed, destroyed) {
-		
-		var entity = added[this.currentId] || changed[this.currentId] || false;
-		
-		if(entity) {
-			this.actionComplete();
-			this.onLoad();
-		}
-	},
-
 	delete: function () {
 		
 		Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
