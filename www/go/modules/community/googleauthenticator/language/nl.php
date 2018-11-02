@@ -2,7 +2,7 @@
 return array (
   'name' => 'Google Authenticator',
   'description' => 'Verbeter de beveiliging door het toevoegen van 2-factor authenticatie opties in het gebruikers account',
-  'Google authenticator' => 'Goolge Authenticator',
+  'Google authenticator' => 'Google Authenticator',
   'Enable Google authenticator' => 'Google Authenticator inschakelen',
   'Scan the QR code below to enable Google authenticator for your account.' => 'Scan de QR code om Google Authenticator in te schakelen op uw account.',
   'Secret key for manual input' => 'Geheime sleutel voor handmatige invoer',

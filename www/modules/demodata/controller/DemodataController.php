@@ -1209,8 +1209,11 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 		//useful for other modules to create stuff
 		$this->fireEvent('demodata', array('users'=>array('demo'=>$demo, 'linda'=>$linda, 'elmer'=>$elmer)));
 		
-		if(\GO::modules()->demodata)
+		if(\GO::modules()->demodata) {
 			\GO::modules()->demodata->delete();
+			
+			GO()->rebuildCache();
+		}
 		
 		if(!$this->isCli()){
 			//login as demo				

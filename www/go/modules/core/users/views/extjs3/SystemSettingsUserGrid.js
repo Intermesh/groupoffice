@@ -280,7 +280,7 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 	
 	edit : function(id) {
 		var dlg = new go.usersettings.UserSettingsDialog();
-		dlg.show(id);						
+		dlg.load(id).show();
 	}
 	
 });

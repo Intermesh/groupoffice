@@ -255,7 +255,12 @@ GO.email.EmailComposer = function(config) {
 		},
 		scope : this
 	}), 
-	'->'];
+	'->',
+		this.createLinkButton = new go.modules.core.links.CreateLinkButton({
+			text: "",
+			iconCls: "ic-link"
+		})
+	];
 
 	tbar.push(this.emailEditor.getAttachmentsButton());
 
@@ -837,6 +842,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 
 		Ext.getBody().mask(t("Loading..."));
 
+		this.createLinkButton.reset();
 		
 		this.showConfig=config;
 		
@@ -1182,6 +1188,10 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 	submitForm : function(hide){
 		this.sendMail(false, false);
 	},
+	
+	setLinkEntity : function(link) {
+		this.createLinkButton.addLink(link.entity, link.entityId);
+	},
 
 	sendMail : function(draft, autoSave) {
 		//prevent double send with ctrl+enter
@@ -1222,9 +1232,11 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 			else if(draft || autoSave)
 				sendUrl = GO.url("email/message/save");
 			
-			if(this.link) {
-				this.sendParams.link = this.link.entity + ":" + this.link.entityId;
-			}
+//			if(this.link) {
+//				this.sendParams.link = this.link.entity + ":" + this.link.entityId;
+//			}
+			
+			this.sendParams.links = Ext.encode(this.createLinkButton.getNewLinks());
 
 			this.formPanel.form.submit({
 				url : sendUrl,

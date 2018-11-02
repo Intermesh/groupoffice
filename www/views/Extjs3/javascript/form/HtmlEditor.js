@@ -29,10 +29,10 @@ GO.form.HtmlEditor = function (config) {
 		config.plugins.unshift(spellcheckInsertPlugin);
 
 	config.plugins.unshift(
-					wordPastePlugin,
-					hrPlugin,
 					ioDentPlugin,
 					rmFormatPlugin,
+					wordPastePlugin,
+					hrPlugin,
 					ssScriptPlugin
 					);
 

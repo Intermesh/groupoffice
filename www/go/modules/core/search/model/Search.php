@@ -111,6 +111,10 @@ class Search extends \go\core\acl\model\AclOwnerEntity {
 			$query->where($sub);	
 		}
 		
+		if(!empty($filter['entityId'])) {
+			$query->where('entityId', '=', $filter['entityId']);
+		}
+		
 		return parent::filter($query, $filter);
 	}
 	

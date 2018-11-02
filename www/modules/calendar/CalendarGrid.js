@@ -193,7 +193,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 			var self = this;
 
 			var timeIndicatorTask = {
-				interval: 60000,
+				interval: 1000,
 				run: function(){
 					if (self.isVisible()) {
 						self._setTimeIndicator();
@@ -246,7 +246,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 		this.body.update('');
 
 		//get content size of element
-		var ctSize = this.container.getSize(true);
+		var ctSize = this.container.getSize(false);
 		
 		this.containerSize = ctSize['width']-this.scrollOffset;
 
@@ -366,12 +366,12 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 		}
 
 		//for the scrollbar
-		Ext.DomHelper.append(this.headingsRow,
-		{
-			tag: 'td',
-			style: "width:"+(this.scrollOffset)+"px;height:0px",
-			cls: "x-calGrid-heading"
-		});
+//		Ext.DomHelper.append(this.headingsRow,
+//		{
+//			tag: 'td',
+//			style: "width:"+(this.scrollOffset)+"px;height:0px",
+//			cls: "x-calGrid-heading"
+//		});
 		/*
 		Ext.DomHelper.append(this.allDayRow,
 				{
@@ -689,14 +689,14 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 	{
 		var snap = this.getSnap();
 		var gridPosition = this.gridTable.getXY();
-
+	
 		return Math.floor((x-gridPosition[0]-40)/snap["x"]);
 	},
 	startSelection : function (e){
 		//check if we are not dragging an event, check for left button		
 		if(this.permissionLevel>GO.permissionLevels.read && !this.dragEvent && (e.button == '0'))
 		{
-			var coords = Ext.get(e.target).getXY();
+			var coords = e.getXY();//Ext.get(e.target).getXY();
 
 			this.clickedDay = this.getDayByX(coords[0]);
 			this.clickedRow = this.getRowNumberByY(coords[1]);
@@ -730,7 +730,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 
 					this.selector.setXY(position);
 					//substract double border
-					this.selector.setSize(this.snapCol['x'], this.snapCol['y']);
+					this.selector.setSize(this.snapCol['x'] -2, this.snapCol['y']);
 					this.selector.setVisible(true,false);
 				}
 			}
@@ -2352,22 +2352,23 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 			var minutesElapsed = now.getMinutes()+now.getHours()*60;
 			var indicatorTop = Math.ceil(minutesElapsed / (24 * 60) * this.gridTable.getHeight());
 
-			var left = 41 + (this.theWeekDay * this.columnWidth);
+			var left = 40 + (this.theWeekDay * this.columnWidth) + 1;
 
-			
 			if (this.timeIndicator1)
-				Ext.removeNode(this.timeIndicator1);
+				Ext.removeNode(this.timeIndicator1.dom);
+			
 			this.timeIndicator1 = Ext.DomHelper.append(this.gridContainer,
 				{
 					tag: 'div',
 					id: Ext.id(),
 					cls: "x-calGrid-indicator",
-					style:"left:"+left+"px;top:"+indicatorTop+"px;width:"+this.columnWidth+"px;"
+					style:"left:"+left+"px;top:"+indicatorTop+"px;width:"+(this.columnWidth - 1)+"px;"
 				},true);
 
 	
 			if (this.timeIndicator2)
-				Ext.removeNode(this.timeIndicator2);
+				Ext.removeNode(this.timeIndicator2.dom);
+			
 			this.timeIndicator2 = Ext.DomHelper.append(this.gridContainer,
 				{
 					tag: 'div',

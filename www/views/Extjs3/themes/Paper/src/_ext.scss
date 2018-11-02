@@ -640,6 +640,10 @@
 	border: 1px solid color($fg, "line");
 	color: inherit;
 	transition: background-color 225ms linear, box-shadow 225ms $curve-standard;
+	
+	button {
+		min-height: dp(32);
+	}
 
 	&.x-item-disabled {
 		.x-btn-text {
@@ -1497,9 +1501,12 @@ td.grid-hd-group-cell {
 		background-repeat: no-repeat;
 		background-position: center center;	
 	}
-	&-ec-icon, &-node-indent,&-ec-icon,&-node-icon, &-node-anchor {
+	&-ec-icon, &-node-indent,&-ec-icon,&-node-icon, &-node-anchor, &-node-cb {
 		display:table-cell;
 		vertical-align: top; //required for Firefox
+	}
+	&-node-cb {
+		padding: 0 dp(4);
 	}
 	&-node-anchor {
 		width:auto;
@@ -2299,8 +2306,15 @@ body.x-body-masked .x-window-plain .x-window-mc {
 	border:1px solid color($fg, 'track');
 }
 .x-html-editor-tb .x-toolbar {
-	box-shadow:none;
+	height: dp(40);
 	background-color: transparent;
+	.x-toolbar-cell {
+		padding:0;
+	}
+	.x-btn {
+		font-size:.8em;
+	}
+	
 }
 .x-html-editor-tb .x-btn-text {
 	background-image: none; //url(wysiwyg.gif);

@@ -16,9 +16,9 @@ class State extends AbstractState {
 			return false;
 		}
 		preg_match('/Bearer (.*)/', $auth, $matches);
-    if(!isset($matches[1])){
-      return false;
-    }
+		if(!isset($matches[1])){
+			return false;
+		}
 		
 		return $matches[1];
 	}
@@ -73,9 +73,9 @@ class State extends AbstractState {
 		return $this->token;
 	}
   
-  public function setToken(Token $token) {
-    $this->token = $token;
-  }
+	public function setToken(Token $token) {
+		$this->token = $token;
+	}
 	
 	public function isAuthenticated() {
 		return $this->getToken() !== false;
@@ -88,15 +88,15 @@ class State extends AbstractState {
 	public function outputSession() {		
 		Response::get()->output($this->getSession());
 	}
-  
-  public function getSession() {
-    if (!$this->isAuthenticated()) {
+
+	public function getSession() {
+		if (!$this->isAuthenticated()) {
 			throw new \go\core\http\Exception(401);
 		}
 		
 		$settings = \go\modules\core\core\model\Settings::get();
 		
-    $user = $this->getToken()->getUser();
+		$user = $this->getToken()->getUser();
 		$response = [
 			'username' => $user->username,
 			'accounts' => ['1'=> [
@@ -113,9 +113,9 @@ class State extends AbstractState {
       'user' => $user->toArray(),
 			'oldSettings' => $this->clientSettings(), // added for compatibility
 		];
-    
-    return $response;
-  }
+
+		return $response;
+	}
 	
 	private function clientSettings() {
 		$user = \GO::user();

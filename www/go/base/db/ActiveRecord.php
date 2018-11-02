@@ -4684,7 +4684,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			echo "Processing ".static::class ."\n";
 			
 			$entityTypeId = static::getType()->getId();
-			
+		
 			$start = 0;
 			$limit = 100;
 			
@@ -4698,7 +4698,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			
 			$findParams->getCriteria()->addCondition('entityId',null, 'IS', 'search');							
 			
-			//per thousands to keep memory low
+			//In small batches to keep memory low
 			$stmt = $this->find($findParams);
 			while($stmt->rowCount()) {	
 	
@@ -4712,6 +4712,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 						} else
 						{
 							echo "S";
+							$start++;
 						}
 						
 					} catch (\Exception $e) {
@@ -4721,9 +4722,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				}
 				echo "\n";
 				
-				$stmt = $this->find($findParams->start($start += $limit));		
-
-				
+				$stmt = $this->find($findParams->start($start));				
 			}
 			
 			echo "\nDone\n\n";

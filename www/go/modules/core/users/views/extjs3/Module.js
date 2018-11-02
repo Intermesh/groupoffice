@@ -7,6 +7,7 @@ go.Modules.register("core", 'users', {
 		"go.modules.core.users.SystemSettingsUserGrid"
 	],
 	userSettingsPanels: [
-		"go.modules.core.users.UserGroupGrid"
+		"go.modules.core.users.UserGroupGrid",
+		"go.modules.core.users.UserSettingsWorkingWeek"
 	]
 });

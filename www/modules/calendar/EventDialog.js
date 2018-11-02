@@ -123,12 +123,8 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			items : this.formPanel,
 			focus : focusSubject.createDelegate(this),
 			buttonAlign:'left',
-			buttons : [this.linkBrowseButton = new go.detail.addButton({
-				iconCls : 'ic-link',
-				text : t("Links"),
-				disabled : true,
-				detailView: this
-			}),
+			buttons : [
+			this.createLinkButton = new go.modules.core.links.CreateLinkButton(),
 			this.fileBrowseButton,
 			'->',{
 				text : t("Apply"),
@@ -166,7 +162,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 		config = config || {};
 
 		GO.dialogListeners.apply(this);
-
+		this.createLinkButton.reset();
 		this.win.show();
 
 		if(!this.initialized){
@@ -430,9 +426,11 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 
 		this.participantsPanel.setEventId(event_id);
 
-		this.linkBrowseButton.setDisabled(event_id < 1);
+//		this.linkBrowseButton.setDisabled(event_id < 1);
 		if(this.fileBrowseButton)
 			this.fileBrowseButton.setId(event_id);
+		
+		this.createLinkButton.setEntity("Event", event_id);
 	},
 
 	setCurrentDate : function() {
@@ -530,6 +528,8 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 					newEvent.is_organizer = action.result.is_organizer;
 					
 				this.fireEvent('save', newEvent, this.oldDomId, action);
+				
+				this.createLinkButton.save();
 				
 				GO.dialog.TabbedFormDialog.prototype.refreshActiveDisplayPanels.call(this);
 

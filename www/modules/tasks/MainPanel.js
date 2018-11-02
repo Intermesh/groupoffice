@@ -478,7 +478,7 @@ Ext.extend(GO.tasks.MainPanel, Ext.Panel,{
 
 GO.tasks.showTaskDialog = function(config){
 
-	if(!GO.tasks.taskDialog)
+	//if(!GO.tasks.taskDialog)
 		GO.tasks.taskDialog = new GO.tasks.TaskDialog();
 
 	GO.tasks.taskDialog.show(config);

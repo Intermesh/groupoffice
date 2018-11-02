@@ -329,3 +329,5 @@ CREATE TABLE IF NOT EXISTS `su_visible_calendars` (
   `calendar_id` int(11) NOT NULL,
   PRIMARY KEY  (`user_id`,`calendar_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE `cal_calendars` ADD INDEX(`user_id`);

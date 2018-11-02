@@ -71,7 +71,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		}); 
 		
 		Ext.apply(this,{
-			width:dp(1000),
+			width:dp(1100),
 			height:dp(800),
 			layout:'border',
 			closeAction:'hide',
@@ -125,19 +125,10 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	/**
 	 * The show function of this dialog.
 	 * This immediately starts loading all tabpanels in this dialog.
-	 * 
-	 * @param int userId
 	 */
-	show: function(userId){
-		this.currentUserId = userId;
-
+	show: function(){
 		go.usersettings.UserSettingsDialog.superclass.show.call(this);
-		
 		this.navMenu.select(this.tabStore.getAt(0));
-		
-		if(this.currentUserId) {
-			this.load();
-		}
 	},
 	
 	/**
@@ -307,24 +298,42 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	 * @param int userId (Optional)
 	 */
 	load : function(userId){
-		this.currentUserId = userId ? userId : this.currentUserId;
+		var me = this;
 		
-		this.actionStart();
-		this.fireEvent('loadstart',this, this.currentUserId);
-
-		go.Stores.get("User").get([this.currentUserId], function(users){
-			this.formPanel.getForm().setValues(users[0]);
-			this.loadComplete(users[0]);
-		}, this);
+		function innerLoad(){
+			me.currentUserId = userId ? userId : me.currentUserId;
 		
-		// loop through child panels and call onLoadComplete function if available
-		this.tabPanel.items.each(function(tab) {
+			me.actionStart();
+			me.fireEvent('loadstart',me, me.currentUserId);
 
-			if(tab.onLoadStart){
-				tab.onLoadStart(this.currentUserId);
-			}
-			
-		},this);
+			go.Stores.get("User").get([me.currentUserId], function(users){
+				me.formPanel.getForm().setValues(users[0]);
+
+				me.findBy(function(cmp,cont){
+					if(typeof cmp.onLoad === 'function') {
+						cmp.onLoad(users[0]);
+					}
+				},me);
+
+				me.loadComplete(users[0]);
+			}, me);
+
+			// loop through child panels and call onLoadComplete function if available
+			me.tabPanel.items.each(function(tab) {
+				if(tab.onLoadStart){
+					tab.onLoadStart(me.currentUserId);
+				}
+			},me);
+		}
+		
+		// The form needs to be rendered before the data can be set
+		if(!this.rendered){
+			this.on('afterrender',innerLoad,this,{single:true});
+		} else {
+			innerLoad.call(this);
+		}
+
+		return this;
 	},
 	
 	/**
