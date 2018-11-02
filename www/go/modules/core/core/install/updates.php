@@ -234,3 +234,4 @@ $updates["201810111129"][] = "INSERT INTO `core_group_default_group` (`groupId`)
 $updates["201810111129"][] = "ALTER TABLE `core_user` ADD `shortDateInList` BOOLEAN NOT NULL DEFAULT TRUE AFTER `dateFormat`;";
 $updates["201810251129"][] = "TRUNCATE TABLE go_state"; //for fixed date columns
 
+$updates["201811020837"][] = "ALTER TABLE `core_user` CHANGE `firstWeekday` `firstWeekday` TINYINT(4) NOT NULL DEFAULT '1';";
