@@ -25,10 +25,26 @@ use go\modules\core\modules\model\Module;
  */
 abstract class Entity extends Property {
 	
+	/**
+	 * Fires just before the entity will be saved
+	 * 
+	 * @param Entity $entity The entity that will be saved
+	 */
 	const EVENT_BEFORESAVE = 'beforesave';
 	
+	/**
+	 * Fires after the entity has been saved
+	 * 
+	 * @param Entity $entity The entity that has been saved
+	 */
 	const EVENT_SAVE = 'save';
 	
+	
+	/**
+	 * Fires after the entity has been deleted
+	 * 
+	 * @param Entity $entity The entity that has been deleted
+	 */
 	const EVENT_DELETE = 'delete';
 
 	/**
