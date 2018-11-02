@@ -2,11 +2,11 @@
 namespace go\modules\community\addressbook\model;
 
 use go\core\acl\model\AclItemEntity;
-use go\core\db\Criteria;
 use go\core\db\Query;
 use go\core\orm\CustomFieldsTrait;
 use go\core\orm\SearchableTrait;
 use go\core\validate\ErrorCode;
+use go\modules\core\links\model\Link;
 						
 /**
  * Contact model
@@ -273,8 +273,8 @@ class Contact extends AclItemEntity {
 	}
 	
 	public function getOrganizationIds() {
-		$query = \go\modules\core\links\model\Link::find()->selectSingleValue('toId');
-		\go\modules\core\links\model\Link::filter($query, [
+		$query = Link::find()->selectSingleValue('toId');
+		Link::filter($query, [
 				'entityId' => $this->id,
 				'entity' => "Contact",
 				'entities' => [
@@ -305,5 +305,29 @@ class Contact extends AclItemEntity {
 
 	protected function getSearchFilter() {
 		return $this->isOrganization ? 'isOrganization' : 'isContact';
+	}
+	
+	/**
+	 * Because we've implemented the getter method "getOrganizationIds" the contact 
+	 * modSeq must be incremented when a link between two contacts is deleted or 
+	 * created.
+	 * 
+	 * @param Link $link
+	 */
+	public static function onLinkSaveOrDelete(Link $link) {
+		if($link->getToEntity() !== "Contact" || $link->getFromEntity() !== "Contact") {
+			return;
+		}
+		
+		$ids = [$link->toId, $link->fromId];
+		
+		Contact::getType()->changes(
+					(new \go\core\db\Query)
+					->select('c.id AS entityId, a.aclId, "0" AS destroyed')
+					->from('addressbook_contact', 'c')
+					->join('addressbook_addressbook', 'a', 'a.id = c.addressBookId')					
+					->where('c.id', 'IN', $ids)
+					);
+		
 	}
 }
