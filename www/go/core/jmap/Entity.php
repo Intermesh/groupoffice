@@ -152,7 +152,7 @@ abstract class Entity  extends OrmEntity {
 							->single();
 
 			if(!$change) {			
-				throw new CannotCalculateChanges();
+				throw new CannotCalculateChanges("Can't calculare changes for state: ". $sinceState);
 			}
 		}	
 		
