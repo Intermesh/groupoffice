@@ -1,7 +1,5 @@
 /* global go, Ext */
 
-//todo create base component for entities
-
 go.modules.community.addressbook.TreeLoader = Ext.extend(go.tree.EntityLoader, {
 
 	entityStore: "AddressBook",
@@ -43,6 +41,11 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(go.tree.EntityLoader, {
 		
 		var attr = go.modules.community.addressbook.TreeLoader.superclass.convertEntityToNode.call(this, entity);
 		attr.loader = this.groupLoader;
+		
+		if(entity.groups.length === 0) {
+			attr.children = [];
+			attr.expanded = true;
+		}
 		return attr;
 	}
 

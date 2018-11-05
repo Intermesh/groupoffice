@@ -34,9 +34,13 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 		this.on("click", function (node, e) {
 
 			if (e.target.tagName === "BUTTON") {
-				this.showAddressBookMoreMenu(node, e);
 
-
+				if(node.attributes.entity.name === "AddressBook") {
+					this.showAddressBookMoreMenu(node, e);
+				} else
+				{
+					this.showGroupMoreMenu(node, e);
+				}
 			}
 		}, this);
 	},
@@ -78,7 +82,7 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 							node = me.getNodeById(nodeId);
 
 			if (node) {
-				node.attributes.entity = changed[id];
+				node.attributes.data = changed[id];
 
 				if (changed[id].name) {
 					node.setText(changed[id].name);
@@ -140,7 +144,7 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 								if (btn !== "yes") {
 									return;
 								}
-								go.Stores.get("AddressBook").set({destroy: [this.addressBookMoreBtn.entity.id]});
+								go.Stores.get("AddressBook").set({destroy: [this.showAddressBookMoreMenu.entity.id]});
 							}, this);
 						},
 						scope: this
@@ -176,33 +180,35 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 		this.addressBookMoreMenu.showAt(e.getXY());
 	},
 
-	initGroupMoreBtn: function () {
-		this.groupMoreBtn = new Ext.Button({
-			renderTo: this.getEl(),
-			cls: 'go-more-button-over',
-			iconCls: 'ic-more-vert',
-			menu: [{
-					iconCls: 'ic-edit',
-					text: t("Edit"),
-					handler: function () {
-						var dlg = new go.modules.community.addressbook.GroupDialog();
-						dlg.load(this.groupMoreBtn.entity.id).show();
-					},
-					scope: this
-				}, {
-					itemId: "delete",
-					iconCls: 'ic-delete',
-					text: t("Delete"),
-					handler: function () {
-						Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
-							if (btn !== "yes") {
-								return;
-							}
-							go.Stores.get("AddressBookGroup").set({destroy: [this.groupMoreBtn.entity.id]});
-						}, this);
-					},
-					scope: this
-				}]
-		});
+	showGroupMoreMenu: function (node, e) {
+		if(!this.groupMoreMenu) {
+			this.groupMoreMenu = new Ext.menu.Menu({									
+				items: [{
+						iconCls: 'ic-edit',
+						text: t("Edit"),
+						handler: function () {
+							var dlg = new go.modules.community.addressbook.GroupDialog();
+							dlg.load(this.groupMoreMenu.data.id).show();
+						},
+						scope: this
+					}, {
+						itemId: "delete",
+						iconCls: 'ic-delete',
+						text: t("Delete"),
+						handler: function () {
+							Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
+								if (btn !== "yes") {
+									return;
+								}
+								go.Stores.get("AddressBookGroup").set({destroy: [this.groupMoreMenu.data.id]});
+							}, this);
+						},
+						scope: this
+					}]
+			});
+		}
+		
+		this.groupMoreMenu.data = node.attributes.data;
+		this.groupMoreMenu.showAt(e.getXY());
 	}
 });
