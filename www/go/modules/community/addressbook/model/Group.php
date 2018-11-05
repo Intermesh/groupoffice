@@ -74,4 +74,14 @@ class Group extends \go\core\acl\model\AclItemEntity {
 		
 		return parent::internalDelete();
 	}
+	
+	public static function filter(\go\core\db\Query $query, array $filter) {
+		
+		
+		if(!empty($filter['addressBookId'])) {
+			$query->andWhere(['addressBookId' => $filter['addressBookId']]);
+		}
+		
+		return parent::filter($query, $filter);
+	}
 }
