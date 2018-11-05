@@ -5,12 +5,7 @@ go.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(go.form.Dialog, {
 	entityStore:"User",
 	width: 400,
 	height: 500,
-	
-	initComponent : function(){
-		go.googleauthenticator.EnableAuthenticatorDialog.superclass.initComponent.call(this);
-		this.deleteBtn.setVisible(false);
-	},
-	
+
 	initFormItems: function () {
 		
 		this.QRcomponent = new Ext.BoxComponent({
@@ -20,13 +15,13 @@ go.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(go.form.Dialog, {
 				this.el = ct.createChild({
 					tag: 'img',
 					cls: "googleauthenticator-qr",
-					src: this.qrUrl
+					src: go.Jmap.downloadUrl(this.qrUrl)
 				});
 			},
 			setQRUrl: function (url) {
 				this.qrUrl = url;
 				if (this.rendered) {
-					this.getEl().dom.src = url;
+					this.getEl().dom.src = go.Jmap.downloadUrl(url);
 				}
 			},
 			clearQRUrl: function () {
