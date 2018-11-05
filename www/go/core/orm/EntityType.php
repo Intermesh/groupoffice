@@ -256,13 +256,28 @@ class EntityType {
 	 * @param Query $changedEntities A query object that provides "entityId", "aclId" and "destroyed" in this order!.
 	 */
 	public function changes(Query $changedEntities) {		
+		
+		GO()->getDbConnection()->beginTransaction();
+		
 		$this->highestModSeq = $this->nextModSeq();		
 		
 		$changedEntities->select('"' . $this->getId() . '", "'. $this->highestModSeq .'", NOW()', true);		
 		
-		if(!GO()->getDbConnection()->insert('core_change', $changedEntities, ['entityId', 'aclId', 'destroyed', 'entityTypeId', 'modSeq', 'createdAt'])->execute()) {
-			throw new \Exception("Could not save change");
-		}		
+		try {
+			$stmt = GO()->getDbConnection()->insert('core_change', $changedEntities, ['entityId', 'aclId', 'destroyed', 'entityTypeId', 'modSeq', 'createdAt']);
+			$stmt->execute();
+		} catch(\Exception $e) {
+			GO()->getDbConnection()->rollBack();
+			throw $e;
+		}
+		
+		if(!$stmt->rowCount()) {
+			//if no changes were written then rollback the modSeq increment.
+			GO()->getDbConnection()->rollBack();
+		} else
+		{
+			GO()->getDbConnection()->commit();
+		}				
 	}
 	
 	/**
