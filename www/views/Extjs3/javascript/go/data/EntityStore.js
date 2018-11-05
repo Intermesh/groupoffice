@@ -309,7 +309,10 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	get: function (ids, cb, scope) {
 
 		if(go.util.empty(ids)) {
-			return [];
+			if(cb) {		
+				cb.call(scope || this, [], this);			
+			}
+			return;
 		}
 		
 		if(!Ext.isArray(ids)) {
