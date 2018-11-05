@@ -326,3 +326,6 @@ views/Extjs3/javascript/go/Wizard.js
 views/Extjs3/javascript/go/Array.js
 views/Extjs3/javascript/go/grid/editor/ComboColumn.js
 
+views/Extjs3/javascript/go/tree/EntityLoader.js
+views/Extjs3/javascript/go/tree/Node.js
+views/Extjs3/javascript/go/tree/TreeNodeUI.js
