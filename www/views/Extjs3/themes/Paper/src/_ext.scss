@@ -1509,10 +1509,11 @@ td.grid-hd-group-cell {
 		
 		.secondary {
 			float: right;
-			button: {
+			
+			button {
 				padding:0;
 				margin: 0;
-				cursor: pointer;
+				cursor: pointer;				
 			}
 		}
 	}
