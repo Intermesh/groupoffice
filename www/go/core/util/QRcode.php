@@ -3087,7 +3087,17 @@ namespace go\core\util;
             return $this->encodeInput($input);
         }
         
-        //----------------------------------------------------------------------
+        /**
+				 * Create a QR code in PNG format
+				 * 
+				 * @param string $text	The text to create the QR code for
+				 * @param boolean $outfile
+				 * @param string $level The correctionlevel of the QR code
+				 * @param int $size	The size of one square in the QR code (In pixels)
+				 * @param int $margin	The margin around the QR code
+				 * @param boolean $saveandprint
+				 * @return type
+				 */
         public static function png($text, $outfile = false, $level = QR_ECLEVEL_L, $size = 3, $margin = 4, $saveandprint=false) 
         {
             $enc = QRencode::factory($level, $size, $margin);
