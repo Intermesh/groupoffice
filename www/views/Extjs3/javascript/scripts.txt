@@ -296,6 +296,8 @@ views/Extjs3/javascript/go/usersettings/UserSettingsDialog.js
 views/Extjs3/javascript/go/Router.js
 views/Extjs3/javascript/go/PasswordPrompt.js
 
+views/Extjs3/javascript/go/QRCodeComponent.js
+
 views/Extjs3/javascript/go/User.js
 views/Extjs3/javascript/go/String.js
 
