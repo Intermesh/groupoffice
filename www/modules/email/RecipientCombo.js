@@ -13,8 +13,7 @@ GO.email.RecipientCombo = Ext.extend(GO.form.ComboBoxMulti, {
 			fields: ['id', 'entity', 'email', 'name', 'photoBlobId',
 				{
 					name: "full_email",
-					convert: function (v, data) {
-						console.log(data);
+					convert: function (v, data) {						
 						return '"' + data.name.replace(/"/g, '\\"') + '" <' + data.email + '>';
 					}
 				}]
@@ -36,10 +35,10 @@ GO.email.RecipientCombo = Ext.extend(GO.form.ComboBoxMulti, {
 
 		this.on({
 			grow: function () {
-				this.doLayout();
+				this.findParentByType("window").doLayout();
 			},
 			scope: this
-		});
+		}, this);
 
 
 	}

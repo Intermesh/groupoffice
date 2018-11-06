@@ -169,25 +169,88 @@ GO.email.EmailComposer = function(config) {
 		anchor : '100%',
 		items: [
 			this.toCombo = new GO.email.RecipientCombo(),
-			this.showMenuButton = new Ext.Button({
-				tooltip : t("Show", "email"),
-				iconCls : 'ic-more',
-				menu : this.showMenu
+			new Ext.Button({				
+				iconCls : 'ic-add',
+				handler: function() {
+					var select = new go.modules.community.addressbook.SelectDialog ({
+						scope: this,
+						handler: function(name, email) {
+							var v = this.toCombo.getValue();
+							
+							if(!go.util.empty(v)) {
+								v += ", ";
+							}							
+							v += '"' + name.replace(/"/g, '\\"') + '" <' + email + '>';							
+							this.toCombo.setValue(v);
+						}
+					});
+					select.show();
+				},
+				scope: this
 			})
 		]
 	},
-	this.ccCombo = new GO.email.RecipientCombo({
-		fieldLabel : t("CC", "email"),
-		name : 'cc',
-		anchor : '100%'
-	}),
+	{
+		xtype:'compositefield',
+		anchor : '100%',
+		items: [this.ccCombo = new GO.email.RecipientCombo({
+			fieldLabel : t("CC", "email"),
+			name : 'cc',
+			anchor : '100%'
+		}),
+		new Ext.Button({				
+				iconCls : 'ic-add',
+				handler: function() {
+					var select = new go.modules.community.addressbook.SelectDialog ({
+						scope: this,
+						handler: function(name, email) {
+							var v = this.ccCombo.getValue();
+							
+							if(!go.util.empty(v)) {
+								v += ", ";
+							}							
+							v += '"' + name.replace(/"/g, '\\"') + '" <' + email + '>';							
+							this.ccCombo.setValue(v);
+						}
+					});
+					select.show();
+				},
+				scope: this
+			})
+		]
+	},
 
-	this.bccCombo = new GO.email.RecipientCombo({
-		fieldLabel : t("BCC", "email"),
-		name : 'bcc',
-		anchor : '100%'
-
-	})];
+	{
+		xtype:'compositefield',
+		anchor : '100%',
+		items: [this.bccCombo = new GO.email.RecipientCombo({
+			fieldLabel : t("BCC", "email"),
+			name : 'bcc',
+			anchor : '100%'
+		}),
+			new Ext.Button({				
+				iconCls : 'ic-add',
+				handler: function() {
+					var select = new go.modules.community.addressbook.SelectDialog ({
+						scope: this,
+						handler: function(name, email) {
+							var v = this.bccCombo.getValue();
+							
+							if(!go.util.empty(v)) {
+								v += ", ";
+							}							
+							v += '"' + name.replace(/"/g, '\\"') + '" <' + email + '>';							
+							this.bccCombo.setValue(v);
+						}
+					});
+					select.show();
+				},
+				scope: this
+			})	
+			
+	]
+	}
+	];
 								
 	var anchor = -113;
 						
@@ -262,7 +325,18 @@ GO.email.EmailComposer = function(config) {
 		})
 	];
 
-	tbar.push(this.emailEditor.getAttachmentsButton());
+	tbar.push(this.emailEditor.getAttachmentsButton(), 
+	this.showMenuButton = new Ext.Button({
+				tooltip : t("Show", "email"),
+				iconCls : 'ic-more',				
+				menu : this.showMenu
+			}),
+	
+	{
+			tooltip : t("Extra options", "email"),
+			iconCls : 'ic-more-vert',
+			menu : this.optionsMenu
+		});
 
 //	if(go.Modules.isAvailable("legacy", "addressbook")) {
 //		
