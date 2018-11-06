@@ -176,17 +176,14 @@ class Criteria {
 		
 		if(!isset($comparisonOperator) && (is_string($condition) || $condition instanceof Criteria)) {
 			//condition is raw string
-			$this->where[] = ["tokens", $logicalOperator, $condition];
-			return $this;
+			return ["tokens", $logicalOperator, $condition];			
 		}
 		
 		if(!isset($comparisonOperator)) {
 			$comparisonOperator = '=';
 		}
-		$this->where[] = ["column", $logicalOperator, $condition, $comparisonOperator, $value];
+		return ["column", $logicalOperator, $condition, $comparisonOperator, $value];			
 		
-		
-		return $this;
 	}
 	
 	protected function internalWhereExists(Query $subQuery, $not = false, $logicalOperator = "AND") {
@@ -215,7 +212,8 @@ class Criteria {
 	 * @return static
 	 */
 	public function andWhere($column, $operator = null, $value = null) {
-		return $this->internalWhere($column, $operator, $value, 'AND');
+		$this->where[] = $this->internalWhere($column, $operator, $value, 'AND');
+		return $this;
 	}
 	
 	/**
@@ -227,7 +225,8 @@ class Criteria {
 	 * @return static
 	 */
 	public function orWhere($column, $operator = null, $value = null) {
-		return $this->internalWhere($column, $operator, $value, 'OR');
+		$this->where[] = $this->internalWhere($column, $operator, $value, 'OR');
+		return $this;
 	}
 
 	/**

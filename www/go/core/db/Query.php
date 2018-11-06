@@ -292,9 +292,8 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 * @param Criteria|array|string $condition {@see Criteria::normalize()}
 	 * @return static
 	 */
-	public function having($condition, $operator = 'AND') {
-		$this->having[] = [$operator, $this->normalizeCondition($condition)];
-		return $this;
+	public function having($condition, $operator = null, $value = null) {
+		return $this->andHaving($condition, $operator, $value);
 	}
 
 	/**
@@ -305,8 +304,9 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 * @param Criteria|array|string $condition {@see Criteria::normalize()}
 	 * @return static
 	 */
-	public function andHaving($condition) {
-		return $this->having($condition);
+	public function andHaving($condition, $operator = null, $value = null) {
+		$this->having[] = $this->internalWhere($condition, $operator, $value, 'AND');
+		return $this;
 	}
 
 	/**
@@ -317,8 +317,9 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 * @param Criteria|array|string $condition {@see Criteria::normalize()}
 	 * @return static
 	 */
-	public function orHaving($condition) {
-		return $this->having($condition, 'OR');
+	public function orHaving($condition, $operator = null, $value = null) {
+		$this->having[] = $this->internalWhere($condition, $operator, $value, 'OR');
+		return $this;
 	}
 
 	/**
