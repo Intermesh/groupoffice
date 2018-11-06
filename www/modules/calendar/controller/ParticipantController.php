@@ -95,10 +95,18 @@ class ParticipantController extends \GO\Base\Controller\AbstractModelController 
 		foreach($contacts as $contact){
 
 			$contactEntity = \go\modules\community\addressbook\model\Contact::findById($contact['id']);
+			$userId = $contactEntity->goUserId;
+			if(!$userId) {
+				$user = \go\modules\core\users\model\User::find()->where(['email' => $contact['email']])->single();
+				if($user) {
+					$userId = $user->id;
+				}
+			}
+			
 			
 			$participant = new \GO\Calendar\Model\Participant();
 			$participant->contact_id=$contact['id'];
-			$participant->user_id=$contactEntity->goUserId;
+			$participant->user_id=$userId;
 			$participant->name=$contact['name'];
 			$participant->email=$contact['email'];
 
