@@ -36,7 +36,6 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 			scope: this
 		};
 
-		var me = this;
 
 		// If a currently running read request is found, abort it
 //		if (action === Ext.data.Api.actions.read && this.activeRequest[action]) {
@@ -44,25 +43,35 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 //			go.Jmap.abort(this.activeRequest[action]);
 //		}
 //		this.activeRequest[action] = 
-		me.getItemList(this.entityStore.entity.name + "/query", params, function (getItemListResponse) {
 
-			me.entityStore.get(getItemListResponse.ids, function (items) {
+		if (params.sort) {
+			params.sort = [params.sort + " " + params.dir];
+			delete params.dir;
+		}
+		
+		this.entityStore.query(params, function (options, success, response) {
+			
+			if(!success) {
+				throw "Query method failed!";
+			}
+
+			this.entityStore.get(response.ids, function (items) {
 				var data = {
-					total: getItemListResponse.total,
+					total: response.total,
 					records: items,
 					success: true
 				};
 
-				me.activeRequest[action] = undefined;
+				this.activeRequest[action] = undefined;
 
 				if (action === Ext.data.Api.actions.read) {
-					me.onRead(action, o, data);
+					this.onRead(action, o, data);
 				} else {
-					me.onWrite(action, o, data, rs);
+					this.onWrite(action, o, data, rs);
 				}
 			});
 
-		});
+		}, this);
 
 
 	},
@@ -105,23 +114,6 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 			// NOTE reader.readResponse does not currently return Ext.data.Response
 			o.request.callback.call(o.request.scope, result, o.request.arg, result.success);
 		}, this);
-	},
-
-	getItemList: function (method, params, callback) {
-
-		//transfort sort parameters to jmap style
-		if (params.sort) {
-			params.sort = [params.sort + " " + params.dir];
-			delete params.dir;
-		}
-
-		return go.Jmap.request({
-			method: method,
-			params: params,
-			callback: function (options, success, response) {
-				callback.call(this, response);
-			}
-		});
 	},
 
 	//Prefetches all data of type go.data.types.Entity defined in go.Entities
