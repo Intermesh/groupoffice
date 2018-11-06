@@ -168,81 +168,92 @@ GO.email.EmailComposer = function(config) {
 		xtype:'compositefield',
 		anchor : '100%',
 		items: [
-			this.toCombo = new GO.form.ComboBoxMulti({
-				sep : ',',
-				fieldLabel : t("To", "email"),
-				name : 'to',
-				flex : 1,
-				listeners: {
-					grow: function() {
-						this.doLayout();
-					},
-					scope: this
+
+			this.toCombo = new GO.email.RecipientCombo(),
+			new Ext.Button({				
+				iconCls : 'ic-add',
+				handler: function() {
+					var select = new go.modules.community.addressbook.SelectDialog ({
+						scope: this,
+						handler: function(name, email) {
+							var v = this.toCombo.getValue();
+							
+							if(!go.util.empty(v)) {
+								v += ", ";
+							}							
+							v += '"' + name.replace(/"/g, '\\"') + '" <' + email + '>';							
+							this.toCombo.setValue(v);
+						}
+					});
+					select.show();
 				},
-				
-				store : new GO.data.JsonStore({
-					url : GO.url("search/email"),
-					fields : ['full_email','info']
-				}),
-				valueField : 'full_email',
-				displayField : 'info'
-			}),
-			this.showMenuButton = new Ext.Button({
-				tooltip : t("Show", "email"),
-				iconCls : 'ic-more',
-				menu : this.showMenu
+				scope: this
 			})
 		]
 	},
-	this.ccCombo = new GO.form.ComboBoxMulti({
-		sep : ',',
-		fieldLabel : t("CC", "email"),
-		name : 'cc',
+
+	{
+		xtype:'compositefield',
 		anchor : '100%',
-		listeners: {
-			grow: function() {
-				this.doLayout();
-			},
-			scope: this
-		},
-
-		store : new GO.data.JsonStore({
-			url : GO.url("search/email"),
-			fields : ['full_email','info']
+		items: [this.ccCombo = new GO.email.RecipientCombo({
+			fieldLabel : t("CC", "email"),
+			name : 'cc',
+			anchor : '100%'
 		}),
-		displayField : 'info',
-		valueField : 'full_email',
-		hideTrigger : true,
-		minChars : 2,
-		triggerAction : 'all',
-		selectOnFocus : false
+		new Ext.Button({				
+				iconCls : 'ic-add',
+				handler: function() {
+					var select = new go.modules.community.addressbook.SelectDialog ({
+						scope: this,
+						handler: function(name, email) {
+							var v = this.ccCombo.getValue();
+							
+							if(!go.util.empty(v)) {
+								v += ", ";
+							}							
+							v += '"' + name.replace(/"/g, '\\"') + '" <' + email + '>';							
+							this.ccCombo.setValue(v);
+						}
+					});
+					select.show();
+				},
+				scope: this
+			})
+		]
+	},
 
-	}),
 
-	this.bccCombo = new GO.form.ComboBoxMulti({
-		sep : ',',
-		fieldLabel : t("BCC", "email"),
-		name : 'bcc',
+	{
+		xtype:'compositefield',
 		anchor : '100%',
-		listeners: {
-			grow: function() {
-				this.doLayout();
-			},
-			scope: this
-		},
-
-		store : new GO.data.JsonStore({
-			url : GO.url("search/email"),
-			fields : ['full_email','info']
+		items: [this.bccCombo = new GO.email.RecipientCombo({
+			fieldLabel : t("BCC", "email"),
+			name : 'bcc',
+			anchor : '100%'
 		}),
-		displayField : 'info',
-		valueField : 'full_email',
-		hideTrigger : true,
-		minChars : 2,
-		triggerAction : 'all',
-		selectOnFocus : false
-
-	})];
+			new Ext.Button({				
+				iconCls : 'ic-add',
+				handler: function() {
+					var select = new go.modules.community.addressbook.SelectDialog ({
+						scope: this,
+						handler: function(name, email) {
+							var v = this.bccCombo.getValue();
+							
+							if(!go.util.empty(v)) {
+								v += ", ";
+							}							
+							v += '"' + name.replace(/"/g, '\\"') + '" <' + email + '>';							
+							this.bccCombo.setValue(v);
+						}
+					});
+					select.show();
+				},
+				scope: this
+			})	
+			
+	]
+	}
+	];
 								
 	var anchor = -113;
 						
@@ -317,7 +328,18 @@ GO.email.EmailComposer = function(config) {
 		})
 	];
 
-	tbar.push(this.emailEditor.getAttachmentsButton());
+	tbar.push(this.emailEditor.getAttachmentsButton(), 
+			this.showMenuButton = new Ext.Button({
+				tooltip : t("Show", "email"),
+				iconCls : 'ic-more',				
+				menu : this.showMenu
+			}),
+	
+	{
+			tooltip : t("Extra options", "email"),
+			iconCls : 'ic-more-vert',
+			menu : this.optionsMenu
+		});
 
 
 		
