@@ -406,7 +406,7 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 			filter: {
 				entities: [this.entity]
 			}
-		}, function (options, success, response) {
+		}, function (response) {
 			
 			if(!response.ids.length) {
 				this.store.loadData([], false);
@@ -443,7 +443,7 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 				filter: {
 					fieldSetId: response.ids
 				}
-			}, function (options, success, response) {
+			}, function (response) {
 				go.Stores.get("Field").get(response.ids, function (fields) {
 					var storeData = [];
 					fields.forEach(function (f) {

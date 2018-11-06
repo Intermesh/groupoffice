@@ -49,11 +49,7 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 			delete params.dir;
 		}
 		
-		this.entityStore.query(params, function (options, success, response) {
-			
-			if(!success) {
-				throw "Query method failed!";
-			}
+		this.entityStore.query(params, function (response) {
 
 			this.entityStore.get(response.ids, function (items) {
 				var data = {

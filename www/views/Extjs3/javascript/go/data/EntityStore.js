@@ -498,15 +498,22 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	 * Query the API for a sorted / filtered list of entity id's
 	 * 
 	 * @param {object} params
-	 * @param {function} callback
+	 * @param {function} cb
 	 * @param {object} scope
 	 * @returns {String} Client call ID
 	 */
-	query : function(params, callback, scope) {
+	query : function(params, cb, scope) {
 		return go.Jmap.request({
 			method: this.entity.name + "/query",
 			params: params,
-			callback: callback,
+			callback: function(options, success, response) {
+				
+				if(!success) {
+					throw this.entity.name + "/query failed!";
+				}
+				
+				cb.call(scope || this, response);
+			},
 			scope: scope || this
 		});
 	}

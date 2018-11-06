@@ -89,7 +89,7 @@ go.tree.EntityLoader = Ext.extend(Ext.tree.TreeLoader, {
 			delete params.dir;
 		}
 		
-		this.result = this.entityStore.query(params, function (o, success, response) {
+		this.result = this.entityStore.query(params, function (response) {
 			this.entityStore.get(response.ids, function (entities) {
 				var response = {
 					argument: {callback: callback, node: options.node, scope: scope},
