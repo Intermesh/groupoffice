@@ -644,6 +644,20 @@
 	button {
 		min-height: dp(32);
 	}
+	
+	.x-form-composite & {
+		height: dp(32);
+		width: dp(32);
+		line-height: dp(32) - 2;
+		button {
+			min-height: dp(32);
+			min-width: dp(32);
+			&::before {
+				top: dp(4);
+				left: dp(4);
+			}
+		}
+	}
 
 	&.x-item-disabled {
 		.x-btn-text {
