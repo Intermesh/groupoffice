@@ -1,5 +1,6 @@
 - Core: Added QR code generator
 - Googleauthenticator: Use the QR code generator to generate the GA QR code
+- Webdav: Fixed Webdav quota information
 
 30-10-2018 6.3.48
 - Demodata: Fixed demo data module that kept asking to add data
