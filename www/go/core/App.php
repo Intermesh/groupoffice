@@ -116,7 +116,7 @@ use go\modules\core\core\model\Settings;
 		 * @return float
 		 */
 		public function getStorageQuota() {
-			$quota = $this->getCache()['limits']['storageQuota'];
+			$quota = $this->getConfig()['limits']['storageQuota'];
 			if(empty($quota)) {
 				$quota = disk_total_space($this->getConfig()['general']['dataPath']);
 			}
@@ -130,7 +130,7 @@ use go\modules\core\core\model\Settings;
 		 * @return float
 		 */
 		public function getStorageFreeSpace() {
-			$quota = $this->getCache()['limits']['storageQuota'];
+			$quota = $this->getConfig()['limits']['storageQuota'];
 			if(empty($quota)) {
 				return disk_free_space($this->getConfig()['general']['dataPath']);
 			} else
