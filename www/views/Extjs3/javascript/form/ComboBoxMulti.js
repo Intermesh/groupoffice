@@ -174,6 +174,11 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
         var p = r.left + value.length + 2 + pad.length;
         this.selectText.defer(200, this, [p, p]);
     },
+		
+		setValue : function(v) {
+			GO.form.ComboBoxMulti.superclass.setValue.call(this, v);
+			this.syncHeight();
+		},
     
     onSelect: function(record, index){
         if (this.fireEvent('beforeselect', this, record, index) !== false) {
