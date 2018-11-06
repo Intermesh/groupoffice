@@ -1493,6 +1493,24 @@ td.grid-hd-group-cell {
 		padding-right: 0;
 		display: table;
 		width: 100%;
+		
+		.secondary {
+			float: right;
+			
+			button {
+				padding:0;
+				margin: 0;
+				cursor: pointer;	
+				display: none;
+			}
+		}
+		&:hover, &.x-tree-selected {
+			.secondary {
+				button {
+					display: block;					
+				}
+			}
+		}
 	}
 	&-node-indent {
 		width:0.01%;
@@ -1507,15 +1525,7 @@ td.grid-hd-group-cell {
 		display:table-cell;
 		vertical-align: top; //required for Firefox
 		
-		.secondary {
-			float: right;
-			
-			button {
-				padding:0;
-				margin: 0;
-				cursor: pointer;				
-			}
-		}
+		
 	}
 	&-node-cb {
 		padding: 0 dp(4);
