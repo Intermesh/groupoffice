@@ -5,33 +5,14 @@ go.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(go.form.Dialog, {
 	entityStore:"User",
 	width: 400,
 	height: 500,
-	
-	initComponent : function(){
-		go.googleauthenticator.EnableAuthenticatorDialog.superclass.initComponent.call(this);
-		this.deleteBtn.setVisible(false);
-	},
-	
+
 	initFormItems: function () {
 		
-		this.QRcomponent = new Ext.BoxComponent({
-			name:'googleauthenticator.qrUrl',
-			qrUrl: Ext.BLANK_IMAGE_URL,
-			onRender: function (ct, position) {
-				this.el = ct.createChild({
-					tag: 'img',
-					cls: "googleauthenticator-qr",
-					src: this.qrUrl
-				});
-			},
-			setQRUrl: function (url) {
-				this.qrUrl = url;
-				if (this.rendered) {
-					this.getEl().dom.src = url;
-				}
-			},
-			clearQRUrl: function () {
-				this.setQRUrl(Ext.BLANK_IMAGE_URL);
-			}
+		this.QRcomponent = new go.QRCodeComponent({
+			name:'googleauthenticator.qrBlobId',
+			cls: "googleauthenticator-qr",
+			width: 200,
+			height: 200
 		});
 		
 		this.secretField = new GO.form.PlainField({
@@ -63,7 +44,7 @@ go.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(go.form.Dialog, {
 		return items;
 	},
 	onLoad : function() {
-		this.QRcomponent.setQRUrl(this.formPanel.entity.googleauthenticator.qrUrl);
+		this.QRcomponent.setQrBlobId(this.formPanel.entity.googleauthenticator.qrBlobId);
 		go.googleauthenticator.EnableAuthenticatorDialog.superclass.onLoad.call(this);
 	}
 });
