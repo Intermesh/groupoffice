@@ -7,13 +7,16 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(go.tree.EntityLoader, {
 	secondaryTextTpl: '<button class="icon">more_vert</button>',
 	
 	constructor : function(config) {
+		
+		config = config || {};
+		
 		go.modules.community.addressbook.TreeLoader.superclass.constructor.call(this, config);
 		
 		this.baseAttrs.iconCls = 'ic-account-box';
 		
 		this.groupLoader = new go.tree.EntityLoader({
 			entityStore: "AddressBookGroup",
-			secondaryTextTpl: '<button class="icon">more_vert</button>',
+			secondaryTextTpl: config.secondaryTextTpl || '<button class="icon">more_vert</button>',
 			baseAttrs: {
 				nodeType: "groupoffice",
 				iconCls: 'ic-group',

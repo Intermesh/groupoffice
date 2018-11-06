@@ -1,8 +1,7 @@
 /* global go, Ext */
 
 go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel, {
-
-	loader: new go.modules.community.addressbook.TreeLoader(),
+	
 	root: {
 		nodeType: 'async',
 		draggable: false,
@@ -12,9 +11,28 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 	rootVisible: false,
 
 	currentAddressBookId: null,
-
+	
+	/**
+	 * If given then the tree can be used to select contacts in bulk by selecting
+	 * an address book or group. selectHandler will be called with the entities
+	 * as array.
+	 */
+	selectHandler: null,
+	scope: null,
+	
 	initComponent: function () {
 
+		
+		
+		if(this.selectHandler) {
+			this.loader = new go.modules.community.addressbook.TreeLoader();
+		} else
+		{
+			this.loader = new go.modules.community.addressbook.TreeLoader({
+				secondaryTextTpl: '<button class="icon">add</button>'
+			});
+		}
+		
 		go.modules.community.addressbook.AddressBookTree.superclass.initComponent.call(this);
 
 
@@ -35,11 +53,21 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 
 			if (e.target.tagName === "BUTTON") {
 
-				if(node.attributes.entity.name === "AddressBook") {
-					this.showAddressBookMoreMenu(node, e);
+				if(!this.selectHandler) {
+					if(node.attributes.entity.name === "AddressBook") {
+						this.showAddressBookMoreMenu(node, e);
+					} else
+					{
+						this.showGroupMoreMenu(node, e);
+					}
 				} else
 				{
-					this.showGroupMoreMenu(node, e);
+					if(node.attributes.entity.name === "AddressBook") {
+						this.selectAddressBook(node.attributes.data.id);
+					} else
+					{
+						this.selectGroup(node.attributes.data.id);
+					}
 				}
 			}
 		}, this);
@@ -210,5 +238,27 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 		
 		this.groupMoreMenu.data = node.attributes.data;
 		this.groupMoreMenu.showAt(e.getXY());
+	},
+	
+	selectGroup : function(groupId) {
+		var s = go.Stores.get("Contact");
+		s.query({
+			filter: {groupId: groupId, hasEmailAddresses: true}
+		}, function(response) {			
+			s.get(response.ids, function(contacts) {
+				this.selectHandler.call(this.scope || this, contacts);
+			}, this);
+		}, this);
+	},
+	
+	selectAddressBook : function(addressBookId) {
+		var s = go.Stores.get("Contact");
+		s.query({
+			filter: {addressBookId: addressBookId, hasEmailAddresses: true}
+		}, function(response) {			
+			s.get(response.ids, function(contacts) {
+				this.selectHandler.call(this.scope || this, contacts);
+			}, this);
+		}, this);
 	}
 });

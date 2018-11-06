@@ -51,7 +51,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 						dv.emailButton.menu.removeAll();						
 						dv.data.emailAddresses.forEach(function(a) {
 							dv.emailButton.menu.addMenuItem({
-								text: "<div>" + a.email + "</div><small>" + t("emailTypes")[a.type] + "</small></div>",
+								text: "<div>" + a.email + "</div><small>" + t("emailTypes")[a.type] + "</small>",
 								handler: function() {
 									go.util.mailto({
 										email: a.email,
@@ -66,7 +66,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 						dv.callButton.menu.removeAll();						
 						dv.data.phoneNumbers.forEach(function(a) {
 							dv.callButton.menu.addMenuItem({
-								text: "<div>" + a.number + "</div><small>" + t("phoneTypes")[a.type] + "</small></div>",
+								text: "<div>" + a.number + "</div><small>" + t("phoneTypes")[a.type] + "</small>",
 								handler: function() {
 									go.util.callto({
 										number: a.number,

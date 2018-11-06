@@ -16,6 +16,10 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				'permissionLevel',
 				'photoBlobId',
 				"isOrganization",
+				"emailAddresses",
+				"phoneNumbers",
+				"dates",
+				"streetAddresses",
 				{name: 'organizations', type: go.data.types.Contact, key: 'organizationIds'}
 			].concat(go.modules.core.customfields.CustomFields.getFieldDefinitions("Contact")),
 			sortInfo :{field: "name", direction: "ASC"},
@@ -107,7 +111,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				},
 				{
 					xtype: "datecolumn",
-					hidden: false,
+					hidden: true,
 					id: 'modifiedAt',
 					header: t('Modified at'),
 					width: dp(160),

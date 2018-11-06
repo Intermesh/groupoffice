@@ -247,7 +247,13 @@ class Contact extends AclItemEntity {
 		
 		if (isset($filter['isOrganization'])) {
 			$query->andWhere('isOrganization', '=', $filter['isOrganization']);
-		}	
+		}
+		
+		if(isset($filter['hasEmailAddresses'])) {
+			$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "LEFT")
+							->groupBy(['c.id'])
+							->having('count(e.id) > 0');
+		}
 		
 		return parent::filter($query, $filter);
 	}

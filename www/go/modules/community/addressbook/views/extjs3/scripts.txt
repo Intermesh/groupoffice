@@ -12,3 +12,4 @@ SystemSettingsPanel.js
 CustomFieldSetDialog.js
 customfield/Contact.js
 Utils.js
+SelectDialog.js
