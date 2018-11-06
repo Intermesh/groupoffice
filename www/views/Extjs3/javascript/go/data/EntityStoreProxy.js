@@ -69,7 +69,7 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 				} else {
 					this.onWrite(action, o, data, rs);
 				}
-			});
+			}, this);
 
 		}, this);
 
