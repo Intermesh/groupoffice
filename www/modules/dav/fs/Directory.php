@@ -271,17 +271,20 @@ class Directory extends \Sabre\DAV\FS\Directory{
 		$folder->delete();
 	}
 
-//	/**
-//	 * Returns available diskspace information
-//	 *
-//	 * @return array
-//	 */
-//	public function getQuotaInfo() {
-//
-//		return array(
-//				disk_total_space($this->path) - disk_free_space($this->path),
-//				disk_free_space($this->path)
-//		);
-//	}
+	/**
+	 * Returns available diskspace information
+	 *
+	 * @return array
+	 */
+	public function getQuotaInfo() {		
+	
+		$user = GO()->getAuthState()->getUser();
+		$free = $user->getStorageFreeSpace();
+		
+		return array(
+				$user->getStorageQuota() - $free,
+				$free
+		);		
+	}
 
 }

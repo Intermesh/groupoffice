@@ -243,6 +243,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 	public static function checkQuota($newBytes) {
 		$enoughQuota = true;
 		$userQuota = \GO::user()->getDiskQuota();
+		
 		if ($userQuota) {
 			$enoughQuota = \GO::user()->disk_usage + $newBytes <= $userQuota;
 		}
@@ -250,6 +251,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 			$currentQuota = \GO::config()->get_setting('file_storage_usage');
 			$enoughQuota = $currentQuota + $newBytes <= \GO::config()->quota;
 		}
+		
 		return $enoughQuota;
 	}
 

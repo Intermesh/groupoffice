@@ -109,6 +109,36 @@ use go\modules\core\core\model\Settings;
 		public function getDataFolder() {
 			return new Folder($this->getConfig()['general']['dataPath']);
 		}
+		
+		/**
+		 * Get total space of the data folder in bytes
+		 * 
+		 * @return float
+		 */
+		public function getStorageQuota() {
+			$quota = $this->getCache()['limits']['storageQuota'];
+			if(empty($quota)) {
+				$quota = disk_total_space($this->getConfig()['general']['dataPath']);
+			}
+			
+			return $quota;
+		}		
+		
+		/**
+		 * Get free space in bytes
+		 * 
+		 * @return float
+		 */
+		public function getStorageFreeSpace() {
+			$quota = $this->getCache()['limits']['storageQuota'];
+			if(empty($quota)) {
+				return disk_free_space($this->getConfig()['general']['dataPath']);
+			} else
+			{
+				 $usage = \GO::config()->get_setting('file_storage_usage');				 
+				 return $quota - $usage;
+			}
+		}
 
 		/**
 		 * Get the temporary files folder

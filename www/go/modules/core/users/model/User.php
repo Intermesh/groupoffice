@@ -178,7 +178,17 @@ class User extends Entity {
 	
 	
 	protected $files_folder_id;
+	/**
+	 * Disk quota in MB
+	 * @var int
+	 */
 	public $disk_quota;
+	
+	/**
+	 * Disk usage in bytes
+	 * 
+	 * @var int
+	 */
 	public $disk_usage;
 	
 	public $mail_reminders;
@@ -636,6 +646,29 @@ class User extends Entity {
 		}
 		
 		return true;		
+	}
+	
+	
+	/**
+	 * Get the user disk quota in bytes
+	 * @return int amount of bytes the user may use
+	 */
+	public function getStorageQuota(){
+		if(!empty($this->disk_quota)) {
+			return $this->disk_quota*1024*1024;
+		} else 
+		{
+			return GO()->getStorageQuota();
+		}
+	}
+	
+	public function getStorageFreeSpace() {
+		if(!empty($this->disk_quota)) {
+			return $this->disk_quota*1024*1024 - $this->disk_usage;
+		} else
+		{
+			return GO()->getStorageFreeSpace();
+		}
 	}
 	
 	protected function internalDelete() {
