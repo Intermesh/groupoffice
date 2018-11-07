@@ -264,22 +264,28 @@ $qs[] = function() {
 
 		//this could lead to a "clientName" column having a null value. Which lead to ticket #201816451
 		if (method_exists($record['name'], 'getModule')) {
-
 			$name = $record['name']::getModule();
-
-			$module = (new Query)
-											->select('id')->from('core_module')->where(['name' => $name])
-											->execute()->fetch();
-			
-			
-			$shortName = substr($record['name'], strrpos($record['name'], '\\') + 1);
 			$clientName = $record['name']::getClientName();
-
-
-			App::get()->getDbConnection()
-							->update('core_entity', ['moduleId' => $module['id'], 'name' => $shortName, 'clientName' => $clientName], ['id' => $record['id']])
-							->execute();
+		} else {
+			// Search for module name based on the name column(namespace) in the core_entity table (Ticket: #201817072)
+			// Needed for modules that are already refactored and where the activerecord does not exist anymore (Notes)
+			$nameParts = explode('\\',$record['name']);
+			if(!isset($nameParts[1])){
+				continue;
+			}
+			$name = strtolower($nameParts[1]);
+			$clientName = array_pop($nameParts);
 		}
+			
+		$module = (new Query)
+										->select('id')->from('core_module')->where(['name' => $name])
+										->execute()->fetch();
+
+		$shortName = substr($record['name'], strrpos($record['name'], '\\') + 1);
+		
+		App::get()->getDbConnection()
+						->update('core_entity', ['moduleId' => $module['id'], 'name' => $shortName, 'clientName' => $clientName], ['id' => $record['id']])
+						->execute();
 	}
 };
 //UPDATE core_entity SET name = CONCAT(UCASE(LEFT(name, 1)), SUBSTRING(name, 2))
