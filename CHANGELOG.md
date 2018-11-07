@@ -1,3 +1,4 @@
+- Core: fixed issue with GO62 to GO63 update in combination with modules that are already refactored.
 - Core: Added QR code generator
 - Googleauthenticator: Use the QR code generator to generate the GA QR code
 - Webdav: Fixed Webdav quota information
