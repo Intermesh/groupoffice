@@ -1,3 +1,7 @@
+- Multi instance: Storage and user quota can be set in multi instance module
+- Multi instance: Trials will be deactivated after 30 days
+- Multi instance: Possible to set welcome message on start page via API
+
 08-11-2018 6.3.49
 - Merged 6.2 fixes
 - Use globalconfig.inc.php in new framework too. (Thanks to pvdvendjc)
