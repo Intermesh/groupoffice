@@ -1,3 +1,6 @@
+08-11-2018 6.3.49
+- Merged 6.2 fixes
+- Use globalconfig.inc.php in new framework too. (Thanks to pvdvendjc)
 - Core: fixed issue with GO62 to GO63 update in combination with modules that are already refactored.
 - Core: Added QR code generator
 - Googleauthenticator: Use the QR code generator to generate the GA QR code
