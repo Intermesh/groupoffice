@@ -169,7 +169,7 @@ class Instance extends Entity {
 			$this->setInstanceConfig($config);
 		}
 		
-		$this->createWelcomeMessage();
+		//$this->createWelcomeMessage();
 		
 		return true;	
 	}
