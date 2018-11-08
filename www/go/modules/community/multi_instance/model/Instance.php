@@ -13,7 +13,21 @@ class Instance extends Entity {
 	public $id;	
 	public $hostname;	
 	public $createdAt;
+	
+	/**
+	 * Number of users
+	 * 
+	 * @var int
+	 */
 	public $userCount;
+	
+	/**
+	 * Maximum amount of users
+	 * 
+	 * @var int
+	 */
+	public $usersMax;
+	
 	public $lastLogin;	
 	public $adminDisplayName;	
 	public $adminEmail; 	
@@ -21,6 +35,20 @@ class Instance extends Entity {
 	public $modifiedAt;
 
 	public $removedAt;
+	
+	/**
+	 * Storage usage in bytes
+	 * @var int
+	 */
+	public $storageUsage;
+	
+	
+	/**
+	 * Storage quota in bytes
+	 * 
+	 * @var int
+	 */
+	public $storageQuota;
 
 	protected static function defineMapping() {
 		return parent::defineMapping()
@@ -119,21 +147,23 @@ class Instance extends Entity {
 			return false;
 		}
 		
-		if(!$this->isNew()) {
-			
-			if($this->isModified('deletedAt')) {
-				$bak = $this->getConfigFile()->getFolder()->getFile('config.php.bak');
-				if($bak->exists())
-				{
-					if(!$bak->rename('config.php')) {
-						return false;
-					}
-				}
-			}
-			
-			return true;
+		if($this->isNew()) {		
+			$this->createInstance();
+		} 
+		
+		if($this->isModified(['storageQuota', 'userMax'])) {
+			$config = $this->getInstanceConfig();
+			$config['quota'] = $this->storageQuota / 1024;
+			$config['max_users'] = $this->usersMax;
+			$this->setInstanceConfig($config);
 		}
 		
+		
+		return true;	
+	}
+	
+	
+	private function createInstance() {
 		$dbName =  $this->getDbName();
 		$dbUsername = $this->getDbUser();	
 		$dbPassword = bin2hex(openssl_random_pseudo_bytes(8));
@@ -177,8 +207,6 @@ class Instance extends Entity {
 			
 			throw $e;
 		}
-		
-		return true;	
 	}
 	
 	private function dropDatabase($dbName) {		
@@ -229,13 +257,53 @@ class Instance extends Entity {
 	
 	private $instanceDbConn;
 	
+	
+	private $instanceConfig;
+	private $globalConfig;
+	
+	private function getInstanceConfig() {
+		if(!isset($this->instanceConfig)) {						
+			include($this->getConfigFile()->getPath());
+			$this->instanceConfig = $config;
+		}		
+		return $this->instanceConfig;
+	}
+	
+	private function setInstanceConfig($config) {
+		$this->getConfigFile()->putContents("<?php\n\$config = " . var_export($config, true) . ";\n");
+		
+		if(function_exists("opcache_invalidate")) {
+			opcache_invalidate($this->getConfigFile()->getPath());
+		}
+		
+		$this->instanceConfig = $config;
+	}
+	
+	private function getGlobalConfig() {
+		
+		if(!isset($this->instanceConfig)) {			
+			$globalConfigFile = "/etc/groupoffice/globalconfig.inc.php";
+			if(file_exists($globalConfigFile)) {
+				include("/etc/groupoffice/globalconfig.inc.php");
+				$this->globalConfig	= $config ?? [];
+			} else
+			{
+				$this->globalConfig	= [];
+			}
+		}
+		
+		return $this->globalConfig;
+	}
+	
 	/**
 	 * 
 	 * @return \go\core\db\Connection
 	 */
 	private function getInstanceDbConnection() {
-		if(!isset($this->instanceDbConn)) {			
-			include($this->getConfigFile()->getPath());
+		if(!isset($this->instanceDbConn)) {		
+			
+			$config = $this->getInstanceConfig();
+			
 			$dsn = 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . $config['db_name'];
 			$this->instanceDbConn = new \go\core\db\Connection($dsn, $config['db_user'], $config['db_pass']);
 		}
@@ -285,14 +353,22 @@ class Instance extends Entity {
 			
 			$this->adminDisplayName = $record['displayName'];
 			$this->adminEmail = $record['email'];
+			
+			$this->storageUsage = (int) (new \go\core\db\Query())
+						->setDbConnection($this->getInstanceDbConnection())
+						->selectSingleValue('value')
+						->from('go_settings')
+						->where('name', '=', "file_storage_usage")
+						->single();
+			
+			$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
+			
+			$this->storageQuota = isset($config['quota']) ? $config['quota'] * 1024 : null; 
 		}
 		catch(\Exception $e) {
 			//ignore
 		}
-	}
-	
-	
-	
+	}	
 	
 	protected function internalDelete() {
 		$this->getTempFolder()->delete();
@@ -310,11 +386,7 @@ class Instance extends Entity {
 		include($this->getConfigFile()->getPath());
 		$config['enabled'] = $value;
 		
-		$this->getConfigFile()->putContents("<?php\n\$config = " . var_export($config, true) . ";\n");
-		
-		if(function_exists("opcache_invalidate")) {
-			opcache_invalidate($this->getConfigFile()->getPath());
-		}
+		$this->setInstanceConfig($config);
 	}
 	
 	public function getEnabled() {
