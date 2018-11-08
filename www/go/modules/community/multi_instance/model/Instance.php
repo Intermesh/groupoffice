@@ -58,7 +58,7 @@ class Instance extends Entity {
 	public $storageQuota;
 	
 	
-	private $welcomeMessage;
+	protected $welcomeMessage;
 
 	protected static function defineMapping() {
 		return parent::defineMapping()
