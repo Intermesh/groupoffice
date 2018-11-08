@@ -209,7 +209,7 @@ class Instance extends Entity {
 						->from('core_module')
 						->where(['package'=>'core', 'name'=>'users'])->single();
 		
-		foreach($core as $name => $value) {
+		foreach($users as $name => $value) {
 			$this->getInstanceDbConnection()
 							->replace('core_setting', ['name' => $name, 'value' => $value, "moduleId" => $usersModuleId])->execute();
 		}
@@ -220,7 +220,7 @@ class Instance extends Entity {
 						->from('core_module')
 						->where(['package'=>'core', 'name'=>'groups'])->single();
 		
-		foreach($core as $name => $value) {
+		foreach($groups as $name => $value) {
 			$this->getInstanceDbConnection()
 							->replace('core_setting', ['name' => $name, 'value' => $value, "moduleId" => $groupsModuleId])->execute();
 		}
