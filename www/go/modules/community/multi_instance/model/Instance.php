@@ -195,7 +195,7 @@ class Instance extends Entity {
 						->where(['package'=>'core', 'name'=>'core'])->single();
 		
 		foreach($core as $name => $value) {
-			if($name === "databaseVersion") {
+			if($name === "databaseVersion" || $name === "title") {
 				continue;
 			}
 			
