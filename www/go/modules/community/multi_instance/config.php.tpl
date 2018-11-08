@@ -7,3 +7,4 @@ $config['db_port'] = 3306;
 $config['file_storage_path'] = "{dataPath}";
 $config['tmpdir'] = "{tmpPath}";
 $config['debug'] = false;
+$config['servermanager'] = '{servermanager}';

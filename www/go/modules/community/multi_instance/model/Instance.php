@@ -175,6 +175,63 @@ class Instance extends Entity {
 	}
 	
 	
+	public function onInstall() {
+		$this->createWelcomeMessage();
+		
+		$this->copySystemSettings();		
+		
+		$this->save();
+	}
+	
+	private function copySystemSettings() {
+		$core = GO()->getSettings()->toArray();
+		$groups = \go\modules\core\groups\model\Settings::get()->toArray();
+		$users = \go\modules\core\users\model\Settings::get()->toArray();
+		
+		$coreModuleId = (new \go\core\db\Query)
+						->setDbConnection($this->getInstanceDbConnection())
+						->selectSingleValue('id')
+						->from('core_module')
+						->where(['package'=>'core', 'name'=>'core'])->single();
+		
+		foreach($core as $name => $value) {
+			if($name === "databaseVersion") {
+				continue;
+			}
+			
+			$this->getInstanceDbConnection()
+							->replace('core_setting', ['name' => $name, 'value' => $value, "moduleId" => $coreModuleId])->execute();
+		}
+		
+		$usersModuleId = (new \go\core\db\Query)
+						->setDbConnection($this->getInstanceDbConnection())
+						->selectSingleValue('id')
+						->from('core_module')
+						->where(['package'=>'core', 'name'=>'users'])->single();
+		
+		foreach($core as $name => $value) {
+			$this->getInstanceDbConnection()
+							->replace('core_setting', ['name' => $name, 'value' => $value, "moduleId" => $usersModuleId])->execute();
+		}
+		
+		$groupsModuleId = (new \go\core\db\Query)
+						->setDbConnection($this->getInstanceDbConnection())
+						->selectSingleValue('id')
+						->from('core_module')
+						->where(['package'=>'core', 'name'=>'groups'])->single();
+		
+		foreach($core as $name => $value) {
+			$this->getInstanceDbConnection()
+							->replace('core_setting', ['name' => $name, 'value' => $value, "moduleId" => $groupsModuleId])->execute();
+		}
+		
+		
+		
+						
+						
+	}
+	
+	
 	private function createWelcomeMessage() {
 		
 		if(isset($this->welcomeMessage)) {
@@ -212,6 +269,8 @@ class Instance extends Entity {
 									"content" => $this->welcomeMessage
 							])->execute();
 		}
+		
+		$this->welcomeMessage = null;
 		
 	}
 	
@@ -296,14 +355,16 @@ class Instance extends Entity {
 				'{dbUsername}',
 				'{dbPassword}',
 				'{tmpPath}',
-				'{dataPath}'
+				'{dataPath}',
+				'{servermanager}',
 		], [
 				$dsn['options']['host'],
 				$dbName,
 				$dbUsername,
 				$dbPassword,
 				$tmpPath,
-				$dataPath
+				$dataPath,
+				GO()->findConfigFile()
 		],
 		$tpl->getContents());		
 	}

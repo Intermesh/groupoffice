@@ -236,7 +236,8 @@ use go\modules\core\core\model\Settings;
 							"dataPath" => $config['file_storage_path'] ?? '/var/lib/groupoffice', //TODO default should be /var/lib/groupoffice
 							"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
 							"debug" => $config['debug'] ?? false,
-							"cache" => Disk::class
+							"cache" => Disk::class,
+							"servermanager" => $config['servermanager'] ?? false
 					],
 					"db" => [
 							"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . ($config['db_name'] ?? "groupoffice-com"),

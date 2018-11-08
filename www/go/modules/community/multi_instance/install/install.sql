@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS `multi_instance_instance` (
   `storageQuota` bigint(20) DEFAULT NULL,
   `isTrial` tinyint(1) NOT NULL DEFAULT 0,
   `enabled` BOOLEAN NOT NULL DEFAULT TRUE,
+  `welcomeMessage` TEXT NULL DEFAULT NULL ,
   PRIMARY KEY (`id`),
   UNIQUE KEY `hostname` (`hostname`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
