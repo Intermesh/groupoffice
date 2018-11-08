@@ -99,7 +99,8 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 	},	
 	
 	setValue : function(v) {
-		if(!this.serverFormats) {			
+		if(!this.serverFormats) {		
+			
 			v *= this.multiplier;
 			v = GO.util.numberFormat(v, this.decimals);
 		} 

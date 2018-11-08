@@ -33,8 +33,15 @@ class Instance extends Entity {
 	public $adminEmail; 	
 	public $loginCount;	
 	public $modifiedAt;
-
-	public $removedAt;
+	
+	public $enabled;
+	
+	/**
+	 * Trails will be deactivated automatically after a configurable period.
+	 * 
+	 * @var boolean
+	 */
+	public $isTrial;
 	
 	/**
 	 * Storage usage in bytes
@@ -49,6 +56,9 @@ class Instance extends Entity {
 	 * @var int
 	 */
 	public $storageQuota;
+	
+	
+	private $welcomeMessage;
 
 	protected static function defineMapping() {
 		return parent::defineMapping()
@@ -151,15 +161,58 @@ class Instance extends Entity {
 			$this->createInstance();
 		} 
 		
-		if($this->isModified(['storageQuota', 'userMax'])) {
+		if($this->isModified(['storageQuota', 'userMax', 'enabled'])) {
 			$config = $this->getInstanceConfig();
 			$config['quota'] = $this->storageQuota / 1024;
 			$config['max_users'] = $this->usersMax;
+			$config['enabled'] = $this->enabled;
 			$this->setInstanceConfig($config);
 		}
 		
+		$this->createWelcomeMessage();
 		
 		return true;	
+	}
+	
+	
+	private function createWelcomeMessage() {
+		
+		if(isset($this->welcomeMessage)) {
+			$this->getInstanceDbConnection()
+							->insert("core_acl", [
+									'ownedBy' => 1,
+									'usedIn' => 'su_announcements.acl_id',
+									'modifiedAt' => new \DateTime()
+							])->execute();
+			
+			$aclId = $this->getInstanceDbConnection()->getPDO()->lastInsertId();
+			
+			$this->getInstanceDbConnection()
+							->insert("core_acl_group", [
+									'aclId' => $aclId,
+									'groupId' => 1,
+									'level' => 50
+							])->execute();
+			
+			$this->getInstanceDbConnection()
+							->insert("core_acl_group", [
+									'aclId' => $aclId,
+									'groupId' => 2,
+									'level' => 10
+							])->execute();
+			
+			$this->getInstanceDbConnection()
+							->insert('su_announcements', [
+									'user_id' => 1,
+									'acl_id' => $aclId,
+									'due_time' => 0,
+									'ctime' => time(),
+									'mtime' => time(),
+									'title' => GO()->t("Welcome to Group-Office"),
+									"content" => $this->welcomeMessage
+							])->execute();
+		}
+		
 	}
 	
 	
@@ -364,6 +417,7 @@ class Instance extends Entity {
 			$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
 			
 			$this->storageQuota = isset($config['quota']) ? $config['quota'] * 1024 : null; 
+			$this->enabled = $config['enabled'] ?? true;
 		}
 		catch(\Exception $e) {
 			//ignore
@@ -382,21 +436,8 @@ class Instance extends Entity {
 	}
 	
 	
-	public function setEnabled($value) {
-		include($this->getConfigFile()->getPath());
-		$config['enabled'] = $value;
 		
-		$this->setInstanceConfig($config);
-	}
-	
-	public function getEnabled() {
-		if($this->getConfigFile()->exists()) {
-			include($this->getConfigFile()->getPath());
-		
-			return isset($config['enabled']) ? $config['enabled'] : true;
-		} else
-		{
-			return null;
-		}
+	public function setWelcomeMessage($html) {
+		$this->welcomeMessage = $html;
 	}
 }
