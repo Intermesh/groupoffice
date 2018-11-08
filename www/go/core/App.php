@@ -205,6 +205,11 @@ use go\modules\core\core\model\Settings;
 				return $this->config;
 			}
 			
+			$globalConfigFile = '/etc/groupoffice/globalconfig.inc.php';
+			if (file_exists($globalConfigFile)) {
+				require($globalConfigFile);
+			}
+			
 			$configFile = $this->findConfigFile();
 			if(!$configFile) {
 				
@@ -228,9 +233,9 @@ use go\modules\core\core\model\Settings;
 			
 			$this->config = [
 					"general" => [
-							"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice', //TODO default should be /var/lib/groupoffice
+							"dataPath" => $config['file_storage_path'] ?? '/var/lib/groupoffice', //TODO default should be /var/lib/groupoffice
 							"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
-							"debug" => !empty($config['debug']),
+							"debug" => $config['debug'] ?? false,
 							"cache" => Disk::class
 					],
 					"db" => [
@@ -239,18 +244,15 @@ use go\modules\core\core\model\Settings;
 							"password" => $config['db_pass'] ?? ""
 					],
 					"limits" => [
-							"maxUsers" => 0,
-							"storageQuota" => 0,
-							"allowedModules" => ""
+							"maxUsers" => $config['max_users'] ?? 0,
+							"storageQuota" => $config['quota'] ?? 0,
+							"allowedModules" => $config['allowed_modules'] ?? ""
 					],
 					"branding" => [
-							"name" => "GroupOffice"
+						"name" => $config['product_name'] ?? "GroupOffice"
 					]
 			];
 			
-			if(isset($config['product_name'])) {
-				$this->config['branding']['name'] = $config['product_name'];
-			}
 			return $this->config;
 		}
 

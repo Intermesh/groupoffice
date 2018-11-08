@@ -102,7 +102,7 @@ class Instance extends Entity {
 	}
 	
 	private function getTempFolder() {
-		return GO()->getTmpFolder()->getFolder('multi_instance' . $this->hostname);
+		return GO()->getTmpFolder()->getFolder('multi_instance/' . $this->hostname);
 	}
 	
 	private function getDbName() {

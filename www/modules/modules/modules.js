@@ -539,7 +539,8 @@ Ext.extend(GO.modules.MainPanel,Ext.grid.EditorGridPanel, {
 		if(record.data.id) {
 			params.update = {};
 			params.update[record.data.id] = {
-				enabled: record.data.enabled
+				enabled: record.data.enabled,
+				sort_order: record.data.sort_order
 			};
 			go.Stores.get("Module").set(params, function(options, success, response) {
 
