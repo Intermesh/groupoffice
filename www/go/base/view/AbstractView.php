@@ -17,12 +17,12 @@ abstract class AbstractView{
 			return;
 		
 		//iframe hack for file uploads fails with application/json				
-//		if(!GO::request()->isJson()){
-//			header('Content-Type: text/html; charset=UTF-8');
-//		}else
-//		{
+		if(!\GO\Base\Util\Http::isAjaxRequest(false) || \GO\Base\Util\Http::isMultipartRequest()){
+			header('Content-Type: text/html; charset=UTF-8');
+		}else
+		{
 			header('Content-Type: application/json; charset=UTF-8');
-//		}		
+		}		
 
 //		header('Content-Type: text/html; charset=UTF-8');
 		header('X-XSS-Protection: 1; mode=block');
