@@ -1269,9 +1269,13 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 
 //		$select .= "SQL_NO_CACHE ";
+		
+		
 
 		if(empty($params['fields']))
 			$params['fields']=$this->getDefaultFindSelectFields(isset($params['limit']) && $params['limit']==1);
+		else
+			GO()->debug($params['fields']);
 
 
 		$fields = $params['fields'].' ';
@@ -1341,7 +1345,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 
 		
-		$joinCf = !empty($params['joinCustomFields']) && $this->hasCustomFields() && GO::modules()->customfields && GO::modules()->customfields->permissionLevel;
+		$joinCf = !empty($params['joinCustomFields']) && $this->hasCustomFields();
 
 		if($joinCf) {
 			
@@ -1349,7 +1353,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				return "cf." . $f->databaseName;
 			}, \go\modules\core\customfields\model\Field::findByEntity($this->getType()->getId())->all());
 			
-			$fields .= ", " .implode(', ', $names);
+			if(!empty($names)) {
+				$fields .= ", " .implode(', ', $names);
+			}
 		}
 
 		$fields .= $joinRelationSelectFields;

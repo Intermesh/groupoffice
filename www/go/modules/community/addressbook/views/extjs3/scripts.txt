@@ -6,6 +6,7 @@ ContactDetail.js
 TreeLoader.js
 AddressBookTree.js
 AddressBookDialog.js
+AddressBookCombo.js
 GroupDialog.js
 ContactCombo.js
 SystemSettingsPanel.js

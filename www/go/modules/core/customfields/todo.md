@@ -1,6 +1,5 @@
 For old framework:
 
-replace all GO.customfields.addColumns
 advanced search
 cascade delete
 blocks module
@@ -13,10 +12,6 @@ Disabled categories for: ticket type, project template, calendar resource groups
 modules/projects2/views/Extjs3/AddressbookOverrides.js
 
 Refactor e-mail and document templates
-Linking in email
-
-calendar participants / address book
-E-mail composer address book
 
 For new:
 
@@ -27,15 +22,9 @@ Search Cache
 
 CF:
 
-Product
-Factuur/Offerte
-Afspraak
-Calendar
-Bestand
-Map
 TimeEntry
-Ticket
 Gebruiker
+Site content en site
 
 
 PHP Model:
