@@ -320,23 +320,9 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 	},
 
 	addCustomFields : function(){
-		if(this.customFieldType && GO.customfields && GO.customfields.types[this.customFieldType])
-		{			
-			var classParts = this.customFieldType.split('\\');
-			var shortModelName = classParts[3].toLowerCase();
-			
-			for(var i=0;i<GO.customfields.types[this.customFieldType].panels.length;i++)
-			{				
-				if(this.jsonPost){
-					var customfields = GO.customfields.types[this.customFieldType].panels[i].customfields;
-					for(var n=0;n<customfields.length;n++){
-						customfields[n].dataname = shortModelName+"."+customfields[n].dataname;
-					};
-				}
-				
-				this.addPanel(GO.customfields.types[this.customFieldType].panels[i]);
-			}
-		}
+		
+		this._panels[0].add(go.modules.core.customfields.CustomFields.getFormFieldSets(this.customFieldType))
+
 	},
 	
 

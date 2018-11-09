@@ -46,6 +46,8 @@ use GO;
  * @property int $acl_write
  */
 class Folder extends \GO\Base\Db\ActiveRecord {
+	
+	use \go\core\orm\CustomFieldsTrait;
 
 	private $_path;
 	

@@ -37,13 +37,7 @@ GO.calendar.EventDialog = function(calendar) {
 	this.resourcesPanel
 	];
 
-	if(GO.customfields && GO.customfields.types["GO\\Calendar\\Model\\Event"])
-	{
-		for(var i=0;i<GO.customfields.types["GO\\Calendar\\Model\\Event"].panels.length;i++)
-		{
-			items.push(GO.customfields.types["GO\\Calendar\\Model\\Event"].panels[i]);
-		}
-	}
+	this.propertiesPanel.add(go.modules.core.customfields.CustomFields.getFormFieldSets("Event"));
 	
 	if(go.Modules.isAvailable("legacy", "comments")){
 		this.commentsGrid = new GO.comments.CommentsGrid({title:t("Comments", "comments")});

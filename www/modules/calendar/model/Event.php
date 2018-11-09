@@ -61,6 +61,8 @@ use Swift_Attachment;
 use Swift_Mime_ContentEncoder_PlainContentEncoder;
 
 class Event extends \GO\Base\Db\ActiveRecord {
+	
+	use \go\core\orm\CustomFieldsTrait;
 
 	const STATUS_TENTATIVE = 'TENTATIVE';
 //	const STATUS_DECLINED = 'DECLINED';

@@ -1932,19 +1932,16 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 				scope:this
 			},'-']
 
-			if(go.Modules.isAvailable("core", "customfields"))
-			{
-				tbar.push(new Ext.Button({
-					iconCls: 'ic-settings',
-					disabled: !GO.settings.modules.calendar.write_permission,
-					text: t("Custom fields", "customfields"),
-					handler: function()
-					{
-						GO.calendar.groupDialog.show(1);
-					},
-					scope: this
-				}));
-			}
+			tbar.push(new Ext.Button({
+				iconCls: 'ic-settings',
+				disabled: !GO.settings.modules.calendar.write_permission,
+				text: t("Custom fields", "customfields"),
+				handler: function()
+				{
+					GO.calendar.groupDialog.show(1);
+				},
+				scope: this
+			}));
 
 			tbar.push('->');
 			tbar.push(new go.toolbar.SearchButton({
@@ -2141,7 +2138,7 @@ go.Modules.register("legacy", 'calendar', {
 	mainPanel: GO.calendar.MainPanel,
 	title : t("Calendar", "calendar"),
 	iconCls : 'go-tab-icon-calendar',
-	entities: ["Event"],
+	entities: ["Event", "Calendar"],
 	links: [{
 			entity: "Event",			
 			linkWindow: function() {

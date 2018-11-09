@@ -314,3 +314,16 @@ $updates['201707131221'][] = 'ALTER TABLE `cal_settings` ADD `chack_conflict` BO
 $updates['201708151100'][] = 'ALTER TABLE `cal_settings` CHANGE `chack_conflict` `check_conflict` BOOLEAN NOT NULL DEFAULT TRUE;';
 $updates['201809171650'][] = 'ALTER TABLE `cal_events_declined` CHANGE `uid` `uid` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;';
 $updates['201811011333'][] = "ALTER TABLE `cal_calendars` ADD INDEX(`user_id`);";
+
+
+
+$updates['201810161450'][] = "ALTER TABLE `cf_cal_events` CHANGE `model_id` `id` INT(11) NULL DEFAULT NULL;";
+$updates['201810161450'][] = "RENAME TABLE `cf_cal_events` TO `cal_events_custom_fields`;";
+$updates['201810161450'][] = "delete from cal_events_custom_fields where id not in (select id from cal_events);";
+$updates['201810161450'][] = "ALTER TABLE `cal_events_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `cal_events`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+
+
+$updates['201810161450'][] = "ALTER TABLE `cf_cal_calendars` CHANGE `model_id` `id` INT(11) NULL DEFAULT NULL;";
+$updates['201810161450'][] = "RENAME TABLE `cf_cal_calendars` TO `cal_calendars_custom_fields`;";
+$updates['201810161450'][] = "delete from cal_calendars_custom_fields where id not in (select id from cal_calendars);";
+$updates['201810161450'][] = "ALTER TABLE `cal_calendars_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `cal_calendars`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
