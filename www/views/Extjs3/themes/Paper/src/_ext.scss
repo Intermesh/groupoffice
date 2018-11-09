@@ -767,7 +767,8 @@
 	&-text-icon button::before{
 		@extend %icon;
 		padding-right: dp(8);
-		margin-top: dp(-4);
+		//MS Why was this here?
+		/*margin-top: dp(-4);*/
 	}
    &-pressed {
 		//background-color: color($bg, 'hover');
