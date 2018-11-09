@@ -7,7 +7,7 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 	height: dp(600),
 	modal: true,
 	title: t("Select from address book"),
-	handler: function(name, email) {
+	handler: function(name, email, id) {
 		
 	},
 	scope: null,
@@ -49,17 +49,20 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 					var record = grid.getStore().getAt(rowIndex), emails = record.get("emailAddresses");
 					
 					if(emails.length === 1) {
-						this.selectEmail(record.get("name"), emails[0].email);
+						this.selectEmail(record.get("name"), emails[0].email, record.get("id"));
 						return;
 					}
 					
 					var me = this,  items = emails.map(function(a) {
 						return {
-							name: record.get("name"),
-							email: a.email,
+							data: {
+								name: record.get("name"),
+								email: a.email,
+								id: record.get("id")
+							},
 							text: "<div>" + a.email + "</div><small>" +  this.labels[a.type] + "</div>",
 							handler: function() {
-								me.selectEmail(this.name, this.email);
+								me.selectEmail(this.data.name, this.data.email, this.data.id);
 							}
 						};
 					}, this);
@@ -106,8 +109,8 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 	},
 	
 	
-	selectEmail : function(name, email) {
-		this.handler.call(this.scope, name, email);
+	selectEmail : function(name, email, id) {
+		this.handler.call(this.scope, name, email, id);
 		this.close();
 	},
 	
@@ -133,7 +136,7 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 	
 	selectMultiple : function(contacts) {
 		contacts.forEach(function(contact) {
-			this.selectEmail(contact.name, contact.emailAddresses[0].email);
+			this.selectEmail(contact.name, contact.emailAddresses[0].email, contact.id);
 		}, this);
 		this.close();
 	}
