@@ -476,12 +476,6 @@ class User extends \GO\Base\Db\ActiveRecord {
 				$this->holidayset = $holiday; 
 		}
 		
-		if(!$this->isNew && empty($this->holidayset) && ($contact = $this->createContact())){
-			$holiday = Holiday::localeFromCountry($contact->country);
-
-			if($holiday !== false)
-				$this->holidayset = $holiday; 
-		}
 		
 		$pwd = $this->getAttribute('password');
 		if($this->isModified('password') && !empty($pwd)){
@@ -814,51 +808,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 * @return \GO\Addressbook\Model\Contact 
 	 */
 	public function createContact(){
-		if (GO::modules()->isInstalled("addressbook")) {
-			
-			if(!empty($this->contact_id)){
-				//this is for old databases
-				$contact = \GO\Addressbook\Model\Contact::model()->findByPk($this->contact_id);
-				if($contact){
-					$contact->go_user_id=$this->id;
-					
-					$name = GO\Base\Util\StringHelper::split_name($this->displayName);
-					$contact->first_name = $name['first_name'];
-					$contact->middle_name =$name['middle_name'];
-					$contact->last_name = $name['last_name'];
-					$contact->email = $this->email;
-					
-					if($contact->isModified())
-						$contact->save(true);
-					
-					return $contact;
-				}
-			}
-			
-			$contact = $this->contact();
-			if (!$contact) {
-				$contact = new \GO\Addressbook\Model\Contact();
-				$addressbook = \GO\Addressbook\Model\Addressbook::model()->getUsersAddressbook();
-				$contact->go_user_id = $this->id;
-				$contact->addressbook_id = $addressbook->id;				
-			}			
-			
-			$name = GO\Base\Util\StringHelper::split_name($this->displayName);
-			$contact->first_name = $name['first_name'];
-			$contact->middle_name =$name['middle_name'];
-			$contact->last_name = $name['last_name'];
-			$contact->email = $this->email;
-
-			if($contact->isNew || $contact->isModified()){
-				$contact->skip_user_update=true;
-				$contact->save(true);
-			}
-			
-			return $contact;
-		}else
-		{
-			return false;
-		}
+		throw new \Exception("No longer supported");
 	}
 
 	protected function remoteComboFields() {

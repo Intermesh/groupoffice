@@ -15,8 +15,7 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 	triggerAction: 'all',
 	editable: true,
 	selectOnFocus: true,
-	forceSelection: true,
-	allowBlank: false,
+	forceSelection: true,	
 	/**
 	 * Set to true to show organizations, set to null to show both.
 	 */
@@ -24,7 +23,7 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 	initComponent: function () {
 		Ext.applyIf(this, {
 			store: new go.data.Store({
-				fields: ['id', 'name', "photoBlobId", {name: 'organizations', type: go.data.types.Contact, key: 'organizationIds'}],
+				fields: ['id', 'name', "photoBlobId", {name: 'organizations', type: go.data.types.Contact, key: 'organizationIds'}, 'goUserId', 'firstName', 'middleName', 'lastName', 'gender'],
 				entityStore: "Contact",
 				baseParams: {
 					filter: {

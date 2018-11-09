@@ -95,8 +95,9 @@ class Parser{
 	}
 	
 	private function _getModelAttributes($model, $tagPrefix=''){
-		$attributes = $model->getAttributes($this->attributesFormat);		
+		$attributes = $model instanceof \GO\Base\Db\ActiveRecord ? $model->getAttributes($this->attributesFormat) : $model->toArray();		
 		
+				
 		if(method_exists($model, 'getFormattedAddress')){
 			$attributes['formatted_address']=$model->getFormattedAddress();
 		}
@@ -105,8 +106,16 @@ class Parser{
 			$attributes['formatted_post_address']=$model->getFormattedPostAddress();
 		}
 				
-		if($model->hasCustomFields()){
+		if(method_exists($model, "getCustomFields")){
 			$attributes = array_merge($attributes, $model->getCustomFields());
+			
+			
+			$attributes = array_filter($attributes, "is_scalar");
+		
+		$attributes = array_map(function($a) {
+			return $a instanceof \DateTime ? $a->format(GO()->getAuthState()->getUser()->getDateTimeFormat()) : $a;
+		}, $attributes);
+
 			
 //			// For multiselect fields, replace the | with a ,
 //			$cfCols = $model->customfieldsRecord->getColumns();
@@ -128,7 +137,7 @@ class Parser{
 		}
 
 		$attributes = $this->_addTagPrefixAndRemoveEmptyValues($attributes, $tagPrefix);
-		
+
 		return $attributes;
 	}
 	
@@ -165,32 +174,28 @@ class Parser{
 	 * @param boolean $leaveEmptyTags Set to true if you don't want unreplaced tags to be cleaned up.
 	 * @return StringHelper 
 	 */
-	public function replaceContactTags($content, Contact $contact, $leaveEmptyTags=false){
+	public function replaceContactTags($content, \go\modules\community\addressbook\model\Contact $contact, $leaveEmptyTags=false){
 		
-		if(\GO::modules()->customfields)
-			\GO\Customfields\Model\AbstractCustomFieldsRecord::$formatForExport=true;
 		
 		$attributes = $leaveEmptyTags ? array() : $this->_defaultTags;
 		
-		if(!empty($contact->salutation))
-			$attributes['salutation']=$contact->salutation;
+//		if(!empty($contact->salutation))
+//			$attributes['salutation']=$contact->salutation;
 		
-		$attributes['contact:sirmadam']=$contact->sex=="M" ? \GO::t('sir') : \GO::t('madam');
+		$attributes['contact:sirmadam']=$contact->gender=="M" ? \GO::t('sir') : \GO::t('madam');
 		
 		$attributes = array_merge($attributes, $this->_getModelAttributes($contact, 'contact:'));
 		
 		// By default this was replaced just by M or F but now it will be replaced by the whole text Male or Female.
-		$attributes['contact:sex']=$contact->sex=="M" ? \GO::t('male','addressbook') : \GO::t('female','addressbook');
+		$attributes['contact:sex']=$contact->gender == "M" ? \GO::t('male','addressbook') : \GO::t('female','addressbook');
 		
-		if($contact->company)
+		$orgs = $contact->getOrganizationIds();
+		if(count($orgs) && ($company = \go\modules\community\addressbook\model\Contact::findById($orgs[0])))
 		{
-			$attributes = array_merge($attributes, $this->_getModelAttributes($contact->company, 'company:'));
+			$attributes = array_merge($attributes, $this->_getModelAttributes($company, 'company:'));
 		}
 		
 		$attributes = array_merge($attributes, $this->_getUserAttributes());
-				
-		if(\GO::modules()->customfields)
-			\GO\Customfields\Model\AbstractCustomFieldsRecord::$formatForExport=false;
 		
 		return $this->_parse($content, $attributes, $leaveEmptyTags);
 	}

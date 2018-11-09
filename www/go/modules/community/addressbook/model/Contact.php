@@ -235,6 +235,19 @@ class Contact extends AclItemEntity {
 						->addRelation('groups', ContactGroup::class, ['id' => 'contactId']);
 	}
 	
+	/**
+	 * Find contact for user ID.
+	 * 
+	 * A contact can optionally be connected to a user. It's not guaranteed that
+	 * the contact is present.
+	 * 
+	 * @param int $userId
+	 * @return static
+	 */
+	public static function findForUser($userId) {
+		return static::find()->where('goUserId', '=', $userId)->single();
+	}
+	
 	public static function filter(Query $query, array $filter) {
 		if (isset($filter['addressBookId'])) {
 			$query->andWhere('addressBookId', '=', $filter['addressBookId']);
