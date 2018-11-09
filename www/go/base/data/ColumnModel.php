@@ -375,8 +375,6 @@ class ColumnModel {
 				GO()->getDebugger()->debug($e->getMessage());
 			}
 		}
-			
-		//restore_error_handler();
 		
 		if (isset($this->_formatRecordFunction)){
 			$formattedRecord = call_user_func($this->_formatRecordFunction, $formattedRecord, $model, $this);

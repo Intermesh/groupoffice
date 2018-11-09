@@ -172,11 +172,11 @@ class Field extends AclItemEntity {
 	/**
 	 * Find all fields for an entity
 	 * 
-	 * @param int $enityId
+	 * @param int $entityTypeId
 	 * @return Query
 	 */
-	public static function findByEntity($entityId) {
-		return static::find()->where(['fs.entityId' => $entityId])->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId');
+	public static function findByEntity($entityTypeId) {
+		return static::find()->where(['fs.entityId' => $entityTypeId])->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId');
 	}
 
 }

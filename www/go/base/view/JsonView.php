@@ -83,10 +83,10 @@ class JsonView extends AbstractView{
 
 
 				//Add the customerfields to the data array
-				if (\GO::user()->getModulePermissionLevel('customfields') && $model->customfieldsRecord){
-					$response['data'][$modelName]['attributes'] = array_merge($response['data'][$modelName]['attributes'], $model->customfieldsRecord->getAttributes());
-					$response['data'][$modelName]['customfields']=$this->_getCustomFieldDefinitions($model);
-				}
+//				if (\GO::user()->getModulePermissionLevel('customfields') && $model->customfieldsRecord){
+//					$response['data'][$modelName]['attributes'] = array_merge($response['data'][$modelName]['attributes'], $model->customfieldsRecord->getAttributes());
+//					$response['data'][$modelName]['customfields']=$this->_getCustomFieldDefinitions($model);
+//				}
 			} else {
 				$response[$modelName] = $model;
 			}
@@ -213,10 +213,10 @@ class JsonView extends AbstractView{
 
 
 				//Add the customerfields to the data array
-				if (\GO::user()->getModulePermissionLevel('customfields') && $model->customfieldsRecord){
-					$response['data'][$modelName]['attributes'] = array_merge($response['data'][$modelName]['attributes'], $model->customfieldsRecord->getAttributes());
-					$response['data'][$modelName]['customfields']['categories']=$this->_getCustomFieldDefinitions($model);
-				}
+//				if (\GO::user()->getModulePermissionLevel('customfields') && $model->customfieldsRecord){
+//					$response['data'][$modelName]['attributes'] = array_merge($response['data'][$modelName]['attributes'], $model->customfieldsRecord->getAttributes());
+//					$response['data'][$modelName]['customfields']['categories']=$this->_getCustomFieldDefinitions($model);
+//				}
 			} else {
 				$response[$modelName] = $model;
 			}

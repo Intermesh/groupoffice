@@ -802,21 +802,7 @@ class MaintenanceController extends AbstractController {
 		if(!$this->isCli())			
 			echo '<pre>';
 		
-		if(\GO::modules()->isInstalled("addressbook")){
-			echo "\n\nProcessing addressbook\n";
-			flush();
-			$stmt = \GO\Addressbook\Model\Addressbook::model()->find();
-			while($addressbook = $stmt->fetch()){
-				$contactStmt = $addressbook->contacts();
-				$companiesStmt = $addressbook->companies();
-				
-				if(!$contactStmt->rowCount() && !$companiesStmt->rowCount()){
-					echo "Removing ".$addressbook->name."\n";
-					$addressbook->delete();
-					flush();
-				}
-			}
-		}
+	
 		
 		if(\GO::modules()->isInstalled("calendar")){
 			echo "\n\nProcessing calendar\n";

@@ -4112,6 +4112,12 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	}
 
 	public function resolveAttribute($path, $outputType='raw'){
+		
+		if(substr($path, 0, 13) === 'customFields.') { 
+			$cf = $this->getCustomFields();
+			return $cf[substr($path, 13)] ?? null;
+		}
+		
 		$parts = explode('.', $path);
 
 		$model = $this;
