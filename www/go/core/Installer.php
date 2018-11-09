@@ -12,7 +12,11 @@ use go\modules\core\groups\model\Group;
 use go\modules\core\users\model\User;
 use go\modules\core\users\model\UserGroup;
 
+use go\core\event\EventEmitterTrait;
+
 class Installer {
+	
+	use EventEmitterTrait;
 	
 	private $isInProgress = false;
 	
@@ -129,6 +133,9 @@ class Installer {
 	}
 	
 	public function upgrade() {
+		
+		$this->fireEvent('upgrade');
+		
 		//todo
 		$this->isInProgress = true;
 	}

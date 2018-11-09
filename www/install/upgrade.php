@@ -141,7 +141,7 @@ try {
 		GO()->getDbConnection()->query("delete from core_module where name IN ('servermanager', 'admin2userlogin', 'formprocessor', 'settings', 'sites', 'syncml', 'dropbox', 'timeregistration', 'projects', 'hoursapproval', 'webodf','imapauth','ldapauth', 'presidents','ab2users', 'backupmanager', 'calllog', 'emailportlet', 'gnupg', 'language', 'mailings', 'newfiles')");
 	}
 	
-	function upgrade() {
+	function upgrade() {		
 		$u = [];
 
 		$modules = Module::find()->all();
@@ -330,6 +330,10 @@ try {
 		echo "Resetting state\n";
 		
 		GO()->resetSyncState();
+		
+		// Run the upgrade function in the installer. (New framework)
+		$installer = App::get()->getInstaller();
+		$installer->upgrade();
 
 		echo "Done!\n";
 
