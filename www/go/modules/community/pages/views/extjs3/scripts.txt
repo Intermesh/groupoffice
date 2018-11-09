@@ -3,7 +3,6 @@ MainPanel.js
 SystemSettingsSitesGrid.js
 SitePropertiesForm.js
 SitePropertyDialog.js
-SitePermissionsForm.js
 SiteWizard.js
 SitePanel.js
 SiteTreePanel.js

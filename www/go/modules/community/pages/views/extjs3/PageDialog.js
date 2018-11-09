@@ -41,17 +41,7 @@ go.modules.community.pages.PageDialog = Ext.extend(go.form.Dialog, {
 		return items;
 	},
 	
-	generateSlug: function(form){
-	    PageName = form.getForm().getFieldValues(true)['pageName'];
-	    //regex
-	    slug = PageName;
-	    return slug;
-	},
-	
 	submit: function(){
-	    slug = this.generateSlug(this.formPanel);
-	    console.log("current slug: " + slug);
-	    console.log("current siteId: " + this.siteId);
 	    //check if form has dirty fields.
 	    go.modules.community.pages.PageDialog.superclass.submit.call(this);
 	}

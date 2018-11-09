@@ -34,7 +34,6 @@ go.modules.community.pages.SystemSettingsSitesGrid = Ext.extend(go.grid.GridPane
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
 						var dlg = new go.modules.community.pages.SiteWizard();
-						console.log("Add site");
 						dlg.show();
 					}
 				}

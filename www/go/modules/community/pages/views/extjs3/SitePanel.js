@@ -9,7 +9,8 @@ go.modules.community.pages.SitePanel = Ext.extend(go.panels.ModulePanel, {
                 });
 		this.tree = new go.modules.community.pages.SiteTreePanel({
 		    region:"west",
-		    width:dp(250)
+		    width:dp(250),
+		    currentSiteId: this.siteId
 		});
 		
                 this.items = [
