@@ -17,9 +17,14 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 			id = link.entity;
 			if(link.filter) {
 				id += "-" + link.filter;
+			} else
+			{
+				link.filter = null;
 			}
 			data.push([id, link.entity, link.title, link.filter, link.iconCls]);
 		});
+		
+		console.log(data);
 
 		Ext.apply(config, {
 			tbar: [{xtype: "selectallcheckbox"}],
@@ -47,7 +52,7 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 		});
 
 		config.store.sort('name', 'ASC');
-
+console.log(config.store);
 		
 
 		go.links.EntityGrid.superclass.constructor.call(this, config);
