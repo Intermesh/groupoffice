@@ -687,21 +687,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 
 			$response['participants']=array('results'=>array($participantModel->toJsonArray($model->start_time, $model->end_time)),'total'=>1,'success'=>true);
 			
-			if(!empty($params['linkModelNameAndId'])){
-				$arr = explode(':', $params['linkModelNameAndId']);
-				
-				if($arr[0]=='GO\Addressbook\Model\Contact'){
-					$contact = \GO\Addressbook\Model\Contact::model()->findByPk($arr[1]);
-					
-					if($contact){
-						$participantModel = new \GO\Calendar\Model\Participant();
-						$participantModel->setContact($contact);
-						
-						$response['participants']['results'][]=$participantModel->toJsonArray($model->start_time, $model->end_time);
-						$response['participants']['total']=2;
-					}
-				}
-			}
+		
 		}else
 		{
 			$particsStmt = \GO\Calendar\Model\Participant::model()->findByAttribute('event_id',$params['id']);
@@ -969,7 +955,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 				if(empty($params['events_only'])){
 					if(!$bdaysAdded && $calendar->show_bdays && \GO::modules()->addressbook){
 						$bdaysAdded=true;
-						$response = $this->_getBirthdayResponseForPeriod($response,$calendar,$startTime,$endTime);
+						//$response = $this->_getBirthdayResponseForPeriod($response,$calendar,$startTime,$endTime);
 					}
 
 					if (!$holidaysAdded && !empty($calendar->show_holidays)) {

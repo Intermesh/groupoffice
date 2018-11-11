@@ -13,6 +13,12 @@ use go\core\orm\Property;
 
 class Address extends Property {
 	
+	
+	const TYPE_POSTAL = "postal";
+	const TYPE_VISIT = "visit";
+	const TYPE_WORK = "work";
+	const TYPE_HOME = "home";
+	
 	/**
 	 * 
 	 * @var int

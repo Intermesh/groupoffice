@@ -265,7 +265,6 @@ class User extends \GO\Base\Db\ActiveRecord {
 
 	public function relations() {
 		return array(
-			'contact' => array('type' => self::HAS_ONE, 'model' => 'GO\Addressbook\Model\Contact', 'field' => 'go_user_id'),
 			'reminders' => array('type'=>self::MANY_MANY, 'model'=>'GO\Base\Model\Reminder', 'field'=>'user_id', 'linkModel' => 'GO\Base\Model\ReminderUser'),
 			'groups' => array('type'=>self::MANY_MANY, 'model'=>'GO\Base\Model\Group', 'field'=>'userId', 'linkModel' => 'GO\Base\Model\UserGroup'),
 			'_workingWeek' => array('type' => self::HAS_ONE, 'model' => 'GO\Base\Model\WorkingWeek', 'field' => 'user_id')

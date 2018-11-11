@@ -449,26 +449,8 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		$text .= ' ('.\GO::t("possible until", "files").' '.\GO\Base\Util\Date::get_timestamp(\GO\Base\Util\Date::date_add($file->expire_time,-1), false).')'.$lb;
 		$text .= $linktext;
 		
-		if($params['template_id'] && ($template = \GO\Addressbook\Model\Template::model()->findByPk($params['template_id']))){
-			$message = \GO\Email\Model\SavedMessage::model()->createFromMimeData($template->content);
-	
-			$response['data']=$message->toOutputArray($html, true);
-			
-			if(strpos($response['data'][$bodyindex],'{body}')){
-				$response['data'][$bodyindex] = \GO\Addressbook\Model\Template::model()->replaceUserTags($response['data'][$bodyindex], true);
-				
-				\GO\Addressbook\Model\Template::model()->htmlSpecialChars=false;
-				$response['data'][$bodyindex] = \GO\Addressbook\Model\Template::model()->replaceCustomTags($response['data'][$bodyindex], array('body'=>$text));			
-			}else{
-				$response['data'][$bodyindex] = \GO\Addressbook\Model\Template::model()->replaceUserTags($response['data'][$bodyindex], false);
-				$response['data'][$bodyindex] = $text.$response['data'][$bodyindex];
-			}
-				
-			
-		}else
-		{
-			$response['data'][$bodyindex]=$text;	
-		}
+		
+		$response['data'][$bodyindex]=$text;
 				
 		$response['data']['subject'] = \GO::t("Download link", "files"); //.' '.$file->name;
 		$response['success']=true;

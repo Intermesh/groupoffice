@@ -117,24 +117,7 @@ class ParticipantController extends \GO\Base\Controller\AbstractModelController 
 	}
 	
 	
-	public function actionGetCompanies($params){
-		$ids = json_decode($params['companies']);
-
-		$store = new \GO\Base\Data\ArrayStore();
-
-		foreach($ids as $company_id){
-
-			$company=\GO\Addressbook\Model\Company::model()->findByPk($company_id);
-
-			$participant = new \GO\Calendar\Model\Participant();
-			$participant->name=$company->name;
-			$participant->email=$company->email;
-
-			$store->addRecord($participant->toJsonArray($params['start_time'], $params['end_time']));
-		}
-		
-		return $store->getData();
-	}
+	
 	
 	
 	public function actionGetUsers($params){
@@ -165,59 +148,6 @@ class ParticipantController extends \GO\Base\Controller\AbstractModelController 
 	protected function actionClearNewParticipantsSession($params) {
 		unset(\GO::session()->values['new_participant_ids']);
 		return array('success'=>true);
-	}
-	
-	public function actionGetAddresslists($params){
-		$ids = json_decode($params['addresslists']);
-
-		$store = new \GO\Base\Data\ArrayStore();
-		
-		$addedContacts=array();
-		
-		foreach($ids as $addresslist_id){
-
-			$addresslist = \GO\Addressbook\Model\Addresslist::model()->findByPk($addresslist_id, false, true);
-			
-			$stmt = $addresslist->contacts();
-			
-			foreach($stmt as $contact){
-				
-				if(!in_array($contact->id, $addedContacts)){
-					
-					$addedContacts[]=$contact->id;
-					$participant = new \GO\Calendar\Model\Participant();
-					if(($user = $contact->goUser)){						
-						$participant->user_id=$user->id;
-						$participant->name=$user->name;
-						$participant->email=$user->email;
-					}else{
-						$participant->name=$contact->name;
-						$participant->email=$contact->email;
-					}
-
-					$store->addRecord($participant->toJsonArray($params['start_time'], $params['end_time']));
-				}
-			}
-			
-			$addedCompanies=array();
-			
-			$stmt = $addresslist->companies();
-			
-			foreach($stmt as $company){
-				
-				if(!in_array($company->id, $addedCompanies)){
-					
-					$addedCompanies[]=$company->id;
-					$participant = new \GO\Calendar\Model\Participant();
-					$participant->name=$company->name;
-					$participant->email=$company->email;					
-
-					$store->addRecord($participant->toJsonArray($params['start_time'], $params['end_time']));
-				}
-			}
-		}
-		
-		return $store->getData();
 	}
 	
 	public function actionGetUserGroups($params){

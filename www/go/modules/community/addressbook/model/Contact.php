@@ -248,6 +248,33 @@ class Contact extends AclItemEntity {
 		return static::find()->where('goUserId', '=', $userId)->single();
 	}
 	
+	/**
+	 * Find contact by e-mail address
+	 * 
+	 * @param string $email
+	 * @return Query
+	 */
+	public static function findByEmail($email) {
+		return static::find()
+						->join("contact_email_address", "e", "e.contactId = c.id")
+						->groupBy(['c.id'])
+						->where('e.email', '=', $email);
+	}
+	
+	
+	/**
+	 * Find contact by e-mail address
+	 * 
+	 * @param string $email
+	 * @return Query
+	 */
+	public static function findByPhone($email) {
+		return static::find()
+						->join("contact_email_address", "e", "e.contactId = c.id")
+						->groupBy(['c.id'])
+						->where('e.email', '=', $email);
+	}
+	
 	public static function filter(Query $query, array $filter) {
 		if (isset($filter['addressBookId'])) {
 			$query->andWhere('addressBookId', '=', $filter['addressBookId']);
@@ -348,5 +375,45 @@ class Contact extends AclItemEntity {
 					->where('c.id', 'IN', $ids)
 					);
 		
+	}
+	
+	
+
+	
+	/**
+	 * Find email address by type
+	 * 
+	 * @param string $type
+	 * @param boolean $returnAny
+	 * @return EmailAddress|boolean
+	 */
+	public function findEmailByType($type, $returnAny = true) {
+		return $this->findPropByType("emailAddresses", $type, $returnAny);
+	}
+	
+	/**
+	 * Find street address by type
+	 * 
+	 * @param string $type
+	 * @param boolean $returnAny
+	 * @return Address|boolean
+	 */
+	public function findAddressByType($type, $returnAny = true) {
+		return $this->findPropByType("addresses", $type, $returnAny);
+	}
+	
+	
+	private function findPropByType($propName, $type, $returnAny) {
+		foreach($this->$propName as $prop) {
+			if($prop->type === $type) {
+				return $prop;
+			}
+		}
+		
+		if(!$returnAny) {
+			return false;
+		}
+		
+		return $this->$propName[0] ?? false;
 	}
 }
