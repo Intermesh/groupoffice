@@ -66,12 +66,26 @@ trait CustomFieldsTrait {
 	
 	/**
 	 * Set custom field data
+	 * 
+	 * The data array may hold partial data. It will be merged into the existing
+	 * data.
+	 * 
 	 * @param array $data
 	 */
-	public function setCustomFields($data) {		
+	public function setCustomFields(array $data) {		
 		$this->customFieldsData = array_merge($this->getCustomFields(), $this->normalizeCustomFieldsInput($data));		
 		
 		$this->customFieldsModified = true;
+	}
+	
+	/**
+	 * Set a custom field value
+	 * 
+	 * @param string $name
+	 * @param mixed $value
+	 */
+	public function setCustomField($name, $value) {
+		$this->setCustomFields([$name => $value]);
 	}
 	
 	private static $customFields;
