@@ -986,32 +986,53 @@ abstract class Property extends Model {
 			return true;
 		}
 		
-		foreach ($table->getColumns() as $colName => $column) {
+		foreach ($table->getMappedColumns() as $colName => $column) {
 			//Assume constants are correct, and this makes it unessecary to declare the property
 			if(array_key_exists($colName, $table->getConstantValues())) {
 				continue;
 			}
 
-			if (!$this->validateRequired($column)) {
+			if (!$this->validateColumn($column, $this->$colName)) {
 				//only one error per column
 				continue;
-			}
-			
-			if(empty($this->$colName)) {
-				continue;
-			}
-			
-			if(!is_scalar($this->$colName) && (!is_object($this->$colName) || method_exists($this->$colName, '__toString'))) {
-				$this->setValidationError($colName, ErrorCode::MALFORMED, "Non scalar value given");
-				continue;
-			}
+			}			
+		}
+	}
+	
+	
+	private function validateColumn(Column $column, $value) {
+		if (!$this->validateRequired($column)) {
+			return false;
+		}
+		
+		//Null is allowed because we checked this above.
+		if(empty($value)) {
+			return true;
+		}
 
-			if (!empty($column->length)){				
-				if(StringUtil::length($this->$colName) > $column->length) {
-					$this->setValidationError($colName, ErrorCode::MALFORMED, 'Length can\'t be greater than ' . $column->length);
-				}
+		switch ($column->dbType) {
+			case 'date':
+			case 'datetime':
+				return $value instanceof DateTime || $value instanceof DateTimeImmutable;
+				
+			default:				
+				return $this->validateColumnString($column, $value);		
+		}
+	}
+	
+	private function validateColumnString(Column $column, $value) {
+		if(!is_scalar($value) && (!is_object($value) || !method_exists($value, '__toString'))) {
+			$this->setValidationError($column->name, ErrorCode::MALFORMED, "Non scalar value given. Type: ". gettype($value));
+			return false;
+		} 
+
+		if (!empty($column->length)){				
+			if(StringUtil::length($value) > $column->length) {
+				$this->setValidationError($column->name, ErrorCode::MALFORMED, 'Length can\'t be greater than ' . $column->length);
+				return false;
 			}
 		}
+		return true;		
 	}
 	
 	private function tableIsModified(MappedTable $table) {
