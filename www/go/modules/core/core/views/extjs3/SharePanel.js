@@ -15,6 +15,9 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 			listeners: {
 				change: this.onCheckChange,
 				scope: this
+			},
+			isDisabled : function(record) {
+				return record.data.id === 1;
 			}
 		});
 		
@@ -135,6 +138,10 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 		this.store.on("beforeload", this.onBeforeStoreLoad, this);
 		
 		go.modules.core.core.SharePanel.superclass.initComponent.call(this);
+		
+		this.on("beforeedit", function(e) {
+			return e.record.data.id !== 1; //cancel edit for admins group
+		}, this);
 
 	},
 	
