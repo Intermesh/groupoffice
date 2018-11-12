@@ -59,6 +59,15 @@ class Acl extends \go\core\jmap\Entity {
 						->addRelation('groups', AclGroup::class, ['id' => 'aclId'], true);
 	}
 	
+	protected function internalValidate() {
+		
+		if($this->isModified(['groups']) && !$this->hasAdmins()) {
+			$this->setValidationError('groups', \go\core\validate\ErrorCode::FORBIDDEN, "You can't change the admin permissions");
+		}
+			
+		return parent::internalValidate();
+	}
+	
 	
 	protected function internalSave() {
 		
@@ -85,17 +94,7 @@ class Acl extends \go\core\jmap\Entity {
 													]);
 				}
 			}
-		} else {
-			
-			//add admins if removed.
-			if($this->isModified(['groups']) && !$this->hasAdmins()) {
-				$this->groups[] = (new AclGroup())
-							->setValues([
-									'groupId' => Group::ID_ADMINS, 
-									'level' => self::LEVEL_MANAGE
-											]);
-			}
-		}
+		} 
 		
 		if(!parent::internalSave()) {
 			return false;
@@ -107,7 +106,7 @@ class Acl extends \go\core\jmap\Entity {
 	private function hasAdmins() {
 		foreach($this->groups as $group) {
 			if($group->groupId == Group::ID_ADMINS) {				
-				return true;
+				return $group->level == Acl::LEVEL_MANAGE;
 			}
 		}
 
