@@ -10,4 +10,5 @@ PageContent.js
 PageDialog.js
 SiteTree.js
 SiteTreeEdit.js
+PagesTreeLoader.js
 
