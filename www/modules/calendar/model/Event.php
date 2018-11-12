@@ -2167,15 +2167,18 @@ $sub = $offset>0;
 				if($user)
 					$p->user_id=$user->id;
 			}		
+			
+			$p->setAttributes($attributes);
 		}else
 		{
 			//the organizer might be added as a participant too. We don't want to 
 			//import that a second time but we shouldn't update the is_organizer flag if
 			//we found an existing participant.
-			unset($attributes['is_organizer']);
+			//unset($attributes['is_organizer']);			
+			$p->status = $attributes['status'];			
 		}
 
-		$p->setAttributes($attributes);
+		
 		$p->save();
 		
 		return $p;
