@@ -381,7 +381,14 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 			items: [
 				{
 					columnWidth: .5,//left
-					items:[this.globalFieldset,this.regionFieldset]
+					items:[this.globalFieldset,this.regionFieldset,{
+						xtype:'button',
+						style:'margin-left:14px',
+						handler:this.resetState,
+						scope:this,
+						text:t('Reset windows and grids'),
+						anchor:''
+					}]
 				},{
 					columnWidth: .5,//right
 					items: [this.formattingFieldset,this.soundsFieldset,this.notificationsFieldset]
@@ -390,6 +397,23 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 		});
 		
 		go.usersettings.LookAndFeelPanel.superclass.initComponent.call(this);
+	},
+	
+	// OLD FRAMEWORK CODE, refactor when clientSettings: {} property is available for User
+	resetState : function(){
+		if(confirm(t('Are you sure you want to reset all grid columns, windows, panel sizes etc. to the factory defaults?'))){
+			GO.request({
+				maskEl:Ext.getBody(),
+				url:'maintenance/resetState',
+				params:{
+					user_id:this.ownerCt.ownerCt.ownerCt.currentUserId
+				},
+				success:function(){
+					document.location.reload();
+				},
+				scope:this
+			});
+		}
 	},
 	
 	onLoadComplete : function(data){
