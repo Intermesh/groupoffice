@@ -1,3 +1,22 @@
+- Notes: Removed adding createdBy in init of the Notebook entity. 
+				 This causes issues when creating an instance of the object when no user is logged in.
+
+12-11-2018 6.3.50
+- Language: Updated Hungarian
+- CreateLinkButton: fixed issue that reset did not clear the new added items.
+- Multi instance: Storage and user quota can be set in multi instance module
+- Multi instance: Trials will be deactivated after 30 days
+- Multi instance: Possible to set welcome message on start page via API
+- Multi instance: copy system settings from manager to new instance
+
+08-11-2018 6.3.49
+- Merged 6.2 fixes
+- Use globalconfig.inc.php in new framework too. (Thanks to pvdvendjc)
+- Core: fixed issue with GO62 to GO63 update in combination with modules that are already refactored.
+- Core: Added QR code generator
+- Googleauthenticator: Use the QR code generator to generate the GA QR code
+- Webdav: Fixed Webdav quota information
+
 30-10-2018 6.3.48
 - Demodata: Fixed demo data module that kept asking to add data
 - Calendar: Fixed bug when clicking on grid created appointment on the wrong day
