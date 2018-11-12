@@ -7,10 +7,10 @@ go.modules.community.pages.SiteTree = Ext.extend(Ext.tree.TreePanel,{
         text: 'Root',
         draggable: false,
         id: 'source',
-	expanded: true
+	expanded: false
     },
     
-	rootVisible: false,
+	rootVisible: true,
     initComponent : function() {
 	go.modules.community.pages.SiteTree.superclass.initComponent.call(this);
     }

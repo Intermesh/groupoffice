@@ -60,7 +60,8 @@ class Page extends EntityController {
 		}
 		$r[] = $currentPage;
 	    };
-	    \go\core\jmap\Response::get()->addResponse(json_encode($r));
+//	    \go\core\jmap\Response::get()->addResponse(json_encode($r));
+	    \go\core\jmap\Response::get()->addResponse($r);
 	}
 	}
 

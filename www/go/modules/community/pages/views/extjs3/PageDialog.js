@@ -20,12 +20,12 @@ go.modules.community.pages.PageDialog = Ext.extend(go.form.Dialog, {
 						allowBlank: false
 					},
 					{
-						xtype: 'xhtmleditor',
+						xtype: 'phtmleditor',
 						name: 'content',
 						fieldLabel: "",
 						hideLabel: true,
 						anchor: '100%',
-						allowBlank: true
+						allowBlank: true,
 					},
 					{
 						xtype: 'hidden',
@@ -42,7 +42,7 @@ go.modules.community.pages.PageDialog = Ext.extend(go.form.Dialog, {
 	},
 	
 	submit: function(){
-	    //check if form has dirty fields.
+	    //todo: check if form has dirty fields.
 	    go.modules.community.pages.PageDialog.superclass.submit.call(this);
 	}
 });
