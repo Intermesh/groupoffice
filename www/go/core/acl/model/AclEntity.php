@@ -53,6 +53,19 @@ abstract class AclEntity extends Entity {
 		return parent::internalSave();
 	}
 	
+	protected function internalDelete() {
+		if(!parent::internalDelete()) {
+			return false;
+		}
+		
+		$acl = Acl::findById($this->aclId);
+		if(!$acl->delete()) {
+			throw new \Exception("Could not delete ACL ".$this->aclId);
+		}
+		
+		return true;
+	}
+	
 	protected function createAcl() {
 		$this->acl = new Acl();
 		$this->acl->usedIn = $this->getMapping()->getColumn('aclId')->table->getName().'.aclId';
