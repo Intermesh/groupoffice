@@ -4,6 +4,8 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 	 */
 	name: "groups",
 	
+	cls: "go-share-panel", 
+	
 	clicksToEdit: 1,
 	initComponent: function () {
 		
@@ -86,8 +88,8 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 						
 						var user = record.get("user"),
-										style = user && user.avatarId ?  'background-image: url(' + go.Jmap.downloadUrl(record.get("user").avatarId) + ')"' : "";
-										cls = user ? "avatar" : "avatar group",										
+										style = user && user.avatarId ?  'background-image: url(' + go.Jmap.downloadUrl(record.get("user").avatarId) + ')"' : "background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24));";
+										html = user ? "" : '<i class="icon">group</i>',										
 										max = 5,
 										members = record.get('members').slice(0, max).column('displayName');
 						
@@ -99,7 +101,7 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 							}
 						
 						
-						return '<div class="user"><div class="' + cls + '" style="' + style + '"></div>' +
+						return '<div class="user"><div class="avatar" style="' + style + '">' + html + '</div>' +
 							'<div class="wrap">'+
 								'<div class="displayName">' + record.get('name') + '</div>' +
 								'<small class="username">' + memberStr + '</small>' +
