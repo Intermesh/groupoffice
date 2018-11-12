@@ -1,3 +1,4 @@
+12-11-2018 6.3.50
 - Language: Updated Hungarian
 - CreateLinkButton: fixed issue that reset did not clear the new added items.
 - Multi instance: Storage and user quota can be set in multi instance module
