@@ -1,3 +1,8 @@
+.ellipsis {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden; }
+
 .go-addressbook-url.homepage:before {
   display: inline-block;
   font-family: 'Material Icons';
@@ -29,14 +34,6 @@
   border-top: 1px solid rgba(0, 0, 0, 0.12);
   margin-top: 7px;
   padding-top: 7px; }
-
-.go-addressbook-contact-avatar {
-  text-align: center; }
-  .go-addressbook-contact-avatar .avatar {
-    font-size: 134.75px;
-    line-height: 175px;
-    height: 175px;
-    width: 175px; }
 
 .go-addressbook-name-panel {
   padding: 14px; }
@@ -76,4 +73,10 @@
 
 .avatar.organization {
   background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24)); }
-  
+
+.go-detail-view-contact .avatar {
+  float: none; }
+  .go-detail-view-contact .avatar .icon {
+    line-height: 100%; }
+
+/*# sourceMappingURL=style.css.map */

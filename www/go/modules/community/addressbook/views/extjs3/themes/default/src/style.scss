@@ -70,3 +70,13 @@
 		background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24));	
 	}
 }
+
+.go-detail-view-contact {
+	.avatar {
+		float: none;
+		
+		.icon {
+			line-height: 100%;
+		}
+	}
+}
