@@ -262,7 +262,7 @@ class Task extends \GO\Base\Db\ActiveRecord {
 		if(!empty($this->rrule)) {
 
 			$rrule = new \GO\Base\Util\Icalendar\Rrule();
-			$rrule->readIcalendarRruleString($this->due_time, $this->rrule, true);
+			$rrule->readIcalendarRruleString($this->due_time, $this->rrule);
 		
 			$nextDueTime = $rrule->getNextRecurrence($this->due_time+1);
 			
