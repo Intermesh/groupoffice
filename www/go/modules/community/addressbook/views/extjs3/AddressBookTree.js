@@ -2,12 +2,6 @@
 
 go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel, {
 	
-	root: {
-		nodeType: 'async',
-		draggable: false,
-		id: null,
-		uiProvider: Ext.tree.RootTreeNodeUI // needed to make "rootVisible" work
-	},
 	rootVisible: false,
 
 	currentAddressBookId: null,
@@ -22,9 +16,7 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 	
 	initComponent: function () {
 
-		
-		
-		if(this.selectHandler) {
+		if(this.selectHandler === null) {
 			this.loader = new go.modules.community.addressbook.TreeLoader();
 		} else
 		{
@@ -32,6 +24,13 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 				secondaryTextTpl: '<button class="icon">add</button>'
 			});
 		}
+		
+		this.root = {
+			nodeType: 'groupoffice',
+			draggable: false,
+			id: null,
+			uiProvider: Ext.tree.RootTreeNodeUI // needed to make "rootVisible" work
+		};
 		
 		go.modules.community.addressbook.AddressBookTree.superclass.initComponent.call(this);
 
