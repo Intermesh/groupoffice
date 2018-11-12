@@ -2226,7 +2226,7 @@ $sub = $offset>0;
 				$this->duplicateRelation('participants', $duplicate);
 
 			if($duplicate->isRecurring() && $this->isRecurring())
-				$this->duplicateRelation('exceptions', $duplicate);	
+				$this->duplicateRelation('exceptions', $duplicate);
 			
 			if($duplicate->is_organizer) {
 				$this->duplicateRelation('resources', $duplicate, array('status'=>self::STATUS_NEEDS_ACTION));
