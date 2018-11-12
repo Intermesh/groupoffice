@@ -1,3 +1,4 @@
+- CreateLinkButton: fixed issue that reset did not clear the new added items.
 - Multi instance: Storage and user quota can be set in multi instance module
 - Multi instance: Trials will be deactivated after 30 days
 - Multi instance: Possible to set welcome message on start page via API
