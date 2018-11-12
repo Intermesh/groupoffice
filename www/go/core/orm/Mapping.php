@@ -12,26 +12,30 @@ use ReflectionClass;
  * It maps tables to objects properties.
  * The mapping object is cached. So when you make changes you need to run /install/upgrade.php
  */
-class Mapping {
+class Mapping {	
 	
-	
-	
+	/**
+	 * Property class name this mapping is for
+	 * 
+	 * @var string 
+	 */
 	private $for;
 
 	/**
 	 *
 	 * @var MappedTable[] 
 	 */
-	private $tables = [];
-	
+	private $tables = [];	
 	
 	private $relations = [];
 	
-//	private $selectAliases = [];
-	
-	
 	private $query;
 	
+	/**
+	 * Constructor
+	 * 
+	 * @param string $for Property class name this mapping is for
+	 */
 	public function __construct($for) {
 		$this->for = $for;
 	}
@@ -116,11 +120,19 @@ class Mapping {
 	}	
 	
 	/**
+	 * Add a relational property
 	 * 
-	 * @param type $name
-	 * @param type $entityName
+	 * A relation property is saved in another property model and can be a has one
+	 * or has many type of relation.
+	 * 
+	 * When saving has many relations all properties are removed from the database
+	 * and reinserted because they are often not uniquely identifyable from the
+	 * JMAP API. eg. email addresses of contacts
+	 * 
+	 * @param string $name
+	 * @param string $entityName
 	 * @param array $keys
-	 * @param type $many
+	 * @param boolean $many
 	 * @return $this
 	 */
 	public function addRelation($name, $entityName, array $keys, $many = true) {
@@ -129,7 +141,9 @@ class Mapping {
 	}
 	
 	/**
+	 * Get all relational properties
 	 * 
+	 * @see addRelation();
 	 * @return Relation[]
 	 */
 	public function getRelations() {
@@ -137,8 +151,10 @@ class Mapping {
 	}
 	
 	/**
+	 * Get a relational property by name.
 	 * 
-	 * @param stgring $name
+	 * @see addRelation(); 
+	 * @param string $name
 	 * @return Relation|boolean
 	 */
 	public function getRelation($name) {
@@ -178,8 +194,10 @@ class Mapping {
 	}
 	
 	/**
+	 * Get a column by property name. Returns false if not found in any of the 
+	 * mapped tables.
 	 * 
-	 * @param type $propName
+	 * @param string $propName
 	 * @return boolean|Column
 	 */
 	public function getColumn($propName) {
@@ -193,13 +211,21 @@ class Mapping {
 		return false;
 	}
 	
+	/**
+	 * Check if a property name is mapped
+	 * 
+	 * @param string $name
+	 * @return boolean
+	 */
 	public function hasProperty($name) {
 		return $this->getRelation($name) != false || $this->getColumn($name) != false;
 	}
 	
 	/**
+	 * Get all mapped property objects in a key value array. This is a mix of columns 
+	 * and relations.
 	 * 
-	 * @return array
+	 * @return mixed[]
 	 */
 	public function getProperties() {
 		$props = [];
