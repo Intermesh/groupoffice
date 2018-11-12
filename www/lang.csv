@@ -16,20 +16,20 @@ core;users;Regional;Regionális;go/modules/core/users/views/extjs3/CreateUserAcc
 core;users;Timezone;Időzóna;go/modules/core/users/views/extjs3/CreateUserAccountPanel.js
 core;users;Date format;Dátum formátum;go/modules/core/users/views/extjs3/CreateUserAccountPanel.js
 core;users;Time Format;Idő formátum;go/modules/core/users/views/extjs3/CreateUserAccountPanel.js
-core;users;Use short format for date and time in lists;Használjon rövid formátumú dátumot és az időt listákon;go/modules/core/users/views/extjs3/CreateUserAccountPanel.js
+core;users;Use short format for date and time in lists;Használjon rövid formátumú dátumot és időt a listákon;go/modules/core/users/views/extjs3/CreateUserAccountPanel.js
 core;users;First weekday;A hét első napja;go/modules/core/users/views/extjs3/CreateUserAccountPanel.js
-core;users;Sunday;vasárnap;go/modules/core/users/views/extjs3/CreateUserAccountPanel.js
-core;users;Monday;hétfő;go/modules/core/users/views/extjs3/CreateUserAccountPanel.js
-core;users;Formatting;formázás;go/modules/core/users/views/extjs3/CreateUserAccountPanel.js
-core;users;Thousand Seperator;ezres elválasztó;go/modules/core/users/views/extjs3/CreateUserAccountPanel.js
-core;users;Decimal Seperator;tizedes elválasztó;go/modules/core/users/views/extjs3/CreateUserAccountPanel.js
+core;users;Sunday;Vasárnap;go/modules/core/users/views/extjs3/CreateUserAccountPanel.js
+core;users;Monday;Hétfő;go/modules/core/users/views/extjs3/CreateUserAccountPanel.js
+core;users;Formatting;Formázás;go/modules/core/users/views/extjs3/CreateUserAccountPanel.js
+core;users;Thousand Seperator;Ezres elválasztó;go/modules/core/users/views/extjs3/CreateUserAccountPanel.js
+core;users;Decimal Seperator;Tizedes elválasztó;go/modules/core/users/views/extjs3/CreateUserAccountPanel.js
 core;users;Currency;Valuta;go/modules/core/users/views/extjs3/CreateUserAccountPanel.js
 core;users;Users will automatically be added to these groups;A felhasználók automatikusan hozzáadódnak ezek a csoportok;go/modules/core/users/views/extjs3/CreateUserAccountPanel.js
 core;users;Display name;Megjelenítendő név;go/modules/core/users/views/extjs3/CreateUserAccountPanel.js
 core;customfields;The changes have been applied to the customfields of the selected files.;A módosítások alkalmazása a customfields a kiválasztott fájlokat.;go/modules/core/customfields/views/extjs3/MainPanel.js
 core;customfields;Category;Kategória;go/modules/core/customfields/views/extjs3/MainPanel.js
 core;customfields;Enable the display of selected categories only;Engedélyezze a kijelző kiválasztott kategóriák csak;go/modules/core/customfields/views/extjs3/MainPanel.js
-core;customfields;Enabled customfields;Egyéni mezők bekapcsolva;go/modules/core/customfields/views/extjs3/MainPanel.js
+core;customfields;Enabled customfields;Dátum formátum;go/modules/core/customfields/views/extjs3/MainPanel.js
 core;customfields;Custom field categories;Egyéni mező kategóriák;go/modules/core/customfields/views/extjs3/MainPanel.js
 core;customfields;Block;Blokk;go/modules/core/customfields/views/extjs3/MainPanel.js
 core;customfields;Custom field;Egyéni mező;go/modules/core/customfields/views/extjs3/MainPanel.js
@@ -123,7 +123,7 @@ community;googleauthenticator;Secret key for manual input;Titkos kulcs manuális
 community;googleauthenticator;No secret available;Titok nem elérhető;go/modules/community/googleauthenticator/views/extjs3/Settings.js
 community;googleauthenticator;When enabling Google autenticator you'll need to scan the QR code with the Google authenticator app otherwise you cannot login to Group-Office anymore.;Ha bekapcsolja a Google autenticator akkor kell beolvasni a QR-kódot a Google Hitelesítő alkalmazás különben nem tud bejelentkezni Group-Office többé.;go/modules/community/googleauthenticator/views/extjs3/Settings.js
 community;googleauthenticator;Provide your current password to enable Google authenticator.;Adja meg jelenlegi jelszavát, hogy a Google Authenticator.;go/modules/community/googleauthenticator/views/extjs3/Settings.js
-community;googleauthenticator;Enable Google authenticator;Engedélyezze a Google hitelesítő;go/modules/community/googleauthenticator/views/extjs3/Settings.js
+community;googleauthenticator;Enable Google authenticator;Google hitelesítés bekapcsolása;go/modules/community/googleauthenticator/views/extjs3/Settings.js
 community;googleauthenticator;When disabling Google autenticator this step will be removed from the login process.;Ha letiltja a Google autenticator ezt a lépést el lesz távolítva a bejelentkezési folyamatot.;go/modules/community/googleauthenticator/views/extjs3/Settings.js
 community;googleauthenticator;Provide your current password to disable Google authenticator.;Adja meg jelenlegi jelszavát letiltani Google Hitelesítő.;go/modules/community/googleauthenticator/views/extjs3/Settings.js
 community;googleauthenticator;Disable Google authenticator;Kikapcsolja a Google Hitelesítő;go/modules/community/googleauthenticator/views/extjs3/Settings.js
@@ -188,8 +188,8 @@ legacy;comments;Action date;Végrehajtás dátume;modules/comments/CommentsDetai
 legacy;comments;Manage categories;Kategóriák kezelése;modules/comments/CommentsDetailPanel.js
 legacy;comments;Comments;Hozzászólások;modules/comments/CommentsDetailPanel.js
 legacy;comments;{author} wrote at {date};{Szerző} írta {Date};modules/comments/CommentsDetailPanel.js
-legacy;tickets;Ticket;Hibajegy;modules/tickets/TypeDialog.js
-legacy;tickets;Ticket group;Hibajegy csoport;modules/tickets/TypeDialog.js
+legacy;tickets;Ticket;Jegy;modules/tickets/TypeDialog.js
+legacy;tickets;Ticket group;Jegy csoport;modules/tickets/TypeDialog.js
 legacy;tickets;Contact;Kapcsolat;modules/tickets/TypeDialog.js
 legacy;tickets;Status;Státusz;modules/tickets/TypeDialog.js
 legacy;tickets;Rate / hours;Ár / óra;modules/tickets/TypeDialog.js
@@ -206,79 +206,79 @@ legacy;tickets;To status;Státuszig;modules/tickets/TypeDialog.js
 legacy;tickets;Error status;Hiba státusz;modules/tickets/TypeDialog.js
 legacy;tickets;Start;;modules/tickets/TypeDialog.js
 legacy;tickets;Change status of tickets without booked hours too;Hibajegy státusz változtatása az óraszám változtatása nélkül;modules/tickets/TypeDialog.js
-legacy;tickets;Ok;Ok;modules/tickets/TypeDialog.js
-legacy;tickets;Types;típusai;modules/tickets/TypeDialog.js
+legacy;tickets;Ok;;modules/tickets/TypeDialog.js
+legacy;tickets;Types;Típusok;modules/tickets/TypeDialog.js
 legacy;tickets;Type group;Típus csoport;modules/tickets/TypeDialog.js
 legacy;tickets;Manage groups;csoportok kezelése;modules/tickets/TypeDialog.js
 legacy;tickets;Responsible;Felelős;modules/tickets/TypeDialog.js
 legacy;tickets;Nobody;Senki;modules/tickets/TypeDialog.js
 legacy;tickets;Email templates;E-mail sablonok;modules/tickets/TypeDialog.js
 legacy;tickets;New message;Új üzenet;modules/tickets/TypeDialog.js
-legacy;tickets;Change ticket from status;Hibajegy státuszának változtatása;modules/tickets/TypeDialog.js
+legacy;tickets;Change ticket from status;Jegy státuszának változtatása;modules/tickets/TypeDialog.js
 legacy;tickets;Change ticket type;Váltson típus;modules/tickets/TypeDialog.js
 legacy;tickets;Save as note;Mentés jegyzetként;modules/tickets/TypeDialog.js
 legacy;tickets;Send message;Üzenet küldése;modules/tickets/TypeDialog.js
-legacy;tickets;Edit message;üzenet szerkesztése;modules/tickets/TypeDialog.js
+legacy;tickets;Edit message;Üzenet szerkesztése;modules/tickets/TypeDialog.js
 legacy;tickets;Statuses;Állapotok;modules/tickets/TypeDialog.js
 legacy;tickets;Tickets;Jegyek;modules/tickets/TypeDialog.js
 legacy;tickets;Number;Szám;modules/tickets/TypeDialog.js
-legacy;tickets;Mark as read;Jelöld olvasottként;modules/tickets/TypeDialog.js
-legacy;tickets;Mark as unread;megjelölés olvasatlanként;modules/tickets/TypeDialog.js
-legacy;tickets;Change responsible agent;Változás felelős szer;modules/tickets/TypeDialog.js
+legacy;tickets;Mark as read;Megjelölés olvasottként;modules/tickets/TypeDialog.js
+legacy;tickets;Mark as unread;Megjelölés olvasatlanként;modules/tickets/TypeDialog.js
+legacy;tickets;Change responsible agent;Felelős módosítása;modules/tickets/TypeDialog.js
 legacy;tickets;CSV with rates;CSV árak;modules/tickets/TypeDialog.js
 legacy;tickets;Rates;Az árak;modules/tickets/TypeDialog.js
 legacy;tickets;Amount;Összeg;modules/tickets/TypeDialog.js
 legacy;tickets;Cost code;költség-kód;modules/tickets/TypeDialog.js
 legacy;tickets;Template;Sablon;modules/tickets/TypeDialog.js
 legacy;tickets;Default response;Alapértelmezett válasz;modules/tickets/TypeDialog.js
-legacy;tickets;Auto reply;Autómatikus válasz;modules/tickets/TypeDialog.js
-legacy;tickets;Use this template when an agent creates a ticket for the customer;Használja ezt a sablont, ha egy ügynök létrehoz egy jegyet a vevő;modules/tickets/TypeDialog.js
-legacy;tickets;Ticket created for agent;Ticket létrehozott szer;modules/tickets/TypeDialog.js
-legacy;tickets;Ticket claim notification;Ticket követelés bejelentése;modules/tickets/TypeDialog.js
+legacy;tickets;Auto reply;Automatikus válasz;modules/tickets/TypeDialog.js
+legacy;tickets;Use this template when an agent creates a ticket for the customer;Használja ezt a sablont, ha egy felelős hoz létre jegyet ügyfélnek;modules/tickets/TypeDialog.js
+legacy;tickets;Ticket created for agent;Jegy létrejött a felelős számára;modules/tickets/TypeDialog.js
+legacy;tickets;Ticket claim notification;Jegy hozzárendelés-figyelmeztetés;modules/tickets/TypeDialog.js
 legacy;tickets;Enabled customfields;Bekapcsolt customfields;modules/tickets/TypeDialog.js
-legacy;tickets;External ticket page;Külső jegyet oldal;modules/tickets/TypeDialog.js
+legacy;tickets;External ticket page;Külső jegy-oldal;modules/tickets/TypeDialog.js
 legacy;tickets;Use alternative URL;Használd az alternatív URL-;modules/tickets/TypeDialog.js
 legacy;tickets;Enable external ticket page;Lehetővé teszi a külső jegy oldal;modules/tickets/TypeDialog.js
-legacy;tickets;Enable ticket submission for anonymous users;Engedélyezze jegy benyújtási anonim felhasználók számára;modules/tickets/TypeDialog.js
+legacy;tickets;Enable ticket submission for anonymous users;Engedélyezze jegy létrehozását ismeretlen felhasználók számára is;modules/tickets/TypeDialog.js
 legacy;tickets;Custom CSS for external ticket page;Egyéni CSS külső jegy oldal;modules/tickets/TypeDialog.js
 legacy;tickets;"In the textarea below you can add css lines to style the external ticket page. <br /> The class of the page container is: external-ticket-page <br /> An example:<br /> .external-ticket-page input { border:1px solid #000;}";"A textarea alábbi felveheti css vonalak a stílus a külső jegyet oldalon. <br /> Az osztály az oldal tartály: külső-jegy-oldal <br /> Egy példa: <br /> .external-jegy-oldal input {border: 1px szilárd # 000;}";modules/tickets/TypeDialog.js
 legacy;tickets;Show external ticket page;Itt található a külső jegy oldal;modules/tickets/TypeDialog.js
-legacy;tickets;The site module and/or the defaultsite module are not installed, do you want to install them now?;Az oldalon modul és / vagy a defaultsite modul nincs telepítve, nem akarsz telepíteni őket most?;modules/tickets/TypeDialog.js
-legacy;tickets;Closed tickets per user;Zárt jegyek felhasználónként;modules/tickets/TypeDialog.js
-legacy;tickets;Tickets by type;Jegyek típus;modules/tickets/TypeDialog.js
+legacy;tickets;The site module and/or the defaultsite module are not installed, do you want to install them now?;A „Site modul” és / vagy a „defaultsite” modul nincs telepítve. Szeretné most telepíteni?;modules/tickets/TypeDialog.js
+legacy;tickets;Closed tickets per user;Lezárt jegyek felhasználónként;modules/tickets/TypeDialog.js
+legacy;tickets;Tickets by type;Jegyek típusok szerint;modules/tickets/TypeDialog.js
 legacy;tickets;E-mail notifications;Email Értesítések;modules/tickets/TypeDialog.js
 legacy;tickets;Closed tickets in month;Zárt jegyek hónap;modules/tickets/TypeDialog.js
-legacy;tickets;Current tickets counts;Jelenlegi jegyek számát;modules/tickets/TypeDialog.js
-legacy;tickets;Number of current tickets;Száma a jelenlegi jegyek;modules/tickets/TypeDialog.js
+legacy;tickets;Current tickets counts;Jelenlegi jegyek száma;modules/tickets/TypeDialog.js
+legacy;tickets;Number of current tickets;Ennek a jegynek a száma;modules/tickets/TypeDialog.js
 legacy;tickets;Average ticket duration;Átlagos időtartama jegy;modules/tickets/TypeDialog.js
 legacy;tickets;Options;Opciók;modules/tickets/TypeDialog.js
 legacy;tickets;Customer message on external page;Ügyfél üzenet a külső oldalon;modules/tickets/TypeDialog.js
-legacy;tickets;Ticket saved message on external page;Ticket mentett üzenet a külső oldalon;modules/tickets/TypeDialog.js
-legacy;tickets;Number of days before tickets that have not been answered by the client, will be automatically closed. Set this to 0 to turn off this feature.;Előtti napok száma jegyek, amelyeket nem válaszol az ügyfél által automatikusan bezáródik. 0-ra állítod, hogy kapcsolja ki ezt a funkciót.;modules/tickets/TypeDialog.js
-legacy;tickets;Never close tickets in this status;Soha közel jegyek ebben az állapotban;modules/tickets/TypeDialog.js
-legacy;tickets;Notify contact defaults true;Értesítés kapcsolati alapértelmezett true;modules/tickets/TypeDialog.js
-legacy;tickets;Disable reminder when assign agent;Disable emlékeztetőt, amikor hozzárendelése szer;modules/tickets/TypeDialog.js
-legacy;tickets;Disable reminder for unanswered tickets;Disable emlékeztető megválaszolatlan jegyek;modules/tickets/TypeDialog.js
-legacy;tickets;When creating new tickets, do not automatically pre-select a ticket type by default;Amikor új jegyet, nem automatikusan előre ki egy jegy típusától alapértelmezés;modules/tickets/TypeDialog.js
-legacy;tickets;Only module managers may reopen closed tickets;Csak modul menedzserek újbóli zárt jegyek;modules/tickets/TypeDialog.js
-legacy;tickets;Show confirm dialog when closing ticket;Itt található megerősítés párbeszédablak záráskor jegy;modules/tickets/TypeDialog.js
-legacy;tickets;<b>Caution!</b> Select an IMAP mailbox below to automatically import mails as tickets. All e-mails from the inbox will be REMOVED after the import. So you must use a dedicated mail account for this.;<B> Figyelem! </ B> Válasszon egy IMAP postafiók lenti automatikusan importálja maileket jegyeket. Minden e-mailt a beérkező levelek után kerülnek eltávolításra az import. Tehát akkor kell használni egy külön postafiókot erre.;modules/tickets/TypeDialog.js
+legacy;tickets;Ticket saved message on external page;Jegy mentett üzenet a külső oldalon;modules/tickets/TypeDialog.js
+legacy;tickets;Number of days before tickets that have not been answered by the client, will be automatically closed. Set this to 0 to turn off this feature.;Napok száma, amit elérve a jegyet automatikusan lezárja a rendszer. Állítsa nullára, ha ki szeretné kapcsolni ezt a funkciót.;modules/tickets/TypeDialog.js
+legacy;tickets;Never close tickets in this status;Soha ne zárjon le automatikusan jegyet ebben a státuszában;modules/tickets/TypeDialog.js
+legacy;tickets;Notify contact defaults true;Értesítése a kapcsolatot alapértelmezetten;modules/tickets/TypeDialog.js
+legacy;tickets;Disable reminder when assign agent;Felelős hozzárendelése után kapcsolja ki az emlékeztetőt;modules/tickets/TypeDialog.js
+legacy;tickets;Disable reminder for unanswered tickets;Kapcsolja ki az emlékeztetőt a megválaszolatlan jegyeknél;modules/tickets/TypeDialog.js
+legacy;tickets;When creating new tickets, do not automatically pre-select a ticket type by default;Új jegy létrejöttekor ne adjon hozzá típust automatikusan;modules/tickets/TypeDialog.js
+legacy;tickets;Only module managers may reopen closed tickets;Csak modul menedzser nyithat vissza lezárt jegyet;modules/tickets/TypeDialog.js
+legacy;tickets;Show confirm dialog when closing ticket;Kérjen megerősítést jegy lezárásakor;modules/tickets/TypeDialog.js
+legacy;tickets;<b>Caution!</b> Select an IMAP mailbox below to automatically import mails as tickets. All e-mails from the inbox will be REMOVED after the import. So you must use a dedicated mail account for this.;<B> Figyelem! </ B> Válasszon egy IMAP postafiókot az alábbiak közül, ahonnan beérkezett emaileket automatikusan jeggyé konvertálja a rendszer. Mivel konvertálás után törli az emailt, így célszerű egy dedikált podtafiókot fenntartani erre a célra.;modules/tickets/TypeDialog.js
 legacy;tickets;Mailbox for new tickets;Postafiók új jegyek;modules/tickets/TypeDialog.js
-legacy;tickets;Created tickets;Alkotó jegyek;modules/tickets/TypeDialog.js
-legacy;tickets;Created tickets per year in weeks;Alkotó jegyek évente hetek;modules/tickets/TypeDialog.js
-legacy;tickets;Created tickets per month;Alkotó jegyeket havonta;modules/tickets/TypeDialog.js
+legacy;tickets;Created tickets;Létrejött jegyek;modules/tickets/TypeDialog.js
+legacy;tickets;Created tickets per year in weeks;Létrejött jegyek évente hetes bontásban;modules/tickets/TypeDialog.js
+legacy;tickets;Created tickets per month;Létrejött jegyek havonta;modules/tickets/TypeDialog.js
 legacy;tickets;Average response time;Átlagos válaszidő;modules/tickets/TypeDialog.js
-legacy;tickets;New ticket;új jegy;modules/tickets/TypeDialog.js
-legacy;tickets;Assigned to agent;Hozzárendelve ügynök;modules/tickets/TypeDialog.js
-legacy;tickets;Message to agent on new message;Üzenet ügynök új üzenet;modules/tickets/TypeDialog.js
-legacy;tickets;Message when due date has passed;Üzenet amikor esedékesség letelt;modules/tickets/TypeDialog.js
-legacy;tickets;Reopen;újra kinyit;modules/tickets/TypeDialog.js
-legacy;tickets;Reopen ticket;újranyitása jegy;modules/tickets/TypeDialog.js
+legacy;tickets;New ticket;Új jegy;modules/tickets/TypeDialog.js
+legacy;tickets;Assigned to agent;Felelős hozzárendelve;modules/tickets/TypeDialog.js
+legacy;tickets;Message to agent on new message;Üzenet a felelősnek ha új válasz érkezik;modules/tickets/TypeDialog.js
+legacy;tickets;Message when due date has passed;Üzenet, ha lejárt a határidő;modules/tickets/TypeDialog.js
+legacy;tickets;Reopen;Újranyit;modules/tickets/TypeDialog.js
+legacy;tickets;Reopen ticket;Jegy újranyitása;modules/tickets/TypeDialog.js
 legacy;tickets;Read;Olvas;modules/tickets/TypeDialog.js
-legacy;tickets;Close ticket;Bezár jegy;modules/tickets/TypeDialog.js
-legacy;tickets;Are you sure you want to close this ticket?;Biztosan be szeretné zárni ezt a jegyet?;modules/tickets/TypeDialog.js
-legacy;tickets;Ticket overview;Ticket áttekintés;modules/tickets/TypeDialog.js
-legacy;tickets;Messages;üzenetek;modules/tickets/TypeDialog.js
+legacy;tickets;Close ticket;Jegy lezárása;modules/tickets/TypeDialog.js
+legacy;tickets;Are you sure you want to close this ticket?;Biztosan le szeretné zárni ezt a jegyet?;modules/tickets/TypeDialog.js
+legacy;tickets;Ticket overview;Jegyek áttekintése;modules/tickets/TypeDialog.js
+legacy;tickets;Messages;Üzenetek;modules/tickets/TypeDialog.js
 legacy;tickets;Note;jegyzet;modules/tickets/TypeDialog.js
 legacy;tickets;* Status changed to;* Állapot megváltozott;modules/tickets/TypeDialog.js
 legacy;tickets;* Type changed to;* Típus változott;modules/tickets/TypeDialog.js
@@ -288,27 +288,27 @@ legacy;tickets;Claim;Követelés;modules/tickets/TypeDialog.js
 legacy;tickets;Claim ticket;azzal jegy;modules/tickets/TypeDialog.js
 legacy;tickets;Unclaim;Kereset;modules/tickets/TypeDialog.js
 legacy;tickets;Unclaim ticket;Kereset jegy;modules/tickets/TypeDialog.js
-legacy;tickets;Ticket groups;Ticket csoportok;modules/tickets/TypeDialog.js
-legacy;tickets;Show tickets from others with this type to regular users;Jegyeket másoktól ilyen típusú rendszeres használók;modules/tickets/TypeDialog.js
-legacy;tickets;Send e-mail to agent when a customer replies;E-mail küldése az ügynöknek, amikor egy ügyfél válaszok;modules/tickets/TypeDialog.js
-legacy;tickets;Use alternate sender in emails to customer;Használjon alternatív feladó e-maileket az ügyfél;modules/tickets/TypeDialog.js
+legacy;tickets;Ticket groups;Jegy csoportok;modules/tickets/TypeDialog.js
+legacy;tickets;Show tickets from others with this type to regular users;Mások ilyen típusú jegyeket is jelenítse meg ;modules/tickets/TypeDialog.js
+legacy;tickets;Send e-mail to agent when a customer replies;E-mail küldése a felelősnek, amikor egy ügyfél válaszol;modules/tickets/TypeDialog.js
+legacy;tickets;Use alternate sender in emails to customer;Használjon alternatív feladót amikor e-mailet küld az ügyfélnek;modules/tickets/TypeDialog.js
 legacy;tickets;Alternate sender name;Alternatív feladó neve;modules/tickets/TypeDialog.js
 legacy;tickets;Alternate sender email;Alternatív feladó e-mail;modules/tickets/TypeDialog.js
 legacy;tickets;Show on external page;Bemutató külső oldalon;modules/tickets/TypeDialog.js
-legacy;tickets;Notify following email addresses when new tickets are created;Értesítés a következő e-mail címeket, ha új jegy létre;modules/tickets/TypeDialog.js
-legacy;tickets;"""E-mail to"" on new";„E-mail” új;modules/tickets/TypeDialog.js
-legacy;tickets;E-mail body;E-mail szervezet;modules/tickets/TypeDialog.js
+legacy;tickets;Notify following email addresses when new tickets are created;Értesítse a következő e-mail címeket, ha új jegy jött létre;modules/tickets/TypeDialog.js
+legacy;tickets;"""E-mail to"" on new";E-mail cím(ek);modules/tickets/TypeDialog.js
+legacy;tickets;E-mail body;E-mail törzs;modules/tickets/TypeDialog.js
 legacy;tickets;enable templates by type;engedélyezze sablonokat típus;modules/tickets/TypeDialog.js
-legacy;fix_edt;campaignManagement;campaignManagement;modules/fix_edt/views/Extjs3/DossierDialog.js
+legacy;fix_edt;campaignManagement;;modules/fix_edt/views/Extjs3/DossierDialog.js
 legacy;fix_edt;Note that if the event is marked as private, the files of this event are still accessible by users who have permissions to this event's calendar.;Megjegyezzük, hogy ha az esemény meg van jelölve magán, a fájlok az esemény továbbra is elérhető a felhasználók, akiknek jogosultsága az esemény naptárát.;modules/fix_edt/views/Extjs3/DossierDialog.js
 legacy;leavedays;Reason why;Az ok, amiért;modules/leavedays/views/Extjs3/YearCreditDialog.js
 legacy;leavedays;Year summary;Év összefoglaló;modules/leavedays/views/Extjs3/YearCreditDialog.js
-legacy;leavedays;ID;ID;modules/leavedays/views/Extjs3/YearCreditDialog.js
-legacy;leavedays;First date;Első randi;modules/leavedays/views/Extjs3/YearCreditDialog.js
-legacy;leavedays;Last date;Utolsó dátum;modules/leavedays/views/Extjs3/YearCreditDialog.js
-legacy;leavedays;Hours nat. holidays;Óra nat. ünnepek;modules/leavedays/views/Extjs3/YearCreditDialog.js
+legacy;leavedays;ID;;modules/leavedays/views/Extjs3/YearCreditDialog.js
+legacy;leavedays;First date;Első nap;modules/leavedays/views/Extjs3/YearCreditDialog.js
+legacy;leavedays;Last date;Utolsó nap;modules/leavedays/views/Extjs3/YearCreditDialog.js
+legacy;leavedays;Hours nat. holidays;Óra állami ünnepek;modules/leavedays/views/Extjs3/YearCreditDialog.js
 legacy;leavedays;Status;Állapot;modules/leavedays/views/Extjs3/YearCreditDialog.js
-legacy;leavedays;Holiday request;Nyaralás kérés;modules/leavedays/views/Extjs3/YearCreditDialog.js
+legacy;leavedays;Holiday request;Szabadság kérés;modules/leavedays/views/Extjs3/YearCreditDialog.js
 legacy;leavedays;Holiday;Ünnep;modules/leavedays/views/Extjs3/YearCreditDialog.js
 legacy;leavedays;Employee;Munkavállaló;modules/leavedays/views/Extjs3/YearCreditDialog.js
 legacy;leavedays;Leave hours;Hagyja óra;modules/leavedays/views/Extjs3/YearCreditDialog.js
@@ -338,26 +338,26 @@ legacy;leavedays;Sep;szeptember;modules/leavedays/views/Extjs3/YearCreditDialog.
 legacy;leavedays;Oct;Október;modules/leavedays/views/Extjs3/YearCreditDialog.js
 legacy;leavedays;Nov;November;modules/leavedays/views/Extjs3/YearCreditDialog.js
 legacy;leavedays;Dec;December;modules/leavedays/views/Extjs3/YearCreditDialog.js
-legacy;leavedays;Reload;Reload;modules/leavedays/views/Extjs3/YearCreditDialog.js
+legacy;leavedays;Reload;Frissítés;modules/leavedays/views/Extjs3/YearCreditDialog.js
 legacy;leavedays;There are no holidays taken this month;Nincs szabadságon ebben a hónapban;modules/leavedays/views/Extjs3/YearCreditDialog.js
 legacy;leavedays;Holidays;Szabadnapok;modules/leavedays/views/Extjs3/YearCreditDialog.js
 legacy;leavedays;Remaining credit may automatically taken to next year;A fennmaradó hitel automatikusan a következő évben;modules/leavedays/views/Extjs3/YearCreditDialog.js
-legacy;leavedays;Copy last year's credits;Másolás tavalyi kredit;modules/leavedays/views/Extjs3/YearCreditDialog.js
+legacy;leavedays;Copy last year's credits;Másolja át a tavalyit;modules/leavedays/views/Extjs3/YearCreditDialog.js
 legacy;leavedays;This will copy all the credits from %y1 to %y2, overwriting credits of %y2. Continue?;A program bemásolja az összes kredit a% y1 és y2%, felülírva kredit% y2. Folytatni?;modules/leavedays/views/Extjs3/YearCreditDialog.js
 legacy;leavedays;Month View;Havi nézet;modules/leavedays/views/Extjs3/YearCreditDialog.js
-legacy;leavedays;Manager;Menedzser;modules/leavedays/views/Extjs3/YearCreditDialog.js
+legacy;leavedays;Manager;Felettese;modules/leavedays/views/Extjs3/YearCreditDialog.js
 legacy;leavedays;Year credit;Éves keret;modules/leavedays/views/Extjs3/YearCreditDialog.js
 legacy;posthofld;Code;Kód;modules/posthofld/views/Extjs3/leavedaysOverrides.js
-legacy;posthofld;ID;ID;modules/posthofld/views/Extjs3/leavedaysOverrides.js
+legacy;posthofld;ID;;modules/posthofld/views/Extjs3/leavedaysOverrides.js
 legacy;posthofld;First date;Első dátum;modules/posthofld/views/Extjs3/leavedaysOverrides.js
 legacy;posthofld;Last date;Utolsó dátum;modules/posthofld/views/Extjs3/leavedaysOverrides.js
-legacy;posthofld;Hours nat. holidays;Óra nat. ünnepek;modules/posthofld/views/Extjs3/leavedaysOverrides.js
+legacy;posthofld;Hours nat. holidays;Óra állami ünnepek;modules/posthofld/views/Extjs3/leavedaysOverrides.js
 legacy;posthofld;Status;Állapot;modules/posthofld/views/Extjs3/leavedaysOverrides.js
 legacy;posthofld;Holiday request;Szabadnap kérés;modules/posthofld/views/Extjs3/leavedaysOverrides.js
 legacy;fixdossiers;bankAccounts;bankszámlák;modules/fixdossiers/views/Extjs3/DossierDialog.js
 legacy;fixdossiers;dossiers;dokumentációk;modules/fixdossiers/views/Extjs3/DossierDialog.js
 legacy;fixdossiers;FIX Dossiers;FIX Dossiers;modules/fixdossiers/views/Extjs3/DossierDialog.js
-legacy;fixdossiers;campaignManagement;campaignManagement;modules/fixdossiers/views/Extjs3/DossierDialog.js
+legacy;fixdossiers;campaignManagement;;modules/fixdossiers/views/Extjs3/DossierDialog.js
 legacy;fixdossiers;Note that if the event is marked as private, the files of this event are still accessible by users who have permissions to this event's calendar.;Megjegyezzük, hogy ha az esemény meg van jelölve magán, a fájlok az esemény továbbra is elérhető a felhasználók, akiknek jogosultsága az esemény naptárát.;modules/fixdossiers/views/Extjs3/DossierDialog.js
 legacy;fixdossiers;Begeleiden;Begeleiden;modules/fixdossiers/views/Extjs3/DossierDialog.js
 legacy;fixdossiers;Begeleider;Begeleider;modules/fixdossiers/views/Extjs3/DossierDialog.js
@@ -465,7 +465,7 @@ legacy;calendar;This and future;Ez és a jövő;modules/calendar/ViewGroupGrid.j
 legacy;calendar;Visible;Látható;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Event;Esemény;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Calendar;Naptár;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Calendar color;naptár szín;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Calendar color;Naptár színe;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Ok;;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Categories;Kategóriák;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Give each calendar a unique color;Adj minden naptári egyedi színt;modules/calendar/ViewGroupGrid.js
@@ -512,7 +512,7 @@ legacy;calendar;Options;Opciók;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Resources;Erőforrások;modules/calendar/ViewGroupGrid.js
 legacy;calendar;There are no extra options available.;Nincsenek extra lehetőségek állnak rendelkezésre.;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Resource group;Erőforrás-csoport;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Calendar group;naptár csoport;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Calendar group;Naptár csoport;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Don't show new reservations as busy;Ne jelenjen meg új lefoglalására elfoglalt;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Administrators;A rendszergazdák;modules/calendar/ViewGroupGrid.js
 legacy;calendar;items;példány;modules/calendar/ViewGroupGrid.js
@@ -536,8 +536,8 @@ legacy;calendar;Remove duplicates;Távolítsuk ismétlődések;modules/calendar/
 legacy;calendar;Select an icalendar (*.ics) file;Válasszon ki egy iCalendar (* .ics) fájl;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Resource;Forrás;modules/calendar/ViewGroupGrid.js
 legacy;calendar;You have errors in your form. You need to select a group for this resource.;Hibák vannak az űrlapon. Be kell, hogy válasszon ki egy csoportot az erőforráshoz.;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Q;Q;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Select calendar;Select naptár;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Q;;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Select calendar;Válasszon naptárat;modules/calendar/ViewGroupGrid.js
 legacy;calendar;No information available;Nincs elérhető információ;modules/calendar/ViewGroupGrid.js
 legacy;calendar;No participants to display;Nincs résztvevők megjelenítéséhez;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Previous day;Előző nap;modules/calendar/ViewGroupGrid.js
@@ -553,7 +553,7 @@ legacy;calendar;Ends at;Kezdõ;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Timespan;Időtartam;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Used resources;használt erőforrások;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Resource used in;Erőforrás használt;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Calendars;naptár;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Calendars;Naptárak;modules/calendar/ViewGroupGrid.js
 legacy;calendar;colors;színek;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Views;Nézet;modules/calendar/ViewGroupGrid.js
 legacy;calendar;5 Days;5 nap;modules/calendar/ViewGroupGrid.js
@@ -568,7 +568,7 @@ legacy;calendar;You are not the organizer;Te nem a szervező;modules/calendar/Vi
 legacy;calendar;You are not authorised to edit this event because you are not the organizer.;Ön nem jogosult módosítani ezt az eseményt, mert nem te vagy a szervező.;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Custom fields;Egyéni mezők;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Global categories;globális kategóriák;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Notify participants?;Értesítés a résztvevők?;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Notify participants?;Értesítse a résztvevőket?;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Do you want to notify by e-mail only the participants that you just added?;Szeretné értesíteni e-mailben csak a résztvevők, hogy csak hozzá?;modules/calendar/ViewGroupGrid.js
 legacy;calendar;New participants;új szereplők;modules/calendar/ViewGroupGrid.js
 legacy;calendar;All participants;Minden résztvevő;modules/calendar/ViewGroupGrid.js
@@ -596,27 +596,27 @@ legacy;calendar;Tentative;Kísérleti;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Not responded yet;Még nem adott választ;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Create permission;Készítsen engedélyt;modules/calendar/ViewGroupGrid.js
 legacy;calendar;You can't remove the organizer;Nem lehet eltávolítani a szervezőt;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Participants;résztvevők;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Participants;Résztvevők;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Addressbook;Címjegyzék;modules/calendar/ViewGroupGrid.js
-legacy;calendarfullscreen;Direct URL;közvetlen URL;modules/calendarfullscreen/views/Extjs3/CalendarOverrides.js
+legacy;calendarfullscreen;Direct URL;Közvetlen URL;modules/calendarfullscreen/views/Extjs3/CalendarOverrides.js
 legacy;calendarfullscreen;Fullscreen;Teljes képernyő;modules/calendarfullscreen/views/Extjs3/CalendarOverrides.js
-legacy;forms;ID;ID;modules/forms/views/Extjs3/ManageFormsDialog.js
-legacy;forms;Form;Forma;modules/forms/views/Extjs3/ManageFormsDialog.js
+legacy;forms;ID;;modules/forms/views/Extjs3/ManageFormsDialog.js
+legacy;forms;Form;Űrlap;modules/forms/views/Extjs3/ManageFormsDialog.js
 legacy;forms;Label;Címke;modules/forms/views/Extjs3/ManageFormsDialog.js
-legacy;forms;Required;Kívánt;modules/forms/views/Extjs3/ManageFormsDialog.js
-legacy;forms;Sort;Fajta;modules/forms/views/Extjs3/ManageFormsDialog.js
+legacy;forms;Required;Kötelező;modules/forms/views/Extjs3/ManageFormsDialog.js
+legacy;forms;Sort;;modules/forms/views/Extjs3/ManageFormsDialog.js
 legacy;forms;Created;Létrehozva;modules/forms/views/Extjs3/ManageFormsDialog.js
 legacy;forms;Modified;Módosított;modules/forms/views/Extjs3/ManageFormsDialog.js
-legacy;forms;Add entire address book;Add hozzá teljes címjegyzéket;modules/forms/views/Extjs3/ManageFormsDialog.js
-legacy;forms;Are you sure that you want to add al the contacts from this addressbook?;Biztos, hogy a felvenni kívánt al a névjegyeit a címjegyzék?;modules/forms/views/Extjs3/ManageFormsDialog.js
+legacy;forms;Add entire address book;Add hozzá a teljes címjegyzéket;modules/forms/views/Extjs3/ManageFormsDialog.js
+legacy;forms;Are you sure that you want to add al the contacts from this addressbook?;Biztos, hogy hozzá akarja adni az összes tételt ebből a címjegyzékből?;modules/forms/views/Extjs3/ManageFormsDialog.js
 legacy;forms;Completed;befejezték;modules/forms/views/Extjs3/ManageFormsDialog.js
-legacy;forms;Fields;Fields;modules/forms/views/Extjs3/ManageFormsDialog.js
-legacy;forms;Please select a form below and choose what you want to export. After that click on Export to get the csv data.;Kérjük, válasszon egy alábbi űrlapot, és válassza ki, mit szeretne exportálni. Ezután kattintson a kivitel, hogy a CSV-adatok.;modules/forms/views/Extjs3/ManageFormsDialog.js
+legacy;forms;Fields;Mezők;modules/forms/views/Extjs3/ManageFormsDialog.js
+legacy;forms;Please select a form below and choose what you want to export. After that click on Export to get the csv data.;Kérjük, válasszon egy űrlapot, és válassza ki, mit szeretne exportálni. Ezután kattintson az Export gombra.;modules/forms/views/Extjs3/ManageFormsDialog.js
 legacy;forms;What do you want to export?;Mit szeretne exportálni?;modules/forms/views/Extjs3/ManageFormsDialog.js
 legacy;forms;Export all;Az összes exportálása;modules/forms/views/Extjs3/ManageFormsDialog.js
-legacy;forms;Export completed;export befejeződött;modules/forms/views/Extjs3/ManageFormsDialog.js
-legacy;forms;Export not completed;Export nem fejeződött;modules/forms/views/Extjs3/ManageFormsDialog.js
-legacy;forms;SelectOptions;válasszuk az Opciók;modules/forms/views/Extjs3/ManageFormsDialog.js
+legacy;forms;Export completed;Export befejeződött;modules/forms/views/Extjs3/ManageFormsDialog.js
+legacy;forms;Export not completed;Export nem fejeződött be;modules/forms/views/Extjs3/ManageFormsDialog.js
+legacy;forms;SelectOptions;;modules/forms/views/Extjs3/ManageFormsDialog.js
 legacy;forms;Please click apply first before you import;Kérjük, kattintson alkalmazni először, mielőtt importálni;modules/forms/views/Extjs3/ManageFormsDialog.js
 legacy;forms;Upload a CSV file with a single column for the value or just with the value on each line.;CSV-fájl feltöltése egyetlen oszlopon az érték, vagy csak az érték minden vonalon.;modules/forms/views/Extjs3/ManageFormsDialog.js
 legacy;forms;Contact;Kapcsolatba lépni;modules/forms/views/Extjs3/ManageFormsDialog.js
@@ -626,13 +626,13 @@ legacy;forms;Forms;Forms;modules/forms/views/Extjs3/ManageFormsDialog.js
 legacy;forms;Only show not completed forms;Csak azt mutatják, nem kitöltött űrlapok;modules/forms/views/Extjs3/ManageFormsDialog.js
 legacy;forms;Manage Forms;Űrlapkezelő;modules/forms/views/Extjs3/ManageFormsDialog.js
 legacy;dokuwiki;Ok;;modules/dokuwiki/MainPanel.js
-legacy;dokuwiki;Dokuwiki url;Dokuwikiben url;modules/dokuwiki/MainPanel.js
-legacy;dokuwiki;Dokuwiki;Dokuwikiben;modules/dokuwiki/MainPanel.js
+legacy;dokuwiki;Dokuwiki url;;modules/dokuwiki/MainPanel.js
+legacy;dokuwiki;Dokuwiki;;modules/dokuwiki/MainPanel.js
 legacy;bgsupdateprojectrate;Update templates;frissítés sablonok;modules/bgsupdateprojectrate/views/Extjs3/Projects2Overwrites.js
 legacy;bgsupdateprojectrate;External fee;külső díj;modules/bgsupdateprojectrate/views/Extjs3/Projects2Overwrites.js
 legacy;bgsupdateprojectrate;Internal fee;belső díj;modules/bgsupdateprojectrate/views/Extjs3/Projects2Overwrites.js
-legacy;bgsupdateprojectrate;Update projects;projektek frissítése;modules/bgsupdateprojectrate/views/Extjs3/Projects2Overwrites.js
-legacy;advancedprojecttree;Search project;projekt keresése;modules/advancedprojecttree/views/Extjs3/ProjectsTree.js
+legacy;bgsupdateprojectrate;Update projects;Projektek frissítése;modules/bgsupdateprojectrate/views/Extjs3/Projects2Overwrites.js
+legacy;advancedprojecttree;Search project;Projekt keresése;modules/advancedprojecttree/views/Extjs3/ProjectsTree.js
 legacy;advancedprojecttree;Manager or Employee;Vezetője vagy alkalmazottja;modules/advancedprojecttree/views/Extjs3/ProjectsTree.js
 legacy;advancedprojecttree;Add project;Projekt hozzáadása;modules/advancedprojecttree/views/Extjs3/ProjectsTree.js
 legacy;advancedprojecttree;The maximum number of projects has been reached. Contact your hosting provider to activate unlimited usage of the projects module.;Elérte a projektek maximális számát. Forduljon a szolgáltatójához, hogy aktiválja projektek korlátlan használatát a modulban.;modules/advancedprojecttree/views/Extjs3/ProjectsTree.js
@@ -644,12 +644,12 @@ legacy;sendletter;Download Merged;Letöltés Egyesített;modules/sendletter/view
 legacy;sendletter;New Letter;új betű;modules/sendletter/views/Extjs3/MainPanel.js
 legacy;sendletter;Creating documents;dokumentumok létrehozása;modules/sendletter/views/Extjs3/MainPanel.js
 legacy;sendletter;Almost done;Majdnem kész;modules/sendletter/views/Extjs3/MainPanel.js
-legacy;sendletter;Address lists;címlisták;modules/sendletter/views/Extjs3/MainPanel.js
-legacy;sendletter;ODT Template;ODT Template;modules/sendletter/views/Extjs3/MainPanel.js
+legacy;sendletter;Address lists;Címlisták;modules/sendletter/views/Extjs3/MainPanel.js
+legacy;sendletter;ODT Template;ODT sablon;modules/sendletter/views/Extjs3/MainPanel.js
 legacy;sendletter;Sent letters;elküldött levelek;modules/sendletter/views/Extjs3/MainPanel.js
 legacy;licenses;Server;szerver;modules/licenses/PackageFilterPanel.js
 legacy;licenses;Data usage;Adathasználat;modules/licenses/PackageFilterPanel.js
-legacy;licenses;Total installations;Összesen berendezések;modules/licenses/PackageFilterPanel.js
+legacy;licenses;Total installations;Összesen telepítés;modules/licenses/PackageFilterPanel.js
 legacy;licenses;Package;Csomag;modules/licenses/PackageFilterPanel.js
 legacy;licenses;Package name;Csomag név;modules/licenses/PackageFilterPanel.js
 legacy;licenses;Version;;modules/licenses/PackageFilterPanel.js
@@ -659,7 +659,7 @@ legacy;licenses;Host;;modules/licenses/PackageFilterPanel.js
 legacy;licenses;IP address;;modules/licenses/PackageFilterPanel.js
 legacy;licenses;Upgrades;frissítések;modules/licenses/PackageFilterPanel.js
 legacy;licenses;Licenses;Az engedélyeket;modules/licenses/PackageFilterPanel.js
-legacy;licenses;Upgrade licenses;frissítés engedélyek;modules/licenses/PackageFilterPanel.js
+legacy;licenses;Upgrade licenses;Engedélyek frissítése;modules/licenses/PackageFilterPanel.js
 legacy;licenses;Please select which package you want to update:;Kérjük, válassza ki, melyik csomagot szeretné frissíteni:;modules/licenses/PackageFilterPanel.js
 legacy;licenses;Upgrade package;frissítési csomag;modules/licenses/PackageFilterPanel.js
 legacy;licenses;To package;csomagba;modules/licenses/PackageFilterPanel.js
@@ -667,32 +667,32 @@ legacy;licenses;License;;modules/licenses/PackageFilterPanel.js
 legacy;licenses;Expiry date;Lejárati dátum;modules/licenses/PackageFilterPanel.js
 legacy;licenses;Server manager license;Server manager licenc;modules/licenses/PackageFilterPanel.js
 legacy;licenses;Maximum server manager users;Maximális szerver manager felhasználó;modules/licenses/PackageFilterPanel.js
-legacy;licenses;Packages;csomagok;modules/licenses/PackageFilterPanel.js
+legacy;licenses;Packages;Csomagok;modules/licenses/PackageFilterPanel.js
 legacy;licenses;Download package;Csomag letöltése;modules/licenses/PackageFilterPanel.js
-legacy;licenses;Servers;szerverek;modules/licenses/PackageFilterPanel.js
+legacy;licenses;Servers;Szerverek;modules/licenses/PackageFilterPanel.js
 legacy;licenses;Menu;Menü;modules/licenses/PackageFilterPanel.js
 legacy;lists;Select options;Válassza ki az opciókat;modules/lists/views/Extjs3/ListModelGrid.js
 legacy;lists;Please click apply first before you import;Kérjük, kattintson alkalmazni először, mielőtt importálni;modules/lists/views/Extjs3/ListModelGrid.js
 legacy;lists;Upload a CSV file with a single column for the value or just with the value on each line.;CSV-fájl feltöltése egyetlen oszlopon az érték, vagy csak az érték minden vonalon.;modules/lists/views/Extjs3/ListModelGrid.js
 legacy;lists;Select the fiel that you want to import:;Válassza ki a kívánt fiel importálni:;modules/lists/views/Extjs3/ListModelGrid.js
-legacy;lists;Ok;Rendben;modules/lists/views/Extjs3/ListModelGrid.js
+legacy;lists;Ok;;modules/lists/views/Extjs3/ListModelGrid.js
 legacy;lists;List;Lista;modules/lists/views/Extjs3/ListModelGrid.js
-legacy;lists;Lists;List;modules/lists/views/Extjs3/ListModelGrid.js
-legacy;lists;Browse...;Tallózás ...;modules/lists/views/Extjs3/ListModelGrid.js
+legacy;lists;Lists;Listák;modules/lists/views/Extjs3/ListModelGrid.js
+legacy;lists;Browse...;Tallózás…;modules/lists/views/Extjs3/ListModelGrid.js
 legacy;lists;Changes you make here will take affect after you restart Group-Office.;Itt elvégzett módosítások elviszi befolyásolja újraindítása után Group-Office.;modules/lists/views/Extjs3/ListModelGrid.js
-legacy;lists;recordName;rekordnév;modules/lists/views/Extjs3/ListModelGrid.js
-legacy;employeegallery;Please select a company;Kérjük, válasszon egy cég;modules/employeegallery/views/Extjs3/MainPanel.js
-legacy;employeegallery;No employees to display;Nem alkalmazottak megjelenítéséhez;modules/employeegallery/views/Extjs3/MainPanel.js
-legacy;employeegallery;Employee Gallery;Alkalmazott Galéria;modules/employeegallery/views/Extjs3/MainPanel.js
+legacy;lists;recordName;;modules/lists/views/Extjs3/ListModelGrid.js
+legacy;employeegallery;Please select a company;Kérjük, válasszon egy céget;modules/employeegallery/views/Extjs3/MainPanel.js
+legacy;employeegallery;No employees to display;Nem megjeleníthető alkalmazott;modules/employeegallery/views/Extjs3/MainPanel.js
+legacy;employeegallery;Employee Gallery;Alkalmazott galéria;modules/employeegallery/views/Extjs3/MainPanel.js
 legacy;displaypermissions;Permissions overview;Engedélyek áttekintése;modules/displaypermissions/PluginUsers.js
 legacy;displaypermissions;No permissions found;Nincs engedély talált;modules/displaypermissions/PluginUsers.js
 legacy;displaypermissions;Model type;Modell típus;modules/displaypermissions/PluginUsers.js
-legacy;displaypermissions;Permission level;jogosultsági szint;modules/displaypermissions/PluginUsers.js
+legacy;displaypermissions;Permission level;Jogosultsági szint;modules/displaypermissions/PluginUsers.js
 legacy;displaypermissions;E-mail Account;Email fiók;modules/displaypermissions/PluginUsers.js
 legacy;displaypermissions;Use account;Használja a fiók;modules/displaypermissions/PluginUsers.js
 legacy;displaypermissions;Read only and delegated;Csak olvasható és átruházott;modules/displaypermissions/PluginUsers.js
 legacy;disableformfields;Visible form fields;Látható űrlapmezőket;modules/disableformfields/views/Extjs3/Overrides.js
-legacy;disableformfields;Show Addresslist tab;Megjelenítése Addresslist lap;modules/disableformfields/views/Extjs3/Overrides.js
+legacy;disableformfields;Show Addresslist tab;Megjelenítése Addresslist fület;modules/disableformfields/views/Extjs3/Overrides.js
 legacy;disableformfields;Visible contact fields;Látható kapcsolati mezők;modules/disableformfields/views/Extjs3/Overrides.js
 legacy;disableformfields;Visible company fields;Látható cég mezők;modules/disableformfields/views/Extjs3/Overrides.js
 legacy;disableformfields;Show addresslists tab in contacts;Megjelenítése addresslists lapján kapcsolatok;modules/disableformfields/views/Extjs3/Overrides.js
@@ -705,8 +705,8 @@ legacy;dgticketstime;employee;munkavállaló;modules/dgticketstime/views/Extjs3/
 legacy;dgticketstime;timeEntry;timeEntry;modules/dgticketstime/views/Extjs3/TicketsOverrides.js
 legacy;calendarcompany;Fax;Fax;modules/calendarcompany/views/Extjs3/CompanyProfilePanel.js
 legacy;calendarcompany;Homepage;Homepage;modules/calendarcompany/views/Extjs3/CompanyProfilePanel.js
-legacy;calendarcompany;Bank number;Bank száma;modules/calendarcompany/views/Extjs3/CompanyProfilePanel.js
-legacy;calendarcompany;Bank BIC number;Bank BIC számát;modules/calendarcompany/views/Extjs3/CompanyProfilePanel.js
+legacy;calendarcompany;Bank number;Bankszámlaszám;modules/calendarcompany/views/Extjs3/CompanyProfilePanel.js
+legacy;calendarcompany;Bank BIC number;Bank BIC azonosító;modules/calendarcompany/views/Extjs3/CompanyProfilePanel.js
 legacy;calendarcompany;VAT number;Adószám;modules/calendarcompany/views/Extjs3/CompanyProfilePanel.js
 legacy;calendarcompany;Invoicing email;számlázás email;modules/calendarcompany/views/Extjs3/CompanyProfilePanel.js
 legacy;calendarcompany;Address Book;Címjegyzék;modules/calendarcompany/views/Extjs3/CompanyProfilePanel.js
@@ -824,7 +824,7 @@ legacy;dgplanning;Thu;Csü;modules/dgplanning/views/Extjs3/HoursOverviewGrid.js
 legacy;dgplanning;Fri;Pén;modules/dgplanning/views/Extjs3/HoursOverviewGrid.js
 legacy;dgplanning;Sat;Szo;modules/dgplanning/views/Extjs3/HoursOverviewGrid.js
 legacy;dgplanning;Sun;Vas;modules/dgplanning/views/Extjs3/HoursOverviewGrid.js
-legacy;dgplanning;Add task;feladat hozzáadása;modules/dgplanning/views/Extjs3/HoursOverviewGrid.js
+legacy;dgplanning;Add task;Feladat hozzáadása;modules/dgplanning/views/Extjs3/HoursOverviewGrid.js
 legacy;dgplanning;Jobs;Állás;modules/dgplanning/views/Extjs3/HoursOverviewGrid.js
 legacy;dgplanning;Employee;Munkavállaló;modules/dgplanning/views/Extjs3/HoursOverviewGrid.js
 legacy;dgplanning;Start date;Kezdő dátum;modules/dgplanning/views/Extjs3/HoursOverviewGrid.js
@@ -897,7 +897,7 @@ legacy;calendartimetracking;Travel distance;utazási távolság;modules/calendar
 legacy;calendartimetracking;Time entry;időbeírási;modules/calendartimetracking/views/Extjs3/CalendarOverrides.js
 legacy;calendartimetracking;Remove time entry;Távolítsuk időbeírási;modules/calendartimetracking/views/Extjs3/CalendarOverrides.js
 legacy;eliteproductionplanning;Planning;Tervezés;modules/eliteproductionplanning/views/Extjs3/Helpers.js
-legacy;eliteproductionplanning;Add event;esemény hozzáadása;modules/eliteproductionplanning/views/Extjs3/Helpers.js
+legacy;eliteproductionplanning;Add event;Új esemény;modules/eliteproductionplanning/views/Extjs3/Helpers.js
 legacy;eliteproductionplanning;Total time for this month: {hours}h {minutes}m;Teljes idő ebben a hónapban: {óra} h {perc} m;modules/eliteproductionplanning/views/Extjs3/Helpers.js
 legacy;eliteproductionplanning;{hours}h {minutes}m;{Óra} h {perc} m;modules/eliteproductionplanning/views/Extjs3/Helpers.js
 legacy;eliteproductionplanning;Do you want to edit this occurence or the entire series?;Szeretné szerkeszteni ezt előfordulást, vagy az egész sorozatot?;modules/eliteproductionplanning/views/Extjs3/Helpers.js
@@ -910,16 +910,16 @@ legacy;eliteproductionplanning;Repeat forever;Ismételjük örökre;modules/elit
 legacy;eliteproductionplanning;Repeat until date;Ismételjük, dátumig;modules/eliteproductionplanning/views/Extjs3/Helpers.js
 legacy;eliteproductionplanning;Repeat count;Ismétlés száma;modules/eliteproductionplanning/views/Extjs3/Helpers.js
 legacy;eliteproductionplanning;Repeat every;Ismétlés;modules/eliteproductionplanning/views/Extjs3/Helpers.js
-legacy;eliteproductionplanning;At days;at nap;modules/eliteproductionplanning/views/Extjs3/Helpers.js
+legacy;eliteproductionplanning;At days;Ezeken a napokon;modules/eliteproductionplanning/views/Extjs3/Helpers.js
 legacy;eliteproductionplanning;Recurrence;Ismétlődés;modules/eliteproductionplanning/views/Extjs3/Helpers.js
 legacy;eliteproductionplanning;Appointment;Időpont egyeztetés;modules/eliteproductionplanning/views/Extjs3/Helpers.js
-legacy;eliteproductionplanning;Start;Rajt;modules/eliteproductionplanning/views/Extjs3/Helpers.js
-legacy;eliteproductionplanning;Duration;tartam;modules/eliteproductionplanning/views/Extjs3/Helpers.js
-legacy;eliteproductionplanning;Janitors;portások;modules/eliteproductionplanning/views/Extjs3/Helpers.js
+legacy;eliteproductionplanning;Start;;modules/eliteproductionplanning/views/Extjs3/Helpers.js
+legacy;eliteproductionplanning;Duration;Időtartam;modules/eliteproductionplanning/views/Extjs3/Helpers.js
+legacy;eliteproductionplanning;Janitors;;modules/eliteproductionplanning/views/Extjs3/Helpers.js
 legacy;eliteproductionplanning;Total time;Teljes idő;modules/eliteproductionplanning/views/Extjs3/Helpers.js
 legacy;eliteproductionplanning;Recurrences are not available for exceptions.;Kiújulás nem állnak rendelkezésre kivételek.;modules/eliteproductionplanning/views/Extjs3/Helpers.js
 legacy;radiussearch;Add location radius;Hely hozzáadása sugár;modules/radiussearch/views/Extjs3/RadiusFormPanel.js
-legacy;radiussearch;Radius;Sugár;modules/radiussearch/views/Extjs3/RadiusFormPanel.js
+legacy;radiussearch;Radius;;modules/radiussearch/views/Extjs3/RadiusFormPanel.js
 legacy;commentsreport;Comments reporting;Comments jelentési;modules/commentsreport/views/Extjs3/Settings.js
 legacy;commentsreport;Manager;Menedzser;modules/commentsreport/views/Extjs3/Settings.js
 legacy;commentsreport;Managers email addresses;Menedzserek e-mail címek;modules/commentsreport/views/Extjs3/Settings.js
@@ -1525,7 +1525,7 @@ legacy;files;Create folder;Mappa létrehozása;modules/files/SaveAsDialog.js
 legacy;files;Download link expire time;Letöltés link elévülési ideje;modules/files/SaveAsDialog.js
 legacy;files;Automatically delete file when download link expires;Automatikusan törölje a fájlt, amikor lejár letöltési ideje linknek;modules/files/SaveAsDialog.js
 legacy;files;Files modified in the past 7 days;Módosított fájlok az elmúlt 7 napban;modules/files/SaveAsDialog.js
-legacy;files;Add folder;mappa hozzáadása;modules/files/SaveAsDialog.js
+legacy;files;Add folder;Új mappa;modules/files/SaveAsDialog.js
 legacy;files;Ok;;modules/files/SaveAsDialog.js
 legacy;files;Select folder...;Mappa kiválasztása...;modules/files/SaveAsDialog.js
 legacy;files;Image viewer;Képnézegető;modules/files/SaveAsDialog.js
@@ -1972,7 +1972,7 @@ legacy;mediawiki;Module title;Modul neve;modules/mediawiki/views/Extjs3/MainPane
 legacy;copytag;Tag;Címke;modules/copytag/views/Extjs3/MainPanel.js
 legacy;copytag;User tags;felhasználó címkék;modules/copytag/views/Extjs3/MainPanel.js
 legacy;reminders;Popup reminder;felugró emlékeztető;modules/reminders/MainPanel.js
-legacy;reminders;Add users;Felhasználó hozzáadása;modules/reminders/MainPanel.js
+legacy;reminders;Add users;Új felhasználó;modules/reminders/MainPanel.js
 legacy;reminders;Add user groups;felhasználói csoportok hozzáadása;modules/reminders/MainPanel.js
 legacy;reminders;Snooze time;Szundi ideje;modules/reminders/MainPanel.js
 legacy;reminders;Popup reminders;Popup emlékeztetők;modules/reminders/MainPanel.js
@@ -2039,7 +2039,7 @@ legacy;email;Are you sure you want to copy the selected email messages to this m
 legacy;email;Are you sure you want to copy the selected email message to this mailbox folder?;Biztos, hogy másolni szeretné a kijelölt e-mail üzenetet ebbe a mappába?;modules/email/ImapAclUserDialog.js
 legacy;email;Copy email to...;Másolja ezt az e-mailt ...;modules/email/ImapAclUserDialog.js
 legacy;email;Aliases;;modules/email/ImapAclUserDialog.js
-legacy;email;Add folder;Mappa hozzáadása;modules/email/ImapAclUserDialog.js
+legacy;email;Add folder;Új mappa;modules/email/ImapAclUserDialog.js
 legacy;email;Rename folder;Mappa átnevezése;modules/email/ImapAclUserDialog.js
 legacy;email;Select a folder to rename please;Válassza ki az átnevezni kívánt mappát;modules/email/ImapAclUserDialog.js
 legacy;email;You can't rename the INBOX folder;Nem nevezheti át az INBOX mappát.;modules/email/ImapAclUserDialog.js
@@ -2689,7 +2689,7 @@ legacy;cron;System task scheduler;Rendszerfeladat ütemező;modules/cron/views/E
 legacy;cron;Job;Munka;modules/cron/views/Extjs3/CronDialog.js
 legacy;cron;Next run;Következő futás;modules/cron/views/Extjs3/CronDialog.js
 legacy;cron;Last run;Az utolsó futás;modules/cron/views/Extjs3/CronDialog.js
-legacy;cron;Month days;hónap napok;modules/cron/views/Extjs3/CronDialog.js
+legacy;cron;Month days;Hónap napjai;modules/cron/views/Extjs3/CronDialog.js
 legacy;cron;Months;Hónapok;modules/cron/views/Extjs3/CronDialog.js
 legacy;cron;Week days;A hét napjai;modules/cron/views/Extjs3/CronDialog.js
 legacy;cron;Enabled;Bekapcsolva;modules/cron/views/Extjs3/CronDialog.js
@@ -2727,7 +2727,7 @@ legacy;sqltool;ID;;modules/sqltool/views/Extjs3/MainPanel.js
 legacy;sqltool;Sql tool;;modules/sqltool/views/Extjs3/MainPanel.js
 legacy;sqltool;Reports;Jelentések;modules/sqltool/views/Extjs3/MainPanel.js
 legacy;elite;File;Fájl;modules/elite/views/Extjs3/CustomFields.js
-core;core;Add;hozzáad;*
+core;core;Add;Hozzáadás;*
 core;core;Delete;Töröl;*
 core;core;Yes;Igen;*
 core;core;No;Nem;*
@@ -3000,10 +3000,10 @@ core;core;Generate password;jelszó létrehozása;*
 core;core;The generated password has been copied to your clipboard.;A generált jelszót a vágólapra másolt.;*
 core;core;Access denied;Hozzáférés megtagadva;*
 core;core;Sorry, you don't have permissions to update this item;Sajnáljuk, de nincs jogosultsága frissíteni ezt az elemet;*
-core;core;Sorry, something went wrong. Please try again.;Elnézést, valami nem ment jól. Kérlek próbáld újra.;*
+core;core;Sorry, something went wrong. Please try again.;Elnézést, valami hiba történt. Kérem próbálja újra.;*
 core;core;Name;Név;*
 core;core;No items to display;Nincs megjeleníthető elem;*
-core;core;Maintenance mode;Karbantartás Mód;*
+core;core;Maintenance mode;Karbantartás üzemmód;*
 core;core;Sorry, maintenance mode is enabled and you can't login right now. Please come back later or contact your system administrator;Sajnáljuk, karbantartási mód engedélyezve van, és nem tud bejelentkezni most. Kérjük, látogasson vissza később, vagy lépjen kapcsolatba a rendszergazdával;*
 core;core;Account disabled;Fiók korlátozva;*
 core;core;You're account has been disabled;Az Ön fiókja le van tiltva;*
@@ -3030,7 +3030,7 @@ core;core;Username;Felhasználónév;*
 core;core;Encryption;Titkosítás;*
 core;core;Verify SSL certificate;Ellenőrizze SSL tanúsítványt;*
 core;core;Debug;;*
-core;core;Send all system notifications to the specified e-mail address;Küldje rendszerrel kapcsolatos összes értesítést a megadott e-mail címre;*
+core;core;Send all system notifications to the specified e-mail address;A rendszerrel kapcsolatos összes értesítést erre az e-mail címre küldje;*
 core;core;E-mail;;*
 core;core;Sending...;Küldés ...;*
 core;core;Success;Sikerült;*
@@ -3086,7 +3086,7 @@ core;core;First day of week;A hét első napja;*
 core;core;Sunday;vasárnap;*
 core;core;Monday;hétfő;*
 core;core;Holidays;Ünnepek;*
-core;core;Formatting;formázás;*
+core;core;Formatting;Formázás;*
 core;core;List elválasztó;lista elválasztó;*
 core;core;Text elválasztó;szöveg elválasztó;*
 core;core;Thousand Seperator;ezres elválasztó;*
@@ -3229,7 +3229,7 @@ core;core;Latest links;legújabb linkek;*
 core;core;Show all;Mutasd az összeset;*
 core;core;Appointments;Időpontok;*
 core;core;Tasks;Feladatok;*
-core;core;Notes;Megjegyzések;*
+core;core;Notes;Feljegyzések;*
 core;core;Reminders;Emlékeztetők;*
 core;core;Minutes;Percek;*
 core;core;Hour;Óra;*
@@ -3354,7 +3354,7 @@ core;core;Too big;Túl nagy;*
 core;core;Invalid file type;érvénytelen fájltípus;*
 core;core;Upload queue is empty;Feltöltés várólista üres;*
 core;core;Drop files here;Húzza ide a fájlokat;*
-core;core;{0}/{1} ({3} failed) ({5}/s);{0} / {1} ({3} sikertelen) ({5} / s);*
+core;core;{0}/{1} ({3} failed) ({5}/s);{0}/{1} ({3} sikertelen) ({5} / s);*
 core;core;Groups;Csoportok;*
 core;core;Members;Tagok;*
 core;core;Group;Csoport;*
@@ -3366,19 +3366,19 @@ core;core;Suffix;utótag;*
 core;core;Function;Funkció;*
 core;core;Text;Szöveg;*
 core;core;Share;Megosztás;*
-core;core;full_days[0];full_days [0];*
-core;core;full_days[1];full_days [1];*
-core;core;full_days[2];full_days [2];*
-core;core;full_days[3];full_days [3];*
-core;core;full_days[4];full_days [4];*
-core;core;full_days[5];full_days [5];*
-core;core;full_days[6];full_days [6];*
+core;core;full_days[0];Vasárnap;*
+core;core;full_days[1];Hétfő;*
+core;core;full_days[2];Kedd;*
+core;core;full_days[3];Szerda;*
+core;core;full_days[4];Csütörtök;*
+core;core;full_days[5];Péntek;*
+core;core;full_days[6];Szombat;*
 core;core;Company;Cég;*
 core;core;Administration;Adminisztráció;*
 core;core;N/A;;*
 core;core;Phone;Telefon;*
 core;core;Customer;Ügyfél;*
-core;core;End;vége;*
+core;core;End;Befejezés;*
 core;core;months;hónap;*
 core;core;days;napok;*
 core;core;None;Egyik sem;*
@@ -3392,25 +3392,25 @@ core;core;First;Első;*
 core;core;Second;Második;*
 core;core;Third;Harmadik;*
 core;core;Fourth;Negyedik;*
-core;core;shortDays[0];shortDays [0];*
-core;core;shortDays[1];shortDays [1];*
-core;core;shortDays[2];shortDays [2];*
-core;core;shortDays[3];shortDays [3];*
-core;core;shortDays[4];shortDays [4];*
-core;core;shortDays[5];shortDays [5];*
-core;core;shortDays[6];shortDays [6];*
-core;core;Delete all items;Az összes elem törlése;*
+core;core;shortDays[0];Vas;*
+core;core;shortDays[1];Hét;*
+core;core;shortDays[2];Ked;*
+core;core;shortDays[3];Sze;*
+core;core;shortDays[4];Csü;*
+core;core;shortDays[5];Pén;*
+core;core;shortDays[6];Szo;*
+core;core;Delete all items;Összes elem törlése;*
 core;core;Are you sure you want to delete all items?;Biztos, hogy törli az összes elemet?;*
 core;core;Color;Szín;*
 core;core;View;Nézet;*
 core;core;Location;Elhelyezkedés;*
-core;core;short_days[0];short_days [0];*
-core;core;short_days[1];short_days [1];*
-core;core;short_days[2];short_days [2];*
-core;core;short_days[3];short_days [3];*
-core;core;short_days[4];short_days [4];*
-core;core;short_days[5];short_days [5];*
-core;core;short_days[6];short_days [6];*
+core;core;short_days[0];Vas;*
+core;core;short_days[1];Hét;*
+core;core;short_days[2];Ked;*
+core;core;short_days[3];Sze;*
+core;core;short_days[4];Csü;*
+core;core;short_days[5];Pén;*
+core;core;short_days[6];Szo;*
 core;core;Reminder;Emlékeztető;*
 core;core;Copy;Másol;*
 core;core;Availability;Elérhetőség;*
@@ -3442,7 +3442,7 @@ core;core;Keywords;Kulcsszavak;*
 core;core;Author;Szerző;*
 core;core;Search results;Keresési eredmények;*
 core;core;Disabled;Kikapcsolva;*
-core;core;Totals;összesítés;*
+core;core;Totals;Összesen;*
 core;core;Authorized users;Jogosult felhasználók;*
 core;core;Sex;Neme;*
 core;core;Male;Férfi;*
@@ -3474,7 +3474,7 @@ core;core;Paste;Beilleszt;*
 core;core;Folders (Java required);Mappák (Java szükséges);*
 core;core;File exists;A fájl létezik;*
 core;core;Yes to all;Igen, mindre;*
-core;core;No to all;Nem mindre;*
+core;core;No to all;Nem, mindre;*
 core;core;Do you wish to overwrite the file '{file}'?;Kívánja felülírni ezt a fájlt: '{fájl}' ?;*
 core;core;"Java Webstart is not installed. Java enables easier editing of files and easier file uploading. Please visit <a class=""normal-link"" href=""http://www.java.com/download"" target=""_blank"">http://www.java.com/download</a> to install it.";"Java Webstart nincs telepítve. Java lehetővé teszi a  fájlok könnyebb szerkesztését és könnyebb feltöltését. Kérjük, látogasson el a <a class=""normal-link"" href=""http://www.java.com/download"" target=""_blank""> http://www.java.com/download </a> címre a telepítéshez.";*
 core;core;Select files;Fájlok kiválasztása;*
@@ -3489,6 +3489,6 @@ core;core;Email address;Email cím;*
 core;core;search query;keresés;*
 core;core;Please save first by clicking 'Apply';Kérjük, mentse előbb az „Alkalmazás” gombra kattintva;*
 core;core;Import file type;Import fájltípus;*
-core;core;Texts;szövegek;*
+core;core;Texts;Szövegek;*
 core;core;Add + new;Hozzáadás + új;*
 core;core;Read permissions;Olvasás engedélyek;*

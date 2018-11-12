@@ -67,7 +67,7 @@ return array (
   'You can\'t edit this folder' => 'Nem szerkesztheti ezt a mappát',
   'You can\'t delete the INBOX folder' => 'Nem törölheti az INBOX mappát',
   'Enter the folder name:' => 'Írja be a mappa nevét:',
-  'Add folder' => 'Mappa hozzáadása',
+  'Add folder' => 'Új mappa',
   'Download all as zipfile' => 'Töltse le az egészet egy ZIP fájlba csomagolva',
   'Body' => 'Test',
   'Answered' => 'Megválaszolt',

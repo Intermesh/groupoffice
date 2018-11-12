@@ -7,7 +7,7 @@ return array (
   'Please enter a name' => 'Adjon meg egy nevet',
   'Please enter a name for the archive' => 'Kérem a nevet az archiváláshoz',
   'Start transfer' => 'Átvitel kezdődik',
-  'Add folder' => 'mappa hozzáadása',
+  'Add folder' => 'Új mappa',
   'Please select only one item' => 'Kérjük, válasszon csak egy elemet',
   'Activate sharing' => 'Megosztás aktiválása',
   'Notify me about changes in this folder' => 'Értesítés ha változik ez a mappa',
