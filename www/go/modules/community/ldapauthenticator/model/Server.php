@@ -110,4 +110,10 @@ class Server extends Entity {
 		
 		return parent::internalSave();
 	}
+	
+	protected function internalDelete() {
+		GO()->getCache()->delete("authentication-domains");
+		
+		return parent::internalDelete();
+	}
 }
