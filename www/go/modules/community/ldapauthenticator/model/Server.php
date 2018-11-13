@@ -102,4 +102,12 @@ class Server extends Entity {
   public static function getClientName() {
     return "LdapAuthServer";
   }
+	
+	protected function internalSave() {
+		if($this->isModified("domains")) {
+			GO()->getCache()->delete("authentication-domains");
+		}
+		
+		return parent::internalSave();
+	}
 }

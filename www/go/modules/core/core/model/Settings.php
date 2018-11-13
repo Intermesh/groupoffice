@@ -220,6 +220,14 @@ class Settings extends core\Settings {
 	
 	
 	/**
+	 * Default domain name to append to username for authentication
+	 * 
+	 * @var string
+	 */
+	public $defaultAuthenticationDomain;
+	
+	
+	/**
 	 * The full URL to Group-Office. With trailing /.
 	 * 
 	 * eg. https://my.groupoffice.net/

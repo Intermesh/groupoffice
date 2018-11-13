@@ -1,15 +1,12 @@
 <?php
 namespace go\core\auth;
 
-use go\core\auth\model\Token;
 use go\modules\core\users\model\User;
-use go\core\validate\ErrorCode;
 
 class Password extends PrimaryAuthenticator {	
 	
-	public static function isAvailableFor($username) {
+	public static function isAvailableFor($username) {		
 		return User::find()->selectSingleValue('id')->where(['username' => $username])->andWhere('password', '!=', 'null')->single() !== false;
-		
 	}
 	
 	/**

@@ -682,18 +682,48 @@ class User extends Entity {
 	}
 	
 	
-		public function legacyOnDelete() {
-			$user = LegacyUser::model()->findByPk($this->id);
-			LegacyUser::model()->fireEvent("beforedelete", [$user, true]);
-			//delete all acl records		
-			$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels();
-			
-			foreach($defaultModels as $model){
-				$model->deleteByAttribute('user_id',$this->id);
-			}
+	public function legacyOnDelete() {
+		$user = LegacyUser::model()->findByPk($this->id);
+		LegacyUser::model()->fireEvent("beforedelete", [$user, true]);
+		//delete all acl records		
+		$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels();
 
-			
-			LegacyUser::model()->fireEvent("delete", [$user, true]);
+		foreach($defaultModels as $model){
+			$model->deleteByAttribute('user_id',$this->id);
 		}
+
+
+		LegacyUser::model()->fireEvent("delete", [$user, true]);
+	}
+	
+	/**
+	 * Get authentication domains that authenticators can use to identify the user
+	 * belongs to that authenticator.
+	 * 
+	 * For example the IMAP and LDAP authenticator modules use this by implementing
+	 * the \go\core\auth\DomainProvider interface.
+	 * 
+	 * @return string[]
+	 */
+	public static function getAuthenticationDomains() {
+		
+		$domains = GO()->getCache()->get("authentication-domains");
+		if(is_array($domains)) {
+			return $domains;
+		}
+		
+		
+		$classFinder = new \go\core\util\ClassFinder();
+		$classes = $classFinder->findByParent(\go\core\auth\DomainProvider::class);
+		
+		$domains = [];
+		foreach($classes as $cls) {
+			$domains = array_merge($domains, $cls::getDomainNames());
+		}
+		
+		GO()->getCache()->set("authentication-domains", $domains);
+		
+		return $domains;		
+	}
 
 }

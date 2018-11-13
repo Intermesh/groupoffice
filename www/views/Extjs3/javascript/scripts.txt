@@ -274,6 +274,7 @@ views/Extjs3/javascript/go/layout/ResponsiveLayout.js
 
 views/Extjs3/javascript/go/AuthenticationManager.js
 views/Extjs3/javascript/go/login/LanguageCombobox.js
+views/Extjs3/javascript/go/login/DomainCombo.js
 views/Extjs3/javascript/go/login/LoginDialog.js
 views/Extjs3/javascript/go/login/BaseLoginPanel.js
 views/Extjs3/javascript/go/login/ForgotDialog.js

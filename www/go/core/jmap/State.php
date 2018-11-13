@@ -77,13 +77,21 @@ class State extends AbstractState {
 	 * Called when the user makes an authenticated GET request
 	 */
 	public function outputSession() {		
-		Response::get()->output($this->getSession());
+		
+		if (!$this->isAuthenticated()) {
+			Response::get()->setStatus(401);
+			Response::get()->output([
+					"auth" => [
+							"domains" => User::getAuthenticationDomains()
+					]
+			]);
+		} else
+		{
+			Response::get()->output($this->getSession());
+		}
 	}
 
-	public function getSession() {
-		if (!$this->isAuthenticated()) {
-			throw new \go\core\http\Exception(401);
-		}
+	public function getSession() {	
 		
 		$settings = \go\modules\core\core\model\Settings::get();
 		
@@ -96,6 +104,9 @@ class State extends AbstractState {
 				'isReadOnly' => false,
 				'hasDataFor' => []
 			]],
+			"auth" => [
+						"domains" => User::getAuthenticationDomains()
+			],
 			'capabilities' => Capabilities::get(),
 			'apiUrl' => $settings->URL.'jmap.php',
 			'downloadUrl' => $settings->URL.'download.php?blob={blobId}',
