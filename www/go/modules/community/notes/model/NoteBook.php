@@ -14,11 +14,4 @@ class NoteBook extends AclEntity {
 						->addTable("notes_note_book");
 	}
 	
-	protected function init() {
-		parent::init();
-		
-		if($this->isNew()) {
-			$this->createdBy = \go\core\App::get()->getAuthState()->getUserId();
-		}
-	}
 }

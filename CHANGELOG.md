@@ -1,3 +1,6 @@
+- Notes: Removed adding createdBy in init of the Notebook entity. 
+				 This causes issues when creating an instance of the object when no user is logged in.
+
 12-11-2018 6.3.50
 - Language: Updated Hungarian
 - CreateLinkButton: fixed issue that reset did not clear the new added items.
