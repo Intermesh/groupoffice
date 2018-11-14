@@ -30,7 +30,7 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 
 		//this.add(new go.links.LinksDetailPanel());
 		
-		if (go.Modules.isAvailable("legacy", "comments")) {
+		if (go.Modules.isAvailable("community", "comments")) {
 			this.add(new go.modules.comments.CommentsDetailPanel());
 		}
 

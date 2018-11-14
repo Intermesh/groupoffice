@@ -16,7 +16,7 @@ go.modules.comments.QuickaddForm = Ext.extend(Ext.form.FormPanel, {
 				new go.modules.comments.CategoryCombo(),
 				{
 					xtype: 'xhtmleditor',
-					name: 'comment',
+					name: 'text',
 					fieldLabel: "",
 					hideLabel: true,
 					anchor: '100%',
@@ -42,12 +42,12 @@ go.modules.comments.QuickaddForm = Ext.extend(Ext.form.FormPanel, {
 	},
 	
 	getSubmitValues : function() {
-		return this.formPanel.getForm().getFieldValues();
+		return this.form.getFieldValues();
 	},
 
 	submitForm: function () {
 
-		if (!this.formPanel.getForm().isValid()) {
+		if (!this.form.isValid()) {
 			return;
 		}
 
@@ -56,8 +56,7 @@ go.modules.comments.QuickaddForm = Ext.extend(Ext.form.FormPanel, {
 		id = Ext.id();
 		params.create = {};
 		params.create[id] = values;
-		
-		this.actionStart();
+	
 		this.fireEvent('submitStart',this);
 		
 		this.entityStore.set(params, function (options, success, response) {
@@ -68,7 +67,7 @@ go.modules.comments.QuickaddForm = Ext.extend(Ext.form.FormPanel, {
 				this.submitComplete(response);
 			} else {
 				for(name in response.notUpdated[id].validationErrors) {
-					var field = this.formPanel.getForm().findField(name);
+					var field = this.form.findField(name);
 					if(field) {
 						field.markInvalid(response.notUpdated[id].validationErrors[name].description);
 					}
@@ -83,42 +82,7 @@ go.modules.comments.QuickaddForm = Ext.extend(Ext.form.FormPanel, {
 	 */
 	submitComplete: function(result){
 		this.fireEvent('submitcomplete',this, result);
-		this.actionComplete();
-	},	
-		
-	/**
-	 * Call this function when an action is started.
-	 * This will disable all action buttons of this window.
-	 */
-	actionStart : function() {
-		if(this.getBottomToolbar()) {
-			this.getBottomToolbar().setDisabled(true);
-		}
-		if(this.getTopToolbar()) {
-			this.getTopToolbar().setDisabled(true);
-		}
-		
-		if(this.getFooterToolbar()) {
-			this.getFooterToolbar().setDisabled(true);
-		}
-	},
-	
-	/**
-	 * Call this function when an action is completed.
-	 * This will enable all action buttons of this window again.
-	 */
-	actionComplete : function() {
-		if(this.getBottomToolbar()) {
-			this.getBottomToolbar().setDisabled(false);
-		}
-		
-		if(this.getTopToolbar()) {
-			this.getTopToolbar().setDisabled(false);
-		}
-		if(this.getFooterToolbar()) {
-			this.getFooterToolbar().setDisabled(false);
-		}
-	}	
+	}
 	
 	
 });

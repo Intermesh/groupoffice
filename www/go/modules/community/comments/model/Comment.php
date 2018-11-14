@@ -8,34 +8,29 @@ use go\core\util\DateTime;
 
 class Comment extends Entity {
 
-	public $comment;
-	public $categoryId;
+	public $text;
+	public $labelIds;
 	public $entityId;
 	protected $entity;
 	
 	public $entityTypeId;
 	
-	/**
-	 *
-	 * @var DateTime
-	 */
+	/** @var DateTime */
 	public $createdAt;
-	
-	/**
-	 *
-	 * @var DateTime
-	 */
+	/** @var DateTime */
 	public $modifiedAt;
 	public $createdBy;
 	public $modifiedBy;
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
-						->addTable("comments_comment")
-						->setQuery(
-							(new Query())
-								->select("e.name AS entity")
-								->join('core_entity', 'e', 'e.id = t.entityTypeId')
+			->addTable("comments_comment")
+			->addRelation('labels', Label::class, ['id' => 'commentId'])
+			->addRelation('attachments', Attachment::class, ['id' => 'commentId'])
+			->setQuery(
+				(new Query())
+					->select("e.name AS entity")
+					->join('core_entity', 'e', 'e.id = t.entityTypeId')
 		);
 	}
 	
@@ -52,18 +47,18 @@ class Comment extends Entity {
 		$this->entity = $entity->getName();
 		$this->entityTypeId = $entity->getId();
 	}
-//	
-//	public static function filter($data){
-//		
-//		if(isset($data['entityId'])){
-//			$this->query->where('t.entityId', '=', $data['entityId']);
-//		}
-//		
-//		if(isset($data['entity'])){
-//			$this->query->where(['e.name' => $data['entity']]);	
-//		}
-//		
-//		
-//	}
-//	
+	
+	public static function filter(Query $query, array $filter) {
+		
+		if(isset($filter['entityId'])){
+			$query->where('t.entityId', '=', $filter['entityId']);
+		}
+		
+		if(isset($filter['entity'])){
+			$query->where(['e.name' => $filter['entity']]);	
+		}
+		
+		return parent::filter($query, $filter);	
+	}
+	
 }

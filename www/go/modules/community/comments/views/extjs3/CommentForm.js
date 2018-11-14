@@ -1,42 +1,33 @@
-go.modules.comments.CommentForm = Ext.extend(go.form.FormWindow, {
+go.modules.comments.CommentForm = Ext.extend(go.form.Dialog, {
 	stateId: 'comments-commentForm',
 	title: t("Comment", "comments"),
 	entityStore: go.Stores.get("Comment"),
+	closeAction:'hide',
 	width: 600,
-	height: 600,
+	height: 500,
 	
 	initFormItems: function () {
-		var items = [{
-				xtype: 'fieldset',
-				autoHeight: true,
-				items: [
-					new go.modules.comments.CategoryCombo(),
-					{
-						xtype: 'xhtmleditor',
-						name: 'comment',
-						fieldLabel: "",
-						hideLabel: true,
-						anchor: '100%',
-						height: 300,
-						allowBlank: false
-					}]
-			}
-		]
+		return [
+			{xtype:'hidden',name:'entityTypeId'},
+			{xtype:'hidden', name: 'entityId'},
+			new go.form.HtmlEditor({
+				enableFont: false,
+				enableFontSize: false,
+				enableAlignments: false,
+				enableSourceEdit: false,
+				plugins: [go.form.HtmlEditor.emojiPlugin],
+				name: 'text',
+				fieldLabel: "",
+				hideLabel: true,
+				anchor: '100% 100%',
+				allowBlank: false
+			})
+		];
+	},
 
-		return items;
-	},
-	getSubmitValues: function(){
-		var values = go.modules.comments.CommentForm.superclass.getSubmitValues.call(this);
-		
-		values.entityId=this.entityId;
-		values.entity=this.entity;
-		
-		return values;
-	},
 	show : function(entityId,entity){
-	
-		this.entityId = entityId;
-		this.entity= entity;
+		//this.formPanel.form.findField('entityTypeId').setValue(entity);
+		this.formPanel.form.findField('entityId').setValue(parseInt(entityId));
 		
 		go.modules.comments.CommentForm.superclass.show.call(this);
 	}

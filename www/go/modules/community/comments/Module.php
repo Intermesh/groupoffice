@@ -1,7 +1,7 @@
 <?php
 namespace go\modules\community\comments;
 
-use go\core\auth\model\User;
+use go\modules\core\users\model\User;
 use go\core\module\Base;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
@@ -14,12 +14,12 @@ class Module extends Base {
 	}
 	
 	public function defineListeners() {
-		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
+		//User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 	}
 	
 	public static function onMap(Mapping $mapping) {		
 		
-		$mapping->addRelation("commentSettings", Settings::class, ['id' => 'userId'], false);	
-		return true;
+		//$mapping->addRelation("commentSettings", Settings::class, ['id' => 'userId'], false);	
+		//return true;
 	}
 }
