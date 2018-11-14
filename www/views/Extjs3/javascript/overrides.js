@@ -672,20 +672,36 @@ Ext.override(Ext.layout.ToolbarLayout ,{
 	}
 );
 
+Ext.override(Ext.menu.Item ,{
+	getTemplateArgs: function() {
+        return {
+            id: this.id,
+            cls: this.itemCls + (this.menu ?  ' x-menu-item-arrow' : '') + (this.cls ?  ' ' + this.cls : ''),
+            href: this.href || '#',
+            hrefTarget: this.hrefTarget,
+            icon: this.icon || Ext.BLANK_IMAGE_URL,
+            iconCls: this.iconCls || '',
+            text: this.itemText||this.text||'&#160;',
+            altText: this.altText || '',
+            iconStyle: this.iconStyle || ''
+        };
+    }
+ });
+
 Ext.menu.Item.prototype.itemTpl = new Ext.XTemplate(
 	'<a id="{id}" class="{cls} x-unselectable" hidefocus="true" unselectable="on" href="{href}"',
 		 '<tpl if="hrefTarget">',
 			  ' target="{hrefTarget}"',
 		 '</tpl>',
 	 '>',
-		  '<span class="x-menu-item-icon {iconCls}"></span>',
+		  '<span style="{iconStyle}" class="x-menu-item-icon {iconCls}"></span>',
 		  '<span class="x-menu-item-text">{text}</span>',
 	 '</a>'
 );
 Ext.layout.MenuLayout.prototype.itemTpl = new Ext.XTemplate(
 	'<li id="{itemId}" class="{itemCls}">',
 		 '<tpl if="needsIcon">',
-			  '<span class="{iconCls}"><tpl if="icon"><img alt="{altText}" src="{icon}" /></tpl></span>',
+			  '<span style="{iconStyle}" class="{iconCls}"><tpl if="icon"><img alt="{altText}" src="{icon}" /></tpl></span>',
 		 '</tpl>',
 	'</li>'
 );
