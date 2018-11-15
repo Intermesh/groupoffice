@@ -30,7 +30,7 @@
 			var lcName = name.toLowerCase();
 			
       if(entities[lcName]) {
-        throw "Entity name is already registered by module " +entities[lcName]['package'] + "/" + entities[lcName]['name'];
+        throw "Entity name is already registered by module " +entities[lcName]['package'] + "/" + entities[lcName]['module'];
       }
       
       entities[lcName] = {     
