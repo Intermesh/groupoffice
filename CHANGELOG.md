@@ -2,6 +2,8 @@
 				 This causes issues when creating an instance of the object when no user is logged in.
 - Core: Implemented domain combo box with default setting on login screen so
 				LDAP and IMAP authenticator users can logon without entering the domain.
+- Core: Added delete buttons in more menu of authentication grids
+- Core: Prevent duplicate key errors in core_entity in 6.2 to 6.3 upgrade.
 
 12-11-2018 6.3.50
 - Language: Updated Hungarian
