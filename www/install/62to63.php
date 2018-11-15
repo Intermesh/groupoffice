@@ -231,6 +231,9 @@ $qs[] = 'ALTER TABLE `core_customfields_field` DROP `validationRegex`;';
 $qs[] = 'ALTER TABLE `core_customfields_field` ADD `databaseName` VARCHAR(190) NOT NULL AFTER `name`;';
 $qs[] = 'UPDATE `core_customfields_field` set databaseName = concat("col_", id);';
 
+//Remove old projects entity because it will lead to a duplicate key error
+$qs[] = 'DELETE FROM `go_model_types` WHERE model_name="GO\\\\Projects\\\\Model\\\\Project";';
+
 
 $qs[] = 'RENAME TABLE `go_model_types` TO `core_entity`;';
 $qs[] = 'ALTER TABLE `core_entity` CHANGE `model_name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;';
@@ -250,7 +253,6 @@ $qs[] = 'ALTER TABLE `core_customfields_field_set` ADD `entityId` INT NOT NULL A
 $qs[] = "DELETE t1 FROM core_entity t1 INNER JOIN core_entity t2 WHERE t1.id > t2.id AND t1.name = t2.name;";
 $qs[] = 'update `core_customfields_field_set` set entityId = (select id from core_entity where name = extendsModel);';
 $qs[] = 'ALTER TABLE `core_entity` DROP INDEX `name`;';
-$qs[] = 'ALTER TABLE `core_entity` ADD UNIQUE(`name`);';
 
 
 //will set moduleId and convert class name to short name
@@ -264,7 +266,7 @@ $qs[] = function() {
 
 		//this could lead to a "clientName" column having a null value. Which lead to ticket #201816451
 		if (method_exists($record['name'], 'getModule')) {
-			$name = $record['name']::getModule();
+			$moduleName = $record['name']::getModule();
 			$clientName = $record['name']::getClientName();
 		} else {
 			// Search for module name based on the name column(namespace) in the core_entity table (Ticket: #201817072)
@@ -273,18 +275,24 @@ $qs[] = function() {
 			if(!isset($nameParts[1])){
 				continue;
 			}
-			$name = strtolower($nameParts[1]);
+			$moduleName = strtolower($nameParts[1]);
 			$clientName = array_pop($nameParts);
 		}
 			
 		$module = (new Query)
-										->select('id')->from('core_module')->where(['name' => $name])
+										->select('id')->from('core_module')->where(['name' => $moduleName])
 										->execute()->fetch();
 
 		$shortName = substr($record['name'], strrpos($record['name'], '\\') + 1);
 		
+		//Conflicting custom modules. Append the namespace part.
+		$existing = (new Query())->select()->from("core_entity")->where(['clientName' => $clientName])->single();
+		if($existing) {
+			$clientName = ucfirst($moduleName) .  $clientName;
+		}
+		
 		App::get()->getDbConnection()
-						->update('core_entity', ['moduleId' => $module['id'], 'name' => $shortName, 'clientName' => $clientName], ['id' => $record['id']])
+						->update('core_entity', ['moduleId' => $module ? $module['id'] : null, 'name' => $shortName, 'clientName' => $clientName], ['id' => $record['id']])
 						->execute();
 	}
 };

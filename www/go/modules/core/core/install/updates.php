@@ -92,7 +92,7 @@ $updates["201804042007"][] = "delete  FROM `core_search` WHERE entityTypeId not 
 $updates["201804042007"][] = "ALTER TABLE `core_search` ADD FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
 
 $updates["201804062007"][] = "ALTER TABLE `core_entity`  ADD `clientName` VARCHAR(190) NULL DEFAULT NULL;";
-$updates["201804062007"][] = "update `core_entity` set clientName = name;";
+$updates["201804062007"][] = "update `core_entity` set clientName = name WHERE clientName is null";
 $updates["201804062007"][] = "ALTER TABLE `core_entity` ADD UNIQUE(`clientName`);";
 
 $updates["201804062008"][] = "CREATE TABLE `core_blob` (
