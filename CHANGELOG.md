@@ -1,3 +1,7 @@
+15-11-2018 6.3.51
+- Core: upgrade broke all passwords. If your password break again after this 
+        upgrade then move /var/lib/groupoffice/defuse-crypto.txt to 
+        /home/groupoffice/defuse-crypto.txt
 - Notes: Removed adding createdBy in init of the Notebook entity. 
 				 This causes issues when creating an instance of the object when no user is logged in.
 - Core: Implemented domain combo box with default setting on login screen so

@@ -17,15 +17,30 @@ go.login.DomainCombo = Ext.extend(GO.form.ComboBoxReset, {
 					idIndex: 0
 				});
 				
-				go.login.DomainCombo.superclass.initComponent.call(this);				
+				go.login.DomainCombo.superclass.initComponent.call(this);		
 			},
 			
-			setDomains : function(domains) {
-				GO.authenticationDomains = domains;
-				
-				this.store.loadData(GO.authenticationDomains.map(function (i) {
-					return [i, i];
-				}));
+			reloadDomains : function() {
+				Ext.Ajax.request({
+					method: "GET",
+					jsonData: {},
+					url: go.User.apiUrl,
+					callback: function(options, success, response) {
+						var result = Ext.decode(response.responseText);								
+
+						GO.authenticationDomains = result.auth.domains;
+
+						this.store.loadData(GO.authenticationDomains.map(function (i) {
+							return [i, i];
+						}));
+						
+						this.setVisible(GO.authenticationDomains.length > 0);
+						
+						//needed for trigger rendering issue
+						this.onResize();
+					},
+					scope: this
+				});
 			}
 		
 });

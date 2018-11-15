@@ -58,6 +58,15 @@ go.modules.community.imapauthenticator.ServerGrid = Ext.extend(go.grid.GridPanel
 			this.edit(record.data.id);
 		}, this);
 	},
+	
+	
+	//This reloads the domains combo after changes. 
+	entityStore: "ImapAuthServer",	
+	onChanges: function(store, added, changed, destroyed) {
+		if(Object.keys(changed).length || destroyed.length) {
+				GO.SystemSettingsDomainCombo.reloadDomains();
+		}
+	},
 
 	initRowActions: function () {
 
