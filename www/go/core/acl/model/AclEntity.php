@@ -58,12 +58,19 @@ abstract class AclEntity extends Entity {
 			return false;
 		}
 		
-		$acl = Acl::findById($this->aclId);
-		if(!$acl->delete()) {
-			throw new \Exception("Could not delete ACL ".$this->aclId);
+		if(!method_exists($this, 'aclEntityClass')) {
+			$this->deleteAcl();
 		}
 		
 		return true;
+	}
+	
+	protected function deleteAcl() {
+		//TODO refactor in master		
+		$acl = Acl::internalFind()->where(['aclId' => $this->aclId])->single();
+		if(!$acl->internalDelete()) {
+			throw new \Exception("Could not delete ACL ".$this->aclId);
+		}
 	}
 	
 	protected function createAcl() {

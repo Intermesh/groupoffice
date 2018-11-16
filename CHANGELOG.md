@@ -1,3 +1,7 @@
+16-11-2018 6.3.51
+- Core: Check if createdBy or modifiedBy is set in detail panel to avoid crash
+- Core: Delete contact didn't work
+
 15-11-2018 6.3.51
 - Core: upgrade broke all passwords. If your password break again after this 
         upgrade then move /var/lib/groupoffice/defuse-crypto.txt to 
