@@ -165,3 +165,11 @@ $updates['201801221524'][] = "ALTER TABLE `em_links` CHANGE `uid` `uid` VARCHAR(
 $updates['201805011020'][] = "ALTER TABLE `em_accounts` 
 CHANGE COLUMN `password` `password` VARCHAR(512) NULL DEFAULT NULL ,
 CHANGE COLUMN `smtp_password` `smtp_password` VARCHAR(512) NOT NULL DEFAULT '';";
+
+$updates['201805011020'][] = function() {
+	$cf = new \go\core\util\ClassFinder();	
+	$cf->addNamespace("go\\modules\\community\\email");			
+	foreach($cf->findByParent(go\core\orm\Entity::class) as $cls) {
+		$cls::getType();
+	}
+};

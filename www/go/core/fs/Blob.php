@@ -220,5 +220,19 @@ class Blob extends orm\Entity {
 	public static function url($blobId) {
 		return GO()->getSettings()->URL . 'download.php?blob=' . $blobId;
 	}
+	
+	/**
+	 * Parse blob id's inserted as images in HTML content.
+	 * 
+	 * @param string $html
+	 * @return string[] Array of blob ID's
+	 */
+	public static function parseFromHtml($html) {
+		if(!preg_match_all('/<img .*?cid="(.*?)".*?>/i', $html, $matches)) {
+			return [];
+		}
+		
+		return array_unique($matches[1]);
+	}
 
 }

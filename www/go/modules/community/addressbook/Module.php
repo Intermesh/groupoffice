@@ -36,6 +36,7 @@ class Module extends Base {
 		
 		Link::on(Link::EVENT_DELETE, Contact::class, 'onLinkSaveOrDelete');
 		Link::on(Link::EVENT_SAVE, Contact::class, 'onLinkSaveOrDelete');
+		
 	}
 							
 }

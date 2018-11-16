@@ -16,8 +16,18 @@ use go\modules\core\modules\model\Module;
 /**
  * Entity model
  * 
- * Note: when changing database columns you need to run install/upgrade.php to 
+ * Note: when changing database columns or creating new entities you need to run install/upgrade.php to 
  * rebuild the cache.
+ * 
+ * Note: If you want to manually register an entity from a legacy module this code can be used in upgrades.php:
+ * 
+ * $updates['201805011020'][] = function() {
+ * 	$cf = new \go\core\util\ClassFinder();	
+ * 	$cf->addNamespace("go\\modules\\community\\email");			
+ * 	foreach($cf->findByParent(go\core\orm\Entity::class) as $cls) {
+ * 		$cls::getType();
+ * 	}
+ * };
  * 
  * An entity is a model that is saved to the database. An entity can have 
  * multiple database tables. It can be extended with has one related tables and

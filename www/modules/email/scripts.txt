@@ -39,4 +39,10 @@ modules/email/CopyMailToDialog.js
 modules/email/RecipientCombo.js
 modules/email/views/Extjs3/LabelDialog.js
 
+modules/email/TemplateDialog.js
+modules/email/TemplateGrid.js
+modules/email/SystemSettingsPanel.js
+modules/email/TemplateMenu.js
+modules/email/TemplateCombo.js
+
 

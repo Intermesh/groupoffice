@@ -7,10 +7,15 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 			xtype:'fieldset',
 			title:t("Options"),
 			items:[
-			this.sortBySendMailTime = new Ext.form.Checkbox({
-				boxLabel:t("Sort recipient addresses by time of last email sending (requires Address Book module)", "email"),
-				hideLabel:true,				
-				name:'emailSettings.sort_email_addresses_by_time'
+//			this.sortBySendMailTime = new Ext.form.Checkbox({
+//				boxLabel:t("Sort recipient addresses by time of last email sending (requires Address Book module)", "email"),
+//				hideLabel:true,				
+//				name:'emailSettings.sort_email_addresses_by_time'
+//			}),
+
+			this.templateCombo = new GO.email.TemplateCombo({
+				hiddenName: "emailSettings.defaultTemplateId",
+				fieldLabel: t("Default template")				
 			}),
 			this.useHtml = new Ext.form.Checkbox({
 				boxLabel:t("Use HTML markup", "email"),

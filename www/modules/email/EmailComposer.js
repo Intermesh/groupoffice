@@ -326,10 +326,25 @@ GO.email.EmailComposer = function(config) {
 	];
 
 	tbar.push(this.emailEditor.getAttachmentsButton(), 
-	this.showMenuButton = new Ext.Button({
+			this.showMenuButton = new Ext.Button({
 				tooltip : t("Show", "email"),
 				iconCls : 'ic-more',				
 				menu : this.showMenu
+			}),
+			
+			this.templatesBtn = new Ext.Button({
+				
+				iconCls:'ic-style',
+				tooltip:t("Template"),
+				menu: new GO.email.TemplateMenu({
+					selectedTemplateId: go.User.emailSettings.defaultTemplateId,
+					listeners: {
+						scope: this,
+						change: function(item, id) {							
+							this.loadTemplate(id);
+						}
+					}
+				})
 			}),
 	
 	{
@@ -713,12 +728,42 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		}
 	},
 	
+	loadTemplate : function(id) {
+		
+		this.clearTemplate();
+		if(!id) {
+			return;
+		}
+		
+		go.Jmap.request({
+			method: "EmailTemplate/parse",
+			scope: this,
+			callback: function(options, success, response) {				
+				this.emailEditor.getActiveEditor().setValue('<div id="EmailSignature">' +response.body + '</div>' + this.emailEditor.getActiveEditor().getValue());
+			},
+			params: {
+				id: id
+			}
+		});
+	},
+	
+	clearTemplate : function() {
+		var doc = this.emailEditor.getActiveEditor().getDoc();
+		var sig = doc.getElementById("EmailSignature");
+		if(sig) {
+			sig.parentNode.removeChild(sig);
+		}
+	},
+	
 	addSignature : function(accountRecord){
 		accountRecord = accountRecord || this.fromCombo.store.getById(this.fromCombo.getValue());
 			
 		if(!accountRecord) {
 			return false;
 		}
+		
+		this.loadTemplate(go.User.emailSettings.defaultTemplateId);
+
 		
 		var signature_below_reply = accountRecord.get("signature_below_reply");
 	
@@ -1145,7 +1190,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 							this.lastLoadParams.alias_id = action.result.data.alias_id
 						if(action.result.data.template_id) {
 							this.lastLoadParams.template_id = action.result.data.template_id
-							this.initTemplateMenu(); // set template menu 
+							//this.initTemplateMenu(); // set template menu 
 //							this.initTemplateMenu({template_id: this.lastLoadParams.template_id}); // set template menu 
 						}
 							

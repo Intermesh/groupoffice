@@ -163,6 +163,12 @@ class User extends Entity {
 	
 	
 	public $max_rows_list;
+	
+	/**
+	 * The user timezone
+	 * 
+	 * @var string eg. europe/amsterdam
+	 */
 	public $timezone;
 	public $start_module;
 	public $language;
