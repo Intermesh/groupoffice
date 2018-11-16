@@ -144,11 +144,17 @@ class Parser{
 	private function _getUserAttributes(){
 		$attributes=array();
 		
-		if(\GO::user() && \GO::user()->contact){
-			$attributes = array_merge($attributes, $this->_getModelAttributes(\GO::user()->contact,'user:'));
-			$attributes['user:sirmadam']=\GO::user()->contact->sex=="M" ? \GO::t('cmdSir','addressbook') : \GO::t('cmdMadam', 'addressbook');
-			if(\GO::user()->contact->company){
-				$attributes = array_merge($attributes, $this->_getModelAttributes(\GO::user()->contact->company,'usercompany:'));
+		
+		if(\GO::user() && ($contact = \go\modules\community\addressbook\model\Contact::findForUser(\GO::user()->id))){
+			$attributes = array_merge($attributes, $this->_getModelAttributes($contact,'user:'));
+			$attributes['user:sirmadam']=$contact->gender=="M" ? \GO::t('Sir','addressbook', 'community') : \GO::t('Madam', 'addressbook', 'community');
+			
+			$company = false;
+			if(isset($contact->getOrganizationIds()[0])) {
+				$company = \go\modules\community\addressbook\model\Contact::findById($contact->getOrganizationIds()[0]);
+			}
+			if($company){
+				$attributes = array_merge($attributes, $this->_getModelAttributes($company,'usercompany:'));
 			}
 			
 			$attributes = array_merge($attributes, $this->_getModelAttributes(\GO::user(),'user:'));			
@@ -216,8 +222,6 @@ class Parser{
 	 */
 	public function replaceModelTags($content, $model, $tagPrefix='', $leaveEmptyTags=false){
 		
-		if(\GO::modules()->customfields)
-			\GO\Customfields\Model\AbstractCustomFieldsRecord::$formatForExport=true;
 		
 		$attributes = $leaveEmptyTags ? array() : $this->_defaultTags;
 		
@@ -227,9 +231,6 @@ class Parser{
 		
 		$content = $this->_replaceRelations($content, $model, $tagPrefix, $leaveEmptyTags);
 		
-		if(\GO::modules()->customfields)
-			\GO\Customfields\Model\AbstractCustomFieldsRecord::$formatForExport=false;
-	
 		return $this->_parse($content, $attributes, $leaveEmptyTags);		
 	}
 	
@@ -292,17 +293,10 @@ class Parser{
 	 * @return StringHelper 
 	 */
 	public function replaceUserTags($content, $leaveEmptyTags=false){
-		if(\GO::modules()->customfields)
-			\GO\Customfields\Model\AbstractCustomFieldsRecord::$formatForExport=true;
 		
 		$attributes = $leaveEmptyTags ? array() : $this->_defaultTags;
 		
 		$attributes = array_merge($attributes, $this->_getUserAttributes());
-		
-		//$attributes['contact:salutation']=\GO::t('default_salutation_unknown');
-		
-		if(\GO::modules()->customfields)
-			\GO\Customfields\Model\AbstractCustomFieldsRecord::$formatForExport=false;
 		
 		return $this->_parse($content, $attributes, $leaveEmptyTags);
 	}
