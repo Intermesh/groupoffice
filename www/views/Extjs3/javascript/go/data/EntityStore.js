@@ -182,10 +182,11 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	/**
 	 * Get entities
 	 * 
-	 * @param {array} ids
-	 * @param {function} cb
+	 * @link https://jmap.io/spec-core.html#/get
+	 * @param {string[]|int[]} ids
+	 * @param {function} cb Callback function that is called with entities[] and notFoundIds[] 
 	 * @param {object} scope
-	 * @returns {array|boolean} entities or false is data needs to be loaded from server
+	 * @returns void
 	 */
 	get: function (ids, cb, scope) {
 
@@ -197,9 +198,9 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			throw "ids must be an array";
 		}
 
-		var entities = [], unknownIds = [];
+		var entities = [], unknownIds = [], notFoundIds = [];
 
-		for (var i = 0; i < ids.length; i++) {
+		for (var i = 0, l = ids.length; i < l; i++) {
 			var id = ids[i];
 			if(!id) {
 				throw "Empty ID passed to EntityStore.get()";
@@ -208,6 +209,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				entities.push(this.data[id]);
 			} else if(this.notFound.indexOf(id) > -1) {
 				//entities.push(null);
+				notFoundIds.push(id);
 			} else
 			{
 				unknownIds.push(id);
@@ -226,6 +228,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					
 					if(!GO.util.empty(response.notFound)) {
 						this.notFound = this.notFound.concat(response.notFound);
+						notFoundIds = notFoundIds.concat(response.notFound);
 						console.log("Item not found", response);						
 					}
 					
@@ -239,7 +242,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		} 
 		
 		if(cb) {		
-			cb.call(scope || this, entities);			
+			cb.call(scope || this, entities, notFoundIds);			
 		}
 		return entities;
 	},
