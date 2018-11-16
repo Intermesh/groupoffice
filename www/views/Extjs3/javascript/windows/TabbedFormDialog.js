@@ -321,7 +321,9 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 
 	addCustomFields : function(){
 		
-		this._panels[0].add(go.modules.core.customfields.CustomFields.getFormFieldSets(this.customFieldType))
+		if(this.customFieldType) {
+			this._panels[0].add(go.modules.core.customfields.CustomFields.getFormFieldSets(this.customFieldType))
+		}
 
 	},
 	
