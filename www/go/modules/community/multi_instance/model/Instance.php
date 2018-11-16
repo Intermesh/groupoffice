@@ -384,7 +384,7 @@ class Instance extends Entity {
 	}
 	
 	private function setInstanceConfig($config) {
-		$this->getConfigFile()->putContents("<?php\n\$config = " . var_export($config, true) . ";\n");
+		$this->getConfigFile()->putContents("<?php\nif(empty(\$config)){\n\$config = [];\n}\n\$config = array_merge(\$config, " . var_export($config, true) . ");\n");
 		
 		if(function_exists("opcache_invalidate")) {
 			opcache_invalidate($this->getConfigFile()->getPath());
