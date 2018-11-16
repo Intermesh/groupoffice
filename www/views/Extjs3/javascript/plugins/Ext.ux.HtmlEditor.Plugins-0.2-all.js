@@ -37,11 +37,16 @@ Ext.ux.form.HtmlEditor.MidasCommand = Ext.extend(Ext.util.Observable, {
         Ext.each(this.midasBtns, function(b){
             //if (Ext.isObject(b)) {
 						if (typeof(b)=='object') {
+						    // Certain commands also require a value to be passed such as the heading plugin.
+						    if(!b.value){
+							b.value = "";
+						    }
                 midasCmdButton = {
 										tabIndex:-1,
-                    iconCls: 'x-edit-' + b.cmd,
+                    
+		    iconCls: 'x-edit-' + b.cmd,
                     handler: function(){
-                        this.cmp.relayCmd(b.cmd);
+                        this.cmp.relayCmd(b.cmd,b.value);
                     },
                     scope: this,
                     tooltip: b.tooltip ||
@@ -645,15 +650,17 @@ Ext.ux.form.HtmlEditor.HeadingButtons = Ext.extend(Ext.ux.form.HtmlEditor.MidasC
         tooltip: {
             title: '1st Heading'
         },
-        overflowText: '1st Heading'
+        overflowText: '1st Heading',
+	taglessValue: 'h1'
     }, {
         enableOnSelection: true,
         cmd: 'formatblock',
-        value: '<h2>',
+        value: "<h2>",
         tooltip: {
             title: '2nd Heading'
         },
-        overflowText: '2nd Heading'
+        overflowText: '2nd Heading',
+	taglessValue: 'h2'
     }]
 }); 
 
@@ -686,6 +693,47 @@ Ext.ux.form.HtmlEditor.HeadingMenu = Ext.extend(Ext.util.Observable, {
                 autoDestroy: true,
                 fields: ['value','display'],
                 data: [['H1','1st Heading'],['H2','2nd Heading'],['H3','3rd Heading'],['H4','4th Heading'],['H5','5th Heading'],['H6','6th Heading'],['P','Paragraph']]
+            },
+            listeners: {
+                'select': function(combo,rec){
+                    this.relayCmd('formatblock', '<'+rec.get('value')+'>');
+                    combo.reset();
+                },
+                scope: cmp
+            }
+        });
+    }
+});
+/**
+ * @author based on the HeadingMenu by Shea Frederick - http://www.vinylfox.com
+ * @class Ext.ux.form.HtmlEditor.HeadingMenuEdited
+ * @extends Ext.util.Observable
+ * <p>A plugin that creates a menu on the HtmlEditor for selecting a heading size. This variant only has 2 headings and normal text. 
+ * This is an edited version of the HeadingMenu method to be used in the pages module.</p>
+ */
+Ext.ux.form.HtmlEditor.HeadingMenuEdited = Ext.extend(Ext.util.Observable, {
+    init: function(cmp){
+        this.cmp = cmp;
+        this.cmp.on('render', this.onRender, this);
+    },
+    // private
+    onRender: function(){
+        var cmp = this.cmp;
+        var btn = this.cmp.getToolbar().addItem({
+            xtype: 'combo',
+            displayField: 'display',
+            valueField: 'value',
+            name: 'headingsize',
+            forceSelection: true,
+            mode: 'local',
+            triggerAction: 'all',
+            width: dp(150),
+            emptyText: 'Heading',
+            store: {
+                xtype: 'arraystore',
+                autoDestroy: true,
+                fields: ['value','display'],
+                data: [['p','Normal text'],['H1','Heading 1'],['H2','Heading 2']]
             },
             listeners: {
                 'select': function(combo,rec){

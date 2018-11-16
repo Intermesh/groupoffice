@@ -1,8 +1,8 @@
 go.modules.community.pages.PageDialog = Ext.extend(go.form.Dialog, {
 	title: t("Page"),
 	entityStore: go.Stores.get("Page"),
-	width: 600,
-	height: 600,
+	width: dp(1200),
+	height: dp(600),
 	//maximized: true,
 	maximizable: true,
 	siteId: '_',
@@ -26,6 +26,11 @@ go.modules.community.pages.PageDialog = Ext.extend(go.form.Dialog, {
 						hideLabel: true,
 						anchor: '100%',
 						allowBlank: true,
+						enableColors: false,
+						enableFont: false,
+						enableFontSize: false,
+						enableSourceEdit: false
+						
 					},
 					{
 						xtype: 'hidden',

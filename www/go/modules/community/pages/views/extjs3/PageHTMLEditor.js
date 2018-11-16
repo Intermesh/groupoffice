@@ -13,25 +13,18 @@ go.modules.community.pages.PageHTMLEditor = function (config) {
 		config.plugins = [config.plugins];
 
 	var spellcheckInsertPlugin = new GO.plugins.HtmlEditorSpellCheck(this);
-	var wordPastePlugin = new Ext.ux.form.HtmlEditor.Word();
-	//var dividePlugin = new Ext.ux.form.HtmlEditor.Divider();
-	//var tablePlugin = new Ext.ux.form.HtmlEditor.Table();
-	var hrPlugin = new Ext.ux.form.HtmlEditor.HR();
+	var dividePlugin = new Ext.ux.form.HtmlEditor.Divider();
 	var ioDentPlugin = new Ext.ux.form.HtmlEditor.IndentOutdent();
 	var ssScriptPlugin = new Ext.ux.form.HtmlEditor.SubSuperScript();
-	var rmFormatPlugin = new Ext.ux.form.HtmlEditor.RemoveFormat();
-	var HeaderPlugin = new Ext.ux.form.HtmlEditor.HeadingButtons();
-
+	var HeaderPlugin = new Ext.ux.form.HtmlEditor.HeadingMenuEdited();
 	if (GO.settings.pspellSupport)
 		config.plugins.unshift(spellcheckInsertPlugin);
 
 	config.plugins.unshift(
+					dividePlugin,
 					HeaderPlugin,
-					wordPastePlugin,
-					hrPlugin,
 					ioDentPlugin,
-					rmFormatPlugin,
-					ssScriptPlugin
+					ssScriptPlugin,
 					);
 
 	go.modules.community.pages.PageHTMLEditor.superclass.constructor.call(this, config);

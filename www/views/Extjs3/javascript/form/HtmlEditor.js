@@ -15,6 +15,7 @@ GO.form.HtmlEditor = function (config) {
 
 	if (!Ext.isArray(config.plugins))
 		config.plugins = [config.plugins];
+	    
 	//only load the plugins if the config.plugins is empty.
 	if(config.plugins.length < 1){
 	var spellcheckInsertPlugin = new GO.plugins.HtmlEditorSpellCheck(this);
