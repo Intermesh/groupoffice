@@ -34,7 +34,7 @@ use function GO;
  * `````````````````````````````````````````````````````````````````````````````
  * $tpl = 'Hi {{user.username}},'
  *						. '{{#if test.foo}}'."\n"
- *						. 'Your e-mail {{#if test.bar}} is {{/if}} {{user.email}}'."\n"
+ *						. 'Your e-mail {{#if now|date:Y == 2018}} is {{/if}} {{user.email}}'."\n"
  *						. '{{/if}}'
  *						. ''
  *						. '{{#each emailAddress in user.contact.emailAddresses}}'
@@ -100,7 +100,7 @@ class TemplateParser {
 			$format = GO()->getAuthState()->getUser()->dateFormat;
 		}
 
-		$date->setTimezone(GO()->getAuthState()->getUser()->timezone);
+		$date->setTimezone(new \DateTimeZone(GO()->getAuthState()->getUser()->timezone));
 
 		return $date->format($format);
 	}
@@ -249,15 +249,9 @@ class TemplateParser {
 		
 		$replaced .= substr($str, $offset);
 		
-		GO()->debug($replaced);
-		
-		preg_match_all('/\{\{(.*?)\}\}/', $replaced, $matches);
-		GO()->debug($matches);
-		
+		preg_match_all('/\{\{(.*?)\}\}/', $replaced, $matches);		
 		preg_match_all('/{{.*}}/', $replaced, $matches);
 				
-		GO()->debug($matches);
-		
 		$replaced = preg_replace_callback('/{{.*?}}/', [$this, 'replaceVar'], $replaced);
 		
 //		echo "\n--- Result:\n";
@@ -308,8 +302,7 @@ class TemplateParser {
 
 	private function replaceIf($tag, $str) {
 		
-		$parsed = $this->parse($tag['expression']);
-		
+		$parsed = $this->parse($tag['expression']);		
 		$expression = $this->validateExpression($parsed);
 		
 		$ret = eval($expression);	
@@ -353,20 +346,20 @@ class TemplateParser {
 							$part == 'true' ||
 							$part == 'false' ||
 							$part == 'null' ||
+							$part == '||' ||
+							$part == '&&' ||
 							in_array($part, self::$tokens) ||
 							$this->isString($part)											
 				) {
 				$str .= $part.' ';
-			}elseif($this->isVar(ltrim($part, "!")))
+			}else
 			{
-				if($part[0] == "!") {
-					$str .= "!";
-				}
-				$str .= var_export($this->getVar(ltrim($part, "!")), true).' ';
-			} else
-			{			
-				throw new Exception("Invalid token: ".var_export($part, true));
-			}
+				$str .= var_export($this->getVarFiltered($part), true).' ';
+			} 
+//			else
+//			{			
+//				throw new Exception("Invalid token: ".var_export($part, true));
+//			}
 			
 		}
 //		echo $str;
