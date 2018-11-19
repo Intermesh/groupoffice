@@ -1,3 +1,8 @@
+- Tickets: First message content was not set on ticket when importing from imap 
+  making {MESSAGE} unavailable in templates
+- Files: Recent file didn't show files from folders without ACL id
+- Files: Fixed shares folder with complex sharing structures
+
 16-11-2018 6.3.51
 - Core: Check if createdBy or modifiedBy is set in detail panel to avoid crash
 - Core: Delete contact didn't work
