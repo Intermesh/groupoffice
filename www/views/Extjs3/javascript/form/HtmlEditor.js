@@ -65,7 +65,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 				success: function(response) {
 					var imgEl = null;
 					if (file.type.match(/^image\//)) {
-						domId = Ext.id(), img = '<img id="' + domId + '" cid="' + response.blobId + '" src="' + go.Jmap.downloadUrl(response.blobId) + '" alt="' + file.name + '" />';
+						domId = Ext.id(), img = '<img id="' + domId + '" src="' + go.Jmap.downloadUrl(response.blobId) + '" alt="' + file.name + '" />';
 						this.insertAtCursor(img);
 						var imgEl = this.getDoc().getElementById(domId);
 					} 
@@ -181,14 +181,10 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 				var file = new File([blob], "pasted-image." + blob.type.substring(6),{type: blob.type});
 				go.Jmap.upload(file, {
 					success: function(response) {
-						imgEl.setAttribute("src", go.Jmap.downloadUrl(response.blobId));
-						imgEl.setAttribute("cid", response.blobId);
+						imgEl.setAttribute("src", go.Jmap.downloadUrl(response.blobId));						
 						me.fireEvent('attach', response.blobId, file, imgEl);
 					}
 				});
-				
-				
-				
 				
 			}
 		};
