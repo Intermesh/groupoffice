@@ -95,7 +95,7 @@
 		 * cfg.autoUpload: boolean jmap upload file on select
 		 * cfg.listeners: {
 		 *   select => (files: File[]): callback to trigger when files are selected
-		 *   upload => (response: Blob): response from server after every Upload completed (if autoUpload)
+		 *   upload => (response: {blobId: "..."}): response from server after every Upload completed (if autoUpload)
 		 *   uploadComplete => () when all uploads are complete (if autoUpload)
 		 *   scope: same as in ext
 		 * @param {object} cfg
