@@ -17,6 +17,7 @@ go.modules.community.pages.PageHTMLEditor = function (config) {
 	var ioDentPlugin = new Ext.ux.form.HtmlEditor.IndentOutdent();
 	var ssScriptPlugin = new Ext.ux.form.HtmlEditor.SubSuperScript();
 	var HeaderPlugin = new Ext.ux.form.HtmlEditor.HeadingMenuEdited();
+	var rmFormatPlugin = new Ext.ux.form.HtmlEditor.RemoveFormat();
 	if (GO.settings.pspellSupport)
 		config.plugins.unshift(spellcheckInsertPlugin);
 
@@ -25,6 +26,7 @@ go.modules.community.pages.PageHTMLEditor = function (config) {
 					HeaderPlugin,
 					ioDentPlugin,
 					ssScriptPlugin,
+					rmFormatPlugin
 					);
 
 	go.modules.community.pages.PageHTMLEditor.superclass.constructor.call(this, config);

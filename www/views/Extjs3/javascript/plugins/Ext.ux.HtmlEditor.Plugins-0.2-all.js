@@ -14,6 +14,7 @@ Ext.ux.form.HtmlEditor.MidasCommand = Ext.extend(Ext.util.Observable, {
     init: function(cmp){
         this.cmp = cmp;
         this.btns = [];
+	this.combo = [];
         this.cmp.on('render', this.onRender, this);
         this.cmp.on('initialize', this.onInit, this, {
             delay: 100,
@@ -25,7 +26,7 @@ Ext.ux.form.HtmlEditor.MidasCommand = Ext.extend(Ext.util.Observable, {
         Ext.EventManager.on(this.cmp.getDoc(), {
             'mousedown': this.onEditorEvent,
             'dblclick': this.onEditorEvent,
-            'click': this.onEditorEvent,
+            'click': this.onClick,
             'keyup': this.onEditorEvent,
             buffer: 100,
             scope: this
@@ -64,6 +65,17 @@ Ext.ux.form.HtmlEditor.MidasCommand = Ext.extend(Ext.util.Observable, {
             }
             this.btns.push(btn);
         }, this);
+	this.combo = this.cmp.getToolbar().findByType('combo');
+    },
+    onClick: function(){
+	Ext.each(this.combo, function(b){
+	    if(b.isExpanded()){
+		b.collapse();
+	    }
+	    console.log(b.getRawValue());
+	});
+	
+	this.onEditorEvent();
     },
     // private
     onEditorEvent: function(){
@@ -719,7 +731,7 @@ Ext.ux.form.HtmlEditor.HeadingMenuEdited = Ext.extend(Ext.util.Observable, {
     // private
     onRender: function(){
         var cmp = this.cmp;
-        var btn = this.cmp.getToolbar().addItem({
+        btn = this.cmp.getToolbar().addItem({
             xtype: 'combo',
             displayField: 'display',
             valueField: 'value',
@@ -738,10 +750,10 @@ Ext.ux.form.HtmlEditor.HeadingMenuEdited = Ext.extend(Ext.util.Observable, {
             listeners: {
                 'select': function(combo,rec){
                     this.relayCmd('formatblock', '<'+rec.get('value')+'>');
-                    combo.reset();
+                    //combo.reset();
                 },
                 scope: cmp
             }
         });
-    }
+    },
 });
