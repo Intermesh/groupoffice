@@ -168,20 +168,35 @@ GO.email.EmailComposer = function(config) {
 		xtype:'compositefield',
 		anchor : '100%',
 		items: [
-			this.toCombo = new GO.email.RecipientCombo(),
+			this.toCombo = new GO.email.RecipientCombo({
+				listeners: {
+					scope: this,
+					select: function(combo, record, index){						
+						if(record.data.entity === "Contact") {
+							if(!this.htmlEditorIsDirty()) {
+								this.loadTemplate(this.templateMenu.selectedTemplateId, record.data.id);
+							}
+						}
+					}
+				}
+			}),
 			new Ext.Button({				
 				iconCls : 'ic-add',
 				handler: function() {
 					var select = new go.modules.community.addressbook.SelectDialog ({
 						scope: this,
-						handler: function(name, email) {
+						handler: function(name, email, id) {
 							var v = this.toCombo.getValue();
 							
 							if(!go.util.empty(v)) {
 								v += ", ";
 							}							
 							v += '"' + name.replace(/"/g, '\\"') + '" <' + email + '>';							
-							this.toCombo.setValue(v);
+							this.toCombo.setValue(v);							
+							
+							if(!this.htmlEditorIsDirty()) {
+								this.loadTemplate(this.templateMenu.selectedTemplateId, id);
+							}
 						}
 					});
 					select.show();
@@ -336,12 +351,15 @@ GO.email.EmailComposer = function(config) {
 				
 				iconCls:'ic-style',
 				tooltip:t("Template"),
-				menu: new GO.email.TemplateMenu({
+				menu: this.templateMenu = new GO.email.TemplateMenu({
 					selectedTemplateId: go.User.emailSettings.defaultTemplateId,
 					listeners: {
 						scope: this,
 						change: function(item, id) {							
 							this.loadTemplate(id);
+						},
+						beforechange: function(item, id) {
+							
 						}
 					}
 				})
@@ -728,11 +746,19 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		}
 	},
 	
-	loadTemplate : function(id) {
+	loadTemplate : function() {
 		
-		this.clearTemplate();
-		if(!id) {
+		if(!id || !this.clearTemplate(id, contactId)) {
 			return;
+		}
+		
+		var params = {
+			id: id,
+			entities: {}
+		};
+		
+		if(this.contactId) {
+			params.entities["contact"] = {name: "Contact", id: contactId};
 		}
 		
 		go.Jmap.request({
@@ -740,19 +766,44 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 			scope: this,
 			callback: function(options, success, response) {				
 				this.emailEditor.getActiveEditor().setValue('<div id="EmailSignature">' +response.body + '</div>' + this.emailEditor.getActiveEditor().getValue());
+				
+				var doc = this.emailEditor.getActiveEditor().getDoc();
+				var sig = doc.getElementById("EmailSignature");
+				this.lastTemplateValue = sig.innerHTML;
 			},
-			params: {
-				id: id
-			}
+			params: params
 		});
+	},
+	
+	
+	htmlEditorIsDirty : function() {
+		var doc = this.emailEditor.getActiveEditor().getDoc();
+		var sig = doc.getElementById("EmailSignature");
+		
+		if(!sig) {
+			return false;
+		}
+		
+		return this.lastTemplateValue && sig.innerHTML != this.lastTemplateValue;
+//			Ext.MessageBox.confirm("Apply template", "Applying the template will overwrite your changes. Do you want to do this?", function(btn) {
+//				if(btn === "yes") {					
+//					this.loadTemplate(id, contactId);
+//				}
+//			}, this);
+			
+//			
 	},
 	
 	clearTemplate : function() {
 		var doc = this.emailEditor.getActiveEditor().getDoc();
 		var sig = doc.getElementById("EmailSignature");
-		if(sig) {
-			sig.parentNode.removeChild(sig);
+		
+		if(!sig) {
+			return true;
 		}
+		
+		sig.parentNode.removeChild(sig);	
+		return true;
 	},
 	
 	addSignature : function(accountRecord){

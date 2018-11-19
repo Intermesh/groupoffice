@@ -7,7 +7,7 @@ GO.email.TemplateMenu = Ext.extend(Ext.menu.Menu, {
 		});
 		GO.email.TemplateMenu.superclass.initComponent.call(this);
 		
-		this.addEvents({change: true});
+		this.addEvents({change: true, beforechange: true});
 
 		this.store.on("load", this.updateMenu, this);
 		this.on("render", function () {
@@ -39,6 +39,7 @@ GO.email.TemplateMenu = Ext.extend(Ext.menu.Menu, {
 				templateId: records[i].data.id,
 				listeners:{
 					scope: this,
+					beforecheckchange:  this.onBeforeCheckChange,
 					checkchange: this.onCheckChange
 				},
 				group: "templates",
@@ -49,12 +50,19 @@ GO.email.TemplateMenu = Ext.extend(Ext.menu.Menu, {
 	
 	onCheckChange : function(item, checked) {
 		
-		if(checked) {
-			console.log(item);
-		
+		if(checked) {			
 			this.selectedTemplateId = item.templateId;
 			this.fireEvent("change", this, this.selectedTemplateId);
 		}
+	},
+	
+	onBeforeCheckChange : function(item, checked) {
+		
+		if(!checked) {
+			return true;
+		}
+		
+		return this.fireEvent("beforechange", this, item.templateId);		
 	},
 	
 	setSelectedTemplateId : function(id) {
