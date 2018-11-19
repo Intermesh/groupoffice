@@ -40,6 +40,26 @@ Ext.override(Ext.form.TextArea,{
 	}
 });
 
+Ext.override(Ext.form.BasicForm,{
+	submit : function(options){
+        options = options || {};
+        if(this.standardSubmit){
+            var v = options.clientValidation === false || this.isValid();
+            if(v){
+                var el = this.el.dom;
+                if(this.url){
+                    el.action = this.url;
+                }
+                el.submit();
+            }
+            return v;
+        }
+        var submitAction = String.format('{0}submit', this.api ? 'direct' : '');
+        this.doAction(submitAction, options);
+        return this;
+    }
+});
+
 Ext.override(Ext.grid.Column,{
 	renderer:function(value, metaData, record, rowIndex, colIndex, store){
 		//console.log(this);
