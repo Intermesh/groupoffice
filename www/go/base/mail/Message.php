@@ -465,6 +465,16 @@ class Message extends \Swift_Message{
 			}
 		}
 		
+		$blobIds = \go\core\fs\Blob::parseFromHtml($body);
+		foreach($blobIds as $blobId) {
+			$blob = \go\core\fs\Blob::findById($blobId);
+			
+			$img = \Swift_EmbeddedFile::fromPath($blob->getFile()->getPath());
+			$img->setContentType($blob->type);
+			$contentId = $this->embed($img);
+			$body = \go\core\fs\Blob::replaceSrcInHtml($body, $blobId, $contentId);
+		}
+		
 		return $body;
 	}
 	
