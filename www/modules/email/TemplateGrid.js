@@ -4,6 +4,12 @@ GO.email.TemplateGrid = Ext.extend(go.grid.GridPanel, {
 		forceFit: true,
 		autoFill: true
 	},
+	
+	ownedBy: null,
+	
+	setOwnedBy : function(userId) {
+		this.ownedBy = this.store.baseParams.filter.ownedBy = userId;
+	},
 
 	initComponent: function () {
 
@@ -20,13 +26,19 @@ GO.email.TemplateGrid = Ext.extend(go.grid.GridPanel, {
 					iconCls: 'ic-add',
 					handler: function() {
 						var dlg = new GO.email.TemplateDialog();
-						dlg.show();
-					}
+						dlg.setValues({ownedBy: this.ownedBy}).show();
+					},
+					scope: this
 			}],
 			
 			store: new go.data.Store({
-				fields: ['id', 'name'],
-				entityStore: "EmailTemplate"				
+				fields: ['id', 'name', 'aclId', "permissionLevel"],
+				entityStore: "EmailTemplate",
+				baseParams: {
+					filter: {
+						ownedBy: this.ownedBy
+					}
+				}
 			}),
 			autoHeight: true,
 			plugins: [actions],
@@ -98,6 +110,20 @@ GO.email.TemplateGrid = Ext.extend(go.grid.GridPanel, {
 						},
 						scope: this
 					},{
+						itemId:"share",
+						iconCls: 'ic-share',
+						text: t("Share"),
+						handler: function() {
+							var shareWindow = new go.modules.core.core.ShareWindow({
+								title: t("Share") + ": " + this.moreMenu.record.get('name')
+							});
+							
+							shareWindow.load(this.moreMenu.record.get('aclId')).show();
+						},
+						scope: this						
+					},
+					'-',
+					{
 						itemId: "delete",
 						iconCls: 'ic-delete',
 						text: t("Delete"),
@@ -112,7 +138,11 @@ GO.email.TemplateGrid = Ext.extend(go.grid.GridPanel, {
 			});
 		}	
 		
-		this.moreMenu.record = record;		
+		this.moreMenu.record = record;	
+		this.moreMenu.getComponent("edit").setDisabled(record.get("permissionLevel") < GO.permissionLevels.manage);
+		this.moreMenu.getComponent("share").setDisabled(record.get("permissionLevel") < GO.permissionLevels.manage);
+		this.moreMenu.getComponent("delete").setDisabled(record.get("permissionLevel") < GO.permissionLevels.manage);
+		
 		this.moreMenu.showAt(e.getXY());
 	},
 	

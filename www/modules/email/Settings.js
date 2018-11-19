@@ -60,15 +60,19 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 				editable : false,
 				selectOnFocus : true,
 				forceSelection : true
-			})]}
+			})]
+			},
+			this.templateGrid = new GO.email.TemplateGrid({
+				ownedBy: null
+			})
 		];
 		
 		GO.email.SettingsPanel.superclass.initComponent.call(this);
 	},
 	
 	
-	onLoadComplete : function(action) {
-
+	onLoadComplete : function(user) {
+		this.templateGrid.setOwnedBy(user.id);
 	},
 
 	onSubmitComplete : function() {

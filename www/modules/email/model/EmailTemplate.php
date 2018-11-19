@@ -44,4 +44,13 @@ class EmailTemplate extends AclOwnerEntity {
 			$this->attachments[] = $existing[$blobId] ?? (new EmailTemplateAttachment())->setValues(['blobId' => $blobId]);
 		}
 	}
+	
+	public static function filter(\go\core\db\Query $query, array $filter) {
+		
+		if(array_key_exists('ownedBy', $filter)) {
+			$query->where('ownedBy','=', $filter['ownedBy']);
+		}
+		
+		return parent::filter($query, $filter);
+	}
 }
