@@ -1,3 +1,4 @@
+- Core: Numberfield broken when loaded before render
 - Tickets: First message content was not set on ticket when importing from imap 
   making {MESSAGE} unavailable in templates
 - Files: Recent file didn't show files from folders without ACL id
