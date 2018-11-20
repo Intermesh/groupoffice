@@ -746,9 +746,9 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		}
 	},
 	
-	loadTemplate : function() {
+	loadTemplate : function(id, contactId) {
 		
-		if(!id || !this.clearTemplate(id, contactId)) {
+		if(!id || !this.clearTemplate()) {
 			return;
 		}
 		
@@ -757,7 +757,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 			entities: {}
 		};
 		
-		if(this.contactId) {
+		if(contactId) {
 			params.entities["contact"] = {name: "Contact", id: contactId};
 		}
 		
