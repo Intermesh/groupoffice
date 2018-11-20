@@ -5,6 +5,7 @@ go.modules.community.pages.PagesTreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 	loading : false,
 	
 	load: function (node, callback, scope) {
+	    console.log("load");
 		if (this.clearOnLoad) {
 			while (node.firstChild) {
 				node.removeChild(node.firstChild);
@@ -18,44 +19,44 @@ go.modules.community.pages.PagesTreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 			
 			this.loading = true;
 			
-			if(node.attributes.isAddressBook) {
-				 this.requestGroups(node, callback, scope || node);
-			} else
-			{
+//			if(node.attributes.isAddressBook) {
+//				 this.requestGroups(node, callback, scope || node);
+//			} else
+//			{
 				this.requestEntityData(node, callback, scope || node);
-			}
+//			}
 		}
 	},
 	
-	requestGroups : function(node, callback, scope) {
-						
-		go.Stores.get("AddressBookGroup").get(node.attributes.entity.groups, function(groups){
-			var result = [];
-			
-			groups.forEach(function(group) {
-				result.push({
-					id: "group-" + group.id,
-					iconCls: 'ic-group',
-					text: group.name,
-					//leaf: true, don't use leaf because this doesn't allow dropping contacts anymore
-					children: [],
-					expanded: true,
-					entity: group,
-					isGroup: true
-				});
-			});
-			
-			var response = {
-				argument: {callback: callback, node: node, scope: scope},
-				responseData:result
-			};
-			
-			this.loading = false;
-			this.handleResponse(response);
-		}, this)
-		
-		
-	},
+//	requestGroups : function(node, callback, scope) {
+//						
+//		go.Stores.get("AddressBookGroup").get(node.attributes.entity.groups, function(groups){
+//			var result = [];
+//			
+//			groups.forEach(function(group) {
+//				result.push({
+//					id: "group-" + group.id,
+//					iconCls: 'ic-group',
+//					text: group.name,
+//					//leaf: true, don't use leaf because this doesn't allow dropping contacts anymore
+//					children: [],
+//					expanded: true,
+//					entity: group,
+//					isGroup: true
+//				});
+//			});
+//			
+//			var response = {
+//				argument: {callback: callback, node: node, scope: scope},
+//				responseData:result
+//			};
+//			
+//			this.loading = false;
+//			this.handleResponse(response);
+//		}, this)
+//		
+//		
+//	},
 	
 	requestEntityData : function(node, callback, scope){
 
@@ -76,23 +77,18 @@ go.modules.community.pages.PagesTreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 		
 		this.result = this.getItemList(this.entityStore.entity.name + "/query", params, function (getItemListResponse) {
 			this.entityStore.get(getItemListResponse.ids, function (items) {
-				var result = [{
-						leaf: true,
-						iconCls: "ic-star",
-						text: t("All contacts"),
-						id: "all"
-				}];
+				var result = [];
 				
 				items.forEach(function(entity) {
 					result.push({
-						id: "addressbook-" + entity.id,
+						id: "page-" + entity.id,
 						entityId: entity.id||null,
 						entity: entity,
-						isAddressBook: true,
-						expanded: entity.groups.length == 0,						
-						text: entity.name,
+						isPage: true,
+//						expanded: entity.groups.length == 0,						
+						text: entity.pageName,
 						nodeType: 'async',
-						children: entity.groups.length == 0 ? [] : null
+//						children: entity.groups.length == 0 ? [] : null
 					});
 				});
 				

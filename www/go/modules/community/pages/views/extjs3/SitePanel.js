@@ -11,6 +11,7 @@ go.modules.community.pages.SitePanel = Ext.extend(go.panels.ModulePanel, {
 		    region:"west",
 		    width:dp(250),
 		    currentSiteId: this.siteId
+		    // add event listener to change the currently shown page, or pass a callback.
 		});
 		
                 this.items = [
@@ -40,6 +41,7 @@ go.modules.community.pages.SitePanel = Ext.extend(go.panels.ModulePanel, {
 
 
                 go.modules.community.pages.SitePanel.superclass.initComponent.call(this);
+		//add events here
 
                 
         },

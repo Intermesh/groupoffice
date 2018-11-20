@@ -9,6 +9,8 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel,{
 	this.items = [
 	this.siteTree = new go.modules.community.pages.SiteTree({
 	    itemId: 'siteTree'
+	    //pass along a cb or event handler for changing page content
+	    
 	}),
 	this.siteTreeEdit = new go.modules.community.pages.SiteTreeEdit({
 	    itemId: 'siteTreeEdit'
