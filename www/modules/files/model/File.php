@@ -249,7 +249,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 		}
 		if ($enoughQuota && \GO::config()->quota > 0) {
 			$currentQuota = \GO::config()->get_setting('file_storage_usage');
-			$enoughQuota = $currentQuota + $newBytes <= \GO::config()->quota;
+			$enoughQuota = $currentQuota + $newBytes <= (\GO::config()->quota * 1024);
 		}
 		
 		return $enoughQuota;
