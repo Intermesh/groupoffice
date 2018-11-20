@@ -1,3 +1,8 @@
+- Core: Fix in ExtJS for new browser spec where FormElement.action would no longer be empty
+- Holidays: Fix for creating an empty workweek when none exists yet
+- Email: New base64 encoding function for unicode ascii character in mail folder names
+- Core: Added support for icon style in MenuItems with property iconStyle: cssProps
+- VCard: Fix import of phone number without a type are within a vcard group
 - Core: Numberfield broken when loaded before render
 - Tickets: First message content was not set on ticket when importing from imap 
   making {MESSAGE} unavailable in templates
