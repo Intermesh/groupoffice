@@ -48,6 +48,7 @@ go.modules.community.pages.PageDialog = Ext.extend(go.form.Dialog, {
 	
 	submit: function(){
 	    //todo: check if form has dirty fields.
+	    //bij het opslaan alle h1 en h2 tags doorlopen en voor elk een id toevoegen.
 	    go.modules.community.pages.PageDialog.superclass.submit.call(this);
 	}
 });
