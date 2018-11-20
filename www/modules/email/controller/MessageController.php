@@ -1143,7 +1143,7 @@ class MessageController extends \GO\Base\Controller\AbstractController {
 		
 		if(!isset($params['alias_id']))
 			$params['alias_id']=0;
-
+		
 		$recipients = new \GO\Base\Mail\EmailRecipients();
 		$recipients->mergeWith($message->cc)->mergeWith($message->to);
 		
@@ -1244,6 +1244,27 @@ class MessageController extends \GO\Base\Controller\AbstractController {
 			$response['data']['subject'] = 'Re: ' . $message->subject;
 		} else {
 			$response['data']['subject'] = $message->subject;
+		}
+		
+		if(isset($params['includeAttachments'])){
+			// Include attachments
+
+			if($message instanceof \GO\Email\Model\ImapMessage){
+				//saved messages always create temp files
+				$message->createTempFilesForAttachments();
+			}
+
+			$oldMessage = $message->toOutputArray($html,false,true);
+
+			// Fix for array_merge functions on lines below when the $response['data']['inlineAttachments'] and $response['data']['attachments'] do not exist
+			if(empty($response['data']['inlineAttachments']))
+				$response['data']['inlineAttachments'] = array();
+
+			if(empty($response['data']['attachments']))
+				$response['data']['attachments'] = array();
+
+			$response['data']['inlineAttachments'] = array_merge($response['data']['inlineAttachments'], $oldMessage['inlineAttachments']);
+			$response['data']['attachments'] = array_merge($response['data']['attachments'], $oldMessage['attachments']);
 		}
 
 		if(empty($params['keepHeaders'])){

@@ -1068,6 +1068,10 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 					params.addEmailAsAttachmentList = Ext.encode(config.addEmailAsAttachmentList);
 				}
 				
+				if(config.includeAttachments){
+					params.includeAttachments = config.includeAttachments;
+				}
+				
 				var url;
 				
 				if(!config.task)
