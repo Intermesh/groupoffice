@@ -83,6 +83,14 @@ class Page extends AclItemEntity {
 		return parent::defineMapping()
 						->addTable("pages_page");
 	}
+	public static function filter(\go\core\db\Query $query, array $filter) {
+		if (isset($filter['siteId'])) {
+			$query->andWhere('siteId', '=', $filter['siteId']);
+		}
+		
+		return parent::filter($query, $filter);
+	}
+	
 	protected static function aclEntityClass() {
 		return Site::class;
 	}

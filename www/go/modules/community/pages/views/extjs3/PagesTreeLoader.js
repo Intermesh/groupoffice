@@ -5,7 +5,6 @@ go.modules.community.pages.PagesTreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 	loading : false,
 	
 	load: function (node, callback, scope) {
-	    console.log("load");
 		if (this.clearOnLoad) {
 			while (node.firstChild) {
 				node.removeChild(node.firstChild);
@@ -19,12 +18,13 @@ go.modules.community.pages.PagesTreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 			
 			this.loading = true;
 			
-//			if(node.attributes.isAddressBook) {
+			if(node.attributes.isPage) {
 //				 this.requestGroups(node, callback, scope || node);
-//			} else
-//			{
+			callback.call();
+			} else
+			{
 				this.requestEntityData(node, callback, scope || node);
-//			}
+			}
 		}
 	},
 	
@@ -137,5 +137,6 @@ go.modules.community.pages.PagesTreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 		return(attr.leaf ?
 						new Ext.tree.TreeNode(attr) :
 						new Ext.tree.AsyncTreeNode(attr));
-	}
+	},
+	
 });

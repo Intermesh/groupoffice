@@ -4,12 +4,31 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel,{
     buttonAlign: 'left',
     currentSiteId: '',
     split: true,
-//    autoScroll: true,
+    autoScroll: true,
     initComponent : function() {
 	this.items = [
 	this.siteTree = new go.modules.community.pages.SiteTree({
-	    itemId: 'siteTree'
+	    itemId: 'siteTree',
+	    loader: new go.modules.community.pages.PagesTreeLoader({
+		baseAttrs: {
+			//iconCls: 'ic-web-asset'
+			iconCls: 'ic-remove'
+		},
+		entityStore: go.Stores.get("Page"),
+		currentSiteId: this.currentSiteId,
+		getParams : function(node) {
+		var filter = {
+		    isDirectory:true
+		};
+		    filter.siteId = this.currentSiteId;
+		return {
+		    filter:filter
+		};
+		},
+	    }),
+	
 	    //pass along a cb or event handler for changing page content
+	    //make sure to update the siteId filter when changing pages!
 	    
 	}),
 	this.siteTreeEdit = new go.modules.community.pages.SiteTreeEdit({
@@ -51,9 +70,12 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel,{
 		    scope:this
 		 }]
 	});
-
-	
-
+	this.siteTree.getLoader().entityStore.on('changes', function(){
+	    if(!this.siteTree.getLoader().loading){
+	    this.siteTree.getRootNode().reload();
+	    }
+	},this);
+	    
 	go.modules.community.pages.SiteTreePanel.superclass.initComponent.call(this);
     },
     changePanel: function(panel){

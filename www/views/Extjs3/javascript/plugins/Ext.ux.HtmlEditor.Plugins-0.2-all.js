@@ -72,7 +72,7 @@ Ext.ux.form.HtmlEditor.MidasCommand = Ext.extend(Ext.util.Observable, {
 	    if(b.isExpanded()){
 		b.collapse();
 	    }
-	    console.log(b.getRawValue());
+	    //console.log(b.getRawValue());
 	});
 	
 	this.onEditorEvent();
