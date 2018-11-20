@@ -1,3 +1,4 @@
+- Calculate mailbox usage. Fallback on du is dovecot fails
 - Tasks: fix recurring task when setting the date for the followup when marked completed
 - Calendar: Fixed inconsistent events when adding new participants later
 - Calendar: Only update participant status when importing icalendar replies
