@@ -13,6 +13,9 @@
  * @author Wilmar van Beusekom <wilmar@intermesh.nl>
  */
 
+namespace GO\Addressbook\Model;
+use Sabre;
+
 /**
  * @property String $photo Full path to photo
  * @property String $photoURL URL to photo
@@ -69,11 +72,6 @@
  * @property int $last_email_time
  * @property string $color
  */
-
-namespace GO\Addressbook\Model;
-use Sabre;
-
-
 class Contact extends \GO\Base\Db\ActiveRecord {
 		
 	/**
@@ -707,8 +705,7 @@ class Contact extends \GO\Base\Db\ActiveRecord {
 //					$attributes['title'] = $vobjProp->getValue() ? $vobjProp->getValue() : null;
 //					break;
 				case 'TEL':
-					
-					
+
 					
 					if($vobjProp->getValue()){
 						$types = array();
@@ -736,6 +733,21 @@ class Contact extends \GO\Base\Db\ActiveRecord {
 						}
 						if(in_array('home',$types) && ( in_array('voice',$types) || count($types)==1 || in_array('pref',$types)) )
 							$attributes['home_phone'] = $vobjProp->getValue();
+						
+						
+						if(empty($types) || in_array('pref',$types)) {
+							// TODO: if $types unknown add phone number to field in priority order or by X-ABLabel
+							//$label = $vobject->{$vobjProp->group . 'X-ABLABEL'};
+	
+							$phoneFields = ['cellular','home_phone','cellular2','work_phone','fax','work_fax'];
+							foreach($phoneFields as $field) {
+								if(!isset($attributes[$field])) {
+									$attributes[$field] = $vobjProp->getValue();
+									break;
+								}
+							}
+						}
+						
 					}
 //					foreach ($vobjProp->parameters as $param) {
 //						if ($param['name']=='TYPE') {
