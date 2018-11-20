@@ -1,3 +1,5 @@
+- Email: Added includeAttachments parameter to the reply action in the email message controller.
+				 This will include the attachments of the original mail in the reply.
 - Calculate mailbox usage. Fallback on du is dovecot fails
 - Email: make SMIME signing possible for shared mail accounts
 - Tasks: fix recurring task when setting the date for the followup when marked completed
