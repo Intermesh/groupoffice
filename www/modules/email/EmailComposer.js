@@ -1237,9 +1237,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		if(this.selectLinkField){
 			this.replaceTemplateLinkTag();
 		}
-		
-		console.log(config);
-		
+
 		if (config['delegated_cc_enabled']) {
 				
 				GO.request({
