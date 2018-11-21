@@ -1,4 +1,19 @@
-16-11-2018 6.3.51
+- Webdav: Added an ignore for Microsoft Office lock files
+
+20-11-2018 6.3.53
+- Core: Number conversion error on some systems
+- Core: Fix in ExtJS for new browser spec where FormElement.action would no longer be empty
+- Holidays: Fix for creating an empty workweek when none exists yet
+- Email: New base64 encoding function for unicode ascii character in mail folder names
+- Core: Added support for icon style in MenuItems with property iconStyle: cssProps
+- VCard: Fix import of phone number without a type are within a vcard group
+- Core: Numberfield broken when loaded before render
+- Tickets: First message content was not set on ticket when importing from imap 
+  making {MESSAGE} unavailable in templates
+- Files: Recent file didn't show files from folders without ACL id
+- Files: Fixed shares folder with complex sharing structures
+
+16-11-2018 6.3.52
 - Core: Check if createdBy or modifiedBy is set in detail panel to avoid crash
 - Core: Delete contact didn't work
 

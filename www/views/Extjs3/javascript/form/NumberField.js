@@ -99,13 +99,13 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 	},	
 	
 	setValue : function(v) {
-		if(!this.serverFormats) {		
-			
-			v *= this.multiplier;
-			v = GO.util.numberFormat(v, this.decimals);
-		} 
+		GO.form.NumberField.superclass.setValue.call(this, v);
 		
-		return GO.form.NumberField.superclass.setValue.call(this, v);
+		if(!this.serverFormats) {			
+			v = v * this.multiplier;
+			formatted = GO.util.numberFormat(v, this.decimals);
+			this.setRawValue(formatted);
+		}
 	},
 	
 	/**
