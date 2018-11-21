@@ -1,3 +1,5 @@
+- Webdav: Added an ignore for Microsoft Office lock files
+
 20-11-2018 6.3.53
 - Core: Number conversion error on some systems
 - Core: Fix in ExtJS for new browser spec where FormElement.action would no longer be empty
