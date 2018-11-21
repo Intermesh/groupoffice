@@ -13,6 +13,11 @@ use go\core\orm\Property;
 
 class Url extends Property {
 	
+	const TYPE_HOMEPAGE = "homepage";
+	const TYPE_TWITTER = "twitter";
+	const TYPE_FACEBOOK = "facebook";
+	const TYPE_LINKEDIN = "linkedin";
+	
 	/**
 	 * 
 	 * @var int

@@ -58,14 +58,15 @@ GO.form.SelectCountry = function(config){
 		displayField: 'name',
 		triggerAction: 'all',
 		editable: true,
-		mode:'local',
-		selectOnFocus:true,
-		forceSelection: true,
+		mode:'local',		
 		emptyText: t("No country selected")
 	});
 
 }
  
-Ext.extend(GO.form.SelectCountry, Ext.form.ComboBox);
+Ext.extend(GO.form.SelectCountry, Ext.form.ComboBox, {
+	selectOnFocus:true,
+	forceSelection: true
+});
 
 Ext.reg("selectcountry", GO.form.SelectCountry);

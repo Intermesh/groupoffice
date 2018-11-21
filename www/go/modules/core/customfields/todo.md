@@ -1,21 +1,71 @@
 For old framework:
 
 advanced search
-cascade delete
-blocks module
+cascade delete custom fields
+
 logging in activerecord
 duplicate
 mergeWith
 Search Cache
-Export
-Disabled categories for: ticket type, project template, calendar resource groups, folder dialog
+Export contacts VCF, CSV
+Disabled categories for: ticket type, calendar resource groups, folder dialog
 modules/projects2/views/Extjs3/AddressbookOverrides.js
+FilesModule::afterBatchEditStore
+Folder:: deriveCustomfieldSettings
 
 Refactor e-mail and document templates
 
+
+Contact -> Email compose vanuit dropdown
+
 For new:
 
-Search Cache
+	Search Cache custom fields
+	Attachments in notes
+
+	calendar birthdays
+	demodata
+	carddav
+	zpush
+	site / defaultsite
+	ticket groups
+	templates for project contracts (See income model)
+
+
+Custom field update / install queries for modules
+Migration of templates, custom fields and address book
+
+
+Affected customer modules:
+favorites (greifswald)
+  blocks module
+	bestgroen
+	relations
+	AMD
+	calendarcompany
+	comments report (Houtwerf?)
+	disableformfields (Elite)
+	efront
+	elite
+	employee gallery
+	exactonline (dg)
+	fivehundredwords
+	forms ?
+	kassanova
+	maranga
+	nuwbackup
+	nuwleadreport
+	orderplanning (weap)
+	radius search (nltechniek)
+	reservations
+	sendletter
+	unit4export
+	voip
+	werkplaatsplanning (WEAP)
+	xero
+
+
+
 
 
 

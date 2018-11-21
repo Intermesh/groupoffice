@@ -215,8 +215,6 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 			$response['data']['musername'] = $model->mUser->name;
 		$response['data']['locked_user_name']=$model->lockedByUser ? $model->lockedByUser->name : '';
 		
-		if (\GO::modules()->customfields)
-			$response['customfields'] = \GO\Customfields\Controller\CategoryController::getEnabledCategoryData("GO\Files\Model\File", $model->folder_id);
 		
 		
 		$fh = \GO\Files\Model\FileHandler::model()->findByPk(

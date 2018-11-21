@@ -1090,33 +1090,10 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		
 		$entity = $cls::findById($params['id']);
 		
-		if(empty($entity->filesFolderId)) {
-			$filesPath = $entityType->getModule()->name. '/'. $entityType->getName() . '/' . $entity->id;
-			$aclId =$entity->findAclId();
-			$folder = \GO\Files\Model\Folder::model()->findByPath($filesPath,true, array('acl_id'=>$aclId,'readonly'=>1));
-
-			if(!$folder){
-				throw new \Exception("Failed to create folder ".$filesPath);
-			}
-	//      if (!empty($model->acl_id))
-	//          $folder->acl_id = $model->acl_id;
-
-			$folder->acl_id=$aclId;
-
-			$folder->visible = 0;
-			$folder->readonly = 1;
-			$folder->systemSave = true;
-			$folder->save(true);
-
-			$entity->filesFolderId = $folder->id;
-			if(!$entity->save()) {
-				throw new \Exception("Could not save entity!");
-			}
-		}
-		
+		$folder = \GO\Files\Model\Folder::model()->findForEntity($entity);
 		return [
 				"success" => true,
-				"files_folder_id" => $entity->filesFolderId
+				"files_folder_id" => $folder->id
 		];
 	}
 

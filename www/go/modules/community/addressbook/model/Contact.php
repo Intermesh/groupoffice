@@ -378,6 +378,16 @@ class Contact extends AclItemEntity {
 	}
 	
 	
+	/**
+	 * Find URL by type
+	 * 
+	 * @param string $type
+	 * @param boolean $returnAny
+	 * @return EmailAddress|boolean
+	 */
+	public function findUrlByType($type, $returnAny = true) {
+		return $this->findPropByType("urls", $type, $returnAny);
+	}
 
 	
 	/**
