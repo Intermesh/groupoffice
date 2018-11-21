@@ -3,7 +3,7 @@
 namespace go\modules\core\customfields\model;
 
 use go\core\acl\model\AclOwnerEntity;
-use go\core\db\Query;
+use go\core\orm\Query;
 
 class FieldSet extends AclOwnerEntity {
 /**

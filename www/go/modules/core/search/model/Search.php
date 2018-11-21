@@ -3,7 +3,7 @@
 namespace go\modules\core\search\model;
 
 use go\core\acl\model\Acl;
-use go\core\db\Query;
+use go\core\orm\Query;
 use go\core\orm\Entity;
 use go\core\orm\EntityType;
 use go\core\util\DateTime;

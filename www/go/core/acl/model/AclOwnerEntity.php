@@ -4,7 +4,7 @@ namespace go\core\acl\model;
 use go\core\acl\model\Acl;
 use go\core\acl\model\AclGroup;
 use go\core\App;
-use go\core\db\Query;
+use go\core\orm\Query;
 use go\core\jmap\Entity;
 use go\core\orm\Mapping;
 

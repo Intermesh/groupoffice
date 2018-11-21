@@ -5,7 +5,7 @@ namespace go\modules\core\customfields\model;
 use Exception;
 use GO;
 use go\core\acl\model\AclItemEntity;
-use go\core\db\Query;
+use go\core\orm\Query;
 use go\core\db\Table;
 use go\core\db\Utils;
 use go\core\ErrorHandler;

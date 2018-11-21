@@ -6,7 +6,7 @@ use GO\Base\Db\ActiveRecord;
 use go\core\acl\model\Acl;
 use go\core\App;
 use go\core\db\Criteria;
-use go\core\db\Query;
+use go\core\orm\Query;
 use go\core\jmap\Entity;
 use go\core\orm\Entity as Entity2;
 use go\core\orm\EntityType;

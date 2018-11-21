@@ -7,7 +7,7 @@ use go\core\App;
 use go\core\data\Model;
 use go\core\db\Column;
 use go\core\db\Criteria;
-use go\core\db\Query;
+use go\core\orm\Query;
 use go\core\event\EventEmitterTrait;
 use go\core\fs\Blob;
 use go\core\util\DateTime;
@@ -381,7 +381,8 @@ abstract class Property extends Model {
 
 		$query = (new Query())
 						->from($tables[$mainTableName]->getName(), $tables[$mainTableName]->getAlias())
-						->fetchMode(PDO::FETCH_CLASS, static::class, [false, $fetchProperties]);
+						->fetchMode(PDO::FETCH_CLASS, static::class, [false, $fetchProperties])
+						->setModel(static::class);
 
 		self::joinAdditionalTables($tables, $query);
 		self::buildSelect($query, $fetchProperties);

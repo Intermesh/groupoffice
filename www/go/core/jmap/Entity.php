@@ -2,7 +2,7 @@
 
 namespace go\core\jmap;
 
-use go\core\db\Query;
+use go\core\orm\Query;
 use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\orm\Entity as OrmEntity;
 use PDO;

@@ -5,7 +5,7 @@ use go\core\App;
 use go\modules\core\groups\model\Group;
 use go\modules\core\users\model\User;
 use go\core\db\Criteria;
-use go\core\db\Query;
+use go\core\orm\Query;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\util\DateTime;

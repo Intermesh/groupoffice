@@ -1,7 +1,7 @@
 <?php
 namespace go\modules\community\test\model;
 
-use go\core\db\Query;
+use go\core\orm\Query;
 
 
 /**

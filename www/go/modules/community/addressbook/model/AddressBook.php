@@ -56,7 +56,7 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 						
 	}
 	
-	public static function filter(\go\core\db\Query $query, array $filter) {
+	public static function filter(\go\core\orm\Query $query, array $filter) {
 		if(!empty($filter['q'])) {
 			$query->andWhere("name", "LIKE", $filter['q'] . "%");			
 		}

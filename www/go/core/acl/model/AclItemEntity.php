@@ -3,7 +3,7 @@
 namespace go\core\acl\model;
 
 use go\core\acl\model\Acl;
-use go\core\db\Query;
+use go\core\orm\Query;
 use go\core\jmap\EntityController;
 use go\core\jmap\Entity;
 
@@ -38,6 +38,8 @@ abstract class AclItemEntity extends AclEntity {
 	 * 
 	 * @param Query $query
 	 * @param int $level
+	 * @param int $userId Defaults to current user ID
+	 * @return Query
 	 */
 	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null) {
 

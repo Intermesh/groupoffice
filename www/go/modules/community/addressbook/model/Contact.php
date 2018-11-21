@@ -2,7 +2,7 @@
 namespace go\modules\community\addressbook\model;
 
 use go\core\acl\model\AclItemEntity;
-use go\core\db\Query;
+use go\core\orm\Query;
 use go\core\orm\CustomFieldsTrait;
 use go\core\orm\SearchableTrait;
 use go\core\validate\ErrorCode;

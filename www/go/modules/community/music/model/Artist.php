@@ -77,7 +77,7 @@ class Artist extends Entity {
 	 * @param array $filter key value array eg. ["q" => "foo"]
 	 * @return Query
 	 */
-	public static function filter(\go\core\db\Query $query, array $filter) {
+	public static function filter(\go\core\orm\Query $query, array $filter) {
 		
 		//Handle quick search filter parameter
 		if(isset($filter['q'])) {

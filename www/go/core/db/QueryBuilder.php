@@ -465,17 +465,20 @@ class QueryBuilder {
 		if (is_string($token)) {
 			return $token;
 		} else {
-			switch (get_class($token)) {
-				case Expression::class:
-					return (string) $token;
-
-				case Query::class:
-					return $this->buildSubQuery($token, $prefix);
-
-				case Criteria::class:
-					$this->buildBindParameters = array_merge($this->buildBindParameters, $token->getBindParameters());
-					return "(\n" . $prefix . "\t" . $this->buildWhere($token->getWhere(), $prefix . "\t") . $prefix . "\n)";
+			if($token instanceof Expression) {
+				return (string) $token;
 			}
+			
+			if($token instanceof Query) {
+				return $this->buildSubQuery($token, $prefix);
+			}
+			
+			if($token instanceof Criteria) {
+				$this->buildBindParameters = array_merge($this->buildBindParameters, $token->getBindParameters());
+				return "(\n" . $prefix . "\t" . $this->buildWhere($token->getWhere(), $prefix . "\t") . $prefix . "\n)";
+			}
+			
+			throw new \Exception("Invalid token?");
 		}
 	}
 

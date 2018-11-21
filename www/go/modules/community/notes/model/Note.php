@@ -3,7 +3,7 @@ namespace go\modules\community\notes\model;
 
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
-use go\core\db\Query;
+use go\core\orm\Query;
 use go\core\orm\CustomFieldsTrait;
 use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;

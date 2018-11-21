@@ -157,7 +157,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 
 		return $this;
 	}
-
+	
 	/**
 	 * Select a single column or count(*) for example.
 	 * 

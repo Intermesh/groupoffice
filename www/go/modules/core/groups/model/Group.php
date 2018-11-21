@@ -4,7 +4,7 @@ namespace go\modules\core\groups\model;
 
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
-use go\core\db\Query;
+use go\core\orm\Query;
 use go\core\validate\ErrorCode;
 use go\modules\core\users\model\UserGroup;
 
