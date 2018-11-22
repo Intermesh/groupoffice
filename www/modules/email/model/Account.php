@@ -576,19 +576,17 @@ class Account extends \GO\Base\Db\ActiveRecord {
 
 	public function getDefaultTemplate() {
 //		if (\GO::modules()->addressbook) {
-//			$defaultAccountTemplateModel = \GO\Addressbook\Model\DefaultTemplateForAccount::model()->findByPk($this->id);
-//			if (!$defaultAccountTemplateModel) {
-//				$defaultUserTemplateModel = \GO\Addressbook\Model\DefaultTemplate::model()->findByPk(\GO::user()->id);
-//				if (!$defaultUserTemplateModel)
-//					return false;
-//				else
-//					return $defaultUserTemplateModel;
-//			} else {
-//				return $defaultAccountTemplateModel;
-//			}
-//		} else {
-			return false;
-//		}
+			$defaultAccountTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($this->id);
+			if (!$defaultAccountTemplateModel) {
+				$defaultUserTemplateModel = \GO\Email\Model\DefaultTemplate::model()->findByPk(\GO::user()->id);
+				if (!$defaultUserTemplateModel)
+					return false;
+				else
+					return $defaultUserTemplateModel;
+			} else {
+				return $defaultAccountTemplateModel;
+			}
+
 	}
 	
 }

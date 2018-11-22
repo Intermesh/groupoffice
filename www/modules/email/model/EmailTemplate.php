@@ -45,7 +45,7 @@ class EmailTemplate extends AclOwnerEntity {
 		}
 	}
 	
-	public static function filter(\go\core\db\Query $query, array $filter) {
+	public static function filter(\go\core\orm\Query $query, array $filter) {
 		
 		if(array_key_exists('ownedBy', $filter)) {
 			$query->where('ownedBy','=', $filter['ownedBy']);

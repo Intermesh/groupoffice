@@ -52,6 +52,19 @@ class AliasController extends \GO\Base\Controller\AbstractModelController {
 		
 		unset($record['signature']);
 		
+		$defaultAccountTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($model->account_id);
+			if($defaultAccountTemplateModel){
+				$record['template_id']=$defaultAccountTemplateModel->template_id;
+			}else{
+				$defaultUserTemplateModel = \GO\Email\Model\DefaultTemplate::model()->findByPk(\GO::user()->id);
+				if(!$defaultUserTemplateModel){
+					$defaultUserTemplateModel= new \GO\Email\Model\DefaultTemplateForAccount();
+					$defaultUserTemplateModel->account_id = $model->account_id;
+					$defaultUserTemplateModel->save();
+				}
+				$record['template_id']=$defaultUserTemplateModel->template_id;
+			}
+		
 
 		return parent::formatStoreRecord($record, $model, $store);
 	}

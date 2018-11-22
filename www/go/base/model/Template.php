@@ -31,10 +31,10 @@
  */
 
 
-namespace GO\Base\Template;
+namespace GO\Base\Model;
 
 
-class Parser{
+class Template extends \GO\Base\Db\ActiveRecord{
 	
 	const TYPE_EMAIL=0;
 	
@@ -50,21 +50,35 @@ class Parser{
 	
 	public $attributesFormat = 'formatted';
 	
+		/**
+	 * Returns a static model of itself
+	 * 
+	 * @param String $className
+	 * @return Template 
+	 */
+	public static function model($className=__CLASS__)
+	{	
+		return parent::model($className);
+	}
 	
-	public function __construct() {
-
+	// TODO : move language from mailings module to addressbook module
+	protected function getLocalizedName() {
+		return \GO::t("template", "addressbook");
+	}
+	
+	protected function init() {
+		$this->columns['content']['required']=true;
 		
-//		$this->addDefaultTag('contact:salutation', \GO::t('default_salutation_unknown'));
-		$this->addDefaultTag('salutation', \GO::t('default_salutation_unknown'));
+//		$this->addDefaultTag('contact:salutation', \GO::t("Dear Mr / Ms"));
+		$this->addDefaultTag('salutation', \GO::t("Dear Mr / Ms"));
 		$this->addDefaultTag('date', \GO\Base\Util\Date::get_timestamp(time(), false));
 		
-		
+		return parent::init();
 	}
 	
-	public static function model() {
-		return new self();
+	protected function getPermissionLevelForNewModel() {
+		return \GO\Base\Model\Acl::MANAGE_PERMISSION;
 	}
-
 	
 	/**
 	 * Add a default tag value.
@@ -81,7 +95,13 @@ class Parser{
 	}
 	
 	
-
+	public function aclField(){
+		return 'acl_id';	
+	}
+	
+	public function tableName(){
+		return 'ab_email_templates';
+	}
 	
 	private function _addTagPrefixAndRemoveEmptyValues($attributes, $tagPrefix){
 		if(!empty($tagPrefix)){
@@ -94,50 +114,146 @@ class Parser{
 		return $attributes;
 	}
 	
+	
+	private function getCompanyAttributes(\go\modules\community\addressbook\model\Contact $company){
+		$attributes['company:salutation'] = GO()->t("Dear sir/madam");
+		
+		$attributes['company:crn'] = $company->registrationNumber;
+		$attributes['company:vat_no'] = $company->vatNo;
+		$attributes['company:iban'] = $company->IBAN;
+		$attributes['company:homepage'] = $company->findUrlByType(\go\modules\community\addressbook\model\Url::TYPE_HOMEPAGE, false)->url ?? "";
+		
+		
+			$a = $company->findAddressByType(\go\modules\community\addressbook\model\Address::TYPE_VISIT, true);
+			if($a) {				
+				$attributes['company:address'] = $a->street;
+				$attributes['company:address_no'] = $a->street2;
+				$attributes['company:zip'] = $a->zipCode;
+				$attributes['company:country'] = $a->country;
+				$attributes['company:state'] = $a->state;
+				
+				$attributes['company:formatted_address'] = $a->getFormatted();
+			}
+			
+			$a = $company->findAddressByType(\go\modules\community\addressbook\model\Address::TYPE_VISIT, true);
+			if($a) {				
+				$attributes['company:post_address'] = $a->street;
+				$attributes['company:post_address_no'] = $a->street2;
+				$attributes['company:post_zip'] = $a->zipCode;
+				$attributes['company:post_country'] = $a->country;
+				$attributes['company:post_state'] = $a->state;
+				
+				$attributes['company:formatted_post_address'] = $a->getFormatted();
+			}
+
+			$attributes['company:email'] = $company->emailAddresses[0] ?? "";
+			$attributes['company:invoice_email'] = $company->findEmailByType(\go\modules\community\addressbook\model\EmailAddress::TYPE_BILLING, true);
+			
+			foreach($company->phoneNumbers as $p) {
+				switch($p->type) {
+					
+					case \go\modules\community\addressbook\model\PhoneNumber::TYPE_FAX:
+						$attributes['company:fax'] = $p->number;
+					break;
+				
+					default:
+						$attributes['company:phone'] = $p->number;
+					break;
+
+				}
+			}
+			return $attributes;
+	} 
+	
+	private function getContactAttributes($contact){
+		$attributes['contact:salutation'] = GO()->t("Dear")." ".$contact->firstName;
+		$attributes['contact:sirmadam']=$contact->gender=="M" ? \GO::t('sir') : \GO::t('madam');
+		
+		$attributes['contact:fist_name'] = $contact->firstName;
+		$attributes['contact:middle_name'] = $contact->middleName;
+		$attributes['contact:last_name'] = $contact->lastName;
+
+			//$attributes = array_merge($attributes, $this->_getModelAttributes($contact, 'contact:'));
+
+			// By default this was replaced just by M or F but now it will be replaced by the whole text Male or Female.
+			$attributes['contact:sex']=$contact->gender == "M" ? \GO::t('male','addressbook') : \GO::t('female','addressbook');
+
+			if(isset($contact->addresses[0])) {
+				$a = $contact->addresses[0];
+
+				$attributes['contact:address'] = $a->street;
+				$attributes['contact:address_no'] = $a->street2;
+				$attributes['contact:zip'] = $a->zipCode;
+				$attributes['contact:country'] = $a->country;
+				$attributes['contact:state'] = $a->state;
+				$attributes['contact:formatted_address'] = $a->getFormatted();
+			}
+
+			$attributes['contact:email'] = $contact->emailAddresses[0] ?? "";
+			$attributes['contact:email2'] = $contact->emailAddresses[2] ?? "";
+			$attributes['contact:email3'] = $contact->emailAddresses[3] ?? "";
+
+			foreach($contact->phoneNumbers as $p) {
+				switch($p->type) {
+					case \go\modules\community\addressbook\model\PhoneNumber::TYPE_HOME:
+						$attributes['contact:home_phone'] = $p->number;
+					break;
+
+					case \go\modules\community\addressbook\model\PhoneNumber::TYPE_WORK:
+						$attributes['contact:work_phone'] = $p->number;
+					break;
+
+					case \go\modules\community\addressbook\model\PhoneNumber::TYPE_FAX:
+						$attributes['contact:fax'] = $p->number;
+					break;
+				}
+			}
+
+
+			$orgs = $contact->getOrganizationIds();
+			if(count($orgs) && ($company = \go\modules\community\addressbook\model\Contact::findById($orgs[0])))
+			{
+				$attributes = array_merge($attributes, $this->_getModelAttributes($company, 'company:'));
+			}
+			
+			return $attributes;
+	} 
+	
+	
+	
 	private function _getModelAttributes($model, $tagPrefix=''){
 		$attributes = $model instanceof \GO\Base\Db\ActiveRecord ? $model->getAttributes($this->attributesFormat) : $model->toArray();		
 		
-				
-		if(method_exists($model, 'getFormattedAddress')){
-			$attributes['formatted_address']=$model->getFormattedAddress();
-		}
-		
-		if(method_exists($model, 'getFormattedPostAddress')){
-			$attributes['formatted_post_address']=$model->getFormattedPostAddress();
-		}
-				
 		if(method_exists($model, "getCustomFields")){
 			$attributes = array_merge($attributes, $model->getCustomFields());
 			
 			
-			$attributes = array_filter($attributes, "is_scalar");
-		
-		$attributes = array_map(function($a) {
-			return $a instanceof \DateTime ? $a->format(GO()->getAuthState()->getUser()->getDateTimeFormat()) : $a;
-		}, $attributes);
-
 			
-//			// For multiselect fields, replace the | with a ,
-//			$cfCols = $model->customfieldsRecord->getColumns();
-//			
-//			foreach($cfCols as $cfColName => $cfCol){
-//				if(isset($cfCol['customfield'])){
-//					$cfType = $cfCol['customfield']->customfieldtype;
-//
-//					if($cfType instanceof \GO\Customfields\Customfieldtype\Select){
-//
-//						$isMultiSelect = $cfType->getField()->getAttribute('multiselect');
-//
-//						if($isMultiSelect && isset($attributes[$cfColName])){
-//							$attributes[$cfColName] = str_replace('|', ', ', $attributes[$cfColName]);
-//						}
-//					}
-//				}		
-//			}
+		
+			$attributes = array_map(function($a) {
+				return $a instanceof \DateTime ? $a->format(GO()->getAuthState()->getUser()->getDateTimeFormat()) : $a;
+			}, $attributes);
 		}
-
+		
 		$attributes = $this->_addTagPrefixAndRemoveEmptyValues($attributes, $tagPrefix);
-
+		
+		$cls = get_class($model);
+		
+		switch($cls) {
+			case \go\modules\community\addressbook\model\Contact::class:
+				if($model->isOrganization) {
+					$attributes = array_merge($attributes, $this->getCompanyAttributes($model));
+				} else
+				{
+					$attributes = array_merge($attributes, $this->getContactAttributes($model));
+				}
+				
+				break;			
+		}
+				
+		$attributes = array_filter($attributes, "is_scalar"); 
+		
+		
 		return $attributes;
 	}
 	
@@ -180,30 +296,8 @@ class Parser{
 	 * @param boolean $leaveEmptyTags Set to true if you don't want unreplaced tags to be cleaned up.
 	 * @return StringHelper 
 	 */
-	public function replaceContactTags($content, \go\modules\community\addressbook\model\Contact $contact, $leaveEmptyTags=false){
-		
-		
-		$attributes = $leaveEmptyTags ? array() : $this->_defaultTags;
-		
-//		if(!empty($contact->salutation))
-//			$attributes['salutation']=$contact->salutation;
-		
-		$attributes['contact:sirmadam']=$contact->gender=="M" ? \GO::t('sir') : \GO::t('madam');
-		
-		$attributes = array_merge($attributes, $this->_getModelAttributes($contact, 'contact:'));
-		
-		// By default this was replaced just by M or F but now it will be replaced by the whole text Male or Female.
-		$attributes['contact:sex']=$contact->gender == "M" ? \GO::t('male','addressbook') : \GO::t('female','addressbook');
-		
-		$orgs = $contact->getOrganizationIds();
-		if(count($orgs) && ($company = \go\modules\community\addressbook\model\Contact::findById($orgs[0])))
-		{
-			$attributes = array_merge($attributes, $this->_getModelAttributes($company, 'company:'));
-		}
-		
-		$attributes = array_merge($attributes, $this->_getUserAttributes());
-		
-		return $this->_parse($content, $attributes, $leaveEmptyTags);
+	public function replaceContactTags($content, \go\modules\community\addressbook\model\Contact $contact, $leaveEmptyTags=false){		
+		return $this->replaceModelTags($content, $contact, 'contact:', $leaveEmptyTags);
 	}
 	
 	
@@ -221,15 +315,15 @@ class Parser{
 	 * @return StringHelper 
 	 */
 	public function replaceModelTags($content, $model, $tagPrefix='', $leaveEmptyTags=false){
-		
-		
 		$attributes = $leaveEmptyTags ? array() : $this->_defaultTags;
 		
 		$attributes = array_merge($attributes, $this->_getModelAttributes($model, $tagPrefix));
 		
 		$attributes = array_merge($attributes, $this->_getUserAttributes());
 		
-		$content = $this->_replaceRelations($content, $model, $tagPrefix, $leaveEmptyTags);
+		if($model instanceof \GO\Base\Db\ActiveRecord) {
+			$content = $this->_replaceRelations($content, $model, $tagPrefix, $leaveEmptyTags);
+		}
 		
 		return $this->_parse($content, $attributes, $leaveEmptyTags);		
 	}
@@ -293,10 +387,11 @@ class Parser{
 	 * @return StringHelper 
 	 */
 	public function replaceUserTags($content, $leaveEmptyTags=false){
-		
 		$attributes = $leaveEmptyTags ? array() : $this->_defaultTags;
 		
 		$attributes = array_merge($attributes, $this->_getUserAttributes());
+		
+		//$attributes['contact:salutation']=\GO::t("Dear Mr / Ms");
 		
 		return $this->_parse($content, $attributes, $leaveEmptyTags);
 	}
