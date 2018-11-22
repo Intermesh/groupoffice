@@ -1515,35 +1515,36 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$useQL = GO::config()->allow_quicklink;
 		$response['allow_quicklink']=$useQL?1:0;
 
-		return $response;
+		
+		$contact = \go\modules\community\addressbook\model\Contact::findByEmail($response['sender'])->applyAcl()->single();
+		if(!empty($contact)){
+			$response['contact_thumb_url']= GO()->getAuthState()->getDownloadUrl($contact->photoBlobId);
 
-//		$contact = \GO\Addressbook\Model\Contact::model()->findSingleByEmail($response['sender']);
-//		if(!empty($contact)){
-//			$response['contact_thumb_url']=$contact->getPhotoThumbURL();
-//
-//			if($useQL){
-//				$response['sender_contact_id']=$contact->id;
-//				$response['contact_name']=$contact->name.' ('.$contact->addressbook->name.')';
-//
-//
-//				$company = $contact->company;
-//				if(!empty($company) && Acl::getUserPermissionLevel($company->addressbook->acl_id)>=Acl::WRITE_PERMISSION){
-//					$response['sender_company_id']=$company->id;
-//					$response['company_name']=$company->name.' ('.$company->addressbook->name.')';
-//				}
-//
-//				if(GO::modules()->savemailas){
-//					$contactLinkedMessage = \GO\Savemailas\Model\LinkedEmail::model()->findByImapMessage($imapMessage, $contact);
-//					$response['contact_linked_message_id']=$contactLinkedMessage && $contactLinkedMessage->linkExists($contact) ? $contactLinkedMessage->id : 0;
-//
-//					if(!empty($company)){
-//						$companyLinkedMessage = \GO\Savemailas\Model\LinkedEmail::model()->findByImapMessage($imapMessage, $company);
-//						$response['company_linked_message_id']=$companyLinkedMessage && $companyLinkedMessage->linkExists($company) ? $companyLinkedMessage->id : 0;
-//					}
-//				}
-//			}
-//		}
-//		return $response;
+			if($useQL){
+				$response['sender_contact_id']=$contact->id;
+				$response['contact_name']=$contact->name;
+
+				$orgIds = $contact->getOrganizationIds();
+				
+
+				$company = isset($orgIds[0]) ? \go\modules\community\addressbook\model\Contact::findById($orgIds[0]) : null;
+				if(!empty($company) && $company->getPermissionLevel() >= \go\core\acl\model\Acl::LEVEL_WRITE){
+					$response['sender_company_id']=$company->id;
+					$response['company_name']=$company->name;
+				}
+
+				if(GO::modules()->savemailas){
+					$contactLinkedMessage = \GO\Savemailas\Model\LinkedEmail::model()->findByImapMessage($imapMessage, $contact);
+					$response['contact_linked_message_id']=$contactLinkedMessage && $contactLinkedMessage->linkExists($contact) ? $contactLinkedMessage->id : 0;
+
+					if(!empty($company)){
+						$companyLinkedMessage = \GO\Savemailas\Model\LinkedEmail::model()->findByImapMessage($imapMessage, $company);
+						$response['company_linked_message_id']=$companyLinkedMessage && $companyLinkedMessage->linkExists($company) ? $companyLinkedMessage->id : 0;
+					}
+				}
+			}
+		}
+		return $response;
 	}
 
 	private function _checkXSS($params, $response) {

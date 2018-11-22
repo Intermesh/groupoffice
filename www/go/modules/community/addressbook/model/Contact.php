@@ -295,6 +295,12 @@ class Contact extends AclItemEntity {
 							->having('count(e.id) > 0');
 		}
 		
+		if(isset($filter['email'])) {
+			$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "INNER")
+							->where(['e.email' => $filter['email']]);
+							
+		}
+		
 		return parent::filter($query, $filter);
 	}
 	
