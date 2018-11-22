@@ -1,3 +1,4 @@
+- Core/Calendar/Tasks: Add recurrence fieldset to the core and apply to the calendar and task module.
 - Webdav: Added an ignore for Microsoft Office lock files
 
 20-11-2018 6.3.53
