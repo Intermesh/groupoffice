@@ -117,7 +117,7 @@ go.form.RecurrenceFieldset = Ext.extend(Ext.form.FieldSet, {
 
 		this.repeatEndDate = new Ext.form.DateField({
 			name : 'until',
-			width : 100,
+			width : 120,
 			disabled : true,
 			format : GO.settings['date_format'],
 			allowBlank : true,			
@@ -154,7 +154,7 @@ go.form.RecurrenceFieldset = Ext.extend(Ext.form.FieldSet, {
 		this.repeatUntilDateXCheckbox = new Ext.ux.form.XCheckbox({
 			boxLabel : t("Repeat until"),
 			name : 'repeat_UntilDate',
-			width : 'auto',
+			width: 100,
 			hideLabel : true,
 			listeners : {
 				check : {
@@ -178,6 +178,7 @@ go.form.RecurrenceFieldset = Ext.extend(Ext.form.FieldSet, {
 			name: 'count',
 			disabled : true,
 			maxLength: 1000,
+			width : 50,
 			allowBlank:false,
 			value: 1,
 			minValue: 1,
@@ -187,7 +188,7 @@ go.form.RecurrenceFieldset = Ext.extend(Ext.form.FieldSet, {
 		this.repeatCountXCheckbox = new Ext.ux.form.XCheckbox({
 			boxLabel : t("Repeat"),
 			name : 'repeat_count',
-			width : 'auto',
+			width: 100,
 			hideLabel : true,
 			listeners : {
 				check : {
