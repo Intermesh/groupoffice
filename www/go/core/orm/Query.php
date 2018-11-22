@@ -1,6 +1,8 @@
 <?php
 namespace go\core\orm;
 
+use Exception;
+use go\core\acl\model\Acl;
 use go\core\db\Query as DbQuery;
 
 class Query extends DbQuery {
@@ -30,7 +32,7 @@ class Query extends DbQuery {
 	 */
 	public function applyAcl($level = Acl::LEVEL_READ, $userId = null) {
 		if(!isset($this->model)) {
-			throw new \Exception("No model is set for this query");
+			throw new Exception("No model is set for this query");
 		}
 		
 		$cls = $this->model;

@@ -256,7 +256,7 @@ class Contact extends AclItemEntity {
 	 */
 	public static function findByEmail($email) {
 		return static::find()
-						->join("contact_email_address", "e", "e.contactId = c.id")
+						->join("addressbook_email_address", "e", "e.contactId = c.id")
 						->groupBy(['c.id'])
 						->where('e.email', '=', $email);
 	}
@@ -270,7 +270,7 @@ class Contact extends AclItemEntity {
 	 */
 	public static function findByPhone($email) {
 		return static::find()
-						->join("contact_email_address", "e", "e.contactId = c.id")
+						->join("addressbook_phone_number", "e", "e.contactId = c.id")
 						->groupBy(['c.id'])
 						->where('e.email', '=', $email);
 	}

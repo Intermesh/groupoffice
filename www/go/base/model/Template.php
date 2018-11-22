@@ -166,7 +166,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	} 
 	
 	private function getContactAttributes($contact){
-		$attributes['contact:salutation'] = GO()->t("Dear")." ".$contact->firstName;
+		$attributes['salutation'] = $attributes['contact:salutation'] = GO()->t("Hi")." ".$contact->firstName;
 		$attributes['contact:sirmadam']=$contact->gender=="M" ? \GO::t('sir') : \GO::t('madam');
 		
 		$attributes['contact:fist_name'] = $contact->firstName;

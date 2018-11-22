@@ -25,6 +25,7 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 	}
 	
 	protected function getStoreParams($params) {
+		$params['type'] = 0;
 		if(isset($params['type'])){
 			$findParams = \GO\Base\Db\FindParams::newInstance();
 			

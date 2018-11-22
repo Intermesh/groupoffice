@@ -13,10 +13,10 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 //				name:'emailSettings.sort_email_addresses_by_time'
 //			}),
 
-			this.templateCombo = new GO.email.TemplateCombo({
-				hiddenName: "emailSettings.defaultTemplateId",
-				fieldLabel: t("Default template")				
-			}),
+//			this.templateCombo = new GO.email.TemplateCombo({
+//				hiddenName: "emailSettings.defaultTemplateId",
+//				fieldLabel: t("Default template")				
+//			}),
 			this.useHtml = new Ext.form.Checkbox({
 				boxLabel:t("Use HTML markup", "email"),
 				hideLabel:true,				
@@ -62,9 +62,10 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 				forceSelection : true
 			})]
 			},
-			this.templateGrid = new GO.email.TemplateGrid({
-				ownedBy: null
-			})
+//			this.templateGrid = new GO.email.TemplateGrid({
+//				ownedBy: null
+//			}),
+			this.templatesGrid = new GO.email.TemplatesGrid()
 		];
 		
 		GO.email.SettingsPanel.superclass.initComponent.call(this);
