@@ -3,7 +3,7 @@
 namespace go\modules\core\search\controller;
 
 use go\core\acl\model\Acl;
-use go\core\db\Query;
+use go\core\orm\Query;
 use go\core\jmap\EntityController;
 use go\modules\community\addressbook\model\Contact;
 use go\modules\core\modules\model\Module;

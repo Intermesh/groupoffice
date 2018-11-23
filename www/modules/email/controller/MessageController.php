@@ -889,7 +889,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 					} else {
 						$email = \GO\Base\Util\StringHelper::get_email_from_string($params['to']);						
 						$contact = \go\modules\community\addressbook\model\Contact::find()
-										->filter(['email' => $email, 'permissionLevel' => \go\core\acl\model\Acl::READ_PERMISSION])
+										->filter(['email' => $email, 'permissionLevel' => \go\core\acl\model\Acl::LEVEL_READ])
 										->single();
 						
 						
@@ -1520,7 +1520,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$response['allow_quicklink']=$useQL?1:0;
 
 		
-		$contact = \go\modules\community\addressbook\model\Contact::findByEmail($response['sender'])->applyAcl()->single();
+		$contact = \go\modules\community\addressbook\model\Contact::find()->filter(['email' => $response['sender'], 'permissionLevel' => \go\core\acl\model\Acl::LEVEL_READ])->single();
 		if(!empty($contact)){
 			$response['contact_thumb_url']= GO()->getAuthState()->getDownloadUrl($contact->photoBlobId);
 
