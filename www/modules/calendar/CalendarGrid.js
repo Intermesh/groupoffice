@@ -193,7 +193,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 			var self = this;
 
 			var timeIndicatorTask = {
-				interval: 1000,
+				interval: 60000,
 				run: function(){
 					if (self.isVisible()) {
 						self._setTimeIndicator();
