@@ -10,7 +10,7 @@ return array (
   'Title' => 'Cím',
   'Manage announcements' => 'kezelése bejelentések',
   'Announcement' => 'Közlemény',
-  'Announcements' => 'Közlemények',
+  'Announcements' => 'Hirdetmények',
   'name' => 'Kezdőlap',
   'Start page' => 'Kezdőlap',
   'Select portlet' => 'Select portlet',
