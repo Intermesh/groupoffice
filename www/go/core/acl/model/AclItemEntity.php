@@ -67,15 +67,7 @@ abstract class AclItemEntity extends AclEntity {
 		}
 
 		$query->join($aclColumn->table->getName(), 'aclEntity', implode(' AND ', $keys));
-	}
-	
-	public static function filter(Query $query, array $filter) {
-		if(!empty($filter['permissionLevel'])) {
-			static::applyAclToQuery($query, $filter['permissionLevel']);
-		}
-		return parent::filter($query, $filter);
-	}
-	
+	}	
 	
 	/**
 	 * Get the entity that holds the acl id.

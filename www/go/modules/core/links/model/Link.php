@@ -231,10 +231,6 @@ class Link extends Entity {
 	
 	public static function filter(Query $query, array $filter) {
 		
-		if(!empty($filter['entityId']))	{
-			$query->where('fromId', '=', $filter['entityId']);
-		}
-
 		if(!empty($filter['entity']))	{
 			$query->where(['eFrom.name' => $filter['entity']]);		
 		}	
@@ -255,11 +251,40 @@ class Link extends Entity {
 			$query->where($sub);		
 		}		
 		
-		if(!empty($filter['q'])) {
-			$query->where('s.keywords', 'LIKE', '%' . $filter['q'] .'%');
-		}	
+	
 
 		return parent::filter($query, $filter);
+	}
+	
+	protected static function defineFilters() {
+		return parent::defineFilters()
+						->add('entityId', function (Query $query, $value, array $filter){
+							$query->where('fromId', '=', $value);
+						})
+						->add('entity', function (Query $query, $value, array $filter){
+							$query->where(['eFrom.name' => $value]);		
+						})
+						->add('entities', function (Query $query, $value, array $filter){
+							// Entity filter consist out of name => "Contact" and an optional "filter" => "isOrganization"
+							if(empty($value)) {
+								return;
+							}
+							
+							$sub = (new Criteria);
+
+							foreach($value as $e) {
+								$w = ['eTo.name' => $e['name']];
+								if(isset($e['filter'])) {
+									$w['filter'] = $e['filter'];
+								}
+
+								$sub->orWhere($w);
+							}
+
+							$query->where($sub);		
+							
+						});
+					
 	}
 	
 	protected static function searchColumns() {

@@ -433,16 +433,22 @@ class User extends Entity {
 		return ['username', 'displayName', 'email'];
 	}
 	
+	protected static function defineFilters() {
+		return parent::defineFilters()
+						->add('showDisabled', function (Query $query, $value, array $filter){							
+							if($value === false) {
+								$query->andWhere('enabled', '=', true);
+							}
+						})
+						->add('groupId', function (Query $query, $value, array $filter){
+							$query->join('core_user_group', 'ug', 'ug.userId = u.id')->andWhere(['ug.groupId' => $filter['groupId']]);
+						});
+	}
+	
 	public static function filter(Query $query, array $filter) {
-				
-		if(!isset($filter['showDisabled']) || $filter['showDisabled'] !== true) {
-			$query->andWhere('enabled', '=', 1);
+		if(!isset($filter['showDisabled'])) {
+			$filter['showDisabled'] = false;
 		}
-		
-		if(!empty($filter['groupId'])) {
-			$query->join('core_user_group', 'ug', 'ug.userId = u.id')->andWhere(['ug.groupId' => $filter['groupId']]);
-		}
-		
 		return parent::filter($query, $filter);
 	}
 

@@ -887,8 +887,12 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 					if (!empty($params['contact_id'])) {
 						$contact = \go\modules\community\addressbook\model\Contact::findById($params['contact_id']);
 					} else {
-						$email = \GO\Base\Util\StringHelper::get_email_from_string($params['to']);
-						$contact = \go\modules\community\addressbook\model\Contact::findByEmail($email)->applyAcl()->single();
+						$email = \GO\Base\Util\StringHelper::get_email_from_string($params['to']);						
+						$contact = \go\modules\community\addressbook\model\Contact::find()
+										->filter(['email' => $email, 'permissionLevel' => \go\core\acl\model\Acl::READ_PERMISSION])
+										->single();
+						
+						
 					}
 
 //					$company = false;

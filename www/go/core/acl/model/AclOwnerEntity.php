@@ -105,13 +105,6 @@ abstract class AclOwnerEntity extends AclEntity {
 		return $query;
 	}
 	
-	public static function filter(Query $query, array $filter) {
-		if(!empty($filter['permissionLevel'])) {
-			static::applyAclToQuery($query, $filter['permissionLevel']);
-		}
-		return parent::filter($query, $filter);
-	}
-	
 	/**
 	 * Finds all aclId's for this entity
 	 * 

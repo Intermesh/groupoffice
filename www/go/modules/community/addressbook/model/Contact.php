@@ -233,6 +233,7 @@ class Contact extends AclItemEntity {
 						->addRelation('addresses', Address::class, ['id' => 'contactId'])
 						->addRelation('urls', Url::class, ['id' => 'contactId'])
 						->addRelation('groups', ContactGroup::class, ['id' => 'contactId']);
+						
 	}
 	
 	/**
@@ -275,35 +276,30 @@ class Contact extends AclItemEntity {
 						->where('e.email', '=', $email);
 	}
 	
-	public static function filter(Query $query, array $filter) {
-		if (isset($filter['addressBookId'])) {
-			$query->andWhere('addressBookId', '=', $filter['addressBookId']);
-		}
-		
-		if (isset($filter['groupId'])) {
-			$query->join('addressbook_contact_group', 'g', 'g.contactId = c.id')
-							->andWhere('g.groupId', '=', $filter['groupId']);
-		}
-		
-		if (isset($filter['isOrganization'])) {
-			$query->andWhere('isOrganization', '=', $filter['isOrganization']);
-		}
-		
-		if(isset($filter['hasEmailAddresses'])) {
-			$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "LEFT")
-							->groupBy(['c.id'])
-							->having('count(e.id) > 0');
-		}
-		
-		if(isset($filter['email'])) {
-			$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "INNER")
-							->where(['e.email' => $filter['email']]);
-							
-		}
-		
-		return parent::filter($query, $filter);
+	protected static function defineFilters() {
+
+		return parent::defineFilters()
+										->add("addressBookId", function(Query $query, $value, $filter) {
+											$query->andWhere('addressBookId', '=', $value);
+										})
+										->add("groupId", function(Query $query, $value, $filter) {
+											$query->join('addressbook_contact_group', 'g', 'g.contactId = c.id')
+											->andWhere('g.groupId', '=', $filter['groupId']);
+										})
+										->add("isOrganization", function(Query $query, $value, $filter) {
+											$query->andWhere('isOrganization', '=', $filter['isOrganization']);
+										})
+										->add("hasEmailAddresses", function(Query $query, $value, $filter) {
+											$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "LEFT")
+											->groupBy(['c.id'])
+											->having('count(e.id) > 0');
+										})
+										->add("email", function(Query $query, $value, $filter) {
+											$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "INNER")
+											->where(['e.email' => $filter['email']]);
+										});
 	}
-	
+
 	protected static function searchColumns() {
 		return ['name'];
 	}

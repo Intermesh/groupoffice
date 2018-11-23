@@ -159,14 +159,12 @@ class Field extends AclItemEntity {
 		$entityCls = $entityType->getClassName();
 		return $entityCls::customFieldsTableName(); //From customfieldstrait
 	}
-
-	public static function filter(Query $query, array $filter) {
-
-		if (!empty($filter['fieldSetId'])) {
-			$query->andWhere(['fieldSetId' => $filter['fieldSetId']]);
-		}
-
-		return parent::filter($query, $filter);
+	
+	protected static function defineFilters() {
+		return parent::defineFilters()
+						->add('fieldSetId', function (Query $query, $value, array $filter){
+							$query->andWhere(['fieldSetId' => $value]);
+						});
 	}
 	
 	/**

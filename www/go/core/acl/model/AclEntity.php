@@ -2,7 +2,7 @@
 namespace go\core\acl\model;
 
 use go\core\jmap\Entity;
-use go\core\jmap\exception\CannotCalculateChanges;
+use go\core\orm\Query;
 use PDO;
 use function GO;
 
@@ -116,4 +116,13 @@ abstract class AclEntity extends Entity {
 		
 		return $result;
 	}
+	
+	protected static function defineFilters() {
+		return parent::defineFilters()->add("permissionLevel", function(Query $query, $value, array $filter) {
+							if (!empty($filter['permissionLevel'])) {
+								static::applyAclToQuery($query, $filter['permissionLevel']);
+							}
+						});
+	}
+
 }

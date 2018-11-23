@@ -22,22 +22,15 @@ class Query extends DbQuery {
 	}
 	
 	/**
-	 * Applies conditions to the query so that only entities with the given 
-	 * permission level are fetched.
+	 * Applies JMAP filters to the query
 	 * 
+	 * @param array $filters
 	 * 
-	 * @param int $level
-	 * @param int $userId Defaults to current user ID
 	 * @return $this
 	 */
-	public function applyAcl($level = Acl::LEVEL_READ, $userId = null) {
-		if(!isset($this->model)) {
-			throw new Exception("No model is set for this query");
-		}
-		
-		$cls = $this->model;
-		
-		$cls::applyAclToQuery($this, $level, $userId);
+	public function filter(array $filters) {		
+		$cls = $this->model;		
+		$cls::filter($this, $filters);
 		
 		return $this;
 	}

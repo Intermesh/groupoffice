@@ -14,7 +14,6 @@ FilesModule::afterBatchEditStore
 Folder:: deriveCustomfieldSettings
 Address lists
 
-Refactor e-mail and document templates
 
 
 Contact -> Email compose vanuit dropdown
@@ -34,7 +33,7 @@ For new:
 
 
 Custom field update / install queries for modules
-Migration of templates, custom fields and address book
+Migration of custom fields and address book
 
 
 Affected customer modules:

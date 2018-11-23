@@ -386,9 +386,44 @@ abstract class Entity extends Property {
   public static function getClientName() {
 		$cls = static::class;
     return substr($cls, strrpos($cls, '\\') + 1);
-  }
+  }		
 	
-	
+	/**
+	 * Defines JMAP filters
+	 * 
+	 * @example
+	 * ```
+	 * protected static function defineFilters() {
+	 * 
+	 * 		return parent::defineFilters()
+	 * 										->add("addressBookId", function(Query $query, $value, array $filter) {
+	 * 											$query->andWhere('addressBookId', '=', $value);
+	 * 										})
+	 * 										->add("groupId", function(Query $query, $value, array $filter) {
+	 * 											$query->join('addressbook_contact_group', 'g', 'g.contactId = c.id')
+	 * 											   ->andWhere('g.groupId', '=', $value);
+	 * 										});
+	 * }
+	 * ```
+	 * 
+	 * @link https://jmap.io/spec-core.html#/query
+	 * 
+	 * @return Filters
+	 */
+	protected static function defineFilters() {
+		$filters = new Filters();
+
+		return $filters->add('q', function(Query $query, $value, $filter) {
+							if (!empty($value)) {
+								static::search($query, $value);
+							}
+						})->add('exclude', function(Query $query, $value, $filter) {
+							if (!empty($value)) {
+								$query->andWhere('id', 'NOT IN', $value);
+							}
+						});
+	}
+
 	/**
 	 * Filter entities See JMAP spec for details on the $filter array.
 	 * 
@@ -403,16 +438,8 @@ abstract class Entity extends Property {
 	 * @return Query
 	 */
 
-	public static function filter(Query $query, array $filter) {
-
-		if(!empty($filter['q'])) {
-			static::search($query, $filter['q']);			
-		}
-		
-		if(!empty($filter['exclude'])) {
-			$query->andWhere('id', 'NOT IN', $filter['exclude']);
-		}
-		
+	public static function filter(Query $query, array $filter) {		
+		static::defineFilters()->apply($query, $filter);	
 		return $query;
 	}
 	

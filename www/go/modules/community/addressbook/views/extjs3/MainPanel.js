@@ -217,6 +217,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 		this.addButton.setDisabled(false);
 		if (addressBookId) {
 			this.addAddressBookId = addressBookId;
+			s.baseParams.filter.addressBookId = addressBookId;
 		} else
 		{
 			var firstAbNode = this.addressBookTree.getRootNode().childNodes[1];
@@ -228,9 +229,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 			}
 		}
 
-		s.baseParams.filter = {
-			addressBookId: addressBookId
-		};
+		
 		s.load();
 	},
 

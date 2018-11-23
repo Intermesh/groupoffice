@@ -79,12 +79,11 @@ class Note extends AclItemEntity {
 		return ['name', 'content'];
 	}
 	
-	public static function filter(Query $query, array $filter) {		
-		if(!empty($filter['noteBookId'])) {
-			$query->where(['noteBookId' => $filter['noteBookId']]);
-		}
-		
-		return parent::filter($query, $filter);		
+	protected static function defineFilters() {
+		return parent::defineFilters()
+						->add('noteBookId', function(Query $query, $value, array $filter) {
+							$query->where(['noteBookId' => $value]);
+						});
 	}
 	
 	/**
