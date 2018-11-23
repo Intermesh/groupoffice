@@ -21,6 +21,10 @@ class Query extends DbQuery {
 		return $this;
 	}
 	
+	public function getModel() {
+		return $this->model;
+	}
+	
 	/**
 	 * Applies JMAP filters to the query
 	 * 

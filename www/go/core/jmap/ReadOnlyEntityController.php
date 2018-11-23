@@ -147,8 +147,10 @@ abstract class ReadOnlyEntityController extends Controller {
 			$params['accountId'] = null;
 		}
 		
-		if(empty($params['filter']['permissionLevel']) || $params['filter']['permissionLevel'] < Acl::LEVEL_READ) {
-			$params['filter']['permissionLevel'] = Acl::LEVEL_READ;
+		if(is_a($this->entityClass(), \go\core\acl\model\AclEntity::class, true)) {
+			if(empty($params['filter']['permissionLevel']) || $params['filter']['permissionLevel'] < Acl::LEVEL_READ) {
+				$params['filter']['permissionLevel'] = Acl::LEVEL_READ;
+			}
 		}
 		return $params;
 	}

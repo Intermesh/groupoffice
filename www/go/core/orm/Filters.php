@@ -28,7 +28,7 @@ class Filters {
 	private function validate(Query $query, array $filter) {
 		$invalidFilters = array_diff(array_keys($filter), array_keys($this->functions));
 		if(!empty($invalidFilters)) {
-			throw new Exception("Invalid filters supplied for '".$query->getModel()."': '". implode("', '", $invalidFilters)) ."'";
+			throw new Exception("Invalid filters supplied for '".$query->getModel()."': '". implode("', '", $invalidFilters) ."'");
 		}
 	}
 	

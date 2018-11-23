@@ -229,33 +229,6 @@ class Link extends Entity {
 		return ['name' => $this->toName, 'description' => $this->toDescription];
 	}
 	
-	public static function filter(Query $query, array $filter) {
-		
-		if(!empty($filter['entity']))	{
-			$query->where(['eFrom.name' => $filter['entity']]);		
-		}	
-		
-		// Entity filter consist out of name => "Contact" and an optional "filter" => "isOrganization"
-		if(!empty($filter['entities']))	{			
-			$sub = (new Criteria);
-			
-			foreach($filter['entities'] as $e) {
-				$w = ['eTo.name' => $e['name']];
-				if(isset($e['filter'])) {
-					$w['filter'] = $e['filter'];
-				}
-				
-				$sub->orWhere($w);
-			}
-			
-			$query->where($sub);		
-		}		
-		
-	
-
-		return parent::filter($query, $filter);
-	}
-	
 	protected static function defineFilters() {
 		return parent::defineFilters()
 						->add('entityId', function (Query $query, $value, array $filter){
