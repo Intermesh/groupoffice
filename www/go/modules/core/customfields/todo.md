@@ -11,8 +11,8 @@ Export contacts VCF, CSV
 Disabled categories for: ticket type, calendar resource groups, folder dialog
 modules/projects2/views/Extjs3/AddressbookOverrides.js
 FilesModule::afterBatchEditStore
-Folder:: deriveCustomfieldSettings
-Address lists
+Folder::deriveCustomfieldSettings
+Address lists /mailings
 
 
 
