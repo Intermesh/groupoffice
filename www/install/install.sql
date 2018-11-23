@@ -758,3 +758,19 @@ CREATE TABLE IF NOT EXISTS `core_group_default_group` (
 ALTER TABLE `core_group_default_group`
   ADD CONSTRAINT `core_group_default_group_ibfk_1` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;
 ALTER TABLE `core_search` ADD INDEX(`filter`);
+
+
+
+CREATE TABLE IF NOT EXISTS `core_change_user_modseq` (
+  `userId` int(11) NOT NULL,
+  `entityTypeId` int(11) NOT NULL,
+  `highestModSeq` int(11) NOT NULL DEFAULT 0,
+  `lowestModSeq` int(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`userId`,`entityTypeId`),
+  KEY `entityTypeId` (`entityTypeId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+
+
+ALTER TABLE `core_change_user_modseq`
+  ADD CONSTRAINT `core_change_user_modseq_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `core_change_user_modseq_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;

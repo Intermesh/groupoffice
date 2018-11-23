@@ -2,8 +2,8 @@
 -- Tabelstructuur voor tabel `cf_ta_tasks`
 --
 
-DROP TABLE IF EXISTS `ta_task_custom_fields`;
-CREATE TABLE IF NOT EXISTS `ta_task_custom_fields` (
+DROP TABLE IF EXISTS `ta_tasks_custom_fields`;
+CREATE TABLE IF NOT EXISTS `ta_tasks_custom_fields` (
   `id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

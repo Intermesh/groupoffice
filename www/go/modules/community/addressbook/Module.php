@@ -30,6 +30,7 @@ class Module extends Base {
 	public function getAuthor() {
 		return "Intermesh BV <info@intermesh.nl>";
 	}
+
 	
 	public function defineListeners() {
 		parent::defineListeners();

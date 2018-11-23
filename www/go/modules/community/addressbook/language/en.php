@@ -1,5 +1,8 @@
 <?php
 return [
+		"name" => "Address Book",
+		"description" => "Store contacts and organizations",
+		
 		"emailTypes" => [
 				"work" => "Work",
 				"private" => "Private",

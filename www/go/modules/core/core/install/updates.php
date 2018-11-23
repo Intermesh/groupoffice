@@ -321,3 +321,18 @@ $updates['201810151544'][] = "ALTER TABLE `core_change_user`
 
 $updates['201810191544'][] = "ALTER TABLE `core_search` ADD `filter` VARCHAR(50) NULL DEFAULT NULL AFTER `keywords`;";
 $updates['201810191544'][] = "ALTER TABLE `core_search` ADD INDEX(`filter`);";
+
+
+$updates['201811231507'][] = "CREATE TABLE IF NOT EXISTS `core_change_user_modseq` (
+  `userId` int(11) NOT NULL,
+  `entityTypeId` int(11) NOT NULL,
+  `highestModSeq` int(11) NOT NULL DEFAULT 0,
+  `lowestModSeq` int(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`userId`,`entityTypeId`),
+  KEY `entityTypeId` (`entityTypeId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;";
+
+
+$updates['201811231507'][] = "ALTER TABLE `core_change_user_modseq`
+  ADD CONSTRAINT `core_change_user_modseq_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `core_change_user_modseq_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;";

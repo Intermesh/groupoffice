@@ -3085,7 +3085,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 			//automatically set sort order column
 			if($this->getSortOrderColumn())
-				$this->{$this->getSortOrderColumn()}=$this->count();
+				$this->{$this->getSortOrderColumn()}=$this->nextSortOrder();
 
 			$wasNew=true;
 
@@ -3194,6 +3194,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$this->_modifiedAttributes = array();
 
 		return true;
+	}
+	
+	protected function nextSortOrder() {
+		return $this->count();
 	}
 	
 	protected function checkModelFolder() {

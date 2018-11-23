@@ -8,13 +8,14 @@ if(!systemIsOk()) {
 }
 
 use GO\Base\Cron\CronJob;
-use GO\Base\Model\Module as Module2;
+use GO\Base\Model\Module;
 use GO\Base\Observable;
 use go\core\App;
 use go\core\jmap\State;
 use go\core\module\Base;
-use go\modules\community\googleauthenticator\Module as Module3;
-use go\modules\community\notes\Module;
+use go\modules\community\googleauthenticator\Module as GAModule;
+use go\modules\community\notes\Module as NotesModule;
+use go\modules\community\addressbook\Module as AddressBookModule;
 
 
 function dbIsEmpty() {
@@ -47,7 +48,11 @@ if (!empty($_POST)) {
 				'email' => $_POST['email']
 		];
 
-		App::get()->getInstaller()->install($admin, [new Module(), new Module3()]);
+		App::get()->getInstaller()->install($admin, [
+				new AddressBookModule(), 
+				new NotesModule(),
+				new GAModule()
+				]);
 
 
 		//install not yet refactored modules
@@ -61,7 +66,7 @@ if (!empty($_POST)) {
 				continue;
 			}
 			if ($moduleController->autoInstall() && $moduleController->isInstallable()) {
-				$module = new Module2();
+				$module = new Module();
 				$module->name = $moduleController->name();
 				if (!$module->save()) {
 					throw new Exception("Could not save module " . $module->name);

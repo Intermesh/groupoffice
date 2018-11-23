@@ -17,8 +17,9 @@ class MappedTable extends Table {
 	 * @var array eg ['id' => 'userId']
 	 */
 	private $keys;
+		
 	
-	private $mappedColumns = [];	
+	private $mappedColumns = [];
 	
 	private $constantValues = [];
 	
@@ -55,20 +56,25 @@ class MappedTable extends Table {
 		}
 
 		$this->keys = $keys;		
-		$this->mappedColumns = $columns;
+		$this->mappedColumns = array_filter($this->columns, function($c) use ($columns) {
+			return in_array($c->name, $columns);
+		});
+		
+		foreach($this->mappedColumns as $col) {
+			$col->table = $this;
+		}
+		
 		$this->constantValues = $constantValues;
 	}
 	
 	
 	/**
-	 * Get the columns that are mapped
+	 * Get the columns that are mapped.	 
 	 * 
 	 * @return Column[]
 	 */
 	public function getMappedColumns() {
-		return array_filter($this->columns, function($c) {
-			return in_array($c->name, $this->mappedColumns);
-		});
+		return $this->mappedColumns;
 	}
 	
 	public function getColumn($name) {

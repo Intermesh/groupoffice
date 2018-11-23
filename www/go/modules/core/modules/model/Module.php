@@ -21,6 +21,34 @@ class Module extends AclOwnerEntity {
 	public $version;
 	public $enabled;
 	
+	
+	
+	protected function internalSave() {
+		
+		if($this->isNew()) {
+			$this->sort_order = $this->nextSortOrder();			
+		}
+		
+		return parent::internalSave();
+	}
+	
+	
+	private function nextSortOrder() {
+		$query = new \go\core\db\Query();			
+		$query->from("core_module");
+
+		if($this->package == "core") {
+			$query->selectSingleValue("COALESCE(MAX(sort_order), 0) + 1")
+				->where(['package' => "core"]);
+		} else
+		{
+			$query->selectSingleValue("COALESCE(MAX(sort_order), 100)")
+				->where('package', '!=', "core");
+		}
+
+		return $query->single();
+	}
+	
 
 	protected static function defineMapping() {
 		return parent::defineMapping()->addTable('core_module');
