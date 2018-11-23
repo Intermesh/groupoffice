@@ -117,7 +117,9 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 			params:params,
 			success : function(form, action) {
 				this.win.show();
-				this.changeRepeat(action.result.data.freq);
+				
+				this.recurrencePanel.reset();
+
 				this.setValues(config.values);
 					
 				this.remind_before = action.result.data.remind_before;
@@ -136,7 +138,12 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 					}
 				}
 			
-				
+				var startDate = this.formPanel.form.findField('start_time');
+			
+				this.recurrencePanel.setStartDate(startDate.getValue());
+				this.recurrencePanel.changeRepeat(action.result.data.freq);
+				this.recurrencePanel.setDaysButtons(action.result.data);
+			
 				if(action.result.data.category_id == 0)
 				{
 					//this.selectCategory.setRemoteText();
@@ -408,141 +415,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 				
 
 		// Start of recurrence tab
-		this.repeatEvery = new GO.form.NumberField({
-			decimals:0,
-			name : 'interval',
-			minValue:1,
-			width : 50,
-			value : '1'
-		});
-
-
-		this.repeatType = new Ext.form.ComboBox({
-			hiddenName : 'freq',
-			triggerAction : 'all',
-			editable : false,
-			selectOnFocus : true,
-			width : 200,
-			forceSelection : true,
-			mode : 'local',
-			value : '',
-			valueField : 'value',
-			displayField : 'text',
-			store : new Ext.data.SimpleStore({
-				fields : ['value', 'text'],
-				data : [['', t("No recurrence")],
-				['DAILY', t("Days")],
-				['WEEKLY', t("Weeks")],
-				['MONTHLY_DATE', t("Months by date")],
-				['MONTHLY', t("Months by day")],
-				['YEARLY', t("Years")]]
-			}),
-			hideLabel : true,
-			listeners : {
-				change : {
-					fn : checkDateInput,
-					scope : this
-				}
-			}
-		});
-
-		this.repeatType.on('select', function(combo, record) {
-			this.changeRepeat(record.data.value);
-		}, this);
-
-		this.monthTime = new Ext.form.ComboBox({
-			//hiddenName : 'month_time',
-			hiddenName : 'bysetpos',
-			triggerAction : 'all',
-			selectOnFocus : true,
-			disabled : true,
-			width : 80,
-			forceSelection : true,
-			fieldLabel : t("At days", "tasks"),
-			mode : 'local',
-			value : '1',
-			valueField : 'value',
-			displayField : 'text',
-			store : new Ext.data.SimpleStore({
-				fields : ['value', 'text'],
-				data : [['1', t("First")],
-				['2', t("Second")],
-				['3', t("Third")],
-				['4', t("Fourth")]]
-			})
-		});
-		
-		
-		var days = ['SU','MO','TU','WE','TH','FR','SA'];
-
-		this.cb = [];
-		for (var day = 0; day < 7; day++) {
-			this.cb[day] = new Ext.form.Checkbox({
-				boxLabel : t("shortDays")[day],
-				name : days[day],
-				disabled : true,
-				checked : false,
-				//width : 'auto',
-				hideLabel : true,
-				labelSeperator : ''
-			});
-		}
-
-		this.repeatEndDate = this.repeatEndDate = new Ext.form.DateField({
-			name : 'until',
-			width : 100,
-			disabled : true,
-			format : GO.settings['date_format'],
-			allowBlank : true,
-			fieldLabel : t("Repeat until", "tasks"),
-			listeners : {
-				change : {
-					fn : checkDateInput,
-					scope : this
-				}
-			}
-		});
-
-		this.repeatForever = new Ext.form.Checkbox({
-			boxLabel : t("repeat forever", "tasks"),
-			name : 'repeat_forever',
-			checked : true,
-			disabled : true,
-			width : 'auto',
-			hideLabel : true,
-			labelSeperator : '',
-			listeners : {
-				check : {
-					fn : this.disableUntilField,
-					scope : this
-				}
-			}
-		});
-
-		this.recurrencePanel = new Ext.Panel({
-			title : t("Recurrence", "tasks"),
-			bodyStyle : 'padding: 5px',
-			layout : 'form',
-			hideMode : 'offsets',
-			defaults:{
-				forceLayout:true,
-				border:false
-			},
-			items : [{
-				fieldLabel : t("Repeat every", "tasks"),
-				xtype : 'compositefield',
-				items : [this.repeatEvery,this.repeatType]
-			}, {
-				xtype : 'compositefield',
-				fieldLabel : t("At days", "tasks"),
-				items : [this.monthTime,this.cb[1],this.cb[2],this.cb[3],this.cb[4],this.cb[5],this.cb[6],this.cb[0]]
-			}, {
-				fieldLabel : t("Repeat until", "tasks"),
-				xtype : 'compositefield',
-				items : [this.repeatEndDate,this.repeatForever]
-			}
-			]
-		});
+		this.recurrencePanel = new go.form.RecurrenceFieldset();
 
 		var remindDate = now.add(Date.DAY, -GO.tasks.reminderDaysBefore);
 		// start other options tab
@@ -597,9 +470,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 				items.push(GO.customfields.types["GO\\Tasks\\Model\\Task"].panels[i]);
 			}
 		}
-		
-		
-		
+	
 		this.tabPanel = new Ext.TabPanel({
 			activeTab : 0,
 			deferredRender : false,
@@ -619,96 +490,5 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 			},
 			items : this.tabPanel
 		});
-	},
-
-	/*populateComboBox : function(records)
-	{
-		var data = [];
-
-		for(var i=0; i<records.length; i++)
-		{
-			var tasklist = []
-			tasklist.push(records[i].id);
-			tasklist.push(records[i].data.name);
-
-			data.push(tasklist);
-		}
-
-		this.selectCategory.store.loadData(data);
-		var r = this.selectCategory.store.getAt(0);
-		if(r)
-			this.selectCategory.setValue(r.data.id);
-	},*/
-
-	changeRepeat : function(value) {
-
-		var repeatForever = this.repeatForever.getValue();
-		
-		var form = this.formPanel.form;
-		switch (value) {
-			case '' :
-				this.disableDays(true);
-				this.monthTime.setDisabled(true);
-				this.repeatForever.setDisabled(true);
-				this.repeatEndDate.setDisabled(true);
-				this.repeatEvery.setDisabled(true);
-				break;
-
-			case 'DAILY' :
-				this.disableDays(true);
-				this.monthTime.setDisabled(true);
-				this.repeatForever.setDisabled(false);
-				this.repeatEndDate.setDisabled(repeatForever);
-				this.repeatEvery.setDisabled(false);
-
-				break;
-
-			case 'WEEKLY' :
-				this.disableDays(false);
-				this.monthTime.setDisabled(true);
-				this.repeatForever.setDisabled(false);
-				this.repeatEndDate.setDisabled(repeatForever);
-				this.repeatEvery.setDisabled(false);
-
-				break;
-
-			case 'MONTHLY_DATE' :
-				this.disableDays(true);
-				this.monthTime.setDisabled(true);
-				this.repeatForever.setDisabled(false);
-				this.repeatEndDate.setDisabled(repeatForever);
-				this.repeatEvery.setDisabled(false);
-
-				break;
-
-			case 'MONTHLY' :
-				this.disableDays(false);
-				this.monthTime.setDisabled(false);
-				this.repeatForever.setDisabled(false);
-				this.repeatEndDate.setDisabled(repeatForever);
-				this.repeatEvery.setDisabled(false);
-				break;
-
-			case 'YEARLY' :
-				this.disableDays(true);
-				this.monthTime.setDisabled(true);
-				this.repeatForever.setDisabled(false);
-				this.repeatEndDate.setDisabled(repeatForever);
-				this.repeatEvery.setDisabled(false);
-				break;
-		}
-	},
-	disableDays : function(disabled) {
-		var days = ['SU','MO','TU','WE','TH','FR','SA'];
-		for (var day = 0; day < 7; day++) {
-			this.formPanel.form.findField(days[day])
-			.setDisabled(disabled);
-		}
-	},
-	disableUntilField : function() {
-		if(this.repeatForever.checked)
-			this.repeatEndDate.setDisabled(true);
-		else
-			this.repeatEndDate.setDisabled(false);
 	}
 });

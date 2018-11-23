@@ -1,6 +1,6 @@
 <?php
 return array (
-  'Admin tools' => 'admin eszközök',
+  'Admin tools' => 'Adminisztrációs eszközök',
   'Scripts' => 'Szkriptek',
   'Script output' => 'Script kimenet',
   'Database check' => 'Adatbázis ellenőrzés',
