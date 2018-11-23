@@ -245,6 +245,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 				waitMsg:t("Loading..."),
 				success : function(form, action) {
 					//this.win.show();
+					this.recurrencePanel.reset();
 					
 					this.setData(action);
 					
@@ -253,12 +254,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 					} else {
 						this.reminderComposite.setDisabled(true);
 					}
-					var days = ['SU','MO','TU','WE','TH','FR','SA'];
-					Ext.each(this.dayButtons, function(btn) {
-						btn.toggle(!!action.result.data[days[btn.day]]);
-					});
 					
-
 					// If this is a recurrence and the following is true (action.result.data.exception_for_event_id and action.result.data.exception_date are set and not empty)
 					if(action.result.data.exception_date){
 						this.formPanel.form.baseParams['thisAndFuture'] = config.thisAndFuture;
@@ -288,8 +284,11 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 							this.commentsGrid.setDisabled(true);
 						}
 					}
+								
+					this.recurrencePanel.setStartDate(this.startDate.getValue());
+					this.recurrencePanel.changeRepeat(action.result.data.freq);
+					this.recurrencePanel.setDaysButtons(action.result.data);
 					
-					this.changeRepeat(action.result.data.freq);
 					this.setValues(config.values);
 					//this.setWritePermission(action.result.data.write_permission);
 					//this.selectCalendar.setValue(action.result.data.calendar_id);
@@ -327,8 +326,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 					if(action.result.group_id != '1' && !action.result.data.resourceGroupAdmin) {
 						this.eventStatus.disable();
 					}
-					
-					
+										
 					this.participantsPanel.store.loadData(action.result.participants);
 					
 					//hide participants for resources
@@ -648,17 +646,6 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			}
 		}
 		
-		if (this.repeatType.getValue() != "") {
-			if (GO.util.empty(this.repeatEndDate.getValue())) {
-				this.repeatForeverXCheckbox.setValue(true);
-			} else {
-
-				if (this.repeatEndDate.getValue() < eD) {
-					this.repeatEndDate.setValue(eD.add(Date.DAY, 1));
-				}
-			}
-		}
-
 		this.participantsPanel.reloadAvailability();
 	},
 
@@ -923,222 +910,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 
 		});
 		// Start of recurrence tab
-
-		this.repeatEvery = new GO.form.NumberField({
-			decimals:0,
-			name : 'interval',
-			minValue:1,
-			width : 50,
-			value : '1'
-		});
-
-		this.repeatType = new Ext.form.ComboBox({
-			hiddenName : 'freq',
-			triggerAction : 'all',
-			editable : false,
-			selectOnFocus : true,
-			width : 200,
-			forceSelection : true,
-			mode : 'local',
-			value : '',
-			valueField : 'value',
-			displayField : 'text',
-			store : new Ext.data.SimpleStore({
-				fields : ['value', 'text'],
-				data : [['', t("No recurrence")],
-				['DAILY', t("Days")],
-				['WEEKLY', t("Weeks")],
-				['MONTHLY_DATE', t("Months by date")],
-				['MONTHLY', t("Months by day")],
-				['YEARLY', t("Years")]]
-			}),
-			hideLabel : true
-
-		});
-
-		this.repeatType.on('select', function(combo, record) {
-			this.checkDateInput();
-			this.changeRepeat(record.data.value);
-		}, this);
-
-		this.monthTime = new Ext.form.ComboBox({
-			hiddenName : 'bysetpos',
-			triggerAction : 'all',
-			selectOnFocus : true,
-			disabled : true,
-			width : 80,
-			forceSelection : true,
-			mode : 'local',
-			value : '1',
-			valueField : 'value',
-			displayField : 'text',
-			store : new Ext.data.SimpleStore({
-				fields : ['value', 'text'],
-				data : [['1', t("First")],
-				['2', t("Second")],
-				['3', t("Third")],
-				['4', t("Fourth")],
-				['-1', t("Last", "calendar")]
-			]
-			})
-		});
-
-		var days = ['SU','MO','TU','WE','TH','FR','SA'];
-
-		this.cb = [];
-		this.dayButtons = [];
-		for (var day = 0; day < 7; day++) {
-			this.cb[day] = new Ext.form.Hidden({
-				name : days[day],
-				value : 0,
-			});
-			this.dayButtons[day] = new Ext.Button({
-				text : t("short_days")[day],
-				day:day,
-				enableToggle: true,
-				pressed : false,
-				listeners: {
-					toggle:function(btn,pressed) {
-						this.cb[btn.day].setValue(pressed?1:0);
-					},
-					scope:this
-				}
-			});
-		}
-
-		this.repeatEndDate = new Ext.form.DateField({
-			name : 'until',
-			width : 100,
-			disabled : true,
-			format : GO.settings['date_format'],
-			allowBlank : true,			
-			listeners : {
-				change : {
-					fn : this.checkDateInput,
-					scope : this
-				}
-			}
-		});
-
-		
-		
-		
-		this.repeatForeverXCheckbox = new Ext.ux.form.XCheckbox({
-			boxLabel : t("Repeat forever", "calendar"),
-			name : 'repeat_forever',
-			checked: true,
-			width : 'auto',
-			hideLabel : true,
-			listeners : {
-				check : {
-				fn : function(cb, checked){
-					
-						if(!checked && !this.repeatUntilDateXCheckbox.getValue() && !this.repeatCountXCheckbox.getValue()) {
-							this.repeatForeverXCheckbox.setValue(true);
-						} else {
-							this.repeatUntilDateXCheckbox.setValue(false);
-							this.repeatCountXCheckbox.setValue(false);
-						}
-					},
-					scope : this
-				}
-			}
-		});
-		
-		this.repeatUntilDateXCheckbox = new Ext.ux.form.XCheckbox({
-			boxLabel : t("Repeat until", "calendar"),
-			name : 'repeat_UntilDate',
-//			checked : true,
-//			disabled : true,
-			width : 'auto',
-			hideLabel : true,
-			listeners : {
-				check : {
-					fn : function(cb, checked){
-					if(!checked && !this.repeatForeverXCheckbox.getValue() && !this.repeatCountXCheckbox.getValue()) {
-							this.repeatUntilDateXCheckbox.setValue(true);
-							return;
-						} else {
-							this.repeatForeverXCheckbox.setValue(false);
-							this.repeatCountXCheckbox.setValue(false);
-
-							this.repeatEndDate.setDisabled(!checked);
-						}
-					},
-					scope : this
-				}
-			}
-		});
-		
-		this.repeatNumber = new Ext.form.NumberField({
-			name: 'count',
-			disabled : true,
-			maxLength: 1000,
-			allowBlank:false,
-			value: 1,
-			minValue: 1,
-			decimals:0
-		});
-		
-		
-		this.repeatCountXCheckbox = new Ext.ux.form.XCheckbox({
-			boxLabel : t("Repeat", "calendar"),
-			name : 'repeat_count',
-			width : 'auto',
-			hideLabel : true,
-			listeners : {
-				check : {
-					fn : function(cb, checked) {
-						if(!checked && !this.repeatForeverXCheckbox.getValue() && !this.repeatUntilDateXCheckbox.getValue()) {
-							this.repeatCountXCheckbox.setValue(true);
-							return;
-						} else {
-							this.repeatForeverXCheckbox.setValue(false);
-							this.repeatUntilDateXCheckbox.setValue(false);
-
-							this.repeatNumber.setDisabled(!checked);
-						}
-					},
-					scope : this
-				}
-			}
-		});
-		
-		this.recurrencePanel = new Ext.form.FieldSet({
-			title : t("Recurrence", "calendar"),
-			cls:'go-form-panel',
-			layout : 'form',
-			hideMode : 'offsets',
-			defaults:{
-				forceLayout:true,
-				border:false
-			},
-			items : [{
-				fieldLabel : t("Repeat every", "calendar"),
-				xtype : 'compositefield',
-				items : [this.repeatEvery,this.repeatType,this.monthTime]
-			}, this.daysGroup = new Ext.ButtonGroup({
-				disabled:true,
-				fieldLabel : t("At days", "calendar"),
-				items : [
-					this.cb[1],this.cb[2],this.cb[3],this.cb[4],this.cb[5],this.cb[6],this.cb[0],
-					this.dayButtons[1],this.dayButtons[2],this.dayButtons[3],this.dayButtons[4],this.dayButtons[5],this.dayButtons[6],this.dayButtons[0]
-				]
-			}),
-			this.repeatForeverXCheckbox, 
-			{
-				hideLabel: true,
-				xtype : 'compositefield',
-				items : [this.repeatCountXCheckbox, this.repeatNumber,{xtype:'plainfield', value: t("times", "calendar")}]
-			}, {
-				hideLabel: true,
-				xtype : 'compositefield',
-				items : [this.repeatUntilDateXCheckbox, this.repeatEndDate]
-			}
-
-			
-			]
-		});
+		this.recurrencePanel = new go.form.RecurrenceFieldset();
 
 		var reminderValues = [['0', t("No reminder", "calendar")]];
 
@@ -1382,88 +1154,6 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 		this.tabPanel.doLayout();
 	},
 
-	changeRepeat : function(value) {
-
-		var repeatForever = this.repeatForeverXCheckbox.getValue();
-		
-		
-		
-		var form = this.formPanel.form;
-		switch (value) {
-			default :
-				this.disableDays(true);
-				this.monthTime.setDisabled(true);
-				this.repeatForeverXCheckbox.setDisabled(true);
-				this.repeatCountXCheckbox.setDisabled(true);
-				this.repeatUntilDateXCheckbox.setDisabled(true);
-				this.repeatNumber.setDisabled(true);
-				this.repeatEndDate.setDisabled(true);
-				this.repeatEvery.setDisabled(true);
-				break;
-
-			case 'DAILY' :
-				this.disableDays(true);
-				this.monthTime.setDisabled(true);
-				this.repeatForeverXCheckbox.setDisabled(false);
-				this.repeatCountXCheckbox.setDisabled(false);
-				this.repeatUntilDateXCheckbox.setDisabled(false);
-				this.repeatNumber.setDisabled(false);
-				this.repeatEndDate.setDisabled(repeatForever);
-				this.repeatEvery.setDisabled(false);
-
-				break;
-
-			case 'WEEKLY' :
-				this.disableDays(false);
-				this.monthTime.setDisabled(true);
-				this.repeatForeverXCheckbox.setDisabled(false);
-				this.repeatCountXCheckbox.setDisabled(false);
-				this.repeatUntilDateXCheckbox.setDisabled(false);
-				this.repeatNumber.setDisabled(false);
-				this.repeatEndDate.setDisabled(repeatForever);
-				this.repeatEvery.setDisabled(false);
-
-				break;
-
-			case 'MONTHLY_DATE' :
-				this.disableDays(true);
-				this.monthTime.setDisabled(true);
-				this.repeatForeverXCheckbox.setDisabled(false);
-				this.repeatCountXCheckbox.setDisabled(false);
-				this.repeatUntilDateXCheckbox.setDisabled(false);
-				this.repeatNumber.setDisabled(false);
-				this.repeatEndDate.setDisabled(repeatForever);
-				this.repeatEvery.setDisabled(false);
-
-				break;
-
-			case 'MONTHLY' :
-				this.disableDays(false);
-				this.monthTime.setDisabled(false);
-				this.repeatForeverXCheckbox.setDisabled(false);
-				this.repeatCountXCheckbox.setDisabled(false);
-				this.repeatUntilDateXCheckbox.setDisabled(false);
-				this.repeatNumber.setDisabled(false);
-				this.repeatEndDate.setDisabled(repeatForever);
-				this.repeatEvery.setDisabled(false);
-				break;
-
-			case 'YEARLY' :
-				this.disableDays(true);
-				this.monthTime.setDisabled(true);
-				this.repeatForeverXCheckbox.setDisabled(false);
-				this.repeatCountXCheckbox.setDisabled(false);
-				this.repeatUntilDateXCheckbox.setDisabled(false);
-				this.repeatNumber.setDisabled(false);
-				this.repeatEndDate.setDisabled(repeatForever);
-				this.repeatEvery.setDisabled(false);
-				break;
-		}
-	},
-	disableDays : function(disabled) {
-		this.daysGroup.setDisabled(disabled);;
-	},
-	
 	getResourceIds : function() {
 		var components = this.formPanel.findBy(function(component,container){
 			if (!GO.util.empty(component.checkboxName) && component.checkboxName.substring(0,10)=='resources[' && !component.collapsed) {
