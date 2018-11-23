@@ -181,6 +181,41 @@ use go\modules\core\core\model\Settings;
 			
 			return $this;
 		}
+		
+		private function getGlobalConfig() {
+			$globalConfigFile = '/etc/groupoffice/globalconfig.inc.php';
+			if (file_exists($globalConfigFile)) {
+				require($globalConfigFile);
+			}
+			
+			return $config ?? [];
+		}
+		
+		private function getInstanceConfig() {
+			$configFile = $this->findConfigFile();
+			if(!$configFile) {
+				
+				$msg = "No config.php was found. Possible locations: \n\n";
+				
+				if(isset($_SERVER['HTTP_HOST'])) {
+								$msg .= '/etc/groupoffice/multi_instance/' . explode(':', $_SERVER['HTTP_HOST'])[0] . "/config.php\n\n";
+				}
+				
+				$msg .= dirname(dirname(__DIR__)) . "/config.php\n\n".
+								"/etc/groupoffice/config.php";
+				
+				throw new Exception($msg);
+			}
+			
+			require($configFile);	
+			
+			if(!isset($config)) {
+				throw new ConfigurationException();
+			}
+			
+			return $config;
+		}
+		
 
 		/**
 		 * Get the configuration data
@@ -205,31 +240,7 @@ use go\modules\core\core\model\Settings;
 				return $this->config;
 			}
 			
-			$globalConfigFile = '/etc/groupoffice/globalconfig.inc.php';
-			if (file_exists($globalConfigFile)) {
-				require($globalConfigFile);
-			}
-			
-			$configFile = $this->findConfigFile();
-			if(!$configFile) {
-				
-				$msg = "No config.php was found. Possible locations: \n\n";
-				
-				if(isset($_SERVER['HTTP_HOST'])) {
-								$msg .= '/etc/groupoffice/multi_instance/' . explode(':', $_SERVER['HTTP_HOST'])[0] . "/config.php\n\n";
-				}
-				
-				$msg .= dirname(dirname(__DIR__)) . "/config.php\n\n".
-								"/etc/groupoffice/config.php";
-				
-				throw new Exception($msg);
-			}
-			
-			require($configFile);	
-			
-			if(!isset($config)) {
-				throw new ConfigurationException();
-			}
+			$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
 			
 			$this->config = [
 					"general" => [
