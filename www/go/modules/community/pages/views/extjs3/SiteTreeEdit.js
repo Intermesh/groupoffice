@@ -1,20 +1,67 @@
-go.modules.community.pages.SiteTreeEdit = Ext.extend(Ext.Panel,{
-    layout:"fit",
+go.modules.community.pages.SiteTreeEdit = Ext.extend(go.grid.GridPanel,{
+    siteId: '',
+    hideHeaders: true,
+    enableDragDrop: true,
+    ddText : '',
+    sm: new Ext.grid.RowSelectionModel({singleSelect:true}),
     initComponent : function() {
-	this.items = [
-	this.myImage1 = new Ext.BoxComponent({
-	autoEl: {
-        tag: 'img',
-        //src: 'http://www.barebooks.com/wp-content/uploads/2013/10/GM05.gif'
-	//src: 'https://media.giphy.com/media/LkjlH3rVETgsg/giphy.gif'
-	src: 'https://i.gifer.com/4noV.gif'
-	}
-	})
-	]
+                this.store = new go.data.Store({
+			baseParams: {filter : {'siteId' : this.siteId}},
+                        fields: [
+				'id',
+                                'pageName',
+				'sortOrder',
+                                {name: 'createdAt', type: 'date'},
+                                {name: 'modifiedAt', type: 'date'},
+                                {name: 'creator', type: go.data.types.User, key: 'createdBy'},
+                                {name: 'modifier', type: go.data.types.User, key: 'modifiedBy'},
+                                'permissionLevel'
+                        ],
+                        entityStore: go.Stores.get("Page")
+                });
+                
 
+                Ext.apply(this, {
+
+                        columns: [
+                                {
+                                        id: 'id',
+                                        hidden: true,
+                                        sortable: false,
+                                        dataIndex: 'id'
+                                },
+				{
+                                        id: 'pageName',
+                                        width: dp(75),
+                                        sortable: false,
+                                        dataIndex: 'pageName'
+                                },
+				{
+                                        id: 'sortOrder',
+                                        hidden: true,
+                                        sortable: true,
+                                        dataIndex: 'sortOrder'
+                                }
+                                
+                        ],
+                        
+                        
+
+                        viewConfig: {
+                                emptyText: '<i>description</i><p>' + t("No items to display") + '</p>',
+				headersDisabled: true,
+                        },
+                        
+			collapsible: false,
+                        autoExpandColumn: 'pageName',
+			stateful: true,
+                        stateId: 'page-grid'
+                });
 	
-
+	    this.store.on('load',function(){
+		    this.getSelectionModel().selectFirstRow();
+	    },this);
 	go.modules.community.pages.SiteTreeEdit.superclass.initComponent.call(this);
-    }
+    } 
     
 })

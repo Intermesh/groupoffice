@@ -1,4 +1,4 @@
-go.modules.community.pages.PagesTreeLoader = Ext.extend(Ext.tree.TreeLoader, {
+go.modules.community.pages.SiteTreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 
 	entityStore: null,
 	
@@ -20,7 +20,10 @@ go.modules.community.pages.PagesTreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 			
 			if(node.attributes.isPage) {
 //				 this.requestGroups(node, callback, scope || node);
+			//todo: generate nodes for the page headers here
+			//make sure to test with pages without any headers (thus no nodes).
 			callback.call();
+			this.loading = false;
 			} else
 			{
 				this.requestEntityData(node, callback, scope || node);
@@ -85,6 +88,7 @@ go.modules.community.pages.PagesTreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 						entityId: entity.id||null,
 						entity: entity,
 						isPage: true,
+						sortOrder: entity.sortOrder,
 //						expanded: entity.groups.length == 0,						
 						text: entity.pageName,
 						nodeType: 'async',

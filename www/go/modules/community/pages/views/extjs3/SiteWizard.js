@@ -3,7 +3,7 @@ go.modules.community.pages.SiteWizard = Ext.extend(go.Wizard, {
 	height: dp(500),
 	initComponent : function() {
 		
-		
+		//todo: finish button disablen tot store.onLoad (load event) gebeurt. Deze wordt meerdere keren aangeroepen, gebruik niet de toggle methode.
 		this.propForm = new go.modules.community.pages.SitePropertiesForm({
 			});
 		this.shareEntityPanel = new go.form.EntityPanel({

@@ -9,7 +9,7 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel,{
 	this.items = [
 	this.siteTree = new go.modules.community.pages.SiteTree({
 	    itemId: 'siteTree',
-	    loader: new go.modules.community.pages.PagesTreeLoader({
+	    loader: new go.modules.community.pages.SiteTreeLoader({
 		baseAttrs: {
 			//iconCls: 'ic-web-asset'
 			iconCls: 'ic-remove'
@@ -32,7 +32,8 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel,{
 	    
 	}),
 	this.siteTreeEdit = new go.modules.community.pages.SiteTreeEdit({
-	    itemId: 'siteTreeEdit'
+	    itemId: 'siteTreeEdit',
+	    siteId: this.currentSiteId
 	}),
 	],
 	this.fbar = new Ext.Toolbar({
@@ -43,6 +44,7 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel,{
 		    handler: function (b, e) {
 		    this.getFooterToolbar().getComponent('saveButton').setVisible(true);
 		    b.setVisible(false);
+		    this.siteTreeEdit.store.load();
 		    this.changePanel('siteTreeEdit');
 		    },
 		    scope:this
