@@ -3,13 +3,15 @@ CREATE TABLE `addressbook_address` (
   `id` int(11) NOT NULL,
   `contactId` int(11) NOT NULL,
   `type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `street` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `street` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `street2` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `zipCode` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `city` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `state` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `country` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `countryCode` char(2) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL COMMENT 'ISO_3166 Alpha 2 code'
+  `zipCode` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `city` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `state` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `country` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `countryCode` char(2) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL COMMENT 'ISO_3166 Alpha 2 code',
+  `latitude` decimal(10,8) DEFAULT NULL,
+  `longitude` decimal(11,8) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `addressbook_addressbook` (
@@ -25,6 +27,7 @@ CREATE TABLE `addressbook_contact` (
   `createdBy` int(11) NOT NULL,
   `createdAt` datetime NOT NULL,
   `modifiedAt` datetime NOT NULL,
+  `modifiedBy` int(11) DEFAULT NULL,
   `goUserId` int(11) DEFAULT NULL,
   `prefixes` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'Prefixes like ''Sir''',
   `firstName` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
@@ -47,20 +50,37 @@ CREATE TABLE `addressbook_contact` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `addressbook_contact_custom_fields` (
-  `id` int(11) NOT NULL
+  `id` int(11) NOT NULL,
+  `regNo` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT '',
+  `branch` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT '',
+  `date` date DEFAULT '2018-09-20',
+  `dateAndTime` datetime DEFAULT '2018-09-20 18:10:00',
+  `textArea` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `num2` decimal(19,4) DEFAULT NULL,
+  `select` int(11) DEFAULT NULL,
+  `test` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT '',
+  `sel` int(11) DEFAULT NULL,
+  `cb` tinyint(1) NOT NULL DEFAULT 1,
+  `num1` decimal(19,4) DEFAULT NULL,
+  `func` decimal(19,2) DEFAULT NULL,
+  `yesno1` tinyint(4) DEFAULT NULL,
+  `user` int(11) DEFAULT NULL,
+  `user2` int(11) DEFAULT NULL,
+  `contact` int(11) DEFAULT NULL,
+  `file` varchar(512) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `addressbook_contact_group` (
   `contactId` int(11) NOT NULL,
   `groupId` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
 CREATE TABLE `addressbook_contact_star` (
   `contactId` int(11) NOT NULL,
   `userId` int(11) NOT NULL,
   `modSeq` int(11) NOT NULL DEFAULT 0,
-  `starred` tinyint(1) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `starred` tinyint(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
 CREATE TABLE `addressbook_date` (
   `id` int(11) NOT NULL,
@@ -79,8 +99,8 @@ CREATE TABLE `addressbook_email_address` (
 CREATE TABLE `addressbook_group` (
   `id` int(11) NOT NULL,
   `addressBookId` int(11) NOT NULL,
-  `name` varchar(190) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=COMPACT;
+  `name` varchar(190) CHARACTER SET latin1 NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
 CREATE TABLE `addressbook_phone_number` (
   `id` int(11) NOT NULL,
@@ -91,18 +111,18 @@ CREATE TABLE `addressbook_phone_number` (
 
 CREATE TABLE `addressbook_smart_addressbook` (
   `id` int(11) NOT NULL,
-  `name` varchar(190) NOT NULL,
+  `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `ownedBy` int(11) NOT NULL,
   `matchAny` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'true to show contact matching any of the conditions instead of all.'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
 CREATE TABLE `addressbook_smart_addressbook_filter` (
   `id` int(11) NOT NULL,
   `smartAddressBookId` int(11) NOT NULL,
-  `property` varchar(190) NOT NULL,
-  `operator` varchar(50) NOT NULL,
-  `value` varchar(190) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `property` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `operator` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `value` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
 CREATE TABLE `addressbook_url` (
   `id` int(11) NOT NULL,
@@ -126,10 +146,16 @@ ALTER TABLE `addressbook_contact`
   ADD UNIQUE KEY `goUserId` (`goUserId`),
   ADD KEY `owner` (`createdBy`),
   ADD KEY `photoBlobId` (`photoBlobId`),
-  ADD KEY `addressBookId` (`addressBookId`);
+  ADD KEY `addressBookId` (`addressBookId`),
+  ADD KEY `modifiedBy` (`modifiedBy`);
 
 ALTER TABLE `addressbook_contact_custom_fields`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `addressbook_contact_custom_fields_ibfk_82` (`select`),
+  ADD KEY `addressbook_contact_custom_fields_ibfk_89` (`sel`),
+  ADD KEY `addressbook_contact_custom_fields_ibfk_100` (`user`),
+  ADD KEY `addressbook_contact_custom_fields_ibfk_102` (`user2`),
+  ADD KEY `addressbook_contact_custom_fields_ibfk_103` (`contact`);
 
 ALTER TABLE `addressbook_contact_group`
   ADD PRIMARY KEY (`contactId`,`groupId`),
@@ -206,10 +232,18 @@ ALTER TABLE `addressbook_addressbook`
 
 ALTER TABLE `addressbook_contact`
   ADD CONSTRAINT `addressbook_contact_ibfk_1` FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `addressbook_contact_ibfk_2` FOREIGN KEY (`photoBlobId`) REFERENCES `core_blob` (`id`);
+  ADD CONSTRAINT `addressbook_contact_ibfk_2` FOREIGN KEY (`photoBlobId`) REFERENCES `core_blob` (`id`),
+  ADD CONSTRAINT `addressbook_contact_ibfk_3` FOREIGN KEY (`modifiedBy`) REFERENCES `core_user` (`id`),
+  ADD CONSTRAINT `addressbook_contact_ibfk_4` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`),
+  ADD CONSTRAINT `addressbook_contact_ibfk_5` FOREIGN KEY (`goUserId`) REFERENCES `core_user` (`id`) ON DELETE SET NULL;
 
 ALTER TABLE `addressbook_contact_custom_fields`
-  ADD CONSTRAINT `addressbook_contact_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `addressbook_contact_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `addressbook_contact_custom_fields_ibfk_100` FOREIGN KEY (`user`) REFERENCES `core_user` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `addressbook_contact_custom_fields_ibfk_102` FOREIGN KEY (`user2`) REFERENCES `core_user` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `addressbook_contact_custom_fields_ibfk_103` FOREIGN KEY (`contact`) REFERENCES `addressbook_contact` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `addressbook_contact_custom_fields_ibfk_82` FOREIGN KEY (`select`) REFERENCES `core_customfields_select_option` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `addressbook_contact_custom_fields_ibfk_89` FOREIGN KEY (`sel`) REFERENCES `core_customfields_select_option` (`id`) ON DELETE SET NULL;
 
 ALTER TABLE `addressbook_contact_group`
   ADD CONSTRAINT `addressbook_contact_group_ibfk_1` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE,
@@ -226,7 +260,7 @@ ALTER TABLE `addressbook_email_address`
   ADD CONSTRAINT `addressbook_email_address_ibfk_1` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `addressbook_group`
-  ADD CONSTRAINT `addressbook_group_ibfk_1` FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook` (`id`);
+  ADD CONSTRAINT `addressbook_group_ibfk_1` FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `addressbook_phone_number`
   ADD CONSTRAINT `addressbook_phone_number_ibfk_1` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
