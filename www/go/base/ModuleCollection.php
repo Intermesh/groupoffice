@@ -46,7 +46,7 @@ class ModuleCollection extends Model\ModelCollection{
 		if(!isset($this->_allowedModules)) {
 			if(!empty(\GO::config()->allowed_modules)) {
 				$this->_allowedModules=  explode(',', \GO::config()->allowed_modules);		
-				$this->_allowedModules = array_merge($this->_allowedModules, ['links', 'search', 'users', 'modules', 'groups', 'customfields']);
+				$this->_allowedModules = array_merge($this->_allowedModules, ['core', 'links', 'search', 'users', 'modules', 'groups', 'customfields']);
 				
 			} else
 			{

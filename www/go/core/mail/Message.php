@@ -2,6 +2,15 @@
 
 namespace go\core\mail;
 
+/**
+ * A mail message to send
+ * 
+ * @example
+ * ````
+ * $message = GO()->getMailer()->compose();
+ * $message->setTo()->setFrom()->setBody()->send();
+ * ```
+ */
 class Message extends \Swift_Message {
 
 	private $mailer;

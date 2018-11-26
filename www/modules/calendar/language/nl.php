@@ -183,7 +183,7 @@ Dit is de standaard agenda van gebruiker :username',
   array (
     'ACCEPTED' => '%s heeft de afspraak %s geaccepteerd',
     'DECLINED' => '%s heeft de afspraak %s geweigerd',
-    'TENTATIVE' => '%s weet nog niet of hij/zij afspraak %s accepteerd',
+    'TENTATIVE' => '%s weet nog niet of hij/zij afspraak %s accepteert',
   ),
   'Direct URL' => 'Directe URL',
   'You can\'t remove the organizer' => 'U kunt de organisator niet verwijderen',

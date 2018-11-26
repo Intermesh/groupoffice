@@ -625,7 +625,7 @@ class GO{
 		
 		date_default_timezone_set(\GO::user() ? \GO::user()->timezone : \GO::config()->default_timezone);
 		
-		setlocale(LC_ALL, GO()->getSettings()->getLocale());
+		setlocale(LC_CTYPE, GO()->getSettings()->getLocale());
 		
 //		}else{
 //			//for escape shell arg

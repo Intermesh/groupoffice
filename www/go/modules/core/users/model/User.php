@@ -178,7 +178,17 @@ class User extends Entity {
 	
 	
 	protected $files_folder_id;
+	/**
+	 * Disk quota in MB
+	 * @var int
+	 */
 	public $disk_quota;
+	
+	/**
+	 * Disk usage in bytes
+	 * 
+	 * @var int
+	 */
 	public $disk_usage;
 	
 	public $mail_reminders;
@@ -638,6 +648,29 @@ class User extends Entity {
 		return true;		
 	}
 	
+	
+	/**
+	 * Get the user disk quota in bytes
+	 * @return int amount of bytes the user may use
+	 */
+	public function getStorageQuota(){
+		if(!empty($this->disk_quota)) {
+			return $this->disk_quota*1024*1024;
+		} else 
+		{
+			return GO()->getStorageQuota();
+		}
+	}
+	
+	public function getStorageFreeSpace() {
+		if(!empty($this->disk_quota)) {
+			return $this->disk_quota*1024*1024 - $this->disk_usage;
+		} else
+		{
+			return GO()->getStorageFreeSpace();
+		}
+	}
+	
 	protected function internalDelete() {
 		
 		if($this->id == 1) {
@@ -649,18 +682,48 @@ class User extends Entity {
 	}
 	
 	
-		public function legacyOnDelete() {
-			$user = LegacyUser::model()->findByPk($this->id);
-			LegacyUser::model()->fireEvent("beforedelete", [$user, true]);
-			//delete all acl records		
-			$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels();
-			
-			foreach($defaultModels as $model){
-				$model->deleteByAttribute('user_id',$this->id);
-			}
+	public function legacyOnDelete() {
+		$user = LegacyUser::model()->findByPk($this->id);
+		LegacyUser::model()->fireEvent("beforedelete", [$user, true]);
+		//delete all acl records		
+		$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels();
 
-			
-			LegacyUser::model()->fireEvent("delete", [$user, true]);
+		foreach($defaultModels as $model){
+			$model->deleteByAttribute('user_id',$this->id);
 		}
+
+
+		LegacyUser::model()->fireEvent("delete", [$user, true]);
+	}
+	
+	/**
+	 * Get authentication domains that authenticators can use to identify the user
+	 * belongs to that authenticator.
+	 * 
+	 * For example the IMAP and LDAP authenticator modules use this by implementing
+	 * the \go\core\auth\DomainProvider interface.
+	 * 
+	 * @return string[]
+	 */
+	public static function getAuthenticationDomains() {
+		
+		$domains = GO()->getCache()->get("authentication-domains");
+		if(is_array($domains)) {
+			return $domains;
+		}
+		
+		
+		$classFinder = new \go\core\util\ClassFinder();
+		$classes = $classFinder->findByParent(\go\core\auth\DomainProvider::class);
+		
+		$domains = [];
+		foreach($classes as $cls) {
+			$domains = array_merge($domains, $cls::getDomainNames());
+		}
+		
+		GO()->getCache()->set("authentication-domains", $domains);
+		
+		return $domains;		
+	}
 
 }

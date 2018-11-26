@@ -113,7 +113,9 @@ echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?l
 	GO.settings = <?php echo json_encode($settings); ?>;
 	GO.language = "<?php echo GO::config()->language; ?>";
 	GO.calltoTemplate = '<?php echo GO::config()->callto_template; ?>';
-
+	
+	GO.authenticationDomains = <?php echo json_encode(go\modules\core\users\model\User::getAuthenticationDomains()); ?>;
+	GO.authenticationDomainDefault = "<?php echo GO()->getSettings()->defaultAuthenticationDomain; ?>";
 <?php
 if (isset(GO::session()->values['security_token'])) {
 	echo 'GO.securityToken="' . GO::session()->values['security_token'] . '";';

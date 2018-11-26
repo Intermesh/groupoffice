@@ -10,7 +10,7 @@ go.modules.core.users.UserSettingsWorkingWeek = Ext.extend(Ext.Panel, {
 			labelWidth: 100,
 			items: [{
 				xtype: 'fieldset',
-				title: t("Working hours"),
+				title: t("Working hours"),				
 				defaults: {
 					serverFormats: false,
 					maxValue: 24,
@@ -43,6 +43,6 @@ go.modules.core.users.UserSettingsWorkingWeek = Ext.extend(Ext.Panel, {
 				]
 			}]
 		}];
-		go.modules.core.users.UserSettingsWorkingWeek .superclass.initComponent.call(this);
+		go.modules.core.users.UserSettingsWorkingWeek.superclass.initComponent.call(this);
 	}
 });

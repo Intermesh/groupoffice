@@ -12,7 +12,7 @@ return array (
   'No secret available' => 'Titok nem elérhető',
   'When enabling Google autenticator you\'ll need to scan the QR code with the Google authenticator app otherwise you cannot login to Group-Office anymore.' => 'Ha bekapcsolja a Google autenticator akkor kell beolvasni a QR-kódot a Google Hitelesítő alkalmazás különben nem tud bejelentkezni Group-Office többé.',
   'Provide your current password to enable Google authenticator.' => 'Adja meg jelenlegi jelszavát, hogy a Google Authenticator.',
-  'Enable Google authenticator' => 'Engedélyezze a Google hitelesítő',
+  'Enable Google authenticator' => 'Google hitelesítés bekapcsolása',
   'When disabling Google autenticator this step will be removed from the login process.' => 'Ha letiltja a Google autenticator ezt a lépést el lesz távolítva a bejelentkezési folyamatot.',
   'Provide your current password to disable Google authenticator.' => 'Adja meg jelenlegi jelszavát letiltani Google Hitelesítő.',
   'Disable Google authenticator' => 'Kikapcsolja a Google Hitelesítő',

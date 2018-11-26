@@ -199,7 +199,7 @@ GO.CheckerPanel = Ext.extend(function(config){
 	{
 		header:t("Time"),
 		dataIndex: 'local_time',
-		width: 80,
+		width: dp(120),
 		groupable: false
 	},
 	{

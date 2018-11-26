@@ -742,18 +742,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 
 		//handle delete request for both files and folder
-		if (isset($params['delete_keys'])) {
-
-			$ids = $this->_splitFolderAndFileIds(json_decode($params['delete_keys'], true));
-
-			$params['delete_keys'] = json_encode($ids['folders']);
-			$store->processDeleteActions($params, "GO\Files\Model\Folder");
-
-			$params['delete_keys'] = json_encode($ids['files']);
-			$store->processDeleteActions($params, "GO\Files\Model\File");
-		}
-
-
+		$this->_processDeletes($params, $store);
+		
 		$store->getColumnModel()->setFormatRecordFunction(array($this, 'formatListRecord'));
 
 		$findParams = $store->getDefaultParams($params);
@@ -833,8 +823,36 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		return $response;
 	}
+	
+	/**
+	 * Process deletes, separate function because it needs to be called from different places.
+	 * 
+	 * @param array $params
+	 * @param type $store
+	 */
+	private function _processDeletes($params, $store=false){
+		if(!$store){
+			$store = \GO\Base\Data\Store::newInstance(\GO\Files\Model\Folder::model());
+		}
+		
+		//handle delete request for both files and folder
+		if (isset($params['delete_keys'])) {
+
+			$ids = $this->_splitFolderAndFileIds(json_decode($params['delete_keys'], true));
+
+			$params['delete_keys'] = json_encode($ids['folders']);
+			$store->processDeleteActions($params, "GO\Files\Model\Folder");
+
+			$params['delete_keys'] = json_encode($ids['files']);
+			$store->processDeleteActions($params, "GO\Files\Model\File");
+		}
+	}
 
 	private function _searchFiles($params) {
+		
+			//handle delete request for both files and folder
+			$this->_processDeletes($params);
+		
 			$response['success'] = true;
 
 			$queryStr = !empty($params['query']) ? '%'.$params['query'].'%' : '%';

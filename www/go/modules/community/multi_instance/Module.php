@@ -19,6 +19,17 @@ class Module extends \go\core\module\Base {
 			throw new \Exception("Failed to save cron job: " . var_export($cron->getValidationErrors(), true));
 		}
 		
+		
+		$cron = new \go\modules\core\core\model\CronJobSchedule();
+		$cron->moduleId = $model->id;
+		$cron->name = "DeactivateTrials";
+		$cron->expression = "0 10 * * *";
+		$cron->description = "Deactivate trials";
+		
+		if(!$cron->save()) {
+			throw new \Exception("Failed to save cron job: " . var_export($cron->getValidationErrors(), true));
+		}
+		
 		return parent::afterInstall($model);
 	}
 }

@@ -6,7 +6,7 @@ return array (
   'Job' => 'Munka',
   'Next run' => 'Következő futás',
   'Last run' => 'Az utolsó futás',
-  'Month days' => 'hónap napok',
+  'Month days' => 'Hónap napjai',
   'Months' => 'Hónapok',
   'Week days' => 'A hét napjai',
   'Enabled' => 'Bekapcsolva',

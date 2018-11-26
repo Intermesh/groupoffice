@@ -112,6 +112,36 @@ use const GO_CONFIG_FILE;
 		public function getDataFolder() {
 			return new Folder($this->getConfig()['general']['dataPath']);
 		}
+		
+		/**
+		 * Get total space of the data folder in bytes
+		 * 
+		 * @return float
+		 */
+		public function getStorageQuota() {
+			$quota = $this->getConfig()['limits']['storageQuota'];
+			if(empty($quota)) {
+				$quota = disk_total_space($this->getConfig()['general']['dataPath']);
+			}
+			
+			return $quota;
+		}		
+		
+		/**
+		 * Get free space in bytes
+		 * 
+		 * @return float
+		 */
+		public function getStorageFreeSpace() {
+			$quota = $this->getConfig()['limits']['storageQuota'];
+			if(empty($quota)) {
+				return disk_free_space($this->getConfig()['general']['dataPath']);
+			} else
+			{
+				 $usage = \GO::config()->get_setting('file_storage_usage');				 
+				 return $quota - $usage;
+			}
+		}
 
 		/**
 		 * Get the temporary files folder
@@ -154,6 +184,39 @@ use const GO_CONFIG_FILE;
 			
 			return $this;
 		}
+		
+		private function getGlobalConfig() {
+			$globalConfigFile = '/etc/groupoffice/globalconfig.inc.php';
+			if (file_exists($globalConfigFile)) {
+				require($globalConfigFile);
+			}
+			
+			return $config ?? [];
+		}
+		
+		private function getInstanceConfig() {
+			$configFile = $this->findConfigFile();
+			if(!$configFile) {
+				
+				$host = isset($_SERVER['HTTP_HOST']) ? explode(':', $_SERVER['HTTP_HOST'])[0] : '<HOSTNAME>';
+				
+				$msg = "No config.php was found. Possible locations: \n\n".
+								"/etc/groupoffice/multi_instance/" .$host . "/config.php\n\n".				
+								 dirname(dirname(__DIR__)) . "/config.php\n\n".
+								"/etc/groupoffice/config.php";
+				
+				throw new Exception($msg);
+			}
+			
+			require($configFile);	
+			
+			if(!isset($config)) {
+				throw new ConfigurationException();
+			}
+			
+			return $config;
+		}
+		
 
 		/**
 		 * Get the configuration data
@@ -178,31 +241,15 @@ use const GO_CONFIG_FILE;
 				return $this->config;
 			}
 			
-			$configFile = $this->findConfigFile();
-			if(!$configFile) {
-				
-				$host = isset($_SERVER['HTTP_HOST']) ? explode(':', $_SERVER['HTTP_HOST'])[0] : '<HOSTNAME>';
-				
-				$msg = "No config.php was found. Possible locations: \n\n".
-								'/etc/groupoffice/multi_instance/' . $host . "/config.php\n\n".
-								dirname(dirname(__DIR__)) . "/config.php\n\n".
-								"/etc/groupoffice/config.php";
-				
-				throw new Exception($msg);
-			}
-			
-			require($configFile);	
-			
-			if(!isset($config)) {
-				throw new ConfigurationException();
-			}
+			$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
 			
 			$this->config = [
 					"general" => [
 							"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice', //TODO default should be /var/lib/groupoffice
 							"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
-							"debug" => !empty($config['debug']),
-							"cache" => Disk::class
+							"debug" => $config['debug'] ?? false,
+							"cache" => Disk::class,
+							"servermanager" => $config['servermanager'] ?? false
 					],
 					"db" => [
 							"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . ($config['db_name'] ?? "groupoffice-com"),
@@ -210,18 +257,15 @@ use const GO_CONFIG_FILE;
 							"password" => $config['db_pass'] ?? ""
 					],
 					"limits" => [
-							"maxUsers" => 0,
-							"storageQuota" => 0,
-							"allowedModules" => ""
+							"maxUsers" => $config['max_users'] ?? 0,
+							"storageQuota" => $config['quota'] ?? 0,
+							"allowedModules" => $config['allowed_modules'] ?? ""
 					],
 					"branding" => [
-							"name" => "GroupOffice"
+						"name" => $config['product_name'] ?? "GroupOffice"
 					]
 			];
 			
-			if(isset($config['product_name'])) {
-				$this->config['branding']['name'] = $config['product_name'];
-			}
 			return $this->config;
 		}
 
