@@ -78,6 +78,9 @@ class Address extends Property {
 	 * @var string
 	 */
 	public $countryCode;
+	
+	public $latitude;
+	public $longitude;
 
 	protected static function defineMapping() {
 		return parent::defineMapping()

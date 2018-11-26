@@ -42,7 +42,7 @@ class Module extends AclOwnerEntity {
 				->where(['package' => "core"]);
 		} else
 		{
-			$query->selectSingleValue("COALESCE(MAX(sort_order), 100)")
+			$query->selectSingleValue("COALESCE(MAX(sort_order), 100) + 1")
 				->where('package', '!=', "core");
 		}
 

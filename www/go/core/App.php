@@ -388,6 +388,15 @@ use const GO_CONFIG_FILE;
 		public function getAuthState() {
 			return $this->authState;
 		}
+		
+		/**
+		 * Get the server environment
+		 * 
+		 * @return Enviroment
+		 */
+		public function getEnvironment() {
+			return Environment::get();
+		}
 
 		/**
 		 * Get the authenticated user ID

@@ -46,6 +46,12 @@ class Contact extends AclItemEntity {
 	 * @var int
 	 */							
 	public $createdBy;
+	
+	/**
+	 *
+	 * @var int 
+	 */
+	public $modifiedBy;
 
 	/**
 	 * 
@@ -213,6 +219,11 @@ class Contact extends AclItemEntity {
 	public $groups = [];
 	
 	
+	/**
+	 * Starred by the current user or not.
+	 * 
+	 * @var boolean
+	 */
 	public $starred = false;
 
 	protected static function aclEntityClass(): string {
@@ -234,6 +245,18 @@ class Contact extends AclItemEntity {
 						->addRelation('urls', Url::class, ['id' => 'contactId'])
 						->addRelation('groups', ContactGroup::class, ['id' => 'contactId']);
 						
+	}
+	
+	public function setNameFromParts() {
+		$this->name = $this->firstName;
+		if(!empty($this->middleName)) {
+			$this->name .= " ".$this->middleName;
+		}
+		if(!empty($this->lastName)) {
+			$this->name .= " ".$this->lastName;
+		}
+		
+		$this->name = trim($this->name);
 	}
 	
 	/**
@@ -305,6 +328,10 @@ class Contact extends AclItemEntity {
 	}
 	
 	protected function internalValidate() {		
+		
+		if(!isset($this->name)) {
+			$this->setNameFromParts();
+		}
 		
 		if($this->isModified('addressBookId') || $this->isModified('groups')) {
 			//verify groups and address book match

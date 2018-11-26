@@ -373,13 +373,11 @@ class Connection {
 	
 
 	/**
-	 * Create a select statement. 
-	 * 
-	 * You don't need to use this function directly. You can select like this:
+	 * Create a select statement.
 	 * 
 	 * @example 
 	 * ```
-	 * $query = (new Query())
+	 * $query = GO()->getDbConnection()
 	 * 						->select('*')
 	 * 						->from('test_a')
 	 * 						->where('id', '=', 1);
@@ -389,28 +387,20 @@ class Connection {
 	 * ```
 	 * 
 	 * @see Query
-	 * 
-	 * @param Query $query
-	 * @return Statement
+	 * @return Query
 	 */
-	public function select(Query $query) {
-		$queryBuilder = new QueryBuilder();
-		$build = $queryBuilder->buildSelect($query);
-
-		$stmt = $this->createStatement($build);
-		call_user_func_array([$stmt, 'setFetchMode'], $query->getFetchMode());
-
-		$stmt->setQuery($query);
-		return $stmt;
+	public function select($select = "*") {
+		$query = new Query();
+		return $query->setDbConnection($this)->select($select);
 	}
 
 	/**
-	 * Execute the command
+	 * Create a statement from a QueryBuilder result
 	 * 
 	 * @return Statement
 	 * @throws PDOException
 	 */
-	private function createStatement($build) {
+	public function createStatement($build) {
 		if(isset($build['debug'])) {
 			App::get()->debug($build['debug'], Debugger::TYPE_SQL);
 		}

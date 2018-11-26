@@ -55,7 +55,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 				->where(['package' => "core"]);
 		} else
 		{
-			$query->selectSingleValue("COALESCE(MAX(sort_order), 0) + 100")
+			$query->selectSingleValue("COALESCE(MAX(sort_order), 100) + 1")
 				->where('package', '!=', "core");
 		}
 

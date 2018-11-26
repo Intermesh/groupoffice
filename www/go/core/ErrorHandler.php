@@ -58,13 +58,9 @@ class ErrorHandler {
 		
 		$errorString = $cls . " in " . $e->getFile() ." at line ". $e->getLine().': '.$e->getMessage();
 		
-		if(Environment::get()->isCli()) {
-			echo $errorString . "\n";
+		if(!Environment::get()->isCli()) {
+			error_log($errorString, 0);
 		}
-		
-		error_log($errorString, 0);
-		
-//		echo $e->getTraceAsString();
 		
 		App::get()->debug($errorString);
 		foreach(explode("\n", $e->getTraceAsString()) as $line) {
@@ -84,14 +80,17 @@ class ErrorHandler {
 		
 		if(!headers_sent()) {
 			if($e instanceof http\Exception) {
-				http_response_code($e->code);
+				http_response_code($e->code);				
 			}
 			header('Content-Type: text/plain');
 		}
-
-		echo "[".date(DateTime::FORMAT_API)."] ". $errorString."\n\n";	
-		echo "\n\nDebug dump: \n\n";			
-		print_r(App::get()->getDebugger()->getEntries());
+		
+		echo "\n" . $errorString . " at ".date(DateTime::FORMAT_API)."\n\n";	
+			
+		if(GO()->getDebugger()->enabled) {			
+			echo "\n\nDebug dump: \n\n";			
+			echo implode("\n", App::get()->getDebugger()->getEntries());
+		}
 	}
 
 	/**

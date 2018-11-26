@@ -116,7 +116,9 @@ class Blob extends orm\Entity {
 	}
 	
 	/**
-	 * Create from temporary file
+	 * Create from temporary file.
+	 * 
+	 * The blob needs to be saved.
 	 * 
 	 * @param \go\core\fs\File $file
 	 * @return \self

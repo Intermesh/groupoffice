@@ -20,7 +20,7 @@ class Capabilities extends Singleton {
 	
 	public $maxCallInRequest = 10;
 	
-	public $maxObjectsInGet = 100; //broken?
+	public $maxObjectsInGet = 100; //broken? Infinite loop when more than this number.
 	
 	public $maxObjectsInSet = 1000;
 	

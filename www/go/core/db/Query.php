@@ -441,17 +441,26 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 * @return Statement Returns false on failure.
 	 */
 	public function execute() {
-		$statement = $this->getDbConnection()->select($this);
-		if (!$statement->execute()) {
+		
+		$queryBuilder = new QueryBuilder();
+		$build = $queryBuilder->buildSelect($this);
+
+		$stmt = $this->getDbConnection()->createStatement($build);
+		call_user_func_array([$stmt, 'setFetchMode'], $this->getFetchMode());
+
+		$stmt->setQuery($this);		
+		
+		if (!$stmt->execute()) {
 			return false;
 		}
-		return $statement;
+		return $stmt;
 	}
 	
 	/**
 	 * Executes the query and returns a single object
 	 * 
-	 * @return mixed The queries record, column or object. Returns false when nothing is found
+	 * @return mixed|boolean The queries record, column or object. Returns false 
+	 *   when nothing is found
 	 */
 	public function single() {		
 		return $this->offset(0)
