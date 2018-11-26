@@ -18,7 +18,7 @@ abstract class Entity  extends OrmEntity {
 	
 	/**
 	 * Track changes in the core_change log for the JMAP protocol.
-	 * Disabled during install.
+	 * Disabled during install and upgrade.
 	 * 
 	 * @var boolean 
 	 */
