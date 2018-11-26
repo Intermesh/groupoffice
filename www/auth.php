@@ -94,7 +94,7 @@ try {
 	 * @param type $password
 	 * @return User|boolean
 	 */
-	function getToken($data) {
+	function getToken($data) {		
 		//loop through all auth methods
 		$authMethods = Method::find()->orderBy(['sortOrder' => 'ASC']);
 		foreach ($authMethods as $method) {

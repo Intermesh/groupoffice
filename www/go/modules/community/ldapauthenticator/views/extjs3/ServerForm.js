@@ -8,7 +8,6 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 	onLoad : function() {
 				
 		this.createEmailCheckbox.setValue(!GO.util.empty(this.formPanel.getForm().findField('imapHostname').getValue()));
-		console.log(this.formPanel.getForm().findField('username').getValue());
 		this.formPanel.getForm().findField('ldapUseAuthentication').setValue(!GO.util.empty(this.formPanel.getForm().findField('username').getValue()));
 		
 		go.modules.community.ldapauthenticator.ServerForm.superclass.onLoad.call(this);

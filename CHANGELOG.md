@@ -1,3 +1,53 @@
+- Files: Fixed issue that files could not be deleted when a search is active.
+- Core: Merging of globalconfig.inc.php failed when config array was defined as array();
+- Core: Incorrect quota error message
+- Core/Calendar/Tasks: Add recurrence fieldset to the core and apply to the calendar and task module.
+- Webdav: Added an ignore for Microsoft Office lock files
+
+20-11-2018 6.3.53
+- Core: Number conversion error on some systems
+- Core: Fix in ExtJS for new browser spec where FormElement.action would no longer be empty
+- Holidays: Fix for creating an empty workweek when none exists yet
+- Email: New base64 encoding function for unicode ascii character in mail folder names
+- Core: Added support for icon style in MenuItems with property iconStyle: cssProps
+- VCard: Fix import of phone number without a type are within a vcard group
+- Core: Numberfield broken when loaded before render
+- Tickets: First message content was not set on ticket when importing from imap 
+  making {MESSAGE} unavailable in templates
+- Files: Recent file didn't show files from folders without ACL id
+- Files: Fixed shares folder with complex sharing structures
+
+16-11-2018 6.3.52
+- Core: Check if createdBy or modifiedBy is set in detail panel to avoid crash
+- Core: Delete contact didn't work
+
+15-11-2018 6.3.51
+- Core: upgrade broke all passwords. If your password break again after this 
+        upgrade then move /var/lib/groupoffice/defuse-crypto.txt to 
+        /home/groupoffice/defuse-crypto.txt
+- Notes: Removed adding createdBy in init of the Notebook entity. 
+				 This causes issues when creating an instance of the object when no user is logged in.
+- Core: Implemented domain combo box with default setting on login screen so
+				LDAP and IMAP authenticator users can logon without entering the domain.
+- Core: Added delete buttons in more menu of authentication grids
+- Core: Prevent duplicate key errors in core_entity in 6.2 to 6.3 upgrade.
+
+12-11-2018 6.3.50
+- Language: Updated Hungarian
+- CreateLinkButton: fixed issue that reset did not clear the new added items.
+- Multi instance: Storage and user quota can be set in multi instance module
+- Multi instance: Trials will be deactivated after 30 days
+- Multi instance: Possible to set welcome message on start page via API
+- Multi instance: copy system settings from manager to new instance
+
+08-11-2018 6.3.49
+- Merged 6.2 fixes
+- Use globalconfig.inc.php in new framework too. (Thanks to pvdvendjc)
+- Core: fixed issue with GO62 to GO63 update in combination with modules that are already refactored.
+- Core: Added QR code generator
+- Googleauthenticator: Use the QR code generator to generate the GA QR code
+- Webdav: Fixed Webdav quota information
+
 30-10-2018 6.3.48
 - Demodata: Fixed demo data module that kept asking to add data
 - Calendar: Fixed bug when clicking on grid created appointment on the wrong day

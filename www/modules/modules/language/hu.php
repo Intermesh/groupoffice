@@ -19,4 +19,5 @@ return array (
   'Enabled' => 'Bekapcsolt',
   'Sort order' => 'Sorrend',
   'All data will be lost! Are you sure you want to delete module \'{item}\'?' => 'Minden adat el fog veszni! Biztos, hogy törölni kívánja ezt a modult: \'{item}\'?',
+  'Buy licenses' => 'Vásárlás',
 );

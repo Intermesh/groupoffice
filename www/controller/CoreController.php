@@ -810,15 +810,12 @@ All rights reserved.");
 		$response['data']['about']=str_replace('{product_name}', GO::config()->product_name, $response['data']['about']);
 
 		
-		$response['data']['mailbox_usage']=GO::config()->get_setting('mailbox_usage');
-		$response['data']['file_storage_usage']=GO::config()->get_setting('file_storage_usage');
-		$response['data']['database_usage']=GO::config()->get_setting('database_usage');
-		$response['data']['total_usage']=$response['data']['database_usage']+$response['data']['file_storage_usage']+$response['data']['mailbox_usage'];
+		$response['data']['mailbox_usage']=\GO\Base\Util\Number::formatSize(GO::config()->get_setting('mailbox_usage'));
+		$response['data']['file_storage_usage']= \GO\Base\Util\Number::formatSize(GO::config()->get_setting('file_storage_usage')) .' / '.\GO\Base\Util\Number::formatSize(GO::config()->quota * 1024);
+		
+		$response['data']['database_usage']=\GO\Base\Util\Number::formatSize(GO::config()->get_setting('database_usage'));
+		$response['data']['total_usage']=\GO\Base\Util\Number::formatSize(GO::config()->get_setting('database_usage') + GO::config()->get_setting('file_storage_usage') + GO::config()->get_setting('mailbox_usage'));
 		$response['data']['has_usage']=$response['data']['total_usage']>0;
-		foreach($response['data'] as $key=>$value){
-			if($key!='has_usage' && $key!='about')
-				$response['data'][$key]=  \GO\Base\Util\Number::formatSize($value);
-		}
 		
 		$response['success']=true;
 		

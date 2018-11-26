@@ -27,10 +27,28 @@ go.panels.CreateModifyTpl = Ext.extend(Ext.Panel, {
 	update: function(data) {
 		this.cUserId = data.createdBy || data.ownedBy || data.user_id;
 		this.mUserId = data.modifiedBy || data.muser_id;
-		this.entityStore.get([this.cUserId,this.mUserId], function(entities) {
+		
+		var ids = [];
+		if(this.cUserId) {
+			ids.push(this.cUserId);
+		}
+		
+		if(this.mUserId) {
+			ids.push(this.mUserId);	
+		}
+		this.tpl.cUser = {displayName: ''};
+		this.tpl.mUser = {displayName: ''};
+		
+		this.entityStore.get(ids, function(entities, notFoundIds) {
 			
-			this.tpl.cUser = entities[0] || {displayName: ''};
-			this.tpl.mUser = entities[1] || {displayName: ''};
+			entities.forEach(function(e) {
+				if(e.id === this.cUserId) {
+					this.tpl.cUser = e;
+				}
+				if(e.id === this.mUserId) {
+					this.tpl.cUser = e;
+				}
+			}, this);
 			
 			go.panels.CreateModifyTpl.superclass.update.call(this, data);
 		},this);	

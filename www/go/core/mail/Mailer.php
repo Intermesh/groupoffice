@@ -4,6 +4,15 @@ namespace go\core\mail;
 
 use go\core\App;
 
+/**
+ * Sends mail messages
+ * 
+ * @example
+ * ````
+ * $message = GO()->getMailer()->compose();
+ * $message->setTo()->setFrom()->setBody()->send();
+ * ```
+ */
 class Mailer {
 
 	private $swift;

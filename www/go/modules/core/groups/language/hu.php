@@ -13,7 +13,7 @@ return array (
   'description' => 'Admin modul; csoportok kezel�se.',
   'Group defaults' => 'Csoport alapértelmezés',
   'Members of the groups below can access a new group when it is created. These groups can share items with users and user groups that they are not members of.' => 'A csoportok tagjai alábbi hozzáférhet egy új csoportot, amikor azt létrehozzák. Ezek a csoportok megoszthatnak elemeket felhasználók és felhasználói csoportok, hogy ők nem tagjai.',
-  'Use the button below to apply the above to existing groups. WARNING: This will erase all custom permissions on groups.' => 'Használja az alábbi gombot, hogy a fenti a meglévő csoportokat. FIGYELEM: Ez törli az összes egyéni jogosultságokat csoportok.',
-  'Apply to all' => 'Alkalmazás az összesre',
+  'Use the button below to apply the above to existing groups. WARNING: This will erase all custom permissions on groups.' => 'Az alábbi gomb a fenti módosításokat alkalmazza a meglévő csoportokra. FIGYELEM: Ez törli az összes egyedileg kiosztott jogosultságot a csoporton.',
+  'Apply to all' => 'Alkalmazás az mindre',
   'Are you sure you want to reset all group permissions? This can\'t be undone.' => 'Biztos, hogy vissza kívánja állítani az összes csoport jogosultságot az alapértelmezettre? Ezt nem lehet visszavonni.',
 );

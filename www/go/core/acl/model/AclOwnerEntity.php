@@ -65,6 +65,25 @@ abstract class AclOwnerEntity extends AclEntity {
 		$this->aclId = $this->acl->id;
 	}
 	
+	protected function internalDelete() {
+		if(!parent::internalDelete()) {
+			return false;
+		}
+		
+		if(!method_exists($this, 'aclEntityClass')) {
+			$this->deleteAcl();
+		}
+		
+		return true;
+	}
+	
+	protected function deleteAcl() {		
+		$acl = Acl::find()->where(['aclId' => $this->aclId])->single();
+		if(!$acl->delete()) {
+			throw new \Exception("Could not delete ACL ".$this->aclId);
+		}
+	}
+	
 	/**
 	 * Get the ACL entity
 	 * 

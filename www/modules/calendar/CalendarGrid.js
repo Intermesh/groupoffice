@@ -193,7 +193,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 			var self = this;
 
 			var timeIndicatorTask = {
-				interval: 1000,
+				interval: 60000,
 				run: function(){
 					if (self.isVisible()) {
 						self._setTimeIndicator();
@@ -654,7 +654,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 	},
 
 	getSnap : function()
-	{
+	{			
 		return this.snapCol;
 	},
 
@@ -689,7 +689,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 	{
 		var snap = this.getSnap();
 		var gridPosition = this.gridTable.getXY();
-	
+	console.log(x, gridPosition[0], snap['x'], (x-gridPosition[0]-40)/snap["x"]);
 		return Math.floor((x-gridPosition[0]-40)/snap["x"]);
 	},
 	startSelection : function (e){
@@ -1994,7 +1994,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 			endRow=0;
 		}
 
-		var day = this.getDayByX(position[0]);
+		var day = this.getDayByX(position[0] + 2);
 
 		var date = this.startDate.add(Date.DAY, day);
 

@@ -3,7 +3,7 @@ return array (
   'The changes have been applied to the customfields of the selected files.' => 'A módosítások alkalmazása a customfields a kiválasztott fájlokat.',
   'Category' => 'Kategória',
   'Enable the display of selected categories only' => 'Engedélyezze a kijelző kiválasztott kategóriák csak',
-  'Enabled customfields' => 'Egyéni mezők bekapcsolva',
+  'Enabled customfields' => 'Dátum formátum',
   'Custom field categories' => 'Egyéni mező kategóriák',
   'Block' => 'Blokk',
   'Custom field' => 'Egyéni mező',

@@ -987,7 +987,7 @@ this.messagePanel.show();
 	},
 
 	getFolderNodeId : function (account_id, mailbox){
-		return btoa("f_"+account_id+"_"+mailbox);
+		return GO.util.Base64.encode("f_"+account_id+"_"+mailbox);
 	},
 	/**
 	 * Returns true if the current folder needs to be refreshed in the grid

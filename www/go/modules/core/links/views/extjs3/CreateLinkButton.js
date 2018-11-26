@@ -44,8 +44,7 @@ go.modules.core.links.CreateLinkButton = Ext.extend(Ext.Button, {
 					}
 				}]});
 		
-				this.totalCount++;
-				this.setCount();
+				this.setCount(++this.totalCount);
 			}
 		});
 		
@@ -73,9 +72,7 @@ go.modules.core.links.CreateLinkButton = Ext.extend(Ext.Button, {
 						toEntity: record.get('entity'),
 						toId: record.get('entityId')
 					});
-					
-					this.totalCount++;
-					this.setCount();
+					this.setCount(++this.totalCount);
 				}
 			},
 			getListParent: function () {
@@ -137,8 +134,7 @@ go.modules.core.links.CreateLinkButton = Ext.extend(Ext.Button, {
 					
 					var record = grid.store.getAt(rowIndex);
 					grid.store.remove(record);
-					this.totalCount--;
-					this.setCount();
+					this.setCount(--this.totalCount);
 					
 					var i = this.newLinks.findIndex(function(l) {
 						return l.toId === record.get('toId') && l.toEntity === record.get('toEntity');
@@ -182,7 +178,8 @@ go.modules.core.links.CreateLinkButton = Ext.extend(Ext.Button, {
 
 	},	
 	
-	setCount : function() {		
+	setCount : function(count) {		
+		this.totalCount = count;
 		this.setText(this.origText + " <span class='badge'>" + (this.totalCount) + "</span>");
 	},
 	
@@ -205,19 +202,20 @@ go.modules.core.links.CreateLinkButton = Ext.extend(Ext.Button, {
 		this.linkGrid.store.load({
 			scope: this,
 			callback: function() {
-				this.totalCount = this.linkGrid.store.getTotalCount();				
-				this.setCount();			
+				this.setCount(this.linkGrid.store.getTotalCount());			
 			}
 		});
 		//this.menu.on("show", this.load, this, {single: true});
 	},
 	
 	reset : function() {
+		
+		// Clear the new attached links list
+		this.newLinks = [];		
 		this.linkGrid.store.removeAll();
 		this.linkGrid.store.baseParams.filter.entity = null;
 		this.linkGrid.store.baseParams.filter.entityId = null;	
-		this.totalCount = 0;
-		this.setCount();
+		this.setCount(0);
 		//this.menu.un("show", this.load);
 	},
 	

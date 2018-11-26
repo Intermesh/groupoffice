@@ -104,11 +104,13 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		
 		if(this.data[entity.id]) {			
 			this.changes.changed[entity.id] = entity;
+			Ext.apply(this.data[entity.id], entity);
 		} else
 		{
 			this.changes.added[entity.id] = entity;
+			this.data[entity.id] = entity;
 		}		
-		this.data[entity.id] = entity;
+		
 		
 		//remove from not found.
 		var i = this.notFound.indexOf(entity.id);
@@ -302,9 +304,11 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	/**
 	 * Get entities
 	 * 
-	 * @param {array} ids
-	 * @param {function} cb called with "entitiies[]" and boolean "async"
+	 * @link https://jmap.io/spec-core.html#/get
+	 * @param {string[]|int[]} ids
+	 * @param {function} cb Callback function that is called with entities[] and notFoundIds[] 
 	 * @param {object} scope
+	 * @returns void
 	 */
 	get: function (ids, cb, scope) {
 
@@ -319,9 +323,9 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			throw "ids must be an array";
 		}
 
-		var entities = [], unknownIds = [];
+		var entities = [], unknownIds = [], notFoundIds = [];
 
-		for (var i = 0; i < ids.length; i++) {
+		for (var i = 0, l = ids.length; i < l; i++) {
 			var id = ids[i];
 			if(!id) {
 				throw "Empty ID passed to EntityStore.get()";
@@ -330,6 +334,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				entities.push(this.data[id]);
 			} else if(this.notFound.indexOf(id) > -1) {
 				//entities.push(null);
+				//notFoundIds.push(id);
 			} else
 			{
 				unknownIds.push(id+"");
@@ -350,6 +355,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 						}
 					}
 
+
 					if(!unknownIds.length) {
 						return this.get(ids, cb, scope);					
 					}
@@ -366,24 +372,24 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 							if(!go.util.empty(response.notFound)) {
 								this.notFound = this.notFound.concat(response.notFound);
-								this.metaStore.setItem("notfound", this.notFound);
+								this.metaStore.setItem("notfound", this.notFound);								
 								console.log("Item not found", response);						
-							}					
-
-							this.get(ids, cb, scope); //passed hidden 4th argument to pass to the callback to track that it was asynchronously called					
+							}
+							this.get(ids, cb, scope);
 						},
 						scope: this
 					});
 				}.createDelegate(this));
 			});
 			
-			return;
-			
-		} 	
-	
+			return;			
+		}	
 		
 		if(cb) {		
-			cb.call(scope || this, entities, this);			
+			var notFoundIds = this.notFound.filter(function(i) {			
+				return ids.indexOf(i) > -1;	
+			});
+			cb.call(scope || this, entities, notFoundIds);
 		}
 		
 	},

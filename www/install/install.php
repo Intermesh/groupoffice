@@ -7,6 +7,7 @@ if(!systemIsOk()) {
 	exit();
 }
 
+
 use GO\Base\Cron\CronJob;
 use GO\Base\Model\Module;
 use GO\Base\Observable;
@@ -108,6 +109,11 @@ if (!empty($_POST)) {
 	
 				
 		\go\modules\core\users\model\User::findById(1)->legacyOnSave();
+		
+		
+		if(GO()->getConfig()['general']['servermanager']) {
+			exec("php ".\go\core\Environment::get()->getInstallFolder() .'/go/modules/community/multi_instance/oninstall.php '.GO()->getConfig()['general']['servermanager']. ' '.explode(':',$_SERVER['HTTP_HOST'])[0], $output, $ret);
+		}		
 
 		header("Location: finished.php");
 		exit();

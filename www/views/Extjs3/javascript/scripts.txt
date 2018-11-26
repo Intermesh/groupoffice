@@ -270,6 +270,7 @@ views/Extjs3/javascript/go/form/RadioGroup.js
 views/Extjs3/javascript/go/form/Switch.js
 views/Extjs3/javascript/go/form/FormGroup.js
 views/Extjs3/javascript/go/form/Chips.js
+views/Extjs3/javascript/go/form/RecurrenceFieldset.js
 
 views/Extjs3/javascript/go/panels/CreateModifyTpl.js
 views/Extjs3/javascript/go/panels/LinksTpl.js
@@ -286,6 +287,7 @@ views/Extjs3/javascript/go/layout/ResponsiveLayout.js
 
 views/Extjs3/javascript/go/AuthenticationManager.js
 views/Extjs3/javascript/go/login/LanguageCombobox.js
+views/Extjs3/javascript/go/login/DomainCombo.js
 views/Extjs3/javascript/go/login/LoginDialog.js
 views/Extjs3/javascript/go/login/BaseLoginPanel.js
 views/Extjs3/javascript/go/login/ForgotDialog.js
@@ -306,6 +308,8 @@ views/Extjs3/javascript/go/usersettings/UserSettingsDialog.js
 
 views/Extjs3/javascript/go/Router.js
 views/Extjs3/javascript/go/PasswordPrompt.js
+
+views/Extjs3/javascript/go/QRCodeComponent.js
 
 views/Extjs3/javascript/go/User.js
 views/Extjs3/javascript/go/String.js

@@ -124,5 +124,5 @@ abstract class AclEntity extends Entity {
 							}
 						});
 	}
-
+	
 }

@@ -26,7 +26,13 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 			["Instance/set", 
 					[
 							"create" => [
-									"clientId-1" => ["hostname" => $hostname]
+									"clientId-1" => [
+											"hostname" => $hostname, 
+											"isTrial" => true, 
+											"storageQuota" => 1024 * 1024 * 1024, //In bytes
+											"usersMax" => 0, //0 for infinite
+											"welcomeMessage" => "Welcome to Group-Office" //this HTML message will display on the start page
+											]
 							]
 					],
 				"clientCallId-1"

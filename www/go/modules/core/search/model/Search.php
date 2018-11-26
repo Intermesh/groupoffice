@@ -27,6 +27,11 @@ class Search extends \go\core\acl\model\AclOwnerEntity {
 		$this->aclId = $aclId;
 	}
 	
+	//don't delete acl on search
+	protected function deleteAcl() {
+		
+	}
+	
 	
 	/**
 	 * Set the entity type

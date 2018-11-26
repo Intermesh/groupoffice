@@ -477,9 +477,11 @@ abstract class Entity extends Property {
 			$searchConditions = (new Criteria());
 
 			foreach($columns as $column) {
+				$columnConditions = (new Criteria());
 				foreach($tokensWithWildcard as $token) {
-					$searchConditions->andWhere($column, 'LIKE', $token);
+					$columnConditions->andWhere($column, 'LIKE', $token);
 				}
+				$searchConditions->orWhere($columnConditions);
 			}		
 		}
 		
