@@ -1,3 +1,4 @@
+26-11-2018 6.2.108
 - Email: Added includeAttachments parameter to the reply action in the email message controller.
 				 This will include the attachments of the original mail in the reply.
 - Calculate mailbox usage. Fallback on du is dovecot fails
