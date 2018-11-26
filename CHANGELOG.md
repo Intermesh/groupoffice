@@ -1,3 +1,4 @@
+- Files: Fixed issue that files could not be deleted when a search is active.
 - Core: Merging of globalconfig.inc.php failed when config array was defined as array();
 - Core: Incorrect quota error message
 - Core/Calendar/Tasks: Add recurrence fieldset to the core and apply to the calendar and task module.
