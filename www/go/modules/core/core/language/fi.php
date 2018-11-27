@@ -594,4 +594,9 @@ Salasana: %s',
     'xls' => 'Microsoft Excel tiedosto',
     'ai' => 'Adobe Illustrator tiedosto',
   ),
+	'Recurrence' => 'Toistuminen',
+	'Repeat forever' => 'toista ikuisesti',
+  'Repeat every' => 'Toista joka',
+  'Repeat until' => 'Toista kunnes',
+	'At days' => 'Päivinä'
 );

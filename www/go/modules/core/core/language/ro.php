@@ -573,4 +573,9 @@ Password: %s',
     'ai' => 'Fişier Adobe Illustrator',
     'eml' => 'Mesaj E-mail',
   ),
+	'Recurrence' => 'Repetare',
+  'Repeat forever' => 'repetă pentru totdeauna',
+  'Repeat every' => 'Repetă de fiecare',
+  'Repeat until' => 'Repetă până',
+	'At days' => 'La ziua'
 );

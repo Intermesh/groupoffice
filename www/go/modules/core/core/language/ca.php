@@ -715,4 +715,9 @@ Si no heu sol·licitat una nova contrasenya, si us plau esborreu aquest e-mail.'
     'sql' => 'Exportació de BDs SQL',
     'xmind' => 'Arxiu XMind',
   ),
+	'Repeat forever' => 'Repetir per sempre',
+  'Repeat every' => 'Repetir cada',
+  'Repeat until' => 'Repetir fins',
+	'Recurrence' => 'Repetició',
+	'At days' => 'Diària',
 );

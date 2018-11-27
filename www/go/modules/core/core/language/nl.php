@@ -772,4 +772,11 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
 	"Finish" => "Afronden",
 	'List separator' => 'Lijstscheidingsteken',
   'Text separator' => 'Tekstschedingsteken',
+	'Recurrence' => 'Herhaling',
+	'Repeat forever' => 'Altijd herhalen',
+  'Repeat until' => 'Herhalen tot',
+  'Repeat' => 'Herhaal',
+  'times' => 'keer',
+  'Repeat every' => 'Herhaal elke',
+	'At days' => 'Op dagen'
 );
