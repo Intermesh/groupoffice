@@ -242,13 +242,72 @@ class Installer {
 
 		echo "Done!\n";
 	}
+	
+	/**
+	 * Use full for dev when you want to check what's going to happen.
+	 * You can use this in /install/upgrade.php
+	 */
+	public function checkVersions() {
+		$modules = Module::find()->all();
+
+		/* @var $module Module */
+		foreach ($modules as $module) {
+
+			if (!$module->isAvailable()) {
+				echo "Skipping module " . $module->name . " because it's not available.\n";
+				continue;
+			}
+			
+			$updatesFile = $this->getUpdatesFile($module);
+			if(!$updatesFile) {
+				continue;
+			}
+			
+			$updates = array();
+			require($updatesFile);			
+
+			//put the updates in an extra array dimension so we know to which module
+			//they belong too.
+			$count = 0;
+			$all = [];
+			foreach ($updates as $timestamp => $updatequeries) {
+				$all = array_merge($all, $updatequeries);
+			}
+			
+			echo ($module->package ?? "legacy") . "/" . $module->name .': ' . $module->version . '/' .count($all);
+			
+			$next = $module->version + 1;
+			if(isset($all[$next])) {
+				echo ". Next: ".str_replace("\n", "\n\t\t", $all[$next]) ."\n";
+			}
+			
+			echo "\n";
+		}
+	}
+	
+	private function getUpdatesFile(Module $module) {
+		if ($module->package == null) {
+			$root = GO()->getEnvironment()->getInstallFolder();
+			//old not refactored yet
+			$file = $root->getFile('modules/' . $module->name . '/install/updates.php');
+			if (!$file->exists()) {
+				$file = $root->getFile('modules/' . $module->name . '/install/updates.inc.php');
+			}
+		} else {
+			$file = $module->module()->getFolder()->getFile('install/updates.php');
+		}	
+
+		if (!$file->exists()) {
+			return false;
+		}
+		
+		return $file;
+	}
 
 	private function upgradeModules() {
 		$u = [];
 
-		$modules = Module::find()->all();
-
-		$root = GO()->getEnvironment()->getInstallFolder();
+		$modules = Module::find()->all();		
 
 		$modulesById = [];
 		/* @var $module Module */
@@ -261,25 +320,14 @@ class Installer {
 
 			$modulesById[$module->id] = $module;
 
-			if ($module->package == null) {
-
-
-				//old not refactored yet
-				$upgradefile = $root->getFile('modules/' . $module->name . '/install/updates.php');
-				if (!$upgradefile->exists()) {
-					$upgradefile = $root->getFile('modules/' . $module->name . '/install/updates.inc.php');
-				}
-			} else {
-				$upgradefile = $module->module()->getFolder()->getFile('install/updates.php');
-			}
-
-			if (!$upgradefile->exists()) {
+			$updatesFile = $this->getUpdatesFile($module);
+			if(!$updatesFile) {
 				continue;
 			}
-
+			
 			$updates = array();
-			require($upgradefile);
-
+			require($updatesFile);
+			
 			//put the updates in an extra array dimension so we know to which module
 			//they belong too.
 			foreach ($updates as $timestamp => $updatequeries) {
@@ -291,8 +339,8 @@ class Installer {
 
 		$counts = array();
 
-		$aModuleWasUpgradedToNewBackend = false;
-
+		$aModuleWasUpgradedToNewBackend = false;		
+		
 		foreach ($u as $timestamp => $updateQuerySet) {
 
 			foreach ($updateQuerySet as $moduleId => $queries) {
@@ -304,13 +352,9 @@ class Installer {
 					exit("Invalid queries in module: " . $module->name);
 				}
 
-
-				if (!isset($counts[$moduleId]))
+				if (!isset($counts[$moduleId])) {
 					$counts[$moduleId] = 0;
-
-//			/	echo $module->name ." installed version ".$module->version ." new version: ".$counts[$moduleId] ."\n";
-
-
+				}
 
 				foreach ($queries as $query) {
 					$counts[$moduleId] ++;
@@ -354,6 +398,9 @@ class Installer {
 
 							if ($e->getCode() == 42000 || $e->getCode() == '42S21' || $e->getCode() == '42S01' || $e->getCode() == '42S22') {
 								//duplicate and drop errors. Ignore those on updates
+								
+								echo "\n\nIGNORING: ". $e->getMessage()." from query: ".$query."\n\n";
+								
 							} else {
 								die();
 							}

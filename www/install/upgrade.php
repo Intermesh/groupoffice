@@ -45,6 +45,7 @@ try {
 		}	
 	
 		GO()->getInstaller()->upgrade();		
+		//GO()->getInstaller()->checkVersions();		
 
 		echo "</pre></div>";
 

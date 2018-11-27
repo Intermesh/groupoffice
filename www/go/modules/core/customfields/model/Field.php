@@ -128,7 +128,7 @@ class Field extends AclItemEntity {
 	 */
 	public function getDataType() {
 		
-		if(!isset($this->dataType)) {
+		if(!isset($this->dataType)) {			
 			$dataType = Base::findByName($this->type);
 			$this->dataType = (new $dataType($this));
 		}		
