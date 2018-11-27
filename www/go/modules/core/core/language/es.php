@@ -909,4 +909,9 @@ Si no ha solicitado una nueva contraseña por favor ignore y borre este e-mail.'
     'sql' => 'Exportación base de datos SQL',
     'xmind' => 'Fichero XMind',
   ),
+	'Recurrence' => 'Recurrencia',
+	'Repeat forever' => 'Repetir indefinidamente',
+  'Repeat every' => 'Repetir cada',
+  'Repeat until' => 'Repetir hasta',
+  'At days' => 'Día de semana'
 );

@@ -946,4 +946,9 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'Text separator' => 'Texttrennzeichen',
   'Share' => 'Teilen',
   'name' => 'Name',
+  'Recurrence' => 'Wiederholung',
+	'Repeat forever' => 'unbefristet (immer wiederholen)',
+  'Repeat every' => 'Wiederhole alle',
+  'Repeat until' => 'wiederholen bis Datum',
+	'At days' => 'Jeweils am',
 );

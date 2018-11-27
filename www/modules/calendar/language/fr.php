@@ -1,10 +1,6 @@
 <?php
 return array (
   'Appointments' => 'Rendez-vous',
-  'Recurrence' => 'Récurrence',
-  'Repeat forever' => 'Répéter pour toujours',
-  'Repeat every' => 'Répéter chaque',
-  'Repeat until' => 'Répéter jusqu\'au',
   'Show as busy' => 'Me montrer comme occupé',
   'Time is not applicable' => 'Evènement sur la journée',
   '1 Day' => '1 Jour',
@@ -28,7 +24,6 @@ return array (
   'months by date' => 'mois par date',
   'months by day' => 'mois par jour',
   'years' => 'années',
-  'At days' => 'Aux jours',
   'No reminder' => 'Aucun rappel',
   'Reminder' => 'Rappel',
   'Check availability' => 'Vérifier la disponibilité',

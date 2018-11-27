@@ -675,4 +675,9 @@ Si vous n\'avez pas fait une demande de changement de mot de passe, suppprimer c
     'oth' => 'Document OpenOffice.Org PageWeb',
     'xmind' => 'Fichier XMind',
   ),
+	'Recurrence' => 'Récurrence',
+	'Repeat forever' => 'Répéter pour toujours',
+  'Repeat every' => 'Répéter chaque',
+  'Repeat until' => 'Répéter jusqu\'au',
+	'At days' => 'Aux jours',
 );
