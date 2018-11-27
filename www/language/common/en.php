@@ -747,3 +747,6 @@ $l['strModule'] = 'Module';
 $l['createEventText'] = 'Create event for {0}';
 $l['moveEventText'] = 'Move event to {0}';
 $l['updateEventText'] = 'Update event to {0}';
+
+$l['filterOnly'] = 'Filter only';
+$l['use'] = 'Use';
