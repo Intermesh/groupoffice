@@ -20,7 +20,7 @@
 	<link rel="icon" type="image/png" sizes="32x32" href="<?php echo \GO::view()->getUrl().'themes/Paper/img/favicon'; ?>/favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="<?php echo \GO::view()->getUrl().'themes/Paper/img/favicon'; ?>/favicon-16x16.png">
 	<link rel="manifest" href="<?php echo \GO::view()->getUrl().'themes/Paper/img/favicon'; ?>/site.webmanifest">
-	<link rel="mask-icon" href="<?php echo \GO::view()->getUrl().'themes/Paper/img/favicon'; ?>/safari-pinned-tab.svg" color="#777777">
+	<link rel="mask-icon" href="<?php echo \GO::view()->getUrl().'themes/Paper/img/favicon'; ?>/safari-pinned-tab.svg" color="#888888">
 	<?php } ?>
 	
 	<meta name="msapplication-TileColor" content="#2b5797">
