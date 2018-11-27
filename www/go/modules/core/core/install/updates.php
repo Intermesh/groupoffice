@@ -338,12 +338,7 @@ $updates['201811270837'][] = "ALTER TABLE `core_change_user_modseq`
 
 $updates['201811270837'][] = function() {
 	
-
-	$fields = \go\modules\core\customfields\model\Field::find();
+	$m = new \go\modules\core\customfields\updates\Migrate63to64();
+	$m->run();
 	
-	foreach($fields as $field) {
-		$parts = explode('\\', $field->type);
-		$field->type = array_pop($parts);
-		$field->save();
-	}
 };

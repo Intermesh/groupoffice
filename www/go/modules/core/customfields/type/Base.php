@@ -14,7 +14,11 @@ use go\modules\core\customfields\model\Field;
 /**
  * Abstract data type class
  * 
- * @todo Implement all types when all of custom fields will be refactored
+ * The data types handles:
+ * 
+ * 1. Column creation in database (Override getFieldSql())
+ * 2. Input formatting with apiToDb();
+ * 3. Output formatting with dbToApi();
  * 
  */
 abstract class Base extends Model {
@@ -210,7 +214,8 @@ abstract class Base extends Model {
 		$all = static::findAll();
 
 		if(!isset($all[$name])) {
-			throw new Exception("Custom field type '$name' not found");
+			GO()->debug("WARNING: Custom field type '$name' not found");			
+			return Text::class;
 		}
 		
 		return $all[$name];

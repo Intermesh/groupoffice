@@ -51,14 +51,19 @@ class FieldSet extends AclOwnerEntity {
 	
 	public static function filter(Query $query, array $filter) {
 		
-		if(!empty($filter['entities'])) {
-			
-			$ids = \go\core\orm\EntityType::namesToIds($filter['entities']);
-			
-			$query->andWhere('entityId', 'IN', $ids);
-		}
-		
+		if(!isset($filter['entities'])) {
+			$entities = \go\core\orm\EntityType::findAll();			
+			$filter['entities'] = array_filter($entities, function($e) {return $e->getName();});
+		} 
 		return parent::filter($query, $filter);
+	}
+	
+	protected static function defineFilters() {
+		return parent::defineFilters()
+						->add('entities', function(Query $query, $value, $filter) {
+							//$ids = \go\core\orm\EntityType::namesToIds($value);			
+							$query->andWhere('e.name', 'IN', $value);
+						});
 	}
 	
 	protected function internalDelete() {

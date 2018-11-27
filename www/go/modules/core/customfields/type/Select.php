@@ -6,6 +6,7 @@ use Exception;
 use GO;
 use go\core\db\Query;
 use go\core\db\Utils;
+use PDOException;
 
 class Select extends Base {
 
@@ -45,15 +46,17 @@ class Select extends Base {
 		}		
 
 		if ($this->field->isNew()) {
-			$sql = "ALTER TABLE `" . $this->field->tableName() . "` ADD CONSTRAINT `" . $this->getConstraintName() . "` FOREIGN KEY (" . Utils::quoteColumnName($this->field->databaseName) . ") REFERENCES `core_customfields_select_option`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";			
-			if(!GO()->getDbConnection()->query($sql)) {
-				throw new \Exception("Couldn't add contraint");
-			}
-		}			
+			$this->addConstraint();
+		}
 		
 		$this->saveOptions();	
 
 		return true;
+	}
+	
+	public function addConstraint() {
+		$sql = "ALTER TABLE `" . $this->field->tableName() . "` ADD CONSTRAINT `" . $this->getConstraintName() . "` FOREIGN KEY (" . Utils::quoteColumnName($this->field->databaseName) . ") REFERENCES `core_customfields_select_option`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";			
+		GO()->getDbConnection()->query($sql);
 	}
 	
 	private function getConstraintName() {

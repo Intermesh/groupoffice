@@ -50,24 +50,7 @@ CREATE TABLE `addressbook_contact` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `addressbook_contact_custom_fields` (
-  `id` int(11) NOT NULL,
-  `regNo` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT '',
-  `branch` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT '',
-  `date` date DEFAULT '2018-09-20',
-  `dateAndTime` datetime DEFAULT '2018-09-20 18:10:00',
-  `textArea` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `num2` decimal(19,4) DEFAULT NULL,
-  `select` int(11) DEFAULT NULL,
-  `test` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT '',
-  `sel` int(11) DEFAULT NULL,
-  `cb` tinyint(1) NOT NULL DEFAULT 1,
-  `num1` decimal(19,4) DEFAULT NULL,
-  `func` decimal(19,2) DEFAULT NULL,
-  `yesno1` tinyint(4) DEFAULT NULL,
-  `user` int(11) DEFAULT NULL,
-  `user2` int(11) DEFAULT NULL,
-  `contact` int(11) DEFAULT NULL,
-  `file` varchar(512) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+  `id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `addressbook_contact_group` (
@@ -150,12 +133,7 @@ ALTER TABLE `addressbook_contact`
   ADD KEY `modifiedBy` (`modifiedBy`);
 
 ALTER TABLE `addressbook_contact_custom_fields`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `addressbook_contact_custom_fields_ibfk_82` (`select`),
-  ADD KEY `addressbook_contact_custom_fields_ibfk_89` (`sel`),
-  ADD KEY `addressbook_contact_custom_fields_ibfk_100` (`user`),
-  ADD KEY `addressbook_contact_custom_fields_ibfk_102` (`user2`),
-  ADD KEY `addressbook_contact_custom_fields_ibfk_103` (`contact`);
+  ADD PRIMARY KEY (`id`);
 
 ALTER TABLE `addressbook_contact_group`
   ADD PRIMARY KEY (`contactId`,`groupId`),
@@ -238,12 +216,7 @@ ALTER TABLE `addressbook_contact`
   ADD CONSTRAINT `addressbook_contact_ibfk_5` FOREIGN KEY (`goUserId`) REFERENCES `core_user` (`id`) ON DELETE SET NULL;
 
 ALTER TABLE `addressbook_contact_custom_fields`
-  ADD CONSTRAINT `addressbook_contact_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `addressbook_contact_custom_fields_ibfk_100` FOREIGN KEY (`user`) REFERENCES `core_user` (`id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `addressbook_contact_custom_fields_ibfk_102` FOREIGN KEY (`user2`) REFERENCES `core_user` (`id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `addressbook_contact_custom_fields_ibfk_103` FOREIGN KEY (`contact`) REFERENCES `addressbook_contact` (`id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `addressbook_contact_custom_fields_ibfk_82` FOREIGN KEY (`select`) REFERENCES `core_customfields_select_option` (`id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `addressbook_contact_custom_fields_ibfk_89` FOREIGN KEY (`sel`) REFERENCES `core_customfields_select_option` (`id`) ON DELETE SET NULL;
+  ADD CONSTRAINT `addressbook_contact_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `addressbook_contact_group`
   ADD CONSTRAINT `addressbook_contact_group_ibfk_1` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE,

@@ -90,6 +90,11 @@
 			this.getFieldSets(entity).forEach(function(fs) {
 				me.getFields(fs.id).forEach(function(field) {					
 					type = me.getType(field.type);
+					if(!type) {
+						console.error("Custom field type " + field.type + " not found");
+						return;
+					}
+					
 					defs.push(type.getFieldDefinition(field));
 				});
 			});
@@ -236,7 +241,12 @@
 				
 				
 				go.modules.core.customfields.CustomFields.getFields(fieldSet.id).forEach(function (field) {					
-					var cmp = me.getType(field.type).getDetailField(field);					
+					var type = me.getType(field.type);
+					if(!type) {
+						console.error("Custom field type " + field.type + " not found");
+						return;
+					}
+					var cmp = type.getDetailField(field);					
 					items.push(cmp);
 				});
 				

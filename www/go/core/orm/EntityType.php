@@ -158,7 +158,8 @@ class EntityType {
 		$records = (new Query)
 						->select('e.*, m.name AS moduleName, m.package AS modulePackage')
 						->from('core_entity', 'e')
-						->join('core_module', 'm', 'm.id = e.moduleId')						
+						->join('core_module', 'm', 'm.id = e.moduleId')
+						->where(['m.enabled' => true])
 						->all();
 		
 		$i = [];

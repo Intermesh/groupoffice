@@ -344,7 +344,7 @@ class Connection {
 	}
 
 	/**
-	 * Create an update command
+	 * Create an update statement
 	 * 
 	 * @example
 	 * ```
@@ -392,6 +392,20 @@ class Connection {
 	public function select($select = "*") {
 		$query = new Query();
 		return $query->setDbConnection($this)->select($select);
+	}
+	
+	/**
+	 * Select a single column or count(*) for example.
+	 * 
+	 * Shortcut for:
+	 * $query->fetchMode(\PDO::FETCH_COLUMN,0)->select($select)
+	 * 
+	 * @param string $select
+	 * @return Query
+	 */
+	public function selectSingleValue($select) {
+		$query = new Query();
+		return $query->setDbConnection($this)->selectSingleValue($select);
 	}
 
 	/**

@@ -1,20 +1,20 @@
 <?php
-
 namespace go\modules\core\customfields\model;
 
-use Exception;
 use GO;
 use go\core\acl\model\AclItemEntity;
-use go\core\orm\Query;
 use go\core\db\Table;
-use go\core\db\Utils;
-use go\core\ErrorHandler;
 use go\core\orm\EntityType;
-use go\modules\core\customfields\type\Base;
+use go\core\orm\Query;
+use go\core\util\DateTime;
 use go\modules\core\customfields\model\FieldSet;
-use function GuzzleHttp\json_decode;
-use function GuzzleHttp\json_encode;
+use go\modules\core\customfields\type\Base;
 
+/**
+ * Field
+ * 
+ * A custom field
+ */
 class Field extends AclItemEntity {
 
 	/**
@@ -23,23 +23,94 @@ class Field extends AclItemEntity {
 	 * @var int
 	 */
 	public $id;
+	
+	/**
+	 * Display name
+	 * @var string 
+	 */
 	public $name;
+	
+	/**
+	 * Foreign key for fieldSet
+	 * @var int
+	 */
 	public $fieldSetId;
+	
+	/**
+	 * Sort order
+	 * 
+	 * @var int
+	 */
 	public $sortOrder;
 	protected $options;
+	
+	
+	/**
+	 * The database column name
+	 * 
+	 * @var string 
+	 */
 	public $databaseName;
+	
+	/**
+	 * True if an entry is requied
+	 * @var boolean
+	 */
 	public $required;
+	
+	/**
+	 * Hint text to display in the form
+	 * @var string
+	 */
 	public $hint;
+	
+	/**
+	 * Field prefix
+	 * 
+	 * eg. :"€:
+	 * 
+	 * @var string
+	 */
 	public $prefix;
+	
+	/**
+	 * Field suffix
+	 * 
+	 * eg. "%"
+	 * 
+	 * @var string 
+	 */
 	public $suffix;
+	
+	/**
+	 * Data type
+	 * 
+	 * @var string
+	 */
 	public $type;
+	
+	/**
+	 * Modified at time
+	 * 
+	 * @var DateTime
+	 */
 	public $modifiedAt;
+	
+	/**
+	 * Created at time
+	 * ]
+	 * @var DateTime
+	 */
 	public $createdAt;
+	
+	
 	private $default;
 	private $defaultModified = false;
 	private $unique;
 	private $uniqueModified = false;
 	private $dataType;
+	
+	
 	protected static function defineMapping() {
 		return parent::defineMapping()->addTable('core_customfields_field', 'f');
 	}
@@ -52,14 +123,23 @@ class Field extends AclItemEntity {
 		return ['fieldSetId' => 'id'];
 	}
 
-	/**
-	 * LEGACY. $field->multiselect is used many times.
-	 * fix before removing a property
-	 */
-	public function getMultiselect() {
-		return $this->getOptions('multiselect');
-	}
+//	/**
+//	 * LEGACY. $field->multiselect is used many times.
+//	 * fix before removing a property
+//	 */
+//	public function getMultiselect() {
+//		return $this->getOptions('multiselect');
+//	}
 
+	/**
+	 * Get field options. 
+	 * 
+	 * These options can vary per data type.
+	 * 
+	 * eg. "multiselect" for select fields or maxLength for text fields.
+	 * 
+	 * @return array
+	 */
 	public function getOptions() {
 		return empty($this->options) ? [] : json_decode($this->options, true);
 	}
@@ -68,18 +148,36 @@ class Field extends AclItemEntity {
 		$this->options = json_encode(array_merge($this->getOptions(), $options));
 	}
 
+	/**
+	 * Get field option
+	 * 
+	 * @see getOptions()
+	 * @param string $name
+	 * @return mixed
+	 */
 	public function getOption($name) {
 		$o = $this->getOptions();
 		return isset($o[$name]) ? $o[$name] : null;
 	}
 
+	/**
+	 * Set a field option
+	 * 
+	 * @see getOptions()
+	 * @param string $name
+	 * @param mixed $value
+	 */
 	public function setOption($name, $value) {
 		$o = $this->getOptions();
 		$o[$name] = $value;
 		$this->setOptions($o);
 	}
 	
-	
+	/**
+	 * Get default value for the column
+	 * 
+	 * @return mixed
+	 */	
 	public function getDefault() {
 		if($this->defaultModified || $this->isNew()) {
 			return $this->default;
@@ -123,6 +221,7 @@ class Field extends AclItemEntity {
 	}
 
 	/**
+	 * The data type object
 	 * 
 	 * @return Base
 	 */
@@ -153,6 +252,11 @@ class Field extends AclItemEntity {
 		return $this->getDataType()->onFieldDelete();
 	}
 
+	/**
+	 * Get the table name this field is stored in.
+	 * 
+	 * @return sting
+	 */
 	public function tableName() {
 		$fieldSet = FieldSet::findById($this->fieldSetId);
 		$entityType = EntityType::findByName($fieldSet->getEntity());

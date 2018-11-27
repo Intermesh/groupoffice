@@ -24,7 +24,9 @@ use go\modules\core\users\model\UserGroup;
 use PDOException;
 
 class Installer {
-
+	
+	const MIN_UPGRADABLE_VERSION = "6.3.53";
+	
 	private $isInProgress = false;
 
 	/**
@@ -139,15 +141,14 @@ class Installer {
 		Listeners::get()->init();
 	}
 
-	private $minUpgradableVerion = "6.3.53";
 
 	public function isValidDb() {
 		if (!GO()->getDatabase()->hasTable("core_module")) {
-			throw new \Exception("This is not a Group-Office 6.3+ database. Please upgrade to " . $this->minUpgradableVerion . " first.");
+			throw new \Exception("This is not a Group-Office 6.3+ database. Please upgrade to " . self::MIN_UPGRADABLE_VERSION . " first.");
 		}
 
-		if (GO()->getSettings()->databaseVersion !== $this->minUpgradableVerion) {
-			throw new \Exception("Your version is " . GO()->getSettings()->databaseVersion . ". Please upgrade to " . $this->minUpgradableVerion . " first.");
+		if (version_compare(GO()->getSettings()->databaseVersion, self::MIN_UPGRADABLE_VERSION) === -1) {
+			throw new \Exception("Your version is " . GO()->getSettings()->databaseVersion . ". Please upgrade to " . self::MIN_UPGRADABLE_VERSION . " first.");
 		}
 	}
 
@@ -268,9 +269,8 @@ class Installer {
 
 			//put the updates in an extra array dimension so we know to which module
 			//they belong too.
-			$count = 0;
 			$all = [];
-			foreach ($updates as $timestamp => $updatequeries) {
+			foreach ($updates as $updatequeries) {
 				$all = array_merge($all, $updatequeries);
 			}
 			
