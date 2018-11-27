@@ -1,5 +1,6 @@
 - Core: Show correct thumbnail size error
 - Billing: Added extra permissionlevel in billing statuses
+-Billing: Added extra permissionlevel in billing statuses
 
 26-11-2018 6.2.108
 - Email: Added includeAttachments parameter to the reply action in the email message controller.
