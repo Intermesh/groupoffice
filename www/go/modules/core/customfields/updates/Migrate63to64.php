@@ -2,6 +2,7 @@
 namespace go\modules\core\customfields\updates;
 
 use go\core\db\Query;
+use go\core\db\Utils;
 use go\modules\core\customfields\model\Field;
 use go\modules\core\customfields\model\FieldSet;
 use PDOException;
@@ -39,7 +40,7 @@ class Migrate63to64 {
 			}
 		}
 		
-		//exit("STOP FOR TEST");
+//		exit("STOP FOR TEST");
 	}
 	
 	
@@ -91,7 +92,47 @@ class Migrate63to64 {
 	}
 	
 	private function updateMultiSelect(Field $field) {
+		$field->type = "MultiSelect";		
+		try{
+			$field->getDataType()->createMultiSelectTable();
+		}catch(\PDOException $e) {
+			//ignore already existing
+		}
 		
+		
+		$options = GO()->getDbConnection()
+						->select("*")
+						->from("core_customfields_select_option")
+						->where('fieldId', '=', $field->id)->all();
+		
+		foreach($options as $o) {
+			$optionMap[$o['text']] = $o['id'];
+		}
+		
+		$query = GO()->getDbConnection()->select()
+						->from($field->tableName())
+						->where($field->databaseName, '!=', "");
+		
+		foreach($query as $record){
+			$values = explode("|", $record[$field->databaseName]);
+			
+			foreach($values as $value) {
+				if(!isset($optionMap[$value])) {
+					continue;
+				}
+				
+				GO()->getDbConnection()
+								->replace(
+												$field->getDataType()->getMultiSelectTableName(), 
+												['id' => $record['id'], 'optionId' => $optionMap[$value]]
+												)->execute();
+			}
+		}		
+		$field->save();
+		
+		//remove column because it's stored in linking table
+		$sql = "ALTER TABLE `" . $field->tableName() . "` DROP " . Utils::quoteColumnName($field->databaseName) ;
+		GO()->getDbConnection()->query($sql);
 	}
 	
 	

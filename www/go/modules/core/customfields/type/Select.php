@@ -54,6 +54,7 @@ class Select extends Base {
 		return true;
 	}
 	
+	//Is public for migration. Can be made private in 6.5
 	public function addConstraint() {
 		$sql = "ALTER TABLE `" . $this->field->tableName() . "` ADD CONSTRAINT `" . $this->getConstraintName() . "` FOREIGN KEY (" . Utils::quoteColumnName($this->field->databaseName) . ") REFERENCES `core_customfields_select_option`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";			
 		GO()->getDbConnection()->query($sql);

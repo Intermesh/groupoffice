@@ -22,11 +22,12 @@ class MultiSelect extends Select {
 		return true;
 	}
 
-	private function getMultiSelectTableName() {
+	public function getMultiSelectTableName() {
 		return "core_customfields_multiselect_" . $this->field->id;
 	}
 
-	private function createMultiSelectTable() {
+	//Is public for migration. Can be made private in 6.5
+	public function createMultiSelectTable() {
 
 		$tableName = $this->field->tableName();
 
