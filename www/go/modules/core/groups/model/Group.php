@@ -52,6 +52,10 @@ class Group extends AclEntity {
 	 */
 	public $users;
 	
+	protected function aclEntityClass() {
+		
+	}
+	
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable('core_group', 'g')

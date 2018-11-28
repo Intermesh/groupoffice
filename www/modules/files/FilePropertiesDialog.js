@@ -200,6 +200,13 @@ GO.files.FilePropertiesDialog = function(config){
 				this.save(true)
 				},
 			scope: this
+		},
+		{
+			text:t("Apply"),
+			handler: function(){
+				this.save(false)
+				},
+			scope: this
 		}]
 	});
 	
