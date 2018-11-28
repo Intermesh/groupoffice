@@ -327,3 +327,10 @@ $updates['201811270837'][] = "ALTER TABLE `cf_cal_calendars` CHANGE `model_id` `
 $updates['201811270837'][] = "RENAME TABLE `cf_cal_calendars` TO `cal_calendars_custom_fields`;";
 $updates['201811270837'][] = "delete from cal_calendars_custom_fields where id not in (select id from cal_calendars);";
 $updates['201811270837'][] = "ALTER TABLE `cal_calendars_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `cal_calendars`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+
+
+$updates['201811282011'][] = function() {	
+	$m = new \go\modules\core\customfields\install\Migrate63to64();
+	$m->migrateEntity("Event");	
+	$m->migrateEntity("Calendar");	
+};

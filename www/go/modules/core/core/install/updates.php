@@ -336,9 +336,4 @@ $updates['201811270837'][] = "ALTER TABLE `core_change_user_modseq`
   ADD CONSTRAINT `core_change_user_modseq_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_change_user_modseq_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;";
 
-$updates['201811270837'][] = function() {
-	
-	$m = new \go\modules\core\customfields\updates\Migrate63to64();
-	$m->run();
-	
-};
+

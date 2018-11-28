@@ -241,3 +241,10 @@ $updates['201810161450'][] = "ALTER TABLE `cf_fs_files` CHANGE `model_id` `id` I
 $updates['201810161450'][] = "RENAME TABLE `cf_fs_files` TO `fs_files_custom_fields`;";
 $updates['201810161450'][] = "delete from fs_files_custom_fields where id not in (select id from fs_files);";
 $updates['201810161450'][] = "ALTER TABLE `fs_files_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `fs_files`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+
+
+$updates['201811282011'][] = function() {	
+	$m = new \go\modules\core\customfields\install\Migrate63to64();
+	$m->migrateEntity("File");	
+	$m->migrateEntity("Folder");	
+};

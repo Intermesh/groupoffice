@@ -8,3 +8,8 @@ $updates["201801221035"][] = "ALTER TABLE `core_user`
 
 $updates["201803201612"][] = "ALTER TABLE `core_auth_password` CHANGE `password` `password` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;";
 $updates["201803201612"][] = "ALTER TABLE `core_auth_password` CHANGE `digest` `digest` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;";
+
+$updates['201811282011'][] = function() {	
+	$m = new \go\modules\core\customfields\install\Migrate63to64();
+	$m->migrateEntity("User");	
+};
