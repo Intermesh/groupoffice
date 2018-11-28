@@ -65,21 +65,12 @@ class Migrate63to64 {
 							->update($field->tableName(), [$field->databaseName => $o['id']], [$field->databaseName => $o['text']])->execute();	
 		}		
 		
-		$optionIds = GO()->getDbConnection()
-						->selectSingleValue('id')
-						->from("core_customfields_select_option")
-						->where('fieldId', '=', $field->id);
-	
-		GO()->getDbConnection()->update(
-						$field->tableName(), 
-						[$field->databaseName => null], 
-						(new Query)
-						->where($field->databaseName, 'NOT IN', $optionIds)
-						)->execute();
-		
 		//for changing db column
+		$field->setDefault(null);
 		$field->save();
-		try {
+		
+		$this->nullifyInvalidOptions($field);
+		try {			
 			$field->getDataType()->addConstraint();
 		} catch(PDOException $e) {			
 			//ignore duplicates
@@ -216,10 +207,13 @@ class Migrate63to64 {
 											[$field->databaseName => $id], 
 											['id' => $record['id']]
 											)->execute();
-		}
+		}		
 		
 		$field->type = "Select";
+		$field->setDefault(null);
 		$field->save();
+		
+		$this->nullifyInvalidOptions($field);
 		try {
 			$field->getDataType()->addConstraint();
 		} catch(PDOException $e) {			
@@ -232,5 +226,21 @@ class Migrate63to64 {
 			$field->type = "Text";
 			$field->delete();
 		}
+	}
+	
+	
+	private function nullifyInvalidOptions(Field $field) {
+		//set invalid options to null
+		$optionIds = GO()->getDbConnection()
+						->selectSingleValue('id')
+						->from("core_customfields_select_option")
+						->where('fieldId', '=', $field->id);
+		
+		GO()->getDbConnection()->update(
+						$field->tableName(), 
+						[$field->databaseName => null], 
+						(new Query)
+						->where($field->databaseName, 'NOT IN', $optionIds)
+						)->execute();
 	}
 }
