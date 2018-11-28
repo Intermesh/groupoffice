@@ -2,12 +2,10 @@
 
 namespace go\modules\core\customfields\type;
 
-use Exception;
 use GO;
-use go\core\db\Query;
 use go\core\db\Utils;
 
-class User extends Base {
+class Group extends Base {
 
 	protected function getFieldSQL() {
 		$d = $this->field->getDefault();
@@ -28,7 +26,7 @@ class User extends Base {
 	
 	//public for migration from 6.3. Make private in 6.5
 	public function addConstraint() {
-		$sql = "ALTER TABLE `" . $this->field->tableName() . "` ADD CONSTRAINT `" . $this->field->tableName() . "_ibfk_" . $this->field->id . "` FOREIGN KEY (" . Utils::quoteColumnName($this->field->databaseName) . ") REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";			
+		$sql = "ALTER TABLE `" . $this->field->tableName() . "` ADD CONSTRAINT `" . $this->field->tableName() . "_ibfk_" . $this->field->id . "` FOREIGN KEY (" . Utils::quoteColumnName($this->field->databaseName) . ") REFERENCES `core_group`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";
 		GO()->getDbConnection()->query($sql);
 	}
 }

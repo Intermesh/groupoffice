@@ -59,7 +59,7 @@ try {
 
 	} 
 } catch (\Exception $e) {
-	echo "<b>Error:</b> ".$e->getMessage()."\n\n";;
+	echo "<b>Error:</b> ". \go\core\ErrorHandler::logException($e)."\n\n";;
 	
 	echo $e->getTraceAsString();
 	

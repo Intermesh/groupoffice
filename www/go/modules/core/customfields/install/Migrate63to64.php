@@ -32,10 +32,61 @@ class Migrate63to64 {
 				case "Treeselect":
 						$this->updateTreeSelect($field);
 					break;
+				
+				case "User":
+					$this->updateSelectEntity($field, \go\modules\core\users\model\User::class);
+					break;
+				
+				case "Group":
+					$this->updateSelectEntity($field, \go\modules\core\groups\model\Group::class);
+					break;
 			}
 		}
 		
 //		exit("STOP FOR TEST");
+	}
+	
+	private function updateSelectEntity(Field $field, $entityCls) {		
+		
+		$query = $this->findRecords($field);		
+		foreach($query as $record) {
+			//Value is string <id>:<Text>
+			$id = explode(':', $record[$field->databaseName])[0];
+			$record[$field->databaseName] = $id;
+			
+			GO()->getDbConnection()
+								->update(
+												$field->tableName(), 
+												[$field->databaseName => $id],
+												['id' => $record['id']]
+												)->execute();
+		}
+		
+		$validIds = $entityCls::find()->selectSingleValue('id');
+		
+		//for changing db column
+		$field->setDefault(null);
+		$field->save();	
+		
+		//nullify invalid records
+		GO()->getDbConnection()->update(
+						$field->tableName(), 
+						[$field->databaseName => null],
+						(new Query)->where($field->databaseName, 'NOT IN', $validIds)
+						)->execute();
+		
+		try {			
+			$field->getDataType()->addConstraint();
+		} catch(PDOException $e) {			
+			//ignore duplicates
+		}
+	}
+	
+	private function findRecords(Field $field) {
+		return GO()->getDbConnection()->select("id, `" . $field->databaseName . "`")
+						->from($field->tableName())
+						->where($field->databaseName, '!=', "")
+						->andWhere($field->databaseName, 'IS NOT', null);
 	}
 	
 	
@@ -95,9 +146,7 @@ class Migrate63to64 {
 			$optionMap[$o['text']] = $o['id'];
 		}
 		
-		$query = GO()->getDbConnection()->select()
-						->from($field->tableName())
-						->where($field->databaseName, '!=', "");
+		$query = $this->findRecords($field);
 		
 		foreach($query as $record){
 			$values = explode("|", $record[$field->databaseName]);
@@ -160,7 +209,7 @@ class Migrate63to64 {
 		return $id + self::TREE_SELECT_OPTION_INCREMENT;
 	}
 	
-	private function findRecords(Field $field, array $fields) {
+	private function findTreeSelectRecords(Field $field, array $fields) {
 		$query = GO()->getDbConnection()->select()
 						->from($field->tableName());		
 		foreach($fields as $field) {
@@ -198,7 +247,7 @@ class Migrate63to64 {
 		$this->convertTreeSelectOptions($field);
 		
 		$fields = $this->findSlaveFields($field);
-		foreach($this->findRecords($field, $fields) as $record) {			
+		foreach($this->findTreeSelectRecords($field, $fields) as $record) {			
 			$id = $this->findSelectOptionId($record, $fields);			
 			
 			GO()->getDbConnection()

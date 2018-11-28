@@ -503,10 +503,10 @@ class QueryBuilder {
 		if (!isset($value)) {
 			if ($comparisonOperator == '=' || $comparisonOperator == 'IS') {
 				$tokens[] = "IS NULL";
-			} elseif ($comparisonOperator == '!=' || $comparisonOperator == 'NOT IS') {
+			} elseif ($comparisonOperator == '!=' || $comparisonOperator == 'IS NOT') {
 				$tokens[] = "IS NOT NULL";
 			} else {
-				throw new Exception('Null value not possible with comparator ' . $tokens[3]);
+				throw new Exception('Null value not possible with comparator: ' . $comparisonOperator);
 			}
 		} else if (is_array($value)) {
 			$tokens[] = $comparisonOperator == "=" ? "IN" : $comparisonOperator;
