@@ -13,8 +13,6 @@ class Migrate63to64 {
 		
 		$entityType = \go\core\orm\EntityType::findByName($entityName);
 		
-		$this->convertTypeNames($entityType->getId());
-		
 		$fields = Field::findByEntity($entityType->getId());
 
 		foreach ($fields as $field) {
@@ -90,13 +88,17 @@ class Migrate63to64 {
 	}
 	
 	
-	private function convertTypeNames($entityTypeId) {
+	public function convertTypeNames() {
 		
-		$fields = Field::findByEntity($entityTypeId);
+		$fields = Field::find();
 		
 		foreach ($fields as $field) {
 			$parts = explode('\\', $field->type);
 			$type = array_pop($parts);
+			
+			if($type == "UserGroup") {
+				$type = "Group";
+			}
 			
 			//Use DBAL because entity will alter database and we don't need that here.
 			GO()->getDbConnection()

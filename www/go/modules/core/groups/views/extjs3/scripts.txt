@@ -3,3 +3,4 @@ SystemSettingsGroupGrid.js
 GroupDialog.js
 GroupUserGrid.js
 GroupDefaultsWindow.js 
+GroupCombo.js

@@ -43,3 +43,6 @@ type/YesNo.js
 
 type/UserDialog.js
 type/User.js
+
+type/GroupDialog.js
+type/Group.js
