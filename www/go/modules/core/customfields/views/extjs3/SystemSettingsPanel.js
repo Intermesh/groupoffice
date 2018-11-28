@@ -43,11 +43,12 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 			if (this.loading || !this.rendered) {
 				return;
 			}
-			var me = this;
+			var me = this, id, e;
 			
 			Ext.apply(added, changed);
 			
-			added.forEach(function (e) {
+			for(id in added) {			
+				e = added[id];
 
 				//change for another entity. Skip it.
 				if(e.entity !== me.entity) {						
@@ -70,7 +71,7 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 					record.endEdit();
 					record.commit();
 				}
-			});
+			};
 			
 			if(destroyed.length) {
 				this.store.remove(this.store.getRange().filter(function(r) {
@@ -84,12 +85,12 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 				return;
 			}
 
-			var me = this;
+			var me = this, id, e;
 			
 			Ext.apply(added, changed);
 			
-			added.forEach(function (e) {					
-
+			for(id in added) {			
+				e = added[id];
 				if(me.store.findBy(function (record) {
 					if (record.data.isFieldSet && record.data.fieldSetId === e.fieldSetId) {
 						return true;
@@ -116,7 +117,8 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 					record.endEdit();
 					record.commit();
 				}
-			});
+			};
+			
 			if(destroyed.length) {
 				this.store.remove(this.store.getRange().filter(function(r) {
 					return destroyed.indexOf(r.data.fieldId) > -1;
