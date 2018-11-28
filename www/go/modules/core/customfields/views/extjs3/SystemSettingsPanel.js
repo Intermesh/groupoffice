@@ -44,34 +44,33 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 				return;
 			}
 			var me = this;
+			
+			Ext.apply(added, changed);
+			
+			added.forEach(function (e) {
 
-			store.get(added.concat(changed), function (entities) {			
-				
-				entities.forEach(function (e) {
-					
-					//change for another entity. Skip it.
-					if(e.entity !== me.entity) {						
-						return;
+				//change for another entity. Skip it.
+				if(e.entity !== me.entity) {						
+					return;
+				}
+
+				var record = me.store.getAt(me.store.findBy(function (record) {
+					if (record.data.isFieldSet && record.data.fieldSetId === e.id) {
+						return true;
 					}
+				}));
 
-					var record = me.store.getAt(me.store.findBy(function (record) {
-						if (record.data.isFieldSet && record.data.fieldSetId === e.id) {
-							return true;
-						}
-					}));
-
-					if (!record) {
-						me.load();
-					} else
-					{
-						record.beginEdit();
-						record.set("name", e.name);
-						record.set("sortOrder", e.sortOrder);
-						record.endEdit();
-						record.commit();
-					}
-				});
-			}, this);
+				if (!record) {
+					me.load();
+				} else
+				{
+					record.beginEdit();
+					record.set("name", e.name);
+					record.set("sortOrder", e.sortOrder);
+					record.endEdit();
+					record.commit();
+				}
+			});
 			
 			if(destroyed.length) {
 				this.store.remove(this.store.getRange().filter(function(r) {
@@ -86,38 +85,38 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 			}
 
 			var me = this;
-			store.get(added.concat(changed), function (entities) {
-				entities.forEach(function (e) {					
-					
-					if(me.store.findBy(function (record) {
-						if (record.data.isFieldSet && record.data.fieldSetId === e.fieldSetId) {
-							return true;
-						}
-					}) === -1) {
-						//fieldset not part of this panel
-						return;
-					}
-					
-					var record = me.store.getAt(me.store.findBy(function (record) {
-						if (record.data.fieldId === e.id) {
-							return true;
-						}
-					}));
-
-					if (!record) {
-						me.load();
-					} else
-					{
-						record.beginEdit();
-						record.set("name", e.name);
-						record.set("databaseName", e.databaseName);
-						record.set("sortOrder", e.sortOrder);
-						record.endEdit();
-						record.commit();
-					}
-				});
-			}, this);
 			
+			Ext.apply(added, changed);
+			
+			added.forEach(function (e) {					
+
+				if(me.store.findBy(function (record) {
+					if (record.data.isFieldSet && record.data.fieldSetId === e.fieldSetId) {
+						return true;
+					}
+				}) === -1) {
+					//fieldset not part of this panel
+					return;
+				}
+
+				var record = me.store.getAt(me.store.findBy(function (record) {
+					if (record.data.fieldId === e.id) {
+						return true;
+					}
+				}));
+
+				if (!record) {
+					me.load();
+				} else
+				{
+					record.beginEdit();
+					record.set("name", e.name);
+					record.set("databaseName", e.databaseName);
+					record.set("sortOrder", e.sortOrder);
+					record.endEdit();
+					record.commit();
+				}
+			});
 			if(destroyed.length) {
 				this.store.remove(this.store.getRange().filter(function(r) {
 					return destroyed.indexOf(r.data.fieldId) > -1;

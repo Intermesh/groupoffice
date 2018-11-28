@@ -13,6 +13,12 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 		//create record from entity store if not exists
 		if(value && this.store.entityStore && this.store.entityStore.entity && !this.findRecord(me.valueField, value)) {
 			this.store.entityStore.get([value], function (entities) {
+				
+				if(!entities[0]) {
+					console.warn("Invalid entity ID '" + value + "' for entity store '" + this.store.entityStore.entity.name + "'");
+					return;
+				}
+				
 				var comboRecord = Ext.data.Record.create([{
 					name: me.valueField
 				},{
@@ -23,7 +29,7 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 				me.store.add(currentRecord);
 				
 				go.form.ComboBox.superclass.setValue.call(me, value);
-			});
+			}, this);
 		} else
 		{
 			go.form.ComboBox.superclass.setValue.call(this, value);

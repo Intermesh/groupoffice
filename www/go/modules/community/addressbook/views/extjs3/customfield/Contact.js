@@ -32,8 +32,12 @@ go.modules.community.addressbook.customfield.Contact = Ext.extend(go.modules.cor
 			return "";
 		}
 		
-		go.Stores.get("Contact").get([value], function(users) {
-			cmp.setValue(users[0].name);
+		go.Stores.get("Contact").get([value], function(contacts) {
+			if(!contacts[0]) {
+				console.warn("Contact not found for ID: " + value);
+				return;
+			}
+			cmp.setValue(contacts[0].name);
 			cmp.setVisible(true);
 		});
 		
