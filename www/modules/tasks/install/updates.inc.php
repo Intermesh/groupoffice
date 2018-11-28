@@ -112,6 +112,5 @@ $updates['201810161450'][] = "delete from ta_tasks_custom_fields where id not in
 $updates['201810161450'][] = "ALTER TABLE `ta_tasks_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `ta_tasks`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
 $updates['201811282011'][] = function() {	
 	$m = new \go\modules\core\customfields\install\Migrate63to64();
-	$m->migrateEntity("Order");	
-	$m->migrateEntity("Product");	
+	$m->migrateEntity("Task");
 };
