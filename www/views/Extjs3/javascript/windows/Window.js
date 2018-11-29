@@ -84,6 +84,10 @@ GO.Window = Ext.extend(Ext.Window,{
 
 	hide : function(){
 		
+		if (this.activeGhost) {
+		 this.unghost();
+		}
+		
 		for(var i=0;i<this.temporaryListeners.length;i++)
 		{
 			this.un(this.temporaryListeners[i].eventName, this.temporaryListeners[i].fn, this.temporaryListeners[i].scope);
