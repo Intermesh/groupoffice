@@ -1,3 +1,6 @@
+- Calendar: Fixed link creating when adding event to another item
+- Core: Checkbox in tree panels never fired "checked" on checkchange.
+
 26-11-2018 6.3.54
 - Files: Fixed issue that files could not be deleted when a search is active.
 - Core: Merging of globalconfig.inc.php failed when config array was defined as array();
