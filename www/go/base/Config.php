@@ -1383,7 +1383,10 @@ var $billing_clear_payment_method_on_duplicate = true;
 		$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
 		
 		//auto host
-		$config['host'] = trim(dirname($_SERVER['SCRIPT_NAME']), '/');
+		if(empty($config['host'])) {
+			$config['host'] = dirname($_SERVER['SCRIPT_NAME']);
+		} 
+		$config['host'] = trim($config['host'], '/');
 		$config['host'] = empty($config['host']) ? '/' : '/' . $config['host'] . '/';		
 		$config['root_path'] = \go\core\Environment::get()->getInstallFolder()->getPath() . '/';
 		
