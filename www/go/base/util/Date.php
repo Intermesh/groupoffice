@@ -85,8 +85,10 @@ class Date {
 			if(!isset(self::$holidays[$region][$year])){
 				$hstmt = \GO\Base\Model\Holiday::model()->getHolidaysInPeriod($year.'-01-01', $year.'-12-31', $region);			
 				
-				foreach($hstmt as $h){
-					self::$holidays[$region][$year][$h->date]=$h->name;
+				if($hstmt) {
+					foreach($hstmt as $h){
+						self::$holidays[$region][$year][$h->date]=$h->name;
+					}
 				}
 			}
 			
