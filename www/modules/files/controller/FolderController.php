@@ -423,7 +423,16 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 //				$acl->description = $model->tableName() . '.' . $model->aclField();
 //				$acl->user_id = \GO::user() ? \GO::user()->id : 1;
 //				$acl->save();
-				$model->setNewAcl();
+				$shared_folder = $model;
+				while(!$shared_folder->isSomeonesHomeFolder() && $shared_folder->parent_id!=0) {
+					$shared_folder = $shared_folder->parent;
+				}
+				$acl = $model->setNewAcl($shared_folder->user_id);
+				$userGroup = \GO\Base\Model\Group::model()->findSingleByAttribute('isUserGroupFor', \GO::user()->id);
+				if($userGroup) {
+					$acl->addGroup($userGroup->id, \GO\Base\Model\Acl::MANAGE_PERMISSION);						
+				}
+				$acl->save(); // again
 				
 				//for enabling the acl permissions panel
 				$response['acl_id']=$model->acl_id;
@@ -476,7 +485,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 	protected function afterDisplay(&$response, &$model, &$params) {
 		$response['data']['path'] = $model->path;
 		$response['data']['type'] = \GO::t("Folder", "files");
-		
+		$response['data']['notify'] = $model->hasNotifyUser(\GO::user()->id);
 		$response['data']['url']=$model->externalUrl;
 
 		return parent::afterDisplay($response, $model, $params);
