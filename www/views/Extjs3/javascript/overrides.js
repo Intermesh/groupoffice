@@ -292,7 +292,7 @@ Ext.override(Ext.tree.TreeNodeUI, {
         this.iconNode = cs[2];
         var index = 3;
         if(cb){
-            this.checkbox = cs[3];
+            this.checkbox = cs[3].childNodes[0];
             // fix for IE6
             this.checkbox.defaultChecked = this.checkbox.checked;
             index++;
