@@ -1,3 +1,4 @@
+- Core: Fixed session reset problem (Export and Smime)
 - Calendar: Fixed link creating when adding event to another item
 - Core: Checkbox in tree panels never fired "checked" on checkchange.
 
