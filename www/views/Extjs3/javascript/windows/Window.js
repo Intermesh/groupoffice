@@ -111,6 +111,13 @@ GO.Window = Ext.extend(Ext.Window,{
 
 	hide : function() {		
 		this.removeTempListeners();		
+		
+		//Fix for ticket #201817154. Unclosable window remained when window was 
+		//hidden after submit while being dragged.
+		if (this.activeGhost) {
+		 this.unghost();
+		}
+		
 		GO.Window.superclass.hide.call(this);
 	}		
 });
