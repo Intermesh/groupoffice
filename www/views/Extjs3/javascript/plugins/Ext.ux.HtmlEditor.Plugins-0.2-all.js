@@ -750,7 +750,7 @@ Ext.ux.form.HtmlEditor.HeadingMenuEdited = Ext.extend(Ext.util.Observable, {
             listeners: {
                 'select': function(combo,rec){
                     this.relayCmd('formatblock', '<'+rec.get('value')+'>');
-                    //combo.reset();
+                    combo.reset();
                 },
                 scope: cmp
             }

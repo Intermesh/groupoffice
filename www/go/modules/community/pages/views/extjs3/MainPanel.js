@@ -1,7 +1,7 @@
 go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
     layout: "border",
-    siteId: '1',
-    pageId: '2',
+    siteId: '',
+    pageId: '',
     initComponent: function () {
 
 	this.content = new go.modules.community.pages.PageContent({
@@ -43,12 +43,12 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 		}
 	    ]
 	});
-	this.on("render", function () {
-	    console.log(this.siteId);
-	    console.log(this.pageId);
-	    this.tree.currentSiteId = this.siteId;
-	    this.content.currentPage = this.pageId;
-	}, this);
+//	this.on("render", function () {
+//	    console.log(this.siteId);
+//	    console.log(this.pageId);
+//	    this.tree.currentSiteId = this.siteId;
+//	    this.content.currentPage = this.pageId;
+//	}, this);
 
 	go.modules.community.pages.MainPanel.superclass.initComponent.call(this);
 	//add events here
@@ -69,11 +69,15 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 	dlg.load(id).show();
     },
     
-    setIds: function(pageId, siteId = this.siteId){
+    setSiteId: function(siteId){
 	this.siteId = siteId;
+	this.tree.currentSiteId = this.siteId;
+	this.tree.setLoaderSiteId(siteId);
+    },
+    
+    navigateToPage: function(pageId){
 	this.pageId = pageId;
-	    console.log(this.siteId);
-	    console.log(this.pageId);
+	this.content.currentPage = this.pageId;
     }
 
 });

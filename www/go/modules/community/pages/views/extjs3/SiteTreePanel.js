@@ -64,10 +64,9 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 
 	this.on("afterrender", function () {
 	    this.siteTreeEdit.siteId = this.currentSiteId;
-
 	    this.siteTree.getLoader().siteId = this.currentSiteId;
 	    this.siteTree.getLoader().on('load', function () {
-		console.log('loaded');
+		console.log('tree loaded');
 		this.siteTree.getLoader().entityStore.on('changes', this.reloadTree, this);
 	    }, this);
 	}, this);
@@ -91,13 +90,14 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 	});
     },
     reloadTree: function () {
-	console.log('reload');
+	console.log('reloading');
 	if (!this.siteTree.getLoader().loading) {
-	    console.log('current siteId: ' + this.currentSiteId);
-	    console.log('loader siteId: ' + this.siteTree.getLoader().siteId);
 	    this.siteTree.getRootNode().reload();
 	} else {
-	    console.log('loading...');
+	    console.log('tree is still loading');
 	}
+    },
+    setLoaderSiteId: function(siteId){
+	this.siteTree.getLoader().siteId = siteId;
     }
 })

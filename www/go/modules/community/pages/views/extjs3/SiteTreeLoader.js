@@ -6,7 +6,6 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(Ext.tree.TreeLoader, {
     siteId: '',
 
     load: function (node, callback, scope) {
-	console.log('siteId: ' + this.siteId);
 	if (this.clearOnLoad) {
 	    while (node.firstChild) {
 		node.removeChild(node.firstChild);
