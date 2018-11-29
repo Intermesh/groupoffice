@@ -1350,7 +1350,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			}
 		}
 
-		$joinCf = !empty($params['joinCustomFields']) && $this->customfieldsModel() && GO::modules()->customfields && GO::modules()->customfields->permissionLevel;
+		$joinCf = !empty($params['joinCustomFields']) && $this->customfieldsModel();
 
 		if($joinCf){
 
