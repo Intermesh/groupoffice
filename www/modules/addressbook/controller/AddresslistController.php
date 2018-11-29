@@ -49,7 +49,7 @@ class AddresslistController extends \GO\Base\Controller\AbstractModelController 
 		$sortDir = isset($params['dir'])?$params['dir']:'ASC';
 		$storeParams->order(array('addresslistGroupName',$sortColumn),array('ASC',$sortDir));
 
-		$storeParams->select('t.*,COALESCE(addresslistGroup.name,"'.\GO::t('strDefault').'") AS addresslistGroupName');
+		$storeParams->select('t.*,COALESCE(addresslistGroup.name,"'.\GO::t('Filter').'") AS addresslistGroupName');
 	}
 
 	public function formatStoreRecord($record, $model, $store) {
