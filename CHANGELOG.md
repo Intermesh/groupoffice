@@ -1,6 +1,8 @@
 - Core: Fixed session reset problem (Export and Smime)
 - Calendar: Fixed link creating when adding event to another item
 - Core: Checkbox in tree panels never fired "checked" on checkchange.
+- Core: Fix for ticket #201817154. Unclosable window remained when window was 
+  hidden after submit while being dragged
 
 26-11-2018 6.3.54
 - Files: Fixed issue that files could not be deleted when a search is active.
