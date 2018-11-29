@@ -258,7 +258,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @access  public
 	 */
 
-	public function getefault_time_format() {
+	public function getdefault_time_format() {
 		return \go\modules\core\users\model\Settings::get()->defaultTimeFormat;
 	}
 
