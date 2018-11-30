@@ -39,6 +39,19 @@ class Migrate63to64 {
 			$this->copyContacts($addressBook);
 		}
 	}
+	
+	public function migrateCustomField() {
+	
+		$cfMigrator = new \go\modules\core\customfields\install\Migrate63to64();
+		$fields = \go\modules\core\customfields\model\Field::find()->where(['type' => [
+				'Contact', 
+				//'Company'
+				]]);
+		
+		foreach($fields as $field) {
+			$cfMigrator->updateSelectEntity($field, Contact::class);
+		}
+	}
 
 	private function isAddressbookEmpty($id) {
 		$record = GO()->getDbConnection()->select('id')->from('ab_addressbooks')->where(['id' => $id])->single();

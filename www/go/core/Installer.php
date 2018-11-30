@@ -193,6 +193,8 @@ class Installer {
 	public function upgrade() {
 		$this->isInProgress = true;
 
+		GO()->setAuthState((new auth\TemporaryState())->setUserId(1));
+		
 
 		$this->isValidDb();
 		

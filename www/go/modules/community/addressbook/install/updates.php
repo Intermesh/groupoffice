@@ -25,4 +25,10 @@ $updates['201811282011'][] = function() {
 	$m->migrateEntity("Contact");	
 };
 
+
+$updates['201811282011'][] = function() {	
+	$m = new \go\modules\community\addressbook\install\Migrate63to64();
+	$m->migrateCustomField();	
+};
+
 //todo merge company custom fields

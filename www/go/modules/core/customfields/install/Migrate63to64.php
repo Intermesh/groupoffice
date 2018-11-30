@@ -13,6 +13,11 @@ class Migrate63to64 {
 		
 		$entityType = \go\core\orm\EntityType::findByName($entityName);
 		
+		if(!$entityType) {
+			echo "Entity type: ". $entityName . " not found. Skipping.\n";
+			return;
+		}
+		
 		$fields = Field::findByEntity($entityType->getId());
 
 		foreach ($fields as $field) {
@@ -44,7 +49,7 @@ class Migrate63to64 {
 //		exit("STOP FOR TEST");
 	}
 	
-	private function updateSelectEntity(Field $field, $entityCls) {		
+	public function updateSelectEntity(Field $field, $entityCls) {		
 		
 		$query = $this->findRecords($field);		
 		foreach($query as $record) {
