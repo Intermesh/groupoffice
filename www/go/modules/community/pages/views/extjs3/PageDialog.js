@@ -29,7 +29,7 @@ go.modules.community.pages.PageDialog = Ext.extend(go.form.Dialog, {
 						enableColors: false,
 						enableFont: false,
 						enableFontSize: false,
-						enableSourceEdit: false
+						//enableSourceEdit: false
 						
 					},
 					{

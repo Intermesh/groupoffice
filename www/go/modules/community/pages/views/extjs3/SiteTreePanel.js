@@ -65,10 +65,10 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 	this.on("afterrender", function () {
 	    this.siteTreeEdit.siteId = this.currentSiteId;
 	    this.siteTree.getLoader().siteId = this.currentSiteId;
-	    this.siteTree.getLoader().on('load', function () {
-		console.log('tree loaded');
-		this.siteTree.getLoader().entityStore.on('changes', this.reloadTree, this);
-	    }, this);
+//	    this.siteTree.getLoader().on('load', function () {
+//		console.log('tree loaded');
+//	    }, this);
+	    this.siteTree.getLoader().entityStore.on('changes', this.reloadTree, this);
 	}, this);
 
 	go.modules.community.pages.SiteTreePanel.superclass.initComponent.call(this);
