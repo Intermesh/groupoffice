@@ -2,17 +2,19 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
     layout: "border",
     siteId: '',
     pageId: '',
+    siteSlug: '',
+    //used in routing and redirecting in MainLayout.js
+    isSite: true,
+    
     initComponent: function () {
 
 	this.content = new go.modules.community.pages.PageContent({
 	    region: "center",
-	    padding: '1% 5% 0px 2%',
+	    padding: '1% 5% 2% 2%',
 	});
 	this.tree = new go.modules.community.pages.SiteTreePanel({
 	    region: "west",
 	    width: dp(250),
-	    //currentSiteId: this.siteId
-	    // add event listener to change the currently shown page, or pass a callback.
 	});
 
 	this.items = [
@@ -29,6 +31,24 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 			this.addPage();
 		    },
 		    scope: this
+		},		{
+		    iconCls: 'ic-delete',
+		    tooltip: t('Delete current page'),
+		    handler: function (e, toolEl) {
+			Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you wish to delete the current page?"), function (btn) {
+			    if (btn != "yes") {
+				return;
+			    }
+			    selectedId = this.pageId;
+			    go.Stores.get("Page").set({
+			    destroy: [selectedId]
+			    });
+			    //todo:
+			    //delete treepanel node as well.
+			}, this);
+			go.Router.goto(this.siteSlug)
+		    },
+		    scope: this
 		}, '->',
 		{
 		    xtype: "tbsearch"
@@ -37,21 +57,13 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 		    iconCls: 'ic-edit',
 		    tooltip: t('Edit'),
 		    handler: function (e, toolEl) {
-			this.editPage(2);
+			this.editPage(this.pageId);
 		    },
 		    scope: this
 		}
 	    ]
 	});
-//	this.on("render", function () {
-//	    console.log(this.siteId);
-//	    console.log(this.pageId);
-//	    this.tree.currentSiteId = this.siteId;
-//	    this.content.currentPage = this.pageId;
-//	}, this);
-
 	go.modules.community.pages.MainPanel.superclass.initComponent.call(this);
-	//add events here
 
 
     },
@@ -68,13 +80,15 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 	});
 	dlg.load(id).show();
     },
-    
+
+    //sets the site id for all relevant panels
     setSiteId: function(siteId){
 	this.siteId = siteId;
 	this.tree.currentSiteId = this.siteId;
 	this.tree.setLoaderSiteId(siteId);
     },
     
+    //updates the page id for all relevant panels
     navigateToPage: function(pageId){
 	this.pageId = pageId;
 	this.content.currentPage = this.pageId;

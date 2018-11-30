@@ -103,7 +103,7 @@ class Page extends AclItemEntity {
     public function getPageName() {
 	return $this->pageName;
     }
-
+    //set page name and generate a slug if the page doesnt have one yet.
     public function setPageName($name) {
 	$this->pageName = $name;
 	if (empty($this->slug)) {
@@ -116,21 +116,38 @@ class Page extends AclItemEntity {
     public function getContent() {
 	return $this->content;
     }
+    //set content and plainContent
     public function setContent($content) {
+	//adds the right encoding.
+	if(empty($this->content)){
+	    $content = '<?xml encoding="utf-8" ?>'.$content;
+	}
+	//var_dump($content);
+	//parse content to remove or add relevant tag id's.
 	$this->content = $this->parseContent($content);
 	if (empty($this->plainContent)) {
-	    //keep header tags to navigate while searching.
+	    //keep header tags to navigate while searching?
 	    $this->plainContent = strip_tags($content, '<h1><h2>');
 	}
     }
     
+    //fixes <p> id's, loops through the headers and generates id's 
+    //for the headers that dont have one yet.
     protected function parseContent($content){
-	$cleanedContent = $this->cleanTextIds($content);
 	$path = $this->getSlugPath();
 	$counter;
 	
 	$doc = new \DOMDocument();
-	$doc->loadHTML($cleanedContent);
+	
+	//ignore duplicate id errors so cleanTextIds() can use loadHTML to fix them.
+	libxml_use_internal_errors(true);
+	//prevent loadHTML from adding doctype or tags like head and body.
+	$doc->loadHTML($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+	$doc = $this->cleanTextIds($doc);
+	libxml_clear_errors();
+	libxml_use_internal_errors(false);
+	
+	
 	$xpath = new \DOMXPath($doc);
 	$headers = $xpath->evaluate('//h1 | //h2');
 	foreach($headers as $element){
@@ -164,9 +181,8 @@ class Page extends AclItemEntity {
     //Removes id's from <p> tags. 
     //Changing a <h> to a <p> does not remove the id.
     //This method is used to fix that.
-    protected function cleanTextIds($content){
-	$doc = new \DOMDocument();
-	$doc->loadHTML($content);
+    protected function cleanTextIds($DOMdocument){
+	$doc = $DOMdocument;
 	$text = $doc->getElementsByTagName('p');
 	foreach($text as $element){
 	    if($element->hasAttribute('id')){
@@ -175,7 +191,7 @@ class Page extends AclItemEntity {
 		$element->parentNode->replaceChild($changedElement, $element);
 	    }
 	}
-	return $doc->saveHTML();
+	return $doc;
     }
     
     //Generates The current page url based on the slug of the site and page.

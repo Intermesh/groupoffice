@@ -9,7 +9,7 @@ go.Modules.register("community", "pages", {
 	],
 	initModule: function () {}
 });
-
+//remove default module routing.
 go.Router.remove(/pages$/);
 
 
@@ -17,9 +17,11 @@ go.Router.remove(/pages$/);
 go.Router.add(/(.*)\/view\/(.*)/, function(siteSlug, pageSlug) {
     console.log('site slug:' + siteSlug);
     console.log('page slug:' + pageSlug);
-    //als na de pageSlug nog een # staat, opnieuw goto aanroepen om hiernaartoe te springen.
+    console.log('view: '+go.Router.getPath())
+    //als na de pageSlug nog een # staat, opnieuw goto aanroepen om naar de header te springen.
     var p = GO.mainLayout.openModule("pages");
-         go.Jmap.request({
+    p.siteSlug = siteSlug;
+    go.Jmap.request({
 	method: "Site/get",
 	params: {
 	    slug: siteSlug
@@ -29,23 +31,22 @@ go.Router.add(/(.*)\/view\/(.*)/, function(siteSlug, pageSlug) {
 	},
 	scope: this
     });
-     go.Jmap.request({
+    go.Jmap.request({
 	method: "Page/get",
 	params: {
 	    slug: pageSlug
 	},
 	callback: function(options, success, result) {
-	    p.navigateToPage(2);
+	    p.navigateToPage(59);
 	},
 	scope: this
     });
     
 });
 //redirects to the view hash after crud operations on pages
-//todo: delete action afvangen en naar een andere pagina redirecten.
 go.Router.add(/page\/(.*)/ , function(pageId) {
     // slug van de page ophalen
-    console.log('redirect to page '+ pageId);
+    console.log('redirect from: '+ go.Router.getPath());
     var p = GO.mainLayout.getModulePanel("pages");
     p.navigateToPage(pageId);
     go.Router.goto('pages\/view\/'+pageId+'/');
@@ -54,7 +55,7 @@ go.Router.add(/page\/(.*)/ , function(pageId) {
 //Redirect the tabpanel hash to the view hash.
 var routes = go.Router.add(/pages$/ , function() {
     // site|module naam naar site id vertalen, hierop gebaseerd eerste page ophalen en naar redirecten.
-    console.log('redirect');    
-    go.Router.goto('pages\/view\/firstPage/');
+    console.log('redirect from: '+ go.Router.getPath() );    
+    go.Router.goto('pages\/view\/');
 });
 console.log(routes);

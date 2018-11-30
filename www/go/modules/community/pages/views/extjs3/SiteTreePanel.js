@@ -94,7 +94,7 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 	if (!this.siteTree.getLoader().loading) {
 	    this.siteTree.getRootNode().reload();
 	} else {
-	    console.log('tree is still loading');
+	    console.log('tree is already loading');
 	}
     },
     setLoaderSiteId: function(siteId){
