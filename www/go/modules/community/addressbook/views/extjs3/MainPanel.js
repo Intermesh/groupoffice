@@ -220,6 +220,9 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 			s.baseParams.filter.addressBookId = addressBookId;
 		} else
 		{
+			
+			delete s.baseParams.filter.addressBookId;
+			
 			var firstAbNode = this.addressBookTree.getRootNode().childNodes[1];
 			if (firstAbNode) {
 				this.addAddressBookId = firstAbNode.attributes.data.id;

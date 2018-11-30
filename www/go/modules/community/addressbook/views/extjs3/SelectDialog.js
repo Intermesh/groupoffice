@@ -117,10 +117,14 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 	setAddressBookId: function (addressBookId) {
 		var s = this.grid.store;
 
-		s.baseParams.filter = {
-			addressBookId: addressBookId,
+		s.baseParams.filter = {			
 			hasEmailAddresses: true
 		};
+		
+		if(addressBookId) {
+			s.baseParams.filter.addressBookId = addressBookId;
+		}
+		
 		s.load();
 	},
 
