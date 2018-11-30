@@ -16,7 +16,7 @@ use go\core\http\Request;
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
-$root = dirname(__FILE__).'/';
+//$root = dirname(__FILE__).'/';
 
 try {
   //initialize autoloading of library
