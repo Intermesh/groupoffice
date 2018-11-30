@@ -359,7 +359,7 @@ class Connection {
 	 * 
 	 * @param string $tableName
 	 * @param array|Expression
-	 * @param Criteria $query
+	 * @param Query|string|array $query {@see Query::normalize()}
 	 * @return Statement
 	 */
 	public function update($tableName, $data, $query = null) {

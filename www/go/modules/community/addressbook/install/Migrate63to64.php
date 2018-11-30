@@ -152,8 +152,6 @@ class Migrate63to64 {
 			if($field->type == "Company") {
 				$field->type = "Contact";
 				$incrementID = $this->getCompanyIdIncrement();
-				
-				var_dump($field->id);
 			} else
 			{
 				$incrementID = 0;
