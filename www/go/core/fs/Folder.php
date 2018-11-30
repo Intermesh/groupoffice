@@ -2,7 +2,6 @@
 namespace go\core\fs;
 
 use Exception;
-use IFW;
 
 /**
  * A folder object

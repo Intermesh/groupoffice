@@ -58,6 +58,8 @@ use const GO_CONFIG_FILE;
 		 * @var CacheInterface 
 		 */
 		private $cache;
+		
+		private $version;
 
 		protected function __construct() {
 			date_default_timezone_set("UTC");
@@ -69,11 +71,14 @@ use const GO_CONFIG_FILE;
 		}
 		
 		public function getVersion() {
-			return require(Environment::get()->getInstallFolder()->getPath() . '/version.php');
+			if(!isset($this->version)) {
+				$this->version = require(Environment::get()->getInstallFolder()->getPath() . '/version.php');
+			}
+			return $this->version;
 		}
 
 		private function initCompatibility() {
-			require(Environment::get()->getInstallFolder()->getPath() . "/go/GO.php");
+			require(Environment::get()->getInstallPath() . "/go/GO.php");
 			spl_autoload_register(array('GO', 'autoload'));
 		}
 
