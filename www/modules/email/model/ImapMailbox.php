@@ -411,5 +411,5 @@ class ImapMailbox extends \GO\Base\Model {
                 } else {
                         return $this->subscribed ||  $this->getHasChildren(true);
                 }
-	}	
+	}
 }

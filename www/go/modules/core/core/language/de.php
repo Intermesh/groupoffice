@@ -334,7 +334,6 @@ return array (
 Copyright (c) 2003-{current_year}, {company_name}<br/>
 All rights reserved.' => 'Version: {version}<br />
 Copyright (c) 2003-{current_year}, {product_name}<br />
-<<<<<<< HEAD
 All rights reserved.<br />',
   'Totals' => 'Gesamt',
   'Page %s of %s' => 'Seite %s von %s',
