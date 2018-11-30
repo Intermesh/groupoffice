@@ -49,18 +49,17 @@ class Migrate63to64 {
 //		exit("STOP FOR TEST");
 	}
 	
-	public function updateSelectEntity(Field $field, $entityCls) {		
+	public function updateSelectEntity(Field $field, $entityCls, $incrementID = 0) {		
 		
 		$query = $this->findRecords($field);		
 		foreach($query as $record) {
 			//Value is string <id>:<Text>
 			$id = explode(':', $record[$field->databaseName])[0];
-			$record[$field->databaseName] = $id;
 			
 			GO()->getDbConnection()
 								->update(
 												$field->tableName(), 
-												[$field->databaseName => $id],
+												[$field->databaseName => $id + $incrementID],
 												['id' => $record['id']]
 												)->execute();
 		}
@@ -69,7 +68,9 @@ class Migrate63to64 {
 		
 		//for changing db column
 		$field->setDefault(null);
-		$field->save();	
+		if(!$field->save()) {
+			throw new \Exception("Couldn't save field: ".var_export($field->getValidationErrors()));
+		}
 		
 		//nullify invalid records
 		GO()->getDbConnection()->update(

@@ -16,6 +16,9 @@ use function GO;
 class Migrate63to64 {
 
 	public function run() {
+			
+		$this->migrateCustomFields();
+		
 		$db = GO()->getDbConnection();
 		//Start from scratch
 		$db->query("DELETE FROM addressbook_addressbook");
@@ -36,8 +39,105 @@ class Migrate63to64 {
 				throw new Exception("Could not save addressbook");
 			}
 
-			$this->copyContacts($addressBook);
+			$this->copyCompanies($addressBook);
+			
+			$this->copyContacts($addressBook);			
 		}
+		
+		$this->migrateCompanyLinks();		
+		$this->addCustomFieldKeys();
+
+		$m = new \go\modules\core\customfields\install\Migrate63to64();
+		$m->migrateEntity("Contact");				
+		
+		$this->migrateCustomField();
+
+		GO()->getDbConnection()->delete("core_entity", ['name' => "Company"])->execute();
+		
+	}
+	
+	private function addCustomFieldKeys() {
+		$c = GO()->getDbConnection();
+		$c->query("delete from addressbook_contact_custom_fields where id not in (select id from addressbook_contact);");	
+		$c->query("ALTER TABLE `addressbook_contact_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `addressbook_contact`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;");
+
+	}
+	public function migrateCustomFields() {
+		$c = GO()->getDbConnection();
+		$c->query("DROP TABLE IF EXISTS addressbook_contact_custom_fields");
+		$c->query("CREATE TABLE addressbook_contact_custom_fields LIKE cf_ab_contacts;");
+		$c->query("INSERT addressbook_contact_custom_fields SELECT * FROM cf_ab_contacts;");
+		$c->query("ALTER TABLE `addressbook_contact_custom_fields` CHANGE `model_id` `id` INT(11) NULL DEFAULT NULL;");
+		
+		$this->mergeCompanyCustomFields();
+		
+		
+	}
+	
+	private function mergeCompanyCustomFields() {
+		$stmt = GO()->getDbConnection()->query("SHOW CREATE TABLE cf_ab_companies");
+		$stmt->setFetchMode(\PDO::FETCH_COLUMN, 1);
+		
+		$alterSQL = "ALTER TABLE addressbook_contact_custom_fields ";
+		$sql = $stmt->fetch();
+		
+		$lines = array_map('trim', explode("\n", str_replace("\r", "", $sql)));		
+		foreach($lines as $line) {
+			if($line[0] == '`' && substr($line, 0, 10) != '`model_id`') {
+				$alterSQL .= "ADD ".$line."\n";
+			}
+		}
+		$alterSQL = substr($alterSQL, 0, -2) .';';
+		
+		echo $alterSQL."\n\n";
+		
+		GO()->getDbConnection()->query($alterSQL);
+		
+		$table = \go\core\db\Table::getInstance("cf_ab_companies");
+		$cols = array_filter($table->getColumnNames(), function($n) {return $n != "model_id";});
+		
+		
+		$data = GO()->getDbConnection()
+						->select('(`model_id` + '. $this->getCompanyIdIncrement().') as id')
+						->select($cols, true)
+						->from('cf_ab_companies');
+		
+		GO()->getDbConnection()->insert('addressbook_contact_custom_fields', $data, array_merge(['id'], $cols))->execute();
+		
+		$companyEntityType = \go\core\orm\EntityType::findByName("Company");
+		
+		if($companyEntityType) {
+			GO()->getDbConnection()
+							->update("core_customfields_field_set", 
+											['entityId' => Contact::getType()->getId()], 
+											['entityId' => $companyEntityType->getId()])
+							->execute();
+		}
+	}
+	
+	public function migrateCompanyLinks() {
+		$companyEntityType = \go\core\orm\EntityType::findByName("Company");
+		if(!$companyEntityType) {
+			return;
+		}
+		
+		GO()->getDbConnection()
+						->update("core_link", 
+										[
+												'fromEntityTypeId' => Contact::getType()->getId(),
+												'fromId' => new \go\core\db\Expression('fromId + ' . $this->getCompanyIdIncrement())
+										], 
+										['fromEntityTypeId' => $companyEntityType->getId()])
+						->execute();
+		
+		GO()->getDbConnection()
+						->update("core_link", 
+										[
+												'toEntityTypeId' => Contact::getType()->getId(),
+												'toId' => new \go\core\db\Expression('fromId + ' . $this->getCompanyIdIncrement())
+										], 
+										['toEntityTypeId' => $companyEntityType->getId()])
+						->execute();
 	}
 	
 	public function migrateCustomField() {
@@ -45,12 +145,30 @@ class Migrate63to64 {
 		$cfMigrator = new \go\modules\core\customfields\install\Migrate63to64();
 		$fields = \go\modules\core\customfields\model\Field::find()->where(['type' => [
 				'Contact', 
-				//'Company'
+				'Company'
 				]]);
 		
 		foreach($fields as $field) {
-			$cfMigrator->updateSelectEntity($field, Contact::class);
+			if($field->type == "Company") {
+				$field->type = "Contact";
+				$incrementID = $this->getCompanyIdIncrement();
+				
+				var_dump($field->id);
+			} else
+			{
+				$incrementID = 0;
+			}
+			$cfMigrator->updateSelectEntity($field, Contact::class, $incrementID);
 		}
+	}
+	
+	private $companyIdIncrement;
+	
+	public function getCompanyIdIncrement() {
+		if(!isset($this->companyIdIncrement)) {
+			$this->companyIdIncrement = (int) GO()->getDbConnection()->selectSingleValue('max(id)')->from('ab_contacts')->execute()->fetch();
+		}
+		return $this->companyIdIncrement;
 	}
 
 	private function isAddressbookEmpty($id) {
@@ -226,13 +344,152 @@ class Migrate63to64 {
 
 			$contact->notes = $r['comment'];
 
-			$contact->filesFolderId = $r['files_folder_id'];
+			//$contact->filesFolderId = $r['files_folder_id'];
 
 			$contact->createdAt = new DateTime("@" . $r['ctime']);
 			$contact->modifiedAt = new DateTime("@" . $r['mtime']);
 			$contact->createdBy = \go\modules\core\users\model\User::findById($r['user_id'], ['id']) ? $r['user_id'] : 1;
 			$contact->modifiedBy = \go\modules\core\users\model\User::findById($r['muser_id'], ['id']) ? $r['muser_id'] : 1;
 			$contact->goUserId = empty($r['go_user_id']) || !\go\modules\core\users\model\User::findById($r['go_user_id'], ['id']) ? null : $r['go_user_id'];
+
+			if ($r['photo']) {
+
+				$file = GO()->getDataFolder()->getFile($r['photo']);
+				if ($file->exists()) {
+					$tmpFile = \go\core\fs\File::tempFile($file->getExtension());
+					$file->copy($tmpFile);
+					$blob = \go\core\fs\Blob::fromTmp($tmpFile);
+					if (!$blob->save()) {
+						throw new \Exception("Could not save blob");
+					}
+
+					$contact->photoBlobId = $blob->id;
+				}
+			}
+
+			if (!$contact->save()) {
+				throw new \Exception("Could not save contact");
+			}
+			
+			if($r['company_id']) {				
+				$orgId = $r['company_id'] + $this->getCompanyIdIncrement();
+				
+				$org = Contact::findById($orgId);
+				if($org) {
+					\go\modules\core\links\model\Link::create($contact, $org);
+				}
+			}
+		}
+	}
+	
+	
+	
+	private function copyCompanies(AddressBook $addressBook) {
+		$db = GO()->getDbConnection();		
+
+		$contacts = $db->select()->from('ab_companies')->where(['addressbook_id' => $addressBook->id]);
+
+		foreach ($contacts as $r) {
+			$contact = new Contact();
+			$contact->isOrganization = true;
+			$contact->id = $r['id'] + $this->getCompanyIdIncrement();
+			$contact->addressBookId = $addressBook->id;
+			$contact->name = $r['name'];		
+			
+			//name2 ??
+			
+			if (!empty($r['email'])) {
+				$contact->emailAddresses[] = (new EmailAddress())
+								->setValues([
+						'type' => EmailAddress::TYPE_WORK,
+						'email' => $r['email']
+				]);
+			}
+
+			if (!empty($r['invoice_email'])) {
+				$contact->emailAddresses[] = (new EmailAddress())
+								->setValues([
+						'type' => EmailAddress::TYPE_BILLING,
+						'email' => $r['invoice_email']
+				]);
+			}
+			
+
+			if (!empty($r['phone'])) {
+				$contact->phoneNumbers[] = (new PhoneNumber())
+								->setValues([
+						'type' => PhoneNumber::TYPE_WORK,
+						'number' => $r['phone']
+				]);
+			}
+
+			if (!empty($r['fax'])) {
+				$contact->phoneNumbers[] = (new PhoneNumber())
+								->setValues([
+						'type' => PhoneNumber::TYPE_FAX,
+						'number' => $r['fax']
+				]);
+			}
+
+		
+			if (!empty($r['homepage'])) {
+				$contact->urls[] = (new Url())
+								->setValues([
+						'type' => Url::TYPE_HOMEPAGE,
+						'url' => $r['homepage']
+				]);
+			}
+
+	
+
+
+			$address = new Address();
+			$address->type = Address::TYPE_HOME;
+			$address->country = $r['country'] ?? null;
+			$address->state = $r['state'] ?? null;
+			$address->city = $r['city'] ?? null;
+			$address->zipCode = $r['zip'] ?? null;
+			$address->street = $r['address'] ?? null;
+			$address->street2 = $r['address_no'] ?? null;
+			$address->latitude = $r['latitude'] ?? null;
+			$address->longitude = $r['longitude'] ?? null;
+
+			if ($address->isModified()) {
+				$contact->addresses[] = $address;
+			}
+			
+			$address = new Address();
+			$address->type = Address::TYPE_POSTAL;
+			$address->country = $r['post_country'] ?? null;
+			$address->state = $r['post_state'] ?? null;
+			$address->city = $r['post_city'] ?? null;
+			$address->zipCode = $r['post_zip'] ?? null;
+			$address->street = $r['post_address'] ?? null;
+			$address->street2 = $r['post_address_no'] ?? null;
+			$address->latitude = $r['post_latitude'] ?? null;
+			$address->longitude = $r['post_longitude'] ?? null;
+
+			if ($address->isModified()) {
+				$contact->addresses[] = $address;
+			}
+
+			$contact->notes = $r['comment'];
+
+			//$contact->filesFolderId = $r['files_folder_id'];
+
+			$contact->createdAt = new DateTime("@" . $r['ctime']);
+			$contact->modifiedAt = new DateTime("@" . $r['mtime']);
+			$contact->createdBy = \go\modules\core\users\model\User::findById($r['user_id'], ['id']) ? $r['user_id'] : 1;
+			$contact->modifiedBy = \go\modules\core\users\model\User::findById($r['muser_id'], ['id']) ? $r['muser_id'] : 1;
+			$contact->goUserId = empty($r['go_user_id']) || !\go\modules\core\users\model\User::findById($r['go_user_id'], ['id']) ? null : $r['go_user_id'];
+			
+			$contact->IBAN = $r['bank_no'];
+			
+			//bank_bic???
+			
+			$contact->vatNo = $r['vat_no'];
+			
+							
 
 			if ($r['photo']) {
 
