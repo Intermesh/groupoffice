@@ -73,7 +73,7 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 	
 	
 	onLoadComplete : function(user) {
-		this.templateGrid.setOwnedBy(user.id);
+		//this.templateGrid.setOwnedBy(user.id);
 	},
 
 	onSubmitComplete : function() {

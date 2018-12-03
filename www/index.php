@@ -22,8 +22,8 @@ try {
   //initialize autoloading of library
   require_once('GO.php');
   //\GO::init();
-
-
+	
+	
 if(!empty($_POST['accessToken'])) {
 	//used for direct token login from multi_instance module
 	//this token is used in default_scripts.inc.php too

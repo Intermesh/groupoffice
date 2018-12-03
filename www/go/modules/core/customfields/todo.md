@@ -32,8 +32,6 @@ For new:
 	templates for project contracts (See income model)
 
 
-Custom field update / install queries for modules
-Migration of custom fields and address book
 
 
 Affected customer modules:
