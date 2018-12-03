@@ -1,3 +1,4 @@
+03-12-2018 6.3.55
 - Holidays: fix in copy holidays from last year
 - Core: Always join customfields when joinCustomFields is set. because this is a core module now.
 - DAV: 'host' property used for DAV baseUri
