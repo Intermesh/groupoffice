@@ -341,3 +341,6 @@ $updates['201811281508'][] = function() {
 	$m = new \go\modules\core\customfields\install\Migrate63to64();
 	$m->convertTypeNames();
 };
+
+
+$updates['201812031512'][] = "UPDATE core_module set sort_order = sort_order + 100 where package != 'core' or package is null;";

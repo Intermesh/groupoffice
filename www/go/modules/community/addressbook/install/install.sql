@@ -37,9 +37,9 @@ CREATE TABLE `addressbook_contact` (
   `gender` enum('M','F') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'M for Male, F for Female or null for unknown',
   `notes` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `isOrganization` tinyint(1) NOT NULL DEFAULT 0,
-  `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'name field for companies and contacts. It should be the display name of first, middle and last name',
-  `IBAN` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `registrationNumber` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'Company trade registration number',
+  `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'name field for companies and contacts. It should be the display name of first, middle and last name',
+  `IBAN` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `registrationNumber` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Company trade registration number',
   `vatNo` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `vatReverseCharge` tinyint(1) NOT NULL DEFAULT 0,
   `debtorNumber` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -89,7 +89,7 @@ CREATE TABLE `addressbook_phone_number` (
   `id` int(11) NOT NULL,
   `contactId` int(11) NOT NULL,
   `type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `number` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL
+  `number` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
 CREATE TABLE `addressbook_smart_addressbook` (

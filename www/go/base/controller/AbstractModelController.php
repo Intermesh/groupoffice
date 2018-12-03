@@ -1062,33 +1062,33 @@ class AbstractModelController extends AbstractController {
 		
 //		asort($attributes);
 		
-		if($model->customfieldsRecord){
-			$customAttributes = array();
-			$columns = $model->customfieldsRecord->getColumns();
-			foreach($columns as $name=>$attr){
-				try {
-					$cfModel = \GO\Customfields\Model\Field::model()->findByPk(substr($name,4));
-					$cfAllowed = $cfModel!==false;
-				} catch (\GO\Base\Exception\AccessDenied $e) {
-					$cfAllowed = false;
-				}
-
-				if($name != 'model_id'
-								&& !empty($cfAllowed)
-								&& isset($attr['customfield'])
-								&& !in_array($name, $params['exclude'])
-								&& (empty($params['hide_unknown_gotypes']) || !empty($attr['gotype']))
-								&& !in_array($attr['customfield']->datatype,$params['exclude_cf_datatypes']))
-				{					
-					$customAttributes[$model->customfieldsRecord->getAttributeLabel($name)]=array('name'=>'cf.'.$name, 'label'=>$model->customfieldsRecord->getAttributeLabel($name),'gotype'=>'customfield');					
-				}
-			}
-			ksort($customAttributes);
-			foreach($customAttributes as $a){
-				$attributes[$a['name']]=$a;
-			}
-//			$attributes=array_merge($attributes, $customAttributes);
-		}
+//		if($model->customfieldsRecord){
+//			$customAttributes = array();
+//			$columns = $model->customfieldsRecord->getColumns();
+//			foreach($columns as $name=>$attr){
+//				try {
+//					$cfModel = \GO\Customfields\Model\Field::model()->findByPk(substr($name,4));
+//					$cfAllowed = $cfModel!==false;
+//				} catch (\GO\Base\Exception\AccessDenied $e) {
+//					$cfAllowed = false;
+//				}
+//
+//				if($name != 'model_id'
+//								&& !empty($cfAllowed)
+//								&& isset($attr['customfield'])
+//								&& !in_array($name, $params['exclude'])
+//								&& (empty($params['hide_unknown_gotypes']) || !empty($attr['gotype']))
+//								&& !in_array($attr['customfield']->datatype,$params['exclude_cf_datatypes']))
+//				{					
+//					$customAttributes[$model->customfieldsRecord->getAttributeLabel($name)]=array('name'=>'cf.'.$name, 'label'=>$model->customfieldsRecord->getAttributeLabel($name),'gotype'=>'customfield');					
+//				}
+//			}
+//			ksort($customAttributes);
+//			foreach($customAttributes as $a){
+//				$attributes[$a['name']]=$a;
+//			}
+////			$attributes=array_merge($attributes, $customAttributes);
+//		}
 		
 		foreach($attributes as $field=>$attr)
 			$response['results'][]=$attr;

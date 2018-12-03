@@ -14,37 +14,52 @@ use go\modules\community\addressbook\model\Url;
 use function GO;
 
 class Migrate63to64 {
+	
+	private $countries;
 
 	public function run() {
+		
+		//clear cache
+		\go\core\db\Table::destroyInstances();
+		
+		$this->countries = GO()->t('countries');
 			
 		$this->migrateCustomFields();
 		
 		$db = GO()->getDbConnection();
 		//Start from scratch
-		$db->query("DELETE FROM addressbook_addressbook");
+//		$db->query("DELETE FROM addressbook_addressbook");
 
-		$addressBooks = $db->select()->from('ab_addressbooks');
+		$addressBooks = $db->select('a.*')->from('ab_addressbooks', 'a')
+						->join("ab_contacts", 'c', 'c.addressbook_id = a.id', 'left')
+						->join("ab_companies", 'o', 'c.addressbook_id = a.id', 'left')
+						->having("count(c.id)>0 or count(o.id)>0");		
 
 		foreach ($addressBooks as $abRecord) {
-			if ($this->isAddressbookEmpty($abRecord['id'])) {
-				continue;
-			}
+			echo "Migrating addressbook ". $abRecord['name'] . "\n";
+			flush();
 
-			$addressBook = new AddressBook();
-			$addressBook->id = $abRecord['id'];
-			$addressBook->createdBy = $abRecord['user_id'];
-			$addressBook->aclId = $abRecord['acl_id'];
-			$addressBook->name = $abRecord['name'];
-			if (!$addressBook->save()) {
-				throw new Exception("Could not save addressbook");
+			$addressBook = AddressBook::find()->where(['name'=>$abRecord['name']])->single();
+			if(!$addressBook) {
+				$addressBook = new AddressBook();
+				$addressBook->id = $abRecord['id'];
+				$addressBook->createdBy = $abRecord['user_id'];
+				$addressBook->aclId = $abRecord['acl_id'];
+				$addressBook->name = $abRecord['name'];
+				if (!$addressBook->save()) {
+					throw new Exception("Could not save addressbook");
+				}
 			}
 
 			$this->copyCompanies($addressBook);
 			
-			$this->copyContacts($addressBook);			
+			$this->copyContacts($addressBook);	
+			
+			echo "\n";
+			flush();
 		}
 		
-		$this->migrateCompanyLinks();		
+		//$this->migrateCompanyLinks();		
 		$this->addCustomFieldKeys();
 
 		$m = new \go\modules\core\customfields\install\Migrate63to64();
@@ -63,6 +78,8 @@ class Migrate63to64 {
 
 	}
 	public function migrateCustomFields() {
+		echo "Migrating custom fields\n";
+		flush();
 		$c = GO()->getDbConnection();
 		$c->query("DROP TABLE IF EXISTS addressbook_contact_custom_fields");
 		$c->query("CREATE TABLE addressbook_contact_custom_fields LIKE cf_ab_contacts;");
@@ -116,6 +133,8 @@ class Migrate63to64 {
 	}
 	
 	public function migrateCompanyLinks() {
+		echo "Migrating links\n";
+		flush();
 		$companyEntityType = \go\core\orm\EntityType::findByName("Company");
 		if(!$companyEntityType) {
 			return;
@@ -141,6 +160,9 @@ class Migrate63to64 {
 	}
 	
 	public function migrateCustomField() {
+		
+		echo "Migrating address book custom field types\n";
+		flush();
 	
 		$cfMigrator = new \go\modules\core\customfields\install\Migrate63to64();
 		$fields = \go\modules\core\customfields\model\Field::find()->where(['type' => [
@@ -169,18 +191,28 @@ class Migrate63to64 {
 		return $this->companyIdIncrement;
 	}
 
-	private function isAddressbookEmpty($id) {
-		$record = GO()->getDbConnection()->select('id')->from('ab_addressbooks')->where(['id' => $id])->single();
-
-		return $record === false;
-	}
 
 	private function copyContacts(AddressBook $addressBook) {
+		
+		
 		$db = GO()->getDbConnection();
 
-		$contacts = $db->select()->from('ab_contacts')->where(['addressbook_id' => $addressBook->id]);
+		$contacts = $db->select()->from('ab_contacts')
+						->where(['addressbook_id' => $addressBook->id])
+						->orderBy(['id' => 'ASC']);
+		
+		//continue where we left last time if failed.
+		$max = $db->selectSingleValue('max(id)')->from("addressbook_contact")->where('id', '<', $this->getCompanyIdIncrement())->single();
+		if($max>0) {
+			$contacts->andWhere('id', '>', $max);
+		}
+						
 
 		foreach ($contacts as $r) {
+			$r = array_map("trim", $r);
+			echo ".";
+			flush();
+		
 			$contact = new Contact();
 			$contact->id = $r['id'];
 			$contact->addressBookId = $addressBook->id;
@@ -220,14 +252,14 @@ class Migrate63to64 {
 				$contact->emailAddresses[] = (new EmailAddress())
 								->setValues([
 						'type' => EmailAddress::TYPE_WORK,
-						'email' => $r['email']
+						'email' => $r['email2']
 				]);
 			}
 			if (!empty($r['email3'])) {
 				$contact->emailAddresses[] = (new EmailAddress())
 								->setValues([
 						'type' => EmailAddress::TYPE_WORK,
-						'email' => $r['email']
+						'email' => $r['email3']
 				]);
 			}
 
@@ -366,6 +398,7 @@ class Migrate63to64 {
 			}
 
 			if (!$contact->save()) {
+				GO()->debug($r);
 				throw new \Exception("Could not save contact");
 			}
 			
@@ -386,8 +419,19 @@ class Migrate63to64 {
 		$db = GO()->getDbConnection();		
 
 		$contacts = $db->select()->from('ab_companies')->where(['addressbook_id' => $addressBook->id]);
+		
+		//continue where we left last time if failed.
+		$max = $db->selectSingleValue('max(id)')->from("addressbook_contact")->single();
+		if($max>0) {
+			$contacts->andWhere('id', '>', $max - $this->getCompanyIdIncrement());
+		}
 
 		foreach ($contacts as $r) {
+			$r = array_map("trim", $r);
+			
+			echo ".";
+			flush();
+			
 			$contact = new Contact();
 			$contact->isOrganization = true;
 			$contact->id = $r['id'] + $this->getCompanyIdIncrement();
@@ -438,7 +482,6 @@ class Migrate63to64 {
 				]);
 			}
 
-	
 
 
 			$address = new Address();
@@ -505,6 +548,9 @@ class Migrate63to64 {
 			}
 
 			if (!$contact->save()) {
+				
+				GO()->debug($r);
+				
 				throw new \Exception("Could not save contact");
 			}
 		}

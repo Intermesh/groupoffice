@@ -1,12 +1,5 @@
 <?php
-use GO\Base\Observable;
-use go\core\App;
-use go\core\Environment;
-use go\modules\core\modules\model\Module;
-use go\core\util\Lock;
-
-
-
+use go\core\ErrorHandler;
 
 
 try {
@@ -58,8 +51,8 @@ try {
 		echo "</section>";
 
 	} 
-} catch (\Exception $e) {
-	echo "<b>Error:</b> ". \go\core\ErrorHandler::logException($e)."\n\n";;
+} catch (Exception $e) {
+	echo "<b>Error:</b> ". ErrorHandler::logException($e)."\n\n";;
 	
 	echo $e->getTraceAsString();
 	

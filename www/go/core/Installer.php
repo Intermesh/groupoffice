@@ -215,6 +215,9 @@ class Installer {
 		GO()->setCache(new None());
 		Entity2::$trackChanges = false;
 		
+		GO()->getDbConnection()->delete("core_entity", ['name' => 'GO\\Projects\\Model\\Project'])->execute();
+
+		
 		if (!$this->upgradeModules()) {
 			echo "\n\nA module was refactored. Rerunning...\n\n";
 			$this->upgradeModules();

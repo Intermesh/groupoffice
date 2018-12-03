@@ -34,6 +34,9 @@ class Table {
 	}
 	
 	public static function destroyInstances() {
+		foreach(self::$cache as $i) {
+			$i->clearCache();
+		}
 		self::$cache = [];
 	}
 	
