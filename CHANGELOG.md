@@ -1,3 +1,10 @@
+- Holidays: fix in copy holidays from last year
+- Core: Always join customfields when joinCustomFields is set. because this is a core module now.
+- DAV: 'host' property used for DAV baseUri
+- Files: Creating folder in shared folder will not make you the owner anymore
+- Addressbook: fixed birthday portlet on start page
+- Addressbook: fixed importing contacts without type (works for vcard property groups)
+- Core: GO::config() will use 'host' from config.php if it is specified
 - Core: Fixed session reset problem (Export and Smime)
 - Calendar: Fixed link creating when adding event to another item
 - Core: Checkbox in tree panels never fired "checked" on checkchange.
