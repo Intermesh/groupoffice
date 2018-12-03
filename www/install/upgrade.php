@@ -59,7 +59,13 @@ try {
 	echo "</pre></div>";
 	
 	if(GO()->getDebugger()->enabled) {
-		echo "<div style=\"clear:both;margin-bottom:20px;\"></div><div class=\"card\"><h2>Debugger output</h2><pre>" . implode("\n", GO()->getDebugger()->getEntries()) . "</pre></div>";
+		echo "<div style=\"clear:both;margin-bottom:20px;\"></div><div class=\"card\"><h2>Debugger output</h2><pre>";
+		
+		foreach(GO()->getDebugger()->getEntries() as $line) {
+			echo $line ."\n";
+		}
+		
+		echo "</pre></div>";
 	}
 	
 	echo "</section>";

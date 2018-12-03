@@ -19,12 +19,15 @@ class Migrate63to64 {
 
 	public function run() {
 		
-		//clear cache
-		\go\core\db\Table::destroyInstances();
+		//clear cache for ClassFinder fail in custom field type somehow.
+		GO()->getCache()->flush();
 		
 		$this->countries = GO()->t('countries');
 			
 		$this->migrateCustomFields();
+		
+		
+		$this->migrateCompanyLinks();
 		
 		$db = GO()->getDbConnection();
 		//Start from scratch
@@ -141,6 +144,22 @@ class Migrate63to64 {
 			return;
 		}
 		
+//		GO()->getDbConnection()
+//						->delete(
+//										'core_link', 
+//										(new \go\core\db\Query)
+//										->where(['fromEntityTypeId' => Contact::getType()->getId()])
+//										->andWhere('fromId', 'NOT IN', Contact::find()->select('id'))
+//										)->execute();
+//		
+//		GO()->getDbConnection()
+//						->delete(
+//										'core_link', 
+//										(new \go\core\db\Query)
+//										->where(['toEntityTypeId' => Contact::getType()->getId()])
+//										->andWhere('toId', 'NOT IN', Contact::find()->select('id'))
+//										)->execute();
+		
 		GO()->getDbConnection()
 						->update("core_link", 
 										[
@@ -159,14 +178,14 @@ class Migrate63to64 {
 										['toEntityTypeId' => $companyEntityType->getId()])
 						->execute();
 		
-		GO()->getDbConnection()
-						->update("core_search", 
-										[
-												'entityTypeId' => Contact::getType()->getId(),
-												'entityId' => new \go\core\db\Expression('entityId + ' . $this->getCompanyIdIncrement())
-										], 
-										['entityTypeId' => $companyEntityType->getId()])
-						->execute();
+//		GO()->getDbConnection()
+//						->update("core_search", 
+//										[
+//												'entityTypeId' => Contact::getType()->getId(),
+//												'entityId' => new \go\core\db\Expression('entityId + ' . $this->getCompanyIdIncrement())
+//										], 
+//										['entityTypeId' => $companyEntityType->getId()])
+//						->execute();
 	}
 	
 	public function migrateCustomField() {
