@@ -282,7 +282,6 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 	
 							if(GO.customfields && GO.customfields.types["GO\\Files\\Model\\Folder"]){
 								this.tabPanel.items.each(function(item, i) {
-									console.log(item)
 									if(item.customfields) {
 										item.setDisabled(true);
 									}
