@@ -208,6 +208,8 @@ class Installer {
 		if (!$lock->lock()) {
 			throw new \Exception("Upgrade is already in progress");
 		}
+		
+		ini_set("max_execution_time", 0);
 
 
 		GO()->getDbConnection()->query("SET sql_mode=''");

@@ -28,12 +28,7 @@ class GroupController extends \GO\Base\Controller\AbstractModelController {
 		$response['total']=0;
 		while($group = $stmt->fetch()){
 			$record = $group->getAttributes('formatted');
-			
-			if(\GO::modules()->customfields)
-				$record['customfields'] = \GO\Customfields\Controller\CategoryController::getEnabledCategoryData("GO\\Calendar\\Model\\Event", $group->id);
-			else
-				$record['customfields']=array();
-			
+						
 			$record['resources']=array();
 			
 			$calStmt = \GO\Calendar\Model\Calendar::model()->find(\GO\Base\Db\FindParams::newInstance()

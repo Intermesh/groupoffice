@@ -33,6 +33,7 @@ class Migrate63to64 {
 		$addressBooks = $db->select('a.*')->from('ab_addressbooks', 'a')
 						->join("ab_contacts", 'c', 'c.addressbook_id = a.id', 'left')
 						->join("ab_companies", 'o', 'c.addressbook_id = a.id', 'left')
+						->groupBy(['a.id'])
 						->having("count(c.id)>0 or count(o.id)>0");		
 
 		foreach ($addressBooks as $abRecord) {
@@ -132,7 +133,7 @@ class Migrate63to64 {
 		}
 	}
 	
-	public function migrateCompanyLinks() {
+	public function migrateCompanyLinks() {		
 		echo "Migrating links\n";
 		flush();
 		$companyEntityType = \go\core\orm\EntityType::findByName("Company");
@@ -202,7 +203,12 @@ class Migrate63to64 {
 						->orderBy(['id' => 'ASC']);
 		
 		//continue where we left last time if failed.
-		$max = $db->selectSingleValue('max(id)')->from("addressbook_contact")->where('id', '<', $this->getCompanyIdIncrement())->single();
+		$max = $db->selectSingleValue('max(id)')
+						->from("addressbook_contact")
+						->where('id', '<', $this->getCompanyIdIncrement())
+						->andWhere(['addressBookId' => $addressBook->id])
+						->single();
+		
 		if($max>0) {
 			$contacts->andWhere('id', '>', $max);
 		}
@@ -421,7 +427,7 @@ class Migrate63to64 {
 		$contacts = $db->select()->from('ab_companies')->where(['addressbook_id' => $addressBook->id]);
 		
 		//continue where we left last time if failed.
-		$max = $db->selectSingleValue('max(id)')->from("addressbook_contact")->single();
+		$max = $db->selectSingleValue('max(id)')->from("addressbook_contact")->andWhere(['addressBookId' => $addressBook->id])->single();
 		if($max>0) {
 			$contacts->andWhere('id', '>', $max - $this->getCompanyIdIncrement());
 		}
