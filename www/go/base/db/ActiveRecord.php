@@ -438,7 +438,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * 'unique'=>false //true|array to enforce a unique value value can me array of related attributes
 	 * 'greater'=>'start_time' //this column must be greater than column start time
 	 * 'greaterorequal'=>'start_time' //this column must be greater or equal to column start time
-	 * 'customfield'=> 'If this is a custom field this is the custom field model \GO\Customfields\Model\Field
 	 * The validator looks like this:
 	 *
 	 * function validate ($value){

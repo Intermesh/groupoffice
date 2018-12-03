@@ -726,8 +726,6 @@ class AbstractModelController extends AbstractController {
 		
 		//define('EXPORTING', true);
 		//used by custom fields to format diffently
-		if(\GO::modules()->customfields)
-			\GO\Customfields\Model\AbstractCustomFieldsRecord::$formatForExport=true;
 
 		if(!empty($params['exportOrientation']) && ($params['exportOrientation']=="H"))
 			$orientation = 'L'; // Set the orientation to Landscape

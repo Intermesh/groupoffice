@@ -13,7 +13,7 @@ modules/projects2/views/Extjs3/AddressbookOverrides.js
 FilesModule::afterBatchEditStore
 Folder::deriveCustomfieldSettings
 Address lists /mailings
-
+General import/export
 
 
 Contact -> Email compose vanuit dropdown

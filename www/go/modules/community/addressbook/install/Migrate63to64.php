@@ -154,9 +154,18 @@ class Migrate63to64 {
 						->update("core_link", 
 										[
 												'toEntityTypeId' => Contact::getType()->getId(),
-												'toId' => new \go\core\db\Expression('fromId + ' . $this->getCompanyIdIncrement())
+												'toId' => new \go\core\db\Expression('toId + ' . $this->getCompanyIdIncrement())
 										], 
 										['toEntityTypeId' => $companyEntityType->getId()])
+						->execute();
+		
+		GO()->getDbConnection()
+						->update("core_search", 
+										[
+												'entityTypeId' => Contact::getType()->getId(),
+												'entityId' => new \go\core\db\Expression('entityId + ' . $this->getCompanyIdIncrement())
+										], 
+										['entityTypeId' => $companyEntityType->getId()])
 						->execute();
 	}
 	

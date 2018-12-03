@@ -226,9 +226,7 @@ abstract class AbstractJsonController extends AbstractController {
 	protected function renderExport(\GO\Base\Data\AbstractStore $store, $params) {
 		//define('EXPORTING', true);
 		//used by custom fields to format diffently
-		if(\GO::modules()->customfields)
-			\GO\Customfields\Model\AbstractCustomFieldsRecord::$formatForExport=true;
-		
+
 		$checkboxSettings = array(
 			'export_include_headers'=>!empty($params['includeHeaders']),
 			'export_human_headers'=>empty($params['humanHeaders']),
