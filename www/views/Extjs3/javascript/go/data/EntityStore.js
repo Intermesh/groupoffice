@@ -311,7 +311,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	 * @returns void
 	 */
 	get: function (ids, cb, scope) {
-
+		
 		if(go.util.empty(ids)) {
 			if(cb) {		
 				cb.call(scope || this, [], this);			
@@ -321,8 +321,8 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		
 		if(!Ext.isArray(ids)) {
 			throw "ids must be an array";
-		}
-
+		}		
+		
 		var entities = [], unknownIds = [], notFoundIds = [];
 
 		for (var i = 0, l = ids.length; i < l; i++) {
@@ -337,7 +337,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				//notFoundIds.push(id);
 			} else
 			{
-				unknownIds.push(id+"");
+				unknownIds.push(id);
 			}			
 		}
 		
