@@ -923,11 +923,11 @@ Minden jog fenntartva.<br />
   'Please enter a search query' => 'Adjon meg egy keresési lekérdezést',
   'Email address' => 'Email cím',
   'Import file type' => 'Import fájltípus',
-	'Recurrence' => 'Ismétlődés',
+  'Recurrence' => 'Ismétlődés',
   'Repeat forever' => 'Örökké ismétlődjön',
   'Repeat every' => 'Ismétlés',
   'Repeat until' => 'Eddig',
-	'At days' => 'at nap',
-	'Repeat' => 'Ismétlés',
-  'times' => 'alkalommal'
+  'At days' => 'at nap',
+  'Repeat' => 'Ismétlés',
+  'times' => 'alkalommal',
 );
