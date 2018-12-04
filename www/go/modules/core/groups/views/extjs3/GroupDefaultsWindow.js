@@ -25,7 +25,9 @@ go.modules.core.groups.GroupDefaultsWindow = Ext.extend(go.Window, {
 							entityStore: "Group",
 							fieldLabel: t("Groups"),
 							storeBaseParams: {
-								filter: [{"includeUsers": false}]
+								filter: {
+									hideUsers: true
+								}
 							}
 					}), 
 					{
