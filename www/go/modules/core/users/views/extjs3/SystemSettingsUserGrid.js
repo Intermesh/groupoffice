@@ -32,7 +32,7 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				'authenticationMethods',
 				{name: 'createdAt', type: 'date'},
 				{name: 'lastLogin', type: 'date'}	
-			].concat(go.modules.core.customfields.CustomFields.getFieldDefinitions("User")),
+			],
 			baseParams: {filter: {}},
 			entityStore: "User"
 		});
@@ -132,7 +132,7 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'authenticationMethods'
 				},
 				actions
-			].concat(go.modules.core.customfields.CustomFields.getColumns("User")),
+			],
 			viewConfig: {
 				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>',
 				forceFit: true,

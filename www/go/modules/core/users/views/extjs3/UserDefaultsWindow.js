@@ -12,7 +12,7 @@ go.modules.core.users.UserDefaultsWindow = Ext.extend(go.Window, {
 
 
 		this.formPanel = new Ext.form.FormPanel({
-			title: t("User defaults"),
+			title: t("Defaults"),
 			items: [
 				{
 					layout: "hbox",
