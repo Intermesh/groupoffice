@@ -96,6 +96,14 @@ class Migrate63to64 {
 	}
 	
 	private function mergeCompanyCustomFields() {
+		
+		$table = \go\core\db\Table::getInstance("cf_ab_companies");
+		$cols = array_filter($table->getColumnNames(), function($n) {return $n != "model_id";});
+		
+		if(empty($cols)) {
+			return;
+		}
+		
 		$stmt = GO()->getDbConnection()->query("SHOW CREATE TABLE cf_ab_companies");
 		$stmt->setFetchMode(\PDO::FETCH_COLUMN, 1);
 		
@@ -110,14 +118,11 @@ class Migrate63to64 {
 		}
 		$alterSQL = substr($alterSQL, 0, -2) .';';
 		
-		echo $alterSQL."\n\n";
+		//echo $alterSQL."\n\n";
 		
 		GO()->getDbConnection()->query($alterSQL);
 		
-		$table = \go\core\db\Table::getInstance("cf_ab_companies");
-		$cols = array_filter($table->getColumnNames(), function($n) {return $n != "model_id";});
-		
-		
+				
 		$data = GO()->getDbConnection()
 						->select('(`model_id` + '. $this->getCompanyIdIncrement().') as id')
 						->select($cols, true)
