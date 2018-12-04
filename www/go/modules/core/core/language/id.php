@@ -779,4 +779,11 @@ return array (
   'Please enter a search query' => 'Masukkan kueri pencarian',
   'Folders' => 'Folder',
   'Save as' => 'Simpan sebagai',
+	'times' => 'kali',
+	'Repeat forever' => 'Ulangi terus',
+  'Repeat until' => 'Ulangi hingga',
+  'Repeat' => 'Ulangi',
+  'Recurrence' => 'Pengulangan',
+  'Repeat every' => 'Ulangi setiap',
+	'At days' => 'Pada hari'
 );

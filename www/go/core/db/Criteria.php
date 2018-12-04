@@ -155,13 +155,13 @@ class Criteria {
 	 * ```
 	 * 
 	 * @param string|array|Criteria $condition
-	 * @param string $operator AND, OR, NOT
+	 * @param string $comparisonOperator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
 	 * @param mixed $value
 	 * 
 	 * @return static
 	 */
-	public function where($condition, $operator = null, $value = null) {
-		return $this->andWhere($condition, $operator, $value);
+	public function where($condition, $comparisonOperator = null, $value = null) {
+		return $this->andWhere($condition, $comparisonOperator, $value);
 	}
 	
 	protected function internalWhere($condition, $comparisonOperator, $value, $logicalOperator) {			

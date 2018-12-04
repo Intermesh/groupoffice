@@ -127,22 +127,22 @@ community;googleauthenticator;Enable Google authenticator;Google hitelesítés b
 community;googleauthenticator;When disabling Google autenticator this step will be removed from the login process.;Ha letiltja a Google autenticator ezt a lépést el lesz távolítva a bejelentkezési folyamatot.;go/modules/community/googleauthenticator/views/extjs3/Settings.js
 community;googleauthenticator;Provide your current password to disable Google authenticator.;Adja meg jelenlegi jelszavát letiltani Google Hitelesítő.;go/modules/community/googleauthenticator/views/extjs3/Settings.js
 community;googleauthenticator;Disable Google authenticator;Kikapcsolja a Google Hitelesítő;go/modules/community/googleauthenticator/views/extjs3/Settings.js
-community;imapauthenticator;Server profile;Server profil;go/modules/community/imapauthenticator/views/extjs3/Settings.js
+community;imapauthenticator;Server profile;;go/modules/community/imapauthenticator/views/extjs3/Settings.js
 community;imapauthenticator;Enter the domains this imap server should be used to authenticate. Users must login with their e-mail address and if the domain matches this profile it will be used.;Írja be a domain az IMAP-kiszolgáló hitelesítésére használt. A felhasználóknak meg kell be saját e-mail címét, és a domain megfelel ennek a profilt is használható.;go/modules/community/imapauthenticator/views/extjs3/Settings.js
-community;imapauthenticator;Domains;Domains;go/modules/community/imapauthenticator/views/extjs3/Settings.js
-community;imapauthenticator;Validate certificate;érvényesítse tanúsítvány;go/modules/community/imapauthenticator/views/extjs3/Settings.js
+community;imapauthenticator;Domains;Tartományok;go/modules/community/imapauthenticator/views/extjs3/Settings.js
+community;imapauthenticator;Validate certificate;Érvényesítse a tanúsítványt;go/modules/community/imapauthenticator/views/extjs3/Settings.js
 community;imapauthenticator;Remove domain from username;Távolítsuk domaint felhasználónév;go/modules/community/imapauthenticator/views/extjs3/Settings.js
 community;imapauthenticator;Users must login with their full e-mail adress. Enable this option if the IMAP excepts the username without domain.;A felhasználóknak meg kell jelentkezned azok teljes e-mail címét. Jelölje be ezt az opciót, ha az IMAP EXCEPTS a felhasználónév tartománynév nélküli.;go/modules/community/imapauthenticator/views/extjs3/Settings.js
-community;imapauthenticator;Use authentication;hitelesítés használatával;go/modules/community/imapauthenticator/views/extjs3/Settings.js
+community;imapauthenticator;Use authentication;Hitelesítés használatával;go/modules/community/imapauthenticator/views/extjs3/Settings.js
 community;imapauthenticator;Enable this if the SMTP server credentials are identical to the IMAP server.;Engedélyezze ezt, ha az SMTP szerver oldali azonosak az IMAP szerverhez.;go/modules/community/imapauthenticator/views/extjs3/Settings.js
-community;imapauthenticator;User options;felhasználói beállítások;go/modules/community/imapauthenticator/views/extjs3/Settings.js
+community;imapauthenticator;User options;Felhasználói beállítások;go/modules/community/imapauthenticator/views/extjs3/Settings.js
 community;imapauthenticator;Users will automatically be added to these groups;A felhasználók automatikusan hozzáadódnak ezek a csoportok;go/modules/community/imapauthenticator/views/extjs3/Settings.js
-community;imapauthenticator;IMAP Authenticator;IMAP Hitelesítő;go/modules/community/imapauthenticator/views/extjs3/Settings.js
+community;imapauthenticator;IMAP Authenticator;;go/modules/community/imapauthenticator/views/extjs3/Settings.js
 legacy;cal2weeks;2 Weeks;2 hét;modules/cal2weeks/views/Extjs3/CalendarOverwrites.js
 legacy;assistant;You don't seem to have the Group-Office assistant installed.;Nem úgy tűnik, hogy a Group-Office segéd telepítve van.;modules/assistant/assistant.js
 legacy;assistant;Click here to read the installation instructions.;Kattintson ide telepítési utasítások elolvasásához.;modules/assistant/assistant.js
-legacy;smime;Add to SMIME certificates;Hozzá SMIME tanúsítványok;modules/smime/PluginMessagePanel.js
-legacy;smime;Certificate added;Certificate hozzáadott;modules/smime/PluginMessagePanel.js
+legacy;smime;Add to SMIME certificates;Adja hozzá a SMIME tanúsítványokhoz;modules/smime/PluginMessagePanel.js
+legacy;smime;Certificate added;Certificate hozzáadva;modules/smime/PluginMessagePanel.js
 legacy;smime;SMIME certificate was added for;SMIME tanúsítvány adtunk;modules/smime/PluginMessagePanel.js
 legacy;smime;Could not add SMIME certificate for;Nem sikerült hozzáadni a SMIME tanúsítványt;modules/smime/PluginMessagePanel.js
 legacy;smime;Sign with SMIME;Jelentkezzen SMIME;modules/smime/PluginMessagePanel.js
@@ -155,9 +155,9 @@ legacy;smime;PKCS12 certificate;PKCS12 tanúsítvány;modules/smime/PluginMessag
 legacy;smime;You have uploaded a certificate already. SMIME support is enabled for this account.;Már feltöltött tanúsítvány már. SMIME támogatása engedélyezve van ebben a fiókban.;modules/smime/PluginMessagePanel.js
 legacy;smime;To upload a new PKCS12 certificate you must enter your Group-Office password. The Group-Office password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.;Feltölteni egy új PKCS12 tanúsítványt meg kell adni a csoport soros jelszót. A csoport soros jelszó nem egyezhet meg PCSK12 bizonyítvány, biztonsági okokból. Nincs jelszó szintén tilos.;modules/smime/PluginMessagePanel.js
 legacy;smime;Select new PKCS12 Certificate;Válassza az új PKCS12 Certificate;modules/smime/PluginMessagePanel.js
-legacy;smime;Delete certificate;tanúsítvány törlése;modules/smime/PluginMessagePanel.js
-legacy;smime;Download certificate;tanúsítvány letöltése;modules/smime/PluginMessagePanel.js
-legacy;smime;Always sign messages;Mindig jelentkezzen üzenetek;modules/smime/PluginMessagePanel.js
+legacy;smime;Delete certificate;Tanúsítvány törlése;modules/smime/PluginMessagePanel.js
+legacy;smime;Download certificate;Tanúsítvány letöltése;modules/smime/PluginMessagePanel.js
+legacy;smime;Always sign messages;Mindig írja alá az üzeneteket;modules/smime/PluginMessagePanel.js
 legacy;smime;This message was sent to you encrypted.;Ezt az üzenetet küldte neked titkosított.;modules/smime/PluginMessagePanel.js
 legacy;smime;This message is digitally signed. Click here to verify the signature and import the certificate.;Ez az üzenet digitálisan aláírva. Kattintson ide, hogy ellenőrizze az aláírás és a tanúsítványt importálni.;modules/smime/PluginMessagePanel.js
 legacy;dgprojects2;Project type;Projekt típusa;modules/dgprojects2/views/Extjs3/AddSchemaDialog.js
@@ -170,24 +170,24 @@ legacy;dgprojects2;Schema;Séma;modules/dgprojects2/views/Extjs3/AddSchemaDialog
 legacy;dgprojects2;Are you sure to submit the project? This will set the project's Slagingskans field to 100%, which will also change Gewogen Offertebedrag.;Biztos benne, hogy nyújtsa be a projektbe? Ez fogja meghatározni a projekt Slagingskans területén 100%, ami szintén változik Gewogen Offertebedrag.;modules/dgprojects2/views/Extjs3/AddSchemaDialog.js
 legacy;dgprojects2;Set all income to invoiceable;Állítsa be az összes jövedelem kiszámlázható;modules/dgprojects2/views/Extjs3/AddSchemaDialog.js
 legacy;dgprojects2;expenses;költségek;modules/dgprojects2/views/Extjs3/AddSchemaDialog.js
-legacy;dgprojects2;From;Tól től;modules/dgprojects2/views/Extjs3/AddSchemaDialog.js
+legacy;dgprojects2;From;Tól;modules/dgprojects2/views/Extjs3/AddSchemaDialog.js
 legacy;dgprojects2;Until;Amíg;modules/dgprojects2/views/Extjs3/AddSchemaDialog.js
-legacy;dgprojects2;Project;program;modules/dgprojects2/views/Extjs3/AddSchemaDialog.js
+legacy;dgprojects2;Project;;modules/dgprojects2/views/Extjs3/AddSchemaDialog.js
 legacy;dgprojects2;Expense budget;költségkeret;modules/dgprojects2/views/Extjs3/AddSchemaDialog.js
 legacy;dgprojects2;Amount;Összeg;modules/dgprojects2/views/Extjs3/AddSchemaDialog.js
 legacy;dgprojects2;VAT (%);ÁFA (%);modules/dgprojects2/views/Extjs3/AddSchemaDialog.js
 legacy;dgprojects2;Duplicate items?;Ismétlődő elemek?;modules/dgprojects2/views/Extjs3/AddSchemaDialog.js
-legacy;dgprojects2;This duplicates the selected items. Proceed?;Ez megduplázza a kiválasztott terméket. Folytassa?;modules/dgprojects2/views/Extjs3/AddSchemaDialog.js
+legacy;dgprojects2;This duplicates the selected items. Proceed?;Ez megduplázza a kiválasztott terméket. Folytassuk?;modules/dgprojects2/views/Extjs3/AddSchemaDialog.js
 legacy;dgprojects2;Total amount;Teljes összeg;modules/dgprojects2/views/Extjs3/AddSchemaDialog.js
-legacy;dgprojects2;Reference no.;Referencia szám.;modules/dgprojects2/views/Extjs3/AddSchemaDialog.js
-legacy;kvsmanager;Financieel expert;Financieel szakértő;modules/kvsmanager/views/Extjs3/DossierDialog.js
-legacy;kvsmanager;campaignManagement;campaignManagement;modules/kvsmanager/views/Extjs3/DossierDialog.js
+legacy;dgprojects2;Reference no.;Referenciaszám;modules/dgprojects2/views/Extjs3/AddSchemaDialog.js
+legacy;kvsmanager;Financieel expert;;modules/kvsmanager/views/Extjs3/DossierDialog.js
+legacy;kvsmanager;campaignManagement;;modules/kvsmanager/views/Extjs3/DossierDialog.js
 legacy;comments;Category;Kategória;modules/comments/CommentsDetailPanel.js
-legacy;comments;Browse comments;Böngésszen megjegyzések;modules/comments/CommentsDetailPanel.js
-legacy;comments;Action date;Végrehajtás dátume;modules/comments/CommentsDetailPanel.js
+legacy;comments;Browse comments;Böngészés a megjegyzések között;modules/comments/CommentsDetailPanel.js
+legacy;comments;Action date;Végrehajtás dátuma;modules/comments/CommentsDetailPanel.js
 legacy;comments;Manage categories;Kategóriák kezelése;modules/comments/CommentsDetailPanel.js
 legacy;comments;Comments;Hozzászólások;modules/comments/CommentsDetailPanel.js
-legacy;comments;{author} wrote at {date};{Szerző} írta {Date};modules/comments/CommentsDetailPanel.js
+legacy;comments;{author} wrote at {date};{author} írta ekkor: {date};modules/comments/CommentsDetailPanel.js
 legacy;tickets;Ticket;Jegy;modules/tickets/TypeDialog.js
 legacy;tickets;Ticket group;Jegy csoport;modules/tickets/TypeDialog.js
 legacy;tickets;Contact;Kapcsolat;modules/tickets/TypeDialog.js
@@ -200,7 +200,7 @@ legacy;tickets;Message;Üzenet;modules/tickets/TypeDialog.js
 legacy;tickets;CC notifications to;Értesítés másolata;modules/tickets/TypeDialog.js
 legacy;tickets;Due at;Határidő;modules/tickets/TypeDialog.js
 legacy;tickets;Bill;Számla;modules/tickets/TypeDialog.js
-legacy;tickets;Book;Könyv;modules/tickets/TypeDialog.js
+legacy;tickets;Book;;modules/tickets/TypeDialog.js
 legacy;tickets;From status;Státusztól;modules/tickets/TypeDialog.js
 legacy;tickets;To status;Státuszig;modules/tickets/TypeDialog.js
 legacy;tickets;Error status;Hiba státusz;modules/tickets/TypeDialog.js
@@ -209,7 +209,7 @@ legacy;tickets;Change status of tickets without booked hours too;Hibajegy státu
 legacy;tickets;Ok;;modules/tickets/TypeDialog.js
 legacy;tickets;Types;Típusok;modules/tickets/TypeDialog.js
 legacy;tickets;Type group;Típus csoport;modules/tickets/TypeDialog.js
-legacy;tickets;Manage groups;csoportok kezelése;modules/tickets/TypeDialog.js
+legacy;tickets;Manage groups;Csoportok kezelése;modules/tickets/TypeDialog.js
 legacy;tickets;Responsible;Felelős;modules/tickets/TypeDialog.js
 legacy;tickets;Nobody;Senki;modules/tickets/TypeDialog.js
 legacy;tickets;Email templates;E-mail sablonok;modules/tickets/TypeDialog.js
@@ -225,7 +225,7 @@ legacy;tickets;Number;Szám;modules/tickets/TypeDialog.js
 legacy;tickets;Mark as read;Megjelölés olvasottként;modules/tickets/TypeDialog.js
 legacy;tickets;Mark as unread;Megjelölés olvasatlanként;modules/tickets/TypeDialog.js
 legacy;tickets;Change responsible agent;Felelős módosítása;modules/tickets/TypeDialog.js
-legacy;tickets;CSV with rates;CSV árak;modules/tickets/TypeDialog.js
+legacy;tickets;CSV with rates;CSV árakkal;modules/tickets/TypeDialog.js
 legacy;tickets;Rates;Az árak;modules/tickets/TypeDialog.js
 legacy;tickets;Amount;Összeg;modules/tickets/TypeDialog.js
 legacy;tickets;Cost code;költség-kód;modules/tickets/TypeDialog.js
@@ -237,12 +237,12 @@ legacy;tickets;Ticket created for agent;Jegy létrejött a felelős számára;mo
 legacy;tickets;Ticket claim notification;Jegy hozzárendelés-figyelmeztetés;modules/tickets/TypeDialog.js
 legacy;tickets;Enabled customfields;Bekapcsolt customfields;modules/tickets/TypeDialog.js
 legacy;tickets;External ticket page;Külső jegy-oldal;modules/tickets/TypeDialog.js
-legacy;tickets;Use alternative URL;Használd az alternatív URL-;modules/tickets/TypeDialog.js
-legacy;tickets;Enable external ticket page;Lehetővé teszi a külső jegy oldal;modules/tickets/TypeDialog.js
+legacy;tickets;Use alternative URL;Használjon alternatív URL-t;modules/tickets/TypeDialog.js
+legacy;tickets;Enable external ticket page;Külső jegy-oldal engedélyezése;modules/tickets/TypeDialog.js
 legacy;tickets;Enable ticket submission for anonymous users;Engedélyezze jegy létrehozását ismeretlen felhasználók számára is;modules/tickets/TypeDialog.js
 legacy;tickets;Custom CSS for external ticket page;Egyéni CSS külső jegy oldal;modules/tickets/TypeDialog.js
 legacy;tickets;"In the textarea below you can add css lines to style the external ticket page. <br /> The class of the page container is: external-ticket-page <br /> An example:<br /> .external-ticket-page input { border:1px solid #000;}";"A textarea alábbi felveheti css vonalak a stílus a külső jegyet oldalon. <br /> Az osztály az oldal tartály: külső-jegy-oldal <br /> Egy példa: <br /> .external-jegy-oldal input {border: 1px szilárd # 000;}";modules/tickets/TypeDialog.js
-legacy;tickets;Show external ticket page;Itt található a külső jegy oldal;modules/tickets/TypeDialog.js
+legacy;tickets;Show external ticket page;Külső jegy-oldal engedélyezése;modules/tickets/TypeDialog.js
 legacy;tickets;The site module and/or the defaultsite module are not installed, do you want to install them now?;A „Site modul” és / vagy a „defaultsite” modul nincs telepítve. Szeretné most telepíteni?;modules/tickets/TypeDialog.js
 legacy;tickets;Closed tickets per user;Lezárt jegyek felhasználónként;modules/tickets/TypeDialog.js
 legacy;tickets;Tickets by type;Jegyek típusok szerint;modules/tickets/TypeDialog.js
@@ -250,7 +250,7 @@ legacy;tickets;E-mail notifications;Email Értesítések;modules/tickets/TypeDia
 legacy;tickets;Closed tickets in month;Zárt jegyek hónap;modules/tickets/TypeDialog.js
 legacy;tickets;Current tickets counts;Jelenlegi jegyek száma;modules/tickets/TypeDialog.js
 legacy;tickets;Number of current tickets;Ennek a jegynek a száma;modules/tickets/TypeDialog.js
-legacy;tickets;Average ticket duration;Átlagos időtartama jegy;modules/tickets/TypeDialog.js
+legacy;tickets;Average ticket duration;Jegyek átlagos élettartama;modules/tickets/TypeDialog.js
 legacy;tickets;Options;Opciók;modules/tickets/TypeDialog.js
 legacy;tickets;Customer message on external page;Ügyfél üzenet a külső oldalon;modules/tickets/TypeDialog.js
 legacy;tickets;Ticket saved message on external page;Jegy mentett üzenet a külső oldalon;modules/tickets/TypeDialog.js
@@ -270,16 +270,16 @@ legacy;tickets;Created tickets per month;Létrejött jegyek havonta;modules/tick
 legacy;tickets;Average response time;Átlagos válaszidő;modules/tickets/TypeDialog.js
 legacy;tickets;New ticket;Új jegy;modules/tickets/TypeDialog.js
 legacy;tickets;Assigned to agent;Felelős hozzárendelve;modules/tickets/TypeDialog.js
-legacy;tickets;Message to agent on new message;Üzenet a felelősnek ha új válasz érkezik;modules/tickets/TypeDialog.js
+legacy;tickets;Message to agent on new message;Üzenet a felelősnek, ha új válasz érkezik;modules/tickets/TypeDialog.js
 legacy;tickets;Message when due date has passed;Üzenet, ha lejárt a határidő;modules/tickets/TypeDialog.js
 legacy;tickets;Reopen;Újranyit;modules/tickets/TypeDialog.js
 legacy;tickets;Reopen ticket;Jegy újranyitása;modules/tickets/TypeDialog.js
 legacy;tickets;Read;Olvas;modules/tickets/TypeDialog.js
 legacy;tickets;Close ticket;Jegy lezárása;modules/tickets/TypeDialog.js
-legacy;tickets;Are you sure you want to close this ticket?;Biztosan le szeretné zárni ezt a jegyet?;modules/tickets/TypeDialog.js
+legacy;tickets;Are you sure you want to close this ticket?;Biztosan lezárja ezt a jegyet?;modules/tickets/TypeDialog.js
 legacy;tickets;Ticket overview;Jegyek áttekintése;modules/tickets/TypeDialog.js
 legacy;tickets;Messages;Üzenetek;modules/tickets/TypeDialog.js
-legacy;tickets;Note;jegyzet;modules/tickets/TypeDialog.js
+legacy;tickets;Note;Jegyzet;modules/tickets/TypeDialog.js
 legacy;tickets;* Status changed to;* Állapot megváltozott;modules/tickets/TypeDialog.js
 legacy;tickets;* Type changed to;* Típus változott;modules/tickets/TypeDialog.js
 legacy;tickets;Attachments;Mellékletek;modules/tickets/TypeDialog.js
@@ -354,25 +354,25 @@ legacy;posthofld;Last date;Utolsó dátum;modules/posthofld/views/Extjs3/leaveda
 legacy;posthofld;Hours nat. holidays;Óra állami ünnepek;modules/posthofld/views/Extjs3/leavedaysOverrides.js
 legacy;posthofld;Status;Állapot;modules/posthofld/views/Extjs3/leavedaysOverrides.js
 legacy;posthofld;Holiday request;Szabadnap kérés;modules/posthofld/views/Extjs3/leavedaysOverrides.js
-legacy;fixdossiers;bankAccounts;bankszámlák;modules/fixdossiers/views/Extjs3/DossierDialog.js
-legacy;fixdossiers;dossiers;dokumentációk;modules/fixdossiers/views/Extjs3/DossierDialog.js
-legacy;fixdossiers;FIX Dossiers;FIX Dossiers;modules/fixdossiers/views/Extjs3/DossierDialog.js
+legacy;fixdossiers;bankAccounts;;modules/fixdossiers/views/Extjs3/DossierDialog.js
+legacy;fixdossiers;dossiers;;modules/fixdossiers/views/Extjs3/DossierDialog.js
+legacy;fixdossiers;FIX Dossiers;;modules/fixdossiers/views/Extjs3/DossierDialog.js
 legacy;fixdossiers;campaignManagement;;modules/fixdossiers/views/Extjs3/DossierDialog.js
-legacy;fixdossiers;Note that if the event is marked as private, the files of this event are still accessible by users who have permissions to this event's calendar.;Megjegyezzük, hogy ha az esemény meg van jelölve magán, a fájlok az esemény továbbra is elérhető a felhasználók, akiknek jogosultsága az esemény naptárát.;modules/fixdossiers/views/Extjs3/DossierDialog.js
-legacy;fixdossiers;Begeleiden;Begeleiden;modules/fixdossiers/views/Extjs3/DossierDialog.js
-legacy;fixdossiers;Begeleider;Begeleider;modules/fixdossiers/views/Extjs3/DossierDialog.js
+legacy;fixdossiers;Note that if the event is marked as private, the files of this event are still accessible by users who have permissions to this event's calendar.;;modules/fixdossiers/views/Extjs3/DossierDialog.js
+legacy;fixdossiers;Begeleiden;;modules/fixdossiers/views/Extjs3/DossierDialog.js
+legacy;fixdossiers;Begeleider;;modules/fixdossiers/views/Extjs3/DossierDialog.js
 legacy;tasks;Category;Kategória;modules/tasks/TaskListsGrid.js
-legacy;tasks;Ok;Ok;modules/tasks/TaskListsGrid.js
-legacy;tasks;Global category;globális kategória;modules/tasks/TaskListsGrid.js
-legacy;tasks;Schedule call;Időzatett hívás;modules/tasks/TaskListsGrid.js
+legacy;tasks;Ok;;modules/tasks/TaskListsGrid.js
+legacy;tasks;Global category;Globális kategória;modules/tasks/TaskListsGrid.js
+legacy;tasks;Schedule call;Időzített hívás;modules/tasks/TaskListsGrid.js
 legacy;tasks;Task;Feladat;modules/tasks/TaskListsGrid.js
 legacy;tasks;Starts at;Kezdődik;modules/tasks/TaskListsGrid.js
 legacy;tasks;Due at;Határidő;modules/tasks/TaskListsGrid.js
-legacy;tasks;Tasklist;Feladat lista;modules/tasks/TaskListsGrid.js
-legacy;tasks;Select category;Válassz kategóriát;modules/tasks/TaskListsGrid.js
+legacy;tasks;Tasklist;Feladatlista;modules/tasks/TaskListsGrid.js
+legacy;tasks;Select category;Válasszon kategóriát;modules/tasks/TaskListsGrid.js
 legacy;tasks;At days;at nap;modules/tasks/TaskListsGrid.js
 legacy;tasks;Repeat until;ismételjük, amíg;modules/tasks/TaskListsGrid.js
-legacy;tasks;repeat forever;ismételje meg örökre;modules/tasks/TaskListsGrid.js
+legacy;tasks;repeat forever;Ismétlődjön örökké;modules/tasks/TaskListsGrid.js
 legacy;tasks;Recurrence;Ismétlődés;modules/tasks/TaskListsGrid.js
 legacy;tasks;Repeat every;Ismétlés;modules/tasks/TaskListsGrid.js
 legacy;tasks;Options;Opciók;modules/tasks/TaskListsGrid.js
@@ -390,38 +390,38 @@ legacy;tasks;Remove duplicates;Távolítsuk ismétlődések;modules/tasks/TaskLi
 legacy;tasks;Select an icalendar (*.ics) file;Válasszon ki egy iCalendar (* .ics) fájl;modules/tasks/TaskListsGrid.js
 legacy;tasks;No Tasks to display;Nincs megjeleníthető feladat;modules/tasks/TaskListsGrid.js
 legacy;tasks;Tasks;Feladatok;modules/tasks/TaskListsGrid.js
-legacy;tasks;Visible tasklists;látható tasklists;modules/tasks/TaskListsGrid.js
+legacy;tasks;Visible tasklists;Látható feladatlista;modules/tasks/TaskListsGrid.js
 legacy;tasks;Status;Állapot;modules/tasks/TaskListsGrid.js
 legacy;tasks;Project;;modules/tasks/TaskListsGrid.js
-legacy;tasks;Continue task;Folytatás feladat;modules/tasks/TaskListsGrid.js
-legacy;tasks;Needs action;beavatkozás szükséges;modules/tasks/TaskListsGrid.js
-legacy;tasks;Accepted;Elfogadott;modules/tasks/TaskListsGrid.js
-legacy;tasks;Declined;Elutasította;modules/tasks/TaskListsGrid.js
-legacy;tasks;Tentative;Kísérleti;modules/tasks/TaskListsGrid.js
-legacy;tasks;Delegated;felhatalmazáson alapuló;modules/tasks/TaskListsGrid.js
-legacy;tasks;Completed;befejezték;modules/tasks/TaskListsGrid.js
+legacy;tasks;Continue task;Feladat folytatása;modules/tasks/TaskListsGrid.js
+legacy;tasks;Needs action;Beavatkozás szükséges;modules/tasks/TaskListsGrid.js
+legacy;tasks;Accepted;Jóváhagyott;modules/tasks/TaskListsGrid.js
+legacy;tasks;Declined;Elutasított;modules/tasks/TaskListsGrid.js
+legacy;tasks;Tentative;Próba;modules/tasks/TaskListsGrid.js
+legacy;tasks;Delegated;Felhatalmazáson alapuló;modules/tasks/TaskListsGrid.js
+legacy;tasks;Completed;Kész;modules/tasks/TaskListsGrid.js
 legacy;tasks;In process;Folyamatban;modules/tasks/TaskListsGrid.js
 legacy;tasks;Tasklists;Feladatlista;modules/tasks/TaskListsGrid.js
 legacy;tasks;Active;Aktív;modules/tasks/TaskListsGrid.js
-legacy;tasks;Due in seven days;Due hét napja;modules/tasks/TaskListsGrid.js
+legacy;tasks;Due in seven days;Egy héten belül;modules/tasks/TaskListsGrid.js
 legacy;tasks;Overdue;Lejárt;modules/tasks/TaskListsGrid.js
-legacy;tasks;Incomplete tasks;hiányos feladatok;modules/tasks/TaskListsGrid.js
-legacy;tasks;Future tasks;jövőbeni feladatok;modules/tasks/TaskListsGrid.js
+legacy;tasks;Incomplete tasks;Hiányos feladatok;modules/tasks/TaskListsGrid.js
+legacy;tasks;Future tasks;Jövőbeni feladatok;modules/tasks/TaskListsGrid.js
 legacy;tasks;All;Mind;modules/tasks/TaskListsGrid.js
 legacy;tasks;Categories;Kategóriák;modules/tasks/TaskListsGrid.js
-legacy;tasks;ID;ID;modules/tasks/TaskListsGrid.js
+legacy;tasks;ID;;modules/tasks/TaskListsGrid.js
 legacy;tasks;Percentage complete;Százalék kész;modules/tasks/TaskListsGrid.js
 legacy;tasks;Completed at;Befejezve;modules/tasks/TaskListsGrid.js
-legacy;tasks;statuses[NEEDS-ACTION];állapotok [NEEDS-ACTION];modules/tasks/TaskListsGrid.js
-legacy;tasks;statuses[ACCEPTED];állapotok [ACCEPTED];modules/tasks/TaskListsGrid.js
-legacy;tasks;statuses[DECLINED];állapotok [CSÖKKENTEK];modules/tasks/TaskListsGrid.js
-legacy;tasks;statuses[TENTATIVE];állapotok [Feltételes];modules/tasks/TaskListsGrid.js
-legacy;tasks;statuses[DELEGATED];állapotok [FELHATALMAZÁSON];modules/tasks/TaskListsGrid.js
-legacy;tasks;statuses[COMPLETED];állapotok [KÉSZ];modules/tasks/TaskListsGrid.js
-legacy;tasks;statuses[IN-PROCESS];állapotok [IN-PROCESS];modules/tasks/TaskListsGrid.js
+legacy;tasks;statuses[NEEDS-ACTION];statuses[NEEDS-ACTION];modules/tasks/TaskListsGrid.js
+legacy;tasks;statuses[ACCEPTED];statuses[ACCEPTED];modules/tasks/TaskListsGrid.js
+legacy;tasks;statuses[DECLINED];statuses[DECLINED];modules/tasks/TaskListsGrid.js
+legacy;tasks;statuses[TENTATIVE];statuses[TENTATIVE];modules/tasks/TaskListsGrid.js
+legacy;tasks;statuses[DELEGATED];statuses[DELEGATED];modules/tasks/TaskListsGrid.js
+legacy;tasks;statuses[COMPLETED];statuses[COMPLETED];modules/tasks/TaskListsGrid.js
+legacy;tasks;statuses[IN-PROCESS];statuses[IN-PROCESS];modules/tasks/TaskListsGrid.js
 legacy;tasks;project;;modules/tasks/TaskListsGrid.js
 legacy;tasks;Defaults settings for tasks;Alapértékek beállítása a feladatokhoz;modules/tasks/TaskListsGrid.js
-legacy;tasks;Days before start;Napok megkezdése előtt;modules/tasks/TaskListsGrid.js
+legacy;tasks;Days before start;Hátralévő napok;modules/tasks/TaskListsGrid.js
 legacy;tasks;Default tasklist;Alapértelmezett tasklist;modules/tasks/TaskListsGrid.js
 legacy;tools;Script output;Script kimenet;modules/tools/MainPanel.js
 legacy;tools;Admin tools;Adminisztrációs eszközök;modules/tools/MainPanel.js
@@ -456,11 +456,11 @@ legacy;nuwleadreport;Announcements;Hirdetmények;modules/nuwleadreport/views/Ext
 legacy;nuwleadreport;Lead report;Vezetői jelentés;modules/nuwleadreport/views/Extjs3/MainPanel.js
 legacy;calendar;Resource groups;Erőforrás-csoportok;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Category;Kategória;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Recurring event;ismétlődő esemény;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Do you want to delete a single instance or all instances of this recurring event?;Ezt a példányt szeretné törölni vagy valamennyi példányát ez ismétlődő esemény?;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Do you want to edit this occurence or the entire series?;Szeretné szerkeszteni ezt példányt, vagy az egész sorozatot?;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Single occurence;egységes előfordulás;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Entire series;teljes sorozat;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Recurring event;Ismétlődő esemény;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Do you want to delete a single instance or all instances of this recurring event?;Ezt az előfordulását szeretné törölni az eseménynek, vagy mindet?;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Do you want to edit this occurence or the entire series?;Ezt az előfordulását szeretné szerkeszteni az eseménynek, vagy mindet?;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Single occurence;Egy előfordulás;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Entire series;Teljes sorozat;modules/calendar/ViewGroupGrid.js
 legacy;calendar;This and future;Ez és a jövő;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Visible;Látható;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Event;Esemény;modules/calendar/ViewGroupGrid.js
@@ -468,38 +468,38 @@ legacy;calendar;Calendar;Naptár;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Calendar color;Naptár színe;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Ok;;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Categories;Kategóriák;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Give each calendar a unique color;Adj minden naptári egyedi színt;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Direct URL;közvetlen URL;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Give each calendar a unique color;Adjon minden naptárnak egyedi színt;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Direct URL;;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Copy event;Esemény másolása;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Move event;Esemény áthelyezése;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Comments;Hozzászólások;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Note that if the event is marked as private, the files of this event are still accessible by users who have permissions to this event's calendar.;Megjegyezzük, hogy ha az esemény meg van jelölve magán, a fájlok az esemény továbbra is elérhető a felhasználók, akiknek jogosultsága az esemény naptárát.;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Note that if the event is marked as private, the files of this event are still accessible by users who have permissions to this event's calendar.;Ügyeljen rá, hogy ha az esemény „Személyes”-ként van is megjelölve a kapcsolódó fájlokhoz továbbra is hozzáférnek azok a felhasználók, akiknek jogosultsága van rá, hogy láthassa ezt a naptárat.;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Appointment;Időpont egyeztetés;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Ignore conflict?;Figyelmen kívül hagyja a konfliktus?;modules/calendar/ViewGroupGrid.js
-legacy;calendar;This event conflicts with another event in your calender. Save this event anyway?;Ez az esemény ütközik egy másik esemény az naptár. Mentése eseményen?;modules/calendar/ViewGroupGrid.js
-legacy;calendar;One or more resources in this event are already in use at the same time:</br>;Egy vagy több erőforrás, ebben az esetben a már használatban lévő egyidejűleg: </ br>;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Ignore conflict?;Ignorálja az ütközéseket?;modules/calendar/ViewGroupGrid.js
+legacy;calendar;This event conflicts with another event in your calender. Save this event anyway?;Ez az esemény ütközik egy másik eseménnyel. Így is elmentsük?;modules/calendar/ViewGroupGrid.js
+legacy;calendar;One or more resources in this event are already in use at the same time:</br>;Egy vagy több erőforrás már foglalt ebben az időpontban: </ br>;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Resource conflict;Erőforrás konfliktus;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Check availability;Ellenőrizd az elérhetőséget;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Time is not applicable;Az idő nem alkalmazandó;modules/calendar/ViewGroupGrid.js
-legacy;calendar;statuses[NEEDS-ACTION];állapotok [NEEDS-ACTION];modules/calendar/ViewGroupGrid.js
-legacy;calendar;statuses[ACCEPTED];állapotok [ACCEPTED];modules/calendar/ViewGroupGrid.js
-legacy;calendar;statuses[DECLINED];állapotok [CSÖKKENTEK];modules/calendar/ViewGroupGrid.js
-legacy;calendar;statuses[TENTATIVE];állapotok [Feltételes];modules/calendar/ViewGroupGrid.js
-legacy;calendar;statuses[DELEGATED];állapotok [FELHATALMAZÁSON];modules/calendar/ViewGroupGrid.js
-legacy;calendar;statuses[COMPLETED];állapotok [KÉSZ];modules/calendar/ViewGroupGrid.js
-legacy;calendar;statuses[IN-PROCESS];állapotok [IN-PROCESS];modules/calendar/ViewGroupGrid.js
-legacy;calendar;statuses[CONFIRMED];állapotok [CONFIRMED];modules/calendar/ViewGroupGrid.js
-legacy;calendar;statuses[CANCELLED];állapotok [TÖRÖLVE];modules/calendar/ViewGroupGrid.js
-legacy;calendar;Accepted;Elfogadott;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Declined;Elutasította;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Delegated;felhatalmazáson alapuló;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Show as busy;Mutassa foglaltnak;modules/calendar/ViewGroupGrid.js
+legacy;calendar;statuses[NEEDS-ACTION];statuses[NEEDS-ACTION];modules/calendar/ViewGroupGrid.js
+legacy;calendar;statuses[ACCEPTED];statuses[ACCEPTED];modules/calendar/ViewGroupGrid.js
+legacy;calendar;statuses[DECLINED];statuses[DECLINED];modules/calendar/ViewGroupGrid.js
+legacy;calendar;statuses[TENTATIVE];statuses[TENTATIVE];modules/calendar/ViewGroupGrid.js
+legacy;calendar;statuses[DELEGATED];statuses[DELEGATED];modules/calendar/ViewGroupGrid.js
+legacy;calendar;statuses[COMPLETED];statuses[COMPLETED];modules/calendar/ViewGroupGrid.js
+legacy;calendar;statuses[IN-PROCESS];statuses[IN-PROCESS];modules/calendar/ViewGroupGrid.js
+legacy;calendar;statuses[CONFIRMED];statuses[CONFIRMED];modules/calendar/ViewGroupGrid.js
+legacy;calendar;statuses[CANCELLED];statuses[CANCELLED];modules/calendar/ViewGroupGrid.js
+legacy;calendar;Accepted;Elfogadva;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Declined;Elutasítva;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Delegated;Felhatalmazáson alapuló;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Show as busy;Jelölje foglaltnak;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Select category;Válassz kategóriát;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Private;Személyes;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Start;;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Status;Állapot;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Last;Utolsó;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Repeat forever;Örökké ismétlődjön;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Repeat forever;Ismétlődjön örökké;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Repeat until;Eddig;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Repeat;Ismétlés;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Recurrence;Ismétlődés;modules/calendar/ViewGroupGrid.js
@@ -530,20 +530,20 @@ legacy;calendar;Show holidays;megjelenítése szabadság;modules/calendar/ViewGr
 legacy;calendar;Show completed tasks;Elvégzett feladatok megjelenítése;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Tooltip text;elemleírásokat;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Visible tasklists;látható tasklists;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Tasklist;Feladat lista;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Tasklist;Feladatlista;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Publish iCalendar file of last month and future events. Caution! The calendar will be readable to everyone.;Adja iCalendar fájl utolsó hónapban, és a jövőbeli eseményeket. Vigyázat! A naptár olvasható lesz mindenki számára.;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Remove duplicates;Távolítsuk ismétlődések;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Remove duplicates;Duplikátumok eltávolítása;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Select an icalendar (*.ics) file;Válasszon ki egy iCalendar (* .ics) fájl;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Resource;Forrás;modules/calendar/ViewGroupGrid.js
-legacy;calendar;You have errors in your form. You need to select a group for this resource.;Hibák vannak az űrlapon. Be kell, hogy válasszon ki egy csoportot az erőforráshoz.;modules/calendar/ViewGroupGrid.js
+legacy;calendar;You have errors in your form. You need to select a group for this resource.;Hibák vannak az űrlapon. Válasszon ki egy csoportot az erőforráshoz.;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Q;;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Select calendar;Válasszon naptárat;modules/calendar/ViewGroupGrid.js
 legacy;calendar;No information available;Nincs elérhető információ;modules/calendar/ViewGroupGrid.js
-legacy;calendar;No participants to display;Nincs résztvevők megjelenítéséhez;modules/calendar/ViewGroupGrid.js
+legacy;calendar;No participants to display;Nincs megjeleníthető résztvevő;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Previous day;Előző nap;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Next day;Következő nap;modules/calendar/ViewGroupGrid.js
-legacy;calendar;The appointment has been accepted and scheduled. You can close this window.;A kinevezés már elfogadott és tervezett. Bezárhatja ezt az ablakot.;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Select the calendar to put this appointment in;Válassza ki a naptár, hogy ezt a kinevezést;modules/calendar/ViewGroupGrid.js
+legacy;calendar;The appointment has been accepted and scheduled. You can close this window.;A esemény már jóváhagyott. Bezárhatja ezt az ablakot.;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Select the calendar to put this appointment in;Válassza ki, hogy melyik naptárba rögzítsük az eseményt;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Morning;Reggel;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Afternoon;Délután;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Evening;Este;modules/calendar/ViewGroupGrid.js
@@ -558,47 +558,47 @@ legacy;calendar;colors;színek;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Views;Nézet;modules/calendar/ViewGroupGrid.js
 legacy;calendar;5 Days;5 nap;modules/calendar/ViewGroupGrid.js
 legacy;calendar;List;Lista;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Print current view;Kiírja az aktuális nézet;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Print current view;Nyomtassuk az aktuális nézetet;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Print count per category;Nyomtatás száma egy kategóriát;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Would you like to send a cancellation notice to the participants?;Szeretné, hogy küldjön egy lemondó nyilatkozat, hogy a résztvevők?;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Would you like to notify the organizer that you will not attend by e-mail?;Szeretné, hogy értesítse a szervező, hogy nem fog részt venni, e-mail?;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Send notification?;Értesítést küld?;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Would you like to send updated meeting information to participants?;Szeretné, hogy küldjön frissített találkozó adatait a résztvevők?;modules/calendar/ViewGroupGrid.js
-legacy;calendar;You are not the organizer;Te nem a szervező;modules/calendar/ViewGroupGrid.js
-legacy;calendar;You are not authorised to edit this event because you are not the organizer.;Ön nem jogosult módosítani ezt az eseményt, mert nem te vagy a szervező.;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Would you like to send a cancellation notice to the participants?;Tájékoztassuk a többi résztvevőt e-mailben a találkozó lemondásáról?;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Would you like to notify the organizer that you will not attend by e-mail?;Tájékoztassuk a többi résztvevőt e-mailben arról, hogy Ön nem vesz részt az eseményen?;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Send notification?;Értesítést küldjünk?;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Would you like to send updated meeting information to participants?;Tájékoztassuk a többi résztvevőt e-mailben a találkozó módosulásairól?;modules/calendar/ViewGroupGrid.js
+legacy;calendar;You are not the organizer;Nem Ön a szervező.;modules/calendar/ViewGroupGrid.js
+legacy;calendar;You are not authorised to edit this event because you are not the organizer.;Ön nem jogosult módosítani ezt az eseményt, mert nem Ön a szervezője.;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Custom fields;Egyéni mezők;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Global categories;globális kategóriák;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Global categories;Globális kategóriák;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Notify participants?;Értesítse a résztvevőket?;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Do you want to notify by e-mail only the participants that you just added?;Szeretné értesíteni e-mailben csak a résztvevők, hogy csak hozzá?;modules/calendar/ViewGroupGrid.js
-legacy;calendar;New participants;új szereplők;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Do you want to notify by e-mail only the participants that you just added?;Csak az újonnan hozzáadott résztvevőket értesítsük?;modules/calendar/ViewGroupGrid.js
+legacy;calendar;New participants;Új résztvevő(k);modules/calendar/ViewGroupGrid.js
 legacy;calendar;All participants;Minden résztvevő;modules/calendar/ViewGroupGrid.js
-legacy;calendar;No participants;Nem résztvevői;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Would you like to notify the participants by e-mail?;Szeretné, hogy értesítse a résztvevők e-mailben?;modules/calendar/ViewGroupGrid.js
+legacy;calendar;No participants;Nincs résztvevő;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Would you like to notify the participants by e-mail?;Tájékoztassuk a résztvevőket e-mailben?;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Start date;Kezdő dátum;modules/calendar/ViewGroupGrid.js
 legacy;calendar;End date;Befejezés dátuma;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Previous month;Előző hónap;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Next month;Következő hónap;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Attendance;Részvétel;modules/calendar/ViewGroupGrid.js
-legacy;calendar;I will attend;Részt fogok venni;modules/calendar/ViewGroupGrid.js
+legacy;calendar;I will attend;Részt veszek rajta;modules/calendar/ViewGroupGrid.js
 legacy;calendar;I will not attend;Nem veszek részt;modules/calendar/ViewGroupGrid.js
 legacy;calendar;I might attend;Talán részt veszek;modules/calendar/ViewGroupGrid.js
 legacy;calendar;I haven't decided yet;Még nem döntöttem el;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Notify the organizer by e-mail about my decision;A szervező értesítése e-mailben a döntéstről;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Notify the organizer by e-mail about my decision;Tájékoztassuk a szervezőt a döntésről;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Organizer;Szervező;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Event details;Esemény részletei;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Defaults settings for appointments;Emlékeztetők alapértelmezett beállításai;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Default calendar;Alapértelmezett naptár;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Show event statuses in views;Mutassa az események állapotát;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Check for conflicts;Ütközések ellenőrzése;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Forthcoming appointments;Soron következő kinevezéseket;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Past appointments;Korábbi találkozók;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Tentative;Kísérleti;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Not responded yet;Még nem adott választ;modules/calendar/ViewGroupGrid.js
-legacy;calendar;Create permission;Készítsen engedélyt;modules/calendar/ViewGroupGrid.js
-legacy;calendar;You can't remove the organizer;Nem lehet eltávolítani a szervezőt;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Forthcoming appointments;Soron következő események;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Past appointments;Elmúlt események;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Tentative;Próba;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Not responded yet;Még nem válaszolt;modules/calendar/ViewGroupGrid.js
+legacy;calendar;Create permission;Jogosultság létrehozása;modules/calendar/ViewGroupGrid.js
+legacy;calendar;You can't remove the organizer;Nem távolíthatja el szervezőt;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Participants;Résztvevők;modules/calendar/ViewGroupGrid.js
 legacy;calendar;Addressbook;Címjegyzék;modules/calendar/ViewGroupGrid.js
-legacy;calendarfullscreen;Direct URL;Közvetlen URL;modules/calendarfullscreen/views/Extjs3/CalendarOverrides.js
+legacy;calendarfullscreen;Direct URL;;modules/calendarfullscreen/views/Extjs3/CalendarOverrides.js
 legacy;calendarfullscreen;Fullscreen;Teljes képernyő;modules/calendarfullscreen/views/Extjs3/CalendarOverrides.js
 legacy;forms;ID;;modules/forms/views/Extjs3/ManageFormsDialog.js
 legacy;forms;Form;Űrlap;modules/forms/views/Extjs3/ManageFormsDialog.js
@@ -647,7 +647,7 @@ legacy;sendletter;Almost done;Majdnem kész;modules/sendletter/views/Extjs3/Main
 legacy;sendletter;Address lists;Címlisták;modules/sendletter/views/Extjs3/MainPanel.js
 legacy;sendletter;ODT Template;ODT sablon;modules/sendletter/views/Extjs3/MainPanel.js
 legacy;sendletter;Sent letters;elküldött levelek;modules/sendletter/views/Extjs3/MainPanel.js
-legacy;licenses;Server;szerver;modules/licenses/PackageFilterPanel.js
+legacy;licenses;Server;;modules/licenses/PackageFilterPanel.js
 legacy;licenses;Data usage;Adathasználat;modules/licenses/PackageFilterPanel.js
 legacy;licenses;Total installations;Összesen telepítés;modules/licenses/PackageFilterPanel.js
 legacy;licenses;Package;Csomag;modules/licenses/PackageFilterPanel.js
@@ -657,8 +657,8 @@ legacy;licenses;Passphrase;Jelmondat;modules/licenses/PackageFilterPanel.js
 legacy;licenses;Products;Termékek;modules/licenses/PackageFilterPanel.js
 legacy;licenses;Host;;modules/licenses/PackageFilterPanel.js
 legacy;licenses;IP address;;modules/licenses/PackageFilterPanel.js
-legacy;licenses;Upgrades;frissítések;modules/licenses/PackageFilterPanel.js
-legacy;licenses;Licenses;Az engedélyeket;modules/licenses/PackageFilterPanel.js
+legacy;licenses;Upgrades;Frissítések;modules/licenses/PackageFilterPanel.js
+legacy;licenses;Licenses;;modules/licenses/PackageFilterPanel.js
 legacy;licenses;Upgrade licenses;Engedélyek frissítése;modules/licenses/PackageFilterPanel.js
 legacy;licenses;Please select which package you want to update:;Kérjük, válassza ki, melyik csomagot szeretné frissíteni:;modules/licenses/PackageFilterPanel.js
 legacy;licenses;Upgrade package;frissítési csomag;modules/licenses/PackageFilterPanel.js

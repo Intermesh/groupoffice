@@ -40,8 +40,7 @@ abstract class AclEntity extends Entity {
 			return $result;
 		}
 		
-		$maxChanges -= (count($result['changed']) + count($result['removed']));
-		
+		$maxChanges -= (count($result['changed']) + count($result['removed']));		
 		
 		//Detect permission changes for AclItemEntities. For example notes that depend on notebook permissions.		
 		$acls = static::findAcls();	

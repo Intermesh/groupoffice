@@ -385,4 +385,9 @@ Kullanıcı Adı: %s<br />;
     'ai' => 'Adobe Illustrator dosyası',
     'eml' => 'E-posta iletisi',
   ),
+	'Recurrence' => 'Tekrarlama',
+	'Repeat forever' => 'sürekli tekrarla',
+  'Repeat every' => 'Tekrarla, her',
+  'Repeat until' => 'Son tekrarlama',
+	'At days' => 'Hangi günler'
 );

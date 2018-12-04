@@ -403,4 +403,9 @@ If you did not request a new password please delete this mail.',
     'sql' => 'SQL database export',
     'xmind' => 'XMind file',
   ),
+	'Recurrence' => '반복',
+	'Repeat forever' => '계속 반복',
+  'Repeat every' => '반복 주기',
+  'Repeat until' => '반복 종료',
+	'At days' => '요일'
 );

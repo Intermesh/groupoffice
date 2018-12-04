@@ -845,4 +845,9 @@ Se non hai richiesto una nuova password ti preghiamo di eliminare questo messagg
     'sql' => 'Esportazione database SQL',
     'xmind' => 'File XMind',
   ),
+	'Recurrence' => 'Ricorrenza',
+	'Repeat forever' => 'ripeti per sempre',
+  'Repeat every' => 'Ripeti ogni',
+  'Repeat until' => 'Ripeti finché',
+	'At days' => 'Al giorno',
 );

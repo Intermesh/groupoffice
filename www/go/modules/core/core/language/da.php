@@ -526,4 +526,9 @@ Kodeord: %s',
   'filetypes' => 
   array (
   ),
+	'Recurrence' => 'Gentagelse',
+	'Repeat forever' => 'Gentag uendeligt',
+  'Repeat every' => 'Gentag hver',
+  'Repeat until' => 'Gentag indtil',
+	'At days' => 'På dage'
 );

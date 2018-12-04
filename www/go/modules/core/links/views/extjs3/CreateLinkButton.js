@@ -8,10 +8,7 @@ go.modules.core.links.CreateLinkButton = Ext.extend(Ext.Button, {
 	totalCount: 0,
 	addLink : function(entity, entityId) {	
 		
-		this.newLinks.push({						
-						toEntity: entity,
-						toId: entityId
-					});
+		
 					
 		var callId = go.Jmap.request({
 			method: "Search/query",
@@ -34,6 +31,10 @@ go.modules.core.links.CreateLinkButton = Ext.extend(Ext.Button, {
 			scope: this,
 			callback: function(options, success, result) {
 				
+				this.newLinks.push({						
+						toEntity: entity,
+						toId: entityId
+					});
 					
 				this.linkGrid.store.loadData({"records" :[{
 					"toId": entityId,
