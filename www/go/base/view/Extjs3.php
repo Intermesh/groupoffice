@@ -156,8 +156,6 @@ class Extjs3{
 	public function exportModules(){
 		//$GLOBALS['GO_MODULES']->modules
 		
-		$arr = GO()->getCache()->get("export-modules");
-		if(!$arr) {
 						
 			$modules = \GO::modules()->getAllModules(true);
 
@@ -176,8 +174,6 @@ class Extjs3{
 
 			}
 			
-			 GO()->getCache()->set("export-modules", $arr);
-		}
 
 		return $arr;
 	}

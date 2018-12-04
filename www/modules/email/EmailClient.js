@@ -1542,6 +1542,10 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 
 /**
  * Function that will open an email composer. If a composer is already open it will create a new one. Otherwise it will reuse an already created one.
+ * 
+ * {
+ *	values: {to: "merijn@intermesh.nl"}
+ * }
  */
 GO.email.showComposer = function(config){
 
@@ -1927,10 +1931,10 @@ GO.email.moveToInbox = function(mailUid,fromAccountId) {
 		 * @return {undefined}
 		 */
 go.util.mailto = function (config) {
-	config.to = config.email;
+	config.values = {to: config.email};
 
 	if (config.name) {
-		config.to = '"' + config.name.replace(/"/g, '\"') + '" <' + config.email + '>';
+		config.values.to = '"' + config.name.replace(/"/g, '\"') + '" <' + config.email + '>';
 	}
 	
 	GO.email.showComposer(config);
