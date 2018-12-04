@@ -49,7 +49,7 @@ abstract class Settings extends data\Model {
 							->from('core_setting')
 							->where([
 									'moduleId' => $this->getModuleId(), 
-									'name' => array_keys(get_object_vars($this))
+									'name' => array_keys($this->getSettingProperties())
 									])
 							->execute();
 			
@@ -64,14 +64,16 @@ abstract class Settings extends data\Model {
 //		$this->save();
 //	}
 	
+	private function getSettingProperties() {
+		return array_filter(get_object_vars($this), function($key) {
+			return $key !== 'oldData';
+		}, ARRAY_FILTER_USE_KEY);
+	}
+	
 	public function save() {
 		$new = (array) $this;
 		
-		foreach(get_object_vars($this) as $name => $value) {
-			
-			if($name == 'oldData') {
-				continue;
-			}
+		foreach($this->getSettingProperties() as $name => $value) {
 			
 			if(!array_key_exists($name, $this->oldData) || $value != $this->oldData[$name]) {
 				$this->update($name, $value);
