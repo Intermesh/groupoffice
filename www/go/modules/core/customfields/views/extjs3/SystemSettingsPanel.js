@@ -18,12 +18,21 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 	autoHeight: true,
 
 	entity: null,
+	
+	title: t('Custom fields'),
+	
+	toolbarTitle: true,
 
 	createFieldSetDialog: function () {
 		return new go.modules.core.customfields.FieldSetDialog();
 	},
 
 	initComponent: function () {
+		var title;
+		if(this.toolbarTitle) {
+			title = this.title;
+			this.title = null;
+		}
 
 		this.plugins = [new go.grid.plugin.Sortable(this.onSort, this, this.isDropAllowed)];
 
@@ -133,7 +142,7 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 			tbar: [
 				{
 					xtype: "tbtitle",
-					text: t('Custom fields')
+					text: title
 				},
 				"->",
 				{

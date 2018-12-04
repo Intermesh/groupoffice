@@ -61,7 +61,7 @@ class Select extends Base {
 	}
 	
 	private function getConstraintName() {
-		return $this->field->tableName() . "_ibfk_" . $this->field->id;
+		return $this->field->tableName() . "_ibfk_go_" . $this->field->id;
 	}
 	
 	protected function saveOptions() {

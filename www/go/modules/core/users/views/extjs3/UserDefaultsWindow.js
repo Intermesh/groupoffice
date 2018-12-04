@@ -2,14 +2,17 @@
 /* global Ext, go */
 
 go.modules.core.users.UserDefaultsWindow = Ext.extend(go.Window, {
-	title: t("User defaults"),
+	title: t("User settings"),
 	autoScroll: true,
 	modal: true,
 	width: dp(800),
 	height: dp(600),
+	layout: 'fit',
 	initComponent: function () {
 
+
 		this.formPanel = new Ext.form.FormPanel({
+			title: t("User defaults"),
 			items: [
 				{
 					layout: "hbox",
@@ -62,7 +65,7 @@ go.modules.core.users.UserDefaultsWindow = Ext.extend(go.Window, {
 									name: "defaultShortDateInList",
 									checked: true,
 									hideLabel: true,
-									boxLabel: t("Use short format for date and time in lists",'users','core')
+									boxLabel: t("Use short format for date and time in lists", 'users', 'core')
 								},
 								new Ext.form.ComboBox({
 									fieldLabel: t("First weekday", "users", "core"),
@@ -143,8 +146,18 @@ go.modules.core.users.UserDefaultsWindow = Ext.extend(go.Window, {
 				}
 			]
 		});
+		
+		this.tabPanel = new Ext.TabPanel({
+			activeTab: 0,
+			items: [this.formPanel, new go.modules.core.customfields.SystemSettingsPanel({
+					title: t("Custom fields"),
+					toolbarTitle: false,
+					entity: "User"
+				})]
+		});
 
-		this.items = [this.formPanel];
+
+		this.items = [this.tabPanel];
 
 		this.bbar = ['->', {
 				text: t("Save"),
