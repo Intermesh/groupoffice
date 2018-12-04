@@ -47,7 +47,10 @@ abstract class Settings extends data\Model {
 			$stmt = (new Query)
 							->select('name, value')
 							->from('core_setting')
-							->where(['moduleId' => $this->getModuleId()])
+							->where([
+									'moduleId' => $this->getModuleId(), 
+									'name' => array_keys(get_object_vars($this))
+									])
 							->execute();
 			
 			while($record = $stmt->fetch()) {
