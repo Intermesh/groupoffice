@@ -61,25 +61,25 @@ class Group extends AclOwnerEntity {
 						->addTable('core_group', 'g')
 						->addRelation('users', UserGroup::class, ['id' => 'groupId']);
 	}
-
-	public static function filter(Query $query, array $filter) {
-		if (!empty($filter['hideUsers'])) {
-			$query->andWhere(['isUserGroupFor' => null]);
-		}
-		
-		if (!empty($filter['excludeEveryone'])) {
-			$query->andWhere('id', '!=', Group::ID_EVERYONE);
-		}
-		
-		if (!empty($filter['excludeAdmins'])) {
-			$query->andWhere('id', '!=', Group::ID_ADMINS);
-		}
-		
-		if(!empty($filter['exclude'])) {
-			$query->andWhere('id', 'NOT IN', $filter['exclude']);
-		}		
-
-		return parent::filter($query, $filter);
+	
+	protected static function defineFilters() {
+		return parent::defineFilters()
+						->add('hideUsers', function(Query $query, $value, $filter) {
+							if($value) {
+								$query->andWhere(['isUserGroupFor' => null]);	
+							}
+						})
+						->add('excludeEveryone', function(Query $query, $value, $filter) {
+							if($value) {
+								$query->andWhere('id', '!=', Group::ID_EVERYONE);
+							}
+						})
+						->add('excludeAdmins', function(Query $query, $value, $filter) {
+							if($value) {
+								$query->andWhere('id', '!=', Group::ID_ADMINS);
+							}
+						});
+						
 	}
 	
 	protected static function searchColumns() {
