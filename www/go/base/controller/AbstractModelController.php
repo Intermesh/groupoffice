@@ -45,6 +45,19 @@ class AbstractModelController extends AbstractController {
 		return empty($params['id']) ? false : $params['id'];
 	}
 	
+	
+//	private function _extractCustomfieldValues(&$attributes){
+//		$v = [];
+//		foreach($attributes as $key=>$value)
+//		{
+//			if(substr($key,0,13)=='customFields_'){
+//				$v[substr($key,13)] = $attributes[$key];
+//				unset($attributes[$key]);
+//			}
+//		}
+//		return $v;
+//	}
+	
 
 	/**
 	 * The default action when the form in an edit dialog is submitted.
@@ -68,7 +81,14 @@ class AbstractModelController extends AbstractController {
 		
 		if($ret!==false)
 		{		
+			
+			//$customFields = $this->_extractCustomfieldValues($params);
+//			var_dump($customFields);
 			$model->setAttributes($params);
+			
+//			if(!empty($customFields)) {
+//				$model->setCustomFields($customFields);
+//			}
 
 			$modifiedAttributes = $model->getModifiedAttributes();
 			if($model->save() ){
@@ -200,11 +220,9 @@ class AbstractModelController extends AbstractController {
 		$response['data']['write_permission']=true;
 			
 		
-		if(\GO::user()->getModulePermissionLevel('customfields') && $model->customfieldsRecord)
+		if($model->hasCustomfields())
 		{
-			foreach($model->customfieldsRecord->getAttributes() as $key => $value) {
-				$response['data']['customFields.'.$key] = $value;
-			}
+			$response['data']['customFields'] = $model->getCustomFields();
 		}
 						
 		$response['success'] = true;
@@ -469,8 +487,9 @@ class AbstractModelController extends AbstractController {
 		if(!isset($response['data']['workflow']) && \GO::modules()->workflow)
 			$response = $this->_processWorkflowDisplay($model,$response);
 		
-		if($model->customfieldsRecord)
-			$response = $this->_processCustomFieldsDisplay($model,$response);
+		if($model->hasCustomfields()) {
+			$response['data']['customFields'] = $model->getCustomFields();
+		}
 
 		if (\GO::modules()->lists)
 			$response = \GO\Lists\ListsModule::displayResponse($model, $response);
@@ -593,58 +612,6 @@ class AbstractModelController extends AbstractController {
 	}
 	
 	
-	private function _processCustomFieldsDisplay($model,$response){
-		$customAttributes = $model->customfieldsRecord->getAttributes('html');
-
-		//Get all field models and build an array of categories with their
-		//fields for display.
-		
-		$cls = $model->customfieldsRecord->extendsModel();
-		$entityId = $cls::getType()->getId();;
-
-		$findParams = \GO\Base\Db\FindParams::newInstance()
-						->joinRelation('category')
-						->order(array('category.sortOrder','t.sortOrder'),array('ASC','ASC'));
-		$findParams->getCriteria()
-						->addCondition('entityId', $entityId,'=','category');
-
-		$stmt = \GO\Customfields\Model\Field::model()->find($findParams);			
-
-		$categories=array();
-
-		while($field = $stmt->fetch()){
-			if(!isset($categories[$field->fieldSetId])){
-				$categories[$field->category->id]['id']=$field->category->id;
-				$categories[$field->category->id]['name']=$field->category->name;
-				$categories[$field->category->id]['fields']=array();
-			}
-			if(!empty($customAttributes[$field->columnName()]) ){
-				if($field->datatype == "GO\Customfields\Customfieldtype\Heading")
-				{
-					$header = array('name'=>$field->name,'value'=>$customAttributes[$field->columnName()]);
-				}
-				if(!empty($header) )
-				{
-					$categories[$field->category->id]['fields'][] = $header;
-					$header = null;
-				}
-				$categories[$field->category->id]['fields'][]=array(
-						'name'=>$field->name,
-						'datatype'=>$field->datatype,
-						'value'=>$customAttributes[$field->columnName()]
-				);				
-			}
-		}
-		//for new panels
-		$response['data']['customFields'] = $customAttributes;
-
-		foreach($categories as $category){
-			if(count($category['fields']))
-				$response['data']['customfields'][]=$category;
-		}
-			
-		return $response;
-	}
 	
 	public function formatTaskLinkRecord($record, $model, $cm){
 		
@@ -759,8 +726,6 @@ class AbstractModelController extends AbstractController {
 		
 		//define('EXPORTING', true);
 		//used by custom fields to format diffently
-		if(\GO::modules()->customfields)
-			\GO\Customfields\Model\AbstractCustomFieldsRecord::$formatForExport=true;
 
 		if(!empty($params['exportOrientation']) && ($params['exportOrientation']=="H"))
 			$orientation = 'L'; // Set the orientation to Landscape
@@ -1095,33 +1060,33 @@ class AbstractModelController extends AbstractController {
 		
 //		asort($attributes);
 		
-		if($model->customfieldsRecord){
-			$customAttributes = array();
-			$columns = $model->customfieldsRecord->getColumns();
-			foreach($columns as $name=>$attr){
-				try {
-					$cfModel = \GO\Customfields\Model\Field::model()->findByPk(substr($name,4));
-					$cfAllowed = $cfModel!==false;
-				} catch (\GO\Base\Exception\AccessDenied $e) {
-					$cfAllowed = false;
-				}
-
-				if($name != 'model_id'
-								&& !empty($cfAllowed)
-								&& isset($attr['customfield'])
-								&& !in_array($name, $params['exclude'])
-								&& (empty($params['hide_unknown_gotypes']) || !empty($attr['gotype']))
-								&& !in_array($attr['customfield']->datatype,$params['exclude_cf_datatypes']))
-				{					
-					$customAttributes[$model->customfieldsRecord->getAttributeLabel($name)]=array('name'=>'cf.'.$name, 'label'=>$model->customfieldsRecord->getAttributeLabel($name),'gotype'=>'customfield');					
-				}
-			}
-			ksort($customAttributes);
-			foreach($customAttributes as $a){
-				$attributes[$a['name']]=$a;
-			}
-//			$attributes=array_merge($attributes, $customAttributes);
-		}
+//		if($model->customfieldsRecord){
+//			$customAttributes = array();
+//			$columns = $model->customfieldsRecord->getColumns();
+//			foreach($columns as $name=>$attr){
+//				try {
+//					$cfModel = \GO\Customfields\Model\Field::model()->findByPk(substr($name,4));
+//					$cfAllowed = $cfModel!==false;
+//				} catch (\GO\Base\Exception\AccessDenied $e) {
+//					$cfAllowed = false;
+//				}
+//
+//				if($name != 'model_id'
+//								&& !empty($cfAllowed)
+//								&& isset($attr['customfield'])
+//								&& !in_array($name, $params['exclude'])
+//								&& (empty($params['hide_unknown_gotypes']) || !empty($attr['gotype']))
+//								&& !in_array($attr['customfield']->datatype,$params['exclude_cf_datatypes']))
+//				{					
+//					$customAttributes[$model->customfieldsRecord->getAttributeLabel($name)]=array('name'=>'cf.'.$name, 'label'=>$model->customfieldsRecord->getAttributeLabel($name),'gotype'=>'customfield');					
+//				}
+//			}
+//			ksort($customAttributes);
+//			foreach($customAttributes as $a){
+//				$attributes[$a['name']]=$a;
+//			}
+////			$attributes=array_merge($attributes, $customAttributes);
+//		}
 		
 		foreach($attributes as $field=>$attr)
 			$response['results'][]=$attr;

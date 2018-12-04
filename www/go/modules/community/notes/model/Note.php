@@ -3,7 +3,7 @@ namespace go\modules\community\notes\model;
 
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
-use go\core\db\Query;
+use go\core\orm\Query;
 use go\core\orm\CustomFieldsTrait;
 use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
@@ -79,12 +79,11 @@ class Note extends AclItemEntity {
 		return ['name', 'content'];
 	}
 	
-	public static function filter(Query $query, array $filter) {		
-		if(!empty($filter['noteBookId'])) {
-			$query->where(['noteBookId' => $filter['noteBookId']]);
-		}
-		
-		return parent::filter($query, $filter);		
+	protected static function defineFilters() {
+		return parent::defineFilters()
+						->add('noteBookId', function(Query $query, $value, array $filter) {
+							$query->where(['noteBookId' => $value]);
+						});
 	}
 	
 	/**

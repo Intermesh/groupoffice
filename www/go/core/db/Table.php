@@ -34,6 +34,9 @@ class Table {
 	}
 	
 	public static function destroyInstances() {
+		foreach(self::$cache as $i) {
+			$i->clearCache();
+		}
 		self::$cache = [];
 	}
 	
@@ -179,6 +182,13 @@ class Table {
 			case 'binary':
 				$c->pdoType = PDO::PARAM_LOB;
 				break;
+			
+			case 'text':
+			case 'longtext':
+			case 'mediumtext':
+			case 'tinytext':
+				break;
+			
 			default:				
 				$c->trimInput = true;
 				break;			

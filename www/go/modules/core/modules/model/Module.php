@@ -2,7 +2,7 @@
 namespace go\modules\core\modules\model;
 
 use Exception;
-use go\core\acl\model\AclEntity;
+use go\core\acl\model\AclOwnerEntity;
 use go\core\App;
 use go\modules\core\groups\model\Group;
 use go\modules\core\users\model\User;
@@ -12,7 +12,7 @@ use go\core\module\Base;
 use go\core\orm\Entity;
 use go\modules\core\search\model\Search;
 
-class Module extends AclEntity {
+class Module extends AclOwnerEntity {
 	public $id;
 	public $name;
 	public $package;
@@ -20,6 +20,34 @@ class Module extends AclEntity {
 	public $admin_menu;
 	public $version;
 	public $enabled;
+	
+	
+	
+	protected function internalSave() {
+		
+		if($this->isNew()) {
+			$this->sort_order = $this->nextSortOrder();			
+		}
+		
+		return parent::internalSave();
+	}
+	
+	
+	private function nextSortOrder() {
+		$query = new \go\core\db\Query();			
+		$query->from("core_module");
+
+		if($this->package == "core") {
+			$query->selectSingleValue("COALESCE(MAX(sort_order), 0) + 1")
+				->where(['package' => "core"]);
+		} else
+		{
+			$query->selectSingleValue("COALESCE(MAX(sort_order), 100) + 1")
+				->where('package', '!=', "core");
+		}
+
+		return $query->single();
+	}
 	
 
 	protected static function defineMapping() {
@@ -149,5 +177,21 @@ class Module extends AclEntity {
 		}
 		
 		return $available;
+	}
+	
+	/**
+	 * Check if a module is available
+	 * 
+	 * @param string $package
+	 * @param string $name
+	 * @param int $userId
+	 * @param int $level
+	 * @return boolean
+	 */
+	public static function isAvailableFor($package, $name, $userId = null, $level = \go\core\acl\model\Acl::LEVEL_READ) {
+		$query = static::find()->where(['package' => $package, 'name' => $name]);
+		static::applyAclToQuery($query, $level, $userId);
+		
+		return $query->single() !== false;
 	}
 }

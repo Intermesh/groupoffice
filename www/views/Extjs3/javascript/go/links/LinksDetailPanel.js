@@ -10,13 +10,13 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 				limit: this.limit,
 				position: 0,
 				filter: {
-					entities: [this.entity.name]
+					entities: [{name: this.link.entity, filter: this.link.filter}]
 				}
 			},
 			fields: ['id', 'to', 'toId', {name: 'createdAt', type: 'date'}, 'toEntity'],
 			entityStore: "Link",
 			listeners: {
-				load: function () {
+				datachanged: function () {
 					this.setVisible(this.store.getCount() > 0);
 				},
 				scope: this
@@ -27,7 +27,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 		var tpl = new Ext.XTemplate('<div class="icons"><tpl for=".">\
 				<p data-id="{id}">\
 				<tpl if="xindex === 1">\
-					<i class="label entity {toEntity}" ext:qtip="{toEntity}"></i>\
+					<i class="label ' + this.link.iconCls + '" ext:qtip="{toEntity}"></i>\
 				</tpl>\
 				<tpl for="to">\
 				<a>{name}</a>\
@@ -60,7 +60,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 //			header: false,
 			collapsible: true,
 			titleCollapse: true,
-			title: this.entity.title,
+			title: this.link.title,
 			items: this.dataView = new Ext.DataView({
 				store: this.store,
 				tpl: tpl,
@@ -128,17 +128,9 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 go.links.getDetailPanels = function() {
 
 	var panels = [];
-	var linkableEntitities = go.Entities.getAll().filter(function(e) {
-			return e.linkable;
-	});
-				
-	linkableEntitities.sort(function(a, b) {
-		return a.title.localeCompare(b.title);
-	});
-
-	linkableEntitities.forEach(function (e) {		
+	go.modules.core.links.Links.getAll().forEach(function (e) {		
 		panels.push(new go.links.DetailPanel({
-			entity: e
+			link: e
 		}));
 	});
 	

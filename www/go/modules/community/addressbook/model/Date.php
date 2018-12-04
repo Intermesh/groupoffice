@@ -13,6 +13,10 @@ use go\core\orm\Property;
 
 class Date extends Property {
 	
+	const TYPE_BIRTHDAY = 'birthday';
+	
+	const TYPE_ANNIVERSARY = 'anniversary';
+	
 	/**
 	 * 
 	 * @var int
@@ -29,7 +33,7 @@ class Date extends Property {
 	 * 
 	 * @var string
 	 */							
-	public $type = 'birthday';
+	public $type = self::TYPE_BIRTHDAY;
 
 	/**
 	 * 

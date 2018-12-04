@@ -204,7 +204,6 @@ class MaintenanceController extends AbstractController {
 		$checkModels = array(
 				"GO\Calendar\Model\Event"=>array('name', 'start_time', 'end_time', 'calendar_id', 'rrule'),
 				"GO\Tasks\Model\Task"=>array('name', 'start_time', 'due_time', 'tasklist_id', 'rrule', 'user_id'),
-				"GO\Addressbook\Model\Contact"=>array('first_name', 'middle_name', 'last_name', 'addressbook_id', 'company_id', 'email'),
 				"GO\Files\Model\Folder"=>array('name', 'parent_id'),
 //				"GO\Calendar\Model\Participant"=>array('event_id', 'email'),
 				//"GO\Billing\Model\Order"=>array('order_id','book_id','btime')
@@ -802,21 +801,7 @@ class MaintenanceController extends AbstractController {
 		if(!$this->isCli())			
 			echo '<pre>';
 		
-		if(\GO::modules()->isInstalled("addressbook")){
-			echo "\n\nProcessing addressbook\n";
-			flush();
-			$stmt = \GO\Addressbook\Model\Addressbook::model()->find();
-			while($addressbook = $stmt->fetch()){
-				$contactStmt = $addressbook->contacts();
-				$companiesStmt = $addressbook->companies();
-				
-				if(!$contactStmt->rowCount() && !$companiesStmt->rowCount()){
-					echo "Removing ".$addressbook->name."\n";
-					$addressbook->delete();
-					flush();
-				}
-			}
-		}
+	
 		
 		if(\GO::modules()->isInstalled("calendar")){
 			echo "\n\nProcessing calendar\n";

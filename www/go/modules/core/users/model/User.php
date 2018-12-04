@@ -13,7 +13,7 @@ use go\core\auth\Method;
 use go\core\auth\Password;
 use go\core\auth\PrimaryAuthenticator;
 use go\core\db\Criteria;
-use go\core\db\Query;
+use go\core\orm\Query;
 use go\core\exception\Forbidden;
 use go\core\jmap\Entity;
 use go\modules\core\modules\model\Module;
@@ -163,6 +163,12 @@ class User extends Entity {
 	
 	
 	public $max_rows_list;
+	
+	/**
+	 * The user timezone
+	 * 
+	 * @var string eg. europe/amsterdam
+	 */
 	public $timezone;
 	public $start_module;
 	public $language;
@@ -437,20 +443,22 @@ class User extends Entity {
 		return ['username', 'displayName', 'email'];
 	}
 	
+	protected static function defineFilters() {
+		return parent::defineFilters()
+						->add('showDisabled', function (Query $query, $value, array $filter){							
+							if($value === false) {
+								$query->andWhere('enabled', '=', true);
+							}
+						})
+						->add('groupId', function (Query $query, $value, array $filter){
+							$query->join('core_user_group', 'ug', 'ug.userId = u.id')->andWhere(['ug.groupId' => $filter['groupId']]);
+						});
+	}
+	
 	public static function filter(Query $query, array $filter) {
-				
-		if(!isset($filter['showDisabled']) || $filter['showDisabled'] !== true) {
-			$query->andWhere('enabled', '=', 1);
+		if(!isset($filter['showDisabled'])) {
+			$filter['showDisabled'] = false;
 		}
-		
-		if(!empty($filter['groupId'])) {
-			$query->join('core_user_group', 'ug', 'ug.userId = u.id')->andWhere(['ug.groupId' => $filter['groupId']]);
-		}
-		
-		if(!empty($filter['exclude'])) {
-			$query->andWhere('id', 'NOT IN', $filter['exclude']);
-		}
-		
 		return parent::filter($query, $filter);
 	}
 

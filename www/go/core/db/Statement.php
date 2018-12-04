@@ -1,6 +1,12 @@
 <?php
 namespace go\core\db;
 
+/**
+ * PDO Statement
+ * 
+ * Represents a prepared statement and, after the statement is executed, an
+ * associated result set.
+ */
 class Statement extends \PDOStatement implements \JsonSerializable {
 	
 	private $query;

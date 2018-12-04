@@ -47,16 +47,15 @@ go.modules.community.search.Panel = Ext.extend(Ext.Panel, {
 		}, this);
 	},
 	
-	gotoSelected: function() {
-		
+	gotoSelected: function() {		
 		var record = this.grid.getSelectionModel().getSelected();
 		if(!record) {
 			return;
 		}
 		
-		var e = go.Entities.get(record.data.entity);
-		e.goto(record.data.entityId);
+		go.Entities.get(record.data.entity).goto(record.data.entityId);
 		this.collapse();
+		
 	},
 	
 	search: function (q) {
@@ -74,7 +73,11 @@ go.modules.community.search.Panel = Ext.extend(Ext.Panel, {
 		var filter = {}, entities = [];
 		
 		Ext.each(this.entityGrid.getSelectionModel().getSelections(), function (r) {
-			entities.push(r.data.entity);
+			entities.push({
+				name: r.data.entity,
+				filter: r.data.filter
+			});
+			
 		}, this);
 		if(entities.length) {
 			filter.entities = entities;

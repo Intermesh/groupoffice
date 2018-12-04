@@ -257,7 +257,7 @@ class Token extends Entity {
 			return;
 		}
 		
-    if (session_status() == PHP_SESSION_NONE) {
+    if (session_status() == PHP_SESSION_NONE && !headers_sent()) {
       //without cookie_httponly the cookie can be accessed by malicious scripts 
       //injected to the site and its value can be stolen. Any information stored in 
       //session tokens may be stolen and used later for identity theft or

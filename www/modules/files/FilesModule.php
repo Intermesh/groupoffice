@@ -158,72 +158,72 @@ class FilesModule extends \GO\Base\Module{
 	
 	
 	public static function afterBatchEditStore($controller, &$response, &$tmpModel, &$params) {
-		$countCustomfield = 0;
-		$countCustomfieldCategory = array();
-		
-		
-		if('GO\Files\Model\File' !== $tmpModel->className()) {
-			return $response['results'];
-		}
-		
-		$module = call_user_func_array($params['model_name'].'::model', array());
-		$stmt = call_user_func_array(array($module, 'find'), 
-							array(\GO\Base\Db\FindParams::newInstance()->debugSql()->ignoreAcl()
-							->criteria(
-											\GO\Base\Db\FindCriteria::newInstance()
-											->addInCondition($params['primaryKey'], json_decode($params['keys']))
-											)
-									)
-							);		
-		
-		foreach ($stmt as $model) {
-			
-			$customfields = \GO\Customfields\Controller\CategoryController::getEnabledCategoryData("GO\Files\Model\File", $model->folder_id);
-			
-			$countCustomfield++;
-			if(isset($customfields['enabled_categories'])) {
-				foreach ($customfields['enabled_categories'] as $id) {
-
-						if(isset($countCustomfieldCategory[$id])) {
-							$countCustomfieldCategory[$id]++;
-						} else {
-							$countCustomfieldCategory[$id] = 1;
-						}
-
-				}
-			}else
-			{
-				if(!isset($allCats)) {
-					$allCats = \GO\Customfields\Model\Category::model()->findByModel("GO\Files\Model\File")->fetchAll();
-				}
-				
-				foreach($allCats as $cat) {
-					$id = $cat->id;
-					if(isset($countCustomfieldCategory[$id])) {
-						$countCustomfieldCategory[$id]++;
-					} else {
-						$countCustomfieldCategory[$id] = 1;
-					}
-				}
-			}
-			
-		}
-		
-		// remove fields
-		foreach ($response['results']  as $key => $results) {
-			if($results['gotype'] == 'customfield') {
-				
-				
-				if(!isset($countCustomfieldCategory[$results['category_id']]) || $countCustomfieldCategory[$results['category_id']] != $countCustomfield) {
-					
-					unset($response['results'][$key]);
-				}
-				
-			}
-		}
-		
-		$response['results'] = array_values($response['results']);
-		
+//		$countCustomfield = 0;
+//		$countCustomfieldCategory = array();
+//		
+//		
+//		if('GO\Files\Model\File' !== $tmpModel->className()) {
+//			return $response['results'];
+//		}
+//		
+//		$module = call_user_func_array($params['model_name'].'::model', array());
+//		$stmt = call_user_func_array(array($module, 'find'), 
+//							array(\GO\Base\Db\FindParams::newInstance()->debugSql()->ignoreAcl()
+//							->criteria(
+//											\GO\Base\Db\FindCriteria::newInstance()
+//											->addInCondition($params['primaryKey'], json_decode($params['keys']))
+//											)
+//									)
+//							);		
+//		
+//		foreach ($stmt as $model) {
+//			
+//			$customfields = \GO\Customfields\Controller\CategoryController::getEnabledCategoryData("GO\Files\Model\File", $model->folder_id);
+//			
+//			$countCustomfield++;
+//			if(isset($customfields['enabled_categories'])) {
+//				foreach ($customfields['enabled_categories'] as $id) {
+//
+//						if(isset($countCustomfieldCategory[$id])) {
+//							$countCustomfieldCategory[$id]++;
+//						} else {
+//							$countCustomfieldCategory[$id] = 1;
+//						}
+//
+//				}
+//			}else
+//			{
+//				if(!isset($allCats)) {
+//					$allCats = \GO\Customfields\Model\Category::model()->findByModel("GO\Files\Model\File")->fetchAll();
+//				}
+//				
+//				foreach($allCats as $cat) {
+//					$id = $cat->id;
+//					if(isset($countCustomfieldCategory[$id])) {
+//						$countCustomfieldCategory[$id]++;
+//					} else {
+//						$countCustomfieldCategory[$id] = 1;
+//					}
+//				}
+//			}
+//			
+//		}
+//		
+//		// remove fields
+//		foreach ($response['results']  as $key => $results) {
+//			if($results['gotype'] == 'customfield') {
+//				
+//				
+//				if(!isset($countCustomfieldCategory[$results['category_id']]) || $countCustomfieldCategory[$results['category_id']] != $countCustomfield) {
+//					
+//					unset($response['results'][$key]);
+//				}
+//				
+//			}
+//		}
+//		
+//		$response['results'] = array_values($response['results']);
+//		
 	}
 	
 }

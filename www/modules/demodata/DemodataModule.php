@@ -15,7 +15,7 @@ class DemodataModule extends \GO\Base\Module {
 	}
 
 	public function autoInstall() {
-		return true;
+		return false;
 	}
 
 }

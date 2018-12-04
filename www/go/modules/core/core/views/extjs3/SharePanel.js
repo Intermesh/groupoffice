@@ -4,6 +4,8 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 	 */
 	name: "groups",
 	
+	cls: "go-share-panel", 
+	
 	clicksToEdit: 1,
 	initComponent: function () {
 		
@@ -15,6 +17,9 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 			listeners: {
 				change: this.onCheckChange,
 				scope: this
+			},
+			isDisabled : function(record) {
+				return record.data.id === 1;
 			}
 		});
 		
@@ -29,8 +34,7 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 				'id', 
 				'name', 
 				{name: 'user', type: go.data.types.User, key: 'isUserGroupFor'}, //fetches entity from store
-				'users', //used in renderer
-				'userCount', //used in renderer
+				{name: 'members', type: go.data.types.User, key: 'users.userId'},
 				{
 					name: 'level', 
 					type: {
@@ -84,22 +88,12 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 						
 						var user = record.get("user"),
-										style = user && user.avatarId ?  'background-image: url(' + go.Jmap.downloadUrl(record.get("user").avatarId) + ')"' : "";
-										cls = user ? "avatar" : "avatar group",
-										memberStr = t("Loading members..."),
-										members = record.get('users').column('userId'),
-										users = go.Stores.get('User').get(members),
-										max = 5;
+										style = user && user.avatarId ?  'background-image: url(' + go.Jmap.downloadUrl(record.get("user").avatarId) + ')"' : "background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24));";
+										html = user ? "" : '<i class="icon">group</i>',										
+										max = 5,
+										members = record.get('members').slice(0, max).column('displayName');
 						
-						if(users) {
-							memberStr = "";
-							users.slice(0, max).forEach(function(user){
-								if(memberStr != "") {
-									memberStr += ", "
-								}
-								memberStr += user.displayName;
-							});
-						}
+							memberStr = members.join(", ");
 								
 							var more = members.length - max;
 							if(more > 0) {
@@ -107,7 +101,7 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 							}
 						
 						
-						return '<div class="user"><div class="' + cls + '" style="' + style + '"></div>' +
+						return '<div class="user"><div class="avatar" style="' + style + '">' + html + '</div>' +
 							'<div class="wrap">'+
 								'<div class="displayName">' + record.get('name') + '</div>' +
 								'<small class="username">' + memberStr + '</small>' +
@@ -144,8 +138,12 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 		});
 		
 		this.store.on("beforeload", this.onBeforeStoreLoad, this);
-		this.store.on("load", this.onStoreLoad, this);
+		
 		go.modules.core.core.SharePanel.superclass.initComponent.call(this);
+		
+		this.on("beforeedit", function(e) {
+			return e.record.data.id !== 1; //cancel edit for admins group
+		}, this);
 
 	},
 	
@@ -282,7 +280,7 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 			return true;
 		}
 		
-		go.Stores.get("Group").get(this.getSelectedGroupIds(), function(entities) {			
+		go.Stores.get("Group").get(this.getSelectedGroupIds(), function(entities) {
 			this.store.loadData({records: entities}, true);
 			this.store.sortData();
 			this.store.load({
@@ -293,31 +291,7 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 		}, this);
 		
 		return false;
-	},
-	onStoreLoad : function() {
-		
-		//don't add selected on search
-		if(this.store.baseParams.filter.q) {
-			return;
-		}		
-		
-		//fetch group members
-		var records = this.store.getRange(), me = this;
-		var memberIds = [];
-		
-		records.forEach(function(record) {
-			memberIds = memberIds.concat(record.data.users.column("userId"));			
-		});
-		
-		var unique = memberIds.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
-						
-		go.Stores.get('User').get(unique, function(entities, async) {	
-			//all data is fetched now. Refresh grid ui.	
-			if(async && me.rendered) {
-				me.getView().refresh();														
-			}
-		});
-	},
+	},	
 	
 	getValue: function () {				
 		return this.selectedGroups;

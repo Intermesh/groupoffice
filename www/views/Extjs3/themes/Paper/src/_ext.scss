@@ -644,6 +644,20 @@
 	button {
 		min-height: dp(32);
 	}
+	
+	.x-form-composite & {
+		height: dp(32);
+		width: dp(32);
+		line-height: dp(32) - 2;
+		button {
+			min-height: dp(32);
+			min-width: dp(32);
+			&::before {
+				top: dp(4);
+				left: dp(4);
+			}
+		}
+	}
 
 	&.x-item-disabled {
 		.x-btn-text {
@@ -753,7 +767,8 @@
 	&-text-icon button::before{
 		@extend %icon;
 		padding-right: dp(8);
-		margin-top: dp(-4);
+		//MS Why was this here?
+		/*margin-top: dp(-4);*/
 	}
    &-pressed {
 		//background-color: color($bg, 'hover');
@@ -1043,6 +1058,13 @@
 //############
 //### GRID ### 
 //############
+
+.x-grid3-no-row-borders{
+	.x-grid3-row{
+		border-bottom: 0px;
+	}
+}
+
 .x-grid3{
 	background-color: color($bg, "card");
 	&-scroller {
@@ -1115,6 +1137,9 @@
 			content: 'check_box';
 		}
 	}
+	
+	
+	
 	&-row {
 		border:0;
 		border-bottom:1px solid color($fg, 'divider');
@@ -1437,11 +1462,13 @@ td.grid-hd-group-cell {
 	color:color($fg, 'text');
 	opacity:1;
 	border:0;
-	padding: 0 dp(8) 0 dp(32);
+	padding: 0 dp(8) 0 dp(40);
 	background-color:#fff;
 	a { color:inherit;}
 }
 .x-dd-drag-proxy {
+	
+	line-height: dp(40);
 
 	.x-grid3-hd-inner{
 		border:0;
@@ -1481,6 +1508,24 @@ td.grid-hd-group-cell {
 		padding-right: 0;
 		display: table;
 		width: 100%;
+		
+		.secondary {
+			float: right;
+			
+			button {
+				padding:0;
+				margin: 0;
+				cursor: pointer;	
+				display: none;
+			}
+		}
+		&:hover, &.x-tree-selected {
+			.secondary {
+				button {
+					display: block;					
+				}
+			}
+		}
 	}
 	&-node-indent {
 		width:0.01%;
@@ -1494,13 +1539,15 @@ td.grid-hd-group-cell {
 	&-ec-icon, &-node-indent,&-ec-icon,&-node-icon, &-node-anchor, &-node-cb {
 		display:table-cell;
 		vertical-align: top; //required for Firefox
+		
+		
 	}
 	&-node-cb {
 		padding: 0 dp(4);
 	}
 	&-node-anchor {
 		width:auto;
-		overflow:hidden;
+		overflow:visible;
 		position:relative;
 	}
 	&-ec-icon {
@@ -1549,7 +1596,7 @@ td.grid-hd-group-cell {
 		}
 	}
 }
-.x-tree-node a span, .x-dd-drag-ghost a span {
+.x-tree-node a > span, .x-dd-drag-ghost a > span {
 	@extend .ellipsis;
 	padding: 0 dp(8);
 	display:block;
@@ -1557,25 +1604,30 @@ td.grid-hd-group-cell {
 	left:0;
 	right:0;
 	position:absolute;
-	> * {
+	//Required for email tree view only:
+	> *:not(.secondary) {
 		pointer-events: none;
 	}
 }
-.x-tree-node .x-tree-drag-append a span {
-    background-color: $cHover;
-	 border: 2px dashed white;
+
+.x-tree-node a {	
+	border: 1px solid transparent;
+}
+.x-tree-node .x-tree-drag-append a {
+   background-color: $cHover;
+	 border: 1px dashed white;
 }
 
 .x-tree-node .x-tree-node-inline-icon:not(.go-icon) {
    background-image: none;
 }
 
-.x-tree-node-loading a span{
+.x-tree-node-loading a{
 	font-style: italic;
 	color:#444444;
 }
 
-.x-tree-node .x-tree-node-disabled a span{
+.x-tree-node .x-tree-node-disabled a{
 	color:gray !important;
 }
 
@@ -1595,7 +1647,7 @@ td.grid-hd-group-cell {
 	border-top-color:#36c;
 }
 
-.x-tree-node .x-tree-drag-append a span{
+.x-tree-node .x-tree-drag-append a {
 	background-color:#ddd;
 	border-color:gray;
 }
@@ -2076,7 +2128,7 @@ $menuScrollerSize : dp(4);
 	}
 	&-item {
 		min-height: dp(32);
-		padding: dp(8) dp(8) dp(8) dp(24);
+		padding: dp(8);
 	}
 	&-small {
 		@extend %font-caption;
@@ -2293,7 +2345,7 @@ body.x-body-masked .x-window-plain .x-window-mc {
 // HTML
 .x-html-editor-wrap {
 	border-radius: dp(4);
-	border:1px solid color($fg, 'divider');
+	border:1px solid color($fg, 'track');
 }
 .x-html-editor-tb .x-toolbar {
 	height: dp(40);

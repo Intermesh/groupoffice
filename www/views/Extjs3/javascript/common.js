@@ -262,30 +262,7 @@ GO.util.mergeObjects = function(a, b) {
 
 GO.util.empty = function(v)
 {
-	if(!v)
-	{
-		return true;
-	}
-	if(v=='')
-	{
-		return true;
-	}
-
-	if(v=='0')
-	{
-		return true;
-	}
-	
-	if(v=='undefined')
-	{
-		return true;
-	}
-	
-	if(v=='null')
-	{
-		return true;
-	}
-	return false;
+	return go.util.empty(v);
 }
 
 GO.mailTo = function(email){
@@ -1507,8 +1484,6 @@ GO.util.HtmlDecode = function HtmlDecode(s) {
 		}
 	});
 }
-
-
 
 GO.util.dateFormat = function(v) {	
 	return go.util.Format.dateTime(v);	

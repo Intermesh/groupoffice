@@ -17,79 +17,38 @@
      * 
      * @param {string} package
      * @param {string} module
-		 * @param {string|object} config
-		 * 
-		 * You can pass just a string as config for the name of the entity. 
-		 * If you need linking then you can pass a config object:
-		 * 
-		 * 
-		 * @example
-		 * 
-		 *		 /**
-		 *			 * Entity name
-		 *			 *
-		 *			name: "Note",
-		 *			
-		 *			/**
-		 *			 * Opens a dialog to create a new linked item
-		 *			 * 
-		 *			 * @param {string} entity eg. "Note"
-		 *			 * @param {string|int} entityId
-		 *			 * @returns {go.form.Dialog}
-		 *			 *
-		 *			linkWindow: function(entity, entityId) {
-		 *				return new go.modules.community.notes.NoteForm();
-		 *			},
-		 *			
-		 *			/**
-		 *			 * Return component for the detail view
-		 *			 * 
-		 *			 * @returns {go.panels.DetailView}
-		 *			 *
-		 *			linkDetail: function() {
-		 *				return new go.modules.community.notes.NoteDetail();
-		 *			}	
+		 * @param {string} name
 		 * 
      * @returns {undefined}
      */
-    register: function (package, module, config) {
-			
-			if(!Ext.isObject(config)) {
-				config = {
-					name: config,
-					linkable: false
-				}
+    register: function (package, module, name) {	
+						
+			if(!name) {
+				throw "Invalid entity registered. 'name' property is required.";
 			}
 			
-			if(!config.name) {
-				throw "Invalid entity registered. 'name' property is required."
-			}
+			var lcName = name.toLowerCase();
 			
-      if(entities[config.name]) {
-        throw "Entity name is already registered by module " +entities[name]['package'] + "/" + entities[name]['name'];
+      if(entities[lcName]) {
+        throw "Entity name is already registered by module " +entities[lcName]['package'] + "/" + entities[lcName]['module'];
       }
-			
-			if(!config.linkable && config.linkWindow) {
-				config.linkable = true;
-			}
       
-      entities[config.name.toLowerCase()] = Ext.applyIf(config, {        
+      entities[lcName] = {     
+				name: name,
         module: module,
         package: package,
-				title: t(config.name),
+				title: t(name),
 				getRouterPath : function (id) {
-					return this.name.toLowerCase() + "/" + id;
+					return lcName + "/" + id;
 				},
         goto: function (id) {
           go.Router.goto(this.getRouterPath(id));
         }			
-      });
+      };
 			
-			
-			
-			//these datatypes will be prefetched by go.data.JmapProxy.fetchEntities()
+			//these datatypes will be prefetched by go.data.EntityStoreProxy.fetchEntities()
 			// Key can also be a function that is called with the record data.
-			go.data.types[config.name] = {
+			go.data.types[name] = {
 				convert: function (v, data) {
 					var key = this.type.getKey.call(this, data);
 					
@@ -97,26 +56,61 @@
 						return null;
 					}
 					
-					var entities = go.Stores.get(config.name).get([key]);
-					return entities ? entities[0] : null;	
+
+					if(Ext.isArray(key)) {
+						var e = [];
+						key.forEach(function(k) {
+							if(go.Stores.get(name).data[k]) {
+								e.push(go.Stores.get(name).data[k]);
+							} else
+							{
+								console.error("Key " + k + " not found in store " + name);
+							}
+						});
+						
+						return e;
+					} else
+					{
+						return go.Stores.get(name).data[key];	
+					}
+
 				},
 				
 				getKey : function(data) {
-					if(typeof(this.key) == "function") {
+					if(typeof(this.key) === "function") {
 						return this.key.call(this, data);
 					} else
 					{
 						if(!this.key) {
 							throw "Key is undefined";
 						}	
-
-						return data[this.key];
+						
+						var parts = this.key.split(".");
+						
+						parts.forEach(function(p) {
+							if(Ext.isArray(data)) {
+								var arr = [];
+								data.forEach(function(i) {
+									arr.push(i[p]);
+								});
+								data = arr;
+							} else
+							{
+								data = data[p];
+							}
+							if(!data) {
+								return false;
+							}
+						});
+						
+						return data;
+						
 					}
 				},
 				sortType: Ext.data.SortTypes.none,
 				type: "entity",
-				entity: config.name
-			}
+				entity: name
+			};
     },
 
 		/**
@@ -147,7 +141,7 @@
 		 * @returns {Object[]}
 		 */
     getAll: function() {
-			var e = [];
+			var e = [], entity;
       for(entity in entities) {
 				if(go.Modules.isAvailable(entities[entity].package, entities[entity].module)) {
 					e.push(entities[entity]);

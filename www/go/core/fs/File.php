@@ -316,6 +316,8 @@ class File extends FileSystemObject {
 		if($destinationFile->exists()) {
 			throw new \Exception("The destination '".$destinationFile->getPath()."' already exists!");
 		}
+		
+		$destinationFile->getFolder()->create();
 	
 		if (!copy($this->path, $destinationFile->getPath())) {
 			return false;

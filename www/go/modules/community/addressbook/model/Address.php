@@ -13,6 +13,12 @@ use go\core\orm\Property;
 
 class Address extends Property {
 	
+	
+	const TYPE_POSTAL = "postal";
+	const TYPE_VISIT = "visit";
+	const TYPE_WORK = "work";
+	const TYPE_HOME = "home";
+	
 	/**
 	 * 
 	 * @var int
@@ -36,6 +42,12 @@ class Address extends Property {
 	 * @var string
 	 */							
 	public $street = '';
+	
+	/**
+	 * 
+	 * @var string
+	 */							
+	public $street2 = '';
 
 	/**
 	 * 
@@ -60,10 +72,67 @@ class Address extends Property {
 	 * @var string
 	 */							
 	public $country;
+	
+	/**
+	 * ISO 3601 2 char country code. eg. "NL".
+	 * @var string
+	 */
+	public $countryCode;
+	
+	public $latitude;
+	public $longitude;
 
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable("addressbook_address");
+	}
+	
+	protected function internalValidate() {
+		if($this->isModified('countryCode') && isset($this->countryCode)) {
+			$this->countryCode = strtoupper($this->countryCode);
+			$countries = GO()->t('countries');
+			if(!isset($countries[$this->countryCode])) {
+				$this->setValidationError('countryCode', \go\core\validate\ErrorCode::INVALID_INPUT, "Unknown ISO 3601 2 char country code provided: " . $this->countryCode);
+			}
+		}
+		return parent::internalValidate();
+	}
+	
+	protected function internalSave() {		
+		if($this->isModified('countryCode')) {			
+			if(isset($this->countryCode)) {
+				$countries = GO()->t('countries');
+				$this->country = $countries[$this->countryCode];
+			}
+		} elseif($this->isModified('country')) {
+			$countryCodes = array_flip(GO()->t('countries'));
+			if(isset($countryCodes[$this->country])) {
+				$this->countryCode = $countryCodes[$this->country] ?? null;
+			}
+		}
+		
+	
+		
+		return parent::internalSave();
+	}
+	
+	public function getFormatted() {
+			
+		if(empty($this->street) && empty($this->city) && empty($this->state)){
+			return "";
+		}
+		require(\go\core\Environment::get()->getInstallFolder() . '/language/addressformats.php');
+
+		$format = isset($af[$this->countryCode]) ? $af[$this->countryCode] : $af['default'];
+
+		$format= str_replace('{address}', $this->street, $format);
+		$format= str_replace('{address_no}', $this->street2, $format);
+		$format= str_replace('{city}', $this->city, $format);
+		$format= str_replace('{zip}', $this->zipCode, $format);
+		$format= str_replace('{state}', $this->state, $format);
+		$format= str_replace('{country}', $this->country, $format);
+		
+		return preg_replace("/(\r\n)+|(\n|\r)+/", "\n", $format);
 	}
 
 }

@@ -50,6 +50,7 @@ use GO;
  */
 class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttachableInterface {
 
+	use \go\core\orm\CustomFieldsTrait;
 
 	public static $deleteInDatabaseOnly=false;
 

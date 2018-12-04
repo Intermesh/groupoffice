@@ -1,14 +1,26 @@
+/* global Ext, go */
+
 go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	currentId : null, 
 	entityStore: null,
 	buttonAlign: 'left',
 	autoScroll: true,
 	entity: null,
+	values : null,
+	
+	initComponent : function() {
+		go.form.EntityPanel.superclass.initComponent.call(this);			
+		
+		this.values = {};
+		
+		this.getForm().trackResetOnLoad = true;
+	},	
 	
 	onChanges : function(entityStore, added, changed, destroyed) {		
 		var entity = added[this.currentId] || changed[this.currentId] || false;
 		if(entity) {			
 			this.entity = entity;
+			//TODO, This will bluntly overwrite user's modification when modified.
 			this.getForm().setValues(entity);
 		}		
 	},
@@ -17,28 +29,56 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		return this.getForm().isValid();
 	},
 	
-	load: function (id) {
+	load: function (id, callback, scope) {
 		this.currentId = id;
 
-		var entities = this.entityStore.get([id]);
-		
-		if(entities) {
-			this.getForm().setValues(entities[0]);
+		this.entityStore.get([id], function(entities) {
+			this.setValues(entities[0]);
 			this.entity = entities[0];
-			return entities[0];
-		} else {
-			return false;
-		}		
+			
+			if(callback) {
+				callback.call(scope || this, entities[0]);
+			}
+			
+			this.fireEvent("load", this);
+		}, this);
+	},
+	
+	getValues : function (dirtyOnly) {	
+		var v = {};		
+		for(var name in this.values) {
+			if(!dirtyOnly || this.entity[name] !== this.values[name]) {
+				v[name] = this.values[name];
+			}
+		}
+		
+		Ext.apply(v, this.getForm().getFieldValues(dirtyOnly));
+		return v;
+	},
+	
+	setValues : function(v) {
+		var field, name;
+		
+		this.getForm().setValues(v);
+		
+		//set all non form values.
+		for(name in v) {		
+			field = this.getForm().findField(name);
+			if(!field) {
+				this.values[name] = v[name];
+			}
+		}
+		return this;
 	},
 
 	submit: function (cb, scope) {
 
 		if (!this.isValid()) {
 			return;
-		}
-
-		var id, params = {}, values = this.getForm().getFieldValues(true);
-		//		//this.id is null when new
+		}		
+		//get only modified values on existing items, otherwise get all values.
+		var id, params = {}, values = this.getValues(!!this.currentId);
+		
 		if (this.currentId) {
 
 			id = this.currentId;
@@ -110,3 +150,5 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 //		}
 //	}
 });
+
+Ext.reg("entityform", go.form.EntityPanel);

@@ -374,15 +374,19 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 		var propertiesPanel = new Ext.Panel({
 			hideMode : 'offsets',
 			title : t("Properties"),
-			defaults : {
-				anchor : '100%'
-			},
-			labelWidth:120,
-			cls:'go-form-panel',
+			
+			//cls:'go-form-panel',
 			//waitMsgTarget:true,
 			layout : 'form',
 			autoScroll : true,
-			items : [
+			items : [{
+					xtype: "fieldset",
+					defaults : {
+				anchor : '100%'
+			},
+			labelWidth:120,
+					items:[
+			
 				this.nameField, 
 				startDate,
 				dueDate,
@@ -390,6 +394,8 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 				this.selectTaskList,
 				this.selectCategory,
 				this.selectPriority	
+				]
+			}
 			]
 
 		});
@@ -397,14 +403,14 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 		if(GO.moduleManager.userHasModule("projects2")){
 			descAnchor-=40;
 			this.selectProject = new GO.projects2.SelectProject();
-			propertiesPanel.add(this.selectProject);
+			propertiesPanel.items.first().add(this.selectProject);
 		} else if(GO.moduleManager.userHasModule("projects")) {
 			descAnchor-=40;
 			this.selectProject = new GO.projects.SelectProject();
-			propertiesPanel.add(this.selectProject);
+			propertiesPanel.items.first().add(this.selectProject);
 		}
 		
-		propertiesPanel.add({
+		propertiesPanel.items.first().add({
 				xtype:'textarea',
 				fieldLabel:t("Description"),
 				name : 'description',
@@ -412,8 +418,9 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 				grow: true,
 				preventScrollbars: true
 			});
-				
-
+			
+		propertiesPanel.add(go.modules.core.customfields.CustomFields.getFormFieldSets("Task"));
+		
 		// Start of recurrence tab
 		this.recurrencePanel = new go.form.RecurrenceFieldset();
 
@@ -462,15 +469,6 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 
 		var items = [propertiesPanel, this.recurrencePanel, optionsPanel];
 
-
-		if(GO.customfields && GO.customfields.types["GO\\Tasks\\Model\\Task"])
-		{
-			for(var i=0;i<GO.customfields.types["GO\\Tasks\\Model\\Task"].panels.length;i++)
-			{
-				items.push(GO.customfields.types["GO\\Tasks\\Model\\Task"].panels[i]);
-			}
-		}
-	
 		this.tabPanel = new Ext.TabPanel({
 			activeTab : 0,
 			deferredRender : false,
@@ -490,5 +488,6 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 			},
 			items : this.tabPanel
 		});
+
 	}
 });

@@ -3,7 +3,7 @@
 namespace go\core\acl\model;
 
 use go\core\acl\model\Acl;
-use go\core\db\Query;
+use go\core\orm\Query;
 use go\core\jmap\EntityController;
 use go\core\jmap\Entity;
 
@@ -16,9 +16,9 @@ use go\core\jmap\Entity;
  * It's main purpose is to provide the {@see applyAclToQuery()} function so you 
  * can easily query items which a user has read permissions for.
  * 
- * @see AclEntity
+ * @see AclOwnerEntity
  */
-abstract class AclItemEntity extends Entity {
+abstract class AclItemEntity extends AclEntity {
 
 	/**
 	 * Get the {@see AclEntity} class name that holds the acl
@@ -38,12 +38,14 @@ abstract class AclItemEntity extends Entity {
 	 * 
 	 * @param Query $query
 	 * @param int $level
+	 * @param int $userId Defaults to current user ID
+	 * @return Query
 	 */
-	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ) {
+	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null) {
 
 		self::joinAclEntity($query);
 
-		Acl::applyToQuery($query, 'aclEntity.aclId', $level);
+		Acl::applyToQuery($query, 'aclEntity.aclId', $level, $userId);
 		
 		return $query;
 	}
@@ -65,15 +67,7 @@ abstract class AclItemEntity extends Entity {
 		}
 
 		$query->join($aclColumn->table->getName(), 'aclEntity', implode(' AND ', $keys));
-	}
-	
-	public static function filter(Query $query, array $filter) {
-		if(!empty($filter['permissionLevel'])) {
-			static::applyAclToQuery($query, $filter['permissionLevel']);
-		}
-		return parent::filter($query, $filter);
-	}
-	
+	}	
 	
 	/**
 	 * Get the entity that holds the acl id.

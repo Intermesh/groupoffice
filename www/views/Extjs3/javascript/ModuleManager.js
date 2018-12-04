@@ -196,7 +196,7 @@ GO.ModuleManager = Ext.extend(function(){
 	},
 	
 	userHasModule : function(module){
-		return go.Modules.isAvailable("community", module);
+		return go.Modules.isAvailable("legacy", module);
 	},
 	
 	getAllSubmenus : function(){

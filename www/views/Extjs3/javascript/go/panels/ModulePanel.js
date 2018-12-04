@@ -1,6 +1,12 @@
 go.panels.ModulePanel = Ext.extend(Ext.Panel, {
 	route : function(id, entity) {
 		
+		//cast to int if nummeric
+		var int = parseInt(id);
+		if(int == id) {
+			id = int;
+		}
+		
 		if(!this.rendered) {
 			//if module is not rendered then postpone untill after render.
 			this.on("afterrender", function() {

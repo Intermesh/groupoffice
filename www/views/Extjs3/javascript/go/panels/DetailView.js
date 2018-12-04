@@ -44,12 +44,11 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 		}, this);
 	},
 	
-	onChanges : function(entityStore, added, changed, destroyed) {
-		
+	onChanges : function(entityStore, added, changed, destroyed) {		
 		var entity = added[this.currentId] || changed[this.currentId] || false;
 			
 		if(entity) {
-			this.internalLoad(entity);			
+			this.internalLoad(entity);
 		}
 
 		if (destroyed.indexOf(this.currentId) > -1) {
@@ -112,11 +111,11 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 
 	load: function (id) {
 		this.currentId = id;
-		var entities = this.entityStore.get([id]);
-		if(entities) {
+		this.entityStore.get([id], function(entities) {
 			this.internalLoad(entities[0]);
-		}
+		}, this);
 	}
 });
 
+Ext.reg("detailview", go.panels.DetailView);
 Ext.reg("detailview", go.panels.DetailView);

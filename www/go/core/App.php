@@ -58,6 +58,8 @@ use const GO_CONFIG_FILE;
 		 * @var CacheInterface 
 		 */
 		private $cache;
+		
+		private $version;
 
 		protected function __construct() {
 			date_default_timezone_set("UTC");
@@ -69,11 +71,14 @@ use const GO_CONFIG_FILE;
 		}
 		
 		public function getVersion() {
-			return require(Environment::get()->getInstallFolder()->getPath() . '/version.php');
+			if(!isset($this->version)) {
+				$this->version = require(Environment::get()->getInstallFolder()->getPath() . '/version.php');
+			}
+			return $this->version;
 		}
 
 		private function initCompatibility() {
-			require(Environment::get()->getInstallFolder()->getPath() . "/go/GO.php");
+			require(Environment::get()->getInstallPath() . "/go/GO.php");
 			spl_autoload_register(array('GO', 'autoload'));
 		}
 
@@ -323,6 +328,25 @@ use const GO_CONFIG_FILE;
 			return $this->cache;
 		}
 		
+		
+		/**
+		 * Get a module
+		 * 
+		 * return the module if it's installed and available.
+		 * 
+		 * @param string $package Set to null for legacy modules
+		 * @param string $name
+		 * @return boolean
+		 */
+		public function getModule($package, $name) {
+			$model = \go\modules\core\modules\model\Module::find()->where(['package' => $package, 'name' => $name, 'enabled' => true])->single();
+			if(!$model || !$model->isAvailable()) {
+				return false;
+			}
+			
+			return $model;
+		}
+		
 		/**
 		 * Set the cache provider
 		 * 
@@ -412,6 +436,15 @@ use const GO_CONFIG_FILE;
 		 */
 		public function getAuthState() {
 			return $this->authState;
+		}
+		
+		/**
+		 * Get the server environment
+		 * 
+		 * @return Enviroment
+		 */
+		public function getEnvironment() {
+			return Environment::get();
 		}
 
 		/**

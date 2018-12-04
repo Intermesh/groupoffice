@@ -57,9 +57,21 @@ class EntityTest extends TestCase {
 		$string = str_replace("string ", "copy ", $string);
 		$array = json_decode($string, true);
 		
+		
 		$copy = new B();
 		$copy->setValues($array);
-		$success = $copy->save();
+		$success = $copy->save();		
+
+		$this->assertEquals(true, $success);
+	}
+	
+	
+	public function testCopy() {
+		$source = B::find()->single();
+		$copy = $source->copy();		
+	
+		$copy->propA .= " (copy of " . $source->id . ")";		
+		$success = $copy->save();		
 
 		$this->assertEquals(true, $success);
 	}

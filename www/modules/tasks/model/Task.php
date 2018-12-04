@@ -43,6 +43,8 @@ use Sabre;
  */
 class Task extends \GO\Base\Db\ActiveRecord {
 	
+	use \go\core\orm\CustomFieldsTrait;
+	
 	const STATUS_NEEDS_ACTION = "NEEDS-ACTION";
 	const STATUS_COMPLETED = "COMPLETED";
 	const STATUS_ACCEPTED = "ACCEPTED";

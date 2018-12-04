@@ -3,22 +3,13 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 	entityId: null,
 	modal: true,
 	stateId: "go-create-link-windows",
+	modal: true,
 	search: function (v) {
 		
 		var filter = {};
 		
-		var entities = [];
-
-		Ext.each(this.entityGrid.getSelectionModel().getSelections(), function (r) {
-			entities.push(r.data.entity);
-		}, this);
-
-		if(entities.length) { 
-			filter.entities = entities;
-		}
-
-		filter.q = this.searchField.getValue();
-			
+		filter.entities = this.entityGrid.getSelectionModel().getSelections().map(function(r){return {name: r.data.entity, filter: r.data.filter};});
+		filter.q = this.searchField.getValue();			
 		
 		this.grid.store.load({
 			params: {

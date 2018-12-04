@@ -116,7 +116,9 @@ class Blob extends orm\Entity {
 	}
 	
 	/**
-	 * Create from temporary file
+	 * Create from temporary file.
+	 * 
+	 * The blob needs to be saved.
 	 * 
 	 * @param \go\core\fs\File $file
 	 * @return \self
@@ -220,5 +222,44 @@ class Blob extends orm\Entity {
 	public static function url($blobId) {
 		return GO()->getSettings()->URL . 'download.php?blob=' . $blobId;
 	}
-
+	
+	/**
+	 * Parse blob id's inserted as images in HTML content.
+	 * 
+	 * @param string $html
+	 * @return string[] Array of blob ID's
+	 */
+	public static function parseFromHtml($html) {
+		if(!preg_match_all('/<img .*?src=".*?blob=(.*?)".*?>/i', $html, $matches)) {
+			return [];
+		}
+		
+		return array_unique($matches[1]);
+	}
+	
+	/**
+	 * Find image tags with a blobId download URL in "src" and replace them with a 
+	 * new "src" attribute.
+	 * 
+	 * Useful when attaching inline images for example:
+	 * 
+	 * ````
+	 * $blobIds = \go\core\fs\Blob::parseFromHtml($body);
+	 * foreach($blobIds as $blobId) {
+	 * 	$blob = \go\core\fs\Blob::findById($blobId);
+	 * 	
+	 * 	$img = \Swift_EmbeddedFile::fromPath($blob->getFile()->getPath());
+	 * 	$img->setContentType($blob->type);
+	 * 	$contentId = $this->embed($img);
+	 * 	$body = \go\core\fs\Blob::replaceSrcInHtml($body, $blobId, $contentId);
+	 * }
+	 * 
+	 * @param string $html The HTML subject
+	 * @param string $blobId The blob ID to find and replace
+	 * @param string $newSrc The new "src" attribute for the blob
+	 * @return string Replaced HTML
+	 */
+	public static function replaceSrcInHtml($html, $blobId, $src) {		
+		return preg_replace('/(<img .*?src=").*?blob='.$blobId.'(".*?>)/i', '$1'.$src.'$2', $html);
+	}
 }

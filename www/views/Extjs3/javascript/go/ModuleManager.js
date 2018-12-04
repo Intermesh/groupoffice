@@ -13,7 +13,38 @@
 		 * 	  mainPanel: GO.addressbook.MainPanel,
 		 * 	  title: t("Address book", "addressbook"),
 		 * 	  iconCls: 'go-tab-icon-addressbook',
-		 * 	  entities: ["Contact", "Company"], //String or config object. See go.Entities class for details.
+		 * 	  entities: ["Contact", "Company"],
+		 * 	  links: [{
+		 *			/**
+		 *			 * Entity name
+		 *			 *
+		 *			entity: "Contact",
+		 *			
+		 *			/**
+		 *			 * For advanced usage only when search results need to be filtered.
+		 *			 *
+		 *			filter: "isContact",
+		 *			
+		 *			/**
+		 *			 * Opens a dialog to create a new linked item
+		 *			 * 
+		 *			 * @param {string} entity eg. "Note"
+		 *			 * @param {string|int} entityId
+		 *			 * @returns {go.form.Dialog}
+		 *			 *
+		 *			linkWindow: function(entity, entityId) {
+		 *				return new go.modules.community.addressbook.ContactDialog();
+		 *			},
+		 *			
+		 *			/**
+		 *			 * Return component for the detail view
+		 *			 * 
+		 *			 * @returns {go.panels.DetailView}
+		 *			 *
+		 *			linkDetail: function() {
+		 *				return new go.modules.community.addressbook.ContactDetail();
+		 *			}	
+		 *		}],
 		 * 	  userSettingsPanels: ["GO.addressbook.SettingsPanel"],
 		 * 	  systemSettingsPanels: ["go.modules.commmunity.addressbook.SystemSettingsPanel"],
 		 * 	  initModule: function () {	
@@ -101,12 +132,10 @@
 			if (!this.registered[package] || !this.registered[package][name]) {
 				return false;
 			}
-
-			var all = go.Stores.get("Module").data, id;
-
-			for (id in all) {
-				if ((package === "legacy" || all[id].package == package) && all[id].name === name) {
-					return all[id];
+			
+			for (var id in this.entities) {
+				if ((package === "legacy" || this.entities[id].package === package) && this.entities[id].name === name) {
+					return this.entities[id];
 				}
 			}
 
@@ -114,11 +143,11 @@
 		},
 
 		getAll: function () {
-			return go.Stores.get("Module").data;
+			return this.entities;
 		},
 
 		getAvailable: function () {
-			var available = [],all = go.Stores.get("Module").data, id;
+			var available = [],all = this.entities, id;
 
 			for (id in all) {
 				if (this.isAvailable(all[id].package, all[id].name)) {
@@ -131,85 +160,40 @@
 
 		//will be called after login
 		init: function () {
-			var package, name;
+			var package, name, me = this;
 			
-			go.Stores.get("Module").getUpdates(function () {
+			return new Promise(function(resolve, reject){
+			
+				go.Stores.get("Module").all(function (entities) {
 
-				for (package in this.registered) {
-					for (name in this.registered[package]) {
-						if (!this.isAvailable(package, name)) {
-							continue;
+					this.entities = entities;
+
+					for (package in me.registered) {
+						for (name in me.registered[package]) {
+							if (!me.isAvailable(package, name)) {
+								continue;
+							}
+
+							var config = me.registered[package][name];
+
+							if (config.mainPanel) {
+								//todo GO.moduleManager is deprecated
+								GO.moduleManager._addModule(name, config.mainPanel, config.panelConfig, config.subMenuConfig);
+							}
+
+							if (config.initModule)
+							{
+								go.Translate.setModule(package, name);
+								config.initModule();
+							}
 						}
-
-						var config = this.registered[package][name];
-
-						if (config.mainPanel) {
-							//todo GO.moduleManager is deprecated
-							GO.moduleManager._addModule(name, config.mainPanel, config.panelConfig, config.subMenuConfig);
-						}
-
-						if (config.initModule)
-						{
-							go.Translate.setModule(package, name);
-							config.initModule();
-						}
-
 					}
-				}
 
-
-				go.Modules.fireReady();
-			}, this);
-		},
-
-		isReady: false,
-
-		fireReady: function () {
-			this.isReady = true;
-			this.fireEvent('internalready', this);
-		},
-		/**
-		 * Use this to do stuff after the custom fields data has been loaded
-		 * 
-		 * @param {type} fn
-		 * @param {type} scope
-		 * @returns {undefined}
-		 */
-		onReady: function (fn, scope) {
-			if (!this.isReady) {
-				this.on('internalready', fn, scope || this);
-			} else {
-				fn.call(scope || this, this);
-			}
+					resolve(me);
+				}, me);
+			
+			});
 		}
-
-//		/**
-//		 * Call function when module becomes available.
-//		 * 
-//		 * @param {string} module
-//		 * @param {function} fn
-//		 * @param {object} scope		 
-//		 */
-//		onAvailable: function(package, module, fn, scope) {
-//			this.onReady(function() {
-//				if(this.isAvailable(module)) {
-//					fn.call(scope);
-//				}
-//			}, this);
-//		}
-
-//		onModuleReady: function(module, fn, scope) {
-//			if(!this.isReady) {
-//				this.on('internalready', function(){
-//					this.onModuleReady(module, fn, scope);
-//				}, scope);
-//			} else
-//			{				
-//				if(this.isAvailable(module)) {
-//					fn.call(scope || this, this);
-//				}
-//			}
-//		}
 	});
 
 	go.Modules = new Modules;

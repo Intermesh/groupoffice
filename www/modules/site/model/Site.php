@@ -43,6 +43,8 @@ namespace GO\Site\Model;
 
 class Site extends \GO\Base\Db\ActiveRecord {
 	
+	use \go\core\orm\CustomFieldsTrait;
+	
 	/**
 	 *
 	 * @var \GO\Site\Components\Config 

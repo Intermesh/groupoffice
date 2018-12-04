@@ -38,6 +38,12 @@ class EntityType {
 	 */
 	public $highestModSeq;
 	
+	private $highestUserModSeq;
+	
+	private $modSeqIncremented = false;
+	
+	private $userModSeqIncremented = false;
+	
 	/**
 	 * The name of the entity for the JMAP client API
 	 * 
@@ -152,7 +158,8 @@ class EntityType {
 		$records = (new Query)
 						->select('e.*, m.name AS moduleName, m.package AS modulePackage')
 						->from('core_entity', 'e')
-						->join('core_module', 'm', 'm.id = e.moduleId')						
+						->join('core_module', 'm', 'm.id = e.moduleId')
+						->where(['m.enabled' => true])
 						->all();
 		
 		$i = [];
@@ -204,6 +211,22 @@ class EntityType {
 		
 		return static::fromRecord($record);
 	}
+	
+	/**
+	 * Convert array of entity names to ids
+	 * 
+	 * @param string $names eg ['Contact', 'Note']
+	 * @return int[] eg. [1,2]
+	 */
+	public static function namesToIds($names) {
+		return array_map(function($name) {
+			$e = static::findByName($name);
+			if(!$e) {
+				throw new \Exception("Entity '$name'  not found");
+			}
+			return $e->getId();
+		}, $names);	
+	}
   
 
 	private static function fromRecord($record) {
@@ -224,29 +247,55 @@ class EntityType {
 	}
 	
 	/**
-	 * Convert array of entity names to ids
+	 * Register multiple changes for JMAP
 	 * 
-	 * @param string $names eg ['Contact', 'Note']
-	 * @return int[] eg. [1,2]
+	 * This function increments the entity type's modSeq so the JMAP sync API 
+	 * can detect this change for clients.
+	 * 
+	 * It writes the changes into the 'core_change' table.
+	 * 	 
+	 * @param Query $changedEntities A query object that provides "entityId", "aclId" and "destroyed" in this order!.
 	 */
-	public static function namesToIds($names) {
-		return array_map(function($name) {
-			$e = static::findByName($name);
-			if(!$e) {
-				throw new \Exception("Entity '$name'  not found");
-			}
-			return $e->getId();
-		}, $names);	
-	}
+	public function changes(Query $changedEntities) {		
 		
+		GO()->getDbConnection()->beginTransaction();
+		
+		$this->highestModSeq = $this->nextModSeq();		
+		
+		$changedEntities->select('"' . $this->getId() . '", "'. $this->highestModSeq .'", NOW()', true);		
+		
+		try {
+			$stmt = GO()->getDbConnection()->insert('core_change', $changedEntities, ['entityId', 'aclId', 'destroyed', 'entityTypeId', 'modSeq', 'createdAt']);
+			$stmt->execute();
+		} catch(\Exception $e) {
+			GO()->getDbConnection()->rollBack();
+			throw $e;
+		}
+		
+		if(!$stmt->rowCount()) {
+			//if no changes were written then rollback the modSeq increment.
+			GO()->getDbConnection()->rollBack();
+		} else
+		{
+			GO()->getDbConnection()->commit();
+		}				
+	}
+	
 	/**
-	 * Register a change of an entity. When the application ends these changes will be saved in the "core_change" log table.
+	 * Register a change for JMAP
+	 * 
+	 * This function increments the entity type's modSeq so the JMAP sync API 
+	 * can detect this change for clients.
+	 * 
+	 * It writes the changes into the 'core_change' table.
+	 * 
+	 * It also writes user specific changes 'core_user_change' table ({@see \go\core\orm\Mapping::addUserTable()). 
 	 * 
 	 * @param Entity $entity
 	 */
 	public function change(Entity $entity) {
 		$this->highestModSeq = $this->nextModSeq();
-			
+
 		$record = [
 				'modSeq' => $this->highestModSeq,
 				'entityTypeId' => $this->id,
@@ -259,10 +308,92 @@ class EntityType {
 		if(!GO()->getDbConnection()->insert('core_change', $record)->execute()) {
 			throw new \Exception("Could not save change");
 		}
+	}
+		
+	/**
+	 * Checks if a saved entity needs changes for the JMAP API with change() and userChange()
+	 * 
+	 * @param Entity $entity
+	 * @throws Exception
+	 */
+	public function checkChange(Entity $entity) {
+		
+		if(!$entity->isDeleted()) {
+			$modifiedPropnames = array_keys($entity->getModified());		
+			$userPropNames = $entity->getUserProperties();
 
+			$entityModified = !empty(array_diff($modifiedPropnames, $userPropNames));
+			$userPropsModified = !empty(array_intersect($userPropNames, $modifiedPropnames));
+		} else
+		{
+			$entityModified = true;
+			$userPropsModified = false;
+		}
+		
+		
+		if($entityModified) {
+			$this->change($entity);
+		}
+		
+		if($userPropsModified) {
+			$this->userChange($entity);
+		}
+		
+		if($entity->isDeleted()) {
+			
+			$where = [
+					'entityTypeId' => $this->id,
+					'entityId' => $entity->getId(),
+					'userId' => GO()->getUserId()
+							];
+			
+			$stmt = GO()->getDbConnection()->delete('core_change_user', $where);
+			if(!$stmt->execute()) {
+				throw new \Exception("Could not delete user change");
+			}
+		}
 	}
 	
-	private $modSeqIncremented = false;
+	private function userChange(Entity $entity) {
+		$data = [
+				'modSeq' => $this->nextUserModSeq()			
+						];
+
+		$where = [
+				'entityTypeId' => $this->id,
+				'entityId' => $entity->getId(),
+				'userId' => GO()->getUserId()
+						];
+
+		$stmt = GO()->getDbConnection()->update('core_change_user', $data, $where);
+		if(!$stmt->execute()) {
+			throw new \Exception("Could not save user change");
+		}
+
+		if(!$stmt->rowCount()) {
+			$where['modSeq'] = 1;
+			if(!GO()->getDbConnection()->insert('core_change_user', $where)->execute()) {
+				throw new \Exception("Could not save user change");
+			}
+		}
+	}
+	
+	/**
+	 * Get the modSeq for the user specific properties.
+	 * 
+	 * @return string
+	 */
+	public function getHighestUserModSeq() {
+		if(!isset($this->highestUserModSeq)) {
+		$this->highestUserModSeq = (int) (new Query())
+						->selectSingleValue("highestModSeq")
+						->from("core_change_user_modseq")
+						->where(["entityTypeId" => $this->id, "userId" => GO()->getUserId()])
+						->forUpdate()->single();
+		}
+		return $this->highestUserModSeq;
+	}
+	
 	
 	/**
 	 * Get the modification sequence
@@ -281,12 +412,12 @@ class EntityType {
 		  UPDATE child_codes SET counter_field = counter_field + 1;
 		 * COMMIT
 		 */
-		$query = (new Query())
+		$modSeq = (new Query())
 						->selectSingleValue("highestModSeq")
 						->from("core_entity")
 						->where(["id" => $this->id])
-						->forUpdate();
-		$modSeq = (int) $query->execute()->fetch();
+						->forUpdate()
+						->single();
 		$modSeq++;
 
 		App::get()->getDbConnection()
@@ -301,6 +432,37 @@ class EntityType {
 		$this->highestModSeq = $modSeq;
 		
 		return $modSeq;
-	}		
+	}	
 	
+	/**
+	 * Get the modification sequence
+	 * 
+	 * @param string $entityClass
+	 * @return int
+	 */
+	public function nextUserModSeq() {
+		
+		if($this->userModSeqIncremented) {
+			return $this->getHighestUserModSeq();
+		}
+		
+		$modSeq = $this->getHighestUserModSeq();
+		$modSeq++;
+
+		App::get()->getDbConnection()
+						->replace(
+										"core_change_user_modseq", 
+										[
+												'highestModSeq' => $modSeq,
+												"entityTypeId" => $this->id,
+												"userId" => GO()->getUserId()
+										]
+						)->execute(); //mod seq is a global integer that is incremented on any entity update
+	
+		$this->userModSeqIncremented = true;
+		
+		$this->highestUserModSeq = $modSeq;
+		
+		return $modSeq;
+	}	
 }

@@ -4,16 +4,11 @@
 	color: #febf35;
 }
 
-/*.go-addressbook-contact-avatar {
-	text-align: center;
-	.avatar {
-		font-size: dp(154);
-		line-height: dp(200);
-		
-		height: dp(200);
-		width: dp(200);
-	}
-}*/
+.go-addressbook-index-row {
+	border-top: 1px solid color($fg, 'line');
+	margin-top: dp(8);
+	padding-top: dp(8);
+}
 
 .go-addressbook-name-panel {
 	padding: dp(16);	
@@ -29,17 +24,18 @@
 
 .go-addressbook-url-panel {
 	text-align: right;
+	line-height: dp(20);
 }
 
 .go-addressbook-url{
 	
-	height: dp(24);
-	width: dp(24);
+	height: dp(20);
+	width: dp(20);
 	background-repeat: none;
 	background-position: center;
 	background-size: contain;
 	display: inline-block;
-	border-radius: 3px;
+	border-radius: 1px;
 	&.linkedin {
 		background-image: url("resources/linkedin.png");		
 	}
@@ -53,13 +49,16 @@
 	}
 
 	&.homepage {
+		background-color: $cPrimary;
+		border-radius: 2px;				
+		
 		&:before {
-			border-radius: 3px;
+			font-size: dp(20);			
 			@extend %icon;
-			content: "home";
+			content: "home";					
 			vertical-align: baseline;
-			color: white;
-			background-color: $cPrimary;
+			line-height: inherit;
+			color: white;			
 		}
 	}
 
@@ -68,9 +67,16 @@
 
 .avatar {
 	&.organization {
-		&::before {
-			content: "business";
-		}		
 		background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24));	
+	}
+}
+
+.go-detail-view-contact {
+	.avatar {
+		float: none;
+		
+		.icon {
+			line-height: 100%;
+		}
 	}
 }

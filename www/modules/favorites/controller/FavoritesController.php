@@ -56,29 +56,4 @@ class FavoritesController extends \GO\Base\Controller\AbstractJsonController {
 		echo $this->renderStore($store);	
 	}
 	
-	protected function actionAddressbookStore(){
-		$colModel = new \GO\Base\Data\ColumnModel(\GO\Addressbook\Model\Addressbook::model());
-//		$colModel->formatColumn('type', '$model->customfieldtype->name()');
-		
-		$findParams = new \GO\Base\Db\FindParams();
-		$findParams->ignoreAcl();
-		$findParams->getCriteria()->addCondition('user_id', \GO::user()->id, '=','f');
-		$findParams->order('name');
-		$findParams->joinModel(
-			array(
-				'model'=>'GO\Favorites\Model\Addressbook',
-				'localTableAlias'=>'t', //defaults to "t"
-				'localField'=>'id', //defaults to "id"
-				'foreignField'=>'addressbook_id', //defaults to primary key of the remote model
-				'tableAlias'=>'f', //Optional table alias
-				'type'=>'INNER' //defaults to INNER,
-			)
-		);	
-		
-		$store = new \GO\Base\Data\DbStore('GO\Addressbook\Model\Addressbook',$colModel , $_POST, $findParams);
-		$store->multiSelectable('books');
-//		$store->defaultSort = array('sort','name');
-		
-		echo $this->renderStore($store);	
-	}
 }

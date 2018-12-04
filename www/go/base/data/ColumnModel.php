@@ -103,20 +103,27 @@ class ColumnModel {
 				}
 			}
 
-			if (\GO::modules()->customfields && $model->customfieldsRecord) {
-				$cfAttributes = array_keys($model->customfieldsRecord->columns);
-				array_shift($cfAttributes); //remove model_id column
-
-				foreach ($cfAttributes as $colName) {
-					if(!in_array($colName, $excludeColumns)){
-					
-						$sortIndex = empty($includeColumns) ? 0 : array_search($colName, $includeColumns);				
-						if($sortIndex!==false){
-							$column = new Column($colName, $model->customfieldsRecord->getAttributeLabel($colName), $sortIndex);
-							$this->addColumn($column);
-						}
-					}
-				}
+			if ($model->hasCustomFields()) {
+				$column = new Column('customFields', 'CF');
+				$column->setFormat(function($model) {
+					return $model->getCustomFields();
+				});
+				$this->addColumn($column);
+				
+				
+//				$cfAttributes = array_keys($model->customfieldsRecord->columns);
+//				array_shift($cfAttributes); //remove model_id column
+//
+//				foreach ($cfAttributes as $colName) {
+//					if(!in_array($colName, $excludeColumns)){
+//					
+//						$sortIndex = empty($includeColumns) ? 0 : array_search($colName, $includeColumns);				
+//						if($sortIndex!==false){
+//							$column = new Column($colName, $model->customfieldsRecord->getAttributeLabel($colName), $sortIndex);
+//							$this->addColumn($column);
+//						}
+//					}
+//				}
 			}
 	}
 
@@ -368,8 +375,6 @@ class ColumnModel {
 				GO()->getDebugger()->debug($e->getMessage());
 			}
 		}
-			
-		//restore_error_handler();
 		
 		if (isset($this->_formatRecordFunction)){
 			$formattedRecord = call_user_func($this->_formatRecordFunction, $formattedRecord, $model, $this);

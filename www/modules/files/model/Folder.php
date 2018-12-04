@@ -46,6 +46,8 @@ use GO;
  * @property int $acl_write
  */
 class Folder extends \GO\Base\Db\ActiveRecord {
+	
+	use \go\core\orm\CustomFieldsTrait;
 
 	private $_path;
 	
@@ -121,67 +123,70 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * @see customfields/CategoryController::actionSetAnabled
 	 */
 	public function deriveCustomfieldSettings(Folder $from) {
+		return true;
 		
-		if(!\GO::modules()->isInstalled('customfields')) {
-			return true;
-		}
-		
-		$success = true;
-		//cleanup
-		$enabledCategories = \GO\Customfields\Model\EnabledCategory::model()->findByAttributes(array(
-			'model_name'=>'GO\Files\model\File',
-			'model_id'=>$this->id
-		));
-		$enabledCategories->callOnEach('delete');
-		//find
-		$disableCategories = \GO\Customfields\Model\DisableCategories::model()->findByPk(array(
-			'model_id'=>$this->id,
-			'model_name'=>'GO\Files\model\File'
-		));
-		
-		if(!\GO\Customfields\Model\DisableCategories::isEnabled('GO\Files\model\File', $from->id)) {
-			
-			if(!empty($disableCategories)) { //clean me when $from is not active
-				
-				$success = $disableCategories->delete();
-			}
-			return $success;
-		} 
-		
-		if(empty($disableCategories)) {
-			$disableCategories = new \GO\Customfields\Model\DisableCategories();
-			$disableCategories->model_name='GO\Files\model\File';
-			$disableCategories->model_id=$this->id;
-			$success = $disableCategories->save() && $success;
-		}
-		$parentCategories = \GO\Customfields\Model\EnabledCategory::model()->findByAttributes(array(
-			'model_name'=>'GO\Files\model\File',
-			'model_id'=>$from->id
-		));
-		//create
-		foreach($parentCategories as $category){
-			$enabled = $category->duplicate(array('model_id'=>$this->id));
-			$success = $enabled->save() && $success;
-		}
-		return $success;
+//		if(!\GO::modules()->isInstalled('customfields')) {
+//			return true;
+//		}
+//		
+//		$success = true;
+//		//cleanup
+//		$enabledCategories = \GO\Customfields\Model\EnabledCategory::model()->findByAttributes(array(
+//			'model_name'=>'GO\Files\model\File',
+//			'model_id'=>$this->id
+//		));
+//		$enabledCategories->callOnEach('delete');
+//		//find
+//		$disableCategories = \GO\Customfields\Model\DisableCategories::model()->findByPk(array(
+//			'model_id'=>$this->id,
+//			'model_name'=>'GO\Files\model\File'
+//		));
+//		
+//		if(!\GO\Customfields\Model\DisableCategories::isEnabled('GO\Files\model\File', $from->id)) {
+//			
+//			if(!empty($disableCategories)) { //clean me when $from is not active
+//				
+//				$success = $disableCategories->delete();
+//			}
+//			return $success;
+//		} 
+//		
+//		if(empty($disableCategories)) {
+//			$disableCategories = new \GO\Customfields\Model\DisableCategories();
+//			$disableCategories->model_name='GO\Files\model\File';
+//			$disableCategories->model_id=$this->id;
+//			$success = $disableCategories->save() && $success;
+//		}
+//		$parentCategories = \GO\Customfields\Model\EnabledCategory::model()->findByAttributes(array(
+//			'model_name'=>'GO\Files\model\File',
+//			'model_id'=>$from->id
+//		));
+//		//create
+//		foreach($parentCategories as $category){
+//			$enabled = $category->duplicate(array('model_id'=>$this->id));
+//			$success = $enabled->save() && $success;
+//		}
+//		return $success;
 	}
 	
 	public function recursivlyApplyCustomfieldSettings() {
 		
-		if(!\GO::modules()->isInstalled('customfields')) {
-			return true;
-		}
+		return true;
 		
-		$ids = $this->getSubFolderIds();
-		foreach($ids as $subfolder_id) {
-			if($subfolder_id==$this->id) {
-				continue; //skip
-			}
-			$subfolder = Folder::model()->findByPk($subfolder_id);
-			$subfolder->deriveCustomfieldSettings($this);
-			$subfolder->recursiveApplyCustomFieldCategories = true;
-			$subfolder->save();
-		}
+//		if(!\GO::modules()->isInstalled('customfields')) {
+//			return true;
+//		}
+//		
+//		$ids = $this->getSubFolderIds();
+//		foreach($ids as $subfolder_id) {
+//			if($subfolder_id==$this->id) {
+//				continue; //skip
+//			}
+//			$subfolder = Folder::model()->findByPk($subfolder_id);
+//			$subfolder->deriveCustomfieldSettings($this);
+//			$subfolder->recursiveApplyCustomFieldCategories = true;
+//			$subfolder->save();
+//		}
 	}
 
 	/**
@@ -1367,5 +1372,44 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		while($file = $stmt->fetch()){
 			$file->delete();
 		}
+	}
+	/**
+	 * 
+	 * @param \go\core\orm\Entity $entity
+	 * @return self
+	 * @throws \Exception
+	 */
+	public function findForEntity(\go\core\orm\Entity $entity) {
+		$folder = empty($entity->filesFolderId) ? null : $this->findByPk($entity->filesFolderId);
+		if($folder) {
+			return $folder;
+		}
+		
+		$entityType = $entity->getType();
+
+		$filesPath = $entityType->getModule()->name. '/'. $entityType->getName() . '/' . $entity->id;
+		$aclId =$entity->findAclId();
+		$folder = \GO\Files\Model\Folder::model()->findByPath($filesPath,true, array('acl_id'=>$aclId,'readonly'=>1));
+
+		if(!$folder){
+			throw new \Exception("Failed to create folder ".$filesPath);
+		}
+//      if (!empty($model->acl_id))
+//          $folder->acl_id = $model->acl_id;
+
+		$folder->acl_id=$aclId;
+
+		$folder->visible = 0;
+		$folder->readonly = 1;
+		$folder->systemSave = true;
+		$folder->save(true);
+
+		$entity->filesFolderId = $folder->id;
+		if(!$entity->save()) {
+			throw new \Exception("Could not save entity!");
+		}
+		
+		return $folder;
+		
 	}
 }

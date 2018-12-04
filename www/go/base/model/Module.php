@@ -46,6 +46,22 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		return parent::model($className);
 	}
 	
+	protected function nextSortOrder() {
+		$query = new \go\core\db\Query();			
+		$query->from("core_module");
+
+		if($this->package == "core") {
+			$query->selectSingleValue("COALESCE(MAX(sort_order), 0) + 1")
+				->where(['package' => "core"]);
+		} else
+		{
+			$query->selectSingleValue("COALESCE(MAX(sort_order), 100) + 1")
+				->where('package', '!=', "core");
+		}
+
+		return $query->single();
+	}
+	
 	/**
 	 * Install's a module with all it's dependencies
 	 * 
@@ -283,11 +299,11 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		return is_dir($this->getPath());
 	}
 	
-	public function isAllowed(){
+	public function isAllowed() {
 		if(empty(\GO::config()->allowed_modules)) {
 			return true;
 		}
-		$allowedModules=explode(',', \GO::config()->allowed_modules);		
+		$allowedModules = explode(',', \GO::config()->allowed_modules);		
 		$allowedModules = array_merge($allowedModules, ['core', 'links', 'search', 'users', 'modules', 'groups', 'customfields']);
 		
 		return in_array($this->name, $allowedModules);

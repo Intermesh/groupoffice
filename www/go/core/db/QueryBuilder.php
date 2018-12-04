@@ -85,6 +85,11 @@ class QueryBuilder {
 	 * @param string $tableName The table to operate on
 	 */
 	public function setTableName($tableName) {
+		
+		if(!isset($tableName)) {
+			throw new \Exception("No from() table set for the select query");
+			
+		}
 		$this->tableName = $tableName;
 		$this->table = Table::getInstance($tableName);
 	}
@@ -120,7 +125,7 @@ class QueryBuilder {
 	/**
 	 * @return bool
 	 */
-	public function buildInsert($tableName, $data, $command = "INSERT") {
+	public function buildInsert($tableName, $data, $columns = [], $command = "INSERT") {
 
 		$this->reset();
 		$this->setTableName($tableName);
@@ -130,29 +135,28 @@ class QueryBuilder {
 
 		$sql .= "INTO `{$this->tableName}` ";
 
-		if ($data instanceof \go\core\db\Query) {
+		if ($data instanceof \go\core\db\Query) {			
+			if(!empty($columns)) {
+				$sql .= " (`" . implode("`, `", $columns ) . "`)\n";
+			}
+			
 			$build = $data->build();
 
 			$sql .= ' ' . $build['sql'];
-			$this->buildBindParameters = array_merge($this->buildBindParameters, $data->getBindParameters());
-		} else if ($data instanceof \go\core\orm\Store) { //TODO
-			$builder = $data->getQuery()->getBuilder($data->getRecordClassName());
-			$builder->mergeAliasMap($this->aliasMap);
-
-			$build = $builder->buildSelect($data->getQuery());
-
-			$sql .= ' ' . $build['sql'];
-			//import subquery bind params
-			foreach ($build['params'] as $v) {
-				$this->buildBindParameters[] = $v;
-			}
+			$this->buildBindParameters = array_merge($this->buildBindParameters, $build['params']);
 		} else {
 
 			$tags = [];
 			foreach ($data as $colName => $value) {
-				$paramTag = $this->getParamTag();
-				$tags[] = $paramTag;
-				$this->addBuildBindParameter($paramTag, $value, $this->tableName, $colName);
+				
+				if($value instanceof Expression) {
+					$tags[] = (string) $value;
+				} else
+				{				
+					$paramTag = $this->getParamTag();
+					$tags[] = $paramTag;
+					$this->addBuildBindParameter($paramTag, $value, $this->tableName, $colName);
+				}
 			}
 
 			$sql .= " (\n\t`" . implode("`,\n\t`", array_keys($data)) . "`\n)\n" .
@@ -174,10 +178,15 @@ class QueryBuilder {
 		if (is_array($data)) {
 			$updates = [];
 			foreach ($data as $colName => $value) {
-				$paramTag = $this->getParamTag();
-				$updates[] = '`' . $colName . '` = ' . $paramTag;
-
-				$this->addBuildBindParameter($paramTag, $value, $this->tableAlias, $colName);
+				
+				if($value instanceof Expression) {
+					$updates[] = '`' . $colName . '` = ' . $value;
+				} else
+				{				
+					$paramTag = $this->getParamTag();
+					$updates[] = '`' . $colName . '` = ' . $paramTag;
+					$this->addBuildBindParameter($paramTag, $value, $this->tableAlias, $colName);
+				}
 			}
 			$set = implode(",\n\t", $updates);
 		} else if ($data instanceof Expression) {
@@ -226,10 +235,45 @@ class QueryBuilder {
 	 * @param boolean $replaceBindParameters Will replace all :paramName tags with the values. Used for debugging the SQL string.
 	 * @return string
 	 */
-	public function buildSelect(Query $query = null, $prefix = '') {
+	public function buildSelect(Query $query = null) {
 
-		$this->setTableName($query->getFrom());
+		$unions = $query->getUnions();
+		
+		$r = $this->internalBuildSelect($query, empty($unions) ? "" : "\t");
+		
+		$unions = $query->getUnions();
+		if(empty($unions)) {
+			return $r;
+		}
+		
+		$r['sql'] = "(\n" . $r['sql'];
+		
+		foreach($unions as $q) {
+			$u = $this->internalBuildSelect($q, "\t");
+			$r['sql'] .=  "\n) UNION (\n" . $u['sql'];
+			$r['params'] = array_merge($r['params'], $u['params']);
+		}
+		
+		$r['sql'] .= "\n)";		
+		
+		$orderBy = $this->buildOrderBy(true);
+		if(!empty($orderBy)) {
+			$r['sql'] .= "\n" . $orderBy;
+		}
+		
+		if ($query->getUnionLimit() > 0) {
+			$r['sql'] .= "\nLIMIT " . $query->getUnionOffset() . ',' . $query->getUnionLimit();
+		}
+		
+		$r['debug'] = $this->debug ? $this->replaceBindParameters($r['sql'], $r['params']) : null;
+		
+		return $r;
+		
+	}
+	
+	protected function internalBuildSelect(Query $query, $prefix = '') {
 		$this->reset();
+		$this->setTableName($query->getFrom());		
 		$this->tableAlias = $query->getTableAlias();
 		$this->query = $query;
 		$this->buildBindParameters = $query->getBindParameters();
@@ -241,7 +285,7 @@ class QueryBuilder {
 			$joins .= "\n" . $prefix . $this->join($join, $prefix);
 		}
 
-		$select = "\n" . $prefix . $this->buildSelectFields();
+		$select = $prefix . $this->buildSelectFields();
 		$select .= "\n" . $prefix . "FROM `" . $this->tableName . '` `' . $this->tableAlias . "`";
 
 		$where = $this->buildWhere($this->query->getWhere(), $prefix);
@@ -249,16 +293,26 @@ class QueryBuilder {
 		if (!empty($where)) {
 			$where = "\n" . $prefix . "WHERE " . $where;
 		}
-		$group = "\n" . $prefix . $this->buildGroupBy();
-		$having = "\n" . $prefix . $this->buildHaving();
-		$orderBy = "\n" . $prefix . $this->buildOrderBy();
+		$group = $this->buildGroupBy();		
+		if(!empty($group)) {
+			$group = "\n" . $prefix . $group;
+		}
+		
+		$having = $this->buildHaving();
+		if(!empty($having)) {
+			$having = "\n" . $prefix . $having;
+		}
+		$orderBy = $this->buildOrderBy();
+		if(!empty($orderBy)) {
+			$orderBy = "\n" . $prefix . $orderBy;
+		}
 
 		$limit = "";
 		if ($this->query->getLimit() > 0) {
 			$limit .= "\n" . $prefix . "LIMIT " . $this->query->getOffset() . ',' . $this->query->getLimit();
 		}
 
-		$sql = trim($prefix . $select . $joins . $where . $group . $having . $orderBy . $limit);
+		$sql = $select . $joins . $where . $group . $having . $orderBy . $limit;
 
 		if ($this->query->getForUpdate()) {
 			$sql .= "\n" . $prefix . "FOR UPDATE";
@@ -363,9 +417,7 @@ class QueryBuilder {
 	 * @param string
 	 */
 	protected function buildWhere(array $conditions, $prefix = "") {
-
-
-
+		
 		if (isset($conditions[0])) {
 			$conditions[0][1] = "";
 		}
@@ -375,7 +427,7 @@ class QueryBuilder {
 			$where .= $prefix . $this->buildCondition($condition, $prefix) . "\n";
 		}
 
-		return trim($where);
+		return rtrim($where);
 	}
 
 	/**
@@ -413,17 +465,20 @@ class QueryBuilder {
 		if (is_string($token)) {
 			return $token;
 		} else {
-			switch (get_class($token)) {
-				case Expression::class:
-					return (string) $token;
-
-				case Query::class:
-					return $this->buildSubQuery($token, $prefix);
-
-				case Criteria::class:
-					$this->buildBindParameters = array_merge($this->buildBindParameters, $token->getBindParameters());
-					return "(\n" . $prefix . "\t" . $this->buildWhere($token->getWhere(), $prefix . "\t") . $prefix . "\n)";
+			if($token instanceof Expression) {
+				return (string) $token;
 			}
+			
+			if($token instanceof Query) {
+				return $this->buildSubQuery($token, $prefix);
+			}
+			
+			if($token instanceof Criteria) {
+				$this->buildBindParameters = array_merge($this->buildBindParameters, $token->getBindParameters());
+				return "(\n" . $prefix . "\t" . $this->buildWhere($token->getWhere(), $prefix . "\t") . $prefix . "\n)";
+			}
+			
+			throw new \Exception("Invalid token?");
 		}
 	}
 
@@ -448,13 +503,13 @@ class QueryBuilder {
 		if (!isset($value)) {
 			if ($comparisonOperator == '=' || $comparisonOperator == 'IS') {
 				$tokens[] = "IS NULL";
-			} elseif ($comparisonOperator == '!=' || $comparisonOperator == 'NOT IS') {
+			} elseif ($comparisonOperator == '!=' || $comparisonOperator == 'IS NOT') {
 				$tokens[] = "IS NOT NULL";
 			} else {
-				throw new Exception('Null value not possible with comparator ' . $tokens[3]);
+				throw new Exception('Null value not possible with comparator: ' . $comparisonOperator);
 			}
 		} else if (is_array($value)) {
-			$tokens[] = $comparisonOperator;
+			$tokens[] = $comparisonOperator == "=" ? "IN" : $comparisonOperator;
 			$tokens[] = $this->buildInValues($columnParts, $value);
 		} else if ($value instanceof \go\core\db\Query) {
 			$tokens[] = $comparisonOperator;
@@ -525,13 +580,7 @@ class QueryBuilder {
 	 * @throws Exception
 	 */
 	protected function quoteTableName($tableName) {
-
-		//disallow \ ` and \00  : http://stackoverflow.com/questions/1542627/escaping-field-names-in-pdo-statements
-		if (preg_match("/[`\\\\\\000\(\),]/", $tableName)) {
-			throw new Exception("Invalid characters found in column name: " . $tableName);
-		}
-
-		return '`' . str_replace('`', '``', $tableName) . '`';
+		return Utils::quoteTableName($tableName);
 	}
 
 	/**
@@ -584,8 +633,8 @@ class QueryBuilder {
 		return $str;
 	}
 
-	private function buildOrderBy() {
-		$oBy = $this->query->getOrderBy();
+	private function buildOrderBy($forUnion = false) {
+		$oBy = $forUnion ? $this->query->getUnionOrderBy() : $this->query->getOrderBy();
 		if (empty($oBy)) {
 			return '';
 		}

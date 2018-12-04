@@ -147,8 +147,10 @@ abstract class ReadOnlyEntityController extends Controller {
 			$params['accountId'] = null;
 		}
 		
-		if(empty($params['filter']['permissionLevel']) || $params['filter']['permissionLevel'] < Acl::LEVEL_READ) {
-			$params['filter']['permissionLevel'] = Acl::LEVEL_READ;
+		if(is_a($this->entityClass(), \go\core\acl\model\AclEntity::class, true)) {
+			if(empty($params['filter']['permissionLevel']) || $params['filter']['permissionLevel'] < Acl::LEVEL_READ) {
+				$params['filter']['permissionLevel'] = Acl::LEVEL_READ;
+			}
 		}
 		return $params;
 	}
@@ -270,9 +272,9 @@ abstract class ReadOnlyEntityController extends Controller {
 			throw new InvalidArguments("ids must be of type array");
 		}
 		
-		if(isset($params['ids']) && count($params['ids']) > Capabilities::get()->maxObjectsInGet) {
-			throw new InvalidArguments("You can't get more than " . Capabilities::get()->maxObjectsInGet . " objects");
-		}
+//		if(isset($params['ids']) && count($params['ids']) > Capabilities::get()->maxObjectsInGet) {
+//			throw new InvalidArguments("You can't get more than " . Capabilities::get()->maxObjectsInGet . " objects");
+//		}
 		
 		if(!isset($params['properties'])) {
 			$params['properties'] = [];
@@ -335,10 +337,12 @@ abstract class ReadOnlyEntityController extends Controller {
 		$result['list'] = [];
 
 		foreach($query as $e) {
-			$result['list'][] = $e->toArray(); 
-			$foundIds[] = $e->getId();
+			$arr = $e->toArray();
+			$arr['id'] = $e->getId();
+			$result['list'][] = $arr; 
+			$foundIds[] = $arr['id'];
 		}
-//		$result['found'] = $foundIds;
+		
 		if(isset($p['ids'])) {
 			$result['notFound'] = array_values(array_diff($p['ids'], $foundIds));			
 		}

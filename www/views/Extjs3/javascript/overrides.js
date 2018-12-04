@@ -40,8 +40,9 @@ function dp(size) {
 })();
 
 
+
 (function() {
-	
+
 	var componentInitComponent = Ext.Component.prototype.initComponent;
 
 	Ext.override(Ext.Component, {  
@@ -243,6 +244,30 @@ Ext.override(Ext.FormPanel,{
 		if (firstField) {
 			firstField.focus();
 		}
+	},
+	
+	// prevents adding form fields that are part of custom form field components like the combobox of go.form.Chips for example.
+	processAdd : function(c){
+        
+			if(this.isField(c)){
+					this.form.add(c);
+
+			}else if(c.findBy){
+					this.applySettings(c);
+					this.form.add.apply(this.form, this.findFieldsInComponent(c));
+			}
+	},
+	
+	findFieldsInComponent : function(comp) {
+		var m = [];
+		comp.cascade(function(c){
+				if(this.isField(c)) {
+						m.push(c);
+						//don't cascade into form fields.
+						return (c.getXType() == 'compositefield' || c.getXType() == 'checkboxgroup' || c.getXType() == "radiogroup"); //don't cascade into form fields
+				}
+		}, this);
+		return m;
 	}
 });
 
@@ -692,16 +717,32 @@ Ext.override(Ext.layout.ToolbarLayout ,{
 	}
 );
 
-Ext.menu.Item.prototype.itemTpl = new Ext.XTemplate(
-	'<a id="{id}" class="{cls} x-unselectable" hidefocus="true" unselectable="on" href="{href}"',
-		 '<tpl if="hrefTarget">',
-			  ' target="{hrefTarget}"',
-		 '</tpl>',
-	 '>',
-		  '<span class="x-menu-item-icon {iconCls}"></span>',
-		  '<span class="x-menu-item-text">{text}</span>',
-	 '</a>'
-);
+Ext.override(Ext.menu.Item, {
+	 onRender : function(container, position){
+        if (!this.itemTpl) {
+            this.itemTpl = Ext.menu.Item.prototype.itemTpl = new Ext.XTemplate(
+							'<a id="{id}" class="{cls} x-unselectable" hidefocus="true" unselectable="on" href="{href}"',
+								 '<tpl if="hrefTarget">',
+										' target="{hrefTarget}"',
+								 '</tpl>',
+							 '>',
+									'<span class="x-menu-item-icon {iconCls}"></span>',
+									'<span class="x-menu-item-text">{text}</span>',
+							 '</a>'
+						);
+        }
+        var a = this.getTemplateArgs();
+        this.el = position ? this.itemTpl.insertBefore(position, a, true) : this.itemTpl.append(container, a, true);
+        this.iconEl = this.el.child('span.x-menu-item-icon');
+        this.textEl = this.el.child('.x-menu-item-text');
+        if(!this.href) { // if no link defined, prevent the default anchor event
+            this.mon(this.el, 'click', Ext.emptyFn, null, { preventDefault: true });
+        }
+        Ext.menu.Item.superclass.onRender.call(this, container, position);
+    }
+});
+
+
 Ext.layout.MenuLayout.prototype.itemTpl = new Ext.XTemplate(
 	'<li id="{itemId}" class="{itemCls}">',
 		 '<tpl if="needsIcon">',

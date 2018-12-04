@@ -38,10 +38,13 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	private $distinct;
 	private $select = [];
 	private $orderBy = [];
+	private $unionOrderBy = [];
 	private $groupBy = [];
 	private $having = [];
 	private $limit;
+	private $unionLimit;
 	private $offset = 0;
+	private $unionOffset = 0;
 	protected $joins = [];
 	private $fetchMode;
 	private $forUpdate;
@@ -84,6 +87,22 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 
 	public function getJoins() {
 		return $this->joins;
+	}
+	
+	public function getUnions() {
+		return $this->unions;
+	}
+	
+	public function getUnionOffset() {
+		return $this->unionOffset;
+	}
+	
+	public function getUnionLimit() {
+		return $this->unionLimit;
+	}
+	
+	public function getUnionOrderBy() {
+		return $this->unionOrderBy;
 	}
 
 	public function getFetchMode() {
@@ -138,7 +157,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 
 		return $this;
 	}
-
+	
 	/**
 	 * Select a single column or count(*) for example.
 	 * 
@@ -210,6 +229,23 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 
 		return $this;
 	}
+	
+	private $unions = [];
+	
+	/**
+	 * Create a union query
+	 * 
+	 * Calling limit(), offset() and orderBy() after the union will apply to the 
+	 * global union scope and not the individual query.
+	 * 
+	 * @param \go\core\db\Query $query
+	 * @return $this
+	 */
+	public function union(Query $query) {
+		$this->unions[] = $query;
+		
+		return $this;
+	}
 
 	/**
 	 * Set the main table alias.
@@ -230,7 +266,12 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 * @return static
 	 */
 	public function orderBy(array $by, $append = false) {
-		$this->orderBy = $append ? array_merge($this->orderBy, $by) : $by;
+		if(empty($this->unions)) {
+			$this->orderBy = $append ? array_merge($this->orderBy, $by) : $by;
+		} else
+		{
+			$this->unionOrderBy = $append ? array_merge($this->unionOrderBy, $by) : $by;
+		}
 		return $this;
 	}
 
@@ -251,9 +292,8 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 * @param Criteria|array|string $condition {@see Criteria::normalize()}
 	 * @return static
 	 */
-	public function having($condition, $operator = 'AND') {
-		$this->having[] = [$operator, $this->normalizeCondition($condition)];
-		return $this;
+	public function having($condition, $operator = null, $value = null) {
+		return $this->andHaving($condition, $operator, $value);
 	}
 
 	/**
@@ -264,8 +304,9 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 * @param Criteria|array|string $condition {@see Criteria::normalize()}
 	 * @return static
 	 */
-	public function andHaving($condition) {
-		return $this->having($condition);
+	public function andHaving($condition, $operator = null, $value = null) {
+		$this->having[] = $this->internalWhere($condition, $operator, $value, 'AND');
+		return $this;
 	}
 
 	/**
@@ -276,8 +317,9 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 * @param Criteria|array|string $condition {@see Criteria::normalize()}
 	 * @return static
 	 */
-	public function orHaving($condition) {
-		return $this->having($condition, 'OR');
+	public function orHaving($condition, $operator = null, $value = null) {
+		$this->having[] = $this->internalWhere($condition, $operator, $value, 'OR');
+		return $this;
 	}
 
 	/**
@@ -332,7 +374,12 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 * @return static
 	 */
 	public function offset($offset = 0) {
-		$this->offset = (int) $offset;
+		if(empty($this->unions)) {
+			$this->offset = (int) $offset;
+		} else
+		{
+			$this->unionOffset = (int) $offset;
+		}
 		return $this;
 	}
 
@@ -343,7 +390,12 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 * @return static
 	 */
 	public function limit($limit = 0) {
-		$this->limit = (int) $limit;
+		if(empty($this->unions)) {
+			$this->limit = (int) $limit;
+		} else
+		{			
+			$this->unionLimit = (int) $limit;	
+		}
 		return $this;
 	}
 
@@ -386,20 +438,29 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	/**
 	 * Executes the query and returns the statement
 	 * 
-	 * @return Statement
+	 * @return Statement Returns false on failure.
 	 */
 	public function execute() {
-		$statement = $this->getDbConnection()->select($this);
-		if (!$statement->execute()) {
+		
+		$queryBuilder = new QueryBuilder();
+		$build = $queryBuilder->buildSelect($this);
+
+		$stmt = $this->getDbConnection()->createStatement($build);
+		call_user_func_array([$stmt, 'setFetchMode'], $this->getFetchMode());
+
+		$stmt->setQuery($this);		
+		
+		if (!$stmt->execute()) {
 			return false;
 		}
-		return $statement;
+		return $stmt;
 	}
 	
 	/**
 	 * Executes the query and returns a single object
 	 * 
-	 * @return mixed
+	 * @return mixed|boolean The queries record, column or object. Returns false 
+	 *   when nothing is found
 	 */
 	public function single() {		
 		return $this->offset(0)

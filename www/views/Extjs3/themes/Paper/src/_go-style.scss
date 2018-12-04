@@ -45,6 +45,12 @@ h4 { @extend %font-subheading; }
 h5 { @extend %font-subheading-dense; }
 h6 { @extend %font-data-head; }
 
+
+p {
+	margin: dp(16) 0;
+}
+
+
 strong { color: color($grey, 700); font-weight: $font-weight-m; }
 small { color: color($grey); font-weight: $font-weight-r; font-size:.85em; line-height: 1.2; }
 
@@ -561,6 +567,7 @@ button {
 	color:inherit;
 	cursor: pointer;
 	font-size: inherit;
+	cursor: pointer;
 }
 .closed{
 	display:none !important;
@@ -580,12 +587,21 @@ button {
 	display:inline-block;
 	padding:0;
 	background: url('img/default-avatar.svg') no-repeat center center;
-	background-size:cover;
-	
+	background-size:cover;	
 	border-radius: 50%;
 	width:dp(40);
 	height: dp(40);
+	font-size: dp(28);	
+	text-align: center;	
 	
+	.icon {
+		color: white;
+		line-height: dp(40);
+		font-size: inherit;			
+		height: 100%;
+		width: 100%;
+	}
+
 	.go-detail-view & {
 		float:left;
 		margin-top:dp(4);
@@ -610,7 +626,7 @@ button {
 	min-height: dp(40);
 	
 	.wrap {
-		padding-top: dp(3);
+		//padding-top: dp(3);
 		&.single {
 			padding-top: dp(10);
 		}
@@ -620,8 +636,8 @@ button {
 	}
 	.avatar {
 		position: absolute;
-		top: 0;
-		left: 0;
+		top: dp(4);
+		left: dp(4);
 		vertical-align: middle;
 	}
 	
@@ -1450,7 +1466,14 @@ table[id^="comments-ext"] b {
 }
 
 
-
+.go-chip {
+	display: inline-block; 
+	border-radius: dp(4); 
+	background-color: $cPrimaryTp; 
+	margin-right: dp(8);
+	margin-top: dp(8);
+	padding-left: dp(8);
+}
 
 .go-html-formatted {
 	

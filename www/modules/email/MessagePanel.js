@@ -87,10 +87,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			'<tr><td><b>'+t("Attachments", "email")+':</b></td></tr><tr><td id="'+this.attachmentsId+'">'+
 			'<tpl for="attachments">'+
 				'<tpl if="extension==\'vcf\'">';
-				if(go.Modules.isAvailable("legacy", "addressbook"))
-					templateStr += '<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}" onclick="GO.email.readVCard(\'{url}&importVCard=1\');">{name:htmlEncode} ({human_size})</a> ';
-				else
-					templateStr += '<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}">{name:htmlEncode} ({human_size})</a> ';
+				templateStr += '<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}">{name:htmlEncode} ({human_size})</a> ';
 				templateStr += '</tpl>'+
 				'<tpl if="extension!=\'vcf\'">'+
 				'<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}">{name:htmlEncode} ({human_size})</a> '+

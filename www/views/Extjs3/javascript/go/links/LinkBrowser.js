@@ -22,7 +22,7 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 		});
 
 		this.entityGrid.getSelectionModel().on('selectionchange', function (sm) {
-			this.store.baseParams.filter.entities = sm.getSelections().map(function(r){return r.data.entity;});
+			this.store.baseParams.filter.entities = sm.getSelections().map(function(r){return {name: r.data.entity, filter: r.data.filter};});
 			this.store.load();
 		}, this, {buffer: 1});
 

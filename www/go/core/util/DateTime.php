@@ -18,5 +18,9 @@ class DateTime extends PHPDateTime implements ArrayableInterface, \JsonSerializa
 	public function jsonSerialize() {
 		return $this->format(self::FORMAT_API);
 	}
+	
+	public function __toString() {
+		return $this->format(self::FORMAT_API);
+	}
 
 }

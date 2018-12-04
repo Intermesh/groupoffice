@@ -40,8 +40,7 @@ go.modules.core.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 				'id', 
 				'name',
 				'isUserGroupFor',
-				'members',
-				'memberCount',
+				{name: 'members', type: go.data.types.User, key: 'users.userId'},
 				{
 					name: 'selected', 
 					type: {
@@ -55,7 +54,6 @@ go.modules.core.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 			entityStore: "Group"
 		});
 		
-		this.store.on('load', this.onStoreLoad, this);
 
 		Ext.apply(this, {		
 			plugins: [checkColumn],
@@ -72,27 +70,15 @@ go.modules.core.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'displayName',
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
-						var user = record.get("user");
-						var style = user && user.avatarId ?  'background-image: url(' + go.Jmap.downloadUrl(record.get("user").avatarId) + ')"' : "";
-						
-						var memberStr = t("Loading members...");
-						
-						//will be processed after storeload by onStoreLoad
-						var members = record.get('members');						
-						if(Ext.isArray(members)) {
-							var users = go.Stores.get('User').get(members); 							
-							memberStr = "";
-							users.forEach(function(user){
-								if(memberStr != "") {
-									memberStr += ", "
-								}
-								memberStr += user.displayName;
-							});
-								
-							var more = record.get('memberCount') - members.length;
-							if(more > 0) {
-								memberStr += t(" and {count} more").replace('{count}', more);
-							}
+						var user = record.get("user"),
+							style = user && user.avatarId ?  'background-image: url(' + go.Jmap.downloadUrl(record.get("user").avatarId) + ')"' : "",						
+							max = 5,
+							members = record.get('members').slice(0, max).column('displayName'),						
+							memberStr = members.join(", "),								
+							more = members.length - max;
+							
+						if(more > 0) {
+							memberStr += t(" and {count} more").replace('{count}', more);
 						}
 						
 						return '<div class="user"><div class="avatar" style="'+style+'"></div>' +
@@ -115,48 +101,8 @@ go.modules.core.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 //			stateId: 'users-grid'
 		});
 
-		go.modules.core.users.UserGroupGrid.superclass.initComponent.call(this);
-		
-		
-	},
-	
-	onStoreLoad : function() {
-		
-		//fetch members after store load
-		var records = this.store.getRange(), me = this, count = 0;
-		var memberIds = [];
-		
-		records.forEach(function(record) {
-			count++;
-			go.Jmap.request({
-				method: 'User/query',
-				params: {
-					limit: 3,
-					filter: {
-						groupId: record.id						
-					}
-				},
-				callback:function(options, success, response) {
-					record.data.members = response.ids;
-					record.data.memberCount = response.total;
-					memberIds = memberIds.concat(response.ids);
-					count--;
-					
-					if(count == 0) {						
-						//all members filled.						
-						var unique = memberIds.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
-						
-						go.Stores.get('User').get(unique, function() {	
-							//all data is fetched now. Refresh grid ui.	
-							me.getView().refresh();														
-						});
-					}
-				}				
-			});
-		})
-		
-		
-	},
+		go.modules.core.users.UserGroupGrid.superclass.initComponent.call(this);		
+	},	
 	
 	onCheckChange : function(record, newValue) {
 		if(newValue) {

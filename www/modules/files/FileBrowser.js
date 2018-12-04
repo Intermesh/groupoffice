@@ -167,7 +167,7 @@ GO.files.FileBrowser = function(config){
 
 
 	var fields ={
-		fields:['type_id', 'id','name','type', 'size', 'mtime', 'extension', 'timestamp', 'thumb_url','path','acl_id','locked_user_id','locked','folder_id','permission_level','readonly','unlock_allowed','handler', 'content_expire_date'],
+		fields:['type_id', 'id','name','type', 'size', 'mtime', 'extension', 'timestamp', 'thumb_url','path','acl_id','locked_user_id','locked','folder_id','permission_level','readonly','unlock_allowed','handler', 'content_expire_date'].concat(go.modules.core.customfields.CustomFields.getFieldDefinitions("File")),
 		columns:[{
 			id:'name',
 			header:t("Name"),
@@ -200,13 +200,9 @@ GO.files.FileBrowser = function(config){
 			header:t("Modified at"),
 			dataIndex: 'mtime',
 			width: dp(140)
-		}]
+		}].concat(go.modules.core.customfields.CustomFields.getColumns("File"))
 	};
 
-	if(go.Modules.isAvailable("core", "customfields"))
-	{
-		GO.customfields.addColumns("GO\\Files\\Model\\File", fields);
-	}
 
 	this.gridStore = new GO.data.JsonStore({
 //		url: GO.settings.modules.files.url+'json.php',
@@ -2136,17 +2132,34 @@ go.Modules.register("legacy", 'files', {
 	mainPanel: GO.files.FileBrowser,
 	title: t("Files", "files"),
 	iconCls: 'go-tab-icon-files',
-	entities: [{
-			name: "File",
-			linkable: true
-	}, {
-		name: "Folder",
-		linkable: true
-	}],
-	initModule: function () {	
-		
-	}
+	entities: ["File","Folder"],
+	links: [
+		{
+			entity: "File",			
+			linkDetail: function(){
+				return new GO.files.FilePanel();
+			}
+		},
+		{
+			entity: "Folder",
+			linkDetail: function(){
+				return new GO.files.FolderPanel();
+			}
+		}
+	]
 });
 
 GO.files.pasteSelections = new Array();
 GO.files.pasteMode = 'copy';
+
+
+GO.files.launchFile = function(config) {
+	GO.request({
+		url: 'files/file/open',
+		params: config,
+		success: function(response, options, result) {
+			result.handler.call();
+		},
+		scope: this
+	})
+};

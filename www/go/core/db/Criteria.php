@@ -164,28 +164,26 @@ class Criteria {
 		return $this->andWhere($condition, $operator, $value);
 	}
 	
-	protected function internalWhere($condition, $comparisonOperator, $value, $logicalOperator) {				
-		if(!isset($comparisonOperator) && (is_string($condition) || $condition instanceof Criteria)) {
-			//condition is raw string
-			$this->where[] = ["tokens", $logicalOperator, $condition];
-			return $this;
-		}		
+	protected function internalWhere($condition, $comparisonOperator, $value, $logicalOperator) {			
 		
 		if(is_array($condition)) {
+			$sub = new Criteria();
 			foreach($condition as $colName => $value) {
-				if(!isset($comparisonOperator)) {
-					$comparisonOperator = is_array($value) ? 'IN' : '=';
-				}
-				$this->where[] = ["column", $logicalOperator, $colName, $comparisonOperator, $value];
+				$sub->andWhere($colName, '=', $value);				
 			}			
-		} else {
-			if(!isset($comparisonOperator)) {
-				$comparisonOperator = is_array($value) ? 'IN' : '=';
-			}
-			$this->where[] = ["column", $logicalOperator, $condition, $comparisonOperator, $value];
+			$condition = $sub;			
+		} 
+		
+		if(!isset($comparisonOperator) && (is_string($condition) || $condition instanceof Criteria)) {
+			//condition is raw string
+			return ["tokens", $logicalOperator, $condition];			
 		}
 		
-		return $this;
+		if(!isset($comparisonOperator)) {
+			$comparisonOperator = '=';
+		}
+		return ["column", $logicalOperator, $condition, $comparisonOperator, $value];			
+		
 	}
 	
 	protected function internalWhereExists(Query $subQuery, $not = false, $logicalOperator = "AND") {
@@ -214,7 +212,8 @@ class Criteria {
 	 * @return static
 	 */
 	public function andWhere($column, $operator = null, $value = null) {
-		return $this->internalWhere($column, $operator, $value, 'AND');
+		$this->where[] = $this->internalWhere($column, $operator, $value, 'AND');
+		return $this;
 	}
 	
 	/**
@@ -226,7 +225,8 @@ class Criteria {
 	 * @return static
 	 */
 	public function orWhere($column, $operator = null, $value = null) {
-		return $this->internalWhere($column, $operator, $value, 'OR');
+		$this->where[] = $this->internalWhere($column, $operator, $value, 'OR');
+		return $this;
 	}
 
 	/**

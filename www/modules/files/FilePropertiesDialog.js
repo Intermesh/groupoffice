@@ -154,15 +154,8 @@ GO.files.FilePropertiesDialog = function(config){
 	this.versionsGrid = new GO.files.VersionsGrid();
 	
 	var items = [this.propertiesPanel, this.commentsPanel, this.versionsGrid];
-
-	if(GO.customfields && GO.customfields.types["GO\\Files\\Model\\File"])
-	{
-		for(var i=0;i<GO.customfields.types["GO\\Files\\Model\\File"].panels.length;i++)
-		{
-			items.push(GO.customfields.types["GO\\Files\\Model\\File"].panels[i]);
-		}
-	}
-
+	
+	this.propertiesPanel.add(go.modules.core.customfields.CustomFields.getFormFieldSets("File"));
 	
 	this.tabPanel =new Ext.TabPanel({
 		activeTab: 0,

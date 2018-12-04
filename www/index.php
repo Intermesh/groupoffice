@@ -16,14 +16,14 @@ use go\core\http\Request;
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
-$root = dirname(__FILE__).'/';
+//$root = dirname(__FILE__).'/';
 
 try {
   //initialize autoloading of library
   require_once('GO.php');
   //\GO::init();
-
-
+	
+	
 if(!empty($_POST['accessToken'])) {
 	//used for direct token login from multi_instance module
 	//this token is used in default_scripts.inc.php too
@@ -87,7 +87,7 @@ if(empty($_REQUEST['r']) && PHP_SAPI!='cli'){
 
 } catch(Exception $e) {
   
-  if(($e instanceof PDOException || $e instanceof ConfigurationException) &&  !Request::get()->isXHR() && (empty($_REQUEST['r']) || $_REQUEST['r'] != 'maintenance/upgrade')) {
+  if(!GO()->getDebugger()->enabled && ($e instanceof PDOException || $e instanceof ConfigurationException) &&  !Request::get()->isXHR() && (empty($_REQUEST['r']) || $_REQUEST['r'] != 'maintenance/upgrade')) {
     header('Location: install/');				
     exit();
   } else

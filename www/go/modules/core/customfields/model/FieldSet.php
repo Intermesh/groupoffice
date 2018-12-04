@@ -2,12 +2,12 @@
 
 namespace go\modules\core\customfields\model;
 
-use go\core\acl\model\AclEntity;
-use go\core\db\Query;
+use go\core\acl\model\AclOwnerEntity;
+use go\core\orm\Query;
 
-class FieldSet extends AclEntity {
+class FieldSet extends AclOwnerEntity {
 /**
-	 * The Entity ID
+	 * The ID
 	 * 
 	 * @var int
 	 */
@@ -15,11 +15,23 @@ class FieldSet extends AclEntity {
 
 	public $name;
 	
+	public $description;
+	
 	protected $entityId;
 	
 	public $sortOrder;
 	
 	protected $entity;
+	
+	protected $filter;	
+	
+	public function getFilter() {
+		return empty($this->filter) || $this->filter == '[]'  ? new \stdClass() : json_decode($this->filter, true);
+	}
+	
+	public function setFilter($filter) {
+		$this->filter = json_encode($filter);
+	}
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
@@ -29,6 +41,40 @@ class FieldSet extends AclEntity {
 	
 	public function getEntity() {
 		return $this->entity;
+	}
+	
+	public function setEntity($name) {
+		$this->entity = $name;
+		$e = \go\core\orm\EntityType::findByName($name);
+		$this->entityId = $e->getId();
+	}
+	
+	public static function filter(Query $query, array $filter) {
+		
+		if(!isset($filter['entities'])) {
+			$entities = \go\core\orm\EntityType::findAll();			
+			$filter['entities'] = array_filter($entities, function($e) {return $e->getName();});
+		} 
+		return parent::filter($query, $filter);
+	}
+	
+	protected static function defineFilters() {
+		return parent::defineFilters()
+						->add('entities', function(Query $query, $value, $filter) {
+							//$ids = \go\core\orm\EntityType::namesToIds($value);			
+							$query->andWhere('e.name', 'IN', $value);
+						});
+	}
+	
+	protected function internalDelete() {
+		
+		foreach(Field::find()->where(['fieldSetId' => $this->id]) as $field) {
+			if(!$field->delete()) {
+				return false;
+			}
+		}
+		
+		return parent::internalDelete();
 	}
 
 }

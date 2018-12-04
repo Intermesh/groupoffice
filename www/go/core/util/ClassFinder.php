@@ -10,14 +10,21 @@ use go\modules\core\modules\model\Module;
 use ReflectionClass;
 
 /**
- * Finds classes within Group-Office
+ * Finds classes within Group-Office.
+ * 
+ * This only finds classes in the new framwwork under "go/*".
+ * 
+ * Warning: Using this is expensive. Caching the results is recommended.
  * 
  */
-class ClassFinder {
+class ClassFinder {	
 	
-	
-	public static function getDefaultNamespaces() {
-		
+	/**
+	 * Get all the Group-Office namespaces to search in.
+	 * 
+	 * @return string[]
+	 */
+	public static function getDefaultNamespaces() {		
 		$ns = GO()->getCache()->get("class-finder-default-namespaces");
 		
 		if(!$ns) {
@@ -72,6 +79,9 @@ class ClassFinder {
 	 * @param string[] Full class name without leading "\" eg. ["IFW\App"]
 	 */
 	public function find() {
+		
+		GO()->debug("ClassFinder find() used.");
+		
 		$this->allClasses = [];
 		foreach ($this->namespaces as $namespace => $folder) {
 

@@ -1,9 +1,9 @@
 <?php
 namespace go\modules\community\email\model;
 
-use go\core\acl\model\AclEntity;
+use go\core\acl\model\AclOwnerEntity;
 
-class Account extends AclEntity {
+class Account extends AclOwnerEntity {
 	
 	public $id;
 	public $username;

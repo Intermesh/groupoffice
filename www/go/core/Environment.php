@@ -81,13 +81,29 @@ class Environment extends Singleton {
 		return $val;
 	}
 	
+	private $installFolder;
+	
 	/**
 	 * Get the folder where Group-Office is installed
 	 * 
 	 * @return \go\core\fs\Folder
 	 */
 	public function getInstallFolder() {
-		return new fs\Folder(dirname(dirname(__DIR__)));
+		
+		if(!isset($this->installFolder)) {
+			$this->installFolder = new fs\Folder($this->getInstallPath());
+		}
+		
+		return $this->installFolder;
+	}
+	
+	/**
+	 * Get install path without trailing slash
+	 * 
+	 * @return string eg /usr/share/groupoffice
+	 */
+	public function getInstallPath() {
+		return dirname(dirname(__DIR__));
 	}
 
 }

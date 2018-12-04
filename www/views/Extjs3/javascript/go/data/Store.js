@@ -1,4 +1,6 @@
 
+/* global go, Ext */
+
 /**
  * 
  * 
@@ -45,7 +47,7 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 				sort: 'sort', // The parameter name which specifies the column to sort on
 				dir: 'dir'       // The parameter name which specifies the sort direction
 			},
-			proxy: new go.data.JmapProxy(config)
+			proxy: config.entityStore ? new go.data.EntityStoreProxy(config) : new go.data.JmapProxy(config)
 		}));
 		
 		this.setup();
@@ -56,14 +58,10 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		var old = this.loading;
 		this.loading = true;
 			
-		var ret = go.data.Store.superclass.loadData.call(this, o, append);				
-		
-		var me = this;
-		setTimeout(function(){
-			me.loading = old;
-		}, 0);	
-		
-		return ret;
+		this.proxy.preFetchEntities(o.records, function() {
+			go.data.Store.superclass.loadData.call(this, o, append);	
+			this.loading = old;		
+		}, this);
 	},
 	
 	sort : function(fieldName, dir) {
@@ -84,25 +82,24 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		
 		if(!this.baseParams.filter) {
 			this.baseParams.filter = {};
-		}
-
-		this.on('beforeload', function() {			
-			this.loading = true;
-		}, this)
+		}		
 		
-		//set loaded to true on load() or loadData();
-		this.on('load', function() {
-			var me = this;
-			setTimeout(function() {
-				me.loaded = true;
-				me.loading = false;
-			}, 0);
-		}, this)
-		
-
 		if(this.entityStore) {			
 			this.initEntityStore();
 		}
+	},
+	
+	
+	load : function(params) {
+		this.loading = true;
+		
+		this.on("load", function() {
+			this.loading = false;
+			this.loaded = true;
+		}, this, {single: true});
+		
+		return go.data.Store.superclass.load.call(this, params);		
+		
 	},
 	
 	initEntityStore : function() {
@@ -133,19 +130,25 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 			return;
 		}		
 		
-		for(var i in added) {
-			if(!this.updateRecord(added[i]) ){
-				this.reload();
-				return;
-			}
+
+		if(Object.keys(added).length || Object.keys(changed).length) {
+			//we must reload because we don't know how to sort partial data.
+			this.reload();
 		}
-				
-		for(var i in changed) {
-			if(!this.updateRecord(changed[i]) ){
-				this.reload();
-				return;
-			}
-		}
+		
+//		for(var i in added) {
+//			if(!this.updateRecord(added[i]) ){
+//				this.reload();
+//				return;
+//			}
+//		}
+//				
+//		for(var i in changed) {
+//			if(!this.updateRecord(changed[i]) ){
+//				this.reload();
+//				return;
+//			}
+//		}
 		
 		for(var i = 0, l = destroyed.length; i < l; i++) {
 			var record = this.getById(destroyed[i]);
@@ -166,22 +169,19 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 			return false;
 		}
 		
+
 //		if(record.isModified()) {
 //			alert("Someone modified your record!");
 //		}
 		
-		
-		this.serverUpdate = true;
 		record.beginEdit();
 		this.fields.each(function(field) {
 			record.set(field.name, entity[field.name]);
-		});
-		
+		});		
 		
 		record.endEdit();
 		record.commit();
 		
-		this.serverUpdate = false;
 		return true;
 	},
 	destroy : function() {	

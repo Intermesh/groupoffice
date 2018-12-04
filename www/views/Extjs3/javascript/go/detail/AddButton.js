@@ -1,3 +1,5 @@
+/* global GO, go, Ext */
+
 /**
  * 
  * A add menu button for detail views. 
@@ -125,8 +127,8 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 	buildMenu: function () {
 		var items = [
 			{
-				iconCls: 'ic-link',
-				text: t("Link", "links"),
+				iconCls: 'ic-search',
+				text: t("Existing item"),
 				handler: function () {
 					var linkWindow = new go.links.CreateLinkWindow({
 						entityId: this.getEntityId(),
@@ -136,32 +138,20 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 					linkWindow.show();
 				},
 				scope: this
-			}
+			},
+			
+			'-'
 		];
 
-		var linkableEntitities = go.Entities.getAll().filter(function (e) {
-			return !!e.linkWindow;
-		});
-
-		if (!linkableEntitities.length) {
-			return items;
-		}
-
-		items.push("-");
-
-		var me = this;
-
-		linkableEntitities.sort(function (a, b) {
-			return a.title.localeCompare(b.title);
-		});
-
-		linkableEntitities.forEach(function (e) {
+		go.modules.core.links.Links.getAll().filter(function(l) {
+			return !!l.linkWindow;
+		}).forEach(function (l) {
 
 			items.push({
-				iconCls: 'entity ' + e.name,
-				text: e.title,
+				iconCls: l.iconCls,
+				text: l.title,
 				handler: function () {
-					var window = e.linkWindow.call(e.scope, this.getEntity(), this.getEntityId(), this.detailView.data);
+					var window = l.linkWindow.call(l.scope, this.getEntity(), this.getEntityId(), this.detailView.data);
 
 					if (!window) {
 						return;
@@ -195,14 +185,14 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 						window.on('save', function (window, entity) {
 
 							//hack for event dialog because save event is different
-							if (e.entity === "Event") {
+							if (l.entity === "Event") {
 								entity = arguments[2].result.id;
 							}
 
 							var link = {
 								fromEntity: this.getEntity(),
 								fromId: this.getEntityId(),
-								toEntity: e.name,
+								toEntity: l.name,
 								toId: null
 							};
 
@@ -216,7 +206,7 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 							}
 
 							go.Stores.get("Link").set({
-								create: [link]
+								create: {clientId : link}
 							}, function (options, success, result) {
 								if (result.notCreated) {
 									throw "Could not create link";
@@ -224,12 +214,11 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 							});
 
 						}, this, {single: true});
-
 					}
 				},
-				scope: me
+				scope: this
 			});
-		});
+		}, this);
 
 		return items;
 	},

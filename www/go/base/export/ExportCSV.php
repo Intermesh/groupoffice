@@ -71,7 +71,7 @@ class ExportCSV extends AbstractExport {
 				$this->_write(array_keys($this->getLabels()));
 		}
 		
-		while($record = $this->store->nextRecord()){
+		while($record = $this->store->nextRecord()){			
 			$record = $this->prepareRecord($record);
 			$this->_write($record);
 		}

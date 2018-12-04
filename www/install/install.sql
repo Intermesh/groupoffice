@@ -82,7 +82,8 @@ CREATE TABLE `core_customfields_field_set` (
   `entityId` int(11) NOT NULL,
   `aclId` int(11) NOT NULL,
   `name` varchar(50) DEFAULT NULL,
-  `sortOrder` tinyint(4) NOT NULL DEFAULT '0'
+  `sortOrder` tinyint(4) NOT NULL DEFAULT '0',
+	`filter` TEXT NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS `core_entity`;
@@ -144,6 +145,7 @@ CREATE TABLE `core_search` (
   `description` varchar(255) NOT NULL DEFAULT '',
   `entityTypeId` int(11) NOT NULL,
   `keywords` varchar(255) NOT NULL DEFAULT '',
+	`filter` VARCHAR(50) NULL DEFAULT NULL,
   `modifiedAt` datetime DEFAULT NULL,
   `aclId` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -720,6 +722,22 @@ ALTER TABLE `core_change`
   ADD CONSTRAINT `core_change_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE;
 
 
+DROP TABLE IF EXISTS `core_change_user`;
+CREATE TABLE IF NOT EXISTS `core_change_user` (
+  `userId` int(11) NOT NULL,
+  `entityId` varchar(21) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `entityTypeId` int(11) NOT NULL,
+  `modSeq` int(11) NOT NULL,
+  PRIMARY KEY (`userId`,`entityId`,`entityTypeId`),
+  KEY `entityTypeId` (`entityTypeId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+
+
+ALTER TABLE `core_change_user`
+  ADD CONSTRAINT `core_change_user_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `core_change_user_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;
+
+
 DROP TABLE IF EXISTS `core_user_default_group`;
 CREATE TABLE IF NOT EXISTS `core_user_default_group` (
   `groupId` int(11) NOT NULL,
@@ -739,3 +757,20 @@ CREATE TABLE IF NOT EXISTS `core_group_default_group` (
 
 ALTER TABLE `core_group_default_group`
   ADD CONSTRAINT `core_group_default_group_ibfk_1` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;
+ALTER TABLE `core_search` ADD INDEX(`filter`);
+
+
+
+CREATE TABLE IF NOT EXISTS `core_change_user_modseq` (
+  `userId` int(11) NOT NULL,
+  `entityTypeId` int(11) NOT NULL,
+  `highestModSeq` int(11) NOT NULL DEFAULT 0,
+  `lowestModSeq` int(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`userId`,`entityTypeId`),
+  KEY `entityTypeId` (`entityTypeId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+
+
+ALTER TABLE `core_change_user_modseq`
+  ADD CONSTRAINT `core_change_user_modseq_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `core_change_user_modseq_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;

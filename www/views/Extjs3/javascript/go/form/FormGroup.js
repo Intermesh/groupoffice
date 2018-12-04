@@ -1,3 +1,24 @@
+/* global Ext */
+
+/**
+ * 
+ * new go.form.FormGroup({
+ *	name: "dataType.options",
+ *	fieldLabel: t("Options"),
+ *	itemCfg: {
+ *		layout: "form",
+ *		items: [{
+ *				xtype: "hidden",
+ *				name: "id"
+ *			}, {
+ *				hideLabel: true,
+ *				xtype: "textfield",
+ *				name: "text",
+ *				anchor: "100%"
+ *			}]
+ *	}
+ *})
+ */
 go.form.FormGroup = Ext.extend(Ext.Panel, {
 	isFormField: true,
 	
@@ -22,6 +43,12 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		}
 		
 		
+		this.initBbar();
+		
+		go.form.FormGroup.superclass.initComponent.call(this);
+	},
+	
+	initBbar: function() {
 		this.bbar = [
 				'->',
 			{
@@ -33,8 +60,6 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 				scope: this
 			}
 		];
-		
-		go.form.FormGroup.superclass.initComponent.call(this);
 	},
 	
 	setPanelValue : function(panel, v) {
@@ -57,8 +82,12 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		}, this);
 	},
 	
+	createNewItemPanel : function() {
+		return Ext.ComponentMgr.create(this.itemCfg);
+	},
+	
 	addPanel : function(v) {
-		var panel = Ext.ComponentMgr.create(this.itemCfg);
+		var panel = this.createNewItemPanel()
 		
 		var wrap = {
 			xtype: "container",
@@ -124,6 +153,9 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 	getValue: function () {
 		var v = [];
+		if(!this.items) {
+			return v;
+		}
 		this.items.each(function(i) {
 			v.push(this.getPanelValue(i.formPanel));
 		}, this);
