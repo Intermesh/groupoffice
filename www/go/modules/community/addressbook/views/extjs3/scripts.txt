@@ -12,5 +12,6 @@ ContactCombo.js
 SystemSettingsPanel.js
 CustomFieldSetDialog.js
 customfield/Contact.js
+customfield/ContactDialog.js
 Utils.js
 SelectDialog.js

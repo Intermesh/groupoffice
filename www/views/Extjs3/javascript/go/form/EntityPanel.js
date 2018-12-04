@@ -14,6 +14,8 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		this.values = {};
 		
 		this.getForm().trackResetOnLoad = true;
+		
+		this.addEvents({load: true, setvalues: true});
 	},	
 	
 	onChanges : function(entityStore, added, changed, destroyed) {		
@@ -68,6 +70,8 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 				this.values[name] = v[name];
 			}
 		}
+		
+		this.fireEvent('setvalues', this, v);
 		return this;
 	},
 

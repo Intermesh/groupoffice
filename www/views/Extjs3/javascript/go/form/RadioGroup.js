@@ -28,8 +28,10 @@ go.form.RadioGroup = Ext.extend(Ext.form.RadioGroup, {
 		var me = this;
 		this.items.forEach(function(i) {
 			if(!i.name) {
-				i.name = me.name;
+				i.name = me.name;				
 			}
+			
+			i.checked = me.value === i.inputValue;
 		});
 		
 		go.form.RadioGroup.superclass.onRender.call(this, ct, position);

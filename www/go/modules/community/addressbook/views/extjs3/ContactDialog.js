@@ -6,9 +6,18 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 	entityStore: "Contact",
 	width: 600,
 	height: 600,
+	
+	initComponent: function() {
+		
+		go.modules.community.addressbook.ContactDialog.superclass.initComponent.call(this);
+		
+		this.formPanel.on("setvalues", function(form, v){
+			this.setOrganization(v["isOrganization"]);
+		}, this);
+	},
 
 	initFormItems: function () {
-	
+		
 		var items = [{
 				xtype: 'fieldset',
 				items: [
@@ -72,6 +81,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 										xtype: 'radiogroup',
 										fieldLabel: t("Gender"),
 										name:"gender",
+										value: null,
 										items: [
 											{boxLabel: t("Unknown"), inputValue: null},
 											{boxLabel: t("Male"), inputValue: 'M'},
@@ -358,12 +368,6 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 		].concat(go.modules.core.customfields.CustomFields.getFormFieldSets("Contact"));
 
 		return items;	
-	},
-	
-	show : function() {
-		this.setOrganization(this.formPanel.getValues()["isOrganization"]);
-		
-		return go.modules.community.addressbook.ContactDialog.superclass.show.call(this);
 	},
 
 	setOrganization: function (isOrganization) {

@@ -14,7 +14,7 @@ go.modules.community.addressbook.customfield.Contact = Ext.extend(go.modules.cor
 	 * @returns {go.modules.core.customfields.FieldDialog}
 	 */
 	getDialog : function() {
-		return new go.modules.core.customfields.FieldDialog();
+		return new  go.modules.community.addressbook.customfield.ContactDialog();
 	},
 	
 	/**
@@ -52,7 +52,9 @@ go.modules.community.addressbook.customfield.Contact = Ext.extend(go.modules.cor
 	 */
 	createFormFieldConfig: function (customfield, config) {
 		var c = go.modules.core.customfields.type.Select.superclass.createFormFieldConfig.call(this, customfield, config);
+		console.log(customfield);
 		c.xtype = "contactcombo";
+		c.isOrganization = customfield.options.isOrganization; 
 		c.hiddenName = c.name;
 		delete c.name;
 		
