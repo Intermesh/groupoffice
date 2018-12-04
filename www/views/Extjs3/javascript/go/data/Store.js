@@ -58,10 +58,12 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		var old = this.loading;
 		this.loading = true;
 			
-		this.proxy.preFetchEntities(o.records, function() {
-			go.data.Store.superclass.loadData.call(this, o, append);	
-			this.loading = old;		
-		}, this);
+		if(this.proxy instanceof go.data.EntityStoreProxy) {
+			this.proxy.preFetchEntities(o.records, function() {
+				go.data.Store.superclass.loadData.call(this, o, append);	
+				this.loading = old;		
+			}, this);
+		}
 	},
 	
 	sort : function(fieldName, dir) {
