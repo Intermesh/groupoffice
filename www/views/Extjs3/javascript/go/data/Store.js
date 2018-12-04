@@ -63,6 +63,10 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 				go.data.Store.superclass.loadData.call(this, o, append);	
 				this.loading = old;		
 			}, this);
+		} else
+		{
+			go.data.Store.superclass.loadData.call(this, o, append);	
+			this.loading = old;
 		}
 	},
 	
