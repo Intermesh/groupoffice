@@ -44,20 +44,23 @@ abstract class Settings extends data\Model {
 			return;
 		}
 		
+		$props = array_keys($this->getSettingProperties());
+		if(!empty($props)) {
 			$stmt = (new Query)
 							->select('name, value')
 							->from('core_setting')
 							->where([
 									'moduleId' => $this->getModuleId(), 
-									'name' => array_keys($this->getSettingProperties())
+									'name' => $props
 									])
 							->execute();
 			
 			while($record = $stmt->fetch()) {
 				$this->{$record['name']} = $record['value'];
 			}
-			
-			$this->oldData = (array) $this;
+		}
+		
+		$this->oldData = (array) $this;
 	}
 	
 //	public function __destruct() {
@@ -65,9 +68,11 @@ abstract class Settings extends data\Model {
 //	}
 	
 	private function getSettingProperties() {
-		return array_filter(get_object_vars($this), function($key) {
+		$props =  array_filter(get_object_vars($this), function($key) {
 			return $key !== 'oldData';
-		}, ARRAY_FILTER_USE_KEY);
+		}, ARRAY_FILTER_USE_KEY);		
+		
+		return $props;
 	}
 	
 	public function save() {
