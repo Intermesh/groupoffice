@@ -49,7 +49,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 		
 		this.tabStore = new Ext.data.ArrayStore({
-			fields: ['name', 'icon', 'visible'],
+			fields: ['name', 'icon'],
 			data: []
 		});
 		
@@ -422,10 +422,9 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 		var pnl = new panelClass(cfg);
 		
-			var menuRec = new Ext.data.Record({
-			'name':pnl.title,
-			'icon':pnl.iconCls.substr(3).replace(/-/g,'_'),
-			'visible':true
+		var menuRec = new Ext.data.Record({
+			name :pnl.title,
+			iconCls: pnl.iconCls //.substr(3).replace(/-/g,'_')
 		});
 		
 		if(pnl.isFormField) {

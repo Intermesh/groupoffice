@@ -90,7 +90,7 @@
 		},
 
 		/**
-		 * Check if the current user has thie module
+		 * Check if the current user has this module
 		 * 
 		 * @param {string} package
 		 * @param {string} name
@@ -113,6 +113,13 @@
 			return module.permissionLevel >= this.registered[package][name].requiredPermissionLevel;
 		},
 
+		/**
+		 * Get module configuration object as passed with go.Modules.register()
+		 * 
+		 * @param {string} package
+		 * @param {string} name
+		 * @returns {Object}
+		 */
 		getConfig: function (package, name) {
 			if (!package) {
 				package = "legacy";
@@ -124,6 +131,13 @@
 			return this.registered[package][name];
 		},
 
+		/**
+		 * Get module entity
+		 * 
+		 * @param {string} package
+		 * @param {string} name
+		 * @returns {Module|Boolean}
+		 */
 		get: function (package, name) {
 
 			if (!package) {
@@ -142,10 +156,20 @@
 			return false;
 		},
 
+		/**
+		 * Get all entities including those the current user has no permission for.
+		 * 
+		 * @returns {Module[]}
+		 */
 		getAll: function () {
 			return this.entities;
 		},
 
+		/**
+		 * Get all available modules
+		 * 
+		 * @returns {Module[]}
+		 */
 		getAvailable: function () {
 			var available = [],all = this.entities, id;
 
