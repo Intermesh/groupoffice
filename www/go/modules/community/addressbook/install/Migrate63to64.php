@@ -207,9 +207,11 @@ class Migrate63to64 {
 		foreach($fields as $field) {
 			if($field->type == "Company") {
 				$field->type = "Contact";
+				$field->setOption("isOrganization", true);
 				$incrementID = $this->getCompanyIdIncrement();
 			} else
 			{
+				$field->setOption("isOrganization", false);
 				$incrementID = 0;
 			}
 			$cfMigrator->updateSelectEntity($field, Contact::class, $incrementID);
