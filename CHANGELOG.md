@@ -1,3 +1,6 @@
+04-12-2018 6.3.55
+- Core: Switch user was broken
+
 03-12-2018 6.3.55
 - Holidays: fix in copy holidays from last year
 - Core: Always join customfields when joinCustomFields is set. because this is a core module now.
