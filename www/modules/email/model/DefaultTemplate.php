@@ -18,8 +18,12 @@
 
 namespace GO\Email\Model;
 
+use GO\Base\Db\ActiveRecord;
+use GO\Base\Db\FindParams;
+use GO\Base\Model\Template;
 
-class DefaultTemplate extends \GO\Base\Db\ActiveRecord {
+
+class DefaultTemplate extends ActiveRecord {
 	
 	/**
 	 * Returns a static model of itself
@@ -49,7 +53,7 @@ class DefaultTemplate extends \GO\Base\Db\ActiveRecord {
 	protected function defaultAttributes() {
 		$attr = parent::defaultAttributes();
 		
-		$findParams = \GO\Base\Db\FindParams::newInstance()->limit(1);
+		$findParams = FindParams::newInstance()->limit(1);
 		$stmt = Template::model()->find($findParams);
 		
 		if($template=$stmt->fetch())

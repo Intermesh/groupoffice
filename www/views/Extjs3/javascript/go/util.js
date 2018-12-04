@@ -66,6 +66,12 @@
 			});
 		},
 
+		/**
+		 * Launch email composer
+		 * 
+		 * @param {Object} config {name: "Merijn" email: "mschering@intermesh.nl", subject: "Hello", body: "Just saying hello!"}
+		 * @return {undefined}
+		 */
 		mailto: function (config) {
 			var email = config.email;
 

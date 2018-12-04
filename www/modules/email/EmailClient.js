@@ -1917,3 +1917,23 @@ GO.email.moveToInbox = function(mailUid,fromAccountId) {
 		scope : this
 	});
 }
+
+
+
+/**
+		 * Launch email composer
+		 * 
+		 * @param {Object} config {name: "Merijn" email: "mschering@intermesh.nl", subject: "Hello", body: "Just saying hello!"}
+		 * @return {undefined}
+		 */
+go.util.mailto = function (config) {
+	config.to = config.email;
+
+	if (config.name) {
+		config.to = '"' + config.name.replace(/"/g, '\"') + '" <' + config.email + '>';
+	}
+	
+	GO.email.showComposer(config);
+
+	
+};
