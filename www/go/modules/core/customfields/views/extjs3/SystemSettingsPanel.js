@@ -420,6 +420,7 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 			
 			if(!response.ids.length) {
 				this.store.loadData([], false);
+				this.loading = false;
 				return;
 			}
 
