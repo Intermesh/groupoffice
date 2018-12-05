@@ -333,13 +333,7 @@ GO.email.EmailComposer = function(config) {
 				tooltip : t("Show", "email"),
 				iconCls : 'ic-more',				
 				menu : this.showMenu
-			}),
-	
-	{
-			tooltip : t("Extra options", "email"),
-			iconCls : 'ic-more-vert',
-			menu : this.optionsMenu
-		});
+			}));
 
 
 		
