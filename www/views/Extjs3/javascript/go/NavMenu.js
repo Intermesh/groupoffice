@@ -13,7 +13,7 @@ go.NavMenu = Ext.extend(Ext.DataView,{
 			tpl:'<tpl for=".">\
 					<tpl if="name == \'-\'"><hr /></tpl>\
 					<tpl if="name != \'-\'">\
-						<div><i class="icon {iconCls}"></i>\
+						<div><i class="icon {iconCls}">{icon}</i>\
 					<span>{name}</span></div>\
 					</tpl>\
 				</tpl>',
