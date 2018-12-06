@@ -1271,7 +1271,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 	public function copyContentsFrom(Folder $sourceFolder, $mergeFolders=false){
 		//make sure database is in sync with filesystem.
-		$sourceFolder->syncFilesystem(true);
+	//	$sourceFolder->syncFilesystem(true);
 
 
 		$stmt = $sourceFolder->folders();
