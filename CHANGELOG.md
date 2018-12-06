@@ -1,3 +1,5 @@
+- Core: moving a folder failed when on different volumes
+
 04-12-2018 6.3.56
 - Core: Switch user was broken
 
