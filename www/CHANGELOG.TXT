@@ -1,3 +1,4 @@
+- Tickets/Files: Fixed issue that files could not be accessed when user has no permissions to files module.
 - Holidays: Added an "active" checkbox to creditTypes. When not active, it is not possible anymore to request holidays for that type.
 - Holidays: fix copy last years credit when a credit is already added
 - Core: Show correct thumbnail size error
