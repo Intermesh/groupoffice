@@ -71,7 +71,7 @@ class BatchEditController extends \GO\Base\Controller\AbstractController {
 									default:
 										break;
 								}
-								$existing = $model->customfieldsRecord->{$item['name']};
+								$existing = $model->resolveAttribute($item['name']);
 								
 							} else {
 								$type = $item['gotype'];
@@ -106,7 +106,7 @@ class BatchEditController extends \GO\Base\Controller\AbstractController {
 								}
 							}
 						}
-					}
+					}		
 					$this->_updateModel($model, $data);
 				}
 			}
@@ -140,7 +140,7 @@ class BatchEditController extends \GO\Base\Controller\AbstractController {
 					$changeAttributes[$value['name']] = $value['value'];
 			}
 		}
-		
+
 		$model->setAttributes($changeAttributes);
 		
 		return $model->save();
@@ -216,7 +216,7 @@ class BatchEditController extends \GO\Base\Controller\AbstractController {
 				if(!in_array($key, $params['excludeColumns']) && !empty($value['gotype'])) {
 					$row = array();
 					
-					$row['name']= $key;
+					$row['name']= 'customFields.'.$key;
 					$row['label']= $cf->getAttributeLabel($key);
 					$row['value']='';
 					$row['edit']='';

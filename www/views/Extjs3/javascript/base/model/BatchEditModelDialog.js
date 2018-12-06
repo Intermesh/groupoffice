@@ -45,38 +45,13 @@ GO.base.model.BatchEditModelDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 			col.setEditor(editor);
 		}else {
 			var field = GO.base.form.getFormFieldByType(record.get('gotype'), record.get('name'), config);
-			
-//			console.log(editor);
-//			if (field.xtype == 'superboxselect') {
-//				
-//				var ed = new Ext.grid.GridEditor(
-//								{
-//									field: field,
-//									autoSize: true,
-//									completeOnEnter: false // <- enter will stop editing if not set
-//									, grid: this.editGrid
-//									, listeners: {
-//										beforeshow: function (editor) {
-////											var rowHeight = Ext.fly(editor.grid.getView().getRow(editor.row)).getHeight();
-////											if (rowHeight < 100) {
-////												rowHeight = 100;
-////											}
-//											editor.field.setHeight(100);
-//										}
-//									}
-//								}
-//				);
-//				col.setEditor(ed);
-//			}else
-//			{
-				col.setEditor(field);
-//			}
+			col.setEditor(field);
 		}		
 		
 	},
 	
-	afterSubmit : function(){
-		
+	afterSubmit : function(action){
+		console.log(action);
 	},
 	
 	getSubmitParams : function(){
