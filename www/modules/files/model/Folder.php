@@ -1089,6 +1089,8 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			//$copy->parent_id=$destinationFolder->id;
 			if(!$copy)
 				return false;
+			
+			$copy->deriveCustomfieldSettings($this);
 
 			$destinationFsFolder = $copy->fsFolder->parent();
 //			$copy->fsFolder->delete();
