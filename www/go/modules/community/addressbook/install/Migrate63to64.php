@@ -88,7 +88,7 @@ class Migrate63to64 {
 		$c->query("DROP TABLE IF EXISTS addressbook_contact_custom_fields");
 		$c->query("CREATE TABLE addressbook_contact_custom_fields LIKE cf_ab_contacts;");
 		$c->query("INSERT addressbook_contact_custom_fields SELECT * FROM cf_ab_contacts;");
-		$c->query("ALTER TABLE `addressbook_contact_custom_fields` CHANGE `model_id` `id` INT(11) NULL DEFAULT NULL;");
+		$c->query("ALTER TABLE `addressbook_contact_custom_fields` CHANGE `model_id` `id` INT(11) NOT NULL;");
 		
 		$this->mergeCompanyCustomFields();
 		
