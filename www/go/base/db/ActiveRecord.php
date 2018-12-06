@@ -2380,14 +2380,15 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$v = [];
 		foreach($attributes as $key=>$value)
 		{
-			if(substr($key,0,13)=='customFields_'){
+			if(substr($key,0,13)=='customFields_' || substr($key,0,13)=='customFields.'){
 				$v[substr($key,13)] = $attributes[$key];
 				unset($attributes[$key]);
 			}
 		}
 		return $v;
 	}
-
+	
+	
 	/**
 	 * This function is used to set attributes of this model from a controller.
 	 * Input may be in regional format and the model will translate it to the
@@ -4182,6 +4183,12 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			$last = array_pop($parts);
 
 			while($part = array_shift($parts)){
+				
+				// Solved when customfields is refactored in GO6.4
+				if($part == 'customFields') {
+					$part = 'customfields';
+				}
+				
 				$model = $model->$part;
 				if(!$model){
 					return null;
