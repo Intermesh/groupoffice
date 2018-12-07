@@ -427,8 +427,12 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 			go.Stores.get("FieldSet").get(response.ids, function (fieldSets) {
 				fieldSetsLoaded = true;
 
-				var storeData = [];
+				var storeData = [], lastSortOrder = -1;
 				fieldSets.forEach(function (fs) {
+					if(!fs.sortOrder) {
+						fs.sortOrder = lastSortOrder + 1;
+					} 
+					lastSortOrder = fs.sortOrder;
 					storeData.push([
 						fs.name,
 						null,
@@ -456,8 +460,12 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 				}
 			}, function (response) {
 				go.Stores.get("Field").get(response.ids, function (fields) {
-					var storeData = [];
+					var storeData = [], lastSortOrder = -1;
 					fields.forEach(function (f) {
+						if(!f.sortOrder) {
+							f.sortOrder = lastSortOrder + 1;
+						} 
+						lastSortOrder = f.sortOrder;
 						storeData.push([
 							f.name,
 							f.dataName,

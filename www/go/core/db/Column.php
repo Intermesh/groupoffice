@@ -146,6 +146,44 @@ class Column {
 			}
 		}
 	}
+	
+	/**
+	 * Get the SQL string to add / alter this field.
+	 * 
+	 * eg. "tinyint(1) NOT NULL DEFAULT '0'"
+	 * 
+	 * @return string
+	 */
+	public function getCreateSQL() {
+		$sql = $this->dbType;
+		
+		if(!empty($this->length)) {
+			$sql .= '(' . $this->length . ')';
+		}
+		
+		if(!$this->nullAllowed) {
+			$sql .= ' NOT NULL';
+		} else
+		{
+			$sql .= ' NULL';
+		}
+		
+		if($this->autoIncrement) {
+			$sql .= ' AUTO_INCREMENT';
+		} else if(isset($this->default)) {
+			
+			if(is_bool($this->default)) {
+				$default = $this->default ? "TRUE" : "FALSE";
+			} else
+			{
+				$default = '\'' . str_replace('\'', '\\\'', $this->default). '\'';
+			}
+			
+			$sql .= ' DEFAULT '.$default;
+		}
+		
+		return $sql;
+	}
 
 	/**
 	 * Input formatting for the database.

@@ -163,7 +163,7 @@ class Utils {
 	
 	public static function quoteTableName($name) {
 		//disallow \ ` and \00  : http://stackoverflow.com/questions/1542627/escaping-field-names-in-pdo-statements
-		if (preg_match("/[`\\\\\\000\(\),]/", $name)) {
+		if (preg_match("/[`\\\\\\000,]/", $name)) {
 			throw new Exception("Invalid characters found in column name: " . $name);
 		}
 

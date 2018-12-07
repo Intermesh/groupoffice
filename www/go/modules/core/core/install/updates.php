@@ -344,3 +344,5 @@ $updates['201811281508'][] = function() {
 
 
 $updates['201812031512'][] = "UPDATE core_module set sort_order = sort_order + 100 where package != 'core' or package is null;";
+
+$updates['201812061512'][] = "ALTER TABLE `core_customfields_select_option` DROP `sortOrder`;";

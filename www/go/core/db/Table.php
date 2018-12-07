@@ -140,7 +140,7 @@ class Table {
 			$c->dbType = strtolower($matches[1]);
 		} else {
 			$c->dbType = strtolower($field['Type']);
-			$c->length = 0;
+			$c->length = null;
 		}
 		
 		if($c->default == 'CURRENT_TIMESTAMP') {
@@ -285,7 +285,7 @@ class Table {
 	 */
 	public function getColumns() {
 		return $this->columns;
-	}
+	}	
 	
 	/**
 	 * Get the auto incrementing column

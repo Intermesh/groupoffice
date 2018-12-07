@@ -97,38 +97,42 @@ class Migrate63to64 {
 	
 	private function mergeCompanyCustomFields() {
 		
-		$table = \go\core\db\Table::getInstance("cf_ab_companies");
-		$cols = array_filter($table->getColumnNames(), function($n) {return $n != "model_id";});
+		$companyTable = \go\core\db\Table::getInstance("cf_ab_companies");
+		$cfTable = \go\core\db\Table::getInstance("addressbook_contact_custom_fields");
+		$cols = $companyTable->getColumns();
+		$cols = array_filter($cols, function($n) {return $n->name != "model_id";});
 		
 		if(empty($cols)) {
 			return;
-		}
-		
-		$stmt = GO()->getDbConnection()->query("SHOW CREATE TABLE cf_ab_companies");
-		$stmt->setFetchMode(\PDO::FETCH_COLUMN, 1);
+		}		
 		
 		$alterSQL = "ALTER TABLE addressbook_contact_custom_fields ";
-		$sql = $stmt->fetch();
 		
-		$lines = array_map('trim', explode("\n", str_replace("\r", "", $sql)));		
-		foreach($lines as $line) {
-			if($line[0] == '`' && substr($line, 0, 10) != '`model_id`') {
-				$alterSQL .= "ADD ".$line."\n";
+		$renameMap = [];
+		foreach($cols as $col) {
+			$i = 1;
+			$name = $stripped = preg_replace('/\s+/', '_', $col->name);
+			while($cfTable->hasColumn($name)) {
+				$name = $stripped . '_' . $i++;
 			}
+			$renameMap[$col->name] = $name;
+			
+			$alterSQL .= 'ADD `' . $name . '` ' . $col->getCreateSQL() . ",\n";
 		}
-		$alterSQL = substr($alterSQL, 0, -2) .';';
 		
-		//echo $alterSQL."\n\n";
+		$alterSQL = substr($alterSQL, 0, -2) . ';';
+		
+		echo $alterSQL."\n\n";
 		
 		GO()->getDbConnection()->query($alterSQL);
 		
 				
 		$data = GO()->getDbConnection()
 						->select('(`model_id` + '. $this->getCompanyIdIncrement().') as id')
-						->select($cols, true)
+						->select(array_map([\go\core\db\Utils::class, "quoteColumnName"],array_keys($renameMap)), true)
 						->from('cf_ab_companies');
 		
-		GO()->getDbConnection()->insert('addressbook_contact_custom_fields', $data, array_merge(['id'], $cols))->execute();
+		GO()->getDbConnection()->insert('addressbook_contact_custom_fields', $data, array_merge(['id'], array_values($renameMap)))->execute();
 		
 		$companyEntityType = \go\core\orm\EntityType::findByName("Company");
 		
