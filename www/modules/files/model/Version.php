@@ -155,7 +155,7 @@ class Version extends \GO\Base\Db\ActiveRecord {
 			
 
 		//If this folder belongs to a contact or project etc. then we only need write permission to delete it.
-		if($level == \GO\Base\Model\Acl::DELETE_PERMISSION && $this->file->folder->acl->description != 'fs_folders.acl_id') {
+		if($level == \GO\Base\Model\Acl::DELETE_PERMISSION && $this->file->folder->acl->usedIn != 'fs_folders.acl_id') {
 			$level = \GO\Base\Model\Acl::WRITE_PERMISSION;
 		}
 		
