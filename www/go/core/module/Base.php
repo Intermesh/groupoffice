@@ -346,7 +346,7 @@ abstract class Base {
 	 */
 	public static function getTitle() {
 		$title = GO()->t("name", static::getPackage(), static::getName());
-		if($title == "name") {
+		if($title == "GroupOffice Core") {
 			return self::getName();
 		}
 		

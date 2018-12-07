@@ -34,12 +34,25 @@ abstract class Base extends Model {
 	}
 	
 	/**
-	 * Get column definition for SQL
+	 * Get column definition for SQL.
 	 * 
-	 * @return string
+	 * When false is returned no databaseName is required and no field will be created.
+	 * 
+	 * @return string|boolean
 	 */
 	protected function getFieldSQL() {
 		return "VARCHAR(".($this->field->getOption('maxLength') ?? 190).") DEFAULT " . GO()->getDbConnection()->getPDO()->quote($this->field->getDefault() ?? "NULL");
+	}
+	
+	public function onFieldValidate() {
+		$fieldSql = $this->getFieldSQL();
+		if(!$fieldSql) {
+			return true;
+		}
+		
+		if($this->field->isModified("databaseName") && preg_match('/[^a-zA-Z_0-9]/', $this->field->databaseName)) {
+			$this->field->setValidationError('databaseName', \go\core\validate\ErrorCode::INVALID_INPUT, GO()->t("Invalid database name. Only use alpha numeric chars and underscores.", 'core','customfields'));
+		}		
 	}
 	
 	/**
@@ -49,8 +62,13 @@ abstract class Base extends Model {
 	 */
 	public function onFieldSave() {
 		
-		$table = $this->field->tableName();
 		$fieldSql = $this->getFieldSQL();
+		if(!$fieldSql) {
+			return true;
+		}
+		
+		$table = $this->field->tableName();
+		
 		
 		$quotedDbName = Utils::quoteColumnName($this->field->databaseName);
 	
@@ -90,6 +108,12 @@ abstract class Base extends Model {
 	 * @return boolean
 	 */
 	public function onFieldDelete() {
+		
+		$fieldSql = $this->getFieldSQL();
+		if(!$fieldSql) {
+			return true;
+		}
+		
 		$table = $this->field->tableName();
 		$sql = "ALTER TABLE `" . $table . "` DROP " . Utils::quoteColumnName($this->field->databaseName) ;
 

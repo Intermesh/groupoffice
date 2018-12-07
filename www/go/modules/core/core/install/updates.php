@@ -316,7 +316,7 @@ $updates['201811270837'][] = "ALTER TABLE `core_customfields_select_option` CHAN
 $updates['201811270837'][] = "ALTER TABLE `core_customfields_select_option` ADD FOREIGN KEY (`fieldId`) REFERENCES `core_customfields_field`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
 $updates['201811270837'][] = "ALTER TABLE `core_customfields_select_option` ADD FOREIGN KEY (`fieldId`) REFERENCES `core_customfields_field`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
 
-$updates['201811270837'][] = "ALTER TABLE `core_customfields_field_set` ADD `description` TEXT NOT NULL AFTER `name`;";
+$updates['201811270837'][] = "ALTER TABLE `core_customfields_field_set` ADD `description` TEXT NULL AFTER `name`;";
 $updates['201811270837'][] = "ALTER TABLE `core_customfields_select_option` ADD `parentId` INT NULL DEFAULT NULL AFTER `fieldId`, ADD INDEX (`parentId`);";
 $updates['201811270837'][] = "ALTER TABLE `core_customfields_select_option` ADD FOREIGN KEY (`parentId`) REFERENCES `core_customfields_select_option`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
 
@@ -352,6 +352,7 @@ $updates['201811270837'][] = "ALTER TABLE `core_change_user_modseq`
   ADD CONSTRAINT `core_change_user_modseq_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_change_user_modseq_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;";
 
+$updates['201811281508'][] = "ALTER TABLE `core_customfields_field` CHANGE `databaseName` `databaseName` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;";
 
 $updates['201811281508'][] = function() {
 	$m = new \go\modules\core\customfields\install\Migrate63to64();

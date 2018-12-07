@@ -10,6 +10,10 @@ use go\core\db\Utils;
 class MultiSelect extends Select {
 	
 	private $optionsToSave;
+	
+	protected function getFieldSQL() {
+		return false;
+	}
 
 	public function onFieldSave() {
 

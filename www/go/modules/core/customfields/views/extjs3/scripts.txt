@@ -46,3 +46,8 @@ type/User.js
 
 type/GroupDialog.js
 type/Group.js
+
+type/NotesDialog.js
+type/Notes.js
+
+type/EncryptedText.js

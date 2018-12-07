@@ -44,6 +44,24 @@ class Migrate63to64 {
 				case "Group":
 					$this->updateSelectEntity($field, \go\modules\core\groups\model\Group::class);
 					break;
+				
+				case "Textarea":
+					$field->type = "TextArea";
+					$field->save();
+					break;
+				
+				case "Datetime":
+					$field->type = "DateTime";
+					$field->save();
+					break;
+				
+				case "Heading":
+				case "Infotext":
+				case "ReadonlyText":
+					$field->type = "Notes";
+					$field->setOption("formNotes", $field->name);
+					$field->save();
+					break;
 			}
 		}
 		
