@@ -12,7 +12,7 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 		loader: new go.modules.community.pages.SiteTreeLoader({
 		    baseAttrs: {
 			//iconCls: 'ic-web-asset'
-			iconCls: 'ic-remove'
+			iconCls: 'ic-label'
 		    },
 		    entityStore: go.Stores.get("Page"),
 		}),

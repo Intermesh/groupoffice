@@ -107,9 +107,7 @@ class Page extends AclItemEntity {
     public function setPageName($name) {
 	$this->pageName = $name;
 	if (empty($this->slug)) {
-	    
-	//todo: char limit op de slug zetten
-	    $this->slug = $this->slugify($name, 160);
+	    $this->slug = $this->slugify($name, 189);
 	}
     }
 
@@ -118,17 +116,10 @@ class Page extends AclItemEntity {
     }
     //set content and plainContent
     public function setContent($content) {
-	//adds the right encoding.
-	if(empty($this->content)){
-	    $content = '<?xml encoding="utf-8" ?>'.$content;
-	}
-	//var_dump($content);
 	//parse content to remove or add relevant tag id's.
 	$this->content = $this->parseContent($content);
-	if (empty($this->plainContent)) {
 	    //keep header tags to navigate while searching?
-	    $this->plainContent = strip_tags($content, '<h1><h2>');
-	}
+	$this->plainContent = strip_tags($content, '<h1><h2>');
     }
     
     //fixes <p> id's, loops through the headers and generates id's 
@@ -141,8 +132,10 @@ class Page extends AclItemEntity {
 	
 	//ignore duplicate id errors so cleanTextIds() can use loadHTML to fix them.
 	libxml_use_internal_errors(true);
+	
 	//prevent loadHTML from adding doctype or tags like head and body.
-	$doc->loadHTML($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+	//Also adds the right encoding.
+	$doc->loadHTML('<?xml encoding="utf-8" ?>'.$content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 	$doc = $this->cleanTextIds($doc);
 	libxml_clear_errors();
 	libxml_use_internal_errors(false);
@@ -176,7 +169,9 @@ class Page extends AclItemEntity {
 	    $element->parentNode->replaceChild($newElement, $element);
 	}
 	}
-	return $doc->saveHTML();
+	//The replace is used to remove the encoding to prevent duplicates.
+	//Adding the encoding once doesnt work since it can be messed with inside the html editor. Even without source edit enabled.
+	return str_replace('<?xml encoding="utf-8" ?>', '', $doc->saveHTML());
     }
     //Removes id's from <p> tags. 
     //Changing a <h> to a <p> does not remove the id.

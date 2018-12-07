@@ -58,4 +58,3 @@ var routes = go.Router.add(/pages$/ , function() {
     console.log('redirect from: '+ go.Router.getPath() );    
     go.Router.goto('pages\/view\/');
 });
-console.log(routes);

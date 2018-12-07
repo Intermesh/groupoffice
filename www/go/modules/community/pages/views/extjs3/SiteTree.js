@@ -1,5 +1,5 @@
 go.modules.community.pages.SiteTree = Ext.extend(Ext.tree.TreePanel, {
-
+    layout:'fit',
     enableDD: false,
     border: true,
     root: {
