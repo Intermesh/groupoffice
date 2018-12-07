@@ -1,3 +1,4 @@
+- Billing: Fixed loading address data when opening Orderdialog from contact (link)
 - Files: Copy custom field settings too when copying folders
 - Core: moving a folder failed when on different volumes
 
