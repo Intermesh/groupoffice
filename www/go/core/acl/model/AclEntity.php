@@ -31,6 +31,18 @@ abstract class AclEntity extends Entity {
 	 */
 	private $acl;
 	
+	/**
+	 * Define aclField as variabele as hack for old modules (where acl_id is the default)
+	 * The function Acl::applyToQuery needs the defined field and cannot work with the alias is defined in (new \go\core\db\Query)->select('acl_id AS aclId')
+	 * This will only work for getters, setters will fail
+	 * @var type
+	 */
+	private static $_aclField = 'aclId';
+	
+	public static function setAclField($field) {
+		self::$_aclField = $field;
+	}
+
 //	Disabled for performance reasons. How should we handle this?
 //	/**
 //	 * The groups in the ACL with their level
@@ -120,7 +132,7 @@ abstract class AclEntity extends Entity {
 		$tables = static::getMapping()->getTables();
 		$firstTable = array_shift($tables);
 		$tableAlias = $firstTable->getAlias();
-		Acl::applyToQuery($query, $tableAlias . '.aclId', $level);
+		Acl::applyToQuery($query, $tableAlias . '.' . self::$_aclField, $level);
 		
 		return $query;
 	}
@@ -145,7 +157,7 @@ abstract class AclEntity extends Entity {
 	public static function findAcls() {
 		$tables = static::getMapping()->getTables();
 		$firstTable = array_shift($tables);
-		return (new Query)->selectSingleValue('aclId')->from($firstTable->getName());
+		return (new Query)->selectSingleValue(self::$_aclField)->from($firstTable->getName());
 	}
 	
 	public function findAclId() {
