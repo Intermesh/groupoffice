@@ -1,3 +1,10 @@
+- Billing: Fixed loading address data when opening Orderdialog from contact (link)
+- Files: Copy custom field settings too when copying folders
+- Core: moving a folder failed when on different volumes
+
+04-12-2018 6.3.56
+- Core: Switch user was broken
+
 03-12-2018 6.3.55
 - Holidays: fix in copy holidays from last year
 - Core: Always join customfields when joinCustomFields is set. because this is a core module now.

@@ -4127,7 +4127,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if(count($parts)>1){
 			$last = array_pop($parts);
 
-			while($part = array_shift($parts)){
+			while($part = array_shift($parts)){				
 				$model = $model->$part;
 				if(!$model){
 					return null;

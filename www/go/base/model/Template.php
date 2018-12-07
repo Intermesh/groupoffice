@@ -114,7 +114,6 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		return $attributes;
 	}
 	
-	
 	private function getCompanyAttributes(\go\modules\community\addressbook\model\Contact $company){
 		$attributes['company:salutation'] = GO()->t("Dear sir/madam");
 		
@@ -234,7 +233,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 				return $a instanceof \DateTime ? $a->format(GO()->getAuthState()->getUser()->getDateTimeFormat()) : $a;
 			}, $attributes);
 		}
-		
+
 		$attributes = $this->_addTagPrefixAndRemoveEmptyValues($attributes, $tagPrefix);
 		
 		$cls = get_class($model);

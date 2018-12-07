@@ -2210,8 +2210,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$tmpFolder = \GO\Base\Fs\Folder::tempFolder(uniqid(time()));
 		$atts = $message->getAttachments();
 		while($att=array_shift($atts)){
-			if(empty($att->content_id))
+			if($att->disposition == 'attachment') {
 				$att->saveToFile($tmpFolder);
+			}
 		}
 
 		$archiveFile = $tmpFolder->parent()->createChild(GO::t("Attachments", "email").'.zip');
