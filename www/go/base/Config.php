@@ -258,7 +258,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @access  public
 	 */
 
-	public function getefault_time_format() {
+	public function getdefault_time_format() {
 		return \go\modules\core\users\model\Settings::get()->defaultTimeFormat;
 	}
 
@@ -1349,6 +1349,25 @@ var $billing_clear_payment_method_on_duplicate = true;
 		return false;
 	}
 	
+	private function getGlobalConfig() {
+		$globalConfigFile = '/etc/groupoffice/globalconfig.inc.php';
+		if (file_exists($globalConfigFile)) {
+			require($globalConfigFile);
+		}
+
+		return $config ?? [];
+	}
+
+	private function getInstanceConfig() {
+		$config_file = $this->get_config_file();
+
+		if($config_file)
+			include($config_file);
+
+		return $config ?? [];
+	}
+		
+	
 	
 	/**
 	 * Constructor. Initialises all public variables.
@@ -1361,18 +1380,13 @@ var $billing_clear_payment_method_on_duplicate = true;
 
 		$this->root_path = str_replace('\\','/',dirname(dirname(dirname(__FILE__)))).'/';
 
-		//suppress error for open_basedir warnings etc
-		if(file_exists('/etc/groupoffice/globalconfig.inc.php')) {
-			require('/etc/groupoffice/globalconfig.inc.php');
-		}		
-
-		$config_file = $this->get_config_file();
-
-		if($config_file)
-			include($config_file);
+		$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
 		
 		//auto host
-		$config['host'] = trim(dirname($_SERVER['SCRIPT_NAME']), '/');
+		if(empty($config['host'])) {
+			$config['host'] = dirname($_SERVER['SCRIPT_NAME']);
+		} 
+		$config['host'] = trim($config['host'], '/');
 		$config['host'] = empty($config['host']) ? '/' : '/' . $config['host'] . '/';		
 		$config['root_path'] = \go\core\Environment::get()->getInstallFolder()->getPath() . '/';
 		

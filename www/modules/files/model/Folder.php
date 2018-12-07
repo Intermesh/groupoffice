@@ -557,6 +557,13 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 	private $_folderCache=array();
 
+	public function save($ignoreAcl = false) {
+		if(!$this->isModified()) { // this will make it possible to set the "notify" in a folder see afterSubmit
+			return true;
+		}
+		return parent::save($ignoreAcl);
+	}
+	
 	public function clearFolderCache(){
 		$this->_folderCache=array();
 	}
@@ -1082,6 +1089,8 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			//$copy->parent_id=$destinationFolder->id;
 			if(!$copy)
 				return false;
+			
+			$copy->deriveCustomfieldSettings($this);
 
 			$destinationFsFolder = $copy->fsFolder->parent();
 //			$copy->fsFolder->delete();
@@ -1264,7 +1273,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 	public function copyContentsFrom(Folder $sourceFolder, $mergeFolders=false){
 		//make sure database is in sync with filesystem.
-		$sourceFolder->syncFilesystem(true);
+	//	$sourceFolder->syncFilesystem(true);
 
 
 		$stmt = $sourceFolder->folders();

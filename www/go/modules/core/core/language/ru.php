@@ -487,4 +487,9 @@ If you did not request a new password please delete this mail.' => '%s,
     'ai' => 'Файл Adobe Illustrator',
     'eml' => 'Сообщение E-mail',
   ),
+	'Recurrence' => 'Повторение',
+	'Repeat forever' => 'повторять всегда',
+  'Repeat every' => 'Повторять каждый',
+  'Repeat until' => 'Повторять до',
+	'At days' => 'В дни'
 );

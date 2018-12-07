@@ -98,6 +98,10 @@ class Field extends \GO\Base\Db\ActiveRecord{
 			restore_error_handler();
 		}
 		
+		if($this->isModified('databaseName') && preg_match('/[^a-zA-Z_0-9]/', $this->databaseName)) {			
+			$this->setValidationError('databaseName', GO()->t("Invalid database name. Only use alpha numeric chars and underscores.", 'core','customfields'));
+		}
+		
 		return parent::validate();
 	}
 	

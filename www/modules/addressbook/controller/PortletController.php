@@ -72,12 +72,14 @@ class PortletController extends \GO\Base\Controller\AbstractMultiSelectModelCont
 		
 		$settings = \GO\Addressbook\Model\BirthdaysPortletSetting::model()->findByAttribute('user_id', \GO::user()->id);
 		
-		if(count($settings)) {
-			$abooks=array_map(function($value) {
-				return $value->addressbook_id;
-			}, $settings->fetchAll());
+		
+		$abooks=array_map(function($value) {
+			return $value->addressbook_id;
+		}, $settings->fetchAll());
+		if(count($abooks)) {
 			$findCriteria->addInCondition('addressbook_id', $abooks);
 		}
+		
 		
 		$having = "upcoming BETWEEN '$start' AND '$end'";
 		

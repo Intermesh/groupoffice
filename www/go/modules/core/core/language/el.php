@@ -630,4 +630,9 @@ All rights reserved.<br />
     'ai' => 'Αρχείο Adobe Illustrator',
     'eml' => 'Μήνυμα Ηλεκτρονικού Ταχυδρομείου',
   ),
+	'Recurrence' => 'Επανάληψη',
+	'Repeat forever' => 'Επανάληψη για πάντα',
+  'Repeat every' => 'Επανάληψη κάθε',
+  'Repeat until' => 'Επανάληψη μέχρι',
+	'At days' => 'Στις ημέρες'
 );

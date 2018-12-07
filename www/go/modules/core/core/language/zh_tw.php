@@ -503,4 +503,9 @@ return array (
   'filetypes' => 
   array (
   ),
+	'Repeat forever' => '一直重複',
+  'Repeat every' => '間隔',
+  'Repeat until' => '重複至',
+	'Recurrence' => '重複',
+	'At days' => '在哪幾天'
 );

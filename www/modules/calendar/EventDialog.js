@@ -162,7 +162,11 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 		config = config || {};
 
 		GO.dialogListeners.apply(this);
-		this.createLinkButton.reset();
+		
+		this.on("hide", function() {
+			this.createLinkButton.reset();
+		}, this);
+		
 		this.win.show();
 
 		if(!this.initialized){

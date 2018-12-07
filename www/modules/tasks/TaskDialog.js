@@ -67,9 +67,11 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 
 		if (!config) {
 			config = {};
-		}
+		}		
 		
-		this.createLinkButton.reset();
+		this.on("hide", function() {
+			this.createLinkButton.reset();
+		}, this);
 		
 		this.showConfig=config;
 

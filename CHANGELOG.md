@@ -1,3 +1,24 @@
+- Billing: Fixed loading address data when opening Orderdialog from contact (link)
+- Files: Copy custom field settings too when copying folders
+- Core: moving a folder failed when on different volumes
+
+04-12-2018 6.3.56
+- Core: Switch user was broken
+
+03-12-2018 6.3.55
+- Holidays: fix in copy holidays from last year
+- Core: Always join customfields when joinCustomFields is set. because this is a core module now.
+- DAV: 'host' property used for DAV baseUri
+- Files: Creating folder in shared folder will not make you the owner anymore
+- Addressbook: fixed birthday portlet on start page
+- Addressbook: fixed importing contacts without type (works for vcard property groups)
+- Core: GO::config() will use 'host' from config.php if it is specified
+- Core: Fixed session reset problem (Export and Smime)
+- Calendar: Fixed link creating when adding event to another item
+- Core: Checkbox in tree panels never fired "checked" on checkchange.
+- Core: Fix for ticket #201817154. Unclosable window remained when window was 
+  hidden after submit while being dragged
+
 26-11-2018 6.3.54
 - Files: Fixed issue that files could not be deleted when a search is active.
 - Core: Merging of globalconfig.inc.php failed when config array was defined as array();

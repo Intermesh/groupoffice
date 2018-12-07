@@ -154,25 +154,27 @@ class Extjs3{
 	
 	
 	public function exportModules(){
-		//$GLOBALS['GO_MODULES']->modules
 						
 		$modules = \GO::modules()->getAllModules(true);
-		
+
 		$arr = array();
-		
+
 		foreach($modules as $module){
 			$arr[$module->name]=$module->getAttributes();
-			
+
 			$arr[$module->name]['url']=\GO::config()->host.'modules/'.$module->name.'/';
 			//$arr[$module->name]['path']=\GO::config()->root_path.'modules/'.$module->name.'/';
 			$arr[$module->name]['full_url']=\GO::config()->full_url.'modules/'.$module->name.'/';
-			
+
 			$arr[$module->name]['permission_level']=$module->permissionLevel;
 			$arr[$module->name]['read_permission']=$module->permissionLevel>=\GO\Base\Model\Acl::READ_PERMISSION;
 			$arr[$module->name]['write_permission']=$module->permissionLevel>=\GO\Base\Model\Acl::WRITE_PERMISSION;
-			
+
 		}
+
+		GO()->getCache()->set("export-modules", $arr);
 		
+
 		return $arr;
 	}
 }

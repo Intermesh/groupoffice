@@ -235,3 +235,19 @@ $updates["201810111129"][] = "ALTER TABLE `core_user` ADD `shortDateInList` BOOL
 $updates["201810251129"][] = "TRUNCATE TABLE go_state"; //for fixed date columns
 
 $updates["201811020837"][] = "ALTER TABLE `core_user` CHANGE `firstWeekday` `firstWeekday` TINYINT(4) NOT NULL DEFAULT '1';";
+
+
+$updates['201811020837'][] = function() {
+	foreach(GO\Customfields\Model\Field::model()->find() as $field) {
+		if(preg_match("/\s+/", $field->databaseName)) {
+				
+			$field->databaseName = $stripped = preg_replace('/\s+/', '_', $field->databaseName);
+			$i = 1;
+			$tableName = $field->category->customfieldsTableName();
+			while(\go\core\db\Table::getInstance($tableName)->hasColumn($field->databaseName)) {
+				$field->databaseName = $stripped .'_' .$i++;
+			}
+			$field->save();
+		}
+	}
+};

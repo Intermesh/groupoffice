@@ -155,13 +155,13 @@ class Criteria {
 	 * ```
 	 * 
 	 * @param string|array|Criteria $condition
-	 * @param string $operator AND, OR, NOT
+	 * @param string $comparisonOperator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
 	 * @param mixed $value
 	 * 
 	 * @return static
 	 */
-	public function where($condition, $operator = null, $value = null) {
-		return $this->andWhere($condition, $operator, $value);
+	public function where($condition, $comparisonOperator = null, $value = null) {
+		return $this->andWhere($condition, $comparisonOperator, $value);
 	}
 	
 	protected function internalWhere($condition, $comparisonOperator, $value, $logicalOperator) {				
@@ -171,21 +171,44 @@ class Criteria {
 			return $this;
 		}		
 		
+		if(isset($comparisonOperator)) {
+			$comparisonOperator = preg_replace("/[\s]+/",' ',strtoupper($comparisonOperator));
+		} else
+		{
+			$comparisonOperator = '=';
+		}
+		
 		if(is_array($condition)) {
 			foreach($condition as $colName => $value) {
-				if(!isset($comparisonOperator)) {
-					$comparisonOperator = is_array($value) ? 'IN' : '=';
+				if(is_array($value)) {
+					$comparisonOperator = $this->convertComparisonOperatorForArray($value, $comparisonOperator);
 				}
 				$this->where[] = ["column", $logicalOperator, $colName, $comparisonOperator, $value];
 			}			
 		} else {
-			if(!isset($comparisonOperator)) {
-				$comparisonOperator = is_array($value) ? 'IN' : '=';
+			if(is_array($value)) {
+				$comparisonOperator = $this->convertComparisonOperatorForArray($value, $comparisonOperator);
 			}
 			$this->where[] = ["column", $logicalOperator, $condition, $comparisonOperator, $value];
 		}
 		
 		return $this;
+	}
+	
+	private function convertComparisonOperatorForArray($value, $comparisonOperator) {
+		switch($comparisonOperator) {
+			case 'IN':
+			case '=':
+				return 'IN';
+			
+			case 'NOT IN':
+			case '!=':
+				return 'NOT IN';
+			
+			default:
+				throw new Exception("Illegal comparison operator '" . $comparisonOperator . "' for array value");
+				
+		}
 	}
 	
 	protected function internalWhereExists(Query $subQuery, $not = false, $logicalOperator = "AND") {

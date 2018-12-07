@@ -484,4 +484,9 @@ Juhul, kui sa parooli vahetamist ei palunud, siis kustuta see e-kiri',
     'sql' => 'SQL andmebaasi eksport',
     'xmind' => 'XMind fail',
   ),
+  'Recurrence' => 'Korduvad',
+	'Repeat forever' => 'korda igavesti',
+  'Repeat every' => 'Korda iga',
+  'Repeat until' => 'Korda kuni',
+	'At days' => 'Päevadel'
 );

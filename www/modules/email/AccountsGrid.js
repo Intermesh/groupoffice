@@ -63,9 +63,8 @@ GO.email.AccountsGrid = function(config){
 	});
 
 	config.tbar = [{
-		iconCls: 'btn-add',
+		iconCls: 'ic-add',
 		text: t("Add"),
-		cls: 'x-btn-text-icon',
 		handler: function(){
 			
 			this.showAccountDialog();
@@ -73,9 +72,8 @@ GO.email.AccountsGrid = function(config){
 		scope: this,
 		disabled: !GO.settings.modules.email.write_permission
 	},{
-		iconCls: 'btn-delete',
+		iconCls: 'ic-delete',
 		text: t("Delete"),
-		cls: 'x-btn-text-icon',
 		handler: function(){
 			this.deleteSelected({
 				callback: function(){

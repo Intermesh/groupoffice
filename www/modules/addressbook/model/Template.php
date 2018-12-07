@@ -115,7 +115,9 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	}
 	
 	private function _getModelAttributes($model, $tagPrefix=''){
-		$attributes = $model->getAttributes($this->attributesFormat);		
+		$attributes = $model instanceof \GO\Base\Db\ActiveRecord ? $model->getAttributes($this->attributesFormat) : $model->toArray();		
+		
+		
 		
 		if(method_exists($model, 'getFormattedAddress')){
 			$attributes['formatted_address']=$model->getFormattedAddress();
@@ -124,8 +126,14 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		if(method_exists($model, 'getFormattedPostAddress')){
 			$attributes['formatted_post_address']=$model->getFormattedPostAddress();
 		}
-				
-		if($model->customfieldsRecord){
+		
+		if(method_exists($model, "getCustomFields")){
+			$attributes = array_merge($attributes, $model->getCustomFields());
+		
+			$attributes = array_map(function($a) {
+				return $a instanceof \DateTime ? $a->format(GO()->getAuthState()->getUser()->getDateTimeFormat()) : $a;
+			}, $attributes);
+		} else	if($model->customfieldsRecord){
 			$attributes = array_merge($attributes, $model->customfieldsRecord->getAttributes($this->attributesFormat));
 			
 			// For multiselect fields, replace the | with a ,
@@ -146,7 +154,8 @@ class Template extends \GO\Base\Db\ActiveRecord{
 				}		
 			}
 		}
-
+		$attributes = array_filter($attributes, "is_scalar"); 
+		
 		$attributes = $this->_addTagPrefixAndRemoveEmptyValues($attributes, $tagPrefix);
 		
 		return $attributes;
@@ -238,7 +247,9 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		
 		$attributes = array_merge($attributes, $this->_getUserAttributes());
 		
-		$content = $this->_replaceRelations($content, $model, $tagPrefix, $leaveEmptyTags);
+		if($model instanceof \GO\Base\Db\ActiveRecord) {
+			$content = $this->_replaceRelations($content, $model, $tagPrefix, $leaveEmptyTags);
+		}
 		
 		if(\GO::modules()->customfields)
 			\GO\Customfields\Model\AbstractCustomFieldsRecord::$formatForExport=false;

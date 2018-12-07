@@ -334,7 +334,6 @@ return array (
 Copyright (c) 2003-{current_year}, {company_name}<br/>
 All rights reserved.' => 'Version: {version}<br />
 Copyright (c) 2003-{current_year}, {product_name}<br />
-<<<<<<< HEAD
 All rights reserved.<br />',
   'Totals' => 'Gesamt',
   'Page %s of %s' => 'Seite %s von %s',
@@ -946,4 +945,9 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'Text separator' => 'Texttrennzeichen',
   'Share' => 'Teilen',
   'name' => 'Name',
+  'Recurrence' => 'Wiederholung',
+	'Repeat forever' => 'unbefristet (immer wiederholen)',
+  'Repeat every' => 'Wiederhole alle',
+  'Repeat until' => 'wiederholen bis Datum',
+	'At days' => 'Jeweils am',
 );

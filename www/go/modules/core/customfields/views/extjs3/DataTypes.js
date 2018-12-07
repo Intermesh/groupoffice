@@ -196,11 +196,9 @@
 			getFormField: function (customfield, config) {
 				var f = GO.customfields.dataTypes["GO\\Customfields\\Customfieldtype\\Text"].getFormField(customfield, config);
 				var store = new GO.data.JsonStore({
-					//url: GO.settings.modules.customfields.url+'json.php',
 					url: GO.url('customfields/field/selectOptions'),
 					baseParams: {
-						//'task': 'field_options',
-						'field_id': customfield.id//customfield.id.replace("col_","")
+						'field_id': customfield.customfield_id
 					},
 					root: 'results',
 					totalProperty: 'total',
@@ -316,9 +314,9 @@
 
 								while (GO.customfields.slaves[combo.treeMasterFieldId][nextNestingLevel]) {
 
-									var field = formPanel.form.findField(GO.customfields.slaves[combo.treeMasterFieldId][nextNestingLevel]);
+									var field = formPanel.form.findField("customFields." + GO.customfields.slaves[combo.treeMasterFieldId][nextNestingLevel]);
 									if (!field)
-										field = formPanel.form.findField(GO.customfields.slaves[combo.treeMasterFieldId][nextNestingLevel] + '[]');
+										field = formPanel.form.findField("customFields." + GO.customfields.slaves[combo.treeMasterFieldId][nextNestingLevel] + '[]');
 									console.log(nextNestingLevel, combo.nestingLevel, field);
 									if (nextNestingLevel == combo.nestingLevel + 1) //is first upcoming slave
 										field.store.baseParams.parent_id = record.id;
@@ -338,22 +336,22 @@
 										return true;
 								});
 								//add listener to form to set the correct form values and store parameters
-								if (!GO.util.empty(formPanel) && !formPanel["GO\\Customfields\\Customfieldtype\\TreeselectListenerAdded"]) {
-									formPanel["GO\\Customfields\\Customfieldtype\\TreeselectListenerAdded"] = true;
+								if (!GO.util.empty(formPanel) && !formPanel["TreeselectListenerAdded"]) {
+									formPanel["TreeselectListenerAdded"] = true;
 
 									formPanel.on('actioncomplete', function (form, action) {
 										if (action.type == 'load') {
 											form.items.each(function (field) {
-												//check if this field is a tree select
+												//check if this field is a tree select											
 												if (field.treeMasterFieldId) {
 
 													var nextField = false;
 													var nextNestingLevel = field.nestingLevel + 1;
 													if (GO.customfields.slaves[field.treeMasterFieldId][nextNestingLevel]) {
 
-														nextField = formPanel.form.findField(GO.customfields.slaves[field.treeMasterFieldId][nextNestingLevel]);
+														nextField = formPanel.form.findField("customFields." + GO.customfields.slaves[field.treeMasterFieldId][nextNestingLevel]);
 														if (!nextField)
-															nextField = formPanel.form.findField(GO.customfields.slaves[field.treeMasterFieldId][nextNestingLevel] + '[]');
+															nextField = formPanel.form.findField("customFields." + GO.customfields.slaves[field.treeMasterFieldId][nextNestingLevel] + '[]');
 													}
 													var v = field.getValue();
 

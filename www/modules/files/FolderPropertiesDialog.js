@@ -184,8 +184,13 @@ GO.files.FolderPropertiesDialog = function(config){
 		height:600,
 		closeAction:'hide',
 		items:this.formPanel,
-		buttons:[
-		{
+		buttons:[{
+			text:t("Apply"),
+			handler: function(){
+				this.save(false)
+				},
+			scope: this
+		},{
 			text:t("Save"),
 			handler: function(){
 				this.save(true)
@@ -243,7 +248,27 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 				GO.files.FolderPropertiesDialog.superclass.show.call(this);
 			},
 			failure: function(form, action) {
-				Ext.MessageBox.alert(t("Error"), action.result.feedback);
+				if(action.result.exceptionClass === 'GO\\Base\\Exception\\AccessDenied') {
+					this.formPanel.form.load({
+						url: GO.url('files/folder/display'),
+						params: {
+							id: folder_id
+						},			
+						success: function(form, action) {
+							this.parent_id=action.result.data.parent_id;
+							this.setPermission(action.result.data.is_someones_home_dir, action.result.data.permission_level, action.result.data.readonly);
+							
+							this.tabPanel.setActiveTab(0);
+							GO.dialog.TabbedFormDialog.prototype.setRemoteComboTexts.call(this, action);
+							GO.files.FolderPropertiesDialog.superclass.show.call(this);
+							this.readPermissionsTab.setDisabled(true);
+							this.commentsPanel.setDisabled(true);
+						},
+						scope:this
+					});
+				} else {				
+					Ext.MessageBox.alert(t("Error"), action.result.feedback);
+				}
 			},
 			scope: this
 		});		
@@ -255,6 +280,7 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 	
 	onNotifyChecked : function(checkbox,checked) {
 		Ext.Msg.show({
+			width:400,
 			title: checked  ? t("Set notification on subfolders?", "files") :  t("Remove notification from subfolders?", "files"),
 			msg: t("Do you want to apply this to all the subfolders?", "files"),
 			buttons: Ext.Msg.YESNO,
@@ -275,6 +301,9 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 		form.findField('apply_state').setDisabled(permission_level<GO.permissionLevels.manage && !GO.settings.has_admin_permission);
 		if(!this.readPermissionsTab.disabled)
 			this.readPermissionsTab.setDisabled(!is_someones_home_dir && readonly);
+
+		this.commentsPanel.setDisabled(!readonly);
+		
 	},
 	
 	save : function(hide)

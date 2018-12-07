@@ -258,6 +258,7 @@ class Token extends Entity {
 		}
 		
     if (session_status() == PHP_SESSION_NONE) {
+			
       //without cookie_httponly the cookie can be accessed by malicious scripts 
       //injected to the site and its value can be stolen. Any information stored in 
       //session tokens may be stolen and used later for identity theft or
@@ -275,9 +276,13 @@ class Token extends Entity {
       session_start();
     }
 		
-		$securityToken = $_SESSION['GO_SESSION']['security_token'] ?? null;
+		if(!isset($_SESSION['GO_SESSION'])) {
+				$_SESSION['GO_SESSION'] = [];
+			}			
+		$_SESSION['GO_SESSION']['user_id'] = $this->userId;
+		$_SESSION['GO_SESSION']['accessToken'] = $this->accessToken;			
 		
-		$_SESSION['GO_SESSION'] = ['user_id' => $this->userId, 'accessToken' => $this->accessToken, 'security_token' => $securityToken];		
+		
 	}
 	
 	private function oldLogout() {

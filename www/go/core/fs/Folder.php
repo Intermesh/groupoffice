@@ -2,7 +2,6 @@
 namespace go\core\fs;
 
 use Exception;
-use IFW;
 
 /**
  * A folder object
@@ -218,8 +217,16 @@ class Folder extends FileSystemObject {
 		if ($newPath === $this->getPath()) {
 			return true;
 		}
+		
+		$success = false;
+		try{
+			$success = rename($this->getPath(), $newPath);
+		} catch(\Exception $e) {
+			//rename fails accross partitions. Ignore and retry with copy delete.
+			GO()->debug("Rename failed. Falling back on copy, delete");
+		}
 
-		if (!@rename($this->getPath(), $newPath)) { // Notice suppressed by @
+		if (!$success) { // Notice suppressed by @
 			//	throw new Exception("Rename failed");
 			// If renaming is throwing an error then do it the old way.
 			// This is done because of problems when moving items across partitions.
