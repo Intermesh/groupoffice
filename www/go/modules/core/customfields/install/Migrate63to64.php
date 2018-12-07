@@ -8,7 +8,8 @@ use go\modules\core\customfields\model\FieldSet;
 use PDOException;
 use function GO;
 
-class Migrate63to64 {
+class Migrate63to64 {	
+	
 	public function migrateEntity($entityName) {
 		
 		$entityType = \go\core\orm\EntityType::findByName($entityName);
@@ -244,19 +245,23 @@ class Migrate63to64 {
 									'id' => $o['id'] + self::TREE_SELECT_OPTION_INCREMENT,
 									'fieldId' => $field->id,
 									'parentId' => !empty($o['parent_id']) ? $o['parent_id'] + self::TREE_SELECT_OPTION_INCREMENT : null,
-									'text' => $o['name'],
-									'sortOrder' => $o['sort']									
+									'text' => $o['name']							
 							])->execute();
 		}
 	}
 	
-	private function updateTreeSelect(Field $field) {		
+	private function updateTreeSelect(Field $field) {			
 		
 		$this->convertTreeSelectOptions($field);
 		
 		$fields = $this->findSlaveFields($field);
 		foreach($this->findTreeSelectRecords($field, $fields) as $record) {			
+			
+			GO()->debug($record);
+			
 			$id = $this->findSelectOptionId($record, $fields);			
+			
+			GO()->debug($id);
 			
 			GO()->getDbConnection()
 							->update(

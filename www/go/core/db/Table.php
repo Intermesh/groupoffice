@@ -42,6 +42,7 @@ class Table {
 	
 	private $name;
 	protected $columns;	
+	private $pk = [];
 	
 	public function __construct($name) {
 		$this->name = $name;
@@ -66,6 +67,10 @@ class Table {
 	 */
 	public function clearCache() {
 		App::get()->getCache()->delete($this->getCacheKey());
+		$this->columns = null;
+		$this->pk = [];
+		
+		$this->init();
 	}
 
 	private function init() {
@@ -116,7 +121,7 @@ class Table {
 		}
 	}
 	
-	private $pk = [];
+	
 
 	private function createColumn($field) {
 		

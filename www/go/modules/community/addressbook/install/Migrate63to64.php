@@ -137,12 +137,29 @@ class Migrate63to64 {
 		$companyEntityType = \go\core\orm\EntityType::findByName("Company");
 		
 		if($companyEntityType) {
+			
+			foreach($renameMap as $old => $new) {
+				GO()->getDbConnection()
+							->update("core_customfields_field", 
+											['databaseName' => $new],
+											[
+													'fieldSetId' => (new \go\core\db\Query)
+														->select('id')
+														->from('core_customfields_field_set')
+														->where(['entityId' => $companyEntityType->getId()]), 
+													'databaseName' => $old]
+											)
+							->execute();
+			}
+			
 			GO()->getDbConnection()
 							->update("core_customfields_field_set", 
 											['entityId' => Contact::getType()->getId()], 
 											['entityId' => $companyEntityType->getId()])
 							->execute();
 		}
+		
+		\go\core\db\Table::destroyInstances();
 	}
 	
 	public function migrateCompanyLinks() {		
