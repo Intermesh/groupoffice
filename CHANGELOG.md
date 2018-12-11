@@ -1,3 +1,6 @@
+11-12-2018 6.3.58
+- Core: Fixed access denied error in upgrade.
+
 10-12-2018 6.3.57
 - Billing: Fixed loading address data when opening Orderdialog from contact (link)
 - Files: Copy custom field settings too when copying folders
