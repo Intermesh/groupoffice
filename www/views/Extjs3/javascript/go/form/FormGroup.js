@@ -27,6 +27,8 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	// Set to true to add padding between rows
 	pad: false,
 	
+	dirty: false,
+	
 	initComponent : function() {		
 		
 		
@@ -87,9 +89,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	},
 	
 	addPanel : function(v) {
-		var panel = this.createNewItemPanel()
-		
-		var wrap = {
+		var panel = this.createNewItemPanel(), me = this, wrap = {
 			xtype: "container",
 			layout: "hbox",
 			formPanel: panel,
@@ -105,6 +105,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 						iconCls: 'ic-delete',
 						handler: function() {
 							this.ownerCt.ownerCt.destroy();
+							me.dirty = true;
 						}
 					}]
 				}
@@ -127,6 +128,10 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 	
 	isDirty: function () {
+		if(this.dirty) {
+			return true;
+		}
+		
 		var dirty = false;
 		this.items.each(function(i) {
 			if(this.panelIsDirty(i.formPanel)) {
@@ -137,6 +142,11 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		}, this);
 		
 		return dirty;
+	},
+	
+	reset : function() {
+		this.setValue([]);
+		this.dirty = false;
 	},
 
 	setValue: function (records) {	
