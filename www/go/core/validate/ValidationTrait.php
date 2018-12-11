@@ -30,15 +30,6 @@ trait ValidationTrait {
 	public function getValidationErrors() {
 		return $this->validationErrors;
 	}
-	
-	/**
-	 * Return validation errors as printable string
-	 * 
-	 * @return string
-	 */
-	public function getValidationErrorsAsString() {
-		return var_export($this->validationErrors, true);
-	}
 
 	/**
 	 * Get the validationError for the given attribute
