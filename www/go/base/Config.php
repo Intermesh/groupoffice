@@ -108,6 +108,14 @@ var $billing_clear_payment_method_on_duplicate = true;
 	var $imap_sort_on_date = false;
 
 	/**
+	 * Delete the message inside the draft folder and move it to the send folder after sending.
+	 * Do not remove it when set to false.
+	 *
+	 * @var boolean
+	 */
+	var $delete_draft_on_send = true;
+	
+	/**
 	 * The Group-Office server ID
 	 *
 	 * @var     StringHelper
