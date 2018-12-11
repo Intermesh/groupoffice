@@ -203,7 +203,7 @@ class Column {
 					return $value;
 				} else {
 					$dt = new GoDateTime($value);
-					$dt->setTimezone(new DateTimeZone(date_default_timezone_get())); //UTC
+					$dt->setTimezone(new DateTimeZone("UTC")); //UTC
 					return $dt;
 				}
 
@@ -278,7 +278,7 @@ class Column {
 
 			case 'date':
 			case 'datetime':
-				return $value instanceof GoDateTime ? $value: new GoDateTime($value);
+				return $value instanceof GoDateTime ? $value: new GoDateTime($value, new DateTimeZone("UTC"));
 				
 			default:
 				return $value;
