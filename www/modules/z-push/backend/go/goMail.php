@@ -853,8 +853,8 @@ class goMail extends GoBaseBackendDiff {
 
 				// always use "." as folder delimiter
 				$box["id"] = str_replace($mailbox->delimiter, ".", $box["id"]);
-				$box["mod"] = $mailbox->getBaseName();
-				$box["displayname"] = $mailbox->getDisplayName();
+				$box["displayname"] = $box["mod"] = $mailbox->getBaseName();
+				//$box["displayname"] = $mailbox->getDisplayName();
 				$box["parentid"] = str_replace($mailbox->delimiter, ".", $mailbox->getParentName());
 				if (!$box['parentid'])
 					$box['parentid'] = "0";
