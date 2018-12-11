@@ -248,8 +248,8 @@ $updates['201811020837'][] = function() {
 				$field->databaseName = $stripped .'_' .$i++;
 			}
 			if(!$field->save(true)) {
-				var_dump($field->getValidationErrors());
-				exit();
+				echo "Save of field ". $field->name . " failed: ". var_export($field->getValidationErrors(), true) ."\n";
+				throw new \Exception("Failed to save custom field.");
 			}
 		}
 	}
