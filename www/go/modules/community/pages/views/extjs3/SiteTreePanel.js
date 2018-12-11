@@ -17,9 +17,6 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 		    entityStore: go.Stores.get("Page"),
 		}),
 
-		//pass along a cb or event handler for changing page content
-		//make sure to update the siteId filter when changing pages!
-
 	    }),
 	    this.siteTreeEdit = new go.modules.community.pages.SiteTreeEdit({
 		itemId: 'siteTreeEdit'
@@ -71,6 +68,7 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 	    this.siteTree.getLoader().entityStore.on('changes', this.reloadTree, this);
 	}, this);
 
+
 	go.modules.community.pages.SiteTreePanel.superclass.initComponent.call(this);
     },
     changePanel: function (panel) {
@@ -99,5 +97,8 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
     },
     setLoaderSiteId: function(siteId){
 	this.siteTree.getLoader().siteId = siteId;
+    },
+    getSelectionModel: function(){
+	return this.siteTree.getSelectionModel();
     }
 })

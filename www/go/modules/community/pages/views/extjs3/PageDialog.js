@@ -5,8 +5,8 @@ go.modules.community.pages.PageDialog = Ext.extend(go.form.Dialog, {
 	height: dp(600),
 	//maximized: true,
 	maximizable: true,
-	siteId: '_',
-	sortOrder: 0,
+	siteId: '',
+	sortOrder: '',
 	initFormItems: function () {
 		var items = [{
 				xtype: 'fieldset',

@@ -62,7 +62,14 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 		    scope: this
 		}
 	    ]
-	});
+	});	
+	
+	this.tree.getSelectionModel().on('selectionchange', function(sm, node){
+	    if(node){
+		node.expand();
+		go.Router.goto(this.siteSlug + '\/view\/' + node.attributes.entitySlug)
+	    }
+	}, this);
 	go.modules.community.pages.MainPanel.superclass.initComponent.call(this);
 
 

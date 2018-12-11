@@ -20,9 +20,11 @@ go.modules.community.pages.SiteTree = Ext.extend(Ext.tree.TreePanel, {
 	    }
 	});
 
-	this.root.on('expand', function (node) {
-	    this.getSelectionModel().select(node.firstChild);
-	}, this);
+//triggers every reload but should trigger only once.
+//	this.root.on('expand', function (node) {
+//	    console.log('root expand');
+//	    this.getSelectionModel().select(node.firstChild);
+//	}, this);
     },
 
 })

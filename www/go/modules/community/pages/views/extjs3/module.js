@@ -21,6 +21,7 @@ go.Router.add(/(.*)\/view\/(.*)/, function(siteSlug, pageSlug) {
     //als na de pageSlug nog een # staat, opnieuw goto aanroepen om naar de header te springen.
     var p = GO.mainLayout.openModule("pages");
     p.siteSlug = siteSlug;
+    //check toevoegen of slug huidige site is, zo ja niet request doen.
     go.Jmap.request({
 	method: "Site/get",
 	params: {
@@ -49,7 +50,7 @@ go.Router.add(/page\/(.*)/ , function(pageId) {
     console.log('redirect from: '+ go.Router.getPath());
     var p = GO.mainLayout.getModulePanel("pages");
     p.navigateToPage(pageId);
-    go.Router.goto('pages\/view\/'+pageId+'/');
+    go.Router.goto('pages\/view\/'+pageId);
 });
 
 //Redirect the tabpanel hash to the view hash.

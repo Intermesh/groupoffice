@@ -87,6 +87,7 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 		    result.push({
 			id: "page-" + entity.id,
 			entityId: entity.id || null,
+			entitySlug: entity.slug,
 			entity: entity,
 			isPage: true,
 			sortOrder: entity.sortOrder,

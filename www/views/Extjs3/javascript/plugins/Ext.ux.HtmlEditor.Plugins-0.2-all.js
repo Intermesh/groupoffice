@@ -68,6 +68,7 @@ Ext.ux.form.HtmlEditor.MidasCommand = Ext.extend(Ext.util.Observable, {
 	this.combo = this.cmp.getToolbar().findByType('combo');
     },
     onClick: function(){
+	//closes any comboboxes that might be opened.
 	Ext.each(this.combo, function(b){
 	    if(b.isExpanded()){
 		b.collapse();

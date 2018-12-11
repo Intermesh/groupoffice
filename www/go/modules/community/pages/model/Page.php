@@ -65,7 +65,7 @@ class Page extends AclItemEntity {
      * 
      * @var int
      */
-    public $sortOrder;
+    protected $sortOrder;
 
     /**
      * 
@@ -100,6 +100,19 @@ class Page extends AclItemEntity {
 	return ['siteId' => 'id'];
     }
 
+    public function getSortOrder() {
+	return $this->sortOrder;
+    }
+    //set sortorder. generates one if the page doesnt have one yet.
+    public function setSortOrder($sortOrder) {
+	if (empty($this->sortOrder)) {
+	    $res = (new \go\core\db\Query)->select('sortOrder')->from('pages_page')->where(['siteId' => $this->siteId])->orderBy(['sortOrder' => 'DESC'])->single();
+	    $this->sortOrder = $res['sortOrder']+1;
+	}else{
+	    $this->sortOrder = $sortOrder;
+	}
+    }
+    
     public function getPageName() {
 	return $this->pageName;
     }
@@ -165,7 +178,7 @@ class Page extends AclItemEntity {
 	    }else{
 	    $newElement->setAttribute('id',$path . $headerSlug);
 	    }
-	    $newElement->nodeValue = $element->nodeValue;
+	    $newElement->nodeValue = htmlspecialchars($element->nodeValue);
 	    $element->parentNode->replaceChild($newElement, $element);
 	}
 	}

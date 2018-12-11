@@ -17,6 +17,7 @@ go.modules.community.pages.tempHTMLEditorPlugins = Ext.extend(Ext.ux.form.HtmlEd
 //    init: function(cmp){
 //        this.cmp = cmp;
 //        this.btns = [];
+//	this.combo = [];
 //        this.cmp.on('render', this.onRender, this);
 //        this.cmp.on('initialize', this.onInit, this, {
 //            delay: 100,
@@ -28,7 +29,7 @@ go.modules.community.pages.tempHTMLEditorPlugins = Ext.extend(Ext.ux.form.HtmlEd
 //        Ext.EventManager.on(this.cmp.getDoc(), {
 //            'mousedown': this.onEditorEvent,
 //            'dblclick': this.onEditorEvent,
-//            'click': this.onEditorEvent,
+//            'click': this.onClick,
 //            'keyup': this.onEditorEvent,
 //            buffer: 100,
 //            scope: this
@@ -40,6 +41,7 @@ go.modules.community.pages.tempHTMLEditorPlugins = Ext.extend(Ext.ux.form.HtmlEd
 //        Ext.each(this.midasBtns, function(b){
 //            //if (Ext.isObject(b)) {
 //						if (typeof(b)=='object') {
+//						    // Certain commands also require a value to be passed such as the heading plugin.
 //						    if(!b.value){
 //							b.value = "";
 //						    }
@@ -66,6 +68,18 @@ go.modules.community.pages.tempHTMLEditorPlugins = Ext.extend(Ext.ux.form.HtmlEd
 //            }
 //            this.btns.push(btn);
 //        }, this);
+//	this.combo = this.cmp.getToolbar().findByType('combo');
+//    },
+//    onClick: function(){
+//	//closes any comboboxes that might be opened.
+//	Ext.each(this.combo, function(b){
+//	    if(b.isExpanded()){
+//		b.collapse();
+//	    }
+//	    //console.log(b.getRawValue());
+//	});
+//	
+//	this.onEditorEvent();
 //    },
 //    // private
 //    onEditorEvent: function(){
@@ -721,7 +735,7 @@ go.modules.community.pages.tempHTMLEditorPlugins = Ext.extend(Ext.ux.form.HtmlEd
 //    // private
 //    onRender: function(){
 //        var cmp = this.cmp;
-//        var btn = this.cmp.getToolbar().addItem({
+//        btn = this.cmp.getToolbar().addItem({
 //            xtype: 'combo',
 //            displayField: 'display',
 //            valueField: 'value',
@@ -745,5 +759,5 @@ go.modules.community.pages.tempHTMLEditorPlugins = Ext.extend(Ext.ux.form.HtmlEd
 //                scope: cmp
 //            }
 //        });
-//    }
+//    },
 //});
