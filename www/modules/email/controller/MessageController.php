@@ -822,7 +822,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			}
 		}		
 
-		if (!empty($params['draft_uid'])) {
+		if (!empty($params['draft_uid']) && \GO::config()->delete_draft_on_send) {
 			//remove drafts on send
 			$imap = $account->openImapConnection($account->drafts);
 			$imap->delete(array($params['draft_uid']));
