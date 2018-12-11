@@ -348,8 +348,7 @@ class Contact extends AclItemEntity {
 	}
 	
 	public function getOrganizationIds() {
-		$query = Link::find()->selectSingleValue('toId');
-		Link::filter($query, [
+		$query = Link::find()->selectSingleValue('toId')->filter([
 				'entityId' => $this->id,
 				'entity' => "Contact",
 				'entities' => [
@@ -441,6 +440,16 @@ class Contact extends AclItemEntity {
 		return $this->findPropByType("addresses", $type, $returnAny);
 	}
 	
+	/**
+	 * Find date by type
+	 * 
+	 * @param string $type
+	 * @param boolean $returnAny
+	 * @return Date|boolean
+	 */
+	public function findDateByType($type, $returnAny = true) {
+		return $this->findPropByType("dates", $type, $returnAny);
+	}
 	
 	private function findPropByType($propName, $type, $returnAny) {
 		foreach($this->$propName as $prop) {

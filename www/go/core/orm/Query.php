@@ -28,6 +28,13 @@ class Query extends DbQuery {
 	/**
 	 * Applies JMAP filters to the query
 	 * 
+	 * @example:
+	 * 
+	 * $stmt = Contact::find()
+	 * 						->filter([
+	 * 								"permissionLevel" => Acl::LEVEL_READ
+	 * 						]);
+	 * 
 	 * @param array $filters
 	 * 
 	 * @return $this
@@ -37,6 +44,24 @@ class Query extends DbQuery {
 		$cls::filter($this, $filters);
 		
 		return $this;
+	}
+	
+	/**
+	 * Select models linked to the given entity
+	 * 
+	 * @param \go\core\orm\Entity $entity
+	 * @return $this
+	 */
+	public function withLink(Entity $entity) {
+		
+		$c = new \go\core\db\Criteria();
+		$cls = $this->model;
+		$c->where(['link.fromEntityTypeId' => $entity->getType()->getId(),
+				'link.fromId' => $entity->id,
+				'link.toEntityTypeId' => $cls::getType()->getId()
+				])->andWhere('link.toId = '.$this->getTableAlias().'.id');
+						
+		return $this->join('core_link', 'link', $c);
 	}
 
 }

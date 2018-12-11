@@ -126,15 +126,15 @@ class Settings extends \GO\Base\Db\ActiveRecord{
 				}
 			}
 
-			if (\GO::modules()->addressbook) {
-				$stmt = $this->addressbooks();
-				if (!$stmt->rowCount()) {
-					$addressbook = \GO\Addressbook\Model\Addressbook::model()->findSingleByAttribute('user_id', $user->id);
-					if ($addressbook) {
-						$settings->addManyMany('addressbooks', $addressbook->id, array('default_addressbook' => 1));
-					}
-				}
-			}
+//			if (\GO::modules()->addressbook) {
+//				$stmt = $this->addressbooks();
+//				if (!$stmt->rowCount()) {
+//					$addressbook = \GO\Addressbook\Model\Addressbook::model()->findSingleByAttribute('user_id', $user->id);
+//					if ($addressbook) {
+//						$settings->addManyMany('addressbooks', $addressbook->id, array('default_addressbook' => 1));
+//					}
+//				}
+//			}
 // KAPOT MET 6.3 notes
 //			if (\GO::modules()->notes) {
 //				$stmt = $this->noteCategories();

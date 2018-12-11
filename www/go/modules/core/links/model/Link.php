@@ -14,6 +14,32 @@ use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
 use go\modules\core\search\model\Search;
 
+/**
+ * Link model
+ * 
+ * @example Find organization links for a contact. When you know which entity you're looking for you can use withLink() in the find query.
+ * ```
+ * $companies = \go\modules\community\addressbook\model\Contact::find()
+							->withLink($contact)
+							->andWhere('isOrganization', '=', true)
+							->selectSingleValue('name')
+							->all();
+ * ```
+ * 
+ * Find links using the JMAP filter:
+ * 
+ * ```
+ * $query = Link::find()->filter([
+				'entityId' => $contact->id,
+				'entity' => "Contact",
+				'entities' => [
+						['name' => "Contact", "filter" => "isOrganization"]
+				]
+		]);
+ * ```
+ * 
+ * 
+ */
 class Link extends Entity {
 	
 	/**
