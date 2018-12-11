@@ -213,8 +213,8 @@ class ContactConvertor {
 	}
 	
 	
-	private function flatToHasMany($items, $message, $mapping) {
-		
+	private function flatToHasMany($items, $message, $mapping, $cls) {
+		ZLog::Write(LOGLEVEL_DEBUG, "flatToHasMany");
 		//create array by type
 		//['work' => [['number' => 123]]]
 		$values = [];
@@ -226,11 +226,11 @@ class ContactConvertor {
 					$values[$type][] = $v;
 				}
 			}
-		}		
+		}
 		
 		foreach($values as $type => $valuesOfType) {
-			$items = $this->patchType($items, $type, $valuesOfType, $mapping[$type]);
-		}
+			$items = $this->patchType($items, $type, $valuesOfType, $mapping[$type], $cls);
+		}	
 		
 		return $items;
 	}
@@ -248,26 +248,32 @@ class ContactConvertor {
 		return $v;		
 	}
 	
-	private function patchType($items, $type, $values, $mapping) {
+	private function patchType($items, $type, $values, $mapping, $cls) {
 		
 		$maxValues = count($mapping);
-		$typeIndex = 0;
+		$count = 0;
 		for($i = 0, $c = count($items); $i < $c; $i++) {
 			if($items[$i]->type != $type) {
 				//other type. Ignore
 				continue;
 			}
 			
-			if(isset($values[$typeIndex])) {
-				$items[$i]->setValues($values[$typeIndex]);
-				$typeIndex++;
-			} elseif($typeIndex <= $maxValues)
+			$value = array_pop($values);
+			if($value) {				
+				$items[$i]->setValues($value);
+			} elseif($count < $maxValues)
 			{
 				array_splice($items, $i, 1);
 				$i--;
 				$c--;
 			}
+			
+			$count++;
 		}		
+		
+		foreach($values as $value) {
+			$items[] = (new $cls)->setValues($value)->setValues(['type' => $type]);
+		}
 		
 		return $items;
 	}
@@ -277,7 +283,7 @@ class ContactConvertor {
 			$contact->$goProp = $message->$asProp;
 		}
 		
-		$contact->phoneNumbers = $this->flatToHasMany($contact->phoneNumbers ?? [], $message, $this->phoneMapping);		
+		$contact->phoneNumbers = $this->flatToHasMany($contact->phoneNumbers ?? [], $message, $this->phoneMapping, PhoneNumber::class);		
 		
 		return $contact;
 	}
