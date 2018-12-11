@@ -806,7 +806,7 @@ class goMail extends GoBaseBackendDiff {
 		$box = array(
 						'id'=>'INBOX',
 						'type'=>SYNC_FOLDER_TYPE_INBOX,
-						'displayname'=>GO::t("Inbox", "email"),
+						'displayname'=> 'INBOX',
 						"parentid"=>"0",
 						"mod"=>'INBOX'
 				);
