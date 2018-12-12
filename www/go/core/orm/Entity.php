@@ -191,6 +191,15 @@ abstract class Entity extends Property {
 			$this->rollback();
 			return false;
 		}
+		
+		//See \go\core\orm\SearchableTrait;
+		if(method_exists($this, 'deleteSearch')) {
+			if(!$this->deleteSearch()) {				
+				$this->setValidationError("search", ErrorCode::INVALID_INPUT, "Could not delete core_search entry");		
+				$this->rollback();
+				return false;
+			}
+		}	
 
 		if (!$this->fireEvent(self::EVENT_DELETE, $this)) {
 			$this->rollback();

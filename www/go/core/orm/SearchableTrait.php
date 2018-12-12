@@ -60,6 +60,13 @@ trait SearchableTrait {
 		return true;
 	}
 	
+	public function deleteSearch() {
+		return \GO()->getDbConnection()
+						->delete('core_search', 
+										['entityTypeId' => static::getType()->getId(), 'entityId' => $this->id]
+										)->execute();
+	}
+	
 	
 	/**
 	 * 
