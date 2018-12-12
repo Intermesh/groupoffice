@@ -60,11 +60,29 @@ trait SearchableTrait {
 		return true;
 	}
 	
-	public function deleteSearch() {
-		return \GO()->getDbConnection()
+	public function deleteSearchAndLinks() {
+		if(!\GO()->getDbConnection()
 						->delete('core_search', 
 										['entityTypeId' => static::getType()->getId(), 'entityId' => $this->id]
-										)->execute();
+										)->execute()) {
+			return false;
+		}
+		
+		if(!\GO()->getDbConnection()
+						->delete('core_link', 
+										['fromEntityTypeId' => static::getType()->getId(), 'fromId' => $this->id]
+										)->execute()) {
+			return false;
+		}
+		
+		if(!\GO()->getDbConnection()
+						->delete('core_link', 
+										['toEntityTypeId' => static::getType()->getId(), 'toId' => $this->id]
+										)->execute()) {
+			return false;
+		}
+		
+		return true;
 	}
 	
 	

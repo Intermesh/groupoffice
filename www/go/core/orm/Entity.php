@@ -193,8 +193,8 @@ abstract class Entity extends Property {
 		}
 		
 		//See \go\core\orm\SearchableTrait;
-		if(method_exists($this, 'deleteSearch')) {
-			if(!$this->deleteSearch()) {				
+		if(method_exists($this, 'deleteSearchAndLinks')) {
+			if(!$this->deleteSearchAndLinks()) {				
 				$this->setValidationError("search", ErrorCode::INVALID_INPUT, "Could not delete core_search entry");		
 				$this->rollback();
 				return false;
@@ -206,10 +206,9 @@ abstract class Entity extends Property {
 			return false;
 		}
 
-		return $this->commit();
-		
+		return $this->commit();		
 	}
-
+	
 	protected function commit() {
 		parent::commit();
 
