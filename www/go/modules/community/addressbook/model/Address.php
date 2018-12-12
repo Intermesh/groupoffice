@@ -134,5 +134,21 @@ class Address extends Property {
 		
 		return preg_replace("/(\r\n)+|(\n|\r)+/", "\n", $format);
 	}
+	
+	public function getCombinedStreet() {
+		return trim($this->street . ' ' . $this->street2);
+	}
+	
+	public function setCombinedStreet($v) {
+		$lastSpace = strrpos($v, ' ');
+		if($lastSpace === false) {
+			$this->street = $v;
+			$this->street2 = null;
+		} else
+		{
+			$this->street = substr($v, 0, $lastSpace);
+			$this->street2 = substr($v, $lastSpace + 1);
+		}
+	}
 
 }

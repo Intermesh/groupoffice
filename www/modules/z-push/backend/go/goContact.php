@@ -105,7 +105,6 @@ class goContact extends GoBaseBackendDiff {
 		$contact = $this->convertor->AS2GO($message, $contact, $contentParameters);
 		//ZLog::Write(LOGLEVEL_DEBUG, var_export($contact, true));
 		
-		ZLog::Write(LOGLEVEL_DEBUG, var_export($contact->isNew(), true));
 		
 		if(!$contact->save()) {
 			ZLog::Write(LOGLEVEL_ERROR, "Failed to save contact: ".var_export(GO()->getDebugger()->getEntries(), true));

@@ -4,12 +4,11 @@
 For old framework:
 
 advanced search
-cascade delete custom fields
-
 logging in activerecord
 duplicate
 mergeWith
 Search Cache
+
 Export contacts VCF, CSV
 Disabled categories for: ticket type, calendar resource groups, folder dialog
 modules/projects2/views/Extjs3/AddressbookOverrides.js
@@ -18,8 +17,7 @@ Folder::deriveCustomfieldSettings
 Address lists /mailings
 General import/export
 
-
-Contact -> Email compose vanuit dropdown
+Remove search cache and links on delete
 
 For new:
 
@@ -35,7 +33,7 @@ For new:
 	templates for project contracts (See income model)
 
 
-
+Upgrade notes for customer
 
 Affected customer modules:
 favorites (greifswald)

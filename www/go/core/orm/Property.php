@@ -749,6 +749,12 @@ abstract class Property extends Model {
 		
 		if(isset($models)) {
 			foreach ($models as &$newProp) {
+				
+				//Check for invalid input
+				if(!($newProp instanceof Property)) {
+					throw new \Exception("Invalid value given for '". $relation->name ."'. Should be a GO\Orm\Property");
+				}
+				
 				$this->applyRelationKeys($relation, $newProp);
 				if (!$newProp->internalSave()) {
 					return false;
