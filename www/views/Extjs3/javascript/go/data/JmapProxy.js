@@ -113,6 +113,9 @@ go.data.JmapProxy = Ext.extend(Ext.data.HttpProxy, {
 			method: method,
 			params: params,
 			callback: function(options, success, response) {
+				if(!success) {
+					throw "Query failed!";
+				}
 				callback.call(this, response);
 			}
 		});
