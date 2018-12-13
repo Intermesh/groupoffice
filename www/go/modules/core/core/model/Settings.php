@@ -117,7 +117,7 @@ class Settings extends core\Settings {
 	 * @var string
 	 */
 	public $smtpUsername = null;
-	
+	public $locale;
 	/**
 	 * SMTP Password
 	 * 

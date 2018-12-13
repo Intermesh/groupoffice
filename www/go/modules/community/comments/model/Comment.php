@@ -9,7 +9,6 @@ use go\core\util\DateTime;
 class Comment extends Entity {
 
 	public $text;
-	public $labelIds;
 	public $entityId;
 	protected $entity;
 	
@@ -22,11 +21,13 @@ class Comment extends Entity {
 	public $createdBy;
 	public $modifiedBy;
 	
+	private $_labels;
+	
 	protected static function defineMapping() {
 		return parent::defineMapping()
 			->addTable("comments_comment")
-			->addRelation('labels', Label::class, ['id' => 'commentId'])
-			->addRelation('attachments', Attachment::class, ['id' => 'commentId'])
+			//->addRelation('labels', Label::class, ['id' => 'commentId'])
+		//	->addRelation('attachments', Attachment::class, ['id' => 'commentId'])
 			->setQuery(
 				(new Query())
 					->select("e.name AS entity")
@@ -59,6 +60,42 @@ class Comment extends Entity {
 		}
 		
 		return parent::filter($query, $filter);	
+	}
+	
+	public static function sort(Query $query, array $sort) {	
+		//GO()->debug($sort);
+		if(!empty($sort['id'])) {
+			$sort = ['createdAt' => 'DESC'];
+		}
+
+		return parent::sort($query, $sort);
+		
+	}
+	
+	protected function internalSave() {
+		$success = parent::internalSave();
+		
+		if(isset($this->_labels)) {
+			$success = $success && GO()->getDbConnection()->delete('comments_comment_label', ['commentId' => $this->id])->execute();
+			foreach ($this->_labels as $labelId) {
+				$success = $success && GO()->getDbConnection()->insert('comments_comment_label', ['labelId'=>$labelId,'commentId'=>$this->id])->execute();
+			}
+		}
+		return $success;
+	}
+	
+	public function setLabelIds($ids) {
+		$this->_labels = $ids;
+	}
+	
+	public function getLabelIds() {
+		//TODO: turn off ATTR_EMULATE_PREPARES to fetch Integers
+		return (new Query)
+			->selectSingleValue('labelId')
+			->from('comments_comment_label')
+			->where(['commentId' => $this->id])
+			->execute()
+			->fetchAll();
 	}
 	
 }

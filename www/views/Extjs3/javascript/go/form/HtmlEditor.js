@@ -6,7 +6,7 @@ go.form.HtmlEditor = Ext.extend(Ext.form.HtmlEditor, {
    emptyTextTpl: '<span style="color:#ccc;">{0}</span>',
    emptyText: '',
 	hideToolbar: false,
-	
+
 	initComponent: function() {
 		go.form.HtmlEditor.superclass.initComponent.apply(this);
 		
@@ -22,7 +22,7 @@ go.form.HtmlEditor = Ext.extend(Ext.form.HtmlEditor, {
 				blur:this.applyEmptyText,
 				scope:this
 			});
-			this.applyEmptyText();
+			//this.applyEmptyText();
 			
 		},this);
 	},

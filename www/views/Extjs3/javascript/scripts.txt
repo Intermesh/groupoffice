@@ -240,8 +240,10 @@ views/Extjs3/javascript/go/data/EntityStore.js
 views/Extjs3/javascript/go/EntityManager.js
 views/Extjs3/javascript/go/ModuleManager.js
 
+views/Extjs3/javascript/go/panels/ScrollLoader.js
 views/Extjs3/javascript/go/grid/GridTrait.js
 views/Extjs3/javascript/go/grid/GridPanel.js
+views/Extjs3/javascript/go/grid/EditorGridPanel.js
 views/Extjs3/javascript/go/grid/SelectAllCheckBox.js
 views/Extjs3/javascript/go/grid/DateColumn.js
 
@@ -259,6 +261,8 @@ views/Extjs3/javascript/go/form/multiselect/Field.js
 views/Extjs3/javascript/go/form/multiselect/Window.js
 views/Extjs3/javascript/go/form/GridField.js
 views/Extjs3/javascript/go/form/RadioGroup.js
+views/Extjs3/javascript/go/form/HtmlEditor.js
+views/Extjs3/javascript/go/form/Chips.js
 
 views/Extjs3/javascript/go/panels/CreateModifyTpl.js
 views/Extjs3/javascript/go/panels/LinksTpl.js
@@ -314,3 +318,4 @@ views/Extjs3/javascript/go/util/Format.js
 
 views/Extjs3/javascript/go/Wizard.js
 views/Extjs3/javascript/go/Array.js
+views/Extjs3/javascript/go/menu/EmojiMenu.js

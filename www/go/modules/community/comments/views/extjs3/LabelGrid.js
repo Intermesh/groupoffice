@@ -3,7 +3,7 @@ go.modules.comments.LabelGrid = Ext.extend(go.grid.EditorGridPanel, {
 	initComponent: function () {
 
 		this.store = new go.data.Store({
-			fields: ['id', 'name', 'color'],
+			fields: ['id', {name:'name'}, {name:'color'}],
 			entityStore: go.Stores.get("CommentLabel")
 		});
 
@@ -12,14 +12,14 @@ go.modules.comments.LabelGrid = Ext.extend(go.grid.EditorGridPanel, {
 				iconCls: 'ic-add',
 				text: t('Add'),
 				handler: function () {
-					var r = new Ext.data.Record({
+					var r = new this.store.recordType({
 						id: 0,
 						name: '',
 						color: ''
 					});
 					this.stopEditing();
 					this.store.insert(0, r);
-					this.startEditing(0, 0);
+					this.startEditing(0, 1);
 				},
 				scope: this
 			}, {

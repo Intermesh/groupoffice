@@ -18,19 +18,17 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			tooltip: t('Add'),
 			iconCls: 'ic-add',
 			menu: {
-				items:[{
-					iconCls: 'ic-attach-file', 
-					text: t('Select file')
-				},{
-					iconCls: 'ic-file-upload', 
-					text: t('Upload file')
-				},'-'
+				items:[
+//					{
+//					iconCls: 'ic-attach-file', 
+//					text: t('Select file')
+//				},{
+//					iconCls: 'ic-file-upload', 
+//					text: t('Upload file')
+//				},'-'
 //				},{
 //					iconCls: 'ic-link', 
 //					text: t('Add Link')
-//				},{
-//					iconCls: 'ic-label', 
-//					text: t('Add Label')
 //				}
 			]
 			}
@@ -67,7 +65,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			body.style.margin = '8px 0';
 			
 			setTimeout(function() {
-				var h =  Math.max(me.boxMinHeight,Math.min(body.offsetHeight +16, me.boxMaxHeight)); // 400  max height
+				var h =  Math.max(me.boxMinHeight,Math.min(body.offsetHeight + 16, me.boxMaxHeight)); // 400  max height
 				if(h > 40) {
 					me.tb.show();
 				} else {
@@ -86,6 +84,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			handler: function(){ 
 				this.submit(); 
 				this.textField.syncValue();
+				this.chips.reset();
 			},
 			scope: this
 		});
@@ -96,6 +95,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			this.middleBox = new Ext.Container({
 				layout:'vbox',
 				align:'stretch',
+				//height:37,
 				flex:1,
 				items: [
 					this.commentBox = new Ext.Container({
@@ -103,7 +103,12 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 						frame: true,
 						items:[this.textField]
 					}),
-					this.labelBox = new Ext.Container({style:'padding-bottom:4px'}),
+					this.chips = new go.form.Chips({
+						name: 'labelIds',
+						entityStore: go.Stores.get('CommentLabel'),
+						style:'padding-bottom:4px',
+						comboStore: this.store
+					}),
 					this.attachmentBox = new Ext.Container()
 				]
 			}),
@@ -115,10 +120,9 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 	},
 	
 	grow: function(){
-		var totalHeight = this.commentBox.getHeight() + this.labelBox.getHeight() + this.attachmentBox.getHeight();
-		console.log(totalHeight, this.labelBox.getHeight());
+		var totalHeight = this.commentBox.getHeight() + this.chips.getHeight() + this.attachmentBox.getHeight();
 		this.setHeight(totalHeight);
-		this.middleBox.setHeight(totalHeight);
+		this.middleBox.setHeight(totalHeight-2);
 		this.ownerCt.doLayout();
 		this.doLayout();
 	},
@@ -129,6 +133,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 	},
 	
 	loadLabels : function() {
+		this.addBtn.menu.removeAll();
 		this.store.each(function(r) {
 			this.addBtn.menu.add({
 				text: r.get('name'),
@@ -136,14 +141,8 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 				record: r,
 				iconStyle: 'color: #'+r.get('color'),
 				handler: function(me) {
-					this.labelBox.add({
-						xtype:'box',
-						autoEl: {
-							tag: 'span',
-							html: '<span>o</span> '+me.record.get('name')
-						},
-						style: 'border: 1px solid black'
-					});
+					this.chips.dataView.store.add([me.record]);
+					this.loadLabels(); //redraw
 					this.doLayout();
 					this.grow();
 				},

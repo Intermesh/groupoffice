@@ -20,6 +20,9 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	
 	autoDestroy: true,
 	
+	autoSave: false,
+	//writer: {}, // needed for buggy Ext store changes 
+	
 	/**
 	 * true when load or loaddata has been called.
 	 * 
@@ -47,6 +50,14 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 			},
 			proxy: new go.data.JmapProxy(config)
 		}));
+		
+
+		this.on({
+			 scope: this,
+			 remove: this.destroyRecord, // will remember destoyed records
+			 //clear: this.onClear
+		});
+        
 		
 		this.setup();
 	
@@ -190,6 +201,48 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		this.entityStore.get(ids, function (items) {
 			this.loadData(items);
 		}, this);
+	},
+	
+	removeById : function(id) {
+		this.remove(this.getById(id));
+	},
+	
+	//override Extjs writer save for entityStore
+	save: function(cb) {
+		var queue = {},
+			 rs = this.getModifiedRecords(),
+			 hasChanges = false;
+		if(this.removed.length){
+			hasChanges = true;
+			queue.destroy = [];
+			for(var r,i = 0; r = this.removed[i]; i++){
+				queue.destroy.push(r.id);
+			}
+		}
+		if(rs.length){
+			hasChanges = true;
+			queue.create = {};
+			queue.update = {};
+			for(var r,i = 0;r = rs[i]; i++){
+				if(!r.isValid()) {
+					continue;
+				}
+				var change = {};
+				for(attr in r.modified) {
+					change[attr] = r.data[attr];
+				}
+				queue[r.phantom?'create':'update'][r.id] = change;
+			}
+		}
+		if(hasChanges) {
+			if(this.fireEvent('beforesave', this, queue) !== false){
+				//console.log(queue);
+				this.entityStore.set(queue, function(options, success, queue){
+					this.commitChanges();
+					if(cb) {cb(success) }
+				},this);
+			}
+		}
 	}
 	
 //	onUpdate : function(store, record, operation) {

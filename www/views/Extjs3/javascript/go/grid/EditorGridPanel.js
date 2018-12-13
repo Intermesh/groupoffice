@@ -10,29 +10,23 @@
  * 
  */
 
-go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {	
+go.grid.EditorGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {	
 
 	initComponent: function () {
-		go.grid.GridPanel.superclass.initComponent.call(this);
+		go.grid.EditorGridPanel.superclass.initComponent.call(this);
 		
 		Ext.applyIf(this, go.grid.GridTrait);
 		this.initGridTrait();
-		Ext.applyIf(this, go.panels.ScrollLoader);
-		this.initScrollLoader();
 	}
 
 });
 
-Ext.reg("gogrid", go.grid.GridPanel);
-
-
 (function() {
-	var origGetState = Ext.grid.GridPanel.prototype.getState;
+	var origGetState = Ext.grid.EditorGridPanel.prototype.getState;
 	
-	Ext.override(Ext.grid.GridPanel, {
+	Ext.override(Ext.grid.EditorGridPanel, {
 			
 			getState : function() {
-
 				var o = origGetState.call(this);
 
 				for(var i = 0, c; (c = this.colModel.config[i]); i++){
@@ -40,9 +34,6 @@ Ext.reg("gogrid", go.grid.GridPanel);
 						delete o.columns[i].width;
 					}            
 				}
-
-				console.log(o);
-
 				return o;
 			}
 	});
