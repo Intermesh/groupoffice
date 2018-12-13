@@ -235,7 +235,7 @@ class ModuleCollection extends Model\ModelCollection{
 		$stmt = $this->model->find($findParams);
 		$modules = array();
 		while($module = $stmt->fetch()){
-			if($this->_isAllowed($module->name) && $module->isAvailable())
+			if($this->_isAllowed($module->id) && $module->isAvailable())
 				$modules[]=$module;
 		}
 		
