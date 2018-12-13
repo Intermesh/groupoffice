@@ -1,3 +1,6 @@
+- Core: Use Acpu caching if available
+- Sync: Wrong hierarchy sync of folder structure in mail. Search in other folders fixed.
+
 10-12-2018 6.2.109
 - Tickets/Files: Fixed issue that files could not be accessed when user has no permissions to files module.
 - Holidays: Added an "active" checkbox to creditTypes. When not active, it is not possible anymore to request holidays for that type.
