@@ -61,7 +61,7 @@ class None implements CacheInterface {
 		return true;
 	}
 
-	public function isSupported() {
+	public static function isSupported() {
 		return true;
 	}
 

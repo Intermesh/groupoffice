@@ -148,7 +148,7 @@ class Disk implements CacheInterface {
 		}
 	}
 
-	public function isSupported() {
+	public static function isSupported() {
 		$folder = App::get()->getSettings()->getDataFolder();
 		
 		if(!$folder->isWritable()) {

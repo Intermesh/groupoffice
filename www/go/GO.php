@@ -435,13 +435,13 @@ class GO{
 	public static function cache(){
 
         if (!isset(self::$_cache)) {
-            if(GO::config()->debug || !GO::isInstalled()){
+            if(!GO::isInstalled()){
               self::$_cache=new \GO\Base\Cache\None();
 						}else{
 							if(!isset(GO::session()->values['cacheDriver'])){
 								$cachePref = array(
 //										"\\GO\\Base\\Cache\\XCache",
-//										"\\GO\\Base\\Cache\\Apc",
+										"\\GO\\Base\\Cache\\Apcu",
 										"\\GO\\Base\\Cache\\Disk"
 								);
 								foreach($cachePref as $cacheDriver){
@@ -457,6 +457,7 @@ class GO{
 							}else
 							{
 								$cacheDriver = GO::session()->values['cacheDriver'];
+								GO::debug("Using $cacheDriver cache");
 								self::$_cache = new $cacheDriver;
 							}
 						}
