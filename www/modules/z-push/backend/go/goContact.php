@@ -58,7 +58,7 @@ class goContact extends GoBaseBackendDiff {
 
 		$message = $this->convertor->GO2AS($contact, $contentParameters);
 		
-		ZLog::Write(LOGLEVEL_DEBUG, var_export($message, true));
+//		ZLog::Write(LOGLEVEL_DEBUG, var_export($message, true));
 		return $message;		
 	}
 	
@@ -78,7 +78,7 @@ class goContact extends GoBaseBackendDiff {
 	{
 		
 		ZLog::Write(LOGLEVEL_DEBUG, "ChangeMessage($folderid, $id, .., ..)");
-		//ZLog::Write(LOGLEVEL_DEBUG, var_export($message, true));
+//		ZLog::Write(LOGLEVEL_DEBUG, var_export($message, true));
 
 		$contact = empty($id) ? false : Contact::findById($id);
 

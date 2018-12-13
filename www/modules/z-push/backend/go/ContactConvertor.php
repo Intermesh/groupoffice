@@ -327,11 +327,16 @@ class ContactConvertor {
 		
 		$contact->notes = GoSyncUtils::getBodyFromMessage($message);
 		
-		
+		ZLog::Write(LOGLEVEL_DEBUG,var_export($message->picture, true) );
 		if (!empty($message->picture)) {
 			$pictureString = base64_decode($message->picture);					
 			$blob = Blob::fromString($pictureString);
+			$blob->type = 'image/jpeg';
+			$blob->name = $contact->name . '.jpg';
+			$blob->save();
 			$contact->photoBlobId = $blob->id;
+			
+			ZLog::Write(LOGLEVEL_DEBUG, "New picture set: ".$contact->photoBlobId );
 		} else {
 			$contact->photoBlobId = null;
 		}
