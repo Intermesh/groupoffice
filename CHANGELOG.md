@@ -1,4 +1,6 @@
+- Core: Update in store could make values null that were prefetched. See ticket #201817274.
 - Core: Delete search cache and links when entities are deleted.
+- Core: Run checkdatabase as admin. Fixes #266
 
 11-12-2018 6.3.58
 - Core: Fixed access denied error in upgrade.
