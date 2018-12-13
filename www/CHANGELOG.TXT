@@ -1,5 +1,6 @@
 - Core: Use Acpu caching if available
 - Sync: Wrong hierarchy sync of folder structure in mail. Search in other folders fixed.
+- Holidays: Fixed the display order of creditTypes in the year summary tab.
 
 10-12-2018 6.2.109
 - Tickets/Files: Fixed issue that files could not be accessed when user has no permissions to files module.
