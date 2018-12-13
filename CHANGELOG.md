@@ -1,3 +1,4 @@
+- Projects2/Timeregistration: Fixed issue that the invoiced check icon for time entries was not displayed anymore.
 - Core: Delete search cache and links when entities are deleted.
 
 11-12-2018 6.3.58
