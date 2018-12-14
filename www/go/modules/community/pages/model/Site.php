@@ -80,19 +80,10 @@ class Site extends AclEntity {
 						->addTable("pages_site");
 	}
 	
-	public static function filter(Query $query, array $filter) {
-		
-		if(!empty($filter['q'])) {
-			$query->andWhere(
-							(new Criteria())
-							->where('siteName', 'LIKE', $filter['q'] . '%')
-							->orWhere('slug', 'LIKE', '%'. $filter['q'] .'%')
-							->orWhere('modifiedBy', 'LIKE', $filter['q'] .'%')
-							->orWhere('createdBy', 'LIKE', $filter['q'] .'%')
-							);
-		}
-		return parent::filter($query, $filter);
+	protected static function searchColumns() {
+	    return ['siteName', 'slug'];
 	}
+	
 	public function getSiteName(){
 	    return $this->siteName;
 	}
