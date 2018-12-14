@@ -1,4 +1,4 @@
-/nbproject
+nbproject
 /*-license.txt
 .idea
 /www/vendor
@@ -67,3 +67,4 @@
 !/www/modules/webodf
 .DS_Store
 .sass-cache
+
