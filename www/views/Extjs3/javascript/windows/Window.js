@@ -82,7 +82,7 @@ GO.Window = Ext.extend(Ext.Window,{
 		GO.Window.superclass.show.call(this);
 	},
 
-	hide : function(){
+	hide : function(animateTarget, cb, scope){
 		
 		if (this.activeGhost) {
 		 this.unghost();
@@ -96,6 +96,6 @@ GO.Window = Ext.extend(Ext.Window,{
 		
 		document.activeElement.blur();
 		
-		GO.Window.superclass.hide.call(this);
+		GO.Window.superclass.hide.call(this, animateTarget, cb, scope);
 	}		
 });
