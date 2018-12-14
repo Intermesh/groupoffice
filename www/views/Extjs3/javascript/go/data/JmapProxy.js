@@ -72,7 +72,7 @@ go.data.JmapProxy = Ext.extend(Ext.data.HttpProxy, {
 			this.fireEvent('load', this, o, o.request.arg);
 		}
 		o.request.callback.call(o.request.scope, result, o.request.arg, result.success);
-
+		
 	}
 });
 

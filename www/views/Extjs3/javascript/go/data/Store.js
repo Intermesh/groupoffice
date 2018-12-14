@@ -182,7 +182,9 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		
 		record.beginEdit();
 		this.fields.each(function(field) {
-			record.set(field.name, entity[field.name]);
+			if(field.name in entity) {
+				record.set(field.name, entity[field.name]);
+			}
 		});		
 		
 		record.endEdit();
