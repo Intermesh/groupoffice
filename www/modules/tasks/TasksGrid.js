@@ -36,7 +36,9 @@ GO.tasks.TasksPanel = function(config)
 		}, this);
 
 		var fields ={
-			fields:['id', 'icon', 'name','completed','due_time','is_active', 'late', 'description', 'status', 'ctime', 'mtime', 'start_time', 'completion_time','disabled','tasklist_name','category_name','priority','project_name','percentage_complete','user_name'],
+			fields:[
+				'id', 'icon', 'name','completed','due_time','is_active', 'late', 'description', 'status', 'ctime', 'mtime', 'start_time', 'completion_time','disabled','tasklist_name','category_name','priority','project_name','percentage_complete','user_name'
+			].concat(go.modules.core.customfields.CustomFields.getFieldDefinitions("Task")),
 			columns:[this.checkColumn,{
 				id:'icon',
 				header:"&nbsp;",
@@ -97,19 +99,21 @@ GO.tasks.TasksPanel = function(config)
 			},
 			{
 				header:t("Due date", "tasks"),
-				dataIndex: 'due_time',
-				width: dp(120)
+				dataIndex: 'due_time',	
+				xtype: "datecolumn",
+				dateOnly: true
 			},{
+				xtype: "datecolumn",
+				dateOnly: true,
 				header: t("Starts at", "tasks"),
 				dataIndex: 'start_time',
 				hidden:true,
-				width: dp(120),
 				hidden:true
 			},{
+				xtype: "datecolumn",
 				header: t("Completed at", "tasks"),
 				dataIndex: 'completion_time',
 				hidden:true,
-				width: dp(120)
 			},{
 				header: t("Status"),
 				dataIndex: 'status',
@@ -135,22 +139,23 @@ GO.tasks.TasksPanel = function(config)
 				width:150,
 				sortable:false
 			},{
+				xtype: "datecolumn",
 				header: t("Created at"),
 				dataIndex: 'ctime',
 				hidden:true,
-				width: dp(140)
+				
 			},{
+				xtype: "datecolumn",
 				header: t("Modified at"),
 				dataIndex: 'mtime',
 				hidden:true,
-				width: dp(140)
 			},{
 				id:'id',
 				width:200,
 				header: 'ID',
 				dataIndex: 'id',
 				hidden: true
-			}]
+			}].concat(go.modules.core.customfields.CustomFields.getColumns("Task"))
 		};
 
 		if(go.Modules.isAvailable("legacy", "projects2")){
@@ -167,11 +172,6 @@ GO.tasks.TasksPanel = function(config)
 				hidden:true,
 				width:150
 			});
-		}
-
-		if(go.Modules.isAvailable("core", "customfields"))
-		{
-			GO.customfields.addColumns("GO\\Tasks\\Model\\Task", fields);
 		}
 
 		var reader = new Ext.data.JsonReader({

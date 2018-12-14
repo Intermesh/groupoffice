@@ -167,13 +167,13 @@ GO.files.FileBrowser = function(config){
 
 
 	var fields ={
-		fields:['type_id', 'id','name','type', 'size', 'mtime', 'extension', 'timestamp', 'thumb_url','path','acl_id','locked_user_id','locked','folder_id','permission_level','readonly','unlock_allowed','handler', 'content_expire_date'],
+		fields:['type_id', 'id','name','type', 'size', 'mtime', 'extension', 'timestamp', 'thumb_url','path','acl_id','locked_user_id','locked','folder_id','permission_level','readonly','unlock_allowed','handler', 'content_expire_date'].concat(go.modules.core.customfields.CustomFields.getFieldDefinitions("File")),
 		columns:[{
 			id:'name',
 			header:t("Name"),
 			dataIndex: 'name',
 			renderer:function(v, meta, r){
-				var cls = r.get('acl_id')>0 && r.get('readonly')==0 ? 'folder-shared' : 'filetype filetype-'+r.get('extension');
+				var cls = r.get('acl_id')>0 && r.get('readonly')==0 ? 'filetype filetype-folder-shared' : 'filetype filetype-'+r.get('extension');
 				if(r.get('locked_user_id')>0)
 					v = '<div class="fs-grid-locked">'+v+'</div>';
 
@@ -200,13 +200,9 @@ GO.files.FileBrowser = function(config){
 			header:t("Modified at"),
 			dataIndex: 'mtime',
 			width: dp(140)
-		}]
+		}].concat(go.modules.core.customfields.CustomFields.getColumns("File"))
 	};
 
-	if(go.Modules.isAvailable("core", "customfields"))
-	{
-		GO.customfields.addColumns("GO\\Files\\Model\\File", fields);
-	}
 
 	this.gridStore = new GO.data.JsonStore({
 //		url: GO.settings.modules.files.url+'json.php',
@@ -1002,13 +998,14 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 			this.upButton.setDisabled(false);
 		}
 
-		if(this.filePanel.model_id>0 && !store.getById('f:'+this.filePanel.model_id)){
-			this.filePanel.reset();
-		}
-
-		if(this.folderPanel.model_id>0 && !store.getById('d:'+this.folderPanel.model_id)){
-			this.folderPanel.reset();
-		}
+//Don't reset because direct routes won't work anymore.
+//		if(this.filePanel.model_id>0 && !store.getById('f:'+this.filePanel.model_id)){
+//			this.filePanel.reset();
+//		}
+//
+//		if(this.folderPanel.model_id>0 && !store.getById('d:'+this.folderPanel.model_id)){
+//			this.folderPanel.reset();
+//		}
 
 	},
 
@@ -1904,7 +1901,6 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 	showPropertiesDialog : function(record)
 	{
-		console.log(record);
 		if(record.data.extension=='folder')
 		{
 			GO.files.showFolderPropertiesDialog(record.data.id);
@@ -2136,11 +2132,34 @@ go.Modules.register("legacy", 'files', {
 	mainPanel: GO.files.FileBrowser,
 	title: t("Files", "files"),
 	iconCls: 'go-tab-icon-files',
-	entities: ["File", "Folder"],
-	initModule: function () {	
-		
-	}
+	entities: ["File","Folder"],
+	links: [
+		{
+			entity: "File",			
+			linkDetail: function(){
+				return new GO.files.FilePanel();
+			}
+		},
+		{
+			entity: "Folder",
+			linkDetail: function(){
+				return new GO.files.FolderPanel();
+			}
+		}
+	]
 });
 
 GO.files.pasteSelections = new Array();
 GO.files.pasteMode = 'copy';
+
+
+GO.files.launchFile = function(config) {
+	GO.request({
+		url: 'files/file/open',
+		params: config,
+		success: function(response, options, result) {
+			result.handler.call();
+		},
+		scope: this
+	})
+};

@@ -72,6 +72,8 @@ class Mailbox extends \GO\Base\Db\ActiveRecord {
         /* Next, create a string that will be passed to crypt, containing all
          * of the settings, separated by dollar signs
          */
+				
+				//$5$ will use CRYPT_SHA256
         $param='$5$rounds=5000$'.
                 $salt; //add the salt
        

@@ -15,6 +15,9 @@ require(__DIR__ . "/vendor/autoload.php");
 //Create the app with the database connection
 App::get()->setAuthState(new State());
 
+//Hard code debug to false to prevent spamming of log.
+App::get()->getDebugger()->enabled = false;
+
 header('Cache-Control: no-cache');
 header('Pragma: no-cache');
 //header('Connection: keep-alive');

@@ -49,4 +49,6 @@ return array (
   'Cache' => 'Cache',
   'Alias' => 'Alias',
   'Mailbox' => 'Mailbox',
+  'Ok' => 'OK',
+  'Use \'*\' for a catch all alias (not recommended).' => 'Verwenden Sie \'*\' für einen CatchAll (nicht empfohlen).',
 );

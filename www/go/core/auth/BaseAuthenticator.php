@@ -43,4 +43,12 @@ abstract class BaseAuthenticator {
 		
 		return true;
 	}
+	/**
+	 * Check if this authenticator is available for the user.
+	 * 
+	 * @param string $username
+	 * @param string $domain
+	 */
+	abstract public static function isAvailableFor($username);	
+		
 }

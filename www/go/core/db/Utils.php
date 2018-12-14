@@ -159,5 +159,37 @@ class Utils {
         'options' => $options
     ];
   }
+	
+	
+	public static function quoteTableName($name) {
+		//disallow \ ` and \00  : http://stackoverflow.com/questions/1542627/escaping-field-names-in-pdo-statements
+		if (preg_match("/[`\\\\\\000,]/", $name)) {
+			throw new Exception("Invalid characters found in column name: " . $name);
+		}
+
+		return '`' . str_replace('`', '``', $name) . '`';
+	}
+	
+	public static function quoteColumnName($name) {
+		return self::quoteTableName($name);
+	}
+	
+	
+	public static function isUniqueKeyException(\PDOException $e) {
+		//Unique index error = 23000
+		if ($e->getCode() != 23000) {
+			return false;
+		}
+
+		$msg = $e->getMessage();
+		App::get()->debug($msg);
+
+		if(preg_match("/key '(.*)'/", $msg, $matches)) {
+			$key = $matches[1];
+			return $key;
+		}
+
+		return false;
+	}
 
 }

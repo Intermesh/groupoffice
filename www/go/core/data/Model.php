@@ -127,6 +127,8 @@ abstract class Model implements ArrayableInterface, \JsonSerializable {
 			return $value;
 		} else if (is_scalar($value) || is_null($value)) {
 			return $value;
+		} else if ($value instanceof \StdClass) {
+			return $value;
 		} else {
 			throw new NotArrayable();
 		}

@@ -157,7 +157,7 @@ return array (
   'Week' => 'Viikko',
   'Weeks' => 'Viikkoa',
   'Month' => 'Kuukausi',
-  'months' => 
+  'full_months' => 
   array (
     1 => 'Tammikuu',
     2 => 'Helmikuu',
@@ -594,4 +594,9 @@ Salasana: %s',
     'xls' => 'Microsoft Excel tiedosto',
     'ai' => 'Adobe Illustrator tiedosto',
   ),
+	'Recurrence' => 'Toistuminen',
+	'Repeat forever' => 'toista ikuisesti',
+  'Repeat every' => 'Toista joka',
+  'Repeat until' => 'Toista kunnes',
+	'At days' => 'Päivinä'
 );

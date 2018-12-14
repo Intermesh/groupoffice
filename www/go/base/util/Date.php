@@ -85,8 +85,10 @@ class Date {
 			if(!isset(self::$holidays[$region][$year])){
 				$hstmt = \GO\Base\Model\Holiday::model()->getHolidaysInPeriod($year.'-01-01', $year.'-12-31', $region);			
 				
-				foreach($hstmt as $h){
-					self::$holidays[$region][$year][$h->date]=$h->name;
+				if($hstmt) {
+					foreach($hstmt as $h){
+						self::$holidays[$region][$year][$h->date]=$h->name;
+					}
 				}
 			}
 			
@@ -162,8 +164,13 @@ class Date {
 //		if(!isset($date_separator)){
 //			$date_separator=\GO::user() ? \GO::user()->date_separator : \GO::config()->default_date_separator;
 //		}
+		
+		$dayIndex = strpos(\GO::user()->date_format, 'd');
+		if($dayIndex === false) {
+			$dayIndex = strpos(\GO::user()->date_format, 'j');
+		}
 
-		if(\GO::user() && \GO::user()->date_format=='mdY')
+		if(\GO::user() && $dayIndex > strpos(\GO::user()->date_format, 'm'))
 			$date_string = str_replace(array('-','.'),array('/','/'),$date_string);
 		else
 			$date_string = str_replace(array('/','.'),array('-','-'),$date_string);
@@ -217,6 +224,20 @@ class Date {
 		}
 		$date_format = $with_time ? 'Y-m-d H:i' : 'Y-m-d';
 		return date($date_format, $time);
+	}
+	
+	/**
+	 * Convert user formatted date to DateTime object
+	 * 
+	 * @param string $date_string
+	 * @return \go\core\util\DateTime
+	 */
+	public static function to_datetime($date_string) {
+		try{
+			return new \go\core\util\DateTime(Date::to_input_format($date_string));
+		}catch(\Exception $e){
+			return false;
+		}
 	}
 
 	/**

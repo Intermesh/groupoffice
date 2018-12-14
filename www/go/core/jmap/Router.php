@@ -92,7 +92,7 @@ class Router implements RouterInterface {
 			if (!$entityType) {
 				throw new Exception(400, 'Bad request. Entity type "' . $parts[0] . '"  not found');
 			}
-			$controllerClass = str_replace("model", "controller", $entityType->getClassName());
+			$controllerClass = str_ireplace("model", "controller", $entityType->getClassName());
 			$controllerMethod = $parts[1];
 		} else {
 			// With namespace: community/notes/Note/query

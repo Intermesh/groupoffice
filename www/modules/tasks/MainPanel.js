@@ -478,7 +478,7 @@ Ext.extend(GO.tasks.MainPanel, Ext.Panel,{
 
 GO.tasks.showTaskDialog = function(config){
 
-	if(!GO.tasks.taskDialog)
+	//if(!GO.tasks.taskDialog)
 		GO.tasks.taskDialog = new GO.tasks.TaskDialog();
 
 	GO.tasks.taskDialog.show(config);
@@ -525,13 +525,18 @@ go.Modules.register("legacy", 'tasks', {
 	mainPanel: GO.tasks.MainPanel,
 	title: t("Tasks", "tasks"),
 	iconCls: 'go-tab-icon-tasks',
-	entities: ["Task"],
+	entities: ['Task'],
+	links: [{
+			entity: "Task",			
+			linkWindow: function() {
+				var win = new GO.tasks.TaskDialog();
+				win.win.closeAction = "close";
+				return win;
+			},
+			linkDetail: function() {
+				return new GO.tasks.TaskPanel();
+			}	
+	}],
 	userSettingsPanels: ["GO.tasks.SettingsPanel"],
-	initModule: function () {	
-		go.Links.registerLinkToWindow("Task", function(entity, entityId) {
-			var win = new GO.tasks.TaskDialog();
-			win.win.closeAction = "close";
-			return win;
-		});
-	}
+	systemSettingsPanels: ["GO.tasks.SystemSettingsPanel"]
 });

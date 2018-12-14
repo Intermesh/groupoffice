@@ -1,3 +1,5 @@
+/* global go */
+
 (function () {
 	function fallbackCopyTextToClipboard(text) {
 		var textArea = document.createElement("textarea");
@@ -18,6 +20,40 @@
 	}
 
 	go.util = {
+
+		empty: function (v) {
+
+			if (!v)
+			{
+				return true;
+			}
+			if (v == '')
+			{
+				return true;
+			}
+
+			if (v == '0')
+			{
+				return true;
+			}
+
+			if (v == 'undefined')
+			{
+				return true;
+			}
+
+			if (v == 'null')
+			{
+				return true;
+			}
+			
+			if(Ext.isArray(v) && !v.length) {
+				return true;
+			}
+			return false;
+
+		},
+
 		copyTextToClipboard: function (text) {
 			if (!navigator.clipboard) {
 				fallbackCopyTextToClipboard(text);
@@ -29,26 +65,32 @@
 				console.error('Async: Could not copy text: ', err);
 			});
 		},
-		
-		mailto : function(config) {
+
+		/**
+		 * Launch email composer
+		 * 
+		 * @param {Object} config {name: "Merijn" email: "mschering@intermesh.nl", subject: "Hello", body: "Just saying hello!"}
+		 * @return {undefined}
+		 */
+		mailto: function (config) {
 			var email = config.email;
-			
-			if(config.name) {
-				email = '"' + config.name.replace(/"/g, '\"') + '" <' + config.email + '>'; 
+
+			if (config.name) {
+				email = '"' + config.name.replace(/"/g, '\"') + '" <' + config.email + '>';
 			}
-			
+
 			document.location = "mailto:" + email;
 		},
-		
-		callto : function(config) {
+
+		callto: function (config) {
 			document.location = "tel:" + config.number;
 		},
-		
-		streetAddress : function(config) {
-			window.open("https://www.openstreetmap.org/search?query=" + encodeURIComponent(config.street + ", " +config.zipCode.replace(/ /g, '') + ", " + config.country));
+
+		streetAddress: function (config) {
+			window.open("https://www.openstreetmap.org/search?query=" + encodeURIComponent(config.street + ", " + config.zipCode.replace(/ /g, '') + ", " + config.country));
 		},
-		
-		showDate : function(date) {
+
+		showDate: function (date) {
 			console.log("No date handler");
 		},
 		
@@ -59,7 +101,7 @@
 		 * cfg.autoUpload: boolean jmap upload file on select
 		 * cfg.listeners: {
 		 *   select => (files: File[]): callback to trigger when files are selected
-		 *   upload => (response: Blob): response from server after every Upload completed (if autoUpload)
+		 *   upload => (response: {blobId: "..."}): response from server after every Upload completed (if autoUpload)
 		 *   uploadComplete => () when all uploads are complete (if autoUpload)
 		 *   scope: same as in ext
 		 * @param {object} cfg
@@ -104,10 +146,27 @@
 			}
 			
 			this.uploadDialog.click();
+		},
+		
+		textToHtml : function(text) {
+			return Ext.util.Format.nl2br(text);
+		},
+		
+		addSlashes : function( str ) {
+			return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
 		}
+		
+		
+		/*
+		 * Search through group-office. 
+		 * 
+		 * Code can be found in go/modules/core/search/views/extjs3/Module.js
+		 * @method search
+		 * @param {string} query
+		 */
 
 	};
-	
+
 
 
 })();

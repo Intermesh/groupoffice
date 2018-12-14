@@ -2,19 +2,19 @@ go.modules.community.addressbook.StarButton = Ext.extend(Ext.Button, {
 	iconCls: "ic-star-border",
 	cls: 'go-addressbook-star',
 	contactId: null,
-	
+		
 	initComponent: function() {
 		go.modules.community.addressbook.StarButton.superclass.initComponent.call(this);
 		
 		//listen for changes in store
-		go.Stores.get("ContactStar").on('changes', function(store, added, changed, destroyed) {
-			if(added.concat(changed).indexOf(this.getEntityId()) > -1) {
-				var starred = go.Stores.get("ContactStar").get([this.getEntityId()])[0].starred;
-				
-				this.setIconClass(starred ? 'ic-star' : 'ic-star-border');
+		go.Stores.get("Contact").on('changes', function(store, added, changed, destroyed) {
+			var id = this.getEntityId(), change = changed[id] || added[id];
+			
+			if(change && "starred" in change) {
+				this.setIconClass(change.starred ? 'ic-star' : 'ic-star-border');				
 			}
 			
-			if(destroyed.indexOf(this.getEntityId()) > -1) {
+			if(destroyed.indexOf(id) > -1) {
 				this.setIconClass('ic-star-border');
 			}
 		}, this);
@@ -49,8 +49,9 @@ go.modules.community.addressbook.StarButton = Ext.extend(Ext.Button, {
 	setContactId : function(id) {
 		this.contactId = id;
 		
-		var entities = go.Stores.get("ContactStar").get([this.getEntityId()])
-		var starred = entities && entities[0] && entities[0].starred;
-		this.setIconClass(starred ? 'ic-star' : 'ic-star-border');
+		go.Stores.get("Contact").get([this.getEntityId()], function(entities) {
+			var starred = entities && entities[0] && entities[0].starred;
+			this.setIconClass(starred ? 'ic-star' : 'ic-star-border');
+		}, this);
 	}
 });

@@ -93,7 +93,7 @@ class JuploadController extends \GO\Base\Controller\AbstractController {
          main-class="wjhk.jupload2.JUploadApplet"
          width="640"
          height="400">
-        <param name="postURL" value="' . \GO::url('files/jupload/handleUploads',array(). false) . '" />
+        <param name="postURL" value="' . \GO::url('files/jupload/handleUploads',array(), false) . '" />
 				
 				<param name="showLogWindow" value="false" />
 				<param name="maxChunkSize" value="1048576" />    

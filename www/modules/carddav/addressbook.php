@@ -71,7 +71,7 @@ $server->addPlugin(new Sabre\DAVACL\Plugin());
 
 //baseUri can also be /carddav/ with:
 //Alias /carddav/ /path/to/addressbook.php
-$baseUri = strpos($_SERVER['REQUEST_URI'], 'addressbook.php') ? \GO()->getSettings()->URL . 'modules/carddav/addressbook.php/' : '/carddav/';
+$baseUri = strpos($_SERVER['REQUEST_URI'], 'addressbook.php') ? \GO::config()->host . 'modules/carddav/addressbook.php/' : '/carddav/';
 $server->setBaseUri($baseUri);
 
 // Support for html frontend
@@ -80,4 +80,3 @@ $server->addPlugin($browser);
 
 // And off we go!
 $server->exec();
-?>

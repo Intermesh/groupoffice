@@ -36,6 +36,8 @@ namespace GO\Calendar\Model;
  */
 class Calendar extends \GO\Base\Model\AbstractUserDefaultModel {
 	
+	use \go\core\orm\CustomFieldsTrait;
+	
 	/**
 	 * The default color to display this calendar in the view
 	 * 

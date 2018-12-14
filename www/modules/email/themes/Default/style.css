@@ -1,5 +1,5 @@
 @media print {
- .em-autolink-message,.em-contact-link-container,.em-link-message{ display: none !important; }
+ .go-warning-msg,.message-move,.em-autolink-message,.em-contact-link-container,.em-link-message{ display: none !important; }
 }
 
 .em-autolink-message{
@@ -14,9 +14,9 @@
 	text-decoration:underline;
 }
 
-.em-link-link{
+.go-html-formatted a.em-link-link:link, .go-html-formatted a.em-link-link:visited, .go-html-formatted a.em-link-link:active{
 	cursor:pointer;
-	text-decoration:underline;
+	text-decoration:none;
 	padding-left:18px;
 	margin-left:5px;
 	background-repeat: no-repeat;

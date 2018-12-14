@@ -43,8 +43,16 @@ class ModuleCollection extends Model\ModelCollection{
 	
 	private function _isAllowed($name){
 		
-		if(!isset($this->_allowedModules))
-			$this->_allowedModules=empty(\GO::config()->allowed_modules) ? array() : explode(',', \GO::config()->allowed_modules);
+		if(!isset($this->_allowedModules)) {
+			if(!empty(\GO::config()->allowed_modules)) {
+				$this->_allowedModules = explode(',', \GO::config()->allowed_modules);		
+				$this->_allowedModules = array_merge($this->_allowedModules, ['core', 'links', 'search', 'users', 'modules', 'groups', 'customfields']);
+				
+			} else
+			{
+				$this->_allowedModules = [];
+			}
+		}
 		
 		return empty($this->_allowedModules) || in_array($name, $this->_allowedModules);			
 	}
@@ -240,6 +248,16 @@ class ModuleCollection extends Model\ModelCollection{
 	 */
 	public function getAllModules($ignoreAcl=false){
 		
+		$cacheKey = $ignoreAcl ? 'all-modules-ignore' : 'all-modules';
+		
+		if(\GO::user()) {
+			$cacheKey .= '-'. \GO::user()->id;
+		}
+		
+		if(($modules = \GO::cache()->get($cacheKey))) {
+			return $modules;
+		}
+		
 		$findParams = Db\FindParams::newInstance()->order("sort_order");
 		
 		if($ignoreAcl)
@@ -251,6 +269,8 @@ class ModuleCollection extends Model\ModelCollection{
 			if($this->_isAllowed($module->name) && $module->isAvailable())
 				$modules[]=$module;
 		}
+		
+		\GO::cache()->set($cacheKey, $modules);
 		
 		return $modules;
 	}

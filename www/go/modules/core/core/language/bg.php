@@ -171,7 +171,7 @@ return array (
   'Week' => 'Седмица',
   'Weeks' => 'Седмици',
   'Month' => 'Месец',
-  'months' => 
+  'full_months' => 
   array (
     1 => 'Януари',
     2 => 'Февруари',
@@ -906,4 +906,9 @@ If you did not request a new password please delete this mail.' => '%s,
     'sql' => 'SQL експорт на база данни',
     'xmind' => 'XMind файл',
   ),
+	'Recurrence' => 'Повторение',
+	'Repeat forever' => 'повтаряй завинаги',
+  'Repeat every' => 'Повтаряй на всеки',
+  'Repeat until' => 'Повтаряй до',
+	'At days' => 'На ден',
 );

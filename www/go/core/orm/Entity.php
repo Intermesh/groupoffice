@@ -7,16 +7,27 @@ use GO;
 use go\core\acl\model\Acl;
 use go\core\App;
 use go\core\db\Criteria;
-use go\core\db\Query;
+use go\core\orm\Query;
 use go\core\jmap\EntityController;
-use go\modules\core\modules\model\Module;
+use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
+use go\modules\core\modules\model\Module;
 
 /**
  * Entity model
  * 
- * Note: when changing database columns you need to run install/upgrade.php to 
+ * Note: when changing database columns or creating new entities you need to run install/upgrade.php to 
  * rebuild the cache.
+ * 
+ * Note: If you want to manually register an entity from a legacy module this code can be used in upgrades.php:
+ * 
+ * $updates['201805011020'][] = function() {
+ * 	$cf = new \go\core\util\ClassFinder();	
+ * 	$cf->addNamespace("go\\modules\\community\\email");			
+ * 	foreach($cf->findByParent(go\core\orm\Entity::class) as $cls) {
+ * 		$cls::getType();
+ * 	}
+ * };
  * 
  * An entity is a model that is saved to the database. An entity can have 
  * multiple database tables. It can be extended with has one related tables and
@@ -24,10 +35,26 @@ use go\core\validate\ErrorCode;
  */
 abstract class Entity extends Property {
 	
+	/**
+	 * Fires just before the entity will be saved
+	 * 
+	 * @param Entity $entity The entity that will be saved
+	 */
 	const EVENT_BEFORESAVE = 'beforesave';
 	
+	/**
+	 * Fires after the entity has been saved
+	 * 
+	 * @param Entity $entity The entity that has been saved
+	 */
 	const EVENT_SAVE = 'save';
 	
+	
+	/**
+	 * Fires after the entity has been deleted
+	 * 
+	 * @param Entity $entity The entity that has been deleted
+	 */
 	const EVENT_DELETE = 'delete';
 
 	/**
@@ -75,14 +102,6 @@ abstract class Entity extends Property {
 		$keys = $this->primaryKeyValues();
 		return count($keys) > 1 ? implode("-", array_values($keys)) : array_values($keys)[0];
 	}
-	
-	
-	public function toArray($properties = array()) {
-		$arr = parent::toArray($properties);
-		$arr['id'] = $this->getId();
-		return $arr;
-	}
-
 
 	/**
 	 * Find by ID's. 
@@ -250,16 +269,24 @@ abstract class Entity extends Property {
 			$this->rollback();
 			return false;
 		}
+		
+		//See \go\core\orm\SearchableTrait;
+		if(method_exists($this, 'deleteSearchAndLinks')) {
+			if(!$this->deleteSearchAndLinks()) {				
+				$this->setValidationError("search", ErrorCode::INVALID_INPUT, "Could not delete core_search entry");		
+				$this->rollback();
+				return false;
+			}
+		}	
 
 		if (!$this->fireEvent(self::EVENT_DELETE, $this)) {
 			$this->rollback();
 			return false;
 		}
 
-		return $this->commit();
-		
+		return $this->commit();		
 	}
-
+	
 	protected function commit() {
 		parent::commit();
 
@@ -305,9 +332,10 @@ abstract class Entity extends Property {
 	 * 
 	 * @param Query $query
 	 * @param int $level
+	 * @param int $userId Leave to null for the current user
 	 * @return Query $query;
 	 */
-	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ) {
+	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null) {
 		
 		return $query;
 	}
@@ -366,18 +394,118 @@ abstract class Entity extends Property {
   public static function getClientName() {
 		$cls = static::class;
     return substr($cls, strrpos($cls, '\\') + 1);
-  }
+  }		
 	
-	
+	/**
+	 * Defines JMAP filters
+	 * 
+	 * @example
+	 * ```
+	 * protected static function defineFilters() {
+	 * 
+	 * 		return parent::defineFilters()
+	 * 										->add("addressBookId", function(Query $query, $value, array $filter) {
+	 * 											$query->andWhere('addressBookId', '=', $value);
+	 * 										})
+	 * 										->add("groupId", function(Query $query, $value, array $filter) {
+	 * 											$query->join('addressbook_contact_group', 'g', 'g.contactId = c.id')
+	 * 											   ->andWhere('g.groupId', '=', $value);
+	 * 										});
+	 * }
+	 * ```
+	 * 
+	 * @link https://jmap.io/spec-core.html#/query
+	 * 
+	 * @return Filters
+	 */
+	protected static function defineFilters() {
+		$filters = new Filters();
+
+		return $filters->add('q', function(Query $query, $value, $filter) {
+							if (!empty($value)) {
+								static::search($query, $value);
+							}
+						})->add('exclude', function(Query $query, $value, $filter) {
+							if (!empty($value)) {
+								$query->andWhere('id', 'NOT IN', $value);
+							}
+						});
+	}
+
 	/**
 	 * Filter entities See JMAP spec for details on the $filter array.
 	 * 
-	 * @link https://jmap.io/spec-core.html#/query
+	 * By default these filters are implemented:
+	 * 
+	 * q: Will search on multiple fields defined in {@see searchColumns()}
+	 * exclude: Exclude this array of id's
+	 * 
+	 * @link https://jmap.io/spec-core.html#/query	 
 	 * @param Query $query
 	 * @param array $filter key value array eg. ["q" => "foo"]
 	 * @return Query
 	 */
+
 	public static function filter(Query $query, array $filter) {		
+		static::defineFilters()->apply($query, $filter);	
+		return $query;
+	}
+	
+	/**
+	 * Return columns to search on with the "q" filter. {@see filter()}
+	 * 
+	 * @return string[]
+	 */
+	protected static function searchColumns() {
+		return [];
+	}
+	
+	/**
+	 * Applies a search expression to the given database query
+	 * 
+	 * @param Query $query
+	 * @param string $expression
+	 * @return Query
+	 */
+	protected static function search(Query $query, $expression) {
+		
+		$columns = static::searchColumns();
+		
+		//Explode string into tokens and wrap in wildcard signs to search within the texts.
+		$tokens = StringUtil::explodeSearchExpression($expression);
+		
+		if(!empty($columns)) {
+			
+			$tokensWithWildcard = array_map(
+											function($t){
+												return '%' . $t . '%';
+											}, 
+											$tokens
+											);
+
+			$searchConditions = (new Criteria());
+
+			foreach($columns as $column) {
+				$columnConditions = (new Criteria());
+				foreach($tokensWithWildcard as $token) {
+					$columnConditions->andWhere($column, 'LIKE', $token);
+				}
+				$searchConditions->orWhere($columnConditions);
+			}		
+		}
+		
+		//Search on the "id" field if the search phrase is an int.
+		if(static::getMapping()->getColumn('id')){
+			foreach($tokens as $token) {
+				$int = (int) $token;
+				if((string) $int === $token) {
+					$searchConditions->orWhere('id', '=', $int);
+				}
+			}
+		}
+
+		$query->andWhere($searchConditions);
+
 		return $query;
 	}
 	
@@ -415,6 +543,15 @@ abstract class Entity extends Property {
 //							, true
 //		);
 		
+		
+		//Enable sorting on customfields with ['customFields.fieldName' => 'DESC']
+		foreach($sort as $field => $dir) {
+			if(substr($field, 0, 13) == "customFields.") {
+				$query->join(static::customFieldsTableName(), 'customFields', 'customFields.id = '.$query->getTableAlias().'.id', 'LEFT');
+				break;
+			}
+		}
+		
 		$query->orderBy($sort, true);
 		
 		return $query;
@@ -429,4 +566,12 @@ abstract class Entity extends Property {
 		return null;
 	}
 	
+	/**
+	 * Copy the entity
+	 *
+	 * @return static
+	 */	
+	public function copy() {
+		return $this->internalCopy();
+	}
 }

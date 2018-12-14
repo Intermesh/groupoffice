@@ -1,3 +1,5 @@
+/* global go, Ext */
+
 /**
  * Copyright Intermesh
  *
@@ -36,24 +38,17 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 		go.panels.DetailView.superclass.initComponent.call(this, arguments);		
 		
 		this.cls += " go-detail-view-" + this.entityStore.entity.name.toLowerCase();
-
-		this.entityStore.on('changes', this.onChanges, this);
 		
-		this.on('destroy', function() {
-			this.entityStore.un('changes', this.onChanges, this);
-		}, this);
-		
-		this.on('render', function() {
-			this.reset();
+		this.on('afterrender', function() {
+			this.reset();			
 		}, this);
 	},
 	
-	onChanges : function(entityStore, added, changed, destroyed) {
-		if (changed.concat(added).indexOf(this.currentId) > -1) {
-			var entities = this.entityStore.get([this.currentId]);
-			if(entities) {
-				this.internalLoad(entities[0]);
-			}
+	onChanges : function(entityStore, added, changed, destroyed) {		
+		var entity = added[this.currentId] || changed[this.currentId] || false;
+			
+		if(entity) {
+			this.internalLoad(entity);
 		}
 
 		if (destroyed.indexOf(this.currentId) > -1) {
@@ -116,12 +111,11 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 
 	load: function (id) {
 		this.currentId = id;
-		var entities = this.entityStore.get([id]);
-		if(entities) {
+		this.entityStore.get([id], function(entities) {
 			this.internalLoad(entities[0]);
-		}
+		}, this);
 	}
 });
 
-
+Ext.reg("detailview", go.panels.DetailView);
 Ext.reg("detailview", go.panels.DetailView);

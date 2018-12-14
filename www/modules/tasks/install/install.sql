@@ -2,10 +2,10 @@
 -- Tabelstructuur voor tabel `cf_ta_tasks`
 --
 
-DROP TABLE IF EXISTS `cf_ta_tasks`;
-CREATE TABLE IF NOT EXISTS `cf_ta_tasks` (
-  `model_id` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`model_id`)
+DROP TABLE IF EXISTS `ta_tasks_custom_fields`;
+CREATE TABLE IF NOT EXISTS `ta_tasks_custom_fields` (
+  `id` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -138,3 +138,6 @@ CREATE TABLE IF NOT EXISTS `su_visible_lists` (
   `tasklist_id` int(11) NOT NULL,
   PRIMARY KEY  (`user_id`,`tasklist_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+ALTER TABLE `ta_tasks_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `ta_tasks`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;

@@ -44,31 +44,41 @@ abstract class Settings extends data\Model {
 			return;
 		}
 		
+		$props = array_keys($this->getSettingProperties());
+		if(!empty($props)) {
 			$stmt = (new Query)
 							->select('name, value')
 							->from('core_setting')
-							->where(['moduleId' => $this->getModuleId()])
+							->where([
+									'moduleId' => $this->getModuleId(), 
+									'name' => $props
+									])
 							->execute();
 			
 			while($record = $stmt->fetch()) {
 				$this->{$record['name']} = $record['value'];
 			}
-			
-			$this->oldData = (array) $this;
+		}
+		
+		$this->oldData = (array) $this;
 	}
 	
 //	public function __destruct() {
 //		$this->save();
 //	}
 	
+	private function getSettingProperties() {
+		$props =  array_filter(get_object_vars($this), function($key) {
+			return $key !== 'oldData';
+		}, ARRAY_FILTER_USE_KEY);		
+		
+		return $props;
+	}
+	
 	public function save() {
 		$new = (array) $this;
 		
-		foreach(get_object_vars($this) as $name => $value) {
-			
-			if($name == 'oldData') {
-				continue;
-			}
+		foreach($this->getSettingProperties() as $name => $value) {
 			
 			if(!array_key_exists($name, $this->oldData) || $value != $this->oldData[$name]) {
 				$this->update($name, $value);

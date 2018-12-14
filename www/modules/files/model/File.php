@@ -50,6 +50,7 @@ use GO;
  */
 class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttachableInterface {
 
+	use \go\core\orm\CustomFieldsTrait;
 
 	public static $deleteInDatabaseOnly=false;
 
@@ -243,13 +244,15 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 	public static function checkQuota($newBytes) {
 		$enoughQuota = true;
 		$userQuota = \GO::user()->getDiskQuota();
+		
 		if ($userQuota) {
 			$enoughQuota = \GO::user()->disk_usage + $newBytes <= $userQuota;
 		}
 		if ($enoughQuota && \GO::config()->quota > 0) {
 			$currentQuota = \GO::config()->get_setting('file_storage_usage');
-			$enoughQuota = $currentQuota + $newBytes <= \GO::config()->quota;
+			$enoughQuota = $currentQuota + $newBytes <= (\GO::config()->quota * 1024);
 		}
+		
 		return $enoughQuota;
 	}
 
@@ -544,6 +547,11 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 		$log = parent::log($action, false, $modifiedCustomfieldAttrs);
 		if(empty($log))
 			return false;
+		
+		if($log === true) {
+			return true;
+		}
+		
 		if($log->action=='update') {
 			$log->action = 'propedit';
 			if($log->object->isModified('folder_id'))
@@ -553,7 +561,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 				$log->message = $log->object->getOldAttributeValue('name') . ' > ' . $log->message;
 			}
 		}
-		return $log->save();
+		return $save ? $log->save() : $log;
 	}
 
 	/**
@@ -729,7 +737,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 
 
 	public function findRecent($start=false,$limit=false){
-		$storeParams = \GO\Base\Db\FindParams::newInstance();
+		$storeParams = \GO\Base\Db\FindParams::newInstance()->ignoreAcl();
 
 		$joinSearchCacheCriteria = \GO\Base\Db\FindCriteria::newInstance()
 					->addRawCondition('`t`.`id`', '`sc`.`entityId`')

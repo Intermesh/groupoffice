@@ -77,7 +77,7 @@ class Artist extends Entity {
 	 * @param array $filter key value array eg. ["q" => "foo"]
 	 * @return Query
 	 */
-	public static function filter(\go\core\db\Query $query, array $filter) {
+	public static function filter(\go\core\orm\Query $query, array $filter) {
 		
 		//Handle quick search filter parameter
 		if(isset($filter['q'])) {
@@ -94,6 +94,17 @@ class Artist extends Entity {
 		
 		//Always return parent filter function because it may implement core filters.
 		return parent::filter($query, $filter);
+	}
+	
+	protected static function defineFilters() {
+		return parent::defineFilters()
+						->add('genres', function (Query $query, $value, array $filter) {
+							if(!empty($value)) {
+								$query->join('music_album', 'a', 'a.artistId = t.id')
+									->groupBy(['t.id']) // group the results by id to filter out duplicates because of the join
+									->where(['a.genreId' => $value]);	
+							}
+						});
 	}
 
 }

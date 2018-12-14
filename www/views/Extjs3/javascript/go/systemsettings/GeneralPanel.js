@@ -16,23 +16,36 @@ go.systemsettings.GeneralPanel = Ext.extend(Ext.form.FormPanel, {
 							fieldLabel: t('Title'),
 							hint: t("Used as page title and sender name for notifications")
 						},
-						this.languageCombo = new Ext.form.ComboBox({
-							fieldLabel: t('Language'),
-							name: 'language',
-							store: new Ext.data.SimpleStore({
-								fields: ['id', 'language'],
-								data: GO.Languages
-							}),
-							displayField: 'language',
-							valueField: 'id',
-							hiddenName: 'language',
-							mode: 'local',
-							triggerAction: 'all',
-							editable: false,
-							selectOnFocus: true,
-							forceSelection: true,
-							hint: t("The language is automatically detected from the browser. If the language is not available then this language will be used.")
-						}), {
+						{
+							xtype: "compositefield",
+							items: [
+								this.languageCombo = new Ext.form.ComboBox({
+									flex: 1,
+									fieldLabel: t('Language'),
+									name: 'language',
+									store: new Ext.data.SimpleStore({
+										fields: ['id', 'language'],
+										data: GO.Languages
+									}),
+									displayField: 'language',
+									valueField: 'id',
+									hiddenName: 'language',
+									mode: 'local',
+									triggerAction: 'all',
+									editable: false,
+									selectOnFocus: true,
+									forceSelection: true,
+									hint: t("The language is automatically detected from the browser. If the language is not available then this language will be used.")
+								})
+								,{
+									xtype: "button",
+									iconCls: "ic-cloud-download",
+									tooltip: t("Download spreadsheet to translate"),
+									scope: this,
+									handler: this.onExportLanguage
+								}
+							]
+						}, {
 							xtype: 'textfield',
 							name: 'URL',
 							fieldLabel: t('URL'),
@@ -71,6 +84,24 @@ go.systemsettings.GeneralPanel = Ext.extend(Ext.form.FormPanel, {
 				scope: this
 			});
 		}, this);
+	},
+
+	onExportLanguage: function () {
+		this.getEl().mask(t("Exporting..."));
+		//var win = window.open("about:blank");
+		go.Jmap.request({
+			method: "community/dev/Language/export",
+			params: {
+				language: this.languageCombo.getValue()
+			},
+			callback: function (options, success, response) {
+				this.getEl().unmask();
+				if(success) {
+					document.location = go.Jmap.downloadUrl(response.blobId);
+				}
+			},
+			scope: this
+		});
 	},
 
 	onSubmit: function (cb, scope) {

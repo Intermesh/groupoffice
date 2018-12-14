@@ -1,6 +1,6 @@
 <?php
 return array (
-	'Groups' => 'Groepen',
+  'Groups' => 'Groepen',
   'You can\'t delete the group Admins' => 'U kunt de groep Admins niet verwijderen',
   'You can\'t delete the group Everyone' => 'U kunt de groep Iedereen niet verwijderen',
   'The group you are trying to create already exists' => 'De groep die u probeert te maken bestaat al',
@@ -18,4 +18,5 @@ return array (
   'Use' => 'Gebruiken',
   'name' => 'Groepen',
   'description' => 'Admin module; Beheren van gebruikersgroepen.',
+	"Members of the groups below can access a new group when it is created. These groups can share items with users and user groups that they are not members of." => "Leden van onderstaande groepen krijgen toegang wanneer er een nieuwe groep wordt aangemaakt. Deze groepen kunnen items delen met gebruikers en gebruikersgroepen waar zij geen lid van zijn. "
 );

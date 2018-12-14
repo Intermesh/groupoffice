@@ -25,7 +25,7 @@ go.data.GroupingStore = Ext.extend(Ext.data.GroupingStore, {
 				sort: 'sort', // The parameter name which specifies the column to sort on
 				dir: 'dir'       // The parameter name which specifies the sort direction
 			},
-			proxy: new go.data.JmapProxy(config),
+			proxy: new go.data.EntityStoreProxy(config),
 			reader: new Ext.data.JsonReader(config)
 		}));
 		
@@ -33,6 +33,7 @@ go.data.GroupingStore = Ext.extend(Ext.data.GroupingStore, {
 		
 	},
 	setup : go.data.Store.prototype.setup,	
+	initEntityStore : go.data.Store.prototype.initEntityStore,	
 	onChanges : go.data.Store.prototype.onChanges,	
 	updateRecord : go.data.Store.prototype.updateRecord,
 	destroy : go.data.Store.prototype.destroy

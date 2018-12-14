@@ -72,21 +72,11 @@ GO.email.LinkedMessagePanel = Ext.extend(GO.email.MessagePanel,{
 //					},
 //					scope: this
 //				},
-				this.linkButton = new Ext.Button({
-					iconCls: 'btn-link',
-					text: t("Link"),
-					hidden:true,
-					handler: function(){
-						if(!this.linksDialog)
-						{
-							this.linksDialog = new GO.dialog.LinksDialog();							
-						}
-
-						this.linksDialog.setSingleLink(this.data.id, "GO\\Savemailas\\Model\\LinkedEmail");
-						this.linksDialog.show();
-								},
-					scope: this
-				})];
+				this.addButton = this.newMenuButton = new go.detail.addButton({			
+					detailView: this,
+					noFiles: true
+				})
+		];
 
 		GO.email.LinkedMessagePanel.superclass.initComponent.call(this);
 	},
@@ -99,6 +89,7 @@ GO.email.LinkedMessagePanel = Ext.extend(GO.email.MessagePanel,{
 	reload : function (){
 		this.load(this.lastId, this.lastConfig);	
 	},
+	entity: "LinkedEmail",
 	load : function(id, config){
 
 	 config = config || {};
@@ -109,7 +100,7 @@ GO.email.LinkedMessagePanel = Ext.extend(GO.email.MessagePanel,{
 		if(!this.remoteMessage)
 			this.remoteMessage={};
 
-		this.messageId=id;		
+		this.messageId=this.currentId=id;		
 		this.remoteMessage.id=this.messageId;
 
 		this.loadUrl = '';
@@ -145,9 +136,9 @@ GO.email.LinkedMessagePanel = Ext.extend(GO.email.MessagePanel,{
 				
 				
 				if(this.data.is_linked_message)
-					this.linkButton.show();
+					this.addButton.show();
 				else
-					this.linkButton.hide();
+					this.addButton.hide();
 			}
 		});
 	},

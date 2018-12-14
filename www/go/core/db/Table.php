@@ -34,11 +34,15 @@ class Table {
 	}
 	
 	public static function destroyInstances() {
+		foreach(self::$cache as $i) {
+			$i->clearCache();
+		}
 		self::$cache = [];
 	}
 	
 	private $name;
 	protected $columns;	
+	private $pk = [];
 	
 	public function __construct($name) {
 		$this->name = $name;
@@ -63,6 +67,10 @@ class Table {
 	 */
 	public function clearCache() {
 		App::get()->getCache()->delete($this->getCacheKey());
+		$this->columns = null;
+		$this->pk = [];
+		
+		$this->init();
 	}
 
 	private function init() {
@@ -113,7 +121,7 @@ class Table {
 		}
 	}
 	
-	private $pk = [];
+	
 
 	private function createColumn($field) {
 		
@@ -137,7 +145,7 @@ class Table {
 			$c->dbType = strtolower($matches[1]);
 		} else {
 			$c->dbType = strtolower($field['Type']);
-			$c->length = 0;
+			$c->length = null;
 		}
 		
 		if($c->default == 'CURRENT_TIMESTAMP') {
@@ -179,6 +187,13 @@ class Table {
 			case 'binary':
 				$c->pdoType = PDO::PARAM_LOB;
 				break;
+			
+			case 'text':
+			case 'longtext':
+			case 'mediumtext':
+			case 'tinytext':
+				break;
+			
 			default:				
 				$c->trimInput = true;
 				break;			
@@ -275,7 +290,7 @@ class Table {
 	 */
 	public function getColumns() {
 		return $this->columns;
-	}
+	}	
 	
 	/**
 	 * Get the auto incrementing column
@@ -306,10 +321,10 @@ class Table {
 	/**
 	 * Truncate the table
 	 * 
-	 * @return bool
+	 * @return boolean
 	 */
 	public function truncate() {
-		return GO()->getDbConnection()->query("TRUNCATE TABLE `" . $this->name . "`");
+		return GO()->getDbConnection()->query("TRUNCATE TABLE ".$this->getName())->execute();
 	}
 
 }

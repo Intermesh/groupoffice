@@ -34,6 +34,15 @@ trait SearchableTrait {
 		return null;
 	}
 	
+	/**
+	 * You can return an optional search filter here.
+	 * 
+	 * @return string
+	 */
+	protected function getSearchFilter() {
+		return null;
+	}
+	
 	public function saveSearch($checkExisting = true) {
 		$search = $checkExisting ? \go\modules\core\search\model\Search::find()->where('entityTypeId','=', static::getType()->getId())->andWhere('entityId', '=', $this->id)->single() : false;
 		if(!$search) {
@@ -44,7 +53,9 @@ trait SearchableTrait {
 		$search->setAclId($this->findAclId());
 		$search->name = $this->getSearchName();
 		$search->description = $this->getSearchDescription();
+		$search->filter = $this->getSearchFilter();
 		$search->modifiedAt = $this->modifiedAt;
+		
 //		$search->createdAt = $this->createdAt;
 		
 		$keywords = $this->getSearchKeywords();
@@ -54,21 +65,61 @@ trait SearchableTrait {
 		$search->setKeywords($keywords);
 		
 		if(!$search->internalSave()) {
-			throw new \Exception("Could not save search cache!");
+			throw new \Exception("Could not save search cache: " . var_export($search->getValidationErrors(), true));
+		}
+		
+		return true;
+	}
+	
+	public function deleteSearchAndLinks() {
+		if(!\GO()->getDbConnection()
+						->delete('core_search', 
+										['entityTypeId' => static::getType()->getId(), 'entityId' => $this->id]
+										)->execute()) {
+			return false;
+		}
+		
+		if(!\GO()->getDbConnection()
+						->delete('core_link', 
+										['fromEntityTypeId' => static::getType()->getId(), 'fromId' => $this->id]
+										)->execute()) {
+			return false;
+		}
+		
+		if(!\GO()->getDbConnection()
+						->delete('core_link', 
+										['toEntityTypeId' => static::getType()->getId(), 'toId' => $this->id]
+										)->execute()) {
+			return false;
 		}
 		
 		return true;
 	}
 	
 	
-	public static function rebuildSearch() {
-		$classFinder = new \go\core\util\ClassFinder();
-		$entities = $classFinder->findByTrait(SearchableTrait::class);
+	/**
+	 * 
+	 * @param string $cls
+	 * @return \go\core\db\Statement
+	 */
+	private static function queryMissingSearchCache($cls) {
+		$query = $cls::find();
+		/* @var $query \go\core\db\Query */
+		$query->join("core_search", "search", "search.entityId = ".$query->getTableAlias() . ".id AND search.entityTypeId = " . $cls::getType()->getId(), "LEFT");
+		$query->andWhere('search.id IS NULL');
+		return $query->execute();
+	}
+	
+	private static function rebuildSearchForEntity($cls) {
+		echo $cls."\n";
 		
-		foreach($entities as $cls) {
-			echo $cls."\n";
-			$stmt = $cls::find();
-			foreach($stmt as $e) {				
+
+		//In small batches to keep memory low
+		$stmt = self::queryMissingSearchCache($cls);			
+
+		while($stmt->rowCount()) {
+
+			foreach($stmt as $e) {		
 				try {
 					$e->saveSearch(false);
 					echo ".";
@@ -77,7 +128,17 @@ trait SearchableTrait {
 					echo "E";
 				}
 			}
-			
+
+			$stmt = self::queryMissingSearchCache($cls);
+		}
+	}
+	
+	public static function rebuildSearch() {
+		$classFinder = new \go\core\util\ClassFinder();
+		$entities = $classFinder->findByTrait(SearchableTrait::class);
+		
+		foreach($entities as $cls) {
+			self::rebuildSearchForEntity($cls);			
 			echo "\nDone\n\n";
 		}
 	}

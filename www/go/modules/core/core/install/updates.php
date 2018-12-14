@@ -92,7 +92,7 @@ $updates["201804042007"][] = "delete  FROM `core_search` WHERE entityTypeId not 
 $updates["201804042007"][] = "ALTER TABLE `core_search` ADD FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
 
 $updates["201804062007"][] = "ALTER TABLE `core_entity`  ADD `clientName` VARCHAR(190) NULL DEFAULT NULL;";
-$updates["201804062007"][] = "update `core_entity` set clientName = name;";
+$updates["201804062007"][] = "update `core_entity` set clientName = name WHERE clientName is null";
 $updates["201804062007"][] = "ALTER TABLE `core_entity` ADD UNIQUE(`clientName`);";
 
 $updates["201804062008"][] = "CREATE TABLE `core_blob` (
@@ -205,16 +205,70 @@ $updates['201807271339'][] = "ALTER TABLE `core_change`
 $updates['201807271339'][] = "ALTER TABLE `core_change`
   ADD CONSTRAINT `core_change_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_change_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE;";
+$updates["201810071410"][]="DROP TABLE IF EXISTS `go_mail_counter`;";
+
+$updates["201810091544"][]="update core_user set theme='Paper' where theme='Group-Office' or theme='Default' or theme = 'ExtJS'";
+
+$updates["201810111129"][]="DELETE FROM `core_setting` WHERE `name` = 'defaultGroups'";
+
+$updates["201810111129"][]="CREATE TABLE IF NOT EXISTS `core_user_default_group` (
+  `groupId` int(11) NOT NULL,
+  PRIMARY KEY (`groupId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+
+$updates["201810111129"][]="ALTER TABLE `core_user_default_group`
+  ADD CONSTRAINT `core_user_default_group_ibfk_1` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;";
+
+$updates["201810111129"][]="CREATE TABLE IF NOT EXISTS `core_group_default_group` (
+  `groupId` int(11) NOT NULL,
+  PRIMARY KEY (`groupId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+
+$updates["201810111129"][]="ALTER TABLE `core_group_default_group`
+  ADD CONSTRAINT `core_group_default_group_ibfk_1` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;";
+
+$updates["201810111129"][] = "INSERT INTO `core_group_default_group` (`groupId`) VALUES (2);";
+
+$updates["201810111129"][] = "ALTER TABLE `core_user` ADD `shortDateInList` BOOLEAN NOT NULL DEFAULT TRUE AFTER `dateFormat`;";
+$updates["201810251129"][] = "TRUNCATE TABLE go_state"; //for fixed date columns
+
+$updates["201811020837"][] = "ALTER TABLE `core_user` CHANGE `firstWeekday` `firstWeekday` TINYINT(4) NOT NULL DEFAULT '1';";
+
+
+$updates['201811020837'][] = "";
+
+$updates['201811020837'][] = function() {
+	foreach(GO\Customfields\Model\Field::model()->find(GO\Base\Db\FindParams::newInstance()->ignoreAcl()) as $field) {
+		if(preg_match("/[^a-z0-9A-Z_]+/", $field->databaseName)) {
+				
+			$field->databaseName = $stripped = preg_replace('/[^a-z0-9A-Z_]+/', '_', $field->databaseName);
+			$i = 1;
+			$tableName = $field->category->customfieldsTableName();
+			while(\go\core\db\Table::getInstance($tableName)->hasColumn($field->databaseName)) {
+				$field->databaseName = $stripped .'_' .$i++;
+			}
+			if(!$field->save(true)) {
+				echo "Save of field ". $field->name . " failed: ". var_export($field->getValidationErrors(), true) ."\n";
+				throw new \Exception("Failed to save custom field.");
+			}
+		}
+	}
+};
+
+
+//Master
 
 
 
-$updates['201807271339'][] = "update `core_entity` set highestModSeq=0 where highestModSeq is null;";
-$updates['201807271339'][] = "ALTER TABLE `core_entity` CHANGE `highestModSeq` `highestModSeq` INT(11) NOT NULL DEFAULT '0';";
+$updates['201811270837'][] = "update `core_entity` set highestModSeq=0 where highestModSeq is null;";
+$updates['201811270837'][] = "ALTER TABLE `core_entity` CHANGE `highestModSeq` `highestModSeq` INT(11) NOT NULL DEFAULT '0';";
 
-$updates['201807271339'][] = "truncate table core_change;";
+$updates['201811270837'][] = "truncate table core_change;";
 
-$updates['201807271339'][] = "DROP TABLE IF EXISTS `core_acl_group_changes`;";
-$updates['201807271339'][] = "CREATE TABLE IF NOT EXISTS `core_acl_group_changes` (
+$updates['201811270837'][] = "DROP TABLE IF EXISTS `core_acl_group_changes`;";
+$updates['201811270837'][] = "CREATE TABLE IF NOT EXISTS `core_acl_group_changes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `aclId` int(11) NOT NULL,
   `groupId` int(11) NOT NULL,
@@ -226,22 +280,104 @@ $updates['201807271339'][] = "CREATE TABLE IF NOT EXISTS `core_acl_group_changes
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
 
-$updates['201807271339'][] = "ALTER TABLE `core_acl_group_changes`
+$updates['201811270837'][] = "ALTER TABLE `core_acl_group_changes`
   ADD CONSTRAINT `all` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `group` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;";
 
-$updates['201807271339'][] = "insert into core_acl_group_changes select null, aclId, groupId, COALESCE((select highestModSeq from core_entity where name='Acl'), 0), null from core_acl_group;";
+$updates['201811270837'][] = "insert into core_acl_group_changes select null, aclId, groupId, COALESCE((select highestModSeq from core_entity where name='Acl'), 0), null from core_acl_group;";
 
-$updates['201807271339'][] = "ALTER TABLE `core_change`
+$updates['201811270837'][] = "ALTER TABLE `core_change`
 ADD COLUMN `id` INT NOT NULL AUTO_INCREMENT FIRST,
 DROP PRIMARY KEY,
 ADD PRIMARY KEY (`id`);";
 
 
-$updates['201808241650'][] = "ALTER TABLE `core_blob` ADD `modifiedAt` DATETIME NULL DEFAULT NULL AFTER `createdAt`, ADD `staleAt` DATETIME NULL DEFAULT NULL AFTER `modifiedAt`;";
-$updates['201808241650'][] = "ALTER TABLE `core_blob` ADD INDEX(`staleAt`);
+$updates['201811270837'][] = "ALTER TABLE `core_blob` ADD `modifiedAt` DATETIME NULL DEFAULT NULL AFTER `createdAt`, ADD `staleAt` DATETIME NULL DEFAULT NULL AFTER `modifiedAt`;";
+$updates['201811270837'][] = "ALTER TABLE `core_blob` ADD INDEX(`staleAt`);
 UPDATE `core_blob` set modifiedAt = from_unixtime(modified)";
-$updates['201808241650'][] = "ALTER TABLE `core_blob` DROP `modified`";
+$updates['201811270837'][] = "ALTER TABLE `core_blob` DROP `modified`";
+
+$updates['201811270837'][] = "insert into core_cron_job (moduleId,name, expression, description) values ((select id from core_module where name='core'), 'GarbageCollection', '0 * * * *', 'Garbage collection')";
 
 
-$updates['201808241650'][] = "insert into core_cron_job (moduleId,name, expression, description) values ((select id from core_module where name='core'), 'GarbageCollection', '0 * * * *', 'Garbage collection')";
+
+
+
+
+
+//Address book
+
+$updates['201811270837'][] = "ALTER TABLE `core_customfields_field_set` ADD `filter` TEXT NULL DEFAULT NULL;";
+
+//TODO update install.sql from here
+
+$updates['201811270837'][] = "ALTER TABLE `core_customfields_field` CHANGE `datatype` `type` VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Text';";
+$updates['201811270837'][] = "ALTER TABLE `core_customfields_field` CHANGE `helptext` `hint` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;";
+
+
+$updates['201811270837'][] = "RENAME TABLE `cf_select_options` TO `core_customfields_select_option`;";
+
+$updates['201811270837'][] = "ALTER TABLE `core_customfields_select_option` CHANGE `field_id` `fieldId` INT(11) NOT NULL;";
+$updates['201811270837'][] = "ALTER TABLE `core_customfields_select_option` CHANGE `sort_order` `sortOrder` INT(11) NOT NULL;";
+$updates['201811270837'][] = "ALTER TABLE `core_customfields_select_option` ADD FOREIGN KEY (`fieldId`) REFERENCES `core_customfields_field`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+$updates['201811270837'][] = "ALTER TABLE `core_customfields_select_option` ADD FOREIGN KEY (`fieldId`) REFERENCES `core_customfields_field`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+
+$updates['201811270837'][] = "ALTER TABLE `core_customfields_field_set` ADD `description` TEXT NULL AFTER `name`;";
+$updates['201811270837'][] = "ALTER TABLE `core_customfields_select_option` ADD `parentId` INT NULL DEFAULT NULL AFTER `fieldId`, ADD INDEX (`parentId`);";
+$updates['201811270837'][] = "ALTER TABLE `core_customfields_select_option` ADD FOREIGN KEY (`parentId`) REFERENCES `core_customfields_select_option`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+
+$updates['201811270837'][] = "CREATE TABLE IF NOT EXISTS `core_change_user` (
+  `userId` int(11) NOT NULL,
+  `entityId` varchar(21) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `entityTypeId` int(11) NOT NULL,
+  `modSeq` int(11) NOT NULL,
+  PRIMARY KEY (`userId`,`entityId`,`entityTypeId`),
+  KEY `entityTypeId` (`entityTypeId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT";
+
+
+$updates['201811270837'][] = "ALTER TABLE `core_change_user`
+  ADD CONSTRAINT `core_change_user_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `core_change_user_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;";
+
+$updates['201811270837'][] = "ALTER TABLE `core_search` ADD `filter` VARCHAR(50) NULL DEFAULT NULL AFTER `keywords`;";
+$updates['201811270837'][] = "ALTER TABLE `core_search` ADD INDEX(`filter`);";
+
+
+$updates['201811270837'][] = "CREATE TABLE IF NOT EXISTS `core_change_user_modseq` (
+  `userId` int(11) NOT NULL,
+  `entityTypeId` int(11) NOT NULL,
+  `highestModSeq` int(11) NOT NULL DEFAULT 0,
+  `lowestModSeq` int(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`userId`,`entityTypeId`),
+  KEY `entityTypeId` (`entityTypeId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;";
+
+
+$updates['201811270837'][] = "ALTER TABLE `core_change_user_modseq`
+  ADD CONSTRAINT `core_change_user_modseq_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `core_change_user_modseq_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;";
+
+$updates['201811281508'][] = "ALTER TABLE `core_customfields_field` CHANGE `databaseName` `databaseName` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;";
+
+$updates['201811281508'][] = function() {
+	$m = new \go\modules\core\customfields\install\Migrate63to64();
+	$m->convertTypeNames();
+};
+
+
+$updates['201812031512'][] = "UPDATE core_module set sort_order = sort_order + 100 where package != 'core' or package is null;";
+
+$updates['201812061512'][] = "ALTER TABLE `core_customfields_select_option` DROP `sortOrder`;";
+
+//Is either renamed by legacy addressbook module or created here if address book module was not installed.
+$updates['201812150000'][] = "CREATE TABLE IF NOT EXISTS `go_templates` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL DEFAULT 0,
+  `type` tinyint(4) NOT NULL DEFAULT 0,
+  `name` varchar(100) DEFAULT NULL,
+  `acl_id` int(11) NOT NULL DEFAULT 0,
+  `content` longblob NOT NULL,
+  `extension` varchar(4) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";

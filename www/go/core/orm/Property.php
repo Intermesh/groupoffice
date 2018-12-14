@@ -7,7 +7,7 @@ use go\core\App;
 use go\core\data\Model;
 use go\core\db\Column;
 use go\core\db\Criteria;
-use go\core\db\Query;
+use go\core\orm\Query;
 use go\core\event\EventEmitterTrait;
 use go\core\fs\Blob;
 use go\core\util\DateTime;
@@ -381,7 +381,8 @@ abstract class Property extends Model {
 
 		$query = (new Query())
 						->from($tables[$mainTableName]->getName(), $tables[$mainTableName]->getAlias())
-						->fetchMode(PDO::FETCH_CLASS, static::class, [false, $fetchProperties]);
+						->fetchMode(PDO::FETCH_CLASS, static::class, [false, $fetchProperties])
+						->setModel(static::class);
 
 		self::joinAdditionalTables($tables, $query);
 		self::buildSelect($query, $fetchProperties);
@@ -450,28 +451,38 @@ abstract class Property extends Model {
 	private static function joinAdditionalTables(array $tables, Query $query) {
 		$first = array_shift($tables);
 
-		foreach ($tables as $table) {
-			foreach ($table->getKeys() as $from => $to) {
-				if (!isset($on)) {
-					$on = "";
-				} else {
-					$on .= " AND ";
-				}
-				
-				//find the alias. The default table in the column is not a mapped table
-				$fromTableName = static::getMapping()->getColumn($from)->getTable()->getName();				
-				//So we fetch the mapped table to get the alias
-				$fromAlias = static::getMapping()->getTable($fromTableName)->getAlias();
-				$on .= $fromAlias . "." . $from . ' = ';
-				$on .= $table->getAlias() . "." . $to;
-			}
-			
-			if(!empty($table->getConstantValues())) {
-				$on = Criteria::normalize($on)->andWhere($table->getConstantValues());
-			}
-			$query->join($table->getName(), $table->getAlias(), $on, "LEFT");
-			unset($on);
+		foreach ($tables as $joinedTable) {
+			static::joinTable($joinedTable, $query);
 		}
+	}
+	
+	private static function joinTable(MappedTable $joinedTable, Query $query) {
+		foreach ($joinedTable->getKeys() as $from => $to) {
+			if (!isset($on)) {
+				$on = "";
+			} else {
+				$on .= " AND ";
+			}
+
+			//find the alias. The default table in the column is not a mapped table
+			$fromTableName = static::getMapping()->getColumn($from)->getTable()->getName();				
+			//So we fetch the mapped table to get the alias
+			$fromAlias = static::getMapping()->getTable($fromTableName)->getAlias();
+			$on .= $fromAlias . "." . $from . ' = ';
+			$on .= $joinedTable->getAlias() . "." . $to;
+		}
+
+		if($joinedTable->isUserTable) {
+			if(!GO()->getUserId()) {
+				throw new \Exception("Can't join user table when not authenticated");
+			}
+			$on .= " AND " . $joinedTable->getAlias() . ".userId = " . GO()->getUserId();
+		}
+
+		if(!empty($joinedTable->getConstantValues())) {
+			$on = Criteria::normalize($on)->andWhere($joinedTable->getConstantValues());
+		}
+		$query->join($joinedTable->getName(), $joinedTable->getAlias(), $on, "LEFT");
 	}
 
 	/**
@@ -568,10 +579,6 @@ abstract class Property extends Model {
 		if (!$this->validate()) {
 			return false;
 		}
-
-		if($this->isNew() || $this->isModified()){
-			$this->setSaveProps();		
-		}
 		
 		$modified = $this->getModified();
 		foreach ($this->getMapping()->getTables() as $table) {			
@@ -643,26 +650,33 @@ abstract class Property extends Model {
 	/**
 	 * Sets some default values such as modifiedAt and modifiedBy
 	 */
-	private function setSaveProps() {
-		if(property_exists($this, "modifiedBy") && !$this->isModified(["modifiedBy"])) {
-			$this->modifiedBy = $this->getCreatedBy();
+	private function setSaveProps(\go\core\db\Table $table, $modifiedForTable) {
+		
+		if (!$this->recordIsNew($table) && empty($modifiedForTable)) {
+			return $modifiedForTable;
 		}
 		
-		if(property_exists($this, "modifiedAt") && !$this->isModified(["modifiedAt"])) {
-			$this->modifiedAt = new DateTime();
+		if($table->getColumn("modifiedBy") && !isset($modifiedForTable["modifiedBy"])) {
+			$this->modifiedBy = $modifiedForTable['modifiedBy'] = $this->getCreatedBy();
+		}
+		
+		if($table->getColumn("modifiedAt") && !isset($modifiedForTable["modifiedAt"])) {
+			$this->modifiedAt = $modifiedForTable['modifiedAt'] = new DateTime();
 		}
 		
 		if(!$this->isNew()) {
-			return;
+			return $modifiedForTable;
 		}
 		
-		if(property_exists($this, "createdAt") && !$this->isModified(["createdAt"])) {
-			$this->createdAt = new DateTime();
+		if($table->getColumn("createdAt") && !isset($modifiedForTable["createdAt"])) {
+			$this->createdAt = $modifiedForTable['createdAt'] = new DateTime();
 		}
 		
-		if(property_exists($this, "createdBy") && !$this->isModified(["createdBy"])) {
-			$this->createdBy = $this->getCreatedBy();
+		if($table->getColumn("createdBy") && !isset($modifiedForTable["createdBy"])) {
+			$this->createdBy = $modifiedForTable['createdBy']= $this->getCreatedBy();
 		}
+		
+		return $modifiedForTable;
 	}
 	
 	protected function getCreatedBy() {
@@ -735,6 +749,12 @@ abstract class Property extends Model {
 		
 		if(isset($models)) {
 			foreach ($models as &$newProp) {
+				
+				//Check for invalid input
+				if(!($newProp instanceof Property)) {
+					throw new \Exception("Invalid value given for '". $relation->name ."'. Should be a GO\Orm\Property");
+				}
+				
 				$this->applyRelationKeys($relation, $newProp);
 				if (!$newProp->internalSave()) {
 					return false;
@@ -792,8 +812,10 @@ abstract class Property extends Model {
 	 * @throws Exception
 	 */
 	private function saveTable(MappedTable $table, array &$modified) {
-		
+				
 		$modifiedForTable = $this->extractModifiedForTable($table, $modified);
+		
+		$modifiedForTable = $this->setSaveProps($table, $modifiedForTable);
 
 		if (empty($modifiedForTable)) {
 			return true;
@@ -805,6 +827,10 @@ abstract class Property extends Model {
 				//For example Password extends User but the ket "userId" of password is not part of the properties
 				foreach($table->getKeys() as $from => $to) {
 					$modifiedForTable[$to] = $this->{$from};
+				}		
+				
+				if($table->isUserTable) {
+					$modifiedForTable["userId"] = GO()->getUserId();
 				}
 				
 				foreach($table->getConstantValues() as $colName => $value) {
@@ -826,7 +852,13 @@ abstract class Property extends Model {
 				if (empty($modifiedForTable)) {
 					return true;
 				}
-				$stmt = App::get()->getDbConnection()->update($table->getName(), $modifiedForTable, $this->primaryKeys[$table->getAlias()]);
+				
+				$keys = $this->primaryKeys[$table->getAlias()];
+				if($table->isUserTable) {
+					$keys['userId'] = GO()->getUserId();
+				}
+				
+				$stmt = App::get()->getDbConnection()->update($table->getName(), $modifiedForTable, $keys);
 				if (!$stmt->execute()) {
 					throw new \Exception("Could not execute update query");
 				}				
@@ -837,20 +869,9 @@ abstract class Property extends Model {
 			}
 		} catch (PDOException $e) {
 			
-//			var_dump(App::get()->getDebugger()->getEntries());
-
-			//Unique index error = 23000
-			if ($e->getCode() == 23000) {
-				
-				$msg = $e->getMessage();
-				App::get()->debug($msg);				
-				
-				$key = 'id';
-				if(preg_match("/key '(.*)'/", $msg, $matches)) {
-					$key = $matches[1];
-				}
-				
-				$this->setValidationError($key, ErrorCode::UNIQUE);
+			$uniqueKey = \go\core\db\Utils::isUniqueKeyException($e);
+			if ($uniqueKey) {				
+				$this->setValidationError($uniqueKey, ErrorCode::UNIQUE);				
 				return false;
 			} else {
 				throw $e;
@@ -972,32 +993,53 @@ abstract class Property extends Model {
 			return true;
 		}
 		
-		foreach ($table->getColumns() as $colName => $column) {
+		foreach ($table->getMappedColumns() as $colName => $column) {
 			//Assume constants are correct, and this makes it unessecary to declare the property
 			if(array_key_exists($colName, $table->getConstantValues())) {
 				continue;
 			}
 
-			if (!$this->validateRequired($column)) {
+			if (!$this->validateColumn($column, $this->$colName)) {
 				//only one error per column
 				continue;
-			}
-			
-			if(empty($this->$colName)) {
-				continue;
-			}
-			
-			if(!is_scalar($this->$colName) && (!is_object($this->$colName) || method_exists($this->$colName, '__toString'))) {
-				$this->setValidationError($colName, ErrorCode::MALFORMED, "Non scalar value given");
-				continue;
-			}
+			}			
+		}
+	}
+	
+	
+	private function validateColumn(Column $column, $value) {
+		if (!$this->validateRequired($column)) {
+			return false;
+		}
+		
+		//Null is allowed because we checked this above.
+		if(empty($value)) {
+			return true;
+		}
 
-			if (!empty($column->length)){				
-				if(StringUtil::length($this->$colName) > $column->length) {
-					$this->setValidationError($colName, ErrorCode::MALFORMED, 'Length can\'t be greater than ' . $column->length);
-				}
+		switch ($column->dbType) {
+			case 'date':
+			case 'datetime':
+				return $value instanceof DateTime || $value instanceof DateTimeImmutable;
+				
+			default:				
+				return $this->validateColumnString($column, $value);		
+		}
+	}
+	
+	private function validateColumnString(Column $column, $value) {
+		if(!is_scalar($value) && (!is_object($value) || !method_exists($value, '__toString'))) {
+			$this->setValidationError($column->name, ErrorCode::MALFORMED, "Non scalar value given. Type: ". gettype($value));
+			return false;
+		} 
+
+		if (!empty($column->length)){				
+			if(StringUtil::length($value) > $column->length) {
+				$this->setValidationError($column->name, ErrorCode::MALFORMED, 'Length can\'t be greater than ' . $column->length);
+				return false;
 			}
 		}
+		return true;		
 	}
 	
 	private function tableIsModified(MappedTable $table) {
@@ -1200,5 +1242,25 @@ abstract class Property extends Model {
 			}
 		}
 	}
+	
+	/**
+	 * Copy the property.
+	 * 
+	 * The property will not be saved to the database.
+	 * The primary key values will not be copied.
+	 * 
+	 * @return \static
+	 */
+	protected function internalCopy() {
+		$copy = new static;
+		$v = $this->toArray();
+		$pk = $this->getPrimaryKey();
+		foreach($pk as $field) {
+			unset($v[$field]);
+		}
+		
+		$copy->setValues($v);
 
+		return $copy;
+	}
 }

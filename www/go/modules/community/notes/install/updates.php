@@ -81,3 +81,8 @@ $updates['201804181402'][] = "ALTER TABLE `notes_note` DROP `deletedAt`;";
 
 
 $updates['201804181402'][] = "ALTER TABLE `notes_note_book` DROP `modSeq`;";
+
+$updates['201811282011'][] = function() {	
+	$m = new \go\modules\core\customfields\install\Migrate63to64();
+	$m->migrateEntity("Note");	
+};

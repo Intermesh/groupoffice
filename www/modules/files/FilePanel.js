@@ -251,12 +251,10 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 				
 				'</table>';
 
-
+		this.add(go.modules.core.customfields.CustomFields.getDetailPanels("File"));
 		
 		if(go.Modules.isAvailable("legacy", "workflow"))
 			this.template +=GO.workflow.WorkflowTemplate;
-		
-		Ext.apply(this.templateConfig, GO.linksTemplateConfig);
 
 		GO.files.FilePanel.superclass.initComponent.call(this);
 	}

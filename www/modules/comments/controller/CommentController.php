@@ -69,26 +69,7 @@ class CommentController extends \GO\Base\Controller\AbstractModelController{
 		
 		return parent::beforeSubmit($response, $model, $params);
 	}
-	
-	protected function afterSubmit(&$response, &$model, &$params, $modifiedAttributes) {
-		$modelTypeModel = \GO\Base\Model\ModelType::model()->findSingleByAttribute('id',$model->model_type_id);
-		if ($modelTypeModel->model_name == 'GO\Addressbook\Model\Contact') {
-			$modelWithComment = \GO::getModel($modelTypeModel->model_name)->findByPk($model->model_id);
-			$modelWithComment->setAttribute('action_date',\GO\Base\Util\Date::to_unixtime($params['action_date']));
-			$modelWithComment->save();
-		}
-		return parent::afterSubmit($response, $model, $params, $modifiedAttributes);
-	}
-	
-	protected function afterLoad(&$response, &$model, &$params) {
-		$modelTypeModel = \GO\Base\Model\ModelType::model()->findSingleByAttribute('id',$model->model_type_id);
-		if ($modelTypeModel->model_name == 'GO\Addressbook\Model\Contact') {
-			$modelWithComment = \GO::getModel($modelTypeModel->model_name)->findByPk($model->model_id);
-			$actionDate = $modelWithComment->getAttribute('action_date');
-			$response['data']['action_date'] = \GO\Base\Util\Date::get_timestamp($actionDate,false);
-		}
-		return parent::afterLoad($response, $model, $params);
-	}
+
 	
 	protected function actionCombinedStore($params) {
 		$response = array(

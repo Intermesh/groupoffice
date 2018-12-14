@@ -52,6 +52,8 @@ use GO\Base\Util\TagParser;
 use GO\Site\Model\Site As SiteModel;
 
 class Content extends \GO\Base\Db\ActiveRecord{
+	
+	use \go\core\orm\CustomFieldsTrait;
 
 	private $_cf=array();	
 	

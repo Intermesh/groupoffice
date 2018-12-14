@@ -41,7 +41,7 @@ if(!class_exists('GO'))
     define('SCRIPT_TIMEOUT', 0);
 
     // When accessing through a proxy, the "X-Forwarded-For" header contains the original remote IP
-    define('USE_X_FORWARDED_FOR_HEADER', false);
+    define('USE_CUSTOM_REMOTE_IP_HEADER', false);
 
     // When using client certificates, we can check if the login sent matches the owner of the certificate.
     // This setting specifies the owner parameter in the certificate to look at.
@@ -110,7 +110,7 @@ if(!class_exists('GO'))
 		\GO::config()->zpush2_loglevel=LOGLEVEL_OFF;
 	}
     define('LOGBACKEND', 'filelog');
-	define('LOGLEVEL', LOGLEVEL_OFF);
+	define('LOGLEVEL', \GO::config()->zpush2_loglevel);
     define('LOGAUTHFAIL', false);
 
     // To save e.g. WBXML data only for selected users, add the usernames to the array

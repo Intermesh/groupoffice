@@ -61,6 +61,8 @@ use Swift_Attachment;
 use Swift_Mime_ContentEncoder_PlainContentEncoder;
 
 class Event extends \GO\Base\Db\ActiveRecord {
+	
+	use \go\core\orm\CustomFieldsTrait;
 
 	const STATUS_TENTATIVE = 'TENTATIVE';
 //	const STATUS_DECLINED = 'DECLINED';
@@ -2319,12 +2321,7 @@ The following is the error message:
 		
 		$participant = new Participant();
 		$participant->event_id=$this->id;
-		$participant->user_id=$user->id;
-		
-		$contact = $user->createContact();
-		
-		if($contact)
-			$participant->contact_id=$contact->id;
+		$participant->user_id=$user->id;		
 		
 		$participant->name=$user->name;
 		$participant->email=$user->email;

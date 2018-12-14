@@ -253,113 +253,11 @@ abstract class EntityController extends ReadOnlyEntityController {
 	 * @param array $params
 	 * @throws CannotCalculateChanges
 	 */
-	public function getUpdates($params) {
-		
-		$p = $this->paramsGetUpdates($params);
-		
-		//We might optimize this later but for now when there is a change in permissions we can't calculate changes.
-		//Client must invalidate cache and refetch all required items.
-		
-		$cls = $this->entityClass();
-		
-		if(!is_a($cls, Entity::class, true)) {
-			//not jmap entity so we can't calculate
-			throw new CannotCalculateChanges();
-		}
-		
-		$result = [
-				'accountId' => $p['accountId'],
-				'oldState' => $p['sinceState'],
-				'newState' => null,
-				'hasMoreUpdates' => false,
-				'changed' => [],
-				'removed' => []
-		];
-		
-		//state has entity modseq and acl modseq so we can detect permission changes
-		$states = explode(':', $p['sinceState']);
-		if(count($states) != 2) 
-		{
-			throw new CannotCalculateChanges();
-		}
-		$entityState = $states[0];
-		$aclState = $states[1];
-		
-		
-		//find the old state changelog entry
-		if($entityState) { //If state == 0 then we don't need to check this
-			$sinceChange = (new Query())
-							->select("*")
-							->from("core_change")
-							->where(["entityTypeId" => $cls::getType()->getId()])
-							->andWhere('modSeq', '=', $entityState)
-							->single();
-
-			if(!$sinceChange) {			
-				throw new CannotCalculateChanges();
-			}
-		}
-		
-		//Detect permission changes for AclItemEntities. For example notes that depend on notebook permissions.
-		if(is_a($cls, \go\core\acl\model\AclItemEntity::class, true)) {
-			$acls = $cls::findAcls();	
-			if($acls) {
-				$oldAclIds = Acl::wereGranted(GO()->getUserId(), $aclState, $acls)->all();
-				$currentAclIds = Acl::areGranted(GO()->getUserId(), $acls)->all();
-				$changedAcls = array_merge(array_diff($oldAclIds, $currentAclIds), array_diff($currentAclIds, $oldAclIds));	
-			}
-		}
-
-		
-		$entityType = $cls::getType();
-		
-		$changes = (new Query)->select('entityId,max(destroyed) AS destroyed, max(modSeq) AS modSeq, max(aclId) AS aclId')
-						->from('core_change')
-						->fetchMode(PDO::FETCH_ASSOC)
-						->limit($p['maxChanges'])
-						->orderBy(['modSeq' => 'ASC'])						
-						->groupBy(['entityId'])
-						->where(["entityTypeId" => $cls::getType()->getId()])
-						->andWhere('modSeq', '>', $entityState);
-		
-		Acl::applyToQuery($changes, "t.aclId");
-		
-		foreach ($changes as $change) {
-			if ($change['destroyed']) {
-				$result['removed'][] = $change['entityId'];
-			} else {
-					
-				$result['changed'][] = $change['entityId'];
-			}
-		}
-		
-		//add AclItemEntity changes based on permissions		
-		if(!empty($changedAcls)) {
-			$query = $cls::find()->fetchMode(PDO::FETCH_ASSOC)->select('aclEntity.aclId')->select($cls::getPrimaryKey(true), true)->where('aclEntity.aclId', 'in', $changedAcls);			
-			$cls::joinAclEntity($query);
-			
-			//we don't need entities here. Just a list of id's.
-			foreach($query as $entity) {
-				$aclId = $entity['aclId'];
-				unset($entity['aclId']);
-				$id = implode("-", $entity);
-				if(in_array($aclId, $currentAclIds)) {
-					$result['changed'][] = $id;
-				} else
-				{
-					$result['removed'][] = $id;
-				}
-			}			
-		}
-		
-
-		if(isset($change)){
-			$result['newState'] = $change['modSeq'] . ':' . Acl::getType()->highestModSeq;
-		} else
-		{
-			$result['newState'] = $this->getState();
-		}
-		$result['hasMoreUpdates'] = $result['newState'] != $this->getState();
+	public function getUpdates($params) {		
+		$p = $this->paramsGetUpdates($params);	
+		$cls = $this->entityClass();		
+		$result = $cls::getChanges($p['sinceState'], $p['maxChanges']);		
+		$result['accountId'] = $p['accountId'];
 
 		Response::get()->addResponse($result);
 	}

@@ -1,24 +1,3 @@
-DROP TABLE IF EXISTS `cf_fs_files`;
-CREATE TABLE IF NOT EXISTS `cf_fs_files` (
-  `model_id` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`model_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
---
--- Tabelstructuur voor tabel `cf_fs_folders`
---
-
-DROP TABLE IF EXISTS `cf_fs_folders`;
-CREATE TABLE IF NOT EXISTS `cf_fs_folders` (
-  `model_id` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`model_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
-
 
 
 --
@@ -269,4 +248,18 @@ CREATE TABLE IF NOT EXISTS `fs_shared_root_folders` (
   `user_id` int(11) NOT NULL,
   `folder_id` int(11) NOT NULL,
   PRIMARY KEY (`user_id`,`folder_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE `fs_files_custom_fields` (
+ `id` int(11) NOT NULL,
+ PRIMARY KEY (`id`),
+ CONSTRAINT `fs_files_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `fs_files` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE `fs_folders_custom_fields` (
+ `id` int(11) NOT NULL,
+ PRIMARY KEY (`id`),
+ CONSTRAINT `fs_folders_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `fs_folders` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

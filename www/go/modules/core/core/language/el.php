@@ -164,7 +164,7 @@ return array (
   'Week' => 'Εβδομάδα',
   'Weeks' => 'Εβδομάδες',
   'Month' => 'Μήνας',
-  'months' => 
+  'full_months' => 
   array (
     1 => 'Ιανουάριος',
     2 => 'Φεβρουάριος',
@@ -630,4 +630,9 @@ All rights reserved.<br />
     'ai' => 'Αρχείο Adobe Illustrator',
     'eml' => 'Μήνυμα Ηλεκτρονικού Ταχυδρομείου',
   ),
+	'Recurrence' => 'Επανάληψη',
+	'Repeat forever' => 'Επανάληψη για πάντα',
+  'Repeat every' => 'Επανάληψη κάθε',
+  'Repeat until' => 'Επανάληψη μέχρι',
+	'At days' => 'Στις ημέρες'
 );

@@ -1,11 +1,7 @@
 <?php
 return array (
   'Appointments' => '约会',
-  'Recurrence' => '重复',
   'Options' => '选项',
-  'Repeat forever' => '一直重复',
-  'Repeat every' => '间隔',
-  'Repeat until' => '重复至',
   'Time is not applicable' => '时间不定',
   'Navigation' => '导航',
   '1 Day' => '1 天',
@@ -29,7 +25,6 @@ return array (
   'days' => '天',
   'weeks' => '周',
   'years' => '年',
-  'At days' => '在哪几天',
   'No reminder' => '不提醒',
   'Reminder' => '提醒',
   'Participants' => '参与人',

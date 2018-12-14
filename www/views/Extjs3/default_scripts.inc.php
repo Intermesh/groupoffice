@@ -89,9 +89,9 @@ if(GO::config()->debug) {
 }
 
 //echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' => \GO::language()->getLanguage()]) . '"></script>';
-echo '<script type="text/javascript" src="' . GO::config()->url . 'views/Extjs3/ext/adapter/ext/ext-base-debug.js"></script>';
-echo '<script type="text/javascript" src="' . GO::config()->url . 'views/Extjs3/ext/ext-all-debug.js"></script>';
-echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?lang='.\go\core\Language::get()->getIsoCode() . '&v='.GO()->getVersion().'"></script>';
+echo '<script type="text/javascript" src="views/Extjs3/ext/adapter/ext/ext-base-debug.js"></script>';
+echo '<script type="text/javascript" src="views/Extjs3/ext/ext-all-debug.js"></script>';
+echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?lang='.\GO()->getLanguage()->getIsoCode() . '&v='.GO()->getVersion().'"></script>';
 
 ?>
 
@@ -113,7 +113,9 @@ echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?l
 	GO.settings = <?php echo json_encode($settings); ?>;
 	GO.language = "<?php echo GO::config()->language; ?>";
 	GO.calltoTemplate = '<?php echo GO::config()->callto_template; ?>';
-
+	
+	GO.authenticationDomains = <?php echo json_encode(go\modules\core\users\model\User::getAuthenticationDomains()); ?>;
+	GO.authenticationDomainDefault = "<?php echo GO()->getSettings()->defaultAuthenticationDomain; ?>";
 <?php
 if (isset(GO::session()->values['security_token'])) {
 	echo 'GO.securityToken="' . GO::session()->values['security_token'] . '";';
@@ -139,9 +141,13 @@ if ($cacheFile->exists()) {
 	$scripts = array();
 	$load_modules = GO::modules()->getAllModules(true);
 
-	$scripts[] = "var BaseHref = '" . GO::config()->host . "';";
+	$scripts[] = "var BaseHref = '';";
 
 	$scripts[] = new File(GO::config()->root_path . 'views/Extjs3/javascript/namespaces.js');
+	
+	//for t() function to auto detect module package and name
+	$scripts[] = "go.module='core';go.package='core';";
+	
 	$data = file_get_contents(GO::config()->root_path . 'views/Extjs3/javascript/scripts.txt');
 	$lines = array_map('trim', explode("\n", $data));
 	foreach ($lines as $line) {
@@ -217,11 +223,13 @@ if ($cacheFile->exists()) {
 				echo '<script type="text/javascript">';
 				$js = "";
         if($parts[0] == 'go' && $parts[1] == 'modules') {
+					//for t() function to auto detect module package and name
           $js .= "go.module = '".$parts[3]."';";
           $js .= "go.package = '".$parts[2]."';";
           $js .= "go.Translate.setModule('".$parts[2]."', '" .$parts[3]. "');";   
         } else if($parts[0] == 'modules')
         {
+					//for t() function to auto detect module package and name
           $js .= "go.module = '".$parts[1]."';";
           $js .= "go.package = 'legacy';";
           $js .= "go.Translate.setModule('legacy', '" .$parts[1]. "');";   

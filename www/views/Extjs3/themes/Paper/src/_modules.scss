@@ -1,5 +1,3 @@
-/* main: yourtheme.scss*/
-
 $app-icons: (
  addressbook: contacts_alt1,
  calendar: calendar_lg,
@@ -156,8 +154,13 @@ $app-icons: (
 	@extend %font-body2;
 }
 
-.x-tree-node .ml-folder-unseen a span.em-folder-status { // badge
+
+.x-tree-node .ml-folder-unseen a .em-folder-status { // badge
 	@extend %badge;
+	
+}
+.em-folder-status {
+	float:right;
 }
 
 .ml-unseen-dot {
@@ -215,4 +218,16 @@ $app-icons: (
 
 .mo-description {
 	padding-left: dp(40);
+}
+
+
+
+.cal-has-links{
+	//background:url(../../../../views/Extjs3/themes/Default/images/attach.gif) no-repeat center 3px;
+	@extend %icon;
+	font-size: dp(16);
+	&:before {
+		content: "link";
+	}
+	float:right;
 }

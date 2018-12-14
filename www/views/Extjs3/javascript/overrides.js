@@ -26,6 +26,7 @@ function dp(size) {
 (function(){
   
   //add module and package to components so they are aware of the module they belong to.
+	//go.module and go.package are defined in default_scripts.inc.php 
   var origExtend = Ext.extend;
 
   Ext.extend = function() {
@@ -39,34 +40,68 @@ function dp(size) {
 })();
 
 
-//hack to set translate to module from component in getId because getId() is always called before initComponent in the constructor and there's no way to override the constructor
-Ext.override(Ext.Component, {  
-  componentgetID : Ext.Component.prototype.getId,
-  getId : function(){
- 
-    if(this.module) {
-      go.Translate.setModule(this.package, this.module);
-    }
-    
-    return this.componentgetID();
-  },
-	
-	//Without this override findParentByType doesn't work if you don't Ext.reg() all your components
-	 getXTypes : function(){
-        var tc = this.constructor;
-        if(!tc.xtypes){
-            var c = [], sc = this;
-            while(sc){
-                c.unshift(sc.constructor.xtype);
-                sc = sc.constructor.superclass;
-            }
-            tc.xtypeChain = c;
-            tc.xtypes = c.join('/');
-        }
-        return tc.xtypes;
-    }
-});
 
+(function() {
+
+	var componentInitComponent = Ext.Component.prototype.initComponent;
+
+	Ext.override(Ext.Component, {  
+			
+
+		initComponent : function() {
+			componentInitComponent.call(this);			
+
+			if(this.entityStore) {
+				this.initEntityStore();
+			}
+		},
+		
+		initEntityStore : function() {
+			if(Ext.isString(this.entityStore)) {
+				this.entityStore = go.Stores.get(this.entityStore);
+				if(!this.entityStore) {
+					throw "Invalid 'entityStore' property given to component"; 
+				}
+			}
+			
+			this.on("afterrender", function() {
+				this.entityStore.on('changes',this.onChanges, this);		
+			}, this);
+
+			this.on('beforedestroy', function() {
+				this.entityStore.un('changes', this.onChanges, this);
+			}, this);
+		},
+
+		/**
+		 * Fires when items are added, changed or destroyed in the entitystore.
+		 * 
+		 * @param {go.data.EntityStore} entityStore
+		 * @param {Object[]} added
+		 * @param {Object[]} changed
+		 * @param {int[]} destroyed
+		 * @returns {void}
+		 */
+		onChanges : function(entityStore, added, changed, destroyed) {		
+
+		},
+
+		//Without this override findParentByType doesn't work if you don't Ext.reg() all your components
+		 getXTypes : function(){
+					var tc = this.constructor;
+					if(!tc.xtypes){
+							var c = [], sc = this;
+							while(sc){
+									c.unshift(sc.constructor.xtype);
+									sc = sc.constructor.superclass;
+							}
+							tc.xtypeChain = c;
+							tc.xtypes = c.join('/');
+					}
+					return tc.xtypes;
+			}
+	});
+})();
 
 Ext.override(Ext.form.TextArea,{
 	insertAtCursor: function(v) {
@@ -78,6 +113,26 @@ Ext.override(Ext.form.TextArea,{
 		this.el.focus();
 		text_field.setSelectionRange(endPos+v.length, endPos+v.length);
 	}
+});
+
+Ext.override(Ext.form.BasicForm,{
+	submit : function(options){
+        options = options || {};
+        if(this.standardSubmit){
+            var v = options.clientValidation === false || this.isValid();
+            if(v){
+                var el = this.el.dom;
+                if(this.url){
+                    el.action = this.url;
+                }
+                el.submit();
+            }
+            return v;
+        }
+        var submitAction = String.format('{0}submit', this.api ? 'direct' : '');
+        this.doAction(submitAction, options);
+        return this;
+    }
 });
 
 Ext.override(Ext.grid.Column,{
@@ -189,6 +244,30 @@ Ext.override(Ext.FormPanel,{
 		if (firstField) {
 			firstField.focus();
 		}
+	},
+	
+	// prevents adding form fields that are part of custom form field components like the combobox of go.form.Chips for example.
+	processAdd : function(c){
+        
+			if(this.isField(c)){
+					this.form.add(c);
+
+			}else if(c.findBy){
+					this.applySettings(c);
+					this.form.add.apply(this.form, this.findFieldsInComponent(c));
+			}
+	},
+	
+	findFieldsInComponent : function(comp) {
+		var m = [];
+		comp.cascade(function(c){
+				if(this.isField(c)) {
+						m.push(c);
+						//don't cascade into form fields.
+						return (c.getXType() == 'compositefield' || c.getXType() == 'checkboxgroup' || c.getXType() == "radiogroup"); //don't cascade into form fields
+				}
+		}, this);
+		return m;
 	}
 });
 
@@ -218,7 +297,7 @@ Ext.override(Ext.tree.TreeNodeUI, {
             '<span class="x-tree-node-indent">',this.indentMarkup,"</span>",
             '<span class="x-tree-ec-icon x-tree-elbow"></span>',
             '<span style="background-image:url(', a.icon || this.emptyIcon, ');" class="x-tree-node-icon',(a.icon ? " x-tree-node-inline-icon" : ""),(a.iconCls ? " "+a.iconCls : ""),'" unselectable="on"></span>',
-            cb ? ('<input class="x-tree-node-cb" type="checkbox" ' + (a.checked ? 'checked="checked" />' : '/>')) : '',
+            cb ? ('<span class="x-tree-node-cb"><input type="checkbox" ' + (a.checked ? 'checked="checked" /></span>' : '/></span>')) : '',
             '<a hidefocus="on" class="x-tree-node-anchor" href="',href,'" tabIndex="1" ',
              a.hrefTarget ? ' target="'+a.hrefTarget+'"' : "", '><span unselectable="on">',n.text,"</span></a></div>",
             '<ul class="x-tree-node-ct" style="display:none;"></ul>',
@@ -238,7 +317,7 @@ Ext.override(Ext.tree.TreeNodeUI, {
         this.iconNode = cs[2];
         var index = 3;
         if(cb){
-            this.checkbox = cs[3];
+            this.checkbox = cs[3].childNodes[0];
             // fix for IE6
             this.checkbox.defaultChecked = this.checkbox.checked;
             index++;
@@ -638,16 +717,32 @@ Ext.override(Ext.layout.ToolbarLayout ,{
 	}
 );
 
-Ext.menu.Item.prototype.itemTpl = new Ext.XTemplate(
-	'<a id="{id}" class="{cls} x-unselectable" hidefocus="true" unselectable="on" href="{href}"',
-		 '<tpl if="hrefTarget">',
-			  ' target="{hrefTarget}"',
-		 '</tpl>',
-	 '>',
-		  '<span class="x-menu-item-icon {iconCls}"></span>',
-		  '<span class="x-menu-item-text">{text}</span>',
-	 '</a>'
-);
+Ext.override(Ext.menu.Item, {
+	 onRender : function(container, position){
+        if (!this.itemTpl) {
+            this.itemTpl = Ext.menu.Item.prototype.itemTpl = new Ext.XTemplate(
+							'<a id="{id}" class="{cls} x-unselectable" hidefocus="true" unselectable="on" href="{href}"',
+								 '<tpl if="hrefTarget">',
+										' target="{hrefTarget}"',
+								 '</tpl>',
+							 '>',
+									'<span class="x-menu-item-icon {iconCls}"></span>',
+									'<span class="x-menu-item-text">{text}</span>',
+							 '</a>'
+						);
+        }
+        var a = this.getTemplateArgs();
+        this.el = position ? this.itemTpl.insertBefore(position, a, true) : this.itemTpl.append(container, a, true);
+        this.iconEl = this.el.child('span.x-menu-item-icon');
+        this.textEl = this.el.child('.x-menu-item-text');
+        if(!this.href) { // if no link defined, prevent the default anchor event
+            this.mon(this.el, 'click', Ext.emptyFn, null, { preventDefault: true });
+        }
+        Ext.menu.Item.superclass.onRender.call(this, container, position);
+    }
+});
+
+
 Ext.layout.MenuLayout.prototype.itemTpl = new Ext.XTemplate(
 	'<li id="{itemId}" class="{itemCls}">',
 		 '<tpl if="needsIcon">',
@@ -661,41 +756,18 @@ Ext.layout.MenuLayout.prototype.itemTpl = new Ext.XTemplate(
 //	dateFormat: "c" //from server
 //});
 
-GO.mainLayout.onReady(function() {
-
-		//Override this when authenticated and mainlayout initializes
-		Ext.override(Ext.DatePicker, {
-			startDay: parseInt(GO.settings.first_weekday)
-		});
-
-		Ext.override(Ext.form.DateField, {
-			format: GO.settings.date_format,
-			startDay: parseInt(GO.settings.first_weekday),
-			altFormats: "Y-m-d|c|" + GO.settings.date_format.replace("Y","y"),
-			dtSeparator:' '
-		});
-
-		Ext.override(Ext.grid.DateColumn, {
-			align: "right",
-			format: go.User.dateFormat + " " + go.User.timeFormat
-		});
-	
-});
-
 Ext.override(Ext.Panel, {
 	panelInitComponent : Ext.Panel.prototype.initComponent,
 	
 	initComponent : function() {
 		
 		if(GO.util.isMobileOrTablet()) {
-			this.split = false;
-			
+			this.split = false;			
 		}
 		
 		this.panelInitComponent.call(this);
 	}
 });
-
 
 Ext.override(Ext.form.Field, {
 	fieldInitComponent : Ext.form.Field.prototype.initComponent,
@@ -710,7 +782,15 @@ Ext.override(Ext.form.Field, {
 		
 		
 		this.fieldInitComponent.call(this);
-	}
+	},
+	
+	setFieldLabel: function(label){
+		if(this.rendered){
+			this.label.update(label+':');
+		} else {
+			this.label = label;
+		}
+	}		
 });
 
 Ext.util.Format.dateRenderer = function(format) {

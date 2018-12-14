@@ -94,7 +94,7 @@ try {
 	 * @param type $password
 	 * @return User|boolean
 	 */
-	function getToken($data) {
+	function getToken($data) {		
 		//loop through all auth methods
 		$authMethods = Method::find()->orderBy(['sortOrder' => 'ASC']);
 		foreach ($authMethods as $method) {
@@ -171,7 +171,9 @@ try {
 
 	if (empty($methods) && !$token->isAuthenticated()) {
 		$token->setAuthenticated();
-		$token->save();
+		if(!$token->save()) {
+			throw new \Exception("Could not save token: ". var_export($token->getValidationErrors(), true));
+		}
 	}
 
 	if ($token->isAuthenticated()) {

@@ -13,7 +13,7 @@ use go\core\auth\Method;
 use go\core\auth\Password;
 use go\core\auth\PrimaryAuthenticator;
 use go\core\db\Criteria;
-use go\core\db\Query;
+use go\core\orm\Query;
 use go\core\exception\Forbidden;
 use go\core\jmap\Entity;
 use go\modules\core\modules\model\Module;
@@ -115,6 +115,13 @@ class User extends Entity {
 	public $dateFormat;
 	
 	/**
+	 * Display dates short in lists.
+	 * 
+	 * @var boolean
+	 */
+	public $shortDateInList = true;
+	
+	/**
 	 * Time format
 	 * 
 	 * @var string
@@ -156,6 +163,12 @@ class User extends Entity {
 	
 	
 	public $max_rows_list;
+	
+	/**
+	 * The user timezone
+	 * 
+	 * @var string eg. europe/amsterdam
+	 */
 	public $timezone;
 	public $start_module;
 	public $language;
@@ -171,7 +184,17 @@ class User extends Entity {
 	
 	
 	protected $files_folder_id;
+	/**
+	 * Disk quota in MB
+	 * @var int
+	 */
 	public $disk_quota;
+	
+	/**
+	 * Disk usage in bytes
+	 * 
+	 * @var int
+	 */
 	public $disk_usage;
 	
 	public $mail_reminders;
@@ -214,13 +237,21 @@ class User extends Entity {
 	 * @var bool 
 	 */
 	private $passwordVerified = true;
+	
+	/**
+	 * The working week
+	 * 
+	 * @var WorkingWeek
+	 */
+	public $workingWeek;
 
 	protected static function defineMapping() {
 		return parent::defineMapping()
 			->addTable('core_user', 'u')
 			->addTable('core_auth_password', 'p', ['id' => 'userId'])
 //			->addRelation('password', Password::class, ['id' => 'userId'], false)
-			->addRelation("groups", UserGroup::class, ['id' => 'userId']);
+			->addRelation("groups", UserGroup::class, ['id' => 'userId'])
+			->addRelation('workingWeek', WorkingWeek::class, ['id' => 'user_id'], false);
 	}
 	
 	/**
@@ -246,11 +277,14 @@ class User extends Entity {
 			$this->dateFormat = $s->defaultDateFormat;
 			$this->timezone = $s->defaultTimezone;
 			$this->firstWeekday = $s->defaultFirstWeekday;
-
 			$this->currency = $s->defaultCurrency;
-			
-			foreach($s->getDefaultGroups() as $v) {
-				$this->groups[] = (new UserGroup)->setValues($v);
+			$this->shortDateInList = $s->defaultShortDateInList;
+			$this->listSeparator = $s->defaultListSeparator;
+			$this->textSeparator = $s->defaultTextSeparator;
+			$this->thousandsSeparator = $s->defaultThousandSeparator;
+			$this->decimalSeparator = $s->defaultDecimalSeparator;			
+			foreach($s->getDefaultGroups() as $groupId) {
+				$this->groups[] = (new UserGroup)->setValues(['groupId' => $groupId]);
 			}
 		}
 	}
@@ -405,30 +439,26 @@ class User extends Entity {
 		return $this->id == App::get()->getAuthState()->getUserId() || App::get()->getAuthState()->getUser()->isAdmin();
 	}
 	
+	protected static function searchColumns() {
+		return ['username', 'displayName', 'email'];
+	}
+	
+	protected static function defineFilters() {
+		return parent::defineFilters()
+						->add('showDisabled', function (Query $query, $value, array $filter){							
+							if($value === false) {
+								$query->andWhere('enabled', '=', true);
+							}
+						})
+						->add('groupId', function (Query $query, $value, array $filter){
+							$query->join('core_user_group', 'ug', 'ug.userId = u.id')->andWhere(['ug.groupId' => $filter['groupId']]);
+						});
+	}
+	
 	public static function filter(Query $query, array $filter) {
-		
-		if(!empty($filter['q'])) {
-			$query->andWhere(
-							(new Criteria())
-							->where('username', 'LIKE', $filter['q'] . '%')
-							->orWhere('displayName', 'LIKE', '%'. $filter['q'] .'%')
-							->orWhere('email', 'LIKE', $filter['q'] .'%')
-							);
-			
+		if(!isset($filter['showDisabled'])) {
+			$filter['showDisabled'] = false;
 		}
-		
-		if(!isset($filter['showDisabled']) || $filter['showDisabled'] !== true) {
-			$query->andWhere('enabled', '=', 1);
-		}
-		
-		if(!empty($filter['groupId'])) {
-			$query->join('core_user_group', 'ug', 'ug.userId = u.id')->andWhere(['ug.groupId' => $filter['groupId']]);
-		}
-		
-		if(!empty($filter['exclude'])) {
-			$query->andWhere('id', 'NOT IN', $filter['exclude']);
-		}
-		
 		return parent::filter($query, $filter);
 	}
 
@@ -569,13 +599,13 @@ class User extends Entity {
 				$this->groups[] = $everyoneUserGroup;
 			}
 			
-			$this->checkOldFramework();			
+			$this->legacyOnSave();			
 			
 		}
 	}
 	
 	
-	public function checkOldFramework() {
+	public function legacyOnSave() {
 		//for old framework. Remove when all is refactored!
 		$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels($this->id);			
 		$user = LegacyUser::model()->findByPk($this->id);
@@ -583,6 +613,8 @@ class User extends Entity {
 			$model->getDefault($user);
 		}
 	}
+	
+
 	
 	/**
 	 * Add user to group if not already in it.
@@ -624,14 +656,82 @@ class User extends Entity {
 		return true;		
 	}
 	
+	
+	/**
+	 * Get the user disk quota in bytes
+	 * @return int amount of bytes the user may use
+	 */
+	public function getStorageQuota(){
+		if(!empty($this->disk_quota)) {
+			return $this->disk_quota*1024*1024;
+		} else 
+		{
+			return GO()->getStorageQuota();
+		}
+	}
+	
+	public function getStorageFreeSpace() {
+		if(!empty($this->disk_quota)) {
+			return $this->disk_quota*1024*1024 - $this->disk_usage;
+		} else
+		{
+			return GO()->getStorageFreeSpace();
+		}
+	}
+	
 	protected function internalDelete() {
 		
 		if($this->id == 1) {
 			$this->setValidationError("id", ErrorCode::FORBIDDEN, "You can't delete the primary administrator");
 			return false;
 		}
-		
+		$this->legacyOnDelete();
 		return parent::internalDelete();
+	}
+	
+	
+	public function legacyOnDelete() {
+		$user = LegacyUser::model()->findByPk($this->id);
+		LegacyUser::model()->fireEvent("beforedelete", [$user, true]);
+		//delete all acl records		
+		$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels();
+
+		foreach($defaultModels as $model){
+			$model->deleteByAttribute('user_id',$this->id);
+		}
+
+
+		LegacyUser::model()->fireEvent("delete", [$user, true]);
+	}
+	
+	/**
+	 * Get authentication domains that authenticators can use to identify the user
+	 * belongs to that authenticator.
+	 * 
+	 * For example the IMAP and LDAP authenticator modules use this by implementing
+	 * the \go\core\auth\DomainProvider interface.
+	 * 
+	 * @return string[]
+	 */
+	public static function getAuthenticationDomains() {
+		
+		$domains = GO()->getCache()->get("authentication-domains");
+		if(is_array($domains)) {
+			return $domains;
+		}
+		
+		
+		$classFinder = new \go\core\util\ClassFinder();
+		$classes = $classFinder->findByParent(\go\core\auth\DomainProvider::class);
+		
+		$domains = [];
+		foreach($classes as $cls) {
+			$domains = array_merge($domains, $cls::getDomainNames());
+		}
+		
+		GO()->getCache()->set("authentication-domains", $domains);
+		
+		return $domains;		
 	}
 
 }

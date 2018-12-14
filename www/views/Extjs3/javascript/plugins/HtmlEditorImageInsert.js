@@ -41,7 +41,7 @@ Ext.extend(GO.plugins.HtmlEditorImageInsert, Ext.util.Observable, {
 		var element={};
 
 		element.itemId='htmlEditorImage';
-		element.cls='x-btn-icon go-edit-insertimage';
+		element.iconCls='ic-image';
 		element.enableToggle=false;
 		element.scope=this;
 		element.clickEvent='mousedown';
@@ -53,15 +53,56 @@ Ext.extend(GO.plugins.HtmlEditorImageInsert, Ext.util.Observable, {
 		element.overflowText=t("Insert image in the text");
 		
 							
-		this.uploadForm = new GO.UploadPCForm();
+//		this.uploadForm = new GO.UploadPCForm();
+//
+//		this.uploadForm.on('upload', function(e, files)
+//		{
+//			this.selectTempImage(files[0]);
+//		},this);
 
-		this.uploadForm.on('upload', function(e, files)
-		{
-			this.selectTempImage(files[0]);
-		},this);
+		this.fileField = new go.form.FileField({
+							renderField: false,
+							renderButton: true,							
+							name: 'imageId',							
+							autoUpload: true,														
+							wrapCfg: {
+								cls: 'x-menu-item-text',
+								
+								width: "auto",
+								style: "display:inline-block"
+							},	
+							buttonCfg: {
+								width: "auto",
+								style: "border:0;font-weight:normal;padding:0; margin: 0",
+								text: t("Upload"),
+							},
+							accept: 'image/*'
+						});
 
 		var menuItems = [
-		this.uploadForm
+		//this.uploadForm
+		{
+			iconCls: 'ic-computer',
+			text: t("Upload"),
+			handler: function() {
+				go.util.openFileDialog({
+					multiple: true,
+					accept: "image/*",
+					directory: true,
+					autoUpload: true,
+					listeners: {
+						upload: function(response) {
+							var img = '<img src="' + go.Jmap.downloadUrl(response.blobId) + '" alt="'+response.name+'" />';
+							
+							this.editor.focus();
+							this.editor.insertAtCursor(img);
+						},
+						scope: this
+					}
+				});
+			},
+			scope: this
+		}
 		];
 
 		if(go.Modules.isAvailable("legacy", "files")){
@@ -96,26 +137,6 @@ Ext.extend(GO.plugins.HtmlEditorImageInsert, Ext.util.Observable, {
 		GO.selectFileBrowserWindow.show();
 
 		GO.selectFileBrowserWindow.show.defer(200, GO.selectFileBrowserWindow);
-	},
-
-	selectTempImage : function(path)
-	{
-		
-		var token = GO.base.util.MD5(path);
-		
-		this.selectedUrl = GO.url("core/downloadTempFile", {path:path, token: token});
-
-		this.selectedPath = path;	
-		
-
-		var html = '<img src="'+this.selectedUrl+'" border="0" />';
-
-		this.fireEvent('insert', this,  this.selectedPath, true, token);
-		
-		this.menu.hide();
-
-		this.editor.focus();
-		this.editor.insertAtCursor(html);		
 	},
 	
 	selectImage : function(r){	

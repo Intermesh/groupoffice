@@ -13,6 +13,10 @@ use go\core\orm\Property;
 
 class EmailAddress extends Property {
 	
+	
+	const TYPE_WORK = "work";
+	const TYPE_HOME = "home";
+	const TYPE_BILLING = "billing";
 	/**
 	 * 
 	 * @var int

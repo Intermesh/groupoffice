@@ -1,22 +1,29 @@
+/* global Ext, go */
+
 go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	currentId : null, 
 	entityStore: null,
 	buttonAlign: 'left',
 	autoScroll: true,
 	entity: null,
-	initComponent : function() {
-		go.form.EntityPanel.superclass.initComponent.call(this);				
-		this.entityStore.on('changes',this.onChanges, this);
-		this.on('destroy', function() {
-			this.entityStore.un('changes', this.onChanges, this);
-		}, this);
-	},
+	values : null,
 	
-	onChanges : function(entityStore, added, changed, destroyed) {
-		if(changed.concat(added).indexOf(this.currentId) !== -1) {			
-			var entities = this.entityStore.get([this.currentId]);
-			this.entity = entities[0];
-			this.getForm().setValues(entities[0]);
+	initComponent : function() {
+		go.form.EntityPanel.superclass.initComponent.call(this);			
+		
+		this.values = {};
+		
+		this.getForm().trackResetOnLoad = true;
+		
+		this.addEvents({load: true, setvalues: true});
+	},	
+	
+	onChanges : function(entityStore, added, changed, destroyed) {		
+		var entity = added[this.currentId] || changed[this.currentId] || false;
+		if(entity) {			
+			this.entity = entity;
+			//TODO, This will bluntly overwrite user's modification when modified.
+			this.getForm().setValues(entity);
 		}		
 	},
 	
@@ -24,28 +31,58 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		return this.getForm().isValid();
 	},
 	
-	load: function (id) {
+	load: function (id, callback, scope) {
 		this.currentId = id;
 
-		var entities = this.entityStore.get([id]);
-		
-		if(entities) {
-			this.getForm().setValues(entities[0]);
+		this.entityStore.get([id], function(entities) {
+			this.setValues(entities[0]);
 			this.entity = entities[0];
-			return entities[0];
-		} else {
-			return false;
-		}		
+			
+			if(callback) {
+				callback.call(scope || this, entities[0]);
+			}
+			
+			this.fireEvent("load", this);
+		}, this);
+	},
+	
+	getValues : function (dirtyOnly) {	
+		var v = {};		
+		for(var name in this.values) {
+			if(!dirtyOnly || this.entity[name] !== this.values[name]) {
+				v[name] = this.values[name];
+			}
+		}
+		
+		Ext.apply(v, this.getForm().getFieldValues(dirtyOnly));
+		return v;
+	},
+	
+	setValues : function(v) {
+		var field, name;
+		
+		this.getForm().setValues(v);
+		
+		//set all non form values.
+		for(name in v) {		
+			field = this.getForm().findField(name);
+			if(!field) {
+				this.values[name] = v[name];
+			}
+		}
+		
+		this.fireEvent('setvalues', this, v);
+		return this;
 	},
 
 	submit: function (cb, scope) {
 
 		if (!this.isValid()) {
 			return;
-		}
+		}		
+		//get only modified values on existing items, otherwise get all values.
+		var id, params = {}, values = this.getValues(!!this.currentId);
 
-		var id, params = {}, values = this.getForm().getFieldValues(this.currentId ? true : false);
-		//		//this.id is null when new
 		if (this.currentId) {
 
 			id = this.currentId;
@@ -117,3 +154,5 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 //		}
 //	}
 });
+
+Ext.reg("entityform", go.form.EntityPanel);

@@ -23,7 +23,20 @@ class Authenticator extends PrimaryAuthenticator {
 	}
 
 	public static function isAvailableFor($username) {		
-		return static::findServer($username) != false;
+		
+		list($username, $domain) = self::splitUserName($username);
+		
+		return static::findServer($domain) != false;
+	}
+	
+	private static function splitUserName($username) {
+		$arr = explode('@', $username);
+		if(count($arr) !== 2) {
+			return [$username, ""];
+		} else
+		{
+			return $arr;
+		}
 	}
 	
 	/**
@@ -31,13 +44,7 @@ class Authenticator extends PrimaryAuthenticator {
 	 * @param string $email
 	 * @return Server|boolean
 	 */
-	private static function findServer($email) {
-		$adPos = strrpos($email, '@');
-		if(!$adPos) {
-			return false;
-		}
-		
-		$domain = substr($email, $adPos + 1);
+	private static function findServer($domain) {		
 		
 		return Server::find()
 						->join('ldapauth_server_domain', 'd', 's.id = d.serverId')
@@ -48,7 +55,9 @@ class Authenticator extends PrimaryAuthenticator {
 	
 	public function authenticate($username, $password) {
 		
-		$server = $this->findServer($username);
+		list($ldapUsername, $domain) = $this->splitUserName($username);
+		
+		$server = $this->findServer($domain);
 		
 		$connection = new Connection();
 		if(!$connection->connect($server->getUri())) {
@@ -70,7 +79,6 @@ class Authenticator extends PrimaryAuthenticator {
 			}
 		}
 		
-		$ldapUsername = explode('@', $username)[0];
 		$record = Record::find($connection, $server->peopleDN, $server->usernameAttribute . "=" . $ldapUsername)->fetch();
 		
 		if(!$record) {
@@ -96,17 +104,17 @@ class Authenticator extends PrimaryAuthenticator {
 		}
 		
 		if($server->hasEmailAccount()) {
-			$this->setEmailAccount($ldapUsername, $password, $username, $server, $user);
+			$this->setEmailAccount($ldapUsername, $password, $record->mail[0], $server, $user);
 		}
 		
 		return $user;
 	
 	}	
 	
-	private function createUser($email, Record $record) {
+	private function createUser($username, Record $record) {
 		$user = new User();
 		$user->displayName = $record->cn[0];
-		$user->username = $email;
+		$user->username = $username;
 		$user->email = $record->mail[0];
 		$user->recoveryEmail = isset($record->mail[1]) ? $record->mail[1] : $record->mail[0];		
 		

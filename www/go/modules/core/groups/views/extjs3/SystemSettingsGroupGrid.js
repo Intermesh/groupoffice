@@ -31,13 +31,11 @@ go.modules.core.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 				'id',
 				'name',
 				'isUserGroupFor',
-				'users',
-				'memberCount'
+				{name: 'members', type: go.data.types.User, key: 'users.userId'}
+				
 			],
-			entityStore: go.Stores.get("Group")
+			entityStore: "Group"
 		});
-
-		this.store.on('load', this.onStoreLoad, this);
 
 		Ext.apply(this, {
 			plugins: [actions],
@@ -49,6 +47,13 @@ go.modules.core.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
 						var dlg = new go.modules.core.groups.GroupDialog();
+						dlg.show();
+					}
+				}, {
+					iconCls: 'ic-settings',
+					tooltip: t("Group defaults"),
+					handler: function() {
+						var dlg = new go.modules.core.groups.GroupDefaultsWindow();
 						dlg.show();
 					}
 				}
@@ -63,23 +68,13 @@ go.modules.core.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'displayName',
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 						
-						var memberStr = t("Loading members..."),
-										members = record.get('users').column('userId'),
-										users = go.Stores.get('User').get(members),
-										max = 5;
+						var max = 5,
+								members = record.get('members').slice(0, max).column('displayName');
 						
-						if(users) {
-							memberStr = "";
-							users.slice(0, max).forEach(function (user) {
-								if (memberStr != "") {
-									memberStr += ", "
-								}
-								memberStr += user.displayName;
-							});
-						}
-
+						memberStr = members.join(", ");
+								
 						var more = members.length - max;
-						if (more > 0) {
+						if(more > 0) {
 							memberStr += t(" and {count} more").replace('{count}', more);
 						}
 						
@@ -179,26 +174,6 @@ go.modules.core.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 
 		var dlg = new go.modules.core.groups.GroupDialog();
 		dlg.load(id).show();
-
-	},
-
-	onStoreLoad: function () {
-
-		var records = this.store.getRange(), me = this, count = 0;
-		var memberIds = [];
-		
-		records.forEach(function(record) {
-			memberIds = memberIds.concat(record.data.users.column("userId"));			
-		});
-		
-		var unique = memberIds.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
-						
-		go.Stores.get('User').get(unique, function(entities, async) {	
-			//all data is fetched now. Refresh grid ui.	
-			if(async && me.rendered) {
-				me.getView().refresh();														
-			}
-		});
 
 	}
 

@@ -43,6 +43,8 @@ use Sabre;
  */
 class Task extends \GO\Base\Db\ActiveRecord {
 	
+	use \go\core\orm\CustomFieldsTrait;
+	
 	const STATUS_NEEDS_ACTION = "NEEDS-ACTION";
 	const STATUS_COMPLETED = "COMPLETED";
 	const STATUS_ACCEPTED = "ACCEPTED";
@@ -262,7 +264,7 @@ class Task extends \GO\Base\Db\ActiveRecord {
 		if(!empty($this->rrule)) {
 
 			$rrule = new \GO\Base\Util\Icalendar\Rrule();
-			$rrule->readIcalendarRruleString($this->due_time, $this->rrule, true);
+			$rrule->readIcalendarRruleString($this->due_time, $this->rrule);
 		
 			$nextDueTime = $rrule->getNextRecurrence($this->due_time+1);
 			

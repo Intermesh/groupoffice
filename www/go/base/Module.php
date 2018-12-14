@@ -403,13 +403,13 @@ class Module extends Observable {
 	 */
 	public function buildSearchCache(&$response){		
 		
-		$response[]  = "Building search cache for ".$this->name()."\n";		
+		//$response[]  = "Building search cache for ".$this->name()."\n";		
 				
 		$models=$this->getModels();
 
 		foreach($models as $model){
 			if($model->isSubclassOf("GO\Base\Db\ActiveRecord")){
-				echo $response[] = "Processing ".$model->getName()."\n";
+				//$response[] = "Processing ".$model->getName()."\n";
 				$stmt = \GO::getModel($model->getName())->rebuildSearchCache();
 			
 			}

@@ -45,7 +45,10 @@ GO.moduleManager.onModuleReady('calendar',function(){
 						}
 				}.createDelegate(this);
 			
-			GO.favorites.favoritesCalendarStore.load();
+			
+			this.on("afterrender", function() {
+				GO.favorites.favoritesCalendarStore.load();
+			}, this);
 						
 			var changeCalendar = function(grid, calendars, records)
 			{

@@ -13,6 +13,13 @@ use go\core\orm\Property;
 
 class PhoneNumber extends Property {
 	
+	const TYPE_HOME = "home";
+	const TYPE_MOBILE = "mobile";
+	const TYPE_WORK_MOBILE = "workmobile";
+	const TYPE_WORK = "work";
+	const TYPE_FAX = "fax";
+	const TYPE_WORK_FAX = "workfax";
+	
 	/**
 	 * 
 	 * @var int

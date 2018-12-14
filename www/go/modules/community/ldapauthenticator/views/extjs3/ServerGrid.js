@@ -2,7 +2,8 @@
 go.modules.community.ldapauthenticator.ServerGrid = Ext.extend(go.grid.GridPanel, {
 	viewConfig: {
 		forceFit: true,
-		autoFill: true
+		autoFill: true,
+		emptyText: 	'<p>' +t("No items to display") + '</p>'
 	},
 
 	initComponent: function () {
@@ -26,7 +27,7 @@ go.modules.community.ldapauthenticator.ServerGrid = Ext.extend(go.grid.GridPanel
 			
 			store: new go.data.Store({
 				fields: ['id', 'hostname'],
-				entityStore: go.Stores.get("LdapAuthServer")				
+				entityStore: "LdapAuthServer"				
 			}),
 			autoHeight: true,
 			plugins: [actions],
@@ -51,6 +52,20 @@ go.modules.community.ldapauthenticator.ServerGrid = Ext.extend(go.grid.GridPanel
 		});
 
 		go.modules.community.ldapauthenticator.ServerGrid.superclass.initComponent.call(this);
+		
+		this.on("rowdblclick", function(grid, rowIndex, e) {
+			var record = grid.getStore().getAt(rowIndex);
+			this.edit(record.data.id);
+		}, this);
+	},
+	
+	//This reloads the domains combo after changes. 
+	entityStore: "LdapAuthServer",	
+	onChanges: function(store, added, changed, destroyed) {
+		
+		if(Object.keys(changed).length || destroyed.length) {
+				GO.SystemSettingsDomainCombo.reloadDomains();
+		}
 	},
 
 	initRowActions: function () {
@@ -65,24 +80,56 @@ go.modules.community.ldapauthenticator.ServerGrid = Ext.extend(go.grid.GridPanel
 			keepSelection: true,
 
 			actions: [{
-					iconCls: 'ic-edit'
+					iconCls: 'ic-more-vert'
 				}]
 		});
 
 		actions.on({
 			action: function (grid, record, action, row, col, e, target) {
-				console.log(action);
-//				switch (action.iconCls) {
-//					case 'ic-edit':
-						var form = new go.modules.community.ldapauthenticator.ServerForm();
-						form.load(record.data.id).show();
-//						break;
-//				}
+				this.showMoreMenu(record, e);
 			},
 			scope: this
 		});
 
 		return actions;
 
+	},
+	
+	showMoreMenu : function(record, e) {
+		if(!this.moreMenu) {
+			this.moreMenu = new Ext.menu.Menu({
+				items: [
+					{
+						itemId: "edit",
+						iconCls: 'ic-edit',
+						text: t("Edit"),
+						handler: function() {
+							
+							this.edit(this.moreMenu.record.data.id);
+							
+						},
+						scope: this
+					},{
+						itemId: "delete",
+						iconCls: 'ic-delete',
+						text: t("Delete"),
+						handler: function() {
+							this.getSelectionModel().selectRecords([this.moreMenu.record]);
+							this.deleteSelected();
+						},
+						scope: this
+					}
+					
+				]
+			});
+		}	
+		
+		this.moreMenu.record = record;		
+		this.moreMenu.showAt(e.getXY());
+	},
+	
+	edit: function(id) {
+		var form = new go.modules.community.ldapauthenticator.ServerForm();
+		form.load(id).show();
 	}
 });

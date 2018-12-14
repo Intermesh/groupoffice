@@ -1,3 +1,5 @@
+/* global go */
+
 /** 
  * Copyright Intermesh
  * 
@@ -13,8 +15,9 @@
 go.systemsettings.Dialog = Ext.extend(go.Window, {
 	
 	modal:true,
-	resizable:true,
-	maximizable:true,
+	resizable:false,
+	maximizable:false,
+	maximized: true,
 	iconCls: 'ic-settings',
 	title: t("System settings"),
 	
@@ -36,42 +39,28 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		
 		
 		this.tabStore = new Ext.data.ArrayStore({
-			fields: ['name', 'icon', 'visible'],
+			fields: ['name', 'iconCls'],
 			data: []
 		});
 		
-		this.selectMenu = new Ext.Panel({
+		this.selectMenu = new go.NavMenu({
 			region:'west',
-			cls: 'go-sidenav',
-			layout:'fit',
 			width:dp(300),
-			items:[this.selectView = new Ext.DataView({
-				xtype: 'dataview',
-				cls: 'go-nav',
-				store:this.tabStore,
-				singleSelect: true,
-				overClass:'x-view-over',
-				itemSelector:'div',
-				tpl:'<tpl for=".">\
-					<div><i class="icon {icon}"></i>\
-					<span>{name}</span></div>\
-				</tpl>',
-				columns: [{dataIndex:'name'}],
-				listeners: {
-					selectionchange: function(view, nodes) {		
-						if(nodes.length) {
-							this.tabPanel.setActiveTab(nodes[0].viewIndex);
-						} else
-						{
-							//restore selection if user clicked outside of view
-							view.select(this.tabPanel.items.indexOf(this.tabPanel.getActiveTab()));
-						}
-					},
-					scope:this
-				}
-			})]
-		});
-		
+			store: this.tabStore,
+			listeners: {
+				selectionchange: function(view, nodes) {		
+					if(nodes.length) {
+						this.tabPanel.setActiveTab(nodes[0].viewIndex);
+					} else
+					{
+						//restore selection if user clicked outside of view
+						view.select(this.tabPanel.items.indexOf(this.tabPanel.getActiveTab()));
+					}
+				},
+				scope:this
+			}
+		});		
+
 		Ext.apply(this,{
 			width:dp(1000),
 			height:dp(800),
@@ -104,7 +93,7 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 	},
 	
 	loadModulePanels : function() {
-		var available = go.Modules.getAvailable(), config, pnl, i, i1;
+		var available = go.Modules.getAvailable(), config, pnl, i, i1, sepAdded = false;
 		
 		for(i = 0, l = available.length; i < l; i++) {
 			
@@ -112,6 +101,11 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 			
 			if(!config.systemSettingsPanels) {
 				continue;
+			}
+			
+			if(available[i].package != 'core' && !sepAdded) {
+				this.selectMenu.addSeparator();
+				sepAdded = true;
 			}
 			
 			for(i1 = 0, l2 = config.systemSettingsPanels.length; i1 < l2; i1++) {
@@ -123,7 +117,7 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 	
 	show: function(){
 		go.systemsettings.Dialog.superclass.show.call(this);
-		this.selectView.select(this.tabStore.getAt(0));
+		this.selectMenu.select(this.tabStore.getAt(0));
 		this.load();
 	},
 
@@ -151,7 +145,7 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 	onSubmitComplete : function(tab, success) {
 		if(success) {
 			this.submitCount--;
-			if(this.submitCount == 0) {
+			if(this.submitCount === 0) {
 				this.hide();
 			}
 		}
@@ -160,6 +154,9 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 	onLoadComplete : function() {
 		
 	},
+	
+	
+	
 	
 	/**
 	 * Add a panel to the tabpanel of this dialog
@@ -179,10 +176,9 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		
 		var pnl = new panelClass(cfg);
 		
-			var menuRec = new Ext.data.Record({
-			'name':pnl.title,
-			'icon':pnl.iconCls,
-			'visible':true
+		var menuRec = new Ext.data.Record({
+			name: pnl.title,
+			iconCls: pnl.iconCls
 		});
 		
 		if(Ext.isEmpty(position)){

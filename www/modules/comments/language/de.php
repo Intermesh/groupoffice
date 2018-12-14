@@ -17,4 +17,5 @@ return array (
   'name' => 'Kommentare',
   'description' => 'Modul zur Aktivierung von Kommentaren in anderen Modulen',
   'Comments' => 'Kommentare',
+  '{author} wrote at {date}' => '{author} schrieb am {date}',
 );

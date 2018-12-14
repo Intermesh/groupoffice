@@ -52,6 +52,11 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 	 */
 	serverFormats: true,
 	
+	/**
+	 * Multiply value 
+	 */
+	multiplier: 1,
+	
 	initComponent : function(){
 		GO.form.NumberField.superclass.initComponent.call(this);
 		
@@ -88,17 +93,19 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 		if(this.serverFormats) {
 			return v;
 		} else
-		{
-			return GO.util.unlocalizeNumber(v);
+		{			
+			return GO.util.unlocalizeNumber(v) / this.multiplier;
 		}
 	},	
 	
 	setValue : function(v) {
-		if(!this.serverFormats) {
-			v = GO.util.numberFormat(v, this.decimals);
-		} 
+		GO.form.NumberField.superclass.setValue.call(this, v);
 		
-		return GO.form.NumberField.superclass.setValue.call(this, v);
+		if(!this.serverFormats) {			
+			v = v * this.multiplier;
+			formatted = GO.util.numberFormat(v, this.decimals);
+			this.setRawValue(formatted);
+		}
 	},
 	
 	/**

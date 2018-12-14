@@ -67,7 +67,7 @@ class EventHandlers {
 			$accountModel = \GO\Email\Model\Account::model()->findByPk($alias['account_id']);
 			$cert = Model\Certificate::model()->findByPk($alias['account_id']);
 
-			if ($cert && !empty($accountModel) && GO::user()->id===$accountModel->user_id) {
+			if ($cert && !empty($accountModel)) {
 				$alias['has_smime_cert'] = true;
 				$alias['always_sign'] = $cert->always_sign;
 			}

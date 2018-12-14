@@ -45,20 +45,31 @@ class Settings extends core\Settings {
 	 */
 	private function detectURL() {
 		
-		if(!isset($_SERVER['SERVER_NAME'])) {
+		if(!isset($_SERVER['REQUEST_URI'])) {
 			return null;
 		}		
 		
-		$path = '/' . trim(dirname($_SERVER['PHP_SELF']), '/');		
-		$https = (isset($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"] == "on" || $_SERVER["HTTPS"] == "1")) || !empty($_SERVER["HTTP_X_SSL_REQUEST"]);
+		$path = $_SERVER['REQUEST_URI'];
+
+		$scriptName = basename($_SERVER['SCRIPT_NAME']);
+		$lastSlash = strrpos($path, $scriptName);
+		if($lastSlash !== false) {
+			$path = substr($path, 0, $lastSlash);
+		}
+		//replace double slashes as they also resolve
+		$path = preg_replace('/\/+/', '/', $path);
+		
+			//trim install folder
+		if(substr($path, -9) == '/install/') {
+			$path = substr($path, 0, -8);
+		}		
+		
+		$https = (isset($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"] == "on" || $_SERVER["HTTPS"] == "1")) || !empty($_SERVER["HTTP_X_SSL_REQUEST"]) || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on');
 		$protocol = $https ? 'https://' : 'http://';
 		
-		//trim install folder
-		if(substr($path, -8) == '/install') {
-			$path = substr($path, 0, -8);
-		}
+		$url = $protocol . $_SERVER['HTTP_HOST'] . $path;
 		
-		return $protocol . $_SERVER['HTTP_HOST'] . $path;
+		return $url;
 	}
 
 	const SMTP_ENCRYPTION_TLS = 'tls';
@@ -122,6 +133,48 @@ class Settings extends core\Settings {
 	public function setSmtpPassword($value) {
 		$this->smtpPassword = \go\core\util\Crypt::encrypt($value);
 	}
+	
+	
+	protected $locale;
+	
+	/**
+	 * Get locale for the system. We need a UTF8 locale so command line functions
+	 * work with UTF8.
+	 * 
+	 * @return string
+	 */
+	public function getLocale() {
+		
+		if(isset($this->locale)) {
+			return $this->locale;
+		}
+		
+		try {
+			exec('locale -a', $output);
+
+			if(isset($output) && is_array($output)){
+				foreach($output as $locale){
+					if(stripos($locale,'utf')!==false){
+						$this->locale = $locale;
+						$this->save();
+						return $this->locale;
+					}
+				}
+			}
+		} catch(\Exception $e) {
+			GO()->debug("Could not determine locale");
+		}
+
+		//This locale is often installed so try to fallback on C.UTF8
+		$this->locale = "C.UTF8";
+		$this->save();
+		
+		return $this->locale;
+	}
+	
+	public function setLocale($locale) {
+		$this->locale = $locale;
+	}
 
 	/**
 	 * Encryption to use for SMTP
@@ -164,6 +217,14 @@ class Settings extends core\Settings {
 	 * @var int
 	 */
 	public $passwordMinLength = 6;
+	
+	
+	/**
+	 * Default domain name to append to username for authentication
+	 * 
+	 * @var string
+	 */
+	public $defaultAuthenticationDomain;
 	
 	
 	/**

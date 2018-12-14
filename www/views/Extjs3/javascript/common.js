@@ -45,17 +45,38 @@ GO.util.stringToFunction = function(str) {
   return  fn;
 };
 
+/**
+ * Translate a string
+ * 
+ * Module and package can be omitted in most cases. It will auto detect these.
+ * 
+ * go.module and go.package are set at:
+ * 
+ * 1. Before each module scripts are loaded
+ * 2. An override on Ext.extend() will set "module" and "package" on each 
+ *    components. A second override on Ext.Component will set 
+ *    go.Translate.module and package on getId() (getId() was the only way to 
+ *    make it happen always and on time) This override was made on ext-all-debug.js
+ *    because it had to do something before and after initcomponent and 
+ *    overriding constructors is not possible.
+ * 
+ * @param {string} str
+ * @param {string} module
+ * @param {string} package
+ * @returns {t.l|GO..lang}
+ */
 function t(str, module, package) {
-
-	if(!module) {
-		module = go.Translate.module;
-		package = go.Translate.package;
-	}
 	
-	if(!package) {
+	if(module && !package) {
 		package = "legacy";
 	}
 		
+	if(!module) {
+		module = go.Translate.module;		
+	}
+	if(!package) {
+		package = go.Translate.package;
+	}
 	
 	if(!GO.lang[package] || !GO.lang[package][module]) {
 		return t(str, "core", "core");
@@ -67,7 +88,7 @@ function t(str, module, package) {
     return l[str]
   }
   
-  if(module != "core" && package != "core"){
+  if(module != "core" || package != "core"){
     return t(str, "core", "core");
   } else
   {
@@ -122,12 +143,12 @@ GO.openHelp = function(page){
 
 
 GO.util.callToLink = function(phone){
+		return '<a onclick="GO.util.callToHandler(\''+phone+'\');">'+phone+'</a>';	
+}
 
-	if(GO.util.empty(GO.settings.config.encode_callto_link)){
-		return '<a onclick="GO.mainLayout.fireEvent(\'callto\', \''+phone+'\');" href="'+GO.calltoTemplate.replace('{phone}', phone.replace('(0)','').replace(/[^0-9+]/g,''))+'">'+phone+'</a>';
-	} else {
-		return '<a onclick="GO.mainLayout.fireEvent(\'callto\', \''+phone+'\');" href="'+GO.calltoTemplate.replace('{phone}', encodeURIComponent(phone.replace('(0)','').replace(/[^0-9+]/g,'')))+'">'+phone+'</a>';		
-	}
+GO.util.callToHandler = function(phone) {	
+	document.location = GO.calltoTemplate.replace('{phone}', phone.replace('(0)','').replace(/[^0-9+]/g,''));
+	return false;
 }
 
 GO.url = function(relativeUrl, params){
@@ -241,30 +262,7 @@ GO.util.mergeObjects = function(a, b) {
 
 GO.util.empty = function(v)
 {
-	if(!v)
-	{
-		return true;
-	}
-	if(v=='')
-	{
-		return true;
-	}
-
-	if(v=='0')
-	{
-		return true;
-	}
-	
-	if(v=='undefined')
-	{
-		return true;
-	}
-	
-	if(v=='null')
-	{
-		return true;
-	}
-	return false;
+	return go.util.empty(v);
 }
 
 GO.mailTo = function(email){
@@ -957,8 +955,8 @@ if(GO.settings && GO.settings.time_format){
 		minutes:[]
 	};
 
-	if (GO.settings.time_format.substr(0, 1) == 'G') {
-			var timeformat = 'G';
+	if (GO.settings.time_format.substr(0, 1) == 'H' || GO.settings.time_format.substr(0, 1) == 'h') {
+			var timeformat = 'H';
 	} else {			
 			var timeformat = 'g a';
 	}
@@ -1487,30 +1485,6 @@ GO.util.HtmlDecode = function HtmlDecode(s) {
 	});
 }
 
-
-
-GO.util.dateFormat = function(v) {
-	if(!v) {
-		return "-";
-	}
-	
-	if (!Ext.isDate(v)) {
-			v = new Date(Date.parse(v));
-	}
-
-	var elapsed = v.getElapsed() / 1000;
-
-	if(elapsed < 86400) {
-		
-		return Ext.util.Format.date(v, GO.settings.time_format);	
-	}
-	
-	if(elapsed < 172800) {		
-		return t('Yesterday');
-	}
-		
-	return Ext.util.Format.date(v, GO.settings.date_format);
-	
-
-	
-}
+GO.util.dateFormat = function(v) {	
+	return go.util.Format.dateTime(v);	
+};

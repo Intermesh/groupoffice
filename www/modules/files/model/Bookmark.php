@@ -20,12 +20,7 @@ namespace GO\Files\Model;
 
 class Bookmark extends \GO\Base\Db\ActiveRecord {
 	
-	/**
-	 * Returns a static model of itself
-	 * 
-	 * @param String $className
-	 * @return \GO\Addressbook\Model\Company 
-	 */
+
 	public static function model($className=__CLASS__)
 	{	
 		return parent::model($className);

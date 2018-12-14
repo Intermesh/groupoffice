@@ -423,7 +423,16 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 //				$acl->description = $model->tableName() . '.' . $model->aclField();
 //				$acl->user_id = \GO::user() ? \GO::user()->id : 1;
 //				$acl->save();
-				$model->setNewAcl();
+				$shared_folder = $model;
+				while(!$shared_folder->isSomeonesHomeFolder() && $shared_folder->parent_id!=0) {
+					$shared_folder = $shared_folder->parent;
+				}
+				$acl = $model->setNewAcl($shared_folder->user_id);
+				$userGroup = \GO\Base\Model\Group::model()->findSingleByAttribute('isUserGroupFor', \GO::user()->id);
+				if($userGroup) {
+					$acl->addGroup($userGroup->id, \GO\Base\Model\Acl::MANAGE_PERMISSION);						
+				}
+				$acl->save(); // again
 				
 				//for enabling the acl permissions panel
 				$response['acl_id']=$model->acl_id;
@@ -476,7 +485,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 	protected function afterDisplay(&$response, &$model, &$params) {
 		$response['data']['path'] = $model->path;
 		$response['data']['type'] = \GO::t("Folder", "files");
-		
+		$response['data']['notify'] = $model->hasNotifyUser(\GO::user()->id);
 		$response['data']['url']=$model->externalUrl;
 
 		return parent::afterDisplay($response, $model, $params);
@@ -742,18 +751,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 
 		//handle delete request for both files and folder
-		if (isset($params['delete_keys'])) {
-
-			$ids = $this->_splitFolderAndFileIds(json_decode($params['delete_keys'], true));
-
-			$params['delete_keys'] = json_encode($ids['folders']);
-			$store->processDeleteActions($params, "GO\Files\Model\Folder");
-
-			$params['delete_keys'] = json_encode($ids['files']);
-			$store->processDeleteActions($params, "GO\Files\Model\File");
-		}
-
-
+		$this->_processDeletes($params, $store);
+		
 		$store->getColumnModel()->setFormatRecordFunction(array($this, 'formatListRecord'));
 
 		$findParams = $store->getDefaultParams($params);
@@ -833,8 +832,36 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		return $response;
 	}
+	
+	/**
+	 * Process deletes, separate function because it needs to be called from different places.
+	 * 
+	 * @param array $params
+	 * @param type $store
+	 */
+	private function _processDeletes($params, $store=false){
+		if(!$store){
+			$store = \GO\Base\Data\Store::newInstance(\GO\Files\Model\Folder::model());
+		}
+		
+		//handle delete request for both files and folder
+		if (isset($params['delete_keys'])) {
+
+			$ids = $this->_splitFolderAndFileIds(json_decode($params['delete_keys'], true));
+
+			$params['delete_keys'] = json_encode($ids['folders']);
+			$store->processDeleteActions($params, "GO\Files\Model\Folder");
+
+			$params['delete_keys'] = json_encode($ids['files']);
+			$store->processDeleteActions($params, "GO\Files\Model\File");
+		}
+	}
 
 	private function _searchFiles($params) {
+		
+			//handle delete request for both files and folder
+			$this->_processDeletes($params);
+		
 			$response['success'] = true;
 
 			$queryStr = !empty($params['query']) ? '%'.$params['query'].'%' : '%';
@@ -1090,33 +1117,10 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		
 		$entity = $cls::findById($params['id']);
 		
-		if(empty($entity->filesFolderId)) {
-			$filesPath = $entityType->getModule()->name. '/'. $entityType->getName() . '/' . $entity->id;
-			$aclId =$entity->findAclId();
-			$folder = \GO\Files\Model\Folder::model()->findByPath($filesPath,true, array('acl_id'=>$aclId,'readonly'=>1));
-
-			if(!$folder){
-				throw new \Exception("Failed to create folder ".$filesPath);
-			}
-	//      if (!empty($model->acl_id))
-	//          $folder->acl_id = $model->acl_id;
-
-			$folder->acl_id=$aclId;
-
-			$folder->visible = 0;
-			$folder->readonly = 1;
-			$folder->systemSave = true;
-			$folder->save(true);
-
-			$entity->filesFolderId = $folder->id;
-			if(!$entity->save()) {
-				throw new \Exception("Could not save entity!");
-			}
-		}
-		
+		$folder = \GO\Files\Model\Folder::model()->findForEntity($entity);
 		return [
 				"success" => true,
-				"files_folder_id" => $entity->filesFolderId
+				"files_folder_id" => $folder->id
 		];
 	}
 

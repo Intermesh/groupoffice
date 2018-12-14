@@ -24,47 +24,43 @@ class Extjs3 {
 	public function getCSSFile($theme = 'Paper') {
 
 		$cacheFile = GO()->getDataFolder()->getFile('clientscripts/' . $theme . '/style.css');
-
+		
+		
 		if (GO()->getDebugger()->enabled || !$cacheFile->exists()) {
 			if ($cacheFile->exists()) {
 				$cacheFile->delete();
 			}
 			$modules = Module::getInstalled();
-
+			$css = "";
 			foreach ($modules as $module) {
 
 				if (isset($module->package)) {
 					$folder = $module->module()->getFolder();
 					$file = $folder->getFile('views/extjs3/themes/default/style.css');
 					if ($file->exists()) {
-						$css = $this->replaceCssUrl($file->getContents(),$file);
-						$cacheFile->putContents($css, FILE_APPEND);
+						$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";						
 					}
 
 					$file = $folder->getFile('views/extjs3/themes/' . $theme . '/style.css');
 					if ($file->exists()) {
-						$css = $this->replaceCssUrl($file->getContents(),$file);
-						$cacheFile->putContents($css, FILE_APPEND);
-						continue;
+						$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";						
 					}
 				}
 
-
 				//old path
-
 				$folder = Environment::get()->getInstallFolder()->getFolder('modules/' . $module->name);
 				$file = $folder->getFile('themes/Default/style.css');
 				if ($file->exists()) {
-					$css = $this->replaceCssUrl($file->getContents(),$file);
-					$cacheFile->putContents($css, FILE_APPEND);
+					$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";
 				}
 
 				$file = $folder->getFile('themes/' . $theme . '/style.css');
 				if ($file->exists()) {
-					$css = $this->replaceCssUrl($file->getContents(),$file);
-					$cacheFile->putContents($css, FILE_APPEND);
+					$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";					
 				}
 			}
+			
+			$cacheFile->putContents($css);
 		}
 		return $cacheFile;
 	}
@@ -88,7 +84,7 @@ class Extjs3 {
 	 */
 	public function getLanguageJS() {
 		
-		$iso = Language::get()->getIsoCode();
+		$iso = \GO()->getLanguage()->getIsoCode();
 	
 		
 		$cacheFile = GO()->getDataFolder()->getFile('clientscripts/lang_'.$iso.'.js');
@@ -98,7 +94,7 @@ class Extjs3 {
 
 			$str = "var GO = GO || {};\n";
 
-			$extjsLang = Language::get()->t("extjs_lang");
+			$extjsLang = \GO()->getLanguage()->t("extjs_lang");
 			if ($extjsLang == 'extjs_lang')
 				$extjsLang = $iso;
 
@@ -117,17 +113,13 @@ class Extjs3 {
 			}
 
 			//Put all lang vars in js		
-			$l = Language::get()->getAllLanguage();
+			$l = \GO()->getLanguage()->getAllLanguage();
 			$l['iso'] = $iso;
 
 			$str .= 'GO.lang = ' . json_encode($l) . ";\n";
 			
-			//branding
-			$str = str_replace("{product_name}", GO()->getConfig()['branding']['name'], $str);
-			$str = str_replace("GroupOffice", GO()->getConfig()['branding']['name'], $str);
-			$str = str_replace("Group Office", GO()->getConfig()['branding']['name'], $str);
-			$str = str_replace("Group-Office", GO()->getConfig()['branding']['name'], $str);
-
+			$str .= "GO.lang.holidaySets = " . json_encode(\GO\Base\Model\Holiday::getAvailableHolidayFiles()) .";\n";
+			
 			$cacheFile->putContents($str);
 		}
 		

@@ -3,12 +3,14 @@
 namespace go\modules\core\search\model;
 
 use go\core\acl\model\Acl;
-use go\core\db\Query;
-use go\core\orm\Entity;
+use go\core\acl\model\AclOwnerEntity;
+use go\core\db\Criteria;
 use go\core\orm\EntityType;
+use go\core\orm\Query;
 use go\core\util\DateTime;
+use go\core\util\StringUtil;
 
-class Search extends \go\core\acl\model\AclEntity {
+class Search extends AclOwnerEntity {
 
 	public $id;
 	public $entityId;
@@ -25,6 +27,11 @@ class Search extends \go\core\acl\model\AclEntity {
 	
 	public function setAclId($aclId) {
 		$this->aclId = $aclId;
+	}
+	
+	//don't delete acl on search
+	protected function deleteAcl() {
+		
 	}
 	
 	
@@ -45,6 +52,7 @@ class Search extends \go\core\acl\model\AclEntity {
 
 	public $name;
 	public $description;
+	public $filter;
 	protected $keywords;
 
 	public function setKeywords($keywords) {
@@ -53,9 +61,9 @@ class Search extends \go\core\acl\model\AclEntity {
 	
 	protected function internalValidate() {
 		
-		$this->name = \go\core\util\StringUtil::cutString($this->name, $this->getMapping()->getColumn('name')->length, false);
-		$this->description = \go\core\util\StringUtil::cutString($this->description, $this->getMapping()->getColumn('description')->length);		
-		$this->keywords = \go\core\util\StringUtil::cutString($this->keywords, $this->getMapping()->getColumn('description')->length, true, "");
+		$this->name = StringUtil::cutString($this->name, $this->getMapping()->getColumn('name')->length, false);
+		$this->description = StringUtil::cutString($this->description, $this->getMapping()->getColumn('description')->length);		
+		$this->keywords = StringUtil::cutString($this->keywords, $this->getMapping()->getColumn('description')->length, true, "");
 		
 		return parent::internalValidate();
 	}
@@ -82,23 +90,43 @@ class Search extends \go\core\acl\model\AclEntity {
 	 * @param Query $query
 	 * @param int $level
 	 */
-	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ) {
-		Acl::applyToQuery($query, 's.aclId', $level);
+	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null) {
+		Acl::applyToQuery($query, 's.aclId', $level, $userId);
 		
 		return $query;
 	}
 	
-	public static function filter(Query $query, array $filter) {
-		
-		if (!empty($filter['q'])) {
-			$query->where('keywords', 'LIKE', "%" . $filter['q'] . "%");
-		}	
+	protected static function defineFilters() {
+		return parent::defineFilters()
+						->add('entityId', function (Query $query, $value, array $filter){
+							$query->where(['entityId' => $value]);		
+						})
+						->add('entities', function (Query $query, $value, array $filter){
+							// Entity filter consist out of name => "Contact" and an optional "filter" => "isOrganization"
+							if(empty($value)) {
+								return;
+							}
+							
+							$sub = (new Criteria);
 
-		if (!empty($filter['entities'])) {
-			$query->where('e.name', 'IN', $filter['entities']);		
-		}
-		
-		return parent::filter($query, $filter);
+							foreach($value as $e) {
+								$w = ['e.name' => $e['name']];
+								if(isset($e['filter'])) {
+									$w['filter'] = $e['filter'];
+								}
+
+								$sub->orWhere($w);
+							}
+
+							$query->where($sub);		
+							
+						});
+					
+	}
+	
+	
+	protected static function searchColumns() {
+		return ['keywords'];
 	}
 	
 }

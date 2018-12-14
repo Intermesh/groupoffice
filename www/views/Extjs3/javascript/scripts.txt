@@ -1,3 +1,6 @@
+views/Extjs3/javascript/vendor/localforage.nopromises.js
+views/Extjs3/javascript/vendor/localforage.getitems.js
+
 views/Extjs3/javascript/go/go.js
 views/Extjs3/javascript/go/Translate.js
 
@@ -233,6 +236,7 @@ views/Extjs3/javascript/go/flux/Store.js
 views/Extjs3/javascript/go/Jmap.js
 
 views/Extjs3/javascript/go/data/JmapProxy.js
+views/Extjs3/javascript/go/data/EntityStoreProxy.js
 views/Extjs3/javascript/go/data/Store.js
 views/Extjs3/javascript/go/data/GroupingStore.js
 
@@ -241,9 +245,11 @@ views/Extjs3/javascript/go/EntityManager.js
 views/Extjs3/javascript/go/ModuleManager.js
 
 views/Extjs3/javascript/go/grid/GridTrait.js
+views/Extjs3/javascript/go/grid/plugin/Sortable.js
 views/Extjs3/javascript/go/grid/GridPanel.js
 views/Extjs3/javascript/go/grid/EditorGridPanel.js
 views/Extjs3/javascript/go/grid/SelectAllCheckBox.js
+views/Extjs3/javascript/go/grid/DateColumn.js
 
 
 views/Extjs3/javascript/go/Window.js
@@ -253,21 +259,26 @@ views/Extjs3/javascript/go/form/FormFieldSet.js
 views/Extjs3/javascript/go/form/PasswordGeneratorField.js
 views/Extjs3/javascript/go/form/BasicForm.js
 views/Extjs3/javascript/go/form/DateField.js
+views/Extjs3/javascript/go/form/DateTimeField.js
 views/Extjs3/javascript/go/form/FileField.js
 views/Extjs3/javascript/go/form/ComboBox.js
+views/Extjs3/javascript/go/form/ComboBoxReset.js
 views/Extjs3/javascript/go/form/multiselect/Field.js
 views/Extjs3/javascript/go/form/multiselect/Window.js
 views/Extjs3/javascript/go/form/GridField.js
 views/Extjs3/javascript/go/form/RadioGroup.js
 views/Extjs3/javascript/go/form/Switch.js
 views/Extjs3/javascript/go/form/FormGroup.js
+views/Extjs3/javascript/go/form/Chips.js
+views/Extjs3/javascript/go/form/RecurrenceFieldset.js
 
 views/Extjs3/javascript/go/panels/CreateModifyTpl.js
-views/Extjs3/javascript/go/panels/LinksTpl.js
+
 views/Extjs3/javascript/go/panels/DetailView.js
 views/Extjs3/javascript/go/panels/ModulePanel.js
 views/Extjs3/javascript/go/panels/Panel.js
 views/Extjs3/javascript/go/Toolbar.js
+views/Extjs3/javascript/go/SearchField.js
 views/Extjs3/javascript/go/NavMenu.js
 views/Extjs3/javascript/go/Notifier.js
 
@@ -276,6 +287,7 @@ views/Extjs3/javascript/go/layout/ResponsiveLayout.js
 
 views/Extjs3/javascript/go/AuthenticationManager.js
 views/Extjs3/javascript/go/login/LanguageCombobox.js
+views/Extjs3/javascript/go/login/DomainCombo.js
 views/Extjs3/javascript/go/login/LoginDialog.js
 views/Extjs3/javascript/go/login/BaseLoginPanel.js
 views/Extjs3/javascript/go/login/ForgotDialog.js
@@ -283,9 +295,7 @@ views/Extjs3/javascript/go/login/UsernamePanel.js
 views/Extjs3/javascript/go/login/LoginPanel.js
 views/Extjs3/javascript/go/login/RecoveryDialog.js
 
-views/Extjs3/javascript/go/CustomFields.js
 views/Extjs3/javascript/go/Links.js
-views/Extjs3/javascript/go/links/LinkToButton.js
 views/Extjs3/javascript/go/links/EntityGrid.js
 views/Extjs3/javascript/go/links/LinkGrid.js
 views/Extjs3/javascript/go/links/CreateLinkWindow.js
@@ -299,11 +309,15 @@ views/Extjs3/javascript/go/usersettings/UserSettingsDialog.js
 views/Extjs3/javascript/go/Router.js
 views/Extjs3/javascript/go/PasswordPrompt.js
 
+views/Extjs3/javascript/go/QRCodeComponent.js
+
 views/Extjs3/javascript/go/User.js
 views/Extjs3/javascript/go/String.js
 
 views/Extjs3/javascript/go/detail/ReadMore.js
 views/Extjs3/javascript/go/detail/AddButton.js
+views/Extjs3/javascript/go/detail/PropertyList.js
+views/Extjs3/javascript/go/detail/Property.js
 
 views/Extjs3/javascript/go/systemsettings/GeneralPanel.js
 views/Extjs3/javascript/go/systemsettings/AppearancePanel.js
@@ -311,9 +325,12 @@ views/Extjs3/javascript/go/systemsettings/NotificationsPanel.js
 views/Extjs3/javascript/go/systemsettings/AuthenticationPanel.js
 views/Extjs3/javascript/go/systemsettings/Dialog.js
 views/Extjs3/javascript/go/util.js
+views/Extjs3/javascript/go/util/Format.js
 
 views/Extjs3/javascript/go/Wizard.js
 views/Extjs3/javascript/go/Array.js
-
-
 views/Extjs3/javascript/go/grid/editor/ComboColumn.js
+
+views/Extjs3/javascript/go/tree/EntityLoader.js
+views/Extjs3/javascript/go/tree/Node.js
+views/Extjs3/javascript/go/tree/TreeNodeUI.js

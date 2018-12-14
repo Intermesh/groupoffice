@@ -84,14 +84,14 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 		$response['data']['name'] = $alias->name;
 		$response['data']['signature'] = $alias->signature;
 
-		if (\GO::modules()->isInstalled('addressbook')) {
-			$defaultTemplateModel = \GO\Addressbook\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
-			if ($defaultTemplateModel) {
-				$response['data']['default_account_template_id'] = $defaultTemplateModel->template_id;
-			} else {
-				$response['data']['default_account_template_id'] = '';
-			}
-		}
+//		if (\GO::modules()->isInstalled('addressbook')) {
+//			$defaultTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
+//			if ($defaultTemplateModel) {
+//				$response['data']['default_account_template_id'] = $defaultTemplateModel->template_id;
+//			} else {
+//				$response['data']['default_account_template_id'] = '';
+//			}
+//		}
 
 		return parent::afterLoad($response, $model, $params);
 	}
@@ -129,15 +129,15 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 			$alias->save();
 		}
 
-		if (\GO::modules()->addressbook && isset($params['default_account_template_id'])) {
+		if ( isset($params['default_account_template_id'])) {
 			if ($params['default_account_template_id']==-1 || empty($params['default_account_template_id'])) {
-				$defaultTemplateModel = \GO\Addressbook\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
+				$defaultTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
 				if ($defaultTemplateModel)
 					$defaultTemplateModel->delete();
 			} elseif ($params['default_account_template_id']>0) {
-				$defaultTemplateModel = \GO\Addressbook\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
+				$defaultTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
 				if (!$defaultTemplateModel) {
-					$defaultTemplateModel = new \GO\Addressbook\Model\DefaultTemplateForAccount();
+					$defaultTemplateModel = new \GO\Email\Model\DefaultTemplateForAccount();
 					$defaultTemplateModel->account_id = $model->id;
 				}
 				$defaultTemplateModel->template_id = $params['default_account_template_id'];
@@ -149,11 +149,10 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 	}
 
 	protected function remoteComboFields() {
-		if (\GO::modules()->addressbook)
+		
 			return array('user_id' => '$model->user->name',
 					'default_template_id' => '$model->defaultTemplate->emailTemplate->name');
-		else
-			return array('user_id' => '$model->user->name');
+		
 	}
 
 	protected function actionCheckUnseen($params) {
@@ -393,15 +392,17 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 
 			$nodeId = base64_encode('f_' . $mailbox->getAccount()->id . '_' . $mailbox->name);
 
-			$text = $mailbox->getDisplayName();
-
+			
+			$text = '';
 			if(!$fetchAllWithSubscribedFlag){
 				if ($mailbox->unseen > 0) {
-					$text .= '<span class="em-folder-status" id="status_' . $nodeId . '">' . $mailbox->unseen . '</span>';
+					$width = strlen((string) $mailbox->unseen)*6+10;
+					$text .= '<div  class="em-folder-status" id="status_' . $nodeId . '">' . $mailbox->unseen . '</div>';
 				} else {
-					$text .= '<span class="em-folder-status" id="status_' . $nodeId . '"></span>';
+					$text .= '<div class="em-folder-status" id="status_' . $nodeId . '"></div>';
 				}
 			}
+			$text .= '<div class="ellipsis">'.$mailbox->getDisplayName().'</div>';
 
 //			\GO::debug($mailbox);
 

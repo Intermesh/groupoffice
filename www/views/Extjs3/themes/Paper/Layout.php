@@ -20,7 +20,7 @@
 	<link rel="icon" type="image/png" sizes="32x32" href="<?php echo \GO::view()->getUrl().'themes/Paper/img/favicon'; ?>/favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="<?php echo \GO::view()->getUrl().'themes/Paper/img/favicon'; ?>/favicon-16x16.png">
 	<link rel="manifest" href="<?php echo \GO::view()->getUrl().'themes/Paper/img/favicon'; ?>/site.webmanifest">
-	<link rel="mask-icon" href="<?php echo \GO::view()->getUrl().'themes/Paper/img/favicon'; ?>/safari-pinned-tab.svg" color="#5bbad5">
+	<link rel="mask-icon" href="<?php echo \GO::view()->getUrl().'themes/Paper/img/favicon'; ?>/safari-pinned-tab.svg" color="#888888">
 	<?php } ?>
 	
 	<meta name="msapplication-TileColor" content="#2b5797">
@@ -28,9 +28,9 @@
 
 	<title><?php echo \GO::config()->title; ?></title>
 	
-	<link href="<?=\GO::view()->getUrl()?>themes/Paper/style.css" media="screen and (min-device-width:1201px)" type="text/css" rel="stylesheet" />
-	<link rel="stylesheet" type="text/css" media="screen and (max-device-width:1200px)" href="<?=\GO::view()->getUrl()?>themes/Paper/style-mobile.css" />
-	<link href="<?=\GO::view()->getUrl()?>css.php" type="text/css" rel="stylesheet" />
+	<link href="<?=\GO::view()->getUrl()?>themes/Paper/style.css?v=<?=\GO()->getVersion(); ?>" media="screen and (min-device-width:1201px)" type="text/css" rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" media="screen and (max-device-width:1200px)" href="<?=\GO::view()->getUrl()?>themes/Paper/style-mobile.css?v=<?=\GO()->getVersion(); ?>" />
+	<link href="<?=\GO::view()->getUrl()?>css.php?v=<?=\GO()->getVersion(); ?>" type="text/css" rel="stylesheet" />
 	
 	<?php
 	if(!empty(\GO::config()->custom_css_url))
@@ -57,9 +57,10 @@
 </head>
 <body>
 	<div id="sound"></div>
-
-	<?php require(\GO::config()->root_path.'views/Extjs3/default_scripts.inc.php'); ?>
-
-	<script type="text/javascript">GO.util.density = GO.util.isMobileOrTablet() ? 160 : 140;</script>
+	<!--Putting scripts in div will speed up developer tools because they don't have to show all those nodes-->
+	<div id="scripts-container">
+		<?php require(\GO::config()->root_path.'views/Extjs3/default_scripts.inc.php'); ?>
+		<script type="text/javascript">GO.util.density = GO.util.isMobileOrTablet() ? 160 : 140;</script>
+	</div>
 </body>
 </html>

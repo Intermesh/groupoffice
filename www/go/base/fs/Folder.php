@@ -152,8 +152,16 @@ class Folder extends Base {
 		//do nothing if path is the same.
 		if($newPath==$this->path())
 			return true;
+		
+		$success = false;
+		try{
+			$success = rename($this->path(), $newPath);
+		} catch(\Exception $e) {
+			//rename fails accross partitions. Ignore and retry with copy delete.
+			\GO::debug("Rename failed. Falling back on copy, delete");
+		}
 			
-		if(!@rename($this->path(), $newPath)){ // Notice suppressed by @
+		if(!$success){ // Notice suppressed by @
 			//	throw new Exception("Rename failed");
 			
 			// If renaming is throwing an error then do it the old way.

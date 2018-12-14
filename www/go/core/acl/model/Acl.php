@@ -5,7 +5,7 @@ use go\core\App;
 use go\modules\core\groups\model\Group;
 use go\modules\core\users\model\User;
 use go\core\db\Criteria;
-use go\core\db\Query;
+use go\core\orm\Query;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\util\DateTime;
@@ -59,6 +59,15 @@ class Acl extends \go\core\jmap\Entity {
 						->addRelation('groups', AclGroup::class, ['id' => 'aclId'], true);
 	}
 	
+	protected function internalValidate() {
+		
+		if($this->isModified(['groups']) && !$this->hasAdmins()) {
+			$this->setValidationError('groups', \go\core\validate\ErrorCode::FORBIDDEN, "You can't change the admin permissions");
+		}
+			
+		return parent::internalValidate();
+	}
+	
 	
 	protected function internalSave() {
 		
@@ -85,17 +94,7 @@ class Acl extends \go\core\jmap\Entity {
 													]);
 				}
 			}
-		} else {
-			
-			//add admins if removed.
-			if($this->isModified(['groups']) && !$this->hasAdmins()) {
-				$this->groups[] = (new AclGroup())
-							->setValues([
-									'groupId' => Group::ID_ADMINS, 
-									'level' => self::LEVEL_MANAGE
-											]);
-			}
-		}
+		} 
 		
 		if(!parent::internalSave()) {
 			return false;
@@ -106,8 +105,8 @@ class Acl extends \go\core\jmap\Entity {
 	
 	private function hasAdmins() {
 		foreach($this->groups as $group) {
-			if($group->groupId == Group::ID_ADMINS) {
-				return true;
+			if($group->groupId == Group::ID_ADMINS) {				
+				return $group->level == Acl::LEVEL_MANAGE;
 			}
 		}
 
@@ -179,8 +178,9 @@ class Acl extends \go\core\jmap\Entity {
 	 * @param Query $query
 	 * @param string $column eg. t.aclId
 	 * @param int $level The required permission level
+	 * @param int $userId If null then the current user is used.
 	 */
-	public static function applyToQuery(Query $query, $column, $level = self::LEVEL_READ) {
+	public static function applyToQuery(Query $query, $column, $level = self::LEVEL_READ, $userId = null) {
 		
 		$subQuery = (new Query)
 						->select('aclId')
@@ -188,7 +188,7 @@ class Acl extends \go\core\jmap\Entity {
 						->where('acl_g.aclId = '.$column)
 						->join('core_user_group', 'acl_u' , 'acl_u.groupId = acl_g.groupId')
 						->andWhere([
-								'acl_u.userId' => App::get()->getAuthState()->getUserId()						
+								'acl_u.userId' => isset($userId) ? $userId : App::get()->getAuthState()->getUserId()						
 										])
 						->andWhere('acl_g.level', '>=', $level);
 		
@@ -312,5 +312,5 @@ class Acl extends \go\core\jmap\Entity {
 		}
 		
 		return $query;
-	}	
+	}
 }

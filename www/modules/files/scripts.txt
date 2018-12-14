@@ -29,5 +29,5 @@ modules/files/FileBrowser.js
 modules/files/BookmarksGrid.js
 modules/files/OpenFileWindow.js
 modules/files/CompressDialog.js
-
+modules/files/FileBrowserMenuItem.js
 modules/files/FilesDetailPanel.js

@@ -20,9 +20,9 @@ GO.email.AccountDialog = function(config) {
 		fieldLabel : t("Root mailbox", "email"),
 		name : 'mbroot'
 	}) ];
-    console.log("JAAA");
+
 	if(go.Modules.isAvailable("legacy", "sieve")) {
-        console.log("JAAA");
+
 		advancedItems.push(
 			new Ext.form.NumberField({
 				fieldLabel : t("Sieve filter port number", "sieve"),
@@ -43,35 +43,35 @@ GO.email.AccountDialog = function(config) {
 		);
 	}
 
-	if(go.Modules.isAvailable("legacy", "addressbook")){
-				
-		this.templatesCombo = new GO.form.ComboBox({
-			fieldLabel : t("Default e-mail template", "email"),
-			hiddenName : 'default_account_template_id',
-			width: 300,
-			store : new GO.data.JsonStore({
-				url : GO.url("addressbook/template/accountTemplatesStore"),
-				baseParams : {
-					'type':"0"
-				},
-				root : 'results',
-				totalProperty : 'total',
-				id : 'id',
-				fields : ['id', 'name', 'group', 'text','template_id','checked'],
-				remoteSort : true
-			}),
-			value : '',
-			valueField : 'id',
-			displayField : 'name',
-			typeAhead : true,
-			mode : 'local',
-			triggerAction : 'all',
-			editable : false,
-			selectOnFocus : true,
-			forceSelection : true
-		});
-		
-	}
+//	if(go.Modules.isAvailable("legacy", "addressbook")){
+//				
+//		this.templatesCombo = new GO.form.ComboBox({
+//			fieldLabel : t("Default e-mail template", "email"),
+//			hiddenName : 'default_account_template_id',
+//			width: 300,
+//			store : new GO.data.JsonStore({
+//				url : GO.url("addressbook/template/accountTemplatesStore"),
+//				baseParams : {
+//					'type':"0"
+//				},
+//				root : 'results',
+//				totalProperty : 'total',
+//				id : 'id',
+//				fields : ['id', 'name', 'group', 'text','template_id','checked'],
+//				remoteSort : true
+//			}),
+//			value : '',
+//			valueField : 'id',
+//			displayField : 'name',
+//			typeAhead : true,
+//			mode : 'local',
+//			triggerAction : 'all',
+//			editable : false,
+//			selectOnFocus : true,
+//			forceSelection : true
+//		});
+//		
+//	}
 
 	this.imapAllowSelfSignedCheck = new Ext.ux.form.XCheckbox({
 		boxLabel: t("Allow self signed certificate when using SSL or TLS", "email"),
@@ -470,6 +470,7 @@ GO.email.AccountDialog = function(config) {
 		items : [this.tabPanel = new Ext.TabPanel({
 			hideLabel : true,
 			deferredRender : false,
+			layoutOnTabChange: true,
 			activeTab : 0,
 			border : false,
 			anchor : '100% 100%',
@@ -525,8 +526,8 @@ GO.email.AccountDialog = function(config) {
 	GO.email.AccountDialog.superclass.constructor.call(this, {
 		layout : 'fit',
 		modal : false,
-		height: dp(550),
-		width : dp(958),
+		height: dp(616),
+		width : dp(1008),
 		closeAction : 'hide',
 		title : t("E-mail Account", "email"),
 
@@ -695,10 +696,10 @@ Ext.extend(GO.email.AccountDialog, GO.Window, {
 
 				this.permissionsTab.setAcl(action.result.data.acl_id);
 				
-				if (this.templatesCombo) {
-					this.templatesCombo.store.load();
-					this.templatesCombo.setRemoteText(action.result.remoteComboTexts['default_template_id']);
-				}
+//				if (this.templatesCombo) {
+//					this.templatesCombo.store.load();
+//					this.templatesCombo.setRemoteText(action.result.remoteComboTexts['default_template_id']);
+//				}
 			},
 			scope : this
 		});

@@ -34,7 +34,8 @@ $blob->type = Request::get()->getContentType();
 if ($blob->save()) {
 	Response::get()->setStatus(201, 'Created');
 	Response::get()->output([
-		'blobId' => $blob->id,
+		'blobId' => $blob->id,			
+		'name' => $blob->name,
 		'type' => $blob->type,
 		'size' => $blob->size
 	]);

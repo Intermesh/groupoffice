@@ -17,7 +17,6 @@ use go\core\util\StringUtil;
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
 class File extends FileSystemObject {
-	
 
 	/**
 	 * Get a temporary file
@@ -268,7 +267,7 @@ class File extends FileSystemObject {
 	 */
 	public function open($mode){
 		
-		$this->create();
+		//$this->create();
 		
 		return fopen($this->getPath(), $mode);
 	}
@@ -317,6 +316,8 @@ class File extends FileSystemObject {
 		if($destinationFile->exists()) {
 			throw new \Exception("The destination '".$destinationFile->getPath()."' already exists!");
 		}
+		
+		$destinationFile->getFolder()->create();
 	
 		if (!copy($this->path, $destinationFile->getPath())) {
 			return false;

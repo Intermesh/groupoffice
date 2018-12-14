@@ -58,6 +58,10 @@ class User extends EntityController {
 		$token->userId = $params['userId'];
 		$success = $token->setAuthenticated();
 		
+		$_SESSION['GO_SESSION'] = array_filter($_SESSION['GO_SESSION'], function($key) {
+			return in_array($key, ['user_id', 'accessToken', 'security_token']);
+		}, ARRAY_FILTER_USE_KEY); 
+		
 		Response::get()->addResponse(['success' => true]);
 	}
 }

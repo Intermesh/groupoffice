@@ -47,16 +47,24 @@ class Method extends Entity {
 	 * @return array ['password' => "go\core\auth\Password"]
 	 */
 	public static function findAllAuthenticators() {
-		$classFinder = new \go\core\util\ClassFinder();
-		$authenticators = $classFinder->findByParent(BaseAuthenticator::class);
 		
-		$arr = [];
+		$authenticators = GO()->getCache()->get("authenticators");
 		
-		foreach($authenticators as $a) {
-			$arr[$a::id()] = $a;
+		if(!$authenticators) {
+			$classFinder = new \go\core\util\ClassFinder();
+			$authenticators = $classFinder->findByParent(BaseAuthenticator::class);
+
+			$arr = [];
+
+			foreach($authenticators as $a) {
+				$arr[$a::id()] = $a;
+			}
+			
+			GO()->getCache()->set("authenticators", $arr);
+			return $arr;
 		}
 		
-		return $arr;
+		return $authenticators;
 		
 	}
 	

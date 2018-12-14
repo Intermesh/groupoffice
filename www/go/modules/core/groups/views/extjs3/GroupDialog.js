@@ -1,6 +1,6 @@
 go.modules.core.groups.GroupDialog = Ext.extend(go.form.Dialog, {
 	title: t('Group'),
-	entityStore: go.Stores.get("Group"),
+	entityStore: "Group",
 	height: dp(600),
 	initComponent : function() {
 		go.modules.core.groups.GroupDialog.superclass.initComponent.call(this);

@@ -435,13 +435,13 @@ class GO{
 	public static function cache(){
 
         if (!isset(self::$_cache)) {
-            if(GO::config()->debug || !GO::isInstalled()){
+            if(!GO::isInstalled()){
               self::$_cache=new \GO\Base\Cache\None();
 						}else{
 							if(!isset(GO::session()->values['cacheDriver'])){
 								$cachePref = array(
 //										"\\GO\\Base\\Cache\\XCache",
-//										"\\GO\\Base\\Cache\\Apc",
+										"\\GO\\Base\\Cache\\Apcu",
 										"\\GO\\Base\\Cache\\Disk"
 								);
 								foreach($cachePref as $cacheDriver){
@@ -457,6 +457,7 @@ class GO{
 							}else
 							{
 								$cacheDriver = GO::session()->values['cacheDriver'];
+								GO::debug("Using $cacheDriver cache");
 								self::$_cache = new $cacheDriver;
 							}
 						}
@@ -625,11 +626,8 @@ class GO{
 		
 		date_default_timezone_set(\GO::user() ? \GO::user()->timezone : \GO::config()->default_timezone);
 		
-		//set local to utf-8 so functions will behave consistently
-		if ( !empty(\GO::config()->locale_all) ){
-			setlocale(LC_CTYPE, \GO::config()->locale_all);
-			putenv('LC_ALL='.\GO::config()->locale_all);
-		}
+		setlocale(LC_CTYPE, GO()->getSettings()->getLocale());
+		
 //		}else{
 //			//for escape shell arg
 //			if(!isset(\GO::session()->values['locale_all'])){

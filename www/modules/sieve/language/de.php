@@ -128,4 +128,6 @@ return array (
   'Argument2' => 'Argument2',
   'Operator' => 'Operator',
   'Body' => 'Body',
+  'Ok' => 'OK',
+  'Filters' => 'Filter',
 );

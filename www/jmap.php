@@ -10,6 +10,11 @@ require(__DIR__ . "/vendor/autoload.php");
 App::get()->setAuthState(new State());
 
 if(Request::get()->getMethod() === 'POST') {
+	
+	if(!go\core\http\Request::get()->getHeader('Authorization')) {
+		throw new \Exception("Missing 'Authorization' header.");
+	}
+	
 	$router = new Router();
 	$router->run();
 } elseif (Request::get()->getMethod() === 'GET') {

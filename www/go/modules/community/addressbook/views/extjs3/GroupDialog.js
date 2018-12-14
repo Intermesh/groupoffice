@@ -1,7 +1,7 @@
 go.modules.community.addressbook.GroupDialog = Ext.extend(go.form.Dialog, {
 	stateId: 'addressbook-group-dialog',
 	title: t('Group'),
-	entityStore: go.Stores.get("AddressBookGroup"),
+	entityStore: "AddressBookGroup",
 	autoHeight: true,
 	initFormItems: function () {
 		return [{

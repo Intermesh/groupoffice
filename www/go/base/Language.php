@@ -54,8 +54,8 @@ class Language{
 	 * @return StringHelper Old ISO code that was set.
 	 */
 	public function setLanguage($isoCode = null){		
-		if(!isset($isoCode) || \go\core\Language::get()->hasLanguage($isoCode)) {
-			\go\core\Language::get()->setLanguage($isoCode);	
+		if(!isset($isoCode) || \GO()->getLanguage()->hasLanguage($isoCode)) {
+			\GO()->getLanguage()->setLanguage($isoCode);	
 		}
 		
 	}
@@ -66,7 +66,7 @@ class Language{
 	 * @return StringHelper Language ISO code. eg. en,nl or en_UK
 	 */
 	public function getLanguage(){
-		return 	\go\core\Language::get()->getIsoCode();
+		return 	\GO()->getLanguage()->getIsoCode();
 	}
 	
 	
@@ -77,7 +77,7 @@ class Language{
 	 * @return boolean 
 	 */
 	public function hasLanguage($langIso){
-		return 	\go\core\Language::get()->hasLanguage($langIso);
+		return 	\GO()->getLanguage()->hasLanguage($langIso);
 	}
 	
 	/**
@@ -100,7 +100,7 @@ class Language{
 	 * @return array array('en'=>'English');
 	 */
 	public function getLanguages(){
-		return \go\core\Language::get()->getLanguages();
+		return \GO()->getLanguage()->getLanguages();
 	}
 	
 	/**

@@ -1,7 +1,6 @@
 <?php
 return array (
   'Please enter the password of your SMIME certificate.' => 'Prosím, zadejte heslo k vašemu certifikátu SMIME.',
-  'This message was sent to you encrypted.' => 'Odesílaná zpráva byla zašifrována.',
   'This message is digitally signed. Click here to verify the signature and import the certificate.' => 'Tato zpráva je digitálně podepsána. Klikněte zde pro kontrolu podpisu a import certifikátu.',
   'SMIME Certificate' => 'SMIME certifikát',
   'Sign with SMIME' => 'Podepsat pomocí SMIME certifikátu',

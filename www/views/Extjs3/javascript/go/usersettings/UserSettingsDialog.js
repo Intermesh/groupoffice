@@ -17,7 +17,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	maximizable:true,
 	iconCls: 'ic-settings',
 	title: t("Settings"),
-	currentUser:null,
+	currentUserId:null,
 
 	initComponent: function () {
 		
@@ -49,7 +49,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 		
 		this.tabStore = new Ext.data.ArrayStore({
-			fields: ['name', 'icon', 'visible'],
+			fields: ['name', 'icon'],
 			data: []
 		});
 		
@@ -71,7 +71,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		}); 
 		
 		Ext.apply(this,{
-			width:dp(1000),
+			width:dp(1100),
 			height:dp(800),
 			layout:'border',
 			closeAction:'hide',
@@ -90,6 +90,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			'submitStart' : true,
 			'submitComplete' : true
 		});
+		
 		
 		this.addPanel(go.usersettings.AccountSettingsPanel);
 		this.addPanel(go.usersettings.LookAndFeelPanel);
@@ -124,19 +125,10 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	/**
 	 * The show function of this dialog.
 	 * This immediately starts loading all tabpanels in this dialog.
-	 * 
-	 * @param int userId
 	 */
-	show: function(userId){
-		this.currentUser = userId;
-
+	show: function(){
 		go.usersettings.UserSettingsDialog.superclass.show.call(this);
-		
 		this.navMenu.select(this.tabStore.getAt(0));
-		
-		if(this.currentUser) {
-			this.load();
-		}
 	},
 	
 	/**
@@ -212,10 +204,10 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		},this);
 
 		//		//this.id is null when new
-		if(this.currentUser) {
-			id = this.currentUser;
+		if(this.currentUserId) {
+			id = this.currentUserId;
 			params.update = {};
-			params.update[this.currentUser] = values;
+			params.update[this.currentUserId] = values;
 		} else {			
 			id = Ext.id();
 			params.create = {};
@@ -229,7 +221,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 				return;
 			}
 						
-			if(response.updated && response.updated[id]){
+			if(response.updated && id in response.updated){
 				this.submitComplete(response);
 			} else
 			{
@@ -292,7 +284,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		this.actionComplete();
 		
 		//reload group-office
-		if(this.currentUser == go.User.id) {
+		if(this.currentUserId == go.User.id) {
 			document.location = BaseHref + "?SET_LANGUAGE=" + this.formPanel.getForm().findField('language').getValue();
 		} else
 		{
@@ -306,24 +298,42 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	 * @param int userId (Optional)
 	 */
 	load : function(userId){
-		this.currentUser = userId ? userId : this.currentUser;
+		var me = this;
 		
-		this.actionStart();
-		this.fireEvent('loadstart',this, this.currentUser);
-
-		go.Stores.get("User").get([this.currentUser], function(users){
-			this.formPanel.getForm().setValues(users[0]);
-			this.loadComplete(users[0]);
-		}, this);
+		function innerLoad(){
+			me.currentUserId = userId ? userId : me.currentUserId;
 		
-		// loop through child panels and call onLoadComplete function if available
-		this.tabPanel.items.each(function(tab) {
+			me.actionStart();
+			me.fireEvent('loadstart',me, me.currentUserId);
 
-			if(tab.onLoadStart){
-				tab.onLoadStart(this.currentUserId);
-			}
-			
-		},this);
+			go.Stores.get("User").get([me.currentUserId], function(users){
+				me.formPanel.getForm().setValues(users[0]);
+
+				me.findBy(function(cmp,cont){
+					if(typeof cmp.onLoad === 'function') {
+						cmp.onLoad(users[0]);
+					}
+				},me);
+
+				me.loadComplete(users[0]);
+			}, me);
+
+			// loop through child panels and call onLoadComplete function if available
+			me.tabPanel.items.each(function(tab) {
+				if(tab.onLoadStart){
+					tab.onLoadStart(me.currentUserId);
+				}
+			},me);
+		}
+		
+		// The form needs to be rendered before the data can be set
+		if(!this.rendered){
+			this.on('afterrender',innerLoad,this,{single:true});
+		} else {
+			innerLoad.call(this);
+		}
+
+		return this;
 	},
 	
 	/**
@@ -412,10 +422,9 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 		var pnl = new panelClass(cfg);
 		
-			var menuRec = new Ext.data.Record({
-			'name':pnl.title,
-			'icon':pnl.iconCls.substr(3).replace(/-/g,'_'),
-			'visible':true
+		var menuRec = new Ext.data.Record({
+			name :pnl.title,
+			iconCls: pnl.iconCls //.substr(3).replace(/-/g,'_')
 		});
 		
 		if(pnl.isFormField) {

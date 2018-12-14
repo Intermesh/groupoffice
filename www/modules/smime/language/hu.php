@@ -1,0 +1,22 @@
+<?php
+return array (
+  'Add to SMIME certificates' => 'Adja hozzá a SMIME tanúsítványokhoz',
+  'Certificate added' => 'Certificate hozzáadva',
+  'SMIME certificate was added for' => 'SMIME tanúsítvány adtunk',
+  'Could not add SMIME certificate for' => 'Nem sikerült hozzáadni a SMIME tanúsítványt',
+  'Sign with SMIME' => 'Jelentkezzen SMIME',
+  'Encrypt with SMIME' => 'Titkosítás SMIME segítségével',
+  'Please enter the password of your SMIME certificate.' => 'Kérjük, adja meg jelszavát SMIME tanúsítványt.',
+  'SMIME Certificate' => 'SMIME tanúsítvány',
+  'Public SMIME certificates' => 'Nyilvános SMIME tanúsítványok',
+  'SMIME settings' => 'SMIME beállítások',
+  'PKCS12 certificate' => 'PKCS12 tanúsítvány',
+  'You have uploaded a certificate already. SMIME support is enabled for this account.' => 'Már feltöltött tanúsítvány már. SMIME támogatása engedélyezve van ebben a fiókban.',
+  'To upload a new PKCS12 certificate you must enter your Group-Office password. The Group-Office password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.' => 'Feltölteni egy új PKCS12 tanúsítványt meg kell adni a csoport soros jelszót. A csoport soros jelszó nem egyezhet meg PCSK12 bizonyítvány, biztonsági okokból. Nincs jelszó szintén tilos.',
+  'Select new PKCS12 Certificate' => 'Válassza az új PKCS12 Certificate',
+  'Delete certificate' => 'Tanúsítvány törlése',
+  'Download certificate' => 'Tanúsítvány letöltése',
+  'Always sign messages' => 'Mindig írja alá az üzeneteket',
+  'This message was sent to you encrypted.' => 'Ezt az üzenetet küldte neked titkosított.',
+  'This message is digitally signed. Click here to verify the signature and import the certificate.' => 'Ez az üzenet digitálisan aláírva. Kattintson ide, hogy ellenőrizze az aláírás és a tanúsítványt importálni.',
+);

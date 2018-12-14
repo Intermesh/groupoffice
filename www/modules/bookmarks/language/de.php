@@ -21,4 +21,8 @@ return array (
   'Bookmarks' => 'Lesezeichen',
   'Logo' => 'Logo',
   'Thumbnails' => 'Thumbnails',
+  'Website description.' => 'Webseiten Beschreibung',
+  'Ok' => 'OK',
+  'items' => 'Elemente',
+  'item' => 'Element',
 );

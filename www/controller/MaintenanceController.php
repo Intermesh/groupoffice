@@ -204,7 +204,6 @@ class MaintenanceController extends AbstractController {
 		$checkModels = array(
 				"GO\Calendar\Model\Event"=>array('name', 'start_time', 'end_time', 'calendar_id', 'rrule'),
 				"GO\Tasks\Model\Task"=>array('name', 'start_time', 'due_time', 'tasklist_id', 'rrule', 'user_id'),
-				"GO\Addressbook\Model\Contact"=>array('first_name', 'middle_name', 'last_name', 'addressbook_id', 'company_id', 'email'),
 				"GO\Files\Model\Folder"=>array('name', 'parent_id'),
 //				"GO\Calendar\Model\Participant"=>array('event_id', 'email'),
 				//"GO\Billing\Model\Order"=>array('order_id','book_id','btime')
@@ -320,47 +319,31 @@ class MaintenanceController extends AbstractController {
 		
 		GO::setIgnoreAclPermissions(true);
 		
-		$this->lockAction();
+		if(!$this->lockAction()) {
+			exit("Already running!");
+		}
 		
 		if(!$this->isCli()){
 			echo '<pre>';
 		}
 		
+		echo "Checking search cache\n\n";
+		echo ".: Record cached, E: Error while occurred, S: Record skipped (probably normal)\n"
+		.    "==============================================================================\n\n";
+		
 		\GO::session()->closeWriting(); //close writing otherwise concurrent requests are blocked.
 		
 		$response = array();
-		
-//		if(empty($params['keepexisting']))
-//			\GO::getDbConnection()->query('TRUNCATE TABLE go_search_cache');
-//		
-		//inserting is much faster without full text index. It's faster to add it again afterwards.
-//		echo "Dropping full text search index\n";
-//		try{
-//			\GO::getDbConnection()->query("ALTER TABLE go_search_cache DROP INDEX ft_keywords");
-//		}catch(\Exception $e){
-//			echo $e->getMessage()."\n";
-//		}
 				
 		if(!empty($params['modelName'])){
 			$modelName = $params['modelName'];
-			
-			if(empty($params['keepexisting'])){
-				$query = 'DELETE FROM go_search_cache WHERE model_name='.\GO::getDbConnection()->quote($modelName);
-				\GO::getDbConnection()->query($query);
-			}
-
 			$models = array(new ReflectionClass($modelName));
 		} else {
-			if(empty($params['keepexisting']))
-			\GO::getDbConnection()->query('TRUNCATE TABLE core_search');
-			
 			$models=\GO::findClasses('model');
 		}
 		
 		foreach($models as $model){
 			if($model->isSubclassOf("GO\Base\Db\ActiveRecord") && !$model->isAbstract()){
-				echo "Processing ".$model->getName()."\n";
-				flush();
 				$stmt = \GO::getModel($model->getName())->rebuildSearchCache();			
 			}
 		}
@@ -396,6 +379,7 @@ class MaintenanceController extends AbstractController {
 		 
 		
 		GO::setIgnoreAclPermissions(true);
+		GO::session()->runAsRoot();
 		
 		$this->run("upgrade",$params);		
 		
@@ -818,21 +802,7 @@ class MaintenanceController extends AbstractController {
 		if(!$this->isCli())			
 			echo '<pre>';
 		
-		if(\GO::modules()->isInstalled("addressbook")){
-			echo "\n\nProcessing addressbook\n";
-			flush();
-			$stmt = \GO\Addressbook\Model\Addressbook::model()->find();
-			while($addressbook = $stmt->fetch()){
-				$contactStmt = $addressbook->contacts();
-				$companiesStmt = $addressbook->companies();
-				
-				if(!$contactStmt->rowCount() && !$companiesStmt->rowCount()){
-					echo "Removing ".$addressbook->name."\n";
-					$addressbook->delete();
-					flush();
-				}
-			}
-		}
+	
 		
 		if(\GO::modules()->isInstalled("calendar")){
 			echo "\n\nProcessing calendar\n";

@@ -45,6 +45,12 @@ h4 { @extend %font-subheading; }
 h5 { @extend %font-subheading-dense; }
 h6 { @extend %font-data-head; }
 
+
+p {
+	margin: dp(16) 0;
+}
+
+
 strong { color: color($grey, 700); font-weight: $font-weight-m; }
 small { color: color($grey); font-weight: $font-weight-r; font-size:.85em; line-height: 1.2; }
 
@@ -53,6 +59,25 @@ small { color: color($grey); font-weight: $font-weight-r; font-size:.85em; line-
 .success { color: $cSuccess !important; }
 .danger { color: $cDanger !important; }
 .warning { color: $cWarning !important; }
+
+p {
+	margin: dp(16) 0;
+}
+
+
+/*#window-container, #viewport {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	overflow: hidden;
+	visibility: hidden;
+	> * {
+		visibility: visible;
+	}
+}*/
+
 
 /*#bg {
 	z-index: -1;
@@ -380,6 +405,8 @@ a {
 			}
 		}
 	}
+
+	
 }
 .go-grid3-hide-headers {
 	.x-panel-tbar {
@@ -540,6 +567,7 @@ button {
 	color:inherit;
 	cursor: pointer;
 	font-size: inherit;
+	cursor: pointer;
 }
 .closed{
 	display:none !important;
@@ -555,23 +583,33 @@ button {
 }
 
 .avatar {
+	position:relative;
 	display:inline-block;
 	padding:0;
 	background: url('img/default-avatar.svg') no-repeat center center;
-	background-size:cover;
-	border: 1px solid white;
+	background-size:cover;	
 	border-radius: 50%;
+	width:dp(40);
 	height: dp(40);
-	width: dp(40);
-	font-size: dp(28);
-	line-height: dp(40);
-	text-align: center;
-	&::before {
-			color: white;
-			@extend %icon;
-			font-size: inherit;			
-			height: 100%;
-			width: 100%;
+	font-size: dp(28);	
+	text-align: center;	
+	
+	.icon {
+		color: white;
+		line-height: dp(40);
+		font-size: inherit;			
+		height: 100%;
+		width: 100%;
+	}
+
+	.go-detail-view & {
+		float:left;
+		margin-top:dp(4);
+		margin-right: dp(16);
+	}
+	
+	.x-btn {
+		border: 0;
 	}
 	
 	&.group {
@@ -588,7 +626,7 @@ button {
 	min-height: dp(40);
 	
 	.wrap {
-		padding-top: dp(3);
+		//padding-top: dp(3);
 		&.single {
 			padding-top: dp(10);
 		}
@@ -598,8 +636,8 @@ button {
 	}
 	.avatar {
 		position: absolute;
-		top: 0;
-		left: 0;
+		top: dp(4);
+		left: dp(4);
 		vertical-align: middle;
 	}
 	
@@ -622,7 +660,7 @@ button {
 	right: dp(16);
 	top: dp(8);
 	z-index:15;
-	
+	border: 1px solid white;
 	width: dp(48);
 	height: dp(48);
 	&.login-avatar{
@@ -671,8 +709,18 @@ hr {
 	position:absolute;
 	right:dp(-4);
 	top:dp(4);	
-
 }
+
+.go-create-link-btn {
+	.x-btn-mc em.x-btn-arrow > button:after {
+		content: '';
+	}
+	.badge {
+		@extend %badge;
+		display: inline-block;	
+	}
+}
+
 .x-tab-with-icon {
 	position:relative;
 }
@@ -999,7 +1047,8 @@ button.filetype-pdf, button.filetype-doc {
 		box-sizing: border-box;
 		display:table;
 		text-decoration: none;
-		padding: dp(8) dp(16) dp(16) dp(8);
+		padding: dp(8) dp(16);
+		margin: 0;
 		width: 100%;
 		span, a {
 			display: block;
@@ -1061,11 +1110,10 @@ button.filetype-pdf, button.filetype-doc {
 	} */
 	.table_header_links {
 		@extend %font-caption;
+		@extend .ellipsis;
 		padding: dp(8);
 		vertical-align: middle;
-		height: dp(40);		
-		overflow: hidden;
-		text-overflow: ellipsis;
+		height: dp(40);
 		border-bottom: 1px solid color($fg, 'line');
 		background-color: transparent !important;
 	}
@@ -1418,7 +1466,14 @@ table[id^="comments-ext"] b {
 }
 
 
-
+.go-chip {
+	display: inline-block; 
+	border-radius: dp(4); 
+	background-color: $cPrimaryTp; 
+	margin-right: dp(8);
+	margin-top: dp(8);
+	padding-left: dp(8);
+}
 
 .go-html-formatted {
 	

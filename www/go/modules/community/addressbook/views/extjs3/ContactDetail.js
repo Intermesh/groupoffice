@@ -1,12 +1,13 @@
+/* global Ext, go, GO */
+
 go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView, {
-	entityStore: go.Stores.get("Contact"),
+	entityStore: "Contact",
 	stateId: 'addressbook-contact-detail',
 	
 	initComponent: function () {
-
-
+		
 		this.tbar = this.initToolbar();
-
+		
 		Ext.apply(this, {
 			items: [{
 					xtype: 'container',
@@ -15,8 +16,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 					items: [						
 						this.namePanel = new Ext.BoxComponent({
 							tpl: "<h3>{name}</h3><h4>{jobTitle}</h4>"
-						}),
-						this.starButton = new go.modules.community.addressbook.StarButton(), 
+						}),						
 						this.urlPanel = new Ext.BoxComponent({
 							flex: 1,
 							cls: 'go-addressbook-url-panel',
@@ -28,20 +28,19 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 						detailView.data.jobTitle = detailView.data.jobTitle || "";						
 						detailView.namePanel.update(detailView.data);
 						detailView.urlPanel.update(detailView.data.urls);
-						detailView.starButton.setContactId(detailView.data.id);
-					},
+					}
 					
 				}, 
 				
 				{
 					tpl: new Ext.XTemplate('<div class="go-detail-view-avatar">\
-<div class="avatar {[this.getCls(values.isOrganization)]}" style="{[this.getStyle(values.photoBlobId)]}"></div></div>', 
+<div class="avatar" style="{[this.getStyle(values.photoBlobId)]}">{[this.getHtml(values.isOrganization)]}</div></div>', 
 					{
-						getCls: function (isOrganization) {
-							return isOrganization ? "organization" : "";
+						getHtml: function (isOrganization) {
+							return isOrganization ? '<i class="icon">business</i>' : "";
 						},
 						getStyle: function (photoBlobId) {
-							return photoBlobId ? 'background-image: url(' + go.Jmap.downloadUrl(photoBlobId) + ')"' : "";
+							return photoBlobId ? 'background-image: url(' + go.Jmap.downloadUrl(photoBlobId) + ')"' : "background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24));";
 						}
 					})
 				},
@@ -52,7 +51,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 						dv.emailButton.menu.removeAll();						
 						dv.data.emailAddresses.forEach(function(a) {
 							dv.emailButton.menu.addMenuItem({
-								text: "<div>" + a.email + "</div><small>" + t("emailTypes")[a.type] + "</small></div>",
+								text: "<div>" + a.email + "</div><small>" + t("emailTypes")[a.type] + "</small>",
 								handler: function() {
 									go.util.mailto({
 										email: a.email,
@@ -61,13 +60,13 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 								}
 							});
 						});
-						dv.emailButton.setDisabled(dv.data.emailAddresses.length == 0);
+						dv.emailButton.setDisabled(dv.data.emailAddresses.length === 0);
 						
 						
 						dv.callButton.menu.removeAll();						
 						dv.data.phoneNumbers.forEach(function(a) {
 							dv.callButton.menu.addMenuItem({
-								text: "<div>" + a.number + "</div><small>" + t("phoneTypes")[a.type] + "</small></div>",
+								text: "<div>" + a.number + "</div><small>" + t("phoneTypes")[a.type] + "</small>",
 								handler: function() {
 									go.util.callto({
 										number: a.number,
@@ -76,7 +75,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 								}
 							});
 						});
-						dv.callButton.setDisabled(dv.data.phoneNumbers.length == 0);
+						dv.callButton.setDisabled(dv.data.phoneNumbers.length === 0);
 						
 					},
 					xtype: "toolbar",
@@ -116,7 +115,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 					<tpl for="addresses">\
 						<hr class="indent">\
 						<a class="s6"><i class="icon label">location_on</i>\
-							<span>{street}<br>\
+							<span>{street} {street2}<br>\
 							<tpl if="zipCode">{zipCode}<br></tpl>\
 							<tpl if="city">{city}<br></tpl>\
 							<tpl if="state">{state}<br></tpl>\
@@ -149,33 +148,6 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 						</a></tpl>\
 					</div>\
 					</tpl>'
-				}, {
-					collapsible: true,
-					title: t("Organizations"),
-					xtype: "panel",
-					onLoad : function(dv) {
-						this.setVisible(dv.data.organizations.length);
-						if(!dv.data.organizations.length) {							
-							return;
-						}
-						
-						if(!this.template) {
-							this.template = new Ext.XTemplate('<div class="icons">\
-					<tpl for=".">\
-						<a class="s6" href="#contact/{id}"><tpl if="xindex == 1"><i class="icon label">domain</i></tpl>\
-							<span>{name}</span>\
-							<label>{[values.jobTitle || "-"]}</label>\
-						</a>\
-					</tpl>\
-					</div>').compile();
-						}
-						
-						var ids = dv.data.organizations.column('organizationContactId');
-						
-						go.Stores.get("Contact").get(ids, function(organizations) {
-							this.update(this.template.apply(organizations));
-						}, this);
-					}
 				}
 			]
 		});
@@ -183,9 +155,9 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 
 		go.modules.community.addressbook.ContactDetail.superclass.initComponent.call(this);
 
-		//go.CustomFields.addDetailPanels(this);
+		this.add(go.modules.core.customfields.CustomFields.getDetailPanels("Contact"));
 
-		this.add(new go.links.LinksDetailPanel());
+		this.add(new go.links.getDetailPanels());
 
 		if (go.Modules.isAvailable("legacy", "comments")) {
 			this.add(new go.modules.comments.CommentsDetailPanel());
@@ -200,6 +172,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 
 		this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < GO.permissionLevels.write);
 
+		this.starItem.setIconClass(this.data.starred ? "ic-star" : "ic-star-border");
 		go.modules.community.addressbook.ContactDetail.superclass.onLoad.call(this);
 	},
 
@@ -215,19 +188,31 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 				tooltip: t("Edit"),
 				handler: function (btn, e) {
 					var dlg = new go.modules.community.addressbook.ContactDialog();
-					dlg.show();
-					dlg.load(this.data.id);
+					dlg.load(this.data.id).show();
 				},
 				scope: this
 			},
 
 			new go.detail.addButton({
-				detailPanel: this
+				detailView: this
 			}),
 
 			{
 				iconCls: 'ic-more-vert',
 				menu: [
+					this.starItem = new Ext.menu.Item({
+						iconCls: "ic-star",
+						text: t("Star"),
+						handler: function () {
+							var update = {};
+							update[this.currentId] = {starred: !this.data.starred};
+							
+							go.Stores.get("Contact").set({
+								update: update
+							});
+						},
+						scope: this
+					}),
 					{
 						iconCls: "btn-print",
 						text: t("Print"),
@@ -235,7 +220,22 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 							this.body.print({title: this.data.name});
 						},
 						scope: this
-					}
+					},
+					'-',
+					this.deleteItem = new Ext.menu.Item({
+						itemId: "delete",
+						iconCls: 'ic-delete',
+						text: t("Delete"),
+						handler: function () {
+							Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
+								if (btn !== "yes") {
+									return;
+								}
+								this.entityStore.set({destroy: [this.currentId]});
+							}, this);
+						},
+						scope: this
+					})
 
 				]
 			}]);

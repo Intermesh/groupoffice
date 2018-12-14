@@ -68,9 +68,6 @@ class Zip {
 		} else {
 			
 			\GO::debug("Using zip exec");
-		
-			if (!\GO\Base\Util\Common::isWindows())
-				putenv('LANG=en_US.UTF-8');
 
 			chdir($workingFolder->path());
 

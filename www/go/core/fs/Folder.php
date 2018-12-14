@@ -2,7 +2,6 @@
 namespace go\core\fs;
 
 use Exception;
-use IFW;
 
 /**
  * A folder object
@@ -218,8 +217,16 @@ class Folder extends FileSystemObject {
 		if ($newPath === $this->getPath()) {
 			return true;
 		}
+		
+		$success = false;
+		try{
+			$success = rename($this->getPath(), $newPath);
+		} catch(\Exception $e) {
+			//rename fails accross partitions. Ignore and retry with copy delete.
+			GO()->debug("Rename failed. Falling back on copy, delete");
+		}
 
-		if (!@rename($this->getPath(), $newPath)) { // Notice suppressed by @
+		if (!$success) { // Notice suppressed by @
 			//	throw new Exception("Rename failed");
 			// If renaming is throwing an error then do it the old way.
 			// This is done because of problems when moving items across partitions.
@@ -376,6 +383,30 @@ class Folder extends FileSystemObject {
 		} else {
 			return false;
 		}
+	}
+	
+	/**
+	 * Find files and folder matching a regular expression pattern
+	 * 
+	 * @param string $regex
+	 * @param boolean $findFolders
+	 * @param boolean $findFiles
+	 * @return FileSystemObject[]
+	 */
+	public function find($regex, $findFolders = true, $findFiles = true) {
+		$result = [];
+		
+		foreach($this->getChildren($findFiles, true) as $child) {
+			$isFolder = $child->isFolder();
+			if(($findFolders || !$isFolder) && preg_match($regex, $child->getName())) {
+				$result[] = $child;
+			}
+			if($isFolder) {
+				$result = array_merge($result, $child->find($regex, $findFolders, $findFiles));
+			}
+		}
+		
+		return $result;
 	}
 
 }

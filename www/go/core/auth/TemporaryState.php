@@ -34,11 +34,15 @@ class TemporaryState extends AbstractState {
 	
 	public function setUserId($userId) {
 		$this->userId = $userId;
+		
+		return $this;
 	}
 
 	public function setUser(User $user) {
 		$this->user = $user;
 		$this->userId = $user->id;
+		
+		return $this;
 	}
 }
 

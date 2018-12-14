@@ -1,7 +1,7 @@
 <?php
 namespace go\modules\community\test\model;
 
-use go\core\db\Query;
+use go\core\orm\Query;
 
 
 /**
@@ -47,26 +47,22 @@ class B extends A {
 		return C::findById($this->cId);
 	}
 	
-	public static function filter(Query $query, array $filter) {
-		
-		if(isset($filter['propA'])) {
-			$query->andWhere('propA', 'LIKE', $filter['propA'] . "%");
-		}
+	protected static function defineFilters() {
+		return parent::defineFilters()
+						->add("propA", function(Query $query, $value, array $filter) {
+							$query->andWhere('propA', 'LIKE', $filter['propB'] . "%");
+						})
+						->add("propB", function(Query $query, $value, array $filter) {
+							$query->andWhere('propB', 'LIKE', $filter['propB'] . "%");
+						})
+						->add("hasHasMany", function(Query $query, $value, array $filter) {
+							$tables = AHasMany::getMapping()->getTables();
+							$firstTable = array_shift($tables);
 
-		if(isset($filter['propB'])) {
-			$query->andWhere('propB', 'LIKE', $filter['propB'] . "%");
-		}
+							$query->join($firstTable->getName(), 'hasMany', 'a.id = hasMany.aId')->groupBy(['a.id']);
 
-		if(isset($filter['hasHasMany'])) {
-			$tables = AHasMany::getMapping()->getTables();
-			$firstTable = array_shift($tables);
-
-			$query->join($firstTable->getName(), 'hasMany', 'a.id = hasMany.aId')->groupBy(['a.id']);
-
-			$query->andWhere('hasMany.propOfHasManyA', "LIKE", "%" . $filter['hasHasMany'] . "%");
-		}
-
-		return parent::filter($query, $filter);
+							$query->andWhere('hasMany.propOfHasManyA', "LIKE", "%" . $filter['hasHasMany'] . "%");
+						});
 	}
 	
 }

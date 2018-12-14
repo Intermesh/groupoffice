@@ -39,11 +39,12 @@ class InsufficientDiskspace extends \Exception
 	 * @return integer quota in bytes
 	 */
 	protected function getQuota() {
-		if(\GO::config()->quota < $this->getTotalUsage() && \GO::config()->quota > 0)
-			return \GO::config()->quota;
+		$quota = \GO::config()->quota * 1024;
+		if($quota < $this->getTotalUsage() && $quota > 0)
+			return $quota;
 		if(\GO::user() && \GO::user()->disk_quota)
 			return \GO::user()->getDiskQuota();
-		return \GO::config()->quota;
+		return $quota;
 	}
 	
 	/**
@@ -52,7 +53,8 @@ class InsufficientDiskspace extends \Exception
 	 * @return integer Disk uage in bytes
 	 */
 	protected function getUsage() {
-		if(\GO::config()->quota < $this->getTotalUsage() && \GO::config()->quota > 0)
+		$quota = \GO::config()->quota * 1024;
+		if($quota < $this->getTotalUsage() && $quota > 0)
 			return $this->getTotalUsage();
 		if(\GO::user() && \GO::user()->disk_usage)
 			return \GO::user()->disk_usage;

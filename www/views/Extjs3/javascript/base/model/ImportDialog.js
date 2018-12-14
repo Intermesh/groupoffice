@@ -139,19 +139,19 @@ Ext.extend( GO.base.model.ImportDialog, GO.Window, {
 						if(response.result.totalCount != response.result.successCount){
 							GO.errorDialog.show(
 								errorsText,
-								t("Records imported successfully:", "addressbook")+' '+response.result.successCount+'/'+response.result.totalCount
+								t("Records imported successfully", "addressbook")+': '+response.result.successCount+'/'+response.result.totalCount
 							);
 						} else {
 							Ext.MessageBox.alert(
 								'',
-								t("Records imported successfully:", "addressbook")+' '+response.result.successCount+'/'+response.result.totalCount
+								t("Records imported successfully", "addressbook")+': '+response.result.successCount+'/'+response.result.totalCount
 								+ errorsText
 							);
 						}
 					}else{
 						Ext.MessageBox.alert(
 							'',
-							t("Records imported successfully!", "addressbook")
+							t("Records imported successfully", "addressbook")
 							+ errorsText
 						);
 					}

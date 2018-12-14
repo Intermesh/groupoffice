@@ -15,6 +15,38 @@ class GoSyncUtils {
 
 		return \GO\Sync\Model\Settings::model()->findForUser($user);
 	}
+	
+//	public static function getEntityModSeq($entity) {
+//		$entityModSeq = GO()->getDbConnection()
+//						->selectSingleValue("MAX(modSeq)")
+//						->from("core_change")
+//						->where([
+//								"entityTypeId" => $entity->getType()->getId(), 
+//								"entityId" => $entity->id
+//										])
+//						->single();
+//		
+//		if(empty($entityModSeq)) {
+//			return false;
+//		}
+//		
+//		$userModSeq = GO()->getDbConnection()
+//						->selectSingleValue("MAX(modSeq)")
+//						->from("core_change_user")
+//						->where([
+//								"entityTypeId" => $entity->getType()->getId(), 
+//								"entityId" => $entity->id,  
+//								"userId" => GO()->getUserId()
+//										])
+//						->single();
+//		
+//		if(empty($entityModSeq)) {
+//			return false;
+//		}
+//		
+//		return $entityModSeq.':'.$userModSeq;	
+//		
+//	}
 
 	/**
 	 * Returns the best match of preferred body preference types.

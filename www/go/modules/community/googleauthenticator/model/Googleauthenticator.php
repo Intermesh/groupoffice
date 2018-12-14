@@ -8,10 +8,13 @@ use go\core\orm\Property;
 
 
 class Googleauthenticator extends Property {
-
+		
 	public $userId;
 	protected $secret;
 	public $createdAt;
+	
+	private $verify = false;
+	private $requestSecret = false;
 
 	/**
 	 * We only publish the secret when it was just created
@@ -29,12 +32,39 @@ class Googleauthenticator extends Property {
 		return $this->secret;
 	}
 	
+	public function setRequestSecret($value){
+		$this->requestSecret = $value;
+	}
+	
+	public function setVerify($code){
+		$this->verify = $code;
+	}
+	
+	public function setSecret($secret) {
+		$this->secret = $secret;
+	}
+		
+	protected function internalValidate() {
+		
+		// When saving the new secret, the code needs to be verified first
+		if(!empty($this->verify) && !$this->verifyCode($this->verify)){
+			$this->setValidationError('verify', \go\core\validate\ErrorCode::INVALID_INPUT, "The verify code is not correct.");
+		}
+		
+		return parent::internalValidate();
+	}
+	
 	protected function internalSave(){
 		
 		if(empty($this->secret)) {
 			$this->secret = $this->createSecret();
 		}
 		
+		// Don't actually save when only the secret is requested
+		if($this->requestSecret){
+			return true;
+		}
+				
 		return parent::internalSave();
 	}
 	
@@ -76,7 +106,7 @@ class Googleauthenticator extends Property {
 	}
 	
 	public function getIsEnabled() {
-		return isset($this->secret);
+		return isset($this->secret)&& isset($this->createdAt);
 	}
 
 	/**
@@ -134,7 +164,38 @@ class Googleauthenticator extends Property {
 	 *
 	 * @return string
 	 */
-	public function getQrUrl($name=null, $secret=null, $title = null, $params = array()) {
+//	public function getQrUrl($name=null, $secret=null, $title = null, $params = array()) {
+//		
+//		if(!$this->publish) {
+//			return null;
+//		}
+//		
+//		$name = empty($name)?App::get()->getSettings()->title:$name;
+//		$secret = empty($secret)?$this->secret:$secret;
+//		
+//		$width = !empty($params['width']) && (int) $params['width'] > 0 ? (int) $params['width'] : 200;
+//		$height = !empty($params['height']) && (int) $params['height'] > 0 ? (int) $params['height'] : 200;
+//		$level = !empty($params['level']) && array_search($params['level'], array('L', 'M', 'Q', 'H')) !== false ? $params['level'] : 'M';
+//
+//		$urlencoded = urlencode('otpauth://totp/' . rawurlencode($name) . '?secret=' . $secret . '');
+//		if (isset($title)) {
+//			$urlencoded .= urlencode('&issuer=' . urlencode($title));
+//		}
+//
+//		return 'https://chart.googleapis.com/chart?chs=' . $width . 'x' . $height . '&chld=' . $level . '|0&cht=qr&chl=' . $urlencoded . '';
+//	}
+	
+	/**
+	 * Get the blob id of the QR code image
+	 * 
+	 * @param string $name
+	 * @param string $secret
+	 * @param string $title
+	 * @param array $params
+	 * 
+	 * @return boolean/string
+	 */
+	public function getQrBlobId($name=null, $secret=null, $title = null, $params = array()) {
 		
 		if(!$this->publish) {
 			return null;
@@ -143,16 +204,47 @@ class Googleauthenticator extends Property {
 		$name = empty($name)?App::get()->getSettings()->title:$name;
 		$secret = empty($secret)?$this->secret:$secret;
 		
-		$width = !empty($params['width']) && (int) $params['width'] > 0 ? (int) $params['width'] : 200;
-		$height = !empty($params['height']) && (int) $params['height'] > 0 ? (int) $params['height'] : 200;
-		$level = !empty($params['level']) && array_search($params['level'], array('L', 'M', 'Q', 'H')) !== false ? $params['level'] : 'M';
-
-		$urlencoded = urlencode('otpauth://totp/' . rawurlencode($name) . '?secret=' . $secret . '');
-		if (isset($title)) {
-			$urlencoded .= urlencode('&issuer=' . urlencode($title));
+		$level = QR_ECLEVEL_M;
+		
+		if(!empty($params['level']) && array_search($params['level'], array('L', 'M', 'Q', 'H')) !== false){
+			switch($params['level']){
+				case 'L':
+					$level = QR_ECLEVEL_L;
+					break;
+				case 'Q':
+					$level = QR_ECLEVEL_Q;
+					break;
+				case 'H':
+					$level = QR_ECLEVEL_H;
+					break;
+				case 'M':
+				default:
+					$level = QR_ECLEVEL_M;
+					break;
+			}
 		}
-
-		return 'https://chart.googleapis.com/chart?chs=' . $width . 'x' . $height . '&chld=' . $level . '|0&cht=qr&chl=' . $urlencoded . '';
+		
+		$otpUrl = 'otpauth://totp/' . rawurlencode($name) . '?secret=' . $secret . '';
+		if (isset($title)) {
+			$otpUrl .= '&issuer='.urlencode($title);
+		}
+		
+		$tmpFile = \go\core\fs\File::tempFile($name);
+		
+		\go\core\util\QRcode::png($otpUrl, $tmpFile->getPath(),QR_ECLEVEL_M,8);
+				
+		$qrBlob = \go\core\fs\Blob::fromTmp($tmpFile->getPath());
+		$qrBlob->setValues(array(
+				'name'=>$name,
+				'modified'=>time(),
+				'type'=>'image/png'
+		));
+		
+		if(!$qrBlob->save()){
+			return false;
+		}
+		
+		return $qrBlob->id;
 	}
 
 	/**

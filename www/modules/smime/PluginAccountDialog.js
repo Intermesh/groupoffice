@@ -1,3 +1,5 @@
+/* global Ext, GO */
+
 /**
  * Copyright Intermesh
  *
@@ -107,6 +109,6 @@ GO.moduleManager.onModuleReady('email',function(){
 				}
 			}, this);
 		})
-	})
+	});
 });
         

@@ -7,7 +7,7 @@ use go\core\fs\File;
 use go\core\jmap\Request;
 use go\modules\core\modules\model\Module;
 
-class Language extends Singleton {
+class Language {
 
 	/**
 	 *
@@ -16,8 +16,7 @@ class Language extends Singleton {
 	private $isoCode;
 	private $data = [];
 
-	protected function __construct() {
-		parent::__construct();
+	public function __construct() {
 		$this->isoCode = $this->getBrowserLanguage();	
 	}
 	
@@ -50,7 +49,7 @@ class Language extends Singleton {
 	private function getBrowserLanguage(){
 		
 		if(isset($_GET['SET_LANGUAGE']) && $this->hasLanguage($_GET['SET_LANGUAGE'])) {
-			setcookie('GO_LANGUAGE', $_GET['SET_LANGUAGE']);
+			setcookie('GO_LANGUAGE', $_GET['SET_LANGUAGE'], time() + (10 * 365 * 24 * 60 * 60));
 			return $_GET['SET_LANGUAGE'];
 		}
 		
@@ -63,6 +62,13 @@ class Language extends Singleton {
 			$lang = str_replace('-','_',explode(';', $lang)[0]);
 			if($this->hasLanguage($lang)){
 				return $lang;
+			}
+			
+			if(($pos = strpos($lang, "_"))) {
+				$lang = substr($lang, 0, $pos);
+				if($this->hasLanguage($lang)){
+					return $lang;
+				}
 			}
 		}
 		
@@ -80,11 +86,18 @@ class Language extends Singleton {
 
 		$this->loadSection($package, $module);
 		
-		if(!isset($this->data[$package]) || !isset($this->data[$package][$module])) {
-			return t($str);
+		//fallback on core lang
+		if(!isset($this->data[$package]) || !isset($this->data[$package][$module]) || ($package != "core" && $module != "core" && !isset($this->data[$package][$module][$str]))) {
+			return $this->t($str);
 		}
 		
 		return $this->data[$package][$module][$str] ?? $str;
+	}
+	
+	public function translationExists($str, $package = 'core', $module = 'core') {
+		$this->loadSection($package, $module);
+		
+		return isset($this->data[$package]) && isset($this->data[$package][$module]) && isset($this->data[$package][$module][$str]);
 	}
 
 
@@ -115,10 +128,25 @@ class Language extends Singleton {
 				$langData = array_merge($langData, $this->loadFile($file));
 			}
 			
-		
+			$productName = GO()->getConfig()['branding']['name'];
 
 			foreach ($langData as $key => $translation) {
-					$langData[$key] = str_replace('{product_name}', \GO::config()->product_name, $translation);
+							
+					//branding
+					$langData[$key]  = str_replace(
+									[
+											"{product_name}",
+											"GroupOffice",
+											"Group-Office",
+											"Group Office"
+									], 
+									[
+											$productName,
+											$productName,
+											$productName,
+											$productName
+									
+									], $langData[$key]);
 			}
 
 			$this->data[$package][$module] = $langData;			

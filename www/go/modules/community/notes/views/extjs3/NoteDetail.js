@@ -1,5 +1,7 @@
+/* global go, Ext, GO, mcrypt */
+
 go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
-	entityStore: go.Stores.get("Note"),
+	entityStore: "Note",
 	stateId: 'no-notes-detail',
 
 	//model_name: "go\\modules\\community\\notes\\model\\Note", //only for backwards compatibility with older panels.
@@ -22,10 +24,9 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 
 		go.modules.community.notes.NoteDetail.superclass.initComponent.call(this);
 
-		go.CustomFields.addDetailPanels(this);
-
-		this.add(new go.links.LinksDetailPanel());
-
+		this.add(go.modules.core.customfields.CustomFields.getDetailPanels("Note"));
+		this.add(go.links.getDetailPanels());
+		
 		if (go.Modules.isAvailable("legacy", "comments")) {
 			this.add(new go.modules.comments.CommentsDetailPanel());
 		}
@@ -37,13 +38,13 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 
 	decrypt: function () {
 
-		if (!this.data.content || this.data.content.substring(0, 8) != "{GOCRYPT") {
+		if (!this.data.content || this.data.content.substring(0, 8) !== "{GOCRYPT") {
 			return;
 		}
 		
 		var key = prompt("Enter password to decrypt");
 
-		if(this.data.content.substring(0, 9) == "{GOCRYPT}") {
+		if(this.data.content.substring(0, 9) === "{GOCRYPT}") {
 
 			var msg = window.atob(this.data.content.substring(9));
 
@@ -82,7 +83,7 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 					}
 				},
 				scope: this
-			})
+			});
 		}
 		
 	},
@@ -109,19 +110,22 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 				tooltip: t("Edit"),
 				handler: function (btn, e) {
 					var noteEdit = new go.modules.community.notes.NoteForm();
-					noteEdit.show();
-					noteEdit.load(this.data.id);
+					noteEdit.load(this.data.id).show();
 				},
 				scope: this
 			},
 
 			new go.detail.addButton({
-				detailPanel: this
+				detailView: this
 			}),
 
-			{
+			this.moreMenu = {
 				iconCls: 'ic-more-vert',
 				menu: [
+					{
+						xtype: "linkbrowsermenuitem"
+					},
+					'-',
 					{
 						iconCls: "btn-print",
 						text: t("Print"),
@@ -136,7 +140,7 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 						text: t("Delete"),
 						handler: function () {
 							Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
-								if (btn != "yes") {
+								if (btn !== "yes") {
 									return;
 								}
 								this.entityStore.set({destroy: [this.currentId]});
@@ -146,6 +150,12 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 					})
 				]
 			}]);
+		
+		if(go.Modules.isAvailable("legacy", "files")) {
+			this.moreMenu.menu.splice(1,0,{
+				xtype: "filebrowsermenuitem"
+			});
+		}
 
 		var tbarCfg = {
 			disabled: true,

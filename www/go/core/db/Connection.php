@@ -289,39 +289,68 @@ class Connection {
 	 * 
 	 * @param string $tableName
 	 * @param array|Query $data Key value array or select query
+	 * @param string[] $columns If $data is a query object then you can supply the 
+	 *	selected columns with this parameter. If not given all columns must be 
+	 *	selected in the correct order.
+	 * 
 	 * @return Statement
 	 */
-	public function insert($tableName, $data) {
+	public function insert($tableName, $data, $columns = []) {
 
 		$queryBuilder = new QueryBuilder();
-		$build = $queryBuilder->buildInsert($tableName, $data);
+		$build = $queryBuilder->buildInsert($tableName, $data, $columns);
 
 		return $this->createStatement($build);
 	}
 	
-	public function insertIgnore($tableName, $data) {
+	/**
+	 * Insert data in the database and ignore if the records exist
+	 * 
+	 * @see insert()
+	 * @param string $tableName
+	 * @param array|Query $data Key value array or select query
+	 * @param string[] $columns If $data is a query object then you can supply the 
+	 *	selected columns with this parameter. If not given all columns must be 
+	 *	selected in the correct order.
+	 * 
+	 * @return Statement
+	 */
+	public function insertIgnore($tableName, $data, $columns = []) {
 
 		$queryBuilder = new QueryBuilder();
-		$build = $queryBuilder->buildInsert($tableName, $data, "INSERT IGNORE");
+		$build = $queryBuilder->buildInsert($tableName, $data, $columns, "INSERT IGNORE");
 
 		return $this->createStatement($build);
 	}
 	
-	public function replace($tableName, $data) {
+	/**
+	 * Replace data in the database
+	 * 
+	 * @see insert()
+	 * @param string $tableName
+	 * @param array|Query $data Key value array or select query
+	 * @param string[] $columns If $data is a query object then you can supply the 
+	 *	selected columns with this parameter. If not given all columns must be 
+	 *	selected in the correct order.
+	 * 
+	 * @return Statement
+	 */
+	public function replace($tableName, $data, $columns = []) {
 
 		$queryBuilder = new QueryBuilder();
-		$build = $queryBuilder->buildInsert($tableName, $data, "REPLACE");
+		$build = $queryBuilder->buildInsert($tableName, $data, $columns, "REPLACE");
 
 		return $this->createStatement($build);
 	}
 
 	/**
-	 * Create an update command
+	 * Create an update statement
 	 * 
 	 * @example
 	 * ```
 	 * $data = [
-	 * 		"propA" => "string 3"
+	 * 		"propA" => "string 3",
+	 *		"count" => new \go\core\db\Expression('count + 1'),		//Example for expression
 	 * ];
 	 * 
 	 * $stmt = App::get()->getDbConnection()->update("test_a", $data, ['id' => 1]);
@@ -330,7 +359,7 @@ class Connection {
 	 * 
 	 * @param string $tableName
 	 * @param array|Expression
-	 * @param Criteria $query
+	 * @param Query|string|array $query {@see Query::normalize()}
 	 * @return Statement
 	 */
 	public function update($tableName, $data, $query = null) {
@@ -344,13 +373,11 @@ class Connection {
 	
 
 	/**
-	 * Create a select statement. 
-	 * 
-	 * You don't need to use this function directly. You can select like this:
+	 * Create a select statement.
 	 * 
 	 * @example 
 	 * ```
-	 * $query = (new Query())
+	 * $query = GO()->getDbConnection()
 	 * 						->select('*')
 	 * 						->from('test_a')
 	 * 						->where('id', '=', 1);
@@ -360,28 +387,34 @@ class Connection {
 	 * ```
 	 * 
 	 * @see Query
-	 * 
-	 * @param Query $query
-	 * @return Statement
+	 * @return Query
 	 */
-	public function select(Query $query) {
-		$queryBuilder = new QueryBuilder();
-		$build = $queryBuilder->buildSelect($query);
-
-		$stmt = $this->createStatement($build);
-		call_user_func_array([$stmt, 'setFetchMode'], $query->getFetchMode());
-
-		$stmt->setQuery($query);
-		return $stmt;
+	public function select($select = "*") {
+		$query = new Query();
+		return $query->setDbConnection($this)->select($select);
+	}
+	
+	/**
+	 * Select a single column or count(*) for example.
+	 * 
+	 * Shortcut for:
+	 * $query->fetchMode(\PDO::FETCH_COLUMN,0)->select($select)
+	 * 
+	 * @param string $select
+	 * @return Query
+	 */
+	public function selectSingleValue($select) {
+		$query = new Query();
+		return $query->setDbConnection($this)->selectSingleValue($select);
 	}
 
 	/**
-	 * Execute the command
+	 * Create a statement from a QueryBuilder result
 	 * 
 	 * @return Statement
 	 * @throws PDOException
 	 */
-	private function createStatement($build) {
+	public function createStatement($build) {
 		if(isset($build['debug'])) {
 			App::get()->debug($build['debug'], Debugger::TYPE_SQL);
 		}

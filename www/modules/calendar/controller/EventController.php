@@ -139,7 +139,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			//$params['recurrenceExceptionDate'] is a unixtimestamp. We should return this event with an empty id and the exception date.			
 			//this parameter is sent by the view when it wants to edit a single occurence of a repeating event.
 			
-			if($params['exception_date'] != $recurringEvent->start_time) {
+			//if($params['exception_date'] != $recurringEvent->start_time) {
 				//reset the original attributes other wise create exception can fail
 				$model->resetAttributes();
 				if(!empty($params['thisAndFuture']) && $params['thisAndFuture'] == 'true') {
@@ -184,7 +184,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 					$this->_setEventAttributes($model, $params);
 
 				}
-			}
+			//}
 		}
 				
 		return parent::beforeSubmit($response, $model, $params);
@@ -314,7 +314,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 //		$newParticipantIds = !empty(\GO::session()->values['new_participant_ids']) ? \GO::session()->values['new_participant_ids'] : array();
 //		$oldParticipantsIds = array_diff($allParticipantIds,$newParticipantIds);
 //		if (!empty($newParticipantIds) && !empty($oldParticipantsIds))
-		if ($this->newParticipants && count($allParticipantIds) > 1) {
+		if ($this->newParticipants && count($allParticipantIds) > 1 && !$isNewEvent) {
 			$response['askForMeetingRequestForNewParticipants'] = true;
 		}
 		
@@ -647,8 +647,6 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		$response['data']['start_date'] = \GO\Base\Util\Date::get_timestamp($model->start_time, false);
 		$response['data']['end_date'] = \GO\Base\Util\Date::get_timestamp($model->end_time, false);
 
-		if (\GO::modules()->customfields)
-			$response['customfields'] = \GO\Customfields\Controller\CategoryController::getEnabledCategoryData("GO\Calendar\Model\Event", $model->calendar->group_id);
 
 		$response['group_id'] = $model->calendar->group_id;
 		
@@ -687,21 +685,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 
 			$response['participants']=array('results'=>array($participantModel->toJsonArray($model->start_time, $model->end_time)),'total'=>1,'success'=>true);
 			
-			if(!empty($params['linkModelNameAndId'])){
-				$arr = explode(':', $params['linkModelNameAndId']);
-				
-				if($arr[0]=='GO\Addressbook\Model\Contact'){
-					$contact = \GO\Addressbook\Model\Contact::model()->findByPk($arr[1]);
-					
-					if($contact){
-						$participantModel = new \GO\Calendar\Model\Participant();
-						$participantModel->setContact($contact);
-						
-						$response['participants']['results'][]=$participantModel->toJsonArray($model->start_time, $model->end_time);
-						$response['participants']['total']=2;
-					}
-				}
-			}
+		
 		}else
 		{
 			$particsStmt = \GO\Calendar\Model\Participant::model()->findByAttribute('event_id',$params['id']);
@@ -969,7 +953,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 				if(empty($params['events_only'])){
 					if(!$bdaysAdded && $calendar->show_bdays && \GO::modules()->addressbook){
 						$bdaysAdded=true;
-						$response = $this->_getBirthdayResponseForPeriod($response,$calendar,$startTime,$endTime);
+						//$response = $this->_getBirthdayResponseForPeriod($response,$calendar,$startTime,$endTime);
 					}
 
 					if (!$holidaysAdded && !empty($calendar->show_holidays)) {
@@ -1600,6 +1584,13 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			
 		//notify orgnizer
 		$participant = $event->getParticipantOfCalendar();
+		
+		//update participant statuses from main event if possible
+		$organizerEvent = $event->getOrganizerEvent();
+		if($organizerEvent) {
+			\GO::getDbConnection()->query("DELETE FROM cal_participants WHERE event_id = ".$event->id);
+			\GO::getDbConnection()->query("INSERT INTO cal_participants (event_id, name, email, user_id, contact_id, status, last_modified, is_organizer, role) SELECT '".$event->id."', name, email, user_id, contact_id, status, last_modified, is_organizer, role FROM cal_participants p2 WHERE p2.event_id = ".$organizerEvent->id);
+		}
 
 //		if(!$participant)
 //		{

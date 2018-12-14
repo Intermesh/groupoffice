@@ -1,17 +1,26 @@
 <?php
 return [
+		"name" => "Address Book",
+		"description" => "Store contacts and organizations",
+		
 		"emailTypes" => [
 				"work" => "Work",
-				"private" => "Private"
+				"home" => "Home",
+				"billing" => "Billing"
 		],
 		"phoneTypes" => [
 				"work" => "Work",
-				"private" => "Private",
-				"mobile" => "Mobile"
+				"home" => "Home",
+				"mobile" => "Mobile",
+				"workmobile" => "Work Mobile",
+				"fax" => "Fax",
+				"workfax" => "Work fax"
 		],
 		"addressTypes" => [
+				"visit" => "Visit",
+				"postal" => "Postal",
 				"work" => "Work",
-				"private" => "Private"				
+				"home" => "Home"
 		],
 		"dateTypes" => [
 				"birthday" => "Birthday",

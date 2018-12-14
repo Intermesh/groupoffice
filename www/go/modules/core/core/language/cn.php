@@ -146,7 +146,7 @@ return array (
   'Week' => '周',
   'Weeks' => '周',
   'Month' => '月',
-  'months' => 
+  'full_months' => 
   array (
     1 => 'January',
     2 => 'February',
@@ -574,4 +574,9 @@ return array (
     'ai' => 'Adobe Illustrator file',
     'eml' => 'E-mail message',
   ),
+	'Repeat forever' => '一直重复',
+  'Repeat every' => '间隔',
+  'Repeat until' => '重复至',
+	'Recurrence' => '重复',
+	'At days' => '在哪几天',
 );

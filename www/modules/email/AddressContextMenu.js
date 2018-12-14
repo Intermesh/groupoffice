@@ -60,13 +60,9 @@ GO.email.AddressContextMenu = function(config)
 		text: t("Search through Group-Office", "email").replace('{product_name}', GO.settings.config.product_name),
 		cls: 'x-btn-text-icon',
 		handler: function(){
-			var searchPanel = new GO.grid.SearchPanel(
-			{
-				query: this.address
-				}
-			);
-			GO.mainLayout.tabPanel.add(searchPanel);
-			searchPanel.show();
+			
+			go.util.search(this.address);
+			
 		},
 		scope: this
 	});
@@ -83,22 +79,66 @@ GO.email.AddressContextMenu = function(config)
 				
 	config.items=[this.composeButton,
 	this.searchButton,
-	this.searchMessagesButton];
+	this.searchMessagesButton
 	
-	if(go.Modules.isAvailable("legacy", "addressbook"))
-	{
-		this.lookUpButton = new Ext.menu.Item({
-			iconCls: 'btn-addressbook',
-			text: t("Lookup in address book", "addressbook"),
-			cls: 'x-btn-text-icon',
-			handler: function(){
-				GO.addressbook.searchSender(this.address, this.personal);
+	];
+	
+	if(go.Modules.isAvailable("community", "addressbook")) {
+		
+		this.store = new go.data.Store({
+			entityStore: "Contact",
+			fields: ["id", "name"]
+		});
+		
+		this.addEvents({change: true, beforechange: true});
+
+		this.store.on("load", this.updateMenu, this);
+		
+		
+		
+		this.addButton = new Ext.menu.Item({
+			iconCls: 'ic-add',
+			text: t("Add to address book"),
+			handler: function() {
+				
+				var nameParts = this.personal.split(" "), v = {
+					firstName: nameParts.shift(),
+					emailAddresses: [{
+							type: "work",
+							email: this.address
+					}]
+				};
+				
+				v.lastName = nameParts.join(" ");				
+				
+				var dlg = new go.modules.community.addressbook.ContactDialog();
+				dlg.setValues(v).show();
 			},
 			scope: this
 		});
+		
+		config.items.push("-", this.addButton);
+		
 	
-		config.items.push(this.lookUpButton);
+		
 	}
+					
+	
+	
+//	if(go.Modules.isAvailable("legacy", "addressbook"))
+//	{
+//		this.lookUpButton = new Ext.menu.Item({
+//			iconCls: 'btn-addressbook',
+//			text: t("Lookup in address book", "addressbook"),
+//			cls: 'x-btn-text-icon',
+//			handler: function(){
+//				GO.addressbook.searchSender(this.address, this.personal);
+//			},
+//			scope: this
+//		});
+//	
+//		config.items.push(this.lookUpButton);
+//	}
 
 					
 	GO.email.AddressContextMenu.superclass.constructor.call(this, config);	
@@ -113,6 +153,44 @@ Ext.extend(GO.email.AddressContextMenu, Ext.menu.Menu,{
 		this.address = address || '';
 		this.personal= personal || '';
 		
+		this.store.baseParams.filter.email = this.address;
+		this.store.load();
+		
 		GO.email.AddressContextMenu.superclass.showAt.call(this, xy);
-	}	
+	}	,
+	
+	updateMenu: function () {
+		
+		this.initItems();
+		var item, rem = [], items = [];
+		this.items.each(function(i){
+				rem.push(i);
+		});
+		for (var i = 2, len = rem.length - 2; i < len; ++i){
+				item = rem[i];
+				this.remove(item, true);
+		}
+		
+		
+		this.el.sync();
+		
+		
+		var records = this.store.getRange(), len = records.length;
+		
+		if(len) {
+			this.insert(2, "-");	
+		}
+		
+		for (var i = 0; i < len; i++) {
+			this.insert(3 + i, {
+				iconCls: 'ic-account-box',
+				text: t("Open") + ": " + records[i].data.name,
+				contactId: records[i].data.id,
+				handler: function() {
+					var dlg = new go.modules.community.addressbook.ContactDialog();
+					dlg.load(this.contactId).show();
+				}
+			});
+		}
+	}
 });

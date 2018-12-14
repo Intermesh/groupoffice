@@ -2,7 +2,7 @@
 return array (
   'Admin tools' => 'Adminisztrációs eszközök',
   'Scripts' => 'Szkriptek',
-  'Script output' => 'Végeredmény',
+  'Script output' => 'Script kimenet',
   'Database check' => 'Adatbázis ellenőrzés',
   'Remove duplicate contacts and events' => 'Duplikált kapcsolatok és események eltávolítása',
   'Backup database' => 'Adatbázis mentése',

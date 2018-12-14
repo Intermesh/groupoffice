@@ -72,6 +72,42 @@ class AclGroupController extends \GO\Base\Controller\AbstractMultiSelectModelCon
 		$response = array_merge($response,parent::actionSelectedStore($params));
 		return $response;
 	}
+	
+		protected function actionSelectNewStore($params){
+		
+		$model = \GO::getModel($this->modelName());
+		$linkModel = \GO::getModel($this->linkModelName());
+		
+		$store = \GO\Base\Data\Store::newInstance($model);
+		
+		$joinCriteria = \GO\Base\Db\FindCriteria::newInstance()
+			->addCondition($this->getRemoteKey(), $params['model_id'],'=','lt')
+			->addCondition($model->primaryKey(), 'lt.'.$this->linkModelField(), '=', 't', true, true);			
+		
+		$this->formatColumns($store->getColumnModel());
+		
+		$findParams = $store->getDefaultParams($params);
+		
+		if($this->uniqueSelection){
+			$findParams->join($linkModel->tableName(), $joinCriteria, 'lt', 'LEFT');
+
+			$findCriteria = \GO\Base\Db\FindCriteria::newInstance()
+							->addCondition($this->linkModelField(), null,'IS','lt');
+			$findParams->criteria($findCriteria);
+		}
+		$findParams->debugSql();
+		if(!empty($params['query'])) {
+			$findParams->join('core_user', (new \GO\Base\Db\FindCriteria())->addRawCondition('user.id', 't.isUserGroupFor'), 'user', 'LEFT');
+			$findParams->searchQuery('%'.preg_replace ('/[\s*]+/','%', $params['query']).'%', ['t.name', 'user.displayName']);			
+		}
+		
+		
+		$availableModels = $model->find($findParams);
+		
+		$store->setStatement($availableModels);
+
+		return $store->getData();
+	}
 
 	protected function beforeAdd(array $params) {
 		$addKeys = !empty($params['add']) ? json_decode($params['add']) : array();

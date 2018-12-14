@@ -22,7 +22,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 			this.on({
 				scope: this,
 				search: function (tb, v) {
-					if(this.store instanceof go.data.Store) {
+					if(this.store instanceof go.data.Store || this.store instanceof go.data.GroupingStore) {
 						this.store.baseParams.filter.q = v;
 					} else {
 						//params for old framework
@@ -91,7 +91,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 		
 		var isActive = false;
 		
-		if(this.store instanceof go.data.Store) {
+		if(this.store instanceof go.data.Store || this.store instanceof go.data.GroupingStore) {
 			isActive = !GO.util.empty(this.store.baseParams.filter.q);
 		} else {
 			isActive = !GO.util.empty(this.store.baseParams.query);

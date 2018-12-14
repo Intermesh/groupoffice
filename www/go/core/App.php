@@ -4,6 +4,7 @@ namespace go\core {
 
 use Exception;
 use GO;
+use GO\Base\Observable;
 use go\core\auth\State as AuthState;
 use go\core\cache\CacheInterface;
 use go\core\cache\Disk;
@@ -57,6 +58,8 @@ use const GO_CONFIG_FILE;
 		 * @var CacheInterface 
 		 */
 		private $cache;
+		
+		private $version;
 
 		protected function __construct() {
 			date_default_timezone_set("UTC");
@@ -68,11 +71,14 @@ use const GO_CONFIG_FILE;
 		}
 		
 		public function getVersion() {
-			return require(Environment::get()->getInstallFolder()->getPath() . '/version.php');
+			if(!isset($this->version)) {
+				$this->version = require(Environment::get()->getInstallFolder()->getPath() . '/version.php');
+			}
+			return $this->version;
 		}
 
 		private function initCompatibility() {
-			require(Environment::get()->getInstallFolder()->getPath() . "/go/GO.php");
+			require(Environment::get()->getInstallPath() . "/go/GO.php");
 			spl_autoload_register(array('GO', 'autoload'));
 		}
 
@@ -110,6 +116,36 @@ use const GO_CONFIG_FILE;
 		 */
 		public function getDataFolder() {
 			return new Folder($this->getConfig()['general']['dataPath']);
+		}
+		
+		/**
+		 * Get total space of the data folder in bytes
+		 * 
+		 * @return float
+		 */
+		public function getStorageQuota() {
+			$quota = $this->getConfig()['limits']['storageQuota'];
+			if(empty($quota)) {
+				$quota = disk_total_space($this->getConfig()['general']['dataPath']);
+			}
+			
+			return $quota;
+		}		
+		
+		/**
+		 * Get free space in bytes
+		 * 
+		 * @return float
+		 */
+		public function getStorageFreeSpace() {
+			$quota = $this->getConfig()['limits']['storageQuota'];
+			if(empty($quota)) {
+				return disk_free_space($this->getConfig()['general']['dataPath']);
+			} else
+			{
+				 $usage = \GO::config()->get_setting('file_storage_usage');				 
+				 return $quota - $usage;
+			}
 		}
 
 		/**
@@ -153,6 +189,39 @@ use const GO_CONFIG_FILE;
 			
 			return $this;
 		}
+		
+		private function getGlobalConfig() {
+			$globalConfigFile = '/etc/groupoffice/globalconfig.inc.php';
+			if (file_exists($globalConfigFile)) {
+				require($globalConfigFile);
+			}
+			
+			return $config ?? [];
+		}
+		
+		private function getInstanceConfig() {
+			$configFile = $this->findConfigFile();
+			if(!$configFile) {
+				
+				$host = isset($_SERVER['HTTP_HOST']) ? explode(':', $_SERVER['HTTP_HOST'])[0] : '<HOSTNAME>';
+				
+				$msg = "No config.php was found. Possible locations: \n\n".
+								"/etc/groupoffice/multi_instance/" .$host . "/config.php\n\n".				
+								 dirname(dirname(__DIR__)) . "/config.php\n\n".
+								"/etc/groupoffice/config.php";
+				
+				throw new Exception($msg);
+			}
+			
+			require($configFile);	
+			
+			if(!isset($config)) {
+				throw new ConfigurationException();
+			}
+			
+			return $config;
+		}
+		
 
 		/**
 		 * Get the configuration data
@@ -177,50 +246,39 @@ use const GO_CONFIG_FILE;
 				return $this->config;
 			}
 			
-			$configFile = $this->findConfigFile();
-			if(!$configFile) {
-				
-				$host = isset($_SERVER['HTTP_HOST']) ? explode(':', $_SERVER['HTTP_HOST'])[0] : '<HOSTNAME>';
-				
-				$msg = "No config.php was found. Possible locations: \n\n".
-								'/etc/groupoffice/multi_instance/' . $host . "/config.php\n\n".
-								dirname(dirname(__DIR__)) . "/config.php\n\n".
-								"/etc/groupoffice/config.php";
-				
-				throw new Exception($msg);
-			}
+			$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
 			
-			require($configFile);	
-			
-			if(!isset($config)) {
-				throw new ConfigurationException();
+			if(cache\Apcu::isSupported()) {
+				$cacheCls = cache\Apcu::class;				
+			} else
+			{
+				$cacheCls = cache\Disk::class;
 			}
 			
 			$this->config = [
 					"general" => [
 							"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice', //TODO default should be /var/lib/groupoffice
 							"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
-							"debug" => !empty($config['debug']),
-							"cache" => Disk::class
+							"debug" => $config['debug'] ?? false,
+							"cache" => $cacheCls,
+							"servermanager" => $config['servermanager'] ?? false
 					],
 					"db" => [
+							"name" => $config['db_name'],
 							"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . ($config['db_name'] ?? "groupoffice-com"),
 							"username" => $config['db_user'] ?? "groupoffice",
 							"password" => $config['db_pass'] ?? ""
 					],
 					"limits" => [
-							"maxUsers" => 0,
-							"storageQuota" => 0,
-							"allowedModules" => ""
+							"maxUsers" => $config['max_users'] ?? 0,
+							"storageQuota" => $config['quota'] ?? 0,
+							"allowedModules" => $config['allowed_modules'] ?? ""
 					],
 					"branding" => [
-							"name" => "GroupOffice"
+						"name" => $config['product_name'] ?? "GroupOffice"
 					]
 			];
 			
-			if(isset($config['product_name'])) {
-				$this->config['branding']['name'] = $config['product_name'];
-			}
 			return $this->config;
 		}
 
@@ -278,6 +336,25 @@ use const GO_CONFIG_FILE;
 			return $this->cache;
 		}
 		
+		
+		/**
+		 * Get a module
+		 * 
+		 * return the module if it's installed and available.
+		 * 
+		 * @param string $package Set to null for legacy modules
+		 * @param string $name
+		 * @return boolean
+		 */
+		public function getModule($package, $name) {
+			$model = \go\modules\core\modules\model\Module::find()->where(['package' => $package, 'name' => $name, 'enabled' => true])->single();
+			if(!$model || !$model->isAvailable()) {
+				return false;
+			}
+			
+			return $model;
+		}
+		
 		/**
 		 * Set the cache provider
 		 * 
@@ -308,7 +385,8 @@ use const GO_CONFIG_FILE;
 				$webclient = new Extjs3();
 				$webclient->flushCache();
 
-				\GO\Base\Observable::cacheListeners();
+				Observable::cacheListeners();
+
 				Listeners::get()->init();
 			}
 		}
@@ -367,6 +445,15 @@ use const GO_CONFIG_FILE;
 		public function getAuthState() {
 			return $this->authState;
 		}
+		
+		/**
+		 * Get the server environment
+		 * 
+		 * @return Enviroment
+		 */
+		public function getEnvironment() {
+			return Environment::get();
+		}
 
 		/**
 		 * Get the authenticated user ID
@@ -388,7 +475,7 @@ use const GO_CONFIG_FILE;
 		/**
 		 * Get the application settings
 		 * 
-		 * @return AppSettings
+		 * @return Settings
 		 */
 		public function getSettings() {
 			return Settings::get();
@@ -402,7 +489,21 @@ use const GO_CONFIG_FILE;
 		 * @param String $package Only applies if module is set to 'base'
 		 */
 		public function t($str, $package = 'core', $module = 'core') {
-			return Language::get()->t($str, $package, $module);
+			return $this->getLanguage()->t($str, $package, $module);
+		}
+		
+		private $language;
+		
+		/**
+		 * 
+		 * @return Language
+		 */
+		public function getLanguage() {
+			if(!isset($this->language)) {
+				$this->language = new Language();
+			}
+			
+			return $this->language;
 		}
 
 		/**

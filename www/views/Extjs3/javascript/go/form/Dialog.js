@@ -1,3 +1,5 @@
+/* global go, Ext */
+
 /**
  * 
  * Typical usage
@@ -8,85 +10,112 @@
 
 go.form.Dialog = Ext.extend(go.Window, {
 	autoScroll: true,
-	width: 500,
+	width: dp(500),
 	modal: true,
 	entityStore: null,
 	currentId: null,
 	buttonAlign: 'left',
 	layout: "fit",
+	
+	/**
+	 * Redirect to the entity detail view after save.
+	 */
+	redirectOnSave: true,
+	
 	initComponent: function () {
 
 		this.formPanel = new go.form.EntityPanel({
 			entityStore: this.entityStore,
 			items: this.initFormItems()
 		});
-
+		
+		this.formPanel.on("save", function(fp, entity) {
+			this.fireEvent("save", this, entity);
+		}, this);
+		
 		this.items = [this.formPanel];
 
-		if (!this.buttons) {
-			this.buttons = [
-//			this.deleteBtn = new Ext.Button({
-//				text: t("Delete"),
-//				cls: 'danger',
-//				handler: this.delete,
-//				disabled: true,
-//				scope: this
-//			}), 
-				'->', {
+		Ext.applyIf(this,{
+			buttons:[
+				'->', 
+				{
 					text: t("Save"),
 					handler: this.submit,
 					scope: this
-				}];
+				}
+			]
+		});
+
+		go.form.Dialog.superclass.initComponent.call(this);		
+		
+		if(this.entityStore.entity.linkable) {
+			this.addCreateLinkButton();
 		}
-
-		go.form.Dialog.superclass.initComponent.call(this);
-
-		this.entityStore.on('changes', this.onChanges, this);
-
-		this.on('destroy', function () {
-			this.entityStore.un('changes', this.onChanges, this);
-		}, this);
 
 		//deprecated
 		if (this.formValues) {
-			this.formPanel.form.setValues(this.formValues);
+			this.formPanel.setValues(this.formValues);
 			delete this.formValues;
 		}
+		
+		this.addEvents({load: true, submit: true});
+	},
+	
+
+	addCreateLinkButton : function() {
+		
+		this.getFooterToolbar().insert(0, this.createLinkButton = new go.modules.core.links.CreateLinkButton());	
+		
+		this.on("load", function() {
+			this.createLinkButton.setEntity(this.entityStore.entity.name, this.currentId);
+		}, this);
+
+		this.on("show", function() {
+			if(!this.currentId) {
+				this.createLinkButton.reset();
+			}
+		}, this);
+
+		this.on("submit", function(dlg, success, serverId) {			
+			this.createLinkButton.setEntity(this.entityStore.entity.name, serverId);
+			this.createLinkButton.save();
+		}, this);
+	
 	},
 	
 	setValues : function(v) {
-		this.formPanel.form.setValues(v);
+		this.formPanel.setValues(v);
 		
 		return this;
 	},
 
 	load: function (id) {
-		this.currentId = id;
-
-		if (!this.formPanel.load(id)) {
-			//If no entity was returned the entity store will load it and fire the "changes" event. This dialog listens to that event.
-			this.actionStart();
-		} else
-		{
-			//needs to fire because overrides are made to handle logic after form load.
-			this.onLoad();
+		
+		var me = this;
+		
+		function innerLoad(){
+			me.currentId = id;
+			me.actionStart();
+			me.formPanel.load(id, function() {
+				me.onLoad();
+				me.actionComplete();
+			}, this);
+		}
+		
+		// The form needs to be rendered before the data can be set
+		if(!this.rendered){
+			this.on('afterrender',innerLoad,this,{single:true});
+		} else {
+			innerLoad.call(this);
 		}
 
 		return this;
 	},
-
-	onChanges: function (entityStore, added, changed, destroyed) {
-
-		if (changed.concat(added).indexOf(this.currentId) !== -1) {
-			this.actionComplete();
-			this.onLoad();
-		}
-	},
-
+	
 	delete: function () {
 		
 		Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
-			if (btn != "yes") {
+			if (btn !== "yes") {
 				return;
 			}
 			
@@ -112,6 +141,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 	},
 	
 	onLoad : function() {
+		this.fireEvent("load", this);
 //		this.deleteBtn.setDisabled(this.formPanel.entity.permissionLevel < GO.permissionLevels.writeAndDelete);
 	},
 
@@ -141,21 +171,36 @@ go.form.Dialog = Ext.extend(go.Window, {
 	focus: function () {
 		this.formPanel.focus();
 	},
+	
+	onBeforeSubmit: function() {
+		return true;
+	},
 
 	submit: function () {
+		
+		if(!this.onBeforeSubmit()) {
+			return;
+		}
 
 		if (!this.isValid()) {
 			return;
 		}
-
+		
 		this.actionStart();
 
 		this.formPanel.submit(function (formPanel, success, serverId) {
 			this.actionComplete();
 			this.onSubmit(success, serverId);
-			if (success) {
-				this.close();
+			this.fireEvent("submit", this, success, serverId);
+
+			if(!success) {
+				return;
 			}
+			if(this.redirectOnSave) {
+				this.entityStore.entity.goto(serverId);
+			}
+			this.close();
+						
 		}, this);
 	},
 
@@ -171,3 +216,5 @@ go.form.Dialog = Ext.extend(go.Window, {
 		];
 	}
 });
+
+Ext.reg("formdialog", go.form.Dialog);

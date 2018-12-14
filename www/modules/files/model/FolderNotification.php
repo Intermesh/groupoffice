@@ -61,7 +61,7 @@ class FolderNotification extends \GO\Base\Db\ActiveRecord {
 		$users = array();
 		while ($fnRow = $stmt->fetch()) {
 			//ignore user who changed file(s)
-			if ($fnRow->user_id == \GO::user()->id)
+			if (\GO::user() && $fnRow->user_id == \GO::user()->id)
 				continue;
 			$users[] = $fnRow->user_id;
 		}
