@@ -1,13 +1,16 @@
 <?php
 
 use GO\Base\Util\StringHelper;
+use go\core\acl\model\Acl;
 use go\core\fs\Blob;
 use go\modules\community\addressbook\model\Address;
+use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\addressbook\model\Contact;
 use go\modules\community\addressbook\model\Date;
 use go\modules\community\addressbook\model\EmailAddress;
 use go\modules\community\addressbook\model\PhoneNumber;
 use go\modules\community\addressbook\model\Url;
+use go\modules\core\links\model\Link;
 
 /**
  * Contact convertor class
@@ -130,7 +133,7 @@ class ContactConvertor {
 							->selectSingleValue('name')
 							->all();
 			
-			$message->companyname = implode(',', $companies);
+			$message->companyname = implode(', ', $companies);
 		} else
 		{
 			$message->companyname = $contact->name;
@@ -314,29 +317,115 @@ class ContactConvertor {
 	 * @return Contact
 	 */
 	public function AS2GO(SyncContact $message, Contact $contact, $contentParameters) {
-		foreach($this->simpleMapping as $goProp => $asProp) {
-			$contact->$goProp = $message->$asProp;
+		
+		try {
+			GO()->getDbConnection()->beginTransaction();
+			
+			foreach($this->simpleMapping as $goProp => $asProp) {
+				$contact->$goProp = $message->$asProp;
+			}
+
+			$contact->phoneNumbers = $this->flatToHasMany($contact->phoneNumbers ?? [], $message, $this->phoneMapping, PhoneNumber::class);		
+			$contact->dates = $this->flatToHasMany($contact->dates ?? [], $message, $this->dateMapping, Date::class);
+			$contact->urls = $this->flatToHasMany($contact->urls ?? [], $message, $this->urlMapping, Url::class);
+			$contact->addresses = $this->flatToHasMany($contact->addresses ?? [], $message, $this->addressMapping, Address::class);
+
+			$this->setEmailAddresses($message, $contact);
+
+			$contact->notes = GoSyncUtils::getBodyFromMessage($message);
+
+			ZLog::Write(LOGLEVEL_DEBUG,var_export($message->picture, true) );
+			if (!empty($message->picture)) {
+				$pictureString = base64_decode($message->picture);					
+				$blob = Blob::fromString($pictureString);
+				$blob->type = 'image/jpeg';
+				$blob->name = $contact->name . '.jpg';
+				$blob->save();
+				$contact->photoBlobId = $blob->id;
+
+				ZLog::Write(LOGLEVEL_DEBUG, "New picture set: ".$contact->photoBlobId );
+			} else {
+				$contact->photoBlobId = null;
+			}
+
+			$this->setOrganizations( $message, $contact);
+
+			if(!$contact->save()) {
+				throw new Exception("Failed to save contact");
+			}
+			GO()->getDbConnection()->commit();
+			
+			return $contact;
+			
+		} catch(Exception $e) {
+			ZLog::Write(LOGLEVEL_ERROR, "Failed to save contact: ".var_export(GO()->getDebugger()->getEntries(), true));
+			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
+			
+			GO()->getDbConnection()->rollBack();
 		}
 		
-		$contact->phoneNumbers = $this->flatToHasMany($contact->phoneNumbers ?? [], $message, $this->phoneMapping, PhoneNumber::class);		
-		$contact->dates = $this->flatToHasMany($contact->dates ?? [], $message, $this->dateMapping, Date::class);
-		$contact->urls = $this->flatToHasMany($contact->urls ?? [], $message, $this->urlMapping, Url::class);
-		$contact->addresses = $this->flatToHasMany($contact->addresses ?? [], $message, $this->addressMapping, Address::class);
+		return false;
+	}
+	
+	private function setOrganizations(SyncContact $message, Contact $contact) {
+
+		$asOrganizationNames = array_map('trim', explode(",", $message->companyname));
 		
-		$this->setEmailAddresses($message, $contact);
+		ZLog::Write(LOGLEVEL_DEBUG, "Organizations: ".$message->companyname);
 		
-		$contact->notes = GoSyncUtils::getBodyFromMessage($message);
+		//compare with existing.
+		$goOrganizations = $contact->isNew() ? [] : Contact::find()
+							->withLink($contact)
+							->andWhere('isOrganization', '=', true)
+							->all();
 		
-		
-		if (!empty($message->picture)) {
-			$pictureString = base64_decode($message->picture);					
-			$blob = Blob::fromString($pictureString);
-			$contact->photoBlobId = $blob->id;
-		} else {
-			$contact->photoBlobId = null;
+		$goOrganizationsNames = [];
+		foreach($goOrganizations as $o) {
+			if(!in_array($o->name, $asOrganizationNames)) {
+				Link::deleteLink($o, $contact);
+				ZLog::Write(LOGLEVEL_DEBUG, "Unlink: ".$o->name);
+			} else
+			{
+				$goOrganizationsNames[] = $o->name;
+			}
 		}
 		
-		return $contact;
+		$newAsOrgNames = array_diff($asOrganizationNames, $goOrganizationsNames);
+		foreach($newAsOrgNames as $name) {
+			$org = Contact::find()->where(['isOrganization' => true])->andWhere('name', 'LIKE', $name)->single();
+			if(!$org) {
+				
+				ZLog::Write(LOGLEVEL_DEBUG, "Create: ".$name);
+				$org = new Contact();
+				$org->name = $name;
+				$org->isOrganization = true;
+				$org->addressBookId = $this->getDefaultAddressBook()->id;
+				if(!$org->save()) {
+					throw new Exception("Could not save organization");
+				}
+			}
+			ZLog::Write(LOGLEVEL_DEBUG, "Create link: ".$name);
+			$link = Link::create($contact, $org);
+			if(!$link) {
+				throw new Exception("Could not link organization");
+			}
+		}		
+	}
+	/**
+	 * Get default address book
+	 * 
+	 * @return AddressBook
+	 * @throws Exception
+	 */
+	public function getDefaultAddressBook() {
+		//TODO make configurable
+		$addressbook = AddressBook::find()
+						->filter(['permissionLevel' => Acl::LEVEL_WRITE])->single();
+
+		if (!$addressbook)
+			throw new Exception("FATAL: No default addressbook configured");
+		
+		return $addressbook;
 	}
 	
 	private function setEmailAddresses(SyncContact $message, Contact $contact) {

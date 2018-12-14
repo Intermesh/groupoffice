@@ -1,16 +1,8 @@
 <?php
 
-use GO\Base\Db\FindCriteria;
-use GO\Base\Db\FindParams;
-use GO\Base\Fs\File;
-use GO\Base\Model\Acl as Acl2;
 use GO\Base\Util\StringHelper;
 use go\core\acl\model\Acl;
 use go\modules\community\addressbook\model\Contact;
-use go\modules\community\addressbook\model\Date;
-use go\modules\community\addressbook\model\PhoneNumber;
-use go\modules\community\addressbook\model\Url;
-use GO\Sync\Model\UserAddressbook;
 
 class goContact extends GoBaseBackendDiff {
 	
@@ -21,7 +13,7 @@ class goContact extends GoBaseBackendDiff {
 		$this->convertor = new ContactConvertor();
 	}
 
-	public function DeleteMessage($folderid, $id, $contentparameters) {
+	public function DeleteMessage($folderid, $id, $contentParameters) {
 		ZLog::Write(LOGLEVEL_DEBUG, 'goContact->DeleteMessage('.$folderid.','.$id.')');
 		
 		$contact = Contact::findById($id);		
@@ -43,7 +35,7 @@ class goContact extends GoBaseBackendDiff {
 	 * 
 	 * @param StringHelper $folderid
 	 * @param int $id
-	 * @param array $contentparameters
+	 * @param array $contentParameters
 	 * @return SyncContact
 	 */
 	public function GetMessage($folderid, $id, $contentParameters) {
@@ -58,7 +50,7 @@ class goContact extends GoBaseBackendDiff {
 
 		$message = $this->convertor->GO2AS($contact, $contentParameters);
 		
-		ZLog::Write(LOGLEVEL_DEBUG, var_export($message, true));
+//		ZLog::Write(LOGLEVEL_DEBUG, var_export($message, true));
 		return $message;		
 	}
 	
@@ -78,20 +70,13 @@ class goContact extends GoBaseBackendDiff {
 	{
 		
 		ZLog::Write(LOGLEVEL_DEBUG, "ChangeMessage($folderid, $id, .., ..)");
-		//ZLog::Write(LOGLEVEL_DEBUG, var_export($message, true));
+//		ZLog::Write(LOGLEVEL_DEBUG, var_export($message, true));
 
 		$contact = empty($id) ? false : Contact::findById($id);
 
-		if (!$contact) {				
-			//TODO make configurable
-			$addressbook = \go\modules\community\addressbook\model\AddressBook::find()
-							->filter(['permissionLevel' => Acl::LEVEL_WRITE])->single();
-
-			if (!$addressbook)
-				throw new Exception("FATAL: No default addressbook configured");
-
+		if (!$contact) {
 			$contact = new Contact();
-			$contact->addressBookId = $addressbook->id;
+			$contact->addressBookId = $this->convertor->getDefaultAddressBook()->id;
 		} else
 		{
 			ZLog::Write(LOGLEVEL_DEBUG, "Found contact");
@@ -102,14 +87,8 @@ class goContact extends GoBaseBackendDiff {
 			return $this->StatMessage($folderid, $id);
 		}
 
-		$contact = $this->convertor->AS2GO($message, $contact, $contentParameters);
-		//ZLog::Write(LOGLEVEL_DEBUG, var_export($contact, true));
-		
-		
-		if(!$contact->save()) {
-			ZLog::Write(LOGLEVEL_ERROR, "Failed to save contact: ".var_export(GO()->getDebugger()->getEntries(), true));
-		}
-
+		$this->convertor->AS2GO($message, $contact, $contentParameters);
+	
 		return $this->StatMessage($folderid, $id);		
 
 	}
@@ -151,7 +130,7 @@ class goContact extends GoBaseBackendDiff {
 		
 		$list = Contact::find()
 						->select('c.id, UNIX_TIMESTAMP(c.modifiedAt) AS `mod`, "1" AS flags')
-						->fetchMode(\PDO::FETCH_ASSOC)
+						->fetchMode(PDO::FETCH_ASSOC)
 						->filter([
 								"permissionLevel" => Acl::LEVEL_READ
 						])->all();
@@ -189,8 +168,8 @@ class goContact extends GoBaseBackendDiff {
 		return $folders;
 	}
 	
-	public function getNotification($folder=null) {
-		return false;// Contact::getState();
+	public function getNotification($folder = null) {
+		return Contact::getState();
 	}
 
 }

@@ -130,7 +130,7 @@ class Blob extends orm\Entity {
 			$blob = new self();
 			$blob->id = $hash;
 			$blob->size = $file->getSize();
-			$blob->staleAt = new DateTime("+1 hour");
+			//$blob->staleAt = new DateTime("+1 hour");
 		}
 		$blob->name = $file->getName();
 		$blob->tmpFile = $file->getPath();
@@ -153,7 +153,7 @@ class Blob extends orm\Entity {
 			$blob->id = $hash;
 			$blob->size = mb_strlen($string, '8bit');
 			$blob->strContent = $string;
-			$blob->staleAt = new DateTime("+1 hour");
+			//$blob->staleAt = new DateTime("+1 hour");
 		}
 		return $blob;
 	}

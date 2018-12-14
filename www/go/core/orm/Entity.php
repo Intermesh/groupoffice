@@ -471,9 +471,10 @@ abstract class Entity extends Property {
 		
 		$columns = static::searchColumns();
 		
+		//Explode string into tokens and wrap in wildcard signs to search within the texts.
+		$tokens = StringUtil::explodeSearchExpression($expression);
+		
 		if(!empty($columns)) {
-			//Explode string into tokens and wrap in wildcard signs to search within the texts.
-			$tokens = StringUtil::explodeSearchExpression($expression);
 			
 			$tokensWithWildcard = array_map(
 											function($t){
