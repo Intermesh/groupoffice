@@ -26,7 +26,7 @@ use PDOException;
 
 class Installer {
 	
-	const MIN_UPGRADABLE_VERSION = "6.3.53";
+	const MIN_UPGRADABLE_VERSION = "6.3.58";
 	
 	private $isInProgress = false;
 
