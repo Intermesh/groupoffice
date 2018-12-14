@@ -19,11 +19,13 @@ go.modules.community.pages.PageContent = Ext.extend(Ext.Panel,{
        
     updateData : function() {
 	if(this.currentPage){
-	  	go.Stores.get("Page").get([this.currentPage], function(content){
-	   
-	    this.update(content[0].content, false)
+	  go.Stores.get("Page").get([this.currentPage], function(content){
+	  this.update(content[0].content, false)
 	},this);  
 	}
-
+    },
+    
+    showEmptyPage : function() {
+	this.update();
     }
 })

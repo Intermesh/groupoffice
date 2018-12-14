@@ -4,7 +4,7 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
     pageId: '',
     siteSlug: '',
     //used in routing and redirecting in MainLayout.js
-    isSite: true,
+    shouldRedirect: true,
     
     initComponent: function () {
 
@@ -90,6 +90,7 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 
     //sets the site id for all relevant panels
     setSiteId: function(siteId){
+	console.log('set site id to: '+siteId)
 	this.siteId = siteId;
 	this.tree.currentSiteId = this.siteId;
 	this.tree.setLoaderSiteId(siteId);
@@ -97,6 +98,7 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
     
     //updates the page id for all relevant panels
     navigateToPage: function(pageId){
+	console.log('set page id to: '+pageId)
 	this.pageId = pageId;
 	this.content.currentPage = this.pageId;
     }

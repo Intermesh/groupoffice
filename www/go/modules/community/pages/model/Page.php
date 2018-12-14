@@ -173,6 +173,10 @@ class Page extends AclItemEntity {
 		    break;
 		}
 	    }
+	    //Passing the align attribute to the new header if the old one had one.
+	    if($element->hasAttribute('align')){
+		$newElement->setAttribute('align', $element->getAttribute('align'));
+	    }
 	    if($counter != 0){
 	    $newElement->setAttribute('id',$path . $headerSlug . $counter);
 	    }else{
@@ -214,7 +218,7 @@ class Page extends AclItemEntity {
     //default character limit is 100, max character limit for most slugs in the database is 190.
     protected function slugify($input, $charLimit = 100){
 	return strtolower(preg_replace('/[ ]/', '_', 
-		mb_substr(preg_replace('/[\&\#\(\)\[\]\{\}\$\+\,\.\/\\\:\;\=\?\@\^\<\>\!\*\|\%]/', '', $input),0,$charLimit)));
+		mb_substr(preg_replace('/\'\"[\&\#\(\)\[\]\{\}\$\+\,\.\/\\\:\;\=\?\@\^\<\>\!\*\|\%]/', '', $input),0,$charLimit)));
     }
 
     /**
@@ -223,7 +227,11 @@ class Page extends AclItemEntity {
      * @return self
      */
     public static function findBySlug($slug) {
-	return self::find()->single();
+	return self::find()->where(['slug' => $slug])->single();
+    }
+    
+    public static function findFirstSitePage($siteId){
+	return $res = (new \go\core\db\Query)->select('slug')->from('pages_page')->where(['siteId' => $siteId])->orderBy(['sortOrder' => 'ASC'])->single();
     }
 
 }

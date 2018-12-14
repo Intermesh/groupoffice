@@ -100,8 +100,13 @@ class Site extends AclEntity {
 	public function setSiteName($name){
 	    $this->siteName = $name;
 	    if(empty($this->slug)) {
-		$this->slug = strtolower(preg_replace('/[ \&\#\(\)\[\]\{\}\$\+\,\.\/\\\:\;\=\?\@\^\<\>\!\*\|\%]/', '_', $name));
+		$this->slug = strtolower(preg_replace('/[ \'\"\&\#\(\)\[\]\{\}\$\+\,\.\/\\\:\;\=\?\@\^\<\>\!\*\|\%]/', '_', $name));
 	    }
+	}
+	
+	public static function findBySlug($slug){
+	    return self::find()->where(['slug' => $slug])->single();
+	    
 	}
 	
 
