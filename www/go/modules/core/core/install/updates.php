@@ -370,3 +370,14 @@ $updates['201812031512'][] = "UPDATE core_module set sort_order = sort_order + 1
 
 $updates['201812061512'][] = "ALTER TABLE `core_customfields_select_option` DROP `sortOrder`;";
 
+//Is either renamed by legacy addressbook module or created here if address book module was not installed.
+$updates['201812150000'][] = "CREATE TABLE IF NOT EXISTS `go_templates` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL DEFAULT 0,
+  `type` tinyint(4) NOT NULL DEFAULT 0,
+  `name` varchar(100) DEFAULT NULL,
+  `acl_id` int(11) NOT NULL DEFAULT 0,
+  `content` longblob NOT NULL,
+  `extension` varchar(4) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";

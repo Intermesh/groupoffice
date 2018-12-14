@@ -737,3 +737,14 @@ ALTER TABLE `core_user_default_group`
 ALTER TABLE `core_user_group`
   ADD CONSTRAINT `core_user_group_ibfk_1` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_user_group_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;
+
+CREATE TABLE IF NOT EXISTS `go_templates` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL DEFAULT 0,
+  `type` tinyint(4) NOT NULL DEFAULT 0,
+  `name` varchar(100) DEFAULT NULL,
+  `acl_id` int(11) NOT NULL DEFAULT 0,
+  `content` longblob NOT NULL,
+  `extension` varchar(4) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

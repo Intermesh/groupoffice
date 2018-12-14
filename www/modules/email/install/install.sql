@@ -289,3 +289,26 @@ CREATE TABLE `email_template_attachment` (
  CONSTRAINT `email_template_attachment_ibfk_1` FOREIGN KEY (`blobId`) REFERENCES `core_blob` (`id`),
  CONSTRAINT `email_template_attachment_ibfk_2` FOREIGN KEY (`templateId`) REFERENCES `email_template` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+
+
+DROP TABLE IF EXISTS `email_default_email_templates`;
+CREATE TABLE IF NOT EXISTS `email_default_email_templates` (
+  `user_id` int(11) NOT NULL,
+  `template_id` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`user_id`),
+  KEY `template_id` (`template_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `ab_default_email_templates`
+--
+
+DROP TABLE IF EXISTS `email_default_email_account_templates`;
+CREATE TABLE IF NOT EXISTS `email_default_email_account_templates` (
+  `account_id` int(11) NOT NULL,
+  `template_id` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`account_id`),
+  KEY `template_id` (`template_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

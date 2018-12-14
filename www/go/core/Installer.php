@@ -65,17 +65,62 @@ class Installer {
 		$database->setUtf8();
 
 		Utils::runSQLFile(Environment::get()->getInstallFolder()->getFile("install/install.sql"));
-
-
 		App::get()->getDbConnection()->query("SET FOREIGN_KEY_CHECKS=0;");
-		foreach (["Admins", "Everyone", "Internal"] as $groupName) {
-			$group = new Group();
-			$group->name = $groupName;
-			if (!$group->save()) {
-				throw new Exception("Could not create group");
-			}
+		
+		$this->installGroups();
+
+		$this->installAdminUser($adminValues);		
+
+		//By default everyone can share with any group
+		Settings::get()->setDefaultGroups([Group::ID_EVERYONE]);
+
+		$this->installCoreModules();
+		$this->registerCoreEntities();		
+		
+		$this->installEmailTemplate();
+
+		foreach ($installModules as $installModule) {
+			$installModule->install();
 		}
 
+		App::get()->getSettings()->databaseVersion = App::get()->getVersion();
+		App::get()->getSettings()->save();
+
+		App::get()->setCache(new Disk());
+		Listeners::get()->init();
+	}
+	
+	
+	private function registerCoreEntities() {
+		$classFinder = new ClassFinder(false);
+		$classFinder->addNamespace("go\\core");
+		$classFinder->addNamespace("go\\modules\\core");
+
+		$entities = $classFinder->findByParent(Entity::class);
+
+		foreach ($entities as $entity) {
+			if (!$entity::getType()) {
+				return false;
+			}
+		}
+	}
+	
+	private function installCoreModules() {
+		$classFinder = new ClassFinder(false);
+		$classFinder->addNamespace("go\\modules\\core");
+
+		$coreModules = $classFinder->findByParent(Base::class);
+
+		foreach ($coreModules as $coreModule) {
+			$mod = new $coreModule();
+
+			if (!$mod->install()) {
+				throw new \Exception("Failed to install core module " . $coreModule);
+			}
+		}
+	}
+	
+	private function installAdminUser($adminValues) {
 		$admin = new User();
 		$admin->displayName = "System administrator";
 		$admin->username = "admin";
@@ -95,50 +140,38 @@ class Installer {
 		if (!$admin->save()) {
 			throw new Exception("Failed to create admin user: " . var_export($admin->getValidationErrors(), true));
 		}
-
-		//By default everyone can share with any group
-		Settings::get()->setDefaultGroups([Group::ID_EVERYONE]);
-
-
-
-		$classFinder = new ClassFinder(false);
-		$classFinder->addNamespace("go\\modules\\core");
-
-		$coreModules = $classFinder->findByParent(Base::class);
-
-		foreach ($coreModules as $coreModule) {
-			$mod = new $coreModule();
-
-			if (!$mod->install()) {
-				throw new \Exception("Failed to install core module " . $coreModule);
+	}
+	
+	private function installGroups() {
+		foreach (["Admins", "Everyone", "Internal"] as $groupName) {
+			$group = new Group();
+			$group->name = $groupName;
+			if (!$group->save()) {
+				throw new Exception("Could not create group");
 			}
 		}
-
-
-		//register core entities
-		$classFinder = new ClassFinder(false);
-		$classFinder->addNamespace("go\\core");
-		$classFinder->addNamespace("go\\modules\\core");
-
-		$entities = $classFinder->findByParent(Entity::class);
-
-		foreach ($entities as $entity) {
-			if (!$entity::getType()) {
-				return false;
-			}
-		}
-
-		foreach ($installModules as $installModule) {
-			$installModule->install();
-		}
-
-
-		//for new framework
-		App::get()->getSettings()->databaseVersion = App::get()->getVersion();
-		App::get()->getSettings()->save();
-
-		App::get()->setCache(new Disk());
-		Listeners::get()->init();
+	}
+	
+	private function installEmailTemplate() {
+		$message = new \GO\Base\Mail\Message();
+		$message->setHtmlAlternateBody('Hi<gotpl if="contact:firstName"> {contact:firstName},</gotpl><br />
+<br />
+{body}<br />
+<br />
+'.\GO()->t("Best regards").'<br />
+<br />
+<br />
+{user:displayName}<br />');
+		
+		$template = new \GO\Base\Model\Template();
+		$template->setAttributes(array(
+			'content' => $message->toString(),
+			'name' => GO()->t("Default"),
+			'type' => Template::TYPE_EMAIL,
+			'user_id' => 1
+		));
+		$template->save();
+		$template->acl->addGroup(\GO::config()->group_internal);
 	}
 
 

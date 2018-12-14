@@ -37,7 +37,7 @@ class DefaultTemplate extends ActiveRecord {
 	}
 	
 	public function tableName() {
-		return 'ab_default_email_templates';
+		return 'email_default_email_templates';
 	}
 	
 	public function primaryKey() {

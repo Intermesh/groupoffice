@@ -63,7 +63,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	
 	// TODO : move language from mailings module to addressbook module
 	protected function getLocalizedName() {
-		return \GO::t("template", "addressbook");
+		return \GO::t("template");
 	}
 	
 	protected function init() {
@@ -100,7 +100,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	}
 	
 	public function tableName(){
-		return 'ab_email_templates';
+		return 'go_templates';
 	}
 	
 	private function _addTagPrefixAndRemoveEmptyValues($attributes, $tagPrefix){
