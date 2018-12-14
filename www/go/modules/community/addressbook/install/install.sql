@@ -1,4 +1,4 @@
-
+DROP TABLE IF EXISTS `addressbook_address`;
 CREATE TABLE `addressbook_address` (
   `id` int(11) NOT NULL,
   `contactId` int(11) NOT NULL,
@@ -14,6 +14,7 @@ CREATE TABLE `addressbook_address` (
   `longitude` decimal(11,8) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+DROP TABLE IF EXISTS `addressbook_addressbook`;
 CREATE TABLE `addressbook_addressbook` (
   `id` int(11) NOT NULL,
   `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -21,6 +22,7 @@ CREATE TABLE `addressbook_addressbook` (
   `createdBy` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+DROP TABLE IF EXISTS `addressbook_contact`;
 CREATE TABLE `addressbook_contact` (
   `id` int(11) NOT NULL,
   `addressBookId` int(11) NOT NULL,
@@ -29,11 +31,11 @@ CREATE TABLE `addressbook_contact` (
   `modifiedAt` datetime NOT NULL,
   `modifiedBy` int(11) DEFAULT NULL,
   `goUserId` int(11) DEFAULT NULL,
-  `prefixes` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'Prefixes like ''Sir''',
-  `firstName` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `middleName` varchar(55) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `lastName` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `suffixes` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'Suffixes like ''Msc.''',
+  `prefixes` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Prefixes like ''Sir''',
+  `firstName` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `middleName` varchar(55) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `lastName` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `suffixes` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Suffixes like ''Msc.''',
   `gender` enum('M','F') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'M for Male, F for Female or null for unknown',
   `notes` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `isOrganization` tinyint(1) NOT NULL DEFAULT 0,
@@ -49,15 +51,18 @@ CREATE TABLE `addressbook_contact` (
   `filesFolderId` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+DROP TABLE IF EXISTS `addressbook_contact_custom_fields`;
 CREATE TABLE `addressbook_contact_custom_fields` (
   `id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+DROP TABLE IF EXISTS `addressbook_contact_group`;
 CREATE TABLE `addressbook_contact_group` (
   `contactId` int(11) NOT NULL,
   `groupId` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
+DROP TABLE IF EXISTS `addressbook_contact_star`;
 CREATE TABLE `addressbook_contact_star` (
   `contactId` int(11) NOT NULL,
   `userId` int(11) NOT NULL,
@@ -65,6 +70,7 @@ CREATE TABLE `addressbook_contact_star` (
   `starred` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
+DROP TABLE IF EXISTS `addressbook_date`;
 CREATE TABLE `addressbook_date` (
   `id` int(11) NOT NULL,
   `contactId` int(11) NOT NULL,
@@ -72,6 +78,7 @@ CREATE TABLE `addressbook_date` (
   `date` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+DROP TABLE IF EXISTS `addressbook_email_address`;
 CREATE TABLE `addressbook_email_address` (
   `id` int(11) NOT NULL,
   `contactId` int(11) NOT NULL,
@@ -79,12 +86,14 @@ CREATE TABLE `addressbook_email_address` (
   `email` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+DROP TABLE IF EXISTS `addressbook_group`;
 CREATE TABLE `addressbook_group` (
   `id` int(11) NOT NULL,
   `addressBookId` int(11) NOT NULL,
   `name` varchar(190) CHARACTER SET latin1 NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
+DROP TABLE IF EXISTS `addressbook_phone_number`;
 CREATE TABLE `addressbook_phone_number` (
   `id` int(11) NOT NULL,
   `contactId` int(11) NOT NULL,
@@ -92,6 +101,7 @@ CREATE TABLE `addressbook_phone_number` (
   `number` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
+DROP TABLE IF EXISTS `addressbook_smart_addressbook`;
 CREATE TABLE `addressbook_smart_addressbook` (
   `id` int(11) NOT NULL,
   `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -99,6 +109,7 @@ CREATE TABLE `addressbook_smart_addressbook` (
   `matchAny` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'true to show contact matching any of the conditions instead of all.'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
+DROP TABLE IF EXISTS `addressbook_smart_addressbook_filter`;
 CREATE TABLE `addressbook_smart_addressbook_filter` (
   `id` int(11) NOT NULL,
   `smartAddressBookId` int(11) NOT NULL,
@@ -107,6 +118,7 @@ CREATE TABLE `addressbook_smart_addressbook_filter` (
   `value` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
+DROP TABLE IF EXISTS `addressbook_url`;
 CREATE TABLE `addressbook_url` (
   `id` int(11) NOT NULL,
   `contactId` int(11) NOT NULL,
