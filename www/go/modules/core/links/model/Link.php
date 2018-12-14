@@ -143,9 +143,10 @@ class Link extends Entity {
 	 * @return Link
 	 */
 	public static function create($a, $b, $description = null) {
-				
-		if(static::exists($a, $b)) {
-			return true;
+		
+		$existingLink = static::findLink($a, $b);
+		if($existingLink) {
+			return $existingLink;
 		}
 		
 		$link = new Link();
@@ -158,6 +159,8 @@ class Link extends Entity {
 		if(!$link->save()) {
 			throw new \Exception("Couldn't create link: ". var_export($link->getValidationErrors(), true));
 		}
+		
+		return $link;
 	}
 	
 	/**
@@ -168,12 +171,54 @@ class Link extends Entity {
 	 * @return boolean
 	 */
 	public static function exists($a, $b) {
+		return $this->findLink($a, $b) !== false;
+	}
+	/**
+	 * Find a link
+	 * 
+	 * @param Entity|ActiveRecord $a
+	 * @param Entity|ActiveRecord  $b
+	 * @return Link|boolean
+	 */
+	public static function findLink($a, $b) {
 		return Link::find()->where([
 				'fromEntityTypeId' => $a->getType()->getId(),
 				'fromId' => $a->id,
 				'toEntityTypeId' => $b->getType()->getId(),
 				'toId' => $b->id,
-		])->single() !== false;
+		])->single();
+	}
+	
+	/**
+	 * Delete a link between two entities
+	 * 
+	 * @param Entity|ActiveRecord $a
+	 * @param Entity|ActiveRecord  $b
+	 * @return boolean
+	 */
+	public static function deleteLink($a, $b) {
+		if(!GO()->getDbConnection()
+						->delete('core_link',[
+				'fromEntityTypeId' => $a->getType()->getId(),
+				'fromId' => $a->id,
+				'toEntityTypeId' => $b->getType()->getId(),
+				'toId' => $b->id,
+		])->execute()) {
+			return false;
+		}
+		
+		if(!GO()->getDbConnection()
+						->delete('core_link',[
+				'fromEntityTypeId' => $b->getType()->getId(),
+				'fromId' => $b->id,
+				'toEntityTypeId' => $a->getType()->getId(),
+				'toId' => $a->id,
+		])->execute()) {
+			return false;
+		}
+		
+		return true;
+						
 	}
 	
 	protected function internalValidate() {
