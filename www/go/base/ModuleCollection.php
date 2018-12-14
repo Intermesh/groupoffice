@@ -250,8 +250,8 @@ class ModuleCollection extends Model\ModelCollection{
 		
 		$cacheKey = $ignoreAcl ? 'all-modules-ignore' : 'all-modules';
 		
-		if(GO::user()) {
-			$cacheKey .= '-'.GO::user()->id;
+		if(\GO::user()) {
+			$cacheKey .= '-'. \GO::user()->id;
 		}
 		
 		if(($modules = \GO::cache()->get($cacheKey))) {
