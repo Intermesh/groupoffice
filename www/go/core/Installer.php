@@ -5,6 +5,7 @@ namespace go\core;
 use Exception;
 use GO;
 use go\core\App;
+use go\core\auth\TemporaryState;
 use go\core\cache\Disk;
 use go\core\cache\None;
 use go\core\db\Query;
@@ -167,7 +168,7 @@ class Installer {
 		$template->setAttributes(array(
 			'content' => $message->toString(),
 			'name' => GO()->t("Default"),
-			'type' => Template::TYPE_EMAIL,
+			'type' => \GO\Base\Model\Template::TYPE_EMAIL,
 			'user_id' => 1
 		));
 		$template->save();
@@ -226,7 +227,7 @@ class Installer {
 	public function upgrade() {
 		$this->isInProgress = true;
 
-		GO()->setAuthState((new auth\TemporaryState())->setUserId(1));
+		GO()->setAuthState((new TemporaryState())->setUserId(1));
 		
 
 		$this->isValidDb();
