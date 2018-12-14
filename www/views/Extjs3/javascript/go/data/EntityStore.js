@@ -158,8 +158,9 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	
 	
 	getState: function(cb) {
+		var me = this;
 		this.initState(function(){
-			cb.call(this, this.state);
+			cb.call(me, me.state);
 		});
 	},
 
@@ -183,6 +184,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					break;
 
 				case this.entity.name + "/query":
+					console.log("Query state: " + state + " - " + action.payload.state);
 					//if a list call was made then fetch updates if state mismatch
 					if (state && action.payload.state !== state) {
 						this.getUpdates();
@@ -199,7 +201,10 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	},
 
 	getUpdates: function (cb, scope) {		
+		
 		this.getState(function(state){
+			
+			console.log("Get updates for state: " + state);
 		
 			if(state) {
 				var clientCallId = go.Jmap.request({

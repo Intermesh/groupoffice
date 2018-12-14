@@ -204,9 +204,8 @@ go.Jmap = {
 							return true;
 						}
 						if (response[1][0] == "error") {
-							console.log('server-side JMAP failure', response);			
-							Ext.MessageBox.alert(t("Error"), response[1][1].message);					
-							
+							console.error('server-side JMAP failure', response);			
+							//Ext.MessageBox.alert(t("Error"), response[1][1].message);
 						}
 
 						go.flux.Dispatcher.dispatch(response[0], response[1]);
