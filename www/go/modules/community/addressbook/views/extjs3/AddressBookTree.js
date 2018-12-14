@@ -91,20 +91,12 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 		var me = this, reload = false, id;
 		for (id in added) {
 			if (!me.findAddressbookNode(id)) {
-				reload = true;
-				return false;
+				me.getRootNode().reload();
+				return;
 			}
 		}
-		;
-
-		if (reload) {
-			me.getRootNode().reload();
-			return;
-		}
-
-
+		
 		for (id in changed) {
-
 			nodeId = "AddressBook-" + id,
 							node = me.getNodeById(nodeId);
 
@@ -171,7 +163,7 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 								if (btn !== "yes") {
 									return;
 								}
-								go.Stores.get("AddressBook").set({destroy: [this.showAddressBookMoreMenu.entity.id]});
+								go.Stores.get("AddressBook").set({destroy: [this.addressBookMoreMenu.data.id]});
 							}, this);
 						},
 						scope: this
