@@ -561,8 +561,9 @@ $updates['201803081044'][] = "ALTER TABLE `ab_addresslist_group`
 $updates['201803081045'][] = "ALTER TABLE `ab_addresslists` ADD `addresslist_group_id` INT NULL AFTER `id`;";
 $updates['201806251632'][] = "ALTER TABLE `ab_contacts` CHANGE `initials` `initials` VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '';";
 
-$updates['201811241553'][] = 'update core_module set package=\'community\', version=0, sort_order = sort_order + 100 where name=\'addressbook\'';
-
 $updates['201812141203'][] = 'rename table ab_default_email_templates to email_default_email_templates';
 $updates['201812141203'][] = 'rename table ab_default_email_account_templates to email_default_email_account_templates';
 $updates['201812141203'][] = 'rename table ab_email_templates to go_templates';
+
+
+$updates['201812141203'][] = 'update core_module set package=\'community\', version=0, sort_order = sort_order + 100 where name=\'addressbook\'';
