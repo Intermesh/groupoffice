@@ -4,6 +4,7 @@ go.Window = Ext.extend(Ext.Window, {
 	resizable : !GO.util.isMobileOrTablet(),
 	draggable: !GO.util.isMobileOrTablet(),
 	maximized: GO.util.isMobileOrTablet(),
+	closeAction: "close",
 	
 	initComponent : function(){
 		
@@ -36,25 +37,25 @@ go.Window = Ext.extend(Ext.Window, {
 		return s;
 
 	},
-	// fix for ext close animation
-	close : function(){
-		if(this.fireEvent('beforeclose', this) !== false){
-			 if(this.hidden){
-				  this.doClose();
-			 }else{
-				  this.hide(undefined, this.doClose, this);
-			 }
-		}
-  },
+//	// fix for ext close animation
+//	close : function(){
+//		if(this.fireEvent('beforeclose', this) !== false){
+//			 if(this.hidden){
+//				  this.doClose();
+//			 }else{
+//				  this.hide(undefined, this.doClose, this);
+//			 }
+//		}
+//  },
 	
-	hide : function() {				
+	hide : function(animateTarget, cb, scope) {				
 		//Fix for ticket #201817154. Unclosable window remained when window was 
 		//hidden after submit while being dragged.
 		if (this.activeGhost) {
 		 this.unghost();
 		}
 		
-		go.Window.superclass.hide.call(this);
+		go.Window.superclass.hide.call(this, animateTarget, cb, scope);
 	},
 		
 	autoSize : function(){
