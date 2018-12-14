@@ -288,7 +288,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 								}, {
 									xtype: "selectcountry",
 									fieldLabel: t("Country"),
-									hiddenName: "countryCode",									
+									hiddenName: "countryCode",
 									anchor: "100%"
 								}]
 						}
