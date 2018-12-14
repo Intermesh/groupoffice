@@ -63,7 +63,7 @@ class Apcu implements CacheInterface{
 	 * Flush all values 
 	 */
 	public function flush(){
-		apcu_clear_cache("user");
+		apcu_clear_cache();
 	}
 	
 	public function supported(){
