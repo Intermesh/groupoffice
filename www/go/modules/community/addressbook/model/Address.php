@@ -88,20 +88,18 @@ class Address extends Property {
 	}
 	
 	protected function internalValidate() {
-		if($this->isModified('countryCode') && isset($this->countryCode)) {
-			$this->countryCode = strtoupper($this->countryCode);
-			$countries = GO()->t('countries');
-			if(!isset($countries[$this->countryCode])) {
-				$this->setValidationError('countryCode', \go\core\validate\ErrorCode::INVALID_INPUT, "Unknown ISO 3601 2 char country code provided: " . $this->countryCode);
-			}
-		}
+		$this->validateCountry();		
 		return parent::internalValidate();
 	}
 	
-	protected function internalSave() {		
+	private function validateCountry() {
 		if($this->isModified('countryCode')) {			
 			if(isset($this->countryCode)) {
 				$countries = GO()->t('countries');
+				if(!isset($countries[$this->countryCode])) {
+					$this->setValidationError('countryCode', \go\core\validate\ErrorCode::INVALID_INPUT, "Unknown ISO 3601 2 char country code provided: " . $this->countryCode);
+					return false;
+				}
 				$this->country = $countries[$this->countryCode];
 			}
 		} elseif($this->isModified('country')) {
@@ -110,11 +108,8 @@ class Address extends Property {
 				$this->countryCode = $countryCodes[$this->country] ?? null;
 			}
 		}
-		
-	
-		
-		return parent::internalSave();
 	}
+	
 	
 	public function getFormatted() {
 			
