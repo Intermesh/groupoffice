@@ -35,13 +35,16 @@ go.form.Dialog = Ext.extend(go.Window, {
 		
 		this.items = [this.formPanel];
 
-		this.buttons = [
-			'->', 
-			{
-				text: t("Save"),
-				handler: this.submit,
-				scope: this
-			}];
+		Ext.applyIf(this,{
+			buttons:[
+				'->', 
+				{
+					text: t("Save"),
+					handler: this.submit,
+					scope: this
+				}
+			]
+		});
 
 		go.form.Dialog.superclass.initComponent.call(this);		
 		
