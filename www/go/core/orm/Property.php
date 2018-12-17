@@ -821,6 +821,10 @@ abstract class Property extends Model {
 			return true;
 		}		
 		
+		if(empty($table->getPrimaryKey())) {
+			throw new Exception("No primary key defined for table: '" . $table->getName() . "'");
+		}
+		
 		try {
 			if ($this->recordIsNew($table)) {				
 				//this if for cases when a second table extends the model but the key is not part of the properties
