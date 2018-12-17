@@ -300,6 +300,54 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		});
 		
 	},
+	
+	/**
+	 * Add module panel after rendering of main layout
+	 *  
+	 * @example 
+	 * ```
+	 * initModule: function () {
+	 * 		
+	 * 		setTimeout(function() {
+	 * 			
+	 * 			var test = Ext.extend(Ext.Panel, {
+	 * 				title: "Test",
+	 * 				html: "Dit is een test"
+	 * 			})
+	 * 			
+	 * 			GO.mainLayout.addModulePanel("test", test);
+	 * 			
+	 * 		}, 2000);
+	 * 		
+	 * 	}
+	 * 	```
+	 * 
+	 * @param {type} moduleName
+	 * @param {type} panelClass
+	 * @param {type} panelConfig
+	 * @returns {MainLayoutAnonym$1.initModule@pro;tabPanel@pro;items@arr;map|MainLayoutAnonym$1.initModule@pro;tabPanel@call;insert|MainLayoutAnonym$1.initModule.panel|Boolean}
+	 */
+	addModulePanel : function(moduleName, panelClass, panelConfig) {		
+		
+		this.startMenu.add({
+			id: 'go-start-menu-' + moduleName,
+			moduleName: moduleName,
+			text: panelClass.prototype.title,
+			iconCls: 'go-menu-icon-' + moduleName,
+			handler: function (item, e) {
+				this.openModule(item.moduleName);
+			},
+			scope: this
+		});
+		
+		GO.moduleManager._addModule(moduleName, panelClass, panelConfig || {});
+				
+		go.Router.add(new RegExp(moduleName + "$"), function () {
+			GO.mainLayout.openModule(name);
+		});
+		
+		return this.initModule(moduleName);
+	},
 
 	onAuthentication: function () {
 		
