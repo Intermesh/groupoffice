@@ -222,7 +222,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			//update hash if not already set.
 			if (!go.Router.routing) {
 			    if(newTab.shouldRedirect){
-				//Sites require goto instead of setPath for the redirect and slugs to function.
+				//Sites require goto instead of setPath for redirects to function.
 				window.go.Router.goto(newTab.moduleName);
 			    }else{
 				window.go.Router.setPath(newTab.moduleName);

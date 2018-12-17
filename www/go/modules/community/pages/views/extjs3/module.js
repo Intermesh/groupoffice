@@ -1,5 +1,3 @@
-
-//register module foreach site?
 go.Modules.register("community", "pages", {
     mainPanel: "go.modules.community.pages.MainPanel",
     title: t("Site"),

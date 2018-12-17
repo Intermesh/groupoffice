@@ -64,7 +64,7 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 	    this.siteTree.getLoader().on('load', function () {
 		this.siteTree.getLoader().entityStore.on('changes', this.onChanges, this);
 	    }, this, {single: true});
-	    
+
 	}, this);
 
 
@@ -94,56 +94,54 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 	    console.log('tree is already loading');
 	}
     },
-    setLoaderSiteId: function(siteId){
+    setSiteId: function (siteId) {
+	this.currentSiteId = siteId;
 	this.siteTree.getLoader().siteId = siteId;
+	this.siteTreeEdit.siteId = siteId;
     },
-    getSelectionModel: function(){
+    getSelectionModel: function () {
 	return this.siteTree.getSelectionModel();
     },
-    
-    onChanges: function(entityStore, added, changed, destroyed){
+
+    onChanges: function (entityStore, added, changed, destroyed) {
 //	console.log(added);
 //	console.log(changed);
 //	console.log(destroyed);
-		var me = this, reload = false, id;
-		
-		//for each added
-		for (id in added) {
+	var me = this, reload = false, id;
+	//for each added
+	for (id in added) {
 //		    console.log('page added');
 //		    console.log(!me.siteTree.getRootNode().findChild('id', id))
-			if (!me.siteTree.getRootNode().findChild('id', id)) {
+	    if (!me.siteTree.getRootNode().findChild('id', id)) {
 //			    console.log('page added 2. node not found');
-			    me.reloadTree();
-			    return;
-			}
-		}
-		
-		//for each changed
-		for (id in changed) {
+		me.reloadTree();
+		return;
+	    }
+	}
+	//for each changed
+	for (id in changed) {
 //		    console.log('page changed');
-			nodeId = "page-" + id,
-			node = me.siteTree.getNodeById(nodeId);
-			if (node) {
+	    nodeId = "page-" + id,
+		    node = me.siteTree.getNodeById(nodeId);
+	    if (node) {
 //			    console.log('page changed 2. node found')
-				node.attributes.data = changed[id];
+		node.attributes.data = changed[id];
 
-				if (changed[id].name) {
-					node.setText(changed[id].name);
-				}
-				node.reload();
-			}
-
+		if (changed[id].name) {
+		    node.setText(changed[id].name);
 		}
-		
-		//foreach destroyed
-		destroyed.forEach(function (id) {
+		node.reload();
+	    }
+	}
+	//foreach destroyed
+	destroyed.forEach(function (id) {
 //		    console.log('page deleted');
-			var node = me.siteTree.getNodeById("page-" + id);
-			if (node) {
+	    var node = me.siteTree.getNodeById("page-" + id);
+	    if (node) {
 //			    console.log('page deleted 2. node found')
-				node.destroy();
-				me.reloadTree();
-			}
-		});
+		node.destroy();
+		me.reloadTree();
+	    }
+	});
     }
 })

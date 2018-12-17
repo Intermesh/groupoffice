@@ -147,7 +147,7 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 
     getParams: function (node) {
 	var filter = {
-	    siteId : this.siteId
+	    siteId: this.siteId
 	};
 	return {
 	    filter: filter

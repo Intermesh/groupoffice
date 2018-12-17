@@ -5,21 +5,21 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
     siteSlug: '',
     //used in routing and redirecting in MainLayout.js
     shouldRedirect: true,
-    
+
     initComponent: function () {
 
 	this.content = new go.modules.community.pages.PageContent({
 	    region: "center",
 	    padding: '1% 5% 2% 2%',
 	});
-	this.tree = new go.modules.community.pages.SiteTreePanel({
+	this.treeArea = new go.modules.community.pages.SiteTreePanel({
 	    region: "west",
 	    width: dp(250),
 	});
 
 	this.items = [
 	    this.content,
-	    this.tree
+	    this.treeArea
 	];
 
 	this.tbar = new Ext.Toolbar({
@@ -31,7 +31,7 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 			this.addPage();
 		    },
 		    scope: this
-		},		{
+		}, {
 		    iconCls: 'ic-delete',
 		    tooltip: t('Delete current page'),
 		    handler: function (e, toolEl) {
@@ -41,16 +41,16 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 			    }
 			    selectedId = this.pageId;
 			    go.Stores.get("Page").set({
-			    destroy: [selectedId]
+				destroy: [selectedId]
 			    });
-			go.Router.goto(this.siteSlug)
+			    go.Router.goto(this.siteSlug);
 			}, this);
 		    },
 		    scope: this
 		}, '->',
-		{
-		    xtype: "tbsearch"
-		},
+//		{
+//		    xtype: "tbsearch"
+//		},
 		{
 		    iconCls: 'ic-edit',
 		    tooltip: t('Edit'),
@@ -60,10 +60,10 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 		    scope: this
 		}
 	    ]
-	});	
+	});
 	//navigate to a different page when selecting a node.
-	this.tree.getSelectionModel().on('selectionchange', function(sm, node){
-	    if(node){
+	this.treeArea.getSelectionModel().on('selectionchange', function (sm, node) {
+	    if (node) {
 		node.expand();
 		go.Router.goto(this.siteSlug + '\/view\/' + node.attributes.entitySlug)
 	    }
@@ -87,18 +87,22 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
     },
 
     //sets the site id for all relevant panels
-    setSiteId: function(siteId){
-	console.log('set site id to: '+siteId)
+    setSiteId: function (siteId) {
+	console.log('set site id to: ' + siteId)
 	this.siteId = siteId;
-	this.tree.currentSiteId = this.siteId;
-	this.tree.setLoaderSiteId(siteId);
+	this.treeArea.setSiteId(siteId);
     },
-    
+
     //updates the page id for all relevant panels
-    navigateToPage: function(pageId){
-	console.log('set page id to: '+pageId)
-	this.pageId = pageId;
-	this.content.currentPage = this.pageId;
+    //todo: disable toolbar items delete and edit when no pageid is set.
+    navigateToPage: function (pageId) {
+	console.log('set page id to: ' + pageId)
+	if(pageId){
+	    this.pageId = pageId;
+	    this.content.currentPage = this.pageId;
+	}else{
+	    this.content.showEmptyPage();
+	}
     }
 
 });
