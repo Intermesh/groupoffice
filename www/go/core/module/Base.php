@@ -16,6 +16,14 @@ use function GO;
 /**
  * Base module class
  * 
+ * Handles:
+ * 
+ * 1. Installation and uninstall of the module
+ * 2. Registering Event listeners
+ * 3. You can implement custom download methods prefixed with "download". For 
+ *    example method go\modules\community\addressbook\Module::downloadVcard($contactId) 
+ *    can be accessed with: "download.php?blob=community/addressbook/vcard/1"
+ * 
  * @copyright (c) 2014, Intermesh BV http://www.intermesh.nl
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3

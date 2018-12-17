@@ -265,59 +265,86 @@ abstract class EntityController extends ReadOnlyEntityController {
 	
 	protected function paramsExport($params){
 		
-		if(!isset($params['convertor'])) {
-			throw new InvalidArguments("'convertor' parameter is required");
+		if(!isset($params['converter'])) {
+			throw new InvalidArguments("'converter' parameter is required");
 		}
 		
 		return $this->paramsGet($params);
 	}
 	
+	protected function paramsImport($params){
+		
+		if(!isset($params['converter'])) {
+			throw new InvalidArguments("'converter' parameter is required");
+		}
+		
+		if(!isset($params['blobId'])) {
+			throw new InvalidArguments("'blobId' parameter is required");
+		}
+		
+		if(!isset($params['values'])) {
+			$params['values'] = [];
+		}
+		
+		return $params;
+	}
 	
 	
-	public function export($params) {
+	public function import($params) {
+		$params = $this->paramsImport($params);
 		
-		$params = $this->paramsExport($params);
+		$convertor = $this->findConverter($params['converter']);
 		
+		$response = $convertor->importBlob($params['blobId'], $params['values']);
+		
+		\go\core\jmap\Response::get()->addResponse($response);
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return \go\core\data\convert\AbstractConverter
+	 * @throws InvalidArguments
+	 */
+	private function findConverter($converter) {
 		$cls = $this->entityClass();
 		$module = $cls::getType()->getModule();
 		
 		//check in module
-		$convertorCls = "go\\modules\\" . $module->package . "\\" . $module->name . "\\convert\\" . $params['convertor'];
-		if(!class_exists($convertorCls)) {
-			$convertorCls = "go\\core\\data\\convert\\" . $params['convertor'];
-			if(!class_exists($convertorCls)) {
-				throw new InvalidArguments("Convertor '" . $params['convertor'] .'" is not found');
+		$converterCls = "go\\modules\\" . $module->package . "\\" . $module->name . "\\convert\\" . $converter;
+		if(!class_exists($converterCls)) {
+			$converterCls = "go\\core\\data\\convert\\" . $converter;
+			if(!class_exists($converterCls)) {
+				throw new InvalidArguments("Convertor '" . $converter .'" is not found');
 			}
 		}
 		
-		$convertor = new $convertorCls;
+		$converter = new $converterCls;
+		return $converter;
+	}
+	
+	
+	/**
+	 * Standard export function
+	 * 
+	 * You can use Foo/query first and then pass the ids of that result to 
+	 * Foo/export().
+	 * 
+	 * @see \go\core\data\convert\AbstractConverter
+	 * 
+	 * @param array $params Identical to Foo/get. Additionally you MUST pass a 'converter' It will look for the AbstractConverter object in the "convert" folder of the module.
+	 * @throws InvalidArguments
+	 * @throws \Exception
+	 */
+	public function export($params) {
 		
-		$entities = $this->getGetQuery($params)->all();
+		$params = $this->paramsExport($params);
 		
-		$tempFile = \go\core\fs\File::tempFile($convertor->getFileExtension());
-		$fp = $tempFile->open('w+');
+		$convertor = $this->findConverter($params['converter']);
+				
+		$entities = $this->getGetQuery($params);
 		
-		fputs($fp, $convertor->getStart());
-		foreach($entities as $entity) {
-			$properties = $entity->toArray();
-			
-			$str = $convertor->to($properties);
-			
-			fputs($fp, $str);
-			
-			if(next($entities)) {
-				fputs($fp, $convertor->getBetween());	
-			}
-		}
-
-		fputs($fp, $convertor->getEnd());		
-		
-		fclose($fp);
-		
-		$blob = \go\core\fs\Blob::fromTmp($tempFile);
-		if(!$blob->save()) {
-			throw new \Exception("Couldn't save blob: " . var_export($blob->getValidationErrors(), true));
-		}
+		$blob = $convertor->exportToBlob($entities);
 		
 		Response::get()->addResponse(['blobId' => $blob->id]);
 		

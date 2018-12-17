@@ -106,7 +106,9 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 					iconCls: 'ic-more-vert',
 					menu: [{
 							iconCls: 'ic-cloud-upload',
-							text: t("Import")
+							text: t("Import"),
+							handler: this.onImport,
+							scope: this
 						}, {
 							iconCls: 'ic-cloud-download',
 							text: t("Export"),
@@ -304,8 +306,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 
 	onExport: function () {
 		
-		var win = window.open("about:blank");
-		
+		this.getEl().mask(t("Exporting..."));
 		var callId = go.Jmap.request({
 			method: "Contact/query",
 			params: Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0}),
@@ -316,14 +317,52 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 		go.Jmap.request({
 			method: "Contact/export",
 			params: {
-				convertor: "json",
+				converter: "VCard",
 				"#ids": {
 					resultOf: callId,
 					path: "/ids"
 				}
 			},
+			scope: this,
 			callback: function (options, success, response) {
-				win.location = go.Jmap.downloadUrl(response.blobId);
+				this.getEl().unmask();
+				if(!success) {
+					Ext.MessageBox.alert(t("Error"), response[1].message);				
+				} else
+				{					
+					document.location = go.Jmap.downloadUrl(response.blobId);
+				}
+			}
+		});
+	},
+	
+	onImport : function() {
+		go.util.openFileDialog({
+			multiple: true,
+			accept: "text/vcard",
+			directory: false,
+			autoUpload: true,
+			scope: this,
+			listeners: {
+				upload: function(response) {
+					this.getEl().mask(t("Importing..."));
+					go.Jmap.request({
+						method: "Contact/import",
+						params: {
+							converter: "VCard",
+							blobId: response.blobId,
+							values: {addressBookId: this.addAddressBookId}
+						},
+						callback: function (options, success, response) {
+							if(!success) {
+								Ext.MessageBox.alert(t("Error"), response[1].message);				
+							}
+							this.getEl().unmask();
+						},
+						scope: this
+					});
+				},
+				scope: this
 			}
 		});
 	}

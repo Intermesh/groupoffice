@@ -1,10 +1,49 @@
 <?php
 namespace go\core\data\convert;
 
+use go\core\orm\Entity;
+
 /**
- * Abstract convertor class
+ * Abstract converter class
  * 
  * Used for converting entities into other formats.
+ * 
+ * Converters must be put in a "convert" folder / namespace to work with the
+ * \go\core\jmap\EntityController::export() function
+ * 
+ * 
+ * @example Client javascript
+ * 
+ * ```
+ * onExport: function () {
+ * 		
+ * 		var win = window.open("about:blank");
+ * 		
+ * 		var callId = go.Jmap.request({
+ * 			method: "Contact/query",
+ * 			params: Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0}),
+ * 			callback: function (options, success, response) {
+ * 			}
+ * 		});
+ * 		
+ * 		go.Jmap.request({
+ * 			method: "Contact/export",
+ * 			params: {
+ * 				converter: "JSON",
+ * 				"#ids": {
+ * 					resultOf: callId,
+ * 					path: "/ids"
+ * 				}
+ * 			},
+ * 			callback: function (options, success, response) {
+ * 				win.location = go.Jmap.downloadUrl(response.blobId);
+ * 			}
+ * 		});
+ * 	}
+ * ```
+ * 
+ * 
+ * @see \go\core\jmap\EntityController::export()
  */
 abstract class AbstractConverter {
 	
@@ -27,27 +66,60 @@ abstract class AbstractConverter {
 	/**
 	 * Convert an entity into another format
 	 * 
-	 * @param array $properties
+	 * @param Entity $entity
 	 * @return string 
 	 */
-	abstract public function to(array $properties);
+	abstract public function export(Entity $entity);
 	
 	/**
-	 * Convert to a properties array from another format
+	 * Convert input data to an entity
 	 * 
-	 * @return array
+	 * @return Entity
 	 */
-	abstract public function from($data);
+	abstract public function import($data, Entity $entity = null);
 	
-	public function getStart() {
-		return "";
+	/**
+	 * Read file and import them into Group-Office
+	 * 
+	 * @return int[] id's of imported entities
+	 */
+	abstract public function importFile(\go\core\fs\File $file, $values = []);
+	
+	public function importBlob($blobId, $values = []) {		
+		$blob = \go\core\fs\Blob::findById($blobId);		
+		return $this->importFile($blob->getFile(), $values);		
 	}
 	
-	public function getBetween() {
-		return "";
+	protected function exportEntityToBlob(Entity $entity, $fp, $index, $total) {
+		$str = $this->export($entity);
+		fputs($fp, $str);
 	}
 	
-	public function getEnd() {
-		return "";
+	/**
+	 * Export entities to a blob
+	 * 
+	 * @param \go\core\db\Query $entities
+	 * @return \go\core\fs\Blob
+	 * @throws \Exception
+	 */
+	public function exportToBlob(\go\core\db\Query $entities) {		
+		$tempFile = \go\core\fs\File::tempFile($this->getFileExtension());
+		$fp = $tempFile->open('w+');
+		
+		$total = $entities->getIterator()->rowCount();
+		
+		$i = 0;
+		foreach($entities as $entity) {
+			$this->exportEntityToBlob($entity, $fp, $i++, $total);
+		}
+		
+		fclose($fp);
+		
+		$blob = \go\core\fs\Blob::fromTmp($tempFile);
+		if(!$blob->save()) {
+			throw new \Exception("Couldn't save blob: " . var_export($blob->getValidationErrors(), true));
+		}
+		
+		return $blob;
 	}
 }

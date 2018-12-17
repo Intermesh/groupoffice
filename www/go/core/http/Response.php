@@ -87,7 +87,7 @@ class Response extends Singleton{
 	 *
 	 * @param string $name
 	 * @param string|StringUtil[] $value
-	 * @return void
+	 * @return $this
 	 */
 	public function setHeader($name, $value) {
 		$name = strtolower($name);
@@ -97,12 +97,15 @@ class Response extends Singleton{
 		}
 
 		$this->headers[$name] = $value;	
+		
+		return $this;
 	}
 
 	/**
 	 * Remove an HTTP header
 	 * 
 	 * @param string $name
+	 * @return $this;
 	 */
 	public function removeHeader($name) {
 		if (!headers_sent()) {
@@ -110,6 +113,7 @@ class Response extends Singleton{
 		}
 
 		unset($this->headers[$name]);
+		return $this;
 	}
 
 	/**
