@@ -449,7 +449,7 @@ use const GO_CONFIG_FILE;
 		/**
 		 * Get the server environment
 		 * 
-		 * @return Enviroment
+		 * @return Environment
 		 */
 		public function getEnvironment() {
 			return Environment::get();
