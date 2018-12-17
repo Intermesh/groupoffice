@@ -66,8 +66,8 @@ go.Modules.register("community", "addressbook", {
 				return new go.modules.community.addressbook.ContactDetail();
 			}	
 		}],
-	systemSettingsPanels: ["go.modules.community.addressbook.SystemSettingsPanel"],
-	initModule: function () {}
+	systemSettingsPanels: ["go.modules.community.addressbook.SystemSettingsPanel"]
+	
 });
 
 //go.Stores.get("User");

@@ -39,5 +39,21 @@ class Module extends Base {
 		Link::on(Link::EVENT_SAVE, Contact::class, 'onLinkSaveOrDelete');
 		
 	}
+	
+	public function downloadVCard($contactId) {
+		$contact = \go\modules\community\addressbook\model\Contact::findById($contactId);
+		
+		$c = new \go\modules\community\addressbook\convert\VCard();
+		
+		$vcard =  $c->export($contact);		
+		
+		\go\core\http\Response::get()
+						->setHeader('Content-Type', 'text/vcard;charset=utf-8')
+						->setHeader('Content-Disposition', 'attachment; filename="'.$contact->name.'.vcf"')
+						->setHeader("Content-Length", strlen($vcard))
+						->sendHeaders();
+		
+		echo $vcard;
+	}
 							
 }

@@ -214,10 +214,17 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 						scope: this
 					}),
 					{
-						iconCls: "btn-print",
+						iconCls: "ic-print",
 						text: t("Print"),
 						handler: function () {
 							this.body.print({title: this.data.name});
+						},
+						scope: this
+					},{
+						iconCls: "ic-cloud-download",
+						text: t("Export VCard"),
+						handler: function () {
+							document.location = go.Jmap.downloadUrl("community/addressbook/vcard/" + this.data.id);
 						},
 						scope: this
 					},

@@ -104,6 +104,32 @@
 		 *   upload => (response: {blobId: "..."}): response from server after every Upload completed (if autoUpload)
 		 *   uploadComplete => () when all uploads are complete (if autoUpload)
 		 *   scope: same as in ext
+		 *   
+		 * @example
+		 * 
+		 * {
+		 * 			iconCls: 'ic-computer',
+		 * 			text: t("Upload"),
+		 * 			handler: function() {
+		 * 				go.util.openFileDialog({
+		 * 					multiple: true,
+		 * 					accept: "image/*",
+		 * 					directory: true,
+		 * 					autoUpload: true,
+		 * 					listeners: {
+		 * 						upload: function(response) {
+		 * 							var img = '<img src="' + go.Jmap.downloadUrl(response.blobId) + '" alt="'+response.name+'" />';
+		 * 							
+		 * 							this.editor.focus();
+		 * 							this.editor.insertAtCursor(img);
+		 * 						},
+		 * 						scope: this
+		 * 					}
+		 * 				});
+		 * 			},
+		 * 			scope: this
+		 * 		}
+		 *   
 		 * @param {object} cfg
 		 */
 		openFileDialog: function(cfg) {
@@ -111,28 +137,40 @@
 				this.uploadDialog = document.createElement("input");
 				this.uploadDialog.setAttribute("type", "file");
 				this.uploadDialog.onchange = function (e) {
-					if(cfg.listeners.select) { 
-						cfg.listeners.select.call(cfg.listeners.scope||this, this.files); 
-					}
-					if(!cfg.autoUpload) {
-						return
-					}
+					
 					var uploadCount = this.files.length;
+					
+					if(!uploadCount) {
+						return;
+					}
+					
+					if(this.cfg.listeners.select) { 
+						this.cfg.listeners.select.call(this.cfg.listeners.scope||this, this.files); 
+					}
+					
+					if(!this.cfg.autoUpload) {						
+						return;
+					}
+					
 					for (var i = 0; i < this.files.length; i++) {
 						go.Jmap.upload(this.files[i], {
 							success: function(response) {
-								if(cfg.listeners.upload) {
-									cfg.listeners.upload.call(cfg.listeners.scope||this, response);
+								if(this.cfg.listeners.upload) {
+									this.cfg.listeners.upload.call(this.cfg.listeners.scope||this, response);
 								}
 								uploadCount--;
-								if(uploadCount === 0 && cfg.listeners.uploadComplete) {
-									cfg.listeners.uploadComplete.call(cfg.listeners.scope||this);
+								if(uploadCount === 0 && this.cfg.listeners.uploadComplete) {
+									this.cfg.listeners.uploadComplete.call(this.cfg.listeners.scope||this);
 								}
-							}
+							},
+							scope: this
 						});
 					}
+					
+					this.value = "";
 				};
 			}
+			this.uploadDialog.cfg = cfg;
 			this.uploadDialog.removeAttribute('webkitdirectory');
 			this.uploadDialog.removeAttribute('directory');
 			this.uploadDialog.removeAttribute('multiple');
