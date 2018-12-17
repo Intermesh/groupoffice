@@ -1,9 +1,7 @@
 <?php
 namespace go\modules\community\pages\model;
-						
-use go\core\acl\model\AclEntity;
-use go\core\db\Criteria;
-use go\core\db\Query;
+
+use go\core\acl\model\AclOwnerEntity;
 						
 /**
  * Site model
@@ -13,7 +11,7 @@ use go\core\db\Query;
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
 
-class Site extends AclEntity {
+class Site extends AclOwnerEntity {
 	
 	/**
 	 * 
@@ -73,7 +71,7 @@ class Site extends AclEntity {
 	 * 
 	 * @var string
 	 */							
-	protected $slug;
+	public $slug;
 
 	protected static function defineMapping() {
 		return parent::defineMapping()

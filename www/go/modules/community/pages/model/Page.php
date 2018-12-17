@@ -2,7 +2,10 @@
 
 namespace go\modules\community\pages\model;
 
+use DOMDocument;
+use DOMXPath;
 use go\core\acl\model\AclItemEntity;
+use go\core\orm\Query;
 
 /**
  * Page model
@@ -105,7 +108,7 @@ class Page extends AclItemEntity {
     //set sortorder. generates one if the page doesnt have one yet.
     public function setSortOrder($sortOrder) {
 	if (empty($this->sortOrder)) {
-	    $res = (new \go\core\db\Query)->select('sortOrder')->from('pages_page')->where(['siteId' => $this->siteId])->orderBy(['sortOrder' => 'DESC'])->single();
+	    $res = (new Query)->select('sortOrder')->from('pages_page')->where(['siteId' => $this->siteId])->orderBy(['sortOrder' => 'DESC'])->single();
 	    $this->sortOrder = $res['sortOrder']+1;
 	}else{
 	    $this->sortOrder = $sortOrder;
@@ -140,7 +143,7 @@ class Page extends AclItemEntity {
 	$path = $this->getSlugPath();
 	$counter;
 	
-	$doc = new \DOMDocument();
+	$doc = new DOMDocument();
 	
 	//ignore duplicate id errors so cleanTextIds() can use loadHTML to fix them.
 	libxml_use_internal_errors(true);
@@ -153,7 +156,7 @@ class Page extends AclItemEntity {
 	libxml_use_internal_errors(false);
 	
 	
-	$xpath = new \DOMXPath($doc);
+	$xpath = new DOMXPath($doc);
 	$headers = $xpath->evaluate('//h1 | //h2');
 	foreach($headers as $element){
 	    if(!$element->hasAttribute('id')){
@@ -208,7 +211,7 @@ class Page extends AclItemEntity {
     //Generates The current page url based on the slug of the site and page.
     //used to generate linkable id's for page headers.
     protected function getSlugPath(){
-	$siteSlug = (new \go\core\db\Query)->select('slug')->from('pages_site')->where(['id' => $this->siteId])->single();
+	$siteSlug = (new Query)->select('slug')->from('pages_site')->where(['id' => $this->siteId])->single();
 	$slugPath = $siteSlug['slug'] . '/view/'. $this->slug . '/#';
 	return $slugPath;
     }
@@ -230,7 +233,7 @@ class Page extends AclItemEntity {
     }
     
     public static function findFirstSitePage($siteId){
-	return $res = (new \go\core\db\Query)->select('slug')->from('pages_page')->where(['siteId' => $siteId])->orderBy(['sortOrder' => 'ASC'])->single();
+	return (new Query)->select('slug')->from('pages_page')->where(['siteId' => $siteId])->orderBy(['sortOrder' => 'ASC'])->single();
     }
 
 }

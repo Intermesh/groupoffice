@@ -19,12 +19,6 @@ go.modules.community.pages.SiteTree = Ext.extend(Ext.tree.TreePanel, {
 		return node.attributes.sortOrder;
 	    }
 	});
-
-//triggers every reload but should trigger only once.
-//	this.root.on('expand', function (node) {
-//	    console.log('root expand');
-//	    this.getSelectionModel().select(node.firstChild);
-//	}, this);
     },
 
 })

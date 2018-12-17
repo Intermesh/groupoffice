@@ -11,4 +11,5 @@ SiteTree.js
 SiteTreeEdit.js
 SiteTreeLoader.js
 PageHTMLEditor.js
+HTMLEditorPlugins.js
 

@@ -43,10 +43,8 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 			    go.Stores.get("Page").set({
 			    destroy: [selectedId]
 			    });
-			    //todo:
-			    //delete treepanel node as well.
-			}, this);
 			go.Router.goto(this.siteSlug)
+			}, this);
 		    },
 		    scope: this
 		}, '->',
@@ -63,7 +61,7 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 		}
 	    ]
 	});	
-	
+	//navigate to a different page when selecting a node.
 	this.tree.getSelectionModel().on('selectionchange', function(sm, node){
 	    if(node){
 		node.expand();

@@ -11,7 +11,6 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 		itemId: 'siteTree',
 		loader: new go.modules.community.pages.SiteTreeLoader({
 		    baseAttrs: {
-			//iconCls: 'ic-web-asset'
 			iconCls: 'ic-label'
 		    },
 		    entityStore: go.Stores.get("Page"),
@@ -62,10 +61,10 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 	this.on("afterrender", function () {
 	    this.siteTreeEdit.siteId = this.currentSiteId;
 	    this.siteTree.getLoader().siteId = this.currentSiteId;
-//	    this.siteTree.getLoader().on('load', function () {
-//		console.log('tree loaded');
-//	    }, this);
-	    this.siteTree.getLoader().entityStore.on('changes', this.reloadTree, this);
+	    this.siteTree.getLoader().on('load', function () {
+		this.siteTree.getLoader().entityStore.on('changes', this.onChanges, this);
+	    }, this, {single: true});
+	    
 	}, this);
 
 
@@ -100,5 +99,51 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
     },
     getSelectionModel: function(){
 	return this.siteTree.getSelectionModel();
+    },
+    
+    onChanges: function(entityStore, added, changed, destroyed){
+//	console.log(added);
+//	console.log(changed);
+//	console.log(destroyed);
+		var me = this, reload = false, id;
+		
+		//for each added
+		for (id in added) {
+//		    console.log('page added');
+//		    console.log(!me.siteTree.getRootNode().findChild('id', id))
+			if (!me.siteTree.getRootNode().findChild('id', id)) {
+//			    console.log('page added 2. node not found');
+			    me.reloadTree();
+			    return;
+			}
+		}
+		
+		//for each changed
+		for (id in changed) {
+//		    console.log('page changed');
+			nodeId = "page-" + id,
+			node = me.siteTree.getNodeById(nodeId);
+			if (node) {
+//			    console.log('page changed 2. node found')
+				node.attributes.data = changed[id];
+
+				if (changed[id].name) {
+					node.setText(changed[id].name);
+				}
+				node.reload();
+			}
+
+		}
+		
+		//foreach destroyed
+		destroyed.forEach(function (id) {
+//		    console.log('page deleted');
+			var node = me.siteTree.getNodeById("page-" + id);
+			if (node) {
+//			    console.log('page deleted 2. node found')
+				node.destroy();
+				me.reloadTree();
+			}
+		});
     }
 })

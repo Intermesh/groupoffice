@@ -147,9 +147,8 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 
     getParams: function (node) {
 	var filter = {
-	    isDirectory: true
+	    siteId : this.siteId
 	};
-	filter.siteId = this.siteId;
 	return {
 	    filter: filter
 	};
