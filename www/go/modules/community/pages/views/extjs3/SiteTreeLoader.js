@@ -77,8 +77,6 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(Ext.tree.TreeLoader, {
     },
 
     doRequest: function (params, callback, scope, options) {
-
-
 	this.result = this.getItemList(this.entityStore.entity.name + "/query", params, function (getItemListResponse) {
 	    this.entityStore.get(getItemListResponse.ids, function (items) {
 		var result = [];

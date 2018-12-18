@@ -12,6 +12,7 @@ Ext.ns('Ext.ux.form.HtmlEditor');
 Ext.ux.form.HtmlEditor.MidasCommand = Ext.extend(Ext.util.Observable, {
     // private
     init: function(cmp){
+	console.log(cmp);
         this.cmp = cmp;
         this.btns = [];
 	this.combo = [];
@@ -72,7 +73,6 @@ Ext.ux.form.HtmlEditor.MidasCommand = Ext.extend(Ext.util.Observable, {
 	    if(b.isExpanded()){
 		b.collapse();
 	    }
-	    //console.log(b.getRawValue());
 	});
 	
 	this.onEditorEvent();

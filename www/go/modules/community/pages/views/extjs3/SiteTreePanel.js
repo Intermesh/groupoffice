@@ -8,7 +8,6 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
     initComponent: function () {
 	this.items = [
 	    this.siteTree = new go.modules.community.pages.SiteTree({
-		itemId: 'siteTree',
 		loader: new go.modules.community.pages.SiteTreeLoader({
 		    baseAttrs: {
 			iconCls: 'ic-label'
@@ -18,45 +17,44 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 
 	    }),
 	    this.siteTreeEdit = new go.modules.community.pages.SiteTreeEdit({
-		itemId: 'siteTreeEdit'
 	    }),
-	],
-		this.fbar = new Ext.Toolbar({
-		    items: [{
-			    itemId: "reorderButton",
-			    iconCls: 'ic-swap-vert',
-			    tooltip: t('Reorder'),
-			    handler: function (b, e) {
-				this.getFooterToolbar().getComponent('saveButton').setVisible(true);
-				b.setVisible(false);
-				this.siteTreeEdit.store.load();
-				this.changePanel('siteTreeEdit');
-			    },
-			    scope: this
-			},
-			{
-			    itemId: "saveButton",
-			    iconCls: 'ic-save',
-			    tooltip: t('Save'),
-			    hidden: true,
-			    handler: function (b, e) {
-				b.setVisible(false);
-				this.getFooterToolbar().getComponent('reorderButton').setVisible(true);
-				this.changePanel('siteTree');
-			    },
-			    scope: this
-			}, '->',
-			{
-			    iconCls: 'ic-get-app',
-			    tooltip: t('Download'),
-			    handler: function (e, toolEl) {
-				//console.log("download pdf");
-				var a = ["test"];
-				this.downloadPDF();
-			    },
-			    scope: this
-			}]
-		});
+	];
+	this.reorderButton = {
+	    iconCls: 'ic-swap-vert',
+	    tooltip: t('Reorder'),
+	    handler: function (b, e) {
+		this.swapButtonVisibility();
+		this.siteTreeEdit.store.load();
+		this.changePanel(this.siteTreeEdit.getId());
+	    },
+	    scope: this
+	};
+	this.saveButton = {
+	    iconCls: 'ic-save',
+	    tooltip: t('Save'),
+	    hidden: true,
+	    handler: function (b, e) {
+		this.swapButtonVisibility();
+		this.changePanel(this.siteTree.getId());
+	    },
+	    scope: this
+	};
+
+	this.fbar = new Ext.Toolbar({
+	    items: [this.reorderButton,
+		this.saveButton
+			, '->',
+		{
+		    iconCls: 'ic-get-app',
+		    tooltip: t('Download'),
+		    handler: function (e, toolEl) {
+			//console.log("download pdf");
+			var a = ["test"];
+			this.downloadPDF();
+		    },
+		    scope: this
+		}]
+	});
 
 	this.on("afterrender", function () {
 	    this.siteTree.getLoader().on('load', function () {
@@ -83,6 +81,8 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 		console.log(response);
 	    }
 	});
+    },
+    swapButtonVisibility: function(){
     },
     reloadTree: function () {
 	console.log('reloading');

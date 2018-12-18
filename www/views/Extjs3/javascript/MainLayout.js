@@ -273,7 +273,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 	getModulePanel: function (moduleName) {
 		var panelId = 'go-module-panel-' + moduleName;
-
 		if (this.tabPanel.items.map[panelId])
 		{
 			return this.tabPanel.items.map[panelId];
@@ -338,7 +337,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		this.startMenu.add({
 			id: 'go-start-menu-' + moduleName,
 			moduleName: moduleName,
-			text: panelClass.prototype.title,
+			text: panelConfig.title,
 			iconCls: 'go-menu-icon-' + moduleName,
 			handler: function (item, e) {
 				this.openModule(item.moduleName);
@@ -347,11 +346,13 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		});
 		
 		GO.moduleManager._addModule(moduleName, panelClass, panelConfig || {});
-				
-		go.Router.add(new RegExp(moduleName + "$"), function () {
-			GO.mainLayout.openModule(name);
+		if(panelConfig.routeFunction){
+		    go.Router.insert(new RegExp(moduleName + "$"), panelConfig.routeFunction);
+		}else{
+		    go.Router.add(new RegExp(moduleName + "$"), function () {
+			GO.mainLayout.openModule(moduleName);
 		});
-		
+		}
 		return this.initModule(moduleName);
 	},
 

@@ -58,6 +58,24 @@ go.Router = {
 		this.routes.push({re: re, handler: handler, requireAuthentication: requireAuthentication});
 		return this;
 	},
+	
+	insert: function (re, handler, position, requireAuthentication ) {
+		if (typeof re == 'function') {
+			handler = re;
+			re = '';
+		}
+		
+		if(typeof requireAuthentication === "undefined") {
+			requireAuthentication = true;
+		}
+		if(typeof position === "undefined") {
+			position = 1;
+		}
+		
+		this.routes.splice(position, 0, {re: re, handler: handler, requireAuthentication: requireAuthentication});
+		return this;
+	},
+	
 	remove: function (param) {
 		for (var i = 0, r; i < this.routes.length, r = this.routes[i]; i++) {
 			if (r.handler === param || r.re.toString() === param.toString()) {
@@ -110,7 +128,6 @@ go.Router = {
 		return this;
 	},
 	goto: function (path) {
-		
 		if(this.getPath() == path) {
 			
 			//rerun route if hash is the same
