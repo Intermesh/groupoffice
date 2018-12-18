@@ -12,8 +12,8 @@ go.modules.community.pages.PageContent = Ext.extend(Ext.Panel, {
 	this.on("render", function () {
 	    this.updateData();
 	    this.entityStore.on("changes", function () {
-		if(this.currentPage){
-		this.updateData();
+		if (this.currentPage) {
+		    this.updateData();
 		}
 	    }, this);
 	}, this);

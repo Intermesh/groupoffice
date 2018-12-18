@@ -47,10 +47,16 @@ go.modules.community.pages.PageDialog = Ext.extend(go.form.Dialog, {
     },
 
     submit: function () {
-	if(this.formPanel.getForm().isDirty()){
+	if (this.formPanel.getForm().isDirty()) {
 	    go.modules.community.pages.PageDialog.superclass.submit.call(this);
-	}else{
+	} else {
 	    this.close();
+	}
+    },
+    onSubmit: function (success, serverId) {
+
+	if (success) {
+	    go.Router.goto(this.siteId + '\/edit\/' + serverId);
 	}
     }
 });

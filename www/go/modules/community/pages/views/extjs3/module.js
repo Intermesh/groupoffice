@@ -26,8 +26,6 @@ go.Modules.register("community", "pages", {
 		    };
 		    // This adds the tab
 		    GO.mainLayout.addModulePanel(overViewTabConfig.moduleTabId, overViewTabConfig.mainPanel, overViewTabConfig.panelConfig);
-//		    console.log('modules: ');
-//		    console.log(GO.moduleManager.getAllPanels());
 		}
 	    },
 	    scope: this
@@ -36,15 +34,13 @@ go.Modules.register("community", "pages", {
 });
 
 generateRoute = function (site) {
-    //console.log('generating site route.');
     var slug = site.slug;
     var routefunction;
-    //go.Router.remove(new RegExp(slug+'$'));
     //Redirect the tabpanel hash to the view hash.
     //todo: afvangen fouten bij zoeken van site en eerste pagina.
-    routefunction = function(){
+    routefunction = function () {
 	console.log('running route function')
-	// gebaseerd op site|module naam eerste pagina ophalen en naar redirecten
+	// gebaseerd op site naam eerste pagina ophalen en naar redirecten
 	go.Jmap.request({
 	    method: "Site/getFirstPage",
 	    params: {
@@ -69,21 +65,16 @@ generateRoute = function (site) {
 	});
     };
     return routefunction;
-    
+
 };
 
-
-
-
-
 //All site related hashes end up here through redirects.
-//todo: Laden van site zonder pagina's
+//todo: 
+//Laden van site zonder pagina's
 //afvangen pagina slugs die niet bestaan!
 //als na de pageSlug nog een # staat, opnieuw goto aanroepen om naar de header te springen.
 //split pageslug op /!
 go.Router.add(/(.*)\/view\/(.*)/, function (siteSlug, pageSlug) {
-//    console.log('site slug:' + siteSlug);
-//    console.log('page slug:' + pageSlug);
     var p;
     p = GO.mainLayout.getModulePanel(siteSlug);
     //check if the current site is already known.
@@ -112,7 +103,7 @@ go.Router.add(/(.*)\/view\/(.*)/, function (siteSlug, pageSlug) {
 	scope: this
     });
 });
-//redirects to the view hash after crud operations on pages
+//vervangen met /(.*)\/edited\/(.*)
 go.Router.add(/page\/(.*)/, function (pageId) {
     go.Jmap.request({
 	method: "Page/get",

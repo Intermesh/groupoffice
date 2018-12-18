@@ -19,29 +19,32 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 	    this.siteTreeEdit = new go.modules.community.pages.SiteTreeEdit({
 	    }),
 	];
-	this.reorderButton = {
+	this.reorderButton = new Ext.Button({
 	    iconCls: 'ic-swap-vert',
 	    tooltip: t('Reorder'),
 	    handler: function (b, e) {
-		this.swapButtonVisibility();
+		b.setVisible(false);
+		this.saveButton.setVisible(true);
 		this.siteTreeEdit.store.load();
 		this.changePanel(this.siteTreeEdit.getId());
 	    },
 	    scope: this
-	};
-	this.saveButton = {
+	});
+	this.saveButton = new Ext.Button({
 	    iconCls: 'ic-save',
 	    tooltip: t('Save'),
 	    hidden: true,
 	    handler: function (b, e) {
-		this.swapButtonVisibility();
+		b.setVisible(false);
+		this.reorderButton.setVisible(true);
 		this.changePanel(this.siteTree.getId());
 	    },
 	    scope: this
-	};
+	});
 
 	this.fbar = new Ext.Toolbar({
-	    items: [this.reorderButton,
+	    items: [
+		this.reorderButton,
 		this.saveButton
 			, '->',
 		{
@@ -82,8 +85,6 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 	    }
 	});
     },
-    swapButtonVisibility: function(){
-    },
     reloadTree: function () {
 	console.log('reloading');
 	if (!this.siteTree.getLoader().loading) {
@@ -102,27 +103,22 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
     },
 
     onChanges: function (entityStore, added, changed, destroyed) {
-//	console.log(added);
-//	console.log(changed);
-//	console.log(destroyed);
+
 	var me = this, reload = false, id;
 	//for each added
 	for (id in added) {
-//		    console.log('page added');
-//		    console.log(!me.siteTree.getRootNode().findChild('id', id))
+
 	    if (!me.siteTree.getRootNode().findChild('id', id)) {
-//			    console.log('page added 2. node not found');
+
 		me.reloadTree();
 		return;
 	    }
 	}
 	//for each changed
 	for (id in changed) {
-//		    console.log('page changed');
 	    nodeId = "page-" + id,
 		    node = me.siteTree.getNodeById(nodeId);
 	    if (node) {
-//			    console.log('page changed 2. node found')
 		node.attributes.data = changed[id];
 
 		if (changed[id].name) {
@@ -133,10 +129,8 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 	}
 	//foreach destroyed
 	destroyed.forEach(function (id) {
-//		    console.log('page deleted');
 	    var node = me.siteTree.getNodeById("page-" + id);
 	    if (node) {
-//			    console.log('page deleted 2. node found')
 		node.destroy();
 		me.reloadTree();
 	    }
