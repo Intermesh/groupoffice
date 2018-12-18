@@ -22,6 +22,8 @@ class Contact extends EntityController {
 		return model\Contact::class;
 	}	
 	
+	
+	
 	protected function transformSort($sort) {
 		$sort = parent::transformSort($sort);
 		

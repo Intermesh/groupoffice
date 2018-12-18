@@ -184,6 +184,8 @@ class Table {
 					$c->default = date(Column::DATE_FORMAT);
 				}				
 				break;
+				
+			case 'varbinary':
 			case 'binary':
 				$c->pdoType = PDO::PARAM_LOB;
 				break;

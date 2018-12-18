@@ -348,11 +348,14 @@ class ContactConvertor {
 				$contact->photoBlobId = null;
 			}
 
-			$this->setOrganizations( $message, $contact);
+			
 
 			if(!$contact->save()) {
 				throw new Exception("Failed to save contact");
 			}
+			
+			$this->setOrganizations( $message, $contact);
+			
 			GO()->getDbConnection()->commit();
 			
 			return $contact;
@@ -399,7 +402,7 @@ class ContactConvertor {
 				$org = new Contact();
 				$org->name = $name;
 				$org->isOrganization = true;
-				$org->addressBookId = $this->getDefaultAddressBook()->id;
+				$org->addressBookId = $contact->addressBookId;
 				if(!$org->save()) {
 					throw new Exception("Could not save organization");
 				}

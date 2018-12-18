@@ -255,3 +255,18 @@ ALTER TABLE `addressbook_smart_addressbook_filter`
 
 ALTER TABLE `addressbook_url`
   ADD CONSTRAINT `addressbook_url_ibfk_1` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
+
+
+DROP TABLE IF EXISTS `addressbook_vcard`;
+CREATE TABLE IF NOT EXISTS `addressbook_vcard` (
+  `contactId` int(11) NOT NULL,
+  `modifiedAt` datetime NOT NULL,
+  `data` mediumblob NOT NULL,
+  `uid` varbinary(200) NOT NULL,
+  PRIMARY KEY (`contactId`),
+  KEY `uid` (`uid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+
+
+ALTER TABLE `addressbook_vcard`
+  ADD CONSTRAINT `addressbook_vcard_ibfk_1` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;

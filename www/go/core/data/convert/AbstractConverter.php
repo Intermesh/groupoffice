@@ -85,10 +85,6 @@ abstract class AbstractConverter {
 	 */
 	abstract public function importFile(\go\core\fs\File $file, $values = []);
 	
-	public function importBlob($blobId, $values = []) {		
-		$blob = \go\core\fs\Blob::findById($blobId);		
-		return $this->importFile($blob->getFile(), $values);		
-	}
 	
 	protected function exportEntityToBlob(Entity $entity, $fp, $index, $total) {
 		$str = $this->export($entity);
@@ -102,7 +98,7 @@ abstract class AbstractConverter {
 	 * @return \go\core\fs\Blob
 	 * @throws \Exception
 	 */
-	public function exportToBlob(\go\core\db\Query $entities) {		
+	public function exportToBlob(\go\core\orm\Query $entities) {		
 		$tempFile = \go\core\fs\File::tempFile($this->getFileExtension());
 		$fp = $tempFile->open('w+');
 		
@@ -110,12 +106,14 @@ abstract class AbstractConverter {
 		
 		$i = 0;
 		foreach($entities as $entity) {
-			$this->exportEntityToBlob($entity, $fp, $i++, $total);
+			$this->exportEntityToBlob($entity, $fp, $i, $total);
+			$i++;
 		}
 		
 		fclose($fp);
 		
 		$blob = \go\core\fs\Blob::fromTmp($tempFile);
+		$blob->name = "Export-" . date('Y-m-d-H:i:s') . '.'. $this->getFileExtension();
 		if(!$blob->save()) {
 			throw new \Exception("Couldn't save blob: " . var_export($blob->getValidationErrors(), true));
 		}

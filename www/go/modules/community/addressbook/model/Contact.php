@@ -322,6 +322,12 @@ class Contact extends AclItemEntity {
 											->where(['e.email' => $filter['email']]);
 										});
 	}
+	
+	public static function converters() {
+		$arr = parent::converters();
+		$arr['text/vcard'] = \go\modules\community\addressbook\convert\VCard::class;		
+		return $arr;
+	}
 
 	protected static function searchColumns() {
 		return ['name'];
