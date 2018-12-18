@@ -38,7 +38,6 @@ go.modules.community.pages.SitePropertiesForm = Ext.extend(Ext.form.FormPanel, {
     },
 
     submit: function (cb, scope) {
-
 	if (!this.isValid()) {
 	    return;
 	}

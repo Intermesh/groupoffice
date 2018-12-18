@@ -47,7 +47,10 @@ go.modules.community.pages.PageDialog = Ext.extend(go.form.Dialog, {
     },
 
     submit: function () {
-	//todo: check if form has dirty fields. Dont submit if no dirty fields.
-	go.modules.community.pages.PageDialog.superclass.submit.call(this);
+	if(this.formPanel.getForm().isDirty()){
+	    go.modules.community.pages.PageDialog.superclass.submit.call(this);
+	}else{
+	    this.close();
+	}
     }
 });

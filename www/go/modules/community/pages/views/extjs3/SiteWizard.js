@@ -35,10 +35,15 @@ go.modules.community.pages.SiteWizard = Ext.extend(go.Wizard, {
 	    return false;
 	}
 	if (this.nextItem) {
-	    this.propForm.submit(this.afterPropertiesSubmit, this);
+		this.propForm.submit(this.afterPropertiesSubmit, this);
 	} else {
 	    if (this.shareEntityPanel.currentId) {
-		this.shareEntityPanel.submit(this.afterPermissionsSubmit, this);
+		//only post if there are changes.
+		if(this.shareEntityPanel.getForm().isDirty()){
+		    this.shareEntityPanel.submit(this.afterPermissionsSubmit, this);
+		}else{
+		    this.close();
+		}
 	    }
 	}
     },

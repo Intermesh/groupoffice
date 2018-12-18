@@ -12,7 +12,9 @@ go.modules.community.pages.PageContent = Ext.extend(Ext.Panel, {
 	this.on("render", function () {
 	    this.updateData();
 	    this.entityStore.on("changes", function () {
+		if(this.currentPage){
 		this.updateData();
+		}
 	    }, this);
 	}, this);
 
@@ -28,6 +30,7 @@ go.modules.community.pages.PageContent = Ext.extend(Ext.Panel, {
     },
 
     showEmptyPage: function () {
+	this.currentPage = null;
 	this.update('<i>description</i><p>' + t("No page to display") + '</p>', false);
     }
 })

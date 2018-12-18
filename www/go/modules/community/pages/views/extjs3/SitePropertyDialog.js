@@ -35,6 +35,10 @@ go.modules.community.pages.SitePropertyDialog = Ext.extend(go.form.Dialog, {
 	if (!this.isValid()) {
 	    return;
 	}
+	if(!this.formPanel.getForm().isDirty()){
+	    this.close();
+	    return;
+	}
 
 	this.actionStart();
 

@@ -59,8 +59,6 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 		});
 
 	this.on("afterrender", function () {
-	    this.siteTreeEdit.siteId = this.currentSiteId;
-	    this.siteTree.getLoader().siteId = this.currentSiteId;
 	    this.siteTree.getLoader().on('load', function () {
 		this.siteTree.getLoader().entityStore.on('changes', this.onChanges, this);
 	    }, this, {single: true});

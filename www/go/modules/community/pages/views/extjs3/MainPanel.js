@@ -25,6 +25,7 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 	this.tbar = new Ext.Toolbar({
 	    items: [
 		{
+		    itemId: 'tbarAddBtn',
 		    iconCls: 'ic-add',
 		    tooltip: t('Add'),
 		    handler: function (e, toolEl) {
@@ -32,6 +33,7 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 		    },
 		    scope: this
 		}, {
+		    itemId: 'tbarDelBtn',
 		    iconCls: 'ic-delete',
 		    tooltip: t('Delete current page'),
 		    handler: function (e, toolEl) {
@@ -52,6 +54,7 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 //		    xtype: "tbsearch"
 //		},
 		{
+		    itemId: 'tbarEditBtn',
 		    iconCls: 'ic-edit',
 		    tooltip: t('Edit'),
 		    handler: function (e, toolEl) {
@@ -100,8 +103,22 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 	if(pageId){
 	    this.pageId = pageId;
 	    this.content.currentPage = this.pageId;
+	    //acl check here
+	    this.disableButtons(false, false);
+	    //else
+	    //this.disableButtons(true,true);
 	}else{
+	    this.pageId = pageId;
 	    this.content.showEmptyPage();
+	    this.disableButtons(true, false);
+	}
+    },
+    //toggles the edit and delete buttons.
+    disableButtons: function (bool, disableAddBtn) {
+	this.getTopToolbar().getComponent('tbarDelBtn').setDisabled(bool)
+	this.getTopToolbar().getComponent('tbarEditBtn').setDisabled(bool)
+	if(disableAddBtn){
+	    this.getTopToolbar().getComponent('tbarAddBtn').setDisabled(bool)
 	}
     }
 
