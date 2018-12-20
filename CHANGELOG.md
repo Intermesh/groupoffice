@@ -1,3 +1,4 @@
+- Core: Added a display name colum to the permissions add dialog. This will make it easier to search for the correct user to add.
 - Core: Use Apcu caching if available.
 - Core: Update in store could make values null that were prefetched. See ticket #201817274.
 - Projects2/Timeregistration: Fixed issue that the invoiced check icon for time entries was not displayed anymore.
