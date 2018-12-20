@@ -201,3 +201,5 @@ $updates['201610281650'][] = 'ALTER TABLE `cf_tree_select_options` CONVERT TO CH
 
 
 $updates['201610281659'][] = 'SET foreign_key_checks = 1;';
+
+$updates["201812201715"][] = "ALTER TABLE `cf_categories` CHANGE `extends_model` `extends_model` VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '0';";
