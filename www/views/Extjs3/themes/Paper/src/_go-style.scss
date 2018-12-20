@@ -1379,7 +1379,7 @@ table[id^="comments-ext"] b {
 .go-multiselect-grid {
 	.x-panel-tbar {
 		border-bottom: 0;
-		border-top: 1px solid color($fg, 'line');
+		border-top: 1px solid color($fg, 'divider');
 		.x-toolbar {
 			border-bottom: 0;
 		}

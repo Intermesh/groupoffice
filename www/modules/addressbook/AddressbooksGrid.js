@@ -16,7 +16,7 @@ GO.addressbook.AddresbooksGrid = function(config){
 			//scrollOffset: 0,
 			emptyText: t("No items to display")
 		},
-		tools: [{xtype:'tbsearch', store: config.store}],
+		tbtools: [{xtype:'tbsearch', store: config.store}],
 		allowNoSelection:true,
 		bbar: new GO.SmallPagingToolbar({
 //			items:[this.searchField = new GO.form.SearchField({

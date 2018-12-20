@@ -109,25 +109,34 @@ Ext.extend(GO.grid.MultiSelectGrid, GO.grid.GridPanel,{
 	requestPrefix : '',
 	
 	initComponent: function() {
-		
-		this.tbar = [
-			{xtype:'tbtitle',text: this.title}, 
-			'->'
-		];
-		delete this.title;
-		
-		if(this.tools) {
-			for(var i =0; i < this.tools.length; i++) {
-				this.tbar.push(this.tools[i]);
+		if(this.tbtools) {
+			this.tbar = [
+				{xtype:'tbtitle',text: this.title}, 
+				'->'
+			];
+			delete this.title;
+
+
+			for(var i =0; i < this.tbtools.length; i++) {
+				this.tbar.push(this.tbtools[i]);
 			}
-			delete this.tools;
+			delete this.tbtools;
+
+			this.tbar.push({
+				iconCls:'ic-done-all',
+				qtip:t("Select all"),
+				handler:function(){this.selectAll();},
+				scope: this
+			});
+		} else if(this.tools) {
+			this.tools.push({
+				text:t("Select all"),
+				id:'plus',
+				qtip:t("Select all"),
+				handler:function(){this.selectAll();},
+				scope: this
+			});
 		}
-		this.tbar.push({
-			iconCls:'ic-done-all',
-			qtip:t("Select all"),
-			handler:function(){this.selectAll();},
-			scope: this
-		});
 		
 		GO.grid.MultiSelectGrid.superclass.initComponent.call(this);
 	},

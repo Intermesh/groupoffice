@@ -504,7 +504,7 @@ this.exportCompanyMenu.setColumnModel(this.companiesGrid.getColumnModel());
 		layout:'form',
 		width:dp(280),
 		autoScroll:true,
-		style: {'padding-right': '15px'}, // scroll offset
+		//style: {'padding-right': '15px'}, // scroll offset
 		split:true,
 		items: [this.navMenu, this.addressbooksGrid,this.mailingsFilterPanel]			
 	});

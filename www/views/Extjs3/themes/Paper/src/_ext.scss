@@ -291,7 +291,7 @@
 	@extend %icon;
 	content: 'check_box_outline_blank'; // 'check_box' when on
 	position: relative;
-	color:color($fg, 'icon');
+	color: inherit;
 	display:inline-block;
 	height: dp(32);
 	width: dp(32);
