@@ -108,13 +108,6 @@ go.modules.community.pages.SystemSettingsSitesGrid = Ext.extend(go.grid.GridPane
 	this.on('rowdblclick', function (grid, rowIndex, e) {
 	    this.editProperties(this.store.getAt(rowIndex).id);
 	});
-	//attempt at fixing created_by/modified_by turning to default "-" after editing.
-	// causes "Abort request clientCallId-11" in console on loading this component?
-	//this.store.entityStore.on("changes",this.reloadStore, this);
-    },
-
-    reloadStore: function () {
-	this.store.reload();
     },
 
     initRowActions: function () {

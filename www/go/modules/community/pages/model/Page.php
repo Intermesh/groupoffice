@@ -159,10 +159,11 @@ class Page extends AclItemEntity {
 	$xpath = new DOMXPath($doc);
 	$headers = $xpath->evaluate('//h1 | //h2');
 	foreach($headers as $element){
-	    if(!$element->hasAttribute('id')){
+	    //if(!$element->hasAttribute('id')){
 	    $counter = 0;
 	    $headerSlug = $this->slugify($element->nodeValue, 100);
-	    $newElement = $doc->createElement($element->nodeName);
+	    //$newElement = $doc->createElement($element->nodeName);
+	    $newElement = $element->cloneNode(true);
 	    while(true){
 		if($counter == 0){
 		    if(is_null($doc->getElementById($headerSlug))){
@@ -184,9 +185,9 @@ class Page extends AclItemEntity {
 	    }else{
 	    $newElement->setAttribute('id',$path . $headerSlug);
 	    }
-	    $newElement->nodeValue = htmlspecialchars($element->nodeValue);
+	    //$newElement->nodeValue = htmlspecialchars($element->nodeValue);
 	    $element->parentNode->replaceChild($newElement, $element);
-	}
+	//}
 	}
 	//The replace is used to remove the encoding to prevent duplicates.
 	//Adding the encoding once doesnt work since it can be messed with inside the html editor. Even without source edit enabled.
@@ -228,8 +229,13 @@ class Page extends AclItemEntity {
      * @param string $slug
      * @return self
      */
-    public static function findBySlug($slug) {
-	return self::find()->where(['slug' => $slug])->single();
+    public static function findBySlug($params) {
+	if(isset($params['siteId'])){
+	    $whereParams = ['slug' => $params['slug'], 'siteId' => $params['siteId']];
+	}else{
+	    $whereParams = ['slug' => $params['slug']];
+	}
+	return self::find()->where($whereParams)->single();
     }
     
     public static function findFirstSitePage($siteId){

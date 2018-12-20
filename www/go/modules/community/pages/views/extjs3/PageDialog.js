@@ -7,6 +7,8 @@ go.modules.community.pages.PageDialog = Ext.extend(go.form.Dialog, {
     maximizable: true,
     siteId: '',
     sortOrder: '',
+    redirectOnSave: false,
+    newPage: false,
     initFormItems: function () {
 	var items = [{
 		xtype: 'fieldset',
@@ -54,9 +56,18 @@ go.modules.community.pages.PageDialog = Ext.extend(go.form.Dialog, {
 	}
     },
     onSubmit: function (success, serverId) {
-
-	if (success) {
-	    go.Router.goto(this.siteId + '\/edit\/' + serverId);
+	//if a page is newly created the site will have to navigate to it.
+	if (success && this.newPage) {
+	    //get the page slug
+	    this.entityStore.get([serverId], function (result) {
+		pageSlug = result[0]['slug'];
+		
+		//get the site slug
+		go.Stores.get("Site").get([this.siteId], function (result) {
+		    //navigate to the new page
+		    go.Router.goto(result[0]['slug'] + '\/view\/' + pageSlug);
+		}, this);
+	    }, this);
 	}
     }
 });

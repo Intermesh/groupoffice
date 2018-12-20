@@ -37,7 +37,7 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 		    iconCls: 'ic-delete',
 		    tooltip: t('Delete current page'),
 		    handler: function (e, toolEl) {
-			Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you wish to delete the current page?"), function (btn) {
+			Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you wish to delete the currently opened page?"), function (btn) {
 			    if (btn != "yes") {
 				return;
 			    }
@@ -77,14 +77,16 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
     },
     addPage: function () {
 	var dlg = new go.modules.community.pages.PageDialog({
-	    siteId: this.siteId
+	    siteId: this.siteId,
+	    newPage: true
 	});
 	dlg.show();
     },
 
     editPage: function (id) {
 	var dlg = new go.modules.community.pages.PageDialog({
-	    siteId: this.siteId
+	    siteId: this.siteId,
+	    newPage: false
 	});
 	dlg.load(id).show();
     },
@@ -113,7 +115,7 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 	    this.disableButtons(true, false);
 	}
     },
-    //toggles the edit and delete buttons.
+    //toggles the edit and delete buttons. Optionally also disables the add button.
     disableButtons: function (bool, disableAddBtn) {
 	this.getTopToolbar().getComponent('tbarDelBtn').setDisabled(bool)
 	this.getTopToolbar().getComponent('tbarEditBtn').setDisabled(bool)

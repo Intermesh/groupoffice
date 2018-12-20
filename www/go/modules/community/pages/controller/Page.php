@@ -37,7 +37,7 @@ class Page extends EntityController {
 
 	$p = $this->paramsGet($params);
 
-	$page = model\Page::findBySlug($p['slug']);
+	$page = model\Page::findBySlug($p);
 
 	$result = [
 	    'accountId' => $p['accountId'],

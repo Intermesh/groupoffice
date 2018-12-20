@@ -222,8 +222,14 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			//update hash if not already set.
 			if (!go.Router.routing) {
 			    if(newTab.shouldRedirect){
-				//Goto needs to be used for redirects to function properly.
-				window.go.Router.goto(newTab.moduleName);
+				//Goto needs to be used for redirects to trigger properly when changing tabs. 
+				//It should avoid redirecting if navigating to a site and page through the url directly instead of through changing tabs.
+				//The expected path format is either 'modulename' or 'modulename/view/pagename'.
+				path = go.Router.getPath().split('\/');
+				//Prevent calling goto if the current path contains a pagename and the modulename is the same as the 'new' tab.
+				if(!(path[2] && path[0] == newTab.moduleName)){
+				window.go.Router.goto(newTab.moduleName); 
+				}
 			    }else{
 				window.go.Router.setPath(newTab.moduleName);
 			    }

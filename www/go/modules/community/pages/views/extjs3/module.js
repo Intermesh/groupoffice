@@ -5,13 +5,15 @@ go.Modules.register("community", "pages", {
     systemSettingsPanels: [
 	"go.modules.community.pages.SystemSettingsSitesGrid"
     ],
+    loaded: false,
+    //todo: Tabs added event toevoegen.
     initModule: function () {
 	go.Jmap.request({
 	    method: "Site/get",
 	    params: {
 	    },
 	    callback: function (options, success, result) {
-		console.log(result['list']);
+		//console.log(result['list']);
 		var overViewTabConfig;
 		for (i = 0; i < result['list'].length; i++) {
 		    //configure site tab settings
@@ -27,6 +29,8 @@ go.Modules.register("community", "pages", {
 		    // This adds the tab
 		    GO.mainLayout.addModulePanel(overViewTabConfig.moduleTabId, overViewTabConfig.mainPanel, overViewTabConfig.panelConfig);
 		}
+
+		//trigger event hier
 	    },
 	    scope: this
 	});
@@ -39,7 +43,7 @@ generateRoute = function (site) {
     //Redirect the tabpanel hash to the view hash.
     //todo: afvangen fouten bij zoeken van site en eerste pagina.
     routefunction = function () {
-	console.log('running route function')
+	//console.log('running route function')
 	// gebaseerd op site naam eerste pagina ophalen en naar redirecten
 	go.Jmap.request({
 	    method: "Site/getFirstPage",
@@ -47,7 +51,7 @@ generateRoute = function (site) {
 		slug: go.Router.getPath()
 	    },
 	    callback: function (options, success, result) {
-		console.log('opening page through tab.');
+		//console.log('opening page through tab.');
 		var PageSlug = result['list'][0]['slug'];
 		if (!success) {
 		    console.log(result);
@@ -74,6 +78,8 @@ generateRoute = function (site) {
 //afvangen pagina slugs die niet bestaan!
 //als na de pageSlug nog een # staat, opnieuw goto aanroepen om naar de header te springen.
 //split pageslug op /!
+//voeg aan page/get ook siteId als param toe!
+//requests naar eigen functies verplaatsen.
 go.Router.add(/(.*)\/view\/(.*)/, function (siteSlug, pageSlug) {
     var p;
     p = GO.mainLayout.getModulePanel(siteSlug);
@@ -88,37 +94,62 @@ go.Router.add(/(.*)\/view\/(.*)/, function (siteSlug, pageSlug) {
 		p = GO.mainLayout.openModule(siteSlug);
 		p.setSiteId(result['list'][0]['id']);
 		p.siteSlug = siteSlug;
+		if (pageSlug) {
+		    go.Jmap.request({
+			method: "Page/get",
+			params: {
+			    slug: pageSlug,
+			    siteId: p.siteId
+			},
+			callback: function (options, success, result) {
+			    debugger;
+			    if (success) {
+				console.log('navtoslug');
+				p.navigateToPage(result['list'][0]['id']);
+			    } else {
+				console.log('navtonull');
+				p.navigateToPage();
+			    }
+			},
+			scope: this
+		    });
+		} else {
+		    debugger;
+		    console.log('navtonull');
+		    p.navigateToPage();
+		}
 	    },
 	    scope: this
 	});
+    }else{
+			if (pageSlug) {
+		    go.Jmap.request({
+			method: "Page/get",
+			params: {
+			    slug: pageSlug,
+			    siteId: p.siteId
+			},
+			callback: function (options, success, result) {
+			    debugger;
+			    if (success) {
+				console.log('navtoslug');
+				p.navigateToPage(result['list'][0]['id']);
+			    } else {
+				console.log('navtonull');
+				p.navigateToPage();
+			    }
+			},
+			scope: this
+		    });
+		} else {
+		    debugger;
+		    console.log('navtonull');
+		    p.navigateToPage();
+		}
     }
-    go.Jmap.request({
-	method: "Page/get",
-	params: {
-	    slug: pageSlug
-	},
-	callback: function (options, success, result) {
-	    p.navigateToPage(result['list'][0]['id']);
-	},
-	scope: this
-    });
-});
-//vervangen met /(.*)\/edited\/(.*)
-go.Router.add(/page\/(.*)/, function (pageId) {
-    go.Jmap.request({
-	method: "Page/get",
-	params: {
-	    ids: {pageId}
-	},
-	callback: function (options, success, result) {
-	    var p = GO.mainLayout.getModulePanel("pages");
-	    console.log('redirect from: ' + go.Router.getPath());
-	    go.Router.goto('pages\/view\/' + result['list'][0]['slug']);
-	},
-	scope: this
-    });
+
 });
 
-// console.log(go.Router.routes);
+console.log(go.Router.routes);
 
 

@@ -1,4 +1,4 @@
-go.modules.community.pages.SiteTreeLoader = Ext.extend(Ext.tree.TreeLoader, {
+go.modules.community.pages.SiteTreeLoader = Ext.extend(go.tree.EntityLoader, {
 
     entityStore: null,
 
@@ -6,28 +6,30 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(Ext.tree.TreeLoader, {
     siteId: '',
 
     load: function (node, callback, scope) {
-	if (this.clearOnLoad) {
-	    while (node.firstChild) {
-		node.removeChild(node.firstChild);
+	if (this.siteId) {
+	    if (this.clearOnLoad) {
+		while (node.firstChild) {
+		    node.removeChild(node.firstChild);
+		}
 	    }
-	}
-	if (this.doPreload(node)) { // preloaded json children
-	    this.runCallback(callback, scope || node, [node]);
-	} else if (this.directFn || this.dataUrl || this.url) {
-	    this.requestData(node, callback, scope || node);
-	} else if (this.entityStore) {
+	    if (this.doPreload(node)) { // preloaded json children
+		this.runCallback(callback, scope || node, [node]);
+	    } else if (this.directFn || this.dataUrl || this.url) {
+		this.requestData(node, callback, scope || node);
+	    } else if (this.entityStore) {
 
-	    this.loading = true;
+		this.loading = true;
 
-	    if (node.attributes.isPage) {
+		if (node.attributes.isPage) {
 //				 this.requestGroups(node, callback, scope || node);
-		//todo: generate nodes for the page headers here
-		//make sure to test with pages without any headers (thus no nodes).
-		callback.call();
-		this.loading = false;
-	    } else
-	    {
-		this.requestEntityData(node, callback, scope || node);
+		    //todo: generate nodes for the page headers here
+		    //make sure to test with pages without any headers (thus no nodes).
+		    callback.call();
+		    this.loading = false;
+		} else
+		{
+		    this.requestEntityData(node, callback, scope || node);
+		}
 	    }
 	}
     },
@@ -63,7 +65,6 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(Ext.tree.TreeLoader, {
 //	},
 
     requestEntityData: function (node, callback, scope) {
-
 	if (this.fireEvent("beforeload", this, node, callback) !== false) {
 
 	    var p = this.getParams(node);
@@ -110,7 +111,6 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(Ext.tree.TreeLoader, {
     },
 
     getItemList: function (method, params, callback, scope) {
-
 	//transfort sort parameters to jmap style
 	if (params.sort) {
 	    params.sort = [params.sort + " " + params.dir];
@@ -128,19 +128,22 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(Ext.tree.TreeLoader, {
     },
 
     createNode: function (attr) {
-	Ext.applyIf(attr, this.baseAttrs || {});
+	if (this.siteId) {
+	    Ext.applyIf(attr, this.baseAttrs || {});
 
-	if (this.applyLoader !== false) {
-	    attr.loader = this;
+	    if (this.applyLoader !== false) {
+		attr.loader = this;
+	    }
+
+	    if (typeof attr.uiProvider == 'string') {
+		attr.uiProvider = this.uiProviders[attr.uiProvider] || eval(attr.uiProvider);
+	    }
+
+	    return(attr.leaf ?
+		    new Ext.tree.TreeNode(attr) :
+		    new Ext.tree.AsyncTreeNode(attr));
 	}
-
-	if (typeof attr.uiProvider == 'string') {
-	    attr.uiProvider = this.uiProviders[attr.uiProvider] || eval(attr.uiProvider);
-	}
-
-	return(attr.leaf ?
-		new Ext.tree.TreeNode(attr) :
-		new Ext.tree.AsyncTreeNode(attr));
+	return new Ext.tree.TreeNode(attr);
     },
 
     getParams: function (node) {

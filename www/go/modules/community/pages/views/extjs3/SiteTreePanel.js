@@ -96,6 +96,7 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
     setSiteId: function (siteId) {
 	this.currentSiteId = siteId;
 	this.siteTree.getLoader().siteId = siteId;
+	this.siteTree.initiateRootNode();
 	this.siteTreeEdit.siteId = siteId;
     },
     getSelectionModel: function () {
@@ -103,7 +104,6 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
     },
 
     onChanges: function (entityStore, added, changed, destroyed) {
-
 	var me = this, reload = false, id;
 	//for each added
 	for (id in added) {
@@ -120,9 +120,8 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 		    node = me.siteTree.getNodeById(nodeId);
 	    if (node) {
 		node.attributes.data = changed[id];
-
-		if (changed[id].name) {
-		    node.setText(changed[id].name);
+		if (changed[id].pageName) {
+		    node.setText(changed[id].pageName);
 		}
 		node.reload();
 	    }

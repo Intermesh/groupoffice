@@ -20,5 +20,15 @@ go.modules.community.pages.SiteTree = Ext.extend(Ext.tree.TreePanel, {
 	    }
 	});
     },
-
+    
+    initiateRootNode: function(){
+	newRoot = {
+	nodeType: 'async',
+	text: 'Root',
+	draggable: false,
+	id: null,
+	expanded: true
+	};
+	this.setRootNode(newRoot);
+    },
 })
