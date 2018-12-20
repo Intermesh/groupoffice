@@ -110,8 +110,8 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 					</tpl></tpl>\
 					</div>\
 					<div class="icons">\
+					<hr class="indent">\
 					<tpl if="formatted_address">\
-						<hr class="indent">\
 						<p class="s6"><i class="icon label">home</i>\
 							<span>{address}<br>\
 							<tpl if="address_no">{address_no}<br></tpl>\
@@ -121,13 +121,12 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 							<tpl if="country">{[t("countries")[values.country]]}</tpl></span>\
 							<label>' + t("Private address", "addressbook") + '</label>\
 						</p>\
-						<tpl if="birthday"><p class="s6">\
+					</tpl>\
+					<tpl if="birthday"><p class="s6">\
 						<i class="icon label">cake</i>\
 						<label>' + t('Birthday') + '</label>\
 						<span>{birthday}</span>\
-						</p></tpl>\
-					</tpl>\
-					<hr class="indent" />\
+					</p></tpl>\
 					<tpl if="homepage"><p>\
 						<i class="icon label">language</i>\
 						<label>' + t("Homepage", "addressbook") + '</label>\
