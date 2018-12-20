@@ -4,6 +4,7 @@
 
 GO.grid.MultiSelectGrid = function (config){
 	config = config || {};
+	console.log(config);
 
 	this.checkColumn = new GO.grid.CheckColumn({
 		header: '&nbsp;',
@@ -27,17 +28,7 @@ GO.grid.MultiSelectGrid = function (config){
 	if(config.allowNoSelection)
 		this.allowNoSelection = true;
 	
-	if(!config.tools)
-		config.tools=[];
 	
-	config.tools.push(
-		{
-			text:t("Select all"),
-			id:'plus',
-			qtip:t("Select all"),
-			handler:function(){this.selectAll();},
-			scope: this
-		});
 
 	Ext.apply(config, {
 		plugins: [this.checkColumn],		
@@ -116,6 +107,30 @@ Ext.extend(GO.grid.MultiSelectGrid, GO.grid.GridPanel,{
 	selectedAll : false,
 	
 	requestPrefix : '',
+	
+	initComponent: function() {
+		
+		this.tbar = [
+			{xtype:'tbtitle',text: this.title}, 
+			'->'
+		];
+		delete this.title;
+		
+		if(this.tools) {
+			for(var i =0; i < this.tools.length; i++) {
+				this.tbar.push(this.tools[i]);
+			}
+			delete this.tools;
+		}
+		this.tbar.push({
+			iconCls:'ic-done-all',
+			qtip:t("Select all"),
+			handler:function(){this.selectAll();},
+			scope: this
+		});
+		
+		GO.grid.MultiSelectGrid.superclass.initComponent.call(this);
+	},
 	
 	afterRender : function() {
 		
