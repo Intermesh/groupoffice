@@ -128,7 +128,8 @@ Ext.extend(GO.grid.MultiSelectGrid, GO.grid.GridPanel,{
 				handler:function(){this.selectAll();},
 				scope: this
 			});
-		} else if(this.tools) {
+		} else {
+			this.tools = [];
 			this.tools.push({
 				text:t("Select all"),
 				id:'plus',
