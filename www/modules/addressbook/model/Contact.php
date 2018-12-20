@@ -787,7 +787,7 @@ class Contact extends \GO\Base\Db\ActiveRecord {
 						if(isset($addrArr[6]))
 							$companyAttributes['country'] = $addrArr[6];
 					}
-					if(in_array('home',$types)) {						
+					if(in_array('home',$types) || in_array('pref', $types)) {						
 					
 						$addrArr = explode(';',$vobjProp->getValue());	
 						if(isset($addrArr[2]))

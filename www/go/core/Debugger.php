@@ -95,7 +95,7 @@ class Debugger {
 	
 	public function __construct() {
 		try {
-			$this->enabled = !empty(GO()->getConfig()['general']['debug']);
+			$this->enabled = !empty(GO()->getConfig()['general']['debug']) && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug');
 			if($this->enabled) {
 				$this->logPath = GO()->getDataFolder()->getFile('log/debug.log')->getPath();
 			}
