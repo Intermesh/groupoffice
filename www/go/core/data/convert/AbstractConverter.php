@@ -72,13 +72,6 @@ abstract class AbstractConverter {
 	abstract public function export(Entity $entity);
 	
 	/**
-	 * Convert input data to an entity
-	 * 
-	 * @return Entity
-	 */
-	abstract public function import($data, Entity $entity = null);
-	
-	/**
 	 * Read file and import them into Group-Office
 	 * 
 	 * @return int[] id's of imported entities

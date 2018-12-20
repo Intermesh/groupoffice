@@ -2,14 +2,24 @@
 
 namespace go\modules\community\addressbook\convert;
 
+use Exception;
 use GO;
+use go\core\acl\model\Acl;
 use go\core\data\convert\AbstractConverter;
+use go\core\ErrorHandler;
 use go\core\fs\Blob;
+use go\core\fs\File;
 use go\core\orm\Entity;
+use go\core\util\DateTime;
 use go\core\util\StringUtil;
+use go\modules\community\addressbook\model\Address;
 use go\modules\community\addressbook\model\Contact;
+use go\modules\community\addressbook\model\Date;
+use go\modules\community\addressbook\model\EmailAddress;
+use go\modules\community\addressbook\model\PhoneNumber;
+use go\modules\community\addressbook\model\VCard as VCardModel;
+use go\modules\core\links\model\Link;
 use Sabre\VObject\Component\VCard as VCardComponent;
-use Sabre\VObject\Document;
 use Sabre\VObject\Reader;
 use Sabre\VObject\Splitter\VCard as VCardSplitter;
 
@@ -18,37 +28,31 @@ class VCard extends AbstractConverter {
 	
 	const EMPTY_NAME = '(no name)';
 
-	private static function createUid(Contact $contact) {
-		$url = trim(GO()->getSettings()->URL, '/');
-		$uid = substr($url, strpos($url, '://') + 3);
-		$uid = str_replace('/', '-', $uid);
-
-		return $contact->id . '@' . $uid;
-	}
-
 	/**
 	 * 
 	 * @param Contact $contact
 	 * @return VCardComponent
 	 */
-	public function getVCard(Contact $contact, $vcardModel) {
+	private function getVCard(Contact $contact) {
 		
-		if ($vcardModel) {
-			$vobject = $vcardModel->toVObject();
+		if ($contact->vcardBlobId) {
+			//Contact has a stored VCard 
+			$blob = Blob::findById($contact->vcardBlobId);
+			$vcard = Reader::read($blob->getFile()->open("r"), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);			
+			
 			//remove all supported properties
-			$vobject->remove('EMAIL');
-			$vobject->remove('TEL');
-			$vobject->remove('ADR');
-			$vobject->remove('ORG');
-//			$vobject->remove('CATEGORIES');
-			$vobject->remove('PHOTO');
+			$vcard->remove('EMAIL');
+			$vcard->remove('TEL');
+			$vcard->remove('ADR');
+			$vcard->remove('ORG');
+			$vcard->remove('PHOTO');
 
-			return $vobject;
+			return $vcard;
 		} else {
 			//We have to use 3.0 for the photo property :( See https://github.com/sabre-io/vobject/issues/294#issuecomment-231987064
 			return new VCardComponent([
 					"VERSION" => "3.0",
-					"UID" => self::createUid($contact)
+					"UID" => $contact->uid
 			]);
 		}
 	}
@@ -57,10 +61,10 @@ class VCard extends AbstractConverter {
 	 * Parse an Event object to a VObject
 	 * @param Contact $contact
 	 */
+	
 	public function export(Entity $contact) {
-
-		$vcardModel = \go\modules\community\addressbook\model\VCard::findById($contact->id);
-		$vcard = $this->getVCard($contact, $vcardModel);
+		
+		$vcard = $this->getVCard($contact);
 
 		$vcard->LANGUAGE = GO()->getSettings()->language;
 		$vcard->PRODID = '-//Intermesh//NONSGML Group-Office ' . GO()->getVersion() . '//EN';
@@ -112,43 +116,48 @@ class VCard extends AbstractConverter {
 			$vcard->add('PHOTO', $blob->getFile()->getContents(), ['TYPE' => $blob->type, 'ENCODING' => 'b']);
 		}
 
-		return $this->saveCard($contact, $vcard, $vcardModel);
+		return $vcard->serialize();
 	}
 
-	private function importHasMany(array &$prop, $vcardProp, $cls, $fn) {
+	private function importHasMany(array $prop, $vcardProp, $cls, $fn) {
 
 		if (!isset($vcardProp)) {
-			return;
+			return $prop;
 		}
-
+		
 		foreach ($vcardProp as $index => $value) {
-			if (!isset($prop->phoneNumbers[$index])) {
+			GO()->debug("Import " . $index . " - ".$value);
+			if (!isset($prop[$index])) {
 				$prop[$index] = new $cls;
+				GO()->debug("NEW!");
 			}
 
 			$prop[$index]->type = $this->convertType($value['TYPE']);
-			;
-			$prop[$index]->setValues(call_user_func($fn, $value));
+			$v = call_user_func($fn, $value);
+			GO()->debug($v);
+			$prop[$index]->setValues($v);
 		}
 
 		$c = count($prop) - 1;
 		if ($c > $index) {
 			array_splice($prop, $index, $c - $index);
 		}
+		
+		return $prop;
 	}
 
-	private function importDate(Contact $contact, $type = \go\modules\community\addressbook\model\Date::TYPE_BIRTHDAY, $date) {
+	private function importDate(Contact $contact, $type = Date::TYPE_BIRTHDAY, $date) {
 
 		if (isset($date)) {
 			$bday = $contact->findDateByType($type);
 
 			if (!empty($date)) {
 				if (!$bday) {
-					$bday = new \go\modules\community\addressbook\model\Date();
+					$bday = new Date();
 					$bday->type = $type;
 					$contact->dates[] = $bday;
 				}
-				$bday->date = new \go\core\util\DateTime((string) $date);
+				$bday->date = new DateTime((string) $date);
 			} else {
 				if ($bday) {
 					$contact->dates = array_filter($contact->dates, function($d) use($bday) {
@@ -161,22 +170,26 @@ class VCard extends AbstractConverter {
 
 	/**
 	 * Parse a VObject to an Contact object
-	 * @param VCardComponent $data
+	 * @param VCardComponent $vcardComponent
 	 * @param Contact $contact;
 	 * @return Contact[]
 	 */
-	public function import($data, Entity $entity = null) {
+	public function import(VCardComponent $vcardComponent, Entity $entity = null) {
 
-		if ($data->VERSION != "3.0") {
-			$data->convert("3.0");
+		if ($vcardComponent->VERSION != "3.0") {
+			$vcardComponent->convert("3.0");
 		}
 		
 		if (!isset($entity)) {
 			$entity = new Contact();
 		}
+		
+		if(!isset($entity->uid) && isset($vcardComponent->uid)) {
+			$entity->uid = (string) $vcardComponent->uid;
+		}
 
-		if(isset($data->{"X_GO-GENDER"})) {
-			$gender = (string) $data->{"X_GO-GENDER"};
+		if(isset($vcardComponent->{"X_GO-GENDER"})) {
+			$gender = (string) $vcardComponent->{"X_GO-GENDER"};
 			switch ($gender) {
 				case 'M':
 				case 'F':
@@ -187,30 +200,30 @@ class VCard extends AbstractConverter {
 			}
 		}
 
-		$entity->isOrganization = isset($data->{"X-ABShowAs"}) && $data->{"X-ABShowAs"} == "COMPANY";
+		$entity->isOrganization = isset($vcardComponent->{"X-ABShowAs"}) && $vcardComponent->{"X-ABShowAs"} == "COMPANY";
 
-		$n = $data->N->getParts();
+		$n = $vcardComponent->N->getParts();
 		empty($n[0]) ?: $entity->lastName = $n[0];
 		empty($n[1]) ?: $entity->firstName = $n[1];
 		empty($n[2]) ?: $entity->middleName = $n[2];
 		empty($n[3]) ?: $entity->prefixes = $n[3];
 		empty($n[4]) ?: $entity->suffixes = $n[4];
-		$entity->name = (string) $data->FN ?? self::EMPTY_NAME;
+		$entity->name = (string) $vcardComponent->FN ?? self::EMPTY_NAME;
 
-		$this->importDate($entity, \go\modules\community\addressbook\model\Date::TYPE_BIRTHDAY, $data->BDAY);
-		$this->importDate($entity, \go\modules\community\addressbook\model\Date::TYPE_ANNIVERSARY, $data->ANNIVERSARY);
+		$this->importDate($entity, Date::TYPE_BIRTHDAY, $vcardComponent->BDAY);
+		$this->importDate($entity, Date::TYPE_ANNIVERSARY, $vcardComponent->ANNIVERSARY);
 
-		empty($data->NOTE) ?: $entity->notes = (string) $data->NOTE;
+		empty($vcardComponent->NOTE) ?: $entity->notes = (string) $vcardComponent->NOTE;
 
-		$this->importHasMany($entity->emailAddresses, $data->EMAIL, \go\modules\community\addressbook\model\EmailAddress::class, function($value) {
+		$entity->emailAddresses = $this->importHasMany($entity->emailAddresses, $vcardComponent->EMAIL, EmailAddress::class, function($value) {
 			return ['email' => (string) $value];
 		});
 
-		$this->importHasMany($entity->phoneNumbers, $data->TEL, \go\modules\community\addressbook\model\PhoneNumber::class, function($value) {
+		$entity->phoneNumbers = $this->importHasMany($entity->phoneNumbers, $vcardComponent->TEL, PhoneNumber::class, function($value) {
 			return ['number' => (string) $value];
 		});
 
-		$this->importHasMany($entity->addresses, $data->ADR, \go\modules\community\addressbook\model\Address::class, function($value) {
+		$entity->addresses = $this->importHasMany($entity->addresses, $vcardComponent->ADR, Address::class, function($value) {
 			$a = $value->getParts();
 			$addr = [];
 			empty($a[1]) ?: $addr['street2'] = $a[1];
@@ -222,10 +235,10 @@ class VCard extends AbstractConverter {
 			return $addr;
 		});
 
-		if (isset($data->PHOTO)) {
-			$data = $data->PHOTO->getValue();
-			if ($data) {
-				$blob = Blob::fromString($data);
+		if (isset($vcardComponent->PHOTO)) {
+			$vcardComponent = $vcardComponent->PHOTO->getValue();
+			if ($vcardComponent) {
+				$blob = Blob::fromString($vcardComponent);
 				if ($blob->save()) {
 					$entity->photoBlobId = $blob->id;
 				}
@@ -235,10 +248,10 @@ class VCard extends AbstractConverter {
 		}
 
 		if (!$entity->save()) {
-			throw new \Exception("Could not save contact");
+			throw new Exception("Could not save contact");
 		}
 
-		$this->importOrganizations($entity, $data);
+		$this->importOrganizations($entity, $vcardComponent);
 		
 		return $entity;
 	}
@@ -295,7 +308,7 @@ class VCard extends AbstractConverter {
 		return 'vcf';
 	}
 
-	public function importFile(\go\core\fs\File $file, $values = []) {
+	public function importFile(File $file, $values = []) {
 
 		$response = [
 				'ids' => [],
@@ -304,59 +317,59 @@ class VCard extends AbstractConverter {
 
 		$splitter = new VCardSplitter(StringUtil::cleanUtf8($file->getContents()), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 
-		while ($vcardComponent = $splitter->getNext()) {
-			
-			if($vcardComponent->uid) {
-				$vcardModel = \go\modules\community\addressbook\model\VCard::find()
-								->filter(['permissionLevel' => \go\core\acl\model\Acl::LEVEL_READ])
-								->where(['uid' => (string) $vcardComponent->uid])->single();
-			} else
-			{
-				$vcardModel = false;
-			}
-			
-			if($vcardModel) {
-				$contact = Contact::findById($vcardModel->contactId);
-			}else {
-				$contact = new Contact();
-				$contact->setValues($values);
-			}
-
-			GO()->getDbConnection()->beginTransaction();
+		while ($vcardComponent = $splitter->getNext()) {			
 			try {
-				$contact = $this->import($vcardComponent, $contact);
-				$this->saveCard($contact, $vcardComponent, $vcardModel);
-
-				GO()->getDbConnection()->commit();
-
+				$contact = $this->findOrCreateContact($vcardComponent, $values['addressBookId']);
+				$contact->setValues($values);
+				$this->import($vcardComponent, $contact);
 				$response['ids'][] = $contact->id;
-			} catch (\Exception $e) {
-
-				GO()->getDbConnection()->rollBack();
-				\go\core\ErrorHandler::logException($e);
-
-				$response['errors'][] = "Failed to save contact";
 			}
+			catch(\Exception $e) {
+				ErrorHandler::logException($e);
+				$response['errors'][] = "Failed to import card: ". $e->getMessage();
+			}			
 		}
 
 		return $response;
 	}
-
-	private function saveCard(Contact $contact, $vcardComponent, $vcardModel) {
-//		$vcModel = \go\modules\community\addressbook\model\VCard::findById($contact->id);
-		if (!$vcardModel) {
-			$vcardModel = new \go\modules\community\addressbook\model\VCard();
-			$vcardModel->uid = (string) $vcardComponent->UID ?? $this->createUid($contact);
-			$vcardModel->contactId = $contact->id;
-		}
-		$vcardModel->data = $vcardComponent->serialize();
-
-		if (!$vcardModel->save()) {
-			throw new \Exception("Could not save card");
+	
+	/**
+	 * 
+	 * @param VCardComponent $vcardComponent
+	 * @param int $addressBookId
+	 * @return Contact
+	 */
+	private function findOrCreateContact(VCardComponent $vcardComponent, $addressBookId) {
+		$contact = false;
+			if(isset($vcard->uid)) {
+				$contact = Contact::find()->where(['addressBookId' => $addressBookId, 'uid' => (string) $vcardComponent->uid])->single();
+			}
+			
+			if(!$contact) {
+				$contact = new Contact();				
+			}
+			
+			//Serialize data to store vcard
+			$blob = $this->saveBlob($vcardComponent);			
+			$contact->vcardBlobId = $blob->id;
+			
+			return $contact;
+	}
+	/**
+	 * 
+	 * @param string $vcardData
+	 * @return Blob
+	 * @throws Exception
+	 */
+	private function saveBlob($vcardComponent){
+		$blob = \go\core\fs\Blob::fromString($vcardComponent->serialize());
+		$blob->type = 'text/vcard';
+		$blob->name = ($vcardComponent->uid ?? 'nouid' ) . '.vcf';
+		if(!$blob->save()) {
+			throw new \Exception("could not save vcard blob");
 		}
 		
-		
-		return $vcardModel->data;
+		return $blob;
 	}
 
 }
