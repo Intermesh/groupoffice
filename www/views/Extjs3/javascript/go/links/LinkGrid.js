@@ -33,8 +33,7 @@ go.links.LinkGrid = Ext.extend(go.grid.GridPanel, {
 			}
 		];
 		this.autoExpandColumn = 'name';
-		this.store = new go.data.Store({
-			autoDestroy: true,
+		this.store = new go.data.Store({			
 			fields: ['id', 'entityId', 'entity', 'name', 'description', {name: 'modifiedAt', type: 'date'}],
 			entityStore: "Search",
 			sortInfo: {
