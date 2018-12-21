@@ -99,7 +99,6 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
     },
 
     //updates the page id for all relevant panels
-    //todo: disable toolbar items delete and edit when no pageid is set.
     navigateToPage: function (pageId) {
 	console.log('set page id to: ' + pageId)
 	if(pageId){

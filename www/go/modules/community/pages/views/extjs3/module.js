@@ -12,7 +12,6 @@ go.Modules.register("community", "pages", {
 	    params: {
 	    },
 	    callback: function (options, success, result) {
-		//console.log(result['list']);
 		var overViewTabConfig;
 		//initiate and add all sites to the mainlayout tabpanel
 		for (i = 0; i < result['list'].length; i++) {
@@ -71,13 +70,14 @@ generateRoute = function (site) {
 //All site related hashes end up here through redirects.
 //todo: 
 //als na de pageSlug nog een # staat, opnieuw goto aanroepen om naar de header te springen.
-//split pageslug op /!
 go.Router.add(/(.*)\/view\/(.*)/, function (siteSlug, pageHeaderSlug) {
     var pageSlug, headerSlug, p;
-    pageSlug = pageHeaderSlug;
-    headerSlug = pageHeaderSlug;
+    slugs = pageHeaderSlug.split('/');
+    pageSlug = slugs[0];
+    headerSlug = slugs[1];
     p = GO.mainLayout.getModulePanel(siteSlug);
-    //check if the current site is already known.
+
+//check if the current site is already known.
     if (p.siteSlug !== siteSlug) {
 	go.Jmap.request({
 	    method: "Site/get",
@@ -88,14 +88,23 @@ go.Router.add(/(.*)\/view\/(.*)/, function (siteSlug, pageHeaderSlug) {
 		p = GO.mainLayout.openModule(siteSlug);
 		p.setSiteId(result['list'][0]['id']);
 		p.siteSlug = siteSlug;
+		if (headerSlug) {
+		    
+		    p.content.on('contentLoaded', function () {
+			header = document.getElementById(go.Router.getPath());
+			if (header) {
+			    header.scrollIntoView();
+			}
+		    });
+		}
 		openPage(pageSlug, p);
 	    },
 	    scope: this
 	});
     } else {
+	GO.mainLayout.openModule(siteSlug);
 	openPage(pageSlug, p);
     }
-
 });
 
 //this method attempts to get and load a page based on the slug.
@@ -111,6 +120,7 @@ openPage = function (pageSlug, panel) {
 	    callback: function (options, success, result) {
 		if (success && result['list'][0]) {
 		    panel.navigateToPage(result['list'][0]['id']);
+
 		} else {
 		    panel.navigateToPage();
 		}
@@ -121,3 +131,15 @@ openPage = function (pageSlug, panel) {
 	panel.navigateToPage();
     }
 };
+//
+////handles scrolling towards the header.
+//handleHeader = function (headerSlug) {
+//    if (headerSlug) {
+//	console.log(headerSlug);
+//	header = document.getElementById(go.Router.getPath());
+//	console.log(header);
+//	if (header) {
+//	    header.scrollIntoView();
+//	}
+//    }
+//};
