@@ -80,6 +80,7 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(go.tree.EntityLoader, {
     doRequest: function (params, callback, scope, options) {
 	this.result = this.getItemList(this.entityStore.entity.name + "/query", params, function (getItemListResponse) {
 	    this.entityStore.get(getItemListResponse.ids, function (items) {
+		
 		var result = [];
 
 		items.forEach(function (entity) {
@@ -101,7 +102,6 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(go.tree.EntityLoader, {
 		    argument: {callback: callback, node: options.node, scope: scope},
 		    responseData: result
 		};
-
 		this.loading = false;
 		this.handleResponse(response);
 //				callback.call(scope, options, true, result); //????

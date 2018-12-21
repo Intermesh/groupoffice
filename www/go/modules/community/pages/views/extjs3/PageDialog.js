@@ -61,7 +61,6 @@ go.modules.community.pages.PageDialog = Ext.extend(go.form.Dialog, {
 	    //get the page slug
 	    this.entityStore.get([serverId], function (result) {
 		pageSlug = result[0]['slug'];
-		
 		//get the site slug
 		go.Stores.get("Site").get([this.siteId], function (result) {
 		    //navigate to the new page

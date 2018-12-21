@@ -33,6 +33,6 @@ go.modules.community.pages.PageContent = Ext.extend(Ext.Panel, {
 
     showEmptyPage: function () {
 	this.currentPage = null;
-	this.update('<i>description</i><p>' + t("No page to display") + '</p>', false);
+	this.update('<p><b>' + t("No page found to display.") + '</b></p>', false);
     }
 })

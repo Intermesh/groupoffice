@@ -182,14 +182,14 @@ go.modules.community.pages.SystemSettingsSitesGrid = Ext.extend(go.grid.GridPane
 				},
 				scope: this
 			    },
-		]
-	    })
-	}
+			]
+		    })
+		}
 
-	this.moreMenu.record = record;
+		this.moreMenu.record = record;
 
-	this.moreMenu.showAt(e.getXY());
-    },
+		this.moreMenu.showAt(e.getXY());
+	    },
 
     editProperties: function (id) {
 	var dlg = new go.modules.community.pages.SitePropertyDialog();

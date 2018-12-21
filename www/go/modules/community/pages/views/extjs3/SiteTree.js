@@ -2,13 +2,7 @@ go.modules.community.pages.SiteTree = Ext.extend(Ext.tree.TreePanel, {
     layout: 'fit',
     enableDD: false,
     border: true,
-    root: {
-	nodeType: 'async',
-	text: 'Root',
-	draggable: false,
-	id: null,
-	expanded: true
-    },
+    root: {},
     rootVisible: false,
 
     initComponent: function () {

@@ -151,7 +151,7 @@ class Page extends AclItemEntity {
 	//prevent loadHTML from adding doctype or tags like head and body.
 	//Also adds the right encoding.
 	$doc->loadHTML('<?xml encoding="utf-8" ?>'.$content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-	$doc = $this->cleanTextIds($doc);
+	$doc = $this->cleanIds($doc);
 	libxml_clear_errors();
 	libxml_use_internal_errors(false);
 	
@@ -159,35 +159,28 @@ class Page extends AclItemEntity {
 	$xpath = new DOMXPath($doc);
 	$headers = $xpath->evaluate('//h1 | //h2');
 	foreach($headers as $element){
-	    //if(!$element->hasAttribute('id')){
 	    $counter = 0;
 	    $headerSlug = $this->slugify($element->nodeValue, 100);
 	    //$newElement = $doc->createElement($element->nodeName);
 	    $newElement = $element->cloneNode(true);
 	    while(true){
 		if($counter == 0){
-		    if(is_null($doc->getElementById($headerSlug))){
+		    if(is_null($doc->getElementById($path . $headerSlug))){
 			break;
 		    }
 		    $counter++;
-		}elseif (!is_null($doc->getElementById($headerSlug . $counter))) {
+		}elseif(!is_null($doc->getElementById($path . $headerSlug . $counter))) {
 		    $counter++;
 		}else{
 		    break;
 		}
-	    }
-	    //Passing the align attribute to the new header if the old one had one.
-	    if($element->hasAttribute('align')){
-		$newElement->setAttribute('align', $element->getAttribute('align'));
 	    }
 	    if($counter != 0){
 	    $newElement->setAttribute('id',$path . $headerSlug . $counter);
 	    }else{
 	    $newElement->setAttribute('id',$path . $headerSlug);
 	    }
-	    //$newElement->nodeValue = htmlspecialchars($element->nodeValue);
 	    $element->parentNode->replaceChild($newElement, $element);
-	//}
 	}
 	//The replace is used to remove the encoding to prevent duplicates.
 	//Adding the encoding once doesnt work since it can be messed with inside the html editor. Even without source edit enabled.
@@ -196,10 +189,11 @@ class Page extends AclItemEntity {
     //Removes id's from <p> tags. 
     //Changing a <h> to a <p> does not remove the id.
     //This method is used to fix that.
-    protected function cleanTextIds($DOMdocument){
+    protected function cleanIds($DOMdocument){
 	$doc = $DOMdocument;
-	$text = $doc->getElementsByTagName('p');
-	foreach($text as $element){
+	$xpath = new DOMXPath($doc);
+	$tags = $xpath->evaluate('//h1 | //h2 | //p');
+	foreach($tags as $element){
 	    if($element->hasAttribute('id')){
 		$element->removeAttribute('id');
 		$changedElement = $element;
@@ -221,7 +215,7 @@ class Page extends AclItemEntity {
     //default character limit is 100, max character limit for most slugs in the database is 190.
     protected function slugify($input, $charLimit = 100){
 	return strtolower(preg_replace('/[ ]/', '_', 
-		mb_substr(preg_replace('/\'\"[\&\#\(\)\[\]\{\}\$\+\,\.\/\\\:\;\=\?\@\^\<\>\!\*\|\%]/', '', $input),0,$charLimit)));
+		mb_substr(preg_replace('/[\'\"\&\#\(\)\[\]\{\}\$\+\,\.\/\\\:\;\=\?\@\^\<\>\!\*\|\%]/', '', $input),0,$charLimit)));
     }
 
     /**

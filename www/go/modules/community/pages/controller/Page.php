@@ -38,15 +38,31 @@ class Page extends EntityController {
 	$p = $this->paramsGet($params);
 
 	$page = model\Page::findBySlug($p);
-
+	if ($page) {
+	    $list = [$page];
+	    $notFound = [];
+	} else {
+	    $list = [];
+	    $notFound = [$params['slug']];
+	}
 	$result = [
 	    'accountId' => $p['accountId'],
 	    'state' => $this->getState(),
-	    'list' => [$page],
-	    'notFound' => []
+	    'list' => $list,
+	    'notFound' => $notFound
 	];
 
 	\go\core\jmap\Response::get()->addResponse($result);
+    }
+
+    protected function paramsGet(array $params) {
+	$p = parent::paramsGet($params);
+
+	if (!isset($p['slug'])) {
+	    $p['slug'] = [];
+	}
+
+	return $p;
     }
 
     public function getTree($siteId) {

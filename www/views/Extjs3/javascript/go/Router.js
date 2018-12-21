@@ -128,7 +128,6 @@ go.Router = {
 		return this;
 	},
 	goto: function (path) {
-	    console.log('goto:'+path);
 		if(this.getPath() == path) {
 			
 			//rerun route if hash is the same
