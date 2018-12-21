@@ -77,7 +77,7 @@ go.Router.add(/(.*)\/view\/(.*)/, function (siteSlug, pageHeaderSlug) {
     headerSlug = slugs[1];
     p = GO.mainLayout.getModulePanel(siteSlug);
 
-//check if the current site is already known.
+    //checks if the site is already initialized;
     if (p.siteSlug !== siteSlug) {
 	go.Jmap.request({
 	    method: "Site/get",
@@ -88,15 +88,13 @@ go.Router.add(/(.*)\/view\/(.*)/, function (siteSlug, pageHeaderSlug) {
 		p = GO.mainLayout.openModule(siteSlug);
 		p.setSiteId(result['list'][0]['id']);
 		p.siteSlug = siteSlug;
-		if (headerSlug) {
-		    
-		    p.content.on('contentLoaded', function () {
-			header = document.getElementById(go.Router.getPath());
-			if (header) {
-			    header.scrollIntoView();
-			}
-		    });
-		}
+		//sets up the eventlistener needed to properly jump to headers.
+		p.content.on('contentLoaded', function () {
+		    header = document.getElementById(go.Router.getPath());
+		    if (header) {
+			header.scrollIntoView();
+		    }
+		});
 		openPage(pageSlug, p);
 	    },
 	    scope: this

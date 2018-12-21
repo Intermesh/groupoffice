@@ -24,7 +24,6 @@ go.modules.community.pages.PageContent = Ext.extend(Ext.Panel, {
 		if(content[0]){
 		    this.update(content[0].content, false);
 		    this.fireEvent('contentLoaded', this);
-		    console.log('content loaded')
 		}
 	    }, this);
 	}

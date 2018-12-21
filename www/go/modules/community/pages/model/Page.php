@@ -127,17 +127,17 @@ class Page extends AclItemEntity {
 	    $this->slug = $this->parseSlug($this->slugify($name, 189));
 	}
     }
-
+    //checks if a slug already exists and alters it to prevent duplicates.
     protected function parseSlug($slug) {
 	$counter = 0;
 	while (true) {
-	    if (counter == 0) {
+	    if ($counter == 0) {
 		if (self::find()->where(['slug' => $slug])->single()) {
 		    $counter++;
 		} else {
 		    break;
 		}
-	    } elseif (self::find()->where(['slug' => $slug . $counter])->single()) {
+	    } elseif (self::find()->where(['slug' => ($slug . $counter)])->single()) {
 		$counter++;
 	    } else {
 		break;
