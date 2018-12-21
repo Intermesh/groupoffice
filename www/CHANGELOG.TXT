@@ -1,5 +1,7 @@
-- Customfields: Enlarged "extends_model" column size in the database in the customfields category table.
 - Core: Use Acpu caching if available
+
+21-12-2018 6.2.110
+- Customfields: Enlarged "extends_model" column size in the database in the customfields category table.
 - Sync: Wrong hierarchy sync of folder structure in mail. Search in other folders fixed.
 - Holidays: Fixed the display order of creditTypes in the year summary tab.
 
