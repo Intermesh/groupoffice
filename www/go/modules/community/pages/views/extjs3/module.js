@@ -6,14 +6,14 @@ go.Modules.register("community", "pages", {
     ],
     loaded: false,
     initModule: function () {
-	//get a list with all sites
+	//gets a list with all sites
 	go.Jmap.request({
 	    method: "Site/get",
 	    params: {
 	    },
 	    callback: function (options, success, result) {
 		var overViewTabConfig;
-		//initiate and add all sites to the mainlayout tabpanel
+		//generate routes for the sites and add all of them to the mainlayout tabpanel
 		for (i = 0; i < result['list'].length; i++) {
 		    //configure site tab settings
 		    overViewTabConfig = {
@@ -68,8 +68,6 @@ generateRoute = function (site) {
 };
 
 //All site related hashes end up here through redirects.
-//todo: 
-//als na de pageSlug nog een # staat, opnieuw goto aanroepen om naar de header te springen.
 go.Router.add(/(.*)\/view\/(.*)/, function (siteSlug, pageHeaderSlug) {
     var pageSlug, headerSlug, p;
     slugs = pageHeaderSlug.split('/');
@@ -129,15 +127,3 @@ openPage = function (pageSlug, panel) {
 	panel.navigateToPage();
     }
 };
-//
-////handles scrolling towards the header.
-//handleHeader = function (headerSlug) {
-//    if (headerSlug) {
-//	console.log(headerSlug);
-//	header = document.getElementById(go.Router.getPath());
-//	console.log(header);
-//	if (header) {
-//	    header.scrollIntoView();
-//	}
-//    }
-//};

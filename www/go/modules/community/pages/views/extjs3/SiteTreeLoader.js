@@ -5,6 +5,13 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(go.tree.EntityLoader, {
     loading: false,
     siteId: '',
 
+    constructor: function(config){
+		config = config || {};
+		
+		go.modules.community.pages.SiteTreeLoader.superclass.constructor.call(this, config);
+		this.baseAttrs.uiProvider = null;
+    },
+
     load: function (node, callback, scope) {
 	if (this.siteId) {
 	    if (this.clearOnLoad) {
@@ -80,7 +87,7 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(go.tree.EntityLoader, {
     doRequest: function (params, callback, scope, options) {
 	this.result = this.getItemList(this.entityStore.entity.name + "/query", params, function (getItemListResponse) {
 	    this.entityStore.get(getItemListResponse.ids, function (items) {
-		
+		console.log(items);
 		var result = [];
 
 		items.forEach(function (entity) {

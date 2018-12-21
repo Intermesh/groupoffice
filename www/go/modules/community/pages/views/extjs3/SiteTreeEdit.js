@@ -57,7 +57,10 @@ go.modules.community.pages.SiteTreeEdit = Ext.extend(go.grid.GridPanel, {
 	});
 	this.on('render', function () {
 	    this.store.load();
-	    this.store.entityStore.on("changes", this.store.reload , this); 
+	    this.store.entityStore.on("changes", function () {
+		this.store.baseParams = {filter: {'siteId': this.siteId}};
+		this.store.reload;
+	    }, this);
 	}, this);
 	this.store.on('load', function () {
 	    this.getSelectionModel().selectFirstRow();
