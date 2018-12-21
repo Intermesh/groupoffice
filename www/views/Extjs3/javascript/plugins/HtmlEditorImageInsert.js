@@ -51,33 +51,6 @@ Ext.extend(GO.plugins.HtmlEditorImageInsert, Ext.util.Observable, {
 			text:t("Insert image in the text")
 		}
 		element.overflowText=t("Insert image in the text");
-		
-							
-//		this.uploadForm = new GO.UploadPCForm();
-//
-//		this.uploadForm.on('upload', function(e, files)
-//		{
-//			this.selectTempImage(files[0]);
-//		},this);
-
-		this.fileField = new go.form.FileField({
-							renderField: false,
-							renderButton: true,							
-							name: 'imageId',							
-							autoUpload: true,														
-							wrapCfg: {
-								cls: 'x-menu-item-text',
-								
-								width: "auto",
-								style: "display:inline-block"
-							},	
-							buttonCfg: {
-								width: "auto",
-								style: "border:0;font-weight:normal;padding:0; margin: 0",
-								text: t("Upload"),
-							},
-							accept: 'image/*'
-						});
 
 		var menuItems = [
 		//this.uploadForm

@@ -197,9 +197,13 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 				detailView: this
 			}),
 
-			{
+			this.moreMenu ={
 				iconCls: 'ic-more-vert',
 				menu: [
+					{
+						xtype: "linkbrowsermenuitem"
+					},
+					'-',
 					this.starItem = new Ext.menu.Item({
 						iconCls: "ic-star",
 						text: t("Star"),
@@ -213,6 +217,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 						},
 						scope: this
 					}),
+					'-',
 					{
 						iconCls: "ic-print",
 						text: t("Print"),
@@ -229,6 +234,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 						scope: this
 					},
 					'-',
+					
 					this.deleteItem = new Ext.menu.Item({
 						itemId: "delete",
 						iconCls: 'ic-delete',
@@ -246,6 +252,13 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 
 				]
 			}]);
+		
+		if(go.Modules.isAvailable("legacy", "files")) {
+			this.moreMenu.menu.splice(1,0,{
+				xtype: "filebrowsermenuitem"
+			});
+		}
+
 
 		var tbarCfg = {
 			disabled: true,
