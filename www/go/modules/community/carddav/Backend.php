@@ -35,17 +35,14 @@ class Backend extends AbstractBackend {
 		
 		$vcardComp = Reader::read($cardData, Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 		
-		$blob = \go\core\fs\Blob::fromString($cardData);
-		$blob->type = 'text/vcard';
-		$blob->name = $vcardComp->uid . '.vcf';
-		if(!$blob->save()) {
-			throw new \Exception("could not save vcard blob");
-		}
-			
 		$contact = new Contact();
+		$contact->modifiedAt = $modifiedAt;
 		$contact->addressBookId = $addressBookId;
+		$contact->uid = (string) $vcardComp->uid;
+		$contact->uri = $cardUri;
 		
-		$contact->vcardBlobId = $blob->id;
+		$this->createBlob($contact, $cardData);
+		
 		$c = new VCard();
 		$c->import($vcardComp, $contact);
 		
@@ -56,9 +53,33 @@ class Backend extends AbstractBackend {
 	public function deleteAddressBook($addressBookId): void {
 		
 	}
+	
+	private function createBlob(Contact $contact, $cardData) {
+		
+		//Important to set exactly the same modifiedAt on both blob and contact. 
+		//We compare these to check if vcards need to be updated.
+		$contact->modifiedAt = new \go\core\util\DateTime();
+		
+		$blob = \go\core\fs\Blob::fromString($cardData);
+		$blob->type = 'text/vcard';
+		$blob->name = $contact->uri;
+		$blob->modifiedAt = $contact->modifiedAt;
+		if(!$blob->save()) {
+			throw new \Exception("could not save vcard blob");
+		}
+		
+		if(isset($contact->vcardBlobId)) {
+			$old = \go\core\fs\Blob::findById($contact->vcardBlobId);
+			$old->delete();
+		}
+		
+		$contact->vcardBlobId = $blob->id;
+		
+		return $blob;
+	}
 
 	public function deleteCard($addressBookId, $cardUri): bool {		
-		$contact = Contact::find(['id', 'addressBookId'])->where(['addressBookId' => $addressBookId, 'uid' => $cardUri])->single();
+		$contact = Contact::find(['id', 'addressBookId'])->where(['addressBookId' => $addressBookId, 'uri' => $cardUri])->single();
 		if(!$contact) {
 			throw new NotFound();
 		}
@@ -104,7 +125,7 @@ class Backend extends AbstractBackend {
 			throw new Forbidden();
 		}
 		
-		$contact = Contact::find()->where(['addressBookId' => $addressBookId, 'uid' => $cardUri])->single();
+		$contact = Contact::find()->where(['addressBookId' => $addressBookId, 'uri' => $cardUri])->single();
 		if(!$contact) {
 			throw new NotFound();
 		}
@@ -112,35 +133,51 @@ class Backend extends AbstractBackend {
 		
 		$blob = \go\core\fs\Blob::findById($contact->vcardBlobId);
 		
+		if($blob->modifiedAt < $contact->modifiedAt) {
+			//blob won't be deleted if still used
+			$blob->delete();
+			$cardData = $c->export($contact);			
+			$blob = $this->createBlob($contact, $cardData);
+			$contact->save();
+		}
+		
 		return [
 					'carddata' => $blob->getFile()->getContents(),
-					'uri' => $contact->uid,
+					'uri' => $contact->uri,
 					'lastmodified' => $contact->modifiedAt->format("U"),
 					'etag' => $contact->vcardBlobId,
 					'size' => $blob->size
 			];
-	}
+	}	
 	
-	private function generateMissingCards($addressbookId) {
-		$contacts = Contact::find()->where(['addressBookId' => $addressbookId])->andWhere('vcardBlobId', 'IS', null)->execute();
+	private function generateCards($addressbookId) {
+		$contacts = Contact::find()
+						->join('core_blob', 'b', 'b.id = c.vcardBlobId', 'LEFT')
+						->where(['addressBookId' => $addressbookId])
+						->andWhere('c.vcardBlobId IS NULL OR b.modifiedAt < c.modifiedAt')
+						->execute();
+		
+//		throw new \Exception($contacts->rowCount());
+		
 		if(!$contacts->rowCount()) {
 			return;
 		}
 		
+		//Important to set exactly the same modifiedAt on both blob and contact. 
+		//We compare these to check if vcards need to be updated.
+		$modifiedAt = new \go\core\util\DateTime();
+		
 		$c = new VCard();
 		
 		foreach($contacts as $contact) {
-			$vcardData = $c->export($contact);
+			$cardData = $c->export($contact);
 			
-			$blob = \go\core\fs\Blob::fromString($vcardData);
-			$blob->type = 'text/vcard';
-			$blob->name = $contact->uid . '.vcf';
-			if(!$blob->save()) {
-				throw new \Exception("could not save vcard blob");
+			$blob = $this->createBlob($contact, $cardData);
+			
+			if(!$contact->save()) {
+				$blob->delete();
+				throw new \Exception("Could not save contact");
 			}
-			
-			$contact->vcardBlobId = $blob->id;
-			$contact->save();
 		}
 	}
 
@@ -154,9 +191,9 @@ class Backend extends AbstractBackend {
 			throw new Forbidden();
 		}
 		
-		$this->generateMissingCards($addressbookId);		
+		$this->generateCards($addressbookId);		
 		
-		return GO()->getDbConnection()->select('uid as uri, UNIX_TIMESTAMP(c.modifiedAt) as lastmodified, vcardBlobId AS etag, b.size')
+		return GO()->getDbConnection()->select('c.uri, UNIX_TIMESTAMP(c.modifiedAt) as lastmodified, vcardBlobId AS etag, b.size')
 						->from('addressbook_contact', 'c')
 						->join('core_blob', 'b', 'c.vcardBlobId = b.id')
 						->where('c.addressBookId', '=', $addressbookId)->all();
@@ -169,46 +206,36 @@ class Backend extends AbstractBackend {
 
 	public function updateCard($addressBookId, $cardUri, $cardData) {
 		
-		$contact = Contact::find(['id', 'addressBookId'])->where(['addressBookId' => $addressBookId, 'uid' => $cardUri])->single();
+		$contact = Contact::find()->where(['addressBookId' => $addressBookId, 'uri' => $cardUri])->single();
 		if(!$contact) {
 			throw new NotFound();
 		}
-		if(!$contact->getPermissionLevel() < Acl::LEVEL_DELETE) {
+		if($contact->getPermissionLevel() < Acl::LEVEL_DELETE) {
 			throw new Forbidden();
 		}
 		
-		$vcardModel = VCardModel::find()
-						->join('addressbook_contact', 'c', 'c.id = v.contactId')
-						->where(['uid' => $cardUri, 'addressBookId' => $addressBookId])
-						->single();
+		//Important to set exactly the same modifiedAt on both blob and contact. 
+		//We compare these to check if vcards need to be updated.
+		$modifiedAt = new \go\core\util\DateTime();
 		
-		if(!$vcardModel) {
-			throw new NotFound();
-		}
-		
-		$contact = Contact::findById($vcardModel->contactId);
-		
-		GO()->getDbConnection()->beginTransaction();
-		
+	
 		try {
 			GO()->debug($cardData);
 			$c = new VCard();
-			$vobject = Reader::read($cardData, Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
-			$c->importVObject($vobject, $contact);
-
-			$vcardModel->data = $cardData;
-			if(!$vcardModel->save()) {
-				throw new Exception("Can't save vcardmodel");
-			}
+			
+			$blob = $this->createBlob($contact, $cardData);
+			
+			$vcardComponent = Reader::read($cardData, Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
+			$c->import($vcardComponent, $contact);
 			
 		} catch(Exception $e) {
-			ErrorHandler::logException($e);
-			GO()->getDbConnection()->rollBack();
+			ErrorHandler::logException($e);		
+			
+			$blob->delete();			
+			
 			return false;
 		}
-		
-		GO()->getDbConnection()->commit();
-		
-		return $vcardModel->getETag();						
+		//vcardBlobId can serve as etag
+		return $contact->vcardBlobId;						
 	}
 }

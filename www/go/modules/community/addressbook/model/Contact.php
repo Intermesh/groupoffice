@@ -243,6 +243,13 @@ class Contact extends AclItemEntity {
 	 */
 	public $vcardBlobId;	
 	
+	/**
+	 * CardDAV uri for the contact
+	 * 
+	 * @var string
+	 */
+	public $uri;
+	
 	
 	protected static function aclEntityClass(): string {
 		return AddressBook::class;
@@ -370,6 +377,10 @@ class Contact extends AclItemEntity {
 			$this->uid = $this->generateUid();
 		}
 		
+		if(!isset($this->uri)) {
+			$this->uri = $this->uid . '.vcf';
+		}
+		
 		if($this->isModified('addressBookId') || $this->isModified('groups')) {
 			//verify groups and address book match
 			
@@ -431,6 +442,14 @@ class Contact extends AclItemEntity {
 		}
 		
 		$ids = [$link->toId, $link->fromId];
+		
+		//Update modifiedAt dates for Z-Push and carddav
+		GO()->getDbConnection()
+						->update(
+										'addressbook_contact',
+										['modifiedAt' => new \go\core\util\DateTime()], 
+										['id' => $ids]
+										)->execute();	
 		
 		Contact::getType()->changes(
 					(new \go\core\db\Query)
