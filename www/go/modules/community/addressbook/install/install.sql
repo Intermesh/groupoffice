@@ -1,4 +1,3 @@
-DROP TABLE IF EXISTS `addressbook_address`;
 CREATE TABLE `addressbook_address` (
   `id` int(11) NOT NULL,
   `contactId` int(11) NOT NULL,
@@ -14,7 +13,6 @@ CREATE TABLE `addressbook_address` (
   `longitude` decimal(11,8) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `addressbook_addressbook`;
 CREATE TABLE `addressbook_addressbook` (
   `id` int(11) NOT NULL,
   `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -22,7 +20,6 @@ CREATE TABLE `addressbook_addressbook` (
   `createdBy` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `addressbook_contact`;
 CREATE TABLE `addressbook_contact` (
   `id` int(11) NOT NULL,
   `addressBookId` int(11) NOT NULL,
@@ -48,21 +45,21 @@ CREATE TABLE `addressbook_contact` (
   `photoBlobId` binary(40) DEFAULT NULL,
   `language` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `jobTitle` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `filesFolderId` int(11) DEFAULT NULL
+  `filesFolderId` int(11) DEFAULT NULL,
+  `uid` varchar(200) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
+  `vcardBlobId` binary(40) DEFAULT NULL,
+  `uri` varchar(200) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `addressbook_contact_custom_fields`;
 CREATE TABLE `addressbook_contact_custom_fields` (
   `id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-DROP TABLE IF EXISTS `addressbook_contact_group`;
 CREATE TABLE `addressbook_contact_group` (
   `contactId` int(11) NOT NULL,
   `groupId` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
-DROP TABLE IF EXISTS `addressbook_contact_star`;
 CREATE TABLE `addressbook_contact_star` (
   `contactId` int(11) NOT NULL,
   `userId` int(11) NOT NULL,
@@ -70,7 +67,6 @@ CREATE TABLE `addressbook_contact_star` (
   `starred` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
-DROP TABLE IF EXISTS `addressbook_date`;
 CREATE TABLE `addressbook_date` (
   `id` int(11) NOT NULL,
   `contactId` int(11) NOT NULL,
@@ -78,7 +74,6 @@ CREATE TABLE `addressbook_date` (
   `date` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `addressbook_email_address`;
 CREATE TABLE `addressbook_email_address` (
   `id` int(11) NOT NULL,
   `contactId` int(11) NOT NULL,
@@ -86,14 +81,12 @@ CREATE TABLE `addressbook_email_address` (
   `email` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `addressbook_group`;
 CREATE TABLE `addressbook_group` (
   `id` int(11) NOT NULL,
   `addressBookId` int(11) NOT NULL,
   `name` varchar(190) CHARACTER SET latin1 NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
-DROP TABLE IF EXISTS `addressbook_phone_number`;
 CREATE TABLE `addressbook_phone_number` (
   `id` int(11) NOT NULL,
   `contactId` int(11) NOT NULL,
@@ -101,7 +94,6 @@ CREATE TABLE `addressbook_phone_number` (
   `number` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
-DROP TABLE IF EXISTS `addressbook_smart_addressbook`;
 CREATE TABLE `addressbook_smart_addressbook` (
   `id` int(11) NOT NULL,
   `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -109,7 +101,6 @@ CREATE TABLE `addressbook_smart_addressbook` (
   `matchAny` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'true to show contact matching any of the conditions instead of all.'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
-DROP TABLE IF EXISTS `addressbook_smart_addressbook_filter`;
 CREATE TABLE `addressbook_smart_addressbook_filter` (
   `id` int(11) NOT NULL,
   `smartAddressBookId` int(11) NOT NULL,
@@ -118,7 +109,6 @@ CREATE TABLE `addressbook_smart_addressbook_filter` (
   `value` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
-DROP TABLE IF EXISTS `addressbook_url`;
 CREATE TABLE `addressbook_url` (
   `id` int(11) NOT NULL,
   `contactId` int(11) NOT NULL,
@@ -142,7 +132,8 @@ ALTER TABLE `addressbook_contact`
   ADD KEY `owner` (`createdBy`),
   ADD KEY `photoBlobId` (`photoBlobId`),
   ADD KEY `addressBookId` (`addressBookId`),
-  ADD KEY `modifiedBy` (`modifiedBy`);
+  ADD KEY `modifiedBy` (`modifiedBy`),
+  ADD KEY `vcardBlobId` (`vcardBlobId`);
 
 ALTER TABLE `addressbook_contact_custom_fields`
   ADD PRIMARY KEY (`id`);
@@ -225,7 +216,8 @@ ALTER TABLE `addressbook_contact`
   ADD CONSTRAINT `addressbook_contact_ibfk_2` FOREIGN KEY (`photoBlobId`) REFERENCES `core_blob` (`id`),
   ADD CONSTRAINT `addressbook_contact_ibfk_3` FOREIGN KEY (`modifiedBy`) REFERENCES `core_user` (`id`),
   ADD CONSTRAINT `addressbook_contact_ibfk_4` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`),
-  ADD CONSTRAINT `addressbook_contact_ibfk_5` FOREIGN KEY (`goUserId`) REFERENCES `core_user` (`id`) ON DELETE SET NULL;
+  ADD CONSTRAINT `addressbook_contact_ibfk_5` FOREIGN KEY (`goUserId`) REFERENCES `core_user` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `addressbook_contact_ibfk_6` FOREIGN KEY (`vcardBlobId`) REFERENCES `core_blob` (`id`);
 
 ALTER TABLE `addressbook_contact_custom_fields`
   ADD CONSTRAINT `addressbook_contact_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
@@ -255,18 +247,3 @@ ALTER TABLE `addressbook_smart_addressbook_filter`
 
 ALTER TABLE `addressbook_url`
   ADD CONSTRAINT `addressbook_url_ibfk_1` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
-
-
-DROP TABLE IF EXISTS `addressbook_vcard`;
-CREATE TABLE IF NOT EXISTS `addressbook_vcard` (
-  `contactId` int(11) NOT NULL,
-  `modifiedAt` datetime NOT NULL,
-  `data` mediumblob NOT NULL,
-  `uid` varbinary(200) NOT NULL,
-  PRIMARY KEY (`contactId`),
-  KEY `uid` (`uid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
-
-
-ALTER TABLE `addressbook_vcard`
-  ADD CONSTRAINT `addressbook_vcard_ibfk_1` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
