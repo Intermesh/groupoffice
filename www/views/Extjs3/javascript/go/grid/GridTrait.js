@@ -43,28 +43,27 @@ go.grid.GridTrait = {
 	//It buffers keyboard actions and it doesn't fire when ctrl or shift is used for multiselection
 	initNav : function() {
 		this.addEvents({navigate: true});
-		this.on('rowclick', function(grid, rowIndex, e){
-			var record = this.getSelectionModel().getSelected();
+		this.on('rowclick', function(grid, rowIndex, e){			
 
-			if(!e.ctrlKey && !e.shiftKey && record)
+			if(!e.ctrlKey && !e.shiftKey)
 			{
-				this.fireEvent('navigate', this, rowIndex, record);				
-		}
-		
-			if(record) {
-				this.rowClicked=true;
+				var record = this.getSelectionModel().getSelected();
+				if(record) {
+					this.fireEvent('navigate', this, rowIndex, record);				
+				}
 			}
 			
 		}, this);
 		
 		
-		this.getSelectionModel().on("rowselect",function(sm, rowIndex, r){
-			if(!this.rowClicked)
+		this.on("keydown",function(e) {
+			if(!e.ctrlKey && !e.shiftKey)
 			{
-				this.fireEvent('navigate', this, rowIndex, r);
-			}
-			
-			this.rowClicked = false;
+				var record = this.getSelectionModel().getSelected();
+				if(record) {
+					this.fireEvent('navigate', this, this.store.indexOf(record), record);				
+				}
+			}			
 		}, this, {
 			buffer: 100
 		});
