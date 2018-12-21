@@ -198,7 +198,7 @@
 
 			Ext.Ajax.defaultHeaders['Authorization'] = 'Bearer ' + result.accessToken;
 			
-			document.cookie = "accessToken" + result.accessToken;
+			document.cookie = "accessToken=" + result.accessToken;
 
 			this.fireEvent("authenticated", this, result);
 			

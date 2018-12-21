@@ -57,7 +57,11 @@ class Mapping {
 	 *   ['type' => "foo"] then you can set it with this parameter.
 	 * @return $this
 	 */
-	public function addTable($name, $alias = 't', array $keys = null, array $columns = null, array $constantValues = []) {
+	public function addTable($name, $alias = null, array $keys = null, array $columns = null, array $constantValues = []) {
+		
+		if(!$alias) {
+			$alias = $name;
+		}
 		$this->tables[$name] = new MappedTable($name, $alias, $keys, empty($columns) ? $this->buildColumns() : $columns, $constantValues);
 		return $this;
 	}	

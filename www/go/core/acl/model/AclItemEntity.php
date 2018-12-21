@@ -16,19 +16,23 @@ use go\core\jmap\Entity;
  * It's main purpose is to provide the {@see applyAclToQuery()} function so you 
  * can easily query items which a user has read permissions for.
  * 
+ * You can also specify another AclItemEntity so it will recurse.
+ * 
  * @see AclOwnerEntity
  */
 abstract class AclItemEntity extends AclEntity {
 
 	/**
-	 * Get the {@see AclEntity} class name that holds the acl
+	 * Get the {@see AclOwnerEntity} or {@see AclItemEntity} class name that it 
+	 * depends on.
 	 * 
 	 * @return string 
 	 */
 	abstract protected static function aclEntityClass();
 
 	/**
-	 * Get the keys that
+	 * Get the keys for joining the aclEntityClass table.
+	 * 
 	 * @return array eg. ['folderId' => 'id']
 	 */
 	abstract protected static function aclEntityKeys();
@@ -43,30 +47,48 @@ abstract class AclItemEntity extends AclEntity {
 	 */
 	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null) {
 
-		self::joinAclEntity($query);
+		$alias = self::joinAclEntity($query);
 
-		Acl::applyToQuery($query, 'aclEntity.aclId', $level, $userId);
+		Acl::applyToQuery($query, $alias . '.aclId', $level, $userId);
 		
 		return $query;
 	}
 	
-	public static function joinAclEntity(Query $query) {
+	public static function joinAclEntity(Query $query, $fromAlias = null) {
 		$cls = static::aclEntityClass();
 
 		/* @var $cls Entity */
-
-		$aclColumn = $cls::getMapping()->getColumn('aclId');
-		if(!$aclColumn) {
-			throw new \Exception("Column 'aclId' is required for AclEntity '$cls'");
+		
+		if(!isset($fromAlias)) {
+			$fromAlias = $query->getTableAlias();
 		}
+
+		
 //		$toTable = $cls::getMapping()->getTable($aclColumn->table->getName());
 
 		$keys = [];
 		foreach (static::aclEntityKeys() as $from => $to) {
-			$keys[] = $query->getTableAlias() . '.' . $from . ' = aclEntity.' . $to;
+			$column = $cls::getMapping()->getColumn($to);
+			
+			$keys[] = $fromAlias . '.' . $from . ' = ' . $column->table->getAlias() . ' . '. $to;
 		}
 
-		$query->join($aclColumn->table->getName(), 'aclEntity', implode(' AND ', $keys));
+		$query->join($column->table->getName(), $column->table->getAlias(), implode(' AND ', $keys));
+		
+		
+		//If this is another AclItemEntity then recurse
+		if(is_a($cls, AclItemEntity::class, true)) {
+			return $cls::joinAclEntity($query,  $column->table->getAlias());
+		} else
+		{
+			//otherwise this must hold the aclId column
+			$aclColumn = $cls::getMapping()->getColumn('aclId');
+			if(!$aclColumn) {
+				throw new \Exception("Column 'aclId' is required for AclEntity '$cls'");
+			}
+			
+			return $column->table->getAlias();
+		}
 	}	
 	
 	/**

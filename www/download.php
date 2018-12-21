@@ -34,7 +34,11 @@ if(strpos($_GET['blob'], '/') === false) {
 		exit();
 	}
 
-	$blob->getFile()->output(true, true, ['Content-Type' => $blob->type, "Expires" => (new DateTime("1 year"))->format("D, j M Y H:i:s")]);
+	$blob->getFile()->output(true, true, [
+			'Content-Type' => $blob->type, 
+			"Expires" => (new DateTime("1 year"))->format("D, j M Y H:i:s"),
+			'Content-Disposition' => 'attachment; filename="' . $blob->name . '"'
+					]);
 	exit();
 }
 

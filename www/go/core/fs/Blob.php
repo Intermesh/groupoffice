@@ -7,6 +7,28 @@ use go\core\orm;
 use go\core\util\DateTime;
 use function GO;
 
+/**
+ * Blob entity
+ * 
+ * Group Office has a BLOB system to store files. When uploading a file a unique 
+ * hash is calculated for the file to identify it. So when the same file is 
+ * stored more than once in Group Office it will only be saved to disk once. You 
+ * don’t have to worry about uploading or downloading the data. Because this has 
+ * already been implemented for you.
+ * 
+ * In the database you must store the BLOB id in a BINARY (40) type column.
+ * 
+ * Warning
+ * It’s very important that a foreign key constraint is defined for the BLOB id 
+ * when it’s used in a table. Because the garbage collection mechanism uses 
+ * these keys to determine if a BLOB is stale and to be cleaned up. In other 
+ * words if you don’t do this your BLOB data will be removed automatically.
+ * 
+ * A blob can be downloaded with download.php?blob=HASH. It can be uploaded via
+ * upload.php with HTTP.
+ * 
+ * @link https://groupoffice-developer.readthedocs.io/en/latest/blob.html
+ */
 class Blob extends orm\Entity {
 
 	/**
@@ -66,6 +88,15 @@ class Blob extends orm\Entity {
 	/**
 	 * Get all table columns referencing the core_blob.id column.
 	 * 
+	 * It uses the 'information_schema' to read all foreign key relations.
+	 * So it's important that every blob is saved in a column with a 'RESTRICT'
+	 * foreign key relation to core_blob.id. For example:
+	 * 
+	 * ```
+	 * ALTER TABLE `addressbook_contact`
+	 *    ADD CONSTRAINT `addressbook_contact_ibfk_2` FOREIGN KEY (`photoBlobId`) REFERENCES `core_blob` (`id`);
+	 * ```
+	 * @link https://groupoffice-developer.readthedocs.io/en/latest/blob.html
 	 * @return array [['table'=>'foo', 'column' => 'blobId']]
 	 */
 	public static function getReferences() {
@@ -87,11 +118,13 @@ class Blob extends orm\Entity {
 	}
 	
 	/**
-	 * Set the blob stale if it's not used in any of the referencing tables.
+	 * Check if this blob is used in a database table
 	 * 
-	 * @return bool true if blob is stale
+	 * It uses foreign key relations to check this.
+	 * 
+	 * @return boolean
 	 */
-	public function setStaleIfUnused() {
+	public function isUsed() {
 		$refs = $this->getReferences();	
 		
 		$exists = false;
@@ -103,11 +136,20 @@ class Blob extends orm\Entity {
 							->single();
 			
 			if($exists) {
-				break;
+				return true;
 			}
 		}
 		
-		$this->staleAt = $exists ? null : new DateTime();
+		return false;
+	}
+	
+	/**
+	 * Set the blob stale if it's not used in any of the referencing tables.
+	 * 
+	 * @return bool true if blob is stale
+	 */
+	public function setStaleIfUnused() {		
+		$this->staleAt = $this->isUsed() ? null : new DateTime();
 		
 		if(!$this->save()) {
 			throw new \Exception("Couldn't save blob");
@@ -184,14 +226,40 @@ class Blob extends orm\Entity {
 		return parent::internalSave();
 	}
 	
+	/**
+	 * Checks if blob is in use. If it's used it will not delete but return true.
+	 * It will remove the file on disk.
+	 * 
+	 * @return boolean
+	 */
 	protected function internalDelete() {
+		
+		//Check if blob is in use.
+		if(!$this->deleteHard && $this->isUsed()) {
+			GO()->debug("Not deleting blob because it's in use");
+			return true;
+		}
+		
 		if(parent::internalDelete()) {
 			if(is_file($this->path())) {
 				unlink($this->path());
 			}
 			return true;
-		}
-		return false;
+		}		
+	}
+	
+	private $deleteHard = false;
+	
+	/**
+	 * Delete without checking isUsed()
+	 * 
+	 * It will throw an PDOException if you call this when it's in use.
+	 * 
+	 * @return true
+	 */
+	public function hardDelete() {
+		$this->deleteHard = true;
+		return $this->delete();
 	}
 
 	/**

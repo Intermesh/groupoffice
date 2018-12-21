@@ -416,7 +416,7 @@ class Connection {
 	 */
 	public function createStatement($build) {
 		if(isset($build['debug'])) {
-			App::get()->debug($build['debug'], Debugger::TYPE_SQL);
+			//App::get()->debug($build['debug'], Debugger::TYPE_SQL);
 		}
 
 //		Code is useful to find where a query was made.

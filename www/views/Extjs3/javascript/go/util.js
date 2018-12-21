@@ -192,7 +192,7 @@
 		
 		addSlashes : function( str ) {
 			return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
-		}
+		},
 		
 		
 		/*
@@ -202,6 +202,91 @@
 		 * @method search
 		 * @param {string} query
 		 */
+		
+		
+	/**
+	 * Export an entity to a file
+	 * 
+	 * @param {string} entity eg. "Contact"
+	 * @param {string} queryParams eg. Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0})
+	 * @param {stirng} contentType eg "text/vcard" or "application/json"
+	 * @return {undefined}
+	 */
+	exportToFile: function (entity, queryParams, contentType) {
+		
+		Ext.getBody().mask(t("Exporting..."));
+		var callId = go.Jmap.request({
+			method: entity + "/query",
+			params: queryParams,
+			callback: function (options, success, response) {
+			}
+		});
+		
+		go.Jmap.request({
+			method: entity + "/export",
+			params: {
+				contentType: contentType,
+				"#ids": {
+					resultOf: callId,
+					path: "/ids"
+				}
+			},
+			scope: this,
+			callback: function (options, success, response) {
+				Ext.getBody().unmask();
+				if(!success) {
+					Ext.MessageBox.alert(t("Error"), response[1].message);				
+				} else
+				{					
+					document.location = go.Jmap.downloadUrl(response.blobId);
+				}
+			}
+		});
+	},
+	
+	/**
+	 * Import a file
+	 * 
+	 * @param {string} entity eg. "Contact"
+	 * @param {string} accept File types to accept. eg. F"text/vcard,application/json"
+	 * @param {object} values Extra values to apply to all imported items. eg. {addressBookId: 1}
+	 * @param {function} callback
+	 * @param {object} scope
+	 * @return {undefined}
+	 */
+	importFile : function(entity, accept, values, callback, scope) {
+		go.util.openFileDialog({
+			multiple: true,
+			accept: accept,
+			directory: false,
+			autoUpload: true,
+			scope: this,
+			listeners: {
+				upload: function(response) {
+					Ext.getBody().mask(t("Importing..."));
+					go.Jmap.request({
+						method: entity + "/import",
+						params: {
+							blobId: response.blobId,
+							values: values
+						},
+						callback: function (options, success, response) {
+							if(!success) {
+								Ext.MessageBox.alert(t("Error"), response[1].message);				
+							}
+							Ext.getBody().unmask();
+							
+							if(callback) {
+								callback.call(scope || this, response);
+							}
+						},
+						scope: this
+					});
+				},
+				scope: this
+			}
+		});
+	}
 
 	};
 

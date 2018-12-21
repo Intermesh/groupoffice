@@ -225,7 +225,7 @@ class File extends FileSystemObject {
 	
 		if($sendHeaders) {
 			$r->setHeader('Content-Type', $this->getContentType());
-			$r->setHeader('Content-Disposition', 'inline; filename="' . $this->getName() . '"');
+			$r->setHeader('Content-Disposition', 'attachment; filename="' . $this->getName() . '"');
 			$r->setHeader('Content-Transfer-Encoding', 'binary');
 
 			if ($useCache) {			

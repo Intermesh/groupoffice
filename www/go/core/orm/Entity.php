@@ -574,4 +574,18 @@ abstract class Entity extends Property {
 	public function copy() {
 		return $this->internalCopy();
 	}
+	
+	
+	/**
+	 * Map of file types to a converter class for importing and exporting.
+	 * 
+	 * Override to add more.
+	 * 
+	 * @return array
+	 */
+	public static function converters() {
+		return [
+				'application/json' => \go\core\data\convert\JSON::class			
+		];
+	}
 }

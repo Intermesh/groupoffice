@@ -222,7 +222,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 						scope: this
 					},{
 						iconCls: "ic-cloud-download",
-						text: t("Export VCard"),
+						text: t("Export") + " (vCard)",
 						handler: function () {
 							document.location = go.Jmap.downloadUrl("community/addressbook/vcard/" + this.data.id);
 						},

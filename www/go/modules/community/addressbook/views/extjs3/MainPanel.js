@@ -107,13 +107,49 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 					menu: [{
 							iconCls: 'ic-cloud-upload',
 							text: t("Import"),
-							handler: this.onImport,
+							handler: function() {
+								go.util.importFile(
+												'Contact', 
+												"text/vcard,application/json",
+												{addressBookId: this.addAddressBookId});
+							},
 							scope: this
 						}, {
 							iconCls: 'ic-cloud-download',
 							text: t("Export"),
-							handler: this.onExport,
-							scope: this
+							menu: [
+								{
+									text: 'vCard',
+									iconCls: 'ic-contacts',
+									handler: function() {
+										go.util.exportToFile(
+														'Contact', 
+														Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0}),
+														'text/vcard');									
+									},
+									scope: this
+								},{
+									text: 'CSV',
+									iconCls: 'ic-description',
+									handler: function() {
+										go.util.exportToFile(
+														'Contact', 
+														Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0}),
+														'text/csv');									
+									},
+									scope: this
+								}
+//								{
+//									text: 'JSON',
+//									handler: function() {
+//										go.util.exportToFile(
+//														'Contact', 
+//														Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0}),
+//														'application/json');									
+//									},
+//									scope: this
+//								}
+							]							
 						},
 						"-",
 						{
@@ -302,69 +338,6 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 			update: updates
 		});
 
-	},
-
-	onExport: function () {
-		
-		this.getEl().mask(t("Exporting..."));
-		var callId = go.Jmap.request({
-			method: "Contact/query",
-			params: Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0}),
-			callback: function (options, success, response) {
-			}
-		});
-		
-		go.Jmap.request({
-			method: "Contact/export",
-			params: {
-				converter: "VCard",
-				"#ids": {
-					resultOf: callId,
-					path: "/ids"
-				}
-			},
-			scope: this,
-			callback: function (options, success, response) {
-				this.getEl().unmask();
-				if(!success) {
-					Ext.MessageBox.alert(t("Error"), response[1].message);				
-				} else
-				{					
-					document.location = go.Jmap.downloadUrl(response.blobId);
-				}
-			}
-		});
-	},
-	
-	onImport : function() {
-		go.util.openFileDialog({
-			multiple: true,
-			accept: "text/vcard",
-			directory: false,
-			autoUpload: true,
-			scope: this,
-			listeners: {
-				upload: function(response) {
-					this.getEl().mask(t("Importing..."));
-					go.Jmap.request({
-						method: "Contact/import",
-						params: {
-							converter: "VCard",
-							blobId: response.blobId,
-							values: {addressBookId: this.addAddressBookId}
-						},
-						callback: function (options, success, response) {
-							if(!success) {
-								Ext.MessageBox.alert(t("Error"), response[1].message);				
-							}
-							this.getEl().unmask();
-						},
-						scope: this
-					});
-				},
-				scope: this
-			}
-		});
 	}
 
 });

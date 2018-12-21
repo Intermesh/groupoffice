@@ -31,23 +31,22 @@ class JSON extends AbstractConverter {
 	}
 	
 	protected function exportEntityToBlob(Entity $entity, $fp, $index, $total) {
+				
 		if($index == 0) {
-			$str = "[\n";
+			fputs($fp, "[\n");
 		}
-		else
-		{
-			$str = "";
-		}
-		$str .= parent::exportEntityToBlob($entity, $fp, $index, $total);
+		parent::exportEntityToBlob($entity, $fp, $index, $total);
 		
-		if($index == $total) {
-			$str .= "\n]\n";
+		if($index == $total - 1) {
+		 fputs($fp, "\n]\n");
 		} else
 		{
-			$str .= "\n,\n";
+			fputs($fp, "\n,\n");
 		}
-		
-		return $str;
+	}
+
+	public function getFileExtension() {
+		return 'json';
 	}
 
 }
