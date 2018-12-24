@@ -24,7 +24,7 @@ class Backend extends AbstractBackend {
 	}
 
 	public function createCard($addressBookId, $cardUri, $cardData) {
-		$addressbook = AddressBook::findById($addressbookId);
+		$addressbook = AddressBook::findById($addressBookId);
 		if(!$addressbook) {
 			throw new NotFound();
 		}
@@ -36,7 +36,6 @@ class Backend extends AbstractBackend {
 		$vcardComp = Reader::read($cardData, Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 		
 		$contact = new Contact();
-		$contact->modifiedAt = $modifiedAt;
 		$contact->addressBookId = $addressBookId;
 		$contact->uid = (string) $vcardComp->uid;
 		$contact->uri = $cardUri;
