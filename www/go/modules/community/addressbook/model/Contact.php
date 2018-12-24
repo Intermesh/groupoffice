@@ -405,6 +405,22 @@ class Contact extends AclItemEntity {
 		]);
 		return array_map("intval", $query->all());
 	}
+	
+	public function setOrganizationIds($ids) {
+		$current = $this->getOrganizationIds();
+		$remove = array_diff($current, $ids);
+		
+		if(count($remove)) {
+			Link::deleteLinkWithIds($remove, Contact::getType()->getId(), $this->id, Contact::getType()->getId());
+		}
+		
+		$add = array_diff($ids, $current);
+		
+		foreach($add as $orgId) {
+			$org = self::findById($orgId);
+			Link::create($this, $org);
+		}
+	}
 
 	protected function getSearchDescription() {
 		$addressBook = AddressBook::findById($this->addressBookId);
