@@ -51,7 +51,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 						dv.emailButton.menu.removeAll();						
 						dv.data.emailAddresses.forEach(function(a) {
 							dv.emailButton.menu.addMenuItem({
-								text: "<div>" + a.email + "</div><small>" + t("emailTypes")[a.type] + "</small>",
+								text: "<div>" + a.email + "</div><small>" + (t("emailTypes")[a.type] || a.type) + "</small>",
 								handler: function() {
 									go.util.mailto({
 										email: a.email,
@@ -66,7 +66,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 						dv.callButton.menu.removeAll();						
 						dv.data.phoneNumbers.forEach(function(a) {
 							dv.callButton.menu.addMenuItem({
-								text: "<div>" + a.number + "</div><small>" + t("phoneTypes")[a.type] + "</small>",
+								text: "<div>" + a.number + "</div><small>" + (t("phoneTypes")[a.type] || a.type)  + "</small>",
 								handler: function() {
 									go.util.callto({
 										number: a.number,
@@ -120,7 +120,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 							<tpl if="city">{city}<br></tpl>\
 							<tpl if="state">{state}<br></tpl>\
 							<tpl if="country">{country}</tpl></span>\
-							<label>{[t("addressTypes")[values.type]]}</label>\
+							<label>{[t("addressTypes")[values.type] || values.type]}</label>\
 						</a>\
 					</tpl>\
 					</div>'
@@ -144,7 +144,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 						<hr class="indent">\
 						<tpl for="dates"><a class="s6"><tpl if="xindex == 1"><i class="icon label">cake</i></tpl>\
 							<span>{[GO.util.dateFormat(values.date)]}</span>\
-							<label>{[t("dateTypes")[values.type]]}</label>\
+							<label>{[t("dateTypes")[values.type] || values.type]}</label>\
 						</a></tpl>\
 					</div>\
 					</tpl>'
