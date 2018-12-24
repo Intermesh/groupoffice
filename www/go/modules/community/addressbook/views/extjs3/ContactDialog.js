@@ -127,6 +127,22 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 								]
 							}
 						]
+					},
+					
+					
+					{
+						anchor: '100%',
+						xtype: "chips",
+						entityStore: "Contact",
+						displayField: "name",
+						valueField: 'id',
+						storeBaseParams: {
+							filter: {
+								isOrganization: true
+							}
+						},
+						name: "organizationIds",
+						fieldLabel: t("Organizations")
 					}
 
 					//new go.modules.community.addressbook.ContactBookCombo(),

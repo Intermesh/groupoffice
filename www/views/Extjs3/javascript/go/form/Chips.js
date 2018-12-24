@@ -9,10 +9,15 @@
  * 
  * {
 				xtype: "chips",
-				entityStore: go.Stores.get("AddressBook"),
+				entityStore: go.Stores.get("Contact"),
 				displayField: "name",
 				name: "addressBooks",
-				fieldLabel: t("Address books")
+				storeBaseParams: { //Optional base params
+					filter: {
+						isOrganization: true
+					}
+				},
+				fieldLabel: t("Organization")
 			}
  * 
  * With custom store. Data must be local!:
@@ -39,6 +44,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	entityStore: null,
 	comboStore: null,
 	autoHeight: true,
+	storeBaseParams: null,
 	
 	initComponent: function () {
 
@@ -147,15 +153,20 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	},
 	createComboBox: function () {
 		
-		if(this.entityStore){
+		if(this.entityStore) {
+			
+			if(!this.storeBaseParams) {
+				this.storeBaseParams = {};
+			}
+			if(!this.storeBaseParams.filter) {
+				this.storeBaseParams.filter = {};
+			}
+			this.storeBaseParams.filter.exclude = [];
+			
 			this.comboStore = new go.data.Store({
 				fields: [this.valueField, this.displayField],
 				entityStore: this.entityStore,
-				baseParams: {
-					filter: {
-						exclude: []
-					}
-				}
+				baseParams: this.storeBaseParams
 			});
 		} else
 		{
