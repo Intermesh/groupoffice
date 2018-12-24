@@ -130,8 +130,8 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 					},
 					
 					
-					{
-						anchor: '100%',
+					this.organizationsField = new go.form.Chips({
+						anchor: '-20',
 						xtype: "chips",
 						entityStore: "Contact",
 						displayField: "name",
@@ -143,7 +143,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						},
 						name: "organizationIds",
 						fieldLabel: t("Organizations")
-					}
+					})
 
 					//new go.modules.community.addressbook.ContactBookCombo(),
 
@@ -394,7 +394,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 	setOrganization: function (isOrganization) {
 		this.contactNameField.setVisible(!isOrganization);
 		this.nameField.setVisible(isOrganization);
-//		this.organizationsField.setVisible(!isOrganization);		
+		this.organizationsField.setVisible(!isOrganization);		
 		this.genderField.setVisible(!isOrganization);
 	},
 
