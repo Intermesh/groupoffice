@@ -56,7 +56,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 										items: [{
 												xtype: 'textfield',
 												name: 'firstName',
-												emptyText: t("First name"),
+												emptyText: t("First"),
 												flex: 3,
 												listeners: {
 													change: this.buildFullName,
@@ -65,7 +65,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 											}, {
 												xtype: 'textfield',
 												name: 'middleName',
-												emptyText: t("Middle name"),
+												emptyText: t("Middle"),
 												flex: 2,
 												listeners: {
 													change: this.buildFullName,
@@ -74,7 +74,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 											}, {
 												xtype: 'textfield',
 												name: 'lastName',
-												emptyText: t("Last name"),
+												emptyText: t("Last"),
 												flex: 3,
 												listeners: {
 													change: this.buildFullName,
