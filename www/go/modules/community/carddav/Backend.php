@@ -135,6 +135,7 @@ class Backend extends AbstractBackend {
 		if($blob->modifiedAt < $contact->modifiedAt) {
 			//blob won't be deleted if still used
 			$blob->delete();
+			$c = new VCard();
 			$cardData = $c->export($contact);			
 			$blob = $this->createBlob($contact, $cardData);
 			$contact->save();
@@ -156,15 +157,9 @@ class Backend extends AbstractBackend {
 						->andWhere('c.vcardBlobId IS NULL OR b.modifiedAt < c.modifiedAt')
 						->execute();
 		
-//		throw new \Exception($contacts->rowCount());
-		
 		if(!$contacts->rowCount()) {
 			return;
 		}
-		
-		//Important to set exactly the same modifiedAt on both blob and contact. 
-		//We compare these to check if vcards need to be updated.
-		$modifiedAt = new \go\core\util\DateTime();
 		
 		$c = new VCard();
 		
@@ -213,17 +208,11 @@ class Backend extends AbstractBackend {
 			throw new Forbidden();
 		}
 		
-		//Important to set exactly the same modifiedAt on both blob and contact. 
-		//We compare these to check if vcards need to be updated.
-		$modifiedAt = new \go\core\util\DateTime();
+		$blob = $this->createBlob($contact, $cardData);	
 		
-	
 		try {
 			GO()->debug($cardData);
-			$c = new VCard();
-			
-			$blob = $this->createBlob($contact, $cardData);
-			
+			$c = new VCard();			
 			$vcardComponent = Reader::read($cardData, Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 			$c->import($vcardComponent, $contact);
 			

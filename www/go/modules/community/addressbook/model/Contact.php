@@ -367,19 +367,28 @@ class Contact extends AclItemEntity {
 		
 	}
 	
+	protected function internalSave() {
+		if(!parent::internalSave()) {
+			return false;
+		}
+		
+		if(!isset($this->uid)) {
+			//We need the auto increment ID for the UID so we need to save again if this is a new contact
+			$this->uid = $this->generateUid();
+			if(!isset($this->uri)) {
+				$this->uri = $this->uid . '.vcf';
+			}
+			return $this->internalSave();
+		}		
+		
+		return true;
+	}
+	
 	protected function internalValidate() {		
 		
 		if(empty($this->name)) {
 			$this->setNameFromParts();
 		}		
-		
-		if(!isset($this->uid)) {
-			$this->uid = $this->generateUid();
-		}
-		
-		if(!isset($this->uri)) {
-			$this->uri = $this->uid . '.vcf';
-		}
 		
 		if($this->isModified('addressBookId') || $this->isModified('groups')) {
 			//verify groups and address book match
