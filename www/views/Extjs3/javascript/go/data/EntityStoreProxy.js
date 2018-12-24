@@ -118,6 +118,7 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 		var fields = this.getEntityFields();
 		if (!fields.length) {
 			cb.call(scope);
+			return;
 		}
 
 		var count = 0, called = 0, me = this;
