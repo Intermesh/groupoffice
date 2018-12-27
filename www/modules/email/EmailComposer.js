@@ -540,7 +540,7 @@ GO.email.EmailComposer = function(config) {
 					
 					this._changeTemplate(record.get('template_id'));			
 					
-					this.templateSelectionDialog.close();
+					this.templateSelectionDialog.hide();
 				}, this);
 				
 				

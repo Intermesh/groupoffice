@@ -1,4 +1,8 @@
+
 - Core: Use Acpu caching if available
+
+27-12-2018 6.2.111
+- Core: Some windows could only be used once. Because of a bug in window.close() and closeAction = hide.
 
 21-12-2018 6.2.110
 - Customfields: Enlarged "extends_model" column size in the database in the customfields category table.
