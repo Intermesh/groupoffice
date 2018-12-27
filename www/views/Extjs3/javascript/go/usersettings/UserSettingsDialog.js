@@ -16,7 +16,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	resizable:true,
 	maximizable:true,
 	iconCls: 'ic-settings',
-	title: t("Settings"),
+	title: t("My account"),
 	currentUserId:null,
 
 	initComponent: function () {

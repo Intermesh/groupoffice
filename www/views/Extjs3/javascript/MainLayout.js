@@ -549,7 +549,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 								text: go.User.displayName,
 								cls: 'go-display-name'
 							}, '-', {
-								text: t("My Account"),
+								text: t("My account"),
 								iconCls: 'ic-account-circle',
 								handler: function () {
 									var dlg = new go.usersettings.UserSettingsDialog();
