@@ -5,7 +5,7 @@
 DROP TABLE IF EXISTS `cf_categories`;
 CREATE TABLE IF NOT EXISTS `cf_categories` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `extends_model` varchar(50) NOT NULL DEFAULT '0',
+  `extends_model` varchar(100) NOT NULL DEFAULT '0',
   `acl_id` int(11) NOT NULL DEFAULT '0',
   `name` varchar(50) DEFAULT NULL,
   `sort_index` tinyint(4) NOT NULL DEFAULT '0',

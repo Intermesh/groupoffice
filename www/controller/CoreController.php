@@ -388,7 +388,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		$file = new \GO\Base\Fs\File($src);
 		
 		if($file->size() > \GO::config()->max_thumbnail_size*1024*1024){
-			throw new Exception("Image may not be larger than 5MB.");
+			throw new \Exception("Image may not be larger than " . \GO\Base\Util\Number::formatSize(\GO::config()->max_thumbnail_size*1024*1024));
 		}
 		
 
