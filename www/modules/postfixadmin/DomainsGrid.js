@@ -45,7 +45,8 @@ GO.postfixadmin.DomainsGrid = function(config){
 		  sortable: false
 		},		{
 			header: t("Description"), 
-			dataIndex: 'description'
+			dataIndex: 'description',
+			hidden: true
 		},		{
 			header: t("Aliases", "postfixadmin"), 
 			dataIndex: 'alias_count',
@@ -75,11 +76,13 @@ GO.postfixadmin.DomainsGrid = function(config){
 		},	{
 			header: t("Created at"), 
 			dataIndex: 'ctime',
-			width: dp(140)
+			width: dp(140),
+			hidden: true
 		},		{
 			header: t("Modified at"), 
 			dataIndex: 'mtime',
-			width: dp(140)
+			width: dp(140),
+			hidden: true
 		}
 	]
 	});

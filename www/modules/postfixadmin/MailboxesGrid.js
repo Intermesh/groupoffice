@@ -53,11 +53,13 @@ GO.postfixadmin.MailboxesGrid = function(config){
 		}, 		{
 			header: t("Created at"), 
 			dataIndex: 'ctime',
-			width: dp(140)
+			width: dp(140),
+			hidden: true
 		},		{
 			header: t("Modified at"), 
 			dataIndex: 'mtime',
-			width: dp(140)
+			width: dp(140),
+			hidden: true
 		},		{
 			header: t("Active", "postfixadmin"), 
 			dataIndex: 'active'
