@@ -1580,3 +1580,18 @@ table[id^="comments-ext"] b {
 	text-decoration:underline;
 	color: $cAnchor;
 }
+
+
+.go-multiselect-grid {
+	.x-panel-tbar {
+		border-bottom: 0;
+		border-top: 1px solid color($fg, 'divider');
+		.x-toolbar {
+			border-bottom: 0;
+		}
+	}
+	.x-panel-bbar .x-toolbar {
+		border-top: 0;
+	}
+}
+

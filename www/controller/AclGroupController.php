@@ -56,6 +56,7 @@ class AclGroupController extends \GO\Base\Controller\AbstractMultiSelectModelCon
 	
 	protected function formatColumns(\GO\Base\Data\ColumnModel $cm) {
 		$cm->formatColumn('manage_permission', 'isset($model->level) ? $model->level : ""');
+		$cm->formatColumn('displayName', 'isset($model->displayName) ? $model->displayName : \GO::t("Group")');
 		return parent::formatColumns($cm);
 	}
 	
@@ -95,10 +96,12 @@ class AclGroupController extends \GO\Base\Controller\AbstractMultiSelectModelCon
 							->addCondition($this->linkModelField(), null,'IS','lt');
 			$findParams->criteria($findCriteria);
 		}
-		$findParams->debugSql();
+		
+		$findParams->join('core_user', (new \GO\Base\Db\FindCriteria())->addRawCondition('user.id', 't.isUserGroupFor'), 'user', 'LEFT');
+		$findParams->select('t.*, user.displayName');
+		
 		if(!empty($params['query'])) {
-			$findParams->join('core_user', (new \GO\Base\Db\FindCriteria())->addRawCondition('user.id', 't.isUserGroupFor'), 'user', 'LEFT');
-			$findParams->searchQuery('%'.preg_replace ('/[\s*]+/','%', $params['query']).'%', ['t.name', 'user.displayName']);			
+			$findParams->searchQuery('%'.preg_replace ('/[\s*]+/','%', $params['query']).'%', ['t.name', 'user.displayName']);
 		}
 		
 		

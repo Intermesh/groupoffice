@@ -139,12 +139,16 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			//$params['recurrenceExceptionDate'] is a unixtimestamp. We should return this event with an empty id and the exception date.			
 			//this parameter is sent by the view when it wants to edit a single occurence of a repeating event.
 			
-			//if($params['exception_date'] != $recurringEvent->start_time) {
+
+			$thisAndFuture = !empty($params['thisAndFuture']) && $params['thisAndFuture'] == 'true';
+			
+			if($params['exception_date'] != $recurringEvent->start_time || !$thisAndFuture) {
+
 				//reset the original attributes other wise create exception can fail
 				$model->resetAttributes();
-				if(!empty($params['thisAndFuture']) && $params['thisAndFuture'] == 'true') {
+				if($thisAndFuture) {
 					// Save This and Future
-					$model = $recurringEvent->duplicate(array('uuid'=>null));
+					$model = $recurringEvent->duplicate(array('uuid'=>null, 'rrule' => ""));
 					//$model = new \GO\Calendar\Model\Event();
 					unset($params['exception_for_event_id']);
 					unset($params['repeat_end_time']);
@@ -184,7 +188,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 					$this->_setEventAttributes($model, $params);
 
 				}
-			//}
+			}
 		}
 				
 		return parent::beforeSubmit($response, $model, $params);
