@@ -461,13 +461,12 @@ a {
 }
 #message-ct {
 	position: absolute;
-	z-index: 100000;
+	z-index: 100000000;
 	top: dp(16);
 	right: 8px;
 	left: 8px;
 	list-style: none;
 	overflow: visible;
-	pointer-events:none;
 	> div {
 		@extend .z4;
 		min-width: dp(280);
