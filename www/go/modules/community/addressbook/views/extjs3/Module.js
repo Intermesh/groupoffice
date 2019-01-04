@@ -12,6 +12,8 @@ go.Modules.register("community", "addressbook", {
 			
 			filter: "isContact",
 			
+			iconCls: "entity ic-person",
+			
 			/**
 			 * Opens a dialog to create a new linked item
 			 * 
