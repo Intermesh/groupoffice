@@ -140,7 +140,7 @@ go.modules.core.users.UserDefaultsWindow = Ext.extend(go.Window, {
 
 							fieldLabel: t("Groups"),
 							storeBaseParams: {
-								filter: [{"includeUsers": false}]
+								filter: {hideUsers: true, excludeEveryone: true}
 							}
 						})]
 				}
