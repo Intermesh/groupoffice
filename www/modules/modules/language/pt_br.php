@@ -12,4 +12,10 @@ return array (
   'name' => 'Módulos',
   'description' => 'Administrar módulo; Gerenciar módulos.',
   'Modules' => 'Módulos',
+  'Add to shopping cart' => 'Adicionar ao carrinho de compras',
+  'Select users for package {package}' => 'Selecione usuários para o pacote {package}',
+  'Buy licenses' => 'Comprar licenças',
+  '30 day trial license' => 'Licença de avaliação por 30 dias',
+  'Enabled' => 'Habilitado',
+  'Sort order' => 'Ordenar por',
 );
