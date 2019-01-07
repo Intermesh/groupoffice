@@ -200,6 +200,11 @@ GO.files.FileBrowser = function(config){
 			header:t("Modified at"),
 			dataIndex: 'mtime',
 			width: dp(140)
+		}, {
+			id: 'id',
+			header: 'ID',
+			dataIndex: 'id',
+			hidden: true
 		}]
 	};
 
