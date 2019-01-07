@@ -147,7 +147,7 @@ GO.util.callToLink = function(phone){
 }
 
 GO.util.callToHandler = function(phone) {	
-	document.location = GO.calltoTemplate.replace('{phone}', phone.replace('(0)','').replace(/[^0-9+]/g,''));
+	window.open(GO.calltoTemplate.replace('{phone}', phone.replace('(0)','').replace(/[^0-9+]/g,'')));
 	return false;
 }
 
