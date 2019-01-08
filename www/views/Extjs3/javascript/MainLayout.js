@@ -332,8 +332,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		this.startMenu.add({
 			id: 'go-start-menu-' + moduleName,
 			moduleName: moduleName,
-			text: panelClass.prototype.title,
-			iconCls: 'go-menu-icon-' + moduleName,
+			text: panelConfig.title || panelClass.prototype.title,
+			iconCls: panelConfig.iconCls || 'go-menu-icon-' + moduleName,
 			handler: function (item, e) {
 				this.openModule(item.moduleName);
 			},
