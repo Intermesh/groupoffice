@@ -2,6 +2,8 @@
 namespace go\modules\community\music\model;
 
 use go\core\jmap\Entity;
+use go\core\orm\Query;
+use go\core\util\DateTime;
 						
 /**
  * Artist model
@@ -27,13 +29,13 @@ class Artist extends Entity {
 
 	/**
 	 * 
-	 * @var \IFW\Util\DateTime
+	 * @var DateTime
 	 */							
 	public $createdAt;
 
 	/**
 	 * 
-	 * @var \IFW\Util\DateTime
+	 * @var DateTime
 	 */							
 	public $modifiedAt;
 
@@ -65,44 +67,22 @@ class Artist extends Entity {
 
 	protected static function defineMapping() {
 		return parent::defineMapping()
-						->addTable("music_artist")
+						->addTable("music_artist", "artist")
 						->addRelation('albums', Album::class, ['id' => 'artistId']);
 	}
 	
-	/**
-	 * Filter entities See JMAP spec for details on the $filter array.
-	 * 
-	 * @link https://jmap.io/spec-core.html#/query
-	 * @param Query $query
-	 * @param array $filter key value array eg. ["q" => "foo"]
-	 * @return Query
-	 */
-	public static function filter(\go\core\orm\Query $query, array $filter) {
-		
-		//Handle quick search filter parameter
-		if(isset($filter['q'])) {
-			$query->where('name','LIKE', $filter['q'] .'%');
-		}
-		
-		//An array of Genre ID's can be passed
-		if(!empty($filter['genres'])) {
-			//filter artists on their album genres
-			$query->join('music_album', 'a', 'a.artistId = t.id')
-					->groupBy(['t.id']) // group the results by id to filter out duplicates because of the join
-					->where(['a.genreId' => $filter['genres']]);			
-		}
-		
-		//Always return parent filter function because it may implement core filters.
-		return parent::filter($query, $filter);
+
+	protected static function searchColumns() {
+		return ['name'];
 	}
 	
 	protected static function defineFilters() {
 		return parent::defineFilters()
 						->add('genres', function (Query $query, $value, array $filter) {
 							if(!empty($value)) {
-								$query->join('music_album', 'a', 'a.artistId = t.id')
-									->groupBy(['t.id']) // group the results by id to filter out duplicates because of the join
-									->where(['a.genreId' => $value]);	
+								$query->join('music_album', 'album', 'album.artistId = artist.id')
+									->groupBy(['artist.id']) // group the results by id to filter out duplicates because of the join
+									->where(['album.genreId' => $value]);	
 							}
 						});
 	}
