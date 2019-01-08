@@ -33,7 +33,7 @@ class Album extends Property {
 
 	/**
 	 * 
-	 * @var \IFW\Util\DateTime
+	 * @var \go\core\util\DateTime
 	 */							
 	public $releaseDate;
 	

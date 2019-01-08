@@ -76,6 +76,15 @@ class Artist extends Entity {
 		return ['name'];
 	}
 	
+	/**
+	 * Defines JMAP filters
+	 * 
+	 * Adds the 'genres' filter which can be an array of genre id's.
+	 * 
+	 * @link https://jmap.io/spec-core.html#/query
+	 * 
+	 * @return Filters
+	 */
 	protected static function defineFilters() {
 		return parent::defineFilters()
 						->add('genres', function (Query $query, $value, array $filter) {
