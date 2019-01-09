@@ -23,8 +23,6 @@ go.modules.community.music.ArtistDetail = Ext.extend(go.panels.DetailView, {
 				
 				//Render the avatar
 				{
-					xtype: "box",
-					cls: "content",
 					tpl: new Ext.XTemplate('<div class="go-detail-view-avatar">\
 <div class="avatar" style="{[this.getStyle(values.photo)]}"></div></div>', 
 					{
@@ -52,10 +50,10 @@ go.modules.community.music.ArtistDetail = Ext.extend(go.panels.DetailView, {
 						
 						if(!this.template) {
 							this.template = new Ext.XTemplate('<div class="icons">\
-					<tpl for=".">\
+					<tpl for="albums">\
 						<p class="s6"><tpl if="xindex == 1"><i class="icon label">album</i></tpl>\
 							<span>{name}</span>\
-							<label>{[GO.util.dateFormat(values.releaseDate)]} - {[go.Stores.get("Genre").get([values.genreId])[0].name]}</label>\
+							<label>{[GO.util.dateFormat(values.releaseDate)]} - {[parent.genres[values.genreId]]}</label>\
 						</p>\
 					</tpl>\
 					</div>').compile();
@@ -65,7 +63,13 @@ go.modules.community.music.ArtistDetail = Ext.extend(go.panels.DetailView, {
 						var ids = dv.data.albums.column('genreId');
 						
 						go.Stores.get("Genre").get(ids, function(genres) {
-							this.update(this.template.apply(dv.data.albums));
+							var g = {};
+							
+							genres.forEach(function(genre) {
+								g[genre.id] = genre.name;
+							});
+							
+							this.update(this.template.apply({albums: dv.data.albums, genres: g}));
 						}, this);
 					}
 				}

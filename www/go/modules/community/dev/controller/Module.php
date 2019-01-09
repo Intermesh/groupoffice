@@ -33,7 +33,7 @@ class Module extends Controller {
 
 			case 'date':
 			case 'datetime':
-				return "\IFW\Util\DateTime";
+				return "\go\core\util\DateTime";
 
 			default:
 				return "string";

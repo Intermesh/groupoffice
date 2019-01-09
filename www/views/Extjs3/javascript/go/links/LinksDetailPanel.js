@@ -119,7 +119,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 		this.hide();
 		
 		this.store.baseParams.filter.entity = dv.entity ? dv.entity : dv.entityStore.entity.name, //dv.entity exists on old DetailView or display panels
-		this.store.baseParams.filter.entityId = dv.model_id ? dv.model_id : dv.currentId //model_id is from old display panel
+		this.store.baseParams.filter.entityId = dv.model_id ? dv.model_id : dv.currentId; //model_id is from old display panel
 		this.store.baseParams.position = 0;
 		this.store.load();
 	}
