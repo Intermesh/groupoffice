@@ -441,7 +441,7 @@ class GO{
 							if(!isset(GO::session()->values['cacheDriver'])){
 								$cachePref = array(
 //										"\\GO\\Base\\Cache\\XCache",
-										//"\\GO\\Base\\Cache\\Apcu",
+										"\\GO\\Base\\Cache\\Apcu",
 										"\\GO\\Base\\Cache\\Disk"
 								);
 								foreach($cachePref as $cacheDriver){
