@@ -105,7 +105,7 @@ go.modules.community.music.GenreFilter = Ext.extend(go.grid.GridPanel, {
 						iconCls: 'ic-edit',
 						text: t("Edit"),
 						handler: function() {
-							var dlg = new go.modules.community.music.GenreForm();
+							var dlg = new go.modules.community.music.GenreDialog();
 							dlg.load(this.moreMenu.record.id).show();
 						},
 						scope: this						

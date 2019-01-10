@@ -536,8 +536,10 @@ $(function() {
 	 */
 	public function beginForm($action=false, $method=false, $htmlAttributes=false)
 	{
-		if(!empty($action))
-			$this->action = $action;
+		if(empty($action)) {
+			$action = $_SERVER['REQUEST_URI'];
+		}
+		$this->action = $action;
 		
 		if(!empty($method))
 			$this->method = $method;
