@@ -1,3 +1,5 @@
+- Core: Removed robots noindex header because they don't have any effect because
+				robots.txt is used.
 - Core: Updated Brazilian Portugese and Czech language
 - Core: Fixed display of short date when choosing date further away than a week.
 - Core: Fixed clicking to dismiss notifier messages
