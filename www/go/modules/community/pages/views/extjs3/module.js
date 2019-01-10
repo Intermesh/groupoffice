@@ -42,22 +42,18 @@ generateRoute = function (site) {
 	go.Jmap.request({
 	    method: "Site/getFirstPage",
 	    params: {
-		slug: go.Router.getPath()
+		slug: slug //go.Router.getPath()
 	    },
 	    callback: function (options, success, result) {
-		var PageSlug = result['list'][0]['slug'];
-		if (!success) {
-		    console.log(result);
-		    window.alert(t("Something went wrong while connecting to the server."))
-		    console.log('redirect from: ' + go.Router.getPath());
-		    go.Router.goto(slug + '\/view\/');
-		} else if (!PageSlug) {
-		    console.log('failed to find any pages.');
-		    console.log('redirect from: ' + go.Router.getPath());
+		var pageSlug = false;
+		if(result['list'][0] && result['list'][0]['slug']){
+		    pageSlug = result['list'][0]['slug'];
+		}
+		if (!pageSlug || !success) {
+		    console.warn("Failed to retrieve any pages.")
 		    go.Router.goto(slug + '\/view\/');
 		} else {
-		    console.log('redirect from: ' + go.Router.getPath());
-		    go.Router.goto(slug + '\/view\/' + PageSlug);
+		    go.Router.goto(slug + '\/view\/' + pageSlug);
 		}
 	    },
 	    scope: this
@@ -69,42 +65,59 @@ generateRoute = function (site) {
 
 //All site related hashes end up here through redirects.
 go.Router.add(/(.*)\/view\/(.*)/, function (siteSlug, pageHeaderSlug) {
-    var pageSlug, headerSlug, p;
+    var pageSlug, headerSlug, panel;
     slugs = pageHeaderSlug.split('/');
     pageSlug = slugs[0];
     headerSlug = slugs[1];
-    p = GO.mainLayout.getModulePanel(siteSlug);
-
-    //checks if the site is already initialized;
-    if (p.siteSlug !== siteSlug) {
+    panel = GO.mainLayout.getModulePanel(siteSlug);
+    
+    //Checks if the site is already initialized;
+    if (panel.siteSlug !== siteSlug) {
 	go.Jmap.request({
 	    method: "Site/get",
 	    params: {
 		slug: siteSlug
 	    },
 	    callback: function (options, success, result) {
-		p = GO.mainLayout.openModule(siteSlug);
-		p.setSiteId(result['list'][0]['id']);
-		p.siteSlug = siteSlug;
-		//sets up the eventlistener needed to properly jump to headers.
-		p.content.on('contentLoaded', function () {
-		    header = document.getElementById(go.Router.getPath());
-		    if (header) {
-			header.scrollIntoView();
-		    }
-		});
-		openPage(pageSlug, p);
+		panel = GO.mainLayout.openModule(siteSlug);
+		if (success && result['list'][0]) {
+		    panel.setSiteId(result['list'][0]['id']);
+		    panel.siteSlug = siteSlug;
+		    //sets up the eventlistener needed to properly jump to headers.
+		    panel.content.on('contentLoaded', function () {
+			//gets the current header, passing the earlier headerSlug wont update itself.
+			headerSlug = go.Router.getPath().split('/').pop();
+			header = document.getElementById(headerSlug);
+			if (header) {
+			    header.scrollIntoView();
+			}
+		    },this);
+		    openPage(pageSlug, panel);
+		} else {
+		    go.Router.goto('summary');
+		    console.warn('No Site found with the slug: ' + siteSlug);
+		}
 	    },
 	    scope: this
 	});
-    } else {
+	
+    //Check to see if the page has already been set.
+    } else if (panel.pageSlug !== pageSlug) {
 	GO.mainLayout.openModule(siteSlug);
-	openPage(pageSlug, p);
+	openPage(pageSlug, panel);
+	
+    //if the site and page are already open jump to the header if there is one in the url.
+    } else if (headerSlug) {
+	GO.mainLayout.openModule(siteSlug);
+	header = document.getElementById(headerSlug);
+	if (header) {
+	    header.scrollIntoView();
+	}
     }
 });
 
 //this method attempts to get and load a page based on the slug.
-//if page isnt found it loads the a page not found page.
+//if page isnt found it fills the content of the page with a page not found string.
 openPage = function (pageSlug, panel) {
     if (pageSlug) {
 	go.Jmap.request({
@@ -115,10 +128,11 @@ openPage = function (pageSlug, panel) {
 	    },
 	    callback: function (options, success, result) {
 		if (success && result['list'][0]) {
-		    panel.navigateToPage(result['list'][0]['id']);
+		    panel.navigateToPage(result['list'][0]['id'], pageSlug);
 
 		} else {
 		    panel.navigateToPage();
+		    console.warn('No Page found with the slug: ' + pageSlug);
 		}
 	    },
 	    scope: this

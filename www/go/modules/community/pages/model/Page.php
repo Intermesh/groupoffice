@@ -127,6 +127,7 @@ class Page extends AclItemEntity {
 	    $this->slug = $this->parseSlug($this->slugify($name, 189));
 	}
     }
+
     //checks if a slug already exists and alters it to prevent duplicates.
     protected function parseSlug($slug) {
 	$counter = 0;
@@ -164,7 +165,6 @@ class Page extends AclItemEntity {
 
     //fixes <p> id's, loops through the headers and generates id's for them.
     protected function parseContent($content) {
-	$path = $this->getSlugPath();
 	$counter;
 
 	$doc = new DOMDocument();
@@ -184,30 +184,31 @@ class Page extends AclItemEntity {
 	$headers = $xpath->evaluate('//h1 | //h2');
 	foreach ($headers as $element) {
 	    $counter = 0;
-	    $headerSlug = $this->slugify($element->nodeValue, 100);
+	    $headerSlug = '#'. $this->slugify($element->nodeValue, 100);
 	    //$newElement = $doc->createElement($element->nodeName);
 	    $newElement = $element->cloneNode(true);
 	    while (true) {
 		if ($counter == 0) {
-		    if (is_null($doc->getElementById($path . $headerSlug))) {
+		    if (is_null($doc->getElementById($headerSlug))) {
 			break;
 		    }
 		    $counter++;
-		} elseif (!is_null($doc->getElementById($path . $headerSlug . $counter))) {
+		} elseif (!is_null($doc->getElementById($headerSlug . $counter))) {
 		    $counter++;
 		} else {
 		    break;
 		}
 	    }
 	    if ($counter != 0) {
-		$newElement->setAttribute('id', $path . $headerSlug . $counter);
+		$newElement->setAttribute('id', $headerSlug . $counter);
 	    } else {
-		$newElement->setAttribute('id', $path . $headerSlug);
+		$newElement->setAttribute('id', $headerSlug);
 	    }
 	    $element->parentNode->replaceChild($newElement, $element);
 	}
 	//The replace is used to remove the encoding to prevent duplicates.
 	//Adding the encoding once doesnt work since it can be messed with inside the html editor. Even without source edit enabled.
+	
 	return str_replace('<?xml encoding="utf-8" ?>', '', $doc->saveHTML());
     }
 
@@ -217,24 +218,20 @@ class Page extends AclItemEntity {
 	$xpath = new DOMXPath($doc);
 	$tags = $xpath->evaluate('//h1 | //h2 | //p');
 	foreach ($tags as $element) {
-	    if ($element->hasAttribute('id')) {
+	    $element->nodeValue = str_replace("\xE2\x80\x8B", "", $element->nodeValue);
+	    if($element->nodeValue == ''){
+		$element->parentNode->removeChild($element);
+	    }elseif ($element->hasAttribute('id')) {
 		$element->removeAttribute('id');
 	    }
+	    
 	}
 	return $doc;
     }
 
-    //Generates The current page url based on the slug of the site and page.
-    //used to generate linkable id's for page headers.
-    protected function getSlugPath() {
-	$siteSlug = (new Query)->select('slug')->from('pages_site')->where(['id' => $this->siteId])->single();
-	$slugPath = $siteSlug['slug'] . '/view/' . $this->slug . '/#';
-	return $slugPath;
-    }
-
     //Removes dangerous url characters, replaces spaces with _ and limits the amount of characters.
     //default character limit is 100, max character limit for most slugs in the database is 190.
-    protected function slugify($input, $charLimit = 100) {
+    public function slugify($input, $charLimit = 100) {
 	return strtolower(preg_replace('/[ ]/', '_', mb_substr(preg_replace('/[\'\"\&\#\(\)\[\]\{\}\$\+\,\.\/\\\:\;\=\?\@\^\<\>\!\*\|\%]/', '', $input), 0, $charLimit)));
     }
 

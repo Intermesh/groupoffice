@@ -36,13 +36,20 @@ class Site extends EntityController {
 
 	$p = $this->paramsGet($params);
 
-	$page = model\Site::findBySlug($p['slug']);
+	$site = model\Site::findBySlug($p['slug']);
 
+	if ($site) {
+	    $list = [$site];
+	    $notFound = [];
+	} else {
+	    $list = [];
+	    $notFound = [$params['slug']];
+	}
 	$result = [
 	    'accountId' => $p['accountId'],
 	    'state' => $this->getState(),
-	    'list' => [$page],
-	    'notFound' => []
+	    'list' => $list,
+	    'notFound' => $notFound
 	];
 
 	\go\core\jmap\Response::get()->addResponse($result);
@@ -53,20 +60,29 @@ class Site extends EntityController {
 
 	if (isset($p['slug'])) {
 	    $siteId = model\Site::findBySlug($p['slug']);
+	    if(isset($siteId->id)){
 	    $name = model\Page::findFirstSitePage($siteId->id);
-
+	    
 	    $result = [
 		'accountId' => $p['accountId'],
 		'state' => $this->getState(),
 		'list' => [$name],
 		'notFound' => []
 	    ];
+	    }else{
+		 $result = [
+		'accountId' => $p['accountId'],
+		'state' => $this->getState(),
+		'list' => [],
+		'notFound' => [$p['slug'], $siteId]
+	    ];
+	    }
 	} else {
 	    $result = [
 		'accountId' => $p['accountId'],
 		'state' => $this->getState(),
 		'list' => [],
-		'notFound' => []
+		'notFound' => [$params]
 	    ];
 	}
 

@@ -3,6 +3,7 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
     siteId: '',
     pageId: '',
     siteSlug: '',
+    pageSlug: '',
     //used in routing and redirecting in MainLayout.js
     shouldRedirect: true,
 
@@ -81,6 +82,7 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 	    newPage: true
 	});
 	dlg.show();
+	
     },
 
     editPage: function (id) {
@@ -88,6 +90,10 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 	    siteId: this.siteId,
 	    newPage: false
 	});
+	dlg.on('pageChanged', function (pageId, scope){
+	    tree = this.treeArea.siteTree;
+	    tree.getNodeById(tree.getLoader().entityStore.entity.name+"-"+pageId).reload();
+	}, this, {single: true});
 	dlg.load(id).show();
     },
 
@@ -99,18 +105,19 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
     },
 
     //updates the page id for all relevant panels
-    navigateToPage: function (pageId) {
+    navigateToPage: function (pageId, pageSlug) {
 	console.log('set page id to: ' + pageId)
+	this.pageId = pageId;
+	this.pageSlug = pageSlug;
 	if(pageId){
-	    this.pageId = pageId;
 	    this.content.currentPage = this.pageId;
 	    //acl check here
 	    this.disableButtons(false, false);
 	    //else
 	    //this.disableButtons(true,true);
 	}else{
-	    this.pageId = pageId;
 	    this.content.showEmptyPage();
+	    //acl check here
 	    this.disableButtons(true, false);
 	}
     },

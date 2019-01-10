@@ -9,6 +9,10 @@ go.modules.community.pages.PageDialog = Ext.extend(go.form.Dialog, {
     sortOrder: '',
     redirectOnSave: false,
     newPage: false,
+    initComponent: function () {
+	go.modules.community.pages.PageDialog.superclass.initComponent.call(this);
+	this.addEvents('pageChanged');
+    },
     initFormItems: function () {
 	var items = [{
 		xtype: 'fieldset',
@@ -67,6 +71,10 @@ go.modules.community.pages.PageDialog = Ext.extend(go.form.Dialog, {
 		    go.Router.goto(result[0]['slug'] + '\/view\/' + pageSlug);
 		}, this);
 	    }, this);
+	}else if (success){
+	    this.fireEvent('pageChanged', serverId ,this);
+	}else{
+	    console.warn("Something went wrong while saving changes.")
 	}
     }
 });

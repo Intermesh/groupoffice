@@ -1,15 +1,13 @@
 go.modules.community.pages.SiteTreeLoader = Ext.extend(go.tree.EntityLoader, {
 
     entityStore: null,
-
     loading: false,
     siteId: '',
 
-    constructor: function(config){
-		config = config || {};
-		
-		go.modules.community.pages.SiteTreeLoader.superclass.constructor.call(this, config);
-		this.baseAttrs.uiProvider = null;
+    constructor: function (config) {
+	config = config || {};
+	go.modules.community.pages.SiteTreeLoader.superclass.constructor.call(this, config);
+	this.baseAttrs.uiProvider = null;
     },
 
     load: function (node, callback, scope) {
@@ -21,136 +19,38 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(go.tree.EntityLoader, {
 	    }
 	    if (this.doPreload(node)) { // preloaded json children
 		this.runCallback(callback, scope || node, [node]);
-	    } else if (this.directFn || this.dataUrl || this.url) {
-		this.requestData(node, callback, scope || node);
 	    } else if (this.entityStore) {
-
 		this.loading = true;
-
-		if (node.attributes.isPage) {
-//				 this.requestGroups(node, callback, scope || node);
-		    //todo: generate nodes for the page headers here
-		    //make sure to test with pages without any headers (thus no nodes).
-		    callback.call();
+		if(node.attributes.leaf){
+		    var response = {
+			argument: {callback: callback, node: node, scope: scope},
+			responseData: {}
+		    };
+		    this.handleResponse(response);
 		    this.loading = false;
-		} else
-		{
+		}else if (!node.attributes.isPage) {
 		    this.requestEntityData(node, callback, scope || node);
+		} else if(node.attributes.isPage){
+		    this.getHeaders(node, callback, scope || node);
 		}
 	    }
 	}
     },
 
-//	requestGroups : function(node, callback, scope) {
-//						
-//		go.Stores.get("AddressBookGroup").get(node.attributes.entity.groups, function(groups){
-//			var result = [];
-//			
-//			groups.forEach(function(group) {
-//				result.push({
-//					id: "group-" + group.id,
-//					iconCls: 'ic-group',
-//					text: group.name,
-//					//leaf: true, don't use leaf because this doesn't allow dropping contacts anymore
-//					children: [],
-//					expanded: true,
-//					entity: group,
-//					isGroup: true
-//				});
-//			});
-//			
-//			var response = {
-//				argument: {callback: callback, node: node, scope: scope},
-//				responseData:result
-//			};
-//			
-//			this.loading = false;
-//			this.handleResponse(response);
-//		}, this)
-//		
-//		
-//	},
-
-    requestEntityData: function (node, callback, scope) {
-	if (this.fireEvent("beforeload", this, node, callback) !== false) {
-
-	    var p = this.getParams(node);
-
-	    if (node.attributes.params) {
-		go.util.mergeObjects(p, node.attributes.params);
-	    }
-
-	    this.doRequest(p, callback, scope, {node: node});
-	}
-    },
-
-    doRequest: function (params, callback, scope, options) {
-	this.result = this.getItemList(this.entityStore.entity.name + "/query", params, function (getItemListResponse) {
-	    this.entityStore.get(getItemListResponse.ids, function (items) {
-		console.log(items);
-		var result = [];
-
-		items.forEach(function (entity) {
-		    result.push({
-			id: "page-" + entity.id,
-			entityId: entity.id || null,
-			entitySlug: entity.slug,
-			entity: entity,
-			isPage: true,
-			sortOrder: entity.sortOrder,
-//						expanded: entity.groups.length == 0,						
-			text: entity.pageName,
-			nodeType: 'async',
-//						children: entity.groups.length == 0 ? [] : null
-		    });
-		});
-
-		var response = {
-		    argument: {callback: callback, node: options.node, scope: scope},
-		    responseData: result
-		};
-		this.loading = false;
-		this.handleResponse(response);
-//				callback.call(scope, options, true, result); //????
-	    }, this);
-
-	}, this);
-    },
-
-    getItemList: function (method, params, callback, scope) {
-	//transfort sort parameters to jmap style
-	if (params.sort) {
-	    params.sort = [params.sort + " " + params.dir];
-	    delete params.dir;
-	}
-
-	return go.Jmap.request({
-	    method: method,
-	    params: params,
-	    callback: function (options, success, response) {
-		callback.call(this, response);
-	    },
-	    scope: scope
-	});
-    },
-
-    createNode: function (attr) {
-	if (this.siteId) {
-	    Ext.applyIf(attr, this.baseAttrs || {});
-
-	    if (this.applyLoader !== false) {
-		attr.loader = this;
-	    }
-
-	    if (typeof attr.uiProvider == 'string') {
-		attr.uiProvider = this.uiProviders[attr.uiProvider] || eval(attr.uiProvider);
-	    }
-
-	    return(attr.leaf ?
-		    new Ext.tree.TreeNode(attr) :
-		    new Ext.tree.AsyncTreeNode(attr));
-	}
-	return new Ext.tree.TreeNode(attr);
+    convertEntityToNode: function (entityData) {
+	return {
+	    id: this.entityStore.entity.name + "-" + entityData.id,
+	    entityId: entityData.id || null,
+	    data: entityData,
+	    entity: this.entityStore.entity,
+	    text: entityData.pageName,
+	    entitySlug: entityData.slug,
+	    secondaryText: this.secondaryTextTpl.apply(entityData),
+	    nodeType: 'groupoffice',
+	    loader: this,
+	    isPage: true,
+	    sortOrder: entityData.sortOrder,
+	};
     },
 
     getParams: function (node) {
@@ -160,6 +60,50 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(go.tree.EntityLoader, {
 	return {
 	    filter: filter
 	};
+    },
+    
+    getHeaders: function (node, cb, scope){
+	var headers = [];
+	var params = {pageSlug: node.attributes.entitySlug};
+	go.Jmap.request({
+	    method: "page/getHeaders",
+	    params: params,
+	    scope: this,
+	    callback: function (options, success, response) {
+		if (response.items && response.items.length > 0) {
+		    response.items.forEach(function (entity) {
+			subHeaders = []
+			if (entity.items && entity.items.length > 0) {
+			    entity.items.forEach(function (subEntity) {
+				subHeaders.push({
+				    text: subEntity.name,
+				    entitySlug: subEntity.slug,
+				    nodeType: 'groupoffice',
+				    isPage: false,
+				    leaf: true
+				});
+			    });
+			}
+			header = {
+			    text: entity.name,
+			    entitySlug: entity.slug,
+			    nodeType: 'groupoffice',
+			    isPage: false,
+			    children: subHeaders
+			}
+			if(!header.children.length > 0){
+			    header.expanded = true;
+			}
+			headers.push(header);
+		    });
+		}
+		var headersResponse = {
+		    argument: {callback: cb, node: node, scope: scope},
+		    responseData: headers
+		};
+		this.handleResponse(headersResponse);
+		this.loading = false;
+	    }
+	});
     }
-
 });

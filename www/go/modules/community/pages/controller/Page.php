@@ -65,45 +65,48 @@ class Page extends EntityController {
 	return $p;
     }
 
-    public function getTree($siteId) {
-	$r = [];
-	$query = (new Query)->select()->from('pages_page')->where(['siteId' => $siteId['siteId']])->orderBy(['sortOrder' => 'ASC'])->all();
-	$currentPage;
+    public function getHeaders($params) {
+	//todo: error's afvangen
+	$r['items'] = [];
+	$pageSlug = $params['pageSlug'];
+	$query = (new Query)->select()->from('pages_page')->where(['slug' => $pageSlug])->single();
 	$currentHeader;
 	$doc = new \DOMDocument();
 	$counter = 1;
-	foreach ($query as $page) {
-	    $currentHeader = null;
-	    $currentPage = ['id' => $counter, 'name' => $page['pageName']];
-	    $counter++;
-	    $doc->loadHTML($page['content']);
-	    $xpath = new \DOMXPath($doc);
-	    $headers = $xpath->evaluate('//h1 | //h2');
+	$currentHeader = null;
+	$doc->loadHTML('<?xml encoding="utf-8" ?>' . $query['content'] , LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+	$xpath = new \DOMXPath($doc);
+	$headers = $xpath->evaluate('//h1 | //h2');
 
-	    foreach ($headers as $element) {
+	foreach ($headers as $element) {
 
-		if ($element->tagName == 'h1') {
-		    if (isset($currentHeader)) {
-			$currentPage['items'][] = $currentHeader;
-		    }
-		    $currentHeader = ['id' => $counter, 'name' => $element->nodeValue];
-		    $counter++;
+	    if ($element->tagName == 'h1') {
+		if (isset($currentHeader)) {
+		    $r['items'][] = $currentHeader;
+		}
+		$currentHeader = ['name' => $element->nodeValue, 'slug' => $this->parseSlug($element, $pageSlug), 'isPage' => false];
+		$counter++;
+	    } else {
+		if (isset($currentHeader)) {
+		    $currentHeader['items'][] = ['name' => $element->nodeValue, 'slug' => $this->parseSlug($element, $pageSlug), 'isPage' => false];
 		} else {
-		    if (isset($currentHeader)) {
-			$currentHeader['items'][] = ['id' => $counter, 'name' => $element->nodeValue];
-		    } else {
-			$currentPage['items'][] = ['id' => $counter, 'name' => $element->nodeValue];
-		    }
-		    $counter++;
-		};
+		    $r['items'][] = ['name' => $element->nodeValue, 'slug' => $this->parseSlug($element, $pageSlug), 'isPage' => false];
+		}
+		$counter++;
 	    };
-	    if (isset($currentHeader)) {
-		$currentPage['items'][] = $currentHeader;
-	    }
-	    $r[] = $currentPage;
 	};
-//	    \go\core\jmap\Response::get()->addResponse(json_encode($r));
+	if (isset($currentHeader)) {
+	    $r['items'][] = $currentHeader;
+	};
 	\go\core\jmap\Response::get()->addResponse($r);
+    }
+
+    private function parseSlug($element, $pageSlug) {
+	//Get the slug based on the header id and remove zero width spaces.
+	$slug = str_replace("\xE2\x80\x8B", "", $element->getAttribute('id'));
+	$slug = $pageSlug . '/' . $slug;
+	
+	return $slug;
     }
 
 }

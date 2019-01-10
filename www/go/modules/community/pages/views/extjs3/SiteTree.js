@@ -4,6 +4,7 @@ go.modules.community.pages.SiteTree = Ext.extend(Ext.tree.TreePanel, {
     border: true,
     root: {},
     rootVisible: false,
+    autoScroll: true,
 
     initComponent: function () {
 	go.modules.community.pages.SiteTree.superclass.initComponent.call(this);

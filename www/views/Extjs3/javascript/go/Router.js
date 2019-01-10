@@ -69,7 +69,7 @@ go.Router = {
 			requireAuthentication = true;
 		}
 		if(typeof position === "undefined") {
-			position = 1;
+			position = 0;
 		}
 		
 		this.routes.splice(position, 0, {re: re, handler: handler, requireAuthentication: requireAuthentication});

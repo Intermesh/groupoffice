@@ -51,7 +51,6 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 		    iconCls: 'ic-get-app',
 		    tooltip: t('Download'),
 		    handler: function (e, toolEl) {
-			//console.log("download pdf");
 			var a = ["test"];
 			this.downloadPDF();
 		    },
@@ -72,18 +71,19 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
     changePanel: function (panel) {
 	this.layout.setActiveItem(panel);
     },
-    downloadPDF: function (id = this.currentSiteId) {
-	this.reloadTree();
+    downloadPDF: function (id = 43) {
+	console.log(this.siteTree.getRootNode());
+	//this.reloadTree();
 	//temp used to generate the treepanel content at the click of a currently unused button.
-	var params = {siteId: id};
-	go.Jmap.request({
-	    method: "page/getTree",
-	    params: params,
-	    scope: this,
-	    callback: function (options, success, response) {
-		console.log(response);
-	    }
-	});
+//	var params = {pageId: id};
+//	go.Jmap.request({
+//	    method: "page/getHeaders",
+//	    params: params,
+//	    scope: this,
+//	    callback: function (options, success, response) {
+//		console.log(response);
+//	    }
+//	});
     },
     reloadTree: function () {
 	console.log('reloading');
@@ -104,34 +104,40 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
     },
 
     onChanges: function (entityStore, added, changed, destroyed) {
+//	console.log('added');
+//	console.log(added);
+//	console.log('changed');
+//	console.log(changed);
+//	console.log('destroyed');
+//	console.log(destroyed);
 	var me = this, reload = false, id;
 	//for each added
 	for (id in added) {
 
 	    if (!me.siteTree.getRootNode().findChild('id', id)) {
-
 		me.reloadTree();
 		return;
 	    }
 	}
 	//for each changed
-	for (id in changed) {
-	    nodeId = "page-" + id,
-		    node = me.siteTree.getNodeById(nodeId);
-	    if (node) {
-		node.attributes.data = changed[id];
-		if (changed[id].pageName) {
-		    node.setText(changed[id].pageName);
-		}
-		node.reload();
-	    }
-	}
+	//Currently not used since it also triggers on expanding a node, meaning the node would reload when first opened.
+	//The event 'pageChanged' is used in the mainpanel and PageDialog instead.
+//	for (id in changed) {
+//	    nodeId = me.siteTree.getLoader().entityStore.entity.name + "-" + id,
+//		    node = me.siteTree.getNodeById(nodeId);
+//	    if (node) {
+//		node.attributes.data = changed[id];
+//		if (changed[id].pageName) {
+//		    node.setText(changed[id].pageName);
+//		}
+//		//node.reload();
+//	    }
+//	}
 	//foreach destroyed
 	destroyed.forEach(function (id) {
-	    var node = me.siteTree.getNodeById("page-" + id);
+	    var node = me.siteTree.getNodeById(me.siteTree.getLoader().entityStore.entity.name+ "-" + id);
 	    if (node) {
 		node.destroy();
-		me.reloadTree();
 	    }
 	});
     }
