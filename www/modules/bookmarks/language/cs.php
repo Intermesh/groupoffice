@@ -21,4 +21,6 @@ return array (
   'description' => 'Popis',
   'Bookmarks' => 'Záložky',
   'Logo' => 'Logo',
+  'items' => 'položky',
+  'item' => 'položka',
 );

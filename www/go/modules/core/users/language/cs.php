@@ -132,4 +132,6 @@ Heslo: {password}',
   'Disk Quota' => 'Disková kvóta',
   'Space used' => 'Využité místo',
   'Desktop notifications active' => 'Upozornění na ploše',
+  'Working week' => 'Pracovní týden',
+  'Working hours' => 'Pracovní doba',
 );

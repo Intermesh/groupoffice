@@ -114,24 +114,18 @@ class SharedRootFolder extends \GO\Base\Db\ActiveRecord {
 				$shares[$folder->path] = $folder;
 			}
 			ksort($shares);
-			
-//			var_dump(array_keys($shares));
 
-			$lastPath = null;
-			
 			foreach ($shares as $path => $folder) {
 				
 				$isInHome = strpos($path . '/', $homeFolder . '/') === 0;
 				
-				if (!$isInHome && !$this->isParentShared($path, $lastPath, $folder)) {
+				if (!$isInHome && !$this->isParentShared($path, $folder, $shares)) {
 
 					$sharedRoot = new SharedRootFolder();
 					$sharedRoot->user_id = $user_id;
 					$sharedRoot->folder_id = $folder->id;
 					$sharedRoot->save();					
 				}
-				
-				$lastPath = $path;
 			}
 			
 			\GO::config()->save_setting('files_shared_cache_ctime',time(), $user_id);
@@ -143,32 +137,17 @@ class SharedRootFolder extends \GO\Base\Db\ActiveRecord {
 		}
 	}
 	
-	private function isParentShared($path, $lastPath, Folder $folder) {
-		
-//		echo "---\n";		
-//		var_dump($path);
-		
-		if(!isset($lastPath) || strpos($path . '/', $lastPath . '/') !== 0) {
-			return false;
-		}	
-		
-//		var_dump($lastPath);
-		
+	private function isParentShared($path, Folder $folder, $shares) {		
 		$parentPath = $path;
 		$parent = $folder;
 		while($parent = $parent->parent) {
 			
-//			var_dump($parentPath);
-//			flush();
-			
 			$parentPath = substr($parentPath, 0, strrpos($parentPath, '/'));
-			
-			if($parentPath == $lastPath) {
-				return true;
-			}
+
 			
 			if($parent->acl_id > 0) {
-				return false;
+				//if folder is shared but not in the current user's shared folder list return false.
+				return isset($shares[$parentPath]);
 			}
 		}
 		
