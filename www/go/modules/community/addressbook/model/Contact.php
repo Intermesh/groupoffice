@@ -294,6 +294,9 @@ class Contact extends AclItemEntity {
 	 * @return static
 	 */
 	public static function findForUser($userId) {
+		if(empty($userId)) {
+			return false;
+		}
 		return static::find()->where('goUserId', '=', $userId)->single();
 	}
 	
