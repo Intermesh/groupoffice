@@ -808,7 +808,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		
 		$this->_link($params, $message, $tags);
 
-		$response['unknown_recipients'] = $this->_findUnknownRecipients($params);
+		//$response['unknown_recipients'] = $this->_findUnknownRecipients($params);
 
 
 		return $response;
