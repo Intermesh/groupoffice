@@ -79,8 +79,9 @@ class ArrayObject extends \ArrayObject {
 	
 	private function equals($a, $b) {
 		if(is_array($a) && is_array($b)) {
-			$a = new static($a);
-			return empty($a->diff($b));
+			$aObj = new static($a);
+			$bObj = new static($b);
+			return empty($aObj->diff($b)) && empty($bObj->diff($a));
 		} else
 		{
 			return $a == $b;
