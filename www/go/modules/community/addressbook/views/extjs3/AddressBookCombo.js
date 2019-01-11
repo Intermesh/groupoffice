@@ -1,7 +1,7 @@
 /* global Ext, go, GO */
 
 go.modules.community.addressbook.AddresBookCombo = Ext.extend(go.form.ComboBox, {
-	fieldLabel: t("Addres Book"),
+	fieldLabel: t("Address book"),
 	hiddenName: 'addressBookId',
 	anchor: '100%',
 	emptyText: t("Please select..."),

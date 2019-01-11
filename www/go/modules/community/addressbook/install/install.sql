@@ -143,8 +143,7 @@ ALTER TABLE `addressbook_contact_group`
   ADD KEY `groupId` (`groupId`);
 
 ALTER TABLE `addressbook_contact_star`
-  ADD PRIMARY KEY (`contactId`,`userId`),
-  ADD KEY `userId` (`userId`);
+  ADD PRIMARY KEY (`contactId`,`userId`);
 
 ALTER TABLE `addressbook_date`
   ADD PRIMARY KEY (`id`),

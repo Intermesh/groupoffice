@@ -294,6 +294,9 @@ class Contact extends AclItemEntity {
 	 * @return static
 	 */
 	public static function findForUser($userId) {
+		if(empty($userId)) {
+			return false;
+		}
 		return static::find()->where('goUserId', '=', $userId)->single();
 	}
 	
@@ -378,7 +381,11 @@ class Contact extends AclItemEntity {
 			if(!isset($this->uri)) {
 				$this->uri = $this->uid . '.vcf';
 			}
-			return $this->internalSave();
+			return GO()->getDbConnection()
+							->update('addressbook_contact', 
+											['uid' => $this->uid, 'uri' => $this->uri], 
+											['id' => $this->id])
+							->execute();			
 		}		
 		
 		return true;

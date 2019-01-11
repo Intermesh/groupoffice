@@ -11,4 +11,6 @@ return array (
   'General' => 'Geral',
   'You don\'t have permission to delete all selected notes' => 'Você não tem permissão para apagar todas as Notas selecionadas',
   'Multiple note books selected' => 'Várias categorias selecionadas',
+  'Invalid password' => 'Senha inválida',
+  'Add test' => 'Adicionar teste',
 );

@@ -37,7 +37,9 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 							{
 								flex: 1,
 								layout: "form",
-								items: [			
+								items: [		
+								
+										
 									this.nameField = new Ext.form.TextField({
 										xtype: 'textfield',
 										name: 'name',
@@ -101,8 +103,8 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 								]
 							},
 							{
-								width: dp(152),
-								style: "padding: " + dp(16) + "px",
+								width: dp(152),								
+								style: "padding-left: " + dp(16) + "px",
 								layout: "form",
 								items: [
 									this.avatarComp = new go.form.FileField({
@@ -143,7 +145,12 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						},
 						name: "organizationIds",
 						fieldLabel: t("Organizations")
+					}),
+					
+					this.addressBook = new go.modules.community.addressbook.AddresBookCombo({
+						anchor: '-20'
 					})
+							
 
 					//new go.modules.community.addressbook.ContactBookCombo(),
 

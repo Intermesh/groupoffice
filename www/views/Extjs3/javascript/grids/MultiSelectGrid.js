@@ -4,7 +4,6 @@
 
 GO.grid.MultiSelectGrid = function (config){
 	config = config || {};
-	console.log(config);
 
 	this.checkColumn = new GO.grid.CheckColumn({
 		header: '&nbsp;',

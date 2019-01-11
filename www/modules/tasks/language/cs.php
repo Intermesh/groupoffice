@@ -85,4 +85,6 @@ return array (
   'name' => 'Úkoly',
   'description' => 'Můžete zaznamenávat důležité akce.',
   'Tasks' => 'Úkoly',
+  'Remove duplicates' => 'Smazat duplicity',
+  'Contact' => 'Kontakt',
 );

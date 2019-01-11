@@ -2,7 +2,7 @@
 
 go.Modules.register("community", "addressbook", {
 	mainPanel: "go.modules.community.addressbook.MainPanel",
-	title: t("Addressbook"),
+	title: t("Address book"),
 	entities: ["Contact", "AddressBook", "AddressBookGroup"],
 	links: [{
 			/**

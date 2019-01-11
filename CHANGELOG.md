@@ -1,3 +1,8 @@
+- Core: Removed robots noindex header because they don't have any effect because
+				robots.txt is used.
+- Core: Updated Brazilian Portugese and Czech language
+- Core: Fixed display of short date when choosing date further away than a week.
+- Core: Fixed clicking to dismiss notifier messages
 - Core: Moved search field from pagination bar to the top toolbar in Multiselect grids
 - Core: Added a display name colum to the permissions add dialog. This will make it easier to search for the correct user to add.
 - Core: Use Apcu caching if available.

@@ -12,4 +12,6 @@ return array (
   'name' => 'Comentários',
   'description' => 'Adiciona a funcionalidade de comentários para outros módulos',
   'Comments' => 'Comentários',
+  '{author} wrote at {date}' => '{author} escreveu em {date}',
+  'Action date' => 'Data de ação',
 );
