@@ -422,6 +422,11 @@ abstract class Property extends Model {
 	private static function buildSelect(Query $query, array $fetchProperties) {
 
 		foreach (self::getMapping()->getTables() as $table) {
+			
+			if($table->isUserTable && !GO()->getUserId()) {
+				continue;
+			}
+			
 			foreach($table->getMappedColumns() as $column) {		
 				if($column->primary || in_array($column->name, $fetchProperties)) {
 					$query->select($table->getAlias() . "." . $column->name, true);				
@@ -474,7 +479,9 @@ abstract class Property extends Model {
 
 		if($joinedTable->isUserTable) {
 			if(!GO()->getUserId()) {
-				throw new \Exception("Can't join user table when not authenticated");
+				//throw new \Exception("Can't join user table when not authenticated");
+				GO()->debug("Can't join user table when not authenticated");
+				return;
 			}
 			$on .= " AND " . $joinedTable->getAlias() . ".userId = " . GO()->getUserId();
 		}
