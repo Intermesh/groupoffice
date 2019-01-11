@@ -38,6 +38,7 @@ modules/email/Portlet.js
 modules/email/CopyMailToDialog.js
 modules/email/RecipientCombo.js
 modules/email/views/Extjs3/LabelDialog.js
+modules/email/views/Extjs3/TemplateGridPanel.js
 modules/email/views/Extjs3/TemplateSelectionDialog.js
 
 modules/email/EmailTemplateDialog.js
