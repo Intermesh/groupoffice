@@ -206,62 +206,50 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			
 //			console.log("Get updates for state: " + state);
 		
-			if(state) {
-				var clientCallId = go.Jmap.request({
-					method: this.entity.name + "/getUpdates",
-					params: {
-						sinceState: this.state
-					},
-					callback: function(options, success, response) {
-						if(success) {
-							this.setState(response.newState, function(){
-								if(response.hasMoreUpdates) {
-									this.getUpdates(cb, scope);
-								} else
-								{
-									if(cb) {
-										cb.call(scope || this, this);
-									}
-								}
-							}, this);
-							
-						} else
-						{					
-							this.clearState();
-						}
-
-					},
-					scope: this
-				});
-
-				go.Jmap.request({
-					method: this.entity.name + "/get",
-					params: {
-						"#ids": {
-							resultOf: clientCallId,
-							path: '/changed'
-						}
-					},
-					callback: function(options, success, response) {					
-						
-					},
-					scope: this
-				});
-			} else
-			{
-				go.Jmap.request({
-					method: this.entity.name + "/get",
-					callback: function (options, success, response) {
-
-						this.setState(response.state);
-
-						if(cb) {
-							cb.call(scope || this, this);
-						}
-					},
-					scope: this
-				});
+			if(!state) {
+				return;
 			}
+			
+			var clientCallId = go.Jmap.request({
+				method: this.entity.name + "/getUpdates",
+				params: {
+					sinceState: this.state
+				},
+				callback: function(options, success, response) {
+					if(success) {
+						this.setState(response.newState, function(){
+							if(response.hasMoreUpdates) {
+								this.getUpdates(cb, scope);
+							} else
+							{
+								if(cb) {
+									cb.call(scope || this, this);
+								}
+							}
+						}, this);
+
+					} else
+					{					
+						this.clearState();
+					}
+
+				},
+				scope: this
+			});
+
+			go.Jmap.request({
+				method: this.entity.name + "/get",
+				params: {
+					"#ids": {
+						resultOf: clientCallId,
+						path: '/changed'
+					}
+				},
+				callback: function(options, success, response) {					
+
+				},
+				scope: this
+			});
 		});
 
 	},
