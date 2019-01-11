@@ -218,9 +218,7 @@ class Acl extends \go\core\jmap\Entity {
 							->groupBy(['g.aclId']);
 
 			self::$permissionLevelCache[$cacheKey] = (int) $query->execute()->fetch();
-		}
-		
-		App::get()->debug("Permission level ($cacheKey) = " . self::$permissionLevelCache[$cacheKey]);
+		}	
 		
 		return self::$permissionLevelCache[$cacheKey];
 	}
