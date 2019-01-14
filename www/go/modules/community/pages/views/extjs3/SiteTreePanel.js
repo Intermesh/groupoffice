@@ -5,6 +5,7 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
     currentSiteId: '',
     split: true,
     autoScroll: true,
+    //toggleFunction:null,
     initComponent: function () {
 	this.items = [
 	    this.siteTree = new go.modules.community.pages.SiteTree({
@@ -26,6 +27,7 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 		b.setVisible(false);
 		this.saveButton.setVisible(true);
 		this.siteTreeEdit.store.load();
+		//this.toggleFunction(false, true);
 		this.changePanel(this.siteTreeEdit.getId());
 	    },
 	    scope: this
@@ -37,6 +39,7 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 	    handler: function (b, e) {
 		b.setVisible(false);
 		this.reorderButton.setVisible(true);
+		//this.toggleFunction(true, true);
 		this.changePanel(this.siteTree.getId());
 	    },
 	    scope: this
@@ -120,25 +123,28 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 	    }
 	}
 	//for each changed
-	//Currently not used since it also triggers on expanding a node, meaning the node would reload when first opened.
-	//The event 'pageChanged' is used in the mainpanel and PageDialog instead.
-//	for (id in changed) {
-//	    nodeId = me.siteTree.getLoader().entityStore.entity.name + "-" + id,
-//		    node = me.siteTree.getNodeById(nodeId);
-//	    if (node) {
-//		node.attributes.data = changed[id];
-//		if (changed[id].pageName) {
-//		    node.setText(changed[id].pageName);
-//		}
-//		//node.reload();
-//	    }
-//	}
+	//Currently only used to update the node name and not to reload the node itself.
+	//The event 'pageChanged' is used in the mainpanel and PageDialog to reload the node.
+	//This is because changed also triggers when first expanding the node.
+	for (id in changed) {
+	    nodeId = 'page' + "-" + id,
+		    node = me.siteTree.getNodeById(nodeId);
+	    if (node) {
+		node.attributes.data = changed[id];
+		if (changed[id].pageName) {
+		    node.setText(changed[id].pageName);
+		}
+	    }
+	}
 	//foreach destroyed
 	destroyed.forEach(function (id) {
-	    var node = me.siteTree.getNodeById(me.siteTree.getLoader().entityStore.entity.name+ "-" + id);
+	    var node = me.siteTree.getNodeById("page-" + id);
 	    if (node) {
 		node.destroy();
+		me.reloadTree();
 	    }
 	});
-    }
-})
+    },
+    
+
+});

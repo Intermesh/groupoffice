@@ -16,6 +16,7 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 	this.treeArea = new go.modules.community.pages.SiteTreePanel({
 	    region: "west",
 	    width: dp(250),
+	    //toggleFunction: this.disableButtons
 	});
 
 	this.items = [
@@ -68,9 +69,13 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 	//navigate to a different page when selecting a node.
 	this.treeArea.getSelectionModel().on('selectionchange', function (sm, node) {
 	    if (node) {
+		if(!node.isExpanded()){
+		node.parentNode.collapseChildNodes(true);
 		node.expand();
+		}
 		go.Router.goto(this.siteSlug + '\/view\/' + node.attributes.entitySlug)
 	    }
+	    
 	}, this);
 	go.modules.community.pages.MainPanel.superclass.initComponent.call(this);
 
@@ -82,7 +87,7 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 	    newPage: true
 	});
 	dlg.show();
-	
+
     },
 
     editPage: function (id) {
@@ -90,32 +95,34 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 	    siteId: this.siteId,
 	    newPage: false
 	});
-	dlg.on('pageChanged', function (pageId, scope){
+	dlg.on('pageChanged', function (pageId, scope) {
 	    tree = this.treeArea.siteTree;
-	    tree.getNodeById(tree.getLoader().entityStore.entity.name+"-"+pageId).reload();
+	    tree.getNodeById("page-" + pageId).reload();
 	}, this, {single: true});
 	dlg.load(id).show();
     },
 
     //sets the site id for all relevant panels
     setSiteId: function (siteId) {
-	console.log('set site id to: ' + siteId)
+	//console.log('set site id to: ' + siteId)
 	this.siteId = siteId;
 	this.treeArea.setSiteId(siteId);
     },
 
     //updates the page id for all relevant panels
     navigateToPage: function (pageId, pageSlug) {
-	console.log('set page id to: ' + pageId)
+	//console.log('set page id to: ' + pageId)
 	this.pageId = pageId;
 	this.pageSlug = pageSlug;
-	if(pageId){
+	if (pageId) {
 	    this.content.currentPage = this.pageId;
 	    //acl check here
 	    this.disableButtons(false, false);
 	    //else
 	    //this.disableButtons(true,true);
-	}else{
+	    
+		this.treeArea.siteTree.expandPath();
+	} else {
 	    this.content.showEmptyPage();
 	    //acl check here
 	    this.disableButtons(true, false);
@@ -125,9 +132,8 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
     disableButtons: function (bool, disableAddBtn) {
 	this.getTopToolbar().getComponent('tbarDelBtn').setDisabled(bool)
 	this.getTopToolbar().getComponent('tbarEditBtn').setDisabled(bool)
-	if(disableAddBtn){
+	if (disableAddBtn) {
 	    this.getTopToolbar().getComponent('tbarAddBtn').setDisabled(bool)
 	}
     }
-
 });

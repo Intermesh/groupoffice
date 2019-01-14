@@ -39,7 +39,7 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(go.tree.EntityLoader, {
 
     convertEntityToNode: function (entityData) {
 	return {
-	    id: this.entityStore.entity.name + "-" + entityData.id,
+	    id: "page-" + entityData.id,
 	    entityId: entityData.id || null,
 	    data: entityData,
 	    entity: this.entityStore.entity,
@@ -76,6 +76,7 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(go.tree.EntityLoader, {
 			if (entity.items && entity.items.length > 0) {
 			    entity.items.forEach(function (subEntity) {
 				subHeaders.push({
+				    id: 'header-'+ subEntity.slug,
 				    text: subEntity.name,
 				    entitySlug: subEntity.slug,
 				    nodeType: 'groupoffice',
@@ -85,6 +86,7 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(go.tree.EntityLoader, {
 			    });
 			}
 			header = {
+			    id: 'header-'+ entity.slug,
 			    text: entity.name,
 			    entitySlug: entity.slug,
 			    nodeType: 'groupoffice',
@@ -96,6 +98,8 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(go.tree.EntityLoader, {
 			}
 			headers.push(header);
 		    });
+		}else{
+		    console.warn("Failed to load header treenodes.")
 		}
 		var headersResponse = {
 		    argument: {callback: cb, node: node, scope: scope},

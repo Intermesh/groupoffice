@@ -50,7 +50,7 @@ go.modules.community.pages.SystemSettingsSitesGrid = Ext.extend(go.grid.GridPane
 		},
 		{
 		    id: 'creator',
-		    header: t('created by'),
+		    header: t('Created by'),
 		    width: dp(160),
 		    sortable: true,
 		    dataIndex: 'creator',
@@ -70,7 +70,7 @@ go.modules.community.pages.SystemSettingsSitesGrid = Ext.extend(go.grid.GridPane
 		},
 		{
 		    id: 'modifier',
-		    header: t('last modified by'),
+		    header: t('Last modified by'),
 		    width: dp(160),
 		    sortable: true,
 		    dataIndex: 'modifier',
@@ -81,7 +81,7 @@ go.modules.community.pages.SystemSettingsSitesGrid = Ext.extend(go.grid.GridPane
 		}, {
 		    xtype: "datecolumn",
 		    id: 'modifiedAt',
-		    header: t('last modified at'),
+		    header: t('Last modified at'),
 		    width: dp(120),
 		    sortable: true,
 		    dataIndex: 'modifiedAt',
@@ -162,15 +162,15 @@ go.modules.community.pages.SystemSettingsSitesGrid = Ext.extend(go.grid.GridPane
 			},
 			scope: this
 		    },
-		    {
-			itemId: "openFold",
-			iconCls: 'ic-folder',
-			text: t("Open Folder"),
-			handler: function () {
-			    console.log("Open folder");
-			},
-			scope: this
-		    },
+//		    {
+//			itemId: "openFold",
+//			iconCls: 'ic-folder',
+//			text: t("Open Folder"),
+//			handler: function () {
+//			    console.log("Open folder");
+//			},
+//			scope: this
+//		    },
 		    "-"
 			    , {
 				itemId: "delete",

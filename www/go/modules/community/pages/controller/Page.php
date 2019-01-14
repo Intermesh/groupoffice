@@ -66,11 +66,19 @@ class Page extends EntityController {
     }
 
     public function getHeaders($params) {
-	//todo: error's afvangen
-	$r['items'] = [];
+	$r = [	    
+	    'accountId' => [],
+	    'state' => $this->getState(),
+	    'items' => [],
+	    'notFound' => []
+	];
 	$pageSlug = $params['pageSlug'];
 	$query = (new Query)->select()->from('pages_page')->where(['slug' => $pageSlug])->single();
-	$currentHeader;
+	if(!$query){
+	    $r['notFound'] = $params['pageSlug'];
+	    \go\core\jmap\Response::get()->addResponse($r);
+	    return;
+	}
 	$doc = new \DOMDocument();
 	$counter = 1;
 	$currentHeader = null;

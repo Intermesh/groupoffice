@@ -29,7 +29,7 @@ class Site extends AclOwnerEntity {
      * 
      * @var int
      */
-    public $fileFolderId;
+    public $fileFolderId = null;
 
     /**
      * 
@@ -100,7 +100,7 @@ class Site extends AclOwnerEntity {
     //Removes dangerous url characters, replaces spaces with _ and limits the amount of characters.
     //default character limit is 100, max character limit for most slugs in the database is 190.
     protected function slugify($input, $charLimit = 100) {
-	return strtolower(preg_replace('/[ ]/', '_', mb_substr(preg_replace('/[\'\"\&\#\(\)\[\]\{\}\$\+\,\.\/\\\:\;\=\?\@\^\<\>\!\*\|\%]/', '', $input), 0, $charLimit)));
+	return strtolower(preg_replace('/[ ]/', '_', mb_substr(preg_replace('/[\'\"\&\#\(\)\[\]\{\}\$\+\,\.\/\\\:\;\=\?\@\^\<\>\!\*\|\%]/', '_', $input), 0, $charLimit)));
     }
 
 }

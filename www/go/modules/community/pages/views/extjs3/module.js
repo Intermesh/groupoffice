@@ -6,6 +6,7 @@ go.Modules.register("community", "pages", {
     ],
     loaded: false,
     initModule: function () {
+	this.entityStore = go.Stores.get("Site");
 	//gets a list with all sites
 	go.Jmap.request({
 	    method: "Site/get",
@@ -46,7 +47,7 @@ generateRoute = function (site) {
 	    },
 	    callback: function (options, success, result) {
 		var pageSlug = false;
-		if(result['list'][0] && result['list'][0]['slug']){
+		if (result['list'][0] && result['list'][0]['slug']) {
 		    pageSlug = result['list'][0]['slug'];
 		}
 		if (!pageSlug || !success) {
@@ -70,9 +71,10 @@ go.Router.add(/(.*)\/view\/(.*)/, function (siteSlug, pageHeaderSlug) {
     pageSlug = slugs[0];
     headerSlug = slugs[1];
     panel = GO.mainLayout.getModulePanel(siteSlug);
-    
+
     //Checks if the site is already initialized;
     if (panel.siteSlug !== siteSlug) {
+	console.log('loading site')
 	go.Jmap.request({
 	    method: "Site/get",
 	    params: {
@@ -85,13 +87,16 @@ go.Router.add(/(.*)\/view\/(.*)/, function (siteSlug, pageHeaderSlug) {
 		    panel.siteSlug = siteSlug;
 		    //sets up the eventlistener needed to properly jump to headers.
 		    panel.content.on('contentLoaded', function () {
+
 			//gets the current header, passing the earlier headerSlug wont update itself.
-			headerSlug = go.Router.getPath().split('/').pop();
-			header = document.getElementById(headerSlug);
-			if (header) {
-			    header.scrollIntoView();
+			headerSlug = go.Router.getPath().split('/')[3];
+			if (headerSlug) {
+			    header = document.getElementById(headerSlug);
+			    if (header) {
+				header.scrollIntoView();
+			    }
 			}
-		    },this);
+		    }, this);
 		    openPage(pageSlug, panel);
 		} else {
 		    go.Router.goto('summary');
@@ -100,14 +105,16 @@ go.Router.add(/(.*)\/view\/(.*)/, function (siteSlug, pageHeaderSlug) {
 	    },
 	    scope: this
 	});
-	
-    //Check to see if the page has already been set.
+
+	//Check to see if the page has already been set.
     } else if (panel.pageSlug !== pageSlug) {
+	console.log('loading page')
 	GO.mainLayout.openModule(siteSlug);
 	openPage(pageSlug, panel);
-	
-    //if the site and page are already open jump to the header if there is one in the url.
+
+	//if the site and page are already open jump to the header if there is one in the url.
     } else if (headerSlug) {
+	console.log('jump to header')
 	GO.mainLayout.openModule(siteSlug);
 	header = document.getElementById(headerSlug);
 	if (header) {

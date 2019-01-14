@@ -3,6 +3,7 @@ go.modules.community.pages.SiteTreeEdit = Ext.extend(go.grid.GridPanel, {
     hideHeaders: true,
     enableDragDrop: true,
     ddText: '',
+    title: t('Reorder'),
     sm: new Ext.grid.RowSelectionModel({singleSelect: true}),
     initComponent: function () {
 	this.store = new go.data.Store({
@@ -56,7 +57,6 @@ go.modules.community.pages.SiteTreeEdit = Ext.extend(go.grid.GridPanel, {
 	    stateId: 'page-grid'
 	});
 	this.on('render', function () {
-	    this.store.load();
 	    this.store.entityStore.on("changes", function () {
 		this.store.baseParams = {filter: {'siteId': this.siteId}};
 		this.store.reload;

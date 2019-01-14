@@ -8,23 +8,24 @@ go.modules.community.pages.SitePropertyDialog = Ext.extend(go.form.Dialog, {
 		    {
 			xtype: 'textfield',
 			name: 'siteName',
-			fieldLabel: t("site name"),
+			fieldLabel: t("Site Name"),
 			anchor: '100%',
 			allowBlank: false
-		    }, {
-			xtype: 'combo',
-			name: 'documentFormat',
-			fieldLabel: t("document format"),
-			anchor: '100%',
-			allowBlank: false,
-			triggerAction: 'all',
-			hiddenName: 'documentFormat',
-			emptyText: t("Please select..."),
-			editable: true,
-			selectOnFocus: true,
-			forceSelection: true,
-			store: [['html', 'html'], ['mark', 'markdown']],
-		    },
+		    }, 
+//		    {
+//			xtype: 'combo',
+//			name: 'documentFormat',
+//			fieldLabel: t("document format"),
+//			anchor: '100%',
+//			allowBlank: false,
+//			triggerAction: 'all',
+//			hiddenName: 'documentFormat',
+//			emptyText: t("Please select..."),
+//			editable: true,
+//			selectOnFocus: true,
+//			forceSelection: true,
+//			store: [['html', 'html'], ['mark', 'markdown']],
+//		    },
 		]
 	    }
 	];
