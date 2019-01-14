@@ -67,12 +67,13 @@ GO.moduleManager.onModuleReady('email',function(){
 							scope:this
 						})]
 				},
-				{
-					xtype:'checkbox',
+				this.alwaysSignCheckbox = new Ext.ux.form.XCheckbox({
+					//xtype:'checkbox',
 					hideLabel:true,
+					disabled:true,
 					boxLabel:GO.smime.lang.alwaysSign,
 					name:'always_sign'
-				}
+				})
 				]
 			});
 							
@@ -81,9 +82,11 @@ GO.moduleManager.onModuleReady('email',function(){
 								
 			this.on('show', function(){
 				this.smimePanel.setDisabled(true);
+				this.deleteCert.setValue(false);
 			}, this);
 								
-			this.propertiesPanel.form.on("actioncomplete", function(form, action){													
+			this.propertiesPanel.form.on("actioncomplete", function(form, action){
+				console.log(action.result);
 				if(action.type=='submit'){
 					this.uploadFile.clearQueue();
 					
@@ -91,15 +94,17 @@ GO.moduleManager.onModuleReady('email',function(){
 					// Need to create the upload inputfield again. 
 					// Because otherwise the upload button doesn't work anymore when opening the dialog the 2nd time.
 					this.uploadFile.createUploadInput(); 
-					
+					this.alwaysSignCheckbox.setDisabled(!action.result.cert);
 					this.deleteCert.setDisabled(!action.result.cert);
 					this.downloadButton.setDisabled(!action.result.cert);
-				}else
-				{
+				} else {
 					this.smimePanel.setDisabled(false);
+					this.alwaysSignCheckbox.setDisabled(!action.result.data.cert);
 					this.deleteCert.setDisabled(!action.result.data.cert);
 					this.downloadButton.setDisabled(!action.result.data.cert);
-					
+					if(!action.result.data.always_sign) {
+						this.alwaysSignCheckbox.setValue(false);
+					}
 					if(!action.result.data.cert)
 						Ext.getCmp('smimeHasCert').hide();
 					else
