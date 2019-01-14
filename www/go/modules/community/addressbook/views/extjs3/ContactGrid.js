@@ -39,7 +39,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					draggable: false,
 					hideable: false,
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
-						if(rowIndex === 0 && value) {							
+						if(rowIndex === 0 && value) {
 							return '<div class="icon ic-star go-addressbook-star"></div>';
 						} else
 						{
@@ -48,9 +48,9 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 							}
 							
 							var lastRecord = rowIndex > 0 ? grid.store.getAt(rowIndex - 1) : false;
-							var char = record.data.name.substr(0, 1);
-							if(!lastRecord || lastRecord.data.name.substr(0, 1) !== char) {
-								return "<h3>" + char.toUpperCase() + "</h3>";
+							var char = record.data.name.substr(0, 1).toUpperCase();
+							if(!lastRecord || lastRecord.data.name.substr(0, 1).toUpperCase() !== char) {
+								return "<h3>" + char + "</h3>";
 							}
 						}
 						
