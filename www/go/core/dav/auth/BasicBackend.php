@@ -17,13 +17,16 @@ namespace go\core\dav\auth;
 
 use GO;
 use go\core\auth\TemporaryState;
+use go\modules\core\modules\model\Module;
 use go\modules\core\users\model\User;
 use Sabre\DAV\Auth\Backend\AbstractBasic;
+use Sabre\DAV\Exception\Forbidden;
 
 class BasicBackend extends AbstractBasic {
 	
 	private $user;
-	public $checkModuleAccess='dav';
+	private $checkModulePermission = 'dav';
+	private $checkModulePackage = 'legacy';
 	
 	public function __construct() {
 		$this->setRealm("Group-Office");
@@ -41,11 +44,21 @@ class BasicBackend extends AbstractBasic {
 			return false;
 		}
 		
+		if(!Module::isAvailableFor($this->checkModulePackage, $this->checkModulePermission, $user->id)) {
+			throw new Forbidden("Module " .$this->checkModulePackage . '/' . $this->checkModulePermission . " not available");
+		}
+		
 		$state = new TemporaryState();
 		$state->setUserId($user->id);		
 		GO()->setAuthState($state);
 
 		$this->user = $user;		
+
 		return true;
+	}
+	
+	public function checkModulePermission($package, $module) {
+		$this->checkModulePermission = $module;
+		$this->checkModulePackage = $package;
 	}
 }
