@@ -75,10 +75,15 @@ class Module extends Observable {
 	 * @return String 
 	 */
 	public function localizedName() {
-		$name = \GO::t('name', $this->name());
-		if($name=='name')
-			$name = $this->name();
-		return $name;
+		
+		$pkg = 'legacy';
+		$name = $this->name();
+		
+		if(!GO()->getLanguage()->translationExists("name", $pkg, $name)) {
+			return $name;
+		}
+		
+		return GO()->t("name", $pkg, $name);	
 	}
 	
 	/**
@@ -119,7 +124,14 @@ class Module extends Observable {
 	 * @return String 
 	 */
 	public function description() {
-		return \GO::t('description', $this->name());
+		$pkg = 'legacy';
+		$name = $this->name();
+		
+		if(!GO()->getLanguage()->translationExists("description", $pkg, $name)) {
+			return "No description";
+		}
+		
+		return GO()->t("description", $pkg, $name);	
 	}
 	
 	/**

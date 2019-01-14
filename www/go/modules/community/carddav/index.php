@@ -46,6 +46,13 @@ $server->on('exception', function($e){
 	GO()->debug((string) $e);
 });
 
+//$server->on("auth", function() {
+//	if(!\go\modules\core\modules\model\Module::isAvailableFor("community", 'carddav')) {
+//		http_response_code(403);
+//		exit("Module CardDAV not available");
+//	}
+//});
+
 /* Server Plugins */
 $server->addPlugin(new AuthPlugin($authBackend));
 $server->addPlugin(new CardDAVPlugin());

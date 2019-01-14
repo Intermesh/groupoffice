@@ -155,6 +155,11 @@ class ClassFinder {
 			if ($file->getExtension() == 'php') {
 
 				$name = $file->getNameWithoutExtension();
+				$firstChar = substr($name, 0, 1);
+				if($firstChar !== strtoupper($firstChar)) {
+					//skip filenames that start with a lower case char
+					continue;
+				}
 
 				$className = $namespace . '\\'. $name;
 

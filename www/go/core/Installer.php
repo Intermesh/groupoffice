@@ -171,7 +171,7 @@ class Installer {
 			'type' => \GO\Base\Model\Template::TYPE_EMAIL,
 			'user_id' => 1
 		));
-		$template->save();
+		$template->save(true);
 		$template->acl->addGroup(\GO::config()->group_internal);
 	}
 
