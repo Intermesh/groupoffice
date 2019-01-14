@@ -329,7 +329,7 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 				
 				trigger_error("CronJob ".$this->name." failed. EXCEPTION: ".(string) $e, E_USER_WARNING);
 				
-				$this->error=(string)$e;
+				$this->error = date('c') . ": " .(string)$e;
 			}
 			
 			$this->_finishRun($failed);
