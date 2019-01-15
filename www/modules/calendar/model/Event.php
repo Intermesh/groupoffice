@@ -1436,22 +1436,28 @@ class Event extends \GO\Base\Db\ActiveRecord {
 
 		//$html .= '<tr><td colspan="2">&nbsp;</td></tr>';
 
-		$cfRecord = $this->getCustomfieldsRecord();
-		if (!empty($cfRecord)) {
-			$columns = $cfRecord->getColumns();
-			foreach ($columns as $column) {
-				if (isset($column['customfield'])) {
-					$colId = $column['customfield']->databaseName;
-					$recordAttributes = $cfRecord->getAttributes();
-					if (!empty($recordAttributes[$colId])) {
-						$colValue = $cfRecord->getAttribute($column['customfield']->name);
-						$html .= '<tr><td style="vertical-align:top">'.($column['customfield']->name).'</td>'.
-										'<td>'.$recordAttributes[$colId].'</td></tr>';
-					}
-				}
-			}
-		}
+		$cfRecord = $this->getCustomFields();
 		
+		if (!empty($cfRecord)) {
+		$fieldsets = \go\modules\core\customfields\model\FieldSet::find()->filter(['entities' => ['Event']]);
+		
+			foreach($fieldsets as $fieldset) {
+				$html .= '<tr><td colspan="2"><b>'.($fieldset->name).'</td></tr>';
+
+				$fields = \go\modules\core\customfields\model\Field::find()->where(['fieldSetId' => $fieldset->id]);
+				
+				foreach($fields as $field) {
+					
+					if(empty($cfRecord[$field->databaseName])) {
+						continue;
+					}
+					
+					$html .= '<tr><td style="vertical-align:top">'.($field->name).'</td>'.
+										'<td>'.$cfRecord[$field->databaseName].'</td></tr>';
+				}				
+			}
+		}		
+	
 		$html .= '</table>';
 		
 		$stmt = $this->participants();

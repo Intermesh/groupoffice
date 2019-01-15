@@ -2150,7 +2150,8 @@ go.Modules.register("legacy", 'calendar', {
 				return new GO.calendar.EventPanel();
 			}	
 	}],
-	userSettingsPanels: ["GO.calendar.SettingsPanel"]
+	userSettingsPanels: ["GO.calendar.SettingsPanel"],
+	systemSettingsPanels: ["GO.calendar.SystemSettingsPanel"]
 	
 });
 

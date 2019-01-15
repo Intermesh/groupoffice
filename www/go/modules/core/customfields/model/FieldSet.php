@@ -5,6 +5,14 @@ namespace go\modules\core\customfields\model;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\orm\Query;
 
+/**
+ * FieldSet entity
+ * 
+ * Find for entity type
+ * ```
+ * $fieldsets = \go\modules\core\customfields\model\FieldSet::find()->filter(['entities' => ['Event']]);
+ * ```
+ */
 class FieldSet extends AclOwnerEntity {
 /**
 	 * The ID
@@ -47,15 +55,6 @@ class FieldSet extends AclOwnerEntity {
 		$this->entity = $name;
 		$e = \go\core\orm\EntityType::findByName($name);
 		$this->entityId = $e->getId();
-	}
-	
-	public static function filter(Query $query, array $filter) {
-		
-		if(!isset($filter['entities'])) {
-			$entities = \go\core\orm\EntityType::findAll();			
-			$filter['entities'] = array_filter($entities, function($e) {return $e->getName();});
-		} 
-		return parent::filter($query, $filter);
 	}
 	
 	protected static function defineFilters() {
