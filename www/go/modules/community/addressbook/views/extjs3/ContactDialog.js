@@ -6,6 +6,9 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 	entityStore: "Contact",
 	width: 600,
 	height: 600,
+	defaults: {
+		labelWidth: dp(140)
+	},
 	
 	initComponent: function() {
 		
@@ -265,6 +268,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						itemCfg: {
 							xtype: "panel",
 							layout: "form",
+							labelWidth: dp(140),
 							items: [{
 									anchor: "100%",
 									fieldLabel: t("Type"),
@@ -393,7 +397,42 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 								}]
 						}
 					}]
-			}
+			}, 
+			this.businessFieldSet = new Ext.form.FieldSet({
+				xtype: "fieldset",
+				title: t("Business"),
+				defaults: {
+					anchor: "-20",
+				},
+				items: [
+					{
+						xtype: "textfield",
+						name: "iban",
+						fieldLabel: t("IBAN")
+					},
+					{
+						xtype: "textfield",
+						name: "registrationNumber",
+						fieldLabel: t("Registration number")
+					},
+					{
+						xtype: "textfield",
+						name: "debtorNumber",
+						fieldLabel: t("Customer number")
+					},
+					{
+						xtype: "xcheckbox",
+						name: "vatReverseCharge",
+						hideLabel: true,
+						boxLabel: t("Reverse charge VAT")
+					},
+					{
+						xtype: "textfield",
+						name: "vatNo",
+						fieldLabel: t("VAT number")
+					}
+				]
+			})
 		].concat(go.modules.core.customfields.CustomFields.getFormFieldSets("Contact"));
 
 		return items;	
@@ -404,6 +443,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 		this.nameField.setVisible(isOrganization);
 		this.organizationsField.setVisible(!isOrganization);		
 		this.genderField.setVisible(!isOrganization);
+		this.businessFieldSet.setVisible(isOrganization);
 	},
 
 	buildFullName: function () {
