@@ -114,49 +114,49 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		return $attributes;
 	}
 	
-	private function getCompanyAttributes(\go\modules\community\addressbook\model\Contact $company){
-		$attributes['company:salutation'] = GO()->t("Dear sir/madam");
+	private function getCompanyAttributes(\go\modules\community\addressbook\model\Contact $company, $tagPrefix = 'company:'){
+		$attributes[$tagPrefix . 'salutation'] = GO()->t("Dear sir/madam");
 		
-		$attributes['company:crn'] = $company->registrationNumber;
-		$attributes['company:vat_no'] = $company->vatNo;
-		$attributes['company:iban'] = $company->IBAN;
-		$attributes['company:homepage'] = $company->findUrlByType(\go\modules\community\addressbook\model\Url::TYPE_HOMEPAGE, false)->url ?? "";
+		$attributes[$tagPrefix . 'crn'] = $company->registrationNumber;
+		$attributes[$tagPrefix . 'vat_no'] = $company->vatNo;
+		$attributes[$tagPrefix . 'iban'] = $company->IBAN;
+		$attributes[$tagPrefix . 'homepage'] = $company->findUrlByType(\go\modules\community\addressbook\model\Url::TYPE_HOMEPAGE, false)->url ?? "";
 		
 		
 			$a = $company->findAddressByType(\go\modules\community\addressbook\model\Address::TYPE_VISIT, true);
 			if($a) {				
-				$attributes['company:address'] = $a->street;
-				$attributes['company:address_no'] = $a->street2;
-				$attributes['company:zip'] = $a->zipCode;
-				$attributes['company:country'] = $a->country;
-				$attributes['company:state'] = $a->state;
+				$attributes[$tagPrefix . 'address'] = $a->street;
+				$attributes[$tagPrefix . 'address_no'] = $a->street2;
+				$attributes[$tagPrefix . 'zip'] = $a->zipCode;
+				$attributes[$tagPrefix . 'country'] = $a->country;
+				$attributes[$tagPrefix . 'state'] = $a->state;
 				
-				$attributes['company:formatted_address'] = $a->getFormatted();
+				$attributes[$tagPrefix . 'formatted_address'] = $a->getFormatted();
 			}
 			
 			$a = $company->findAddressByType(\go\modules\community\addressbook\model\Address::TYPE_VISIT, true);
 			if($a) {				
-				$attributes['company:post_address'] = $a->street;
-				$attributes['company:post_address_no'] = $a->street2;
-				$attributes['company:post_zip'] = $a->zipCode;
-				$attributes['company:post_country'] = $a->country;
-				$attributes['company:post_state'] = $a->state;
+				$attributes[$tagPrefix . 'post_address'] = $a->street;
+				$attributes[$tagPrefix . 'post_address_no'] = $a->street2;
+				$attributes[$tagPrefix . 'post_zip'] = $a->zipCode;
+				$attributes[$tagPrefix . 'post_country'] = $a->country;
+				$attributes[$tagPrefix . 'post_state'] = $a->state;
 				
-				$attributes['company:formatted_post_address'] = $a->getFormatted();
+				$attributes[$tagPrefix . 'formatted_post_address'] = $a->getFormatted();
 			}
 
-			$attributes['company:email'] = $company->emailAddresses[0] ?? "";
-			$attributes['company:invoice_email'] = $company->findEmailByType(\go\modules\community\addressbook\model\EmailAddress::TYPE_BILLING, true);
+			$attributes[$tagPrefix . 'email'] = $company->emailAddresses[0] ?? "";
+			$attributes[$tagPrefix . 'invoice_email'] = $company->findEmailByType(\go\modules\community\addressbook\model\EmailAddress::TYPE_BILLING, true);
 			
 			foreach($company->phoneNumbers as $p) {
 				switch($p->type) {
 					
 					case \go\modules\community\addressbook\model\PhoneNumber::TYPE_FAX:
-						$attributes['company:fax'] = $p->number;
+						$attributes[$tagPrefix . 'fax'] = $p->number;
 					break;
 				
 					default:
-						$attributes['company:phone'] = $p->number;
+						$attributes[$tagPrefix . 'phone'] = $p->number;
 					break;
 
 				}
@@ -164,46 +164,46 @@ class Template extends \GO\Base\Db\ActiveRecord{
 			return $attributes;
 	} 
 	
-	private function getContactAttributes($contact){
-		$attributes['salutation'] = $attributes['contact:salutation'] = GO()->t("Hi")." ".$contact->firstName;
-		$attributes['contact:sirmadam']=$contact->gender=="M" ? \GO::t('sir') : \GO::t('madam');
+	private function getContactAttributes($contact, $tagPrefix = 'contact:'){
+		$attributes[$tagPrefix . 'salutation'] = GO()->t("Hi")." ".$contact->firstName;
+		$attributes[$tagPrefix . 'sirmadam']=$contact->gender=="M" ? \GO::t('sir') : \GO::t('madam');
 		
-		$attributes['contact:fist_name'] = $contact->firstName;
-		$attributes['contact:middle_name'] = $contact->middleName;
-		$attributes['contact:last_name'] = $contact->lastName;
+		$attributes[$tagPrefix . 'fist_name'] = $contact->firstName;
+		$attributes[$tagPrefix . 'middle_name'] = $contact->middleName;
+		$attributes[$tagPrefix . 'last_name'] = $contact->lastName;
 
-			//$attributes = array_merge($attributes, $this->_getModelAttributes($contact, 'contact:'));
+			//$attributes = array_merge($attributes, $this->_getModelAttributes($contact, $tagPrefix . ''));
 
 			// By default this was replaced just by M or F but now it will be replaced by the whole text Male or Female.
-			$attributes['contact:sex']=$contact->gender == "M" ? \GO::t('male','addressbook') : \GO::t('female','addressbook');
+			$attributes[$tagPrefix . 'sex']=$contact->gender == "M" ? \GO::t('male','addressbook') : \GO::t('female','addressbook');
 
 			if(isset($contact->addresses[0])) {
 				$a = $contact->addresses[0];
 
-				$attributes['contact:address'] = $a->street;
-				$attributes['contact:address_no'] = $a->street2;
-				$attributes['contact:zip'] = $a->zipCode;
-				$attributes['contact:country'] = $a->country;
-				$attributes['contact:state'] = $a->state;
-				$attributes['contact:formatted_address'] = $a->getFormatted();
+				$attributes[$tagPrefix . 'address'] = $a->street;
+				$attributes[$tagPrefix . 'address_no'] = $a->street2;
+				$attributes[$tagPrefix . 'zip'] = $a->zipCode;
+				$attributes[$tagPrefix . 'country'] = $a->country;
+				$attributes[$tagPrefix . 'state'] = $a->state;
+				$attributes[$tagPrefix . 'formatted_address'] = $a->getFormatted();
 			}
 
-			$attributes['contact:email'] = $contact->emailAddresses[0] ?? "";
-			$attributes['contact:email2'] = $contact->emailAddresses[2] ?? "";
-			$attributes['contact:email3'] = $contact->emailAddresses[3] ?? "";
+			$attributes[$tagPrefix . 'email'] = $contact->emailAddresses[0] ?? "";
+			$attributes[$tagPrefix . 'email2'] = $contact->emailAddresses[2] ?? "";
+			$attributes[$tagPrefix . 'email3'] = $contact->emailAddresses[3] ?? "";
 
 			foreach($contact->phoneNumbers as $p) {
 				switch($p->type) {
 					case \go\modules\community\addressbook\model\PhoneNumber::TYPE_HOME:
-						$attributes['contact:home_phone'] = $p->number;
+						$attributes[$tagPrefix . 'home_phone'] = $p->number;
 					break;
 
 					case \go\modules\community\addressbook\model\PhoneNumber::TYPE_WORK:
-						$attributes['contact:work_phone'] = $p->number;
+						$attributes[$tagPrefix . 'work_phone'] = $p->number;
 					break;
 
 					case \go\modules\community\addressbook\model\PhoneNumber::TYPE_FAX:
-						$attributes['contact:fax'] = $p->number;
+						$attributes[$tagPrefix . 'fax'] = $p->number;
 					break;
 				}
 			}
@@ -241,10 +241,10 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		switch($cls) {
 			case \go\modules\community\addressbook\model\Contact::class:
 				if($model->isOrganization) {
-					$attributes = array_merge($attributes, $this->getCompanyAttributes($model));
+					$attributes = array_merge($attributes, $this->getCompanyAttributes($model, $tagPrefix));
 				} else
 				{
-					$attributes = array_merge($attributes, $this->getContactAttributes($model));
+					$attributes = array_merge($attributes, $this->getContactAttributes($model, $tagPrefix));
 				}
 				
 				break;			
