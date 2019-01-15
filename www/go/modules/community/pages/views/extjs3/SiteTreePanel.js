@@ -4,8 +4,7 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
     buttonAlign: 'left',
     currentSiteId: '',
     split: true,
-    autoScroll: true,
-    //toggleFunction:null,
+    //autoScroll: true,
     initComponent: function () {
 	this.items = [
 	    this.siteTree = new go.modules.community.pages.SiteTree({
@@ -27,7 +26,7 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 		b.setVisible(false);
 		this.saveButton.setVisible(true);
 		this.siteTreeEdit.store.load();
-		//this.toggleFunction(false, true);
+		this.fireEvent('toggleButtons', true, true);
 		this.changePanel(this.siteTreeEdit.getId());
 	    },
 	    scope: this
@@ -38,8 +37,9 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 	    hidden: true,
 	    handler: function (b, e) {
 		b.setVisible(false);
+		this.saveSortOrder();
 		this.reorderButton.setVisible(true);
-		//this.toggleFunction(true, true);
+		this.fireEvent('toggleButtons', false, true);
 		this.changePanel(this.siteTree.getId());
 	    },
 	    scope: this
@@ -60,6 +60,7 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 		    scope: this
 		}]
 	});
+	this.addEvents('toggleButtons');
 
 	this.on("afterrender", function () {
 	    this.siteTree.getLoader().on('load', function () {
@@ -67,26 +68,14 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 	    }, this, {single: true});
 
 	}, this);
-
-
 	go.modules.community.pages.SiteTreePanel.superclass.initComponent.call(this);
     },
     changePanel: function (panel) {
 	this.layout.setActiveItem(panel);
     },
-    downloadPDF: function (id = 43) {
+    downloadPDF: function (id) {
 	console.log(this.siteTree.getRootNode());
-	//this.reloadTree();
-	//temp used to generate the treepanel content at the click of a currently unused button.
-//	var params = {pageId: id};
-//	go.Jmap.request({
-//	    method: "page/getHeaders",
-//	    params: params,
-//	    scope: this,
-//	    callback: function (options, success, response) {
-//		console.log(response);
-//	    }
-//	});
+	this.reloadTree();
     },
     reloadTree: function () {
 	console.log('reloading');
@@ -145,6 +134,17 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 	    }
 	});
     },
-    
 
+    saveSortOrder: function () {
+	var records = this.siteTreeEdit.store.getRange();
+	var update = {};
+	for (var i = 0, l = records.length; i < l; i++) {
+	    update[records[i].data.id] = {sortOrder: i+1};
+	}
+	go.Stores.get("Page").set({
+	    update: update
+	}, function () {
+	    this.reloadTree();
+	}, this);
+    }
 });

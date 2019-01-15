@@ -177,19 +177,29 @@ go.modules.community.pages.SystemSettingsSitesGrid = Ext.extend(go.grid.GridPane
 				iconCls: 'ic-delete',
 				text: t("Delete"),
 				handler: function () {
-				    this.getSelectionModel().selectRecords([this.moreMenu.record]);
-				    this.deleteSelected();
+				    //this.getSelectionModel().selectRecords([this.moreMenu.record]);
+				    //this.deleteSelected();
+				    Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you wish to delete this site?"), function (btn) {
+					if (btn != "yes") {
+					    return;
+					}
+					selectedId = this.moreMenu.record.data.id;
+					go.Stores.get("Site").set({
+					    destroy: [selectedId]
+					});
+					GO.mainLayout.tabPanel.remove(GO.mainLayout.tabPanel.getItem('go-module-panel-' + this.moreMenu.record.data.slug))
+				    }, this);
 				},
 				scope: this
 			    },
-			]
-		    })
-		}
+		]
+	    })
+	}
 
-		this.moreMenu.record = record;
+	this.moreMenu.record = record;
 
-		this.moreMenu.showAt(e.getXY());
-	    },
+	this.moreMenu.showAt(e.getXY());
+    },
 
     editProperties: function (id) {
 	var dlg = new go.modules.community.pages.SitePropertyDialog();

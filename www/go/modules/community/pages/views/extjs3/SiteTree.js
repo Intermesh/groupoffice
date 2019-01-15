@@ -27,18 +27,15 @@ go.modules.community.pages.SiteTree = Ext.extend(Ext.tree.TreePanel, {
 	this.root.on('load', function (node) {
 	    this.expandPath();
 	}, this)
-	debugger;
     },
 
     expandPath: function () {
-	console.log('expandpath')
 	slugs = go.Router.getPath().split('/');
 	page = slugs[2];
 	headerSlug = slugs[3];
 	pageNode = this.root.findChild('entitySlug', page);
 	if (pageNode) {
 	    pageNode.on('load', function (node) {
-		console.log('cascade')
 		//run through all the nodes in a page to determine which should be selected and expanded.
 		node.cascade(function (node) {
 		    node.expand();
@@ -60,11 +57,10 @@ go.modules.community.pages.SiteTree = Ext.extend(Ext.tree.TreePanel, {
 		}
 	    }, this);
 	    if (pageNode.isLoaded()) {
-		console.log('expand')
 		pageNode.expand();
 	    } else {
 		this.root.on('load', function (node) {
-		    console.log('onload expand')
+		    //todo: This is sometimes null. find out why.
 		    pageNode.expand();
 		}, this, {single: true});
 	    }

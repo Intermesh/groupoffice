@@ -1,10 +1,11 @@
-go.modules.community.pages.SiteTreeEdit = Ext.extend(go.grid.GridPanel, {
+go.modules.community.pages.SiteTreeEdit = Ext.extend(Ext.grid.GridPanel, {
+    //using Ext.grid instead of go.grid since go.grid causes infinite scrolling 
+    //in this panel for some reason and it has no required benefits over Ext.grid
     siteId: '',
     hideHeaders: true,
     enableDragDrop: true,
     ddText: '',
     title: t('Reorder'),
-    sm: new Ext.grid.RowSelectionModel({singleSelect: true}),
     initComponent: function () {
 	this.store = new go.data.Store({
 	    baseParams: {filter: {'siteId': this.siteId}},
@@ -20,28 +21,30 @@ go.modules.community.pages.SiteTreeEdit = Ext.extend(go.grid.GridPanel, {
 	    ],
 	    entityStore: go.Stores.get("Page")
 	});
-
-
+	this.plugins = [new go.grid.plugin.Sortable(this.onSort, this, this.isDropAllowed)];
+	this.store.setDefaultSort('sortOrder', 'ASC');
+	var genId = Ext.id()
 	Ext.apply(this, {
 
 	    columns: [
 		{
-		    id: 'id',
+		    id: genId+'-id',
 		    hidden: true,
 		    sortable: false,
 		    dataIndex: 'id'
 		},
 		{
-		    id: 'pageName',
+		    id: genId+'-pageName',
 		    width: dp(75),
 		    sortable: false,
 		    dataIndex: 'pageName'
 		},
 		{
-		    id: 'sortOrder',
+		    id: genId+'-sortOrder',
 		    hidden: true,
 		    sortable: true,
-		    dataIndex: 'sortOrder'
+		    dataIndex: 'sortOrder',
+		    xtype: 'numbercolumn'
 		}
 
 	    ],
@@ -52,20 +55,25 @@ go.modules.community.pages.SiteTreeEdit = Ext.extend(go.grid.GridPanel, {
 	    },
 
 	    collapsible: false,
-	    autoExpandColumn: 'pageName',
-	    stateful: true,
-	    stateId: 'page-grid'
+	    autoExpandColumn: genId+'-pageName',
+//	    stateful: true,
+//	    stateId: genId+'-page-grid'
 	});
 	this.on('render', function () {
 	    this.store.entityStore.on("changes", function () {
 		this.store.baseParams = {filter: {'siteId': this.siteId}};
 		this.store.reload;
-	    }, this);
-	}, this);
-	this.store.on('load', function () {
-	    this.getSelectionModel().selectFirstRow();
+	    }, this, {single:true});
 	}, this);
 	go.modules.community.pages.SiteTreeEdit.superclass.initComponent.call(this);
-    }
+	
+    },
+    
+    onSort: function(sortable, selections, dragData, dd){
+    },
+    
+    isDropAllowed: function(selections, overRecord){
+	return true;
+    },
 
-})
+});

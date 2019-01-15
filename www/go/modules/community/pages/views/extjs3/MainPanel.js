@@ -77,6 +77,9 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 	    }
 	    
 	}, this);
+	this.treeArea.on('toggleButtons',function(bool, inclAddButton){
+	    this.disableButtons(bool,inclAddButton)
+	},this);
 	go.modules.community.pages.MainPanel.superclass.initComponent.call(this);
 
 

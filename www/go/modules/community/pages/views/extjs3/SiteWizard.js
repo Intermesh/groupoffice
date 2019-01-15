@@ -24,7 +24,9 @@ go.modules.community.pages.SiteWizard = Ext.extend(go.Wizard, {
 	this.shareEntityPanel.items.get(0).store.on('load', function () {
 	    if (this.shareEntityPanel.items.get(0).store.loaded) {
 		this.continueButton.setDisabled(false);
-		this.continueButton.setText('Finish');
+		if(!this.nextItem){
+		     this.continueButton.setText('Finish');
+		}
 	    }
 	}, this);
 	go.modules.community.pages.SiteWizard.superclass.initComponent.call(this);
@@ -40,7 +42,7 @@ go.modules.community.pages.SiteWizard = Ext.extend(go.Wizard, {
 	if (activeItem.onContinue && activeItem.onContinue(this) === false) {
 	    return false;
 	}
-	if (this.nextItem) {
+	if (this.nextItem && this.propForm.form.isDirty()) {
 	    this.propForm.submit(this.afterPropertiesSubmit, this);
 	} else {
 	    if (this.shareEntityPanel.currentId) {
