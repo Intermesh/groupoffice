@@ -463,7 +463,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 //		{
 		var gridData = this.participantsPanel.getGridData();
 		params.participants=Ext.encode(gridData);
-			
+		
 		this.formPanel.form.submit({
 			url : GO.url('calendar/event/submit'),
 			params : params,
