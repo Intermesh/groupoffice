@@ -55,7 +55,8 @@ go.modules.core.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 
 						var v = form.getFieldValues();
 						if(v.customFields) {
-							action.options.params = {customFieldsJSON: Ext.encode(v.customFields)};
+							action.options.params = action.options.params || {};
+							action.options.params.customFieldsJSON = Ext.encode(v.customFields);
 						}
 
 						return true;
