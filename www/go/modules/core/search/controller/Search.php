@@ -20,7 +20,7 @@ class Search extends EntityController {
 		$q = $params['filter']['q'] ?? null;
 
 		$query = new Query();
-		$query->select('u.id, "User" as entity, u.email, "" as type, u.displayName AS name, u.avatarId AS photoBlobId')
+		$query->select('u.id as entityId, "User" as entity, u.email, "" as type, u.displayName AS name, u.avatarId AS photoBlobId')
 						->from('core_user', 'u')
 						->join('core_group', 'g', 'u.id = g.isUserGroupFor');
 
@@ -35,11 +35,13 @@ class Search extends EntityController {
 		if (Module::isAvailableFor("community", "addressbook")) {
 
 			$contactsQuery = (new Query)
-							->select('c.id, "Contact" as entity, e.email, e.type, c.name, c.photoBlobId')
+							->select('c.id as entityId, "Contact" as entity, e.email, e.type, c.name, c.photoBlobId')
 							->from("addressbook_contact", "c")
 							->join("addressbook_email_address", "e", "e.contactId=c.id");
 
 			Contact::applyAclToQuery($contactsQuery);
+			
+			$contactsQuery->groupBy(['e.email']);
 
 			if (!empty($q)) {
 				$contactsQuery
@@ -53,7 +55,7 @@ class Search extends EntityController {
 		}
 		
 		\go\core\jmap\Response::get()->addResponse([
-				'list' => array_map(function($r) {$r['id'] = (int) $r['id']; return $r;}, $query->toArray())
+				'list' => array_map(function($r) {$r['entityId'] = (int) $r['entityId']; return $r;}, $query->toArray())
 				]);
 	}
 

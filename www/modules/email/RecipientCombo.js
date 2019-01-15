@@ -10,7 +10,7 @@ GO.email.RecipientCombo = Ext.extend(GO.form.ComboBoxMulti, {
 
 		this.store = new go.data.Store({
 			method: "Search/email",
-			fields: ['id', 'entity', 'email', 'name', 'photoBlobId',
+			fields: ['entityId', 'entity', 'email', 'name', 'photoBlobId',
 				{
 					name: "full_email",
 					convert: function (v, data) {						
