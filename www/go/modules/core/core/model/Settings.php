@@ -203,6 +203,14 @@ class Settings extends core\Settings {
 	 */
 	public $maintenanceMode = false;
 	
+	
+	/**
+	 * Enable HTML message that will show on the login screen.
+	 * 
+	 * @var string 
+	 */
+	public $loginMessageEnabled = false;
+	
 	/**
 	 * HTML message that will show on the login screen.
 	 * 
