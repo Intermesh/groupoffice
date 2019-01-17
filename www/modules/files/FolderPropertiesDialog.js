@@ -158,7 +158,7 @@ GO.files.FolderPropertiesDialog = function(config){
 		this.tabPanel.add(this.disableCategoriesPanel);
 		
 		
-		if(GO.customfields && GO.customfields.types["GO\\Files\\Model\\Folder"])
+		if(go.Modules.isAvailable("core", "customfields") && GO.customfields.types["GO\\Files\\Model\\Folder"])
 		{
 			for(var i=0;i<GO.customfields.types["GO\\Files\\Model\\Folder"].panels.length;i++)
 			{
@@ -271,7 +271,7 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 							this.commentsPanel.setDisabled(true);
 
 	
-							if(GO.customfields && GO.customfields.types["GO\\Files\\Model\\Folder"]){
+							if(go.Modules.isAvailable("core", "customfields") && GO.customfields.types["GO\\Files\\Model\\Folder"]){
 								this.tabPanel.items.each(function(item, i) {
 									if(item.customfields) {
 										item.setDisabled(true);

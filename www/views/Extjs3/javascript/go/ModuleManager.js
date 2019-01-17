@@ -63,9 +63,15 @@
 		 * 
 		 * @param {string} package
 		 * @param {string} name
+		 * @param {int} Required permission level
+		 * 
 		 * @returns {boolean}
 		 */
-		isAvailable: function (package, name) {
+		isAvailable: function (package, name, permissionLevel) {
+			
+			if(!Ext.isDefined(permissionLevel)) {
+				permissionLevel = GO.permissionLevels.read;
+			}
 
 			if (!package) {
 				package = "legacy";
@@ -79,7 +85,7 @@
 			if (!module) {
 				return false;
 			}
-			return module.permissionLevel >= this.registered[package][name].requiredPermissionLevel;
+			return module.permissionLevel >= permissionLevel;
 		},
 
 		getConfig: function (package, name) {
@@ -137,11 +143,11 @@
 
 				for (package in this.registered) {
 					for (name in this.registered[package]) {
-						if (!this.isAvailable(package, name)) {
+						var config = this.registered[package][name];
+						
+						if (!this.isAvailable(package, name, config.requiredPermissionLevel)) {
 							continue;
 						}
-
-						var config = this.registered[package][name];
 
 						if (config.mainPanel) {
 							//todo GO.moduleManager is deprecated

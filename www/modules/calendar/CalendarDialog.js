@@ -270,7 +270,7 @@ GO.calendar.CalendarDialog = function(config)
 	items.push(this.readPermissionsTab);
 	items.push(this.importTab);
 
-	if(GO.customfields && GO.customfields.types["GO\\Calendar\\Model\\Calendar"])
+	if(go.Modules.isAvailable("core", "customfields") && GO.customfields.types["GO\\Calendar\\Model\\Calendar"])
 	{
 		for(var i=0;i<GO.customfields.types["GO\\Calendar\\Model\\Calendar"].panels.length;i++)
 		{
