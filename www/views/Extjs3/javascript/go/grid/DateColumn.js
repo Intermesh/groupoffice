@@ -15,12 +15,11 @@ go.grid.DateColumn = Ext.extend(Ext.grid.Column, {
 			return go.User.shortDateInList ? go.util.Format.shortDateTime(v) : go.util.Format.dateTime(v);
 		};
 		
-		this.resizable = false;
+		this.resizable = !go.User.shortDateInList;
 		if(this.dateOnly) {
-			this.width = dp(120);
-		} else
-		{
-			this.width = go.User.shortDateInList ? dp(120) : dp(180);
+			this.width = dp(128);
+		} else {
+			this.width = go.User.shortDateInList ? dp(128) : dp(168);
 		}
 	}
 });		
