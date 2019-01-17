@@ -1926,6 +1926,15 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 		{
 			this.on('filebrowserready', fn, scope);
 		}
+	},
+	
+	route: function(id, entity) {
+		
+		var detailViewName = entity + "Detail";
+		
+		this[detailViewName].load(parseInt(id));
+//		mainPanel[detailViewName].show();
+		this.eastPanel.getLayout().setActiveItem(this[detailViewName]);
 	}
 });
 
