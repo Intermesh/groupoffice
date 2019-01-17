@@ -66,7 +66,6 @@ GO.postfixadmin.AliasDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 				xtype: 'xcheckbox',
 			  name: 'active',
 				anchor: '-20',
-			  allowBlank:false,
 			  boxLabel: GO.postfixadmin.lang.active,
 			  hideLabel: true
 			}]
