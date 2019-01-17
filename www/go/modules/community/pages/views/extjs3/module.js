@@ -38,12 +38,12 @@ go.Modules.register("community", "pages", {
 generateRoute = function (site) {
     var slug = site.slug;
     var routefunction;
-    //Redirect the tabpanel route to the view route and get the first page of the site..
+    //Redirect the tabpanel route to the view route and get the first page of the site.
     routefunction = function () {
 	go.Jmap.request({
 	    method: "Site/getFirstPage",
 	    params: {
-		slug: slug //go.Router.getPath()
+		slug: slug
 	    },
 	    callback: function (options, success, result) {
 		var pageSlug = false;

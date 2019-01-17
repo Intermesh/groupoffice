@@ -28,19 +28,19 @@ go.modules.community.pages.SiteTreeEdit = Ext.extend(Ext.grid.GridPanel, {
 
 	    columns: [
 		{
-		    id: genId+'-id',
+		    id: genId + '-id',
 		    hidden: true,
 		    sortable: false,
 		    dataIndex: 'id'
 		},
 		{
-		    id: genId+'-pageName',
+		    id: genId + '-pageName',
 		    width: dp(75),
 		    sortable: false,
 		    dataIndex: 'pageName'
 		},
 		{
-		    id: genId+'-sortOrder',
+		    id: genId + '-sortOrder',
 		    hidden: true,
 		    sortable: true,
 		    dataIndex: 'sortOrder',
@@ -55,7 +55,7 @@ go.modules.community.pages.SiteTreeEdit = Ext.extend(Ext.grid.GridPanel, {
 	    },
 
 	    collapsible: false,
-	    autoExpandColumn: genId+'-pageName',
+	    autoExpandColumn: genId + '-pageName',
 //	    stateful: true,
 //	    stateId: genId+'-page-grid'
 	});
@@ -63,16 +63,47 @@ go.modules.community.pages.SiteTreeEdit = Ext.extend(Ext.grid.GridPanel, {
 	    this.store.entityStore.on("changes", function () {
 		this.store.baseParams = {filter: {'siteId': this.siteId}};
 		this.store.reload;
-	    }, this, {single:true});
+	    }, this, {single: true});
 	}, this);
 	go.modules.community.pages.SiteTreeEdit.superclass.initComponent.call(this);
+
+    },
+
+    onSort: function (sortable, selections, dragData, dd) {
+    },
+
+    isDropAllowed: function (selections, overRecord) {
 	
-    },
-    
-    onSort: function(sortable, selections, dragData, dd){
-    },
-    
-    isDropAllowed: function(selections, overRecord){
+//	console.log(overRecord)
+//	console.log(selections.includes(overRecord))
+	if (overRecord && selections.includes(overRecord)) {
+//	    debugger;
+	    var res = false;
+	    var storeItems = overRecord.store.data.items;
+	    selections.forEach(
+		    function (record) {
+//			console.log(overRecord.store.data.items[overRecord.store.data.length - 1].id)
+//			console.log(record)
+//			if (overRecord.store.data.items[overRecord.store.data.length - 1].id === record.id) {
+			index = storeItems.indexOf(record)
+//			console.log(index);
+//			console.log(storeItems[index+1])
+			if(index && !storeItems[index+1]){
+//			    console.log(overRecord.store.data.items[overRecord.store.data.length - 1].id === record.id);
+//			    console.log('_')
+			    res = true;
+			    return;
+			}
+		    })
+		if (res){
+//		console.log('last item + duplicate')
+		return false;
+	    }
+	}else if(!overRecord){
+	    console.log('no record')
+	    return false;
+	}
+//	console.log('---')
 	return true;
     },
 

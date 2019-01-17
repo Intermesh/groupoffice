@@ -11,12 +11,11 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 
 	this.content = new go.modules.community.pages.PageContent({
 	    region: "center",
-	    padding: '1% 5% 2% 2%',
+	    padding: '1% 5% 20% 2%',
 	});
 	this.treeArea = new go.modules.community.pages.SiteTreePanel({
 	    region: "west",
 	    width: dp(250),
-	    //toggleFunction: this.disableButtons
 	});
 
 	this.items = [
@@ -52,9 +51,6 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 		    },
 		    scope: this
 		}, '->',
-//		{
-//		    xtype: "tbsearch"
-//		},
 		{
 		    itemId: 'tbarEditBtn',
 		    iconCls: 'ic-edit',
