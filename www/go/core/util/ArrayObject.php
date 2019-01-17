@@ -50,8 +50,9 @@ class ArrayObject extends \ArrayObject {
 	 */
 	public function mergeRecurive(array $arr) {
 		foreach ($arr as $key => $value) {
-			if (is_array($value) && isset($this[$key])) {
-				$this[$key] = self::mergeRecurive($this[$key], $value);
+			if (is_array($value) && isset($this[$key])) {				
+				$this[$key] = new self($this[$key]);
+				$this[$key]->mergeRecurive($value);
 			} else {
 				$this[$key] = $value;
 			}
