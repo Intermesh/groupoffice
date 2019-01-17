@@ -1,3 +1,8 @@
+- E-mail: Fixed Tooltips in the way of email #276
+- Files: Fixed global folder search
+         Fixed Search Folder #287
+- Core: created checkbox to enable login message.
+        Fixed Missing Features in 6.3.x #290
 - Start page: Portlets must only be declared if user has permissions for the module
               Fixed Disharmony between Files and Start Page #291
 - Custom fields: Fixed disable custom field categories
