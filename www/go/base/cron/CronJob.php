@@ -121,8 +121,8 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 								WHERE user_id=`t`.`id` AND `cu`.`cronjob_id`=:cronjob_id
 							)
 							OR `id` IN (
-								SELECT `ug`.`user_id` FROM `go_cron_groups` cg 
-								INNER JOIN `core_user_group` ug ON `ug`.`group_id`=`cg`.`group_id`
+								SELECT `ug`.`userId` FROM `go_cron_groups` cg 
+								INNER JOIN `core_user_group` ug ON `ug`.`groupId`=`cg`.`group_id`
 								WHERE `cg`.`cronjob_id`=:cronjob_id
 							);";
 		$stmnt = GO::getDbConnection()->prepare($query);
