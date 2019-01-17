@@ -113,16 +113,23 @@ class FolderNotification extends \GO\Base\Db\ActiveRecord {
 		$users = array();
 		$messages = array();
 
+		$currentLang = \GO::language()->getLanguage();
+		
 		foreach ($notifications as $notification) {
 			if (!isset($messages[$notification->type]))
 				$messages[$notification->type] = array();
 
 			if (!isset($users[$notification->modified_user_id])) {
 				$user = \GO::user()->findByPk($notification->modified_user_id);
-				if ($user)
+				if ($user){
+					
+					\GO::language()->setLanguage($user->language);
+					
 					$users[$notification->modified_user_id] = $user->getName();
-				else
+				}else {
+					\GO::language()->setLanguage($currentLang);
 					$users[$notification->modified_user_id] = \GO::t('deletedUser', 'files');
+				}
 			}
 
 			switch ($notification->type) {
@@ -227,5 +234,7 @@ class FolderNotification extends \GO\Base\Db\ActiveRecord {
 				->setFrom(array(\GO::config()->webmaster_email=>\GO::config()->title))
 				->setBody($emailBody);
 		\GO\Base\Mail\Mailer::newGoInstance()->send($message);
+		
+		\GO::language()->setLanguage($currentLang);
 	}
 }
