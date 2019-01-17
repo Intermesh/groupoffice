@@ -1,4 +1,7 @@
-- core: Language didn't merge recursively with English leading to incomplete
+- Billing: Copy matching custom fields in order dialog
+- Custom fields: Fixed disable custom field categories
+- Core: Invalid sql in cron->getAllUsers()
+- Core: Language didn't merge recursively with English leading to incomplete
         country selection combo box.
 - Files: Fixed incorrect shared folder tree
 - Core: Removed robots noindex header because they don't have any effect because
