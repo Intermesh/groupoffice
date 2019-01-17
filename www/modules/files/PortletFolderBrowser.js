@@ -1,5 +1,5 @@
 GO.mainLayout.onReady(function(){
-	if(go.Modules.isAvailable("legacy", "summary"))
+	if(go.Modules.isAvailable("legacy", "summary") && go.Modules.isAvailable("legacy", "files"))
 	{
 		GO.summary.portlets['portlet-folder-browser']={
 			multiple:true,

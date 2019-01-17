@@ -1,4 +1,5 @@
-- Billing: Copy matching custom fields in order dialog
+- Start page: Portlets must only be declared if user has permissions for the module
+              Fixed Disharmony between Files and Start Page #291
 - Custom fields: Fixed disable custom field categories
 - Core: Invalid sql in cron->getAllUsers()
 - Core: Language didn't merge recursively with English leading to incomplete
