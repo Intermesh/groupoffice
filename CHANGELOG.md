@@ -1,3 +1,5 @@
+- core: Language didn't merge recursively with English leading to incomplete
+        country selection combo box.
 - Files: Fixed incorrect shared folder tree
 - Core: Removed robots noindex header because they don't have any effect because
 				robots.txt is used.
