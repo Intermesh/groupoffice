@@ -1,3 +1,5 @@
+- E-mail: Fixed Email Attachment wiggle #275
+- E-mail: Fixed Sieve issue #268
 - E-mail: Fixed Tooltips in the way of email #276
 - Files: Fixed global folder search
          Fixed Search Folder #287
