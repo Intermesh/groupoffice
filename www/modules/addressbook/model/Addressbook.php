@@ -106,7 +106,7 @@ namespace GO\Addressbook\Model;
 			$ab = new Addressbook();
 			$ab->name = \GO::t("Users");
 			$ab->users = true;
-			$ab->save();
+			$ab->save(true);
 			
 			$ab->acl->addGroup(\GO::config()->group_internal);
 		}
