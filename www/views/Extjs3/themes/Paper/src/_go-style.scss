@@ -1467,6 +1467,14 @@ table[id^="comments-ext"] b {
 		margin-left: dp(-8);
 	}
 	margin-bottom: dp(16);
+	
+	.x-btn-text {
+		font-weight: normal;
+	}
+	
+	.x-btn-text-icon button::before {
+		padding-right: dp(16);
+	}
 }
 
 

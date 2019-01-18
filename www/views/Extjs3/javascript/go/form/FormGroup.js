@@ -4,7 +4,8 @@
  * 
  * new go.form.FormGroup({
  *	name: "dataType.options",
- *	fieldLabel: t("Options"),
+ *	addButtonText: t("Add option"),
+ *	addButtonIconCls: 'ic-add',
  *	itemCfg: {
  *		layout: "form",
  *		items: [{
@@ -14,7 +15,8 @@
  *				hideLabel: true,
  *				xtype: "textfield",
  *				name: "text",
- *				anchor: "100%"
+ *				anchor: "100%",
+ *				setFocus: true //this will focus this field when a new item has been added
  *			}]
  *	}
  *})
@@ -33,6 +35,12 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	
 	addButtonText: t("Add"),
 	addButtonIconCls: "ic-add",
+	
+	layout: "form",
+	
+	defaults: {
+		anchor: "100%"
+	},
 	
 	initComponent : function() {		
 		
@@ -61,13 +69,34 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 				iconCls: this.addButtonIconCls,
 				text: this.addButtonText,
 				handler: function() {
-					this.addPanel();
+					var wrap = this.addPanel();
 					this.doLayout();
+					
+					this.focusNewField(wrap);
 				
 				},
 				scope: this
 			}
 		];
+	},
+	
+	focusNewField : function(wrap) {
+		var item;
+		for(var i = 0, l = wrap.items.getCount();i < l;i++) {
+			item = wrap.items.get(i);
+			
+			console.log(item);
+			
+			if(item.setFocus) {				
+				item.getEl().focus();
+				return true;
+			}
+			
+			if(item.items && this.focusNewField(item)) {
+				return true;
+			}
+		}
+		return false;
 	},
 	
 	setPanelValue : function(panel, v) {
@@ -98,8 +127,8 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		var panel = this.createNewItemPanel(), me = this, wrap = new Ext.Container({
 			xtype: "container",
 			layout: "hbox",
-			formPanel: panel,
-			
+			formPanel: panel,			
+			findBy: false,
 			isFormField: false,
 			style: this.pad ?  "padding-top: " + dp(16) + "px" : "",
 			items: [				

@@ -4,8 +4,8 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 	stateId: 'addressbook-contact-dialog',
 	title: t("Contact"),
 	entityStore: "Contact",
-	width: 600,
-	height: 600,
+	width: dp(800),
+	height: dp(600),
 	defaults: {
 		labelWidth: dp(140)
 	},
@@ -40,8 +40,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 							{
 								flex: 1,
 								layout: "form",
-								items: [		
-								
+								items: [									
 										
 									this.nameField = new Ext.form.TextField({
 										xtype: 'textfield',
@@ -181,6 +180,9 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 				xtype: 'fieldset',
 				title: t("Communication"),
 				autoHeight: true,
+				defaults: {
+					anchor: "-20"
+				},
 				items: [
 					{
 						hideLabel: true,
@@ -189,11 +191,14 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						addButtonIconCls: 'ic-email',
 						addButtonText: t("Add e-mail address"),
 						itemCfg: {
+							anchor: "100%",
 							layout: "form",
-							items: [{
+							items: [{			
+									anchor: "100%",
 									xtype: "compositefield",
 									hideLabel: true,
-									items: [{
+									items: [
+										{
 											xtype: 'combo',
 											name: 'type',
 											mode: 'local',
@@ -209,14 +214,16 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 											}),
 											valueField: 'value',
 											displayField: 'display',
-											width: dp(120),
+											width: dp(140),
 											value: "work"
-										}, {
+										}, 
+										{
 											flex: 1,
 											xtype: "textfield",
 											allowBlank: false,
 											vtype: 'emailAddress',
-											name: "email"
+											name: "email",
+											setFocus: true
 										}]
 								}]
 						}
@@ -249,13 +256,14 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 											}),
 											valueField: 'value',
 											displayField: 'display',
-											width: dp(120),
+											width: dp(140),
 											value: "work"
 										}, {
 											flex: 1,
 											xtype: "textfield",
 											allowBlank: false,
-											name: "number"
+											name: "number",
+											setFocus: true
 										}]
 								}]
 						}
@@ -264,6 +272,9 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 			}, {
 				xtype: "fieldset",
 				//title: t("Street addresses"),
+				defaults: {
+					anchor: "-20"
+				},
 				
 				items: [{
 						hideLabel: true,
@@ -299,7 +310,8 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 									xtype: "textfield",
 									fieldLabel: t("Street"),
 									name: "street",
-									anchor: "100%"
+									anchor: "100%",
+									setFocus: true
 								}, {
 									xtype: "textfield",
 									fieldLabel: t("Street 2"),
@@ -332,13 +344,16 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 			}, {
 				xtype: "fieldset",
 				title: t("Other"),
+				defaults: {
+					anchor: "-20"
+				},
 				items: [{
 						xtype: "formgroup",
 						name: "dates",
 						addButtonText: t("Add date"),
 						addButtonIconCls: 'ic-event',
 						itemCfg: {
-							layout: "form",
+							
 							items: [{
 									xtype: "compositefield",
 									hideLabel: true,
@@ -358,13 +373,14 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 											}),
 											valueField: 'value',
 											displayField: 'display',
-											width: dp(120),
+											width: dp(140),
 											value: "birthday"
 										}, {
 											flex: 1,
 											xtype: "datefield",
 											allowBlank: false,
-											name: "date"
+											name: "date",
+											setFocus: true
 										}]
 								}]
 						}
@@ -373,7 +389,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						xtype: "formgroup",
 						name: "urls",
 						addButtonText: t("Add online url"),
-						addButtonIconCls: 'ic-homepage',
+						addButtonIconCls: 'ic-home',
 						itemCfg: {
 							layout: "form",
 							items: [{
@@ -395,13 +411,14 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 											}),
 											valueField: 'value',
 											displayField: 'display',
-											width: dp(120),
+											width: dp(140),
 											value: "homepage"
 										}, {
 											flex: 1,
 											xtype: "textfield",
 											allowBlank: false,
-											name: "url"
+											name: "url",
+											setFocus: true
 										}]
 								}]
 						}
@@ -416,7 +433,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 				items: [
 					{
 						xtype: "textfield",
-						name: "iban",
+						name: "IBAN",
 						fieldLabel: t("IBAN")
 					},
 					{
