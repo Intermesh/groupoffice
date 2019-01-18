@@ -91,7 +91,7 @@
 		},
 
 		showDate: function (date) {
-			console.log("No date handler");
+			console.log("No date handler", date);
 		},
 		
 		/**
