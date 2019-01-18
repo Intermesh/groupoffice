@@ -1146,7 +1146,7 @@ class GO{
 	 * @return string
 	 */
 	public static function url($path='', $params=array(), $relative=true, $htmlspecialchars=false, $appendSecurityToken=true){
-		$url = $relative ? \GO::config()->host : \GO::config()->full_url;
+		$url = $relative ? "" : \GO::config()->full_url;
 
 		if(empty($path) && empty($params)){
 			return $url;
