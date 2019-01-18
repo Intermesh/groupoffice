@@ -15,7 +15,7 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 			items: [{
 					xtype: 'readmore',
 					onLoad: function (detailView) {
-						this.setText("<h3>" + detailView.data.name + "</h3>" + detailView.data.content);
+						this.setText("<h3>" + detailView.data.name + "</h3><div class='go-html-formatted'>" + detailView.data.content + "</div>");
 					}
 				}
 			]

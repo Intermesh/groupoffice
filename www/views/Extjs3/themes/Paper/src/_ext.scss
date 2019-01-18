@@ -452,8 +452,10 @@
 	
 	&-helptext {
 		@extend %font-caption;
-		white-space: pre-wrap;
+		/*white-space: pre-wrap;*/
 		line-height: 1.6em;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 	
 }
@@ -2363,6 +2365,12 @@ body.x-body-masked .x-window-plain .x-window-mc {
 	background-image: none; //url(wysiwyg.gif);
 	color: color($fg, 'secondary-text');
 }
+
+
+.x-html-editor-tb {
+	padding: dp(8) 0;
+}
+
 
 // ####################
 // ### BORDERLAYOUT ###

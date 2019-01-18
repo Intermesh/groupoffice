@@ -1,4 +1,15 @@
-- core: Language didn't merge recursively with English leading to incomplete
+- E-mail: Fixed Email Attachment wiggle #275
+- E-mail: Fixed Sieve issue #268
+- E-mail: Fixed Tooltips in the way of email #276
+- Files: Fixed global folder search
+         Fixed Search Folder #287
+- Core: created checkbox to enable login message.
+        Fixed Missing Features in 6.3.x #290
+- Start page: Portlets must only be declared if user has permissions for the module
+              Fixed Disharmony between Files and Start Page #291
+- Custom fields: Fixed disable custom field categories
+- Core: Invalid sql in cron->getAllUsers()
+- Core: Language didn't merge recursively with English leading to incomplete
         country selection combo box.
 - Files: Fixed incorrect shared folder tree
 - Core: Removed robots noindex header because they don't have any effect because

@@ -1273,6 +1273,9 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		ini_set('max_execution_time', 600);
 		ini_set('memory_limit', '512M');
+		//So other actions can run simultanuously
+		GO::session()->closeWriting();
+		
 		$sources = json_decode($params['compress_sources'], true);
 
 
@@ -1372,6 +1375,11 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 
 	protected function actionDecompress($params){
+		
+		//So other actions can run simultanuously
+		GO::session()->closeWriting();
+		
+		
 		if (!\GO\Base\Util\Common::isWindows())
 			putenv('LANG=en_US.UTF-8');
 

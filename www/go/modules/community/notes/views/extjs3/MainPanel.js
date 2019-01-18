@@ -30,7 +30,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.panels.ModulePanel, {
 					xtype: 'tbtitle',
 					text: t('Notebooks')
 				}, '->', {
-					disabled: go.Modules.get("community", 'notes').permissionLevel < GO.permissionLevels.write,
+					//disabled: go.Modules.get("community", 'notes').permissionLevel < GO.permissionLevels.write,
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {

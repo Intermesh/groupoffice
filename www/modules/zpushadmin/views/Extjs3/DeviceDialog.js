@@ -6,8 +6,8 @@ GO.zpushadmin.DeviceDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			goDialogId:'zpushadmindevice',
 			title:t("Device", "zpushadmin"),
 			formControllerUrl: 'zpushadmin/device',
-			height:280,
-			width:400,
+			height:dp(500),
+			width: dp(500),
 			helppage:'Z-push_admin_user_manual#Device_dialog'
 		});
 		

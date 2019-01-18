@@ -147,7 +147,7 @@ Ext.extend(GO.tasks.SimpleTasksPanel, GO.grid.GridPanel, {
 });
 
 GO.mainLayout.onReady(function () {
-	if (go.Modules.isAvailable("legacy", "summary"))
+	if (go.Modules.isAvailable("legacy", "summary") && go.Modules.isAvailable("legacy", "tasks"))
 	{
 		var tasksGrid = new GO.tasks.SimpleTasksPanel();
 

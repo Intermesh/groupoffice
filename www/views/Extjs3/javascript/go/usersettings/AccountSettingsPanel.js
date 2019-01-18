@@ -17,6 +17,10 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 	autoScroll:true,
 	id: 'pnl-account-settings',
 	passwordProtected: true,
+	layout: "form",
+	defaults: {
+		anchor: "100%"
+	},
 
 	initComponent: function () {
 			
@@ -51,7 +55,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 					flex:1,
 					layout: 'form',
 					defaults: {
-						width: dp(300)
+						anchor: "100%"
 					},
 					items: [{
 						xtype: 'textfield',
@@ -86,6 +90,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 		});
 
 		this.quotaFieldset = new Ext.form.FieldSet({
+			labelWidth:dp(152),		
 			hidden: !go.User.isAdmin,
 			title: t('Disk space'),
 			items: [{
@@ -94,7 +99,8 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 						xtype: 'numberfield',
 						name: 'disk_quota',
 						fieldLabel: t('Disk quota'),
-						decimals: 0
+						decimals: 0,
+						width: dp(300)
 					},{
 						xtype: 'displayfield',
 						value: 'MB'
@@ -107,7 +113,8 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 				setValue: function(v) {
 					this.setRawValue(Math.round(v/1024/1024*100)/100+'MB');
 					return this;
-				}
+				},
+						width: dp(300)
 			}
 		]});
 	

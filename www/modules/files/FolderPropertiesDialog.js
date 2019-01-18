@@ -126,7 +126,7 @@ GO.files.FolderPropertiesDialog = function(config){
 		hideLabel:true,
 		items:[this.propertiesPanel, this.commentsPanel, this.readPermissionsTab]
 	});
-	
+
 //	if(go.Modules.isAvailable("core", "customfields")){
 //		this.disableCategoriesPanel = new GO.customfields.DisableCategoriesPanel();
 //		
@@ -271,7 +271,7 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 							this.commentsPanel.setDisabled(true);
 
 	
-							if(GO.customfields && GO.customfields.types["GO\\Files\\Model\\Folder"]){
+							if(go.Modules.isAvailable("core", "customfields") && GO.customfields.types["GO\\Files\\Model\\Folder"]){
 								this.tabPanel.items.each(function(item, i) {
 									if(item.customfields) {
 										item.setDisabled(true);

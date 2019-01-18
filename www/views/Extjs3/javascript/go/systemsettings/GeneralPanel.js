@@ -61,11 +61,25 @@ go.systemsettings.GeneralPanel = Ext.extend(Ext.form.FormPanel, {
 							hideLabel: true,
 							boxLabel: t('Enable maintenance mode'),
 							hint: t("When maintenance mode is enabled only administrators can login")
-						}, {
+						},
+						{
+							xtype: 'xcheckbox',
+							name: 'loginMessageEnabled',
+							hideLabel: true,
+							boxLabel: t('Enable login message'),	
+							listeners: {
+								check: function(cb, checked) {
+									this.form.findField('loginMessage').setDisabled(!checked);
+								},
+								scope: this								
+							}
+						}, 
+						{
 							xtype: "xhtmleditor",
 							anchor: "100%",
 							height: dp(200),
 							name: 'loginMessage',
+							disabled: true,
 							fieldLabel: t("Login message"),
 							hint: t("This message will show on the login screen")
 						}
