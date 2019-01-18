@@ -1,17 +1,5 @@
 
 
---
--- Tabelstructuur voor tabel `sync_addressbook_user`
---
-
-DROP TABLE IF EXISTS `sync_addressbook_user`;
-CREATE TABLE IF NOT EXISTS `sync_addressbook_user` (
-  `addressbook_id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL DEFAULT '0',
-  `default_addressbook` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`addressbook_id`,`user_id`),
-  KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -154,3 +142,21 @@ ALTER TABLE `sync_user_note_book`
   ADD CONSTRAINT `sync_user_note_book_user` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;
 
 
+
+
+CREATE TABLE `sync_addressbook_user` (
+  `addressBookId` int(11) NOT NULL,
+  `userId` int(11) NOT NULL,
+  `isDefault` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+ALTER TABLE `sync_addressbook_user`
+  ADD PRIMARY KEY (`addressbookId`,`userId`),
+  ADD KEY `userId` (`userId`);
+
+
+
+ALTER TABLE `sync_addressbook_user`
+  ADD CONSTRAINT `sync_addressbook_user_ibfk_1` FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `sync_addressbook_user_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;
