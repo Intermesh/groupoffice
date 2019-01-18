@@ -39,7 +39,7 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
-						->addTable("addressbook_addressbook");
+						->addTable("addressbook_addressbook", "a");
 	}
 	
 	/**

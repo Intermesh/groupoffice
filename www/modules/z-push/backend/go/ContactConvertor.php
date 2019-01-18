@@ -195,7 +195,7 @@ class ContactConvertor {
 						call_user_func($asProp, $i, $message);
 					} else
 					{
-						$message->$asProp = $i->$goProp;
+						$message->$asProp = $i->$goProp instanceof DateTime ? $i->$goProp->format("U") : $i->$goProp;
 					}
 				}
 				return true;
@@ -324,6 +324,14 @@ class ContactConvertor {
 			foreach($this->simpleMapping as $goProp => $asProp) {
 				$contact->$goProp = $message->$asProp;
 			}
+			
+			if(!empty($message->birthday)) {
+				$message->birthday = new DateTime('@' . $message->birthday);
+			}
+			
+			if(!empty($message->anniversary)) {
+				$message->anniversary = new DateTime('@' . $message->anniversary);
+			}
 
 			$contact->phoneNumbers = $this->flatToHasMany($contact->phoneNumbers ?? [], $message, $this->phoneMapping, PhoneNumber::class);		
 			$contact->dates = $this->flatToHasMany($contact->dates ?? [], $message, $this->dateMapping, Date::class);
@@ -395,6 +403,9 @@ class ContactConvertor {
 		
 		$newAsOrgNames = array_diff($asOrganizationNames, $goOrganizationsNames);
 		foreach($newAsOrgNames as $name) {
+			if(empty($name)) {
+				continue;
+			}
 			$org = Contact::find()->where(['isOrganization' => true])->andWhere('name', 'LIKE', $name)->single();
 			if(!$org) {
 				
@@ -421,9 +432,12 @@ class ContactConvertor {
 	 * @throws Exception
 	 */
 	public function getDefaultAddressBook() {
-		//TODO make configurable
+		
 		$addressbook = AddressBook::find()
-						->filter(['permissionLevel' => Acl::LEVEL_WRITE])->single();
+						->join('sync_addressbook_user', 'su', 'su.addressBookId = a.id')
+						->filter(['permissionLevel' => Acl::LEVEL_WRITE])
+						->where('ug.userId', '=', GO()->getAuthState()->getUserId())
+						->single();
 
 		if (!$addressbook)
 			throw new Exception("FATAL: No default addressbook configured");
