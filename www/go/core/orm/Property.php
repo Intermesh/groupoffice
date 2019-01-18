@@ -620,12 +620,12 @@ abstract class Property extends Model {
 		foreach ($this->getFetchedRelations() as $relation) {
 			if ($relation->many) {
 				if (!$this->saveRelatedHasMany($relation)) {
-					$this->setValidationError($relation->name, ErrorCode::RELATIONAL);
+					$this->setValidationError($relation->name, ErrorCode::RELATIONAL, null, ['validationErrors' => $this->relatedValidationErrors, 'index' => $this->relatedValidationErrorIndex]);
 					return false;
 				}
 			} else {
 				if (!$this->saveRelatedHasOne($relation)) {
-					$this->setValidationError($relation->name, ErrorCode::RELATIONAL);
+					$this->setValidationError($relation->name, ErrorCode::RELATIONAL, null, ['validationErrors' => $this->relatedValidationErrors]);
 					return false;
 				}
 			}
@@ -640,13 +640,16 @@ abstract class Property extends Model {
 		$modified = $this->getModified([$relation->name]);
 		if (isset($modified[$relation->name][1])) {
 			if (!$modified[$relation->name][1]->internalDelete()) {
+				$this->relatedValidationErrors = $modified[$relation->name][1]->getValidationErrors();
 				return false;
 			}
 		}
 
 		if (isset($this->{$relation->name})) {			
-			$this->applyRelationKeys($relation, $this->{$relation->name});
-			if (!$this->{$relation->name}->internalSave()) {
+			$prop = $this->{$relation->name};
+			$this->applyRelationKeys($relation, $prop);
+			if (!$prop->internalSave()) {
+				$this->relatedValidationErrors = $prop->getValidationErrors();
 				return false;
 			}
 
@@ -655,12 +658,27 @@ abstract class Property extends Model {
 
 		return true;
 	}
+	
+	/**
+	 * Keeps record of the index when a related has many prop save fails. This
+	 * will be returned to the client.
+	 * 
+	 * @var int 
+	 */
+	private $relatedValidationErrorIndex = 0;
+	
+	/**
+	 * 
+	 * @var array 
+	 */
+	private $relatedValidationErrors = [];
 
 	private function saveRelatedHasMany(Relation $relation) {
 		
 		//copy for overloaded properties because __get can't return by reference because we also return null sometimes.
 		$models = $this->{$relation->name};
 		
+		$this->relatedValidationErrorIndex = 0;
 		//remove old model if it's replaced
 		$modified = $this->getModified([$relation->name]);
 		if (isset($modified[$relation->name][1])) {			
@@ -668,20 +686,22 @@ abstract class Property extends Model {
 				
 				//if not in current value then delete it.
 				if (!in_array($oldProp, $models) && !$oldProp->internalDelete()) {
+					$this->relatedValidationErrors = $oldProp->getValidationErrors();
 					return false;
 				}
 			}
 		}
-
 		
 		if(isset($models)) {
 			foreach ($models as &$newProp) {
 				$this->applyRelationKeys($relation, $newProp);
 				if (!$newProp->internalSave()) {
+					$this->relatedValidationErrors = $newProp->getValidationErrors();
 					return false;
 				}
 
 				$this->savedPropertyRelations[] = $newProp;
+				$this->relatedValidationErrorIndex++;
 			}
 			$this->{$relation->name} = $models;
 		}
