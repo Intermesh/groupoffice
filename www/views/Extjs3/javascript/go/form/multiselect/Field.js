@@ -97,9 +97,9 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 			bbar: {
 				items: [
 //					{xtype: "tbtitle", text: config.title},
-					"->",
 					{
 						iconCls: "ic-add",
+						text: t("Add"),
 						handler: function () {
 
 							this.selectWin = new go.form.multiselect.Window({
