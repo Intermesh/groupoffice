@@ -29,6 +29,11 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	
 	dirty: false,
 	
+	hideLabel: true,		
+	
+	addButtonText: t("Add"),
+	addButtonIconCls: "ic-add",
+	
 	initComponent : function() {		
 		
 		
@@ -52,12 +57,13 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	
 	initBbar: function() {
 		this.bbar = [
-				'->',
 			{
-				iconCls: 'ic-add',
+				iconCls: this.addButtonIconCls,
+				text: this.addButtonText,
 				handler: function() {
 					this.addPanel();
 					this.doLayout();
+				
 				},
 				scope: this
 			}
@@ -89,14 +95,14 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	},
 	
 	addPanel : function(v) {
-		var panel = this.createNewItemPanel(), me = this, wrap = {
+		var panel = this.createNewItemPanel(), me = this, wrap = new Ext.Container({
 			xtype: "container",
 			layout: "hbox",
 			formPanel: panel,
-			findBy: false,
+			
 			isFormField: false,
-			items: [
-				panel,
+			style: this.pad ?  "padding-top: " + dp(16) + "px" : "",
+			items: [				
 				{
 					xtype: "container",
 					width: dp(48),					
@@ -108,13 +114,10 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 							me.dirty = true;
 						}
 					}]
-				}
+				},
+				panel
 			]
-		};
-		
-		if(this.pad) {
-			wrap.style = "padding-top: " + dp(16) + "px";
-		}
+		});
 		
 		if(v) {
 			this.setPanelValue(panel, v);

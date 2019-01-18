@@ -152,7 +152,8 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 					
 					this.addressBook = new go.modules.community.addressbook.AddresBookCombo({
 						anchor: '-20',
-						value: go.User.addressBookSettings.defaultAddressBookId
+						value: go.User.addressBookSettings ? go.User.addressBookSettings.defaultAddressBookId : null,
+						allowBlank: false
 					})
 							
 
@@ -182,9 +183,11 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 				autoHeight: true,
 				items: [
 					{
+						hideLabel: true,
 						xtype: "formgroup",
 						name: "emailAddresses",
-						fieldLabel: t("E-mail addresses"),
+						addButtonIconCls: 'ic-email',
+						addButtonText: t("Add e-mail address"),
 						itemCfg: {
 							layout: "form",
 							items: [{
@@ -223,7 +226,8 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 					{
 						xtype: "formgroup",
 						name: "phoneNumbers",
-						fieldLabel: t("Phone numbers"),
+						addButtonText: t("Add phone number"),
+						addButtonIconCls: 'ic-phone',
 						itemCfg: {
 							layout: "form",
 							items: [{
@@ -259,11 +263,14 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 				]
 			}, {
 				xtype: "fieldset",
-				title: t("Street addresses"),
+				//title: t("Street addresses"),
+				
 				items: [{
 						hideLabel: true,
 						xtype: "formgroup",
 						name: "addresses",
+						addButtonText: t("Add street address"),
+						addButtonIconCls: 'ic-add-location',
 						pad: true,
 						itemCfg: {
 							xtype: "panel",
@@ -327,8 +334,9 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 				title: t("Other"),
 				items: [{
 						xtype: "formgroup",
-						fieldLabel: t("Dates"),
 						name: "dates",
+						addButtonText: t("Add date"),
+						addButtonIconCls: 'ic-event',
 						itemCfg: {
 							layout: "form",
 							items: [{
@@ -363,8 +371,9 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 					},
 					{
 						xtype: "formgroup",
-						fieldLabel: t("Online"),
 						name: "urls",
+						addButtonText: t("Add online url"),
+						addButtonIconCls: 'ic-homepage',
 						itemCfg: {
 							layout: "form",
 							items: [{

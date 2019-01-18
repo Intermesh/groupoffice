@@ -14,7 +14,8 @@ go.modules.community.addressbook.SettingsPanel = Ext.extend(Ext.Panel, {
 			items: [{
 					xtype: "addressbookcombo",
 					hiddenName: "addressBookSettings.defaultAddressBookId",
-					fieldLabel: t("Default address book")
+					fieldLabel: t("Default address book"),
+					allowBlank: true
 				}
 			]}
 		];

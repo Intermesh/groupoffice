@@ -12,7 +12,6 @@ go.modules.community.addressbook.AddresBookCombo = Ext.extend(go.form.ComboBox, 
 	editable: true,
 	selectOnFocus: true,
 	forceSelection: true,
-	allowBlank: false,
 	initComponent: function () {
 		Ext.applyIf(this, {
 			store: new go.data.Store({

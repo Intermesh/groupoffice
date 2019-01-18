@@ -1462,6 +1462,11 @@ table[id^="comments-ext"] b {
 	.x-panel-bbar .x-toolbar {
 		border-top: 0;
 	}
+
+	.x-toolbar {
+		margin-left: dp(-8);
+	}
+	margin-bottom: dp(16);
 }
 
 
