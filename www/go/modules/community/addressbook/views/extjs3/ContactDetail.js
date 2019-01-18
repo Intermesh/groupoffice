@@ -135,19 +135,17 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 								item = e.getTarget("a", box.getEl()),
 								i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);
 								
-								go.util.showDate(this.data.dates[i]);
+								go.util.showDate(new Date(this.data.dates[i].date));
 							}, this);
 						}
 					},
-					tpl: '<tpl if="dates.length">\
-						<div class="icons">\
+					tpl: '<tpl if="dates.length"><div class="icons">\
 						<hr class="indent">\
 						<tpl for="dates"><a class="s6"><tpl if="xindex == 1"><i class="icon label">cake</i></tpl>\
-							<span>{[GO.util.dateFormat(values.date)]}</span>\
+							<span>{[go.util.Format.date(values.date)]}</span>\
 							<label>{[t("dateTypes")[values.type] || values.type]}</label>\
 						</a></tpl>\
-					</div>\
-					</tpl>'
+					</div>	</tpl>'
 				}
 			]
 		});
