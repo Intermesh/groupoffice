@@ -332,6 +332,13 @@ abstract class Property extends Model {
 		return true;
 	}
 
+	/**
+	 * Get the properties to fetch when using the find() method.
+	 * These properties will be preloaded including related properties from other
+	 * tables. They will also be returned to the client.
+	 * 
+	 * @return string[]
+	 */
 	protected static function getDefaultFetchProperties() {
 		
 		$cacheKey = 'property-getDefaultFetchProperties-' . str_replace('\\', '-', static::class);

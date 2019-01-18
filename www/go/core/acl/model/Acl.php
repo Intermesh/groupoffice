@@ -2,13 +2,12 @@
 namespace go\core\acl\model;
 
 use go\core\App;
-use go\modules\core\groups\model\Group;
-use go\modules\core\users\model\User;
 use go\core\db\Criteria;
 use go\core\db\Query;
-use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\util\DateTime;
+use go\modules\core\groups\model\Group;
+use go\modules\core\users\model\User;
 
 /**
  * The Acl class
@@ -62,15 +61,9 @@ class Acl extends Property {
 	
 	protected function internalSave() {
 		
-		if($this->isNew() && empty($this->groups)) {			
-			
-			$this->groups[] = (new AclGroup())
-						->setValues([
-								'groupId' => Group::ID_ADMINS, 
-								'level' => self::LEVEL_MANAGE
-										]);
-
-			
+		if($this->isNew() && empty($this->groups)) {		
+					
+			$this->addGroup(Group::ID_ADMINS, self::LEVEL_MANAGE);
 			
 			if($this->ownedBy != User::ID_SUPER_ADMIN) {
 				
@@ -79,15 +72,47 @@ class Acl extends Property {
 								->selectSingleValue('id')
 								->single();
 				
-				$this->groups[] = (new AclGroup())
-								->setValues([
-										'groupId' => $groupId, 
-										'level' => self::LEVEL_MANAGE
-												]);
+				$this->addGroup($groupId, self::LEVEL_MANAGE);
 			}
 		}
 		
 		return parent::internalSave();
+	}
+	
+	/**
+	 * Add a group to the ACL
+	 * 
+	 * @example
+	 * ```
+	 * $acl->addGroup(Group::ID_INTERNAL)->save();
+	 * ```
+	 * 
+	 * @param int $groupId
+	 * @param int $level
+	 * @return $this
+	 */
+	public function addGroup($groupId, $level = self::LEVEL_READ) {
+		$this->groups[] = (new AclGroup())
+								->setValues([
+										'groupId' => $groupId, 
+										'level' => $level
+												]);
+		
+		return $this;
+	}
+	
+	/**
+	 * Remove group
+	 * 
+	 * @param int $groupId
+	 * @return $this
+	 */
+	public function removeGroup($groupId) {
+		$this->groups = array_filter($this->groups, function($group) use ($groupId) {
+			return $groupId != $groupId;
+		});
+		
+		return $this;
 	}
 	
 	/**

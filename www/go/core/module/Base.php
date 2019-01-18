@@ -176,9 +176,10 @@ abstract class Base {
 	}
 	
 	/**
-	 * Override to implement installation routines after the database has been created
+	 * Override to implement installation routines after the database has been 
+	 * created. Share the module with group "Internal" for example.
 	 * 
-	 * @return boolean
+	 * @return bool
 	 */
 	protected function afterInstall(Module $model) {
 		return true;
@@ -186,7 +187,7 @@ abstract class Base {
 	
 	/**
 	 * Override to implement uninstallation routines before the database will be destroyed.
-	 * @return boolean
+	 * @return bool
 	 */
 	protected function beforeUninstall() {
 		return true;
