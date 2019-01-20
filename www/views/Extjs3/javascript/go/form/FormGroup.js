@@ -66,7 +66,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	initBbar: function() {
 		this.bbar = [
 			{
-				iconCls: this.addButtonIconCls,
+				//iconCls: this.addButtonIconCls,
 				text: this.addButtonText,
 				handler: function() {
 					var wrap = this.addPanel();

@@ -381,14 +381,17 @@ class Contact extends AclItemEntity {
 			if(!isset($this->uri)) {
 				$this->uri = $this->uid . '.vcf';
 			}
-			return GO()->getDbConnection()
+			if(!GO()->getDbConnection()
 							->update('addressbook_contact', 
 											['uid' => $this->uid, 'uri' => $this->uri], 
 											['id' => $this->id])
-							->execute();			
+							->execute()) {
+				return false;
+			}
 		}		
 		
-		return true;
+		return $this->saveOriganizationIds();
+		
 	}
 	
 	protected function internalValidate() {		
@@ -411,31 +414,55 @@ class Contact extends AclItemEntity {
 		return parent::internalValidate();
 	}
 	
+	private $organizationIds;
+	private $setOrganizationIds;
+	
 	public function getOrganizationIds() {
-		$query = Link::find()->selectSingleValue('toId')->filter([
-				'entityId' => $this->id,
-				'entity' => "Contact",
-				'entities' => [
-						['name' => "Contact", "filter" => "isOrganization"]
-				]
-		]);
-		return array_map("intval", $query->all());
+		
+		if($this->isNew()) {
+			$this->organizationIds = [];
+		}
+		
+		if(!isset($this->organizationIds)) {
+			$query = Link::find()->selectSingleValue('toId')->filter([
+					'entityId' => $this->id,
+					'entity' => "Contact",
+					'entities' => [
+							['name' => "Contact", "filter" => "isOrganization"]
+					]
+			]);
+			
+			$this->organizationIds = array_map("intval", $query->all());
+		}
+		
+		
+		return $this->organizationIds;
 	}
 	
-	public function setOrganizationIds($ids) {
+	public function setOrganizationIds($ids) {		
+		$this->setOrganizationIds = $ids;				
+	}
+	
+	private function saveOriganizationIds(){
+		if(!isset($this->setOrganizationIds)) {
+			return true;
+		}
 		$current = $this->getOrganizationIds();
-		$remove = array_diff($current, $ids);
 		
+		$remove = array_diff($current, $this->setOrganizationIds);
 		if(count($remove)) {
 			Link::deleteLinkWithIds($remove, Contact::getType()->getId(), $this->id, Contact::getType()->getId());
 		}
 		
-		$add = array_diff($ids, $current);
+		$add = array_diff($this->setOrganizationIds, $current);
 		
 		foreach($add as $orgId) {
 			$org = self::findById($orgId);
-			Link::create($this, $org);
+			if(!Link::create($this, $org)) {
+				throw new \Exception("Failed to link organization: ". $orgId);
+			}
 		}
+		return true;
 	}
 
 	protected function getSearchDescription() {

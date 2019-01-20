@@ -1322,6 +1322,11 @@ table[id^="comments-ext"] b {
 	}
 }
 
+.x-form {
+	.x-btn-icon button {
+		color: color($fg, "secondary-text");
+	}
+}
 
 .x-panel.text {
 	padding: dp(16);
@@ -1472,9 +1477,9 @@ table[id^="comments-ext"] b {
 		font-weight: normal;
 	}
 	
-	.x-btn-text-icon button::before {
+/*	.x-btn-text-icon button::before {
 		padding-right: dp(16);
-	}
+	}*/
 }
 
 
@@ -1485,6 +1490,10 @@ table[id^="comments-ext"] b {
 	margin-right: dp(8);
 	margin-top: dp(8);
 	padding-left: dp(8);
+	
+	button.icon {
+		color: color($fg, "secondary-text");
+	}
 }
 
 .go-html-formatted {

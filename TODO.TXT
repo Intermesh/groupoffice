@@ -1,5 +1,7 @@
 6.4
 
+- Billing: Copy matching custom fields in order dialog
+
 
 For old framework:
 
@@ -17,8 +19,6 @@ Folder::deriveCustomfieldSettings
 Address lists / mailings
 General import/export
 
-Custom fields time entry
-
 custom fields billign items dropped ?!
 
 Remove search cache and links on delete
@@ -30,9 +30,6 @@ For new:
 
 	calendar birthdays
 	demodata
-	carddav
-	zpush
-	site / defaultsite
 	ticket groups
 	templates for project contracts (See income model)
 
