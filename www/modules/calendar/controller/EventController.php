@@ -374,8 +374,8 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 					$resourceEvent->busy = !$resourceEvent->calendar->group->show_not_as_busy;
 
 
-					if (\GO::modules()->customfields && isset($params['resource_options'][$resource_calendar_id]))
-						$resourceEvent->customfieldsRecord->setAttributes($params['resource_options'][$resource_calendar_id]);
+					if (isset($params['resource_options'][$resource_calendar_id]))
+						$resourceEvent->setCustomFields($params['resource_options'][$resource_calendar_id]);
 
 					$resourceEvent->save(true);
 
@@ -652,7 +652,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		$response['data']['end_date'] = \GO\Base\Util\Date::get_timestamp($model->end_time, false);
 
 
-		$response['group_id'] = $model->calendar->group_id;
+		$response['group_id'] = $response['data']['group_id'] = intval($model->calendar->group_id);
 		
 		
 		if(!$model->id){
@@ -743,7 +743,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			
 			if(\GO::modules()->customfields){
 				
-				$attr = $resourceEvent->customfieldsRecord->getAttributes('html');
+				$attr = $resourceEvent->getCustomFields();
 				foreach($attr as $key=>$value){
 					$resource_options = 'resource_options['.$resourceEvent->calendar->id.']['.$key.']';
 					$response['data'][$resource_options] = $value;

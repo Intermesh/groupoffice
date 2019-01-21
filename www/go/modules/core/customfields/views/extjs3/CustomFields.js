@@ -168,6 +168,7 @@
 					return;
 				}
 				var formField = type.renderFormField(field);
+				formField.field = field;
 				r.push(formField);						
 			});
 
@@ -258,6 +259,7 @@
 						return;
 					}
 					var cmp = type.getDetailField(field);					
+					cmp.field = field;
 					items.push(cmp);
 				});
 				

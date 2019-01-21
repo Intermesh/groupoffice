@@ -24,6 +24,7 @@ GO.calendar.CalendarDialog = function(config)
 		anchor: '100% 100%',		
 		cls:'go-form-panel',
 		labelWidth: 120,
+		autoScroll: true,
 		items: [
 		this.selectUser = new GO.form.SelectUser({
 			fieldLabel: t("User"),
@@ -257,6 +258,9 @@ GO.calendar.CalendarDialog = function(config)
 		})],
 		cls: 'go-form-panel'
 	});
+	
+	
+	this.propertiesTab.add(go.modules.core.customfields.CustomFields.getFormFieldSets("Calendar"));
 
 
 	var items = [this.propertiesTab];
@@ -270,15 +274,7 @@ GO.calendar.CalendarDialog = function(config)
 	items.push(this.readPermissionsTab);
 	items.push(this.importTab);
 
-	if(go.Modules.isAvailable("core", "customfields") && GO.customfields.types["GO\\Calendar\\Model\\Calendar"])
-	{
-		for(var i=0;i<GO.customfields.types["GO\\Calendar\\Model\\Calendar"].panels.length;i++)
-		{
-			var panel = GO.customfields.types["GO\\Calendar\\Model\\Calendar"].panels[i];
-			panel.autoScroll = true;
-			items.push(panel);
-		}
-	}
+
 
 	this.tabPanel = new Ext.TabPanel({
 		hideLabel:true,

@@ -39,6 +39,22 @@ Ext.applyIf(Array.prototype, {
 		return this.map(function(i) {
 			return i[name];
 		});
+	},
+	
+	/**
+	 * Same as indexOf but not strict. eg. "2" will be found in [2].
+	 * 
+	 * @param {type} v
+	 * @returns {Number}
+	 */
+	indexOfLoose : function(v) {
+		for(var i = 0, l = this.length; i < l; i++) {
+			if(this[i] == v) {
+				return i;
+			}
+		}
+		
+		return -1;
 	}
 });
 

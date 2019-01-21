@@ -7,17 +7,17 @@ GO.calendar.SystemSettingsPanel = Ext.extend(Ext.Panel, {
 		this.items = [
 			new go.modules.core.customfields.SystemSettingsPanel({
 					entity: "Event",
-					title: "Event custom fields"
-	//				createFieldSetDialog : function() {
-	//					return new go.modules.community.addressbook.CustomFieldSetDialog();
-	//				}
+					title: "Event custom fields",
+					createFieldSetDialog : function() {
+						return new GO.calendar.CustomFieldSetDialog();
+					}
 			}),
 			new go.modules.core.customfields.SystemSettingsPanel({
 					entity: "Calendar",
-					title: "Calendar custom fields"
-	//				createFieldSetDialog : function() {
-	//					return new go.modules.community.addressbook.CustomFieldSetDialog();
-	//				}
+					title: "Resource booking custom fields",
+					createFieldSetDialog : function() {
+						return new GO.calendar.CustomFieldSetDialog();
+					}
 			})
 		];
 		

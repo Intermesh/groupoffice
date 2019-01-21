@@ -66,7 +66,7 @@ go.modules.core.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 				
 				form.getForm().on("actioncomplete", function(f, action) {
 					if(action.type === "load") {
-						this.filter(f.getFieldValues());
+						this.filter(f.getFieldValues());						
 					}
 				}, this);
 			}
@@ -84,18 +84,17 @@ go.modules.core.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 	 * @returns {undefined}
 	 */
 	filter: function (entity) {
-		
 		for (var name in this.fieldSet.filter) {
 			var v = this.fieldSet.filter[name];
 
 			if (Ext.isArray(v)) {
-				if (v.indexOf(entity[name]) === -1) {
+				if (v.indexOfLoose(entity[name]) === -1) {
 					this.setVisible(false);
 					return;
 				}
 			} else
 			{
-				if (v !== entity[name]) {
+				if (v != entity[name]) {
 					this.setVisible(false);
 					return;
 				}
