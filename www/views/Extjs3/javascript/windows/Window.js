@@ -1,27 +1,3 @@
-GO.Window = function(config)
-	{
-		if(!config)
-		{
-			config={};
-		}
-		
-		//make sure window fits screen
-		if(config.width && config.width > window.innerWidth) {
-			config.width = window.innerWidth - dp(32);
-		}		
-		if(config.height && config.height > window.innerHeight) {
-			config.height = window.innerHeight	- dp(32);
-		}
-	
-		Ext.applyIf(config,{
-			keys:[],
-			maximizable:true,
-			minimizable:true
-		});
-	
-		GO.Window.superclass.constructor.call(this, config);
-	};
-
 GO.Window = Ext.extend(Ext.Window,{
 
 	constrainHeader : true,
@@ -29,14 +5,47 @@ GO.Window = Ext.extend(Ext.Window,{
 //this breaks some functionality that do stuff on render.
 	temporaryListeners : [],
 	
-	afterRender : function(){
+	
+	initComponent : function(){
 		
-		GO.Window.superclass.afterRender.call(this);
+
+		
+		//make sure window fits screen
+		if(this.width && this.width > window.innerWidth) {
+			this.width = window.innerWidth - dp(32);
+		}		
+		if(this.height && this.height > window.innerHeight) {
+			this.height = window.innerHeight	- dp(32);
+
+		}
+		
+		GO.Window.superclass.initComponent.call(this);
 		
 		this.on('move', function(){			
 			//to fix combobox autocomplete failure after move or hide window			
 			document.activeElement.blur();
 		});
+		
+		
+		this.autoRestoreFocus();
+	},	
+	
+	/**
+	 * Restore focus to active element before opening the window.	 
+	 */
+	autoRestoreFocus :  function() {
+		
+		this.on("beforeshow", function() {
+			this.activeEl = document.activeElement;
+		}, this);
+		
+		this.on("close", function() {	
+			this.activeEl.focus();
+		}, this);
+		
+		this.on("hide", function() {			
+			this.activeEl.focus();
+		}, this);
 	},
 	
 	addListenerTillHide : function(eventName, fn, scope){
