@@ -29,6 +29,19 @@ go.form.Dialog = Ext.extend(go.Window, {
 			items: this.initFormItems()
 		});
 		
+		
+		//Add a hidden submit button so the form will submit on enter
+		this.formPanel.add(new Ext.Button({
+					hidden: true,
+					hideMode: "offsets",
+					type: "submit",
+					handler: function() {
+						this.submit();
+					},
+					scope: this
+				}));
+				
+		
 		this.formPanel.on("save", function(fp, entity) {
 			this.fireEvent("save", this, entity);
 		}, this);
