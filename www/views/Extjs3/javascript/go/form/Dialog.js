@@ -101,6 +101,10 @@ go.form.Dialog = Ext.extend(go.Window, {
 		
 		return this;
 	},
+	
+	getValues : function() {
+		return this.formPanel.getValues();
+	},
 
 	load: function (id) {
 		
