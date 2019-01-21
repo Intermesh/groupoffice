@@ -249,15 +249,49 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		return v;
 	},
 
-	markInvalid: function () {
-
+	markInvalid: function (msg) {
+		var f = this.getAllFormFields();
+		for(var i = 0, l = f.length; i < l; i++) {
+			f[i].markInvalid(msg);			
+		}
 	},
+	
 	clearInvalid: function () {
-
+		var f = this.getAllFormFields();
+		for(var i = 0, l = f.length; i < l; i++) {
+			f[i].clearInvalid();			
+		}
 	},
 
 	validate: function () {
+		var f = this.getAllFormFields();
+		for(var i = 0, l = f.length; i < l; i++) {
+			if(!f[i].validate()) {
+				return false;
+			}
+		}
 		return true;
+	},
+	
+	getAllFormFields : function(c) {
+		var fields = [];
+		
+		if(!c) {
+			c = this;
+		}
+		
+		if(c.items) {
+			c.items.each(function(i) {
+				if(i.isFormField) {
+					fields.push(i);
+				} else if(i.items) {
+					fields = fields.concat(this.getAllFormFields(i));
+				}
+					
+			}, this);
+		}
+		
+		return fields;
 	}
 });
 
