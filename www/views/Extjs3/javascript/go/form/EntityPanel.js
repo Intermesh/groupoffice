@@ -101,13 +101,15 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 
 			var saved = (params.create ? response.created : response.updated) || {};
 			if (id in saved) {				
-				this.fireEvent("save", this, values);
+				this.fireEvent("save", this, values, serverId);
 
 				var serverId = params.create ? response.created[id].id : id;
 
 				if(cb) {
 					cb.call(scope, this, true, serverId);
 				}
+				
+				this.fireEvent("submit", this, true, serverId);
 			} else
 			{
 				//something went wrong
@@ -137,6 +139,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 				if(cb) {
 					cb.call(scope, this, false, null);
 				}
+				this.fireEvent("submit", this, true, null);
 			}
 		}, this);
 
