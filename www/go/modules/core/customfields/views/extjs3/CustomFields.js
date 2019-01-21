@@ -138,6 +138,17 @@
 			}
 			return formFieldSets;
 		},
+		
+		/**
+		 * Show or hide fieldsets based on their "filter" property. 
+		 * See FieldSet::getFilter() in the PHP documentation
+		 * 
+		 */
+		filterFieldSets : function(formPanel) {
+			formPanel.findByType("customformfieldset").forEach(function(fs){
+				fs.filter(formPanel.getForm().getFieldValues());
+			}, this);
+		},
 
 		/**
 		 * Get form fields for field set

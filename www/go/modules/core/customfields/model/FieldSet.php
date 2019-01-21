@@ -33,6 +33,21 @@ class FieldSet extends AclOwnerEntity {
 	
 	protected $filter;	
 	
+	/**
+	 * The filter is an object that can be used to show and hide field sets based
+	 * on the entity values.
+	 * 
+	 * For example a contact fieldset may have:
+	 * 
+	 * filter = {
+	 *    addressBookId: [1, 2],
+	 *    isOrganization: true
+	 * }
+	 * 
+	 * Will only show this fieldset for addressBookId 1 and 2 and for organizations.
+	 * 
+	 * @return array
+	 */
 	public function getFilter() {
 		return empty($this->filter) || $this->filter == '[]'  ? new \stdClass() : json_decode($this->filter, true);
 	}

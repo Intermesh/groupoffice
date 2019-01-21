@@ -96,6 +96,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 			params.create[id] = values;
 		}
 
+		this.fireEvent('beforesubmit', this, values);
 		
 		this.entityStore.set(params, function (options, success, response) {
 
