@@ -61,29 +61,17 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 												xtype: 'textfield',
 												name: 'firstName',
 												emptyText: t("First"),
-												flex: 3,
-												listeners: {
-													change: this.buildFullName,
-													scope: this
-												}
+												flex: 3
 											}, {
 												xtype: 'textfield',
 												name: 'middleName',
 												emptyText: t("Middle"),
-												flex: 2,
-												listeners: {
-													change: this.buildFullName,
-													scope: this
-												}
+												flex: 2
 											}, {
 												xtype: 'textfield',
 												name: 'lastName',
 												emptyText: t("Last"),
-												flex: 3,
-												listeners: {
-													change: this.buildFullName,
-													scope: this
-												}
+												flex: 3
 											}]
 									}),
 									{
@@ -488,5 +476,16 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 
 		this.nameField.setValue(name);
 
+	},
+	
+	onBeforeSubmit : function() {
+		
+		//build full name on submit. Because when ENTER is pressed in one of the name
+		//fields the blur event is not triggered.
+		if(!this.getValues()['isOrganization']) {
+			this.buildFullName();
+		}
+		
+		return go.modules.community.addressbook.ContactDialog.superclass.onBeforeSubmit.call(this);
 	}
 });
