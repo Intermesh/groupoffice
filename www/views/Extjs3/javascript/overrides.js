@@ -115,6 +115,35 @@ Ext.override(Ext.form.TextArea,{
 	}
 });
 
+Ext.override(Ext.form.TextField,{
+	
+	//Added check for ENTER key. Becuase this code prevented form submission
+	filterKeys : function(e){
+
+		if(e.ctrlKey){
+				return;
+		}
+		var k = e.getKey();
+
+		if(k == e.ENTER) {
+			return;
+		}
+
+		if(Ext.isGecko && (e.isNavKeyPress() || k == e.BACKSPACE || (k == e.DELETE && e.button == -1))){
+				return;
+		}
+		var cc = String.fromCharCode(e.getCharCode());
+		if(!Ext.isGecko && e.isSpecialKey() && !cc){
+				return;
+		}
+		if(!this.maskRe.test(cc)){
+				e.stopEvent();
+		}
+	}
+});
+
+
+
 Ext.override(Ext.form.BasicForm,{
 	submit : function(options){
         options = options || {};
