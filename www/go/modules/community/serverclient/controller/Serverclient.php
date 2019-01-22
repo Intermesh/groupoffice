@@ -20,8 +20,8 @@ class Serverclient extends \go\core\jmap\Controller {
 		if($user->hasPermissionLevel(\go\core\acl\model\Acl::LEVEL_WRITE)) {
 			$postfixAdmin = new MailDomain($params['password']);
 			foreach ($params['domains'] as $domain) {
-				$this->addMailbox($user,$domain);
-				$this->addAccount($user,$domain);
+				$postfixAdmin->addMailbox($user,$domain);
+				$postfixAdmin->addAccount($user,$domain);
 			}
 		}
 
