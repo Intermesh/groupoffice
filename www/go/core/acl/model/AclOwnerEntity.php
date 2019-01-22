@@ -110,7 +110,21 @@ abstract class AclOwnerEntity extends AclEntity {
 	}
 	
 	/**
-	 * Applies conditions to the query so that only entities with the given permission level are fetched.
+	 * Applies conditions to the query so that only entities with the given 
+	 * permission level are fetched.
+	 * 
+	 * Note: when you join another table with an acl ID you can use Acl::applyToQuery():
+	 * 
+	 * ```
+	 * $query = User::find();
+	 * 
+	 * $query	->join('applications_application', 'a', 'a.createdBy = u.id')
+							->groupBy(['u.id']);
+			
+	 * //We don't want to use the Users acl but the applications acl.
+			\go\core\acl\model\Acl::applyToQuery($query, 'a.aclId');
+	 * 
+	 * ```
 	 * 
 	 * @param Query $query
 	 * @param int $level

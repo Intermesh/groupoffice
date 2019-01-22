@@ -40,7 +40,7 @@ abstract class Property extends Model {
 	/**
 	 * Fires when the mapping is defined. Other modules can add new properties
 	 * 
-	 * The event listeners is called with the {@see Mapping} object.
+	 * The event listener is called with the {@see Mapping} object.
 	 */
 	const EVENT_MAPPING = "mapping";
 

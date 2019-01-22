@@ -748,3 +748,5 @@ CREATE TABLE IF NOT EXISTS `go_templates` (
   `extension` varchar(4) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE `core_group` ADD UNIQUE(`name`);
