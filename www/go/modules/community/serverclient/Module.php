@@ -17,7 +17,13 @@ class Module extends Base {
 	}
 	
 	public static function getDomains(){
-		return empty(\GO::config()->serverclient_domains) ? array() : array_map('trim',explode(",", \GO::config()->serverclient_domains));
+		if(empty(\GO::config()->serverclient_domains)) {
+			return array();
+		}
+		if(is_array(\GO::config()->serverclient_domains)) {
+			return \GO::config()->serverclient_domains;
+		}
+		return array_map('trim',explode(",", \GO::config()->serverclient_domains));
 	}
 
 	public static function onSaveUser(User $user) {
