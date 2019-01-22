@@ -28,7 +28,7 @@ class Module extends Base {
 		
 		$domains = self::getDomains();
 		
-		if(!empty($user->plainPassword()) && empty($domains)) {
+		if(!empty($user->plainPassword()) && !empty($domains)) {
 			$postfixAdmin = new MailDomain($user->plainPassword());
 			foreach ($domains as $domain) {
 				$postfixAdmin->setMailboxPassword($user, $domain);
