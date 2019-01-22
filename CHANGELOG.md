@@ -1,3 +1,5 @@
+21-01-2018 6.3.59
+- Mailserver: Server client module works again
 - E-mail: Fixed Email Attachment wiggle #275
 - E-mail: Fixed Sieve issue #268
 - E-mail: Fixed Tooltips in the way of email #276
