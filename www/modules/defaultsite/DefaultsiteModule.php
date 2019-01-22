@@ -22,7 +22,7 @@ class DefaultsiteModule extends \GO\Base\Module {
 		return array('site');
 	}
 
-	public function install() {
+	public function enable() {
 		
 		if(\GO::modules()->isInstalled('site')){
 			$alreadyExists = \GO\Site\Model\Site::model()->findSingleByAttribute('module','defaultsite');
@@ -53,7 +53,7 @@ class DefaultsiteModule extends \GO\Base\Module {
 			}
 		}
 		
-		return parent::install();
+		return parent::enable();
 	}
 	
 }
