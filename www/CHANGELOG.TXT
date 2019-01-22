@@ -1,3 +1,6 @@
+22-01-2019 6.2.112
+- Files: Switch notification language to the user when sending folder notifications
+- Tickets: Fixed duplicate ticket type with id 0 bug (Ticket #201817296)
 - Core: Removed robots noindex header because they don't have any effect because
 				robots.txt is used.
 - Core: Use Acpu caching if available
