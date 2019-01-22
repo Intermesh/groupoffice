@@ -23,6 +23,7 @@ trait CustomFieldsTrait {
 	 */
 	private $customFieldsData;
 	private $customFieldsModified = false;
+	private $customFieldsIsNew;
 	
 	/**
 	 * Get all custom fields data for an entity
@@ -35,6 +36,8 @@ trait CustomFieldsTrait {
 							->select('*')
 							->from($this->customFieldsTableName(), 'cf')
 							->where(['id' => $this->id])->single();
+			
+			$this->customFieldsIsNew = !$record;
 							
 			if($record) {			
 				
@@ -55,7 +58,7 @@ trait CustomFieldsTrait {
 			}
 		}
 		
-		return $this->customFieldsData;
+		return array_filter($this->customFieldsData, function($key) {return $key != 'id';}, ARRAY_FILTER_USE_KEY);
 	}
 	
 	//for legacy modules
@@ -72,7 +75,7 @@ trait CustomFieldsTrait {
 	 * 
 	 * @param array $data
 	 */
-	public function setCustomFields(array $data) {		
+	public function setCustomFields(array $data) {			
 		$this->customFieldsData = array_merge($this->getCustomFields(), $this->normalizeCustomFieldsInput($data));		
 		
 		$this->customFieldsModified = true;
@@ -151,23 +154,24 @@ trait CustomFieldsTrait {
 				if(!$field->getDataType()->beforeSave(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record)) {
 					return false;
 				}
-			}
+			}			
 			
-			if(!isset($record['id'])) {
-				if(!empty($record)) {			
+			if($this->customFieldsIsNew) {
+				if(!empty($record)) {								
 					$record['id'] = $this->id;	
 					if(!App::get()
 									->getDbConnection()
 									->insert($this->customFieldsTableName(), $record)->execute()){
 									return false;
 					}
+					$this->customFieldsIsNew = false;
 				}
 			} else
 			{
 				unset($record['id']);
 				if(!empty($record) && !App::get()
 								->getDbConnection()
-								->update($this->customFieldsTableName(), $record, ['id' => $this->customFieldsData['id']])->execute()) {
+								->update($this->customFieldsTableName(), $record, ['id' => $this->id])->execute()) {
 					return false;
 				}
 			}

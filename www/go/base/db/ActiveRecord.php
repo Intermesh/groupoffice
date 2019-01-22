@@ -3665,8 +3665,13 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			}
 		}
 
-
-
+		if($this->hasCustomFields()) {
+			foreach($this->getCustomFields() as $col => $v) {
+				if(!empty($v) && is_string($v)) {
+					$keywords[] = $v;
+				}
+			}
+		}
 
 		$keywords = $prepend.','.implode(',',$keywords);
 

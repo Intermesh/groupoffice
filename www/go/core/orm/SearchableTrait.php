@@ -28,7 +28,7 @@ trait SearchableTrait {
 	/**
 	 * All the keywords that can be searched on
 	 * 
-	 * @return string
+	 * @return string[]
 	 */
 	protected function getSearchKeywords() {
 		return null;
@@ -60,9 +60,20 @@ trait SearchableTrait {
 		
 		$keywords = $this->getSearchKeywords();
 		if(!isset($keywords)) {
-			$keywords = $search->name.', '.$search->description;
+			$keywords = [$search->name, $search->description];
 		}
-		$search->setKeywords($keywords);
+		
+		if(method_exists($this, 'getCustomFields')) {
+			foreach($this->getCustomFields() as $col => $v) {
+				if(!empty($v) && is_string($v)) {
+					$keywords[] = $v;
+				}
+			}
+		}
+		
+		$keywords = array_unique($keywords);
+		
+		$search->setKeywords(implode(',', $keywords));
 		
 		if(!$search->internalSave()) {
 			throw new \Exception("Could not save search cache: " . var_export($search->getValidationErrors(), true));
