@@ -5141,10 +5141,12 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 				}
 			}
+			
+			if($this->hasCustomFields()) {
+				$this->setCustomFields($model->getCustomFields());
+			}
+			
 			$this->save();
-
-			//copy custom fields
-			//TODO
 		}
 
 		$model->copyLinks($this);
