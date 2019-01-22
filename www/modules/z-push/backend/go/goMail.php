@@ -734,6 +734,9 @@ class goMail extends GoBaseBackendDiff {
 				{
 					ZLog::Write(LOGLEVEL_DEBUG, 'Client sent cutoff date for calendar: ' . \GO\Base\Util\Date::get_timestamp($cutoffdate));
 					$uids = $imap->search('SINCE ' . date("j-M-Y", $cutoffdate));
+					if(empty($uids)) {
+						return [];
+					}
 					$headers = $imap->get_flags(min($uids).':*');
 				}
 				
