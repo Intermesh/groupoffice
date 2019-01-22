@@ -12,7 +12,7 @@ class Module extends Base {
 		return 'Intermesh BV';
 	}
 
-	public static function defineListeners() {
+	public function defineListeners() {
 		User::on(\go\core\orm\Entity::EVENT_SAVE, static::class, 'onSaveUser');
 	}
 	
