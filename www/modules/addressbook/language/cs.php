@@ -279,4 +279,5 @@ return array (
   'LinkedIn URL' => 'LinkedIn URL',
   'Facebook URL' => 'Facebook URL',
   'Twitter URL' => 'Twitter URL',
+  'Remove duplicates' => 'Smazat duplicity',
 );

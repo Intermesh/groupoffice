@@ -112,41 +112,45 @@ class Language {
 			//Get english default
 			$file = $this->findLangFile('en',$package, $module);
 			if ($file->exists()) {
-				$langData = $this->loadFile($file);
+				$langData = new util\ArrayObject($this->loadFile($file));
 			}
 
 			//overwirte english with actual language
 			if ($this->isoCode != 'en') {
 				$file = $this->findLangFile($this->isoCode, $package, $module);
 				if ($file->exists()) {
-					$langData = array_merge($langData, $this->loadFile($file));
+					$langData->mergeRecurive($this->loadFile($file));
 				}
 			}
 
 			$file = $this->findLangOverride($this->isoCode, $package, $module);
 			if ($file->exists()) {
-				$langData = array_merge($langData, $this->loadFile($file));
+				$langData->mergeRecurive($this->loadFile($file));
 			}
 			
 			$productName = GO()->getConfig()['branding']['name'];
 
 			foreach ($langData as $key => $translation) {
+				
+				if(!is_string($translation)) {
+					continue;
+				}
 							
-					//branding
-					$langData[$key]  = str_replace(
-									[
-											"{product_name}",
-											"GroupOffice",
-											"Group-Office",
-											"Group Office"
-									], 
-									[
-											$productName,
-											$productName,
-											$productName,
-											$productName
-									
-									], $langData[$key]);
+				//branding
+				$langData[$key]  = str_replace(
+								[
+										"{product_name}",
+										"GroupOffice",
+										"Group-Office",
+										"Group Office"
+								], 
+								[
+										$productName,
+										$productName,
+										$productName,
+										$productName
+
+								], $langData[$key]);
 			}
 
 			$this->data[$package][$module] = $langData;			

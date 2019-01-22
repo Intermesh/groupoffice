@@ -291,7 +291,7 @@
 	@extend %icon;
 	content: 'check_box_outline_blank'; // 'check_box' when on
 	position: relative;
-	color:color($fg, 'icon');
+	color: inherit;
 	display:inline-block;
 	height: dp(32);
 	width: dp(32);
@@ -448,8 +448,10 @@
 	
 	&-helptext {
 		@extend %font-caption;
-		white-space: pre-wrap;
+		/*white-space: pre-wrap;*/
 		line-height: 1.6em;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 	
 }
@@ -874,6 +876,7 @@
 		}
 	}
 }
+
 .x-toolbar{
 	height: dp(56);
 	padding:0 dp(8) 0 0;
@@ -2290,6 +2293,12 @@ body.x-body-masked .x-window-plain .x-window-mc {
 .x-html-editor-tb .x-btn-text {
 	background-image: none; //url(wysiwyg.gif);
 }
+
+
+.x-html-editor-tb {
+	padding: dp(8) 0;
+}
+
 
 // ####################
 // ### BORDERLAYOUT ###

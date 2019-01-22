@@ -200,6 +200,11 @@ GO.files.FileBrowser = function(config){
 			header:t("Modified at"),
 			dataIndex: 'mtime',
 			width: dp(140)
+		}, {
+			id: 'id',
+			header: 'ID',
+			dataIndex: 'id',
+			hidden: true
 		}]
 	};
 
@@ -1921,6 +1926,15 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 		{
 			this.on('filebrowserready', fn, scope);
 		}
+	},
+	
+	route: function(id, entity) {
+		
+		var detailViewName = entity + "Detail";
+		
+		this[detailViewName].load(parseInt(id));
+//		mainPanel[detailViewName].show();
+		this.eastPanel.getLayout().setActiveItem(this[detailViewName]);
 	}
 });
 

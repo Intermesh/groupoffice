@@ -1,3 +1,38 @@
+22-01-2018 6.3.59
+- Mailserver: Server client module works again
+- E-mail: Fixed Email Attachment wiggle #275
+- E-mail: Fixed Sieve issue #268
+- E-mail: Fixed Tooltips in the way of email #276
+- Files: Fixed global folder search
+         Fixed Search Folder #287
+- Core: created checkbox to enable login message.
+        Fixed Missing Features in 6.3.x #290
+- Start page: Portlets must only be declared if user has permissions for the module
+              Fixed Disharmony between Files and Start Page #291
+- Custom fields: Fixed disable custom field categories
+- Core: Invalid sql in cron->getAllUsers()
+- Core: Language didn't merge recursively with English leading to incomplete
+        country selection combo box.
+- Files: Fixed incorrect shared folder tree
+- Core: Removed robots noindex header because they don't have any effect because
+				robots.txt is used.
+- Core: Updated Brazilian Portugese and Czech language
+- Core: Fixed display of short date when choosing date further away than a week.
+- Core: Fixed clicking to dismiss notifier messages
+- Core: Moved search field from pagination bar to the top toolbar in Multiselect grids
+- Core: Added a display name colum to the permissions add dialog. This will make it easier to search for the correct user to add.
+- Core: Use Apcu caching if available.
+- Core: Update in store could make values null that were prefetched. See ticket #201817274.
+- Projects2/Timeregistration: Fixed issue that the invoiced check icon for time entries was not displayed anymore.
+- Core: Delete search cache and links when entities are deleted.
+- Core: Run checkdatabase as admin. Fixes #266
+
+11-12-2018 6.3.58
+- Core: Fixed access denied error in upgrade.
+
+10-12-2018 6.3.57
+- Billing: Fixed loading address data when opening Orderdialog from contact (link)
+- Files: Copy custom field settings too when copying folders
 - Core: moving a folder failed when on different volumes
 
 04-12-2018 6.3.56

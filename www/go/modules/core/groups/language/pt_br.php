@@ -17,4 +17,9 @@ return array (
   'Use' => 'Usar',
   'name' => 'Grupos',
   'description' => 'Módulo administração; Gerenciar grupos de usuários.',
+  'Group defaults' => 'Padrões do grupo',
+  'Members of the groups below can access a new group when it is created. These groups can share items with users and user groups that they are not members of.' => 'Os membros dos grupos abaixo podem acessar um novo grupo quando ele for criado. Esses grupos podem compartilhar itens com usuários e grupos de usuários dos quais eles não são membros.',
+  'Use the button below to apply the above to existing groups. WARNING: This will erase all custom permissions on groups.' => 'Use o botão abaixo para aplicar o exposto acima aos grupos existentes. AVISO: Isso apagará todas as permissões personalizadas nos grupos.',
+  'Apply to all' => 'Aplicar a todos',
+  'Are you sure you want to reset all group permissions? This can\'t be undone.' => 'Tem certeza de que deseja redefinir todas as permissões do grupo? Isso não pode ser desfeito.',
 );

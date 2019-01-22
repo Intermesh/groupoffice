@@ -22,12 +22,11 @@ GO.customfields.addColumns = function(link_type, fields) {
 };
 
 GO.customfields.getMatchingFieldNamesMap = function(sourceLinkId, targetLinkId){
-
 	var sourceFields={};
 	for(var i = 0; i < GO.customfields.types[sourceLinkId].panels.length; i++) {
 		var p = GO.customfields.types[sourceLinkId].panels[i];
 		for(var n = 0; n < p.customfields.length; n++) {
-			sourceFields[p.customfields[n]['name']] = p.customfields[n]['dataname'];
+			sourceFields[p.customfields[n]['name']] = p.customfields[n]['databaseName'];
 		}
 	}
 
@@ -36,7 +35,7 @@ GO.customfields.getMatchingFieldNamesMap = function(sourceLinkId, targetLinkId){
 		var p = GO.customfields.types[targetLinkId].panels[i];
 		for(var n = 0; n < p.customfields.length; n++) {
 			if(sourceFields[p.customfields[n]['name']]){
-				map[sourceFields[p.customfields[n]['name']]]=p.customfields[n]['dataname'];
+				map[sourceFields[p.customfields[n]['name']]]=p.customfields[n]['databaseName'];
 			}
 		}
 	}

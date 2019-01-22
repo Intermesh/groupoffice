@@ -432,7 +432,8 @@ $columnModel->formatColumn('username', '$model->user->displayName', array(), 'us
 							array(
 									"CONCAT(t.name,' ',t.name2,' ',' ',a.name)",
 									't.email'
-									))					
+									))	
+						->joinCustomFields()
 			->joinModel(array(
 				'model'=>'GO\Addressbook\Model\Addressbook',
 				'foreignField'=>'id', //defaults to primary key of the remote model

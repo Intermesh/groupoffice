@@ -5,9 +5,7 @@
 	<?php GO::router()->getController()->fireEvent('headstart'); ?>	
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="HandheldFriendly" content="true"/> 
-
 	<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
-	<meta name="robots" content="noindex" />
 	<meta http-equiv="x-ua-compatible" content="IE=edge">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-title" content="<?php echo \GO::config()->title; ?>">

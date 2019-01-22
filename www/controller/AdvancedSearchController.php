@@ -21,4 +21,3 @@ class AdvancedSearchController extends \GO\Base\Controller\AbstractModelControll
 		return $storeParams;
 	}
 }
-?>

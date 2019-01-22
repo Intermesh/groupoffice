@@ -1100,7 +1100,7 @@ class AbstractModelController extends AbstractController {
 			$columns = $model->customfieldsRecord->getColumns();
 			foreach($columns as $name=>$attr){
 				try {
-					$cfModel = \GO\Customfields\Model\Field::model()->findByPk(substr($name,4));
+					$cfModel = \GO\Customfields\Model\Field::model()->findByAttribute('databaseName', $name);
 					$cfAllowed = $cfModel!==false;
 				} catch (\GO\Base\Exception\AccessDenied $e) {
 					$cfAllowed = false;

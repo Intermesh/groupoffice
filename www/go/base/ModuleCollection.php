@@ -248,6 +248,16 @@ class ModuleCollection extends Model\ModelCollection{
 	 */
 	public function getAllModules($ignoreAcl=false){
 		
+		$cacheKey = $ignoreAcl ? 'all-modules-ignore' : 'all-modules';
+		
+		if(\GO::user()) {
+			$cacheKey .= '-'. \GO::user()->id;
+		}
+		
+		if(($modules = \GO::cache()->get($cacheKey))) {
+			return $modules;
+		}
+		
 		$findParams = Db\FindParams::newInstance()->order("sort_order");
 		
 		if($ignoreAcl)
@@ -259,6 +269,8 @@ class ModuleCollection extends Model\ModelCollection{
 			if($this->_isAllowed($module->name) && $module->isAvailable())
 				$modules[]=$module;
 		}
+		
+		\GO::cache()->set($cacheKey, $modules);
 		
 		return $modules;
 	}

@@ -55,6 +55,7 @@ foreach ($extendableModels as $extendableModel) {
 							'sortable:true,' .
 							'id: "' . $field['dataname'] . '",' .
 							'customfield_id: "' . $field['id'] . '",' .
+							'options: ' . \json_encode($field['options']).','.
 							'nesting_level: "' . (isset($field['options']['nestingLevel']) ? $field['options']['nestingLevel'] : 0) . '",' .
 							'multiselect: "' . (isset($field['options']['multiselect']) ? $field['options']['multiselect'] : 0) . '",' .
 							'exclude_from_grid: "' . $exclude_from_grid . '",' .

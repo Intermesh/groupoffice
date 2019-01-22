@@ -93,7 +93,7 @@ GO.addressbook.ContactDialog = function(config)
 				
 	items.push(this.selectAddresslistsPanel);
 	
-	if(GO.customfields && GO.customfields.types["GO\\Addressbook\\Model\\Contact"]) {
+	if(go.Modules.isAvailable("core", "customfields") && GO.customfields.types["GO\\Addressbook\\Model\\Contact"]) {
 		for(var i=0;i<GO.customfields.types["GO\\Addressbook\\Model\\Contact"].panels.length;i++) {
 			items.push(GO.customfields.types["GO\\Addressbook\\Model\\Contact"].panels[i]);
 		}

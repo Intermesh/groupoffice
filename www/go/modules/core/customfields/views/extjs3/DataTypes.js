@@ -196,11 +196,9 @@
 			getFormField: function (customfield, config) {
 				var f = GO.customfields.dataTypes["GO\\Customfields\\Customfieldtype\\Text"].getFormField(customfield, config);
 				var store = new GO.data.JsonStore({
-					//url: GO.settings.modules.customfields.url+'json.php',
 					url: GO.url('customfields/field/selectOptions'),
 					baseParams: {
-						//'task': 'field_options',
-						'field_id': customfield.id//customfield.id.replace("col_","")
+						'field_id': customfield.customfield_id
 					},
 					root: 'results',
 					totalProperty: 'total',

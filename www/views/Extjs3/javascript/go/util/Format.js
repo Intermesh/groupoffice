@@ -102,7 +102,7 @@
 					return t('Tomorrow');								
 			}
 
-			if(diff > -6) {
+			if(diff > -6 && diff < 6) {
 				return t('full_days')[v.getDay()];
 			}			
 

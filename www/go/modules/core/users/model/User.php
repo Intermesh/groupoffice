@@ -326,6 +326,10 @@ class User extends Entity {
 	}
 	
 	private $plainPassword;
+	
+	public function plainPassword() {
+		return $this->plainPassword;
+	}
 
 	public function setPassword($password) {
 		$this->plainPassword = $password;

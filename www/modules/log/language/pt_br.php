@@ -10,4 +10,5 @@ return array (
   'name' => 'Registro de Atividade',
   'description' => 'Registra todos os eventos de remoção, atualização e criação. Poderá gerar perda de performance em instalações grandes!',
   'ID' => 'ID',
+  'Activity log' => 'Log de atividades',
 );

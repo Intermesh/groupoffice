@@ -16,6 +16,11 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 	title : t("Synchronization", "sync"),
 	iconCls: 'ic-sync',
 	defaultType: 'textfield',
+	layout: "form",
+	defaults: {
+		anchor: "100%"
+	},
+
 
 	onLoadStart: function (userId) {
 		
@@ -103,16 +108,19 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 					width: dp(104)
 				});
 				
-			this.items.push(this.noteBookSelect = new go.form.multiselect.Field({
+			this.noteBookSelect = new go.form.multiselect.Field({
 				name: "syncNoteBooks",
 				idField: "noteBookId",
 				displayField: "name",
 				entityStore: "NoteBook",
+				hideLabel: true,
 				title: t("Notebooks", "notes"),
 				extraColumns: [defaultCol],
 				extraFields: [{name: "isDefault", type: "boolean"}],
 				plugins: [defaultCol]
-			}));
+			});
+			
+			this.items.push(this.noteBookSelect);
 		}
 	
 		this.on('show',function(){

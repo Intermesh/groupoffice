@@ -150,9 +150,18 @@ class Mailbox extends \GO\Base\Db\ActiveRecord {
 		return new \GO\Base\Fs\Folder('/home/vmail/'.$this->maildir);
 	}
 	
-	public function cacheUsage(){
-		//$this->usage = $this->getMaildirFolder()->calculateSize()/1024;
+	public function cacheUsage(){		
+		$this->usage = $this->enabled ? $this->getUsageFromDovecot() : false;
 		
+		if($this->usage === false) {
+			$this->usage = $this->getMaildirFolder()->calculateSize()/1024;
+		}
+		
+		return $this->save();
+	}
+	
+	
+	private function getUsageFromDovecot() {
 		exec("doveadm quota get -u " . escapeshellarg($this->username), $output, $return);
 		
 		/**
@@ -174,9 +183,7 @@ User quota MESSAGE   81592        -                                             
 			return false;
 		}
 		
-		$this->usage = (int) $matches[1];
-		
-		return $this->save();
+		return (int) $matches[1];
 	}
 
 	private function _checkQuota() {

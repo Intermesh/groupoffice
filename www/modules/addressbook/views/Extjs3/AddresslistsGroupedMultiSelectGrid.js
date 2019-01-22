@@ -84,14 +84,15 @@ GO.addressbook.AddresslistsGroupedMultiSelectGrid = Ext.extend(GO.grid.MultiSele
 				startCollapsed:true
 			}),
 			allowNoSelection:true,
+			tbtools: [{xtype:'tbsearch', store: store}],
 			bbar: new GO.SmallPagingToolbar({
-				items:[
-					this.searchField = new GO.form.SearchField({
-						store: store,
-						//width:120,
-						emptyText: t("Search")
-					})
-				],
+//				items:[
+//					this.searchField = new GO.form.SearchField({
+//						store: store,
+//						//width:120,
+//						emptyText: t("Search")
+//					})
+//				],
 				store:store,
 				pageSize:GO.settings.addresslists_store_forced_limit?parseInt(GO.settings.addresslists_store_forced_limit):parseInt(GO.settings.config.nav_page_size)
 			})

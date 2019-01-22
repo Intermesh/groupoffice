@@ -150,7 +150,7 @@ Ext.extend(GO.calendar.SummaryGroupPanel, Ext.grid.GridPanel, {
 
 GO.mainLayout.onReady(function(){
 	
-	if(go.Modules.isAvailable("legacy", "summary"))
+	if(go.Modules.isAvailable("legacy", "summary") && go.Modules.isAvailable("legacy", "calendar"))
 	{
 		var calGrid = new GO.calendar.SummaryGroupPanel({
 			//state causes it to load: id: 'summary-calendar-grid'

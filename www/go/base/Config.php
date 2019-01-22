@@ -1566,7 +1566,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	}
 	
 	public function getlogin_message() {
-		return GO()->getSettings()->loginMessage;
+		return GO()->getSettings()->loginMessageEnabled ? GO()->getSettings()->loginMessage : null;
 	}
 	
 	public function getfull_url() {

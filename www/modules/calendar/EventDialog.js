@@ -37,7 +37,7 @@ GO.calendar.EventDialog = function(calendar) {
 	this.resourcesPanel
 	];
 
-	if(GO.customfields && GO.customfields.types["GO\\Calendar\\Model\\Event"])
+	if(go.Modules.isAvailable("core", "customfields") && GO.customfields.types["GO\\Calendar\\Model\\Event"])
 	{
 		for(var i=0;i<GO.customfields.types["GO\\Calendar\\Model\\Event"].panels.length;i++)
 		{
@@ -1082,10 +1082,10 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 							}
 						}
 						if (GO.customfields.types["GO\\Calendar\\Model\\Event"]) {
-							resourceOptions.push({
-								xtype: 'plainfield',
-								value: '<br />'
-							});
+//							resourceOptions.push({
+//								xtype: 'plainfield',
+//								value: '<br />'
+//							});
 							var panels = GO.customfields.types["GO\\Calendar\\Model\\Event"].panels;
 							for(var l=0; l<panels.length; l++)
 							{
@@ -1139,7 +1139,8 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 					autoHeight:true,
 					collapsed:true,
 					forceLayout:true,
-					items:resourceOptions
+					items:resourceOptions,
+					bodyStyle: 'padding-left: 20px'
 				});
 			}
 			

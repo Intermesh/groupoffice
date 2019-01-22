@@ -435,13 +435,12 @@ class GO{
 	public static function cache(){
 
         if (!isset(self::$_cache)) {
-            if(GO::config()->debug || !GO::isInstalled()){
+            if(!GO::isInstalled()){
               self::$_cache=new \GO\Base\Cache\None();
 						}else{
 							if(!isset(GO::session()->values['cacheDriver'])){
 								$cachePref = array(
-//										"\\GO\\Base\\Cache\\XCache",
-//										"\\GO\\Base\\Cache\\Apc",
+										"\\GO\\Base\\Cache\\Apcu",
 										"\\GO\\Base\\Cache\\Disk"
 								);
 								foreach($cachePref as $cacheDriver){
@@ -457,6 +456,7 @@ class GO{
 							}else
 							{
 								$cacheDriver = GO::session()->values['cacheDriver'];
+								GO::debug("Using $cacheDriver cache");
 								self::$_cache = new $cacheDriver;
 							}
 						}
@@ -1146,7 +1146,7 @@ class GO{
 	 * @return string
 	 */
 	public static function url($path='', $params=array(), $relative=true, $htmlspecialchars=false, $appendSecurityToken=true){
-		$url = $relative ? \GO::config()->host : \GO::config()->full_url;
+		$url = $relative ? "" : \GO::config()->full_url;
 
 		if(empty($path) && empty($params)){
 			return $url;

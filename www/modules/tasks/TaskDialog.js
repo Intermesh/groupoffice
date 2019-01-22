@@ -465,7 +465,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 		var items = [propertiesPanel, this.recurrencePanel, optionsPanel];
 
 
-		if(GO.customfields && GO.customfields.types["GO\\Tasks\\Model\\Task"])
+		if(go.Modules.isAvailable("core", "customfields") && GO.customfields.types["GO\\Tasks\\Model\\Task"])
 		{
 			for(var i=0;i<GO.customfields.types["GO\\Tasks\\Model\\Task"].panels.length;i++)
 			{

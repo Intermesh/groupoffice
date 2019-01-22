@@ -28,11 +28,11 @@ go.Notifier = {
 			setTimeout(function () {
 				me.remove(msgCtr);
 			}, msg.time);
-		} else {
-			msgCtr.el.on('click', function () {
-				me.remove(msgCtr);
-			});
 		}
+		
+		msgCtr.el.on('click', function () {
+			me.remove(msgCtr);
+		});		
 		
 		return msgCtr;
 	},

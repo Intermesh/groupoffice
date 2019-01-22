@@ -15,7 +15,8 @@ Ext.ux.FieldHelp = Ext.extend(Object, (function(){
 		}
 		this.helpTextEl = this.wrap[this.helpAlign == 'top' ? 'insertFirst' : 'createChild']({
 			cls: 'x-form-helptext',
-			html: this.helpText
+			html: this.helpText,
+			"ext:qtip": this.helpText
 		});
 	}
 

@@ -223,12 +223,10 @@ margin:5px 2px;
 .attachment-wrap.x-view-over{
 	background-color:#ebf1e2;
 	border:0px !important;
-	margin:1px;
 }
 .attachment-wrap.x-view-selected{
 	background-color:#ebf1e2;
 	border:1px solid #669900 !important;;
-	margin:0px !important;
 }
 
 .email-upload-pc{

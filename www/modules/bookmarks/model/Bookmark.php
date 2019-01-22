@@ -53,7 +53,7 @@ class Bookmark extends \GO\Base\Db\ActiveRecord {
 
 		if ($this->logo!='') {
 			if ($this->public_icon == '1') {
-				return \GO::modules()->host .'modules/bookmarks/'.$this->logo;
+				return 'modules/bookmarks/'.$this->logo;
 			} else {
 				return \GO::url('core/thumb', array('src'=>$this->logo, 'w'=>16,'h'=>16));
 			}

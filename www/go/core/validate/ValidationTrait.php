@@ -68,7 +68,7 @@ trait ValidationTrait {
 
 //		\go\core\App::get()->getDebugger()->debugCalledFrom();
 
-		$this->validationErrors[$key] = ['code' => $code, 'description' => $description, 'data' => $data];
+		$this->validationErrors[$key] = array_merge($data, ['code' => $code, 'description' => $description]);
 	}
 
 	/**

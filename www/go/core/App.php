@@ -247,15 +247,23 @@ use go\modules\core\core\model\Settings;
 			
 			$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
 			
+			if(cache\Apcu::isSupported()) {
+				$cacheCls = cache\Apcu::class;				
+			} else
+			{
+				$cacheCls = cache\Disk::class;
+			}
+			
 			$this->config = [
 					"general" => [
 							"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice', //TODO default should be /var/lib/groupoffice
 							"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
 							"debug" => $config['debug'] ?? false,
-							"cache" => Disk::class,
+							"cache" => $cacheCls,
 							"servermanager" => $config['servermanager'] ?? false
 					],
 					"db" => [
+							"name" => $config['db_name'],
 							"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . ($config['db_name'] ?? "groupoffice-com"),
 							"username" => $config['db_user'] ?? "groupoffice",
 							"password" => $config['db_pass'] ?? ""

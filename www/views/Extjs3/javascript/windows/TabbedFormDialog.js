@@ -149,7 +149,9 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 	loadData : false,
 	
 	
-	jsonPost : false,
+	jsonPost : false,	
+	
+	closeAction: 'hide',
 	
 	initComponent : function(){
 		
@@ -160,8 +162,7 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 			resizable:true,
 			maximizable:true,
 			width:600,
-			height:400,
-			closeAction:'hide'
+			height:400
 		});
 		
 		if(this.jsonPost){

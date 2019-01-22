@@ -17,7 +17,7 @@ go.modules.core.users.CreateUserWizard = Ext.extend(go.Wizard, {
 		});
 	
 		this.items = [
-			new go.modules.core.users.CreateUserAccountPanel(),
+			this.userPanel = new go.modules.core.users.CreateUserAccountPanel(),
 			this.passwordPanel = new go.modules.core.users.CreateUserPasswordPanel(),
 			this.groupsGrid
 		]
@@ -70,7 +70,7 @@ go.modules.core.users.CreateUserWizard = Ext.extend(go.Wizard, {
 	onFinish: function(wiz, lastItem) {
 		this.applyPanelData(lastItem);
 		
-		
+		this.userPanel.onSubmitStart(this.user);
 		
 		var id = Ext.id(), params = {};
 		params.create = {};
@@ -82,6 +82,7 @@ go.modules.core.users.CreateUserWizard = Ext.extend(go.Wizard, {
 				
 				//var serverId = params.create ? response.created[id].id : response.updated[id].id;
 				this.onSaveSuccess(response.created[id]);
+				this.userPanel.onSubmitComplete(response.created[id], response);
 				this.close();
 				
 			} else

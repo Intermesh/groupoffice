@@ -298,7 +298,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		script.defer = true;
 		script.async = true;
 		script.onload = function () {
-			
+
 			//load modules
 			go.Modules.onReady(function () {
 

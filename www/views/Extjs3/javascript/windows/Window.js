@@ -109,7 +109,7 @@ GO.Window = Ext.extend(Ext.Window,{
 		GO.Window.superclass.close.call(this);
 	},
 
-	hide : function() {		
+	hide : function(animateTarget, cb, scope) {		
 		this.removeTempListeners();		
 		
 		//Fix for ticket #201817154. Unclosable window remained when window was 
@@ -118,6 +118,6 @@ GO.Window = Ext.extend(Ext.Window,{
 		 this.unghost();
 		}
 		
-		GO.Window.superclass.hide.call(this);
+		GO.Window.superclass.hide.call(this, animateTarget, cb, scope);
 	}		
 });
