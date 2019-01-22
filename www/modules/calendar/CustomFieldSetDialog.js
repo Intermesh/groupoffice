@@ -78,6 +78,31 @@ GO.calendar.CustomFieldSetDialog = Ext.extend(go.modules.core.customfields.Field
 		
 		return this;
 	},
+	
+	
+	
+	show: function () {
+		
+		var p = arguments;
+		
+		//templatestore must be loaded before form loads for chips component
+		if(!this.groupStore.loaded) {
+			
+			this.loading = true;
+			
+			this.groupStore.load({
+				callback: function() {
+					GO.tickets.CustomFieldSetDialog.superclass.show.apply(this, p);
+				},
+				scope: this
+			});
+		} else
+		{
+			GO.tickets.CustomFieldSetDialog.superclass.load.apply(this, p);
+		}
+		
+		return this;
+	},
 
 	onLoad: function () {
 		this.formPanel.getForm().findField("enableFilter").setValue(!!this.formPanel.entity.filter.group_id);

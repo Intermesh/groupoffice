@@ -3,7 +3,7 @@
 - Billing: Copy matching custom fields in order dialog
 
 
-For old framework:
+For old framework cf:
 
 advanced search
 logging in activerecord
@@ -11,9 +11,10 @@ duplicate
 mergeWith
 Search Cache
 
-Export contacts VCF, CSV
-Disabled categories for: ticket type, calendar resource groups, folder dialog
-modules/projects2/views/Extjs3/AddressbookOverrides.js
+Merge contacts
+Export contacts CSV
+Disabled categories for:  folder dialog
+
 FilesModule::afterBatchEditStore
 Folder::deriveCustomfieldSettings
 Address lists / mailings
@@ -35,6 +36,11 @@ For new:
 
 
 Upgrade notes for customer
+
+DG::
+
+Income contracts als maatwerk:
+modules/projects2/views/Extjs3/AddressbookOverrides.js
 
 Affected customer modules:
 favorites (greifswald)

@@ -91,6 +91,15 @@ trait CustomFieldsTrait {
 	private static $customFields;
 	
 	/**
+	 * Check if custom fields are modified
+	 * 
+	 * @return bool
+	 */
+	protected function isCustomFieldsModified() {
+		return $this->customFieldsModified;
+	}
+	
+	/**
 	 * Get all custom fields for this entity
 	 * 
 	 * @return Field

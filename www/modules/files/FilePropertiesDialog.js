@@ -41,6 +41,7 @@ GO.files.FilePropertiesDialog = function(config){
 		waitMsgTarget:true,
 		labelWidth: dp(128),
 		defaultType: 'textfield',
+		autoScroll: true,
 		items: [
 			{xtype:'fieldset', 
 				items:[
@@ -180,8 +181,8 @@ GO.files.FilePropertiesDialog = function(config){
 	GO.files.FilePropertiesDialog.superclass.constructor.call(this,{
 		title:t("Properties"),
 		layout:'fit',
-		width:650,
-		height:550,
+		width:dp(700),
+		height:dp(700),
 		closeAction:'hide',
 		items:this.formPanel,
 		maximizable:true,

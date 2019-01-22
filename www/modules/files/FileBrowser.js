@@ -753,14 +753,14 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	this.on('fileselected',function(grid, r){
 		if(r.data.extension!='folder'){
 //			this.folderPanel.setVisible(false);
-//			this.filePanel.show()
+			this.filePanel.show();
 			this.eastPanel.getLayout().setActiveItem(this.filePanel);
 
 			this.filePanel.load(r.id.substr(2));
 		}else
 		{
 //			this.filePanel.setVisible(false);
-//			this.folderPanel.show();
+			this.folderPanel.show();
 			this.eastPanel.getLayout().setActiveItem(this.folderPanel);
 
 			this.folderPanel.load(r.id.substr(2));
@@ -2147,6 +2147,7 @@ go.Modules.register("legacy", 'files', {
 	title: t("Files", "files"),
 	iconCls: 'go-tab-icon-files',
 	entities: ["File","Folder"],
+	systemSettingsPanels: ["GO.files.SystemSettingsPanel"],
 	links: [
 		{
 			entity: "File",			

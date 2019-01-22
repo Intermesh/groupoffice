@@ -75,9 +75,6 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		return parent::init();
 	}
 
-	public function customfieldsModel() {
-		return "GO\Files\Customfields\Model\Folder";
-	}
 
 	protected function getCacheAttributes() {
 
@@ -564,7 +561,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 	public function save($ignoreAcl = false) {
 
-		if(!$this->isModified() ){// && !$this->getCustomfieldsRecord()->isModified()) { // this will make it possible to set the "notify" in a folder see afterSubmit
+		if(!$this->isModified() && !$this->isCustomFieldsModified() ){ // this will make it possible to set the "notify" in a folder see afterSubmit
 			return true;
 		}
 		return parent::save($ignoreAcl);

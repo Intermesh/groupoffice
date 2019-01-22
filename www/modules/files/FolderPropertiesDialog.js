@@ -21,82 +21,86 @@ GO.files.FolderPropertiesDialog = function(config){
 	this.propertiesPanel = new Ext.Panel({
 		layout:'form',
 		title:t("Properties"),
-		cls:'go-form-panel',
-		waitMsgTarget:true,
-		defaultType: 'textfield',
+		waitMsgTarget:true,		
+		autoScroll: true,
 		labelWidth:100, 
-		border:false,   
-		items: [
-		{
-			fieldLabel: t("Name"),
-			name: 'name',
-			anchor: '100%',
-			validator:function(v){
-				return !v.match(/[&\/:\*\?"<>|\\]/);
-			}
-		},{
-			xtype: 'plainfield',
-			fieldLabel: t("Location"),
-			name: 'path'
-		},
-		{
-			xtype: 'plainfield',
-			fieldLabel: "URL",
-			name: 'url'
-		},
-		new GO.form.HtmlComponent({
-			html:'<hr />'
-		}),
-		{
-			xtype: 'plainfield',
-			fieldLabel: t("Created at"),
-			name: 'ctime'
-		},
-		{
-			xtype: 'plainfield',
-			fieldLabel: t("Modified at"),
-			name: 'mtime'
-		},
-		{
-			xtype: 'plainfield',
-			fieldLabel: t("Created by"),
-			name: 'username'
-		},
-		{
-			xtype: 'plainfield',
-			fieldLabel: t("Modified by"),
-			name: 'musername'
-		},
-		{
-			xtype: 'htmlcomponent',
-			html:'<hr />'
-		},
-		{
-			xtype:'xcheckbox',
-			boxLabel: t("Activate sharing", "files"),
-			name: 'share',
-			listeners: {
-				check: function(cb, checked) {
-					this.save(false);
+		border:false, 
+		items: [{
+				xtype:"fieldset",
+				defaultType: 'textfield',
+				labelWidth:100, 
+				items: [
+				{
+					fieldLabel: t("Name"),
+					name: 'name',
+					anchor: '100%',
+					validator:function(v){
+						return !v.match(/[&\/:\*\?"<>|\\]/);
+					}
+				},{
+					xtype: 'plainfield',
+					fieldLabel: t("Location"),
+					name: 'path'
 				},
-				scope:this
-			},
-			checked: false,
-			hideLabel:true
-		},
-		this.notifyCheckBox = new Ext.ux.form.XCheckbox({
-			boxLabel: t("Notify me about changes in this folder", "files"),
-			name: 'notify',
-			checked: false,
-			hideLabel:true
-		}),
-		this.applyStateCheckbox = new Ext.ux.form.XCheckbox({
-			boxLabel: t("Apply the folder's display settings for everyone.", "files"),
-			name: 'apply_state',
-			checked: false,
-			hideLabel:true
-		})
-		]
+				{
+					xtype: 'plainfield',
+					fieldLabel: "URL",
+					name: 'url'
+				},
+				new GO.form.HtmlComponent({
+					html:'<hr />'
+				}),
+				{
+					xtype: 'plainfield',
+					fieldLabel: t("Created at"),
+					name: 'ctime'
+				},
+				{
+					xtype: 'plainfield',
+					fieldLabel: t("Modified at"),
+					name: 'mtime'
+				},
+				{
+					xtype: 'plainfield',
+					fieldLabel: t("Created by"),
+					name: 'username'
+				},
+				{
+					xtype: 'plainfield',
+					fieldLabel: t("Modified by"),
+					name: 'musername'
+				},
+				{
+					xtype: 'htmlcomponent',
+					html:'<hr />'
+				},
+				{
+					xtype:'xcheckbox',
+					boxLabel: t("Activate sharing", "files"),
+					name: 'share',
+					listeners: {
+						check: function(cb, checked) {
+							this.save(false);
+						},
+						scope:this
+					},
+					checked: false,
+					hideLabel:true
+				},
+				this.notifyCheckBox = new Ext.ux.form.XCheckbox({
+					boxLabel: t("Notify me about changes in this folder", "files"),
+					name: 'notify',
+					checked: false,
+					hideLabel:true
+				}),
+				this.applyStateCheckbox = new Ext.ux.form.XCheckbox({
+					boxLabel: t("Apply the folder's display settings for everyone.", "files"),
+					name: 'apply_state',
+					checked: false,
+					hideLabel:true
+				})
+				]
+			}]
 	});
 
 	this.readPermissionsTab = new GO.grid.PermissionsPanel({
@@ -126,6 +130,8 @@ GO.files.FolderPropertiesDialog = function(config){
 		hideLabel:true,
 		items:[this.propertiesPanel, this.commentsPanel, this.readPermissionsTab]
 	});
+	
+	this.propertiesPanel.add(go.modules.core.customfields.CustomFields.getFormFieldSets("Folder"));
 
 //	if(go.Modules.isAvailable("core", "customfields")){
 //		this.disableCategoriesPanel = new GO.customfields.DisableCategoriesPanel();
