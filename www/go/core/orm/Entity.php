@@ -56,6 +56,14 @@ abstract class Entity extends Property {
 	 * @param Entity $entity The entity that has been deleted
 	 */
 	const EVENT_DELETE = 'delete';
+	
+	/**
+	 * Fires when the filters are defined. Other modules can extend the filters
+	 * 
+	 * The event listener is called with the {@see Filters} object.
+	 * @see self::defineFilters()
+	 */
+	const EVENT_FILTER = "filter";
 
 	/**
 	 * Find entities
@@ -399,6 +407,9 @@ abstract class Entity extends Property {
 	/**
 	 * Defines JMAP filters
 	 * 
+	 * This also fires the self::EVENT_FILTER event so modules can extend the
+	 * filters.
+	 * 
 	 * @example
 	 * ```
 	 * protected static function defineFilters() {
@@ -421,7 +432,7 @@ abstract class Entity extends Property {
 	protected static function defineFilters() {
 		$filters = new Filters();
 
-		return $filters->add('q', function(Query $query, $value, $filter) {
+		$filters->add('q', function(Query $query, $value, $filter) {
 							if (!empty($value)) {
 								static::search($query, $value);
 							}
@@ -430,6 +441,10 @@ abstract class Entity extends Property {
 								$query->andWhere('id', 'NOT IN', $value);
 							}
 						});
+						
+		static::fireEvent(self::EVENT_FILTER, $filters);
+		
+		return $filters;
 	}
 
 	/**

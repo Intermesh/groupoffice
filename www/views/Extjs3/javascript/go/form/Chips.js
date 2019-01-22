@@ -48,14 +48,12 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	
 	initComponent: function () {
 
-
 		var tpl = new Ext.XTemplate(
 						'<tpl for=".">',
-						'<div class="go-chip">{' + this.displayField + '} <button class="icon">delete</button></div>',
+						'<div class="go-chip">{' + this.displayField + '} <button type="button" class="icon">delete</button></div>',
 						'</tpl>',
 						'<div class="x-clear"></div>'
-						);
-		
+						);		
 	
 		this.dataView = new Ext.DataView({
 			store: new Ext.data.JsonStore({

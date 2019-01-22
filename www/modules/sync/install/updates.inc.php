@@ -66,8 +66,8 @@ $updates['201802031500'][] = 'ALTER TABLE `sync_user_note_book` ADD  CONSTRAINT 
 $updates['201901191547'][] = "ALTER TABLE `sync_addressbook_user` DROP INDEX `user_id`;";
 
 $updates['201901191547'][] = "ALTER TABLE `sync_addressbook_user` CHANGE `default_addressbook` `isDefault` BOOLEAN NOT NULL DEFAULT FALSE;";
-$updates['201901191547'][] = "ALTER TABLE `sync_addressbook_user` CHANGE `user_id` `userId` INT(11) NULL DEFAULT NULL;";
-$updates['201901191547'][] = "ALTER TABLE `sync_addressbook_user` CHANGE `addressbook_id` `addressBookId` INT(11) NULL DEFAULT NULL;";
+$updates['201901191547'][] = "ALTER TABLE `sync_addressbook_user` CHANGE `user_id` `userId` INT(11) NOT NULL;";
+$updates['201901191547'][] = "ALTER TABLE `sync_addressbook_user` CHANGE `addressbook_id` `addressBookId` INT(11) NOT NULL;";
 //$updates['201901191547'][] = "DELETE FROM `sync_addressbook_user` where addressBookId not in (select id from addressbook_addressbook);";
 $updates['201901191547'][] = "DELETE FROM `sync_addressbook_user` where userId not in (select id from core_user);";
 

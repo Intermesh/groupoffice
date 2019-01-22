@@ -42,7 +42,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 				callback.call(scope || this, entities[0]);
 			}
 			
-			this.fireEvent("load", this);
+			this.fireEvent("load", this, entities[0]);
 		}, this);
 	},
 	

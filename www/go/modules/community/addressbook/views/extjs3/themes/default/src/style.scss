@@ -1,5 +1,9 @@
 @import "../../../../../../../../../views/Extjs3/themes/Paper/src/_base.scss";
 
+.go-module-icon-addressbook, .go-menu-icon-addressbook {
+	background:url('resources/addressbook.png');
+}
+
 .go-addressbook-star {
 	color: #febf35;
 }

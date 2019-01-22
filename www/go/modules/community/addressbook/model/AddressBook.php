@@ -63,5 +63,46 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 		
 		return parent::filter($query, $filter);
 	}
+	
+	/**
+	 * Find or create a default address book for the user
+	 * 
+	 * @param \go\modules\core\users\model\User $user
+	 * @return \go\modules\community\addressbook\model\AddressBook
+	 * @throws \Exception
+	 */
+	public static function getDefault(\go\modules\core\users\model\User $user = null) {
+		
+		if(!isset($user)) {
+			$user = GO()->getAuthState()->getUser();
+		}
+			
+		if(!isset($user->addressBookSettings)) {
+			$user->addressBookSettings = new \go\modules\community\addressbook\model\UserSettings();
+		}
+		
+		if(!empty($user->addressBookSettings->defaultAddressBookId)) {
+			return static::findById($user->addressBookSettings->defaultAddressBookId);
+		}
+		
+		GO()->getDbConnection()->beginTransaction();
+		
+		$addressBook = new \go\modules\community\addressbook\model\AddressBook();
+		$addressBook->name = $user->displayName;
+		if(!$addressBook->save()) {
+			GO()->getDbConnection()->rollBack();
+			throw new \Exception("Could not create address book");
+		}
+		
+		$user->addressBookSettings->defaultAddressBookId = $addressBook->id;
+		if(!$user->save()) {
+			GO()->getDbConnection()->rollBack();
+			throw new \Exception("Failed to save user");
+		}		
+		
+		GO()->getDbConnection()->commit();
+		
+		return $addressBook;
+	}
 
 }

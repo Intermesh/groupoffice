@@ -206,76 +206,76 @@ class BatchEditController extends \GO\Base\Controller\AbstractController {
 			}
 		}
 		
-		// Get the customfields for this model
-		$cf = $tmpModel->getCustomfieldsRecord();
-		if($cf){
-			$cfcolumns = $cf->getColumns();
-
-			$cfrows = array();
-			foreach($cfcolumns as $key=>$value) {
-				if(!in_array($key, $params['excludeColumns']) && !empty($value['gotype'])) {
-					$row = array();
-					
-					$row['name']= 'customFields.'.$key;
-					$row['label']= $cf->getAttributeLabel($key);
-					$row['value']='';
-					$row['edit']='';
-					$row['customfield'] = true;
-					$row['gotype']=$value['gotype'];
-					$row['category_id']=$value['customfield']->category->id;
-					$row['category_name']=$value['customfield']->category->name;
-					$row['customfieldtype']=$value['customfield']->datatype;
-					$row['multiselect']=$value['customfield']->getOption('multiselect');
-					
-					$row['has_data'] = false;
-					
-					if($value['customfield']->getOption('multiselect') || in_array($value['customfield']->datatype , array('GO\Customfields\Customfieldtype\Textarea', 'GO\Customfields\Customfieldtype\Text'))) {
-						$row['mergeable'] = true;
-					} else {
-						$row['mergeable'] = false;
-					}
-				
-					$cfrows[] = $row;
-				}
-			}
-		
-			
-			$module = call_user_func_array($params['model_name'].'::model', array());
-			$stmt = call_user_func_array(array($module, 'find'), 
-							array(\GO\Base\Db\FindParams::newInstance()->debugSql()->ignoreAcl()
-							->criteria(
-											\GO\Base\Db\FindCriteria::newInstance()
-											->addInCondition($params['primaryKey'], json_decode($params['keys']))
-											)
-									)
-							);		
-			
-			
-			usort($cfrows,function ($a,$b) {
-				if ($a['category_name']==$b['category_name'])
-					return strcmp($a['label'],$b['label']);
-				else
-					return strcmp($a['category_name'],$b['category_name']);
-			});
-			
-			$rows = array_merge($rows,$cfrows);
-			
-			
-			foreach ($stmt as $value) {
-
-				foreach ($rows as &$field) {
-					if (!$field['customfield']) {
-						if (!empty($value->{$field['name']})) {
-							$field['has_data'] = true;
-						}
-					} else {
-						if (!empty($value->customfieldsRecord->{$field['name']})) {
-							$field['has_data'] = true;
-						}
-					}
-				}
-			}
-		}
+//		// Get the customfields for this model
+//		$cf = $tmpModel->getCustomfieldsRecord();
+//		if($cf){
+//			$cfcolumns = $cf->getColumns();
+//
+//			$cfrows = array();
+//			foreach($cfcolumns as $key=>$value) {
+//				if(!in_array($key, $params['excludeColumns']) && !empty($value['gotype'])) {
+//					$row = array();
+//					
+//					$row['name']= 'customFields.'.$key;
+//					$row['label']= $cf->getAttributeLabel($key);
+//					$row['value']='';
+//					$row['edit']='';
+//					$row['customfield'] = true;
+//					$row['gotype']=$value['gotype'];
+//					$row['category_id']=$value['customfield']->category->id;
+//					$row['category_name']=$value['customfield']->category->name;
+//					$row['customfieldtype']=$value['customfield']->datatype;
+//					$row['multiselect']=$value['customfield']->getOption('multiselect');
+//					
+//					$row['has_data'] = false;
+//					
+//					if($value['customfield']->getOption('multiselect') || in_array($value['customfield']->datatype , array('GO\Customfields\Customfieldtype\Textarea', 'GO\Customfields\Customfieldtype\Text'))) {
+//						$row['mergeable'] = true;
+//					} else {
+//						$row['mergeable'] = false;
+//					}
+//				
+//					$cfrows[] = $row;
+//				}
+//			}
+//		
+//			
+//			$module = call_user_func_array($params['model_name'].'::model', array());
+//			$stmt = call_user_func_array(array($module, 'find'), 
+//							array(\GO\Base\Db\FindParams::newInstance()->debugSql()->ignoreAcl()
+//							->criteria(
+//											\GO\Base\Db\FindCriteria::newInstance()
+//											->addInCondition($params['primaryKey'], json_decode($params['keys']))
+//											)
+//									)
+//							);		
+//			
+//			
+//			usort($cfrows,function ($a,$b) {
+//				if ($a['category_name']==$b['category_name'])
+//					return strcmp($a['label'],$b['label']);
+//				else
+//					return strcmp($a['category_name'],$b['category_name']);
+//			});
+//			
+//			$rows = array_merge($rows,$cfrows);
+//			
+//			
+//			foreach ($stmt as $value) {
+//
+//				foreach ($rows as &$field) {
+//					if (!$field['customfield']) {
+//						if (!empty($value->{$field['name']})) {
+//							$field['has_data'] = true;
+//						}
+//					} else {
+//						if (!empty($value->customfieldsRecord->{$field['name']})) {
+//							$field['has_data'] = true;
+//						}
+//					}
+//				}
+//			}
+//		}
 		$response['results'] = $rows;
 				
 		

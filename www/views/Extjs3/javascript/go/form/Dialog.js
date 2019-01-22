@@ -113,8 +113,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 		function innerLoad(){
 			me.currentId = id;
 			me.actionStart();
-			me.formPanel.load(id, function() {
-				me.onLoad();
+			me.formPanel.load(id, function(entityPanel, entityValues) {
+				me.onLoad(entityValues);
 				me.actionComplete();
 			}, this);
 		}
@@ -157,8 +157,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 		}
 	},
 	
-	onLoad : function() {
-		this.fireEvent("load", this);
+	onLoad : function(entityValues) {
+		this.fireEvent("load", this, entityValues);
 //		this.deleteBtn.setDisabled(this.formPanel.entity.permissionLevel < GO.permissionLevels.writeAndDelete);
 	},
 

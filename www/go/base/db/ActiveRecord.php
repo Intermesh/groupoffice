@@ -3665,8 +3665,13 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			}
 		}
 
-
-
+		if($this->hasCustomFields()) {
+			foreach($this->getCustomFields() as $col => $v) {
+				if(!empty($v) && is_string($v)) {
+					$keywords[] = $v;
+				}
+			}
+		}
 
 		$keywords = $prepend.','.implode(',',$keywords);
 
@@ -4789,11 +4794,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			$copy->setNewAcl($user_id);
 		}
 
-//		if(!$ignoreCustomFields && $this->customFieldsRecord){
-//			$cfAtt = $this->customFieldsRecord->getAttributes('raw');
-//			unset($cfAtt['model_id']);
-//			$copy->customFieldsRecord->setAttributes($cfAtt, false);
-//		}
+		if(!$ignoreCustomFields && $this->hasCustomFields()){
+			$copy->setCustomFields($this->getCustomFields());
+		}
 
 		$this->_duplicateFileColumns($copy);
 
@@ -5138,10 +5141,12 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 				}
 			}
+			
+			if($this->hasCustomFields()) {
+				$this->setCustomFields($model->getCustomFields());
+			}
+			
 			$this->save();
-
-			//copy custom fields
-			//TODO
 		}
 
 		$model->copyLinks($this);
