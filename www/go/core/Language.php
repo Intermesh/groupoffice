@@ -107,12 +107,15 @@ class Language {
 		} 
 		
 		if(!isset($this->data[$package][$module])) {
-
-			$langData = [];
+			
+			$langData = new util\ArrayObject();
+			
 			//Get english default
 			$file = $this->findLangFile('en',$package, $module);
 			if ($file->exists()) {
 				$langData = new util\ArrayObject($this->loadFile($file));
+			} else {
+				GO()->debug('No default(en) language file for module "'.$package.'/'.$module.'" defined.', 'Language');
 			}
 
 			//overwirte english with actual language
