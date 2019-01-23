@@ -40,6 +40,19 @@ class ArrayObject extends \ArrayObject {
 	}
 	
 	/**
+	 * Similar to getArrayCopy() but it is recursive when there are children that
+	 * are also an ArrayObject
+	 * 
+	 * @return array
+	 */
+	public function getArray() {
+		return array_map( function($item){
+        return $item instanceof self ? $item->getArray() : $item;
+    }, $this->getArrayCopy() );
+	}
+	
+	
+	/**
 	 * Merge array recursively. 
 	 * 
 	 * array_merge_recursive from php does not handle string elements right. 
@@ -48,11 +61,11 @@ class ArrayObject extends \ArrayObject {
 	 * @param array $arr
 	 * @return self
 	 */
-	public function mergeRecurive(array $arr) {
+	public function mergeRecursive(array $arr) {
 		foreach ($arr as $key => $value) {
 			if (is_array($value) && isset($this[$key])) {				
 				$this[$key] = new self($this[$key]);
-				$this[$key]->mergeRecurive($value);
+				$this[$key]->mergeRecursive($value);
 			} else {
 				$this[$key] = $value;
 			}

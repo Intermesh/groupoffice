@@ -107,25 +107,28 @@ class Language {
 		} 
 		
 		if(!isset($this->data[$package][$module])) {
-
-			$langData = new util\ArrayObject([]);
+			
+			$langData = new util\ArrayObject();
+			
 			//Get english default
 			$file = $this->findLangFile('en',$package, $module);
 			if ($file->exists()) {
 				$langData = new util\ArrayObject($this->loadFile($file));
+			} else {
+				GO()->debug('No default(en) language file for module "'.$package.'/'.$module.'" defined.', 'Language');
 			}
 
 			//overwirte english with actual language
 			if ($this->isoCode != 'en') {
 				$file = $this->findLangFile($this->isoCode, $package, $module);
 				if ($file->exists()) {
-					$langData->mergeRecurive($this->loadFile($file));
+					$langData->mergeRecursive($this->loadFile($file));
 				}
 			}
 
 			$file = $this->findLangOverride($this->isoCode, $package, $module);
 			if ($file->exists()) {
-				$langData->mergeRecurive($this->loadFile($file));
+				$langData->mergeRecursive($this->loadFile($file));
 			}
 			
 			$productName = GO()->getConfig()['branding']['name'];
@@ -153,7 +156,7 @@ class Language {
 								], $langData[$key]);
 			}
 
-			$this->data[$package][$module] = $langData;			
+			$this->data[$package][$module] = $langData->getArray();			
 		}
 	}
 	

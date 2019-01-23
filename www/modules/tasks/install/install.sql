@@ -4,7 +4,7 @@
 
 DROP TABLE IF EXISTS `ta_tasks_custom_fields`;
 CREATE TABLE IF NOT EXISTS `ta_tasks_custom_fields` (
-  `id` int(11) NOT NULL DEFAULT '0',
+  `id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
