@@ -8,16 +8,23 @@ go.links.LinkGrid = Ext.extend(go.grid.GridPanel, {
 			{
 				id: 'name',
 				header: t('Name'),
-				width: 75,
+				width: dp(100),
 				sortable: true,
 				dataIndex: 'name',
 				renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 					return '<i class="entity ' + record.data.entity + '"></i> ' + value;
 				}
+			},{
+				id: 'id',
+				header: t('ID'),
+				width: dp(80),
+				sortable: true,
+				dataIndex: 'entityId',
+				hidden: true
 			}, {
 
 				header: t('Type'),
-				width: 75,
+				width: dp(80),
 				sortable: false,
 				dataIndex: 'entity',
 				hidden: true
@@ -25,7 +32,7 @@ go.links.LinkGrid = Ext.extend(go.grid.GridPanel, {
 			{
 				id: 'modifiedAt',
 				header: t('Modified at'),
-				width: 160,
+				width: dp(160),
 				sortable: true,
 				dataIndex: 'modifiedAt',
 				renderer: Ext.util.Format.dateRenderer(go.User.dateTimeFormat),
