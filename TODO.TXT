@@ -5,37 +5,18 @@
 
 For old framework cf:
 
-advanced search
-logging in activerecord
-duplicate
-mergeWith
-Search Cache
-
 Merge contacts
-Export contacts CSV
-Disabled categories for:  folder dialog
-
-FilesModule::afterBatchEditStore
-Folder::deriveCustomfieldSettings
+Export / import  contacts CSV
+Batch edit custom fields not possible
 Address lists / mailings
-General import/export
-
+Disabled categories for:  folder dialog Folder::deriveCustomfieldSettings
 custom fields billign items dropped ?!
+Calendar birthdays
+Demodata
+ticket groups
 
-Remove search cache and links on delete
+core_group.name uniek maken
 
-For new:
-
-	Search Cache custom fields
-	Attachments in notes
-
-	calendar birthdays
-	demodata
-	ticket groups
-	templates for project contracts (See income model)
-
-
-Upgrade notes for customer
 
 DG::
 
@@ -69,60 +50,7 @@ favorites (greifswald)
 	voip
 	werkplaatsplanning (WEAP)
 	xero
-
-
-
-
-
-
-
-CF:
-
-TimeEntry
-Gebruiker
-Site content en site
-
-
-PHP Model:
-
-use \go\core\orm\CustomFieldsTrait;
-
-Detail panel:
-
-this.add(go.modules.core.customfields.CustomFields.getDetailPanels("Task"));
-
-Store fields:
-
-.concat(go.modules.core.customfields.CustomFields.getFieldDefinitions("Task"))
-
-Grid columns:
-
-.concat(go.modules.core.customfields.CustomFields.getColumns("Task"))
-
-
-Dialog:
-
-propertiesPanel.add(go.modules.core.customfields.CustomFields.getFormFieldSets("Task"));
-
-
-System settings
-GO.tasks.SystemSettingsPanel = Ext.extend(Ext.Panel, {
-	iconCls: 'ic-done',
-	autoScroll: true,
-	initComponent: function () {
-		this.title = t("Tasks");		
-		
-		this.items = [new go.modules.core.customfields.SystemSettingsPanel({
-				entity: "Task"
-//				createFieldSetDialog : function() {
-//					return new go.modules.community.addressbook.CustomFieldSetDialog();
-//				}
-		})];
-		
-		
-		GO.tasks.SystemSettingsPanel.superclass.initComponent.call(this);
-	}
-});
+advancedsearch projects (nuw)
 
 
 
