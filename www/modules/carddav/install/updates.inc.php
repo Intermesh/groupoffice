@@ -11,4 +11,4 @@ $updates['201604051221'][]="ALTER TABLE `dav_contacts` CHANGE COLUMN `data` `dat
 $updates['201801150941'][]="update `dav_contacts` set data = replace(data, 'VERSION:5','VERSION:3.0');";
 
 //final server update for old module
-$updates['201901230836'][] = 'update core_module set package=\'community\', version=0 where name=\'carddav\'';
+$updates['201901230836'][] = 'update core_module set package=\'community\', version=0, sort_order = sort_order + 100 where name=\'carddav\'';
