@@ -104,6 +104,9 @@ class ErrorHandler {
 	 * @return boolean
 	 */
 	public static function errorHandler($errno, $errstr, $errfile, $errline) {
+		if (!(error_reporting() & $errno)) {
+			return false;
+		}
 		throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
 	}
 }
