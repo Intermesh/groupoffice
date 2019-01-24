@@ -1,23 +1,7 @@
-GO.Window = function(config)
-	{
-		if(!config)
-		{
-			config={};
-		}
-	
-		Ext.applyIf(config,{
-			keys:[],
-			maximizable:true,
-			minimizable:true
-		});
-	
-		GO.Window.superclass.constructor.call(this, config);
-	};
-
 GO.Window = Ext.extend(Ext.Window,{
 
 	temporaryListeners : [],
-	
+	closeAction:'hide',
 	afterRender : function(){
 		
 		GO.Window.superclass.afterRender.call(this);
