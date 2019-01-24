@@ -1,3 +1,5 @@
+- Contacts: Added ID column to merge dialog (default hidden)
+
 22-01-2018 6.3.59
 - Mailserver: Server client module works again
 - E-mail: Fixed Email Attachment wiggle #275
