@@ -65,22 +65,23 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 	//navigate to a different page when selecting a node.
 	this.treeArea.getSelectionModel().on('selectionchange', function (sm, node) {
 	    if (node) {
-		if(!node.isExpanded()){
-		node.parentNode.collapseChildNodes(true);
-		node.expand();
+		if (!node.isExpanded()) {
+		    node.parentNode.collapseChildNodes(true);
+		    node.expand();
 		}
 		go.Router.goto(this.siteSlug + '\/view\/' + node.attributes.entitySlug)
 	    }
-	    
+
 	}, this);
-	this.treeArea.on('toggleButtons',function(bool, inclAddButton){
-	    this.disableButtons(bool,inclAddButton)
-	},this);
+	this.treeArea.on('toggleButtons', function (bool, inclAddButton) {
+	    this.disableButtons(bool, inclAddButton)
+	}, this);
 	go.modules.community.pages.MainPanel.superclass.initComponent.call(this);
 
 
     },
     addPage: function () {
+	//dialog will need to know if the page is newly created to show the correct page after creation.
 	var dlg = new go.modules.community.pages.PageDialog({
 	    siteId: this.siteId,
 	    newPage: true
@@ -94,6 +95,8 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 	    siteId: this.siteId,
 	    newPage: false
 	});
+	//After the page has changed its treenode will have to reload to update
+	//its name and child nodes.
 	dlg.on('pageChanged', function (pageId, scope) {
 	    tree = this.treeArea.siteTree;
 	    tree.getNodeById("page-" + pageId).reload();
@@ -103,35 +106,35 @@ go.modules.community.pages.MainPanel = Ext.extend(go.panels.ModulePanel, {
 
     //sets the site id for all relevant panels
     setSiteId: function (siteId) {
-	//console.log('set site id to: ' + siteId)
 	this.siteId = siteId;
 	this.treeArea.setSiteId(siteId);
     },
 
-    //updates the page id for all relevant panels
+    //updates the page id for all relevant panels and toggle buttons
     navigateToPage: function (pageId, pageSlug) {
-	//console.log('set page id to: ' + pageId)
-	this.pageId = pageId;
-	this.pageSlug = pageSlug;
+	if (this.pageId !== pageId && this.pageSlug != pageSlug) {
+	    this.pageId = pageId;
+	    this.pageSlug = pageSlug;
+	}
 	if (pageId) {
 	    this.content.currentPage = this.pageId;
 	    //acl check here
 	    this.disableButtons(false, false);
 	    //else
 	    //this.disableButtons(true,true);
-	    
-		this.treeArea.siteTree.expandPath();
+
 	} else {
 	    this.content.showEmptyPage();
 	    //acl check here
 	    this.disableButtons(true, false);
 	}
     },
+
     //toggles the edit and delete buttons. Optionally also disables the add button.
-    disableButtons: function (bool, disableAddBtn) {
+    disableButtons: function (bool, toggleAddBtn) {
 	this.getTopToolbar().getComponent('tbarDelBtn').setDisabled(bool)
 	this.getTopToolbar().getComponent('tbarEditBtn').setDisabled(bool)
-	if (disableAddBtn) {
+	if (toggleAddBtn) {
 	    this.getTopToolbar().getComponent('tbarAddBtn').setDisabled(bool)
 	}
     }

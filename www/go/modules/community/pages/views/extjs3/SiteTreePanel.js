@@ -4,7 +4,6 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
     buttonAlign: 'left',
     currentSiteId: '',
     split: true,
-    //autoScroll: true,
     initComponent: function () {
 	this.items = [
 	    this.siteTree = new go.modules.community.pages.SiteTree({
@@ -28,6 +27,7 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 		this.siteTreeEdit.store.load();
 		this.fireEvent('toggleButtons', true, true);
 		this.changePanel(this.siteTreeEdit.getId());
+		this.siteTreeEdit.focus();
 	    },
 	    scope: this
 	});
@@ -49,16 +49,17 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 	    items: [
 		this.reorderButton,
 		this.saveButton
-			, '->',
-		{
-		    iconCls: 'ic-get-app',
-		    tooltip: t('Download'),
-		    handler: function (e, toolEl) {
-			var a = ["test"];
-			this.downloadPDF();
-		    },
-		    scope: this
-		}]
+//			, '->',
+//		{
+//		    iconCls: 'ic-get-app',
+//		    tooltip: t('Download'),
+//		    handler: function (e, toolEl) {
+//			var a = ["test"];
+//			this.downloadPDF();
+//		    },
+//		    scope: this
+//		}
+	    ]
 	});
 	this.addEvents('toggleButtons');
 
@@ -73,16 +74,15 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
     changePanel: function (panel) {
 	this.layout.setActiveItem(panel);
     },
-    downloadPDF: function (id) {
-	console.log(this.siteTree.getRootNode());
-	this.reloadTree();
-    },
+
+//    downloadPDF: function (id) {
+//    },
+
     reloadTree: function () {
-	console.log('reloading');
 	if (!this.siteTree.getLoader().loading) {
 	    this.siteTree.getRootNode().reload();
 	} else {
-	    console.log('tree is already loading');
+	    console.warn('tree is already loading');
 	}
     },
     setSiteId: function (siteId) {
@@ -139,7 +139,7 @@ go.modules.community.pages.SiteTreePanel = Ext.extend(Ext.Panel, {
 	var records = this.siteTreeEdit.store.getRange();
 	var update = {};
 	for (var i = 0, l = records.length; i < l; i++) {
-	    update[records[i].data.id] = {sortOrder: i+1};
+	    update[records[i].data.id] = {sortOrder: i + 1};
 	}
 	go.Stores.get("Page").set({
 	    update: update

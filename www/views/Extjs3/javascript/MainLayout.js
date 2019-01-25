@@ -343,8 +343,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		this.startMenu.add({
 			id: 'go-start-menu-' + moduleName,
 			moduleName: moduleName,
-			text: panelConfig.title,
-			iconCls: 'go-menu-icon-' + moduleName,
+			text: panelConfig.title || panelClass.prototype.title,
+			iconCls: panelConfig.iconCls || 'go-menu-icon-' + moduleName,
 			handler: function (item, e) {
 				this.openModule(item.moduleName);
 			},
@@ -562,7 +562,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 								text: go.User.displayName,
 								cls: 'go-display-name'
 							}, '-', {
-								text: t("My Account"),
+								text: t("My account"),
 								iconCls: 'ic-account-circle',
 								handler: function () {
 									var dlg = new go.usersettings.UserSettingsDialog();

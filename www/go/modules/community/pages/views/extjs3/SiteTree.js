@@ -14,8 +14,20 @@ go.modules.community.pages.SiteTree = Ext.extend(Ext.tree.TreePanel, {
 		return node.attributes.sortOrder;
 	    }
 	});
+	GO.mainLayout.tabPanel.on('tabchange', function (tabPanel, panel) {
+	    if (panel.siteId !== '' && panel.siteId == this.loader.siteId) {
+		panel.treeArea.siteTree.onTabChange();
+	    }
+	}, this);
+
+	GO.mainLayout.tabPanel.on('beforetabchange', function (panel, newTab, currentTab) {
+	    if (currentTab && currentTab.treeArea) {
+		currentTab.treeArea.siteTree.onBeforeTabChange();
+	    }
+	}, this);
     },
 
+    //create and load in a new root node
     initiateRootNode: function () {
 	newRoot = {
 	    nodeType: 'async',
@@ -24,50 +36,66 @@ go.modules.community.pages.SiteTree = Ext.extend(Ext.tree.TreePanel, {
 	    expanded: true
 	};
 	this.setRootNode(newRoot);
+	this.rootVisible = false;
 	this.root.on('load', function (node) {
-	    this.expandPath();
+	    if (node.childNodes.length > 0) {
+		this.expandPath();
+	    }
 	}, this)
     },
 
+    //before changing sites this will try to close the sites treenodes and clear the selection.
+    onBeforeTabChange: function () {
+	if (this.root.isLoaded() && this.getSelectionModel().getSelectedNode()) {
+	    this.root.collapseChildNodes(true);
+	    this.getSelectionModel().clearSelections();
+	}
+    },
+    onTabChange: function () {
+	this.expandPath();
+    },
+
+    //attempts to determine which nodes should be opened based on the current url.
     expandPath: function () {
 	slugs = go.Router.getPath().split('/');
-	page = slugs[2];
+	pageSlug = slugs[2];
 	headerSlug = slugs[3];
-	pageNode = this.root.findChild('entitySlug', page);
+	pageNode = this.root.findChild('entitySlug', pageSlug);
 	if (pageNode) {
-	    pageNode.on('load', function (node) {
-		//run through all the nodes in a page to determine which should be selected and expanded.
-		node.cascade(function (node) {
-		    node.expand();
-		    childNode = node.findChild('id', 'header-' + page + '/' + headerSlug)
-		    if (node.id === 'header-' + page + '/' + headerSlug || (node == pageNode && !headerSlug)) {
-			node.select();
-			return false
-		    } else if (childNode) {
-			childNode.select();
-			return false
-		    }
-		    ;
-		    node.collapse();
-		})
-		//Check if anything is selected, if there isnt the header in the url likely doesnt exist.
-		//In this case just the page node will be selected.
-		if (!this.getSelectionModel().getSelectedNode()) {
-		    pageNode.select();
-		}
-	    }, this);
 	    if (pageNode.isLoaded()) {
-		pageNode.expand();
+		this.cascadeExpand(pageSlug, headerSlug, pageNode)
 	    } else {
 		this.root.on('load', function (node) {
-		    //todo: This is sometimes null. find out why.
-		    pageNode.expand();
-		}, this, {single: true});
+		    if (pageNode) {
+			pageNode.expand()
+			pageNode.on('load', function (node) {
+			    this.cascadeExpand(pageSlug, headerSlug, node)
+			}, this);
+		    }
+		}, this)
 	    }
 	}
     },
-    
-    cascadeExpand: function(pageSlug, HeaderSlug, PageNode){
-	
+
+    cascadeExpand: function (pageSlug, headerSlug, pageNode) {
+	//run through all the nodes in a page to determine which should be selected and expanded.
+	pageNode.cascade(function (node) {
+	    node.expand();
+	    childNode = node.findChild('id', 'header-' + pageSlug + '/' + headerSlug)
+	    if (node.id === 'header-' + pageSlug + '/' + headerSlug || (node == pageNode && !headerSlug)) {
+		node.select();
+		return false
+	    } else if (childNode) {
+		childNode.select();
+		return false
+	    }
+	    ;
+	    node.collapse();
+	})
+	//Check if anything is selected. If there isnt, the header in the url likely doesnt exist.
+	//In this case just the page node will be selected.
+	if (!this.getSelectionModel().getSelectedNode()) {
+	    pageNode.select();
+	}
     }
 })

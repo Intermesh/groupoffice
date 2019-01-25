@@ -166,7 +166,7 @@ go.Jmap = {
 		if(!options.method) {
 			throw "method is required";
 		}
-
+		
 		var me = this;
 
 		if (me.timeout) {
@@ -174,6 +174,9 @@ go.Jmap = {
 		}
 		
 		var clientCallId = "clientCallId-" + this.nextCallId();
+		
+//		console.debug(clientCallId, options.method);
+//		console.trace();
 
 		this.requests.push([options.method, options.params || {}, clientCallId]);
 

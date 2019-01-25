@@ -1,0 +1,6 @@
+/* custom style to center the avatar */
+
+.go-detail-view-artist .avatar {
+  float: none; }
+  .go-detail-view-artist .avatar .icon {
+    line-height: 100%; }

@@ -463,7 +463,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 //		{
 		var gridData = this.participantsPanel.getGridData();
 		params.participants=Ext.encode(gridData);
-			
+		
 		this.formPanel.form.submit({
 			url : GO.url('calendar/event/submit'),
 			params : params,
@@ -1075,10 +1075,10 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 							}
 						}
 						if (GO.customfields.types["GO\\Calendar\\Model\\Event"]) {
-							resourceOptions.push({
-								xtype: 'plainfield',
-								value: '<br />'
-							});
+//							resourceOptions.push({
+//								xtype: 'plainfield',
+//								value: '<br />'
+//							});
 							var panels = GO.customfields.types["GO\\Calendar\\Model\\Event"].panels;
 							for(var l=0; l<panels.length; l++)
 							{
@@ -1132,7 +1132,8 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 					autoHeight:true,
 					collapsed:true,
 					forceLayout:true,
-					items:resourceOptions
+					items:resourceOptions,
+					bodyStyle: 'padding-left: 20px'
 				});
 			}
 			

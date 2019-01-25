@@ -192,33 +192,49 @@ class Link extends Entity {
 	/**
 	 * Delete a link between two entities
 	 * 
+	 * Warning: This will not fire the Link::EVENT_DELETE
+	 * 
 	 * @param Entity|ActiveRecord $a
 	 * @param Entity|ActiveRecord  $b
 	 * @return boolean
 	 */
 	public static function deleteLink($a, $b) {
-		if(!GO()->getDbConnection()
+		return self::deleteLinkWithIds($a->getType()->getId(), $a->id, $b->id, $b->getType()->getId());
+	}
+	
+	/**
+	 * Delete link with id and entity type id's
+	 * 
+	 * Warning: This will not fire the Link::EVENT_DELETE
+	 * 
+	 * @param int $aId
+	 * @param int $aTypeId
+	 * @param int $bId
+	 * @param int $bTypeId
+	 * @return boolean
+	 */
+	public static function deleteLinkWithIds($aId, $aTypeId, $bId, $bTypeId) {
+			if(!GO()->getDbConnection()
 						->delete('core_link',[
-				'fromEntityTypeId' => $a->getType()->getId(),
-				'fromId' => $a->id,
-				'toEntityTypeId' => $b->getType()->getId(),
-				'toId' => $b->id,
+				'fromEntityTypeId' => $aTypeId,
+				'fromId' => $aId,
+				'toEntityTypeId' => $bTypeId,
+				'toId' => $bId,
 		])->execute()) {
 			return false;
 		}
 		
 		if(!GO()->getDbConnection()
 						->delete('core_link',[
-				'fromEntityTypeId' => $b->getType()->getId(),
-				'fromId' => $b->id,
-				'toEntityTypeId' => $a->getType()->getId(),
-				'toId' => $a->id,
+				'fromEntityTypeId' => $bTypeId,
+				'fromId' => $bId,
+				'toEntityTypeId' => $aTypeId,
+				'toId' => $aId,
 		])->execute()) {
 			return false;
 		}
 		
-		return true;
-						
+		return true;						
 	}
 	
 	protected function internalValidate() {

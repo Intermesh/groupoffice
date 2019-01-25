@@ -381,7 +381,7 @@ class MaintenanceController extends AbstractController {
 		GO::setIgnoreAclPermissions(true);
 		GO::session()->runAsRoot();
 		
-		$this->run("upgrade",$params);		
+		//$this->run("upgrade",$params);		
 		
 		$this->lockAction();
 		

@@ -2,7 +2,7 @@
 
 go.Modules.register("community", "addressbook", {
 	mainPanel: "go.modules.community.addressbook.MainPanel",
-	title: t("Addressbook"),
+	title: t("Address book"),
 	entities: ["Contact", "AddressBook", "AddressBookGroup"],
 	links: [{
 			/**
@@ -11,6 +11,8 @@ go.Modules.register("community", "addressbook", {
 			entity: "Contact",
 			
 			filter: "isContact",
+			
+			iconCls: "entity ic-person",
 			
 			/**
 			 * Opens a dialog to create a new linked item
@@ -66,8 +68,8 @@ go.Modules.register("community", "addressbook", {
 				return new go.modules.community.addressbook.ContactDetail();
 			}	
 		}],
-	systemSettingsPanels: ["go.modules.community.addressbook.SystemSettingsPanel"]
-	
+	systemSettingsPanels: ["go.modules.community.addressbook.SystemSettingsPanel"],
+	userSettingsPanels: ["go.modules.community.addressbook.SettingsPanel"]
 });
 
 //go.Stores.get("User");

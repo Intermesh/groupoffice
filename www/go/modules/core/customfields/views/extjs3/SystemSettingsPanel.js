@@ -164,7 +164,7 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 					sortable: false,
 					dataIndex: 'name',
 					renderer: function (v, meta, record) {
-						return record.data.isFieldSet ? "<h3>" + v + "</h3>" : v;
+						return record.data.isFieldSet ? "<h5>" + v + "</h5>" : v;
 					}
 				},
 				{

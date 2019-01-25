@@ -1,5 +1,6 @@
 go.modules.community.pages.SitePropertiesForm = Ext.extend(Ext.form.FormPanel, {
     currentId: null,
+
     isValid: function () {
 	return  this.getForm().isValid();
     },
@@ -16,7 +17,7 @@ go.modules.community.pages.SitePropertiesForm = Ext.extend(Ext.form.FormPanel, {
 			fieldLabel: t("Site Name"),
 			anchor: '100%',
 			allowBlank: false,
-		    }, 
+		    },
 //		    {
 //			xtype: 'combo',
 //			name: 'documentFormat',

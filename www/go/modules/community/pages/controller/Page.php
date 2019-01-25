@@ -65,8 +65,9 @@ class Page extends EntityController {
 	return $p;
     }
 
+    //Returns the headers found inside the content of a page.
     public function getHeaders($params) {
-	$r = [	    
+	$r = [
 	    'accountId' => [],
 	    'state' => $this->getState(),
 	    'items' => [],
@@ -74,7 +75,7 @@ class Page extends EntityController {
 	];
 	$pageSlug = $params['pageSlug'];
 	$query = (new Query)->select()->from('pages_page')->where(['slug' => $pageSlug])->single();
-	if(!$query){
+	if (!$query) {
 	    $r['notFound'] = $params['pageSlug'];
 	    \go\core\jmap\Response::get()->addResponse($r);
 	    return;
@@ -82,7 +83,7 @@ class Page extends EntityController {
 	$doc = new \DOMDocument();
 	$counter = 1;
 	$currentHeader = null;
-	$doc->loadHTML('<?xml encoding="utf-8" ?>' . $query['content'] , LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+	$doc->loadHTML('<?xml encoding="utf-8" ?>' . $query['content'], LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 	$xpath = new \DOMXPath($doc);
 	$headers = $xpath->evaluate('//h1 | //h2');
 
@@ -110,10 +111,10 @@ class Page extends EntityController {
     }
 
     private function parseSlug($element, $pageSlug) {
-	//Get the slug based on the header id and remove zero width spaces.
+	//Get the slug based on the header id and remove zero width spaces created by the editor.
 	$slug = str_replace("\xE2\x80\x8B", "", $element->getAttribute('id'));
 	$slug = $pageSlug . '/' . $slug;
-	
+
 	return $slug;
     }
 

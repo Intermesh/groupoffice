@@ -248,10 +248,7 @@ Ext.extend(GO.files.FilePropertiesDialog, GO.Window, {
 				}
 				
 				this.folder_id=action.result.data.folder_id;
-				
-				if(go.Modules.isAvailable("core", "customfields"))
-					GO.customfields.disableTabs(this.tabPanel, action.result);	
-				
+			
 				
 				this.selectHandler.store.baseParams.id=action.result.data.id;
 				this.selectHandler.clearLastSearch();

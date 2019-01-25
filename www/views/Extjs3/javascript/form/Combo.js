@@ -56,7 +56,7 @@ GO.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 		
 		
 		//console.log(this.value);
-		if(this.value && text){
+		if(text && (this.value || this.value === 0) ){
 			var r = this.findRecord(this.valueField, this.value);
 
 			if(!r)

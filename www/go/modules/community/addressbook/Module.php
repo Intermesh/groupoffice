@@ -1,9 +1,15 @@
 <?php
 namespace go\modules\community\addressbook;
 
+use go\core\http\Response;
 use go\core\module\Base;
+use go\core\orm\Mapping;
+use go\core\orm\Property;
+use go\modules\community\addressbook\convert\VCard;
 use go\modules\community\addressbook\model\Contact;
+use go\modules\community\addressbook\model\UserSettings;
 use go\modules\core\links\model\Link;
+use go\modules\core\users\model\User;
 							
 /**						
  * @copyright (c) 2018, Intermesh BV http://www.intermesh.nl
@@ -37,23 +43,28 @@ class Module extends Base {
 		
 		Link::on(Link::EVENT_DELETE, Contact::class, 'onLinkSaveOrDelete');
 		Link::on(Link::EVENT_SAVE, Contact::class, 'onLinkSaveOrDelete');
-		
+		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 	}
 	
 	public function downloadVCard($contactId) {
-		$contact = \go\modules\community\addressbook\model\Contact::findById($contactId);
+		$contact = Contact::findById($contactId);
 		
-		$c = new \go\modules\community\addressbook\convert\VCard();
+		$c = new VCard();
 		
 		$vcard =  $c->export($contact);		
 		
-		\go\core\http\Response::get()
+		Response::get()
 						->setHeader('Content-Type', 'text/vcard;charset=utf-8')
 						->setHeader('Content-Disposition', 'attachment; filename="'.$contact->name.'.vcf"')
 						->setHeader("Content-Length", strlen($vcard))
 						->sendHeaders();
 		
 		echo $vcard;
+	}
+	
+	
+	public static function onMap(Mapping $mapping) {
+		$mapping->addRelation('addressBookSettings', UserSettings::class, ['id' => 'userId'], false);
 	}
 							
 }

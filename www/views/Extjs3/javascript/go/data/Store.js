@@ -193,9 +193,11 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		return true;
 	},
 	destroy : function() {	
-		this.fireEvent('destroy', this);
+		this.fireEvent('beforedestroy', this);
 		
 		go.data.Store.superclass.destroy.call(this);
+		
+		this.fireEvent('destroy', this);
 	},
 	
 	/**

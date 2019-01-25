@@ -808,7 +808,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		
 		$this->_link($params, $message, $tags);
 
-		$response['unknown_recipients'] = $this->_findUnknownRecipients($params);
+		//$response['unknown_recipients'] = $this->_findUnknownRecipients($params);
 
 
 		return $response;
@@ -887,12 +887,11 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 					if (!empty($params['contact_id'])) {
 						$contact = \go\modules\community\addressbook\model\Contact::findById($params['contact_id']);
 					} else {
-						$email = \GO\Base\Util\StringHelper::get_email_from_string($params['to']);						
+						$email = \GO\Base\Util\StringHelper::get_email_from_string($params['to']);		
+						
 						$contact = \go\modules\community\addressbook\model\Contact::find()
 										->filter(['email' => $email, 'permissionLevel' => \go\core\acl\model\Acl::LEVEL_READ])
 										->single();
-						
-						
 					}
 
 //					$company = false;
@@ -1076,7 +1075,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		
 		if(!isset($params['alias_id']))
 			$params['alias_id']=0;
-
+		
 		$recipients = new \GO\Base\Mail\EmailRecipients();
 		$recipients->mergeWith($message->cc)->mergeWith($message->to);
 		
@@ -1177,6 +1176,27 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$response['data']['subject'] = 'Re: ' . $message->subject;
 		} else {
 			$response['data']['subject'] = $message->subject;
+		}
+		
+		if(isset($params['includeAttachments'])){
+			// Include attachments
+
+			if($message instanceof \GO\Email\Model\ImapMessage){
+				//saved messages always create temp files
+				$message->createTempFilesForAttachments();
+			}
+
+			$oldMessage = $message->toOutputArray($html,false,true);
+
+			// Fix for array_merge functions on lines below when the $response['data']['inlineAttachments'] and $response['data']['attachments'] do not exist
+			if(empty($response['data']['inlineAttachments']))
+				$response['data']['inlineAttachments'] = array();
+
+			if(empty($response['data']['attachments']))
+				$response['data']['attachments'] = array();
+
+			$response['data']['inlineAttachments'] = array_merge($response['data']['inlineAttachments'], $oldMessage['inlineAttachments']);
+			$response['data']['attachments'] = array_merge($response['data']['attachments'], $oldMessage['attachments']);
 		}
 
 		if(empty($params['keepHeaders'])){

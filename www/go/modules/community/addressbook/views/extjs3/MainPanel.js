@@ -251,7 +251,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 
 	setAddressBookId: function (addressBookId) {
 		var s = this.grid.store;
-
+		delete s.baseParams.filter.groupId;
 		this.addButton.setDisabled(false);
 		if (addressBookId) {
 			this.addAddressBookId = addressBookId;
@@ -280,9 +280,9 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 		this.addAddressBookId = addressBookId;
 		this.addButton.setDisabled(false);
 
-		s.baseParams.filter = {
-			groupId: groupId
-		};
+		s.baseParams.filter.addressBookId = addressBookId;
+		s.baseParams.filter.groupId = groupId;
+			
 		s.load();
 	},
 

@@ -294,6 +294,9 @@ class Contact extends AclItemEntity {
 	 * @return static
 	 */
 	public static function findForUser($userId) {
+		if(empty($userId)) {
+			return false;
+		}
 		return static::find()->where('goUserId', '=', $userId)->single();
 	}
 	
@@ -367,19 +370,32 @@ class Contact extends AclItemEntity {
 		
 	}
 	
+	protected function internalSave() {
+		if(!parent::internalSave()) {
+			return false;
+		}
+		
+		if(!isset($this->uid)) {
+			//We need the auto increment ID for the UID so we need to save again if this is a new contact
+			$this->uid = $this->generateUid();
+			if(!isset($this->uri)) {
+				$this->uri = $this->uid . '.vcf';
+			}
+			return GO()->getDbConnection()
+							->update('addressbook_contact', 
+											['uid' => $this->uid, 'uri' => $this->uri], 
+											['id' => $this->id])
+							->execute();			
+		}		
+		
+		return true;
+	}
+	
 	protected function internalValidate() {		
 		
 		if(empty($this->name)) {
 			$this->setNameFromParts();
 		}		
-		
-		if(!isset($this->uid)) {
-			$this->uid = $this->generateUid();
-		}
-		
-		if(!isset($this->uri)) {
-			$this->uri = $this->uid . '.vcf';
-		}
 		
 		if($this->isModified('addressBookId') || $this->isModified('groups')) {
 			//verify groups and address book match
@@ -404,6 +420,22 @@ class Contact extends AclItemEntity {
 				]
 		]);
 		return array_map("intval", $query->all());
+	}
+	
+	public function setOrganizationIds($ids) {
+		$current = $this->getOrganizationIds();
+		$remove = array_diff($current, $ids);
+		
+		if(count($remove)) {
+			Link::deleteLinkWithIds($remove, Contact::getType()->getId(), $this->id, Contact::getType()->getId());
+		}
+		
+		$add = array_diff($ids, $current);
+		
+		foreach($add as $orgId) {
+			$org = self::findById($orgId);
+			Link::create($this, $org);
+		}
 	}
 
 	protected function getSearchDescription() {

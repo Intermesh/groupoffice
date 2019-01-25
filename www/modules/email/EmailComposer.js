@@ -569,7 +569,7 @@ GO.email.EmailComposer = function(config) {
 					
 					this._changeTemplate(record.get('template_id'));			
 					
-					this.templateSelectionDialog.close();
+					this.templateSelectionDialog.hide();
 				}, this);
 				
 				
@@ -1085,6 +1085,10 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 					params.addEmailAsAttachmentList = Ext.encode(config.addEmailAsAttachmentList);
 				}
 				
+				if(config.includeAttachments){
+					params.includeAttachments = config.includeAttachments;
+				}
+				
 				var url;
 				
 				if(!config.task)
@@ -1235,7 +1239,6 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		}
 		
 		this.fireEvent('afterShowAndLoad',this);
-		
 	},
 	
 

@@ -169,7 +169,7 @@ class Page extends AclItemEntity {
 
 	$doc = new DOMDocument();
 
-	//ignore duplicate id errors so cleanIds() fix them.
+	//ignore duplicate id errors so cleanIds() can fix them.
 	libxml_use_internal_errors(true);
 
 	//prevent loadHTML from adding doctype or tags like head and body.
@@ -184,7 +184,7 @@ class Page extends AclItemEntity {
 	$headers = $xpath->evaluate('//h1 | //h2');
 	foreach ($headers as $element) {
 	    $counter = 0;
-	    $headerSlug = '#'. $this->slugify($element->nodeValue, 100);
+	    $headerSlug = '#' . $this->slugify($element->nodeValue, 100);
 	    //$newElement = $doc->createElement($element->nodeName);
 	    $newElement = $element->cloneNode(true);
 	    while (true) {
@@ -206,9 +206,9 @@ class Page extends AclItemEntity {
 	    }
 	    $element->parentNode->replaceChild($newElement, $element);
 	}
-	//The replace is used to remove the encoding to prevent duplicates.
-	//Adding the encoding once doesnt work since it can be messed with inside the html editor. Even without source edit enabled.
-	
+	//The replace is used to remove the encoding to prevent it from being saved in content multiple times.
+	//Adding the encoding only once doesnt work since it can be messed with inside the html editor. Even without source edit enabled.
+
 	return str_replace('<?xml encoding="utf-8" ?>', '', $doc->saveHTML());
     }
 
@@ -219,12 +219,11 @@ class Page extends AclItemEntity {
 	$tags = $xpath->evaluate('//h1 | //h2 | //p');
 	foreach ($tags as $element) {
 	    $element->nodeValue = str_replace("\xE2\x80\x8B", "", $element->nodeValue);
-	    if($element->nodeValue == ''){
+	    if ($element->nodeValue == '') {
 		$element->parentNode->removeChild($element);
-	    }elseif ($element->hasAttribute('id')) {
+	    } elseif ($element->hasAttribute('id')) {
 		$element->removeAttribute('id');
 	    }
-	    
 	}
 	return $doc;
     }

@@ -29,6 +29,8 @@ App::get();
  */
 
 $authBackend = new BasicBackend();
+$authBackend->checkModulePermission('community', 'carddav');
+
 $principalBackend = new PrincipalBackend();
 $carddavBackend = new Backend();
 
@@ -46,6 +48,7 @@ $server->on('exception', function($e){
 	GO()->debug((string) $e);
 });
 
+
 /* Server Plugins */
 $server->addPlugin(new AuthPlugin($authBackend));
 $server->addPlugin(new CardDAVPlugin());
@@ -53,8 +56,15 @@ $server->addPlugin(new AclPlugin());
 
 //baseUri can also be /carddav/ with:
 //Alias /carddav/ /path/to/addressbook.php
-//$baseUri = strpos($_SERVER['REQUEST_URI'], 'index.php') ? \GO::config()->host . 'modules/carddav/addressbook.php/' : '/carddav/';
-$server->setBaseUri('/go/modules/community/carddav/index.php/');
+if(strpos($_SERVER['REQUEST_URI'], 'index.php')) {
+	$path = parse_url(GO()->getSettings()->URL, PHP_URL_PATH);
+	$baseUri =  $path . 'go/modules/community/carddav/index.php/';
+} else
+{
+	$baseUri = '/carddav/';	
+}
+
+$server->setBaseUri($baseUri);
 
 // Support for html frontend
 $browser = new Plugin(false);

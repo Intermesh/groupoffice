@@ -141,28 +141,18 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 	
 	getPreviewPanel : function() {
 		
-		//TODO refactor in MASTER
-		var all = [], allObj = go.Entities.getAll();
-		
-		for(var i in allObj) {
-			all.push(allObj[i]);
-		}
-
-		var linkableEntitities = all.filter(function(e) {
-			if(!go.Modules.isAvailable(e.package, e.module) ){
-				return false;
-			}
-			
-			return !!e.linkDetail;
+		var all = go.modules.core.links.Links.getAll().filter(function(l) {
+			return !!l.linkDetail;
 		});
 		
-		var items = linkableEntitities.map(function(e) {
+		var items = all.map(function(e) {
 			var panel = e.linkDetail();
-			panel.itemId = e.name;
+			panel.itemId = e.entity;
 			
 			return panel;
 		});
 		
+		console.log(items);
 		
 		return this.previewPanel = new Ext.Panel({
 			region: "east",

@@ -330,4 +330,15 @@ class Blob extends orm\Entity {
 	public static function replaceSrcInHtml($html, $blobId, $src) {		
 		return preg_replace('/(<img .*?src=").*?blob='.$blobId.'(".*?>)/i', '$1'.$src.'$2', $html);
 	}
+	
+	/**
+	 * Output for download
+	 */
+	public function output() {
+		$this->getFile()->output(true, true, [
+			'Content-Type' => $this->type, 
+			"Expires" => (new DateTime("1 year"))->format("D, j M Y H:i:s"),
+			'Content-Disposition' => 'attachment; filename="' . $this->name . '"'
+					]);
+	}
 }

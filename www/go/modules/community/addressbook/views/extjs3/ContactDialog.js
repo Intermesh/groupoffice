@@ -6,6 +6,9 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 	entityStore: "Contact",
 	width: 600,
 	height: 600,
+	defaults: {
+		labelWidth: dp(140)
+	},
 	
 	initComponent: function() {
 		
@@ -37,7 +40,9 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 							{
 								flex: 1,
 								layout: "form",
-								items: [			
+								items: [		
+								
+										
 									this.nameField = new Ext.form.TextField({
 										xtype: 'textfield',
 										name: 'name',
@@ -56,7 +61,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 										items: [{
 												xtype: 'textfield',
 												name: 'firstName',
-												emptyText: t("First name"),
+												emptyText: t("First"),
 												flex: 3,
 												listeners: {
 													change: this.buildFullName,
@@ -65,7 +70,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 											}, {
 												xtype: 'textfield',
 												name: 'middleName',
-												emptyText: t("Middle name"),
+												emptyText: t("Middle"),
 												flex: 2,
 												listeners: {
 													change: this.buildFullName,
@@ -74,7 +79,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 											}, {
 												xtype: 'textfield',
 												name: 'lastName',
-												emptyText: t("Last name"),
+												emptyText: t("Last"),
 												flex: 3,
 												listeners: {
 													change: this.buildFullName,
@@ -101,8 +106,8 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 								]
 							},
 							{
-								width: dp(152),
-								style: "padding: " + dp(16) + "px",
+								width: dp(152),								
+								style: "padding-left: " + dp(16) + "px",
 								layout: "form",
 								items: [
 									this.avatarComp = new go.form.FileField({
@@ -127,7 +132,29 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 								]
 							}
 						]
-					}
+					},
+					
+					
+					this.organizationsField = new go.form.Chips({
+						anchor: '-20',
+						xtype: "chips",
+						entityStore: "Contact",
+						displayField: "name",
+						valueField: 'id',
+						storeBaseParams: {
+							filter: {
+								isOrganization: true
+							}
+						},
+						name: "organizationIds",
+						fieldLabel: t("Organizations")
+					}),
+					
+					this.addressBook = new go.modules.community.addressbook.AddresBookCombo({
+						anchor: '-20',
+						value: go.User.addressBookSettings.defaultAddressBookId
+					})
+							
 
 					//new go.modules.community.addressbook.ContactBookCombo(),
 
@@ -241,6 +268,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						itemCfg: {
 							xtype: "panel",
 							layout: "form",
+							labelWidth: dp(140),
 							items: [{
 									anchor: "100%",
 									fieldLabel: t("Type"),
@@ -369,7 +397,42 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 								}]
 						}
 					}]
-			}
+			}, 
+			this.businessFieldSet = new Ext.form.FieldSet({
+				xtype: "fieldset",
+				title: t("Business"),
+				defaults: {
+					anchor: "-20",
+				},
+				items: [
+					{
+						xtype: "textfield",
+						name: "iban",
+						fieldLabel: t("IBAN")
+					},
+					{
+						xtype: "textfield",
+						name: "registrationNumber",
+						fieldLabel: t("Registration number")
+					},
+					{
+						xtype: "textfield",
+						name: "debtorNumber",
+						fieldLabel: t("Customer number")
+					},
+					{
+						xtype: "xcheckbox",
+						name: "vatReverseCharge",
+						hideLabel: true,
+						boxLabel: t("Reverse charge VAT")
+					},
+					{
+						xtype: "textfield",
+						name: "vatNo",
+						fieldLabel: t("VAT number")
+					}
+				]
+			})
 		].concat(go.modules.core.customfields.CustomFields.getFormFieldSets("Contact"));
 
 		return items;	
@@ -378,8 +441,9 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 	setOrganization: function (isOrganization) {
 		this.contactNameField.setVisible(!isOrganization);
 		this.nameField.setVisible(isOrganization);
-//		this.organizationsField.setVisible(!isOrganization);		
+		this.organizationsField.setVisible(!isOrganization);		
 		this.genderField.setVisible(!isOrganization);
+		this.businessFieldSet.setVisible(isOrganization);
 	},
 
 	buildFullName: function () {

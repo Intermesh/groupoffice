@@ -74,7 +74,6 @@ go.Router.add(/(.*)\/view\/(.*)/, function (siteSlug, pageHeaderSlug) {
 
     //Checks if the site is already initialized;
     if (panel.siteSlug !== siteSlug) {
-	console.log('loading site')
 	go.Jmap.request({
 	    method: "Site/get",
 	    params: {
@@ -108,13 +107,11 @@ go.Router.add(/(.*)\/view\/(.*)/, function (siteSlug, pageHeaderSlug) {
 
 	//Check to see if the page has already been set.
     } else if (panel.pageSlug !== pageSlug) {
-	console.log('loading page')
 	GO.mainLayout.openModule(siteSlug);
 	openPage(pageSlug, panel);
 
 	//if the site and page are already open jump to the header if there is one in the url.
     } else if (headerSlug) {
-	console.log('jump to header')
 	GO.mainLayout.openModule(siteSlug);
 	header = document.getElementById(headerSlug);
 	if (header) {
@@ -134,6 +131,7 @@ openPage = function (pageSlug, panel) {
 		siteId: panel.siteId
 	    },
 	    callback: function (options, success, result) {
+
 		if (success && result['list'][0]) {
 		    panel.navigateToPage(result['list'][0]['id'], pageSlug);
 

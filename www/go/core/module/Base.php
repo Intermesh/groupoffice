@@ -353,12 +353,16 @@ abstract class Base {
 	 * @return string
 	 */
 	public static function getTitle() {
-		$title = GO()->t("name", static::getPackage(), static::getName());
-		if($title == "GroupOffice Core") {
-			return self::getName();
+		
+		$pkg = static::getPackage();
+		$name = static::getName();
+		
+		if(!GO()->getLanguage()->translationExists("name", $pkg, $name)) {
+			return $name;
 		}
 		
-		return $title;
+		return GO()->t("name", $pkg, $name);
+	
 	}
 	
 	
@@ -368,13 +372,16 @@ abstract class Base {
 	 * @return string
 	 */
 	public static function getDescription() {
-		$description = GO()->t("description", static::getPackage(), static::getName());
 		
-		if($description == "description") {
-			return "";
+		$pkg = static::getPackage();
+		$name = static::getName();
+		
+		if(!GO()->getLanguage()->translationExists("name", $pkg, $name)) {
+			return "No description";
 		}
 		
-		return $description;
+		return GO()->t("description", static::getPackage(), static::getName());		
+	
 	}
 	
 	/**

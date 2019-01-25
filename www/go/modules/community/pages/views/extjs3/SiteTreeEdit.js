@@ -1,6 +1,6 @@
 go.modules.community.pages.SiteTreeEdit = Ext.extend(Ext.grid.GridPanel, {
     //using Ext.grid instead of go.grid since go.grid causes infinite scrolling 
-    //in this panel for some reason and it has no required benefits over Ext.grid
+    //in this panel and it has no required benefits over Ext.grid
     siteId: '',
     hideHeaders: true,
     enableDragDrop: true,
@@ -21,8 +21,10 @@ go.modules.community.pages.SiteTreeEdit = Ext.extend(Ext.grid.GridPanel, {
 	    ],
 	    entityStore: go.Stores.get("Page")
 	});
+	//this is the plugin that handles drag and drop.
 	this.plugins = [new go.grid.plugin.Sortable(this.onSort, this, this.isDropAllowed)];
 	this.store.setDefaultSort('sortOrder', 'ASC');
+	//ensures the grid items have a unique id.
 	var genId = Ext.id()
 	Ext.apply(this, {
 
@@ -55,9 +57,7 @@ go.modules.community.pages.SiteTreeEdit = Ext.extend(Ext.grid.GridPanel, {
 	    },
 
 	    collapsible: false,
-	    autoExpandColumn: genId + '-pageName',
-//	    stateful: true,
-//	    stateId: genId+'-page-grid'
+	    autoExpandColumn: genId + '-pageName'
 	});
 	this.on('render', function () {
 	    this.store.entityStore.on("changes", function () {
@@ -68,42 +68,31 @@ go.modules.community.pages.SiteTreeEdit = Ext.extend(Ext.grid.GridPanel, {
 	go.modules.community.pages.SiteTreeEdit.superclass.initComponent.call(this);
 
     },
-
+    //this function is called after dropping an item
     onSort: function (sortable, selections, dragData, dd) {
     },
 
+    //This function is called during d&d when moving an item
     isDropAllowed: function (selections, overRecord) {
-	
-//	console.log(overRecord)
-//	console.log(selections.includes(overRecord))
+
 	if (overRecord && selections.includes(overRecord)) {
-//	    debugger;
 	    var res = false;
 	    var storeItems = overRecord.store.data.items;
 	    selections.forEach(
 		    function (record) {
-//			console.log(overRecord.store.data.items[overRecord.store.data.length - 1].id)
-//			console.log(record)
-//			if (overRecord.store.data.items[overRecord.store.data.length - 1].id === record.id) {
 			index = storeItems.indexOf(record)
-//			console.log(index);
-//			console.log(storeItems[index+1])
-			if(index && !storeItems[index+1]){
-//			    console.log(overRecord.store.data.items[overRecord.store.data.length - 1].id === record.id);
-//			    console.log('_')
+			if (index && !storeItems[index + 1]) {
 			    res = true;
 			    return;
 			}
 		    })
-		if (res){
-//		console.log('last item + duplicate')
+	    if (res) {
 		return false;
 	    }
-	}else if(!overRecord){
-	    console.log('no record')
+	} else if (!overRecord) {
+	    console.warn('no record')
 	    return false;
 	}
-//	console.log('---')
 	return true;
     },
 

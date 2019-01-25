@@ -331,7 +331,7 @@ class VCard extends AbstractConverter {
 			return array_map('trim', $matches[1]);
 		}
 		
-		return $name;
+		return [$name];
 	}
 	
 	private function importOrganizations(Contact $contact, $vcard) {		

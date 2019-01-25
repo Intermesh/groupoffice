@@ -11,7 +11,7 @@ go.modules.community.pages.SitePropertyDialog = Ext.extend(go.form.Dialog, {
 			fieldLabel: t("Site Name"),
 			anchor: '100%',
 			allowBlank: false
-		    }, 
+		    },
 //		    {
 //			xtype: 'combo',
 //			name: 'documentFormat',
@@ -31,24 +31,5 @@ go.modules.community.pages.SitePropertyDialog = Ext.extend(go.form.Dialog, {
 	];
 	return items;
     },
-    submit: function () {
-
-	if (!this.isValid()) {
-	    return;
-	}
-	if(!this.formPanel.getForm().isDirty()){
-	    this.close();
-	    return;
-	}
-
-	this.actionStart();
-
-	this.formPanel.submit(function (formPanel, success, serverId) {
-	    this.actionComplete();
-	    if (success) {
-		this.close();
-	    }
-	}, this);
-    }
 });
 

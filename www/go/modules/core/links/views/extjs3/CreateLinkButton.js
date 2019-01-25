@@ -14,7 +14,7 @@ go.modules.core.links.CreateLinkButton = Ext.extend(Ext.Button, {
 			method: "Search/query",
 			params: {
 				filter: {
-					entities: [entity],
+					entities: [{name: entity}],
 					entityId: entityId
 				}
 			}

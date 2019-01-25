@@ -7,7 +7,7 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(go.tree.EntityLoader, {
     constructor: function (config) {
 	config = config || {};
 	go.modules.community.pages.SiteTreeLoader.superclass.constructor.call(this, config);
-	this.baseAttrs.uiProvider = null;
+	//this.baseAttrs.uiProvider = null;
     },
 
     load: function (node, callback, scope) {
@@ -21,16 +21,16 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(go.tree.EntityLoader, {
 		this.runCallback(callback, scope || node, [node]);
 	    } else if (this.entityStore) {
 		this.loading = true;
-		if(node.attributes.leaf){
+		if (node.attributes.leaf) {
 		    var response = {
 			argument: {callback: callback, node: node, scope: scope},
 			responseData: {}
 		    };
 		    this.handleResponse(response);
 		    this.loading = false;
-		}else if (!node.attributes.isPage) {
+		} else if (!node.attributes.isPage) {
 		    this.requestEntityData(node, callback, scope || node);
-		} else if(node.attributes.isPage){
+		} else if (node.attributes.isPage) {
 		    this.getHeaders(node, callback, scope || node);
 		}
 	    }
@@ -53,6 +53,7 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(go.tree.EntityLoader, {
 	};
     },
 
+    //sets filter to only use pages from the current site.
     getParams: function (node) {
 	var filter = {
 	    siteId: this.siteId
@@ -61,8 +62,9 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(go.tree.EntityLoader, {
 	    filter: filter
 	};
     },
-    
-    getHeaders: function (node, cb, scope){
+
+    //Gets the headers found in a page's content from the server and turns them into nodes.
+    getHeaders: function (node, cb, scope) {
 	var headers = [];
 	var params = {pageSlug: node.attributes.entitySlug};
 	go.Jmap.request({
@@ -76,7 +78,7 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(go.tree.EntityLoader, {
 			if (entity.items && entity.items.length > 0) {
 			    entity.items.forEach(function (subEntity) {
 				subHeaders.push({
-				    id: 'header-'+ subEntity.slug,
+				    id: 'header-' + subEntity.slug,
 				    text: subEntity.name,
 				    entitySlug: subEntity.slug,
 				    nodeType: 'groupoffice',
@@ -86,19 +88,19 @@ go.modules.community.pages.SiteTreeLoader = Ext.extend(go.tree.EntityLoader, {
 			    });
 			}
 			header = {
-			    id: 'header-'+ entity.slug,
+			    id: 'header-' + entity.slug,
 			    text: entity.name,
 			    entitySlug: entity.slug,
 			    nodeType: 'groupoffice',
 			    isPage: false,
 			    children: subHeaders
 			}
-			if(!header.children.length > 0){
+			if (!header.children.length > 0) {
 			    header.expanded = true;
 			}
 			headers.push(header);
 		    });
-		}else{
+		} else {
 		    console.warn("Failed to load header treenodes.")
 		}
 		var headersResponse = {

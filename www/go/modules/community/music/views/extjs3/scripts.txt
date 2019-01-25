@@ -1,4 +1,4 @@
-module.js
+Module.js
 MainPanel.js
 GenreFilter.js
 ArtistGrid.js

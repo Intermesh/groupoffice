@@ -24,8 +24,8 @@ go.modules.community.pages.SiteWizard = Ext.extend(go.Wizard, {
 	this.shareEntityPanel.items.get(0).store.on('load', function () {
 	    if (this.shareEntityPanel.items.get(0).store.loaded) {
 		this.continueButton.setDisabled(false);
-		if(!this.nextItem){
-		     this.continueButton.setText('Finish');
+		if (!this.nextItem) {
+		    this.continueButton.setText('Finish');
 		}
 	    }
 	}, this);

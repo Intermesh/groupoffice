@@ -177,8 +177,6 @@ go.modules.community.pages.SystemSettingsSitesGrid = Ext.extend(go.grid.GridPane
 				iconCls: 'ic-delete',
 				text: t("Delete"),
 				handler: function () {
-				    //this.getSelectionModel().selectRecords([this.moreMenu.record]);
-				    //this.deleteSelected();
 				    Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you wish to delete this site?"), function (btn) {
 					if (btn != "yes") {
 					    return;

@@ -1,6 +1,7 @@
 GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 	title : t("E-mail"),
 	iconCls: 'ic-email',
+	autoScroll: true,
 	initComponent: function() {
 		
 		this.items=[{

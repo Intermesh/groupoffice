@@ -3,7 +3,6 @@ go.modules.community.pages.PageDialog = Ext.extend(go.form.Dialog, {
     entityStore: go.Stores.get("Page"),
     width: dp(1200),
     height: dp(600),
-    //maximized: true,
     maximizable: true,
     siteId: '',
     sortOrder: '',
@@ -11,6 +10,7 @@ go.modules.community.pages.PageDialog = Ext.extend(go.form.Dialog, {
     newPage: false,
     initComponent: function () {
 	go.modules.community.pages.PageDialog.superclass.initComponent.call(this);
+	//event used to signal an existing page has updated.
 	this.addEvents('pageChanged');
     },
     initFormItems: function () {
@@ -35,7 +35,7 @@ go.modules.community.pages.PageDialog = Ext.extend(go.form.Dialog, {
 			enableColors: false,
 			enableFont: false,
 			enableFontSize: false,
-			//enableSourceEdit: false
+			enableSourceEdit: false
 
 		    },
 		    {
@@ -71,9 +71,11 @@ go.modules.community.pages.PageDialog = Ext.extend(go.form.Dialog, {
 		    go.Router.goto(result[0]['slug'] + '\/view\/' + pageSlug);
 		}, this);
 	    }, this);
-	}else if (success){
-	    this.fireEvent('pageChanged', serverId ,this);
-	}else{
+	} else if (success) {
+	    //If an existing page has changed its treenode might need updating.
+	    //This event is used for that.
+	    this.fireEvent('pageChanged', serverId, this);
+	} else {
 	    console.warn("Something went wrong while saving changes.")
 	}
     }

@@ -79,12 +79,8 @@ go.modules.core.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 						}
 						
 
-						return '<div class="user"><div class="avatar group"></div>' +
-										'<div class="wrap">' +
-										'<div class="displayName">' + record.get('name') + '</div>' +
-										'<small class="username">' + memberStr + '</small>' +
-										'</div>' +
-										'</div>';
+						return '<div>' + record.get('name') + '</div>' +
+										'<small class="username">' + memberStr + '</small>';
 					}
 				},
 				actions
