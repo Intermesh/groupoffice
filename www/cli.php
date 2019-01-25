@@ -7,6 +7,14 @@ use go\core\Environment;
 
 require(__DIR__ . "/vendor/autoload.php");
 
+$router = new Router();
+
+$args = $router->parseArgs();
+
+if(isset($args['c'])) {
+	define('GO_CONFIG_FILE', $args['c']);
+}
+
 App::get()->setAuthState(new State());
 //no cache
 GO()->setCache(new None());
