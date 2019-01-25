@@ -1,3 +1,5 @@
+- Sieve: Was inactive because of invalid permission check
+- Core: Added missing index on core_search.keywords
 - Contacts: Added ID column to merge dialog (default hidden)
 
 22-01-2018 6.3.59
