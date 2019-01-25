@@ -545,6 +545,17 @@ class Contact extends AclItemEntity {
 	}
 	
 	/**
+	 * Find phoneNumber by type
+	 * 
+	 * @param string $type
+	 * @param boolean $returnAny
+	 * @return PhoneNumbers|boolean
+	 */
+	public function findPhoneNumberByType($type, $returnAny = true) {
+		return $this->findPropByType("phoneNumbers", $type, $returnAny);
+	}
+	
+	/**
 	 * Find street address by type
 	 * 
 	 * @param string $type
