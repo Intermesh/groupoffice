@@ -25,8 +25,8 @@ class Directory extends \Sabre\DAV\FS\Directory{
 
 		$path = rtrim($path, '/');
 
-		$this->relpath = $path;
-		$path = \GO::config()->file_storage_path . $path;
+		$this->relpath = \Normalizer::normalize($path, \Normalizer::FORM_D);
+		$path = \GO::config()->file_storage_path . $this->relpath;
 		
 		//		if(!$this->_getFolder()->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)){
 //			\GO::debug("DAV: User ".\GO::user()->username." doesn't have write permission for ".$this->relpath);
@@ -177,7 +177,7 @@ class Directory extends \Sabre\DAV\FS\Directory{
 	 */
 	public function getChild($name) {
 
-		$path = $this->path . '/' . $name;
+		$path = $this->path . '/' . \Normalizer::normalize($name, \Normalizer::FORM_D);;
 
 		\GO::debug("FSD:getChild($path)");
 
@@ -234,20 +234,29 @@ class Directory extends \Sabre\DAV\FS\Directory{
 			throw new Sabre\DAV\Exception\NotFound("Folder not found in database");
 		}
 		
-		$stmt = $f->getSubFolders();
-		
-		\GO::debug('Subfolders: '.$stmt->rowCount());
+		try {
+			$stmt = $f->getSubFolders();
 
-		while ($folder = $stmt->fetch()) {
-			$nodes[] = $this->getChild($folder->name);
+			\GO::debug('Subfolders: '.$stmt->rowCount());
+
+			while ($folder = $stmt->fetch()) {
+				// UTF8 must be form D for mac os
+				$folder->checkNormalization();
+				$nodes[] = $this->getChild($folder->name);
+			}
+
+			$stmt = $f->files();
+
+			\GO::debug('Files: '.$stmt->rowCount());
+
+			while ($file = $stmt->fetch()) {
+				// UTF8 must be form D for mac os
+				$file->checkNormalization();
+				$nodes[] = $this->getChild($file->name);
+			}
 		}
-
-		$stmt = $f->files();
-		
-		\GO::debug('Files: '.$stmt->rowCount());
-		
-		while ($file = $stmt->fetch()) {
-			$nodes[] = $this->getChild($file->name);
+		catch(\Exception $e) {
+			\GO::debug("Failed to list children: " . $e->getMessage());
 		}
 
 		return $nodes;

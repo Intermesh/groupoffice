@@ -351,9 +351,22 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		}
 		return new \GO\Base\Fs\Folder($oldPath);
 	}
+	
+	public function checkNormalization() {
+		if(!\Normalizer::isNormalized($this->name, \Normalizer::FORM_D)) {
+			\GO::debug("Normalizing $this->id to Unicode Form D");
+			
+			$name = \Normalizer::normalize($this->name, \Normalizer::FORM_D);		
+			$this->getFsFolder()->rename($name);
+			GO()->getDbConnection()->update('fs_folders',['name' => $name], ['id' => $this->id])->execute();
+			$this->name = $name;
+		}
+	}
 
 	protected function beforeSave() {
-
+		
+		//Normalize UTF-8. ONly form D works on MacOS webdav!
+		$this->name = \Normalizer::normalize($this->name, \Normalizer::FORM_D);		
 
 		//check permissions on the filesystem
 		if($this->isNew){
