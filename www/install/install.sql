@@ -489,6 +489,8 @@ ALTER TABLE `core_search`
   ADD KEY `name` (`name`),
   ADD KEY `moduleId` (`moduleId`);
 
+ALTER TABLE `core_search` ADD INDEX(`keywords`);
+
 ALTER TABLE `core_setting`
   ADD PRIMARY KEY (`moduleId`,`name`);
 

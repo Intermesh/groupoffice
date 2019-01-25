@@ -254,3 +254,6 @@ $updates['201811020837'][] = function() {
 		}
 	}
 };
+
+
+$updates['201901251344'][] = "ALTER TABLE `core_search` ADD INDEX(`keywords`);";
