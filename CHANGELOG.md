@@ -1,3 +1,4 @@
+- Projects: Incorrect fee when copied from activity type
 - Sieve: Was inactive because of invalid permission check
 - Core: Added missing index on core_search.keywords
 - Contacts: Added ID column to merge dialog (default hidden)
