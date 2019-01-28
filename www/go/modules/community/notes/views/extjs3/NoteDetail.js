@@ -27,7 +27,7 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 		this.add(go.modules.core.customfields.CustomFields.getDetailPanels("Note"));
 		this.add(go.links.getDetailPanels());
 		
-		if (go.Modules.isAvailable("legacy", "comments")) {
+		if (go.Modules.isAvailable("community", "comments")) {
 			this.add(new go.modules.comments.CommentsDetailPanel());
 		}
 

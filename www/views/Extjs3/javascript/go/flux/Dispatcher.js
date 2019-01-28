@@ -13,7 +13,8 @@ go.flux.Dispatcher = {
 //	console.log("dispatching '" + type + "'", payload);
 	
    for(var i = 0, l = this.receivers.length; i < l; i++) {
-      this.receivers[i].receive({
+		 
+      this.receivers[i].receive.call(this.receivers[i].scope || this.receivers[i], {
 			type: type,
 			payload: payload
 		});
