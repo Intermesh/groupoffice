@@ -998,8 +998,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 			this.treePanel.setExpandFolderId(folderId);
 			this.treePanel.getRootNode().reload();
 		}
-		
-		if(!this.parentID || !this.treePanel.getNodeById(this.parentID))
+
+		if(!this.parentID)// || !this.treePanel.getNodeById(this.parentID))
 		{
 			this.upButton.setDisabled(true);
 		}else
