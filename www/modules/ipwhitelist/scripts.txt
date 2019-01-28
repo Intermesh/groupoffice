@@ -1,3 +1,0 @@
-modules/ipwhitelist/views/Extjs3/PluginGroups.js
-modules/ipwhitelist/views/Extjs3/WhitelistGrid.js
-modules/ipwhitelist/views/Extjs3/IpAddressDialog.js
