@@ -229,3 +229,6 @@ $updates['201610281659'][] = 'SET foreign_key_checks = 1;';
 
 
 $updates['201706121115'][] = "ALTER TABLE `fs_folders` CHANGE `parent_id` `parent_id` INT(11) NOT NULL DEFAULT '0';";
+
+
+$updates['201901281546'][] = "delete from go_settings where name ='files_shared_cache_ctime';";
