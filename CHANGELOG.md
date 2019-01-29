@@ -1,3 +1,5 @@
+- Assistant: base64 encode paths so that it works with UTF-8 on all platforms and browsers. Assistant 1.0.4 is required!
+
 28-01-2018 6.3.60
 - Files: clear shared folder cache so incorrect structures will be rebuilt automatically.
 - Projects: Incorrect fee when copied from activity type
