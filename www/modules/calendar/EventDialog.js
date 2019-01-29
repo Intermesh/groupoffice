@@ -14,6 +14,9 @@
 GO.calendar.EventDialog = function(calendar) {
 	this.calendar = calendar;
 
+	this.linkEntityId = 0;
+	this.linkEntity = false;
+
 	this.buildForm();
 
 	this.beforeInit();
@@ -86,6 +89,11 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 	resources_options : '',
 	beforeInit : function(){
 
+	},
+
+	setLinkEntity: function(config) {
+		this.linkEntity = config.entity;
+		this.linkEntityId = config.entityId;
 	},
 
 	initWindow : function() {
@@ -231,7 +239,9 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 				params.end_date=config.values.end_date.format(GO.settings.date_format);				
 				params.end_time=config.values.end_date.format(GO.settings.time_format);				
 			}
-		}		
+			params.linkEntityId = this.linkEntityId;
+			params.linkEntity = this.linkEntity;
+		}
 		
 		//These parameters are present when a user edits a single occurence of a repeating event
 		params.exception_date=config.exception_date;
