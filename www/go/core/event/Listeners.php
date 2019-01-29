@@ -22,16 +22,7 @@ use go\core\Singleton;
  */
 class Listeners extends Singleton {
 
-	protected function __construct() {
-		parent::__construct();
-		
-		$this->listeners = App::get()->getCache()->get('listeners');
-		
-		if(!$this->listeners) {
-			$this->init();
-		}
-	}
-	
+
 	/**
 	 * Add an event listener
 	 * 
@@ -104,6 +95,14 @@ class Listeners extends Singleton {
 	 * @return boolean
 	 */
 	public function fireEvent($calledClass, $traitUser, $event, $args) {	
+		
+		if(!isset($this->listeners)) {
+			$this->listeners = App::get()->getCache()->get('listeners');
+
+			if(!$this->listeners) {
+				$this->init();
+			}
+		}
 		if (isset($this->listeners[$calledClass][$event])) {
 			foreach ($this->listeners[$calledClass][$event] as $listener) {	
 				$return = call_user_func_array($listener, $args);
