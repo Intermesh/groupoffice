@@ -285,6 +285,7 @@ CREATE TABLE `go_cron` (
   `autodestroy` tinyint(1) NOT NULL DEFAULT '0',
   `params` text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+ALTER TABLE `go_cron` ADD INDEX `nextrun_active` (`nextrun`, `active`);
 
 DROP TABLE IF EXISTS `go_cron_groups`;
 CREATE TABLE `go_cron_groups` (
@@ -359,6 +360,7 @@ CREATE TABLE `go_reminders_users` (
   `time` int(11) NOT NULL,
   `mail_sent` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+ALTER TABLE `go_reminders_users` ADD INDEX `user_id_time` (`user_id`, `time`);
 
 DROP TABLE IF EXISTS `go_saved_exports`;
 CREATE TABLE `go_saved_exports` (
@@ -438,6 +440,9 @@ ALTER TABLE `core_acl_group_changes`
 
 ALTER TABLE `core_auth_method`
   ADD PRIMARY KEY (`id`);
+
+ALTER TABLE `core_auth_method`
+ADD INDEX `moduleId_sortOrder` (`moduleId`, `sortOrder`);
 
 ALTER TABLE `core_auth_password`
   ADD PRIMARY KEY (`userId`);
