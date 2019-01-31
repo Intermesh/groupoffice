@@ -193,12 +193,12 @@
 		"GO\\Customfields\\Customfieldtype\\Select": {
 			icon: 'list',
 			label: 'Select',
-			getFormField: function (customfield, config) {
+			getFormField: function (customfield, config) {				
 				var f = GO.customfields.dataTypes["GO\\Customfields\\Customfieldtype\\Text"].getFormField(customfield, config);
 				var store = new GO.data.JsonStore({
 					url: GO.url('customfields/field/selectOptions'),
 					baseParams: {
-						'field_id': customfield.customfield_id
+						'field_id': customfield.id
 					},
 					root: 'results',
 					totalProperty: 'total',

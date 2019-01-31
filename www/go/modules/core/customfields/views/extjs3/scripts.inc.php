@@ -53,8 +53,8 @@ foreach ($extendableModels as $extendableModel) {
 							'datatype:"' . \GO\Base\Util\StringHelper::escape_javascript($field['datatype']) . '", ' .
 							'align:"' . $align . '", ' .
 							'sortable:true,' .
-							'id: "' . $field['dataname'] . '",' .
-							'customfield_id: "' . $field['id'] . '",' .
+							'databaseName: "' . $field['dataname'] . '",' .
+							'id: "' . $field['id'] . '",' .
 							'options: ' . \json_encode($field['options']).','.
 							'nesting_level: "' . (isset($field['options']['nestingLevel']) ? $field['options']['nestingLevel'] : 0) . '",' .
 							'multiselect: "' . (isset($field['options']['multiselect']) ? $field['options']['multiselect'] : 0) . '",' .
