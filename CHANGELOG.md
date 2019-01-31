@@ -1,14 +1,20 @@
+31-01-2019 6.3.61
+- Core: Request SSL check works when server is behind proxy too
 - Core: Listeners relied on cache to be persistent causing missing properties "taskSettings" and "googleauthenticator"
-- Assistant: base64 encode paths so that it works with UTF-8 on all platforms and browsers. Assistant 1.0.4 is required!
+- Assistant: base64 encode paths so that it works with UTF-8 on all platforms and browsers. 
 
-28-01-2018 6.3.60
+  *** Assistant 1.0.4 is required after this upgade ***
+
+  https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-device.html
+
+28-01-2019 6.3.60
 - Files: clear shared folder cache so incorrect structures will be rebuilt automatically.
 - Projects: Incorrect fee when copied from activity type
 - Sieve: Was inactive because of invalid permission check
 - Core: Added missing index on core_search.keywords
 - Contacts: Added ID column to merge dialog (default hidden)
 
-22-01-2018 6.3.59
+22-01-2019 6.3.59
 - Mailserver: Server client module works again
 - E-mail: Fixed Email Attachment wiggle #275
 - E-mail: Fixed Sieve issue #268
