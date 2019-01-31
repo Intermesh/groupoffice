@@ -58,9 +58,13 @@ a {
 	cursor: pointer;
 	color: color($fg, "text");		
 	text-decoration: none;
-/*	&:link, &:active, &:visited {
-		color: inherit;
-	}*/
+	&:link, &:active, &:visited {
+		
+	}
+	&[target], &[onclick] {
+		@include var(color, c-primary);
+		font-weight: $font-weight-m;
+	}
 	&:hover {
 		text-decoration: underline;
 	}
