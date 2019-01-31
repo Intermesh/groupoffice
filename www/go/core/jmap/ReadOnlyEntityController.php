@@ -142,6 +142,9 @@ abstract class ReadOnlyEntityController extends Controller {
 		if(empty($params['filter']['permissionLevel']) || $params['filter']['permissionLevel'] < Acl::LEVEL_READ) {
 			$params['filter']['permissionLevel'] = Acl::LEVEL_READ;
 		}
+		
+		$params['calculateTotal'] = !empty($params['calculateTotal']) ? true : false;
+		
 		return $params;
 	}
 
@@ -155,25 +158,31 @@ abstract class ReadOnlyEntityController extends Controller {
 		$p = $this->paramsQuery($params);
 		$idsQuery = $this->getQueryQuery($p);
 		
-		$totalQuery = clone $idsQuery;
-		$total = (int) $totalQuery
-										->selectSingleValue("count(*)")
-										->orderBy([], false)
-										->limit(1)
-										->offset(0)
-										->execute()
-										->fetch();
-
 		$state = $this->getState();
 
-		Response::get()->addResponse([
+		
+		$response = [
 				'accountId' => $p['accountId'],
 				'state' => $state,
 				'ids' => array_map('intval', $idsQuery->all()),
-				'notfound' => [],
-				'total' => $total,
+				'notfound' => [],				
 				'canCalculateUpdates' => false
-		]);
+		];
+		
+		if($p['calculateTotal']) {
+			$totalQuery = clone $idsQuery;
+			$total = (int) $totalQuery
+											->selectSingleValue("count(*)")
+											->orderBy([], false)
+											->limit(1)
+											->offset(0)
+											->execute()
+											->fetch();
+
+			$response['total'] = $total;
+		}
+		
+		Response::get()->addResponse($response);
 	}
 	
 	protected function getState() {
