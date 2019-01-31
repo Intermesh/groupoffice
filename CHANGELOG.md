@@ -1,5 +1,6 @@
 - Calendar: Fixed calendar grid render issue when events didn't have a gap between them
 - Core: Implemented 'calculateTotal' param for jmap to improve performance on query requests. (global search)
+- Billing: No search button in select product catalog
 
 31-01-2019 6.3.61
 - Core: Request SSL check works when server is behind proxy too
