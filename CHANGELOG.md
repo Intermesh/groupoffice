@@ -1,3 +1,5 @@
+- Calendar: Fixed calendar grid render issue when events didn't have a gap between them
+
 31-01-2019 6.3.61
 - Core: Request SSL check works when server is behind proxy too
 - Core: Listeners relied on cache to be persistent causing missing properties "taskSettings" and "googleauthenticator"
