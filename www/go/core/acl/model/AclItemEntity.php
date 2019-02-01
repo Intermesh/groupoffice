@@ -90,6 +90,30 @@ abstract class AclItemEntity extends AclEntity {
 			return $column->table->getAlias();
 		}
 	}	
+
+	/**
+	 * Get the table alias holding the aclId
+	 */
+	public static function getAclEntityTableAlias() {
+
+		$cls = static::aclEntityClass();	
+
+		/* @var $cls Entity */
+		
+		//If this is another AclItemEntity then recurse
+		if(is_a($cls, AclItemEntity::class, true)) {
+			return $cls::getAclEntityTableAlias();
+		} else
+		{
+			//otherwise this must hold the aclId column
+			$aclColumn = $cls::getMapping()->getColumn('aclId');
+			if(!$aclColumn) {
+				throw new \Exception("Column 'aclId' is required for AclEntity '$cls'");
+			}
+			
+			return $column->table->getAlias();
+		}
+	}
 	
 	/**
 	 * Get the entity that holds the acl id.
