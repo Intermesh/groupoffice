@@ -22,6 +22,9 @@ go.panels.ModulePanel = Ext.extend(Ext.Panel, {
 		
 		detailViews.forEach(function(dv){
 			dv.load(id);
+
+			//For responsive layout
+			dv.show();
 		});
 		
 		//try to find grid for entity and select correct row
