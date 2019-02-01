@@ -313,9 +313,9 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 				contact.groups = []; //clear groups when changing address book
 			} else
 			{
-				removeFromGrid = r.json.addressBookId !== e.target.attributes.data.addressBookId;
-				//clear groups when changing address book
-				contact.groups = r.json.addressBookId === e.target.attributes.data.addressBookId ? GO.util.clone(r.json.groups) : [];
+				removeFromGrid = r.json.addressBookId != e.target.attributes.data.addressBookId;
+				//clear groups when changing address book				
+				contact.groups = r.json.addressBookId == e.target.attributes.data.addressBookId ? GO.util.clone(r.json.groups) : [];
 				contact.addressBookId = e.target.attributes.data.addressBookId;
 
 				var groupId = e.target.attributes.data.id;
