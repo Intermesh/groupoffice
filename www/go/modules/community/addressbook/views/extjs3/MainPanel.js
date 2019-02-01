@@ -147,7 +147,8 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 						{name: 'modifiedsince', multiple: false}, 
 						{name: 'modifiedbefore', multiple: false}, 
 						{name: 'minage', multiple: false},
-						{name: 'maxage'}
+						{name: 'maxage', multiple: false},
+						{name: 'birthdayindays', multiple: false}
 					]
 				},
 				this.addButton = new Ext.Button({

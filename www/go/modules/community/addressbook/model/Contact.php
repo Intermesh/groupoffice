@@ -388,6 +388,25 @@ class Contact extends AclItemEntity {
 											
 											$query->where('date.type', '=', Date::TYPE_BIRTHDAY)
 															->andWhere('date.date', ">=", $dateTime);
+										})
+										->add("birthdayInDays", function(Query $query, $value) {
+											if(empty($value)) {
+												return;
+											}
+											
+											$dateTime = new \go\core\util\DateTime("-" . $value . " years");
+											$dateTime->setTime(0, 0, 0);											
+											
+											if(!$query->isJoined('addressbook_date')) {
+												$query->join('addressbook_date', 'date', 'date.contactId = c.id', "INNER");
+											}
+											
+											$query->where('date.type', '=', Date::TYPE_BIRTHDAY)
+															->andWhere('DATE_ADD(date.date, 
+																	INTERVAL YEAR(CURDATE())-YEAR(date.date)
+																					 + IF(DAYOFYEAR(CURDATE()) > DAYOFYEAR(date.date),1,0)
+																	YEAR)  
+															BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL '.intval($value).' DAY);');
 										});
 										
 	}
