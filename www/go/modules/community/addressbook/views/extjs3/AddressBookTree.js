@@ -108,8 +108,15 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 				}
 
 				if (changed[id].groups) {
-					delete node.attributes.children;
-					node.reload();
+					for(var i =0, l = changed[id].groups.length; i < l; i ++) {
+						var groupId = changed[id].groups[i];
+						if(!this.getNodeById("AddressBookGroup-" + groupId)) {							
+							delete node.attributes.children;
+							node.reload();
+							break;
+						}
+					}
+					
 				}
 			}
 
@@ -123,8 +130,7 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 		});
 	},
 
-	onGroupChanges: function (entityStore, added, changed, destroyed) {
-
+	onGroupChanges: function (entityStore, added, changed, destroyed) {		
 		if (this.getLoader().loading) {
 			return;
 		}
@@ -133,16 +139,14 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 		for (groupId in changed) {
 			var nodeId = "AddressBookGroup-" + groupId;
 			me.getNodeById(nodeId).setText(changed[groupId].name);
-		}
-		;
+		}		
 
 		destroyed.forEach(function (groupId) {
+			console.log(groupId);
 			me.getNodeById("AddressBookGroup-" + groupId).destroy();
 		});
-
-
 	},
-
+	
 	showAddressBookMoreMenu: function (node, e) {
 		if (!this.addressBookMoreMenu) {
 			this.addressBookMoreMenu = new Ext.menu.Menu({
@@ -179,6 +183,9 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 								}
 							});
 							dlg.show();
+							dlg.on('submit', function(dlg, success, serverId) {
+								this.getNodeById("AddressBook-" + this.addressBookMoreMenu.data.id).reload();
+							}, this);
 						},
 						scope: this
 					}, {
