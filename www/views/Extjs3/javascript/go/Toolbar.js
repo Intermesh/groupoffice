@@ -169,6 +169,22 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 		toolbar.ownerCt.on('resize', function (tb, adjWidth) {
 			this.searchToolBar.setWidth(adjWidth);
 		}, this);
+		
+		if(this.filterNames.length) {
+			
+			var msg = t("You can use these keywords:<br /><br />") + this.filterNames.join(", ") + "<br /><br />";
+			
+			msg += t("For example:<br /><br />" + this.filterNames[0] + ": \"John Doe\" "+ this.filterNames[0] + ": Foo%");
+			
+			Ext.QuickTips.register({
+				target: this.triggerField.getEl(),
+				title: t("Advanced search options"),
+				text: msg,				
+				dismissDelay: 10000 // Hide after 10 seconds hover
+			});
+		}
+		
+		
 		go.toolbar.SearchButton.superclass.onRender.call(this, ct, position);
 	},
 	
