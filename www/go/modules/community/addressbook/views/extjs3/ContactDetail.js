@@ -34,13 +34,13 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView
 				
 				{
 					tpl: new Ext.XTemplate('<div class="go-detail-view-avatar">\
-<div class="avatar" style="{[this.getStyle(values.photoBlobId)]}">{[this.getHtml(values.isOrganization)]}</div></div>', 
+<div class="avatar {[values.isOrganization ? \'organization\' : \'\']}" style="{[this.getStyle(values.photoBlobId)]}">{[this.getHtml(values.isOrganization)]}</div></div>', 
 					{
 						getHtml: function (isOrganization) {
 							return isOrganization ? '<i class="icon">business</i>' : "";
 						},
 						getStyle: function (photoBlobId) {
-							return photoBlobId ? 'background-image: url(' + go.Jmap.downloadUrl(photoBlobId) + ')"' : "background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24));";
+							return photoBlobId ? 'background-image: url(' + go.Jmap.downloadUrl(photoBlobId) + ')"' : "";
 						}
 					})
 				},
