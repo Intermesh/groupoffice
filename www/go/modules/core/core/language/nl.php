@@ -781,4 +781,5 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'Repeat every' => 'Herhaal elke',
 	'At days' => 'Op dagen',
   'Add query argument' => 'Voeg query argument toe',
+	'Create new query' => 'Maak nieuwe zoekopdracht'
 );

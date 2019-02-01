@@ -741,7 +741,8 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 		var eventPos = e.getXY();
 		var shadowPos = this.selector.getXY();
 		//var height = this.selector.getHeight();
-		var increment = this.snap(eventPos[1]-shadowPos[1],this.dragSnap["y"], 0);
+		
+		var increment = this.snap(eventPos[1]-shadowPos[1],this.dragSnap["y"], 0);		
 		this.selector.setHeight(increment);
 	},
 
@@ -1472,7 +1473,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 			{
 				//cached rows
 				var row = this.gridCells[day][rowId];
-				var rowY = row.xy[1];
+				var rowY = row.getY() - columnsContainerY;
 
 				if(rowId==0)
 				{
@@ -1509,12 +1510,12 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 
 					//new top is above the existing bottom and
 					//new bottom is below the existing top
-
+					var rowYend = rowY+row.size['height'];
 					if((
 						row.xy[0]+row.size['width'])>=eventPosition[0] &&
 					row.xy[0]<=eventPosition[0]+appointmentsize['width'] &&
-					rowY+row.size['height']<=eventPosition[1]+appointmentsize['height'] &&
-					rowY+row.size['height']>eventPosition[1])
+					rowY<eventPosition[1]+appointmentsize['height'] &&
+					rowYend>eventPosition[1])
 					{
 						if(typeof(positions[this.appointments[day][i].id])=='undefined')
 						{
@@ -1529,13 +1530,14 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 
 							//set the space occupied
 							var eventRowId=rowId;
-							for(var n=rowY;n<eventPosition[1]+appointmentsize['height']-3;n+=snap["y"])
+							for(var n=rowY;n<eventPosition[1]+appointmentsize['height']-1;n+=snap["y"])
 							{
 								if(typeof(this.rows[eventRowId]) == 'undefined')
 								{
 									this.rows[eventRowId]={}; //Array();
 								}
 								this.rows[eventRowId][position]=this.appointments[day][i].id;
+								//console.log(eventRowId, this.appointments[day][i].id, rowY, rowYend, eventPosition[1], appointmentsize['height'] );
 								eventRowId++;
 							}
 
@@ -1552,6 +1554,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 					maxPositions=position;
 				}
 			}
+			
 			//we got the maximum number of appointments on one row now.
 			//we know for each appointments how many overlaps they have
 			//we now need to know the widths of each event
@@ -1575,8 +1578,10 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 				var eventPosition = this.appointments[day][i].xy;
 				var appointmentsize = this.appointments[day][i].size;
 
-				var rowId = Math.floor(eventPosition[1]/snap["y"]);
-				var eventRows=(appointmentsize['height']-2)/snap["y"];
+				var rowId = this.getRowNumberByY(eventPosition[1]+columnsContainerY);
+				var eventRows=(appointmentsize['height']+1)/snap["y"];
+				
+//				console.log(this.appointments[day][i].id, rowId, eventRows, maxPositions);
 
 				var eventWidth = this.getEventWidth(
 					positions[this.appointments[day][i].id],

@@ -1,6 +1,6 @@
 <?php
 
-namespace GO\Serverclient;
+namespace go\modules\community\serverclient\model;
 
 
 class HttpClient extends \GO\Base\Util\HttpClient{

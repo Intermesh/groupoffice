@@ -62,7 +62,7 @@ GO.query.SavedQueryGrid = function(config) {
 
 	GO.query.SavedQueryGrid.superclass.constructor.call(this, config);
 	
-	this.queryPanel.on('reset',function(){
+	this.queryPanel.on('createNew',function(){
 		this.queryId=0;
 	},this);
 	

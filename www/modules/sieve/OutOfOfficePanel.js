@@ -3,6 +3,7 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 	title:t("Out of office", "sieve"),
 	layout:'form',
 	autoScroll:true,
+	hideMode: "offsets",
 	
 	accountId:0,
 		
@@ -17,7 +18,7 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 			name : 'ooo_activate',
 			format : GO.settings['date_format'],
 			width: 180,
-			allowBlank : false,
+			allowBlank : true,
 			fieldLabel: t("Activate at", "sieve"),
 			isChanged:false,
 			listeners : {
@@ -45,7 +46,7 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 			name : 'ooo_deactivate',
 			format : GO.settings['date_format'],
 			width: 180,
-			allowBlank : false,
+			allowBlank : true,
 			fieldLabel: t("Deactivate after", "sieve"),
 			listeners : {
 				focus : {
@@ -110,7 +111,7 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 		
 		this.messageField = new Ext.form.TextArea({
 			name: 'ooo_message',
-			allowBlank:false,
+			allowBlank:true,
 			anchor:'100%',
 			height:130,
 			width: 300,

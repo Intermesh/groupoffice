@@ -1,6 +1,7 @@
 GO.Window = Ext.extend(Ext.Window,{
 
 	constrainHeader : true,
+	closeAction:'hide',
 //	renderTo: Ext.get('dialogs'), // render before all script tags
 //this breaks some functionality that do stuff on render.
 	temporaryListeners : [],

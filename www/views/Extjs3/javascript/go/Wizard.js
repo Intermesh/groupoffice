@@ -1,6 +1,6 @@
 go.Wizard = Ext.extend(go.Window, {
 	width: dp(500),
-	height: dp(400),
+	height: dp(430),
 	nextItem : null,
 	previousItem : null,
 	layout: "card",

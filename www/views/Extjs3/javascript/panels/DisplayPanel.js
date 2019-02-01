@@ -236,7 +236,7 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		}
 
 		if(go.Modules.isAvailable("legacy", "files")) {
-			if (this.showFiles) {
+			if (this.showFiles && !this.noFileBrowser) {
                 this.add(new go.modules.files.FilesDetailPanel());
             }
 		}
@@ -375,8 +375,9 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		
 		this.updateToolbar();
 		
-		this.xtemplate.overwrite(this.mainItem.body, data);
-
+		if(this.mainItem.body) { // TODO: this will unly render it the second time
+			this.xtemplate.overwrite(this.mainItem.body, data);
+		}
 		for(var id in this.collapsibleSections){
 			if(this.hiddenSections.indexOf(this.collapsibleSections[id])>-1){
 				this.toggleSection(id, true);

@@ -13,7 +13,7 @@
 
 GO.moduleManager.onModuleReady('email',function(){
 	
-	go.Modules.isAvailable('legacy', 'sieve' , function() {
+	
 		Ext.override(GO.email.AccountDialog, {	
 			initComponent : GO.email.AccountDialog.prototype.initComponent.createSequence(function(){
 
@@ -24,10 +24,15 @@ GO.moduleManager.onModuleReady('email',function(){
 				this.tabPanel.insert(inPos,this.outOfOfficePanel);
 				this.tabPanel.insert(inPos,this.sieveGrid);
 
-				this.tabPanel.hideTabStripItem(this.filterGrid);
+				this.tabPanel.hideTabStripItem(this.outOfOfficePanel);
+				this.tabPanel.hideTabStripItem(this.sieveGrid);
 			}),
 
 			sieveCheck :function(account_id){
+				
+				if(!go.Modules.isAvailable('legacy', 'sieve' )) { 
+					return false;
+				}
 
 				if(!GO.util.empty(account_id)){
 					this.account_id = account_id;
@@ -91,12 +96,11 @@ GO.moduleManager.onModuleReady('email',function(){
 					this.tabPanel.hideTabStripItem(this.sieveGrid);
 					this.tabPanel.hideTabStripItem(this.outOfOfficePanel);
 					this.outOfOfficePanel.disableFields(true);
-
 					this.tabPanel.unhideTabStripItem(this.filterGrid);
 				}
 			})
 		});
-	});
+
 });
 
 go.Modules.register("legacy", 'sieve');

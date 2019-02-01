@@ -51,7 +51,10 @@ go.modules.core.users.CreateUserAccountPanel = Ext.extend(Ext.form.FormPanel, {
 			}
 		];
 		 go.modules.core.users.CreateUserAccountPanel.superclass.initComponent.call(this);
-	}
+	},
+	
+	onSubmitStart : function(value) {}, // override by serverclient 
+	onSubmitComplete : function(user, result) {}
 });
 
 
