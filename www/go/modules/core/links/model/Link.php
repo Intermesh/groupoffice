@@ -171,7 +171,7 @@ class Link extends Entity {
 	 * @return boolean
 	 */
 	public static function exists($a, $b) {
-		return $this->findLink($a, $b) !== false;
+		return static::findLink($a, $b) !== false;
 	}
 	/**
 	 * Find a link
