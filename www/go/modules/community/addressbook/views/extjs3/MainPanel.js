@@ -182,6 +182,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 
 		this.contactDetail = new go.modules.community.addressbook.ContactDetail({
 			region: "east",
+			split: true,
 			width: dp(500),
 			tbar: [
 				//add a back button for small screens
