@@ -185,7 +185,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 		return this.formPanel.isValid();
 	},
 
-	focus: function () {
+	focus: function () {		
 		this.formPanel.focus();
 	},
 	

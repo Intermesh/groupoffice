@@ -236,16 +236,9 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 
 			],
 			listeners: {
-				rowdblclick: function (grid, rowIndex, e) {
-
-					var record = grid.getStore().getAt(rowIndex);
-					if (record.get('permissionLevel') < GO.permissionLevels.write) {
-						return;
-					}
-
-					var dlg = new go.modules.community.addressbook.ContactDialog();
-					dlg.load(record.id).show();
-				},
+				rowdblclick: this.onGridDblClick,
+				
+				keypress: this.onGridKeyPress,
 
 				scope: this
 			}
@@ -257,6 +250,35 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 		}, this);
 		
 		return this.grid;
+	},
+	
+	onGridDblClick : function (grid, rowIndex, e) {
+
+		var record = grid.getStore().getAt(rowIndex);
+		if (record.get('permissionLevel') < GO.permissionLevels.write) {
+			return;
+		}
+
+		var dlg = new go.modules.community.addressbook.ContactDialog();
+		dlg.load(record.id).show();
+	},
+	
+	onGridKeyPress : function(e) {
+		if(e.keyCode != e.ENTER) {
+			return;
+		}
+		var record = this.grid.getSelectionModel().getSelected();
+		if(!record) {
+			return;
+		}
+
+		if (record.get('permissionLevel') < GO.permissionLevels.write) {
+			return;
+		}
+
+		var dlg = new go.modules.community.addressbook.ContactDialog();
+		dlg.load(record.id).show();
+
 	},
 	
 	createFilterPanel: function () {

@@ -126,7 +126,8 @@ go.modules.community.notes.MainPanel = Ext.extend(go.panels.ModulePanel, {
 			],
 			listeners: {				
 				rowdblclick: this.onNoteGridDblClick,
-				scope: this
+				scope: this,				
+				keypress: this.onNoteGridKeyPress
 			}
 		});
 
@@ -206,8 +207,26 @@ go.modules.community.notes.MainPanel = Ext.extend(go.panels.ModulePanel, {
 			return;
 		}
 
-		var noteEdit = new go.modules.community.notes.NoteForm();
-		noteEdit.load(record.id).show();
+		var dlg = new go.modules.community.notes.NoteForm();
+		dlg.load(record.id).show();
+	},
+	
+	onNoteGridKeyPress : function(e) {
+		if(e.keyCode != e.ENTER) {
+			return;
+		}
+		var record = this.noteGrid.getSelectionModel().getSelected();
+		if(!record) {
+			return;
+		}
+
+		if (record.get('permissionLevel') < GO.permissionLevels.write) {
+			return;
+		}
+
+		var dlg = new go.modules.community.notes.NoteForm();
+		dlg.load(record.id).show();
+
 	}
 
 			
