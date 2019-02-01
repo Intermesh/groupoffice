@@ -11,8 +11,57 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 
 	addAddressBookId: 1,
 
-	initComponent: function () {
+	initComponent: function () {	
 
+		this.sidePanel = new Ext.Panel({
+			width: dp(300),
+			region: "west",
+			split: true,
+			autoScroll: true,			
+			items: [
+				this.createAddressBookTree(),
+				this.createFilterPanel()
+			]
+		});
+
+		this.contactDetail = new go.modules.community.addressbook.ContactDetail({
+			region: "east",
+			split: true,
+			width: dp(500),
+			tbar: [
+				//add a back button for small screens
+				{
+					// this class will hide the button on large screens
+					cls: 'go-narrow',
+					iconCls: "ic-arrow-back",
+					handler: function () {
+						this.westPanel.show();
+					},
+					scope: this
+				}]
+		});
+
+		this.westPanel = new Ext.Panel({
+			region: "center",
+			layout: "responsive",
+			//stateId: "go-addressbook-west",
+			split: true,
+			narrowWidth: dp(400), //this will only work for panels inside another panel with layout=responsive. Not ideal but at the moment the only way I could make it work
+			items: [
+				this.createGrid(), //first is default in narrow mode
+				this.sidePanel
+			]
+		});
+
+		this.items = [this.westPanel, this.contactDetail];
+
+		go.modules.community.addressbook.MainPanel.superclass.initComponent.call(this);		
+
+
+	},
+	
+	
+	createAddressBookTree : function() {
 		this.addressBookTree = new go.modules.community.addressbook.AddressBookTree({
 			enableDrop: true,
 			ddGroup: "addressbook",
@@ -41,17 +90,39 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 
 				}]
 		});
+		
+		
+		//because the root node is not visible it will auto expand on render.
+		this.addressBookTree.getRootNode().on('expand', function (node) {
+			//when expand is done we'll select the first node. This will trigger a selection change. which will load the grid below.
+			this.addressBookTree.getSelectionModel().select(node.firstChild);
+		}, this);
 
-		this.filterPanel = new Ext.Panel({
-			width: dp(300),
-			region: "west",
-			split: true,
-			autoScroll: true,
-			items: [
-				this.addressBookTree
-			]
-		});
+		//load the grid on selection change.
+		this.addressBookTree.getSelectionModel().on('selectionchange', function (sm, node) {
+			
+			if (!node) {
+				return;
+			}
 
+			if (node.id === "all") {
+				this.setAddressBookId(null);
+			} else if (node.attributes.entity.name === "AddressBook") {
+				this.setAddressBookId(node.attributes.data.id);
+			} else
+			{
+				this.setGroupId(node.attributes.data.id, node.attributes.data.addressBookId);
+			}
+		}, this);
+		
+		//init drag drop
+		this.addressBookTree.on("nodedragover", this.onNodeDragOver, this);
+		this.addressBookTree.on("beforenodedrop", this.onNodeDrop, this);
+		
+		return this.addressBookTree;
+	},
+	
+	createGrid : function() {
 		this.grid = new go.modules.community.addressbook.ContactGrid({
 			region: 'center',
 			enableDragDrop: true, //for dragging contacts to address books or groups in the tree
@@ -61,7 +132,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 					cls: 'go-narrow',
 					iconCls: "ic-menu",
 					handler: function () {
-						this.filterPanel.show();
+						this.sidePanel.show();
 					},
 					scope: this
 				},
@@ -179,75 +250,48 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 				scope: this
 			}
 		});
-
-		this.contactDetail = new go.modules.community.addressbook.ContactDetail({
-			region: "east",
-			split: true,
-			width: dp(500),
-			tbar: [
-				//add a back button for small screens
-				{
-					// this class will hide the button on large screens
-					cls: 'go-narrow',
-					iconCls: "ic-arrow-back",
-					handler: function () {
-						this.westPanel.show();
-					},
-					scope: this
-				}]
-		});
-
-		this.westPanel = new Ext.Panel({
-			region: "center",
-			layout: "responsive",
-			//stateId: "go-addressbook-west",
-			split: true,
-			narrowWidth: dp(400), //this will only work for panels inside another panel with layout=responsive. Not ideal but at the moment the only way I could make it work
-			items: [
-				this.grid, //first is default in narrow mode
-				this.filterPanel
-			]
-		});
-
-		this.items = [this.westPanel, this.contactDetail];
-
-		go.modules.community.addressbook.MainPanel.superclass.initComponent.call(this);
-
-		//because the root node is not visible it will auto expand on render.
-		this.addressBookTree.getRootNode().on('expand', function (node) {
-			//when expand is done we'll select the first node. This will trigger a selection change. which will load the grid below.
-			this.addressBookTree.getSelectionModel().select(node.firstChild);
-		}, this);
-
-		//load the grid on selection change.
-		this.addressBookTree.getSelectionModel().on('selectionchange', function (sm, node) {
-			
-			if (!node) {
-				return;
-			}
-
-			if (node.id === "all") {
-				this.setAddressBookId(null);
-			} else if (node.attributes.entity.name === "AddressBook") {
-				this.setAddressBookId(node.attributes.data.id);
-			} else
-			{
-				this.setGroupId(node.attributes.data.id, node.attributes.data.addressBookId);
-			}
-		}, this);
-
-
+		
 		//Load contact when selecting it in the grid.
 		this.grid.on('navigate', function (sm, rowIndex, record) {
 			go.Router.goto("contact/" + record.id);
 		}, this);
-
-
-		//init drag drop
-		this.addressBookTree.on("nodedragover", this.onNodeDragOver, this);
-		this.addressBookTree.on("beforenodedrop", this.onNodeDrop, this);
-
-
+		
+		return this.grid;
+	},
+	
+	createFilterPanel: function () {
+		var orgFilter = new go.NavMenu({			
+			store: new Ext.data.ArrayStore({
+				fields: ['name', 'icon', 'inputValue'], //icon and iconCls are supported.
+				data: [					
+					[t("Organization"), 'business', true],
+					[t("Contact"), 'person', false]				
+				]
+			}),
+			simpleSelect: true,
+			multiSelect : true,
+			listeners: {
+				selectionchange: function (view, nodes) {
+					if(!nodes.length || nodes.length == 2) {
+						delete this.grid.store.baseParams.filter.isOrganization;
+					} else
+					{
+						var record = view.store.getAt(nodes[0].viewIndex);
+						this.grid.store.baseParams.filter.isOrganization = record.data.inputValue;
+					}
+					this.grid.store.load();
+				},
+				scope: this
+			}
+		});		
+		
+		
+		return new Ext.Panel({
+			title: t("Filters"),
+			items: [
+				orgFilter
+			]
+		});
 	},
 
 	setAddressBookId: function (addressBookId) {
@@ -270,7 +314,6 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 				this.addButton.setDisabled(true);
 			}
 		}
-
 		
 		s.load();
 	},
