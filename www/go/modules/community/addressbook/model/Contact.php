@@ -365,7 +365,31 @@ class Contact extends AclItemEntity {
 											}
 											
 											$query->where('adr.city', 'LIKE', $value);
+										})
+										->add("minAge", function(Query $query, $value) {
+											$dateTime = new \go\core\util\DateTime("-" . $value . " years");
+											$dateTime->setTime(0, 0, 0);
+											
+											if(!$query->isJoined('addressbook_date')) {
+												$query->join('addressbook_date', 'date', 'date.contactId = c.id', "INNER");
+											}
+											
+											$query->where('date.type', '=', Date::TYPE_BIRTHDAY)
+															->andWhere('date.date', "<=", $dateTime);
+											
+										})
+										->add("maxAge", function(Query $query, $value) {
+											$dateTime = new \go\core\util\DateTime("-" . $value . " years");
+											$dateTime->setTime(0, 0, 0);											
+											
+											if(!$query->isJoined('addressbook_date')) {
+												$query->join('addressbook_date', 'date', 'date.contactId = c.id', "INNER");
+											}
+											
+											$query->where('date.type', '=', Date::TYPE_BIRTHDAY)
+															->andWhere('date.date', ">=", $dateTime);
 										});
+										
 	}
 	
 	public static function converters() {

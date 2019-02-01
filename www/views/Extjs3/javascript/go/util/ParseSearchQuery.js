@@ -1,6 +1,8 @@
 go.util.parseSearchQuery = function (string, defaultFilter) {
 	var data = {};
 	
+	defaultFilter = defaultFilter.toLowerCase();
+	
 	//Simple text check
 	if(string.indexOf(':') === -1) {
 		data[defaultFilter] = [];
@@ -27,12 +29,12 @@ go.util.parseSearchQuery = function (string, defaultFilter) {
 	var regex = /(\S+:'(?:[^'\\]|\\.)*')|(\S+:"(?:[^"\\]|\\.)*")|(-?"(?:[^"\\]|\\.)*")|(-?'(?:[^'\\]|\\.)*')|\S+|\S+:\S+/g;
 	var match, token, currentKey = defaultFilter, val;
 	while ((match = regex.exec(string)) !== null) {		
-//		console.log(match);
+		console.log(match);
 		token = match[0];
 		var semiColPos = token.indexOf(':');
 		
 		if(semiColPos != -1) {
-			currentKey = token.substring(0, semiColPos);
+			currentKey = token.substring(0, semiColPos).toLowerCase();
 			
 			val = token.substring(semiColPos + 1, token.length);
 //			console.log(currentKey, val);
@@ -57,7 +59,7 @@ go.util.parseSearchQuery = function (string, defaultFilter) {
 		}		
 	}
 	
-//	console.log(data);
+	console.log(data);
 	
 	return data;
 };
