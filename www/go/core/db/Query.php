@@ -366,6 +366,31 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 
 		return $this;
 	}
+	
+	/**
+	 * Check if table is joined
+	 * 
+	 * @param string $tableName
+	 * @param string $joinTableAlias If given the alias of the existing join must match too.
+	 * @return boolean
+	 */
+	public function isJoined($tableName, $joinTableAlias = null) {
+		foreach($this->joins as $join) {
+			if($join['src'] != $tableName) {
+				continue;
+			}
+			
+			if(!isset($joinTableAlias)) {
+				return true;
+			}
+			
+			if($joinTableAlias == $join['joinTableAlias']) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
 
 	/**
 	 * Skip this number of records
@@ -449,9 +474,15 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 		call_user_func_array([$stmt, 'setFetchMode'], $this->getFetchMode());
 
 		$stmt->setQuery($this);		
-		
-		if (!$stmt->execute()) {
-			return false;
+		try {
+			if (!$stmt->execute()) {
+				return false;
+			}
+		} catch(\Exception $e) {
+			if(!empty($build['debug'])) {
+				GO()->debug("SQL FAILED: " . $build['debug']);
+			}
+			throw $e;
 		}
 		return $stmt;
 	}

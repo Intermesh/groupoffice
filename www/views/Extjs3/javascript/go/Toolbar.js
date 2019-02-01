@@ -1,13 +1,27 @@
 Ext.namespace('go.toolbar');
 
+
 go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 
 	iconCls: 'ic-search',	
 	store: null,
 	tooltip: t('Search'),
-	searchToolBar: null,
+	searchToolBar: null,	
+	
+	//Specify all the remote jmap filters that can be used in the search box as an 
+	//array. eg.['name', 'email']. Users can use: 
+	//
+	//name: "Merijn Schering" name: Merijn% email:%intermesh% 
+	//
+	//to search. This will convert into:
+	//
+	// {name: ["Merijn Schering", "Merijn%", email:["%intermesh%]}
+	
+	filterNames: null,
 	constructor: function (config) {
 		go.toolbar.SearchButton.superclass.constructor.call(this, config);
+		
+		this.filterNames = config.filterNames || ['q'];
 		
 		if(!this.store) {			
 			//try to find store if this button it part of a grid.
@@ -23,7 +37,15 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 				scope: this,
 				search: function (tb, v) {
 					if(this.store instanceof go.data.Store || this.store instanceof go.data.GroupingStore) {
-						this.store.baseParams.filter.q = v;
+						
+						var filter = go.util.parseSearchQuery(v, this.filterNames[0]), me = this;
+						this.filterNames.forEach(function(key) {
+							delete me.store.baseParams.filter[key];
+							if(filter[key]) {
+								me.store.baseParams.filter[key] = filter[key];
+							}
+						});
+						
 					} else {
 						//params for old framework
 						this.store.baseParams.query = v;
@@ -34,7 +56,10 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 				},
 				reset: function() {
 					if(this.store instanceof go.data.Store) {
-						delete this.store.baseParams.filter.q;
+						var me = this;
+						this.filterNames.forEach(function(key) {
+							delete me.store.baseParams.filter[key];							
+						});
 					} else {
 						delete this.store.baseParams.query;
 					}

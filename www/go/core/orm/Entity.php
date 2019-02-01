@@ -433,8 +433,14 @@ abstract class Entity extends Property {
 		$filters = new Filters();
 
 		$filters->add('q', function(Query $query, $value, $filter) {
-							if (!empty($value)) {
-								static::search($query, $value);
+							if(!is_array($value)) {
+								$value = [$value];
+							}
+							
+							foreach($value as $q) {
+								if (!empty($q)) {								
+									static::search($query, $q);
+								}
 							}
 						})->add('exclude', function(Query $query, $value, $filter) {
 							if (!empty($value)) {
