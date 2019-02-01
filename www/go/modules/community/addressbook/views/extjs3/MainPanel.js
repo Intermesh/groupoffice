@@ -138,7 +138,8 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 				},
 				'->',
 				{
-					xtype: 'tbsearch'
+					xtype: 'tbsearch',
+					filterNames: ['name', 'email', 'country', 'city']
 				},
 				this.addButton = new Ext.Button({
 					//disabled: true,

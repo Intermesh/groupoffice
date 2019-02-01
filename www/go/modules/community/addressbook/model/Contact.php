@@ -347,7 +347,24 @@ class Contact extends AclItemEntity {
 										})
 										->add("email", function(Query $query, $value, $filter) {
 											$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "INNER")
-											->where(['e.email' => $filter['email']]);
+											->where('e.email', 'LIKE', $value);
+										})
+										->add("name", function(Query $query, $value, $filter) {											
+											$query->where('name', 'LIKE', $value);
+										})
+										->add("country", function(Query $query, $value, $filter) {
+											if(!$query->isJoined('addressbook_address')) {
+												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "INNER");
+											}
+											
+											$query->where('adr.country', 'LIKE', $value);
+										})
+										->add("city", function(Query $query, $value, $filter) {
+											if(!$query->isJoined('addressbook_address')) {
+												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "INNER");
+											}
+											
+											$query->where('adr.city', 'LIKE', $value);
 										});
 	}
 	
