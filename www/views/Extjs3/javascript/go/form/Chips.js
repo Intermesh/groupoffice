@@ -75,31 +75,32 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	
 		this.dataView.store.on("add", function(store, records) {
 			if(this.entityStore) {
-				this.comboBox.store.baseParams.filter.exclude = this.dataView.store.getRange().column(this.valueField);				
+				this.comboStore.baseParams.filter.exclude = this.dataView.store.getRange().column(this.valueField);				
 			}
-			this.comboBox.store.remove(records);//this.comboBox.store.find(this.valueField, records[0].get(this.valueField)));
+			this.comboStore.remove(records);//this.comboBox.store.find(this.valueField, records[0].get(this.valueField)));
 			this._isDirty = true;
 		}, this);
 		this.dataView.store.on("remove", function(store, record) {
 			if(this.entityStore) {
-				this.comboBox.store.baseParams.filter.exclude = this.dataView.store.getRange().column(this.valueField);							
+				this.comboStore.baseParams.filter.exclude = this.dataView.store.getRange().column(this.valueField);							
 			} 
-			this.comboBox.store.add([record]);
+			this.comboStore.add([record]);
 			this._isDirty = true;
 		}, this);		
 		
-		this.items = [{
+		this.items = [];
+		var cb = this.createComboBox();
+		if(cb) {
+			this.items.push({
 				layout: "form",				
-				items: [this.createComboBox()]
-			},
-			this.dataView
-		];
+				items: [cb]
+			});
+		}
+		this.items.push(this.dataView);
 		
 		//adds back removed records from static stores.
 		this.on("beforedestroy", function() {
-			this.dataView.store.each(function(r) {
-				this.dataView.store.remove(r);
-			}, this);
+			this.reset();
 		}, this);
 
 		go.form.Chips.superclass.initComponent.call(this);
@@ -108,10 +109,20 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	getName: function () {
 		return this.name;
 	},
+	
+	reset : function() {
+		this.dataView.store.each(function(r) {
+			this.dataView.store.remove(r);
+		}, this);
+		this._isDirty = false
+	},
+	
 	_isDirty: false,
+	
 	isDirty: function () {
 		return this._isDirty;
 	},
+	
 	setValue: function (values) {
 		
 		if(this.entityStore) {	
@@ -150,21 +161,19 @@ go.form.Chips = Ext.extend(Ext.Container, {
 		Ext.form.MessageTargets.qtip.clear(this);
 	},
 	createComboBox: function () {
+		if(this.comboStore) {
+			return;
+		}
 		
-		if(this.entityStore) {
-			
-			if(!this.storeBaseParams) {
-				this.storeBaseParams = {};
-			}
-			if(!this.storeBaseParams.filter) {
-				this.storeBaseParams.filter = {};
-			}
-			this.storeBaseParams.filter.exclude = [];
-			
+		if(this.entityStore){
 			this.comboStore = new go.data.Store({
 				fields: [this.valueField, this.displayField],
 				entityStore: this.entityStore,
-				baseParams: this.storeBaseParams
+				baseParams: {
+					filter: {
+						exclude: []
+					}
+				}
 			});
 		} else
 		{

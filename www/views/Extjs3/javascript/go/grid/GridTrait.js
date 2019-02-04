@@ -6,37 +6,19 @@ go.grid.GridTrait = {
 	
 	pageSize: 20,
 	
+	scrollUp: false,  // set to true when you need to loadMore when scrolling up
+	
 	initGridTrait : function() {
 		if (!this.keys)
 		{
 			this.keys = [];
 		}
 	
-		
 		this.initDeleteKey();		
 		if(this.getSelectionModel().getSelected) {
 			this.initNav();
 		}
 
-		//setup auto load more for go.data.Store's only
-		if(this.store instanceof go.data.Store  && this.store.entityStore) {
-			this.on("bodyscroll", this.loadMore, this, {buffer: 100});
-
-			this.store.baseParams.limit = this.pageSize;
-
-			this.store.on("load", function(store, records, o){
-				this.allRecordsLoaded = records.length < this.pageSize;
-				
-				if(this.rendered) {
-					this.loadMore();			
-				} else
-				{
-					this.on("afterrender", function() {
-						this.loadMore();
-					}, this, {single: true});
-				}
-			}, this);
-		}
 	},
 	
 	//The navigate can be used in modules to track row selections for navigation.
@@ -108,43 +90,5 @@ go.grid.GridTrait = {
 			this.doDelete(selectedRecords);
 			
 		}, this);
-	},
-	
-	
-	doDelete : function(selectedRecords) {
-		this.getStore().entityStore.set({
-			destroy:  selectedRecords.column("id")
-		});
-	},
-
-	allRecordsLoaded : false,
-	/**
-	 * Loads more data if the end off the scroll area is reached
-	 * @returns {undefined}
-	 */
-	loadMore: function () {
-		var store = this.getStore();
-
-		if (this.allRecordsLoaded){
-			return;
-		}
-
-
-		var	scroller = this.getView().scroller.dom,
-						body = this.getView().mainBody.dom;
-
-		if (scroller.offsetHeight >= body.offsetHeight || (scroller.offsetHeight + scroller.scrollTop + this.scrollBoundary) >= body.offsetHeight) {
-
-			var o = store.lastOptions ? GO.util.clone(store.lastOptions) : {};
-			o.add = true;
-			o.params = o.params || {};
-			
-			o.params.position = o.params.position || 0;
-			o.params.position += this.pageSize;
-			o.paging = true;
-			
-			store.load(o);
-			
-		}
 	}
 }

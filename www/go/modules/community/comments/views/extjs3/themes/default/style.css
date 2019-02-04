@@ -1,0 +1,7 @@
+.entity.Comment::before {
+	content: "comment"
+}
+
+.go-module-icon-comments , .go-menu-icon-comments{
+	background:url('images/comments.png');
+}

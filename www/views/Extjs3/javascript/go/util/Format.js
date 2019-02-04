@@ -70,6 +70,15 @@
 			}
 			return Ext.util.Format.date(v, GO.settings.date_format);
 		},
+		// string, ...args
+		// eg go.util.Format.string("Welcome {0}, good {1}", 'Michael', 'afternoon')
+		string : function() {
+			var args = arguments;
+			var string = [].shift.call(args);
+			return string.replace(/{(\d+)}/g, function(match, number) { 
+			  return typeof args[number] != 'undefined' ? args[number] : match;
+			});
+		},
 
 		dateTime: function (v) {
 			v = checkDate(v);
