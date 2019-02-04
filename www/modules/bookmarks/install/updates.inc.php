@@ -26,3 +26,5 @@ $updates['201610281650'][] = 'ALTER TABLE `bm_categories` ENGINE=InnoDB;';
 $updates['201610281650'][] = 'ALTER TABLE `bm_categories` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;';
 
 $updates['201610281659'][] = 'SET foreign_key_checks = 1;';
+
+$updates['201901301035'][] =  "ALTER TABLE `bm_categories` ADD INDEX `show_in_startmenu` (`show_in_startmenu`);";

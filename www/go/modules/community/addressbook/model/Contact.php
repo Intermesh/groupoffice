@@ -347,8 +347,68 @@ class Contact extends AclItemEntity {
 										})
 										->add("email", function(Query $query, $value, $filter) {
 											$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "INNER")
-											->where(['e.email' => $filter['email']]);
+											->where('e.email', 'LIKE', $value);
+										})
+										->add("name", function(Query $query, $value, $filter) {											
+											$query->where('name', 'LIKE', $value);
+										})
+										->add("country", function(Query $query, $value, $filter) {
+											if(!$query->isJoined('addressbook_address')) {
+												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "INNER");
+											}
+											
+											$query->where('adr.country', 'LIKE', $value);
+										})
+										->add("city", function(Query $query, $value, $filter) {
+											if(!$query->isJoined('addressbook_address')) {
+												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "INNER");
+											}
+											
+											$query->where('adr.city', 'LIKE', $value);
+										})
+										->add("minAge", function(Query $query, $value) {
+											$dateTime = new \go\core\util\DateTime("-" . $value . " years");
+											$dateTime->setTime(0, 0, 0);
+											
+											if(!$query->isJoined('addressbook_date')) {
+												$query->join('addressbook_date', 'date', 'date.contactId = c.id', "INNER");
+											}
+											
+											$query->where('date.type', '=', Date::TYPE_BIRTHDAY)
+															->andWhere('date.date', "<=", $dateTime);
+											
+										})
+										->add("maxAge", function(Query $query, $value) {
+											$dateTime = new \go\core\util\DateTime("-" . $value . " years");
+											$dateTime->setTime(0, 0, 0);											
+											
+											if(!$query->isJoined('addressbook_date')) {
+												$query->join('addressbook_date', 'date', 'date.contactId = c.id', "INNER");
+											}
+											
+											$query->where('date.type', '=', Date::TYPE_BIRTHDAY)
+															->andWhere('date.date', ">=", $dateTime);
+										})
+										->add("birthdayInDays", function(Query $query, $value) {
+											if(empty($value)) {
+												return;
+											}
+											
+											$dateTime = new \go\core\util\DateTime("-" . $value . " years");
+											$dateTime->setTime(0, 0, 0);											
+											
+											if(!$query->isJoined('addressbook_date')) {
+												$query->join('addressbook_date', 'date', 'date.contactId = c.id', "INNER");
+											}
+											
+											$query->where('date.type', '=', Date::TYPE_BIRTHDAY)
+															->andWhere('DATE_ADD(date.date, 
+																	INTERVAL YEAR(CURDATE())-YEAR(date.date)
+																					 + IF(DAYOFYEAR(CURDATE()) > DAYOFYEAR(date.date),1,0)
+																	YEAR)  
+															BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL '.intval($value).' DAY);');
 										});
+										
 	}
 	
 	public static function converters() {

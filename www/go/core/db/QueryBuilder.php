@@ -408,6 +408,8 @@ class QueryBuilder {
 
 		return $groupBy . "\n";
 	}
+	//Clear first AND or OR. Other wise WHERE AND ... will be generated
+	private $firstWhereCondition = true;
 
 	/**
 	 * Build the where part of the SQL string
@@ -417,10 +419,7 @@ class QueryBuilder {
 	 * @param string
 	 */
 	protected function buildWhere(array $conditions, $prefix = "") {
-		
-		if (isset($conditions[0])) {
-			$conditions[0][1] = "";
-		}
+		$this->firstWhereCondition = true;	
 
 		$where = "";
 		foreach ($conditions as $condition) {
@@ -452,9 +451,24 @@ class QueryBuilder {
 		}
 	}
 
+	/**
+	 * Tokens is always:
+	 * 
+	 * return ["tokens", AND/OR, string/expression/query/criteria];		
+	 * 
+	 * @param type $tokens
+	 * @param type $prefix
+	 * @return string
+	 */
 	private function buildTokens($tokens, $prefix) {
 		$str = "";
-		foreach ($tokens as $token) {
+		
+		if($this->firstWhereCondition) {
+			//clear first AND/OR to avoid WHERE AND to be generated
+			$tokens[0] = "";
+			$this->firstWhereCondition = false;	
+		}
+		foreach ($tokens as $token) {			
 			$str .= $this->buildToken($token, $prefix) . " ";
 		}
 
@@ -481,10 +495,44 @@ class QueryBuilder {
 			throw new \Exception("Invalid token?");
 		}
 	}
+	
+	private function buildColumnArrayValue($logicalOperator, $columnName, $comparisonOperator, $value) {
+		//If the value is an array and it's not an IN query we do:		
+		// (foo like array1 OR foo like array2)
+
+		if(empty($value)) {
+			return "";
+		}
+
+		if ($this->firstWhereCondition) {
+			//Clear first AND or OR. Other wise WHERE AND ... will be generated
+			$this->firstWhereCondition = false;
+			$logicalOperator = "";				
+		}
+
+		$str = $logicalOperator . " (";
+
+		for($i = 0, $c = count($value); $i < $c; $i++) {
+			$str .= $this->buildColumn([null, $i == 0 ? "" : "OR", $columnName, $comparisonOperator, $value[$i]], "");
+		}
+
+		return $str .= ")";
+	}
 
 	private function buildColumn($condition, $prefix) {
 
 		list(, $logicalOperator, $columnName, $comparisonOperator, $value) = $condition;
+		
+		
+		if(is_array($value) && $comparisonOperator != "=" && stripos($comparisonOperator, 'IN') === false) {
+			return $prefix . $this->buildColumnArrayValue($logicalOperator, $columnName, $comparisonOperator, $value);
+		}
+		
+		if ($this->firstWhereCondition) {
+			//Clear first AND or OR. Other wise WHERE AND ... will be generated
+			$this->firstWhereCondition = false;
+			$logicalOperator = "";				
+		}
 
 		$tokens = [$logicalOperator]; //AND / OR
 

@@ -61,7 +61,7 @@ abstract class AclEntity extends Entity {
 
 		$isAclItem = is_a(static::class, AclItemEntity::class, true);			
 
-		$aclTableAlias = $isAclItem ? 'aclEntity' : static::getMapping()->getColumn('aclId')->table->getAlias();;
+		$aclTableAlias = static::getAclEntityTableAlias();
 
 		$query = static::find()
 						->fetchMode(PDO::FETCH_ASSOC)
@@ -123,5 +123,10 @@ abstract class AclEntity extends Entity {
 							}
 						});
 	}
+
+	/**
+	 * Get the table alias holding the aclId
+	 */
+	abstract public static function getAclEntityTableAlias();
 	
 }

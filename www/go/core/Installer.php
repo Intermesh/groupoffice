@@ -389,6 +389,8 @@ class Installer {
 				//echo "Getting updates for ".$module."\n";
 				$module = $modulesById[$moduleId];
 
+				$modStr = '[' . ($module->package ?? "legacy") .'/'. $module->name .'] ';
+
 				if (!is_array($queries)) {
 					exit("Invalid queries in module: " . $module->name);
 				}
@@ -404,7 +406,7 @@ class Installer {
 					}
 
 					if (is_callable($query)) {
-						echo "Running callable function\n";
+						echo $modStr . "Running callable function\n";
 						call_user_func($query);
 					} else if (substr($query, 0, 7) == 'script:') {
 						$updateScript = $root->getFile('modules/' . $module->name . '/install/updatescripts/' . substr($query, 7));
@@ -414,12 +416,12 @@ class Installer {
 						}
 
 						//if(!$quiet)
-						echo 'Running ' . $updateScript . "\n";
+						echo $modStr . 'Running ' . $updateScript . "\n";
 						call_user_func(function() use ($updateScript) {
 							require_once($updateScript);
 						});
 					} else {
-						echo 'Excuting query: ' . $query . "\n";
+						echo $modStr . 'Excuting query: ' . $query . "\n";
 						flush();
 						try {
 							if (!empty($query))

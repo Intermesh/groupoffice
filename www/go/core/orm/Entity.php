@@ -410,6 +410,8 @@ abstract class Entity extends Property {
 	 * This also fires the self::EVENT_FILTER event so modules can extend the
 	 * filters.
 	 * 
+	 * By default a q, modifiedsince, modiffiedbefore and excluded filter is added
+	 * 
 	 * @example
 	 * ```
 	 * protected static function defineFilters() {
@@ -433,14 +435,31 @@ abstract class Entity extends Property {
 		$filters = new Filters();
 
 		$filters->add('q', function(Query $query, $value, $filter) {
-							if (!empty($value)) {
-								static::search($query, $value);
+							if(!is_array($value)) {
+								$value = [$value];
+							}
+							
+							foreach($value as $q) {
+								if (!empty($q)) {								
+									static::search($query, $q);
+								}
 							}
 						})->add('exclude', function(Query $query, $value, $filter) {
 							if (!empty($value)) {
 								$query->andWhere('id', 'NOT IN', $value);
 							}
 						});
+						
+		if(static::getMapping()->getColumn('modifiedAt')) {
+			$filters->add("modifiedsince", function(Query $query, $value) {
+											$dateTime = new \go\core\util\DateTime($value);
+											$query->where('modifiedAt', '>=', $dateTime);
+										})
+										->add("modifiedbefore", function(Query $query, $value) {
+											$dateTime = new \go\core\util\DateTime($value);
+											$query->where('modifiedAt', '<', $dateTime);
+										});
+		}
 						
 		static::fireEvent(self::EVENT_FILTER, $filters);
 		
@@ -454,6 +473,12 @@ abstract class Entity extends Property {
 	 * 
 	 * q: Will search on multiple fields defined in {@see searchColumns()}
 	 * exclude: Exclude this array of id's
+	 * 
+	 * modifiedsince: YYYY-MM-DD (HH:MM) modified since
+	 * 
+	 * modifiedbefore: YYYY-MM-DD (HH:MM) modified since
+	 * 
+	 * exclude: array of id's to exclude
 	 * 
 	 * @link https://jmap.io/spec-core.html#/query	 
 	 * @param Query $query

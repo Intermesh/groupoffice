@@ -16,8 +16,8 @@ if(isset($args['c'])) {
 }
 
 App::get()->setAuthState(new State());
-//no cache
-GO()->setCache(new None());
+//no cache 
+//GO()->setCache(new None());
 
 if(!Environment::get()->isCli()) {
 	throw new Exception("You can only run this script on the Command Line Interface");

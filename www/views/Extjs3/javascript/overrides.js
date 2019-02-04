@@ -233,6 +233,20 @@ Ext.override(Ext.data.GroupingStore,{
 });
 
 
+Ext.override(Ext.form.CompositeField, {
+	origFocus : Ext.FormPanel.prototype.focus,
+	focus : function() {
+		var first = this.items.find(function(item) {
+			return item.isFormField && !item.disabled && item.isVisible();
+		});
+		if(first) {
+			first.focus();
+		} else {
+			this.origFocus();
+		}
+	}
+});
+
 /*testing
 Ext.TaskMgr.start({
 	run: function(){
@@ -264,15 +278,27 @@ Ext.override(Ext.FormPanel,{
 			}
 		});
 	}),
+	
+	origFocus : Ext.FormPanel.prototype.focus,
 	focus : function() {
-		var firstField = this.getForm().items.find(function (item) {
-			if (!item.disabled && item.isVisible() && item.getValue() == "")
-				return true;
-		});
+		var focFn = function() {
+			if(!GO.util.isMobileOrTablet()) {
+				var firstField = this.getForm().items.find(function (item) {
+					if (!item.disabled && item.isVisible())
+						return true;
+				});
 
-		if (firstField) {
-			firstField.focus();
+				if (firstField) {
+					firstField.focus();
+					return;
+				} 
+			}
+
+			this.origFocus();
 		}
+		
+		focFn.defer(200, this);
+		
 	},
 	
 	// prevents adding form fields that are part of custom form field components like the combobox of go.form.Chips for example.

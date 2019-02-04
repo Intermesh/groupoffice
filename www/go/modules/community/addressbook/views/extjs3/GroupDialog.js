@@ -6,10 +6,7 @@ go.modules.community.addressbook.GroupDialog = Ext.extend(go.form.Dialog, {
 	initFormItems: function () {
 		return [{
 				xtype: 'fieldset',
-				items: [{
-						xtype: "hidden",
-						name: "addressBookId"
-					},
+				items: [
 					{
 						xtype: 'textfield',
 						name: 'name',

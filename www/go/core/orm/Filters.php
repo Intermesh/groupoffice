@@ -20,13 +20,13 @@ class Filters {
 	 * @return $this
 	 */
 	public function add($name, $fn) {
-		$this->functions[$name] = $fn;
+		$this->functions[strtolower($name)] = $fn;
 		
 		return $this;
 	}
 	
 	private function validate(Query $query, array $filter) {
-		$invalidFilters = array_diff(array_keys($filter), array_keys($this->functions));
+		$invalidFilters = array_diff(array_map('strtolower',array_keys($filter)), array_keys($this->functions));
 		if(!empty($invalidFilters)) {
 			throw new Exception("Invalid filters supplied for '".$query->getModel()."': '". implode("', '", $invalidFilters) ."'");
 		}
@@ -41,7 +41,7 @@ class Filters {
 	public function apply(Query $query, array $filter) {
 		$this->validate($query, $filter);		
 		foreach($filter as $name => $value) {
-			call_user_func($this->functions[$name], $query, $value, $filter);
+			call_user_func($this->functions[strtolower($name)], $query, $value, $filter);
 		}
 	}
 }

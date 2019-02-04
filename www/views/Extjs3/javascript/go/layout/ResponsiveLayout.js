@@ -109,7 +109,7 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 			ct.items.each(function (i) {			
 				//disable state
 				i.stateful = false;
-				i.hideMode = "offsets";					
+			//	i.hideMode = "offsets";					
 				
 				if(!i.hidden) {
 					i.hide();
@@ -145,6 +145,7 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 		this.setItemSize(panel, this.getLayoutTargetSize());
 
 		this.setActiveItem(panel);
+		panel.doLayout();
 	},
 	
 	

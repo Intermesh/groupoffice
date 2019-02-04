@@ -1,13 +1,40 @@
 Ext.namespace('go.toolbar');
 
+
 go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 
 	iconCls: 'ic-search',	
 	store: null,
 	tooltip: t('Search'),
-	searchToolBar: null,
+	searchToolBar: null,	
+	
+	//Specify all the remote jmap filters that can be used in the search box as an 
+	//array. eg.
+	//
+	//filterNames: [
+//						'name', 
+//						'email', 
+//						'country', 
+//						'city', 
+//						{name: 'modifiedsince', multiple: false}, 
+//						{name: 'modifiedbefore', multiple: false}, 
+//						{name: 'minage', multiple: false},
+//						{name: 'maxage'}
+//					] 
+	//
+	//Users can use: 
+	//
+	//name: "Merijn Schering" name: Merijn% email:%intermesh% 
+	//
+	//to search. This will convert into:
+	//
+	// {name: ["Merijn Schering", "Merijn%", email:["%intermesh%]}
+	
+	filterNames: null,
 	constructor: function (config) {
 		go.toolbar.SearchButton.superclass.constructor.call(this, config);
+		
+		this.initFilterNames(config);
 		
 		if(!this.store) {			
 			//try to find store if this button it part of a grid.
@@ -23,7 +50,15 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 				scope: this,
 				search: function (tb, v) {
 					if(this.store instanceof go.data.Store || this.store instanceof go.data.GroupingStore) {
-						this.store.baseParams.filter.q = v;
+						
+						var filter = go.util.parseSearchQuery(v, this.filterNames[0].name), me = this;
+						this.filterNames.forEach(function(cfg) {
+							delete me.store.baseParams.filter[cfg.name];
+							if(filter[cfg.name]) {
+								me.store.baseParams.filter[cfg.name] = cfg.multiple ? filter[cfg.name] : filter[cfg.name][0];
+							}
+						});
+						
 					} else {
 						//params for old framework
 						this.store.baseParams.query = v;
@@ -34,7 +69,10 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 				},
 				reset: function() {
 					if(this.store instanceof go.data.Store) {
-						delete this.store.baseParams.filter.q;
+						var me = this;
+						this.filterNames.forEach(function(cfg) {
+							delete me.store.baseParams.filter[cfg.name];							
+						});
 					} else {
 						delete this.store.baseParams.query;
 					}
@@ -67,6 +105,18 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 			},
 			flex: 1
 		});
+	},
+	
+	initFilterNames: function(config) {
+		this.filterNames = config.filterNames || ['q'];
+		for(var i = 0, l = this.filterNames.length; i < l; i++) {
+			if(!Ext.isObject(this.filterNames[i])) {
+				this.filterNames[i] = {
+					name: this.filterNames[i],
+					multiple: true
+				}
+			}
+		}
 	},
 	
 	/**
@@ -144,6 +194,28 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 		toolbar.ownerCt.on('resize', function (tb, adjWidth) {
 			this.searchToolBar.setWidth(adjWidth);
 		}, this);
+		
+		if(this.filterNames.length) {
+			
+			var names = this.filterNames.map(function(f) {return f.name;});
+			
+			var msg = t("You can use these keywords:<br /><br />") + names.join(", ") + "<br /><br />";
+			
+			msg += t("For example:<br /><br />" + names[0] + ": \"John Doe\" "+ names[0] + ": Foo%");
+			
+			if(names.indexOf('modifiedsince')) {
+				msg += " modifiedsince: 2019-01-31 23:59 modifiedbefore 2019-02-01";
+			}
+			
+			Ext.QuickTips.register({
+				target: this.triggerField.getEl(),
+				title: t("Advanced search options"),
+				text: msg,				
+				dismissDelay: 10000 // Hide after 10 seconds hover
+			});
+		}
+		
+		
 		go.toolbar.SearchButton.superclass.onRender.call(this, ct, position);
 	},
 	

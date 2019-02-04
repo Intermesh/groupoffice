@@ -327,6 +327,7 @@ views/Extjs3/javascript/go/systemsettings/AuthenticationPanel.js
 views/Extjs3/javascript/go/systemsettings/Dialog.js
 views/Extjs3/javascript/go/util.js
 views/Extjs3/javascript/go/util/Format.js
+views/Extjs3/javascript/go/util/ParseSearchQuery.js
 
 views/Extjs3/javascript/go/Wizard.js
 views/Extjs3/javascript/go/Array.js

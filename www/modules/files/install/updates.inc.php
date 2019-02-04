@@ -230,21 +230,22 @@ $updates['201610281659'][] = 'SET foreign_key_checks = 1;';
 
 $updates['201706121115'][] = "ALTER TABLE `fs_folders` CHANGE `parent_id` `parent_id` INT(11) NOT NULL DEFAULT '0';";
 
+$updates['201901281546'][] = "delete from go_settings where name ='files_shared_cache_ctime';";
+
+$updates['201901281546'][] = "ALTER TABLE `cf_fs_folders` CHANGE `model_id` `id` INT(11) NOT NULL;";
+$updates['201901281546'][] = "RENAME TABLE `cf_fs_folders` TO `fs_folders_custom_fields`;";
+$updates['201901281546'][] = "delete from fs_folders_custom_fields where id not in (select id from fs_folders);";
+$updates['201901281546'][] = "ALTER TABLE `fs_folders_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `fs_folders`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+
+$updates['201901281546'][] = "ALTER TABLE `cf_fs_files` CHANGE `model_id` `id` INT(11) NOT NULL;";
+$updates['201901281546'][] = "RENAME TABLE `cf_fs_files` TO `fs_files_custom_fields`;";
+$updates['201901281546'][] = "delete from fs_files_custom_fields where id not in (select id from fs_files);";
+$updates['201901281546'][] = "ALTER TABLE `fs_files_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `fs_files`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
 
 
-$updates['201810161450'][] = "ALTER TABLE `cf_fs_folders` CHANGE `model_id` `id` INT(11) NOT NULL;";
-$updates['201810161450'][] = "RENAME TABLE `cf_fs_folders` TO `fs_folders_custom_fields`;";
-$updates['201810161450'][] = "delete from fs_folders_custom_fields where id not in (select id from fs_folders);";
-$updates['201810161450'][] = "ALTER TABLE `fs_folders_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `fs_folders`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
-
-$updates['201810161450'][] = "ALTER TABLE `cf_fs_files` CHANGE `model_id` `id` INT(11) NOT NULL;";
-$updates['201810161450'][] = "RENAME TABLE `cf_fs_files` TO `fs_files_custom_fields`;";
-$updates['201810161450'][] = "delete from fs_files_custom_fields where id not in (select id from fs_files);";
-$updates['201810161450'][] = "ALTER TABLE `fs_files_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `fs_files`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
-
-
-$updates['201811282011'][] = function() {	
+$updates['201901281546'][] = function() {	
 	$m = new \go\modules\core\customfields\install\Migrate63to64();
 	$m->migrateEntity("File");	
 	$m->migrateEntity("Folder");	
 };
+

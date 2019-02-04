@@ -60,3 +60,5 @@ go.NavMenu = Ext.extend(Ext.DataView,{
 		}));
 	}
 });
+
+Ext.reg('navmenu', go.NavMenu);

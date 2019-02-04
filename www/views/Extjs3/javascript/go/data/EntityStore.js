@@ -124,7 +124,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		this._fireChanges();
 	},
 	
-	_destroy : function(id) {		
+	_destroy : function(id) {
 		delete this.data[id];
 		this.changes.destroyed.push(id);
 		this.stateStore.removeItem(id + "");
@@ -140,6 +140,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		
 		//delay fireevent one event loop cycle
 		me.timeout = setTimeout(function () {				
+			// console.log('changes', me.entity.name, me.changes.added, me.changes.changed, me.changes.destroyed);
 			me.fireEvent('changes', me, me.changes.added, me.changes.changed, me.changes.destroyed);			
 			me.initChanges();
 			me.timeout = null;
@@ -216,6 +217,12 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					sinceState: this.state
 				},
 				callback: function(options, success, response) {
+
+					if(response.removed) {
+						for(var i = 0, l = response.removed.length; i < l; i++) {
+							this._destroy(response.removed[i]);
+						}
+					}
 					if(success) {
 						this.setState(response.newState, function(){
 							if(response.hasMoreUpdates) {

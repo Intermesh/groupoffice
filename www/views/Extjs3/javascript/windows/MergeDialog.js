@@ -80,8 +80,8 @@ GO.dialog.MergeWindow = Ext.extend(GO.Window,{
 				{
 					xtype: 'tbsearch'
 				}],
-			cls: 'go-grid3-hide-headers',
-			region: "center"
+			region: "center",
+			stateId: "ab-merge-grid"
 		});
 		
 		this.searchGrid.store.baseParams.filter = {entities: [this.entity], permissionLevel: GO.permissionLevels.writeAndDelete};

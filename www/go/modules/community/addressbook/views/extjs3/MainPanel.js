@@ -11,8 +11,57 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 
 	addAddressBookId: 1,
 
-	initComponent: function () {
+	initComponent: function () {	
 
+		this.sidePanel = new Ext.Panel({
+			width: dp(300),
+			region: "west",
+			split: true,
+			autoScroll: true,			
+			items: [
+				this.createAddressBookTree(),
+				this.createFilterPanel()
+			]
+		});
+
+		this.contactDetail = new go.modules.community.addressbook.ContactDetail({
+			region: "east",
+			split: true,
+			width: dp(500),
+			tbar: [
+				//add a back button for small screens
+				{
+					// this class will hide the button on large screens
+					cls: 'go-narrow',
+					iconCls: "ic-arrow-back",
+					handler: function () {
+						this.westPanel.show();
+					},
+					scope: this
+				}]
+		});
+
+		this.westPanel = new Ext.Panel({
+			region: "center",
+			layout: "responsive",
+			//stateId: "go-addressbook-west",
+			split: true,
+			narrowWidth: dp(400), //this will only work for panels inside another panel with layout=responsive. Not ideal but at the moment the only way I could make it work
+			items: [
+				this.createGrid(), //first is default in narrow mode
+				this.sidePanel
+			]
+		});
+
+		this.items = [this.westPanel, this.contactDetail];
+
+		go.modules.community.addressbook.MainPanel.superclass.initComponent.call(this);		
+
+
+	},
+	
+	
+	createAddressBookTree : function() {
 		this.addressBookTree = new go.modules.community.addressbook.AddressBookTree({
 			enableDrop: true,
 			ddGroup: "addressbook",
@@ -41,17 +90,39 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 
 				}]
 		});
+		
+		
+		//because the root node is not visible it will auto expand on render.
+		this.addressBookTree.getRootNode().on('expand', function (node) {
+			//when expand is done we'll select the first node. This will trigger a selection change. which will load the grid below.
+			this.addressBookTree.getSelectionModel().select(node.firstChild);
+		}, this);
 
-		this.filterPanel = new Ext.Panel({
-			width: dp(300),
-			region: "west",
-			split: true,
-			autoScroll: true,
-			items: [
-				this.addressBookTree
-			]
-		});
+		//load the grid on selection change.
+		this.addressBookTree.getSelectionModel().on('selectionchange', function (sm, node) {
+			
+			if (!node) {
+				return;
+			}
 
+			if (node.id === "all") {
+				this.setAddressBookId(null);
+			} else if (node.attributes.entity.name === "AddressBook") {
+				this.setAddressBookId(node.attributes.data.id);
+			} else
+			{
+				this.setGroupId(node.attributes.data.id, node.attributes.data.addressBookId);
+			}
+		}, this);
+		
+		//init drag drop
+		this.addressBookTree.on("nodedragover", this.onNodeDragOver, this);
+		this.addressBookTree.on("beforenodedrop", this.onNodeDrop, this);
+		
+		return this.addressBookTree;
+	},
+	
+	createGrid : function() {
 		this.grid = new go.modules.community.addressbook.ContactGrid({
 			region: 'center',
 			enableDragDrop: true, //for dragging contacts to address books or groups in the tree
@@ -61,13 +132,24 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 					cls: 'go-narrow',
 					iconCls: "ic-menu",
 					handler: function () {
-						this.filterPanel.show();
+						this.sidePanel.show();
 					},
 					scope: this
 				},
 				'->',
 				{
-					xtype: 'tbsearch'
+					xtype: 'tbsearch',
+					filterNames: [
+						'name', 
+						'email', 
+						'country', 
+						'city', 
+						{name: 'modifiedsince', multiple: false}, 
+						{name: 'modifiedbefore', multiple: false}, 
+						{name: 'minage', multiple: false},
+						{name: 'maxage', multiple: false},
+						{name: 'birthdayindays', multiple: false}
+					]
 				},
 				this.addButton = new Ext.Button({
 					//disabled: true,
@@ -165,88 +247,84 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 
 			],
 			listeners: {
-				rowdblclick: function (grid, rowIndex, e) {
-
-					var record = grid.getStore().getAt(rowIndex);
-					if (record.get('permissionLevel') < GO.permissionLevels.write) {
-						return;
-					}
-
-					var dlg = new go.modules.community.addressbook.ContactDialog();
-					dlg.load(record.id).show();
-				},
+				rowdblclick: this.onGridDblClick,
+				
+				keypress: this.onGridKeyPress,
 
 				scope: this
 			}
 		});
-
-		this.contactDetail = new go.modules.community.addressbook.ContactDetail({
-			region: "east",
-			width: dp(500),
-			tbar: [
-				//add a back button for small screens
-				{
-					// this class will hide the button on large screens
-					cls: 'go-narrow',
-					iconCls: "ic-arrow-back",
-					handler: function () {
-						this.westPanel.show();
-					},
-					scope: this
-				}]
-		});
-
-		this.westPanel = new Ext.Panel({
-			region: "center",
-			layout: "responsive",
-			//stateId: "go-addressbook-west",
-			split: true,
-			narrowWidth: dp(400), //this will only work for panels inside another panel with layout=responsive. Not ideal but at the moment the only way I could make it work
-			items: [
-				this.grid, //first is default in narrow mode
-				this.filterPanel
-			]
-		});
-
-		this.items = [this.westPanel, this.contactDetail];
-
-		go.modules.community.addressbook.MainPanel.superclass.initComponent.call(this);
-
-		//because the root node is not visible it will auto expand on render.
-		this.addressBookTree.getRootNode().on('expand', function (node) {
-			//when expand is done we'll select the first node. This will trigger a selection change. which will load the grid below.
-			this.addressBookTree.getSelectionModel().select(node.firstChild);
-		}, this);
-
-		//load the grid on selection change.
-		this.addressBookTree.getSelectionModel().on('selectionchange', function (sm, node) {
-			
-			if (!node) {
-				return;
-			}
-
-			if (node.id === "all") {
-				this.setAddressBookId(null);
-			} else if (node.attributes.entity.name === "AddressBook") {
-				this.setAddressBookId(node.attributes.data.id);
-			} else
-			{
-				this.setGroupId(node.attributes.data.id, node.attributes.data.addressBookId);
-			}
-		}, this);
-
-
+		
 		//Load contact when selecting it in the grid.
 		this.grid.on('navigate', function (sm, rowIndex, record) {
 			go.Router.goto("contact/" + record.id);
 		}, this);
+		
+		return this.grid;
+	},
+	
+	onGridDblClick : function (grid, rowIndex, e) {
 
+		var record = grid.getStore().getAt(rowIndex);
+		if (record.get('permissionLevel') < GO.permissionLevels.write) {
+			return;
+		}
 
-		//init drag drop
-		this.addressBookTree.on("nodedragover", this.onNodeDragOver, this);
-		this.addressBookTree.on("beforenodedrop", this.onNodeDrop, this);
+		var dlg = new go.modules.community.addressbook.ContactDialog();
+		dlg.load(record.id).show();
+	},
+	
+	onGridKeyPress : function(e) {
+		if(e.keyCode != e.ENTER) {
+			return;
+		}
+		var record = this.grid.getSelectionModel().getSelected();
+		if(!record) {
+			return;
+		}
 
+		if (record.get('permissionLevel') < GO.permissionLevels.write) {
+			return;
+		}
 
+		var dlg = new go.modules.community.addressbook.ContactDialog();
+		dlg.load(record.id).show();
+
+	},
+	
+	createFilterPanel: function () {
+		var orgFilter = new go.NavMenu({			
+			store: new Ext.data.ArrayStore({
+				fields: ['name', 'icon', 'inputValue'], //icon and iconCls are supported.
+				data: [					
+					[t("Organization"), 'business', true],
+					[t("Contact"), 'person', false]				
+				]
+			}),
+			simpleSelect: true,
+			multiSelect : true,
+			listeners: {
+				selectionchange: function (view, nodes) {
+					if(!nodes.length || nodes.length == 2) {
+						delete this.grid.store.baseParams.filter.isOrganization;
+					} else
+					{
+						var record = view.store.getAt(nodes[0].viewIndex);
+						this.grid.store.baseParams.filter.isOrganization = record.data.inputValue;
+					}
+					this.grid.store.load();
+				},
+				scope: this
+			}
+		});		
+		
+		
+		return new Ext.Panel({
+			title: t("Filters"),
+			items: [
+				orgFilter
+			]
+		});
 	},
 
 	setAddressBookId: function (addressBookId) {
@@ -269,7 +347,6 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 				this.addButton.setDisabled(true);
 			}
 		}
-
 		
 		s.load();
 	},
@@ -313,9 +390,9 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 				contact.groups = []; //clear groups when changing address book
 			} else
 			{
-				removeFromGrid = r.json.addressBookId !== e.target.attributes.data.addressBookId;
-				//clear groups when changing address book
-				contact.groups = r.json.addressBookId === e.target.attributes.data.addressBookId ? GO.util.clone(r.json.groups) : [];
+				removeFromGrid = r.json.addressBookId != e.target.attributes.data.addressBookId;
+				//clear groups when changing address book				
+				contact.groups = r.json.addressBookId == e.target.attributes.data.addressBookId ? GO.util.clone(r.json.groups) : [];
 				contact.addressBookId = e.target.attributes.data.addressBookId;
 
 				var groupId = e.target.attributes.data.id;
