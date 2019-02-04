@@ -37,6 +37,10 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 	initComponent: function () {
 		go.panels.DetailView.superclass.initComponent.call(this, arguments);		
 		
+		if (go.Modules.isAvailable("community", "comments")) {
+			this.add(new go.modules.comments.CommentsDetailPanel());
+		}
+		
 		this.cls += " go-detail-view-" + this.entityStore.entity.name.toLowerCase();
 		
 		this.on('afterrender', function() {
@@ -117,5 +121,4 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 	}
 });
 
-Ext.reg("detailview", go.panels.DetailView);
 Ext.reg("detailview", go.panels.DetailView);

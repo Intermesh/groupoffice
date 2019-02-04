@@ -20,16 +20,13 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 				}
 			]
 		});
-
+		
 
 		go.modules.community.notes.NoteDetail.superclass.initComponent.call(this);
 
 		this.add(go.modules.core.customfields.CustomFields.getDetailPanels("Note"));
 		this.add(go.links.getDetailPanels());
 		
-		if (go.Modules.isAvailable("community", "comments")) {
-			this.add(new go.modules.comments.CommentsDetailPanel());
-		}
 
 		if (go.Modules.isAvailable("legacy", "files")) {
 			this.add(new go.modules.files.FilesDetailPanel());

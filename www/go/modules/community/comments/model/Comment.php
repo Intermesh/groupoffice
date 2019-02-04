@@ -8,6 +8,8 @@ use go\core\util\DateTime;
 
 class Comment extends Entity {
 
+	public $id; // was removed from jmap\Entity?
+	
 	public $text;
 	public $entityId;
 	protected $entity;

@@ -1,9 +1,12 @@
 go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	entityId:null, 
 	entity:null,
-	height: dp(500),
+	height: dp(150),
 	title: t("Comments", "comments"),
-	collapsible: true,
+	//
+	/// Collapsilbe was turn off because of height recaculation issues in HtmlEditor
+	//
+	//collapsible: true,
 	collapseFirst:false,
 	layout:'border',
 	tools:[{
@@ -35,9 +38,9 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 					}
 				}, this);
 			
-				if(userStore.get(creatorIds)) {
+				if(userStore.get(creatorIds, function() {
 					this.updateView(options);
-				}
+				},this));
 				
 			}, this);
 							
@@ -105,14 +108,14 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	},
 	
 	receive: function(action) {
-		if(action.type === "UserUpdated") {
+		if(action.type === "User/getUpdates") {
 			this.updateView();
 		}
 	},
 
 	onLoad: function (dv) {
 		this.entityId = dv.model_id ? dv.model_id : dv.currentId ;//model_id is from old display panel
-		this.entity = dv.model_name || dv.entity || dv.entityStore.entity.name;
+		this.entity = dv.entity || dv.model_name || dv.entityStore.entity.name;
 		this.composer.initEntity(this.entityId, this.entity);
 		
 		this.store.load({
@@ -135,8 +138,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			 initScrollTop = this.commentsContainer.getEl().dom.scrollTop;
 
 		this.commentsContainer.removeAll();
-
 		this.store.each(function(r) {
+			
 			var labelText ='', mineCls = r.get("createdBy") == go.User.id ? 'mine' : '';
 			var readMore = new go.detail.ReadMore({
 				cls: mineCls
@@ -163,7 +166,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			}
 			readMore.setText(r.get('text'));
 			readMore.add({xtype:'box',html:labelText, cls: 'tags ' +mineCls});
-			this.commentsContainer.insert(0,{
+			this.commentsContainer.add({
 				xtype:"container",
 				cls:'go-messages',
 				items: [{
@@ -186,11 +189,20 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			}, this);},this);
 			prevStr = go.util.Format.date(r.get('createdAt'));
 		}, this);
-
-		this.doLayout();
-		//this.setHeight(Math.max(this.getHeight(),this.commentsContainer.getHeight()));
 		
-		var scroll = this.commentsContainer.getEl();
-		scroll.scroll("b", initScrollTop + (scroll.dom.scrollHeight - initScrollHeight));
+		this.doLayout();
+		var height = 7; // padding on composer
+		this.commentsContainer.items.each(function(item,i) {
+			height += item.getOuterSize().height;
+		});
+		var _this = this;
+		setTimeout(function(){
+			
+			var scroll = _this.commentsContainer.getEl();
+			_this.body.setHeight(Math.max(50,Math.min(400,height + _this.composer.getHeight())));
+			_this.doLayout();
+			scroll.scroll("b", initScrollTop + (scroll.dom.scrollHeight));
+		});
+
 	}
 });

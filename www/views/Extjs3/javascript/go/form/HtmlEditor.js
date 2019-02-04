@@ -30,7 +30,7 @@ go.form.HtmlEditor = Ext.extend(Ext.form.HtmlEditor, {
 	createToolbar: Ext.form.HtmlEditor.prototype.createToolbar.createSequence(function (editor) {
 		this.tb.enableOverflow = true;
 	}),
-	
+
 	applyEmptyText: function() {
 		var value = this.getValue();
 		if(Ext.isEmpty(value)) {
@@ -79,16 +79,15 @@ go.form.HtmlEditor = Ext.extend(Ext.form.HtmlEditor, {
 
 go.form.HtmlEditor.emojiPlugin = {
 	init: function(cmp){
-		this.cmp = cmp;
-		this.cmp.on('render', function() {
-			this.cmp.getToolbar().addButton(new Ext.Button({
+		cmp.on('render', function() {
+			cmp.getToolbar().addButton(new Ext.Button({
 				tooltip: t('Emoji'),
 				overflowText: t('Emoji'),
 				iconCls: 'ic-mood',
 				menu: {
 					xtype:'emojimenu',
 					handler: function(menu,emoji) {
-						this.cmp.insertAtCursor(emoji);
+						cmp.insertAtCursor(emoji);
 					},
 					scope: this
 				}

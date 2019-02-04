@@ -51,7 +51,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			plugins: [go.form.HtmlEditor.emojiPlugin],
 			height: 35,
 			name: 'text',
-			boxMaxHeight: dp(400),
+			boxMaxHeight: 200,
 			boxMinHeight:35
 		});
 		this.textField.on('sync', function(me, html) {
@@ -95,11 +95,12 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			this.middleBox = new Ext.Container({
 				layout:'vbox',
 				align:'stretch',
-				//height:37,
+				//height:37, // todo auto height.
 				flex:1,
 				items: [
 					this.commentBox = new Ext.Container({
 						layout:'fit',
+						width:500,
 						frame: true,
 						items:[this.textField]
 					}),
@@ -115,6 +116,11 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			this.sendBtn
 		]
 		
+		this.textField.on('afterrender', function() {
+			this.grow();
+		}, this);
+		
+		
 		go.modules.comments.Composer.superclass.initComponent.call(this);
 
 	},
@@ -123,6 +129,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		var totalHeight = this.commentBox.getHeight() + this.chips.getHeight() + this.attachmentBox.getHeight();
 		this.setHeight(totalHeight);
 		this.middleBox.setHeight(totalHeight-2);
+		this.ownerCt.setHeight(Math.min(400,this.ownerCt.commentsContainer.getEl().dom.scrollHeight + totalHeight + dp(64)));
 		this.ownerCt.doLayout();
 		this.doLayout();
 	},

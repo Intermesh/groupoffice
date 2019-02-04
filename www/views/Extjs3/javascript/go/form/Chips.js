@@ -93,7 +93,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 		if(cb) {
 			this.items.push({
 				layout: "form",				
-				items: []
+				items: [cb]
 			});
 		}
 		this.items.push(this.dataView);

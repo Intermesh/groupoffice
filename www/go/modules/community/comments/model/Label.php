@@ -5,6 +5,8 @@ use go\core\jmap\Entity;
 
 class Label extends Entity {
 
+	public $id; // was removed from jmap\Entity?
+	
 	public $name;
 	public $color;
 	public $createdBy;

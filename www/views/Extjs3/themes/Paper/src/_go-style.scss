@@ -1620,7 +1620,7 @@ table[id^="comments-ext"] b {
 	}
 	> div { 
 		overflow:hidden;
-		margin-bottom:dp(8);
+		padding-bottom:dp(8);
 		span.photo {
 			@extend .avatar;
 			margin-top:0 !important;
