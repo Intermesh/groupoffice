@@ -90,5 +90,11 @@ go.grid.GridTrait = {
 			this.doDelete(selectedRecords);
 			
 		}, this);
-	}
+	},
+	
+	doDelete : function(selectedRecords) {
+		this.getStore().entityStore.set({
+			destroy:  selectedRecords.column("id")
+		});
+	},
 }
