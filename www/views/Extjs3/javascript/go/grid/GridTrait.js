@@ -96,5 +96,5 @@ go.grid.GridTrait = {
 		this.getStore().entityStore.set({
 			destroy:  selectedRecords.column("id")
 		});
-	},
+	}
 }
