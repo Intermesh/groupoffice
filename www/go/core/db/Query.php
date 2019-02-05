@@ -479,7 +479,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 				return false;
 			}
 		} catch(\Exception $e) {
-			if(!empty($build['debug'])) {
+			if(!empty($build['debug'])) {				
 				GO()->debug("SQL FAILED: " . $build['debug']);
 			}
 			throw $e;

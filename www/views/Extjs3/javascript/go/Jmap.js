@@ -20,7 +20,28 @@ go.Jmap = {
 
 		this.requestOptions[clientCallId] = {
 			method: 'community/dev/Debugger/get',
-			params: {}
+			params: {},
+			callback: function(options, success, response) {
+				
+				console.group(clientCallId);
+				response.forEach(function(r) {
+					switch(r[0]) {
+						case 'error':
+							console.error(r[1]);
+							break;
+						case 'warn':
+							console.warn(r[1]);
+							break;
+						case 'info':
+							console.info(r[1]);
+							break;
+						default:							
+							console.log(r[1]);
+							break;
+					}
+				});
+				console.groupEnd();
+			}
 		};
 	},
 
@@ -197,6 +218,7 @@ go.Jmap = {
 				jsonData: me.requests,
 				success: function (response, opts) {
 					var responses = JSON.parse(response.responseText);
+					
 
 					responses.forEach(function (response) {
 
@@ -204,6 +226,7 @@ go.Jmap = {
 						var o = me.requestOptions[response[2]];
 						if (!o) {
 							//aborted
+							console.debug("Aborted");
 							return true;
 						}
 						if (response[1][0] == "error") {
@@ -218,7 +241,12 @@ go.Jmap = {
 							if (!o.scope) {
 								o.scope = me;
 							}
-							o.callback.call(o.scope, o, success, response[1]);
+							try {
+								o.callback.call(o.scope, o, success, response[1]);
+							}
+							catch(e) {
+								console.error(e);
+							}
 						}
 
 						//cleanup request options

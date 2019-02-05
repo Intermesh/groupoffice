@@ -2,6 +2,7 @@
 namespace go\modules\community\addressbook\model;
 
 use go\core\acl\model\AclItemEntity;
+use go\core\db\Criteria;
 use go\core\db\Query;
 use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\addressbook\model\Contact;
@@ -80,10 +81,8 @@ class Group extends AclItemEntity {
 	}
 
 	protected static function defineFilters() {
-		return parent::defineFilters()->add("addressBookId", function(Query $query, $value) {
-			if(!empty($value)) {
-				$query->andWhere(['addressBookId' => $value]);
-			}
+		return parent::defineFilters()->add("addressBookId", function(Criteria $criteria, $value) {
+			$criteria->andWhere(['addressBookId' => $value]);			
 		});
 	}
 }

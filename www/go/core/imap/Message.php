@@ -378,7 +378,7 @@ class Message extends Model {
 			
 //			var_dump($this->getStructure()->toArray());
 			if (empty($this->getStructure()->parts)) {
-				GO()->debug("No body parts found in message!", 'imap');
+				GO()->debug("No body parts found in message!");
 				return false;
 			}			
 	

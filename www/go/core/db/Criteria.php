@@ -10,6 +10,8 @@ namespace go\core\db;
  */
 class Criteria {
 	
+	public $query;
+	
 	private $where = [];	
 	
 	/**
@@ -216,6 +218,15 @@ class Criteria {
 		return $this;
 	}
 	
+	public function andWhereNot($column, $operator = null, $value = null) {
+		$this->where[] = $this->internalWhere($column, $operator, $value, 'AND NOT');
+		return $this;
+	}
+	
+	public function orWhereNot($column, $operator = null, $value = null) {
+		$this->where[] = $this->internalWhere($column, $operator, $value, 'OR NOT');
+		return $this;
+	}
 	/**
 	 * Concatenate where condition with OR
 	 * 
@@ -265,5 +276,14 @@ class Criteria {
 		$this->bindParameters[] = ['paramTag' => $tag, 'value' => $value, 'pdoType' => $pdoType];
 		
 		return $this;
+	}
+	
+	/**
+	 * Check if the criteria object holds conditions
+	 * 
+	 * @return bool
+	 */
+	public function hasConditions() {
+		return !empty($this->where);
 	}
 }

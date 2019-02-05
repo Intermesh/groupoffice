@@ -98,10 +98,10 @@ class Search extends AclOwnerEntity {
 	
 	protected static function defineFilters() {
 		return parent::defineFilters()
-						->add('entityId', function (Query $query, $value, array $filter){
-							$query->where(['entityId' => $value]);		
+						->add('entityId', function (Criteria $criteria, $value){
+							$criteria->where(['entityId' => $value]);		
 						})
-						->add('entities', function (Query $query, $value, array $filter){
+						->add('entities', function (Criteria $criteria, $value){
 							// Entity filter consist out of name => "Contact" and an optional "filter" => "isOrganization"
 							if(empty($value)) {
 								return;
@@ -118,7 +118,7 @@ class Search extends AclOwnerEntity {
 								$sub->orWhere($w);
 							}
 
-							$query->where($sub);		
+							$criteria->where($sub);		
 							
 						});
 					

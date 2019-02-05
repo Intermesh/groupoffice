@@ -34,11 +34,13 @@ class Debugger {
 	
 	const SECTION_VIEW = 'view';
 	
-	const TYPE_GENERAL = 'general';
+	const LEVEL_LOG = 'log';
 	
-	const TYPE_SQL = 'sql';
+	const LEVEL_WARN = 'warn';
 	
-	private $section = self::SECTION_INIT;
+	const LEVEL_INFO = 'info';
+	
+	const LEVEL_ERROR = 'error';
 
 	/**
 	 * Sets the debugger on or off
@@ -52,40 +54,7 @@ class Debugger {
 	 */
 	public $logPath;
 	
-	/**
-	 * List of enabled debug sections.
-	 * 
-	 * This controls the output of the debugger so you don't get too much debug 
-	 * info. In most cases developers need just self::SECTION_CONTROLLER
-	 * 
-	 * By default there are:
-	 * 
-	 * `````````````````````````````````````````````````````````````````````
-	 * [self::SECTION_INIT, self::SECTION_ROUTER, self::SECTION_CONTROLLER, self::SECTION_VIEW];
-	 * `````````````````````````````````````````````````````````````````````
-	 * 
-	 * But developers can use any arbitrary string as section
-	 * 
-	 * @var array 
-	 */
-	public $enabledSections = [self::SECTION_INIT, self::SECTION_ROUTER, self::SECTION_CONTROLLER];
 	
-	/**
-	 * List of enabled debug types.
-	 * 
-	 * This controls the output of the debugger so you don't get too much debug 
-	 * info.
-	 * 
-	 * By default there are:
-	 * 
-	 * `````````````````````````````````````````````````````````````````````
-	 * [self::TYPE_GENERAL, self::TYPE_SQL];
-	 * `````````````````````````````````````````````````````````````````````
-	 * 
-	 * But developers can use any arbitrary string as type
-	 * @var type 
-	 */
-	public $enabledTypes = [self::TYPE_GENERAL, self::TYPE_SQL];
 
 	/**
 	 * The debug entries as strings
@@ -113,19 +82,28 @@ class Debugger {
 	public function getMicroTime() {
 		list ($usec, $sec) = explode(" ", microtime());
 		return ((float) $usec + (float) $sec);
+	}	
+	
+	public function warn($mixed, $traceBackSteps = 0) {
+		$this->internalLog($mixed, self::LEVEL_WARN, $traceBackSteps);
 	}
 	
-	/**
-	 * Change the section the debugger is in
-	 * 
-	 * {@see self::$enabledSections}
-	 * 
-	 * @param string $section
-	 */
-	public function setSection($section) {
-		$this->section = $section;
-		$this->debug("Start section '" . $section . "'");
+	public function error($mixed, $traceBackSteps = 0) {
+		$this->internalLog($mixed, self::LEVEL_ERROR, $traceBackSteps);
 	}
+	
+	public function info($mixed, $traceBackSteps = 0) {
+		$this->internalLog($mixed, self::LEVEL_INFO, $traceBackSteps);
+	}
+	
+	public function debug($mixed, $traceBackSteps = 0) {
+		$this->log($mixed, $traceBackSteps);
+	}
+	
+	public function log($mixed, $traceBackSteps = 0) {
+		$this->internalLog($mixed, self::LEVEL_LOG, $traceBackSteps);
+	}
+	
 
 	/**
 	 * Add a debug entry. Objects will be converted to strings with var_export();
@@ -135,11 +113,11 @@ class Debugger {
 	 *
 	 * @todo if for some reason an error occurs here then an infinite loop is created
 	 * @param callable|string|object $mixed
-	 * @param string $type The type of message. Types can be arbitrary and can be enabled and disabled for output. {@see self::$enabledTypes}
+	 * @param string $level The type of message. Types can be arbitrary and can be enabled and disabled for output. {@see self::$enabledTypes}
 	 */
-	public function debug($mixed, $type = self::TYPE_GENERAL, $traceBackSteps = 0) {
+	private function internalLog($mixed, $level = self::LEVEL_LOG, $traceBackSteps = 0) {
 
-		if(!$this->enabled ) {// || !in_array($this->section, $this->enabledSections) || !in_array($type, $this->enabledTypes)) {
+		if(!$this->enabled) {
 			return;
 		}		
 		
@@ -193,7 +171,7 @@ class Debugger {
 //			echo $entry . "\n";
 //		}
 		
-		$this->entries[] = $entry;
+		$this->entries[] = [$level, $entry];
 		
 	}
 
@@ -203,7 +181,7 @@ class Debugger {
 	 * @param string $message
 	 */
 	public function debugTiming($message) {
-		$this->debug($this->getTimeStamp() . ' ' . $message, 'timing');
+		$this->debug($this->getTimeStamp() . ' ' . $message);
 	}
 
 	private function getTimeStamp() {

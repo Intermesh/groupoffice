@@ -273,8 +273,8 @@ class Field extends AclItemEntity {
 	
 	protected static function defineFilters() {
 		return parent::defineFilters()
-						->add('fieldSetId', function (Query $query, $value, array $filter){
-							$query->andWhere(['fieldSetId' => $value]);
+						->add('fieldSetId', function (\go\core\db\Criteria $criteria, $value){
+							$criteria->andWhere(['fieldSetId' => $value]);
 						});
 	}
 	

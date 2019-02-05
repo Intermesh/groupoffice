@@ -423,7 +423,8 @@ class QueryBuilder {
 
 		$where = "";
 		foreach ($conditions as $condition) {
-			$where .= $prefix . $this->buildCondition($condition, $prefix) . "\n";
+			$str = $this->buildCondition($condition, $prefix);
+			$where .= $prefix . $str . "\n";
 		}
 
 		return rtrim($where);
@@ -465,7 +466,7 @@ class QueryBuilder {
 		
 		if($this->firstWhereCondition) {
 			//clear first AND/OR to avoid WHERE AND to be generated
-			$tokens[0] = "";
+			$tokens[0] = stripos($tokens[0], "NOT") !== false ? "NOT" : "";
 			$this->firstWhereCondition = false;	
 		}
 		foreach ($tokens as $token) {			
@@ -489,7 +490,9 @@ class QueryBuilder {
 			
 			if($token instanceof Criteria) {
 				$this->buildBindParameters = array_merge($this->buildBindParameters, $token->getBindParameters());
-				return "(\n" . $prefix . "\t" . $this->buildWhere($token->getWhere(), $prefix . "\t") . $prefix . "\n)";
+				$where = $this->buildWhere($token->getWhere(), $prefix . "\t");
+				
+				return "(\n" . $prefix . $where  . "\n" . $prefix . ")";
 			}
 			
 			throw new \Exception("Invalid token?");
@@ -506,8 +509,8 @@ class QueryBuilder {
 
 		if ($this->firstWhereCondition) {
 			//Clear first AND or OR. Other wise WHERE AND ... will be generated
-			$this->firstWhereCondition = false;
-			$logicalOperator = "";				
+			$this->firstWhereCondition = false;				
+			$logicalOperator = stripos($logicalOperator, "NOT") !== false ? "NOT" : "";
 		}
 
 		$str = $logicalOperator . " (";
@@ -525,13 +528,19 @@ class QueryBuilder {
 		
 		
 		if(is_array($value) && $comparisonOperator != "=" && stripos($comparisonOperator, 'IN') === false) {
-			return $prefix . $this->buildColumnArrayValue($logicalOperator, $columnName, $comparisonOperator, $value);
+			//single array value can be simplified and handled like non array value
+			if(count($value) == 1) {
+				$value = $value[0];
+			} else
+			{
+				return $prefix . $this->buildColumnArrayValue($logicalOperator, $columnName, $comparisonOperator, $value);				
+			}
 		}
 		
 		if ($this->firstWhereCondition) {
 			//Clear first AND or OR. Other wise WHERE AND ... will be generated
 			$this->firstWhereCondition = false;
-			$logicalOperator = "";				
+			$logicalOperator = stripos($logicalOperator, "NOT") !== false ? "NOT" : "";		
 		}
 
 		$tokens = [$logicalOperator]; //AND / OR
@@ -547,7 +556,7 @@ class QueryBuilder {
 		}
 
 		$tokens[] = $this->quoteTableName($columnParts[0]) . '.' . $this->quoteColumnName($columnParts[1]); //column name
-
+		
 		if (!isset($value)) {
 			if ($comparisonOperator == '=' || $comparisonOperator == 'IS') {
 				$tokens[] = "IS NULL";

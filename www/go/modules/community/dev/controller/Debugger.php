@@ -8,6 +8,6 @@ use go\core\jmap\Response;
 
 class Debugger extends Controller {
 	public function get() {
-		Response::get()->addResponse(["debug", App::get()->getDebugger()->getEntries()]);
+		Response::get()->addResponse(App::get()->getDebugger()->getEntries());
 	}
 }

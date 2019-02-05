@@ -521,7 +521,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				
 				cb.call(scope || this, response);
 			},
-			scope: scope || this
+			scope: this
 		});
 	}
 });

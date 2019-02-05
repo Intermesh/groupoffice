@@ -36,12 +36,17 @@ go.modules.core.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 			],
 			entityStore: "Group"
 		});
+		
+
 
 		Ext.apply(this, {
 			plugins: [actions],
 			tbar: ['->',
 				{
-					xtype: 'tbsearch'
+					xtype: 'tbsearch',
+					filters: [
+						'q'					
+					]
 				}, {
 					iconCls: 'ic-add',
 					tooltip: t('Add'),

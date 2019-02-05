@@ -56,14 +56,6 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 						
 	}
 	
-	public static function filter(\go\core\orm\Query $query, array $filter) {
-		if(!empty($filter['q'])) {
-			$query->andWhere("name", "LIKE", $filter['q'] . "%");			
-		}
-		
-		return parent::filter($query, $filter);
-	}
-	
 	/**
 	 * Find or create a default address book for the user
 	 * 

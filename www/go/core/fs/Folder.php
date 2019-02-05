@@ -223,7 +223,7 @@ class Folder extends FileSystemObject {
 			$success = rename($this->getPath(), $newPath);
 		} catch(\Exception $e) {
 			//rename fails accross partitions. Ignore and retry with copy delete.
-			GO()->debug("Rename failed. Falling back on copy, delete");
+			GO()->warn("Rename failed. Falling back on copy, delete");
 		}
 
 		if (!$success) { // Notice suppressed by @

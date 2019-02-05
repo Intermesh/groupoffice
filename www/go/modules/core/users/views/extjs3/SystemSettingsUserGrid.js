@@ -44,17 +44,17 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					text: t('Show disabled'),
 					enableToggle:true,
 					toggleHandler: function(btn, state) {
-						if(state) {
-							this.store.baseParams.filter.showDisabled = true;
-						} else {
-							delete this.store.baseParams.filter.showDisabled;
-						}
-						this.store.reload();
+						
+						this.store.setFilter('disabled', state ? {showDisabled: true} : null);
+						this.store.load();
 					},
 					scope:this
 			}, '->', 
 				{
-					xtype: 'tbsearch'
+					xtype: 'tbsearch',
+					filters: [
+						'q'					
+					]
 				},{					
 					iconCls: 'ic-add',
 					tooltip: t('Add'),

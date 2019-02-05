@@ -97,7 +97,7 @@ class Connection {
 		$remote = $ssl ? 'ssl://' : '';			
 		$remote .=  $server.":".$port;
 
-		GO()->debug("Connection to ".$remote, self::DEBUG_TYPE_IMAP);
+		GO()->debug("Connection to ".$remote);
 
 		try{
 			$this->handle = stream_socket_client($remote, $this->connectErrorNo, $this->connectError, $timeout, STREAM_CLIENT_CONNECT, $streamContext);
@@ -108,7 +108,7 @@ class Connection {
 		if (!is_resource($this->handle)) {	
 			
 			$this->handle = null;
-			GO()->debug("Connection to ".$remote." failed ".$this->connectError, self::DEBUG_TYPE_IMAP);
+			GO()->debug("Connection to ".$remote." failed ".$this->connectError);
 			
 			return false;
 		}		
@@ -135,7 +135,7 @@ class Connection {
 			return false;
 		}else
 		{
-			GO()->debug("TLS Crypto enabled", self::DEBUG_TYPE_IMAP);
+			GO()->debug("TLS Crypto enabled");
 		}
 					
 		$this->starttls = true;
@@ -193,7 +193,7 @@ class Connection {
 			$lastLine = array_pop($response['data'][0]);
 		
 			if(($startpos = strpos($lastLine, 'CAPABILITY'))!==false){
-				//GO()->debug("Use capability from login", "imap");					
+		
 				$endpos=  strpos($lastLine, ']', $startpos);
 				if($endpos){
 					$this->capability = substr($lastLine, $startpos, $endpos-$startpos);					
@@ -248,7 +248,7 @@ class Connection {
 		
 		$command = 'A' . $this->commandNumber() . ' ' . $command . "\r\n";
 
-		GO()->debug('> ' . $command, self::DEBUG_TYPE_IMAP);
+		GO()->debug('> ' . $command);
 		
 		return $this->fputs($command);
 	}
@@ -286,7 +286,7 @@ class Connection {
 		$line = fgets($this->handle, $length);
 
 		if($debug){
-			GO()->debug('< ' . $line, self::DEBUG_TYPE_IMAP);	
+			GO()->debug('< ' . $line);	
 		}
 		
 		

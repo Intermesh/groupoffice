@@ -76,8 +76,11 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 			},
 			'->', 
 				{
-					xtype: 'tbsearch'
-				}				
+					xtype: 'tbsearch',
+					filters: [
+						'q'					
+					]
+				}
 			],
 			columns: [
 				{
@@ -276,17 +279,20 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 	onBeforeStoreLoad : function(store, options) {
 
 		//don't add selected on search
-		if(store.baseParams.filter.q || options.selectedLoaded || options.paging) {
+		if(this.store.filters.tbsearch || options.selectedLoaded || options.paging) {
 			return true;
 		}
 		
 		go.Stores.get("Group").get(this.getSelectedGroupIds(), function(entities) {
 			this.store.loadData({records: entities}, true);
 			this.store.sortData();
+			this.store.setFilter('exclude', {
+				exclude: this.getSelectedGroupIds()
+			});
+			
 			this.store.load({
 				add: true,
-				selectedLoaded: true,
-				params: {filter: {exclude: this.getSelectedGroupIds()}}
+				selectedLoaded: true
 			});
 		}, this);
 		

@@ -1,6 +1,31 @@
 Ext.namespace('go.toolbar');
 
-
+/**
+ * 
+ * @example
+ * 
+ * {
+					xtype: 'tbsearch',
+					filters: [
+						'q',
+						'name', 
+						'content',
+						{name: 'modified', multiple: false},
+						{name: 'created', multiple: false}						
+					],
+					listeners: {
+						scope: this,
+						search: function(btn, query, filters) {
+							this.storeFilter.setFilter("tbsearch", filters);
+							this.storeFilter.load();
+						},
+						reset: function() {
+							this.storeFilter.setFilter("tbsearch", null);
+							this.storeFilter.load();
+						}
+					}
+				}
+ */
 go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 
 	iconCls: 'ic-search',	
@@ -30,11 +55,14 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 	//
 	// {name: ["Merijn Schering", "Merijn%", email:["%intermesh%]}
 	
-	filterNames: null,
+	filters: null,
+	
+	
 	constructor: function (config) {
+		config = config || {};
 		go.toolbar.SearchButton.superclass.constructor.call(this, config);
-		
-		this.initFilterNames(config);
+			
+		this.filters = go.util.Filters.normalize(config.filters || ['q']);
 		
 		if(!this.store) {			
 			//try to find store if this button it part of a grid.
@@ -48,31 +76,22 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 		if(this.store) {
 			this.on({
 				scope: this,
-				search: function (tb, v) {
+				search: function (tb, v, filters) {
 					if(this.store instanceof go.data.Store || this.store instanceof go.data.GroupingStore) {
-						
-						var filter = go.util.parseSearchQuery(v, this.filterNames[0].name), me = this;
-						this.filterNames.forEach(function(cfg) {
-							delete me.store.baseParams.filter[cfg.name];
-							if(filter[cfg.name]) {
-								me.store.baseParams.filter[cfg.name] = cfg.multiple ? filter[cfg.name] : filter[cfg.name][0];
-							}
-						});
+					
+						this.store.setFilter('tbsearch', filters).load();
 						
 					} else {
 						//params for old framework
 						this.store.baseParams.query = v;
+						this.store.load();
 					}
 					
 					this.updateView();
-					this.store.load();
 				},
 				reset: function() {
 					if(this.store instanceof go.data.Store) {
-						var me = this;
-						this.filterNames.forEach(function(cfg) {
-							delete me.store.baseParams.filter[cfg.name];							
-						});
+						this.store.setFilter('tbsearch', null).load();
 					} else {
 						delete this.store.baseParams.query;
 					}
@@ -95,6 +114,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 			listeners: {				
 				specialkey: function (field, e) {					
 					if (e.getKey() == Ext.EventObject.ENTER) {
+						e.preventDefault(); //to prevent form submission
 						this.search();
 					}
 				},
@@ -107,17 +127,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 		});
 	},
 	
-	initFilterNames: function(config) {
-		this.filterNames = config.filterNames || ['q'];
-		for(var i = 0, l = this.filterNames.length; i < l; i++) {
-			if(!Ext.isObject(this.filterNames[i])) {
-				this.filterNames[i] = {
-					name: this.filterNames[i],
-					multiple: true
-				}
-			}
-		}
-	},
+	
 	
 	/**
 	 * Set correct class and update tooltip
@@ -195,24 +205,27 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 			this.searchToolBar.setWidth(adjWidth);
 		}, this);
 		
-		if(this.filterNames.length) {
+		if(this.filters) {
 			
-			var names = this.filterNames.map(function(f) {return f.name;});
+			var names = Object.keys(this.filters).filter(function(name) {return name != 'q'});
 			
-			var msg = t("You can use these keywords:<br /><br />") + names.join(", ") + "<br /><br />";
+			if(names.length) {
 			
-			msg += t("For example:<br /><br />" + names[0] + ": \"John Doe\" "+ names[0] + ": Foo%");
-			
-			if(names.indexOf('modifiedsince')) {
-				msg += " modifiedsince: 2019-01-31 23:59 modifiedbefore 2019-02-01";
+				var msg = t("You can use these keywords:<br /><br />") + names.join(", ") + "<br /><br />";
+
+				msg += t("For example:<br /><br />" + names[0] + ": \"John Doe\" "+ names[0] + ": Foo%");
+
+				if(names.indexOf('modified') > -1) {
+					msg += " modified: >2019-01-31 23:59 modified: <2019-02-01";
+				}
+
+				Ext.QuickTips.register({
+					target: this.triggerField.getEl(),
+					title: t("Advanced search options"),
+					text: msg,				
+					dismissDelay: 10000 // Hide after 10 seconds hover
+				});
 			}
-			
-			Ext.QuickTips.register({
-				target: this.triggerField.getEl(),
-				title: t("Advanced search options"),
-				text: msg,				
-				dismissDelay: 10000 // Hide after 10 seconds hover
-			});
 		}
 		
 		
@@ -232,9 +245,14 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 	},
 	
 	search : function() {
-		var v =this.triggerField.getValue();
+		var v = this.triggerField.getValue(), filters = null;
 		this.resetButton.setDisabled(GO.util.empty(v));
-		this.fireEvent('search', this, v);
+		
+		if(this.filters) {
+			filters = go.util.Filters.parseQueryString(v, this.filters);	
+		}
+		
+		this.fireEvent('search', this, v, filters);
 		//this.onSearch.call(this.scope || this, v);
 	},
 

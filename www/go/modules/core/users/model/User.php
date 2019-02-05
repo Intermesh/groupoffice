@@ -449,22 +449,16 @@ class User extends Entity {
 	
 	protected static function defineFilters() {
 		return parent::defineFilters()
-						->add('showDisabled', function (Query $query, $value, array $filter){							
+						->add('showDisabled', function (Criteria $criteria, $value){							
 							if($value === false) {
-								$query->andWhere('enabled', '=', true);
+								$criteria->andWhere('enabled', '=', true);
 							}
 						})
-						->add('groupId', function (Query $query, $value, array $filter){
-							$query->join('core_user_group', 'ug', 'ug.userId = u.id')->andWhere(['ug.groupId' => $filter['groupId']]);
+						->add('groupId', function (Criteria $criteria, $value, Query $query){
+							$query->join('core_user_group', 'ug', 'ug.userId = u.id')->andWhere(['ug.groupId' => $value]);
 						});
 	}
 	
-	public static function filter(Query $query, array $filter) {
-		if(!isset($filter['showDisabled'])) {
-			$filter['showDisabled'] = false;
-		}
-		return parent::filter($query, $filter);
-	}
 
 	/**
 	 * Check if use is an admin

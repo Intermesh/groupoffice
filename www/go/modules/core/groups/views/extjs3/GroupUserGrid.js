@@ -73,8 +73,11 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 			},
 			'->', 
 				{
-					xtype: 'tbsearch'
-				}				
+					xtype: 'tbsearch',
+					filters: [
+						'q'					
+					]
+				}			
 			],
 			columns: [
 				{
@@ -152,18 +155,23 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 	
 	onBeforeStoreLoad : function(store, options) {
 		//don't add selected on search, or when they are already loaded or when gridpanel is trying to fill the page.
-		if(store.baseParams.filter.q || options.selectedLoaded || options.paging) {
+		if(this.store.filters.tbsearch || options.selectedLoaded || options.paging) {
 			return true;
 		}
 		
 		go.Stores.get("User").get(this.selectedUsers, function(entities) {			
 			this.store.loadData({records: entities}, true);
 			this.store.sortData();
+			
+			this.store.setFilter('exclude', {
+				exclude: this.geselectedUsers
+			});
+			
 			this.store.load({
 				add: true,
-				selectedLoaded: true,
-				params: {filter: {exclude: this.selectedUsers}}
+				selectedLoaded: true
 			});
+			
 		}, this);
 		
 		return false;

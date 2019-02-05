@@ -1,12 +1,19 @@
 <?php
 namespace go\modules\community\addressbook\model;
 
+use Exception;
 use go\core\acl\model\AclItemEntity;
-use go\core\orm\Query;
+use go\core\db\Column;
+use go\core\db\Criteria;
+use go\core\db\Query as Query2;
 use go\core\orm\CustomFieldsTrait;
+use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
+use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
+use go\modules\community\addressbook\convert\VCard;
 use go\modules\core\links\model\Link;
+use function GO;
 						
 /**
  * Contact model
@@ -330,90 +337,73 @@ class Contact extends AclItemEntity {
 	protected static function defineFilters() {
 
 		return parent::defineFilters()
-										->add("addressBookId", function(Query $query, $value, $filter) {
-											$query->andWhere('addressBookId', '=', $value);
+										->add("addressBookId", function(Criteria $criteria, $value) {
+											$criteria->andWhere('addressBookId', '=', $value);
 										})
-										->add("groupId", function(Query $query, $value, $filter) {
-											$query->join('addressbook_contact_group', 'g', 'g.contactId = c.id')
-											->andWhere('g.groupId', '=', $filter['groupId']);
+										->add("groupId", function(Criteria $criteria, $value, Query $query) {
+											$query->join('addressbook_contact_group', 'g', 'g.contactId = c.id');
+											
+											$criteria->andWhere('g.groupId', '=', $value);
 										})
-										->add("isOrganization", function(Query $query, $value, $filter) {
-											$query->andWhere('isOrganization', '=', $filter['isOrganization']);
+										->add("isOrganization", function(Criteria $criteria, $value) {
+											$criteria->andWhere('isOrganization', '=', $value);
 										})
-										->add("hasEmailAddresses", function(Query $query, $value, $filter) {
+										->add("hasEmailAddresses", function(Criteria $criteria, $value, Query $query) {
 											$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "LEFT")
 											->groupBy(['c.id'])
-											->having('count(e.id) > 0');
+											->having('count(e.id) '.($value ? '>' : '=').' 0');
 										})
-										->add("email", function(Query $query, $value, $filter) {
+										->addText("email", function(Criteria $criteria, $comparator, $value, Query $query) {
 											$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "INNER")
-											->where('e.email', 'LIKE', $value);
+											->where('e.email', $comparator, $value);
 										})
-										->add("name", function(Query $query, $value, $filter) {											
-											$query->where('name', 'LIKE', $value);
+										->addText("name", function(Criteria $criteria, $comparator, $value) {											
+											$criteria->where('name', $comparator, $value);
 										})
-										->add("country", function(Query $query, $value, $filter) {
+										->addText("country", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_address')) {
 												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "INNER");
 											}
 											
-											$query->where('adr.country', 'LIKE', $value);
+											$criteria->where('adr.country', $comparator, $value);
 										})
-										->add("city", function(Query $query, $value, $filter) {
+										->addText("city", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_address')) {
 												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "INNER");
 											}
 											
-											$query->where('adr.city', 'LIKE', $value);
+											$criteria->where('adr.city', $comparator, $value);
 										})
-										->add("minAge", function(Query $query, $value) {
-											$dateTime = new \go\core\util\DateTime("-" . $value . " years");
-											$dateTime->setTime(0, 0, 0);
+										->addNumber("age", function(Criteria $criteria, $comparator, $value, Query $query) {
 											
 											if(!$query->isJoined('addressbook_date')) {
 												$query->join('addressbook_date', 'date', 'date.contactId = c.id', "INNER");
 											}
 											
-											$query->where('date.type', '=', Date::TYPE_BIRTHDAY)
-															->andWhere('date.date', "<=", $dateTime);
+											$criteria->where('date.type', '=', Date::TYPE_BIRTHDAY);					
+											$tag = ':age'.uniqid();
+											$criteria->andWhere('TIMESTAMPDIFF(YEAR,date.date, CURDATE()) ' . $comparator . $tag)->bind($tag, $value);
 											
 										})
-										->add("maxAge", function(Query $query, $value) {
-											$dateTime = new \go\core\util\DateTime("-" . $value . " years");
-											$dateTime->setTime(0, 0, 0);											
-											
+										->addDate("birthday", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_date')) {
 												$query->join('addressbook_date', 'date', 'date.contactId = c.id', "INNER");
 											}
 											
-											$query->where('date.type', '=', Date::TYPE_BIRTHDAY)
-															->andWhere('date.date', ">=", $dateTime);
-										})
-										->add("birthdayInDays", function(Query $query, $value) {
-											if(empty($value)) {
-												return;
-											}
-											
-											$dateTime = new \go\core\util\DateTime("-" . $value . " years");
-											$dateTime->setTime(0, 0, 0);											
-											
-											if(!$query->isJoined('addressbook_date')) {
-												$query->join('addressbook_date', 'date', 'date.contactId = c.id', "INNER");
-											}
-											
-											$query->where('date.type', '=', Date::TYPE_BIRTHDAY)
-															->andWhere('DATE_ADD(date.date, 
-																	INTERVAL YEAR(CURDATE())-YEAR(date.date)
-																					 + IF(DAYOFYEAR(CURDATE()) > DAYOFYEAR(date.date),1,0)
-																	YEAR)  
-															BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL '.intval($value).' DAY);');
+											$tag = ':bday'.uniqid();
+											$criteria->where('date.type', '=', Date::TYPE_BIRTHDAY)
+																->andWhere('DATE_ADD(date.date, 
+																		INTERVAL YEAR(CURDATE())-YEAR(date.date)
+																						 + IF(DAYOFYEAR(CURDATE()) > DAYOFYEAR(date.date),1,0)
+																		YEAR)  
+																' . $comparator . $tag)->bind($tag, $value->format(Column::DATE_FORMAT));
 										});
 										
 	}
 	
 	public static function converters() {
 		$arr = parent::converters();
-		$arr['text/vcard'] = \go\modules\community\addressbook\convert\VCard::class;		
+		$arr['text/vcard'] = VCard::class;		
 		return $arr;
 	}
 
@@ -519,7 +509,7 @@ class Contact extends AclItemEntity {
 		foreach($add as $orgId) {
 			$org = self::findById($orgId);
 			if(!Link::create($this, $org)) {
-				throw new \Exception("Failed to link organization: ". $orgId);
+				throw new Exception("Failed to link organization: ". $orgId);
 			}
 		}
 		return true;
@@ -566,12 +556,12 @@ class Contact extends AclItemEntity {
 		GO()->getDbConnection()
 						->update(
 										'addressbook_contact',
-										['modifiedAt' => new \go\core\util\DateTime()], 
+										['modifiedAt' => new DateTime()], 
 										['id' => $ids]
 										)->execute();	
 		
 		Contact::getType()->changes(
-					(new \go\core\db\Query)
+					(new Query2)
 					->select('c.id AS entityId, a.aclId, "0" AS destroyed')
 					->from('addressbook_contact', 'c')
 					->join('addressbook_addressbook', 'a', 'a.id = c.addressBookId')					

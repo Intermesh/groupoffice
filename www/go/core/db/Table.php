@@ -90,9 +90,8 @@ class Table {
 		$this->columns = [];
 
 		$sql = "SHOW FULL COLUMNS FROM `" . $this->name . "`;";
-//		\go\core\App::get()->debug($sql, 'sql');
 		
-		$stmt = App::get()->getDbConnection()->getPDO()->query($sql);
+		$stmt = App::get()->getDbConnection()->query($sql);
 		while ($field = $stmt->fetch()) {
 			$this->columns[$field['Field']] = $this->createColumn($field);
 		}

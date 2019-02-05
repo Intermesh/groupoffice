@@ -62,9 +62,9 @@ class ErrorHandler {
 			error_log($errorString, 0);
 		}
 		
-		App::get()->debug($errorString);
+		App::get()->getDebugger()->error($errorString);
 		foreach(explode("\n", $e->getTraceAsString()) as $line) {
-			App::get()->debug($line);
+			App::get()->getDebugger()->error($line);
 		}
 		
 		return $errorString;

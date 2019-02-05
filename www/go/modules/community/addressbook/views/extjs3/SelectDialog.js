@@ -40,7 +40,17 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 				},
 				'->',
 				{
-					xtype: 'tbsearch'
+					xtype: 'tbsearch',
+					filters: [
+						'q',
+						'name', 
+						'email', 
+						'country', 
+						'city', 
+						{name: 'modified', multiple: false}, 					
+						{name: 'age', multiple: false},						
+						{name: 'birthday', multiple: false}
+					]
 				}
 			],
 			listeners: {
@@ -80,6 +90,10 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 			}
 		});
 		
+		this.grid.store.setFilter("required", {			
+			hasEmailAddresses: true
+		});
+		
 		this.items = [this.grid, this.addressBookTree];
 		
 		go.modules.community.addressbook.SelectDialog.superclass.initComponent.call(this);
@@ -114,28 +128,20 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 		this.close();
 	},
 	
-	setAddressBookId: function (addressBookId) {
-		var s = this.grid.store;
-
-		s.baseParams.filter = {			
-			hasEmailAddresses: true
-		};
+	setAddressBookId: function (addressBookId) {		
+		this.grid.store.setFilter("addressbooks", addressBookId ? {
+			addressBookId: addressBookId
+		} : null);
 		
-		if(addressBookId) {
-			s.baseParams.filter.addressBookId = addressBookId;
-		}
-		
-		s.load();
+		this.grid.store.load();
 	},
 
 	setGroupId: function (groupId, addressBookId) {
-		var s = this.grid.store;
+		this.grid.store.setFilter({
+			groupId: groupId
+		});
 		
-		s.baseParams.filter = {
-			groupId: groupId,
-			hasEmailAddresses: true
-		};
-		s.load();
+		this.grid.store.load();
 	},
 	
 	selectMultiple : function(contacts) {
