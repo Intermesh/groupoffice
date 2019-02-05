@@ -38,9 +38,9 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 					}
 				}, this);
 			
-				if(userStore.get(creatorIds, function() {
+				userStore.get(creatorIds, function() {
 					this.updateView(options);
-				},this));
+				}, this);
 				
 			}, this);
 							
@@ -65,10 +65,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				iconCls: 'ic-edit',
 				text: t("Edit"),
 				handler: function() {
-					if(!this.commentForm) {
-						this.commentForm = new go.modules.comments.CommentForm();
-					}
-					this.commentForm.load(this.contextMenu.record.id).show();
+					var dlg = new go.modules.comments.CommentForm();					
+					dlg.load(this.contextMenu.record.id).show();
 				},
 				scope:this
 			}]
@@ -81,7 +79,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				this.initScrollLoader();
 			},
 			store: this.store,
-			scrollUp: true,
+			scrollUp: true
 		});
 
 		this.items = [
