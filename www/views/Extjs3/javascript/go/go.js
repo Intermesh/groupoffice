@@ -16,4 +16,5 @@ Ext.namespace('go.util');
 Ext.namespace('go.acl');
 Ext.namespace('go.detail');
 Ext.namespace('go.layout');
+Ext.namespace('go.menu');
 Ext.namespace('go.tree');

@@ -226,6 +226,7 @@ class Migrate63to64 {
 				]]);
 		
 		foreach($fields as $field) {
+			echo "Migrating ".$field->databaseName ."\n";
 			if($field->type == "Company") {
 				$field->type = "Contact";
 				$field->setOption("isOrganization", true);

@@ -1602,6 +1602,94 @@ table[id^="comments-ext"] b {
 	color: $cAnchor;
 }
 
+.go-chip {
+	display: inline-block; 
+	border-radius: dp(4); 
+	background-color: $cPrimaryTp; 
+	margin-right: dp(8);
+	margin-top: dp(8);
+	padding-left: dp(8);
+}
+
+.go-messages {
+	padding: 0 dp(8);
+	h6 {
+		@extend %font-caption;
+		text-align:center;
+		padding: dp(8) 0;
+	}
+	> div { 
+		overflow:hidden;
+		padding-bottom:dp(8);
+		span.photo {
+			@extend .avatar;
+			margin-top:0 !important;
+			margin-right: dp(8);
+			line-height: 35px;
+			text-align: center;
+			&.mine {
+				margin-right:0;
+				margin-left: dp(8);
+				float:right;
+			}
+		}
+		> div {// message
+			background-color: color($bg, 'status-bar');
+			border-radius: dp(16);
+			display:inline-block;
+			max-width: calc(100% - 80px);
+			.content {
+				padding: dp(8) dp(16);
+			}
+			&.mine {
+				background-color: $cPrimaryTp;
+				float:right;
+			}
+		}
+	}
+}
+
+.tags {
+	padding: 0 dp(16) !important;
+	&.mine {
+		text-align:right;
+	}
+}
+.x-emoji-menu {
+	padding: 7px 0;
+	overflow-y: auto;
+	background-color: color($bg, 'card') !important;
+	em {
+		cursor:pointer;
+		display: block;
+		padding: 3.5px;
+		border: 0;
+		float: left;
+		width:dp(32);
+		height:dp(32);
+		padding: dp(8);
+		font-size:22px;
+	}
+}
+.new-message {
+	border: 1px solid color($fg,'line');// rgba(black, 0.12);
+	border-radius: dp(16);
+	overflow:hidden;
+		.x-panel-body {
+			background-color:transparent;
+		}
+	
+	.x-html-editor-wrap{
+		border:0;
+	}
+	textarea.x-form-textarea {
+		border:0;
+		margin:dp(2) 0;
+		&.x-form-focus {
+			box-shadow: none;
+		}
+	}
+}
 
 .go-multiselect-grid {
 	.x-panel-tbar {

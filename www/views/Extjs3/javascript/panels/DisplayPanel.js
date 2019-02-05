@@ -241,12 +241,10 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
             }
 		}
 		
-		if(go.Modules.isAvailable("legacy", "comments") ){
-			if (this.showComments) {
-                this.add(new go.modules.comments.CommentsDetailPanel());
-            }
+		if (this.showComments && go.Modules.isAvailable("community", "comments")) {
+			this.add(new go.modules.comments.CommentsDetailPanel());
 		}
-
+		
 		if(!this.expandListenObject){
 			this.expandListenObject=this;
 		}

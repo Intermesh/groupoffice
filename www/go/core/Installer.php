@@ -406,9 +406,19 @@ class Installer {
 					}
 
 					if (is_callable($query)) {
+						
+						//upgrades may have modified tables so rebuild model and table cache
+						db\Table::destroyInstances();
+						GO()->getCache()->flush(false);
+										
 						echo $modStr . "Running callable function\n";
 						call_user_func($query);
 					} else if (substr($query, 0, 7) == 'script:') {
+						
+						//upgrades may have modified tables so rebuild model and table cache
+						db\Table::destroyInstances();
+						GO()->getCache()->flush(false);
+						
 						$updateScript = $root->getFile('modules/' . $module->name . '/install/updatescripts/' . substr($query, 7));
 
 						if (!$updateScript->exists()) {
