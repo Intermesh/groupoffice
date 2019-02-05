@@ -41,9 +41,11 @@ class Query extends DbQuery {
 	 */
 	public function filter(array $filters) {		
 		$cls = $this->model;		
-		$criteria = new \go\core\db\Criteria();
-		$this->andWhere($criteria);
+		$criteria = new \go\core\db\Criteria();		
 		$cls::filter($this, $criteria, $filters);
+		if($criteria->hasConditions()) {
+			$this->andWhere($criteria);
+		}
 		
 		return $this;
 	}

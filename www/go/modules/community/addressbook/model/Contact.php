@@ -354,8 +354,9 @@ class Contact extends AclItemEntity {
 											->having('count(e.id) '.($value ? '>' : '=').' 0');
 										})
 										->addText("email", function(Criteria $criteria, $comparator, $value, Query $query) {
-											$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "INNER")
-											->where('e.email', $comparator, $value);
+											$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "INNER");
+											
+											$criteria->where('e.email', $comparator, $value);
 										})
 										->addText("name", function(Criteria $criteria, $comparator, $value) {											
 											$criteria->where('name', $comparator, $value);
