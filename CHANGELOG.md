@@ -1,3 +1,5 @@
+04-02-2019 6.3.62
+- Core: Auth should give 401 response and not 403 on bad login
 - Calendar: Fixed calendar grid render issue when events didn't have a gap between them
 - Core: Implemented 'calculateTotal' param for jmap to improve performance on query requests. (global search)
 - Billing: No search button in select product catalog

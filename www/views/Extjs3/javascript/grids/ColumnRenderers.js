@@ -11,13 +11,13 @@ GO.grid.ColumnRenderers = {
 	
 	coloredYesNo : function(val, meta, record, rowIndex, columnIndex, store){
 		if(val == 1){
-			meta.css = 'cellbg-green';
+			meta.style = 'color:green';
 			return t("Yes");
 		}else if(val == 0){
-			meta.css = 'cellbg-red';
+			meta.style = 'color:red';
 			return t("No");
 		}else{
-			meta.css = 'cellbg-blue';
+			meta.style = 'color:blue';
 			return val;
 		}
 	},
@@ -32,7 +32,7 @@ GO.grid.ColumnRenderers = {
 		}
 		
 		if(date < Math.round(new Date().now()/1000)){
-			meta.css = 'cellbg-red';
+			meta.style = 'color:red';
 			return t("No");
 		}
 	},
@@ -69,7 +69,7 @@ GO.grid.ColumnRenderers = {
 			showTooltip = this.showTooltip;
 			
 		if(showTooltip)	
-			meta.attr = 'ext:qtip="' + val + '"';
+			meta.attr = 'ext:qtip="' + Ext.util.Format.nl2br(val) + '"';
 		
 		if(this.maxLength)
 			maxLength = this.maxLength;
