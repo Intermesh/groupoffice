@@ -112,7 +112,7 @@ class Connection {
 	 * @return PDOStatement
 	 */
 	public function query($sql) {
-		\go\core\App::get()->getDebugger()->debug($sql, Debugger::TYPE_SQL);
+		\go\core\App::get()->getDebugger()->debug($sql);
 		return $this->getPdo()->query($sql);
 	}
 
@@ -136,7 +136,7 @@ class Connection {
 		if($this->transactionSavePointLevel == 0) {
 			//$ret = null;
 			//if (!$this->inTransaction())
-			GO()->debug("START TRANSACTION", Debugger::TYPE_SQL);
+			GO()->debug("START DB TRANSACTION");
 			$ret = $this->getPdo()->beginTransaction();
 
 		}else
@@ -163,7 +163,7 @@ class Connection {
 		
 		$this->transactionSavePointLevel--;	
 		if($this->transactionSavePointLevel == 0) {
-			GO()->debug("ROLLBACK TRANSACTION", Debugger::TYPE_SQL);
+			GO()->debug("ROLLBACK DB TRANSACTION");
 			return $this->getPdo()->rollBack();
 		}else
 		{
@@ -187,7 +187,7 @@ class Connection {
 		
 		$this->transactionSavePointLevel--;
 		if($this->transactionSavePointLevel == 0) {
-			GO()->debug("COMMIT TRANSACTION", Debugger::TYPE_SQL);
+			GO()->debug("COMMIT DB TRANSACTION");
 			return $this->getPdo()->commit();
 		}else
 		{
@@ -416,7 +416,7 @@ class Connection {
 	 */
 	public function createStatement($build) {
 		if(isset($build['debug'])) {
-			App::get()->debug($build['debug'], Debugger::TYPE_SQL);
+			App::get()->debug($build['debug']);
 		}
 
 //		Code is useful to find where a query was made.

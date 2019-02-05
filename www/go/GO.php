@@ -934,7 +934,7 @@ class GO{
 	 */
 	public static function debug($text, $config=false) {
 		
-		return GO()->debug($text, 'general', 1);
+		return GO()->debug($text, 1);
 
 		if (   self::config()->debug
 			|| self::config()->debug_log

@@ -115,7 +115,7 @@ class Language {
 			if ($file->exists()) {
 				$langData = new util\ArrayObject($this->loadFile($file));
 			} else {
-				GO()->debug('No default(en) language file for module "'.$package.'/'.$module.'" defined.', 'Language');
+				GO()->warn('No default(en) language file for module "'.$package.'/'.$module.'" defined.');
 			}
 
 			//overwirte english with actual language

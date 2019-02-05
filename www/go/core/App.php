@@ -419,8 +419,24 @@ use const GO_CONFIG_FILE;
 		 * 
 		 * @param string|callable|array|object $msg
 		 */
-		public function debug($msg, $type = 'general', $traceBackSteps = 0) {
-			$this->getDebugger()->debug($msg, $type, $traceBackSteps);
+		public function debug($msg, $traceBackSteps = 0) {
+			$this->getDebugger()->log($msg, $traceBackSteps);
+		}
+		
+		public function log($msg, $traceBackSteps = 0) {
+			$this->getDebugger()->log($msg, $traceBackSteps);
+		}
+		
+		public function warn($msg, $traceBackSteps = 0) {
+			$this->getDebugger()->warn($msg, $traceBackSteps);
+		}
+		
+		public function error($msg, $traceBackSteps = 0) {
+			$this->getDebugger()->error($msg, $traceBackSteps);
+		}
+		
+		public function info($msg, $traceBackSteps = 0) {
+			$this->getDebugger()->info($msg, $traceBackSteps);
 		}
 
 		private $authState;

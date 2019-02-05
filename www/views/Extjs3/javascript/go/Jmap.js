@@ -22,9 +22,25 @@ go.Jmap = {
 			method: 'community/dev/Debugger/get',
 			params: {},
 			callback: function(options, success, response) {
+				
+				console.group(clientCallId);
 				response.forEach(function(r) {
-					console.debug(r);
+					switch(r[0]) {
+						case 'error':
+							console.error(r[1]);
+							break;
+						case 'warn':
+							console.warn(r[1]);
+							break;
+						case 'info':
+							console.info(r[1]);
+							break;
+						default:							
+							console.log(r[1]);
+							break;
+					}
 				});
+				console.groupEnd();
 			}
 		};
 	},
