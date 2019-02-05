@@ -36,9 +36,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		this.store.on('load', function() {
 			this.loadLabels();
 		},this);
-		this.store.load();
-		
-	
+
 		this.textField = new go.form.HtmlEditor({
 			//enableColors: false,
 			enableFont: false,
@@ -117,6 +115,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		]
 		
 		this.textField.on('afterrender', function() {
+			this.store.load();
 			this.grow();
 		}, this);
 		
