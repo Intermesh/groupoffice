@@ -234,30 +234,6 @@ class Site extends \GO\Base\Db\ActiveRecord {
 		return $treeNodes;
 	}
 	
-	public function getApacheConfig(){
-		return '
-<VirtualHost *:80>
-
-<Directory /var/www/groupoffice-4.1/www/modules/site>
- Options FollowSymLinks
- AllowOverride All
-
-				RewriteEngine On
-				RewriteBase /
-
-				RewriteCond %{REQUEST_FILENAME} !-f
-				RewriteCond %{REQUEST_FILENAME} !-d
-				RewriteRule ^(.*)\?*$ index.php/$1 [L,QSA]
-</Directory>
-
-DocumentRoot /var/www/groupoffice-4.1/www/modules/site
-Alias /public /home/groupoffice/site/1/public
-ServerName www.giralisgroep.nl
-#ErrorLog /var/log/apache2/giralis.nl.log
-</VirtualHost>
-		';
-	}
-	
 	 public function getCustomFieldValueByName($cfName) {
 
 		if (!key_exists($cfName, $this->_cf)) {
