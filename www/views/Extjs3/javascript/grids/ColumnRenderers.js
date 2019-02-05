@@ -69,7 +69,7 @@ GO.grid.ColumnRenderers = {
 			showTooltip = this.showTooltip;
 			
 		if(showTooltip)	
-			meta.attr = 'ext:qtip="' + val + '"';
+			meta.attr = 'ext:qtip="' + Ext.util.Format.nl2br(val) + '"';
 		
 		if(this.maxLength)
 			maxLength = this.maxLength;
