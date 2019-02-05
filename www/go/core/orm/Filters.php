@@ -79,8 +79,8 @@ class Filters {
 					break;
 					
 				case 'text':
-					if(!is_array($v)) {
-						$v = [$v];
+					if(!is_array($value)){
+						$value = [$value];
 					}
 					$v = array_map(function($v) {return '%'.$v.'%';}, $value);//self::parseStringValue($value);
 					call_user_func($filterConfig['fn'], $criteria, "LIKE", $v, $query, $filter);
