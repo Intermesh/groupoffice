@@ -42,15 +42,11 @@ class Router implements RouterInterface {
 	 */
 	public function run() {
 
-		App::get()->getDebugger()->setSection(Debugger::SECTION_ROUTER);
-
 		$body = Request::get()->getBody();
 		
 		if(!is_array($body)) {
 			throw new Exception(400, 'Bad request');
 		}
-
-		App::get()->debug("Body fetched");
 
 		for ($i = 0, $c = count($body); $i < $c; $i++) {
 
@@ -143,8 +139,6 @@ class Router implements RouterInterface {
 		$controller = new $controllerMethod[0];
 
 		$params = $this->resolveResultReferences($params);
-
-		App::get()->getDebugger()->setSection(Debugger::SECTION_CONTROLLER);
 
 		return call_user_func([$controller, $controllerMethod[1]], $params);
 	}

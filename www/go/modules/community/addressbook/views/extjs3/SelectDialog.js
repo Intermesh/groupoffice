@@ -40,7 +40,28 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 				},
 				'->',
 				{
-					xtype: 'tbsearch'
+					xtype: 'tbsearch',
+					filters: [
+						'q',
+						'name', 
+						'email', 
+						'country', 
+						'city', 
+						{name: 'modified', multiple: false}, 					
+						{name: 'age', multiple: false},						
+						{name: 'birthday', multiple: false}
+					],
+					listeners: {
+						scope: this,
+						search: function(btn, query, filters) {
+							this.storeFilter.setFilter("tbsearch", filters);
+							this.storeFilter.load();
+						},
+						reset: function() {
+							this.storeFilter.setFilter("tbsearch", null);
+							this.storeFilter.load();
+						}
+					}
 				}
 			],
 			listeners: {
@@ -80,6 +101,14 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 			}
 		});
 		
+		this.storeFilter = new go.data.StoreFilter({
+			store: this.grid.store
+		});
+		
+		this.storeFilter.setFilter("required", {			
+			hasEmailAddresses: true
+		});
+		
 		this.items = [this.grid, this.addressBookTree];
 		
 		go.modules.community.addressbook.SelectDialog.superclass.initComponent.call(this);
@@ -114,28 +143,20 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 		this.close();
 	},
 	
-	setAddressBookId: function (addressBookId) {
-		var s = this.grid.store;
-
-		s.baseParams.filter = {			
-			hasEmailAddresses: true
-		};
+	setAddressBookId: function (addressBookId) {		
+		this.storeFilter.setFilter("addressbooks", addressBookId ? {
+			addressBookId: addressBookId
+		} : null);
 		
-		if(addressBookId) {
-			s.baseParams.filter.addressBookId = addressBookId;
-		}
-		
-		s.load();
+		this.storeFilter.load();
 	},
 
 	setGroupId: function (groupId, addressBookId) {
-		var s = this.grid.store;
+		this.storeFilter.setFilter({
+			groupId: groupId
+		});
 		
-		s.baseParams.filter = {
-			groupId: groupId,
-			hasEmailAddresses: true
-		};
-		s.load();
+		this.storeFilter.load();
 	},
 	
 	selectMultiple : function(contacts) {

@@ -74,9 +74,9 @@ class FieldSet extends AclOwnerEntity {
 	
 	protected static function defineFilters() {
 		return parent::defineFilters()
-						->add('entities', function(Query $query, $value, $filter) {
+						->add('entities', function(\go\core\db\Criteria $criteria, $value) {
 							//$ids = \go\core\orm\EntityType::namesToIds($value);			
-							$query->andWhere('e.name', 'IN', $value);
+							$criteria->andWhere('e.name', 'IN', $value);
 						});
 	}
 	

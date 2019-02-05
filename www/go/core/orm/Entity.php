@@ -417,12 +417,13 @@ abstract class Entity extends Property {
 	 * protected static function defineFilters() {
 	 * 
 	 * 		return parent::defineFilters()
-	 * 										->add("addressBookId", function(Query $query, $value, array $filter) {
-	 * 											$query->andWhere('addressBookId', '=', $value);
+	 * 										->add("addressBookId", function(Criteria $criteria, $value) {
+	 * 											$criteria->andWhere('addressBookId', '=', $value);
 	 * 										})
-	 * 										->add("groupId", function(Query $query, $value, array $filter) {
-	 * 											$query->join('addressbook_contact_group', 'g', 'g.contactId = c.id')
-	 * 											   ->andWhere('g.groupId', '=', $value);
+	 * 										->add("groupId", function(Criteria $criteria, $value, Query $query) {
+	 * 											$query->join('addressbook_contact_group', 'g', 'g.contactId = c.id');
+	 * 
+	 * 											 $criteria->andWhere('g.groupId', '=', $value);
 	 * 										});
 	 * }
 	 * ```
@@ -434,33 +435,34 @@ abstract class Entity extends Property {
 	protected static function defineFilters() {
 		$filters = new Filters();
 
-		$filters->add('q', function(Query $query, $value, $filter) {
+		$filters->add('q', function(Criteria $criteria, $value) {
 							if(!is_array($value)) {
 								$value = [$value];
 							}
 							
 							foreach($value as $q) {
 								if (!empty($q)) {								
-									static::search($query, $q);
+									static::search($criteria, $q);
 								}
 							}
-						})->add('exclude', function(Query $query, $value, $filter) {
+						})->add('exclude', function(Criteria $criteria, $value) {
 							if (!empty($value)) {
-								$query->andWhere('id', 'NOT IN', $value);
+								$criteria->andWhere('id', 'NOT IN', $value);
 							}
 						});
 						
-		if(static::getMapping()->getColumn('modifiedAt')) {
-			$filters->add("modifiedsince", function(Query $query, $value) {
-											$dateTime = new \go\core\util\DateTime($value);
-											$query->where('modifiedAt', '>=', $dateTime);
-										})
-										->add("modifiedbefore", function(Query $query, $value) {
-											$dateTime = new \go\core\util\DateTime($value);
-											$query->where('modifiedAt', '<', $dateTime);
-										});
+		if (static::getMapping()->getColumn('modifiedAt')) {
+			$filters->addDate("modified", function(Criteria $criteria, $comparator, $value) {				
+				$criteria->where('modifiedAt', $comparator, $value);								
+			});
 		}
-						
+		
+		if (static::getMapping()->getColumn('createdAt')) {
+			$filters->addDate("created", function(Criteria $criteria, $comparator, $value) {				
+				$criteria->where('createdAt', $comparator, $value);								
+			});
+		}
+
 		static::fireEvent(self::EVENT_FILTER, $filters);
 		
 		return $filters;
@@ -486,8 +488,8 @@ abstract class Entity extends Property {
 	 * @return Query
 	 */
 
-	public static function filter(Query $query, array $filter) {		
-		static::defineFilters()->apply($query, $filter);	
+	public static function filter(Query $query, Criteria $criteria, array $filter) {		
+		static::defineFilters()->apply($query, $criteria, $filter);	
 		return $query;
 	}
 	
@@ -503,11 +505,11 @@ abstract class Entity extends Property {
 	/**
 	 * Applies a search expression to the given database query
 	 * 
-	 * @param Query $query
+	 * @param Query $criteria
 	 * @param string $expression
 	 * @return Query
 	 */
-	protected static function search(Query $query, $expression) {
+	protected static function search(Criteria $criteria, $expression) {
 		
 		$columns = static::searchColumns();
 		
@@ -544,9 +546,9 @@ abstract class Entity extends Property {
 			}
 		}
 
-		$query->andWhere($searchConditions);
+		$criteria->andWhere($searchConditions);
 
-		return $query;
+		return $criteria;
 	}
 	
 	/**

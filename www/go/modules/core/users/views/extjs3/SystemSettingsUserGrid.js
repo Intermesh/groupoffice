@@ -36,6 +36,10 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 			baseParams: {filter: {}},
 			entityStore: "User"
 		});
+		
+		this.storeFilter = new go.data.StoreFilter({
+			store: this.store
+		});
 
 		Ext.apply(this, {
 			plugins: [actions],
@@ -44,17 +48,28 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					text: t('Show disabled'),
 					enableToggle:true,
 					toggleHandler: function(btn, state) {
-						if(state) {
-							this.store.baseParams.filter.showDisabled = true;
-						} else {
-							delete this.store.baseParams.filter.showDisabled;
-						}
-						this.store.reload();
+						
+						this.storeFilter.setFilter('disabled', state ? {showDisabled: true} : null);
+						this.storeFilter.load();
 					},
 					scope:this
 			}, '->', 
 				{
-					xtype: 'tbsearch'
+					xtype: 'tbsearch',
+					filters: [
+						'q'					
+					],
+					listeners: {
+						scope: this,
+						search: function(btn, query, filters) {
+							this.storeFilter.setFilter("tbsearch", filters);
+							this.storeFilter.load();
+						},
+						reset: function() {
+							this.storeFilter.setFilter("tbsearch", null);
+							this.storeFilter.load();
+						}
+					}
 				},{					
 					iconCls: 'ic-add',
 					tooltip: t('Add'),

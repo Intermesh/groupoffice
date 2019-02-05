@@ -1,6 +1,7 @@
 <?php
 namespace go\core\acl\model;
 
+use go\core\db\Criteria;
 use go\core\jmap\Entity;
 use go\core\orm\Query;
 use PDO;
@@ -117,10 +118,8 @@ abstract class AclEntity extends Entity {
 	}
 	
 	protected static function defineFilters() {
-		return parent::defineFilters()->add("permissionLevel", function(Query $query, $value, array $filter) {
-							if (!empty($filter['permissionLevel'])) {
-								static::applyAclToQuery($query, $filter['permissionLevel']);
-							}
+		return parent::defineFilters()->add("permissionLevel", function(Criteria $criteria, $value, Query $query) {
+							static::applyAclToQuery($query, $value);
 						});
 	}
 

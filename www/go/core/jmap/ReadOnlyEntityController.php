@@ -4,7 +4,7 @@ namespace go\core\jmap;
 
 use go\core\acl\model\Acl;
 use go\core\App;
-use go\core\db\Query;
+use go\core\orm\Query;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\orm\Entity;
 
@@ -64,17 +64,13 @@ abstract class ReadOnlyEntityController extends Controller {
 						->limit($params['limit'])
 						->offset($params['position']);
 
-		$sort = $this->transformSort($params['sort']);
-		
-		
+		$sort = $this->transformSort($params['sort']);		
 		
 		$cls::sort($query, $sort);
 
-		$query = $this->applyFilterCondition($params['filter'], $query);
-
-		//we don't need entities here. Just a list of id's.
+		$this->applyFilterCondition($params['filter'], $query);
 		
-		//$query->fetchMode(\PDO::FETCH_ASSOC)->select($cls::getPrimaryKey(true));
+		GO()->getDebugger()->debug((string) $query);
 		
 		return $query;
 	}
@@ -85,17 +81,46 @@ abstract class ReadOnlyEntityController extends Controller {
 	 * @param Query $query
 	 * @return Query
 	 */
-	private function applyFilterCondition($filter, $query)  {
+	private function applyFilterCondition($filter, $query, $criteria = null)  {
+		
+		if(!isset($criteria)) {
+			$criteria = $query;
+		}
+		
 		$cls = $this->entityClass();
 		if(isset($filter['conditions']) && isset($filter['operator'])) { // is FilterOperator
-			$subQuery = new Query();
+			
 			foreach($filter['conditions'] as $condition) {
-				$subQuery = $this->applyFilterCondition($condition, $subQuery);
+				$subCriteria = new \go\core\db\Criteria();
+				$this->applyFilterCondition($condition, $query, $subCriteria);
+			
+				if(!$subCriteria->hasConditions()) {
+					continue;
+				}
+				
+				switch(strtoupper($filter['operator'])) {
+					case 'AND':
+						$criteria->where($subCriteria);
+						break;
+
+					case 'OR':
+						$criteria->orWhere($subCriteria);
+						break;
+
+					case 'NOT':
+						$criteria->andWhereNot($subCriteria);
+						break;
+				}
 			}
-			return $query->where($subQuery, $filter['operator']);
+			
 		} else {	
 			// is FilterCondition		
-			return $cls::filter($query, $filter);			
+			$subCriteria = new \go\core\db\Criteria();			
+			$cls::filter($query, $subCriteria, $filter);			
+			
+			if($subCriteria->hasConditions()) {
+				$criteria->andWhere($subCriteria);	
+			}
 		}
 	}
 	

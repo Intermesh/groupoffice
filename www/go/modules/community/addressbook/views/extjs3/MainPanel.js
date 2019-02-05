@@ -138,18 +138,28 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 				},
 				'->',
 				{
-					xtype: 'tbsearch',
-					filterNames: [
+					xtype: 'tbsearch',					
+					filters: [
+						'q',
 						'name', 
 						'email', 
 						'country', 
 						'city', 
-						{name: 'modifiedsince', multiple: false}, 
-						{name: 'modifiedbefore', multiple: false}, 
-						{name: 'minage', multiple: false},
-						{name: 'maxage', multiple: false},
-						{name: 'birthdayindays', multiple: false}
-					]
+						{name: 'modified', multiple: false}, 					
+						{name: 'age', multiple: false},						
+						{name: 'birthday', multiple: false}
+					],
+					listeners: {
+						scope: this,
+						search: function(btn, query, filters) {
+							this.storeFilter.setFilter("tbsearch", filters);
+							this.storeFilter.load();
+						},
+						reset: function() {
+							this.storeFilter.setFilter("tbsearch", null);
+							this.storeFilter.load();
+						}
+					}
 				},
 				this.addButton = new Ext.Button({
 					//disabled: true,
@@ -255,6 +265,11 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 			}
 		});
 		
+		
+		this.storeFilter = new go.data.StoreFilter({
+			store: this.grid.store
+		});
+		
 		//Load contact when selecting it in the grid.
 		this.grid.on('navigate', function (sm, rowIndex, record) {
 			go.Router.goto("contact/" + record.id);
@@ -306,13 +321,13 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 			listeners: {
 				selectionchange: function (view, nodes) {
 					if(!nodes.length || nodes.length == 2) {
-						delete this.grid.store.baseParams.filter.isOrganization;
+						this.storeFilter.setFilter("org", null);
 					} else
 					{
 						var record = view.store.getAt(nodes[0].viewIndex);
-						this.grid.store.baseParams.filter.isOrganization = record.data.inputValue;
-					}
-					this.grid.store.load();
+						this.storeFilter.setFilter("org", {isOrganization: record.data.inputValue});
+					}					
+					this.storeFilter.load();
 				},
 				scope: this
 			}
@@ -328,16 +343,17 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 	},
 
 	setAddressBookId: function (addressBookId) {
-		var s = this.grid.store;
-		delete s.baseParams.filter.groupId;
 		this.addButton.setDisabled(false);
 		if (addressBookId) {
 			this.addAddressBookId = addressBookId;
-			s.baseParams.filter.addressBookId = addressBookId;
+			
+			this.storeFilter.setFilter("addressbooks", {
+				addressBookId: addressBookId
+			});
+			
 		} else
 		{
-			
-			delete s.baseParams.filter.addressBookId;
+			this.storeFilter.setFilter("addressbooks", null);
 			
 			var firstAbNode = this.addressBookTree.getRootNode().childNodes[1];
 			if (firstAbNode) {
@@ -348,19 +364,20 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
 			}
 		}
 		
-		s.load();
+		this.storeFilter.load();
 	},
 
 	setGroupId: function (groupId, addressBookId) {
-		var s = this.grid.store;
-
+	
 		this.addAddressBookId = addressBookId;
 		this.addButton.setDisabled(false);
-
-		s.baseParams.filter.addressBookId = addressBookId;
-		s.baseParams.filter.groupId = groupId;
+		
+		this.storeFilter.setFilter('addressbooks', {
+			addressBookId: addressBookId,
+			groupId: groupId
+		});
 			
-		s.load();
+		this.storeFilter.load();
 	},
 
 	onNodeDragOver: function (e) {

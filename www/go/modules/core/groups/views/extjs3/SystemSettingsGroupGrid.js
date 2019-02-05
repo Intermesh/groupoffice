@@ -36,12 +36,30 @@ go.modules.core.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 			],
 			entityStore: "Group"
 		});
+		
+		this.storeFilter = new go.data.StoreFilter({
+			store: this.store
+		});
 
 		Ext.apply(this, {
 			plugins: [actions],
 			tbar: ['->',
 				{
-					xtype: 'tbsearch'
+					xtype: 'tbsearch',
+					filters: [
+						'q'					
+					],
+					listeners: {
+						scope: this,
+						search: function(btn, query, filters) {
+							this.storeFilter.setFilter("tbsearch", filters);
+							this.storeFilter.load();
+						},
+						reset: function() {
+							this.storeFilter.setFilter("tbsearch", null);
+							this.storeFilter.load();
+						}
+					}
 				}, {
 					iconCls: 'ic-add',
 					tooltip: t('Add'),

@@ -64,19 +64,19 @@ class Group extends AclOwnerEntity {
 	
 	protected static function defineFilters() {
 		return parent::defineFilters()
-						->add('hideUsers', function(Query $query, $value, $filter) {
+						->add('hideUsers', function(Criteria $criteria, $value) {
 							if($value) {
-								$query->andWhere(['isUserGroupFor' => null]);	
+								$criteria->andWhere(['isUserGroupFor' => null]);	
 							}
 						})
-						->add('excludeEveryone', function(Query $query, $value, $filter) {
+						->add('excludeEveryone', function(Criteria $criteria, $value) {
 							if($value) {
-								$query->andWhere('id', '!=', Group::ID_EVERYONE);
+								$criteria->andWhere('id', '!=', Group::ID_EVERYONE);
 							}
 						})
-						->add('excludeAdmins', function(Query $query, $value, $filter) {
+						->add('excludeAdmins', function(Criteria $criteria, $value) {
 							if($value) {
-								$query->andWhere('id', '!=', Group::ID_ADMINS);
+								$criteria->andWhere('id', '!=', Group::ID_ADMINS);
 							}
 						});
 						

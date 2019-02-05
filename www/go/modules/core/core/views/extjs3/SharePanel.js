@@ -76,7 +76,21 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 			},
 			'->', 
 				{
-					xtype: 'tbsearch'
+					xtype: 'tbsearch',
+					filters: [
+						'q'					
+					],
+					listeners: {
+						scope: this,
+						search: function(btn, query, filters) {
+							this.storeFilter.setFilter("tbsearch", filters);
+							this.storeFilter.load();
+						},
+						reset: function() {
+							this.storeFilter.setFilter("tbsearch", null);
+							this.storeFilter.load();
+						}
+					}
 				}				
 			],
 			columns: [
@@ -138,6 +152,10 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 		});
 		
 		this.store.on("beforeload", this.onBeforeStoreLoad, this);
+		
+		this.storeFilter = new go.data.StoreFilter({
+			store: this.store
+		});
 		
 		go.modules.core.core.SharePanel.superclass.initComponent.call(this);
 		
@@ -276,17 +294,20 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 	onBeforeStoreLoad : function(store, options) {
 
 		//don't add selected on search
-		if(store.baseParams.filter.q || options.selectedLoaded || options.paging) {
+		if(this.storeFilter.filters.tbsearch || options.selectedLoaded || options.paging) {
 			return true;
 		}
 		
 		go.Stores.get("Group").get(this.getSelectedGroupIds(), function(entities) {
 			this.store.loadData({records: entities}, true);
 			this.store.sortData();
-			this.store.load({
+			this.storeFilter.setFilter('exclude', {
+				exclude: this.getSelectedGroupIds()
+			});
+			
+			this.storeFilter.load({
 				add: true,
-				selectedLoaded: true,
-				params: {filter: {exclude: this.getSelectedGroupIds()}}
+				selectedLoaded: true
 			});
 		}, this);
 		

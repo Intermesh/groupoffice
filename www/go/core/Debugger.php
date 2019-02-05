@@ -37,8 +37,6 @@ class Debugger {
 	const TYPE_GENERAL = 'general';
 	
 	const TYPE_SQL = 'sql';
-	
-	private $section = self::SECTION_INIT;
 
 	/**
 	 * Sets the debugger on or off
@@ -52,23 +50,6 @@ class Debugger {
 	 */
 	public $logPath;
 	
-	/**
-	 * List of enabled debug sections.
-	 * 
-	 * This controls the output of the debugger so you don't get too much debug 
-	 * info. In most cases developers need just self::SECTION_CONTROLLER
-	 * 
-	 * By default there are:
-	 * 
-	 * `````````````````````````````````````````````````````````````````````
-	 * [self::SECTION_INIT, self::SECTION_ROUTER, self::SECTION_CONTROLLER, self::SECTION_VIEW];
-	 * `````````````````````````````````````````````````````````````````````
-	 * 
-	 * But developers can use any arbitrary string as section
-	 * 
-	 * @var array 
-	 */
-	public $enabledSections = [self::SECTION_INIT, self::SECTION_ROUTER, self::SECTION_CONTROLLER];
 	
 	/**
 	 * List of enabled debug types.
@@ -85,7 +66,7 @@ class Debugger {
 	 * But developers can use any arbitrary string as type
 	 * @var type 
 	 */
-	public $enabledTypes = [self::TYPE_GENERAL, self::TYPE_SQL];
+	public $enabledTypes = [self::TYPE_GENERAL];
 
 	/**
 	 * The debug entries as strings
@@ -115,17 +96,6 @@ class Debugger {
 		return ((float) $usec + (float) $sec);
 	}
 	
-	/**
-	 * Change the section the debugger is in
-	 * 
-	 * {@see self::$enabledSections}
-	 * 
-	 * @param string $section
-	 */
-	public function setSection($section) {
-		$this->section = $section;
-		$this->debug("Start section '" . $section . "'");
-	}
 
 	/**
 	 * Add a debug entry. Objects will be converted to strings with var_export();
@@ -139,7 +109,7 @@ class Debugger {
 	 */
 	public function debug($mixed, $type = self::TYPE_GENERAL, $traceBackSteps = 0) {
 
-		if(!$this->enabled ) {// || !in_array($this->section, $this->enabledSections) || !in_array($type, $this->enabledTypes)) {
+		if(!$this->enabled || !in_array($type, $this->enabledTypes)) {
 			return;
 		}		
 		

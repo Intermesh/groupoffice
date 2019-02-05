@@ -318,13 +318,13 @@ class Link extends Entity {
 	
 	protected static function defineFilters() {
 		return parent::defineFilters()
-						->add('entityId', function (Query $query, $value, array $filter){
-							$query->where('fromId', '=', $value);
+						->add('entityId', function (Criteria $crtiteria, $value){
+							$crtiteria->where('fromId', '=', $value);
 						})
-						->add('entity', function (Query $query, $value, array $filter){
-							$query->where(['eFrom.name' => $value]);		
+						->add('entity', function (Criteria $criteria, $value){
+							$criteria->where(['eFrom.name' => $value]);		
 						})
-						->add('entities', function (Query $query, $value, array $filter){
+						->add('entities', function (Criteria $criteria, $value){
 							// Entity filter consist out of name => "Contact" and an optional "filter" => "isOrganization"
 							if(empty($value)) {
 								return;
@@ -341,7 +341,7 @@ class Link extends Entity {
 								$sub->orWhere($w);
 							}
 
-							$query->where($sub);		
+							$criteria->where($sub);		
 							
 						});
 					

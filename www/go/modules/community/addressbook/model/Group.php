@@ -80,10 +80,8 @@ class Group extends AclItemEntity {
 	}
 
 	protected static function defineFilters() {
-		return parent::defineFilters()->add("addressBookId", function(Query $query, $value) {
-			if(!empty($value)) {
-				$query->andWhere(['addressBookId' => $value]);
-			}
+		return parent::defineFilters()->add("addressBookId", function(Criteria $criteria, $value) {
+			$criteria->andWhere(['addressBookId' => $value]);			
 		});
 	}
 }

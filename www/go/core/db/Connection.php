@@ -36,7 +36,7 @@ class Connection {
 	 * @var PDO
 	 */
 	private $pdo;
-
+	
 	public function __construct($dsn, $username, $password, $options = []) {
 		$this->dsn = $dsn;
 		$this->username = $username;

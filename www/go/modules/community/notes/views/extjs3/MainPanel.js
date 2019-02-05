@@ -20,7 +20,57 @@ go.modules.community.notes.MainPanel = Ext.extend(go.panels.ModulePanel, {
 
 	initComponent: function () {
 
-//		debugger;
+		this.createNoteGrid();
+		this.createNoteBookGrid();	
+
+		this.noteDetail = new go.modules.community.notes.NoteDetail({
+			region: 'center',
+			split: true,
+			tbar: [{
+					cls: 'go-narrow',
+					iconCls: "ic-arrow-back",
+					handler: function () {
+						this.westPanel.show();
+					},
+					scope: this
+				}]
+		});
+
+		this.westPanel = new Ext.Panel({
+			region: "west",
+			layout: "responsive",
+			stateId: "go-notes-west",
+			split: true,
+			width: dp(700),
+			narrowWidth: dp(400), //this will only work for panels inside another panel with layout=responsive. Not ideal but at the moment the only way I could make it work
+			items: [
+				this.noteGrid, //first is default in narrow mode
+				this.noteBookGrid
+			]
+		});
+
+		this.items = [
+			this.westPanel, //first is default in narrow mode
+			this.noteDetail
+		];
+
+		go.modules.community.notes.MainPanel.superclass.initComponent.call(this);
+		
+		
+		this.on("afterrender", this.runModule, this);
+	},
+	
+	runModule : function() {
+		//load note books and select the first
+		this.noteBookGrid.getStore().load({
+			callback: function (store) {
+				this.noteBookGrid.getSelectionModel().selectRow(0);
+			},
+			scope: this
+		});
+	},
+	
+	createNoteBookGrid : function() {
 		this.noteBookGrid = new go.modules.community.notes.NoteBookGrid({
 			region: 'west',
 			cls: 'go-sidenav',
@@ -60,7 +110,10 @@ go.modules.community.notes.MainPanel = Ext.extend(go.panels.ModulePanel, {
 
 		this.noteBookGrid.getSelectionModel().on('selectionchange', this.onNoteBookSelectionChange, this, {buffer: 1}); //add buffer because it clears selection first
 
-
+	},
+	
+	
+	createNoteGrid : function() {
 		this.noteGrid = new go.modules.community.notes.NoteGrid({
 			region: 'center',
 			tbar: [
@@ -75,7 +128,25 @@ go.modules.community.notes.MainPanel = Ext.extend(go.panels.ModulePanel, {
 				},
 				'->',
 				{
-					xtype: 'tbsearch'
+					xtype: 'tbsearch',
+					filters: [
+						'q',
+						'name', 
+						'content',
+						{name: 'modified', multiple: false},
+						{name: 'created', multiple: false}						
+					],
+					listeners: {
+						scope: this,
+						search: function(btn, query, filters) {
+							this.storeFilter.setFilter("tbsearch", filters);
+							this.storeFilter.load();
+						},
+						reset: function() {
+							this.storeFilter.setFilter("tbsearch", null);
+							this.storeFilter.load();
+						}
+					}
 				},
 				this.addButton = new Ext.Button({
 					disabled: true,
@@ -134,51 +205,9 @@ go.modules.community.notes.MainPanel = Ext.extend(go.panels.ModulePanel, {
 		this.noteGrid.on('navigate', function (grid, rowIndex, record) {
 			go.Router.goto("note/" + record.id);
 		}, this);
-
-		this.noteDetail = new go.modules.community.notes.NoteDetail({
-			region: 'center',
-			split: true,
-			tbar: [{
-					cls: 'go-narrow',
-					iconCls: "ic-arrow-back",
-					handler: function () {
-						this.westPanel.show();
-					},
-					scope: this
-				}]
-		});
-
-		this.westPanel = new Ext.Panel({
-			region: "west",
-			layout: "responsive",
-			stateId: "go-notes-west",
-			split: true,
-			width: dp(700),
-			narrowWidth: dp(400), //this will only work for panels inside another panel with layout=responsive. Not ideal but at the moment the only way I could make it work
-			items: [
-				this.noteGrid, //first is default in narrow mode
-				this.noteBookGrid
-			]
-		});
-
-		this.items = [
-			this.westPanel, //first is default in narrow mode
-			this.noteDetail
-		];
-
-		go.modules.community.notes.MainPanel.superclass.initComponent.call(this);
 		
-		
-		this.on("afterrender", this.runModule, this);
-	},
-	
-	runModule : function() {
-		//load note books and select the first
-		this.noteBookGrid.getStore().load({
-			callback: function (store) {
-				this.noteBookGrid.getSelectionModel().selectRow(0);
-			},
-			scope: this
+		this.storeFilter = new go.data.StoreFilter({
+			store: this.noteGrid.store
 		});
 	},
 	
@@ -195,9 +224,9 @@ go.modules.community.notes.MainPanel = Ext.extend(go.panels.ModulePanel, {
 		}, this);
 
 		this.addButton.setDisabled(!this.addNoteBookId);
-
-		this.noteGrid.getStore().baseParams.filter.noteBookId = ids;
-		this.noteGrid.getStore().load();
+		
+		this.storeFilter.setFilter("notebooks", {noteBookId: ids});;
+		this.storeFilter.load();
 	},
 	
 	onNoteGridDblClick : function (grid, rowIndex, e) {
