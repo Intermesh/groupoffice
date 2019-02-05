@@ -90,5 +90,14 @@ class FieldSet extends AclOwnerEntity {
 		
 		return parent::internalDelete();
 	}
+	
+	protected function internalSave() {
+		if(!parent::internalSave()) {
+			return false;
+		}
+		
+		return !$this->isNew() || $this->findAcl()->addGroup(\go\modules\core\groups\model\Group::ID_EVERYONE, \go\core\acl\model\Acl::LEVEL_READ)->save();
+		
+	}
 
 }

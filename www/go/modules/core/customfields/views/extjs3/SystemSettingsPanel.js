@@ -42,9 +42,10 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 				'databaseName',
 				'type',
 				'fieldId',
-				'fieldSetId',
+				'fieldSetId',				
 				{name: 'isFieldSet', type: "boolean"},
-				{name: 'sortOrder', type: "int"}
+				{name: 'sortOrder', type: "int"},
+				"aclId",
 			]
 		});
 
@@ -325,11 +326,25 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 							this.deleteSelected();
 						},
 						scope: this
-					}
+					},
+					this.shareMenuItem = new Ext.menu.Item({
+						
+						iconCls: 'ic-share',
+						text: t("Share"),
+						handler: function () {
+							var shareWindow = new go.modules.core.core.ShareWindow({
+								title: t("Share") + ": " + this.moreMenu.record.data.name
+							});
+
+							shareWindow.load(this.moreMenu.record.data.aclId).show();
+						},
+						scope: this
+					})
 				]
 			});
 		}
 
+		this.shareMenuItem.setVisible(record.data.isFieldSet);
 		this.moreMenu.record = record;
 
 		this.moreMenu.showAt(e.getXY());
@@ -440,7 +455,8 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 						null,
 						fs.id,
 						true,
-						fs.sortOrder * 100000
+						fs.sortOrder * 100000,
+						fs.aclId
 					]);
 
 					fsSortOrderMap[fs.id] = fs.sortOrder * 100000;
@@ -473,7 +489,8 @@ go.modules.core.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel,
 							f.id,
 							f.fieldSetId,
 							false,
-							f.sortOrder + fsSortOrderMap[f.fieldSetId]
+							f.sortOrder + fsSortOrderMap[f.fieldSetId],
+							null
 						]);
 					});
 
