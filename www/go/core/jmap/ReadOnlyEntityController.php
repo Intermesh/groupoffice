@@ -70,8 +70,6 @@ abstract class ReadOnlyEntityController extends Controller {
 
 		$this->applyFilterCondition($params['filter'], $query);
 		
-		GO()->getDebugger()->debug((string) $query);
-		
 		return $query;
 	}
 	

@@ -385,7 +385,7 @@ class EntityType {
 	 */
 	public function getHighestUserModSeq() {
 		if(!isset($this->highestUserModSeq)) {
-		$this->highestUserModSeq = (int) (new Query())
+			$this->highestUserModSeq = (int) (new Query())
 						->selectSingleValue("highestModSeq")
 						->from("core_change_user_modseq")
 						->where(["entityTypeId" => $this->id, "userId" => GO()->getUserId()])
