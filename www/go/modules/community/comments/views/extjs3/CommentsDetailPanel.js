@@ -114,8 +114,14 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	},
 
 	onLoad: function (dv) {
-		this.entityId = dv.model_id ? dv.model_id : dv.currentId ;//model_id is from old display panel
-		this.entity = dv.entity || dv.model_name || dv.entityStore.entity.name;
+		var id = dv.model_id ? dv.model_id : dv.currentId; //model_id is from old display panel
+		var type = dv.entity || dv.model_name || dv.entityStore.entity.name;
+		if(this.entityId === id) {
+			return;
+		}
+		
+		this.entityId = id;
+		this.entity = type;
 		this.composer.initEntity(this.entityId, this.entity);
 		
 		this.store.load({
