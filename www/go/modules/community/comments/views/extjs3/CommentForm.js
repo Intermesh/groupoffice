@@ -1,8 +1,7 @@
 go.modules.comments.CommentForm = Ext.extend(go.form.Dialog, {
 	stateId: 'comments-commentForm',
 	title: t("Comment", "comments"),
-	entityStore: go.Stores.get("Comment"),
-	closeAction:'hide',
+	entityStore: go.Stores.get("Comment"),	
 	width: 600,
 	height: 500,
 	
