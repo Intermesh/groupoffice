@@ -152,6 +152,11 @@ GO.cron.CronGrid = Ext.extend(GO.grid.GridPanel,{
 					dataIndex: 'completedat',
 					sortable: true,
 					width: dp(140)
+				},{
+					header: t("Error", "cron"),
+					dataIndex: 'error',
+					maxLength:20,
+					renderer: GO.grid.ColumnRenderers.Text
 				}
 				]
 			})
