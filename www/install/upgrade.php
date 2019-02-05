@@ -45,14 +45,16 @@ try {
 		echo '<a class="button" href="../">Continue</a>';
 
 		if(GO()->getDebugger()->enabled) {
-			echo "<div style=\"clear:both;margin-bottom:20px;\"></div><div class=\"card\"><h2>Debugger output</h2><pre>" . implode("\n", GO()->getDebugger()->getEntries()) . "</pre></div>";
+			echo "<div style=\"clear:both;margin-bottom:20px;\"></div><div class=\"card\"><h2>Debugger output</h2><pre>" ;
+			GO()->getDebugger()->printEntries();
+			echo "</pre></div>";
 		}
 
 		echo "</section>";
 
 	} 
 } catch (Exception $e) {
-	echo "<b>Error:</b> ". ErrorHandler::logException($e)."\n\n";;
+	echo "<b>Error:</b> ". ErrorHandler::logException($e)."\n\n";
 	
 	echo $e->getTraceAsString();
 	
@@ -61,9 +63,7 @@ try {
 	if(GO()->getDebugger()->enabled) {
 		echo "<div style=\"clear:both;margin-bottom:20px;\"></div><div class=\"card\"><h2>Debugger output</h2><pre>";
 		
-		foreach(GO()->getDebugger()->getEntries() as $line) {
-			echo $line ."\n";
-		}
+		GO()->getDebugger()->printEntries();
 		
 		echo "</pre></div>";
 	}
