@@ -232,7 +232,7 @@ class Debugger {
 	 * Print all entries
 	 */
 	public function printEntries() {
-		echo implode("\n", $this->entries);
+		echo implode("\n", array_map(function($e){return $e[1];}, $this->entries));
 	}
 	
 	/**
