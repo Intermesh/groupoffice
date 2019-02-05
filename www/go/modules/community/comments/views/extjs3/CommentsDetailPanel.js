@@ -43,8 +43,6 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				}, this);
 				
 			}, this);
-							
-		go.flux.Dispatcher.register(this);
 		
 		this.contextMenu = new Ext.menu.Menu({
 			items:[{
@@ -103,12 +101,6 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			
 		go.modules.comments.CommentsDetailPanel.superclass.initComponent.call(this);
 
-	},
-	
-	receive: function(action) {
-		if(action.type === "User/getUpdates") {
-			this.updateView();
-		}
 	},
 
 	onLoad: function (dv) {
