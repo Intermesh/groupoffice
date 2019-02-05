@@ -53,10 +53,10 @@ class Comment extends Entity {
 	
 	protected static function defineFilters() {
 		return parent::defineFilters()
-			->add('entityId', function(Query $query, $value, array $filter) {
-				$query->where('t.entityId', '=', $value);
-			})->add('entity', function(Query $query, $value, array $filter) {
-				$query->where(['e.name' => $value]);	
+			->add('entityId', function(\go\core\db\Criteria $criteria, $value) {
+				$criteria->where('t.entityId', '=', $value);
+			})->add('entity', function(\go\core\db\Criteria $criteria, $value) {
+				$criteria->where(['e.name' => $value]);	
 			});
 	}
 	

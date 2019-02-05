@@ -47,12 +47,9 @@ go.modules.core.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 			],
 			entityStore: "Group"
 		});
+
 		
-		this.storeFilter = new go.data.StoreFilter({
-			store: this.store
-		});
-		
-		this.storeFilter.set("base", {
+		this.store.setFilter("base", {
 					excludeEveryone: true,
 					hideUsers: true
 				});		
@@ -64,18 +61,7 @@ go.modules.core.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 					xtype: 'tbsearch',
 					filters: [
 						'q'					
-					],
-					listeners: {
-						scope: this,
-						search: function(btn, query, filters) {
-							this.storeFilter.setFilter("tbsearch", filters);
-							this.storeFilter.load();
-						},
-						reset: function() {
-							this.storeFilter.setFilter("tbsearch", null);
-							this.storeFilter.load();
-						}
-					}
+					]
 				}				
 			],
 			columns: [

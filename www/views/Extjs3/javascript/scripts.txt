@@ -239,7 +239,6 @@ views/Extjs3/javascript/go/data/JmapProxy.js
 views/Extjs3/javascript/go/data/EntityStoreProxy.js
 views/Extjs3/javascript/go/data/Store.js
 views/Extjs3/javascript/go/data/GroupingStore.js
-views/Extjs3/javascript/go/data/StoreFilter.js
 
 views/Extjs3/javascript/go/data/EntityStore.js
 views/Extjs3/javascript/go/EntityManager.js

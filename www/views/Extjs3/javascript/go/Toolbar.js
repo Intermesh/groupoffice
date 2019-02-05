@@ -76,11 +76,10 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 		if(this.store) {
 			this.on({
 				scope: this,
-				search: function (tb, v) {
+				search: function (tb, v, filters) {
 					if(this.store instanceof go.data.Store || this.store instanceof go.data.GroupingStore) {
-						
-						//Do nothing. You must use the search event to filter the store using go.data.StoreFilter.
-						// See addressbook MainPanel	
+					
+						this.store.setFilter('tbsearch', filters).load();
 						
 					} else {
 						//params for old framework
@@ -92,8 +91,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 				},
 				reset: function() {
 					if(this.store instanceof go.data.Store) {
-						//Do nothing. You must use the search event to filter the store using go.data.StoreFilter.
-						// See addressbook MainPanel	
+						this.store.setFilter('tbsearch', null).load();
 					} else {
 						delete this.store.baseParams.query;
 					}

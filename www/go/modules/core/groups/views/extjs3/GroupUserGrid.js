@@ -64,10 +64,6 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 			},
 			entityStore: "User"
 		});
-		
-		this.storeFilter = new go.data.StoreFilter({
-			store: this.store
-		});
 
 		Ext.apply(this, {		
 			plugins: [checkColumn],
@@ -80,18 +76,7 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 					xtype: 'tbsearch',
 					filters: [
 						'q'					
-					],
-					listeners: {
-						scope: this,
-						search: function(btn, query, filters) {
-							this.storeFilter.setFilter("tbsearch", filters);
-							this.storeFilter.load();
-						},
-						reset: function() {
-							this.storeFilter.setFilter("tbsearch", null);
-							this.storeFilter.load();
-						}
-					}
+					]
 				}			
 			],
 			columns: [
@@ -170,7 +155,7 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 	
 	onBeforeStoreLoad : function(store, options) {
 		//don't add selected on search, or when they are already loaded or when gridpanel is trying to fill the page.
-		if(this.storeFilter.filters.tbsearch || options.selectedLoaded || options.paging) {
+		if(this.store.filters.tbsearch || options.selectedLoaded || options.paging) {
 			return true;
 		}
 		
@@ -178,11 +163,11 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 			this.store.loadData({records: entities}, true);
 			this.store.sortData();
 			
-			this.storeFilter.setFilter('exclude', {
+			this.store.setFilter('exclude', {
 				exclude: this.geselectedUsers
 			});
 			
-			this.storeFilter.load({
+			this.store.load({
 				add: true,
 				selectedLoaded: true
 			});

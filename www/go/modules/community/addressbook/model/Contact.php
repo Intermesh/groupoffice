@@ -337,7 +337,7 @@ class Contact extends AclItemEntity {
 	protected static function defineFilters() {
 
 		return parent::defineFilters()
-										->add("addressBookId", function(Criteria $criteria, $value, $filter) {
+										->add("addressBookId", function(Criteria $criteria, $value) {
 											$criteria->andWhere('addressBookId', '=', $value);
 										})
 										->add("groupId", function(Criteria $criteria, $value, Query $query) {

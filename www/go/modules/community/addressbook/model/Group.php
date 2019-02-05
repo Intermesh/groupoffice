@@ -2,6 +2,7 @@
 namespace go\modules\community\addressbook\model;
 
 use go\core\acl\model\AclItemEntity;
+use go\core\db\Criteria;
 use go\core\db\Query;
 use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\addressbook\model\Contact;

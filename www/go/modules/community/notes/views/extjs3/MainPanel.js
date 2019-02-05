@@ -135,18 +135,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.panels.ModulePanel, {
 						'content',
 						{name: 'modified', multiple: false},
 						{name: 'created', multiple: false}						
-					],
-					listeners: {
-						scope: this,
-						search: function(btn, query, filters) {
-							this.storeFilter.setFilter("tbsearch", filters);
-							this.storeFilter.load();
-						},
-						reset: function() {
-							this.storeFilter.setFilter("tbsearch", null);
-							this.storeFilter.load();
-						}
-					}
+					]
 				},
 				this.addButton = new Ext.Button({
 					disabled: true,
@@ -206,9 +195,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.panels.ModulePanel, {
 			go.Router.goto("note/" + record.id);
 		}, this);
 		
-		this.storeFilter = new go.data.StoreFilter({
-			store: this.noteGrid.store
-		});
+	
 	},
 	
 	onNoteBookSelectionChange : function (sm) {
@@ -225,8 +212,8 @@ go.modules.community.notes.MainPanel = Ext.extend(go.panels.ModulePanel, {
 
 		this.addButton.setDisabled(!this.addNoteBookId);
 		
-		this.storeFilter.setFilter("notebooks", {noteBookId: ids});;
-		this.storeFilter.load();
+		this.noteGrid.store.setFilter("notebooks", {noteBookId: ids});;
+		this.noteGrid.store.load();
 	},
 	
 	onNoteGridDblClick : function (grid, rowIndex, e) {

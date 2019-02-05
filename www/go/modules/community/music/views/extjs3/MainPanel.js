@@ -61,18 +61,7 @@ go.modules.community.music.MainPanel = Ext.extend(go.panels.ModulePanel, {
 						'name', 
 						{name: 'modified', multiple: false},
 						{name: 'created', multiple: false}						
-					],
-					listeners: {
-						scope: this,
-						search: function(btn, query, filters) {
-							this.storeFilter.setFilter("tbsearch", filters);
-							this.storeFilter.load();
-						},
-						reset: function() {
-							this.storeFilter.setFilter("tbsearch", null);
-							this.storeFilter.load();
-						}
-					}
+					]
 				},
 
 				// add button for creating new artists
@@ -106,10 +95,7 @@ go.modules.community.music.MainPanel = Ext.extend(go.panels.ModulePanel, {
 				scope: this
 			}
 		});
-		
-		this.storeFilter = new go.data.StoreFilter({
-			store: this.artistGrid.store
-		});
+	
 
 		// Every entity automatically configures a route. Route to the entity when selecting it in the grid.
 		this.artistGrid.on('navigate', function (grid, rowIndex, record) {
@@ -169,11 +155,11 @@ go.modules.community.music.MainPanel = Ext.extend(go.panels.ModulePanel, {
 		var selectedRecords = sm.getSelections(),
 						ids = selectedRecords.column('id'); //column is a special GO method that get's all the id's from the records in an array.
 
-		this.storeFilter.setFilter('genres', {
+		this.artistGrid.store.setFilter('genres', {
 			genres: ids
 		});
 		
-		this.storeFilter.load();
+		this.artistGrid.store.load();
 	},
 
 	// Fired when the module panel is rendered.

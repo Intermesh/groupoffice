@@ -62,7 +62,9 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
         
 		
 		this.setup();
-	
+		
+		//JMAP remote filters. Used by setFilter()
+		this.filters = {};
 	},
 	
 	loadData : function(o, append){
@@ -263,6 +265,33 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 				},this);
 			}
 		}
+	},
+	
+	/**
+	 * Set a filter obkect for a component
+	 * 
+	 * @param {string} cmpId
+	 * @param {object} filter
+	 * @returns {this}
+	 */
+	setFilter : function(cmpId, filter) {
+		if(filter === null) {
+			delete this.filters[cmpId];
+		} else
+		{
+			this.filters[cmpId] = filter;
+		}		
+		
+		this.baseParams.filter = {
+			operator: "AND",
+			conditions: []
+		};
+		
+		for(var cmpId in this.filters) {
+			this.baseParams.filter.conditions.push(this.filters[cmpId]);
+		}
+		
+		return this;
 	}
 	
 //	onUpdate : function(store, record, operation) {

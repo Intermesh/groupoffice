@@ -112,7 +112,7 @@ class Filters {
 	/**
 	 * Add date filter.
 	 * 
-	 * Supports ranges. For example last week..now,  >=last year, >=2019-01-01
+	 * Supports ranges. For example last week..now,  >last year, >2019-01-01
 	 * 
 	 * Values are converted to DateTime objects. Supports all strtotime formats as input.
 	 * 
