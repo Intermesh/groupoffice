@@ -14,17 +14,22 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 		if (value && this.store.entityStore && this.store.entityStore.entity && !this.findRecord(me.valueField, value)) {
 			this.store.entityStore.get([value], function (entities) {
 
+				var data = {};
 				if (!entities[0]) {
-					console.warn("Invalid entity ID '" + value + "' for entity store '" + this.store.entityStore.entity.name + "'");
-					return;
+					//console.warn("Invalid entity ID '" + value + "' for entity store '" + this.store.entityStore.entity.name + "'");
+					//Set all record keys to prevent errors in XTemplates
+					this.store.fields.keys.forEach(function(key) {
+						data[key] = null;
+					});
+					data[me.valueField] = value;
+					data[me.displayField] = t("Not found or no access!");
+				} else
+				{
+					data = entities[0];
 				}
 
-				var comboRecord = Ext.data.Record.create([{
-						name: me.valueField
-					}, {
-						name: me.displayField
-					}]);
-				var currentRecord = new comboRecord(entities[0], entities[0][me.valueField]);
+				var comboRecord = Ext.data.Record.create(this.store.fields);
+				var currentRecord = new comboRecord(data, data[me.valueField]);
 
 				me.store.add(currentRecord);
 
