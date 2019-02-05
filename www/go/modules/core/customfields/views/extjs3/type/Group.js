@@ -33,11 +33,14 @@ go.modules.core.customfields.type.Group = Ext.extend(go.modules.core.customfield
 		}
 		
 		go.Stores.get("Group").get([value], function(groups) {
+			var displayValue;
 			if(!groups[0]) {
-				console.warn("Group not found for ID: " + value);
-				return;
+				displayValue = t("Not found or no access");
+			} else
+			{
+				displayValue = groups[0].name;
 			}
-			cmp.setValue(groups[0].name);
+			cmp.setValue(displayValue);
 			cmp.setVisible(true);
 		});
 		
