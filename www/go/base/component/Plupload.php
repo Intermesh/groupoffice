@@ -28,7 +28,7 @@ class Plupload {
 		$fileName = isset($_POST["name"]) ? $_POST["name"] : '';
 
 // Clean the fileName for security reasons
-		$fileName = \GO\Base\Fs\File::stripInvalidChars($fileName);
+		$fileName = \go\core\util\StringUtil::normalize(\GO\Base\Fs\File::stripInvalidChars($fileName));
 
 // Make sure the fileName is unique but only if chunking is disabled
 //		if ($chunks < 2 && file_exists($targetDir . DIRECTORY_SEPARATOR . $fileName)) {

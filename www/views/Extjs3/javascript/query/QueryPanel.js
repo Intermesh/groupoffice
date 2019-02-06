@@ -6,6 +6,14 @@ GO.query.QueryPanel = Ext.extend(Ext.Panel , {
 	layout: 'anchor',
 	style: {overflow: 'auto'},
 
+//	initComponent : function(){
+//		GO.query.QueryPanel.superclass.initComponent.call(this);
+//
+//		this.addEvents(
+//			'createNew'
+//		);
+//	},
+//	
 	constructor: function (config) {
 		config = config || {};
 		
@@ -38,6 +46,12 @@ GO.query.QueryPanel = Ext.extend(Ext.Panel , {
 		
 		//add furst criteri item
 		config.title = t("New");
+		config.tools= [{
+				id:'add',
+				handler:this.onCreateNew,
+				qtip:t('Create new query'),
+				scope:this
+		}];
 		config.tbar = [
 			new Ext.Button({
 				iconCls: 'ic-add',
@@ -78,6 +92,11 @@ GO.query.QueryPanel = Ext.extend(Ext.Panel , {
 		
 	},
 	
+	onCreateNew : function(){
+		this.fireEvent('createNew', this);
+		this.reset();
+		this.newCriteria();
+	},
 	
 	afterRender: function () {
 		

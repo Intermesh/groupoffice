@@ -1339,6 +1339,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		
 		ini_set('max_execution_time', 600);
 		ini_set('memory_limit', '512M');
+		GO::session()->closeWriting();
 		
 		$sources = json_decode($params['sources'], true);
 		

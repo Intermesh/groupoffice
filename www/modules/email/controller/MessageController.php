@@ -527,7 +527,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 				$attributes['path'] = $path;
 
-				$attributes['time'] = $message->getDate()->format('U');
+				$date = $message->getDate();
+								
+				$attributes['time'] = $date ? $date->format('U') : time();
 				$attributes['uid']= '<'.$message->getId().'>';// $alias->email.'-'.$message->getDate();
 
 				$linkedModels = new \go\core\util\ArrayObject();

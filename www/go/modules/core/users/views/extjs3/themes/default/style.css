@@ -9,3 +9,7 @@
 .go-module-icon-password { /* for auth methods */
 	background-image:url('images/key.png') !important;
 }
+
+.go-user-disabled {
+	opacity: .6;
+}

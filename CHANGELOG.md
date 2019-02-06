@@ -1,13 +1,29 @@
-- Assistant: base64 encode paths so that it works with UTF-8 on all platforms and browsers. Assistant 1.0.4 is required!
+- Core: Normalize UTF8 filename on upload. fix for broken upload funxtion with utf8 filenames
 
-28-01-2018 6.3.60
+04-02-2019 6.3.62
+- Core: Auth should give 401 response and not 403 on bad login
+- Calendar: Fixed calendar grid render issue when events didn't have a gap between them
+- Core: Implemented 'calculateTotal' param for jmap to improve performance on query requests. (global search)
+- Billing: No search button in select product catalog
+- Core: Added "new" button for advanced search window.
+
+31-01-2019 6.3.61
+- Core: Request SSL check works when server is behind proxy too
+- Core: Listeners relied on cache to be persistent causing missing properties "taskSettings" and "googleauthenticator"
+- Assistant: base64 encode paths so that it works with UTF-8 on all platforms and browsers. 
+
+  *** Assistant 1.0.4 is required after this upgade ***
+
+  https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-device.html
+
+28-01-2019 6.3.60
 - Files: clear shared folder cache so incorrect structures will be rebuilt automatically.
 - Projects: Incorrect fee when copied from activity type
 - Sieve: Was inactive because of invalid permission check
 - Core: Added missing index on core_search.keywords
 - Contacts: Added ID column to merge dialog (default hidden)
 
-22-01-2018 6.3.59
+22-01-2019 6.3.59
 - Mailserver: Server client module works again
 - E-mail: Fixed Email Attachment wiggle #275
 - E-mail: Fixed Sieve issue #268

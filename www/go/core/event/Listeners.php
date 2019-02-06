@@ -22,12 +22,7 @@ use go\core\Singleton;
  */
 class Listeners extends Singleton {
 
-	protected function __construct() {
-		parent::__construct();
-		
-		$this->listeners = App::get()->getCache()->get('listeners');
-	}
-	
+
 	/**
 	 * Add an event listener
 	 * 
@@ -42,9 +37,7 @@ class Listeners extends Singleton {
 		if (!isset($this->listeners[$firingClass][$event])) {
 			$this->listeners[$firingClass][$event] = [];
 		}
-		$this->listeners[$firingClass][$event][] = [$listenerClass, $method];
-
-		
+		$this->listeners[$firingClass][$event][] = [$listenerClass, $method];		
 	}
 
 	/**
@@ -53,11 +46,6 @@ class Listeners extends Singleton {
 	 * Then stores all these listeners in the cache.
 	 */
 	public function init() {
-
-
-		//create lock. If another user is already doing this we should not save to cache.
-		$lock = new  \go\core\util\Lock("listeners");
-		$lockObtained = $lock->lock();		
 
 		$this->listeners = [];
 
@@ -95,9 +83,7 @@ class Listeners extends Singleton {
 		//disable events to prevent recursion
 		EventEmitterTrait::$disableEvents = false;
 		
-		if($lockObtained) {
-			App::get()->getCache()->set('listeners', $this->listeners);		
-		}
+		App::get()->getCache()->set('listeners', $this->listeners);		
 	}
 
 	/**
@@ -109,6 +95,14 @@ class Listeners extends Singleton {
 	 * @return boolean
 	 */
 	public function fireEvent($calledClass, $traitUser, $event, $args) {	
+		
+		if(!isset($this->listeners)) {
+			$this->listeners = App::get()->getCache()->get('listeners');
+
+			if(!$this->listeners) {
+				$this->init();
+			}
+		}
 		if (isset($this->listeners[$calledClass][$event])) {
 			foreach ($this->listeners[$calledClass][$event] as $listener) {	
 				$return = call_user_func_array($listener, $args);

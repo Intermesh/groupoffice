@@ -28,6 +28,11 @@ class StringUtil {
 		return $crlf != "\n" ? str_replace("\n", $crlf, $text) : $text;
 	}
 	
+	
+	public static function normalize($text) {
+		return \Normalizer::normalize($text, \Normalizer::FORM_D);
+	}
+	
 	  /**
 	 * Converts any "CamelCased" into an "underscored_word".
 	 * @param string $camelCasedString the word(s) to underscore

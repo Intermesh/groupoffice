@@ -43,7 +43,11 @@
 }
 
 .cal-display-panel .x-toolbar table{
-	float:right;
+	float:right;	
+}
+
+.cal-display-panel * {
+	box-sizing: content-box;
 }
 
 #availability_date{
@@ -272,7 +276,7 @@ background-color: #F1F1F1 !important;
 
 .x-calGrid-timeHead{
 	background-color:#fff;
-	width:40px !important;
+	width:39px !important;
 	height:20px;
 	border-top:1px solid #DDDDDD;
 	border-right:1px solid #DDDDDD;

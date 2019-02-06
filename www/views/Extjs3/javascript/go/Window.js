@@ -9,11 +9,13 @@ go.Window = Ext.extend(Ext.Window, {
 	initComponent : function(){
 		
 		//make sure window fits screen
-		if(this.width && this.width > window.innerWidth) {
-			this.width = window.innerWidth - dp(32);
-		}		
-		if(this.height && this.height > window.innerHeight) {
-			this.height = window.innerHeight	- dp(32);
+		if(!this.maximized) {
+			if(this.width && this.width > window.innerWidth) {
+				this.width = window.innerWidth - dp(32);
+			}		
+			if(this.height && this.height > window.innerHeight) {
+				this.height = window.innerHeight	- dp(32);
+			}
 		}
 		
 		go.Window.superclass.initComponent.call(this);

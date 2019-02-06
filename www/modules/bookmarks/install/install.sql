@@ -30,5 +30,5 @@ CREATE TABLE IF NOT EXISTS `bm_categories` (
 	`show_in_startmenu` BOOLEAN NOT NULL DEFAULT FALSE,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
-
+ALTER TABLE `bm_categories` ADD INDEX `show_in_startmenu` (`show_in_startmenu`);
 -- --------------------------------------------------------
