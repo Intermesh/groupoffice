@@ -1219,8 +1219,9 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 			//login as demo				
 			\GO::session()->restart();
 			\GO::session()->setCurrentUser($demo->id);
-
-			$this->redirect();
+			
+			header('Location: ' .GO()->getSettings()->URL);
+			exit();
 		}		
 	}
 	
