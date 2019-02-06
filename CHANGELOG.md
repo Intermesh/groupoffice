@@ -1,4 +1,6 @@
-- Core: Normalize UTF8 filename on upload. fix for broken upload funxtion with utf8 filenames
+- Core: Normalize UTF8 filename on upload. Fix for broken upload function with utf8 filenames.
+- Core: Normalize problem with sync filesystem and filenames in different utf8 encoding.
+- Core: Fixed problem with invalid redirect after installing demo data
 
 04-02-2019 6.3.62
 - Core: Auth should give 401 response and not 403 on bad login
