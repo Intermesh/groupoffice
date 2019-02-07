@@ -1,4 +1,4 @@
-go.modules.core.modules.PermissionWindow = Ext.extend(GO.Window,{
+go.modules.core.modules.PermissionsWindow = Ext.extend(GO.Window,{
 	
 	module_id : '',
 	initComponent : function(){
@@ -45,13 +45,13 @@ go.modules.core.modules.PermissionWindow = Ext.extend(GO.Window,{
 				  
 		});
 		
-		go.modules.core.modules.PermissionWindow.superclass.initComponent.call(this);
+		go.modules.core.modules.PermissionsWindow.superclass.initComponent.call(this);
 	},
 	show: function(moduleId, name, acl_id) {
 		this.module_id=moduleId;
 		
 		this.setTitle(t("Permissions") + ' ' + name);		
-		go.modules.core.modules.PermissionWindow.superclass.show.call(this);		
+		go.modules.core.modules.PermissionsWindow.superclass.show.call(this);		
 		this.permissionsTab.setAcl(acl_id);		
 	}
 })
