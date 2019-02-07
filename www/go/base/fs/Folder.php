@@ -118,6 +118,15 @@ class Folder extends Base {
 		}
 	}
 	
+	/**
+	 * Rename on folder with contents fails so do a move.
+	 * 
+	 * @param string $name
+	 * @return bool
+	 */
+	public function rename($name) {
+		return $this->move($this->parent(), $name);
+	}	
 	
 	/**
 	 * Move the folder to another folder.

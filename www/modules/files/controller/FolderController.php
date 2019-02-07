@@ -982,7 +982,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 
 		$currentPath = $folder->path;
-		$newPath = rtrim($model->buildFilesPath(),'.');
+		$newPath = \go\core\util\StringUtil::normalize(rtrim($model->buildFilesPath(),'.'));
 		
 
 		if(!$newPath)
@@ -1089,7 +1089,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 	private function _createNewModelFolder(\GO\Base\Db\ActiveRecord $model) {
 
 		GO::debug("Create new model folder ".$model->className()."(ID:".$model->id.")");
-		$filesPath = rtrim($model->buildFilesPath(),'.');
+		$filesPath = \go\core\util\StringUtil::normalize(rtrim($model->buildFilesPath(),'.'));
 		$folder = \GO\Files\Model\Folder::model()->findByPath($filesPath,true, array('acl_id'=>$model->findAclId(),'readonly'=>1));
 		
 		if(!$folder){

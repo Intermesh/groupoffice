@@ -30,7 +30,11 @@ class StringUtil {
 	
 	
 	public static function normalize($text) {
-		return \Normalizer::normalize($text, \Normalizer::FORM_D);
+		return \Normalizer::normalize($text, \Normalizer::FORM_C);
+	}
+	
+	public static function isNormalized($text) {
+		return \Normalizer::isNormalized($text, \Normalizer::FORM_C);
 	}
 	
 	  /**
@@ -579,5 +583,21 @@ END;
 	 */
 	public static function explodeSearchExpression($expression) {
 		return preg_split("/[\s,]*\\\"([^\\\"]+)\\\"[\s,]*|" . "[\s,]*'([^']+)'[\s,]*|" . "[\s,]+/", $expression, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+	}
+	
+	
+	public static function debugUTF8($str) {
+		
+		if(!\Normalizer::isNormalized($str, \Normalizer::FORM_D)) {
+			echo "Is not FORM D\n";
+		}
+		
+		$ord = "";
+		for ( $pos=0, $l = strlen($str); $pos < $l; $pos ++ ) {
+		 $byte = substr($str, $pos);
+		 $ord .= " U+" . ord($byte);
+		}
+		
+		echo $ord . "\n";
 	}
 }

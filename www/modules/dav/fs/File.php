@@ -24,7 +24,7 @@ class File extends \Sabre\DAV\FS\File {
 
 	public function __construct($path) {
 
-		$this->relpath = \Normalizer::normalize($path, \Normalizer::FORM_D);
+		$this->relpath = \go\core\util\StringUtil::normalize($path);
 		$path = \GO::config()->file_storage_path . $this->relpath ;
 
 		parent::__construct($path);

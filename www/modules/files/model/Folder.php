@@ -290,6 +290,9 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	}
 
 	protected function getFsFolder() {
+		
+		//\go\core\util\StringUtil::debugUTF8($this->path);
+		
 		return new \GO\Base\Fs\Folder(\GO::config()->file_storage_path . $this->path);
 	}
 
@@ -354,11 +357,16 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	
 	public function checkNormalization() {
 		
-		if(!\Normalizer::isNormalized($this->name, \Normalizer::FORM_D)) {
-			\GO::debug("Normalizing $this->id to Unicode Form D");
+		if(!\go\core\util\StringUtil::isNormalized($this->name)) {
+			\GO::debug("Normalizing $this->id to Unicode Form C");
 			
-			$name = \Normalizer::normalize($this->name, \Normalizer::FORM_D);		
-			$this->getFsFolder()->rename($name);
+			$name = \go\core\util\StringUtil::normalize($this->name);		
+			
+			$this->_path = null;
+			
+			if($this->getFsFolder()->exists()) {
+				$this->getFsFolder()->rename($name);
+			}
 			
 			if(!$this->getIsNew()) {
 				GO()->getDbConnection()->update('fs_folders',['name' => $name], ['id' => $this->id])->execute();
