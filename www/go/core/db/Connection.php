@@ -37,6 +37,13 @@ class Connection {
 	 */
 	private $pdo;
 	
+	/**
+	 * Output all SQL to the debugger
+	 * 
+	 * @var bool 
+	 */
+	public $debug = false;
+	
 	public function __construct($dsn, $username, $password, $options = []) {
 		$this->dsn = $dsn;
 		$this->username = $username;
@@ -112,7 +119,9 @@ class Connection {
 	 * @return PDOStatement
 	 */
 	public function query($sql) {
-		\go\core\App::get()->getDebugger()->debug($sql);
+		if($this->debug) {
+			\go\core\App::get()->getDebugger()->debug($sql);
+		}
 		return $this->getPdo()->query($sql);
 	}
 
@@ -415,14 +424,10 @@ class Connection {
 	 * @throws PDOException
 	 */
 	public function createStatement($build) {
-		if(isset($build['debug'])) {
-			App::get()->debug($build['debug']);
+		
+		if($this->debug) {
+			GO()->debug(QueryBuilder::debugBuild($build));			
 		}
-
-//		Code is useful to find where a query was made.
-//		if(strpos($debugQueryString, "SELECT t.userId, t.secret, t.createdAt, t.userId AS `t.userId") === 0 ) {
-//			GO()->getDebugger()->debugCalledFrom();
-//		}
 
 		$stmt = $this->getPDO()->prepare($build['sql']);
 

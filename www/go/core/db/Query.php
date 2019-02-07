@@ -429,7 +429,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 		$queryBuilder->debug = true;
 		$build = $queryBuilder->buildSelect($this);
 		
-		return $build['debug'];
+		return $queryBuilder->debugBuild($build);
 	}
 	
 	/**
@@ -452,7 +452,12 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 		return $this;
 	}
 	
-	private function getDbConnection() {
+	/**
+	 * Get the database connection
+	 * 
+	 * @return \go\core\db\Connection
+	 */
+	public function getDbConnection() {
 		if(!isset($this->dbConn)) {
 			$this->dbConn = App::get()->getDbConnection();
 		}
@@ -478,10 +483,9 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 			if (!$stmt->execute()) {
 				return false;
 			}
-		} catch(\Exception $e) {
-			if(!empty($build['debug'])) {				
-				GO()->debug("SQL FAILED: " . $build['debug']);
-			}
+		} catch(\Exception $e) {				
+			GO()->error("SQL FAILED: " . $queryBuilder->debugBuild($build));
+			
 			throw $e;
 		}
 		return $stmt;
