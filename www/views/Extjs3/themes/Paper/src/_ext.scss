@@ -2222,6 +2222,7 @@ $menuScrollerSize : dp(4);
 .x-window{
 	background-color:color($bg,'dialog');
 	border-radius: $borderRadius;
+	overflow:hidden;
 	//border: 1px solid color($fg, 'line');
 	&-footer.x-panel-btns {
 		padding: dp(8);
