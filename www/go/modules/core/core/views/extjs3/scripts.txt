@@ -1,3 +1,9 @@
 Module.js
 SharePanel.js
 ShareWindow.js
+Stores.js
+CronDialog.js
+ParametersPanel.js
+PeriodGrid.js
+SystemSettingsCronGrid.js
+SystemSettingsTools.js

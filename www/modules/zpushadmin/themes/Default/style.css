@@ -1,5 +1,5 @@
-.go-module-icon-zpushadmin , .go-menu-icon-zpushadmin{
-	background:url('images/zpushadmin.png');
+.go-module-icon-zpushadmin , .go-menu-icon-zpushadmin {
+	background-image: url('images/zpushadmin.png') !important;
 }
 
 .go-tab-icon-zpushadmin {
