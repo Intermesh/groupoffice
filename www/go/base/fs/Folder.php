@@ -92,7 +92,6 @@ class Folder extends Base {
 		\GO::debug("DELETE: ".$this->path());
 		
 		if(!$this->exists()) {
-			\GO::debug("NOTEXIST: ".$this->path());
 			return true;
 		}
 		
@@ -128,7 +127,6 @@ class Folder extends Base {
 	 */
 	public function rename($name) {
 		
-		\GO::debug("Rename ". $this->name() . ' -> '. $name);
 		
 		if($this->move($this->parent(), $name)) {
 			$this->path = dirname($this->path).'/'.$name;
@@ -144,10 +142,7 @@ class Folder extends Base {
 	 * @param boolean $appendNumberToNameIfDestinationExists Rename the folder like "folder (1)" if it already exists.	 * 
 	 * @return Folder $destinationFolder
 	 */
-	public function move(Folder $destinationFolder, $newFolderName=false,$appendNumberToNameIfDestinationExists=false){
-		
-		\GO::debug("Move ". \go\core\util\StringUtil::debugUTF8($this->name()) . ' -> '. \go\core\util\StringUtil::debugUTF8($newFolderName));
-		
+	public function move(Folder $destinationFolder, $newFolderName=false,$appendNumberToNameIfDestinationExists=false){	
 		if(!$this->exists())
 			throw new \Exception("Folder '".$this->path()."' does not exist");
 		
@@ -177,13 +172,7 @@ class Folder extends Base {
 		
 		$success = false;
 		try{
-			$success = rename($this->path(), $newPath);
-			if($success) {
-				\GO::debug("Rename success.");
-			} else
-			{
-				\GO::debug("Rename failed.");
-			}
+			$success = rename($this->path(), $newPath);			
 		} catch(\Exception $e) {
 			//rename fails accross partitions. Ignore and retry with copy delete.
 			\GO::debug("Rename failed. Falling back on copy, delete");
