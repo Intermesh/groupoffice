@@ -57,7 +57,10 @@ class Router implements RouterInterface {
 			list($method, $params, $clientCallId) = $body[$i];
 
 			Response::get()->setClientCall($method, $clientCallId);
-			App::get()->debug("Processing method " . $method . ", call ID: " . $clientCallId);
+			
+			if($method != "community/dev/Debugger/get") {
+				App::get()->debug("Processing method " . $method . ", call ID: " . $clientCallId);
+			}
 			
 			try {
 				$this->callAction($method, $params);
