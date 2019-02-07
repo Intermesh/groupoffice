@@ -1,4 +1,0 @@
-modules/modules/ModulePermissionsWindow.js
-modules/modules/modules.js
-modules/modules/BuyDialog.js
-modules/modules/InstallLicenseDialog.js
