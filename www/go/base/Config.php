@@ -1175,14 +1175,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 */
 	var $checker_interval=120;
 
-	/**
-	 * Full original URL to reach Group-Office with trailing slash
-	 *
-	 * @var     StringHelper
-	 * @access  public
-	 */
-	var $orig_full_url = '';
-
+	
 	/**
 	 * Full URL to the Group-Office assets folder with trailing slash
 	 *
