@@ -80,3 +80,5 @@ $updates['201811061530'][] = 'ALTER TABLE `comments_comment`
 DROP COLUMN `category_id`,
 DROP COLUMN `mtime`,
 DROP COLUMN `ctime`;';
+
+$updates['201902051649'][] = "UPDATE comments_comment SET text = REPLACE(text, '\\n', '<br />');";
