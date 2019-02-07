@@ -358,11 +358,9 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	public function checkNormalization() {
 		
 		if(!\go\core\util\StringUtil::isNormalized($this->name)) {
-			\GO::debug("Normalizing $this->id to Unicode Form C");
+			\GO::debug("Normalizing $this->name to Unicode Form C");
 			
 			$name = \go\core\util\StringUtil::normalize($this->name);		
-			
-			$this->_path = null;
 			
 			if($this->getFsFolder()->exists()) {
 				$this->getFsFolder()->rename($name);
@@ -372,6 +370,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 				GO()->getDbConnection()->update('fs_folders',['name' => $name], ['id' => $this->id])->execute();
 			}
 			$this->name = $name;
+			$this->_path = null;
 		}
 	}
 
@@ -813,7 +812,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			$items = $this->fsFolder->ls();
 
 			foreach ($items as $item) {
-				try{
+//				try{
 				//\GO::debug("FS SYNC: Adding fs ".$item->name()." to database");
 					if ($item->isFile()) {
 						$file = $this->hasFile($item->name());
@@ -833,16 +832,17 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 						$willSync = $recurseOneLevel || $recurseAll;
 
 						$folder = $this->hasFolder($item->name());
-						if(!$folder)
+						if(!$folder) {
 							$folder = $this->addFolder($item->name(), false, !$willSync);
+						}
 
 						if($willSync)
 							$folder->syncFilesystem($recurseAll, false);
 					}
-				}
-				catch(\Exception $e){
-					echo "<span style='color:red;'>".$e->getMessage()."</span>\n";
-				}
+//				}
+//				catch(\Exception $e){
+//					echo "<span style='color:red;'>".$e->getMessage()."</span>\n";
+//				}
 			}
 		}else
 		{
@@ -859,22 +859,22 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		$stmt= $this->folders();
 		while($folder = $stmt->fetch()){
-			try{
+//			try{
 				if(!$folder->fsFolder->exists() || $folder->fsFolder->isFile())
 					$folder->delete(true);
-			}catch(\Exception $e){
-				echo "<span style='color:red;'>".$e->getMessage()."</span>\n";
-			}
+//			}catch(\Exception $e){
+//				echo "<span style='color:red;'>".$e->getMessage()."</span>\n";
+//			}
 		}
 
 		$stmt= $this->files();
 		while($file = $stmt->fetch()){
-			try{
+//			try{
 				if(!$file->fsFile->exists() || $file->fsFile->isFolder())
 					$file->delete(true);
-			}catch(\Exception $e){
-				echo "<span style='color:red;'>".$e->getMessage()."</span>\n";
-			}
+//			}catch(\Exception $e){
+//				echo "<span style='color:red;'>".$e->getMessage()."</span>\n";
+//			}
 		}
 
 		$this->mtime=$this->fsFolder->mtime();

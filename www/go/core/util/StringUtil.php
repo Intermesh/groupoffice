@@ -586,18 +586,13 @@ END;
 	}
 	
 	
-	public static function debugUTF8($str) {
-		
-		if(!\Normalizer::isNormalized($str, \Normalizer::FORM_D)) {
-			echo "Is not FORM D\n";
-		}
-		
+	public static function debugUTF8($str) {		
 		$ord = "";
 		for ( $pos=0, $l = strlen($str); $pos < $l; $pos ++ ) {
 		 $byte = substr($str, $pos);
 		 $ord .= " U+" . ord($byte);
 		}
 		
-		echo $ord . "\n";
+		return $ord;
 	}
 }

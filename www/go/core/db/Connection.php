@@ -389,7 +389,7 @@ class Connection {
 //		if(strpos($debugQueryString, "SELECT t.userId, t.secret, t.createdAt, t.userId AS `t.userId") === 0 ) {
 //			GO()->getDebugger()->debugCalledFrom();
 //		}
-		App::get()->debug($debugQueryString, Debugger::TYPE_SQL);
+		//App::get()->debug($debugQueryString, Debugger::TYPE_SQL);
 
 		$stmt = $this->getPDO()->prepare($build['sql']);
 		$stmt->debugQueryString = $debugQueryString;
