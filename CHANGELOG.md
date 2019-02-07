@@ -1,3 +1,4 @@
+07-02-2019 6.3.63
 - Core: Normalize UTF8 filename on upload. Fix for broken upload function with utf8 filenames.
 - Core: Normalize problem with sync filesystem and filenames in different utf8 encoding.
 - Core: Fixed problem with invalid redirect after installing demo data
