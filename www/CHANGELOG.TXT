@@ -1,3 +1,6 @@
+- leavedays: Fixed SQL error in install.sql file
+- projects: Fix for can't find ACL id on root level if you have manage permission on the projects module but not on the permission type.
+
 22-01-2019 6.2.112
 - Files: Switch notification language to the user when sending folder notifications
 - Tickets: Fixed duplicate ticket type with id 0 bug (Ticket #201817296)
