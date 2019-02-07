@@ -85,7 +85,6 @@ class PortletController extends \GO\Base\Controller\AbstractMultiSelectModelCont
 						->select('t.*, tl.name AS tasklist_name')
 						->criteria($findCriteria)
 						->order(array('tasklist_name', $sort), $dir)
-						->ignoreAcl()
 						->join(\GO\Tasks\Model\PortletTasklist::model()->tableName(),$joinCriteria,'pt')
 						->join(\GO\Tasks\Model\Tasklist::model()->tableName(), $tasklistJoinCriteria,'tl');
 		
