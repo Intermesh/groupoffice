@@ -257,12 +257,18 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 	}
 
 	public function checkNormalization() {
-		if(!\Normalizer::isNormalized($this->name, \Normalizer::FORM_D)) {
-			\GO::debug("Normalizing file $this->id to Unicode Form D");
+		if(!\go\core\util\StringUtil::isNormalized($this->name)) {
+			\GO::debug("Normalizing file $this->id to Unicode Form C");
 			
-			$name = \Normalizer::normalize($this->name, \Normalizer::FORM_D);		
-			$this->getFsFile()->rename($name);
-			GO()->getDbConnection()->update('fs_files',['name' => $name], ['id' => $this->id])->execute();
+			$name = \go\core\util\StringUtil::normalize($this->name);		
+			
+			if($this->getFsFile()->exists()) {
+				$this->getFsFile()->rename($name);
+			}
+			
+			if(!$this->getIsNew()) {
+				 GO()->getDbConnection()->update('fs_files',['name' => $name], ['id' => $this->id])->execute();
+			}
 			$this->name = $name;
 		}
 	}
@@ -270,7 +276,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 	protected function beforeSave() {
 		
 		//Normalize UTF-8. ONly form D works on MacOS webdav!
-		$this->name = \Normalizer::normalize($this->name, \Normalizer::FORM_D);		
+		$this->checkNormalization();
 
 		//check permissions on the filesystem
 		if($this->isNew){

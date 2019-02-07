@@ -235,46 +235,6 @@ class Site extends \GO\Base\Db\ActiveRecord {
 		
 		return $treeNodes;
 	}
-	
-	public function getApacheConfig(){
-		return '
-<VirtualHost *:80>
-
-<Directory /var/www/groupoffice-4.1/www/modules/site>
- Options FollowSymLinks
- AllowOverride All
-
-				RewriteEngine On
-				RewriteBase /
-
-				RewriteCond %{REQUEST_FILENAME} !-f
-				RewriteCond %{REQUEST_FILENAME} !-d
-				RewriteRule ^(.*)\?*$ index.php/$1 [L,QSA]
-</Directory>
-
-DocumentRoot /var/www/groupoffice-4.1/www/modules/site
-Alias /public /home/groupoffice/site/1/public
-ServerName www.giralisgroep.nl
-#ErrorLog /var/log/apache2/giralis.nl.log
-</VirtualHost>
-		';
-	}
-	
-//	 public function getCustomFieldValueByName($cfName) {
-//
-//		if (!key_exists($cfName, $this->_cf)) {
-//
-////			$column = $this->getCustomfieldsRecord()->getColumn(self::$fields[$cfName]->columnName());
-////			if(!$column)
-////				return null;
-//
-//			$value = $this->getCustomfieldsRecord()->{self::$fields[$cfName]->columnName()};
-//
-//			$this->_cf[$cfName] = $value;
-//		}
-//
-//		return $this->_cf[$cfName];
-//	}
 
 	public static function isExpandedNode($nodeId) {
 		$state = \GO::config()->get_setting("site_tree_state", \GO::user()->id);

@@ -38,13 +38,11 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 					}
 				}, this);
 			
-				if(userStore.get(creatorIds, function() {
+				userStore.get(creatorIds, function() {
 					this.updateView(options);
-				},this));
+				}, this);
 				
 			}, this);
-							
-		go.flux.Dispatcher.register(this);
 		
 		this.contextMenu = new Ext.menu.Menu({
 			items:[{
@@ -65,10 +63,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				iconCls: 'ic-edit',
 				text: t("Edit"),
 				handler: function() {
-					if(!this.commentForm) {
-						this.commentForm = new go.modules.comments.CommentForm();
-					}
-					this.commentForm.load(this.contextMenu.record.id).show();
+					var dlg = new go.modules.comments.CommentForm();					
+					dlg.load(this.contextMenu.record.id).show();
 				},
 				scope:this
 			}]
@@ -81,7 +77,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				this.initScrollLoader();
 			},
 			store: this.store,
-			scrollUp: true,
+			scrollUp: true
 		});
 
 		this.items = [
@@ -105,12 +101,6 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			
 		go.modules.comments.CommentsDetailPanel.superclass.initComponent.call(this);
 
-	},
-	
-	receive: function(action) {
-		if(action.type === "User/getUpdates") {
-			this.updateView();
-		}
 	},
 
 	onLoad: function (dv) {

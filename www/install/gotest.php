@@ -135,6 +135,14 @@ function test_system(){
 	$test['fatal']=false;
 
 	$tests[]=$test;
+	
+	
+	$test['name']='intl';
+	$test['showSuccessFeedback'] = false;
+	$test['pass']=class_exists('Normalizer');
+	$test['feedback']='Fatal: the php intl extension is required.';
+	$test['fatal']=true;
+	$tests[]=$test;
 
 	//echo ini_get('mbstring.func_overload');
 

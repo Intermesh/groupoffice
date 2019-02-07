@@ -110,7 +110,7 @@ try {
 			}
 			
 			if(!$user->enabled) {				
-				output([], 401, GO()->t("You're account has been disabled."));
+				output([], 403, GO()->t("You're account has been disabled."));
 			}
 			
 			if(GO()->getSettings()->maintenanceMode && !$user->isAdmin()) {
@@ -140,7 +140,7 @@ try {
 					'errors' => [
 							'username' => ["description" => "Bad username or password", "code" => ErrorCode::INVALID_INPUT]
 					]
-							], 403, "Bad username or password");
+							], 401, "Bad username or password");
 		}
 	} else {
 		if (isset($data['accessToken'])) {

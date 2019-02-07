@@ -25,7 +25,7 @@ class Directory extends \Sabre\DAV\FS\Directory{
 
 		$path = rtrim($path, '/');
 
-		$this->relpath = \Normalizer::normalize($path, \Normalizer::FORM_D);
+		$this->relpath = \go\core\util\StringUtil::normalize($path);
 		$path = \GO::config()->file_storage_path . $this->relpath;
 		
 		//		if(!$this->_getFolder()->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)){
@@ -177,7 +177,7 @@ class Directory extends \Sabre\DAV\FS\Directory{
 	 */
 	public function getChild($name) {
 
-		$path = $this->path . '/' . \Normalizer::normalize($name, \Normalizer::FORM_D);;
+		$path = $this->path . '/' .  \go\core\util\StringUtil::normalize($name);
 
 		\GO::debug("FSD:getChild($path)");
 

@@ -33,11 +33,14 @@ go.modules.community.addressbook.customfield.Contact = Ext.extend(go.modules.cor
 		}
 		
 		go.Stores.get("Contact").get([value], function(contacts) {
+			var displayValue;
 			if(!contacts[0]) {
-				console.warn("Contact not found for ID: " + value);
-				return;
+				displayValue = t("Not found or no access");
+			} else
+			{
+				displayValue = contacts[0].name;
 			}
-			cmp.setValue(contacts[0].name);
+			cmp.setValue(displayValue);
 			cmp.setVisible(true);
 		});
 		
@@ -52,7 +55,7 @@ go.modules.community.addressbook.customfield.Contact = Ext.extend(go.modules.cor
 	 */
 	createFormFieldConfig: function (customfield, config) {
 		var c = go.modules.core.customfields.type.Select.superclass.createFormFieldConfig.call(this, customfield, config);
-		console.log(customfield);
+		
 		c.xtype = "contactcombo";
 		c.isOrganization = customfield.options.isOrganization; 
 		c.hiddenName = c.name;

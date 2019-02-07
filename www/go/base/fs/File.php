@@ -425,13 +425,13 @@ class File extends Base{
 		
 		if(!is_array($uploadedFileArray['tmp_name'])){
 			$uploadedFileArray['tmp_name']=array($uploadedFileArray['tmp_name']);
-			$uploadedFileArray['name']=array($uploadedFileArray['name']);
+			$uploadedFileArray['name']=array(\go\core\util\StringUtil::normalize($uploadedFileArray['name']));
 		}
 		
 		$files = array();
 		for($i=0;$i<count($uploadedFileArray['tmp_name']);$i++){
 			if (is_uploaded_file($uploadedFileArray['tmp_name'][$i])) {
-				$destinationFile = new File($destinationFolder->path().'/'.$uploadedFileArray['name'][$i]);
+				$destinationFile = new File($destinationFolder->path().'/'.\go\core\util\StringUtil::normalize($uploadedFileArray['name'][$i]));
 				if(!$overwrite)
 					$destinationFile->appendNumberToNameIfExists();
 

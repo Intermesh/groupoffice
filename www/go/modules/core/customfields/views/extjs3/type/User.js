@@ -33,11 +33,14 @@ go.modules.core.customfields.type.User = Ext.extend(go.modules.core.customfields
 		}
 		
 		go.Stores.get("User").get([value], function(users) {
+			var displayValue;
 			if(!users[0]) {
-				console.warn("User not found for ID: " + value);
-				return;
+				displayValue = t("Not found or no access");
+			} else
+			{
+				displayValue = users[0].displayName;
 			}
-			cmp.setValue(users[0].displayName);
+			cmp.setValue(displayValue);
 			cmp.setVisible(true);
 		});
 		

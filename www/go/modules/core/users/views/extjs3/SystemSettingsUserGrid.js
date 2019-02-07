@@ -139,7 +139,7 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				autoFill: true,
 				getRowClass: function(record) {
 					if(!record.json.enabled)
-						return 'x-item-disabled';
+						return 'go-user-disabled';
 				}
 			},
 			// config options for stateful behavior
