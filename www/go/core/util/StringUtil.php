@@ -28,6 +28,15 @@ class StringUtil {
 		return $crlf != "\n" ? str_replace("\n", $crlf, $text) : $text;
 	}
 	
+	
+	public static function normalize($text) {
+		return \Normalizer::normalize($text, \Normalizer::FORM_C);
+	}
+	
+	public static function isNormalized($text) {
+		return \Normalizer::isNormalized($text, \Normalizer::FORM_C);
+	}
+	
 	  /**
 	 * Converts any "CamelCased" into an "underscored_word".
 	 * @param string $camelCasedString the word(s) to underscore
@@ -574,5 +583,16 @@ END;
 	 */
 	public static function explodeSearchExpression($expression) {
 		return preg_split("/[\s,]*\\\"([^\\\"]+)\\\"[\s,]*|" . "[\s,]*'([^']+)'[\s,]*|" . "[\s,]+/", $expression, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+	}
+	
+	
+	public static function debugUTF8($str) {		
+		$ord = "";
+		for ( $pos=0, $l = strlen($str); $pos < $l; $pos ++ ) {
+		 $byte = substr($str, $pos);
+		 $ord .= " U+" . ord($byte);
+		}
+		
+		return $ord;
 	}
 }

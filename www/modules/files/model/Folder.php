@@ -292,6 +292,9 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	}
 
 	protected function getFsFolder() {
+		
+		//\go\core\util\StringUtil::debugUTF8($this->path);
+		
 		return new \GO\Base\Fs\Folder(\GO::config()->file_storage_path . $this->path);
 	}
 
@@ -355,20 +358,29 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	public function checkNormalization() {
-		if(!\Normalizer::isNormalized($this->name, \Normalizer::FORM_D)) {
-			\GO::debug("Normalizing $this->id to Unicode Form D");
+		
+		if(!\go\core\util\StringUtil::isNormalized($this->name)) {
+			\GO::debug("Normalizing $this->name to Unicode Form C");
 			
-			$name = \Normalizer::normalize($this->name, \Normalizer::FORM_D);		
-			$this->getFsFolder()->rename($name);
-			GO()->getDbConnection()->update('fs_folders',['name' => $name], ['id' => $this->id])->execute();
+			$name = \go\core\util\StringUtil::normalize($this->name);		
+			
+			if($this->getFsFolder()->exists()) {
+				$this->getFsFolder()->rename($name);
+			}
+			
+			if(!$this->getIsNew()) {
+				GO()->getDbConnection()->update('fs_folders',['name' => $name], ['id' => $this->id])->execute();
+			}
 			$this->name = $name;
+			$this->_path = null;
 		}
 	}
 
 	protected function beforeSave() {
 		
 		//Normalize UTF-8. ONly form D works on MacOS webdav!
-		$this->name = \Normalizer::normalize($this->name, \Normalizer::FORM_D);		
+		$this->checkNormalization();
+		//$this->name = \Normalizer::normalize($this->name, \Normalizer::FORM_D);		
 
 		//check permissions on the filesystem
 		if($this->isNew){
@@ -802,7 +814,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			$items = $this->fsFolder->ls();
 
 			foreach ($items as $item) {
-				try{
+//				try{
 				//\GO::debug("FS SYNC: Adding fs ".$item->name()." to database");
 					if ($item->isFile()) {
 						$file = $this->hasFile($item->name());
@@ -822,16 +834,17 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 						$willSync = $recurseOneLevel || $recurseAll;
 
 						$folder = $this->hasFolder($item->name());
-						if(!$folder)
+						if(!$folder) {
 							$folder = $this->addFolder($item->name(), false, !$willSync);
+						}
 
 						if($willSync)
 							$folder->syncFilesystem($recurseAll, false);
 					}
-				}
-				catch(\Exception $e){
-					echo "<span style='color:red;'>".$e->getMessage()."</span>\n";
-				}
+//				}
+//				catch(\Exception $e){
+//					echo "<span style='color:red;'>".$e->getMessage()."</span>\n";
+//				}
 			}
 		}else
 		{
@@ -848,22 +861,22 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		$stmt= $this->folders();
 		while($folder = $stmt->fetch()){
-			try{
+//			try{
 				if(!$folder->fsFolder->exists() || $folder->fsFolder->isFile())
 					$folder->delete(true);
-			}catch(\Exception $e){
-				echo "<span style='color:red;'>".$e->getMessage()."</span>\n";
-			}
+//			}catch(\Exception $e){
+//				echo "<span style='color:red;'>".$e->getMessage()."</span>\n";
+//			}
 		}
 
 		$stmt= $this->files();
 		while($file = $stmt->fetch()){
-			try{
+//			try{
 				if(!$file->fsFile->exists() || $file->fsFile->isFolder())
 					$file->delete(true);
-			}catch(\Exception $e){
-				echo "<span style='color:red;'>".$e->getMessage()."</span>\n";
-			}
+//			}catch(\Exception $e){
+//				echo "<span style='color:red;'>".$e->getMessage()."</span>\n";
+//			}
 		}
 
 		$this->mtime=$this->fsFolder->mtime();
