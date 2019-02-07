@@ -276,9 +276,6 @@ class GO{
 		if($dbport===false)
 			$dbport=\GO::config()->db_port;
 		
-
-		\GO::debug("Connect: mysql:host=$dbhost;dbname=$dbname, $dbuser, ***",$options);
-
 		
 		self::$db = GO()->getDbConnection()->getPDO();//new \GO\Base\Db\PDO("mysql:host=$dbhost;dbname=$dbname;port=$dbport", $dbuser, $dbpass, $options);
 	}
