@@ -1,3 +1,5 @@
+- Tickets: Use template vars in due date mail
+
 07-02-2019 6.3.63
 - Email: fixed z-index lowering in sanatize function
 - Tasks: Removed ignore ACL from porlet. Tasks should not be shown when permissions are revoked.

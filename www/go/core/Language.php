@@ -122,13 +122,13 @@ class Language {
 			if ($this->isoCode != 'en') {
 				$file = $this->findLangFile($this->isoCode, $package, $module);
 				if ($file->exists()) {
-					$langData->mergeRecurive($this->loadFile($file));
+					$langData->mergeRecursive($this->loadFile($file));
 				}
 			}
 
 			$file = $this->findLangOverride($this->isoCode, $package, $module);
 			if ($file->exists()) {
-				$langData->mergeRecurive($this->loadFile($file));
+				$langData->mergeRecursive($this->loadFile($file));
 			}
 			
 			$productName = GO()->getConfig()['branding']['name'];
@@ -156,7 +156,7 @@ class Language {
 								], $langData[$key]);
 			}
 
-			$this->data[$package][$module] = $langData;			
+			$this->data[$package][$module] = $langData->getArray();			
 		}
 	}
 	
