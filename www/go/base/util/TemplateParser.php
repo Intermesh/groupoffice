@@ -198,6 +198,9 @@ class TemplateParser
 											preg_match_all('/<[^>]*>/', $tag, $matches);
 
 											$replacement = implode('', $matches[0]) . strip_tags($tag);
+											
+											//Fix for word not showing the spaces
+											$replacement = str_replace('<w:t>', '<w:t xml:space="preserve">', $replacement);
 											//go_debug($replacement);
 											//go_debug('****');
 
