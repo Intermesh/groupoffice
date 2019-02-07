@@ -135,6 +135,22 @@ go.form.FileButtonField = Ext.extend(Ext.form.CompositeField,{
 	
 	getRawValue: function(){
 		return this.blob;
+	},
+	
+	disable : function(silent){
+		this.filenameField.disable(silent);
+		this.clearButton.disable(silent);
+		this.uploadButton.disable(silent);
+		
+		go.form.FileButtonField.superclass.disable.call(this,silent);
+	},
+	enable : function(){
+		
+		this.filenameField.enable();
+		this.clearButton.enable();
+		this.uploadButton.enable();
+		
+		go.form.FileButtonField.superclass.enable.call(this,);
 	}
 	
 });
