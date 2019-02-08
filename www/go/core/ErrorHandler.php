@@ -89,7 +89,7 @@ class ErrorHandler {
 			
 		if(GO()->getDebugger()->enabled) {			
 			echo "\n\nDebug dump: \n\n";			
-			echo implode("\n", App::get()->getDebugger()->getEntries());
+			App::get()->getDebugger()->printEntries();
 		}
 	}
 
