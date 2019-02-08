@@ -380,7 +380,7 @@ class ContactConvertor {
 	
 	private function setOrganizations(SyncContact $message, Contact $contact) {
 
-		$asOrganizationNames = array_map('trim', explode(",", $message->companyname));
+		$asOrganizationNames = empty($message->companyname) ? [] : array_map('trim', explode(",", $message->companyname));
 		
 		ZLog::Write(LOGLEVEL_DEBUG, "Organizations: ".$message->companyname);
 		
