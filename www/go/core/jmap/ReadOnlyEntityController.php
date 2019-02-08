@@ -70,13 +70,13 @@ abstract class ReadOnlyEntityController extends Controller {
 		
 		$cls::sort($query, $sort);
 
-		$this->applyFilterCondition($params['filter'], $query);
-		
+		$this->applyFilterCondition($params['filter'], $query);		
+				
 		if(!$this->permissionLevelFoundInFilters && is_a($this->entityClass(), \go\core\acl\model\AclEntity::class, true)) {
 			$query->filter(["permissionLevel" => Acl::LEVEL_READ]);
-		}		
+		}
 		
-		GO()->info((string) $query);		
+		//GO()->info($query);
 		
 		return $query;
 	}
@@ -124,6 +124,11 @@ abstract class ReadOnlyEntityController extends Controller {
 		} else {	
 			// is FilterCondition		
 			$subCriteria = new \go\core\db\Criteria();			
+			
+			if(!$this->permissionLevelFoundInFilters) {
+				$this->permissionLevelFoundInFilters = !empty($filter['permissionLevel']);			
+			}
+			
 			$cls::filter($query, $subCriteria, $filter);			
 			
 			if($subCriteria->hasConditions()) {

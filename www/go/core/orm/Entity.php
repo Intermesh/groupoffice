@@ -513,19 +513,22 @@ abstract class Entity extends Property {
 		
 		$columns = static::searchColumns();
 		
+		if(empty($columns)) {
+			GO()->warn(static::class . ' entity has no searchColumns() defined. The q filter will not work.');
+		}
+		
 		//Explode string into tokens and wrap in wildcard signs to search within the texts.
 		$tokens = StringUtil::explodeSearchExpression($expression);
 		
-		if(!empty($columns)) {
-			
+		$searchConditions = (new Criteria());
+		
+		if(!empty($columns)) {			
 			$tokensWithWildcard = array_map(
 											function($t){
 												return '%' . $t . '%';
 											}, 
 											$tokens
 											);
-
-			$searchConditions = (new Criteria());
 
 			foreach($columns as $column) {
 				$columnConditions = (new Criteria());
@@ -546,7 +549,9 @@ abstract class Entity extends Property {
 			}
 		}
 
-		$criteria->andWhere($searchConditions);
+		if($searchConditions->hasConditions()) {
+			$criteria->andWhere($searchConditions);
+		}
 
 		return $criteria;
 	}

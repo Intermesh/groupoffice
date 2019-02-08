@@ -430,6 +430,7 @@ class Connection {
 		}
 
 		$stmt = $this->getPDO()->prepare($build['sql']);
+		$stmt->setBuild($build);
 
 		foreach ($build['params'] as $p) {
 			if (isset($p['value']) && !is_scalar($p['value'])) {
