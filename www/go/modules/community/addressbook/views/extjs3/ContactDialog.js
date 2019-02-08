@@ -10,12 +10,27 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 		labelWidth: dp(140)
 	},
 	
+	focus : function() {
+		if(this.nameField.getValue() != "") {
+			this.jobTitle.focus();
+		} else
+		{
+			this.nameField.focus();
+		}
+	},	
+	
 	initComponent: function() {
 		
 		go.modules.community.addressbook.ContactDialog.superclass.initComponent.call(this);
 		
 		this.formPanel.on("setvalues", function(form, v){
 			this.setOrganization(v["isOrganization"]);
+		}, this);
+		
+		
+		//register name menu form fields
+		this.nameMenu.items.get(0).items.each(function(i) {						
+			this.formPanel.form.add(i);
 		}, this);
 	},
 	
@@ -27,9 +42,52 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 		}
 		return emailTypes;
 	},
-
-	initFormItems: function () {
+	
+	createNameMenu : function() {
+		var me = this;		
 		
+		this.nameMenu = new Ext.menu.Menu({			
+			items: this.createContactNameFieldSet(),
+			focus : function() {
+				me.firstName.focus();
+			},
+			listeners: {
+				hide: function() {
+					this.buildFullName();
+					this.jobTitle.focus();
+				},
+				afterrender: function(menu) {
+					
+					this.nameMenu.keyNav.destroy();
+					this.nameMenu.keyNav = new Ext.KeyNav(menu.getEl(), {
+							enter : function(e){
+								e.preventDefault();
+								this.nameMenu.hide();
+							},
+							scope: this
+					});
+					
+					this.suffixField.on('specialkey', function(field, e) {
+						
+						// e.HOME, e.END, e.PAGE_UP, e.PAGE_DOWN,
+						// e.TAB, e.ESC, arrow keys: e.LEFT, e.RIGHT, e.UP, e.DOWN
+						if (e.getKey() == e.TAB) {
+								
+								this.nameMenu.hide();
+						}
+
+					}, this);
+				},
+				scope: this
+			}
+		});
+		
+		return this.nameMenu;
+	},
+
+	initFormItems: function () {		
+		
+		this.createNameMenu();
 		
 		var items = [{
 				xtype: 'fieldset',
@@ -40,46 +98,31 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 							{
 								flex: 1,
 								layout: "form",
-								items: [									
-										
+								items: [		
 									this.nameField = new Ext.form.TextField({
 										xtype: 'textfield',
+										flex: 1,
 										name: 'name',
 										fieldLabel: t("Name"),
 										anchor: '100%',
 										allowBlank: false,
-										hidden: true
-									}),
-
-									this.contactNameField = new Ext.form.CompositeField({
-										xtype: 'compositefield',
-
-										fieldLabel: t("Name"),
-										anchor: '100%',
-										allowBlank: false,
-										items: [{
-												xtype: 'textfield',
-												name: 'firstName',
-												emptyText: t("First"),
-												flex: 3
-											}, {
-												xtype: 'textfield',
-												name: 'middleName',
-												emptyText: t("Middle"),
-												flex: 2
-											}, {
-												xtype: 'textfield',
-												name: 'lastName',
-												emptyText: t("Last"),
-												flex: 3
-											}]
-									}),
-									{
+										listeners: {
+											scope: this,
+											focus: function() {		
+												if(!this.getValues()['isOrganization']) {
+													this.nameMenu.show(this.nameField.getEl());
+												}
+											}
+										}
+									}),										
+									
+									this.jobTitle = new Ext.form.TextField({
 										xtype: "textfield",
 										name: "jobTitle",
 										fieldLabel: t("Job title"),
 										anchor: "100%"
-									}, this.genderField = new go.form.RadioGroup({
+									}), 
+									this.genderField = new go.form.RadioGroup({
 										xtype: 'radiogroup',
 										fieldLabel: t("Gender"),
 										name:"gender",
@@ -410,6 +453,13 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 										}]
 								}]
 						}
+					},				
+					{						
+						fieldLabel: t("Notes"),
+						name: "notes",
+						xtype: "textarea",
+						hideLabel: true,
+						grow: true
 					}]
 			}, 
 			this.businessFieldSet = new Ext.form.FieldSet({
@@ -453,8 +503,8 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 	},
 
 	setOrganization: function (isOrganization) {
-		this.contactNameField.setVisible(!isOrganization);
-		this.nameField.setVisible(isOrganization);
+		//this.contactNameField.setVisible(!isOrganization);
+		//this.nameField.setVisible(isOrganization);
 		this.organizationsField.setVisible(!isOrganization);		
 		this.genderField.setVisible(!isOrganization);
 		this.businessFieldSet.setVisible(isOrganization);
@@ -478,14 +528,44 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 
 	},
 	
-	onBeforeSubmit : function() {
-		
-		//build full name on submit. Because when ENTER is pressed in one of the name
-		//fields the blur event is not triggered.
-		if(!this.getValues()['isOrganization']) {
-			this.buildFullName();
-		}
-		
-		return go.modules.community.addressbook.ContactDialog.superclass.onBeforeSubmit.call(this);
+//	onBeforeSubmit : function() {
+//		
+//		//build full name on submit. Because when ENTER is pressed in one of the name
+//		//fields the blur event is not triggered.
+//		if(!this.getValues()['isOrganization']) {
+//			
+//		}
+//		
+//		return go.modules.community.addressbook.ContactDialog.superclass.onBeforeSubmit.call(this);
+//	},
+	
+	
+	createContactNameFieldSet: function () {
+		return new Ext.form.FieldSet(
+						{
+							items: [
+								{
+									xtype: 'textfield',
+									name: 'prefixes',
+									fieldLabel: t("Prefix")
+								}, this.firstName = new Ext.form.TextField({
+									xtype: 'textfield',
+									name: 'firstName',
+									fieldLabel: t("First")
+								}), {
+									xtype: 'textfield',
+									name: 'middleName',
+									fieldLabel: t("Middle")
+								}, {
+									xtype: 'textfield',
+									name: 'lastName',
+									fieldLabel: t("Last")
+								}, this.suffixField = new Ext.form.TextField({
+									xtype: 'textfield',
+									name: 'suffixes',
+									fieldLabel: t("Suffix")
+								})
+							]
+						});
 	}
 });
