@@ -279,7 +279,7 @@ class Migrate63to64 {
 			$contact = new Contact();
 			$contact->id = $r['id'];
 			$contact->addressBookId = $addressBook->id;
-			$contact->firstName = $r['first_name'];
+			$contact->firstName = empty($r['first_name']) ? $r['initials'] : $r['first_name'];
 			$contact->middleName = $r['middle_name'];
 			$contact->lastName = $r['last_name'];
 
