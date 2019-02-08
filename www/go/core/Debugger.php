@@ -123,6 +123,8 @@ class Debugger {
 		
 		if($mixed instanceof \Closure) {
 			$mixed = call_user_func($mixed);
+		}elseif(is_object($mixed) && method_exists($mixed, '__toString')) {
+			$mixed = (string) $mixed;
 		}elseif (!is_scalar($mixed)) {
 			$mixed = print_r($mixed, true);
 		}
