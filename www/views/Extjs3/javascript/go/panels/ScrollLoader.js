@@ -18,13 +18,7 @@ go.panels.ScrollLoader = {
 		//setup auto load more for go.data.Store's only
 		if(this.store instanceof go.data.Store && this.store.entityStore) {
 			
-			if(this instanceof Ext.grid.GridPanel) {
-				this.on("bodyscroll", this.loadMore, this, {buffer: 100});
-			} else {
-				this.on('render', function(p){
-					p.el.on('scroll', this.loadMore, this, {buffer: 100});
-				});
-			}
+			this.on('afterrender', this.onRenderScrollLoader, this);
 
 			this.store.baseParams.limit = this.pageSize;
 
@@ -43,31 +37,39 @@ go.panels.ScrollLoader = {
 		}
 	},
 	
+	onRenderScrollLoader : function() {
+		if(this.isGridPanel()) {
+			this.on("bodyscroll", this.loadMore, this, {buffer: 10});
+			
+			this.slScroller = this.getView().scroller.dom;
+			this.slBody = this.getView().mainBody.dom;
+
+		} else {
+			this.el.on('scroll', this.loadMore, this, {buffer: 10});
+			this.slScroller = this.el.dom;
+			this.slBody = this.el.dom;
+		}
+	},
+	
+	isGridPanel : function() {
+		return this.getView && this.getView().scroller;
+	},
+	
 	/**
 	 * Loads more data if the end off the scroll area is reached
 	 * @returns {undefined}
 	 */
 	loadMore: function () {
-
+		
 		var store = this.store;
 
-		if (this.allRecordsLoaded){
+		if (this.allRecordsLoaded || this.store.loading){
 			return;
-		}
+		}		
 
-		if(this instanceof Ext.grid.GridPanel) {
-			var	scroller = this.getView().scroller.dom,
-				body = this.getView().mainBody.dom;
-		} else {
-		  var scroller = this.el.dom, body = this.el.dom;
-		}
-
-		if(scroller.offsetHeight < body.offsetHeight) {
-			return; // no scroll bar
-		}
 		if(this.scrollUp) {
 			
-			if(scroller.scrollTop  < this.scrollBoundary) {
+			if(this.slScroller.scrollTop  < this.scrollBoundary) {
 				var o = store.lastOptions ? GO.util.clone(store.lastOptions) : {};
 				o.add = true;
 				o.params = o.params || {};
@@ -77,7 +79,7 @@ go.panels.ScrollLoader = {
 				store.load(o);
 			}
 		} else {
-			if ((scroller.offsetHeight + scroller.scrollTop + this.scrollBoundary) >= body.offsetHeight) {
+			if ((this.slScroller.offsetHeight + this.slScroller.scrollTop + this.scrollBoundary) >= this.slBody.offsetHeight) {
 				var o = store.lastOptions ? GO.util.clone(store.lastOptions) : {};
 				o.add = true;
 				o.params = o.params || {};
