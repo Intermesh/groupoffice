@@ -226,11 +226,11 @@ class QueryBuilder {
 	/**
 	 * Build the select SQL and params
 	 */
-	public function buildSelect(Query $query = null) {
+	public function buildSelect(Query $query = null, $prefix = "") {
 
 		$unions = $query->getUnions();
 		
-		$r = $this->internalBuildSelect($query, empty($unions) ? "" : "\t");
+		$r = $this->internalBuildSelect($query, empty($unions) ? $prefix : $prefix . "\t");
 		
 		$unions = $query->getUnions();
 		if(empty($unions)) {
@@ -414,7 +414,7 @@ class QueryBuilder {
 		$where = "";
 		foreach ($conditions as $condition) {
 			$str = $this->buildCondition($condition, $prefix);
-			$where .= $prefix . $str . "\n";
+			$where .= "\n" . $prefix . $str;
 		}
 
 		return rtrim($where);
@@ -482,7 +482,7 @@ class QueryBuilder {
 				$this->buildBindParameters = array_merge($this->buildBindParameters, $token->getBindParameters());
 				$where = $this->buildWhere($token->getWhere(), $prefix . "\t");
 				
-				return "(\n" . $prefix . $where  . "\n" . $prefix . ")";
+				return "(" . $where  . "\n" . $prefix . ")";
 			}
 			
 			throw new \Exception("Invalid token?");
@@ -585,7 +585,7 @@ class QueryBuilder {
 
 		$build = $builder->buildSelect($query, $prefix . "\t");
 
-		$str = "(\n" . $prefix . "\t" . $build['sql'] . "\n" . $prefix . ")";
+		$str = "(\n" . $prefix . $build['sql'] . "\n" . $prefix . ")";
 
 		$this->buildBindParameters = array_merge($this->buildBindParameters, $build['params']);
 
