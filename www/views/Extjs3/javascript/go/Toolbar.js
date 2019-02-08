@@ -152,7 +152,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 		var isActive = false;
 		
 		if(this.store instanceof go.data.Store || this.store instanceof go.data.GroupingStore) {
-			isActive = !GO.util.empty(this.store.baseParams.filter.q);
+			isActive = !GO.util.empty(this.store.filters.tbsearch);
 		} else {
 			isActive = !GO.util.empty(this.store.baseParams.query);
 		}
