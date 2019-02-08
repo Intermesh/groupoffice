@@ -263,7 +263,6 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 	public function actionTree($params) {
 		\GO::session()->closeWriting();
 
-
 		$response = array();
 
 		if(!isset($params['node'])){

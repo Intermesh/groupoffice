@@ -63,6 +63,8 @@ abstract class ReadOnlyEntityController extends Controller {
 		$query = $cls::find($cls::getPrimaryKey(false))
 						->limit($params['limit'])
 						->offset($params['position']);
+		
+		/* @var $query \go\core\orm\Query */
 
 		$sort = $this->transformSort($params['sort']);		
 		
@@ -70,8 +72,16 @@ abstract class ReadOnlyEntityController extends Controller {
 
 		$this->applyFilterCondition($params['filter'], $query);
 		
+		if(!$this->permissionLevelFoundInFilters && is_a($this->entityClass(), \go\core\acl\model\AclEntity::class, true)) {
+			$query->filter(["permissionLevel" => Acl::LEVEL_READ]);
+		}		
+		
+		GO()->info((string) $query);		
+		
 		return $query;
 	}
+	
+	private $permissionLevelFoundInFilters = false;
 	
 	/**
 	 * 
@@ -168,12 +178,6 @@ abstract class ReadOnlyEntityController extends Controller {
 		
 		if(!isset($params['accountId'])) {
 			$params['accountId'] = null;
-		}
-		
-		if(is_a($this->entityClass(), \go\core\acl\model\AclEntity::class, true)) {
-			if(empty($params['filter']['permissionLevel']) || $params['filter']['permissionLevel'] < Acl::LEVEL_READ) {
-				$params['filter']['permissionLevel'] = Acl::LEVEL_READ;
-			}
 		}
 		
 		$params['calculateTotal'] = !empty($params['calculateTotal']) ? true : false;
@@ -335,8 +339,7 @@ abstract class ReadOnlyEntityController extends Controller {
 		//filter permissions
 		$cls::applyAclToQuery($query, Acl::LEVEL_READ);
 		
-		return $query;
-	
+		return $query;	
 	}
 
 	

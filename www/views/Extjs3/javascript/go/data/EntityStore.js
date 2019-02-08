@@ -115,7 +115,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		
 		
 		//remove from not found.
-		var i = this.notFound.indexOf(entity.id);
+		var i = this.notFound.indexOf(entity.id + "");
 		if(i > -1) {
 			this.notFound.splice(i, 1);
 			this.metaStore.setItem("notfound", this.notFound);
@@ -333,6 +333,9 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			throw "ids must be an array";
 		}		
 		
+		//convert ID's to string because indexed db doesn't like int's
+		ids = ids.map(function(id) { return id + "";} );
+		
 		var entities = [], unknownIds = [], notFoundIds = [];
 
 		for (var i = 0, l = ids.length; i < l; i++) {
@@ -345,6 +348,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			} else if(this.notFound.indexOf(id) > -1) {
 				//entities.push(null);
 				//notFoundIds.push(id);
+				console.warn("Not fetching " + this.entity.name + " (" + id + ") because it was not found in an earlier attempt");
 			} else
 			{
 				// Cast ID to string otherwise localforage won't find it!
@@ -357,7 +361,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 				this.stateStore.getItems(unknownIds, function(err,entities) {
 					unknownIds = unknownIds.filter(function(id){
-						return !entities[id+""];
+						return !entities[id];
 					});
 
 					for(var key in entities) {					
