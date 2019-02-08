@@ -16,7 +16,7 @@
 			
 				scope = scope || me;
 
-				go.Stores.get("Field").all(function (fields) {
+				go.Stores.get("Field").all(function (success, fields) {
 					me.fields = fields
 
 					if(me.fieldSets) {
@@ -27,7 +27,7 @@
 					}				
 				}, me);
 
-				go.Stores.get("FieldSet").all(function (fieldSets) {
+				go.Stores.get("FieldSet").all(function (success, fieldSets) {
 					me.fieldSets = fieldSets
 					if(me.fields) {
 						if(cb) {

@@ -22,7 +22,7 @@
      * @returns {undefined}
      */
     register: function (package, module, name) {	
-						
+			
 			if(!name) {
 				throw "Invalid entity registered. 'name' property is required.";
 			}

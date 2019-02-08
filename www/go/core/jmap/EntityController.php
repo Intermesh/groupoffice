@@ -253,7 +253,7 @@ abstract class EntityController extends ReadOnlyEntityController {
 	 * @param array $params
 	 * @throws CannotCalculateChanges
 	 */
-	public function getUpdates($params) {		
+	public function getUpdates($params) {						
 		$p = $this->paramsGetUpdates($params);	
 		$cls = $this->entityClass();		
 		$result = $cls::getChanges($p['sinceState'], $p['maxChanges']);		

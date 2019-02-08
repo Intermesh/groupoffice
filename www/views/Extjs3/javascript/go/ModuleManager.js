@@ -194,7 +194,7 @@
 			
 			return new Promise(function(resolve, reject){
 			
-				go.Stores.get("Module").all(function (entities) {
+				go.Stores.get("Module").all(function (success, entities) {
 
 					this.entities = entities;
 

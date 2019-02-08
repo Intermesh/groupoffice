@@ -28,6 +28,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	
 	changes : null,
 	
+	// Set to true when all dasta has been fetched from server
 	isComplete : false,
 	
 	constructor : function(config) {
@@ -55,7 +56,6 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			cb.call(this);
 			return;
 		}
-		
 		this.stateStore = localforage.createInstance({
 			name: "groupoffice",
 			storeName: this.entity.name + "-entities"
@@ -90,6 +90,8 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		console.warn("State cleared for " + this.entity.name);
 		this.state = null;
 		this.data = {};	
+		
+		this.isComplete = false;
 
 		this.metaStore.clear();
 		this.stateStore.clear();
@@ -119,6 +121,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			this.metaStore.setItem("notfound", this.notFound);
 		}
 		
+		//Localforage requires ID to be string
 		this.stateStore.setItem(entity.id + "", entity);
 		
 		this._fireChanges();
@@ -230,7 +233,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 							} else
 							{
 								if(cb) {
-									cb.call(scope || this, this);
+									cb.call(scope || this, this, true);
 								}
 							}
 						}, this);
@@ -238,6 +241,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					} else
 					{					
 						this.clearState();
+						cb.call(scope || this, this, false);
 					}
 
 				},
@@ -271,7 +275,11 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	all : function(cb, scope) {
 		this.initState(function() {
 			if(this.isComplete) {
-				this.getUpdates(function() {
+				this.getUpdates(function(store, success) {
+					if(!success) {
+						this.all(cb, scope);
+						return;
+					}
 					var me = this;
 					this.stateStore.getItems(null, function(err,entities) {				
 						for(var key in entities) {		
@@ -279,7 +287,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 								me.data[entities[key].id] = entities[key];
 							}
 						}
-						cb.call(scope, me.data);
+						cb.call(scope, true, me.data);
 					});					
 				});
 			} else
@@ -288,12 +296,14 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					method: this.entity.name + "/get",
 					callback: function (options, success, response) {
 						if(!success) {
+							cb.call(scope, false, null);
 							return;
 						}
 
 						this.metaStore.setItem('isComplete', true);
-
-						cb.call(scope, response.list);
+						this.isComplete = true;
+						
+						cb.call(scope, true, response.list);
 					},
 					scope: this
 				});
@@ -337,13 +347,14 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				//notFoundIds.push(id);
 			} else
 			{
-				unknownIds.push(id);
+				// Cast ID to string otherwise localforage won't find it!
+				unknownIds.push(id + "");
 			}			
 		}
 		
 		if (unknownIds.length) {		
 			this.initState(function() {
-				
+
 				this.stateStore.getItems(unknownIds, function(err,entities) {
 					unknownIds = unknownIds.filter(function(id){
 						return !entities[id+""];
