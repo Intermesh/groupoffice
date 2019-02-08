@@ -458,7 +458,6 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						fieldLabel: t("Notes"),
 						name: "notes",
 						xtype: "textarea",
-						hideLabel: true,
 						grow: true
 					}]
 			}, 
