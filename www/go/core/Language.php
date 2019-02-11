@@ -5,7 +5,7 @@ namespace go\core;
 use Exception;
 use go\core\fs\File;
 use go\core\jmap\Request;
-use go\modules\core\modules\model\Module;
+use go\core\model\Module;
 
 class Language {
 

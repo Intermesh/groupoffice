@@ -1,6 +1,6 @@
 Ext.ns("go.modules.community.addressbook.customfield");
 
-go.modules.community.addressbook.customfield.Contact = Ext.extend(go.modules.core.customfields.type.Text, {
+go.modules.community.addressbook.customfield.Contact = Ext.extend(go.modules.core.core.type.Text, {
 	
 	name : "Contact",
 	
@@ -11,7 +11,7 @@ go.modules.community.addressbook.customfield.Contact = Ext.extend(go.modules.cor
 	/**
 	 * Return dialog to edit this type of field
 	 * 
-	 * @returns {go.modules.core.customfields.FieldDialog}
+	 * @returns {go.modules.core.core.FieldDialog}
 	 */
 	getDialog : function() {
 		return new  go.modules.community.addressbook.customfield.ContactDialog();
@@ -54,7 +54,7 @@ go.modules.community.addressbook.customfield.Contact = Ext.extend(go.modules.cor
 	 * @returns {Object}
 	 */
 	createFormFieldConfig: function (customfield, config) {
-		var c = go.modules.core.customfields.type.Select.superclass.createFormFieldConfig.call(this, customfield, config);
+		var c = go.modules.core.core.type.Select.superclass.createFormFieldConfig.call(this, customfield, config);
 		
 		c.xtype = "contactcombo";
 		c.isOrganization = customfield.options.isOrganization; 
@@ -77,7 +77,7 @@ go.modules.community.addressbook.customfield.Contact = Ext.extend(go.modules.cor
 	 * @returns {Object}
 	 */
 	getFieldDefinition : function(field) {		
-		var c = go.modules.core.customfields.type.Select.superclass.getFieldDefinition.call(this, field);
+		var c = go.modules.core.core.type.Select.superclass.getFieldDefinition.call(this, field);
 		c.key = field.databaseName;		
 		return c;
 	}
@@ -85,5 +85,5 @@ go.modules.community.addressbook.customfield.Contact = Ext.extend(go.modules.cor
 	
 });
 
-go.modules.core.customfields.CustomFields.registerType(new go.modules.community.addressbook.customfield.Contact());
+go.modules.core.core.CustomFields.registerType(new go.modules.community.addressbook.customfield.Contact());
 

@@ -1,0 +1,110 @@
+go.modules.core.core.Panel = Ext.extend(Ext.Panel, {
+	lastQ: "",
+	height: dp(500),
+	initComponent: function () {
+		this.grid = new go.links.LinkGrid({
+			cls: 'go-grid3-hide-headers',
+			region: "center",
+			listeners: {
+				click: function () {
+					this.gotoSelected();
+				},
+				keypress: function() {
+					this.gotoSelected();
+				},
+				scope: this
+			}
+		});
+
+		this.entityGrid = new go.links.EntityGrid({
+			width: dp(200),
+			region: "east",
+			split: true,
+			savedSelection: "search"
+		});
+
+		
+		this.entityGrid.getSelectionModel().on('selectionchange', function (sm) {
+			this.search(this.lastQ);
+		}, this, {buffer: 1}); //add buffer because it clears selection first	
+
+		Ext.apply(this, {
+			cls: "go-search-panel",
+			layout: 'border',
+			floating: true,
+			frame: true,
+			collapsed: true,
+			items: [this.entityGrid, this.grid]			
+		});
+
+		go.modules.core.core.Panel.superclass.initComponent.call(this);
+		
+		this.on("expand", function() {
+			Ext.getDoc().on('mousedown', this.collapseIf, this);
+		}, this);
+		this.on("collapse", function() {
+			Ext.getDoc().un('mousedown', this.collapseIf, this);
+		}, this);
+	},
+	
+	gotoSelected: function() {		
+		var record = this.grid.getSelectionModel().getSelected();
+		if(!record) {
+			return;
+		}
+		
+		go.Entities.get(record.data.entity).goto(record.data.entityId);
+		this.collapse();
+		
+	},
+	
+	search: function (q) {
+		
+//
+//		
+//		if(!this.entityGrid.viewReady) {
+//			this.entityGrid.on("viewready", function() {
+//				this.search(q);
+//			}, this, {single: true});
+//			return;
+//		}
+//		
+		this.lastQ = q;
+		var filter = {}, entities = [];
+		
+		Ext.each(this.entityGrid.getSelectionModel().getSelections(), function (r) {
+			entities.push({
+				name: r.data.entity,
+				filter: r.data.filter
+			});
+			
+		}, this);
+		if(entities.length) {
+			filter.entities = entities;
+		}
+
+		filter.q = q;
+		this.grid.store.baseParams.limit = 20;
+		this.grid.store.removeAll();
+		
+		this.grid.store.load({
+			params: {
+				filter: filter
+			},
+			callback: function() {
+						
+			},
+			scope: this
+		});
+		
+		//this.setHeight(dp(600));
+		this.expand();
+	},
+	// private
+	collapseIf : function(e){
+		if(!e.within(this.getEl()) && !e.within(this.searchContainer.getEl())){
+				this.collapse();
+		}
+	}
+
+});

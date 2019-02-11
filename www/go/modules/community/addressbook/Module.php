@@ -8,8 +8,8 @@ use go\core\orm\Property;
 use go\modules\community\addressbook\convert\VCard;
 use go\modules\community\addressbook\model\Contact;
 use go\modules\community\addressbook\model\UserSettings;
-use go\modules\core\links\model\Link;
-use go\modules\core\users\model\User;
+use go\core\model\Link;
+use go\core\model\User;
 							
 /**						
  * @copyright (c) 2018, Intermesh BV http://www.intermesh.nl

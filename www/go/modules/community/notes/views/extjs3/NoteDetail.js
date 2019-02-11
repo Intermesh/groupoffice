@@ -24,7 +24,7 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 
 		go.modules.community.notes.NoteDetail.superclass.initComponent.call(this);
 
-		this.add(go.modules.core.customfields.CustomFields.getDetailPanels("Note"));
+		this.add(go.modules.core.core.CustomFields.getDetailPanels("Note"));
 		this.add(go.links.getDetailPanels());
 		
 

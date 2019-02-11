@@ -4,7 +4,7 @@
 namespace GO\Calendar;
 
 use GO\Calendar\Model\UserSettings;
-use go\modules\core\users\model\User;
+use go\core\model\User;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 

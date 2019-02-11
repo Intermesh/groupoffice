@@ -1707,3 +1707,11 @@ table[id^="comments-ext"] b {
 	}
 }
 
+
+.go-module-icon-password { /* for auth methods */
+	background-image:url('img/key.png') !important;
+}
+
+.go-user-disabled {
+	opacity: .6;
+}

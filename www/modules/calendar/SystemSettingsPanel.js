@@ -5,14 +5,14 @@ GO.calendar.SystemSettingsPanel = Ext.extend(Ext.Panel, {
 		this.title = t("Calendar");		
 		
 		this.items = [
-			new go.modules.core.customfields.SystemSettingsPanel({
+			new go.modules.core.core.SystemSettingsPanel({
 					entity: "Event",
 					title: "Event custom fields",
 					createFieldSetDialog : function() {
 						return new GO.calendar.CustomFieldSetDialog();
 					}
 			}),
-			new go.modules.core.customfields.SystemSettingsPanel({
+			new go.modules.core.core.SystemSettingsPanel({
 					entity: "Calendar",
 					title: "Resource booking custom fields",
 					createFieldSetDialog : function() {

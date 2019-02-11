@@ -347,7 +347,7 @@ use const GO_CONFIG_FILE;
 		 * @return boolean
 		 */
 		public function getModule($package, $name) {
-			$model = \go\modules\core\modules\model\Module::find()->where(['package' => $package, 'name' => $name, 'enabled' => true])->single();
+			$model = \go\core\model\Module::find()->where(['package' => $package, 'name' => $name, 'enabled' => true])->single();
 			if(!$model || !$model->isAvailable()) {
 				return false;
 			}

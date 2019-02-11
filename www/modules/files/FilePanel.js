@@ -258,6 +258,6 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 
 		GO.files.FilePanel.superclass.initComponent.call(this);
 		
-		this.add(go.modules.core.customfields.CustomFields.getDetailPanels("File"));
+		this.add(go.modules.core.core.CustomFields.getDetailPanels("File"));
 	}
 });

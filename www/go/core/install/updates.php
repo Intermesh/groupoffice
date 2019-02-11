@@ -389,3 +389,15 @@ $updates['201901301035'][] = "CREATE TABLE IF NOT EXISTS `go_templates` (
 
 $updates['201901301035'][] = "ALTER TABLE `core_group` ADD UNIQUE(`name`);";
 
+
+$updates['201901301035'][] = function() {	
+	$m = new \go\modules\core\customfields\install\Migrate63to64();
+	$m->migrateEntity("User");	
+};
+
+//delete from core_setting where moduleId = 0;
+//update `core_entity` e inner join core_module m on m.id = e.moduleId  set e.moduleId = (select id from core_module where name = 'core' and package='core') where m.package='core';
+//update `core_setting` e inner join core_module m on m.id = e.moduleId  set e.moduleId = (select id from core_module where name = 'core' and package='core') where m.package='core';
+//update `core_auth_method` e inner join core_module m on m.id = e.moduleId  set e.moduleId = (select id from core_module where name = 'core' and package='core') where m.package='core';
+
+//delete from core_module where package = 'core' and name != 'core';

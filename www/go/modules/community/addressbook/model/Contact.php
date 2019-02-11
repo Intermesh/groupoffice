@@ -12,7 +12,7 @@ use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
 use go\modules\community\addressbook\convert\VCard;
-use go\modules\core\links\model\Link;
+use go\core\model\Link;
 use function GO;
 						
 /**

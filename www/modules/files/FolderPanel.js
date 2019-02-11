@@ -85,6 +85,6 @@ GO.files.FolderPanel = Ext.extend(GO.DisplayPanel,{
 		
 		GO.files.FolderPanel.superclass.initComponent.call(this);
 		
-		this.add(go.modules.core.customfields.CustomFields.getDetailPanels("Folder"));
+		this.add(go.modules.core.core.CustomFields.getDetailPanels("Folder"));
 	}
 });

@@ -1439,12 +1439,12 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		$cfRecord = $this->getCustomFields();
 		
 		if (!empty($cfRecord)) {
-		$fieldsets = \go\modules\core\customfields\model\FieldSet::find()->filter(['entities' => ['Event']]);
+		$fieldsets = \go\core\model\FieldSet::find()->filter(['entities' => ['Event']]);
 		
 			foreach($fieldsets as $fieldset) {
 				$html .= '<tr><td colspan="2"><b>'.($fieldset->name).'</td></tr>';
 
-				$fields = \go\modules\core\customfields\model\Field::find()->where(['fieldSetId' => $fieldset->id]);
+				$fields = \go\core\model\Field::find()->where(['fieldSetId' => $fieldset->id]);
 				
 				foreach($fields as $field) {
 					

@@ -36,7 +36,7 @@ GO.tasks.TaskDialog = function() {
 		items : this.formPanel,
 		focus : focusName.createDelegate(this),
 		bbar : [
-			this.createLinkButton = new go.modules.core.links.CreateLinkButton(),		
+			this.createLinkButton = new go.modules.core.core.CreateLinkButton(),		
 			"->",
 			{
 				text : t("Save"),
@@ -421,7 +421,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 				preventScrollbars: true
 			});
 			
-		propertiesPanel.add(go.modules.core.customfields.CustomFields.getFormFieldSets("Task"));
+		propertiesPanel.add(go.modules.core.core.CustomFields.getFormFieldSets("Task"));
 		
 		// Start of recurrence tab
 		this.recurrencePanel = new go.form.RecurrenceFieldset();

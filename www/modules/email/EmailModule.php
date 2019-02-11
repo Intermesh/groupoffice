@@ -22,7 +22,7 @@
 namespace GO\Email;
 
 use GO;
-use go\modules\core\users\model\User;
+use go\core\model\User;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use GO\Email\Model\Account;

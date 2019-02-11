@@ -222,7 +222,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @access  public
 	 */
 	public function getdefault_currency() {
-		return \go\modules\core\users\model\Settings::get()->defaultCurrency;		
+		return \go\core\model\Settings::get()->defaultCurrency;		
 	}
 
 	/**
@@ -233,7 +233,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @access  public
 	 */
 	public function getDefault_date_format() {
-		$df =  \go\modules\core\users\model\Settings::get()->defaultDateFormat;
+		$df =  \go\core\model\Settings::get()->defaultDateFormat;
 		return $df[0].$df[2].$df[4];
 	}
 	
@@ -247,7 +247,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @access  public
 	 */
 	public function getdefault_date_separator() {
-		$df =  \go\modules\core\users\model\Settings::get()->defaultDateFormat;
+		$df =  \go\core\model\Settings::get()->defaultDateFormat;
 		return $df[1];
 	}
 
@@ -259,7 +259,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 */
 
 	public function getdefault_time_format() {
-		return \go\modules\core\users\model\Settings::get()->defaultTimeFormat;
+		return \go\core\model\Settings::get()->defaultTimeFormat;
 	}
 
 	/**
@@ -280,7 +280,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @access  public
 	 */
 	public function getDefault_first_weekday() {
-		return \go\modules\core\users\model\Settings::get()->defaultFirstWeekday;
+		return \go\core\model\Settings::get()->defaultFirstWeekday;
 	}
 
 	/**
@@ -290,7 +290,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @access  public
 	 */
 	public function getdefault_decimal_separator() {
-		return \go\modules\core\users\model\Settings::get()->defaultDecimalSeparator;
+		return \go\core\model\Settings::get()->defaultDecimalSeparator;
 	}
 
 	/**
@@ -300,7 +300,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @access  public
 	 */
 	public function getdefault_thousands_separator() {
-		return \go\modules\core\users\model\Settings::get()->defaultThousandSeparator;
+		return \go\core\model\Settings::get()->defaultThousandSeparator;
 	}
 	
 	/**
@@ -310,7 +310,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @access  public
 	 */
 	public function getdefault_list_separator() {
-		return \go\modules\core\users\model\Settings::get()->defaultListSeparator;
+		return \go\core\model\Settings::get()->defaultListSeparator;
 	}
 	
 	/**
@@ -320,11 +320,11 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @access  public
 	 */
 	public function getdefault_text_separator() {
-		return \go\modules\core\users\model\Settings::get()->defaultTextSeparator;
+		return \go\core\model\Settings::get()->defaultTextSeparator;
 	}
 	
 	public function getdefault_timezone() {
-		return \go\modules\core\users\model\Settings::get()->defaultTimezone;			
+		return \go\core\model\Settings::get()->defaultTimezone;			
 	}
 
 	/**

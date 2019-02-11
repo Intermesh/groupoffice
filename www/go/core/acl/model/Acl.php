@@ -7,8 +7,8 @@ use go\core\orm\Query;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\util\DateTime;
-use go\modules\core\groups\model\Group;
-use go\modules\core\users\model\User;
+use go\core\model\Group;
+use go\core\model\User;
 
 /**
  * The Acl class

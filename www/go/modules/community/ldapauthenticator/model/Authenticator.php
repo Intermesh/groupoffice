@@ -2,7 +2,7 @@
 namespace go\modules\community\ldapauthenticator\model;
 
 use Exception;
-use go\modules\core\users\model\User;
+use go\core\model\User;
 use go\core\auth\PrimaryAuthenticator;
 use go\core\ldap\Connection;
 use go\core\ldap\Record;

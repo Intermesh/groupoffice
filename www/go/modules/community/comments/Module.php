@@ -1,7 +1,7 @@
 <?php
 namespace go\modules\community\comments;
 
-use go\modules\core\users\model\User;
+use go\core\model\User;
 use go\core\module\Base;
 use go\core\orm\Mapping;
 use go\core\orm\Property;

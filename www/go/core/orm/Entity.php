@@ -11,7 +11,7 @@ use go\core\orm\Query;
 use go\core\jmap\EntityController;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
-use go\modules\core\modules\model\Module;
+use go\core\model\Module;
 
 /**
  * Entity model

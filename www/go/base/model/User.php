@@ -78,7 +78,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 			return null;
 		}
 		
-		$user = \go\modules\core\users\model\User::findById($this->id);
+		$user = \go\core\model\User::findById($this->id);
 		
 		return $user->password;
 	}
@@ -150,7 +150,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 * @deprecated since version 6.3
 	 */
 	public function getDigest(){
-		$user = \go\modules\core\users\model\User::findById($this->id);
+		$user = \go\core\model\User::findById($this->id);
 		
 		return $user->getDigest();
 	}
@@ -545,7 +545,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 		}
 		
 		if(isset($this->password)) {
-			$user = \go\modules\core\users\model\User::findById($this->id);		
+			$user = \go\core\model\User::findById($this->id);		
 			$user->setPassword($this->password);		
 			if(!$user->save()) {
 				throw new \Exception("Could not set password: ".var_export($user->getValidationErrors(), true));
@@ -675,7 +675,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	public static function getDefaultGroupIds(){
 		
 		$groups = [];
-		$s = \go\modules\core\users\model\Settings::get();			
+		$s = \go\core\model\Settings::get();			
 		foreach($s->getDefaultGroups() as $v) {
 			$groups[] = $v['groupId'];
 		}
@@ -744,7 +744,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 */
 	public function checkPassword($password){
 		
-		$user = \go\modules\core\users\model\User::findById($this->id);
+		$user = \go\core\model\User::findById($this->id);
 		return $user->checkPassword($password);
 	}	
 	
@@ -777,7 +777,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	public function defaultAttributes() {
 		$attr = parent::defaultAttributes();
 		
-		$s = \go\modules\core\users\model\Settings::get();
+		$s = \go\core\model\Settings::get();
 
 		
 		$attr['language']=GO()->getSettings()->language;		

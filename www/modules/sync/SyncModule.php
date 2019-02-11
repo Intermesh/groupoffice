@@ -5,7 +5,7 @@ namespace GO\Sync;
 use GO\Base\Module;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
-use go\modules\core\users\model\User;
+use go\core\model\User;
 use GO\Sync\Model\UserAddressBook;
 use GO\Sync\Model\UserNoteBook;
 use GO\Sync\Model\UserSettings;

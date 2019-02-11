@@ -5,7 +5,7 @@ use go\core\auth\DomainProvider;
 use go\core\db\Query;
 use go\core\module\Base;
 use go\modules\community\ldapauthenticator\model\Authenticator;
-use go\modules\core\modules\model\Module as CoreModule;
+use go\core\model\Module as CoreModule;
 
 class Module extends Base implements DomainProvider {
 

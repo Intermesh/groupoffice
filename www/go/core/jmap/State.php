@@ -8,7 +8,7 @@ use go\core\http\Exception;
 use go\core\http\Response;
 use go\core\jmap\Request;
 use go\core\model\Settings;
-use go\modules\core\users\model\User;
+use go\core\model\User;
 
 class State extends AbstractState {
 	

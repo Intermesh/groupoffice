@@ -3,7 +3,7 @@
 namespace go\core\event;
 
 use go\core\App;
-use go\modules\core\modules\model\Module;
+use go\core\model\Module;
 use go\core\Singleton;
 
 /**

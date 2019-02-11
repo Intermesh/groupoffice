@@ -7,7 +7,7 @@ class Module extends \go\core\module\Base {
 		return "Intermesh BV";
 	}
 
-	protected function afterInstall(\go\modules\core\modules\model\Module $model) {
+	protected function afterInstall(\go\core\model\Module $model) {
 		
 		$cron = new \go\core\model\CronJobSchedule();
 		$cron->moduleId = $model->id;

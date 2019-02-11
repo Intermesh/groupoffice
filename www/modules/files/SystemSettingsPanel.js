@@ -5,7 +5,7 @@ GO.files.SystemSettingsPanel = Ext.extend(Ext.Panel, {
 		this.title = t("Files");		
 		
 		this.items = [
-			new go.modules.core.customfields.SystemSettingsPanel({
+			new go.modules.core.core.SystemSettingsPanel({
 					entity: "File",
 					title: t("Custom file fields")
 //					createFieldSetDialog : function() {
@@ -13,7 +13,7 @@ GO.files.SystemSettingsPanel = Ext.extend(Ext.Panel, {
 //					}
 			}),
 			
-			new go.modules.core.customfields.SystemSettingsPanel({
+			new go.modules.core.core.SystemSettingsPanel({
 					entity: "Folder",
 					title: t("Custom folder fields")				
 			})

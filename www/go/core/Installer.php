@@ -17,11 +17,11 @@ use go\core\module\Base;
 use go\core\orm\Entity;
 use go\core\util\ClassFinder;
 use go\core\util\Lock;
-use go\modules\core\groups\model\Group;
-use go\modules\core\groups\model\Settings;
-use go\modules\core\modules\model\Module;
-use go\modules\core\users\model\User;
-use go\modules\core\users\model\UserGroup;
+use go\core\model\Group;
+use go\core\model\Settings;
+use go\core\model\Module;
+use go\core\model\User;
+use go\core\model\UserGroup;
 use PDOException;
 
 class Installer {

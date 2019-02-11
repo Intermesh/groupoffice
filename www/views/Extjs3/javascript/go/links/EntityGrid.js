@@ -11,7 +11,7 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 
 		var selModel = new Ext.grid.CheckboxSelectionModel();
 
-		var data = [], allEntities = go.modules.core.links.Links.getAll(), id;
+		var data = [], allEntities = go.modules.core.core.Links.getAll(), id;
 		
 		allEntities.forEach(function(link){			
 			id = link.entity;

@@ -4,7 +4,7 @@ go.modules.community.addressbook.SystemSettingsPanel = Ext.extend(Ext.Panel, {
 	initComponent: function () {
 		this.title = t("Address book");		
 		
-		this.items = [new go.modules.core.customfields.SystemSettingsPanel({
+		this.items = [new go.modules.core.core.SystemSettingsPanel({
 				// The entity it's for
 				entity: "Contact",
 

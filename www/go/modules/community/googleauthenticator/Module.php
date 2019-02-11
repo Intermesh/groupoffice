@@ -5,9 +5,9 @@ use go\core\module\Base;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\modules\community\googleauthenticator\model;
-use go\modules\core\groups\model\Group;
-use go\modules\core\modules\model\Module as ModuleModel;
-use go\modules\core\users\model\User;
+use go\core\model\Group;
+use go\core\model\Module as ModuleModel;
+use go\core\model\User;
 
 class Module extends Base {
 

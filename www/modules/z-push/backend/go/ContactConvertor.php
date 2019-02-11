@@ -10,7 +10,7 @@ use go\modules\community\addressbook\model\Date;
 use go\modules\community\addressbook\model\EmailAddress;
 use go\modules\community\addressbook\model\PhoneNumber;
 use go\modules\community\addressbook\model\Url;
-use go\modules\core\links\model\Link;
+use go\core\model\Link;
 
 /**
  * Contact convertor class

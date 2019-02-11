@@ -8,7 +8,7 @@ use GO;
 use go\core\App;
 use go\core\db\Query;
 use go\core\jmap\Entity;
-use go\modules\core\modules\model\Module;
+use go\core\model\Module;
 
 /**
  * The EntityType class
@@ -238,7 +238,12 @@ class EntityType {
 		$e->highestModSeq = (int) $record['highestModSeq'];
 
 		if (isset($record['modulePackage'])) {
-			$e->className = 'go\\modules\\' . $record['modulePackage'] . '\\' . $record['moduleName'] . '\\model\\' . ucfirst($e->name);
+			if($record['modulePackage'] == 'core') {
+				$e->className = 'go\\core\\model\\' . ucfirst($e->name);	
+			} else
+			{
+				$e->className = 'go\\modules\\' . $record['modulePackage'] . '\\' . $record['moduleName'] . '\\model\\' . ucfirst($e->name);
+			}
 		} else {			
 			$e->className = 'GO\\' . ucfirst($record['moduleName']) . '\\Model\\' . ucfirst($e->name);			
 		}

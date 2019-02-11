@@ -40,7 +40,7 @@ GO.calendar.EventDialog = function(calendar) {
 	//This field is added for filtering the custom field panels. It needs the group_id to be in the form values to filter on this value.
 	this.propertiesPanel.add(new Ext.form.Hidden({name: "group_id"})); 
 	
-	this.propertiesPanel.add(go.modules.core.customfields.CustomFields.getFormFieldSets("Event"));
+	this.propertiesPanel.add(go.modules.core.core.CustomFields.getFormFieldSets("Event"));
 	
 	if(go.Modules.isAvailable("legacy", "comments")){
 		this.commentsGrid = new GO.comments.CommentsGrid({title:t("Comments", "comments")});
@@ -121,7 +121,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			focus : focusSubject.createDelegate(this),
 			buttonAlign:'left',
 			buttons : [
-			this.createLinkButton = new go.modules.core.links.CreateLinkButton(),
+			this.createLinkButton = new go.modules.core.core.CreateLinkButton(),
 			this.fileBrowseButton,
 			'->',{
 				text : t("Apply"),
@@ -1043,11 +1043,11 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 
 					if(go.Modules.isAvailable("core", "customfields"))
 					{
-						var fieldSets = go.modules.core.customfields.CustomFields.getFormFieldSets("Calendar");
+						var fieldSets = go.modules.core.core.CustomFields.getFormFieldSets("Calendar");
 			
 						for(var l=0; l < fieldSets.length; l++)
 						{
-								var cf = go.modules.core.customfields.CustomFields.getFormFields(fieldSets[l].fieldSet.id);
+								var cf = go.modules.core.core.CustomFields.getFormFields(fieldSets[l].fieldSet.id);
 								var formFields = [new GO.form.PlainField({
 										hideLabel: true,
 										value: '<b>'+fieldSets[l].fieldSet.name+'</b>'
@@ -1076,12 +1076,12 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 						}
 						
 						
-						var fieldSets = go.modules.core.customfields.CustomFields.getFormFieldSets("Event"), length = fieldSets.length;
+						var fieldSets = go.modules.core.core.CustomFields.getFormFieldSets("Event"), length = fieldSets.length;
 						
 						if(length) {
 							for(var l=0; l<length; l++)
 							{		
-								var cf = go.modules.core.customfields.CustomFields.getFormFields(fieldSets[l].fieldSet.id);
+								var cf = go.modules.core.core.CustomFields.getFormFields(fieldSets[l].fieldSet.id);
 								resourceOptions.push(new GO.form.PlainField({
 										hideLabel: true,
 										value: '<b>'+fieldSets[l].fieldSet.name+'</b>'

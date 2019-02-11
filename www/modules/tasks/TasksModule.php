@@ -2,7 +2,7 @@
 
 namespace GO\Tasks;
 
-use go\modules\core\users\model\User;
+use go\core\model\User;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 

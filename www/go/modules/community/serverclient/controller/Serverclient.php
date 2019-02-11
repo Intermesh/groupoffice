@@ -16,7 +16,7 @@ class Serverclient extends \go\core\jmap\Controller {
 	// password is sync in user save event
 	public function setMailbox($params) {
 		
-		$user = \go\modules\core\users\model\User::findById($params['userId']);
+		$user = \go\core\model\User::findById($params['userId']);
 		if($user->hasPermissionLevel(\go\core\acl\model\Acl::LEVEL_WRITE)) {
 			$postfixAdmin = new MailDomain($params['password']);
 			foreach ($params['domains'] as $domain) {

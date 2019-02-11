@@ -239,10 +239,10 @@ class Account extends \GO\Base\Db\ActiveRecord {
 		}
 		
 		if($wasNew) {
-			$user = \go\modules\core\users\model\User::findById($this->user_id);
+			$user = \go\core\model\User::findById($this->user_id);
 			if($user->isAdmin()) {
 				//add admin group
-				$group = \go\modules\core\groups\model\Group::find()->where(['isUserGroupFor' => $user->id])->single();
+				$group = \go\core\model\Group::find()->where(['isUserGroupFor' => $user->id])->single();
 				$this->getAcl()->addGroup($group->id, \go\core\acl\model\Acl::LEVEL_MANAGE);
 			}
 		}

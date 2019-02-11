@@ -17,8 +17,8 @@ namespace go\core\dav\auth;
 
 use GO;
 use go\core\auth\TemporaryState;
-use go\modules\core\modules\model\Module;
-use go\modules\core\users\model\User;
+use go\core\model\Module;
+use go\core\model\User;
 use Sabre\DAV\Auth\Backend\AbstractBasic;
 use Sabre\DAV\Exception\Forbidden;
 

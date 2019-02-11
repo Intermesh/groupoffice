@@ -3,8 +3,8 @@ namespace go\modules\core\customfields\install;
 
 use go\core\db\Query;
 use go\core\db\Utils;
-use go\modules\core\customfields\model\Field;
-use go\modules\core\customfields\model\FieldSet;
+use go\core\model\Field;
+use go\core\model\FieldSet;
 use PDOException;
 use function GO;
 
@@ -38,11 +38,11 @@ class Migrate63to64 {
 					break;
 				
 				case "User":
-					$this->updateSelectEntity($field, \go\modules\core\users\model\User::class);
+					$this->updateSelectEntity($field, \go\core\model\User::class);
 					break;
 				
 				case "Group":
-					$this->updateSelectEntity($field, \go\modules\core\groups\model\Group::class);
+					$this->updateSelectEntity($field, \go\core\model\Group::class);
 					break;
 				
 				case "Textarea":

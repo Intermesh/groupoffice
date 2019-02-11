@@ -7,7 +7,7 @@ go.modules.community.notes.NoteForm = Ext.extend(go.form.Dialog, {
 	
 	initFormItems: function () {
 		
-		var formFieldSets = go.modules.core.customfields.CustomFields.getFormFieldSets("Note"),
+		var formFieldSets = go.modules.core.core.CustomFields.getFormFieldSets("Note"),
 			 fieldSetAnchor = formFieldSets.length ? '100% 80%' : '100% 100%';
 		
 		var items = [{

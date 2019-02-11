@@ -496,7 +496,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 					}
 				]
 			})
-		].concat(go.modules.core.customfields.CustomFields.getFormFieldSets("Contact"));
+		].concat(go.modules.core.core.CustomFields.getFormFieldSets("Contact"));
 
 		return items;	
 	},

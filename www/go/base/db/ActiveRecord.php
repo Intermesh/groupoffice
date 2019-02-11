@@ -1350,7 +1350,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			
 			$names = array_map(function($f) {
 				return "cf." . $f->databaseName;
-			}, \go\modules\core\customfields\model\Field::findByEntity($this->getType()->getId())->all());
+			}, \go\core\model\Field::findByEntity($this->getType()->getId())->all());
 			
 			if(!empty($names)) {
 				$fields .= ", " .implode(', ', $names);
@@ -3505,9 +3505,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			return false;
 		}
 		
-		$search = \go\modules\core\search\model\Search::find()->where('entityTypeId','=', static::getType()->getId())->andWhere('entityId', '=', $this->id)->single();
+		$search = \go\core\model\Search::find()->where('entityTypeId','=', static::getType()->getId())->andWhere('entityId', '=', $this->id)->single();
 		if(!$search) {
-			$search = new \go\modules\core\search\model\Search();
+			$search = new \go\core\model\Search();
 			$search->setEntity(static::getType());
 		}
 		// GO 6.3 backwards compatible
@@ -4000,7 +4000,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$attr = $this->getCacheAttributes();
 
 		if($attr){
-			$model = \go\modules\core\search\model\Search::find()->where(['entityId' => $this->pk, 'entityTypeId'=>$this->modelTypeId()])->single();
+			$model = \go\core\model\Search::find()->where(['entityId' => $this->pk, 'entityTypeId'=>$this->modelTypeId()])->single();
 //			$model = \GO\Base\Model\SearchCacheRecord::model()->findByPk(array('model_id'=>$this->pk, 'model_type_id'=>$this->modelTypeId()),false,true);
 			if($model)
 				$model->delete();

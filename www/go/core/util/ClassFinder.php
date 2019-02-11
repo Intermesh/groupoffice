@@ -6,7 +6,7 @@ use Closure;
 use go\core\App;
 use go\core\Environment;
 use go\core\fs\Folder;
-use go\modules\core\modules\model\Module;
+use go\core\model\Module;
 use ReflectionClass;
 
 /**

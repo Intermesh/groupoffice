@@ -2,7 +2,7 @@
 
 namespace GO\Freebusypermissions;
 
-use go\modules\core\users\model\User;
+use go\core\model\User;
 use go\core\orm;
 
 class FreebusypermissionsModule extends \GO\Base\Module{

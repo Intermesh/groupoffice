@@ -102,7 +102,7 @@ abstract class AbstractExport {
 		
 		if(substr($column, 0, 13) === 'customFields.') {
 			$entityTypeId = $this->_model->getType()->getId();
-			$field = \go\modules\core\customfields\model\Field::findByEntity($entityTypeId)->andWhere('databaseName', '=', substr($column, 13))->single();
+			$field = \go\core\model\Field::findByEntity($entityTypeId)->andWhere('databaseName', '=', substr($column, 13))->single();
 			return $field->name;
 		} else if(strpos($column,'.')){
 			
@@ -268,7 +268,7 @@ abstract class AbstractExport {
 		
 		if(method_exists($this->_model, 'getCustomFields')) {
 			$entityTypeId = $this->_model->getType()->getId();
-			$fields = \go\modules\core\customfields\model\Field::findByEntity($entityTypeId);
+			$fields = \go\core\model\Field::findByEntity($entityTypeId);
 			
 			foreach($fields as $field) {
 				

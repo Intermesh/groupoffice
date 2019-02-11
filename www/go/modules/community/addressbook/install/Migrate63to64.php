@@ -220,7 +220,7 @@ class Migrate63to64 {
 		flush();
 	
 		$cfMigrator = new \go\modules\core\customfields\install\Migrate63to64();
-		$fields = \go\modules\core\customfields\model\Field::find()->where(['type' => [
+		$fields = \go\core\model\Field::find()->where(['type' => [
 				'Contact', 
 				'Company'
 				]]);
@@ -441,9 +441,9 @@ class Migrate63to64 {
 
 			$contact->createdAt = new DateTime("@" . $r['ctime']);
 			$contact->modifiedAt = new DateTime("@" . $r['mtime']);
-			$contact->createdBy = \go\modules\core\users\model\User::findById($r['user_id'], ['id']) ? $r['user_id'] : 1;
-			$contact->modifiedBy = \go\modules\core\users\model\User::findById($r['muser_id'], ['id']) ? $r['muser_id'] : 1;
-			$contact->goUserId = empty($r['go_user_id']) || !\go\modules\core\users\model\User::findById($r['go_user_id'], ['id']) ? null : $r['go_user_id'];
+			$contact->createdBy = \go\core\model\User::findById($r['user_id'], ['id']) ? $r['user_id'] : 1;
+			$contact->modifiedBy = \go\core\model\User::findById($r['muser_id'], ['id']) ? $r['muser_id'] : 1;
+			$contact->goUserId = empty($r['go_user_id']) || !\go\core\model\User::findById($r['go_user_id'], ['id']) ? null : $r['go_user_id'];
 
 			if ($r['photo']) {
 
@@ -470,7 +470,7 @@ class Migrate63to64 {
 				
 				$org = Contact::findById($orgId);
 				if($org) {
-					\go\modules\core\links\model\Link::create($contact, $org);
+					\go\core\model\Link::create($contact, $org);
 				}
 			}
 		}
@@ -583,9 +583,9 @@ class Migrate63to64 {
 
 			$contact->createdAt = new DateTime("@" . $r['ctime']);
 			$contact->modifiedAt = new DateTime("@" . $r['mtime']);
-			$contact->createdBy = \go\modules\core\users\model\User::findById($r['user_id'], ['id']) ? $r['user_id'] : 1;
-			$contact->modifiedBy = \go\modules\core\users\model\User::findById($r['muser_id'], ['id']) ? $r['muser_id'] : 1;
-			$contact->goUserId = empty($r['go_user_id']) || !\go\modules\core\users\model\User::findById($r['go_user_id'], ['id']) ? null : $r['go_user_id'];
+			$contact->createdBy = \go\core\model\User::findById($r['user_id'], ['id']) ? $r['user_id'] : 1;
+			$contact->modifiedBy = \go\core\model\User::findById($r['muser_id'], ['id']) ? $r['muser_id'] : 1;
+			$contact->goUserId = empty($r['go_user_id']) || !\go\core\model\User::findById($r['go_user_id'], ['id']) ? null : $r['go_user_id'];
 			
 			$contact->IBAN = $r['bank_no'];
 			

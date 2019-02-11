@@ -6,7 +6,7 @@ use go\core\db\Query;
 use go\core\db\Table;
 use go\core\db\Utils;
 use go\core\validate\ErrorCode;
-use go\modules\core\customfields\model\Field;
+use go\core\model\Field;
 use PDOException;
 
 /**

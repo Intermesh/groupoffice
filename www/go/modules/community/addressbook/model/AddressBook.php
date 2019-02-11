@@ -59,11 +59,11 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 	/**
 	 * Find or create a default address book for the user
 	 * 
-	 * @param \go\modules\core\users\model\User $user
+	 * @param \go\core\model\User $user
 	 * @return \go\modules\community\addressbook\model\AddressBook
 	 * @throws \Exception
 	 */
-	public static function getDefault(\go\modules\core\users\model\User $user = null) {
+	public static function getDefault(\go\core\model\User $user = null) {
 		
 		if(!isset($user)) {
 			$user = GO()->getAuthState()->getUser();

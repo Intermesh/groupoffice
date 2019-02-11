@@ -2,7 +2,7 @@
 
 Ext.ns("go.modules.community.files.customfield");
 
-go.modules.community.files.customfield.File = Ext.extend(go.modules.core.customfields.type.Text, {
+go.modules.community.files.customfield.File = Ext.extend(go.modules.core.core.type.Text, {
 	
 	name : "File",
 	
@@ -13,10 +13,10 @@ go.modules.community.files.customfield.File = Ext.extend(go.modules.core.customf
 	/**
 	 * Return dialog to edit this type of field
 	 * 
-	 * @returns {go.modules.core.customfields.FieldDialog}
+	 * @returns {go.modules.core.core.FieldDialog}
 	 */
 	getDialog : function() {
-		return new go.modules.core.customfields.FieldDialog();
+		return new go.modules.core.core.FieldDialog();
 	},
 	
 	/**
@@ -42,7 +42,7 @@ go.modules.community.files.customfield.File = Ext.extend(go.modules.core.customf
 	 * @returns {Object}
 	 */
 	createFormFieldConfig: function (customfield, config) {
-		var c = go.modules.core.customfields.type.Select.superclass.createFormFieldConfig.call(this, customfield, config);
+		var c = go.modules.core.core.type.Select.superclass.createFormFieldConfig.call(this, customfield, config);
 		c.xtype = "selectfile";		
 		return c;
 	},
@@ -53,5 +53,5 @@ go.modules.community.files.customfield.File = Ext.extend(go.modules.core.customf
 	
 });
 
-go.modules.core.customfields.CustomFields.registerType(new go.modules.community.files.customfield.File());
+go.modules.core.core.CustomFields.registerType(new go.modules.community.files.customfield.File());
 

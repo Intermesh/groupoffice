@@ -108,7 +108,7 @@ if (!empty($_POST)) {
 		Observable::cacheListeners();			
 	
 				
-		\go\modules\core\users\model\User::findById(1)->legacyOnSave();
+		\go\core\model\User::findById(1)->legacyOnSave();
 		
 		
 		if(GO()->getConfig()['general']['servermanager']) {

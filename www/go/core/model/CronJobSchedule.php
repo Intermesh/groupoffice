@@ -7,7 +7,7 @@ use GO;
 use go\core\jmap\Entity;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
-use go\modules\core\modules\model\Module;
+use go\core\model\Module;
 
 class CronJobSchedule extends Entity {
 

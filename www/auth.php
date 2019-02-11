@@ -5,7 +5,7 @@ require(__DIR__ . "/vendor/autoload.php");
 use go\core\App;
 use go\core\auth\Method;
 use go\core\auth\model\Token;
-use go\modules\core\users\model\User;
+use go\core\model\User;
 use go\core\auth\PrimaryAuthenticator;
 use go\core\http\Request;
 use go\core\http\Response;

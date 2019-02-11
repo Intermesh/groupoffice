@@ -8,7 +8,7 @@ use go\core\db\Table;
 use go\core\db\Utils;
 use go\core\ErrorHandler;
 use go\core\util\ClassFinder;
-use go\modules\core\customfields\model\Field;
+use go\core\model\Field;
 
 
 /**

@@ -4,7 +4,7 @@ GO.tasks.SystemSettingsPanel = Ext.extend(Ext.Panel, {
 	initComponent: function () {
 		this.title = t("Tasks");		
 		
-		this.items = [new go.modules.core.customfields.SystemSettingsPanel({
+		this.items = [new go.modules.core.core.SystemSettingsPanel({
 				entity: "Task"
 //				createFieldSetDialog : function() {
 //					return new go.modules.community.addressbook.CustomFieldSetDialog();

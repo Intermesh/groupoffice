@@ -19,7 +19,7 @@
 namespace go\core\dav\davacl;
 
 use GO;
-use go\modules\core\users\model\User;
+use go\core\model\User;
 use Sabre\CalDAV\Principal\User as PrincipalUser;
 use Sabre\DAV\PropPatch;
 use Sabre\DAV\Xml\Property\Href;

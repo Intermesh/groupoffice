@@ -552,8 +552,8 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 			foreach($books as $book){			
 				
 				//give demo access
-				$book->acl->addGroup(\go\modules\core\groups\model\Group::find()->where(['isUserGroupFor' => $demo->id])->single()->id, \GO\Base\Model\Acl::WRITE_PERMISSION);
-				$book->acl->addGroup(\go\modules\core\groups\model\Group::find()->where(['isUserGroupFor' => $elmer->id])->single()->id, \GO\Base\Model\Acl::WRITE_PERMISSION);
+				$book->acl->addGroup(\go\core\model\Group::find()->where(['isUserGroupFor' => $demo->id])->single()->id, \GO\Base\Model\Acl::WRITE_PERMISSION);
+				$book->acl->addGroup(\go\core\model\Group::find()->where(['isUserGroupFor' => $elmer->id])->single()->id, \GO\Base\Model\Acl::WRITE_PERMISSION);
 				
 				
 				$order = new \GO\Billing\Model\Order();
@@ -609,8 +609,8 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 			$ticket->save();
 			
 			//make elmer and demo a ticket agent
-			$ticket->type->acl->addGroup(\go\modules\core\groups\model\Group::find()->where(['isUserGroupFor' => $elmer->id])->single()->id, \GO\Base\Model\Acl::MANAGE_PERMISSION);
-			$ticket->type->acl->addGroup(\go\modules\core\groups\model\Group::find()->where(['isUserGroupFor' => $demo->id])->single()->id, \GO\Base\Model\Acl::MANAGE_PERMISSION);
+			$ticket->type->acl->addGroup(\go\core\model\Group::find()->where(['isUserGroupFor' => $elmer->id])->single()->id, \GO\Base\Model\Acl::MANAGE_PERMISSION);
+			$ticket->type->acl->addGroup(\go\core\model\Group::find()->where(['isUserGroupFor' => $demo->id])->single()->id, \GO\Base\Model\Acl::MANAGE_PERMISSION);
 			
 				
 			

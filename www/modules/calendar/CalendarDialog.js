@@ -260,7 +260,7 @@ GO.calendar.CalendarDialog = function(config)
 	});
 	
 	
-	this.propertiesTab.add(go.modules.core.customfields.CustomFields.getFormFieldSets("Calendar"));
+	this.propertiesTab.add(go.modules.core.core.CustomFields.getFormFieldSets("Calendar"));
 
 
 	var items = [this.propertiesTab];

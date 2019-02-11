@@ -15,7 +15,7 @@ use go\modules\community\addressbook\model\Contact;
 use go\modules\community\addressbook\model\Date;
 use go\modules\community\addressbook\model\EmailAddress;
 use go\modules\community\addressbook\model\PhoneNumber;
-use go\modules\core\links\model\Link;
+use go\core\model\Link;
 use Sabre\VObject\Component\VCard as VCardComponent;
 use Sabre\VObject\Reader;
 use Sabre\VObject\Splitter\VCard as VCardSplitter;

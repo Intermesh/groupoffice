@@ -8,7 +8,7 @@ use go\core\Environment;
 use go\core\exception\NotFound;
 use go\core\fs\File;
 use go\core\fs\Folder;
-use go\modules\core\modules\model\Module;
+use go\core\model\Module;
 use go\core\orm\Entity;
 use go\core\util\ClassFinder;
 use function GO;

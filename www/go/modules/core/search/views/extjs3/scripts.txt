@@ -1,4 +1,0 @@
-Module.js
-Panel.js
-SearchEmailCombo.js
-SearchCombo.js

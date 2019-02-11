@@ -355,7 +355,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		Ext.state.Manager.setProvider(new GO.state.HttpProvider());
 		
 		this.fireEvent('authenticated', this);
-//		go.modules.core.customfields.CustomFields.init(function(){
+//		go.modules.core.core.CustomFields.init(function(){
 //			go.Modules.init(function() {
 //				
 //			});
@@ -364,7 +364,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		var me = this;
 	
 		Promise.all([
-			go.modules.core.customfields.CustomFields.init(),
+			go.modules.core.core.CustomFields.init(),
 			go.Modules.init(),
 			this.loadLegacyModuleScripts()
 		]).then(function(){
