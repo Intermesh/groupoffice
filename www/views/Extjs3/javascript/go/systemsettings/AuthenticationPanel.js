@@ -1,4 +1,4 @@
-go.systemsettings.AuthenticationPanel = Ext.extend(Ext.form.FormPanel, {
+go.systemsettings.AuthenticationPanel = Ext.extend(go.systemsettings.Panel, {
 	initComponent: function () {
 		
 		this.domainCombo = GO.SystemSettingsDomainCombo = new go.login.DomainCombo({
@@ -31,29 +31,8 @@ go.systemsettings.AuthenticationPanel = Ext.extend(Ext.form.FormPanel, {
 			
 
 		go.systemsettings.AuthenticationPanel.superclass.initComponent.call(this);
-		
-		this.on('render', function() {
-			go.Jmap.request({
-				method: "core/core/Settings/get",
-				callback: function (options, success, response) {
-					this.getForm().setValues(response);
-				},
-				scope: this
-			});
-		}, this);
-	},
-
-	onSubmit: function (cb, scope) {
-		go.Jmap.request({
-			method: "core/core/Settings/set",
-			params: this.getForm().getFieldValues(),
-			callback: function (options, success, response) {
-				cb.call(scope, this, success);
-			},
-			scop: scope
-		});
+	
 	}
-
 
 });
 
