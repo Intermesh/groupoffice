@@ -1,8 +1,8 @@
 <?php
-namespace go\modules\core\customfields\type;
+namespace go\core\customfield;
 
 use go\core\util\Crypt;
-use go\modules\core\customfields\type\Base;
+use go\core\customfield\Base;
 
 class EncryptedText extends Base {
 	/**

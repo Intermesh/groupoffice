@@ -1,6 +1,6 @@
 <?php
 
-namespace go\modules\core\customfields\type;
+namespace go\core\customfield;
 
 class FunctionField extends Base {
 	

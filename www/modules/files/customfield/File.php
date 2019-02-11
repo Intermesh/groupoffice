@@ -2,7 +2,7 @@
 
 namespace GO\Files\Customfield;
 
-use go\modules\core\customfields\type\Base;
+use go\core\customfield\Base;
 
 class File extends Base {
 

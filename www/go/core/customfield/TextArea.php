@@ -1,8 +1,8 @@
 <?php
 
-namespace go\modules\core\customfields\type;
+namespace go\core\customfield;
 
-class Html extends Base {
+class TextArea extends Base {
 	/**
 	 * Get column definition for SQL
 	 * 

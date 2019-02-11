@@ -1,5 +1,5 @@
 <?php
-namespace go\modules\core\customfields\type;
+namespace go\core\customfield;
 
 use Exception;
 use GO;
@@ -195,7 +195,7 @@ abstract class Base extends Model {
 	/**
 	 * Get all field types
 	 * 
-	 * @return string[] eg ['functionField' => "go\modules\core\customfields\type\FunctionField"];
+	 * @return string[] eg ['functionField' => "go\core\customfield\FunctionField"];
 	 */
 	public static function findAll() {
 		

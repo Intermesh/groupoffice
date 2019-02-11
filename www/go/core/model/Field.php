@@ -8,7 +8,7 @@ use go\core\orm\EntityType;
 use go\core\orm\Query;
 use go\core\util\DateTime;
 use go\core\model\FieldSet;
-use go\modules\core\customfields\type\Base;
+use go\core\customfield\Base;
 
 /**
  * Field

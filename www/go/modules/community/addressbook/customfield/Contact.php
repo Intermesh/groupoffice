@@ -4,7 +4,7 @@ namespace go\modules\community\addressbook\customfield;
 
 use GO;
 use go\core\db\Utils;
-use go\modules\core\customfields\type\Base;
+use go\core\customfield\Base;
 
 class Contact extends Base {
 
