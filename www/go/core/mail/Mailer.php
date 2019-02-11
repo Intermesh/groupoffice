@@ -26,6 +26,14 @@ class Mailer {
 	}
 	
 	public function send($message) {
+		
+		if(!empty(GO()->getSettings()->debugEmail)){
+			$message->setTo(GO()->getSettings()->debugEmail);
+			$message->setBcc(array());
+			$message->setCc(array());
+			GO()->warn("E-mail debugging is enabled in the Group-Office configuration. All emails are send to: ".GO()->getSettings()->debugEmail);
+		}
+		
 		return $this->swift()->send($message);
 	}
 	
