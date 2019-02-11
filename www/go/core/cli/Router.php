@@ -5,7 +5,6 @@ namespace go\core\cli;
 use Exception;
 use go\core\exception\NotFound;
 use go\core\jmap\exception\InvalidArguments;
-use go\core\RouterInterface;
 use ReflectionMethod;
 use function str_split;
 
@@ -14,7 +13,7 @@ use function str_split;
  * 
  * Usage: cli.php package/modulename/controller/method --arg1=foo
  */
-class Router implements RouterInterface {
+class Router {
 	
 	private static $args;
 

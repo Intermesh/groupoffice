@@ -3,12 +3,11 @@
 namespace go\core\jmap;
 
 use Exception as CoreException;
+use GO;
 use go\core\App;
-use go\core\Debugger;
 use go\core\ErrorHandler;
 use go\core\http\Exception;
 use go\core\orm\EntityType;
-use go\core\RouterInterface;
 use JsonSerializable;
 
 /**
@@ -24,7 +23,7 @@ use JsonSerializable;
  * 
  * http://jmap.io/spec-core.html#making-an-api-request
  */
-class Router implements RouterInterface {
+class Router {
 
 	private $clientCallId;
 
