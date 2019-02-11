@@ -43,6 +43,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	valueField: "id",
 	entityStore: null,
 	comboStore: null,
+	store: null,
 	autoHeight: true,
 	storeBaseParams: null,
 	
@@ -161,7 +162,8 @@ go.form.Chips = Ext.extend(Ext.Container, {
 		Ext.form.MessageTargets.qtip.clear(this);
 	},
 	createComboBox: function () {
-		if(this.comboStore) {
+		if(this.store) {
+			this.comboStore = this.store;
 			return;
 		}
 		

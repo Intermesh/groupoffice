@@ -83,6 +83,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 				this.submit(); 
 				this.textField.syncValue();
 				this.chips.reset();
+				this.loadLabels();
 			},
 			scope: this
 		});
@@ -106,7 +107,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 						name: 'labelIds',
 						entityStore: go.Stores.get('CommentLabel'),
 						style:'padding-bottom:4px',
-						comboStore: this.store
+						store: this.store
 					}),
 					this.attachmentBox = new Ext.Container()
 				]
