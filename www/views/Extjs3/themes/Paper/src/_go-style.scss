@@ -110,7 +110,6 @@ a {
 	}
 	&[target], &[onclick] {
 		@include var(color, c-primary);
-		font-weight: $font-weight-m;
 	}
 	&:hover {
 		text-decoration: underline;

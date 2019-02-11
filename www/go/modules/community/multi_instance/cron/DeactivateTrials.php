@@ -15,6 +15,7 @@ class DeactivateTrials extends CronJob {
 		
 		foreach($expiredTrials as $trial) {
 			$trial->enabled = false;
+			$trial->isTrial = false;
 			if(!$trial->save()) {
 				throw new \Exception("Could not deactivate trial");
 			}
