@@ -45,12 +45,9 @@ class EmailTemplate extends AclOwnerEntity {
 		}
 	}
 	
-	public static function filter(\go\core\orm\Query $query, array $filter) {
-		
-		if(array_key_exists('ownedBy', $filter)) {
-			$query->where('ownedBy','=', $filter['ownedBy']);
-		}
-		
-		return parent::filter($query, $filter);
+	protected static function defineFilters() {
+		return  parent::defineFilters()->add('ownedBy', function(\go\core\db\Criteria $criteria, $value) {
+			$criteria->where('ownedBy','=', $value);
+		});
 	}
 }
