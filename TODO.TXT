@@ -4,7 +4,7 @@
 
 
 For old framework cf:
-Contact filters
+Contact filters custom fields
 Merge contacts
 Export / import  contacts CSV
 Batch edit custom fields not possible

@@ -89,8 +89,8 @@ if(GO::config()->debug) {
 }
 
 //echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' => \GO::language()->getLanguage()]) . '"></script>';
-echo '<script type="text/javascript" src="views/Extjs3/ext/adapter/ext/ext-base-debug.js"></script>';
-echo '<script type="text/javascript" src="views/Extjs3/ext/ext-all-debug.js"></script>';
+echo '<script type="text/javascript" src="views/Extjs3/javascript/ext-base-debug.js"></script>';
+echo '<script type="text/javascript" src="views/Extjs3/javascript/ext-all-debug.js"></script>';
 echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?lang='.\GO()->getLanguage()->getIsoCode() . '&v='.GO()->getVersion().'"></script>';
 
 ?>
