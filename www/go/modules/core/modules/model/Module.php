@@ -29,7 +29,16 @@ class Module extends AclOwnerEntity {
 			$this->sort_order = $this->nextSortOrder();			
 		}
 		
-		return parent::internalSave();
+		if(!parent::internalSave()) {
+			return false;
+		}
+		
+		$settings = $this->getSettings();
+		if($settings && !$settings->save()) {
+			return false;
+		}
+		
+		return true;
 	}
 	
 	
@@ -67,6 +76,9 @@ class Module extends AclOwnerEntity {
 	}	
 	
 	private function getModuleClass() {
+		if($this->package == "core" && $this->name == "core") {
+			return "\\go\\core\\Module";
+		}
 		return "\\go\\modules\\" . $this->package ."\\" . $this->name ."\\Module";
 	}	
 	
@@ -145,9 +157,16 @@ class Module extends AclOwnerEntity {
 	
 	protected function internalValidate() {
 		
-		if(!$this->isNew() && $this->package == 'core' && $this->isModified('enabled')) {
-			throw new \Exception("You can't disable core modules");		
+		if(!$this->isNew()) {
+			if($this->package == 'core' && $this->isModified('enabled')) {
+				throw new \Exception("You can't disable core modules");		
+			}
+			
+			if($this->isModified(['name', 'package'])) {
+				$this->setValidationError('name', \go\core\validate\ErrorCode::FORBIDDEN,"You can't change the module name and package");
+			}
 		}
+		
 		
 		return parent::internalValidate();
 	}
@@ -193,5 +212,22 @@ class Module extends AclOwnerEntity {
 		static::applyAclToQuery($query, $level, $userId);
 		
 		return $query->single() !== false;
+	}
+	
+	/**
+	 * Get module settings
+	 * 
+	 * @return \go\core\Settings
+	 */
+	public function getSettings() {
+		if(!isset($this->package)) {
+			return null;
+		}
+		
+		return $this->module()->getSettings();
+	}
+	
+	public function setSettings($value) {
+		$this->getSettings()->setValues($value);
 	}
 }

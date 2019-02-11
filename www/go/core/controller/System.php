@@ -1,5 +1,5 @@
 <?php
-namespace go\modules\core\core\controller;
+namespace go\core\controller;
 
 use go\core\cli\Controller;
 use go\core\db\Query;

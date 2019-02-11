@@ -1,5 +1,5 @@
 <?php
-namespace go\modules\core\core;
+namespace go\core;
 
 use go\core\module\Base;
 
@@ -10,7 +10,7 @@ class Module extends Base {
 	
 	protected function afterInstall(\go\modules\core\modules\model\Module $model) {
 		
-		$cron = new \go\modules\core\core\model\CronJobSchedule();
+		$cron = new \go\core\model\CronJobSchedule();
 		$cron->moduleId = $model->id;
 		$cron->name = "GarbageCollection";
 		$cron->expression = "0 * * * *";
@@ -21,5 +21,20 @@ class Module extends Base {
 		}
 		
 		return parent::afterInstall($model);
+	}
+	
+	public static function getName() {
+		return "core";
+	}
+	
+	public static function getPackage() {
+		return "core";
+	}
+	
+	public function getSettings(): \go\core\Settings {
+		if($this->getPackage()) {
+			
+		}
+		return \go\core\model\Settings::get();
 	}
 }

@@ -19,7 +19,7 @@ use go\core\jmap\State;
 use go\core\mail\Mailer;
 use go\core\util\Lock;
 use go\core\webclient\Extjs3;
-use go\modules\core\core\model\Settings;
+use go\core\model\Settings;
 use const GO_CONFIG_FILE;
 
 	/**

@@ -1,4 +1,4 @@
-go.systemsettings.NotificationsPanel = Ext.extend(Ext.form.FormPanel, {
+go.systemsettings.NotificationsPanel = Ext.extend(go.systemsettings.Panel, {
 	initComponent: function () {
 		
 		var tmpDebugMail;
@@ -107,19 +107,17 @@ go.systemsettings.NotificationsPanel = Ext.extend(Ext.form.FormPanel, {
 
 		go.systemsettings.NotificationsPanel.superclass.initComponent.call(this);
 		
-		this.on('afterrender', function() {
-			go.Jmap.request({
-				method: "core/core/Settings/get",
-				callback: function (options, success, response) {
-						var f = this.getForm();
-						f.setValues(response);	
-						tmpDebugMail = response.debugEmail || '';
-						f.findField('smtpEncryptionVerifyCertificate').setDisabled(response['smtpEncryption'] == null);
-						f.findField("enableEmailDebug").setValue(!GO.util.empty(f.findField('debugEmail').getValue()));
-				},
-				scope: this
-			});
-		}, this);
+		
+	},
+	
+	afterRender: function() {
+		
+		go.systemsettings.NotificationsPanel.superclass.afterRender.call(this);
+		
+		var f = this.getForm();
+		
+		f.findField('smtpEncryptionVerifyCertificate').setDisabled(!f.findField('smtpEncryption').getValue());
+		f.findField("enableEmailDebug").setValue(!GO.util.empty(f.findField('debugEmail').getValue()));
 	},
 	
 	sendTestMessage : function() {
@@ -151,23 +149,7 @@ go.systemsettings.NotificationsPanel = Ext.extend(Ext.form.FormPanel, {
 		});
 		
 		
-	},
-
-	onSubmit: function (cb, scope) {
-		go.Jmap.request({
-			method: "core/core/Settings/set",
-			params: this.getForm().getFieldValues(),
-			callback: function (options, success, response) {
-				cb.call(scope, this, success);
-			},
-			scope: scope
-		});
 	}
 
-
 });
-
-//GO.mainLayout.onReady(function(){
-//	go.systemSettingsDialog.addPanel('email', go.systemsettings.EmailPanel);
-//});
 

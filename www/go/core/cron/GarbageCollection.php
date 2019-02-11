@@ -1,10 +1,10 @@
 <?php
-namespace go\modules\core\core\cron;
+namespace go\core\cron;
 
 use Exception;
 use go\core\fs\Blob;
 use go\core\util\DateTime;
-use go\modules\core\core\model\CronJob;
+use go\core\model\CronJob;
 use function GO;
 
 /**

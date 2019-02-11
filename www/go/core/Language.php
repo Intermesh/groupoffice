@@ -186,6 +186,8 @@ class Language {
 		
 		if($package == "legacy") {
 			$folder = Environment::get()->getInstallFolder()->getFolder('modules/' . $module .'/language');
+		} else if($package == "core" && $module == "core") {
+			$folder = Environment::get()->getInstallFolder()->getFolder('go/core/language');
 		} else
 		{
 			$folder = Environment::get()->getInstallFolder()->getFolder('go/modules/' . $package . '/' . $module .'/language');

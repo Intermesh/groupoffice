@@ -1,6 +1,6 @@
 <?php
 
-namespace go\modules\core\core\model;
+namespace go\core\model;
 
 use Cron\CronExpression;
 use GO;

@@ -7,7 +7,7 @@ use go\core\App;
 use go\core\Environment;
 use go\core\fs\File;
 use go\core\Language;
-use go\modules\core\core\model\Settings;
+use go\core\model\Settings;
 use go\modules\core\modules\model\Module;
 
 class Extjs3 {

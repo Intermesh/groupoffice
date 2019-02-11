@@ -321,6 +321,7 @@ views/Extjs3/javascript/go/detail/AddButton.js
 views/Extjs3/javascript/go/detail/PropertyList.js
 views/Extjs3/javascript/go/detail/Property.js
 
+views/Extjs3/javascript/go/systemsettings/Panel.js
 views/Extjs3/javascript/go/systemsettings/GeneralPanel.js
 views/Extjs3/javascript/go/systemsettings/AppearancePanel.js
 views/Extjs3/javascript/go/systemsettings/NotificationsPanel.js

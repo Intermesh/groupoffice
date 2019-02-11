@@ -1,5 +1,5 @@
 <?php
-namespace go\modules\core\core\model;
+namespace go\core\model;
 
 use go\core;
 use go\core\http\Request;
@@ -18,6 +18,14 @@ class Settings extends core\Settings {
 			$this->language = $this->getDefaultLanguage();
 			$this->save();
 		}
+	}
+	
+	protected function getModuleName() {
+		return "core";
+	}
+	
+	protected function getModulePackageName() {
+		return "core";
 	}
 	
 	private function getDefaultLanguage() {		

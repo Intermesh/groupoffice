@@ -1,6 +1,6 @@
 <?php
 
-namespace go\modules\core\core\controller;
+namespace go\core\controller;
 
 use go\core\acl\model;
 use go\core\jmap\EntityController;

@@ -3,7 +3,7 @@ namespace go\modules\community\multi_instance\cron;
 
 use go\core\util\DateTime;
 use go\modules\community\multi_instance\model\Instance;
-use go\modules\core\core\model\CronJob;
+use go\core\model\CronJob;
 
 class DeactivateTrials extends CronJob {
 	

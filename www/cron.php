@@ -6,7 +6,7 @@ if(!empty($argv[1])) {
 require('GO.php');
 
 //new framework
-\go\modules\core\core\model\CronJobSchedule::runNext();
+\go\core\model\CronJobSchedule::runNext();
 
 
 GO()->debug("Running cron for legacy framework");

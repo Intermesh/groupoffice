@@ -399,5 +399,13 @@ abstract class Base {
 		
 		return 'data:'.$icon->getContentType().';base64,'. base64_encode($icon->getContents());
 	}
+	
+	/**
+	 * 
+	 * @return \go\core\Settings
+	 */
+	public function getSettings() {
+		return null;
+	}
 
 }

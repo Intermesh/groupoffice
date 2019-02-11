@@ -9,7 +9,7 @@ class Module extends \go\core\module\Base {
 
 	protected function afterInstall(\go\modules\core\modules\model\Module $model) {
 		
-		$cron = new \go\modules\core\core\model\CronJobSchedule();
+		$cron = new \go\core\model\CronJobSchedule();
 		$cron->moduleId = $model->id;
 		$cron->name = "InstanceCron";
 		$cron->expression = "* * * * *";
@@ -20,7 +20,7 @@ class Module extends \go\core\module\Base {
 		}
 		
 		
-		$cron = new \go\modules\core\core\model\CronJobSchedule();
+		$cron = new \go\core\model\CronJobSchedule();
 		$cron->moduleId = $model->id;
 		$cron->name = "DeactivateTrials";
 		$cron->expression = "0 10 * * *";

@@ -1,7 +1,7 @@
 <?php
 namespace go\modules\community\multi_instance\cron;
 
-use go\modules\core\core\model\CronJob;
+use go\core\model\CronJob;
 
 class InstanceCron extends CronJob {
 	

@@ -3,7 +3,7 @@
 namespace GO\Email\Controller;
 
 use go\core\jmap\EntityController;
-use go\modules\core\core\model;
+use go\core\model;
 
 class EmailTemplate extends EntityController {
 	

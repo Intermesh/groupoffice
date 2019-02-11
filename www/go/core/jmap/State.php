@@ -7,7 +7,7 @@ use go\core\auth\State as AbstractState;
 use go\core\http\Exception;
 use go\core\http\Response;
 use go\core\jmap\Request;
-use go\modules\core\core\model\Settings;
+use go\core\model\Settings;
 use go\modules\core\users\model\User;
 
 class State extends AbstractState {
@@ -122,7 +122,7 @@ class State extends AbstractState {
 
 	public function getSession() {	
 		
-		$settings = \go\modules\core\core\model\Settings::get();
+		$settings = \go\core\model\Settings::get();
 		
 		$user = $this->getToken()->getUser();
 		
