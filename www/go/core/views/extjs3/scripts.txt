@@ -1,12 +1,13 @@
 Module.js
 SharePanel.js
 ShareWindow.js
-Stores.js
-CronDialog.js
-ParametersPanel.js
-PeriodGrid.js
-SystemSettingsCronGrid.js
-SystemSettingsTools.js
+cron/Stores.js
+cron/CronDialog.js
+cron/ParametersPanel.js
+cron/PeriodGrid.js
+cron/SystemSettingsCronGrid.js
+
+tools/SystemSettingsTools.js
 
 
 groups/SystemSettingsGroupGrid.js
