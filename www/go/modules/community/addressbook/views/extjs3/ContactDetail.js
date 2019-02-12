@@ -1,6 +1,6 @@
 /* global Ext, go, GO */
 
-go.modules.community.addressbook.ContactDetail = Ext.extend(go.panels.DetailView, {
+go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 	entityStore: "Contact",
 	stateId: 'addressbook-contact-detail',
 	

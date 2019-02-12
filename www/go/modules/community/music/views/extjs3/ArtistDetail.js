@@ -1,4 +1,4 @@
-go.modules.community.music.ArtistDetail = Ext.extend(go.panels.DetailView, {
+go.modules.community.music.ArtistDetail = Ext.extend(go.detail.Panel, {
 	
 	// The entity store is connected. The detail view is automatically updated.
 	entityStore: go.Stores.get("Artist"),

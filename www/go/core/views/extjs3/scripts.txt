@@ -43,7 +43,7 @@ form/RecurrenceFieldset.js
 
 panels/CreateModifyTpl.js
 
-panels/DetailView.js
+
 panels/ModulePanel.js
 panels/Panel.js
 Toolbar.js
@@ -83,6 +83,7 @@ QRCodeComponent.js
 User.js
 String.js
 
+detail/Panel.js
 detail/ReadMore.js
 detail/AddButton.js
 detail/PropertyList.js

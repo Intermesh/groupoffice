@@ -22,7 +22,7 @@
  * All panel items are updated automatically if they have a "tpl" (Ext.XTemplate) property or an "onLoad" function. The panel is passed as argument.
  * @type |||
  */
-go.panels.DetailView = Ext.extend(Ext.Panel, {
+go.detail.Panel = Ext.extend(Ext.Panel, {
 
 	cls: 'go-detail-view',
 	autoScroll: true,
@@ -35,7 +35,7 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 	entityStore: null,
 
 	initComponent: function () {
-		go.panels.DetailView.superclass.initComponent.call(this, arguments);		
+		go.detail.Panel.superclass.initComponent.call(this, arguments);		
 		
 		if (go.Modules.isAvailable("community", "comments")) {
 			this.add(new go.modules.comments.CommentsDetailPanel());
@@ -121,4 +121,4 @@ go.panels.DetailView = Ext.extend(Ext.Panel, {
 	}
 });
 
-Ext.reg("detailview", go.panels.DetailView);
+Ext.reg("detailview", go.detail.Panel);

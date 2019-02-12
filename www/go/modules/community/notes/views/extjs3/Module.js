@@ -24,7 +24,7 @@ go.Modules.register("community", 'notes', {
 			/**
 			 * Return component for the detail view
 			 * 
-			 * @returns {go.panels.DetailView}
+			 * @returns {go.detail.Panel}
 			 */
 			linkDetail: function() {
 				return new go.modules.community.notes.NoteDetail();

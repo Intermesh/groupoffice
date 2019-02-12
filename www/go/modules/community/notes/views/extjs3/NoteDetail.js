@@ -1,6 +1,6 @@
 /* global go, Ext, GO, mcrypt */
 
-go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
+go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 	entityStore: "Note",
 	stateId: 'no-notes-detail',
 
