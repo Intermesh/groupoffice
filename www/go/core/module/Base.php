@@ -401,6 +401,10 @@ abstract class Base {
 	}
 	
 	/**
+	 * Get the module settings
+	 * 
+	 * A module must override this function and implement a \go\core\Settings object
+	 * to store settings.
 	 * 
 	 * @return \go\core\Settings
 	 */

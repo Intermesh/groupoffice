@@ -28,15 +28,10 @@ go.users.CreateUserWizard = Ext.extend(go.Wizard, {
 			finish: this.onFinish,
 			scope: this
 		});
+	
+		// Get default groups from settings
+		this.groupsGrid.setValue(go.Modules.get('core', 'core').settings.defaultGroups.map(function(groupId){return {groupId: groupId};}));
 		
-		//fetch default groups
-		go.Jmap.request({
-			method: "core/users/Settings/get",
-			callback: function (options, success, response) {				
-				this.groupsGrid.setValue(response.defaultGroups.map(function(groupId){return {groupId: groupId};}));
-			},
-			scope: this
-		})
 	},
 	
 	onContinue: function(wiz, item, nextItem) {

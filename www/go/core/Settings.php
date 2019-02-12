@@ -6,20 +6,31 @@ use Exception;
 use go\core\db\Query;
 
 /**
- * Settings model that can be used for the core and modules to store any string 
- * setting.
+ * Settings model 
+ * 
+ * Any module can implement getSettings() and return a model that extends this
+ * abstract class to store settings. All properties are automatically saved and
+ * loaded from the "core_setting" table.
+ * 
+ * @see module\Base::getSettings()
  */
 abstract class Settings extends data\Model {
 	
 	use SingletonTrait;
 
 	protected function getModuleId() {
-		return (new Query)
+		$moduleId = (new Query)
 			->selectSingleValue('id')
 			->from('core_module')
 			->where(['name' => $this->getModuleName(), 'package' => $this->getModulePackageName()])
 			->execute()
 			->fetch();
+		
+		if(!$moduleId) {
+			throw new \Exception ("Could not find module " .  $this->getModuleName() . "/" . $this->getModulePackageName());
+		}
+		
+		return $moduleId;
 	}
 	
 	protected function getModuleName() {

@@ -100,6 +100,10 @@ class CronJobSchedule extends Entity {
 	public function getCronClass() {
 		$module = Module::findById($this->moduleId);
 		
+		if($module->package == "core" && $module->name == "core") {
+			return "go\\core\\cron\\" . $this->name;
+		}
+		
 		return "go\\modules\\" . $module->package . "\\" . $module->name . "\\cron\\" . $this->name;
 	}
 	

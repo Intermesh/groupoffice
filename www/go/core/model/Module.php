@@ -113,39 +113,25 @@ class Module extends AclOwnerEntity {
 		
 		switch($className) {	
 			
-			case strpos($className, "go\core\auth") === 0:
-				$module = Module::find()->where(['name' => "users"])->single();				
-				break;
-			case Link::class:				
-				$module = Module::find()->where(['name' => "links"])->single();
-				break;
-			case Search::class:			
-				$module = Module::find()->where(['name' => "search"])->single();				
+			case strpos($className, "go\\core") === 0:
+				$module = Module::find()->where(['name' => "core", "package" => "core"])->single();				
 				break;
 			
-			case Module::class:
-				$module = Module::find()->where(['name' => "modules"])->single();				
-			break;				
-			
-			default:
+			default:				
 				
-				if(strstr($className, 'go\core')) {
-					$name = 'core';
+				$classNameParts = explode('\\', $className);
+
+				if($classNameParts[0] == "GO") {
+					//old framework eg. GO\Projects2\Model\TimeEntry
+					$name = strtolower($classNameParts[1]);
+					$package = null;
 				} else
 				{
-				
-					$classNameParts = explode('\\', $className);
-
-					if($classNameParts[0] == "GO") {
-						//old framework eg. GO\Projects2\Model\TimeEntry
-						$name = strtolower($classNameParts[1]);
-					} else
-					{
-						$name = $classNameParts[3];
-					}				
+					$package = $classNameParts[2];
+					$name = $classNameParts[3];
 				}
 				
-				$module = Module::find()->where(['name' => $name])->single();
+				$module = Module::find()->where(['name' => $name, 'package' => $package])->single();
 		}
 		
 		if(!$module) {

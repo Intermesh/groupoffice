@@ -26,17 +26,17 @@ use PDOException;
 
 class Installer {
 	
-	const MIN_UPGRADABLE_VERSION = "6.3.58";
+	const MIN_UPGRADABLE_VERSION = "6.4.58";
 	
-	private $isInProgress = false;
+	private static $isInProgress = false;
 
 	/**
 	 * Check if it's installing or upgrading
 	 * 
 	 * @return bool
 	 */
-	public function isInProgress() {
-		return $this->isInProgress;
+	public static function isInProgress() {
+		return self::$isInProgress;
 	}
 
 	/**
@@ -53,7 +53,7 @@ class Installer {
 		App::get()->getCache()->flush(false);
 		App::get()->setCache(new None());
 
-		$this->isInProgress = true;
+		self::$isInProgress = true;
 
 		Entity2::$trackChanges = false;
 
@@ -65,17 +65,15 @@ class Installer {
 
 		$database->setUtf8();
 
-		Utils::runSQLFile(Environment::get()->getInstallFolder()->getFile("install/install.sql"));
+		Utils::runSQLFile(Environment::get()->getInstallFolder()->getFile("go/core/install/install.sql"));
 		App::get()->getDbConnection()->query("SET FOREIGN_KEY_CHECKS=0;");
 		
 		$this->installGroups();
 
 		$this->installAdminUser($adminValues);		
 
-		//By default everyone can share with any group
-		Settings::get()->setDefaultGroups([Group::ID_EVERYONE]);
-
-		$this->installCoreModules();
+		$this->installCoreModule();
+				
 		$this->registerCoreEntities();		
 		
 		$this->installEmailTemplate();
@@ -95,7 +93,6 @@ class Installer {
 	private function registerCoreEntities() {
 		$classFinder = new ClassFinder(false);
 		$classFinder->addNamespace("go\\core");
-		$classFinder->addNamespace("go\\modules\\core");
 
 		$entities = $classFinder->findByParent(Entity::class);
 
@@ -106,18 +103,30 @@ class Installer {
 		}
 	}
 	
-	private function installCoreModules() {
-		$classFinder = new ClassFinder(false);
-		$classFinder->addNamespace("go\\modules\\core");
+	private function installCoreModule() {
 
-		$coreModules = $classFinder->findByParent(Base::class);
-
-		foreach ($coreModules as $coreModule) {
-			$mod = new $coreModule();
-
-			if (!$mod->install()) {
-				throw new \Exception("Failed to install core module " . $coreModule);
-			}
+		$module = new Module();
+		$module->name = 'core';
+		$module->package = 'core';
+		$module->version = (new \go\core\Module())->getVersion();
+		if(!$module->save()) {
+			throw new \Exception("Could not save core module: " . var_export($module->getValidationErrors(), true));
+		}
+		
+		$cron = new model\CronJobSchedule();
+		$cron->moduleId = $module->id;
+		$cron->name = "GarbageCollection";
+		$cron->expression = "0 * * * *";
+		$cron->description = "Garbage collection";
+		
+		if(!$cron->save()) {
+			throw new Exception("Failed to save cron job: " . var_export($cron->getValidationErrors(), true));
+		}
+		
+		GO()->getSettings()->setDefaultGroups([model\Group::ID_EVERYONE]);
+		
+		if(!auth\Password::register()) {
+			throw new \Exception("Failed to register Password authenticator");
 		}
 	}
 	
@@ -225,7 +234,7 @@ class Installer {
 	}
 
 	public function upgrade() {
-		$this->isInProgress = true;
+		self::$isInProgress = true;
 
 		GO()->setAuthState((new TemporaryState())->setUserId(1));
 		

@@ -170,29 +170,24 @@ go.users.UserDefaultsWindow = Ext.extend(go.Window, {
 		go.users.UserDefaultsWindow.superclass.initComponent.call(this);
 
 
-		this.on('render', function () {
-			go.Jmap.request({
-				method: "core/users/Settings/get",
-				callback: function (options, success, response) {
-					this.formPanel.getForm().setValues(response);
-				},
-				scope: this
-			});
+		this.on('render', function () {	
+			this.formPanel.getForm().setValues(go.Modules.get('core', 'core').settings);
 		}, this);
 	},
 
-	submit: function (cb, scope) {
+	submit: function () {
 
 		this.getEl().mask();
-		go.Jmap.request({
-			method: "core/users/Settings/set",
-			params: this.formPanel.getForm().getFieldValues(),
-			callback: function (options, success, response) {
-				this.getEl().unmask();
-				this.close();
-			},
-			scope: this
-		});
+		
+		var module = go.Modules.get('core', 'core'), p = {"update": {}};
+		
+		p.update[module.id] = {settings: this.formPanel.getForm().getFieldValues()};
+		
+		go.Stores.get("Module").set(p, function (options, success, response) {
+			this.getEl().unmask();
+			this.close();
+		},
+		this);
 	}
 
 });

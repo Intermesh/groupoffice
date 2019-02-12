@@ -9,14 +9,28 @@ class Settings extends core\Settings {
 	protected function __construct() {
 		parent::__construct();
 		
+		$save = false;
+		
 		if(!isset($this->URL)) {
-			$this->URL = $this->detectURL();
-			$this->save();
+			$this->URL = $this->detectURL();	
+			$save = true;
 		}
 		
 		if(!isset($this->language)) {
 			$this->language = $this->getDefaultLanguage();
-			$this->save();
+			$save = true;
+		}
+		
+		if($save) {
+			try {
+				$this->save();
+			}catch(\Exception $e) {
+				
+				//ignore error on install becasuse core module is not there yet
+				if(!core\Installer::isInProgress()) {
+					throw $e;
+				}
+			}
 		}
 	}
 	

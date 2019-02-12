@@ -395,9 +395,8 @@ $updates['201901301035'][] = function() {
 	$m->migrateEntity("User");	
 };
 
-//delete from core_setting where moduleId = 0;
-//update `core_entity` e inner join core_module m on m.id = e.moduleId  set e.moduleId = (select id from core_module where name = 'core' and package='core') where m.package='core';
-//update `core_setting` e inner join core_module m on m.id = e.moduleId  set e.moduleId = (select id from core_module where name = 'core' and package='core') where m.package='core';
-//update `core_auth_method` e inner join core_module m on m.id = e.moduleId  set e.moduleId = (select id from core_module where name = 'core' and package='core') where m.package='core';
-
-//delete from core_module where package = 'core' and name != 'core';
+$updates['201902121355'][] = "delete from core_setting where moduleId = 0;";
+$updates['201902121355'][] = "update `core_entity` e inner join core_module m on m.id = e.moduleId  set e.moduleId = (select id from core_module where name = 'core' and package='core') where m.package='core';";
+$updates['201902121355'][] = "update `core_setting` e inner join core_module m on m.id = e.moduleId  set e.moduleId = (select id from core_module where name = 'core' and package='core') where m.package='core';";
+$updates['201902121355'][] = "update `core_auth_method` e inner join core_module m on m.id = e.moduleId  set e.moduleId = (select id from core_module where name = 'core' and package='core') where m.package='core';";
+$updates['201902121355'][] = "delete from core_module where package = 'core' and name != 'core';";

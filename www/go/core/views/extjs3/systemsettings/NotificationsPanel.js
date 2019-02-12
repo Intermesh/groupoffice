@@ -124,7 +124,7 @@ go.systemsettings.NotificationsPanel = Ext.extend(go.systemsettings.Panel, {
 		this.getEl().mask(t("Sending..."));
 		
 		go.Jmap.request({
-			method: "core/core/Settings/sendTestMessage",
+			method: "core/Settings/sendTestMessage",
 			params: this.getForm().getFieldValues(),
 			callback: function (options, success, response) {
 				this.getEl().unmask();
