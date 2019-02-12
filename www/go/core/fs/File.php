@@ -183,13 +183,28 @@ class File extends FileSystemObject {
 	 *
 	 * @param string
 	 */
-	public function getContents() {
-		
+	public function getContents() {		
 		return file_get_contents($this->getPath());
 	}
 
 	public function getMimeType() {
 		return mime_content_type($this->getPath());
+	}
+	
+	/**
+	 * Find and replace text in a text file
+	 * 
+	 * @param string $find
+	 * @param string $replace
+	 * @return bool
+	 */
+	public function replace($find, $replace) {
+		$contents = $this->getContents();
+		$replaced = str_replace($search, $replace, $contents);
+		if($replaced === $contents) {
+			return true;
+		}
+		return $this->putContents($replaced);		
 	}
 
 	/**
