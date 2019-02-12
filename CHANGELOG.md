@@ -1,3 +1,4 @@
+- Calendar: Fixed event dialog crash bug. (FileBrowserButton could not be destroyed)
 - Document templates: Fixed space problem in docx templates
 - Tickets: Use template vars in due date mail
 - Billing: Fixed problem in copying matching custom field names
