@@ -401,7 +401,7 @@ class Folder extends FileSystemObject {
 			if(($findFolders || !$isFolder) && preg_match($regex, $child->getName())) {
 				$result[] = $child;
 			}
-			if($isFolder) {
+			if($isFolder && $child->exists()) { //Do exists check for broken links
 				$result = array_merge($result, $child->find($regex, $findFolders, $findFiles));
 			}
 		}
