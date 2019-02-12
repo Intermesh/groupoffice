@@ -1,6 +1,6 @@
 Ext.onReady(function(){
-	Ext.override(go.modules.core.users.CreateUserAccountPanel, {
-		initComponent : go.modules.core.users.CreateUserAccountPanel.prototype.initComponent.createSequence(function(){
+	Ext.override(go.users.CreateUserAccountPanel, {
+		initComponent : go.users.CreateUserAccountPanel.prototype.initComponent.createSequence(function(){
 			if(GO.serverclient && GO.serverclient.domains) {				
 				
 
