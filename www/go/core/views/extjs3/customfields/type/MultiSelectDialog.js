@@ -1,9 +1,9 @@
 /* global go, Ext */
 
-go.modules.core.core.type.MultiSelectDialog = Ext.extend(go.customfields.FieldDialog, {
+go.customfields.type.MultiSelectDialog = Ext.extend(go.customfields.FieldDialog, {
 	height: dp(800),
 	initFormItems: function () {
-		var items = go.modules.core.core.type.SelectDialog.superclass.initFormItems.call(this);
+		var items = go.customfields.type.SelectDialog.superclass.initFormItems.call(this);
 
 
 

@@ -1,6 +1,6 @@
-Ext.ns("go.modules.core.core.type");
+Ext.ns("go.customfields.type");
 
-go.modules.core.core.type.Checkbox = Ext.extend(go.modules.core.core.type.Text, {
+go.customfields.type.Checkbox = Ext.extend(go.customfields.type.Text, {
 
 	name: "Checkbox",
 
@@ -14,7 +14,7 @@ go.modules.core.core.type.Checkbox = Ext.extend(go.modules.core.core.type.Text, 
 	 * @returns {go.customfields.FieldDialog}
 	 */
 	getDialog: function () {
-		return new go.modules.core.core.type.CheckboxDialog();
+		return new go.customfields.type.CheckboxDialog();
 	},
 	
 	/**
@@ -37,7 +37,7 @@ go.modules.core.core.type.Checkbox = Ext.extend(go.modules.core.core.type.Text, 
 	 * @returns {Object}
 	 */
 	createFormFieldConfig: function (customfield, config) {
-		var config = go.modules.core.core.type.Number.superclass.createFormFieldConfig.call(this, customfield, config);
+		var config = go.customfields.type.Number.superclass.createFormFieldConfig.call(this, customfield, config);
 
 		delete config.anchor;
 		config.xtype = "checkbox";
@@ -55,5 +55,5 @@ go.modules.core.core.type.Checkbox = Ext.extend(go.modules.core.core.type.Text, 
 
 });
 
-go.customfields.CustomFields.registerType(new go.modules.core.core.type.Checkbox());
+go.customfields.CustomFields.registerType(new go.customfields.type.Checkbox());
 

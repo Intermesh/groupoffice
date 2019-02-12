@@ -1,6 +1,6 @@
-go.modules.core.core.type.TextDialog = Ext.extend(go.customfields.FieldDialog, {
+go.customfields.type.TextDialog = Ext.extend(go.customfields.FieldDialog, {
 	initFormItems: function () {
-		var items = go.modules.core.core.type.TextDialog.superclass.initFormItems.call(this);
+		var items = go.customfields.type.TextDialog.superclass.initFormItems.call(this);
 
 		items[0].items = items[0].items.concat([{
 				xtype: "numberfield",

@@ -1,6 +1,6 @@
-Ext.ns("go.modules.core.core.type");
+Ext.ns("go.customfields.type");
 
-go.modules.core.core.type.MultiSelect = Ext.extend(go.modules.core.core.type.Text, {
+go.customfields.type.MultiSelect = Ext.extend(go.customfields.type.Text, {
 	
 	name : "MultiSelect",
 	
@@ -14,7 +14,7 @@ go.modules.core.core.type.MultiSelect = Ext.extend(go.modules.core.core.type.Tex
 	 * @returns {go.customfields.FieldDialog}
 	 */
 	getDialog : function() {
-		return new go.modules.core.core.type.MultiSelectDialog();
+		return new go.customfields.type.MultiSelectDialog();
 	},
 	
 	/**
@@ -52,7 +52,7 @@ go.modules.core.core.type.MultiSelect = Ext.extend(go.modules.core.core.type.Tex
 	 * @returns {Object}
 	 */
 	createFormFieldConfig: function (customfield, config) {
-		var c = go.modules.core.core.type.MultiSelect.superclass.createFormFieldConfig.call(this, customfield, config);
+		var c = go.customfields.type.MultiSelect.superclass.createFormFieldConfig.call(this, customfield, config);
 
 		c.xtype = "chips";
 		c.valueField = 'id';
@@ -81,7 +81,7 @@ go.modules.core.core.type.MultiSelect = Ext.extend(go.modules.core.core.type.Tex
 	 */
 	getFieldDefinition : function(field) {
 		
-		var c = go.modules.core.core.type.MultiSelect.superclass.getFieldDefinition.call(this, field);
+		var c = go.customfields.type.MultiSelect.superclass.getFieldDefinition.call(this, field);
 		
 		c.convert = function(v, record) {
 			return this.customFieldType.renderDetailView(v, record.data, this.customField);
@@ -93,4 +93,4 @@ go.modules.core.core.type.MultiSelect = Ext.extend(go.modules.core.core.type.Tex
 	
 });
 
-go.customfields.CustomFields.registerType(new go.modules.core.core.type.MultiSelect());
+go.customfields.CustomFields.registerType(new go.customfields.type.MultiSelect());

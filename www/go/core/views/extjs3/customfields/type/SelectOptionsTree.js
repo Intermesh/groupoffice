@@ -1,6 +1,6 @@
 /* global Ext */
 
-go.modules.core.core.type.SelectOptionsTree = function(config){
+go.customfields.type.SelectOptionsTree = function(config){
 
 	config = config || {};
 
@@ -49,7 +49,7 @@ go.modules.core.core.type.SelectOptionsTree = function(config){
 	}];
 
 
-	go.modules.core.core.type.SelectOptionsTree.superclass.constructor.call(this, config);
+	go.customfields.type.SelectOptionsTree.superclass.constructor.call(this, config);
 
 	this.treeEditor = new Ext.tree.TreeEditor(
 		this,
@@ -75,7 +75,7 @@ go.modules.core.core.type.SelectOptionsTree = function(config){
 	this.setValue([]);
 }
 
-Ext.extend(go.modules.core.core.type.SelectOptionsTree, Ext.tree.TreePanel, {
+Ext.extend(go.customfields.type.SelectOptionsTree, Ext.tree.TreePanel, {
 	
 	setValue : function(options) {
 		// set the root node

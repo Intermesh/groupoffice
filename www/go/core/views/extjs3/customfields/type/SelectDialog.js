@@ -1,9 +1,9 @@
 /* global go, Ext */
 
-go.modules.core.core.type.SelectDialog = Ext.extend(go.customfields.FieldDialog, {
+go.customfields.type.SelectDialog = Ext.extend(go.customfields.FieldDialog, {
 	height: dp(800),
 	initFormItems: function () {
-		var items = go.modules.core.core.type.SelectDialog.superclass.initFormItems.call(this);
+		var items = go.customfields.type.SelectDialog.superclass.initFormItems.call(this);
 
 //		items[0].items = items[0].items.concat([{
 //				xtype: "numberfield",
@@ -24,7 +24,7 @@ go.modules.core.core.type.SelectDialog = Ext.extend(go.customfields.FieldDialog,
 			title: t("Options"),
 			items: [
 				
-				new go.modules.core.core.type.SelectOptionsTree({
+				new go.customfields.type.SelectOptionsTree({
 					name: "dataType.options",
 					hideLabel: true
 				})

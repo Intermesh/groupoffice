@@ -1,6 +1,6 @@
-Ext.ns("go.modules.core.core.type");
+Ext.ns("go.customfields.type");
 
-go.modules.core.core.type.Date = Ext.extend(go.modules.core.core.type.Text, {
+go.customfields.type.Date = Ext.extend(go.customfields.type.Text, {
 
 	name: "Date",
 
@@ -14,7 +14,7 @@ go.modules.core.core.type.Date = Ext.extend(go.modules.core.core.type.Text, {
 	 * @returns {go.customfields.FieldDialog}
 	 */
 	getDialog: function () {
-		return new go.modules.core.core.type.DateDialog();
+		return new go.customfields.type.DateDialog();
 	},
 
 	/**
@@ -37,7 +37,7 @@ go.modules.core.core.type.Date = Ext.extend(go.modules.core.core.type.Text, {
 	 * @returns {Object}
 	 */
 	createFormFieldConfig: function (customfield, config) {
-		var config = go.modules.core.core.type.Date.superclass.createFormFieldConfig.call(this, customfield, config);
+		var config = go.customfields.type.Date.superclass.createFormFieldConfig.call(this, customfield, config);
 
 		delete config.anchor;
 		
@@ -53,5 +53,5 @@ go.modules.core.core.type.Date = Ext.extend(go.modules.core.core.type.Text, {
 
 });
 
-go.customfields.CustomFields.registerType(new go.modules.core.core.type.Date());
+go.customfields.CustomFields.registerType(new go.customfields.type.Date());
 

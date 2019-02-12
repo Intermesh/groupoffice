@@ -1,6 +1,6 @@
-Ext.ns("go.modules.core.core.type");
+Ext.ns("go.customfields.type");
 
-go.modules.core.core.type.FunctionField = Ext.extend(go.modules.core.core.type.Number, {
+go.customfields.type.FunctionField = Ext.extend(go.customfields.type.Number, {
 
 	name: "FunctionField",
 
@@ -14,7 +14,7 @@ go.modules.core.core.type.FunctionField = Ext.extend(go.modules.core.core.type.N
 	 * @returns {go.customfields.FieldDialog}
 	 */
 	getDialog: function () {
-		return new go.modules.core.core.type.FunctionFieldDialog();
+		return new go.customfields.type.FunctionFieldDialog();
 	},
 	
 	
@@ -26,7 +26,7 @@ go.modules.core.core.type.FunctionField = Ext.extend(go.modules.core.core.type.N
 	 * @returns {Object}
 	 */
 	createFormFieldConfig: function (customfield, config) {
-		var config = go.modules.core.core.type.FunctionField.superclass.createFormFieldConfig.call(this, customfield, config);
+		var config = go.customfields.type.FunctionField.superclass.createFormFieldConfig.call(this, customfield, config);
 		config.readOnly = true;
 
 		return config;
@@ -35,5 +35,5 @@ go.modules.core.core.type.FunctionField = Ext.extend(go.modules.core.core.type.N
 
 });
 
-go.customfields.CustomFields.registerType(new go.modules.core.core.type.FunctionField());
+go.customfields.CustomFields.registerType(new go.customfields.type.FunctionField());
 

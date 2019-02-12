@@ -1,6 +1,6 @@
-Ext.ns("go.modules.core.core.type");
+Ext.ns("go.customfields.type");
 
-go.modules.core.core.type.Group = Ext.extend(go.modules.core.core.type.Text, {
+go.customfields.type.Group = Ext.extend(go.customfields.type.Text, {
 	
 	name : "Group",
 	
@@ -14,7 +14,7 @@ go.modules.core.core.type.Group = Ext.extend(go.modules.core.core.type.Text, {
 	 * @returns {go.customfields.FieldDialog}
 	 */
 	getDialog : function() {
-		return new go.modules.core.core.type.GroupDialog();
+		return new go.customfields.type.GroupDialog();
 	},
 	
 	/**
@@ -54,7 +54,7 @@ go.modules.core.core.type.Group = Ext.extend(go.modules.core.core.type.Text, {
 	 * @returns {Object}
 	 */
 	createFormFieldConfig: function (customfield, config) {
-		var c = go.modules.core.core.type.Select.superclass.createFormFieldConfig.call(this, customfield, config);
+		var c = go.customfields.type.Select.superclass.createFormFieldConfig.call(this, customfield, config);
 		c.xtype = "groupcombo";
 		c.hiddenName = c.name;
 		delete c.name;
@@ -75,7 +75,7 @@ go.modules.core.core.type.Group = Ext.extend(go.modules.core.core.type.Text, {
 	 * @returns {Object}
 	 */
 	getFieldDefinition : function(field) {		
-		var c = go.modules.core.core.type.Select.superclass.getFieldDefinition.call(this, field);
+		var c = go.customfields.type.Select.superclass.getFieldDefinition.call(this, field);
 		c.key = field.databaseName;		
 		return c;
 	}
@@ -83,4 +83,4 @@ go.modules.core.core.type.Group = Ext.extend(go.modules.core.core.type.Text, {
 	
 });
 
-go.customfields.CustomFields.registerType(new go.modules.core.core.type.Group());
+go.customfields.CustomFields.registerType(new go.customfields.type.Group());

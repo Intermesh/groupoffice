@@ -2,7 +2,7 @@
 
 Ext.ns("go.modules.community.files.customfield");
 
-go.modules.community.files.customfield.File = Ext.extend(go.modules.core.core.type.Text, {
+go.modules.community.files.customfield.File = Ext.extend(go.customfields.type.Text, {
 	
 	name : "File",
 	
@@ -42,7 +42,7 @@ go.modules.community.files.customfield.File = Ext.extend(go.modules.core.core.ty
 	 * @returns {Object}
 	 */
 	createFormFieldConfig: function (customfield, config) {
-		var c = go.modules.core.core.type.Select.superclass.createFormFieldConfig.call(this, customfield, config);
+		var c = go.customfields.type.Select.superclass.createFormFieldConfig.call(this, customfield, config);
 		c.xtype = "selectfile";		
 		return c;
 	},

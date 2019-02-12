@@ -1,9 +1,9 @@
 /* global go, Ext */
 
-go.modules.core.core.type.GroupDialog = Ext.extend(go.customfields.FieldDialog, {
+go.customfields.type.GroupDialog = Ext.extend(go.customfields.FieldDialog, {
 	height: dp(800),
 	initFormItems: function () {
-		var items = go.modules.core.core.type.GroupDialog.superclass.initFormItems.call(this);
+		var items = go.customfields.type.GroupDialog.superclass.initFormItems.call(this);
 
 		return items;
 	}

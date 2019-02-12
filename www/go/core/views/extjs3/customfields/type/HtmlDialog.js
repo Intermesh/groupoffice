@@ -1,3 +1,3 @@
-go.modules.core.core.type.HtmlDialog = Ext.extend(go.customfields.FieldDialog, {
+go.customfields.type.HtmlDialog = Ext.extend(go.customfields.FieldDialog, {
 
 });

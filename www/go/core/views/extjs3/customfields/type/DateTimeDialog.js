@@ -1,6 +1,6 @@
- go.modules.core.core.type.DateTimeDialog = Ext.extend(go.customfields.FieldDialog, {
+ go.customfields.type.DateTimeDialog = Ext.extend(go.customfields.FieldDialog, {
 	 initFormItems : function() {		 
-		 var items =  go.modules.core.core.type.DateTimeDialog.superclass.initFormItems.call(this);
+		 var items =  go.customfields.type.DateTimeDialog.superclass.initFormItems.call(this);
 		 
 		 items[0].items  = items[0].items.concat([{
 				xtype: "datetime",

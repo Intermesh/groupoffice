@@ -1,6 +1,6 @@
-Ext.ns("go.modules.core.core.type");
+Ext.ns("go.customfields.type");
 
-go.modules.core.core.type.Number = Ext.extend(go.modules.core.core.type.Text, {
+go.customfields.type.Number = Ext.extend(go.customfields.type.Text, {
 
 	name: "Number",
 
@@ -14,7 +14,7 @@ go.modules.core.core.type.Number = Ext.extend(go.modules.core.core.type.Text, {
 	 * @returns {go.customfields.FieldDialog}
 	 */
 	getDialog: function () {
-		return new go.modules.core.core.type.NumberDialog();
+		return new go.customfields.type.NumberDialog();
 	},
 
 	/**
@@ -37,7 +37,7 @@ go.modules.core.core.type.Number = Ext.extend(go.modules.core.core.type.Text, {
 	 * @returns {Object}
 	 */
 	createFormFieldConfig: function (customfield, config) {
-		var config = go.modules.core.core.type.Number.superclass.createFormFieldConfig.call(this, customfield, config);
+		var config = go.customfields.type.Number.superclass.createFormFieldConfig.call(this, customfield, config);
 
 		delete config.anchor;
 		config.width = dp(200);
@@ -54,4 +54,4 @@ go.modules.core.core.type.Number = Ext.extend(go.modules.core.core.type.Text, {
 
 });
 
-go.customfields.CustomFields.registerType(new go.modules.core.core.type.Number());
+go.customfields.CustomFields.registerType(new go.customfields.type.Number());

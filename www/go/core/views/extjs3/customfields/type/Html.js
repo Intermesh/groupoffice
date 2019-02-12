@@ -1,6 +1,6 @@
-Ext.ns("go.modules.core.core.type");
+Ext.ns("go.customfields.type");
 
-go.modules.core.core.type.Html = Ext.extend(go.modules.core.core.type.Text, {
+go.customfields.type.Html = Ext.extend(go.customfields.type.Text, {
 
 	name: "Html",
 
@@ -14,7 +14,7 @@ go.modules.core.core.type.Html = Ext.extend(go.modules.core.core.type.Text, {
 	 * @returns {go.customfields.FieldDialog}
 	 */
 	getDialog: function () {
-		return new go.modules.core.core.type.HtmlDialog();
+		return new go.customfields.type.HtmlDialog();
 	},
 
 	/**
@@ -37,7 +37,7 @@ go.modules.core.core.type.Html = Ext.extend(go.modules.core.core.type.Text, {
 	 * @returns {Object}
 	 */
 	createFormFieldConfig: function (customfield, config) {
-		var config = go.modules.core.core.type.Html.superclass.createFormFieldConfig.call(this, customfield, config);
+		var config = go.customfields.type.Html.superclass.createFormFieldConfig.call(this, customfield, config);
 		config.xtype = "xhtmleditor";		
 		return config;
 	},
@@ -49,4 +49,4 @@ go.modules.core.core.type.Html = Ext.extend(go.modules.core.core.type.Text, {
 
 });
 
-go.customfields.CustomFields.registerType(new go.modules.core.core.type.Html());
+go.customfields.CustomFields.registerType(new go.customfields.type.Html());

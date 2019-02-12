@@ -1,6 +1,6 @@
-Ext.ns("go.modules.core.core.type");
+Ext.ns("go.customfields.type");
 
-go.modules.core.core.type.Select = Ext.extend(go.modules.core.core.type.Text, {
+go.customfields.type.Select = Ext.extend(go.customfields.type.Text, {
 	
 	name : "Select",
 	
@@ -14,7 +14,7 @@ go.modules.core.core.type.Select = Ext.extend(go.modules.core.core.type.Text, {
 	 * @returns {go.customfields.FieldDialog}
 	 */
 	getDialog : function() {
-		return new go.modules.core.core.type.SelectDialog();
+		return new go.customfields.type.SelectDialog();
 	},
 	
 	/**
@@ -42,7 +42,7 @@ go.modules.core.core.type.Select = Ext.extend(go.modules.core.core.type.Text, {
 	 * @returns {Object}
 	 */
 	createFormFieldConfig: function (customfield, config) {
-		var c = go.modules.core.core.type.Select.superclass.createFormFieldConfig.call(this, customfield, config);
+		var c = go.customfields.type.Select.superclass.createFormFieldConfig.call(this, customfield, config);
 
 		c.xtype = "treeselectfield";
 		c.customfield = customfield;
@@ -63,7 +63,7 @@ go.modules.core.core.type.Select = Ext.extend(go.modules.core.core.type.Text, {
 	 */
 	getFieldDefinition : function(field) {
 		
-		var c = go.modules.core.core.type.Select.superclass.getFieldDefinition.call(this, field);
+		var c = go.customfields.type.Select.superclass.getFieldDefinition.call(this, field);
 		
 		c.convert = function(v, record) {
 			return this.customFieldType.renderDetailView(v, record.data, this.customField);
@@ -75,4 +75,4 @@ go.modules.core.core.type.Select = Ext.extend(go.modules.core.core.type.Text, {
 	
 });
 
-go.customfields.CustomFields.registerType(new go.modules.core.core.type.Select());
+go.customfields.CustomFields.registerType(new go.customfields.type.Select());

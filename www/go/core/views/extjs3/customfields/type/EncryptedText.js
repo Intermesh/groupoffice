@@ -1,6 +1,6 @@
 Ext.ns("go.modules.deprecated.deprecatedcustomfields.type");
 
-go.modules.core.core.type.EncryptedText = Ext.extend(go.modules.core.core.type.Text, {
+go.customfields.type.EncryptedText = Ext.extend(go.customfields.type.Text, {
 	
 	name : "EncryptedText",
 	
@@ -31,5 +31,5 @@ go.modules.core.core.type.EncryptedText = Ext.extend(go.modules.core.core.type.T
 	
 });
 
-go.customfields.CustomFields.registerType(new go.modules.core.core.type.EncryptedText());
+go.customfields.CustomFields.registerType(new go.customfields.type.EncryptedText());
 

@@ -1,9 +1,9 @@
  /* global Ext, go */
 
-go.modules.core.core.type.FunctionFieldDialog = Ext.extend(go.customfields.FieldDialog, {
+go.customfields.type.FunctionFieldDialog = Ext.extend(go.customfields.FieldDialog, {
 	 height: dp(500),
 	 initFormItems : function() {		 
-		 var items =  go.modules.core.core.type.FunctionFieldDialog.superclass.initFormItems.call(this);
+		 var items =  go.customfields.type.FunctionFieldDialog.superclass.initFormItems.call(this);
 		 
 		 items[0].items  = items[0].items.concat([{
 				 xtype: "box",

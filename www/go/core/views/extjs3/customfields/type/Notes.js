@@ -1,6 +1,6 @@
-Ext.ns("go.modules.core.core.type");
+Ext.ns("go.customfields.type");
 
-go.modules.core.core.type.Notes = Ext.extend(go.modules.core.core.type.Text, {
+go.customfields.type.Notes = Ext.extend(go.customfields.type.Text, {
 
 	name: "Notes",
 
@@ -14,7 +14,7 @@ go.modules.core.core.type.Notes = Ext.extend(go.modules.core.core.type.Text, {
 	 * @returns {go.customfields.FieldDialog}
 	 */
 	getDialog: function () {
-		return new go.modules.core.core.type.NotesDialog();
+		return new go.customfields.type.NotesDialog();
 	},
 
 
@@ -45,5 +45,5 @@ go.modules.core.core.type.Notes = Ext.extend(go.modules.core.core.type.Text, {
 
 });
 
-go.customfields.CustomFields.registerType(new go.modules.core.core.type.Notes());
+go.customfields.CustomFields.registerType(new go.customfields.type.Notes());
 

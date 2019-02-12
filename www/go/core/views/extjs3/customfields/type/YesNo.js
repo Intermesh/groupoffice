@@ -1,6 +1,6 @@
-Ext.ns("go.modules.core.core.type");
+Ext.ns("go.customfields.type");
 
-go.modules.core.core.type.YesNo = Ext.extend(go.modules.core.core.type.Text, {
+go.customfields.type.YesNo = Ext.extend(go.customfields.type.Text, {
 
 	name: "YesNo",
 
@@ -42,7 +42,7 @@ go.modules.core.core.type.YesNo = Ext.extend(go.modules.core.core.type.Text, {
 	 * @returns {Object}
 	 */
 	createFormFieldConfig: function (customfield, config) {
-		var f = go.modules.core.core.type.YesNo.superclass.createFormFieldConfig.call(this, customfield, config);
+		var f = go.customfields.type.YesNo.superclass.createFormFieldConfig.call(this, customfield, config);
 
 		var store = new Ext.data.SimpleStore({
 			id: 'id',
@@ -76,5 +76,5 @@ go.modules.core.core.type.YesNo = Ext.extend(go.modules.core.core.type.Text, {
 
 });
 
-go.customfields.CustomFields.registerType(new go.modules.core.core.type.YesNo());
+go.customfields.CustomFields.registerType(new go.customfields.type.YesNo());
 
