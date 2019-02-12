@@ -8,8 +8,8 @@ data/Store.js
 data/GroupingStore.js
 
 data/EntityStore.js
-EntityManager.js
-ModuleManager.js
+Entities.js
+Modules.js
 
 panels/ScrollLoader.js
 grid/GridTrait.js
