@@ -4,7 +4,7 @@ namespace go\core\controller;
 
 use Exception;
 use GO;
-use go\core\jmap\Controller;
+use gp\core\controller;
 use go\core\jmap\Response;
 use go\core\model;
 

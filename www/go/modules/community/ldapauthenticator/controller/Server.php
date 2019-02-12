@@ -1,7 +1,7 @@
 <?php
 namespace go\modules\community\ldapauthenticator\controller;
 
-use go\core\jmap\Controller;
+use gp\core\controller;
 use go\core\jmap\Response;
 use go\modules\community\ldapauthenticator\model;
 

@@ -62,7 +62,12 @@ class Router {
 			}
 			
 			try {
-				$this->callAction($method, $params);
+				$response = $this->callAction($method, $params);
+				
+				if(isset($response)) {
+					Response::get()->addResponse($response);
+				}
+				
 			} catch (CoreException $e) {
 				$error = ["message" => $e->getMessage()];
 				

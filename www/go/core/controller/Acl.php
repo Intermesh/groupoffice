@@ -33,4 +33,5 @@ class Acl extends EntityController {
 	protected function entityClass() {
 		return model\Acl::class;
 	}
+	
 }

@@ -10,7 +10,7 @@ use go\modules\community\serverclient\model\MailDomain;
  * and open the template in the editor.
  */
 
-class Serverclient extends \go\core\jmap\Controller {
+class Serverclient extends \gp\core\controller {
 	
 	//save mailbox on server when the user is saved
 	// password is sync in user save event

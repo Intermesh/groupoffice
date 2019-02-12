@@ -159,7 +159,7 @@ abstract class Entity  extends OrmEntity {
 		$result = [				
 			'oldState' => $sinceState,
 			'newState' => null,
-			'hasMoreUpdates' => false,
+			'hasMoreChanges' => false,
 			'changed' => [],
 			'removed' => []
 		];		
@@ -190,14 +190,14 @@ abstract class Entity  extends OrmEntity {
 			
 			$states[1]['offset'] += $maxChanges;
 			
-			$result['hasMoreUpdates'] = true;
+			$result['hasMoreChanges'] = true;
 			$result['newState'] = static::intermediateState($states);
 		} else
 		{
 			$result['newState'] = static::getState();
 		}
 		
-		$result['hasMoreUpdates'] = $result['newState'] != static::getState();
+		$result['hasMoreChanges'] = $result['newState'] != static::getState();
 		
 		return $result;		
 	}

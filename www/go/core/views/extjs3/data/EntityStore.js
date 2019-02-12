@@ -215,7 +215,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			}
 			
 			var clientCallId = go.Jmap.request({
-				method: this.entity.name + "/getUpdates",
+				method: this.entity.name + "/changes",
 				params: {
 					sinceState: this.state
 				},
@@ -228,7 +228,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					}
 					if(success) {
 						this.setState(response.newState, function(){
-							if(response.hasMoreUpdates) {
+							if(response.hasMoreChanges) {
 								this.getUpdates(cb, scope);
 							} else
 							{

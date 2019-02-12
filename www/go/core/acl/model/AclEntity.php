@@ -36,7 +36,7 @@ abstract class AclEntity extends Entity {
 		$result = parent::getChanges($sinceState, $maxChanges);	
 		$result['oldState'] = $sinceState;
 		
-		if($result['hasMoreUpdates']) {			
+		if($result['hasMoreChanges']) {			
 			//allready at max
 			return $result;
 		}
@@ -110,7 +110,7 @@ abstract class AclEntity extends Entity {
 		
 		if($query->rowCount() > $maxChanges) {
 			$states[2]['offset'] += $maxChanges;
-			$result['hasMoreUpdates'] = true;
+			$result['hasMoreChanges'] = true;
 			$result['newState'] = static::intermediateState($states);
 		}
 		
