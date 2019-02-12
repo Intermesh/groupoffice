@@ -6,7 +6,7 @@ namespace go\core;
  * Debugger class. All entries are stored and the view can render them eventually.
  * The JSON view returns them all.
  * 
- * The client can enable by sending an HTTP header X-Debug=1
+ * The client can enable by sending an HTTP header X-Debug=1 (Use CTRL + F7 in webclient)
  * 
  * Example:
  * 
@@ -64,7 +64,7 @@ class Debugger {
 	
 	public function __construct() {
 		try {
-			$this->enabled = !empty(GO()->getConfig()['general']['debug']) && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug');
+			$this->enabled = (!empty(GO()->getConfig()['general']['debug']) || jmap\Request::get()->getHeader('X-Debug') == "1") && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug');
 			if($this->enabled) {
 				$this->logPath = GO()->getDataFolder()->getFile('log/debug.log')->getPath();
 			}

@@ -11,6 +11,8 @@ GO.mainLayout.onReady(function(){
 
 				GO.debugWindow.show();
 				GO.debug = true;
+				
+				Ext.Ajax.defaultHeaders['X-Debug'] = "1";
 			}
 		});
 });
