@@ -346,7 +346,7 @@ class Instance extends Entity {
 		
 		$tpl = Module::getFolder()->getFile('config.php.tpl');
 		
-		$dsn = \go\core\db\Utils::parseDSN(GO()->getConfig()['db']['dsn']);
+		$dsn = \go\core\db\Utils::parseDSN(GO()->getConfig()['core']['db']['dsn']);
 
 		
 		return str_replace([

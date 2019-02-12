@@ -111,8 +111,8 @@ if (!empty($_POST)) {
 		\go\core\model\User::findById(1)->legacyOnSave();
 		
 		
-		if(GO()->getConfig()['general']['servermanager']) {
-			exec("php ".\go\core\Environment::get()->getInstallFolder() .'/go/modules/community/multi_instance/oninstall.php '.GO()->getConfig()['general']['servermanager']. ' '.explode(':',$_SERVER['HTTP_HOST'])[0], $output, $ret);
+		if(GO()->getConfig()['core']['general']['servermanager']) {
+			exec("php ".\go\core\Environment::get()->getInstallFolder() .'/go/modules/community/multi_instance/oninstall.php '.GO()->getConfig()['core']['general']['servermanager']. ' '.explode(':',$_SERVER['HTTP_HOST'])[0], $output, $ret);
 		}		
 
 		header("Location: finished.php");

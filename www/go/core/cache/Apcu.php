@@ -20,7 +20,7 @@ class Apcu implements CacheInterface {
 	
 	public function __construct() {
 		GO()->info("Using Apcu cache");
-		$this->prefix = GO()->getConfig()['db']['name'];
+		$this->prefix = GO()->getConfig()['core']['db']['name'];
 	}
 
 	/**

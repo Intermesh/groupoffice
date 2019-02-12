@@ -271,7 +271,7 @@ class Installer {
 		echo "Rebuilding cache\n";
 
 		//reset new cache
-		$cls = GO()->getConfig()['general']['cache'];
+		$cls = GO()->getConfig()['core']['general']['cache'];
 		GO()->setCache(new $cls);
 
 		GO()->rebuildCache();

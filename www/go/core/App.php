@@ -115,7 +115,7 @@ use const GO_CONFIG_FILE;
 		 * @return Folder
 		 */
 		public function getDataFolder() {
-			return new Folder($this->getConfig()['general']['dataPath']);
+			return new Folder($this->getConfig()['core']['general']['dataPath']);
 		}
 		
 		/**
@@ -124,9 +124,9 @@ use const GO_CONFIG_FILE;
 		 * @return float
 		 */
 		public function getStorageQuota() {
-			$quota = $this->getConfig()['limits']['storageQuota'];
+			$quota = $this->getConfig()['core']['limits']['storageQuota'];
 			if(empty($quota)) {
-				$quota = disk_total_space($this->getConfig()['general']['dataPath']);
+				$quota = disk_total_space($this->getConfig()['core']['general']['dataPath']);
 			}
 			
 			return $quota;
@@ -138,9 +138,9 @@ use const GO_CONFIG_FILE;
 		 * @return float
 		 */
 		public function getStorageFreeSpace() {
-			$quota = $this->getConfig()['limits']['storageQuota'];
+			$quota = $this->getConfig()['core']['limits']['storageQuota'];
 			if(empty($quota)) {
-				return disk_free_space($this->getConfig()['general']['dataPath']);
+				return disk_free_space($this->getConfig()['core']['general']['dataPath']);
 			} else
 			{
 				 $usage = \GO::config()->get_setting('file_storage_usage');				 
@@ -154,7 +154,7 @@ use const GO_CONFIG_FILE;
 		 * @return Folder
 		 */
 		public function getTmpFolder() {
-			return new Folder($this->getConfig()['general']['tmpPath']);
+			return new Folder($this->getConfig()['core']['general']['tmpPath']);
 		}
 
 		private $config;
@@ -255,29 +255,37 @@ use const GO_CONFIG_FILE;
 				$cacheCls = cache\Disk::class;
 			}
 			
-			$this->config = [
-					"general" => [
-							"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice', //TODO default should be /var/lib/groupoffice
-							"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
-							"debug" => $config['debug'] ?? false,
-							"cache" => $cacheCls,
-							"servermanager" => $config['servermanager'] ?? false
+			$this->config = (new util\ArrayObject([					
+					"core" => [
+							"general" => [
+									"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice', //TODO default should be /var/lib/groupoffice
+									"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
+									"debug" => $config['debug'] ?? null,
+									"cache" => $cacheCls,
+									"servermanager" => $config['servermanager'] ?? false
+							],
+							"db" => [
+									"name" => $config['db_name'],
+									"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . ($config['db_name'] ?? "groupoffice-com"),
+									"username" => $config['db_user'] ?? "groupoffice",
+									"password" => $config['db_pass'] ?? ""
+							],
+							"limits" => [
+									"maxUsers" => $config['max_users'] ?? 0,
+									"storageQuota" => $config['quota'] ?? 0,
+									"allowedModules" => $config['allowed_modules'] ?? ""
+							],
+							"branding" => [
+								"name" => $config['product_name'] ?? "GroupOffice"
+							],						
 					],
-					"db" => [
-							"name" => $config['db_name'],
-							"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . ($config['db_name'] ?? "groupoffice-com"),
-							"username" => $config['db_user'] ?? "groupoffice",
-							"password" => $config['db_pass'] ?? ""
-					],
-					"limits" => [
-							"maxUsers" => $config['max_users'] ?? 0,
-							"storageQuota" => $config['quota'] ?? 0,
-							"allowedModules" => $config['allowed_modules'] ?? ""
-					],
-					"branding" => [
-						"name" => $config['product_name'] ?? "GroupOffice"
-					]
-			];
+					
+//					"package" => [
+//							"name" => [
+//									"foo" => 'bar'
+//							]
+//					]
+			]))->mergeRecursive($config)->getArray();
 			
 			return $this->config;
 		}
@@ -290,7 +298,7 @@ use const GO_CONFIG_FILE;
 		public function getDbConnection() {
 
 			if (!isset($this->dbConnection)) {
-				$db = $this->getConfig()['db'];
+				$db = $this->getConfig()['core']['db'];
 				$this->dbConnection = new Connection(
 								$db['dsn'], $db['username'], $db['password']
 				);
@@ -330,7 +338,7 @@ use const GO_CONFIG_FILE;
 		 */
 		public function getCache() {
 			if (!isset($this->cache)) {
-				$cls = $this->getConfig()['general']['cache'];
+				$cls = $this->getConfig()['core']['general']['cache'];
 				$this->cache = new $cls;
 			}
 			return $this->cache;

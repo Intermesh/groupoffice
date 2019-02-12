@@ -131,7 +131,7 @@ class Language {
 				$langData->mergeRecursive($this->loadFile($file));
 			}
 			
-			$productName = GO()->getConfig()['branding']['name'];
+			$productName = GO()->getConfig()['core']['branding']['name'];
 
 			foreach ($langData as $key => $translation) {
 				
