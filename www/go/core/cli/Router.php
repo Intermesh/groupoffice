@@ -3,6 +3,7 @@
 namespace go\core\cli;
 
 use Exception;
+use go\core\Controller;
 use go\core\exception\NotFound;
 use go\core\jmap\exception\InvalidArguments;
 use ReflectionMethod;
@@ -11,7 +12,17 @@ use function str_split;
 /**
  * CLI Router
  * 
- * Usage: cli.php package/modulename/controller/method --arg1=foo
+ * You can run a CLI controller method like this:
+ * 
+ * ```
+ * php cli.php package/modulename/controller/method --arg1=foo
+ * ```
+ * 
+ * Or with Docker Compose:
+ * 
+ * ```
+ * docker-compose exec --user www-data groupoffice php cli.php community/addressbook/migrate/run
+ * ```
  */
 class Router {
 	
@@ -86,11 +97,6 @@ class Router {
 
 		$ctrl = new $controllerCls;
 		
-		if(!($ctrl instanceof Controller)) {
-			throw new Exception($controllerCls . " is not a go\core\cli\Controller class.");
-		}
-		
-
 		if (!method_exists($ctrl, $parts[3])) {
 			throw new Exception("Method '" .  $parts[3] . "' doesn't exist in controller '" . $controllerCls . "'");
 		}

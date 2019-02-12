@@ -3,7 +3,7 @@
 namespace go\modules\community\addressbook\controller;
 
 use Exception;
-use go\core\cli\Controller;
+use go\core\Controller;
 use go\core\util\DateTime;
 use go\modules\community\addressbook\model\Address;
 use go\modules\community\addressbook\model\AddressBook;

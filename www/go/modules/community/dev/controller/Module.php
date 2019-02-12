@@ -4,7 +4,7 @@ namespace go\modules\community\dev\controller;
 
 use Exception;
 use GO;
-use go\core\cli\Controller;
+use go\core\Controller;
 use go\core\db\Column;
 use go\core\fs\Folder;
 use go\core\util\StringUtil;

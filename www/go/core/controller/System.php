@@ -1,7 +1,7 @@
 <?php
 namespace go\core\controller;
 
-use go\core\cli\Controller;
+use go\core\Controller;
 use go\core\db\Query;
 use go\core\fs\Blob;
 use go\core\util\DateTime;

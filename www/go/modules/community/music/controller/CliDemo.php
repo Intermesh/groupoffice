@@ -2,7 +2,7 @@
 
 namespace go\modules\community\music\controller;
 
-use go\core\cli\Controller;
+use go\core\Controller;
 use go\core\db\Criteria;
 use go\core\db\Expression;
 use go\core\db\Query;
