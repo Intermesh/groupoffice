@@ -5,7 +5,7 @@ use go\core\fs\Blob;
 use go\core\http\Response;
 use go\core\http\Request;
 
-require(__DIR__ . "/vendor/autoload.php");
+require("../vendor/autoload.php");
 
 //Create the app with the database connection
 App::get()->setAuthState(new State());

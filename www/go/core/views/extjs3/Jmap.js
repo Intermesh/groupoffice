@@ -73,9 +73,13 @@ go.Jmap = {
 		return false;
 	},
 	
+	getApiUrl : function() {
+		return BaseHref + 'api/jmap.php';
+	},
+	
 	get: function(cb, scope) {
 		Ext.Ajax.request({
-			url: BaseHref + 'jmap.php',
+			url: this.getApiUrl(),
 			method: 'GET',
 			callback: function (opts, success, response) {
 				var data;
@@ -213,7 +217,7 @@ go.Jmap = {
 			me.debug();
 
 			Ext.Ajax.request({
-				url: BaseHref + 'jmap.php',
+				url: me.getApiUrl(),
 				method: 'POST',
 				jsonData: me.requests,
 				success: function (response, opts) {

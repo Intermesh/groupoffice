@@ -58,7 +58,7 @@ go.login.RecoveryDialog = Ext.extend(go.Window, {
 				}
 				
 				Ext.Ajax.request({
-					url:BaseHref+'auth.php',
+					url: go.AuthenticationManager.getAuthUrl(),
 					jsonData: {
 						recover: true,
 						hash: this.hashField.getValue(),
@@ -106,7 +106,7 @@ go.login.RecoveryDialog = Ext.extend(go.Window, {
 		this.redirectUrl = redirectUrl;
 		
 		Ext.Ajax.request({
-			url:BaseHref+'auth.php',
+			url: go.AuthenticationManager.getAuthUrl(),
 			jsonData: {
 				recover: true,
 				hash: hash

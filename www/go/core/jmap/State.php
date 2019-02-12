@@ -104,19 +104,19 @@ class State extends AbstractState {
 	}
 	
 	public function getDownloadUrl($blobId) {
-		return Settings::get()->URL . "/download.php?blob=".$blobId;
+		return Settings::get()->URL . "/api/download.php?blob=".$blobId;
 	}
 	
 	public function getApiUrl() {
-		return Settings::get()->URL . '/jmap.php';
+		return Settings::get()->URL . '/api/jmap.php';
 	}
 	
 	public function getUploadUrl() {
-		return Settings::get()->URL . '/upload.php';
+		return Settings::get()->URL . '/api/upload.php';
 	}
 	
 	public function getEventSourceUrl() {
-		return function_exists("xdebug_is_debugger_active") && xdebug_is_debugger_active() ? null : Settings::get()->URL.'/sse.php';
+		return function_exists("xdebug_is_debugger_active") && xdebug_is_debugger_active() ? null : Settings::get()->URL.'/api/sse.php';
 	}
 
 

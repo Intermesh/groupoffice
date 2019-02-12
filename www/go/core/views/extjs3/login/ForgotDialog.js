@@ -52,7 +52,7 @@ go.login.ForgotDialog = Ext.extend(go.Window, {
 		this.getEl().mask();
 
 		Ext.Ajax.request({
-			url: BaseHref + 'auth.php',
+			url: go.AuthenticationManager.getAuthUrl(),
 			jsonData: {forgot: true, email: this.emailField.getValue()},
 			scope: this,
 			callback: function (options, success, response) {

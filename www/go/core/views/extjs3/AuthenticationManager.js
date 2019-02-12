@@ -55,6 +55,10 @@
 				this.panels.splice(index, 0, panel);
 			}
 		},
+		
+		getAuthUrl : function() {
+			return BaseHref + 'api/auth.php';
+		},
 
 		/**
 		 * Does a call to the server to get all available authenticators for the given username
@@ -70,7 +74,7 @@
 			};
 
 			Ext.Ajax.request({
-				url: BaseHref + 'auth.php',
+				url: this.getAuthUrl(),
 				jsonData: clientData,
 				callback: function (options, success, response) {
 					var result = Ext.decode(response.responseText);
@@ -132,7 +136,7 @@
 					name: "groupoffice"
 				}, function() {
 					Ext.Ajax.request({
-						url: BaseHref + 'auth.php',
+						url: go.AuthenticationManager.getAuthUrl(),
 						method: "DELETE",
 						callback: function() {
 							go.User.clearAccessToken();
@@ -155,7 +159,7 @@
 			};
 
 			Ext.Ajax.request({
-				url: BaseHref + 'auth.php',
+				url: this.getAuthUrl(),
 				jsonData: loginData,
 				callback: function (options, success, response) {
 					var result = response.responseText ? Ext.decode(response.responseText) : {};

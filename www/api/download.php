@@ -10,7 +10,7 @@
  * can be accessed with: "download.php?blob=community/addressbook/vcard/1"
  * 
  */
-require(__DIR__ . "/vendor/autoload.php");
+require("../vendor/autoload.php");
 
 use go\core\App;
 use go\core\fs\Blob;

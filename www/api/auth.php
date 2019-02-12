@@ -1,6 +1,6 @@
 <?php
 
-require(__DIR__ . "/vendor/autoload.php");
+require("../vendor/autoload.php");
 
 use go\core\App;
 use go\core\auth\Method;

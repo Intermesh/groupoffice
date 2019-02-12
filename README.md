@@ -4,6 +4,12 @@ Group-Office is an enterprise CRM and groupware tool.
 Share projects, calendars, files and e-mail online with co-workers and clients. 
 Easy to use and fully customizable.
 
+# Install
+
+If you're not a developer and you wish to use Group-Office please visit:
+
+https://www.group-office.com/documentation.html
+
 # Developers
 
 ## Docker
@@ -27,8 +33,3 @@ https://github.com/Intermesh/docker-groupoffice-development
    ```
 5. Launch it in the web browser and follow the installer's instructions.
 
-# Install
-
-To install a release please visit:
-
-https://www.group-office.com/documentation.html

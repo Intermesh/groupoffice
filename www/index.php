@@ -3,6 +3,7 @@
 use go\core\auth\model\Token;
 use go\core\exception\ConfigurationException;
 use go\core\http\Request;
+
 /**
  * Copyright Intermesh
  *
@@ -17,6 +18,10 @@ use go\core\http\Request;
  */
 
 //$root = dirname(__FILE__).'/';
+
+/**
+ * This file loads the web client
+ */
 
 try {
   //initialize autoloading of library

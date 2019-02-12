@@ -10,7 +10,7 @@ use go\core\App;
 use go\core\db\Query;
 use go\core\jmap\State;
 
-require(__DIR__ . "/vendor/autoload.php");
+require("../vendor/autoload.php");
 
 //Create the app with the database connection
 App::get()->setAuthState(new State());
