@@ -34,14 +34,7 @@ Ext.namespace("GO.base.util");
 Ext.namespace("GO.portlets");
 Ext.namespace("GO.panels");
 Ext.namespace("go");
-Ext.namespace("go.cron");
-Ext.namespace("go.customfields");
-Ext.namespace("go.groups");
-Ext.namespace("go.links");
-Ext.namespace("go.modules");
-Ext.namespace("go.tools");
-Ext.namespace("go.users");
-Ext.namespace("go.search");
+
 
 //An object of functions that open a particular link.
 //the index is the link type and the function gets the id as a parameter

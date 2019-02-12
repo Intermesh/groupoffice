@@ -1,4 +1,4 @@
-go.modules.core.core.cronStore = new GO.data.JsonStore({
+go.cron.cronStore = new GO.data.JsonStore({
 	url: GO.url('core/cron/store'),		
 	root: 'results',
 	id: 'id',
@@ -8,7 +8,7 @@ go.modules.core.core.cronStore = new GO.data.JsonStore({
 	model:"GO\\Base\\Cron\\CronJob"
 });
 	
-go.modules.core.core.periodStore = new GO.data.JsonStore({
+go.cron.periodStore = new GO.data.JsonStore({
 	url: GO.url('core/cron/runBetween'),		
 	root: 'results',
 	id: 'id',
@@ -18,7 +18,7 @@ go.modules.core.core.periodStore = new GO.data.JsonStore({
 	model:"GO\\Base\\Cron\\CronJob"
 });
 	
-go.modules.core.core.jobStore = new GO.data.JsonStore({
+go.cron.jobStore = new GO.data.JsonStore({
 	url: GO.url('core/cron/availableCronCollection'),		
 	root: 'results',
 	id: 'class',

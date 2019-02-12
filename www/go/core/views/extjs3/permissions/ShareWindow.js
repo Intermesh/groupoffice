@@ -1,4 +1,4 @@
-go.modules.core.core.ShareWindow = Ext.extend(go.form.Dialog, {
+go.permissions.ShareWindow = Ext.extend(go.form.Dialog, {
 	title: t('Share'),
 	entityStore: go.Stores.get("Acl"),
 	height: dp(600),
@@ -13,11 +13,11 @@ go.modules.core.core.ShareWindow = Ext.extend(go.form.Dialog, {
 				scope: this
 			})];
 		
-		go.modules.core.core.ShareWindow.superclass.initComponent.call(this);
+		go.permissions.ShareWindow.superclass.initComponent.call(this);
 	},
 	initFormItems: function () {
 		return [
-			this.sharePanel = new go.modules.core.core.SharePanel({
+			this.sharePanel = new go.permissions.SharePanel({
 				anchor: '100% -' + dp(32),
 				hideLabel: true,
 				name: "groups"

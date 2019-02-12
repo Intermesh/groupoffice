@@ -34,7 +34,7 @@ GO.files.FileBrowserMenuItem = Ext.extend(Ext.menu.Item, {
 				var store = go.Stores.get(fb.model_name);
 				if (store) {
 					store.data[fb.model_id].filesFolderId = result.files_folder_id;
-					store.saveState();
+					//store.saveState();
 				}
 
 				fb.on('hide', function () {

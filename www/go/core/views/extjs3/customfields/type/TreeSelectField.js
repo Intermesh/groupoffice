@@ -1,6 +1,6 @@
 /* global go, Ext */
 
-go.modules.core.core.TreeSelectField = Ext.extend(Ext.Panel, {
+go.customfields.type.TreeSelectField = Ext.extend(Ext.Panel, {
 	layout: "form",
 	isFormField: true,
 	name: "options",
@@ -9,7 +9,7 @@ go.modules.core.core.TreeSelectField = Ext.extend(Ext.Panel, {
 		return this.name;
 	},
 	initComponent: function () {	
-		go.modules.core.core.TreeSelectField.superclass.initComponent.call(this);		
+		go.customfields.type.TreeSelectField.superclass.initComponent.call(this);		
 		this.add(this.createCombo(this.customfield.dataType.options));
 		
 		this.pathMap = {};
@@ -124,4 +124,4 @@ go.modules.core.core.TreeSelectField = Ext.extend(Ext.Panel, {
 });
 
 
-Ext.reg("treeselectfield", go.modules.core.core.TreeSelectField);
+Ext.reg("treeselectfield", go.customfields.type.TreeSelectField);

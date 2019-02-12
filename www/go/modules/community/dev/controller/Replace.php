@@ -20,7 +20,7 @@ class Replace extends \go\core\Controller {
 //					continue;
 //				}
 //				
-//				$oldCls  = "go.modules.core.core." .$file->getNameWithoutExtension();
+//				$oldCls  = "go.cron." .$file->getNameWithoutExtension();
 //				$newCls = $ns . '.' .$file->getNameWithoutExtension();
 //				
 //				echo "Replace " .$oldCls . " -> " . $newCls ."\n";

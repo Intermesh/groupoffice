@@ -113,7 +113,7 @@ go.modules.community.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 						iconCls: 'ic-share',
 						text: t("Share"),
 						handler: function() {
-							var shareWindow = new go.modules.core.core.ShareWindow({
+							var shareWindow = new go.permissions.ShareWindow({
 								title: t("Share") + ": " + this.moreMenu.record.get('name')
 							});
 							

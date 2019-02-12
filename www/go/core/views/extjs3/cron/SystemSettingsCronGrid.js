@@ -66,7 +66,7 @@ go.cron.SystemSettingsCronGrid = Ext.extend(GO.grid.GridPanel,{
 			//					scope: this
 			//				}]
 			}),
-			store: go.modules.core.core.cronStore,
+			store: go.cron.cronStore,
 			border: false,
 			paging:true,
 			view:new Ext.grid.GridView({
@@ -161,12 +161,12 @@ go.cron.SystemSettingsCronGrid = Ext.extend(GO.grid.GridPanel,{
 		go.cron.SystemSettingsCronGrid.superclass.initComponent.call(this);
 		
 		this.on('render', function(){
-			go.modules.core.core.cronStore.load();
+			go.cron.cronStore.load();
 		},this);
 	},
 	showSettingsDialog : function(){
 		if(!this.settingsDialog){
-			this.settingsDialog = new go.modules.core.core.SettingsDialog();
+			this.settingsDialog = new go.cron.SettingsDialog();
 
 			this.settingsDialog.on('save', function(){   
 				this.store.load();

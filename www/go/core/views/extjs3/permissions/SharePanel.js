@@ -1,4 +1,4 @@
-go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
+go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 	/*
 	 * the form field name
 	 */
@@ -142,7 +142,7 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 		
 		this.store.on("beforeload", this.onBeforeStoreLoad, this);
 		
-		go.modules.core.core.SharePanel.superclass.initComponent.call(this);
+		go.permissions.SharePanel.superclass.initComponent.call(this);
 		
 		this.on("beforeedit", function(e) {
 			return e.record.data.id !== 1; //cancel edit for admins group
@@ -151,7 +151,7 @@ go.modules.core.core.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 	},
 	
 	startEditing : function(row,  col) {
-		go.modules.core.core.SharePanel.superclass.startEditing.call(this, row, col);
+		go.permissions.SharePanel.superclass.startEditing.call(this, row, col);
 		
 		//expand combo when editing
 		if(this.activeEditor) {

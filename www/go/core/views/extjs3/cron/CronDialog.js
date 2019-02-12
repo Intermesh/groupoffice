@@ -133,7 +133,7 @@ go.cron.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		this.jobCombo = new GO.form.ComboBox({
 			hiddenName: 'job',
 			fieldLabel: t("Job", "cron"),
-			store: go.modules.core.core.jobStore,
+			store: go.cron.jobStore,
 			valueField:'class',
 			displayField:'name',
 			mode:'remote',

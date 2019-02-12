@@ -18,7 +18,7 @@ go.cron.PeriodGrid = Ext.extend(go.grid.GridPanel,{
 		
 		Ext.apply(this,{
 			standardTbar:false,
-			store: go.modules.core.core.periodStore,
+			store: go.cron.periodStore,
 			editDialogClass:go.cron.CronDialog,
 			border: false,
 			tbar:[{
@@ -117,6 +117,6 @@ go.cron.PeriodGrid = Ext.extend(go.grid.GridPanel,{
 		});
 		go.cron.PeriodGrid.superclass.initComponent.call(this);
 		
-		go.modules.core.core.periodStore.load();
+		go.cron.periodStore.load();
 	}	
 });

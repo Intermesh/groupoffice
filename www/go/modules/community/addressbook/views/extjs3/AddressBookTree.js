@@ -192,7 +192,7 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 						iconCls: 'ic-share',
 						text: t("Share"),
 						handler: function () {
-							var shareWindow = new go.modules.core.core.ShareWindow({
+							var shareWindow = new go.permissions.ShareWindow({
 								title: t("Share") + ": " + this.addressBookMoreMenu.data.name
 							});
 
