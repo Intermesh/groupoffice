@@ -194,11 +194,11 @@ class File extends FileSystemObject {
 	/**
 	 * Find and replace text in a text file
 	 * 
-	 * @param string $find
+	 * @param string $search
 	 * @param string $replace
 	 * @return bool
 	 */
-	public function replace($find, $replace) {
+	public function replace($search, $replace) {
 		$contents = $this->getContents();
 		$replaced = str_replace($search, $replace, $contents);
 		if($replaced === $contents) {
