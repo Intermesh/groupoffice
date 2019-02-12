@@ -224,33 +224,5 @@ class Language extends Controller {
 			}
 		}		
 	}
-	
-	
-	public function merge() {
-		
-		$corePkgFolder = GO()->getEnvironment()->getInstallFolder()->getFolder("go/modules/core");
-		$coreLangFolder = GO()->getEnvironment()->getInstallFolder()->getFolder("go/core/language");
-		$modFolders = $corePkgFolder->getChildren(false);
-		
-		foreach(GO()->getLanguage()->getLanguages() as $code => $label) {
-			$langData = [];
-			foreach($modFolders as $f) {
-				$langFile = $f->getFile("language/" . $code . '.php');
-				if($langFile->exists()) {
-					$l = require($langFile->getPath());
-					$langData = array_merge($langData, $l);
-				}
-			}
-			
-			$coreLangFile = $coreLangFolder->getFile($code . '.php');
-			if($coreLangFile->exists()) {
-				$l = require($coreLangFile->getPath());
-				$langData = array_merge($langData, $l);
-			}			
-			$coreLangFile->putContents("<?php\nreturn ".var_export($langData, true).";\n");
-			
-		}
-		
-	}
 
 }
