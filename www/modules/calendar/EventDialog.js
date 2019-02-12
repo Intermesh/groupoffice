@@ -541,18 +541,23 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 				if(action.result.feedback){
 					Ext.MessageBox.alert(t("Error"), action.result.feedback);
 				}else	if (hide) {
-					this.win[this.win.closeAction]();
+					this.win.close();					
 				}
 
 				if (config && config.callback) {
 					config.callback.call(this, this, true);
 				}
 				
-				
-				this.participantsPanel.store.loadData({results:action.result.participants});
+				if(this.win.closeAction != "close") {					
+					this.participantsPanel.store.loadData({results:action.result.participants});
+				}
 				
 				
 				GO.calendar.handleMeetingRequest(action.result);
+				
+				if(this.win.closeAction == "close") {	
+					this.purgeListeners();					
+				}
 
 			},
 			failure : function(form, action) {
