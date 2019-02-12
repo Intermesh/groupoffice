@@ -1,9 +1,9 @@
 GO.files.FileBrowserButton = Ext.extend(Ext.Button, {
 	
 	model_name : "",
-	id: 0,
+	model_id: 0,
 	setId : function(id){
-		this.id=id;
+		this.model_id=id;
 		this.setDisabled(!id);
 	},
 	
@@ -20,17 +20,17 @@ GO.files.FileBrowserButton = Ext.extend(Ext.Button, {
 						params:{								
 							mustExist:true,
 							model:this.model_name,
-							id:this.id
+							id:this.model_id
 						},
 						success:function(response, options, result){														
 							var fb = GO.files.openFolder(result.files_folder_id);
 							fb.model_name = this.model_name;
-							fb.model_id = this.id;
+							fb.model_id = this.model_id;
 							
 							//hack to update entity store
               var store = go.Stores.get(fb.model_name);
 							if(store) {
-								store.data[this.id].filesFolderId = result.files_folder_id;
+								store.data[this.model_id].filesFolderId = result.files_folder_id;
 								//store.saveState();
 							}
 							
