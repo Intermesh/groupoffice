@@ -93,6 +93,12 @@ class Router {
 			}
 			$controllerClass = str_ireplace("model", "controller", $entityType->getClassName());
 			$controllerMethod = $parts[1];
+		} else if($parts[0] == "core") {
+			$controllerMethod = array_pop($parts);
+			array_splice($parts, -1, 0, 'controller');
+
+			$controllerClass = 'go\\' . implode('\\', $parts);
+			
 		} else {
 			// With namespace: community/notes/Note/query
 			$controllerMethod = array_pop($parts);

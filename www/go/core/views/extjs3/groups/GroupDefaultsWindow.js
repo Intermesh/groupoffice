@@ -49,7 +49,7 @@ go.groups.GroupDefaultsWindow = Ext.extend(go.Window, {
 								this.getEl().mask();
 								
 								go.Jmap.request({
-									method: "core/groups/Settings/applyDefaultGroups",
+									method: "core/Settings/applyDefaultGroups",
 									params: this.formPanel.getForm().getFieldValues(),
 									callback: function (options, success, response) {
 										this.getEl().unmask();										
@@ -77,28 +77,22 @@ go.groups.GroupDefaultsWindow = Ext.extend(go.Window, {
 		
 		
 		this.on('render', function() {
-			go.Jmap.request({
-				method: "core/groups/Settings/get",
-				callback: function (options, success, response) {
-					this.formPanel.getForm().setValues(response);
-				},
-				scope: this
-			});
+			this.formPanel.getForm().setValues(go.Modules.get('core', 'core').settings);
 		}, this);
 	},
 
 	submit: function (cb, scope) {
 		
 		this.getEl().mask();
-		go.Jmap.request({
-			method: "core/groups/Settings/set",
-			params: this.formPanel.getForm().getFieldValues(),
-			callback: function (options, success, response) {
-				this.getEl().unmask();
-				this.close();
-			},
-			scope: this
-		});
+		var module = go.Modules.get('core', 'core'), p = {"update": {}};
+		
+		p.update[module.id] = {settings: this.formPanel.getForm().getFieldValues()};
+		
+		go.Stores.get("Module").set(p, function (options, success, response) {
+			this.getEl().unmask();
+			this.close();
+		},
+		this);
 	}
 
 });

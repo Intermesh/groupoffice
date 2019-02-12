@@ -30,7 +30,6 @@ views/Extjs3/javascript/WeekPicker.js
 
 go/core/views/extjs3/TimeZones.js
 
-views/Extjs3/javascript/windows/LoginDialog.js
 
 views/Extjs3/javascript/data/JsonStore.js
 views/Extjs3/javascript/data/GroupingStore.js
@@ -198,8 +197,6 @@ views/Extjs3/javascript/treegrid/TreeGridColumns.js
 views/Extjs3/javascript/treegrid/TreeGridLoader.js
 views/Extjs3/javascript/treegrid/TreeGridNodeUI.js
 views/Extjs3/javascript/treegrid/TreeGridSorter.js
-
-views/Extjs3/javascript/windows/OtherLoginLocationDetectedDialog.js
 
 
 views/Extjs3/javascript/calendar/Calendar.js

@@ -162,7 +162,7 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * Get the table alias holding the aclId
 	 */
 	public static function getAclEntityTableAlias() {
-		static::getMapping()->getColumn('aclId')->table->getAlias();
+		return static::getMapping()->getColumn('aclId')->table->getAlias();
 	}
 
 }
