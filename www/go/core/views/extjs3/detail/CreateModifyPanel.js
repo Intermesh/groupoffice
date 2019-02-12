@@ -1,4 +1,4 @@
-go.panels.CreateModifyTpl = Ext.extend(Ext.Panel, {
+go.detail.CreateModifyPanel = Ext.extend(Ext.Panel, {
 	entityStore: "User",
 	cUserId: null,
 	mUserId: null,
@@ -50,7 +50,7 @@ go.panels.CreateModifyTpl = Ext.extend(Ext.Panel, {
 				}
 			}, this);
 			
-			go.panels.CreateModifyTpl.superclass.update.call(this, data);
+			go.detail.CreateModifyPanel.superclass.update.call(this, data);
 		},this);	
 	},
 	

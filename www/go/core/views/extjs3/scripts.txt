@@ -41,15 +41,16 @@ form/FormGroup.js
 form/Chips.js
 form/RecurrenceFieldset.js
 
-panels/CreateModifyTpl.js
-
 
 panels/ModulePanel.js
 panels/Panel.js
-Toolbar.js
+
 SearchField.js
 NavMenu.js
 Notifier.js
+
+toolbar/SearchButton.js
+toolbar/TitleItem.js
 
 layout/ResponsiveLayout.js
 
@@ -64,7 +65,9 @@ login/UsernamePanel.js
 login/LoginPanel.js
 login/RecoveryDialog.js
 
-Links.js
+links/LinkBrowserMenuItem.js
+links/Links.js
+links/CreateLinkButton.js
 links/EntityGrid.js
 links/LinkGrid.js
 links/CreateLinkWindow.js
@@ -88,6 +91,7 @@ detail/ReadMore.js
 detail/AddButton.js
 detail/PropertyList.js
 detail/Property.js
+detail/CreateModifyPanel.js
 
 systemsettings/Panel.js
 systemsettings/GeneralPanel.js
@@ -176,9 +180,7 @@ customfields/type/EncryptedText.js
 
 
 
-links/LinkBrowserMenuItem.js
-links/Links.js
-links/CreateLinkButton.js
+
 
 search/Panel.js
 search/SearchEmailCombo.js

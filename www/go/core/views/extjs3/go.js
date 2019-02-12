@@ -25,3 +25,4 @@ Ext.namespace("go.groups");
 Ext.namespace("go.tools");
 Ext.namespace("go.users");
 Ext.namespace("go.search");
+Ext.namespace('go.toolbar');
