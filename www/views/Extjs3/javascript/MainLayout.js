@@ -618,10 +618,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				text: t("System settings"),
 				iconCls: 'ic-settings',
 				handler: function() {
-					if(!go.systemsettingsDialog) {
-						go.systemsettingsDialog = new go.systemsettings.Dialog();
-					}
-					go.systemsettingsDialog.show();
+					var win = new go.systemsettings.Dialog();					
+					win.show();
 				}
 			});
 		}

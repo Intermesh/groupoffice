@@ -146,7 +146,7 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		if(success) {
 			this.submitCount--;
 			if(this.submitCount === 0) {
-				this.hide();
+				this.close();
 			}
 		}
 	},

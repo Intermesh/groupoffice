@@ -11,7 +11,7 @@ go.users.UserDefaultsWindow = Ext.extend(go.Window, {
 	initComponent: function () {
 
 
-		this.formPanel = new Ext.form.FormPanel({
+		this.formPanel = new go.systemsettings.Panel({
 			title: t("Defaults"),
 			items: [
 				{
@@ -168,22 +168,13 @@ go.users.UserDefaultsWindow = Ext.extend(go.Window, {
 			}];
 
 		go.users.UserDefaultsWindow.superclass.initComponent.call(this);
-
-
-		this.on('render', function () {	
-			this.formPanel.getForm().setValues(go.Modules.get('core', 'core').settings);
-		}, this);
 	},
 
 	submit: function () {
 
 		this.getEl().mask();
 		
-		var module = go.Modules.get('core', 'core'), p = {"update": {}};
-		
-		p.update[module.id] = {settings: this.formPanel.getForm().getFieldValues()};
-		
-		go.Stores.get("Module").set(p, function (options, success, response) {
+		this.formPanel.onSubmit(function (options, success, response) {
 			this.getEl().unmask();
 			this.close();
 		},
