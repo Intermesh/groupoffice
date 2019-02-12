@@ -1,5 +1,5 @@
 <?php
-namespace go\modules\core\customfields\install;
+namespace go\core\install;
 
 use go\core\db\Query;
 use go\core\db\Utils;
@@ -8,7 +8,7 @@ use go\core\model\FieldSet;
 use PDOException;
 use function GO;
 
-class Migrate63to64 {	
+class MigrateCustomFields63to64 {	
 	
 	public function migrateEntity($entityName) {
 		

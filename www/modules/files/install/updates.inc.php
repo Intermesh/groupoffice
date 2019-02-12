@@ -244,7 +244,7 @@ $updates['201901281546'][] = "ALTER TABLE `fs_files_custom_fields` ADD FOREIGN K
 
 
 $updates['201901281546'][] = function() {	
-	$m = new \go\modules\core\customfields\install\Migrate63to64();
+	$m = new \go\core\install\MigrateCustomFields63to64();
 	$m->migrateEntity("File");	
 	$m->migrateEntity("Folder");	
 };

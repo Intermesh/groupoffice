@@ -72,3 +72,7 @@ search/SearchEmailCombo.js
 search/SearchCombo.js
 
 
+
+modules/SystemSettingsModuleGrid.js
+modules/PermissionsWindow.js
+

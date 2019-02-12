@@ -1,4 +1,4 @@
-go.modules.core.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
+go.modules.core.core.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 	iconCls: 'ic-extension',
 	autoExpandColumn: 'name',
 	layout: 'fit',
@@ -206,7 +206,7 @@ go.modules.core.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGrid
 			}
 		}, this);
 
-		go.modules.core.modules.SystemSettingsModuleGrid.superclass.initComponent.call(this);
+		go.modules.core.core.SystemSettingsModuleGrid.superclass.initComponent.call(this);
 		
 	},
 	
@@ -283,7 +283,7 @@ go.modules.core.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGrid
 
 	afterRender: function() {
 
-		go.modules.core.modules.SystemSettingsModuleGrid.superclass.afterRender.call(this);
+		go.modules.core.core.SystemSettingsModuleGrid.superclass.afterRender.call(this);
 
 		this.store.load();
 
@@ -291,7 +291,7 @@ go.modules.core.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGrid
 
 	showPermissions: function(moduleId, name, acl_id) {
 		if (!this.permissionsWin) {
-			this.permissionsWin = new go.modules.core.modules.PermissionsWindow();
+			this.permissionsWin = new go.modules.core.core.PermissionsWindow();
 			this.permissionsWin.on('hide', function() {
 				// Loop through the recently installed modules, allowing the user to
 				// set the permissions, module by module.

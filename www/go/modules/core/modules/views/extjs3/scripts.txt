@@ -1,3 +1,0 @@
-Module.js
-SystemSettingsModuleGrid.js
-PermissionsWindow.js

@@ -365,7 +365,7 @@ $updates['201901301035'][] = "ALTER TABLE `core_change_user_modseq`
 $updates['201901301035'][] = "ALTER TABLE `core_customfields_field` CHANGE `databaseName` `databaseName` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;";
 
 $updates['201901301035'][] = function() {
-	$m = new \go\modules\core\customfields\install\Migrate63to64();
+	$m = new \go\core\install\MigrateCustomFields63to64();
 	$m->convertTypeNames();
 };
 
@@ -391,7 +391,7 @@ $updates['201901301035'][] = "ALTER TABLE `core_group` ADD UNIQUE(`name`);";
 
 
 $updates['201901301035'][] = function() {	
-	$m = new \go\modules\core\customfields\install\Migrate63to64();
+	$m = new \go\core\install\MigrateCustomFields63to64();
 	$m->migrateEntity("User");	
 };
 

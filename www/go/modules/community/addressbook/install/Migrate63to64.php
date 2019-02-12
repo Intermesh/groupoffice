@@ -66,7 +66,7 @@ class Migrate63to64 {
 		//$this->migrateCompanyLinks();		
 		$this->addCustomFieldKeys();
 
-		$m = new \go\modules\core\customfields\install\Migrate63to64();
+		$m = new \go\core\install\MigrateCustomFields63to64();
 		$m->migrateEntity("Contact");				
 		
 		$this->migrateCustomField();
@@ -219,7 +219,7 @@ class Migrate63to64 {
 		echo "Migrating address book custom field types\n";
 		flush();
 	
-		$cfMigrator = new \go\modules\core\customfields\install\Migrate63to64();
+		$cfMigrator = new \go\core\install\MigrateCustomFields63to64();
 		$fields = \go\core\model\Field::find()->where(['type' => [
 				'Contact', 
 				'Company'

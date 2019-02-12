@@ -330,7 +330,7 @@ $updates['201811270837'][] = "ALTER TABLE `cal_calendars_custom_fields` ADD FORE
 
 
 $updates['201811282011'][] = function() {	
-	$m = new \go\modules\core\customfields\install\Migrate63to64();
+	$m = new \go\core\install\MigrateCustomFields63to64();
 	$m->migrateEntity("Event");	
 	$m->migrateEntity("Calendar");	
 };

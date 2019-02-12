@@ -32,7 +32,7 @@ class ClassFinder {
 			
 			$modules = Module::find();
 			foreach ($modules as $module) {
-				if(!isset($module->package) || !$module->isAvailable()) {
+				if(!isset($module->package) || $module->package == "core" ||  !$module->isAvailable()) {
 					continue;
 				}
 				$namespace = "go\\modules\\" . $module->package . "\\" . $module->name;
