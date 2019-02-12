@@ -1,4 +1,4 @@
-go.panels.ModulePanel = Ext.extend(Ext.Panel, {
+go.modules.ModulePanel = Ext.extend(Ext.Panel, {
 	route : function(id, entity) {
 		
 		//cast to int if nummeric
@@ -43,4 +43,4 @@ go.panels.ModulePanel = Ext.extend(Ext.Panel, {
 	}
 });
 
-Ext.reg("modulepanel", go.panels.ModulePanel);
+Ext.reg("modulepanel", go.modules.ModulePanel);

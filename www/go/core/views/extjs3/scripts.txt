@@ -25,7 +25,6 @@ form/EntityPanel.js
 form/Dialog.js
 form/FormFieldSet.js
 form/PasswordGeneratorField.js
-form/BasicForm.js
 form/DateField.js
 form/DateTimeField.js
 form/FileField.js
@@ -42,8 +41,8 @@ form/Chips.js
 form/RecurrenceFieldset.js
 
 
-panels/ModulePanel.js
-panels/Panel.js
+modules/ModulePanel.js
+
 
 SearchField.js
 NavMenu.js

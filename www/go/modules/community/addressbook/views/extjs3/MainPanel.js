@@ -1,6 +1,6 @@
 /* global go, Ext, GO */
 
-go.modules.community.addressbook.MainPanel = Ext.extend(go.panels.ModulePanel, {
+go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 	layout: "responsive",
 

@@ -1,4 +1,4 @@
-go.modules.community.music.MainPanel = Ext.extend(go.panels.ModulePanel, {
+go.modules.community.music.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 	// Use a responsive layout
 	layout: "responsive",
