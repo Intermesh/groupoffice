@@ -671,7 +671,7 @@ abstract class Property extends Model {
 		}
 		
 		if($table->getColumn("modifiedBy") && !isset($modifiedForTable["modifiedBy"])) {
-			$this->modifiedBy = $modifiedForTable['modifiedBy'] = $this->getCreatedBy();
+			$this->modifiedBy = $modifiedForTable['modifiedBy'] = $this->getDefaultCreatedBy();
 		}
 		
 		if($table->getColumn("modifiedAt") && !isset($modifiedForTable["modifiedAt"])) {
@@ -687,13 +687,13 @@ abstract class Property extends Model {
 		}
 		
 		if($table->getColumn("createdBy") && !isset($modifiedForTable["createdBy"])) {
-			$this->createdBy = $modifiedForTable['createdBy']= $this->getCreatedBy();
+			$this->createdBy = $modifiedForTable['createdBy']= $this->getDefaultCreatedBy();
 		}
 		
 		return $modifiedForTable;
 	}
 	
-	protected function getCreatedBy() {
+	protected function getDefaultCreatedBy() {
 		return !App::get()->getAuthState() || !App::get()->getAuthState()->getUserId() ? 1 : App::get()->getAuthState()->getUserId();
 	}
 
