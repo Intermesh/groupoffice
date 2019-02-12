@@ -77,7 +77,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 
 	addCreateLinkButton : function() {
 		
-		this.getFooterToolbar().insert(0, this.createLinkButton = new go.modules.core.core.CreateLinkButton());	
+		this.getFooterToolbar().insert(0, this.createLinkButton = new go.links.CreateLinkButton());	
 		
 		this.on("load", function() {
 			this.createLinkButton.setEntity(this.entityStore.entity.name, this.currentId);

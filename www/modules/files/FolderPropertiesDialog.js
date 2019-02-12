@@ -131,7 +131,7 @@ GO.files.FolderPropertiesDialog = function(config){
 		items:[this.propertiesPanel, this.commentsPanel, this.readPermissionsTab]
 	});
 	
-	this.propertiesPanel.add(go.modules.core.core.CustomFields.getFormFieldSets("Folder"));
+	this.propertiesPanel.add(go.customfields.CustomFields.getFormFieldSets("Folder"));
 
 //	if(go.Modules.isAvailable("core", "customfields")){
 //		this.disableCategoriesPanel = new GO.customfields.DisableCategoriesPanel();

@@ -1,4 +1,4 @@
-go.modules.core.core.FieldSetDialog = Ext.extend(go.form.Dialog, {
+go.customfields.FieldSetDialog = Ext.extend(go.form.Dialog, {
 	stateId: 'custom-field-set-dialog',
 	title: t('Field set'),
 	entityStore: go.Stores.get("FieldSet"),

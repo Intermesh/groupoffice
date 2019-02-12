@@ -13,10 +13,10 @@ go.modules.community.files.customfield.File = Ext.extend(go.modules.core.core.ty
 	/**
 	 * Return dialog to edit this type of field
 	 * 
-	 * @returns {go.modules.core.core.FieldDialog}
+	 * @returns {go.customfields.FieldDialog}
 	 */
 	getDialog : function() {
-		return new go.modules.core.core.FieldDialog();
+		return new go.customfields.FieldDialog();
 	},
 	
 	/**
@@ -53,5 +53,5 @@ go.modules.community.files.customfield.File = Ext.extend(go.modules.core.core.ty
 	
 });
 
-go.modules.core.core.CustomFields.registerType(new go.modules.community.files.customfield.File());
+go.customfields.CustomFields.registerType(new go.modules.community.files.customfield.File());
 

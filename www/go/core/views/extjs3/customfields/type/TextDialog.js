@@ -1,4 +1,4 @@
-go.modules.core.core.type.TextDialog = Ext.extend(go.modules.core.core.FieldDialog, {
+go.modules.core.core.type.TextDialog = Ext.extend(go.customfields.FieldDialog, {
 	initFormItems: function () {
 		var items = go.modules.core.core.type.TextDialog.superclass.initFormItems.call(this);
 

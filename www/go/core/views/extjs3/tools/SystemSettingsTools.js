@@ -9,7 +9,7 @@ Ext.ux.IFrameComponent = Ext.extend(Ext.BoxComponent, {
 	}
 });
  
-go.modules.core.core.SystemSettingsTools = Ext.extend(Ext.Panel,{
+go.tools.SystemSettingsTools = Ext.extend(Ext.Panel,{
 	
 	iconCls: 'ic-build',
 	
@@ -71,6 +71,6 @@ go.modules.core.core.SystemSettingsTools = Ext.extend(Ext.Panel,{
 
 		this.items = [scriptList];
 
-		go.modules.core.core.SystemSettingsTools.superclass.initComponent.call(this);
+		go.tools.SystemSettingsTools.superclass.initComponent.call(this);
 	}	
 });

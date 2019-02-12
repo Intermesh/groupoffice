@@ -1,4 +1,4 @@
-go.modules.core.core.CreateUserAccountPanel = Ext.extend(Ext.form.FormPanel, {
+go.users.CreateUserAccountPanel = Ext.extend(Ext.form.FormPanel, {
 
 	isValid: function () {
 
@@ -50,7 +50,7 @@ go.modules.core.core.CreateUserAccountPanel = Ext.extend(Ext.form.FormPanel, {
 				]
 			}
 		];
-		 go.modules.core.core.CreateUserAccountPanel.superclass.initComponent.call(this);
+		 go.users.CreateUserAccountPanel.superclass.initComponent.call(this);
 	},
 	
 	onSubmitStart : function(value) {}, // override by serverclient 

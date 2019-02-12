@@ -1,3 +1,3 @@
-go.modules.core.core.type.TextAreaDialog = Ext.extend(go.modules.core.core.FieldDialog, {
+go.modules.core.core.type.TextAreaDialog = Ext.extend(go.customfields.FieldDialog, {
 
 });

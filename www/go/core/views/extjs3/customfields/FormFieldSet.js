@@ -1,6 +1,6 @@
 /* global Ext, go */
 
-go.modules.core.core.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
+go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 	fieldSet: null,
 	initComponent: function () {
 		
@@ -14,7 +14,7 @@ go.modules.core.core.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			});
 		}
 		
-		items = items.concat(go.modules.core.core.CustomFields.getFormFields(this.fieldSet.id));
+		items = items.concat(go.customfields.CustomFields.getFormFields(this.fieldSet.id));
 		
 		Ext.apply(this, {
 			title: this.fieldSet.name,
@@ -74,7 +74,7 @@ go.modules.core.core.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			
 		}, this);
 
-		go.modules.core.core.FormFieldSet.superclass.initComponent.call(this);
+		go.customfields.FormFieldSet.superclass.initComponent.call(this);
 	},
 
 	/**
@@ -104,4 +104,4 @@ go.modules.core.core.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 	}
 });
 
-Ext.reg("customformfieldset", go.modules.core.core.FormFieldSet);
+Ext.reg("customformfieldset", go.customfields.FormFieldSet);

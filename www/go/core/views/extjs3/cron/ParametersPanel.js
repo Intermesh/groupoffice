@@ -1,4 +1,4 @@
-go.modules.core.core.ParametersPanel = Ext.extend(Ext.Panel, {
+go.cron.ParametersPanel = Ext.extend(Ext.Panel, {
 	title: t("Params", "cron"),
 	cls: 'go-form-panel',
 	layout: 'form',

@@ -156,7 +156,7 @@ GO.files.FilePropertiesDialog = function(config){
 	
 	var items = [this.propertiesPanel, this.commentsPanel, this.versionsGrid];
 	
-	this.propertiesPanel.add(go.modules.core.core.CustomFields.getFormFieldSets("File"));
+	this.propertiesPanel.add(go.customfields.CustomFields.getFormFieldSets("File"));
 	
 	this.tabPanel =new Ext.TabPanel({
 		activeTab: 0,

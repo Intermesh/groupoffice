@@ -11,7 +11,7 @@ go.modules.core.core.type.MultiSelect = Ext.extend(go.modules.core.core.type.Tex
 	/**
 	 * Return dialog to edit this type of field
 	 * 
-	 * @returns {go.modules.core.core.FieldDialog}
+	 * @returns {go.customfields.FieldDialog}
 	 */
 	getDialog : function() {
 		return new go.modules.core.core.type.MultiSelectDialog();
@@ -93,4 +93,4 @@ go.modules.core.core.type.MultiSelect = Ext.extend(go.modules.core.core.type.Tex
 	
 });
 
-go.modules.core.core.CustomFields.registerType(new go.modules.core.core.type.MultiSelect());
+go.customfields.CustomFields.registerType(new go.modules.core.core.type.MultiSelect());

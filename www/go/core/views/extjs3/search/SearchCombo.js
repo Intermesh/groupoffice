@@ -1,6 +1,6 @@
 /* global GO, Ext, go */
 
-go.modules.core.core.SearchCombo = Ext.extend(go.form.ComboBox, {	
+go.search.SearchCombo = Ext.extend(go.form.ComboBox, {	
 	emptyText: t("Search..."),	
 	valueField: 'id',
 	displayField: 'name',
@@ -30,7 +30,7 @@ go.modules.core.core.SearchCombo = Ext.extend(go.form.ComboBox, {
 			})
 		});
 		
-		go.modules.core.core.SearchCombo .superclass.initComponent.call(this);
+		go.search.SearchCombo .superclass.initComponent.call(this);
 
 	}
 });

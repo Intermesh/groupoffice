@@ -11,7 +11,7 @@ go.modules.community.addressbook.customfield.Contact = Ext.extend(go.modules.cor
 	/**
 	 * Return dialog to edit this type of field
 	 * 
-	 * @returns {go.modules.core.core.FieldDialog}
+	 * @returns {go.customfields.FieldDialog}
 	 */
 	getDialog : function() {
 		return new  go.modules.community.addressbook.customfield.ContactDialog();
@@ -85,5 +85,5 @@ go.modules.community.addressbook.customfield.Contact = Ext.extend(go.modules.cor
 	
 });
 
-go.modules.core.core.CustomFields.registerType(new go.modules.community.addressbook.customfield.Contact());
+go.customfields.CustomFields.registerType(new go.modules.community.addressbook.customfield.Contact());
 

@@ -2,15 +2,15 @@ go.Modules.register("core", 'core', {
 	title: t("Core"),
 	entities: ['Acl', 'Group', 'User', 'Field', 'FieldSet', 'Module', 'Link', 'Search'],
 	systemSettingsPanels: [
-		"go.modules.core.core.SystemSettingsUserGrid",
-		"go.modules.core.core.SystemSettingsGroupGrid",
-		"go.modules.core.core.SystemSettingsModuleGrid",
-		"go.modules.core.core.SystemSettingsCronGrid",
-		"go.modules.core.core.SystemSettingsTools"
+		"go.users.SystemSettingsUserGrid",
+		"go.groups.SystemSettingsGroupGrid",
+		"go.modules.SystemSettingsModuleGrid",
+		"go.cron.SystemSettingsCronGrid",
+		"go.tools.SystemSettingsTools"
 	],
 	userSettingsPanels: [
-		"go.modules.core.core.UserGroupGrid",
-		"go.modules.core.core.UserSettingsWorkingWeek"
+		"go.users.UserGroupGrid",
+		"go.users.UserSettingsWorkingWeek"
 	],
 	
 	initModule: function () {
@@ -32,7 +32,7 @@ go.Modules.register("core", 'core', {
 				searchField.focus();	
 
 				if (!panel) {
-					panel = new go.modules.core.core.Panel({
+					panel = new go.search.Panel({
 						searchContainer : searchContainer
 					});
 					panel.render(Ext.getBody());

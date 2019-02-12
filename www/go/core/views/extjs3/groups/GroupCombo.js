@@ -1,4 +1,4 @@
-go.modules.core.core.GroupCombo = Ext.extend(go.form.ComboBox, {
+go.groups.GroupCombo = Ext.extend(go.form.ComboBox, {
 	fieldLabel: t("Group"),
 	hiddenName: 'groupId',
 	anchor: '100%',
@@ -19,10 +19,10 @@ go.modules.core.core.GroupCombo = Ext.extend(go.form.ComboBox, {
 			})
 		});
 		
-		go.modules.core.core.GroupCombo.superclass.initComponent.call(this);
+		go.groups.GroupCombo.superclass.initComponent.call(this);
 
 	}
 });
 
 
-Ext.reg("groupcombo", go.modules.core.core.GroupCombo);
+Ext.reg("groupcombo", go.groups.GroupCombo);

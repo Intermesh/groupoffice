@@ -322,7 +322,7 @@ GO.email.EmailComposer = function(config) {
 		scope : this
 	}), 
 	'->',
-		this.createLinkButton = new go.modules.core.core.CreateLinkButton({
+		this.createLinkButton = new go.links.CreateLinkButton({
 			text: "",
 			iconCls: "ic-link"
 		})

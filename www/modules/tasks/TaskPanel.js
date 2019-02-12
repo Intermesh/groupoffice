@@ -104,7 +104,7 @@ GO.tasks.TaskPanel = Ext.extend(GO.DisplayPanel,{
 		GO.tasks.TaskPanel.superclass.initComponent.call(this);
 	
 		
-		this.add(go.modules.core.core.CustomFields.getDetailPanels("Task"));
+		this.add(go.customfields.CustomFields.getDetailPanels("Task"));
 
 	}
 });			

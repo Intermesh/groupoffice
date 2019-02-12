@@ -1,4 +1,4 @@
-go.modules.core.core.Panel = Ext.extend(Ext.Panel, {
+go.search.Panel = Ext.extend(Ext.Panel, {
 	lastQ: "",
 	height: dp(500),
 	initComponent: function () {
@@ -37,7 +37,7 @@ go.modules.core.core.Panel = Ext.extend(Ext.Panel, {
 			items: [this.entityGrid, this.grid]			
 		});
 
-		go.modules.core.core.Panel.superclass.initComponent.call(this);
+		go.search.Panel.superclass.initComponent.call(this);
 		
 		this.on("expand", function() {
 			Ext.getDoc().on('mousedown', this.collapseIf, this);

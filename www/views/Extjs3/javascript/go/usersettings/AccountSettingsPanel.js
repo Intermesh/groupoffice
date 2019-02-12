@@ -159,7 +159,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 				this.userFieldset,
 				this.quotaFieldset,
 				this.passwordFieldset
-			].concat(go.modules.core.core.CustomFields.getFormFieldSets("User"))
+			].concat(go.customfields.CustomFields.getFormFieldSets("User"))
 		});
 		
 		go.usersettings.AccountSettingsPanel.superclass.initComponent.call(this);

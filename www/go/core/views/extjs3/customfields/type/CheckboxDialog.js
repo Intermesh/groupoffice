@@ -1,4 +1,4 @@
- go.modules.core.core.type.CheckboxDialog = Ext.extend(go.modules.core.core.FieldDialog, {
+ go.modules.core.core.type.CheckboxDialog = Ext.extend(go.customfields.FieldDialog, {
 	 initFormItems : function() {		 
 		 var items =  go.modules.core.core.type.CheckboxDialog.superclass.initFormItems.call(this);
 		 

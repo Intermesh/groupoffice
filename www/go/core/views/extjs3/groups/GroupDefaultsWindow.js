@@ -1,7 +1,7 @@
 
 /* global go, Ext */
 
-go.modules.core.core.GroupDefaultsWindow = Ext.extend(go.Window, {
+go.groups.GroupDefaultsWindow = Ext.extend(go.Window, {
 	title: t("Group defaults"),
 	autoScroll: true,
 	modal: true,
@@ -73,7 +73,7 @@ go.modules.core.core.GroupDefaultsWindow = Ext.extend(go.Window, {
 				scope: this
 		}];
 
-		go.modules.core.core.GroupDefaultsWindow.superclass.initComponent.call(this);
+		go.groups.GroupDefaultsWindow.superclass.initComponent.call(this);
 		
 		
 		this.on('render', function() {

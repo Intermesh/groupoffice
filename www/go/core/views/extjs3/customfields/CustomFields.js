@@ -134,7 +134,7 @@
 			var fieldSets = this.getFieldSets(entity), formFieldSets = [];
 
 			for (var i = 0, l = fieldSets.length; i < l; i++) {
-				formFieldSets.push(new go.modules.core.core.FormFieldSet({fieldSet: fieldSets[i]}));				
+				formFieldSets.push(new go.customfields.FormFieldSet({fieldSet: fieldSets[i]}));				
 			}
 			return formFieldSets;
 		},
@@ -252,7 +252,7 @@
 				var items = [];		
 				
 				
-				go.modules.core.core.CustomFields.getFields(fieldSet.id).forEach(function (field) {					
+				go.customfields.CustomFields.getFields(fieldSet.id).forEach(function (field) {					
 					var type = me.getType(field.type);
 					if(!type) {
 						console.error("Custom field type " + field.type + " not found");
@@ -273,7 +273,7 @@
 					collapsible: true,
 					onLoad: function(dv) {
 						var vis = false, panel = this;							
-						go.modules.core.core.CustomFields.getFields(fieldSet.id).forEach(function (field) {
+						go.customfields.CustomFields.getFields(fieldSet.id).forEach(function (field) {
 							if(!GO.util.empty(dv.data.customFields[field.databaseName])) {
 								vis = true;
 							}
@@ -299,7 +299,7 @@
 		}
 	});
 
-	go.modules.core.core.CustomFields = new CustomFieldsCls;
+	go.customfields.CustomFields = new CustomFieldsCls;
 
 })();
 

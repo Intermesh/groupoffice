@@ -1,4 +1,4 @@
-go.modules.core.core.UserCombo = Ext.extend(go.form.ComboBox, {
+go.users.UserCombo = Ext.extend(go.form.ComboBox, {
 	fieldLabel: t("User"),
 	hiddenName: 'userId',
 	anchor: '100%',
@@ -19,10 +19,10 @@ go.modules.core.core.UserCombo = Ext.extend(go.form.ComboBox, {
 			})
 		});
 		
-		go.modules.core.core.UserCombo.superclass.initComponent.call(this);
+		go.users.UserCombo.superclass.initComponent.call(this);
 
 	}
 });
 
 
-Ext.reg("usercombo", go.modules.core.core.UserCombo);
+Ext.reg("usercombo", go.users.UserCombo);

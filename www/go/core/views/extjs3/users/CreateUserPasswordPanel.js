@@ -1,4 +1,4 @@
-go.modules.core.core.CreateUserPasswordPanel = Ext.extend(Ext.form.FormPanel, {
+go.users.CreateUserPasswordPanel = Ext.extend(Ext.form.FormPanel, {
 
 	isValid: function () {
 		if (this.passwordField1.getValue() != this.passwordField2.getValue()) {
@@ -35,7 +35,7 @@ go.modules.core.core.CreateUserPasswordPanel = Ext.extend(Ext.form.FormPanel, {
 					})]
 			}
 		];
-		 go.modules.core.core.CreateUserPasswordPanel.superclass.initComponent.call(this);
+		 go.users.CreateUserPasswordPanel.superclass.initComponent.call(this);
 	}
 });
 

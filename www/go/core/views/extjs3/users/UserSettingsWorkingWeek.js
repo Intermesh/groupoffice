@@ -1,4 +1,4 @@
-go.modules.core.core.UserSettingsWorkingWeek = Ext.extend(Ext.Panel, {
+go.users.UserSettingsWorkingWeek = Ext.extend(Ext.Panel, {
 	
 	iconCls: 'ic-access-time',
 	title: t("Working week"),
@@ -43,6 +43,6 @@ go.modules.core.core.UserSettingsWorkingWeek = Ext.extend(Ext.Panel, {
 				]
 			}]
 		}];
-		go.modules.core.core.UserSettingsWorkingWeek.superclass.initComponent.call(this);
+		go.users.UserSettingsWorkingWeek.superclass.initComponent.call(this);
 	}
 });

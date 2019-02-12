@@ -1,5 +1,5 @@
 
- go.modules.community.addressbook.customfield.ContactDialog = Ext.extend(go.modules.core.core.FieldDialog, {
+ go.modules.community.addressbook.customfield.ContactDialog = Ext.extend(go.customfields.FieldDialog, {
 	 initFormItems : function() {		 
 		 var items =  go.modules.core.core.type.CheckboxDialog.superclass.initFormItems.call(this);
 		 

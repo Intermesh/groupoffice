@@ -1,4 +1,4 @@
-go.modules.core.core.type.NumberDialog = Ext.extend(go.modules.core.core.FieldDialog, {
+go.modules.core.core.type.NumberDialog = Ext.extend(go.customfields.FieldDialog, {
 	initFormItems: function () {
 		var items = go.modules.core.core.type.NumberDialog.superclass.initFormItems.call(this);
 

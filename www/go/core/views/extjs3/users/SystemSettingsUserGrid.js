@@ -14,7 +14,7 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
-go.modules.core.core.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
+go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 	iconCls: 'ic-account-box',
 	initComponent: function () {
 		
@@ -59,7 +59,7 @@ go.modules.core.core.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
-						var dlg = new go.modules.core.core.CreateUserWizard();
+						var dlg = new go.users.CreateUserWizard();
 						dlg.show();
 					}
 				},
@@ -68,7 +68,7 @@ go.modules.core.core.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					iconCls: 'ic-settings',
 					tooltip: t("User defaults"),
 					handler: function() {
-						var dlg = new go.modules.core.core.UserDefaultsWindow();
+						var dlg = new go.users.UserDefaultsWindow();
 						dlg.show();
 					}
 				}
@@ -147,7 +147,7 @@ go.modules.core.core.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 			stateId: 'users-grid'
 		});
 
-		go.modules.core.core.SystemSettingsUserGrid.superclass.initComponent.call(this);
+		go.users.SystemSettingsUserGrid.superclass.initComponent.call(this);
 		
 		this.on('render', function() {
 			this.store.load();

@@ -11,7 +11,7 @@
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
 
-go.modules.core.core.PeriodGrid = Ext.extend(go.grid.GridPanel,{
+go.cron.PeriodGrid = Ext.extend(go.grid.GridPanel,{
 	changed : false,
 	
 	initComponent : function(){
@@ -19,7 +19,7 @@ go.modules.core.core.PeriodGrid = Ext.extend(go.grid.GridPanel,{
 		Ext.apply(this,{
 			standardTbar:false,
 			store: go.modules.core.core.periodStore,
-			editDialogClass:go.modules.core.core.CronDialog,
+			editDialogClass:go.cron.CronDialog,
 			border: false,
 			tbar:[{
 				iconCls: 'ic-refresh',
@@ -115,7 +115,7 @@ go.modules.core.core.PeriodGrid = Ext.extend(go.grid.GridPanel,{
 				]
 			})
 		});
-		go.modules.core.core.PeriodGrid.superclass.initComponent.call(this);
+		go.cron.PeriodGrid.superclass.initComponent.call(this);
 		
 		go.modules.core.core.periodStore.load();
 	}	

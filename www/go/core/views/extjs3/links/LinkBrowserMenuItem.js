@@ -1,4 +1,4 @@
-go.modules.core.core.LinkBrowserMenuItem = Ext.extend(Ext.menu.Item, {	
+go.links.LinkBrowserMenuItem = Ext.extend(Ext.menu.Item, {	
 	iconCls: "ic-link",
 	text: t("Links"),
 	handler: function(btn) {
@@ -28,4 +28,4 @@ go.modules.core.core.LinkBrowserMenuItem = Ext.extend(Ext.menu.Item, {
 });
 
 
-Ext.reg("linkbrowsermenuitem", go.modules.core.core.LinkBrowserMenuItem);
+Ext.reg("linkbrowsermenuitem", go.links.LinkBrowserMenuItem);

@@ -4,7 +4,7 @@
  * 
  * @type |||
  */
-go.modules.core.core.SearchEmailCombo = Ext.extend(go.form.ComboBox, {	
+go.search.SearchEmailCombo = Ext.extend(go.form.ComboBox, {	
 	emptyText: t("Search..."),
 	pageSize: 20,
 	valueField: 'id',
@@ -34,9 +34,9 @@ go.modules.core.core.SearchEmailCombo = Ext.extend(go.form.ComboBox, {
 			})
 		});
 
-		go.modules.core.core.SearchEmailCombo.superclass.initComponent.call(this);
+		go.search.SearchEmailCombo.superclass.initComponent.call(this);
 
 	}
 });
 
-Ext.reg("searchemailcombo", go.modules.core.core.SearchEmailCombo);
+Ext.reg("searchemailcombo", go.search.SearchEmailCombo);

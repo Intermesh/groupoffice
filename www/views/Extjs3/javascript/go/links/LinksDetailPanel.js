@@ -128,7 +128,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 go.links.getDetailPanels = function() {
 
 	var panels = [];
-	go.modules.core.core.Links.getAll().forEach(function (e) {		
+	go.links.Links.getAll().forEach(function (e) {		
 		panels.push(new go.links.DetailPanel({
 			link: e
 		}));

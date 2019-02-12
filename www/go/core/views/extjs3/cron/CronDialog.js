@@ -1,4 +1,4 @@
-go.modules.core.core.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
+go.cron.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 
 	initComponent : function(){
 		
@@ -26,7 +26,7 @@ go.modules.core.core.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			select: false
 		});
 		
-		go.modules.core.core.CronDialog.superclass.initComponent.call(this);	
+		go.cron.CronDialog.superclass.initComponent.call(this);	
 	},
 	 	
 	buildForm : function () {
@@ -187,7 +187,7 @@ go.modules.core.core.CronDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
       ]				
 		});
 
-		this.parameterPanel = new go.modules.core.core.ParametersPanel();
+		this.parameterPanel = new go.cron.ParametersPanel();
 	
     this.addPanel(this.propertiesPanel);
 		this.addPanel(this.usersPanel);

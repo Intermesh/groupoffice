@@ -1,6 +1,6 @@
 /* global go */
 
-go.modules.core.core.Links = {
+go.links.Links = {
 	getAll : function() {
 		var e = [];
 						

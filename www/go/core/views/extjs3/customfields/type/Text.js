@@ -11,7 +11,7 @@ go.modules.core.core.type.Text = Ext.extend(Ext.util.Observable, {
 	/**
 	 * Return dialog to edit this type of field
 	 * 
-	 * @returns {go.modules.core.core.FieldDialog}
+	 * @returns {go.customfields.FieldDialog}
 	 */
 	getDialog : function() {
 		return new go.modules.core.core.type.TextDialog();
@@ -148,4 +148,4 @@ go.modules.core.core.type.Text = Ext.extend(Ext.util.Observable, {
 	
 });
 
-go.modules.core.core.CustomFields.registerType(new go.modules.core.core.type.Text());
+go.customfields.CustomFields.registerType(new go.modules.core.core.type.Text());

@@ -1,4 +1,4 @@
-go.modules.core.core.CreateUserWizard = Ext.extend(go.Wizard, {
+go.users.CreateUserWizard = Ext.extend(go.Wizard, {
 	title: t('Create user'),
 	user : null,
 	initComponent : function() {
@@ -6,7 +6,7 @@ go.modules.core.core.CreateUserWizard = Ext.extend(go.Wizard, {
 		//store all form data here
 		this.user = {};
 		
-		this.groupsGrid = new go.modules.core.core.UserGroupGrid({
+		this.groupsGrid = new go.users.UserGroupGrid({
 				title: null,
 				iconCls: null
 			});
@@ -17,11 +17,11 @@ go.modules.core.core.CreateUserWizard = Ext.extend(go.Wizard, {
 		});
 	
 		this.items = [
-			this.userPanel = new go.modules.core.core.CreateUserAccountPanel(),
-			this.passwordPanel = new go.modules.core.core.CreateUserPasswordPanel(),
+			this.userPanel = new go.users.CreateUserAccountPanel(),
+			this.passwordPanel = new go.users.CreateUserPasswordPanel(),
 			this.groupsGrid
 		]
-		go.modules.core.core.CreateUserWizard.superclass.initComponent.call(this);
+		go.users.CreateUserWizard.superclass.initComponent.call(this);
 		
 		this.on({
 			continue: this.onContinue,

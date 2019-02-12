@@ -12,7 +12,7 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
-go.modules.core.core.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
+go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 	/**
 	 * The form field name
 	 */
@@ -119,7 +119,7 @@ go.modules.core.core.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 	
 		this.store.on("beforeload", this.onBeforeStoreLoad, this);
 
-		go.modules.core.core.GroupUserGrid.superclass.initComponent.call(this);
+		go.groups.GroupUserGrid.superclass.initComponent.call(this);
 
 	},
 

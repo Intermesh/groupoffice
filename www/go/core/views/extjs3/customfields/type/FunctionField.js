@@ -11,7 +11,7 @@ go.modules.core.core.type.FunctionField = Ext.extend(go.modules.core.core.type.N
 	/**
 	 * Return dialog to edit this type of field
 	 * 
-	 * @returns {go.modules.core.core.FieldDialog}
+	 * @returns {go.customfields.FieldDialog}
 	 */
 	getDialog: function () {
 		return new go.modules.core.core.type.FunctionFieldDialog();
@@ -35,5 +35,5 @@ go.modules.core.core.type.FunctionField = Ext.extend(go.modules.core.core.type.N
 
 });
 
-go.modules.core.core.CustomFields.registerType(new go.modules.core.core.type.FunctionField());
+go.customfields.CustomFields.registerType(new go.modules.core.core.type.FunctionField());
 

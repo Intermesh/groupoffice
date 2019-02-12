@@ -1,6 +1,6 @@
 /* global Ext, go */
 
-go.modules.core.core.CreateLinkButton = Ext.extend(Ext.Button, {
+go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 	//iconCls: 'ic-link',
 	text: t("Links"),
 	newLinks : [],
@@ -53,7 +53,7 @@ go.modules.core.core.CreateLinkButton = Ext.extend(Ext.Button, {
 					
 	initComponent: function () {
 
-		this.searchField = new go.modules.core.core.SearchCombo({
+		this.searchField = new go.search.SearchCombo({
 			anchor: "100%",
 			hideLabel: true,
 			listeners: {
@@ -173,7 +173,7 @@ go.modules.core.core.CreateLinkButton = Ext.extend(Ext.Button, {
 //			}
 		});
 
-		go.modules.core.core.CreateLinkButton.superclass.initComponent.call(this);
+		go.links.CreateLinkButton.superclass.initComponent.call(this);
 		
 		this.origText = this.text;
 
@@ -256,4 +256,4 @@ go.modules.core.core.CreateLinkButton = Ext.extend(Ext.Button, {
 });
 
 
-Ext.reg("createlinkbutton", go.modules.core.core.CreateLinkButton);
+Ext.reg("createlinkbutton", go.links.CreateLinkButton);

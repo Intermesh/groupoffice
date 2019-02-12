@@ -11,7 +11,7 @@
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
 
-go.modules.core.core.SystemSettingsCronGrid = Ext.extend(GO.grid.GridPanel,{
+go.cron.SystemSettingsCronGrid = Ext.extend(GO.grid.GridPanel,{
 	changed : false,
 	iconCls: 'ic-schedule',
 	
@@ -158,7 +158,7 @@ go.modules.core.core.SystemSettingsCronGrid = Ext.extend(GO.grid.GridPanel,{
 				]
 			})
 		});
-		go.modules.core.core.SystemSettingsCronGrid.superclass.initComponent.call(this);
+		go.cron.SystemSettingsCronGrid.superclass.initComponent.call(this);
 		
 		this.on('render', function(){
 			go.modules.core.core.cronStore.load();
@@ -176,7 +176,7 @@ go.modules.core.core.SystemSettingsCronGrid = Ext.extend(GO.grid.GridPanel,{
 		this.settingsDialog.show();	  
 	},
 	deleteSelected : function(){
-		go.modules.core.core.SystemSettingsCronGrid.superclass.deleteSelected.call(this);
+		go.cron.SystemSettingsCronGrid.superclass.deleteSelected.call(this);
 		this.changed=true;
 	}	
 });

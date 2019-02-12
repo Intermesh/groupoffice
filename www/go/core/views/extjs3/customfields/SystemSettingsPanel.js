@@ -13,7 +13,7 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
-go.modules.core.core.SystemSettingsPanel = Ext.extend(go.grid.GridPanel, {
+go.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel, {
 
 	autoHeight: true,
 
@@ -24,7 +24,7 @@ go.modules.core.core.SystemSettingsPanel = Ext.extend(go.grid.GridPanel, {
 	toolbarTitle: true,
 
 	createFieldSetDialog: function () {
-		return new go.modules.core.core.FieldSetDialog();
+		return new go.customfields.FieldSetDialog();
 	},
 
 	initComponent: function () {
@@ -216,7 +216,7 @@ go.modules.core.core.SystemSettingsPanel = Ext.extend(go.grid.GridPanel, {
 //			stateId: 'apikeys-grid'
 		});
 
-		go.modules.core.core.SystemSettingsPanel.superclass.initComponent.call(this);
+		go.customfields.SystemSettingsPanel.superclass.initComponent.call(this);
 
 		this.on('render', function () {
 			this.load();
@@ -356,7 +356,7 @@ go.modules.core.core.SystemSettingsPanel = Ext.extend(go.grid.GridPanel, {
 			dlg.load(record.data.fieldSetId).show();
 		} else
 		{
-			var dlg = go.modules.core.core.CustomFields.getType(record.data.type).getDialog();
+			var dlg = go.customfields.CustomFields.getType(record.data.type).getDialog();
 			dlg.load(record.data.fieldId).show();
 		}
 	},
@@ -364,7 +364,7 @@ go.modules.core.core.SystemSettingsPanel = Ext.extend(go.grid.GridPanel, {
 	showAddFieldMenu: function (record, e) {
 		if (!this.addFieldMenu) {
 
-			var items = [], types = go.modules.core.core.CustomFields.getTypes();
+			var items = [], types = go.customfields.CustomFields.getTypes();
 
 			for (var name in types) {
 				items.push({

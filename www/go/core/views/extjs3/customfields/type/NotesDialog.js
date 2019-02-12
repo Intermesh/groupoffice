@@ -1,4 +1,4 @@
-go.modules.core.core.type.NotesDialog = Ext.extend(go.modules.core.core.FieldDialog, {
+go.modules.core.core.type.NotesDialog = Ext.extend(go.customfields.FieldDialog, {
 	
 	initFormItems: function () {
 		return [{

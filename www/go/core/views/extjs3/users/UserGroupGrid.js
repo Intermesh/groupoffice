@@ -12,7 +12,7 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
-go.modules.core.core.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
+go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 	title: t("Groups"),
 	iconCls: 'ic-group',
 	selectedGroups: null,
@@ -103,7 +103,7 @@ go.modules.core.core.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 //			stateId: 'users-grid'
 		});
 
-		go.modules.core.core.UserGroupGrid.superclass.initComponent.call(this);		
+		go.users.UserGroupGrid.superclass.initComponent.call(this);		
 	},	
 	
 	onCheckChange : function(record, newValue) {

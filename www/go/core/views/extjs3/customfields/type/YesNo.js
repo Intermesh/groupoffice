@@ -11,10 +11,10 @@ go.modules.core.core.type.YesNo = Ext.extend(go.modules.core.core.type.Text, {
 	/**
 	 * Return dialog to edit this type of field
 	 * 
-	 * @returns {go.modules.core.core.FieldDialog}
+	 * @returns {go.customfields.FieldDialog}
 	 */
 	getDialog: function () {
-		return new go.modules.core.core.FieldDialog();
+		return new go.customfields.FieldDialog();
 	},
 
 	/**
@@ -76,5 +76,5 @@ go.modules.core.core.type.YesNo = Ext.extend(go.modules.core.core.type.Text, {
 
 });
 
-go.modules.core.core.CustomFields.registerType(new go.modules.core.core.type.YesNo());
+go.customfields.CustomFields.registerType(new go.modules.core.core.type.YesNo());
 

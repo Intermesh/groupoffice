@@ -1,7 +1,7 @@
 
 /* global Ext, go */
 
-go.modules.core.core.UserDefaultsWindow = Ext.extend(go.Window, {
+go.users.UserDefaultsWindow = Ext.extend(go.Window, {
 	title: t("User settings"),
 	autoScroll: true,
 	modal: true,
@@ -149,7 +149,7 @@ go.modules.core.core.UserDefaultsWindow = Ext.extend(go.Window, {
 		
 		this.tabPanel = new Ext.TabPanel({
 			activeTab: 0,
-			items: [this.formPanel, new go.modules.core.core.SystemSettingsPanel({
+			items: [this.formPanel, new go.customfields.SystemSettingsPanel({
 					title: t("Custom fields"),
 					toolbarTitle: false,
 					entity: "User"
@@ -167,7 +167,7 @@ go.modules.core.core.UserDefaultsWindow = Ext.extend(go.Window, {
 				scope: this
 			}];
 
-		go.modules.core.core.UserDefaultsWindow.superclass.initComponent.call(this);
+		go.users.UserDefaultsWindow.superclass.initComponent.call(this);
 
 
 		this.on('render', function () {

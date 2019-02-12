@@ -1,9 +1,9 @@
-go.modules.core.core.GroupDialog = Ext.extend(go.form.Dialog, {
+go.groups.GroupDialog = Ext.extend(go.form.Dialog, {
 	title: t('Group'),
 	entityStore: "Group",
 	height: dp(600),
 	initComponent : function() {
-		go.modules.core.core.GroupDialog.superclass.initComponent.call(this);
+		go.groups.GroupDialog.superclass.initComponent.call(this);
 		this.formPanel.layout = "border";
 	},
 	initFormItems: function () {
@@ -21,7 +21,7 @@ go.modules.core.core.GroupDialog = Ext.extend(go.form.Dialog, {
 						allowBlank: false
 					}]
 			},
-			this.groupUserGrid = new go.modules.core.core.GroupUserGrid({
+			this.groupUserGrid = new go.groups.GroupUserGrid({
 				//anchor: '100% -' + dp(64),
 				region: "center",
 				hideLabel: true
@@ -33,7 +33,7 @@ go.modules.core.core.GroupDialog = Ext.extend(go.form.Dialog, {
 //		
 //		this.groupUserGrid.load(id);
 //		
-//		return go.modules.core.core.GroupDialog.superclass.load.call(this, id);
+//		return go.groups.GroupDialog.superclass.load.call(this, id);
 //	}
 });
 

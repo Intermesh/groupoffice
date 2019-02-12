@@ -12,7 +12,7 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
-go.modules.core.core.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
+go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 	iconCls: 'ic-group',
 	initComponent: function () {
 
@@ -51,14 +51,14 @@ go.modules.core.core.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
-						var dlg = new go.modules.core.core.GroupDialog();
+						var dlg = new go.groups.GroupDialog();
 						dlg.show();
 					}
 				}, {
 					iconCls: 'ic-settings',
 					tooltip: t("Group defaults"),
 					handler: function() {
-						var dlg = new go.modules.core.core.GroupDefaultsWindow();
+						var dlg = new go.groups.GroupDefaultsWindow();
 						dlg.show();
 					}
 				}
@@ -100,7 +100,7 @@ go.modules.core.core.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 //			stateId: 'groups-grid'
 		});
 
-		go.modules.core.core.SystemSettingsGroupGrid.superclass.initComponent.call(this);
+		go.groups.SystemSettingsGroupGrid.superclass.initComponent.call(this);
 
 		this.on('render', function () {
 			this.store.load();
@@ -173,7 +173,7 @@ go.modules.core.core.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 
 	edit: function (id) {
 
-		var dlg = new go.modules.core.core.GroupDialog();
+		var dlg = new go.groups.GroupDialog();
 		dlg.load(id).show();
 
 	}

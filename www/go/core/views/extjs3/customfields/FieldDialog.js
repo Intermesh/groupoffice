@@ -1,4 +1,4 @@
-go.modules.core.core.FieldDialog = Ext.extend(go.form.Dialog, {	
+go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {	
 	title: t('Field'),
 	entityStore: go.Stores.get("Field"),
 	height: dp(400),

@@ -12,7 +12,7 @@ go.modules.community.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 				{name: 'creator', type: go.data.types.User, key: 'createdBy'},
 				{name: 'modifier', type: go.data.types.User, key: 'modifiedBy'},
 				'permissionLevel'
-			].concat(go.modules.core.core.CustomFields.getFieldDefinitions("Note")),
+			].concat(go.customfields.CustomFields.getFieldDefinitions("Note")),
 			entityStore: "Note"
 		});
 
@@ -72,7 +72,7 @@ go.modules.community.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 						return v ? v.displayName : "-";
 					}
 				}
-			].concat(go.modules.core.core.CustomFields.getColumns("Note")),
+			].concat(go.customfields.CustomFields.getColumns("Note")),
 			viewConfig: {
 				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>'
 //				enableRowBody: true,
