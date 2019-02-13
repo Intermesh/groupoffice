@@ -91,11 +91,17 @@ trait SearchableTrait {
 	 * @param string $cls
 	 * @return \go\core\db\Statement
 	 */
-	private static function queryMissingSearchCache($cls) {
+	private static function queryMissingSearchCache($cls, $offset = 0) {
+		
+		$limit = 100;
+			
 		$query = $cls::find();
 		/* @var $query \go\core\db\Query */
 		$query->join("core_search", "search", "search.entityId = ".$query->getTableAlias() . ".id AND search.entityTypeId = " . $cls::getType()->getId(), "LEFT");
-		$query->andWhere('search.id IS NULL');
+		$query->andWhere('search.id IS NULL')
+							->limit($limit)
+							->offset($offset);
+		
 		return $query->execute();
 	}
 	
@@ -104,21 +110,32 @@ trait SearchableTrait {
 		
 		//In small batches to keep memory low
 		$stmt = self::queryMissingSearchCache($cls);			
+		
+		$offset = 0;
+		
+		//In small batches to keep memory low	
+		while($stmt->rowCount()) {	
 
-		while($stmt->rowCount()) {
+			while ($m = $stmt->fetch()) {
 
-			foreach($stmt as $e) {		
 				try {
-					$e->saveSearch(false);
+					flush();
+
+					$m->saveSearch(false);
 					echo ".";
-				} catch(\Exception $e) {
+
+				} catch (\Exception $e) {
+					echo $e->getMessage();
 					\go\core\ErrorHandler::logException($e);
 					echo "E";
+					$offset++;
 				}
 			}
+			echo "\n";
 
-			$stmt = self::queryMissingSearchCache($cls);
+			$stmt = self::queryMissingSearchCache($cls, $offset);
 		}
+	
 	}
 	
 	public static function rebuildSearch() {

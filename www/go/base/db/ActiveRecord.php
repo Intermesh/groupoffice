@@ -4843,6 +4843,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 					} catch (\Exception $e) {
 						\go\core\ErrorHandler::logException($e);
 						echo "E";
+						$start++;
 					}
 				}
 				echo "\n";
