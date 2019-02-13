@@ -1,4 +1,9 @@
+12-02-2019 6.3.64
+- Calendar: Fixed event dialog crash bug. (FileBrowserButton could not be destroyed)
+- Document templates: Fixed space problem in docx templates
 - Tickets: Use template vars in due date mail
+- Billing: Fixed problem in copying matching custom field names
+- Document templates: Selecting sources was broken
 
 07-02-2019 6.3.63
 - Email: fixed z-index lowering in sanatize function

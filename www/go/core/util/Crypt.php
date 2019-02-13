@@ -98,8 +98,13 @@ class Crypt {
 	private static function decrypt1($msg, $k, $base64 = true) {
 
 		//Check if mcrypt is supported. mbstring.func_overload will mess up substring with this function
-		if (!function_exists('mcrypt_module_open') || ini_get('mbstring.func_overload') > 0)
-			return false;
+		if (!function_exists('mcrypt_module_open')) {			
+			throw new \Exception("Old mcrypt based hash found but mcrypt is not available. Please install for automatic conversion");			
+		}
+		
+		if(ini_get('mbstring.func_overload') > 0) {
+			throw new \Exception("Can't decrypt because mbstring.func_overload is enabled");
+		}
 
 		$msg = str_replace("{GOCRYPT}", "", $msg, $count);
 
