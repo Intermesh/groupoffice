@@ -215,10 +215,11 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 				scope: this
 			}));
 		
-		
-		Ext.applyIf(this, {
-			buttons: buttons
-		});
+		if(!Ext.isEmpty(buttons)) {
+			Ext.applyIf(this, {
+				buttons: buttons
+			});
+		}
 		
 		this._panels=[];
 		
