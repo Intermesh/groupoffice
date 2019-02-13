@@ -248,12 +248,7 @@ use const GO_CONFIG_FILE;
 			
 			$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
 			
-			if(cache\Apcu::isSupported()) {
-				$cacheCls = cache\Apcu::class;				
-			} else
-			{
-				$cacheCls = cache\Disk::class;
-			}
+			
 			
 			$this->config = (new util\ArrayObject([					
 					"core" => [
@@ -261,7 +256,7 @@ use const GO_CONFIG_FILE;
 									"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice', //TODO default should be /var/lib/groupoffice
 									"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
 									"debug" => $config['debug'] ?? null,
-									"cache" => $cacheCls,
+									
 									"servermanager" => $config['servermanager'] ?? false
 							],
 							"db" => [
@@ -286,6 +281,15 @@ use const GO_CONFIG_FILE;
 //							]
 //					]
 			]))->mergeRecursive($config)->getArray();
+			
+			if(!isset($this->config['core']['general']['cache'])) {
+				if(cache\Apcu::isSupported()) {
+					$this->config['core']['general']['cache'] = cache\Apcu::class;				
+				} else
+				{
+					$this->config['core']['general']['cache'] = cache\Disk::class;
+				}
+			}
 			
 			return $this->config;
 		}
