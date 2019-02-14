@@ -109,6 +109,8 @@ GO.addressbook.CompanyReadPanel = Ext.extend(GO.DisplayPanel,{
 					'</tpl>'+
 				'</tr>'+
 				
+	
+				
 				
 					'<tr>'+	
 						// COMPANY DETAILS+ 1e KOLOM
@@ -201,6 +203,12 @@ GO.addressbook.CompanyReadPanel = Ext.extend(GO.DisplayPanel,{
 					
 					
 					'</table>'+		
+					
+					
+					'<div class="icons"><p><i class="icon label">import_contacts</i>\
+						{addressbook_name}\
+						<label>' + t("Address book", "addressbook") + '</label>\
+					</p></div>'+
 
 					'<tpl if="!GO.util.empty(comment)">'+						
 						'<table cellpadding="0" cellspacing="0" border="0" class="display-panel">'+

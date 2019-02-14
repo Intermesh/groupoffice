@@ -139,6 +139,10 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 							<label>{[this.smLabels[xindex-1]]}</label><span>{.}</span>\
 						</p>\
 					</tpl></tpl>\
+						<div class="icons"><p><i class="icon label">import_contacts</i>\
+						{addressbook_name}\
+						<label>' + t("Address book", "addressbook") + '</label>\
+					</p></div>\
 					</div>',
 									{
 										emailLabels: [t('Primary'), t("Home"), t('Work')], //email 1 2 en 3
@@ -187,7 +191,7 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 							<div>\
 						</tpl>\
 					</tpl>'
-				}, {
+				},  {
 					collapsible: true,
 					onLoad: function (dv) {
 						this.setVisible(!!dv.data.comment);
