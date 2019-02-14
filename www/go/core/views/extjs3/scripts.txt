@@ -40,9 +40,7 @@ form/FormGroup.js
 form/Chips.js
 form/RecurrenceFieldset.js
 
-
 modules/ModulePanel.js
-
 
 SearchField.js
 NavMenu.js
@@ -113,8 +111,7 @@ tree/TreeNodeUI.js
 form/HtmlEditor.js
 menu/EmojiMenu.js
 
-
-
+Module.js
 
 cron/Stores.js
 cron/CronDialog.js
@@ -123,7 +120,6 @@ cron/PeriodGrid.js
 cron/SystemSettingsCronGrid.js
 
 tools/SystemSettingsTools.js
-
 
 groups/SystemSettingsGroupGrid.js
 groups/GroupDialog.js
@@ -177,23 +173,12 @@ customfields/type/NotesDialog.js
 customfields/type/Notes.js
 customfields/type/EncryptedText.js
 
-
-
-
-
 search/Panel.js
 search/SearchEmailCombo.js
 search/SearchCombo.js
 
-
-
 modules/SystemSettingsModuleGrid.js
 modules/PermissionsWindow.js
 
-Module.js
-
 permissions/SharePanel.js
 permissions/ShareWindow.js
-
-
-

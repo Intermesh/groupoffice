@@ -1,6 +1,6 @@
 go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {	
 	title: t('Field'),
-	entityStore: go.Stores.get("Field"),
+	entityStore: "Field",
 	height: dp(400),
 	initFormItems: function () {
 		return [{
