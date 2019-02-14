@@ -7,8 +7,10 @@ use Exception;
 use GO;
 use go\core\App;
 use go\core\db\Query;
-use go\core\jmap\Entity;
+use go\core\ErrorHandler;
+use go\core\jmap;
 use go\modules\core\modules\model\Module;
+use PDOException;
 
 /**
  * The EntityType class
@@ -220,7 +222,7 @@ class EntityType {
 	
 	protected $changed = [];
 	
-	public function change(Entity $entity) {
+	public function change(jmap\Entity $entity) {
 		$this->changed[] = $entity;		
 	}
 	
@@ -275,9 +277,9 @@ class EntityType {
 				
 				try {
 					GO()->getDbConnection()->replace('core_change', $record)->execute();
-				} catch(\PDOException $e) {
+				} catch(PDOException $e) {
 					error_log("Failed to save change for ". var_export($record, true));
-					\go\core\ErrorHandler::logException($e);
+					ErrorHandler::logException($e);
 				}
 			}
 			
