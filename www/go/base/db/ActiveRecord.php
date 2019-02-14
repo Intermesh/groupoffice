@@ -1801,7 +1801,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		foreach($this->columns as $field=>$attributes){
 			
 			if($field != 'uuid'){ 
-				if(isset($attributes['gotype']) && ($attributes['gotype']=='textfield' || $attributes['gotype']=='textarea' || ($attributes['gotype']=='customfield' && $attributes['customfield']->customfieldtype->includeInSearches()))){
+				if(isset($attributes['gotype']) && ($attributes['gotype']=='textfield' || ($attributes['gotype']=='customfield' && $attributes['customfield']->customfieldtype->includeInSearches()))){
 					$fields[]='`'.$prefixTable.'`.`'.$field.'`';
 				}
 			}
