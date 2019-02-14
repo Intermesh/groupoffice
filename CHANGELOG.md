@@ -1,3 +1,4 @@
+- Serverclient: Server client stayed inactive if installed before 6.3
 - Core: Fixed error handling in rebuild search cache
 
 12-02-2019 6.3.64
