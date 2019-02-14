@@ -145,7 +145,9 @@ class Connection {
 		if($this->transactionSavePointLevel == 0) {
 			//$ret = null;
 			//if (!$this->inTransaction())
-			GO()->debug("START DB TRANSACTION");
+			if($this->debug) {
+				GO()->debug("START DB TRANSACTION");
+			}
 			$ret = $this->getPdo()->beginTransaction();
 
 		}else
@@ -171,8 +173,8 @@ class Connection {
 		}
 		
 		$this->transactionSavePointLevel--;	
-		if($this->transactionSavePointLevel == 0) {
-			GO()->debug("ROLLBACK DB TRANSACTION");
+		if($this->transactionSavePointLevel == 0) {			
+			GO()->warn("ROLLBACK DB TRANSACTION");
 			return $this->getPdo()->rollBack();
 		}else
 		{
@@ -196,7 +198,9 @@ class Connection {
 		
 		$this->transactionSavePointLevel--;
 		if($this->transactionSavePointLevel == 0) {
-			GO()->debug("COMMIT DB TRANSACTION");
+			if($this->debug) {
+				GO()->debug("COMMIT DB TRANSACTION");				
+			}
 			return $this->getPdo()->commit();
 		}else
 		{

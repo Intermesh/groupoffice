@@ -82,7 +82,9 @@ class Note extends AclItemEntity {
 	protected static function defineFilters() {
 		return parent::defineFilters()
 						->add('noteBookId', function(Criteria $criteria, $value) {
-							$criteria->where(['noteBookId' => $value]);
+							if(!empty($value)) {
+								$criteria->where(['noteBookId' => $value]);
+							}
 						})
 						->addText('name', function(Criteria $criteria, $comparator, $value, Query $query) {
 							$criteria->andWhere('name', $comparator, $value);

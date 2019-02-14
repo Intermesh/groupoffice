@@ -331,12 +331,14 @@ class EntityType {
 			$userPropsModified = !empty(array_intersect($userPropNames, $modifiedPropnames));
 		} else
 		{
+			GO()->debug($entity->getClientName() . ' isDeleted');
 			$entityModified = true;
 			$userPropsModified = false;
 		}
 		
 		
 		if($entityModified) {
+			GO()->debug($entity->getClientName(). ' isDeleted');
 			$this->change($entity);
 		}
 		

@@ -400,3 +400,7 @@ $updates['201902121355'][] = "update `core_entity` e inner join core_module m on
 $updates['201902121355'][] = "update `core_setting` e inner join core_module m on m.id = e.moduleId  set e.moduleId = (select id from core_module where name = 'core' and package='core') where m.package='core';";
 $updates['201902121355'][] = "update `core_auth_method` e inner join core_module m on m.id = e.moduleId  set e.moduleId = (select id from core_module where name = 'core' and package='core') where m.package='core';";
 $updates['201902121355'][] = "delete from core_module where package = 'core' and name != 'core';";
+
+
+$updates['201902121355'][] = "ALTER TABLE `core_change` DROP FOREIGN KEY `core_change_ibfk_2`;";
+$updates['201902121355'][] = "ALTER TABLE `core_change` ADD CONSTRAINT `core_change_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";
