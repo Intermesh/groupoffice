@@ -31,6 +31,11 @@ go.modules.core.links.CreateLinkButton = Ext.extend(Ext.Button, {
 			scope: this,
 			callback: function(options, success, result) {
 				
+				if(!result.list[0]) {
+					Ext.MessageBox.alert(t("Error"), t("Could not find item to link in search cache"));
+					return;
+				}
+				
 				this.newLinks.push({						
 						toEntity: entity,
 						toId: entityId
