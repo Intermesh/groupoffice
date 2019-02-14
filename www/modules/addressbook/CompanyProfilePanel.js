@@ -8,98 +8,37 @@ GO.addressbook.CompanyProfilePanel = function(config)
 		fieldLabel: t("Address"), 
 		name: 'address',
 		height: 50,
-		maxLength: 255,
-		listeners: {
-			change:function(field, v)
-			{
-				if(this.formPostAddress.getValue()=='')
-				{
-					this.formPostAddress.setValue(v);
-				}
-			},
-			scope:this
-		}
+		maxLength: 255
 	});
 					
 	this.formAddressNo = new Ext.form.TextField(
 	{
 		fieldLabel: t("Address 2"), 
-		name: 'address_no',
-		listeners: {
-			change:function(field, v)
-			{
-				if(this.formPostAddressNo.getValue()=='')
-				{
-					this.formPostAddressNo.setValue(v);
-				}
-			},
-			scope:this
-		}		
+		name: 'address_no'	
 	});
 					
 	this.formZip = new Ext.form.TextField(
 	{
 		fieldLabel: t("ZIP/Postal"), 
-		name: 'zip',
-		listeners: {
-			change:function(field, v)
-			{
-				if(this.formPostZip.getValue()=='')
-				{
-					this.formPostZip.setValue(v);
-				}
-			},
-			scope:this
-		}
+		name: 'zip'
 	});
 					
 	this.formCity = new Ext.form.TextField(
 	{
 		fieldLabel: t("City"), 
-		name: 'city',
-		listeners: {
-			change:function(field, v)
-			{
-				if(this.formPostCity.getValue()=='')
-				{
-					this.formPostCity.setValue(v);
-				}
-			},
-			scope:this
-		}
+		name: 'city'
 	});
 					
 	this.formState = new Ext.form.TextField(
 	{
 		fieldLabel: t("State"), 
-		name: 'state',
-		listeners: {
-			change:function(field, v)
-			{
-				if(this.formPostState.getValue()=='')
-				{
-					this.formPostState.setValue(v);
-				}
-			},
-			scope:this
-		}
+		name: 'state'
 	});
 
 	this.formCountry = new GO.form.SelectCountry({
 		fieldLabel: t("Country"),
 		name: 'country_text',
-		hiddenName: 'country',
-		listeners:{
-			
-			change:function(field, v)
-			{
-				if(this.formPostCountry.getValue()=='')
-				{
-					this.formPostCountry.setValue(v);					
-				}
-			},
-			scope:this
-		}
+		hiddenName: 'country'
 	});
 	
 	/*
@@ -520,3 +459,4 @@ Ext.extend(GO.addressbook.CompanyProfilePanel, Ext.Panel,{
 		this.company_id=company_id;
 	}
 });
+
