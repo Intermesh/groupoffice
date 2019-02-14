@@ -136,7 +136,7 @@ class GO{
 	public static function setMemoryLimit($mb){
 		$max = \GO\Base\Util\Number::configSizeToMB(ini_get("memory_limit"));
 
-		if($mb>$max){
+		if($max > 0 && $mb>$max){
 			return ini_set("memory_limit", $mb.'M');
 		}else
 		{
