@@ -28,6 +28,7 @@
 				}, me);
 
 				go.Stores.get("FieldSet").all(function (success, fieldSets) {
+					
 					me.fieldSets = fieldSets;
 					if(me.fields) {
 						if(cb) {

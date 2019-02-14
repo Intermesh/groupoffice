@@ -152,6 +152,11 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	
 	setState : function(state, cb, scope) {
 		this.state = state;
+		
+		if(!state) {
+			this.clearState();
+		}
+		
 		scope = scope || this;
 		this.metaStore.setItem("state", state, function() {
 			if(cb) {
@@ -211,6 +216,10 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 //			console.log("Get updates for state: " + state);
 		
 			if(!state) {
+				console.info("No state yet so won't fetch updates");
+				if(cb) {
+					cb.call(scope || this, this, false);
+				}
 				return;
 			}
 			
@@ -279,6 +288,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			if(this.isComplete) {
 				this.getUpdates(function(store, success) {
 					if(!success) {
+						this.isComplete = false;
 						this.all(cb, scope);
 						return;
 					}
