@@ -1,3 +1,4 @@
+- Core: Fixed Combobox display of html entities.
 - Serverclient: Server client stayed inactive if installed before 6.3
 - Core: Fixed error handling in rebuild search cache
 
