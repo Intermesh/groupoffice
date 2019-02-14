@@ -9,6 +9,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 			baseParams: {
 				limit: this.limit,
 				position: 0,
+				calculateTotal:true,
 				filter: {
 					entities: [{name: this.link.entity, filter: this.link.filter}]
 				}

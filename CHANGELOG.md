@@ -1,3 +1,5 @@
+- Core: Fixed error handling in rebuild search cache
+
 12-02-2019 6.3.64
 - Calendar: Fixed event dialog crash bug. (FileBrowserButton could not be destroyed)
 - Document templates: Fixed space problem in docx templates

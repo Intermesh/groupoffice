@@ -7,8 +7,10 @@ use Exception;
 use GO;
 use go\core\App;
 use go\core\db\Query;
-use go\core\jmap\Entity;
 use go\core\model\Module;
+use go\core\ErrorHandler;
+use go\core\jmap;
+use PDOException;
 
 /**
  * The EntityType class
@@ -285,7 +287,7 @@ class EntityType {
 			GO()->getDbConnection()->commit();
 		}				
 	}
-	
+
 	/**
 	 * Register a change for JMAP
 	 * 
@@ -296,9 +298,9 @@ class EntityType {
 	 * 
 	 * It also writes user specific changes 'core_user_change' table ({@see \go\core\orm\Mapping::addUserTable()). 
 	 * 
-	 * @param Entity $entity
+	 * @param jmap\Entity $entity
 	 */
-	public function change(Entity $entity) {
+	public function change(jmap\Entity $entity) {
 		$this->highestModSeq = $this->nextModSeq();
 
 		$record = [

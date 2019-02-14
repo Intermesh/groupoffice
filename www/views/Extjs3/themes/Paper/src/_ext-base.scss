@@ -585,7 +585,6 @@ textarea {
     display:block;
     float:left;
     width:100px;
-    padding:3px;
     padding-left:0;
     clear:left;
     z-index:2;
@@ -1016,22 +1015,11 @@ div.x-toolbar-no-items {
    vertical-align:middle;
 }
 
-.x-grid3-hd-row .x-grid3-marker-hd,
-.x-grid3-row .x-grid3-marker {
-   padding:3px; // todo
-}
 
 .x-grid3-cell-inner, .x-grid3-hd-inner{
 	overflow:hidden;
 	text-overflow: ellipsis;
-   padding:3px 3px 3px 5px;
    white-space: nowrap;
-}
-
-/* ActionColumn, reduce padding to accommodate 16x16 icons in normal row height */
-.x-action-col-cell .x-grid3-cell-inner {
-   padding-top: 1px;
-   padding-bottom: 1px;
 }
 
 .x-action-col-icon {
@@ -1166,8 +1154,6 @@ div.x-toolbar-no-items {
 /* Column Reorder DD */
 .x-dd-drag-proxy .x-grid3-hd-inner{
 	width:120px;
-	padding:3px;
-	border:1px solid;
 	overflow:hidden;
 }
 
@@ -1441,18 +1427,20 @@ div.x-toolbar-no-items {
 }
 
 .x-dd-drop-icon{
-   position:absolute;
+  position:absolute;
+	top:0;
+	left:3px;
 	display:block;
 	background-color:transparent;
 	z-index:1;
 }
 
 .x-view-selector {
-    position:absolute;
-    left:0;
-    top:0;
-    width:0;
-    border:1px dotted;
+   position:absolute;
+   left:0;
+   top:0;
+   width:0;
+   border:1px dotted;
 	opacity: .5;
     
 }.ext-strict .ext-ie .x-tree .x-panel-bwrap{
@@ -1460,7 +1448,16 @@ div.x-toolbar-no-items {
     overflow:hidden;
 }
 
-.x-tree-icon, .x-tree-node-cb, .x-tree-ec-icon, .x-tree-elbow-line, .x-tree-elbow, .x-tree-elbow-end, .x-tree-elbow-plus, .x-tree-elbow-minus, .x-tree-elbow-end-plus, .x-tree-elbow-end-minus{
+.x-tree-icon, 
+.x-tree-node-cb, 
+.x-tree-ec-icon, 
+.x-tree-elbow-line, 
+.x-tree-elbow, 
+.x-tree-elbow-end, 
+.x-tree-elbow-plus, 
+.x-tree-elbow-minus, 
+.x-tree-elbow-end-plus, 
+.x-tree-elbow-end-minus {
 	border: 0 none;
 	height: dp(24);
 	margin: 0;

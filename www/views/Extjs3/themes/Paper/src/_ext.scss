@@ -788,13 +788,17 @@
 		}
 	}
 }
-.x-panel-btns .x-toolbar-left-row td.x-toolbar-cell {
-	padding: 0 dp(8) 0 0;
-}
-.x-panel-btns td.x-toolbar-cell {
-	padding: 0 0 0 dp(8);
-}
-
+.x-panel-btns {
+	.x-btn {
+		//border: 1px solid rgba(0, 0, 0, 0.12);
+	}
+	.x-toolbar-left-row td.x-toolbar-cell {
+		padding: 0 dp(8) 0 0;
+	}
+	td.x-toolbar-cell {
+		padding: 0 0 0 dp(8);
+	}
+} 
 
 .x-btn-tl, .x-btn-tr, .x-btn-tc, .x-btn-ml, .x-btn-mr, .x-btn-bl, .x-btn-br, .x-btn-bc{
 	height: 0px; // remove sliding doors
@@ -1330,6 +1334,7 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 .col-move-top, .col-move-bottom{
 	width:dp(16);
 	height: dp(16);
+	pointer-events:none;
 	overflow:visible;
 	&:before {
 		@extend %icon;
@@ -1340,7 +1345,7 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 }
 .col-move-bottom:before{
 	content: 'arrow_drop_up';
-	top:dp(-32);
+	top:dp(-24);
 }
 
 td.grid-hd-group-cell {
@@ -1478,7 +1483,7 @@ td.grid-hd-group-cell {
 	}
 }
 .x-dd-drop-icon:before {
-	padding: dp(4) dp(8);
+	padding: dp(2) dp(8);
 	@extend %icon;
 	.x-dd-drop-ok-add & {
 		content: 'add';
@@ -2268,6 +2273,7 @@ $menuScrollerSize : dp(4);
 
 .x-panel-ghost {
 	@extend .z24;
+	border-radius: $borderRadius;
 	visibility:visible;
 	background-color:white;
 }
