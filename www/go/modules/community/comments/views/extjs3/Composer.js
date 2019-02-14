@@ -1,6 +1,6 @@
 go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 	
-	entityStore: go.Stores.get("Comment"),
+	entityStore: "Comment",
 	layout: 'hbox',
 	cls:'go-form new-message',
 	layoutConfig: {
@@ -11,7 +11,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		
 		this.store = new go.data.Store({
 			fields: ['id', 'name', 'color'],
-			entityStore: go.Stores.get("CommentLabel")
+			entityStore: "CommentLabel"
 		});
 		
 		this.addBtn = new Ext.Button({
@@ -105,7 +105,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 					}),
 					this.chips = new go.form.Chips({
 						name: 'labelIds',
-						entityStore: go.Stores.get('CommentLabel'),
+						entityStore: 'CommentLabel',
 						style:'padding-bottom:4px',
 						store: this.store
 					}),

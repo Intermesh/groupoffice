@@ -11,17 +11,10 @@ go.groups.GroupCombo = Ext.extend(go.form.ComboBox, {
 	selectOnFocus: true,
 	forceSelection: true,
 	allowBlank: false,
-	initComponent: function () {
-		Ext.applyIf(this, {
-			store: new go.data.Store({
-				fields: ['id', 'name'],
-				entityStore: go.Stores.get("Group")
-			})
-		});
-		
-		go.groups.GroupCombo.superclass.initComponent.call(this);
-
-	}
+	store: new go.data.Store({
+		fields: ['id', 'name'],
+		entityStore: "Group"
+	})
 });
 
 

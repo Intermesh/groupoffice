@@ -39,7 +39,7 @@ go.modules.community.music.GenreFilter = Ext.extend(go.grid.GridPanel, {
 			// We use a "go.data.Store" that connects with an Entity store. This store updates automaticaly when entities change.
 			store: new go.data.Store({
 				fields: ['id', 'name', 'aclId', "permissionLevel"],
-				entityStore: go.Stores.get("Genre")
+				entityStore: "Genre"
 			}),
 			selModel: selModel,
 			plugins: [actions],

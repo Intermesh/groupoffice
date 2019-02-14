@@ -9,7 +9,7 @@
  * 
  * {
 				xtype: "chips",
-				entityStore: go.Stores.get("Contact"),
+				entityStore: "Contact",
 				displayField: "name",
 				name: "addressBooks",
 				storeBaseParams: { //Optional base params

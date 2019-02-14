@@ -1,6 +1,6 @@
 go.permissions.ShareWindow = Ext.extend(go.form.Dialog, {
 	title: t('Share'),
-	entityStore: go.Stores.get("Acl"),
+	entityStore: "Acl",
 	height: dp(600),
 	width: dp(800),
 	

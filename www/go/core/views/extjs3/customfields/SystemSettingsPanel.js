@@ -45,7 +45,7 @@ go.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel, {
 				'fieldSetId',				
 				{name: 'isFieldSet', type: "boolean"},
 				{name: 'sortOrder', type: "int"},
-				"aclId",
+				"aclId"
 			]
 		});
 

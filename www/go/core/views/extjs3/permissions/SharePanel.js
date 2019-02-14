@@ -63,7 +63,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 
 			baseParams: {
 			},
-			entityStore: go.Stores.get("Group")
+			entityStore: "Group"
 		});
 		
 		var levelCombo = this.createLevelCombo();

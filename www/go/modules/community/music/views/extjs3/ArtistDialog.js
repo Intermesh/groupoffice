@@ -6,7 +6,7 @@ go.modules.community.music.ArtistDialog = Ext.extend(go.form.Dialog, {
 
 	//The dialog set's entities in an go.data.EntityStore. This store notifies all 
 	//connected go.data.Store view stores to update.
-	entityStore: go.Stores.get("Artist"),
+	entityStore: "Artist",
 	autoHeight: true,
 
 	// return an array of form items here.

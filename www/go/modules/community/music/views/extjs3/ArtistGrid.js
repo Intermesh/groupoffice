@@ -23,7 +23,7 @@ go.modules.community.music.ArtistGrid = Ext.extend(go.grid.GridPanel, {
 
 			// The connected entity store. When Arists are changed the store will 
 			// update automatically
-			entityStore: go.Stores.get("Artist")
+			entityStore: "Artist"
 		});
 
 		Ext.apply(this, {

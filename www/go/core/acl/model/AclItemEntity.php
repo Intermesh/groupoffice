@@ -111,7 +111,7 @@ abstract class AclItemEntity extends AclEntity {
 				throw new \Exception("Column 'aclId' is required for AclEntity '$cls'");
 			}
 			
-			return $column->table->getAlias();
+			return $aclColumn->table->getAlias();
 		}
 	}
 	

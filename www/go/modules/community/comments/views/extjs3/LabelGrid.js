@@ -4,7 +4,7 @@ go.modules.comments.LabelGrid = Ext.extend(go.grid.EditorGridPanel, {
 
 		this.store = new go.data.Store({
 			fields: ['id', {name:'name'}, {name:'color'}],
-			entityStore: go.Stores.get("CommentLabel")
+			entityStore: "CommentLabel"
 		});
 
 		Ext.apply(this, {

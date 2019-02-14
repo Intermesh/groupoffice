@@ -241,7 +241,9 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					} else
 					{					
 						this.clearState();
-						cb.call(scope || this, this, false);
+						if(cb) {
+							cb.call(scope || this, this, false);
+						}
 					}
 
 				},

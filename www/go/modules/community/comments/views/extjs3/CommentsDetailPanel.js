@@ -24,7 +24,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 
 		this.store = new go.data.Store({
 			fields: ['id', 'categoryId', 'categoryName','entityId', {name: 'createdAt', type: 'date'}, {name: 'modifiedAt', type: 'date'}, 'modifiedBy','createdBy', 'text'],
-			entityStore: go.Stores.get("Comment")
+			entityStore: "Comment"
 		});
 		
 		this.store.on('load', function(store,records,options) {

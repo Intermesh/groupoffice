@@ -11,18 +11,10 @@ go.modules.community.music.GenreCombo = Ext.extend(go.form.ComboBox, {
 	selectOnFocus: true,
 	forceSelection: true,
 	allowBlank: false,
-	initComponent: function () {
-		
-		//Add the store on init so that the entity store is loaded
-		Ext.applyIf(this, {
-			store: new go.data.Store({
-				fields: ['id', 'name'],
-				entityStore: go.Stores.get("Genre")
-			})
-		});
-		
-		go.modules.community.music.GenreCombo.superclass.initComponent.call(this);
-	}
+	store: new go.data.Store({
+		fields: ['id', 'name'],
+		entityStore: "Genre"
+	})
 });
 
 // Register an xtype so we can use the component easily.
