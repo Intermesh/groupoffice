@@ -1,3 +1,6 @@
+- Document templates: Fixed linking in new email from template
+- Address book: Added address book name to contact and company detail
+- ActiveSync: Fixed z-push-admin and z-push-top command line utilities
 - Serverclient: Server client stayed inactive if installed before 6.3
 - Core: Fixed error handling in rebuild search cache
 
