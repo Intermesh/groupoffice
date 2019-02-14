@@ -105,8 +105,25 @@ GO.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 	},
 	
 	setValue: function(v) {
+
+		var text = v;
 		
-		GO.form.ComboBox.superclass.setValue.call(this, v);
+		if(this.valueField){
+			var r = this.findRecord(this.valueField, v);
+			if(r){
+					text = Ext.util.Format.htmlDecode(r.data[this.displayField]);
+			}else if(Ext.isDefined(this.valueNotFoundText)){
+					text = this.valueNotFoundText;
+			}
+		}
+		this.lastSelectionText = text;
+		if(this.hiddenField){
+				this.hiddenField.value = Ext.value(v, '');
+		}
+		Ext.form.ComboBox.superclass.setValue.call(this, text);
+
+		this.value = v;
+//		GO.form.ComboBox.superclass.setValue.call(this, v);
 		
 		if(this.idValuePair){
 			if(!GO.util.empty(v)){
@@ -117,9 +134,40 @@ GO.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 			}
 		} 
 		
-		
+		return this;
 	},
+	
+	assertValue : function(){
+			var val = this.getRawValue(),
+					rec;
 
+			if(this.valueField && Ext.isDefined(this.value)){
+					rec = this.findRecord(this.valueField, this.value);
+			}
+			if(!rec || Ext.util.Format.htmlDecode(rec.get(this.displayField)) != val){
+					rec = this.findRecord(this.displayField, val);
+			}
+			if(!rec && this.forceSelection){
+					if(val.length > 0 && val != this.emptyText){
+							this.el.dom.value = Ext.value(this.lastSelectionText, '');
+							this.applyEmptyText();
+					}else{
+							this.clearValue();
+					}
+			}else{
+					if(rec && this.valueField){
+							// onSelect may have already set the value and by doing so
+							// set the display field properly.  Let's not wipe out the
+							// valueField here by just sending the displayField.
+							if (this.value == val){
+									return;
+							}
+							val = rec.get(this.valueField || this.displayField);
+					}
+					this.setValue(val);
+			}
+	},
+		
 	/**
 	 * Selects the first record of the associated store
 	 */

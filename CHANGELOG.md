@@ -1,3 +1,4 @@
+- Core: Fixed Combobox display of html entities.
 - Document templates: Fixed linking in new email from template
 - Address book: Added address book name to contact and company detail
 - ActiveSync: Fixed z-push-admin and z-push-top command line utilities
