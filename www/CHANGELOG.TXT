@@ -1,3 +1,5 @@
+- Address Book: Removed automatic copy to post address because it makes more sense to 
+  use the button
 - leavedays: Fixed SQL error in install.sql file
 - projects: Fix for can't find ACL id on root level if you have manage permission on the projects module but not on the permission type.
 
