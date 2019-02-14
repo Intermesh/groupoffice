@@ -17,24 +17,23 @@
 				scope = scope || me;
 
 				go.Stores.get("Field").all(function (success, fields) {
-					me.fields = fields
+					me.fields = fields;
 
 					if(me.fieldSets) {
 						if(cb) {
 							cb.call(scope);
 						}
-						resolve(me);
+						success ? resolve(me) : reject(me);
 					}				
 				}, me);
 
 				go.Stores.get("FieldSet").all(function (success, fieldSets) {
-					me.fieldSets = fieldSets
+					me.fieldSets = fieldSets;
 					if(me.fields) {
 						if(cb) {
 							cb.call(scope);
 						}
-
-						resolve(me);
+						success ? resolve(me) : reject(me);
 					}
 				}, me);
 			

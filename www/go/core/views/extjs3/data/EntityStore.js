@@ -220,7 +220,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					sinceState: this.state
 				},
 				callback: function(options, success, response) {
-
+					
 					if(response.removed) {
 						for(var i = 0, l = response.removed.length; i < l; i++) {
 							this._destroy(response.removed[i]);

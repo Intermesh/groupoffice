@@ -294,7 +294,10 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			script.async = true;
 			script.onload = function () {
 				resolve();
-			}
+			};
+			script.onerror = function () {
+				reject();
+			};
 
 			document.body.appendChild(script);
 		});
@@ -369,6 +372,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			this.loadLegacyModuleScripts()
 		]).then(function(){
 			me.renderUI();
+		}).catch(function(){
+			console.error(arguments);
 		});
 		
 		

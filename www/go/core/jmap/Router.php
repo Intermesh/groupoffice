@@ -7,6 +7,7 @@ use GO;
 use go\core\App;
 use go\core\ErrorHandler;
 use go\core\http\Exception;
+use go\core\jmap\exception\InvalidResultReference;
 use go\core\orm\EntityType;
 use JsonSerializable;
 
@@ -68,6 +69,12 @@ class Router {
 					Response::get()->addResponse($response);
 				}
 				
+			} catch(InvalidResultReference $e) {
+				$error = ["message" => $e->getMessage()];
+			
+				Response::get()->addResponse([
+						'error', $error
+				]);
 			} catch (CoreException $e) {
 				$error = ["message" => $e->getMessage()];
 				
@@ -176,14 +183,19 @@ class Router {
 
 	private function findResultOf($resultOf) {
 		$results = Response::get()->getData();
-
+		
 		foreach ($results as $result) {
 			if ($resultOf == $result[2]) {
+				
+				if(!empty($result['error'])){
+					throw new InvalidResultReference("The method you are referring to returned an error. (". $resultOf .")");
+				}
+				
 				return $result;
 			}
 		}
 
-		throw new \Exception("ResultReference error: Could not find resultOf: " . $resultOf);
+		throw new InvalidResultReference("Client call id ".$resultOf." does not exist.");
 	}
 
 	private function resolvePath($pathParts, $result) {
@@ -201,7 +213,7 @@ class Router {
 			}
 			
 			if (!isset($result[$part])) {
-				throw new \Exception("ResultReference error: Could not resolve path part " . $part);
+				throw new InvalidResultReference("Could not resolve path part " . $part);
 			}
 
 			$result = $result[$part];

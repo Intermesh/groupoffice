@@ -218,8 +218,9 @@
 							}
 						}
 					}
-
-					resolve(me);
+					
+					success ? resolve(me) : reject(me);
+					
 				}, me);
 			
 			});
