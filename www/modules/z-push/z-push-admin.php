@@ -1,12 +1,14 @@
 #!/usr/bin/php
 <?php
-/**
- * This is a wrapper for z-push admin.php that detects the right group-office config file.
- */
+define("ZPUSH_VERSION", "2.4.4");
+define("ZPUSH_DIR", __DIR__ . "/vendor/z-push/");
 
-require(dirname(__FILE__).'/../../../go/base/util/Cli.php');
+require(ZPUSH_DIR . 'vendor/autoload.php');
+require("backend/go/autoload.php");
 
-$scriptPath = $_SERVER['SCRIPT_FILENAME'];////\GO\Base\Util\Cli::getScriptPath();
+define('ZPUSH_CONFIG', __DIR__ . '/config.php');
+
+$scriptPath = $_SERVER['SCRIPT_FILENAME'];
 
 if(strstr($scriptPath, '/home/govhosts')) {
 
@@ -24,6 +26,4 @@ if(strstr($scriptPath, '/home/govhosts')) {
 	echo "Using config file: $config\n";
 }
 
-chdir(dirname(dirname(__DIR__)).'/z-push');
-
-require('z-push-admin.php');
+require(ZPUSH_DIR . "z-push-admin.php");
