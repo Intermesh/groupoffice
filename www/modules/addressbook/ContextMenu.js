@@ -44,6 +44,19 @@ GO.addressbook.ContextMenu = function(config){
 	});
 	config.items.push(this.actionBatchEdit);
 	
+	this.deleteButton = new Ext.menu.Item({
+		iconCls: 'btn-delete',
+		text: t("Delete"),
+		cls: 'x-btn-text-icon',
+		scope:this,
+		handler: function(){
+			this.deleteItems();
+		}
+	});
+	
+	config.items.push('-');
+	config.items.push(this.deleteButton);
+	
 	GO.addressbook.ContextMenu.superclass.constructor.call(this,config);
 
 }
@@ -64,6 +77,10 @@ Ext.extend(GO.addressbook.ContextMenu, Ext.menu.Menu, {
 			return [];
 		else
 			return this.selected;
+	},
+
+	deleteItems : function(){
+		this.grid.deleteSelected();
 	},
 
 	showCreateMailDialog : function(config) {		
