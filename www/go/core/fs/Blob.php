@@ -288,7 +288,7 @@ class Blob extends orm\Entity {
 	 * @return string
 	 */
 	public static function url($blobId) {
-		return GO()->getSettings()->URL . 'download.php?blob=' . $blobId;
+		return GO()->getSettings()->URL . 'api/download.php?blob=' . $blobId;
 	}
 	
 	/**
