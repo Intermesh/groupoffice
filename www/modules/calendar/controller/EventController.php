@@ -1552,9 +1552,10 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		}
 		
 		$masterEvent = \GO\Calendar\Model\Event::model()->findByUuid((string)$vevent->uid, 0, $settings->calendar_id);		
-
-		if (!$settings->calendar->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION))
-			throw new \Exception(sprintf(\GO::t("The calendar associated with the email account is \"%s\" and you have no write permission to it. Because the appointment is in that calendar, its status has not been changed now.", "calendar"),$masterEvent->calendar->name));
+		$masterEventCalendarName = $masterEvent?$masterEvent->calendar->name:'unknown';
+		if(!$settings->calendar->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION)){
+			throw new \Exception(sprintf(\GO::t("The calendar associated with the email account is \"%s\" and you have no write permission to it. Because the appointment is in that calendar, its status has not been changed now.", "calendar"),$masterEventCalendarName));
+		}
 		
 		//delete existing data		
 		if(!$recurrenceDate){
