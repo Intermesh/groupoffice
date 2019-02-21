@@ -1,3 +1,4 @@
+21-02-2019 6.3.65
 - Core/Files: Fixed display of linked files and folders in the displaypanel.
 - Favorites: Fixed gear icon to manage the favorites.
 - Core: Multiselect grid, Added check if the tools property is given.
