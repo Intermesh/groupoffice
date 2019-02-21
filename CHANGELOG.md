@@ -1,3 +1,6 @@
+- Savemailas: Fixed issue that "Save as"->"File to item" link window also showed entities that did not have file support.
+- Core/Links: Added "entities" property to filter the list of entities in the link window.
+
 21-02-2019 6.3.65
 - Core/Files: Fixed display of linked files and folders in the displaypanel.
 - Favorites: Fixed gear icon to manage the favorites.
