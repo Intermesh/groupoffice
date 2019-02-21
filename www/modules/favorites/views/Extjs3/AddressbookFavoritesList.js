@@ -21,9 +21,9 @@ GO.favorites.AddressbookFavoritesList = Ext.extend(GO.grid.MultiSelectGrid,{
 			allowNoSelection:true,
 			layout:'fit',
 			autoHeight: true,
-			tools: [{
-				text:t("Manage favorites", "favorites"),
-				id:'gear',
+			tbtools: [{
+				tooltip:t("Manage favorites", "favorites"),
+				iconCls:'ic-settings',
 				handler:function(){
 					if(!GO.favorites.addressbookFavoritesDialog){
 						GO.favorites.addressbookFavoritesDialog = new GO.base.model.multiselect.dialog({
@@ -40,22 +40,8 @@ GO.favorites.AddressbookFavoritesList = Ext.extend(GO.grid.MultiSelectGrid,{
 					},this);
 				},
 				scope: this
-			},{
-				text:t("Select all"),
-				id:'plus',
-				qtip:t("Select all"),
-				handler:function(){this.selectAll();},
-				scope: this
 			}],
-			store: GO.favorites.favoritesAddressbookStore,
-//			bbar: new GO.SmallPagingToolbar({
-//				items:[this.searchField = new GO.form.SearchField({
-//					store: GO.favorites.favoritesAddressbookStore,
-//					emptyText: t("Search")
-//				})],
-//				store:GO.favorites.favoritesAddressbookStore,
-//				pageSize:GO.settings.config.nav_page_size
-//			})
+			store: GO.favorites.favoritesAddressbookStore
 		});
 		
 		GO.favorites.AddressbookFavoritesList.superclass.initComponent.call(this);		
