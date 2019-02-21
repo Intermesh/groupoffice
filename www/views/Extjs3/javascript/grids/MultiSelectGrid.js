@@ -128,14 +128,16 @@ Ext.extend(GO.grid.MultiSelectGrid, GO.grid.GridPanel,{
 				scope: this
 			});
 		} else {
-			this.tools = [];
-			this.tools.push({
-				text:t("Select all"),
-				id:'plus',
-				qtip:t("Select all"),
-				handler:function(){this.selectAll();},
-				scope: this
-			});
+			if(!this.tools) {
+				this.tools = [];
+				this.tools.push({
+					text:t("Select all"),
+					id:'plus',
+					qtip:t("Select all"),
+					handler:function(){this.selectAll();},
+					scope: this
+				});
+			}
 		}
 		
 		GO.grid.MultiSelectGrid.superclass.initComponent.call(this);
