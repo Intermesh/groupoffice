@@ -1,3 +1,5 @@
+- Core/Links: Added "entities" property to filter the list of entities in the link window.
+
 21-02-2019 6.3.65
 - Core/Files: Fixed display of linked files and folders in the displaypanel.
 - Favorites: Fixed gear icon to manage the favorites.
