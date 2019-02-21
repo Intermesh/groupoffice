@@ -257,22 +257,22 @@ $updates['201811020837'][] = function() {
 	}
 };
 
-$updates['201901251344'][] = "ALTER TABLE `core_search` ADD INDEX(`keywords`);";
-$updates['201901301035'][] = "ALTER TABLE `go_cron` ADD INDEX `nextrun_active` (`nextrun`, `active`);";
-$updates['201901301035'][] = "ALTER TABLE `go_reminders_users` ADD INDEX `user_id_time` (`user_id`, `time`);";
-$updates['201901301035'][] = "ALTER TABLE `core_auth_method` ADD INDEX `moduleId_sortOrder` (`moduleId`, `sortOrder`);";
+$updates['201902141322'][] = "ALTER TABLE `core_search` ADD INDEX(`keywords`);";
+$updates['201902141322'][] = "ALTER TABLE `go_cron` ADD INDEX `nextrun_active` (`nextrun`, `active`);";
+$updates['201902141322'][] = "ALTER TABLE `go_reminders_users` ADD INDEX `user_id_time` (`user_id`, `time`);";
+$updates['201902141322'][] = "ALTER TABLE `core_auth_method` ADD INDEX `moduleId_sortOrder` (`moduleId`, `sortOrder`);";
+$updates['201902141322'][] = "UPDATE `core_module` SET `package` = 'community' WHERE `name` = 'serverclient';";
+
 
 //Master
 
 
 
-$updates['201901301035'][] = "update `core_entity` set highestModSeq=0 where highestModSeq is null;";
-$updates['201901301035'][] = "ALTER TABLE `core_entity` CHANGE `highestModSeq` `highestModSeq` INT(11) NOT NULL DEFAULT '0';";
-
-$updates['201901301035'][] = "truncate table core_change;";
-
-$updates['201901301035'][] = "DROP TABLE IF EXISTS `core_acl_group_changes`;";
-$updates['201901301035'][] = "CREATE TABLE IF NOT EXISTS `core_acl_group_changes` (
+$updates['201902141322'][] = "update `core_entity` set highestModSeq=0 where highestModSeq is null;";
+$updates['201902141322'][] = "ALTER TABLE `core_entity` CHANGE `highestModSeq` `highestModSeq` INT(11) NOT NULL DEFAULT '0';";
+$updates['201902141322'][] = "truncate table core_change;";
+$updates['201902141322'][] = "DROP TABLE IF EXISTS `core_acl_group_changes`;";
+$updates['201902141322'][] = "CREATE TABLE IF NOT EXISTS `core_acl_group_changes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `aclId` int(11) NOT NULL,
   `groupId` int(11) NOT NULL,
@@ -284,53 +284,44 @@ $updates['201901301035'][] = "CREATE TABLE IF NOT EXISTS `core_acl_group_changes
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
 
-$updates['201901301035'][] = "ALTER TABLE `core_acl_group_changes`
+$updates['201902141322'][] = "ALTER TABLE `core_acl_group_changes`
   ADD CONSTRAINT `all` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `group` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;";
 
-$updates['201901301035'][] = "insert into core_acl_group_changes select null, aclId, groupId, COALESCE((select highestModSeq from core_entity where name='Acl'), 0), null from core_acl_group;";
+$updates['201902141322'][] = "insert into core_acl_group_changes select null, aclId, groupId, COALESCE((select highestModSeq from core_entity where name='Acl'), 0), null from core_acl_group;";
 
-$updates['201901301035'][] = "ALTER TABLE `core_change`
+$updates['201902141322'][] = "ALTER TABLE `core_change`
 ADD COLUMN `id` INT NOT NULL AUTO_INCREMENT FIRST,
 DROP PRIMARY KEY,
 ADD PRIMARY KEY (`id`);";
 
 
-$updates['201901301035'][] = "ALTER TABLE `core_blob` ADD `modifiedAt` DATETIME NULL DEFAULT NULL AFTER `createdAt`, ADD `staleAt` DATETIME NULL DEFAULT NULL AFTER `modifiedAt`;";
-$updates['201901301035'][] = "ALTER TABLE `core_blob` ADD INDEX(`staleAt`);
+$updates['201902141322'][] = "ALTER TABLE `core_blob` ADD `modifiedAt` DATETIME NULL DEFAULT NULL AFTER `createdAt`, ADD `staleAt` DATETIME NULL DEFAULT NULL AFTER `modifiedAt`;";
+$updates['201902141322'][] = "ALTER TABLE `core_blob` ADD INDEX(`staleAt`);
 UPDATE `core_blob` set modifiedAt = from_unixtime(modified)";
-$updates['201901301035'][] = "ALTER TABLE `core_blob` DROP `modified`";
+$updates['201902141322'][] = "ALTER TABLE `core_blob` DROP `modified`";
 
-$updates['201901301035'][] = "insert into core_cron_job (moduleId,name, expression, description) values ((select id from core_module where name='core'), 'GarbageCollection', '0 * * * *', 'Garbage collection')";
+$updates['201902141322'][] = "insert into core_cron_job (moduleId,name, expression, description) values ((select id from core_module where name='core'), 'GarbageCollection', '0 * * * *', 'Garbage collection')";
 
-
-
-
+$updates['201902141322'][] = "ALTER TABLE `core_customfields_field_set` ADD `filter` TEXT NULL DEFAULT NULL;";
 
 
-
-//Address book
-
-$updates['201901301035'][] = "ALTER TABLE `core_customfields_field_set` ADD `filter` TEXT NULL DEFAULT NULL;";
-
-//TODO update install.sql from here
-
-$updates['201901301035'][] = "ALTER TABLE `core_customfields_field` CHANGE `datatype` `type` VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Text';";
-$updates['201901301035'][] = "ALTER TABLE `core_customfields_field` CHANGE `helptext` `hint` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;";
+$updates['201902141322'][] = "ALTER TABLE `core_customfields_field` CHANGE `datatype` `type` VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Text';";
+$updates['201902141322'][] = "ALTER TABLE `core_customfields_field` CHANGE `helptext` `hint` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;";
 
 
-$updates['201901301035'][] = "RENAME TABLE `cf_select_options` TO `core_customfields_select_option`;";
+$updates['201902141322'][] = "RENAME TABLE `cf_select_options` TO `core_customfields_select_option`;";
 
-$updates['201901301035'][] = "ALTER TABLE `core_customfields_select_option` CHANGE `field_id` `fieldId` INT(11) NOT NULL;";
-$updates['201901301035'][] = "ALTER TABLE `core_customfields_select_option` CHANGE `sort_order` `sortOrder` INT(11) NOT NULL;";
-$updates['201901301035'][] = "ALTER TABLE `core_customfields_select_option` ADD FOREIGN KEY (`fieldId`) REFERENCES `core_customfields_field`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
-$updates['201901301035'][] = "ALTER TABLE `core_customfields_select_option` ADD FOREIGN KEY (`fieldId`) REFERENCES `core_customfields_field`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+$updates['201902141322'][] = "ALTER TABLE `core_customfields_select_option` CHANGE `field_id` `fieldId` INT(11) NOT NULL;";
+$updates['201902141322'][] = "ALTER TABLE `core_customfields_select_option` CHANGE `sort_order` `sortOrder` INT(11) NOT NULL;";
+$updates['201902141322'][] = "ALTER TABLE `core_customfields_select_option` ADD FOREIGN KEY (`fieldId`) REFERENCES `core_customfields_field`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+$updates['201902141322'][] = "ALTER TABLE `core_customfields_select_option` ADD FOREIGN KEY (`fieldId`) REFERENCES `core_customfields_field`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
 
-$updates['201901301035'][] = "ALTER TABLE `core_customfields_field_set` ADD `description` TEXT NULL AFTER `name`;";
-$updates['201901301035'][] = "ALTER TABLE `core_customfields_select_option` ADD `parentId` INT NULL DEFAULT NULL AFTER `fieldId`, ADD INDEX (`parentId`);";
-$updates['201901301035'][] = "ALTER TABLE `core_customfields_select_option` ADD FOREIGN KEY (`parentId`) REFERENCES `core_customfields_select_option`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+$updates['201902141322'][] = "ALTER TABLE `core_customfields_field_set` ADD `description` TEXT NULL AFTER `name`;";
+$updates['201902141322'][] = "ALTER TABLE `core_customfields_select_option` ADD `parentId` INT NULL DEFAULT NULL AFTER `fieldId`, ADD INDEX (`parentId`);";
+$updates['201902141322'][] = "ALTER TABLE `core_customfields_select_option` ADD FOREIGN KEY (`parentId`) REFERENCES `core_customfields_select_option`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
 
-$updates['201901301035'][] = "CREATE TABLE IF NOT EXISTS `core_change_user` (
+$updates['201902141322'][] = "CREATE TABLE IF NOT EXISTS `core_change_user` (
   `userId` int(11) NOT NULL,
   `entityId` varchar(21) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
   `entityTypeId` int(11) NOT NULL,
@@ -340,15 +331,15 @@ $updates['201901301035'][] = "CREATE TABLE IF NOT EXISTS `core_change_user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT";
 
 
-$updates['201901301035'][] = "ALTER TABLE `core_change_user`
+$updates['201902141322'][] = "ALTER TABLE `core_change_user`
   ADD CONSTRAINT `core_change_user_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_change_user_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;";
 
-$updates['201901301035'][] = "ALTER TABLE `core_search` ADD `filter` VARCHAR(50) NULL DEFAULT NULL AFTER `keywords`;";
-$updates['201901301035'][] = "ALTER TABLE `core_search` ADD INDEX(`filter`);";
+$updates['201902141322'][] = "ALTER TABLE `core_search` ADD `filter` VARCHAR(50) NULL DEFAULT NULL AFTER `keywords`;";
+$updates['201902141322'][] = "ALTER TABLE `core_search` ADD INDEX(`filter`);";
 
 
-$updates['201901301035'][] = "CREATE TABLE IF NOT EXISTS `core_change_user_modseq` (
+$updates['201902141322'][] = "CREATE TABLE IF NOT EXISTS `core_change_user_modseq` (
   `userId` int(11) NOT NULL,
   `entityTypeId` int(11) NOT NULL,
   `highestModSeq` int(11) NOT NULL DEFAULT 0,
@@ -358,24 +349,24 @@ $updates['201901301035'][] = "CREATE TABLE IF NOT EXISTS `core_change_user_modse
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;";
 
 
-$updates['201901301035'][] = "ALTER TABLE `core_change_user_modseq`
+$updates['201902141322'][] = "ALTER TABLE `core_change_user_modseq`
   ADD CONSTRAINT `core_change_user_modseq_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_change_user_modseq_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;";
 
-$updates['201901301035'][] = "ALTER TABLE `core_customfields_field` CHANGE `databaseName` `databaseName` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;";
+$updates['201902141322'][] = "ALTER TABLE `core_customfields_field` CHANGE `databaseName` `databaseName` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;";
 
-$updates['201901301035'][] = function() {
+$updates['201902141322'][] = function() {
 	$m = new \go\core\install\MigrateCustomFields63to64();
 	$m->convertTypeNames();
 };
 
 
-$updates['201901301035'][] = "UPDATE core_module set sort_order = sort_order + 100 where package != 'core' or package is null;";
+$updates['201902141322'][] = "UPDATE core_module set sort_order = sort_order + 100 where package != 'core' or package is null;";
 
-$updates['201901301035'][] = "ALTER TABLE `core_customfields_select_option` DROP `sortOrder`;";
+$updates['201902141322'][] = "ALTER TABLE `core_customfields_select_option` DROP `sortOrder`;";
 
 //Is either renamed by legacy addressbook module or created here if address book module was not installed.
-$updates['201901301035'][] = "CREATE TABLE IF NOT EXISTS `go_templates` (
+$updates['201902141322'][] = "CREATE TABLE IF NOT EXISTS `go_templates` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL DEFAULT 0,
   `type` tinyint(4) NOT NULL DEFAULT 0,
@@ -387,20 +378,20 @@ $updates['201901301035'][] = "CREATE TABLE IF NOT EXISTS `go_templates` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
 
-$updates['201901301035'][] = "ALTER TABLE `core_group` ADD UNIQUE(`name`);";
+$updates['201902141322'][] = "ALTER TABLE `core_group` ADD UNIQUE(`name`);";
 
 
-$updates['201901301035'][] = function() {	
+$updates['201902141322'][] = function() {	
 	$m = new \go\core\install\MigrateCustomFields63to64();
 	$m->migrateEntity("User");	
 };
 
-$updates['201902121355'][] = "delete from core_setting where moduleId = 0;";
-$updates['201902121355'][] = "update `core_entity` e inner join core_module m on m.id = e.moduleId  set e.moduleId = (select id from core_module where name = 'core' and package='core') where m.package='core';";
-$updates['201902121355'][] = "update `core_setting` e inner join core_module m on m.id = e.moduleId  set e.moduleId = (select id from core_module where name = 'core' and package='core') where m.package='core';";
-$updates['201902121355'][] = "update `core_auth_method` e inner join core_module m on m.id = e.moduleId  set e.moduleId = (select id from core_module where name = 'core' and package='core') where m.package='core';";
-$updates['201902121355'][] = "delete from core_module where package = 'core' and name != 'core';";
+$updates['201902141322'][] = "delete from core_setting where moduleId = 0;";
+$updates['201902141322'][] = "update `core_entity` e inner join core_module m on m.id = e.moduleId  set e.moduleId = (select id from core_module where name = 'core' and package='core') where m.package='core';";
+$updates['201902141322'][] = "update `core_setting` e inner join core_module m on m.id = e.moduleId  set e.moduleId = (select id from core_module where name = 'core' and package='core') where m.package='core';";
+$updates['201902141322'][] = "update `core_auth_method` e inner join core_module m on m.id = e.moduleId  set e.moduleId = (select id from core_module where name = 'core' and package='core') where m.package='core';";
+$updates['201902141322'][] = "delete from core_module where package = 'core' and name != 'core';";
 
 
-$updates['201902121355'][] = "ALTER TABLE `core_change` DROP FOREIGN KEY `core_change_ibfk_2`;";
-$updates['201902121355'][] = "ALTER TABLE `core_change` ADD CONSTRAINT `core_change_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";
+$updates['201902141322'][] = "ALTER TABLE `core_change` DROP FOREIGN KEY `core_change_ibfk_2`;";
+$updates['201902141322'][] = "ALTER TABLE `core_change` ADD CONSTRAINT `core_change_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";

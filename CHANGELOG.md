@@ -1,3 +1,16 @@
+- Core/Files: Fixed display of linked files and folders in the displaypanel.
+- Favorites: Fixed gear icon to manage the favorites.
+- Core: Multiselect grid, Added check if the tools property is given.
+- Tasks/Start page: Put headers back so the startpage widget can be sorted on date.
+- Calendar: Fixed problem that opening event dialog the 2nd time did not work.
+- Core: Don't search in TEXT fields by default
+- Address Book: Removed automatic copy to post address because it makes more sense to 
+  use the button
+- Core: Fixed Combobox display of html entities.
+- Document templates: Fixed linking in new email from template
+- Address book: Added address book name to contact and company detail
+- ActiveSync: Fixed z-push-admin and z-push-top command line utilities
+- Serverclient: Server client stayed inactive if installed before 6.3
 - Core: Fixed error handling in rebuild search cache
 
 12-02-2019 6.3.64

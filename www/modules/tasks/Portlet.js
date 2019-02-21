@@ -14,8 +14,6 @@ GO.tasks.SimpleTasksPanel = function (config)
 		id: 'id'
 	});
 	
-	config.cls = "go-grid3-hide-headers";
-
 	config.store = new Ext.data.GroupingStore({
 		url: GO.url('tasks/portlet/portletGrid'),
 		baseParams: {},

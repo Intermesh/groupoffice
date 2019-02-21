@@ -413,7 +413,7 @@ GO.email.AccountDialog = function(config) {
 
 	//this.permissionsTab.disabled = false;
 	var serverTab = {
-		title: t('Server'),
+		title: t('Server', 'email'),
 		autoScroll: true,
 		visible: (GO.settings.modules.email.write_permission),
 		layout:'table',

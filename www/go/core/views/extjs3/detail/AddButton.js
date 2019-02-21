@@ -46,8 +46,8 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 
 						var dv = this.detailView;
 
-						GO.documenttemplates.emailTemplateDialog.entity = dv.model_name || dv.entity || dv.entityStore.entity.name;
-						GO.documenttemplates.emailTemplateDialog.entityId = dv.model_id ? dv.model_id : dv.currentId;
+						GO.documenttemplates.emailTemplateDialog.entity = this.getEntity();
+						GO.documenttemplates.emailTemplateDialog.entityId = this.getEntityId();
 
 						GO.documenttemplates.emailTemplateDialog.show();
 
@@ -68,8 +68,8 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 
 						var dv = this.detailView;
 
-						GO.documenttemplates.templateDocumentDialog.entity = dv.model_name || dv.entity || dv.entityStore.entity.name;
-						GO.documenttemplates.templateDocumentDialog.entityId = dv.model_id ? dv.model_id : dv.currentId;
+						GO.documenttemplates.templateDocumentDialog.entity = this.getEntity();
+						GO.documenttemplates.templateDocumentDialog.entityId = this.getEntityId();
 
 						GO.documenttemplates.templateDocumentDialog.show();//.show(this.entityId, this.entity);
 
