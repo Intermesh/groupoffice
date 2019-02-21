@@ -2146,22 +2146,30 @@ go.Modules.register("legacy", 'files', {
 	mainPanel: GO.files.FileBrowser,
 	title: t("Files", "files"),
 	iconCls: 'go-tab-icon-files',
-	entities: ["File","Folder"],
-	systemSettingsPanels: ["GO.files.SystemSettingsPanel"],
-	links: [
-		{
-			entity: "File",			
-			linkDetail: function(){
-				return new GO.files.FilePanel();
-			}
-		},
-		{
-			entity: "Folder",
-			linkDetail: function(){
-				return new GO.files.FolderPanel();
-			}
-		}
-	]
+	entities: [{
+			name: "File",
+			links: [
+				{
+					entity: "File",
+					linkDetail: function () {
+						return new GO.files.FilePanel();
+					}
+				}
+
+			]
+		}, {
+			name: "Folder",
+			links: [
+				{
+					entity: "Folder",
+					linkDetail: function () {
+						return new GO.files.FolderPanel();
+					}
+				}
+			]
+		}],
+	systemSettingsPanels: ["GO.files.SystemSettingsPanel"]
+
 });
 
 GO.files.pasteSelections = new Array();

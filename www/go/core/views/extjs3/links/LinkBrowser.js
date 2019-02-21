@@ -141,7 +141,7 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 	
 	getPreviewPanel : function() {
 		
-		var all = go.links.Links.getAll().filter(function(l) {
+		var all = go.Entities.getLinkConfigs().filter(function(l) {
 			return !!l.linkDetail;
 		});
 		

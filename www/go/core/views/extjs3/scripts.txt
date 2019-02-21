@@ -63,7 +63,6 @@ login/LoginPanel.js
 login/RecoveryDialog.js
 
 links/LinkBrowserMenuItem.js
-links/Links.js
 links/CreateLinkButton.js
 links/EntityGrid.js
 links/LinkGrid.js

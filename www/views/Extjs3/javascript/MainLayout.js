@@ -372,8 +372,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			this.loadLegacyModuleScripts()
 		]).then(function(){
 			me.renderUI();
-		}).catch(function(){
-			console.error(arguments);
+		}).catch(function(error){
+			console.error(error);
 		});
 		
 		

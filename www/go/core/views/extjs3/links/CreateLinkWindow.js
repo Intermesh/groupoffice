@@ -4,6 +4,13 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 	modal: true,
 	stateId: "go-create-link-windows",
 	modal: true,
+	
+	
+	//TODO
+	
+	entities: [{}, {}],
+	
+	
 	search: function (v) {
 		
 		var filter = {};

@@ -9,46 +9,49 @@
 		 * 
 		 * @example
 		 * 
-		 * go.Modules.register("community", 'addressbook', {
-		 * 	  mainPanel: GO.addressbook.MainPanel,
-		 * 	  title: t("Address book", "addressbook"),
-		 * 	  iconCls: 'go-tab-icon-addressbook',
-		 * 	  entities: ["Contact", "Company"],
-		 * 	  links: [{
-		 *			/**
-		 *			 * Entity name
-		 *			 *
-		 *			entity: "Contact",
-		 *			
-		 *			/**
-		 *			 * For advanced usage only when search results need to be filtered.
-		 *			 *
-		 *			filter: "isContact",
-		 *			
-		 *			/**
-		 *			 * Opens a dialog to create a new linked item
-		 *			 * 
-		 *			 * @param {string} entity eg. "Note"
-		 *			 * @param {string|int} entityId
-		 *			 * @returns {go.form.Dialog}
-		 *			 *
-		 *			linkWindow: function(entity, entityId) {
-		 *				return new go.modules.community.addressbook.ContactDialog();
-		 *			},
-		 *			
-		 *			/**
-		 *			 * Return component for the detail view
-		 *			 * 
-		 *			 * @returns {go.detail.Panel}
-		 *			 *
-		 *			linkDetail: function() {
-		 *				return new go.modules.community.addressbook.ContactDetail();
-		 *			}	
-		 *		}],
-		 * 	  userSettingsPanels: ["GO.addressbook.SettingsPanel"],
-		 * 	  systemSettingsPanels: ["go.modules.commmunity.addressbook.SystemSettingsPanel"],
-		 * 	  initModule: function () {	
-		 * 	}
+		 * go.Modules.register("community", "addressbook", {
+		 * 	mainPanel: "go.modules.community.addressbook.MainPanel",
+		 * 	title: t("Address book"),
+		 * 	entities: [{
+		 * 			
+		 * 			name: "Contact",
+		 * 			hasFiles: true,
+		 * 			links: [{
+		 * 
+		 * 				filter: "isContact",
+		 * 
+		 * 				iconCls: "entity ic-person",
+		 * 
+		 * 				linkWindow: function(entity, entityId) {
+		 * 					return new go.modules.community.addressbook.ContactDialog();
+		 * 				},
+		 * 					
+		 * 				linkDetail: function() {
+		 * 					return new go.modules.community.addressbook.ContactDetail();
+		 * 				}	
+		 * 			},{
+		 * 			
+		 * 				title: t("Organization"),
+		 * 
+		 * 				iconCls: "entity ic-business",			
+		 * 
+		 * 				filter: "isOrganization",
+		 * 
+		 * 				linkWindow: function(entity, entityId) {
+		 * 					var dlg = new go.modules.community.addressbook.ContactDialog();
+		 * 					dlg.setValues({isOrganization: true});
+		 * 					return dlg;
+		 * 				},
+		 * 				
+		 * 				linkDetail: function() {
+		 * 					return new go.modules.community.addressbook.ContactDetail();
+		 * 				}	
+		 * 			}]
+		 * 			
+		 * 	}, "AddressBook", "AddressBookGroup"],
+		 * 	
+		 * 	systemSettingsPanels: ["go.modules.community.addressbook.SystemSettingsPanel"],
+		 * 	userSettingsPanels: ["go.modules.community.addressbook.SettingsPanel"]
 		 * });
 		 * 
 		 * @param {string} package
@@ -83,8 +86,16 @@
 			}
 
 			if (config.entities) {
-				config.entities.forEach(function (e) {
-					go.Entities.register(package, name, e);
+				config.entities.forEach(function (entity) {
+					
+					if(Ext.isString(entity)) {
+						entity = {name: entity};
+					}
+					
+					entity.package = package;
+					entity.module = name;
+					
+					go.Entities.register(entity);
 				});
 			}
 		},

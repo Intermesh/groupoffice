@@ -2138,18 +2138,20 @@ go.Modules.register("legacy", 'calendar', {
 	mainPanel: GO.calendar.MainPanel,
 	title : t("Calendar", "calendar"),
 	iconCls : 'go-tab-icon-calendar',
-	entities: ["Event", "Calendar"],
-	links: [{
-			entity: "Event",			
-			linkWindow: function() {
-				var win = new GO.calendar.EventDialog();
-				win.win.closeAction = "close";
-				return win;
-			},
-			linkDetail: function() {
-				return new GO.calendar.EventPanel();
-			}	
-	}],
+	entities: [{
+			hasFiles: true,
+			name: "Event",
+			links: [{
+				linkWindow: function() {
+					var win = new GO.calendar.EventDialog();
+					win.win.closeAction = "close";
+					return win;
+				},
+				linkDetail: function() {
+					return new GO.calendar.EventPanel();
+				}	
+		}]
+	}, "Calendar"],
 	userSettingsPanels: ["GO.calendar.SettingsPanel"],
 	systemSettingsPanels: ["GO.calendar.SystemSettingsPanel"]
 	

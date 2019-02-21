@@ -143,7 +143,7 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 			'-'
 		];
 
-		go.links.Links.getAll().filter(function(l) {
+		go.Entities.getLinkConfigs().filter(function(l) {
 			return !!l.linkWindow;
 		}).forEach(function (l) {
 

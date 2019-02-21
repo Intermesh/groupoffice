@@ -150,13 +150,13 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 					return true;
 				}
 
-				if (!types[f.type.entity]) {
-					types[f.type.entity] = [];
+				if (!types[f.type.entity.name]) {
+					types[f.type.entity.name] = [];
 				}
 
 				keys.forEach(function (key) {
-					if (types[f.type.entity].indexOf(key) === -1) {
-						types[f.type.entity].push(key);
+					if (types[f.type.entity.name].indexOf(key) === -1) {
+						types[f.type.entity.name].push(key);
 					}
 				});
 			});

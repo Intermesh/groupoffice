@@ -525,18 +525,21 @@ go.Modules.register("legacy", 'tasks', {
 	mainPanel: GO.tasks.MainPanel,
 	title: t("Tasks", "tasks"),
 	iconCls: 'go-tab-icon-tasks',
-	entities: ['Task'],
-	links: [{
-			entity: "Task",			
-			linkWindow: function() {
-				var win = new GO.tasks.TaskDialog();
-				win.win.closeAction = "close";
-				return win;
-			},
-			linkDetail: function() {
-				return new GO.tasks.TaskPanel();
-			}	
+	entities: [{
+			name: 'Task',
+			hasFiles: true,
+			links: [{
+					linkWindow: function() {
+						var win = new GO.tasks.TaskDialog();
+						win.win.closeAction = "close";
+						return win;
+					},
+					linkDetail: function() {
+						return new GO.tasks.TaskPanel();
+					}	
+			}]
 	}],
+	
 	userSettingsPanels: ["GO.tasks.SettingsPanel"],
 	systemSettingsPanels: ["GO.tasks.SystemSettingsPanel"]
 });

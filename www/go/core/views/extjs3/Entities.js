@@ -15,42 +15,59 @@
      * go.Stores.get("name")]
      * go.Entities.get(name)
      * 
-     * @param {string} package
-     * @param {string} module
-		 * @param {string} name
+		 * @param {object} cfg
 		 * 
      * @returns {undefined}
      */
-    register: function (package, module, name) {	
-			
-			if(!name) {
+    register: function (cfg) {	
+			if(!cfg.name) {
 				throw "Invalid entity registered. 'name' property is required.";
 			}
 			
-			var lcName = name.toLowerCase();
+			var lcName = cfg.name.toLowerCase();
 			
       if(entities[lcName]) {
         throw "Entity name is already registered by module " +entities[lcName]['package'] + "/" + entities[lcName]['module'];
       }
+			
+			if(!cfg.title) {
+				cfg.title = t(cfg.name);
+			}
+			
+			if(!cfg.links) {
+				cfg.links = [];
+			}			
+			
+			cfg.links.forEach(function(l) {
+				
+				l.entity = cfg.name;
+				
+				if(!l.title) {
+					l.title = cfg.title;
+				}
+				if(!l.iconCls) {
+					l.iconCls = "entity " + l.entity;
+				}
+			});
+			
       
-      entities[lcName] = {     
-				name: name,
-        module: module,
-        package: package,
-				title: t(name),
+      entities[lcName] = Ext.apply(cfg, {     				
 				getRouterPath : function (id) {
 					return lcName + "/" + id;
 				},
         goto: function (id) {
           go.Router.goto(this.getRouterPath(id));
         }			
-      };
+      });
 			
 			//these datatypes will be prefetched by go.data.EntityStoreProxy.fetchEntities()
 			// Key can also be a function that is called with the record data.
-			go.data.types[name] = {
+			go.data.types[cfg.name] = {
+				entity: cfg,
+				sortType: Ext.data.SortTypes.none,
+				type: "entity",
 				convert: function (v, data) {
-					var key = this.type.getKey.call(this, data);
+					var key = this.type.getKey.call(this, data), entity = this.type.entity;
 					
 					if(!key) {
 						return null;
@@ -60,18 +77,18 @@
 					if(Ext.isArray(key)) {
 						var e = [];
 						key.forEach(function(k) {
-							if(go.Stores.get(name).data[k]) {
-								e.push(go.Stores.get(name).data[k]);
+							if(go.Stores.get(entity.name).data[k]) {
+								e.push(go.Stores.get(entity.name).data[k]);
 							} else
 							{
-								console.error("Key " + k + " not found in store " + name);
+								console.error("Key " + k + " not found in store " + entity.name);
 							}
 						});
 						
 						return e;
 					} else
 					{
-						return go.Stores.get(name).data[key];	
+						return go.Stores.get(entity.name).data[key];	
 					}
 
 				},
@@ -106,10 +123,8 @@
 						return data;
 						
 					}
-				},
-				sortType: Ext.data.SortTypes.none,
-				type: "entity",
-				entity: name
+				}
+								
 			};
     },
 
@@ -137,6 +152,8 @@
 		/**
 		 * Get all entity objects
 		 * 
+		 * This function will check module availability for the current user.
+		 * 
 		 * @see get(); 
 		 * @returns {Object[]}
 		 */
@@ -149,7 +166,23 @@
 			}
 			
 			return e;
-    }
+    },
+		
+		
+		getLinkConfigs : function() {
+			var linkConfigs = [];	
+
+
+			go.Entities.getAll().forEach(function (m) {					
+				linkConfigs = linkConfigs.concat(m.links);			
+			});	
+
+			linkConfigs.sort(function (a, b) {
+				return a.title.localeCompare(b.title);
+			});
+
+			return linkConfigs;
+		}
   };
   
   
