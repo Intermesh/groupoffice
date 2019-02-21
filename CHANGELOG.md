@@ -1,3 +1,6 @@
+- Core: Don't search in TEXT fields by default
+- Address Book: Removed automatic copy to post address because it makes more sense to 
+  use the button
 - Core: Fixed Combobox display of html entities.
 - Document templates: Fixed linking in new email from template
 - Address book: Added address book name to contact and company detail
