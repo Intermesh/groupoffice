@@ -17,6 +17,8 @@ go.grid.EditorGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {
 		
 		Ext.applyIf(this, go.grid.GridTrait);
 		this.initGridTrait();
+		Ext.applyIf(this, go.panels.ScrollLoader);
+		this.initScrollLoader();
 	}
 
 });
