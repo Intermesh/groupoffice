@@ -139,7 +139,7 @@ go.links.getDetailPanels = function() {
 			return false;
 		}
 
-		return !!e.linkWindow;
+		return e.linkable;
 	});
 				
 	linkableEntitities.sort(function(a, b) {

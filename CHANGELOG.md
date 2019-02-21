@@ -1,3 +1,4 @@
+- Core/Files: Fixed display of linked files and folders in the displaypanel.
 - Favorites: Fixed gear icon to manage the favorites.
 - Core: Multiselect grid, Added check if the tools property is given.
 - Tasks/Start page: Put headers back so the startpage widget can be sorted on date.

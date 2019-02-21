@@ -2152,10 +2152,28 @@ go.Modules.register("legacy", 'files', {
 	iconCls: 'go-tab-icon-files',
 	entities: [{
 			name: "File",
-			linkable: true
+			linkable: true,
+				
+			/**
+			 * Return component for the detail view
+			 * 
+			 * @returns {go.panels.DetailView}
+			 */
+			linkDetail: function() {
+				return new GO.files.FilePanel();
+			}	
 	}, {
 		name: "Folder",
-		linkable: true
+		linkable: true,
+			
+			/**
+			 * Return component for the detail view
+			 * 
+			 * @returns {go.panels.DetailView}
+			 */
+			linkDetail: function() {
+				return new GO.files.FolderPanel();
+			}	
 	}],
 	initModule: function () {	
 		
