@@ -1,3 +1,4 @@
+- Tasks/Start page: Put headers back so the startpage widget can be sorted on date.
 - Calendar: Fixed problem that opening event dialog the 2nd time did not work.
 - Core: Don't search in TEXT fields by default
 - Address Book: Removed automatic copy to post address because it makes more sense to 
