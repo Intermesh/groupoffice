@@ -15,6 +15,10 @@ class Textarea extends Text{
 		return "TEXT NULL";
 	}
 	
+	public function hasLength() {
+		return true;
+	}
+	
 	public function selectForGrid(){
 		return false;
 	}
