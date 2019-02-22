@@ -166,16 +166,16 @@ class Language extends Controller {
 	 * @param type $params
 	 * @throws \Exception
 	 */
-	public function import($params) {
-		$file = new File($params['path']);
+	public function import($path) {
+		$file = new File($path);
 
 		if (!$file->exists()) {
-			throw new \Exception("File not found " . $params['path']);
+			throw new \Exception("File not found " . $path);
 		}
 		$this->handle = $file->open("r");
 
 		if (!$this->handle) {
-			throw new \Exception("Could not open " . $params['path']);
+			throw new \Exception("Could not open " . $path);
 		}
 
 		$headers = fgetcsv($this->handle,0, self::DELIMITER, self::ENCLOSURE);
