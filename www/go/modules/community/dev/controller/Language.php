@@ -150,6 +150,22 @@ class Language extends Controller {
 		}
 	}
 
+	/**
+	 * To import run:
+	 * 
+	 * ```
+	 * php cli.php community/dev/Language/import --path=/path/to/lang.csv
+	 * ```
+	 * 
+	 * or with docker compose:
+	 * 
+	 * ```
+	 * docker-compose exec --user www-data groupoffice php cli.php community/dev/Language/import --path=/path/to/lang.csv
+	 * ```
+	 * 
+	 * @param type $params
+	 * @throws \Exception
+	 */
 	public function import($params) {
 		$file = new File($params['path']);
 
