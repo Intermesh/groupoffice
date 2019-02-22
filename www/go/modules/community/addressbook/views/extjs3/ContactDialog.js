@@ -6,6 +6,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 	entityStore: "Contact",
 	width: dp(800),
 	height: dp(1000),
+	modal: false,
 	defaults: {
 		labelWidth: dp(140)
 	},
