@@ -896,7 +896,15 @@ Ext.override(Ext.menu.Item ,{
             altText: this.altText || '',
             iconStyle: this.iconStyle || ''
         };
-    }
+    },
+		origOnRender: Ext.menu.Item.prototype.onRender,
+		onRender : function(container, position){
+			this.origOnRender.call(this, container, position);
+		
+			//tpl has been overridden and there's no img tag anymore. Without this setIconCls doesn't work.
+			this.iconEl = this.iconEl = this.el.child('span.x-menu-item-icon');
+		}		
+		
  });
 
 Ext.menu.Item.prototype.itemTpl = new Ext.XTemplate(
