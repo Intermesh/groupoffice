@@ -300,6 +300,11 @@ views/Extjs3/javascript/go/PasswordPrompt.js
 
 views/Extjs3/javascript/go/QRCodeComponent.js
 
+views/Extjs3/javascript/go/util.js
+views/Extjs3/javascript/go/util/Format.js
+views/Extjs3/javascript/go/util/Cookies.js
+
+
 views/Extjs3/javascript/go/User.js
 views/Extjs3/javascript/go/String.js
 
@@ -313,8 +318,6 @@ views/Extjs3/javascript/go/systemsettings/AppearancePanel.js
 views/Extjs3/javascript/go/systemsettings/NotificationsPanel.js
 views/Extjs3/javascript/go/systemsettings/AuthenticationPanel.js
 views/Extjs3/javascript/go/systemsettings/Dialog.js
-views/Extjs3/javascript/go/util.js
-views/Extjs3/javascript/go/util/Format.js
 
 views/Extjs3/javascript/go/Wizard.js
 views/Extjs3/javascript/go/Array.js

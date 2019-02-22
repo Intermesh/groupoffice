@@ -1,5 +1,5 @@
 go.User = {
-	accessToken: localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken'),
+	accessToken: go.util.Cookies.get('accessToken'),
 	authenticate: function(cb, scope) {
 		if(!this.accessToken) {
 			return;
@@ -14,8 +14,19 @@ go.User = {
 	
 	clearAccessToken : function() {
 		this.accessToken = null;
-		localStorage.removeItem('accessToken');
-		sessionStorage.removeItem('accessToken');
+		go.util.Cookies.unset('accessToken');
+	},
+	
+	setAccessToken : function(accessToken, remember) {
+		var expires = null;
+		
+		if(remember) {
+			debugger;
+			expires = new Date();
+			expires.setFullYear(expires.getFullYear() + 1);
+		}
+		
+		go.util.Cookies.set('accessToken', accessToken, expires);
 	},
   
   loadSession : function(session) {

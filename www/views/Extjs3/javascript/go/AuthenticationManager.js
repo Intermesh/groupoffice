@@ -180,20 +180,18 @@
 		},
 
 		onAuthenticated: function (result) {
-			var storage = go.AuthenticationManager.rememberLogin ? 'localStorage' : 'sessionStorage';
-			window[storage].setItem('accessToken', result.accessToken);
+			
+			go.User.setAccessToken(result.accessToken, go.AuthenticationManager.rememberLogin);
 			
 			if (GO.loginDialog) {
 				GO.loginDialog.close();
 			}
       
-      go.User.loadSession(result);
-			
-			
+      go.User.loadSession(result);			
 
 			Ext.Ajax.defaultHeaders['Authorization'] = 'Bearer ' + result.accessToken;
 			
-			document.cookie = "accessToken=" + result.accessToken;
+			//document.cookie = "accessToken=" + result.accessToken;
 
 			this.fireEvent("authenticated", this, result);
 			
