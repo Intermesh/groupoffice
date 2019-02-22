@@ -1,3 +1,6 @@
+- Sync: Fixed ticket #201715362. All day event one day short on android.
+- Email/files: Fixed ticket #201918173. File browser didn't reset.
+- Billing: Fixed months in search bar of billing
 - Core: Use cookie to store authentication token to make it available in new opened tabs / windows
 - Customfields: Make the "Max. number of characters:" field usable for textarea customfields too.
 - Savemailas: Fixed issue that "Save as"->"File to item" link window also showed entities that did not have file support.
