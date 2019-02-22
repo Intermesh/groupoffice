@@ -107,7 +107,7 @@ if(!class_exists('GO'))
 	//note: you can't use z-push constants in the GO config file!
 	//use 16 for debug or 32 for wbxml
 	if(!isset(\GO::config()->zpush2_loglevel)){
-		\GO::config()->zpush2_loglevel=LOGLEVEL_OFF;
+		\GO::config()->zpush2_loglevel = \GO::config()->debug ? LOGLEVEL_DEBUG : LOGLEVEL_OFF;
 	}
     define('LOGBACKEND', 'filelog');
 	define('LOGLEVEL', LOGLEVEL_OFF);
