@@ -21,7 +21,6 @@ go.User = {
 		var expires = null;
 		
 		if(remember) {
-			debugger;
 			expires = new Date();
 			expires.setFullYear(expires.getFullYear() + 1);
 		}
