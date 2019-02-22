@@ -23,12 +23,14 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 		var expires = null;
 		
 		if(remember) {
-			debugger;
 			expires = new Date();
 			expires.setFullYear(expires.getFullYear() + 1);
 		}
 		
 		go.util.Cookies.set('accessToken', accessToken, expires);
+		
+		Ext.Ajax.defaultHeaders['Authorization'] = 'Bearer ' + accessToken;
+		
 	},
   
   loadSession : function(session) {

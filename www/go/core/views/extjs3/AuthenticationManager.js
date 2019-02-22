@@ -195,12 +195,9 @@
 			
 			if (GO.loginDialog) {
 				GO.loginDialog.close();
-			}
-      
+			}			
       go.User.loadSession(result);			
-
-			Ext.Ajax.defaultHeaders['Authorization'] = 'Bearer ' + result.accessToken;
-
+			
 			this.fireEvent("authenticated", this, result);
 			
 			GO.mainLayout.onAuthentication();
