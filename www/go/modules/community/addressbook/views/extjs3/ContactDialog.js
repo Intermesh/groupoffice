@@ -85,6 +85,10 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 			}
 		});
 		
+		this.on('destroy', function() {
+			this.nameMenu.destroy();
+		}, this);
+		
 		return this.nameMenu;
 	},
 
