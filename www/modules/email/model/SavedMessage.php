@@ -283,7 +283,7 @@ class SavedMessage extends ComposerMessage {
 			}
 		}
 		return false;
-	}
+	}	
 
 //	protected function _getAttachedImages($mimeNode) {
 //		$imageInfos = array();

@@ -321,9 +321,9 @@ $filetype: (
 		background-repeat: no-repeat;
 		background-position: top left;
 		white-space: nowrap;		
-		padding-left: dp(24);
+		padding-left: dp(32);		
 		line-height: dp(24);
-		margin: dp(8) 0;
+		margin: dp(8) dp(16) dp(8) 0;
 		display: inline-block;
 	}
 }

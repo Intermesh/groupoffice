@@ -31,6 +31,12 @@
 	margin-bottom:20px;
 }
 
+.em-links .go-icon-list{
+	display: inline-block;	
+	margin-left: -15px;
+}
+
+
 .em-spam-move-block {
 	float:right;
 	color: lightgray;

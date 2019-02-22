@@ -169,6 +169,11 @@
     },
 		
 		
+		/**
+		 * Get link configurations as degined in Module.js with go.Modules.register();
+		 * 
+		 * @returns {Array}
+		 */
 		getLinkConfigs : function() {
 			var linkConfigs = [];	
 

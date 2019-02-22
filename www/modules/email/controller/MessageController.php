@@ -1465,24 +1465,12 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if(!$plaintext){
 			$linkedModels = $imapMessage->getLinks();
 			$response['links'] = array();
-			$linkHtml = '';
 			foreach($linkedModels as $linkedModel){
-				$response['links'][] = $linkedModel->getAttributes();
-				
+				$link = $linkedModel->getAttributes();				
 				$entityType = \go\core\orm\EntityType::findById($linkedModel->entityTypeId);
-//				$modelCssClass = 'go-model-icon-'.$entityType->getName().' entity '.$entityType->getName();
-				$route = strtolower($entityType->getName()) .'/'.$linkedModel->entityId;
-				
-				$linkHtml .= '<a class="em-link-link" href="#'.$route.'"><i class="entity '.$entityType->getName().'"></i> <span>'.$linkedModel->name.'</span></a>,';
-			}
-			$response['links']['count'] = count($response['links']);
-
-			if($response['links']['count'] > 0){
-				$linkHtml = trim($linkHtml,' ,');
-				$response['htmlbody']='<div class="em-link-message">'.
-					sprintf(GO::t("This mail is linked to %s item(s): %s", "email"),$response['links']['count'],$linkHtml).'</div>'.
-					$response['htmlbody'];
-			}
+				$link['entity'] = $entityType->getName();
+				$response['links'][] = $link;				
+			}			
 		}
 		// END OF Handle the links div in the email display panel
 		

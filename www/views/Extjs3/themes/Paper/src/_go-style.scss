@@ -1080,6 +1080,13 @@ button.filetype-pdf, button.filetype-doc {
 			}
 		}
 		
+		label {
+			@extend %font-caption;
+			width:100%;
+			display: block;
+			line-height: dp(16);
+		}
+		
 	}
 	.right {
 		top: dp(8);

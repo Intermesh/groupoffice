@@ -84,7 +84,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			'<tpl if="attachments.length">'+
 			'<div style="clear:both;"></div>'+
 			'<table>'+
-			'<tr><td><b>'+t("Attachments", "email")+':</b></td></tr><tr><td id="'+this.attachmentsId+'">'+
+			'<tr><td><h5>'+t("Attachments", "email")+'</h5></td></tr><tr><td id="'+this.attachmentsId+'">'+
 			'<tpl for="attachments">'+
 				'<tpl if="extension==\'vcf\'">';
 				templateStr += '<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}">{name:htmlEncode} ({human_size})</a> ';
@@ -103,11 +103,24 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				'<i class="icon ic-more-vert" id="downloadAllMenu-'+this.downloadAllMenuId +'"></i>'+
 //				'<a class="filetype-link btn-expand-more" id="downloadAllMenu" ></a>'+
 			'</tpl>'+
+							
+							
+			
 			
 			'</td></tr>'+
 			'</table>'+
-			'</tpl>'+
+			'</tpl>'+			
 			'<div style="clear:both;"></div>'+
+			
+			'<tpl if="links.length">'+
+				'<h5>'+t("Links")+'</h5>'+
+				'<div class="em-links">'+
+				'<tpl for="links">'+
+					'<div class="go-icon-list"><p><i class="label entity {[this.linkIconCls(values)]}"></i> <a href="#{entity}/{model_id}">{name}</a> <label>{description}</label></p></div>'+
+				'</tpl>'+
+			'</div></tpl>'+
+			
+			
 			'<tpl if="blocked_images&gt;0">'+
 			'<div class="go-warning-msg em-blocked">'+t("{blocked_images} external images were blocked for your security.", "email")+' <a id="em-unblock-'+this.bodyId+'" class="normal-link">'+t("Click here to unblock them", "email")+'</a></div>'+
 			'</tpl>'+
@@ -190,6 +203,23 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 		this.template = new Ext.XTemplate(templateStr,{
 
+			linkIconCls : function(link) {
+				console.log(link);
+				var linkConfig = go.Entities.getLinkConfigs().find(function(cfg) {
+					console.log(cfg);
+					if(link.entity != cfg.entity) {
+						return false;
+					}
+					
+					if(link.filter != cfg.filter) {
+						return false;
+					}
+					
+					return true;
+				});
+				
+				return linkConfig ? linkConfig.iconCls : "";
+			},
 			addSlashes : function(str)
 			{
 				str = GO.util.html_entity_decode(str, 'ENT_QUOTES');
