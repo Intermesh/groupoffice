@@ -1,3 +1,4 @@
+- Core: Use cookie to store authentication token to make it available in new opened tabs / windows
 - Customfields: Make the "Max. number of characters:" field usable for textarea customfields too.
 - Savemailas: Fixed issue that "Save as"->"File to item" link window also showed entities that did not have file support.
 - Core/Links: Added "entities" property to filter the list of entities in the link window.
