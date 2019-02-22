@@ -58,6 +58,12 @@ class Language extends Controller {
 
 		foreach ($packageFolders as $packageFolder) {
 			foreach ($packageFolder->getFolders() as $moduleFolder) {
+				
+				if(!$moduleFolder->exists()){
+					//broken symlink
+					continue;
+				}
+				
 				$files = $moduleFolder->find("/.*\.js/");
 				$strings = [];
 				foreach ($files as $file) {
@@ -89,7 +95,7 @@ class Language extends Controller {
 		$this->writeStrings("core", "core", $core, "*");
 
 		//todo, this is refsactored in master
-		$blob = Blob::fromTmp($csvFile->getPath());
+		$blob = Blob::fromTmp($csvFile);
 		$blob->type = "text/csv";
 		$blob->name = "lang.csv";
 		$blob->modified = time();
