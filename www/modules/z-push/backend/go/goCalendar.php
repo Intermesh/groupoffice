@@ -65,6 +65,12 @@ class goCalendar extends GoBaseBackendDiff {
 		$message->uid = $event->uuid;
 		$message->location = $event->location;
 		$message->endtime = $event->end_time;
+		
+		if($event->all_day_event) {
+			//correction because GO saves till 23:59
+			$message->endtime += 60;
+		}
+		
 		$message->busystatus = $event->busy == 1 ? "2" : "0";
 		
 		if(!$event->is_organizer)
@@ -130,7 +136,7 @@ class goCalendar extends GoBaseBackendDiff {
 
 		$this->_handleParticipants($event, $message);
 
-//		ZLog::Write(LOGLEVEL_DEBUG, 'MESSAGE '.var_export($message,true));
+		//ZLog::Write(LOGLEVEL_DEBUG, 'MESSAGE '.var_export($message,true));
 		return $message;
 	}
 
