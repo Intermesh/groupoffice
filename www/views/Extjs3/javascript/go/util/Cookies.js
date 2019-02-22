@@ -13,8 +13,12 @@ go.util.Cookies = {
 	set: function (name, value, expires) {		
 		if (expires) {			
 			expires = "; expires=" + expires.toUTCString();
+		} else
+		{
+			expires = "";
 		}
-		document.cookie = "go-" + name + "=" + (value || "") + expires + "; path=/";
+		
+		document.cookie = name + "=" + (value || "") + expires + "; path=/";
 	},
 	
 	/**
@@ -24,7 +28,7 @@ go.util.Cookies = {
 	 * @returns {string}
 	 */
 	get: function (name) {
-		var nameEQ = "go-" + name + "=";
+		var nameEQ = name + "=";
 		var ca = document.cookie.split(';');
 		for (var i = 0; i < ca.length; i++) {
 			var c = ca[i];
@@ -43,6 +47,6 @@ go.util.Cookies = {
 	 * @returns {void}
 	 */
 	unset: function (name) {
-		document.cookie = "go-" + name + '=; Max-Age=-99999999;';
+		document.cookie = name + '=; Max-Age=-99999999;';
 	}
 }
