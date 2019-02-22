@@ -1,4 +1,11 @@
 go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
+	
+	/**
+	 * Provide the entities to show in the list here
+	 * When not provided, the list will show all entities
+	 */
+	entities: null,
+	
 	viewConfig: {
 		forceFit: true,
 		autoFill: true
@@ -9,9 +16,15 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 
 	constructor: function (config) {
 
+		config = config || {};
+		
+		if(config.entities){
+			this.entities = config.entities;
+		}
+
 		var selModel = new Ext.grid.CheckboxSelectionModel();
 
-		var data = [], allEntities = go.Entities.getLinkConfigs(), id;
+		var data = [], allEntities = this.entitiies ? this.entities : go.Entities.getLinkConfigs(), id;
 		
 		allEntities.forEach(function(link){			
 			id = link.entity;
@@ -52,8 +65,6 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 		});
 
 		config.store.sort('name', 'ASC');
-console.log(config.store);
-		
 
 		go.links.EntityGrid.superclass.constructor.call(this, config);
 		

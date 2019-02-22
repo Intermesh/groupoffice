@@ -3,13 +3,12 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 	entityId: null,
 	modal: true,
 	stateId: "go-create-link-windows",
-	modal: true,
 	
-	
-	//TODO
-	
-	entities: [{}, {}],
-	
+	/**
+	 * Provide the entities to show in the list here
+	 * When not provided, the list will show all entities
+	 */
+	entities : null,
 	
 	search: function (v) {
 		
@@ -59,7 +58,8 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 		this.entityGrid = new go.links.EntityGrid({
 			width: dp(200),
 			region:"west",
-			savedSelection: "link"
+			savedSelection: "link",
+			entities:this.entities
 		});
 		
 		this.entityGrid.getSelectionModel().on('selectionchange', function (sm) {

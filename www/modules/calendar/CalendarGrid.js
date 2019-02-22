@@ -689,7 +689,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 	{
 		var snap = this.getSnap();
 		var gridPosition = this.gridTable.getXY();
-	console.log(x, gridPosition[0], snap['x'], (x-gridPosition[0]-40)/snap["x"]);
+//	console.log(x, gridPosition[0], snap['x'], (x-gridPosition[0]-40)/snap["x"]);
 		return Math.floor((x-gridPosition[0]-40)/snap["x"]);
 	},
 	startSelection : function (e){

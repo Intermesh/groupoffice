@@ -79,6 +79,11 @@ PasswordPrompt.js
 
 QRCodeComponent.js
 
+util.js
+util/Format.js
+util/Filters.js
+util/Cookies.js
+
 User.js
 String.js
 
@@ -95,9 +100,6 @@ systemsettings/AppearancePanel.js
 systemsettings/NotificationsPanel.js
 systemsettings/AuthenticationPanel.js
 systemsettings/Dialog.js
-util.js
-util/Format.js
-util/Filters.js
 
 Wizard.js
 Array.js

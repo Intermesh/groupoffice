@@ -542,7 +542,7 @@ GO.email.AccountDialog = function(config) {
 				}
 				this.aliasesDialog.show(this.account_id);
 			},
-			visible: (GO.settings.modules.email.write_permission || !GO.email.disableAliases),
+			hidden: (!GO.settings.modules.email.write_permission || GO.email.disableAliases),
 			scope : this
 		}),{
 			iconCls : 'btn-folder',
