@@ -113,12 +113,12 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 					<hr class="indent">\
 					<tpl if="formatted_address">\
 						<p class="s6"><i class="icon label">home</i>\
-							<span>{address}<br>\
+							<a href="{google_maps_link}" target="_blank">{address}<br>\
 							<tpl if="address_no">{address_no}<br></tpl>\
 							<tpl if="zip">{zip}<br></tpl>\
 							<tpl if="city">{city}<br></tpl>\
 							<tpl if="state">{state}<br></tpl>\
-							<tpl if="country">{[t("countries")[values.country]]}</tpl></span>\
+							<tpl if="country">{[t("countries")[values.country]]}</tpl></a>\
 							<label>' + t("Private address", "addressbook") + '</label>\
 						</p>\
 					</tpl>\
