@@ -525,7 +525,7 @@ class Contact extends AclItemEntity {
 			$organizationIds = $this->getOrganizationIds();
 			
 			if(!empty($organizationIds)) {
-				$orgStr = ': '.implode(', ', Contact::find()->selectSingleValue('name')->where(['id' => $organizationIds])->all());
+				$orgStr = ' - '.implode(', ', Contact::find()->selectSingleValue('name')->where(['id' => $organizationIds])->all());
 			}
 		}
 		return $addressBook->name . $orgStr;
