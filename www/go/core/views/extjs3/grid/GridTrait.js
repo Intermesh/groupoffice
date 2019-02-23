@@ -1,10 +1,10 @@
 go.grid.GridTrait = {
-	/**
-	 * If the end of the list is within this number of pixels it will request the next page	
-	 */
-	scrollBoundary: 300,
-	
-	pageSize: 20,
+//	/**
+//	 * If the end of the list is within this number of pixels it will request the next page	
+//	 */
+//	scrollBoundary: 300,
+//	
+//	pageSize: 20,
 	
 	scrollUp: false,  // set to true when you need to loadMore when scrolling up
 	

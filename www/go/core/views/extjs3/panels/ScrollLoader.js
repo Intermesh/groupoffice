@@ -8,7 +8,7 @@ go.panels.ScrollLoader = {
 	
 	scrollBoundary: 300,
 	
-	pageSize: 30,
+	pageSize: 20,
 	
 	scrollUp: false,  // set to true when you need to loadMore when scrolling up
 	
@@ -62,7 +62,6 @@ go.panels.ScrollLoader = {
 	loadMore: function () {
 		
 		var store = this.store;
-
 		if (this.allRecordsLoaded || this.store.loading){
 			return;
 		}		
@@ -79,6 +78,7 @@ go.panels.ScrollLoader = {
 				store.load(o);
 			}
 		} else {
+
 			if ((this.slScroller.offsetHeight + this.slScroller.scrollTop + this.scrollBoundary) >= this.slBody.offsetHeight) {
 				var o = store.lastOptions ? GO.util.clone(store.lastOptions) : {};
 				o.add = true;

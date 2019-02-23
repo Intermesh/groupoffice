@@ -106,16 +106,19 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		if(this.entityStore) {			
 			this.initEntityStore();
 		}
+		
+		// It's important to realize that if other components register an on load 
+		// listener this.loading will be false. Because this is the first event listener.
+		// ScrollLoader depends on this!
+		this.on("load", function() {
+			this.loading = false;
+			this.loaded = true;
+		}, this);
 	},
 	
 	
 	load : function(params) {
-		this.loading = true;
-		
-		this.on("load", function() {
-			this.loading = false;
-			this.loaded = true;
-		}, this, {single: true});
+		this.loading = true;	
 		
 		return go.data.Store.superclass.load.call(this, params);		
 		
