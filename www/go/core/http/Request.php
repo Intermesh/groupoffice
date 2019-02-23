@@ -239,7 +239,15 @@ class Request extends Singleton{
 	 * @return boolean
 	 */
 	public function isHttps() {
-		return !empty($_SERVER['HTTPS']) && strcasecmp($_SERVER['HTTPS'], 'off');
+		if(!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) != 'off') {
+			return true;
+		}
+		
+		if(!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') {
+			return true;
+		}
+		
+		return false;
 	}
   
   /**
