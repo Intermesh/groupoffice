@@ -604,7 +604,7 @@ class User extends Entity {
 	public function legacyOnSave() {
 		//for old framework. Remove when all is refactored!
 		$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels($this->id);			
-		$user = LegacyUser::model()->findByPk($this->id);
+		$user = LegacyUser::model()->findByPk($this->id, false, true);
 		foreach($defaultModels as $model){
 			$model->getDefault($user);
 		}
@@ -687,7 +687,7 @@ class User extends Entity {
 	
 	
 	public function legacyOnDelete() {
-		$user = LegacyUser::model()->findByPk($this->id);
+		$user = LegacyUser::model()->findByPk($this->id, false, true);
 		LegacyUser::model()->fireEvent("beforedelete", [$user, true]);
 		//delete all acl records		
 		$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels();

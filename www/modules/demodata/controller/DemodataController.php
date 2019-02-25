@@ -205,7 +205,7 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 			$elmer->displayName = 'Elmer Fudd';
 			$elmer->email = 'elmer@acmerpp.demo';
 			$elmer->password='demopass';
-			if ($elmer->save()) {
+			if ($elmer->save(true)) {
 				
 				//make sure he's member of the internal group.
 				$internalUserGroup->addUser($elmer->id);
@@ -229,7 +229,7 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 			$demo->displayName = 'Demo User';
 			$demo->email = 'demo@acmerpp.demo';
 			$demo->password='demopass';
-			if ($demo->save()) {
+			if ($demo->save(true)) {
 				
 				//make sure he's member of the internal group.
 				$internalUserGroup->addUser($demo->id);
@@ -252,7 +252,7 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 			$linda->email = 'linda@acmerpp.demo';
 			$linda->password='demopass';
 							
-			if ($linda->save()) {
+			if ($linda->save(true)) {
 				
 				//make sure she's member of the internal group.
 				$internalUserGroup->addUser($linda->id);
@@ -1087,6 +1087,7 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 				$expense = new \GO\Projects2\Model\Expense();				
 				$expense->description='Rocket fuel';
 				$expense->project_id=$rocketProject->id;
+				$expense->invoice_id = "1234";
 				$expense->nett=3000;
 				$expense->save();
 				
@@ -1094,6 +1095,7 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 				$expense = new \GO\Projects2\Model\Expense();				
 				$expense->expense_budget_id=$expenseBudget->id;
 				$expense->description='Fuse machine';
+				$expense->invoice_id = "1235";
 				$expense->project_id=$rocketProject->id;
 				$expense->nett=2000;
 				$expense->save();
