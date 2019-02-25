@@ -42,7 +42,7 @@ class Widget extends \GO\Site\Components\Widget {
 		}
 
 		
-		$result .= $this->form->beginForm();
+		$result .= $this->form->beginForm("#contact");
 
 		$result .= $this->form->textField($this->formModel, 'email', $this->emailFieldOptions);
 		$result .= $this->form->error($this->formModel, 'email');
