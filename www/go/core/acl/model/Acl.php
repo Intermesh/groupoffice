@@ -74,6 +74,13 @@ class Acl extends Property {
 				
 				$this->addGroup($groupId, self::LEVEL_MANAGE);
 			}
+		} else
+		{
+			$adminLevel = $this->hasGroup(Group::ID_ADMINS);
+			if($adminLevel < self::LEVEL_MANAGE) {
+				$this->removeGroup(Group::ID_ADMINS);
+				$this->addGroup(Group::ID_ADMINS, self::LEVEL_MANAGE);
+			}
 		}
 		
 		return parent::internalSave();
@@ -113,6 +120,22 @@ class Acl extends Property {
 		});
 		
 		return $this;
+	}
+	
+	/**
+	 * Check if this ACL has a group
+	 * 
+	 * @param int $groupId
+	 * @return boolean|int Level
+	 */
+	public function hasGroup($groupId) {
+		foreach($this->groups as $group) {
+			if($group->groupId == $groupId) {
+				return $group->level;
+			}
+		}
+		
+		return false;
 	}
 	
 	/**
