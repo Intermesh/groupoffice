@@ -476,19 +476,11 @@ class Contact extends AclItemEntity {
 		
 		if(!isset($this->organizationIds)) {
 			
-//			$query = GO()->getDbConnection()->select('toId')->from('core_link', 'l')
-//							->join('addressbook_contact', 'c','c.id=l.toId and l.toEntityTypeId = '.self::getType()->getId())
-//							->where('fromId', '=', $this->id)
-//							->andWhere('fromEntityTypeId', '=', self::getType()->getId())
-//							->andWhere('c.isOrganization', '=', true);
-			
-			$query = Link::find()->selectSingleValue('toId')->filter([
-					'entityId' => $this->id,
-					'entity' => "Contact",
-					'entities' => [
-							['name' => "Contact", "filter" => "isOrganization"]
-					]
-			]);
+			$query = GO()->getDbConnection()->selectSingleValue('toId')->from('core_link', 'l')
+							->join('addressbook_contact', 'c','c.id=l.toId and l.toEntityTypeId = '.self::getType()->getId())
+							->where('fromId', '=', $this->id)
+							->andWhere('fromEntityTypeId', '=', self::getType()->getId())
+							->andWhere('c.isOrganization', '=', true);
 			
 			$this->organizationIds = array_map("intval", $query->all());
 		}
