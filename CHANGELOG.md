@@ -1,3 +1,5 @@
+- Core: Fixed removal of Admin group from acl in groups when using "Apply defaults"
+- Users: added ID column (hidden by default)
 - Calendar: Restored select all button for calendars. Ticket #201918192
 - Sync: Fixed error that occured on empty folders.
 - Core: Show description when searching for links

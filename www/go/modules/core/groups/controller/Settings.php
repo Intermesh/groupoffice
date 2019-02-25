@@ -46,7 +46,7 @@ class Settings extends Controller {
 			$acl->setValues([
 					'groups' => $groupsRecords
 			]);
-			
+						
 			if(!$acl->save()) {
 				throw new \Exception("Couldn't save ACL for group ". $group->id);
 			}

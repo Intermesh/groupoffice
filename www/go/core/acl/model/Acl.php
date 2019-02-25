@@ -116,7 +116,7 @@ class Acl extends Property {
 	 */
 	public function removeGroup($groupId) {
 		$this->groups = array_filter($this->groups, function($group) use ($groupId) {
-			return $groupId != $groupId;
+			return $group->groupId != $groupId;
 		});
 		
 		return $this;
