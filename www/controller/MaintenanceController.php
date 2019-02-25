@@ -327,6 +327,11 @@ class MaintenanceController extends AbstractController {
 			echo '<pre>';
 		}
 		
+		if(!empty($params['reset'])) {
+			echo "Resetting cache!\n";
+			GO()->getDbConnection()->query("truncate core_search");
+		}
+		
 		echo "Checking search cache\n\n";
 		echo ".: Record cached, E: Error while occurred, S: Record skipped (probably normal)\n"
 		.    "==============================================================================\n\n";
