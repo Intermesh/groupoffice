@@ -366,6 +366,37 @@ class MaintenanceController extends AbstractController {
 			echo '</pre>';
 		}
 	}
+	
+	private function checkCollations() {		
+		$stmt = GO()->getDbConnection()->query("SHOW TABLE STATUS");	
+
+		foreach($stmt as $record){
+
+			if($record['Engine'] != 'InnoDB' && $record["Name"] != 'fs_filesearch' && $record["Name"] != 'cms_files') {
+				echo "Converting ". $record["Name"] . " to InnoDB\n";
+				flush();
+				$sql = "ALTER TABLE `".$record["Name"]."` ENGINE=InnoDB;";
+				GO()->getDbConnection()->query($sql);	
+			}
+
+			if($record["Collation"] != "utf8mb4_unicode_ci" ) {
+				echo "Converting ". $record["Name"] . " to utf8mb4\n";
+				flush();
+
+				if($record['Name'] === 'em_links') {
+					GO()->getDbConnection()->query("ALTER TABLE `em_links` DROP INDEX `uid`");
+				}			
+				$sql = "ALTER TABLE `".$record["Name"]."` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
+				GO()->getDbConnection()->query($sql);	
+
+				if($record['Name'] === 'em_links') {
+					GO()->getDbConnection()->query("ALTER TABLE `em_links` CHANGE `uid` `uid` VARCHAR(255) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '';");
+					GO()->getDbConnection()->query("ALTER TABLE `em_links` ADD INDEX(`uid`);");
+				}
+
+			}	
+		}
+	}
 
 	/**
 	 * Calls checkDatabase on each Module class.
@@ -381,6 +412,7 @@ class MaintenanceController extends AbstractController {
 		
 		GO::setIgnoreAclPermissions(true);
 		GO::session()->runAsRoot();
+	
 		
 		//$this->run("upgrade",$params);		
 		
@@ -394,6 +426,7 @@ class MaintenanceController extends AbstractController {
 				echo '<pre>';
 		}
 		
+		$this->checkCollations();
 	
 				
 		if(!empty($params['module'])){
