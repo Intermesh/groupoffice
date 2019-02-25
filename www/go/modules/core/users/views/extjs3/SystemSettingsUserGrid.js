@@ -130,6 +130,11 @@ go.modules.core.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 						return result;
 					},
 					dataIndex: 'authenticationMethods'
+				},{
+					header: "ID",
+					width: dp(100),
+					hidden: true,
+					dataIndex: 'id'
 				},
 				actions
 			],
