@@ -21,7 +21,7 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `comments_comment` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `threadId` INT NOT NULL,
-  `text` MEDIUMTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
+  `text` MEDIUMTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
   `createdAt` DATETIME NOT NULL,
   `createdBy` INT NOT NULL,
   `modifiedBy` INT NULL,
