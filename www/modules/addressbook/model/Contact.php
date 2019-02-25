@@ -256,14 +256,18 @@ class Contact extends \GO\Base\Db\ActiveRecord {
 	protected function getCacheAttributes() {
 		
 		$name = $this->name;
-		if($this->company)
-			$name .= ' ('.$this->company->name.')';
+		
+		$description = "";		
 
 		if($this->addressbook)
-			$name .= ' ('.$this->addressbook->name.')';
+			$description .= $this->addressbook->name.'';
+		
+		if($this->company)
+			$description .= ' - '.$this->company->name;	
 			
 		return array(
-				'name' => $name
+				'name' => $name,
+				'description' => $description
 		);
 	}
 	

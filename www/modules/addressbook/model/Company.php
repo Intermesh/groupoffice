@@ -158,12 +158,14 @@ class Company extends \GO\Base\Db\ActiveRecord {
 	protected function getCacheAttributes() {
 		
 		$name = !empty($this->name2) ? $this->name.' '.$this->name2 : $this->name;
-		
+		$description = "";
+			
 		if($this->addressbook)
-			$name .= ' ('.$this->addressbook->name.')';
+			$description = $this->addressbook->name;
 		
 		return array(
-				'name' => $name
+				'name' => $name,
+				'description' => $description
 		);
 	}
 	/**

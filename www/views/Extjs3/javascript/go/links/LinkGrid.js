@@ -39,6 +39,19 @@ go.links.LinkGrid = Ext.extend(go.grid.GridPanel, {
 				hidden: true
 			}
 		];
+		
+		
+		this.view = new Ext.grid.GridView({
+			  enableRowBody:true,
+			  showPreview:true,
+			  getRowClass : function(record, rowIndex, p, ds) {
+					p.body = '<small>' +record.data.description + '</small>';
+					return 'x-grid3-row-expanded';				
+			  },
+			  grid: this,
+			  emptyText: t("No items to display")
+		   }),
+							 
 		this.autoExpandColumn = 'name';
 		this.store = new go.data.Store({
 			autoDestroy: true,
