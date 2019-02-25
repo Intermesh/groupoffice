@@ -5092,13 +5092,17 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 */
 	public function addComment($text){
 		if(!GO::modules()->isInstalled('comments') || !GO::modules()->isInstalled('comments') && !$this->hasLinks())
-			return false;
+			return false;		
 
-		$comment = new \GO\Comments\Model\Comment();
-		$comment->model_id=$this->id;
-		$comment->model_type_id=$this->modelTypeId();
-		$comment->comments=$text;
-		return $comment->save();
+		$comment = new \go\modules\community\comments\model\Comment();
+		$comment->setEntity($this->getType());
+		$comment->entityId = $this->id;
+		$comment->text=$text;
+		if(!$comment->save()) {			
+			throw new \Exception("Failed to save comment");
+		}
+		
+		return $comment;
 
 	}
 
