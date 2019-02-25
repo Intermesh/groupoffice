@@ -1,3 +1,5 @@
+- Tickets: Search didn't search message content anymore
+
 25-02-2019 6.3.66
 - Core: Fixed removal of Admin group from acl in groups when using "Apply defaults"
 - Users: added ID column (hidden by default)
