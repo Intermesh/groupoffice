@@ -1,3 +1,6 @@
+- Calendar: Restored select all button for calendars. Ticket #201918192
+- Sync: Fixed error that occured on empty folders.
+- Core: Show description when searching for links
 - Sync: Fixed ticket #201715362. All day event one day short on android.
 - Email/files: Fixed ticket #201918173. File browser didn't reset.
 - Billing: Fixed months in search bar of billing
