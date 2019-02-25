@@ -301,7 +301,7 @@ GO.dialog.SelectEmail = function(config) {
 		height : 400,
 		width : 600,
 		closeAction : 'hide',
-		title : t("strSelectEmail"),
+		title : t("Select e-mail"),
 		items : this.tabPanel,
 		buttons : [{
 			text : t("Ok"),
