@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS `emp_folders` (
   `user_id` int(11) NOT NULL,
   `mtime` int(11) NOT NULL,
   PRIMARY KEY (`folder_id`,`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS `em_accounts` (
 	`full_reply_headers` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB ;
 
 -- --------------------------------------------------------
 
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS `em_accounts_collapsed` (
   `account_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   PRIMARY KEY (`account_id`,`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `em_accounts_sort` (
   `user_id` int(11) NOT NULL,
   `order` int(11) NOT NULL,
   PRIMARY KEY (`account_id`,`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS `em_aliases` (
   `default` BOOLEAN NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `account_id` (`account_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB ;
 
 -- --------------------------------------------------------
 
@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS `em_filters` (
   `priority` int(11) NOT NULL DEFAULT '0',
   `mark_as_read` enum('0','1') NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -141,7 +141,7 @@ CREATE TABLE IF NOT EXISTS `em_folders` (
   PRIMARY KEY (`id`),
   KEY `account_id` (`account_id`),
   KEY `parent_id` (`parent_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -154,7 +154,7 @@ CREATE TABLE IF NOT EXISTS `em_folders_expanded` (
   `folder_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   PRIMARY KEY (`folder_id`,`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -206,7 +206,7 @@ CREATE TABLE IF NOT EXISTS `em_messages_cache` (
   `serialized_message_object` mediumtext NOT NULL,
   PRIMARY KEY (`folder_id`,`uid`),
   KEY `account_id` (`account_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -226,7 +226,7 @@ CREATE TABLE IF NOT EXISTS `go_links_em_links` (
   PRIMARY KEY `model_id` (`id`,`model_id`,`model_type_id`),
   KEY `id` (`id`,`folder_id`),
   KEY `ctime` (`ctime`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -237,7 +237,7 @@ CREATE TABLE IF NOT EXISTS `em_portlet_folders` (
   `user_id` int(11) NOT NULL,
   `mtime` int(11) NOT NULL,
   PRIMARY KEY (`account_id`,`folder_name`,`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -247,7 +247,7 @@ CREATE TABLE IF NOT EXISTS `em_contacts_last_mail_times` (
   `user_id` int(11) NOT NULL,
   `last_mail_time` int(11) NOT NULL,
   PRIMARY KEY (`contact_id`,`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -260,7 +260,7 @@ CREATE TABLE IF NOT EXISTS `em_labels` (
   `account_id` int(11) NOT NULL,
   `default` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 
 CREATE TABLE `email_template` (
@@ -276,7 +276,7 @@ CREATE TABLE `email_template` (
  KEY `aclId` (`aclId`),
  CONSTRAINT `email_template_ibfk_1` FOREIGN KEY (`ownedBy`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
  CONSTRAINT `email_template_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB;
 
 
 CREATE TABLE `email_template_attachment` (
@@ -288,7 +288,7 @@ CREATE TABLE `email_template_attachment` (
  KEY `blobId` (`blobId`),
  CONSTRAINT `email_template_attachment_ibfk_1` FOREIGN KEY (`blobId`) REFERENCES `core_blob` (`id`),
  CONSTRAINT `email_template_attachment_ibfk_2` FOREIGN KEY (`templateId`) REFERENCES `email_template` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB;
 
 
 DROP TABLE IF EXISTS `email_default_email_templates`;
@@ -297,7 +297,7 @@ CREATE TABLE IF NOT EXISTS `email_default_email_templates` (
   `template_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`user_id`),
   KEY `template_id` (`template_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -311,4 +311,4 @@ CREATE TABLE IF NOT EXISTS `email_default_email_account_templates` (
   `template_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`account_id`),
   KEY `template_id` (`template_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;

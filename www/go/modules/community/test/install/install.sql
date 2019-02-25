@@ -6,7 +6,7 @@ CREATE TABLE `test_a` (
   `createdAt` datetime NOT NULL,
   `modifiedAt` datetime NOT NULL,
   `deletedAt` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -18,7 +18,7 @@ CREATE TABLE `test_a_has_many` (
   `id` int(11) NOT NULL,
   `aId` int(11) NOT NULL,
   `propOfHasManyA` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -30,7 +30,7 @@ CREATE TABLE `test_a_has_one` (
   `id` int(11) NOT NULL,
   `aId` int(11) NOT NULL,
   `propA` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -43,7 +43,7 @@ CREATE TABLE `test_b` (
   `propB` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `cId` int(11) DEFAULT NULL,
   `userId` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -54,7 +54,7 @@ CREATE TABLE `test_b` (
 CREATE TABLE `test_c` (
   `id` int(11) NOT NULL,
   `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB;
 
 --
 -- Indexes for dumped tables
@@ -150,7 +150,7 @@ ALTER TABLE `test_b`
 CREATE TABLE `test_d` (
   `id` int(11) NOT NULL,
   `propD` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB;
 
 --
 -- Indexes for dumped tables

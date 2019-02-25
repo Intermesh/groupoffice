@@ -84,6 +84,13 @@ class Acl extends \go\core\jmap\Entity {
 				
 				$this->addGroup($groupId, self::LEVEL_MANAGE);
 			}
+		} else
+		{
+			$adminLevel = $this->hasGroup(Group::ID_ADMINS);
+			if($adminLevel < self::LEVEL_MANAGE) {
+				$this->removeGroup(Group::ID_ADMINS);
+				$this->addGroup(Group::ID_ADMINS, self::LEVEL_MANAGE);
+			}
 		}
 		
 		if(!parent::internalSave()) {
@@ -192,10 +199,26 @@ class Acl extends \go\core\jmap\Entity {
 	 */
 	public function removeGroup($groupId) {
 		$this->groups = array_filter($this->groups, function($group) use ($groupId) {
-			return $groupId != $groupId;
+			return $group->groupId != $groupId;
 		});
 		
 		return $this;
+	}
+	
+	/**
+	 * Check if this ACL has a group
+	 * 
+	 * @param int $groupId
+	 * @return boolean|int Level
+	 */
+	public function hasGroup($groupId) {
+		foreach($this->groups as $group) {
+			if($group->groupId == $groupId) {
+				return $group->level;
+			}
+		}
+		
+		return false;
 	}
 	
 	/**

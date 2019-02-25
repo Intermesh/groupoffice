@@ -7,8 +7,8 @@ GO.files.SaveAsDialog = Ext.extend(GO.Window, {
 		
 		this.layout='border';
 		this.title=t("Save file", "files");
-		this.height=450;
-		this.width=750;
+		this.height=dp(700);
+		this.width=dp(900);
 		this.border=false;
 		this.collapsible=true;
 		this.maximizable=true;
@@ -88,7 +88,7 @@ GO.files.SaveAsDialog = Ext.extend(GO.Window, {
 		this.formPanel = new Ext.form.FormPanel({
 			region:'north',
 			cls:'go-form-panel',
-			height:32,
+			autoHeight: true,
 			items:this.nameField
 		});
 		
@@ -104,6 +104,9 @@ GO.files.SaveAsDialog = Ext.extend(GO.Window, {
 		
 		if(config.folder_id || config.folder_id == 0){
 			this.fb.setRootID(config.folder_id, config.folder_id);
+		} else
+		{
+			this.fb.setRootID(0, 0);
 		}
 		
 		this.fb.setFilesFilter(extension);		

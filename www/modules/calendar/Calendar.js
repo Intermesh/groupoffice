@@ -216,6 +216,12 @@ GO.calendar.MainPanel = function(config){
 				},this);
 			},
 			scope: this
+		},{
+			text:t("Select all"),
+			id:'plus',
+			qtip:t("Select all"),
+			handler:function(){this.calendarList.selectAll();},
+			scope: this
 		}],
 		bbar: new GO.SmallPagingToolbar({
 			store:this.calendarsStore,

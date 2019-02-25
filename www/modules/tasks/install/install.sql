@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS `ta_tasks_custom_fields`;
 CREATE TABLE IF NOT EXISTS `ta_tasks_custom_fields` (
   `id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `go_links_ta_tasks` (
   PRIMARY KEY `model_id` (`id`,`model_id`,`model_type_id`),
   KEY `id` (`id`,`folder_id`),
   KEY `ctime` (`ctime`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `ta_categories` (
   `user_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS `ta_portlet_tasklists` (
   `user_id` int(11) NOT NULL,
   `tasklist_id` int(11) NOT NULL,
   PRIMARY KEY (`user_id`,`tasklist_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS `ta_settings` (
   `remind` tinyint(1) NOT NULL DEFAULT '0',
   `default_tasklist_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS `ta_tasklists` (
   `files_folder_id` int(11) NOT NULL DEFAULT '0',
   `version` INT UNSIGNED NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS `ta_tasks` (
   KEY `list_id` (`tasklist_id`),
   KEY `rrule` (`rrule`),
   KEY `uuid` (`uuid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 
 --
@@ -137,7 +137,8 @@ CREATE TABLE IF NOT EXISTS `su_visible_lists` (
   `user_id` int(11) NOT NULL,
   `tasklist_id` int(11) NOT NULL,
   PRIMARY KEY  (`user_id`,`tasklist_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 
 ALTER TABLE `ta_tasks_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `ta_tasks`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+

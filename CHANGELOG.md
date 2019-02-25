@@ -1,3 +1,14 @@
+- Tickets: Search didn't search message content anymore
+
+25-02-2019 6.3.66
+- Core: Fixed removal of Admin group from acl in groups when using "Apply defaults"
+- Users: added ID column (hidden by default)
+- Calendar: Restored select all button for calendars. Ticket #201918192
+- Sync: Fixed error that occured on empty folders.
+- Core: Show description when searching for links
+- Sync: Fixed ticket #201715362. All day event one day short on android.
+- Email/files: Fixed ticket #201918173. File browser didn't reset.
+- Billing: Fixed months in search bar of billing
 - Core: Use cookie to store authentication token to make it available in new opened tabs / windows
 - Customfields: Make the "Max. number of characters:" field usable for textarea customfields too.
 - Savemailas: Fixed issue that "Save as"->"File to item" link window also showed entities that did not have file support.
