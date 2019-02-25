@@ -405,7 +405,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 				$this->disk_usage+=$bytes;
 			}
 		} else
-			throw new \Exceptions('Can not calculated diskusage without the files module');
+			throw new \Exception('Can not calculated diskusage without the files module');
 		return $this;
 	}
 	
