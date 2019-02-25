@@ -71,6 +71,7 @@ GO.query.CriteriaFormPanel = Ext.extend(Ext.form.FormPanel , {
 			editable: true,
 			selectOnFocus:true,
 			forceSelection:true,
+			width: 360,
 			listeners:{
 				scope:this,
 				select:function(combo,record){

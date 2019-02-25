@@ -20,8 +20,8 @@ GO.addressbook.AdvancedSearchWindow = Ext.extend(GO.Window, {
 		layoutOnCardChange: true
 	},
 	resizable: true,
-	width: 900,
-	height: 650,
+	width: 1100,
+	height: 700,
 	closeAction: 'hide',
 	queryId : 0,
 	initComponent: function() {
