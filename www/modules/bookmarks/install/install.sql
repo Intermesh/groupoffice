@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS `bm_bookmarks` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `category_id` (`category_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB ;
 
 -- --------------------------------------------------------
 
@@ -29,6 +29,6 @@ CREATE TABLE IF NOT EXISTS `bm_categories` (
   `name` varchar(50) NOT NULL,
 	`show_in_startmenu` BOOLEAN NOT NULL DEFAULT FALSE,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB ;
 ALTER TABLE `bm_categories` ADD INDEX `show_in_startmenu` (`show_in_startmenu`);
 -- --------------------------------------------------------

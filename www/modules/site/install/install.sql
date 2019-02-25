@@ -63,7 +63,7 @@ DROP TABLE IF EXISTS `cf_site_sites`;
 CREATE TABLE IF NOT EXISTS `cf_site_sites` (
   `model_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`model_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -75,7 +75,7 @@ DROP TABLE IF EXISTS `cf_site_content`;
 CREATE TABLE IF NOT EXISTS `cf_site_content` (
   `model_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`model_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS `site_multifile_files` (
   `file_id` int(11) NOT NULL,
   `order` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`model_id`,`field_id`,`file_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS `site_menu` (
   `menu_slug` varchar(255) NOT NULL,
   `label` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB ;
 
 
 -- --------------------------------------------------------
@@ -123,4 +123,4 @@ CREATE TABLE IF NOT EXISTS `site_menu_item` (
   `sort_order` int(11) NOT NULL DEFAULT '0',
   `target` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB ;

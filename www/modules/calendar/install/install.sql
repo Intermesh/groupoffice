@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `cal_calendars` (
   PRIMARY KEY (`id`),
   KEY `group_id` (`group_id`),
   KEY `project_id` (`project_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB ;
 
 -- --------------------------------------------------------
 
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS `cal_categories` (
 	`acl_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `calendar_id` (`calendar_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS `cal_events` (
   KEY `resource_event_id` (`resource_event_id`),
   KEY `recurrence_id` (`recurrence_id`),
   KEY `exception_for_event_id` (`exception_for_event_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS `cal_events_declined` (
   `uid` varchar(190) NOT NULL,
   `email` varchar(100) NOT NULL,
   PRIMARY KEY (`uid`,`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS `cal_exceptions` (
   `mtime` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `event_id` (`event_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -147,7 +147,7 @@ CREATE TABLE IF NOT EXISTS `cal_groups` (
   `fields` varchar(255) NOT NULL DEFAULT '',
   `show_not_as_busy` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -160,7 +160,7 @@ CREATE TABLE IF NOT EXISTS `cal_group_admins` (
   `group_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   PRIMARY KEY (`group_id`,`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -182,7 +182,7 @@ CREATE TABLE IF NOT EXISTS `cal_participants` (
   `role` varchar(100) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `event_id` (`event_id`,`user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB ;
 
 -- --------------------------------------------------------
 
@@ -200,7 +200,7 @@ CREATE TABLE IF NOT EXISTS `cal_settings` (
   `check_conflict` BOOLEAN NOT NULL DEFAULT TRUE,
   PRIMARY KEY (`user_id`),
   KEY `calendar_id` (`calendar_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -219,7 +219,7 @@ CREATE TABLE IF NOT EXISTS `cal_views` (
   `owncolor` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB ;
 
 -- --------------------------------------------------------
 
@@ -233,7 +233,7 @@ CREATE TABLE IF NOT EXISTS `cal_views_calendars` (
   `calendar_id` int(11) NOT NULL DEFAULT '0',
   `background` char(6) NOT NULL DEFAULT 'CCFFCC',
   PRIMARY KEY (`view_id`,`calendar_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -246,7 +246,7 @@ CREATE TABLE IF NOT EXISTS `cal_visible_tasklists` (
   `calendar_id` int(11) NOT NULL,
   `tasklist_id` int(11) NOT NULL,
   PRIMARY KEY (`calendar_id`,`tasklist_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -256,7 +256,7 @@ CREATE TABLE IF NOT EXISTS `cal_calendar_user_colors` (
   `calendar_id` int(11) NOT NULL,
   `color` varchar(6) NOT NULL,
   PRIMARY KEY (`user_id`,`calendar_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 --
 -- Tablestructure for table `cal_views_groups`
@@ -276,7 +276,7 @@ DROP TABLE IF EXISTS `cf_cal_calendars`;
 CREATE TABLE IF NOT EXISTS `cf_cal_calendars` (
   `model_id` int(11) NOT NULL,
   PRIMARY KEY (`model_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -288,7 +288,7 @@ DROP TABLE IF EXISTS `cf_cal_events`;
 CREATE TABLE IF NOT EXISTS `cf_cal_events` (
   `model_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`model_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -308,7 +308,7 @@ CREATE TABLE IF NOT EXISTS `go_links_cal_events` (
   PRIMARY KEY `model_id` (`id`,`model_id`,`model_type_id`),
   KEY `id` (`id`,`folder_id`),
   KEY `ctime` (`ctime`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -328,6 +328,6 @@ CREATE TABLE IF NOT EXISTS `su_visible_calendars` (
   `user_id` int(11) NOT NULL,
   `calendar_id` int(11) NOT NULL,
   PRIMARY KEY  (`user_id`,`calendar_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 ALTER TABLE `cal_calendars` ADD INDEX(`user_id`);

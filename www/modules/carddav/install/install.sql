@@ -11,4 +11,4 @@ CREATE TABLE IF NOT EXISTS `dav_contacts` (
   `uri` varchar(190) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `uri` (`uri`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;

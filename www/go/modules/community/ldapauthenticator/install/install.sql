@@ -27,7 +27,7 @@ CREATE TABLE `ldapauth_server` (
   `smtpUseUserCredentials` tinyint(1) NOT NULL DEFAULT '0',
   `smtpEncryption` enum('tls','ssl') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `smtpValidateCertificate` tinyint(1) NOT NULL DEFAULT '1'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB;
 
 --
 -- Gegevens worden geëxporteerd voor tabel `ldapauth_server`
@@ -43,7 +43,7 @@ CREATE TABLE `ldapauth_server_domain` (
   `id` int(11) NOT NULL,
   `serverId` int(11) NOT NULL,
   `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '*'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB;
 
 --
 -- Gegevens worden geëxporteerd voor tabel `ldapauth_server_domain`
@@ -59,7 +59,7 @@ CREATE TABLE `ldapauth_server_domain` (
 CREATE TABLE `ldapauth_server_group` (
   `serverId` int(11) NOT NULL,
   `groupId` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB;
 
 --
 -- Gegevens worden geëxporteerd voor tabel `ldapauth_server_group`

@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS `ab_addressbooks` (
 	`create_folder` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB ;
 
 -- --------------------------------------------------------
 
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `ab_addresslists` (
 	`ctime` int(11) NOT NULL DEFAULT '0',
   `mtime` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `ab_addresslist_companies` (
   `addresslist_id` int(11) NOT NULL,
   `company_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`addresslist_id`,`company_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS `ab_addresslist_contacts` (
   `addresslist_id` int(11) NOT NULL,
   `contact_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`addresslist_id`,`contact_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS `ab_companies` (
   KEY `link_id` (`link_id`),
   KEY `link_id_2` (`link_id`),
   KEY `email` (`email`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB ;
 
 -- --------------------------------------------------------
 
@@ -181,7 +181,7 @@ CREATE TABLE IF NOT EXISTS `ab_contacts` (
   KEY `last_name` (`last_name`),
   KEY `go_user_id` (`go_user_id`),
   KEY `uuid` (`uuid`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB ;
 
 -- --------------------------------------------------------
 
@@ -195,7 +195,7 @@ CREATE TABLE IF NOT EXISTS `ab_default_email_templates` (
   `template_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`user_id`),
   KEY `template_id` (`template_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -209,7 +209,7 @@ CREATE TABLE IF NOT EXISTS `ab_default_email_account_templates` (
   `template_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`account_id`),
   KEY `template_id` (`template_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -227,7 +227,7 @@ CREATE TABLE IF NOT EXISTS `ab_email_templates` (
   `content` longblob NOT NULL,
   `extension` varchar(4) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -253,7 +253,7 @@ CREATE TABLE IF NOT EXISTS `ab_sent_mailings` (
 	`campaigns_status_id` int(11) NOT NULL DEFAULT '0',
 	`temp_pass` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -271,7 +271,7 @@ CREATE TABLE IF NOT EXISTS `ab_search_queries` (
   PRIMARY KEY (`id`),
   KEY `companies` (`companies`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -285,7 +285,7 @@ DROP TABLE IF EXISTS `cf_ab_companies`;
 CREATE TABLE IF NOT EXISTS `cf_ab_companies` (
   `model_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`model_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -297,7 +297,7 @@ DROP TABLE IF EXISTS `cf_ab_contacts`;
 CREATE TABLE IF NOT EXISTS `cf_ab_contacts` (
   `model_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`model_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -318,7 +318,7 @@ CREATE TABLE IF NOT EXISTS `go_links_ab_companies` (
   PRIMARY KEY `model_id` (`id`,`model_id`,`model_type_id`),
   KEY `id` (`id`,`folder_id`),
   KEY `ctime` (`ctime`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -337,7 +337,7 @@ CREATE TABLE IF NOT EXISTS `go_links_ab_contacts` (
   PRIMARY KEY `model_id` (`id`,`model_id`,`model_type_id`),
   KEY `id` (`id`,`folder_id`),
   KEY `ctime` (`ctime`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -354,7 +354,7 @@ CREATE TABLE IF NOT EXISTS `ab_default_email_templates` (
   `template_id` int(11) NOT NULL,
   PRIMARY KEY (`user_id`),
   KEY `template_id` (`template_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -371,7 +371,7 @@ CREATE TABLE IF NOT EXISTS `ab_sent_mailing_companies` (
 	`has_error` tinyint(1) NOT NULL DEFAULT '0',
 	`error_description` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`sent_mailing_id`,`company_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -388,7 +388,7 @@ CREATE TABLE IF NOT EXISTS `ab_sent_mailing_contacts` (
 	`has_error` tinyint(1) NOT NULL DEFAULT '0',
 	`error_description` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`sent_mailing_id`,`contact_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -405,7 +405,7 @@ CREATE TABLE IF NOT EXISTS `ab_contacts_vcard_props` (
   `value` VARCHAR( 1023 ) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
 	KEY `contact_id` (`contact_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB ;
 
 
 --
@@ -427,7 +427,7 @@ CREATE TABLE IF NOT EXISTS `ab_settings` (
   `user_id` int(11) NOT NULL,
   `default_addressbook_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 --
 -- Tabelstructuur voor tabel `go_links_ab_addresslists`
@@ -444,7 +444,7 @@ CREATE TABLE IF NOT EXISTS `go_links_ab_addresslists` (
   PRIMARY KEY `model_id` (`id`,`model_id`,`model_type_id`),
   KEY `id` (`id`,`folder_id`),
   KEY `ctime` (`ctime`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 --
 -- Tabelstructuur voor tabel `ab_addresslist_group`
@@ -453,7 +453,7 @@ CREATE TABLE IF NOT EXISTS `go_links_ab_addresslists` (
 CREATE TABLE `ab_addresslist_group` (
   `id` int(11) NOT NULL,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB;
 
 ALTER TABLE `ab_addresslist_group`
   ADD PRIMARY KEY (`id`);

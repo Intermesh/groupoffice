@@ -16,4 +16,4 @@ CREATE TABLE IF NOT EXISTS `zpa_devices` (
   `as_version` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`id`),
 	KEY `device_id` (`device_id`,`username`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB ;

@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS `su_announcements` (
   `content` text,
   PRIMARY KEY  (`id`),
   KEY `due_time` (`due_time`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `su_notes` (
   `user_id` int(11) NOT NULL,
   `text` text,
   PRIMARY KEY  (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS `su_rss_feeds` (
   `url` varchar(255) default NULL,
   `summary` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB ;
 
 -- --------------------------------------------------------
 
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS `su_visible_lists` (
   `user_id` int(11) NOT NULL,
   `tasklist_id` int(11) NOT NULL,
   PRIMARY KEY  (`user_id`,`tasklist_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS `su_visible_calendars` (
   `user_id` int(11) NOT NULL,
   `calendar_id` int(11) NOT NULL,
   PRIMARY KEY  (`user_id`,`calendar_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -82,4 +82,4 @@ CREATE TABLE IF NOT EXISTS `su_latest_read_announcement_records` (
   `announcement_id` int(11) NOT NULL DEFAULT '0',
 	`announcement_ctime` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY  (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;

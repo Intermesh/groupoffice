@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS `dav_events` (
   `uri` varchar(190) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `uri` (`uri`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `dav_tasks` (
   `uri` varchar(190) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `uri` (`uri`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -38,4 +38,4 @@ CREATE TABLE dav_calendar_changes (
     calendarid INT(11) UNSIGNED NOT NULL,
     operation TINYINT(1) NOT NULL,
     INDEX calendarid_synctoken (calendarid, synctoken)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB;

@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `smi_certs` (
   `cert` text NOT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB ;
 
 DROP TABLE IF EXISTS `smi_pkcs12`;
 CREATE TABLE IF NOT EXISTS `smi_pkcs12` (
@@ -13,4 +13,4 @@ CREATE TABLE IF NOT EXISTS `smi_pkcs12` (
   `cert` blob,
   `always_sign` tinyint(1) NOT NULL,
   PRIMARY KEY (`account_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;

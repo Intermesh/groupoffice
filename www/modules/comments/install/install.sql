@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS `co_comments` (
 	`category_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `link_id` (`model_id`,`model_type_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -27,6 +27,6 @@ CREATE TABLE IF NOT EXISTS `co_categories` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(127) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------

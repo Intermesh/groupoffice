@@ -3,7 +3,7 @@ CREATE TABLE `apikeys_key` (
   `accessToken` varchar(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
   `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `createdAt` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB;
 
 
 

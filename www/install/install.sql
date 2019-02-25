@@ -4,7 +4,7 @@ SET time_zone = "+00:00";
 DROP TABLE IF EXISTS `core_user_custom_fields`;
 CREATE TABLE `core_user_custom_fields` (
   `id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 
 DROP TABLE IF EXISTS `core_acl`;
@@ -13,14 +13,14 @@ CREATE TABLE `core_acl` (
   `ownedBy` int(11) NOT NULL,
   `usedIn` varchar(190) DEFAULT NULL,
   `modifiedAt` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `core_acl_group`;
 CREATE TABLE `core_acl_group` (
   `aclId` int(11) NOT NULL,
   `groupId` int(11) NOT NULL DEFAULT '0',
   `level` tinyint(4) NOT NULL DEFAULT '10'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `core_acl_group_changes`;
 CREATE TABLE `core_acl_group_changes` (
@@ -28,21 +28,21 @@ CREATE TABLE `core_acl_group_changes` (
   `groupId` int(11) NOT NULL,
   `grantModSeq` int(11) NOT NULL,
   `revokeModSeq` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `core_auth_method`;
 CREATE TABLE `core_auth_method` (
   `id` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
 	`moduleId` INT NOT NULL,
   `sortOrder` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `core_auth_password`;
 CREATE TABLE `core_auth_password` (
   `userId` int(11) NOT NULL,
   `password` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `digest` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `core_auth_token`;
 CREATE TABLE `core_auth_token` (
@@ -55,7 +55,7 @@ CREATE TABLE `core_auth_token` (
   `remoteIpAddress` varchar(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
   `userAgent` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `passedMethods` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `core_customfields_field`;
 CREATE TABLE `core_customfields_field` (
@@ -76,7 +76,7 @@ CREATE TABLE `core_customfields_field` (
   `prefix` varchar(32) NOT NULL DEFAULT '',
   `suffix` varchar(32) NOT NULL DEFAULT '',
   `options` text
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `core_customfields_field_set`;
 CREATE TABLE `core_customfields_field_set` (
@@ -89,7 +89,7 @@ CREATE TABLE `core_customfields_field_set` (
   `aclId` int(11) NOT NULL,
   `name` varchar(50) DEFAULT NULL,
   `sortOrder` tinyint(4) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `core_entity`;
 CREATE TABLE `core_entity` (
@@ -98,7 +98,7 @@ CREATE TABLE `core_entity` (
   `name` varchar(190) NOT NULL,
   `clientName` varchar(190) DEFAULT NULL,
   `highestModSeq` INT NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 
 
@@ -110,7 +110,7 @@ CREATE TABLE `core_group` (
   `createdBy` int(11) NOT NULL,
   `aclId` int(11) DEFAULT NULL,
   `isUserGroupFor` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `core_link`;
 CREATE TABLE `core_link` (
@@ -124,7 +124,7 @@ CREATE TABLE `core_link` (
   `deletedAt` datetime DEFAULT NULL,
   `modSeq` int(11) DEFAULT NULL,
   `folderId` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `core_module`;
 CREATE TABLE `core_module` (
@@ -139,7 +139,7 @@ CREATE TABLE `core_module` (
   `modifiedAt` datetime DEFAULT NULL,
   `modSeq` int(11) DEFAULT NULL,
   `deletedAt` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `core_search`;
 CREATE TABLE `core_search` (
@@ -152,14 +152,14 @@ CREATE TABLE `core_search` (
   `keywords` varchar(255) NOT NULL DEFAULT '',
   `modifiedAt` datetime DEFAULT NULL,
   `aclId` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `core_setting`;
 CREATE TABLE `core_setting` (
   `moduleId` int(11) NOT NULL,
   `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `value` text COLLATE utf8mb4_unicode_ci
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `core_user`;
 CREATE TABLE `core_user` (
@@ -208,19 +208,19 @@ CREATE TABLE `core_user` (
   `no_reminders` tinyint(1) NOT NULL DEFAULT 0,
   `last_password_change` int(11) NOT NULL DEFAULT 0,
   `force_password_change` tinyint(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `core_user_group`;
 CREATE TABLE `core_user_group` (
   `groupId` int(11) NOT NULL,
   `userId` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `go_address_format`;
 CREATE TABLE `go_address_format` (
   `id` int(11) NOT NULL,
   `format` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `go_advanced_searches`;
 CREATE TABLE `go_advanced_searches` (
@@ -230,7 +230,7 @@ CREATE TABLE `go_advanced_searches` (
   `acl_id` int(11) NOT NULL DEFAULT '0',
   `data` text,
   `model_name` varchar(100) NOT NULL DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `go_cache`;
 CREATE TABLE `go_cache` (
@@ -238,12 +238,12 @@ CREATE TABLE `go_cache` (
   `key` varchar(190) NOT NULL DEFAULT '',
   `content` longtext,
   `mtime` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `go_cf_setting_tabs`;
 CREATE TABLE `go_cf_setting_tabs` (
   `cf_category_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `go_clients`;
 CREATE TABLE `go_clients` (
@@ -255,7 +255,7 @@ CREATE TABLE `go_clients` (
   `ctime` int(11) NOT NULL,
   `last_active` int(11) NOT NULL,
   `in_use` tinyint(1) NOT NULL DEFAULT '1'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `go_countries`;
 CREATE TABLE `go_countries` (
@@ -263,7 +263,7 @@ CREATE TABLE `go_countries` (
   `name` varchar(64) DEFAULT NULL,
   `iso_code_2` char(2) NOT NULL DEFAULT '',
   `iso_code_3` char(3) NOT NULL DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `go_cron`;
 CREATE TABLE `go_cron` (
@@ -284,20 +284,20 @@ CREATE TABLE `go_cron` (
   `error` text,
   `autodestroy` tinyint(1) NOT NULL DEFAULT '0',
   `params` text
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 ALTER TABLE `go_cron` ADD INDEX `nextrun_active` (`nextrun`, `active`);
 
 DROP TABLE IF EXISTS `go_cron_groups`;
 CREATE TABLE `go_cron_groups` (
   `cronjob_id` int(11) NOT NULL,
   `group_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `go_cron_users`;
 CREATE TABLE `go_cron_users` (
   `cronjob_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `go_holidays`;
 CREATE TABLE `go_holidays` (
@@ -306,13 +306,13 @@ CREATE TABLE `go_holidays` (
   `name` varchar(100) NOT NULL DEFAULT '',
   `region` varchar(10) NOT NULL DEFAULT '',
   `free_day` tinyint(1) NOT NULL DEFAULT '1'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `go_link_descriptions`;
 CREATE TABLE `go_link_descriptions` (
   `id` int(11) NOT NULL,
   `description` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `go_link_folders`;
 CREATE TABLE `go_link_folders` (
@@ -321,7 +321,7 @@ CREATE TABLE `go_link_folders` (
   `model_id` int(11) NOT NULL DEFAULT '0',
   `model_type_id` int(11) NOT NULL DEFAULT '0',
   `name` varchar(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `go_log`;
 CREATE TABLE `go_log` (
@@ -337,7 +337,7 @@ CREATE TABLE `go_log` (
   `action` varchar(20) NOT NULL DEFAULT '',
   `message` varchar(255) NOT NULL DEFAULT '',
   `jsonData` text
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `go_reminders`;
 CREATE TABLE `go_reminders` (
@@ -351,7 +351,7 @@ CREATE TABLE `go_reminders` (
   `snooze_time` int(11) NOT NULL,
   `manual` tinyint(1) NOT NULL DEFAULT '0',
   `text` text
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `go_reminders_users`;
 CREATE TABLE `go_reminders_users` (
@@ -359,7 +359,7 @@ CREATE TABLE `go_reminders_users` (
   `user_id` int(11) NOT NULL,
   `time` int(11) NOT NULL,
   `mail_sent` tinyint(1) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 ALTER TABLE `go_reminders_users` ADD INDEX `user_id_time` (`user_id`, `time`);
 
 DROP TABLE IF EXISTS `go_saved_exports`;
@@ -372,7 +372,7 @@ CREATE TABLE `go_saved_exports` (
   `orientation` enum('V','H') NOT NULL DEFAULT 'V',
   `include_column_names` tinyint(1) NOT NULL DEFAULT '1',
   `use_db_column_names` tinyint(1) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `go_saved_search_queries`;
 CREATE TABLE `go_saved_search_queries` (
@@ -381,28 +381,28 @@ CREATE TABLE `go_saved_search_queries` (
   `name` varchar(50) NOT NULL,
   `sql` text NOT NULL,
   `type` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `go_search_sync`;
 CREATE TABLE `go_search_sync` (
   `user_id` int(11) NOT NULL DEFAULT '0',
   `module` varchar(50) NOT NULL DEFAULT '',
   `last_sync_time` int(11) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `go_settings`;
 CREATE TABLE `go_settings` (
   `user_id` int(11) NOT NULL DEFAULT '0',
   `name` varchar(50) NOT NULL DEFAULT '',
   `value` longtext
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `go_state`;
 CREATE TABLE `go_state` (
   `user_id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL DEFAULT '',
   `value` text
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `go_working_weeks`;
 CREATE TABLE `go_working_weeks` (
@@ -414,7 +414,7 @@ CREATE TABLE `go_working_weeks` (
   `fr_work_hours` double NOT NULL DEFAULT '8',
   `sa_work_hours` double NOT NULL DEFAULT '0',
   `su_work_hours` double NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 
 ALTER TABLE `core_user_custom_fields`
@@ -684,7 +684,7 @@ CREATE TABLE `core_cron_job` (
   `lastRunAt` datetime DEFAULT NULL,
   `runningSince` datetime DEFAULT NULL,
   `lastError` text COLLATE utf8mb4_unicode_ci DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB;
 
 
 ALTER TABLE `core_cron_job`
@@ -708,7 +708,7 @@ CREATE TABLE `core_change` (
   `aclId` int(11) DEFAULT NULL,
   `createdAt` datetime NOT NULL,
   `destroyed` tinyint(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB;
 
 
 ALTER TABLE `core_change`
@@ -727,7 +727,7 @@ DROP TABLE IF EXISTS `core_user_default_group`;
 CREATE TABLE IF NOT EXISTS `core_user_default_group` (
   `groupId` int(11) NOT NULL,
   PRIMARY KEY (`groupId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB;
 
 
 ALTER TABLE `core_user_default_group`
@@ -737,7 +737,7 @@ DROP TABLE IF EXISTS `core_group_default_group`;
 CREATE TABLE IF NOT EXISTS `core_group_default_group` (
   `groupId` int(11) NOT NULL,
   PRIMARY KEY (`groupId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB;
 
 
 ALTER TABLE `core_group_default_group`
