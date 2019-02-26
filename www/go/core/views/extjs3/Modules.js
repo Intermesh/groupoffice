@@ -12,6 +12,7 @@
 		 * go.Modules.register("community", "addressbook", {
 		 * 	mainPanel: "go.modules.community.addressbook.MainPanel",
 		 * 	title: t("Address book"),
+		 * 	initModule: function() {}, //Will be called after authentication and only if the user has access to the module
 		 * 	entities: [{
 		 * 			
 		 * 			name: "Contact",
