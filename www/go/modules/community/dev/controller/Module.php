@@ -155,7 +155,7 @@ EOD;
 		$this->createFile($folder->getFile('views/extjs3/module.js'), $moduleJS);
 		
 		$mainPanelJS = <<<EOD
-go.modules.$package.$module.MainPanel = Ext.extend(Ext.Panel, {
+go.modules.$package.$module.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	html: "Hello world"
 });
 
@@ -194,7 +194,8 @@ EOD;
 
 		$modelName = StringUtil::upperCamelCasify(str_replace($tablePrefix . '_', '', $tableName));
 		$className = $namespace . '\\model\\' . $modelName;
-		
+		$tableAlias = strtolower($modelName);
+
 		$file = $folder->getFolder('model')->getFile($modelName . '.php');
 
 		if (!$file->exists()) {
@@ -220,7 +221,7 @@ class $modelName extends Property {
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
-						->addTable("$tableName");
+						->addTable("$tableName", "$tableAlias");
 	}
 
 }
