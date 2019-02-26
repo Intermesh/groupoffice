@@ -41,7 +41,7 @@ class Listeners extends Singleton {
 	}
 
 	/**
-	 * Runs through all Module.php files and calls {@see \go\core\module\Base::defineListeners()}
+	 * Runs through all Module.php files and calls {@see \go\core\Base::defineListeners()}
 	 * 
 	 * Then stores all these listeners in the cache.
 	 */

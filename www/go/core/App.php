@@ -34,7 +34,7 @@ use const GO_CONFIG_FILE;
 	 * 
 	 * 
 	 */
-	class App extends module\Base {
+	class App extends Module {
 		
 		use SingletonTrait;
 
@@ -71,7 +71,7 @@ use const GO_CONFIG_FILE;
 		}
 		
 		/**
-		 * Required for app being a go\core\Module extend
+		 * Required for app being a go\core extend
 		 * 
 		 * @return string
 		 */
@@ -80,7 +80,7 @@ use const GO_CONFIG_FILE;
 		}
 
 		/**
-		 * Required for app being a go\core\Module extend
+		 * Required for app being a go\core extend
 		 * 
 		 * @return string
 		 */
@@ -89,7 +89,7 @@ use const GO_CONFIG_FILE;
 		}
 
 		/**
-		 * Required for app being a go\core\Module extend
+		 * Required for app being a go\core extend
 		 * 
 		 * @return string
 		 */

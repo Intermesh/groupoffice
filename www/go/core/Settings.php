@@ -7,7 +7,7 @@ use GO;
 use go\core\data\Model;
 use go\core\db\Query;
 use go\core\exception\Forbidden;
-use go\core\module\Base;
+use go\core\Module;
 
 /**
  * Settings model 
@@ -16,7 +16,7 @@ use go\core\module\Base;
  * abstract class to store settings. All properties are automatically saved and
  * loaded from the "core_setting" table.
  * 
- * @see Base::getSettings()
+ * @see Module::getSettings()
  */
 abstract class Settings extends Model {
 	

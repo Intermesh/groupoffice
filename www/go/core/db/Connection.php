@@ -223,7 +223,7 @@ class Connection {
 	 * The locks array should be indexed by model name and the value is an array with two optional values.
 	 * THe first is a boolean that enables a write lock and the second is a table alias.
 	 * 
-	 * @param array $locks eg. [GO\Core\Modules\Users\Model\User::tableName() => [true, 't']]
+	 * @param array $locks eg. [go\cores\Users\Model\User::tableName() => [true, 't']]
 	 *
 	 * @return boolean
 	 */

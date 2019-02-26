@@ -8,7 +8,7 @@ use go\core\model\Group;
 use go\core\model\User;
 use go\core\db\Utils;
 use go\core\model\Link;
-use go\core\module\Base;
+use go\core;
 use go\core\orm\Entity;
 use go\core\model\Search;
 
@@ -67,7 +67,7 @@ class Module extends AclOwnerEntity {
 	/**
 	 * Get the module base file object
 	 * 
-	 * @return Base
+	 * @return core\Module
 	 */
 	public function module() {
 		if($this->package == "core" && $this->name == "core") {

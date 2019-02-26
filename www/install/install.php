@@ -13,7 +13,7 @@ use GO\Base\Model\Module;
 use GO\Base\Observable;
 use go\core\App;
 use go\core\jmap\State;
-use go\core\module\Base;
+use go\core;
 use go\modules\community\googleauthenticator\Module as GAModule;
 use go\modules\community\notes\Module as NotesModule;
 use go\modules\community\addressbook\Module as AddressBookModule;
@@ -63,7 +63,7 @@ if (!empty($_POST)) {
 		foreach ($modules as $moduleClass) {
 
 			$moduleController = new $moduleClass;
-			if ($moduleController instanceof Base) {
+			if ($moduleController instanceof core\Module) {
 				continue;
 			}
 			if ($moduleController->autoInstall() && $moduleController->isInstallable()) {

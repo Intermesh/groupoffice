@@ -3,7 +3,7 @@
 use GO\Base\Util\Crypt;
 use go\core\fs\File;
 use go\core\fs\Folder;
-use go\core\module\Base;
+use go\core\Module;
 
 /**
  * Copyright Intermesh
@@ -159,7 +159,7 @@ if ($cacheFile->exists()) {
 	if (count($load_modules)) {
 		$modules = array();
 		foreach ($load_modules as $module) {
-			if ($module->moduleManager instanceof Base) {
+			if ($module->moduleManager instanceof Module) {
 				$prefix = dirname(str_replace("\\", "/", get_class($module->moduleManager))) . "/views/extjs3/";
 				$scriptsFile = $module->moduleManager->path() . 'views/extjs3/scripts.txt';
 

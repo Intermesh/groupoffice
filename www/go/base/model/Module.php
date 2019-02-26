@@ -248,7 +248,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		$modules = \GO::modules()->getAllModules(true);
 		foreach ($modules as $module) {
 			
-			if($module->moduleManager instanceof \go\core\module\Base) {
+			if($module->moduleManager instanceof \go\core\Module) {
 				continue;
 			}
 			

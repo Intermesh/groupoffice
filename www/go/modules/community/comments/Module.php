@@ -2,12 +2,12 @@
 namespace go\modules\community\comments;
 
 use go\core\model\User;
-use go\core\module\Base;
+use go\core;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\modules\community\comments\model\Settings;
 
-class Module extends Base {	
+class Module extends core\Module {	
 
 	public function getAuthor() {
 		return "Intermesh BV";

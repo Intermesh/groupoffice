@@ -1,6 +1,6 @@
 <?php
 
-namespace go\core\module;
+namespace go\core;
 
 use Exception;
 use go\core\db\Utils;
@@ -8,7 +8,7 @@ use go\core\Environment;
 use go\core\exception\NotFound;
 use go\core\fs\File;
 use go\core\fs\Folder;
-use go\core\model\Module;
+use go\core\model;
 use go\core\orm\Entity;
 use go\core\util\ClassFinder;
 use function GO;
@@ -28,7 +28,7 @@ use function GO;
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
-abstract class Base {
+abstract class Module {
 	
 	/**
 	 * Find module class file by name
@@ -39,7 +39,7 @@ abstract class Base {
 	public static function findByName($moduleName) {
 		$classFinder = new ClassFinder(false);
 		$classFinder->addNamespace("go\\modules");
-		$mods = $classFinder->findByParent(Base::class);
+		$mods = $classFinder->findByParent(self::class);
 		
 		foreach($mods as $mod) {
 			if($mod::getName() == $moduleName) {
@@ -67,7 +67,7 @@ abstract class Base {
 		GO()->rebuildCache(true);
 		GO()->getDbConnection()->beginTransaction();
 		
-		$model = new Module();
+		$model = new model\Module();
 		$model->name = static::getName();
 		$model->package = static::getPackage();
 		$model->version = $this->getUpdateCount();
@@ -115,7 +115,7 @@ abstract class Base {
 			return false;
 		}
 		
-		$model = Module::find()->where(['name' => static::getName()])->single();
+		$model = model\Module::find()->where(['name' => static::getName()])->single();
 		if(!$model) {
 			throw new NotFound();
 		}
@@ -196,7 +196,7 @@ abstract class Base {
 	 * 
 	 * @return bool
 	 */
-	protected function afterInstall(Module $model) {
+	protected function afterInstall(model\Module $model) {
 		return true;
 	}
 	

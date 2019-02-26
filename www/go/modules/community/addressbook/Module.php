@@ -2,7 +2,7 @@
 namespace go\modules\community\addressbook;
 
 use go\core\http\Response;
-use go\core\module\Base;
+use go\core;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\modules\community\addressbook\convert\VCard;
@@ -31,7 +31,7 @@ use go\core\model\User;
  * 
  * 
  */
-class Module extends Base {
+class Module extends core\Module {
 							
 	public function getAuthor() {
 		return "Intermesh BV <info@intermesh.nl>";

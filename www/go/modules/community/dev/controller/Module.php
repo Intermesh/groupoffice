@@ -59,14 +59,14 @@ class Module extends Controller {
 <?php
 namespace $namespace;
 							
-use go\core\module\Base;
+use go\core;
 							
 /**						
  * @copyright (c) $year, Intermesh BV http://www.intermesh.nl
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
-class Module extends Base {
+class Module extends core\Module {
 							
 	public function getAuthor() {
 		return "Intermesh BV <info@intermesh.nl>";

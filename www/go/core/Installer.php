@@ -5,23 +5,24 @@ namespace go\core;
 use Exception;
 use GO;
 use go\core\App;
+use go\core\auth\Password;
 use go\core\auth\TemporaryState;
 use go\core\cache\Disk;
 use go\core\cache\None;
 use go\core\db\Query;
+use go\core\db\Table;
 use go\core\db\Utils;
 use go\core\Environment;
 use go\core\event\Listeners;
-use go\core\jmap\Entity as Entity2;
-use go\core\module\Base;
+use go\core\jmap;
+use go\core\model;
+use go\core\model\Group;
+use go\core\model\User;
+use go\core\model\UserGroup;
+use go\core\Module;
 use go\core\orm\Entity;
 use go\core\util\ClassFinder;
 use go\core\util\Lock;
-use go\core\model\Group;
-use go\core\model\Settings;
-use go\core\model\Module;
-use go\core\model\User;
-use go\core\model\UserGroup;
 use PDOException;
 
 class Installer {
@@ -42,7 +43,7 @@ class Installer {
 	/**
 	 * 
 	 * @param array $adminValues
-	 * @param Base[] $installModules
+	 * @param Module[] $installModules
 	 * @return boolean
 	 * @throws Exception
 	 */
@@ -55,7 +56,7 @@ class Installer {
 
 		self::$isInProgress = true;
 
-		Entity2::$trackChanges = false;
+		jmap\Entity::$trackChanges = false;
 
 		$database = App::get()->getDatabase();
 
@@ -105,7 +106,7 @@ class Installer {
 	
 	private function installCoreModule() {
 
-		$module = new Module();
+		$module = new model\Module();
 		$module->name = 'core';
 		$module->package = 'core';
 		$module->version = App::get()->getUpdateCount();
@@ -125,7 +126,7 @@ class Installer {
 		
 		GO()->getSettings()->setDefaultGroups([model\Group::ID_EVERYONE]);
 		
-		if(!auth\Password::register()) {
+		if(!Password::register()) {
 			throw new \Exception("Failed to register Password authenticator");
 		}
 	}
@@ -258,7 +259,7 @@ class Installer {
 		GO()->getDbConnection()->query("SET sql_mode=''");
 		GO()->getCache()->flush(false);
 		GO()->setCache(new None());
-		Entity2::$trackChanges = false;
+		jmap\Entity::$trackChanges = false;
 		
 		GO()->getDbConnection()->delete("core_entity", ['name' => 'GO\\Projects\\Model\\Project'])->execute();
 
@@ -283,7 +284,7 @@ class Installer {
 		GO()->resetSyncState();
 		
 		echo "Registering all entities\n";		
-		$modules = Module::find()->all();
+		$modules = model\Module::find()->all();
 		foreach($modules as $module) {
 			if(isset($module->package) && $module->isAvailable()) {
 				$module->module()->registerEntities();
@@ -299,7 +300,7 @@ class Installer {
 	 * You can use this in /install/upgrade.php
 	 */
 	public function checkVersions() {
-		$modules = Module::find()->all();
+		$modules = model\Module::find()->all();
 
 		/* @var $module Module */
 		foreach ($modules as $module) {
@@ -335,7 +336,7 @@ class Installer {
 		}
 	}
 	
-	private function getUpdatesFile(Module $module) {
+	private function getUpdatesFile(model\Module $module) {
 		if ($module->package == null) {
 			$root = GO()->getEnvironment()->getInstallFolder();
 			//old not refactored yet
@@ -357,10 +358,10 @@ class Installer {
 	private function upgradeModules() {
 		$u = [];
 
-		$modules = Module::find()->all();		
+		$modules = model\Module::find()->all();		
 
 		$modulesById = [];
-		/* @var $module Module */
+		/* @var $module model\Module */
 		foreach ($modules as $module) {
 
 			if (!$module->isAvailable()) {
@@ -417,7 +418,7 @@ class Installer {
 					if (is_callable($query)) {
 						
 						//upgrades may have modified tables so rebuild model and table cache
-						db\Table::destroyInstances();
+						Table::destroyInstances();
 						GO()->getCache()->flush(false);
 										
 						echo $modStr . "Running callable function\n";
@@ -425,7 +426,7 @@ class Installer {
 					} else if (substr($query, 0, 7) == 'script:') {
 						
 						//upgrades may have modified tables so rebuild model and table cache
-						db\Table::destroyInstances();
+						Table::destroyInstances();
 						GO()->getCache()->flush(false);
 						
 						$updateScript = $root->getFile('modules/' . $module->name . '/install/updatescripts/' . substr($query, 7));
@@ -477,7 +478,7 @@ class Installer {
 					//$moduleModel = GO\Base\Model\Module::model()->findByName($module);
 					//refetch module to see if package was updated
 					if (!$module->package) {
-						$module = Module::findById($moduleId);
+						$module = model\Module::findById($moduleId);
 						$newBackendUpgrade = $module->package != null;
 						if ($newBackendUpgrade) {
 							$module->version = $counts[$moduleId] = 0;

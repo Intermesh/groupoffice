@@ -81,7 +81,7 @@ class ModuleController extends AbstractJsonController{
 			
 			
 			
-			if($module instanceof \go\core\module\Base) {
+			if($module instanceof \go\core\Module) {
 			
 			$model = GO::modules()->isInstalled($module->getName(), false);
 			
@@ -151,7 +151,7 @@ class ModuleController extends AbstractJsonController{
 			
 			$module = new $moduleClass;//call_user_func($moduleClase();			
 			
-			if($module instanceof \go\core\module\Base) {
+			if($module instanceof \go\core\Module) {
 				$availableModules[$module->name()] = array(						
 						'name'=>$module->getName(),
 						'package'=>$module->getPackage()						

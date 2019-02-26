@@ -1,11 +1,11 @@
 <?php
 namespace go\modules\community\notes;
 
-use go\core\module\Base;
+use go\core;
 use go\core\model\Group;
 use go\core\model\Module as ModuleModel;
 
-class Module extends Base {	
+class Module extends core\Module {	
 
 	public function getAuthor() {
 		return "Intermesh BV";

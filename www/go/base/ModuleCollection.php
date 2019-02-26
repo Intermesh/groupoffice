@@ -94,7 +94,7 @@ class ModuleCollection extends Model\ModelCollection{
 		//for new framework
 		$classFinder = new \go\core\util\ClassFinder(false);
 		$classFinder->addNamespace("go\\modules");
-		$mods = $classFinder->findByParent(\go\core\module\Base::class);
+		$mods = $classFinder->findByParent(\go\core\Module::class);
 		$mods = array_filter($mods, function($mod) {
 			return $this->_isAllowed($mod::getName());
 		});

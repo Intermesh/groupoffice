@@ -3,11 +3,11 @@
 namespace go\modules\community\serverclient;
 
 use go\core\model\User;
-use \go\modules\community\serverclient\model\MailDomain;
-use go\core\module\Base;
+use go\modules\community\serverclient\model\MailDomain;
+use go\core;
 
 
-class Module extends Base {
+class Module extends core\Module {
 	public function getAuthor(){
 		return 'Intermesh BV';
 	}
