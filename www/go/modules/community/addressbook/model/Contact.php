@@ -553,12 +553,15 @@ class Contact extends AclItemEntity {
 		$to = Contact::findById($link->toId);
 		$from = Contact::findById($link->fromId);
 		
+		//Save contact as link to organizations affect the search entities too.
 		if(!$to->isOrganization) {
-			$to->save();
+			$to->saveSearch();
+			Contact::getType()->change($to);
 		}
 		
 		if(!$from->isOrganization) {
-			$from->save();
+			$from->saveSearch();
+			Contact::getType()->change($from);
 		}
 		
 //		$ids = [$link->toId, $link->fromId];

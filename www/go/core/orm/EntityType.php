@@ -325,6 +325,8 @@ class EntityType {
 	 */
 	public function checkChange(Entity $entity) {
 		
+		//GO()->debug($entity->getClientName(). ' checkChange() ' . $entity->getId());
+		
 		if(!$entity->isDeleted()) {
 			$modifiedPropnames = array_keys($entity->getModified());		
 			$userPropNames = $entity->getUserProperties();
@@ -333,14 +335,12 @@ class EntityType {
 			$userPropsModified = !empty(array_intersect($userPropNames, $modifiedPropnames));
 		} else
 		{
-			GO()->debug($entity->getClientName() . ' isDeleted');
 			$entityModified = true;
 			$userPropsModified = false;
 		}
 		
-		
-		if($entityModified) {
-			GO()->debug($entity->getClientName(). ' isDeleted');
+	
+		if($entityModified) {			
 			$this->change($entity);
 		}
 		

@@ -363,8 +363,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				console.warn("Not fetching " + this.entity.name + " (" + id + ") because it was not found in an earlier attempt");
 			} else
 			{
-				// Cast ID to string otherwise localforage won't find it!
-				unknownIds.push(id + "");
+				unknownIds.push(id);
 			}			
 		}
 		
@@ -400,7 +399,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 							if(!go.util.empty(response.notFound)) {
 								this.notFound = this.notFound.concat(response.notFound);
 								this.metaStore.setItem("notfound", this.notFound);								
-								console.log("Item not found", response);						
+								console.warn("Item not found", response);						
 							}
 							this.get(ids, cb, scope);
 						},

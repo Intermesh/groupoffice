@@ -265,6 +265,7 @@ class Link extends Entity {
 			$search = Search::find()->where(['entityId' => $this->toId, 'entityTypeId' => $this->toEntityTypeId])->single();
 			$this->toDescription = $search->description;
 			$this->toName = $search->name;
+			$this->toSearchId = $search->id;
 		}
 		
 		return App::get()->getDbConnection()->insertIgnore('core_link', $reverse)->execute();
