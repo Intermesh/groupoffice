@@ -70,7 +70,9 @@ abstract class Entity  extends \go\core\orm\Entity {
 			return false;
 		}
 		
-		$this->getType()->change($this);
+		if(self::$trackChanges) {
+			$this->getType()->change($this);
+		}
 		
 		return true;
 	}	
