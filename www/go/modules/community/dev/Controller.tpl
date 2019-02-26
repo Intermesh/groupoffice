@@ -21,5 +21,46 @@ class {model} extends EntityController {
 	protected function entityClass() {
 		return model\{model}::class;
 	}	
+	
+	/**
+	 * Handles the {model} entity's {model}/query command
+	 * 
+	 * @param array $params
+	 * @see https://jmap.io/spec-core.html#/query
+	 */
+	public function query($params) {
+		return $this->defaultQuery($params);
+	}
+	
+	/**
+	 * Handles the {model} entity's {model}/get command
+	 * 
+	 * @param array $params
+	 * @see https://jmap.io/spec-core.html#/get
+	 */
+	public function get($params) {
+		return $this->defaultGet($params);
+	}
+	
+	/**
+	 * Handles the {model} entity's {model}/set command
+	 * 
+	 * @see https://jmap.io/spec-core.html#/set
+	 * @param array $params
+	 */
+	public function set($params) {
+		return $this->defaultSet($params);
+	}
+	
+	
+	/**
+	 * Handles the {model} entity's {model}/changes command
+	 * 
+	 * @param array $params
+	 * @see https://jmap.io/spec-core.html#/changes
+	 */
+	public function changes($params) {
+		return $this->defaultChanges($params);
+	}
 }
 

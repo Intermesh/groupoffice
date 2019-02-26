@@ -141,7 +141,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 			if(!isset($this->package)) {
 				$this->_moduleManager = \GO\Base\Module::findByModuleName ($this->name);
 			} else if($this->package == "core" && $this->name == "core") {
-				$this->_moduleManager = new \go\core\Module();
+				$this->_moduleManager = \go\core\App::get();
 			}else{
 				$cls = "go\\modules\\" . $this->package ."\\" . $this->name . "\\Module";
 				$this->_moduleManager = new $cls;

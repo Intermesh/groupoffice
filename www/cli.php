@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 use go\core\App;
 use go\core\cache\None;

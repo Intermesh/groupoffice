@@ -34,7 +34,9 @@ use const GO_CONFIG_FILE;
 	 * 
 	 * 
 	 */
-	class App extends Singleton {
+	class App extends module\Base {
+		
+		use SingletonTrait;
 
 		/**
 		 *
@@ -66,10 +68,40 @@ use const GO_CONFIG_FILE;
 
 			$this->errorHandler = new ErrorHandler();
 			$this->initCompatibility();
-
-			parent::__construct();
 		}
 		
+		/**
+		 * Required for app being a go\core\Module extend
+		 * 
+		 * @return string
+		 */
+		public function getAuthor() {
+			return "Intermesh BV";
+		}
+
+		/**
+		 * Required for app being a go\core\Module extend
+		 * 
+		 * @return string
+		 */
+		public static function getName() {
+			return "core";
+		}
+
+		/**
+		 * Required for app being a go\core\Module extend
+		 * 
+		 * @return string
+		 */
+		public static function getPackage() {
+			return "core";
+		}
+
+		/**
+		 * Get version number
+		 * 
+		 * @return string eg. 6.4.1
+		 */
 		public function getVersion() {
 			if(!isset($this->version)) {
 				$this->version = require(Environment::get()->getInstallFolder()->getPath() . '/version.php');

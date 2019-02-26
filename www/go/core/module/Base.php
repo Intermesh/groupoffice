@@ -70,7 +70,7 @@ abstract class Base {
 		$model = new Module();
 		$model->name = static::getName();
 		$model->package = static::getPackage();
-		$model->version = $this->getVersion();
+		$model->version = $this->getUpdateCount();
 		
 		if(!$model->save()) {
 			$this->rollBack();
@@ -234,7 +234,7 @@ abstract class Base {
 	 * 
 	 * @return int
 	 */
-	public function getVersion() {
+	public function getUpdateCount() {
 		$updateFile = $this->getUpdatesFile();
 		
 		$count = 0;

@@ -70,15 +70,16 @@ class Module extends AclOwnerEntity {
 	 * @return Base
 	 */
 	public function module() {
+		if($this->package == "core" && $this->name == "core") {
+			return App::get();
+		}
+		
 		$cls = $this->getModuleClass();
 		
 		return new $cls;
 	}	
 	
-	private function getModuleClass() {
-		if($this->package == "core" && $this->name == "core") {
-			return "\\go\\core\\Module";
-		}
+	private function getModuleClass() {		
 		return "\\go\\modules\\" . $this->package ."\\" . $this->name ."\\Module";
 	}	
 	
@@ -94,6 +95,10 @@ class Module extends AclOwnerEntity {
 			}
 			
 			return (new $cls)->isAvailable();
+		}
+		
+		if($this->package == "core" && $this->name == "core") {
+			return true;
 		}
 		
 		//todo, how to handle licenses for future packages?
@@ -208,6 +213,10 @@ class Module extends AclOwnerEntity {
 	public function getSettings() {
 		if(!isset($this->package)) {
 			return null;
+		}
+		
+		if($this->name == "core") {
+			
 		}
 		
 		return $this->module()->getSettings();

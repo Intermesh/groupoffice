@@ -108,7 +108,7 @@ class Installer {
 		$module = new Module();
 		$module->name = 'core';
 		$module->package = 'core';
-		$module->version = (new \go\core\Module())->getVersion();
+		$module->version = App::get()->getUpdateCount();
 		if(!$module->save()) {
 			throw new \Exception("Could not save core module: " . var_export($module->getValidationErrors(), true));
 		}
