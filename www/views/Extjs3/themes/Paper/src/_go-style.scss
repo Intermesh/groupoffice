@@ -613,7 +613,7 @@ button {
 	}
 
 	.go-detail-view & {
-		float:left;
+		//float:left; ?? why?
 		margin-top:dp(4);
 		margin-right: dp(16);
 	}
