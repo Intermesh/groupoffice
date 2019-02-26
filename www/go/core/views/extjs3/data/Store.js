@@ -357,3 +357,5 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 //		
 //	}
 });
+
+Ext.reg('gostore', go.data.Store);

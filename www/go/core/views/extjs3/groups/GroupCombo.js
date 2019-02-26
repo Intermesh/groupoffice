@@ -11,10 +11,11 @@ go.groups.GroupCombo = Ext.extend(go.form.ComboBox, {
 	selectOnFocus: true,
 	forceSelection: true,
 	allowBlank: false,
-	store: new go.data.Store({
+	store: {
+		xtype: 'gostore',
 		fields: ['id', 'name'],
 		entityStore: "Group"
-	})
+	}
 });
 
 

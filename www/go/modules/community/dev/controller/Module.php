@@ -141,7 +141,7 @@ EOD;
 		$folder->getFolder('views/extjs3')->create();
 		$folder->getFile('views/extjs3/themes/default/style.css')->touch(true);
 		
-		$this->createFile($folder->getFile('views/extjs3/scripts.txt'), "module.js\nMainPanel.js\n");
+		$this->createFile($folder->getFile('views/extjs3/scripts.txt'), "Module.js\nMainPanel.js\n");
 		$moduleUCFirst = ucfirst($module);
 		$moduleJS = <<<EOD
 go.Modules.register("$package", "$module", {
@@ -152,7 +152,7 @@ go.Modules.register("$package", "$module", {
 });
 
 EOD;
-		$this->createFile($folder->getFile('views/extjs3/module.js'), $moduleJS);
+		$this->createFile($folder->getFile('views/extjs3/Module.js'), $moduleJS);
 		
 		$mainPanelJS = <<<EOD
 go.modules.$package.$module.MainPanel = Ext.extend(go.modules.ModulePanel, {

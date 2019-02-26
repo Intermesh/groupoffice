@@ -11,10 +11,11 @@ go.users.UserCombo = Ext.extend(go.form.ComboBox, {
 	selectOnFocus: true,
 	forceSelection: true,
 	allowBlank: false,
-	store: new go.data.Store({
+	store: {
+		xtype: 'gostore',
 		fields: ['id', 'displayName', 'username', 'avatarId'],
 		entityStore: "User"
-	}),
+	},
 	
 	initComponent: function() {
 		this.tpl = new Ext.XTemplate(
