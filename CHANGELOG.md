@@ -1,4 +1,5 @@
 - Tickets: Search didn't search message content anymore
+- Multi instance: Use cookie in when logging in from multi instance too.
 
 25-02-2019 6.3.66
 - Core: Fixed removal of Admin group from acl in groups when using "Apply defaults"
