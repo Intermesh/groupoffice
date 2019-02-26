@@ -126,6 +126,10 @@
 				}
 								
 			};
+			
+			if(!Ext.data.Types[cfg.name.toUpperCase()]) {
+				Ext.data.Types[cfg.name.toUpperCase()] = go.data.types[cfg.name];
+			}
     },
 
 		/**
@@ -187,6 +191,25 @@
 			});
 
 			return linkConfigs;
+		},
+		
+		getLinkIcon : function(entity, filter) {
+			var linkConfig = this.getLinkConfigs().find(function(cfg) {
+
+				if(entity != cfg.entity) {
+					return false;
+				}
+
+				if(filter != cfg.filter) {
+					return false;
+				}
+
+				return true;
+			});
+
+			return linkConfig ? linkConfig.iconCls : "";
+
+			
 		}
   };
   

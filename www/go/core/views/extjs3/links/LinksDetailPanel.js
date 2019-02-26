@@ -14,7 +14,14 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 					entities: [{name: this.link.entity, filter: this.link.filter}]
 				}
 			},
-			fields: ['id', 'to', 'toId', {name: 'createdAt', type: 'date'}, 'toEntity'],
+			fields: [
+				'id', 
+				{name: "to", type: "Search", key: "toSearchId"}, 
+				'toId', 
+				'toSearchId',
+				{name: 'createdAt', type: 'date'}, 
+				'toEntity'
+			],
 			entityStore: "Link",
 			listeners: {
 				datachanged: function () {

@@ -550,23 +550,34 @@ class Contact extends AclItemEntity {
 			return;
 		}
 		
-		$ids = [$link->toId, $link->fromId];
+		$to = Contact::findById($link->toId);
+		$from = Contact::findById($link->fromId);
 		
-		//Update modifiedAt dates for Z-Push and carddav
-		GO()->getDbConnection()
-						->update(
-										'addressbook_contact',
-										['modifiedAt' => new DateTime()], 
-										['id' => $ids]
-										)->execute();	
+		if(!$to->isOrganization) {
+			$to->save();
+		}
 		
-		Contact::getType()->changes(
-					(new Query2)
-					->select('c.id AS entityId, a.aclId, "0" AS destroyed')
-					->from('addressbook_contact', 'c')
-					->join('addressbook_addressbook', 'a', 'a.id = c.addressBookId')					
-					->where('c.id', 'IN', $ids)
-					);
+		if(!$from->isOrganization) {
+			$from->save();
+		}
+		
+//		$ids = [$link->toId, $link->fromId];
+//		
+//		//Update modifiedAt dates for Z-Push and carddav
+//		GO()->getDbConnection()
+//						->update(
+//										'addressbook_contact',
+//										['modifiedAt' => new DateTime()], 
+//										['id' => $ids]
+//										)->execute();	
+//		
+//		Contact::getType()->changes(
+//					(new Query2)
+//					->select('c.id AS entityId, a.aclId, "0" AS destroyed')
+//					->from('addressbook_contact', 'c')
+//					->join('addressbook_addressbook', 'a', 'a.id = c.addressBookId')					
+//					->where('c.id', 'IN', $ids)
+//					);
 		
 	}
 	

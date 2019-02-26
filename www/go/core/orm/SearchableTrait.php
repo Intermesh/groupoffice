@@ -73,7 +73,7 @@ trait SearchableTrait {
 		
 		$keywords = array_unique($keywords);
 		
-		$search->setKeywords(implode(',', $keywords));
+		$search->setKeywords(implode(',', $keywords));		
 		
 		if(!$search->internalSave()) {
 			throw new \Exception("Could not save search cache: " . var_export($search->getValidationErrors(), true));

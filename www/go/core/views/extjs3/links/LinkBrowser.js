@@ -30,7 +30,7 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 		this.store = new go.data.GroupingStore({
 			autoDestroy: true,
 			remoteGroup: true,
-			fields: ['id', 'toId', 'toEntity', 'to', 'description', {name: 'modifiedAt', type: 'date'}],
+			fields: ['id', 'toId', 'toEntity', {name: "to", type: "Search", key: "toSearchId"}, 'description', {name: 'modifiedAt', type: 'date'}],
 			entityStore: "Link",
 			sortInfo: {field: 'toEntity', direction: 'DESC'},
 			autoLoad: true,
@@ -73,8 +73,12 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 
 						var str = record.data.to.name + " <br /><label>" + record.data.to.description + "</label>";
 
-						if (rowIndex === 0 || store.getAt(rowIndex - 1).data.toEntity !== record.data.toEntity) {
-							str = '<i class="entity ' + record.data.toEntity + '"></i>' + str;
+						var linkIconCls = go.Entities.getLinkIcon(record.data.toEntity, record.data.to.filter);
+						
+						if (rowIndex === 0 || this.lastLinkIconCls != linkIconCls) {
+							str = '<i class="entity ' + linkIconCls + '"></i>' + str;
+							
+							this.lastLinkIconCls = linkIconCls;
 						}
 
 						return str;

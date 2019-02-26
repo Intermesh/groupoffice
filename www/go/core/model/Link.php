@@ -55,6 +55,7 @@ class Link extends Entity {
 	protected $fromEntity;	
 	protected $toName;
 	protected $toDescription;
+	public $toSearchId;
 	
 	protected $aclId;
 	
@@ -126,7 +127,7 @@ class Link extends Entity {
 										->addTable('core_link', 'l')
 										->setQuery(
 														(new Query())
-														->select("eFrom.clientName AS fromEntity, eTo.clientName AS toEntity, s.name as toName, s.description as toDescription, s.aclId")
+														->select("eFrom.clientName AS fromEntity, eTo.clientName AS toEntity, s.name as toName, s.description as toDescription, s.aclId, s.id as toSearchId")
 														->join('core_entity', 'eFrom', 'eFrom.id = l.fromEntityTypeId')
 														->join('core_entity', 'eTo', 'eTo.id = l.toEntityTypeId')
 														->join('core_search', 's', 's.entityId = l.toId AND s.entityTypeId = l.toEntityTypeId')
@@ -306,15 +307,15 @@ class Link extends Entity {
 	public function hasPermissionLevel($level = Acl::LEVEL_READ) {
 		return $this->getPermissionLevel() >= $level;
 	}
-	
-	/**
-	 * The to properties
-	 * 	
-	 * @return array ['name' => string, 'description' => 'description']
-	 */
-	public function getTo() {
-		return ['name' => $this->toName, 'description' => $this->toDescription];
-	}
+//	
+//	/**
+//	 * The to properties
+//	 * 	
+//	 * @return array ['name' => string, 'description' => 'description']
+//	 */
+//	public function getTo() {
+//		return ['name' => $this->toName, 'description' => $this->toDescription];
+//	}
 	
 	protected static function defineFilters() {
 		return parent::defineFilters()

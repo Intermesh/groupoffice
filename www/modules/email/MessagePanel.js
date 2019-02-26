@@ -203,22 +203,24 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 		this.template = new Ext.XTemplate(templateStr,{
 
-			linkIconCls : function(link) {
-				console.log(link);
-				var linkConfig = go.Entities.getLinkConfigs().find(function(cfg) {
-					console.log(cfg);
-					if(link.entity != cfg.entity) {
-						return false;
-					}
-					
-					if(link.filter != cfg.filter) {
-						return false;
-					}
-					
-					return true;
-				});
+			linkIconCls : function(link) {				
 				
-				return linkConfig ? linkConfig.iconCls : "";
+				return go.Entities.getLinkIcon(link.entity, link.filter);
+				
+//				var linkConfig = go.Entities.getLinkConfigs().find(function(cfg) {
+//					
+//					if(link.entity != cfg.entity) {
+//						return false;
+//					}
+//					
+//					if(link.filter != cfg.filter) {
+//						return false;
+//					}
+//					
+//					return true;
+//				});
+//				
+//				return linkConfig ? linkConfig.iconCls : "";
 			},
 			addSlashes : function(str)
 			{

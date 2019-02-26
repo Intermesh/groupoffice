@@ -178,6 +178,9 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 		var f = [];
 
 		this.fields.forEach(function (field) {
+			if(Ext.isString(field.type)) {
+				field.type = Ext.data.Types[field.type.toUpperCase()];
+			}
 			if (field.type && field.type.entity) {
 				f.push(field);
 			}
