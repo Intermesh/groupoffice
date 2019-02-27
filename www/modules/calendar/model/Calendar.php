@@ -176,15 +176,6 @@ This is the default calendar of user :username", "calendar"), array(':username'=
 	
 	protected function afterSave($wasNew) {
 		
-		if($wasNew && $this->group){
-			$stmt = $this->group->admins;
-		 
-		 foreach($stmt as $user){
-			 if($user->user_id!=$this->user_id)//the owner has already been added automatically with manage permission
-				$this->acl->addUser($user->user_id, \GO\Base\Model\Acl::DELETE_PERMISSION);
-		 }
-		}
-		
 		$file = new \GO\Base\Fs\File($this->getPublicIcsPath());
 		
 		if(!$this->public){
