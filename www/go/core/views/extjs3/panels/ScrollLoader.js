@@ -21,17 +21,19 @@ go.panels.ScrollLoader = {
 			this.on('afterrender', this.onRenderScrollLoader, this);
 
 			this.store.baseParams.limit = this.pageSize;
+			
+			
+			this.on("afterrender", function() {
+				if(this.store.loaded) {
+					this.loadMore();
+				}
+			}, this, {single: true});
 
 			this.store.on("load", function(store, records, o){
 				this.allRecordsLoaded = records.length < this.pageSize;
-				
-				if(this.rendered) {
+				//If this element or any parent is hidden then  this.el.dom.offsetParent == null
+				if(this.rendered && this.el.dom.offsetParent) {
 					this.loadMore();			
-				} else
-				{
-					this.on("afterrender", function() {
-						this.loadMore();
-					}, this, {single: true});
 				}
 			}, this);
 		}

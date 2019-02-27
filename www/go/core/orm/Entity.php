@@ -108,7 +108,7 @@ abstract class Entity extends Property {
 	 */
 	public function getId() {		
 		$keys = $this->primaryKeyValues();
-		return count($keys) > 1 ? implode("-", array_values($keys)) : array_values($keys)[0];
+		return implode("-", array_values($keys));
 	}
 
 	/**

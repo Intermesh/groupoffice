@@ -28,6 +28,12 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	
 	changes : null,
 	
+	/**
+	 * changedIds is set by a /changes request. If this item is added because of 
+	 * a changes request we must fire a changes event. Not if we're loading by request.
+	 */
+	changedIds : null,
+	
 	// Set to true when all dasta has been fetched from server
 	isComplete : false,
 	
@@ -84,6 +90,8 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			changed: {},
 			destroyed: []
 		};
+		
+		this.changedIds = [];
 	},
 	
 	clearState : function() {
@@ -97,21 +105,31 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		this.stateStore.clear();
 	},
 	
-	_add : function(entity) {
+	_add : function(entity, fireChanges) {
 		
 		if(!entity.id) {
 			console.error(entity);
 			throw "Entity doesn't have an 'id' property";
+		}		
+		
+		//ChangedIds is set by a /changes request. If this item is added because of 
+		// a changes request we must fire a changes event. Not if we're loading by request.
+		if(!Ext.isDefined(fireChanges)) {
+			fireChanges = this.changedIds.indexOf(entity.id) > -1;
 		}
 		
 		if(this.data[entity.id]) {			
-			this.changes.changed[entity.id] = entity;
+			if(fireChanges) {
+				this.changes.changed[entity.id] = entity;
+			}
 			Ext.apply(this.data[entity.id], entity);
 		} else
 		{
-			this.changes.added[entity.id] = entity;
+			if(fireChanges) {
+				this.changes.added[entity.id] = entity;
+			}
 			this.data[entity.id] = entity;
-		}		
+		}
 		
 		
 		//remove from not found.
@@ -124,7 +142,9 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		//Localforage requires ID to be string
 		this.stateStore.setItem(entity.id + "", entity);
 		
-		this._fireChanges();
+		if(fireChanges) {
+			this._fireChanges();
+		}
 	},
 	
 	_destroy : function(id) {
@@ -229,6 +249,11 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					sinceState: this.state
 				},
 				callback: function(options, success, response) {
+					
+					//keep this array for the Foo/get response to check if an event must be fired.
+					//We will only fire added and changed in _add if this came from a /changes 
+					//request and not when we are loading data ourselves.
+					this.changedIds = response.changed || [];
 					
 					if(response.removed) {
 						for(var i = 0, l = response.removed.length; i < l; i++) {
@@ -492,13 +517,13 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					return;
 				}
 				
-				var entity, clientId;
+				var entity, clientId;				
 				
 				if(response.created) {
 					for(clientId in response.created) {
 						//merge client data with server defaults.
-						entity = Ext.apply(params.create[clientId], response.created[clientId]);						
-						this._add(entity);
+						entity = Ext.apply(params.create[clientId], response.created[clientId]);			
+						this._add(entity, true);
 					}
 				}
 				
@@ -507,7 +532,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 						//merge existing data, with updates from client and server						
 						entity = Ext.apply(this.data[serverId], params.update[serverId]);
 						entity = Ext.apply(entity, response.updated[serverId]);
-						this._add(entity);
+						this._add(entity, true);
 					}
 				}
 				
