@@ -27,7 +27,7 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 	model_id: 0,
 	model_name : "",
 
-	cls : 'go-display-panel',
+	cls : 'go-display-panel go-detail-view',
 	
 	isDisplayPanel : true,
 	

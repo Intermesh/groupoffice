@@ -544,7 +544,7 @@ button {
 	width:dp(40);
 	height: dp(40);
 	
-	.go-detail-view & {
+	.go-detail-view &{
 		float:left;
 		margin-top:dp(4);
 		margin-right: dp(16);
@@ -807,7 +807,7 @@ button.filetype-pdf, button.filetype-doc {
 }
 
 //detail view
-.go-detail-view, .go-display-panel {
+.go-detail-view {
 	
 	@extend %font-body1;
 	/*.x-btn.fab {
