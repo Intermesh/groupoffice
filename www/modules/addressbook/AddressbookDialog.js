@@ -268,8 +268,8 @@ GO.addressbook.AddressbookDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 			});
 			this.addPanel(this.disableCompaniesCategoriesPanel);
 			
-			this.enableBlocksPanel = new GO.customfields.EnableBlocksPanel();
-			this.addPanel(this.enableBlocksPanel);
+//			this.enableBlocksPanel = new GO.customfields.EnableBlocksPanel();
+//			this.addPanel(this.enableBlocksPanel);
 		}
 	},
 	
@@ -282,7 +282,7 @@ GO.addressbook.AddressbookDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 		if(go.Modules.isAvailable("core", "customfields")){
 			this.disableContactsCategoriesPanel.setModel(remoteModelId, "GO\\Addressbook\\Model\\Contact");
 			this.disableCompaniesCategoriesPanel.setModel(remoteModelId, "GO\\Addressbook\\Model\\Company");
-			this.enableBlocksPanel.setModel(remoteModelId,"GO\\Addressbook\\Model\\Addressbook");
+			//this.enableBlocksPanel.setModel(remoteModelId,"GO\\Addressbook\\Model\\Addressbook");
 		}
 		
 		this.removeDuplicatesButton.setDisabled(!remoteModelId);
