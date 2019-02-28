@@ -1318,6 +1318,10 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 
 		$workingFolder = \GO\Files\Model\Folder::model()->findByPk($params['working_folder_id']);
+		
+		if(!$workingFolder->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION)){
+			throw new \GO\Base\Exception\AccessDenied("No permission to write in the target folder.");
+		}
 
 		$workingPath = \GO::config()->file_storage_path.$workingFolder->path;
 		chdir($workingPath);
