@@ -594,9 +594,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 						if ($params['overwrite'] == 'no')
 							$params['overwrite'] = 'ask';
 
-						continue;
-
-						break;
+						continue 2;
 				}
 			}
 
