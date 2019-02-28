@@ -469,22 +469,20 @@ class Contact extends AclItemEntity {
 	private $setOrganizationIds;
 	
 	public function getOrganizationIds() {
-		
-		if($this->isNew()) {
-			$this->organizationIds = [];
-		}
-		
-		if(!isset($this->organizationIds)) {
-			
-			$query = GO()->getDbConnection()->selectSingleValue('toId')->from('core_link', 'l')
+
+		if(!isset($this->organizationIds)) {			
+			if($this->isNew()) {
+				$this->organizationIds = [];
+			} else {
+				$query = GO()->getDbConnection()->selectSingleValue('toId')->from('core_link', 'l')
 							->join('addressbook_contact', 'c','c.id=l.toId and l.toEntityTypeId = '.self::getType()->getId())
 							->where('fromId', '=', $this->id)
 							->andWhere('fromEntityTypeId', '=', self::getType()->getId())
 							->andWhere('c.isOrganization', '=', true);
 			
-			$this->organizationIds = array_map("intval", $query->all());
-		}
-		
+				$this->organizationIds = array_map("intval", $query->all());
+			}
+		}		
 		
 		return $this->organizationIds;
 	}
@@ -518,7 +516,7 @@ class Contact extends AclItemEntity {
 	protected function getSearchDescription() {
 		$addressBook = AddressBook::findById($this->addressBookId);
 		
-		$orgStr = "";
+		$orgStr = "";	
 		
 		if(!$this->isOrganization) {
 			$organizationIds = $this->getOrganizationIds();
@@ -554,12 +552,12 @@ class Contact extends AclItemEntity {
 		$from = Contact::findById($link->fromId);
 		
 		//Save contact as link to organizations affect the search entities too.
-		if(!$to->isOrganization) {
+		if(!$to->isOrganization) {			
 			$to->saveSearch();
 			Contact::getType()->change($to);
 		}
 		
-		if(!$from->isOrganization) {
+		if(!$from->isOrganization) {			
 			$from->saveSearch();
 			Contact::getType()->change($from);
 		}
