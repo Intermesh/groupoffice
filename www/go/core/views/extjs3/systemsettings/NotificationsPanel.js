@@ -1,8 +1,6 @@
 go.systemsettings.NotificationsPanel = Ext.extend(go.systemsettings.Panel, {
 	initComponent: function () {
 		
-		var tmpDebugMail;
-		
 		Ext.apply(this, {
 			title: t('Notifications'),
 			autoScroll: true,
@@ -77,7 +75,7 @@ go.systemsettings.NotificationsPanel = Ext.extend(go.systemsettings.Panel, {
 					]
 				}, {
 					xtype: "fieldset",
-					title: t('Debug'),
+					title: t('Debug'),					
 					items: [{
 							xtype: 'xcheckbox',
 							name: "enableEmailDebug",
@@ -86,12 +84,6 @@ go.systemsettings.NotificationsPanel = Ext.extend(go.systemsettings.Panel, {
 							boxLabel: t("Send all system notifications to the specified e-mail address"),
 							listeners: {
 								check: function (checkbox, checked) {
-									if(!checked) {
-										tmpDebugMail = this.getForm().findField('debugEmail').getValue();
-										this.getForm().findField('debugEmail').setValue('');
-									} else {
-										this.getForm().findField('debugEmail').setValue(tmpDebugMail);
-									}
 									this.getForm().findField('debugEmail').setReadOnly(!checked);
 								},
 								scope: this
@@ -100,14 +92,24 @@ go.systemsettings.NotificationsPanel = Ext.extend(go.systemsettings.Panel, {
 							xtype: 'textfield',
 							name: 'debugEmail',
 							readOnly: true,
-							fieldLabel: t("E-mail")
+							fieldLabel: t("E-mail"),
+							width: dp(240)
 						}]
 				}]
 		});
 
-		go.systemsettings.NotificationsPanel.superclass.initComponent.call(this);
+		go.systemsettings.NotificationsPanel.superclass.initComponent.call(this);		
 		
+	},
+	
+	onSubmit: function (cb, scope) {
 		
+		//clear debug mail on save
+		if(!this.getForm().findField('enableEmailDebug').checked) {
+			this.getForm().findField('debugEmail').setValue('');
+		}
+		
+		go.systemsettings.NotificationsPanel.superclass.onSubmit.call(this, cb, scope);
 	},
 	
 	afterRender: function() {
