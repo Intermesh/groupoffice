@@ -3351,7 +3351,20 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				
 				return $modifications;
 			case \GO\Log\Model\Log::ACTION_ADD:
-				return $this->getAttributes();
+				$attrs =  $this->getAttributes();
+				$logAttrs = array();
+				foreach($attrs as $attr=>$val){
+					
+					$newVal = $this->getAttribute($attr);
+					
+					if(strlen($val) > $cutoffLength){
+						$newVal = substr($newVal,0,$cutoffLength).$cutoffString;
+					}
+					
+					$logAttrs[$attr] = $newVal;
+				}
+								
+				return $logAttrs;
 		}
 		
 		return array();
@@ -3680,7 +3693,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * @param StringHelper $attributeName
 	 */
 	public function cutAttributeLength($attributeName){
-		if(!empty($this->columns[$attributeName]['length']) && \GO\Base\Util\StringHelper::length($this->_attributes[$attributeName]) > $this->columns[$attributeName]['length']){
+		
+		if($this->columns[$attributeName]['dbtype'] == 'text' || $this->columns[$attributeName]['dbtype'] == 'mediumtext'){
+			$this->_attributes[$attributeName]= substr($this->_attributes[$attributeName], 0, $this->columns[$attributeName]['length']);
+		} else if(!empty($this->columns[$attributeName]['length']) && \GO\Base\Util\StringHelper::length($this->_attributes[$attributeName]) > $this->columns[$attributeName]['length']){
 			$this->_attributes[$attributeName]=\GO\Base\Util\StringHelper::substr($this->_attributes[$attributeName], 0, $this->columns[$attributeName]['length']);
 		}
 	}
