@@ -475,7 +475,7 @@ Ext.extend(GO.email.MessagesGrid, GO.grid.GridPanel,{
 		}
 		var priority = record.data['x_priority'];
 		if(priority && priority < 3) {
-			icons.push('high_priority');
+			icons.push('priority_high');
 		}
 		if(priority && priority > 3) {
 			icons.push('low_priority');
