@@ -152,8 +152,10 @@ class Link extends Entity {
 		
 		$link = new Link();
 		$link->fromId = $a->id;
+		$link->fromEntity = $a->getType()->getName();
 		$link->fromEntityTypeId = $a->getType()->getId();
 		$link->toId = $b->id;
+		$link->toEntity = $b->getType()->getName();
 		$link->toEntityTypeId = $b->getType()->getId();
 		$link->description = $description;		
 		
