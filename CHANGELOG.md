@@ -1,3 +1,4 @@
+- Core: Added maxlength props to text and mediumtext dbtypes
 - Files: Decompress zipped files in folder with read only permissions will throw an access denied exception. 
 - Tickets: Search didn't search message content anymore
 - Multi instance: Use cookie in when logging in from multi instance too.
