@@ -56,6 +56,7 @@ class Utils{
 		$stmt = \GO::getDbConnection()->query('SHOW TABLES');
 		while($r=$stmt->fetch()){
 			if($r[0]==$tableName){
+				$stmt->closeCursor();
 				return true;
 			}		
 		}

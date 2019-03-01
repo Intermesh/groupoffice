@@ -17,7 +17,14 @@ function output($data = [], $status = 200, $statusMsg = null) {
 	Response::get()->sendHeaders();
 
 	$data['debug'] = GO()->getDebugger()->getEntries();
-	Response::get()->output(json_encode($data));
+	
+	//var_dump($data);
+	
+	$json = json_encode($data);
+	if(!$json) {
+		throw new \Exception("Failed to encode JSON: " . json_last_error_msg());
+	}	
+	Response::get()->output($json);
 
 	exit();
 }

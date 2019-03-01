@@ -79,6 +79,7 @@ class Utils {
 		$stmt = App::get()->getDbConnection()->query('SHOW DATABASES');
 		while ($r = $stmt->fetch()) {
 			if ($r[0] == $databaseName) {
+				$stmt->closeCursor();
 				return true;
 			}
 		}

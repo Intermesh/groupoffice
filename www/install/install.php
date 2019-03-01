@@ -23,10 +23,15 @@ function dbIsEmpty() {
 	//global $pdo;
 	/* @var $pdo \PDO; */
 	
+	return true;
+	
 	$stmt = App::get()->getDbConnection()->query("SHOW TABLES");
 	$stmt->execute();
 	
-	return $stmt->rowCount() == 0;
+	$empty = !$stmt->fetch();
+	$stmt->closeCursor();
+	
+	return $empty;
 }
 
 if(!dbIsEmpty()) {
@@ -39,8 +44,12 @@ $passwordMatch = true;
 if (!empty($_POST)) {
 
 	if ($_POST['password'] == $_POST['passwordConfirm']) {
+		
+		GO()->getDbConnection()->exec("DROP DATABASE test");
+		GO()->getDbConnection()->exec("CREATE DATABASE test");
+		GO()->getDbConnection()->exec("USE test");
 
-		App::get()->setAuthState(new State());
+		App::get()->setAuthState(new core\auth\TemporaryState());
 
 		$admin = [
 				'displayName' => "System Administrator",
@@ -54,7 +63,6 @@ if (!empty($_POST)) {
 				new NotesModule(),
 				new GAModule()
 				]);
-
 
 		//install not yet refactored modules
 		GO::$ignoreAclPermissions = true;

@@ -104,12 +104,12 @@ class Blob extends orm\Entity {
 		$refs = GO()->getCache()->get("blob-refs");
 		if(!$refs) {
 			$dbName = GO()->getDatabase()->getName();
-			GO()->getDbConnection()->query("USE information_schema");
+			GO()->getDbConnection()->exec("USE information_schema");
 			//somehow bindvalue didn't work here
 			$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where constraint_schema=" . GO()->getDbConnection()->getPDO()->quote($dbName) . " and referenced_table_name='core_blob' and referenced_column_name = 'id'";
 			$stmt = GO()->getDbConnection()->getPDO()->query($sql);
 			$refs = $stmt->fetchAll(\PDO::FETCH_ASSOC);		
-			GO()->getDbConnection()->query("USE `" . $dbName . "`");			
+			GO()->getDbConnection()->exec("USE `" . $dbName . "`");			
 			
 			GO()->getCache()->set("blob-refs", $refs);			
 		}		

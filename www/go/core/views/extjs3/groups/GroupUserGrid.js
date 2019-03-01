@@ -164,7 +164,7 @@ go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 			this.store.sortData();
 			
 			this.store.setFilter('exclude', {
-				exclude: this.geselectedUsers
+				exclude: this.selectedUsers
 			});
 			
 			this.store.load({

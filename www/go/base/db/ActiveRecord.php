@@ -3778,22 +3778,23 @@ abstract class ActiveRecord extends \GO\Base\Model{
 //		}
 //
 		$i = 0;
-		$paramMap = [];
+		$paramMap = [];		
+		$bindParams=array();
 		foreach($this->_modifiedAttributes as $field=>$oldValue) {
-			$p[$field] = "upd".$i;
-			$updates[] = "`$field` = :".$p[$field];
+			$i++;
+			$tag = ":upd".$i;
+			$bindParams[$tag]=$field;
 			
+			$updates[] = "`$field` = ".$tag;
+
 			$i++;
 		}
-
 
 		if(!count($updates))
 			return true;
 
 		$sql = "UPDATE `{$this->tableName()}` SET ".implode(',',$updates)." WHERE ";
 
-
-		$bindParams=array();
 
 		$pk = $this->primaryKey();
 		if(!is_array($pk)){
@@ -3807,29 +3808,22 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			else
 				$first=false;
 			
-			if(!isset($p[$field])) {
-				$p[$field] = "upd".$i;
-				$i++;
-			}
-
-			$sql .= "`".$field."`=:".$p[$field];
+			$i++;
+			$tag = ":upd".$i;
+			$bindParams[$tag]=$field;
+			$sql .= "`".$field."` = ".$tag;
+			
 		}
-
-		$bindParams[$field]=$this->_attributes[$field];
-
 
 
 		try{
 			$stmt = $this->getDbConnection()->prepare($sql);
 
-			$pks = is_array($this->primaryKey()) ? $this->primaryKey() : array($this->primaryKey());
+			//$pks = is_array($this->primaryKey()) ? $this->primaryKey() : array($this->primaryKey());
 
-			foreach($this->columns as $field => $attr){
-
-				if($this->isModified($field) || in_array($field, $pks)){
-					$bindParams[$field]=$this->_attributes[$field];
-					$stmt->bindParam(':'.$p[$field], $this->_attributes[$field], $attr['type'], empty($attr['length']) ? null : $attr['length']);
-				}
+			foreach($bindParams as $tag => $field){
+				$attr = $this->getColumn($field);
+				$stmt->bindParam($tag, $this->_attributes[$field], $attr['type'], empty($attr['length']) ? null : $attr['length']);
 			}
 
 			if($this->_debugSql)
@@ -3843,7 +3837,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			$msg = $e->getMessage();
 
 			if(GO::config()->debug){
-				$msg .= "\n\nFull SQL Query: ".$sql."\n\nParams:\n".var_export($this->_attributes, true);
+				$msg .= "\n\nFull SQL Query: ".$sql."\n\nParams:\n".var_export($bindParams, true);
 
 				$msg .= "\n\n".$e->getTraceAsString();
 

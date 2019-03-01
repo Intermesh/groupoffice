@@ -50,6 +50,7 @@ abstract class AclOwnerEntity extends AclEntity {
 			$this->createAcl();
 		}
 		
+		
 		return parent::internalSave();
 	}
 	
@@ -59,10 +60,10 @@ abstract class AclOwnerEntity extends AclEntity {
 		$this->acl->ownedBy = !empty($this->createdBy) ? $this->createdBy : $this->getDefaultCreatedBy();
 
 		if(!$this->acl->save()) {	
-			return false;
+			throw new \Exception("Could not create ACL");
 		}
 
-		$this->aclId = $this->acl->id;
+		$this->aclId = $this->acl->id;		
 	}
 	
 	protected function internalDelete() {

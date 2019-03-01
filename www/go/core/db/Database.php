@@ -75,7 +75,7 @@ class Database {
 		$sql = "SELECT DATABASE();";
 		$stmt = App::get()->getDbConnection()->query($sql);
 		$stmt->setFetchMode(PDO::FETCH_COLUMN, 0);
-		return  $stmt->fetch();		
+		return $stmt->fetch();				
 	}
 	
 	/**
@@ -86,7 +86,7 @@ class Database {
 	public function setUtf8() {
 		//Set utf8 as collation default
 		$sql = "ALTER DATABASE `" .$this->getName() . "` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";		
-		return App::get()->getDbConnection()->query($sql);
+		return App::get()->getDbConnection()->exec($sql) !== false;
 	}
 }
 

@@ -23,9 +23,7 @@ use PDOStatement;
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
 class Connection {
-
-	const SQL_MODE = "STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"; // "ONLY_FULL_GROUP_BY,STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION";
-
+	
 	private $dsn;
 	private $username;
 	private $password;
@@ -44,11 +42,14 @@ class Connection {
 	 */
 	public $debug = false;
 	
-	public function __construct($dsn, $username, $password, $options = []) {
+	public function __construct($dsn, $username, $password) {
 		$this->dsn = $dsn;
 		$this->username = $username;
 		$this->password = $password;
-		$this->options = $options;
+		$this->options = [
+				PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
+				PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci',sql_mode='STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION',time_zone = '+00:00',lc_messages = 'en_US'"
+		];
 	}
 
 	/**
@@ -97,16 +98,12 @@ class Connection {
 	 */
 	private function setPDO() {
 		$this->pdo = null;
-		$this->pdo = new PDO($this->dsn, $this->username, $this->password, $this->options);
+		$this->pdo = new PDO($this->dsn, $this->username, $this->password, $this->options);		
 		$this->getPdo()->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		$this->getPdo()->setAttribute(PDO::ATTR_PERSISTENT, true);
-//		$this->getPdo()->setAttribute(PDO::ATTR_EMULATE_PREPARES, false); //for native data types int, bool etc. We can't use this because we need fetch_class
-		$this->getPdo()->query("SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci'");
-		$this->getPdo()->query("SET sql_mode='" . self::SQL_MODE . "'");
-		$this->getPdo()->query("SET time_zone = '+00:00'");
-		$this->getPdo()->query("SET lc_messages = 'en_US';"); //unique key error is caught and parsed and relies on english
-		
 		$this->getPdo()->setAttribute(PDO::ATTR_STATEMENT_CLASS, [Statement::class]);
+		$this->getPdo()->setAttribute(PDO::ATTR_EMULATE_PREPARES, false); //for native data types int, bool etc.
+		$this->getPdo()->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
 	}
 
 	/**
@@ -124,12 +121,29 @@ class Connection {
 		}
 		return $this->getPdo()->query($sql);
 	}
+	
+	/**
+	 * Execute an SQL statement and return the number of affected rows
+	 * <p><b>PDO::exec()</b> executes an SQL statement in a single function call, returning the number of rows affected by the statement.</p><p><b>PDO::exec()</b> does not return results from a SELECT statement. For a SELECT statement that you only need to issue once during your program, consider issuing <code>PDO::query()</code>. For a statement that you need to issue multiple times, prepare a PDOStatement object with <code>PDO::prepare()</code> and issue the statement with <code>PDOStatement::execute()</code>.</p>
+	 * @param string $statement <p>The SQL statement to prepare and execute.</p> <p>Data inside the query should be properly escaped.</p>
+	 * @return int <p><b>PDO::exec()</b> returns the number of rows that were modified or deleted by the SQL statement you issued. If no rows were affected, <b>PDO::exec()</b> returns <i>0</i>.</p><p><b>Warning</b></p><p>This function may return Boolean <b><code>FALSE</code></b>, but may also return a non-Boolean value which evaluates to <b><code>FALSE</code></b>. Please read the section on Booleans for more information. Use the === operator for testing the return value of this function.</p><p>The following example incorrectly relies on the return value of <b>PDO::exec()</b>, wherein a statement that affected 0 rows results in a call to <code>die()</code>:</p> <code> &lt;&#63;php<br>$db-&gt;exec()&nbsp;or&nbsp;die(print_r($db-&gt;errorInfo(),&nbsp;true));&nbsp;//&nbsp;incorrect<br>&#63;&gt;  </code>
+	 * @link http://php.net/manual/en/pdo.exec.php
+	 * @see PDO::prepare(), PDO::query(), PDOStatement::execute()
+	 * @since PHP 5 >= 5.1.0, PHP 7, PECL pdo >= 0.1.0
+	 */
+	public function exec($sql) {
+		if($this->debug) {
+			\go\core\App::get()->getDebugger()->debug($sql);
+		}
+		return $this->getPdo()->exec($sql);
+	}
+	
 
 	/**
 	 * UNLOCK TABLES explicitly releases any table locks held by the current session
 	 */
 	public function unlockTables() {
-		return $this->getPdo()->query("UNLOCK TABLES");
+		return $this->getPdo()->exec("UNLOCK TABLES")  !== false;
 	}
 
 	private $transactionSavePointLevel = 0;
@@ -152,7 +166,7 @@ class Connection {
 
 		}else
 		{
-			$ret = $this->query("SAVEPOINT LEVEL".$this->transactionSavePointLevel);			
+			$ret = $this->exec("SAVEPOINT LEVEL".$this->transactionSavePointLevel) !== false;			
 		}		
 		
 		$this->transactionSavePointLevel++;		
@@ -178,7 +192,7 @@ class Connection {
 			return $this->getPdo()->rollBack();
 		}else
 		{
-			return $this->query("ROLLBACK TO SAVEPOINT LEVEL".$this->transactionSavePointLevel);						
+			return $this->exec("ROLLBACK TO SAVEPOINT LEVEL".$this->transactionSavePointLevel) !== false;						
 		}
 	}
 
@@ -204,7 +218,7 @@ class Connection {
 			return $this->getPdo()->commit();
 		}else
 		{
-			return $this->query("RELEASE SAVEPOINT LEVEL".$this->transactionSavePointLevel);			
+			return $this->exec("RELEASE SAVEPOINT LEVEL".$this->transactionSavePointLevel) !== false;			
 		}
 	}
 
@@ -245,7 +259,7 @@ class Connection {
 		$sql = rtrim($sql, ', ');
 
 		App::get()->debug($sql);
-		return App::get()->getDbConnection()->query($sql);
+		return App::get()->getDbConnection()->exec($sql) !== false;
 	}
 
 	/**

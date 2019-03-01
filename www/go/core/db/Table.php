@@ -156,7 +156,8 @@ class Table {
 			case 'tinyint':
 			case 'bigint':
 				if ($c->length == 1 && $c->dbType == 'tinyint') {
-					$c->pdoType = PDO::PARAM_BOOL;
+					//$c->pdoType = PDO::PARAM_BOOL; MySQL native doesn't understand PARAM_BOOL. Doesn't work with ATTR_EMULATE_PREPARES = false.
+					$c->pdoType = PDO::PARAM_INT;
 					$c->default = !isset($field['Default']) ? null : (bool) $c->default;
 				} else {
 					$c->pdoType = PDO::PARAM_INT;
@@ -218,7 +219,7 @@ class Table {
 		//group keys;
 		// ['keyName' => ['col1', 'col2']];
 
-		$stmt = App::get()->getDbConnection()->getPDO()->query($query);
+		$stmt = App::get()->getDbConnection()->query($query);
 		while ($index = $stmt->fetch()) {
 
 			if ($index['Key_name'] === 'PRIMARY') {
