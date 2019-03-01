@@ -45,9 +45,9 @@ if (!empty($_POST)) {
 
 	if ($_POST['password'] == $_POST['passwordConfirm']) {
 		
-		GO()->getDbConnection()->exec("DROP DATABASE test");
-		GO()->getDbConnection()->exec("CREATE DATABASE test");
-		GO()->getDbConnection()->exec("USE test");
+//		GO()->getDbConnection()->exec("DROP DATABASE test");
+//		GO()->getDbConnection()->exec("CREATE DATABASE test");
+//		GO()->getDbConnection()->exec("USE test");
 
 		App::get()->setAuthState(new core\auth\TemporaryState());
 
