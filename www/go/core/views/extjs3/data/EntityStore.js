@@ -133,7 +133,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		
 		
 		//remove from not found.
-		var i = this.notFound.indexOf(entity.id + "");
+		var i = this.notFound.indexOf(entity.id);
 		if(i > -1) {
 			this.notFound.splice(i, 1);
 			this.metaStore.setItem("notfound", this.notFound);
@@ -370,8 +370,6 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			throw "ids must be an array";
 		}		
 		
-		//convert ID's to string because indexed db doesn't like int's
-		ids = ids.map(function(id) { return id + "";} );
 		
 		var entities = [], unknownIds = [], notFoundIds = [];
 
@@ -395,7 +393,8 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		if (unknownIds.length) {		
 			this.initState(function() {
 
-				this.stateStore.getItems(unknownIds, function(err,entities) {
+				//convert ID's to string because indexed db doesn't like int's
+				this.stateStore.getItems(unknownIds.map(function(id) { return id + "";} ), function(err,entities) {
 					unknownIds = unknownIds.filter(function(id){
 						return !entities[id];
 					});
