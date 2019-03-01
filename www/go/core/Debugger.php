@@ -129,13 +129,13 @@ class Debugger {
 			$mixed = print_r($mixed, true);
 		}
 		
-		$bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 6 + $traceBackSteps);
+		$bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 7 + $traceBackSteps);
 		
 //		var_dump($bt);
 		$lastCaller = null;
 		$caller = array_shift($bt);
 		//can be called with \go\core\App::get()->debug(). We need to go one step back (no class for closure)
-		while(isset($caller['class']) && ($caller['function'] == 'debug' || $caller['class'] == self::class)) {
+		while(isset($caller['class']) && ($caller['function'] == 'debug' || $caller['function'] == 'warn' || $caller['function'] == 'error' || $caller['function'] == 'info' || $caller['class'] == self::class)) {
 			$lastCaller = $caller;
 			$caller = array_shift($bt);
 		}
