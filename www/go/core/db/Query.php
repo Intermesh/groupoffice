@@ -480,8 +480,11 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 
 		$stmt->setQuery($this);		
 		try {
-			if (!$stmt->execute()) {
-				return false;
+			$ret = $stmt->execute();
+			if (!$ret) {
+				GO()->error(var_export($ret, true));
+				GO()->error($stmt->errorInfo());
+				throw new \Exception("Could not execute statement. Error code: ". $stmt->errorCode());
 			}
 		} catch(\Exception $e) {				
 			GO()->error("SQL FAILED: " . $queryBuilder->debugBuild($build));
