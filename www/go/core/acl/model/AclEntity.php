@@ -85,8 +85,8 @@ abstract class AclEntity extends Entity {
 		foreach($query as $entity) {				
 			$aclId = $entity['aclId'];
 			unset($entity['aclId']);
-			$id = implode("-", $entity);
-			
+			$id = count($entity) > 1 ? implode("-", $entity) : array_shift($entity);
+						
 			//check if already changed
 			if(in_array($id, $result['changed']) || in_array($id, $result['removed'])) {
 				continue;

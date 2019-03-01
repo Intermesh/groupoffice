@@ -395,3 +395,6 @@ $updates['201902141322'][] = "delete from core_module where package = 'core' and
 
 $updates['201902141322'][] = "ALTER TABLE `core_change` DROP FOREIGN KEY `core_change_ibfk_2`;";
 $updates['201902141322'][] = "ALTER TABLE `core_change` ADD CONSTRAINT `core_change_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";
+
+
+$updates['201903011422'][] = "ALTER TABLE `core_change_user` CHANGE `entityId` `entityId` INT NOT NULL;";

@@ -65,7 +65,7 @@ CREATE TABLE `core_change` (
 
 CREATE TABLE `core_change_user` (
   `userId` int(11) NOT NULL,
-  `entityId` varchar(21) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `entityId` int(11) NOT NULL,
   `entityTypeId` int(11) NOT NULL,
   `modSeq` int(11) NOT NULL
 ) ENGINE=InnoDB;
