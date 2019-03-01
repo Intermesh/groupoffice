@@ -7,7 +7,7 @@ ini_set('display_startup_errors', '1');
 use go\core\App;
 use go\core\cli\State;
 
-$installDb = false;
+$installDb = true;
 
 $autoLoader = require(__DIR__ . "/../www/vendor/autoload.php");
 $autoLoader->add('go\\', __DIR__);
@@ -19,6 +19,7 @@ $config = parse_ini_file(__DIR__ . '/config.ini', true);
 $config['general']['dataPath'] = $dataFolder->getPath();
 $config['general']['tmpPath'] = $dataFolder->getFolder('tmp')->getPath();
 $config['general']["cache"] = \go\core\cache\Disk::class;
+$config['branding']['name'] = 'Group-Office';
 
 if($installDb) {
 	$dataFolder->delete();
@@ -34,12 +35,13 @@ if($installDb) {
 
 	}
 	$pdo->query("CREATE DATABASE groupoffice_phpunit");
+	$pdo = null;
 }
 
 //Install fresh DB
 
 try {
-	App::get()->setConfig($config)->setAuthState(new State());
+	App::get()->setConfig(["core" => $config])->setAuthState(new State());
 	
 	if($installDb) {
 		$admin = [
