@@ -275,7 +275,11 @@ class QueryBuilder {
 		}
 
 		$select = $prefix . $this->buildSelectFields();
-		$select .= "\n" . $prefix . "FROM `" . $this->tableName . '` `' . $this->tableAlias . "`";
+		$select .= "\n" . $prefix . "FROM `" . $this->tableName . '`';
+		
+		if(isset($this->tableAlias) && $this->tableAlias != $this->tableName) {
+			$select .= ' `' . $this->tableAlias . "`";
+		}
 
 		$where = $this->buildWhere($this->query->getWhere(), $prefix);
 
@@ -718,7 +722,7 @@ class QueryBuilder {
 				'paramTag' => $paramTag,
 				'value' => $columnObj->castToDb($value),
 				'pdoType' => $columnObj->pdoType
-		];
+		];		
 	}
 
 	/**
