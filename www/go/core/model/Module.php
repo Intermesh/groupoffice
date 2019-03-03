@@ -2,15 +2,14 @@
 namespace go\core\model;
 
 use Exception;
+use go\core;
+use go\core\acl\model\Acl;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\App;
-use go\core\model\Group;
-use go\core\model\User;
-use go\core\db\Utils;
-use go\core\model\Link;
-use go\core;
+use go\core\db\Query;
 use go\core\orm\Entity;
-use go\core\model\Search;
+use go\core\Settings;
+use go\core\validate\ErrorCode;
 
 class Module extends AclOwnerEntity {
 	public $id;
@@ -43,7 +42,7 @@ class Module extends AclOwnerEntity {
 	
 	
 	private function nextSortOrder() {
-		$query = new \go\core\db\Query();			
+		$query = new Query();			
 		$query->from("core_module");
 
 		if($this->package == "core") {
@@ -118,7 +117,7 @@ class Module extends AclOwnerEntity {
 		
 		switch($className) {	
 			
-			case strpos($className, "go\\core") === 0:
+			case strpos($className, "go\\core") === 0 || strpos($className, "GO\\Base") === 0:
 				$module = Module::find()->where(['name' => "core", "package" => "core"])->single();				
 				break;
 			
@@ -154,7 +153,7 @@ class Module extends AclOwnerEntity {
 			}
 			
 			if($this->isModified(['name', 'package'])) {
-				$this->setValidationError('name', \go\core\validate\ErrorCode::FORBIDDEN,"You can't change the module name and package");
+				$this->setValidationError('name', ErrorCode::FORBIDDEN,"You can't change the module name and package");
 			}
 		}
 		
@@ -177,7 +176,7 @@ class Module extends AclOwnerEntity {
 	 * @return self[]
 	 */
 	public static function getInstalled() {
-		$modules = \go\core\model\Module::find()->where(['enabled' => true])->all();
+		$modules = Module::find()->where(['enabled' => true])->all();
 		
 		$available = [];
 		foreach($modules as $module) {
@@ -198,7 +197,7 @@ class Module extends AclOwnerEntity {
 	 * @param int $level
 	 * @return boolean
 	 */
-	public static function isAvailableFor($package, $name, $userId = null, $level = \go\core\acl\model\Acl::LEVEL_READ) {
+	public static function isAvailableFor($package, $name, $userId = null, $level = Acl::LEVEL_READ) {
 		$query = static::find()->where(['package' => $package, 'name' => $name]);
 		static::applyAclToQuery($query, $level, $userId);
 		
@@ -208,7 +207,7 @@ class Module extends AclOwnerEntity {
 	/**
 	 * Get module settings
 	 * 
-	 * @return \go\core\Settings
+	 * @return Settings
 	 */
 	public function getSettings() {
 		if(!isset($this->package)) {
