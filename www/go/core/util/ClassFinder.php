@@ -30,7 +30,7 @@ class ClassFinder {
 		if(!$ns) {
 			$ns = ['go\\core'];		
 			
-			$modules = Module::find();
+			$modules = Module::find()->where(['enabled' => true]);
 			foreach ($modules as $module) {
 				if(!isset($module->package) || $module->package == "core" ||  !$module->isAvailable()) {
 					continue;
