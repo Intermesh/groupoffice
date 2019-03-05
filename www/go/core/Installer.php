@@ -27,6 +27,8 @@ use PDOException;
 
 class Installer {
 	
+	use event\EventEmitterTrait;
+	
 	const MIN_UPGRADABLE_VERSION = "6.3.58";
 	
 	private static $isInProgress = false;
@@ -291,6 +293,7 @@ class Installer {
 			}
 		}
 	
+		$this->fireEvent('upgrade');
 
 		echo "Done!\n";
 	}
