@@ -1237,7 +1237,6 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 								array_unshift(\GO::session()->values['files']['uploadqueue'], $tmpfile);
 								$response['fileExists'] = $file->name();
 								return $response;
-								break;
 
 							case 'yestoall':
 							case 'yes':
@@ -1252,9 +1251,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 								if ($params['overwrite'] == 'no')
 									$params['overwrite'] = 'ask';
 
-								continue;
-
-								break;
+								continue 2;
 						}
 					} else {
 						$destinationFolder->addFileSystemFile($file);
@@ -1386,6 +1383,10 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 
 		$workingFolder = \GO\Files\Model\Folder::model()->findByPk($params['working_folder_id']);
+		
+		if(!$workingFolder->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION)){
+			throw new \GO\Base\Exception\AccessDenied("No permission to write in the target folder.");
+		}
 
 		$workingPath = \GO::config()->file_storage_path.$workingFolder->path;
 		chdir($workingPath);

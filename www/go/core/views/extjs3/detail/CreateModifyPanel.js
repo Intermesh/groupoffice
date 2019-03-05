@@ -15,7 +15,7 @@ go.detail.CreateModifyPanel = Ext.extend(Ext.Panel, {
 	<small>'+t("by")+' <span>{[this.mUser.displayName]}</span></small>\
 	</p>',{
 		avatar: function(user) {
-			if(!user) {
+			if(!user || !user.avatarId) {
 				return '';
 			}
 			return 'background-image: url('+go.Jmap.downloadUrl(user.avatarId)+')';
@@ -46,7 +46,7 @@ go.detail.CreateModifyPanel = Ext.extend(Ext.Panel, {
 					this.tpl.cUser = e;
 				}
 				if(e.id === this.mUserId) {
-					this.tpl.cUser = e;
+					this.tpl.mUser = e;
 				}
 			}, this);
 			

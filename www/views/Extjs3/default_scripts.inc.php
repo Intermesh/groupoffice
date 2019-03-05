@@ -292,10 +292,8 @@ if (file_exists(GO::view()->getTheme()->getPath() . 'MainLayout.js')) {
 
 //direct login with token
 if(isset($_POST['accessToken'])) { //defined in index.php
-	?>
-	localStorage.removeItem('accessToken');	
-	sessionStorage.setItem('accessToken', '<?= $_POST['accessToken']; ?>');
-	go.User.accessToken ='<?= $_POST['accessToken']; ?>';
+	?>	
+	go.User.setAccessToken('<?= $_POST['accessToken']; ?>', false);
 	<?php
 
 }

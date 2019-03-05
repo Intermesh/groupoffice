@@ -120,8 +120,14 @@ class Columns{
 						break;
 
 					case 'mediumtext':
+						$length = 16777215 ;
+						$gotype = 'textarea';
+						break;
 					case 'longtext':
+						$gotype = 'textarea';
+						break;
 					case 'text':
+						$length = 65535;
 						$gotype = 'textarea';
 						break;
 

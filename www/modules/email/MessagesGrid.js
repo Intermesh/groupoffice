@@ -202,7 +202,7 @@ GO.email.MessagesGrid = function(config){
 	});
 
 	this.showUnreadButton = new Ext.Button({
-		iconCls: 'ic-markunread-mailbox',
+		iconCls: 'ic-markunread',
 		enableToggle:true,
 		toggleHandler:this.toggleUnread,
 		pressed:false,
@@ -475,7 +475,7 @@ Ext.extend(GO.email.MessagesGrid, GO.grid.GridPanel,{
 		}
 		var priority = record.data['x_priority'];
 		if(priority && priority < 3) {
-			icons.push('high_priority');
+			icons.push('priority_high');
 		}
 		if(priority && priority > 3) {
 			icons.push('low_priority');
