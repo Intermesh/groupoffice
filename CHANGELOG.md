@@ -1,3 +1,4 @@
+- Core: Dont' open new tab on tel:// click
 - Core: Added maxlength props to text and mediumtext dbtypes
 - Files: Decompress zipped files in folder with read only permissions will throw an access denied exception. 
 - Tickets: Search didn't search message content anymore
