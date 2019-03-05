@@ -17,7 +17,7 @@
     "ext-calendar": "*",
 		"ext-xml": "*",
 		"ext-intl": "*",
-		"sabre/dav": "3.1.*",
+		"sabre/dav": "3.2.*",
 		"swiftmailer/swiftmailer": "@stable",
 		"michelf/php-markdown": "^1.7",
 		"phpoffice/phpexcel": "^1.8",
