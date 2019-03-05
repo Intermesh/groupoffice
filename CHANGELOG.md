@@ -1,3 +1,4 @@
+- Core: Upgraded to SabreDAV 3.2.3 to fix sync problem with some CardDAV clients (DAVDroid, em client)
 - Core: Add validation to Mapping::addRelation() so developers can't map entities.
 - Core: Dont' open new tab on tel:// click
 - Core: Added maxlength props to text and mediumtext dbtypes
