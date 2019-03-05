@@ -202,7 +202,7 @@ GO.email.MessagesGrid = function(config){
 	});
 
 	this.showUnreadButton = new Ext.Button({
-		iconCls: 'ic-markunread-mailbox',
+		iconCls: 'ic-markunread',
 		enableToggle:true,
 		toggleHandler:this.toggleUnread,
 		pressed:false,
