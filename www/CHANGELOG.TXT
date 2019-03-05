@@ -1,4 +1,5 @@
 - Core: Clear cache folders instead of deleting them so a symlink might be used
+- Files: Decompress zipped files in folder with read only permissions will throw an access denied exception. 
 - Address Book: Removed automatic copy to post address because it makes more sense to 
   use the button
 - leavedays: Fixed SQL error in install.sql file
