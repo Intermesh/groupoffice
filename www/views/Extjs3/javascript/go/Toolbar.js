@@ -5,15 +5,23 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 	iconCls: 'ic-search',	
 	store: null,
 	tooltip: t('Search'),
-	searchToolBar: null,
+	searchToolBar: null,	
 	constructor: function (config) {
 		go.toolbar.SearchButton.superclass.constructor.call(this, config);
-		
+			
 		if(!this.store) {			
 			//try to find store if this button it part of a grid.
 			var grid = this.findParentByType('grid');
 			if(grid) {
 				this.store = grid.store;
+				
+				grid.getSelectionModel().on("rowselect", function() {
+					this.back();
+				}, this);
+				
+				grid.on("rowclick", function() {
+					this.back();
+				}, this);
 			}
 		}	
 	
@@ -57,6 +65,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 			listeners: {				
 				specialkey: function (field, e) {					
 					if (e.getKey() == Ext.EventObject.ENTER) {
+						e.preventDefault(); //to prevent form submission
 						this.search();
 					}
 				},
@@ -68,6 +77,8 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 			flex: 1
 		});
 	},
+	
+	
 	
 	/**
 	 * Set correct class and update tooltip
@@ -102,24 +113,23 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 	
 	/**
 	 * Close the search toolbar
-	 * 
-	 * @param {Button} b
+	 * 	 
 	 */
-	back : function(b){
-		b.findParentByType('toolbar').setVisible(false);
+	back : function(){
+		this.backButton.findParentByType('toolbar').setVisible(false);
 		this.fireEvent('close', this);
 	},
 	
 	onRender : function(ct, position) {
 		var items = this.initialConfig.tools || [];
 		
-		items.unshift({
+		items.unshift(this.backButton = new Ext.Button({
 			iconCls: 'ic-arrow-back',
-			handler: function (b) {
-				this.back(b);
+			handler: function () {
+				this.back();
 			},
 			scope: this
-		}, 
+		}), 
 		this.triggerField);
 				
 		items.push(this.resetButton = new Ext.Button({
