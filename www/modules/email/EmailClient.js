@@ -226,6 +226,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 	
 	var contextItems = [
 	this.contextMenuMarkAsRead = new Ext.menu.Item({
+		iconCls: 'ic-markunread',
 		text: t("Mark as read", "email"),
 		handler: function(){
 			this.flagMessages('Seen', false);
