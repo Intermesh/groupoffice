@@ -1260,7 +1260,6 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 								array_unshift(\GO::session()->values['files']['uploadqueue'], $tmpfile);
 								$response['fileExists'] = $file->name();
 								return $response;
-								break;
 
 							case 'yestoall':
 							case 'yes':
@@ -1275,9 +1274,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 								if ($params['overwrite'] == 'no')
 									$params['overwrite'] = 'ask';
 
-								continue;
-
-								break;
+								continue 2;
 						}
 					} else {
 						$destinationFolder->addFileSystemFile($file);
