@@ -1,3 +1,4 @@
+- Projects: copy the reference nb from a project to the order when an order is created in post calculation
 - Timeregistration: Removed UTC timezone to fix wrong month display in time registration
 
 12-03-2019 6.2.113
