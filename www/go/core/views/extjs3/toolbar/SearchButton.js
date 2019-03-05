@@ -69,6 +69,14 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 			var grid = this.findParentByType('grid');
 			if(grid) {
 				this.store = grid.store;
+				
+				grid.getSelectionModel().on("rowselect", function() {
+					this.back();
+				}, this);
+				
+				grid.on("rowclick", function() {
+					this.back();
+				}, this);
 			}
 		}	
 	
@@ -162,24 +170,23 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 	
 	/**
 	 * Close the search toolbar
-	 * 
-	 * @param {Button} b
+	 * 	 
 	 */
-	back : function(b){
-		b.findParentByType('toolbar').setVisible(false);
+	back : function(){
+		this.backButton.findParentByType('toolbar').setVisible(false);
 		this.fireEvent('close', this);
 	},
 	
 	onRender : function(ct, position) {
 		var items = this.initialConfig.tools || [];
 		
-		items.unshift({
+		items.unshift(this.backButton = new Ext.Button({
 			iconCls: 'ic-arrow-back',
-			handler: function (b) {
-				this.back(b);
+			handler: function () {
+				this.back();
 			},
 			scope: this
-		}, 
+		}), 
 		this.triggerField);
 				
 		items.push(this.resetButton = new Ext.Button({
