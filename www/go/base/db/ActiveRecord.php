@@ -3302,7 +3302,15 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				$modifications = array();
 				foreach($oldValues as  $key=>$oldVal){
 					
+					if(!is_scalar($oldVal)) {
+						continue;
+					}
+					
 					$newVal = $this->getAttribute($key);
+					
+					if(!is_scalar($newVal)) {
+						continue;
+					}
 					
 //					// Check if the value changed from false, to null
 //					if(is_null($newVal) && $oldVal === false){
@@ -3355,7 +3363,15 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				$logAttrs = array();
 				foreach($attrs as $attr=>$val){
 					
+					if(!is_scalar($val)) {
+						continue;
+					}
+					
 					$newVal = $this->getAttribute($attr);
+					
+					if(!is_scalar($newVal)) {
+						continue;
+					}
 					
 					if(strlen($val) > $cutoffLength){
 						$newVal = substr($newVal,0,$cutoffLength).$cutoffString;
