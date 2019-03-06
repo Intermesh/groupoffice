@@ -7,7 +7,7 @@
 go.search.SearchEmailCombo = Ext.extend(go.form.ComboBox, {	
 	emptyText: t("Search..."),
 	pageSize: 20,
-	valueField: 'id',
+	valueField: 'entityId',
 	displayField: 'email',
 	triggerAction: 'all',
 	editable: true,
@@ -29,7 +29,7 @@ go.search.SearchEmailCombo = Ext.extend(go.form.ComboBox, {
 			
 		Ext.applyIf(this, {
 			store: new go.data.Store({
-				fields: ['id', 'name', 'entity', 'type', 'email', 'photoBlobId'],				
+				fields: ['entityId', 'name', 'entity', 'type', 'email', 'photoBlobId'],				
 				method: "Search/email"				
 			})
 		});

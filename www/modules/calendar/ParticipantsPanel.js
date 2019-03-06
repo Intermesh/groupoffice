@@ -67,7 +67,7 @@ GO.calendar.ParticipantsPanel = function(eventDialog, config) {
 						GO.request({
 							url: "calendar/participant/getUsers",
 							params: {
-								users: Ext.encode([record.data.id]),
+								users: Ext.encode([record.data.entityId]),
 								start_time: this.eventDialog.getStartDate().format('U'),
 								end_time: this.eventDialog.getEndDate().format('U')
 							},
