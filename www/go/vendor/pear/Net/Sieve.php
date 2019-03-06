@@ -56,19 +56,19 @@ require_once 'Net/Socket.php';
  * Disconnected state
  * @const NET_SIEVE_STATE_DISCONNECTED
  */
-define('NET_SIEVE_STATE_DISCONNECTED', 1, true);
+define('NET_SIEVE_STATE_DISCONNECTED', 1);
 
 /**
  * Authorisation state
  * @const NET_SIEVE_STATE_AUTHORISATION
  */
-define('NET_SIEVE_STATE_AUTHORISATION', 2, true);
+define('NET_SIEVE_STATE_AUTHORISATION', 2);
 
 /**
  * Transaction state
  * @const NET_SIEVE_STATE_TRANSACTION
  */
-define('NET_SIEVE_STATE_TRANSACTION', 3, true);
+define('NET_SIEVE_STATE_TRANSACTION', 3);
 
 
 /**
