@@ -17,7 +17,9 @@ try {
 	echo "<section><div class=\"card\"><h2>Upgrading Group-Office</h2><pre>";
 	
 	GO()->getInstaller()->isValidDb();
-	GO()->rebuildCache();
+	GO()->setCache(new \go\core\cache\None());	
+	\go\core\db\Table::destroyInstances();
+	
 	$unavailable = GO()->getInstaller()->getUnavailableModules();
 	
 	if (!isset($_GET['ignore']) && count($unavailable)) {

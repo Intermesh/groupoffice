@@ -136,6 +136,14 @@ class Module extends AclOwnerEntity {
 				}
 				
 				$module = Module::find()->where(['name' => $name, 'package' => $package])->single();
+				
+				// Needed for modules which are partly refactored.
+				// For example: The email account entity is required in the new framework 
+				// and the email module itself is not refactored yet.
+				// Can be removed when all is refactored.
+				if(!$module) {
+					$module = Module::find()->where(['name' => $name, 'package' => null])->single();
+				}
 		}
 		
 		if(!$module) {

@@ -422,7 +422,7 @@ class Migrate63to64 {
 
 			$address = new Address();
 			$address->type = Address::TYPE_HOME;
-			$address->countryCode = $r['country'] ?? null;
+			$address->countryCode = isset($r['country']) && \go\core\validate\CountryCode::validate(strtoupper($r['country'])) ? strtoupper($r['country']) : null;
 			$address->state = $r['state'] ?? null;
 			$address->city = $r['city'] ?? null;
 			$address->zipCode = $r['zip'] ?? null;
@@ -432,9 +432,6 @@ class Migrate63to64 {
 			$address->longitude = $r['longitude'] ?? null;
 
 			if ($address->isModified()) {
-				if(!$address->validate()) {
-					$address->countryCode = null;
-				}
 				$contact->addresses[] = $address;
 			}
 
@@ -552,7 +549,7 @@ class Migrate63to64 {
 
 			$address = new Address();
 			$address->type = Address::TYPE_HOME;
-			$address->countryCode = $r['country'] ?? null;
+			$address->countryCode = isset($r['country']) && \go\core\validate\CountryCode::validate(strtoupper($r['country'])) ? strtoupper($r['country']) : null;
 			$address->state = $r['state'] ?? null;
 			$address->city = $r['city'] ?? null;
 			$address->zipCode = $r['zip'] ?? null;
@@ -561,18 +558,13 @@ class Migrate63to64 {
 			$address->latitude = $r['latitude'] ?? null;
 			$address->longitude = $r['longitude'] ?? null;
 
-			if ($address->isModified()) {
-				
-				if(!$address->validate()) {
-					$address->countryCode = null;
-				}
-				
+			if ($address->isModified()) {				
 				$contact->addresses[] = $address;
 			}
 			
 			$address = new Address();
 			$address->type = Address::TYPE_POSTAL;
-			$address->countryCode = $r['post_country'] ?? null;
+			$address->countryCode = isset($r['post_country']) && \go\core\validate\CountryCode::validate(strtoupper($r['post_country'])) ? strtoupper($r['post_country']) : null;
 			$address->state = $r['post_state'] ?? null;
 			$address->city = $r['post_city'] ?? null;
 			$address->zipCode = $r['post_zip'] ?? null;
@@ -582,9 +574,6 @@ class Migrate63to64 {
 			$address->longitude = $r['post_longitude'] ?? null;
 
 			if ($address->isModified()) {
-				if(!$address->validate()) {
-					$address->countryCode = null;
-				}
 				$contact->addresses[] = $address;
 			}
 
