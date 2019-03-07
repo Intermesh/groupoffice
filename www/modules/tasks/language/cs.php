@@ -27,7 +27,7 @@ return array (
   'Show completed tasks' => 'Zobrazit dokončené úkoly',
   'Filter' => 'Filtr',
   'Due date' => 'Datum ukončení',
-  'Due at' => 'Konec',
+  'Due at' => 'Dokončení',
   'Needs action' => 'Vyžaduje akci',
   'Accepted' => 'Přijat',
   'Declined' => 'Odmítnutý',
@@ -48,7 +48,7 @@ return array (
   'Show inactive tasks' => 'Zobrazit neaktivní úkoly',
   'Schedule call' => 'Plánované volání',
   'Defaults settings for tasks' => 'Výchozí nastavení úkolů',
-  'Days before start' => 'Dnů před zahájením',
+  'Days before start' => 'Počet dní před začátkem',
   'Default tasklist' => 'Výchozí přehled úkolů',
   'Visible tasklists' => 'Viditelné přehledy úkolů',
   'Visible' => 'Viditelný',
@@ -87,4 +87,5 @@ return array (
   'Tasks' => 'Úkoly',
   'Remove duplicates' => 'Smazat duplicity',
   'Contact' => 'Kontakt',
+  'Ok' => 'OK',
 );

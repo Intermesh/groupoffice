@@ -35,4 +35,5 @@ return array (
   'To upload a new PKCS12 certificate you must enter your Group-Office password. The Group-Office password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.' => 'Pro nahrání nového PCSK12 certifikátu musíte zadat heslo do GroupOffice. GroupOffice heslo musí být rozdílné oproti heslu k PCSK12 certifikátu pro zajištění bezpečnosti. Prázdné heslo je také zakázáno.',
   'The Group-Office password was incorrect.' => 'Heslo pro {product_name} je chybné.',
   'Your SMIME key password matches your Group-Office password. This is prohibited for security reasons!' => 'Vaše heslo pro SMIME klíč je stejné jako {product_name} heslo. To je z bezpečnostních důvodů zakázáno!',
+  'This message is encrypted.' => 'Tato zpráva je zašifrována.',
 );
