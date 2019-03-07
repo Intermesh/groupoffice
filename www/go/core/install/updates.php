@@ -297,8 +297,8 @@ ADD PRIMARY KEY (`id`);";
 
 
 $updates['201902141322'][] = "ALTER TABLE `core_blob` ADD `modifiedAt` DATETIME NULL DEFAULT NULL AFTER `createdAt`, ADD `staleAt` DATETIME NULL DEFAULT NULL AFTER `modifiedAt`;";
-$updates['201902141322'][] = "ALTER TABLE `core_blob` ADD INDEX(`staleAt`);
-UPDATE `core_blob` set modifiedAt = from_unixtime(modified)";
+$updates['201902141322'][] = "ALTER TABLE `core_blob` ADD INDEX(`staleAt`);";
+$updates['201902141322'][] = "UPDATE `core_blob` set modifiedAt = from_unixtime(modified)";
 $updates['201902141322'][] = "ALTER TABLE `core_blob` DROP `modified`";
 
 $updates['201902141322'][] = "insert into core_cron_job (moduleId,name, expression, description) values ((select id from core_module where name='core'), 'GarbageCollection', '0 * * * *', 'Garbage collection')";

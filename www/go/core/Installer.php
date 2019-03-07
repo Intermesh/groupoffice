@@ -243,7 +243,8 @@ class Installer {
 		
 
 		$this->isValidDb();
-		
+		GO()->getCache()->flush(false);
+		GO()->setCache(new None());
 		
 		$unavailable = GO()->getInstaller()->getUnavailableModules();
 		if(!empty($unavailable)) {
@@ -259,8 +260,7 @@ class Installer {
 
 
 		GO()->getDbConnection()->query("SET sql_mode=''");
-		GO()->getCache()->flush(false);
-		GO()->setCache(new None());
+		
 		jmap\Entity::$trackChanges = false;
 		
 		GO()->getDbConnection()->delete("core_entity", ['name' => 'GO\\Projects\\Model\\Project'])->execute();
