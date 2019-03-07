@@ -48,4 +48,5 @@ return array (
   '(0-6)' => '(0-6)',
   '(2013-2015)' => '(2013-2015)',
   'Example' => 'Example',
+  'System task scheduler' => 'Plánovač úloh',
 );

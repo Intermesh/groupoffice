@@ -19,4 +19,5 @@ return array (
   'name' => 'Moduly',
   'description' => 'Slouží k úpravě modulů.',
   'Modules' => 'Moduly',
+  'Ok' => 'OK',
 );

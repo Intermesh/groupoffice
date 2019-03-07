@@ -74,4 +74,6 @@ return array (
   'Content' => 'Obsah',
   'Prefix' => 'Předpona',
   'Suffix' => 'Přípona',
+  'Ok' => 'OK',
+  'Database column name' => 'Název sloupce v databázi',
 );

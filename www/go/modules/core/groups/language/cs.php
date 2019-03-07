@@ -17,4 +17,8 @@ return array (
   'Use' => 'Použít',
   'name' => 'Skupiny',
   'description' => 'Umožňuje upravovat skupiny.',
+  'Group defaults' => 'Výchozí nastavení skupiny',
+  'Use the button below to apply the above to existing groups. WARNING: This will erase all custom permissions on groups.' => 'Použitím tlačítka níže, můžete nastavit oprávnění pro již existující skupiny. UPOZORNĚNÍ: Tímto krokem smažete všechny individuální oprávnění ve skupinách.',
+  'Apply to all' => 'Aplikovat na všechny skupiny',
+  'Are you sure you want to reset all group permissions? This can\'t be undone.' => 'Opravdu si přejete přenastavit všechna oprávnění skupin? Tento krok již nelze vzít zpět.',
 );
