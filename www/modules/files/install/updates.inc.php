@@ -242,10 +242,17 @@ $updates['201901281546'][] = "RENAME TABLE `cf_fs_files` TO `fs_files_custom_fie
 $updates['201901281546'][] = "delete from fs_files_custom_fields where id not in (select id from fs_files);";
 $updates['201901281546'][] = "ALTER TABLE `fs_files_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `fs_files`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
 
+$updates['201903070922'][] = "ALTER TABLE `fs_files` CHANGE `name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;";
+$updates['201903070922'][] = "ALTER TABLE `fs_files` ADD UNIQUE( `folder_id`, `name`);";
+
+
+$updates['201903070922'][] = "ALTER TABLE `fs_folders` CHANGE `name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;";
+$updates['201903070922'][] = "ALTER TABLE `fs_folders` ADD UNIQUE( `parent_id`, `name`);";
+
+$updates['201903070922'][] = "ALTER TABLE `fs_folders` DROP INDEX `parent_id_2`;";
 
 $updates['201901281546'][] = function() {	
 	$m = new \go\core\install\MigrateCustomFields63to64();
 	$m->migrateEntity("File");	
 	$m->migrateEntity("Folder");	
 };
-
