@@ -760,7 +760,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		//sorting on custom fields doesn't work for folders
 		//TODO
 		if(!isset($params['sort']) || substr($params['sort'],0,4)=='col_' || $params['sort'] == 'name') {
-			$findParams->order(new \go\core\db\Expression('name COLLATE utf8mb4_unicode_ci ' . ($params['dir'] == 'ASC' ? 'ASC' : 'DESC')));
+			$findParams->order(new \go\core\db\Expression('name COLLATE utf8mb4_unicode_ci ' . ((isset($params['dir']) && $params['dir'] == 'ASC') ? 'ASC' : 'DESC')));
 		}
 
 		
@@ -814,7 +814,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			}
 			
 			if(!isset($params['sort']) || $params['sort'] == 'name') {
-				$findParams->order(new \go\core\db\Expression('name COLLATE utf8mb4_unicode_ci ' . ($params['dir'] == 'ASC' ? 'ASC' : 'DESC')));
+				$findParams->order(new \go\core\db\Expression('name COLLATE utf8mb4_unicode_ci ' . ((isset($params['dir']) && $params['dir'] == 'ASC') ? 'ASC' : 'DESC')));
 			}
 
 			$stmt = $folder->files($findParams);
