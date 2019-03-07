@@ -1,3 +1,4 @@
+- Files: Changed columns to utf8mb4_bin so they are case sensitive.
 - Core: Fixed bug that 30 day trial button did not show.
 - Core: Upgraded to SabreDAV 3.2.3 to fix sync problem with some CardDAV clients (DAVDroid, em client)
 - Core: Add validation to Mapping::addRelation() so developers can't map entities.
