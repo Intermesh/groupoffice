@@ -602,7 +602,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * @param boolean $autoCreate True to auto create the folders. ACL's will be ignored.
 	 * @return Folder
 	 */
-	public function findByPath($relpath, $autoCreate=false, $autoCreateAttributes=array(), $caseSensitive=true) {
+	public function findByPath($relpath, $autoCreate=false, $autoCreateAttributes=array()) {
 
 
 		$oldIgnoreAcl = \GO::$ignoreAclPermissions;
@@ -622,7 +622,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 			if(!isset($this->_folderCache[$cacheKey])){
 
-				$col = $caseSensitive ? 'BINARY t.name' : 't.name';
+				$col = 't.name';
 
 				$findParams = \GO\Base\Db\FindParams::newInstance();
 				$findParams->getCriteria()
@@ -981,8 +981,8 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * @param String $filename
 	 * @return File
 	 */
-	public function hasFile($filename, $caseSensitive=true){
-		$col = $caseSensitive ? 'BINARY t.name' : 't.name';
+	public function hasFile($filename){
+		$col = 't.name';
 		$findParams = \GO\Base\Db\FindParams::newInstance()
 						->single();
 		$findParams->getCriteria()
@@ -1004,7 +1004,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 						->single();
 		$findParams->getCriteria()
 							->addBindParameter(':name', $filename)
-							->addRawCondition('BINARY t.name', ':name'); //use utf8_bin for case sensivitiy and special characters.
+							->addRawCondition('t.name', ':name');
 
 		return $this->folders($findParams);
 	}
@@ -1347,7 +1347,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			$findParams->getCriteria()
 						->addCondition('user_id', \GO::user()->id,'=','sharedRootFolders')
 						->addBindParameter(':name', $folderName)
-						->addRawCondition('BINARY t.name', ':name'); //use utf8_bin for case sensivitiy and special characters.
+						->addRawCondition('t.name', ':name');
 
 			$folder=$this->find($findParams);
 			

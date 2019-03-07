@@ -684,15 +684,14 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 	 * @param StringHelper $relpath Relative path from \GO::config()->file_storage_path
 	 * @return File
 	 */
-	public function findByPath($relpath,$caseSensitive=true){
-		$folder = Folder::model()->findByPath(dirname($relpath),false,array(),$caseSensitive);
+	public function findByPath($relpath){
+		$folder = Folder::model()->findByPath(dirname($relpath),false,array());
 		if(!$folder)
 			return false;
 		else
 		{
-			return $folder->hasFile(\GO\Base\Fs\File::utf8Basename($relpath),$caseSensitive);
+			return $folder->hasFile(\GO\Base\Fs\File::utf8Basename($relpath));
 		}
-
 	}
 
 	/**
