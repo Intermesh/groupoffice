@@ -85,6 +85,7 @@ GO.customfields.FieldDialog = function(config){
 		value: 50,
 		fieldLabel: t("Max. number of characters", "customfields"),
 		minValue: 0,
+		serverFormats:false,
 //		maxValue: 255,
 		decimals: 0,
 		disabled: true
