@@ -1032,6 +1032,15 @@ button.filetype-pdf, button.filetype-doc {
 }
 	
 table.display-panel {
+	
+	&.labels {		
+		td, th{
+			&:first-child {
+				width: dp(200);
+			}
+		}
+	}
+	
 	width: 100%;
 	clear: both;
 	td, th {
