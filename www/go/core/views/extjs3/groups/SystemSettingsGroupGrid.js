@@ -31,6 +31,7 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 				'id',
 				'name',
 				'isUserGroupFor',
+				'aclId',
 				{name: 'members', type: go.data.types.User, key: 'users.userId'}
 				
 			],
@@ -58,8 +59,15 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 					iconCls: 'ic-settings',
 					tooltip: t("Group defaults"),
 					handler: function() {
-						var dlg = new go.groups.GroupDefaultsWindow();
-						dlg.show();
+						var module = go.Modules.get("core", "core"),			
+							serverInfo = module.entities.find(function(serverInfo) {
+								return serverInfo.name == "Group";
+							});
+						
+						var win = new go.defaultpermissions.ShareWindow();
+						win.entity = "Group";
+						win.load(serverInfo.defaultAclId).show();
+
 					}
 				}
 
@@ -151,6 +159,18 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 						},
 						scope: this
 					},
+					
+					{
+						itemId: "share",
+						iconCls: 'ic-share',
+						text: t("Share"),
+						handler: function () {
+							var win = new go.permissions.ShareWindow();
+							win.load(this.moreMenu.record.data.aclId).show();
+						},
+						scope: this
+					},
+					
 					"-"
 									, {
 										itemId: "delete",

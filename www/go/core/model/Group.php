@@ -2,11 +2,11 @@
 
 namespace go\core\model;
 
+use go\core\acl\model\Acl;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
-use go\core\orm\Query;
-use go\core\validate\ErrorCode;
 use go\core\model\UserGroup;
+use go\core\validate\ErrorCode;
 
 /**
  * Group model
@@ -103,14 +103,7 @@ class Group extends AclOwnerEntity {
 		$acl = $this->findAcl();
 		//Share group with itself. So members of this group can share with eachother.
 		if($this->id !== Group::ID_ADMINS) {
-			$acl->groups[] = (new \go\core\acl\model\AclGroup)->setValues(['groupId' => $this->id]);		
-		}
-		
-		foreach(\go\core\model\Settings::get()->getDefaultGroups() as $groupId) {		
-			//Share group with everyone. So that everyone can share with all groups. TODO this should be configurable.		
-			if($groupId !== Group::ID_ADMINS) {
-				$acl->groups[] = (new \go\core\acl\model\AclGroup)->setValues(['groupId' => $groupId]);
-			}
+			$acl->addGroup($this->id, Acl::LEVEL_READ);
 		}
 		
 		return $acl->internalSave();

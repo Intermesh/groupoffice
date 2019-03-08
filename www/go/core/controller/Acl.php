@@ -97,10 +97,16 @@ class Acl extends EntityController {
 		foreach($acls as $acl) {
 			if(!$params['add']) {
 				$acl->groups = [];
+				
+				if($entityType->getName() == "Group") {
+					// Groups have a special situtation. They must be shared with the group itself so they can see it.
+					$group = \go\core\model\Group::find()->where(['aclId' => $acl->id])->single();
+					$acl->addGroup($group->id, model\Acl::LEVEL_READ);					
+				}
 			}
 			
 			foreach($defaultAcl->groups as $group) {
-				$aclGroup = $params['add'] ? $acl->findGroup($group->groupId) : false;
+				$aclGroup = $params['add'] || $entityType->getName() == "Group" ? $acl->findGroup($group->groupId) : false;
 				if($aclGroup) {
 					$aclGroup->level = $group->level;					
 				} else

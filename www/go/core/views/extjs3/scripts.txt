@@ -133,7 +133,6 @@ tools/SystemSettingsTools.js
 groups/SystemSettingsGroupGrid.js
 groups/GroupDialog.js
 groups/GroupUserGrid.js
-groups/GroupDefaultsWindow.js 
 groups/GroupCombo.js
 
 users/UserDefaultsWindow.js
