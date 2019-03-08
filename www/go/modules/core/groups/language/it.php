@@ -16,4 +16,6 @@ return array (
   'Module Permissions' => 'Permessi dei moduli',
   'name' => 'Gruppi',
   'description' => 'Modulo Amministratore; Gestione dei gruppi di utenti.',
+  'Apply to all' => 'Applica a tutti',
+  'Are you sure you want to reset all group permissions? This can\'t be undone.' => 'Sicuro di voler resettare tutti i permessi del gruppo? Questa azione è irreversibile!',
 );

@@ -12,4 +12,7 @@ return array (
   'name' => 'Moduli',
   'description' => 'Modulo Admin; Gestione moduli.',
   'Modules' => 'Moduli',
+  'Add to shopping cart' => 'Aggiungi al carrello',
+  'Ok' => 'Ok',
+  'Buy licenses' => 'Acquista licenze',
 );
