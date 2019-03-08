@@ -86,7 +86,7 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		this.addPanel(go.systemsettings.AppearancePanel);
 		this.addPanel(go.systemsettings.NotificationsPanel);
 		this.addPanel(go.systemsettings.AuthenticationPanel);
-		this.addPanel(go.systemsettings.defaultpermissions.DefaultPermissionsPanel);
+		this.addPanel(go.systemsettings.defaultpermissions.SystemSettingsPanel);
 		
 		this.loadModulePanels();
 		

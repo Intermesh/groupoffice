@@ -1,6 +1,5 @@
 go.systemsettings.defaultpermissions.DefaultPermissionsPanel = Ext.extend(go.grid.GridPanel, {
-	iconCls: 'ic-share',
-	title: t("Default permissions"),
+	cls: 'go-grid3-hide-headers',
 	initComponent: function () {
 		
 		var data = go.Entities.getAll().map(function(e) {
@@ -71,6 +70,10 @@ go.systemsettings.defaultpermissions.DefaultPermissionsPanel = Ext.extend(go.gri
 	},
 	
 	onCellClick : function(grid, rowIndex, columnIndex, e) {
+		
+		if(e.target.tagName != "BUTTON") {
+			return;
+		}
 		var record = this.store.getAt(rowIndex);						
 		
 		var win = new go.systemsettings.defaultpermissions.ShareWindow();

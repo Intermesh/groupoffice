@@ -105,6 +105,7 @@ systemsettings/AppearancePanel.js
 systemsettings/NotificationsPanel.js
 systemsettings/AuthenticationPanel.js
 systemsettings/defaultpermissions/DefaultPermissionsPanel.js
+systemsettings/defaultpermissions/SystemSettingsPanel.js
 systemsettings/defaultpermissions/ShareWindow.js
 systemsettings/Dialog.js
 
