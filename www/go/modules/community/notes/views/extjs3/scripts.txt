@@ -7,4 +7,3 @@ NoteBookCombo.js
 NoteBookForm.js
 NoteForm.js
 Decrypt.js
-SystemSettingsPanel.js

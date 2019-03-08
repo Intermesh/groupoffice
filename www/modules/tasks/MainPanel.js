@@ -527,7 +527,6 @@ go.Modules.register("legacy", 'tasks', {
 	iconCls: 'go-tab-icon-tasks',
 	entities: [{
 			name: 'Task',
-			hasFiles: true,
 			links: [{
 					linkWindow: function() {
 						var win = new GO.tasks.TaskDialog();
@@ -540,6 +539,5 @@ go.Modules.register("legacy", 'tasks', {
 			}]
 	}],
 	
-	userSettingsPanels: ["GO.tasks.SettingsPanel"],
-	systemSettingsPanels: ["GO.tasks.SystemSettingsPanel"]
+	userSettingsPanels: ["GO.tasks.SettingsPanel"]
 });

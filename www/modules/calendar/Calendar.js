@@ -2145,7 +2145,6 @@ go.Modules.register("legacy", 'calendar', {
 	title : t("Calendar", "calendar"),
 	iconCls : 'go-tab-icon-calendar',
 	entities: [{
-			hasFiles: true,
 			name: "Event",
 			links: [{
 				linkWindow: function() {
@@ -2157,9 +2156,13 @@ go.Modules.register("legacy", 'calendar', {
 					return new GO.calendar.EventPanel();
 				}	
 		}]
-	}, "Calendar"],
-	userSettingsPanels: ["GO.calendar.SettingsPanel"],
-	systemSettingsPanels: ["GO.calendar.SystemSettingsPanel"]
+	}, {
+		name: "Calendar",
+		customFields: {
+			fieldSetDialog: "GO.calendar.CustomFieldSetDialog"
+		}
+	}],
+	userSettingsPanels: ["GO.calendar.SettingsPanel"]
 	
 });
 

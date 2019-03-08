@@ -1,5 +1,5 @@
-go.systemsettings.defaultpermissions.DefaultPermissionsPanel = Ext.extend(go.grid.GridPanel, {
-	cls: 'go-grid3-hide-headers',
+go.defaultpermissions.DefaultPermissionsPanel = Ext.extend(go.grid.GridPanel, {
+	
 	initComponent: function () {
 		
 		var data = go.Entities.getAll().map(function(e) {
@@ -21,19 +21,23 @@ go.systemsettings.defaultpermissions.DefaultPermissionsPanel = Ext.extend(go.gri
 			
 		}).filter(function(e){return e.isAclOwner;});
 		
-		this.store = new Ext.data.GroupingStore({
+		this.store = new Ext.data.Store({
 			reader: new Ext.data.JsonReader({
 				fields: ['name', 'title', 'module', "package", "customFields", "defaultAclId", "defaultsPanel", "moduleTitle"],
 				root: 'data'
 			}),			
 			data: {data: data },
-			groupField: 'moduleTitle'
+			sortInfo: {
+				field: 'name',
+				direction: 'ASC'
+			},
+//			groupField: 'moduleTitle'
 		});
 			
 			
-		this.view = new Ext.grid.GroupingView({
-			hideGroupedColumn: true
-		});
+//		this.view = new Ext.grid.GroupingView({
+//			hideGroupedColumn: true
+//		});
 		
 		this.autoExpandColumn = "name";
 			
@@ -41,20 +45,21 @@ go.systemsettings.defaultpermissions.DefaultPermissionsPanel = Ext.extend(go.gri
 				{
 					id: 'name',
 					header: t('Name'),
-					sortable: false,
+					sortable: true,
 					dataIndex: 'title',
-					hideable: false,
-					draggable: false,
-					menuDisabled: true					
+					hideable: false,				
 				},{
 					id: 'moduleTitle',
 					dataIndex: 'moduleTitle',
-					hidden: true,
 					header: t("Module")
 				},{
 					dataIndex: 'name',
 					align: "right",
 					width: dp(180),
+					hideable: false,
+					draggable: false,
+					menuDisabled: false,
+					sortable: false,
 					renderer: function(v, meta, record) {	
 						
 						return '<button title="' + Ext.util.Format.htmlEncode(t('Manage default permissions')) + '" class="icon">edit</button>';
@@ -64,7 +69,7 @@ go.systemsettings.defaultpermissions.DefaultPermissionsPanel = Ext.extend(go.gri
 			
 			];
 		
-		go.systemsettings.defaultpermissions.DefaultPermissionsPanel.superclass.initComponent.call(this);
+		go.defaultpermissions.DefaultPermissionsPanel.superclass.initComponent.call(this);
 		
 		this.on('cellclick', this.onCellClick, this);
 	},
@@ -76,7 +81,7 @@ go.systemsettings.defaultpermissions.DefaultPermissionsPanel = Ext.extend(go.gri
 		}
 		var record = this.store.getAt(rowIndex);						
 		
-		var win = new go.systemsettings.defaultpermissions.ShareWindow();
+		var win = new go.defaultpermissions.ShareWindow();
 		win.entity = record.data.name;
 		win.load(record.data.defaultAclId).show();
 		

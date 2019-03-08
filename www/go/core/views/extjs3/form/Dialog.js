@@ -53,7 +53,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 				'->', 
 				{
 					text: t("Save"),
-					handler: this.submit,
+					handler: function() {this.submit();},
 					scope: this
 				}
 			]

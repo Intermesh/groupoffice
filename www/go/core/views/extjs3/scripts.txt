@@ -98,15 +98,15 @@ detail/CreateModifyPanel.js
 permissions/SharePanel.js
 permissions/ShareWindow.js
 
+defaultpermissions/DefaultPermissionsPanel.js
+defaultpermissions/SystemSettingsPanel.js
+defaultpermissions/ShareWindow.js
 
 systemsettings/Panel.js
 systemsettings/GeneralPanel.js
 systemsettings/AppearancePanel.js
 systemsettings/NotificationsPanel.js
 systemsettings/AuthenticationPanel.js
-systemsettings/defaultpermissions/DefaultPermissionsPanel.js
-systemsettings/defaultpermissions/SystemSettingsPanel.js
-systemsettings/defaultpermissions/ShareWindow.js
 systemsettings/Dialog.js
 
 Wizard.js
@@ -148,6 +148,8 @@ users/UserSettingsWorkingWeek.js
 customfields/FormFieldSet.js
 customfields/FieldDialog.js
 customfields/CustomFields.js
+customfields/EntityPanel.js
+customfields/EntityDialog.js
 customfields/SystemSettingsPanel.js
 customfields/FieldSetDialog.js
 customfields/type/Text.js

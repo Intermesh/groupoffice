@@ -3,7 +3,7 @@
  * var dlg = new go.permissions.ShareWindow();
  * dlg.load(aclId).show();
  */
-go.systemsettings.defaultpermissions.ShareWindow = Ext.extend(go.permissions.ShareWindow, {
+go.defaultpermissions.ShareWindow = Ext.extend(go.permissions.ShareWindow, {
 	title: t('Set default permissions'),
 	entityStore: "Acl",
 	height: dp(600),
@@ -11,7 +11,7 @@ go.systemsettings.defaultpermissions.ShareWindow = Ext.extend(go.permissions.Sha
 	entity: null,
 
 	initComponent: function () {
-		go.systemsettings.defaultpermissions.ShareWindow.superclass.initComponent.call(this);
+		go.defaultpermissions.ShareWindow.superclass.initComponent.call(this);
 
 		this.getFooterToolbar().insert(0, new Ext.Button({
 			text: t('Add to all'),

@@ -9,7 +9,6 @@ AddressBookDialog.js
 AddressBookCombo.js
 GroupDialog.js
 ContactCombo.js
-SystemSettingsPanel.js
 CustomFieldSetDialog.js
 customfield/Contact.js
 customfield/ContactDialog.js

@@ -2167,8 +2167,7 @@ go.Modules.register("legacy", 'files', {
 					}
 				}
 			]
-		}],
-	systemSettingsPanels: ["GO.files.SystemSettingsPanel"]
+		}]
 
 });
 

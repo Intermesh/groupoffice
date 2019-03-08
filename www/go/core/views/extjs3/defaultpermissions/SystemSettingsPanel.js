@@ -1,4 +1,4 @@
-go.systemsettings.defaultpermissions.SystemSettingsPanel = Ext.extend(Ext.Panel, {
+go.defaultpermissions.SystemSettingsPanel = Ext.extend(Ext.Panel, {
 	iconCls: 'ic-share',
 	layout: "border",
 	title: t("Default permissions"),
@@ -11,12 +11,12 @@ go.systemsettings.defaultpermissions.SystemSettingsPanel = Ext.extend(Ext.Panel,
 				autoHeight: true,
 				html: t("Select an entity to manage the default permissions when new items are created.")
 			}, 
-			new go.systemsettings.defaultpermissions.DefaultPermissionsPanel({
+			new go.defaultpermissions.DefaultPermissionsPanel({
 				region:"center"
 			})
 		];
 		
-		go.systemsettings.defaultpermissions.SystemSettingsPanel.superclass.initComponent.call(this);
+		go.defaultpermissions.SystemSettingsPanel.superclass.initComponent.call(this);
 	}
 });
 
