@@ -3,19 +3,19 @@ namespace go\core\acl\model;
 
 use go\core\App;
 use go\core\db\Criteria;
-use go\core\orm\Query;
-use go\core\orm\Mapping;
-use go\core\orm\Property;
-use go\core\util\DateTime;
+use go\core\jmap\Entity;
 use go\core\model\Group;
 use go\core\model\User;
+use go\core\orm\Query;
+use go\core\util\DateTime;
+use go\core\validate\ErrorCode;
 
 /**
  * The Acl class
  * 
  * Is an Access Control List to restrict access to data.
  */
-class Acl extends \go\core\jmap\Entity {
+class Acl extends Entity {
 	
 	const LEVEL_READ = 10;
 	const LEVEL_CREATE = 20;
@@ -62,7 +62,7 @@ class Acl extends \go\core\jmap\Entity {
 	protected function internalValidate() {
 		
 		if($this->isModified(['groups']) && !$this->hasAdmins()) {
-			$this->setValidationError('groups', \go\core\validate\ErrorCode::FORBIDDEN, "You can't change the admin permissions");
+			$this->setValidationError('groups', ErrorCode::FORBIDDEN, "You can't change the admin permissions");
 		}
 			
 		return parent::internalValidate();
@@ -112,7 +112,7 @@ class Acl extends \go\core\jmap\Entity {
 	
 	private function logChanges() {
 		
-		if(!\go\core\jmap\Entity::$trackChanges) {
+		if(!Entity::$trackChanges) {
 			return true;
 		}
 		
@@ -209,12 +209,24 @@ class Acl extends \go\core\jmap\Entity {
 	 * Check if this ACL has a group
 	 * 
 	 * @param int $groupId
-	 * @return boolean|int Level
+	 * @return bool|int Level
 	 */
 	public function hasGroup($groupId) {
+		$group = $this->findGroup($groupId);
+		
+		return $group ? $group->level : false;
+	}
+	
+	/**
+	 * Find an AclGroup by id
+	 * 
+	 * @param int $groupId
+	 * @return bool|AclGroup
+	 */
+	public function findGroup($groupId) {
 		foreach($this->groups as $group) {
 			if($group->groupId == $groupId) {
-				return $group->level;
+				return $group;
 			}
 		}
 		

@@ -94,11 +94,18 @@ detail/PropertyList.js
 detail/Property.js
 detail/CreateModifyPanel.js
 
+
+permissions/SharePanel.js
+permissions/ShareWindow.js
+
+
 systemsettings/Panel.js
 systemsettings/GeneralPanel.js
 systemsettings/AppearancePanel.js
 systemsettings/NotificationsPanel.js
 systemsettings/AuthenticationPanel.js
+systemsettings/defaultpermissions/DefaultPermissionsPanel.js
+systemsettings/defaultpermissions/ShareWindow.js
 systemsettings/Dialog.js
 
 Wizard.js
@@ -180,6 +187,3 @@ search/SearchCombo.js
 
 modules/SystemSettingsModuleGrid.js
 modules/PermissionsWindow.js
-
-permissions/SharePanel.js
-permissions/ShareWindow.js

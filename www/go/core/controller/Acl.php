@@ -75,4 +75,46 @@ class Acl extends EntityController {
 		return $this->defaultChanges($params);
 	}
 	
+	public function reset($params) {
+		$params['add'] = $params['add'] ?? false;
+		if(!isset($params['entity'])) {
+			throw new InvalidArguments("The 'entity' param is required");
+		}
+		
+		$entityType = \go\core\orm\EntityType::findByName($params['entity']);
+		
+		if(!$entityType) {
+			throw new NotFound("Could not find entity '" . $params['entity'] . "'");
+		}
+		
+		$cls = $entityType->getClassName();
+		$table = array_values($cls::getMapping()->getTables())[0];
+		$defaultAcl = model\Acl::findById($entityType->getDefaultAclId());
+		
+		$aclIds = GO()->getDbConnection()->select('aclId')->from($table->getName());
+		$acls = model\Acl::find()->where('id', 'IN', $aclIds);
+		
+		foreach($acls as $acl) {
+			if(!$params['add']) {
+				$acl->groups = [];
+			}
+			
+			foreach($defaultAcl->groups as $group) {
+				$aclGroup = $params['add'] ? $acl->findGroup($group->groupId) : false;
+				if($aclGroup) {
+					$aclGroup->level = $group->level;					
+				} else
+				{
+					$acl->addGroup($group->groupId, $group->level);
+				}
+			}
+			
+			if(!$acl->save()) {
+				throw new \Exception("Could not save ACL");
+			}
+		}
+		
+		return [];		
+	}
+	
 }

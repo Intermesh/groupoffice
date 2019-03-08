@@ -508,7 +508,6 @@ abstract class Property extends Model {
 	 * @return array ["propName" => [newval, oldval]]
 	 */
 	public function getModified($properties = []) {
-
 		$modified = [];
 		foreach ($this->oldProps as $key => $oldValue) {		
 			if (!empty($properties) && !in_array($key, $properties)) {
@@ -521,13 +520,20 @@ abstract class Property extends Model {
 				if($newValue->isModified()) {
 					$modified[$key] = [$newValue, null];
 				}
-			} else
+			} else 
 			{
 				if ($newValue !== $oldValue) {
 					$modified[$key] = [$newValue, $oldValue];
+				} else if(is_array($newValue) && isset($newValue[0]) && $newValue[0] instanceof Property) {
+					// Array comparison above might return false because the array contains identical objects but the objects itself might have changed.
+					foreach($newValue as $v) {
+						if($v->isModified()) {
+							$modified[$key] = [$newValue, $oldValue];
+							break;
+						}
+					}
 				}
-			}
-			
+			}			
 		}
 
 		return $modified;
@@ -551,10 +557,27 @@ abstract class Property extends Model {
 			if (!empty($properties) && !in_array($key, $properties)) {
 				continue;
 			}
-			if ($this->{$key} !== $oldValue) {
+			$newValue = $this->{$key};
+			
+			if ($newValue !== $oldValue) {
 				return true;
 			}
+			
+			if($newValue instanceof Property && $newValue->isModified()) {
+				return true;
+			}
+			
+			if(is_array($newValue) && isset($newValue[0]) && $newValue[0] instanceof Property) {
+				// Array comparison above might return false because the array contains identical objects but the objects itself might have changed.
+				foreach($newValue as $v) {
+					if($v->isModified()) {
+						return true;
+					}
+				}
+			}
 		}
+		
+		return false;
 	}
 	
 	/**
@@ -594,7 +617,7 @@ abstract class Property extends Model {
 			return false;
 		}
 		
-		$modified = $this->getModified();
+		$modified = $this->getModified();				
 		foreach ($this->getMapping()->getTables() as $table) {			
 			if (!$this->saveTable($table, $modified)) {				
 				return false;
@@ -961,7 +984,7 @@ abstract class Property extends Model {
 	 * @return boolean
 	 */
 	protected function commit() {
-
+		
 		foreach ($this->savedPropertyRelations as $property) {
 			$property->commit();
 		}

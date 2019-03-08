@@ -27,7 +27,7 @@ go.Modules.register("community", 'notes', {
 					return new go.modules.community.notes.NoteDetail();
 				}	
 			}]
-	}, "NoteBook"],	
+	}, {name: "NoteBook", title: t("Note book")}],	
 	systemSettingsPanels: ["go.modules.community.notes.SystemSettingsPanel"]
 });
 

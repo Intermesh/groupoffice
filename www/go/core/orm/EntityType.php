@@ -25,13 +25,14 @@ use PDOException;
  * It's also used for routing short routes like "Note/get" instead of "community/notes/Note/get"
  * 
  */
-class EntityType {
+class EntityType implements \go\core\data\ArrayableInterface {
 
 	private $className;	
 	private $id;
 	private $name;
 	private $moduleId;	
   private $clientName;
+	private $defaultAclId;
 	
 	/**
 	 * The highest mod sequence used for JMAP data sync
@@ -126,7 +127,8 @@ class EntityType {
 			$record['id'] = App::get()->getDbConnection()->getPDO()->lastInsertId();
 		} else
 		{
-			$e->highestModSeq = isset($record['highestModSeq']) ? (int) $record['highestModSeq'] : null;
+			$e->defaultAclId = $record['defaultAclId'];
+			$e->highestModSeq = $record['highestModSeq'];//) ? (int) $record['highestModSeq'] : null;
 		}
 
 		$e->id = $record['id'];
@@ -156,8 +158,13 @@ class EntityType {
 	 * 
 	 * @return static[]
 	 */
-	public static function findAll() {
-		$records = (new Query)
+	public static function findAll(Query $query = null) {
+		
+		if(!isset($query)) {
+			$query = new Query();
+		}
+		
+		$records = $query
 						->select('e.*, m.name AS moduleName, m.package AS modulePackage')
 						->from('core_entity', 'e')
 						->join('core_module', 'm', 'm.id = e.moduleId')
@@ -237,7 +244,8 @@ class EntityType {
 		$e->name = $record['name'];
     $e->clientName = $record['clientName'];
 		$e->moduleId = $record['moduleId'];
-		$e->highestModSeq = (int) $record['highestModSeq'];
+		$e->highestModSeq = $record['highestModSeq'];
+		$e->defaultAclId = $record['defaultAclId'];
 
 		if (isset($record['modulePackage'])) {
 			if($record['modulePackage'] == 'core') {
@@ -325,7 +333,7 @@ class EntityType {
 	 */
 	public function checkChange(Entity $entity) {
 		
-		//GO()->debug($entity->getClientName(). ' checkChange() ' . $entity->getId());
+//		GO()->debug($entity->getClientName(). ' checkChange() ' . $entity->getId() . 'mod: '.implode(', ', array_keys($entity->getModified())));
 		
 		if(!$entity->isDeleted()) {
 			$modifiedPropnames = array_keys($entity->getModified());		
@@ -394,7 +402,7 @@ class EntityType {
 	 */
 	public function getHighestUserModSeq() {
 		if(!isset($this->highestUserModSeq)) {
-			$this->highestUserModSeq = (int) (new Query())
+			$this->highestUserModSeq = (new Query())
 						->selectSingleValue("highestModSeq")
 						->from("core_change_user_modseq")
 						->where(["entityTypeId" => $this->id, "userId" => GO()->getUserId()])
@@ -473,5 +481,83 @@ class EntityType {
 		$this->highestUserModSeq = $modSeq;
 		
 		return $modSeq;
-	}	
+	}
+	
+	private function createAcl() {
+		$acl = new \go\core\acl\model\Acl();
+		$acl->usedIn = 'core_entity.defaultAclId';
+		$acl->ownedBy = 1;
+		if(!$acl->save()) {
+			throw new \Exception('Could not save default ACL');
+		}
+		
+		return $acl;
+	}
+	
+	public function getDefaultAclId() {
+		if(!$this->isAclOwner()) {
+			return null;
+		}
+		
+		if(!isset($this->defaultAclId)) {
+			
+			GO()->getDbConnection()->beginTransaction();
+			
+			$acl = $this->createAcl();
+			
+			if(!GO()->getDbConnection()->update('core_entity', ['defaultAclId' => $acl->id], ['id' => $this->getId()])->execute()) {
+				GO()->getDbConnection()->rollBack();
+				throw new \Exception("Could not save defaultAclId");
+			}
+			
+			GO()->getDbConnection()->commit();
+			
+			$this->defaultAclId = $acl->id;
+		}
+		
+		return $this->defaultAclId;
+	}
+	
+	/**
+	 * Returns true when this entity type holds an ACL id for permissions.
+	 * 
+	 * @return bool
+	 */
+	public function isAclOwner() {
+		$cls = $this->getClassName();
+		return $cls != \go\core\model\Search::class && 
+						(
+							is_subclass_of($cls, \go\core\acl\model\AclOwnerEntity::class) || 
+							(is_subclass_of($cls, \GO\Base\Db\ActiveRecord::class) && $cls::model()->aclField() && !$cls::model()->isJoinedAclField)
+						);
+	}
+	
+	/**
+	 * Returns true if this entity supports custom fields
+	 * 
+	 * @return bool
+	 */
+	public function supportsCustomFields() {
+		return method_exists($this->getClassName(), "getCustomFields");
+	}
+	
+	/**
+	 * Returns true if the entity supports a files folder.
+	 * 
+	 * @return bool
+	 */
+	public function supportsFiles() {
+		return property_exists($this->getClassName(), 'filesFolderId') || property_exists($this->getClassName(), 'files_folder_id');
+	}
+
+	public function toArray($properties = null) {
+		return [
+				"name" => $this->getName(),
+				"isAclOwner" => $this->isAclOwner(),
+				"defaultAclId" => $this->getDefaultAclId(),
+				"supportsCustomFields" => $this->supportsCustomFields(),
+				"supportsFiles" => $this->supportsFiles()
+		];
+	}
+
 }

@@ -1,3 +1,8 @@
+/**
+ * var aclId = 1;
+ * var dlg = new go.permissions.ShareWindow();
+ * dlg.load(aclId).show();
+ */
 go.permissions.ShareWindow = Ext.extend(go.form.Dialog, {
 	title: t('Share'),
 	entityStore: "Acl",

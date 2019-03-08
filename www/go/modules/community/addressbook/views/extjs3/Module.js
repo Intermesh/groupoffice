@@ -6,7 +6,10 @@ go.Modules.register("community", "addressbook", {
 	entities: [{
 			
 			name: "Contact",
-			hasFiles: true,
+			hasFiles: true, //Rename to files?
+			customFields: {
+				fieldSetDialog: "go.modules.community.addressbook.CustomFieldSetDialog"
+			},
 			links: [{
 
 				filter: "isContact",
@@ -65,7 +68,11 @@ go.Modules.register("community", "addressbook", {
 				}	
 			}]
 			
-	}, "AddressBook", "AddressBookGroup"],
+	}, {
+		name: "AddressBook",
+		title: t("Address book"),
+		isAclOwner: true
+	}, "AddressBookGroup"],
 	
 	systemSettingsPanels: ["go.modules.community.addressbook.SystemSettingsPanel"],
 	userSettingsPanels: ["go.modules.community.addressbook.SettingsPanel"]

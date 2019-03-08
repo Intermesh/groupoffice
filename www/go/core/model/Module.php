@@ -229,6 +229,14 @@ class Module extends AclOwnerEntity {
 		return $this->module()->getSettings();
 	}
 	
+	/**
+	 * Returns all module entities with info
+	 * @return array
+	 */
+	public function getEntities() {		
+		return array_map(function($e) {return $e->toArray();}, core\orm\EntityType::findAll((new core\orm\Query)->where(['moduleId' => $this->id])));
+	}
+	
 	public function setSettings($value) {
 		$this->getSettings()->setValues($value);
 	}

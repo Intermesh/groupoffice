@@ -55,10 +55,14 @@ abstract class AclOwnerEntity extends AclEntity {
 	}
 	
 	protected function createAcl() {
-		$this->acl = new Acl();
+		
+		// Copy the default one.
+		$defaultAcl = Acl::findById(static::getType()->getDefaultAclId());		
+		$this->acl = $defaultAcl->copy();
+		
 		$this->acl->usedIn = $this->getMapping()->getColumn('aclId')->table->getName().'.aclId';
 		$this->acl->ownedBy = !empty($this->createdBy) ? $this->createdBy : $this->getDefaultCreatedBy();
-
+		
 		if(!$this->acl->save()) {	
 			throw new \Exception("Could not create ACL");
 		}

@@ -398,3 +398,7 @@ $updates['201902141322'][] = "ALTER TABLE `core_change` ADD CONSTRAINT `core_cha
 
 
 $updates['201903011422'][] = "ALTER TABLE `core_change_user` CHANGE `entityId` `entityId` INT NOT NULL;";
+
+//ALTER TABLE `core_entity` ADD `defaultAclId` INT NULL DEFAULT NULL AFTER `highestModSeq`;
+//ALTER TABLE `core_entity` ADD FOREIGN KEY (`defaultAclId`) REFERENCES `core_acl`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+

@@ -211,7 +211,7 @@ abstract class Entity extends Property {
 	 * @return boolean
 	 */
 	public final function save() {	
-		//GO()->debug(static::class.'::save()' . $this->getId());
+//		GO()->debug(static::class.'::save()' . $this->getId());
 		App::get()->getDbConnection()->beginTransaction();
 			
 		if (!$this->fireEvent(self::EVENT_BEFORESAVE, $this)) {

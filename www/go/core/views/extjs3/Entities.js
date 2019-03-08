@@ -139,7 +139,11 @@
 		 * 
 		 * name: "Contact"
 		 * module: "addressbook",
-		 * package: "community"
+		 * package: "community",
+		 * customfields: true | {customFieldSetDialog: "class"}
+		 * files: true
+		 * isAclOwner: true
+		 * defaultsPanel: "class"
 		 * 
 		 * Functions:
 		 * 

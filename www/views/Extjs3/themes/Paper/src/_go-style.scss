@@ -577,7 +577,16 @@ button {
 	color:inherit;
 	cursor: pointer;
 	font-size: inherit;
-	cursor: pointer;
+	&:hover{
+		cursor: pointer;
+	}
+	&[disabled] {
+		cursor: default;
+    opacity: .6;
+    -moz-opacity: .6;
+    filter: alpha(opacity=60);
+		pointer-events: none;
+	}
 }
 .closed{
 	display:none !important;

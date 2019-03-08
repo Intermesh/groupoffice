@@ -193,7 +193,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 		return true;
 	},
 
-	submit: function () {
+	submit: function (cb, scope) {
 		
 		if(!this.onBeforeSubmit()) {
 			return;
@@ -209,6 +209,10 @@ go.form.Dialog = Ext.extend(go.Window, {
 			this.actionComplete();
 			this.onSubmit(success, serverId);
 			this.fireEvent("submit", this, success, serverId);
+			
+			if(cb) {
+				cb.call(scope || this, success, serverId);
+			}
 
 			if(!success) {
 				return;
