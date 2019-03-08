@@ -5,7 +5,7 @@
 
 go.Modules.register("core", 'customfields', {
   mainPanel: GO.customfields.MainPanel,
-  title: t("Custom fields", "customfields"),
+  title: t("Custom fields"),
   iconCls: 'go-tab-icon-customfields',
   admin: true,
   requiredPermissionLevel: GO.permissionLevels.write,
