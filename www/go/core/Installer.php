@@ -126,7 +126,11 @@ class Installer {
 			throw new Exception("Failed to save cron job: " . var_export($cron->getValidationErrors(), true));
 		}
 		
-		GO()->getSettings()->setDefaultGroups([model\Group::ID_EVERYONE]);
+		$acl = acl\model\Acl::findById(Group::getType()->getDefaultAclId());
+		$acl->addGroup(model\Group::ID_EVERYONE);
+		if(!$acl->save()) {
+			throw new \Exception("Could not save default ACL for groups");
+		}
 		
 		if(!Password::register()) {
 			throw new \Exception("Failed to register Password authenticator");

@@ -73,6 +73,11 @@ go.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel, {
 		go.customfields.SystemSettingsPanel.superclass.initComponent.call(this);
 		
 		this.on('cellclick', this.onCellClick, this);
+		this.on('rowdblclick', this.onRowDblClick, this);
+	},
+	
+	onRowDblClick :function(grid, rowIndex, e) {
+		this.edit(this.store.getAt(rowIndex));
 	},
 	
 	onCellClick : function(grid, rowIndex, columnIndex, e) {
@@ -80,13 +85,14 @@ go.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel, {
 		if(e.target.tagName != "BUTTON") {
 			return;
 		}
-		var record = this.store.getAt(rowIndex);						
-		
+		this.edit(this.store.getAt(rowIndex));	
+	},
+	
+	edit : function(record) {
 		var win = new go.customfields.EntityDialog({
 			entity: record.data.name
 		});
 		win.show();
-		
 	}
 });
 

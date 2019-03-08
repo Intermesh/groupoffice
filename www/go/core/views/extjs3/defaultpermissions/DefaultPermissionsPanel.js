@@ -72,6 +72,11 @@ go.defaultpermissions.DefaultPermissionsPanel = Ext.extend(go.grid.GridPanel, {
 		go.defaultpermissions.DefaultPermissionsPanel.superclass.initComponent.call(this);
 		
 		this.on('cellclick', this.onCellClick, this);
+		this.on('rowdblclick', this.onRowDblClick, this);
+	},
+	
+	onRowDblClick :function(grid, rowIndex, e) {
+		this.edit(this.store.getAt(rowIndex));
 	},
 	
 	onCellClick : function(grid, rowIndex, columnIndex, e) {
@@ -79,11 +84,13 @@ go.defaultpermissions.DefaultPermissionsPanel = Ext.extend(go.grid.GridPanel, {
 		if(e.target.tagName != "BUTTON") {
 			return;
 		}
-		var record = this.store.getAt(rowIndex);						
+		this.edit(this.store.getAt(rowIndex));	
+	},
+	
+	edit : function(record) {	
 		
 		var win = new go.defaultpermissions.ShareWindow();
 		win.entity = record.data.name;
-		win.load(record.data.defaultAclId).show();
-		
+		win.load(record.data.defaultAclId).show();		
 	}
 });
