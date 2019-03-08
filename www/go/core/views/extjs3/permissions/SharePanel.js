@@ -7,6 +7,9 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 	cls: "go-share-panel", 
 	
 	clicksToEdit: 1,
+	
+	showLevels: true,
+	
 	initComponent: function () {
 		
 		this.selectedGroups = [];
@@ -14,6 +17,9 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 		var checkColumn = new GO.grid.CheckColumn({
 			width: dp(48),
 			dataIndex: 'selected',
+			hideable: false,
+			sortable: false,
+			menuDisabled: true,
 			listeners: {
 				change: this.onCheckChange,
 				scope: this
@@ -66,7 +72,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 			entityStore: "Group"
 		});
 		
-		var levelCombo = this.createLevelCombo();
+		var levelCombo = this.createLevelCombo(), me = this;
 
 		Ext.apply(this, {		
 			plugins: [checkColumn],
@@ -117,8 +123,13 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 					dataIndex : 'level',
 					menuDisabled:true,
 					editor : levelCombo,
-					width: dp(160),
+					width: dp(260),
+					hidden: !this.showLevels,
+					hideable: false,
 					renderer:function(v, meta){
+						if(!me.showLevels) {
+							return "";
+						}
 						var r = levelCombo.store.getById(v);
 						meta.style="position:relative";
 						return r ? r.get('text') + "<i class='trigger'>arrow_drop_down</i></div>" : v;

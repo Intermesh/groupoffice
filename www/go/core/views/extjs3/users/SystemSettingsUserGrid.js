@@ -30,6 +30,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				'avatarId',
 				'loginCount',
 				'authenticationMethods',
+				'personalGroup',
 				{name: 'createdAt', type: 'date'},
 				{name: 'lastLogin', type: 'date'}	
 			],
@@ -200,6 +201,17 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 						text: t("Edit"),
 						handler: function() {this.edit(this.moreMenu.record.id);},
 						scope: this						
+					}, {
+						itemId: "share",
+						iconCls: 'ic-share',
+						text: t("Share"),
+						handler: function () {
+							var win = new go.permissions.ShareWindow({
+								showLevels: false
+							});
+							win.load(this.moreMenu.record.data.personalGroup.aclId).show();
+						},
+						scope: this
 					},{
 						itemId:"loginAs",
 						iconCls: 'ic-swap-horiz',

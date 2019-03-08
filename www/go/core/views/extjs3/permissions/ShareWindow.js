@@ -7,14 +7,16 @@ go.permissions.ShareWindow = Ext.extend(go.form.Dialog, {
 	title: t('Share'),
 	entityStore: "Acl",
 	height: dp(600),
-	width: dp(800),
+	width: dp(1000),
+	modal: true,
+	showLevels: true,
 	
 	initComponent : function() {
 		this.buttons = [
 			'->', this.shareBtn = new Ext.Button({
 				cls: "raised",
 				text: t("Share"),
-				handler: this.submit,
+				handler: function() {this.submit();},
 				scope: this
 			})];
 		
@@ -25,7 +27,8 @@ go.permissions.ShareWindow = Ext.extend(go.form.Dialog, {
 			this.sharePanel = new go.permissions.SharePanel({
 				anchor: '100% -' + dp(32),
 				hideLabel: true,
-				name: "groups"
+				name: "groups",
+				showLevels: this.showLevels
 			})
 		];
 	},

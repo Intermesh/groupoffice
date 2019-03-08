@@ -7,7 +7,7 @@ go.defaultpermissions.ShareWindow = Ext.extend(go.permissions.ShareWindow, {
 	title: t('Set default permissions'),
 	entityStore: "Acl",
 	height: dp(600),
-	width: dp(800),
+	width: dp(1000),
 	entity: null,
 
 	initComponent: function () {
