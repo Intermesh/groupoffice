@@ -49,92 +49,12 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 			]
 		});
 
-		go.Stores.get("FieldSet").on("changes", function (store, added, changed, destroyed) {
-			if (this.loading || !this.rendered) {
-				return;
-			}
-			var me = this, id, e;
-			
-			Ext.apply(added, changed);
-			
-			for(id in added) {			
-				e = added[id];
-
-				//change for another entity. Skip it.
-				if(e.entity !== me.entity) {						
-					return;
-				}
-
-				var record = me.store.getAt(me.store.findBy(function (record) {
-					if (record.data.isFieldSet && record.data.fieldSetId === e.id) {
-						return true;
-					}
-				}));
-
-				if (!record) {
-					me.load();
-				} else
-				{
-					record.beginEdit();
-					record.set("name", e.name);
-					record.set("sortOrder", e.sortOrder);
-					record.endEdit();
-					record.commit();
-				}
-			};
-			
-			if(destroyed.length) {
-				this.store.remove(this.store.getRange().filter(function(r) {
-					return r.data.isFieldSet && destroyed.indexOf(r.data.fieldSetId) > -1;
-				}));
-			}
-		}, this);
-
-		go.Stores.get("Field").on("changes", function (store, added, changed, destroyed) {
-			if (this.loading || !this.rendered) {
-				return;
-			}
-
-			var me = this, id, e;
-			
-			Ext.apply(added, changed);
-			
-			for(id in added) {			
-				e = added[id];
-				if(me.store.findBy(function (record) {
-					if (record.data.isFieldSet && record.data.fieldSetId === e.fieldSetId) {
-						return true;
-					}
-				}) === -1) {
-					//fieldset not part of this panel
-					return;
-				}
-
-				var record = me.store.getAt(me.store.findBy(function (record) {
-					if (record.data.fieldId === e.id) {
-						return true;
-					}
-				}));
-
-				if (!record) {
-					me.load();
-				} else
-				{
-					record.beginEdit();
-					record.set("name", e.name);
-					record.set("databaseName", e.databaseName);
-					record.set("sortOrder", e.sortOrder);
-					record.endEdit();
-					record.commit();
-				}
-			};
-			
-			if(destroyed.length) {
-				this.store.remove(this.store.getRange().filter(function(r) {
-					return destroyed.indexOf(r.data.fieldId) > -1;
-				}));
-			}
-
+		go.Stores.get("FieldSet").on("changes", this.onFieldSetChanges, this);
+		go.Stores.get("Field").on("changes", this.onFieldChanges, this);
+		
+		this.on('destroy', function() {
+			go.Stores.get("FieldSet").un("changes", this.onFieldSetChanges, this);
+			go.Stores.get("Field").un("changes", this.onFieldChanges, this);
 		}, this);
 
 
@@ -220,6 +140,94 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 		
 		this.on('rowdblclick', this.onRowDblClick, this);
 	},
+	
+	onFieldSetChanges : function (store, added, changed, destroyed) {
+			if (this.loading || !this.rendered) {
+				return;
+			}
+			var me = this, id, e;
+			
+			Ext.apply(added, changed);
+			
+			for(id in added) {			
+				e = added[id];
+
+				//change for another entity. Skip it.
+				if(e.entity !== me.entity) {						
+					return;
+				}
+
+				var record = me.store.getAt(me.store.findBy(function (record) {
+					if (record.data.isFieldSet && record.data.fieldSetId === e.id) {
+						return true;
+					}
+				}));
+
+				if (!record) {
+					me.load();
+				} else
+				{
+					record.beginEdit();
+					record.set("name", e.name);
+					record.set("sortOrder", e.sortOrder);
+					record.endEdit();
+					record.commit();
+				}
+			};
+			
+			if(destroyed.length) {
+				this.store.remove(this.store.getRange().filter(function(r) {
+					return r.data.isFieldSet && destroyed.indexOf(r.data.fieldSetId) > -1;
+				}));
+			}
+		},
+	
+	onFieldChanges : function (store, added, changed, destroyed) {
+			if (this.loading || !this.rendered) {
+				return;
+			}
+
+			var me = this, id, e;
+			
+			Ext.apply(added, changed);
+			
+			for(id in added) {			
+				e = added[id];
+				if(me.store.findBy(function (record) {
+					if (record.data.isFieldSet && record.data.fieldSetId === e.fieldSetId) {
+						return true;
+					}
+				}) === -1) {
+					//fieldset not part of this panel
+					return;
+				}
+
+				var record = me.store.getAt(me.store.findBy(function (record) {
+					if (record.data.fieldId === e.id) {
+						return true;
+					}
+				}));
+
+				if (!record) {
+					me.load();
+				} else
+				{
+					record.beginEdit();
+					record.set("name", e.name);
+					record.set("databaseName", e.databaseName);
+					record.set("sortOrder", e.sortOrder);
+					record.endEdit();
+					record.commit();
+				}
+			};
+			
+			if(destroyed.length) {
+				this.store.remove(this.store.getRange().filter(function(r) {
+					return destroyed.indexOf(r.data.fieldId) > -1;
+				}));
+			}
+
+		},
 	
 	onRowDblClick : function(grid, rowIndex, e) {
 		this.edit(this.store.getAt(rowIndex));
