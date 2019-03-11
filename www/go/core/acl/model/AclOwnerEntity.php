@@ -57,8 +57,13 @@ abstract class AclOwnerEntity extends AclEntity {
 	protected function createAcl() {
 		
 		// Copy the default one. When installing the default one can't be accessed yet.
-		$defaultAcl = GO()->getInstaller()->isInProgress() ? new Acl() : Acl::findById(static::getType()->getDefaultAclId());		
-		$this->acl = $defaultAcl->copy();
+		if(GO()->getInstaller()->isInProgress()) {
+			$this->acl = new Acl();
+		} else
+		{
+			$defaultAcl = Acl::findById(static::getType()->getDefaultAclId());		
+			$this->acl = $defaultAcl->copy();
+		}
 		
 		$this->acl->usedIn = $this->getMapping()->getColumn('aclId')->table->getName().'.aclId';
 		$this->acl->ownedBy = !empty($this->createdBy) ? $this->createdBy : $this->getDefaultCreatedBy();
