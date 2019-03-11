@@ -136,7 +136,8 @@ CREATE TABLE `core_entity` (
   `moduleId` int(11) DEFAULT NULL,
   `name` varchar(190) NOT NULL,
   `clientName` varchar(190) DEFAULT NULL,
-  `highestModSeq` int(11) NOT NULL DEFAULT 0
+  `highestModSeq` int(11) NOT NULL DEFAULT 0,
+  `defaultAclId` INT NULL DEFAULT NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE `core_group` (
@@ -711,6 +712,7 @@ ALTER TABLE `core_customfields_select_option`
 
 ALTER TABLE `core_entity`
   ADD CONSTRAINT `core_entity_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE;
+ALTER TABLE `core_entity` ADD FOREIGN KEY (`defaultAclId`) REFERENCES `core_acl`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 ALTER TABLE `core_group`
   ADD CONSTRAINT `core_group_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`),

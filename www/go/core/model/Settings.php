@@ -1,8 +1,11 @@
 <?php
 namespace go\core\model;
 
+use Exception;
+use GO;
 use go\core;
 use go\core\http\Request;
+use go\core\util\Crypt;
 
 class Settings extends core\Settings {
 	
@@ -24,7 +27,7 @@ class Settings extends core\Settings {
 		if($save) {
 			try {
 				$this->save();
-			}catch(\Exception $e) {
+			}catch(Exception $e) {
 				
 				//ignore error on install becasuse core module is not there yet
 				if(!core\Installer::isInProgress()) {
@@ -149,11 +152,11 @@ class Settings extends core\Settings {
 	
 	
 	public function getSmtpPassword() {
-		return \go\core\util\Crypt::decrypt($this->smtpPassword);
+		return Crypt::decrypt($this->smtpPassword);
 	}
 	
 	public function setSmtpPassword($value) {
-		$this->smtpPassword = \go\core\util\Crypt::encrypt($value);
+		$this->smtpPassword = Crypt::encrypt($value);
 	}
 	
 	
@@ -183,7 +186,7 @@ class Settings extends core\Settings {
 					}
 				}
 			}
-		} catch(\Exception $e) {
+		} catch(Exception $e) {
 			GO()->debug("Could not determine locale");
 		}
 
@@ -373,6 +376,34 @@ class Settings extends core\Settings {
 	 * @var boolean
 	 */
 	public $defaultShortDateInList = true;	
+	
+	/**
+	 * New users will be member of these groups
+	 * 
+	 * @return int[]
+	 */
+	public function getDefaultGroups() {		
+		return array_map("intval", (new core\db\Query)
+						->selectSingleValue('groupId')
+						->from("core_group_default_group")
+						->all());
+
+	}
+	
+	/**
+	 * Set default groups for new groups
+	 * 
+	 * @param array eg [['groupId' => 1]]
+	 */
+	public function setDefaultGroups($groups) {	
+		core\db\Table::getInstance("core_group_default_group")->truncate();
+		
+		foreach($groups as $groupId) {
+			if(!GO()->getDbConnection()->insert("core_group_default_group", ['groupId' => $groupId])->execute()) {
+				throw new Exception("Could not save group id ".$groupId);
+			}
+		}
+	}
 	
 	
 	public function save() {
