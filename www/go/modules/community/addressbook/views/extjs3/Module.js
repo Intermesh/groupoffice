@@ -72,7 +72,7 @@ go.Modules.register("community", "addressbook", {
 		name: "AddressBook",
 		title: t("Address book"),
 		isAclOwner: true
-	}, "AddressBookGroup"],	
+	}, "AddressBookGroup", {name: "Filter"}],	
 	
 	userSettingsPanels: ["go.modules.community.addressbook.SettingsPanel"]
 });

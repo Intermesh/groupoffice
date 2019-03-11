@@ -11,7 +11,7 @@ use go\modules\community\addressbook\model;
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */ 
-class AddressBook extends EntityController {
+class Filter extends EntityController {
 	
 	/**
 	 * The class name of the entity this controller is for.
@@ -19,7 +19,7 @@ class AddressBook extends EntityController {
 	 * @return string
 	 */
 	protected function entityClass() {
-		return model\AddressBook::class;
+		return model\Filter::class;
 	}	
 	
 	/**

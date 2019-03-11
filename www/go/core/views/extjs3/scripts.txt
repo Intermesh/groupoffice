@@ -189,3 +189,7 @@ search/SearchCombo.js
 
 modules/SystemSettingsModuleGrid.js
 modules/PermissionsWindow.js
+
+
+filter/Conditions.js
+filter/Condition.js

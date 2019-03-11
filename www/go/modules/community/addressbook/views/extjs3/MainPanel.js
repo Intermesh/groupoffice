@@ -12,9 +12,12 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 	addAddressBookId: 1,
 
 	initComponent: function () {	
+		
+		this.createGrid();
 
 		this.sidePanel = new Ext.Panel({
 			width: dp(300),
+			cls: 'go-sidenav',
 			region: "west",
 			split: true,
 			autoScroll: true,			
@@ -48,7 +51,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 			split: true,
 			narrowWidth: dp(400), //this will only work for panels inside another panel with layout=responsive. Not ideal but at the moment the only way I could make it work
 			items: [
-				this.createGrid(), //first is default in narrow mode
+				this.grid, //first is default in narrow mode
 				this.sidePanel
 			]
 		});
@@ -297,7 +300,8 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 				fields: ['name', 'icon', 'inputValue'], //icon and iconCls are supported.
 				data: [					
 					[t("Organization"), 'business', true],
-					[t("Contact"), 'person', false]				
+					[t("Contact"), 'person', false],
+					['-']
 				]
 			}),
 			simpleSelect: true,
@@ -319,11 +323,32 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 		
 		
 		return new Ext.Panel({
-			title: t("Filters"),
+			
+			tbar: [
+				{
+					xtype: 'tbtitle',
+					text: t("Filters")
+				},
+				'->',
+				{
+					xtype: "button",
+					iconCls: "ic-add",
+					handler: function() {
+						var dlg = new go.modules.community.addressbook.FilterDialog();
+						dlg.show();
+					},
+					scope: this
+				}
+			],
 			items: [
-				orgFilter
+				orgFilter,
+				this.filterGrid = new go.modules.community.addressbook.FilterGrid({
+					filterStore: this.grid.store
+				})
 			]
 		});
+		
+		
 	},
 
 	setAddressBookId: function (addressBookId) {
