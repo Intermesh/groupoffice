@@ -4,8 +4,7 @@ go.Modules.register("core", 'core', {
 	systemSettingsPanels: [
 		"go.users.SystemSettingsUserGrid",
 		"go.groups.SystemSettingsGroupGrid",
-		"go.modules.SystemSettingsModuleGrid",
-		"go.cron.SystemSettingsCronGrid",
+		"go.modules.SystemSettingsModuleGrid",		
 		"go.tools.SystemSettingsTools"
 	],
 	userSettingsPanels: [

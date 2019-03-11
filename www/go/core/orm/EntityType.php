@@ -487,6 +487,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		$acl = new \go\core\acl\model\Acl();
 		$acl->usedIn = 'core_entity.defaultAclId';
 		$acl->ownedBy = 1;
+		//$acl->addGroup(\go\core\model\Group::ID_INTERNAL, \go\core\acl\model\Acl::LEVEL_WRITE);
 		if(!$acl->save()) {
 			throw new \Exception('Could not save default ACL');
 		}
