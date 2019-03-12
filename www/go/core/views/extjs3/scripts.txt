@@ -195,3 +195,4 @@ modules/PermissionsWindow.js
 filter/Conditions.js
 filter/Condition.js
 filter/FieldSet.js
+filter/types/string.js

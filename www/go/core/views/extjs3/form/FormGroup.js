@@ -43,12 +43,12 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	
 	initComponent : function() {		
 		
-		
-		//to prevent items to be cascaded by Extjs basic form
-		this.itemCfg.findBy = false;
-		
-		//to prevent adding to the ExtJS basic form
-		this.itemCfg.isFormField = false;
+		//No longer needed when cancelling add event.
+//		//to prevent items to be cascaded by Extjs basic form
+//		this.itemCfg.findBy = false;
+//		
+//		//to prevent adding to the ExtJS basic form
+//		this.itemCfg.isFormField = false;
 		
 		this.itemCfg.flex = 1;
 		
@@ -59,6 +59,12 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		this.initBbar();
 		
 		go.form.FormGroup.superclass.initComponent.call(this);
+		
+		this.on("add",function(e) {			
+			//to prevent adding to Ext.form.BasicForm with add event.
+			//Cancels event bubbling
+			return false;
+		});
 	},
 	
 	initBbar: function() {

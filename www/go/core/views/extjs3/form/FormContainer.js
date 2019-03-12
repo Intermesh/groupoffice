@@ -10,6 +10,13 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 	initComponent : function() {
 		this.origValue = {};
 		go.form.FormContainer.superclass.initComponent.call(this);
+		
+		this.on("add",function(e) {
+			
+			//to prevent adding to Ext.form.BasicForm with add event.
+			//Cancels event bubbling
+			return false;
+		});
 	},
 	
 	getName: function() {
