@@ -230,7 +230,6 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						addButtonText: t("Add e-mail address"),
 						itemCfg: {
 							anchor: "100%",
-							layout: "form",
 							items: [{			
 									anchor: "100%",
 									xtype: "compositefield",
@@ -274,7 +273,6 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						addButtonText: t("Add phone number"),
 						addButtonIconCls: 'ic-phone',
 						itemCfg: {
-							layout: "form",
 							items: [{
 									xtype: "compositefield",
 									hideLabel: true,
@@ -322,8 +320,6 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						addButtonIconCls: 'ic-add-location',
 						pad: true,
 						itemCfg: {
-							xtype: "panel",
-							layout: "form",
 							labelWidth: dp(140),
 							items: [{
 									anchor: "100%",
@@ -390,8 +386,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						name: "dates",
 						addButtonText: t("Add date"),
 						addButtonIconCls: 'ic-event',
-						itemCfg: {
-							
+						itemCfg: {							
 							items: [{
 									xtype: "compositefield",
 									hideLabel: true,
@@ -429,7 +424,6 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						addButtonText: t("Add online url"),
 						addButtonIconCls: 'ic-home',
 						itemCfg: {
-							layout: "form",
 							items: [{
 									xtype: "compositefield",
 									hideLabel: true,
