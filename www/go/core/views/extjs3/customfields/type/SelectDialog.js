@@ -33,7 +33,6 @@ go.customfields.type.SelectDialog = Ext.extend(go.customfields.FieldDialog, {
 //					name: "dataType.options",
 //					fieldLabel: t("Options"),
 //					itemCfg: {
-//						layout: "form",
 //						items: [{
 //								xtype: "hidden",
 //								name: "id"

@@ -7,7 +7,6 @@
  *	addButtonText: t("Add option"),
  *	addButtonIconCls: 'ic-add',
  *	itemCfg: {
- *		layout: "form",
  *		items: [{
  *				xtype: "hidden",
  *				name: "id"
