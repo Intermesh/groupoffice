@@ -71,27 +71,24 @@ class Acl extends Entity {
 	
 	protected function internalSave() {
 		
-		if($this->isNew() && empty($this->groups)) {		
-					
+		$adminLevel = $this->hasGroup(Group::ID_ADMINS);
+		if($adminLevel < self::LEVEL_MANAGE) {
+			$this->removeGroup(Group::ID_ADMINS);
 			$this->addGroup(Group::ID_ADMINS, self::LEVEL_MANAGE);
-			
-			if($this->ownedBy != User::ID_SUPER_ADMIN) {
-				
-				$groupId = Group::find()
-								->where(['isUserGroupFor' => $this->ownedBy])
-								->selectSingleValue('id')
-								->single();
-				
-				$this->addGroup($groupId, self::LEVEL_MANAGE);
-			}
-		} else
-		{
-			$adminLevel = $this->hasGroup(Group::ID_ADMINS);
-			if($adminLevel < self::LEVEL_MANAGE) {
-				$this->removeGroup(Group::ID_ADMINS);
-				$this->addGroup(Group::ID_ADMINS, self::LEVEL_MANAGE);
-			}
 		}
+		
+		if($this->ownedBy != User::ID_SUPER_ADMIN) {
+
+			$groupId = Group::find()
+							->where(['isUserGroupFor' => $this->ownedBy])
+							->selectSingleValue('id')
+							->single();
+			$ownerLevel = $this->hasGroup($groupId);
+			if($ownerLevel < self::LEVEL_MANAGE) {
+				$this->removeGroup($groupId);
+				$this->addGroup($groupId, self::LEVEL_MANAGE);				
+			}
+		}		
 		
 		if(!parent::internalSave()) {
 			return false;
