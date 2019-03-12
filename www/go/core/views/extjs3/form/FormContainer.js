@@ -3,6 +3,8 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 	
 	name: null,
 	
+	isFormField: true,
+	
 	origValue : null,
 	
 	initComponent : function() {
@@ -55,8 +57,7 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 		this.setValue({});		
 	},
 
-	setValue: function (v) {	
-		
+	setValue: function (v) {
 		this.origValue = v;
 		
 		for(var name in v) {

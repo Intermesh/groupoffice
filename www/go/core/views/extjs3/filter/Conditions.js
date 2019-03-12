@@ -1,7 +1,8 @@
 go.filter.Conditions = Ext.extend(go.form.FormGroup, {
 	fields: null,
-	name: "filter",
-	addButtonText: t("Add condition"),
+	name: "conditions",
+	addButtonText: t("Add condition"),	
+	hideLabel: true,
 	initComponent : function() {
 		
 		this.itemCfg = {
@@ -21,22 +22,19 @@ go.filter.Conditions = Ext.extend(go.form.FormGroup, {
 			conditions.push(condition);
 		}
 		
-		return {
-			operator: "AND",
-			conditions: conditions
-		};
+		return conditions;
 	},
 	
-	setValue : function(filter) {
+	setValue : function(conditions) {
 		
-		if(!filter || !filter.conditions) {
+		if(!conditions) {
 			return;
 		}
 		
 		var v = [];
 		
-		for(var i = 0, l = filter.conditions.length; i < l; i++) {
-			var condition = filter.conditions[i];
+		for(var i = 0, l = conditions.length; i < l; i++) {
+			var condition = conditions[i];
 			for(var name in condition) {
 				v.push({
 					name: name,

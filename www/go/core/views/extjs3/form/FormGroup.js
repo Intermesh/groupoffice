@@ -216,10 +216,8 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		}
 		
 		if(c.items) {
-			c.items.each(function(i) {
-				if(i.isFormField) {
-					fields.push(i);
-				}					
+			c.items.each(function(i) {				
+				fields.push(i.formField);									
 			}, this);
 		}
 		

@@ -95,6 +95,9 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 			params.create = {};
 			params.create[id] = values;
 		}
+		
+//		console.warn(values);
+//		return;
 
 		this.fireEvent('beforesubmit', this, values);
 		

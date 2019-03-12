@@ -12,6 +12,7 @@ go.filter.Condition = Ext.extend(go.form.FormContainer, {
 
 	createFieldCombo: function () {
 		this.fieldCombo = new go.form.ComboBox({
+			width: dp(300),
 			hideLabel: true,
 			submit: false,
 			name: "name",
@@ -27,6 +28,7 @@ go.filter.Condition = Ext.extend(go.form.FormContainer, {
 			editable: false,
 			selectOnFocus: true,
 			forceSelection: true,
+			allowBlank: false,
 			listeners: {
 				scope: this,
 				select: this.onFieldSelect
@@ -52,20 +54,18 @@ go.filter.Condition = Ext.extend(go.form.FormContainer, {
 		
 	},
 	
-	setValue : function(v) {
+	setValue : function(v) {		
+		
+		if(v) {
+			var field = this.fields.find(function(f) {
+				return v.name == f.name
+			});
+
+			this.switchCondition(field.type);
+		}
 		
 		go.filter.Condition.superclass.setValue.call(this, v);
 		
-		var v = this.fieldCombo.getValue();
-		
-		if(!v) {
-			return;
-		}
-		
-		var field = this.fields.find(function(f) {
-			return v == f.name
-		});
-		this.switchCondition(field.type);
 	},
 	
 	switchCondition : function(type) {
@@ -83,6 +83,7 @@ Ext.reg("filtercondition", go.filter.Condition);
 Ext.ns("go.filter.types");
 go.filter.types.StringPanel = Ext.extend(Ext.Panel, {
 	layout: "hbox",
+	flex: 1,
 	initComponent: function () {
 		
 		this.operatorCombo = new go.form.ComboBox({
@@ -95,8 +96,8 @@ go.filter.types.StringPanel = Ext.extend(Ext.Panel, {
 					data: [
 						['contains', t("Contains")],
 						['equals', t("Equals")],
-						['startsWith', t("Starts with")],
-						['endsWith', t("Ends with")]
+						['startswith', t("Starts with")],
+						['endswith', t("Ends with")]
 					]
 				}),
 				valueField: 'value',
@@ -105,7 +106,8 @@ go.filter.types.StringPanel = Ext.extend(Ext.Panel, {
 				triggerAction: 'all',
 				editable: false,
 				selectOnFocus: true,
-				forceSelection: true
+				forceSelection: true,
+				width: Math.ceil(dp(200))
 			});
 			
 			
@@ -121,6 +123,7 @@ go.filter.types.StringPanel = Ext.extend(Ext.Panel, {
 	
 	createValueField: function() {
 		return new Ext.form.TextField({
+			flex: 1,
 			submit: false,
 			name: 'value'
 		});
@@ -138,10 +141,25 @@ go.filter.types.StringPanel = Ext.extend(Ext.Panel, {
 	
 	setValue: function(v) {
 		
-		console.log(v);
+		var wildCardPrefix = v.substring(0,1) == "%", l = v.length, wildCardSuffix = v.substring(l -1, l) == "%", operator = "equals";
 		
-		// TODO 
-		this.operatorCombo.setValue('equals');
+		if(wildCardPrefix && wildCardSuffix) {
+			operator = "contains";
+		} else if(wildCardPrefix) {
+			operator = "endswith";
+		} else if(wildCardSuffix) {
+			operator = "startswith";
+		}
+		
+		if(wildCardPrefix) {
+			v = v.slice(1);
+		}
+		
+		if(wildCardSuffix) {
+			v = v.slice(0, -1);
+		}
+		
+		this.operatorCombo.setValue(operator);
 		this.valueField.setValue(v);
 	},
 	getValue: function() {

@@ -13,6 +13,10 @@
 
 /**
  * Density Independend pixel calculation
+ * 
+ * This function returns precise numbers. When using with ext it's sometimes 
+ * necessary to round them. For example in HBox and VBox layouts.
+ * 
  * @type Number
  */
 GO.util.density = 160; // set in Theme
