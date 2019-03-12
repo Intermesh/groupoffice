@@ -1,3 +1,4 @@
+12-03-2019 6.2.113
 - Billing: Fixed contextmenu of status change based on the extra permisionLevels for statuses
 - Core: Clear cache folders instead of deleting them so a symlink might be used
 - Files: Decompress zipped files in folder with read only permissions will throw an access denied exception. 
