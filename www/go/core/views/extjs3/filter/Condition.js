@@ -1,4 +1,4 @@
-go.filter.Condition = Ext.extend(Ext.Panel, {
+go.filter.Condition = Ext.extend(go.form.FormContainer, {
 	fields: null,
 	
 	layout: "hbox",
@@ -30,6 +30,7 @@ go.filter.Condition = Ext.extend(Ext.Panel, {
 			listeners: {
 				scope: this,
 				select: this.onFieldSelect
+//				change: this.onFieldChange
 			}
 		});
 		
@@ -42,16 +43,37 @@ go.filter.Condition = Ext.extend(Ext.Panel, {
 				return;
 			}
 			
-			this.remove(i, false);
+			this.remove(i, true);
 		}, this);
 		
-		switch(this.fields[index].type) {
+		this.switchCondition(this.fields[index].type);
+		
+		this.doLayout();
+		
+	},
+	
+	setValue : function(v) {
+		
+		go.filter.Condition.superclass.setValue.call(this, v);
+		
+		var v = this.fieldCombo.getValue();
+		
+		if(!v) {
+			return;
+		}
+		
+		var field = this.fields.find(function(f) {
+			return v == f.name
+		});
+		this.switchCondition(field.type);
+	},
+	
+	switchCondition : function(type) {
+		switch(type) {
 			case 'string':
 				this.add(new go.filter.types.StringPanel());				
 				break;
-		}
-		
-		this.doLayout();
+		}		
 	}
 	
 });
@@ -94,7 +116,7 @@ go.filter.types.StringPanel = Ext.extend(Ext.Panel, {
 			this.valueField
 		];
 
-		go.filter.Condition.superclass.initComponent.call(this);
+		go.filter.types.StringPanel.superclass.initComponent.call(this);
 	},
 	
 	createValueField: function() {
@@ -115,6 +137,8 @@ go.filter.types.StringPanel = Ext.extend(Ext.Panel, {
 	},
 	
 	setValue: function(v) {
+		
+		console.log(v);
 		
 		// TODO 
 		this.operatorCombo.setValue('equals');
@@ -139,13 +163,16 @@ go.filter.types.StringPanel = Ext.extend(Ext.Panel, {
 		}
 	},
 	validate: function() {
-		return this.valueField.validate();
+		return this.valueField.validate() && this.operatorCombo.validate();
 	},
 	markInvalid : function() {
 		return this.valueField.markInvalid();
 	},
 	clearInvalid : function() {
 		return this.valueField.clearInvalid();
+	},
+	isDirty : function() {
+		return this.valueField.isDirty() || this.operatorCombo.isDirty();
 	}
 	
 });

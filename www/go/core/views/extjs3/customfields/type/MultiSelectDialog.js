@@ -14,7 +14,7 @@ go.customfields.type.MultiSelectDialog = Ext.extend(go.customfields.FieldDialog,
 				new go.form.FormGroup({
 					name: "dataType.options",
 					fieldLabel: t("Options"),
-					itemCfg: {
+					itemCfg: {						
 						layout: "form",
 						items: [{
 								xtype: "hidden",

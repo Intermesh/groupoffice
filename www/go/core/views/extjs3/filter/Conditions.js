@@ -25,6 +25,27 @@ go.filter.Conditions = Ext.extend(go.form.FormGroup, {
 			operator: "AND",
 			conditions: conditions
 		};
+	},
+	
+	setValue : function(filter) {
+		
+		if(!filter || !filter.conditions) {
+			return;
+		}
+		
+		var v = [];
+		
+		for(var i = 0, l = filter.conditions.length; i < l; i++) {
+			var condition = filter.conditions[i];
+			for(var name in condition) {
+				v.push({
+					name: name,
+					value: condition[name]
+				});
+			}
+		}		
+		
+		go.filter.Conditions.superclass.setValue.call(this, v);		
 	}
 
 });

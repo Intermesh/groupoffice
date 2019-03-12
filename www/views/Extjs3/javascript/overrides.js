@@ -259,13 +259,18 @@ Ext.override(Ext.form.BasicForm,{
 			if(!Ext.isDate(v[name]) && Ext.isObject(v[name]) ){
 				
 				for(var subname in v[name]) {
-					converted[name + '.' + subname] = this.joinValues(v[name][subname]);
+					var combinedName = name + '.' + subname;
+					//if(this.findField(combinedName)) {
+						converted[combinedName] = this.joinValues(v[name][subname]);
+//					}else
+//					{
+//						
+//					}
 				}
 				
-			} else
-			{
-				converted[name] = v[name];
-			}
+			} 
+			converted[name] = v[name];
+			
 			
 		}
 		

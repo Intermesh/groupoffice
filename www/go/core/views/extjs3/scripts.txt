@@ -37,6 +37,7 @@ form/GridField.js
 form/RadioGroup.js
 form/Switch.js
 form/FormGroup.js
+form/FormContainer.js
 form/Chips.js
 form/RecurrenceFieldset.js
 
