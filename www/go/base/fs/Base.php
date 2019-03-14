@@ -314,7 +314,7 @@ abstract class Base{
 		$filename =  preg_replace('/\s+/', ' ', $filename);
 
 		//strip dots from start and end (end . is not allowed on windows)
-		$filename=trim($filename, '.');
+		$filename=trim($filename, '. ');
 
 		if(empty($filename)){
 			$filename = 'unnamed';
