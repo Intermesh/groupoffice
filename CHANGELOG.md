@@ -1,3 +1,4 @@
+- Core: Upgrade 6.2 to 6.3 fixed problem when links had an unknown entity id in them.
 - Email: Fixed filename issue with spaces in email attachment download
 
 07-03-2019 6.3.67
