@@ -474,7 +474,7 @@ $qs[] = function() {
 			$i = $cls::model();
 			$tableName = 'go_links_' . $i->tableName();
 			if($db->hasTable($tableName)) {
-				$q = "insert ignore into core_link select NULL, ".$entity->getId().",id, model_type_id, model_id, description, from_unixtime(ctime), NULL, NULL, folder_id from " . $tableName;
+				$q = "insert ignore into core_link select NULL, ".$entity->getId().",id, model_type_id, model_id, description, from_unixtime(ctime), NULL, NULL, folder_id from " . $tableName. " where model_type_id in (select id from core_entity)";
 				echo $q ."\n";
 				App::get()->getDbConnection()->query($q);
 				
