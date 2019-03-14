@@ -1,3 +1,5 @@
+14-03-2019 6.2.114
+- Document templates: Fixed document broken due to exception
 - Timeregistration: Removed UTC timezone to fix wrong month display in time registration
 
 12-03-2019 6.2.113
