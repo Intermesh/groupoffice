@@ -1102,7 +1102,7 @@ Pokud jste nežádal o nové heslo, prosím smažte tento mail.',
   'Modified' => 'Změněno',
   'Invalid password' => 'Neplatné heslo',
   'product_name' => 'GroupOffice',
-  'My Account' => 'Můj účet',
+  'My account' => 'Můj účet',
   'Members' => 'Členové',
   'Groups' => 'Skupiny',
 );
