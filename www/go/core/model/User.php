@@ -273,6 +273,7 @@ class User extends Entity {
 		
 		if($this->isNew()) {
 			$s = Settings::get();
+			$this->language = $s->language;
 			$this->timeFormat = $s->defaultTimeFormat;	
 			$this->dateFormat = $s->defaultDateFormat;
 			$this->timezone = $s->defaultTimezone;
