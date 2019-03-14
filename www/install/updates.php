@@ -569,3 +569,5 @@ $updates["201707111530"][]="ALTER TABLE `go_modules` CHANGE `id` `id` VARCHAR(50
 $updates["201802281015"][]="ALTER TABLE `go_log` ADD `jsonData` TEXT NULL AFTER `message`;";
 
 $updates["201809211500"][]="ALTER TABLE `go_search_cache` CHANGE `keywords` `keywords` VARCHAR(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '';";
+
+$updates['201903141325'][] = "delete FROM `go_holidays` WHERE region = 'en_UK';";
