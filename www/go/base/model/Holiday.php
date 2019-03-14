@@ -134,7 +134,7 @@ class Holiday extends \GO\Base\Db\ActiveRecord {
 					->criteria($findCriteria)
 					->single();
 
-		$result = Holiday::model()->find($findParams);
+		$result = Holiday::model()->find($findParams);		
 
 		return $result!=false;
 	}
