@@ -130,7 +130,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 					default:
 						
 						//mark validation errors
-						for(name in notSaved[id].validationErrors) {
+						for(var name in notSaved[id].validationErrors) {
 							var field = this.getForm().findField(name);
 							if(field) {
 								field.markInvalid(notSaved[id].validationErrors[name].description);
