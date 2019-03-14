@@ -609,11 +609,11 @@ class ImapMessage extends ComposerMessage {
 						}
 					}
 				} else {
-					$a->name = \GO\Base\Mail\Utils::mimeHeaderDecode($part['name']);
+					$a->name = \GO\Base\Fs\File::stripInvalidChars(\GO\Base\Mail\Utils::mimeHeaderDecode($part['name']));
 					
 					$extension = \GO\Base\Fs\File::getExtension($a->name);
 					if(!empty($part['filename']) && empty($extension)){
-						$a->name = \GO\Base\Mail\Utils::mimeHeaderDecode($part['filename']);
+						$a->name = \GO\Base\Fs\File::stripInvalidChars(\GO\Base\Mail\Utils::mimeHeaderDecode($part['filename']));
 					}
 				}
 				
