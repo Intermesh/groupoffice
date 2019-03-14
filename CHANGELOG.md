@@ -1,3 +1,5 @@
+- Core: Upgrade 6.2 to 6.3 fixed problem when links had an unknown entity id in them.
+
 07-03-2019 6.3.67
 - Customfields: fixed format of max fieldlength for customfields when it is set to 1000 or more. 
 - Core: Updated Czech translation
