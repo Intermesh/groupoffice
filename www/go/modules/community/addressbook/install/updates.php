@@ -16,14 +16,11 @@ $updates['201901191547'][] = "CREATE TABLE IF NOT EXISTS `addressbook_user_setti
   `defaultAddressBookId` int(11) DEFAULT NULL,
   PRIMARY KEY (`userId`),
   KEY `defaultAddressBookId` (`defaultAddressBookId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;";
 
-
-ALTER TABLE `addressbook_user_settings`
+$updates['201901191547'][] = "ALTER TABLE `addressbook_user_settings`
   ADD CONSTRAINT `addressbook_user_settings_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `addressbook_user_settings_ibfk_2` FOREIGN KEY (`defaultAddressBookId`) REFERENCES `addressbook_addressbook` (`id`) ON DELETE SET NULL;";
-
-
 
 $updates['201903141536'][] = "CREATE TABLE `addressbook_filter` (
   `id` int(11) NOT NULL,
@@ -31,19 +28,18 @@ $updates['201903141536'][] = "CREATE TABLE `addressbook_filter` (
   `createdBy` int(11) NOT NULL,
   `filter` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `aclId` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
 
-ALTER TABLE `addressbook_filter`
+$updates['201903141536'][] = "ALTER TABLE `addressbook_filter`
   ADD PRIMARY KEY (`id`),
   ADD KEY `aclid` (`aclId`),
-  ADD KEY `createdBy` (`createdBy`);
+  ADD KEY `createdBy` (`createdBy`);";
 
 
-ALTER TABLE `addressbook_filter`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+$updates['201903141536'][] = "ALTER TABLE `addressbook_filter`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;";
 
-
-ALTER TABLE `addressbook_filter`
+$updates['201903141536'][] = "ALTER TABLE `addressbook_filter`
   ADD CONSTRAINT `addressbook_filter_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`);
 ";
