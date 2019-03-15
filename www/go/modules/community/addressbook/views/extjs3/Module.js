@@ -10,6 +10,54 @@ go.Modules.register("community", "addressbook", {
 			customFields: {
 				fieldSetDialog: "go.modules.community.addressbook.CustomFieldSetDialog"
 			},
+			filters: [
+				{
+					name: 'q',
+					type: "string",
+					multiple: false,
+					title: "Query"
+				},
+				{
+					name: 'name',
+					title: t("Name"),
+					type: "string",
+					multiple: true
+				}, 
+				{
+					name: 'email',
+					title: t("E-mail"),
+					type: "string",
+					multiple: true
+				},{
+					name: 'country',
+					title: t("Country"),
+					type: "string",
+					multiple: true
+				},{
+					name: 'city',
+					title: t("City"),
+					type: "string",
+					multiple: true
+				},
+				{
+					title: t("Modified at"),
+					name: 'modified', 
+					multiple: false,
+					type: 'date'
+				}, 					
+				{
+					title: t("Age"),
+					name: 'age', 
+					multiple: false,
+					type: 'number'
+				},						
+				{
+					title: t("Birthday"),
+					name: 'birthday', 
+					multiple: false,
+					type: 'date'
+				}
+			],
 			links: [{
 
 				filter: "isContact",
