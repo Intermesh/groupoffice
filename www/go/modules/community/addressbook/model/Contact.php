@@ -359,8 +359,7 @@ class Contact extends AclItemEntity {
 										->addText("name", function(Criteria $criteria, $comparator, $value) {											
 											$criteria->where('name', $comparator, $value);
 										})
-										->addText("country", function(Criteria $criteria, $comparator, $value, Query $query) {	
-											$query->debug();
+										->addText("country", function(Criteria $criteria, $comparator, $value, Query $query) {												
 											if(!$query->isJoined('addressbook_address')) {
 												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "LEFT");
 											}
@@ -385,6 +384,9 @@ class Contact extends AclItemEntity {
 											$tag = ':age'.uniqid();
 											$criteria->andWhere('TIMESTAMPDIFF(YEAR,date.date, CURDATE()) ' . $comparator . $tag)->bind($tag, $value);
 											
+										})
+										->add('gender', function(Criteria $criteria, $value) {
+											$criteria->andWhere(['gender' => $value]);
 										})
 										->addDate("birthday", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_date')) {

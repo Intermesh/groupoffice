@@ -48,7 +48,7 @@ go.filter.Condition = Ext.extend(go.form.FormContainer, {
 			this.remove(i, true);
 		}, this);
 		
-		this.switchCondition(this.filters[index].type);
+		this.switchCondition(this.filters[index]);
 		
 		this.doLayout();
 		
@@ -57,19 +57,21 @@ go.filter.Condition = Ext.extend(go.form.FormContainer, {
 	setValue : function(v) {		
 		
 		if(v) {
-			var field = this.filters.find(function(f) {
+			var filter = this.filters.find(function(f) {
 				return v.name == f.name
 			});
 
-			this.switchCondition(field.type);
+			this.switchCondition(filter);
 		}
 		
 		go.filter.Condition.superclass.setValue.call(this, v);
 		
-	},
+	},	
 	
-	switchCondition : function(type) {
-		this.add(new go.filter.types[type]);				
+	switchCondition : function(options) {
+		this.add(new go.filter.types[options.type]({
+			options: options
+		}));				
 	}
 	
 });

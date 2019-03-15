@@ -1,6 +1,7 @@
 go.filter.types.string = Ext.extend(Ext.Panel, {
 	layout: "hbox",
 	flex: 1,
+	options: null,
 	initComponent: function () {
 		
 		this.operatorCombo = new go.form.ComboBox({
@@ -11,10 +12,10 @@ go.filter.types.string = Ext.extend(Ext.Panel, {
 				store: new Ext.data.ArrayStore({
 					fields: ['value', 'text'],					
 					data: [
-						['contains', t("Contains")],
-						['equals', t("Equals")],
-						['startswith', t("Starts with")],
-						['endswith', t("Ends with")]
+						['contains', t("contains")],
+						['equals', t("equals")],
+						['startswith', t("starts with")],
+						['endswith', t("ends with")]
 					]
 				}),
 				valueField: 'value',

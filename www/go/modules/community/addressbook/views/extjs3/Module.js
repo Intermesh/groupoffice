@@ -38,6 +38,21 @@ go.Modules.register("community", "addressbook", {
 					title: t("City"),
 					type: "string",
 					multiple: true
+				},{
+					name: 'gender',
+					title: t("Gender"),
+					type: "select",
+					multiple: true,
+					options: [{
+							value: 'M',
+							title: t("Male"),							
+					},{
+							value: 'F',
+							title: t("Female")
+					},{
+							value: null,
+							title: t("Unknown")
+					}]
 				},
 				{
 					title: t("Modified at"),

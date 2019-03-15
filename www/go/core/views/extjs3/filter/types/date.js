@@ -1,4 +1,4 @@
-go.filter.types.number = Ext.extend(Ext.Panel, {
+go.filter.types.date = Ext.extend(Ext.Panel, {
 	layout: "hbox",
 	flex: 1,
 	options: null,
@@ -8,15 +8,35 @@ go.filter.types.number = Ext.extend(Ext.Panel, {
 				submit: false,
 				hideLabel: true,
 				name: "operator",
-				value: 'equals',
+				value: 'before',
 				store: new Ext.data.ArrayStore({
 					fields: ['value', 'text'],					
 					data: [
-						['equals', t("equals")],
-						['greater', t("is greater than")],
-						['greaterorequal', t("is greater than or equal")],
-						['less', t("is less than")],
-						['lessorequal', t("is less than or equal")]
+						['before', t("is before, today plus")],
+						['after', t("is after, today minus")]
+					]
+				}),
+				valueField: 'value',
+				displayField: 'text',
+				mode: 'local',
+				triggerAction: 'all',
+				editable: false,
+				selectOnFocus: true,
+				forceSelection: true,
+				width: Math.ceil(dp(200))
+			});
+			
+		this.periodCombo = new go.form.ComboBox({
+				submit: false,
+				hideLabel: true,
+				name: "period",
+				value: 'days',
+				store: new Ext.data.ArrayStore({
+					fields: ['value', 'text'],					
+					data: [
+						['days', t("days")],
+						['months', t("months")],
+						['years', t("years")]
 					]
 				}),
 				valueField: 'value',
@@ -34,16 +54,18 @@ go.filter.types.number = Ext.extend(Ext.Panel, {
 		
 		this.items = [
 			this.operatorCombo,
-			this.valueField
+			this.valueField,
+			this.periodCombo
 		];
 
-		go.filter.types.number.superclass.initComponent.call(this);
+		go.filter.types.date.superclass.initComponent.call(this);
 	},
 	
 	createValueField: function() {
 		return new GO.form.NumberField({
 			serverFormats: false,
 			flex: 1,
+			decimals: 0,
 			submit: false,
 			name: 'value'
 		});
@@ -60,57 +82,44 @@ go.filter.types.number = Ext.extend(Ext.Panel, {
 	},
 	
 	setValue: function(v) {
-		
-		var regex = /([>=<]+)(.*)/,						
-						operator = 'equals';
+				
+		var regex = /([><]+) ([\-0-9]+) (days|months|years)/,						
+						operator = 'before', period = 'days', number = 0;
 		
 		if(v) {
 			var matches = v.match(regex);
-			if(matches) {		
-				v = parseFloat(matches[2].trim());			
+
+			if(matches) {	
+				number = parseFloat(matches[2].trim());
+				period = matches[3].trim();
 
 				switch(matches[1]) {
 					case '>':
-						operator = 'greater';
+						operator = 'after';
+						number *= -1;
 						break;
-
-					case '>=':
-						operator = 'greaterorequal';
-						break;
-
 					case '<':
-						operator = 'less';
-						break;
-
-					case '<=':
-						operator = 'lessorequal';
+						operator = 'before';
 						break;
 				}
 			}		
 		}
-		
 		this.operatorCombo.setValue(operator);
-		this.valueField.setValue(v);
+		this.valueField.setValue(number);
+		this.periodCombo.setValue(period);
 	},
 	getValue: function() {
 		
-		var v =  this.valueField.getValue();
+		var v =  this.valueField.getValue() + ' ' + this.periodCombo.getValue();
 		
 		switch(this.operatorCombo.getValue()) {				
-			case 'equals':				
-				return v;
 								
-			case 'greater':				
-				return '> ' + v;
+			case 'after':				
+				return '> -' + v;
 				
-			case 'greaterorequal':				
-				return '>= ' + v;
-				
-			case 'less':				
+			case 'before':				
 				return '< ' + v;
-				
-			case 'lessorqual':				
-				return '<= ' + v;
+			
 		}
 	},
 	validate: function() {
