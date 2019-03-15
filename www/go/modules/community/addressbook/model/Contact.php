@@ -408,7 +408,11 @@ class Contact extends AclItemEntity {
 																						 + IF(DAYOFYEAR(CURDATE()) > DAYOFYEAR(date.date),1,0)
 																		YEAR)  
 																' . $comparator . $tag)->bind($tag, $value->format(Column::DATE_FORMAT));
+										})->add('userGroupId', function(Criteria $criteria, $value, Query $query) {
+											$query->join('core_user_group', 'ug', 'ug.userId = c.goUserId');
+											$criteria->where(['ug.groupId' => $value]);
 										});
+													
 										
 	}
 	

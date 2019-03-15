@@ -759,3 +759,30 @@ CREATE TABLE IF NOT EXISTS `go_templates` (
 ) ENGINE=InnoDB;
 
 ALTER TABLE `core_group` ADD UNIQUE(`name`);
+
+
+
+CREATE TABLE `core_entity_filter` (
+  `id` int(11) NOT NULL,
+  `entityTypeId` int(11) NOT NULL,
+  `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `createdBy` int(11) NOT NULL,
+  `filter` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `aclId` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+
+
+ALTER TABLE `core_entity_filter`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `aclid` (`aclId`),
+  ADD KEY `createdBy` (`createdBy`),
+  ADD KEY `entityTypeId` (`entityTypeId`);
+
+
+ALTER TABLE `core_entity_filter`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+
+ALTER TABLE `core_entity_filter`
+  ADD CONSTRAINT `core_entity_filter_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`),
+  ADD CONSTRAINT `core_entity_filter_ibfk_2` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;

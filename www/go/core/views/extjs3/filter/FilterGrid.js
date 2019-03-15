@@ -1,4 +1,4 @@
-go.modules.community.addressbook.FilterGrid = Ext.extend(go.grid.GridPanel, {
+go.filter.FilterGrid = Ext.extend(go.grid.GridPanel, {
 	viewConfig: {
 		forceFit: true,
 		autoFill: true
@@ -6,6 +6,8 @@ go.modules.community.addressbook.FilterGrid = Ext.extend(go.grid.GridPanel, {
 	autoHeight: true,
 	
 	filterStore: null,
+	
+	entity: null,
 	
 	cls: 'go-grid3-hide-headers',
 
@@ -19,7 +21,9 @@ go.modules.community.addressbook.FilterGrid = Ext.extend(go.grid.GridPanel, {
 		Ext.apply(this, {			
 			store: new go.data.Store({
 				fields: ['id', 'name', 'aclId', "permissionLevel", "filter"],
-				entityStore: "ContactFilter"
+				entityStore: "EntityFilter"				
+			}).setFilter('base', {
+				entity: this.entity
 			}),
 			selModel: selModel,
 			plugins: [actions],
@@ -38,7 +42,7 @@ go.modules.community.addressbook.FilterGrid = Ext.extend(go.grid.GridPanel, {
 			]
 		});
 
-		go.modules.community.addressbook.FilterGrid.superclass.initComponent.call(this);
+		go.filter.FilterGrid.superclass.initComponent.call(this);
 		
 		this.on("render", function() {
 			this.store.load();
@@ -110,7 +114,9 @@ go.modules.community.addressbook.FilterGrid = Ext.extend(go.grid.GridPanel, {
 						iconCls: 'ic-edit',
 						text: t("Edit"),
 						handler: function() {
-							var dlg = new go.modules.community.addressbook.FilterDialog();
+							var dlg = new go.filter.FilterDialog({
+								entity: this.entity
+							});
 							dlg.load(this.moreMenu.record.id).show();
 						},
 						scope: this						
@@ -123,7 +129,7 @@ go.modules.community.addressbook.FilterGrid = Ext.extend(go.grid.GridPanel, {
 								if (btn != "yes") {
 									return;
 								}
-								go.Stores.get("ContactFilter").set({destroy: [this.moreMenu.record.id]});
+								go.Stores.get("EntityFilter").set({destroy: [this.moreMenu.record.id]});
 							}, this);
 						},
 						scope: this						

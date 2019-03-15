@@ -402,3 +402,29 @@ $updates['201903011422'][] = "ALTER TABLE `core_change_user` CHANGE `entityId` `
 $updates['201903111422'][] = "ALTER TABLE `core_entity` ADD `defaultAclId` INT NULL DEFAULT NULL AFTER `highestModSeq`;";
 $updates['201903111422'][] = "ALTER TABLE `core_entity` ADD FOREIGN KEY (`defaultAclId`) REFERENCES `core_acl`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;";
 
+
+
+$updates['201903151726'][] = "CREATE TABLE `core_entity_filter` (
+  `id` int(11) NOT NULL,
+  `entityTypeId` int(11) NOT NULL,
+  `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `createdBy` int(11) NOT NULL,
+  `filter` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `aclId` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;";
+
+
+$updates['201903151726'][] = "ALTER TABLE `core_entity_filter`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `aclid` (`aclId`),
+  ADD KEY `createdBy` (`createdBy`),
+  ADD KEY `entityTypeId` (`entityTypeId`);";
+
+
+$updates['201903151726'][] = "ALTER TABLE `core_entity_filter`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;";
+
+
+$updates['201903151726'][] = "ALTER TABLE `core_entity_filter`
+  ADD CONSTRAINT `core_entity_filter_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`),
+  ADD CONSTRAINT `core_entity_filter_ibfk_2` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;";

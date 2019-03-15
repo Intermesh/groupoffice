@@ -1,6 +1,6 @@
 go.Modules.register("core", 'core', {
 	title: t("Core"),
-	entities: ['Acl', 'Group', 'User', 'Field', {name: 'FieldSet', title: t("Custom field set")}, 'Module', 'Link', 'Search'],
+	entities: ['Acl', 'Group', 'User', 'Field', {name: 'FieldSet', title: t("Custom field set")}, 'Module', 'Link', 'Search', 'EntityFilter'],
 	systemSettingsPanels: [
 		"go.users.SystemSettingsUserGrid",
 		"go.groups.SystemSettingsGroupGrid",

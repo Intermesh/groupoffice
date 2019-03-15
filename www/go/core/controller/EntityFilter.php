@@ -1,8 +1,8 @@
 <?php
-namespace go\modules\community\addressbook\controller;
+namespace go\core\controller;
 
 use go\core\jmap\EntityController;
-use go\modules\community\addressbook\model;
+use go\core\model;
 
 /**
  * The controller for the Addressbook entity
@@ -11,7 +11,7 @@ use go\modules\community\addressbook\model;
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */ 
-class ContactFilter extends EntityController {
+class EntityFilter extends EntityController {
 	
 	/**
 	 * The class name of the entity this controller is for.
@@ -19,7 +19,7 @@ class ContactFilter extends EntityController {
 	 * @return string
 	 */
 	protected function entityClass() {
-		return model\ContactFilter::class;
+		return model\EntityFilter::class;
 	}	
 	
 	/**

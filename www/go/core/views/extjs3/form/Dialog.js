@@ -24,10 +24,10 @@ go.form.Dialog = Ext.extend(go.Window, {
 	
 	initComponent: function () {
 
-		this.formPanel = new go.form.EntityPanel({
-			entityStore: this.entityStore,
-			items: this.initFormItems()
-		});
+		this.formPanel = this.createFormPanel();
+		
+		//In case this.createFormPanel() is overridden it can provide the entityStore too.
+		this.entityStore = this.formPanel.entityStore;
 		
 		
 		//Add a hidden submit button so the form will submit on enter
@@ -72,6 +72,13 @@ go.form.Dialog = Ext.extend(go.Window, {
 		}
 		
 		this.addEvents({load: true, submit: true});
+	},
+	
+	createFormPanel : function(){
+		return new go.form.EntityPanel({
+			entityStore: this.entityStore,
+			items: this.initFormItems()
+		});
 	},
 	
 

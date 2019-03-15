@@ -1,6 +1,7 @@
-go.modules.community.addressbook.FilterDialog = Ext.extend(go.form.Dialog, {
+go.filter.FilterDialog = Ext.extend(go.form.Dialog, {
 	title: t('Filter'),
-	entityStore: "ContactFilter",
+	entityStore: "EntityFilter",
+	entity: null,
 	autoScroll: true,
 	height: dp(400),
 	width: dp(1000),
@@ -8,7 +9,11 @@ go.modules.community.addressbook.FilterDialog = Ext.extend(go.form.Dialog, {
 
 		return [{
 				xtype: 'fieldset',
-				items: [
+				items: [{
+						xtype: "hidden",
+						name: 'entity',
+						value: this.entity
+				},
 					{
 						xtype: 'textfield',
 						name: 'name',
@@ -19,7 +24,7 @@ go.modules.community.addressbook.FilterDialog = Ext.extend(go.form.Dialog, {
 				]},
 			{
 				xtype: 'filterfieldset',
-				entity: "Contact"
+				entity: this.entity
 			}
 
 		];

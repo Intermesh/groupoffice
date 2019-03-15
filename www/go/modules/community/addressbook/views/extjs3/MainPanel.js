@@ -324,7 +324,9 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 					xtype: "button",
 					iconCls: "ic-add",
 					handler: function() {
-						var dlg = new go.modules.community.addressbook.FilterDialog();
+						var dlg = new go.filter.FilterDialog({
+							entity: "Contact"
+						});
 						dlg.show();
 					},
 					scope: this
@@ -332,8 +334,9 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 			],
 			items: [
 				orgFilter,
-				this.filterGrid = new go.modules.community.addressbook.FilterGrid({
-					filterStore: this.grid.store
+				this.filterGrid = new go.filter.FilterGrid({
+					filterStore: this.grid.store,
+					entity: "Contact"
 				})
 			]
 		});

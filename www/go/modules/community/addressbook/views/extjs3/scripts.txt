@@ -15,5 +15,3 @@ customfield/ContactDialog.js
 Utils.js
 SelectDialog.js
 SettingsPanel.js
-FilterDialog.js
-FilterGrid.js
