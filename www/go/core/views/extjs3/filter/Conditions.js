@@ -1,5 +1,5 @@
 go.filter.Conditions = Ext.extend(go.form.FormGroup, {
-	fields: null,
+	entity: null,
 	name: "conditions",
 	addButtonText: t("Add condition"),	
 	hideLabel: true,
@@ -7,7 +7,7 @@ go.filter.Conditions = Ext.extend(go.form.FormGroup, {
 		
 		this.itemCfg = {
 			xtype: "filtercondition"	,
-			fields: this.fields
+			entity: this.entity
 		};
 		
 		go.filter.Conditions.superclass.initComponent.call(this);

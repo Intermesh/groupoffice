@@ -1,17 +1,19 @@
 go.filter.Condition = Ext.extend(go.form.FormContainer, {
-	fields: null,
+	entity: null,
 	
 	layout: "hbox",
 
 	initComponent: function () {
 		
-		this.items = [this.createFieldCombo()];
-
+		console.log( go.Entities.get(this.entity));
+		this.filters = Object.values(go.Entities.get(this.entity).filters);
+		this.items = [this.createFilterCombo()];		
+		
 		go.filter.Condition.superclass.initComponent.call(this);
 	},
 
-	createFieldCombo: function () {
-		this.fieldCombo = new go.form.ComboBox({
+	createFilterCombo: function () {
+		this.filterCombo = new go.form.ComboBox({
 			width: dp(300),
 			hideLabel: true,
 			submit: false,
@@ -19,7 +21,7 @@ go.filter.Condition = Ext.extend(go.form.FormContainer, {
 			store: new Ext.data.JsonStore({
 				fields: ['name', 'title'],
 				root: 'data',
-				data: {data: this.fields}
+				data: {data: this.filters}
 			}),
 			valueField: 'name',
 			displayField: 'title',
@@ -36,19 +38,20 @@ go.filter.Condition = Ext.extend(go.form.FormContainer, {
 			}
 		});
 		
-		return this.fieldCombo;
+		return this.filterCombo;
 	},
 	
 	onFieldSelect : function(combo, record, index) {
 		this.items.each(function(i) {
-			if(i === this.fieldCombo) {
+			if(i === this.filterCombo) {
 				return;
 			}
 			
 			this.remove(i, true);
 		}, this);
 		
-		this.switchCondition(this.fields[index].type);
+		debugger;
+		this.switchCondition(this.filters[index].type);
 		
 		this.doLayout();
 		
@@ -57,7 +60,7 @@ go.filter.Condition = Ext.extend(go.form.FormContainer, {
 	setValue : function(v) {		
 		
 		if(v) {
-			var field = this.fields.find(function(f) {
+			var field = this.filters.find(function(f) {
 				return v.name == f.name
 			});
 

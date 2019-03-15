@@ -75,7 +75,7 @@ Ext.apply(go.Entity.prototype, {
 	title: null,
 	
 	getRouterPath: function (id) {
-		return lcName + "/" + id;
+		return this.name.toLowerCase() + "/" + id;
 	},
 	
 	goto: function (id) {

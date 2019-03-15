@@ -31,8 +31,7 @@
 				if(e.customFields) {
 					e.filters = e.filters.concat(go.customfields.CustomFields.getFilters(e.name));
 				}
-				e.filters =  go.util.Filters.normalize(e.filters);
-				console.log(e);
+				e.filters =  go.util.Filters.normalize(e.filters);				
 			});
 		},
 

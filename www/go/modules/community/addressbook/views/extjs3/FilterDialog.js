@@ -19,15 +19,7 @@ go.modules.community.addressbook.FilterDialog = Ext.extend(go.form.Dialog, {
 				]},
 			{
 				xtype: 'filterfieldset',
-				fields: [{
-						name: 'city',
-						title: t("City"),
-						type: 'string'
-					}, {
-						name: 'country',
-						title: t("Country"),
-						type: 'string'
-					}]
+				entity: "Contact"
 			}
 
 		];

@@ -1,6 +1,6 @@
 go.filter.FieldSet = Ext.extend(Ext.form.FieldSet, {
 	title: t("Conditions"),
-	fields: null,
+	entity: null,
 
 	initComponent: function () {		
 
@@ -13,19 +13,24 @@ go.filter.FieldSet = Ext.extend(Ext.form.FieldSet, {
 					{
 						xtype: "radiogroup",
 						name: 'operator',
+						value: "AND",
 						items: [{
 								xtype: "radio",
 								inputValue: "AND",
-								boxLabel: t("Show results that match ALL of the conditions")
+								boxLabel: t("Match ALL of the conditions")
 							}, {
 								xtype: "radio",
 								inputValue: "OR",
-								boxLabel: t("Show results that match ANY of the conditions")
+								boxLabel: t("Match ANY of the conditions")
+							}, {
+								xtype: "radio",
+								inputValue: "NOT",
+								boxLabel: t("Match NONE of the conditions")
 							}]
 					}, {
 						xtype: "filterconditions",
 						name: "conditions",
-						fields: this.fields
+						entity: this.entity
 					}
 				]
 			}

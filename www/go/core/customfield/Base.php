@@ -255,7 +255,7 @@ abstract class Base extends Model {
 		if(!$query->isJoined($this->field->tableName())){
 			$cls = $query->getModel();
 			$primaryTableAlias = array_values($cls::getMapping()->getTables())[0]->getAlias();
-			$query->join($this->field->tableName(),'customFields', 'customFields.id = '.$primaryTableAlias.'.id');
+			$query->join($this->field->tableName(),'customFields', 'customFields.id = '.$primaryTableAlias.'.id', 'LEFT');
 		}
 	}
 	
@@ -270,13 +270,8 @@ abstract class Base extends Model {
 		
 		
 		$filters->addText($this->field->databaseName, function(Criteria $criteria, $comparator, $value, Query $query, array $filter){
-			$this->joinCustomFieldsTable($query);		
-			
-			$query->debug();
-			
+			$this->joinCustomFieldsTable($query);						
 			$criteria->where('customFields.' . $this->field->databaseName, $comparator, $value);
-			
-			
 		});
 	}
 }

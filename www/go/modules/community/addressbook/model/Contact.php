@@ -359,16 +359,18 @@ class Contact extends AclItemEntity {
 										->addText("name", function(Criteria $criteria, $comparator, $value) {											
 											$criteria->where('name', $comparator, $value);
 										})
-										->addText("country", function(Criteria $criteria, $comparator, $value, Query $query) {
+										->addText("country", function(Criteria $criteria, $comparator, $value, Query $query) {	
+											$query->debug();
 											if(!$query->isJoined('addressbook_address')) {
-												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "INNER");
+												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "LEFT");
 											}
 											
 											$criteria->where('adr.country', $comparator, $value);
+											
 										})
 										->addText("city", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_address')) {
-												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "INNER");
+												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "LEFT");
 											}
 											
 											$criteria->where('adr.city', $comparator, $value);
@@ -376,7 +378,7 @@ class Contact extends AclItemEntity {
 										->addNumber("age", function(Criteria $criteria, $comparator, $value, Query $query) {
 											
 											if(!$query->isJoined('addressbook_date')) {
-												$query->join('addressbook_date', 'date', 'date.contactId = c.id', "INNER");
+												$query->join('addressbook_date', 'date', 'date.contactId = c.id', "LEFT");
 											}
 											
 											$criteria->where('date.type', '=', Date::TYPE_BIRTHDAY);					
