@@ -23,11 +23,17 @@ go.form.RadioGroup = Ext.extend(Ext.form.RadioGroup, {
 		return out ? out.inputValue : null;
 	},
 	
-	initValue : function() {
+	initValue : function() {		
 		this.originalValue = this.getValue();
 	},
 	
-	isDirty : function() {		
+	setValue : function(v) {
+		this.originalValue = v;
+		
+		return go.form.RadioGroup.superclass.setValue.call(this, v);
+	},
+	
+	isDirty : function() {
 		return this.originalValue != this.getValue();
 	},
 	

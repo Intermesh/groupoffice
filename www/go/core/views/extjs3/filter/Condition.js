@@ -4,8 +4,6 @@ go.filter.Condition = Ext.extend(go.form.FormContainer, {
 	layout: "hbox",
 
 	initComponent: function () {
-		
-		console.log( go.Entities.get(this.entity));
 		this.filters = Object.values(go.Entities.get(this.entity).filters);
 		this.items = [this.createFilterCombo()];		
 		
@@ -50,7 +48,6 @@ go.filter.Condition = Ext.extend(go.form.FormContainer, {
 			this.remove(i, true);
 		}, this);
 		
-		debugger;
 		this.switchCondition(this.filters[index].type);
 		
 		this.doLayout();

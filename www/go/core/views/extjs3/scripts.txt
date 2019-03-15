@@ -197,3 +197,4 @@ filter/Conditions.js
 filter/Condition.js
 filter/FieldSet.js
 filter/types/string.js
+filter/types/number.js

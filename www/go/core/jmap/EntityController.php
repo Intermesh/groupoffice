@@ -71,7 +71,8 @@ abstract class EntityController extends Controller {
 
 		$query = $cls::find($cls::getPrimaryKey(false))
 						->limit($params['limit'])
-						->offset($params['position']);
+						->offset($params['position'])
+						->debug();
 		
 		/* @var $query Query */
 
