@@ -40,17 +40,7 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 				},
 				'->',
 				{
-					xtype: 'tbsearch',
-					filters: [
-						'q',
-						'name', 
-						'email', 
-						'country', 
-						'city', 
-						{name: 'modified', multiple: false}, 					
-						{name: 'age', multiple: false},						
-						{name: 'birthday', multiple: false}
-					]
+					xtype: 'tbsearch'
 				}
 			],
 			listeners: {
@@ -137,7 +127,7 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 	},
 
 	setGroupId: function (groupId, addressBookId) {
-		this.grid.store.setFilter({
+		this.grid.store.setFilter("addressbooks", {
 			groupId: groupId
 		});
 		

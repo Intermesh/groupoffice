@@ -212,7 +212,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 			this.searchToolBar.setWidth(adjWidth);
 		}, this);
 		
-		if(this.store.entityStore) {
+		if(this.store && this.store.entityStore) {
 			
 			var names = Object.keys(this.store.entityStore.entity.filters).filter(function(name) {return name != 'q'});
 			
