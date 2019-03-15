@@ -458,11 +458,17 @@ class QueryBuilder {
 	private function buildTokens($tokens, $prefix) {
 		$str = "";
 		
+		if(stripos($tokens[0], "NOT_OR_NULL") !== false) {
+			$tokens[0] = str_replace('NOT_OR_NULL', 'NOT IFNULL(', $tokens[0]);
+			$tokens[] = ', false)';
+		}
+		
 		if($this->firstWhereCondition) {
 			//clear first AND/OR to avoid WHERE AND to be generated
-			$tokens[0] = stripos($tokens[0], "NOT") !== false ? "NOT" : "";
-			$this->firstWhereCondition = false;	
+			$tokens[0] = str_ireplace(['AND', 'OR'], '', $tokens[0]);
+			$this->firstWhereCondition = false;
 		}
+		
 		foreach ($tokens as $token) {			
 			$str .= $this->buildToken($token, $prefix) . " ";
 		}

@@ -10,8 +10,6 @@ namespace go\core\db;
  */
 class Criteria {
 	
-	public $query;
-	
 	private $where = [];	
 	
 	/**
@@ -206,27 +204,101 @@ class Criteria {
 	}
 
 	/**
-	 * Concatenate where condition with AND
+	 * Add where condition with AND (..)
 	 * 
 	 * {@see where()}
 	 * 
 	 * @param String|array|Criteria $column
-	 * @return static
+	 * @param string $comparisonOperator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
+	 * @param mixed $value
+	 * @return $this
 	 */
 	public function andWhere($column, $operator = null, $value = null) {
 		$this->where[] = $this->internalWhere($column, $operator, $value, 'AND');
 		return $this;
 	}
 	
+	/**
+	 * Add where condition with AND NOT(..)
+	 * 
+	 * {@see where()}
+	 * 
+	 * @param String|array|Criteria $column
+	 * @param string $comparisonOperator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
+	 * @param mixed $value
+	 * @return $this
+	 */
 	public function andWhereNot($column, $operator = null, $value = null) {
 		$this->where[] = $this->internalWhere($column, $operator, $value, 'AND NOT');
 		return $this;
 	}
 	
+	/**
+	 * Add where condition with AND NOT IFNULL(.., false))
+	 * 
+	 * WHERE NOT does not match NULL values. This is often not wanted so you can use this to wrap IFNULL so null values.
+	 * 
+	 * For example:
+	 * 
+	 * select * from contact left join address where NOT (address.country LIKE 'netherlands');
+	 * 
+	 * will not return contacts without an address. With this function it will do:
+	 * 
+	 * select * from contact left join address where NOT IFNULL(address.country NOT LIKE 'netherlands', false);
+	 * 
+	 * {@see where()}
+	 * 
+	 * @param String|array|Criteria $column
+	 * @param string $comparisonOperator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
+	 * @param mixed $value
+	 * @return $this
+	 */
+	public function andWhereNotOrNull($column, $operator = null, $value = null) {
+		//NOT_OR_NULL will wrap an IFNULL(..., false) around it so it will also match NULL values
+		$this->where[] = $this->internalWhere($column, $operator, $value, 'AND NOT_OR_NULL');
+		return $this;
+	}
+	
+	/**
+	 * Add where condition with OR NOT(..)
+	 * 
+	 * {@see where()}
+	 * 
+	 * @param String|array|Criteria $column
+	 * @param string $comparisonOperator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
+	 * @param mixed $value
+	 * @return $this
+	 */
 	public function orWhereNot($column, $operator = null, $value = null) {
 		$this->where[] = $this->internalWhere($column, $operator, $value, 'OR NOT');
 		return $this;
 	}
+	
+	/**
+	 * Add where condition with OR NOT IFNULL(.., false))
+	 * 
+	 * WHERE NOT does not match NULL values. This is often not wanted so you can use this to wrap IFNULL so null values.
+	 * 
+	 * For example:
+	 * 
+	 * select * from contact left join address where NOT (address.country LIKE 'netherlands');
+	 * 
+	 * will not return contacts without an address. With this function it will do:
+	 * 
+	 * select * from contact left join address where NOT IFNULL(address.country NOT LIKE 'netherlands', false);
+	 * 
+	 * {@see where()}
+	 * 
+	 * @param String|array|Criteria $column
+	 * @param string $comparisonOperator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
+	 * @param mixed $value
+	 * @return $this
+	 */
+	public function orWhereNotOrNull($column, $operator = null, $value = null) {
+		$this->where[] = $this->internalWhere($column, $operator, $value, 'OR NOT_OR_NULL');
+		return $this;
+	}
+	
 	/**
 	 * Concatenate where condition with OR
 	 * 
