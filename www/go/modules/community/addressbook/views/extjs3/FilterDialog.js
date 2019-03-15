@@ -1,6 +1,6 @@
 go.modules.community.addressbook.FilterDialog = Ext.extend(go.form.Dialog, {
 	title: t('Filter'),
-	entityStore: "Filter",
+	entityStore: "ContactFilter",
 	autoScroll: true,
 	height: dp(400),
 	width: dp(1000),

@@ -19,7 +19,7 @@ go.modules.community.addressbook.FilterGrid = Ext.extend(go.grid.GridPanel, {
 		Ext.apply(this, {			
 			store: new go.data.Store({
 				fields: ['id', 'name', 'aclId', "permissionLevel", "filter"],
-				entityStore: "Filter"
+				entityStore: "ContactFilter"
 			}),
 			selModel: selModel,
 			plugins: [actions],
@@ -123,7 +123,7 @@ go.modules.community.addressbook.FilterGrid = Ext.extend(go.grid.GridPanel, {
 								if (btn != "yes") {
 									return;
 								}
-								go.Stores.get("Filter").set({destroy: [this.moreMenu.record.id]});
+								go.Stores.get("ContactFilter").set({destroy: [this.moreMenu.record.id]});
 							}, this);
 						},
 						scope: this						

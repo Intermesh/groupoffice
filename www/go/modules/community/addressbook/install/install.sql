@@ -261,24 +261,24 @@ ALTER TABLE `addressbook_user_settings`
   ADD CONSTRAINT `addressbook_user_settings_ibfk_2` FOREIGN KEY (`defaultAddressBookId`) REFERENCES `addressbook_addressbook` (`id`) ON DELETE SET NULL;
 
 
-CREATE TABLE `addressbook_filter` (
+CREATE TABLE `addressbook_contact_filter` (
   `id` int(11) NOT NULL,
   `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `createdBy` int(11) NOT NULL,
   `filter` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `aclId` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
 
-ALTER TABLE `addressbook_filter`
+ALTER TABLE `addressbook_contact_filter`
   ADD PRIMARY KEY (`id`),
   ADD KEY `aclid` (`aclId`),
   ADD KEY `createdBy` (`createdBy`);
 
 
-ALTER TABLE `addressbook_filter`
+ALTER TABLE `addressbook_contact_filter`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 
-ALTER TABLE `addressbook_filter`
-  ADD CONSTRAINT `addressbook_filter_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`);
+ALTER TABLE `addressbook_contact_filter`
+  ADD CONSTRAINT `addressbook_contact_filter_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`);
