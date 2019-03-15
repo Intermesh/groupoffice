@@ -23,6 +23,14 @@ go.form.RadioGroup = Ext.extend(Ext.form.RadioGroup, {
 		return out ? out.inputValue : null;
 	},
 	
+	initValue : function() {
+		this.originalValue = this.getValue();
+	},
+	
+	isDirty : function() {		
+		return this.originalValue != this.getValue();
+	},
+	
 	//make radio buttons inherit group name
 	onRender : function(ct, position) {
 		var me = this;
