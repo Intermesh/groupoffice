@@ -125,7 +125,7 @@ abstract class EntityController extends Controller {
 						break;
 
 					case 'NOT':
-						$criteria->andWhereNot($subCriteria);
+						$criteria->andWhereNotOrNull($subCriteria);
 						break;
 				}
 			}
