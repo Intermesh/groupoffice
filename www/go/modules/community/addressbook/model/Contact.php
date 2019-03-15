@@ -361,10 +361,10 @@ class Contact extends AclItemEntity {
 										})
 										->addText("phone", function(Criteria $criteria, $comparator, $value, Query $query) {												
 											if(!$query->isJoined('addressbook_phone')) {
-												$query->join('addressbook_phone', 'phone', 'phone.contactId = c.id', "INNER");
+												$query->join('addressbook_phone_number', 'phone', 'phone.contactId = c.id', "INNER");
 											}
 											
-											$criteria->where('adr.phone', $comparator, $value);
+											$criteria->where('phone.number', $comparator, $value);
 											
 										})
 										->addText("country", function(Criteria $criteria, $comparator, $value, Query $query) {												
@@ -419,7 +419,7 @@ class Contact extends AclItemEntity {
 	}
 
 	protected static function searchColumns() {
-		return ['name'];
+		return ['name', 'debtorNumber'];
 	}
 	
 	private function generateUid() {
