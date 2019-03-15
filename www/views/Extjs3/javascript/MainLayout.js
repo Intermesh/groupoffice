@@ -371,6 +371,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			go.Modules.init(),
 			this.loadLegacyModuleScripts()
 		]).then(function(){
+			go.Entities.init();
 			me.renderUI();
 		}).catch(function(error){
 			console.error(error);

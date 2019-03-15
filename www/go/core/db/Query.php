@@ -474,6 +474,10 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 		
 		$queryBuilder = new QueryBuilder();
 		$build = $queryBuilder->buildSelect($this);
+		
+		if($this->debug && !$this->getDbConnection()->debug) {
+			GO()->debug(QueryBuilder::debugBuild($build));
+		}
 
 		$stmt = $this->getDbConnection()->createStatement($build);
 		call_user_func_array([$stmt, 'setFetchMode'], $this->getFetchMode());
@@ -492,6 +496,19 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 			throw $e;
 		}
 		return $stmt;
+	}
+	
+	private $debug = false;
+
+	/**
+	 * Output query to debugger
+	 * 
+	 * @return $this
+	 */
+	public function debug() {
+		$this->debug = true;
+		
+		return $this;
 	}
 	
 	/**

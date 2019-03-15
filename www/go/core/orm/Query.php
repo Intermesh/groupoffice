@@ -21,6 +21,11 @@ class Query extends DbQuery {
 		return $this;
 	}
 	
+	/**
+	 * Get class name of the model to find
+	 * 
+	 * @return string
+	 */
 	public function getModel() {
 		return $this->model;
 	}

@@ -62,7 +62,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 		config = config || {};
 		go.toolbar.SearchButton.superclass.constructor.call(this, config);
 			
-		this.filters = go.util.Filters.normalize(config.filters || ['q']);
+		//this.filters = go.util.Filters.normalize(config.filters || ['q']);
 		
 		if(!this.store) {			
 			//try to find store if this button it part of a grid.
@@ -212,9 +212,9 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 			this.searchToolBar.setWidth(adjWidth);
 		}, this);
 		
-		if(this.filters) {
+		if(this.store.entityStore) {
 			
-			var names = Object.keys(this.filters).filter(function(name) {return name != 'q'});
+			var names = Object.keys(this.store.entityStore.entity.filters).filter(function(name) {return name != 'q'});
 			
 			if(names.length) {
 			
@@ -255,8 +255,8 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 		var v = this.triggerField.getValue(), filters = null;
 		this.resetButton.setDisabled(GO.util.empty(v));
 		
-		if(this.filters) {
-			filters = go.util.Filters.parseQueryString(v, this.filters);	
+		if(this.store.entityStore) {
+			filters = go.util.Filters.parseQueryString(v, this.store.entityStore.entity.filters);	
 		}
 		
 		this.fireEvent('search', this, v, filters);

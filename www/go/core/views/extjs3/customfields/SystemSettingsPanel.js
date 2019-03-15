@@ -3,21 +3,9 @@ go.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel, {
 	title: t("Custom fields"),
 	initComponent: function () {
 		
-		var data = go.Entities.getAll().map(function(e) {
-			
-			var module = go.Modules.get(e.package, e.module),			
-				serverInfo = module.entities.find(function(serverInfo) {
-					return serverInfo.name == e.name;
-				});
-				
-			if(serverInfo) {
-				if(!e.customFields) {
-					e.customFields = serverInfo.supportsCustomFields;
-				}				
-			}
-			
-			e.moduleTitle = go.Modules.getConfig(module.package, module.name).title;
-			
+		var data = go.Entities.getAll().map(function(e) {			
+			var module = go.Modules.get(e.package, e.module);		
+			e.moduleTitle = go.Modules.getConfig(module.package, module.name).title;			
 			return e;
 			
 		}).filter(function(e){return e.customFields != false;});

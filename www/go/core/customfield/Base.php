@@ -4,11 +4,16 @@ namespace go\core\customfield;
 use Exception;
 use GO;
 use go\core\data\Model;
+use go\core\db\Criteria;
 use go\core\db\Table;
 use go\core\db\Utils;
 use go\core\ErrorHandler;
-use go\core\util\ClassFinder;
 use go\core\model\Field;
+use go\core\orm\Entity;
+use go\core\orm\Filters;
+use go\core\orm\Query;
+use go\core\util\ClassFinder;
+use go\core\validate\ErrorCode;
 
 
 /**
@@ -25,7 +30,7 @@ abstract class Base extends Model {
 	
 	/**
 	 *
-	 * @var Field 
+	 * @var Field
 	 */
 	protected $field;
 	
@@ -51,7 +56,7 @@ abstract class Base extends Model {
 		}
 		
 		if($this->field->isModified("databaseName") && preg_match('/[^a-zA-Z_0-9]/', $this->field->databaseName)) {
-			$this->field->setValidationError('databaseName', \go\core\validate\ErrorCode::INVALID_INPUT, GO()->t("Invalid database name. Only use alpha numeric chars and underscores.", 'core','customfields'));
+			$this->field->setValidationError('databaseName', ErrorCode::INVALID_INPUT, GO()->t("Invalid database name. Only use alpha numeric chars and underscores.", 'core','customfields'));
 		}		
 	}
 	
@@ -243,5 +248,35 @@ abstract class Base extends Model {
 		}
 		
 		return $all[$name];
+	}
+	
+	
+	protected function joinCustomFieldsTable(Query $query) {
+		if(!$query->isJoined($this->field->tableName())){
+			$cls = $query->getModel();
+			$primaryTableAlias = array_values($cls::getMapping()->getTables())[0]->getAlias();
+			$query->join($this->field->tableName(),'customFields', 'customFields.id = '.$primaryTableAlias.'.id');
+		}
+	}
+	
+	
+	/**
+	 * Defines an entity filter for this field.
+	 * 
+	 * @see Entity::defineFilters()
+	 * @param Filters $filter
+	 */
+	public function defineFilter(Filters $filters) {
+		
+		
+		$filters->addText($this->field->databaseName, function(Criteria $criteria, $comparator, $value, Query $query, array $filter){
+			$this->joinCustomFieldsTable($query);		
+			
+			$query->debug();
+			
+			$criteria->where('customFields.' . $this->field->databaseName, $comparator, $value);
+			
+			
+		});
 	}
 }

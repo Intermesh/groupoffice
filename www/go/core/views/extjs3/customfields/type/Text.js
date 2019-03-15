@@ -143,6 +143,14 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			customField: field,
 			customFieldType: this
 		};
+	},
+	
+	getFilter : function(field) {
+		return {
+			name: field.databaseName,
+			type: "string",
+			multiple: true
+		};
 	}
 	
 	

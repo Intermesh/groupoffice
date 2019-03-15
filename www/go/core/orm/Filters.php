@@ -21,7 +21,7 @@ class Filters {
 	 * See also addText(), addNumber() and addDate() for different types
 	 * 
 	 * @param string $name The name of the filter.
-	 * @param Callable $fn The filter function will be called with Query $query, $value, array $filter 
+	 * @param Callable $fn The filter function will be called with Criteria $criteria, $value, Query $query, array $filter 
 	 * @return $this
 	 */
 	public function add($name, $fn) {

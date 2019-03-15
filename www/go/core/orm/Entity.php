@@ -465,6 +465,10 @@ abstract class Entity extends Property {
 				$criteria->where('createdAt', $comparator, $value);								
 			});
 		}
+		
+		if(method_exists(static::class, 'defineCustomFieldFilters')) {
+			static::defineCustomFieldFilters($filters);
+		}
 
 		static::fireEvent(self::EVENT_FILTER, $filters);
 		

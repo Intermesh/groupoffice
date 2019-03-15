@@ -199,6 +199,8 @@
 
 			return available;
 		},
+		
+		
 
 		//will be called after login
 		init: function () {

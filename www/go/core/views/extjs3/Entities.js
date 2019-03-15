@@ -6,6 +6,35 @@
   var stores = {};
   
   go.Entities = {
+		
+		/**
+		 * Populate some entity properties with server info.
+		 * 
+		 * Called in mainlayout after authentication and loading of custom fields and modules.
+		 */
+		init : function() {
+			go.Entities.getAll().forEach(function(e) {			
+				var module = go.Modules.get(e.package, e.module),			
+					serverInfo = module.entities.find(function(serverInfo) {
+						return serverInfo.name == e.name;
+					});
+
+				if(serverInfo) {
+					if(!e.customFields) {
+						e.customFields = serverInfo.supportsCustomFields;
+					}				
+					
+					e.isAclOwner = serverInfo.isAclOwner;
+					e.defaultAclId = serverInfo.defaultAclId;	
+				}
+				
+				if(e.customFields) {
+					e.filters = e.filters.concat(go.customfields.CustomFields.getFilters(e.name));
+				}
+				e.filters =  go.util.Filters.normalize(e.filters);
+				console.log(e);
+			});
+		},
 
     /**
      * Register an entity
@@ -29,36 +58,8 @@
       if(entities[lcName]) {
         throw "Entity name is already registered by module " +entities[lcName]['package'] + "/" + entities[lcName]['module'];
       }
-			
-			if(!cfg.title) {
-				cfg.title = t(cfg.name);
-			}
-			
-			if(!cfg.links) {
-				cfg.links = [];
-			}			
-			
-			cfg.links.forEach(function(l) {
-				
-				l.entity = cfg.name;
-				
-				if(!l.title) {
-					l.title = cfg.title;
-				}
-				if(!l.iconCls) {
-					l.iconCls = "entity " + l.entity;
-				}
-			});
-			
-      
-      entities[lcName] = Ext.apply(cfg, {     				
-				getRouterPath : function (id) {
-					return lcName + "/" + id;
-				},
-        goto: function (id) {
-          go.Router.goto(this.getRouterPath(id));
-        }			
-      });
+		      
+      entities[lcName] = new go.Entity(cfg);
 			
 			//these datatypes will be prefetched by go.data.EntityStoreProxy.fetchEntities()
 			// Key can also be a function that is called with the record data.

@@ -217,4 +217,18 @@ trait CustomFieldsTrait {
 		
 		return $mainTableName.'_custom_fields';
 	}
+	
+	/**
+	 * Defines filters for all custom fields
+	 * 
+	 * @param \go\core\orm\Filters $filters
+	 */
+	protected static function defineCustomFieldFilters(Filters $filters) {
+		
+		$fields = static::getCustomFieldModels();		
+		
+		foreach($fields as $field) {
+			$field->getDataType()->defineFilter($filters);
+		}		
+	}
 }

@@ -2,21 +2,9 @@ go.defaultpermissions.DefaultPermissionsPanel = Ext.extend(go.grid.GridPanel, {
 	
 	initComponent: function () {
 		
-		var data = go.Entities.getAll().map(function(e) {
-			
-			var module = go.Modules.get(e.package, e.module),
-			
-				serverInfo = module.entities.find(function(serverInfo) {
-					return serverInfo.name == e.name;
-				});
-				
-			if(serverInfo) {
-				e.isAclOwner = serverInfo.isAclOwner;
-				e.defaultAclId = serverInfo.defaultAclId;
-			}
-			
-			e.moduleTitle = go.Modules.getConfig(module.package, module.name).title;
-						
+		var data = go.Entities.getAll().map(function(e) {			
+			var module = go.Modules.get(e.package, e.module);			
+			e.moduleTitle = go.Modules.getConfig(module.package, module.name).title;						
 			return e;
 			
 		}).filter(function(e){return e.isAclOwner;});

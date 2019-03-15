@@ -18,7 +18,8 @@ go.util.Filters = {
 				normalized[name] = {
 					name: name,
 					multiple: true,
-					type: "text"
+					type: "text",
+					title: t(name)
 				}
 			}
 		});
