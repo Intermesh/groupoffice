@@ -689,10 +689,6 @@ abstract class Property extends Model {
 	 */
 	private function setSaveProps(\go\core\db\Table $table, $modifiedForTable) {
 		
-		if (!$this->recordIsNew($table) && empty($modifiedForTable)) {
-			return $modifiedForTable;
-		}
-		
 		if($table->getColumn("modifiedBy") && !isset($modifiedForTable["modifiedBy"])) {
 			$this->modifiedBy = $modifiedForTable['modifiedBy'] = $this->getDefaultCreatedBy();
 		}
@@ -872,7 +868,9 @@ abstract class Property extends Model {
 				
 		$modifiedForTable = $this->extractModifiedForTable($table, $modified);
 		
-		$modifiedForTable = $this->setSaveProps($table, $modifiedForTable);
+		if(!empty($modified)) {
+			$modifiedForTable = $this->setSaveProps($table, $modifiedForTable);
+		}
 
 		if (empty($modifiedForTable)) {
 			return true;
