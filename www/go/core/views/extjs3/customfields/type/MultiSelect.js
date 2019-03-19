@@ -88,6 +88,22 @@ go.customfields.type.MultiSelect = Ext.extend(go.customfields.type.Text, {
 		};		
 		
 		return c;
+	},
+	
+	getFilter : function(field) {
+			
+		return {
+			name: field.databaseName,
+			type: "select",
+			multiple: true,
+			title: field.name,
+			options: field.dataType.options.map(function(o) {
+				return {
+					value: o.id,
+					title: o.text
+				}
+			})
+		};
 	}
 	
 	

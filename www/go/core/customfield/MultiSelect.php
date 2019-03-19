@@ -2,10 +2,11 @@
 
 namespace go\core\customfield;
 
-use Exception;
 use GO;
-use go\core\db\Query;
-use go\core\db\Utils;
+use go\core\db\Criteria;
+use go\core\orm\Entity;
+use go\core\orm\Filters;
+use go\core\orm\Query;
 
 class MultiSelect extends Select {
 	
@@ -105,6 +106,35 @@ class MultiSelect extends Select {
 
 	public function onFieldDelete() {
 		return GO()->getDbConnection()->query("DROP TABLE IF EXISTS `" . $this->getMultiSelectTableName() . "`;");
+	}
+	
+	private static $joinCount = 0;
+	
+	private function getJoinAlias() {
+		static::$joinCount++;
+		
+		return $this->field->databaseName .'_' . static::$joinCount;
+	}
+	
+	/**
+	 * Defines an entity filter for this field.
+	 * 
+	 * @see Entity::defineFilters()
+	 * @param Filters $filter
+	 */
+	public function defineFilter(Filters $filters) {
+		
+		
+		$filters->add($this->field->databaseName, function(Criteria $criteria, $value, Query $query, array $filter){
+			
+			//if(!$query->isJoined($this->getMultiSelectTableName())){
+				$cls = $query->getModel();
+				$primaryTableAlias = array_values($cls::getMapping()->getTables())[0]->getAlias();
+				$joinAlias = $this->getJoinAlias();
+				$query->join($this->getMultiSelectTableName(), $joinAlias, $joinAlias.'.id = '.$primaryTableAlias.'.id');
+			//}
+			$criteria->where($joinAlias. '.optionId', '=', $value);
+		});
 	}
 
 }
