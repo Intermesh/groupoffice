@@ -48,6 +48,15 @@ go.customfields.type.DateTime = Ext.extend(go.customfields.type.Text, {
 
 	getFieldType: function () {
 		return "float";
+	},
+	
+	getFilter : function(field) {
+		return {
+			name: field.databaseName,
+			type: "date",	
+			multiple: false,
+			title: field.name
+		};
 	}
 
 

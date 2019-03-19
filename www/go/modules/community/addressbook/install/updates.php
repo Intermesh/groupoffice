@@ -22,3 +22,9 @@ $updates['201901191547'][] = "ALTER TABLE `addressbook_user_settings`
   ADD CONSTRAINT `addressbook_user_settings_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `addressbook_user_settings_ibfk_2` FOREIGN KEY (`defaultAddressBookId`) REFERENCES `addressbook_addressbook` (`id`) ON DELETE SET NULL;";
 
+
+
+
+
+
+// bestgroen ab -4 in core_module !

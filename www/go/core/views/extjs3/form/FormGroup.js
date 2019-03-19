@@ -50,7 +50,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 //		//to prevent adding to the ExtJS basic form
 //		this.itemCfg.isFormField = false;
 		
-		this.itemCfg.flex = 1;
+		this.itemCfg.columnWidth = 1;
 		
 		if(!this.itemCfg.xtype) {
 			this.itemCfg.xtype = "formcontainer";
@@ -113,8 +113,8 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	
 	addPanel : function() {
 		var formField = this.createNewItem(), me = this, wrap = new Ext.Container({
-			xtype: "container",
-			layout: "hbox",
+			//xtype: "container",
+			layout: "column",
 			formField: formField,			
 			findBy: false,
 			isFormField: false,
@@ -122,7 +122,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			items: [				
 				{
 					xtype: "container",
-					width: dp(48),					
+					width: dp(48),		
 					items: [{				
 						xtype: "button",
 						iconCls: 'ic-delete',
@@ -135,7 +135,8 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 				formField
 			]
 		});
-		return this.add(wrap);		
+		this.add(wrap);
+		return wrap;
 	},
 
 	getName: function() {

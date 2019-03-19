@@ -70,6 +70,17 @@ go.customfields.type.Select = Ext.extend(go.customfields.type.Text, {
 		};		
 		
 		return c;
+	},
+	
+	getFilter : function(field) {
+			
+		return {
+			name: field.databaseName,
+			type: "go.customfields.filter.Select",
+			multiple: true,
+			title: field.name,
+			customfield: field
+		};
 	}
 	
 	

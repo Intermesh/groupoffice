@@ -48,8 +48,8 @@ go.customfields.type.YesNo = Ext.extend(go.customfields.type.Text, {
 			id: 'id',
 			fields: ['id', 'text'],
 			data: [
-				['1', t("Yes")],
-				['-1', t("No")]],
+				[1, t("Yes")],
+				[-1, t("No")]],
 			remoteSort: false
 		});
 
@@ -71,6 +71,25 @@ go.customfields.type.YesNo = Ext.extend(go.customfields.type.Text, {
 
 	getFieldType: function () {
 		return "int";
+	},
+	
+	getFilter : function(field) {
+		return {
+			name: field.databaseName,
+			type: "select",
+			multiple: true,
+			title: field.name,
+			options: [{
+					value: null,
+					title: t("Not set")
+			},{
+					value: 1,
+					title: t("Yes")
+			},{
+					value: -1,
+					title: t("No")
+			}]
+		};
 	}
 
 

@@ -185,6 +185,8 @@ customfields/type/NotesDialog.js
 customfields/type/Notes.js
 customfields/type/EncryptedText.js
 
+customfields/filter/Select.js
+
 search/Panel.js
 search/SearchEmailCombo.js
 search/SearchCombo.js

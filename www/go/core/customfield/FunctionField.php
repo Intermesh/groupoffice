@@ -2,7 +2,7 @@
 
 namespace go\core\customfield;
 
-class FunctionField extends Base {
+class FunctionField extends Number {
 	
 	//no db field for functions
 	public function onFieldSave() {

@@ -10,6 +10,16 @@ go.Modules.register("community", "addressbook", {
 			customFields: {
 				fieldSetDialog: "go.modules.community.addressbook.CustomFieldSetDialog"
 			},
+			
+			/**
+			 * Filter definitions
+			 * 
+			 * Will be used by query fields where you can use these like:
+			 * 
+			 * name: Piet,John age: < 40
+			 * 
+			 * Or when adding custom saved filters.
+			 */
 			filters: [
 				{
 					name: 'q',

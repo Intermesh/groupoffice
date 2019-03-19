@@ -2,10 +2,23 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 	title: t('Field'),
 	entityStore: "Field",
 	height: dp(400),
+	initComponent: function() {
+		go.customfields.FieldDialog.superclass.initComponent.call(this);
+		
+		this.formPanel.on("load", function(form, entity){
+			
+			var types = go.customfields.CustomFields.getTypes();
+			form.getForm().findField('typeLabel').setValue(types[entity.type] ? types[entity.type].label : entity.type);
+		}, this);
+	},
 	initFormItems: function () {
 		return [{
 				xtype: 'fieldset',
-				items: [
+				items: [{
+						xtype:'plainfield',
+						name: 'typeLabel',
+						fieldLabel: t('Type')
+				},
 					{
 						xtype: 'textfield',
 						name: 'name',

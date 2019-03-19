@@ -49,6 +49,16 @@ go.customfields.type.Number = Ext.extend(go.customfields.type.Text, {
 
 	getFieldType: function () {
 		return "float";
+	},
+	
+	getFilter : function(field) {
+		return {
+			name: field.databaseName,
+			type: "number",
+			multiple: false,
+			title: field.name,
+			customfield: field
+		};
 	}
 
 

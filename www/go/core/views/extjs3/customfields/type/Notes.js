@@ -41,6 +41,10 @@ go.customfields.type.Notes = Ext.extend(go.customfields.type.Text, {
 			html: customfield.options.detailNotes,
 			hidden: go.util.empty(customfield.options.detailNotes) 
 		});
+	},
+	
+	getFilter : function() {
+		return false;
 	}
 
 });

@@ -27,6 +27,10 @@ go.customfields.type.EncryptedText = Ext.extend(go.customfields.type.Text, {
 				
 			}
 		});
+	},
+	
+	getFilter : function() {
+		return false;
 	}
 	
 });

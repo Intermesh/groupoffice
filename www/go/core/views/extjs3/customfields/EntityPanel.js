@@ -57,7 +57,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 			go.Stores.get("Field").un("changes", this.onFieldChanges, this);
 		}, this);
 
-
+		var types = go.customfields.CustomFields.getTypes();
 		Ext.apply(this, {
 			//plugins: [actions],
 			tbar: [
@@ -82,6 +82,19 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'name',
 					renderer: function (v, meta, record) {
 						return record.data.isFieldSet ? "<h5>" + v + "</h5>" : v;
+					}
+				},{
+					header: t('Database name'),
+					width: dp(200),
+					sortable: false,
+					dataIndex: 'databaseName'
+				},{
+					header: t('Type'),
+					width: dp(100),
+					sortable: false,
+					dataIndex: 'type',
+					renderer: function(v) {
+						return types[v] ? types[v].label : types[v];
 					}
 				},
 				{
@@ -488,7 +501,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 						lastSortOrder = f.sortOrder;
 						storeData.push([
 							f.name,
-							f.dataName,
+							f.databaseName,
 							f.type,
 							f.id,
 							f.fieldSetId,

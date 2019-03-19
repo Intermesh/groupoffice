@@ -1,7 +1,17 @@
 go.filter.types.number = Ext.extend(Ext.Panel, {
 	layout: "hbox",
 	flex: 1,
-	options: null,
+	/**
+	 * Filter definition
+	 * {
+					name: 'q', //Filter name
+					type: "string", //Sting type of go.filters.type or a full class name
+					multiple: false, // nly applies to query field parsing. You can use name: Value1,Value2 nad it will turn into an array for an OR group
+					title: "Query",
+					customfield: model //When it's a custom field
+				},
+	 */
+	filter: null,
 	initComponent: function () {
 		
 		this.operatorCombo = new go.form.ComboBox({

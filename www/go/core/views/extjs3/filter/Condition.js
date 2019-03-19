@@ -1,13 +1,14 @@
 go.filter.Condition = Ext.extend(go.form.FormContainer, {
 	entity: null,
 	
-	layout: "hbox",
+	layout: "column",
 
 	initComponent: function () {
 		this.filters = Object.values(go.Entities.get(this.entity).filters);
 		this.items = [this.createFilterCombo()];		
 		
 		go.filter.Condition.superclass.initComponent.call(this);
+
 	},
 
 	createFilterCombo: function () {
@@ -68,9 +69,20 @@ go.filter.Condition = Ext.extend(go.form.FormContainer, {
 		
 	},	
 	
-	switchCondition : function(options) {
-		this.add(new go.filter.types[options.type]({
-			options: options
+	switchCondition : function(filter) {
+		
+		var cls;
+		
+		if(go.filter.types[filter.type]) {
+			cls = go.filter.types[filter.type];
+		}else
+		{
+			cls = eval(filter.type);
+		}
+		
+		this.add(new cls({
+			columnWidth: 1,
+			filter: filter
 		}));				
 	}
 	

@@ -1,10 +1,12 @@
 /* global go, Ext */
 
-go.customfields.type.TreeSelectField = Ext.extend(Ext.Panel, {
-	layout: "form",
+go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
+	layout: "anchor",
 	isFormField: true,
 	name: "options",
 	findBy: false,
+	customfield: null,
+	//height: dp(36),
 	getName : function() {
 		return this.name;
 	},
@@ -44,7 +46,6 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Panel, {
 
 		return {
 			submit: false,
-		
 			anchor: "100%",
 			xtype: 'combo',
 			store: store,
@@ -74,8 +75,9 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Panel, {
 		
 		if(!go.util.empty(record.json.children)) {			
 			this.add(this.createCombo(record.json.children));
-			this.doLayout();
 		}
+		
+		this.doLayout();
 	},
 	
 	isDirty: function () {
