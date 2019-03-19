@@ -234,10 +234,10 @@ $updates['201706121115'][] = "ALTER TABLE `fs_folders` CHANGE `parent_id` `paren
 $updates['201901281546'][] = "delete from go_settings where name ='files_shared_cache_ctime';";
 
 $updates['201903070922'][] = "ALTER TABLE `fs_files` CHANGE `name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;";
-$updates['201903070922'][] = "ALTER TABLE `fs_files` ADD UNIQUE( `folder_id`, `name`);";
+$updates['201903070922'][] = "ALTER IGNORE TABLE `fs_files` ADD UNIQUE( `folder_id`, `name`);";
 
 
 $updates['201903070922'][] = "ALTER TABLE `fs_folders` CHANGE `name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;";
-$updates['201903070922'][] = "ALTER TABLE `fs_folders` ADD UNIQUE( `parent_id`, `name`);";
+$updates['201903070922'][] = "ALTER IGNORE TABLE `fs_folders` ADD UNIQUE( `parent_id`, `name`);";
 
 $updates['201903070922'][] = "ALTER TABLE `fs_folders` DROP INDEX `parent_id_2`;";
