@@ -49,7 +49,11 @@ go.modules.community.files.customfield.File = Ext.extend(go.customfields.type.Te
 
 	getFieldType: function () {
 		return "string";
-	}	
+	},
+	
+	getFilter : function(field) {
+		return false;
+	}
 	
 });
 

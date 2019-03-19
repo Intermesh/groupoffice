@@ -78,6 +78,17 @@ go.customfields.type.Group = Ext.extend(go.customfields.type.Text, {
 		var c = go.customfields.type.Select.superclass.getFieldDefinition.call(this, field);
 		c.key = field.databaseName;		
 		return c;
+	},
+	
+	getFilter : function(field) {
+			
+		return {
+			name: field.databaseName,
+			type: "go.groups.GroupCombo",
+			multiple: true,
+			title: field.name,
+			customfield: field
+		};
 	}
 	
 	

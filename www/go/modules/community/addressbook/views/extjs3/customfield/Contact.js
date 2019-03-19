@@ -80,6 +80,16 @@ go.modules.community.addressbook.customfield.Contact = Ext.extend(go.customfield
 		var c = go.customfields.type.Select.superclass.getFieldDefinition.call(this, field);
 		c.key = field.databaseName;		
 		return c;
+	},
+	
+	getFilter : function(field) {
+			
+		return {
+			name: field.databaseName,
+			type: "go.modules.community.addressbook.ContactCombo",
+			multiple: true,
+			title: field.name
+		};
 	}
 	
 	

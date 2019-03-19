@@ -411,6 +411,9 @@ class Contact extends AclItemEntity {
 										})->add('userGroupId', function(Criteria $criteria, $value, Query $query) {
 											$query->join('core_user_group', 'ug', 'ug.userId = c.goUserId');
 											$criteria->where(['ug.groupId' => $value]);
+										})->add('isUser', function(Criteria $criteria, $value, Query $query) {
+											$criteria->where('c.goUserId', empty($value) ? '=' : '!=', null);
+											
 										});
 													
 										

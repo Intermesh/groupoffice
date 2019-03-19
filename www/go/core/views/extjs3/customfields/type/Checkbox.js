@@ -50,6 +50,26 @@ go.customfields.type.Checkbox = Ext.extend(go.customfields.type.Text, {
 
 	getFieldType: function () {
 		return "boolean";
+	},
+	
+	getFilter : function(field) {
+			
+		return {
+			name: field.databaseName,
+			type: "select",
+			multiple: true,
+			title: field.name,
+			options: [
+						{
+							value: true,
+							title: t("Yes")
+						},
+						{
+							value: false,
+							title: t("No")
+						}
+					]
+		};
 	}
 
 

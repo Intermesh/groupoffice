@@ -2,9 +2,7 @@
 
 - Billing: Copy matching custom fields in order dialog
 
-
-For old framework cf:
-Contact filters custom fields
+Edit contact profile via My Account
 Merge contacts
 Export / import  contacts CSV
 Batch edit custom fields not possible

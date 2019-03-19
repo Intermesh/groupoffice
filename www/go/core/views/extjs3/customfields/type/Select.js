@@ -76,7 +76,7 @@ go.customfields.type.Select = Ext.extend(go.customfields.type.Text, {
 			
 		return {
 			name: field.databaseName,
-			type: "go.customfields.filter.Select",
+			type: "go.customfields.type.TreeSelectField",
 			multiple: true,
 			title: field.name,
 			customfield: field

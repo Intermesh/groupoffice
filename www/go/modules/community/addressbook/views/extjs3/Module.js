@@ -90,7 +90,22 @@ go.Modules.register("community", "addressbook", {
 					title: t("User group"),
 					name: 'usergroupid', 
 					multiple: true,
-					type: 'string'
+					type: 'go.groups.GroupCombo'
+				}, {
+					title: t("Is a user"),
+					name: 'isUser', 
+					multiple: false,
+					type: 'select',
+					options: [
+						{
+							value: true,
+							title: t("Yes")
+						},
+						{
+							value: false,
+							title: t("No")
+						}
+					]
 				}
 			],
 			links: [{

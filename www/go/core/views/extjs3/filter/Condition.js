@@ -82,7 +82,10 @@ go.filter.Condition = Ext.extend(go.form.FormContainer, {
 		
 		this.add(new cls({
 			columnWidth: 1,
-			filter: filter
+			filter: filter,
+			name: 'value',
+			hiddenName: 'value',
+			customfield: filter.customfield //Might be null if this is a standard filter.
 		}));				
 	}
 	

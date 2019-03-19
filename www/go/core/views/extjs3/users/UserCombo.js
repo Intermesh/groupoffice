@@ -21,8 +21,8 @@ go.users.UserCombo = Ext.extend(go.form.ComboBox, {
 		this.tpl = new Ext.XTemplate(
 				'<tpl for=".">',
 				'<div class="x-combo-list-item"><div class="user">\
-					 <tpl if="!photoBlobId"><div class="avatar"></div></tpl>\\n\
-					 <tpl if="photoBlobId"><div class="avatar" style="background-image:url({[go.Jmap.downloadUrl(values.avatarId)]})"></div></tpl>\
+					 <tpl if="!avatarId"><div class="avatar"></div></tpl>\\n\
+					 <tpl if="avatarId"><div class="avatar" style="background-image:url({[go.Jmap.downloadUrl(values.avatarId)]})"></div></tpl>\
 					 <div class="wrap">\
 						 <div>{displayName}</div><small style="color:#333;">{username}</small>\
 					 </div>\
