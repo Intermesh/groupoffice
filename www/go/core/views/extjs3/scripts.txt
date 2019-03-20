@@ -41,6 +41,7 @@ form/FormGroup.js
 form/FormContainer.js
 form/Chips.js
 form/RecurrenceFieldset.js
+form/KeyValueEditorGrid.js
 
 modules/ModulePanel.js
 
