@@ -20,16 +20,28 @@ https://github.com/Intermesh/docker-groupoffice-development
 
 ## Manual from source
 
-1. Clone this repository
-2. Change into the "www" directory.
-3. Install composer libraries: 
+1. Install regularly like on https://groupoffice.readthedocs.io/en/latest/install/install.html
+2. If using the Debian packages then disable the APT repositoty to avoid overwritten source on update.
+3. Clone this repository
+4. Change into the "www" directory.
+5. Install composer libraries: 
    ```
    "composer install"
    ```
-4. Compile sass: 
+6. Compile sass: 
    ```
    sass views/Extjs3/themes/Paper/src/style.scss views/Extjs3/themes/Paper/style.css
    sass views/Extjs3/themes/Paper/src/style-mobile.scss views/Extjs3/themes/Paper/style-mobile.css
    ```
-5. Launch it in the web browser and follow the installer's instructions.
+7. Symlink the original source directory to your development files. For example:
+
+   Move Debian package folder away::
+      
+      mv /usr/share/groupoffice /usr/share/groupofficebak
+      
+  Create symlink to master clone::
+  
+     ln -s ~/Projects/groupoffice/master/www /usr/share/groupoffice
+     
+8. Launch it in the web browser and follow the installer's instructions.
 
