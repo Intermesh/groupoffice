@@ -1,3 +1,4 @@
+- Core: Handle / ignore open_basedir errors
 - Assistant: Opening files with assistant in shared folder din't work in all cases.
 - Core: Upgrade 6.2 to 6.3 fixed problem when links had an unknown entity id in them.
 - Email: Fixed filename issue with spaces in email attachment download
