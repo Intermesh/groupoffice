@@ -188,9 +188,14 @@ use go\modules\core\core\model\Settings;
 		}
 		
 		private function getGlobalConfig() {
-			$globalConfigFile = '/etc/groupoffice/globalconfig.inc.php';
-			if (file_exists($globalConfigFile)) {
-				require($globalConfigFile);
+			try {
+				$globalConfigFile = '/etc/groupoffice/globalconfig.inc.php';
+				if (file_exists($globalConfigFile)) {
+					require($globalConfigFile);
+				}
+			}catch(\Exception $e) {
+				//openbasedir might complain here. Ignore.
+				
 			}
 			
 			return $config ?? [];
@@ -496,20 +501,36 @@ use go\modules\core\core\model\Settings;
 
 			if (!empty($_SERVER['HTTP_HOST'])) {
 				$workingFile = '/etc/groupoffice/multi_instance/' . explode(':', $_SERVER['HTTP_HOST'])[0] . '/' . $name;
-				if (file_exists($workingFile)) {
-					return $workingFile;
+				try {
+					if (file_exists($workingFile)) {
+						return $workingFile;
+					}
+				}
+				catch(\Exception $e) {
+					//ignore open_basedir error
 				}
 			}
 			
 			$workingFile = dirname(dirname(__DIR__)) . '/' . $name;
-			if (file_exists($workingFile)) {
-				return $workingFile;
+			try {
+				if (file_exists($workingFile)) {
+					return $workingFile;
+				}
+			}
+			catch(\Exception $e) {
+				//ignore open_basedir error
 			}
 
 			$workingFile = '/etc/groupoffice/' . $name;
-			if (file_exists($workingFile)) {
-				return $workingFile;
+			try {
+				if (file_exists($workingFile)) {
+					return $workingFile;
+				}
 			}
+			catch(\Exception $e) {
+				//ignore open_basedir error
+			}
+			
 			return false;
 		}
 

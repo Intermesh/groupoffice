@@ -364,6 +364,10 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 	protected function getPath() {
 		return $this->folder ? $this->folder->path . '/' . $this->name : $this->name;
 	}
+	
+	public function getVirtualPath() {
+		return $this->folder->getVirtualPath() . '/' . $this->name;
+	}
 
 	protected function getFsFile() {
 		return new \GO\Base\Fs\File(\GO::config()->file_storage_path . $this->path);
