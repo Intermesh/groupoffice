@@ -1,3 +1,4 @@
+- Assistant: Opening files with assistant in shared folder was broken
 - Core: Upgrade 6.2 to 6.3 fixed problem when links had an unknown entity id in them.
 
 07-03-2019 6.3.67
