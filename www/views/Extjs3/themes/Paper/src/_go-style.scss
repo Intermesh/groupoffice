@@ -1074,6 +1074,10 @@ table.display-panel {
 	padding: 0 dp(8) 0 dp(16);
 	height: dp(56);
 	line-height: dp(56);
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 .mo-title {
 	background-repeat: no-repeat;
