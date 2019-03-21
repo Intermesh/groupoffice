@@ -141,7 +141,8 @@ $tools : (
  move : games,
  edit: edit,
  add: add,
- delete: delete
+ delete: delete,
+ home: home
 );
 .icon {@extend %icon;}
 
