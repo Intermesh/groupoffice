@@ -92,7 +92,11 @@ if(empty($_REQUEST['r']) && PHP_SAPI!='cli'){
     exit();
   } else
   {
-    throw $e;
+		echo "<h1>Fatal error</h1>";
+		echo "<pre>";
+    echo $e->getMessage();		
+		//echo $e->getTraceAsString();
+		echo "</pre>";
   }
 }
 
