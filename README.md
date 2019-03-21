@@ -35,13 +35,17 @@ https://github.com/Intermesh/docker-groupoffice-development
    ```
 7. Symlink the original source directory to your development files. For example:
 
-   Move Debian package folder away::
+   Move Debian package folder away:
+   
+   ```   
+   mv /usr/share/groupoffice /usr/share/groupofficebak
+   ```
       
-      mv /usr/share/groupoffice /usr/share/groupofficebak
-      
-  Create symlink to master clone::
+   Create symlink to master clone:
   
-     ln -s ~/Projects/groupoffice/master/www /usr/share/groupoffice
+   ```
+   ln -s ~/Projects/groupoffice/master/www /usr/share/groupoffice
+   ```
      
 8. Launch it in the web browser and follow the installer's instructions.
 
