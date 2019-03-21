@@ -1,3 +1,4 @@
+- Email: Autolink linked items when replying to message
 - Projects: Fixed some issues in new invoice dialog
 - Core: Overflow ellipsis on old displaypanel section headers
 - Core: Handle / ignore open_basedir errors
