@@ -1,3 +1,6 @@
+21-03-2019 6.2.115
+- Document templates: Fixed document broken due to exception
+
 14-03-2019 6.2.114
 - Document templates: Fixed document broken due to exception
 - Projects: copy the reference nb from a project to the order when an order is created in post calculation
