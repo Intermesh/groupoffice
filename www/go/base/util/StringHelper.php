@@ -43,7 +43,7 @@ class StringHelper {
 	 * @return string
 	 */
 	public static function normalizeCrlf($text, $crlf="\r\n"){		
-		return preg_replace('/\R/u', $crlf, $text);
+		return \go\core\util\StringUtil::normalizeCrlf($text, $crlf);
 	}
 	
 	/**

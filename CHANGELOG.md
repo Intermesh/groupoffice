@@ -1,5 +1,6 @@
 - Assistant: Opening files with assistant in shared folder was broken
 - Core: Upgrade 6.2 to 6.3 fixed problem when links had an unknown entity id in them.
+- Email: Fixed filename issue with spaces in email attachment download
 
 07-03-2019 6.3.67
 - Customfields: fixed format of max fieldlength for customfields when it is set to 1000 or more. 
