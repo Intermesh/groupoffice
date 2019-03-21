@@ -82,8 +82,8 @@ class Filters {
 					if(!is_array($value)){
 						$value = [$value];
 					}
-					$v = array_map(function($v) {return '%'.$v.'%';}, $value);//self::parseStringValue($value);
-					call_user_func($filterConfig['fn'], $criteria, "LIKE", $v, $query, $filter);
+					//$v = array_map(function($v) {return '%'.$v.'%';}, $value);//self::parseStringValue($value);
+					call_user_func($filterConfig['fn'], $criteria, "LIKE", $value, $query, $filter);
 					break;
 				
 				case 'generic':
@@ -142,7 +142,7 @@ class Filters {
 	}
 	
 	public static function parseNumericValue($value) {
-		$regex = '/\s*(>=|<=|>|<|!=|=)\s*(.*)/';
+		$regex = '/\s*(>=|<=|>|<|!=|<>|=)\s*(.*)/';
 		if(preg_match($regex, $value, $matches)) {
 			list(,$comparator, $v) = $matches;
 		} else

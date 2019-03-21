@@ -84,12 +84,22 @@ go.util.Filters = {
 					//Values will be split into array values
 					f[currentFilterName] = str.splitCSV().map(function (v) {
 						//strip backslash and remove quotes
-						return stripBackSlash(v.trim().replace(/^\"|\"$|^\'|\'$/g, ''));
+						v = stripBackSlash(v.trim().replace(/^\"|\"$|^\'|\'$/g, ''));
+						
+						if(filters[currentFilterName].type === "string") {
+							v = "%" + v + "%";
+						}
+						
+						return v;
 					});
 				} else
 				{
 					//strip backslash and remove quotes
 					f[currentFilterName] = stripBackSlash(str.trim().replace(/^\"|\"$|^\'|\'$/g, ''));
+					
+					if(filters[currentFilterName].type === "string") {
+						f[currentFilterName] = "%" + f[currentFilterName] + "%";
+					}
 				}
 
 				//push it to the not or and array
