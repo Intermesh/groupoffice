@@ -48,7 +48,7 @@ go.modules.core.links.CreateLinkButton = Ext.extend(Ext.Button, {
 						name: result.list[0].name,
 						description: "" 
 					}
-				}]});
+				}]}, true);
 		
 				this.setCount(++this.totalCount);
 			}
