@@ -104,6 +104,7 @@ GO.calendar.MainPanel = function(config){
 	}
 
 	this.datePicker = new Ext.DatePicker({
+		flex: 1,
 		cls:'cal-date-picker',
 		showToday:false,
 		internalRender:true
@@ -203,6 +204,18 @@ GO.calendar.MainPanel = function(config){
 		store: this.calendarsStore,
 		allowNoSelection:true,
 		tools: [{
+			id:'home',
+			qtip: t("My calendar"),
+			handler : function() {
+				this.setDisplay({
+					group_id: 1,
+					project_id:0,
+					applyFilter:true,
+					calendars: [GO.calendar.defaultCalendar['id']]
+				});
+			},
+			scope : this
+		},{
 			text:t("colors", "calendar"),
 			id:'gear',
 			qtip:t("Calendar color", "calendar"),
@@ -760,6 +773,8 @@ GO.calendar.MainPanel = function(config){
 		this.westPanel = new Ext.Panel({
 			region:'west',
 			width: dp(224),
+			boxMinWidth: dp(224),
+			stateId: 'cal-west',
 			cls:'go-sidenav',
 			split:true,
 			layout:'border',
@@ -770,11 +785,12 @@ GO.calendar.MainPanel = function(config){
 				height:dp(241),
 				split:false,
 				baseCls:'x-plain',
+				layout: {
+					type: 'vbox',
+					align: 'center'
+				},
 				items:[
-					new Ext.Panel({
-						cls:'go-date-picker-wrap',
-						items:[this.datePicker]
-					})
+					this.datePicker
 				]
 			}),
 			this.calendarListPanel]

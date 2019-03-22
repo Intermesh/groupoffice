@@ -1,3 +1,7 @@
+- Calendar: Added home button to jump to default calendar
+- Email: Autolink linked items when replying to message
+- Projects: Fixed some issues in new invoice dialog
+- Core: Overflow ellipsis on old displaypanel section headers
 - Core: Handle / ignore open_basedir errors
 - Assistant: Opening files with assistant in shared folder din't work in all cases.
 - Core: Upgrade 6.2 to 6.3 fixed problem when links had an unknown entity id in them.
