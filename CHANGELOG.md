@@ -1,3 +1,4 @@
+- FileSearch: Fixed links to attached indexed attachments in the displaypanel. (Was broken due to new GO63 router)
 - Calendar: Added home button to jump to default calendar
 - Email: Autolink linked items when replying to message
 - Projects: Fixed some issues in new invoice dialog
