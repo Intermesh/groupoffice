@@ -1,4 +1,5 @@
 - FileSearch: Fixed links to attached indexed attachments in the displaypanel. (Was broken due to new GO63 router)
+		*** Running the filesearch index again is needed to let this work ***
 - Calendar: Added home button to jump to default calendar
 - Email: Autolink linked items when replying to message
 - Projects: Fixed some issues in new invoice dialog
@@ -80,7 +81,7 @@
 - Core: Listeners relied on cache to be persistent causing missing properties "taskSettings" and "googleauthenticator"
 - Assistant: base64 encode paths so that it works with UTF-8 on all platforms and browsers. 
 
-  *** Assistant 1.0.4 is required after this upgade ***
+  *** Assistant 1.0.4 is required after this upgrade ***
 
   https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-device.html
 
