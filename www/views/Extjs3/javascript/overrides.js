@@ -999,7 +999,7 @@ Ext.override(Ext.form.CompositeField, {
 Ext.override(Ext.TabPanel, {
 	
 	origHideTabStripItem: Ext.TabPanel.prototype.hideTabStripItem,
-	origUnideTabStripItem: Ext.TabPanel.prototype.unhideTabStripItem,
+	origUnhideTabStripItem: Ext.TabPanel.prototype.unhideTabStripItem,
 	
 	hideTabStripItem : function(item){
 		if(!this.rendered) {
