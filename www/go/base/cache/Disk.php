@@ -133,8 +133,8 @@ class Disk implements CacheInterface{
 		$this->_ttls=array();
 		$this->_ttlsDirty=true;
 		$folder = new \GO\Base\Fs\Folder($this->_dir);
-		$folder->delete();
-		$folder->create(0777);
+		$folder->clearContents();		
+		//$folder->create(0777);
 	}
 	
 	public function __destruct(){

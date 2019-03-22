@@ -109,6 +109,20 @@ class Folder extends Base {
 		return !is_dir($this->path) || rmdir($this->path);
 	}
 	
+	public function clearContents() {
+		if(!$this->exists())
+			return true;
+		
+		$items = $this->ls(true);
+		
+		foreach($items as $item){			
+			if(!$item->delete())
+				return false;
+		}
+		
+		return true;
+	}
+	
 	private function _validateSrcAndDestPath($srcPath, $destPath){
 		if(strpos($srcPath.'/', $destPath.'/')===0)
 		{

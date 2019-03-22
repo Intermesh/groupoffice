@@ -323,7 +323,7 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 		if(!this.readPermissionsTab.disabled)
 			this.readPermissionsTab.setDisabled(!is_someones_home_dir && readonly);
 
-		this.commentsPanel.setDisabled(!readonly);
+		this.commentsPanel.setDisabled(readonly || permission_level<GO.permissionLevels.write);
 		
 	},
 	
