@@ -994,3 +994,33 @@ Ext.util.Format.dateRenderer = function(format) {
 Ext.override(Ext.form.CompositeField, {
 	submit: false //don't submit with form.getFieldValue()
 });
+
+
+Ext.override(Ext.TabPanel, {
+	
+	origHideTabStripItem: Ext.TabPanel.prototype.hideTabStripItem,
+	origUnideTabStripItem: Ext.TabPanel.prototype.unhideTabStripItem,
+	
+	hideTabStripItem : function(item){
+		if(!this.rendered) {
+			this.on('afterrender', function() {
+				this.origHideTabStripItem(item);
+			}, this, {single: true});
+		} else
+		{
+			this.origHideTabStripItem(item);
+		}
+	},
+
+
+	unhideTabStripItem : function(item){
+		if(!this.rendered) {
+			this.on('afterrender', function() {
+				this.origUnhideTabStripItem(item);
+			}, this, {single: true});
+		} else
+		{
+			this.origUnhideTabStripItem(item);
+		}
+	},
+});
