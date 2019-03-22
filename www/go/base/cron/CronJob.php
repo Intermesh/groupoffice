@@ -329,7 +329,9 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 				// if we trigger and error again here the cron wont be saved
 				//trigger_error("CronJob ".$this->name." failed. EXCEPTION: ".(string) $e, E_USER_WARNING);
 				\go\core\ErrorHandler::logException($e);
-				$this->error=(string)$e;
+			
+				$this->error = date('c') . ": " .(string)$e;
+
 			}
 			
 			$this->_finishRun($failed);
