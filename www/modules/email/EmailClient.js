@@ -616,16 +616,16 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				iconCls: 'ic-reply',
 				text: t("Reply", "email"),
 				handler: function(){
-
+					var comp = null;
 					if (!this._permissionDelegated) {
-						GO.email.showComposer({
+						comp =GO.email.showComposer({
 							uid: this.messagePanel.uid,
 							task: 'reply',
 							mailbox: this.messagePanel.mailbox,
 							account_id: this.account_id
-						});
+						});						
 					} else {
-						GO.email.showComposer({
+						comp = GO.email.showComposer({
 							uid: this.messagePanel.uid,
 							task: 'reply',
 							mailbox: this.messagePanel.mailbox,
@@ -633,6 +633,10 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 							delegated_cc_enabled: true
 						});
 					}
+					
+					this.messagePanel.data.links.forEach(function(link) {
+						comp.createLinkButton.addLink(link.entity, link.entityId);
+					});
 				},
 				scope: this
 			}),this.replyAllButton=new Ext.Button({
@@ -640,11 +644,15 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				iconCls: 'ic-reply-all',
 				text: t("Reply all", "email"),
 				handler: function(){
-					GO.email.showComposer({
+					var comp = GO.email.showComposer({
 						uid: this.messagePanel.uid,
 						task: 'reply_all',
 						mailbox: this.messagePanel.mailbox,
 						account_id: this.account_id
+					});
+					
+					this.messagePanel.data.links.forEach(function(link) {
+						comp.createLinkButton.addLink(link.entity, link.entityId);
 					});
 				},
 				scope: this

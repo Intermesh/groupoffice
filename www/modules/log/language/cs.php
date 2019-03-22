@@ -9,5 +9,6 @@ return array (
   'description' => 'Modul, který umožňuje ukládát a zobrazovat informace o všech akcích (mazání, úprava a přidávání). Může mít vliv na výkon při velkých instalacích!',
   'Model' => 'Model',
   'ID' => 'ID',
-  'Controller' => 'Controller',
+  'Controller' => 'Dispečer (controller)',
+  'Activity log' => 'Log',
 );

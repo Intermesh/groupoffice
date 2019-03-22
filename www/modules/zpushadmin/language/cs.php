@@ -33,6 +33,6 @@ return array (
   'description' => 'Modul, který umožňuje správu ActiveSync spojení.',
   'ActiveSync management' => 'ActiveSync administrace',
   'Model' => 'Model',
-  'Imei' => 'Imei',
+  'Imei' => 'IMEI',
   'SMS' => 'SMS',
 );

@@ -49,4 +49,5 @@ return array (
   'Fetchall' => 'Fetchall',
   'Mda' => 'Mda',
   'Email' => 'Email',
+  'Ok' => 'OK',
 );

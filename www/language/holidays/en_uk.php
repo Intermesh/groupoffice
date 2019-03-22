@@ -16,7 +16,7 @@ $input_holidays['fn'][] = array('Early May bank holiday',array('GOHolidaysUK', '
 if (!class_exists('GOHolidaysUK')) {
 	class GOHolidaysUK {
 		public static function summerBank($year) {
-			return (new \DateTime('last mon of Augusts '.$year))->format('Y-m-d');
+			return (new \DateTime('last mon of August '.$year))->format('Y-m-d');
 		}
 
 		public static function springBank($year){

@@ -1461,7 +1461,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$response['isInSpamFolder']=$this->_getSpamMoveMailboxName($params['uid'],$params['mailbox'],$account->id);
 		$response = $this->_getContactInfo($imapMessage, $params, $response);
 
-		// START Handle the links div in the email display panel
+		// START Handle the links div in the email display panel		
 		if(!$plaintext){
 			$linkedModels = $imapMessage->getLinks();
 			$response['links'] = array();
@@ -1720,10 +1720,12 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if(GO::modules()->savemailas){
 			$tags = $this->_findAutoLinkTags($response['htmlbody'], $imapMessage->account->id);
 
+			
 			if(!isset($response['autolink_items']))
 				$response['autolink_items'] = array();
 
 			while($tag = array_shift($tags)){
+				
 //				if($imapMessage->account->id == $tag['account_id']){
 					try{
 						$linkModel = \GO\Savemailas\SavemailasModule::getLinkModel($tag['model'], $tag['model_id']);

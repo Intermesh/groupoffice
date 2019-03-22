@@ -585,7 +585,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	private $_folderCache=array();
 
 	public function save($ignoreAcl = false) {
-
+		
 		if(!$this->isModified() && !$this->isCustomFieldsModified() ){ // this will make it possible to set the "notify" in a folder see afterSubmit
 			return true;
 		}
@@ -697,7 +697,43 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		return $this->parent && $this->parent->name=='users' && $this->parent->parent_id==0;
 	}
+	
+	
+	private static $sharedRootFolders;
+	private static function getSharedRootPaths() {
+		
+		if(!isset(static::$sharedRootFolders)) {
+			$folders = Folder::model()->getTopLevelShares();
+			foreach($folders as $folder) {
+				static::$sharedRootFolders[]= $folder->getPath();
+			}
+			sort(static::$sharedRootFolders);
+		}
+				
+		return static::$sharedRootFolders;		
+	}
 
+	
+	public function getVirtualPath() {
+		$path = $this->getPath();
+		$parts = explode('/', $path);		
+		
+		if($parts[0] == 'users' && $parts[1] == GO::user()->username) {
+			//$path = mb_substr($path, 6);
+			array_shift($parts);
+			return implode('/', $parts);
+		} else
+		{
+			//Figure out shared path
+			foreach(static::getSharedRootPaths() as $root) {
+				if(strpos($path, $root) === 0) {
+					return str_replace(dirname($root) .'/' , 'Shared/', $path);
+				}
+			}
+		}
+		
+		return $path;
+	}
 
 	/**
 	 * Add a file to this folder. The file must already be present on the filesystem.

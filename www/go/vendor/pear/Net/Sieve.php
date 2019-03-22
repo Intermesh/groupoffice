@@ -1183,8 +1183,8 @@ class Net_Sieve
 				'verify_peer_name' => false,
 			),
 		));
-		$crypto_method = STREAM_CRYPTO_METHOD_TLS_CLIENT;
-		if (defined('STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT')) {
+			$crypto_method = STREAM_CRYPTO_METHOD_TLS_CLIENT;
+			if (defined('STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT')) {
 				$crypto_method |= STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT;
 				$crypto_method |= STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT;
 		  }

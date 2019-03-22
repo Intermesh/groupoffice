@@ -338,8 +338,9 @@ class Reader extends Sabre\VObject\Reader{
 		}
 		
 		//remove quoted printable line breaks
-		$data = \GO\Base\Util\StringHelper::normalizeCrlf($data,"\n");
-		
+		$data = \GO\Base\Util\StringHelper::clean_utf8($data);	
+//		$data = \GO\Base\Util\StringHelper::normalizeCrlf($data,"\n");
+
 		
 		if(strpos($data,'QUOTED-PRINTABLE')){		
 			$data = str_replace("=\n", "",$data);

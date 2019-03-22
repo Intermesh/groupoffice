@@ -29,6 +29,10 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 		
 		go.util.Cookies.set('accessToken', accessToken, expires);
 		
+		if(!Ext.Ajax.defaultHeaders) {
+			Ext.Ajax.defaultHeaders = {};
+		}
+		
 		Ext.Ajax.defaultHeaders['Authorization'] = 'Bearer ' + accessToken;
 		
 	},

@@ -1,4 +1,17 @@
-- Files: Changed columns to utf8mb4_bin so they are case sensitive.
+- FileSearch: Fixed links to attached indexed attachments in the displaypanel. (Was broken due to new GO63 router)
+		*** Running the filesearch index again is needed to let this work ***
+- Calendar: Added home button to jump to default calendar
+- Email: Autolink linked items when replying to message
+- Projects: Fixed some issues in new invoice dialog
+- Core: Overflow ellipsis on old displaypanel section headers
+- Core: Handle / ignore open_basedir errors
+- Assistant: Opening files with assistant in shared folder din't work in all cases.
+- Core: Upgrade 6.2 to 6.3 fixed problem when links had an unknown entity id in them.
+- Email: Fixed filename issue with spaces in email attachment download
+
+07-03-2019 6.3.67
+- Customfields: fixed format of max fieldlength for customfields when it is set to 1000 or more. 
+- Core: Updated Czech translation
 - Core: Fixed bug that 30 day trial button did not show.
 - Core: Upgraded to SabreDAV 3.2.3 to fix sync problem with some CardDAV clients (DAVDroid, em client)
 - Core: Add validation to Mapping::addRelation() so developers can't map entities.
@@ -68,7 +81,7 @@
 - Core: Listeners relied on cache to be persistent causing missing properties "taskSettings" and "googleauthenticator"
 - Assistant: base64 encode paths so that it works with UTF-8 on all platforms and browsers. 
 
-  *** Assistant 1.0.4 is required after this upgade ***
+  *** Assistant 1.0.4 is required after this upgrade ***
 
   https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-device.html
 

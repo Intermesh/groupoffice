@@ -117,4 +117,6 @@ return array (
   'The provided usertoken is not valid!' => 'The provided usertoken is not valid!',
   'Add from Group-Office' => 'Přidat z {product_name}',
   'Menu' => 'Menu',
+  'Ok' => 'OK',
+  'Website Manager' => 'Webové stránky',
 );

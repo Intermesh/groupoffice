@@ -79,4 +79,11 @@ return array (
   'name' => 'Attività',
   'description' => 'Inserisci qui una descrizione',
   'Tasks' => 'Attività',
+  'Contact' => 'Contatto',
+  'Phone nr.' => 'Numero telefono',
+  'Add Contact' => 'Aggiungi contatto',
+  'Save number to' => 'Salva numero in',
+  'Overwrite {field} ({number})' => 'Sovrascrivi {field} ({number})',
+  'Add to {field}' => 'Aggiungi a {field}',
+  'Remove duplicates' => 'Rimuovi duplicati',
 );

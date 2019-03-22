@@ -26,6 +26,10 @@ class AliasController extends \GO\Base\Controller\AbstractModelController {
 		if(isset($response['data']['address']) && strpos($response['data']['address'], '@') !== false) {
 			$response['data']['address'] = str_replace('@'.$response['data']['domain_name'], "", $response['data']['address']);
 		}
+		if($model->isNew) {
+			$response['data']['active'] = true;
+		}
+			 
 		
 		return parent::afterLoad($response, $model, $params);
 	}

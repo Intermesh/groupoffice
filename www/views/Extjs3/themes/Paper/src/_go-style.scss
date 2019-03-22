@@ -1146,6 +1146,15 @@ button.filetype-pdf, button.filetype-doc {
 }
 	
 table.display-panel {
+	
+	&.labels {		
+		td, th{
+			&:first-child {
+				width: dp(200);
+			}
+		}
+	}
+	
 	width: 100%;
 	clear: both;
 	td, th {
@@ -1179,6 +1188,10 @@ table.display-panel {
 	padding: 0 dp(8) 0 dp(16);
 	height: dp(56);
 	line-height: dp(56);
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 .mo-title {
 	background-repeat: no-repeat;

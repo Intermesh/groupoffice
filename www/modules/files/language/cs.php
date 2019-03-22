@@ -136,4 +136,5 @@ Byly provedeny následující změny %s:
   'Ver.' => 'Ver.',
   'ID' => 'ID',
   'Download' => 'Stáhnout',
+  'Ok' => 'OK',
 );

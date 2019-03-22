@@ -24,8 +24,15 @@ class StringUtil {
 	 * @param string
 	 */
 	public static function normalizeCrlf($text, $crlf = "\r\n") {
-		$text = str_replace("\r", "", $text);
-		return $crlf != "\n" ? str_replace("\n", $crlf, $text) : $text;
+		if(empty($text)) {
+			return $text;
+		}
+		
+		$normalized =  preg_replace('/\R/u', $crlf, $text);
+		if(empty($normalized)) {
+			throw new \Exception(array_flip(get_defined_constants(true)['pcre'])[preg_last_error()]);
+		}
+		return $normalized;
 	}
 	
 	

@@ -357,29 +357,24 @@ class ImapMessage extends ComposerMessage {
 
 			$this->_plainParts = $imap->find_body_parts($struct,'text', 'plain');
 			$this->_htmlParts = $imap->find_body_parts($struct,'text', 'html');
-
+			
 			if(!$hasAlternative && count($this->_htmlParts['parts']) && count($this->_plainParts['parts'])){
 				//this is not very neat but we found some text attachments as body parts. Let's correct that.
-
 				if($this->_plainParts['parts'][0]['number']>$this->_htmlParts['parts'][0]['number']){
 					$this->_plainParts=array('parts'=>array(), 'text_found'=>false);
-				}else
-				{
+				} else	{
 					$this->_htmlParts=array('parts'=>array(), 'text_found'=>false);
 				}
 			}
 
-
-			for($i=0,$max=count($this->_plainParts['parts']);$i<$max;$i++)
-			{				
+			for($i=0,$max=count($this->_plainParts['parts']);$i<$max;$i++){				
 				if(empty($this->_plainParts['parts'][$i]['charset']))
 					$this->_plainParts['parts'][$i]['charset']=$this->defaultCharset;
 
 				if($this->_plainParts['parts'][$i]['type']=='text')
 					$this->_bodyPartNumbers[]=$this->_plainParts['parts'][$i]['number'];
 			}
-			for($i=0,$max=count($this->_htmlParts['parts']);$i<$max;$i++)
-			{
+			for($i=0,$max=count($this->_htmlParts['parts']);$i<$max;$i++){
 				if(empty($this->_htmlParts['parts'][$i]['charset']))
 					$this->_htmlParts['parts'][$i]['charset']=$this->defaultCharset;
 
@@ -405,8 +400,7 @@ class ImapMessage extends ComposerMessage {
 	protected function getSeen(){
 		if(isset($this->attributes['seen'])){
 			return $this->attributes['seen'];
-		}else
-		{			
+		} else	{			
 			//when a message is retrieved from cache, we don't know if the seen flag has been changed.
 			//so when this is requested we fetch it from the IMAP server.
 			$imap = $this->getImapConnection();		
@@ -416,24 +410,15 @@ class ImapMessage extends ComposerMessage {
 			return $this->attributes['seen'];
 		}
 	}
-	
-//	private function _setSeen(){
-//		
-//		if(!$this->peek && empty($this->seen)){			
-//			$this->seen =true;
-//
-//			$this->getImapConnection()->set_message_flag(array($this->uid), "\Seen");
-//		}
-//	}
-	
-	public function getHtmlBody($asText=false,$noMaxBodySize=false){		
+
+	public function getHtmlBody($asText=false,$noMaxBodySize=false){				
 		if(!isset($this->_htmlBody)){
 			$imap = $this->getImapConnection();		
 			$this->_loadBodyParts();
 			
 			$this->_htmlBody='';
 			if($this->_htmlParts['text_found']){ //check if we found a html body
-				//\GO::debug($this->_htmlParts);
+//				\GO::debug($this->_htmlParts);
 				foreach($this->_htmlParts['parts'] as $htmlPart){
 					if($htmlPart['type']=='text'){
 
@@ -449,29 +434,23 @@ class ImapMessage extends ComposerMessage {
 						$this->_bodyTruncated = $imap->max_read;
 						
 						$this->_htmlBody .= $htmlPartStr;
-					}else //if($this->isAttachment($htmlPart['number']))
-					{
+					} else	{
 						$attachment = $this->getAttachment($htmlPart['number']);
-						if($attachment){
-							$attachment->content_id='go-autogen-'.$htmlPart['number'];
-							$this->_htmlBody .= '<img alt="'.$htmlPart['name'].'" src="cid:'.$attachment->content_id.'" style="display:block;margin:10px 0;" />';
+						
+						if(!$attachment){
+							continue;
 						}
+					
+						$attachment->content_id='go-autogen-'.$htmlPart['number'];
+						$this->_htmlBody .= $this->buildAttachmentHtml($attachment,$htmlPart);
 					}
-//					else
-//					{
-//						\GO::debug("Missing from attachments: ".$htmlPart['number']);	
-//					}
 				}
-				//$this->_htmlBody = \GO\Base\Util\StringHelper::sanitizeHtml($this->_htmlBody);			
 			}
 
 			if(empty($this->_htmlBody) && !$asText){
 				$this->_htmlBody = $this->getPlainBody(true,$noMaxBodySize);			
 			}
-		}else
-		{
-//			$this->_setSeen();
-		}		
+		}
 		
 		if($asText){
 			$htmlToText = new  \GO\Base\Util\Html2Text($this->_htmlBody);
@@ -480,6 +459,27 @@ class ImapMessage extends ComposerMessage {
 		
 		return $this->_htmlBody;
 	}
+	
+	/**
+	 * 
+	 * @param $attachment
+	 * @param [] $partInfo
+	 * 
+	 * @return string
+	 */
+	private function buildAttachmentHtml($attachment, $partInfo){
+		$html = '';
+
+		if($partInfo['type'] == 'image'){
+			$html .= '<img alt="'.htmlspecialchars($partInfo['name']).'" src="cid:'.$attachment->content_id.'" style="display:block;margin:10px 0;" />';
+		} else {
+			$html .= '<a alt="'.htmlspecialchars($partInfo['name']).'" href="cid:'.$attachment->content_id.'" style="display:block;margin:10px 0;">'.htmlspecialchars($partInfo['name']).'</a>';
+//			$html .= '<img alt="'.$htmlPart['name'].'" src="cid:'.$attachment->content_id.'" style="display:block;margin:10px 0;" />';
+		}
+	
+		return $html;
+	}
+	
 	
 	public function getPlainBody($asHtml=false,$noMaxBodySize=false){
 
@@ -502,31 +502,34 @@ class ImapMessage extends ComposerMessage {
 						$this->_plainBody .= $imap->get_message_part_decoded($this->uid, $plainPart['number'],$plainPart['encoding'], $plainPart['charset'],$this->peek, $maxBodySize);
 						$this->_bodyTruncated = $imap->max_read;
 						
-					}else
-					{
+					} else {
 						if($asHtml){
 							//we have to put in this tag and replace it after we convert the text to html. Otherwise this html get's convert into htmlspecialchars.
 							$this->_plainBody.='{inline_'.count($inlineImages).'}';
 							
 							$attachment = $this->getAttachment($plainPart['number']);
-							if($attachment){
-								$attachment->content_id='go-autogen-'.$plainPart['number'];
-								$inlineImages[]='<img alt="'.$plainPart['name'].'" src="cid:'.$attachment->content_id.'" style="display:block;margin:10px 0;" />';
+							
+							if(!$attachment){
+								continue;
 							}
+		
+							$attachment->content_id='go-autogen-'.$plainPart['number'];
+							$inlineImages[]=$this->buildAttachmentHtml($attachment,$plainPart);
 						}
 					}
 				}
 			}
-		}else
-		{
+		} else {
 			foreach($this->_plainParts['parts'] as $plainPart){
 				if($plainPart['type']!='text'){					
 					if($asHtml){					
 						$attachment = $this->getAttachment($plainPart['number']);
-						if($attachment){
-							$attachment->content_id='go-autogen-'.$plainPart['number'];
-							$inlineImages[]='<img alt="'.$plainPart['name'].'" src="cid:'.$attachment->content_id.'" style="display:block;margin:10px 0;" />';
+						if(!$attachment){
+							continue;
 						}
+
+						$attachment->content_id='go-autogen-'.$plainPart['number'];
+						$inlineImages[]=$this->buildAttachmentHtml($attachment,$plainPart);
 					}
 				}
 			}
@@ -543,14 +546,11 @@ class ImapMessage extends ComposerMessage {
 			for($i=0,$max=count($inlineImages);$i<$max;$i++){
 				$body=str_replace('{inline_'.$i.'}', $inlineImages[$i], $body);
 			}
-			
 			return $body;
-		}else
-		{
+		} else {
 			if(empty($this->_plainBody)){
 				return $this->getHtmlBody(true,$noMaxBodySize);
-			}else
-			{				
+			} else {				
 				return $this->_plainBody;
 			}
 		}
@@ -609,11 +609,11 @@ class ImapMessage extends ComposerMessage {
 						}
 					}
 				} else {
-					$a->name = \GO\Base\Mail\Utils::mimeHeaderDecode($part['name']);
+					$a->name = \GO\Base\Fs\File::stripInvalidChars(\GO\Base\Mail\Utils::mimeHeaderDecode($part['name']));
 					
 					$extension = \GO\Base\Fs\File::getExtension($a->name);
 					if(!empty($part['filename']) && empty($extension)){
-						$a->name = \GO\Base\Mail\Utils::mimeHeaderDecode($part['filename']);
+						$a->name = \GO\Base\Fs\File::stripInvalidChars(\GO\Base\Mail\Utils::mimeHeaderDecode($part['filename']));
 					}
 				}
 				
@@ -672,39 +672,6 @@ class ImapMessage extends ComposerMessage {
 		
 		return \GO::url('email/message/zipAllAttachments', $params);
 	}
-//	
-//	protected function getAttachmentUrl($attachment) {
-//		
-//		if(!empty($attachment['tmp_file']))
-//			return \GO::url('core/downloadTempFile', array('path'=>$attachment['tmp_file']));
-//		
-////		$mime = explode('/',$attachment['mime']);
-////		
-////		return  \GO::config()->host."modules/email/attachment.php?".
-////			"account_id=".$this->account->id.
-////			"&amp;mailbox=".urlencode($this->mailbox).
-////			"&amp;uid=".$this->uid.
-////			"&amp;imap_id=".$attachment["number"].
-////			"&amp;encoding=".$attachment["encoding"].
-////			"&amp;type=".$mime[0].
-////			"&amp;subtype=".$mime[1].
-////			"&amp;filename=".urlencode($attachment["name"]);
-//		
-//		
-//		$params = array(
-//				"account_id"=>$this->account->id,
-//				"mailbox"=>$this->mailbox,
-//				"uid"=>$this->uid,
-//				"number"=>$attachment['number'],				
-//				"encoding"=>$attachment['encoding'],				
-//				"filename"=>$attachment['name']
-//		);
-//		
-//		return \GO::url('email/message/attachment', $params);
-//	}
-//	
-	
-	
 	
 	/**
 	 * Get the source of this message
@@ -724,7 +691,6 @@ class ImapMessage extends ComposerMessage {
 	 */
 	public function getInvitationVcalendar(){
 
-		
 		$attachments = $this->getAttachments();
 			
 		foreach($attachments as $attachment){			

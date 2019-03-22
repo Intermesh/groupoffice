@@ -19,4 +19,6 @@ return array (
   'description' => 'Descrizione del sito web.',
   'Bookmarks' => 'Segnalibri',
   'Logo' => 'Logo',
+  'items' => 'elementi',
+  'item' => 'elemento',
 );

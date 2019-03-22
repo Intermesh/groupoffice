@@ -562,6 +562,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 										this.data.contact_linked_message_id = result.linked_email_id;
 									}
 									this.getEl().unmask();
+									this.reload();
 								},
 								scope:this
 							});
@@ -580,6 +581,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 										this.data.company_linked_message_id = result.linked_email_id;
 									}
 									this.getEl().unmask();
+									this.reload();
 								},
 								scope:this
 							});

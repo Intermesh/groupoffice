@@ -23,4 +23,5 @@ return array (
   'Logo' => 'Logo',
   'items' => 'položky',
   'item' => 'položka',
+  'Ok' => 'OK',
 );
