@@ -51,35 +51,42 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	
 	initState : function(cb) {
 		
-//		if(!go.User.loaded) {
-//			go.User.on("load", function(){
-//				this.initState(cb);
-//			}, this, {single: true});
-//			return;
-//		}
-
-		if(this.initialized) {
-			cb.call(this);
-			return;
-		}
-		this.stateStore = localforage.createInstance({
-			name: "groupoffice",
-			storeName: this.entity.name + "-entities"
-		});
-		
-		this.metaStore = localforage.createInstance({
-			name: "groupoffice",
-			storeName: this.entity.name + "-meta"
-		});
-
 		var me = this;
-		this.metaStore.getItems(["notfound", "state", "isComplete"], function(err, r) {
-			me.notFound = r.notFound || [];
-			me.state = r.state;
-			me.isComplete = r.isComplete;
-			me.initialized = true;
-			
-			cb.call(me, this);
+		
+		return new Promise(function(resolve, reject) {
+			if(me.initialized) {
+				if(cb) {
+					cb.call(me);
+					resolve();
+					return;
+				}
+			}
+			me.stateStore = localforage.createInstance({
+				name: "groupoffice",
+				storeName: me.entity.name + "-entities"
+			});
+
+			me.metaStore = localforage.createInstance({
+				name: "groupoffice",
+				storeName: me.entity.name + "-meta"
+			});
+
+			me.metaStore.getItems(["notfound", "state", "isComplete"], function(err, r) {
+
+				if(err) {
+					reject(err);
+				}				
+
+				me.notFound = r.notFound || [];
+				me.state = r.state;
+				me.isComplete = r.isComplete;
+				me.initialized = true;
+
+				if(cb) {
+					cb.call(me);
+				}
+				resolve();
+			});
 		});
 		
 	},
@@ -347,6 +354,77 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			}
 		});
 	},
+	
+	
+	_getAlreadyLoaded : function(ids, entities, unknownIds) {		
+		for (var i = 0, l = ids.length; i < l; i++) {
+			var id = ids[i];
+			if(!id) {
+				throw "Empty ID passed to EntityStore.get()";
+			}
+			if(this.data[id]) {
+				entities.push(this.data[id]);
+			} else if(this.notFound.indexOf(id) > -1) {
+				//entities.push(null);
+				//notFoundIds.push(id);
+				console.warn("Not fetching " + this.entity.name + " (" + id + ") because it was not found in an earlier attempt");
+			} else
+			{
+				unknownIds.push(id);
+			}			
+		}
+	},
+	
+	_getFromBrowserStorage : function(unknownIds) {
+		var me = this;
+		return me.initState().then(function() {
+
+			//convert ID's to string because indexed db doesn't like int's
+			return me.stateStore.getItems(unknownIds.map(function(id) { return id + "";} )).then(function(entities) {
+				unknownIds = unknownIds.filter(function(id){
+					return !entities[id];
+				});
+
+				for(var key in entities) {					
+					if(entities[key]) {
+						me.data[entities[key].id] = entities[key];
+					}
+				}		
+				
+				return unknownIds;
+			});
+		});
+
+	},
+	
+	_getFromServer : function(unknownIds) {
+		
+		var me = this;
+		
+		return new Promise(function(resolve, reject) {
+			go.Jmap.request({
+				method: me.entity.name + "/get",
+				params: {
+					ids: unknownIds
+				},
+				callback: function (options, success, response) {
+					if(!success) {
+						reject();
+						return;
+					}
+
+					if(!go.util.empty(response.notFound)) {
+						me.notFound = me.notFound.concat(response.notFound);
+						me.metaStore.setItem("notfound", me.notFound);								
+						console.warn("Item not found", response);						
+					}
+
+					resolve();
+				},
+				scope: me
+			});
+		});
+	},
 
 	/**
 	 * Get entities
@@ -359,8 +437,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	 */
 	get: function (ids, cb, scope) {
 		
-		var me = this;
-	
+		var me = this;	
 		
 		return new Promise(function(resolve, reject) {
 		
@@ -374,74 +451,27 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 			if(!Ext.isArray(ids)) {
 				throw "ids must be an array";
-			}		
-
-
-			var entities = [], unknownIds = [], notFoundIds = [];
-
-			for (var i = 0, l = ids.length; i < l; i++) {
-				var id = ids[i];
-				if(!id) {
-					throw "Empty ID passed to EntityStore.get()";
-				}
-				if(me.data[id]) {
-					entities.push(me.data[id]);
-				} else if(me.notFound.indexOf(id) > -1) {
-					//entities.push(null);
-					//notFoundIds.push(id);
-					console.warn("Not fetching " + me.entity.name + " (" + id + ") because it was not found in an earlier attempt");
-				} else
-				{
-					unknownIds.push(id);
-				}			
 			}
 
-			if (unknownIds.length) {		
-				me.initState(function() {
+			var entities = [], unknownIds = [];
+			
+			me._getAlreadyLoaded(ids, entities, unknownIds);
 
-					//convert ID's to string because indexed db doesn't like int's
-					me.stateStore.getItems(unknownIds.map(function(id) { return id + "";} ), function(err,entities) {
-						unknownIds = unknownIds.filter(function(id){
-							return !entities[id];
+			if (unknownIds.length) {
+				return me._getFromBrowserStorage(unknownIds).then(function(unknownIds) {
+					if(!unknownIds.length) {
+						return me.get(ids, cb, scope);					
+					} else
+					{
+						return me._getFromServer(unknownIds).then(function() {
+							return me.get(ids, cb, scope);					
 						});
-
-						for(var key in entities) {					
-							if(entities[key]) {
-								me.data[entities[key].id] = entities[key];
-							}
-						}
-
-
-						if(!unknownIds.length) {
-							me.get(ids, cb, scope);					
-							return;
-						}
-
-						go.Jmap.request({
-							method: me.entity.name + "/get",
-							params: {
-								ids: unknownIds
-							},
-							callback: function (options, success, response) {
-								if(!success) {
-									reject();
-									return;
-								}
-
-								if(!go.util.empty(response.notFound)) {
-									me.notFound = me.notFound.concat(response.notFound);
-									me.metaStore.setItem("notfound", me.notFound);								
-									console.warn("Item not found", response);						
-								}
-								me.get(ids, cb, scope);
-							},
-							scope: me
-						});
-					}.createDelegate(me));
-				});
-
-				return;			
-			}	
+					}
+				}).catch(function(err) {
+					reject(err);					
+				});				
+			}			
+			
 			
 			var notFoundIds = me.notFound.filter(function(i) {			
 				return ids.indexOf(i) > -1;	
