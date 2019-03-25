@@ -151,7 +151,7 @@ class Mailbox extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	public function cacheUsage(){		
-		$this->usage = $this->enabled ? $this->getUsageFromDovecot() : false;
+		$this->usage = $this->active ? $this->getUsageFromDovecot() : false;
 		
 		if($this->usage === false) {
 			$this->usage = $this->getMaildirFolder()->calculateSize()/1024;
