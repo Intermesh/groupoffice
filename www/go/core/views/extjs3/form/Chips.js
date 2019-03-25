@@ -168,14 +168,15 @@ go.form.Chips = Ext.extend(Ext.Container, {
 		}
 		
 		if(this.entityStore){
+			var baseParams = this.storeBaseParams || {filter : {}};
+			if(!baseParams.filter) {
+				baseParams.filter = {};				
+			}
+			baseParams.filter.exclude = [];
 			this.comboStore = new go.data.Store({
 				fields: [this.valueField, this.displayField],
 				entityStore: this.entityStore,
-				baseParams: {
-					filter: {
-						exclude: []
-					}
-				}
+				baseParams: baseParams
 			});
 		} else
 		{
