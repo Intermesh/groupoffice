@@ -192,7 +192,7 @@ Ext.override(Ext.form.BasicForm,{
 					return true;
 				}
 
-				if(f.submit === false) {
+				if(f.submit === false || f.disabled === true) {
 					return true;
 				}
 
