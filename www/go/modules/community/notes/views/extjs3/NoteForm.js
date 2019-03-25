@@ -9,7 +9,7 @@ go.modules.community.notes.NoteForm = Ext.extend(go.form.Dialog, {
 	
 	initFormItems: function () {
 		
-		var formFieldSets = go.customfields.CustomFields.getFormFieldSets("Note"),
+	var formFieldSets = go.customfields.CustomFields.getFormFieldSets("Note").filter(function(fs) {return !fs.fieldSet.isTab;}),
 			 fieldSetAnchor = formFieldSets.length ? '100% 80%' : '100% 100%';
 		
 		var items = [{
@@ -32,7 +32,7 @@ go.modules.community.notes.NoteForm = Ext.extend(go.form.Dialog, {
 						allowBlank: false
 					}]
 			}
-		].concat(formFieldSets);
+		];
 
 		return items;
 	}
