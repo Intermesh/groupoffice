@@ -121,7 +121,8 @@ CREATE TABLE `core_customfields_field_set` (
   `name` varchar(50) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `sortOrder` tinyint(4) NOT NULL DEFAULT 0,
-  `filter` text DEFAULT NULL
+  `filter` text DEFAULT NULL,
+	`isTab` BOOLEAN NOT NULL DEFAULT FALSE
 ) ENGINE=InnoDB;
 
 CREATE TABLE `core_customfields_select_option` (

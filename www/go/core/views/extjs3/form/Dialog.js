@@ -22,7 +22,11 @@ go.form.Dialog = Ext.extend(go.Window, {
 	 */
 	redirectOnSave: true,
 	
+	panels : null,
+	
 	initComponent: function () {
+
+		this.panels = [];
 
 		this.formPanel = this.createFormPanel();
 		
@@ -74,13 +78,78 @@ go.form.Dialog = Ext.extend(go.Window, {
 		this.addEvents({load: true, submit: true});
 	},
 	
-	createFormPanel : function(){
+	createFormPanel : function() {
+		
+		var items = this.initFormItems() || [];
+		var layout = 'form';
+		
+		this.addCustomFields(items);
+		
+		var count = this.panels.length;
+		
+		//if items is defined then a panel will be inserted in createTabPanel()
+		if(items.length) {
+			count++;
+		}
+		
+		if(count > 1) {
+			var layout = 'fit';
+			items = [this.createTabPanel(items)];
+		}
+		
 		return new go.form.EntityPanel({
 			entityStore: this.entityStore,
-			items: this.initFormItems()
+			items: items,
+			layout: layout
 		});
 	},
 	
+	addCustomFields : function(items) {
+		if(go.Entities.get(this.entityStore).customFields) {
+			var fieldsets = go.customfields.CustomFields.getFormFieldSets(this.entityStore);
+			fieldsets.forEach(function(fs) {
+				//console.log(fs);
+				if(fs.fieldSet.isTab) {
+					fs.title = null;
+					fs.collapsible = false;
+					var pnl = new Ext.Panel({
+						autoScroll: true,
+						title: fs.fieldSet.name,
+						items: [fs]
+					});
+					this.addPanel(pnl);
+				}else
+				{
+					items.push(fs);
+				}
+			}, this);
+		}
+	},
+	
+	createTabPanel : function(items) {
+		
+		if(items) {
+			this.panels.unshift(new Ext.Panel({
+				title: t("General"),
+				layout: 'form',
+				autoScroll: true,
+				items: items
+			}));
+		}
+		
+		this.tabPanel = new Ext.TabPanel({
+			activeTab: 0,
+			enableTabScroll:true,
+			items: this.panels
+		});
+		
+		
+		return this.tabPanel;
+	},
+	
+	addPanel: function(panel) {
+		this.panels.push(panel);
+	},	
 
 	addCreateLinkButton : function() {
 		

@@ -15,8 +15,6 @@
 
 go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 
-	autoHeight: true,
-
 	entity: null,
 
 	createFieldSetDialog: function () {

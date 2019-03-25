@@ -42,6 +42,8 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		config = config || {};
 		config.root = "records";
 		
+		this.addCustomFields(config);
+		
 		go.data.Store.superclass.constructor.call(this, Ext.applyIf(config, {
 			idProperty:  "id",
 			paramNames: {
@@ -65,6 +67,12 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		
 		//JMAP remote filters. Used by setFilter()
 		this.filters = {};
+	},
+	
+	addCustomFields : function(config) {
+		if(config.entityStore && go.Entities.get(config.entityStore).customFields) {
+			config.fields = config.fields.concat(go.customfields.CustomFields.getFieldDefinitions(config.entityStore))
+		}
 	},
 	
 	loadData : function(o, append){

@@ -7,15 +7,20 @@
  * 2. Added a "navigate" (grid, rowIndex, record) event that can be used to navigate the router.
  * 3. When using a go.data.Store with entityStore it will auto load more results when scrolling.
  * 4. A delete function is added and mapped to the delete keyboard key.
+ * 5. When using "columns" to define the colModel custom fields will be added automatically.
  * 
  */
 
 go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {	
 
 	initComponent: function () {
-		go.grid.GridPanel.superclass.initComponent.call(this);
 		
 		Ext.applyIf(this, go.grid.GridTrait);
+		this.initCustomFields();
+		
+		go.grid.GridPanel.superclass.initComponent.call(this);
+		
+		
 		this.initGridTrait();
 		Ext.applyIf(this, go.panels.ScrollLoader);
 		this.initScrollLoader();

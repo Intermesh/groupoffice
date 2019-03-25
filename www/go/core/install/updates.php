@@ -428,3 +428,6 @@ $updates['201903151726'][] = "ALTER TABLE `core_entity_filter`
 $updates['201903151726'][] = "ALTER TABLE `core_entity_filter`
   ADD CONSTRAINT `core_entity_filter_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`),
   ADD CONSTRAINT `core_entity_filter_ibfk_2` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;";
+
+
+$updates['201903221350'][] = "ALTER TABLE `core_customfields_field_set` ADD `isTab` BOOLEAN NOT NULL DEFAULT FALSE AFTER `filter`;";

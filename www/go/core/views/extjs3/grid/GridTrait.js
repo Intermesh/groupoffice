@@ -21,6 +21,14 @@ go.grid.GridTrait = {
 
 	},
 	
+	initCustomFields : function() {
+		if(!this.columns || !this.store || !this.store.entityStore || !this.store.entityStore.entity.customFields) {
+			return;
+		}		
+		
+		this.columns = this.columns.concat(go.customfields.CustomFields.getColumns(this.store.entityStore.entity.name))
+	},
+	
 	//The navigate can be used in modules to track row selections for navigation.
 	//It buffers keyboard actions and it doesn't fire when ctrl or shift is used for multiselection
 	initNav : function() {

@@ -34,6 +34,13 @@ class FieldSet extends AclOwnerEntity {
 	protected $filter;	
 	
 	/**
+	 * Show this fieldset as a tab in clients
+	 * 
+	 * @var bool 
+	 */
+	public $isTab = false;
+	
+	/**
 	 * The filter is an object that can be used to show and hide field sets based
 	 * on the entity values.
 	 * 
