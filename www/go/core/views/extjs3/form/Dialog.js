@@ -114,6 +114,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 					fs.collapsible = false;
 					var pnl = new Ext.Panel({
 						autoScroll: true,
+						hideMode: 'offsets', //Other wise some form elements like date pickers render incorrectly.
 						title: fs.fieldSet.name,
 						items: [fs]
 					});
@@ -140,6 +141,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 		this.tabPanel = new Ext.TabPanel({
 			activeTab: 0,
 			enableTabScroll:true,
+			deferredRender: false,//required for custom fields tabs filtering
 			items: this.panels
 		});
 		

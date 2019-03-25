@@ -28,6 +28,8 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			//find entity panel
 			var form = this.findParentByType("form");
 			
+			this.formTabPanel = this.findParentByType('tabpanel');
+			
 			if(!form) {
 				console.error("No go.form.EntityPanel found for filtering");
 				return;
@@ -89,19 +91,35 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 
 			if (Ext.isArray(v)) {
 				if (v.indexOfLoose(entity[name]) === -1) {
-					this.setVisible(false);
+					this.setFilterVisible(false);
 					return;
 				}
 			} else
 			{
 				if (v != entity[name]) {
-					this.setVisible(false);
+					this.setFilterVisible(false);
 					return;
 				}
 			}
 		}		
-		this.setVisible(true);
+		this.setFilterVisible(true);
+	},
+	
+	setFilterVisible : function(v) {
+		
+		this.setVisible(v);
+		
+		if(this.formTabPanel && this.fieldSet.isTab) {
+			if(v) {
+				this.formTabPanel.unhideTabStripItem(this.ownerCt);
+			} else
+			{
+				this.formTabPanel.hideTabStripItem(this.ownerCt);
+			}
+		}
 	}
 });
+	
+	
 
 Ext.reg("customformfieldset", go.customfields.FormFieldSet);
