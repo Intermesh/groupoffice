@@ -405,11 +405,6 @@ class ImapMailbox extends \GO\Base\Model {
 	 * @return boolean
 	 */
 	public function isVisible(){
-		$imap = $this->getAccount()->openImapConnection();
-		if ($imap->has_capability("LIST-EXTENDED")) {
-			return $this->subscribed;
-		} else {
-			return $this->subscribed ||  $this->getHasChildren(true);
-		}
+		return $this->subscribed ||  $this->getHasChildren(true);
 	}
 }
