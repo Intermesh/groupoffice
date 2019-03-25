@@ -98,6 +98,10 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		this.doLayout();
 		this.body.scrollTo('top', 0);		
 	},
+	
+	resolve : function() {
+		return null;
+	},
 
 	reload: function () {
 		this.load(this.currentId);
@@ -108,9 +112,22 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			this.getTopToolbar().setDisabled(false);
 		}
 		this.data = data;
-		this.onLoad();				
-
-		this.fireEvent('load', this);
+		
+		var promises = this.resolve();
+		if(!promises) {
+			this.onLoad();
+			this.fireEvent('load', this);
+			return;
+		}
+		
+		var me = this;
+		Promise.all(promises).then(function() {		
+			me.onLoad();
+			me.fireEvent('load', me);
+		}).catch(function(result) {
+			throw result;
+		});
+		
 	},
 
 	load: function (id) {

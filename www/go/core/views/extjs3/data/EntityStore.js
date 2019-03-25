@@ -359,88 +359,99 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	 */
 	get: function (ids, cb, scope) {
 		
-		if(go.util.empty(ids)) {
-			if(cb) {		
-				cb.call(scope || this, [], this);			
+		var me = this;
+	
+		
+		return new Promise(function(resolve, reject) {
+		
+			if(go.util.empty(ids)) {
+				if(cb) {		
+					cb.call(scope || me, [], me);			
+				}
+				resolve([], []);
+				return;
 			}
-			return;
-		}
-		
-		if(!Ext.isArray(ids)) {
-			throw "ids must be an array";
-		}		
-		
-		
-		var entities = [], unknownIds = [], notFoundIds = [];
 
-		for (var i = 0, l = ids.length; i < l; i++) {
-			var id = ids[i];
-			if(!id) {
-				throw "Empty ID passed to EntityStore.get()";
+			if(!Ext.isArray(ids)) {
+				throw "ids must be an array";
+			}		
+
+
+			var entities = [], unknownIds = [], notFoundIds = [];
+
+			for (var i = 0, l = ids.length; i < l; i++) {
+				var id = ids[i];
+				if(!id) {
+					throw "Empty ID passed to EntityStore.get()";
+				}
+				if(me.data[id]) {
+					entities.push(me.data[id]);
+				} else if(me.notFound.indexOf(id) > -1) {
+					//entities.push(null);
+					//notFoundIds.push(id);
+					console.warn("Not fetching " + me.entity.name + " (" + id + ") because it was not found in an earlier attempt");
+				} else
+				{
+					unknownIds.push(id);
+				}			
 			}
-			if(this.data[id]) {
-				entities.push(this.data[id]);
-			} else if(this.notFound.indexOf(id) > -1) {
-				//entities.push(null);
-				//notFoundIds.push(id);
-				console.warn("Not fetching " + this.entity.name + " (" + id + ") because it was not found in an earlier attempt");
-			} else
-			{
-				unknownIds.push(id);
-			}			
-		}
-		
-		if (unknownIds.length) {		
-			this.initState(function() {
 
-				//convert ID's to string because indexed db doesn't like int's
-				this.stateStore.getItems(unknownIds.map(function(id) { return id + "";} ), function(err,entities) {
-					unknownIds = unknownIds.filter(function(id){
-						return !entities[id];
-					});
+			if (unknownIds.length) {		
+				me.initState(function() {
 
-					for(var key in entities) {					
-						if(entities[key]) {
-							this.data[entities[key].id] = entities[key];
+					//convert ID's to string because indexed db doesn't like int's
+					me.stateStore.getItems(unknownIds.map(function(id) { return id + "";} ), function(err,entities) {
+						unknownIds = unknownIds.filter(function(id){
+							return !entities[id];
+						});
+
+						for(var key in entities) {					
+							if(entities[key]) {
+								me.data[entities[key].id] = entities[key];
+							}
 						}
-					}
 
 
-					if(!unknownIds.length) {
-						return this.get(ids, cb, scope);					
-					}
+						if(!unknownIds.length) {
+							me.get(ids, cb, scope);					
+							return;
+						}
 
-					go.Jmap.request({
-						method: this.entity.name + "/get",
-						params: {
-							ids: unknownIds
-						},
-						callback: function (options, success, response) {
-							if(!success) {
-								return;
-							}
+						go.Jmap.request({
+							method: me.entity.name + "/get",
+							params: {
+								ids: unknownIds
+							},
+							callback: function (options, success, response) {
+								if(!success) {
+									reject();
+									return;
+								}
 
-							if(!go.util.empty(response.notFound)) {
-								this.notFound = this.notFound.concat(response.notFound);
-								this.metaStore.setItem("notfound", this.notFound);								
-								console.warn("Item not found", response);						
-							}
-							this.get(ids, cb, scope);
-						},
-						scope: this
-					});
-				}.createDelegate(this));
-			});
+								if(!go.util.empty(response.notFound)) {
+									me.notFound = me.notFound.concat(response.notFound);
+									me.metaStore.setItem("notfound", me.notFound);								
+									console.warn("Item not found", response);						
+								}
+								me.get(ids, cb, scope);
+							},
+							scope: me
+						});
+					}.createDelegate(me));
+				});
+
+				return;			
+			}	
 			
-			return;			
-		}	
-		
-		if(cb) {		
-			var notFoundIds = this.notFound.filter(function(i) {			
+			var notFoundIds = me.notFound.filter(function(i) {			
 				return ids.indexOf(i) > -1;	
 			});
-			cb.call(scope || this, entities, notFoundIds);
-		}
+
+			if(cb) {				
+				cb.call(scope || me, entities, notFoundIds);				
+			}
+			resolve(entities, notFoundIds);
+		});
 		
 	},
 	
