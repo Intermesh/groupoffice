@@ -97,6 +97,21 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 		this.loadModulePanels();
 		
+		var customFieldSets = go.customfields.CustomFields.getFormFieldSets("User").filter(function(fs){return fs.fieldSet.isTab;})
+		customFieldSets.forEach(function(fs){
+			fs.title = null;
+			fs.collapsible = false;
+			var pnl = new Ext.Panel({
+				autoScroll: true,
+				hideMode: 'offsets', //Other wise some form elements like date pickers render incorrectly.
+				title: fs.fieldSet.name,
+				items: [fs],
+				iconCls: 'ic-description'
+			});
+			this._addPanelCmp(pnl);
+		}, this);
+		
+		
 		go.usersettings.UserSettingsDialog.superclass.initComponent.call(this);
 		
 		// When the form is loaded, reset the 'modified' state to NOT modified.
@@ -421,7 +436,11 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 
 		
 		var pnl = new panelClass(cfg);
+		this._addPanelCmp(pnl, position);
 		
+	},
+	
+	_addPanelCmp : function(pnl, position) {
 		var menuRec = new Ext.data.Record({
 			name :pnl.title,
 			iconCls: pnl.iconCls //.substr(3).replace(/-/g,'_')

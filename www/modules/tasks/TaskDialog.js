@@ -421,7 +421,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 				preventScrollbars: true
 			});
 			
-		propertiesPanel.add(go.customfields.CustomFields.getFormFieldSets("Task"));
+	
 		
 		// Start of recurrence tab
 		this.recurrencePanel = new go.form.RecurrenceFieldset();
@@ -480,6 +480,25 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 			hideLabel : true,
 			items : items
 		});
+		
+		
+		go.customfields.CustomFields.getFormFieldSets("Task").forEach(function(fs) {
+			//console.log(fs);
+			if(fs.fieldSet.isTab) {
+				fs.title = null;
+				fs.collapsible = false;
+				var pnl = new Ext.Panel({
+					autoScroll: true,
+					hideMode: 'offsets', //Other wise some form elements like date pickers render incorrectly.
+					title: fs.fieldSet.name,
+					items: [fs]
+				});
+				this.tabPanel.add(pnl);
+			}else
+			{			
+				propertiesPanel.add(fs);
+			}
+		}, this);
 
 		var formPanel = this.formPanel = new Ext.form.FormPanel({
 			waitMsgTarget : true,

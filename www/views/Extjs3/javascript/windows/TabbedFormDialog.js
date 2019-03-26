@@ -322,9 +322,29 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 	},
 
 	addCustomFields : function(){
-		
-		if(this.customFieldType) {
-			this._panels[0].add(go.customfields.CustomFields.getFormFieldSets(this.customFieldType))
+		if(!this.customFieldType) {
+			return;
+		}
+	
+		if(go.Entities.get(this.customFieldType).customFields) {
+			var fieldsets = go.customfields.CustomFields.getFormFieldSets(this.customFieldType);
+			fieldsets.forEach(function(fs) {
+				//console.log(fs);
+				if(fs.fieldSet.isTab) {
+					fs.title = null;
+					fs.collapsible = false;
+					var pnl = new Ext.Panel({
+						autoScroll: true,
+						hideMode: 'offsets', //Other wise some form elements like date pickers render incorrectly.
+						title: fs.fieldSet.name,
+						items: [fs]
+					});
+					this.addPanel(pnl);
+				}else
+				{			
+					this._panels[0].add(fs);
+				}
+			}, this);
 		}
 
 	},
