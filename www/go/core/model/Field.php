@@ -249,7 +249,21 @@ class Field extends AclItemEntity {
 		if(!parent::internalSave()) {
 			return false;
 		}
-		return $this->getDataType()->onFieldSave();
+		
+		try {
+			$this->getDataType()->onFieldSave();
+		} catch(\Exception $e) {
+			GO()->warn($e);
+			
+			if($this->isNew()) {
+				parent::internalDelete();
+				$this->setValidationError('id', \go\core\validate\ErrorCode::GENERAL, $e->getMessage());
+			}
+			
+			return false;
+		}
+		
+		return true;
 	}
 
 	protected function internalDelete() {
