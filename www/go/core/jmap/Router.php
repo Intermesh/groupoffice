@@ -22,6 +22,8 @@ use JsonSerializable;
  * 
  * community/notes/Note/get
  * 
+ * core/Notify/mail
+ * 
  * http://jmap.io/spec-core.html#making-an-api-request
  */
 class Router {
