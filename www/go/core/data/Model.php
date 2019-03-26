@@ -73,6 +73,56 @@ abstract class Model implements ArrayableInterface, \JsonSerializable {
 
 		return $arr;
 	}
+	
+	/**
+	 * Get the readable property names as array
+	 * 
+	 * @return string[]
+	 */
+	protected static function getWritableProperties() {
+
+		$cacheKey = 'getWritableProperties-' . str_replace('\\', '-', static::class);
+		
+		$ret = App::get()->getCache()->get($cacheKey);
+		if ($ret) {
+			return $ret;
+		}
+
+		$arr = [];
+		$reflectionObject = new ReflectionClass(static::class);
+		$methods = $reflectionObject->getMethods(ReflectionMethod::IS_PUBLIC);
+
+		foreach ($methods as $method) {
+			/* @var $method ReflectionMethod */
+
+			if ($method->isStatic()) {
+				continue;
+			}
+
+			$params = $method->getParameters();
+			foreach ($params as $p) {
+				/* @var $p ReflectionParameter */
+				if (!$p->isDefaultValueAvailable()) {
+					continue 2;
+				}
+			}
+			if (substr($method->getName(), 0, 3) == 'set') {
+				$arr[] = lcfirst(substr($method->getName(), 3));
+			}
+		}
+
+		$props = $reflectionObject->getProperties(ReflectionProperty::IS_PUBLIC);
+
+		foreach ($props as $prop) {
+			if (!$prop->isStatic()) {
+				$arr[] = $prop->getName();
+			}
+		}
+		
+		App::get()->getCache()->set($cacheKey, $arr);
+
+		return $arr;
+	}
 
 	
 	
@@ -176,7 +226,7 @@ abstract class Model implements ArrayableInterface, \JsonSerializable {
 			return $this->$getter();
 		}else
 		{
-			throw new Exception("Can't get not existing property '$name' in '".static::class."'");			
+			throw new Exception("Can't get not existing property '$name' in '".static::class."'. Available properties: ". implode(', ', $this->getReadableProperties()));
 		}
 	}		
 	
@@ -233,7 +283,7 @@ abstract class Model implements ArrayableInterface, \JsonSerializable {
 				//for performance reasons we simply ignore it.
 				App::get()->getDebugger()->debug("Discarding read only property '$name' in '".static::class."'");
 			}else {
-				$errorMsg = "Can't set not existing property '$name' in '".static::class."'";
+				$errorMsg = "Can't set not existing property '$name' in '".static::class."'. Available properties: ". implode(', ', $this->getWritableProperties());
 				throw new Exception($errorMsg);
 			}						
 		}
