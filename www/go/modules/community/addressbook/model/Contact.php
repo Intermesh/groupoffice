@@ -468,6 +468,10 @@ class Contact extends AclItemEntity {
 			$this->setNameFromParts();
 		}		
 		
+		if($this->isNew() && !isset($this->addressBookId)) {
+			$this->addressBookId = GO()->getAuthState()->getUser()->addressBookSettings->defaultAddressBookId;
+		}
+		
 		if($this->isModified('addressBookId') || $this->isModified('groups')) {
 			//verify groups and address book match
 			
