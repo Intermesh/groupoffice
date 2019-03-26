@@ -397,7 +397,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				throw "Empty ID passed to EntityStore.get()";
 			}
 			if(this.data[id]) {
-				entities.push(this.data[id]);
+				entities.push(Object.assign({},this.data[id]));
 			} else if(this.notFound.indexOf(id) > -1) {
 				//entities.push(null);
 				//notFoundIds.push(id);
