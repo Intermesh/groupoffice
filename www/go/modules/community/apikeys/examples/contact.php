@@ -1,6 +1,9 @@
 <?php
 //This example creates a contact on a Group-Office installation and sends
-//An email to notify the system admin.
+//an email to notify the system admin.
+
+//NOTE: A custom field 'newsletter' of type checkbox is used in this example. So
+//create that for testing.
 
 //Adjust these variables for your installation
 $apiKey = "5c9a88c3a81c66f19e39c2753a3d69c24850aa18f64b3";
@@ -35,6 +38,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 					'country' => $_POST['country']
 			]
 		];
+	
+	//Create custom field 'subscribe' to use this.
+	$contact['customFields']['newsletter'] = isset($_POST['subscribe']);
 
 	//Create JMAP request body
 	$data = [
@@ -83,7 +89,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 //	echo "</pre>";
 
 	//check for API error. More details on http://jmap.io
-	if (!empty($responses[0][1]['notCreated'])) {
+	if(isset($responses[0][1][0]) && $responses[0][1][0] == "error") {
+		$error = "Error: " . $responses[0][1][1]['message'];
+	} else	if (!empty($responses[0][1]['notCreated'])) {
 		$error = "Error: " . var_export($responses[0][1]['notCreated']['contact-1']['validationErrors'], true);
 	} else
 	{
@@ -101,8 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-		<!--<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>-->
-  </head>
+	 </head>
   <body class="bg-light">
     <div class="container">
   <div class="py-5 text-center">
@@ -202,6 +209,12 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
           </div>
         </div>
         <hr class="mb-4">
+				
+				<div class="form-check">
+					<input type="checkbox" class="form-check-input" id="exampleCheck1" name="subscribe" value="1">
+					<label class="form-check-label" for="exampleCheck1">Subscribe to newsletter</label>
+				</div>
+				<hr class="mb-4">
         
         <button class="btn btn-primary btn-lg btn-block" type="submit">Submit</button>
       </form>
@@ -218,6 +231,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   </footer>
 </div>
 
+	
 
 </body>
 </html>
