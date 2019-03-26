@@ -255,7 +255,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 		var v = this.triggerField.getValue(), filters = null;
 		this.resetButton.setDisabled(GO.util.empty(v));
 		
-		if(this.store.entityStore) {
+		if(this.store &&this.store.entityStore) {
 			filters = go.util.Filters.parseQueryString(v, this.store.entityStore.entity.filters);	
 		}
 		
