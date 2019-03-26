@@ -43,6 +43,7 @@ go.User = new (Ext.extend(Ext.util.Observable, {
     this.uploadUrl = session.uploadUrl;
 		this.eventSourceUrl = session.eventSourceUrl;		
 		this.loaded = true;
+		this.apiVersion = session.version;
 
 		Ext.apply(this, session.user);
 		this.firstWeekDay = parseInt(session.user.firstWeekday);

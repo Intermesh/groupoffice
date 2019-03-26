@@ -127,6 +127,7 @@ class State extends AbstractState {
 		$user = $this->getToken()->getUser();
 		
 		$response = [
+			'version' => GO()->getVersion(),
 			'username' => $user->username,
 			'accounts' => ['1'=> [
 				'name'=>'Virtual',

@@ -1,5 +1,4 @@
-views/Extjs3/javascript/vendor/localforage.nopromises.js
-views/Extjs3/javascript/vendor/localforage.getitems.js
+views/Extjs3/javascript/vendor/localforage.js
 
 go/core/views/extjs3/go.js
 go/core/views/extjs3/Translate.js

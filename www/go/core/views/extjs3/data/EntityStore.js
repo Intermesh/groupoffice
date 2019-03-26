@@ -53,40 +53,66 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		
 		var me = this;
 		
-		return new Promise(function(resolve, reject) {
-			if(me.initialized) {
-				if(cb) {
-					cb.call(me);
-					resolve();
-					return;
-				}
+		if(me.initialized) {
+			if(cb) {
+				cb.call(me);
+				Promise.resolve();
+				return;
 			}
-			me.stateStore = localforage.createInstance({
-				name: "groupoffice",
-				storeName: me.entity.name + "-entities"
-			});
+		}
+		
+		me.stateStore = localforage.createInstance({
+			name: "groupoffice",
+			storeName: me.entity.name + "-entities"
+		});
 
-			me.metaStore = localforage.createInstance({
-				name: "groupoffice",
-				storeName: me.entity.name + "-meta"
-			});
+		me.metaStore = localforage.createInstance({
+			name: "groupoffice",
+			storeName: me.entity.name + "-meta"
+		});
+		
+		return Promise.all([
+			me.metaStore.getItem('notFound', function(v) {
+				me.notFound = v || [];
+				return v;
+			}),
+			me.metaStore.getItem('state', function(v) {
+				me.state = v;
+				return v;
+			}),
+			me.metaStore.getItem('isComplete', function(v) {
+				me.isComplete = v;
+				return v;
+			}),
+			me.metaStore.getItem('apiVersion', function(v) {
+				me.apiVersion = v;
+				return v;
+			}),
+			me.metaStore.getItem('apiUser', function(v) {
+				me.apiUser = v;
+				return v;
+			})
+		]).then(function() {
 
-			me.metaStore.getItems(["notfound", "state", "isComplete"], function(err, r) {
+			me.initialized = true;
 
-				if(err) {
-					reject(err);
-				}				
-
-				me.notFound = r.notFound || [];
-				me.state = r.state;
-				me.isComplete = r.isComplete;
-				me.initialized = true;
-
-				if(cb) {
-					cb.call(me);
-				}
-				resolve();
-			});
+			if(!me.state) {
+				return Promise.all([
+					me.metaStore.setItem("apiVersion", go.User.apiVersion),
+					me.metaStore.setItem("apiUser", go.User.username)
+				]);
+			} else if(me.apiVersion !== go.User.apiVersion || me.apiUser !== go.User.username) {
+				console.warn("API version or username mismatch", me.apiVersion, go.User.apiVersion, me.apiUser, go.User.username);
+				return me.clearState();
+			} else
+			{
+				return true;
+			}
+		}).then(function() {
+			if(cb) {
+				cb.call(me);
+			}
+			return true;
 		});
 		
 	},
@@ -108,8 +134,13 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		
 		this.isComplete = false;
 
-		this.metaStore.clear();
-		this.stateStore.clear();
+		return Promise.all([
+			this.metaStore.clear(),
+			this.stateStore.clear(),		
+			this.metaStore.setItem("apiVersion", go.User.apiVersion),
+			this.metaStore.setItem("apiUser", go.User.username)
+		]);
+		
 	},
 	
 	_add : function(entity, fireChanges) {
@@ -143,7 +174,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		var i = this.notFound.indexOf(entity.id);
 		if(i > -1) {
 			this.notFound.splice(i, 1);
-			this.metaStore.setItem("notfound", this.notFound);
+			this.metaStore.setItem("notFound", this.notFound);
 		}
 		
 		//Localforage requires ID to be string
@@ -325,14 +356,17 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 						return;
 					}
 					var me = this;
-					this.stateStore.getItems(null, function(err,entities) {				
-						for(var key in entities) {		
-							if(entities[key]) {
-								me.data[entities[key].id] = entities[key];
-							}
-						}
+					
+					this.stateStore.keys().then(function(keys){
+						return Promise.all(keys.map(function(key){
+							return me.stateStore.getItem(key).then(function(entity) {
+								me.data[entity.id] = entity;
+							});
+						}))
+					}).then(function() {
 						cb.call(scope, true, me.data);
-					});					
+					});				
+				
 				});
 			} else
 			{
@@ -378,19 +412,25 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	_getFromBrowserStorage : function(unknownIds) {
 		var me = this;
 		return me.initState().then(function() {
+			
+			var itemPromises = [];
+			unknownIds.forEach(function(id) { 
+				itemPromises.push(
+					me.stateStore.getItem(id + "").then(function(entity) {		
+						if(!entity) {
+							return null;
+						}
+						unknownIds = unknownIds.filter(function(id){
+							return id != entity.id;
+						});
 
-			//convert ID's to string because indexed db doesn't like int's
-			return me.stateStore.getItems(unknownIds.map(function(id) { return id + "";} )).then(function(entities) {
-				unknownIds = unknownIds.filter(function(id){
-					return !entities[id];
-				});
-
-				for(var key in entities) {					
-					if(entities[key]) {
-						me.data[entities[key].id] = entities[key];
-					}
-				}		
-				
+						me.data[entity.id] = entity;						
+						return entity;
+					})
+				);
+			});
+			
+			return Promise.all(itemPromises).then(function() {
 				return unknownIds;
 			});
 		});
