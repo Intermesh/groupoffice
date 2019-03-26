@@ -259,9 +259,6 @@ GO.calendar.CalendarDialog = function(config)
 		cls: 'go-form-panel'
 	});
 	
-	
-	this.propertiesTab.add(go.customfields.CustomFields.getFormFieldSets("Calendar"));
-
 
 	var items = [this.propertiesTab];
 	
@@ -286,6 +283,25 @@ GO.calendar.CalendarDialog = function(config)
 		enableTabScroll: true,
 		items:items
 	});
+	
+	
+	go.customfields.CustomFields.getFormFieldSets("Calendar").forEach(function(fs) {
+			//console.log(fs);
+			if(fs.fieldSet.isTab) {
+				fs.title = null;
+				fs.collapsible = false;
+				var pnl = new Ext.Panel({
+					autoScroll: true,
+					hideMode: 'offsets', //Other wise some form elements like date pickers render incorrectly.
+					title: fs.fieldSet.name,
+					items: [fs]
+				});
+				this.tabPanel.add(pnl);
+			}else
+			{			
+				this.propertiesTab.add(fs);
+			}
+		}, this);
 
 	this.formPanel = new Ext.FormPanel({
 		fileUpload:true,

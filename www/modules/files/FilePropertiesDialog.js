@@ -156,7 +156,6 @@ GO.files.FilePropertiesDialog = function(config){
 	
 	var items = [this.propertiesPanel, this.commentsPanel, this.versionsGrid];
 	
-	this.propertiesPanel.add(go.customfields.CustomFields.getFormFieldSets("File"));
 	
 	this.tabPanel =new Ext.TabPanel({
 		activeTab: 0,
@@ -168,6 +167,24 @@ GO.files.FilePropertiesDialog = function(config){
 		hideLabel:true,
 		items:items
 	});
+	
+	go.customfields.CustomFields.getFormFieldSets("File").forEach(function(fs) {
+		//console.log(fs);
+		if(fs.fieldSet.isTab) {
+			fs.title = null;
+			fs.collapsible = false;
+			var pnl = new Ext.Panel({
+				autoScroll: true,
+				hideMode: 'offsets', //Other wise some form elements like date pickers render incorrectly.
+				title: fs.fieldSet.name,
+				items: [fs]
+			});
+			this.tabPanel.add(pnl);
+		}else
+		{			
+			this.propertiesPanel.add(fs);
+		}
+	}, this);
 		
 	this.formPanel = new Ext.form.FormPanel(
 	{

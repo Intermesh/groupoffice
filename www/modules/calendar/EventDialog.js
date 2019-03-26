@@ -43,7 +43,6 @@ GO.calendar.EventDialog = function(calendar) {
 	//This field is added for filtering the custom field panels. It needs the group_id to be in the form values to filter on this value.
 	this.propertiesPanel.add(new Ext.form.Hidden({name: "group_id"})); 
 	
-	this.propertiesPanel.add(go.customfields.CustomFields.getFormFieldSets("Event"));
 	
 	if(go.Modules.isAvailable("legacy", "comments")){
 		this.commentsGrid = new GO.comments.CommentsGrid({title:t("Comments", "comments")});
@@ -62,6 +61,25 @@ GO.calendar.EventDialog = function(calendar) {
 			forceLayout:true
 		}
 	});
+	
+	
+	go.customfields.CustomFields.getFormFieldSets("Event").forEach(function(fs) {
+		//console.log(fs);
+		if(fs.fieldSet.isTab) {
+			fs.title = null;
+			fs.collapsible = false;
+			var pnl = new Ext.Panel({
+				autoScroll: true,
+				hideMode: 'offsets', //Other wise some form elements like date pickers render incorrectly.
+				title: fs.fieldSet.name,
+				items: [fs]
+			});
+			this.tabPanel.add(pnl);
+		}else
+		{			
+			this.propertiesPanel.add(fs);
+		}
+	}, this);
 
 	this.formPanel = new Ext.form.FormPanel({
 		waitMsgTarget : true,

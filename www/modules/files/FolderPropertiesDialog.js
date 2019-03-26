@@ -131,7 +131,23 @@ GO.files.FolderPropertiesDialog = function(config){
 		items:[this.propertiesPanel, this.commentsPanel, this.readPermissionsTab]
 	});
 	
-	this.propertiesPanel.add(go.customfields.CustomFields.getFormFieldSets("Folder"));
+	go.customfields.CustomFields.getFormFieldSets("Folder").forEach(function(fs) {
+		//console.log(fs);
+		if(fs.fieldSet.isTab) {
+			fs.title = null;
+			fs.collapsible = false;
+			var pnl = new Ext.Panel({
+				autoScroll: true,
+				hideMode: 'offsets', //Other wise some form elements like date pickers render incorrectly.
+				title: fs.fieldSet.name,
+				items: [fs]
+			});
+			this.tabPanel.add(pnl);
+		}else
+		{			
+			this.propertiesPanel.add(fs);
+		}
+	}, this);
 
 //	if(go.Modules.isAvailable("core", "customfields")){
 //		this.disableCategoriesPanel = new GO.customfields.DisableCategoriesPanel();

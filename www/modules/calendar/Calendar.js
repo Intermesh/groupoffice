@@ -2170,13 +2170,17 @@ go.Modules.register("legacy", 'calendar', {
 				},
 				linkDetail: function() {
 					return new GO.calendar.EventPanel();
-				}	
-		}]
+				}					
+		}],
+		customFields: {
+			fieldSetDialog: "GO.calendar.CustomFieldSetDialog"
+		}
 	}, {
 		name: "Calendar",
 		customFields: {
 			fieldSetDialog: "GO.calendar.CustomFieldSetDialog"
 		}
+		
 	}],
 	userSettingsPanels: ["GO.calendar.SettingsPanel"]
 	

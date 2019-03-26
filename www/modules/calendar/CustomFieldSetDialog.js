@@ -86,19 +86,19 @@ GO.calendar.CustomFieldSetDialog = Ext.extend(go.customfields.FieldSetDialog, {
 		var p = arguments;
 		
 		//templatestore must be loaded before form loads for chips component
-		if(!this.groupStore.loaded) {
+		if(!this.groupStore.loaded && !this.loading) {
 			
 			this.loading = true;
 			
 			this.groupStore.load({
 				callback: function() {
-					GO.tickets.CustomFieldSetDialog.superclass.show.apply(this, p);
+					GO.calendar.CustomFieldSetDialog.superclass.show.apply(this, p);
 				},
 				scope: this
 			});
 		} else
 		{
-			GO.tickets.CustomFieldSetDialog.superclass.load.apply(this, p);
+			GO.calendar.CustomFieldSetDialog.superclass.show.apply(this, p);
 		}
 		
 		return this;

@@ -42,6 +42,7 @@ go.customfields.type.Checkbox = Ext.extend(go.customfields.type.Text, {
 		delete config.anchor;
 		config.xtype = "checkbox";
 		config.boxLabel = config.fieldLabel;
+		config.hideLabel = true;
 		config.checked = !!customfield.default;
 		delete config.fieldLabel;
 
