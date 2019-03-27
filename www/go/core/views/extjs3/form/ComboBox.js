@@ -28,8 +28,8 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 					data = entities[0];
 				}
 
-				if(Ext.isFunction(me.displayRenderer)) {
-					data[me.displayField] = Ext.util.Format.htmlDecode(me.displayRenderer(data));
+				if(Ext.isFunction(me.renderer)) {
+					data[me.displayField] = Ext.util.Format.htmlDecode(me.renderer(data));
 				}
 				//var displayValue = Ext.isFunction(me.valueField) ? me.valueField(data) : data[me.valueField];
 		
@@ -46,8 +46,8 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 			if(this.valueField){
 				 var r = this.findRecord(this.valueField, value);
 				 if(r){
-					 if(Ext.isFunction(this.displayRenderer)) {
-							r.data[this.displayField] = this.displayRenderer(r.data);
+					 if(Ext.isFunction(this.renderer)) {
+							r.data[this.displayField] = this.renderer(r.data);
 						}
 					  text = r.data[this.displayField];
 				 }else if(Ext.isDefined(this.valueNotFoundText)){
