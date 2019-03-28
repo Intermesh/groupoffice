@@ -700,6 +700,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	private static function getSharedRootPaths() {
 		
 		if(!isset(static::$sharedRootFolders)) {
+			static::$sharedRootFolders = [];
 			$folders = Folder::model()->getTopLevelShares();
 			foreach($folders as $folder) {
 				static::$sharedRootFolders[]= $folder->getPath();
