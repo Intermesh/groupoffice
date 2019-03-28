@@ -264,7 +264,7 @@ class AddressbookModule extends \GO\Base\Module{
 		  //hide old contacts folder if it exists
 			$folder = \GO\Files\Model\Folder::model()->findByPath('contacts');
 			if($folder){
-				if(!$folder->acl_id){
+				if(!$folder->getAcl()){
 					$folder->setNewAcl(1);
 					$folder->readonly=1;
 					$folder->save();
