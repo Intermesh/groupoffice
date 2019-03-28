@@ -1,3 +1,4 @@
+- Core: Old framework registered entity incorrectly. "linkedEmail" instead of "LinkedEmail"
 - FileSearch: Fixed links to attached indexed attachments in the displaypanel. (Was broken due to new GO63 router)
 		*** Running the filesearch index again is needed to let this work ***
 - Calendar: Added home button to jump to default calendar
