@@ -405,6 +405,6 @@ class ImapMailbox extends \GO\Base\Model {
 	 * @return boolean
 	 */
 	public function isVisible(){
-		return $this->subscribed ||  $this->getHasChildren(true);
+			return $this->subscribed ||  $this->getHasChildren(true);
 	}
 }
