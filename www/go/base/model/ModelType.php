@@ -44,7 +44,7 @@ class ModelType extends \GO\Base\Db\ActiveRecord {
 		if(empty($modelName))
 			throw new \Exception("Model name may not be empty");
 		
-		$shortName = self::getShortName($modelName);
+		$shortName = ucfirst(self::getShortName($modelName));
 		
 		$model = $this->findSingleByAttribute('name', $shortName);
 		if($model)
@@ -58,6 +58,7 @@ class ModelType extends \GO\Base\Db\ActiveRecord {
 		
 		$model = new ModelType();
 		$model->name=$shortName;
+		$model->clientName=$shortName;
 		$model->moduleId = $module->id;
 		$model->save();
 		
