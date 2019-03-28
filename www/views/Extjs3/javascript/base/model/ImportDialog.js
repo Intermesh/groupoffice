@@ -339,7 +339,7 @@ Ext.extend( GO.base.model.ImportDialog, GO.Window, {
 					var nameOnly = nameArray[1];
 					if (attributeResult.results[i]['gotype']=='customfield') {
 						if(go.Modules.isAvailable("core", "customfields"))
-							data.push([nameOnly,attributeResult.results[i]['name'],attributeResult.results[i]['label']]);
+							data.push(["customFields."+nameOnly,attributeResult.results[i]['name'],attributeResult.results[i]['label']]);
 					} else {
 						data.push([nameOnly,attributeResult.results[i]['name'],attributeResult.results[i]['label']]);
 					}
