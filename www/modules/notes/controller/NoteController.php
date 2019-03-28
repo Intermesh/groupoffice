@@ -202,7 +202,7 @@ class NoteController extends AbstractController {
 	 */
 	protected function actionDelete($id) {
 
-		if (!GO::request()->isPost()) {
+		if (!GO::request()->isPost() && !GO::environment()->isCli()) {
 			throw new Exception('Delete must be a POST request');
 		}
 
