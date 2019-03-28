@@ -252,7 +252,7 @@ class MultiSelectGrid {
 //			$this->_store->setTitle(implode(', ',$titleArray));		
 		$count = count($this->selectedIds);
 		if($count==1){
-			$model = \GO::getModel($this->_modelName)->findByPk($this->selectedIds[0]);
+			$model = \GO::getModel($this->_modelName)->findByPk($this->selectedIds[0], false, !$this->_checkPermissions);
 			if (isset($model->$titleAttribute))
 				$this->_store->setTitle(\GO\Base\Util\StringHelper::encodeHtml ($model->$titleAttribute));	
 		}else
