@@ -28,6 +28,11 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 					data = entities[0];
 				}
 
+				if(Ext.isFunction(me.renderer)) {
+					data[me.displayField] = Ext.util.Format.htmlDecode(me.renderer(data));
+				}
+				//var displayValue = Ext.isFunction(me.valueField) ? me.valueField(data) : data[me.valueField];
+		
 				var comboRecord = Ext.data.Record.create(this.store.fields);
 				var currentRecord = new comboRecord(data, data[me.valueField]);
 
@@ -37,7 +42,25 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 			}, this);
 		} else
 		{
-			go.form.ComboBox.superclass.setValue.call(this, value);
+			var text = value;
+			if(this.valueField){
+				 var r = this.findRecord(this.valueField, value);
+				 if(r){
+					 if(Ext.isFunction(this.renderer)) {
+							r.data[this.displayField] = this.renderer(r.data);
+						}
+					  text = r.data[this.displayField];
+				 }else if(Ext.isDefined(this.valueNotFoundText)){
+					  text = this.valueNotFoundText;
+				 }
+			}
+			this.lastSelectionText = text;
+			if(this.hiddenField){
+				 this.hiddenField.value = Ext.value(value, '');
+			}
+			Ext.form.ComboBox.superclass.setValue.call(this, text);
+			this.value = value;
+			return this;
 		}
 	},
 	/**
