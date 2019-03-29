@@ -463,7 +463,7 @@ function test_system(){
 		
 		$root = dirname(dirname(__FILE__));
 
-		if($ioncubeWorks && is_dir($root.'/modules/professional'))
+		if($ioncubeWorks)
 		{
 
 			$test['name']='Professional license';

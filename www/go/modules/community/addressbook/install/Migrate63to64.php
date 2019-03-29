@@ -142,12 +142,14 @@ class Migrate63to64 {
 				GO()->getDbConnection()
 							->update("core_customfields_field", 
 											['databaseName' => $new],
-											[
-													'fieldSetId' => (new \go\core\db\Query)
-														->select('id')
-														->from('core_customfields_field_set')
-														->where(['entityId' => $companyEntityType->getId()]), 
-													'databaseName' => $old]
+											(new \go\core\orm\Query)
+											->where(	'fieldSetId', 'IN', 
+															(new \go\core\db\Query)
+																->select('id')
+																->from('core_customfields_field_set')
+																->where(['entityId' => $companyEntityType->getId()])
+															)
+											->andWhere('databaseName', '=', $old)
 											)
 							->execute();
 			}
@@ -226,17 +228,21 @@ class Migrate63to64 {
 				]]);
 		
 		foreach($fields as $field) {
-			echo "Migrating ".$field->databaseName ."\n";
-			if($field->type == "Company") {
-				$field->type = "Contact";
-				$field->setOption("isOrganization", true);
-				$incrementID = $this->getCompanyIdIncrement();
-			} else
-			{
-				$field->setOption("isOrganization", false);
-				$incrementID = 0;
+			try{
+				echo "Migrating ".$field->databaseName ."\n";
+				if($field->type == "Company") {
+					$field->type = "Contact";
+					$field->setOption("isOrganization", true);
+					$incrementID = $this->getCompanyIdIncrement();
+				} else
+				{
+					$field->setOption("isOrganization", false);
+					$incrementID = 0;
+				}
+				$cfMigrator->updateSelectEntity($field, Contact::class, $incrementID);
+			} catch(\Exception $e) {
+				echo "ERROR: Failed to migrate ".$field->databaseName .' - '. $field->id."\n";
 			}
-			$cfMigrator->updateSelectEntity($field, Contact::class, $incrementID);
 		}
 	}
 	
