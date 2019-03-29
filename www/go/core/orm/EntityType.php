@@ -190,7 +190,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 						->select('e.*, m.name AS moduleName, m.package AS modulePackage')
 						->from('core_entity', 'e')
 						->join('core_module', 'm', 'm.id = e.moduleId')
-						->where('id', '=', $id)
+						->where('id', '=', $id)->where(['m.enabled' => true])
 						->single();
 		
 		if(!$record) {
@@ -211,7 +211,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 						->select('e.*, m.name AS moduleName, m.package AS modulePackage')
 						->from('core_entity', 'e')
 						->join('core_module', 'm', 'm.id = e.moduleId')
-						->where('clientName', '=', $name)
+						->where('clientName', '=', $name)->where(['m.enabled' => true])
 						->single();
 		
 		if(!$record) {
