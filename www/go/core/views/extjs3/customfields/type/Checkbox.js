@@ -53,6 +53,14 @@ go.customfields.type.Checkbox = Ext.extend(go.customfields.type.Text, {
 		return "boolean";
 	},
 	
+	/**
+	 * See https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.grid.Column-cfg-xtype
+	 * @returns {String}
+	 */
+	getColumnXType : function() {
+		return "booleancolumn";
+	},
+	
 	getFilter : function(field) {
 			
 		return {

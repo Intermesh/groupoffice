@@ -141,8 +141,39 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			name: "customFields." + field.databaseName,
 			type: this.getFieldType(),
 			customField: field,
-			customFieldType: this
+			customFieldType: this,
+			columnxtype: this.getColumnXType()
 		};
+	},
+	
+	/**
+	 * Get grid column defnitition
+	 * 
+	 * @param {type} field
+	 * @returns {TextAnonym$0.getColumn.TextAnonym$6}
+	 */
+	getColumn : function(field) {
+		
+		var def = this.getFieldDefinition(field);
+		
+		return {
+			dataIndex: def.name,
+			header: def.customField.name,
+			hidden: true,
+			id: "custom-field-" + encodeURIComponent(def.customField.databaseName),
+			sortable: true,
+			hideable: true,
+			draggable: true,
+			xtype: this.getColumnXType()
+		};
+	},
+	
+	/**
+	 * See https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.grid.Column-cfg-xtype
+	 * @returns {String}
+	 */
+	getColumnXType : function() {
+		return "gridcolumn";
 	},
 	
 	getFilter : function(field) {

@@ -51,6 +51,14 @@ go.customfields.type.Number = Ext.extend(go.customfields.type.Text, {
 		return "float";
 	},
 	
+	/**
+	 * See https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.grid.Column-cfg-xtype
+	 * @returns {String}
+	 */
+	getColumnXType : function() {
+		return "numbercolumn";
+	},
+	
 	getFilter : function(field) {
 		return {
 			name: field.databaseName,

@@ -125,6 +125,7 @@
 			});
 			return defs;
 		},
+
 		
 		/**
 		 * Get all Ext.grid.Column definitions for an entity's custom fields
@@ -132,20 +133,19 @@
 		 * @returns {Array}
 		 */
 		getColumns : function(entity) {
-			var cols = [];
+			var cols = [], me = this, type;
 			
-			this.getFieldDefinitions(entity).forEach(function(def) {
-				cols.push({
-					dataIndex: def.name,
-					header: def.customField.name,
-					hidden: true,
-					id: "custom-field-" + encodeURIComponent(def.customField.databaseName),
-					sortable: true,
-					hideable: true,
-					draggable: true
-				})
+			this.getFieldSets(entity).forEach(function(fs) {
+				me.getFields(fs.id).forEach(function(field) {					
+					type = me.getType(field.type);
+					if(!type) {
+						console.error("Custom field type " + field.type + " not found");
+						return;
+					}
+					
+					cols.push(type.getColumn(field));
+				});
 			});
-			
 			return cols;
 		},
 
