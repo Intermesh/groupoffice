@@ -23,15 +23,15 @@ class Migrate63to64 {
 		GO()->getCache()->flush();
 		
 		$this->countries = GO()->t('countries');
-			
-		$this->migrateCustomFields();
-		
-		
-		$this->migrateCompanyLinks();
 		
 		$db = GO()->getDbConnection();
 		//Start from scratch
-//		$db->query("DELETE FROM addressbook_addressbook");
+		$db->query("DELETE FROM addressbook_addressbook");
+		
+			
+		$this->migrateCustomFields();
+		
+		$this->migrateCompanyLinks();		
 
 		$addressBooks = $db->select('a.*')->from('ab_addressbooks', 'a')
 						->join("ab_contacts", 'c', 'c.addressbook_id = a.id', 'left')
