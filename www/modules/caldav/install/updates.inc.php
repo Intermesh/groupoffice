@@ -24,7 +24,7 @@ $updates['201508211200'][]="CREATE TABLE dav_calendar_changes (
 
 $updates['201610281650'][] = 'SET foreign_key_checks = 0;';
 
-$updates['201610281659'][] = 'ALTER TABLE `dav_contacts` CHANGE `uri` `uri` VARCHAR(190);';
+$updates['201610281659'][] = '';//ALTER TABLE `dav_contacts` CHANGE `uri` `uri` VARCHAR(190);';
 
 $updates['201610281659'][] = 'ALTER TABLE `cal_events` CHANGE `uuid` `uuid` VARCHAR(190);';
 $updates['201610281659'][] = 'ALTER TABLE `cal_events_declined` CHANGE `uid` `uid` VARCHAR(190);';
@@ -34,8 +34,8 @@ $updates['201610281659'][] = 'ALTER TABLE `dav_tasks` CHANGE `uri` `uri` VARCHAR
 
 $updates['201610281650'][] = 'ALTER TABLE `dav_calendar_changes` ENGINE=InnoDB;';
 $updates['201610281650'][] = 'ALTER TABLE `dav_calendar_changes` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;';
-$updates['201610281650'][] = 'ALTER TABLE `dav_contacts` ENGINE=InnoDB;';
-$updates['201610281650'][] = 'ALTER TABLE `dav_contacts` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;';
+$updates['201610281650'][] = '';//'ALTER TABLE `dav_contacts` ENGINE=InnoDB;';
+$updates['201610281650'][] = '';//'ALTER TABLE `dav_contacts` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;';
 $updates['201610281650'][] = 'ALTER TABLE `dav_events` ENGINE=InnoDB;';
 $updates['201610281650'][] = 'ALTER TABLE `dav_events` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;';
 $updates['201610281650'][] = 'ALTER TABLE `dav_locks` ENGINE=InnoDB;';
