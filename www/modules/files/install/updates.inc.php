@@ -256,7 +256,7 @@ $updates['201903070922'][] = "delete from fs_files_custom_fields where id not in
 $updates['201903070922'][] = "ALTER TABLE `fs_files_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `fs_files`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
 
 
-$updates['201903070922'][] = function() {	
+$updates['201903291350'][] = function() {	
 	$m = new \go\core\install\MigrateCustomFields63to64();
 	$m->migrateEntity("File");	
 	$m->migrateEntity("Folder");	

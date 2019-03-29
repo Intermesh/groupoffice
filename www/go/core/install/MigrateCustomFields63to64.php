@@ -2,9 +2,12 @@
 namespace go\core\install;
 
 use go\core\db\Query;
+use go\core\db\Table;
 use go\core\db\Utils;
 use go\core\model\Field;
-use go\core\model\FieldSet;
+use go\core\model\Group;
+use go\core\model\User;
+use go\core\orm\EntityType;
 use PDOException;
 use function GO;
 
@@ -12,7 +15,9 @@ class MigrateCustomFields63to64 {
 	
 	public function migrateEntity($entityName) {
 		
-		$entityType = \go\core\orm\EntityType::findByName($entityName);
+		echo "Migrating custom fields for entity: " . $entityName ."\n";
+		
+		$entityType = EntityType::findByName($entityName);
 		
 		if(!$entityType) {
 			echo "Entity type: ". $entityName . " not found. Skipping.\n";
@@ -22,6 +27,8 @@ class MigrateCustomFields63to64 {
 		$fields = Field::findByEntity($entityType->getId());
 
 		foreach ($fields as $field) {
+			
+			echo $field->id . ' - '.$field->type ."\n";
 			
 			switch ($field->type) {
 				case "Select":
@@ -38,11 +45,11 @@ class MigrateCustomFields63to64 {
 					break;
 				
 				case "User":
-					$this->updateSelectEntity($field, \go\core\model\User::class);
+					$this->updateSelectEntity($field, User::class);
 					break;
 				
 				case "Group":
-					$this->updateSelectEntity($field, \go\core\model\Group::class);
+					$this->updateSelectEntity($field, Group::class);
 					break;
 				
 				case "Textarea":
@@ -62,6 +69,7 @@ class MigrateCustomFields63to64 {
 					$field->setOption("formNotes", $field->name);
 					$field->save();
 					break;
+				
 			}
 		}
 		
@@ -304,7 +312,9 @@ class MigrateCustomFields63to64 {
 		array_shift($fields);
 		foreach($fields as $field) {
 			$field->type = "Text";
-			$field->delete();
+			if(!$field->delete()) {
+				throw new \Exception("Could not delete tree select slave");
+			}
 		}
 	}
 	

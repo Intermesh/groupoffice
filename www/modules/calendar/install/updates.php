@@ -329,7 +329,7 @@ $updates['201811270837'][] = "delete from cal_calendars_custom_fields where id n
 $updates['201811270837'][] = "ALTER TABLE `cal_calendars_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `cal_calendars`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
 
 
-$updates['201811282011'][] = function() {	
+$updates['201903291350'][] = function() {	
 	$m = new \go\core\install\MigrateCustomFields63to64();
 	$m->migrateEntity("Event");	
 	$m->migrateEntity("Calendar");	
