@@ -33,7 +33,7 @@ class EmailAddress extends Property {
 	 * 
 	 * @var string
 	 */							
-	public $type;
+	public $type = 'work';
 
 	/**
 	 * 
