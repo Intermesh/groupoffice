@@ -70,9 +70,19 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	},
 	
 	addCustomFields : function(config) {
-		if(config.entityStore && go.Entities.get(config.entityStore).customFields) {
-			config.fields = config.fields.concat(go.customfields.CustomFields.getFieldDefinitions(config.entityStore))
+		if(!config.entityStore) {
+			return;
 		}
+		
+		var entity; 
+		if(Ext.isString(config.entityStore)) {
+			entity = go.Entities.get(config.entityStore);
+		} else
+		{
+			entity = config.entityStore.entity;
+		}
+		
+		config.fields = config.fields.concat(go.customfields.CustomFields.getFieldDefinitions(entity.name));	
 	},
 	
 	loadData : function(o, append){
