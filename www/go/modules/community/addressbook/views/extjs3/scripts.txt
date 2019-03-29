@@ -15,3 +15,10 @@ customfield/ContactDialog.js
 Utils.js
 SelectDialog.js
 SettingsPanel.js
+NameField.js
+SettingsProfilePanel.js
+EmailAddressesField.js
+AddressesField.js
+PhoneNumbersField.js
+DatesField.js
+UrlsField.js

@@ -18,6 +18,10 @@ go.form.RadioGroup = Ext.extend(Ext.form.RadioGroup, {
 	 * @return text
 	 */
 	getValue: function () {
+	
+		if(!this.rendered) {
+			return this.value;
+		}
 
 		var out = go.form.RadioGroup.superclass.getValue.call(this);
 		return out ? out.inputValue : null;
@@ -28,9 +32,8 @@ go.form.RadioGroup = Ext.extend(Ext.form.RadioGroup, {
 	},
 	
 	setValue : function(v) {
-		this.originalValue = v;
-		
-		return go.form.RadioGroup.superclass.setValue.call(this, v);
+		go.form.RadioGroup.superclass.setValue.call(this, v);
+		this.originalValue = this.value = v;
 	},
 	
 	isDirty : function() {

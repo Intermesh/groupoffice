@@ -544,8 +544,17 @@ class User extends Entity {
 		
 		$this->addSystemGroups();
 		
+		$this->saveContact();
 		
 		return true;		
+	}
+	
+	private function saveContact() {
+		if(!isset($this->contact)) {			
+			return true;
+		}
+		$this->contact->goUserId = $this->id;
+		return $this->contact->save();
 	}
 	
 	/**
@@ -731,6 +740,43 @@ class User extends Entity {
 		GO()->getCache()->set("authentication-domains", $domains);
 		
 		return $domains;		
+	}
+	
+	/**
+	 *
+	 * @var \go\modules\community\addressbook\model\Contact
+	 */
+	private $contact;
+	
+	public function getProfile() {
+		if(!Module::findByName('community', 'addressbook')) {
+			return null;
+		}
+		
+		$contact = \go\modules\community\addressbook\model\Contact::findForUser($this->id);
+		if(!$contact) {
+			$contact = new \go\modules\community\addressbook\model\Contact();
+			$contact->addressBookId = GO()->getSettings()->getUserAddressBookId();
+			$contact->name = $this->displayName;
+			$parts = explode(' ', $this->displayName);
+			$contact->firstName = array_shift($parts);
+			$contact->lastName = implode(' ', $parts);
+			$contact->photoBlobId = $this->avatarId;
+			$contact->emailAddresses = [(new \go\modules\community\addressbook\model\EmailAddress())->setValues(['email' => $this->email])];
+		}
+		
+		return $contact;
+	}
+	
+	public function setProfile($values) {
+		if(!Module::findByName('community', 'addressbook')) {
+			throw new \Exception("Can't set profile without address book module.");
+		}
+		
+		$this->contact = $this->getProfile();
+		$this->contact->photoBlobId = $this->avatarId;
+		$this->contact->setValues($values);
+		$this->displayName = $this->contact->name;
 	}
 
 }

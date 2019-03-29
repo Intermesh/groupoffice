@@ -281,6 +281,9 @@ class Field extends AclItemEntity {
 	public function tableName() {
 		$fieldSet = FieldSet::findById($this->fieldSetId);
 		$entityType = EntityType::findByName($fieldSet->getEntity());
+		if(!$entityType) {
+			throw new \Exception("EntityType not found for field set ".$this->name.' ('. $this->id.')');
+		}
 		$entityCls = $entityType->getClassName();
 		return $entityCls::customFieldsTableName(); //From customfieldstrait
 	}

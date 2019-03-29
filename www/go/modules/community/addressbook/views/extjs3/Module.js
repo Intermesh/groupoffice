@@ -172,7 +172,20 @@ go.Modules.register("community", "addressbook", {
 		isAclOwner: true
 	}, "AddressBookGroup"],	
 	
-	userSettingsPanels: ["go.modules.community.addressbook.SettingsPanel"]
+	userSettingsPanels: [
+		"go.modules.community.addressbook.SettingsPanel",
+		"go.modules.community.addressbook.SettingsProfilePanel"
+	]
 });
+
+
+go.modules.community.addressbook.typeStoreData = function(langKey) {
+	var types = [], typeLang = t(langKey);
+
+	for (var key in typeLang) {
+		types.push([key, typeLang[key]]);
+	}
+	return types;
+};
 
 //go.Stores.get("User");
