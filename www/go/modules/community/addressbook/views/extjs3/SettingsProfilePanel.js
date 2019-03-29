@@ -6,6 +6,7 @@ go.modules.community.addressbook.SettingsProfilePanel = Ext.extend(Ext.Panel, {
 	iconCls: 'ic-person',
 	labelWidth: 125,
 	layout: "fit",
+	index: 1,
 	initComponent: function () {
 
 		//The account dialog is an go.form.Dialog that loads the current User as entity.

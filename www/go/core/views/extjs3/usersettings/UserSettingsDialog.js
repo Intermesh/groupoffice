@@ -19,9 +19,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	title: t("My account"),
 	currentUserId:null,
 
-	initComponent: function () {
-		
-		
+	initComponent: function () {		
 		
 		this.saveButton = new Ext.Button({
 			text: t('Save'),
@@ -35,6 +33,17 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			fileUpload: true,
 			baseParams : {}
 		});
+		
+		//Add a hidden submit button so the form will submit on enter
+		this.formPanel.add(new Ext.Button({
+					hidden: true,
+					hideMode: "offsets",
+					type: "submit",
+					handler: function() {
+						this.submit();
+					},
+					scope: this
+				}));
 		
 		this.formPanel.bodyCfg.autocomplete = "off";
 		
@@ -448,6 +457,10 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 		if(pnl.isFormField) {
 			this.formPanel.getForm().add(pnl);
+		}
+		
+		if(pnl.index) {
+			position = pnl.index;
 		}
 		
 		if(Ext.isEmpty(position)){
