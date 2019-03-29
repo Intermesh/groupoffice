@@ -378,7 +378,21 @@ $updates['201902141322'][] = "CREATE TABLE IF NOT EXISTS `go_templates` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
 
-$updates['201902141322'][] = "ALTER TABLE `core_group` ADD UNIQUE(`name`);";
+$updates['201902141322'][] = function() {
+	
+	$duplicates = GO()->getDbConnection()->selectSingleValue('name')->from('core_group')->groupBy(["name"])->having('count(*) > 1');
+	$count = -1;
+	foreach($duplicates as $name) {		
+		foreach(GO()->getDbConnection()->select("id, name")->from('core_group')->where('name', '=', $name) as $record) {
+			$count++;
+			if($count > 0) {
+				GO()->getDbConnection()->update('core_group', ['name' => $record['name'] .' '.$count], ['id'=>$record['id']])->execute();
+			}
+		}		
+	}
+	
+	GO()->getDbConnection()->exec("ALTER TABLE `core_group` ADD UNIQUE(`name`);");	
+};
 
 
 $updates['201902141322'][] = function() {	

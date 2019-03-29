@@ -472,7 +472,7 @@ class Installer {
 								echo "\n\nIGNORING: ". $e->getMessage()." from query: ".$query."\n\n";
 								
 							} else {
-								die();
+								die("ABORTING: Please contact support");
 							}
 						}
 					}
