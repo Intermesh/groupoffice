@@ -9,6 +9,7 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 	
 	initComponent : function() {
 		this.origValue = {};
+		this.additionalFields = [];
 		go.form.FormContainer.superclass.initComponent.call(this);
 		
 		this.on("add",function(e) {
@@ -17,11 +18,17 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 			//Cancels event bubbling
 			return false;
 		});
+		
+		
 	},
 	
 	getName: function() {
 		return this.name;
 	},	
+	
+	addAdditionalField : function(f) {
+		this.additionalFields.push(f);
+	},
 	
 	findField : function(id) {
 
@@ -43,19 +50,21 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 			};
 
 			this.items.each(findMatchingField);
+			this.additionalFields.forEach(findMatchingField);
 		}
 		return field || null;
 	},
 	
 	isDirty: function () {		
-		var dirty = false;
-		this.items.each(function(i) {
+		var dirty = false, fn = function(i) {
 			if(i.isDirty && i.isDirty()) {
 				dirty = true;
 				//stops iteration
 				return false;
 			}
-		}, this);
+		};
+		this.items.each(fn, this);
+		this.additionalFields.each(fn, this);
 		
 		return dirty;
 	},
@@ -100,6 +109,7 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 		}
 		
 		this.items.each(fn, this);
+		this.additionalFields.forEach(fn, this);
 		
 		return v;
 	},	
@@ -121,14 +131,15 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 	},
 
 	validate: function () {
-		var valid = true;
-		this.items.each(function(i) {
+		var valid = true, fn = function(i) {
 			if(i.isFormField && !i.validate()) {
 				valid = false;
 				//stops iteration
 				return false;
 			}
-		}, this);
+		};
+		this.items.each(fn, this);
+		this.additionalFields.forEach(fn, this);
 		
 		return valid;
 	},
