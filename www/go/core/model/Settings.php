@@ -345,6 +345,37 @@ class Settings extends core\Settings {
 	
 	
 	/**
+	 * The default address book for new users
+	 * @var int 
+	 */
+	protected $userAddressBookId = null;
+	
+	public function getUserAddressBookId() {
+		if(!Module::findByName('community', 'addressbook')) {
+			return null;
+		}
+		
+		if(!isset($this->userAddressBookId)) {
+			$addressBook = new \go\modules\community\addressbook\model\AddressBook();	
+			$addressBook->name = GO()->t("Users");
+			if(!$addressBook->save()) {
+				throw new \Exception("Could not save address book");
+			}
+			$this->userAddressBookId = $addressBook->id;
+			if(!$this->save()) {
+				throw new \Exception("Could not save core settings");
+			}
+		}
+		
+		return $this->userAddressBookId;
+	}
+	
+	public function setUserAddressBookId($id) {
+		$this->userAddressBookId = $id;
+	}
+	
+	
+	/**
 	 * Default list separator for import and export
 	 * 
 	 * @var string

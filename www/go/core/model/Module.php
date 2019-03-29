@@ -213,6 +213,17 @@ class Module extends AclOwnerEntity {
 	}
 	
 	/**
+	 * Find a module by package and name
+	 * 
+	 * @param string $package
+	 * @param string $name
+	 * @return self
+	 */
+	public static function findByName($package, $name) {
+		return static::find()->where(['package' => $package, 'name' => $name])->single();
+	}
+	
+	/**
 	 * Get module settings
 	 * 
 	 * @return Settings

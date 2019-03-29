@@ -10,9 +10,7 @@ go.users.UserDefaultsWindow = Ext.extend(go.Window, {
 	layout: 'fit',
 	initComponent: function () {
 
-
 		this.formPanel = new go.systemsettings.Panel({
-			title: t("Defaults"),
 			items: [
 				{
 					layout: "hbox",
@@ -126,7 +124,7 @@ go.users.UserDefaultsWindow = Ext.extend(go.Window, {
 
 					]
 				},
-				{
+				this.otherFieldSet = new Ext.form.FieldSet({
 					title: t("Other"),
 					xtype: "fieldset",
 					items: [
@@ -143,21 +141,20 @@ go.users.UserDefaultsWindow = Ext.extend(go.Window, {
 								filter: {hideUsers: true, excludeEveryone: true}
 							}
 						})]
-				}
+				})
 			]
 		});
 		
-		this.tabPanel = new Ext.TabPanel({
-			activeTab: 0,
-			items: [this.formPanel, new go.customfields.SystemSettingsPanel({
-					title: t("Custom fields"),
-					toolbarTitle: false,
-					entity: "User"
-				})]
-		});
+		if(go.Modules.get('community', 'addressbook')) {
+			this.otherFieldSet.add({
+				xtype: 'addressbookcombo',
+				hiddenName: 'userAddressBookId'
+			});
+		}
+		
 
 
-		this.items = [this.tabPanel];
+		this.items = [this.formPanel];
 
 		this.bbar = ['->', {
 				text: t("Save"),
