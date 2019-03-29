@@ -127,7 +127,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 			$record['id'] = App::get()->getDbConnection()->getPDO()->lastInsertId();
 		} else
 		{
-			$e->defaultAclId = $record['defaultAclId'];
+			$e->defaultAclId = $record['defaultAclId'] ?? null; // in the upgrade situation this column is not there yet.
 			$e->highestModSeq = $record['highestModSeq'];//) ? (int) $record['highestModSeq'] : null;
 		}
 
@@ -245,7 +245,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
     $e->clientName = $record['clientName'];
 		$e->moduleId = $record['moduleId'];
 		$e->highestModSeq = $record['highestModSeq'];
-		$e->defaultAclId = $record['defaultAclId'];
+		$e->defaultAclId = $record['defaultAclId'] ?? null; // in the upgrade situation this column is not there yet.
 
 		if (isset($record['modulePackage'])) {
 			if($record['modulePackage'] == 'core') {
