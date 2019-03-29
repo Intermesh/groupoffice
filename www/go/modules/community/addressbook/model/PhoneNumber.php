@@ -36,7 +36,7 @@ class PhoneNumber extends Property {
 	 * 
 	 * @var string
 	 */							
-	public $type;
+	public $type = 'mobile';
 
 	/**
 	 * 

@@ -550,9 +550,26 @@ class User extends Entity {
 	}
 	
 	private function saveContact() {
+		
+		if(!isset($this->contact) || $this->isModified(['displayName', 'email', 'avatarId'])) {
+			$this->contact = $this->getProfile();
+		}
+		
 		if(!isset($this->contact)) {			
 			return true;
 		}
+		
+		$this->contact->photoBlobId = $this->avatarId;
+		if(!isset($this->contact->emailAddresses[0])) {
+			$this->contact->emailAddresses = [(new \go\modules\community\addressbook\model\EmailAddress())->setValues(['email' => $this->email])];
+		}
+		if(!isset($contact->name) || $this->isModified(['displayName'])) {
+			$this->contact->name = $this->displayName;
+			$parts = explode(' ', $this->displayName);
+			$this->contact->firstName = array_shift($parts);
+			$this->contact->lastName = implode(' ', $parts);		
+		}
+		
 		$this->contact->goUserId = $this->id;
 		return $this->contact->save();
 	}
@@ -756,13 +773,7 @@ class User extends Entity {
 		$contact = \go\modules\community\addressbook\model\Contact::findForUser($this->id);
 		if(!$contact) {
 			$contact = new \go\modules\community\addressbook\model\Contact();
-			$contact->addressBookId = GO()->getSettings()->getUserAddressBookId();
-			$contact->name = $this->displayName;
-			$parts = explode(' ', $this->displayName);
-			$contact->firstName = array_shift($parts);
-			$contact->lastName = implode(' ', $parts);
-			$contact->photoBlobId = $this->avatarId;
-			$contact->emailAddresses = [(new \go\modules\community\addressbook\model\EmailAddress())->setValues(['email' => $this->email])];
+			$contact->addressBookId = GO()->getSettings()->getUserAddressBookId();				
 		}
 		
 		return $contact;
@@ -773,9 +784,9 @@ class User extends Entity {
 			throw new \Exception("Can't set profile without address book module.");
 		}
 		
-		$this->contact = $this->getProfile();
-		$this->contact->photoBlobId = $this->avatarId;
-		$this->contact->setValues($values);
+		$this->contact = $this->getProfile();		
+		$this->contact->setValues($values);		
+	
 		$this->displayName = $this->contact->name;
 	}
 

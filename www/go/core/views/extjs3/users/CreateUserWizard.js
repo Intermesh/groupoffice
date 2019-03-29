@@ -80,6 +80,9 @@ go.users.CreateUserWizard = Ext.extend(go.Wizard, {
 				this.userPanel.onSubmitComplete(response.created[id], response);
 				this.close();
 				
+				var dlg = new go.usersettings.UserSettingsDialog();
+				dlg.load(response.created[id].id).show();
+				
 			} else
 			{
 				//something went wrong
