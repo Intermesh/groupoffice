@@ -285,28 +285,51 @@
 			autoUpload: true,
 			scope: this,
 			listeners: {
-				upload: function(response) {
+				upload: function (response) {
 					Ext.getBody().mask(t("Importing..."));
-					go.Jmap.request({
-						method: entity + "/import",
-						params: {
-							blobId: response.blobId,
-							values: values
-						},
-						callback: function (options, success, response) {
-							if(!success) {
-								Ext.MessageBox.alert(t("Error"), response[1].message);				
-							}
+
+					switch (response.type) {
+
+						case 'text/csv':
 							Ext.getBody().unmask();
-							
-							if(callback) {
-								callback.call(scope || this, response);
-							}
-						},
-						scope: this
-					});
-				},
-				scope: this
+
+							var dlg = new go.import.CsvMappingDialog({
+								entity: entity,
+								blobId: response.blobId,
+								values: values,
+								callback: callback,
+								scope: scope
+							});
+							dlg.show();
+							break;
+
+						default:
+							go.Jmap.request({
+								method: entity + "/import",
+								params: {
+									blobId: response.blobId,
+									values: values
+								},
+								callback: function (options, success, response) {
+									
+									Ext.getBody().unmask();
+									
+									if (!success) {
+										Ext.MessageBox.alert(t("Error"), response.errors.join("<br />"));
+									} else
+									{
+										Ext.MessageBox.alert(t("Success"), t("Imported {count} items").replace('{count}', response.count));
+									}
+
+									if (callback) {
+										callback.call(scope || this, response);
+									}
+								},
+								scope: this
+							});
+						}
+					},
+					scope: this
 			}
 		});
 	}

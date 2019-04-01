@@ -245,12 +245,12 @@ go.Jmap = {
 							if (!o.scope) {
 								o.scope = me;
 							}
-							try {
+							//try {
 								o.callback.call(o.scope, o, success, response[1]);
-							}
-							catch(e) {
-								console.error(e);
-							}
+//							}
+//							catch(e) {
+//								console.error(e);
+//							}
 						}
 
 						//cleanup request options

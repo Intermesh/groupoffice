@@ -1,7 +1,14 @@
 <?php
 namespace go\core\data\convert;
 
+use Exception;
+use go\core\db\Query as Query2;
+use go\core\ErrorHandler;
+use go\core\fs\Blob;
+use go\core\fs\File;
+use go\core\jmap\EntityController;
 use go\core\orm\Entity;
+use go\core\orm\Query;
 
 /**
  * Abstract converter class
@@ -43,7 +50,7 @@ use go\core\orm\Entity;
  * ```
  * 
  * 
- * @see \go\core\jmap\EntityController::export()
+ * @see EntityController::export()
  */
 abstract class AbstractConverter {
 	
@@ -68,8 +75,42 @@ abstract class AbstractConverter {
 	 * 
 	 * @return int[] id's of imported entities
 	 */
-	abstract public function importFile(\go\core\fs\File $file, $values = []);
+	public function importFile(File $file, $entityClass, $params = array()) {
+		$response = ['count' => 0, 'errors' => [], 'success' => true];
+		
+		
+		
+		$fp = $file->open('r');
+		
+		$index = 0;
+		
+		while(!feof($fp)) {		
+			try {
+				
+				$entity = new $entityClass;
+				if(isset($params['values'])) {
+					$entity->setValues($params['values']);
+				}
+
+				$entity = $this->importEntity($entity, $fp, $index++, $params);
+
+				if($entity->hasValidationErrors()) {
+					$response['errors'][] = $entity->getValidationErrors();				
+				} else
+				{
+					$response['count']++;
+				}
+			}
+			catch(Exception $e) {
+				ErrorHandler::logException($e);
+				$response['errors'][] = $e;
+			}
+		}
+		
+		return $response;
+	}
 	
+	abstract protected function importEntity(Entity $entity, $fp, $index, array $params);
 	
 	abstract protected function exportEntity(Entity $entity, $fp, $index, $total);
 		
@@ -85,12 +126,12 @@ abstract class AbstractConverter {
 	/**
 	 * Export entities to a blob
 	 * 
-	 * @param \go\core\db\Query $entities
-	 * @return \go\core\fs\Blob
-	 * @throws \Exception
+	 * @param Query2 $entities
+	 * @return Blob
+	 * @throws Exception
 	 */
-	public final function exportToBlob(\go\core\orm\Query $entities) {		
-		$tempFile = \go\core\fs\File::tempFile($this->getFileExtension());
+	public final function exportToBlob(Query $entities) {		
+		$tempFile = File::tempFile($this->getFileExtension());
 		$fp = $tempFile->open('w+');
 		
 		$total = $entities->getIterator()->rowCount();
@@ -99,10 +140,10 @@ abstract class AbstractConverter {
 		
 		fclose($fp);
 		
-		$blob = \go\core\fs\Blob::fromTmp($tempFile);
+		$blob = Blob::fromTmp($tempFile);
 		$blob->name = "Export-" . date('Y-m-d-H:i:s') . '.'. $this->getFileExtension();
 		if(!$blob->save()) {
-			throw new \Exception("Couldn't save blob: " . var_export($blob->getValidationErrors(), true));
+			throw new Exception("Couldn't save blob: " . var_export($blob->getValidationErrors(), true));
 		}
 		
 		return $blob;

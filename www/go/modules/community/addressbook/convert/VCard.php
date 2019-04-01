@@ -398,13 +398,24 @@ class VCard extends AbstractConverter {
 	public function getFileExtension() {
 		return 'vcf';
 	}
+	
+	protected function importEntity(Entity $entity, $fp, $index, array $params) {
+		//not needed because of import file override
+	}
 
-	public function importFile(File $file, $values = []) {
+	public function importFile(File $file, $entityClass, $params = []) {
 
 		$response = [
 				'ids' => [],
-				'errors' => []
+				'errors' => [],
+				'count' => 0
 		];
+		
+		$values = $params['values'] ?? [];
+		
+		if(!isset($values['addressBookId'])) {
+			$values['addressBookId'] = GO()->getAuthState()->getUser()->addressBookSettings->defaultAddressBookId;
+		}
 
 		$splitter = new VCardSplitter(StringUtil::cleanUtf8($file->getContents()), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 
@@ -419,6 +430,7 @@ class VCard extends AbstractConverter {
 				ErrorHandler::logException($e);
 				$response['errors'][] = "Failed to import card: ". $e->getMessage();
 			}			
+			$response['count']++;
 		}
 
 		return $response;

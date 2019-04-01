@@ -204,3 +204,6 @@ filter/types/date.js
 filter/types/select.js
 filter/FilterGrid.js
 filter/FilterDialog.js
+
+
+import/CsvMappingDialog.js

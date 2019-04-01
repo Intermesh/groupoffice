@@ -39,6 +39,14 @@ abstract class Base extends Model {
 	}
 	
 	/**
+	 * True if this value is an array. Used by CSV import
+	 * @return bool
+	 */
+	public function hasMany() {
+		return false;
+	}
+	
+	/**
 	 * Get column definition for SQL.
 	 * 
 	 * When false is returned no databaseName is required and no field will be created.

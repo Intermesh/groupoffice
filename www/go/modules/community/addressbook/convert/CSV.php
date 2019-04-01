@@ -16,8 +16,16 @@ class CSV extends convert\CSV {
 	
 	protected function internalGetHeaders($entityCls) {
 		$headers = parent::internalGetHeaders($entityCls);
-		$headers[] = 'organizations';
+		$headers[] = ['name' => 'organizations', 'label' => GO()->t('Organizations', 'community', 'addressbook')];
 		return $headers;
+	}
+	
+	protected function setValues(Entity $entity, array $values) {
+		unset($values['organizations']);
+		
+		//TODO
+		
+		return parent::setValues($entity, $values);
 	}
 	
 	protected function getValue(Entity $entity, $header) {

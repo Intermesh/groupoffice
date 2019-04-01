@@ -79,5 +79,9 @@ class Contact extends EntityController {
 	public function import($params) {
 		return $this->defaultImport($params);
 	}
+	
+	public function importCSVMapping($params) {
+		return $this->defaultImportCSVMapping($params);
+	}
 }
 

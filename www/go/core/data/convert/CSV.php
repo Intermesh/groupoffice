@@ -33,7 +33,7 @@ class CSV extends AbstractConverter {
 		$headers = $this->getHeaders($entity);
 		$record = [];
 		foreach($headers as $header) {
-			$record[$header] = $this->getValue($entity, $header);
+			$record[$header['name']] = $this->getValue($entity, $header['name']);
 		}
 		
 		return $record;
@@ -130,14 +130,14 @@ class CSV extends AbstractConverter {
 		if(method_exists($entityCls, 'getCustomFields')) {
 			$fields = Field::findByEntity($entityCls::getType()->getId());
 			foreach($fields as $field) {
-				$headers[] = 'customFields.' . $field->databaseName;
+				$headers[] = ['name' => 'customFields.' . $field->databaseName, 'label' => $field->name, 'many' => $field->getDataType()->hasMany()];
 			}
 		}
 		
 		return $headers;
 	}
 	
-	private function addSubHeaders($headers, $header, $prop) {
+	private function addSubHeaders($headers, $header, $prop, $many = false) {
 		
 		if(in_array($header, static::$excludeHeaders)) {
 			return $headers;
@@ -145,7 +145,7 @@ class CSV extends AbstractConverter {
 		
 		if(!($prop instanceof Relation)) {
 			if(!$prop->primary) {
-				$headers[] = $header;
+				$headers[] = ['name' => $header, 'label' => $header, 'many' => $many];
 			}
 			return $headers;
 		}
@@ -162,7 +162,7 @@ class CSV extends AbstractConverter {
 			}
 			
 			$subheader = $header . '.'. $name;
-			$headers =  $this->addSubHeaders($headers, $subheader, $value);
+			$headers =  $this->addSubHeaders($headers, $subheader, $value, $prop->many);
 		}	
 		
 		return $headers;
@@ -171,7 +171,7 @@ class CSV extends AbstractConverter {
 	protected function exportEntity(Entity $entity, $fp, $index, $total) {
 
 		if ($index == 0) {
-			fputcsv($fp, $this->getHeaders($entity));
+			fputcsv($fp, array_column($this->getHeaders($entity), 'label'));
 		}
 
 		$record = $this->export($entity);
@@ -183,8 +183,126 @@ class CSV extends AbstractConverter {
 		return 'csv';
 	}
 
-	public function importFile(File $file, $values = array()) {
+	
+	
+	
+	
+	protected function importEntity(Entity $entity, $fp, $index, array $params) {
 		
+		if($index == 0) {
+			$headers = fgetcsv($fp);
+		}
+		
+		$record = fgetcsv($fp);
+		
+		$mapping = $params['mapping'] ?? $this->getHeaders(get_class($entity));
+
+		$values = $this->mergeMultiples($record, $mapping, get_class($entity));
+
+		$this->setValues($entity, $values);
+		
+		$entity->save();
+		
+		return $entity;
+	}
+	
+	protected function setValues(Entity $entity, array $values) {
+		$entity->setValues($values);
+	}
+	
+	
+	private function mergeMultiples($record, $mapping, $entityClass) {
+		$v = [];
+		//create arrays of values that are mapped multiple times.
+		
+		$h = $this->getHeaders($entityClass);
+		$headers = [];
+		foreach($h as $i) {
+			$headers[$i['name']] = $i;
+		}
+		
+		foreach($mapping as $index => $path) {	
+			$modelClass = $entityClass;		
+			$relation = false;
+			if(empty($record[$index])) {
+				continue;
+			}
+			$parts = explode('.', $path);
+			$propName = array_pop($parts);
+			$sub = &$v;
+			foreach($parts as $part) {
+				if($modelClass && ($relation = $modelClass::getMapping()->getRelation($part))) {
+					$modelClass = $relation->entityName;
+				}else
+				{
+					$modelClass = false;
+				}
+				
+				if(!isset($sub[$part])) {
+					$sub[$part] = [];
+				}
+				$sub = &$sub[$part];					
+			}
+			
+			$multiple = ($relation && $relation->many) || !empty($headers[$path]['many']);
+			
+			if($multiple) {
+				if(isset($v[$propName])) {
+					$sub[$propName] = array_merge($v[$propName], explode($this->multipleDelimiter, $record[$index]));
+				} else
+				{
+					$sub[$propName] = explode($this->multipleDelimiter, $record[$index]);
+				}
+			} else
+			{
+				$sub[$propName] = $record[$index];
+			}
+		}
+		
+		
+		
+		//second pass for multiple values
+		foreach($v as $prop => $value) {
+			$relation = $entityClass::getMapping()->getRelation($prop);
+			if(!$relation || !$relation->many) {
+				continue;
+			}
+			
+			$new = [];
+			foreach($v[$prop] as $subprop => $subval) {
+				for($i = 0, $c = count($subval); $i < $c; $i++) {
+					if(!isset($new[$i])) {
+						$new[$i] = [];
+					}
+					if(!empty($subval[$i])) {
+						$new[$i][$subprop] = $subval[$i];
+					}
+				}
+			}
+//			GO()->warn($new);
+			$v[$prop] = $new;
+		}
+		
+		
+		return $v;
+	}
+	
+	/**
+	 * Get headers from CSV
+	 * 
+	 * @param File $file
+	 * @return string[]
+	 * @throws \Exception
+	 */
+	public function getCsvHeaders(File $file) {
+		$fp = $file->open('r');
+		$headers = fgetcsv($fp);
+		
+		if(!$headers) {
+			throw new \Exception("Could not read CSV file");
+		}
+		
+		return $headers;
 	}
 
 }

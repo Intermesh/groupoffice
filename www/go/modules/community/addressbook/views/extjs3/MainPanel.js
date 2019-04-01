@@ -184,7 +184,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 							handler: function() {
 								go.util.importFile(
 												'Contact', 
-												"text/vcard,application/json",
+												"text/vcard,text/csv",
 												{addressBookId: this.addAddressBookId});
 							},
 							scope: this

@@ -676,7 +676,13 @@ abstract class EntityController extends Controller {
 		return $params;
 	}
 	
-	
+	/**
+	 * Default handler for Foo/import method
+	 * 
+	 * @param type $params
+	 * @return type
+	 * @throws Exception
+	 */
 	protected function defaultImport($params) {
 		$params = $this->paramsImport($params);
 		
@@ -684,7 +690,33 @@ abstract class EntityController extends Controller {
 		
 		$converter = $this->findConverter($blob->type);
 		
-		$response = $converter->importFile($blob->getFile(), $params['values']);
+		$response = $converter->importFile($blob->getFile(), $this->entityClass(), $params);
+		
+		if(!$response) {
+			throw new \Exception("Invalid response from import convertor");
+		}
+		
+		return $response;
+	}
+	
+	/**
+	 * Default handler for Foo/importCSVMapping method
+	 * 
+	 * @param type $params
+	 * @return type
+	 * @throws Exception
+	 */
+	protected function defaultImportCSVMapping($params) {
+		$blob = Blob::findById($params['blobId']);	
+		
+		$converter = $this->findConverter($blob->type);
+		
+		$response['goHeaders'] = $converter->getHeaders($this->entityClass());
+		$response['csvHeaders'] = $converter->getCsvHeaders($blob->getFile());
+		
+		if(!$response) {
+			throw new \Exception("Invalid response from import convertor");
+		}
 		
 		return $response;
 	}

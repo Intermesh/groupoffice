@@ -26,11 +26,7 @@ class JSON extends AbstractConverter {
 		return json_encode($properties, JSON_PRETTY_PRINT);
 	}
 
-	public function importFile(\go\core\fs\File $file, $values = array()){
-		
-	}
-	
-	protected function exportEntityToBlob(Entity $entity, $fp, $index, $total) {
+	protected function exportEntity(Entity $entity, $fp, $index, $total) {
 				
 		if($index == 0) {
 			fputs($fp, "[\n");
@@ -47,6 +43,10 @@ class JSON extends AbstractConverter {
 
 	public function getFileExtension() {
 		return 'json';
+	}
+
+	protected function importEntity(Entity $entity, $fp, $index, array $params) {
+		
 	}
 
 }
