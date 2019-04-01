@@ -1,3 +1,4 @@
+01-04-2019 6.3.68
 - Email: Fixed subfolders with \ as delimiter
 - Timeregistration: Improved error message when time entry with break fails
 - Addressbook: Fixed custom field import 
