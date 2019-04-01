@@ -16,7 +16,12 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 			
 			items: [
 				this.fieldSet = new Ext.form.FieldSet({
-					labelWidth: dp(200)
+					labelWidth: dp(200),
+					items: [{
+							xtype: 'box',
+							autoEl: 'p',
+							html: t("Please match the CSV columns with the correct Group-Office columns and press 'Import' to continue.")
+					}]
 				})
 			]
 		});

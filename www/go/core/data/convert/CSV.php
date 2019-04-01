@@ -182,10 +182,6 @@ class CSV extends AbstractConverter {
 	public function getFileExtension(): string {
 		return 'csv';
 	}
-
-	
-	
-	
 	
 	protected function importEntity(Entity $entity, $fp, $index, array $params) {
 		
