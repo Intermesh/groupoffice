@@ -140,6 +140,11 @@ class VCard extends AbstractConverter {
 					return trim($str);
 			}
 	}
+	
+	protected function exportEntity(Entity $entity, $fp, $index, $total) {
+		$str = $this->export($entity);
+		fputs($fp, $str);
+	}
 
 	/**
 	 * 

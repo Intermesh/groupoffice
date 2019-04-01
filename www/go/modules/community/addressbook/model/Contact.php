@@ -422,6 +422,7 @@ class Contact extends AclItemEntity {
 	public static function converters() {
 		$arr = parent::converters();
 		$arr['text/vcard'] = VCard::class;		
+		$arr['text/csv'] = \go\modules\community\addressbook\convert\CSV::class;
 		return $arr;
 	}
 
@@ -486,6 +487,19 @@ class Contact extends AclItemEntity {
 		return parent::internalValidate();
 	}
 	
+	/**
+	 * Find all linked organizations
+	 * 
+	 * @return self[]
+	 */
+	public function findOrganizations(){
+		return self::find()
+						->join('core_link', 'l', 'c.id=l.toId and l.toEntityTypeId = '.self::getType()->getId())
+						->where('fromId', '=', $this->id)
+							->andWhere('fromEntityTypeId', '=', self::getType()->getId())
+							->andWhere('c.isOrganization', '=', true);
+	}
+	
 	private $organizationIds;
 	private $setOrganizationIds;
 	
@@ -495,12 +509,7 @@ class Contact extends AclItemEntity {
 			if($this->isNew()) {
 				$this->organizationIds = [];
 			} else {
-				$query = GO()->getDbConnection()->selectSingleValue('toId')->from('core_link', 'l')
-							->join('addressbook_contact', 'c','c.id=l.toId and l.toEntityTypeId = '.self::getType()->getId())
-							->where('fromId', '=', $this->id)
-							->andWhere('fromEntityTypeId', '=', self::getType()->getId())
-							->andWhere('c.isOrganization', '=', true);
-			
+				$query = $this->findOrganizations()->selectSingleValue('c.id');			
 				$this->organizationIds = array_map("intval", $query->all());
 			}
 		}		

@@ -7,6 +7,7 @@ use go\core\App;
 use go\core\data\ArrayableInterface;
 use go\core\data\exception\NotArrayable;
 use go\core\util\DateTime;
+use JsonSerializable;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionParameter;
@@ -22,7 +23,7 @@ use ReflectionProperty;
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
-abstract class Model implements ArrayableInterface, \JsonSerializable {
+abstract class Model implements ArrayableInterface, JsonSerializable {
 
 	/**
 	 * Get the readable property names as array

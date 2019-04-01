@@ -64,14 +64,6 @@ abstract class AbstractConverter {
 	abstract public function getFileExtension();
 	
 	/**
-	 * Convert an entity into another format
-	 * 
-	 * @param Entity $entity
-	 * @return string 
-	 */
-	abstract public function export(Entity $entity);
-	
-	/**
 	 * Read file and import them into Group-Office
 	 * 
 	 * @return int[] id's of imported entities
@@ -79,9 +71,15 @@ abstract class AbstractConverter {
 	abstract public function importFile(\go\core\fs\File $file, $values = []);
 	
 	
-	protected function exportEntityToBlob(Entity $entity, $fp, $index, $total) {
-		$str = $this->export($entity);
-		fputs($fp, $str);
+	abstract protected function exportEntity(Entity $entity, $fp, $index, $total);
+		
+	
+	protected function internalExport($fp, $entities, $total) {
+		$i = 0;
+		foreach($entities as $entity) {
+			$this->exportEntity($entity, $fp, $i, $total);
+			$i++;
+		}
 	}
 	
 	/**
@@ -91,17 +89,13 @@ abstract class AbstractConverter {
 	 * @return \go\core\fs\Blob
 	 * @throws \Exception
 	 */
-	public function exportToBlob(\go\core\orm\Query $entities) {		
+	public final function exportToBlob(\go\core\orm\Query $entities) {		
 		$tempFile = \go\core\fs\File::tempFile($this->getFileExtension());
 		$fp = $tempFile->open('w+');
 		
 		$total = $entities->getIterator()->rowCount();
 		
-		$i = 0;
-		foreach($entities as $entity) {
-			$this->exportEntityToBlob($entity, $fp, $i, $total);
-			$i++;
-		}
+		$this->internalExport($fp, $entities, $total);
 		
 		fclose($fp);
 		

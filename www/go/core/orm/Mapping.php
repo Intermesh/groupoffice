@@ -229,7 +229,7 @@ class Mapping {
 	 * Get all mapped property objects in a key value array. This is a mix of columns 
 	 * and relations.
 	 * 
-	 * @return mixed[]
+	 * @return Column | Relation
 	 */
 	public function getProperties() {
 		$props = [];
