@@ -219,17 +219,27 @@
 							if (!me.isAvailable(package, name, config.requiredPermissionLevel)) {
 								continue;
 							}
+							
+							if (config.initModule){
+								go.Translate.setModule(package, name);
+								config.initModule.call(this);
+							}
 
 							if (config.mainPanel) {
-								//todo GO.moduleManager is deprecated
-								GO.moduleManager._addModule(name, config.mainPanel, config.panelConfig, config.subMenuConfig);
+								if(Ext.isArray(config.mainPanel)) {
+									for(var i = 0; i < config.mainPanel.length; i++) {
+									
+										//todo panel is only constructed to grab config.title/id
+										var m = new config.mainPanel[i]();
+										//todo GO.moduleManager is deprecated
+										GO.moduleManager._addModule(config.mainPanel[i].prototype.id, config.mainPanel[i], {title:m.title}, config.subMenuConfig);
+									}
+								} else {
+									GO.moduleManager._addModule(name, config.mainPanel, config.panelConfig, config.subMenuConfig);
+								}
 							}
 
-							if (config.initModule)
-							{
-								go.Translate.setModule(package, name);
-								config.initModule();
-							}
+							
 						}
 					}
 					
@@ -238,6 +248,20 @@
 				}, me);
 			
 			});
+		},
+		
+		addPanel : function(panels) {
+			if(!Ext.isArray(panels)) {
+				panels = [panels];
+			}
+			
+			panels.forEach(function(p) {
+				if(!p.prototype.id) {
+					throw "Module panel must have an 'id'";
+				}
+				GO.mainLayout.addModulePanel(p.prototype.id, p);
+			}, this);
+
 		}
 	});
 

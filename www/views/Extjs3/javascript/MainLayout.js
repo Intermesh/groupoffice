@@ -332,24 +332,33 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	 */
 	addModulePanel : function(moduleName, panelClass, panelConfig) {		
 		
-		this.startMenu.add({
-			id: 'go-start-menu-' + moduleName,
-			moduleName: moduleName,
-			text: panelConfig.title || panelClass.prototype.title,
-			iconCls: panelConfig.iconCls || 'go-menu-icon-' + moduleName,
-			handler: function (item, e) {
-				this.openModule(item.moduleName);
-			},
-			scope: this
-		});
-		
+//		if(!this.rendered) {
+//			this.on("beforerender", function() {
+//				GO.mainLayout.addModulePanel(moduleName, panelClass, panelConfig);
+//			}, {single: true});
+//			return;
+//		}
+//		
+//		panelConfig = panelConfig || {};
+//		
+//		this.startMenu.add({
+//			id: 'go-start-menu-' + moduleName,
+//			moduleName: moduleName,
+//			text: panelConfig.title || panelClass.prototype.title,
+//			iconCls: panelConfig.iconCls || panelClass.prototype.iconCls || 'go-menu-icon-' + moduleName,
+//			handler: function (item, e) {
+//				this.openModule(item.moduleName);
+//			},
+//			scope: this
+//		});
+//		
 		GO.moduleManager._addModule(moduleName, panelClass, panelConfig || {});
 				
-		go.Router.add(new RegExp(moduleName + "$"), function () {
+		go.Router.add(new RegExp('(' + moduleName + ")$"), function (name) {
 			GO.mainLayout.openModule(name);
 		});
 		
-		return this.initModule(moduleName);
+		//this.initModule(moduleName);
 	},
 
 	onAuthentication: function () {
@@ -497,6 +506,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		this.createTabPanel(items);
 
 		this.beforeRender();
+		this.rendered = true;
+		this.fireEvent("beforerender", this);
 
 		function getUserImgStyle() {
 			if(!go.User.avatarId) {
@@ -640,7 +651,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 
 
-		this.rendered = true;
+		
 		this.fireEvent('render');
 
 		this.welcome();

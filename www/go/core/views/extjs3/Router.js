@@ -40,6 +40,12 @@ go.Router = {
 	/**
 	 * Add a route
 	 * 
+	 * @example
+	 * 
+	 * ```
+	 * go.Router.add(/([a-zA-Z0-9]*)\/([0-9]*)/, function(entity, id) {
+	 * 
+	 * });
 	 * 
 	 * @param {RegExp|function} /notes/(.*)/
 	 * @param {type} handler
