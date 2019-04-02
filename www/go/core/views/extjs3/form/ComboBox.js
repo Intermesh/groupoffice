@@ -7,6 +7,7 @@
  * @type |||
  */
 go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
+	value: null,
 	setValue: function (value) {
 		var me = this;
 
