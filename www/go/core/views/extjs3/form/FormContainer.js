@@ -13,7 +13,6 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 		go.form.FormContainer.superclass.initComponent.call(this);
 
 		this.on("add", function (e) {
-
 			//to prevent adding to Ext.form.BasicForm with add event.
 			//Cancels event bubbling
 			return false;
@@ -31,28 +30,27 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 	},
 
 	getAllFormFields: function () {
-		if (!this.allFormFields) {
-			//use slice to obtain copy
-			var fields = this.additionalFields.slice(), fn = function (f) {
-				if (f.isFormField && !f.isComposite && f.getXType() != 'checkboxgroup') {
-					fields.push(f);
-				} else if (f.items) {
-					if (f.items.each) {
-						//Ext.util.Collection
-						f.items.each(fn);
-					} else
-					{
-						//native array
-						f.items.forEach(fn);
-					}
+	
+		//use slice to obtain copy
+		var fields = this.additionalFields.slice(), fn = function (f) {
+			if (f.isFormField && !f.isComposite && f.getXType() != 'checkboxgroup') {
+				fields.push(f);
+			} else if (f.items) {
+				if (f.items.each) {
+					//Ext.util.Collection
+					f.items.each(fn);
+				} else
+				{
+					//native array
+					f.items.forEach(fn);
 				}
-			};
+			}
+		};
 
-			this.items.each(fn);
+		this.items.each(fn);
 
-			this.allFormFields = fields;
-		}
-		return this.allFormFields;
+		
+		return fields;
 	},
 	findField: function (id) {
 

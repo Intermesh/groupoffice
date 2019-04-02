@@ -124,7 +124,7 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 		switch(this.operatorCombo.getValue()) {				
 								
 			case 'after':				
-				return '> -' + v;
+				return '> ' + v;
 				
 			case 'before':				
 				return '< ' + v;

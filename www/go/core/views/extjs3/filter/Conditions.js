@@ -15,7 +15,6 @@ go.filter.Conditions = Ext.extend(go.form.FormGroup, {
 	
 	getValue : function() {
 		var v = go.filter.Conditions.superclass.getValue.call(this), conditions = [];
-		
 		for(var i = 0, l = v.length; i < l; i++) {
 			var condition = {};
 			condition[v[i].name] = v[i].value;
