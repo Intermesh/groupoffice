@@ -233,14 +233,14 @@ go.Jmap = {
 							console.debug("Aborted");
 							return true;
 						}
-						if (response[1][0] == "error") {
+						if (response[0] == "error") {
 							console.error('server-side JMAP failure', response);			
-							//Ext.MessageBox.alert(t("Error"), response[1][1].message);
+							//Ext.MessageBox.alert(t("Error"), response[1].message);
 						}
 
 						go.flux.Dispatcher.dispatch(response[0], response[1]);
 
-						var success = response[1][0] !== "error";
+						var success = response[0] !== "error";
 						if (o.callback) {
 							if (!o.scope) {
 								o.scope = me;

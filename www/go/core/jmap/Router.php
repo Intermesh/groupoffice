@@ -86,9 +86,7 @@ class Router {
 					$error["trace"] = explode("\n", $e->getTraceAsString());
 				}
 				
-				Response::get()->addResponse([
-						'error', $error
-				]);
+				Response::get()->addError($error);
 			}
 		}
 

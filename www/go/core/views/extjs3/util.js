@@ -258,7 +258,7 @@
 			callback: function (options, success, response) {
 				Ext.getBody().unmask();
 				if(!success) {
-					Ext.MessageBox.alert(t("Error"), response[1].message);				
+					Ext.MessageBox.alert(t("Error"), response.message);				
 				} else
 				{					
 					document.location = go.Jmap.downloadUrl(response.blobId);

@@ -31,6 +31,17 @@ class Response extends \go\core\http\Response {
 	}
 	
 	/**
+	 * Output an error
+	 * 
+	 * @param array $responseData eg. ['resultName, ['data']];
+	 * @return type
+	 * @throws Exception
+	 */
+	public function addError($responseData = null) {		
+		$this->data[] = ["error",  $responseData, $this->clientCallId];
+	}
+	
+	/**
 	 * 
 	 * Array of responses.
 	 * 

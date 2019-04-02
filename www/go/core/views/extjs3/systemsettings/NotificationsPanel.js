@@ -137,10 +137,9 @@ go.systemsettings.NotificationsPanel = Ext.extend(go.systemsettings.Panel, {
 					);
 				} else
 				{
-					var error = "";
-					if(response[0] == "error") {
-						error = "<br /><br />" + response[1].message;
-					}
+					var error = "";					
+					error = "<br /><br />" + response.message;
+					
 					Ext.MessageBox.alert(
 						t("Failed"), 
 						t("Failed to send message to {email}").replace('{email}', this.getForm().findField('systemEmail').getValue() + error) 
