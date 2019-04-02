@@ -93,6 +93,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 		$error = "Error: " . $responses[0][1][1]['message'];
 	} else	if (!empty($responses[0][1]['notCreated'])) {
 		$error = "Error: " . var_export($responses[0][1]['notCreated']['contact-1']['validationErrors'], true);
+	} else if(empty($responses[0][1]['created'])) {
+		$error = "Error: " . var_export($responses, true);
 	} else
 	{
 		$success = "Thank you! We received your contact information.";
