@@ -54,6 +54,14 @@ use go\core\orm\Query;
  */
 abstract class AbstractConverter {
 	
+	public function __construct() {
+		$this->init();
+	}
+	
+	protected function init() {
+		
+	}
+	
 	/**
 	 * The name of the convertor
 	 * 
@@ -145,7 +153,7 @@ abstract class AbstractConverter {
 	 * @return Blob
 	 * @throws Exception
 	 */
-	public final function exportToBlob(Query $entities) {		
+	public final function exportToBlob($name, Query $entities) {		
 		$tempFile = File::tempFile($this->getFileExtension());
 		$fp = $tempFile->open('w+');
 		
@@ -156,7 +164,7 @@ abstract class AbstractConverter {
 		fclose($fp);
 		
 		$blob = Blob::fromTmp($tempFile);
-		$blob->name = "Export-" . date('Y-m-d-H:i:s') . '.'. $this->getFileExtension();
+		$blob->name = $name."-" . date('Y-m-d-H:i:s') . '.'. $this->getFileExtension();
 		if(!$blob->save()) {
 			throw new Exception("Couldn't save blob: " . var_export($blob->getValidationErrors(), true));
 		}

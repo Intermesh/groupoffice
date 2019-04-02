@@ -759,7 +759,10 @@ abstract class EntityController extends Controller {
 				
 		$entities = $this->getGetQuery($params);
 		
-		$blob = $convertor->exportToBlob($entities);
+		$cls = $this->entityClass();
+		$name = $cls::getType()->getName();
+		
+		$blob = $convertor->exportToBlob($name, $entities);
 		
 		return ['blobId' => $blob->id];		
 	}

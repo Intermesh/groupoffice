@@ -44,6 +44,13 @@ class CSV extends AbstractConverter {
 	/**
 	 * Add a custom column to the export and import
 	 * 
+	 * @example
+	 * 
+	 *	//override init
+	 * 	protected function init() {
+	 *		$this->addColumn('status', GO()->t("Status", 'sony', 'assets'));
+	 *	}
+	 * 
 	 * @param string $name Column name
 	 * @param string $label Column label
 	 * @param string $many True if this field value should be converted to an array when importing
