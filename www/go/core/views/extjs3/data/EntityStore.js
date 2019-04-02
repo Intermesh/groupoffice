@@ -495,32 +495,45 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 			var entities = [], unknownIds = [];
 			
-			me._getAlreadyLoaded(ids, entities, unknownIds);
+			var doCallback = function() {
+				var notFoundIds = me.notFound.filter(function(i) {			
+					return ids.indexOf(i) > -1;	
+				});
 
-			if (unknownIds.length) {
-				return me._getFromBrowserStorage(unknownIds).then(function(unknownIds) {
-					if(!unknownIds.length) {
-						return me.get(ids, cb, scope);					
-					} else
-					{
-						return me._getFromServer(unknownIds).then(function() {
-							return me.get(ids, cb, scope);					
-						});
-					}
-				}).catch(function(err) {
-					reject(err);					
-				});				
-			}			
+				if(cb) {				
+					cb.call(scope || me, entities, notFoundIds);				
+				}
+				resolve(entities, notFoundIds);
+			};
 			
-			
-			var notFoundIds = me.notFound.filter(function(i) {			
-				return ids.indexOf(i) > -1;	
-			});
+			me._getAlreadyLoaded(ids, entities, unknownIds);			
 
-			if(cb) {				
-				cb.call(scope || me, entities, notFoundIds);				
+			if (!unknownIds.length) {
+				doCallback();
+				return;
 			}
-			resolve(entities, notFoundIds);
+			
+			me._getFromBrowserStorage(unknownIds).then(function(unknownIds) {
+				if(!unknownIds.length) {
+					return me.get(ids).then(function(e, nf) {
+						entities = e;
+						notFoundIds = nf;
+					});
+				} else
+				{
+					return me._getFromServer(unknownIds).then(function() {
+						return me.get(ids).then(function(e, nf) {
+							entities = e;
+							notFoundIds = nf;
+						});
+					});
+				}
+			}).catch(function(err) {
+				reject(err);					
+			}).then(function() {
+				doCallback();
+			});
+			
 		});
 		
 	},
