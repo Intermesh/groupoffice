@@ -6,12 +6,12 @@ $updates['201811272011'][] = function() {
 };
 $updates['201811272011'][] = "DROP TABLE addressbook_contact_custom_fields";
 
-$updates['201811272011'][] = function() {
+$updates['201904021547'][] = function() {
 	$m = new go\modules\community\addressbook\install\Migrate63to64();
 	$m->run();
 };
 
-$updates['201901191547'][] = "CREATE TABLE IF NOT EXISTS `addressbook_user_settings` (
+$updates['201904021547'][] = "CREATE TABLE IF NOT EXISTS `addressbook_user_settings` (
   `userId` int(11) NOT NULL,
   `defaultAddressBookId` int(11) DEFAULT NULL,
   PRIMARY KEY (`userId`),

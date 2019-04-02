@@ -183,7 +183,7 @@ class Utils {
 		}
 
 		$msg = $e->getMessage();
-		App::get()->debug($msg);
+		//App::get()->debug($msg);
 
 		if(preg_match("/key '(.*)'/", $msg, $matches)) {
 			$key = $matches[1];

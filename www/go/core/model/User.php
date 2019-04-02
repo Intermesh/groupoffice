@@ -551,9 +551,9 @@ class User extends Entity {
 	
 	private function saveContact() {
 		
-		if(!isset($this->contact) || $this->isModified(['displayName', 'email', 'avatarId'])) {
-			$this->contact = $this->getProfile();
-		}
+//		if(!isset($this->contact) ){// || $this->isModified(['displayName', 'email', 'avatarId'])) {
+//			$this->contact = $this->getProfile();
+//		}
 		
 		if(!isset($this->contact)) {			
 			return true;
