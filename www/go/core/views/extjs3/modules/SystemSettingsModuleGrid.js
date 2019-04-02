@@ -350,6 +350,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 		
 		var params = {};
 		
+		
 		if(record.data.id) {
 			params.update = {};
 			params.update[record.data.id] = {
@@ -358,13 +359,19 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 			};
 			go.Stores.get("Module").set(params, function(options, success, response) {
 
-				if(record.data.enabled && record.isModified("enabled")) {
-					//record.set('aclId', response['created'][record.data.id].aclId);
-					this.showPermissions(record.data.name, t(record.data.name, record.data.name), record.data.aclId);
-					this.store.load();				
-				}
+				if(success){
+					if(record.data.enabled && record.isModified("enabled")) {
+						//record.set('aclId', response['created'][record.data.id].aclId);
+						this.showPermissions(record.data.name, t(record.data.name, record.data.name), record.data.aclId);
+						this.store.load();				
+					}
 
-				record.commit();
+					record.commit();
+				} else
+				{
+					Ext.MessageBox.alert(t("Error"), response.message);
+					this.store.load();
+				}
 
 			}, this);
 		} else
@@ -377,11 +384,17 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 					package: record.data.package
 				},
 				callback: function(options, success, response) {
-					record.set('enabled', true);										
-					record.set('id', response['list'][0].id);
-					record.set('aclId', response['list'][0].aclId);
-					this.showPermissions(record.data.name, t(record.data.name, record.data.name), record.data.aclId);					
-					record.commit();
+					if(success) {
+						record.set('enabled', true);										
+						record.set('id', response['list'][0].id);
+						record.set('aclId', response['list'][0].aclId);
+						this.showPermissions(record.data.name, t(record.data.name, record.data.name), record.data.aclId);					
+						record.commit();
+					} else
+					{
+						Ext.MessageBox.alert(t("Error"), response.message);
+						this.store.load();
+					}
 				},
 				scope: this
 			});
@@ -390,6 +403,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 		
 		
 	},
+
 /**
  * Create Json string for posting to the controller
  * 

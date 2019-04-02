@@ -59,37 +59,43 @@ abstract class Module {
 
 		try{
 			$this->installDatabase();
+		
+		
+			GO()->rebuildCache(true);
+			GO()->getDbConnection()->beginTransaction();
+		
+			$model = new model\Module();
+			$model->name = static::getName();
+			$model->package = static::getPackage();
+			$model->version = $this->getUpdateCount();
+
+			if(!$model->save()) {
+				$this->rollBack();
+				return false;
+			}
+
+			if(!$this->registerEntities()) {				
+				$this->rollBack();
+				$this->uninstallDatabase();
+				return false;
+			}
+
+			if(!$this->afterInstall($model)) {
+				$this->rollBack();
+				$this->uninstallDatabase();
+				return false;
+			}		
+
+			if(!GO()->getDbConnection()->commit()) {
+				$this->rollBack();
+				$this->uninstallDatabase();
+				return false;
+			}		
 		} catch(Exception $e) {
+			$this->rollBack();
 			$this->uninstallDatabase();
 			throw $e;
 		}
-		
-		GO()->rebuildCache(true);
-		GO()->getDbConnection()->beginTransaction();
-		
-		$model = new model\Module();
-		$model->name = static::getName();
-		$model->package = static::getPackage();
-		$model->version = $this->getUpdateCount();
-		
-		if(!$model->save()) {
-			$this->rollBack();
-			return false;
-		}
-		
-		if(!$this->registerEntities()) {
-			$this->rollBack();
-			return false;
-		}
-		
-		if(!$this->afterInstall($model)) {
-			$this->rollBack();
-			return false;
-		}		
-		
-		if(!GO()->getDbConnection()->commit()) {
-			return false;
-		}		
 		
 		return $model;
 	}
@@ -139,10 +145,20 @@ abstract class Module {
 	 */
 	public function registerEntities() {
 		$entities = $this->getClassFinder()->findByParent(Entity::class);
+		if(!count($entities)) {
+			return true;
+		}
 		
+		$moduleModel = $this->getModel();
 		foreach($entities as $entity) {
-			if(!$entity::getType()) {
-				return false;
+			$type = $entity::getType();
+			if(!$type) {
+				throw new \Exception("Could not register entity type for " . $entity::getClientName());
+			}
+			$typeModuleModel = $type->getModule();
+			
+			if($typeModuleModel->id != $moduleModel->id) {
+				throw new \Exception("Can't register entity '".$entity::getClientName()."' because it's already registered for module " . ($typeModuleModel->package ?? "legacy") . "/" .$typeModuleModel->name);
 			}
 		}		
 		
@@ -398,6 +414,15 @@ abstract class Module {
 		}
 		
 		return 'data:'.$icon->getContentType().';base64,'. base64_encode($icon->getContents());
+	}
+	
+	/**
+	 * Get the module entity model
+	 * 
+	 * @return model\Module
+	 */
+	public function getModel() {
+		return model\Module::findByName($this->getPackage(), $this->getName());
 	}
 	
 	/**
