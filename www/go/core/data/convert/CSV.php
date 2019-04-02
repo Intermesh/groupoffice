@@ -39,6 +39,34 @@ class CSV extends AbstractConverter {
 		return $record;
 	}
 	
+	private $customColumns = [];
+	
+	/**
+	 * Add a custom column to the export and import
+	 * 
+	 * @param string $name Column name
+	 * @param string $label Column label
+	 * @param string $many True if this field value should be converted to an array when importing
+	 * @param string $exportFunction Defaults to "export" . ucfirst($name)
+	 * @param string $importFunction Defaults to "import" . ucfirst($name)
+	 */
+	protected function addColumn($name, $label, $many = false, $exportFunction = null, $importFunction = null) {
+		if(!isset($exportFunction)) {
+			$exportFunction = "export".ucfirst($name);
+		}
+		if(!isset($importFunction)) {
+			$importFunction = "import".ucfirst($name);
+		}
+		
+		$this->customColumns[$name] = [
+				'name' => $name, 
+				'label' => $label, 
+				'many' => $many,
+				'importFunction' => $importFunction, 
+				'exportFunction' => $exportFunction
+		];
+	}
+	
 	/**
 	 * Get a value for a header
 	 * 
@@ -47,6 +75,11 @@ class CSV extends AbstractConverter {
 	 * @return string
 	 */
 	protected function getValue(Entity $entity, $header) {
+		
+		if(isset($this->customColumns[$header])) {
+			return $this->getCustomColumnValue($entity,$header);
+		}
+				
 		$path = explode('.', $header);
 		
 		$v = $entity;
@@ -77,6 +110,10 @@ class CSV extends AbstractConverter {
 		}
 		
 		return is_array($v) ? implode($this->multipleDelimiter, $v) : $v;
+	}
+	
+	private function getCustomColumnValue(Entity $entity, $header) {
+		return call_user_func([$this, $this->customColumns[$header]['exportFunction']], $entity, $header);
 	}
 	
 	private function exportSubFields($record, $v) {
@@ -132,9 +169,9 @@ class CSV extends AbstractConverter {
 			foreach($fields as $field) {
 				$headers[] = ['name' => 'customFields.' . $field->databaseName, 'label' => $field->name, 'many' => $field->getDataType()->hasMany()];
 			}
-		}
+		}	
 		
-		return $headers;
+		return array_merge($headers, array_values($this->customColumns));
 	}
 	
 	private function addSubHeaders($headers, $header, $prop, $many = false) {
@@ -183,6 +220,15 @@ class CSV extends AbstractConverter {
 		return 'csv';
 	}
 	
+	private function recordIsEmpty(array $record) {
+		foreach($record as $v) {
+			if(!empty($v)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	protected function importEntity(Entity $entity, $fp, $index, array $params) {
 		
 		if($index == 0) {
@@ -191,9 +237,15 @@ class CSV extends AbstractConverter {
 		
 		$record = fgetcsv($fp);
 		
+		if(!$record || $this->recordIsEmpty($record)) {
+			return false;
+		}
+		
 		$mapping = $params['mapping'] ?? $this->getHeaders(get_class($entity));
 
 		$values = $this->mergeMultiples($record, $mapping, get_class($entity));
+		
+		$values = $this->importCustomColumns($entity, $values);
 
 		$this->setValues($entity, $values);
 		
@@ -202,12 +254,24 @@ class CSV extends AbstractConverter {
 		return $entity;
 	}
 	
+	protected function importCustomColumns(Entity $entity, $values){
+		foreach($this->customColumns as $c) {
+			if(!isset($values[$c['name']])) {
+				continue;
+			}
+			call_user_func([$this, $c['importFunction']], $entity, $values[$c['name']], $c['name']);
+			unset($values[$c['name']]);
+		}
+		return $values;
+	}
+	
 	protected function setValues(Entity $entity, array $values) {
 		$entity->setValues($values);
 	}
 	
 	
 	private function mergeMultiples($record, $mapping, $entityClass) {
+	
 		$v = [];
 		//create arrays of values that are mapped multiple times.
 		
@@ -218,6 +282,8 @@ class CSV extends AbstractConverter {
 		}
 		
 		foreach($mapping as $index => $path) {	
+			
+			$index = (int) $index;
 			$modelClass = $entityClass;		
 			$relation = false;
 			if(empty($record[$index])) {

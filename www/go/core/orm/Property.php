@@ -867,12 +867,12 @@ abstract class Property extends Model {
 	private function saveTable(MappedTable $table, array &$modified) {
 				
 		$modifiedForTable = $this->extractModifiedForTable($table, $modified);
-		
-		if(!empty($modified)) {
+		$recordIsNew = $this->recordIsNew($table);
+		if(!empty($modified) || $recordIsNew) {
 			$modifiedForTable = $this->setSaveProps($table, $modifiedForTable);
 		}
 
-		if (empty($modifiedForTable)) {
+		if (empty($modifiedForTable) && !$recordIsNew) {
 			return true;
 		}		
 		
@@ -881,7 +881,7 @@ abstract class Property extends Model {
 		}
 		
 		try {
-			if ($this->recordIsNew($table)) {				
+			if ($recordIsNew) {				
 				//this if for cases when a second table extends the model but the key is not part of the properties
 				//For example Password extends User but the ket "userId" of password is not part of the properties
 				foreach($table->getKeys() as $from => $to) {

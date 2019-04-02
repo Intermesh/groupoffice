@@ -49,6 +49,11 @@ trait SearchableTrait {
 			$search = new \go\core\model\Search();
 			$search->setEntity(static::getType());
 		}
+		
+		if(empty($this->id)) {
+			throw new \Exception("ID is not set");
+		}
+		
 		$search->entityId = $this->id;
 		$search->setAclId($this->findAclId());
 		$search->name = $this->getSearchName();

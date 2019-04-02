@@ -445,3 +445,4 @@ $updates['201903151726'][] = "ALTER TABLE `core_entity_filter`
 
 
 $updates['201903221350'][] = "ALTER TABLE `core_customfields_field_set` ADD `isTab` BOOLEAN NOT NULL DEFAULT FALSE AFTER `filter`;";
+$updates['201904021341'][] = "ALTER TABLE `core_search` CHANGE `description` `description` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;";

@@ -185,7 +185,7 @@ CREATE TABLE `core_search` (
   `entityId` int(11) NOT NULL,
   `moduleId` int(11) DEFAULT NULL,
   `name` varchar(100) DEFAULT NULL,
-  `description` varchar(255) NOT NULL DEFAULT '',
+  `description` varchar(255) NULL DEFAULT NULL,
   `entityTypeId` int(11) NOT NULL,
   `keywords` varchar(255) NOT NULL DEFAULT '',
   `filter` varchar(50) DEFAULT NULL,

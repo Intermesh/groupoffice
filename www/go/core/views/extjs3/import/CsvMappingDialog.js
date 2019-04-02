@@ -48,6 +48,10 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 			},
 			callback: function(options, success, response) {
 				
+				if(!success) {
+					Ext.MessageBox.alert(t("Error"), response.message);
+					return;
+				}
 				var store = this.createGOHeaderStore(response.goHeaders);
 				
 				var index = 0;
@@ -101,7 +105,13 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 	getMapping : function() {
 		var mapping = {};
 		this.fieldSet.items.each(function(i) {
-			mapping[i.hiddenName] = i.getValue();
+			if(!Ext.isDefined(i.hiddenName)) {
+				return true;
+			}
+			var path = i.getValue();
+			if(path) {
+				mapping[i.hiddenName] = path;
+			}
 		});
 		
 		return mapping;

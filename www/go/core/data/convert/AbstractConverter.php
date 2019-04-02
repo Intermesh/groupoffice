@@ -76,9 +76,7 @@ abstract class AbstractConverter {
 	 * @return int[] id's of imported entities
 	 */
 	public function importFile(File $file, $entityClass, $params = array()) {
-		$response = ['count' => 0, 'errors' => [], 'success' => true];
-		
-		
+		$response = ['count' => 0, 'errors' => [], 'success' => true];		
 		
 		$fp = $file->open('r');
 		
@@ -93,6 +91,11 @@ abstract class AbstractConverter {
 				}
 
 				$entity = $this->importEntity($entity, $fp, $index++, $params);
+				
+				//ignore when false is returned. This is not an error. But intentional. Like CSV skipping a blank line for example.
+				if($entity === false) {
+					continue;
+				}
 
 				if($entity->hasValidationErrors()) {
 					$response['errors'][] = $entity->getValidationErrors();				
@@ -109,7 +112,19 @@ abstract class AbstractConverter {
 		
 		return $response;
 	}
-	
+	/**
+	 * Handle's the import. 
+	 * 
+	 * It must read from the $fp file pointer and return the entity object.
+	 * 
+	 * When false is returned the result will be ignored. For example when you want to skip a CSV line because it's empty.
+	 * 
+	 * @param Entity $entity
+	 * @param resource $fp
+	 * @param int $index
+	 * @param array $params
+	 * @return $entity|false
+	 */
 	abstract protected function importEntity(Entity $entity, $fp, $index, array $params);
 	
 	abstract protected function exportEntity(Entity $entity, $fp, $index, $total);
