@@ -7,9 +7,11 @@ use go\core\db\Column;
 use go\core\db\Criteria;
 use go\core\model\Link;
 use go\core\orm\CustomFieldsTrait;
+use go\core\orm\LoggingTrait;
 use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
 use go\core\validate\ErrorCode;
+use go\modules\community\addressbook\convert\CSV;
 use go\modules\community\addressbook\convert\VCard;
 use function GO;
 						
@@ -26,6 +28,8 @@ class Contact extends AclItemEntity {
 	use CustomFieldsTrait;
 	
 	use SearchableTrait;
+	
+	use LoggingTrait;
 	
 	/**
 	 * 
@@ -422,7 +426,7 @@ class Contact extends AclItemEntity {
 	public static function converters() {
 		$arr = parent::converters();
 		$arr['text/vcard'] = VCard::class;		
-		$arr['text/csv'] = \go\modules\community\addressbook\convert\CSV::class;
+		$arr['text/csv'] = CSV::class;
 		return $arr;
 	}
 

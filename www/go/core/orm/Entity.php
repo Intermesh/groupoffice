@@ -262,6 +262,14 @@ abstract class Entity extends Property {
 			}
 		}		
 		
+		//see \go\core\orm\LoggingTrait
+		if(method_exists($this, 'log')) {
+			if(!$this->log($this->isNew() ? \go\core\model\Log::ACTION_ADD : \go\core\model\Log::ACTION_UPDATE)) {				
+				$this->setValidationError("search", ErrorCode::INVALID_INPUT, "Could not save core_search entry");				
+				return false;
+			}
+		}	
+		
 		return true;
 	}
 

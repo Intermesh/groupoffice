@@ -82,7 +82,7 @@ class LogController extends AbstractModelController {
 		$columnModel = new ColumnModel(Log::model());
 		$findParams = FindParams::newInstance()->select()->order('ctime','DESC');
 		$findParams->getCriteria()
-						->addCondition('model', $entityType->getId())
+						->addCondition('model', $entityType->getName())
 						->addCondition('model_id', $params['entityId']);
 		
 		//Create store
