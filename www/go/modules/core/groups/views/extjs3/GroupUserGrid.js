@@ -79,7 +79,7 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 					id: 'name',
 					header: t('Name'),
 					width: dp(200),
-					sortable: true,
+					sortable: false,
 					dataIndex: 'displayName',
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 						
@@ -97,23 +97,11 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>',
 				forceFit: true,
 				autoFill: true
-			},
-			listeners: {
-				scope: this,
-				afterrender: function() {
-					this.store.load();
-				}
 			}
-//			// config options for stateful behavior
-//			stateful: true,
-//			stateId: 'users-grid'
-		});
-		
+		});		
 	
 		this.store.on("beforeload", this.onBeforeStoreLoad, this);
-
 		go.modules.core.groups.GroupUserGrid.superclass.initComponent.call(this);
-
 	},
 
 	
@@ -148,7 +136,9 @@ go.modules.core.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 		this.selectedUsers = [];
 		groups.forEach(function(group) {
 			me.selectedUsers.push(group.userId);
-		});
+		});		
+		
+		this.store.load();
 	},
 	
 	onBeforeStoreLoad : function(store, options) {
