@@ -2,7 +2,7 @@
 return array (
   'Favorite' => 'Favoris',
   'Add to favorites' => 'Ajouter aux favoris',
-  'Manage favorites' => 'GÃ©rer les favoris',
+  'Manage favorites' => 'Gérer les favoris',
   'User' => 'Utilisateur',
   'Calendar' => 'Calendrier',
   'Sort' => 'Trier',

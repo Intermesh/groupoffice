@@ -1,8 +1,8 @@
 <?php
 return array (
   'Time' => 'Date & Heure',
-  'Model' => 'ModÃ¨le',
-  'User agent' => 'Client internet',
+  'Model' => 'Modèle',
+  'User agent' => 'Agent utilisateur',
   'IP address' => 'Adresse IP',
   'Controller' => 'Controlleur',
   'name' => 'Log d\'activitÃ©',
@@ -10,4 +10,5 @@ return array (
   'Action' => 'Action',
   'Message' => 'Message',
   'ID' => 'ID',
+  'Activity log' => 'Journal d\'activité',
 );

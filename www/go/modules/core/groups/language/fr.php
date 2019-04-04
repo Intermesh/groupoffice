@@ -17,4 +17,9 @@ return array (
   'Use' => 'Utiliser',
   'name' => 'Groupes',
   'description' => '<i style="color: green">*** Module Admin *** </i>GÃ©rer les groupes d\'utilisateurs de {product_name}.',
+  'Group defaults' => 'Valeurs groupe par défaut',
+  'Members of the groups below can access a new group when it is created. These groups can share items with users and user groups that they are not members of.' => 'Les membres des groupes ci-dessous peuvent accéder à un nouveau groupe lors de sa création. Ces groupes peuvent partager des éléments avec des utilisateurs et des groupes d\'utilisateurs dont ils ne sont pas membres.',
+  'Use the button below to apply the above to existing groups. WARNING: This will erase all custom permissions on groups.' => 'Utilisez le bouton ci-dessous pour appliquer ce qui précède aux groupes existants. AVERTISSEMENT : cela effacera toutes les autorisations personnalisées sur les groupes.',
+  'Apply to all' => 'Appliquer à tous',
+  'Are you sure you want to reset all group permissions? This can\'t be undone.' => 'Êtes-vous sûr de vouloir réinitialiser toutes les autorisations de groupe ? Cette action ne peut pas être annulée.',
 );
