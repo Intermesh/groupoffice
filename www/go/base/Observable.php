@@ -35,8 +35,6 @@ class Observable{
 	
 	public static $listeners;
 	
-	public static $listenersToWrite = array();
-	
 	/**
 	 * Will check if the event listeners have been cached and will 
 	 * cache them when necessary.
@@ -48,29 +46,13 @@ class Observable{
 
 		\GO::debug("GO\Base\Observable::cacheListeners");
 		\GO::modules()->callModuleMethod('initListeners');
-		self::writeListenersFile();
+		\GO::cache()->set("listeners", self::$listeners);
 		
 		
 		
 	}
 	
 	public static function writeListenersFile(){
-		
-		$cacheFolder = \GO::config()->getCacheFolder();
-		$folder = $cacheFolder->createChild('listeners',false);
-		$folder->delete();	
-		$folder->create();
-
-		foreach(self::$listenersToWrite as $listenerClass=>$listeners){
-			$file = $folder.'/'.str_replace('\\','-', $listenerClass.'.php');
-			$content = "<?php\n// Build date: ".date('d-m-Y H:i:s')."\n";
-			
-			foreach($listeners as $listener){
-				$content .= '$listeners["'.$listener[1].'"][]=array('.var_export($listener[0], true).', "'.$listener[2].'");'."\n";
-			}	
-			
-			file_put_contents($file, $content);		
-		}
 		
 	}
 	
@@ -85,10 +67,13 @@ class Observable{
 		$currentClass = get_class($this);
 		\GO::debug("addListener($eventName,$listenerClass, $staticListenerFunction) => $currentClass");
 
-		if(!isset(self::$listenersToWrite[$currentClass])){
-			self::$listenersToWrite[$currentClass]=array();
+		if(!isset(self::$listeners[$currentClass])){
+			self::$listeners[$currentClass][$eventName]=array();
 		}
-		self::$listenersToWrite[$currentClass][]=array($listenerClass,$eventName,$staticListenerFunction);
+		if(!isset(self::$listeners[$currentClass])){
+			self::$listeners[$currentClass][$eventName]=array();
+		}
+		self::$listeners[$currentClass][$eventName][]=array($listenerClass,$staticListenerFunction);
 
 	}	
 	
@@ -115,24 +100,17 @@ class Observable{
 	 */
 	public function fireEvent($eventName, $params=array()){
 		
-		$className = str_replace('\\','-', get_class($this));		
-		
-//		do{
-		
-		if(!isset(self::$listeners[$className])){
-			
-			//listeners array will be loaded from a file. Because addListener is only called once when there is no cache.
-			$listeners=array();
-			
-			$cacheFile = \GO::config()->getCacheFolder().'/listeners/'.$className.'.php';
-//			$cacheFile = \GO::config()->orig_tmpdir.'cache/listeners/'.$className.'.php';
-			if(file_exists($cacheFile))
-				require($cacheFile);
-			
-			self::$listeners[$className]=$listeners;			
+		$className = get_class($this);			
+
+		if(!isset(self::$listeners)){
+			self::$listeners = \GO::cache()->get("listeners");
+			if(!self::$listeners) {
+				$this->cacheListeners();
+			}
 		}
 		
-		if(isset(self::$listeners[$className][$eventName])){
+		if(isset(self::$listeners[$className][$eventName])){		
+			
 			foreach(self::$listeners[$className][$eventName] as $listener)
 			{
 				\GO::debug('Firing listener for class '.$className.' event '.$eventName.': '.$listener[0].'::'.$listener[1]);
@@ -145,8 +123,7 @@ class Observable{
 				}
 			}
 		}
-//		}
-//		while($className = get_parent_class($className));
+		
 		return true;
 	}
 
