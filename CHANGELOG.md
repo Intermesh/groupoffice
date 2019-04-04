@@ -5,6 +5,7 @@
 - Core: Updated French translation
 - Custom fields: Fixed rename of tree select slaves
 - Core: Don't trackResetOnLoad in TabbedFormDialog because this will create invalid default values because those dialogs are reused.
+- Core: Links open in popup window like in 6/2
 
 01-04-2019 6.3.68
 - Email: Fixed subfolders with \ as delimiter
