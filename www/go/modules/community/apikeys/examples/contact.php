@@ -25,8 +25,21 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 			'lastName' => $_POST['lastName']
 	];
 	
+	if(isset($_POST['addressBookId'])) {
+		$contact['addressBookId'] = $_POST['addressBookId'];
+	}
+	
 	if(isset($_POST['email'])) {
 		$contact['emailAddresses'] = [['email' => $_POST['email']]];
+	}
+	
+	$contact['phoneNumbers'] = [];
+	if(isset($_POST['homePhone'])) {
+		$contact['phoneNumbers'][] = ['type'=>'home', 'number' => $_POST['homePhone']];
+	}
+	
+	if(isset($_POST['mobilePhone'])) {
+		$contact['phoneNumbers'][] = ['type'=>'mobile', 'number' => $_POST['mobilePhone']];
 	}
 	
 	$contact['addresses'] = [
@@ -60,6 +73,12 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 			"clientCallId-1"]
 	];
 	
+	
+//	echo "<pre>";
+//	var_dump($data);
+//	exit();
+
+	
 	$dataStr = json_encode($data);
 	
 	// Make POST request with curl
@@ -75,14 +94,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	);                                                                                                                   
                                                                                                                      
 	$result = curl_exec($ch);
-	
+
 	//check for request error.
 	if (!$result) {
 		die("Failed to send request!" . curl_error($ch));
 	}
 
 	$responses = json_decode($result, true);
-	
+
 	// Uncomment to inspect API response
 //	echo "<pre>";
 //	var_dump($responses);
@@ -145,6 +164,10 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     <div class="col-md-8 order-md-1">
       <h4 class="mb-3">Billing address</h4>
       <form class="needs-validation" method="POST">
+				
+				<!-- You can specify an address book by ID by uncommenting the following input tag. If you don't specify it the default address book of the admin user will be used. -->
+				<!-- <input type="hidden" name="addressBookId" value="1" /> -->
+				
         <div class="row">
           <div class="col-md-6 mb-3">
             <label for="firstName">First name</label>
@@ -170,6 +193,18 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
           <div class="invalid-feedback">
             Please enter a valid email address for shipping updates.
           </div>
+        </div>
+				
+				<div class="mb-3">
+          <label for="homePhone">Home phone <span class="text-muted">(Optional)</span></label>
+          <input type="homePhone" class="form-control" id="homePhone"  name="homePhone">
+         
+        </div>
+				
+				<div class="mb-3">
+          <label for="mobilePhone">Mobile phone <span class="text-muted">(Optional)</span></label>
+          <input type="mobilePhone" class="form-control" id="mobilePhone"  name="mobilePhone">
+         
         </div>
 
         <div class="mb-3">
@@ -209,9 +244,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
               Zip code required.
             </div>
           </div>
-        </div>
-        <hr class="mb-4">
+        </div>								
+        
+				<hr class="mb-4">
 				
+				<h4 class="mb-4">Custom field</h4>
 				<div class="form-check">
 					<input type="checkbox" class="form-check-input" id="exampleCheck1" name="subscribe" value="1">
 					<label class="form-check-label" for="exampleCheck1">Subscribe to newsletter</label>
