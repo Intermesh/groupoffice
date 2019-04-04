@@ -1,3 +1,4 @@
+- Core: Pin TCPDF to version 6.2.22. Higher versions break image loading in PDF
 - Address book: search sent invalid data to the server causing problems on some servers
 - Core: Selected group members should be on top when editing groups
 - Core: Overriding permissions in projects was undone by users editing a project with write permissions
