@@ -1,5 +1,6 @@
 - Core: Empty cache folder instead of delete 2
 - Core: CLI Delete methods for notes and folders
+- Billing: remoteGroup and remotSort on to fix sorting isue with item groups
 
 21-03-2019 6.2.115
 - Document templates: Fixed document broken due to exception
