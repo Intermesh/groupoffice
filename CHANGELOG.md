@@ -1,4 +1,5 @@
 - Address book: search sent invalid data to the server causing problems on some servers
+- Core: Selected group members should be on top when editing groups
 
 01-04-2019 6.3.68
 - Email: Fixed subfolders with \ as delimiter
