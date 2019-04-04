@@ -98,11 +98,38 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 							var record = this.store.getById(node.getAttribute('data-id'));
 							
 							var entity = go.Entities.get(record.data.toEntity);
-
 							if (!entity) {
 								throw record.data.toEntity + " is not a registered entity";
 							}
-							entity.goto(record.data.toId);
+//							entity.goto(record.data.toId);
+							
+							var previewPanel = entity.linkDetail(), win = new go.Window({
+								tools: [{
+									id: 'home',
+									handler: function() {
+										entity.goto(record.data.toId);
+										win.close();
+									}
+								}],
+								title: entity.title,
+								layout: "fit",
+								width: dp("600"),
+								height: dp("700"),
+								items: [
+									previewPanel
+								]
+							});
+							
+							win.show();
+							previewPanel.load(record.data.toId);
+
+//								var lb = new go.links.LinkBrowser({
+//									entity: this.store.baseParams.filter.entity,
+//									entityId: this.store.baseParams.filter.entityId
+//								});
+//
+//								lb.show();
+//								lb.load(record.data.toEntity, record.data.toId);
 						}
 					}
 				}
