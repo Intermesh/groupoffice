@@ -92,7 +92,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 				{
 					id: 'name',
 					header: t('Name'),
-					sortable: true,
+					sortable: false,
 					dataIndex: 'name',
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 						
