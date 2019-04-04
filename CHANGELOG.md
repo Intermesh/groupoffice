@@ -4,6 +4,7 @@
 - Files: Files and folders should not have a file browser menu item
 - Core: Updated French translation
 - Custom fields: Fixed rename of tree select slaves
+- Core: Don't trackResetOnLoad in TabbedFormDialog because this will create invalid default values because those dialogs are reused.
 
 01-04-2019 6.3.68
 - Email: Fixed subfolders with \ as delimiter
