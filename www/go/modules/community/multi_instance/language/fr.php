@@ -1,0 +1,20 @@
+<?php
+return array (
+  'Multi instance' => 'Instance multiple',
+  'Instance' => 'Instance',
+  'Storage quota' => 'Quota de stockage',
+  'Size in GB' => 'Taille en GB',
+  'Maximum number of users' => 'Nombre maximum d\'utilisateurs',
+  'E-mail selected' => 'Email sélectionné',
+  'Last login' => 'Dernière connexion',
+  'User count' => 'Nombre d\'utilisateurs',
+  'Maximum users' => 'Utilisateurs maximum',
+  'Login count' => 'Nombre de connexions',
+  'Admin name' => 'Nom de l\'administrateur',
+  'Admin E-mail' => 'Email de l\'administrateur',
+  'Storage usage' => 'Utilisation du stokage',
+  'Login as administrator' => 'Se connecter en tant qu\'administrateur',
+  'Deactivate' => 'Désactiver',
+  'Deactivate instance' => 'Désactiver l\'instance',
+  'Activate instance' => 'Activer l\'instance',
+);

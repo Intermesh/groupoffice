@@ -28,7 +28,7 @@ class FieldTreeSelectOptionController extends \GO\Base\Controller\AbstractModelC
 		if ($params['parent_id']==0 && $fieldModel->datatype=='GO\Customfields\Customfieldtype\TreeselectSlave') {
 			return \GO\Base\Db\FindParams::newInstance()
 						->order(array("parent_id","sort"))
-						->criteria(\GO\Base\Db\FindCriteria::newInstance()->addCondition('field_id', $fieldModel->treemaster_field_id));
+						->criteria(\GO\Base\Db\FindCriteria::newInstance()->addCondition('field_id', $fieldModel->getOption("treemaster_field_id")));
 		} else {
 			return \GO\Base\Db\FindParams::newInstance()
 						->order("sort")

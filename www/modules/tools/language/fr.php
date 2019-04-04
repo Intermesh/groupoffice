@@ -1,7 +1,7 @@
 <?php
 return array (
   'Admin tools' => 'Outils d\'administration',
-  'Script output' => 'Informations de sortie du script',
+  'Script output' => 'Sortie de script',
   'Database check' => 'Vérification de la base de données',
   'Remove duplicate contacts and events' => 'Supprimer les doublons dans les contacts et les rendez-vous',
   'Backup database' => 'Sauvegarder la base de données',
