@@ -84,14 +84,7 @@ GO.addressbook.MainPanel = function(config) {
 						});
 					},
 					scope: this
-				}],
-				listeners: {
-					search: function(params){
-						this.setSearchParams(params);
-					},
-					scope:this
-				}
-				//store: this.contactsGrid.store
+				}]
 			},{
 					iconCls: 'ic-more-vert',
 					menu: [
@@ -189,13 +182,7 @@ GO.addressbook.MainPanel = function(config) {
 						});
 					},
 					scope: this
-				}],
-				listeners: {
-					search: function(params){
-						this.setSearchParams(params);
-					},
-					scope:this
-				}
+				}]
         },{
             iconCls: 'ic-more-vert',
             menu: [
@@ -636,17 +623,17 @@ Ext.extend(GO.addressbook.MainPanel, Ext.Panel,{
 
 		for(var name in params)
 		{
-			if(name!='advancedQuery' || panel.id=='ab-contacts-grid')
+			if(name!='advancedQuery' || panel.id=='ab-contacts')
 			{
 				this.contactsGrid.store.baseParams[name] = params[name];
 			}
-			if(name!='advancedQuery' || panel.id!='ab-contacts-grid')
+			if(name!='advancedQuery' || panel.id!='ab-contacts')
 			{
 				this.companiesGrid.store.baseParams[name] = params[name];
 			}
 		}
 
-		if(panel.id=='ab-contacts-grid')
+		if(panel.id=='ab-contacts')
 		{
 			this.contactsGrid.store.load();
 		}else
