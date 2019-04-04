@@ -702,9 +702,6 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 		
 		this.showConfig = config;
 		
-		// Needed to reset the dirty state of formfields to false
-		this.formPanel.getForm().trackResetOnLoad = true;
-		
 		this.beforeLoad(remoteModelId, config);
 
 		//tmpfiles on the remoteModel ({name:'Name',tmp_file:/tmp/name.ext} will be attached)
