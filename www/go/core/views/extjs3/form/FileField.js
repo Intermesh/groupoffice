@@ -1,4 +1,30 @@
-
+/**
+ * File upload field
+ * 
+ * @example
+ * ```
+ * this.avatarComp = new go.form.FileField({
+ * 			hideLabel: true,
+ * 			buttonOnly: true,
+ * 			name: 'photoBlobId',
+ * 			height: dp(120),
+ * 			cls: "avatar",
+ * 			autoUpload: true,
+ * 			buttonCfg: {
+ * 				text: '',
+ * 				width: dp(120)
+ * 			},
+ * 			setValue: function (val) {
+ * 				if (this.rendered && !Ext.isEmpty(val)) {
+ * 					this.wrap.setStyle('background-image', 'url(' + go.Jmap.downloadUrl(val) + ')');
+ * 				}
+ * 				go.form.FileField.prototype.setValue.call(this, val);
+ * 			},
+ * 			accept: 'image/*'
+ * 		});
+ *  * ```
+ * 
+ */
 go.form.FileField = Ext.extend(Ext.form.TextField, {
 	/**
 	 * @cfg {String} buttonText The button text to display on the upload button (defaults to
