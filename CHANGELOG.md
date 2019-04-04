@@ -3,6 +3,7 @@
 - Core: Overriding permissions in projects was undone by users editing a project with write permissions
 - Files: Files and folders should not have a file browser menu item
 - Core: Updated French translation
+- Custom fields: Fixed rename of tree select slaves
 
 01-04-2019 6.3.68
 - Email: Fixed subfolders with \ as delimiter
