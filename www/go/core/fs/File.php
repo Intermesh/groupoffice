@@ -333,7 +333,7 @@ class File extends FileSystemObject {
 			return false;
 		}
 
-		$enc = $this->detectEncoding($str);
+		$enc = mb_detect_encoding($this->getContents(), "ASCII,JIS,UTF-8,ISO-8859-1,ISO-8859-15,EUC-JP,SJIS");
 		if (!$enc) {
 			$enc = 'UTF-8';
 		}

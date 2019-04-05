@@ -3,8 +3,8 @@ return array (
   'Browse comments' => 'Parcourir les commentaires',
   'Recent comments' => 'Commentaires récents',
   'Comment' => 'Commentaire',
-  'Manage categories' => 'G�rer les cat�gories',
-  'Category' => 'Cat�gorie',
+  'Manage categories' => 'Gérer les catégories',
+  'Category' => 'Catégorie',
   'No category' => 'Pas de catégorie',
   'Enter new comment here ...' => 'Rédiger un nouveau commentaire ici ...',
   'Read more' => 'Lire la suite',
@@ -13,5 +13,5 @@ return array (
   'name' => 'Commentaires',
   'description' => 'Ajoute la fonctionnalité de commentaires aux autres modules.',
   'Comments' => 'Commentaires',
-  '{author} wrote at {date}' => '{author} a �crit le {date}',
+  '{author} wrote at {date}' => '{author} a écrit le {date}',
 );

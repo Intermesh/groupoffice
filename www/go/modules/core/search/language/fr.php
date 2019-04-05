@@ -1,4 +1,4 @@
 <?php
 return array (
-  'Search...' => 'Recherche…',
+  'Search...' => 'RechercheÂ…',
 );

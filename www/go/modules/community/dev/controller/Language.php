@@ -145,7 +145,15 @@ class Language extends Controller {
 	}
 
 	public function import($params) {
-		$file = new File($params['path']);
+		$sourceFile = new File($params['path']);
+		$file = File::tempFile('csv');
+		if(!$sourceFile->copy($file)) {
+			throw new \Exception("Could not copy file to temporary directory");
+		}
+		
+		if(!$file->convertToUtf8()) {
+			throw new \Exception("Could not convert to UTF-8");
+		}
 
 		if (!$file->exists()) {
 			throw new \Exception("File not found " . $params['path']);
@@ -223,6 +231,8 @@ class Language extends Controller {
 				$file->putContents("<?php\nreturn ".var_export($translations, true).";\n");
 			}
 		}
+		
+		$file->delete();
 		
 	}
 
