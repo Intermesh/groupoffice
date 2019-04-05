@@ -153,9 +153,13 @@ abstract class Module {
 		foreach($entities as $entity) {
 			$type = $entity::getType();
 			if(!$type) {
-				throw new \Exception("Could not register entity type for " . $entity::getClientName());
+				throw new \Exception("Could not register entity type for module ". $this->getName() . " with name " . $entity::getClientName());
 			}
 			$typeModuleModel = $type->getModule();
+			
+			if(!$typeModuleModel) {
+				throw new \Exception("Could not register entity type for module ". $this->getName() . " with name " . $entity::getClientName());				
+			}
 			
 			if($typeModuleModel->id != $moduleModel->id) {
 				throw new \Exception("Can't register entity '".$entity::getClientName()."' because it's already registered for module " . ($typeModuleModel->package ?? "legacy") . "/" .$typeModuleModel->name);
