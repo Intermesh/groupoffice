@@ -53,7 +53,7 @@ class CronController extends \GO\Base\Controller\AbstractJsonController{
 			$model->save();
 			echo $this->renderSubmit($model);
 		} else {
-			echo $this->renderForm($model, $remoteComboFields,array('select'=>$select));
+			echo $this->renderForm($model, $remoteComboFields,array('select'=>$select, 'paramsToSet' => $model->getParamsToSet()));
 		}
 		
   }
@@ -70,7 +70,7 @@ class CronController extends \GO\Base\Controller\AbstractJsonController{
 			$model->save();
 			echo $this->renderSubmit($model);
 		}else {
-			echo $this->renderForm($model, array(),array('select'=>false));
+			echo $this->renderForm($model, array(),array('select'=>false, 'paramsToSet' => $model->getParamsToSet()));
 		}
   }
 

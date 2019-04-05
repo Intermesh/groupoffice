@@ -150,7 +150,7 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		});
 		
 		
-		if(go.Modules.isAvailable("legacy", "files")) {
+		if(go.Modules.isAvailable("legacy", "files") && !this.noFileBrowser) {
 			this.moreButton.menu.insert(1,{
 				xtype: "filebrowsermenuitem"
 			});

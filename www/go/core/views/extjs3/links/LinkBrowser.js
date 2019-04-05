@@ -105,14 +105,8 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 				actions
 			],
 			listeners: {
-				navigate: function(grid, index, record) {					
-					var pnl = this.previewPanel.getComponent(record.data.toEntity);
-					console.log(pnl);
-					if(pnl) {
-						pnl.load(record.data.toId);
-						
-						this.previewPanel.getLayout().setActiveItem(pnl);
-					}
+				navigate: function(grid, index, record) {				
+					this.load(record.data.toEntity, record.data.toId);						
 				},
 				
 //				dblclick: function () {
@@ -143,6 +137,15 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 		go.links.CreateLinkWindow.superclass.initComponent.call(this);
 	},
 	
+	load : function(entity, id) {
+		var pnl = this.previewPanel.getComponent(entity);
+		if(pnl) {
+			pnl.load(id);
+
+			this.previewPanel.getLayout().setActiveItem(pnl);
+		}
+	},
+	
 	getPreviewPanel : function() {
 		
 		var all = go.Entities.getLinkConfigs().filter(function(l) {
@@ -159,6 +162,7 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 		console.log(items);
 		
 		return this.previewPanel = new Ext.Panel({
+			split: true,
 			region: "east",
 			width: dp(500),
 			layout:"card",

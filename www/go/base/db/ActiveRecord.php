@@ -3056,11 +3056,16 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			if($this->overwriteAcl !== null) {
 				if($this->overwriteAcl && !$this->isAclOverwritten()) { //Overwrite
 					
+					
 					$oldAcl = $this->findRelatedAclModel()->acl;
+					if($oldAcl->getUserLevel() < \GO\Base\Model\Acl::MANAGE_PERMISSION) {
+						throw new \GO\Base\Exception\AccessDenied("You're not allowed to change permissions");
+					}					
+					
 					$user_id = !empty($this->user_id) ? $this->user_id : 0;
 					$acl = new \GO\Base\Model\Acl();
 					$acl->usedIn=$this->tableName().'.'.$this->aclOverwrite();
-					$acl->ownedBy=$user_id;
+					$acl->ownedBy=$oldAcl->ownedBy;
 					$acl->save();
 					
 					$oldAcl->copyPermissions($acl);

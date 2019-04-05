@@ -158,7 +158,7 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 	 * @param bool $checkGroupPermissionOnly
 	 * @return int Permission level. See constants in Acl for values. 
 	 */
-	public function getUserLevel($userId){
+	public function getUserLevel($userId = false){
 		return Acl::getUserPermissionLevel($this->id, $userId);
 	}
 

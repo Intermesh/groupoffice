@@ -1,0 +1,20 @@
+<?php
+return array (
+  'Enable Google authenticator' => 'Activer l\'authentification Google',
+  'Secret' => 'Code secret',
+  'Secret key for manual input' => 'Code secret pour saisie manuelle',
+  'Verify' => 'Vérifier',
+  'Scan the QR code below with the Google authenticator app on your mobile device, after that fill in the field below with the code generated in the app.' => 'Scannez le QR code ci-dessous avec l\'application d\'authentification Google sur votre appareil mobile, puis renseignez le champ ci-dessous avec le code généré dans l\'application.',
+  'Get the code from the google authenticator app on your mobile device and fill it in below' => 'Obtenez le code depuis l\'application d\'authentification Google sur votre appareil mobile et remplissez le ci-dessous.',
+  'Code' => 'Code',
+  'Code is required' => 'Le code est obligatoire',
+  'Not found' => 'Non trouvé',
+  'Invalid code' => 'Code invalide',
+  'Google authenticator' => 'Authentification Google',
+  'Enable google authenticator' => 'Activer l\'authentification Google',
+  'Disable google authenticator' => 'Désactiver l\'authentification Google',
+  'When disabling Google autenticator this step will be removed from the login process.' => 'Lorsque l\'authentification Google est désactivée, cette étape sera supprimée du processus d\'authentification.',
+  'Provide your current password to disable Google authenticator.' => 'Saisissez votre mot de passe actuel pour désactiver l\'authentification Google.',
+  'Disable Google authenticator' => 'Désactiver l\'authentification Google',
+  'Provide your current password before you can enable Google authenticator.' => 'Saisissez votre mot de passe actuel pour activer l\'authentification Google.',
+);

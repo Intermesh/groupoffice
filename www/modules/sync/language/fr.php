@@ -24,4 +24,5 @@ return array (
   'Synchronization' => 'Synchronisation',
   'Delete older events and tasks at the client (they will be kept in Group-Office)' => 'Supprimer les anciens rendez-vous et tâches sur l\'appareil mobile (ils seront conservés dans {product_name})',
   '<h1>Group-Office SyncML Server</h1><p>This is the Group-Office SyncML server. Use a SyncML compliant device or software package and connect it to this URL to synchronize with Group-Office.</p>' => '<h1>Serveur SyncML {product_name}</h1><br><p>Veuillez utiliser un appareil ou un logiciel compatible et connecter vous à cette adresse pour synchroniser vos données {product_name}.</p>',
+  'Notebooks' => 'Carnets de notes',
 );

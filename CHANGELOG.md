@@ -1,3 +1,19 @@
+- Core: Prevent license error in System tasks maintenance
+- Core: Pin TCPDF to version 6.2.22. Higher versions break image loading in PDF
+- Address book: search sent invalid data to the server causing problems on some servers
+- Core: Selected group members should be on top when editing groups
+- Core: Overriding permissions in projects was undone by users editing a project with write permissions
+- Files: Files and folders should not have a file browser menu item
+- Core: Updated French translation
+- Custom fields: Fixed rename of tree select slaves
+- Core: Don't trackResetOnLoad in TabbedFormDialog because this will create invalid default values because those dialogs are reused.
+- Core: Links open in popup window like in 6/2
+
+01-04-2019 6.3.68
+- Email: Fixed subfolders with \ as delimiter
+- Timeregistration: Improved error message when time entry with break fails
+- Addressbook: Fixed custom field import 
+- Core: Old framework registered entity incorrectly. "linkedEmail" instead of "LinkedEmail"
 - FileSearch: Fixed links to attached indexed attachments in the displaypanel. (Was broken due to new GO63 router)
 		*** Running the filesearch index again is needed to let this work ***
 - Calendar: Added home button to jump to default calendar

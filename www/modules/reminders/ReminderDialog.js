@@ -144,15 +144,6 @@ GO.reminders.ReminderDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 				fieldLabel: t("Name"),
 				allowBlank:false
 			}
-			,this.selectLink = new GO.form.SelectLink({
-				anchor:'100%',
-				listeners:{
-					scope:this,
-					select:function(cb,record, index){
-						this.formPanel.form.findField('name').setValue(record.data.type_name);
-					}
-				}
-			})
 			,{
 				xtype : 'compositefield',
 				fieldLabel:t("Time", "reminders"),
@@ -222,9 +213,6 @@ GO.reminders.ReminderDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 		}
 	},
 	
-	afterLoad : function(remoteModelId, config, action){
-		this.selectLink.setRemoteText(action.result.data.link_name);
-	},
 		
 	afterSubmit : function(action){
 		if (action.result.id) {

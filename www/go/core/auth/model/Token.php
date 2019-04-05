@@ -221,6 +221,7 @@ class Token extends Entity {
 		$user = $this->getUser();
 		$user->lastLogin = new DateTime();
 		$user->loginCount++;
+		$user->language = GO()->getLanguage()->getIsoCode();
 		if(!$user->save()) {
 			return false;
 		}

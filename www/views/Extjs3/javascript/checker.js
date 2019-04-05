@@ -278,8 +278,13 @@ GO.CheckerPanel = Ext.extend(function(config){
 	GO.grid.GridPanel.superclass.constructor.call(this, config);
 	
 	this.on('rowdblclick', function (grid, index){
+		
 		var selectionModel = grid.getSelectionModel();
 		var record = selectionModel.getSelected();
+		
+		if(!record.data.model_name || !record.data.model_id) {
+			return;
+		}
 		
 		var parts = record.data.model_name.split("\\");		
 		go.Router.goto(parts[3].toLowerCase()+"/"+record.data.model_id);
