@@ -15,12 +15,17 @@ class FieldSet extends EntityController {
 	protected function entityClass() {
 		return model\FieldSet::class;
 	}
+	
+	private function checkEnabledModule(\go\core\orm\Query $query) {
+		return $query	->join('core_module', 'm', 'm.id = e.moduleId')
+						->where(['m.enabled' => true]);
+	}
 
 	protected function getQueryQuery($params) {
-		return parent::getQueryQuery($params)->orderBy(['sortOrder' => 'ASC']);
+		return $this->checkEnabledModule(parent::getQueryQuery($params)->orderBy(['sortOrder' => 'ASC']));
 	}
 	protected function getGetQuery($params) {
-		return parent::getGetQuery($params)->orderBy(['sortOrder' => 'ASC']);
+		return $this->checkEnabledModule(parent::getGetQuery($params)->orderBy(['sortOrder' => 'ASC']));
 	}
 	
 	/**
