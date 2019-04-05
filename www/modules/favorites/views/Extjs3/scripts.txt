@@ -5,6 +5,3 @@ modules/favorites/views/Extjs3/CalendarOverrides.js
 
 modules/favorites/views/Extjs3/TasklistFavoritesList.js
 modules/favorites/views/Extjs3/TasklistOverrides.js
-
-modules/favorites/views/Extjs3/AddressbookFavoritesList.js
-modules/favorites/views/Extjs3/AddressbookOverrides.js
