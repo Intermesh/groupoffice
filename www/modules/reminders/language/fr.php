@@ -2,7 +2,7 @@
 return array (
   'Popup reminder' => 'Popup de rappel',
   'Time' => 'Heure',
-  'Snooze time' => 'Temps de répétition',
+  'Snooze time' => 'Temps de rÃ©pÃ©tition',
   'Text' => 'Texte',
   'Add users' => 'Ajouter des utilisateurs',
   'Add user groups' => 'Ajouter des groupes d\'utilisateurs',

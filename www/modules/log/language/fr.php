@@ -1,7 +1,7 @@
 <?php
 return array (
   'Time' => 'Date & Heure',
-  'Model' => 'ModËle',
+  'Model' => 'Mod√®le',
   'User agent' => 'Agent utilisateur',
   'IP address' => 'Adresse IP',
   'Controller' => 'Controlleur',
@@ -10,5 +10,5 @@ return array (
   'Action' => 'Action',
   'Message' => 'Message',
   'ID' => 'ID',
-  'Activity log' => 'Journal d\'activitÈ',
+  'Activity log' => 'Journal d\'activit√©',
 );
