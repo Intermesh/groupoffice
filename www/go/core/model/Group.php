@@ -6,6 +6,7 @@ use go\core\acl\model\Acl;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
 use go\core\model\UserGroup;
+use go\core\orm\Query;
 use go\core\validate\ErrorCode;
 
 /**
@@ -77,6 +78,14 @@ class Group extends AclOwnerEntity {
 						->add('excludeAdmins', function(Criteria $criteria, $value) {
 							if($value) {
 								$criteria->andWhere('id', '!=', Group::ID_ADMINS);
+							}
+						})->add('forUserId', function(Criteria $criteria, $value, Query $query) {
+							
+							$query->join('core_user_group','ug', 'ug.groupId=g.id')
+											->groupBy(['g.id']);
+							
+							if($value) {
+								$criteria->andWhere(['ug.userId' => $value]);	
 							}
 						});
 						
