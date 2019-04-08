@@ -91,8 +91,8 @@ go.modules.community.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 						iconCls: 'ic-edit',
 						text: t("Edit"),
 						handler: function() {
-							var noteBookForm = new go.modules.community.notes.NoteBookDialog();
-							noteBookForm.load(this.moreMenu.record.id).show();
+							var dlg = new go.modules.community.notes.NoteBookDialog();
+							dlg.load(this.moreMenu.record.id).show();
 						},
 						scope: this						
 					},{

@@ -5,23 +5,18 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 	rootVisible: false,
 
 	currentAddressBookId: null,
-	
-	/**
-	 * If given then the tree can be used to select contacts in bulk by selecting
-	 * an address book or group. selectHandler will be called with the entities
-	 * as array.
-	 */
-	selectHandler: null,
+
+	readOnly: false,
 	scope: null,
 	
 	initComponent: function () {
 
-		if(this.selectHandler === null) {
+		if(this.readOnly === false) {
 			this.loader = new go.modules.community.addressbook.TreeLoader();
 		} else
 		{
 			this.loader = new go.modules.community.addressbook.TreeLoader({
-				secondaryTextTpl: '<button class="icon">add</button>'
+				secondaryTextTpl: ''
 			});
 		}
 		
@@ -52,20 +47,12 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 
 			if (e.target.tagName === "BUTTON") {
 
-				if(!this.selectHandler) {
+				if(!this.readOnly) {
 					if(node.attributes.entity.name === "AddressBook") {
 						this.showAddressBookMoreMenu(node, e);
 					} else
 					{
 						this.showGroupMoreMenu(node, e);
-					}
-				} else
-				{
-					if(node.attributes.entity.name === "AddressBook") {
-						this.selectAddressBook(node.attributes.data.id);
-					} else
-					{
-						this.selectGroup(node.attributes.data.id);
 					}
 				}
 			}
@@ -236,27 +223,5 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 		
 		this.groupMoreMenu.data = node.attributes.data;
 		this.groupMoreMenu.showAt(e.getXY());
-	},
-	
-	selectGroup : function(groupId) {
-		var s = go.Stores.get("Contact");
-		s.query({
-			filter: {groupId: groupId, hasEmailAddresses: true}
-		}, function(response) {			
-			s.get(response.ids, function(contacts) {
-				this.selectHandler.call(this.scope || this, contacts);
-			}, this);
-		}, this);
-	},
-	
-	selectAddressBook : function(addressBookId) {
-		var s = go.Stores.get("Contact");
-		s.query({
-			filter: {addressBookId: addressBookId, hasEmailAddresses: true}
-		}, function(response) {			
-			s.get(response.ids, function(contacts) {
-				this.selectHandler.call(this.scope || this, contacts);
-			}, this);
-		}, this);
 	}
 });
