@@ -654,18 +654,24 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	 * @returns {String} Client call ID
 	 */
 	query : function(params, cb, scope) {
-		return go.Jmap.request({
-			method: this.entity.name + "/query",
-			params: params,
-			callback: function(options, success, response) {
-				
-				if(!success) {
-					throw this.entity.name + "/query failed!";
-				}
-				
-				cb.call(scope || this, response);
-			},
-			scope: this
+		var me = this;
+		return new Promise(function(resolve, reject) {
+			go.Jmap.request({
+				method: me.entity.name + "/query",
+				params: params,
+				callback: function(options, success, response) {
+
+					if(!success) {
+						throw me.entity.name + "/query failed!";
+					}
+
+					resolve(response);
+					if(cb) {
+						cb.call(scope || me, response);
+					}
+				},
+				scope: me
+			});
 		});
 	}
 });
