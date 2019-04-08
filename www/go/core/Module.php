@@ -158,7 +158,7 @@ abstract class Module {
 			$typeModuleModel = $type->getModule();
 			
 			if(!$typeModuleModel) {
-				throw new \Exception("Could not register entity type for module ". $this->getName() . " with name " . $entity::getClientName());				
+				throw new \Exception("Could not register entity type for module ". $this->getName() . " with name " . $entity::getClientName() .' because existing type had no module.' . $typeModuleModel->id);				
 			}
 			
 			if($typeModuleModel->id != $moduleModel->id) {
