@@ -229,7 +229,7 @@ abstract class Entity extends Property {
 			return false;
 		}
 
-		return $this->commit();
+		return $this->commit() && !$this->hasValidationErrors();
 	}
 	
 	/**

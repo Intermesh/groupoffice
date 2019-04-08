@@ -476,7 +476,7 @@ abstract class EntityController extends Controller {
 			
 			$entity = $this->create($properties);
 
-			if (!$entity->hasValidationErrors()) {
+			if ($entity->save()) {
 				$entityProps = new ArrayObject($entity->toArray());
 				$diff = $entityProps->diff($properties);
 				$diff['id'] = $entity->getId();
@@ -512,8 +512,6 @@ abstract class EntityController extends Controller {
 
 		$entity = new $cls;
 		$entity->setValues($properties); 
-		
-		$entity->save();
 		
 		return $entity;
 	}
@@ -553,7 +551,7 @@ abstract class EntityController extends Controller {
 				continue;
 			}
 			
-			if (!$this->update($entity, $properties)) {				
+			if (!$entity->save()) {				
 				$result['notUpdated'][$id] = new SetError("invalidProperties");				
 				$result['notUpdated'][$id]->properties = array_keys($entity->getValidationErrors());
 				$result['notUpdated'][$id]->validationErrors = $entity->getValidationErrors();				
@@ -566,13 +564,6 @@ abstract class EntityController extends Controller {
 			
 			$result['updated'][$id] = empty($diff) ? null : $diff;
 		}
-	}
-	
-	
-	
-	protected function update(Entity $entity, array $properties) {		
-		$entity->save();		
-		return !$entity->hasValidationErrors();
 	}
 	
 	protected function canDestroy(Entity $entity) {
