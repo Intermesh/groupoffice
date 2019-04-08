@@ -174,11 +174,11 @@ GO.mainLayout.on("boot", function() {
 	//default route
 	go.Router.add(function() {	
 		if(go.User.isLoggedIn()) {
-			
-			if(!go.Modules.isAvailable("legacy", GO.settings.start_module)) {
-				//console.log(GO.mainLayout.tabPanel.items.first());
-				GO.settings.start_module = GO.mainLayout.tabPanel.items.first().module;
-			}
+//			
+//			if(!go.Modules.isAvailable("legacy", GO.settings.start_module)) {
+//				//console.log(GO.mainLayout.tabPanel.items.first());
+//				GO.settings.start_module = GO.mainLayout.tabPanel.items.first().module;
+//			}
 			
 			go.Router.goto(GO.settings.start_module);
 		}
