@@ -1,3 +1,5 @@
+- Core/Group: Added forUserId filter in Groups so you can query the groups where the given user is a member of.
+- Core: Implemented Promise to combobox so it is easier to override.
 - Core: Correct UTF-8 encoding on language import
 - Core: Prevent license error in System tasks maintenance
 - Core: Pin TCPDF to version 6.2.22. Higher versions break image loading in PDF
