@@ -16,9 +16,6 @@ go.customfields.type.MultiSelectDialog = Ext.extend(go.customfields.FieldDialog,
 					fieldLabel: t("Options"),
 					itemCfg: {					
 						items: [{
-								xtype: "hidden",
-								name: "id"
-							}, {
 								hideLabel: true,
 								xtype: "textfield",
 								name: "text",
