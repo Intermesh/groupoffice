@@ -1,3 +1,4 @@
+08-04-2019 6.3.69
 - Core: Correct UTF-8 encoding on language import
 - Core: Prevent license error in System tasks maintenance
 - Core: Pin TCPDF to version 6.2.22. Higher versions break image loading in PDF
