@@ -90,6 +90,15 @@ go.customfields.type.MultiSelect = Ext.extend(go.customfields.type.Text, {
 		return c;
 	},
 	
+	getColumn : function(field) {
+		
+		var c = go.customfields.type.MultiSelect.superclass.getColumn.call(this, field);
+		
+		c.sortable = false;
+		
+		return c;
+	},
+	
 	getFilter : function(field) {
 			
 		return {

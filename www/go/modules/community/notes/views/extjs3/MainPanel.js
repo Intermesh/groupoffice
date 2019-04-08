@@ -12,6 +12,8 @@
  */
 
 go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
+	id: "notes",
+	title: t("Notes"),
 
 	layout: 'responsive',
 	layoutConfig: {
@@ -84,7 +86,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
-						var dlg = new go.modules.community.notes.NoteBookForm();
+						var dlg = new go.modules.community.notes.NoteBookDialog();
 						dlg.show();
 					}
 				}, 
@@ -142,7 +144,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (btn) {
-						var noteForm = new go.modules.community.notes.NoteForm();
+						var noteForm = new go.modules.community.notes.NoteDialog();
 						noteForm.show();
 						noteForm.setValues({
 								noteBookId: this.addNoteBookId
@@ -223,7 +225,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			return;
 		}
 
-		var dlg = new go.modules.community.notes.NoteForm();
+		var dlg = new go.modules.community.notes.NoteDialog();
 		dlg.load(record.id).show();
 	},
 	
@@ -240,7 +242,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			return;
 		}
 
-		var dlg = new go.modules.community.notes.NoteForm();
+		var dlg = new go.modules.community.notes.NoteDialog();
 		dlg.load(record.id).show();
 
 	}

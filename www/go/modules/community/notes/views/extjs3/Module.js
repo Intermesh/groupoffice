@@ -1,8 +1,10 @@
 /* global go */
 
-go.Modules.register("community", 'notes', {
-	mainPanel: "go.modules.community.notes.MainPanel",
+go.Modules.register("community", 'notes', {	
 	title: t("Notes"),
+	initModule: function() {
+		this.addPanel(go.modules.community.notes.MainPanel);
+	},
 	entities: [{
 			name: "Note",			
 			hasFiles: true,
@@ -15,7 +17,7 @@ go.Modules.register("community", 'notes', {
 				 * @returns {go.form.Dialog}
 				 */
 				linkWindow: function(entity, entityId) {
-					return new go.modules.community.notes.NoteForm();
+					return new go.modules.community.notes.NoteDialog();
 				},
 
 				/**
