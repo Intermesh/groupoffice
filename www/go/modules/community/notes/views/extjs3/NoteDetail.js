@@ -106,7 +106,7 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 				iconCls: 'ic-edit',
 				tooltip: t("Edit"),
 				handler: function (btn, e) {
-					var noteEdit = new go.modules.community.notes.NoteForm();
+					var noteEdit = new go.modules.community.notes.NoteDialog();
 					noteEdit.load(this.data.id).show();
 				},
 				scope: this
