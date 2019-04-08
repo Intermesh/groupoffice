@@ -284,7 +284,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 				//for performance reasons we simply ignore it.
 				App::get()->getDebugger()->debug("Discarding read only property '$name' in '".static::class."'");
 			}else {
-				$errorMsg = "Can't set not existing property '$name' in '".static::class."'. Available properties: ". implode(', ', $this->getWritableProperties());
+				$errorMsg = "Cannot set non-existent property '$name' in '".static::class."'. Available properties: ". implode(', ', $this->getWritableProperties());
 				throw new Exception($errorMsg);
 			}						
 		}

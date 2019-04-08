@@ -1752,3 +1752,34 @@ table[id^="comments-ext"] b {
 .go-user-disabled {
 	opacity: .6;
 }
+
+.go-grid {
+	.go-grid-hd-btn {
+		@extend .icon;
+		cursor: pointer;
+		display: block;
+		width: dp(20);
+		height: dp(31);
+		position: absolute;
+		top: 0;
+		right:0;
+		&:hover {
+			@include var(color, c-primary);
+		}
+		&::after {
+			//margin-left:dp(4);
+			font-size: .7em;
+			content:'more_vert';
+		}
+	}
+	&.x-grid-panel .x-grid3-header {
+		position:relative;
+		//padding-right: dp(24);
+/*		.x-grid3-hd-over .x-grid3-hd-btn {
+			display: none;
+		}*/
+	}
+	.x-grid3-cell-last {
+		padding-right: dp(24);
+	}
+}

@@ -284,6 +284,12 @@ Ext.override(Ext.form.BasicForm,{
 
 });
 
+Ext.override(Ext.grid.ColumnModel,{
+	getOrgColumnHeader:function(b){
+		return this.config[b].orgHeader||this.config[b].header;
+	}	
+});
+
 Ext.override(Ext.grid.Column,{
 	renderer:function(value, metaData, record, rowIndex, colIndex, store){
 		//console.log(this);

@@ -18,7 +18,51 @@ go.grid.GridTrait = {
 		if(this.getSelectionModel().getSelected) {
 			this.initNav();
 		}
+		// MAKE ROOM FOR HEADER MENU
+		this.enableHdMenu = false;
+		this.getView().scrollOffset = dp(24);
+		this.getView().refresh = function(headersToo) {
+			this.fireEvent('beforerefresh', this);
+			this.grid.stopEditing(true);
 
+			var result = this.renderBody();
+			this.mainBody.update(result).setWidth(this.getOffsetWidth());
+			if (headersToo === true) {
+				 this.updateHeaders();
+				 this.updateHeaderSortState();
+			}
+			this.processRows(0, true);
+			this.layout();
+			this.applyEmptyText();
+			this.fireEvent('refresh', this);
+		};
+		this.getView().updateHeaderWidth = function(updateMain) {
+			var innerHdChild = this.innerHd.firstChild,
+				 totalWidth   = this.getTotalWidth();
+
+			innerHdChild.style.width = this.getOffsetWidth();
+			innerHdChild.firstChild.style.width = totalWidth;
+
+			if (updateMain !== false) {
+				 this.mainBody.dom.style.width = this.getOffsetWidth();
+			}
+		};
+		// END MAKE ROOM
+		
+		this.on('render',function(){
+	
+			
+			// header menu
+			this.addClass("go-grid");
+			this.headerBtnWrap = this.el.child(".x-grid3-header");
+			if (this.headerBtnWrap) {// && this.enableHdMenu) {
+				this.headerBtn = new Ext.Component({
+					cls: "go-grid-hd-btn",
+					renderTo: this.headerBtnWrap
+				});
+				this.headerBtn.el.on("click", this.onHeaderBtnClick, this);
+			}
+		},this);
 	},
 	
 	initCustomFields : function() {
@@ -104,5 +148,41 @@ go.grid.GridTrait = {
 		this.getStore().entityStore.set({
 			destroy:  selectedRecords.column("id")
 		});
+	},
+	
+	handleHdMenuItemClick: function(item) {
+		var cm = this.getColumnModel()
+		  , id = item.getItemId()
+		  , column = cm.getIndexById(id.substr(4));
+		if (column !== -1) {
+			if (item.checked && cm.getColumnsBy(function(c) {return !c.hidden }, this).length <= 1) {
+				 return
+			}
+			cm.setHidden(column, item.checked)
+		}
+	},
+	onHeaderBtnClick: function(event, el, object) {
+		var i, cm = this.getColumnModel(), column, item;
+		if (!this.headerMenu) {
+			this.headerMenu = new Ext.menu.Menu({
+				 items: []
+			});
+			this.headerMenu.on("itemclick", this.handleHdMenuItemClick, this);
+		}
+		this.headerMenu.removeAll();
+		for (i = 0; i < cm.getColumnCount(); i++) {
+			column = cm.getColumnAt(i);
+			if (column.hideable !== false) {
+				item = new Ext.menu.CheckItem({
+					 text: cm.getOrgColumnHeader(i),
+					 itemId: "col-" + cm.getColumnId(i),
+					 checked: !cm.isHidden(i),
+					 hideOnClick: false,
+					 htmlEncode: column.headerHtmlEncode
+				});
+				this.headerMenu.add(item)
+			}
+		}
+		this.headerMenu.show(el, "tr-br?")
 	}
 }

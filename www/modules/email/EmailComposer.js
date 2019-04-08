@@ -175,14 +175,26 @@ GO.email.EmailComposer = function(config) {
 				handler: function() {
 					var select = new go.modules.community.addressbook.SelectDialog ({
 						scope: this,
-						handler: function(name, email) {
+						selectSingle: function(name, email, id) {
 							var v = this.toCombo.getValue();
-							
 							if(!go.util.empty(v)) {
 								v += ", ";
-							}							
+							}	
 							v += '"' + name.replace(/"/g, '\\"') + '" <' + email + '>';							
 							this.toCombo.setValue(v);
+						},
+						selectMultiple: function(ids) {
+							var me = this, v = me.toCombo.getValue();
+							
+							go.Stores.get("Contact").get(ids).then(function(contacts) {										
+								contacts.forEach(function(contact) {
+									if(!go.util.empty(v)) {
+										v += ", ";
+									}							
+									v += '"' + contact.name.replace(/"/g, '\\"') + '" <' + contact.emailAddresses[0].email + '>';							
+									me.toCombo.setValue(v);
+								});
+							});							
 						}
 					});
 					select.show();

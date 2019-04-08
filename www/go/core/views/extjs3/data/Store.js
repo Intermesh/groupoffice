@@ -289,7 +289,7 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	},
 	
 	/**
-	 * Set a filter obkect for a component
+	 * Set a filter object for a component
 	 * 
 	 * @param {string} cmpId
 	 * @param {object} filter
@@ -313,6 +313,10 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		}
 		
 		return this;
+	},
+	
+	getFilter : function() {
+		return this.baseParams.filter;
 	}
 	
 //	onUpdate : function(store, record, operation) {

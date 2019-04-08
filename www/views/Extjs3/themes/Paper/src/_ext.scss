@@ -1116,9 +1116,6 @@
 		//margin-top: dp(9); //don't understand why +1 here?
 		height:dp(32);
 		border-bottom: 1px solid color($fg, 'line');
-		&-offset {
-			padding-left:0;
-		}
 	}
 	&-cell-inner, &-hd-inner {
 		@extend .ellipsis;
@@ -1218,7 +1215,7 @@
 	}
 	&-hd-inner {
 		min-height: dp(20);
-		padding: dp(2) dp(16) dp(2) dp(16);
+		padding: 0 0 0 dp(16);
 	}
 	&-dirty-cell > div {
 		border-radius: $borderRadius;
