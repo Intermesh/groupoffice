@@ -129,7 +129,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 	
 	createTabPanel : function(items) {
 		
-		if(items) {
+		if(items.length) {
 			this.panels.unshift(new Ext.Panel({
 				title: t("General"),
 				layout: 'form',
@@ -139,6 +139,9 @@ go.form.Dialog = Ext.extend(go.Window, {
 		}
 		
 		this.tabPanel = new Ext.TabPanel({
+			defaults: {
+				autoScroll: true
+			},
 			activeTab: 0,
 			enableTabScroll:true,
 			deferredRender: false,//required for custom fields tabs filtering
