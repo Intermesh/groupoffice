@@ -29,16 +29,16 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 		$contact['addressBookId'] = $_POST['addressBookId'];
 	}
 	
-	if(isset($_POST['email'])) {
+	if(!empty($_POST['email'])) {
 		$contact['emailAddresses'] = [['email' => $_POST['email']]];
 	}
 	
 	$contact['phoneNumbers'] = [];
-	if(isset($_POST['homePhone'])) {
+	if(!empty($_POST['homePhone'])) {
 		$contact['phoneNumbers'][] = ['type'=>'home', 'number' => $_POST['homePhone']];
 	}
 	
-	if(isset($_POST['mobilePhone'])) {
+	if(!empty($_POST['mobilePhone'])) {
 		$contact['phoneNumbers'][] = ['type'=>'mobile', 'number' => $_POST['mobilePhone']];
 	}
 	
