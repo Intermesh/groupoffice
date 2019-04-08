@@ -1347,10 +1347,13 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$joinCf = !empty($params['joinCustomFields']) && $this->hasCustomFields();
 
 		if($joinCf) {
+			$cfFieldModels = array_filter(\go\core\model\Field::findByEntity($this->getType()->getId())->all(), function($f) {
+				return $f->type != 'MultiSelect'; //temporary hack
+			});
 			
 			$names = array_map(function($f) {
 				return "cf." . $f->databaseName;
-			}, \go\core\model\Field::findByEntity($this->getType()->getId())->all());
+			}, $cfFieldModels);
 			
 			if(!empty($names)) {
 				$fields .= ", " .implode(', ', $names);
