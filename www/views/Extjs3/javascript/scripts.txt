@@ -1,4 +1,5 @@
 views/Extjs3/javascript/vendor/localforage.js
+views/Extjs3/javascript/vendor/promise-polyfill.js
 
 go/core/views/extjs3/go.js
 go/core/views/extjs3/Translate.js
