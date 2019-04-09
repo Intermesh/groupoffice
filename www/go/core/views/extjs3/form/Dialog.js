@@ -140,7 +140,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 		
 		this.tabPanel = new Ext.TabPanel({
 			defaults: {
-				autoScroll: true
+				autoScroll: true,
+				hideMode: "offsets"
 			},
 			activeTab: 0,
 			enableTabScroll:true,
