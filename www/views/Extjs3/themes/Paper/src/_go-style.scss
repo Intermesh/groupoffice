@@ -1763,13 +1763,15 @@ table[id^="comments-ext"] b {
 		position: absolute;
 		top: 0;
 		right:0;
+		background-color: color($bg, 'card');
 		&:hover {
 			@include var(color, c-primary);
 		}
 		&::after {
 			//margin-left:dp(4);
+			color: color($fg, 'icon');
 			font-size: .7em;
-			content:'more_vert';
+			content:'more_vert';			
 		}
 	}
 	&.x-grid-panel .x-grid3-header {

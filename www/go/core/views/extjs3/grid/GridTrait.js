@@ -18,7 +18,34 @@ go.grid.GridTrait = {
 		if(this.getSelectionModel().getSelected) {
 			this.initNav();
 		}
-		// MAKE ROOM FOR HEADER MENU
+		
+		this.initScrollOffset();
+		
+		this.initHeaderMenu();
+	},
+	
+	initHeaderMenu : function() {
+		this.on('render',function() {			
+			// header menu
+			this.addClass("go-grid");
+			this.headerBtnWrap = this.el.child(".x-grid3-header");
+			if (this.headerBtnWrap) {// && this.enableHdMenu) {
+				this.headerBtn = new Ext.Component({
+					cls: "go-grid-hd-btn",
+					renderTo: this.headerBtnWrap
+				});
+				this.headerBtn.el.on("click", this.onHeaderBtnClick, this);
+			}
+		}, this);
+	},
+	
+	//Always enforce room for scrollbar so last column in resizable because of our custom header button.
+	initScrollOffset : function() {
+		
+		if(this.autoHeight || this.getView().scrollOffset === 0) {
+			return;
+		}
+		
 		this.enableHdMenu = false;
 		this.getView().scrollOffset = dp(24);
 		this.getView().refresh = function(headersToo) {
@@ -47,22 +74,7 @@ go.grid.GridTrait = {
 				 this.mainBody.dom.style.width = this.getOffsetWidth();
 			}
 		};
-		// END MAKE ROOM
 		
-		this.on('render',function(){
-	
-			
-			// header menu
-			this.addClass("go-grid");
-			this.headerBtnWrap = this.el.child(".x-grid3-header");
-			if (this.headerBtnWrap) {// && this.enableHdMenu) {
-				this.headerBtn = new Ext.Component({
-					cls: "go-grid-hd-btn",
-					renderTo: this.headerBtnWrap
-				});
-				this.headerBtn.el.on("click", this.onHeaderBtnClick, this);
-			}
-		},this);
 	},
 	
 	initCustomFields : function() {
