@@ -410,6 +410,10 @@ abstract class EntityController extends Controller {
 			$params['accountId'] = null;
 		}
 		
+		if(!isset($params['create']) && !isset($params['update']) && !isset($params['destroy'])) {
+			throw new InvalidArguments("You must pass one of these arguments: create, update or destroy");
+		}
+		
 		if(!isset($params['create'])) {
 			$params['create'] = [];
 		}
