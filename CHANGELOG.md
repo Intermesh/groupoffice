@@ -1,3 +1,5 @@
+- Core: Login screen - Fixed problem that language selection was not clickable when a message was shown.
+
 08-04-2019 6.3.69
 - Core: Correct UTF-8 encoding on language import
 - Core: Prevent license error in System tasks maintenance
