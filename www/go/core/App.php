@@ -647,11 +647,12 @@ use const GO_CONFIG_FILE;
 
 namespace {
 
+	use go\core\App;
 	/**
 	 * @return App
 	 */
 	function GO() {
-		return \go\core\App::get();
+		return App::get();
 	}
 
 }
