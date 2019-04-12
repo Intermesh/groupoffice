@@ -1,3 +1,4 @@
+- Core: HTML editor: Fixed "Capital after punctuation" functionality in combination with the shift key
 - Core: Login screen - Fixed problem that language selection was not clickable when a message was shown.
 
 08-04-2019 6.3.69
