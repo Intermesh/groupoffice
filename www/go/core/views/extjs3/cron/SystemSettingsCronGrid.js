@@ -21,7 +21,7 @@ go.cron.SystemSettingsCronGrid = Ext.extend(GO.grid.GridPanel,{
 		
 		Ext.apply(this,{
 			standardTbar:false,
-			editDialogClass:GO.cron.CronDialog,
+			editDialogClass: go.cron.CronDialog,
 			tbar : new Ext.Toolbar({
 				items: [{
 					xtype:'tbtitle',
