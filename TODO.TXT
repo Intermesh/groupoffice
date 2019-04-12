@@ -2,9 +2,7 @@
 
 - Billing: Copy matching custom fields in order dialog
 
-Edit contact profile via My Account
 Merge contacts
-Export / import  contacts CSV
 Batch edit custom fields not possible
 Address lists / mailings
 Disabled categories for:  folder dialog Folder::deriveCustomfieldSettings
@@ -12,9 +10,6 @@ custom fields billign items dropped ?!
 Calendar birthdays
 Demodata
 ticket groups
-
-core_group.name uniek maken
-
 
 DG::
 
