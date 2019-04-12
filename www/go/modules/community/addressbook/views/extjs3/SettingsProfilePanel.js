@@ -20,7 +20,8 @@ go.modules.community.addressbook.SettingsProfilePanel = Ext.extend(Ext.Panel, {
 						items: [
 							this.nameField = new go.modules.community.addressbook.NameField({
 								name: "name",
-								flex: 1
+								flex: 1,
+								allowBlank: true
 							}),
 							this.jobTitle = new Ext.form.TextField({
 								xtype: "textfield",
