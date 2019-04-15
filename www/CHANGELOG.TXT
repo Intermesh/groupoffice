@@ -1,3 +1,5 @@
+- Billing: Fixed rounding the vat of orders. It now calculates the vat per orderItem instead of the total of the order.
+
 21-03-2019 6.2.116
 - Core: Empty cache folder instead of delete 2
 - Core: CLI Delete methods for notes and folders
