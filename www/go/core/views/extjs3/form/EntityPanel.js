@@ -67,7 +67,8 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		for(name in v) {		
 			field = this.getForm().findField(name);
 			if(!field) {
-				this.values[name] = v[name];
+				//Clone so we loose references when comparing values with the entity.
+				this.values[name] = go.util.clone(v[name]);
 			}
 		}
 		

@@ -58,6 +58,8 @@ go.modules.community.addressbook.CustomFieldSetDialog = Ext.extend(go.customfiel
 			this.formPanel.values.filter = {};
 		}
 
+		debugger;
+		
 		switch (this.formPanel.getForm().findField('enableFor').getValue()) {
 			case 'contacts':
 				this.formPanel.values.filter.isOrganization = false;

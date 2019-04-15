@@ -20,6 +20,10 @@
 	}
 
 	go.util = {
+
+		clone: function(obj) {
+			return JSON.parse(JSON.stringify(obj));
+		},
 		
 		/**
 		 * Convert bytes to a user readable format
