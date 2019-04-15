@@ -360,7 +360,7 @@ Ext.override(Ext.data.GroupingStore,{
 
 
 Ext.override(Ext.form.CompositeField, {
-	origFocus : Ext.FormPanel.prototype.focus,
+	origFocus : Ext.form.CompositeField.prototype.focus,
 	focus : function() {
 		var first = this.items.find(function(item) {
 			return item.isFormField && !item.disabled && item.isVisible();
@@ -414,14 +414,16 @@ Ext.override(Ext.FormPanel,{
 						return true;
 				});
 
-				if (firstField) {
+
+				//Don't focus on an invalid field or it will loose the invalide state on blur
+				if(firstField && !firstField.activeError && firstField.isValid()) {
 					firstField.focus();
 					return;
 				} 
 			}
 
 			this.origFocus();
-		}
+		};
 		
 		focFn.defer(200, this);
 		

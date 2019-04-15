@@ -126,6 +126,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 			},
 			items:[
 				this.passwordField1 = new go.form.PasswordGeneratorField({
+					minLength: go.Modules.get("core","core").settings.passwordMinLength,
 					listeners: {						
 						generated : function(field, pass) {
 							this.passwordField2.setValue(pass);
@@ -139,7 +140,8 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 				this.passwordField2 = new Ext.form.TextField({
 					inputType: 'password',
 					fieldLabel: t("Confirm password", "users"),
-					name: 'passwordConfirm'
+					submit: false,
+					minLength: go.Modules.get("core","core").settings.passwordMinLength,
 				})
 			]
 		});

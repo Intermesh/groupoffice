@@ -16,6 +16,7 @@ go.users.CreateUserPasswordPanel = Ext.extend(Ext.form.FormPanel, {
 				items: [
 					this.passwordField1 = new go.form.PasswordGeneratorField({						
 						allowBlank: false,
+						minLength: go.Modules.get("core","core").settings.passwordMinLength,
 						anchor: '100%',
 							listeners: {
 							generated : function(field, pass) {
@@ -26,16 +27,17 @@ go.users.CreateUserPasswordPanel = Ext.extend(Ext.form.FormPanel, {
 						
 					}),
 					
-					this.passwordField2 = new Ext.form.TextField({						
+					this.passwordField2 = new Ext.form.TextField({		
+						minLength: go.Modules.get("core","core").settings.passwordMinLength,				
 						allowBlank: false,
 						anchor: '100%',
 						inputType: 'password',
 						fieldLabel: t("Confirm password"),
-						name: 'passwordConfirm'
+						submit: false
 					})]
 			}
 		];
-		 go.users.CreateUserPasswordPanel.superclass.initComponent.call(this);
+		go.users.CreateUserPasswordPanel.superclass.initComponent.call(this);
 	}
 });
 

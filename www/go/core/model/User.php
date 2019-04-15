@@ -290,12 +290,6 @@ class User extends Entity {
 		}
 	}
 	
-	
-
-	public function setPasswordConfirm($passwordConfirm){
-		return true;
-	}
-	
 	public function setCurrentPassword($currentPassword){
 		$this->currentPassword = $currentPassword;
 		

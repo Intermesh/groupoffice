@@ -20,7 +20,8 @@ go.users.CreateUserWizard = Ext.extend(go.Wizard, {
 			this.userPanel = new go.users.CreateUserAccountPanel(),
 			this.passwordPanel = new go.users.CreateUserPasswordPanel(),
 			this.groupsGrid
-		]
+		];
+
 		go.users.CreateUserWizard.superclass.initComponent.call(this);
 		
 		this.on({
@@ -51,7 +52,7 @@ go.users.CreateUserWizard = Ext.extend(go.Wizard, {
 		
 	applyPanelData : function(item) {
 		if(item != this.groupsGrid) {
-			this.user = Ext.apply(this.user, item.getForm().getValues());
+			this.user = Ext.apply(this.user, item.getForm().getFieldValues());
 		} else
 		{
 			this.user.groups = this.groupsGrid.getValue();
@@ -97,10 +98,10 @@ go.users.CreateUserWizard = Ext.extend(go.Wizard, {
 						break;
 
 					default:
-						
+						var name, field;
 						//mark validation errors
 						for(name in notSaved[id].validationErrors) {
-							var field = this.findField(name);
+							field = this.findField(name);
 							if(field) {
 								this.setActiveItem(field[1]);
 								field[0].markInvalid(notSaved[id].validationErrors[name].description);
