@@ -20,7 +20,12 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				"phoneNumbers",
 				"dates",
 				"streetAddresses",
-				{name: 'organizations', type: go.data.types.Contact, key: 'organizationIds'}
+				{name: 'organizations', type: go.data.types.Contact, key: 'organizationIds'},
+				"jobTitle",
+				"debtorNumber",
+				"registrationNumber",
+				"IBAN",
+				"vatNo"
 			],
 			sortInfo :{field: "name", direction: "ASC"},
 			entityStore: "Contact"
@@ -61,7 +66,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					id: 'id',
 					hidden: true,
 					header: 'ID',
-					width: dp(40),
+					width: dp(60),
 					sortable: true,
 					dataIndex: 'id'
 				},
@@ -137,6 +142,45 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					renderer: function (v) {
 						return v ? v.displayName : "-";
 					}
+				},{
+					hidden: true,
+					header: t('Modified by'),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'modifier',
+					renderer: function (v) {
+						return v ? v.displayName : "-";
+					}
+				}, {
+					hidden: true,
+					header: t('Job title'),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'jobTitle'
+				}, {
+					hidden: true,
+					header: t('Registration number'),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'registrationNumber'
+				},{
+					hidden: true,
+					header: t('Debtor number'),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'debtorNumber'
+				}, {
+					hidden: true,
+					header: "IBAN",
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'IBAN'
+				}, {
+					hidden: true,
+					header: t("VAT number"),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'vatNo'
 				}
 			],
 			viewConfig: {
@@ -162,10 +206,10 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					}
 				}
 			},
-			autoExpandColumn: 'name'
+			autoExpandColumn: 'name',
 			// config options for stateful behavior
-//			stateful: true,
-//			stateId: 'contact-grid'
+			stateful: true,
+			stateId: 'contact-grid'
 		});
 		
 
