@@ -200,50 +200,25 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		Ext.EventManager.on(doc, 'keydown', me.correctPunctuation, me);
 	},
 
-	lastChar: false,
-	autoCapitalizeNextChar: true,
+	lastKey: false,
+	capNext: true,
 
-	correctPunctuation: function (event) {
-		var enter = 13,
-						spacechar = 32,
-						dotchar = 190,
-						questonmark = 191,
-						exclamationmark = 49,
-						achar = 65,
-						zchar = 90;
-
-		//IE doesn't has event.button and uses event.keyCode
-		var key = event.button + 1 || event.keyCode;
-
-		var sentenceEnds = [dotchar, exclamationmark, questonmark];
-
-		if (!this.autoCapitalizeNextChar) {
-			switch (key) {
-
-				case spacechar:
-					if (sentenceEnds.indexOf(this.lastChar) != -1) {
-						this.autoCapitalizeNextChar = true;
-					}
-					break;
-				case enter:
-					this.autoCapitalizeNextChar = true;
-					break;
+	correctPunctuation: function (ev) {
+		ev = ev.browserEvent;
+		if (!this.capNext) {
+			if(ev.key === 'Enter' || (ev.key === ' ' && ['.', '!', '?'].indexOf(this.lastKey) !== -1)) {
+				this.capNext = true;
 			}
-		} else
-		{
-			if (key >= achar && key <= zchar) {
-				var char = String.fromCharCode(key);
-				event.preventDefault();
-				this.insertAtCursor(char.toUpperCase());
-
-				this.autoCapitalizeNextChar = false;
-
-			} else if (key != spacechar && key != enter) {
-				this.autoCapitalizeNextChar = false;
+		} else {
+			if (ev.key.match(/^[a-z]$/)) {
+				ev.preventDefault();
+				this.insertAtCursor(ev.key.toUpperCase());
+				this.capNext = false;
+			} else if (ev.key != ' ' && ev.key != 'Enter') {
+				this.capNext = false;
 			}
 		}
-
-		this.lastChar = key;
+		this.lastKey = ev.key;
 	},
 
 	getDocMarkup: function () {

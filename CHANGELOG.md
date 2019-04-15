@@ -1,6 +1,11 @@
+- Core: HTML editor: Fixed "Capital after punctuation" functionality in combination with the shift key
+- Core: Login screen - Fixed problem that language selection was not clickable when a message was shown.
+
 08-04-2019 6.3.69
 - Core: Correct UTF-8 encoding on language import
 - Core: Prevent license error in System tasks maintenance
+- Reminders: fixed add reminder in reminder popup module
+- Leavedays: changes in Monthwindow for extending and fix un undefined issue.
 - Core: Pin TCPDF to version 6.2.22. Higher versions break image loading in PDF
 - Address book: search sent invalid data to the server causing problems on some servers
 - Core: Selected group members should be on top when editing groups
