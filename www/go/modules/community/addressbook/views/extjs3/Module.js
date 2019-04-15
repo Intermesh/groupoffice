@@ -4,13 +4,13 @@ go.Modules.register("community", "addressbook", {
 	mainPanel: "go.modules.community.addressbook.MainPanel",
 	title: t("Address book"),
 	entities: [{
-			
+
 			name: "Contact",
 			hasFiles: true, //Rename to files?
 			customFields: {
 				fieldSetDialog: "go.modules.community.addressbook.CustomFieldSetDialog"
 			},
-			
+
 			/**
 			 * Filter definitions
 			 * 
@@ -32,68 +32,68 @@ go.Modules.register("community", "addressbook", {
 					title: t("Name"),
 					type: "string",
 					multiple: true
-				}, 
+				},
 				{
 					name: 'email',
 					title: t("E-mail"),
 					type: "string",
 					multiple: true
-				},{
+				}, {
 					name: 'phone',
 					title: t("Phone"),
 					type: "string",
 					multiple: true
-				},{
+				}, {
 					name: 'country',
 					title: t("Country"),
 					type: "string",
 					multiple: true
-				},{
+				}, {
 					name: 'city',
 					title: t("City"),
 					type: "string",
 					multiple: true
-				},{
+				}, {
 					name: 'gender',
 					title: t("Gender"),
 					type: "select",
 					multiple: true,
 					options: [{
 							value: 'M',
-							title: t("Male"),							
-					},{
+							title: t("Male"),
+						}, {
 							value: 'F',
 							title: t("Female")
-					},{
+						}, {
 							value: null,
 							title: t("Unknown")
-					}]
+						}]
 				},
 				{
 					title: t("Modified at"),
-					name: 'modified', 
+					name: 'modified',
 					multiple: false,
 					type: 'date'
-				}, 					
+				},
 				{
 					title: t("Age"),
-					name: 'age', 
+					name: 'age',
 					multiple: false,
 					type: 'number'
-				},						
+				},
 				{
 					title: t("Birthday"),
-					name: 'birthday', 
+					name: 'birthday',
 					multiple: false,
 					type: 'date'
 				}, {
 					title: t("User group"),
-					name: 'usergroupid', 
+					name: 'usergroupid',
 					multiple: true,
 					type: 'go.groups.GroupCombo'
 				}, {
 					title: t("Is a user"),
-					name: 'isUser', 
+					name: 'isUser',
 					multiple: false,
 					type: 'select',
 					options: [
@@ -110,68 +110,68 @@ go.Modules.register("community", "addressbook", {
 			],
 			links: [{
 
-				filter: "isContact",
+					filter: "isContact",
 
-				iconCls: "entity ic-person",
+					iconCls: "entity ic-person",
 
-				/**
-				 * Opens a dialog to create a new linked item
-				 * 
-				 * @param {string} entity eg. "Note"
-				 * @param {string|int} entityId
-				 * @returns {go.form.Dialog}
-				 */
-				linkWindow: function(entity, entityId) {
-					return new go.modules.community.addressbook.ContactDialog();
-				},
+					/**
+					 * Opens a dialog to create a new linked item
+					 * 
+					 * @param {string} entity eg. "Note"
+					 * @param {string|int} entityId
+					 * @returns {go.form.Dialog}
+					 */
+					linkWindow: function (entity, entityId) {
+						return new go.modules.community.addressbook.ContactDialog();
+					},
 
-				/**
-				 * Return component for the detail view
-				 * 
-				 * @returns {go.detail.Panel}
-				 */
-				linkDetail: function() {
-					return new go.modules.community.addressbook.ContactDetail();
-				}	
-			},{
-				/**
-				 * Entity name
-				 */
-				title: t("Organization"),
+					/**
+					 * Return component for the detail view
+					 * 
+					 * @returns {go.detail.Panel}
+					 */
+					linkDetail: function () {
+						return new go.modules.community.addressbook.ContactDetail();
+					}
+				}, {
+					/**
+					 * Entity name
+					 */
+					title: t("Organization"),
 
-				iconCls: "entity ic-business",			
+					iconCls: "entity ic-business",
 
-				filter: "isOrganization",
+					filter: "isOrganization",
 
-				/**
-				 * Opens a dialog to create a new linked item
-				 * 
-				 * @param {string} entity eg. "Note"
-				 * @param {string|int} entityId
-				 * @returns {go.form.Dialog}
-				 */
-				linkWindow: function(entity, entityId) {
-					var dlg = new go.modules.community.addressbook.ContactDialog();
-					dlg.setValues({isOrganization: true});
-					return dlg;
-				},
+					/**
+					 * Opens a dialog to create a new linked item
+					 * 
+					 * @param {string} entity eg. "Note"
+					 * @param {string|int} entityId
+					 * @returns {go.form.Dialog}
+					 */
+					linkWindow: function (entity, entityId) {
+						var dlg = new go.modules.community.addressbook.ContactDialog();
+						dlg.setValues({isOrganization: true});
+						return dlg;
+					},
 
-				/**
-				 * Return component for the detail view
-				 * 
-				 * @returns {go.detail.Panel}
-				 */
-				linkDetail: function() {
-					return new go.modules.community.addressbook.ContactDetail();
-				}	
-			}]
-			
-	}, {
-		name: "AddressBook",
-		title: t("Address book"),
-		isAclOwner: true
-	}, "AddressBookGroup"],	
-	
+					/**
+					 * Return component for the detail view
+					 * 
+					 * @returns {go.detail.Panel}
+					 */
+					linkDetail: function () {
+						return new go.modules.community.addressbook.ContactDetail();
+					}
+				}]
+
+		}, {
+			name: "AddressBook",
+			title: t("Address book"),
+			isAclOwner: true
+		}, "AddressBookGroup"],
+
 	userSettingsPanels: [
 		"go.modules.community.addressbook.SettingsPanel",
 		"go.modules.community.addressbook.SettingsProfilePanel"
@@ -179,7 +179,7 @@ go.Modules.register("community", "addressbook", {
 });
 
 
-go.modules.community.addressbook.typeStoreData = function(langKey) {
+go.modules.community.addressbook.typeStoreData = function (langKey) {
 	var types = [], typeLang = t(langKey);
 
 	for (var key in typeLang) {
@@ -189,3 +189,36 @@ go.modules.community.addressbook.typeStoreData = function(langKey) {
 };
 
 //go.Stores.get("User");
+
+
+Ext.onReady(function () {
+	
+	if(!go.modules.business && !go.modules.business.newsletter) {
+		return;
+	}
+	
+	go.modules.business.newsletters.registerEntity({
+		name: "Contact",
+		grid: go.modules.community.addressbook.ContactGrid,
+		add: function () {		
+			return new Promise(function (resolve, reject) {
+				var select = new go.modules.community.addressbook.SelectDialog({
+					mode: 'id',
+					scope: this,					
+					selectMultiple: function (ids) {
+						this.resolved = true;
+						resolve(ids);
+					},
+					listeners: {
+						close: function() {
+							if(!this.resolved) {
+								reject();
+							}
+						}
+					}
+				});
+				select.show();
+			});
+		}
+	});
+});

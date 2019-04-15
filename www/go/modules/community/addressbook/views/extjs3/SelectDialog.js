@@ -6,11 +6,12 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 	width: dp(1000),
 	height: dp(800),
 	modal: true,
+	mode: "email", // or "id" in the future "phone" or "address"
 	title: t("Select from address book"),
 	selectMultiple: function(contactIds) {
 		
 	},
-	selectSingle: function(name, email, id) { 
+	selectSingleEmail: function(name, email, id) { 
 	
 	},
 	scope: null,
@@ -23,10 +24,16 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 		this.bbar = [
 			'->',
 			{
-				text: t("Add all"),
+				text: t("Add all results"),
 				handler: this.selectAll,
 				scope: this
-			}
+			},
+			this.addSelectionButton = new Ext.Button({
+				text: t("Add selection"),
+				handler: this.selectSelection,
+				scope: this,
+				disabled: true
+			})
 		];		
 		
 		this.createGrid();
@@ -71,39 +78,14 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 			],
 			listeners: {
 				rowclick: function (grid, rowIndex, e) {
-
-					var record = grid.getStore().getAt(rowIndex), emails = record.get("emailAddresses");
-					
-					if(emails.length === 1) {
-						this.selectSingle.call(this.scope, record.get("name"), emails[0].email, record.get("id"));
-						this.close();
+					if(e.ctrlKey || e.shiftKey) {
 						return;
 					}
-					
-					var me = this,  items = emails.map(function(a) {
-						return {
-							data: {
-								name: record.get("name"),
-								email: a.email,
-								id: record.get("id")
-							},
-							text: "<div>" + a.email + "</div><small>" +  this.labels[a.type] + "</div>",
-							handler: function() {
-								me.selectSingle.call(me.scope, this.data.name, this.data.email, this.data.id);
-								me.close();
-							}
-						};
-					}, this);
-					
-					var m = new Ext.menu.Menu({
-						cls: "x-menu-no-icons",
-						items: items
-					});
-					
-					m.showAt(e.getXY());
-					
+					var record = grid.getStore().getAt(rowIndex);					
+					if(this.mode === 'email') {
+							this.selectEmail(record, e);
+					}					
 				},
-
 				scope: this
 			}
 		});
@@ -111,6 +93,10 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 		this.grid.store.setFilter("required", {			
 			hasEmailAddresses: true
 		});
+
+		this.grid.getSelectionModel().on("selectionchange", function(sm) {
+			this.addSelectionButton.setDisabled(sm.getSelections().length == 0);
+		}, this);
 		
 		return this.grid;
 	},
@@ -235,10 +221,55 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 		s.query({
 			filter: this.grid.store.getFilter()
 		}, function(response) {			
-			this.selectMultiple.call(this.scope, response.ids);
 			this.getEl().unmask();
-			this.close();
+			Ext.MessageBox.confirm(t("Confirm"), t("Are you sure you want to select all {count} results?").replace('{count}', response.ids.length), function(btn) {
+				if(btn != 'yes') {
+					return;
+				}
+				this.selectMultiple.call(this.scope, response.ids);				
+				this.close();
+			}, this);
+			
 		}, this);
+	},
+
+	selectSelection : function() {
+		var records = this.grid.getSelectionModel().getSelections();		
+		this.selectMultiple.call(this.scope, records.column('id'));
+		this.close();
+	},
+	
+	
+	selectEmail : function(record, e) {
+		var emails = record.get("emailAddresses");
+					
+		// if(emails.length === 1) {
+		// 	this.selectSingle.call(this.scope, record.get("name"), emails[0].email, record.get("id"));
+		// 	this.close();
+		// 	return;
+		// }
+
+		var me = this,  items = emails.map(function(a) {
+			return {
+				data: {
+					name: record.get("name"),
+					email: a.email,
+					id: record.get("id")
+				},
+				text: "<div>" + a.email + "</div><small>" +  this.labels[a.type] + "</div>",
+				handler: function() {
+					me.selectSingle.call(me.scope, this.data.name, this.data.email, this.data.id);
+					me.close();
+				}
+			};
+		}, this);
+
+		var m = new Ext.menu.Menu({
+			cls: "x-menu-no-icons",
+			items: items
+		});
+
+		m.showAt(e.getXY());
 	}
 	
 });
