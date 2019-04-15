@@ -75,7 +75,7 @@ class RootDirectory extends Sabre\DAV\FS\Directory{
 					break;
 					
 				case 'billing':
-					if(GO::modules()->tickets)
+					if(GO::modules()->billing)
 						return new Directory('billing');
 					break;
 					
