@@ -27,7 +27,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 		go.modules.community.addressbook.ContactDialog.superclass.initComponent.call(this);
 
 		this.formPanel.on("setvalues", function (form, v) {
-			this.setOrganization(v["isOrganization"]);
+			this.setOrganization(v.isOrganization);
 		}, this);
 	},
 
@@ -163,7 +163,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 				title: t("Communication"),
 				layout: 'column',
 				defaults: {
-					columnWidth: .5,
+					columnWidth: 0.5,
 					anchor: "-20"
 				},
 				items: [
@@ -184,7 +184,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 				title: t("Other"),
 				layout: 'column',
 				defaults: {
-					columnWidth: .5,
+					columnWidth: 0.5,
 					anchor: "-20"
 				},
 				items: [
