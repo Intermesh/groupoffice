@@ -146,14 +146,15 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		if(this.getTopToolbar()) {
 			this.getTopToolbar().setDisabled(false);
 		}
-		this.data = data;
+		this.data = {};
+		Ext.apply(this.data, data);
 		var me = this;
 		
 		var resolveRelations = [];
 		this.relations.forEach(function(relName) {
 			var relation = me.entityStore.entity.relations[relName];
 			if(me.data[relation.fk]) {
-				resolveRelations.push( 
+				resolveRelations.push(
 					go.Stores.get(relation.store).get([me.data[relation.fk]]).then(function(record){
 						me.data[relName] = record[0];
 					})
