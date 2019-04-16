@@ -1468,8 +1468,10 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			foreach($linkedModels as $linkedModel){
 				$link = $linkedModel->getAttributes();				
 				$entityType = \go\core\orm\EntityType::findById($linkedModel->entityTypeId);
-				$link['entity'] = $entityType->getName();
-				$response['links'][] = $link;				
+				if($entityType) {
+					$link['entity'] = $entityType->getName();
+					$response['links'][] = $link;				
+				}
 			}			
 		}
 		// END OF Handle the links div in the email display panel

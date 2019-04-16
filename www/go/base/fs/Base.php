@@ -102,7 +102,7 @@ abstract class Base{
 	 * Get a child file or folder.
 	 * 
 	 * @param StringHelper $filename
-	 * @return \File|\Folder|boolean 
+	 * @return File|Folder|boolean 
 	 */
 	public function child($filename){
 		$childPath = $this->path.'/'.$filename;
