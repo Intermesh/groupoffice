@@ -11,7 +11,7 @@ use go\core\orm\LoggingTrait;
 use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
 use go\core\validate\ErrorCode;
-use go\modules\community\addressbook\convert\CSV;
+use go\modules\community\addressbook\convert\Csv;
 use go\modules\community\addressbook\convert\VCard;
 use function GO;
 						
@@ -426,7 +426,7 @@ class Contact extends AclItemEntity {
 	public static function converters() {
 		$arr = parent::converters();
 		$arr['text/vcard'] = VCard::class;		
-		$arr['text/csv'] = CSV::class;
+		$arr['text/csv'] = Csv::class;
 		return $arr;
 	}
 
