@@ -409,14 +409,11 @@ class MaintenanceController extends AbstractController {
 	protected function actionCheckDatabase($params) {
 		
 
-		if(!$this->isCli() && !\GO::modules()->tools)
-			throw new \GO\Base\Exception\AccessDenied();
-		
-		 
+		if(!$this->isCli() && !\GO::user()->isAdmin())
+			throw new \GO\Base\Exception\AccessDenied();		 
 		
 		GO::setIgnoreAclPermissions(true);
-		GO::session()->runAsRoot();
-	
+		GO::session()->runAsRoot();	
 		
 		//$this->run("upgrade",$params);		
 		
@@ -429,6 +426,8 @@ class MaintenanceController extends AbstractController {
 		if(!$this->isCli()){
 				echo '<pre>';
 		}
+
+		GO()->getInstaller()->fixCollations();
 		
 		$this->checkCollations();
 	
