@@ -1,13 +1,24 @@
-go.modules.community.addressbook.AddressesField = Ext.extend(go.form.FormGroup, {
-	hideLabel: true,
-	xtype: "formgroup",
-	name: "addresses",
-	addButtonText: t("Add street address"),
-	addButtonIconCls: 'ic-add-location',
-	pad: true,
-	itemCfg: {
-		labelWidth: dp(140),
-		items: [{
+(function () {
+	var store = new Ext.data.ArrayStore({
+		xtype: "arraystore",
+		idIndex: 0,
+		fields: [
+			'value',
+			'display'
+		],
+		data: go.modules.community.addressbook.typeStoreData('addressTypes')
+	});
+
+	go.modules.community.addressbook.AddressesField = Ext.extend(go.form.FormGroup, {
+		hideLabel: true,
+		xtype: "formgroup",
+		name: "addresses",
+		addButtonText: t("Add street address"),
+		addButtonIconCls: 'ic-add-location',
+		pad: true,
+		itemCfg: {
+			labelWidth: dp(140),
+			items: [{
 				anchor: "100%",
 				fieldLabel: t("Type"),
 				xtype: 'combo',
@@ -15,15 +26,7 @@ go.modules.community.addressbook.AddressesField = Ext.extend(go.form.FormGroup, 
 				mode: 'local',
 				editable: false,
 				triggerAction: 'all',
-				store: {
-					xtype: "arraystore",
-					id: 0,
-					fields: [
-						'value',
-						'display'
-					],
-					data: go.modules.community.addressbook.typeStoreData('addressTypes')
-				},
+				store: store,
 				valueField: 'value',
 				displayField: 'display',
 				value: "work"
@@ -59,6 +62,7 @@ go.modules.community.addressbook.AddressesField = Ext.extend(go.form.FormGroup, 
 				hiddenName: "countryCode",
 				anchor: "100%"
 			}]
+		}
 	}
-}
-);
+	);
+})();

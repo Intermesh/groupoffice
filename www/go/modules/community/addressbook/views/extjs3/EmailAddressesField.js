@@ -1,12 +1,23 @@
-go.modules.community.addressbook.EmailAddressesField = Ext.extend(go.form.FormGroup, {
-	hideLabel: true,
-	xtype: "formgroup",
-	name: "emailAddresses",
-	addButtonIconCls: 'ic-email',
-	addButtonText: t("Add e-mail address"),
-	itemCfg: {
-		anchor: "100%",
-		items: [{
+(function () {
+	var store = new Ext.data.ArrayStore({
+		xtype: "arraystore",
+		idIndex: 0,
+		fields: [
+			'value',
+			'display'
+		],
+		data: go.modules.community.addressbook.typeStoreData('emailTypes')
+	});
+
+	go.modules.community.addressbook.EmailAddressesField = Ext.extend(go.form.FormGroup, {
+		hideLabel: true,
+		xtype: "formgroup",
+		name: "emailAddresses",
+		addButtonIconCls: 'ic-email',
+		addButtonText: t("Add e-mail address"),
+		itemCfg: {
+			anchor: "100%",
+			items: [{
 				anchor: "100%",
 				xtype: "compositefield",
 				hideLabel: true,
@@ -17,15 +28,7 @@ go.modules.community.addressbook.EmailAddressesField = Ext.extend(go.form.FormGr
 						mode: 'local',
 						editable: false,
 						triggerAction: 'all',
-						store: {
-							xtype: "arraystore",
-							idIndex: 0,
-							fields: [
-								'value',
-								'display'
-							],
-							data: go.modules.community.addressbook.typeStoreData('emailTypes')
-						},
+						store: store,
 						valueField: 'value',
 						displayField: 'display',
 						width: dp(140),
@@ -40,6 +43,7 @@ go.modules.community.addressbook.EmailAddressesField = Ext.extend(go.form.FormGr
 						setFocus: true
 					}]
 			}]
+		}
 	}
-}
-);
+	);
+})();
