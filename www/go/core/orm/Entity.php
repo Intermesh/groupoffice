@@ -385,9 +385,6 @@ abstract class Entity extends Property {
 		return Module::findById($moduleId)->findAclId();
 	}
 	
-	
-	private static $typeCache = [];
-	
 	/**
 	 * Gets an ID from the database for this class used in database relations and 
 	 * routing short routes like "Note/get"
@@ -395,10 +392,15 @@ abstract class Entity extends Property {
 	 * @return EntityType
 	 */
 	public static function getType() {		
-		if(!isset(self::$typeCache[static::class])) {
-			self::$typeCache[static::class] = EntityType::findByClassName(static::class);;
+
+		$cls = static::class;
+
+		$type = GO()->getCache()->get('type-' . $cls);
+		if(!$type) {
+			$type = EntityType::findByClassName(static::class);
+			GO()->getCache()->set('type-' . $cls, $type, false);
 		}
-		return self::$typeCache[static::class];
+		return $type;
 	}
   
   /**
