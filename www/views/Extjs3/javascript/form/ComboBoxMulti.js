@@ -60,24 +60,28 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
 		
 		maxHeight: 100,
 		
+        
+        growMin : dp(32),
+        growMax: dp(120),
 		
 		syncHeight : function() {
 			
 			this.el.dom.style.overflowY = 'auto';
 			var changed = false;
-			if(this.el.dom.offsetHeight > dp(32)){
-				this.el.dom.style.height = dp(32) + "px";
+			if(this.el.dom.offsetHeight > this.growMin){
+				this.el.dom.style.height = this.growMin + "px";
 				changed = true;
 			}
 
-			var height = Math.min(this.el.dom.scrollHeight, this.maxHeight);
-			if(height > dp(32)) {
-				this.el.dom.style.height = height + "px";
+			var height = Math.min(this.el.dom.scrollHeight, this.growMax);
+			if(height > this.growMin) {
+				this.el.dom.style.height = (height + dp(8)) + "px";
 				changed = true;
 			}
 			
 			if(changed) {
-				this.fireEvent('grow', this);
+                //this.fireEvent('grow', this);
+                this.fireEvent("autosize", this, height);
 			}
 		},
 		
