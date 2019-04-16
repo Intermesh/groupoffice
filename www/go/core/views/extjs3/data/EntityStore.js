@@ -56,8 +56,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		if(me.initialized) {
 			if(cb) {
 				cb.call(me);
-				Promise.resolve();
-				return;
+				return Promise.resolve();
 			}
 		}
 		
@@ -72,25 +71,25 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		});
 		
 		return Promise.all([
-			me.metaStore.getItem('notFound', function(v) {
+			me.metaStore.getItem('notFound').then(function(v) {
 				me.notFound = v || [];
-				return v;
+				return true;
 			}),
-			me.metaStore.getItem('state', function(v) {
+			me.metaStore.getItem('state').then(function(v) {
 				me.state = v;
-				return v;
+				return true;
 			}),
-			me.metaStore.getItem('isComplete', function(v) {
+			me.metaStore.getItem('isComplete').then(function(v) {
 				me.isComplete = v;
-				return v;
+				return true;
 			}),
-			me.metaStore.getItem('apiVersion', function(v) {
+			me.metaStore.getItem('apiVersion').then(function(v) {
 				me.apiVersion = v;
-				return v;
+				return true;
 			}),
-			me.metaStore.getItem('apiUser', function(v) {
+			me.metaStore.getItem('apiUser').then(function(v) {
 				me.apiUser = v;
-				return v;
+				return true;
 			})
 		]).then(function() {
 
@@ -362,7 +361,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 							return me.stateStore.getItem(key).then(function(entity) {
 								me.data[entity.id] = entity;
 							});
-						}))
+						}));
 					}).then(function() {
 						cb.call(scope, true, me.data);
 					});				
