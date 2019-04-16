@@ -33,7 +33,7 @@ go.modules.comments.Settings = Ext.extend(go.Window, {
 	
 	submit : function(){
 		this.labelGrid.store.save();
-		//go.Stores.get('CommentLabel').set({update:items});
+		//go.Db.store('CommentLabel').set({update:items});
 		// CommitChanges does not save to server????
 		//this.labelGrid.store.commitChanges();
 

@@ -294,7 +294,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 			return true;
 		}
 		
-		go.Stores.get("Group").get(this.getSelectedGroupIds(), function(entities) {
+		go.Db.store("Group").get(this.getSelectedGroupIds(), function(entities) {
 			this.store.loadData({records: entities}, true);
 			this.store.sortData();
 			this.store.setFilter('exclude', {

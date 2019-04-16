@@ -31,7 +31,7 @@ GO.files.FileBrowserMenuItem = Ext.extend(Ext.menu.Item, {
 				this.folderId = result.files_folder_id;
 
 				//hack to update entity store
-				var store = go.Stores.get(fb.model_name);
+				var store = go.Db.store(fb.model_name);
 				if (store) {
 					store.data[fb.model_id].filesFolderId = result.files_folder_id;
 					//store.saveState();

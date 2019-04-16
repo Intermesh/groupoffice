@@ -7,7 +7,7 @@ go.modules.community.addressbook.StarButton = Ext.extend(Ext.Button, {
 		go.modules.community.addressbook.StarButton.superclass.initComponent.call(this);
 		
 		//listen for changes in store
-		go.Stores.get("Contact").on('changes', function(store, added, changed, destroyed) {
+		go.Db.store("Contact").on('changes', function(store, added, changed, destroyed) {
 			var id = this.getEntityId(), change = changed[id] || added[id];
 			
 			if(change && "starred" in change) {
@@ -28,13 +28,13 @@ go.modules.community.addressbook.StarButton = Ext.extend(Ext.Button, {
 
 		this.setIconClass(this.isStarred() ? 'ic-star' : 'ic-star-border');
 
-		if(go.Stores.get("ContactStar").data[id]) {
-			go.Stores.get("ContactStar").set({update: update});
+		if(go.Db.store("ContactStar").data[id]) {
+			go.Db.store("ContactStar").set({update: update});
 		} else
 		{
 			update[id].contactId = this.contactId;
 			update[id].userId = go.User.id;
-			go.Stores.get("ContactStar").set({create: update});
+			go.Db.store("ContactStar").set({create: update});
 		}
 
 	},
@@ -49,7 +49,7 @@ go.modules.community.addressbook.StarButton = Ext.extend(Ext.Button, {
 	setContactId : function(id) {
 		this.contactId = id;
 		
-		go.Stores.get("Contact").get([this.getEntityId()], function(entities) {
+		go.Db.store("Contact").get([this.getEntityId()], function(entities) {
 			var starred = entities && entities[0] && entities[0].starred;
 			this.setIconClass(starred ? 'ic-star' : 'ic-star-border');
 		}, this);

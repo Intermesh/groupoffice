@@ -47,12 +47,12 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 			]
 		});
 
-		go.Stores.get("FieldSet").on("changes", this.onFieldSetChanges, this);
-		go.Stores.get("Field").on("changes", this.onFieldChanges, this);
+		go.Db.store("FieldSet").on("changes", this.onFieldSetChanges, this);
+		go.Db.store("Field").on("changes", this.onFieldChanges, this);
 		
 		this.on('destroy', function() {
-			go.Stores.get("FieldSet").un("changes", this.onFieldSetChanges, this);
-			go.Stores.get("Field").un("changes", this.onFieldChanges, this);
+			go.Db.store("FieldSet").un("changes", this.onFieldSetChanges, this);
+			go.Db.store("Field").un("changes", this.onFieldChanges, this);
 		}, this);
 
 		var types = go.customfields.CustomFields.getTypes();
@@ -261,7 +261,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 				update[fieldSetRecords[i].data.fieldSetId] = {sortOrder: i};
 			}
 
-			go.Stores.get("FieldSet").set({
+			go.Db.store("FieldSet").set({
 				update: update
 			}, function() {
 				//Quick and dirty way: reload on fieldset reorder so fields are moved.
@@ -283,7 +283,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 				}
 			}
 
-			go.Stores.get("Field").set({
+			go.Db.store("Field").set({
 				update: update
 			});
 		}
@@ -422,13 +422,13 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 		});
 
 		if (fieldSetIds.length) {
-			go.Stores.get("FieldSet").set({
+			go.Db.store("FieldSet").set({
 				destroy: fieldSetIds
 			});
 		}
 
 		if (fieldIds.length) {
-			go.Stores.get("Field").set({
+			go.Db.store("Field").set({
 				destroy: fieldIds
 			});
 		}
@@ -441,7 +441,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 
 		var fsSortOrderMap = {};
 
-		go.Stores.get("FieldSet").query({
+		go.Db.store("FieldSet").query({
 			sort: ["sortOrder ASC"],
 			filter: {
 				entities: [this.entity]
@@ -454,7 +454,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 				return;
 			}
 
-			go.Stores.get("FieldSet").get(response.ids, function (fieldSets) {
+			go.Db.store("FieldSet").get(response.ids, function (fieldSets) {
 				fieldSetsLoaded = true;
 
 				var storeData = [], lastSortOrder = -1;
@@ -484,13 +484,13 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 
 			}, this);
 
-			go.Stores.get("Field").query({
+			go.Db.store("Field").query({
 				sort: ["sortOrder ASC"],
 				filter: {
 					fieldSetId: response.ids
 				}
 			}, function (response) {
-				go.Stores.get("Field").get(response.ids, function (fields) {
+				go.Db.store("Field").get(response.ids, function (fields) {
 					var storeData = [], lastSortOrder = -1;
 					fields.forEach(function (f) {
 						if(!f.sortOrder) {

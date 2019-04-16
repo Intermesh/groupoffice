@@ -77,7 +77,7 @@ Ext.onReady(function () {
 				}
 				params.update[user.id] = data;
 
-				go.Stores.get("User").set(params, function (options, success, response) {
+				go.Db.store("User").set(params, function (options, success, response) {
 					if (success && !GO.util.empty(response.updated)) {
 						callback.call(this,user.id);
 					} else {
@@ -129,7 +129,7 @@ Ext.onReady(function () {
 								}
 							};
 
-							go.Stores.get("User").set(params, function (options, success, response) {
+							go.Db.store("User").set(params, function (options, success, response) {
 								if (success && !GO.util.empty(response.updated)) {
 									// When password is checked successfully, then show the QR dialog
 									callback.call(this,user.id);

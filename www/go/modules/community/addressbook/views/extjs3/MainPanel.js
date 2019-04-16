@@ -430,7 +430,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 			this.grid.store.remove(e.source.dragData.selections);
 		}
 
-		go.Stores.get("Contact").set({
+		go.Db.store("Contact").set({
 			update: updates
 		});
 

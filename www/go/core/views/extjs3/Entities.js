@@ -40,7 +40,7 @@ go.Entities = (function () {
      * 
      * this will create a global entity and store:
      * 
-     * go.Stores.get("name")]
+     * go.Db.store("name")]
      * go.Entities.get(name)
      * 
 		 * @param {object} cfg
@@ -77,8 +77,8 @@ go.Entities = (function () {
 					if(Ext.isArray(key)) {
 						var e = [];
 						key.forEach(function(k) {
-							if(go.Stores.get(entity.name).data[k]) {
-								e.push(go.Stores.get(entity.name).data[k]);
+							if(go.Db.store(entity.name).data[k]) {
+								e.push(go.Db.store(entity.name).data[k]);
 							} else
 							{
 								console.error("Key " + k + " not found in store " + entity.name);
@@ -88,7 +88,7 @@ go.Entities = (function () {
 						return e;
 					} else
 					{
-						return go.Stores.get(entity.name).data[key];	
+						return go.Db.store(entity.name).data[key];	
 					}
 
 				},

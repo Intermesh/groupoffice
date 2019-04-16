@@ -216,7 +216,7 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 	},
 	
 	selectAll : function() {
-		var s = go.Stores.get("Contact");
+		var s = go.Db.store("Contact");
 		this.getEl().mask(t("Loading..."));
 		s.query({
 			filter: this.grid.store.getFilter()

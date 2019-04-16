@@ -1,5 +1,5 @@
 
-go.Stores = (function() {
+go.Db = (function() {
 	var stores = {};
 	return {			
 		/**
@@ -8,7 +8,7 @@ go.Stores = (function() {
 		 * @param {string} entityName eg. "Contact"
 		 * @returns {Boolean|EntityManagerL#1.stores|stores}
 		 */
-		get: function (entityName) {
+		store: function (entityName) {
 			
 			lcname = entityName.toLowerCase();
 			

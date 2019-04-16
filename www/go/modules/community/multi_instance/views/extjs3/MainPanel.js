@@ -258,7 +258,7 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 							var update = {};
 							update[this.moreMenu.record.id] = {enabled: !this.moreMenu.record.data.enabled};
 						
-							go.Stores.get("Instance").set({
+							go.Db.store("Instance").set({
 								update: update
 							});
 							

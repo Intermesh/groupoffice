@@ -238,7 +238,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			params.create[id] = values;
 		}
 
-		go.Stores.get("User").set(params, function(options, success, response){
+		go.Db.store("User").set(params, function(options, success, response){
 			if(response.notUpdated && response.notUpdated[id] && response.notUpdated[id].validationErrors && response.notUpdated[id].validationErrors.currentPassword){
 				// Current password is incorrect.
 				this.submit();
@@ -330,7 +330,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			me.actionStart();
 			me.fireEvent('loadstart',me, me.currentUserId);
 
-			go.Stores.get("User").get([me.currentUserId], function(users){
+			go.Db.store("User").get([me.currentUserId], function(users){
 				me.formPanel.getForm().setValues(users[0]);
 
 				me.findBy(function(cmp,cont){

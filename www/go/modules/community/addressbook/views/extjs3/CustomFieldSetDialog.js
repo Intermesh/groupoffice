@@ -93,7 +93,7 @@ go.modules.community.addressbook.CustomFieldSetDialog = Ext.extend(go.customfiel
 
 		this.formPanel.getForm().findField("enableAddressBookFilter").setValue(!!this.formPanel.entity.filter.addressBookId);
 
-		//go.Stores.get("AddressBook").get(this.formPanel.entity.filter.addressBookId, function (addressBooks) {
+		//go.Db.store("AddressBook").get(this.formPanel.entity.filter.addressBookId, function (addressBooks) {
 			//this.formPanel.getForm().findField("addressBooks").setValue(this.formPanel.entity.filter.addressBookId);
 		//}, this);
 

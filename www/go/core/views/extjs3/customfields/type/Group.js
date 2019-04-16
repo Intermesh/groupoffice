@@ -32,7 +32,7 @@ go.customfields.type.Group = Ext.extend(go.customfields.type.Text, {
 			return "";
 		}
 		
-		go.Stores.get("Group").get([value], function(groups) {
+		go.Db.store("Group").get([value], function(groups) {
 			var displayValue;
 			if(!groups[0]) {
 				displayValue = t("Not found or no access");

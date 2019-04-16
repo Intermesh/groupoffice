@@ -112,7 +112,7 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 			links['clientId-' + i ] = link;
 		});
 
-		go.Stores.get("Link").set({
+		go.Db.store("Link").set({
 			create: links
 		}, function () {
 			me.close();

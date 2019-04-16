@@ -7,7 +7,7 @@ Ext.onReady(function(){
 			GO.request({
 				url:'modules/module/delete',
 				params:{
-					id: go.Stores.get("Module").findBy(function(mod) {console.log(mod);return mod.name == 'demodata';}).id
+					id: go.Db.store("Module").findBy(function(mod) {console.log(mod);return mod.name == 'demodata';}).id
 				}
 			})
 		}

@@ -209,7 +209,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 							var update = {};
 							update[this.currentId] = {starred: !this.data.starred};
 							
-							go.Stores.get("Contact").set({
+							go.Db.store("Contact").set({
 								update: update
 							});
 						},

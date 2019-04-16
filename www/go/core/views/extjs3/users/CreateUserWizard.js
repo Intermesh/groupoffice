@@ -72,7 +72,7 @@ go.users.CreateUserWizard = Ext.extend(go.Wizard, {
 		params.create = {};
 		params.create[id] = this.user;
 		
-		go.Stores.get("User").set(params, function (options, success, response) {
+		go.Db.store("User").set(params, function (options, success, response) {
 
 			if (response.created && response.created[id]) {				
 				

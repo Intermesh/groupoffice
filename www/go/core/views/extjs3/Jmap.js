@@ -152,7 +152,7 @@ go.Jmap = {
 		
 		source.addEventListener('state', function(e) {
 			for(var entity in JSON.parse(e.data)) {
-				var store =go.Stores.get(entity);
+				var store =go.Db.store(entity);
 				if(store) {
 					store.getUpdates();
 				}
