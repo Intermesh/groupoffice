@@ -31,7 +31,12 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	data: {},
 	currentId: null,
 	basePanels: [],
-
+	/**
+	 * string[] relation names defined in entity store
+	 * When specified the Detailview will listen to these store and fetch the related entities
+	 */
+	relations: [],
+	
 	entityStore: null,
 
 	initComponent: function () {
@@ -48,18 +53,47 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		}, this);
 	},
 	
-	onChanges : function(entityStore, added, changed, destroyed) {		
-		var entity = added[this.currentId] || changed[this.currentId] || false;
-			
-		if(entity) {
-			this.internalLoad(entity);
-		}
+	onChanges : function(entityStore, added, changed, destroyed) {
+		if(entityStore.entity.name === this.entityStore.entity.name) {
+			var entity = added[this.currentId] || changed[this.currentId] || false;
 
-		if (destroyed.indexOf(this.currentId) > -1) {
-			this.reset();
-		}
+			if(entity) {
+				this.internalLoad(entity);
+			}
 
+			if (destroyed.indexOf(this.currentId) > -1) {
+				this.reset();
+			}
+			return;
+		}
+		for(let i = 0,relName; relName = this.relations[i]; i++) {
+			var relation = this.entityStore.entity.relations[relName];
+			if(entityStore.entity.name === relation.store && changed[this.data[relation.fk]]) {
+				this.data[relName] = changed;
+				this.internalLoad(this.data);
+			}
+		}
 	},
+	
+	// listen to relational stores as well
+	initEntityStore: Ext.Panel.prototype.initEntityStore.createSequence(function () {
+		
+		//for(let i = 0,relName; relName = this.relations[i]; i++) {
+		this.relations.forEach(function(relName) {
+			var relation = this.entityStore.entity.relations[relName],
+				entityStore = go.Stores.get(relation.store);
+				
+			if(entityStore) {
+				this.on("afterrender", function() {
+					entityStore.on('changes',this.onChanges, this);		
+				}, this);
+
+				this.on('beforedestroy', function() {
+					entityStore.un('changes', this.onChanges, this);
+				}, this);
+			}
+		}, this);
+	}),
 
 	reset: function () {
 
@@ -86,6 +120,7 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			item.show();
 			
 			if (item.tpl) {
+				//debugger;
 				item.update(this.data);
 			}
 			if (item.onLoad) {
@@ -112,16 +147,30 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			this.getTopToolbar().setDisabled(false);
 		}
 		this.data = data;
+		var me = this;
 		
-		var promises = this.resolve();
-		if(!promises) {
+		var resolveRelations = [];
+		this.relations.forEach(function(relName) {
+			var relation = me.entityStore.entity.relations[relName];
+			if(me.data[relation.fk]) {
+				resolveRelations.push( 
+					go.Stores.get(relation.store).get([me.data[relation.fk]]).then(function(record){
+						me.data[relName] = record[0];
+					})
+				);
+			}
+		});
+		
+		//used for sony
+		//var promises = this.resolve();
+		if(!resolveRelations) {
 			this.onLoad();
 			this.fireEvent('load', this);
 			return;
 		}
 		
-		var me = this;
-		Promise.all(promises).then(function() {		
+		
+		Promise.all(resolveRelations).then(function() {		
 			me.onLoad();
 			me.fireEvent('load', me);
 		}).catch(function(result) {
