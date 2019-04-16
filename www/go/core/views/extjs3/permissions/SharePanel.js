@@ -84,7 +84,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 				{
 					xtype: 'tbsearch',
 					filters: [
-						'q'					
+						'text'					
 					]
 				}
 			],

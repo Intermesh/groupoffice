@@ -7,7 +7,7 @@
  * {
 					xtype: 'tbsearch',
 					filters: [
-						'q',
+						'text',
 						'name', 
 						'content',
 						{name: 'modified', multiple: false},
@@ -62,7 +62,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 		config = config || {};
 		go.toolbar.SearchButton.superclass.constructor.call(this, config);
 			
-		//this.filters = go.util.Filters.normalize(config.filters || ['q']);
+		//this.filters = go.util.Filters.normalize(config.filters || ['text']);
 		
 		if(!this.store) {			
 			//try to find store if this button it part of a grid.
@@ -80,7 +80,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 			}
 		}	
 	
-		//default filter on "q"
+		//default filter on 'text'
 		if(this.store) {
 			this.on({
 				scope: this,
@@ -214,7 +214,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 		
 		if(this.store && this.store.entityStore) {
 			
-			var names = Object.keys(this.store.entityStore.entity.filters).filter(function(name) {return name != 'q'});
+			var names = Object.keys(this.store.entityStore.entity.filters).filter(function(name) {return name != 'text'});
 			
 			if(names.length) {
 			

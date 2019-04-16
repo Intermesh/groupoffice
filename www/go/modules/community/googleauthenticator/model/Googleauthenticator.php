@@ -175,7 +175,7 @@ class Googleauthenticator extends Property {
 //		
 //		$width = !empty($params['width']) && (int) $params['width'] > 0 ? (int) $params['width'] : 200;
 //		$height = !empty($params['height']) && (int) $params['height'] > 0 ? (int) $params['height'] : 200;
-//		$level = !empty($params['level']) && array_search($params['level'], array('L', 'M', 'Q', 'H')) !== false ? $params['level'] : 'M';
+//		$level = !empty($params['level']) && array_search($params['level'], array('L', 'M', 'text', 'H')) !== false ? $params['level'] : 'M';
 //
 //		$urlencoded = urlencode('otpauth://totp/' . rawurlencode($name) . '?secret=' . $secret . '');
 //		if (isset($title)) {

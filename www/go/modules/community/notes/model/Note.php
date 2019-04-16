@@ -71,11 +71,11 @@ class Note extends AclItemEntity {
 	
 	
 	/**
-	 * Return columns to search on with the "q" filter. {@see filter()}
+	 * Return columns to search on with the 'text' filter. {@see filter()}
 	 * 
 	 * @return string[]
 	 */
-	protected static function searchColumns() {
+	protected static function textFilterColumns() {
 		return ['name', 'content'];
 	}
 	

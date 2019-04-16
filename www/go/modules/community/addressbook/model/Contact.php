@@ -430,7 +430,7 @@ class Contact extends AclItemEntity {
 		return $arr;
 	}
 
-	protected static function searchColumns() {
+	protected static function textFilterColumns() {
 		return ['name', 'debtorNumber'];
 	}
 	

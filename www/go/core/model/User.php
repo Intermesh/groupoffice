@@ -438,7 +438,7 @@ class User extends Entity {
 		return $this->id == App::get()->getAuthState()->getUserId() || App::get()->getAuthState()->getUser()->isAdmin();
 	}
 	
-	protected static function searchColumns() {
+	protected static function textFilterColumns() {
 		return ['username', 'displayName', 'email'];
 	}
 	

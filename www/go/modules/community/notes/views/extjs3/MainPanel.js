@@ -132,7 +132,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				{
 					xtype: 'tbsearch',
 					filters: [
-						'q',
+						'text',
 						'name', 
 						'content',
 						{name: 'modified', multiple: false},

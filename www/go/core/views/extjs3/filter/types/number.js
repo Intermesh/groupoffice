@@ -4,7 +4,7 @@ go.filter.types.number = Ext.extend(Ext.Panel, {
 	/**
 	 * Filter definition
 	 * {
-					name: 'q', //Filter name
+					name: 'text', //Filter name
 					type: "string", //Sting type of go.filters.type or a full class name
 					multiple: false, // nly applies to query field parsing. You can use name: Value1,Value2 nad it will turn into an array for an OR group
 					title: "Query",

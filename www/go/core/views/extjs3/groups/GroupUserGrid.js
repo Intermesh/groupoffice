@@ -75,7 +75,7 @@ go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 				{
 					xtype: 'tbsearch',
 					filters: [
-						'q'					
+						'text'					
 					]
 				}			
 			],

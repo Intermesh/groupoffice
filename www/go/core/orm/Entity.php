@@ -446,7 +446,7 @@ abstract class Entity extends Property {
 	protected static function defineFilters() {
 		$filters = new Filters();
 
-		$filters->add('q', function(Criteria $criteria, $value) {
+		$filters->add('text', function(Criteria $criteria, $value) {
 							if(!is_array($value)) {
 								$value = [$value];
 							}
@@ -488,7 +488,7 @@ abstract class Entity extends Property {
 	 * 
 	 * By default these filters are implemented:
 	 * 
-	 * q: Will search on multiple fields defined in {@see searchColumns()}
+	 * text: Will search on multiple fields defined in {@see textFilterColumns()}
 	 * exclude: Exclude this array of id's
 	 * 
 	 * modifiedsince: YYYY-MM-DD (HH:MM) modified since
@@ -499,7 +499,7 @@ abstract class Entity extends Property {
 	 * 
 	 * @link https://jmap.io/spec-core.html#/query	 
 	 * @param Query $query
-	 * @param array $filter key value array eg. ["q" => "foo"]
+	 * @param array $filter key value array eg. ['text' => "foo"]
 	 * @return Query
 	 */
 
@@ -509,11 +509,11 @@ abstract class Entity extends Property {
 	}
 	
 	/**
-	 * Return columns to search on with the "q" filter. {@see filter()}
+	 * Return columns to search on with the "text" filter. {@see filter()}
 	 * 
 	 * @return string[]
 	 */
-	protected static function searchColumns() {
+	protected static function textFilterColumns() {
 		return [];
 	}
 	
@@ -526,7 +526,7 @@ abstract class Entity extends Property {
 	 */
 	protected static function search(Criteria $criteria, $expression) {
 		
-		$columns = static::searchColumns();
+		$columns = static::textFilterColumns();
 		
 		if(empty($columns)) {
 			GO()->warn(static::class . ' entity has no searchColumns() defined. The q filter will not work.');

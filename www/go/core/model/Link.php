@@ -351,7 +351,7 @@ class Link extends Entity {
 					
 	}
 	
-	protected static function searchColumns() {
+	protected static function textFilterColumns() {
 		return ['s.keywords'];
 	}
 	

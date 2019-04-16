@@ -22,7 +22,7 @@ go.Modules.register("community", "addressbook", {
 			 */
 			filters: [
 				{
-					name: 'q',
+					name: 'text',
 					type: "string",
 					multiple: false,
 					title: "Query"

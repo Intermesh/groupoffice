@@ -125,7 +125,7 @@ class Search extends AclOwnerEntity {
 	}
 	
 	
-	protected static function searchColumns() {
+	protected static function textFilterColumns() {
 		return ['keywords'];
 	}
 	

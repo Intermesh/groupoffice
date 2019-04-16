@@ -17,7 +17,7 @@ class Search extends EntityController {
 
 	public function email($params) {
 		
-		$q = $params['filter']['q'] ?? null;
+		$q = $params['filter']['text'] ?? null;
 
 		$query = new Query();
 		$query->select('u.id as entityId, "User" as entity, u.email, "" as type, u.displayName AS name, u.avatarId AS photoBlobId')

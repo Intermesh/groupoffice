@@ -91,7 +91,7 @@ class Group extends AclOwnerEntity {
 						
 	}
 	
-	protected static function searchColumns() {
+	protected static function textFilterColumns() {
 		return ['name'];
 	}
 	

@@ -25,7 +25,7 @@ go.Entity = function (cfg) {
 	
 	if(!this.filters) {
 		this.filters = [{
-				name: "q",
+				name: 'text',
 				type: "string",
 				multiple: false,
 				title: "Query"
@@ -64,7 +64,7 @@ Ext.apply(go.Entity.prototype, {
 	 * 
 	 * Array of filter definitions:
 	 * [{
-	 *	name: 'q',
+	 *	name: 'text',
 	 *	type: 'string',
 	 *	multiple: true, //can be separated with , in search field. eg. q: foo,bar
 	 *	title: 'Query'

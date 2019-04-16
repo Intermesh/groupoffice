@@ -46,7 +46,7 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 				{
 					xtype: 'tbsearch',
 					filters: [
-						'q'					
+						'text'					
 					]
 				}, {
 					iconCls: 'ic-add',
