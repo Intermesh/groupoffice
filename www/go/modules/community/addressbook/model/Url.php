@@ -34,7 +34,7 @@ class Url extends Property {
 	 *
 	 * @var string
 	 */
-	public $type = 'homepage';
+	public $type;
 
 	/**
 	 * 
