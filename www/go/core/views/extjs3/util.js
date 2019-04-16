@@ -114,7 +114,14 @@
 		},
 
 		streetAddress: function (config) {
-			window.open("https://www.openstreetmap.org/search?query=" + encodeURIComponent(config.street + ", " + config.zipCode.replace(/ /g, '') + ", " + config.country));
+
+			if(Ext.isSafari || Ext.isMac) {
+				document.location = "http://maps.apple.com/?address=" + encodeURIComponent(config.street + ", " + config.zipCode.replace(/ /g, '') + ", " + config.country);
+			} else {
+				window.open("https://www.google.com/maps/place/" + encodeURIComponent(config.street + ", " + config.zipCode.replace(/ /g, '') + ", " + config.country));	
+			}
+
+			//window.open("https://www.openstreetmap.org/search?query=" + encodeURIComponent(config.street + ", " + config.zipCode.replace(/ /g, '') + ", " + config.country));
 		},
 
 		showDate: function (date) {
