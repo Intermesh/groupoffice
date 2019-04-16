@@ -896,7 +896,8 @@ abstract class Property extends Model {
 					$modifiedForTable[$colName] = $value;
 				}
 				
-				if (!App::get()->getDbConnection()->insert($table->getName(), $modifiedForTable)->execute()) {
+				$stmt = App::get()->getDbConnection()->insert($table->getName(), $modifiedForTable);
+				if (!$stmt->execute()) {
 					throw new \Exception("Could not execute insert query");
 				}
 
@@ -933,6 +934,7 @@ abstract class Property extends Model {
 				$this->setValidationError($uniqueKey, ErrorCode::UNIQUE);				
 				return false;
 			} else {
+				GO()->error("Failed SQL: " . $stmt);
 				throw $e;
 			}
 		}
