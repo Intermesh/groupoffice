@@ -535,6 +535,14 @@ class Installer {
 					GO()->getDbConnection()->query("ALTER TABLE `em_links` CHANGE `uid` `uid` VARCHAR(255) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '';");
 					GO()->getDbConnection()->query("ALTER TABLE `em_links` ADD INDEX(`uid`);");
 				}
+
+				if($record['Name'] == 'fs_files') {
+					GO()->getDbConnection()->query("ALTER TABLE `fs_files` CHANGE `name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;");
+				}
+
+				if($record['Name'] == 'fs_folders') {
+					GO()->getDbConnection()->query("ALTER TABLE `fs_folders` CHANGE `name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;");
+				}
 	
 			}	
 		}
