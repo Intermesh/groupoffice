@@ -39,7 +39,7 @@ go.systemsettings.Panel = Ext.extend(Ext.form.FormPanel, {
 		
 		p.update[module.id] = {settings: this.getForm().getFieldValues()};
 		
-		go.Stores.get("Module").set(p, function (options, success, response) {
+		go.Db.store("Module").set(p, function (options, success, response) {
 			cb.call(scope, this, success);
 		},
 		scope);

@@ -205,7 +205,7 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 								link.toId = entity.id;
 							}
 
-							go.Stores.get("Link").set({
+							go.Db.store("Link").set({
 								create: {clientId : link}
 							}, function (options, success, result) {
 								if (result.notCreated) {

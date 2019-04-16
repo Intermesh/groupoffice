@@ -188,7 +188,7 @@ go.modules.community.addressbook.typeStoreData = function (langKey) {
 	return types;
 };
 
-//go.Stores.get("User");
+//go.Db.store("User");
 
 
 Ext.onReady(function () {

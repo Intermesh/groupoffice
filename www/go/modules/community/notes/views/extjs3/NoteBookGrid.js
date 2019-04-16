@@ -104,7 +104,7 @@ go.modules.community.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 								if (btn != "yes") {
 									return;
 								}
-								go.Stores.get("NoteBook").set({destroy: [this.moreMenu.record.id]});
+								go.Db.store("NoteBook").set({destroy: [this.moreMenu.record.id]});
 							}, this);
 						},
 						scope: this						

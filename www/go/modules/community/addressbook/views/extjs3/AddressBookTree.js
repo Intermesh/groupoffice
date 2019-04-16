@@ -33,12 +33,12 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 //		this.getSelectionModel().on("selectionchange", this.onSelectionChange, this);
 
 		this.getRootNode().on("load", function () {
-			go.Stores.get("AddressBook").on('changes', this.onAddressBookChanges, this);
-			go.Stores.get("AddressBookGroup").on('changes', this.onGroupChanges, this);
+			go.Db.store("AddressBook").on('changes', this.onAddressBookChanges, this);
+			go.Db.store("AddressBookGroup").on('changes', this.onGroupChanges, this);
 
 			this.on("destroy", function () {
-				go.Stores.get("Addressbook").un('changes', this.onAddressBookChanges, this);
-				go.Stores.get("AddressBookGroup").un('changes', this.onGroupChanges, this);
+				go.Db.store("Addressbook").un('changes', this.onAddressBookChanges, this);
+				go.Db.store("AddressBookGroup").un('changes', this.onGroupChanges, this);
 			});
 		}, this, {single: true});
 
@@ -154,7 +154,7 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 								if (btn !== "yes") {
 									return;
 								}
-								go.Stores.get("AddressBook").set({destroy: [this.addressBookMoreMenu.data.id]});
+								go.Db.store("AddressBook").set({destroy: [this.addressBookMoreMenu.data.id]});
 							}, this);
 						},
 						scope: this
@@ -213,7 +213,7 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 								if (btn !== "yes") {
 									return;
 								}
-								go.Stores.get("AddressBookGroup").set({destroy: [this.groupMoreMenu.data.id]});
+								go.Db.store("AddressBookGroup").set({destroy: [this.groupMoreMenu.data.id]});
 							}, this);
 						},
 						scope: this

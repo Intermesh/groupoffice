@@ -98,7 +98,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 						if(e.target.tagName === "I" && e.target.innerHTML === 'delete') {							
 							//this.delete(record);
 							
-							go.Stores.get("Link").set({
+							go.Db.store("Link").set({
 								destroy: [record.id]
 							});
 						} else 

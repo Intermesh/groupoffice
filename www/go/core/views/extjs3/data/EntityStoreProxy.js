@@ -5,7 +5,7 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 	constructor: function (config) {
 		config = config || {};
 
-		this.entityStore = Ext.isString(config.entityStore) ? go.Stores.get(config.entityStore) : config.entityStore;		
+		this.entityStore = Ext.isString(config.entityStore) ? go.Db.store(config.entityStore) : config.entityStore;		
 
 		this.fields = config.fields;
 
@@ -164,7 +164,7 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 	
 		for (var entity in types) {
 			count++; //count number of requests and check if an equal number of callbacks has been called before proceeding with onRead.
-			var store = go.Stores.get(entity);
+			var store = go.Db.store(entity);
 			store.get(types[entity], callback, this);
 		}
 

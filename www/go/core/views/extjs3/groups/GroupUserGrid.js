@@ -150,7 +150,7 @@ go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 			return true;
 		}
 		
-		go.Stores.get("User").get(this.selectedUsers, function(entities) {			
+		go.Db.store("User").get(this.selectedUsers, function(entities) {			
 			this.store.loadData({records: entities}, true);
 			this.store.sortData();
 			

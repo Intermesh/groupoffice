@@ -357,7 +357,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 				enabled: record.data.enabled,
 				sort_order: record.data.sort_order
 			};
-			go.Stores.get("Module").set(params, function(options, success, response) {
+			go.Db.store("Module").set(params, function(options, success, response) {
 
 				if(success){
 					if(record.data.enabled && record.isModified("enabled")) {

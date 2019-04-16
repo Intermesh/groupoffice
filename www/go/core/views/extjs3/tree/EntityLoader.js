@@ -27,7 +27,7 @@ go.tree.EntityLoader = Ext.extend(Ext.tree.TreeLoader, {
 	
 	initEntityStore : function() {
 		if(Ext.isString(this.entityStore)) {
-			this.entityStore = go.Stores.get(this.entityStore);
+			this.entityStore = go.Db.store(this.entityStore);
 			if(!this.entityStore) {
 				throw "Invalid 'entityStore' property given to component"; 
 			}

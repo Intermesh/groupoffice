@@ -189,7 +189,7 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 
 		actions.on({
 			action: function (grid, record, action, row, col, e, target) {
-				go.Stores.get("Link").set({
+				go.Db.store("Link").set({
 					destroy: [record.id]
 				});
 			}

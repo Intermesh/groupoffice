@@ -150,7 +150,7 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 						this.newLinks = this.newLinks.splice(i, 1);
 					} else
 					{
-						go.Stores.get("Link").set({
+						go.Db.store("Link").set({
 							destroy: [record.id]
 						});
 					}
@@ -248,7 +248,7 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 			return;
 		}
 		
-		go.Stores.get("Link").set({
+		go.Db.store("Link").set({
 			create: this.getNewLinks()
 		}, function() {
 			if(!this.isDestroyed) {

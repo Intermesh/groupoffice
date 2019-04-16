@@ -32,7 +32,7 @@ go.customfields.type.User = Ext.extend(go.customfields.type.Text, {
 			return "";
 		}
 		
-		go.Stores.get("User").get([value], function(users) {
+		go.Db.store("User").get([value], function(users) {
 			var displayValue;
 			if(!users[0]) {
 				displayValue = t("Not found or no access");

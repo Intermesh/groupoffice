@@ -29,7 +29,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		
 		this.store.on('load', function(store,records,options) {
 				
-				var userStore = go.Stores.get("User");
+				var userStore = go.Db.store("User");
 								
 				var creatorIds = [];
 				this.store.each(function(r) {
@@ -129,7 +129,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	updateView : function(o) {
 		o = o || {};
 		this.composer.textField.setValue('');
-		var userStore = go.Stores.get("User"), prevStr;
+		var userStore = go.Db.store("User"), prevStr;
 		var initScrollHeight = (this.store.getCount() == this.commentsContainer.pageSize) ? 0 : this.commentsContainer.getEl().dom.scrollHeight,
 			 initScrollTop = this.commentsContainer.getEl().dom.scrollTop;
 
@@ -154,7 +154,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			}
 
 			if(r.json.labelIds) {
-				go.Stores.get('CommentLabel').get(r.json.labelIds, function(items){
+				go.Db.store('CommentLabel').get(r.json.labelIds, function(items){
 					for(var i = 0; i < items.length; i++){
 						labelText += '<i class="icon" title="'+items[i].name+'" style="color: #'+items[i].color+'">label</i>';
 					}

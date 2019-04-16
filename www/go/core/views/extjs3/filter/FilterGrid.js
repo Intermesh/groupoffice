@@ -129,7 +129,7 @@ go.filter.FilterGrid = Ext.extend(go.grid.GridPanel, {
 								if (btn != "yes") {
 									return;
 								}
-								go.Stores.get("EntityFilter").set({destroy: [this.moreMenu.record.id]});
+								go.Db.store("EntityFilter").set({destroy: [this.moreMenu.record.id]});
 							}, this);
 						},
 						scope: this						
