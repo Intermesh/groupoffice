@@ -34,7 +34,7 @@ GO.email.RecipientCombo = Ext.extend(GO.form.ComboBoxMulti, {
 		GO.email.RecipientCombo.superclass.initComponent.call(this);
 
 		this.on({
-			grow: function () {
+			autosize: function () {
 				this.findParentByType("window").doLayout();
 			},
 			scope: this
