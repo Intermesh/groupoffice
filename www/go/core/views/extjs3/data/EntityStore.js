@@ -158,13 +158,13 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		
 		if(this.data[entity.id]) {			
 			if(fireChanges) {
-				this.changes.changed[entity.id] = entity;
+				this.changes.changed[entity.id] = go.util.clone(entity);
 			}
 			Ext.apply(this.data[entity.id], entity);
 		} else
 		{
 			if(fireChanges) {
-				this.changes.added[entity.id] = entity;
+				this.changes.added[entity.id] = go.util.clone(entity);
 			}
 			this.data[entity.id] = entity;
 		}
@@ -397,7 +397,8 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				throw "Empty ID passed to EntityStore.get()";
 			}
 			if(this.data[id]) {
-				entities.push(Object.assign({},this.data[id]));
+				
+				entities.push(go.util.clone(this.data[id]));
 			} else if(this.notFound.indexOf(id) > -1) {
 				//entities.push(null);
 				//notFoundIds.push(id);
@@ -411,6 +412,10 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	
 	_getFromBrowserStorage : function(unknownIds) {
 		var me = this;
+		
+//		For testing without browser storage
+//		return Promise.resolve(unknownIds);
+		
 		return me.initState().then(function() {
 			
 			var itemPromises = [];
