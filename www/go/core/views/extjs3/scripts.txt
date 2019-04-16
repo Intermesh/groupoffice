@@ -10,6 +10,7 @@ data/GroupingStore.js
 data/EntityStore.js
 Entity.js
 Entities.js
+Stores.js
 Modules.js
 
 panels/ScrollLoader.js

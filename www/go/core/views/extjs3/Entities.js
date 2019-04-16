@@ -1,11 +1,11 @@
 /* global go, Ext */
 
-(function () {
+go.Entities = (function () {
   
   var entities = {};
-  var stores = {};
+
   
-  go.Entities = {
+  return {
 		
 		/**
 		 * Populate some entity properties with server info.
@@ -218,32 +218,7 @@
   };
   
   
-  go.Stores = {
-		
-		/**
-		 * Get EntityStore by entity name
-		 * 
-		 * @param {string} entityName eg. "Contact"
-		 * @returns {Boolean|EntityManagerL#1.stores|stores}
-		 */
-    get: function (entityName) {
-      
-      lcname = entityName.toLowerCase();
-			
-			var entity = go.Entities.get(lcname);
-			if(!entity) {
-				console.debug("'" + lcname + "' is not a registered store. Registered entities: ", go.Entities.getAll());
-				return false;
-			}
-     
-      if(!stores[lcname]) {
-        stores[lcname] = new go.data.EntityStore({
-          entity: entity
-        });
-      }
-      
-      return stores[lcname];
-    }
-  };
+  
 
 })();
+

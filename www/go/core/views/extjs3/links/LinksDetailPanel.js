@@ -92,6 +92,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 					},
 					click: function (dv, index, node, e) {
 						
+						
 						var record = this.store.getAt(index);
 						
 						if(e.target.tagName === "I" && e.target.innerHTML === 'delete') {							
@@ -110,7 +111,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 							}
 //							entity.goto(record.data.toId);
 							
-							var previewPanel = entity.linkDetail(), win = new go.Window({
+							var previewPanel = entity.links[0].linkDetail(), win = new go.Window({
 								tools: [{
 									id: 'home',
 									handler: function() {
@@ -120,8 +121,8 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 								}],
 								title: entity.title,
 								layout: "fit",
-								width: dp("600"),
-								height: dp("700"),
+								width: previewPanel.width || dp("600"),
+								height: previewPanel.height || dp("700"),
 								items: [
 									previewPanel
 								]

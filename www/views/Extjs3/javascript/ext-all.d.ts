@@ -2299,7 +2299,7 @@ declare namespace Ext {
 	 * @param {Object} overrides A literal with members which are copied into the subclass's
 	 * @return {Function} The subclass constructor from the overrides parameter, or a generated one if not provided.
 	 */
-	export function extend<T>(superclass: T, overrides: object): T;
+	export function extend<T>(superclass: Function, overrides: T): T;
 	/**
 	 * Recursively flattens into 1-d Array. Injects Arrays inline.
 	 * @param {Array} arr The array to flatten

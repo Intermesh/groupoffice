@@ -1,9 +1,12 @@
-/* global GO, go, Ext */
+/**
+ * Module class
+ */
+go.Modules = (function () {
+	var Modules = Ext.extend(function() {
+		this.registered = {};
+	}, Ext.util.Observable, {
 
-(function () {
-	var Modules = Ext.extend(Ext.util.Observable, {
-
-		registered: {},
+		registered: null,
 
 		/**
 		 * 
@@ -265,6 +268,6 @@
 		}
 	});
 
-	go.Modules = new Modules;
+	return new Modules();
 
 })();
