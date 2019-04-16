@@ -193,7 +193,7 @@ go.modules.community.addressbook.typeStoreData = function (langKey) {
 
 Ext.onReady(function () {
 	
-	if(!go.modules.business && !go.modules.business.newsletter) {
+	if(!go.modules.business || !go.modules.business.newsletter) {
 		return;
 	}
 	
