@@ -83,7 +83,7 @@ class Listeners extends Singleton {
 		//disable events to prevent recursion
 		EventEmitterTrait::$disableEvents = false;
 		
-		App::get()->getCache()->set('listeners', $this->listeners);		
+		App::get()->getCache()->set('listeners-2', $this->listeners);		
 	}
 
 	/**
@@ -97,7 +97,7 @@ class Listeners extends Singleton {
 	public function fireEvent($calledClass, $traitUser, $event, $args) {	
 		
 		if(!isset($this->listeners)) {
-			$this->listeners = App::get()->getCache()->get('listeners');
+			$this->listeners = App::get()->getCache()->get('listeners-2');
 
 			if(!$this->listeners) {
 				$this->init();
