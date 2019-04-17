@@ -66,13 +66,14 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			}
 			return;
 		}
-		for(let i = 0,relName; relName = this.relations[i]; i++) {
+		// for(let i = 0,relName; relName = this.relations[i]; i++) {
+		this.relations.forEach(function(relName) {
 			var relation = this.entityStore.entity.relations[relName];
 			if(entityStore.entity.name === relation.store && changed[this.data[relation.fk]]) {
 				this.data[relName] = changed;
 				this.internalLoad(this.data);
 			}
-		}
+		}, this);
 	},
 	
 	// listen to relational stores as well
