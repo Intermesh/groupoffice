@@ -157,11 +157,59 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		this.on('beforedestroy', function() {
 			this.entityStore.un('changes', this.onChanges, this);
 			this.entityStore.un("error", this.onError, this);
+			this.unwatchRelations();
+		}, this);
+
+		this.watchRelations();
+	},
+
+	/**
+	 * Registers a listener for changes on entity stores when fields with type = relation is used.
+	 */
+	watchRelations : function() {
+		this.proxy.getEntityFields().forEach(function(field) {
+			var relation = this.entityStore.entity.relations[field.name];
+			go.Db.store(relation.store).on("changes", this.onRelationChanges, this);
+		}, this);
+	},
+
+	unwatchRelations : function() {
+		this.proxy.getEntityFields().forEach(function(field) {
+			var relation = this.entityStore.entity.relations[field.name];
+
+			go.Db.store(relation.store).un("changes", this.onRelationChanges, this);
 		}, this);
 	},
 	
 	onError : function() {
 		this.reload();
+	},
+
+	/**
+	 * Reloads grid when a relation that is present in the grid has changed
+	 * 
+	 * @param {*} entityStore 
+	 * @param {*} added 
+	 * @param {*} changed 
+	 * @param {*} destroyed 
+	 */
+	onRelationChanges : function(entityStore, added, changed, destroyed) {
+		if(!this.proxy.watchRelations[entityStore.entity.name]) {
+			return;
+		}
+
+		for(var id in changed) {
+			if(this.proxy.watchRelations[entityStore.entity.name].indexOf(changed[id].id) > -1) {
+				var o = go.util.clone(this.lastOptions);
+				o.params = o.params || {};
+				o.params.position = 0;
+				o.params.limit = this.getCount();
+
+				this.load(o);
+				return;
+			}
+		}
+		
 	},
 
 	onChanges : function(entityStore, added, changed, destroyed) {		
@@ -173,7 +221,11 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 
 		if(Object.keys(added).length || Object.keys(changed).length) {
 			//we must reload because we don't know how to sort partial data.
-			this.reload();
+			var o = go.util.clone(this.lastOptions);
+			o.params = o.params || {};
+			o.params.position = 0;
+			o.params.limit = this.getCount();
+			this.load(this.lastOptions);
 		}
 		
 //		for(var i in added) {

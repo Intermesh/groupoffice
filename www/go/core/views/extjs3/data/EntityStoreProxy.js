@@ -112,8 +112,11 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 		}, this);
 	},
 
-	//Prefetches all data of type go.data.types.Entity defined in go.Entities
+	/**
+	 * Prefetches all data for fields of type "relation". 
+	 */
 	preFetchEntities: function (records, cb, scope) {
+		this.watchRelations = {};
 
 		var fields = this.getEntityFields();
 		if (!fields.length) {
@@ -134,11 +137,16 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 		});		
 	},
 
-	_addRelation : function(field, record) {
 
-		// if(field.name.indexOf('.') > -1) {
-		// 	debugger;
-		// }
+	/**
+	 * Create a promise that resolves the relational record data.
+	 * 
+	 * @param {any} field 
+	 * @param {*any} record 
+	 * 
+	 * @retrun {Promise}
+	 */
+	_addRelation : function(field, record) {
 
 		var relation = this.entityStore.entity.relations[field.name];
 		if(!relation) {
@@ -151,6 +159,8 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 			return Promise.resolve(null);
 		}
 
+		this._watchRelation(relation.store, key);
+
 		if(Ext.isArray(key)) {
 			return go.Db.store(relation.store).get(key).then(function(entities){
 				me._applyRelationEntity(field.name, record, entities);
@@ -162,6 +172,36 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 		});
 	},
 
+	/**
+	 * Keeps record of relational entity stores and their id's. go.data.Stores uses this collection to listen for changes
+	 * 
+	 * @param {string} entity 
+	 * @param {int} key 
+	 */
+	_watchRelation : function(entity, key) {
+		if(!this.watchRelations[entity]) {
+			this.watchRelations[entity] = [];
+		}
+
+		if(this.watchRelations[entity].indexOf(key) === -1) {
+			this.watchRelations[entity].push(key);
+		}
+	},
+
+	/**
+	 * Applies the entity data to the record.
+	 * It also supports a path like "customFields.user"
+	 * 
+	 * This will become
+	 * {
+	 * 	"customFields" => {
+	 * 		"user" => data
+	 * 	}
+	 * }
+	 * @param {*} key 
+	 * @param {*} record 
+	 * @param {*} entities 
+	 */
 	_applyRelationEntity : function(key, record, entities) {
 		var parts = key.split("."),last = parts.pop(), current = record;
 
@@ -175,6 +215,12 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 		current[last] = entities;
 	},
 
+	/**
+	 * Resolves a key path eg. "customFields.user"
+	 * 
+	 * @param {*} key 
+	 * @param {*} data 
+	 */
 	_resolveKey : function(key, data) {
 		var parts = key.split(".");
 						
@@ -200,33 +246,10 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 		return data;
 	},
 
-	// _addEntity : function(f, types, r) {
-	// 	var keys = f.type.getKey.call(f, r);
-	// 	if (!keys) {
-	// 		return true;
-	// 	}
-
-	// 	if (!Ext.isArray(keys)) {
-	// 		keys = [keys];
-	// 	}
-		
-	// 	if(!keys.length) {
-	// 		return true;
-	// 	}
-
-	// 	if (!types[f.type.entity.name]) {
-	// 		types[f.type.entity.name] = [];
-	// 	}
-
-	// 	keys.forEach(function (key) {
-	// 		if (types[f.type.entity.name].indexOf(key) === -1) {
-	// 			types[f.type.entity.name].push(key);
-	// 		}
-	// 	});
-	// },
-
+	/**
+	 * Get all fields that should resolve a related entity
+	 */
 	getEntityFields: function () {
-
 		var f = [];
 
 		this.fields.forEach(function (field) {
