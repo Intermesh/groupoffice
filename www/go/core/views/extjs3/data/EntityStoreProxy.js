@@ -14,6 +14,8 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 		}));
 
 		this.conn = go.Jmap;
+
+		this.watchRelations = {};
 	},
 
 	entityStore: null,
