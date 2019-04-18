@@ -24,6 +24,8 @@ use go\core\orm\Entity;
 use go\core\util\ClassFinder;
 use go\core\util\Lock;
 use PDOException;
+use go\modules\community\ldapauthenticator\Module as GoModule;
+use go\core\model\Module as GoCoreModule;
 
 class Installer {
 	
@@ -115,6 +117,8 @@ class Installer {
 		if(!$module->save()) {
 			throw new \Exception("Could not save core module: " . var_export($module->getValidationErrors(), true));
 		}
+
+		$module->findAcl()->addGroup(Group::ID_EVERYONE);
 		
 		$cron = new model\CronJobSchedule();
 		$cron->moduleId = $module->id;
@@ -297,6 +301,14 @@ class Installer {
 			}
 		}
 	
+		// Make sure core module is accessible for everyone
+		$module  = GoCoreModule::findByName("core", "core");
+		$acl = $module->findAcl();
+		if(!$acl->hasGroup(Group::ID_EVERYONE)) {
+			$acl->addGroup(Group::ID_EVERYONE);
+			$acl->save();
+		}
+
 		$this->fireEvent('upgrade');
 
 		echo "Done!\n";
