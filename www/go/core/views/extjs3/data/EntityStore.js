@@ -462,7 +462,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				}				
 
 				me.data[id] = entity;
-				return entity;
+				return go.util.clone(entity);
 			});
 		});
 	},
