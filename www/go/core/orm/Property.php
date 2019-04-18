@@ -865,7 +865,12 @@ abstract class Property extends Model {
 	 * @throws Exception
 	 */
 	private function saveTable(MappedTable $table, array &$modified) {
-				
+
+		if($table->isUserTable && !GO()->getAuthState()->isAuthenticated()) {
+			//ignore user tables when not logged in.
+			return true;
+		}	
+
 		$modifiedForTable = $this->extractModifiedForTable($table, $modified);
 		$recordIsNew = $this->recordIsNew($table);
 		if(!empty($modified) || $recordIsNew) {
