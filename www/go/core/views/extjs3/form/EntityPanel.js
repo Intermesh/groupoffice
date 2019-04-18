@@ -149,18 +149,6 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		}, this);
 
 	}
-//	,
-//
-//	focus: function () {
-//		var firstField = this.form.items.find(function (item) {
-//			if (!item.disabled && item.isVisible() && item.getValue() == "")
-//				return true;
-//		});
-//
-//		if (firstField) {
-//			firstField.focus();
-//		}
-//	}
 });
 
 Ext.reg("entityform", go.form.EntityPanel);

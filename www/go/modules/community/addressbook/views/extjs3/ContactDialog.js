@@ -14,6 +14,9 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 	},
 
 	focus: function () {
+		if(this.formPanel.currentId) {
+			return;
+		}
 		if (this.nameField.getValue() != "") {
 			this.jobTitle.focus();
 		} else
