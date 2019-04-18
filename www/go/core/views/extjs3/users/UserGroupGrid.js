@@ -104,6 +104,8 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 		});
 
 		go.users.UserGroupGrid.superclass.initComponent.call(this);		
+
+		this.setDisabled(!go.User.isAdmin);
 	},	
 	
 	onCheckChange : function(record, newValue) {
