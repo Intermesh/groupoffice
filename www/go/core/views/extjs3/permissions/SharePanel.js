@@ -15,7 +15,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 		this.selectedGroups = [];
 		
 		var checkColumn = new GO.grid.CheckColumn({
-			width: dp(48),
+			width: dp(64),
 			dataIndex: 'selected',
 			hideable: false,
 			sortable: false,
@@ -94,6 +94,8 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 					header: t('Name'),
 					sortable: false,
 					dataIndex: 'name',
+					menuDisabled: true,
+					hideable: false,
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 						
 						var user = record.get("user"),
@@ -139,7 +141,8 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 				checkColumn
 			],
 			viewConfig: {
-				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>',				
+				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>',		
+				scrollOffset: 0		
 			},
 			autoExpandColumn: 'name',
 			listeners: {
