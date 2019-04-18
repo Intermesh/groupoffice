@@ -65,7 +65,7 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
 		getParams : function(q) {
 			//override to add q filter for JMAP API
 			this.store.baseParams.filter = this.store.baseParams.filter || {};		
-			this.store.baseParams.filter.q = q;
+			this.store.baseParams.filter.text = q;
 
 			var p = GO.form.ComboBoxMulti.superclass.getParams.call(this, q);
 			//delete p[this.queryParam];
