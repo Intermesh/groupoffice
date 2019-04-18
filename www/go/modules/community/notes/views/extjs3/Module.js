@@ -5,6 +5,10 @@ go.Modules.register("community", 'notes', {
 	initModule: function() {
 		this.addPanel(go.modules.community.notes.MainPanel);
 	},
+	relations: {
+		creator: {store: "User", fk: "createdBy"},
+		modifier: {store: "User", fk: "createdBy"}
+	},
 	entities: [{
 			name: "Note",			
 			hasFiles: true,

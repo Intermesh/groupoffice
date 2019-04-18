@@ -45,6 +45,8 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		this.notFound = [];
 		this.data = {};
 		this.state = null;
+
+		this.pending = {};
 		
 		this.initChanges();		
 	},
@@ -388,70 +390,46 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		});
 	},
 	
-	
-	_getAlreadyLoaded : function(ids, entities, unknownIds) {		
-		for (var i = 0, l = ids.length; i < l; i++) {
-			var id = ids[i];
-			if(!id) {
-				throw "Empty ID passed to EntityStore.get()";
-			}
-			if(this.data[id]) {
-				
-				entities.push(go.util.clone(this.data[id]));
-			} else if(this.notFound.indexOf(id) > -1) {
-				//entities.push(null);
-				//notFoundIds.push(id);
-				console.warn("Not fetching " + this.entity.name + " (" + id + ") because it was not found in an earlier attempt");
-			} else
-			{
-				unknownIds.push(id);
-			}			
+	single: function(id) {
+		if(this.data[id]) {
+			return Promise.resolve(go.util.clone(this.data[id]));
 		}
-	},
-	
-	_getFromBrowserStorage : function(unknownIds) {
-		var me = this;
-		
-//		For testing without browser storage
-//		return Promise.resolve(unknownIds);
-		
-		return me.initState().then(function() {
-			
-			var itemPromises = [];
-			unknownIds.forEach(function(id) { 
-				itemPromises.push(
-					me.stateStore.getItem(id + "").then(function(entity) {		
-						if(!entity) {
-							return null;
-						}
-						unknownIds = unknownIds.filter(function(id){
-							return id != entity.id;
-						});
 
-						me.data[entity.id] = entity;						
-						return entity;
-					})
-				);
-			});
-			
-			return Promise.all(itemPromises).then(function() {
-				return unknownIds;
-			});
+		if(this.notFound.indexOf(id) > -1) {
+			console.warn("Not fetching " + this.entity.name + " (" + id + ") because it was not found in an earlier attempt");
+			return Promise.reject();
+		}
+
+		var me = this;
+
+		//return me._getSingleFromServer(id);
+
+		return this._getSingleFromBrowserStorage(id).then(function(entity) {
+			if(entity) {
+				return entity;
+			}
+
+			return me._getSingleFromServer(id);
 		});
-
 	},
-	
-	_getFromServer : function(unknownIds) {
-		
+
+	_getSingleFromServer : function(id) {
+
+		if(this.pending[id]) {
+			return this.pending[id];
+		}
+
 		var me = this;
-		
-		return new Promise(function(resolve, reject) {
+		this.pending[id] = new Promise(function(resolve, reject) {
 			go.Jmap.request({
 				method: me.entity.name + "/get",
 				params: {
-					ids: unknownIds
+					ids: [id]
 				},
 				callback: function (options, success, response) {
+
+					delete this.pending[id];
+
 					if(!success) {
 						reject();
 						return;
@@ -460,12 +438,31 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					if(!go.util.empty(response.notFound)) {
 						me.notFound = me.notFound.concat(response.notFound);
 						me.metaStore.setItem("notfound", me.notFound);								
-						console.warn("Item not found", response);						
+						console.warn("Item not found", response);					
+						reject();	
+					} else
+					{
+						resolve(go.util.clone(this.data[id]));
 					}
-
-					resolve();
 				},
 				scope: me
+			});
+		});
+
+		return this.pending[id];
+	},
+
+	_getSingleFromBrowserStorage : function(id) {
+		var me = this;
+		return me.initState().then(function() {
+			
+			return me.stateStore.getItem(id + "").then(function(entity) {		
+				if(!entity) {
+					return null;
+				}				
+
+				me.data[id] = entity;
+				return entity;
 			});
 		});
 	},
@@ -480,64 +477,33 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	 * @returns void
 	 */
 	get: function (ids, cb, scope) {
-		
-		var me = this;	
-		
-		return new Promise(function(resolve, reject) {
-		
-			if(go.util.empty(ids)) {
-				if(cb) {		
-					cb.call(scope || me, [], me);			
-				}
-				resolve([], []);
-				return;
+
+		if(go.util.empty(ids)) {
+			if(cb) {		
+				cb.call(scope || this, [], this);			
+			}
+			return Promise.resolve([], []);
+		}
+
+		if(!Ext.isArray(ids)) {
+			throw "ids must be an array";
+		}
+
+		var entities = [], notFound = [], promises = [];
+		ids.forEach(function(id) {
+			promises.push(this.single(id).then(function(entity) {
+					entities.push(entity);
+				}).catch(function() {
+					notFound.push(id);
+				}));
+		}, this);
+
+		return Promise.all(promises).then(function() {
+			if(cb) {
+				cb.call(scope, entities, notFound);
 			}
 
-			if(!Ext.isArray(ids)) {
-				throw "ids must be an array";
-			}
-
-			var entities = [], unknownIds = [];
-			
-			var doCallback = function() {
-				var notFoundIds = me.notFound.filter(function(i) {			
-					return ids.indexOf(i) > -1;	
-				});
-
-				if(cb) {				
-					cb.call(scope || me, entities, notFoundIds);				
-				}
-				resolve(entities, notFoundIds);
-			};
-			
-			me._getAlreadyLoaded(ids, entities, unknownIds);			
-
-			if (!unknownIds.length) {
-				doCallback();
-				return;
-			}
-			
-			me._getFromBrowserStorage(unknownIds).then(function(unknownIds) {
-				if(!unknownIds.length) {
-					return me.get(ids).then(function(e, nf) {
-						entities = e;
-						notFoundIds = nf;
-					});
-				} else
-				{
-					return me._getFromServer(unknownIds).then(function() {
-						return me.get(ids).then(function(e, nf) {
-							entities = e;
-							notFoundIds = nf;
-						});
-					});
-				}
-			}).catch(function(err) {
-				reject(err);					
-			}).then(function() {
-				doCallback();
-			});
-			
+			return entities;
 		});
 		
 	},

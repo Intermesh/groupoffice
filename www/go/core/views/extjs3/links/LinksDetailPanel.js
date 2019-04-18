@@ -16,7 +16,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 			},
 			fields: [
 				'id', 
-				{name: "to", type: "Search", key: "toSearchId"}, 
+				{name: "to", type: "relation"}, 
 				'toId', 
 				'toSearchId',
 				{name: 'createdAt', type: 'date'}, 

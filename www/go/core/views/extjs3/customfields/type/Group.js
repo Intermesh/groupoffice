@@ -63,20 +63,21 @@ go.customfields.type.Group = Ext.extend(go.customfields.type.Text, {
 	},
 
 	getFieldType: function () {
-		return go.data.types.Group;
+		return "relation";
+	},
+
+	getRelations : function(customfield) {
+		var r = {}, relName = "customFields." + customfield.databaseName;
+		r[relName] = {store: "Group", fk: "customFields." + customfield.databaseName};
+		return r;
 	},
 	
-	/**
-	 * Get the field definition for creating Ext.data.Store's
-	 * 
-	 * Also the customFieldType (this) and customField (Entity Field) are added
-	 * 
-	 * @see https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.data.Field
-	 * @returns {Object}
-	 */
-	getFieldDefinition : function(field) {		
-		var c = go.customfields.type.Select.superclass.getFieldDefinition.call(this, field);
-		c.key = field.databaseName;		
+
+	getColumn : function(field) {		
+		var c = go.customfields.type.Group.superclass.getColumn.call(this, field);	
+		c.renderer = function(v) {
+			return v ? v.name : "";
+		};
 		return c;
 	},
 	

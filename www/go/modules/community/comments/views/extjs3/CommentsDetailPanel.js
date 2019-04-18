@@ -23,26 +23,20 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	initComponent: function () {
 
 		this.store = new go.data.Store({
-			fields: ['id', 'categoryId', 'categoryName','entityId', {name: 'createdAt', type: 'date'}, {name: 'modifiedAt', type: 'date'}, 'modifiedBy','createdBy', 'text'],
+			fields: [
+				'id', 
+				'categoryId', 
+				'categoryName',
+				'entityId', 
+				{name: 'createdAt', type: 'date'}, 
+				{name: 'modifiedAt', type: 'date'}, 
+				'modifiedBy',
+				'createdBy', 
+				{name: "creator", type: "relation"},
+				'text'
+			],
 			entityStore: "Comment"
 		});
-		
-		this.store.on('load', function(store,records,options) {
-				
-				var userStore = go.Db.store("User");
-								
-				var creatorIds = [];
-				this.store.each(function(r) {
-					if(creatorIds.indexOf(r.get('createdBy')) === -1) {
-						creatorIds.push(r.get('createdBy'));
-					}
-				}, this);
-			
-				userStore.get(creatorIds, function() {
-					this.updateView(options);
-				}, this);
-				
-			}, this);
 		
 		this.contextMenu = new Ext.menu.Menu({
 			items:[{
@@ -129,7 +123,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	updateView : function(o) {
 		o = o || {};
 		this.composer.textField.setValue('');
-		var userStore = go.Db.store("User"), prevStr;
+		var prevStr;
 		var initScrollHeight = (this.store.getCount() == this.commentsContainer.pageSize) ? 0 : this.commentsContainer.getEl().dom.scrollHeight,
 			 initScrollTop = this.commentsContainer.getEl().dom.scrollTop;
 
@@ -143,14 +137,14 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			var avatar = {
 				xtype:'box',
 				autoEl: {tag: 'span','ext:qtip': t('{author} wrote at {date}')
-					.replace('{author}', userStore.data[r.get("createdBy")].displayName)
+					.replace('{author}', r.get("creator").displayName)
 					.replace('{date}', Ext.util.Format.date(r.get('createdAt'),go.User.dateTimeFormat))},
 				cls: 'photo '+mineCls
 			};
-			if(userStore.data[r.get("createdBy")].avatarId) { 
-				avatar.style = 'background-image: url('+go.Jmap.downloadUrl(userStore.data[r.get("createdBy")].avatarId)+');';
+			if(r.get("creator").avatarId) { 
+				avatar.style = 'background-image: url('+go.Jmap.downloadUrl(r.get("creator").avatarId)+');';
 			} else {
-				avatar.html = userStore.data[r.get("createdBy")].displayName.substr(0,1).toUpperCase();
+				avatar.html = r.get("creator").displayName.substr(0,1).toUpperCase();
 			}
 
 			if(r.json.labelIds) {

@@ -11,6 +11,12 @@ go.Modules.register("community", "addressbook", {
 				fieldSetDialog: "go.modules.community.addressbook.CustomFieldSetDialog"
 			},
 
+			relations: {
+				organizations: {store: "Contact", fk: "organizationIds"},
+				creator: {store: "User", fk: "createdBy"},
+				modifier: {store: "User", fk: "createdBy"}
+			},
+
 			/**
 			 * Filter definitions
 			 * 

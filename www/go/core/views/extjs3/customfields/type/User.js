@@ -63,20 +63,20 @@ go.customfields.type.User = Ext.extend(go.customfields.type.Text, {
 	},
 
 	getFieldType: function () {
-		return go.data.types.User;
+		return "relation";
 	},
-	
-	/**
-	 * Get the field definition for creating Ext.data.Store's
-	 * 
-	 * Also the customFieldType (this) and customField (Entity Field) are added
-	 * 
-	 * @see https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.data.Field
-	 * @returns {Object}
-	 */
-	getFieldDefinition : function(field) {		
-		var c = go.customfields.type.Select.superclass.getFieldDefinition.call(this, field);
-		c.key = field.databaseName;		
+
+	getRelations : function(customfield) {
+		var r = {}, relName = "customFields." + customfield.databaseName;
+		r[relName] = {store: "User", fk: "customFields." + customfield.databaseName};
+		return r;
+	},
+
+	getColumn : function(field) {		
+		var c = go.customfields.type.User.superclass.getColumn.call(this, field);	
+		c.renderer = function(v) {
+			return v ? v.displayName : "";
+		};
 		return c;
 	},
 	

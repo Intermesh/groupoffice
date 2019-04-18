@@ -145,6 +145,10 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			columnxtype: this.getColumnXType()
 		};
 	},
+
+	getRelations : function(customfield) {
+		return {};
+	},
 	
 	/**
 	 * Get grid column defnitition

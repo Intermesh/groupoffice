@@ -54,7 +54,7 @@ go.modules.community.addressbook.customfield.Contact = Ext.extend(go.customfield
 	 * @returns {Object}
 	 */
 	createFormFieldConfig: function (customfield, config) {
-		var c = go.customfields.type.Select.superclass.createFormFieldConfig.call(this, customfield, config);
+		var c = go.modules.community.addressbook.customfield.Contact.superclass.createFormFieldConfig.call(this, customfield, config);
 		
 		c.xtype = "contactcombo";
 		c.isOrganization = customfield.options.isOrganization; 
@@ -65,20 +65,20 @@ go.modules.community.addressbook.customfield.Contact = Ext.extend(go.customfield
 	},
 
 	getFieldType: function () {
-		return go.data.types.Contact;
+		return "relation";
+	},
+
+	getRelations : function(customfield) {
+		var r = {}, relName = "customFields." + customfield.databaseName;
+		r[relName] = {store: "Contact", fk: "customFields." + customfield.databaseName};
+		return r;
 	},
 	
-	/**
-	 * Get the field definition for creating Ext.data.Store's
-	 * 
-	 * Also the customFieldType (this) and customField (Entity Field) are added
-	 * 
-	 * @see https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.data.Field
-	 * @returns {Object}
-	 */
-	getFieldDefinition : function(field) {		
-		var c = go.customfields.type.Select.superclass.getFieldDefinition.call(this, field);
-		c.key = field.databaseName;		
+	getColumn : function(field) {		
+		var c = go.modules.community.addressbook.customfield.Contact.superclass.getColumn.call(this, field);	
+		c.renderer = function(v) {
+			return v ? v.name : "";
+		};
 		return c;
 	},
 	

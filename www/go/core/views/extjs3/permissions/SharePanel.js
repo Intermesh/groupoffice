@@ -39,8 +39,8 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 			fields: [
 				'id', 
 				'name', 
-				{name: 'user', type: go.data.types.User, key: 'isUserGroupFor'}, //fetches entity from store
-				{name: 'members', type: go.data.types.User, key: 'users.userId'},
+				{name: 'user', type: "relation"}, //fetches entity from store
+				{name: 'members', type: "relation"},
 				{
 					name: 'level', 
 					type: {

@@ -13,25 +13,29 @@ go.Entities = (function () {
 		 * Called in mainlayout after authentication and loading of custom fields and modules.
 		 */
 		init : function() {
-			go.Entities.getAll().forEach(function(e) {			
-				var module = go.Modules.get(e.package, e.module),			
+			go.Entities.getAll().forEach(function(entity) {			
+				var module = go.Modules.get(entity.package, entity.module),			
 					serverInfo = module.entities.find(function(serverInfo) {
-						return serverInfo.name == e.name;
+						return serverInfo.name == entity.name;
 					});
 
 				if(serverInfo) {
-					if(!e.customFields) {
-						e.customFields = serverInfo.supportsCustomFields;
+					if(!entity.customFields) {
+						entity.customFields = serverInfo.supportsCustomFields;
 					}				
 					
-					e.isAclOwner = serverInfo.isAclOwner;
-					e.defaultAclId = serverInfo.defaultAclId;	
+					entity.isAclOwner = serverInfo.isAclOwner;
+					entity.defaultAclId = serverInfo.defaultAclId;	
 				}
 				
-				if(e.customFields) {
-					e.filters = e.filters.concat(go.customfields.CustomFields.getFilters(e.name));
+				if(entity.customFields) {
+					entity.filters = entity.filters.concat(go.customfields.CustomFields.getFilters(entity.name));
 				}
-				e.filters =  go.util.Filters.normalize(e.filters);				
+
+				entity.filters =  go.util.Filters.normalize(entity.filters);		
+				
+				entity.relations = entity.relations || {};
+				Ext.apply(entity.relations, go.customfields.CustomFields.getRelations(entity.name));
 			});
 		},
 
@@ -58,78 +62,7 @@ go.Entities = (function () {
         throw "Entity name is already registered by module " +entities[lcName]['package'] + "/" + entities[lcName]['module'];
       }
 		      
-      entities[lcName] = new go.Entity(cfg);
-			
-			//these datatypes will be prefetched by go.data.EntityStoreProxy.fetchEntities()
-			// Key can also be a function that is called with the record data.
-			go.data.types[cfg.name] = {
-				entity: cfg,
-				sortType: Ext.data.SortTypes.none,
-				type: "entity",
-				convert: function (v, data) {
-					var key = this.type.getKey.call(this, data), entity = this.type.entity;
-					
-					if(!key) {
-						return null;
-					}
-					
-
-					if(Ext.isArray(key)) {
-						var e = [];
-						key.forEach(function(k) {
-							if(go.Db.store(entity.name).data[k]) {
-								e.push(go.Db.store(entity.name).data[k]);
-							} else
-							{
-								console.error("Key " + k + " not found in store " + entity.name);
-							}
-						});
-						
-						return e;
-					} else
-					{
-						return go.Db.store(entity.name).data[key];	
-					}
-
-				},
-				
-				getKey : function(data) {
-					if(typeof(this.key) === "function") {
-						return this.key.call(this, data);
-					} else
-					{
-						if(!this.key) {
-							throw "Key is undefined";
-						}	
-						
-						var parts = this.key.split(".");
-						
-						parts.forEach(function(p) {
-							if(Ext.isArray(data)) {
-								var arr = [];
-								data.forEach(function(i) {
-									arr.push(i[p]);
-								});
-								data = arr;
-							} else
-							{
-								data = data[p];
-							}
-							if(!data) {
-								return false;
-							}
-						});
-						
-						return data;
-						
-					}
-				}
-								
-			};
-			
-			if(!Ext.data.Types[cfg.name.toUpperCase()]) {
-				Ext.data.Types[cfg.name.toUpperCase()] = go.data.types[cfg.name];
-			}
+      entities[lcName] = new go.Entity(cfg);	
     },
 
 		/**
@@ -212,13 +145,6 @@ go.Entities = (function () {
 			});
 
 			return linkConfig ? linkConfig.iconCls : "";
-
-			
 		}
   };
-  
-  
-  
-
 })();
-

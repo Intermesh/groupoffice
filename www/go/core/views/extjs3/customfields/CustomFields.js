@@ -101,6 +101,28 @@
 			});
 			return defs;
 		},
+
+		/**
+		 * Get filter definitions for tbsearch and user filter dialogs
+		 * 
+		 * @param {string} entity
+		 * @returns {Array}
+		 */
+		getRelations : function(entity) {
+			var relations = {}, me = this, type;
+			
+			this.getFieldSets(entity).forEach(function(fs) {
+				me.getFields(fs.id).forEach(function(field) {					
+					type = me.getType(field.type);
+					if(!type) {
+						console.error("Custom field type " + field.type + " not found");
+						return;
+					}
+					Ext.apply(relations,  type.getRelations(field));
+				});
+			});
+			return relations;
+		},
 		
 		/**
 		 * Get all Ext.data.Store field definitions for an entity's custom fields

@@ -121,57 +121,109 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 			return;
 		}
 
-		var count = 0, called = 0, me = this;
+		var promises = [];
 
-		function callback(entities, store) {
+		records.forEach(function (record) {
+			fields.forEach(function (field) {
+					promises.push(this._addRelation(field, record));			
+			}, this);
+		}, this);
 
-			called++;
-			if (count === called) {
-				cb.call(scope);
-			}
-		}
-
-		//group entities by type so one single request can be made
-		var types = {};
-
-		records.forEach(function (r) {
-			fields.forEach(function (f) {
-
-				var keys = f.type.getKey.call(f, r);
-				if (!keys) {
-					return true;
-				}
-
-				if (!Ext.isArray(keys)) {
-					keys = [keys];
-				}
-				
-				if(!keys.length) {
-					return true;
-				}
-
-				if (!types[f.type.entity.name]) {
-					types[f.type.entity.name] = [];
-				}
-
-				keys.forEach(function (key) {
-					if (types[f.type.entity.name].indexOf(key) === -1) {
-						types[f.type.entity.name].push(key);
-					}
-				});
-			});
-		});
-	
-		for (var entity in types) {
-			count++; //count number of requests and check if an equal number of callbacks has been called before proceeding with onRead.
-			var store = go.Db.store(entity);
-			store.get(types[entity], callback, this);
-		}
-
-		if(!count) {
+		Promise.all(promises).then(function() {
 			cb.call(scope);
-		}
+		});		
 	},
+
+	_addRelation : function(field, record) {
+
+		// if(field.name.indexOf('.') > -1) {
+		// 	debugger;
+		// }
+
+		var relation = this.entityStore.entity.relations[field.name];
+		if(!relation) {
+			return Promise.reject("Relation " + field.name + " not found for " + this.entityStore.entity.name);
+		}
+		var key = this._resolveKey(relation.fk, record), me = this;
+
+		if(!key) {
+			me._applyRelationEntity(field.name, record, null);
+			return Promise.resolve(null);
+		}
+
+		if(Ext.isArray(key)) {
+			return go.Db.store(relation.store).get(key).then(function(entities){
+				me._applyRelationEntity(field.name, record, entities);
+			});
+		}
+
+		return go.Db.store(relation.store).get([key]).then(function(entities){
+			me._applyRelationEntity(field.name, record, entities[0]);
+		});
+	},
+
+	_applyRelationEntity : function(key, record, entities) {
+		var parts = key.split("."),last = parts.pop(), current = record;
+
+		parts.forEach(function(p) {
+			if(!current[p]) {
+				current[p] = {};
+			}
+			current = current[p];
+		});
+
+		current[last] = entities;
+	},
+
+	_resolveKey : function(key, data) {
+		var parts = key.split(".");
+						
+		parts.forEach(function(p) {
+			if(Ext.isArray(data)) {
+				var arr = [];
+				data.forEach(function(i) {
+					arr.push(i[p]);
+				});
+				data = arr;
+			} else
+			{
+				if(!Ext.isDefined(data[p])) {
+					throw "Key of relation " + key + " does not exist?";
+				}
+				data = data[p];
+			}
+			if(!data) {
+				return false;
+			}
+		});
+		
+		return data;
+	},
+
+	// _addEntity : function(f, types, r) {
+	// 	var keys = f.type.getKey.call(f, r);
+	// 	if (!keys) {
+	// 		return true;
+	// 	}
+
+	// 	if (!Ext.isArray(keys)) {
+	// 		keys = [keys];
+	// 	}
+		
+	// 	if(!keys.length) {
+	// 		return true;
+	// 	}
+
+	// 	if (!types[f.type.entity.name]) {
+	// 		types[f.type.entity.name] = [];
+	// 	}
+
+	// 	keys.forEach(function (key) {
+	// 		if (types[f.type.entity.name].indexOf(key) === -1) {
+	// 			types[f.type.entity.name].push(key);
+	// 		}
+	// 	});
+	// },
 
 	getEntityFields: function () {
 
@@ -181,7 +233,7 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 			if(Ext.isString(field.type)) {
 				field.type = Ext.data.Types[field.type.toUpperCase()];
 			}
-			if (field.type && field.type.entity) {
+			if (field.type && field.type.prefetch) {
 				f.push(field);
 			}
 		});

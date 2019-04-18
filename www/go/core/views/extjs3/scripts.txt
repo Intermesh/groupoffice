@@ -8,6 +8,7 @@ data/Store.js
 data/GroupingStore.js
 
 data/EntityStore.js
+data/Types.js
 Entity.js
 Entities.js
 Stores.js

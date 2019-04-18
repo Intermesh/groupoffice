@@ -32,7 +32,7 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 				'name',
 				'isUserGroupFor',
 				'aclId',
-				{name: 'members', type: go.data.types.User, key: 'users.userId'}
+				{name: 'members', type: "relation"}
 				
 			],
 			entityStore: "Group"

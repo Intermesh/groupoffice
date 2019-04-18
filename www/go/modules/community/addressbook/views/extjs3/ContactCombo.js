@@ -23,7 +23,7 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 	initComponent: function () {
 		Ext.applyIf(this, {
 			store: new go.data.Store({
-				fields: ['id', 'name', "photoBlobId", {name: 'organizations', type: go.data.types.Contact, key: 'organizationIds'}, 'goUserId', 'phoneNumbers','addresses','emailAddresses','firstName', 'middleName', 'lastName', 'gender'],
+				fields: ['id', 'name', "photoBlobId", {name: 'organizations', type: "relation"}, 'goUserId', 'phoneNumbers','addresses','emailAddresses','firstName', 'middleName', 'lastName', 'gender'],
 				entityStore: "Contact",
 				baseParams: {
 					filter: {

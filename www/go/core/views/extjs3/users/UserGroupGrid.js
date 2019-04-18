@@ -34,7 +34,7 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 				'id', 
 				'name',
 				'isUserGroupFor',
-				{name: 'members', type: go.data.types.User, key: 'users.userId'},
+				{name: 'members', type: "relation"},
 				{
 					name: 'selected', 
 					type: {

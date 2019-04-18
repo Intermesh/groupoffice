@@ -1,6 +1,30 @@
 go.Modules.register("core", 'core', {
 	title: t("Core"),
-	entities: ['Acl', 'Group', 'User', 'Field', {name: 'FieldSet', title: t("Custom field set")}, 'Module', 'Link', 'Search', 'EntityFilter'],
+	entities: [
+		'Acl', 
+		{
+			name: 'Group',
+			relations: {
+				members: {store: "User", fk: "users.userId"},
+				user: {store: "User", fk:'isUserGroupFor'}
+			}
+		},
+		'User', 
+		'Field', 
+		{
+			name: 'FieldSet', 
+			title: t("Custom field set")
+		}, 
+		'Module', 
+		{
+			name: 'Link',
+			relations: {
+				to: {store: "Search", fk: "toSearchId"}
+			}
+		}, 
+		'Search', 
+		'EntityFilter'
+	],
 	systemSettingsPanels: [
 		"go.users.SystemSettingsUserGrid",
 		"go.groups.SystemSettingsGroupGrid",
