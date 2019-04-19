@@ -759,7 +759,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		
 		//sorting on custom fields doesn't work for folders
 		//TODO
-		if(!isset($params['sort']) || substr($params['sort'],0,4)=='col_' || $params['sort'] == 'name') {
+		if(!isset($params['sort']) || substr($params['sort'],0,13)=='customFields.' || $params['sort'] == 'name') {
 			$findParams->order(new \go\core\db\Expression('name COLLATE utf8mb4_unicode_ci ' . (!isset($params['dir']) || $params['dir'] == 'ASC' ? 'ASC' : 'DESC')));
 		}
 
@@ -880,7 +880,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 					->addInCondition("groupId", \GO\Base\Model\User::getGroupIds(\GO::user()->id), "a", false);
 
 			$findParams = \GO\Base\Db\FindParams::newInstance()
-					->select('t.*,cf.*')
+					->select('t.*')
 					->ignoreAcl()
 					->joinCustomFields()
 					->joinModel(array(
@@ -905,10 +905,11 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			if(isset($params['sort'])){
 				
 				if($params['sort'] == 'name') {
-					 $findParams->order(new \go\core\db\Expression('name COLLATE utf8mb4_unicode_ci ' . (!isset($params['dir']) || $params['dir'] == 'ASC' ? 'ASC' : 'DESC')));
+					 $findParams->order(new \go\core\db\Expression('t.name COLLATE utf8mb4_unicode_ci ' . (!isset($params['dir']) || $params['dir'] == 'ASC' ? 'ASC' : 'DESC')));
 				}else
 				{				
-					$findParams->order("t.".$params['sort'], $params['dir']);
+					$params['sort'] = str_replace('customFields', 'cf', $params['sort']);
+					$findParams->order($params['sort'], $params['dir']);
 				}
 			}
 			

@@ -199,8 +199,9 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 					'thumb_url' => $this->getThumbURL()
 				);
 
-			if($this->customfieldsRecord)
-				$data = array_merge($data, $this->customfieldsRecord->getAttributes('html'));
+			if(method_exists($this, "getCustomFields")) {
+				$data['customFields'] = $this->getCustomFields();
+			}
 			return $data;
 	}
 
