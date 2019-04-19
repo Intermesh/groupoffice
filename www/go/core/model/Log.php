@@ -41,7 +41,7 @@ class Log extends \go\core\orm\Entity {
 			$this->ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
 			$this->controller_route = "JMAP";
 			$this->username = GO()->getDbConnection()->selectSingleValue('username')->from('core_user')->where('id', '=', GO()->getUserId())->single();
-			$this->user_id = GO()->getUserId();
+			$this->user_id = GO()->getUserId() ?? 1;
 			$this->ctime = time();
 		}
 	}
