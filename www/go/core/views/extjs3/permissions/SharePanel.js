@@ -40,7 +40,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 				'id', 
 				'name', 
 				{name: 'user', type: "relation"}, //fetches entity from store
-				{name: 'members', type: "relation"},
+				{name: 'users', type: "relation", limit: 5},
 				{
 					name: 'level', 
 					type: {
@@ -100,21 +100,17 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 						
 						var user = record.get("user"),
 										style = user && user.avatarId ?  'background-image: url(' + go.Jmap.downloadUrl(record.get("user").avatarId) + ')"' : "background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24));";
-										html = user ? "" : '<i class="icon">group</i>',										
-										max = 5,
-										members = record.get('members').slice(0, max).column('displayName');
-						
-							memberStr = members.join(", ");
-								
-							var more = members.length - max;
+										html = user ? "" : '<i class="icon">group</i>';
+
+							memberStr = record.get('users').column('displayName').join(", ");								
+							var more = record.json._meta.users.total - store.fields.item('users').limit;
 							if(more > 0) {
 								memberStr += t(" and {count} more").replace('{count}', more);
-							}
-						
+							}					
 						
 						return '<div class="user"><div class="avatar" style="' + style + '">' + html + '</div>' +
 							'<div class="wrap">'+
-								'<div class="displayName">' + record.get('name') + '</div>' +
+								'<div class="displayName">' + value + '</div>' +
 								'<small class="username">' + memberStr + '</small>' +
 							'</div>'+
 							'</div>';

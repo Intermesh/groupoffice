@@ -21,12 +21,18 @@ go.Relations = {
   /**
 	 * Create a promise that resolves the relational record data.
 	 * 
-	 * @param {any} field 
+	 * @param {string|object} relName Relation name or object with {name: "users", limit: 5}. This will only resolve the first 5 entities and put the total in record.json._meta.users.total
 	 * @param {*any} record 
 	 * 
 	 * @retrun {Promise}
 	 */
 	getRelation : function(relName, entity) {
+
+		var c = {};
+		if(Ext.isObject(relName)) {
+			c = relName;
+			relName = c.name;
+		}
 
 		var relation = this.entityStore.entity.findRelation(relName);
 
@@ -42,6 +48,13 @@ go.Relations = {
 		}
 
 		if(Ext.isArray(key)) {
+
+			if(c.limit) {
+				entity._meta = entity._meta || {};
+				entity._meta[relName] = {total: key.length};
+
+				key = key.slice(0, c.limit);				
+			}
 
 			key.forEach(function(k) {
 				me.watchRelation(relation.store, k);

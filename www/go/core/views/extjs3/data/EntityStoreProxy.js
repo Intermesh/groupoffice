@@ -132,10 +132,10 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 			return;
 		}
 
-		var promises = [], relations = fields.map(function(field) {return field.name;}), me = this;
+		var promises = [], me = this;
 
 		records.forEach(function (record) {
-			promises.push(go.Relations.get(this.entityStore, record, relations).then(function(result) {
+			promises.push(go.Relations.get(this.entityStore, record, fields).then(function(result) {
 				for(var store in result.watch) {
 					result.watch[store].forEach(function(key) {
 							me._watchRelation(store, key);

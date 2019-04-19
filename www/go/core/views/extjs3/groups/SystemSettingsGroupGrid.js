@@ -32,7 +32,7 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 				'name',
 				'isUserGroupFor',
 				'aclId',
-				{name: 'members', type: "relation"}
+				{name: 'users', type: "relation", limit: 5}
 				
 			],
 			entityStore: "Group"
@@ -78,21 +78,16 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 					header: t('Name'),
 					width: dp(200),
 					sortable: true,
-					dataIndex: 'displayName',
-					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
-						
-						var max = 5,
-								members = record.get('members').slice(0, max).column('displayName');
-						
-						memberStr = members.join(", ");
-								
-						var more = members.length - max;
+					dataIndex: 'name',
+					renderer: function (value, metaData, record, rowIndex, colIndex, store) {						
+					
+						memberStr = record.get("users").column('displayName').join(", ");								
+						var more = record.json._meta.users.total - store.fields.item('users').limit;
 						if(more > 0) {
 							memberStr += t(" and {count} more").replace('{count}', more);
 						}
-						
 
-						return '<div>' + record.get('name') + '</div>' +
+						return '<div>' + value + '</div>' +
 										'<small class="username">' + memberStr + '</small>';
 					}
 				},

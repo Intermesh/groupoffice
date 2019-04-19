@@ -34,7 +34,7 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 				'id', 
 				'name',
 				'isUserGroupFor',
-				{name: 'members', type: "relation"},
+				{name: 'users', type: "relation", limit: 5},
 				{
 					name: 'selected', 
 					type: {
@@ -73,15 +73,13 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'displayName',
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 						var user = record.get("user"),
-							style = user && user.avatarId ?  'background-image: url(' + go.Jmap.downloadUrl(record.get("user").avatarId) + ')"' : "",						
-							max = 5,
-							members = record.get('members').slice(0, max).column('displayName'),						
-							memberStr = members.join(", "),								
-							more = members.length - max;
-							
+							style = user && user.avatarId ?  'background-image: url(' + go.Jmap.downloadUrl(record.get("user").avatarId) + ')"' : "";
+
+						memberStr = record.get("users").column('displayName').join(", ");								
+						var more = record.json._meta.users.total - store.fields.item('users').limit;
 						if(more > 0) {
 							memberStr += t(" and {count} more").replace('{count}', more);
-						}
+						}			
 						
 						return '<div class="user"><div class="avatar" style="'+style+'"></div>' +
 							'<div class="wrap">'+
