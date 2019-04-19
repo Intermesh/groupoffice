@@ -207,7 +207,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 						text: t("Star"),
 						handler: function () {
 							var update = {};
-							update[this.currentId] = {starred: !this.data.starred};
+							update[this.currentId] = {starred: this.data.starred ? null : true};
 							
 							go.Db.store("Contact").set({
 								update: update
