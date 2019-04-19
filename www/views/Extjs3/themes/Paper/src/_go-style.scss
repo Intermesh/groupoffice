@@ -522,6 +522,7 @@ a {
 }
 #message-ct {
 	position: absolute;
+	pointer-events:none;
 	z-index: 100000000;
 	top: dp(16);
 	right: 8px;
@@ -530,6 +531,7 @@ a {
 	overflow: visible;
 	> div {
 		@extend .z4;
+		pointer-events:auto;
 		min-width: dp(280);
 		max-width: dp(400);
 		border-radius: $borderRadius;

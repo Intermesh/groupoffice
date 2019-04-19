@@ -107,7 +107,10 @@ GO.calendar.MainPanel = function(config){
 		flex: 1,
 		cls:'cal-date-picker',
 		showToday:false,
-		internalRender:true
+		internalRender:true,
+		showNextMonth : function(e){
+			this.update(this.activeDate.add('mo', 1));
+		},
 	});
 	
 	this.datePicker.on("select", function(datePicker, DateObj){

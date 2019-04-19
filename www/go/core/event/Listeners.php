@@ -98,7 +98,7 @@ class Listeners extends Singleton {
 		
 		if(!isset($this->listeners)) {
 			$this->listeners = App::get()->getCache()->get('listeners-2');
-			
+
 			if(!$this->listeners) {
 				$this->init();
 			}

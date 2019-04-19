@@ -441,7 +441,18 @@ $updates['201903151726'][] = "ALTER TABLE `core_entity_filter`
 
 $updates['201903151726'][] = "ALTER TABLE `core_entity_filter`
   ADD CONSTRAINT `core_entity_filter_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`),
-  ADD CONSTRAINT `core_entity_filter_ibfk_2` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;";
+	ADD CONSTRAINT `core_entity_filter_ibfk_2` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;";
+	
+$updates['201901251344'][] = function() {
+	GO()->getDbConnection()->query("ALTER TABLE `core_search` CHANGE `keywords` `keywords` VARCHAR(192) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '';");
+	GO()->getDbConnection()->query("ALTER TABLE `core_search` ADD INDEX(`keywords`);");
+};
+
+$updates['201901301035'][] = "ALTER TABLE `go_cron` ADD INDEX `nextrun_active` (`nextrun`, `active`);";
+$updates['201901301035'][] = "ALTER TABLE `go_reminders_users` ADD INDEX `user_id_time` (`user_id`, `time`);";
+$updates['201901301035'][] = "ALTER TABLE `core_auth_method` ADD INDEX `moduleId_sortOrder` (`moduleId`, `sortOrder`);";
+
+$updates['201902141322'][] = "UPDATE `core_module` SET `package` = 'community' WHERE `name` = 'serverclient';";
 
 
 $updates['201903221350'][] = "ALTER TABLE `core_customfields_field_set` ADD `isTab` BOOLEAN NOT NULL DEFAULT FALSE AFTER `filter`;";

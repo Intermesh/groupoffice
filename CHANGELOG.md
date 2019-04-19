@@ -1,7 +1,12 @@
-- Core/Group: Added forUserId filter in Groups so you can query the groups where the given user is a member of.
-- Core: Implemented Promise to combobox so it is easier to override.
+- Core: HTML editor: Fixed "Capital after punctuation" functionality in combination with the shift key
+- Core: Login screen - Fixed problem that language selection was not clickable when a message was shown.
+- Core: Fixed upgrade error for some mysql servers not supporting a large index on core_search
+
+08-04-2019 6.3.69
 - Core: Correct UTF-8 encoding on language import
 - Core: Prevent license error in System tasks maintenance
+- Reminders: fixed add reminder in reminder popup module
+- Leavedays: changes in Monthwindow for extending and fix un undefined issue.
 - Core: Pin TCPDF to version 6.2.22. Higher versions break image loading in PDF
 - Address book: search sent invalid data to the server causing problems on some servers
 - Core: Selected group members should be on top when editing groups
@@ -11,6 +16,7 @@
 - Custom fields: Fixed rename of tree select slaves
 - Core: Don't trackResetOnLoad in TabbedFormDialog because this will create invalid default values because those dialogs are reused.
 - Core: Links open in popup window like in 6/2
+- Billing: Fixed rounding issue with round up or down enabled
 
 01-04-2019 6.3.68
 - Email: Fixed subfolders with \ as delimiter

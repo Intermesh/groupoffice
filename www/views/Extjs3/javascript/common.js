@@ -910,17 +910,17 @@ GO.util.html_entity_decode = function (string, quote_style ) {
     }
     
     return tmp_str;
-}
+};
 
 GO.util.add_slashes = function(str)
 {
 	return (str+'').replace(/([\\"'])/g, "\\$1").replace(/\0/g, "\\0");
-}
+};
 
 GO.util.addParamToUrl = function(url, param, value){
 	var splitter = url.indexOf('?')!=-1 ? '&' : '?';
 	return url+splitter+param+'='+encodeURIComponent(value);
-}
+};
 
 GO.util.basename = function(path)
 {
@@ -930,7 +930,7 @@ GO.util.basename = function(path)
 		path = path.substring(pos+1);
 	}
 	return path;
-}
+};
 
 GO.util.dirname = function(path)
 {
@@ -940,7 +940,7 @@ GO.util.dirname = function(path)
 		path = path.substring(0, pos);
 	}
 	return path;
-}
+};
 
 
 GO.util.logExtEvents = function() {
@@ -949,7 +949,7 @@ GO.util.logExtEvents = function() {
         var a = arguments;
         console.log(this, ' fired event ',evt,' with args ',Array.prototype.slice.call(a, 1, a.length));
     });
-}
+};
 
 if(GO.settings && GO.settings.time_format){
 	GO.date = {
