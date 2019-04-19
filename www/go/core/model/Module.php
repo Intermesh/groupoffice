@@ -36,6 +36,10 @@ class Module extends AclOwnerEntity {
 		if($settings && !$settings->save()) {
 			return false;
 		}
+
+		if($this->isModified(['enabled'])) {
+			GO()->rebuildCache();
+		}
 		
 		return true;
 	}
