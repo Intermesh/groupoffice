@@ -27,6 +27,12 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 	 */
 	doRequest: function (action, rs, params, reader, callback, scope, options) {
 
+		//Reset watchRelation if not adding records
+		if(!options.add) {			
+			this.watchRelations = {};
+		}
+
+
 		var o = {
 			request: {
 				callback: callback,
@@ -118,7 +124,7 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 	 * Prefetches all data for fields of type "relation". 
 	 */
 	preFetchEntities: function (records, cb, scope) {
-		this.watchRelations = {};
+		
 
 		var fields = this.getEntityFields();
 		if (!fields.length) {
@@ -126,52 +132,21 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 			return;
 		}
 
-		var promises = [];
+		var promises = [], relations = fields.map(function(field) {return field.name;}), me = this;
 
 		records.forEach(function (record) {
-			fields.forEach(function (field) {
-					promises.push(this._addRelation(field, record));			
-			}, this);
+			promises.push(go.Relations.get(this.entityStore, record, relations).then(function(result) {
+				for(var store in result.watch) {
+					result.watch[store].forEach(function(key) {
+							me._watchRelation(store, key);
+					});
+				}
+			}));
 		}, this);
 
 		Promise.all(promises).then(function() {
 			cb.call(scope);
 		});		
-	},
-
-
-	/**
-	 * Create a promise that resolves the relational record data.
-	 * 
-	 * @param {any} field 
-	 * @param {*any} record 
-	 * 
-	 * @retrun {Promise}
-	 */
-	_addRelation : function(field, record) {
-
-		var relation = this.entityStore.entity.relations[field.name];
-		if(!relation) {
-			return Promise.reject("Relation " + field.name + " not found for " + this.entityStore.entity.name);
-		}
-		var key = this._resolveKey(relation.fk, record), me = this;
-
-		if(!key) {
-			me._applyRelationEntity(field.name, record, null);
-			return Promise.resolve(null);
-		}
-
-		this._watchRelation(relation.store, key);
-
-		if(Ext.isArray(key)) {
-			return go.Db.store(relation.store).get(key).then(function(entities){
-				me._applyRelationEntity(field.name, record, entities);
-			});
-		}
-
-		return go.Db.store(relation.store).get([key]).then(function(entities){
-			me._applyRelationEntity(field.name, record, entities[0]);
-		});
 	},
 
 	/**
@@ -181,6 +156,7 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 	 * @param {int} key 
 	 */
 	_watchRelation : function(entity, key) {
+
 		if(!this.watchRelations[entity]) {
 			this.watchRelations[entity] = [];
 		}
@@ -188,64 +164,6 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 		if(this.watchRelations[entity].indexOf(key) === -1) {
 			this.watchRelations[entity].push(key);
 		}
-	},
-
-	/**
-	 * Applies the entity data to the record.
-	 * It also supports a path like "customFields.user"
-	 * 
-	 * This will become
-	 * {
-	 * 	"customFields" => {
-	 * 		"user" => data
-	 * 	}
-	 * }
-	 * @param {*} key 
-	 * @param {*} record 
-	 * @param {*} entities 
-	 */
-	_applyRelationEntity : function(key, record, entities) {
-		var parts = key.split("."),last = parts.pop(), current = record;
-
-		parts.forEach(function(p) {
-			if(!current[p]) {
-				current[p] = {};
-			}
-			current = current[p];
-		});
-
-		current[last] = entities;
-	},
-
-	/**
-	 * Resolves a key path eg. "customFields.user"
-	 * 
-	 * @param {*} key 
-	 * @param {*} data 
-	 */
-	_resolveKey : function(key, data) {
-		var parts = key.split(".");
-						
-		parts.forEach(function(p) {
-			if(Ext.isArray(data)) {
-				var arr = [];
-				data.forEach(function(i) {
-					arr.push(i[p]);
-				});
-				data = arr;
-			} else
-			{
-				if(!Ext.isDefined(data[p])) {
-					throw "Key of relation " + key + " does not exist?";
-				}
-				data = data[p];
-			}
-			if(!data) {
-				return false;
-			}
-		});
-		
-		return data;
 	},
 
 	/**

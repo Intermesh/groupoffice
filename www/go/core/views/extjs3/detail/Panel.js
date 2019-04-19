@@ -66,14 +66,16 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			}
 			return;
 		}
-		// for(let i = 0,relName; relName = this.relations[i]; i++) {
-		this.relations.forEach(function(relName) {
-			var relation = this.entityStore.entity.relations[relName];
-			if(entityStore.entity.name === relation.store && changed[this.data[relation.fk]]) {
-				this.data[relName] = changed;
+		if(!this.watchRelations[entityStore.entity.name]) {
+			return;
+		}
+
+		for(var id in changed) {
+			if(this.watchRelations[entityStore.entity.name].indexOf(changed[id].id) > -1) {
 				this.internalLoad(this.data);
+				return;
 			}
-		}, this);
+		}
 	},
 	
 	// listen to relational stores as well
@@ -134,44 +136,27 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		this.doLayout();
 		this.body.scrollTo('top', 0);		
 	},
-	
-	resolve : function() {
-		return null;
-	},
 
 	reload: function () {
 		this.load(this.currentId);
 	},
 	
 	internalLoad : function(data) {
+		this.watchRelations = {};
 		if(this.getTopToolbar()) {
 			this.getTopToolbar().setDisabled(false);
 		}
 		this.data = data;
 		var me = this;
-
-		var resolveRelations = [];
-		this.relations.forEach(function(relName) {
-			var relation = me.entityStore.entity.relations[relName];
-			if(me.data[relation.fk]) {
-				resolveRelations.push(
-					go.Db.store(relation.store).get([me.data[relation.fk]]).then(function(record){
-						me.data[relName] = record[0];
-					})				
-				);
-			}
-		});
 		
-		//used for sony
-		//var promises = this.resolve();
-		if(!resolveRelations) {
+		if(!this.relations.length) {
 			this.onLoad();
 			this.fireEvent('load', this);
 			return;
-		}
+		}	
 		
-		
-		Promise.all(resolveRelations).then(function() {		
+		go.Relations.get(me.entityStore, data, this.relations).then(function(result) {
+			me.watchRelations = result.watch;		
 			me.onLoad();
 			me.fireEvent('load', me);
 		}).catch(function(result) {
