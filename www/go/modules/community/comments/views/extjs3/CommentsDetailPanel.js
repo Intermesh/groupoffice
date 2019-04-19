@@ -38,6 +38,10 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			entityStore: "Comment"
 		});
 		
+		this.store.on('load', function(store,records,options) {		
+			this.updateView(options);
+		}, this);
+
 		this.contextMenu = new Ext.menu.Menu({
 			items:[{
 				iconCls: 'ic-delete',
@@ -115,8 +119,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 					entityId: this.entityId
 				}
 				//sort: 'createdAt DESC'
-			},
-			scope: this
+			}
 		});
 	},
 		
