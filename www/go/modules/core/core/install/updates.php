@@ -256,7 +256,11 @@ $updates['201811020837'][] = function() {
 };
 
 
-$updates['201901251344'][] = "ALTER TABLE `core_search` ADD INDEX(`keywords`);";
+$updates['201901251344'][] = function() {
+	GO()->getDbConnection()->query("ALTER TABLE `core_search` CHANGE `keywords` `keywords` VARCHAR(192) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '';");
+	GO()->getDbConnection()->query("ALTER TABLE `core_search` ADD INDEX(`keywords`);");
+};
+
 $updates['201901301035'][] = "ALTER TABLE `go_cron` ADD INDEX `nextrun_active` (`nextrun`, `active`);";
 $updates['201901301035'][] = "ALTER TABLE `go_reminders_users` ADD INDEX `user_id_time` (`user_id`, `time`);";
 $updates['201901301035'][] = "ALTER TABLE `core_auth_method` ADD INDEX `moduleId_sortOrder` (`moduleId`, `sortOrder`);";
