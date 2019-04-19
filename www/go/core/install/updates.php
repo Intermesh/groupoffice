@@ -263,11 +263,7 @@ $updates['201902141322'][] = "ALTER TABLE `go_reminders_users` ADD INDEX `user_i
 $updates['201902141322'][] = "ALTER TABLE `core_auth_method` ADD INDEX `moduleId_sortOrder` (`moduleId`, `sortOrder`);";
 $updates['201902141322'][] = "UPDATE `core_module` SET `package` = 'community' WHERE `name` = 'serverclient';";
 
-
 //Master
-
-
-
 $updates['201902141322'][] = "update `core_entity` set highestModSeq=0 where highestModSeq is null;";
 $updates['201902141322'][] = "ALTER TABLE `core_entity` CHANGE `highestModSeq` `highestModSeq` INT(11) NOT NULL DEFAULT '0';";
 $updates['201902141322'][] = "truncate table core_change;";
@@ -447,13 +443,6 @@ $updates['201901251344'][] = function() {
 	GO()->getDbConnection()->query("ALTER TABLE `core_search` CHANGE `keywords` `keywords` VARCHAR(192) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '';");
 	GO()->getDbConnection()->query("ALTER TABLE `core_search` ADD INDEX(`keywords`);");
 };
-
-$updates['201901301035'][] = "ALTER TABLE `go_cron` ADD INDEX `nextrun_active` (`nextrun`, `active`);";
-$updates['201901301035'][] = "ALTER TABLE `go_reminders_users` ADD INDEX `user_id_time` (`user_id`, `time`);";
-$updates['201901301035'][] = "ALTER TABLE `core_auth_method` ADD INDEX `moduleId_sortOrder` (`moduleId`, `sortOrder`);";
-
-$updates['201902141322'][] = "UPDATE `core_module` SET `package` = 'community' WHERE `name` = 'serverclient';";
-
 
 $updates['201903221350'][] = "ALTER TABLE `core_customfields_field_set` ADD `isTab` BOOLEAN NOT NULL DEFAULT FALSE AFTER `filter`;";
 $updates['201904021341'][] = "ALTER TABLE `core_search` CHANGE `description` `description` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;";
