@@ -69,8 +69,8 @@ go.modules.community.addressbook.customfield.Contact = Ext.extend(go.customfield
 	},
 
 	getRelations : function(customfield) {
-		var r = {}, relName = "customFields." + customfield.databaseName;
-		r[relName] = {store: "Contact", fk: "customFields." + customfield.databaseName};
+		var r = {};
+		r[customfield.databaseName] = {store: "Contact", fk: customfield.databaseName};
 		return r;
 	},
 	

@@ -80,6 +80,40 @@ Ext.apply(go.Entity.prototype, {
 	
 	goto: function (id) {
 		go.Router.goto(this.getRouterPath(id));
+	},
+
+	/**
+	 * Find a relation by path. Eg. "creator" or "customFields.user"
+	 * 
+	 * For example returns;
+	 * 
+	 * {
+	 * 		path: "customFields.", //Only with nested relations.
+	 * 		store: "User",
+	 * 		fk: "userId"
+	 * }
+	 * 
+	 * 
+	 * 
+	 * @param {string} path 
+	 * @return Object
+	 */
+	findRelation : function(path) {
+		parts = path.split("."),last = parts.pop(), current = this.relations;
+
+		parts.forEach(function(p) {
+			if(!current[p]) {
+				current[p] = {};
+			}
+			
+			current = current[p];
+		});
+
+		if(!current[last]) {
+			return false;
+		}
+		current[last].path = parts.length > 0 ? parts.join('.') + "." : "";
+		return current[last];
 	}
 
 });

@@ -28,18 +28,18 @@ go.Relations = {
 	 */
 	getRelation : function(relName, entity) {
 
-		var relation = this.entityStore.entity.relations[relName];
+		var relation = this.entityStore.entity.findRelation(relName);
+
 		if(!relation) {
 			return Promise.reject("Relation " + relName + " not found for " + this.entityStore.entity.name);
 		}
-		var key = this.resolveKey(relation.fk, entity), me = this;
+
+		var key = this.resolveKey(relation.path + relation.fk, entity), me = this;
 
 		if(!key) {
-      me.applyRelationEntity(relName, entity, null);
+      me.applyRelationEntity(relation.path + relName, entity, null);
 			return Promise.resolve(null);
 		}
-
-		
 
 		if(Ext.isArray(key)) {
 

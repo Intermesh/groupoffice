@@ -67,8 +67,8 @@ go.customfields.type.User = Ext.extend(go.customfields.type.Text, {
 	},
 
 	getRelations : function(customfield) {
-		var r = {}, relName = "customFields." + customfield.databaseName;
-		r[relName] = {store: "User", fk: "customFields." + customfield.databaseName};
+		var r = {};
+		r[customfield.databaseName] = {store: "User", fk: customfield.databaseName};
 		return r;
 	},
 

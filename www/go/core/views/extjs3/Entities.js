@@ -35,7 +35,7 @@ go.Entities = (function () {
 				entity.filters =  go.util.Filters.normalize(entity.filters);		
 				
 				entity.relations = entity.relations || {};
-				Ext.apply(entity.relations, go.customfields.CustomFields.getRelations(entity.name));
+				entity.relations.customFields = go.customfields.CustomFields.getRelations(entity.name);
 			});
 		},
 

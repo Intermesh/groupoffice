@@ -67,8 +67,8 @@ go.customfields.type.Group = Ext.extend(go.customfields.type.Text, {
 	},
 
 	getRelations : function(customfield) {
-		var r = {}, relName = "customFields." + customfield.databaseName;
-		r[relName] = {store: "Group", fk: "customFields." + customfield.databaseName};
+		var r = {};
+		r[customfield.databaseName] = {store: "Group", fk: customfield.databaseName};
 		return r;
 	},
 	

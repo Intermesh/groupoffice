@@ -167,15 +167,16 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	 * Registers a listener for changes on entity stores when fields with type = relation is used.
 	 */
 	watchRelations : function() {
+
 		this.proxy.getEntityFields().forEach(function(field) {
-			var relation = this.entityStore.entity.relations[field.name];
+			var relation =  this.entityStore.entity.findRelation(field.name);
 			go.Db.store(relation.store).on("changes", this.onRelationChanges, this);
 		}, this);
 	},
 
 	unwatchRelations : function() {
 		this.proxy.getEntityFields().forEach(function(field) {
-			var relation = this.entityStore.entity.relations[field.name];
+			var relation = this.entityStore.entity.findRelation(field.name);
 
 			go.Db.store(relation.store).un("changes", this.onRelationChanges, this);
 		}, this);

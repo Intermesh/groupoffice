@@ -83,7 +83,7 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		
 		//for(let i = 0,relName; relName = this.relations[i]; i++) {
 		this.relations.forEach(function(relName) {
-			var relation = this.entityStore.entity.relations[relName],
+			var relation = this.entityStore.entity.findRelation(relName),
 				entityStore = go.Db.store(relation.store);
 				
 			if(entityStore) {
