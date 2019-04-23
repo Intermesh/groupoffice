@@ -56,7 +56,15 @@
 						['h:i a', t('12 hour format','users','core')]
 						]
 					}),
-		
+		age: function(birthday) {
+			birthday = checkDate(birthday);
+			if(!birthday) {
+				return "-";
+			}
+			 var ageDifMs = Date.now() - birthday.getTime();
+			var ageDate = new Date(ageDifMs); // miliseconds from epoch
+			return Math.abs(ageDate.getUTCFullYear() - 1970);
+		},
 		/**
 		 * 
 		 * 

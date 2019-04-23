@@ -66,6 +66,13 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 		return config;
 	},
 	
+	reset:function() {
+		this.items.each(function(f){
+			f.reset();
+	  });
+	  return this;
+	},
+
 	onSelect : function(field, record) {
 		
 		var index = this.items.indexOf(field) + 1;
