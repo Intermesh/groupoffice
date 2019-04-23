@@ -17,8 +17,9 @@ go.util.Cookies = {
 		{
 			expires = "";
 		}
-		
-		document.cookie = name + "=" + (value || "") + expires + "; path=/";
+		var secure = location.protocol === 'https:' ? '; secure' : '';		
+		var cookie = name + "=" + (value || "") + expires + secure + "; path=" + document.location.pathname;
+		document.cookie = cookie;
 	},
 	
 	/**
