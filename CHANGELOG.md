@@ -1,3 +1,4 @@
+- Groupoffice Assistant: Fixed url for downloading GroupOffice assistant
 - Email: Fixed permission issie in email account combobox (At sync settings)
 - Core: HTML editor: Fixed "Capital after punctuation" functionality in combination with the shift key
 - Core: Login screen - Fixed problem that language selection was not clickable when a message was shown.
