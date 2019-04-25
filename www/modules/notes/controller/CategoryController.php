@@ -103,4 +103,27 @@ class CategoryController extends AbstractController {
 		$this->render('json', array('success'=>true, 'value'=>$value));
 	}
 
+
+	/**
+	 * Delete a single not. Must be a POST request
+	 *
+	 * @param int $id
+	 * @throws Exception
+	 * @throws \GO\Base\Exception\NotFound
+	 */
+	protected function actionDelete($id) {
+
+		if (!GO::request()->isPost() && !GO::environment()->isCli()) {
+			throw new Exception('Delete must be a POST request');
+		}
+
+		$model = Category::model()->findByPk($id);
+		if (!$model)
+			throw new \GO\Base\Exception\NotFound();
+
+		$model->delete();
+
+		echo $this->render('delete', array('model' => $model));
+	}
+
 }
