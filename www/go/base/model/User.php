@@ -845,13 +845,15 @@ class User extends \GO\Base\Db\ActiveRecord {
 				$contact = new \GO\Addressbook\Model\Contact();
 				$addressbook = \GO\Addressbook\Model\Addressbook::model()->getUsersAddressbook();
 				$contact->go_user_id = $this->id;
-				$contact->addressbook_id = $addressbook->id;				
+				$contact->addressbook_id = $addressbook->id;			
+					
+				$name = GO\Base\Util\StringHelper::split_name($this->displayName);
+				$contact->first_name = $name['first_name'];
+				$contact->middle_name =$name['middle_name'];
+				$contact->last_name = $name['last_name'];
 			}			
 			
-			$name = GO\Base\Util\StringHelper::split_name($this->displayName);
-			$contact->first_name = $name['first_name'];
-			$contact->middle_name =$name['middle_name'];
-			$contact->last_name = $name['last_name'];
+		
 			$contact->email = $this->email;
 
 			if($contact->isNew || $contact->isModified()){
