@@ -403,7 +403,10 @@ class Participant extends \GO\Base\Db\ActiveRecord {
 			
 			
 			if(!$this->is_organizer && $this->contact_id && \GO::config()->calendar_autolink_participants){
-				$this->contact->link($this->event);
+				$contact = \go\modules\community\addressbook\model\Contact::findById($this->contact_id);
+				if(!empty($contact)) {
+					$contact->link($this->event);
+				}
 			}
 		}
 		
