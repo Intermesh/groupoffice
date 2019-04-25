@@ -7,6 +7,7 @@ use go\core\jmap\Entity;
 use go\core\validate\ErrorCode;
 use go\modules\community\multi_instance\Module;
 use function GO;
+use go\core\util\DateTime;
 
 class Instance extends Entity {
 	
@@ -427,10 +428,8 @@ class Instance extends Entity {
 	
 
 	public function createAccessToken() {
-		$now = new \DateTime();
-		$now->setTimezone(new DateTimeZone("UTC"));
-		$expiresAt = new \DateTime("+1 hour");
-		$expiresAt->setTimezone(new DateTimeZone("UTC"));
+		$now = new DateTime();
+		$expiresAt = new DateTime("+1 hour");
 		
 		$data = [
 				"loginToken" => uniqid().bin2hex(openssl_random_pseudo_bytes(16)),
