@@ -767,7 +767,7 @@ class User extends Entity {
 		$contact = \go\modules\community\addressbook\model\Contact::findForUser($this->id);
 		if(!$contact) {
 			$contact = new \go\modules\community\addressbook\model\Contact();
-			$contact->addressBookId = GO()->getSettings()->getUserAddressBookId();				
+			$contact->addressBookId = GO()->getSettings()->getUserAddressBook()->id;				
 		}
 		
 		return $contact;

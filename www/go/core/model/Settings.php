@@ -6,6 +6,7 @@ use GO;
 use go\core;
 use go\core\http\Request;
 use go\core\util\Crypt;
+use go\modules\community\addressbook\model\AddressBook;
 
 class Settings extends core\Settings {
 	
@@ -350,13 +351,20 @@ class Settings extends core\Settings {
 	 */
 	protected $userAddressBookId = null;
 	
-	public function getUserAddressBookId() {
+	/**
+	 * @return AddressBook
+	 */
+	public function getUserAddressBook() {
 		if(!Module::findByName('community', 'addressbook')) {
 			return null;
 		}
 		
-		if(!isset($this->userAddressBookId)) {
-			$addressBook = new \go\modules\community\addressbook\model\AddressBook();	
+		if(isset($this->userAddressBookId)) {
+			$addressBook = AddressBook::findById($this->userAddressBookId);
+		}
+
+		if(!$addressBook) {
+			$addressBook = new AddressBook();	
 			$addressBook->name = GO()->t("Users");
 			if(!$addressBook->save()) {
 				throw new \Exception("Could not save address book");
@@ -366,8 +374,8 @@ class Settings extends core\Settings {
 				throw new \Exception("Could not save core settings");
 			}
 		}
-		
-		return $this->userAddressBookId;
+
+		return $addressBook;		
 	}
 	
 	public function setUserAddressBookId($id) {
