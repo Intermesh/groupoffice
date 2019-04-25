@@ -30,6 +30,8 @@ try {
 	
 	
 if(!empty($_POST['accessToken'])) {
+	$old = date_default_timezone_get();
+	date_default_timezone_set('UTC');
 	//used for direct token login from multi_instance module
 	//this token is used in default_scripts.inc.php too
 	$token = Token::find()->where('accessToken', '=', $_POST['accessToken'])->single();
@@ -39,6 +41,8 @@ if(!empty($_POST['accessToken'])) {
 	{
 		unset($_POST['accessToken']);
 	}
+
+	date_default_timezone_set($old);
 }
 
 
