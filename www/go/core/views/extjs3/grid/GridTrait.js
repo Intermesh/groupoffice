@@ -25,6 +25,7 @@ go.grid.GridTrait = {
 	},
 	
 	initHeaderMenu : function() {
+		this.enableHdMenu = false;
 		this.on('render',function() {			
 			// header menu
 			this.addClass("go-grid");
@@ -46,7 +47,6 @@ go.grid.GridTrait = {
 			return;
 		}
 		
-		this.enableHdMenu = false;
 		this.getView().scrollOffset = dp(24);
 		this.getView().refresh = function(headersToo) {
 			this.fireEvent('beforerefresh', this);
