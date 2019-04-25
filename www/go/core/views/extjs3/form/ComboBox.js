@@ -33,6 +33,9 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 
 		//create record from entity store if not exists
 		if (value && this.store.entityStore && this.store.entityStore.entity && !this.findRecord(me.valueField, value)) {
+
+			this.value = value;
+			
 			this.resolveEntity(value).then(function (entity) {			
 
 				if(Ext.isFunction(me.renderer)) {

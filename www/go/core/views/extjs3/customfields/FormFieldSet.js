@@ -40,9 +40,11 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 					this.filter(form.getValues());
 				}, this);
 
-				if(form.entity) {
+				form.on("setvalues", function () {					
 					this.filter(form.getValues());
-				}
+				}, this);
+
+				this.filter(form.getValues());
 			} else
 			{
 				//Legacy code
