@@ -1,3 +1,4 @@
+25-04-2019 6.2.117
 - Notes: Implemented delete action in category controller
 - Billing: Fixed rounding the vat of orders. It now calculates the vat per orderItem instead of the total of the order.
 
