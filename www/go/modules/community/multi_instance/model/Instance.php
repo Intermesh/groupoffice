@@ -203,35 +203,7 @@ class Instance extends Entity {
 			$this->getInstanceDbConnection()
 							->replace('core_setting', ['name' => $name, 'value' => $value, "moduleId" => $coreModuleId])->execute();
 		}
-		
-		$usersModuleId = (new \go\core\db\Query)
-						->setDbConnection($this->getInstanceDbConnection())
-						->selectSingleValue('id')
-						->from('core_module')
-						->where(['package'=>'core', 'name'=>'users'])->single();
-		
-		foreach($users as $name => $value) {
-			$this->getInstanceDbConnection()
-							->replace('core_setting', ['name' => $name, 'value' => $value, "moduleId" => $usersModuleId])->execute();
-		}
-		
-		$groupsModuleId = (new \go\core\db\Query)
-						->setDbConnection($this->getInstanceDbConnection())
-						->selectSingleValue('id')
-						->from('core_module')
-						->where(['package'=>'core', 'name'=>'groups'])->single();
-		
-		foreach($groups as $name => $value) {
-			$this->getInstanceDbConnection()
-							->replace('core_setting', ['name' => $name, 'value' => $value, "moduleId" => $groupsModuleId])->execute();
-		}
-		
-		
-		
-						
-						
-	}
-	
+	}	
 	
 	private function createWelcomeMessage() {
 		
