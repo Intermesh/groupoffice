@@ -361,6 +361,8 @@ class Settings extends core\Settings {
 		
 		if(isset($this->userAddressBookId)) {
 			$addressBook = AddressBook::findById($this->userAddressBookId);
+		} else{
+			$addressBook = false;
 		}
 
 		if(!$addressBook) {
