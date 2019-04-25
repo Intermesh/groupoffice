@@ -1,8 +1,15 @@
+25-04-2019 6.3.70
+
+- Core: Improved logging of JSON parse errors in JMAP API
+- Address book: For user contacts, only use user display name to populate contact when creating a new one
+- Groupoffice Assistant: Fixed url for downloading GroupOffice assistant
+- Email: Fixed permission issie in email account combobox (At sync settings)
 - Core: HTML editor: Fixed "Capital after punctuation" functionality in combination with the shift key
 - Core: Login screen - Fixed problem that language selection was not clickable when a message was shown.
 - Core: Fixed upgrade error for some mysql servers not supporting a large index on core_search
 
 08-04-2019 6.3.69
+
 - Core: Correct UTF-8 encoding on language import
 - Core: Prevent license error in System tasks maintenance
 - Reminders: fixed add reminder in reminder popup module
