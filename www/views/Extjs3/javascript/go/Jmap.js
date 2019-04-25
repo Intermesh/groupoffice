@@ -175,33 +175,40 @@ go.Jmap = {
 				method: 'POST',
 				jsonData: me.requests,
 				success: function (response, opts) {
-					var responses = JSON.parse(response.responseText);
+					try {
+						var responses = JSON.parse(response.responseText);
+					
 
-					responses.forEach(function (response) {
+						responses.forEach(function (response) {
 
-						//lookup request options by client ID
-						var o = me.requestOptions[response[2]];
-						if (!o) {
-							//aborted
-							return true;
-						}
-						if (response[1][0] == "error") {
-							console.log('server-side JMAP failure', response);							
-						}
-
-						go.flux.Dispatcher.dispatch(response[0], response[1]);
-
-						var success = response[1][0] !== "error";
-						if (o.callback) {
-							if (!o.scope) {
-								o.scope = me;
+							//lookup request options by client ID
+							var o = me.requestOptions[response[2]];
+							if (!o) {
+								//aborted
+								return true;
 							}
-							o.callback.call(o.scope, o, success, response[1]);
-						}
+							if (response[1][0] == "error") {
+								console.error('server-side JMAP failure', response);							
+							}
 
-						//cleanup request options
-						delete me.requestOptions[response[2]];
-					});
+							go.flux.Dispatcher.dispatch(response[0], response[1]);
+
+							var success = response[1][0] !== "error";
+							if (o.callback) {
+								if (!o.scope) {
+									o.scope = me;
+								}
+								o.callback.call(o.scope, o, success, response[1]);
+							}
+
+							//cleanup request options
+							delete me.requestOptions[response[2]];
+						});
+					} catch(e) {
+						console.error(e,"server reponse:", response.responseText);
+
+						Ext.MessageBox.alert(t("Error"), t("An error occured on the server. The console shows details."))
+					}
 				},
 				failure: function (response, opts) {
 					console.log('server-side failure with status code ' + response.status);
