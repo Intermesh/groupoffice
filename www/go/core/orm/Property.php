@@ -97,19 +97,9 @@ abstract class Property extends Model {
 
 		$this->fetchProperties = $fetchProperties;
 		
-		if($this->isNew) {
-			//make sure default values of the database are tracked as modifications. 
-			//Otherwise the save function may think nothing needs to be inserted.
-			$this->trackModifications();
-		}
-		
 		$this->initDatabaseColumns($this->isNew);
 		$this->initRelations();
-		
-		if (!$this->isNew) {			
-			$this->trackModifications();
-		}
-
+		$this->trackModifications();
 		$this->init();
 	}
 
