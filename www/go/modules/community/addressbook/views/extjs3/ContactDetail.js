@@ -146,6 +146,18 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 							<label>{[t("dateTypes")[values.type] || values.type]}</label>\
 						</a></tpl>\
 					</div>	</tpl>'
+				},
+				{
+					xtype: 'panel',
+					title: t("Notes"),
+					autoHeight: true,
+					items: [{
+						xtype: 'readmore'
+					}],
+					onLoad: function (detailView) {						
+						this.setVisible(!!detailView.data.notes);
+						this.items.first().setText('<div style="white-space: pre-wrap">' + detailView.data.notes + "</div>");
+					}
 				}
 			]
 		});
