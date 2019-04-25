@@ -13,6 +13,8 @@ go.form.FileButtonField = Ext.extend(Ext.form.CompositeField,{
 	
 	autoUpload: true,
 	
+	idOnly: false,
+	
 	accept: '*/*',
 	
 	blob:null,
@@ -118,15 +120,19 @@ go.form.FileButtonField = Ext.extend(Ext.form.CompositeField,{
 		this.blob = blob;
 		if(blob !== null){
 			this.hiddenField.setValue(blob.id);
+			this.uploadButton.disable();
+			this.clearButton.enable();
 			this.setFileNameField(blob.name,blob.size);	
 		} else {
+			this.uploadButton.enable();
+			this.clearButton.disable();
 			this.hiddenField.setValue(null);
 			this.filenameField.setValue(null);
 		}
 	},
 	
 	getValue: function(){
-		return this.blob;
+		return this.getRawValue();
 	},
 	
 	setRawValue : function(blob){
@@ -134,7 +140,7 @@ go.form.FileButtonField = Ext.extend(Ext.form.CompositeField,{
 	},
 	
 	getRawValue: function(){
-		return this.blob;
+		return !this.idOnly ? this.blob : this.hiddenField.getValue();
 	},
 	
 	disable : function(silent){
