@@ -345,23 +345,37 @@ Ext.extend(GO.calendar.ParticipantsPanel, Ext.Panel, {
 		}*/
 		
 		var select = new go.modules.community.addressbook.SelectDialog ({
-						scope: this,
-						handler: function(name, email, id) {
-							GO.request({
-								url:"calendar/participant/getContacts",
-								params:{
-									contacts: Ext.encode([{id: id, name: name, email: email}]),
-									start_time : this.eventDialog.getStartDate().format('U'),
-									end_time : this.eventDialog.getEndDate().format('U')
-								},
-								success:function(response, options, result){
-									this.addParticipants(result);
-								},
-								scope:this
-							});	
-						}
-					});
-					select.show();
+			scope: this,
+			selectSingleEmail: function(name, email, id) {
+				GO.request({
+					url:"calendar/participant/getContacts",
+					params:{
+						contacts: Ext.encode([{entityId: id, name: name, email: email}]),
+						start_time : this.eventDialog.getStartDate().format('U'),
+						end_time : this.eventDialog.getEndDate().format('U')
+					},
+					success:function(response, options, result){
+						this.addParticipants(result);
+					},
+					scope:this
+				});	
+			},
+			selectMultiple: function(ids) {
+				GO.request({
+					url:"calendar/participant/getContacts",
+					params:{
+						contacts: Ext.encode(ids.map(function(id){return {entityId: id};})),
+						start_time : this.eventDialog.getStartDate().format('U'),
+						end_time : this.eventDialog.getEndDate().format('U')
+					},
+					success:function(response, options, result){
+						this.addParticipants(result);
+					},
+					scope:this
+				});		
+			}
+		});
+		select.show();
 					
 					
 //		if (!this.addParticipantsDialog) {

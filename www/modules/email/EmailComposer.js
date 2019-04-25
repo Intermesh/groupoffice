@@ -175,7 +175,7 @@ GO.email.EmailComposer = function(config) {
 				handler: function() {
 					var select = new go.modules.community.addressbook.SelectDialog ({
 						scope: this,
-						selectSingle: function(name, email, id) {
+						selectSingleEmail: function(name, email, id) {
 							var v = this.toCombo.getValue();
 							if(!go.util.empty(v)) {
 								v += ", ";

@@ -95,6 +95,12 @@ class ParticipantController extends \GO\Base\Controller\AbstractModelController 
 		foreach($contacts as $contact){
 
 			$contactEntity = \go\modules\community\addressbook\model\Contact::findById($contact['entityId']);
+			if(empty($contact['email'])) {
+				$contact['email'] = $contactEntity->emailAddresses[0]->email;
+			}
+			if(empty($contact['name'])) {
+				$contact['name'] = $contactEntity->name;
+			}
 			$userId = $contactEntity->goUserId;
 			if(!$userId) {
 				$user = \go\core\model\User::find()->where(['email' => $contact['email']])->single();
