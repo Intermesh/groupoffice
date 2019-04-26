@@ -111,10 +111,12 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 				name: 'disk_usage',
 				fieldLabel: t('Space used'),
 				setValue: function(v) {
-					this.setRawValue(Math.round(v/1024/1024*100)/100+'MB');
-					return this;
-				},
-						width: dp(300)
+					if(this.rendered) {
+						v = Math.round(v/1024/1024*100)/100+'MB';
+					}
+					Ext.form.DisplayField.prototype.setValue.call(this, v);					
+				},				
+				width: dp(300)
 			}
 		]});
 	
