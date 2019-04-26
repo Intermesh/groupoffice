@@ -51,8 +51,6 @@ GO.calendar.ContextMenu = function(config){
 			this.fireEvent("deleteEvent", this);
 		}
 	}),'-',
-	this.newMenuItem = new GO.NewMenuItem(),
-	'-',
 	this.actionExportAsIcs = new Ext.menu.Item({
 		iconCls: 'ic-import-export',
 		text: t("Export as ICS", "calendar"),
@@ -173,20 +171,8 @@ Ext.extend(GO.calendar.ContextMenu, Ext.menu.Menu, {
 		
 		this.actionDelete.setDisabled(!deleteEnabled);
 		
-//		this.actionInfo.setDisabled(!event.event_id);
-		
 		if(this.actionAddTimeRegistration)
 			this.actionAddTimeRegistration.setDisabled(!event.event_id);
-		
-
-//		if(go.Modules.isAvailable("legacy", "email"))
-//			this.actionCreateMail.setDisabled(event.has_other_participants==0);
-
-		this.newMenuItem.setLinkConfig({
-			model_name:"GO\\Calendar\\Model\\Event",
-			model_id:event.event_id,
-			text:event.name
-		});
 	},
 	
 	showCreateMailDialog : function() {
