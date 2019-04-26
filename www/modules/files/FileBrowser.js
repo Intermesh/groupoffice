@@ -1932,6 +1932,9 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 		
 		var detailViewName = entity + "Detail";
 		
+		this[detailViewName].on("load", function(dv){
+			this.setFolderID(dv.data.folder_id || dv.data.parent_id, true);
+		}, this, {single: true});
 		this[detailViewName].load(parseInt(id));
 //		mainPanel[detailViewName].show();
 		this.eastPanel.getLayout().setActiveItem(this[detailViewName]);
