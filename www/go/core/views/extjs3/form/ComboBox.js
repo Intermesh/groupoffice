@@ -10,9 +10,9 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 	value: null,
 	
 	resolveEntity : function(value) {
-		return this.store.entityStore.get([value]).then(function (entities) {
-			if(entities[0]) {
-				return entities[0];
+		return this.store.entityStore.get([value]).then(function (result) {
+			if(result.entities[0]) {
+				return result.entities[0];
 			}else
 			{
 				return Promise.reject();

@@ -480,18 +480,21 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 		if(go.util.empty(ids)) {
 			if(cb) {		
-				cb.call(scope || this, [], this);			
+				cb.call(scope || this, [], []);			
 			}
-			return Promise.resolve([], []);
+			return Promise.resolve({entities: [], notFound: []});
 		}
 
 		if(!Ext.isArray(ids)) {
 			throw "ids must be an array";
 		}
 
-		var entities = [], notFound = [], promises = [];
-		ids.forEach(function(id) {
+		var entities = [], notFound = [], promises = [], order = {};
+		ids.forEach(function(id, index) {
+			//keep order for sorting later
+			order[id] = index;
 			promises.push(this.single(id).then(function(entity) {
+					//Make sure array is sorted the same as ids
 					entities.push(entity);
 				}).catch(function() {
 					notFound.push(id);
@@ -499,11 +502,16 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		}, this);
 
 		return Promise.all(promises).then(function() {
+
+			entities.sort(function (a, b) {
+					return order[a.id] - order[b.id];
+			});
+
 			if(cb) {
 				cb.call(scope, entities, notFound);
 			}
 
-			return entities;
+			return {entities: entities, notFound: notFound};
 		});
 		
 	},

@@ -60,15 +60,15 @@ go.Relations = {
 				me.watchRelation(relation.store, k);
 			});
 
-			return go.Db.store(relation.store).get(key).then(function(entities){
-				me.applyRelationEntity(relName, entity, entities);
+			return go.Db.store(relation.store).get(key).then(function(result) {
+				me.applyRelationEntity(relName, entity, result.entities);
 			});
 		}
 
 		this.watchRelation(relation.store, key);
 
-		return go.Db.store(relation.store).get([key]).then(function(entities){
-			me.applyRelationEntity(relName, entity, entities[0]);
+		return go.Db.store(relation.store).get([key]).then(function(result) {
+			me.applyRelationEntity(relName, entity, result.entities[0]);
 		});
 	},
 

@@ -85,7 +85,6 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 
 		var result;
 
-
 		this.preFetchEntities(response.records, function () {
 			//		try {
 			result = o.reader.readRecords(response);
