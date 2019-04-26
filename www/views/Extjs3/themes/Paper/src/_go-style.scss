@@ -1787,3 +1787,7 @@ table[id^="comments-ext"] b {
 		padding-right: dp(24);
 	}
 }
+
+.go-top-right {
+	position:absolute;top: dp(8); right: dp(8);
+}
