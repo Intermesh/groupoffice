@@ -98,7 +98,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 					this.updateView();
 				},
 				reset: function() {
-					if(this.store instanceof go.data.Store) {
+					if(this.store instanceof go.data.Store || this.store instanceof go.data.GroupingStore) {
 						this.store.setFilter('tbsearch', null).load();
 					} else {
 						delete this.store.baseParams.query;
