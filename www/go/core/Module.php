@@ -59,8 +59,7 @@ abstract class Module {
 
 		try{
 			$this->installDatabase();
-		
-		
+					
 			GO()->rebuildCache(true);
 			GO()->getDbConnection()->beginTransaction();
 		
@@ -74,15 +73,13 @@ abstract class Module {
 				return false;
 			}
 
-			if(!$this->registerEntities()) {				
-				$this->rollBack();
-				$this->uninstallDatabase();
+			if(!$this->registerEntities()) {
+				$this->rollBack();				
 				return false;
 			}
 
 			if(!$this->afterInstall($model)) {
-				$this->rollBack();
-				$this->uninstallDatabase();
+				$this->rollBack();				
 				return false;
 			}		
 
@@ -91,9 +88,8 @@ abstract class Module {
 				$this->uninstallDatabase();
 				return false;
 			}		
-		} catch(Exception $e) {
+		} catch(Exception $e) {			
 			$this->rollBack();
-			$this->uninstallDatabase();
 			throw $e;
 		}
 		
@@ -101,7 +97,11 @@ abstract class Module {
 	}
 	
 	private function rollBack() {
-		GO()->getDbConnection()->rollBack();
+
+		// Transaction is probably aborted by the install.sql file of the module. Any structure change will automatically abort the transaction.			
+		if(GO()->getDbConnection()->inTransaction()) {
+			GO()->getDbConnection()->rollBack();
+		}
 		$this->uninstallDatabase();
 	}	
 	
