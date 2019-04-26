@@ -22,7 +22,12 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 		});
 
 		this.entityGrid.getSelectionModel().on('selectionchange', function (sm) {
-			this.store.baseParams.filter.entities = sm.getSelections().map(function(r){return {name: r.data.entity, filter: r.data.filter};});
+			this.store.setFilter('entities', {
+				entities: sm.getSelections().map(function(r){
+					return {name: r.data.entity, filter: r.data.filter};
+				})
+			});
+			
 			this.store.load();
 		}, this, {buffer: 1});
 
@@ -30,19 +35,17 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 		this.store = new go.data.GroupingStore({
 			autoDestroy: true,
 			remoteGroup: true,
-			fields: ['id', 'toId', 'toEntity', {name: "to", type: "Search", key: "toSearchId"}, 'description', {name: 'modifiedAt', type: 'date'}],
+			fields: ['id', 'toId', 'toEntity', {name: "to", type: "relation"}, 'description', {name: 'modifiedAt', type: 'date'}],
 			entityStore: "Link",
 			sortInfo: {field: 'toEntity', direction: 'DESC'},
 			autoLoad: true,
 			groupOnSort: true,
-			groupField: 'toEntity',
-			baseParams: {
-				filter: 
-					{
-						entity: this.entity,
-						entityId: this.entityId
-					}
-			}
+			groupField: 'toEntity'
+		});
+
+		this.store.setFilter('entity', {
+			entity: this.entity,
+			entityId: this.entityId
 		});
 
 		this.grid = new go.grid.GridPanel({
