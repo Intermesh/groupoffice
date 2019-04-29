@@ -528,7 +528,7 @@ class User extends Entity {
 		
 		if(isset($this->plainPassword)) {
 			$this->password = password_hash($this->plainPassword, PASSWORD_DEFAULT);
-			$this->updateDigest($this->plainPassword);
+			$this->updateDigest();
 		}
 		
 		
