@@ -16,7 +16,7 @@ Add the following code at the bottom of your LocalSettings.php and set the corre
 
 ```
 wfLoadExtension( 'Auth_GroupOffice' );
-$wgGoApiUrl = ''; // For example: 'http://63.go/'
+$wgGoApiUrl = ''; // For example: 'http://example.group-office.com/' (Don't forget to include the trailing slash ( / ))
 $wgEditPageFrameOptions = 'SAMEORIGIN';
 ```
 
