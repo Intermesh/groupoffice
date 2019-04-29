@@ -631,7 +631,7 @@ abstract class Property extends Model {
 			
 		});
 		
-		foreach ($this->getMapping()->getTables() as $table) {			
+		foreach ($tables as $table) {			
 			if (!$this->saveTable($table, $modified)) {				
 				return false;
 			}
