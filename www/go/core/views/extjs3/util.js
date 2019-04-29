@@ -34,22 +34,22 @@ go.util =  (function () {
 			{
 				return true;
 			}
-			if (v == '')
+			if (v === '')
 			{
 				return true;
 			}
 
-			if (v == '0')
+			if (v === '0')
 			{
 				return true;
 			}
 
-			if (v == 'undefined')
+			if (v === 'undefined')
 			{
 				return true;
 			}
 
-			if (v == 'null')
+			if (v === 'null')
 			{
 				return true;
 			}

@@ -219,7 +219,7 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 		var s = go.Db.store("Contact");
 		this.getEl().mask(t("Loading..."));
 		s.query({
-			filter: this.grid.store.getFilter()
+			filter: this.grid.store.baseParams.filter
 		}, function(response) {			
 			this.getEl().unmask();
 			Ext.MessageBox.confirm(t("Confirm"), t("Are you sure you want to select all {count} results?").replace('{count}', response.ids.length), function(btn) {

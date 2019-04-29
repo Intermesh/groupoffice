@@ -439,7 +439,10 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 						me.notFound = me.notFound.concat(response.notFound);
 						me.metaStore.setItem("notfound", me.notFound);								
 						console.warn("Item not found", response);					
-						reject();	
+						reject({
+							id: id,
+							error: "Not found"
+						});	
 					} else
 					{
 						resolve(go.util.clone(this.data[id]));

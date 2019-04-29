@@ -193,7 +193,7 @@ go.data.StoreTrait = {
 		return this;
 	},
 	
-	getFilter : function() {
-		return this.baseParams.filter;
+	getFilter : function(name) {
+		return this.filters[name];
 	}
-}
+};
