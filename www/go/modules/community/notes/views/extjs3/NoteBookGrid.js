@@ -1,10 +1,11 @@
 go.modules.community.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 	viewConfig: {
+		scrollOffset: 0,
 		forceFit: true,
 		autoFill: true
 	},
 
-	constructor: function (config) {
+	initComponent: function () {
 
 		var actions = this.initRowActions();
 
@@ -14,7 +15,7 @@ go.modules.community.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 			xtype: "container",
 			items:[
 				{
-					items: config.tbar, 
+					items: this.tbar, 
 					xtype: 'toolbar'
 				},
 				new Ext.Toolbar({
@@ -23,7 +24,7 @@ go.modules.community.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 			]
 		};
 
-		Ext.apply(config, {
+		Ext.apply(this, {
 			
 			tbar: tbar,
 			
@@ -47,11 +48,11 @@ go.modules.community.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 				actions
 			],
 
-//			stateful: true,
+			stateful: true,
 			stateId: 'note-books-grid'
 		});
 
-		go.modules.community.notes.NoteBookGrid.superclass.constructor.call(this, config);
+		go.modules.community.notes.NoteBookGrid.superclass.initComponent.call(this);
 	},
 
 	initRowActions: function () {
