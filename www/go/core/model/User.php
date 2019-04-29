@@ -37,8 +37,6 @@ $qs[] = "ALTER TABLE `core_user`
 class User extends Entity {
 	
 	use CustomFieldsTrait;
-	
-	const DIGEST_REALM = 'Group-Office';
 
 	const ID_SUPER_ADMIN = 1;
 	
@@ -217,13 +215,6 @@ class User extends Entity {
 	 * @var Password
 	 */
 	protected $password;
-	
-	/**
-	 * Used for DIGEST authentication which is required for webdav to work with the Microsoft Windows client.
-	 * 
-	 * @var string
-	 */
-	protected $digest;
 
 	/**
 	 * The groups of the user
@@ -249,7 +240,6 @@ class User extends Entity {
 		return parent::defineMapping()
 			->addTable('core_user', 'u')
 			->addTable('core_auth_password', 'p', ['id' => 'userId'])
-//			->addRelation('password', Password::class, ['id' => 'userId'], false)
 			->addRelation("groups", UserGroup::class, ['id' => 'userId'])
 			->addRelation('workingWeek', WorkingWeek::class, ['id' => 'user_id'], false);
 	}
@@ -335,17 +325,6 @@ class User extends Entity {
 	public function setPassword($password) {
 		$this->plainPassword = $password;
 	}
-	
-	public function getDigest() {
-		return $this->digest;
-	}
-
-	private function updateDigest() {
-		$digest = md5($this->username . ":" . self::DIGEST_REALM . ":" . $this->plainPassword);
-		if ($digest != $this->digest) {
-			$this->digest = $digest;
-		}
-	}
 
 	/**
 	 * Make sure to call this when changing the password with a recovery hash
@@ -408,8 +387,6 @@ class User extends Entity {
 		if(isset($this->plainPassword) && $this->validatePassword) {
 			if(strlen($this->plainPassword) < GO()->getSettings()->passwordMinLength) {
 				$this->setValidationError('password', ErrorCode::INVALID_INPUT, "Minimum password length is ".GO()->getSettings()->passwordMinLength." chars");
-			} else {
-				$this->updateDigest();
 			}
 		}
 		
@@ -528,9 +505,7 @@ class User extends Entity {
 		
 		if(isset($this->plainPassword)) {
 			$this->password = $this->passwordHash($this->plainPassword);
-			$this->updateDigest();
-		}
-		
+		}		
 		
 		if(!parent::internalSave()) {
 			return false;
