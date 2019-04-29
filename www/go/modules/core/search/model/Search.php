@@ -60,7 +60,7 @@ class Search extends \go\core\acl\model\AclEntity {
 		
 		$this->name = \go\core\util\StringUtil::cutString($this->name, $this->getMapping()->getColumn('name')->length, false);
 		$this->description = \go\core\util\StringUtil::cutString($this->description, $this->getMapping()->getColumn('description')->length);		
-		$this->keywords = \go\core\util\StringUtil::cutString($this->keywords, $this->getMapping()->getColumn('description')->length, true, "");
+		$this->keywords = \go\core\util\StringUtil::cutString($this->keywords, $this->getMapping()->getColumn('keywords')->length, true, "");
 		
 		return parent::internalValidate();
 	}
