@@ -70,7 +70,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 						var imgEl = this.getDoc().getElementById(domId);
 					} 
 
-					this.fireEvent('attach', response.blobId, file, imgEl);
+					this.fireEvent('attach', this, response.blobId, file, imgEl);
 				}
 			});
 		}
@@ -182,7 +182,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 				go.Jmap.upload(file, {
 					success: function(response) {
 						imgEl.setAttribute("src", go.Jmap.downloadUrl(response.blobId));						
-						me.fireEvent('attach', response.blobId, file, imgEl);
+						me.fireEvent('attach', me, response.blobId, file, imgEl);
 					}
 				});
 				
