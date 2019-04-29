@@ -13,6 +13,8 @@
 
 go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {	
 
+	autoExpandMin: dp(200),
+
 	initComponent: function () {
 		
 		Ext.applyIf(this, go.grid.GridTrait);

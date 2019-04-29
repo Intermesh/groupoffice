@@ -4,6 +4,7 @@ Jmap.js
 
 data/JmapProxy.js
 data/EntityStoreProxy.js
+data/StoreTrait.js
 data/Store.js
 data/GroupingStore.js
 

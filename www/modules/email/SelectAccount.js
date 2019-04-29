@@ -57,7 +57,7 @@ Ext.extend(GO.email.SelectAccount, GO.form.ComboBox, {
 		if (!r)
 		{
 			GO.request({
-				url: 'email/account/load',
+				url: 'email/account/display',
 				params: {id: id},
 				success: function (response, options, result) {
 

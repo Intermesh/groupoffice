@@ -63,8 +63,7 @@ GO.mainLayout.on('render', function () {
 				searchContainer.hide();
 			});
 		}
-		;
-	}
+	};
 
 	var dqTask = new Ext.util.DelayedTask(search);
 
@@ -130,5 +129,5 @@ GO.mainLayout.on('render', function () {
 		enableSearch();
 		searchField.setValue(query);
 		search();
-	}
+	};
 });

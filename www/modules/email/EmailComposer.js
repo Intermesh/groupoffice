@@ -175,7 +175,7 @@ GO.email.EmailComposer = function(config) {
 				handler: function() {
 					var select = new go.modules.community.addressbook.SelectDialog ({
 						scope: this,
-						selectSingle: function(name, email, id) {
+						selectSingleEmail: function(name, email, id) {
 							var v = this.toCombo.getValue();
 							if(!go.util.empty(v)) {
 								v += ", ";
@@ -186,8 +186,8 @@ GO.email.EmailComposer = function(config) {
 						selectMultiple: function(ids) {
 							var me = this, v = me.toCombo.getValue();
 							
-							go.Db.store("Contact").get(ids).then(function(contacts) {										
-								contacts.forEach(function(contact) {
+							go.Db.store("Contact").get(ids).then(function(result) {										
+								result.entities.forEach(function(contact) {
 									if(!go.util.empty(v)) {
 										v += ", ";
 									}							

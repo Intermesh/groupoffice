@@ -187,8 +187,13 @@ class File extends FileSystemObject {
 		return file_get_contents($this->getPath());
 	}
 
+	/**
+	 * Alias for getContentType()
+	 * 
+	 * @see getContentType()
+	 */
 	public function getMimeType() {
-		return mime_content_type($this->getPath());
+		return $this->getContentType();
 	}
 	
 	/**

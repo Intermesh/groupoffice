@@ -14,7 +14,7 @@ go.links.LinkGrid = Ext.extend(go.grid.GridPanel, {
 				renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 					var linkIconCls = go.Entities.getLinkIcon(record.data.entity, record.data.filter);
 					
-					return '<i class="entity ' + linkIconCls + '"></i> ' + value;
+					return '<i class="entity ' + linkIconCls + '"></i><small class="go-top-right">' + go.util.Format.shortDateTime(record.get('modifiedAt')) + '</small> ' + value;
 				}
 			},{
 				id: 'id',

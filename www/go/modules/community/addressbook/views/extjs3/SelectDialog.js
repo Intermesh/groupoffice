@@ -242,13 +242,7 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 	
 	selectEmail : function(record, e) {
 		var emails = record.get("emailAddresses");
-					
-		// if(emails.length === 1) {
-		// 	this.selectSingle.call(this.scope, record.get("name"), emails[0].email, record.get("id"));
-		// 	this.close();
-		// 	return;
-		// }
-
+				
 		var me = this,  items = emails.map(function(a) {
 			return {
 				data: {
@@ -258,7 +252,7 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 				},
 				text: "<div>" + a.email + "</div><small>" +  this.labels[a.type] + "</div>",
 				handler: function() {
-					me.selectSingle.call(me.scope, this.data.name, this.data.email, this.data.id);
+					me.selectSingleEmail.call(me.scope, this.data.name, this.data.email, this.data.id);
 					me.close();
 				}
 			};

@@ -1,22 +1,15 @@
 go.data.GroupingStore = Ext.extend(Ext.data.GroupingStore, {
 	
-	entityStore: null,
-	
 	autoDestroy: true,
-	
-	/**
-	 * true when load or loaddata has been called.
-	 * 
-	 * @var bool
-	 */
-	loaded : false,
-	
-	loading : false,
 	
 	constructor: function (config) {
 		
 		config = config || {};
 		config.root = "records";
+
+		Ext.applyIf(this, go.data.StoreTrait);
+		
+		this.addCustomFields(config);
 		
 		go.data.GroupingStore.superclass.constructor.call(this, Ext.apply(config, {
 			paramNames: {
@@ -32,10 +25,38 @@ go.data.GroupingStore = Ext.extend(Ext.data.GroupingStore, {
 		this.setup();
 		
 	},
-	setup : go.data.Store.prototype.setup,	
-	initEntityStore : go.data.Store.prototype.initEntityStore,	
-	onChanges : go.data.Store.prototype.onChanges,	
-	updateRecord : go.data.Store.prototype.updateRecord,
-	destroy : go.data.Store.prototype.destroy
-});
 
+	loadData : function(o, append){
+		var old = this.loading;
+		this.loading = true;
+			
+		if(this.proxy instanceof go.data.EntityStoreProxy) {
+			this.proxy.preFetchEntities(o.records, function() {
+				go.data.GroupingStore.superclass.loadData.call(this, o, append);	
+				this.loading = old;		
+			}, this);
+		} else
+		{
+			go.data.GroupingStore.superclass.loadData.call(this, o, append);	
+			this.loading = old;
+		}
+	},
+
+	sort : function(fieldName, dir) {
+		//Reload first page data set on sort
+		if(this.lastOptions && this.lastOptions.params) {
+			this.lastOptions.params.position = 0;
+			this.lastOptions.add = false;
+		}
+		
+		return go.data.GroupingStore.superclass.sort.call(this, fieldName, dir);
+	},
+
+	destroy : function() {	
+		this.fireEvent('beforedestroy', this);
+		
+		go.data.GroupingStore.superclass.destroy.call(this);
+		
+		this.fireEvent('destroy', this);
+	}
+});

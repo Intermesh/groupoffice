@@ -2,6 +2,7 @@
 
 namespace GO\Email\Model;
 
+use GO\Base\Model\Template;
 
 class DefaultTemplateForAccount extends \GO\Base\Db\ActiveRecord {
 	

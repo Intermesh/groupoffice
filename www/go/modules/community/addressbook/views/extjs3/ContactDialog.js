@@ -155,7 +155,13 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 					this.addressBook = new go.modules.community.addressbook.AddresBookCombo({
 						anchor: '-20',
 						value: go.User.addressBookSettings ? go.User.addressBookSettings.defaultAddressBookId : null,
-						allowBlank: false
+						allowBlank: false,
+						listeners: {
+							scope: this,
+							change: function() {
+								go.customfields.CustomFields.filterFieldSets(this.formPanel);
+							}
+						}
 					})
 
 				]

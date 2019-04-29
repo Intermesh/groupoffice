@@ -12,6 +12,8 @@
 
 go.grid.EditorGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {	
 
+	autoExpandMin: dp(200),
+	
 	initComponent: function () {
 		go.grid.EditorGridPanel.superclass.initComponent.call(this);
 		
