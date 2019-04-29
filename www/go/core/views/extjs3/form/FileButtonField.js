@@ -140,7 +140,7 @@ go.form.FileButtonField = Ext.extend(Ext.form.CompositeField,{
 	},
 	
 	getRawValue: function(){
-		return !this.idOnly ? this.blob : this.hiddenField.getValue();
+		return !this.idOnly ? this.blob : this.hiddenField.getValue() || null;
 	},
 	
 	disable : function(silent){
