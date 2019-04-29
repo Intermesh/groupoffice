@@ -527,8 +527,8 @@ class User extends Entity {
 	protected function internalSave() {
 		
 		if(isset($this->plainPassword)) {
-			$this->password = password_hash($this->plainPassword, PASSWORD_DEFAULT);
-			$this->updateDigest($this->plainPassword);
+			$this->password = $this->passwordHash($this->plainPassword);
+			$this->updateDigest();
 		}
 		
 		
@@ -541,6 +541,16 @@ class User extends Entity {
 		$this->saveContact();
 		
 		return true;		
+	}
+	
+	/**
+	 * Hash a password for users
+	 * 
+	 * @param string $password
+	 * @return string
+	 */
+	public static function passwordHash($password) {
+		return password_hash($password, PASSWORD_DEFAULT);
 	}
 	
 	private function saveContact() {

@@ -453,25 +453,30 @@ abstract class Property extends Model {
 	private static function joinAdditionalTables(array $tables, Query $query) {
 		$first = array_shift($tables);
 
+		$alias = $first->getAlias();
 		foreach ($tables as $joinedTable) {
-			static::joinTable($joinedTable, $query);
+			static::joinTable($alias, $joinedTable, $query);
+			$alias = $joinedTable->getAlias();
 		}
 	}
 	
-	private static function joinTable(MappedTable $joinedTable, Query $query) {
+	private static function joinTable($lastAlias, MappedTable $joinedTable, Query $query) {
 		foreach ($joinedTable->getKeys() as $from => $to) {
 			if (!isset($on)) {
 				$on = "";
 			} else {
 				$on .= " AND ";
 			}
-
-			//find the alias. The default table in the column is not a mapped table
-			$fromTableName = static::getMapping()->getColumn($from)->getTable()->getName();				
-			//So we fetch the mapped table to get the alias
-			$fromAlias = static::getMapping()->getTable($fromTableName)->getAlias();
-			$on .= $fromAlias . "." . $from . ' = ';
-			$on .= $joinedTable->getAlias() . "." . $to;
+			
+			if(strpos($from, '.') === false) {
+				$from = $lastAlias . "." . $from;
+			}
+			
+			if(strpos($to, '.') === false) {
+				$to = $joinedTable->getAlias() . "." . $to;
+			}
+	
+			$on .= $from . ' = ' . $to;
 		}
 
 		if($joinedTable->isUserTable) {
@@ -608,6 +613,24 @@ abstract class Property extends Model {
 		}
 		
 		$modified = $this->getModified();				
+		
+		// make sure auto incremented values come first
+		$tables = $this->getMapping()->getTables();
+		usort($tables, function(\go\core\db\Table $a, \go\core\db\Table $b) {
+			$aHasAI = $a->getAutoIncrementColumn();
+			$bHasAI = $b->getAutoIncrementColumn();
+			if($aHasAI && !$bHasAI) {
+				return -1;
+			}
+			
+			if($bHasAI && !$aHasAI) {
+				return 1;
+			}
+			
+			return 0;
+			
+		});
+		
 		foreach ($this->getMapping()->getTables() as $table) {			
 			if (!$this->saveTable($table, $modified)) {				
 				return false;
@@ -923,7 +946,6 @@ abstract class Property extends Model {
 //				}				
 			}
 		} catch (PDOException $e) {
-			
 			$uniqueKey = \go\core\db\Utils::isUniqueKeyException($e);
 			if ($uniqueKey) {				
 				$this->setValidationError($uniqueKey, ErrorCode::UNIQUE);				
