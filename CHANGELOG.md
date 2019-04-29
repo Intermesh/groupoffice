@@ -1,3 +1,6 @@
+29-04-2019 6.3.71
+- Core: Fixed search caching error
+
 25-04-2019 6.3.70
 
 - Core: Improved logging of JSON parse errors in JMAP API
