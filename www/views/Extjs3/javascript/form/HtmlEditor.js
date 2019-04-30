@@ -58,8 +58,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		if(!e.dataTransfer.files) {
 			return;
 		}
-		for (var i = 0, l = e.dataTransfer.files.length; i < l; i++) {
-			var file = e.dataTransfer.files[i];
+		Array.from(e.dataTransfer.files).forEach(function(file) {   
 			go.Jmap.upload(file, {
 				scope: this,
 				success: function(response) {
@@ -67,13 +66,13 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 					if (file.type.match(/^image\//)) {
 						domId = Ext.id(), img = '<img id="' + domId + '" src="' + go.Jmap.downloadUrl(response.blobId) + '" alt="' + file.name + '" />';
 						this.insertAtCursor(img);
-						var imgEl = this.getDoc().getElementById(domId);
+						imgEl = this.getDoc().getElementById(domId);
 					} 
 
 					this.fireEvent('attach', this, response.blobId, file, imgEl);
 				}
 			});
-		}
+		}, this);
 		
 	},
 

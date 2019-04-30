@@ -242,3 +242,17 @@ $app-icons: (
 		}
 	}
 }
+
+
+.go-attachments {
+	span {
+		cursor: pointer;
+
+		&.x-view-selected {
+			background-color: color($bg, 'selected');
+		}
+		&.x-view-over {
+			background-color: color($bg, 'hover');
+		}
+	}
+}

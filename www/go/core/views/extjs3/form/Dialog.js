@@ -16,6 +16,12 @@ go.form.Dialog = Ext.extend(go.Window, {
 	currentId: null,
 	buttonAlign: 'left',
 	layout: "fit",
+
+
+	/**
+	 * Layout of the automatically created form panel
+	 */
+	formPanelLayout: "form",
 	
 	/**
 	 * Redirect to the entity detail view after save.
@@ -81,7 +87,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 	createFormPanel : function() {
 		
 		var items = this.initFormItems() || [];
-		var layout = 'form';
+		var layout = this.formPanelLayout;
 		
 		this.addCustomFields(items);
 		
@@ -132,7 +138,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 		if(items.length) {
 			this.panels.unshift(new Ext.Panel({
 				title: t("General"),
-				layout: 'form',
+				layout: this.formPanelLayout,
 				autoScroll: true,
 				items: items
 			}));

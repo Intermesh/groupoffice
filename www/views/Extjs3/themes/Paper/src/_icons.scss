@@ -313,18 +313,19 @@ $filetype: (
 }
 
 .filetype {
-	background-size: contain;
+	background-size: dp(24) dp(24);
+	background-position: dp(8) dp(8);
 	background-image:url(img/filetype/unknown.svg);
 	background-repeat: no-repeat;
-	&-link {
-		background-size: contain;
+	&-link {		
+
+		background-size: dp(24) dp(24);
+		background-position: dp(8) dp(8);
 		background-image:url(img/filetype/unknown.svg);
 		background-repeat: no-repeat;
-		background-position: top left;
 		white-space: nowrap;		
-		padding-left: dp(32);		
 		line-height: dp(24);
-		margin: dp(8) dp(16) dp(8) 0;
+		padding: dp(8) dp(16) dp(8) dp(40);
 		display: inline-block;
 	}
 }

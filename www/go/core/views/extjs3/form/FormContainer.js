@@ -1,3 +1,11 @@
+/**
+ * FormContainer
+ * 
+ * A form container is a group of fields that acts like a single form field. 
+ * It returns an object with all it's child form fields a members.
+ * 
+ * See also FormGroup for returning an array.
+ */
 go.form.FormContainer = Ext.extend(Ext.Container, {
 	layout: "form",
 
@@ -115,7 +123,7 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 
 				v[f.getName()] = val;
 			}
-		}
+		};
 
 		this.getAllFormFields().forEach(fn, this);
 
