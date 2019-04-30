@@ -50,5 +50,27 @@ class Statement extends \PDOStatement implements \JsonSerializable {
 	public function __toString() {
 		return QueryBuilder::debugBuild($this->build);
 	}
+
+	/**
+	 * Executes a prepared statement
+	 * 
+	 * @param $input_parameters An array of values with as many elements as there are bound parameters in the SQL statement being executed. All values are treated as PDO::PARAM_STR.
+	 * 
+	 * Multiple values cannot be bound to a single parameter; for example, it is not allowed to bind two values to a single named parameter in an IN() clause.
+	 * 
+	 * Binding more values than specified is not possible; if more keys exist in input_parameters than in the SQL specified in the PDO::prepare(), then the statement will fail and an error is emitted.
+	 * 
+	 * @return bool
+	 */
+	public function execute($input_parameters = null)
+	{
+		try {
+			return parent::execute($input_parameters);
+		}
+		catch(\Exception $e) {
+			GO()->error("SQL FAILURE: " . $this);
+			throw $e;
+		}
+	}
 	
 }
