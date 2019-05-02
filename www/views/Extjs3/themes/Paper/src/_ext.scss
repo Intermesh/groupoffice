@@ -364,6 +364,15 @@
 			border-radius: 0;
 			border-left: 1px solid color($fg, 'line');
 		}
+		
+		&[readonly] {
+			background-color: color($bg, 'readonly');
+		}
+		
+		&.x-triggerfield-selectonly {
+			background-color:color($bg, 'box');
+		}
+		
 	}
 	&-text, textarea.x-form-field {
 		@extend %font-data;
