@@ -23,7 +23,7 @@ go.search.SearchCombo = Ext.extend(go.form.ComboBox, {
 				entityStore: "Search",
 				baseParams: {
 					filter: {
-							permissionLevel: GO.permissionLevels.write
+							permissionLevel: go.permissionLevels.write
 					},
 					limit: 20
 				}

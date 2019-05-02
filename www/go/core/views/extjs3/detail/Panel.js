@@ -170,6 +170,25 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		this.entityStore.get([id], function(entities) {
 			this.internalLoad(entities[0]);
 		}, this);
+	},
+
+	addCustomFields : function() {
+		return this.add(go.customfields.CustomFields.getDetailPanels(this.entityStore.entity.name));
+	},
+
+	addLinks : function() {
+		return this.add(new go.links.getDetailPanels());
+	},
+
+	addComments : function() {
+		if (go.Modules.isAvailable("legacy", "comments")) {
+			return this.add(new go.modules.comments.CommentsDetailPanel());
+		}
+	},
+	addFiles : function() {
+		if (go.Modules.isAvailable("legacy", "files")) {
+			return this.add(new go.modules.files.FilesDetailPanel());
+		}
 	}
 });
 

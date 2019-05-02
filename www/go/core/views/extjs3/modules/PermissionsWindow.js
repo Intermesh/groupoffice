@@ -4,14 +4,14 @@ go.modules.PermissionsWindow = Ext.extend(GO.Window,{
 	initComponent : function(){
 		
 		var levelLabels={};
-		levelLabels[GO.permissionLevels.read]=t("Use", "users");
-		levelLabels[GO.permissionLevels.manage]=t("Manage", "users");
+		levelLabels[go.permissionLevels.read]=t("Use", "users");
+		levelLabels[go.permissionLevels.manage]=t("Manage", "users");
 		
 		this.permissionsTab = new GO.grid.PermissionsPanel({
 					title : t("Use", "users"),
 					levels:[
-						GO.permissionLevels.read,
-						GO.permissionLevels.manage
+						go.permissionLevels.read,
+						go.permissionLevels.manage
 					],
 					levelLabels:levelLabels
 				});

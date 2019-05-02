@@ -28,7 +28,7 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 				baseParams: {
 					filter: {
 						addressBookId: this.addressBookId,
-						permissionLevel: this.permissionLevel || GO.permissionLevels.write			
+						permissionLevel: this.permissionLevel || go.permissionLevels.write			
 					}
 				}
 			})

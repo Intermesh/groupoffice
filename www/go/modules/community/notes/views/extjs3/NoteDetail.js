@@ -1,10 +1,10 @@
 /* global go, Ext, GO, mcrypt */
 
 go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
+	
 	entityStore: "Note",
-	stateId: 'no-notes-detail',
 
-	//model_name: "go\\modules\\community\\notes\\model\\Note", //only for backwards compatibility with older panels.
+	stateId: 'no-notes-detail',
 
 	initComponent: function () {
 
@@ -24,13 +24,10 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 
 		go.modules.community.notes.NoteDetail.superclass.initComponent.call(this);
 
-		this.add(go.customfields.CustomFields.getDetailPanels("Note"));
-		this.add(go.links.getDetailPanels());
-		
-
-		if (go.Modules.isAvailable("legacy", "files")) {
-			this.add(new go.modules.files.FilesDetailPanel());
-		}
+		this.addCustomFields();
+		this.addLinks();
+		//this.addComments();
+		this.addFiles();
 	},
 
 	decrypt: function () {
@@ -89,8 +86,8 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 
 		this.decrypt();
 
-		this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < GO.permissionLevels.write);
-		this.deleteItem.setDisabled(this.data.permissionLevel < GO.permissionLevels.writeAndDelete);
+		this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < go.permissionLevels.write);
+		this.deleteItem.setDisabled(this.data.permissionLevel < go.permissionLevels.writeAndDelete);
 
 		go.modules.community.notes.NoteDetail.superclass.onLoad.call(this);
 	},

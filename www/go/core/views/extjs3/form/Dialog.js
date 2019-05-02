@@ -247,7 +247,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 	
 	onLoad : function(entityValues) {
 		this.fireEvent("load", this, entityValues);
-//		this.deleteBtn.setDisabled(this.formPanel.entity.permissionLevel < GO.permissionLevels.writeAndDelete);
+//		this.deleteBtn.setDisabled(this.formPanel.entity.permissionLevel < go.permissionLevels.writeAndDelete);
 	},
 
 	onSubmit: function (success, serverId) {

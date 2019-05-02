@@ -80,7 +80,7 @@ go.Modules = (function () {
 			}
 
 			if (!config.requiredPermissionLevel) {
-				config.requiredPermissionLevel = GO.permissionLevels.read;
+				config.requiredPermissionLevel = go.permissionLevels.read;
 			}
 
 			if (config.mainPanel) {
@@ -116,7 +116,7 @@ go.Modules = (function () {
 		isAvailable: function (package, name, permissionLevel) {
 			
 			if(!Ext.isDefined(permissionLevel)) {
-				permissionLevel = GO.permissionLevels.read;
+				permissionLevel = go.permissionLevels.read;
 			}
 
 			if (!package) {

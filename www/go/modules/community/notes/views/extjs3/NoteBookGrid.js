@@ -126,9 +126,9 @@ go.modules.community.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 			})
 		}
 		
-		this.moreMenu.getComponent("edit").setDisabled(record.get("permissionLevel") < GO.permissionLevels.manage);
-		this.moreMenu.getComponent("share").setDisabled(record.get("permissionLevel") < GO.permissionLevels.manage);
-		this.moreMenu.getComponent("delete").setDisabled(record.get("permissionLevel") < GO.permissionLevels.manage);
+		this.moreMenu.getComponent("edit").setDisabled(record.get("permissionLevel") < go.permissionLevels.manage);
+		this.moreMenu.getComponent("share").setDisabled(record.get("permissionLevel") < go.permissionLevels.manage);
+		this.moreMenu.getComponent("delete").setDisabled(record.get("permissionLevel") < go.permissionLevels.manage);
 		
 		this.moreMenu.record = record;
 		
