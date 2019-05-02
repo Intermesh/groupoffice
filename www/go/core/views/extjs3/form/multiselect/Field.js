@@ -43,7 +43,7 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 
 	autoHeight: true,	
 	
-	cls: 'go-grid3-hide-headers',
+	hideHeaders: true,
 
 	constructor: function (config) {
 

@@ -9,7 +9,7 @@ go.filter.FilterGrid = Ext.extend(go.grid.GridPanel, {
 	
 	entity: null,
 	
-	cls: 'go-grid3-hide-headers',
+	hideHeaders: true,
 
 	initComponent: function () {
 

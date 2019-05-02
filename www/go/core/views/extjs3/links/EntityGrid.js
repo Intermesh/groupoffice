@@ -10,7 +10,7 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 		forceFit: true,
 		autoFill: true
 	},
-	cls: 'go-grid3-hide-headers',
+	hideHeaders: true,
 	
 	savedSelection: false,
 

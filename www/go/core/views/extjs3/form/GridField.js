@@ -7,7 +7,8 @@ go.form.GridField = Ext.extend(Ext.grid.EditorGridPanel, {
 		deferEmptyText: false
 	},
 	
-	cls: 'go-grid3-hide-headers go-grid3-form-field',
+	cls: 'go-grid3-form-field',
+	hideHeaders: true,
 	clicksToEdit: 1,
 	initComponent: function () {
 

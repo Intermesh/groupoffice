@@ -4,7 +4,7 @@ go.modules.community.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 		forceFit: true,
 		autoFill: true
 	},
-
+	hideHeaders: true,
 	initComponent: function () {
 
 		var actions = this.initRowActions();

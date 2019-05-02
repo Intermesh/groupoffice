@@ -3,7 +3,7 @@ go.search.Panel = Ext.extend(Ext.Panel, {
 	height: dp(500),
 	initComponent: function () {
 		this.grid = new go.links.LinkGrid({
-			cls: 'go-grid3-hide-headers',
+			hideHeaders: true,
 			region: "center",
 			listeners: {
 				click: function () {
