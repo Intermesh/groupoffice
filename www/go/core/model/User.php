@@ -542,7 +542,7 @@ class User extends Entity {
 		if(!isset($this->contact->emailAddresses[0])) {
 			$this->contact->emailAddresses = [(new \go\modules\community\addressbook\model\EmailAddress())->setValues(['email' => $this->email])];
 		}
-		if(!isset($contact->name) || $this->isModified(['displayName'])) {
+		if(!isset($this->contact->name) || $this->isModified(['displayName'])) {
 			$this->contact->name = $this->displayName;
 			$parts = explode(' ', $this->displayName);
 			$this->contact->firstName = array_shift($parts);
