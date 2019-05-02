@@ -141,6 +141,26 @@ GO.email.EmailComposer = function(config) {
 	});
 
 
+	var fillMultipleRecipients = function(combo, ids) {
+		var me = this, v = combo.getValue();
+							
+		go.Db.store("Contact").get(ids).then(function(result) {										
+			result.entities.forEach(function(contact) {
+				if(!go.util.empty(v)) {
+					v += ", ";
+				}							
+				v += '"' + contact.name.replace(/"/g, '\\"') + '" <' + contact.emailAddresses[0].email + '>';							
+				combo.setValue(v);
+			});
+		});	
+	}, fillSingleRecipient = function(combo, name, email, id) {
+		var v = combo.getValue();
+		if(!go.util.empty(v)) {
+			v += ", ";
+		}	
+		v += '"' + name.replace(/"/g, '\\"') + '" <' + email + '>';							
+		combo.setValue(v);
+	};
 
 
 	var items = [
@@ -175,26 +195,13 @@ GO.email.EmailComposer = function(config) {
 				handler: function() {
 					var select = new go.modules.community.addressbook.SelectDialog ({
 						scope: this,
+						
 						selectSingleEmail: function(name, email, id) {
-							var v = this.toCombo.getValue();
-							if(!go.util.empty(v)) {
-								v += ", ";
-							}	
-							v += '"' + name.replace(/"/g, '\\"') + '" <' + email + '>';							
-							this.toCombo.setValue(v);
+							fillSingleRecipient(this.toCombo, name, email, id);							
 						},
+
 						selectMultiple: function(ids) {
-							var me = this, v = me.toCombo.getValue();
-							
-							go.Db.store("Contact").get(ids).then(function(result) {										
-								result.entities.forEach(function(contact) {
-									if(!go.util.empty(v)) {
-										v += ", ";
-									}							
-									v += '"' + contact.name.replace(/"/g, '\\"') + '" <' + contact.emailAddresses[0].email + '>';							
-									me.toCombo.setValue(v);
-								});
-							});							
+							fillMultipleRecipients(this.toCombo, ids);
 						}
 					});
 					select.show();
@@ -217,14 +224,13 @@ GO.email.EmailComposer = function(config) {
 				handler: function() {
 					var select = new go.modules.community.addressbook.SelectDialog ({
 						scope: this,
-						handler: function(name, email) {
-							var v = this.ccCombo.getValue();
-							
-							if(!go.util.empty(v)) {
-								v += ", ";
-							}							
-							v += '"' + name.replace(/"/g, '\\"') + '" <' + email + '>';							
-							this.ccCombo.setValue(v);
+						
+						selectSingleEmail: function(name, email, id) {
+							fillSingleRecipient(this.ccCombo, name, email, id);							
+						},
+
+						selectMultiple: function(ids) {
+							fillMultipleRecipients(this.ccCombo, ids);
 						}
 					});
 					select.show();
@@ -248,14 +254,13 @@ GO.email.EmailComposer = function(config) {
 				handler: function() {
 					var select = new go.modules.community.addressbook.SelectDialog ({
 						scope: this,
-						handler: function(name, email) {
-							var v = this.bccCombo.getValue();
-							
-							if(!go.util.empty(v)) {
-								v += ", ";
-							}							
-							v += '"' + name.replace(/"/g, '\\"') + '" <' + email + '>';							
-							this.bccCombo.setValue(v);
+						
+						selectSingleEmail: function(name, email, id) {
+							fillSingleRecipient(this.bccCombo, name, email, id);							
+						},
+
+						selectMultiple: function(ids) {
+							fillMultipleRecipients(this.bccCombo, ids);
 						}
 					});
 					select.show();
