@@ -1,3 +1,5 @@
+- Core: Fixed displaying of readonly form fields, added class to triggerfield to make readonly correctly visible for drop down fields
+
 25-04-2019 6.3.70
 
 - Core: Improved logging of JSON parse errors in JMAP API
