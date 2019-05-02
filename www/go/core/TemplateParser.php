@@ -35,6 +35,8 @@ use function GO;
  * $tpl = 'Hi {{user.username}},'
  *						. '{{#if test.foo}}'."\n"
  *						. 'Your e-mail {{#if now|date:Y == 2018}} is {{/if}} {{user.email}}'."\n"
+ *						. '{{#else}}'
+ *            . 'Hello'
  *						. '{{/if}}'
  *						. ''
  *						. '{{#each emailAddress in user.contact.emailAddresses}}'
@@ -68,9 +70,20 @@ use function GO;
  *   {{/if}}
  * {{/each}}
  * 
- * {{#first emailAddress in contact.emailAddresses | filter:type:"billing"}}
- *     {{emailAddress.email}}
- * {{/first}}
+ * @example Print billing address if available, else print first.
+ * {{#if contact.emailAddresses | filter:type:"billing" | count > 0}}
+ *  {{contact.emailAddresses | filter:type:"billing"}}
+ * {{#else}}
+ *  {{contact.emailAddresses}}
+ * {{/if}}
+ * 
+ * 
+ * {{contact.emailAddresses}} 
+ * 
+ * ::::::TODO::::::
+ * 
+ * {{contact.emailAddresses[type=billing] ?? contact.emailAddresses ?? "-"}}
+ *  
  * ``````````````````
  
  */
@@ -83,6 +96,7 @@ class TemplateParser {
 		$this->addFilter('date', [$this, "filterDate"]);		
 		$this->addFilter('number', [$this, "filterNumber"]);
 		$this->addFilter('filter', [$this, "filterFilter"]);
+		$this->addFilter('count', [$this, "filterCount"]);
 		
 		$this->addModel('now', new DateTime());
 		$this->addModel("user", GO()->getAuthState()->getUser());
@@ -113,6 +127,10 @@ class TemplateParser {
 		return array_filter($array, function($i) use($propValue){
 			return $i == $propValue;
 		});
+	}
+
+	private function filterCount($countable) {
+		return count($countable);
 	}
 	
 	/**
@@ -249,10 +267,11 @@ class TemplateParser {
 		
 		$replaced .= substr($str, $offset);
 		
-		preg_match_all('/\{\{(.*?)\}\}/', $replaced, $matches);		
-		preg_match_all('/{{.*}}/', $replaced, $matches);
+		// preg_match_all('/\{\{(.*?)\}\}/', $replaced, $matches);		
+		// preg_match_all('/{{.*}}/', $replaced, $matches);
 				
 		$replaced = preg_replace_callback('/{{.*?}}/', [$this, 'replaceVar'], $replaced);
+		//$replaced = preg_replace_callback('/{{[^}]*}}/', [$this, 'replaceVar'], $replaced);		
 		
 //		echo "\n--- Result:\n";
 //		var_dump($replaced);
@@ -304,13 +323,19 @@ class TemplateParser {
 		
 		$parsed = $this->parse($tag['expression']);		
 		$expression = $this->validateExpression($parsed);
+
+		// var_dump($parsed);
+		//var_dump($expression);
+
+		$tpls = explode('{{#else}}', $tag['tpl']);
 		
+
 		$ret = eval($expression);	
 		if($ret){
-			$tag['replacement'] = $this->parse($tag['tpl']);
+			$tag['replacement'] = $this->parse($tpls[0]);
 		}else
 		{
-			$tag['replacement'] = '';
+			$tag['replacement'] = isset($tpls[1]) ? $this->parse($tpls[1]) : "";
 		}
 		
 		return $tag;
@@ -337,7 +362,7 @@ class TemplateParser {
 		foreach($parts as $part) {
 			
 			if($part == ';') {
-				throw new Exception('; not allowed in expressions');
+				throw new Exception('; not allowed in expression: ' . $expression);
 			}
 			
 			if(
@@ -370,13 +395,20 @@ class TemplateParser {
 	}
 	
 	private function isString ($str) {
-		return preg_match('/"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"/s', $str);
+		return preg_match('/"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"/s', $str) || preg_match("/'[^'\\\\]*(?:\\\\.[^'\\\\]*)*'/s", $str);
 	}
 
 	private function replaceVar($matches) {		
 		GO()->debug('replaceVar('.$matches[0].')');
 		$str = substr($matches[0], 2, -2);		
-		return $this->getVarFiltered($str);
+		$value =  $this->getVarFiltered($str);
+
+		//If replace value is array use first value for convenience
+		if(is_array($value)) {
+			return array_shift($value);
+		}
+
+		return $value;
 	}
 	
 	private function getVarFiltered($expression) {
@@ -391,6 +423,10 @@ class TemplateParser {
 			$args = array_map('trim', str_getcsv($filter, ':', '"'));
 			$filterName = array_shift($args);
 			array_unshift($args, $value);
+
+			if(!isset($this->filters[$filterName])) {
+				throw new \Exception("Filter '" . $filterName . "' is undefined");
+			}
 			
 			$value = call_user_func_array($this->filters[$filterName], $args);
 		}
@@ -429,7 +465,7 @@ class TemplateParser {
 	
 	private function getVar($path) {
 		
-		GO()->debug('getVar('.trim($path).')');
+		// var_dump('getVar('.trim($path).')');
 		$pathParts = explode(".", trim($path)); //eg "contact.name"		
 
 		$model = $this;
@@ -449,6 +485,8 @@ class TemplateParser {
 			}
 			
 		}
+
+		// var_dump($model);
 
 		return $model;
 	}

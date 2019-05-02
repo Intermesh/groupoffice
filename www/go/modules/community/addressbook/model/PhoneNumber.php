@@ -49,4 +49,9 @@ class PhoneNumber extends Property {
 						->addTable("addressbook_phone_number");
 	}
 
+	//For easier usage in templates
+	public function __toString () {
+		return $this->number;
+	}
+
 }

@@ -46,4 +46,9 @@ class EmailAddress extends Property {
 						->addTable("addressbook_email_address");
 	}
 
+	//For easier usage in templates
+	public function __toString () {
+		return $this->email;
+	}
+
 }
