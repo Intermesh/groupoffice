@@ -2,7 +2,6 @@
 
 namespace go\core;
 
-use DateTime as DateTime2;
 use Exception;
 use go\core\util\DateTime;
 use stdClass;
@@ -33,15 +32,15 @@ use function GO;
  * 
  * `````````````````````````````````````````````````````````````````````````````
  * $tpl = 'Hi {{user.username}},'
- *						. '{{#if test.foo}}'."\n"
- *						. 'Your e-mail {{#if now|date:Y == 2018}} is {{/if}} {{user.email}}'."\n"
- *						. '{{#else}}'
+ *						. '[if {{test.foo}}]'."\n"
+ *						. 'Your e-mail [if {{now|date:Y}} == 2018] is [/if] {{user.email}}'."\n"
+ *						. '[else]'
  *            . 'Hello'
- *						. '{{/if}}'
+ *						. '[/if]'
  *						. ''
- *						. '{{#each emailAddress in user.contact.emailAddresses}}'
+ *						. '[each emailAddress in user.contact.emailAddresses]'
  *						. '{{emailAddress.email}} type: {{emailAddress.type}}'."\n"
- *						. "{{/each}}";
+ *						. "[/each]";
  *		
  *		$tplParser = new \go\core\TemplateParser();
  *		$tplParser->addModel('test', ['foo' => 'bar'])
@@ -55,27 +54,27 @@ use function GO;
  * `````````````````````````````````````````````````````````````````````````````
  * {{contact.name}}
  * 
- * {{#each address in contact.addresses}}
- *   {{#if address.type=="billing"}}
+ * [each address in contact.addresses]
+ *   [if {{address.type}} == "billing"]
  *     {{address.formatted}}
- *   {{/if}}
- * {{/each}}
+ *   [/if]
+ * [/each]
  * ````````````````````````````````````````````````````````````````````````````
  * 
  * @example iterate through filtered array and only write first match using "eachIndex"
  * ````````````````````````````````````````````````````````````````````````````
- * {{#each emailAddress in contact.emailAddresses | filter:type:"billing"}}
- *   {{#if eachIndex == 1}}
+ * [each emailAddress in contact.emailAddresses | filter:type:"billing"]
+ *   [if eachIndex == 1]
  *     {{emailAddress.email}}
- *   {{/if}}
- * {{/each}}
+ *   [/if]
+ * [/each]
  * 
  * @example Print billing address if available, else print first.
- * {{#if contact.emailAddresses | filter:type:"billing" | count > 0}}
+ * [if {{contact.emailAddresses | filter:type:"billing" | count}} > 0]
  *  {{contact.emailAddresses | filter:type:"billing"}}
- * {{#else}}
+ * [else]
  *  {{contact.emailAddresses}}
- * {{/if}}
+ * [/if]
  * 
  * 
  * {{contact.emailAddresses}} 
@@ -91,6 +90,10 @@ class TemplateParser {
 	
 
 	private $models = [];
+
+	public $encloseVars = false;
+
+	public $enableBlocks = true;
 	
 	public function __construct() {
 		$this->addFilter('date', [$this, "filterDate"]);		
@@ -99,12 +102,10 @@ class TemplateParser {
 		$this->addFilter('count', [$this, "filterCount"]);
 		
 		$this->addModel('now', new DateTime());
-		$this->addModel("user", GO()->getAuthState()->getUser());
-		
-		
+		$this->addModel("user", GO()->getAuthState()->getUser());	
 	}
 	
-	private function filterDate(DateTime2 $date = null, $format = null) {
+	private function filterDate(DateTime $date = null, $format = null) {
 			
 		if(!isset($date)) {
 			return "";
@@ -124,9 +125,12 @@ class TemplateParser {
 	}
 	
 	private function filterFilter($array, $propName, $propValue) {
-		return array_filter($array, function($i) use($propValue){
-			return $i == $propValue;
+		
+		$filtered = array_filter($array, function($i) use($propValue, $propName){
+			return $i->$propName == $propValue;
 		});
+
+		return $filtered;
 	}
 
 	private function filterCount($countable) {
@@ -146,8 +150,8 @@ class TemplateParser {
 	
 	private function findBlocks($str) {
 			
-		preg_match_all('/\n?{{#(each|if)([^}]+)}}\n?/s', $str, $openMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
-		preg_match_all('/{{\/(each|if)}}\n?/s', $str, $closeMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
+		preg_match_all('/\n?\[(each|if)([^\]]+)\]\n?/s', $str, $openMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
+		preg_match_all('/\[\/(each|if)\]\n?/s', $str, $closeMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		
 		$count = count($openMatches);
 		if($count != count($closeMatches)) {
@@ -219,17 +223,28 @@ class TemplateParser {
 		
 		return $tags;
 	}
-/*
-<br>&nbsp; - {{license.course.name}} {{#if license.expiresAt != null}}verloopt op {{license.expiresAt | date}}{{/if}}{{#if !license.expiresAt}}Nog niet behaald{{/if}}&nbsp;<br>
-  */
-	public function parse($str) {		
+	/**
+	 * Parse a template
+	 * 
+	 * @see __construct();
+	 * 
+	 * @param string $str
+	 * 
+	 * return string
+	 */
+	public function parse($str) {				
 		
-//		echo "\n--- Input:\n";
-//		var_dump($str);
-		
-		$tags = $this->findBlocks($str);
-		
-		
+		if($this->enableBlocks) {
+			$str = $this->parseBlocks($str);
+		} 
+
+		$str = preg_replace_callback('/{{.*?}}/', [$this, 'replaceVar'], $str);
+		return $str;
+	}	
+
+	private function parseBlocks($str) {
+		$tags = $this->findBlocks($str);		
+			
 		for($i = 0;$i < count($tags); $i++) {
 			if($tags[$i]['tagName'] == 'if') {
 				$tags[$i] = $this->replaceIf($tags[$i], $str);
@@ -239,64 +254,37 @@ class TemplateParser {
 			}
 		}
 		
-//		var_dump($tags);
 		$replaced = "";
 		$offset = 0;
 		foreach($tags as $tag) {
 			
-//			var_dump($tag);
-			
 			if($tag['offset'] > 0) {
 				$cut = substr($str, $offset, $tag['offset'] - $offset);
-//				echo "\n--- Cut:\n";
-//				var_dump($cut);
-//				var_dump($offset);
-//				var_dump($tag['offset']);
 				$replaced .= $cut;
 			}
-			
-//			echo "\n--- Replace:\n";
-//			var_dump(substr($str, $tag['offset'], $tag['close']['offset'] + $tag['close']['tagLength'] - $tag['offset']));
-//			echo "\n--- With:\n";
-//			var_dump($tag['replacement']);
-//			var_dump('------');
-//			
+
 			$replaced .=  $tag['replacement'];
 			$offset = $tag['close']['offset'] + $tag['close']['tagLength'];
 		}
 		
 		$replaced .= substr($str, $offset);
-		
-		// preg_match_all('/\{\{(.*?)\}\}/', $replaced, $matches);		
-		// preg_match_all('/{{.*}}/', $replaced, $matches);
-				
-		$replaced = preg_replace_callback('/{{.*?}}/', [$this, 'replaceVar'], $replaced);
-		//$replaced = preg_replace_callback('/{{[^}]*}}/', [$this, 'replaceVar'], $replaced);		
-		
-//		echo "\n--- Result:\n";
-//		var_dump($replaced);
-		
+
 		return $replaced;
 	}
 	
-	
 	private function replaceEach($tag, $str) {
-		
 		
 		//example emailAddress in contact.emailAddresses
 		$expressionParts = array_map('trim', explode(' in ', $tag['expression']));
-//		var_dump($expressionParts);
+
 		$array = $this->getVarFiltered($expressionParts[1]);	
 		
 		if(!is_array($array) && !($array instanceof Traversable)) {
 			$tag['replacement'] = "";
 			return $tag;
-//			throw new \Exception('Invalid '.$matches[1].' '.$expressionParts[1].' = '.var_export($array, true));
 		}
 		
-		$varName = trim($expressionParts[0]);
-		
-		
+		$varName = trim($expressionParts[0]);		
 		
 		$replacement = '';
 		$eachIndex = 0;
@@ -310,24 +298,23 @@ class TemplateParser {
 			$replacement .= $add;
 		}
 		
-		$tag['replacement'] = $replacement;
-		
-		return $tag;
-//		return substr($str, 0, $block['offset']) . $replacement . substr($str, $block['close']['offset'] + $block['close']['tagLength']);
-		
+		$tag['replacement'] = $replacement;		
+		return $tag;		
 	}
 
 	private static $tokens = ['==','!=','>','<', '(', ')', '&&', '||', '*', '/', '%', '-', '+'];
 
 	private function replaceIf($tag, $str) {
 		
+		$this->encloseVars = true;
+		$this->enableBlocks = false;
 		$parsed = $this->parse($tag['expression']);		
+		$this->encloseVars = false;
+		$this->enableBlocks = true;
+		
 		$expression = $this->validateExpression($parsed);
 
-		// var_dump($parsed);
-		//var_dump($expression);
-
-		$tpls = explode('{{#else}}', $tag['tpl']);
+		$tpls = explode('[else]', $tag['tpl']);
 		
 
 		$ret = eval($expression);	
@@ -345,8 +332,10 @@ class TemplateParser {
 	}
 	
 	private function validateExpression($expression) {
-		//split string into tokens. See http://stackoverflow.com/questions/5475312/explode-string-into-tokens-keeping-quoted-substr-intact
 		
+		$expression = html_entity_decode($expression);
+
+		//split string into tokens. See http://stackoverflow.com/questions/5475312/explode-string-into-tokens-keeping-quoted-substr-intact		
 		foreach(self::$tokens as $token) {			
 			$expression = str_replace($token, ' '.$token.' ', $expression);
 		}
@@ -371,15 +360,13 @@ class TemplateParser {
 							$part == 'true' ||
 							$part == 'false' ||
 							$part == 'null' ||
-							$part == '||' ||
-							$part == '&&' ||
 							in_array($part, self::$tokens) ||
 							$this->isString($part)											
 				) {
 				$str .= $part.' ';
 			}else
 			{
-				$str .= var_export($this->getVarFiltered($part), true).' ';
+				$str .= '"'. str_replace('"', '\"', $part) . '" ';
 			} 
 //			else
 //			{			
@@ -390,6 +377,8 @@ class TemplateParser {
 //		echo $str;
 //		exit();
 //		throw new \Exception($str);
+
+//return ("exit" ());
 		
 		return 'return ('.$str.');';
 	}
@@ -399,13 +388,17 @@ class TemplateParser {
 	}
 
 	private function replaceVar($matches) {		
-		GO()->debug('replaceVar('.$matches[0].')');
+		// GO()->debug('replaceVar('.$matches[0].')');
 		$str = substr($matches[0], 2, -2);		
 		$value =  $this->getVarFiltered($str);
 
 		//If replace value is array use first value for convenience
 		if(is_array($value)) {
 			return array_shift($value);
+		}
+
+		if($this->encloseVars) {
+			$value = '"' . str_replace('"', '\\"', $value) . '"';
 		}
 
 		return $value;
@@ -416,8 +409,7 @@ class TemplateParser {
 		
 		$varPath = trim(array_shift($filters)); //eg "contact.name";		
 		
-		$value = $this->getVar($varPath);
-		
+		$value = $this->getVar($varPath);		
 		foreach($filters as $filter) {
 			
 			$args = array_map('trim', str_getcsv($filter, ':', '"'));
@@ -427,8 +419,8 @@ class TemplateParser {
 			if(!isset($this->filters[$filterName])) {
 				throw new \Exception("Filter '" . $filterName . "' is undefined");
 			}
-			
 			$value = call_user_func_array($this->filters[$filterName], $args);
+
 		}
 		
 		return $value;
