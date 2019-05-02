@@ -115,7 +115,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 		this.dataView.store.each(function(r) {
 			this.dataView.store.remove(r);
 		}, this);
-		this._isDirty = false
+		this._isDirty = false;
 	},
 	
 	_isDirty: false,
@@ -129,6 +129,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 		if(this.entityStore) {	
 				this.entityStore.get(values, function (entities) {				
 					this.dataView.store.loadData({records: entities}, true);
+					this._isDirty = false;
 			}, this);
 		} else
 		{
@@ -140,9 +141,10 @@ go.form.Chips = Ext.extend(Ext.Container, {
 					me.dataView.store.add([me.comboStore.getAt(index)]);
 				}
 			});
+			this._isDirty = false;
 		}
 		
-		this._isDirty = false;
+		
 	},
 	getValue: function () {		
 		var records = this.dataView.store.getRange(), me = this, v = [];
