@@ -207,24 +207,24 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 
 		this.levelLabels = this.levelLabels || {};
 		
-		if(!this.levelLabels[GO.permissionLevels.read])
-			this.levelLabels[GO.permissionLevels.read] =t("Read only");
-		if(!this.levelLabels[GO.permissionLevels.create])
-			this.levelLabels[GO.permissionLevels.create] =t("Read and Create only");
-		if(!this.levelLabels[GO.permissionLevels.write])
-			this.levelLabels[GO.permissionLevels.write] =t("Write");
-		if(!this.levelLabels[GO.permissionLevels.writeAndDelete])
-			this.levelLabels[GO.permissionLevels.writeAndDelete] =t("Write and delete");
-		if(!this.levelLabels[GO.permissionLevels.manage])
-			this.levelLabels[GO.permissionLevels.manage] =t("Manage");
+		if(!this.levelLabels[go.permissionLevels.read])
+			this.levelLabels[go.permissionLevels.read] =t("Read only");
+		if(!this.levelLabels[go.permissionLevels.create])
+			this.levelLabels[go.permissionLevels.create] =t("Read and Create only");
+		if(!this.levelLabels[go.permissionLevels.write])
+			this.levelLabels[go.permissionLevels.write] =t("Write");
+		if(!this.levelLabels[go.permissionLevels.writeAndDelete])
+			this.levelLabels[go.permissionLevels.writeAndDelete] =t("Write and delete");
+		if(!this.levelLabels[go.permissionLevels.manage])
+			this.levelLabels[go.permissionLevels.manage] =t("Manage");
 		
 		if(!this.levels){
 			this.levels=[
-				GO.permissionLevels.read,
-				GO.permissionLevels.create,
-				GO.permissionLevels.write,
-				GO.permissionLevels.writeAndDelete,
-				GO.permissionLevels.manage
+				go.permissionLevels.read,
+				go.permissionLevels.create,
+				go.permissionLevels.write,
+				go.permissionLevels.writeAndDelete,
+				go.permissionLevels.manage
 			];
 		}
 		
@@ -257,7 +257,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 				
 		
 		if(!this.addLevel)
-			this.addLevel = GO.permissionLevels.read;
+			this.addLevel = go.permissionLevels.read;
 		
 		return new go.form.ComboBox(permissionLevelConfig);
 	},

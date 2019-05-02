@@ -89,8 +89,8 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 
 		this.decrypt();
 
-		this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < GO.permissionLevels.write);
-		this.deleteItem.setDisabled(this.data.permissionLevel < GO.permissionLevels.writeAndDelete);
+		this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < go.permissionLevels.write);
+		this.deleteItem.setDisabled(this.data.permissionLevel < go.permissionLevels.writeAndDelete);
 
 		go.modules.community.notes.NoteDetail.superclass.onLoad.call(this);
 	},

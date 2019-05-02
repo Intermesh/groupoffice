@@ -19,7 +19,7 @@ go.modules.community.addressbook.AddresBookCombo = Ext.extend(go.form.ComboBox, 
 				entityStore: "AddressBook",
 				baseParams: {
 					filter: {
-							permissionLevel: GO.permissionLevels.write
+							permissionLevel: go.permissionLevels.write
 					}
 				}
 			})

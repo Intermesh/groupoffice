@@ -15,7 +15,7 @@ Ext.namespace('GO.util');
 
 Ext.Ajax.timeout = 180000; // 3 minutes
 
-GO.permissionLevels = {
+GO.permissionLevels = go.permissionLevels = {
 		read: 10,
 		create: 20,
 		write: 30,

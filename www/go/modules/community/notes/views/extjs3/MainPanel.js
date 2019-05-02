@@ -82,7 +82,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					xtype: 'tbtitle',
 					text: t('Notebooks')
 				}, '->', {
-					//disabled: go.Modules.get("community", 'notes').permissionLevel < GO.permissionLevels.write,
+					//disabled: go.Modules.get("community", 'notes').permissionLevel < go.permissionLevels.write,
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
@@ -168,7 +168,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				}
 				
 //				,{
-//					disabled: go.Modules.get("community", 'notes').permissionLevel < GO.permissionLevels.write,
+//					disabled: go.Modules.get("community", 'notes').permissionLevel < go.permissionLevels.write,
 //					iconCls: 'ic-add',
 //					tooltip: t('Add test'),
 //					handler: function (e, toolEl) {
@@ -207,7 +207,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		Ext.each(sm.getSelections(), function (r) {
 			ids.push(r.id);
-			if (!this.addNoteBookId && r.get('permissionLevel') >= GO.permissionLevels.write) {
+			if (!this.addNoteBookId && r.get('permissionLevel') >= go.permissionLevels.write) {
 				this.addNoteBookId = r.id;
 			}
 		}, this);
@@ -221,7 +221,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	onNoteGridDblClick : function (grid, rowIndex, e) {
 
 		var record = grid.getStore().getAt(rowIndex);
-		if (record.get('permissionLevel') < GO.permissionLevels.write) {
+		if (record.get('permissionLevel') < go.permissionLevels.write) {
 			return;
 		}
 
@@ -238,7 +238,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			return;
 		}
 
-		if (record.get('permissionLevel') < GO.permissionLevels.write) {
+		if (record.get('permissionLevel') < go.permissionLevels.write) {
 			return;
 		}
 
