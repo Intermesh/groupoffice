@@ -302,6 +302,22 @@ Ext.override(Ext.grid.Column,{
 });
 
 Ext.override(Ext.form.TriggerField,{
+	
+	origUpdateEditState : Ext.form.TriggerField.prototype.updateEditState,
+	
+	updateEditState: function(){
+		
+		this.origUpdateEditState();
+		
+		if(this.rendered){
+			if(!this.readOnly && !this.editable) {
+				this.el.addClass('x-triggerfield-selectonly');
+			} else {
+				this.el.removeClass('x-triggerfield-selectonly');
+			}
+		}
+	},
+	
 	 onRender : function(ct, position){
         this.doc = Ext.isIE ? Ext.getBody() : Ext.getDoc();
         Ext.form.TriggerField.superclass.onRender.call(this, ct, position);
