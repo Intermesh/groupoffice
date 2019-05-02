@@ -296,13 +296,13 @@ try {
 	}
 	
 	if(checkLicenses($dbValid == 62)) {
-	
-		if ($dbValid == 62) {					
-			require(Environment::get()->getInstallFolder() . '/install/62to63.php');
-		}
 
 		//don't be strict
 		GO()->getDbConnection()->query("SET sql_mode=''");
+	
+		if ($dbValid == 62) {					
+			require(Environment::get()->getInstallFolder() . '/install/62to63.php');
+		}		
 
 		if (!upgrade()) {
 			echo "\n\nA module was refactored. Rerunning...\n\n";
