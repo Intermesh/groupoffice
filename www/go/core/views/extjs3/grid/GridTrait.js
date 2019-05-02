@@ -25,6 +25,9 @@ go.grid.GridTrait = {
 	},
 	
 	initHeaderMenu : function() {
+		if(this.enableHdMenu === false) {
+			return;
+		}
 		this.enableHdMenu = false;
 		this.on('render',function() {			
 			// header menu

@@ -65,9 +65,31 @@
 			var ageDate = new Date(ageDifMs); // miliseconds from epoch
 			return Math.abs(ageDate.getUTCFullYear() - 1970);
 		},
+		
+		duration : function(minutes) {
+			var time = parseInt(minutes);
+			var hours = Math.floor( time / 60);          
+			var minutes = time % 60;
+			minutes = (minutes < 10) ? "0"+minutes : minutes;
+			return hours+':'+minutes;
+		},
+
+		valuta : function(amount) {
+			return GO.settings.currency + go.util.Format.number(amount, 2);
+		},
+
+		number : function(value, decimals) {
+			if(isNaN(value))
+				return value; // only localize number values
+			
+			var dec = GO.settings.decimal_separator,
+				tho = GO.settings.thousands_separator;
+			
+			return value
+				.toFixed(decimals || 2)
+				.replace(/[,.]/g, function($1) { return $1 === ',' ? tho : dec });
+		},
 		/**
-		 * 
-		 * 
 		 * @param {string|Date} v
 		 * @returns {String}
 		 */
