@@ -165,17 +165,10 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 
 		go.modules.community.addressbook.ContactDetail.superclass.initComponent.call(this);
 
-		this.add(go.customfields.CustomFields.getDetailPanels("Contact"));
-
-		this.add(new go.links.getDetailPanels());
-
-		if (go.Modules.isAvailable("legacy", "comments")) {
-			this.add(new go.modules.comments.CommentsDetailPanel());
-		}
-
-		if (go.Modules.isAvailable("legacy", "files")) {
-			this.add(new go.modules.files.FilesDetailPanel());
-		}
+		this.addCustomFields();
+		this.addLinks();
+		this.addComments();
+		this.addFiles();
 	},
 
 	onLoad: function () {
