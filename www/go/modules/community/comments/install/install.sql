@@ -1,104 +1,67 @@
--- -----------------------------------------------------
--- Table `comments_thread`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `comments_thread` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `entityId` INT NOT NULL,
-  `entityTypeId` INT NOT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `fk_comments_thread_core_entity1_idx` (`entityTypeId` ASC),
-  CONSTRAINT `fk_comments_thread_core_entity1`
-    FOREIGN KEY (`entityTypeId`)
-    REFERENCES `core_entity` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+CREATE TABLE `comments_attachment` (
+  `commentId` int(11) NOT NULL,
+  `blobId` binary(40) NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `comments_comment` (
+  `id` int(11) NOT NULL,
+  `createdAt` datetime NOT NULL,
+  `entityId` int(11) NOT NULL,
+  `entityTypeId` int(11) NOT NULL,
+  `createdBy` int(11) NOT NULL,
+  `modifiedBy` int(11) DEFAULT NULL,
+  `modifiedAt` datetime DEFAULT NULL,
+  `text` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `comments_comment_label` (
+  `labelId` int(11) NOT NULL,
+  `commentId` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `comments_label` (
+  `id` int(11) NOT NULL,
+  `name` varchar(127) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `color` char(6) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '243a80'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
--- -----------------------------------------------------
--- Table `comments_comment`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `comments_comment` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `threadId` INT NOT NULL,
-  `text` MEDIUMTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-  `createdAt` DATETIME NOT NULL,
-  `createdBy` INT NOT NULL,
-  `modifiedBy` INT NULL,
-  `modifiedAt` DATETIME NULL,
-  PRIMARY KEY (`id`),
-  INDEX `fk_comments_comment_comments_thread_idx` (`threadId` ASC),
-  INDEX `fk_comments_comment_core_user1_idx` (`createdBy` ASC),
-  INDEX `fk_comments_comment_core_user2_idx` (`modifiedBy` ASC),
-  CONSTRAINT `fk_comments_comment_comments_thread`
-    FOREIGN KEY (`threadId`)
-    REFERENCES `comments_thread` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_comments_comment_core_user1`
-    FOREIGN KEY (`createdBy`)
-    REFERENCES `core_user` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_comments_comment_core_user2`
-    FOREIGN KEY (`modifiedBy`)
-    REFERENCES `core_user` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+ALTER TABLE `comments_attachment`
+  ADD PRIMARY KEY (`commentId`,`blobId`),
+  ADD KEY `fk_comments_attachment_comments_comment1_idx` (`commentId`),
+  ADD KEY `fk_comments_attachment_core_blob1_idx` (`blobId`);
+
+ALTER TABLE `comments_comment`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_comments_comment_core_entity_type_idx` (`entityId`),
+  ADD KEY `fk_comments_comment_core_user1_idx` (`createdBy`),
+  ADD KEY `fk_comments_comment_core_user2_idx` (`modifiedBy`);
+
+ALTER TABLE `comments_comment_label`
+  ADD PRIMARY KEY (`labelId`,`commentId`),
+  ADD KEY `fk_comments_label_has_comments_comment_comments_comment1_idx` (`commentId`),
+  ADD KEY `fk_comments_label_has_comments_comment_comments_label1_idx` (`labelId`);
+
+ALTER TABLE `comments_label`
+  ADD PRIMARY KEY (`id`);
 
 
--- -----------------------------------------------------
--- Table `comments_attachment`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `comments_attachment` (
-  `commentId` INT NOT NULL,
-  `blobId` BINARY(40) NOT NULL,
-  `name` VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`commentId`, `blobId`),
-  INDEX `fk_comments_attachment_comments_comment1_idx` (`commentId` ASC),
-  INDEX `fk_comments_attachment_core_blob1_idx` (`blobId` ASC),
-  CONSTRAINT `fk_comments_attachment_comments_comment1`
-    FOREIGN KEY (`commentId`)
-    REFERENCES `comments_comment` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_comments_attachment_core_blob1`
-    FOREIGN KEY (`blobId`)
-    REFERENCES `core_blob` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+ALTER TABLE `comments_comment`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `comments_label`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 
--- -----------------------------------------------------
--- Table `comments_label`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `comments_label` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(127) NOT NULL DEFAULT '',
-  `color` CHAR(6) NOT NULL DEFAULT '243a80',
-  PRIMARY KEY (`id`))
-ENGINE = InnoDB;
+ALTER TABLE `comments_attachment`
+  ADD CONSTRAINT `fk_comments_attachment_comments_comment1` FOREIGN KEY (`commentId`) REFERENCES `comments_comment` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_comments_attachment_core_blob1` FOREIGN KEY (`blobId`) REFERENCES `core_blob` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
+ALTER TABLE `comments_comment`
+  ADD CONSTRAINT `fk_comments_comment_core_user1` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_comments_comment_core_user2` FOREIGN KEY (`modifiedBy`) REFERENCES `core_user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
--- -----------------------------------------------------
--- Table `comments_comment_label`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `comments_comment_label` (
-  `labelId` INT NOT NULL,
-  `commentId` INT NOT NULL,
-  PRIMARY KEY (`labelId`, `commentId`),
-  INDEX `fk_comments_label_has_comments_comment_comments_comment1_idx` (`commentId` ASC),
-  INDEX `fk_comments_label_has_comments_comment_comments_label1_idx` (`labelId` ASC),
-  CONSTRAINT `fk_comments_label_has_comments_comment_comments_label1`
-    FOREIGN KEY (`labelId`)
-    REFERENCES `comments_label` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_comments_label_has_comments_comment_comments_comment1`
-    FOREIGN KEY (`commentId`)
-    REFERENCES `comments_comment` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+ALTER TABLE `comments_comment_label`
+  ADD CONSTRAINT `fk_comments_label_has_comments_comment_comments_comment1` FOREIGN KEY (`commentId`) REFERENCES `comments_comment` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_comments_label_has_comments_comment_comments_label1` FOREIGN KEY (`labelId`) REFERENCES `comments_label` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
