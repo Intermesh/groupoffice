@@ -363,7 +363,8 @@ abstract class AbstractController extends Observable {
 		
 		try {	
 			if($checkPermissions && !$this->_checkPermission($action)){
-				throw new AccessDenied();
+				$cls = get_class($this);
+				throw new AccessDenied($cls ."::" .$this->getAction());
 			}
 			
 			$ignoreAcl = in_array($action, $this->ignoreAclPermissions()) || in_array('*', $this->ignoreAclPermissions());

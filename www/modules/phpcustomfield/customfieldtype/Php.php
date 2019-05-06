@@ -37,8 +37,12 @@ class Php extends \GO\Customfields\Customfieldtype\AbstractCustomfieldtype{
 	public function formatFormOutput($key, &$attributes, \GO\Customfields\Model\AbstractCustomFieldsRecord $model) {		
 		return $this->formatDisplay($key, $attributes, $model);
 	}
-	
-	public function fieldSql() {
+    
+    public function formatRawOutput($key, &$attributes, \GO\Customfields\Model\AbstractCustomFieldsRecord $model) {
+        return $this->formatDisplay($key, $attributes, $model);
+    }
+
+    public function fieldSql() {
 		return "TINYINT(1) NOT NULL DEFAULT 1";
 	}
 	

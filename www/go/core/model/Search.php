@@ -63,7 +63,7 @@ class Search extends AclOwnerEntity {
 		
 		$this->name = StringUtil::cutString($this->name, $this->getMapping()->getColumn('name')->length, false);
 		$this->description = StringUtil::cutString($this->description, $this->getMapping()->getColumn('description')->length);		
-		$this->keywords = StringUtil::cutString($this->keywords, $this->getMapping()->getColumn('description')->length, true, "");
+		$this->keywords = StringUtil::cutString($this->keywords, $this->getMapping()->getColumn('keywords')->length, true, "");
 		
 		return parent::internalValidate();
 	}

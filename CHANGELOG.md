@@ -1,5 +1,14 @@
 - Core: Fixed displaying of readonly form fields, added class to triggerfield to make readonly correctly visible for drop down fields
 
+06-05-2019 6.3.72
+- Core: Auto logout when checker fails fixed
+- Core: Show route in log when access denied error is logged
+- Core: Fixed upgrade issue
+- Email: Fixed email client updating on every checker request
+
+29-04-2019 6.3.71
+- Core: Fixed search caching error
+
 25-04-2019 6.3.70
 
 - Core: Improved logging of JSON parse errors in JMAP API
