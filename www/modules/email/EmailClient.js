@@ -1027,7 +1027,7 @@ this.messagePanel.show();
 				node.getUI().removeClass('ml-folder-unseen');
 
 			var statusText = statusEl.dom.innerHTML;
-			var current = statusText=='' ? 0 : parseInt(statusText.substring(1, statusText.length-1));
+			var current = statusText=='' ? 0 : parseInt(statusText);
 
 			if(current != unseen)
 			{
