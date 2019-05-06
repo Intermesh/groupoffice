@@ -399,7 +399,7 @@ Ext.extend(GO.Checker, Ext.util.Observable, {
 			run: this.checkForNotifications,
 			scope:this,
 			interval: GO.settings.config.checker_interval*1000,
-			//			interval:10000 // debug / test config
+						// interval: 10000 // debug / test config
 		});
 	},
   
@@ -452,8 +452,10 @@ Ext.extend(GO.Checker, Ext.util.Observable, {
 							});
 						} else if(id=="loginstatus") {
 							this.handleLoginstatusResponse(result[id]);
-						}	else if (id!='success') {
-							this.callbacks[id].callback.call(this.callbacks[id].scope, this, result[id],data);
+						}	else if (id!='success' && id!='feedback') {
+							if(this.callbacks[id]) {
+								this.callbacks[id].callback.call(this.callbacks[id].scope, this, result[id],data);
+							}
 						}
 						if (id=="emails" && result[id].email_status) {
 

@@ -1,3 +1,7 @@
+- Core: Show route in log when access denied error is logged
+- Core: Fixed upgrade issue
+- Email: Fixed email client updating on every checker request
+
 29-04-2019 6.3.71
 - Core: Fixed search caching error
 
