@@ -3,12 +3,12 @@
 	font-family: 'Material Icons';
 	font-style: normal;
 	font-weight: 400;
-	src: url(./fonts/MaterialIcons-Regular.eot);// IE9 compat modes
+	src: url(#{$resourcePath}fonts/MaterialIcons-Regular.eot);// IE9 compat modes
 	src: local("Material Icons"), 
 		local("MaterialIcons-Regular"), 
-		url(./fonts/MaterialIcons-Regular.woff2) format("woff2"), // Super Modern
-		url(./fonts/MaterialIcons-Regular.woff) format("woff"),  // Pretty Modern
-		url(./fonts/MaterialIcons-Regular.ttf) format("truetype"); // Android, Safari, iOS
+		url(#{$resourcePath}fonts/MaterialIcons-Regular.woff2) format("woff2"), // Super Modern
+		url(#{$resourcePath}fonts/MaterialIcons-Regular.woff) format("woff"),  // Pretty Modern
+		url(#{$resourcePath}fonts/MaterialIcons-Regular.ttf) format("truetype"); // Android, Safari, iOS
 }
 // #################
 // ##### ICONS #####
@@ -302,12 +302,12 @@ $filetype: (
 	@if type-of($extensions) == 'list' {
 		@each $extension in $extensions {
 			.filetype-#{$extension} {
-				background-image:url('img/filetype/#{$img}.svg') !important;
+				background-image:url('#{$resourcePath}img/filetype/#{$img}.svg') !important;
 			}
 		}
 	} @else {
 		.filetype-#{$extensions} {
-			background-image:url('img/filetype/#{$img}.svg') !important;
+			background-image:url('#{$resourcePath}img/filetype/#{$img}.svg') !important;
 		}
 	}
 }
@@ -316,7 +316,12 @@ $filetype: (
 	background-size: dp(24) dp(24);
 	background-position: dp(8) dp(8);
 	background-image:url(img/filetype/unknown.svg);
+	background-size: contain;
+	background-image:url(#{$resourcePath}img/filetype/unknown.svg);
 	background-repeat: no-repeat;
+	&-link {
+		background-size: contain;
+		background-image:url(#{$resourcePath}img/filetype/unknown.svg);
 	&-link {		
 
 		background-size: dp(24) dp(24);
@@ -1270,15 +1275,6 @@ $material-icons : (
 		content: '#{$icon}' !important;
 	}
 }
-
-
-
-
-
-
-
-
-
 
 .go-icon-ok .x-grid3-cell-inner{
 	&:before {
