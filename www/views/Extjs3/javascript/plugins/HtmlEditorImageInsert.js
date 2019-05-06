@@ -80,7 +80,7 @@ Ext.extend(GO.plugins.HtmlEditorImageInsert, Ext.util.Observable, {
 
 		if(go.Modules.isAvailable("legacy", "files")){
 			menuItems.push({
-				iconCls:'btn-groupoffice',
+				iconCls:'ic-folder',
 				text : t("Add from Group-Office", "email").replace('{product_name}', GO.settings.config.product_name),
 				handler : function()
 				{
@@ -103,7 +103,8 @@ Ext.extend(GO.plugins.HtmlEditorImageInsert, Ext.util.Observable, {
 
 		GO.files.createSelectFileBrowser();
 
-		GO.selectFileBrowser.setFileClickHandler(this.selectImage, this);
+		GO.selectFileBrowser.setFileClickHandler(this.selectImage, this, true);
+		GO.selectFileBrowser.createBlobs = true;
 
 		GO.selectFileBrowser.setFilesFilter(this.filesFilter);
 		GO.selectFileBrowser.setRootID(this.root_folder_id, this.files_folder_id);
@@ -112,24 +113,29 @@ Ext.extend(GO.plugins.HtmlEditorImageInsert, Ext.util.Observable, {
 		GO.selectFileBrowserWindow.show.defer(200, GO.selectFileBrowserWindow);
 	},
 	
-	selectImage : function(r){	
-		
+	selectImage : function(blobs){	
 
-		this.selectedRecord = r;
-		this.selectedPath = r.data.path;
-		
-		var token = GO.base.util.MD5(r.data.name);
-		
-		//filename is added as parameter. This is only for matching the url in the body of the html in GO\\Base\\Mail\\Message::handleEmailFormInput with preg_match.
-		this.selectedUrl = GO.url("files/file/download",{id:r.data.id,token:token});
-						
-		var html = '<img src="'+this.selectedUrl+'" border="0" />';
-								
-		this.fireEvent('insert', this, this.selectedPath, false, token);
-
+		var img = '<img src="' + go.Jmap.downloadUrl(blobs[0].blobId) + '" alt="'+blobs[0].name+'" />';
+							
 		this.editor.focus();
+		this.editor.insertAtCursor(img);
+		
+
+		// this.selectedRecord = r;
+		// this.selectedPath = r.data.path;
+		
+		// var token = GO.base.util.MD5(r.data.name);
+		
+		// //filename is added as parameter. This is only for matching the url in the body of the html in GO\\Base\\Mail\\Message::handleEmailFormInput with preg_match.
+		// this.selectedUrl = GO.url("files/file/download",{id:r.data.id,token:token});
+						
+		// var html = '<img src="'+this.selectedUrl+'" border="0" />';
+								
+		// this.fireEvent('insert', this, this.selectedPath, false, token);
+
+		// this.editor.focus();
 			
-		this.editor.insertAtCursor(html);
+		// this.editor.insertAtCursor(html);
 		
 		GO.selectFileBrowserWindow.hide();
 	}

@@ -635,8 +635,8 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		}else
 		{
 			if(this.fileClickHandler)
-			{
-				this.fileClickHandler.call(this.scope, record);
+			{				
+				this.callFileClickHandler(record);
 			}else
 			{
 				//GO.files.openFile({id:record.data.id});
@@ -848,7 +848,30 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
                 this.filesContextMenu.emailFilesButton.setDisabled(!enable);
 							
 			this.filesContextMenu.downloadSelectedFilesButton.setDisabled(!enable);
-        },
+				},
+				
+	callFileClickHandler : function(record) {
+		if(!this.createBlobs) {
+			GO.selectFileBrowser.fileClickHandler.call(GO.selectFileBrowser.scope, record);
+		} else{
+
+			var records = this.getSelectedGridRecords(), ids = [];
+
+			records.forEach(function(r) {
+				ids.push(r.data.id);
+			});
+
+			GO.request({
+				url: "files/file/createBlob",
+				params: {
+					ids: ids.join(',')
+				},
+				success: function(response, options, result) {
+					GO.selectFileBrowser.fileClickHandler.call(GO.selectFileBrowser.scope, result.blobs);
+				}
+			});
+		}
+	},
 
 	saveCMState: function(state) {
 		GO.request({
@@ -1025,9 +1048,10 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 	},*/
 
-	setFileClickHandler : function(handler, scope)
+	setFileClickHandler : function(handler, scope, createBlobs)
 	{
 		this.fileClickHandler = handler;
+		this.createBlobs = createBlobs;
 		this.scope = scope;
 	},
 
@@ -1806,8 +1830,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 		}else
 		{
 			if(this.fileClickHandler)
-			{
-				this.fileClickHandler.call(this.scope, record);
+			{				
+				this.callFileClickHandler(record);
 			}else
 			{
 				//browsers don't like loading a json request and download dialog at the same time.'
@@ -2054,7 +2078,7 @@ GO.files.showFolder = function(folder_id){
 	}, this);
 	
 	return fb;
-}
+};
 
 GO.files.openFolder = function(id, folder_id)
 {
@@ -2112,7 +2136,8 @@ GO.files.createSelectFileBrowser = function(){
 				text: t("Ok"),
 				handler: function(){
 					var records = GO.selectFileBrowser.getSelectedGridRecords();
-					GO.selectFileBrowser.fileClickHandler.call(GO.selectFileBrowser.scope, records[0]);
+
+					GO.selectFileBrowser.callFileClickHandler(records[0]);
 				},
 				scope: this
 			},{

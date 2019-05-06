@@ -52,6 +52,15 @@ class Folder extends FileSystemObject {
 //	}
 
 	/**
+	 * Get a temporary folder
+	 * 
+	 * @return static
+	 */
+	public static function tempFolder() {
+		return GO()->getTmpFolder()->getFolder(uniqid(time()));
+	}
+
+	/**
 	 * Get folder directory listing.
 	 *
 	 * @param boolean $includeFiles

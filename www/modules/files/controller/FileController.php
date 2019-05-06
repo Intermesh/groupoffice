@@ -3,6 +3,10 @@
 
 namespace GO\Files\Controller;
 
+use GO\Files\Model\File;
+use go\core\fs\Blob;
+use go\core\fs\File as GoFile;
+use go\core\fs\Folder;
 
 class FileController extends \GO\Base\Controller\AbstractModelController {
 
@@ -27,6 +31,22 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		$md = new \go\core\fs\MetaData($this);
 		$exif = $md->extractExif(__DIR__.'/test.jpg');
 		
+	}
+
+	public function actionCreateBlob($ids) {
+		$ids = explode(',', $ids);
+		$blobs = [];
+		foreach($ids as $id) {
+			$file = File::model()->findByPk($id);
+
+			$fsFile = new GOFile($file->fsFile->path());
+			$blob = Blob::fromFile($fsFile);
+			$blob->save();			
+
+			$blobs[] = ['name' => $file->name, 'blobId' => $blob->id];
+		}
+
+		return array_merge(['success' => true, 'blobs' => $blobs], $blob->toArray());
 	}
 	
 	

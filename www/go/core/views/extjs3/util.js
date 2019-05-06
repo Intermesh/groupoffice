@@ -214,7 +214,7 @@ go.util =  (function () {
 				this.uploadDialog.setAttribute('webkitdirectory', true);
 				this.uploadDialog.setAttribute('directory', true);
 			}
-			if(cfg.directory) {
+			if(cfg.multiple) {
 				this.uploadDialog.setAttribute('multiple', true);
 			}
 			

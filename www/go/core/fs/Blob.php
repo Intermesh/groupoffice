@@ -82,6 +82,7 @@ class Blob extends orm\Entity {
 	public $staleAt;
 	
 	private $tmpFile;
+	private $removeFile = true;
 	private $strContent;
 	
 
@@ -156,16 +157,16 @@ class Blob extends orm\Entity {
 		}
 		return isset($this->staleAt);
 	}
-	
+
 	/**
-	 * Create from temporary file.
+	 * Create from file.
 	 * 
-	 * The blob needs to be saved.
+	 * The Blob needs to be save after calling this function.
 	 * 
-	 * @param \go\core\fs\File $file
+	 * @param File $file
 	 * @return \self
 	 */
-	public static function fromTmp(File $file) {
+	public static function fromFile(File $file, $removeFile = false) {
 		$hash = bin2hex(sha1_file($file->getPath(), true));
 		$blob = self::findById($hash);
 		if (empty($blob)) {
@@ -178,7 +179,20 @@ class Blob extends orm\Entity {
 		$blob->tmpFile = $file->getPath();
 		$blob->type = $file->getContentType();
 		$blob->modifiedAt = $file->getModifiedAt();
+		$blob->removeFile = $removeFile;
 		return $blob;
+	}
+	
+	/**
+	 * Create from temporary file.
+	 * 
+	 * The Blob needs to be save after calling this function. This will remove the temporary file!
+	 * 
+	 * @param File $file
+	 * @return \self
+	 */
+	public static function fromTmp(File $file) {
+		return self::fromFile($file, true);
 	}
 	
 	/**
@@ -217,7 +231,11 @@ class Blob extends orm\Entity {
 		}
 		if (!file_exists($this->path())) { 
 			if (!empty($this->tmpFile)) {
-				rename($this->tmpFile, $this->path());
+				if($this->removeFile) {
+					rename($this->tmpFile, $this->path());
+				} else{
+					copy($this->tmpFile, $this->path());
+				}
 			} else if (!empty($this->strContent)) {
 				file_put_contents($this->path(), $this->strContent);
 			}
