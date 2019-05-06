@@ -315,18 +315,12 @@ $filetype: (
 .filetype {
 	background-size: dp(24) dp(24);
 	background-position: dp(8) dp(8);
-	background-image:url(img/filetype/unknown.svg);
-	background-size: contain;
 	background-image:url(#{$resourcePath}img/filetype/unknown.svg);
 	background-repeat: no-repeat;
 	&-link {
-		background-size: contain;
-		background-image:url(#{$resourcePath}img/filetype/unknown.svg);
-	&-link {		
-
 		background-size: dp(24) dp(24);
 		background-position: dp(8) dp(8);
-		background-image:url(img/filetype/unknown.svg);
+		background-image:url(#{$resourcePath}img/filetype/unknown.svg);
 		background-repeat: no-repeat;
 		white-space: nowrap;		
 		line-height: dp(24);
