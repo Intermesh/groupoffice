@@ -42,10 +42,13 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 		*/
 	maxValue : Number.MAX_VALUE,
 		
+	// depricated
+	decimals : false,
+	
 	/**
 	 * @cfg {Number} decimals The maximum precision to display after the decimal separator (defaults to 2)
 	 */
-	decimals : 2,
+	decimalPercision: 2,
 	
 	/**
 	 * Old framework wants it formatted. The new framework wants it unformatted.
@@ -61,6 +64,10 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 		GO.form.NumberField.superclass.initComponent.call(this);
 		
 		this.style="text-align:right";
+		
+		if(this.decimals !== false) { // backwards compatible
+			this.decimalPercision = this.decimals
+		}
 		
 		this.on('focus',function(input){
 			this.fixPrecision();
@@ -82,7 +89,7 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 				number = this.minValue;
 			}
 			if(this.serverFormats) {
-				number = GO.util.numberFormat(number, this.decimals);
+				number = GO.util.numberFormat(number, this.decimalPercision);
 			}
 			this.setValue(number);
 		}
@@ -103,7 +110,7 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 		
 		if(!this.serverFormats) {			
 			v = v * this.multiplier;
-			formatted = GO.util.numberFormat(v, this.decimals);
+			formatted = GO.util.numberFormat(v, this.decimalPercision);
 			this.setRawValue(formatted);
 		}
 	},
