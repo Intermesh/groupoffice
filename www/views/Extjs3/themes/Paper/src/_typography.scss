@@ -6,10 +6,14 @@ $font-weight-r: 400;
 $font-weight-m: 600;
 $font-weight-l: 100;
 
+@function letter-space($space, $font-size) {
+	@return (($space / $font-size)  * $density / 160) * 1em;
+}
+
 %font-button {
 	font-size: sp(14);
 	font-weight: $font-weight-m;
-	/*letter-spacing: 0.04em;*/
+/*	letter-spacing: letter-space(.75, 14);*/
 	text-decoration: none;
 }
 

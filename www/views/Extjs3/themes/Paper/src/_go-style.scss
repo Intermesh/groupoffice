@@ -1023,13 +1023,12 @@ button.filetype-pdf, button.filetype-doc {
 	}
 	
 	.x-panel-bbar {
-		height: dp(64);
-		padding-left: dp(8);
 		.x-btn{
 			border: 1px solid color($fg, "line");
 		}
 		.x-toolbar {
 			border-bottom: 0;
+			height: dp(64);
 		}
 	}
 	
