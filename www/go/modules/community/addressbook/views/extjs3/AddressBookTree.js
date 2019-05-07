@@ -180,10 +180,11 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 						text: t("Share"),
 						handler: function () {
 							var shareWindow = new go.permissions.ShareWindow({
+								entityStore: "AddressBook",
 								title: t("Share") + ": " + this.addressBookMoreMenu.data.name
 							});
 
-							shareWindow.load(this.addressBookMoreMenu.data.aclId).show();
+							shareWindow.load(this.addressBookMoreMenu.data.id).show();
 						},
 						scope: this
 					}]

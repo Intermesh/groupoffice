@@ -28,6 +28,11 @@ go.util.Filters = {
 	},
 
 	parseQueryString: function (string, filters) {
+
+		if(Ext.isEmpty(string)) {
+			return null;
+		}
+
 		var and = [], not = [], arr = and;
 
 		filters = this.normalize(filters);

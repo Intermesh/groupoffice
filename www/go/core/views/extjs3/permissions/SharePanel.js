@@ -44,13 +44,8 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 				{
 					name: 'level', 
 					type: {
-						convert: function (v, data) {
-							var index = me.getSelectedGroupIds().indexOf(parseInt(data.id));
-							if(index == -1) {
-								return null;
-							}
-							
-							return me.selectedGroups[index].level;
+						convert: function (v, data) {							
+							return me.selectedGroups[data.id];
 						}
 					}
 				},
@@ -72,7 +67,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 			entityStore: "Group"
 		});
 		
-		var levelCombo = this.createLevelCombo(), me = this;
+		var levelCombo = this.createLevelCombo();
 
 		Ext.apply(this, {		
 			plugins: [checkColumn],
@@ -172,33 +167,18 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 	onCheckChange : function(record, newValue) {
 		if(newValue) {			
 			record.set('level', this.addLevel);
-			this.selectedGroups.push({
-				groupId: record.data.id,
-				level: record.data.level
-			});		
+			this.selectedGroups[record.data.id] = record.data.level;
 		} else
 		{
 			record.set('level', null);
-			this.selectedGroups.splice(this.getSelectedGroupIds().indexOf(record.id), 1);
+			this.selectedGroups[record.data.id] = null;
 		}
 		
 		this._isDirty = true;
 	},
+
 	afterEdit : function(e) {
-		
-		var index = this.getSelectedGroupIds().indexOf(e.record.id);							
-		
-		if(index == -1) {
-			this.selectedGroups.push({
-				groupId: e.record.data.id,
-				level: e.record.data.level
-			});			
-			e.record.set('selected', true);
-		} else
-		{
-			this.selectedGroups[index].level = e.record.data.level;
-		}
-		
+		this.selectedGroups[e.record.id] = e.record.data.level;				
 		this._isDirty = true;
 	},
 	
@@ -276,6 +256,11 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 		return this._isDirty || this.store.getModifiedRecords().length > 0;
 	},
 
+	reset : function() {
+		this.setValue([]);
+		this.dirty = false;
+	},
+
 	setValue: function (groups) {		
 		this._isDirty = false;		
 		this.selectedGroups = groups;
@@ -283,13 +268,14 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 	},
 	
 	getSelectedGroupIds : function() {
-		return this.selectedGroups.column("groupId");
+		return Object.keys(this.selectedGroups).map(function(id) { return parseInt(id);});
 	},
 	
 	onBeforeStoreLoad : function(store, options) {
 
 		//don't add selected on search
 		if(this.store.filters.tbsearch || options.selectedLoaded || options.paging) {
+			this.store.setFilter('exclude', null);
 			return true;
 		}
 		

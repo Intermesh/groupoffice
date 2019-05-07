@@ -100,6 +100,11 @@ go.form.GridField = Ext.extend(Ext.grid.EditorGridPanel, {
 		return true;
 	},
 
+	reset : function() {
+		this.setValue([]);
+		this.dirty = false;
+	},
+
 	initRowActions: function () {
 
 		var actions = new Ext.ux.grid.RowActions({
