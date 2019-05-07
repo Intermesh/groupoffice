@@ -254,5 +254,15 @@ $app-icons: (
 		&.x-view-over {
 			background-color: color($bg, 'hover');
 		}
+
+		i {
+			cursor: pointer;
+			display: none;
+		}
+		&.x-view-selected, &.x-view-over {
+			i {
+				display: inline-block;
+			}
+		}
 	}
 }

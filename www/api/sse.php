@@ -9,6 +9,7 @@
 use go\core\App;
 use go\core\db\Query;
 use go\core\jmap\State;
+use go\core\orm\EntityType;
 
 require("../vendor/autoload.php");
 
@@ -16,7 +17,7 @@ require("../vendor/autoload.php");
 App::get()->setAuthState(new State());
 
 //Hard code debug to false to prevent spamming of log.
-App::get()->getDebugger()->enabled = false;
+App::get()->getDebugger()->enabled = true;
 
 header('Cache-Control: no-cache');
 header('Pragma: no-cache');
@@ -32,36 +33,6 @@ const MAX_LIFE_TIME = 120;
 $ping = $_GET['ping'] ?? 10;
 $sleeping = 0;
 
-//Client may specify 
-if(isset($_GET['types'])) {
-	$entityNames = explode(",", $_GET['types']);
-	$types = \go\core\orm\EntityType::namesToIds($entityNames);
-} else
-{
-	$types = [];
-}
-
-function checkChanges() {
-	global $types;
-	
-	$entities = (new Query)
-						->select('clientName,highestModSeq')
-						->from('core_entity')
-						->where('highestModSeq', '!=', null);
-	
-	if(!empty($types)) {
-		$entities->andWhere('id', 'IN', $types);
-	}
-	
-	$state = [];
-	foreach ($entities as $r) {
-		$state[$r['clientName']] = (int) $r['highestModSeq'];
-	}
-	
-	return $state;
-}
-
-$changes = checkChanges();
 
 function sendMessage($type, $data) {
 	echo "event: $type\n";
@@ -74,6 +45,33 @@ function sendMessage($type, $data) {
 	
 	flush();	
 }
+sendMessage('ping', []);
+
+$query = new Query();
+//Client may specify 
+if(isset($_GET['types'])) {
+	$entityNames = explode(",", $_GET['types']);
+	$query->where('e.name', 'IN', $entityNames);
+}
+$entities = EntityType::findAll($query);
+$map = [];
+foreach($entities as $e) {
+	$map[$e->getName()] = $e->getClassName();
+}
+
+function checkChanges() {
+	global $map;
+	
+	$state = [];
+	foreach ($map as $name => $cls) {		
+		$cls::getType()->clearCache();
+		$state[$name] = $cls::getState();
+	}
+	return $state;
+}
+
+$changes = checkChanges();
+
 
 function diff($old, $new) {
 

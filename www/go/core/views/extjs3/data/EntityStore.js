@@ -445,6 +445,9 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 						});	
 					} else
 					{
+						if(!this.data[id]) {
+							debugger;
+						}
 						resolve(go.util.clone(this.data[id]));
 					}
 				},

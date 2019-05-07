@@ -37,7 +37,11 @@ abstract class Entity  extends OrmEntity {
 	 * @return string
 	 */
 	public static function getState($entityState = null) {
-		return ($entityState ?? static::getType()->highestModSeq) . ':' . static::getType()->getHighestUserModSeq();		
+		$state = ($entityState ?? static::getType()->getHighestModSeq()) . ':';
+		
+		$state .= static::getMapping()->hasUserTable  ? static::getType()->getHighestUserModSeq() : "0";		
+
+		return $state;
 	}
 	
 	/**

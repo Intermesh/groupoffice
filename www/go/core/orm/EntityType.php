@@ -39,7 +39,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	 * 
 	 * @var int
 	 */
-	public $highestModSeq;
+	protected $highestModSeq;
 	
 	private $highestUserModSeq;
 	
@@ -128,7 +128,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		} else
 		{
 			$e->defaultAclId = $record['defaultAclId'] ?? null; // in the upgrade situation this column is not there yet.
-			$e->highestModSeq = $record['highestModSeq'];//) ? (int) $record['highestModSeq'] : null;
+			$e->highestModSeq = (int) $record['highestModSeq'];//) ? (int) $record['highestModSeq'] : null;
 		}
 
 		$e->id = $record['id'];
@@ -139,6 +139,40 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		
 		return $e;
 	}
+
+	/**
+	 * The highest mod sequence used for JMAP data sync
+	 * 
+	 * @return int
+	 */
+	public function getHighestModSeq() {
+		if(isset($this->highestModSeq)) {
+			return $this->highestModSeq;
+		}
+
+		$this->highestModSeq = (new Query())
+			->selectSingleValue("highestModSeq")
+			->from("core_entity")
+			->where(["id" => $this->id])			
+			->single();
+
+		return $this->highestModSeq;
+	}
+
+	/**
+	 * Clear cached modseqs
+	 * 
+	 * @return $this
+	 */
+	public function clearCache() {
+
+		$this->highestModSeq = null;
+		$this->highestUserModSeq = null;
+
+		return $this;
+	}
+
+
 	
 	/**
 	 * Creates a short name based on the class name.
@@ -224,7 +258,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	/**
 	 * Convert array of entity names to ids
 	 * 
-	 * @param string $names eg ['Contact', 'Note']
+	 * @param string[] $names eg ['Contact', 'Note']
 	 * @return int[] eg. [1,2]
 	 */
 	public static function namesToIds($names) {
@@ -244,11 +278,13 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		$e->name = $record['name'];
     $e->clientName = $record['clientName'];
 		$e->moduleId = $record['moduleId'];
-		$e->highestModSeq = $record['highestModSeq'];
+		$e->highestModSeq = (int) $record['highestModSeq'];
 		$e->defaultAclId = $record['defaultAclId'] ?? null; // in the upgrade situation this column is not there yet.
 
 		if (isset($record['modulePackage'])) {
-			if($record['modulePackage'] == 'core') {
+			if($e->name == "Acl") {
+				$e->className = "go\\core\\acl\\model\\Acl";
+			} elseif($record['modulePackage'] == 'core') {
 				$e->className = 'go\\core\\model\\' . ucfirst($e->name);	
 			} else
 			{
@@ -402,11 +438,11 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	 */
 	public function getHighestUserModSeq() {
 		if(!isset($this->highestUserModSeq)) {
-			$this->highestUserModSeq = (new Query())
+			$this->highestUserModSeq = (int) (new Query())
 						->selectSingleValue("highestModSeq")
 						->from("core_change_user_modseq")
 						->where(["entityTypeId" => $this->id, "userId" => GO()->getUserId()])
-						->forUpdate()->single();
+						->single();					
 		}
 		return $this->highestUserModSeq;
 	}
@@ -463,7 +499,13 @@ class EntityType implements \go\core\data\ArrayableInterface {
 			return $this->getHighestUserModSeq();
 		}
 		
-		$modSeq = $this->getHighestUserModSeq();
+		$modSeq = (new Query())
+			->selectSingleValue("highestModSeq")
+			->from("core_change_user_modseq")
+			->where(["entityTypeId" => $this->id, "userId" => GO()->getUserId()])
+			->forUpdate()
+			->single();
+
 		$modSeq++;
 
 		App::get()->getDbConnection()
@@ -560,5 +602,4 @@ class EntityType implements \go\core\data\ArrayableInterface {
 				"supportsFiles" => $this->supportsFiles()
 		];
 	}
-
 }

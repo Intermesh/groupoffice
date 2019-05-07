@@ -179,6 +179,17 @@ class Acl extends Entity {
 	 * @return $this
 	 */
 	public function addGroup($groupId, $level = self::LEVEL_READ) {
+
+		if(empty($level)) {
+			return $this->removeGroup($groupId);
+		}
+
+		$group = $this->findGroup($groupId);
+		if($group) {
+			$group->level = $level;
+			return $this;
+		}
+
 		$this->groups[] = (new AclGroup())
 								->setValues([
 										'groupId' => $groupId, 
@@ -332,16 +343,19 @@ class Acl extends Entity {
 
 	
 	/**
+	 * Get all the Acl IDs that currently include read permissions for the given user.
 	 * 
 	 * @param int $userId
+	 * @param Query $acls Only check the given ACL's. This query should select a single column returning ACL ids.
 	 * @return Query
 	 */
 	public static function areGranted($userId, Query $acls = null) {
-		$query = (new Query())
+		$query = (new Query())						
 						->selectSingleValue('ag.aclId')
 						->from('core_acl_group', 'ag')
 						->join('core_user_group', 'ug', 'ag.groupId = ug.groupId')
-						->where('ug.userId', '=', $userId);
+						->where('ug.userId', '=', $userId)
+						->groupBy(['ag.aclId']);
 		
 		if(isset($acls)) {
 			$query->andWhere('ag.aclId', 'IN', $acls);
@@ -350,6 +364,14 @@ class Acl extends Entity {
 		return $query;
 	}
 	
+	/**
+	 * Get all the Acl IDs that include read permissions for the given user at a given state in the past.
+	 * 
+	 * @param int $userId
+	 * @param stirng $sinceState The state
+	 * @param Query $acls Only check the given ACL's. This query should select a single column returning ACL ids.
+	 * @return Query
+	 */
 	public static function wereGranted($userId, $sinceState, Query $acls = null) {
 		$query = (new Query())
 						->selectSingleValue('agc.aclId')
@@ -361,7 +383,8 @@ class Acl extends Entity {
 										(new Criteria())
 										->where('agc.revokeModSeq', 'IS', NULL)
 										->orWhere('agc.revokeModSeq', '>', $sinceState)
-										);
+										)
+						->groupBy(['agc.aclId']);
 		
 		if(isset($acls)) {
 			$query->andWhere('agc.aclId', 'IN', $acls);

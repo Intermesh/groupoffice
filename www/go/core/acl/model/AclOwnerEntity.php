@@ -7,6 +7,7 @@ use go\core\App;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
 use go\core\orm\Mapping;
+use go\core\exception\Forbidden;
 
 /**
  * The AclEntity
@@ -23,35 +24,78 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * 
 	 * @var int
 	 */
-	public $aclId;
+	protected $aclId;
 	
 	/**
 	 * The acl entity
 	 * @var Acl 
 	 */
 	private $acl;
-	
-//	Disabled for performance reasons. How should we handle this?
-//	/**
-//	 * The groups in the ACL with their level
-//	 * 
-//	 * @var AclGroup[]
-//	 */
-//	public $acl = [];
-//	
-//	protected static function defineMapping() {
-//		return parent::defineMapping()
-//						->addRelation('acl', AclGroup::class, ['aclId' => 'aclId'], true);
-//	}
-	
+
 	protected function internalSave() {
 		
 		if($this->isNew() && !isset($this->aclId)) {
 			$this->createAcl();
 		}
-		
+
+		if(!$this->saveAcl()) {
+			return false;
+		}
 		
 		return parent::internalSave();
+	}
+
+	/**
+	 * True if the current user may share this item
+	 * 
+	 * @return bool
+	 */
+	public function mayShare() {
+		$a = $this->findAcl();
+		return $a->hasPermissionLevel(Acl::LEVEL_MANAGE);
+	}
+
+	private function saveAcl() {
+		if(!isset($this->setAcl)) {
+			return true;
+		}
+
+		$a = $this->findAcl();
+
+		if(!$this->mayShare()) {
+			throw new Forbidden();
+		}
+
+		foreach($this->setAcl as $groupId => $level) {
+			$a->addGroup($groupId, $level);
+		}
+
+		return $a->save();
+	}
+
+	/**
+	 * Returns an array with group ID as key and permission level as value.
+	 * 
+	 * @return array eg. ["2" => 50, "3" => 10]
+	 */
+	public function getAcl() {
+		$acl = [];
+		foreach($this->findAcl()->groups as $group) {
+			$acl[$group->groupId] = $group->level;
+		}
+
+		return $acl;
+	}
+
+	private $setAcl;
+
+	/**
+	 * Set the ACL
+	 * 
+	 * @param $acl an array with group ID as key and permission level as value. eg. ["2" => 50, "3" => 10]
+	 */
+	public function setAcl($acl) {
+		$this->setAcl = $acl;		
 	}
 	
 	protected function createAcl() {

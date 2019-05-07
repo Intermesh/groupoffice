@@ -30,6 +30,15 @@ class Mapping {
 	private $relations = [];
 	
 	private $query;
+
+	/**
+	 * Mapping has a table per user. 
+	 * 
+	 * @see addUserTable();
+	 * 
+	 * @bool
+	 */
+	public $hasUserTable = false;
 	
 	/**
 	 * Constructor
@@ -84,6 +93,7 @@ class Mapping {
 	public function addUserTable($name, $alias, array $keys = null, array $columns = null, array $constantValues = []) {
 		$this->tables[$name] = new MappedTable($name, $alias, $keys, empty($columns) ? $this->buildColumns() : $columns, $constantValues);
 		$this->tables[$name]->isUserTable = true;
+		$this->hasUserTable = true;
 		if(!\go\core\db\Table::getInstance($name)->getColumn('modSeq')) {
 			throw new \Exception("The table ".$name." must have a 'modSeq' column of type INT");
 		}
