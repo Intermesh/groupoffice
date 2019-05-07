@@ -71,8 +71,8 @@ class Router {
 			throw new Exception(400, 'Bad request');
 		}
 
-		for ($i = 0, $c = count($body); $i < $c; $i++) {
-			$this->callMethod($body[$i]);
+		while($method = array_shift($body)) {
+			$this->callMethod($method);
 		}
 
 		Response::get()->sendHeaders();
