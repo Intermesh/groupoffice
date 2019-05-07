@@ -10,6 +10,7 @@ use go\core\http\Exception;
 use go\core\jmap\exception\InvalidResultReference;
 use go\core\orm\EntityType;
 use JsonSerializable;
+use go\core\http;
 
 /**
  * JMAP compatible router
@@ -34,6 +35,17 @@ class Router {
 		return $this->clientCallId;
 	}
 
+	public function error($type, $status, $detail) {	
+		$r = http\Response::get();
+		$r->setStatus($status, $detail);
+		$r->sendHeaders();
+		$r->output([
+			"type" => $type,
+			"status" => $status,
+			"detail" => $detail
+		]);
+	}
+
 	/**
 	 * Run the router
 	 * 
@@ -44,54 +56,66 @@ class Router {
 	 */
 	public function run() {
 
+		if(!go\core\http\Request::get()->getHeader('Authorization')) {
+			return $this->error("badrequest", 400, "Missing 'Authorization' header.");
+		}
+
+		if (!App::get()->getAuthState()->isAuthenticated()) {			
+			return $this->error("unauthorized", 401, "Unauthorized");
+		}
+
 		$body = Request::get()->getBody();
 		
 		if(!is_array($body)) {
+			return $this->error("urn:ietf:params:jmap:error:notRequest", 400, "The request parsed as JSON but did not match the type signature of the Request object.");
 			throw new Exception(400, 'Bad request');
 		}
 
 		for ($i = 0, $c = count($body); $i < $c; $i++) {
-
-			if (count($body[$i]) != 3) {
-				throw new Exception(400, 'Bad request');
-			}
-
-			list($method, $params, $clientCallId) = $body[$i];
-
-			Response::get()->setClientCall($method, $clientCallId);
-			
-			if($method != "community/dev/Debugger/get") {
-				App::get()->debug("Processing method " . $method . ", call ID: " . $clientCallId);
-			}
-			
-			try {
-				$response = $this->callAction($method, $params);
-				
-				if(isset($response)) {
-					Response::get()->addResponse($response);
-				}
-				
-			} catch(InvalidResultReference $e) {
-				$error = ["message" => $e->getMessage()];
-			
-				Response::get()->addResponse([
-						'error', $error
-				]);
-			} catch (CoreException $e) {
-				$error = ["message" => $e->getMessage()];
-				
-				if(GO()->getDebugger()->enabled) {
-					//only in debug mode, may contain sensitive information
-					$error["debugMessage"] = ErrorHandler::logException($e);
-					$error["trace"] = explode("\n", $e->getTraceAsString());
-				}
-				
-				Response::get()->addError($error);
-			}
+			$this->callMethod($body[$i]);
 		}
 
 		Response::get()->sendHeaders();
 		Response::get()->output();
+	}
+
+	private function callMethod(array $body) {
+		if (count($body) != 3) {
+			throw new Exception(400, 'Bad request');
+		}
+
+		list($method, $params, $clientCallId) = $body;
+
+		Response::get()->setClientCall($method, $clientCallId);
+		
+		if($method != "community/dev/Debugger/get") {
+			App::get()->debug("Processing method " . $method . ", call ID: " . $clientCallId);
+		}
+		
+		try {
+			$response = $this->callAction($method, $params);
+			
+			if(isset($response)) {
+				Response::get()->addResponse($response);
+			}
+			
+		} catch(InvalidResultReference $e) {
+			$error = ["message" => $e->getMessage()];
+		
+			Response::get()->addResponse([
+					'error', $error
+			]);
+		} catch (CoreException $e) {
+			$error = ["message" => $e->getMessage()];
+			
+			if(GO()->getDebugger()->enabled) {
+				//only in debug mode, may contain sensitive information
+				$error["debugMessage"] = ErrorHandler::logException($e);
+				$error["trace"] = explode("\n", $e->getTraceAsString());
+			}
+			
+			Response::get()->addError($error);
+		}
 	}
 
 	private function findControllerAction($method) {
@@ -155,6 +179,11 @@ class Router {
 	 * @return JsonSerializable
 	 */
 	protected function callAction($method, $params) {
+
+		// Special testing method that echoes the params
+		if($method == "Core/echo") {
+			return $params;
+		}
 
 		$controllerMethod = $this->findControllerAction($method);
 		$controller = new $controllerMethod[0];
