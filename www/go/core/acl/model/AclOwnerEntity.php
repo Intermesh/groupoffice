@@ -101,7 +101,8 @@ abstract class AclOwnerEntity extends AclEntity {
 	protected function createAcl() {
 		
 		// Copy the default one. When installing the default one can't be accessed yet.
-		if(GO()->getInstaller()->isInProgress()) {
+		// When ACL has been provided by the client don't copy the default.
+		if(isset($this->setAcl) || GO()->getInstaller()->isInProgress()) {
 			$this->acl = new Acl();
 		} else
 		{
