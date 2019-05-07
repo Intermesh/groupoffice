@@ -1,5 +1,5 @@
 <?php
-namespace go\core\acl\model;
+namespace go\core\model;
 
 use go\core\App;
 use go\core\db\Query;

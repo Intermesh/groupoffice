@@ -243,7 +243,7 @@ class Account extends \GO\Base\Db\ActiveRecord {
 			if($user->isAdmin()) {
 				//add admin group
 				$group = \go\core\model\Group::find()->where(['isUserGroupFor' => $user->id])->single();
-				$this->getAcl()->addGroup($group->id, \go\core\acl\model\Acl::LEVEL_MANAGE);
+				$this->getAcl()->addGroup($group->id, \go\core\model\Acl::LEVEL_MANAGE);
 			}
 		}
 

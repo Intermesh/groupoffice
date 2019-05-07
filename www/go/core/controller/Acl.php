@@ -2,7 +2,7 @@
 
 namespace go\core\controller;
 
-use go\core\acl\model;
+use go\core\model;
 use go\core\jmap\EntityController;
 use go\core\orm\Entity;
 use function GO;
@@ -75,6 +75,9 @@ class Acl extends EntityController {
 		return $this->defaultChanges($params);
 	}
 	
+	/**
+	 * Reset ACL permissions to the defaults
+	 */
 	public function reset($params) {
 		$params['add'] = $params['add'] ?? false;
 		if(!isset($params['entity'])) {

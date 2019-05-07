@@ -282,9 +282,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		$e->defaultAclId = $record['defaultAclId'] ?? null; // in the upgrade situation this column is not there yet.
 
 		if (isset($record['modulePackage'])) {
-			if($e->name == "Acl") {
-				$e->className = "go\\core\\acl\\model\\Acl";
-			} elseif($record['modulePackage'] == 'core') {
+			if($record['modulePackage'] == 'core') {
 				$e->className = 'go\\core\\model\\' . ucfirst($e->name);	
 			} else
 			{
@@ -526,10 +524,10 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	}
 	
 	private function createAcl() {
-		$acl = new \go\core\acl\model\Acl();
+		$acl = new \go\core\model\Acl();
 		$acl->usedIn = 'core_entity.defaultAclId';
 		$acl->ownedBy = 1;
-		//$acl->addGroup(\go\core\model\Group::ID_INTERNAL, \go\core\acl\model\Acl::LEVEL_WRITE);
+		//$acl->addGroup(\go\core\model\Group::ID_INTERNAL, \go\core\model\Acl::LEVEL_WRITE);
 		if(!$acl->save()) {
 			throw new \Exception('Could not save default ACL');
 		}

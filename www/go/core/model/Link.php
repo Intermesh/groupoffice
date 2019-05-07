@@ -3,7 +3,7 @@
 namespace go\core\model;
 
 use GO\Base\Db\ActiveRecord;
-use go\core\acl\model\Acl;
+use go\core\model\Acl;
 use go\core\App;
 use go\core\db\Criteria;
 use go\core\orm\Query;

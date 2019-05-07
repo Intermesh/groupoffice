@@ -2,7 +2,7 @@
 
 namespace go\core\acl\model;
 
-use go\core\acl\model\Acl;
+use go\core\model\Acl;
 use go\core\orm\Query;
 use go\core\jmap\EntityController;
 use go\core\jmap\Entity;

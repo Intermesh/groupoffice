@@ -2,7 +2,7 @@
 
 namespace go\core\model;
 
-use go\core\acl\model\Acl;
+use go\core\model\Acl;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
 use go\core\model\UserGroup;

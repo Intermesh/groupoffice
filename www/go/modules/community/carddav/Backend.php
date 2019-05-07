@@ -2,7 +2,7 @@
 namespace go\modules\community\carddav;
 
 use Exception;
-use go\core\acl\model\Acl;
+use go\core\model\Acl;
 use go\core\ErrorHandler;
 use go\modules\community\addressbook\convert\VCard;
 use go\modules\community\addressbook\model\AddressBook;

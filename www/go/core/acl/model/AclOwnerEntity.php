@@ -1,8 +1,8 @@
 <?php
 namespace go\core\acl\model;
 
-use go\core\acl\model\Acl;
-use go\core\acl\model\AclGroup;
+use go\core\model\Acl;
+use go\core\model\AclGroup;
 use go\core\App;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
@@ -176,7 +176,7 @@ abstract class AclOwnerEntity extends AclEntity {
 							->groupBy(['u.id']);
 			
 	 * //We don't want to use the Users acl but the applications acl.
-			\go\core\acl\model\Acl::applyToQuery($query, 'a.aclId');
+			\go\core\model\Acl::applyToQuery($query, 'a.aclId');
 	 * 
 	 * ```
 	 * 

@@ -2,7 +2,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 	/*
 	 * the form field name
 	 */
-	name: "groups",
+	name: "acl",
 	
 	cls: "go-share-panel", 
 	

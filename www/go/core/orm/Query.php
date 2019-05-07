@@ -2,7 +2,7 @@
 namespace go\core\orm;
 
 use Exception;
-use go\core\acl\model\Acl;
+use go\core\model\Acl;
 use go\core\db\Query as DbQuery;
 
 class Query extends DbQuery {

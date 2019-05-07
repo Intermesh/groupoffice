@@ -6,6 +6,7 @@ use go\core\jmap\Entity;
 use go\core\orm\Query;
 use PDO;
 use function GO;
+use go\core\model\Acl;
 
 abstract class AclEntity extends Entity {
 	/**

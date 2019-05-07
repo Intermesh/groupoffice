@@ -1,7 +1,7 @@
 <?php
 
 use GO\Base\Util\StringHelper;
-use go\core\acl\model\Acl;
+use go\core\model\Acl;
 use go\core\fs\Blob;
 use go\modules\community\addressbook\model\Address;
 use go\modules\community\addressbook\model\AddressBook;

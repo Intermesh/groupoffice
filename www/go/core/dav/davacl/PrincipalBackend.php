@@ -64,7 +64,7 @@ class PrincipalBackend extends AbstractBackend {
 
 		if (!isset($this->users)) {
 			$this->users = [];
-			$users = User::find(['id', 'username', 'displayName', 'email']);//->filter(['permissionLevel' => \go\core\acl\model\Acl::LEVEL_READ]);
+			$users = User::find(['id', 'username', 'displayName', 'email']);//->filter(['permissionLevel' => \go\core\model\Acl::LEVEL_READ]);
 			foreach($users as $user) {
 				$this->users[] = $this->modelToDAVUser($user);
 			}

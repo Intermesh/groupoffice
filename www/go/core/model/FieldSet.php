@@ -103,7 +103,7 @@ class FieldSet extends AclOwnerEntity {
 			return false;
 		}
 		
-		return !$this->isNew() || $this->findAcl()->addGroup(\go\core\model\Group::ID_EVERYONE, \go\core\acl\model\Acl::LEVEL_WRITE)->save();
+		return !$this->isNew() || $this->findAcl()->addGroup(\go\core\model\Group::ID_EVERYONE, \go\core\model\Acl::LEVEL_WRITE)->save();
 		
 	}
 

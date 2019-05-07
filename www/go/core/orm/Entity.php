@@ -4,7 +4,7 @@ namespace go\core\orm;
 
 use Exception;
 use GO;
-use go\core\acl\model\Acl;
+use go\core\model\Acl;
 use go\core\App;
 use go\core\db\Criteria;
 use go\core\orm\Query;

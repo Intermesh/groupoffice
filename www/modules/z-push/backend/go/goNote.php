@@ -1,6 +1,6 @@
 <?php
 
-use go\core\acl\model\Acl;
+use go\core\model\Acl;
 use go\core\util\StringUtil;
 use go\modules\community\notes\model\Note;
 

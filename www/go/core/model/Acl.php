@@ -1,5 +1,5 @@
 <?php
-namespace go\core\acl\model;
+namespace go\core\model;
 
 use go\core\App;
 use go\core\db\Criteria;
@@ -67,9 +67,45 @@ class Acl extends Entity {
 			
 		return parent::internalValidate();
 	}
+
+	/**
+	 * Returns an array with group ID as key and permission level as value.
+	 * 
+	 * @return array eg. ["2" => 50, "3" => 10]
+	 */
+	public function getAcl() {
+		$acl = [];
+		foreach($this->groups as $group) {
+			$acl[$group->groupId] = $group->level;
+		}
+
+		return $acl;
+	}
+
+	private $setAcl;
+
+	/**
+	 * Set the ACL
+	 * 
+	 * @param $acl an array with group ID as key and permission level as value. eg. ["2" => 50, "3" => 10]
+	 */
+	public function setAcl($acl) {
+		$this->setAcl = $acl;		
+	}
 	
+	private function saveAcl() {
+		if(!isset($this->setAcl)) {
+			return true;
+		}
+		
+		foreach($this->setAcl as $groupId => $level) {
+			$this->addGroup($groupId, $level);
+		}
+	}
 	
 	protected function internalSave() {
+
+		$this->saveAcl();
 		
 		$adminLevel = $this->hasGroup(Group::ID_ADMINS);
 		if($adminLevel < self::LEVEL_MANAGE) {

@@ -3,7 +3,7 @@
 namespace go\core\jmap;
 
 use Exception;
-use go\core\acl\model\Acl;
+use go\core\model\Acl;
 use go\core\acl\model\AclEntity;
 use go\core\App;
 use go\core\Controller;

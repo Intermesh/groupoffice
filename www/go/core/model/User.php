@@ -7,7 +7,7 @@ use GO;
 use GO\Base\Model\AbstractUserDefaultModel;
 use GO\Base\Model\User as LegacyUser;
 use GO\Base\Util\Http;
-use go\core\acl\model\Acl;
+use go\core\model\Acl;
 use go\core\App;
 use go\core\auth\Method;
 use go\core\auth\Password;

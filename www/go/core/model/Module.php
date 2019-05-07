@@ -3,7 +3,7 @@ namespace go\core\model;
 
 use Exception;
 use go\core;
-use go\core\acl\model\Acl;
+use go\core\model\Acl;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\App;
 use go\core\db\Query;
