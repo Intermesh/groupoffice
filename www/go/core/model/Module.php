@@ -246,10 +246,26 @@ class Module extends AclOwnerEntity {
 	
 	/**
 	 * Returns all module entities with info
-	 * @return array
+	 * @return EntityType[]
 	 */
 	public function getEntities() {		
-		return array_map(function($e) {return $e->toArray();}, core\orm\EntityType::findAll((new core\orm\Query)->where(['moduleId' => $this->id])));
+		$es = [];
+
+		foreach(core\orm\EntityType::findAll((new core\orm\Query)->where(['moduleId' => $this->id])) as $e) {
+			$es[$e->getName()] = $e;
+		}
+
+		return $es;
+	}
+
+	public function setEntities($entities) {
+		$current = $this->getEntities();
+
+		foreach($entities as $name => $e) {
+			if(isset($e['defaultAcl'])) {
+				$current[$name]->setDefaultAcl($e['defaultAcl']);
+			}
+		}
 	}
 	
 	public function setSettings($value) {

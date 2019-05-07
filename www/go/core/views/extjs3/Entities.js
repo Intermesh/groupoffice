@@ -15,9 +15,7 @@ go.Entities = (function () {
 		init : function() {
 			go.Entities.getAll().forEach(function(entity) {			
 				var module = go.Modules.get(entity.package, entity.module),			
-					serverInfo = module.entities.find(function(serverInfo) {
-						return serverInfo.name == entity.name;
-					});
+					serverInfo = module.entities[entity.name];
 
 				if(serverInfo) {
 					if(!entity.customFields) {

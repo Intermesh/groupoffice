@@ -11,7 +11,7 @@ go.defaultpermissions.DefaultPermissionsPanel = Ext.extend(go.grid.GridPanel, {
 		
 		this.store = new Ext.data.Store({
 			reader: new Ext.data.JsonReader({
-				fields: ['name', 'title', 'module', "package", "customFields", "defaultAclId", "defaultsPanel", "moduleTitle"],
+				fields: ['name', 'title', 'module', "package", "customFields", "defaultAcl", "defaultsPanel", "moduleTitle"],
 				root: 'data'
 			}),			
 			data: {data: data },

@@ -11,6 +11,7 @@ use go\core\model\Module;
 use go\core\ErrorHandler;
 use go\core\jmap;
 use PDOException;
+use go\core\model\Acl;
 
 /**
  * The EntityType class
@@ -591,11 +592,43 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		return property_exists($this->getClassName(), 'filesFolderId') || property_exists($this->getClassName(), 'files_folder_id');
 	}
 
+	/**
+	 * Returns an array with group ID as key and permission level as value.
+	 * 
+	 * @return array eg. ["2" => 50, "3" => 10]
+	 */
+	public function getDefaultAcl() {
+
+		$defaultAclId = $this->getDefaultAclId();
+		if(!$defaultAclId) {
+			return null;
+		}
+		$a = Acl::findById($defaultAclId);
+		$acl = [];
+		foreach($a->groups as $group) {
+			$acl[$group->groupId] = $group->level;
+		}
+
+		return $acl;
+	}
+
+	public function setDefaultAcl($acl) {
+		$defaultAclId = $this->getDefaultAclId();
+		if(!$defaultAclId) {
+			throw new \Exception("Entity '".$this->name."' does not support a default ACL");
+		}
+		$a = Acl::findById($defaultAclId);
+		foreach($acl as $groupId => $level) {
+			$a->addGroup($groupId, $level);
+		}
+		return $a->save();
+	}
+
 	public function toArray($properties = null) {
 		return [
 				"name" => $this->getName(),
 				"isAclOwner" => $this->isAclOwner(),
-				"defaultAclId" => $this->getDefaultAclId(),
+				"defaultAcl" => $this->getDefaultAcl(),
 				"supportsCustomFields" => $this->supportsCustomFields(),
 				"supportsFiles" => $this->supportsFiles()
 		];

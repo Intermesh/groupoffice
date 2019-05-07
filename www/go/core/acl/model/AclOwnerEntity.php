@@ -87,7 +87,7 @@ abstract class AclOwnerEntity extends AclEntity {
 		return $acl;
 	}
 
-	private $setAcl;
+	protected $setAcl;
 
 	/**
 	 * Set the ACL

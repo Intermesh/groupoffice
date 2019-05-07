@@ -77,7 +77,11 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 					tooltip: t("Add"),
 					handler: function () {
 						var dlg = new go.modules.community.addressbook.AddressBookDialog();
-						dlg.show();
+
+						// TODO automatic?
+						dlg.setValues({
+							acl: go.Modules.get("community", "addressbook").entities.AddressBook.defaultAcl
+						}).show();
 					}
 				},
 				//add back button for smaller screens

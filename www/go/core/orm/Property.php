@@ -169,15 +169,15 @@ abstract class Property extends Model {
 	 * Copies all properties so isModified() can detect changes.
 	 */
 	private function trackModifications() {
-		foreach ($this->getMapping()->getTables() as $table) {
-			foreach ($table->getColumns() as $colName => $column) {
-				if (in_array($colName, static::getPropNames())) {
-					$this->oldProps[$colName] = $this->$colName;
-				}
-			}
-		}
-		foreach ($this->getFetchedRelations() as $relation) {
-			$this->oldProps[$relation->name] = $this->{$relation->name};
+		//Watch db cols and relations
+		$watch = array_keys($this->getMapping()->getProperties());
+		
+		//watch other props
+		$watch = array_merge($watch, static::getPropNames());
+		$watch = array_unique($watch);
+
+		foreach ($watch as $propName) {
+			$this->oldProps[$propName] = $this->$propName;
 		}
 	}
 
@@ -391,23 +391,31 @@ abstract class Property extends Model {
 
 	private static function getPropNames() {
 		$cls = static::class;
-		if (!isset(static::$propNames[$cls])) {
+		$cacheKey = $cls . '-getPropNames';
+
+		$propNames = GO()->getCache()->get($cacheKey);
+
+		if (!$propNames) {
 			$reflectionClass = new ReflectionClass($cls);
-			$props = $reflectionClass->getProperties();
-			static::$propNames[$cls] = [];
+			$props = $reflectionClass->getProperties(\ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED);
+			$propNames = [];
 			foreach ($props as $prop) {
-				static::$propNames[$cls][] = $prop->getName();
+				if(!$prop->isStatic()) {
+					$propNames[] = $prop->getName();
+				}
 			}
 			
 			//add dynamic relations		
 			foreach(static::getMapping()->getProperties() as $name => $type) {
-				if(!in_array($name, static::$propNames[$cls])) {
-					static::$propNames[$cls][] = $name;
+				if(!in_array($name, $propNames)) {
+					$propNames[] = $name;
 				}
 			}
+
+			GO()->getCache()->set($cacheKey, $propNames);
 		}
 
-		return static::$propNames[$cls];
+		return $propNames;
 	}
 
 	/**

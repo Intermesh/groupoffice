@@ -168,14 +168,14 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 			return $value->toArray();
 		} elseif (is_array($value)) {
 			//support an array of models too
-			if (isset($value[0])) {
+			//if (isset($value[0])) {
 				$arr = [];
 				foreach ($value as $key => $v) {
 					$arr[$key] = $this->convertValue($v);
 				}
 				return $arr;
-			}
-			return $value;
+			//}
+			//return $value;
 		} else if (is_scalar($value) || is_null($value)) {
 			return $value;
 		} else if ($value instanceof \StdClass) {
