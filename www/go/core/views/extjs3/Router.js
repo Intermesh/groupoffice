@@ -16,6 +16,8 @@ go.Router = {
 	routing: false,
 	
 	requireAuthentication : false,
+
+	defaultRoute: null,
 	
 	config: function (options) {
 		this.root = options && options.root ? '/' + this.trimSlashes(options.root) + '/' : '/';
@@ -52,14 +54,17 @@ go.Router = {
 	 * @returns {go.Router}
 	 */
 	add: function (re, handler, requireAuthentication) {
-		if (typeof re == 'function') {
-			handler = re;
-			re = '';
-		}
-		
+
 		if(typeof requireAuthentication === "undefined") {
 			requireAuthentication = true;
 		}
+
+		if (typeof re == 'function') {
+			handler = re;
+			re = '';
+			this.defaultRoute = {re: re, handler: handler, requireAuthentication: requireAuthentication};
+			return this;
+		}		
 		
 		this.routes.push({re: re, handler: handler, requireAuthentication: requireAuthentication});
 		return this;
@@ -86,35 +91,37 @@ go.Router = {
 		if(this.suspendEvent) {
 			this.suspendEvent = false;
 			return this;
-		}
-		
-		
+		}		
 		
 		for (var i = 0; i < this.routes.length; i++) {
 			var match = path.match(this.routes[i].re);
 			if (match) {
 				match.shift();
-				
-				this.requireAuthentication = this.routes[i].requireAuthentication;
-				
-				if(!go.User && this.routes[i].requireAuthentication){
-					
-					console.log("redirect", this.routes[i]);
-					this.pathBeforeLogin = this.getPath();
-					return this.goto('login');					
-				}
-	
-				for(var n = 0, l = match.length; n < l; n++) {
-					match[n] = decodeURIComponent(match[n]);
-				}
-				this.routing = true;
-				this.routes[i].handler.apply({}, match);
-				this.routing = false;
-				return this;
+				return this.handleRoute(this.routes[i], match);				
 			}
 		}
+		return this.defaultRoute ? this.handleRoute(this.defaultRoute, []) : this;
+	},
+
+	handleRoute : function(route, match) {
+		this.requireAuthentication = route.requireAuthentication;
+				
+		if(!go.User && route.requireAuthentication){
+			
+			console.log("redirect", route);
+			this.pathBeforeLogin = this.getPath();
+			return this.goto('login');					
+		}
+
+		for(var n = 0, l = match.length; n < l; n++) {
+			match[n] = decodeURIComponent(match[n]);
+		}
+		this.routing = true;
+		route.handler.apply({}, match);
+		this.routing = false;
 		return this;
 	},
+
 	goto: function (path) {
 		
 		if(this.getPath() == path) {
@@ -127,14 +134,12 @@ go.Router = {
 		}
 		return this;
 	}
-}
+};
 
 //// configuration
 go.Router.config({mode: 'hash'});
 
 GO.mainLayout.on("boot", function() {		
-	
-	
 	
 	go.Router.add(/^login$/, function() {
 		GO.mainLayout.login();
@@ -144,47 +149,13 @@ GO.mainLayout.on("boot", function() {
 		var recoveryPanel = new go.login.RecoveryDialog();
 		recoveryPanel.show(hash, redirectUrl);
 	}, false);
-	
-	
-	//Add these default routes on boot so they are added as last options for sure.
-	//
-	//default route for entities		
-	go.Router.add(/([a-zA-Z0-9]*)\/([0-9]*)/, function(entity, id) {
-		var entityObj = go.Entities.get(entity);
-		if(!entityObj) {
-			console.log("Entity ("+entity+") not found in default entity route")
-			return false;
-		}
-    
-    var module = entityObj.module; 
-		var mainPanel = GO.mainLayout.openModule(module);
-		var detailViewName = entity + "Detail";
 
-		if (mainPanel.route) {
-			mainPanel.route(id, entityObj);
-		} else if(mainPanel[detailViewName]) {
-			mainPanel[detailViewName].load(id);
-			mainPanel[detailViewName].show();
-		} else {
-			console.log("Default entity route failed because " + detailViewName + " or 'route' function not found in mainpanel of " + module + ":", mainPanel);
-			console.log(arguments);
-		}
-	});
-
-	//default route
+	// default route
 	go.Router.add(function() {	
 		if(go.User.isLoggedIn()) {
-//			
-//			if(!go.Modules.isAvailable("legacy", GO.settings.start_module)) {
-//				//console.log(GO.mainLayout.tabPanel.items.first());
-//				GO.settings.start_module = GO.mainLayout.tabPanel.items.first().module;
-//			}
-			
 			go.Router.goto(GO.settings.start_module);
 		}
 	});
-		
-	go.Router.check();			
 });
 
 

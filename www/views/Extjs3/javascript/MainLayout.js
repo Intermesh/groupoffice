@@ -101,6 +101,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					go.User.clearAccessToken();
 					
 					me.fireEvent("boot", this);
+					go.Router.check();
 					if(go.Router.requireAuthentication) {
 						go.Router.pathBeforeLogin = go.Router.getPath();
 						go.Router.goto("login");
@@ -109,6 +110,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			});
 		} else {
 			this.fireEvent("boot", this); // In the router there is an event attached.
+			go.Router.check();
 			if(go.Router.requireAuthentication) {
 				go.Router.pathBeforeLogin = go.Router.getPath();
 				go.Router.goto("login");
@@ -367,12 +369,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		Ext.state.Manager.setProvider(new GO.state.HttpProvider());
 		
 		this.fireEvent('authenticated', this);
-//		go.customfields.CustomFields.init(function(){
-//			go.Modules.init(function() {
-//				
-//			});
-//		});
-		
 		var me = this;
 	
 		Promise.all([
@@ -382,6 +378,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		]).then(function(){
 			go.Entities.init();
 			me.renderUI();
+			me.addDefaultRoutes();
 		}).catch(function(error){
 			console.error(error);
 		});
@@ -389,6 +386,35 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		
 	},
 	
+	addDefaultRoutes : function() {
+		//Add these default routes on boot so they are added as last options for sure.
+		//
+		//default route for entities		
+		go.Router.add(/([a-zA-Z0-9]*)\/([0-9]*)/, function(entity, id) {
+			var entityObj = go.Entities.get(entity);
+			if(!entityObj) {
+				console.log("Entity ("+entity+") not found in default entity route")
+				return false;
+			}
+			
+			var module = entityObj.module; 
+			var mainPanel = GO.mainLayout.openModule(module);
+			var detailViewName = entity + "Detail";
+
+			if (mainPanel.route) {
+				mainPanel.route(id, entityObj);
+			} else if(mainPanel[detailViewName]) {
+				mainPanel[detailViewName].load(id);
+				mainPanel[detailViewName].show();
+			} else {
+				console.log("Default entity route failed because " + detailViewName + " or 'route' function not found in mainpanel of " + module + ":", mainPanel);
+				console.log(arguments);
+			}
+		});
+
+		go.Router.check();
+	},
+
 	renderUI : function() {
 
 		if (this.loginPanel) {
