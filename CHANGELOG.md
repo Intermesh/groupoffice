@@ -1,3 +1,5 @@
+- Core: Clear listeners before creating the new ones again.
+
 06-05-2019 6.3.72
 - Core: Auto logout when checker fails fixed
 - Core: Show route in log when access denied error is logged
