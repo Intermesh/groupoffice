@@ -38,7 +38,7 @@ if(strpos($_GET['blob'], '/') === false) {
 	exit();
 }
 
-//Blob used for routing to a DownloadController if we get here.
+//Blob used for routing to a download method in the module file if we get here.
 
 $parts = explode("/", $_GET['blob']);
 

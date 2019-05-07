@@ -47,7 +47,8 @@
 		}
 	<?php
 			if(GO()->getSettings()->logoId) {
-				echo ".go-app-logo, #go-logo {background-image: url(".\go\core\fs\Blob::url(GO()->getSettings()->logoId).")}";
+				//blob id is not used by script but added only for caching.
+				echo ".go-app-logo, #go-logo {background-image: url(" . GO()->getSettings()->URL . "api/logo.php?blob=" . GO()->getSettings()->logoId . ")}";
 			}
 		}
 	?>
