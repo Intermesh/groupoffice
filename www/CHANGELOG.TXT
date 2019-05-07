@@ -1,3 +1,4 @@
+- Comments: Add comments module to modulemanager when installed.
 - Core: Added isDeleted() function to ActiveRecord which will return a boolean
 
 25-04-2019 6.2.117
