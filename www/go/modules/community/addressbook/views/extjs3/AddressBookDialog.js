@@ -7,9 +7,7 @@ go.modules.community.addressbook.AddressBookDialog = Ext.extend(go.form.Dialog, 
 
 	initFormItems: function () {
 
-		this.addPanel(new go.permissions.SharePanel({
-				
-		}));
+		this.addPanel(new go.permissions.SharePanel());
 
 		return [{
 				xtype: 'fieldset',

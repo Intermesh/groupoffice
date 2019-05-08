@@ -7,10 +7,7 @@ go.modules.community.notes.NoteBookDialog = Ext.extend(go.form.Dialog, {
 	height: dp(600),
 	initFormItems: function () {
 
-		this.addPanel(new go.permissions.SharePanel({
-			title: t("Permissions"),
-			value: go.Entities.get("NoteBook").defaultAcl
-		}));
+		this.addPanel(new go.permissions.SharePanel());
 
 		return [{
 				xtype: 'fieldset',
