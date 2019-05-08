@@ -9,10 +9,14 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 	clicksToEdit: 1,
 	
 	showLevels: true,
+
+	title: t("Permissions"),
 	
 	initComponent: function () {
 		
-		this.selectedGroups = [];
+		if(!this.value) {
+			this.value = [];
+		}
 		
 		var checkColumn = new GO.grid.CheckColumn({
 			width: dp(64),
@@ -45,7 +49,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 					name: 'level', 
 					type: {
 						convert: function (v, data) {							
-							return me.selectedGroups[data.id];
+							return me.value[data.id];
 						}
 					}
 				},
@@ -71,10 +75,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 
 		Ext.apply(this, {		
 			plugins: [checkColumn],
-			tbar: [{
-					xtype: 'tbtitle',
-					text: t("Group Office users and groups")
-			},
+			tbar: [
 			'->', 
 				{
 					xtype: 'tbsearch',
@@ -167,18 +168,18 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 	onCheckChange : function(record, newValue) {
 		if(newValue) {			
 			record.set('level', this.addLevel);
-			this.selectedGroups[record.data.id] = record.data.level;
+			this.value[record.data.id] = record.data.level;
 		} else
 		{
 			record.set('level', null);
-			this.selectedGroups[record.data.id] = null;
+			this.value[record.data.id] = null;
 		}
 		
 		this._isDirty = true;
 	},
 
 	afterEdit : function(e) {
-		this.selectedGroups[e.record.id] = e.record.data.level;				
+		this.value[e.record.id] = e.record.data.level;				
 		this._isDirty = true;
 	},
 	
@@ -242,7 +243,25 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 		return new go.form.ComboBox(permissionLevelConfig);
 	},
 	
-	
+	afterRender : function() {
+
+		go.permissions.SharePanel.superclass.afterRender.call(this);
+
+		var form = this.findParentByType("entityform");
+
+		if(!form) {
+			return;
+		}
+		this.value = form.entityStore.entity.defaultAcl;
+
+		form.on("load", function(f, v) {
+			this.setDisabled(v.permissionLevel < go.permissionLevels.manage);
+		}, this);
+
+		if(!go.util.empty(this.value)) {
+			this.store.load();
+		}
+	},
 	
 	isFormField: true,
 
@@ -263,12 +282,12 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 
 	setValue: function (groups) {		
 		this._isDirty = false;		
-		this.selectedGroups = groups;
+		this.value = groups;
 		this.store.load();
 	},
 	
 	getSelectedGroupIds : function() {
-		return Object.keys(this.selectedGroups).map(function(id) { return parseInt(id);});
+		return Object.keys(this.value).map(function(id) { return parseInt(id);});
 	},
 	
 	onBeforeStoreLoad : function(store, options) {
@@ -296,7 +315,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 	},	
 	
 	getValue: function () {				
-		return this.selectedGroups;
+		return this.value;
 	},
 
 	markInvalid: function (msg) {

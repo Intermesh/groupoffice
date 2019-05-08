@@ -98,7 +98,13 @@ class Acl extends Controller {
 		foreach($entities as $entity) {
 			if(!$params['add']) {
 				$entity->findAcl()->groups = [];
+
+				if($entityType->getName() == "Group") {
+		 			// Groups have a special situtation. They must be shared with the group itself so they can see it.
+					$entity->findAcl()->addGroup($entity->id, model\Acl::LEVEL_READ);					
+				}			
 			}
+			
 			$entity->setAcl($defaultAcl);
 			if(!$entity->save()) {
 				throw new \Exception("Could not save default ACL for entity");

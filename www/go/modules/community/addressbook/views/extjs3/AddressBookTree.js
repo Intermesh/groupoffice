@@ -129,7 +129,6 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 		}		
 
 		destroyed.forEach(function (groupId) {
-			console.log(groupId);
 			me.getNodeById("AddressBookGroup-" + groupId).destroy();
 		});
 	},
@@ -138,6 +137,7 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 		if (!this.addressBookMoreMenu) {
 			this.addressBookMoreMenu = new Ext.menu.Menu({
 				items: [{
+						itemId: "edit",
 						iconCls: 'ic-edit',
 						text: t("Edit"),
 						handler: function () {
@@ -175,22 +175,12 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 							}, this);
 						},
 						scope: this
-					}, {
-						iconCls: 'ic-share',
-						text: t("Share"),
-						handler: function () {
-							var shareWindow = new go.permissions.ShareWindow({
-								entityStore: "AddressBook",
-								title: t("Share") + ": " + this.addressBookMoreMenu.data.name
-							});
-
-							shareWindow.load(this.addressBookMoreMenu.data.id).show();
-						},
-						scope: this
 					}]
 			});
 		}
 		this.addressBookMoreMenu.data = node.attributes.data;
+		this.addressBookMoreMenu.getComponent("edit").setDisabled(this.addressBookMoreMenu.data.permissionLevel < go.permissionLevels.manage);
+		this.addressBookMoreMenu.getComponent("delete").setDisabled(this.addressBookMoreMenu.data.permissionLevel  < go.permissionLevels.manage);
 		this.addressBookMoreMenu.showAt(e.getXY());
 	},
 

@@ -23,7 +23,7 @@ go.Entities = (function () {
 					}				
 					
 					entity.isAclOwner = serverInfo.isAclOwner;
-					entity.defaultAclId = serverInfo.defaultAclId;	
+					entity.defaultAcl = serverInfo.defaultAcl;	
 				}
 				
 				if(entity.customFields) {

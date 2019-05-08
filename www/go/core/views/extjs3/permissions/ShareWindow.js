@@ -25,6 +25,7 @@ go.permissions.ShareWindow = Ext.extend(go.form.Dialog, {
 	initFormItems: function () {
 		return [
 			this.sharePanel = new go.permissions.SharePanel({
+				title: false,
 				anchor: '100% -' + dp(32),
 				hideLabel: true,
 				name: "acl",

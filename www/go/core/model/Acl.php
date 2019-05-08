@@ -9,6 +9,7 @@ use go\core\model\User;
 use go\core\orm\Query;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
+use go\core\exception\Forbidden;
 
 /**
  * The Acl class
@@ -67,45 +68,21 @@ class Acl extends Entity {
 			
 		return parent::internalValidate();
 	}
-
-	// /**
-	//  * Returns an array with group ID as key and permission level as value.
-	//  * 
-	//  * @return array eg. ["2" => 50, "3" => 10]
-	//  */
-	// public function getAcl() {
-	// 	$acl = [];
-	// 	foreach($this->groups as $group) {
-	// 		$acl[$group->groupId] = $group->level;
-	// 	}
-
-	// 	return $acl;
-	// }
-
-	// private $setAcl;
-
-	// /**
-	//  * Set the ACL
-	//  * 
-	//  * @param $acl an array with group ID as key and permission level as value. eg. ["2" => 50, "3" => 10]
-	//  */
-	// public function setAcl($acl) {
-	// 	$this->setAcl = $acl;		
-	// }
 	
-	// private function saveAcl() {
-	// 	if(!isset($this->setAcl)) {
-	// 		return true;
-	// 	}
-		
-	// 	foreach($this->setAcl as $groupId => $level) {
-	// 		$this->addGroup($groupId, $level);
-	// 	}
-	// }
+	/**
+	 * Permissions are set via AclOwnerEntity models through setAcl(). When this propery is used it will configure the Acl models.
+	 * This permission is not checked in the controller as usal but checked on save here.
+	 */
+	protected function checkManagePermission() {
+		$level = $this->getUserPermissionLevel($this->id, GO()->getUserId());
+		if($level != self::LEVEL_MANAGE) {
+			throw new Forbidden("You are not allowed to manage permissions on this ACL");
+		}
+	}
 	
 	protected function internalSave() {
 
-		// $this->saveAcl();
+		$this->checkManagePermission();
 		
 		$adminLevel = $this->hasGroup(Group::ID_ADMINS);
 		if($adminLevel < self::LEVEL_MANAGE) {

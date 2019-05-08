@@ -45,26 +45,12 @@ abstract class AclOwnerEntity extends AclEntity {
 		return parent::internalSave();
 	}
 
-	/**
-	 * True if the current user may share this item
-	 * 
-	 * @return bool
-	 */
-	public function mayShare() {
-		$a = $this->findAcl();
-		return $a->hasPermissionLevel(Acl::LEVEL_MANAGE);
-	}
-
 	private function saveAcl() {
 		if(!isset($this->setAcl)) {
 			return true;
 		}
 
 		$a = $this->findAcl();
-
-		if(!$this->mayShare()) {
-			throw new Forbidden();
-		}
 
 		foreach($this->setAcl as $groupId => $level) {
 			$a->addGroup($groupId, $level);

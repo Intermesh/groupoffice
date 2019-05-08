@@ -80,7 +80,8 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 
 						// TODO automatic?
 
-						
+						dlg.show();
+						return;
 						dlg.setValues({
 							acl: go.Modules.get("community", "addressbook").entities.AddressBook.defaultAcl
 						}).show();

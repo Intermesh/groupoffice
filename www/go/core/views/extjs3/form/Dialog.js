@@ -17,6 +17,11 @@ go.form.Dialog = Ext.extend(go.Window, {
 	buttonAlign: 'left',
 	layout: "fit",
 
+	/**
+	 * If set then the title bar will be appended with ": "+ value of the field.
+	 */
+	titleField: "name",
+
 
 	/**
 	 * Layout of the automatically created form panel
@@ -82,6 +87,32 @@ go.form.Dialog = Ext.extend(go.Window, {
 		}
 		
 		this.addEvents({load: true, submit: true});
+
+		this.initTitleField();
+
+	},
+
+	initTitleField : function() {
+		if(this.titleField) {
+			this.titleField = this.formPanel.getForm().findField(this.titleField);
+			if(this.titleField) {
+				this.titleField.on("change", this.updateTitle, this);
+				this.formPanel.on("load", this.updateTitle, this);
+			}
+		}
+	},
+
+	updateTitle : function() {
+		if(!this.origTitle) {
+			this.origTitle = this.title;
+		}
+		var title = this.origTitle, v = this.titleField.getValue();
+
+		if(v) {
+			title += ": " + v;
+		}
+
+		this.setTitle(title);
 	},
 	
 	createFormPanel : function() {

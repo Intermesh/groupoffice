@@ -421,7 +421,7 @@ Ext.override(Ext.FormPanel,{
 
 
 				//Don't focus on an invalid field or it will loose the invalide state on blur
-				if(firstField && !firstField.activeError && firstField.isValid && firstField.isValid()) {
+				if(firstField && !firstField.activeError) {// && firstField.isValid && firstField.isValid()) {
 					firstField.focus();
 					return;
 				} 
