@@ -1,7 +1,6 @@
 go.Modules.register("core", 'core', {
 	title: t("Core"),
 	entities: [
-		'Acl', 
 		{
 			name: 'Group',
 			relations: {

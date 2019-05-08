@@ -3,12 +3,21 @@
  * var dlg = new go.permissions.ShareWindow();
  * dlg.load(aclId).show();
  */
-go.defaultpermissions.ShareWindow = Ext.extend(go.permissions.ShareWindow, {
+go.defaultpermissions.ShareWindow = Ext.extend(go.form.Dialog, {
 	title: t('Set default permissions'),
-	entityStore: "Acl",
+	entityStore: "Module",
 	height: dp(600),
 	width: dp(1000),
-	entity: null,
+	formPanelLayout: "fit",
+
+	forEntityStore: null,
+
+	initFormItems : function() {
+		return new go.permissions.SharePanel({
+			hideLabel: true,
+			name: 'entities.' + this.forEntityStore + '.defaultAcl'
+		});
+	},
 
 	initComponent: function () {
 		go.defaultpermissions.ShareWindow.superclass.initComponent.call(this);
@@ -35,7 +44,7 @@ go.defaultpermissions.ShareWindow = Ext.extend(go.permissions.ShareWindow, {
 							method: "Acl/reset",
 							params: {
 								add: true,
-								entity: this.entity
+								entity: this.forEntityStore
 							},
 							callback: function (options, success, response) {
 								this.getEl().unmask();
@@ -75,7 +84,7 @@ go.defaultpermissions.ShareWindow = Ext.extend(go.permissions.ShareWindow, {
 							method: "Acl/reset",
 							params: {
 								add: false,
-								entity: this.entity
+								entity: this.forEntityStore
 							},
 							callback: function (options, success, response) {
 								this.getEl().unmask();

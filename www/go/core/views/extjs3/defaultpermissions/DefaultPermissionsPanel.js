@@ -3,7 +3,8 @@ go.defaultpermissions.DefaultPermissionsPanel = Ext.extend(go.grid.GridPanel, {
 	initComponent: function () {
 		
 		var data = go.Entities.getAll().map(function(e) {			
-			var module = go.Modules.get(e.package, e.module);			
+			var module = go.Modules.get(e.package, e.module);		
+			e.moduleId = module.id;	
 			e.moduleTitle = go.Modules.getConfig(module.package, module.name).title;						
 			return e;
 			
@@ -11,7 +12,7 @@ go.defaultpermissions.DefaultPermissionsPanel = Ext.extend(go.grid.GridPanel, {
 		
 		this.store = new Ext.data.Store({
 			reader: new Ext.data.JsonReader({
-				fields: ['name', 'title', 'module', "package", "customFields", "defaultAcl", "defaultsPanel", "moduleTitle"],
+				fields: ['moduleId', 'name', 'title', 'module', "package", "customFields", "defaultAcl", "defaultsPanel", "moduleTitle"],
 				root: 'data'
 			}),			
 			data: {data: data },
@@ -77,8 +78,9 @@ go.defaultpermissions.DefaultPermissionsPanel = Ext.extend(go.grid.GridPanel, {
 	
 	edit : function(record) {	
 		
-		var win = new go.defaultpermissions.ShareWindow();
-		win.entity = record.data.name;
-		win.load(record.data.defaultAclId).show();		
+		var win = new go.defaultpermissions.ShareWindow({
+			forEntityStore: record.data.name
+		});
+		win.load(record.data.moduleId).show();		
 	}
 });

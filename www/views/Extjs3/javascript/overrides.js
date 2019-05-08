@@ -253,35 +253,22 @@ Ext.override(Ext.form.BasicForm,{
 	  return this.setValuesOrig(values);		
 	},
 	
-	joinValues : function(v) {
-		
-		if(!Ext.isObject(v)){
+	joinValues : function(root, v, prefix) {
+		if(!Ext.isDefined(v)) {
+			v = root;
+		}
+		if(!Ext.isObject(v) || Ext.isDate(v[name])){
 			return v;
 		}
-		
-		var converted = {};
-		
-		for(var name in v) {
-			if(!Ext.isDate(v[name]) && Ext.isObject(v[name]) ){
-				
-				for(var subname in v[name]) {
-					var combinedName = name + '.' + subname;
-					//if(this.findField(combinedName)) {
-						converted[combinedName] = this.joinValues(v[name][subname]);
-//					}else
-//					{
-//						
-//					}
-				}
-				
-			} 
-			converted[name] = v[name];
-			
-			
+
+		if(!prefix) {
+			prefix = "";
 		}
-		
-		return converted;
-		
+
+		for(var name in v) {
+			root[prefix + name] = this.joinValues(root, v[name], prefix + name + ".");		
+		}		
+		return v;		
 	}
 
 });
