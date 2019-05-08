@@ -27,7 +27,7 @@ CREATE TABLE `core_auth_method` (
 
 CREATE TABLE `core_auth_password` (
   `userId` int(11) NOT NULL,
-  `password` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `password` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE `core_auth_token` (
