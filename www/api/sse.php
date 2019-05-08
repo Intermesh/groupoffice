@@ -67,6 +67,7 @@ function checkChanges() {
 		$cls::getType()->clearCache();
 		$state[$name] = $cls::getState();
 	}
+	// sendMessage('ping', $state);
 	return $state;
 }
 
