@@ -356,7 +356,7 @@ class Blob extends orm\Entity {
 		$this->getFile()->output(true, true, [
 			'Content-Type' => $this->type, 
 			"Expires" => (new DateTime("1 year"))->format("D, j M Y H:i:s"),
-			'Content-Disposition' => 'attachment; filename="' . $this->name . '"'
+			'Content-Disposition' => 'inline; filename="' . $this->name . '"'
 					]);
 	}
 }
