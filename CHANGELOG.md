@@ -1,4 +1,5 @@
-- Fixed paging and searching in select email in sync settings
+- Sync/email: Fixed paging and searching in select email in sync settings
+- Core: Created new setting callto_open_window to control if a phone number click will open a window
 
 06-05-2019 6.3.72
 - Core: Auto logout when checker fails fixed
