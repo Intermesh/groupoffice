@@ -248,7 +248,10 @@ class File extends FileSystemObject {
 			$r->setHeader('Content-Disposition', 'attachment; filename="' . $this->getName() . '"');
 			$r->setHeader('Content-Transfer-Encoding', 'binary');
 
-			if ($useCache) {			
+			if ($useCache) {				
+				$r->setHeader('Cache-Control', 'PRIVATE');
+				$r->removeHeader('Pragma');
+
 				$r->setModifiedAt($this->getModifiedAt());
 				$r->setETag($this->getMd5Hash());
 				$r->abortIfCached();
