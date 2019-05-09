@@ -81,7 +81,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 						var style = "", cls = "", content = "";
 
 						if (record.data.photoBlobId) {
-							style = 'background-image: url(' + go.Jmap.downloadUrl(record.data.photoBlobId) + ')"';
+							style = 'background-image: url(' + go.Jmap.downloadUrl(record.data.photoBlobId) + ')';
 						} else
 						{
 							cls = record.data.isOrganization ? "organization" : "";
