@@ -1,3 +1,5 @@
+- Core: Fixed issue that when a link is created on model->save and the Link/set is called afterwards, that an error is thrown when the link did already exist.
+				Now the error is ignored when validationerror status == 11 
 - Core: Clear listeners before creating the new ones again.
 - Core: Fixed issue that the columnSelectGrid for export could crash when pressing "Delete" button to remove a column.
 				Double click or drag/drop should be used. Delete is disabled now.
