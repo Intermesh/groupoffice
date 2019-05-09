@@ -111,6 +111,15 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		return item;
 	},
 	
+	each : function(fn, scope){
+		var items = [].concat(this.items); // each safe for removal
+		for(var i = 0, len = items.length; i < len; i++){
+			if(fn.call(scope || items[i].items[0].items.get(1), items[i].items[0].items.get(1), i, len) === false){
+				break;
+			}
+		}
+	},
+	
 	addPanel : function() {
 		var formField = this.createNewItem(), me = this, wrap = new Ext.Container({
 			//xtype: "container",
