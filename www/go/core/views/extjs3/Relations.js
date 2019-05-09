@@ -45,7 +45,7 @@ go.Relations = {
 		if(!key) {
       me.applyRelationEntity(relation.path + relName, entity, null);
 			return Promise.resolve(null);
-		}
+		}		
 
 		if(Ext.isArray(key)) {
 
@@ -67,8 +67,8 @@ go.Relations = {
 
 		this.watchRelation(relation.store, key);
 
-		return go.Db.store(relation.store).get([key]).then(function(result) {
-			me.applyRelationEntity(relName, entity, result.entities[0]);
+		return go.Db.store(relation.store).single(key).then(function(relatedEntity) {
+			me.applyRelationEntity(relName, entity, relatedEntity);
 		});
 	},
 

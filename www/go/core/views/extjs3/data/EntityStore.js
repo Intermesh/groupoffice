@@ -57,9 +57,9 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		
 		if(me.initialized) {
 			if(cb) {
-				cb.call(me);
-				return Promise.resolve();
+				cb.call(me);				
 			}
+			return me.initialized;
 		}
 		
 		me.stateStore = localforage.createInstance({
@@ -72,7 +72,8 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			storeName: me.entity.name + "-meta"
 		});
 		
-		return Promise.all([
+		// me.initialized = this.clearState().then(function() {return Promise.all([			
+		me.initialized = Promise.all([			
 			me.metaStore.getItem('notFound').then(function(v) {
 				me.notFound = v || [];
 				return true;
@@ -94,9 +95,6 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				return true;
 			})
 		]).then(function() {
-
-			me.initialized = true;
-
 			if(!me.state) {
 				return Promise.all([
 					me.metaStore.setItem("apiVersion", go.User.apiVersion),
@@ -115,6 +113,9 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			}
 			return true;
 		});
+	// });
+
+		return me.initialized;
 		
 	},
 	
@@ -282,7 +283,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				return;
 			}
 			
-			var clientCallId = go.Jmap.request({
+			var promise = go.Jmap.request({
 				method: this.entity.name + "/changes",
 				params: {
 					sinceState: this.state
@@ -327,7 +328,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				method: this.entity.name + "/get",
 				params: {
 					"#ids": {
-						resultOf: clientCallId,
+						resultOf: promise.callId,
 						path: '/changed'
 					}
 				},
@@ -391,6 +392,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	},
 	
 	single: function(id) {
+
 		if(this.data[id]) {
 			return Promise.resolve(go.util.clone(this.data[id]));
 		}
@@ -402,8 +404,9 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 		var me = this;
 
-		//return me._getSingleFromServer(id);
-
+		// For testing without indexeddb
+		// return me._getSingleFromServer(id);
+		
 		return this._getSingleFromBrowserStorage(id).then(function(entity) {
 			if(entity) {
 				return entity;
@@ -420,6 +423,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		}
 
 		var me = this;
+		
 		this.pending[id] = new Promise(function(resolve, reject) {
 			go.Jmap.request({
 				method: me.entity.name + "/get",
@@ -445,8 +449,9 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 						});	
 					} else
 					{
+						//this.data is filled with flux in the recieve() function.
 						if(!this.data[id]) {
-							debugger;
+							throw "Data not available ???";
 						}
 						resolve(go.util.clone(this.data[id]));
 					}
@@ -460,9 +465,14 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 	_getSingleFromBrowserStorage : function(id) {
 		var me = this;
-		return me.initState().then(function() {
-			
+		
+		//Pause JMAP requests because indexeddb events will trigger the queue
+		go.Jmap.pause();
+		return me.initState().then(function() {			
 			return me.stateStore.getItem(id + "").then(function(entity) {		
+
+				//Continue JMAP
+				go.Jmap.continue();
 				if(!entity) {
 					return null;
 				}				

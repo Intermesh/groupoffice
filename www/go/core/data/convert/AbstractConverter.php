@@ -26,7 +26,7 @@ use go\core\orm\Query;
  * 		
  * 		var win = window.open("about:blank");
  * 		
- * 		var callId = go.Jmap.request({
+ * 		var promise = go.Jmap.request({
  * 			method: "Contact/query",
  * 			params: Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0}),
  * 			callback: function (options, success, response) {
@@ -38,7 +38,7 @@ use go\core\orm\Query;
  * 			params: {
  * 				converter: "JSON",
  * 				"#ids": {
- * 					resultOf: callId,
+ * 					resultOf: promise.callId,
  * 					path: "/ids"
  * 				}
  * 			},

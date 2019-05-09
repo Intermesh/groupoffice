@@ -250,7 +250,7 @@ go.util =  (function () {
 	exportToFile: function (entity, queryParams, contentType) {
 		
 		Ext.getBody().mask(t("Exporting..."));
-		var callId = go.Jmap.request({
+		var promise = go.Jmap.request({
 			method: entity + "/query",
 			params: queryParams,
 			callback: function (options, success, response) {
@@ -262,7 +262,7 @@ go.util =  (function () {
 			params: {
 				contentType: contentType,
 				"#ids": {
-					resultOf: callId,
+					resultOf: promise.callId,
 					path: "/ids"
 				}
 			},

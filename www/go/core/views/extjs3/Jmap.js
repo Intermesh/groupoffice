@@ -15,13 +15,10 @@ go.Jmap = {
 	},
 
 	debug: function () {
-		var clientCallId = "clientCallId-" + this.nextCallId();
-		this.requests.push(['community/dev/Debugger/get', {}, clientCallId]);
-
-		this.requestOptions[clientCallId] = {
+		this.scheduleRequest({
 			method: 'community/dev/Debugger/get',
 			params: {},
-			callback: function(options, success, response) {
+			callback: function(options, success, response, clientCallId) {
 				
 				console.group(clientCallId);
 				response.forEach(function(r) {
@@ -42,7 +39,7 @@ go.Jmap = {
 				});
 				console.groupEnd();
 			}
-		};
+		});
 	},
 
 	abort: function (clientCallId) {
@@ -190,80 +187,121 @@ go.Jmap = {
 	request: function (options) {
 		if(!options.method) {
 			throw "method is required";
-		}
-		
-		var me = this;
+		}		
 
-		if (me.timeout) {
-			clearTimeout(me.timeout);
+		if (this.timeout) {
+			clearTimeout(this.timeout);
 		}
 		
-		var clientCallId = "clientCallId-" + this.nextCallId();
-		
-//		console.debug(clientCallId, options.method);
-//		console.trace();
+		var promise = this.scheduleRequest(options);
+
+		if(!this.paused) {
+			this.continue();
+		}
+
+		return promise;
+	},
+
+	scheduleRequest: function(options) {
+		var clientCallId = "clientCallId-" + this.nextCallId(), promise = new Promise(function(resolve, reject){
+			options.resolve = resolve;
+			options.reject = reject;
+		});
+		promise.callId = clientCallId;
 
 		this.requests.push([options.method, options.params || {}, clientCallId]);
-
 		this.requestOptions[clientCallId] = options;
 
-		me.timeout = setTimeout(function () {
+		return promise;
+	},
 
-			if (!me.requests.length) {
-				//All requests aborted
-				return;
-			}
+	/**
+	 * Pause request execution
+	 */
+	pause : function() {
+		this.paused = true;
+		if (this.timeout) {
+			clearTimeout(this.timeout);
+		}
+	},
 
-			me.debug();
-
-			Ext.Ajax.request({
-				url: me.getApiUrl(),
-				method: 'POST',
-				jsonData: me.requests,
-				success: function (response, opts) {
-					try {
-						var responses = JSON.parse(response.responseText);
-
-						responses.forEach(function (response) {
-
-							//lookup request options by client ID
-							var o = me.requestOptions[response[2]];
-							if (!o) {
-								//aborted
-								console.debug("Aborted");
-								return true;
-							}
-							if (response[0] == "error") {
-								console.error('server-side JMAP failure', response);			
-							}
-
-							go.flux.Dispatcher.dispatch(response[0], response[1]);
-
-							var success = response[0] !== "error";
-							if (o.callback) {
-								if (!o.scope) {
-									o.scope = me;
-								}
-								o.callback.call(o.scope, o, success, response[1]);
-							}
-						});
-
-					} catch(e) {
-						console.error(e,"server reponse:", response.responseText);
-
-						Ext.MessageBox.alert(t("Error"), t("An error occured on the server. The console shows details."))
-					}
-				},
-				failure: function (response, opts) {
-					console.log('server-side failure with status code ' + response.status);
-				}
-			});
-
-			me.requests = [];
-			me.timeout = null;
-
+	/**
+	 * Continue request event execution as the next macro task.
+	 */
+	continue: function() {
+		this.paused = false;
+		if (this.timeout) {
+			clearTimeout(this.timeout);
+		}
+		var me = this;
+		this.timeout = setTimeout(function() {
+			me.processQueue();
 		}, 0);
+	},
 
-		return clientCallId;
+	processQueue: function () {
+
+		if (!this.requests.length) {
+			//All requests aborted
+			return;
+		}
+
+		this.debug();
+
+		Ext.Ajax.request({
+			url: this.getApiUrl(),
+			method: 'POST',
+			jsonData: this.requests,
+			scope: this,
+			success: function (response, opts) {
+				try {
+					var responses = JSON.parse(response.responseText);
+
+					responses.forEach(function (response) {
+
+						//lookup request options by client ID
+						var o = this.requestOptions[response[2]];
+						if (!o) {
+							//aborted
+							console.debug("Aborted");
+							return true;
+						}
+						if (response[0] == "error") {
+							console.error('server-side JMAP failure', response);			
+								console.error('server-side JMAP failure', response);			
+							console.error('server-side JMAP failure', response);			
+						}
+
+						go.flux.Dispatcher.dispatch(response[0], response[1]);
+
+						var success = response[0] !== "error";
+						if (o.callback) {
+							if (!o.scope) {
+								o.scope = this;
+							}
+							o.callback.call(o.scope, o, success, response[1], response[2]);
+						}
+
+						if(success) {							
+							o.resolve(response[1]);
+						} else{
+							o.reject(response[1]);
+						}
+					}, this);
+
+				} catch(e) {
+					console.error(e,"server reponse:", response.responseText);
+
+					Ext.MessageBox.alert(t("Error"), t("An error occured on the server. The console shows details."))
+				}
+			},
+			failure: function (response, opts) {
+				console.log('server-side failure with status code ' + response.status);
+			}
+		});
+
+		this.requests = [];
+		this.timeout = null;
+
 	}
 };

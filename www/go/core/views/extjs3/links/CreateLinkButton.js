@@ -10,7 +10,7 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 		
 		
 					
-		var callId = go.Jmap.request({
+		var promise = go.Jmap.request({
 			method: "Search/query",
 			params: {
 				filter: {
@@ -24,7 +24,7 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 			method: "Search/get",
 			params: {
 				"#ids": {
-					resultOf: callId,
+					resultOf: promise.callId,
 					path: "ids"
 				}
 			},
