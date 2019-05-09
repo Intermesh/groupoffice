@@ -1,4 +1,6 @@
 - Core: Clear listeners before creating the new ones again.
+- Core: Fixed issue that the columnSelectGrid for export could crash when pressing "Delete" button to remove a column.
+				Double click or drag/drop should be used. Delete is disabled now.
 
 06-05-2019 6.3.72
 - Core: Auto logout when checker fails fixed

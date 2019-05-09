@@ -27,6 +27,7 @@ GO.base.ColumnSelectPanel = Ext.extend(Ext.Panel,{
 			store: new Ext.data.JsonStore({
 				fields: fields
 			}),
+			noDelete:true,
 			columns: cols,
 			enableDragDrop: true,
 			stripeRows: true,
@@ -39,6 +40,7 @@ GO.base.ColumnSelectPanel = Ext.extend(Ext.Panel,{
 			store: new Ext.data.JsonStore({
 				fields: fields
 			}),
+			noDelete:true,
 			columns: cols,
 			enableDragDrop: true,
 			stripeRows: true,
