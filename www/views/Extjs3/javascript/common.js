@@ -147,7 +147,13 @@ GO.util.callToLink = function(phone){
 }
 
 GO.util.callToHandler = function(phone) {	
-	window.location.replace(GO.calltoTemplate.replace('{phone}', phone.replace('(0)','').replace(/[^0-9+]/g,'')));
+	var url = GO.calltoTemplate.replace('{phone}', phone.replace('(0)','').replace(/[^0-9+]/g,''));
+	if(GO.calltoOpenWindow) {
+		window.open(url);
+	} else
+	{
+		window.location.replace(url);
+	}
 	return false;
 }
 
