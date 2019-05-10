@@ -356,8 +356,11 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 //		
 		GO.moduleManager._addModule(moduleName, panelClass, panelConfig || {});
 				
-		go.Router.add(new RegExp('(' + moduleName + ")$"), function (name) {
-			GO.mainLayout.openModule(name);
+		go.Router.add(new RegExp('^(' + moduleName + ")$"), function (name) {
+			var pnl = GO.mainLayout.openModule(name);
+			if(pnl.routeDefault) {
+				pnl.routeDefault();
+			}
 		});
 		
 		//this.initModule(moduleName);
