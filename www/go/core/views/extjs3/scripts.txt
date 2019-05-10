@@ -211,3 +211,7 @@ filter/FilterDialog.js
 
 
 import/CsvMappingDialog.js
+
+smtp/AccountDialog.js
+smtp/GridPanel.js
+smtp/AccountCombo.js

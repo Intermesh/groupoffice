@@ -74,6 +74,9 @@ class Acl extends Entity {
 	 * This permission is not checked in the controller as usal but checked on save here.
 	 */
 	protected function checkManagePermission() {
+		if($this->isNew() || $this->ownedBy == GO()->getUserId()) {
+			return true;
+		}
 		$level = $this->getUserPermissionLevel($this->id, GO()->getUserId());
 		if($level != self::LEVEL_MANAGE) {
 			throw new Forbidden("You are not allowed to manage permissions on this ACL");

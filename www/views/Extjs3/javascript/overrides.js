@@ -266,7 +266,7 @@ Ext.override(Ext.form.BasicForm,{
 		}
 
 		for(var name in v) {
-			root[prefix + name] = this.joinValues(root, v[name], prefix + name + ".");		
+			root[prefix + name] = this.joinValues(root, v[name] || null, prefix + name + ".");		
 		}		
 		return v;		
 	}

@@ -37,9 +37,19 @@ go.data.StoreTrait = {
 			this.loaded = true;
     }, this);
     
-    //JMAP remote filters. Used by setFilter()
-		this.filters = {};
-  },	
+		this.initFilters();
+	},	
+	
+	initFilters : function() {
+		//JMAP remote filters. Used by setFilter()
+		if(this.filters) {
+			for(var name in this.filters) {
+				this.setFilter(name, this.filters[name]);
+			}
+		} else {
+			this.filters = {};
+		}
+	},
   
   addCustomFields : function(config) {
 		if(!config.entityStore) {

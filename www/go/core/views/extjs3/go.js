@@ -31,3 +31,4 @@ Ext.namespace('go.filter');
 Ext.ns("go.filter.types");
 Ext.ns("go.customfields.filter");
 Ext.ns('go.import');
+Ext.ns('go.smtp');

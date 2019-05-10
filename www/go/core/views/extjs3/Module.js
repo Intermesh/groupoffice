@@ -22,7 +22,8 @@ go.Modules.register("core", 'core', {
 			}
 		}, 
 		'Search', 
-		'EntityFilter'
+		'EntityFilter',
+		'SmtpAccount'
 	],
 	systemSettingsPanels: [
 		"go.users.SystemSettingsUserGrid",

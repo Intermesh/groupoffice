@@ -11,22 +11,16 @@ go.modules.community.addressbook.AddresBookCombo = Ext.extend(go.form.ComboBox, 
 	triggerAction: 'all',
 	editable: true,
 	selectOnFocus: true,
-	forceSelection: true,
-	initComponent: function () {
-		Ext.applyIf(this, {
-			store: new go.data.Store({
-				fields: ['id', 'name'],
-				entityStore: "AddressBook",
-				baseParams: {
-					filter: {
-							permissionLevel: go.permissionLevels.write
-					}
-				}
-			})
-		});
-		
-		go.modules.community.addressbook.AddresBookCombo.superclass.initComponent.call(this);
-
+	forceSelection: true,	
+	store: {
+		xtype: "gostore",
+		fields: ['id', 'name'],
+		entityStore: "AddressBook",
+		baseParams: {
+			filter: {
+					permissionLevel: go.permissionLevels.write
+			}
+		}
 	}
 });
 

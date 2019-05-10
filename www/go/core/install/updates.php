@@ -447,3 +447,33 @@ $updates['201901251344'][] = function() {
 $updates['201903221350'][] = "ALTER TABLE `core_customfields_field_set` ADD `isTab` BOOLEAN NOT NULL DEFAULT FALSE AFTER `filter`;";
 $updates['201904021341'][] = "ALTER TABLE `core_search` CHANGE `description` `description` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;";
 $updates['201904291603'][] = "ALTER TABLE `core_auth_password` DROP `digest`;";
+
+
+$updates['201905101208'][] = "CREATE TABLE `core_smtp_account` (
+  `id` int(11) NOT NULL,
+  `moduleId` int(11) NOT NULL,
+  `aclId` int(11) NOT NULL,
+  `hostname` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `port` int(11) NOT NULL DEFAULT 587,
+  `username` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `password` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `encryption` enum('tls','ssl') COLLATE utf8mb4_unicode_ci DEFAULT 'tls',
+  `verifyCertificate` tinyint(1) NOT NULL DEFAULT 1,
+  `fromName` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fromEmail` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+
+$updates['201905101208'][] = "ALTER TABLE `core_smtp_account`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `moduleId` (`moduleId`),
+  ADD KEY `aclId` (`aclId`);";
+
+
+$updates['201905101208'][] = "ALTER TABLE `core_smtp_account`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;";
+
+
+$updates['201905101208'][] = "ALTER TABLE `core_smtp_account`
+  ADD CONSTRAINT `core_smtp_account_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `core_smtp_account_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`);";

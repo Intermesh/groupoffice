@@ -786,3 +786,32 @@ ALTER TABLE `core_entity_filter`
 ALTER TABLE `core_entity_filter`
   ADD CONSTRAINT `core_entity_filter_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`),
   ADD CONSTRAINT `core_entity_filter_ibfk_2` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;
+
+  CREATE TABLE `core_smtp_account` (
+  `id` int(11) NOT NULL,
+  `moduleId` int(11) NOT NULL,
+  `aclId` int(11) NOT NULL,
+  `hostname` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `port` int(11) NOT NULL DEFAULT 587,
+  `username` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `password` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `encryption` enum('tls','ssl') COLLATE utf8mb4_unicode_ci DEFAULT 'tls',
+  `verifyCertificate` tinyint(1) NOT NULL DEFAULT 1,
+  `fromName` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fromEmail` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+ALTER TABLE `core_smtp_account`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `moduleId` (`moduleId`),
+  ADD KEY `aclId` (`aclId`);
+
+
+ALTER TABLE `core_smtp_account`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+
+ALTER TABLE `core_smtp_account`
+  ADD CONSTRAINT `core_smtp_account_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `core_smtp_account_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`);
