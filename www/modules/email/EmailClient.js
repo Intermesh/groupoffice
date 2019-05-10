@@ -1626,7 +1626,6 @@ GO.email.extraTreeContextMenuItems = [];
 go.Modules.register("legacy", 'email', {
 	mainPanel: GO.email.EmailClient,
 	title: t("E-mail"),
-	entities: ['EmailTemplate'],
 	userSettingsPanels: ["GO.email.SettingsPanel"]
 //	systemSettingsPanels: ["GO.email.SystemSettingsPanel"]
 });
