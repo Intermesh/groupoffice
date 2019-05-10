@@ -68,24 +68,9 @@ class Acl extends Entity {
 			
 		return parent::internalValidate();
 	}
+		
 	
-	/**
-	 * Permissions are set via AclOwnerEntity models through setAcl(). When this propery is used it will configure the Acl models.
-	 * This permission is not checked in the controller as usal but checked on save here.
-	 */
-	protected function checkManagePermission() {
-		if($this->isNew() || $this->ownedBy == GO()->getUserId()) {
-			return true;
-		}
-		$level = $this->getUserPermissionLevel($this->id, GO()->getUserId());
-		if($level != self::LEVEL_MANAGE) {
-			throw new Forbidden("You are not allowed to manage permissions on this ACL");
-		}
-	}
-	
-	protected function internalSave() {
-
-		$this->checkManagePermission();
+	protected function internalSave() {		
 		
 		$adminLevel = $this->hasGroup(Group::ID_ADMINS);
 		if($adminLevel < self::LEVEL_MANAGE) {

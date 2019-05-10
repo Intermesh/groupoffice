@@ -52,6 +52,8 @@ abstract class AclOwnerEntity extends AclEntity {
 
 		$a = $this->findAcl();
 
+		$this->checkManagePermission();
+
 		foreach($this->setAcl as $groupId => $level) {
 			$a->addGroup($groupId, $level);
 		}
@@ -80,8 +82,22 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * 
 	 * @param $acl an array with group ID as key and permission level as value. eg. ["2" => 50, "3" => 10]
 	 */
-	public function setAcl($acl) {
+	public function setAcl($acl) {		
 		$this->setAcl = $acl;		
+	}
+
+	/**
+	 * Permissions are set via AclOwnerEntity models through setAcl(). When this propery is used it will configure the Acl models.
+	 * This permission is not checked in the controller as usal but checked on save here.
+	 */
+	protected function checkManagePermission() {
+		if($this->findAcl()->ownedBy == GO()->getUserId()) {
+			return true;
+		}
+
+		if(!$this->findAcl()->hasPermissionLevel(self::LEVEL_MANAGE)) {		
+			throw new Forbidden("You are not allowed to manage permissions on this ACL");
+		}
 	}
 	
 	protected function createAcl() {
@@ -98,7 +114,7 @@ abstract class AclOwnerEntity extends AclEntity {
 		
 		$this->acl->usedIn = $this->getMapping()->getColumn('aclId')->table->getName().'.aclId';
 		$this->acl->ownedBy = !empty($this->createdBy) ? $this->createdBy : $this->getDefaultCreatedBy();
-		
+
 		if(!$this->acl->save()) {	
 			throw new \Exception("Could not create ACL");
 		}
