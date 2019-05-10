@@ -128,6 +128,7 @@ try {
 		throw new \Exception("Upgrade is already in progress");
 	}
 
+	GO::session()->runAsRoot();
 	
 	GO()->getCache()->flush(false);
 	GO()->setCache(new \go\core\cache\None());
