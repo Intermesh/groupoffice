@@ -56,6 +56,13 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 						//restore selection if user clicked outside of view
 						view.select(this.tabPanel.items.indexOf(this.tabPanel.getActiveTab()));
 					}
+
+					var activeTab = this.tabPanel.getActiveTab();
+					if(activeTab && activeTab.itemId) {
+						go.Router.setPath("systemsettings/" + activeTab.itemId);
+					} else{
+						go.Router.setPath("systemsettings");
+					}
 				},
 				scope:this
 			}

@@ -670,7 +670,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				text: t("System settings"),
 				iconCls: 'ic-settings',
 				handler: function() {
-					this.openSystemSettings();
+					go.Router.goto("systemsettings");
 				},
 				scope: this
 			});
