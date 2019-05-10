@@ -84,7 +84,7 @@ go.Modules = (function () {
 			}
 
 			if (config.mainPanel) {
-				go.Router.add(new RegExp(name + "$"), function () {
+				go.Router.add(new RegExp("^" + name + "$"), function () {
 					GO.mainLayout.openModule(name);
 				});
 			}

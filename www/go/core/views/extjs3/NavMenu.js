@@ -42,9 +42,7 @@ go.NavMenu = Ext.extend(Ext.DataView,{
 			overClass:'x-view-over',
 			itemSelector:'div',
 			tpl:'<tpl for=".">\
-					<tpl if="name == \'-\'"><hr /></tpl>\
-					<tpl if="name != \'-\'">\
-						<div><i class="icon {iconCls}">{icon}</i>\
+					<div><i class="icon {iconCls}">{icon}</i>\
 					<span>{name}</span></div>\
 					</tpl>\
 				</tpl>',
@@ -52,13 +50,14 @@ go.NavMenu = Ext.extend(Ext.DataView,{
 		});
 		
 		go.NavMenu.superclass.initComponent.call(this);
-	},
-	
-	addSeparator : function() {
-		this.store.add(new Ext.data.Record({
-			name: "-"
-		}));
 	}
+	//separater messed up select() function because of mismathing index
+
+	// addSeparator : function() {
+	// 	this.store.add(new Ext.data.Record({
+	// 		name: "-"
+	// 	}));
+	// }
 });
 
 Ext.reg('navmenu', go.NavMenu);

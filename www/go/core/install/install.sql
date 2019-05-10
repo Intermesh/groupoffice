@@ -815,3 +815,50 @@ ALTER TABLE `core_smtp_account`
 ALTER TABLE `core_smtp_account`
   ADD CONSTRAINT `core_smtp_account_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_smtp_account_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`);
+
+
+CREATE TABLE `core_email_template` (
+  `id` int(11) NOT NULL,
+  `moduleId` int(11) NOT NULL,
+  `aclId` int(11) NOT NULL,
+  `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subject` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `body` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+
+CREATE TABLE `core_email_template_attachment` (
+  `id` int(11) NOT NULL,
+  `emailTemplateId` int(11) NOT NULL,
+  `blobId` binary(40) NOT NULL,
+  `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `inline` tinyint(1) NOT NULL DEFAULT 0,
+  `attachment` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+
+
+ALTER TABLE `core_email_template`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`),
+  ADD KEY `aclId` (`aclId`),
+  ADD KEY `moduleId` (`moduleId`);
+
+ALTER TABLE `core_email_template_attachment`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `templateId` (`emailTemplateId`),
+  ADD KEY `blobId` (`blobId`);
+
+
+ALTER TABLE `core_email_template`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `core_email_template_attachment`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+
+ALTER TABLE `core_email_template`
+  ADD CONSTRAINT `core_email_template_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`),
+  ADD CONSTRAINT `core_email_template_ibfk_2` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE `core_email_template_attachment`
+  ADD CONSTRAINT `core_email_template_attachment_ibfk_1` FOREIGN KEY (`blobId`) REFERENCES `core_blob` (`id`),
+  ADD CONSTRAINT `core_email_template_attachment_ibfk_2` FOREIGN KEY (`emailTemplateId`) REFERENCES `core_email_template` (`id`) ON DELETE CASCADE;

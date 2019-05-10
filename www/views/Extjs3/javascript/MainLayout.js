@@ -387,6 +387,13 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	},
 	
 	addDefaultRoutes : function() {
+		var me = this;
+
+		go.Router.add(/systemsettings\/?([a-z0-9-_]*)?/i, function(tabId) {
+			console.warn(tabId);				
+			me.openSystemSettings().setActiveItem(tabId);
+		});
+
 		//Add these default routes on boot so they are added as last options for sure.
 		//
 		//default route for entities		
@@ -411,6 +418,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				console.log(arguments);
 			}
 		});
+
+		
 
 		go.Router.check();
 	},
@@ -661,9 +670,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				text: t("System settings"),
 				iconCls: 'ic-settings',
 				handler: function() {
-					var win = new go.systemsettings.Dialog();					
-					win.show();
-				}
+					this.openSystemSettings();
+				},
+				scope: this
 			});
 		}
 
@@ -685,6 +694,17 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		go.Jmap.sse();
 	},
 	
+	
+	openSystemSettings : function() {
+		if(!this.systemSettingsWindow)
+		{ 
+			this.systemSettingsWindow = new go.systemsettings.Dialog();					
+		}
+
+		this.systemSettingsWindow.show();
+
+		return this.systemSettingsWindow;
+	},
 	
 	welcome : function() {
 		if(go.User.id==1 && go.User.logins == 1) {

@@ -126,6 +126,7 @@ tree/TreeNodeUI.js
 
 form/HtmlEditor.js
 menu/EmojiMenu.js
+menu/StoreMenu.js
 
 Module.js
 
@@ -215,3 +216,8 @@ import/CsvMappingDialog.js
 smtp/AccountDialog.js
 smtp/GridPanel.js
 smtp/AccountCombo.js
+
+form/AttachmentsField.js
+
+emailtemplate/TemplateDialog.js
+emailtemplate/GridPanel.js

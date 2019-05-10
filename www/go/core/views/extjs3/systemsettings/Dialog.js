@@ -39,7 +39,7 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		
 		
 		this.tabStore = new Ext.data.ArrayStore({
-			fields: ['name', 'iconCls'],
+			fields: ['name', 'iconCls', 'itemId'],
 			data: []
 		});
 		
@@ -48,7 +48,7 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 			width:dp(300),
 			store: this.tabStore,
 			listeners: {
-				selectionchange: function(view, nodes) {		
+				selectionchange: function(view, nodes) {	
 					if(nodes.length) {
 						this.tabPanel.setActiveTab(nodes[0].viewIndex);
 					} else
@@ -106,14 +106,21 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 			}
 			
 			if(available[i].package != 'core' && !sepAdded) {
-				this.selectMenu.addSeparator();
-				sepAdded = true;
+				// this.selectMenu.addSeparator();
+				// sepAdded = true;
 			}
 			
 			for(i1 = 0, l2 = config.systemSettingsPanels.length; i1 < l2; i1++) {
 				pnl = eval(config.systemSettingsPanels[i1]);				
 				this.addPanel(pnl);
 			}
+		}
+	},
+
+	setActiveItem: function(itemId) {
+		var record = this.tabStore.find('itemId', itemId);		
+		if(record) {
+			this.selectMenu.select(this.tabStore.getAt(record));
 		}
 	},
 	
@@ -179,6 +186,7 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		var pnl = new panelClass(cfg);
 		
 		var menuRec = new Ext.data.Record({
+			itemId: pnl.itemId,
 			name: pnl.title,
 			iconCls: pnl.iconCls
 		});
