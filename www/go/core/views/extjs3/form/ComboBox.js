@@ -41,8 +41,9 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 				if(Ext.isFunction(me.renderer)) {
 					entity[me.displayField] = Ext.util.Format.htmlDecode(me.renderer(entity));
 				}
-				//var displayValue = Ext.isFunction(me.valueField) ? me.valueField(data) : data[me.valueField];
-				createRecord(entity);
+
+				 me.store.loadData({records:[entity]}, true);
+				 go.form.ComboBox.superclass.setValue.call(me, value);				
 				
 			}).catch(function(e) {
 				console.error(e);
@@ -54,7 +55,8 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 				});
 				data[me.valueField] = value;
 				data[me.displayField] = t("Not found or no access!");
-				createRecord(data);
+				me.store.loadData({records:[data]}, true);
+				go.form.ComboBox.superclass.setValue.call(me, value);			
 			});
 		} else
 		{
