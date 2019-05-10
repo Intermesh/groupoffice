@@ -389,8 +389,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	addDefaultRoutes : function() {
 		var me = this;
 
-		go.Router.add(/systemsettings\/?([a-z0-9-_]*)?/i, function(tabId) {
-			console.warn(tabId);				
+		go.Router.add(/systemsettings\/?([a-z0-9-_]*)?/i, function(tabId) {		
 			me.openSystemSettings().setActiveItem(tabId);
 		});
 
@@ -698,7 +697,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	openSystemSettings : function() {
 		if(!this.systemSettingsWindow)
 		{ 
-			this.systemSettingsWindow = new go.systemsettings.Dialog();					
+			this.systemSettingsWindow = new go.systemsettings.Dialog({
+				closeAction: "hide"
+			});					
 		}
 
 		this.systemSettingsWindow.show();

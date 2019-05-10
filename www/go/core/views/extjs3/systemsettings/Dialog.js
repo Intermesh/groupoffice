@@ -19,8 +19,12 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 	maximizable:false,
 	maximized: true,
 	iconCls: 'ic-settings',
-	title: t("System settings"),
-	
+	title: t("System settings"),	
+	width:dp(1000),
+	height:dp(800),
+	layout:'border',
+	closeAction: "hide",
+
 	initComponent: function () {
 		
 		this.saveButton = new Ext.Button({
@@ -69,10 +73,7 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		});		
 
 		Ext.apply(this,{
-			width:dp(1000),
-			height:dp(800),
-			layout:'border',
-			closeAction:'hide',
+			
 			items: [
 				this.selectMenu,
 				this.tabPanel
@@ -99,6 +100,10 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		this.loadModulePanels();
 		
 		go.systemsettings.Dialog.superclass.initComponent.call(this);
+
+		this.on("hide", function() {
+			go.Router.setPath("");
+		}, this);
 	},
 	
 	loadModulePanels : function() {
