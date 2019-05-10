@@ -14,7 +14,8 @@ use go\core\validate\ErrorCode;
 use go\modules\community\addressbook\convert\Csv;
 use go\modules\community\addressbook\convert\VCard;
 use function GO;
-						
+use go\core\mail\Message;
+
 /**
  * Contact model
  *
@@ -685,5 +686,15 @@ class Contact extends AclItemEntity {
 		}
 		
 		return $this->$propName[0] ?? false;
+	}
+
+	/**
+   * Decorate the message for newsletter sending.
+   * This function should at least add the to address.
+   * 
+   * @param \Swift_Message $message
+   */
+  public function decorateMessage(Message $message) {
+		$message->setTo($this->emailAddresses[0]->email, $this->name);
 	}
 }
