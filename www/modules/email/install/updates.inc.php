@@ -201,5 +201,5 @@ $updates['201811181020'][] = "CREATE TABLE `email_template_attachment` (
  CONSTRAINT `email_template_attachment_ibfk_2` FOREIGN KEY (`templateId`) REFERENCES `email_template` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT";
 
-$updates['201905111651'][] = "DROP TABLE `email_template`;";
 $updates['201905111651'][] = "DROP TABLE `email_template_attachment`;";
+$updates['201905111651'][] = "DROP TABLE `email_template`;";
