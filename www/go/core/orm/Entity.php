@@ -12,6 +12,7 @@ use go\core\jmap\EntityController;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\model\Module;
+use GO\Base\Util\TemplateParser;
 
 /**
  * Entity model
@@ -651,5 +652,20 @@ abstract class Entity extends Property {
 		return [
 				'application/json' => \go\core\data\convert\JSON::class			
 		];
+	}
+
+	/**
+	 * Convert this entity to template models for parsing.
+	 * 
+	 * This will be used for @see TemplateParser::addModel()
+	 * 
+	 * By default it will provide itself with the entityType->getName() in lowerCamelCase.
+	 * 
+	 * for example ['contact' => Contact $this];
+	 * 
+	 * @return array
+	 */
+	public function toTemplate() {
+		return [lcfirst(self::getType()->getName()) => $this];
 	}
 }
