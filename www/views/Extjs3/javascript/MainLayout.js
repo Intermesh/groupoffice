@@ -89,7 +89,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		Ext.Ajax.defaultHeaders = {'Accept-Language': GO.lang.iso};
 
 		if(go.User.accessToken){
-			Ext.Ajax.defaultHeaders['Authorization'] = 'Bearer '+go.User.accessToken;
+			Ext.Ajax.defaultHeaders.Authorization = 'Bearer ' + go.User.accessToken;
 			go.User.authenticate(function(data, options, success, response){
 				
 				if(success) {

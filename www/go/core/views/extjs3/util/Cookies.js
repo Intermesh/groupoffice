@@ -7,18 +7,18 @@ go.util.Cookies = {
 	 * 
 	 * @param {string} name
 	 * @param {string} value
-	 * @param {Date} expires Leave empty to clear on browser close
+	 * @param {int} maxAge Maximum age in seconds. Leave empty to clear on browser close
 	 * @returns {void}
 	 */
-	set: function (name, value, expires) {		
-		if (expires) {			
-			expires = "; expires=" + expires.toUTCString();
+	set: function (name, value, maxAge) {		
+		if (maxAge) {			
+			maxAge = ";Max-Age=" + maxAge;
 		} else
 		{
-			expires = "";
+			maxAge = "";
 		}
-		var secure = location.protocol === 'https:' ? '; secure' : '';		
-		var cookie = name + "=" + (value || "") + expires + secure + "; path=" + document.location.pathname;
+		var secure = location.protocol === 'https:' ? ';secure' : '';		
+		var cookie = name + "=" + encodeURIComponent(value + "") + maxAge + secure + ";path=" + document.location.pathname;
 		document.cookie = cookie;
 	},
 	

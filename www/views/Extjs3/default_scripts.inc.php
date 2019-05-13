@@ -4,6 +4,7 @@ use GO\Base\Util\Crypt;
 use go\core\fs\File;
 use go\core\fs\Folder;
 use go\core\Module;
+use go\core\jmap\Response;
 
 /**
  * Copyright Intermesh
@@ -49,27 +50,6 @@ $settings['language'] = GO::language()->getLanguage();
 $settings['show_contact_cf_tabs'] = array();
 $settings['modules'] = GO::view()->exportModules();
 
-
-//if (GO::modules()->addressbook) {
-//	// Add the addresslist tab to the global settings panel
-//	$settings['show_addresslist_tab'] = GO::config()->get_setting('globalsettings_show_tab_addresslist');
-//
-//	if (GO::modules()->customfields) {
-//		$settings['show_contact_cf_tabs'] = array();
-//
-//		$tabsEnabledStmt = CfSettingTab::model()->find();
-//		$tabsEnabled = $tabsEnabledStmt->fetchAll(PDO::FETCH_COLUMN);
-//
-//		// Add the contact customfield tabs to the global settings panel
-//		$contactClassName = Contact::model()->className();
-//		$customfieldsCategories = Category::model()->findByModel($contactClassName);
-//		foreach ($customfieldsCategories as $cfc) {
-//			if (in_array($cfc->id, $tabsEnabled))
-//				$settings['show_contact_cf_tabs'][$cfc->id] = true;
-//		}
-//	}
-//}
-
 $settings['upload_quickselect'] = GO::config()->upload_quickselect;
 $settings['html_editor_font'] = GO::config()->html_editor_font;
 
@@ -95,19 +75,8 @@ echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?l
 
 ?>
 
-<script type="text/javascript">
+<script type="text/javascript" nonce="<?= Response::get()->getCspNonce(); ?>">
 
-	//hide mask after 10s to display errors is necessary.
-//	setTimeout(function () {
-//		var loadMask = document.getElementById('loading-mask');
-//		var loading = document.getElementById('loading');
-//		if (loadMask)
-//			loadMask.style.display = 'none';
-//
-//		if (loading)
-//			loading.style.display = 'none';
-//
-//	}, 10000);
 	Ext.namespace("GO");
 
 	GO.settings = <?php echo json_encode($settings); ?>;
@@ -196,6 +165,8 @@ if ($cacheFile->exists()) {
 		}
 	}
 
+	$scripts[] = "GO.util.density = GO.util.isMobileOrTablet() ? 160 : 140;";
+
 	//two modules may include the same script
 	//$scripts = array_map('trim', $scripts);
 	//	$scripts = array_unique($scripts);
@@ -215,12 +186,12 @@ if ($cacheFile->exists()) {
 		if (GO::config()->debug) {
 			if (is_string($script)) {
 //        $js .=  $script ."\n;\n";
-				echo '<script type="text/javascript">' . $script . '</script>' . "\n";
+				echo '<script type="text/javascript" nonce="'.Response::get()->getCspNonce().'">' . $script . '</script>' . "\n";
 			} else if ($script instanceof File) {
         $relPath = $script->getRelativePath($rootFolder);
         $parts = explode('/', $relPath);
 //        $js .= "\n//source: ".$relPath ."\n";
-				echo '<script type="text/javascript">';
+				echo '<script type="text/javascript" nonce="'.Response::get()->getCspNonce().'">';
 				$js = "";
         if($parts[0] == 'go' && $parts[1] == 'modules') {
 					//for t() function to auto detect module package and name
@@ -287,11 +258,16 @@ if (file_exists(GO::view()->getTheme()->getPath() . 'MainLayout.js')) {
 	echo "\n";
 }
 ?>
-<script type="text/javascript">
+<script type="text/javascript" nonce="<?= Response::get()->getCspNonce(); ?>">
 <?php
 
 //direct login with token
 if(isset($_POST['accessToken'])) { //defined in index.php
+
+	if(preg_match('/[^0-9az]/i', $_POST['accessToken'])) {
+    throw new \Exception("Invalid acccess token format");
+	}
+	
 	?>	
 	go.User.setAccessToken('<?= $_POST['accessToken']; ?>', false);
 	<?php
@@ -319,5 +295,5 @@ if (isset($_REQUEST['f'])) {
 }
 ?>
 
-	Ext.onReady(GO.mainLayout.boot, GO.mainLayout);
+Ext.onReady(GO.mainLayout.boot, GO.mainLayout);
 </script>

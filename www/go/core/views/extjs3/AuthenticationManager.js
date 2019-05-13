@@ -70,7 +70,8 @@
 				clientVersion: '>9000',
 				deviceName: navigator.userAgent,
 				username: username,
-				password: password
+				password: password,
+				rememberLogin: this.rememberLogin
 			};
 
 			Ext.Ajax.request({
@@ -155,6 +156,7 @@
 			var loginData = {
 				loginToken: this.loginToken, //while the user is authenticating only loginToken is set 
 				accessToken: this.accessToken, //after authentication the access token is retrieved. It can be stored for remembering the login when a user closes the browser.
+				rememberLogin: this.rememberLogin,
 				methods: methods
 			};
 

@@ -5804,7 +5804,7 @@ Ext.apply(Ext, function(){
         
         emptyFn : function(){},
 
-        
+        //Appears in content-security-policy too
         BLANK_IMAGE_URL : 'data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==',
 
         extendX : function(supr, fn){
