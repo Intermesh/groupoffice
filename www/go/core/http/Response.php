@@ -83,7 +83,7 @@ class Response extends Singleton{
 
 	public function getCspNonce() {
 		if(!isset($this->cspNonce)) {
-			$this->cspNonce = hash("sha256", openssl_random_pseudo_bytes(16));
+			$this->cspNonce = hash("sha256", random_bytes(16));
 		}
 
 		return $this->cspNonce;

@@ -602,4 +602,14 @@ END;
 		
 		return $ord;
 	}
+
+	/**
+	 * Generate random string
+	 * 
+	 * @param int $length
+	 * @return string
+	 */
+	public static function random($length) {
+		return bin2hex(random_bytes($length));
+	}
 }
