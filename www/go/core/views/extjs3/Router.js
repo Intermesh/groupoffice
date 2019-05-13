@@ -106,7 +106,7 @@ go.Router = {
 	handleRoute : function(route, match) {
 		this.requireAuthentication = route.requireAuthentication;
 				
-		if(!go.User && route.requireAuthentication){
+		if(!go.User.isLoggedIn() && route.requireAuthentication){
 			
 			console.log("redirect", route);
 			this.pathBeforeLogin = this.getPath();
