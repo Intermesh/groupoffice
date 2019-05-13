@@ -76,10 +76,10 @@ use function GO;
  *  {{contact.emailAddresses}}
  * [/if]
  * 
+ * @example or by index
+ * {{contact.emailAddresses[0].email}} 
  * 
- * {{contact.emailAddresses}} 
- * 
- * ::::::TODO::::::
+ * ::::::Maybe?::::::
  * 
  * {{contact.emailAddresses[type=billing] ?? contact.emailAddresses ?? "-"}}
  *  
@@ -463,6 +463,19 @@ class TemplateParser {
 		$model = $this;
 
 		foreach ($pathParts as $pathPart) {
+
+			//check for array access eg. contact.emailAddresses[0];
+			if(preg_match('/(.*)\[([0-9]+)\]/', $pathPart, $matches)) {
+
+				// var_dump($matches);
+				
+				$index = (int) $matches[2];
+				$pathPart = $matches[1];
+			} else{
+				$index = null;
+			}
+
+
 			if(is_array($model)) {
 				if (!isset($model[$pathPart])) {
 					return null;
@@ -476,6 +489,13 @@ class TemplateParser {
 				$model = $model->$pathPart;
 			}
 			
+			if(isset($index)) {
+				if(!isset($model[$index])) {
+					return null;
+				}
+				$model = $model[$index];
+				
+			}
 		}
 
 		// var_dump($model);

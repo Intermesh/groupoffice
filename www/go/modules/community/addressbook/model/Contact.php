@@ -697,4 +697,11 @@ class Contact extends AclItemEntity {
   public function decorateMessage(Message $message) {
 		$message->setTo($this->emailAddresses[0]->email, $this->name);
 	}
+
+	public function toTemplate() {
+		$array = parent::toTemplate();
+		$array['organizations'] = $this->findOrganizations()->all();
+
+		return $array;
+	}
 }
