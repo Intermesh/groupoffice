@@ -102,7 +102,7 @@ class TemplateParser {
 		$this->addFilter('count', [$this, "filterCount"]);
 		
 		$this->addModel('now', new DateTime());
-		$this->addModel("user", GO()->getAuthState()->getUser()->toTemplate());	
+		// $this->addModel("user", GO()->getAuthState()->getUser()->toTemplate());	
 	}
 	
 	private function filterDate(DateTime $date = null, $format = null) {
