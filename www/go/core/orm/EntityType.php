@@ -161,12 +161,17 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	}
 
 	/**
-	 * Clear cached modseqs
+	 * Clear cached modseqs.
+	 * 
+	 * Calling this function is needed when the request is running for a long time and multiple increments are possible.
+	 * For example when sending newsletters on a CLI script.
 	 * 
 	 * @return $this
 	 */
 	public function clearCache() {
 
+		$this->modSeqIncremented = false;
+		$this->userModSeqIncremented = false;
 		$this->highestModSeq = null;
 		$this->highestUserModSeq = null;
 
