@@ -13,6 +13,8 @@ use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\model\Module;
 use GO\Base\Util\TemplateParser;
+use go\core\data\ModelHelper;
+use go\core\data\exception\NotArrayable;
 
 /**
  * Entity model
@@ -666,6 +668,24 @@ abstract class Entity extends Property {
 	 * @return array
 	 */
 	public function toTemplate() {
-		return [lcfirst(self::getType()->getName()) => $this];
+		// return [lcfirst(self::getType()->getName()) => $this];
+
+		$arr = [];
+		
+		if(empty($properties)) {
+			$properties = $this->getReadableProperties();
+		}
+
+		foreach ($properties as $propName) {
+			try {
+				$value = ModelHelper::getValue($this, $propName);
+				$arr[$propName] = method_exists($value, 'toTemplate') ? $value->toTemplate() : $value;
+			} catch (NotArrayable $e) {
+				
+				App::get()->debug("Skipped prop " . static::class . "::" . $propName . " because type '" . gettype($value) . "' not scalar or ArrayConvertable.");
+			}
+		}
+		
+		return $arr;
 	}
 }

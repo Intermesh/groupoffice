@@ -71,8 +71,15 @@ class EmailTemplate extends AclOwnerEntity
 					
 	}
 	
-	 
+	/**
+	 *  
+	 */ 
   public function setModule($module) {
+
+		if(is_int($module)) {
+			$this->moduleId = $module;
+			return;
+		}
     $module = Module::findByName($module['package'], $module['name']);
     if(!$module) {
       $this->setValidationError('module', ErrorCode::INVALID_INPUT, 'Module was not found');

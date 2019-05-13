@@ -102,7 +102,7 @@ class TemplateParser {
 		$this->addFilter('count', [$this, "filterCount"]);
 		
 		$this->addModel('now', new DateTime());
-		$this->addModel("user", GO()->getAuthState()->getUser());	
+		$this->addModel("user", GO()->getAuthState()->getUser()->toTemplate());	
 	}
 	
 	private function filterDate(DateTime $date = null, $format = null) {
@@ -150,7 +150,7 @@ class TemplateParser {
 	
 	private function findBlocks($str) {
 			
-		preg_match_all('/\n?\[(each|if)([^\]]+)\]\n?/s', $str, $openMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
+		preg_match_all('/\n?\[(each|if)\n?/s', $str, $openMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		preg_match_all('/\[\/(each|if)\]\n?/s', $str, $closeMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		
 		$count = count($openMatches);
@@ -161,14 +161,22 @@ class TemplateParser {
 			throw new Exception("Open and close tags don't match");
 		}
 		
-//		var_dump($closeMatches);
+		// var_dump($openMatches);
 		
 		$tags = [];
 		
 		
-		for($i = 0; $i < $count; $i++) {			
+		for($i = 0; $i < $count; $i++) {
+			// var_dump($openMatches[$i][0][0]);			
 			$offset = $openMatches[$i][0][1];
-			$tags[$offset] = ['tagName' => $openMatches[$i][1][0], 'type' => 'open', 'offset' => $offset, 'expression' => trim($openMatches[$i][2][0]), 'tagLength' => strlen($openMatches[$i][0][0])];			
+			$expression = $this->findExpression($offset + strlen($openMatches[$i][0][0]), $str);
+
+			$tags[$offset] = [
+				'tagName' => $openMatches[$i][1][0], 
+				'type' => 'open', 
+				'offset' => $offset, 
+				'expression' => $expression, 
+				'tagLength' => strlen($openMatches[$i][0][0]) + strlen($expression) + 1];			
 		}
 		
 		
@@ -193,6 +201,39 @@ class TemplateParser {
 			$tags[$i]['tpl'] = substr($str, $tags[$i]['offset'] + $tags[$i]['tagLength'], $tags[$i]['close']['offset'] - $tags[$i]['offset'] - $tags[$i]['tagLength']); 
 		}
 		return $tags;
+	}
+
+	private function findExpression($startPos, $str) {
+		$openBrackets = 1;
+
+		$expression = '';
+		$max = strlen($str);
+		for($i = $startPos; $i < $max; $i++) {
+			$char = $str[$i];
+
+			switch($char) {
+				case '[':
+					$openBrackets++;
+					$expression .= $char;
+				break;
+
+				case ']':
+					$openBrackets--;
+					if($openBrackets == 0) {
+						return $expression;
+					} else {
+						$expression .= $char;
+					}
+					break;
+
+				default:
+					$expression .= $char;
+			}
+			
+		}
+
+		throw new \Exception("Invalid block");
+		
 	}
 	
 	private function findCloseTags($tags) {
@@ -311,13 +352,22 @@ class TemplateParser {
 		$parsed = $this->parse($tag['expression']);		
 		$this->encloseVars = false;
 		$this->enableBlocks = true;
+
+		
 		
 		$expression = $this->validateExpression($parsed);
 
 		$tpls = explode('[else]', $tag['tpl']);
 		
 
-		$ret = eval($expression);	
+		try {
+			$ret = eval($expression);	
+		} catch(\Exception $e) {
+			GO()->warn('eval() failed '. $e->getMessage());
+			GO()->warn($tag['expression']);
+			GO()->warn($expression);
+			$ret = false;
+		}
 		if($ret){
 			$tag['replacement'] = $this->parse($tpls[0]);
 		}else
@@ -380,8 +430,8 @@ class TemplateParser {
 
 //return ("exit" ());
 		
-		return 'return ('.$str.');';
-	}
+		return empty($str) ? 'return false;' : 'return ('.$str.');';
+	} 
 	
 	private function isString ($str) {
 		return preg_match('/"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"/s', $str) || preg_match("/'[^'\\\\]*(?:\\\\.[^'\\\\]*)*'/s", $str);
@@ -398,7 +448,7 @@ class TemplateParser {
 		}
 
 		if($this->encloseVars) {
-			$value = '"' . str_replace('"', '\\"', $value) . '"';
+			$value = is_scalar($value) || (is_object($value) && method_exists($value, '__toString')) ? '"' . str_replace('"', '\\"', $value) . '"' : !empty($value);
 		}
 
 		return $value;
