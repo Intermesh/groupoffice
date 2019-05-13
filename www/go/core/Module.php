@@ -79,6 +79,7 @@ abstract class Module {
 			}
 
 			if(!$this->afterInstall($model)) {
+				GO()->warn(static::class .'::afterInstall returned false');
 				$this->rollBack();				
 				return false;
 			}		

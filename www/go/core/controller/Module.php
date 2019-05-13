@@ -40,6 +40,10 @@ class Module extends EntityController {
 		
 		$mod = new $cls;
 		$model = $mod->install();
+
+		if(!$model) {
+			throw new \Exception("Failed to install");
+		}
 		
 		return $this->get(['ids' => [$model->id]]);
 	}
