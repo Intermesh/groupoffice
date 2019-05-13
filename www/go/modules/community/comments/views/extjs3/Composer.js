@@ -44,7 +44,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			enableAlignments: false,
 			enableSourceEdit: false,
 			hideToolbar: true,
-			emptyText: 'Add comment...',
+			emptyText: t('Add comment')+'...',
 			allowBlank: false,
 			plugins: [go.form.HtmlEditor.emojiPlugin],
 			height: 35,
