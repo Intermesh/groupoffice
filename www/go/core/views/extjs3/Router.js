@@ -89,7 +89,11 @@ go.Router = {
 		this.loadedPath = path;
 				
 		if(this.suspendEvent) {
-			this.suspendEvent = false;
+			var me = this;
+			setTimeout(function() {
+				me.suspendEvent = false;
+			});
+			
 			return this;
 		}		
 		
