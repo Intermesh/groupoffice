@@ -1,4 +1,4 @@
-
+14-05-2019 6.3.73
 - Sync/email: Fixed paging and searching in select email in sync settings
 - Core: Created new setting callto_open_window to control if a phone number click will open a window
 - Core: Fixed issue that when a link is created on model->save and the Link/set is called afterwards, that an error is thrown when the link did    
