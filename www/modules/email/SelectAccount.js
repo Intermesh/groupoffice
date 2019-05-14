@@ -37,9 +37,10 @@ GO.email.SelectAccount = function (config) {
 		typeAhead: true,
 		mode: 'remote',
 		triggerAction: 'all',
-		editable: false,
+		editable: true,
 		selectOnFocus:true,
-		forceSelection: true
+		forceSelection: true,
+		pageSize: parseInt(GO.settings['max_rows_list'])
 	});
 
 	GO.email.SelectAccount.superclass.constructor.call(this, config);

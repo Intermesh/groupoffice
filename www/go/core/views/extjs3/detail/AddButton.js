@@ -208,7 +208,12 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 							go.Db.store("Link").set({
 								create: {clientId : link}
 							}, function (options, success, result) {
-								if (result.notCreated) {
+								if (result.notCreated 
+										&& !(result.notCreated.newlink 
+										&& result.notCreated.newlink.validationErrors 
+										&& result.notCreated.newlink.validationErrors.fromEntityId
+										&& result.notCreated.newlink.validationErrors.fromEntityId.code
+										&& result.notCreated.newlink.validationErrors.fromEntityId.code === 11)) {
 									throw "Could not create link";
 								}
 							});

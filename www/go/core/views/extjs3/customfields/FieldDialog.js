@@ -51,6 +51,11 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 						name: "unique",
 						boxLabel: t("Unique values"),
 						hideLabel: true
+					},{
+						xtype: "checkbox",
+						name: "required",
+						boxLabel: t("Required field"),
+						hideLabel: true
 					}
 				]
 			}

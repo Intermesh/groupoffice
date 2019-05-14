@@ -40,8 +40,8 @@ GO.sieve.CriteriumCreatorDialog = function(config){
 	config.title=t("Set criterium", "sieve");
 	config.border=false;
 	config.layout= 'fit';
-	config.height=120;
-	config.width=660;
+	config.height = dp(200);
+	config.width= dp(800);
 	config.baseParams={
 		task : 'addAction',
 		account_id : 0,
@@ -413,7 +413,7 @@ Ext.extend(GO.sieve.CriteriumCreatorDialog, GO.Window,{
 			selectOnFocus:true,
 			forceSelection:true,
 			allowBlank:false,
-			width: dp(140),
+			width: dp(200),
 			emptyText:t("Operator", "sieve"),
 			disabled: true,
 			hidden: true
@@ -431,7 +431,7 @@ Ext.extend(GO.sieve.CriteriumCreatorDialog, GO.Window,{
 			selectOnFocus:true,
 			forceSelection:true,
 			allowBlank:false,
-			width: dp(140),
+			width: dp(200),
 			emptyText:t("Operator", "sieve"),
 			disabled: true,
 			hidden: true
@@ -450,7 +450,7 @@ Ext.extend(GO.sieve.CriteriumCreatorDialog, GO.Window,{
 			selectOnFocus:true,
 			forceSelection:true,
 			allowBlank:false,
-			width: dp(140),
+			width: dp(200),
 			emptyText:t("Operator", "sieve"),
 			disabled: true,
 			hidden: true
@@ -536,24 +536,27 @@ Ext.extend(GO.sieve.CriteriumCreatorDialog, GO.Window,{
 		this.formPanel = new Ext.form.FormPanel({
 			bodyStyle: 'padding:5px',
 			border: false,
-			items: [
-				{
-					xtype:'compositefield',
-					items:[
-						this.cmbField,
-						this.txtCustom,
-						this.cmbUnderOver,
-						this.cmbOperator, 
-						this.cmbBodyOperator, 
-						this.cmbDateOperator,
-						this.txtCriterium,
-						this.numberCriterium,
-						this.rgSize,
-						this.dateCriterium
-					],
-					hideLabel: true
-				}
-			]
+			items: [ {
+				xtype: "fieldset",				
+				items: [
+					{
+						xtype:'compositefield',
+						items:[
+							this.cmbField,
+							this.txtCustom,
+							this.cmbUnderOver,
+							this.cmbOperator, 
+							this.cmbBodyOperator, 
+							this.cmbDateOperator,
+							this.txtCriterium,
+							this.numberCriterium,
+							this.rgSize,
+							this.dateCriterium
+						],
+						hideLabel: true
+					}
+				]
+			}]
 		});
 	}
 });

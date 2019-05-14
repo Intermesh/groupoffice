@@ -713,9 +713,11 @@ Ext.encode = Ext.util.JSON.encode = function(json){
 Ext.decode = Ext.util.JSON.decode = function(jsonStr){
 	try{
 		var json = eval("(" + jsonStr + ')');
-		if(json && json.redirectToLogin) {      
-			document.location.href=BaseHref;
-    }
+		if(json && json.redirectToLogin) {
+			console.warn("Redirecting to login because access is denied");  
+			document.location.href = BaseHref;
+			return;
+    	}
 		
 		return json;
 	}

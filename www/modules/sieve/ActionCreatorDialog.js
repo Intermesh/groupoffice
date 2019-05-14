@@ -66,8 +66,8 @@ GO.sieve.ActionCreatorDialog = function(config){
 	config.title=t("Set action", "sieve");
 	config.border=false;
 	config.layout= 'fit';
-	config.height=400;
-	config.width=550;
+	config.height = dp(600);
+	config.width= dp(600);
 	config.baseParams={
 		task : 'addAction',
 		account_id : 0,
@@ -369,14 +369,17 @@ Ext.extend(GO.sieve.ActionCreatorDialog, GO.Window,{
 		this.formPanel = new Ext.form.FormPanel({
 			layout: 'form',
 			border:false,
-			items: [
-				this.cmbAction,
-				this.cmbFolder,
-				this.txtDays,
-				this.txtMessage,
-				this.txtEmailAddressOptional,
-				this.txtEmailAddress
-			]
+			items: [ {
+				xtype: "fieldset",				
+				items: [
+					this.cmbAction,
+					this.cmbFolder,
+					this.txtDays,
+					this.txtMessage,
+					this.txtEmailAddressOptional,
+					this.txtEmailAddress
+				]
+			}]
 		});
 		
 		this.cmbAction.on('select',function(combo,record,index){

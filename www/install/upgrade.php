@@ -39,6 +39,8 @@ try {
 			//todo package!			
 			GO()->getDbConnection()->query("update core_module set enabled=0 where name IN ('" . implode("', '", array_column($unavailable, 'name')) . "')");
 		}	
+
+		\GO::session()->runAsRoot();
 	
 		GO()->getInstaller()->upgrade();		
 		//GO()->getInstaller()->checkVersions();		
