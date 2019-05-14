@@ -351,18 +351,14 @@ class TemplateParser {
 		$this->enableBlocks = false;
 		$parsed = $this->parse($tag['expression']);		
 		$this->encloseVars = false;
-		$this->enableBlocks = true;
-
-		
+		$this->enableBlocks = true;	
 		
 		$expression = $this->validateExpression($parsed);
-
-		$tpls = explode('[else]', $tag['tpl']);
-		
+		$tpls = explode('[else]', $tag['tpl']);		
 
 		try {
 			$ret = eval($expression);	
-		} catch(\Exception $e) {
+		} catch(\ParseError $e) {
 			GO()->warn('eval() failed '. $e->getMessage());
 			GO()->warn($tag['expression']);
 			GO()->warn($expression);
@@ -448,7 +444,7 @@ class TemplateParser {
 		}
 
 		if($this->encloseVars) {
-			$value = is_scalar($value) || (is_object($value) && method_exists($value, '__toString')) ? '"' . str_replace('"', '\\"', $value) . '"' : !empty($value);
+			$value = is_scalar($value) || !isset($value) || (is_object($value) && method_exists($value, '__toString')) ? '"' . str_replace('"', '\\"', $value) . '"' : !empty($value);
 		}
 
 		return $value;

@@ -63,16 +63,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 		
 		this.items = [this.formPanel];
 
-		Ext.applyIf(this,{
-			buttons:[
-				'->', 
-				{
-					text: t("Save"),
-					handler: function() {this.submit();},
-					scope: this
-				}
-			]
-		});
+		this.initButtons();
 
 		go.form.Dialog.superclass.initComponent.call(this);		
 		
@@ -90,6 +81,19 @@ go.form.Dialog = Ext.extend(go.Window, {
 
 		this.initTitleField();
 
+	},
+
+	initButtons: function() {
+		Ext.applyIf(this,{
+			buttons:[
+				'->', 
+				{
+					text: t("Save"),
+					handler: function() {this.submit();},
+					scope: this
+				}
+			]
+		});
 	},
 
 	initTitleField : function() {

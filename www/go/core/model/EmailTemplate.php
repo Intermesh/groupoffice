@@ -106,8 +106,12 @@ class EmailTemplate extends AclOwnerEntity
 		$this->attachments = [];
 		foreach ($cids as $blobId) {
 			$blob = Blob::findById($blobId);
-			$this->attachments[] = $existing[$blobId] ?? (new EmailTemplateAttachment())->setValues(['blobId' => $blobId, 'name' => $blob->name, 'inline' => true]);
-			unset($existing[$blobId]);
+			if(isset($existing[$blobId])) {
+				$existing[$blobId]->inline = true;
+				$this->attachments[] = $existing[$blobId];
+			} else {
+				$this->attachments[] = (new EmailTemplateAttachment())->setValues(['blobId' => $blobId, 'name' => $blob->name, 'inline' => true]);
+			}			
 		}
 
 		foreach ($existing as $a) {
@@ -115,5 +119,18 @@ class EmailTemplate extends AclOwnerEntity
 				$this->attachments[] = $a;
 			}
 		}
+	}
+
+	public function toArray($properties = [])
+	{
+		$array =  parent::toArray($properties);
+
+		if(isset($array['attachments'])) {
+			$array['attachments'] = array_filter($array['attachments'], function($a) {
+				return $a['attachment'] == true;
+			});
+		}
+
+		return $array;
 	}
 }
