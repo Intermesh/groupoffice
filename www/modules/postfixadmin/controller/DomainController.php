@@ -188,7 +188,7 @@ class DomainController extends \GO\Base\Controller\AbstractModelController {
 		
 		$mailboxes = \GO\Postfixadmin\Model\Mailbox::model()->find($findParams);
 		
-		$rootDir = '/home/vmail/';
+		$rootDir = '/var/mail/vhosts/';
 		$tmp = $rootDir . "tmp/" . uniqid() .'/';
 		$this->exec("mkdir -p ".$tmp);
 		
@@ -231,6 +231,6 @@ class DomainController extends \GO\Base\Controller\AbstractModelController {
 			throw new \Exception("Command failed with status " . $return);
 		}
 
-		return $output;
+		return $return;
 	}
 }
