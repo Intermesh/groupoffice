@@ -545,6 +545,8 @@ class Contact extends AclItemEntity {
 				throw new Exception("Failed to link organization: ". $orgId);
 			}
 		}
+
+		$this->organizationIds = $this->setOrganizationIds;
 		return true;
 	}
 
