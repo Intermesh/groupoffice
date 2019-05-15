@@ -88,11 +88,16 @@ go.Jmap = {
 		});
 	},
 	
-	downloadUrl: function(blobId) {
+	downloadUrl: function(blobId, inline) {
 		if (!blobId) {
 			return '';
 		}
-		return go.User.downloadUrl.replace('{blobId}', blobId);
+		var url = go.User.downloadUrl.replace('{blobId}', blobId);
+		if(inline) {
+			url += '&inline=1';
+		}
+
+		return url;
 	},
 	
 	upload : function(file, cfg) {
