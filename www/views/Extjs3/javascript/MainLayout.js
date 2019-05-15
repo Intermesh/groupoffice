@@ -380,8 +380,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			this.loadLegacyModuleScripts()
 		]).then(function(){
 			go.Entities.init();
-			me.renderUI();
 			me.addDefaultRoutes();
+			me.renderUI();
+			
 		}).catch(function(error){
 			console.error(error);
 		});
