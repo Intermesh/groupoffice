@@ -129,44 +129,49 @@ go.Jmap = {
 	 * @returns {Boolean}
 	 */
 	sse : function() {
-		if (!window.EventSource) {
-			console.debug("Browser doesn't support EventSource");
-			return false;
-		}
-		
-		if(!go.User.eventSourceUrl) {
-			console.debug("Not starting EventSource when xdebug is running");
-			return false;
-		}
-		
-		//filter out legacy modules
-		var entities = go.Entities.getAll().filter(function(e) {return e.package != "legacy";});
-		
-		var url = go.User.eventSourceUrl + '?types=' + 
-						entities.column("name").join(',');
-		
-		var source = new EventSource(url), me = this;
-		
-		source.addEventListener('state', function(e) {
-			for(var entity in JSON.parse(e.data)) {
-				var store =go.Db.store(entity);
-				if(store) {
-					store.getUpdates();
+		try {
+			if (!window.EventSource) {
+				console.debug("Browser doesn't support EventSource");
+				return false;
+			}
+			
+			if(!go.User.eventSourceUrl) {
+				console.debug("Not starting EventSource when xdebug is running");
+				return false;
+			}
+			
+			//filter out legacy modules
+			var entities = go.Entities.getAll().filter(function(e) {return e.package != "legacy";});
+			
+			var url = go.User.eventSourceUrl + '?types=' + 
+							entities.column("name").join(',');
+			
+			var source = new EventSource(url), me = this;
+			
+			source.addEventListener('state', function(e) {
+				for(var entity in JSON.parse(e.data)) {
+					var store =go.Db.store(entity);
+					if(store) {
+						store.getUpdates();
+					}
 				}
-			}
-		}, false);
+			}, false);
 
-		source.addEventListener('open', function(e) {
-			// Connection was opened.
-		}, false);
+			source.addEventListener('open', function(e) {
+				// Connection was opened.
+			}, false);
 
-		source.addEventListener('error', function(e) {
-			if (e.readyState == EventSource.CLOSED) {
-				// Connection was closed.
-				
-				me.sse();
-			}
-		}, false);
+			source.addEventListener('error', function(e) {
+				if (e.readyState == EventSource.CLOSED) {
+					// Connection was closed.
+					
+					me.sse();
+				}
+			}, false);
+		}
+		catch(e) {
+			console.error("Failed to start Server Sent Events. Perhaps the API URL in the system settings is invalid?", e);
+		}
 	},
 
 	/**
