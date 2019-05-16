@@ -174,7 +174,7 @@ GO.email.EmailComposer = function(config) {
 				name : 'to',
 				flex : 1,
 				listeners: {
-					grow: function() {
+					autosize: function() {
 						this.doLayout();
 					},
 					scope: this
@@ -200,7 +200,7 @@ GO.email.EmailComposer = function(config) {
 		name : 'cc',
 		anchor : '100%',
 		listeners: {
-			grow: function() {
+			autosize: function() {
 				this.doLayout();
 			},
 			scope: this
@@ -225,7 +225,7 @@ GO.email.EmailComposer = function(config) {
 		name : 'bcc',
 		anchor : '100%',
 		listeners: {
-			grow: function() {
+			autosize: function() {
 				this.doLayout();
 			},
 			scope: this
@@ -820,7 +820,8 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		currentVal += selections;
 
 		field.setValue(currentVal);
-
+		setTimeout(function() { field.syncHeight(); });
+		
 		if (fieldName == 'cc') {
 			this.ccFieldCheck.setChecked(true);
 		} else if (fieldName == 'bcc') {
