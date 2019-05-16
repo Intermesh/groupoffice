@@ -131,7 +131,7 @@ class FolderNotification extends \GO\Base\Db\ActiveRecord {
 				$messages[$notification->type] = array();
 
 			if (!isset($users[$notification->modified_user_id])) {
-				$user = \GO::user()->findByPk($notification->modified_user_id);
+				$user = \GO::user()->findByPk($notification->modified_user_id, false, true);
 				if ($user){					
 					$users[$notification->modified_user_id] = $user->getName();
 				}else {					
