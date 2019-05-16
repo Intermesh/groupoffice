@@ -360,10 +360,15 @@ a {
 		&.x-view-selected i {
 			@include var(color, c-primary);
 		}
-		i {
+		> i {
 			color: color($fg,'secondary-text');
 			margin-right:dp(16);
-			
+		}
+		button {
+			visibility: hidden;
+		}
+		&:hover button {
+			visibility: visible;;
 		}
 		&.x-view{
 			&-over {
