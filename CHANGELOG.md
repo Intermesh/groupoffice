@@ -1,3 +1,5 @@
+- Scanbox: Fixed "link to item" feature
+- Core/Links: Added singleSelect config to createLinkWindow
 - core: Smaller paddings on trees and grids
 - email: red color on email flags
 - customfields: function field could unset other custom fields.
