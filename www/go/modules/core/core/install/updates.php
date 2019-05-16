@@ -257,7 +257,7 @@ $updates['201811020837'][] = function() {
 
 
 $updates['201901251344'][] = function() {
-	GO()->getDbConnection()->query("ALTER TABLE `core_search` CHANGE `keywords` `keywords` VARCHAR(192) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '';");
+	GO()->getDbConnection()->query("ALTER TABLE `core_search` CHANGE `keywords` `keywords` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '';");
 	GO()->getDbConnection()->query("ALTER TABLE `core_search` ADD INDEX(`keywords`);");
 };
 

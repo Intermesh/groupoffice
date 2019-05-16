@@ -147,9 +147,9 @@ CREATE TABLE `core_search` (
   `entityId` int(11) NOT NULL,
   `moduleId` int(11) DEFAULT NULL,
   `name` varchar(100) DEFAULT NULL,
-  `description` varchar(192) NOT NULL DEFAULT '',
+  `description` varchar(190) NOT NULL DEFAULT '',
   `entityTypeId` int(11) NOT NULL,
-  `keywords` varchar(255) NOT NULL DEFAULT '',
+  `keywords` varchar(190) NOT NULL DEFAULT '',
   `modifiedAt` datetime DEFAULT NULL,
   `aclId` int(11) NOT NULL
 ) ENGINE=InnoDB;
