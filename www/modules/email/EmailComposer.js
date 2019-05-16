@@ -847,7 +847,8 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		currentVal += selections;
 
 		field.setValue(currentVal);
-
+		setTimeout(function() { field.syncHeight(); });
+		
 		if (fieldName == 'cc') {
 			this.ccFieldCheck.setChecked(true);
 		} else if (fieldName == 'bcc') {
