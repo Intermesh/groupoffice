@@ -127,8 +127,6 @@ try {
 	if (!$lock->lock()) {
 		throw new \Exception("Upgrade is already in progress");
 	}
-
-	GO::session()->runAsRoot();
 	
 	GO()->getCache()->flush(false);
 	GO()->setCache(new \go\core\cache\None());
@@ -304,6 +302,8 @@ try {
 		if ($dbValid == 62) {					
 			require(Environment::get()->getInstallFolder() . '/install/62to63.php');
 		}		
+
+		GO::session()->runAsRoot();
 
 		if (!upgrade()) {
 			echo "\n\nA module was refactored. Rerunning...\n\n";
