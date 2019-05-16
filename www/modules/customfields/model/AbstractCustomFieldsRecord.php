@@ -38,8 +38,6 @@ abstract class AbstractCustomFieldsRecord extends \GO\Base\Db\ActiveRecord{
 			return 'model_id';
 	}	
 	
-	
-	
 	public function init(){
 		//$className = $this->className();
 		$this->_getAllFields();		
@@ -47,10 +45,6 @@ abstract class AbstractCustomFieldsRecord extends \GO\Base\Db\ActiveRecord{
 		
 		return parent::init();
 	}
-	
-	
-	
-	
 	
 	public function tableName(){
 		return 'cf_'.$this->getExtendedModel()->tableName();

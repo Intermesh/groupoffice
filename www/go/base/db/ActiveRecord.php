@@ -3185,7 +3185,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				$this->checkModelFolder();				
 			}
 
-			$this->setIsNew(false);			
+			$this->setIsNew(false);		
+			//make sure custom field record is created on new records
+			$this->getCustomfieldsRecord();
+
 			$changed  = $this->_processFileColumns($fileColumns);
 			if($changed || $this->afterDbInsert() || $this->isModified('files_folder_id')){
 				$this->_dbUpdate();
@@ -3221,6 +3224,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 
 		//use private customfields record so it's accessed only when accessed before
+
+
+
 		if (isset($this->_customfieldsRecord)){
 			//id is not set if this is a new record so we make sure it's set here.
 			$this->_customfieldsRecord->{$this->_customfieldsRecord->primaryKey()}=$this->id;
@@ -3800,7 +3806,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 *
 	 * @return boolean
 	 */
-	private function _dbInsert(){
+	protected function _dbInsert(){
 
 		$fieldNames = array();
 
@@ -4714,7 +4720,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			$customattr = $this->_attributes;
 			$customattr['model_id']=$this->id;
 
-			$this->_customfieldsRecord = new $model;
+			$this->_customfieldsRecord = new $model(false);
 			$this->_customfieldsRecord->setAttributes($customattr,false);
 			$this->_customfieldsRecord->clearModifiedAttributes();
 		}
