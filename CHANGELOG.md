@@ -1,3 +1,4 @@
+- core: Use varchar 190 field for search keywords
 - Scanbox: Fixed "link to item" feature
 - Core/Links: Added singleSelect config to createLinkWindow
 - core: Smaller paddings on trees and grids
