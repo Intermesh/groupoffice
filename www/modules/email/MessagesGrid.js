@@ -501,7 +501,10 @@ Ext.extend(GO.email.MessagesGrid, GO.grid.GridPanel,{
 		if(record.data['flagged'] == 1){
 			icons.push('flag');
 		}
-		return unseen + '<i class="icon">'+icons.join('</i><i class="icon">')+'</i>';
+
+		return unseen + icons.map(function(i) {
+			return '<i class="icon em-'+i+'">' + i + '</i>';
+		}).join();
 		
 	},
 

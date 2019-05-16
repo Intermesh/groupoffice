@@ -1,7 +1,11 @@
-- Core: Fixed displaying of readonly form fields, added class to triggerfield to make readonly correctly visible for drop down fields
+- core: Use varchar 190 field for search keywords
+- Scanbox: Fixed "link to item" feature
+- Core/Links: Added singleSelect config to createLinkWindow
+- core: Smaller paddings on trees and grids
+- email: red color on email flags
+- customfields: function field could unset other custom fields.
 
-
-
+14-05-2019 6.3.73
 - Sync/email: Fixed paging and searching in select email in sync settings
 - Core: Created new setting callto_open_window to control if a phone number click will open a window
 - Core: Fixed issue that when a link is created on model->save and the Link/set is called afterwards, that an error is thrown when the link did    

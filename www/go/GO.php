@@ -290,7 +290,7 @@ class GO{
 	 */
 	public static function clearCache(){
 		
-		\GO::config()->getCacheFolder(false)->delete();		
+		\GO::config()->getCacheFolder(false)->clearContents();	
 		
 		\GO::cache()->flush();
 
