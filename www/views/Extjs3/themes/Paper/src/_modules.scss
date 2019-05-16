@@ -184,12 +184,35 @@ $app-icons: (
 	}
 }
 
+.x-grid3-col-icon {
+		i {
+			&.em-flag {
+				color: color($red, 700);
+			}
+	}
+}
+
+.message-body {
+	padding: dp(8) dp(16);
+
+	position: relative;	
+	
+	p.MsoListParagraph, li.MsoListParagraph, div.MsoListParagraph
+	{
+		margin-top:0cm;
+		margin-right:0cm;
+		margin-bottom:0cm;
+		margin-left:36.0pt;
+		margin-bottom:.0001pt;
+		font-size:11.0pt;
+	}
+}
 
 .message-header {
 	position: relative;
 	background-color: color($bg, "background");
 	border-bottom:1px solid color($fg, "line");
-	padding: dp(16);
+	padding: dp(8) dp(16);
 		
 	b {
 		@extend %font-caption;

@@ -185,27 +185,7 @@ margin:5px 2px;
 #email-message-panel .x-panel-body {
 	background-color:white;
 }
-.message-body{
-	padding: 8px;
-	position: relative;
-}
-.message-body p, .em-message p, .em-composer p{
-	margin-top:0px;
-	margin-bottom:0px;
-}
 
-
-
-
-.message-body p.MsoListParagraph, .message-body li.MsoListParagraph, .message-body div.MsoListParagraph
-{
-	margin-top:0cm;
-	margin-right:0cm;
-	margin-bottom:0cm;
-	margin-left:36.0pt;
-	margin-bottom:.0001pt;
-	font-size:11.0pt;
-}
 
 .email-grid-icon{
 	float:left;
