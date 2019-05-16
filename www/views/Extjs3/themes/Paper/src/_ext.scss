@@ -2197,13 +2197,13 @@ $menuScrollerSize : dp(4);
 	&-header {
       border: 0;
 		border-top: 1px solid color($fg, 'divider');
-      padding: 0 dp(8) 0 dp(8);
+      padding: 0 dp(8) 0 dp(14);
       height: dp(56);
       line-height: dp(56);
       //background-color:$cPrimary;
 		&-text {
 			@extend %font-subheading;
-			padding-left: dp(8);
+			//padding-left: dp(8);
 		}
       .x-border-panel > & {
 			background-color: transparent;
