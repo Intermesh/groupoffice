@@ -1,5 +1,6 @@
 - core: Smaller paddings on trees and grids
 - email: red color on email flags
+- customfields: function field could unset other custom fields.
 
 14-05-2019 6.3.73
 - Sync/email: Fixed paging and searching in select email in sync settings
