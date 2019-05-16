@@ -42,9 +42,9 @@ class FunctionField extends AbstractCustomfieldtype {
 
 		$f = $this->field->getOption("function");
 		if (!empty($f)) {
-			foreach ($attributes as $key=>$value) {
+			foreach ($attributes as $k=>$value) {
 				
-					$f = str_replace('{' . $key . '}', floatval(\GO\Base\Util\Number::unlocalize($value)), $f);
+					$f = str_replace('{' . $k . '}', floatval(\GO\Base\Util\Number::unlocalize($value)), $f);
 				
 			}
 			$f = preg_replace('/\{[^}]*\}/', '0',$f);

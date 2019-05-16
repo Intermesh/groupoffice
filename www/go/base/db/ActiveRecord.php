@@ -160,7 +160,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * @var \GO\Base\Model\Acl
 	 */
 	private $_acl=false;
-
+	
+	private $_isDeleted = false;
+	
 	/**
 	 * If this property is set the ACL of the model will be changed
 	 * Possible values:
@@ -4086,6 +4088,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if(!$success)
 			throw new \Exception("Could not delete from database");
 
+		$this->_isDeleted = true;
+		
 		$this->log(\GO\Log\Model\Log::ACTION_DELETE);
 
 		$attr = $this->getCacheAttributes();
@@ -4126,13 +4130,15 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if($this->hasLinks() && !is_array($this->pk)) {
 			$this->deleteReminders();
 		}
-
+		
 		$this->fireEvent('delete', array(&$this));
 
 		return true;
 	}
 	
-	
+	public function isDeleted(){
+		return $this->_isDeleted;
+	}
 
 
 	private function _deleteLinks(){
