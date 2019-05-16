@@ -1,3 +1,6 @@
+- core: Smaller paddings on trees and grids
+- email: red color on email flags
+
 14-05-2019 6.3.73
 - Sync/email: Fixed paging and searching in select email in sync settings
 - Core: Created new setting callto_open_window to control if a phone number click will open a window
