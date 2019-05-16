@@ -105,6 +105,8 @@ abstract class AbstractConverter {
 					continue;
 				}
 
+				$entity->save();
+
 				if($entity->hasValidationErrors()) {
 					$response['errors'][] = $entity->getValidationErrors();				
 				} else
