@@ -89,7 +89,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		Ext.Ajax.defaultHeaders = {'Accept-Language': GO.lang.iso};
 
 		if(go.User.accessToken){
-			Ext.Ajax.defaultHeaders['Authorization'] = 'Bearer '+go.User.accessToken;
+			Ext.Ajax.defaultHeaders.Authorization = 'Bearer ' + go.User.accessToken;
 			go.User.authenticate(function(data, options, success, response){
 				
 				if(success) {
@@ -356,8 +356,11 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 //		
 		GO.moduleManager._addModule(moduleName, panelClass, panelConfig || {});
 				
-		go.Router.add(new RegExp('(' + moduleName + ")$"), function (name) {
-			GO.mainLayout.openModule(name);
+		go.Router.add(new RegExp('^(' + moduleName + ")$"), function (name) {
+			var pnl = GO.mainLayout.openModule(name);
+			if(pnl.routeDefault) {
+				pnl.routeDefault();
+			}
 		});
 		
 		//this.initModule(moduleName);
@@ -377,8 +380,10 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			this.loadLegacyModuleScripts()
 		]).then(function(){
 			go.Entities.init();
-			me.renderUI();
 			me.addDefaultRoutes();
+			me.renderUI();
+			go.Router.check();
+			
 		}).catch(function(error){
 			console.error(error);
 		});
@@ -387,6 +392,12 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	},
 	
 	addDefaultRoutes : function() {
+		var me = this;
+
+		go.Router.add(/systemsettings\/?([a-z0-9-_]*)?/i, function(tabId) {		
+			me.openSystemSettings().setActiveItem(tabId);
+		});
+
 		//Add these default routes on boot so they are added as last options for sure.
 		//
 		//default route for entities		
@@ -411,8 +422,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				console.log(arguments);
 			}
 		});
-
-		go.Router.check();
 	},
 
 	renderUI : function() {
@@ -661,9 +670,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				text: t("System settings"),
 				iconCls: 'ic-settings',
 				handler: function() {
-					var win = new go.systemsettings.Dialog();					
-					win.show();
-				}
+					go.Router.goto("systemsettings");
+				},
+				scope: this
 			});
 		}
 
@@ -685,6 +694,19 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		go.Jmap.sse();
 	},
 	
+	
+	openSystemSettings : function() {
+		if(!this.systemSettingsWindow)
+		{ 
+			this.systemSettingsWindow = new go.systemsettings.Dialog({
+				closeAction: "hide"
+			});					
+		}
+
+		this.systemSettingsWindow.show();
+
+		return this.systemSettingsWindow;
+	},
 	
 	welcome : function() {
 		if(go.User.id==1 && go.User.logins == 1) {

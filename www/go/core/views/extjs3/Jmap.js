@@ -88,11 +88,16 @@ go.Jmap = {
 		});
 	},
 	
-	downloadUrl: function(blobId) {
+	downloadUrl: function(blobId, inline) {
 		if (!blobId) {
 			return '';
 		}
-		return go.User.downloadUrl.replace('{blobId}', blobId);
+		var url = go.User.downloadUrl.replace('{blobId}', blobId);
+		if(inline) {
+			url += '&inline=1';
+		}
+
+		return url;
 	},
 	
 	upload : function(file, cfg) {
@@ -129,44 +134,55 @@ go.Jmap = {
 	 * @returns {Boolean}
 	 */
 	sse : function() {
-		if (!window.EventSource) {
-			console.debug("Browser doesn't support EventSource");
-			return false;
-		}
-		
-		if(!go.User.eventSourceUrl) {
-			console.debug("Not starting EventSource when xdebug is running");
-			return false;
-		}
-		
-		//filter out legacy modules
-		var entities = go.Entities.getAll().filter(function(e) {return e.package != "legacy";});
-		
-		var url = go.User.eventSourceUrl + '?types=' + 
-						entities.column("name").join(',');
-		
-		var source = new EventSource(url), me = this;
-		
-		source.addEventListener('state', function(e) {
-			for(var entity in JSON.parse(e.data)) {
-				var store =go.Db.store(entity);
-				if(store) {
-					store.getUpdates();
+		try {
+			if (!window.EventSource) {
+				console.debug("Browser doesn't support EventSource");
+				return false;
+			}
+			
+			if(!go.User.eventSourceUrl) {
+				console.debug("Not starting EventSource when xdebug is running");
+				return false;
+			}
+			
+			//filter out legacy modules
+			var entities = go.Entities.getAll().filter(function(e) {return e.package != "legacy";});
+			
+			var url = go.User.eventSourceUrl + '?types=' + 
+							entities.column("name").join(',');
+			
+			var source = new EventSource(url), me = this;
+			
+			source.addEventListener('state', function(e) {
+				for(var entity in JSON.parse(e.data)) {
+					var store =go.Db.store(entity);
+					if(store) {
+						store.getState().then(function(state) {
+							if(!state) {
+								//don't fetch updates if there's no state yet because it never was used in that case.
+								return;
+							}
+							store.getUpdates();
+						});
+					}
 				}
-			}
-		}, false);
+			}, false);
 
-		source.addEventListener('open', function(e) {
-			// Connection was opened.
-		}, false);
+			source.addEventListener('open', function(e) {
+				// Connection was opened.
+			}, false);
 
-		source.addEventListener('error', function(e) {
-			if (e.readyState == EventSource.CLOSED) {
-				// Connection was closed.
-				
-				me.sse();
-			}
-		}, false);
+			source.addEventListener('error', function(e) {
+				if (e.readyState == EventSource.CLOSED) {
+					// Connection was closed.
+					
+					me.sse();
+				}
+			}, false);
+		}
+		catch(e) {
+			console.error("Failed to start Server Sent Events. Perhaps the API URL in the system settings is invalid?", e);
+		}
 	},
 
 	/**
@@ -267,26 +283,27 @@ go.Jmap = {
 							return true;
 						}
 						if (response[0] == "error") {
-							console.error('server-side JMAP failure', response);			
-								console.error('server-side JMAP failure', response);			
-							console.error('server-side JMAP failure', response);			
+							console.error('server-side JMAP failure', response);							
 						}
 
 						go.flux.Dispatcher.dispatch(response[0], response[1]);
 
-						var success = response[0] !== "error";
-						if (o.callback) {
-							if (!o.scope) {
-								o.scope = this;
+						//make sure dispatch is executed before callbacks and resolves.
+						setTimeout(function() {
+							var success = response[0] !== "error";
+							if (o.callback) {
+								if (!o.scope) {
+									o.scope = this;
+								}
+								o.callback.call(o.scope, o, success, response[1], response[2]);
 							}
-							o.callback.call(o.scope, o, success, response[1], response[2]);
-						}
 
-						if(success) {							
-							o.resolve(response[1]);
-						} else{
-							o.reject(response[1]);
-						}
+							if(success) {							
+								o.resolve(response[1]);
+							} else{
+								o.reject(response[1]);
+							}
+						}, 0);
 					}, this);
 
 				} catch(e) {

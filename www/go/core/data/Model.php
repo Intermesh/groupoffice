@@ -163,7 +163,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 	 * @return DateTime
 	 * @throws NotArrayable
 	 */
-	private function convertValue($value) {
+	protected function convertValue($value) {
 		if ($value instanceof ArrayableInterface) {
 			return $value->toArray();
 		} elseif (is_array($value)) {

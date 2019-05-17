@@ -3,9 +3,11 @@ go.filter.FilterDialog = Ext.extend(go.form.Dialog, {
 	entityStore: "EntityFilter",
 	entity: null,
 	autoScroll: true,
-	height: dp(400),
+	height: dp(600),
 	width: dp(1000),
 	initFormItems: function () {
+
+		this.addPanel(new go.permissions.SharePanel());
 
 		return [{
 				xtype: 'fieldset',

@@ -34,7 +34,7 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 				value: false,
 				boxLabel: t("Remember my login on this computer until I press logout"),
 				listeners: {
-					check: function (checked) {
+					check: function (checkbox, checked) {
 						go.AuthenticationManager.rememberLogin = checked;
 					}
 				}

@@ -6,6 +6,7 @@ use DateTime;
 use go\core\http;
 use go\core\Singleton;
 use go\core\util\StringUtil;
+use Defuse\Crypto\Crypto;
 
 /**
  * Response Object
@@ -76,6 +77,16 @@ class Response extends Singleton{
 
 	public function setContentType($contentType) {
 		$this->setHeader('Content-Type', $contentType);
+	}
+
+	private $cspNonce;
+
+	public function getCspNonce() {
+		if(!isset($this->cspNonce)) {
+			$this->cspNonce = hash("sha256", random_bytes(16));
+		}
+
+		return $this->cspNonce;
 	}
 
 	/**

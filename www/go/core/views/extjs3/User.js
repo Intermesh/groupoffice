@@ -7,7 +7,6 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 		}
 		go.Jmap.get(function(data, options, success, response){
 			if(data) {
-				document.cookie = "accessToken=" + this.accessToken;
 				this.loadSession(data);
 			}
 			cb.call(scope, data, options, success, response);
@@ -20,21 +19,13 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 	},
 	
 	setAccessToken : function(accessToken, remember) {
-		var expires = null;
-		
-		if(remember) {
-			expires = new Date();
-			expires.setFullYear(expires.getFullYear() + 1);
-		}
-		
-		go.util.Cookies.set('accessToken', accessToken, expires);
 		this.accessToken = accessToken;
 		
 		if(!Ext.Ajax.defaultHeaders) {
 			Ext.Ajax.defaultHeaders = {};
 		}
 		
-		Ext.Ajax.defaultHeaders['Authorization'] = 'Bearer ' + accessToken;
+		Ext.Ajax.defaultHeaders.Authorization = 'Bearer ' + accessToken;
 		
 	},
   

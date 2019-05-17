@@ -38,7 +38,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 					cls: 'go-narrow',
 					iconCls: "ic-arrow-back",
 					handler: function () {
-						this.westPanel.show();
+						go.Router.goto("addressbook");
 					},
 					scope: this
 				}]
@@ -290,8 +290,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 				fields: ['name', 'icon', 'inputValue'], //icon and iconCls are supported.
 				data: [					
 					[t("Organization"), 'business', true],
-					[t("Contact"), 'person', false],
-					['-']
+					[t("Contact"), 'person', false]
 				]
 			}),
 			simpleSelect: true,
@@ -334,6 +333,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 			],
 			items: [
 				orgFilter,
+				{xtype: "box", autoEl: "hr"},
 				this.filterGrid = new go.filter.FilterGrid({
 					filterStore: this.grid.store,
 					entity: "Contact"

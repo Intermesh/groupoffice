@@ -545,6 +545,8 @@ class Contact extends AclItemEntity {
 				throw new Exception("Failed to link organization: ". $orgId);
 			}
 		}
+
+		$this->organizationIds = $this->setOrganizationIds;
 		return true;
 	}
 
@@ -696,5 +698,12 @@ class Contact extends AclItemEntity {
    */
   public function decorateMessage(Message $message) {
 		$message->setTo($this->emailAddresses[0]->email, $this->name);
+	}
+
+	public function toTemplate() {
+		$array = parent::toTemplate();
+		$array['organizations'] = $this->findOrganizations()->all();
+
+		return $array;
 	}
 }

@@ -1,4 +1,19 @@
 go.modules.ModulePanel = Ext.extend(Ext.Panel, {
+
+	/**
+	 * When the module name is routed. Eg. "notes" then this function is called.
+	 */
+	routeDefault : function() {
+		if(this.getLayout() instanceof go.layout.ResponsiveLayout) {
+			this.items.first().show();
+		}
+	},
+
+	/**
+	 * This route is called for entities. eg. Note/1
+	 * @param {int} id 
+	 * @param {string} entity eg. "Note"
+	 */
 	route : function(id, entity) {
 		
 		//cast to int if nummeric

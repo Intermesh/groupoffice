@@ -1,4 +1,19 @@
-- Core: Fixed displaying of readonly form fields, added class to triggerfield to make readonly correctly visible for drop down fields
+- Email: Changed messages grid to a grouped grid, grouped on date
+- core: Use varchar 190 field for search keywords
+- Scanbox: Fixed "link to item" feature
+- Core/Links: Added singleSelect config to createLinkWindow
+- core: Smaller paddings on trees and grids
+- email: red color on email flags
+- customfields: function field could unset other custom fields.
+
+14-05-2019 6.3.73
+- Sync/email: Fixed paging and searching in select email in sync settings
+- Core: Created new setting callto_open_window to control if a phone number click will open a window
+- Core: Fixed issue that when a link is created on model->save and the Link/set is called afterwards, that an error is thrown when the link did    
+        already exist. Now the error is ignored when validationerror status == 11 
+- Core: Clear listeners before creating the new ones again.
+- Core: Fixed issue that the columnSelectGrid for export could crash when pressing "Delete" button to remove a column.
+        Double click or drag/drop should be used. Delete is disabled now.
 
 06-05-2019 6.3.72
 - Core: Auto logout when checker fails fixed

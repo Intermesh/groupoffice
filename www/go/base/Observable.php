@@ -42,14 +42,11 @@ class Observable{
 	 * At the moment this function is called in index.php In the future this
 	 * should be called at the new entry point of the application.
 	 */
-	public static function cacheListeners(){
-
+	public static function cacheListeners(){		
+		self::$listeners = [];
 		\GO::debug("GO\Base\Observable::cacheListeners");
 		\GO::modules()->callModuleMethod('initListeners');
 		\GO::cache()->set("listeners", self::$listeners);
-		
-		
-		
 	}
 	
 	public static function writeListenersFile(){

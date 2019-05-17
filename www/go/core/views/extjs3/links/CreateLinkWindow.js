@@ -2,6 +2,7 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 	entity: null,
 	entityId: null,
 	modal: true,
+	singleSelect:false,
 	stateId: "go-create-link-windows",
 	
 	/**
@@ -45,6 +46,9 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 		});		
 
 		this.grid = new go.links.LinkGrid({
+			selModel: new Ext.grid.RowSelectionModel({
+				singleSelect:this.singleSelect
+			}),
 			cls: 'go-search-grid',
 			region: "center",
 			listeners: {
@@ -98,16 +102,18 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 	},
 
 	link: function () {
-		var selections = this.grid.getSelectionModel().getSelections(),
-						me = this, links = {}, i = 0;
-
+		
+		var selections = this.singleSelect ? [this.grid.getSelected()] : this.grid.getSelectionModel().getSelections(),
+			me = this, links = {}, i = 0;
+		
 		selections.forEach(function (record) {
 			var link = {
 				fromEntity: me.entity,
 				fromId: me.entityId,
 				toEntity: record.get('entity'),
 				toId: record.get('entityId')
-			}
+			};
+			
 			i++;
 			links['clientId-' + i ] = link;
 		});

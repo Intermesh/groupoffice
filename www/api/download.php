@@ -34,7 +34,7 @@ if(strpos($_GET['blob'], '/') === false) {
 		exit();
 	}
 
-	$blob->output();	
+	$blob->output(!empty($_GET['inline']));	
 	exit();
 }
 

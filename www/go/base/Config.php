@@ -895,6 +895,13 @@ var $billing_clear_payment_method_on_duplicate = true;
 	var $callto_template='callto:{phone}';
 
 	/**
+	 * Open a new new window when a phone number is clicked
+	 * 
+	 * @var bool
+	 */
+	var $callto_open_window = false;
+
+	/**
 	 * Disable security check for cross domain forgeries
 	 *
 	 * @var <type>

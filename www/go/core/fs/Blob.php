@@ -352,11 +352,13 @@ class Blob extends orm\Entity {
 	/**
 	 * Output for download
 	 */
-	public function output() {
+	public function output($inline = false) {
+		$disp = $inline ? 'inline' : 'attachment';
+
 		$this->getFile()->output(true, true, [
 			'Content-Type' => $this->type, 
 			"Expires" => (new DateTime("1 year"))->format("D, j M Y H:i:s"),
-			'Content-Disposition' => 'inline; filename="' . $this->name . '"'
+			'Content-Disposition' => $disp . ';filename="' . $this->name . '"'
 					]);
 	}
 }

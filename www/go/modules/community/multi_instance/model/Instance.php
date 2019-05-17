@@ -251,7 +251,7 @@ class Instance extends Entity {
 	private function createInstance() {
 		$dbName =  $this->getDbName();
 		$dbUsername = $this->getDbUser();	
-		$dbPassword = bin2hex(openssl_random_pseudo_bytes(8));
+		$dbPassword = bin2hex(random_bytes(8));
 		$dataFolder = $this->getDataFolder();
 		$tmpFolder = $this->getTempFolder();	
 		$configFile = $this->getConfigFile();
@@ -404,8 +404,8 @@ class Instance extends Entity {
 		$expiresAt = new DateTime("+1 hour");
 		
 		$data = [
-				"loginToken" => uniqid().bin2hex(openssl_random_pseudo_bytes(16)),
-				"accessToken" => uniqid().bin2hex(openssl_random_pseudo_bytes(16)),
+				"loginToken" => uniqid().bin2hex(random_bytes(16)),
+				"accessToken" => uniqid().bin2hex(random_bytes(16)),
 				"expiresAt" => $expiresAt,
 				"userAgent" => "Multi Instance Module",
 				"userId" => 1,

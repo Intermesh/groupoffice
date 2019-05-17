@@ -32,7 +32,8 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					cls: 'go-narrow',
 					iconCls: "ic-arrow-back",
 					handler: function () {
-						this.westPanel.show();
+						//this.westPanel.show();
+						go.Router.goto("notes");
 					},
 					scope: this
 				}]

@@ -1,4 +1,8 @@
-<?php $lang = GO::language()->getLanguage(); ?>
+<?php
+use go\core\jmap\Response;
+use go\core\jmap\Request;
+
+$lang = GO::language()->getLanguage(); ?>
 <!DOCTYPE html>
 <html lang="<?= $lang; ?>">
 <head>
@@ -24,6 +28,8 @@
 	<meta name="msapplication-TileColor" content="#2b5797">
 	<meta name="theme-color" content="#ffffff">
 
+	<meta http-equiv="Content-Security-Policy" content="default-src <?= Request::get()->getHost(); ?> 'unsafe-eval' 'nonce-<?= Response::get()->getCspNonce(); ?>'; img-src 'self' data:; style-src 'self' 'unsafe-inline'">
+
 	<title><?= \GO::config()->title; ?></title>
 
 	<link href="<?= \GO::view()->getTheme()->getUrl();?>style.css?v=<?=\GO()->getVersion(); ?>" media="screen and (min-device-width:1201px)" type="text/css" rel="stylesheet" />
@@ -37,29 +43,12 @@
 	\GO::router()->getController()->fireEvent('head');
 
 	?>
-	<style>
-	<?php
-		if(GO()->getSettings()->primaryColor) {
-	?>
-		:root {
-				--c-primary: <?= '#'.GO()->getSettings()->primaryColor; ?>;
-				--c-primary-tp: <?= GO()->getSettings()->getPrimaryColorTransparent(); ?>;
-		}
-	<?php
-			if(GO()->getSettings()->logoId) {
-				//blob id is not used by script but added only for caching.
-				echo ".go-app-logo, #go-logo {background-image: url(" . GO()->getSettings()->URL . "api/logo.php?blob=" . GO()->getSettings()->logoId . ")}";
-			}
-		}
-	?>
-	</style>
 </head>
 <body>
 	<div id="sound"></div>
 	<!--Putting scripts in div will speed up developer tools because they don't have to show all those nodes-->
 	<div id="scripts-container">
 		<?php require(\GO::config()->root_path.'views/Extjs3/default_scripts.inc.php'); ?>
-		<script type="text/javascript">GO.util.density = GO.util.isMobileOrTablet() ? 160 : 140;</script>
 	</div>
 </body>
 </html>

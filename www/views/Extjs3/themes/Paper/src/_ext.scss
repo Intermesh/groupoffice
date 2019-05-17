@@ -1134,7 +1134,7 @@
 	&-cell-inner, &-hd-inner {
 		@extend .ellipsis;
 		min-height: dp(40);
-		padding: dp(10) dp(4) dp(10) dp(16); // 10 top = middle of row line-height 20dp
+		padding: dp(6) dp(4) dp(6) dp(16); // 10 top = middle of row line-height 20dp
 		.ux-row-action-cell & {
 			padding: dp(8) 0;
 		}
@@ -1182,7 +1182,7 @@
 		}
 	}
 	&-col {
-		padding: dp(8) 0;
+		padding: dp(4) 0;
 		position: relative;
 	}
 	&-check-col-td > div {
@@ -1524,7 +1524,7 @@ td.grid-hd-group-cell {
 // ############
 .x-tree{
 	&-node-el {
-		padding: dp(8);
+		padding: dp(6) dp(8);
 		padding-right: 0;
 		display: table;
 		width: 100%;
@@ -1618,7 +1618,7 @@ td.grid-hd-group-cell {
 }
 .x-tree-node a > span, .x-dd-drag-ghost a > span {
 	@extend .ellipsis;
-	padding: 0 dp(8);
+	padding: 0 dp(6);
 	display:block;
 	top:0;
 	left:0;
@@ -2197,13 +2197,13 @@ $menuScrollerSize : dp(4);
 	&-header {
       border: 0;
 		border-top: 1px solid color($fg, 'divider');
-      padding: 0 dp(8) 0 dp(8);
+      padding: 0 dp(8) 0 dp(14);
       height: dp(56);
       line-height: dp(56);
       //background-color:$cPrimary;
 		&-text {
 			@extend %font-subheading;
-			padding-left: dp(8);
+			//padding-left: dp(8);
 		}
       .x-border-panel > & {
 			background-color: transparent;

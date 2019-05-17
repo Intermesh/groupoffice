@@ -51,14 +51,11 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		this.initChanges();		
 	},
 	
-	initState : function(cb) {
+	initState : function() {
 		
 		var me = this;
 		
-		if(me.initialized) {
-			if(cb) {
-				cb.call(me);				
-			}
+		if(me.initialized) {			
 			return me.initialized;
 		}
 		
@@ -99,21 +96,19 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				return Promise.all([
 					me.metaStore.setItem("apiVersion", go.User.apiVersion),
 					me.metaStore.setItem("apiUser", go.User.username)
-				]);
+				]).then(function() {
+					return me.state;
+				})
 			} else if(me.apiVersion !== go.User.apiVersion || me.apiUser !== go.User.username) {
 				console.warn("API version or username mismatch", me.apiVersion, go.User.apiVersion, me.apiUser, go.User.username);
-				return me.clearState();
+				return me.clearState().then(function() {
+					return me.state;
+				});
 			} else
 			{
-				return true;
+				return me.state;
 			}
-		}).then(function() {
-			if(cb) {
-				cb.call(me);
-			}
-			return true;
 		});
-	// });
 
 		return me.initialized;
 		
@@ -210,34 +205,36 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		}, 0);
 	},
 	
-	setState : function(state, cb, scope) {
+	setState : function(state) {
+		var me = this;
 		this.state = state;
+
+		var setter = function() {
+			return me.metaStore.setItem("state", state);
+		};
 		
 		if(!state) {
-			this.clearState();
+			return me.clearState().then(function() {
+				return setter();
+			});
 		}
-		
-		scope = scope || this;
-		this.metaStore.setItem("state", state, function() {
-			if(cb) {
-				cb.call(scope);
-			}
-		});	
-	},
+
+		return setter();	
+	},	
 	
-	
-	getState: function(cb) {
+	getState: function() {
 		var me = this;
-		this.initState(function(){
-			cb.call(me, me.state);
+		return this.initState().then(function() {
+			return me.state;
 		});
 	},
 
 
-	receive: function (action) {		
-		this.getState(function(state){
+	receive: function (action) {	
+		var me = this;	
+		me.getState().then(function(state){
 			switch (action.type) {
-				case this.entity.name + "/get":
+				case me.entity.name + "/get":
 
 					// If no items are available, don't continue
 					if(!action.payload.list){
@@ -246,97 +243,98 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 					//add data from get response
 					for(var i = 0,l = action.payload.list.length;i < l; i++) {
-						this._add(action.payload.list[i]);
-					};
+						me._add(action.payload.list[i]);
+					}
 
-					this.setState(action.payload.state);
+					me.setState(action.payload.state);
 					break;
 
-				case this.entity.name + "/query":
+				case me.entity.name + "/query":
 //					console.log("Query state: " + state + " - " + action.payload.state);
 					//if a list call was made then fetch updates if state mismatch
 					if (state && action.payload.state !== state) {
-						this.getUpdates();
-						this.setState(action.payload.state);
+						me.getUpdates();
+						//me.setState(action.payload.state);
 					}
 					break;
 
-				case this.entity.name + "/set":
+				case me.entity.name + "/set":
 					//update state from set we initiated
-					this.setState(action.payload.newState);
+					me.setState(action.payload.newState);
 					break;
 			}
 		});
 	},
 
 	getUpdates: function (cb, scope) {		
+
+		var me = this;
 		
-		this.getState(function(state){
+		return me.getState().then(function(state){
 			
 //			console.log("Get updates for state: " + state);
 		
 			if(!state) {
 				console.info("No state yet so won't fetch updates");
 				if(cb) {
-					cb.call(scope || this, this, false);
+					cb.call(scope || me, me, false);
 				}
-				return;
+				debugger;
+				return Promise.reject("No state yet");
 			}
 			
+			//we need the initial request promise for the callId.
 			var promise = go.Jmap.request({
-				method: this.entity.name + "/changes",
+				method: me.entity.name + "/changes",
 				params: {
-					sinceState: this.state
-				},
-				callback: function(options, success, response) {
-					
-					//keep this array for the Foo/get response to check if an event must be fired.
-					//We will only fire added and changed in _add if this came from a /changes 
-					//request and not when we are loading data ourselves.
-					this.changedIds = response.changed || [];
-					
-					if(response.removed) {
-						for(var i = 0, l = response.removed.length; i < l; i++) {
-							this._destroy(response.removed[i]);
-						}
+					sinceState: me.state
+				}
+			});
+			
+			promise.then(function(response) {					
+				//keep me array for the Foo/get response to check if an event must be fired.
+				//We will only fire added and changed in _add if me came from a /changes 
+				//request and not when we are loading data ourselves.
+				me.changedIds = response.changed || [];
+				
+				if(response.removed) {
+					for(var i = 0, l = response.removed.length; i < l; i++) {
+						me._destroy(response.removed[i]);
 					}
-					if(success) {
-						this.setState(response.newState, function(){
-							if(response.hasMoreChanges) {
-								this.getUpdates(cb, scope);
-							} else
-							{
-								if(cb) {
-									cb.call(scope || this, this, true);
-								}
-							}
-						}, this);
-
+				}
+				
+				return me.setState(response.newState).then(function(){
+					if(response.hasMoreChanges) {
+						return me.getUpdates(cb, scope);
 					} else
-					{					
-						this.clearState();
+					{
 						if(cb) {
-							cb.call(scope || this, this, false);
+							cb.call(scope || me, me, true);
 						}
-					}
 
-				},
-				scope: this
+						return true;
+					}
+				}, me);
+			}).catch(function(response) {
+				return me.clearState().then(function(response) {
+					if(cb) {
+						cb.call(scope || me, me, false);
+					}
+					return response;
+				});
 			});
 
-			go.Jmap.request({
-				method: this.entity.name + "/get",
+			var getPromise = go.Jmap.request({
+				method: me.entity.name + "/get",
 				params: {
 					"#ids": {
 						resultOf: promise.callId,
 						path: '/changed'
 					}
-				},
-				callback: function(options, success, response) {					
-
-				},
-				scope: this
+				}
 			});
+
+			return Promise.all([promise, getPromise]);
 		});
 
 	},
@@ -346,20 +344,15 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	 * 
 	 * @param {function} cb
 	 * @param {object} scope
-	 * @returns {void}
+	 * @returns {Promise}
 	 */
 	all : function(cb, scope) {
-		this.initState(function() {
-			if(this.isComplete) {
-				this.getUpdates(function(store, success) {
-					if(!success) {
-						this.isComplete = false;
-						this.all(cb, scope);
-						return;
-					}
-					var me = this;
-					
-					this.stateStore.keys().then(function(keys){
+		var me = this;
+
+		return me.initState().then(function() {
+			if(me.isComplete) {
+				return me.getUpdates().then(function() {					
+					return me.stateStore.keys().then(function(keys){
 						return Promise.all(keys.map(function(key){
 							return me.stateStore.getItem(key).then(function(entity) {
 								me.data[entity.id] = entity;
@@ -367,30 +360,45 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 						}));
 					}).then(function() {
 						cb.call(scope, true, me.data);
+						return me.data;
 					});				
 				
+				}).catch(function() {
+					me.isComplete = false;
+					return me.all(cb, scope);							
 				});
 			} else
 			{
-				go.Jmap.request({
-					method: this.entity.name + "/get",
-					callback: function (options, success, response) {
-						if(!success) {
-							cb.call(scope, false, null);
-							return;
-						}
+				return go.Jmap.request({
+					method: me.entity.name + "/get"		
+				}).then(function(response) {
+					
+					me.metaStore.setItem('isComplete', true);
+					me.isComplete = true;
+					
+					cb.call(scope, true, response.list);
 
-						this.metaStore.setItem('isComplete', true);
-						this.isComplete = true;
-						
-						cb.call(scope, true, response.list);
-					},
-					scope: this
+					return me.data;
+				}).catch(function(response) {
+					cb.call(scope, false, response);
 				});
 			}
 		});
 	},
 	
+	/**
+	 * Get a single entity
+	 * 
+	 * @example
+	 * ```
+	 * go.Db.store("Foo").single().then(function(entity) {
+	 * 	console.log(entity);
+	 * });
+	 * ```
+	 * 
+	 * @param {int} id
+	 * @return {Promise} 
+	 */
 	single: function(id) {
 
 		if(this.data[id]) {
@@ -424,42 +432,32 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 		var me = this;
 		
-		this.pending[id] = new Promise(function(resolve, reject) {
-			go.Jmap.request({
+		me.pending[id] = go.Jmap.request({
 				method: me.entity.name + "/get",
 				params: {
 					ids: [id]
-				},
-				callback: function (options, success, response) {
-
-					delete this.pending[id];
-
-					if(!success) {
-						reject();
-						return;
-					}
-
+				}
+			}).then(function(response) {
+					delete me.pending[id];
 					if(!go.util.empty(response.notFound)) {
 						me.notFound = me.notFound.concat(response.notFound);
 						me.metaStore.setItem("notfound", me.notFound);								
 						console.warn("Item not found", response);					
-						reject({
+						return Promise.reject({
 							id: id,
 							error: "Not found"
 						});	
 					} else
 					{
 						//this.data is filled with flux in the recieve() function.
-						if(!this.data[id]) {
-							throw "Data not available ???";
+						if(!me.data[id]) {
+							debugger;
+							return Promise.reject("Data not available ???");
 						}
-						resolve(go.util.clone(this.data[id]));
+						return go.util.clone(me.data[id]);
 					}
-				},
-				scope: me
-			});
-		});
-
+				}
+			);
 		return this.pending[id];
 	},
 
@@ -486,11 +484,20 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	/**
 	 * Get entities
 	 * 
+	 * Also see singele() for fetching a single entity
+	 * 
+	 * @example
+	 * ```
+	 * go.Db.store("Foo").get().then(function(result) {
+	 * 	console.log(result.entities);
+	 * });
+	 * ```
+	 * 
 	 * @link https://jmap.io/spec-core.html#/get
 	 * @param {string[]|int[]} ids
 	 * @param {function} cb Callback function that is called with entities[] and notFoundIds[] 
 	 * @param {object} scope
-	 * @returns void
+	 * @returns {Promise} called with {entities:[], notFoundIds:[]}
 	 */
 	get: function (ids, cb, scope) {
 
@@ -554,25 +561,27 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	 *		create: {"client-id-1" : {name: "test"}},
 	 *		update: update,
 	 *		destroy: [2]
-	 *	}, function(options, success, response){}, this);
+	 *	}).then(function(response){
+	 * 
+	 *  });
 	 * 
 	 * ```
 	 * 
 	 * Destroy:
 	 * 
 	 * ```
-	 * this.entityStore.set({destroy: [1,2]}, function (options, success, response) {
+	 * this.entityStore.set({destroy: [1,2]}).then(function (response) {
 			if (response.destroyed) {
-				this.hide();
+				
 			}
-		}, this);
+		});
 		```
 	 * 
 	 * @param {object} params	 
 	 * @param {function} cb A function called with success, values, response, options
 	 * @param {object} scope
 	 * 	 
-	 * @returns {string} Client request ID
+	 * @returns {Promise} 
 	 * 
 	 * @link http://jmap.io/spec-core.html#/set
 	 */

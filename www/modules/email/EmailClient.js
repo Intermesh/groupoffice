@@ -17,18 +17,27 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
 	initComponent : function() {
 
-	this.messagesStore = new GO.data.JsonStore({
-		url: GO.url("email/message/store"),
-		root: 'results',
-		totalProperty: 'total',
-		id: 'uid',
-		fields:['uid','icon','deleted','flagged','labels','has_attachments','seen','subject','from','to','sender','size','udate','internal_udate', 'x_priority','answered','forwarded','account_id','mailbox','mailboxname'],
-		remoteSort: true
-	});
+		this.messagesStore = new GO.data.GroupingStore({
+			url: GO.url("email/message/store"),
+			root: 'results',
+			totalProperty: 'total',
+			remoteSort: true,
+			reader: new Ext.data.JsonReader({
+				root: 'results',
+				totalProperty: 'total',
+				fields:['uid','icon','deleted','flagged','labels','has_attachments','seen','subject','from','to','sender','size','udate','internal_udate', 'x_priority','answered','forwarded','account_id','mailbox','mailboxname'],
+				id: 'uid'
+			}),
+			sortInfo: {
+				field: 'udate',
+				direction: 'DESC'
+			},
+			groupField: 'udate'
+		});
 
-	this.messagesStore.setDefaultSort('arrival', 'DESC');
-	
-	this.messagesStore.on('load', function(){
+//		this.messagesStore.setDefaultSort('udate', 'DESC');
+
+		this.messagesStore.on('load', function(){
 
 			this.isManager = this.messagesGrid.store.reader.jsonData.permission_level == GO.permissionLevels.manage;
 
@@ -1626,7 +1635,6 @@ GO.email.extraTreeContextMenuItems = [];
 go.Modules.register("legacy", 'email', {
 	mainPanel: GO.email.EmailClient,
 	title: t("E-mail"),
-	entities: ['EmailTemplate'],
 	userSettingsPanels: ["GO.email.SettingsPanel"]
 //	systemSettingsPanels: ["GO.email.SystemSettingsPanel"]
 });

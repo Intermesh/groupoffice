@@ -92,7 +92,8 @@ GO.email.MessagesGrid = function(config){
 		
 		config.cm =  new Ext.grid.ColumnModel({
 		defaults:{
-			sortable:true
+			sortable:true,
+			groupable:false
 		},
 		columns:[
 		{
@@ -125,13 +126,27 @@ GO.email.MessagesGrid = function(config){
 			id:'arrival',
 			header: t("Date"),
 			dataIndex:'internal_udate',
-			xtype: "datecolumn",
-			hidden:true
+			hidden:true,
+			groupable:true,
+			align:'right',
+			renderer: function(value, metaData, record, rowIndex, colIndex, store){
+				return !store.groupField ? go.util.Format.dateTime(value) : go.util.Format.time(value);
+			},
+			groupRenderer : function(value){
+				return go.util.Format.shortDateTime(value,false,true);
+			}
 		},{
 			id:'date',
 			header: t("Date sent", "email"),
 			dataIndex:'udate',
-			xtype: "datecolumn"
+			groupable:true,
+			align:'right',
+			renderer: function(value, metaData, record, rowIndex, colIndex, store){
+				return !store.groupField ? go.util.Format.dateTime(value) : go.util.Format.time(value);
+			},
+			groupRenderer : function(value){
+				return go.util.Format.shortDateTime(value,false,true);
+			}
 		},{
 			id:'size',
 			header: t("Size"),
@@ -154,8 +169,11 @@ GO.email.MessagesGrid = function(config){
 		config.autoExpandColumn='message';
 	}
 
-	config.view=new Ext.grid.GridView({
+	config.view = new Ext.grid.GroupingView({
+		autoFill: true,
 		holdPosition: true,
+		forceFit: true,
+		groupTextTpl:'{group}',
 		emptyText: t("No items to display"),
 		getRowClass:function(row, index) {
 			return (row.data.seen == '0') ? 'ml-unseen-row' : 'ml-seen-row';
@@ -166,7 +184,7 @@ GO.email.MessagesGrid = function(config){
 			}
 			this.holdPosition = false;
 		}
-	});
+	}),
 
 	config.sm=new Ext.grid.RowSelectionModel();
 	config.loadMask=true;
@@ -483,7 +501,10 @@ Ext.extend(GO.email.MessagesGrid, GO.grid.GridPanel,{
 		if(record.data['flagged'] == 1){
 			icons.push('flag');
 		}
-		return unseen + '<i class="icon">'+icons.join('</i><i class="icon">')+'</i>';
+
+		return unseen + icons.map(function(i) {
+			return '<i class="icon em-'+i+'">' + i + '</i>';
+		}).join();
 		
 	},
 

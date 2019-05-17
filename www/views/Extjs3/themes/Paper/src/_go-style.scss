@@ -360,10 +360,15 @@ a {
 		&.x-view-selected i {
 			@include var(color, c-primary);
 		}
-		i {
+		> i {
 			color: color($fg,'secondary-text');
 			margin-right:dp(16);
-			
+		}
+		button {
+			visibility: hidden;
+		}
+		&:hover button {
+			visibility: visible;;
 		}
 		&.x-view{
 			&-over {
@@ -463,15 +468,15 @@ a {
 		display:inline-block;
 		text-decoration: none;
 		height:dp(40);
-		padding: dp(20) dp(8) dp(8) dp(8);
+		padding: dp(22) dp(8) dp(8) dp(8);
 		color: white;
 		&:hover,&:active { color: white; }
 	}
 }
 #search_query {
 	float:left;
-	display:inline-block;
-	padding-top: dp(12);
+	display:block;
+	padding-top: dp(16);
 	.search-field-wrap {
 		position:fixed;
 		display: block !important;
@@ -484,6 +489,7 @@ a {
 		transition: opacity 280ms $curve-standard;
 		opacity:1;
 		.x-form-trigger {
+			height: dp(40);
 			color: white;
 		}
 		&.x-hide-display {

@@ -19,8 +19,12 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 	maximizable:false,
 	maximized: true,
 	iconCls: 'ic-settings',
-	title: t("System settings"),
-	
+	title: t("System settings"),	
+	width:dp(1000),
+	height:dp(800),
+	layout:'border',
+	closeAction: "hide",
+
 	initComponent: function () {
 		
 		this.saveButton = new Ext.Button({
@@ -39,7 +43,7 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		
 		
 		this.tabStore = new Ext.data.ArrayStore({
-			fields: ['name', 'iconCls'],
+			fields: ['name', 'iconCls', 'itemId'],
 			data: []
 		});
 		
@@ -48,7 +52,7 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 			width:dp(300),
 			store: this.tabStore,
 			listeners: {
-				selectionchange: function(view, nodes) {		
+				selectionchange: function(view, nodes) {	
 					if(nodes.length) {
 						this.tabPanel.setActiveTab(nodes[0].viewIndex);
 					} else
@@ -56,16 +60,20 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 						//restore selection if user clicked outside of view
 						view.select(this.tabPanel.items.indexOf(this.tabPanel.getActiveTab()));
 					}
+
+					var activeTab = this.tabPanel.getActiveTab();
+					if(activeTab && activeTab.itemId) {
+						go.Router.setPath("systemsettings/" + activeTab.itemId);
+					} else{
+						go.Router.setPath("systemsettings");
+					}
 				},
 				scope:this
 			}
 		});		
 
 		Ext.apply(this,{
-			width:dp(1000),
-			height:dp(800),
-			layout:'border',
-			closeAction:'hide',
+			
 			items: [
 				this.selectMenu,
 				this.tabPanel
@@ -92,6 +100,10 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		this.loadModulePanels();
 		
 		go.systemsettings.Dialog.superclass.initComponent.call(this);
+
+		this.on("hide", function() {
+			go.Router.setPath("");
+		}, this);
 	},
 	
 	loadModulePanels : function() {
@@ -106,14 +118,21 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 			}
 			
 			if(available[i].package != 'core' && !sepAdded) {
-				this.selectMenu.addSeparator();
-				sepAdded = true;
+				// this.selectMenu.addSeparator();
+				// sepAdded = true;
 			}
 			
 			for(i1 = 0, l2 = config.systemSettingsPanels.length; i1 < l2; i1++) {
 				pnl = eval(config.systemSettingsPanels[i1]);				
 				this.addPanel(pnl);
 			}
+		}
+	},
+
+	setActiveItem: function(itemId) {
+		var record = this.tabStore.find('itemId', itemId);		
+		if(record) {
+			this.selectMenu.select(this.tabStore.getAt(record));
 		}
 	},
 	
@@ -179,6 +198,7 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		var pnl = new panelClass(cfg);
 		
 		var menuRec = new Ext.data.Record({
+			itemId: pnl.itemId,
 			name: pnl.title,
 			iconCls: pnl.iconCls
 		});

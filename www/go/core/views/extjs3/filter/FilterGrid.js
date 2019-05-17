@@ -133,25 +133,12 @@ go.filter.FilterGrid = Ext.extend(go.grid.GridPanel, {
 							}, this);
 						},
 						scope: this						
-					},{
-						itemId:"share",
-						iconCls: 'ic-share',
-						text: t("Share"),
-						handler: function() {
-							var shareWindow = new go.permissions.ShareWindow({
-								title: t("Share") + ": " + this.moreMenu.record.get('name')
-							});
-							
-							shareWindow.load(this.moreMenu.record.get('aclId')).show();
-						},
-						scope: this						
-					},
+					}
 				]
-			})
+			});
 		}
 		
 		this.moreMenu.getComponent("edit").setDisabled(record.get("permissionLevel") < go.permissionLevels.manage);
-		this.moreMenu.getComponent("share").setDisabled(record.get("permissionLevel") < go.permissionLevels.manage);
 		this.moreMenu.getComponent("delete").setDisabled(record.get("permissionLevel") < go.permissionLevels.manage);
 		
 		this.moreMenu.record = record;

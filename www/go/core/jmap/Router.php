@@ -56,13 +56,7 @@ class Router {
 	 */
 	public function run() {
 
-		if(!go\core\http\Request::get()->getHeader('Authorization')) {
-			return $this->error("badrequest", 400, "Missing 'Authorization' header.");
-		}
-
-		if (!App::get()->getAuthState()->isAuthenticated()) {			
-			return $this->error("unauthorized", 401, "Unauthorized");
-		}
+		
 
 		$body = Request::get()->getBody();
 		

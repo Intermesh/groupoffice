@@ -147,7 +147,7 @@ class Token extends Entity {
 	}
 	
 	private static function generateToken(){
-		return uniqid().bin2hex(openssl_random_pseudo_bytes(16));
+		return uniqid().bin2hex(random_bytes(16));
 	}
 
 	/**

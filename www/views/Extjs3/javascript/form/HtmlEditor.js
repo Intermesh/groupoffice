@@ -52,6 +52,15 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		var doc = this.getEditorBody();
 		doc.addEventListener('paste', this.onPaste.createDelegate(this));
 		doc.addEventListener('drop', this.onDrop.createDelegate(this));
+
+		//Fix for Tooltips in the way of email #276
+		doc.addEventListener("mouseenter", function() {
+			setTimeout(function() {
+				Ext.QuickTips.getQuickTip().hide();
+			}, 500);
+			
+		});
+		
 	},
 	
 	onDrop: function(e) {
