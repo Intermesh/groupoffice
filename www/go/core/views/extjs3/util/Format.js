@@ -100,6 +100,19 @@
 			}
 			return Ext.util.Format.date(v, GO.settings.date_format);
 		},
+		
+			/**
+		 * @param {string|Date} v
+		 * @returns {String}
+		 */
+		time : function(v) {
+			v = checkDate(v);
+			if(!v) {
+				return "-";
+			}
+			return Ext.util.Format.date(v, GO.settings.time_format);
+		},
+		
 		// string, ...args
 		// eg go.util.Format.string("Welcome {0}, good {1}", 'Michael', 'afternoon')
 		string : function() {
@@ -119,7 +132,11 @@
 			return Ext.util.Format.date(v, GO.settings.date_format + " " + GO.settings.time_format);
 		},
 
-		shortDateTime: function (v) {
+		shortDateTime: function (v, showTime, longNotation) {
+			
+			showTime?showTime:null;
+			longNotation?longNotation:null;
+			
 			v = checkDate(v);
 			if(!v) {
 				return "-";
@@ -132,17 +149,17 @@
 			
 			switch(diff) {
 				case 0:
-					return Ext.util.Format.date(v, GO.settings.time_format.replace(/g/, "G").replace(/h/, "H"));
-				
+					return !showTime ? t('Today') : t('Today') + " " + t('at') + " " + Ext.util.Format.date(v, GO.settings.time_format.replace(/g/, "G").replace(/h/, "H"));
 				case -1:
-					return t('Yesterday');
-					
+					return !showTime ? t('Yesterday') : t('Yesterday') + " " + t('at') + " " + Ext.util.Format.date(v, GO.settings.time_format.replace(/g/, "G").replace(/h/, "H"));
 				case 1:
-					return t('Tomorrow');								
+					return !showTime ? t('Tomorrow') : t('Tomorrow') + " " + t('at') + " " + Ext.util.Format.date(v, GO.settings.time_format.replace(/g/, "G").replace(/h/, "H"));
 			}
 
 			if(diff > -6 && diff < 6) {
-				return t('full_days')[v.getDay()];
+				var str = !longNotation ? t('full_days')[v.getDay()] : t('full_days')[v.getDay()] + " " + v.getDate() + " " + t('short_months')[v.getMonth()+1];
+				str += !showTime?"": " " + t('at') + " " + Ext.util.Format.date(v, GO.settings.time_format.replace(/g/, "G").replace(/h/, "H"));
+				return str;
 			}			
 
 			if (now.getFullYear() === v.getFullYear()) {
@@ -152,11 +169,14 @@
 				if(dayIndex == -1) {
 					dayIndex = GO.settings.date_format.indexOf('j');
 				}
-
-				return Ext.util.Format.date(v, dayIndex > monthIndex ? 'M j' : 'j M');
-			} else
-			{
-				return Ext.util.Format.date(v, GO.settings.date_format);
+				
+				var str = !longNotation ? Ext.util.Format.date(v, dayIndex > monthIndex ? 'M j' : 'j M') : t('full_days')[v.getDay()] + " " + v.getDate() + " " + t('short_months')[v.getMonth()+1];
+				str += !showTime?"": " " + t('at') + " " + Ext.util.Format.date(v, GO.settings.time_format.replace(/g/, "G").replace(/h/, "H"));
+				return str;
+			} else {
+				var str = !longNotation ? Ext.util.Format.date(v, GO.settings.date_format) : t('full_days')[v.getDay()] + " " + v.getDate() + " " + t('short_months')[v.getMonth()+1] + " " + v.getFullYear();
+				str += !showTime?"": " " + t('at') + " " + Ext.util.Format.date(v, GO.settings.time_format.replace(/g/, "G").replace(/h/, "H"));
+				return str;
 			}
 		}
 	};
