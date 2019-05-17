@@ -266,3 +266,45 @@ $app-icons: (
 		}
 	}
 }
+
+
+// Bookmarks
+.chooseIcon {
+	margin-top:10px;
+	margin-left:50%;
+	position:relative;
+	display:inline-block;
+	padding:0;
+	background: url('img/default-avatar.svg') no-repeat center center;
+	background-size:cover;	
+	border-radius: 50%;
+	width:dp(40);
+	height: dp(40);
+	font-size: dp(28);	
+	text-align: center;	
+	
+	.icon {
+		color: red;
+		line-height: dp(40);
+		font-size: inherit;			
+		height: 100%;
+		width: 100%;
+	}
+
+	.go-detail-view & {
+		//float:left; ?? why?
+		margin-top:dp(4);
+		margin-right: dp(16);
+	}
+	
+	.x-btn {
+		border: 0;
+	}
+	
+	&.group {
+		&::before {
+			content: "group";			
+		}
+		background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24));	
+	}
+}
