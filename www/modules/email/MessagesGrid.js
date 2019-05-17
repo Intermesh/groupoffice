@@ -20,75 +20,7 @@ GO.email.MessagesGrid = function(config){
 
 	config.hideMode='offsets';
 
-	if(config.region=='north')
-	{
-		config.cm = new Ext.grid.ColumnModel({
-			defaults:{
-				sortable:true
-			},
-			columns:[
-			{
-				header:"&nbsp;",
-				width:dp(32),
-				dataIndex: 'icon',
-				renderer: this.renderIcon,
-				hideable:false,
-				sortable:false
-			},{
-				id: 'labels',
-				header: t("Labels", "email"),
-				width:50,
-				xtype: 'templatecolumn',
-				tpl: new Ext.XTemplate('<div class="em-messages-grid-labels-container"><tpl for="labels"><div ext:qtip="{name}" style="background-color: #{color}">&nbsp;</div></tpl></div>'),
-				hidden:true,
-				sortable:false
-			},{
-				header: t("From", "email"),
-				dataIndex: 'from',
-				renderer:{
-					fn: this.renderNorthMessageRow,
-					scope: this
-				},
-				id:'from',
-				width:200
-			},{
-				header: t("To", "email"),
-				dataIndex: 'to',
-				renderer:{
-					fn: this.renderNorthMessageRow,
-					scope: this
-				},
-				id:'to',
-				width:200,
-				hidden: true
-			},{
-				header: t("Subject", "email"),
-				dataIndex: 'subject',
-				renderer:{
-					fn: this.renderNorthMessageRow,
-					scope: this
-				},
-				width:200
-			},{
-				xtype: "datecolumn",
-				header: t("Date"),
-				dataIndex: 'internal_udate',
-					hidden:true
-			},{
-				xtype: "datecolumn",
-				header: t("Date sent", "email"),
-				dataIndex: 'udate',
-			},{
-				header: t("Size"),
-				dataIndex: 'size',
-				width:65,
-				align:'right',
-				hidden:true,
-				renderer:Ext.util.Format.fileSize
-			}]
-		});
 
-	} else {
 		
 		config.cm =  new Ext.grid.ColumnModel({
 		defaults:{
@@ -167,7 +99,6 @@ GO.email.MessagesGrid = function(config){
 		});
 		
 		config.autoExpandColumn='message';
-	}
 
 	config.view = new Ext.grid.GroupingView({
 		autoFill: true,
@@ -385,7 +316,7 @@ GO.email.MessagesGrid = function(config){
 
 	}, this);
 
-};
+}
 
 Ext.extend(GO.email.MessagesGrid, GO.grid.GridPanel,{
 	
