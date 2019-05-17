@@ -230,10 +230,11 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	},
 
 
-	receive: function (action) {		
+	receive: function (action) {	
+		var me = this;	
 		this.getState().then(function(state){
 			switch (action.type) {
-				case this.entity.name + "/get":
+				case me.entity.name + "/get":
 
 					// If no items are available, don't continue
 					if(!action.payload.list){
@@ -242,24 +243,24 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 					//add data from get response
 					for(var i = 0,l = action.payload.list.length;i < l; i++) {
-						this._add(action.payload.list[i]);
-					};
+						me._add(action.payload.list[i]);
+					}
 
-					this.setState(action.payload.state);
+					me.setState(action.payload.state);
 					break;
 
-				case this.entity.name + "/query":
+				case me.entity.name + "/query":
 //					console.log("Query state: " + state + " - " + action.payload.state);
 					//if a list call was made then fetch updates if state mismatch
 					if (state && action.payload.state !== state) {
-						this.getUpdates();
-						this.setState(action.payload.state);
+						me.getUpdates();
+						me.setState(action.payload.state);
 					}
 					break;
 
-				case this.entity.name + "/set":
+				case me.entity.name + "/set":
 					//update state from set we initiated
-					this.setState(action.payload.newState);
+					me.setState(action.payload.newState);
 					break;
 			}
 		});
