@@ -232,7 +232,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 	receive: function (action) {	
 		var me = this;	
-		this.getState().then(function(state){
+		me.getState().then(function(state){
 			switch (action.type) {
 				case me.entity.name + "/get":
 
@@ -254,7 +254,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					//if a list call was made then fetch updates if state mismatch
 					if (state && action.payload.state !== state) {
 						me.getUpdates();
-						me.setState(action.payload.state);
+						//me.setState(action.payload.state);
 					}
 					break;
 
@@ -279,6 +279,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				if(cb) {
 					cb.call(scope || me, me, false);
 				}
+				debugger;
 				return Promise.reject("No state yet");
 			}
 			
@@ -450,6 +451,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					{
 						//this.data is filled with flux in the recieve() function.
 						if(!me.data[id]) {
+							debugger;
 							return Promise.reject("Data not available ???");
 						}
 						return go.util.clone(me.data[id]);

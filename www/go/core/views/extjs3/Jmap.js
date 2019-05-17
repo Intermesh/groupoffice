@@ -157,7 +157,13 @@ go.Jmap = {
 				for(var entity in JSON.parse(e.data)) {
 					var store =go.Db.store(entity);
 					if(store) {
-						store.getUpdates();
+						store.getState().then(function(state) {
+							if(!state) {
+								//don't fetch updates if there's no state yet because it never was used in that case.
+								return;
+							}
+							store.getUpdates();
+						});
 					}
 				}
 			}, false);
@@ -277,26 +283,27 @@ go.Jmap = {
 							return true;
 						}
 						if (response[0] == "error") {
-							console.error('server-side JMAP failure', response);			
-								console.error('server-side JMAP failure', response);			
-							console.error('server-side JMAP failure', response);			
+							console.error('server-side JMAP failure', response);							
 						}
 
 						go.flux.Dispatcher.dispatch(response[0], response[1]);
 
-						var success = response[0] !== "error";
-						if (o.callback) {
-							if (!o.scope) {
-								o.scope = this;
+						//make sure dispatch is executed before callbacks and resolves.
+						setTimeout(function() {
+							var success = response[0] !== "error";
+							if (o.callback) {
+								if (!o.scope) {
+									o.scope = this;
+								}
+								o.callback.call(o.scope, o, success, response[1], response[2]);
 							}
-							o.callback.call(o.scope, o, success, response[1], response[2]);
-						}
 
-						if(success) {							
-							o.resolve(response[1]);
-						} else{
-							o.reject(response[1]);
-						}
+							if(success) {							
+								o.resolve(response[1]);
+							} else{
+								o.reject(response[1]);
+							}
+						}, 0);
 					}, this);
 
 				} catch(e) {
