@@ -9,17 +9,13 @@ go.flux.Dispatcher = {
 	 * @param {object} payload
 	 */
   dispatch: function(type, payload) {
-
-//	console.log("dispatching '" + type + "'", payload);
-	
-   for(var i = 0, l = this.receivers.length; i < l; i++) {
-		 
+//	console.log("dispatching '" + type + "'", payload);	
+   for(var i = 0, l = this.receivers.length; i < l; i++) {		 
       this.receivers[i].receive.call(this.receivers[i].scope || this.receivers[i], {
-			type: type,
-			payload: payload
-		});
-   };
-	 
+				type: type,
+				payload: payload
+			});
+   }	 
   },
 	
 	/**

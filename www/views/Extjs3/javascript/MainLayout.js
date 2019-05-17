@@ -382,6 +382,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			go.Entities.init();
 			me.addDefaultRoutes();
 			me.renderUI();
+			go.Router.check();
 			
 		}).catch(function(error){
 			console.error(error);
@@ -421,10 +422,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				console.log(arguments);
 			}
 		});
-
-		
-
-		go.Router.check();
 	},
 
 	renderUI : function() {
