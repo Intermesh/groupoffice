@@ -207,8 +207,15 @@ class QueryBuilder {
 		$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName);
 
 		$sql = "DELETE FROM `" . $this->tableAlias . "` USING `" . $this->tableName . "` AS `" . $this->tableAlias . "` ";
+		$joins = "";
+		foreach ($this->query->getJoins() as $join) {
+			$joins .= "\n" . $this->join($join, "");
+		}
+		$sql .= $joins;
 
 		$where = $this->buildWhere($this->getQuery()->getWhere());
+
+		
 
 		if (!empty($where)) {
 			$sql .= "\nWHERE " . $where;
