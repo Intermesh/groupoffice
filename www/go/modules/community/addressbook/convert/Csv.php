@@ -32,6 +32,10 @@ class Csv extends convert\Csv {
 	{
 		$contact = parent::importEntity($entity, $fp, $index, $params);
 
+		if(!$contact) {
+			return false;
+		}
+
 		return $contact->isOrganization == $this->organizations ? $contact : false;
 	}
 
@@ -43,13 +47,33 @@ class Csv extends convert\Csv {
 	public static $excludeHeaders = ['addressBookId', 'goUserId', 'vcardBlobId', 'uri'];
 	
 	protected function init() {
-		$this->addColumn('organizations', GO()->t("Organizations", "community", "addressbook"), true);
+		$this->addColumn('isOrganization', GO()->t("Is organization", "community", "addressbook"), false);
+		$this->addColumn('organizations', GO()->t("Organizations", "community", "addressbook"), true);		
+	}
+
+	protected function importIsOrganization(Contact $contact, $isOrganization, array &$values) {
+		if(isset($isOrganization)) {
+			//value is present in CSV file so just use it
+			$contact->isOrganization = $isOrganization;
+			return;
+		}
+
+		//A contact will be an organization if there's a name but no firstName or lastName
+		$contact->isOrganization = empty($values['firstName']) && empty($values['lastName']);
+		
+		if($contact->isOrganization && empty($values['name']) && isset($values['organizations'][0])) {
+			$contact->name = $values['organizations'][0];
+			unset($values['organizations']);
+		}
 	}
 	
-	protected function importOrganizations(Contact $contact, array $values) {
+	protected function importOrganizations(Contact $contact, $organizationNames) {
+		if(!isset($organizationNames)) {
+			return;
+		}
 		//todo how to handle if org is not imported yet?
 		$orgIds = [];
-		foreach($values as $name) {
+		foreach($organizationNames as $name) {
 			$org = Contact::find()->where(['name' => $name, 'isOrganization' => true])->single();
 			if(!$org) {
 				$org = new Contact();

@@ -285,11 +285,10 @@ go.util =  (function () {
 	 * @param {string} entity eg. "Contact"
 	 * @param {string} accept File types to accept. eg. F"text/vcard,application/json"
 	 * @param {object} values Extra values to apply to all imported items. eg. {addressBookId: 1}
-	 * @param {function} callback
-	 * @param {object} scope
-	 * @return {undefined}
+	 * @param {object} options Options that can be used by importers. For CSV you can provide labels. {labels: {propName: "Label"}}
+	 * @return {void}
 	 */
-	importFile : function(entity, accept, values, callback, scope) {
+	importFile : function(entity, accept, values, options) {
 		go.util.openFileDialog({
 			multiple: true,
 			accept: accept,
@@ -308,9 +307,8 @@ go.util =  (function () {
 							var dlg = new go.import.CsvMappingDialog({
 								entity: entity,
 								blobId: response.blobId,
-								values: values,
-								callback: callback,
-								scope: scope
+								values: values,								
+								labels: options.labels || {}
 							});
 							dlg.show();
 							break;

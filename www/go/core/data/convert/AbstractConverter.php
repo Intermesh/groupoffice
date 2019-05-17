@@ -81,6 +81,9 @@ abstract class AbstractConverter {
 	/**
 	 * Read file and import them into Group-Office
 	 * 
+	 * @param File $file the source file
+	 * @param string $entityClass The entity class model. eg. go\modules\community\addressbook\model\Contact
+	 * @param array $params Extra import parameters. By default this can only hold 'values' which is a key value array that will be set on each model.
 	 * @return int[] id's of imported entities
 	 */
 	public function importFile(File $file, $entityClass, $params = array()) {
@@ -116,7 +119,7 @@ abstract class AbstractConverter {
 			}
 			catch(Exception $e) {
 				ErrorHandler::logException($e);
-				$response['errors'][] = $e;
+				$response['errors'][] = $e->getMessage();
 			}
 		}
 		
@@ -125,7 +128,7 @@ abstract class AbstractConverter {
 	/**
 	 * Handle's the import. 
 	 * 
-	 * It must read from the $fp file pointer and return the entity object.
+	 * It must read from the $fp file pointer and return the entity object. The entity is not saved yet.
 	 * 
 	 * When false is returned the result will be ignored. For example when you want to skip a CSV line because it's empty.
 	 * 

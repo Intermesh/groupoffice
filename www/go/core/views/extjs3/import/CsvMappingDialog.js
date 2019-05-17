@@ -4,6 +4,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 	blobId: null,
 	values: null,
 	
+	
 	width: dp(500),
 	height: dp(500),
 	title: t("Import Comma Separated values"),
@@ -11,6 +12,8 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 	
 	
 	initComponent : function() {		
+
+		
 		
 		this.formPanel = new Ext.form.FormPanel({
 			
@@ -83,10 +86,11 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 	},
 	
 	createGOHeaderStore : function(headers) {
-			var store = new Ext.data.ArrayStore({
+			var me = this, store = new Ext.data.ArrayStore({
 			fields: ['name', 'label'],
 			data: headers.map(function(h) {
-				return [h.name, h.label];
+				var label = me.labels[h.name] || h.label || h.name;
+				return [h.name, label];
 			})
 		});
 		
@@ -135,9 +139,9 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 					this.close();
 				}
 
-				if (this.callback) {
-					this.callback.call(this.scope || this, response);
-				}
+				// if (this.callback) {
+				// 	this.callback.call(this.scope || this, response);
+				// }
 				
 				this.close();
 			},

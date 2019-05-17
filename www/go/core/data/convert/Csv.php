@@ -7,6 +7,13 @@ use go\core\model\Field;
 use go\core\orm\Entity;
 use go\core\orm\Relation;
 
+/**
+ * CSV converter.
+ * 
+ * Imports a CSV file to entities.
+ * 
+ * A mapping can be supplied to the JMAP controller or importFile() function. {@see importFile()}
+ */
 class Csv extends AbstractConverter {
 	
 	/**
@@ -54,8 +61,8 @@ class Csv extends AbstractConverter {
 	 * @param string $name Column name
 	 * @param string $label Column label
 	 * @param string $many True if this field value should be converted to an array when importing
-	 * @param string $exportFunction Defaults to "export" . ucfirst($name)
-	 * @param string $importFunction Defaults to "import" . ucfirst($name)
+	 * @param string $exportFunction Defaults to "export" . ucfirst($name) The function is called with Entity $entity, $columnName
+	 * @param string $importFunction Defaults to "import" . ucfirst($name) The import function is called with Entity $entity, $value, array $values
 	 */
 	protected function addColumn($name, $label, $many = false, $exportFunction = null, $importFunction = null) {
 		if(!isset($exportFunction)) {
@@ -166,7 +173,7 @@ class Csv extends AbstractConverter {
 
 		foreach($properties as $name => $value) {
 			//Skip system data
-			if(in_array($name, ['createdAt', 'createdBy', 'ownedBy', 'modifiedAt','aclId','filesFolderId', 'modifiedBy'])){
+			if(in_array($name, array_merge(['createdAt', 'createdBy', 'ownedBy', 'modifiedAt','aclId','filesFolderId', 'modifiedBy'], array_keys($this->customColumns)))){
 				continue;
 			}
 			$headers = $this->addSubHeaders($headers, $name, $value);
@@ -189,7 +196,8 @@ class Csv extends AbstractConverter {
 		
 		if(!($prop instanceof Relation)) {
 			if(!$prop->primary) {
-				$headers[] = ['name' => $header, 'label' => $header, 'many' => $many];
+				//client will define labels if not given. Only custom fields provide label
+				$headers[] = ['name' => $header, 'label' => null, 'many' => $many];
 			}
 			return $headers;
 		}
@@ -236,6 +244,18 @@ class Csv extends AbstractConverter {
 		return true;
 	}
 	
+	/**
+	 * Imports a single record and returns an entity 
+	 * 
+	 * @param File $file the source file
+	 * @param string $entityClass The entity class model. eg. go\modules\community\addressbook\model\Contact
+	 * @param array $params Extra import parameters. By default this can only hold 'values' which is a key value array that will be set on each model.
+	 * 	$params Can hold "mapping" property. The key is the CSV record index and value the 
+	 * 	property path. "propName" or "prop.name" if it's a relation.
+	 * 	If the relation is a has many values can be separated with " ::: ".
+	 * 
+	 * @return int[] id's of imported entities
+	 */
 	protected function importEntity(Entity $entity, $fp, $index, array $params) {
 		
 		if($index == 0) {
@@ -250,23 +270,18 @@ class Csv extends AbstractConverter {
 		
 		$mapping = $params['mapping'] ?? $this->getHeaders(get_class($entity));
 
-		$values = $this->mergeMultiples($record, $mapping, get_class($entity));
+		$values = $this->convertRecordToProperties($record, $mapping, get_class($entity));
 		
 		$values = $this->importCustomColumns($entity, $values);
 
 		$this->setValues($entity, $values);
-		
-		// $entity->save();
-		
+
 		return $entity;
 	}
 	
 	protected function importCustomColumns(Entity $entity, $values){
 		foreach($this->customColumns as $c) {
-			if(!isset($values[$c['name']])) {
-				continue;
-			}
-			call_user_func([$this, $c['importFunction']], $entity, $values[$c['name']], $c['name']);
+			call_user_func_array([$this, $c['importFunction']], [$entity, $values[$c['name']] ?? null, &$values, $c['name']]);
 			unset($values[$c['name']]);
 		}
 		return $values;
@@ -276,8 +291,10 @@ class Csv extends AbstractConverter {
 		$entity->setValues($values);
 	}
 	
-	
-	private function mergeMultiples($record, $mapping, $entityClass) {
+	/**
+	 * Will convert the CSV record to a key value array to use in Entity::setValues();
+	 */
+	private function convertRecordToProperties($record, $mapping, $entityClass) {
 	
 		$v = [];
 		//create arrays of values that are mapped multiple times.
