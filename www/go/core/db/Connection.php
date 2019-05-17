@@ -447,16 +447,21 @@ class Connection {
 			GO()->debug(QueryBuilder::debugBuild($build));			
 		}
 
-		$stmt = $this->getPDO()->prepare($build['sql']);
-		$stmt->setBuild($build);
+		try {
+			$stmt = $this->getPDO()->prepare($build['sql']);
+			$stmt->setBuild($build);
 
-		foreach ($build['params'] as $p) {
-			if (isset($p['value']) && !is_scalar($p['value'])) {
-				throw new Exception("Invalid value " . var_export($p['value'], true));
+			foreach ($build['params'] as $p) {
+				if (isset($p['value']) && !is_scalar($p['value'])) {
+					throw new Exception("Invalid value " . var_export($p['value'], true));
+				}
+				$stmt->bindValue($p['paramTag'], $p['value'], $p['pdoType']);
 			}
-			$stmt->bindValue($p['paramTag'], $p['value'], $p['pdoType']);
+			return $stmt;
+		}catch(\PDOException $e) {
+			GO()->error("Failed SQL: ". QueryBuilder::debugBuild($build));
+			throw $e;
 		}
-		return $stmt;
 	}
 
 
