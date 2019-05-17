@@ -213,47 +213,44 @@ go.Modules = (function () {
 		init: function () {
 			var package, name, me = this;
 			
-			return new Promise(function(resolve, reject){
-			
-				go.Db.store("Module").all(function (success, entities) {
+			return go.Db.store("Module").all().then (function(entities) {
+				me.entities = entities, promises = [];
 
-					this.entities = entities;
-
-					for (package in me.registered) {
-						for (name in me.registered[package]) {							
-							var config = me.registered[package][name];
-						
-							if (!me.isAvailable(package, name, config.requiredPermissionLevel)) {
-								continue;
-							}
-							
-							if (config.initModule){
-								go.Translate.setModule(package, name);
-								config.initModule.call(this);
-							}
-
-							if (config.mainPanel) {
-								if(Ext.isArray(config.mainPanel)) {
-									for(var i = 0; i < config.mainPanel.length; i++) {
-									
-										//todo panel is only constructed to grab config.title/id
-										var m = new config.mainPanel[i]();
-										//todo GO.moduleManager is deprecated
-										GO.moduleManager._addModule(config.mainPanel[i].prototype.id, config.mainPanel[i], {title:m.title}, config.subMenuConfig);
-									}
-								} else {
-									GO.moduleManager._addModule(name, config.mainPanel, config.panelConfig, config.subMenuConfig);
-								}
-							}
-
-							
+				for (package in me.registered) {
+					for (name in me.registered[package]) {							
+						var config = me.registered[package][name];
+					
+						if (!me.isAvailable(package, name, config.requiredPermissionLevel)) {
+							continue;
 						}
+						
+						if (config.initModule){
+							go.Translate.setModule(package, name);
+							var initModulePromise = config.initModule.call(me);
+							if(initModulePromise) {
+								promises.push(initModulePromise);
+							}
+						}
+
+						if (config.mainPanel) {
+							if(Ext.isArray(config.mainPanel)) {
+								for(var i = 0; i < config.mainPanel.length; i++) {
+								
+									//todo panel is only constructed to grab config.title/id
+									var m = new config.mainPanel[i]();
+									//todo GO.moduleManager is deprecated
+									GO.moduleManager._addModule(config.mainPanel[i].prototype.id, config.mainPanel[i], {title:m.title}, config.subMenuConfig);
+								}
+							} else {
+								GO.moduleManager._addModule(name, config.mainPanel, config.panelConfig, config.subMenuConfig);
+							}
+						}							
 					}
-					
-					success ? resolve(me) : reject(me);
-					
-				}, me);
-			
+				}
+
+				return Promise.all(promises).then(function() {
+					entities
+				});
 			});
 		},
 		

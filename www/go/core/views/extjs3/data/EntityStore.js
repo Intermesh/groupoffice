@@ -376,11 +376,15 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					me.metaStore.setItem('isComplete', true);
 					me.isComplete = true;
 					
-					cb.call(scope, true, response.list);
+					if(cb) {
+						cb.call(scope, true, response.list);
+					}
 
 					return me.data;
 				}).catch(function(response) {
-					cb.call(scope, false, response);
+					if(cb) {
+						cb.call(scope, false, response);
+					}
 				});
 			}
 		});
