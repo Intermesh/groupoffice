@@ -724,7 +724,7 @@ Ext.decode = Ext.util.JSON.decode = function(jsonStr){
 	catch (e)
 	{
 
-		switch(json.trim())
+		switch(jsonStr.trim())
 		{
 			case 'NOTLOGGEDIN':
 				//document.location=BaseHref;
@@ -735,8 +735,9 @@ Ext.decode = Ext.util.JSON.decode = function(jsonStr){
 			break;
 
 			default:	
-				json += '<br /><br />Ext.decode exception occurred';
-				GO.errorDialog.show(t("An error occurred on the webserver. Contact your system administrator and supply the detailed error.")+'<br /><br />'+jsonStr);
+				console.error(jsonStr);
+				jsonStr += '<br /><br />Ext.decode exception occurred';
+				GO.errorDialog.show(t("An error occurred on the webserver. Contact your system administrator and supply the detailed error from the server log."));
 				break;
 		}
 	}
