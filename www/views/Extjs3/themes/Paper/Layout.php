@@ -28,7 +28,7 @@ $lang = GO::language()->getLanguage(); ?>
 	<meta name="msapplication-TileColor" content="#2b5797">
 	<meta name="theme-color" content="#ffffff">
 
-	<meta http-equiv="Content-Security-Policy" content="default-src <?= Request::get()->getHost(); ?> 'unsafe-eval' 'nonce-<?= Response::get()->getCspNonce(); ?>'; img-src 'self' data: http: https:; style-src 'self' 'unsafe-inline'; child-src groupoffices: groupoffice:">
+	<meta http-equiv="Content-Security-Policy" content="default-src <?= Request::get()->getHost(); ?> ; script-src 'self' 'nonce-<?= Response::get()->getCspNonce(); ?>' 'unsafe-eval'; img-src 'self' data: http: https:; style-src 'self' 'unsafe-inline'; frame-src groupoffices: groupoffice:">
 
 	<title><?= \GO::config()->title; ?></title>
 
