@@ -192,7 +192,7 @@ if ($cacheFile->exists()) {
         $relPath = $script->getRelativePath($rootFolder);
         $parts = explode('/', $relPath);
 //        $js .= "\n//source: ".$relPath ."\n";
-				echo '<script type="text/javascript" nonce="'.Response::get()->getCspNonce().'">';
+				
 				$js = "";
         if($parts[0] == 'go' && $parts[1] == 'modules') {
 					//for t() function to auto detect module package and name
@@ -205,10 +205,14 @@ if ($cacheFile->exists()) {
           $js .= "go.module = '".$parts[1]."';";
           $js .= "go.package = 'legacy';";
           $js .= "go.Translate.setModule('legacy', '" .$parts[1]. "');";   
-        }
-				echo $js;
+				}
 				
-				echo "</script>";
+
+				if(!empty($js)) {
+					echo '<script type="text/javascript" nonce="'.Response::get()->getCspNonce().'">';
+					echo $js;				
+					echo "</script>\n";
+				}
 //        $js .= $script->getContents()."\n;\n";
 //        
 //     
