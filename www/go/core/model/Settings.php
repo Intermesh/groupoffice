@@ -269,6 +269,16 @@ class Settings extends core\Settings {
 	 * @var string 
 	 */
 	public $URL;
+
+
+	/**
+	 * Keep log in core_change for this number of days.
+	 * 
+	 * When a client has not logged in for this period the sync data will be deleted and resynchronized.
+	 * 
+	 * @var int
+	 */
+	public $syncChangesMaxAge = 90;
 	
 	/**
 	 * This variable is checked against the code version.
