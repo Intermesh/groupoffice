@@ -214,6 +214,9 @@ abstract class Entity extends Property {
 	 * @return boolean
 	 */
 	public final function save() {	
+
+		$this->isSaving = true;
+
 //		GO()->debug(static::class.'::save()' . $this->getId());
 		App::get()->getDbConnection()->beginTransaction();
 			
@@ -233,6 +236,17 @@ abstract class Entity extends Property {
 		}
 
 		return $this->commit() && !$this->hasValidationErrors();
+	}
+
+	private $isSaving = false;
+
+	/**
+	 * Check if this entity is saving
+	 * 
+	 * @return bool
+	 */
+	public function isSaving() {
+		return $this->isSaving;
 	}
 	
 	/**
@@ -276,12 +290,25 @@ abstract class Entity extends Property {
 		return true;
 	}
 
+	private $isDeleting = false;
+
+	/**
+	 * Check if this entity is being deleted.
+	 * 
+	 * @return bool
+	 */
+	public function isDeleting() {
+		return $this->isDeleting;
+	}
+
 	/**
 	 * Delete the entity
 	 * 
 	 * @return boolean
 	 */
 	public final function delete() {
+
+		$this->isDeleting = true;
 		
 		//GO()->debug(static::class.'::delete() ' . $this->getId());
 
@@ -312,12 +339,17 @@ abstract class Entity extends Property {
 	protected function commit() {
 		parent::commit();
 
+		$this->isDeleting = false;
+		$this->isSaving = false;
+
 		return App::get()->getDbConnection()->commit();
 	}
 
 	protected function rollback() {
 		App::get()->debug("Rolling back save operation for ".static::class);
 		parent::rollBack();
+		$this->isDeleting = false;
+		$this->isSaving = false;
 		return App::get()->getDbConnection()->rollBack();
 	}
 
