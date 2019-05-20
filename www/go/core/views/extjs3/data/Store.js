@@ -126,7 +126,10 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 
 		return new Promise(function(resolve, reject) {
 			o.callback = function(records, options, success) {
-				origCallback.call(this, records, options, success);
+				if(origCallback) {
+					origCallback.call(this, records, options, success);
+				}
+				
 				if(success) {
 					resolve(records);
 				} else{
