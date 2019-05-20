@@ -134,7 +134,11 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 				}				
 			};
 
-			go.data.Store.superclass.load.call(me, o);
+			if(go.data.Store.superclass.load.call(me, o) === false) {
+				//beforeload handlers cancelled
+				reject();
+			}
+			
 		});
 	}	
 
