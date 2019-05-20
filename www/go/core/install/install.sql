@@ -1,9 +1,11 @@
 CREATE TABLE `core_acl` (
   `id` int(11) NOT NULL,
   `ownedBy` int(11) NOT NULL,
-  `usedIn` varchar(190) DEFAULT NULL,
-  `modifiedAt` datetime DEFAULT NULL
-) ENGINE=InnoDB;
+  `usedIn` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `modifiedAt` datetime DEFAULT NULL,
+  `entityTypeId` int(11) DEFAULT NULL,
+  `entityId` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `core_acl_group` (
   `aclId` int(11) NOT NULL,
@@ -745,6 +747,10 @@ ALTER TABLE `core_user_default_group`
 ALTER TABLE `core_user_group`
   ADD CONSTRAINT `core_user_group_ibfk_1` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_user_group_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;
+
+
+ALTER TABLE `core_acl`
+  ADD CONSTRAINT `core_acl_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`);
 
 CREATE TABLE IF NOT EXISTS `go_templates` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

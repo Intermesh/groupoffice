@@ -113,6 +113,8 @@ abstract class AclOwnerEntity extends AclEntity {
 		}
 		
 		$this->acl->usedIn = $this->getMapping()->getColumn('aclId')->table->getName().'.aclId';
+		$this->acl->entityTypeId = $this->getType()->getId();
+		$this->acl->entityId = $this->id;
 		$this->acl->ownedBy = !empty($this->createdBy) ? $this->createdBy : $this->getDefaultCreatedBy();
 
 		if(!$this->acl->save()) {	

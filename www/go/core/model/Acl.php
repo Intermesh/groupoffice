@@ -46,6 +46,20 @@ class Acl extends Entity {
 	 * @var DateTime
 	 */
 	public $modifiedAt;
+
+	/**
+	 * The entity type this ACL belongs to.
+	 * 
+	 * @var int
+	 */
+	public $entityTypeId;
+
+	/**
+	 * The ID of the entity this ACL belongs to.
+	 * 
+	 * @var int
+	 */
+	public $entityId;
 	
 	/**
 	 * The list of groups that have access

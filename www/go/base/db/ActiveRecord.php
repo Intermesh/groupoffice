@@ -3071,6 +3071,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 					$acl = new \GO\Base\Model\Acl();
 					$acl->usedIn=$this->tableName().'.'.$this->aclOverwrite();
 					$acl->ownedBy=$oldAcl->ownedBy;
+					$acl->entityTypeId = $this->getType()->getId();
+					$acl->entityId = $this->id;
 					$acl->save();
 					
 					$oldAcl->copyPermissions($acl);
@@ -3451,6 +3453,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$acl = new \GO\Base\Model\Acl();
 		$acl->usedIn = $this->tableName().'.'.$this->aclField();
 		$acl->ownedBy=$user_id;
+		$acl->entityTypeId = $this->getType()->getId();
+		$acl->entityId = $this->id;
 		if(!$acl->save()) {
 			throw new \Exception("Could not save ACL: ".var_export($this->getValidationErrors(), true));
 		}

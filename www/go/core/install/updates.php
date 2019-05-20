@@ -2,6 +2,14 @@
 
 use go\core\App;
 use go\core\util\IniFile;
+use go\core\util\ClassFinder;
+use go\core\acl\model\AclOwnerEntity;
+use go\core\db\Expression;
+use go\core\db\Query;
+use go\core\orm\EntityType;
+use GO\Base\Db\ActiveRecord;
+use go\core\model\Search;
+use GO\Base\Model\SearchCacheRecord;
 
 $updates["201803090847"][] = "ALTER TABLE `go_log` ADD `jsonData` TEXT NULL AFTER `message`;";
 
@@ -526,3 +534,57 @@ $updates['201905101208'][] = "ALTER TABLE `core_email_template`
 $updates['201905101208'][] = "ALTER TABLE `core_email_template_attachment`
   ADD CONSTRAINT `core_email_template_attachment_ibfk_1` FOREIGN KEY (`blobId`) REFERENCES `core_blob` (`id`),
   ADD CONSTRAINT `core_email_template_attachment_ibfk_2` FOREIGN KEY (`emailTemplateId`) REFERENCES `core_email_template` (`id`) ON DELETE CASCADE;";
+
+
+$updates['201905201227'][] = "ALTER TABLE `core_acl` ADD `entityTypeId` INT NULL DEFAULT NULL AFTER `modifiedAt`, ADD `entityId` INT NULL DEFAULT NULL AFTER `entityTypeId`;";
+$dupates['201905201227'][] = "ALTER TABLE `core_acl` ADD FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;";
+$updates['201905201227'][] = function() {
+ 
+  $cf = new ClassFinder();
+  $classes = $cf->findByParent(AclOwnerEntity::class);
+  
+  $mods = GO::modules()->getAll();
+  foreach($mods as $m) {
+    if($m->package == null) {
+      $classes = array_merge($classes, array_map(function($c){return $c->getName();},$m->moduleManager->getModels()));
+    }
+  }
+
+
+  foreach($classes as $cls) {    
+
+    if($cls === Search::class || $cls === SearchCacheRecord::class) {
+      continue;
+    }
+
+    if(is_subclass_of($cls, AclOwnerEntity::class)) {
+      $type = $cls::getType();
+      $tables = $cls::getMapping()->getTables();
+      $table = array_values($tables)[0]->getName();
+      $colName = 'aclId';
+    } else {
+      if(!is_subclass_of($cls, ActiveRecord::class)) {
+        continue;
+      }
+      $colName = $cls::model()->aclField();
+      if(!$colName || ($cls::model()->isJoinedAclField && $cls != "GO\\Files\\Model\\Folder")) {
+        continue;
+      }
+      $type = $cls::getType();
+      $table = $cls::model()->tableName();     
+    }
+
+    $stmt = GO()->getDbConnection()->update(
+      'core_acl', 
+      [
+        'acl.entityTypeId' => $type->getId(), 
+        'acl.entityId' => new Expression('entity.id')],
+      (new Query())
+        ->tableAlias('acl')
+        ->join($table, 'entity', 'entity.'.$colName.' = acl.id'));
+  
+   if(!$stmt->execute()) {
+     throw new \Exception("Could not update ACL");
+   }
+  }
+};
