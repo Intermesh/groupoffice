@@ -115,7 +115,9 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 				//console.log(queue);
 				this.entityStore.set(queue, function(options, success, queue){
 					this.commitChanges();
-					if(cb) {cb(success) }
+					if(cb) {
+						cb(success);
+					}
 				},this);
 			}
 		}
@@ -129,7 +131,7 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 				if(origCallback) {
 					origCallback.call(this, records, options, success);
 				}
-				
+
 				if(success) {
 					resolve(records);
 				} else{
