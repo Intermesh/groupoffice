@@ -172,14 +172,16 @@ class QueryBuilder {
 		if (is_array($data)) {
 			$updates = [];
 			foreach ($data as $colName => $value) {
-				
+
+				$tableAndCol = $this->splitTableAndColumn($colName);
+				$colName = '`' . $tableAndCol[0] .'`.`'.$tableAndCol[1].'`';
 				if($value instanceof Expression) {
-					$updates[] = '`' . $colName . '` = ' . $value;
+					$updates[] = $colName . ' = ' . $value;
 				} else
 				{				
 					$paramTag = $this->getParamTag();
-					$updates[] = '`' . $colName . '` = ' . $paramTag;
-					$this->addBuildBindParameter($paramTag, $value, $this->tableAlias, $colName);
+					$updates[] = $colName . ' = ' . $paramTag;
+					$this->addBuildBindParameter($paramTag, $value, $tableAndCol[0], $tableAndCol[1]);
 				}
 			}
 			$set = implode(",\n\t", $updates);
@@ -187,7 +189,13 @@ class QueryBuilder {
 			$set = (string) $data;
 		}
 		
-		$sql = "UPDATE `{$this->tableName}` `" . $this->tableAlias . "` SET\n\t" . $set;
+		$sql = "UPDATE `{$this->tableName}` `" . $this->tableAlias . "`";
+		
+		foreach ($this->query->getJoins() as $join) {
+			$sql .= "\n" . $this->join($join, "");
+		}
+		
+		$sql .= "\nSET\n\t" . $set;
 
 		$where = $this->buildWhere($this->getQuery()->getWhere());
 
@@ -207,15 +215,12 @@ class QueryBuilder {
 		$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName);
 
 		$sql = "DELETE FROM `" . $this->tableAlias . "` USING `" . $this->tableName . "` AS `" . $this->tableAlias . "` ";
-		$joins = "";
+
 		foreach ($this->query->getJoins() as $join) {
-			$joins .= "\n" . $this->join($join, "");
+			$sql .= "\n" . $this->join($join, "");
 		}
-		$sql .= $joins;
 
-		$where = $this->buildWhere($this->getQuery()->getWhere());
-
-		
+		$where = $this->buildWhere($this->getQuery()->getWhere());	
 
 		if (!empty($where)) {
 			$sql .= "\nWHERE " . $where;

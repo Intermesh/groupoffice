@@ -384,6 +384,20 @@ class Connection {
 	 * $stmt->execute();
 	 * ````
 	 * 
+	 * @example with join
+	 * ```
+	 * GO()->getDbConnection()->update(
+	 *     'core_acl', 
+	 *     [
+	 *       'acl.entityTypeId' => $entityTypeId, 
+	 *       'acl.entityId' => new Expression('ab.id')], // Use go\core\db\Expression for references to tables
+	 *     (new Query())
+	 *       ->tableAlias('acl') // set alias for core_acl table
+	 *       ->join('addressbook_addressbook, 'ab', 'ab.aclId = acl.id'))
+	 *   ->execute();  
+	 * ``` 
+	 *
+	 * 
 	 * @param string $tableName
 	 * @param array|Expression
 	 * @param Query|string|array $query {@see Query::normalize()}
