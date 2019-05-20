@@ -73,4 +73,20 @@ class Query extends DbQuery {
 		return $this->join('core_link', 'link', $c);
 	}
 
+	/**
+	 * Delete's all entities in the query
+	 * @return bool
+	 */
+	public function delete() {
+		GO()->getDbConnection()->beginTransaction();
+		foreach($this->getIterator() as $entity) {
+			if(!$entity->delete()) {
+				GO()->getDbConnection()->rollBack();
+				return false;
+			}
+		}
+		GO()->getDbConnection()->commit();
+		return true;
+	}
+
 }
