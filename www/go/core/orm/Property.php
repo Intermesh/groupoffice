@@ -1044,6 +1044,11 @@ abstract class Property extends Model {
 	
 	private $isDeleted = false;
 	
+	/**
+	 * Check if this property was just deleted.
+	 * 
+	 * @var bool
+	 */
 	public function isDeleted() {
 		return $this->isDeleted;
 	}
