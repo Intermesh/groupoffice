@@ -62,8 +62,6 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 				select: this.onSelect
 			}
 		};
-
-		return config;
 	},
 	
 	reset:function() {
