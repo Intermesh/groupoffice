@@ -263,7 +263,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 		var me = this;
 		setTimeout(function() {
 			if(!go.util.empty(me.value) && !form.currentId) {				
-				me.store.load();
+				me.store.load().catch(function(){}); //ignore failed load becuase onBeforeStoreLoad can return false
 			}
 		}, 0);		
 	},
@@ -288,7 +288,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 	setValue: function (groups) {		
 		this._isDirty = false;		
 		this.value = groups;
-		this.store.load();
+		this.store.load().catch(function(){}); //ignore failed load becuase onBeforeStoreLoad can return false
 	},
 	
 	getSelectedGroupIds : function() {
