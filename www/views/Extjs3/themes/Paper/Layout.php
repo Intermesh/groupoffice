@@ -1,6 +1,7 @@
 <?php
 use go\core\jmap\Response;
 use go\core\jmap\Request;
+use go\core\webclient\CSP;
 
 $lang = GO::language()->getLanguage(); ?>
 <!DOCTYPE html>
@@ -28,8 +29,6 @@ $lang = GO::language()->getLanguage(); ?>
 	<meta name="msapplication-TileColor" content="#2b5797">
 	<meta name="theme-color" content="#ffffff">
 
-	<meta http-equiv="Content-Security-Policy" content="default-src <?= Request::get()->getHost(); ?> ; script-src 'self' 'nonce-<?= Response::get()->getCspNonce(); ?>' 'unsafe-eval'; img-src 'self' data: http: https:; style-src 'self' 'unsafe-inline'; frame-src groupoffices: groupoffice:">
-
 	<title><?= \GO::config()->title; ?></title>
 
 	<link href="<?= \GO::view()->getTheme()->getUrl();?>style.css?v=<?=\GO()->getVersion(); ?>" media="screen and (min-device-width:1201px)" type="text/css" rel="stylesheet" />
@@ -39,10 +38,12 @@ $lang = GO::language()->getLanguage(); ?>
 	<?php
 	if(!empty(\GO::config()->custom_css_url))
 		echo '<link href="'.\GO::config()->custom_css_url.'" type="text/css" rel="stylesheet" />';
+
+	$csp = new CSP();
 	//$this is \GO\Core\Controller\Auth
 	\GO::router()->getController()->fireEvent('head');
-
 	?>
+	<meta http-equiv="Content-Security-Policy" content="<?= $csp; ?>">
 </head>
 <body>
 	<div id="sound"></div>
