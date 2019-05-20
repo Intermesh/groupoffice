@@ -64,18 +64,24 @@ class Group extends AclItemEntity {
 	}
 	
 	protected function internalDelete() {
-		//modseq increase because groups is a property too.
-		AddressBook::getType()->change(AddressBook::findById($this->addressBookId));
-		
-		//mark contact as changed
-		Contact::getType()->changes(
-					(new Query)
-					->select('c.id AS entityId, a.aclId, "0" AS destroyed')
-					->from('addressbook_contact', 'c')
-					->join('addressbook_addressbook', 'a', 'a.id = c.addressBookId')
-					->join('addressbook_contact_group', 'g', 'c.id = g.contactId')
-					->where('g.groupId', '=', $this->id)
-					);
+
+		$addressBook = AddressBook::findById($this->addressBookId);
+
+		// When address book is being deleted then these don't need to fire.
+		if(!$addressBook->isDeleting()) {
+			//modseq increase because groups is a property too.
+			AddressBook::getType()->change($addressBook);
+			
+			//mark contact as changed because they have a "groups" property that changes.
+			Contact::getType()->changes(
+						(new Query)
+						->select('c.id AS entityId, a.aclId, "0" AS destroyed')
+						->from('addressbook_contact', 'c')
+						->join('addressbook_addressbook', 'a', 'a.id = c.addressBookId')
+						->join('addressbook_contact_group', 'g', 'c.id = g.contactId')
+						->where('g.groupId', '=', $this->id)
+						);
+		}
 		
 		return parent::internalDelete();
 	}
