@@ -120,7 +120,23 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 			}
 		}
 	},
-	
+
+	load: function(o) {
+		o = o || {}, origCallback = o.callback, me = this;
+
+		return new Promise(function(resolve, reject) {
+			o.callback = function(records, options, success) {
+				origCallback.call(this, records, options, success);
+				if(success) {
+					resolve(records);
+				} else{
+					reject();
+				}				
+			};
+
+			go.data.Store.superclass.load.call(me, o);
+		});
+	}	
 
 });
 
