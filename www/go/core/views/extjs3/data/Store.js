@@ -103,7 +103,7 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 				if(!r.isValid()) {
 					continue;
 				}
-				var change = {};
+				var change = {}, attr;
 				for(attr in r.modified) {
 					change[attr] = r.data[attr];
 				}
