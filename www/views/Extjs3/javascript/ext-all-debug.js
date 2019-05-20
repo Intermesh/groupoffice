@@ -38919,7 +38919,7 @@ Ext.menu.Menu = Ext.extend(Ext.Container, {
             cls: 'x-menu ' + ((this.floating) ? 'x-menu-floating x-layer ' : '') + (this.cls || '') + (this.plain ? ' x-menu-plain' : '') + (this.showSeparator ? '' : ' x-menu-nosep'),
             style: this.style,
             cn: [
-                {tag: 'a', cls: 'x-menu-focus', href: '#', onclick: 'return false;', tabIndex: '-1'},
+                {tag: 'a', cls: 'x-menu-focus', tabIndex: '-1'},
                 {tag: 'ul', cls: 'x-menu-list'}
             ]
         };
