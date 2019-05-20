@@ -13,5 +13,13 @@ class NoteBook extends AclOwnerEntity {
 		return parent::defineMapping()
 						->addTable("notes_note_book");
 	}
+
+	protected function internalSave()
+	{
+		if(!Note::find()->where(['noteBookId' => $this->id])->delete()) {
+			return false;
+		}
+		return parent::internalSave();
+	}
 	
 }
