@@ -124,12 +124,14 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	},
 
 	load: function(o) {
-		o = o || {}, origCallback = o.callback, me = this;
+		o = o || {};
+		
+		var origCallback = o.callback, origScope = o.scope || this, me = this;
 
 		return new Promise(function(resolve, reject) {
 			o.callback = function(records, options, success) {
 				if(origCallback) {
-					origCallback.call(this, records, options, success);
+					origCallback.call(origScope, records, options, success);
 				}
 
 				if(success) {
