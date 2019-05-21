@@ -12,8 +12,9 @@ go.modules.ModulePanel = Ext.extend(Ext.Panel, {
 	/**
 	 * This route is called for entities. eg. Note/1
 	 * @param {int} id 
-	 * @param {string} entity eg. "Note"
+	 * @param {Object} entity from go.Entities.get()
 	 */
+	
 	route : function(id, entity) {
 		
 		//cast to int if nummeric
