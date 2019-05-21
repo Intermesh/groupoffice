@@ -24,6 +24,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 		GO.email.MessagePanel.superclass.initComponent.call(this);
 
+
 		this.attachmentContextMenu = new GO.email.AttachmentContextMenu();
 		this.allAttachmentContextMenu = new GO.email.AllAttachmentContextMenu();
 		
@@ -53,7 +54,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 			'<td style="width:70px"><b>'+t("From", "email")+'</b></td>'+
 
-			'<td>: {from} &lt;<a onclick="GO.email.showAddressMenu(event, \'{sender}\', \'{[this.addSlashes(values.from)]}\');">{sender}</a>&gt;</td>'+
+			'<td>: {from} &lt;<a href="mailto:&quot;{[GO.util.html_entity_decode(values.from, \'ENT_QUOTES\')]}&quot; &lt;{sender}&gt;">{sender}</a>&gt;</td>'+
 //			'<td rowspan="99"><span id="'+this.linkMessageId+'" class="em-contact-link"></span></td>'+
 
 			'</tr>'+
@@ -62,20 +63,20 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			//'<tr><td><b>'+t("Size")+'</b></td><td>: {size}</td></tr>'+
 			'<tr><td><b>'+t("To", "email")+'</b></td><td>: '+
 			'<tpl for="to">'+
-			'{personal} <tpl if="email.length">&lt;<a onclick="GO.email.showAddressMenu(event, \'{email}\', \'{[this.addSlashes(values.personal)]}\');">{email}</a>&gt;; </tpl>'+
+			'{personal} <tpl if="email.length">&lt;<a href="mailto:&quot;{[GO.util.html_entity_decode(values.personal, \'ENT_QUOTES\')]}&quot; &lt;{email}&gt;">{email}</a>&gt;; </tpl>'+
 			'</tpl>'+
 			'</td></tr>'+
 			'<tpl if="cc.length">'+
 			'<tr><td><b>'+t("CC", "email")+'</b></td><td>: '+
 			'<tpl for="cc">'+
-			'{personal} <tpl if="email.length">&lt;<a onclick="GO.email.showAddressMenu(event, \'{email}\', \'{[this.addSlashes(values.personal)]}\');">{email}</a>&gt;; </tpl>'+
+			'{personal} <tpl if="email.length">&lt;<a href="mailto:&quot;{[GO.util.html_entity_decode(values.personal, \'ENT_QUOTES\')]}&quot; &lt;{email}&gt;">{email}</a>&gt;; </tpl>'+
 			'</tpl>'+
 			'</td></tr>'+
 			'</tpl>'+
 			'<tpl if="bcc.length">'+
 			'<tr><td><b>'+t("BCC", "email")+'</b></td><td>: '+
 			'<tpl for="bcc">'+
-			'{personal} <tpl if="email.length">&lt;<a onclick="GO.email.showAddressMenu(event, \'{email}\', \'{[this.addSlashes(values.name)]}\');">{email}</a>&gt;; </tpl>'+
+			'{personal} <tpl if="email.length">&lt;<a href="mailto:&quot;{[GO.util.html_entity_decode(values.personal, \'ENT_QUOTES\')]}&quot; &lt;{email}&gt;">{email}</a>&gt;; </tpl>'+
 			'</tpl>'+
 			'</td></tr>'+
 			'</tpl>'+
@@ -509,9 +510,8 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			}, this);
 		}
 
-		this.messageBodyEl = Ext.get(this.bodyId);
-		this.messageBodyEl.on('click', this.onMessageBodyClick, this);
-		this.messageBodyEl.on('contextmenu', this.onMessageBodyContextMenu, this);
+		// this.messageBodyEl = Ext.get(this.bodyId);
+		
 
 		if(data.attachments.length)
 		{
@@ -661,79 +661,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		}
 	},
 
-	launchAddressContextMenu : function(e, href){
-		var queryString = '';
-		var email = '';
-		var indexOf = href.indexOf('?');
-		if(indexOf>-1)
-		{
-			email = href.substr(7, indexOf-7);
-			queryString = href.substr(indexOf+1);
-		}else
-		{
-			email = href.substr(7);
-		}
 
-		e.preventDefault();
-
-		GO.email.addressContextMenu.showAt(e.getXY(), email, '', queryString);
-	},
-
-	onMessageBodyContextMenu :  function(e, target){
-
-		if(target.tagName!='A')
-		{
-			target = Ext.get(target).findParent('A', 10);
-			if(!target)
-				return false;
-		}
-
-		if(target.tagName=='A')
-		{
-			var href=target.attributes['href'].value;
-
-			if(href.substr(0,6)=='mailto')
-			{
-				this.launchAddressContextMenu(e, href);
-			}
-		}
-	},
-
-	onMessageBodyClick :  function(e, target){
-		if(target.tagName!='A')
-		{
-			target = Ext.get(target).findParent('A', 10);
-			if(!target)
-				return false;
-		}
-
-		if(target.tagName=='A')
-		{
-
-			var href=target.attributes['href'].value;
-
-			if(href.substr(0,6)=='mailto')
-			{
-				this.launchAddressContextMenu(e, href);
-			}else if(href.substr(0,3)=='go:')
-			{
-				e.preventDefault();
-
-				var cmd = 'GO.mailFunctions.'+href.substr(3);
-				eval(cmd);
-			}else
-			{
-//				if (target.href && target.href.indexOf('#') != -1 && target.pathname == document.location.pathname){
-//				//internal link, do default
-//
-//				}else
-//				{
-//					e.preventDefault();
-//					this.fireEvent('linkClicked', href);
-//				}
-			}
-		}
-	},
 
 	cal_id:0,
 	status_id:0,

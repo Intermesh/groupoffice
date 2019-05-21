@@ -272,14 +272,7 @@ GO.util.empty = function(v)
 }
 
 GO.mailTo = function(email){
-	
-	if(GO.email && GO.settings.modules.email.read_permission)
-	{
-		return '<a  onclick="GO.email.showAddressMenu(event, \''+email+'\',\'\');">'+email+'</a>';
-	}else
-	{
-		return '<a href="mailto:'+email+'">'+email+'</a>';
-	}	
+	return '<a href="mailto:'+email+'">'+email+'</a>';	
 }
 
 GO.util.getFileExtension = function(filename)

@@ -102,6 +102,7 @@ GO.email.AddressContextMenu = function(config)
 			handler: function() {
 				
 				var nameParts = this.personal.split(" "), v = {
+					name: this.personal,
 					firstName: nameParts.shift(),
 					emailAddresses: [{
 							type: "work",
@@ -112,7 +113,8 @@ GO.email.AddressContextMenu = function(config)
 				v.lastName = nameParts.join(" ");				
 				
 				var dlg = new go.modules.community.addressbook.ContactDialog();
-				dlg.setValues(v).show();
+				dlg.show();
+				dlg.setValues(v);
 			},
 			scope: this
 		});
@@ -166,7 +168,7 @@ Ext.extend(GO.email.AddressContextMenu, Ext.menu.Menu,{
 		this.items.each(function(i){
 				rem.push(i);
 		});
-		for (var i = 2, len = rem.length - 2; i < len; ++i){
+		for (var i = 3, len = rem.length - 2; i < len; ++i){
 				item = rem[i];
 				this.remove(item, true);
 		}
@@ -178,11 +180,11 @@ Ext.extend(GO.email.AddressContextMenu, Ext.menu.Menu,{
 		var records = this.store.getRange(), len = records.length;
 		
 		if(len) {
-			this.insert(2, "-");	
+			this.insert(3, "-");	
 		}
 		
 		for (var i = 0; i < len; i++) {
-			this.insert(3 + i, {
+			this.insert(4 + i, {
 				iconCls: 'ic-account-box',
 				text: t("Open") + ": " + records[i].data.name,
 				contactId: records[i].data.id,

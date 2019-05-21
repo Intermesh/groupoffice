@@ -342,6 +342,23 @@ go.util =  (function () {
 					scope: this
 				}
 			});
+		},
+
+		parseEmail : function(emails) {
+			var re  = /(?:"?([A-Z][^<"]+)"?\s*)?<?([^>\s,]+)/g;
+			var a = [];
+			while (m = re.exec(emails)) {
+				if(m[1]) { m[1] = m[1].trim(); }
+				console.log("Name: "  + m[1]);
+				console.log("Email: " + m[2]);
+
+				a.push({
+					name: m[1],
+					email: m[2]
+				});
+			}
+
+			return a;
 		}
 	};
 })();

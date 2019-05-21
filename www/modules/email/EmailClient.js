@@ -1650,12 +1650,56 @@ go.Modules.register("legacy", 'email', {
 //	}),0);
 
 
-GO.email.showAddressMenu = function(e, email, name)
-{
-	var e = Ext.EventObject.setEvent(e);
-	e.preventDefault();
-	GO.email.addressContextMenu.showAt(e.getXY(), email, name);
-}
+// GO.email.showAddressMenu = function(e, email, name)
+// {
+// 	var e = Ext.EventObject.setEvent(e);
+// 	e.preventDefault();
+// 	GO.email.addressContextMenu.showAt(e.getXY(), email, name);
+// }
+
+(function() {
+
+	function launchAddressContextMenu(e, href){
+		var queryString = '';
+		var email = '';
+		var indexOf = href.indexOf('?');
+		if(indexOf>-1)
+		{
+			email = href.substr(7, indexOf-7);
+			queryString = href.substr(indexOf+1);
+		}else
+		{
+			email = href.substr(7);
+		}
+
+		e.preventDefault();
+
+		var addresses = go.util.parseEmail(email);
+
+		GO.email.addressContextMenu.showAt(e.getXY(), addresses[0].email, addresses[0].name, queryString);
+	}
+
+	function checkForMailto(e, target) {
+		// if(target.tagName!='A')
+		// {
+		// 	target = Ext.get(target).findParent('A', 10);
+		// 	if(!target)
+		// 		return false;
+		// }
+
+		if(target.tagName=='A' && target.attributes.href)
+		{
+			var href=target.attributes.href.value;
+
+			if(href.substr(0,6)=='mailto')
+			{
+				launchAddressContextMenu(e, href);
+			}
+		}
+	}
+
+	Ext.getBody().on('click', checkForMailto);
+})();
 
 GO.newMenuItems.push(
 //				{
