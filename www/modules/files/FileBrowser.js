@@ -1950,7 +1950,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 	
 	route: function(id, entity) {
 		
-		var detailViewName = entity + "Detail";
+		var detailViewName = entity.name.toLowerCase() + "Detail";
 		
 		this[detailViewName].on("load", function(dv){
 			this.setFolderID(dv.data.folder_id || dv.data.parent_id, true);
