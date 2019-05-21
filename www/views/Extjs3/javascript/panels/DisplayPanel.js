@@ -460,42 +460,18 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		}	
 		
 		if(target.tagName=='A' && target.attributes['href'])
-		{
-			
-			
+		{			
 			var href=target.attributes['href'].value;
-			if(GO.email && href.substr(0,6)=='mailto')
+			if(href.substr(0,3)=='go:')
 			{
-				var indexOf = href.indexOf('?');
-				if(indexOf>0)
-				{
-					var email = href.substr(7, indexOf-8);
-				}else
-				{
-					var email = href.substr(7);
-				}				
+				var fn = href.substr(3);
 
-				e.preventDefault();
-				
-				GO.email.addressContextMenu.showAt(e.getXY(), email);					
-				//this.fireEvent('emailClicked', email);			
+				eval("this." + fn);
+
+				e.preventDefault();				
 			}else 
-			{			
-				
-			
-
-
+			{
 				this.fireEvent('afterbodyclick', this, target, e, href);
-
-
-				/*if(href!='#')
-				{
-					if(href.substr(0,6)=='callto')
-						document.location.href=href;
-					else
-						window.open(href);
-				}*/
-				
 			}
 		}		
 	},

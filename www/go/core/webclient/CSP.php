@@ -17,6 +17,7 @@ class CSP {
     ->add("script-src", Request::get()->getHost())
     ->add("script-src", "'nonce-" . Response::get()->getCspNonce() . "'")
     ->add("script-src", "'unsafe-eval'")
+    ->add("script-src", "'unsafe-inline'") //TODO replace all onclick="" in the code and remove this line
     ->add('img-src', Request::get()->getHost())
     ->add('img-src', "'self'")
     ->add('img-src', "data:")

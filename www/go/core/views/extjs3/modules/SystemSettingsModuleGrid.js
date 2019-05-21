@@ -140,17 +140,6 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 					decimals:0
 				}
 			},{
-				header:'',
-				dataIndex:'actions',
-				renderer:function(val, meta, record, rowIndex, columnIndex, store){
-					meta.css += 'mo-actions-column';			
-					if(record.data.installed){
-						return '<a href="#" onclick="GO.moduleManager.deleteModule(\''+record.data.id+'\',\''+record.data.name+'\');"><span class="go-icon-mo-delete"></span></a>';
-					} else {
-						return '';
-					}
-				}
-			},{
 				header: "Package",
 				dataIndex: 'package',
 				id: 'package',
