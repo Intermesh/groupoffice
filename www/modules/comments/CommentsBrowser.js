@@ -62,5 +62,3 @@ Ext.extend(GO.comments.CommentsBrowser, GO.Window, {
 		GO.comments.CommentsBrowser.superclass.show.call(this);
 	}
 });
-
-GO.moduleManager.addModule('comments');
