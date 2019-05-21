@@ -410,13 +410,17 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		if(this.data[id]) {
 			return Promise.resolve(go.util.clone(this.data[id]));
 		}
+		
+		var me = this;
 
 		if(this.notFound.indexOf(id) > -1) {
-			console.warn("Not fetching " + this.entity.name + " (" + id + ") because it was not found in an earlier attempt");
-			return Promise.reject();
-		}
-
-		var me = this;
+//			console.warn("Not fetching " + this.entity.name + " (" + id + ") because it was not found in an earlier attempt");
+			return Promise.reject({
+							id: id,
+							entity: me.entity.name,
+							error: "Not found (in earlier attempt on server)"
+						});
+		}		
 
 		// For testing without indexeddb
 		// return me._getSingleFromServer(id);
@@ -447,10 +451,10 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					delete me.pending[id];
 					if(!go.util.empty(response.notFound)) {
 						me.notFound = me.notFound.concat(response.notFound);
-						me.metaStore.setItem("notfound", me.notFound);								
-						console.warn("Item not found", response);					
+						me.metaStore.setItem("notfound", me.notFound);										
 						return Promise.reject({
 							id: id,
+							entity: me.entity.name,
 							error: "Not found"
 						});	
 					} else
