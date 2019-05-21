@@ -68,7 +68,7 @@ class Group extends AclItemEntity {
 		$addressBook = AddressBook::findById($this->addressBookId);
 
 		// When address book is being deleted then these don't need to fire.
-		if(!$addressBook->isDeleting()) {
+		// if(!$addressBook->isDeleting()) {
 			//modseq increase because groups is a property too.
 			AddressBook::getType()->change($addressBook);
 			
@@ -81,7 +81,7 @@ class Group extends AclItemEntity {
 						->join('addressbook_contact_group', 'g', 'c.id = g.contactId')
 						->where('g.groupId', '=', $this->id)
 						);
-		}
+		// }
 		
 		return parent::internalDelete();
 	}
