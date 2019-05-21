@@ -90,11 +90,7 @@ go.search.Panel = Ext.extend(Ext.Panel, {
 		this.grid.store.load({
 			params: {
 				filter: filter
-			},
-			callback: function() {
-						
-			},
-			scope: this
+			}
 		});
 		
 		//this.setHeight(dp(600));

@@ -52,7 +52,11 @@ GO.mainLayout.on('render', function () {
 		panel.search(searchField.getValue());
 	}, enableSearch = function () {
 		searchContainer.show();
-		searchField.focus();
+		searchField.focus(true);
+
+		if(searchField.getValue()) {
+			panel.expand();
+		}
 
 		if (!panel) {
 			panel = new go.search.Panel({
@@ -60,7 +64,7 @@ GO.mainLayout.on('render', function () {
 			});
 			panel.render(Ext.getBody());
 			panel.on("collapse", function () {
-				searchField.setValue("");
+				//searchField.setValue("");
 				searchContainer.hide();
 			});
 		}
