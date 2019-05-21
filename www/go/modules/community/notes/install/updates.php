@@ -87,4 +87,5 @@ $updates['201903291350'][] = function() {
 	$m->migrateEntity("Note");	
 };
 
-$updates['201905201417'][] = "ALTER TABLE `notes_note` DROP FOREIGN KEY `notes_note_ibfk_1`; ALTER TABLE `notes_note` ADD CONSTRAINT `notes_note_ibfk_1` FOREIGN KEY (`noteBookId`) REFERENCES `notes_note_book`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;";
+$updates['201905201417'][] = "ALTER TABLE `notes_note` DROP FOREIGN KEY `notes_note_ibfk_1`;";
+$updates['201905201417'][] = "ALTER TABLE `notes_note` ADD CONSTRAINT `notes_note_ibfk_1` FOREIGN KEY (`noteBookId`) REFERENCES `notes_note_book`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;";
