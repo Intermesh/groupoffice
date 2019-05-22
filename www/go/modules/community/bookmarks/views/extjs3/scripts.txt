@@ -1,0 +1,11 @@
+Module.js
+SelectFile.js
+ThumbsDialog.js
+BookmarkContextMenu.js
+BookmarkColumnView.js
+MainPanel.js
+BookmarksView.js
+ManageCategoryDialog.js
+ManageCategoriesGrid.js
+BookmarksDialog.js
+CategoryDialog.js
