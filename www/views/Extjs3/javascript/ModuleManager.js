@@ -162,7 +162,7 @@ GO.ModuleManager = Ext.extend(function(){
 				fn:fn,
 				scope: scope				
 			});
-		}else{
+		} else {
 			fn.call(scope, module, this);
 		}
 	},

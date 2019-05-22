@@ -1,0 +1,86 @@
+<?php
+namespace go\modules\community\bookmarks\model;
+						
+use go\core\jmap\Entity;
+use go\core\db\Criteria;
+use go\core\orm\Query;
+
+/**
+ * Bookmark model
+ *
+ * @copyright (c) 2019, Intermesh BV http://www.intermesh.nl
+ * @author Merijn Schering <mschering@intermesh.nl>
+ * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
+ */
+
+class Bookmark extends Entity {
+	
+	/**
+	 * 
+	 * @var int
+	 */							
+	public $id;
+
+	/**
+	 * 
+	 * @var int
+	 */							
+	public $categoryId;
+
+	/**
+	 * 
+	 * @var int
+	 */							
+	public $createdBy;
+
+	/**
+	 * 
+	 * @var string
+	 */							
+	public $name;
+
+	/**
+	 * 
+	 * @var string
+	 */							
+	public $content;
+
+	/**
+	 * 
+	 * @var string
+	 */							
+	public $description;
+
+	/**
+	 * 
+	 * @var string
+	 */							
+	public $logo;
+
+	/**
+	 * 
+	 * @var bool
+	 */							
+	public $openExtern = true;
+
+	/**
+	 * 
+	 * @var bool
+	 */							
+	public $behaveAsModule = false;
+
+	protected static function defineMapping() {
+		return parent::defineMapping()
+						->addTable("bookmarks_bookmark", "bookmarks");
+	}
+
+	protected static function defineFilters() {
+		return parent::defineFilters()->add('categoryId', function(Criteria $criteria, $value, Query $query, array $filter){
+			$criteria->andWhere('categoryId', '=', $value);
+		});
+	}
+
+	protected static function textFilterColumns() {
+		return ['name', 'description'];
+	}
+}
