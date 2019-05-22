@@ -33,7 +33,7 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 
 		Ext.applyIf(this, go.data.StoreTrait);
 		
-		if(this.enableCustomFields) {
+		if(!Ext.isDefined(config.enableCustomFields) || config.enableCustomFields) {
 			this.addCustomFields(config);
 		}
 		
