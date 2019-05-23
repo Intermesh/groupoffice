@@ -2,7 +2,7 @@
 - Comments: Add comments module to modulemanager when installed.
 - Core: Added isDeleted() function to ActiveRecord which will return a boolean
 - Core: Admin user could remove admin user from an ACL
-- Tickets: Ticket dialog will remember customer data when creating from email and it will load a type the current user is not an agent for. Ticket #201918041
+- Files: Users that no longer had folder permissions still received notifications. Ticket #201918666.
 
 25-04-2019 6.2.117
 - Notes: Implemented delete action in category controller
