@@ -12,8 +12,8 @@ readfile($webclient->getCSSFile()->getPath());
 if(GO()->getSettings()->primaryColor) {
 ?>
 :root {
-    --c-primary: <?= '#'.GO()->getSettings()->primaryColor; ?>;
-    --c-primary-tp: <?= GO()->getSettings()->getPrimaryColorTransparent(); ?>;
+    --c-primary: <?= '#'.GO()->getSettings()->primaryColor; ?> !important;
+    --c-primary-tp: <?= GO()->getSettings()->getPrimaryColorTransparent(); ?> !important;
 }
 <?php
   if(GO()->getSettings()->logoId) {
