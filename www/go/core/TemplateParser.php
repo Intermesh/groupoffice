@@ -86,8 +86,7 @@ use function GO;
  * ``````````````````
  
  */
-class TemplateParser {
-	
+class TemplateParser {	
 
 	private $models = [];
 
@@ -101,21 +100,29 @@ class TemplateParser {
 		$this->addFilter('filter', [$this, "filterFilter"]);
 		$this->addFilter('count', [$this, "filterCount"]);
 		
-		$this->addModel('now', new DateTime());
-		// $this->addModel("user", GO()->getAuthState()->getUser()->toTemplate());	
+		$this->addModel('now', new DateTime());	
+	}
+
+	private $user;
+
+	protected function getUser() {
+		if(!isset($this->user)) {
+			$this->user = GO()->getAuthState()->getUser(['dateFormat', 'timezone']);	
+		}
+		return $this->user;
 	}
 	
 	private function filterDate(DateTime $date = null, $format = null) {
-			
+
 		if(!isset($date)) {
 			return "";
 		}
 
 		if(!isset($format)) {
-			$format = GO()->getAuthState()->getUser()->dateFormat;
+			$format = $this->getUser()->dateFormat;
 		}
 
-		$date->setTimezone(new \DateTimeZone(GO()->getAuthState()->getUser()->timezone));
+		$date->setTimezone(new \DateTimeZone($this->getUser()->timezone));
 
 		return $date->format($format);
 	}
@@ -147,27 +154,20 @@ class TemplateParser {
 		$this->filters[$name] = $function;
 	}
 	
-	
 	private function findBlocks($str) {
 			
-		preg_match_all('/\n?\[(each|if)\n?/s', $str, $openMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
+		preg_match_all('/\n?\[(each|if)/s', $str, $openMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		preg_match_all('/\[\/(each|if)\]\n?/s', $str, $closeMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
+		preg_match_all('/\[else\]/s', $str, $elseMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		
 		$count = count($openMatches);
 		if($count != count($closeMatches)) {
-			
-//			var_dump($str);
-			
 			throw new Exception("Open and close tags don't match");
 		}
 		
-		// var_dump($openMatches);
-		
-		$tags = [];
-		
+		$tags = [];		
 		
 		for($i = 0; $i < $count; $i++) {
-			// var_dump($openMatches[$i][0][0]);			
 			$offset = $openMatches[$i][0][1];
 			$expression = $this->findExpression($offset + strlen($openMatches[$i][0][0]), $str);
 
@@ -188,18 +188,54 @@ class TemplateParser {
 		//close and open 
 		ksort($tags);
 		$tags = array_values($tags);		
-		
-		
-		$tags = $this->findCloseTags($tags);
-				
-		
+	
+		$tags = $this->findCloseTags($tags);				
+	
 		$tags = array_values(array_filter($tags, function($tag) {
 			return $tag['type'] == 'open' && isset($tag['close']);
 		}));
+	
+		foreach($elseMatches as $elseMatch) {
+			$tags = $this->matchElseTag($tags, $elseMatch);
+		}
+
+		//only parse top level blocks because other tags will be parsed separately.
+		$tags = array_filter($tags, function($tag) {
+			return $tag['nesting'] == 0;
+		});
 		
 		for($i = 0, $c = count($tags); $i < $c; $i++) {
-			$tags[$i]['tpl'] = substr($str, $tags[$i]['offset'] + $tags[$i]['tagLength'], $tags[$i]['close']['offset'] - $tags[$i]['offset'] - $tags[$i]['tagLength']); 
+			$start = $tags[$i]['offset'] + $tags[$i]['tagLength'];
+			
+			if(!isset($tags[$i]['elseOffset']) ) {
+				$length = $tags[$i]['close']['offset'] - $start;
+				$tags[$i]['tpl'] = substr($str, $start, $length); 
+				$tags[$i]['else'] = null;
+			} else{
+				$length = $tags[$i]['elseOffset'] - $start;
+		
+				$elseStart = $start + $length + 6;
+				$elseLength = $tags[$i]['close']['offset'] - $elseStart;
+				 
+				$tags[$i]['tpl'] = substr($str, $start, $length); 
+				$tags[$i]['else'] = substr($str, $elseStart, $elseLength);
+			}		
 		}
+		
+		return $tags;
+	}
+
+	private function matchElseTag($tags, $elseMatch) {
+		for($i = count($tags) - 1; $i >= 0; $i--) {
+
+			$offset = $elseMatch[0][1];
+
+			if($offset > $tags[$i]['offset'] && $offset < $tags[$i]['close']['offset']) {
+				$tags[$i]['elseOffset'] = $offset;
+				return $tags;
+			}
+		}
+
 		return $tags;
 	}
 
@@ -233,32 +269,22 @@ class TemplateParser {
 		}
 
 		throw new \Exception("Invalid block");
-		
+
 	}
 	
 	private function findCloseTags($tags) {
 		
 		$open = 0;
-		$current = null;
-		$tagName = null;
+		$opened = [];
 		
 		for($i = 0, $count = count($tags); $i < $count; $i++) {	
-			
-			if($open > 0 && $tags[$i]['tagName'] != $tagName) {
-				continue;
-			}
-			
 			if($tags[$i]['type'] == 'open') {
-				$open++;
-				if($open == 1) {
-					$tagName = $tags[$i]['tagName'];
-					$current = $i;
-				}												
+				$opened[$open] = &$tags[$i];
+				$opened[$open]['nesting'] = $open;
+				$open++;										
 			} else {
-				$open--;				
-				if($open == 0) {
-					$tags[$current]['close'] = $tags[$i];					
-				}
+				$open--;	
+				$opened[$open]['close'] = $tags[$i];
 			}
 		}
 		
@@ -273,13 +299,11 @@ class TemplateParser {
 	 * 
 	 * return string
 	 */
-	public function parse($str) {				
-		
+	public function parse($str) {		
 		if($this->enableBlocks) {
 			$str = $this->parseBlocks($str);
-		} 
-
-		$str = preg_replace_callback('/{{.*?}}/', [$this, 'replaceVar'], $str);
+		}
+		$str = preg_replace_callback('/{{.*?}}/', [$this, 'replaceVar'], $str);	
 		return $str;
 	}	
 
@@ -343,7 +367,7 @@ class TemplateParser {
 		return $tag;		
 	}
 
-	private static $tokens = ['==','!=','>','<', '(', ')', '&&', '||', '*', '/', '%', '-', '+'];
+	private static $tokens = ['==','!=','>','<', '(', ')', '&&', '||', '*', '/', '%', '-', '+', '!'];
 
 	private function replaceIf($tag, $str) {
 		
@@ -351,11 +375,9 @@ class TemplateParser {
 		$this->enableBlocks = false;
 		$parsed = $this->parse($tag['expression']);		
 		$this->encloseVars = false;
-		$this->enableBlocks = true;	
+		$this->enableBlocks = true;
 		
-		$expression = $this->validateExpression($parsed);
-		$tpls = explode('[else]', $tag['tpl']);		
-
+		$expression = $this->validateExpression($parsed);	
 		try {
 			$ret = eval($expression);	
 		} catch(\ParseError $e) {
@@ -365,10 +387,10 @@ class TemplateParser {
 			$ret = false;
 		}
 		if($ret){
-			$tag['replacement'] = $this->parse($tpls[0]);
+			$tag['replacement'] = $this->parse($tag['tpl']);
 		}else
 		{
-			$tag['replacement'] = isset($tpls[1]) ? $this->parse($tpls[1]) : "";
+			$tag['replacement'] = isset($tag['else']) ? $this->parse($tag['else']) : "";
 		}
 		
 		return $tag;
@@ -387,9 +409,7 @@ class TemplateParser {
 		}
 		$expression = str_replace(';', ' ; ', $expression);
 		
-		$parts = preg_split('#\s*((?<!\\\\)"[^"]*")\s*|\s+#', $expression, -1 , PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-		
-		
+		$parts = preg_split('#\s*((?<!\\\\)"[^"]*")\s*|\s+#', $expression, -1 , PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);		
 		$parts = array_map('trim', $parts);
 		
 		$str = '';
@@ -413,19 +433,8 @@ class TemplateParser {
 			}else
 			{
 				$str .= '"'. str_replace('"', '\"', $part) . '" ';
-			} 
-//			else
-//			{			
-//				throw new Exception("Invalid token: ".var_export($part, true));
-//			}
-			
-		}
-//		echo $str;
-//		exit();
-//		throw new \Exception($str);
-
-//return ("exit" ());
-		
+			}			
+		}		
 		return empty($str) ? 'return false;' : 'return ('.$str.');';
 	} 
 	
@@ -433,8 +442,7 @@ class TemplateParser {
 		return preg_match('/"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"/s', $str) || preg_match("/'[^'\\\\]*(?:\\\\.[^'\\\\]*)*'/s", $str);
 	}
 
-	private function replaceVar($matches) {		
-		// GO()->debug('replaceVar('.$matches[0].')');
+	private function replaceVar($matches) {
 		$str = substr($matches[0], 2, -2);		
 		$value =  $this->getVarFiltered($str);
 
@@ -443,8 +451,10 @@ class TemplateParser {
 			return array_shift($value);
 		}
 
-		if($this->encloseVars) {
-			$value = is_scalar($value) || !isset($value) || (is_object($value) && method_exists($value, '__toString')) ? '"' . str_replace('"', '\\"', $value) . '"' : !empty($value);
+		if($this->encloseVars) {		
+			$value = is_scalar($value) || 
+				!isset($value) || 
+				(is_object($value) && method_exists($value, '__toString')) ? '"' . str_replace('"', '\\"', $value) . '"' : !empty($value);
 		}
 
 		return $value;
@@ -485,17 +495,14 @@ class TemplateParser {
 				if(!array_key_exists($pathPart, $model)) {
 					return false;
 				}
-
 				$model = $model[$pathPart];
 			}else
 			{
 				if(!$model->hasReadableProperty($pathPart)) {
 					return false;
 				}
-
 				$model = $model->$pathPart;
-			}
-			
+			}			
 		}
 
 		return true;
@@ -509,7 +516,6 @@ class TemplateParser {
 		$model = $this;
 
 		foreach ($pathParts as $pathPart) {
-
 			//check for array access eg. contact.emailAddresses[0];
 			if(preg_match('/(.*)\[([0-9]+)\]/', $pathPart, $matches)) {
 
@@ -520,7 +526,6 @@ class TemplateParser {
 			} else{
 				$index = null;
 			}
-
 
 			if(is_array($model)) {
 				if (!isset($model[$pathPart])) {
@@ -544,11 +549,8 @@ class TemplateParser {
 			}
 		}
 
-		// var_dump($model);
-
 		return $model;
-	}
-	
+	}	
 	
 	public function hasReadableProperty($name) {
 		return array_key_exists($name, $this->models);
@@ -574,6 +576,4 @@ class TemplateParser {
 	public function __get($name) {
 		return $this->models[$name];
 	}
-
 }
-

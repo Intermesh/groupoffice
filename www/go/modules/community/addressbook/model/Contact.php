@@ -15,6 +15,7 @@ use go\modules\community\addressbook\convert\Csv;
 use go\modules\community\addressbook\convert\VCard;
 use function GO;
 use go\core\mail\Message;
+use go\core\TemplateParser;
 
 /**
  * Contact model
@@ -571,6 +572,14 @@ class Contact extends AclItemEntity {
 
 	protected function getSearchFilter() {
 		return $this->isOrganization ? 'isOrganization' : 'isContact';
+	}
+
+	public function getSalutation() 
+	{
+		$tpl = new TemplateParser();
+		$tpl->addModel('contact', $this->toArray(['firstName', 'lastName', 'middleName', 'name', 'gender', 'prefixes', 'suffixes', 'language']));
+
+		return $tpl->parse(GO()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->salutationTemplate);
 	}
 	
 	/**

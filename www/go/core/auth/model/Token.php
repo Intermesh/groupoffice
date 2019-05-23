@@ -202,9 +202,14 @@ class Token extends Entity {
 	/**
 	 * Get the user this token belongs to
 	 * 
+	 * @param array $properties the properties to fetch
 	 * @return User
 	 */
-	public function getUser() {
+	public function getUser(array $properties = []) {
+		if(!empty($properties)) {
+			return $this->user ?? \go\core\model\User::findById($this->userId, $properties);
+		}
+
 		if(!$this->user) {
 			$this->user = \go\core\model\User::findById($this->userId);
 		}
