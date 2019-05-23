@@ -371,6 +371,12 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		this.htmlEditor.syncSize();
 		this.ownerCt.doLayout();
 	},
+
+	// doLayout: function() {
+		
+	// 	GO.base.email.EmailEditorPanel.superclass.doLayout.call(this, arguments);
+	// 	this.htmlEditor.syncSize();
+	// },
 	
 	initHtmlEditorPlugins : function(htmlEditorConfig) {		
 		// optional image attachment

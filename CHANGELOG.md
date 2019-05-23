@@ -1,3 +1,5 @@
+- Tickets: Added missing language in tickets for Brazilian portuges
+
 21-05-2019 6.3.74
 - core: Use varchar 190 field for search keywords
 - Scanbox: Fixed "link to item" feature

@@ -174,7 +174,9 @@ GO.email.EmailComposer = function(config) {
 				name : 'to',
 				flex : 1,
 				listeners: {
-					autosize: function() {
+					autosize: function() {			
+						//For some reason this only works by calling it twice when pasting multiple lines :(						
+						this.doLayout();
 						this.doLayout();
 					},
 					scope: this
@@ -201,6 +203,8 @@ GO.email.EmailComposer = function(config) {
 		anchor : '100%',
 		listeners: {
 			autosize: function() {
+				//For some reason this only works by calling it twice when pasting multiple lines :(						
+				this.doLayout();
 				this.doLayout();
 			},
 			scope: this
@@ -226,6 +230,8 @@ GO.email.EmailComposer = function(config) {
 		anchor : '100%',
 		listeners: {
 			autosize: function() {
+				//For some reason this only works by calling it twice when pasting multiple lines :(
+				this.doLayout();
 				this.doLayout();
 			},
 			scope: this
@@ -244,7 +250,7 @@ GO.email.EmailComposer = function(config) {
 
 	})];
 								
-	var anchor = -113;
+	// var anchor = -113;
 						
 	
 	
