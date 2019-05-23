@@ -5,9 +5,8 @@ go.modules.community.bookmarks.BookmarkContextMenu = Ext.extend(Ext.menu.Menu,{
 		this['minWidth'] = 180;
 					
 		this.deleteButton = new Ext.menu.Item({
-			iconCls: 'btn-delete',
+			iconCls: 'ic-delete',
 			text: t("Delete"),
-			cls: 'x-btn-text-icon',
 			handler: function(){
 				Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
 					if (btn != "yes") {
@@ -21,9 +20,8 @@ go.modules.community.bookmarks.BookmarkContextMenu = Ext.extend(Ext.menu.Menu,{
 		
 		this.editButton = new Ext.menu.Item({
 			
-			iconCls: 'btn-edit',
+			iconCls: 'ic-edit',
 			text: t("Edit"),
-			cls: 'x-btn-text-icon',
 			handler: function(){
 				var dlg = new go.modules.community.bookmarks.BookmarksDialog();
 				dlg.load(this.record.id).show();						
@@ -31,7 +29,8 @@ go.modules.community.bookmarks.BookmarkContextMenu = Ext.extend(Ext.menu.Menu,{
 			scope:this
 		});
 		
-		this.items=[this.deleteButton,this.editButton];
+		this.items=[this.editButton,this.deleteButton];
+		
 		go.modules.community.bookmarks.BookmarkContextMenu.superclass.initComponent.call(this);	
 	},
 	setRecord : function (record){

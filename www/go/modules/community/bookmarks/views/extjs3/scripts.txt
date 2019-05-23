@@ -1,6 +1,4 @@
 Module.js
-SelectFile.js
-ThumbsDialog.js
 BookmarkContextMenu.js
 BookmarkColumnView.js
 MainPanel.js
