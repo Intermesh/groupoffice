@@ -18,6 +18,6 @@ if(GO()->getSettings()->primaryColor) {
 <?php
   if(GO()->getSettings()->logoId) {
     //blob id is not used by script but added only for caching.
-    echo ".go-app-logo, #go-logo {background-image: url(" . GO()->getSettings()->URL . "api/logo.php?blob=" . GO()->getSettings()->logoId . ")}";
+    echo ".go-app-logo, #go-logo {background-image: url(" . GO()->getSettings()->URL . "api/logo.php?blob=" . GO()->getSettings()->logoId . ") !important}";
   }
 }
