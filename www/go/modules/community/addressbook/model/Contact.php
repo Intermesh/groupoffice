@@ -579,7 +579,13 @@ class Contact extends AclItemEntity {
 		$tpl = new TemplateParser();
 		$tpl->addModel('contact', $this->toArray(['firstName', 'lastName', 'middleName', 'name', 'gender', 'prefixes', 'suffixes', 'language']));
 
-		return $tpl->parse(GO()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->salutationTemplate);
+		$user = GO()->getAuthState()->getUser(['addressBookSettings']);
+
+		if(!isset($user->addressBookSettings)){
+			$user->addressBookSettings = new UserSettings();
+		}
+
+		return $tpl->parse($user->addressBookSettings->salutationTemplate);
 	}
 	
 	/**
