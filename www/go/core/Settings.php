@@ -89,10 +89,14 @@ abstract class Settings extends data\Model {
 	}
 	
 	private function update($name, $value) {
-		
+		$moduleId = $this->getModuleId();
+
+		if(!$moduleId) {
+			throw new \Exception("Could not find module for settings model ". static::class);
+		}
 		
 		if (!App::get()->getDbConnection()->replace('core_setting', [
-								'moduleId' => $this->getModuleId(),
+								'moduleId' => $moduleId,
 								'name' => $name,
 								'value' => $value
 						])->execute()) {
