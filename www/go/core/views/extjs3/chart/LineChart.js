@@ -8,9 +8,6 @@ go.chart.LineChart = Ext.extend(go.chart.ChartComponent, {
 	options:{},
 	
 	update: function(series){
-		
-		console.log(this);
-		
 		var data = {
 			labels: this.labels,
 			series: series

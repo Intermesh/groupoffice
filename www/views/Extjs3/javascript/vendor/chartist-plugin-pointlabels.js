@@ -14,7 +14,7 @@
     },
     textAnchor: 'middle',
     align: 'center',
-    labelInterpolationFnc: Chartist.noop
+    labelInterpolationFnc: function(value) {return value ? value: 0}
   };
 
   var labelPositionCalculation = {
