@@ -77,11 +77,11 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'name',
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 
-
-						var style = "", cls = "", content = "";
+						// empty <i> tag is needed to increase line-height
+						var style = "margin-right:16px;", cls = "", content = '<i class="icon"></i>';
 
 						if (record.data.photoBlobId) {
-							style = 'background-image: url(' + go.Jmap.downloadUrl(record.data.photoBlobId) + ')';
+							style += 'background-image: url(' + go.Jmap.downloadUrl(record.data.photoBlobId) + ')';
 						} else
 						{
 							cls = record.data.isOrganization ? "organization" : "";
@@ -90,9 +90,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 							}
 						}
 
-						return '<div class="user"><div class="avatar ' + cls + '" style="' + style + '">'+content+'</div>' +
-										'<div class="wrap single">' + record.get('name') + '</div>' +
-										'</div>';
+						return '<div class="avatar ' + cls + '" style="' + style + '">'+content+'</div>' + record.get('name');
 					}
 				},
 				{
