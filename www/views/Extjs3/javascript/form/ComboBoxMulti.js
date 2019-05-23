@@ -39,13 +39,21 @@ GO.form.ComboBoxMulti = function(config){
 		
 		
 		
-		this.on('render', function() {			
-			//this.syncHeight();
-			this.getEl().on('input', function(e) {								
-				this.syncHeight();
-      }, this);
-			
-		}, this);
+    this.on('render', function() {			
+        //this.syncHeight();
+        this.getEl().on('input', function(e) {								
+            var me = this;
+            setTimeout(function() {
+                me.syncHeight();
+            }, 100);
+            //this.syncHeight();
+        }, this);
+
+        // this.on("change", function() {
+        //     this.syncHeight();
+        // }, this);
+        
+    }, this);
    
 //    this.on('focus', function(){this.focused=true;}, this);
 //    this.on('blur', function(){this.focused=false;}, this);
@@ -89,8 +97,8 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
 			if(height > this.growMin) {
 				this.el.dom.style.height = (height + dp(8)) + "px";
 				changed = true;
-			}
-			
+            }
+            this.setHeight(height);			
 			if(changed) {
                 //this.fireEvent('grow', this);
                 this.fireEvent("autosize", this, height);

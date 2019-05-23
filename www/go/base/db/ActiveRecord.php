@@ -3142,7 +3142,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				$this->checkModelFolder();				
 			}
 
-			$this->setIsNew(false);			
+			$this->setIsNew(false);		
+			//make sure custom field record is created on new records
+			$this->getCustomfieldsRecord();
+
 			$changed  = $this->_processFileColumns($fileColumns);
 			if($changed || $this->afterDbInsert() || $this->isModified('files_folder_id')){
 				$this->_dbUpdate();
@@ -3753,7 +3756,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 *
 	 * @return boolean
 	 */
-	private function _dbInsert(){
+	protected function _dbInsert(){
 
 		$fieldNames = array();
 

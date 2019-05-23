@@ -1,4 +1,8 @@
 - Email: Changed messages grid to a grouped grid, grouped on date
+- Tickets: Added missing language in tickets for Brazilian portuges
+- Email: Fixed render issue when pasting multiple recipients in email composer
+
+21-05-2019 6.3.74
 - core: Use varchar 190 field for search keywords
 - Scanbox: Fixed "link to item" feature
 - Core/Links: Added singleSelect config to createLinkWindow
