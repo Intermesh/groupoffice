@@ -194,11 +194,13 @@ class State extends AbstractState {
 	}
 	
 	/**
+	 * Get the logged in user
 	 * 
+	 * @param array $properties the properties to fetch
 	 * @return User
 	 */
-	public function getUser() {
-		return $this->getToken() ? $this->getToken()->getUser() : null;
+	public function getUser(array $properties = []) {		
+		return $this->getToken() ? $this->getToken()->getUser($properties) : null;
 	}
 
 }

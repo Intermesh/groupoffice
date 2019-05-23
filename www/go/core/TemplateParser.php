@@ -102,6 +102,15 @@ class TemplateParser {
 		
 		$this->addModel('now', new DateTime());	
 	}
+
+	private $user;
+
+	protected function getUser() {
+		if(!isset($this->user)) {
+			$this->user = GO()->getAuthState()->getUser(['dateFormat', 'timezone']);	
+		}
+		return $this->user;
+	}
 	
 	private function filterDate(DateTime $date = null, $format = null) {
 
@@ -110,10 +119,10 @@ class TemplateParser {
 		}
 
 		if(!isset($format)) {
-			$format = GO()->getAuthState()->getUser()->dateFormat;
+			$format = $this->getUser()->dateFormat;
 		}
 
-		$date->setTimezone(new \DateTimeZone(GO()->getAuthState()->getUser()->timezone));
+		$date->setTimezone(new \DateTimeZone($this->getUser()->timezone));
 
 		return $date->format($format);
 	}
