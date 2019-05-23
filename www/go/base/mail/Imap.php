@@ -2317,8 +2317,9 @@ class Imap extends ImapBodyStruct {
 		if($charset){
 
 			//some clients don't send the charset.
-			if($charset=='us-ascii')
-				$charset = 'windows-1252';
+			if($charset=='us-ascii') {
+				$charset = $this->findCharsetInHtmlBody($str);				
+			}
 
 			$str = \GO\Base\Util\StringHelper::clean_utf8($str, $charset);
 			if($charset != 'utf-8') {
@@ -2335,6 +2336,15 @@ class Imap extends ImapBodyStruct {
 //						$encoding,
 //						$charset
 //		);
+	}
+
+	private function findCharsetInHtmlBody($body) {		
+// var_dump($body);
+		if(preg_match('/<meta.*charset=([^"\'\b]+)/i', $body, $matches)) {			
+			return $matches[1];
+		}
+
+		return 'windows-1252';
 	}
 
 
