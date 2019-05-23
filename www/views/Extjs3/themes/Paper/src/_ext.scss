@@ -357,6 +357,10 @@
 	&-field {
 		@extend %font-data;
 		color: color($fg, 'text');
+		height: dp(32);
+		line-height: dp(18);
+		transition: border-color 100ms linear, box-shadow 225ms linear;
+		border-radius: dp(4);
 		&.x-item-disabled {
 			background-color: color($bg, 'background');
 		}
@@ -374,16 +378,12 @@
 		}
 		
 	}
-	&-text, textarea.x-form-field {
+	&-text, textarea.x-form-field, &-time {
 		@extend %font-data;
 		background-color:color($bg, 'box');
-		border-radius: dp(4);
 		border: 1px solid color($fg, 'track');
 		display: inline-block;
 		padding: dp(6) dp(8);
-		min-height: dp(32);
-		line-height: dp(18);
-		transition: border-color 100ms linear, box-shadow 225ms linear;
 	}
 	
 	textarea.x-form-field {
@@ -1087,7 +1087,7 @@
 }
 
 .x-grid3{
-	background-color: color($bg, "card");
+	background-color: color($bg, "box");
 	&-scroller {
 		-webkit-overflow-scrolling: touch;
 	}
@@ -2403,7 +2403,7 @@ body.x-body-masked .x-window-plain .x-window-mc {
 	color:color($fg, 'text');
 	border-bottom: 0 !important;
 	&:hover {
-		background-color: color($grey, 200);
+		background-color: color($fg, 'hover');
 	}
 	.x-panel-collapsed & {
 		border-bottom: 1px solid color($fg, 'divider') !important;
