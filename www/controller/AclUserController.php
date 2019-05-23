@@ -126,7 +126,7 @@ class AclUserController extends \GO\Base\Controller\AbstractMultiSelectModelCont
 				$aclItem = \GO\Base\Model\Acl::model()->findByPk($params['model_id']);
 				if ($aclItem->user_id == $delKey) {
 					// Situation: user with id $delKey is owner of ACL with id $params['model_id']
-					if(\GO::user()->isAdmin()){
+					if(\GO::user()->isAdmin() && $aclItem->user_id != \GO::user()->id){
 						// Situation: Current user is in root group. Action: set current
 						// user as owner of the ACL
 						$aclItem->user_id = \GO::user()->id;
