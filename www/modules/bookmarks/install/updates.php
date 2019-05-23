@@ -28,6 +28,9 @@ $updates['201610281650'][] = 'ALTER TABLE `bm_categories` CONVERT TO CHARACTER S
 $updates['201610281659'][] = 'SET foreign_key_checks = 1;';
 
 $updates['201901301035'][] =  "ALTER TABLE `bm_categories` ADD INDEX `show_in_startmenu` (`show_in_startmenu`);";
+$updates['201905231455'][] = function() {
+	\go\core\db\Utils::runSQLFile(\GO()->getEnvironment()->getInstallFolder()->getFile("go/modules/community/bookmarks/install/install.sql"));
+};
 $updates['201905221222'][] = 'update core_module set package=\'community\', version=0, sort_order = sort_order + 100 where name=\'bookmarks\'';
 $updates['201905221222'][] = '
 INSERT INTO bookmarks_category (createdBy, aclId, name) 

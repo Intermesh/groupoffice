@@ -12,18 +12,12 @@
  */
  
 go.modules.community.bookmarks.CategoryDialog = Ext.extend(go.form.Dialog, {
-	
-	initComponent : function(){
-		Ext.apply(this, {
-			titleField:'name',
-			title:t("Category"),
-			entityStore: "BookmarksCategory",
-			height:150,
-			width:500
-		});
 
-		go.modules.community.bookmarks.CategoryDialog.superclass.initComponent.call(this);	
-	},
+	title:t("Category"),
+	entityStore: "BookmarksCategory",
+	height:150,
+	width: 500,
+
 	initFormItems : function () {
 		return [{
 			xtype: 'fieldset',

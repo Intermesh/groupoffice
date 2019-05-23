@@ -187,5 +187,4 @@ go.modules.community.bookmarks.openBookmark = function(record) {
 GO.moduleManager.addModule('bookmark', go.modules.community.bookmarks.MainPanel, {
 	title : t("Bookmark"),
 	iconCls : 'go-tab-icon-bookmarks'
-	
 });

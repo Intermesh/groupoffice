@@ -14,14 +14,8 @@
 go.modules.community.bookmarks.BookmarksDialog = Ext.extend(go.form.Dialog,{
 	entityStore: "Bookmark",
 	title: t("Bookmark"),
-
-	show: function (config) {		
-		var logo='icons/bookmark.png';
-		go.modules.community.bookmarks.BookmarksDialog.superclass.show.call(this);
-	},
-
 	initFormItems: function () {
-	
+		var thumbExample = null;
 		var items = [{
 			xtype: "fieldset",
 			items: [ // de invoervelden
@@ -31,7 +25,7 @@ go.modules.community.bookmarks.BookmarksDialog = Ext.extend(go.form.Dialog,{
 				anchor:'100%',
 				store: new go.data.Store({
 					fields: ['id', {name: 'creator', type: "relation"}, 'aclId', "name"],
-					entityStore: "BookmarksCategory"
+					entityStore: "BookmarksCategory",
 				}),
 				displayField:'name',
 				valueField:'id',
@@ -47,7 +41,6 @@ go.modules.community.bookmarks.BookmarksDialog = Ext.extend(go.form.Dialog,{
 				xtype: 'textfield',
 				fieldLabel: 'URL',
 				anchor: '100%',
-//				vtype: 'url',
 				value:'http://',
 				allowBlank: false,
 				validator: function(value) {
@@ -65,7 +58,8 @@ go.modules.community.bookmarks.BookmarksDialog = Ext.extend(go.form.Dialog,{
 							callback: function(options, success, result) {
 								this.websiteTitle.setValue(result.title);
 								this.websiteDescription.setValue(result.description);
-								this.selectFile.setValue(result.logo);
+								thumbExample.getEl().dom.style.backgroundImage = 'url(' + go.Jmap.downloadUrl(result.logo) + ')';
+								this.thumbField.setValue(result.logo);
 								this.el.unmask();								
 							},
 							scope: this
@@ -76,11 +70,52 @@ go.modules.community.bookmarks.BookmarksDialog = Ext.extend(go.form.Dialog,{
 
 			},this.websiteTitle = new Ext.form.TextField({
 				name: 'name',
-				xtype: 'textfield',
 				fieldLabel: t("Title"), 
 				anchor: '100%',
 				allowBlank: false
-			}),this.externCheck = new Ext.ux.form.XCheckbox({
+			}),
+			this.websiteDescription = new Ext.form.TextField({
+				name: 'description',
+				fieldLabel: t("Description"),
+				anchor: '100%',
+				height:65
+			}),
+			this.thumbField = new Ext.form.Hidden({
+				name: 'logo',
+				setValue: function(value) {
+					thumbExample.getEl().dom.style.backgroundImage = 'url(' + go.Jmap.downloadUrl(value) + ')';
+					this.setRawValue(value);
+				}
+			}),
+			thumbExample = new Ext.Button({
+				fieldLabel: t("Logo"), 
+				dialog: this,
+				style: {
+					width:'32px',
+					height:'32px',
+					backgroundRepeat: 'no-repeat',
+					backgroundSize:'cover',
+					cursor:'pointer',
+					border:'1px solid black'
+				},
+				listeners: {
+					click: function() {
+						go.util.openFileDialog({
+							multiple: false,
+							accept: "image/*",
+							autoUpload: true,
+							listeners: {
+								upload: function(response) {
+									thumbExample.getEl().dom.style.backgroundImage = 'url(' + go.Jmap.downloadUrl(response.blobId) + ')';
+									this.thumbField.setValue(response.blobId);
+								},
+								scope: this
+							}
+						});
+					}, scope: this
+				}
+			}),
+			this.externCheck = new Ext.ux.form.XCheckbox({
 				name: 'openExtern',
 				xtype: 'checkbox',
 				boxLabel: t("Open in new browser tab"),
@@ -94,25 +129,6 @@ go.modules.community.bookmarks.BookmarksDialog = Ext.extend(go.form.Dialog,{
 				hideLabel:true,
 				anchor: '100%'
 			}),
-			this.websiteDescription = new Ext.form.TextField({
-				name: 'description',
-				xtype: 'textarea',
-				fieldLabel: t("Description"),
-				anchor: '100%',
-				height:65
-			}),
-			this.selectFile = new go.modules.community.bookmarks.SelectFile({
-				fieldLabel: t("Logo"), 
-				name: 'logo',
-				anchor: '100%',
-				value:'',
-				dialog: this
-			}),
-			
-			this.thumbExample = new Ext.Component({
-				style: {
-					marginLeft: '100px'
-				}})
 			]
 		}];		
 
@@ -121,7 +137,7 @@ go.modules.community.bookmarks.BookmarksDialog = Ext.extend(go.form.Dialog,{
 			this.externCheck.setValue(0);
 			this.externCheck.setDisabled(checked);
 		},this)
-                
+				
 		return items;
 	}
 });

@@ -20,7 +20,7 @@ go.modules.community.bookmarks.BookmarkColumnView = Ext.extend(Ext.DataView,{
 			store: go.modules.community.bookmarks.groupingStore,
 			tpl: new Ext.XTemplate(
 				'<tpl for=".">',
-					'<tpl if="this.is_new_category(values.category.name,xindex,xcount)">', // Show category name column (Only when category changes)
+					'<tpl if="this.is_new_category(values.category.id,xindex,xcount)">', // Show category name column (Only when category changes)
 						'<tpl if="xindex &gt; 1"><br/><br/></div></tpl>', // Close previous category column (Don't do this the first time)
 						'<div class="bookmark-column">',
 						'<tpl for="category">',
@@ -34,20 +34,18 @@ go.modules.community.bookmarks.BookmarkColumnView = Ext.extend(Ext.DataView,{
         		'</tpl>',
 				'<br/><br/></div>',
 				{
-					is_new_category: function(category_name,index,count){
-
-						if(!this.lastcategory || category_name!=this.lastcategory){
-							this.lastcategory=category_name;
-							return true;
-						}else
-						{
-							// check if it is the last category if it is reset it
-							if(index == count) {
-								this.lastcategory = "";
-							}
-							return false;
-						}
-					}.createDelegate(this)
+                    is_new_category: function(id,index,count){
+                        var result = false;
+                        if(!this.lastid || id != this.lastid){
+                            this.lastid = id;
+                            result = true;
+                        }
+                        // check if it is the last id if it is reset it
+                        if(index == count) {
+                            this.lastid = null;
+                        }
+                        return result;
+                    }
 				}
 			),
 			autoHeight:true,
@@ -85,6 +83,6 @@ go.modules.community.bookmarks.BookmarkColumnView = Ext.extend(Ext.DataView,{
 			}
 		});
 		
-		go.modules.community.bookmarks.BookmarkColumnView .superclass.initComponent.call(this);
+		go.modules.community.bookmarks.BookmarkColumnView.superclass.initComponent.call(this);
 	}
 });
