@@ -625,27 +625,15 @@ textarea {
 
 /* Editor small font for grid, toolbar and tree */
 .x-small-editor .x-form-text {
-   height:20px; //todo
-   line-height:16px;
    vertical-align:middle;
 }
-
-.ext-border-box .x-small-editor .x-form-text {
-    height:20px;
-}
-
 .x-small-editor .x-form-select-one {
-   height:20px; // todo
    line-height:16px;
    vertical-align:middle;
 }
 
 .x-small-editor .x-form-num-field {
     text-align:right;
-}
-
-.x-small-editor .x-form-field-wrap .x-form-trigger{
-    height:19px; //todo
 }
 
 
