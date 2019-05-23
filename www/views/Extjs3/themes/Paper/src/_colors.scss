@@ -162,19 +162,19 @@ $fg: (
   text:					rgba(black, 0.87)
 );
 $bg: (
-  status-bar: color($grey, 200),
-  app-bar:    color($grey, 100),
-  form:			color($grey, 50),
-  background: color($grey, 50),
-  hover:      rgba(black, 0.04),
-  pressed:	rgba(black, .08),
+	status-bar: color($grey, 200),
+	app-bar:    color($grey, 100),
+	form:			color($grey, 50),
+	background: color($grey, 50), 
+	hover:      rgba(black, .04),
+	pressed:		rgba(black, .08),
 	selected:	rgba(black, .08),
-	readonly: rgba(black, .08),
-  box:		  white,
-  tbar:       white,
-  card:       white,
-  dialog:     color($grey, 50),
-  disabled-button:   rgba(black, 0.12)
+	readonly:	rgba(black, .08),
+	box:		  white,
+	tbar:       white,
+	card:       white, 
+	dialog:     color($grey, 50),
+	disabled-button:   rgba(black, 0.12)
 );
 
 // DARK 

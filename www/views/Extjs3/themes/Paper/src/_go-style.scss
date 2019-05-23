@@ -7,6 +7,9 @@
 	//border: none;
 	background:color($grey,200);
 }
+input[type="time"]::-webkit-clear-button {
+    display: none;
+}
 
 html {
    font-size: 100%;
@@ -18,7 +21,8 @@ html {
 }
 
 body {
-	@include var(background-color, c-primary-tp);	
+	@include var(background-color, c-primary-tp);
+	//background-image: radial-gradient( circle farthest-corner at 10% 20%,  rgba(239,166,76,1) 0%, rgba(245,184,184,1) 100.2% );
 }
 
 body * {
@@ -323,7 +327,9 @@ a {
 	@extend %font-title;
 }
 
-
+.go-main-tab-panel {
+		border-right: 0;
+}
 .go-about-logo {
 	background-image: url('img/logo-blue.svg');
 }
@@ -390,17 +396,19 @@ a {
 	color: white;
 	@include var(background-color, c-primary);
 	+ .x-tab-panel {
-		@include var(background-color, c-primary);
 		> .x-tab-panel-header {
 			position: relative;
 			border-width: 0 0 0 0;
-			/*background-color:rgba(255,255,255,.17);*/
-			.x-tab-strip-active {
-				border-bottom-color: $cAccent;
-				color:white;
-				.x-tab-strip-text{ color:white;}
+			@include var(background-color, c-primary);
+			.x-tab-strip {
+				
+				&-active {
+					border-bottom-color: $cAccent;
+					color:white;
+					.x-tab-strip-text{ color:white;}
+				}
+				&-wrap { border: 0; }
 			}
-			.x-tab-strip-wrap { border: 0; }
 			.x-tab-scroller-right, .x-tab-scroller-left {
 				color: white;
 			}
@@ -1022,10 +1030,6 @@ button.filetype-pdf, button.filetype-doc {
 	.icons > p, .icons > a {
 		position:relative;
 		padding-left: dp(64);
-	}
-	
-	.x-panel-body {
-		background-color: color($bg, "card");
 	}
 	
 	.x-panel-bbar {

@@ -32,6 +32,7 @@ form/FormFieldSet.js
 form/PasswordGeneratorField.js
 form/DateField.js
 form/DateTimeField.js
+form/TimeField.js
 form/FileField.js
 form/FileButtonField.js
 form/ComboBox.js

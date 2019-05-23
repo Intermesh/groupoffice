@@ -73,6 +73,11 @@
 			minutes = (minutes < 10) ? "0"+minutes : minutes;
 			return hours+':'+minutes;
 		},
+		//valid str format is 2:04, 08:00, (19:61 == 20:01)
+		minutes: function(timeStr) {
+			parts = timeStr.split(':');
+			return parseInt(parts[0])*60+parseInt(parts[1]);
+		},
 
 		valuta : function(amount) {
 			return GO.settings.currency + go.util.Format.number(amount, 2);
