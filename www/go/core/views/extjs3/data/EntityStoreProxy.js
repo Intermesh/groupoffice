@@ -140,6 +140,8 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 							me._watchRelation(store, key);
 					});
 				}
+			}).catch(function(error) {
+				console.error(error);
 			}));
 		}, this);
 		

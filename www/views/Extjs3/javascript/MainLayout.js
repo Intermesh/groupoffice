@@ -263,8 +263,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				this.saveState();
 			}
 		}, this);
-
-
 	},
 
 	getModulePanel: function (moduleName) {
@@ -277,6 +275,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		{
 			return false;
 		}
+		
 	},
 
 	//overridable
@@ -285,6 +284,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	},
 	
 	loadLegacyModuleScripts : function() {
+
 		return new Promise(function(resolve, reject) {
 				//legacy scripts loaded from scripts.inc.php
 			var script = document.createElement('script');
@@ -425,7 +425,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	},
 
 	renderUI : function() {
-
 		if (this.loginPanel) {
 			this.loginPanel.destroy();
 		}
@@ -466,7 +465,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 			if (this.state && this.state.indexOf(allPanels[i].moduleName) > -1)
 				items.push(GO.moduleManager.getPanel(allPanels[i].moduleName));
-
+			
 			menuItemConfig = {
 				id: 'go-start-menu-' + allPanels[i].moduleName,
 				moduleName: allPanels[i].moduleName,
@@ -491,7 +490,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				adminMenuItems.push(menuItemConfig);
 			}
 		}
-
+		
 		var subMenus = GO.moduleManager.getAllSubmenus();
 
 		for (var key in subMenus) {
@@ -739,7 +738,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 //	},
 
 		initModule: function (moduleName) {
-			
 			if(!this.tabPanel) {
 				return false;
 			}
@@ -790,12 +788,12 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	},
 
 	openModule: function (moduleName) {
-
 		var panel = this.initModule(moduleName);
 		if (panel) {
 			panel.show();
 			return panel;
 		}
+
 		return false;
 	},
 

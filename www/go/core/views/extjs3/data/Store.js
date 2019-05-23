@@ -24,6 +24,8 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	
 	remoteSort : true,
 	
+	enableCustomFields: true,
+	
 	constructor: function (config) {
 		
 		config = config || {};
@@ -31,7 +33,9 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 
 		Ext.applyIf(this, go.data.StoreTrait);
 		
-		this.addCustomFields(config);
+		if(!Ext.isDefined(config.enableCustomFields) || config.enableCustomFields) {
+			this.addCustomFields(config);
+		}
 		
 		go.data.Store.superclass.constructor.call(this, Ext.applyIf(config, {
 			idProperty:  "id",

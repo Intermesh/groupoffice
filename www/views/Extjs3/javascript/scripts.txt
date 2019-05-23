@@ -1,3 +1,4 @@
+views/Extjs3/javascript/vendor/chartist.min.js
 views/Extjs3/javascript/vendor/localforage.js
 views/Extjs3/javascript/vendor/promise-polyfill.js
 

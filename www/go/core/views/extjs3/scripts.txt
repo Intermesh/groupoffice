@@ -221,3 +221,6 @@ form/AttachmentsField.js
 
 emailtemplate/TemplateDialog.js
 emailtemplate/GridPanel.js
+
+chart/ChartComponent.js
+chart/LineChart.js
