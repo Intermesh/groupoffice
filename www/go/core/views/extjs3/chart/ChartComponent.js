@@ -14,15 +14,15 @@ go.chart.ChartComponent = Ext.extend(Ext.BoxComponent, {
 	 );
 	},
 
-	onRender : function(){
-		go.chart.ChartComponent.superclass.onRender.apply(this, arguments);
-
-//		var params = {
-//			bgcolor: this.backgroundColor
-//		};
-		this.dom = Ext.getDom(this.id);
-		this.el = Ext.get(this.dom);
-	},
+//	onRender : function(){
+//		go.chart.ChartComponent.superclass.onRender.apply(this, arguments);
+//
+////		var params = {
+////			bgcolor: this.backgroundColor
+////		};
+//		this.dom = Ext.getDom(this.id);
+//		this.el = Ext.get(this.dom);
+//	},
 	
 	getId : function(){
 		return this.id || (this.id = "gochartcmp" + (++Ext.Component.AUTO_ID));

@@ -7,16 +7,21 @@ go.chart.LineChart = Ext.extend(go.chart.ChartComponent, {
 	labels:[],
 	options:{},
 	
-	update: function(data){
+	update: function(series){
 		
 		console.log(this);
 		
-		var elSelector = "#"+this.el.id;
-		new Chartist.Line(elSelector, {
+		var data = {
 			labels: this.labels,
-			series: data
-		}, this.options);
+			series: series
+		};
 		
+		if(!this.chart) {
+			this.chart = new Chartist.Line("#" + this.el.id, data, this.options);
+		} else
+		{
+			this.chart.update(data);
+		}
 		
 	}
 	
