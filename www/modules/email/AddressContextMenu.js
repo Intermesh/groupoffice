@@ -91,7 +91,7 @@ GO.email.AddressContextMenu = function(config)
 		});
 		
 		this.addEvents({change: true, beforechange: true});
-
+		
 		this.store.on("load", this.updateMenu, this);
 		
 		
@@ -162,6 +162,10 @@ Ext.extend(GO.email.AddressContextMenu, Ext.menu.Menu,{
 	}	,
 	
 	updateMenu: function () {
+
+		if(!this.el) {
+			return;
+		}
 		
 		this.initItems();
 		var item, rem = [], items = [];
