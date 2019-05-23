@@ -30,7 +30,9 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 		go.modules.community.addressbook.ContactDialog.superclass.initComponent.call(this);
 
 		this.formPanel.on("setvalues", function (form, v) {
-			this.setOrganization(!!v.isOrganization);
+			if(Ext.isDefined(v.isOrganization)) {
+				this.setOrganization(!!v.isOrganization);
+			}
 		}, this);
 	},
 
