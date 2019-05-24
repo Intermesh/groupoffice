@@ -486,7 +486,7 @@ Ext.extend(GO.email.MessagesGrid, GO.grid.GridPanel,{
 
 		return unseen + icons.map(function(i) {
 			return '<i class="icon em-'+i+'">' + i + '</i>';
-		}).join();
+		}).join("");
 		
 	},
 
