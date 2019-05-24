@@ -230,29 +230,35 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	},
 
 
-	receive: function (action) {	
+	receive: function (action) {
 		var me = this;	
 		me.getState().then(function(state){
 			switch (action.type) {
 				case me.entity.name + "/get":
 
 					// If no items are available, don't continue
-					if(!action.payload.list){
+					if(!action.payload.response.list){
+						return;
+					}
+					
+					// If properties was set in the request params then we don't want to 
+					// store this entity. We only want to keep complete entities
+					if(action.payload.options.params && action.payload.options.params.properties && action.payload.options.params.properties.length) {
 						return;
 					}
 
 					//add data from get response
-					for(var i = 0,l = action.payload.list.length;i < l; i++) {
-						me._add(action.payload.list[i]);
+					for(var i = 0,l = action.payload.response.list.length;i < l; i++) {
+						me._add(action.payload.response.list[i]);
 					}
 
-					me.setState(action.payload.state);
+					me.setState(action.payload.response.state);
 					break;
 
 				case me.entity.name + "/query":
 //					console.log("Query state: " + state + " - " + action.payload.state);
 					//if a list call was made then fetch updates if state mismatch
-					if (state && action.payload.state !== state) {
+					if (state && action.payload.response.state !== state) {
 						me.getUpdates();
 						//me.setState(action.payload.state);
 					}
@@ -260,7 +266,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 				case me.entity.name + "/set":
 					//update state from set we initiated
-					me.setState(action.payload.newState);
+					me.setState(action.payload.response.newState);
 					break;
 			}
 		});
