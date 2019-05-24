@@ -56,17 +56,22 @@ class Authenticator extends PrimaryAuthenticator {
 	public function authenticate($username, $password) {
 		
 		list($ldapUsername, $domain) = $this->splitUserName($username);
-		
+
 		$server = $this->findServer($domain);
-		
+		if($server->loginWithEmail) {
+			$ldapUsername = $username;
+		}
 		$connection = new Connection();
 		if(!$connection->connect($server->getUri())) {
 			throw new \Exception("Could not connect to LDAP server");
 		}
+		if(!$server->ldapVerifyCertificate) {
+			$connection->setOption(LDAP_OPT_X_TLS_REQUIRE_CERT, LDAP_OPT_X_TLS_NEVER);
+		}
 		if($server->encryption == 'tls') {
 			if(!$connection->startTLS()) {
-				throw new \Exception("Couldn't enable TLS");
-			}
+				throw new \Exception("Couldn't enable TLS: " . $connection->getError());
+			}			
 		}
 		
 		if (!empty($server->username)) {			

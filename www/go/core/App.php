@@ -540,11 +540,13 @@ use go\modules\core\core\model\Settings;
 
 namespace {
 
+	use go\core\App;
+
 	/**
 	 * @return App
 	 */
 	function GO() {
-		return \go\core\App::get();
+		return App::get();
 	}
 
 }
