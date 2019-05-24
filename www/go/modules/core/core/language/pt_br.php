@@ -1,5 +1,6 @@
 <?php
 return array (
+  'extjs_lang' => 'pt_BR',
   'Export hidden columns too' => 'Também exportar colunas ocultas',
   'search query' => 'consulta para pesquisa',
   'Please save first by clicking \'Apply\'' => 'Salve primeiro clicando em \'Aplicar\'',
