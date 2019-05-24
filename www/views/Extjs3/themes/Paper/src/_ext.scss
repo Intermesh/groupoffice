@@ -2210,9 +2210,10 @@ $menuScrollerSize : dp(4);
       }
 	}
 	&-icon::before { 
-		@extend %icon;
-		padding-right: dp(16);
+		@extend %icon;		
 		margin-top: dp(-4);
+		float: left;
+		padding: dp(20) sp(16) dp(20) 0;
 	}
 	&-collapsed {
 		.x-window-tl {

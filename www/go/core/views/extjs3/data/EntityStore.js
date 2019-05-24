@@ -525,19 +525,23 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		}
 
 		var entities = [], notFound = [], promises = [], order = {};
+
+		go.Jmap.pause();
+
 		ids.forEach(function(id, index) {
 			//keep order for sorting later
 			order[id] = index;
 			promises.push(this.single(id).then(function(entity) {
 					//Make sure array is sorted the same as ids
-					entities.push(entity);
+					entities.push(entity);					
 				}).catch(function() {
 					notFound.push(id);
 				}));
 		}, this);
 
-		return Promise.all(promises).then(function() {
+		go.Jmap.continue();
 
+		return Promise.all(promises).then(function() {
 			entities.sort(function (a, b) {
 					return order[a.id] - order[b.id];
 			});

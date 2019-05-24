@@ -20,12 +20,9 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 		Ext.applyIf(this, go.grid.GridTrait);
 		this.initCustomFields();
 		
-		go.grid.GridPanel.superclass.initComponent.call(this);
+		go.grid.GridPanel.superclass.initComponent.call(this);	
 		
-		
-		this.initGridTrait();
-		Ext.applyIf(this, go.panels.ScrollLoader);
-		this.initScrollLoader();
+		this.initGridTrait();		
 	}
 
 });

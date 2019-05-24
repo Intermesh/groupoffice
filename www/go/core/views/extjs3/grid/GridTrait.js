@@ -6,8 +6,13 @@ go.grid.GridTrait = {
 //	
 //	pageSize: 20,
 	
-	scrollUp: false,  // set to true when you need to loadMore when scrolling up
+	//scrollUp: false,  // set to true when you need to loadMore when scrolling up
 	
+	/**
+	 * Init scrollloader for loading more records when scrolling
+	 */
+	scrollLoader: true,
+
 	initGridTrait : function() {
 		if (!this.keys)
 		{
@@ -22,6 +27,11 @@ go.grid.GridTrait = {
 		this.initScrollOffset();
 		
 		this.initHeaderMenu();
+
+		if(this.scrollLoader) {
+			Ext.applyIf(this, go.panels.ScrollLoader);
+			this.initScrollLoader();
+		}
 	},
 	
 	initHeaderMenu : function() {

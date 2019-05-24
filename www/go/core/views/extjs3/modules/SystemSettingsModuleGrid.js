@@ -13,7 +13,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 		var reader = new Ext.data.JsonReader({
 			root: 'results',
 			totalProperty: 'total',
-			fields: ['name', 'package', 'localizedName',  'description', 'id', 'sort_order', 'admin_menu', 'aclId', 'icon', 'enabled', 'warning', 'buyEnabled','not_installable', 'isRefactored','installed'],
+			fields: ['name', 'package', 'localizedPackage', 'localizedName',  'description', 'id', 'sort_order', 'admin_menu', 'aclId', 'icon', 'enabled', 'warning', 'buyEnabled','not_installable', 'isRefactored','installed'],
 			id: 'name'
 		});
 
@@ -24,7 +24,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 				field: 'name',
 				direction: 'ASC'
 			},
-			groupField: 'package',
+			groupField: 'localizedPackage',
 			remoteGroup:false,
 			remoteSort:false
 		});
@@ -124,7 +124,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 				dataIndex: 'name',
 				id: 'name',
 				renderer: function(name, cell, record) {
-					return '<div class="mo-title" style="background-image:url(' + record.data["icon"] + ')">'
+					return '<div class="mo-title" style="background-image:url(' + go.Jmap.downloadUrl('core/moduleIcon/'+(record.data.package || "legacy")+'/'+record.data.name) + ')">'
 									+ record.data.localizedName +'</div>';
 				}
 			}, 
@@ -141,8 +141,8 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 				}
 			},{
 				header: "Package",
-				dataIndex: 'package',
-				id: 'package',
+				dataIndex: 'localizedPackage',
+				id: 'localizedPackage',
 				renderer: function(v) {
 					return v.ucFirst();
 				}

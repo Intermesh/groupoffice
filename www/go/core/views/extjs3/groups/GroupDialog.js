@@ -1,12 +1,13 @@
 go.groups.GroupDialog = Ext.extend(go.form.Dialog, {
 	title: t('Group'),
 	entityStore: "Group",
-	height: dp(600),
-	initComponent : function() {
-		go.groups.GroupDialog.superclass.initComponent.call(this);
-		this.formPanel.layout = "border";
-	},
+	height: dp(800),
+	width: dp(1000),
+	formPanelLayout: "border",
 	initFormItems: function () {
+
+		this.addPanel(new go.permissions.SharePanel());
+		this.addPanel(new go.groups.GroupModuleGrid());
 		
 		return [{
 				region: "north",
