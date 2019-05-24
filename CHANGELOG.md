@@ -1,5 +1,8 @@
 - Tickets: Added missing language in tickets for Brazilian portuges
 - Email: Fixed render issue when pasting multiple recipients in email composer
+- Smime: validate if import is in PEM format. Fixed S/MIME Certificate Import Error #288
+- core: fixed language issue with pt_BR
+- billing: show country in full name
 
 21-05-2019 6.3.74
 - core: Use varchar 190 field for search keywords
