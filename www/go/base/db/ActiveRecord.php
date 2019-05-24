@@ -3143,8 +3143,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			}
 
 			$this->setIsNew(false);		
-			//make sure custom field record is created on new records
-			$this->getCustomfieldsRecord();
 
 			$changed  = $this->_processFileColumns($fileColumns);
 			if($changed || $this->afterDbInsert() || $this->isModified('files_folder_id')){

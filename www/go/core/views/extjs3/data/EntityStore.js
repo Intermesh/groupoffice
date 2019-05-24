@@ -342,6 +342,8 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	/**
 	 * Get all entities
 	 * 
+	 * Note: the results are sorted in an unpredictable manner! Use query().then(return get()) for sorting.
+	 * 
 	 * @param {function} cb
 	 * @param {object} scope
 	 * @returns {Promise}

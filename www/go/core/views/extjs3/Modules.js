@@ -211,21 +211,34 @@ go.Modules = (function () {
 
 		//will be called after login
 		init: function () {
-			var package, name, me = this;
+			var package, me = this;
 			
-			return go.Db.store("Module").all().then (function(entities) {
-				me.entities = entities, promises = [];
+			return go.Db.store("Module").query().then(function(response){
+				return go.Db.store("Module").get(response.ids);
+			}).then (function(result) {
+				me.entities = result.entities;
+				var promises = [];
 
-				for (package in me.registered) {
-					for (name in me.registered[package]) {							
-						var config = me.registered[package][name];
+				for (var id in me.entities) {
 					
-						if (!me.isAvailable(package, name, config.requiredPermissionLevel)) {
+					var mod = me.entities[id];
+					
+					// for (name in me.registered[package]) {	
+						var pkg = mod.package || "legacy";
+						if(!me.registered[pkg]) {
+							continue;
+						}
+						var config = me.registered[pkg][mod.name];
+						if(!config){
+							continue;
+						}
+					
+						if (config.requiredPermissionLevel > mod.permissionLevel) {
 							continue;
 						}
 						
 						if (config.initModule){
-							go.Translate.setModule(package, name);
+							go.Translate.setModule(mod.package, mod.name);
 							var initModulePromise = config.initModule.call(me);
 							if(initModulePromise) {
 								promises.push(initModulePromise);
@@ -242,14 +255,14 @@ go.Modules = (function () {
 									GO.moduleManager._addModule(config.mainPanel[i].prototype.id, config.mainPanel[i], {title:m.title}, config.subMenuConfig);
 								}
 							} else {
-								GO.moduleManager._addModule(name, config.mainPanel, config.panelConfig, config.subMenuConfig);
+								GO.moduleManager._addModule(mod.name, config.mainPanel, config.panelConfig, config.subMenuConfig);
 							}
 						}							
-					}
+					// }
 				}
 
 				return Promise.all(promises).then(function() {
-					entities
+					return me.entities;
 				});
 			});
 		},
