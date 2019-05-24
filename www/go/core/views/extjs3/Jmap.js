@@ -286,7 +286,10 @@ go.Jmap = {
 							console.error('server-side JMAP failure', response);							
 						}
 
-						go.flux.Dispatcher.dispatch(response[0], response[1]);
+						go.flux.Dispatcher.dispatch(response[0], {
+							options: o,
+							response: response[1]
+						});
 
 						//make sure dispatch is executed before callbacks and resolves.
 						setTimeout(function() {
