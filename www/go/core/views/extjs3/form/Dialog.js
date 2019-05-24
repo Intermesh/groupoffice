@@ -323,6 +323,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 		}
 
 		if (!this.isValid()) {
+			this.showFirstInvalidField();
 			return;
 		}
 		
@@ -338,6 +339,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 			}
 
 			if(!success) {
+				this.showFirstInvalidField();
 				return;
 			}
 			if(this.redirectOnSave) {
@@ -346,6 +348,31 @@ go.form.Dialog = Ext.extend(go.Window, {
 			this.close();
 						
 		}, this);
+	},
+
+	showFirstInvalidField : function() {
+
+		var firstFieldWithError = this.formPanel.form.items.find(function(item) {
+			return !!item.activeError;
+		});
+
+		if(!firstFieldWithError) {
+			return;
+		}
+		//Check for tab panel to show tab with error.
+		var panel = null;
+		var tabPanel = firstFieldWithError.findParentBy(function(c){
+				if(c.isXType("tabpanel")) {
+					return true;
+				}
+				panel = c;
+		});
+
+		if(tabPanel) {
+			panel.show();
+		}
+
+		firstFieldWithError.focus();
 	},
 
 	initFormItems: function () {
