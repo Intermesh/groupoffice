@@ -39,7 +39,6 @@ return array (
     'home' => 'Thuis',
     'mobile' => 'Mobiel',
     'workmobile' => 'Werk mobiel',
-    'fax' => 'Fax',
     'workfax' => 'Werk fax',
   ),
   'Call' => 'Bellen',

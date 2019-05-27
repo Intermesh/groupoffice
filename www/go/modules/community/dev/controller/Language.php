@@ -33,6 +33,7 @@ class Language extends Controller {
 		$rootFolder = Environment::get()->getInstallFolder();
 
 		$coreFiles = $rootFolder->getFolder("views/Extjs3/javascript")->find('/.*\.js/', false);
+		$coreFiles = array_merge($coreFiles, $rootFolder->getFolder("go/core/views/extjs3")->find('/.*\.js/', false));
 
 		$csvFile = File::tempFile('csv');
 
