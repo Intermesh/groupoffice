@@ -3,6 +3,7 @@ BookmarkContextMenu.js
 BookmarkColumnView.js
 MainPanel.js
 BookmarksView.js
+BookmarkCombo.js
 ManageCategoryDialog.js
 ManageCategoriesGrid.js
 BookmarksDialog.js

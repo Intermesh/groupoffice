@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS `bookmarks_bookmark` (
   `name` varchar(64) NOT NULL,
   `content` text NOT NULL,
   `description` varchar(255) DEFAULT NULL,
-  `logo` varchar(255) DEFAULT NULL,
+  `logo` blob DEFAULT NULL,
   `openExtern` tinyint(1) NOT NULL DEFAULT '1',
   `behaveAsModule` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
