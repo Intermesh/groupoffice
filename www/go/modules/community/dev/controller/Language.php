@@ -235,7 +235,9 @@ class Language extends Controller {
 			foreach ($modules as $module => $translations) {
 				if ($package == "legacy") {
 					$langFilePath = "modules/" . $module . "/language/" . $lang . ".php";
-				} else {
+				} else if($package == "core"){
+					$langFilePath = "go/core/language/" . $lang . ".php";
+				}else {
 					$langFilePath = "go/modules/" . $package . "/" . $module . "/language/" . $lang . ".php";
 				}
 				
