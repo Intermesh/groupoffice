@@ -153,5 +153,34 @@ class Bookmark extends EntityController {
 		$response['description']=\GO\Base\Util\StringHelper::cut_string($response['description'], 255, true, "");
 		return $response;
 	}
+
+	/**
+	 * updates all logos to a blob
+	 * 
+	 * 
+	 *
+	 */
+	public static function updateLogos() {
+
+		$results = GO()->getDbConnection()->select("*")->from("bm_bookmarks");
+		foreach($results as $result) {
+			
+			$bookmarkId = $result["id"];
+			$logoPath = $result["logo"];
+			$publicIcon = $result["public_icon"];
+
+			if($publicIcon == 0) {
+				$file = \GO()->getDataFolder()->getFile($logoPath);
+			} else {
+				$file = \GO()->getEnvironment()->getInstallFolder()->getFile("modules/bookmarks/" . $logoPath);
+			}
+
+			$blob = Blob::fromFile($file);			
+			if(!$blob->save()) {
+				$errors = $blob->getValidationErrors();
+			}
+			GO()->getDbConnection()->update('bookmarks_bookmark', ['logo' => $blob->id], ['id' => $bookmarkId])->execute();		
+		}
+	}
 }
 

@@ -12,6 +12,7 @@ use go\modules\community\addressbook\model\EmailAddress;
 use go\modules\community\addressbook\model\PhoneNumber;
 use go\modules\community\addressbook\model\Url;
 use function GO;
+use go\core\db\Table;
 
 class Migrate63to64 {
 	
@@ -21,6 +22,7 @@ class Migrate63to64 {
 		
 		//clear cache for ClassFinder fail in custom field type somehow.
 		GO()->getCache()->flush();
+		Table::destroyInstances();
 		
 		$this->countries = GO()->t('countries');
 		
