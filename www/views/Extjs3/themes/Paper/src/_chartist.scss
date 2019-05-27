@@ -386,3 +386,8 @@ $chart-tooltip-color: #453D3F;
 .ct-area.ct-threshold-below {
   stroke: #59922b;
 }
+
+.chart-container svg {
+	overflow: visible;
+	margin-top: 7px;
+}
