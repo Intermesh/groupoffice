@@ -160,7 +160,7 @@ class Language extends Controller {
 	 * or with docker compose:
 	 * 
 	 * ```
-	 * docker-compose exec --user www-data groupoffice php cli.php community/dev/Language/import --path=/path/to/lang.csv
+	 * docker-compose exec --user root groupoffice-master php cli.php community/dev/Language/import --path=/path/to/lang.csv
 	 * ```
 	 * 
 	 * @param type $params

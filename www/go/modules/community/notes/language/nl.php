@@ -8,5 +8,5 @@ return array (
   'Note' => 'Notitie',
   'Notes' => 'Notities',
   'Content' => 'Text',
-  'Invalid password' => 'Ongeldig wachtwoord',
+  'Invalid password' => 'Ongeldig wachtwoord'
 );
