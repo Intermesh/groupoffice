@@ -161,33 +161,25 @@ class Bookmark extends EntityController {
 	 *
 	 */
 	public static function updateLogos() {
-		$query = "SELECT * FROM `bm_bookmarks`";
-		$stmnt = \GO::getDbConnection()->prepare($query);
-		$stmnt->execute();
-		$results = $stmnt->fetchAll(\PDO::FETCH_ASSOC);
+
+		$results = GO()->getDbConnection()->select("*")->from("bm_bookmarks");
 		foreach($results as $result) {
+			
 			$bookmarkId = $result["id"];
 			$logoPath = $result["logo"];
 			$publicIcon = $result["public_icon"];
 
 			if($publicIcon == 0) {
-				$path = "/var/lib/groupoffice/" . $logoPath;
+				$file = \GO()->getDataFolder()->getFile($logoPath);
 			} else {
-				$path = "/usr/share/groupoffice/modules/bookmarks/" . $logoPath;
+				$file = \GO()->getEnvironment()->getInstallFolder()->getFile("modules/bookmarks/" . $logoPath);
 			}
 
-			$filename = basename($path);
-			$contents = file_get_contents($path,FILE_USE_INCLUDE_PATH);
-
-			$blob = Blob::fromString($contents);
-			$blob->name = $filename;
-			$blob->type = "image/x-icon";
+			$blob = Blob::fromFile($file);			
 			if(!$blob->save()) {
 				$errors = $blob->getValidationErrors();
 			}
-			$blobId = $blob->id;
-			$updatestmt = \GO::getDbConnection()->prepare('UPDATE bookmarks_bookmark SET logo = ? WHERE id = ?');
-			$updatestmt->execute([$blobId,$bookmarkId]);
+			GO()->getDbConnection()->update('bookmarks_bookmark', ['logo' => $blob->id], ['id' => $bookmarkId])->execute();		
 		}
 	}
 }
