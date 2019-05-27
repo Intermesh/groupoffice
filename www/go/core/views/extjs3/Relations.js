@@ -141,11 +141,13 @@ go.Relations = {
 			} else
 			{
 				if(!Ext.isDefined(data[p])) {
+					data = null;
      			return false;
 				}
 				data = data[p];
 			}
 			if(!data) {
+				data = null;
 				return false;
 			}
 		});

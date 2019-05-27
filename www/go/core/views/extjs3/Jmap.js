@@ -8,6 +8,8 @@ go.Jmap = {
 
 	timeout: null,
 
+	paused: 0,
+
 	nextCallId: function () {
 		this.callId++;
 
@@ -235,7 +237,7 @@ go.Jmap = {
 	 * Pause request execution
 	 */
 	pause : function() {
-		this.paused = true;
+		this.paused++;
 		if (this.timeout) {
 			clearTimeout(this.timeout);
 		}
@@ -245,7 +247,14 @@ go.Jmap = {
 	 * Continue request event execution as the next macro task.
 	 */
 	continue: function() {
-		this.paused = false;
+		if(this.paused>0) {
+			this.paused--;
+		}
+
+		if(this.paused > 0)
+		{
+			return;
+		}
 		if (this.timeout) {
 			clearTimeout(this.timeout);
 		}
@@ -286,7 +295,10 @@ go.Jmap = {
 							console.error('server-side JMAP failure', response);							
 						}
 
-						go.flux.Dispatcher.dispatch(response[0], response[1]);
+						go.flux.Dispatcher.dispatch(response[0], {
+							options: o,
+							response: response[1]
+						});
 
 						//make sure dispatch is executed before callbacks and resolves.
 						setTimeout(function() {

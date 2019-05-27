@@ -20,7 +20,10 @@ class Module extends AclOwnerEntity {
 	public $version;
 	public $enabled;
 	
-	
+	protected static function textFilterColumns()
+	{
+		return ['name', 'package'];
+	}
 	
 	protected function internalSave() {
 		
@@ -40,10 +43,26 @@ class Module extends AclOwnerEntity {
 		if($this->isModified(['enabled'])) {
 			GO()->rebuildCache();
 		}
+
+		//When module groups change the groups change too. Because the have a "modules" property.
+		$aclChanges = $this->getAclChanges();
+		if(!empty($aclChanges)) {
+			Group::getType()
+				->changes(
+					GO()->getDbConnection()
+						->select('id as entityId, aclId, "0" as destroyed')
+						->from('core_group')
+						->where('id', 'IN', array_keys($aclChanges)
+					)
+				);
+		}
 		
 		return true;
 	}
 	
+	public function package(){
+		return self::PACKAGE_COMMUNITY;
+	}
 	
 	private function nextSortOrder() {
 		$query = new Query();			
@@ -63,7 +82,7 @@ class Module extends AclOwnerEntity {
 	
 
 	protected static function defineMapping() {
-		return parent::defineMapping()->addTable('core_module');
+		return parent::defineMapping()->addTable('core_module', 'm');
 	}
 	
 	

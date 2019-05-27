@@ -43,19 +43,24 @@ if(strpos($_GET['blob'], '/') === false) {
 $parts = explode("/", $_GET['blob']);
 
 $package = array_shift($parts);
-$module = array_shift($parts);
-$method = "download" . array_shift($parts);
-//left over are params
+if($package == "core") {
+	$c = GO();
+	$method = "download" . array_shift($parts);
+} else {
+	$module = array_shift($parts);
+	$method = "download" . array_shift($parts);
+	//left over are params
 
-$ctrlCls = "go\\modules\\" . $package . "\\". $module . "\\Module";
-
-if(!class_exists($ctrlCls)) {
-	http_response_code(404);	
-	exit("Controller class '$ctrlCls' not found");
+	$ctrlCls = "go\\modules\\" . $package . "\\". $module . "\\Module";
+	if(!class_exists($ctrlCls)) {
+		http_response_code(404);	
+		exit("Controller class '$ctrlCls' not found");
+	}
+	
+	$c = new $ctrlCls;
 }
 
 
-$c = new $ctrlCls;
 
 if(!method_exists($c, $method)) {
 	http_response_code(404);	

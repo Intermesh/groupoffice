@@ -141,7 +141,7 @@ go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 		
 		this._isDirty = false;
 		this.selectedUsers = users.column("userId");
-		this.store.load();
+		this.store.load().catch(function(){});
 	},
 	
 	onBeforeStoreLoad : function(store, options) {

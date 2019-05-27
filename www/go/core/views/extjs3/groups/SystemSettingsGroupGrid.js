@@ -153,30 +153,18 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 							this.edit(this.moreMenu.record.id);
 						},
 						scope: this
-					},
-					
+					},					
+					"-", 
 					{
-						itemId: "share",
-						iconCls: 'ic-share',
-						text: t("Share"),
+						itemId: "delete",
+						iconCls: 'ic-delete',
+						text: t("Delete"),
 						handler: function () {
-							var win = new go.permissions.ShareWindow();
-							win.load(this.moreMenu.record.data.aclId).show();
+							this.getSelectionModel().selectRecords([this.moreMenu.record]);
+							this.deleteSelected();
 						},
 						scope: this
 					},
-					
-					"-"
-									, {
-										itemId: "delete",
-										iconCls: 'ic-delete',
-										text: t("Delete"),
-										handler: function () {
-											this.getSelectionModel().selectRecords([this.moreMenu.record]);
-											this.deleteSelected();
-										},
-										scope: this
-									},
 				]
 			})
 		}

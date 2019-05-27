@@ -9,9 +9,9 @@
 }
 
 .go-addressbook-index-row {
-	border-top: 1px solid color($fg, 'line');
+	border-top: dp(8)x solid white;
 	margin-top: dp(8);
-	padding-top: dp(8);
+	box-shadow: 0px -1px 0 color($fg, 'line');
 }
 
 .go-addressbook-name-panel {

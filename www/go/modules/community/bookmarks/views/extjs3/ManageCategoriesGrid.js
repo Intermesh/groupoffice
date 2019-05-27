@@ -8,23 +8,25 @@
  *
  * @version $Id: ManageCategoriesGrid.js 22112 2018-01-12 07:59:41Z mschering $
  * @copyright Copyright Intermesh
- * @author Twan Verhofstad
+ * @author Richard
  */
 
 go.modules.community.bookmarks.ManageCategoriesGrid = Ext.extend(go.grid.GridPanel,{
+    
     changed : false,
+    layout: 'fit',
+    autoScroll: true,
+    split: true,
+    border: false,	
+    paging: true,
+
     initComponent: function() {
         this.store = new go.data.Store({
             fields: ['id', {name: 'creator', type: "relation"}, 'aclId', "name"],
             entityStore: "BookmarksCategory"
-        }),
-        this.layout='fit';
-        this.autoScroll=true;
-        this.split=true;
-        this.border=false;	
-        this.paging=true;
+        });
     
-        var columnModel =  new Ext.grid.ColumnModel({
+        this.cm =  new Ext.grid.ColumnModel({
             defaults:{
                 sortable:true
             },
@@ -43,9 +45,7 @@ go.modules.community.bookmarks.ManageCategoriesGrid = Ext.extend(go.grid.GridPan
             ]
         });
         
-        this.cm=columnModel;
-        
-        this.view=new Ext.grid.GridView({
+        this.view = new Ext.grid.GridView({
             autoFill: true,
             forceFit: true,
             emptyText: t("No items to display")		
@@ -53,14 +53,6 @@ go.modules.community.bookmarks.ManageCategoriesGrid = Ext.extend(go.grid.GridPan
         
         this.sm = new Ext.grid.RowSelectionModel();
         this.loadMask=true;
-        
-        
-        this.categoryDialog = new go.modules.community.bookmarks.CategoryDialog();
-        this.categoryDialog.on('save', function(){   
-            this.store.load();
-            this.changed=true;
-        }, this);
-        
         
         this.tbar=[{
             iconCls: 'ic-add',

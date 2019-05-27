@@ -24,10 +24,8 @@ go.modules.community.bookmarks.BookmarksView = Ext.extend(Ext.Panel,{
             
             this.bookmarkthumbs  = new Ext.XTemplate(
                 '<tpl for=".">',
-                '<tpl if="this.is_new_category(values.category.name,xindex,xcount)">', 
-                    '<tpl for="category">',
-                        '<h1 class="categorie">{name}</h1>',
-                    '</tpl>',
+                '<tpl if="this.is_new_category(values.category.id,xindex,xcount)">', 
+                    '<h1 class="categorie">{values.category.name} </h1>',
                 '</tpl>',
                 '<div class="thumb-wrap">',
                 '<div class="thumb">',
@@ -36,17 +34,17 @@ go.modules.community.bookmarks.BookmarksView = Ext.extend(Ext.Panel,{
                 '<div style="clear:both"></div>',
                 {
                     // switchen van categorie
-                    is_new_category: function(category_name,index,count){
-                        if(!this.lastcategory || category_name != this.lastcategory){
-                            this.lastcategory = category_name;
-                            return true;
-                        } else {
-                            // check if it is the last category if it is reset it
-                            if(index == count) {
-                                this.lastcategory = "";
-                            }
-                            return false;
+                    is_new_category: function(id,index,count){
+                        var result = false;
+                        if(!this.lastid || id != this.lastid){
+                            this.lastid = id;
+                            result = true;
                         }
+                        // check if it is the last id if it is reset it
+                        if(index == count) {
+                            this.lastid = null;
+                        }
+                        return result;
                     }
                 }
                 );
@@ -59,7 +57,7 @@ go.modules.community.bookmarks.BookmarksView = Ext.extend(Ext.Panel,{
                 store: this.store,
                 tpl: this.bookmarkthumbs,
                 cls: 'thumbnails',
-                itemSelector:'div.thumb',
+                itemSelector:'div.thumb-wrap',
                 multiSelect: false,
                 singleSelect: false,
                 trackOver:true
@@ -83,8 +81,6 @@ go.modules.community.bookmarks.BookmarksView = Ext.extend(Ext.Panel,{
             
             this.DV.on('contextmenu',function( DV, index, node, e) {
                 e.preventDefault();
-                
-                var XY = new Array(e.getPageX(),e.getPageY());
         
                 if (!this.contextMenu) {
                     this.contextMenu = new go.modules.community.bookmarks.BookmarkContextMenu();
@@ -93,23 +89,23 @@ go.modules.community.bookmarks.BookmarksView = Ext.extend(Ext.Panel,{
                 //Verry Important !! to get the record and the XY data of the mouse
                 var record = this.DV.getRecord(node);
                 this.contextMenu.setRecord(record);
-                this.contextMenu.showAt(XY);
+                this.contextMenu.showAt([e.getPageX(),e.getPageY()]);
 
             }, this);
         
-            /*
-          * Mouseover
-          */
+        //     /*
+        //   * Mouseover
+        //   */
             
-            this.DV.on('mouseenter',function( DV, index, node, e) {
-                this.mouseOver=true;
-            },this);
+        //     this.DV.on('mouseenter',function( DV, index, node, e) {
+        //         this.mouseOver=true;
+        //     },this);
         
-            this.DV.on('mouseenter',function( DV, index, node, e) {
-                }, this, {
-                    delay:600,
-                    buffer:200
-                })
+        //     this.DV.on('mouseenter',function( DV, index, node, e) {
+        //         }, this, {
+        //             delay:600,
+        //             buffer:200
+        //         })
         
             Ext.apply(this, {
                 items: [this.DV]

@@ -51,12 +51,8 @@ class Group extends AclOwnerEntity {
 	 * 
 	 * @var UserGroup[]
 	 */
-	public $users;
-	
-	protected function aclEntityClass() {
-		
-	}
-	
+	public $users;	
+
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable('core_group', 'g')
@@ -101,10 +97,12 @@ class Group extends AclOwnerEntity {
 			return false;
 		}
 		
+		$this->saveModules();
+
 		if(!$this->isNew()) {
 			return true;
 		}
-		
+
 		return $this->setDefaultPermissions();		
 	}
 	
@@ -126,6 +124,43 @@ class Group extends AclOwnerEntity {
 		}
 		
 		return parent::internalDelete();
+	}
+
+
+	public function getModules() {
+		$modules = [];
+
+		$mods = Module::find()
+							->select('id,level')
+							->fetchMode(\PDO::FETCH_ASSOC)
+							->join('core_acl_group', 'acl_g', 'acl_g.aclId=m.aclId')
+							->where(['acl_g.groupId' => $this->id]);
+
+		foreach($mods as $m) {
+			$modules[$m['id']] = $m['level'];
+		}
+
+		return $modules;
+	}
+
+	private $setModules;
+
+	public function setModules($modules) {
+		$this->setModules = $modules;
+	}
+
+	private function saveModules() {
+		if(!isset($this->setModules)) {
+			return true;
+		}
+
+		foreach($this->setModules as $moduleId => $level) {
+			$module = Module::findById($moduleId);
+			$module->setAcl([
+				$this->id => $level
+			]);
+			$module->save();
+		}
 	}
 
 }

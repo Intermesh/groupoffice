@@ -28,8 +28,6 @@ go.Modules.register("community", "bookmarks", {
 					'}';
 
 					document.getElementsByTagName('head')[0].appendChild(style);
-					
-					//document.getElementById('someElementId').className = 'cssClass';
 
 					var cls = Ext.extend(GO.panel.IFrameComponent, {
 						id: 'bookmarks-' + bookmark.id,

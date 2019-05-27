@@ -8,7 +8,7 @@ return array (
   'Open in new browser tab' => 'Open in nieuw browser tabblad',
   'Administrate categories' => 'Beheer categorieën',
   'Thumbnails' => 'Pictogrammen',
-  'Choose icon for bookmark' => 'Kies pictogram voor de bookmark',
+  'Choose icon for bookmark' => 'Upload logo',
   'Clear Logo' => 'Wis logo',
   'Show all' => 'Toon alles',
   'Shared category' => 'Gedeelde categorie',

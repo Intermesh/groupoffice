@@ -272,7 +272,7 @@ GO.email.EmailComposer = function(config) {
 	}
 	];
 								
-	var anchor = -113;
+	// var anchor = -113;
 						
 	
 	

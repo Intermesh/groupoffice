@@ -20,6 +20,16 @@ class Module extends EntityController {
 		return model\Module::class;
 	}
 	
+		
+	protected function getQueryQuery($params)
+	{
+		return parent::getQueryQuery($params)->orderBy(['sort_order' => 'ASC']);
+	}
+
+	protected function getGetQuery($params)
+	{
+		return parent::getGetQuery($params)->orderBy(['sort_order' => 'ASC']);
+	}
 	
 	public function install($params) {
 		
