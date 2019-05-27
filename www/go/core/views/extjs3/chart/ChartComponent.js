@@ -5,7 +5,8 @@ go.chart.ChartComponent = Ext.extend(Ext.BoxComponent, {
 		* The background color of the chart. Defaults to <tt>'#ffffff'</tt>.
 		*/
 //	backgroundColor: '#ffffff',
-
+	cls:'chart-container',
+	
 	initComponent : function(){
 	 go.chart.ChartComponent.superclass.initComponent.call(this);
 
