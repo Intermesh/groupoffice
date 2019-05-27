@@ -45,4 +45,12 @@ class Category extends \go\core\acl\model\AclOwnerEntity {
 	public static function getClientName() {
 		return "BookmarksCategory";
 	}
+
+	protected function internalDelete() {
+		if(!Bookmark::find()->where(['categoryId' => $this->id])->delete()) {
+			return false;
+		}
+
+		return parent::internalDelete();
+	}
 }

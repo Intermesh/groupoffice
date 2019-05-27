@@ -156,30 +156,36 @@ class Bookmark extends EntityController {
 
 	/**
 	 * updates all logos to a blob
-	 * 
-	 * 
 	 *
 	 */
 	public static function updateLogos() {
 
 		$results = GO()->getDbConnection()->select("*")->from("bm_bookmarks");
 		foreach($results as $result) {
-			
-			$bookmarkId = $result["id"];
-			$logoPath = $result["logo"];
+			$data = [];
+			$data['id'] = $result["id"];
+			$data['categoryId'] = $result["category_id"];
+			$data['createdBy'] = $result["user_id"];
+			$data['name'] = $result["name"];		
+			$data['content'] = $result["content"];
+			$data['description'] = $result["description"];
+			$data['logo'] = $result["logo"];
+			$data['openExtern'] = $result["open_extern"];
+			$data['behaveAsModule'] = $result["behave_as_module"];
 			$publicIcon = $result["public_icon"];
 
 			if($publicIcon == 0) {
-				$file = \GO()->getDataFolder()->getFile($logoPath);
+				$file = \GO()->getDataFolder()->getFile($data['logo']);
 			} else {
-				$file = \GO()->getEnvironment()->getInstallFolder()->getFile("modules/bookmarks/" . $logoPath);
+				$file = \GO()->getEnvironment()->getInstallFolder()->getFile("modules/bookmarks/" . $data['logo']);
 			}
 
 			$blob = Blob::fromFile($file);			
 			if(!$blob->save()) {
 				$errors = $blob->getValidationErrors();
 			}
-			GO()->getDbConnection()->update('bookmarks_bookmark', ['logo' => $blob->id], ['id' => $bookmarkId])->execute();		
+			$data['logo'] = $blob->id;
+			GO()->getDbConnection()->insert('bookmarks_bookmark', $data)->execute();
 		}
 	}
 }
