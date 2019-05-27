@@ -353,8 +353,11 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 //			},
 //			scope: this
 //		});
+
+		panelConfig =panelConfig || {}
+		panelConfig.package = panelClass.prototype.package;
 //		
-		GO.moduleManager._addModule(moduleName, panelClass, panelConfig || {});
+		GO.moduleManager._addModule(moduleName, panelClass, panelConfig);
 				
 		go.Router.add(new RegExp('^(' + moduleName + ")$"), function (name) {
 			var pnl = GO.mainLayout.openModule(name);
@@ -463,19 +466,25 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		for (var i = 0, l = allPanels.length; i < l; i++) {
 
-			if (this.state && this.state.indexOf(allPanels[i].moduleName) > -1)
-				items.push(GO.moduleManager.getPanel(allPanels[i].moduleName));
-			
+			var panel = GO.moduleManager.getPanel(allPanels[i].moduleName);			
+
+			if (this.state && this.state.indexOf(allPanels[i].moduleName) > -1) {
+				items.push(panel);
+			}
+				
 			menuItemConfig = {
 				id: 'go-start-menu-' + allPanels[i].moduleName,
 				moduleName: allPanels[i].moduleName,
 				text: allPanels[i].title,
-				iconCls: 'go-menu-icon-' + allPanels[i].moduleName,
+				//iconCls: 'go-menu-icon-' + allPanels[i].moduleName,
+				iconStyle: "background-position: center middle; background-image: url("+go.Jmap.downloadUrl('core/moduleIcon/' + (panel.package || "legacy") + "/" + allPanels[i].moduleName)+")",
+				//icon: ,
 				handler: function (item, e) {
 					this.openModule(item.moduleName);
 				},
 				scope: this
 			};
+			console.warn(menuItemConfig)
 
 			if (!allPanels[i].admin) {
 				if (!this.state)
