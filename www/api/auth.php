@@ -194,7 +194,7 @@ try {
 		
 		//Server side cookie worked better on safari. Client side cookies were removed on reboot.
 		$expires = !empty($data['rememberLogin']) ? strtotime("+1 year") : 0;
-		setcookie('accessToken', $token->accessToken, $expires, null, Request::get()->getHost(), false, false);
+		setcookie('accessToken', $token->accessToken, $expires, "/", Request::get()->getHost(), false, false);
 		
 		output($response, 201, "Authentication is complete, access token created.");
 	} 
