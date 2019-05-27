@@ -484,7 +484,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				},
 				scope: this
 			};
-			console.warn(menuItemConfig)
 
 			if (!allPanels[i].admin) {
 				if (!this.state)

@@ -1010,4 +1010,5 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'Use authentication' => 'Gebruik authenticatie',
   'Verify certificate' => 'Verifieer certificaat',
   'Group defaults' => 'Standaardwaarden groepen',
+  'Default permissions' => 'Standaardrechten'
 );

@@ -59,14 +59,13 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 					iconCls: 'ic-settings',
 					tooltip: t("Group defaults"),
 					handler: function() {
-						var module = go.Modules.get("core", "core"),			
-							serverInfo = module.entities.find(function(serverInfo) {
-								return serverInfo.name == "Group";
-							});
+						var module = go.Modules.get("core", "core");
+
+						var win = new go.defaultpermissions.ShareWindow({
+							forEntityStore: "Group"
+						});
 						
-						var win = new go.defaultpermissions.ShareWindow();
-						win.entity = "Group";
-						win.load(serverInfo.defaultAclId).show();
+						win.load(module.id).show();		
 
 					}
 				}

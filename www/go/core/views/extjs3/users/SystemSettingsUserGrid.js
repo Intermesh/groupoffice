@@ -204,12 +204,13 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					}, {
 						itemId: "share",
 						iconCls: 'ic-share',
-						text: t("Share"),
+						text: t("Permissions"),
 						handler: function () {
-							var win = new go.permissions.ShareWindow({
+							var win = new go.users.PermissionsDialog({
 								showLevels: false
 							});
-							win.load(this.moreMenu.record.data.personalGroup.aclId).show();
+							console.warn(this.moreMenu.record.data.personalGroup.id);
+							win.load(this.moreMenu.record.data.personalGroup.id).show();
 						},
 						scope: this
 					},{
