@@ -17,4 +17,7 @@ return array (
   'Code is required' => 'Code is verplicht',
   'Not found' => 'Niet gevonden',
   'Invalid code' => 'Ongeldige code',
+  'Secret' => 'Geheim',
+  'Verify' => 'Verifiëren',
+  'Enable google authenticator' => 'Google Authenticator inschakelen',
 );

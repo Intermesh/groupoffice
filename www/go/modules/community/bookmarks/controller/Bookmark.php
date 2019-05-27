@@ -153,5 +153,42 @@ class Bookmark extends EntityController {
 		$response['description']=\GO\Base\Util\StringHelper::cut_string($response['description'], 255, true, "");
 		return $response;
 	}
+
+	/**
+	 * updates all logos to a blob
+	 * 
+	 * 
+	 *
+	 */
+	public static function updateLogos() {
+		$query = "SELECT * FROM `bm_bookmarks`";
+		$stmnt = \GO::getDbConnection()->prepare($query);
+		$stmnt->execute();
+		$results = $stmnt->fetchAll(\PDO::FETCH_ASSOC);
+		foreach($results as $result) {
+			$bookmarkId = $result["id"];
+			$logoPath = $result["logo"];
+			$publicIcon = $result["public_icon"];
+
+			if($publicIcon == 0) {
+				$path = "/var/lib/groupoffice/" . $logoPath;
+			} else {
+				$path = "/usr/share/groupoffice/modules/bookmarks/" . $logoPath;
+			}
+
+			$filename = basename($path);
+			$contents = file_get_contents($path,FILE_USE_INCLUDE_PATH);
+
+			$blob = Blob::fromString($contents);
+			$blob->name = $filename;
+			$blob->type = "image/x-icon";
+			if(!$blob->save()) {
+				$errors = $blob->getValidationErrors();
+			}
+			$blobId = $blob->id;
+			$updatestmt = \GO::getDbConnection()->prepare('UPDATE bookmarks_bookmark SET logo = ? WHERE id = ?');
+			$updatestmt->execute([$blobId,$bookmarkId]);
+		}
+	}
 }
 

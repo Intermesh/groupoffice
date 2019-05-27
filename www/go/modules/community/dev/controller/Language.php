@@ -33,6 +33,7 @@ class Language extends Controller {
 		$rootFolder = Environment::get()->getInstallFolder();
 
 		$coreFiles = $rootFolder->getFolder("views/Extjs3/javascript")->find('/.*\.js/', false);
+		$coreFiles = array_merge($coreFiles, $rootFolder->getFolder("go/core/views/extjs3")->find('/.*\.js/', false));
 
 		$csvFile = File::tempFile('csv');
 
@@ -160,7 +161,7 @@ class Language extends Controller {
 	 * or with docker compose:
 	 * 
 	 * ```
-	 * docker-compose exec --user www-data groupoffice php cli.php community/dev/Language/import --path=/path/to/lang.csv
+	 * docker-compose exec --user root groupoffice-master php cli.php community/dev/Language/import --path=/path/to/lang.csv
 	 * ```
 	 * 
 	 * @param type $params
@@ -235,21 +236,23 @@ class Language extends Controller {
 			foreach ($modules as $module => $translations) {
 				if ($package == "legacy") {
 					$langFilePath = "modules/" . $module . "/language/" . $lang . ".php";
-				} else {
+				} else if($package == "core"){
+					$langFilePath = "go/core/language/" . $lang . ".php";
+				}else {
 					$langFilePath = "go/modules/" . $package . "/" . $module . "/language/" . $lang . ".php";
 				}
 				
 				
-				$file = $rootFolder->getFile($langFilePath);
+				$langfile = $rootFolder->getFile($langFilePath);
 				
-				if ($file->exists()) {
-					$existingTranslations = require($file->getPath());
+				if ($langfile->exists()) {
+					$existingTranslations = require($langfile->getPath());
 					
 					$translations = array_merge($existingTranslations, $translations);
 				}
 				echo "Writing: ".$langFilePath."\n";
 				
-				$file->putContents("<?php\nreturn ".var_export($translations, true).";\n");
+				$langfile->putContents("<?php\nreturn ".var_export($translations, true).";\n");
 			}
 		}
 		

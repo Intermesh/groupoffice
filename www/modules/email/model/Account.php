@@ -321,6 +321,9 @@ class Account extends \GO\Base\Db\ActiveRecord {
 				$decrypted = Request::GetAuthPassword();
 			}else
 			{			
+				if(empty($this->password)) {
+					return "";
+				}
 				$decrypted = \GO\Base\Util\Crypt::decrypt($this->password);
 			}
 		}

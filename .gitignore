@@ -69,3 +69,4 @@
 !/www/modules/webodf
 .DS_Store
 .sass-cache
+lang.csv

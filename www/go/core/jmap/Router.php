@@ -83,7 +83,11 @@ class Router {
 		Response::get()->setClientCall($method, $clientCallId);
 		
 		if($method != "community/dev/Debugger/get") {
-			App::get()->debug("Processing method " . $method . ", call ID: " . $clientCallId);
+			//App::get()->debug("Processing method " . $method . ", call ID: " . $clientCallId);
+			GO()->getDebugger()->groupEnd();	
+			GO()->getDebugger()->groupCollapsed($method .',  ID: '. $clientCallId );			
+			GO()->getDebugger()->debug("request:");
+			GO()->getDebugger()->debug($params);			
 		}
 		
 		try {

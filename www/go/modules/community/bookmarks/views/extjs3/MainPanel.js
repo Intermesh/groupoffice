@@ -114,15 +114,16 @@ go.modules.community.bookmarks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		});
 
 			//add it to the main panel's items.
-			this.tbar = new Ext.Toolbar([{
+			this.tbar = new Ext.Toolbar([this.addButton = new Ext.Button({
 				iconCls: 'btn-add',
 				text: t("Add"),
 				handler: function(){
+					//this.addButton.setDisabled(true);
 					var dlg = new go.modules.community.bookmarks.BookmarksDialog();
 					dlg.show();
 				},
 				scope:this
-			},{
+			}),{
 				text: t("Toggle view"),
 				iconCls: 'btn-thumbnails',
 				handler: function(){

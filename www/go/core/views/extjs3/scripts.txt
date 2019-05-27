@@ -143,8 +143,10 @@ groups/SystemSettingsGroupGrid.js
 groups/GroupDialog.js
 groups/GroupUserGrid.js
 groups/GroupCombo.js
+groups/GroupModuleGrid.js
 
 users/UserDefaultsWindow.js
+users/PermissionsDialog.js
 users/SystemSettingsUserGrid.js
 users/CreateUserAccountPanel.js
 users/CreateUserPasswordPanel.js

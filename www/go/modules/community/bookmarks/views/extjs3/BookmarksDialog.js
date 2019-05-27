@@ -14,34 +14,20 @@
 go.modules.community.bookmarks.BookmarksDialog = Ext.extend(go.form.Dialog,{
 	entityStore: "Bookmark",
 	title: t("Bookmark"),
+	focus: function() {
+		this.formPanel.form.findField("content").focus();
+	},
 	initFormItems: function () {
 		var thumbExample = null;
 		var items = [{
 			xtype: "fieldset",
-			items: [ // de invoervelden
-			this.selectCategory = new go.form.ComboBox({
-				fieldLabel: t("Category"),
-				hiddenName:'categoryId',
-				anchor:'100%',
-				store: new go.data.Store({
-					fields: ['id', {name: 'creator', type: "relation"}, 'aclId', "name"],
-					entityStore: "BookmarksCategory",
-				}),
-				displayField:'name',
-				valueField:'id',
-				triggerAction: 'all',
-				editable: false,
-				allowBlank: false,
-				selectOnFocus:true,
-				forceSelection: true,
-				emptyText: t("Please select..."),
-				mode:'remote'
-			}), {
+			items: [new go.modules.community.bookmarks.BookmarkCombo(), 
+			{
 				name: 'content',
 				xtype: 'textfield',
 				fieldLabel: 'URL',
 				anchor: '100%',
-				value:'http://',
+				emptyText: 'http://example.com',
 				allowBlank: false,
 				validator: function(value) {
 					var urlRegexp = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/;

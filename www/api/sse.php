@@ -17,7 +17,7 @@ require("../vendor/autoload.php");
 App::get()->setAuthState(new State());
 
 //Hard code debug to false to prevent spamming of log.
-App::get()->getDebugger()->enabled = true;
+App::get()->getDebugger()->enabled = false;
 
 header('Cache-Control: no-cache');
 header('Pragma: no-cache');

@@ -53,8 +53,6 @@ class Debugger {
 	 * @var string Full path on FS
 	 */
 	public $logPath;
-	
-	
 
 	/**
 	 * The debug entries as strings
@@ -72,6 +70,22 @@ class Debugger {
 			//GO is not configured / installed yet.
 			$this->enabled = true;
 		}
+	}
+
+	protected $currentGroup;
+	protected $groupStartTime;
+
+	public function groupCollapsed($name) {		
+		$this->entries[] = ['groupCollapsed', $name];
+		$this->currentGroup = &$this->entries[count($this->entries)-1][1];
+		$this->groupStartTime = $this->getTimeStamp();
+	}
+
+	public function groupEnd(){
+		$time = $this->getTimeStamp() - $this->groupStartTime;
+		$this->currentGroup .= ', time: '.$time.'ms';
+
+		$this->entries[] = ['groupEnd', null];
 	}
 
 	/**
@@ -125,9 +139,10 @@ class Debugger {
 			$mixed = call_user_func($mixed);
 		}elseif(is_object($mixed) && method_exists($mixed, '__toString')) {
 			$mixed = (string) $mixed;
-		}elseif (!is_scalar($mixed)) {
-			$mixed = print_r($mixed, true);
 		}
+		// elseif (!is_scalar($mixed)) {
+		// 	$mixed = print_r($mixed, true);
+		// }
 		
 		$bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 7 + $traceBackSteps);
 		
@@ -159,21 +174,22 @@ class Debugger {
 			$caller['line'] = '[unknown line]';
 		}
 		
-		$entry = "[" . $this->getTimeStamp() . "][" . $caller['class'] . ":".$lastCaller['line']."] " . $mixed;
+		//$entry = "[" . $this->getTimeStamp() . "][" . $caller['class'] . ":".$lastCaller['line']."] " . $mixed;
 
 		if(!empty($this->logPath)) {
 			$debugLog = new Fs\File($this->logPath);
 
 			if($debugLog->isWritable()) {
-				$debugLog->putContents($entry."\n", FILE_APPEND);
+				if (!is_scalar($mixed)) {
+					$print = print_r($mixed, true);
+				} else{
+					$print = $mixed;
+				}
+				$debugLog->putContents($print."\n", FILE_APPEND);
 			}
 		}
-		
-//		if(Environment::get()->isCli()) {
-//			echo $entry . "\n";
-//		}
-		
-		$this->entries[] = [$level, $entry];
+
+		$this->entries[] = [$level, $mixed];
 		
 	}
 
@@ -183,11 +199,11 @@ class Debugger {
 	 * @param string $message
 	 */
 	public function debugTiming($message) {
-		$this->debug($this->getTimeStamp() . ' ' . $message);
+		$this->debug($this->getTimeStamp() . 'ms ' . $message);
 	}
 
-	private function getTimeStamp() {
-		return intval(($this->getMicroTime() - $_SERVER["REQUEST_TIME_FLOAT"])*1000) . 'ms';
+	public function getTimeStamp() {
+		return intval(($this->getMicroTime() - $_SERVER["REQUEST_TIME_FLOAT"])*1000);
 	}
 
 	public function debugCalledFrom($limit = 10) {

@@ -59,14 +59,13 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 					iconCls: 'ic-settings',
 					tooltip: t("Group defaults"),
 					handler: function() {
-						var module = go.Modules.get("core", "core"),			
-							serverInfo = module.entities.find(function(serverInfo) {
-								return serverInfo.name == "Group";
-							});
+						var module = go.Modules.get("core", "core");
+
+						var win = new go.defaultpermissions.ShareWindow({
+							forEntityStore: "Group"
+						});
 						
-						var win = new go.defaultpermissions.ShareWindow();
-						win.entity = "Group";
-						win.load(serverInfo.defaultAclId).show();
+						win.load(module.id).show();		
 
 					}
 				}
@@ -153,30 +152,18 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 							this.edit(this.moreMenu.record.id);
 						},
 						scope: this
-					},
-					
+					},					
+					"-", 
 					{
-						itemId: "share",
-						iconCls: 'ic-share',
-						text: t("Share"),
+						itemId: "delete",
+						iconCls: 'ic-delete',
+						text: t("Delete"),
 						handler: function () {
-							var win = new go.permissions.ShareWindow();
-							win.load(this.moreMenu.record.data.aclId).show();
+							this.getSelectionModel().selectRecords([this.moreMenu.record]);
+							this.deleteSelected();
 						},
 						scope: this
 					},
-					
-					"-"
-									, {
-										itemId: "delete",
-										iconCls: 'ic-delete',
-										text: t("Delete"),
-										handler: function () {
-											this.getSelectionModel().selectRecords([this.moreMenu.record]);
-											this.deleteSelected();
-										},
-										scope: this
-									},
 				]
 			})
 		}

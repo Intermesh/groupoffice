@@ -642,6 +642,35 @@ use const GO_CONFIG_FILE;
 			GO()->getDatabase()->getTable('core_acl_group_changes')->truncate();
 			GO()->getDbConnection()->insert('core_acl_group_changes', (new Query())->select("null, aclId, groupId, '0', null")->from("core_acl_group"))->execute();
 		}
+
+		/**
+		 * Download method for module icons
+		 * 
+		 * /api/download.php?blob=core/moduleIcon/community/addressbook
+		 */
+		public function downloadModuleIcon($package, $name) {
+
+			if($package == "legacy") {
+				$file = GO()->getEnvironment()->getInstallFolder()->getFile('modules/' . $name .'/themes/Default/images/'.$name.'.png');
+				if(!$file->exists()) {
+					$file = GO()->getEnvironment()->getInstallFolder()->getFile('modules/' . $name .'/views/Extjs3/themes/Default/images/'.$name.'.png');
+				}	
+
+				if(!$file->exists()) {
+					$file = GO()->getEnvironment()->getInstallFolder()->getFile('modules/' . $name .'/themes/Default/'.$name.'.png');
+				}	
+
+				
+
+			} else {
+				$file = GO()->getEnvironment()->getInstallFolder()->getFile('go/modules/' . $package . '/' . $name .'/icon.png');	
+			}
+
+			if(!$file->exists()) {
+				$file = GO()->getEnvironment()->getInstallFolder()->getFile('views/Extjs3/themes/Paper/img/default-avatar.svg');
+			}
+			$file->output(true, true, ['Content-Disposition' => 'inline; filename="module.svg"']);
+		}
 	}
 }
 

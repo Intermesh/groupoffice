@@ -510,7 +510,7 @@ abstract class Property extends Model {
 	 * @param array $properties If given only these properties will be checked for modifications.
 	 * @return array ["propName" => [newval, oldval]]
 	 */
-	public function getModified($properties = []) {
+	public function getModified(array $properties = []) {
 		$modified = [];
 		foreach ($this->oldProps as $key => $oldValue) {		
 			if (!empty($properties) && !in_array($key, $properties)) {

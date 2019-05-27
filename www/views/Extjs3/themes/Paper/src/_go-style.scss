@@ -1412,10 +1412,7 @@ table[id^="comments-ext"] b {
 .x-grid3-cell {
 	.trigger {
 		@extend %icon;
-		position:absolute;
-		right: 1px;
-		top:1px;
-		padding: dp(16) 0 dp(16) dp(4);
+		float: right;
 	}
 }
 

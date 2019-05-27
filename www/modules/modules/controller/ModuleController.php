@@ -97,6 +97,7 @@ class ModuleController extends AbstractJsonController{
 //					'buyEnabled'=>!GO::scriptCanBeDecoded() || 
 //							($module->appCenter() && (\GO\Professional\License::isTrial() || \GO\Professional\License::moduleIsRestricted($module->name())!==false)),
 				
+					'localizedPackage'=>$module->getPackage(),
 					'package'=>$module->getPackage(),
 					'enabled'=>$model && $model->enabled,
 					'isRefactored' => true,
@@ -118,8 +119,8 @@ class ModuleController extends AbstractJsonController{
 					'aclId'=>$model ? $model->aclId : 0,
 //					'buyEnabled'=>!GO::scriptCanBeDecoded() || 
 //							($module->appCenter() && (\GO\Professional\License::isTrial() || \GO\Professional\License::moduleIsRestricted($module->name())!==false)),
-				
-					'package'=>$module->package(),
+					'package' => 'legacy',
+					'localizedPackage'=>$module->package(),
 					'enabled'=>$model && $model->enabled,
 					'not_installable'=> !$module->isInstallable(),
 					'sort_order' => ($model && $model->sort_order)?$model->sort_order:''

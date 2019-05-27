@@ -45,6 +45,17 @@ abstract class AclOwnerEntity extends AclEntity {
 		return parent::internalSave();
 	}
 
+	private $aclChanges;
+
+	/**
+	 * This is set with the new and old groupLevel values
+	 * 
+	 * @var array [groupId => [newLevel, oldLevel]]
+	 */
+	protected function getAclChanges() {
+		return $this->aclChanges;
+	}
+
 	private function saveAcl() {
 		if(!isset($this->setAcl)) {
 			return true;
@@ -56,6 +67,22 @@ abstract class AclOwnerEntity extends AclEntity {
 
 		foreach($this->setAcl as $groupId => $level) {
 			$a->addGroup($groupId, $level);
+		}
+
+		
+		$mod = $a->getModified(['groups']);
+		if(isset($mod['groups'])) {
+			$this->aclChanges = [];
+			foreach($mod['groups'][0] as $new) {
+				$this->aclChanges[$new->groupId] = [$new->level, null];
+			}
+			foreach($mod['groups'][1] as $old) {
+				if(!isset($this->aclChanges[$new->groupId])) {
+					$this->aclChanges[$new->groupId] = [null, $old->level];
+				} else {
+					$this->aclChanges[$new->groupId][1] = $old->level;
+				}
+			}
 		}
 
 		return $a->save();

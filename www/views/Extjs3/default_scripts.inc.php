@@ -181,7 +181,6 @@ if ($cacheFile->exists()) {
   }
 
 	$rootFolder = new Folder(GO::config()->root_path);
-	
 	foreach ($scripts as $script) {
 
 		if (GO::config()->debug) {

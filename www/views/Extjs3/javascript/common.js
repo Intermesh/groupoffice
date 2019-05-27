@@ -65,7 +65,7 @@ GO.util.stringToFunction = function(str) {
  * @param {string} package
  * @returns {t.l|GO..lang}
  */
-function t(str, module, package) {
+function t(str, module, package, dontFallBack) {
 	
 	if(module && !package) {
 		package = "legacy";
@@ -79,6 +79,9 @@ function t(str, module, package) {
 	}
 	
 	if(!GO.lang[package] || !GO.lang[package][module]) {
+		if(dontFallBack) {
+			return str;
+		}
 		return t(str, "core", "core");
 	}
 	
@@ -86,9 +89,9 @@ function t(str, module, package) {
   
   if(l[str]) {
     return l[str]
-  }
+	}
   
-  if(module != "core" || package != "core"){
+  if((module != "core" || package != "core") && !dontFallBack){
     return t(str, "core", "core");
   } else
   {

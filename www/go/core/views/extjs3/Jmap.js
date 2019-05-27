@@ -8,6 +8,8 @@ go.Jmap = {
 
 	timeout: null,
 
+	paused: 0,
+
 	nextCallId: function () {
 		this.callId++;
 
@@ -18,26 +20,11 @@ go.Jmap = {
 		this.scheduleRequest({
 			method: 'community/dev/Debugger/get',
 			params: {},
-			callback: function(options, success, response, clientCallId) {
-				
-				console.group(clientCallId);
-				response.forEach(function(r) {
-					switch(r[0]) {
-						case 'error':
-							console.error(r[1]);
-							break;
-						case 'warn':
-							console.warn(r[1]);
-							break;
-						case 'info':
-							console.info(r[1]);
-							break;
-						default:							
-							console.log(r[1]);
-							break;
-					}
+			callback: function(options, success, response, clientCallId) {		
+				response.forEach(function(r) {					
+					var method = r.shift();								
+					console[method].apply(null, r);
 				});
-				console.groupEnd();
 			}
 		});
 	},
@@ -235,7 +222,7 @@ go.Jmap = {
 	 * Pause request execution
 	 */
 	pause : function() {
-		this.paused = true;
+		this.paused++;
 		if (this.timeout) {
 			clearTimeout(this.timeout);
 		}
@@ -245,7 +232,14 @@ go.Jmap = {
 	 * Continue request event execution as the next macro task.
 	 */
 	continue: function() {
-		this.paused = false;
+		if(this.paused>0) {
+			this.paused--;
+		}
+
+		if(this.paused > 0)
+		{
+			return;
+		}
 		if (this.timeout) {
 			clearTimeout(this.timeout);
 		}
