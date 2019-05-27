@@ -656,6 +656,12 @@ use const GO_CONFIG_FILE;
 					$file = GO()->getEnvironment()->getInstallFolder()->getFile('modules/' . $name .'/views/Extjs3/themes/Default/images/'.$name.'.png');
 				}	
 
+				if(!$file->exists()) {
+					$file = GO()->getEnvironment()->getInstallFolder()->getFile('modules/' . $name .'/themes/Default/'.$name.'.png');
+				}	
+
+				
+
 			} else {
 				$file = GO()->getEnvironment()->getInstallFolder()->getFile('go/modules/' . $package . '/' . $name .'/icon.png');	
 			}
