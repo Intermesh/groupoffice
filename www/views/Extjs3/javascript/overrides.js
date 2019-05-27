@@ -366,6 +366,7 @@ Ext.override(Ext.data.GroupingStore,{
 
 Ext.override(Ext.form.CompositeField, {
 	origFocus : Ext.form.CompositeField.prototype.focus,
+	cascade : Ext.Container.prototype.cascade,
 	focus : function() {
 		var first = this.items.find(function(item) {
 			return item.isFormField && !item.disabled && item.isVisible();

@@ -32,13 +32,10 @@ $updates['201901301035'][] =  "ALTER TABLE `bm_categories` ADD INDEX `show_in_st
 $updates['201901301035'][] = function() {
 	\go\core\db\Utils::runSQLFile(\GO()->getEnvironment()->getInstallFolder()->getFile("go/modules/community/bookmarks/install/install.sql"));
 };
-$updates['201905221222'][] = '
+
+$updates['201905241053'][] = '
 INSERT INTO bookmarks_category (id,createdBy, aclId, name) 
 SELECT id, user_id, acl_id, name FROM bm_categories
-';
-$updates['201905221222'][] = '
-INSERT INTO bookmarks_bookmark (id, categoryId, createdBy, name,content,description,logo,openExtern,behaveAsModule) 
-SELECT id, category_id,user_id, name, content, description, logo, open_extern, behave_as_module FROM bm_bookmarks
 ';
 
 $updates['201905241053'][] = function() {
