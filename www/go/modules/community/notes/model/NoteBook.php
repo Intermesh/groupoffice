@@ -14,12 +14,11 @@ class NoteBook extends AclOwnerEntity {
 						->addTable("notes_note_book");
 	}
 
-	protected function internalSave()
-	{
+	protected function internalDelete() {
 		if(!Note::find()->where(['noteBookId' => $this->id])->delete()) {
 			return false;
 		}
-		return parent::internalSave();
+
+		return parent::internalDelete();
 	}
-	
 }
