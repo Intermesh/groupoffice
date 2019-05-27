@@ -242,16 +242,16 @@ class Language extends Controller {
 				}
 				
 				
-				$file = $rootFolder->getFile($langFilePath);
+				$langfile = $rootFolder->getFile($langFilePath);
 				
-				if ($file->exists()) {
-					$existingTranslations = require($file->getPath());
+				if ($langfile->exists()) {
+					$existingTranslations = require($langfile->getPath());
 					
 					$translations = array_merge($existingTranslations, $translations);
 				}
 				echo "Writing: ".$langFilePath."\n";
 				
-				$file->putContents("<?php\nreturn ".var_export($translations, true).";\n");
+				$langfile->putContents("<?php\nreturn ".var_export($translations, true).";\n");
 			}
 		}
 		
