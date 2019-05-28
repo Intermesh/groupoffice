@@ -23,7 +23,7 @@ class MemoryFile extends File{
 		return parent::__construct($filename);
 	}
 	
-	public function getContents() {
+	public function getContents($offset = 0, $maxlen = null) {
 		return $this->data;
 	}
 	public function contents() {

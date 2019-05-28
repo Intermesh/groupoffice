@@ -8,6 +8,7 @@ use go\core\Environment;
 use go\core\fs\Folder;
 use go\core\model\Module;
 use ReflectionClass;
+use go\core\fs\File;
 
 /**
  * Finds classes within Group-Office.
@@ -147,7 +148,31 @@ class ClassFinder {
 		return $r;
 	}
 
-	private function folderToClassNames(Folder $folder, $namespace) {
+	private function hasLicense(File $file, $namespace) {
+		//check for pro license on business package
+		if(!strstr($namespace, "go\\modules\\business")) {
+			return true;
+		}
+
+		//check data for presence of ionCube in code.
+		// $data = $file->getContents(0, 100);
+		$data = file_get_contents($file->getPath(), false, null, 0, 100);
+		if(strpos($data, 'ionCube') === false) {			
+			return true;
+		}
+
+		if(!extension_loaded('ionCube Loader')) {
+			return false;
+		}
+		
+		if(!GO()->getEnvironment()->getInstallFolder()->getFile('groupoffice-pro-' . substr(GO()->getVersion(), 0, 3) .' license.txt')->exists()) {
+			return false;
+		}
+
+		return true;
+	}
+
+	private function folderToClassNames(Folder $folder, $namespace) {	
 
 		$classes = [];
 		foreach ($folder->getFiles() as $file) {
@@ -158,6 +183,10 @@ class ClassFinder {
 				$firstChar = substr($name, 0, 1);
 				if($firstChar !== strtoupper($firstChar)) {
 					//skip filenames that start with a lower case char
+					continue;
+				}
+
+				if(!$this->hasLicense($file, $namespace)) {
 					continue;
 				}
 
