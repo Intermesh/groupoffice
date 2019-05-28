@@ -21,13 +21,13 @@ class EmailAddress extends Property {
 	 * 
 	 * @var int
 	 */							
-	public $id;
+	protected $id;
 
 	/**
 	 * 
 	 * @var int
 	 */							
-	public $contactId;
+	protected $contactId;
 
 	/**
 	 * 

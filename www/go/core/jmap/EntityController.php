@@ -214,7 +214,7 @@ abstract class EntityController extends Controller {
 		
 		$ids = [];		
 		foreach($idsQuery as $record) {
-			$ids[] = $record->getId();
+			$ids[] = $record->id();
 		}
 
 		$response = [
@@ -386,7 +386,7 @@ abstract class EntityController extends Controller {
 
 		foreach($query as $e) {
 			$arr = $e->toArray();
-			$arr['id'] = $e->getId();
+			$arr['id'] = $e->id();
 			$result['list'][] = $arr; 
 			$foundIds[] = $arr['id'];
 		}
@@ -483,7 +483,7 @@ abstract class EntityController extends Controller {
 			if ($entity->save()) {
 				$entityProps = new ArrayObject($entity->toArray());
 				$diff = $entityProps->diff($properties);
-				$diff['id'] = $entity->getId();
+				$diff['id'] = $entity->id();
 				
 				$result['created'][$clientId] = empty($diff) ? null : $diff;
 			} else {				

@@ -19,7 +19,11 @@ class ModelHelper {
 			$model->{$propName} = $value;						
 		}
 	}
-	
+
+	public static function setValue(Model $model, $propName, $value) {
+		$model->{$propName} = $value;								
+	}
+
 	/**
 	 * Helper function to get a value from an object externally.
 	 * 

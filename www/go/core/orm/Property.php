@@ -18,6 +18,7 @@ use PDO;
 use PDOException;
 use ReflectionClass;
 use function GO;
+use go\core\data\ModelHelper;
 
 /**
  * Property model
@@ -154,8 +155,18 @@ abstract class Property extends Model {
 			foreach ($relation->keys as $from => $to) {
 				$where[$to] = $this->$from;
 			}			
-
-			if ($relation->many) {
+			if($relation->mapped) {
+				$values = $cls::internalFind()->andWhere($where)->all();
+				if(!count($values)) {
+					$values = new \stdClass;
+				} else{
+					$o = [];
+					foreach($values as $v) {
+						$o[$v->id()] = $v;
+					}
+					$this->{$relation->name} = $o;
+				}
+			} else if ($relation->many) {
 				$props = $this->isNew() ? [] : $cls::internalFind()->andWhere($where)->all();
 				$this->{$relation->name} = $props;
 			} else if(!$this->isNew()){
@@ -236,9 +247,18 @@ abstract class Property extends Model {
 
 		return $mapping;
 	}
+
+	/**
+	 * Get ID which is are the primary keys combined with a "-".
+	 * 
+	 * @return string eg. "1" or with multiple keys: "1-2"
+	 */
+	public function id() {		
+		$keys = $this->primaryKeyValues();
+		return count($keys) > 1 ? implode("-", array_values($keys)) : array_values($keys)[0];
+	}
 	
-	protected static function getReadableProperties() {
-		
+	protected static function getReadableProperties() {		
 		$cacheKey = 'property-getReadableProperties-' . str_replace('\\', '-', static::class);
 		
 		$props = GO()->getCache()->get($cacheKey);
@@ -249,7 +269,6 @@ abstract class Property extends Model {
 
 			//add dynamic relations		
 			foreach(static::getMapping()->getProperties() as $propName => $type) {
-
 				//do property_exists because otherwise it will add protected properties too.
 				if(!property_exists(static::class, $propName) && !in_array($propName, $props)) {
 					$props[] = $propName;
@@ -349,14 +368,6 @@ abstract class Property extends Model {
 				return !in_array($propName, ['modified', 'oldValues', 'validationErrors']);
 			});
 
-			//add dynamic relations		
-			foreach(static::getMapping()->getProperties() as $propName => $type) {			
-				//Add protected props
-				if(!in_array($propName, $props)) {
-					$props[] = $propName;
-				}
-			}		
-			
 			GO()->getCache()->set($cacheKey, $props);
 		}
 		return $props;
@@ -385,6 +396,38 @@ abstract class Property extends Model {
 		self::buildSelect($query, $fetchProperties);
 
 		return $query;
+	}
+
+	/**
+	 * Find by ID's. 
+	 * 
+	 * It will search on the primary key field of the first mapped table.
+	 * 
+	 * @exanple
+	 * ```
+	 * $note = Note::findById(1);
+	 * 
+	 * //If a key has more than one column they can be combined with a "-". eg. "1-2"
+	 * $models = ModelWithDoublePK::findById("1-1");
+	 * ```
+	 * 
+	 * @param string $id 
+	 * @param string[] $properties
+	 * @return static
+	 * @throws Exception
+	 */
+	protected static function internalFindById($id, array $properties = []) {
+		$tables = static::getMapping()->getTables();
+		$primaryTable = array_shift($tables);
+		$keys = $primaryTable->getPrimaryKey();
+		
+		$query = static::internalFind($properties);		
+		
+		$ids = explode('-', $id);
+		$keys = array_combine($keys, $ids);
+		$query->where($keys);
+		
+		return $query->single();
 	}
 
 	protected static $propNames = [];
@@ -430,10 +473,10 @@ abstract class Property extends Model {
 			
 			if($table->isUserTable && !GO()->getUserId()) {
 				continue;
-			}
+			}		
 			
 			foreach($table->getMappedColumns() as $column) {		
-				if($column->primary || in_array($column->name, $fetchProperties)) {
+				if($column->primary || in_array($column->name, $fetchProperties) || static::isProtectedProperty($column->name)) {
 					$query->select($table->getAlias() . "." . $column->name, true);				
 				}
 			}
@@ -803,23 +846,31 @@ abstract class Property extends Model {
 		
 		//copy for overloaded properties because __get can't return by reference because we also return null sometimes.
 		$models = $this->{$relation->name};
+
+		//Get array of id's for checking existing values
+		$ids = array_map(function($m){
+			return $m->id();
+		}, $models);
 		
 		$this->relatedValidationErrorIndex = 0;
-		//remove old model if it's replaced
+
+		//remove models that are not present in	
 		$modified = $this->getModified([$relation->name]);
 		if (isset($modified[$relation->name][1])) {			
 			foreach ($modified[$relation->name][1] as $oldProp) {
 				
 				//if not in current value then delete it.
 				//objects are compared by reference. 
-				if (!in_array($oldProp, $models) && !$oldProp->internalDelete()) {
+				if (!in_array($oldProp->id(), $ids) && !$oldProp->internalDelete()) {
 					$this->relatedValidationErrors = $oldProp->getValidationErrors();
 					return false;
 				}
 			}
 		}
 		
+		
 		if(isset($models)) {
+			$this->{$relation->name} = [];
 			foreach ($models as &$newProp) {
 				
 				//Check for invalid input
@@ -835,8 +886,15 @@ abstract class Property extends Model {
 
 				$this->savedPropertyRelations[] = $newProp;
 				$this->relatedValidationErrorIndex++;
+
+				if(!$relation->mapped) {
+					$this->{$relation->name}[] = $newProp;
+				} else
+				{
+					$this->{$relation->name}[$newProp->id()] = $newProp;
+				}
+
 			}
-			$this->{$relation->name} = $models;
 		}
 
 		return true;
@@ -1222,12 +1280,18 @@ abstract class Property extends Model {
 		return parent::setValues($values);
 	}
 
+	public function setValue($name, $value) {
+		$value = $this->normalizeValue($name, $value);
+		ModelHelper::setValue($this, $name, $value);
+		return $this;
+	}
+
 	/**
 	 * Turns array values into relation models and ISO date strings into DateTime objects
 	 * 
-	 * @param type $propName
-	 * @param type $value
-	 * @return type
+	 * @param string $propName
+	 * @param mixed $value
+	 * @return mixed
 	 */
 	private function normalizeValue($propName, $value) {
 		$relation = static::getMapping()->getRelation($propName);
@@ -1237,9 +1301,17 @@ abstract class Property extends Model {
 				//if a has one relation exists then apply the new values to the existing property instead of creating a new one.
 				return $this->$propName->setValues($value);
 			} else {
-				return $relation->normalizeInput($value);
-			}
-			
+				if($relation->mapped) {
+					return $this->patch($relation, $propName, $value);
+				} else if($relation->many) {
+					foreach($value as $key => $item) {
+						$value[$key] = $this->internalNormalizeRelation($relation, $item);
+					}
+					return $value;
+				} else{
+					return $relation->normalizeInput($value);
+				}			
+			}			
 		}
 
 		$column = static::getMapping()->getColumn($propName);
@@ -1248,6 +1320,46 @@ abstract class Property extends Model {
 		}
 
 		return $value;
+	}
+
+	protected function patch(Relation $relation, $propName, $value) {
+		foreach($value as $id => $patch) {
+			if(!isset($patch)) {
+				if(!array_key_exists($id, $this->$propName)) {
+					GO()->warn("Key $id does not exist in ". static::class .'->'.$propName);
+				}
+				unset($this->$propName[$id]);
+				continue;
+			}
+
+			$this->$propName[$id] = $this->internalNormalizeRelation($relation, $patch, $id);			 
+		}
+
+		return $this->$propName;
+	}
+
+	private function internalNormalizeRelation(Relation $relation, $value, $id = null) {
+		$cls = $relation->entityName;
+		if ($value instanceof $cls) {
+			return $value;
+		}
+
+		if (is_array($value)) {
+			$propName = $relation->name;
+			if(isset($id) && isset($this->$propName[$id])) {
+				$o = $this->$propName[$id];				
+			} else {
+				$o = new $cls;
+			}
+			
+			$o->setValues($value);
+
+			return $o;
+		} else if (is_null($value)) {
+			return null;
+		} else {
+			throw new Exception("Invalid value given to relation '" . $this->name . "'. Should be an array or an object of type '" . $relation->entityName . "': " . var_export($value, true));
+		}
 	}
 
 	/**

@@ -153,6 +153,49 @@ class Mapping {
 		$this->relations[$name] = new Relation($name, $entityName, $keys, $many);
 		return $this;
 	}
+
+	/**
+	 * Add has one relation
+	 * 
+	 * @param string $name
+	 * @param string $entityName
+	 * @param array $keys
+	 * 
+	 * @return $this;
+	 */
+	public function addHasOne($name, $entityName, array $keys) {
+		$this->relations[$name] = new Relation($name, $entityName, $keys, false);
+		return $this;
+	}
+
+	/**
+	 * Add an array relation.
+	 * 
+	 * @param string $name
+	 * @param string $entityName
+	 * @param array $keys
+	 * 
+	 * @return $this;
+	 */
+	public function addArray($name, $entityName, array $keys) {
+		$this->relations[$name] = new Relation($name, $entityName, $keys, true);
+		return $this;
+	}
+
+	/**
+	 * Add a mapped relation. Index is the ID.
+	 * 
+	 * @param string $name
+	 * @param string $entityName
+	 * @param array $keys
+	 * 
+	 * @return $this;
+	 */
+	public function addMap($name, $entityName, array $keys) {
+		$this->relations[$name] = new Relation($name, $entityName, $keys, true);
+		$this->relations[$name]->mapped = true;
+		return $this;
+	}
 	
 	/**
 	 * Get all relational properties

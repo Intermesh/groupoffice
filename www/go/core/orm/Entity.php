@@ -103,16 +103,6 @@ abstract class Entity extends Property {
 		}
 		return static::internalFind($properties);
 	}
-	
-	/**
-	 * Get ID which is are the primary keys combined with a "-".
-	 * 
-	 * @return string eg. "1" or with multiple keys: "1-2"
-	 */
-	public function getId() {		
-		$keys = $this->primaryKeyValues();
-		return count($keys) > 1 ? implode("-", array_values($keys)) : array_values($keys)[0];
-	}
 
 	/**
 	 * Find by ID's. 
@@ -134,17 +124,7 @@ abstract class Entity extends Property {
 	 */
 	public static final function findById($id, array $properties = []) {
 
-		$tables = static::getMapping()->getTables();
-		$primaryTable = array_shift($tables);
-		$keys = $primaryTable->getPrimaryKey();
-		
-		$query = static::internalFind($properties);		
-		
-		$ids = explode('-', $id);
-		$keys = array_combine($keys, $ids);
-		$query->where($keys);
-		
-		return $query->single();
+		return static::internalFindById($id, $properties);
 	}
 	
 	/**
@@ -217,7 +197,7 @@ abstract class Entity extends Property {
 
 		$this->isSaving = true;
 
-//		GO()->debug(static::class.'::save()' . $this->getId());
+//		GO()->debug(static::class.'::save()' . $this->id());
 		App::get()->getDbConnection()->beginTransaction();
 			
 		if (!$this->fireEvent(self::EVENT_BEFORESAVE, $this)) {
@@ -310,7 +290,7 @@ abstract class Entity extends Property {
 
 		$this->isDeleting = true;
 		
-		//GO()->debug(static::class.'::delete() ' . $this->getId());
+		//GO()->debug(static::class.'::delete() ' . $this->id());
 
 		App::get()->getDbConnection()->beginTransaction();
 
@@ -720,4 +700,19 @@ abstract class Entity extends Property {
 		
 		return $arr;
 	}
+
+
+	// public function patch($values) {
+	// 	foreach($values as $propName => $value) {
+	// 		if(is_object($value)) {
+	// 			$this->internalPatch($propName, $value);
+	// 		} else{
+	// 			$this->setValue($propName, $value);
+	// 		}
+	// 	}
+
+	// 	return $this;
+	// }
+
+
 }

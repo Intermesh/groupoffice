@@ -274,13 +274,12 @@ class Contact extends AclItemEntity {
 		return parent::defineMapping()
 						->addTable("addressbook_contact", 'c')
 						->addUserTable("addressbook_contact_star", "s", ['id' => 'contactId'])
-						->addRelation('dates', Date::class, ['id' => 'contactId'])
-						->addRelation('phoneNumbers', PhoneNumber::class, ['id' => 'contactId'])
-						->addRelation('emailAddresses', EmailAddress::class, ['id' => 'contactId'])
-						->addRelation('addresses', Address::class, ['id' => 'contactId'])
-						->addRelation('urls', Url::class, ['id' => 'contactId'])
-						->addRelation('groups', ContactGroup::class, ['id' => 'contactId']);
-						
+						->addArray('dates', Date::class, ['id' => 'contactId'])
+						->addArray('phoneNumbers', PhoneNumber::class, ['id' => 'contactId'])
+						->addArray('emailAddresses', EmailAddress::class, ['id' => 'contactId'])
+						->addArray('addresses', Address::class, ['id' => 'contactId'])
+						->addArray('urls', Url::class, ['id' => 'contactId'])
+						->addArray('groups', ContactGroup::class, ['id' => 'contactId']);						
 	}
 	
 	public function setNameFromParts() {
