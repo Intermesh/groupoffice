@@ -11,25 +11,18 @@ use go\core\orm\Property;
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
 
-class Address extends Property {
-	
+class Address extends Property {	
 	
 	const TYPE_POSTAL = "postal";
 	const TYPE_VISIT = "visit";
 	const TYPE_WORK = "work";
 	const TYPE_HOME = "home";
-	
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $id;
 
 	/**
 	 * 
 	 * @var int
 	 */							
-	public $contactId;
+	protected $contactId;
 
 	/**
 	 * 

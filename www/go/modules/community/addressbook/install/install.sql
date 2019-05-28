@@ -1,5 +1,4 @@
 CREATE TABLE `addressbook_address` (
-  `id` int(11) NOT NULL,
   `contactId` int(11) NOT NULL,
   `type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `street` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -53,7 +52,7 @@ CREATE TABLE `addressbook_contact` (
 
 CREATE TABLE `addressbook_contact_custom_fields` (
   `id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `addressbook_contact_group` (
   `contactId` int(11) NOT NULL,
@@ -68,14 +67,12 @@ CREATE TABLE `addressbook_contact_star` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
 CREATE TABLE `addressbook_date` (
-  `id` int(11) NOT NULL,
   `contactId` int(11) NOT NULL,
   `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'birthday',
   `date` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `addressbook_email_address` (
-  `id` int(11) NOT NULL,
   `contactId` int(11) NOT NULL,
   `type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `email` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL
@@ -88,37 +85,24 @@ CREATE TABLE `addressbook_group` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
 CREATE TABLE `addressbook_phone_number` (
-  `id` int(11) NOT NULL,
   `contactId` int(11) NOT NULL,
   `type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `number` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
-CREATE TABLE `addressbook_smart_addressbook` (
-  `id` int(11) NOT NULL,
-  `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `ownedBy` int(11) NOT NULL,
-  `matchAny` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'true to show contact matching any of the conditions instead of all.'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
-
-CREATE TABLE `addressbook_smart_addressbook_filter` (
-  `id` int(11) NOT NULL,
-  `smartAddressBookId` int(11) NOT NULL,
-  `property` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `operator` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `value` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
-
 CREATE TABLE `addressbook_url` (
-  `id` int(11) NOT NULL,
   `contactId` int(11) NOT NULL,
-  `type` varchar(190) NOT NULL,
-  `url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `type` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `addressbook_user_settings` (
+  `userId` int(11) NOT NULL,
+  `defaultAddressBookId` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
 
 ALTER TABLE `addressbook_address`
-  ADD PRIMARY KEY (`id`),
   ADD KEY `contactId` (`contactId`);
 
 ALTER TABLE `addressbook_addressbook`
@@ -143,14 +127,13 @@ ALTER TABLE `addressbook_contact_group`
   ADD KEY `groupId` (`groupId`);
 
 ALTER TABLE `addressbook_contact_star`
-  ADD PRIMARY KEY (`contactId`,`userId`);
+  ADD PRIMARY KEY (`contactId`,`userId`),
+  ADD KEY `addressbook_contact_star_ibfk_2` (`userId`);
 
 ALTER TABLE `addressbook_date`
-  ADD PRIMARY KEY (`id`),
   ADD KEY `contactId` (`contactId`);
 
 ALTER TABLE `addressbook_email_address`
-  ADD PRIMARY KEY (`id`,`contactId`),
   ADD KEY `contactId` (`contactId`);
 
 ALTER TABLE `addressbook_group`
@@ -158,23 +141,15 @@ ALTER TABLE `addressbook_group`
   ADD KEY `addressBookId` (`addressBookId`);
 
 ALTER TABLE `addressbook_phone_number`
-  ADD PRIMARY KEY (`id`),
   ADD KEY `contactId` (`contactId`);
-
-ALTER TABLE `addressbook_smart_addressbook`
-  ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `addressbook_smart_addressbook_filter`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `smartAddressBookId` (`smartAddressBookId`);
 
 ALTER TABLE `addressbook_url`
-  ADD PRIMARY KEY (`id`,`contactId`),
   ADD KEY `contactId` (`contactId`);
 
+ALTER TABLE `addressbook_user_settings`
+  ADD PRIMARY KEY (`userId`),
+  ADD KEY `defaultAddressBookId` (`defaultAddressBookId`);
 
-ALTER TABLE `addressbook_address`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `addressbook_addressbook`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
@@ -182,25 +157,7 @@ ALTER TABLE `addressbook_addressbook`
 ALTER TABLE `addressbook_contact`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `addressbook_date`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
-ALTER TABLE `addressbook_email_address`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
 ALTER TABLE `addressbook_group`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
-ALTER TABLE `addressbook_phone_number`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
-ALTER TABLE `addressbook_smart_addressbook`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
-ALTER TABLE `addressbook_smart_addressbook_filter`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
-ALTER TABLE `addressbook_url`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 
@@ -211,7 +168,7 @@ ALTER TABLE `addressbook_addressbook`
   ADD CONSTRAINT `addressbook_addressbook_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`);
 
 ALTER TABLE `addressbook_contact`
-  ADD CONSTRAINT `addressbook_contact_ibfk_1` FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook` (`id`) ON DELETE RESTRICT,
+  ADD CONSTRAINT `addressbook_contact_ibfk_1` FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook` (`id`),
   ADD CONSTRAINT `addressbook_contact_ibfk_2` FOREIGN KEY (`photoBlobId`) REFERENCES `core_blob` (`id`),
   ADD CONSTRAINT `addressbook_contact_ibfk_3` FOREIGN KEY (`modifiedBy`) REFERENCES `core_user` (`id`),
   ADD CONSTRAINT `addressbook_contact_ibfk_4` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`),
@@ -219,7 +176,7 @@ ALTER TABLE `addressbook_contact`
   ADD CONSTRAINT `addressbook_contact_ibfk_6` FOREIGN KEY (`vcardBlobId`) REFERENCES `core_blob` (`id`);
 
 ALTER TABLE `addressbook_contact_custom_fields`
-  ADD CONSTRAINT `addressbook_contact_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `addressbook_contact_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;;
 
 ALTER TABLE `addressbook_contact_group`
   ADD CONSTRAINT `addressbook_contact_group_ibfk_1` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE,
@@ -236,49 +193,14 @@ ALTER TABLE `addressbook_email_address`
   ADD CONSTRAINT `addressbook_email_address_ibfk_1` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `addressbook_group`
-  ADD CONSTRAINT `addressbook_group_ibfk_1` FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook` (`id`) ON DELETE RESTRICT;
+  ADD CONSTRAINT `addressbook_group_ibfk_1` FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook` (`id`);
 
 ALTER TABLE `addressbook_phone_number`
   ADD CONSTRAINT `addressbook_phone_number_ibfk_1` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
 
-ALTER TABLE `addressbook_smart_addressbook_filter`
-  ADD CONSTRAINT `addressbook_smart_addressbook_filter_ibfk_1` FOREIGN KEY (`smartAddressBookId`) REFERENCES `addressbook_smart_addressbook` (`id`) ON DELETE CASCADE;
-
 ALTER TABLE `addressbook_url`
   ADD CONSTRAINT `addressbook_url_ibfk_1` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
-
-
-CREATE TABLE IF NOT EXISTS `addressbook_user_settings` (
-  `userId` int(11) NOT NULL,
-  `defaultAddressBookId` int(11) DEFAULT NULL,
-  PRIMARY KEY (`userId`),
-  KEY `defaultAddressBookId` (`defaultAddressBookId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
-
 
 ALTER TABLE `addressbook_user_settings`
   ADD CONSTRAINT `addressbook_user_settings_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `addressbook_user_settings_ibfk_2` FOREIGN KEY (`defaultAddressBookId`) REFERENCES `addressbook_addressbook` (`id`) ON DELETE SET NULL;
-
-
-CREATE TABLE `addressbook_contact_filter` (
-  `id` int(11) NOT NULL,
-  `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `createdBy` int(11) NOT NULL,
-  `filter` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `aclId` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
-
-
-ALTER TABLE `addressbook_contact_filter`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `aclid` (`aclId`),
-  ADD KEY `createdBy` (`createdBy`);
-
-
-ALTER TABLE `addressbook_contact_filter`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
-
-ALTER TABLE `addressbook_contact_filter`
-  ADD CONSTRAINT `addressbook_contact_filter_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`);

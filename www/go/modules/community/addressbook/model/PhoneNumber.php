@@ -19,18 +19,12 @@ class PhoneNumber extends Property {
 	const TYPE_WORK = "work";
 	const TYPE_FAX = "fax";
 	const TYPE_WORK_FAX = "workfax";
-	
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $id;
 
 	/**
 	 * 
 	 * @var int
 	 */							
-	public $contactId;
+	protected $contactId;
 
 	/**
 	 * 

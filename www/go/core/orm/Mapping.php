@@ -147,6 +147,7 @@ class Mapping {
 	 * @param string $entityName
 	 * @param array $keys
 	 * @param boolean $many
+	 * @depcreated Use addHasONe() addArray() or addMap()
 	 * @return $this
 	 */
 	public function addRelation($name, $entityName, array $keys, $many = true) {

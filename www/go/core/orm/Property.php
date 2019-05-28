@@ -844,58 +844,67 @@ abstract class Property extends Model {
 
 	private function saveRelatedHasMany(Relation $relation) {
 		
-		//copy for overloaded properties because __get can't return by reference because we also return null sometimes.
-		$models = $this->{$relation->name};
-
-		//Get array of id's for checking existing values
-		$ids = array_map(function($m){
-			return $m->id();
-		}, $models);
 		
-		$this->relatedValidationErrorIndex = 0;
-
 		//remove models that are not present in	
 		$modified = $this->getModified([$relation->name]);
-		if (isset($modified[$relation->name][1])) {			
-			foreach ($modified[$relation->name][1] as $oldProp) {
-				
-				//if not in current value then delete it.
-				//objects are compared by reference. 
-				if (!in_array($oldProp->id(), $ids) && !$oldProp->internalDelete()) {
-					$this->relatedValidationErrors = $oldProp->getValidationErrors();
-					return false;
+		if(empty($modified)) {
+			return true;
+		}
+
+		//copy for overloaded properties because __get can't return by reference because we also return null sometimes.
+		$models = $this->{$relation->name} ?? [];		
+		$this->relatedValidationErrorIndex = 0;
+
+
+		if(!$relation->mapped) {
+			//arrays will always be replaced entirely.
+			//So we delete them with one query and set all models to be inserted as new records.
+			$cls = $relation->entityName;
+			$tables = $cls::getMapping()->getTables();
+			$first = array_shift($tables);
+			$where = [];
+			foreach($relation->keys as $from => $to) {
+				$where[$to] = $this->$from;
+			}			
+			\GO()->getDbConnection()->delete($first->getName(), $where)->execute();			
+		} else{
+			if (isset($modified[$relation->name][1])) {			
+				foreach ($modified[$relation->name][1] as $oldProp) {
+					
+					//if not in current value then delete it.
+					//objects are compared by reference. 
+					if (!in_array($oldProp, $models) && !$oldProp->internalDelete()) {
+						$this->relatedValidationErrors = $oldProp->getValidationErrors();
+						return false;
+					}
 				}
 			}
 		}
 		
-		
-		if(isset($models)) {
-			$this->{$relation->name} = [];
-			foreach ($models as &$newProp) {
-				
-				//Check for invalid input
-				if(!($newProp instanceof Property)) {
-					throw new \Exception("Invalid value given for '". $relation->name ."'. Should be a GO\Orm\Property");
-				}
-				
-				$this->applyRelationKeys($relation, $newProp);
-				if (!$newProp->internalSave()) {
-					$this->relatedValidationErrors = $newProp->getValidationErrors();
-					return false;
-				}
-
-				$this->savedPropertyRelations[] = $newProp;
-				$this->relatedValidationErrorIndex++;
-
-				if(!$relation->mapped) {
-					$this->{$relation->name}[] = $newProp;
-				} else
-				{
-					$this->{$relation->name}[$newProp->id()] = $newProp;
-				}
-
+		$this->{$relation->name} = [];
+		foreach ($models as &$newProp) {
+			
+			//Check for invalid input
+			if(!($newProp instanceof Property)) {
+				throw new \Exception("Invalid value given for '". $relation->name ."'. Should be a GO\Orm\Property");
 			}
-		}
+			
+			$this->applyRelationKeys($relation, $newProp);
+			if (!$newProp->internalSave()) {
+				$this->relatedValidationErrors = $newProp->getValidationErrors();
+				return false;
+			}
+
+			$this->savedPropertyRelations[] = $newProp;
+			$this->relatedValidationErrorIndex++;
+
+			if(!$relation->mapped) {
+				$this->{$relation->name}[] = $newProp;
+			} else
+			{
+				$this->{$relation->name}[$newProp->id()] = $newProp;
+			}
+		}	
 
 		return true;
 	}
@@ -927,7 +936,12 @@ abstract class Property extends Model {
 	}
 	
 	private function recordIsNew(MappedTable $table) {		
-		foreach($table->getPrimaryKey() as $pk) {
+		$primaryKeys = $table->getPrimaryKey();
+		if(empty($primaryKeys)) {
+			//no primary key. Always insert.
+			return true;
+		}
+		foreach($primaryKeys as $pk) {
 			if(empty($this->primaryKeys[$table->getAlias()][$pk])) {
 				return true;
 			}
@@ -960,9 +974,9 @@ abstract class Property extends Model {
 			return true;
 		}		
 		
-		if(empty($table->getPrimaryKey())) {
-			throw new Exception("No primary key defined for table: '" . $table->getName() . "'");
-		}
+		// if(empty($table->getPrimaryKey())) {
+		// 	throw new Exception("No primary key defined for table: '" . $table->getName() . "'");
+		// }
 		
 		try {
 			if ($recordIsNew) {				
