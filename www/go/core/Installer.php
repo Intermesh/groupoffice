@@ -278,9 +278,8 @@ class Installer {
 		GO()->getDbConnection()->delete("core_entity", ['name' => 'GO\\Projects\\Model\\Project'])->execute();
 
 		
-		if (!$this->upgradeModules()) {
-			echo "\n\nA module was refactored. Rerunning...\n\n";
-			$this->upgradeModules();
+		while (!$this->upgradeModules()) {
+			echo "\n\nA module was refactored. Rerunning...\n\n";			
 		}
 
 		echo "Rebuilding cache\n";
@@ -506,6 +505,7 @@ class Installer {
 						if ($newBackendUpgrade) {
 							$module->version = $counts[$moduleId] = 0;
 							$aModuleWasUpgradedToNewBackend = true;
+							
 						} else {
 							$module->version = $counts[$moduleId];
 						}
@@ -518,11 +518,14 @@ class Installer {
 					if (!$module->save()) {
 						throw new \Exception("Failed to save module");
 					}
+					if($aModuleWasUpgradedToNewBackend) {
+						return false;
+					}
 				}
 			}
 		}
 
-		return !$aModuleWasUpgradedToNewBackend;
+		return true;//!$aModuleWasUpgradedToNewBackend;
 	}
 
 	public static function fixCollations() {
