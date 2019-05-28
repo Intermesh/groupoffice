@@ -400,7 +400,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 			
 			$where = [
 					'entityTypeId' => $this->id,
-					'entityId' => $entity->getId(),
+					'entityId' => $entity->id(),
 					'userId' => GO()->getUserId()
 							];
 			
