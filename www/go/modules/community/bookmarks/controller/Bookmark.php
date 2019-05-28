@@ -180,11 +180,15 @@ class Bookmark extends EntityController {
 				$file = \GO()->getEnvironment()->getInstallFolder()->getFile("modules/bookmarks/" . $data['logo']);
 			}
 
-			$blob = Blob::fromFile($file);			
-			if(!$blob->save()) {
-				$errors = $blob->getValidationErrors();
+			if($file->exists()) {
+				$blob = Blob::fromFile($file);			
+				if(!$blob->save()) {
+					$errors = $blob->getValidationErrors();
+				}
+				$data['logo'] = $blob->id;
+			} else{
+				unset($data['logo']);
 			}
-			$data['logo'] = $blob->id;
 			GO()->getDbConnection()->insert('bookmarks_bookmark', $data)->execute();
 		}
 	}
