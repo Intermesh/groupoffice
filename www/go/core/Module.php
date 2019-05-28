@@ -49,6 +49,27 @@ abstract class Module {
 		
 		return false;
 	}
+
+	/**
+	 * For example "groupoffice-pro"
+	 */
+	public function requiredLicense(){
+		return null;
+	}
+
+	public function isInstallable() {
+		$lic = $this->requiredLicense();
+
+		if(!isset($lic)) {
+			return $this->name() != 'core';
+		}
+	 
+		if(!extension_loaded('ionCube Loader')) {
+			return false;
+		}
+
+		return GO()->getEnvironment()->getInstallFolder()->getFile( $lic . '-' . substr(GO()->getVersion(), 0, 3) .' license.txt')->exists();
+	}
 	
 	/**
 	 * Install the module

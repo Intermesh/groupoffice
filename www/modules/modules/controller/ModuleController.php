@@ -101,7 +101,7 @@ class ModuleController extends AbstractJsonController{
 					'package'=>$module->getPackage(),
 					'enabled'=>$model && $model->enabled,
 					'isRefactored' => true,
-					'not_installable'=> $model && $model->package == "core",
+					'not_installable'=> !$module->isInstallable(),
 					'sort_order' => ($model && $model->sort_order)?$model->sort_order:''
 			);
 			} else

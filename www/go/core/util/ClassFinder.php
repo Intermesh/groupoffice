@@ -149,6 +149,9 @@ class ClassFinder {
 	}
 
 	private function hasLicense(File $file, $namespace) {
+		
+		//TODO read license from Module.php
+
 		//check for pro license on business package
 		if(!strstr($namespace, "go\\modules\\business")) {
 			return true;
