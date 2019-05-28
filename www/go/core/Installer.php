@@ -80,6 +80,10 @@ class Installer {
 		$this->installCoreModule();
 				
 		$this->registerCoreEntities();		
+
+		// Fix chicken / egg problem for acl->entityTypeId
+		Group::check();
+		GoCoreModule::check();
 		
 		$this->installEmailTemplate();
 

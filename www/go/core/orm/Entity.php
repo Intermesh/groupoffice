@@ -701,18 +701,11 @@ abstract class Entity extends Property {
 		return $arr;
 	}
 
+	/**
+	 * Check database integrity
+	 */
+	public static function check() {
 
-	// public function patch($values) {
-	// 	foreach($values as $propName => $value) {
-	// 		if(is_object($value)) {
-	// 			$this->internalPatch($propName, $value);
-	// 		} else{
-	// 			$this->setValue($propName, $value);
-	// 		}
-	// 	}
-
-	// 	return $this;
-	// }
-
+	}
 
 }

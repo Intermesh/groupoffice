@@ -1323,7 +1323,7 @@ abstract class Property extends Model {
 					}
 					return $value;
 				} else{
-					return $relation->normalizeInput($value);
+					return $this->internalNormalizeRelation($relation, $value);
 				}			
 			}			
 		}

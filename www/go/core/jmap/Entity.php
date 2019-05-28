@@ -272,7 +272,5 @@ abstract class Entity  extends OrmEntity {
 	
 		return $changes;
 	}
-	
-	
-	
+
 }

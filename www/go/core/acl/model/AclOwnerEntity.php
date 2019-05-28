@@ -8,6 +8,7 @@ use go\core\orm\Query;
 use go\core\jmap\Entity;
 use go\core\orm\Mapping;
 use go\core\exception\Forbidden;
+use go\core\db\Expression;
 
 /**
  * The AclEntity
@@ -42,7 +43,18 @@ abstract class AclOwnerEntity extends AclEntity {
 			return false;
 		}
 		
-		return parent::internalSave();
+		if(!parent::internalSave()) {
+			return false;
+		}
+
+		if($this->isNew()) {
+			$this->acl->entityId = $this->id;
+			if(!$this->acl->save()) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	private $aclChanges;
@@ -140,8 +152,18 @@ abstract class AclOwnerEntity extends AclEntity {
 		}
 		
 		$this->acl->usedIn = $this->getMapping()->getColumn('aclId')->table->getName().'.aclId';
-		$this->acl->entityTypeId = $this->getType()->getId();
-		$this->acl->entityId = $this->id;
+		try {
+			$this->acl->entityTypeId = $this->getType()->getId();
+		} catch(\Exception $e) {
+
+			//During install this will throw a module not found error due to chicken / egg problem.
+			//We'll fix the data with the Group::check() function in the installer.
+			if(!GO()->getInstaller()->isInProgress()) {
+				throw $e;
+			}
+			$this->acl->entityTypeId = null;
+		}
+		//$this->acl->entityId = $this->id;
 		$this->acl->ownedBy = !empty($this->createdBy) ? $this->createdBy : $this->getDefaultCreatedBy();
 
 		if(!$this->acl->save()) {	
@@ -249,6 +271,28 @@ abstract class AclOwnerEntity extends AclEntity {
 	 */
 	public static function getAclEntityTableAlias() {
 		return static::getMapping()->getColumn('aclId')->table->getAlias();
+	}
+
+	/**
+	 * Check database integrity
+	 */
+	public static function check()
+	{
+		$tables = static::getMapping()->getTables();
+		$table = array_values($tables)[0]->getName();
+		
+		$stmt = GO()->getDbConnection()->update(
+      'core_acl', 
+      [
+        'acl.entityTypeId' => static::getType()->getId(), 
+        'acl.entityId' => new Expression('entity.id')],
+      (new Query())
+        ->tableAlias('acl')
+        ->join($table, 'entity', 'entity.aclId = acl.id'));
+  
+		if(!$stmt->execute()) {
+			throw new \Exception("Could not update ACL");
+		}
 	}
 
 }

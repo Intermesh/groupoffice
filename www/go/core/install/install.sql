@@ -189,6 +189,7 @@ CREATE TABLE `core_search` (
   `description` varchar(190) NOT NULL DEFAULT '',
   `entityTypeId` int(11) NOT NULL,
   `keywords` varchar(190) NOT NULL DEFAULT '',
+  `filter` VARCHAR(50) NULL DEFAULT NULL,
   `modifiedAt` datetime DEFAULT NULL,
   `aclId` int(11) NOT NULL
 ) ENGINE=InnoDB;

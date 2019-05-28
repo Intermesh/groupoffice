@@ -3103,9 +3103,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			if($this->aclField() && !$this->isJoinedAclField && empty($this->{$this->aclField()})){
 				//generate acl id
 				if(!empty($this->user_id))
-					$this->setNewAcl($this->user_id);
+					$newAcl = $this->setNewAcl($this->user_id);
 				else
-					$this->setNewAcl(GO::user() ? GO::user()->id : 1);
+					$newAcl = $this->setNewAcl(GO::user() ? GO::user()->id : 1);
 			}
 
 			
@@ -3121,6 +3121,11 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 			$this->_dbInsert();
 			$lastInsertId = $this->getDbConnection()->lastInsertId();
+
+			if(isset($newAcl)) {
+				$newAcl->entityId = $lastInsertId;
+				$newAcl->save();
+			}
 			
 			if(!is_array($this->primaryKey())){				
 				if(empty($this->{$this->primaryKey()})){
