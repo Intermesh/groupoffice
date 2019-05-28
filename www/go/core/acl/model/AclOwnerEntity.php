@@ -47,7 +47,7 @@ abstract class AclOwnerEntity extends AclEntity {
 			return false;
 		}
 
-		if($this->isNew()) {
+		if($this->isNew() && isset($this->acl)) {
 			$this->acl->entityId = $this->id;
 			if(!$this->acl->save()) {
 				return false;
