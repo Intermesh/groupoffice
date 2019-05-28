@@ -184,7 +184,12 @@ class File extends FileSystemObject {
 	 * @param string
 	 */
 	public function getContents($offset = 0, $maxlen = null) {		
-		return file_get_contents($this->getPath(), false, null, $offset, $maxlen);
+		if(isset($maxlen)) {
+			return file_get_contents($this->getPath(), false, null, $offset, $maxlen);	
+		} else{
+			return file_get_contents($this->getPath(), false, null, $offset);
+		}
+		
 	}
 
 	/**
