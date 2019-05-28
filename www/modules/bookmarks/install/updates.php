@@ -42,5 +42,5 @@ $updates['201905241053'][] = function() {
 	\go\modules\community\bookmarks\controller\Bookmark::updateLogos();
 };
 
-$updates['201905241125'][] = 'update core_module set package=\'community\', version=0, sort_order = sort_order + 100 where name=\'bookmarks\'';
 $updates['201905241125'][] = "update core_entity set clientName='BookmarksCategory' where name='Category' and moduleId=(select id from core_module where name='bookmarks' and package='community')";
+$updates['201905241125'][] = 'update core_module set package=\'community\', version=0, sort_order = sort_order + 100 where name=\'bookmarks\'';
