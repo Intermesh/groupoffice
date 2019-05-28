@@ -17,18 +17,13 @@ class Url extends Property {
 	const TYPE_TWITTER = "twitter";
 	const TYPE_FACEBOOK = "facebook";
 	const TYPE_LINKEDIN = "linkedin";
-	
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $id;
+
 
 	/**
 	 * 
 	 * @var int
 	 */							
-	public $contactId;
+	protected $contactId;
 	
 	/**
 	 *

@@ -15,9 +15,12 @@ class Utils {
 
 		try {
 			for ($i = 0, $c = count($queries); $i < $c; $i++) {
-				App::get()->getDbConnection()->query($queries[$i]);
+				if(!empty($queries[$i])) {
+					App::get()->getDbConnection()->query($queries[$i]);
+				}
 			}
 		} catch (PDOException $e) {
+			var_dump($queries);
 			throw new Exception($e->getMessage() . ' on query (' . $i . ') ' . $queries[$i]);
 		}
 	}

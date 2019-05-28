@@ -13,6 +13,8 @@ use GO\Base\Controller\AbstractController;
 use GO\Base\Db\PDO;
 use PDOException;
 use ReflectionClass;
+use go\core\util\ClassFinder;
+use go\core\orm\Entity;
 
 class MaintenanceController extends AbstractController {
 	
@@ -446,6 +448,16 @@ class MaintenanceController extends AbstractController {
 			$this->_checkCoreModels();
 			\GO::modules()->callModuleMethod('checkDatabase', array(&$response));
 		}
+
+
+		$cf = new ClassFinder();
+		$entities = $cf->findByParent(Entity::class);
+
+		foreach($entities as $entity) {
+			echo "Checking ". $entity."\n";
+			$entity::check();
+		}
+
 		
 		echo "All Done!\n";
 		

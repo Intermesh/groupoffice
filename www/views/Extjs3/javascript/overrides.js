@@ -700,7 +700,11 @@ Ext.override(Ext.Component, {
 	printBody: function(config) {
 		this.body.print(Ext.isEmpty(config)? this.initialConfig: config);
 	}
-}); 
+});
+
+Ext.override(Ext.Container, {
+	bufferResize: 500
+});
 
 
 Ext.encode = Ext.util.JSON.encode = function(json){

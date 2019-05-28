@@ -16,18 +16,12 @@ class Date extends Property {
 	const TYPE_BIRTHDAY = 'birthday';
 	
 	const TYPE_ANNIVERSARY = 'anniversary';
-	
-	/**
-	 * 
-	 * @var int
-	 */							
-	public $id;
 
 	/**
 	 * 
 	 * @var int
 	 */							
-	public $contactId;
+	protected $contactId;
 
 	/**
 	 * 

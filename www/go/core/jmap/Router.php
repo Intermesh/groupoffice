@@ -84,7 +84,6 @@ class Router {
 		
 		if($method != "community/dev/Debugger/get") {
 			//App::get()->debug("Processing method " . $method . ", call ID: " . $clientCallId);
-			GO()->getDebugger()->groupEnd();	
 			GO()->getDebugger()->groupCollapsed($method .',  ID: '. $clientCallId );			
 			GO()->getDebugger()->debug("request:");
 			GO()->getDebugger()->debug($params);			
@@ -113,6 +112,11 @@ class Router {
 			}
 			
 			Response::get()->addError($error);
+		} finally{
+			
+			if($method != "community/dev/Debugger/get") {			
+				GO()->getDebugger()->groupEnd();
+			}
 		}
 	}
 

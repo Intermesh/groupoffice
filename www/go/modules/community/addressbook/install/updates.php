@@ -22,3 +22,17 @@ $updates['201905201100'][] = "ALTER TABLE `addressbook_contact` DROP FOREIGN KEY
 $updates['201905201100'][] = "ALTER TABLE `addressbook_contact` ADD CONSTRAINT `addressbook_contact_ibfk_1` FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;";
 $updates['201905201100'][] = "ALTER TABLE `addressbook_group` DROP FOREIGN KEY `addressbook_group_ibfk_1`;";
 $updates['201905201100'][] = "ALTER TABLE `addressbook_group` ADD CONSTRAINT `addressbook_group_ibfk_1` FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;";
+
+$updates['201905281248'][] = "ALTER TABLE `addressbook_email_address` DROP FOREIGN KEY addressbook_email_address_ibfk_1;";
+$updates['201905281248'][] = "ALTER TABLE `addressbook_email_address` CHANGE `id` `id` INT(11) NOT NULL;";
+$updates['201905281248'][] = "ALTER TABLE `addressbook_email_address` DROP PRIMARY KEY;";
+$updates['201905281248'][] = "ALTER TABLE `addressbook_email_address` DROP `id`;";
+$updates['201905281248'][] = "ALTER TABLE `addressbook_email_address` ADD FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+$updates['201905281248'][] = "ALTER TABLE `addressbook_phone_number` DROP `id`;";
+$updates['201905281248'][] = "ALTER TABLE `addressbook_date` DROP `id`;";
+$updates['201905281248'][] = "ALTER TABLE addressbook_url DROP FOREIGN KEY addressbook_url_ibfk_1;";
+$updates['201905281248'][] = "ALTER TABLE `addressbook_url` CHANGE `id` `id` INT(11) NOT NULL;";
+$updates['201905281248'][] = "ALTER TABLE `addressbook_url` DROP PRIMARY KEY;";
+$updates['201905281248'][] = "ALTER TABLE `addressbook_url` DROP `id`;";
+$updates['201905281248'][] = "ALTER TABLE `addressbook_url` ADD FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+$updates['201905281248'][] = "ALTER TABLE `addressbook_address` DROP `id`";

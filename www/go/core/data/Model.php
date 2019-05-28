@@ -125,8 +125,27 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 		return $arr;
 	}
 
-	
-	
+	private static function getProptectedProperties() {
+		$cacheKey = 'getProtectedProperties-' . str_replace('\\', '-', static::class);
+		
+		$ret = App::get()->getCache()->get($cacheKey);
+		if ($ret) {
+			return $ret;
+		}
+
+		$reflectionObject = new ReflectionClass(static::class);
+		$props = $reflectionObject->getProperties(ReflectionProperty::IS_PROTECTED);
+
+		$arr = array_map(function($i){return $i->getName();}, $props);
+
+		App::get()->getCache()->set($cacheKey, $arr);
+
+		return $arr;
+	}
+
+	protected static function isProtectedProperty($name) {
+		return in_array($name, static::getProptectedProperties());
+	}	
 	/**
 	 * Convert model into array for API output.
 	 * 

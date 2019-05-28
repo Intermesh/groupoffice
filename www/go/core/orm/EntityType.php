@@ -354,7 +354,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		$record = [
 				'modSeq' => $this->highestModSeq,
 				'entityTypeId' => $this->id,
-				'entityId' => $entity->getId(),
+				'entityId' => $entity->id(),
 				'aclId' => $entity->findAclId(),
 				'destroyed' => $entity->isDeleted(),
 				'createdAt' => new DateTime()

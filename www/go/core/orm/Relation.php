@@ -44,6 +44,9 @@ class Relation {
 	 */
 	public $keys;
 
+
+	public $mapped = false;
+
 	/**
 	 * Constructor
 	 * 
@@ -70,43 +73,5 @@ class Relation {
 		$this->entityName = $entityName;
 		$this->keys = $keys;
 		$this->many = $many;
-	}
-
-	/**
-	 * Normalizes input for related properties. A key value array or an object 
-	 * may be given to a relation.
-	 * 
-	 * @param static|array $value
-	 * @return \static
-	 * @throws Exception
-	 */
-	public function normalizeInput($value) {
-
-		if ($this->many) {
-			foreach ($value as &$v) {
-				$v = $this->internalNormalizeInput($v);
-			}
-			return $value;
-		} else {
-			return $this->internalNormalizeInput($value);
-		}
-	}
-
-	private function internalNormalizeInput($value) {
-		$cls = $this->entityName;
-		if ($value instanceof $cls) {
-			return $value;
-		}
-
-		if (is_array($value)) {
-			$o = new $cls;
-			$o->setValues($value);
-
-			return $o;
-		} else if (is_null($value)) {
-			return null;
-		} else {
-			throw new Exception("Invalid value given to relation '" . $this->name . "'. Should be an array or an object of type '" . $this->entityName . "': " . var_export($value, true));
-		}
 	}
 }
