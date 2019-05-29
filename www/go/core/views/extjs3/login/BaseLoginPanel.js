@@ -43,7 +43,7 @@ go.login.BaseLoginPanel = Ext.extend(Ext.FormPanel, {
 		go.AuthenticationManager.doAuthentication(this.getPostData(),function(authMan, success, result){
 			if(result.errors && result.errors[this.getId()]){
 				this.setErrors(result.errors[this.getId()]);
-				return
+				return;
 			}
 
 			this.onSuccess();

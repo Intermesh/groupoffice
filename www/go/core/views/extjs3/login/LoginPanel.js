@@ -42,11 +42,20 @@ go.login.LoginPanel = Ext.extend(Ext.Container, {
 
 		go.login.LoginPanel.superclass.initComponent.call(this);
 
+		
+
 		this.on('render', function () {
 
+			// go.Router.on("change", this.onRouterChange,this);
+			this.on('destroy', function() {
+				this.loginDialog.close();
+				go.Router.un("change", this.onRouterChange, this);
+			}, this);
+
 			//todo, this dialog should be part of this conponent
-			GO.loginDialog = new go.login.LoginDialog();
-			GO.loginDialog.show();
+			this.loginDialog = new go.login.LoginDialog();
+			this.loginDialog.panel = this;
+			this.loginDialog.show();
 
 			var me = this;
 			setTimeout(function () {
@@ -69,5 +78,9 @@ go.login.LoginPanel = Ext.extend(Ext.Container, {
 
 		}, this);
 
+	},
+	onRouterChange : function(path, oldPath, route) {
+		//console.warn(arguments);
+		this.destroy();
 	}
 });
