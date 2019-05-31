@@ -993,6 +993,11 @@ abstract class Property extends Model {
 				foreach($table->getConstantValues() as $colName => $value) {
 					$modifiedForTable[$colName] = $value;
 				}
+
+				if(empty($modifiedForTable)) {
+					//if there's no primary key we might get here.
+					return true;
+				}
 				
 				$stmt = App::get()->getDbConnection()->insert($table->getName(), $modifiedForTable);
 				if (!$stmt->execute()) {
