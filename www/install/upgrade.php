@@ -307,7 +307,13 @@ try {
 			require(Environment::get()->getInstallFolder() . '/install/62to63.php');
 		}		
 
-		GO::session()->runAsRoot();
+		try {
+			GO::session()->runAsRoot();
+		}
+		catch(\Exception $e) {
+			echo "\nWarning: could not run as root!\n\n";
+			echo $e;
+		}
 
 		if (!upgrade()) {
 			echo "\n\nA module was refactored. Rerunning...\n\n";
