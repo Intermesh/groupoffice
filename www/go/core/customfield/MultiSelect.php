@@ -101,11 +101,26 @@ class MultiSelect extends Select {
 			return [];
 		}
 
-		return array_map(function($i){return (int) $i;}, (new Query())
-										->selectSingleValue("optionId")
-										->from($this->getMultiSelectTableName())
-										->where(['id' => $values['id']])
-										->all());
+		return (new Query())
+						->selectSingleValue("optionId")
+						->from($this->getMultiSelectTableName())
+						->where(['id' => $values['id']])
+						->all();
+	}
+
+	public function dbToText($value, &$values)
+	{
+		//new model
+		if(empty($values['id'])) {
+			return [];
+		}
+
+		return implode(", ", (new Query())
+							->selectSingleValue("o.text")
+							->join("core_customfields_select_option", "o", "o.id = ms.optionId")
+							->from($this->getMultiSelectTableName(), 'ms')
+							->where(['id' => $values['id']])
+							->all());
 	}
 
 	public function onFieldDelete() {

@@ -35,4 +35,9 @@ class DateTime extends Base {
 			$criteria->where('customFields.' . $this->field->databaseName, $comparator, $value);
 		});
 	}
+
+	public function dbToText($value, &$values)
+	{
+		return $value instanceof \DateTime ? $value->format(GO()->getAuthState()->getUser()->getDateTimeFormat()) : $value;
+	}
 }

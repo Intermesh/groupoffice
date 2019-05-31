@@ -168,6 +168,18 @@ abstract class Base extends Model {
 	public function dbToApi($value, &$values) {
 		return $value;
 	}
+
+	/**
+	 * Get the data as string
+	 * Used for templates or export
+	 * 
+	 * @param mixed $value The value for this field
+	 * @param array $values The values inserted in the database
+	 * @return string
+	 */
+	public function dbToText($value, &$values) {
+		return $this->dbToApi($value, $values);
+	}
 	
 	/**
 	 * Called after the data is saved to API.

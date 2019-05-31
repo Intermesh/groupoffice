@@ -224,14 +224,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		$attributes = $model instanceof \GO\Base\Db\ActiveRecord ? $model->getAttributes($this->attributesFormat) : $model->toArray();		
 		
 		if(method_exists($model, "getCustomFields")){
-			$attributes = array_merge($attributes, $model->getCustomFields());
-			
-			
-			
-		
-			$attributes = array_map(function($a) {
-				return $a instanceof \DateTime ? $a->format(GO()->getAuthState()->getUser()->getDateTimeFormat()) : $a;
-			}, $attributes);
+			$attributes = array_merge($attributes, $model->getCustomFields(true));
 		}
 
 		$attributes = $this->_addTagPrefixAndRemoveEmptyValues($attributes, $tagPrefix);

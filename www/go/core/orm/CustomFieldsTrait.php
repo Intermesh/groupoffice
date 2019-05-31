@@ -30,7 +30,9 @@ trait CustomFieldsTrait {
 	 * 
 	 * @return array
 	 */
-	public function getCustomFields() {
+	public function getCustomFields($asText = false) {
+		$fn = $asText ? 'dbToText' : 'dbToApi';
+
 		if(!isset($this->customFieldsData)) {
 			$record = (new Query())
 							->select('*')
@@ -47,7 +49,7 @@ trait CustomFieldsTrait {
 				}				
 				
 				foreach(self::getCustomFieldModels() as $field) {
-					$record[$field->databaseName] = $field->getDataType()->dbToApi(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record);			
+					$record[$field->databaseName] = $field->getDataType()->$fn(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record);			
 				}
 				
 				$this->customFieldsData = $record;
@@ -60,6 +62,7 @@ trait CustomFieldsTrait {
 		
 		return array_filter($this->customFieldsData, function($key) {return $key != 'id';}, ARRAY_FILTER_USE_KEY);
 	}
+
 	
 	//for legacy modules
 	public function setCustomFieldsJSON($json) {
