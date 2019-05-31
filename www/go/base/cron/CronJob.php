@@ -359,7 +359,7 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 				$this->nextrun-=60;
 			}
 		}
-		GO::debug('CRONJOB ('.$this->name.') NEXTRUN : '.$this->getAttribute('nextrun','formatted'));
+		// GO::debug('CRONJOB ('.$this->name.') NEXTRUN : '.date('c', $this->getAttribute('nextrun'));
 		return parent::beforeSave();
 	}
 	

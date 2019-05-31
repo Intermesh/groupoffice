@@ -4,12 +4,17 @@
 
 Merge contacts
 Batch edit custom fields not possible
-Address lists / mailings
 Disabled categories for:  folder dialog Folder::deriveCustomfieldSettings
 custom fields billign items dropped ?!
 Calendar birthdays
 Demodata
 ticket groups
+
+LDAP sync
+HW FTP import
+Comments report
+Collabora code integation
+
 
 DG::
 

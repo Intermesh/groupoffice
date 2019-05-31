@@ -9,6 +9,7 @@ class Server extends Entity {
 	public $hostname;
 	public $port = 389;
 	public $encryption = "tls";
+	public $ldapVerifyCertificate = true;
 	
 	public $usernameAttribute = "uid";
 	
@@ -22,7 +23,7 @@ class Server extends Entity {
 	
 	public $imapValidateCertificate = true;
 
-	public $removeDomainFromUsername = false;
+	public $loginWithEmail = false;
 
 	public $smtpHostname;
 	public $smtpPort;

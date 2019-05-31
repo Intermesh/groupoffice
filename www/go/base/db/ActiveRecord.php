@@ -3344,6 +3344,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		
 		return array();
 	}
+
+	public static $log_enabled = true;
 	
 	/**
 	 * Will all a log record in go_log
@@ -3354,7 +3356,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 */
 	protected function log($action, $save=true, $modifiedCustomfieldAttrs=false){
 		// jsonData field in go_log might not exist yet during upgrade
-		if(\GO::router()->getControllerRoute() == 'maintenance/upgrade') {
+		if(!self::$log_enabled) {
 			return true;
 		}
 		$message = $this->getLogMessage($action);

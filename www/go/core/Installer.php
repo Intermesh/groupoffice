@@ -26,6 +26,7 @@ use go\core\util\Lock;
 use PDOException;
 use go\modules\community\ldapauthenticator\Module as GoModule;
 use go\core\model\Module as GoCoreModule;
+use GO\Base\Db\ActiveRecord;
 
 class Installer {
 	
@@ -60,6 +61,8 @@ class Installer {
 
 		self::$isInProgress = true;
 
+		ActiveRecord::$log_enabled = false;
+		
 		jmap\Entity::$trackChanges = false;
 
 		$database = App::get()->getDatabase();
@@ -274,6 +277,8 @@ class Installer {
 		GO()->getDbConnection()->query("SET sql_mode=''");
 		
 		jmap\Entity::$trackChanges = false;
+
+		ActiveRecord::$log_enabled = false;
 		
 		GO()->getDbConnection()->delete("core_entity", ['name' => 'GO\\Projects\\Model\\Project'])->execute();
 

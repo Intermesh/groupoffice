@@ -11,6 +11,9 @@ try {
 		header("Location: test.php");
 		exit();
 	}
+
+	
+
 	
 	require('header.php');
 	

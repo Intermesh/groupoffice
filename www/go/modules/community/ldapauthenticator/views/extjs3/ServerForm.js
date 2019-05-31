@@ -23,7 +23,7 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 				},
 				items: [{
 
-						hint: t("Enter the domains this ldap server should be used to authenticate. Users must login with their e-mail address and if the domain matches this profile it will be used.", "ldapauthenticator"),
+						hint: t("Enter the domains this ldap server should be used to authenticate. Users must login with their e-mail address and if the domain matches this profile it will be used."),
 						xtype: "gridfield",
 						name: "domains",
 						store: new Ext.data.JsonStore({
@@ -56,13 +56,13 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 					{
 						xtype: 'textfield',
 						name: 'hostname',
-						fieldLabel: t("Hostname", "ldapauthenticator"),
+						fieldLabel: t("Hostname"),
 						required: true
 					}, {
 						xtype: 'numberfield',
 						decimals: 0,
 						name: 'port',
-						fieldLabel: t("Port", "ldapauthenticator"),
+						fieldLabel: t("Port"),
 						required: true,
 						value: 389
 					}, {
@@ -82,6 +82,12 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						valueField: 'value',
 						displayField: 'display',
 						value: 'tls'
+					},{
+						xtype:"checkbox",
+						hideLabel: true,
+						name: 'ldapVerifyCertificate',
+						boxLabel: t("Verify SSL certicate"),
+						checked: true				
 					},
 					{
 						xtype: 'xcheckbox',
@@ -114,14 +120,23 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 					]
 			}, this.usersFieldSet = new Ext.form.FieldSet({
 				title: t("Users"),
+				defaults: {
+					anchor: '100%'
+				},
 				items: [
 					{
 						xtype: 'textfield',
 						name: 'usernameAttribute',
-						fieldLabel: t("Username attribute", "ldapauthenticator"),
+						fieldLabel: t("Username attribute"),
 						value: "uid",
 						required: true
-					}, {
+					}, 
+					{
+						xtype:"checkbox",
+						hideLabel: true,
+						name: 'loginWithEmail',
+						boxLabel: t("Login with e-mail address")						
+					},{
 						xtype: 'textfield',
 						name: 'peopleDN',
 						fieldLabel: "peopleDN",
@@ -137,7 +152,7 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						xtype:"checkbox",
 						submit: false,
 						hideLabel: true,
-						boxLabel: t("Create e-mail account for users", "ldapauthenticator"),
+						boxLabel: t("Create e-mail account for users"),
 						listeners: {
 							check: function (checkbox, checked) {
 								this.imapFieldSet.setVisible(checked);
@@ -185,17 +200,11 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						displayField: 'display',
 						value: 'tls'
 					}, {
-						xtype: 'xcheckbox',
+						xtype: 'checkbox',
 						checked: true,
 						hideLabel: true,
 						boxLabel: t('Validate certificate'),
 						name: 'imapValidateCertificate'
-					}, {
-						xtype: 'xcheckbox',
-						hideLabel: true,
-						boxLabel: t('Remove domain from username', 'imapauthenticator'),
-						name: 'removeDomainFromUsername',
-						hint: t("Users must login with their full e-mail adress. Enable this option if the IMAP excepts the username without domain.")
 					}]
 			}), this.smtpFieldSet = new Ext.form.FieldSet({
 				hidden: true,
@@ -216,7 +225,7 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						decimals: 0,
 						value: 587
 					}, {
-						xtype: 'xcheckbox',
+						xtype: 'checkbox',
 						hideLabel: true,
 						boxLabel: t('Use user credentials', 'imapauthenticator'),
 						name: 'smtpUseUserCredentials',
@@ -254,7 +263,7 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						displayField: 'display',
 						value: 'tls'
 					}, {
-						xtype: 'xcheckbox',
+						xtype: 'checkbox',
 						hideLabel: true,
 						boxLabel: t('Validate certificate'),
 						name: 'smtpValidateCertificate',
@@ -262,10 +271,10 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 					}]
 			}), {
 				xtype: 'fieldset',
-				title: t("User options", "ldapauthenticator"),
+				title: t("User options"),
 				items: [
 					new go.form.multiselect.Field({
-						hint: t("Users will automatically be added to these groups", "ldapauthenticator"),
+						hint: t("Users will automatically be added to these groups"),
 						name: "groups",
 						idField: "groupId",
 						displayField: "name",
