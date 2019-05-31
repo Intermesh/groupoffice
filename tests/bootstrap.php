@@ -54,7 +54,8 @@ try {
 		$installer = new \go\core\Installer();	
 		$installer->install($admin, [
 				new go\modules\community\notes\Module(),
-				new go\modules\community\test\Module()
+				new go\modules\community\test\Module(),
+				new go\modules\community\addressbook\Module(),
 				]);
 	}
 } catch (Exception $e) {
