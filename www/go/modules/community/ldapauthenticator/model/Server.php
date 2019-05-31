@@ -2,6 +2,7 @@
 namespace go\modules\community\ldapauthenticator\model;
 
 use go\core\jmap\Entity;
+use go\core\ldap\Connection;
 
 class Server extends Entity {
 	
@@ -116,5 +117,39 @@ class Server extends Entity {
 		GO()->getCache()->delete("authentication-domains");
 		
 		return parent::internalDelete();
+	}
+
+	private $connection;
+
+	/**
+	 * Connect to LDAP server
+	 * 
+	 * @return Connection
+	 */
+	public function connect() {
+		$this->connection = new Connection();
+		if(!$this->connection->connect($this->getUri())) {
+			throw new \Exception("Could not connect to LDAP server");
+		}
+		if(!$this->ldapVerifyCertificate) {
+			$this->connection->setOption(LDAP_OPT_X_TLS_REQUIRE_CERT, LDAP_OPT_X_TLS_NEVER);
+		}
+		if($this->encryption == 'tls') {
+			if(!$this->connection->startTLS()) {
+				throw new \Exception("Couldn't enable TLS: " . $this->connection->getError());
+			}			
+		}
+		
+		if (!empty($this->username)) {			
+			
+			if (!$this->connection->bind($this->username, $this->password)) {				
+				throw new \Exception("Invalid password given for '".$this->username."'");
+			} else
+			{
+				GO()->debug("Authenticated with user '" . $this->username . '"');
+			}
+		}
+
+		return $this->connection;
 	}
 }

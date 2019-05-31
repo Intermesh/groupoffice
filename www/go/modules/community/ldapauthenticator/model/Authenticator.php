@@ -61,28 +61,8 @@ class Authenticator extends PrimaryAuthenticator {
 		if($server->loginWithEmail) {
 			$ldapUsername = $username;
 		}
-		$connection = new Connection();
-		if(!$connection->connect($server->getUri())) {
-			throw new \Exception("Could not connect to LDAP server");
-		}
-		if(!$server->ldapVerifyCertificate) {
-			$connection->setOption(LDAP_OPT_X_TLS_REQUIRE_CERT, LDAP_OPT_X_TLS_NEVER);
-		}
-		if($server->encryption == 'tls') {
-			if(!$connection->startTLS()) {
-				throw new \Exception("Couldn't enable TLS: " . $connection->getError());
-			}			
-		}
 		
-		if (!empty($server->username)) {			
-			
-			if (!$connection->bind($server->username, $server->password)) {				
-				throw new \Exception("Invalid password given for '".$server->username."'");
-			} else
-			{
-				GO()->debug("Authenticated with user '" . $server->username . '"');
-			}
-		}
+		$connection = $server->connect();
 		
 		$record = Record::find($connection, $server->peopleDN, $server->usernameAttribute . "=" . $ldapUsername)->fetch();
 		
