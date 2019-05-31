@@ -457,9 +457,7 @@ class Connection {
 	 */
 	public function createStatement($build) {
 		
-		if($this->debug) {
-			GO()->debug(QueryBuilder::debugBuild($build));			
-		}
+		
 
 		try {
 			$stmt = $this->getPDO()->prepare($build['sql']);

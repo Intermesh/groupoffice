@@ -474,6 +474,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 		
 		$queryBuilder = new QueryBuilder();
 		$build = $queryBuilder->buildSelect($this);
+		$build['start'] = GO()->getDebugger()->getTimeStamp();
 		
 		if($this->debug && !$this->getDbConnection()->debug) {
 			GO()->debug(QueryBuilder::debugBuild($build));
