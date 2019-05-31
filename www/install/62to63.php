@@ -12,6 +12,11 @@ $qs[] = function () {
 	$stmt = GO()->getDbConnection()->query("SHOW TABLE STATUS");	
 	
 	foreach($stmt as $record){
+		if($record['Engine'] == null) {
+
+			//skip views
+			continue;
+		}
 		
 		if($record['Engine'] != 'InnoDB' && $record["Name"] != 'fs_filesearch' && $record["Name"] != 'cms_files') {
 			echo "Converting ". $record["Name"] . " to InnoDB\n";

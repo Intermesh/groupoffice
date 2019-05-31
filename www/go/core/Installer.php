@@ -11,6 +11,7 @@ use go\core\util\ClassFinder;
 use go\modules\core\groups\model\Group;
 use go\modules\core\users\model\User;
 use go\modules\core\users\model\UserGroup;
+use GO\Base\Db\ActiveRecord;
 
 class Installer {
 	
@@ -38,6 +39,8 @@ class Installer {
 		//don't cache on install
 		App::get()->getCache()->flush(false);
 		App::get()->setCache(new None());
+
+		ActiveRecord::$log_enabled = false;
 		
 		$this->isInProgress = true;
 		

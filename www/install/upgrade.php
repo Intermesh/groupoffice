@@ -4,8 +4,7 @@ use go\core\App;
 use go\core\Environment;
 use go\modules\core\modules\model\Module;
 use go\core\util\Lock;
-
-
+use GO\Base\Db\ActiveRecord;
 
 
 /**
@@ -116,12 +115,17 @@ try {
 		header("Location: test.php");
 		exit();
 	}
+
+	
+
 	
 	require('header.php');
 	
 	echo "<section><div class=\"card\"><h2>Upgrading Group-Office</h2><pre>";
 	
 	App::get();
+
+	ActiveRecord::$log_enabled = false;
 
 	$lock = new Lock("upgrade");
 	if (!$lock->lock()) {
