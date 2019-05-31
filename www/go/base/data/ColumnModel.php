@@ -363,7 +363,7 @@ class ColumnModel {
 			$formattedRecord = $model->getAttributes($this->_modelFormatType);
 		
 		if(method_exists($model, 'getCustomFields')) {
-			$model->customFields = $model->getCustomFields(true);
+			$model->customFields = $model->getCustomFields($this->_modelFormatType == 'formatted');
 		}
 		
 		$columns = $this->getColumns();
