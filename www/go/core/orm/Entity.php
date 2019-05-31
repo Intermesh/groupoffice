@@ -193,7 +193,7 @@ abstract class Entity extends Property {
 	 * 
 	 * @return boolean
 	 */
-	public final function save() {	
+	public function save() {	
 
 		$this->isSaving = true;
 

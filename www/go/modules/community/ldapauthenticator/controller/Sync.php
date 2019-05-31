@@ -12,6 +12,11 @@ use go\core\jmap\Entity;
 
 class Sync extends Controller {
 
+
+  public function users($id, $dryRun = false, $delete = false, $maxDeletePercentage = 5) {
+
+  }
+
   /**
    * docker-compose exec --user www-data groupoffice-master php /usr/local/share/groupoffice/cli.php community/ldapauthenticator/Sync/groups --id=2 --dryRun=1 --delete=1 --maxDeletePercentage=50
    */
