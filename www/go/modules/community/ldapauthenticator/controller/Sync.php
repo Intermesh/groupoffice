@@ -9,12 +9,87 @@ use go\core\model\Group;
 use go\core\ldap\Connection;
 use go\core\model\UserGroup;
 use go\core\jmap\Entity;
+use go\core\model\User;
+use go\modules\community\ldapauthenticator\Module;
 
 class Sync extends Controller {
 
 
+  /**
+   * docker-compose exec --user www-data groupoffice-master php /usr/local/share/groupoffice/cli.php community/ldapauthenticator/Sync/users --id=2 --dryRun=1 --delete=1 --maxDeletePercentage=50
+   */
   public function users($id, $dryRun = false, $delete = false, $maxDeletePercentage = 5) {
+    //objectClass	inetOrgPerson)
+    $server = Server::findById($id);
+    if(!$server) {
+      throw new NotFound();
+    }
 
+    $connection = $server->connect();
+
+    $usersInLDAP = [1];
+		
+		$records = Record::find($connection, $server->peopleDN, "(objectClass=inetOrgPerson)");
+    
+    $i = 0;
+    foreach($records as $record) {
+      $i++;
+      $username = $record->uid[0] ?? $record->SAMAccountName[0];
+
+      if (empty($username)) {
+        throw new \Exception("Empty group name in LDAP record!");
+      }
+      $user = User::find()->where(['username' => $username])->single();
+      if (!$user) {
+
+        echo "Creating user '" . $username . "'\n";
+
+        $user = new User();
+        $user->username = $username;
+        
+      } else {
+        echo "User '" . $username . "' exists\n";    
+      }
+
+      Module::ldapRecordToUser($username, $record, $user);
+
+      if (!$dryRun && $user->isModified() && !$user->save()) {
+        echo "Error saving user: " . implode("\n", $user->getValidationErrors());
+      }      
+
+			echo "Synced " . $username . "\n";		
+
+			$usersInLDAP[] = $user->id;
+		}
+
+		if ($delete) {
+			$this->deleteUsers($usersInLDAP, $maxDeletePercentage, $dryRun);
+		}
+
+    echo "Done\n\n";
+  }
+
+
+  private function deleteUsers($usersInLDAP, $maxDeletePercentage, $dryRun) {
+    $users = User::find()->execute();
+
+		$totalInGO = $users->rowCount();
+		$totalInLDAP = count($usersInLDAP);
+
+		echo "Groups in Group-Office: " . $totalInGO . "\n";
+    echo "Groups in LDAP: " . $totalInLDAP . "\n";
+    
+    $percentageToDelete = round((1 - $totalInLDAP / $totalInGO) * 100);		
+    if ($percentageToDelete > $maxDeletePercentage)
+      throw new \Exception("Delete Aborted because script was about to delete more then $maxDeletePercentage% of the groups (" . $percentageToDelete . "%, " . ($totalInGO - $totalInLDAP) . " groups)\n");
+
+    foreach($users as $user) {
+      if (!in_array($user->id, $usersInLDAP)) {
+        echo "Deleting " . $user->username . "\n";
+        if (!$dryRun)
+          $user->delete();
+      }
+    }
   }
 
   /**
