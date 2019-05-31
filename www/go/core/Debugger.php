@@ -75,11 +75,11 @@ class Debugger {
 	protected $currentGroup;
 	protected $groupStartTime;
 
-	public function groupCollapsed($name) {		
+	public function group($name) {		
 		if(!$this->enabled) {
 			return;
 		}
-		$this->entries[] = ['groupCollapsed', $name];
+		$this->entries[] = ['group', $name];
 		$this->currentGroup = &$this->entries[count($this->entries)-1][1];
 		$this->groupStartTime = $this->getTimeStamp();
 	}
