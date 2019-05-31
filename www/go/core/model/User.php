@@ -507,13 +507,15 @@ class User extends Entity {
 			$this->password = $this->passwordHash($this->plainPassword);
 		}		
 		
-		if(!parent::internalSave()) {
-			return false;
-		}
-		
 		$this->addSystemGroups();
 		
+		if(!parent::internalSave()) {
+			return false;
+		}	
+		
 		$this->saveContact();
+		
+		$this->legacyOnSave();	
 		
 		return true;		
 	}
@@ -588,23 +590,15 @@ class User extends Entity {
 			}
 			
 			if(!in_array($personalGroup->id, $groupIds)) { 
-				$personalUserGroup = (new UserGroup)->setValues(['groupId' => $personalGroup->id, 'userId' => $this->id]);
-				if(!$personalUserGroup->internalSave()) {
-					throw new Exception("Couldn't add user to group");
-				}
+				$personalUserGroup = (new UserGroup)->setValues(['groupId' => $personalGroup->id]);
 				$this->groups[] = $personalUserGroup;
 			}
 			
 			if(!in_array(Group::ID_EVERYONE, $groupIds)) { 
-				$everyoneUserGroup = (new UserGroup)->setValues(['groupId' => Group::ID_EVERYONE, 'userId' => $this->id]);
-				if(!$everyoneUserGroup->internalSave()) {
-					throw new Exception("Couldn't add user to group");
-				}
+				$everyoneUserGroup = (new UserGroup)->setValues(['groupId' => Group::ID_EVERYONE]);
+
 				$this->groups[] = $everyoneUserGroup;
-			}
-			
-			$this->legacyOnSave();			
-			
+			}			
 		}
 	}
 	
