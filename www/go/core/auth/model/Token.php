@@ -259,7 +259,7 @@ class Token extends Entity {
 	 */
 	private function oldLogin(){
 		
-		if(\go\core\Environment::get()->isCli()) {
+		if(\go\core\Environment::get()->isCli() || basename($_SERVER['PHP_SELF']) == 'index.php') {
 			return;
 		}		
 		

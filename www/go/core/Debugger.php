@@ -63,9 +63,9 @@ class Debugger {
 	public function __construct() {
 		try {
 			$this->enabled = (!empty(GO()->getConfig()['core']['general']['debug']) || jmap\Request::get()->getHeader('X-Debug') == "1") && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug');
-			if($this->enabled) {
-				$this->logPath = GO()->getDataFolder()->getFile('log/debug.log')->getPath();
-			}
+			// if($this->enabled) {
+			// 	$this->logPath = GO()->getDataFolder()->getFile('log/debug.log')->getPath();
+			// }
 		} catch (\go\core\exception\ConfigurationException $e) {
 			//GO is not configured / installed yet.
 			$this->enabled = true;
@@ -76,12 +76,18 @@ class Debugger {
 	protected $groupStartTime;
 
 	public function groupCollapsed($name) {		
+		if(!$this->enabled) {
+			return;
+		}
 		$this->entries[] = ['groupCollapsed', $name];
 		$this->currentGroup = &$this->entries[count($this->entries)-1][1];
 		$this->groupStartTime = $this->getTimeStamp();
 	}
 
 	public function groupEnd(){
+		if(!$this->enabled) {
+			return;
+		}
 		$time = $this->getTimeStamp() - $this->groupStartTime;
 		$this->currentGroup .= ', time: '.$time.'ms';
 
@@ -94,8 +100,9 @@ class Debugger {
 	 * @return float Milliseconds
 	 */
 	public function getMicroTime() {
-		list ($usec, $sec) = explode(" ", microtime());
-		return ((float) $usec + (float) $sec);
+		// list ($usec, $sec) = explode(" ", microtime());
+		// return ((float) $usec + (float) $sec);
+		return microtime(true);
 	}	
 	
 	public function warn($mixed, $traceBackSteps = 0) {
@@ -202,6 +209,11 @@ class Debugger {
 		$this->debug($this->getTimeStamp() . 'ms ' . $message);
 	}
 
+	/**
+	 * Get the ellapsed time since the start of the request in milliseconds
+	 * 
+	 * @return int milliseconds
+	 */
 	public function getTimeStamp() {
 		return intval(($this->getMicroTime() - $_SERVER["REQUEST_TIME_FLOAT"])*1000);
 	}

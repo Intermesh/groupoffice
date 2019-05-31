@@ -271,18 +271,20 @@ class File extends FileSystemObject {
 			throw new \Exception("Could not output file because output has already been sent. Turn off output buffering to find out where output has been started.");
 		}
 
-		$handle = fopen($this->getPath(), "rb");
+		// $handle = fopen($this->getPath(), "rb");
 
-		if (!is_resource($handle)) {
-			throw new Exception("Could not read file");
-		}
+		// if (!is_resource($handle)) {
+		// 	throw new Exception("Could not read file");
+		// }
 		
 		$r->sendHeaders();
 
-		while (!feof($handle)) {
-			echo fread($handle, 1024);
-			flush();
-		}
+		readfile($this->getPath());
+
+		// while (!feof($handle)) {
+		// 	echo fread($handle, 1024);
+		// 	// flush();
+		// }
 	}
 	
 	/**

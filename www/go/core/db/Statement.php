@@ -65,7 +65,13 @@ class Statement extends \PDOStatement implements \JsonSerializable {
 	public function execute($input_parameters = null)
 	{
 		try {
-			return parent::execute($input_parameters);
+			
+			$ret = parent::execute($input_parameters);
+			if(GO()->getDbConnection()->debug && isset($this->build)) {
+				$duration  =  GO()->getDebugger()->getTimeStamp() - $this->build['start'];
+				GO()->debug(QueryBuilder::debugBuild($this->build).' ('.$duration.'ms)');			
+			}
+			return $ret;
 		}
 		catch(\Exception $e) {
 			GO()->error("SQL FAILURE: " . $this);

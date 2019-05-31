@@ -1,4 +1,4 @@
-(function () {
+go.AuthenticationManager = (function () {
 	var AuthMan = Ext.extend(Ext.util.Observable, {
 
 		/**
@@ -191,13 +191,19 @@
 
 		},
 
+		login : function() {
+			this.loginPanel = new go.login.LoginPanel();
+		},
+
 		onAuthenticated: function (result) {
 			
 			go.User.setAccessToken(result.accessToken, go.AuthenticationManager.rememberLogin);
 			
-			if (GO.loginDialog) {
-				GO.loginDialog.close();
-			}			
+			if(this.loginPanel) {
+				this.loginPanel.destroy();
+				this.loginPanel = null;
+			}
+
       go.User.loadSession(result);			
 			
 			this.fireEvent("authenticated", this, result);
@@ -207,5 +213,5 @@
 		}
 	});
 
-	go.AuthenticationManager = new AuthMan();
+	return new AuthMan();
 })();

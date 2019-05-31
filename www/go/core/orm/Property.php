@@ -1031,7 +1031,9 @@ abstract class Property extends Model {
 				$this->setValidationError($uniqueKey, ErrorCode::UNIQUE);				
 				return false;
 			} else {
-				GO()->error("Failed SQL: " . $stmt);
+				if(isset($stmt)) {
+					GO()->error("Failed SQL: " . $stmt);
+				}
 				throw $e;
 			}
 		}

@@ -102,40 +102,12 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					
 					me.fireEvent("boot", this);
 					go.Router.check();
-					if(go.Router.requireAuthentication) {
-						go.Router.pathBeforeLogin = go.Router.getPath();
-						go.Router.goto("login");
-					}
 				}
 			});
 		} else {
 			this.fireEvent("boot", this); // In the router there is an event attached.
 			go.Router.check();
-			if(go.Router.requireAuthentication) {
-				go.Router.pathBeforeLogin = go.Router.getPath();
-				go.Router.goto("login");
-			}
 		}
-	},
-
-	login: function () {		
-		GO.mainLayout.on('render', function () {
-			go.Router.goto(go.Router.pathBeforeLogin);
-		}, this, {single: true});
-		
-		if(!this.loginPanel) {
-			//go.AuthenticationManager.register('password', new go.login.PasswordPanel(), 0);
-			
-			this.loginPanel = new go.login.LoginPanel();
-			this.loginPanel.on('destoy', function() {
-				this.loginPanel = null;
-			}, this);
-		}
-		
-		//console.log('ja');
-			
-
-		this.fireEvent('login', this);
 	},
 
 	saveState: function () {
@@ -376,6 +348,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		
 		this.fireEvent('authenticated', this);
 		var me = this;
+
+		Ext.getBody().mask(t("Loading..."));
 	
 		Promise.all([
 			go.customfields.CustomFields.init(),
@@ -386,9 +360,12 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			me.addDefaultRoutes();
 			me.renderUI();
 			go.Router.check();
+			Ext.getBody().unmask();
 			
 		}).catch(function(error){
 			console.error(error);
+			Ext.getBody().unmask();
+			Ext.MessageBox.alert(t("Error"), t("An error occurred. MOre details can be found in the console."));
 		});
 		
 		
@@ -428,9 +405,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	},
 
 	renderUI : function() {
-		if (this.loginPanel) {
-			this.loginPanel.destroy();
-		}
+
 		GO.checker = new GO.Checker();
 
 
