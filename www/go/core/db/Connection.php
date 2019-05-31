@@ -456,9 +456,6 @@ class Connection {
 	 * @throws PDOException
 	 */
 	public function createStatement($build) {
-		
-		
-
 		try {
 			$stmt = $this->getPDO()->prepare($build['sql']);
 			$stmt->setBuild($build);
@@ -475,6 +472,4 @@ class Connection {
 			throw $e;
 		}
 	}
-
-
 }
