@@ -17,6 +17,7 @@ if(isset($args['c'])) {
 }
 
 App::get()->setAuthState(new State());
+GO::session()->runAsRoot();
 //no cache 
 //GO()->setCache(new None());
 
