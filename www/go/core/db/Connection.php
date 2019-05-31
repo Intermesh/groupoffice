@@ -457,6 +457,7 @@ class Connection {
 	 */
 	public function createStatement($build) {
 		try {
+			$build['start'] = GO()->getDebugger()->getMicroTime();
 			$stmt = $this->getPDO()->prepare($build['sql']);
 			$stmt->setBuild($build);
 

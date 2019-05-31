@@ -113,7 +113,7 @@ class Group extends AclOwnerEntity {
 			$acl->addGroup($this->id, Acl::LEVEL_READ);
 		}
 		
-		return $acl->internalSave();
+		return $acl->save();
 	}
 	
 	protected function internalDelete() {

@@ -866,7 +866,14 @@ abstract class Property extends Model {
 			foreach($relation->keys as $from => $to) {
 				$where[$to] = $this->$from;
 			}			
-			\GO()->getDbConnection()->delete($first->getName(), $where)->execute();			
+			\GO()->getDbConnection()->delete($first->getName(), $where)->execute();		
+			
+			//set state to new for all models. Models could have been saved if save() is called multiple times.
+			foreach($models as $model) {
+				$model->isNew = true;
+				$model->primaryKeys = [];
+			}
+			
 		} else{
 			if (isset($modified[$relation->name][1])) {			
 				foreach ($modified[$relation->name][1] as $oldProp) {
@@ -1301,6 +1308,13 @@ abstract class Property extends Model {
 		return parent::setValues($values);
 	}
 
+	/**
+	 * Set a property
+	 * 
+	 * @param string $name
+	 * @param mixed $value
+	 * @return $this
+	 */
 	public function setValue($name, $value) {
 		$value = $this->normalizeValue($name, $value);
 		ModelHelper::setValue($this, $name, $value);
