@@ -3,6 +3,7 @@ namespace go\modules\community\ldapauthenticator\model;
 
 use go\core\jmap\Entity;
 use go\core\ldap\Connection;
+use go\core\util\DateTime;
 
 class Server extends Entity {
 	
@@ -33,6 +34,12 @@ class Server extends Entity {
 	public $smtpUseUserCredentials= false;
 	public $smtpValidateCertificate = true;
 	public $smtpEncryption;
+
+	public $syncUsers = false;
+	public $syncUsersQuery;
+	public $syncGroups = false;
+	public $syncGroupsQuery;
+
 	
 	
 	/**
@@ -109,6 +116,12 @@ class Server extends Entity {
 		if($this->isModified("domains")) {
 			GO()->getCache()->delete("authentication-domains");
 		}
+
+		if($this->isModified(['syncUsers', 'syncGroups'])) {
+			if($this->syncGroups || $this->syncUsers){
+				$this->runCronJob();
+			}
+		}
 		
 		return parent::internalSave();
 	}
@@ -151,5 +164,26 @@ class Server extends Entity {
 		}
 
 		return $this->connection;
+	}
+
+	private function runCronJob() {
+
+		$module = \go\core\model\Module::findByName('community', 'ldapauthenticator');
+
+		$cron = \go\core\model\CronJobSchedule::find()->where(['moduleId' => $module->id, 'name' => 'Sync'])->single();
+
+		if(!$cron) {
+			$cron = new \go\core\model\CronJobSchedule();
+			$cron->moduleId = $module->id;
+			$cron->name = "Sync";
+			$cron->expression = "0 0 * * *";
+			$cron->description = "Synchronize LDAP Authenication server";
+		}
+		$cron->enabled = true;
+		$cron->nextRunAt = new DateTime();
+		
+		if(!$cron->save()) {
+			throw new \Exception("Failed to save cron job: " . var_export($cron->getValidationErrors(), true));
+		}
 	}
 }

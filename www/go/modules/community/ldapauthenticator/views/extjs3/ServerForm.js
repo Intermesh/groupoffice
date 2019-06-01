@@ -286,6 +286,37 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						}
 					})
 				]
+			}, {
+				xtype: "fieldset",
+				title: t("Synchronization"),
+				defaults: {
+					anchor: '100%'
+				},
+				items: [
+					 {
+						xtype: 'checkbox',
+						checked: false,
+						hideLabel: true,
+						boxLabel: t('Synchronize users'),
+						name: 'syncUsers'
+					},{
+						xtype: 'textfield',
+						name: 'syncUsersQuery',
+						fieldLabel: t("User query"),
+						required: true
+					},  {
+						xtype: 'checkbox',
+						checked: false,
+						hideLabel: true,
+						boxLabel: t('Synchronize groups'),
+						name: 'syncGroups'
+					},{
+						xtype: 'textfield',
+						name: 'syncGroupsQuery',
+						fieldLabel: t("Group query"),
+						required: true
+					},  
+				]
 			}
 		];
 	}

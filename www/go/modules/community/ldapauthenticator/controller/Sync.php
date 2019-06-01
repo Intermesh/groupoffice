@@ -8,12 +8,17 @@ use go\core\ldap\Record;
 use go\core\model\Group;
 use go\core\ldap\Connection;
 use go\core\model\UserGroup;
-use go\core\jmap\Entity;
 use go\core\model\User;
 use go\modules\community\ldapauthenticator\Module;
+use go\core\event\EventEmitterTrait;
 
 class Sync extends Controller {
 
+  const EVENT_SYNC_USER = 'syncuser';
+
+  const EVENT_SYNC_GROUP = 'syncuser';
+
+	use EventEmitterTrait;
 
   /**
    * docker-compose exec --user www-data groupoffice-master php /usr/local/share/groupoffice/cli.php community/ldapauthenticator/Sync/users --id=2 --dryRun=1 --delete=1 --maxDeletePercentage=50
@@ -25,11 +30,13 @@ class Sync extends Controller {
       throw new NotFound();
     }
 
+    $this->serverId = $id;
+
     $connection = $server->connect();
 
     $usersInLDAP = [1];
 		
-		$records = Record::find($connection, $server->peopleDN, "(objectClass=inetOrgPerson)");
+		$records = Record::find($connection, $server->peopleDN, $server->syncUsersQuery);
     
     $i = 0;
     foreach($records as $record) {
@@ -53,8 +60,16 @@ class Sync extends Controller {
 
       Module::ldapRecordToUser($username, $record, $user);
 
-      if (!$dryRun && $user->isModified() && !$user->save()) {
-        echo "Error saving user: " . implode("\n", $user->getValidationErrors());
+      $this->fireEvent(self::EVENT_SYNC_USER, $user, $record);
+
+      if (!$dryRun) {
+        if($user->isModified() && !$user->save()) {
+          echo "Error saving user: " . implode("\n", $user->getValidationErrors());
+          continue;
+        }
+
+        GO()->getDbConnection()
+          ->replace('ldapauth_server_user_sync', ['serverId' => $id, 'userId' => $user->id])->execute();
       }      
 
 			echo "Synced " . $username . "\n";		
@@ -71,8 +86,9 @@ class Sync extends Controller {
 
 
   private function deleteUsers($usersInLDAP, $maxDeletePercentage, $dryRun) {
-    $users = User::find()->execute();
-
+    $users = User::find()
+      ->join('ldapauth_server_user_sync', 's', 's.userId = u.id')
+      ->where('serverId', '=', $this->serverId)->execute();
 		$totalInGO = $users->rowCount();
 		$totalInLDAP = count($usersInLDAP);
 
@@ -91,6 +107,8 @@ class Sync extends Controller {
       }
     }
   }
+  
+  private $serverId;
 
   /**
    * docker-compose exec --user www-data groupoffice-master php /usr/local/share/groupoffice/cli.php community/ldapauthenticator/Sync/groups --id=2 --dryRun=1 --delete=1 --maxDeletePercentage=50
@@ -102,11 +120,13 @@ class Sync extends Controller {
       throw new NotFound();
     }
 
+    $this->serverId = $id;
+
     $connection = $server->connect();
 
     $groupsInLDAP = [Group::ID_ADMINS, Group::ID_EVERYONE, Group::ID_INTERNAL];
 		
-		$records = Record::find($connection, $server->peopleDN, "(objectClass=Group)");
+		$records = Record::find($connection, $server->peopleDN, $server->syncGroupsQuery);
     
     $i = 0;
     foreach($records as $record) {
@@ -116,7 +136,7 @@ class Sync extends Controller {
       if (empty($name)) {
         throw new \Exception("Empty group name in LDAP record!");
       }
-      $group = Group::find()->where(['name' => $name])->single();
+      $group = Group::find()->where(['name' => $name, 'isUserGroupFor' => null])->single();
       if (!$group) {
 
         echo "Creating group '" . $name . "'\n";
@@ -130,6 +150,7 @@ class Sync extends Controller {
         echo "Group '" . $name . "' exists\n";    
       }
 
+    
       // Clear existing users
       $group->users = [];
     
@@ -146,10 +167,16 @@ class Sync extends Controller {
         }
       }
 
+      $this->fireEvent(self::EVENT_SYNC_GROUP, $group, $record);
+
       if (!$dryRun) {
         if(!$group->save()) {
           throw new \Excpetion("Could not save group");
         }
+
+        GO()->getDbConnection()
+          ->replace('ldapauth_server_group_sync', ['serverId' => $id, 'groupId' => $group->id])->execute();
+
       }
 
 			echo "Synced " . $name . "\n";		
@@ -169,7 +196,9 @@ class Sync extends Controller {
   }
 
   private function deleteGroups($groupsInLDAP, $maxDeletePercentage, $dryRun) {
-    $groups = Group::find()->where('isUserGroupFor', 'IS', null)->execute();
+    $groups = Group::find()
+      ->join('ldapauth_server_group_sync', 's', 's.groupId = g.id')
+      ->where('serverId', '=', $this->serverId)->execute();
 
 		$totalInGO = $groups->rowCount();
 		$totalInLDAP = count($groupsInLDAP);
