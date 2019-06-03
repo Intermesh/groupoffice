@@ -1,3 +1,4 @@
+03-06-2019 6.2.118
 - Email: Detect charset from HTML body if not present in IMAP structure
 - Files: Ignore permissions on folder notifications
 - Comments: Add comments module to modulemanager when installed.
