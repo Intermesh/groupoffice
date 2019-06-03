@@ -136,6 +136,16 @@ trait SearchableTrait {
 		echo $cls."\n";
 		
 
+		echo "Deleting old values\n";
+
+		$stmt = GO()->getDbConnection()->delete('core_search', (new Query)
+			->where('entityTypeId', '=', $cls::getType()->getId())
+			->andWhere('entityId', 'NOT IN', $cls::find()->selectSingleValue('id'))
+		);
+		$stmt->execute();
+
+		echo "Deleted ". $stmt->rowCount() . " entries\n";
+
 		//In small batches to keep memory low
 		$stmt = self::queryMissingSearchCache($cls);			
 		
