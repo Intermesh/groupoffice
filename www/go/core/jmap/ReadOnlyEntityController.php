@@ -67,7 +67,7 @@ abstract class ReadOnlyEntityController extends Controller {
 		$sort = $this->transformSort($params['sort']);
 		
 		//always add primary key for a stable sort. (https://dba.stackexchange.com/questions/22609/mysql-group-by-and-order-by-giving-inconsistent-results)
-		if(!isset($sort['id'])) {
+		if(!isset($sort['id']) && !empty($query->getGroupBy())) {
 			$sort['id'] = 'ASC';
 		}
 		
@@ -156,8 +156,7 @@ abstract class ReadOnlyEntityController extends Controller {
 	public function query($params) {
 		
 		$p = $this->paramsQuery($params);
-		$idsQuery = $this->getQueryQuery($p);
-		
+		$idsQuery = $this->getQueryQuery($p);		
 		$state = $this->getState();
 
 		

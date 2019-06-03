@@ -154,8 +154,11 @@ class Acl extends Property {
 						->join('core_user_group', 'acl_u' , 'acl_u.groupId = acl_g.groupId')
 						->andWhere([
 								'acl_u.userId' => App::get()->getAuthState()->getUserId()						
-										])
-						->andWhere('acl_g.level', '>=', $level);
+										]);
+
+		if($level != self::LEVEL_READ) {
+			$subQuery->andWhere('acl_g.level', '>=', $level);
+		}
 		
 		$query->whereExists(
 						$subQuery

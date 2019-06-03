@@ -72,6 +72,8 @@ go.modules.community.search.Panel = Ext.extend(Ext.Panel, {
 //		
 		this.lastQ = q;
 		var filter = {}, entities = [];
+
+		this.getEl().mask(t("Loading..."));
 		
 		Ext.each(this.entityGrid.getSelectionModel().getSelections(), function (r) {
 			entities.push(r.data.entity);
@@ -81,7 +83,7 @@ go.modules.community.search.Panel = Ext.extend(Ext.Panel, {
 		}
 
 		filter.q = q;
-		this.grid.store.baseParams.limit = 20;
+		this.grid.store.baseParams.limit = 10;
 		this.grid.store.removeAll();
 		
 		this.grid.store.load({
@@ -89,7 +91,7 @@ go.modules.community.search.Panel = Ext.extend(Ext.Panel, {
 				filter: filter
 			},
 			callback: function() {
-						
+				this.getEl().unmask();
 			},
 			scope: this
 		});
