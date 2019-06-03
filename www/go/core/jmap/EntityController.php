@@ -77,6 +77,16 @@ abstract class EntityController extends Controller {
 		/* @var $query Query */
 
 		$sort = $this->transformSort($params['sort']);		
+
+		if(!empty($query->getGroupBy())) {
+			//always add primary key for a stable sort. (https://dba.stackexchange.com/questions/22609/mysql-group-by-and-order-by-giving-inconsistent-results)		
+			$keys = $cls::getPrimaryKey();
+			foreach($keys as $key) {
+				if(!isset($sort[$key])) {
+					$sort[$key] = 'ASC';
+				}
+			}
+		}
 		
 		$cls::sort($query, $sort);
 
@@ -264,15 +274,6 @@ abstract class EntityController extends Controller {
 		foreach ($sort as $s) {
 			list($column, $direction) = explode(' ', $s);
 			$transformed[$column] = $direction;
-		}
-
-		//always add primary key for a stable sort. (https://dba.stackexchange.com/questions/22609/mysql-group-by-and-order-by-giving-inconsistent-results)		
-		$cls = $this->entityClass();
-		$keys = $cls::getPrimaryKey();
-		foreach($keys as $key) {
-			if(!isset($transformed[$key])) {
-				$transformed[$key] = 'ASC';
-			}
 		}
 		
 		return $transformed;		
