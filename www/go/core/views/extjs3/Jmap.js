@@ -150,13 +150,17 @@ go.Jmap = {
 				for(var entity in data) {
 					var store = go.Db.store(entity);
 					if(store) {
-						store.getState().then(function(state) {
-							if(!state) {
-								//don't fetch updates if there's no state yet because it never was used in that case.
-								return;
-							}
-							store.getUpdates();
-						});
+						(function(store) {
+							store.getState().then(function(state) {
+								if(!state) {
+									//don't fetch updates if there's no state yet because it never was used in that case.
+									return;
+								}
+
+								console.warn(store.entity.name);
+								store.getUpdates();
+							});
+						})(store);
 					}
 				}
 			}, false);

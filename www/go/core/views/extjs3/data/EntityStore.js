@@ -283,7 +283,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		
 		return me.getState().then(function(state){
 			
-//			console.log("Get updates for state: " + state);
+			console.log("getUpdates", me.entity.name, state);
 		
 			if(!state) {
 				console.info("No state yet so won't fetch updates");
