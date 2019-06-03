@@ -22,14 +22,12 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 	
 	
 	setValue: function (value) {
-		
-		var me = this, createRecord = function(data) {
-			var comboRecord = Ext.data.Record.create(me.store.fields);
-			var currentRecord = new comboRecord(data, data[me.valueField]);
-			me.store.add(currentRecord);
 
-			go.form.ComboBox.superclass.setValue.call(me, value);
-		};
+		if(!this.hiddenName) {
+			return go.form.ComboBox.superclass.setValue.call(this, value);
+		}
+		
+		var me = this;
 
 		//create record from entity store if not exists
 		if (value && this.store.entityStore && this.store.entityStore.entity && !this.findRecord(me.valueField, value)) {
@@ -37,10 +35,6 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 			this.value = value;
 			
 			this.resolveEntity(value).then(function (entity) {			
-
-				if(Ext.isFunction(me.renderer)) {
-					entity[me.displayField] = Ext.util.Format.htmlDecode(me.renderer(entity));
-				}
 				me.store.on("load", function() {
 					go.form.ComboBox.superclass.setValue.call(me, value);				
 				}, this, {single: true});
