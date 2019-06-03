@@ -191,7 +191,7 @@ go.Jmap = {
 	 * scope: callback function scope
 	 * dispatchAfterCallback: dispatch the response after the callback. Defaults to false.
 	 * 
-	 * @returns {String} Client call ID.
+	 * @returns {Promise} resolved with response
 	 */
 	request: function (options) {
 		if(!options.method) {

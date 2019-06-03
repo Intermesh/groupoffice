@@ -137,8 +137,7 @@ go.data.StoreTrait = {
 		}		
 	},
 
-	onChanges : function(entityStore, added, changed, destroyed) {		
-
+	onChanges : function(entityStore, added, changed, destroyed) {
 		if(!this.loaded || this.loading) {
 			return;
 		}		
