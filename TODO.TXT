@@ -28,7 +28,7 @@ Modules in group configurarable
 Filters
 Global search improved
 Bookmarks backend refactored
-Search Query Language
+Search Query
 
 
 DG::
