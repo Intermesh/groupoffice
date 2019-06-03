@@ -9,6 +9,11 @@ use function GO;
 use go\core\model\Acl;
 
 abstract class AclEntity extends Entity {
+
+
+
+	protected $permissionLevel;
+	
 	/**
 	 * Get the current state of this entity
 	 * 

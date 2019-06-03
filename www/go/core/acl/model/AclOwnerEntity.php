@@ -33,6 +33,7 @@ abstract class AclOwnerEntity extends AclEntity {
 	 */
 	private $acl;
 
+
 	protected function internalSave() {
 		
 		if($this->isNew() && !isset($this->aclId)) {
@@ -214,7 +215,11 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * @return int
 	 */
 	public function getPermissionLevel() {
-		return Acl::getUserPermissionLevel($this->aclId, App::get()->getAuthState()->getUserId());
+		if(!isset($this->permissionLevel)) {
+			$this->permissionLevel = Acl::getUserPermissionLevel($this->aclId, App::get()->getAuthState()->getUserId());
+		}
+
+		return $this->permissionLevel;
 	}
 	
 	/**

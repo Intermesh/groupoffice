@@ -279,6 +279,18 @@ class Acl extends Entity {
 		$query->whereExists(
 						$subQuery
 						);
+
+
+		// $on =  'acl_g.aclId = ' . $column;
+		// if($level != self::LEVEL_READ) {
+		// 	$on .= ' AND level >= ' .$level;
+		// }
+
+		// $query->join('core_acl_group', 'acl_g',$on)
+		// 	->join('core_user_group', 'acl_u', 'acl_u.groupId = acl_g.groupId AND acl_u.userId=' . (isset($userId) ? $userId : App::get()->getAuthState()->getUserId()))
+		// 	->select('MAX(acl_g.level) as permissionLevel', true)
+		// 	->groupBy(['id']);
+		
 	}
 	
 	private static $permissionLevelCache = [];

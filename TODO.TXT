@@ -14,6 +14,7 @@ ticket groups
 Todo
 Adres list convert
 houtwerf search loopt vast
+router permissionlevel pass to controller
 
 
 New in 6.4:
@@ -30,7 +31,7 @@ Filters
 Global search improved
 Bookmarks backend refactored
 Search Query
-
+Sync data with browser
 
 DG::
 

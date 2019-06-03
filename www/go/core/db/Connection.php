@@ -40,7 +40,7 @@ class Connection {
 	 * 
 	 * @var bool 
 	 */
-	public $debug = false;
+	public $debug = true;
 	
 	public function __construct($dsn, $username, $password) {
 		$this->dsn = $dsn;
@@ -457,7 +457,7 @@ class Connection {
 	 */
 	public function createStatement($build) {
 		try {
-			$build['start'] = GO()->getDebugger()->getMicroTime();
+			$build['start'] = GO()->getDebugger()->getTimeStamp();
 			$stmt = $this->getPDO()->prepare($build['sql']);
 			$stmt->setBuild($build);
 
