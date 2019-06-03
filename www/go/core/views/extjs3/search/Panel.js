@@ -71,6 +71,8 @@ go.search.Panel = Ext.extend(Ext.Panel, {
 //		
 		this.lastQ = q;
 		var filter = {}, entities = [];
+
+		this.getEl().mask(t("Loading..."));
 		
 		Ext.each(this.entityGrid.getSelectionModel().getSelections(), function (r) {
 			entities.push({
@@ -84,13 +86,17 @@ go.search.Panel = Ext.extend(Ext.Panel, {
 		}
 
 		filter.text = q;
-		this.grid.store.baseParams.limit = 20;
+		this.grid.store.baseParams.limit = 10;
 		this.grid.store.removeAll();
 		
 		this.grid.store.load({
 			params: {
 				filter: filter
-			}
+			},
+			callback: function() {
+				this.getEl().unmask();
+			},
+			scope: this
 		});
 		
 		//this.setHeight(dp(600));
