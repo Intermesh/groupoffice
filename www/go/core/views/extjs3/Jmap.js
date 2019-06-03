@@ -141,8 +141,14 @@ go.Jmap = {
 			var source = new EventSource(url), me = this;
 			
 			source.addEventListener('state', function(e) {
-				for(var entity in JSON.parse(e.data)) {
-					var store =go.Db.store(entity);
+
+				var data = JSON.parse(e.data);
+				console.group("SSE state");
+				console.log(data);
+				console.groupEnd();
+
+				for(var entity in data) {
+					var store = go.Db.store(entity);
 					if(store) {
 						store.getState().then(function(state) {
 							if(!state) {
