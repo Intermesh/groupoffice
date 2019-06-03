@@ -148,7 +148,7 @@ go.data.StoreTrait = {
 			o.params = o.params || {};
 			o.params.position = 0;
 			o.params.limit = this.getCount();
-			this.load(this.lastOptions);
+			this.load(o);
 		}
 		
 		for(var i = 0, l = destroyed.length; i < l; i++) {

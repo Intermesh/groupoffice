@@ -197,7 +197,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		
 		//delay fireevent one event loop cycle
 		me.timeout = setTimeout(function () {
-			// console.log('changes', me.entity.name, me.changes.added, me.changes.changed, me.changes.destroyed);
+			// console.warn('changes', me.entity.name, me.changes.added, me.changes.changed, me.changes.destroyed);
 			me.fireEvent('changes', me, me.changes.added, me.changes.changed, me.changes.destroyed);			
 			me.initChanges();
 			me.timeout = null;
