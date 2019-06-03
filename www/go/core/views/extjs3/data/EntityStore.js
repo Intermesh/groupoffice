@@ -290,7 +290,6 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				if(cb) {
 					cb.call(scope || me, me, false);
 				}
-				debugger;
 				return Promise.reject("No state yet");
 			}
 			
