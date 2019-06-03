@@ -1,4 +1,5 @@
-- Email: Changed messages grid to a grouped grid, grouped on date
+03-06-2019 6.3.76
+- Fixed some 6.2 upgrade issues.
 
 27-05-2019 6.3.75
 - Tickets: Added missing language in tickets for Brazilian portuges
