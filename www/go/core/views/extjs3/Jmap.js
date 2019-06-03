@@ -156,8 +156,7 @@ go.Jmap = {
 									//don't fetch updates if there's no state yet because it never was used in that case.
 									return;
 								}
-
-								console.warn(store.entity.name);
+								
 								store.getUpdates();
 							});
 						})(store);
