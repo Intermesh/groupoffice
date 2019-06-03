@@ -13,6 +13,19 @@ use go\core\orm\Relation;
  * Imports a CSV file to entities.
  * 
  * A mapping can be supplied to the JMAP controller or importFile() function. {@see importFile()}
+ * 
+ * The key is the CSV record index and value the 
+ * 	property path. "propName" or "prop.name" if it's a relation.
+ * 	If the relation is a has many values can be separated with " ::: ".
+ * 
+ * For example pass to the options:
+ * 
+ * [
+ * 		"mapping" => [
+ * 			"firstName",
+ * 			"emailAddresses.email"
+ * 	]
+ * ]
  */
 class Csv extends AbstractConverter {
 	
