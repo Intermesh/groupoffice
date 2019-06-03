@@ -316,7 +316,7 @@ class MaintenanceController extends AbstractController {
 	 */
 	protected function actionBuildSearchCache($params) {
 		
-		if(!$this->isCli() && !\GO::modules()->tools && \GO::router()->getControllerAction()!='upgrade')
+		if(!$this->isCli() && !GO::user()->isAdmin() && \GO::router()->getControllerAction()!='upgrade')
 			throw new \GO\Base\Exception\AccessDenied();
 		
 		GO::setIgnoreAclPermissions(true);
