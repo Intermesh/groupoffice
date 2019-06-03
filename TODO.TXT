@@ -10,10 +10,25 @@ Calendar birthdays
 Demodata
 ticket groups
 
+
+Todo
+Adres list convert
+
+
+New in 6.4:
+
+System settings
+Default permissions
 LDAP sync
-HW FTP import
-Comments report
-Collabora code integation
+Address book
+Newsletters
+Comments
+Profile
+Modules in group configurarable
+Filters
+Global search improved
+Bookmarks backend refactored
+Search Query Language
 
 
 DG::
