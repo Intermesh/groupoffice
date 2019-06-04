@@ -866,7 +866,6 @@ abstract class Property extends Model {
 				return $model->internalCopy();
 			}, $models);
 			
-			
 		} else{
 			if (isset($modified[$relation->name][1])) {			
 				foreach ($modified[$relation->name][1] as $oldProp) {
@@ -1484,13 +1483,15 @@ abstract class Property extends Model {
 	 */
 	protected function internalCopy() {
 		$copy = new static;
-		$v = $this->toArray();
-		$pk = $this->getPrimaryKey();
-		foreach($pk as $field) {
-			unset($v[$field]);
+
+		//copy public and protected columns except for auto increments.
+		$props = $this->getApiProperties();
+		foreach($props as $name => $p) {
+			$col = static::getMapping()->getColumn($name);
+			if(isset($p['access']) && (!$col || $col->autoIncrement == false)) {
+				$copy->$name = $this->$name;
+			}
 		}
-		
-		$copy->setValues($v);
 
 		return $copy;
 	}

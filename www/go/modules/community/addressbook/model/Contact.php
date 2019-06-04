@@ -703,7 +703,7 @@ class Contact extends AclItemEntity {
 	}
 	
 	private function findPropByType($propName, $type, $returnAny) {
-		foreach($this->$propName as $prop) {
+		foreach($this->$propName as &$prop) {
 			if($prop->type === $type) {
 				return $prop;
 			}

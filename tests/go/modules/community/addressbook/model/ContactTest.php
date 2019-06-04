@@ -4,6 +4,7 @@ namespace go\modules\community\addressbook\model;
 
 use PHPUnit\Framework\TestCase;
 use go\modules\community\addressbook\model\AddressBook;
+use go\modules\community\addressbook\model\Contact;
 
 class ContactTest extends TestCase {	
 
@@ -36,6 +37,19 @@ class ContactTest extends TestCase {
     $success = $contact->save();
 
     $this->assertEquals(true, $success);
+
+    $contact = Contact::findById($contact->id);
+
+    $a = $contact->findEmailByType(EmailAddress::TYPE_HOME);
+    $a->type = EmailAddress::TYPE_WORK;
+
+    $success = $contact->save();
+
+    $this->assertEquals(true, $success);
+
+    $contact = Contact::findById($contact->id);
+
+    $this->assertEquals(EmailAddress::TYPE_WORK, $contact->emailAddresses[0]->type);
 
   }
 }
