@@ -196,6 +196,16 @@ class Debugger {
 			}
 		}
 
+		if(GO()->getEnvironment()->isCli()) {
+			if (!is_scalar($mixed)) {
+				$print = print_r($mixed, true);
+			} else{
+				$print = $mixed;
+			}
+
+			echo '['.$level.'] '.$print ."\n";
+		}
+
 		$this->entries[] = [$level, $mixed];
 		
 	}

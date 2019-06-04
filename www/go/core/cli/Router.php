@@ -23,6 +23,8 @@ use function str_split;
  * ```
  * docker-compose exec --user www-data groupoffice php cli.php community/addressbook/migrate/run
  * ```
+ * 
+ * Core controllers can be accessed with core/ControllerName
  */
 class Router {
 	
@@ -89,7 +91,14 @@ class Router {
 		$path = array_shift($args);
 		$parts = explode('/', $path);
 
-		$controllerCls = 'go\\modules\\' . $parts[0] . '\\' . $parts[1] . '\\controller\\' . $parts[2];
+		if($parts[0] == 'core') {
+			$controllerCls = 'go\\core\\controller\\' . $parts[1];
+			$method = $parts[2];
+		} else{
+			$controllerCls = 'go\\modules\\' . $parts[0] . '\\' . $parts[1] . '\\controller\\' . $parts[2];
+			$method = $parts[3];
+		}
+
 
 		if (!class_exists($controllerCls)) {
 			throw new NotFound("Route: " . $path . " ( ".$controllerCls.")  not found.");
@@ -97,11 +106,11 @@ class Router {
 
 		$ctrl = new $controllerCls;
 		
-		if (!method_exists($ctrl, $parts[3])) {
-			throw new Exception("Method '" .  $parts[3] . "' doesn't exist in controller '" . $controllerCls . "'");
+		if (!method_exists($ctrl, $method)) {
+			throw new Exception("Method '" .  $method . "' doesn't exist in controller '" . $controllerCls . "'");
 		}
 		
-		$this->callMethod($ctrl, $parts[3], $args);
+		$this->callMethod($ctrl, $method, $args);
 	}
 
 	private function getMethodParams($controller, $methodName) {	
