@@ -22,10 +22,7 @@ class ContactTest extends TestCase {
     $contact->addressBookId = $addressBook->id;
     $contact->firstName = "John";
     $contact->lastName = "Doe";
-    $contact->emailAddresses[0] = (new EmailAddress())->setValues(['email' => 'john@doe.test']);
-
-    $contact->emailAddresses[0] = (new EmailAddress())->setValues(['email' => 'john@doe.test']);
-  
+    $contact->emailAddresses[0] = (new EmailAddress())->setValues(['email' => 'john@doe.test', 'type' => EmailAddress::TYPE_HOME]);  
 		$contact->addresses[0] = $a = new Address();		
 
     $a->street =	"Street";
@@ -40,8 +37,11 @@ class ContactTest extends TestCase {
 
     $contact = Contact::findById($contact->id);
 
-    $a = $contact->findEmailByType(EmailAddress::TYPE_HOME);
-    $a->type = EmailAddress::TYPE_WORK;
+    $email = $contact->findEmailByType(EmailAddress::TYPE_HOME);
+    $email->type = EmailAddress::TYPE_WORK;
+
+    $address = $contact->findAddressByType(Address::TYPE_POSTAL);
+    $address->countryCode = "DE";
 
     $success = $contact->save();
 
@@ -50,6 +50,7 @@ class ContactTest extends TestCase {
     $contact = Contact::findById($contact->id);
 
     $this->assertEquals(EmailAddress::TYPE_WORK, $contact->emailAddresses[0]->type);
+    $this->assertEquals("DE", $contact->addresses[0]->countryCode);
 
   }
 }
