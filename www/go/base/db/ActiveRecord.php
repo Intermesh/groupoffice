@@ -189,7 +189,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * For compatibility with new framework
 	 * @return type
 	 */
-	public static function getType() {
+	public static function entityType() {
 		return \go\core\orm\EntityType::findByClassName(static::class);
 	}
 
@@ -1349,7 +1349,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$joinCf = !empty($params['joinCustomFields']) && $this->hasCustomFields();
 
 		if($joinCf) {
-			$cfFieldModels = array_filter(\go\core\model\Field::findByEntity($this->getType()->getId())->all(), function($f) {
+			$cfFieldModels = array_filter(\go\core\model\Field::findByEntity($this->entityType()->getId())->all(), function($f) {
 				return $f->type != 'MultiSelect'; //temporary hack
 			});
 			
@@ -3071,7 +3071,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 					$acl = new \GO\Base\Model\Acl();
 					$acl->usedIn=$this->tableName().'.'.$this->aclOverwrite();
 					$acl->ownedBy=$oldAcl->ownedBy;
-					$acl->entityTypeId = $this->getType()->getId();
+					$acl->entityTypeId = $this->entityType()->getId();
 					$acl->entityId = $this->id;
 					$acl->save();
 					
@@ -3461,7 +3461,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$acl = new \GO\Base\Model\Acl();
 		$acl->usedIn = $this->tableName().'.'.$this->aclField();
 		$acl->ownedBy=$user_id;
-		$acl->entityTypeId = $this->getType()->getId();
+		$acl->entityTypeId = $this->entityType()->getId();
 		$acl->entityId = $this->id;
 		if(!$acl->save()) {
 			throw new \Exception("Could not save ACL: ".var_export($this->getValidationErrors(), true));
@@ -3556,10 +3556,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			return false;
 		}
 		
-		$search = \go\core\model\Search::find()->where('entityTypeId','=', static::getType()->getId())->andWhere('entityId', '=', $this->id)->single();
+		$search = \go\core\model\Search::find()->where('entityTypeId','=', static::entityType()->getId())->andWhere('entityId', '=', $this->id)->single();
 		if(!$search) {
 			$search = new \go\core\model\Search();
-			$search->setEntity(static::getType());
+			$search->setEntity(static::entityType());
 		}
 		// GO 6.3 backwards compatible
 		if(!empty($attr['mtime'])) {
@@ -4417,7 +4417,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}else
 		{
 			$to_model_id = $model->id;
-			$to_model_type_id = $model->getType()->getId();
+			$to_model_type_id = $model->entityType()->getId();
 		}
 		
 		
@@ -4490,7 +4490,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}else
 		{
 			$to_model_id = $model->id;
-			$to_model_type_id = $model->getType()->getId();
+			$to_model_type_id = $model->entityType()->getId();
 		}
 		
 		if(!$to_model_id)
@@ -4551,7 +4551,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}else
 		{
 			$to_model_id = $model->id;
-			$to_model_type_id = $model->getType()->getId();
+			$to_model_type_id = $model->entityType()->getId();
 		}
 		
 		
@@ -4755,7 +4755,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			
 			echo "Processing ".static::class ."\n";
 			
-			$entityTypeId = static::getType()->getId();
+			$entityTypeId = static::entityType()->getId();
 		
 			$start = 0;
 			$limit = 100;
@@ -5147,7 +5147,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			return false;		
 
 		$comment = new \go\modules\community\comments\model\Comment();
-		$comment->setEntity($this->getType());
+		$comment->setEntity($this->entityType());
 		$comment->entityId = $this->id;
 		$comment->text=$text;
 		if(!$comment->save()) {			

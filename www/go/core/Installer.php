@@ -109,7 +109,7 @@ class Installer {
 		$entities = $classFinder->findByParent(Entity::class);
 
 		foreach ($entities as $entity) {
-			if (!$entity::getType()) {
+			if (!$entity::entityType()) {
 				return false;
 			}
 		}
@@ -137,7 +137,7 @@ class Installer {
 			throw new Exception("Failed to save cron job: " . var_export($cron->getValidationErrors(), true));
 		}
 		
-		$acl = model\Acl::findById(Group::getType()->getDefaultAclId());
+		$acl = model\Acl::findById(Group::entityType()->getDefaultAclId());
 		$acl->addGroup(model\Group::ID_EVERYONE);
 		if(!$acl->save()) {
 			throw new \Exception("Could not save default ACL for groups");

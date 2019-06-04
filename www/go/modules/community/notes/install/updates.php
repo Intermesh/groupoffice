@@ -46,8 +46,8 @@ $updates['201711071208'][] = 'ALTER TABLE `notes_note_custom_fields` ADD FOREIGN
 $updates['201711071208'][] = 'update `core_entity` set moduleId = (select id from core_module where name=\'notes\'), name = \'Note\', clientName = \'Note\' where name = \'GO\\\\Notes\\\\Model\\\\Note\';';
 
 $updates['201712141425'][] = function() {
-		\go\modules\community\notes\model\NoteBook::getType();
-		\go\modules\community\notes\model\Note::getType();		
+		\go\modules\community\notes\model\NoteBook::entityType();
+		\go\modules\community\notes\model\Note::entityType();		
 };
 
 

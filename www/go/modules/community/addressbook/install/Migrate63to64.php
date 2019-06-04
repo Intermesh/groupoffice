@@ -159,7 +159,7 @@ class Migrate63to64 {
 			
 			GO()->getDbConnection()
 							->update("core_customfields_field_set", 
-											['entityId' => Contact::getType()->getId()], 
+											['entityId' => Contact::entityType()->getId()], 
 											['entityId' => $companyEntityType->getId()])
 							->execute();
 		}
@@ -179,7 +179,7 @@ class Migrate63to64 {
 //						->delete(
 //										'core_link', 
 //										(new \go\core\db\Query)
-//										->where(['fromEntityTypeId' => Contact::getType()->getId()])
+//										->where(['fromEntityTypeId' => Contact::entityType()->getId()])
 //										->andWhere('fromId', 'NOT IN', Contact::find()->select('id'))
 //										)->execute();
 //		
@@ -187,14 +187,14 @@ class Migrate63to64 {
 //						->delete(
 //										'core_link', 
 //										(new \go\core\db\Query)
-//										->where(['toEntityTypeId' => Contact::getType()->getId()])
+//										->where(['toEntityTypeId' => Contact::entityType()->getId()])
 //										->andWhere('toId', 'NOT IN', Contact::find()->select('id'))
 //										)->execute();
 		
 		GO()->getDbConnection()
 						->update("core_link", 
 										[
-												'fromEntityTypeId' => Contact::getType()->getId(),
+												'fromEntityTypeId' => Contact::entityType()->getId(),
 												'fromId' => new \go\core\db\Expression('fromId + ' . $this->getCompanyIdIncrement())
 										], 
 										['fromEntityTypeId' => $companyEntityType->getId()])
@@ -203,7 +203,7 @@ class Migrate63to64 {
 		GO()->getDbConnection()
 						->update("core_link", 
 										[
-												'toEntityTypeId' => Contact::getType()->getId(),
+												'toEntityTypeId' => Contact::entityType()->getId(),
 												'toId' => new \go\core\db\Expression('toId + ' . $this->getCompanyIdIncrement())
 										], 
 										['toEntityTypeId' => $companyEntityType->getId()])
@@ -212,7 +212,7 @@ class Migrate63to64 {
 //		GO()->getDbConnection()
 //						->update("core_search", 
 //										[
-//												'entityTypeId' => Contact::getType()->getId(),
+//												'entityTypeId' => Contact::entityType()->getId(),
 //												'entityId' => new \go\core\db\Expression('entityId + ' . $this->getCompanyIdIncrement())
 //										], 
 //										['entityTypeId' => $companyEntityType->getId()])

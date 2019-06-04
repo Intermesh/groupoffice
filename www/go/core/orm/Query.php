@@ -65,9 +65,9 @@ class Query extends DbQuery {
 		
 		$c = new \go\core\db\Criteria();
 		$cls = $this->model;
-		$c->where(['link.fromEntityTypeId' => $entity->getType()->getId(),
+		$c->where(['link.fromEntityTypeId' => $entity->entityType()->getId(),
 				'link.fromId' => $entity->id,
-				'link.toEntityTypeId' => $cls::getType()->getId()
+				'link.toEntityTypeId' => $cls::entityType()->getId()
 				])->andWhere('link.toId = '.$this->getTableAlias().'.id');
 						
 		return $this->join('core_link', 'link', $c);

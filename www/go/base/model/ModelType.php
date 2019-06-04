@@ -51,7 +51,7 @@ class ModelType extends \GO\Base\Db\ActiveRecord {
 			return $model->id;
 		
 		//Use new framework EntityType
-		$modelName::getType();
+		$modelName::entityType();
 		
 		return $this->findByModelName($modelName);
 	}

@@ -192,7 +192,7 @@ class Csv extends AbstractConverter {
 			$headers = $this->addSubHeaders($headers, $name, $value);
 		}
 		if(method_exists($entityCls, 'getCustomFields')) {
-			$fields = Field::findByEntity($entityCls::getType()->getId());
+			$fields = Field::findByEntity($entityCls::entityType()->getId());
 			foreach($fields as $field) {
 				$headers[] = ['name' => 'customFields.' . $field->databaseName, 'label' => $field->name, 'many' => $field->getDataType()->hasMany()];
 			}

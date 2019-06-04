@@ -173,7 +173,7 @@ abstract class Module {
 		
 		$moduleModel = $this->getModel();
 		foreach($entities as $entity) {
-			$type = $entity::getType();
+			$type = $entity::entityType();
 			if(!$type) {
 				throw new \Exception("Could not register entity type for module ". $this->getName() . " with name " . $entity::getClientName());
 			}

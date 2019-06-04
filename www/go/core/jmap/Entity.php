@@ -37,9 +37,9 @@ abstract class Entity  extends OrmEntity {
 	 * @return string
 	 */
 	public static function getState($entityState = null) {
-		$state = ($entityState ?? static::getType()->getHighestModSeq()) . ':';
+		$state = ($entityState ?? static::entityType()->getHighestModSeq()) . ':';
 		
-		$state .= static::getMapping()->hasUserTable  ? static::getType()->getHighestUserModSeq() : "0";		
+		$state .= static::getMapping()->hasUserTable  ? static::entityType()->getHighestUserModSeq() : "0";		
 
 		return $state;
 	}
@@ -59,7 +59,7 @@ abstract class Entity  extends OrmEntity {
 		}
 		
 		if(self::$trackChanges) {
-			$this->getType()->checkChange($this);
+			$this->entityType()->checkChange($this);
 		} else
 		{
 			GO()->warn('Track changes was disabled during save of '. static::class);
@@ -80,7 +80,7 @@ abstract class Entity  extends OrmEntity {
 		}
 		
 		if(self::$trackChanges) {
-			$this->getType()->checkChange($this);
+			$this->entityType()->checkChange($this);
 		} else
 		{
 			GO()->warn('Track changes was disabled during delete of '. static::class);
@@ -145,7 +145,7 @@ abstract class Entity  extends OrmEntity {
 	 */
 	public static function getChanges($sinceState, $maxChanges) {
 		
-		$entityType = static::getType();
+		$entityType = static::entityType();
 		
 		
 		//states are the main entity state combined with user table states. {@see Mapping::addUserTable()}
@@ -254,7 +254,7 @@ abstract class Entity  extends OrmEntity {
 						->from("core_change_user", "change_user")
 						->where([
 								"userId" => GO()->getUserId(),
-								"entityTypeId" => static::getType()->getId()
+								"entityTypeId" => static::entityType()->getId()
 						])
 						->andWhere('modSeq', '>', $sinceModSeq);
 	}
@@ -266,7 +266,7 @@ abstract class Entity  extends OrmEntity {
 						->from('core_change', 'change')
 						->fetchMode(PDO::FETCH_ASSOC)						
 						->groupBy(['entityId'])
-						->where(["entityTypeId" => static::getType()->getId()])
+						->where(["entityTypeId" => static::entityType()->getId()])
 						->andWhere('modSeq', '>', $sinceModSeq);
 		
 	

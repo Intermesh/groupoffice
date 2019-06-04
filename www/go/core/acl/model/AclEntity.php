@@ -21,7 +21,7 @@ abstract class AclEntity extends Entity {
 	 * @return string
 	 */
 	public static function getState($entityState = null) {
-		return parent::getState($entityState) . ':' . Acl::getType()->getHighestModSeq();
+		return parent::getState($entityState) . ':' . Acl::entityType()->getHighestModSeq();
 	}
 	
 	
@@ -64,7 +64,7 @@ abstract class AclEntity extends Entity {
 			return $result;
 		}
 			
-		$entityType = static::getType();		
+		$entityType = static::entityType();		
 
 		$isAclItem = is_a(static::class, AclItemEntity::class, true);			
 

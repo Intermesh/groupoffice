@@ -83,7 +83,7 @@ class GarbageCollection extends CronJob {
 			$query = (new Query)->select('sub.id')->from($tableName);
 
 			$stmt = GO()->getDbConnection()->delete('core_search', (new Query)
-				->where('entityTypeId', '=', $cls::getType()->getId())
+				->where('entityTypeId', '=', $cls::entityType()->getId())
 				->andWhere('entityId', 'NOT IN', $query)
 			);
 			$stmt->execute();
@@ -91,7 +91,7 @@ class GarbageCollection extends CronJob {
 			GO()->debug("Deleted ". $stmt->rowCount() . " cached search results for $cls");
 
 			$stmt = GO()->getDbConnection()->delete('core_link', (new Query)
-				->where('fromEntityTypeId', '=', $cls::getType()->getId())
+				->where('fromEntityTypeId', '=', $cls::entityType()->getId())
 				->andWhere('fromId', 'NOT IN', $query)
 			);
 			$stmt->execute();
@@ -99,7 +99,7 @@ class GarbageCollection extends CronJob {
 			GO()->debug("Deleted ". $stmt->rowCount() . " links from $cls");
 
 			$stmt = GO()->getDbConnection()->delete('core_link', (new Query)
-				->where('toEntityTypeId', '=', $cls::getType()->getId())
+				->where('toEntityTypeId', '=', $cls::entityType()->getId())
 				->andWhere('toId', 'NOT IN', $query)
 			);
 			$stmt->execute();

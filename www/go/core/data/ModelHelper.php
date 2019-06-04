@@ -51,7 +51,7 @@ class ModelHelper {
 		$props = $model->getApiProperties();
 
 		if(!isset($props[$propName])) {
-			throw new \Exception("Not existing property $propName for ". $model::getType()->getName());
+			throw new \Exception("Not existing property $propName for ". get_class($model));
 		}
 
 		if($props[$propName]['getter']) {

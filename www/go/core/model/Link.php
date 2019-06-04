@@ -152,11 +152,11 @@ class Link extends Entity {
 		
 		$link = new Link();
 		$link->fromId = $a->id;
-		$link->fromEntity = $a->getType()->getName();
-		$link->fromEntityTypeId = $a->getType()->getId();
+		$link->fromEntity = $a->entityType()->getName();
+		$link->fromEntityTypeId = $a->entityType()->getId();
 		$link->toId = $b->id;
-		$link->toEntity = $b->getType()->getName();
-		$link->toEntityTypeId = $b->getType()->getId();
+		$link->toEntity = $b->entityType()->getName();
+		$link->toEntityTypeId = $b->entityType()->getId();
 		$link->description = $description;		
 		
 		if(!$link->save()) {
@@ -185,9 +185,9 @@ class Link extends Entity {
 	 */
 	public static function findLink($a, $b) {
 		return Link::find()->where([
-				'fromEntityTypeId' => $a->getType()->getId(),
+				'fromEntityTypeId' => $a->entityType()->getId(),
 				'fromId' => $a->id,
-				'toEntityTypeId' => $b->getType()->getId(),
+				'toEntityTypeId' => $b->entityType()->getId(),
 				'toId' => $b->id,
 		])->single();
 	}
@@ -202,7 +202,7 @@ class Link extends Entity {
 	 * @return boolean
 	 */
 	public static function deleteLink($a, $b) {
-		return self::deleteLinkWithIds($a->getType()->getId(), $a->id, $b->id, $b->getType()->getId());
+		return self::deleteLinkWithIds($a->entityType()->getId(), $a->id, $b->id, $b->entityType()->getId());
 	}
 	
 	/**

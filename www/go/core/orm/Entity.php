@@ -28,7 +28,7 @@ use go\core\data\exception\NotArrayable;
  * 	$cf = new \go\core\util\ClassFinder();	
  * 	$cf->addNamespace("go\\modules\\community\\email");			
  * 	foreach($cf->findByParent(go\core\orm\Entity::class) as $cls) {
- * 		$cls::getType();
+ * 		$cls::entityType();
  * 	}
  * };
  * 
@@ -395,7 +395,7 @@ abstract class Entity extends Property {
 	 * @return int
 	 */
 	public function findAclId() {
-		$moduleId = static::getType()->getModuleId();
+		$moduleId = static::entityType()->getModuleId();
 		
 		return Module::findById($moduleId)->findAclId();
 	}
@@ -406,7 +406,7 @@ abstract class Entity extends Property {
 	 * 
 	 * @return EntityType
 	 */
-	public static function getType() {		
+	public static function entityType() {		
 
 		$cls = static::class;
 
@@ -680,7 +680,7 @@ abstract class Entity extends Property {
 	 * @return array
 	 */
 	public function toTemplate() {
-		// return [lcfirst(self::getType()->getName()) => $this];
+		// return [lcfirst(self::entityType()->getName()) => $this];
 
 		$arr = [];
 		

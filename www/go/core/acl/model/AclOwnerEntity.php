@@ -148,13 +148,13 @@ abstract class AclOwnerEntity extends AclEntity {
 			$this->acl = new Acl();
 		} else
 		{
-			$defaultAcl = Acl::findById(static::getType()->getDefaultAclId());		
+			$defaultAcl = Acl::findById(static::entityType()->getDefaultAclId());		
 			$this->acl = $defaultAcl->copy();
 		}
 		
 		$this->acl->usedIn = $this->getMapping()->getColumn('aclId')->table->getName().'.aclId';
 		try {
-			$this->acl->entityTypeId = $this->getType()->getId();
+			$this->acl->entityTypeId = $this->entityType()->getId();
 		} catch(\Exception $e) {
 
 			//During install this will throw a module not found error due to chicken / egg problem.
@@ -289,7 +289,7 @@ abstract class AclOwnerEntity extends AclEntity {
 		$stmt = GO()->getDbConnection()->update(
       'core_acl', 
       [
-        'acl.entityTypeId' => static::getType()->getId(), 
+        'acl.entityTypeId' => static::entityType()->getId(), 
         'acl.entityId' => new Expression('entity.id')],
       (new Query())
         ->tableAlias('acl')

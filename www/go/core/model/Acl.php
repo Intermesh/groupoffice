@@ -144,7 +144,7 @@ class Acl extends Entity {
 			return true;
 		}
 		
-		$modSeq = Acl::getType()->nextModSeq();
+		$modSeq = Acl::entityType()->nextModSeq();
 		
 		foreach($addedGroupIds as $groupId) {
 			$success = App::get()->getDbConnection()

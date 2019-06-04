@@ -114,7 +114,7 @@ trait CustomFieldsTrait {
 		if(!isset(self::$customFields)) {
 			self::$customFields = Field::find()
 						->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId')
-						->where(['fs.entityId' => static::getType()->getId()])->all();
+						->where(['fs.entityId' => static::entityType()->getId()])->all();
 		}
 		
 		return self::$customFields;

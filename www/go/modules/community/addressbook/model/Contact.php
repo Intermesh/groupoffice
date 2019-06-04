@@ -499,9 +499,9 @@ class Contact extends AclItemEntity {
 	 */
 	public function findOrganizations(){
 		return self::find()
-						->join('core_link', 'l', 'c.id=l.toId and l.toEntityTypeId = '.self::getType()->getId())
+						->join('core_link', 'l', 'c.id=l.toId and l.toEntityTypeId = '.self::entityType()->getId())
 						->where('fromId', '=', $this->id)
-							->andWhere('fromEntityTypeId', '=', self::getType()->getId())
+							->andWhere('fromEntityTypeId', '=', self::entityType()->getId())
 							->andWhere('c.isOrganization', '=', true);
 	}
 	
@@ -534,7 +534,7 @@ class Contact extends AclItemEntity {
 		
 		$remove = array_diff($current, $this->setOrganizationIds);
 		if(count($remove)) {
-			Link::deleteLinkWithIds($remove, Contact::getType()->getId(), $this->id, Contact::getType()->getId());
+			Link::deleteLinkWithIds($remove, Contact::entityType()->getId(), $this->id, Contact::entityType()->getId());
 		}
 		
 		$add = array_diff($this->setOrganizationIds, $current);
@@ -617,12 +617,12 @@ class Contact extends AclItemEntity {
 		//Save contact as link to organizations affect the search entities too.
 		if(!$to->isOrganization) {			
 			$to->saveSearch();
-			Contact::getType()->change($to);
+			Contact::entityType()->change($to);
 		}
 		
 		if(!$from->isOrganization) {			
 			$from->saveSearch();
-			Contact::getType()->change($from);
+			Contact::entityType()->change($from);
 		}
 		
 //		$ids = [$link->toId, $link->fromId];
@@ -635,7 +635,7 @@ class Contact extends AclItemEntity {
 //										['id' => $ids]
 //										)->execute();	
 //		
-//		Contact::getType()->changes(
+//		Contact::entityType()->changes(
 //					(new Query2)
 //					->select('c.id AS entityId, a.aclId, "0" AS destroyed')
 //					->from('addressbook_contact', 'c')

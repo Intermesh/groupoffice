@@ -336,7 +336,7 @@ class Module extends Observable {
 		foreach($records as $ar) {
 			$cls = $ar->getName();
 			if(is_a($cls, Db\ActiveRecord::class, true) && $cls::model()->hasLinks()) {
-				if(!$cls::getType()) {
+				if(!$cls::entityType()) {
 					return false;
 				}
 			}

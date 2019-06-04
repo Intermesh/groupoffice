@@ -101,7 +101,7 @@ trait LoggingTrait {
 			$log->model_id = $this->id;
 
 			$log->action = $action;
-			$log->model = $this->getType()->getName();
+			$log->model = $this->entityType()->getName();
 			$log->message = $message;
 			//$log->object = $this;
 			$log->jsonData = json_encode($data);

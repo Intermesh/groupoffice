@@ -79,7 +79,7 @@ class AclUsersGroups extends ActiveRecord {
 		$success = App::get()->getDbConnection()
 							->update('core_acl_group_changes', 
 											[
-													'revokeModSeq' => \go\core\model\Acl::getType()->nextModSeq()
+													'revokeModSeq' => \go\core\model\Acl::entityType()->nextModSeq()
 											],
 											[
 													'aclId' => $this->aclId, 
@@ -112,7 +112,7 @@ class AclUsersGroups extends ActiveRecord {
 											[
 													'aclId' => $this->aclId, 
 													'groupId' => $this->groupId, 
-													'grantModSeq' => \go\core\model\Acl::getType()->nextModSeq()
+													'grantModSeq' => \go\core\model\Acl::entityType()->nextModSeq()
 											]
 											)->execute();
 		if(!$success) {

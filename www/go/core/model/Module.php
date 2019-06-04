@@ -47,7 +47,7 @@ class Module extends AclOwnerEntity {
 		//When module groups change the groups change too. Because the have a "modules" property.
 		$aclChanges = $this->getAclChanges();
 		if(!empty($aclChanges)) {
-			Group::getType()
+			Group::entityType()
 				->changes(
 					GO()->getDbConnection()
 						->select('id as entityId, aclId, "0" as destroyed')

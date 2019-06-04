@@ -170,7 +170,7 @@ $updates['201811181020'][] = function() {
 	$cf = new \go\core\util\ClassFinder();	
 	$cf->addNamespace("go\\modules\\community\\email");			
 	foreach($cf->findByParent(go\core\orm\Entity::class) as $cls) {
-		$cls::getType();
+		$cls::entityType();
 	}
 };
 

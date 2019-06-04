@@ -558,7 +558,7 @@ $updates['201905201227'][] = function() {
     }
 
     if(is_subclass_of($cls, AclOwnerEntity::class)) {
-      $type = $cls::getType();
+      $type = $cls::entityType();
       $tables = $cls::getMapping()->getTables();
       $table = array_values($tables)[0]->getName();
       $colName = 'aclId';
@@ -570,7 +570,7 @@ $updates['201905201227'][] = function() {
       if(!$colName || ($cls::model()->isJoinedAclField && $cls != "GO\\Files\\Model\\Folder")) {
         continue;
       }
-      $type = $cls::getType();
+      $type = $cls::entityType();
       $table = $cls::model()->tableName();     
     }
 

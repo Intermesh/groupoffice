@@ -77,7 +77,7 @@ class SearchCacheRecord extends \GO\Base\Db\ActiveRecord {
 		} else
 		{
 			$entityId = $model->id;
-			$entityTypeId = $model->getType()->getId();
+			$entityTypeId = $model->entityType()->getId();
 		}
 		
 		

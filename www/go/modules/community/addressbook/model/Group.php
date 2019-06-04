@@ -57,7 +57,7 @@ class Group extends AclItemEntity {
 		
 		//modseq increase because groups is a property too.
 		if($this->isNew()) {
-			AddressBook::getType()->change(AddressBook::findById($this->addressBookId));
+			AddressBook::entityType()->change(AddressBook::findById($this->addressBookId));
 		}
 		
 		return parent::internalSave();
@@ -70,10 +70,10 @@ class Group extends AclItemEntity {
 		// When address book is being deleted then these don't need to fire.
 		// if(!$addressBook->isDeleting()) {
 			//modseq increase because groups is a property too.
-			AddressBook::getType()->change($addressBook);
+			AddressBook::entityType()->change($addressBook);
 			
 			//mark contact as changed because they have a "groups" property that changes.
-			Contact::getType()->changes(
+			Contact::entityType()->changes(
 						(new Query)
 						->select('c.id AS entityId, a.aclId, "0" AS destroyed')
 						->from('addressbook_contact', 'c')
