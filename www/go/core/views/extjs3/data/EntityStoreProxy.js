@@ -51,10 +51,12 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 //			go.Jmap.abort(this.activeRequest[action]);
 //		}
 //		this.activeRequest[action] = 
-
-		if (params.sort) {
-			params.sort = [params.sort + " " + params.dir];
-			delete params.dir;
+		if (params.sort && Ext.isString(params.sort)) {
+			var srt = params.sort.split(' ');
+			params.sort = [{property:srt[0]}];
+			if(srt[1] && srt[1] === 'DESC') {
+				params.sort[0].isAscending = false;
+			}
 		}
 		
 		this.entityStore.query(params, function (response) {

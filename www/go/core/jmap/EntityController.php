@@ -262,8 +262,7 @@ abstract class EntityController extends Controller {
 		$transformed = [];
 
 		foreach ($sort as $s) {
-			list($column, $direction) = explode(' ', $s);
-			$transformed[$column] = $direction;
+			$transformed[$s['property']] = (isset($s['isAscending']) && $s['isAscending']===false) ? 'DESC' : 'ASC';
 		}
 
 		//always add primary key for a stable sort. (https://dba.stackexchange.com/questions/22609/mysql-group-by-and-order-by-giving-inconsistent-results)		
