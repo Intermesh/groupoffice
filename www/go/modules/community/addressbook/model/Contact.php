@@ -190,7 +190,7 @@ class Contact extends AclItemEntity {
 	 *
 	 * @var EmailAddress[]
 	 */
-	// public $emailAddresses = [];
+	 public $emailAddresses = [];
 	
 	/**
 	 *
