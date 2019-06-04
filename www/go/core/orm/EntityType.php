@@ -213,7 +213,13 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		
 		$i = [];
 		foreach($records as $record) {
-			$i[] = static::fromRecord($record);
+			$type = static::fromRecord($record);
+			$cls = $type->getClassName();
+			if(!class_exists($cls)) {
+				GO()->warn($cls .' not found!');
+				continue;
+			}
+			$i[] = $type;
 		}
 		
 		return $i;
