@@ -393,7 +393,7 @@ use const GO_CONFIG_FILE;
 		 * 
 		 * @param string $package Set to null for legacy modules
 		 * @param string $name
-		 * @return boolean
+		 * @return \go\core\model\Module
 		 */
 		public function getModule($package, $name) {
 			$model = \go\core\model\Module::find()->where(['package' => $package, 'name' => $name, 'enabled' => true])->single();

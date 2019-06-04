@@ -485,7 +485,11 @@ abstract class Property extends Model {
 			foreach($table->getPrimaryKey() as $pk) {				
 				//$query->select("alias.id AS `alias.userId`");
 				$query->select($table->getAlias() . "." . $pk . " AS `" . $table->getAlias() . "." . $pk ."`", true);				
-			}			
+			}
+
+			if(!empty($table->getConstantValues())) {
+				$query->andWhere($table->getConstantValues());
+			}
 		}
 
 		$mappedQuery = static::getMapping()->getQuery();

@@ -273,8 +273,7 @@ abstract class EntityController extends Controller {
 		$transformed = [];
 
 		foreach ($sort as $s) {
-			list($column, $direction) = explode(' ', $s);
-			$transformed[$column] = $direction;
+			$transformed[$s['property']] = (isset($s['isAscending']) && $s['isAscending']===false) ? 'DESC' : 'ASC';
 		}
 		
 		return $transformed;		
