@@ -272,7 +272,7 @@ class Debugger {
 	 * Print all entries
 	 */
 	public function printEntries() {
-		echo implode("\n", array_map(function($e){return $e[1];}, $this->entries));
+		echo implode("\n", array_map(function($e){return is_scalar($e[1]) ? $e[1] : print_r($e[1]);}, $this->entries));
 	}
 	
 	/**

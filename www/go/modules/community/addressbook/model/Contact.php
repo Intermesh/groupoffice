@@ -190,7 +190,7 @@ class Contact extends AclItemEntity {
 	 *
 	 * @var EmailAddress[]
 	 */
-	public $emailAddresses = [];
+	// public $emailAddresses = [];
 	
 	/**
 	 *
@@ -576,7 +576,7 @@ class Contact extends AclItemEntity {
 	{
 		$keywords = [$this->name, $this->debtorNumber];
 		foreach($this->emailAddresses as $e) {
-			$keywords[] = $e->emai;
+			$keywords[] = $e->email;
 		}
 		if(!$this->isOrganization) {
 			$keywords = array_merge($keywords, $this->findOrganizations()->selectSingleValue('name')->all());

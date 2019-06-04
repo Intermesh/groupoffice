@@ -83,6 +83,13 @@ abstract class Property extends Model {
 	 */
 	private $primaryKeys = []; 
 
+
+
+	/**
+	 * Holds dynamic properties mapped by other modules with the EVENT_MAPPING
+	 */
+	private $dynamicProperties = [];
+
 	/**
 	 * Constructor
 	 * 
@@ -258,81 +265,63 @@ abstract class Property extends Model {
 		return count($keys) > 1 ? implode("-", array_values($keys)) : array_values($keys)[0];
 	}
 	
-	protected static function getReadableProperties() {		
-		$cacheKey = 'property-getReadableProperties-' . str_replace('\\', '-', static::class);
+	public static function getApiProperties() {		
+		$cacheKey = 'property-getApiProperties-' . str_replace('\\', '-', static::class);
 		
 		$props = GO()->getCache()->get($cacheKey);
 		
 		if(!$props) {
 		
-			$props = parent::getReadableProperties();
+			$props = parent::getApiProperties();
 
 			//add dynamic relations		
 			foreach(static::getMapping()->getProperties() as $propName => $type) {
 				//do property_exists because otherwise it will add protected properties too.
-				if(!property_exists(static::class, $propName) && !in_array($propName, $props)) {
-					$props[] = $propName;
+				if(!isset($props[$propName])) {
+					$props[$propName] = ['setter' => false, 'getter' => false, 'access' => \ReflectionProperty::IS_PUBLIC, 'dynamic' => true];
 				}
-			}		
+			}
+
+			if(method_exists(static::class, 'getCustomFields')) {
+				$props['customFields'] = ['setter' => true, 'getter' => true, 'access' => null];
+			}
 			
 			GO()->getCache()->set($cacheKey, $props);
 		}
 		return $props;
 	}
 	
-	private $dynamicProperties = [];
-	
-	
-	//can't return by reference because of [2018-02-09T15:40:46+00:00] ErrorException in /media/sf_Projects/groupoffice-6.3/www/go/core/orm/Property.php at line 252: Only variable references should be returned by reference
-
-	public function __get($name) {
-		
-		$getter = 'get'.$name;
-
-		if(method_exists($this,$getter)){
-			return $this->$getter();
-		}		
-		
+	public function &__get($name) {
 		if(static::getMapping()->hasProperty($name)) {
-			return isset($this->dynamicProperties[$name]) ? $this->dynamicProperties[$name] : null;
+			if(!isset($this->dynamicProperties[$name])) {
+				$this->dynamicProperties[$name] = null;
+			}
+			return $this->dynamicProperties[$name];
 		}		
 		throw new Exception("Can't get not existing property '$name' in '".static::class."'");			
 		
 	}
 	
 	public function __isset($name) {
-		
-		
-		$getter = 'get'.$name;
-
-		if(method_exists($this,$getter)){
-			return $this->$getter() != null;
-		}
-		
+			
 		if(static::getMapping()->hasProperty($name)) {
 			return isset($this->dynamicProperties[$name]);
 		}
-		return parent::__isset($name);
+		return false;
 	}
 	
 	public function __set($name, $value) {		
 		if($this->setPrimaryKey($name, $value)) {
 			return ;
 		}
-		
-		$setter = 'set'.$name;
-			
-		if(method_exists($this,$setter)){
-			return $this->$setter($value);
-		}
-		
-		//if(static::getMapping()->getRelation($name)) {		
-		//Had to change to hasPropery to make it work for dynamically added tables.
-		if(static::getMapping()->hasProperty($name)) {			
+
+		//Support for dynamically mapped props via EVENT_MAP
+		$props = static::getApiProperties();
+		if(isset($props[$name]) && !empty($props[$name]['dynamic'])) {			
 			$this->dynamicProperties[$name] = $value;
 		} else
 		{
-			return parent::__set($name, $value);
+			throw new Exception("Can't set not existing property '$name' in '".static::class."'");
 		}
 	}
 	

@@ -34,23 +34,23 @@ class UserSettings extends Property {
 		return parent::defineMapping()->addTable("cal_settings", "cals");
 	}
 	
-	public function getReminder() {
-		$response = EventController::reminderSecondsToForm($this->reminder);
+	// public function getReminder() {
+	// 	$response = EventController::reminderSecondsToForm($this->reminder);
 		
-		if(!$response['data']['enable_reminder']){
-			$response['data']['reminder_value'] = null;
-		}
-		return $response;
-	}
+	// 	if(!$response['data']['enable_reminder']){
+	// 		$response['data']['reminder_value'] = null;
+	// 	}
+	// 	return $response;
+	// }
 	
-	public function setReminder($params) {
-		if(isset($params['reminder_value'])){
-			if($params['reminder_value'] !== ''){
-				$this->reminder = $params['reminder_multiplier'] * $params['reminder_value'];
-			} else {
-				$this->reminder = null;
-			}
-		}
-	}
+	// public function setReminder($params) {
+	// 	if(isset($params['reminder_value'])){
+	// 		if($params['reminder_value'] !== ''){
+	// 			$this->reminder = $params['reminder_multiplier'] * $params['reminder_value'];
+	// 		} else {
+	// 			$this->reminder = null;
+	// 		}
+	// 	}
+	// }
 
 }

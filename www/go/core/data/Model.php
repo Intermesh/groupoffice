@@ -26,13 +26,21 @@ use ReflectionProperty;
 abstract class Model implements ArrayableInterface, JsonSerializable {
 
 	/**
-	 * Get the readable property names as array
+	 * Get all properties exposed to the API
 	 * 
-	 * @return string[]
+	 * eg.
+	 * 
+	 * [
+	 * 	"propName" => [
+	 * 		'setter' => true, //Set with setPropName
+	 * 		'getter'=> true', //Get with getPropName
+	 * 		'access' => ReflectionProperty::IS_PROTECTED // is a protected property
+	 * ]
+	 * 
+	 * @return array
 	 */
-	protected static function getReadableProperties() {
-
-		$cacheKey = 'getReadableProperties-' . str_replace('\\', '-', static::class);
+	public static function getApiProperties() {
+		$cacheKey = 'api-props-' . str_replace('\\', '-', static::class);
 		
 		$ret = App::get()->getCache()->get($cacheKey);
 		if ($ret) {
@@ -50,29 +58,66 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 				continue;
 			}
 
-			$params = $method->getParameters();
-			foreach ($params as $p) {
-				/* @var $p ReflectionParameter */
-				if (!$p->isDefaultValueAvailable()) {
-					continue 2;
-				}
-			}
+			
 			if (substr($method->getName(), 0, 3) == 'get') {
-				$arr[] = lcfirst(substr($method->getName(), 3));
+
+				$params = $method->getParameters();
+				foreach ($params as $p) {
+					/* @var $p ReflectionParameter */
+					if (!$p->isDefaultValueAvailable()) {
+						continue 2;
+					}
+				}
+
+				$propName = lcfirst(substr($method->getName(), 3));
+				if(!isset($arr[$propName])) {
+					$arr[$propName] = ["setter" => false, "getter" => false, "access" => null];
+				}
+				$arr[$propName]['getter'] = true;				
+			}
+
+			if (substr($method->getName(), 0, 3) == 'set') {
+				$propName = lcfirst(substr($method->getName(), 3));
+				if(!isset($arr[$propName])) {
+					$arr[$propName] = ["setter" => false, "getter" => false, "access" => null];
+				}
+				$arr[$propName]['setter'] = true;				
 			}
 		}
 
-		$props = $reflectionObject->getProperties(ReflectionProperty::IS_PUBLIC);
+		$props = $reflectionObject->getProperties();
 
 		foreach ($props as $prop) {
 			if (!$prop->isStatic()) {
-				$arr[] = $prop->getName();
+				$propName = $prop->getName();
+				if(!isset($arr[$propName])) {
+					$arr[$propName] = ["setter" => false, "getter" => false, "access" => null];
+				}
+
+				if($prop->isPublic()) {	
+					$arr[$propName]['access'] = ReflectionProperty::IS_PUBLIC;					
+					$arr[$propName]['setter'] = false;
+					$arr[$propName]['getter'] = false;
+				}				
+				if($prop->isProtected()) {
+					$arr[$propName]['access'] = ReflectionProperty::IS_PROTECTED;					
+				}
 			}
 		}
 		
 		App::get()->getCache()->set($cacheKey, $arr);
 
 		return $arr;
+	}
+	/**
+	 * Get the readable property names as array
+	 * 
+	 * @return string[]
+	 */
+	protected static function getReadableProperties() {
+		return array_keys(array_filter(static::getApiProperties(), function($props){
+			return $props['getter'] || $props['access'] == ReflectionProperty::IS_PUBLIC;
+		}));
 	}
 	
 	/**
@@ -81,70 +126,19 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 	 * @return string[]
 	 */
 	protected static function getWritableProperties() {
-
-		$cacheKey = 'getWritableProperties-' . str_replace('\\', '-', static::class);
-		
-		$ret = App::get()->getCache()->get($cacheKey);
-		if ($ret) {
-			return $ret;
-		}
-
-		$arr = [];
-		$reflectionObject = new ReflectionClass(static::class);
-		$methods = $reflectionObject->getMethods(ReflectionMethod::IS_PUBLIC);
-
-		foreach ($methods as $method) {
-			/* @var $method ReflectionMethod */
-
-			if ($method->isStatic()) {
-				continue;
-			}
-
-			$params = $method->getParameters();
-			foreach ($params as $p) {
-				/* @var $p ReflectionParameter */
-				if (!$p->isDefaultValueAvailable()) {
-					continue 2;
-				}
-			}
-			if (substr($method->getName(), 0, 3) == 'set') {
-				$arr[] = lcfirst(substr($method->getName(), 3));
-			}
-		}
-
-		$props = $reflectionObject->getProperties(ReflectionProperty::IS_PUBLIC);
-
-		foreach ($props as $prop) {
-			if (!$prop->isStatic()) {
-				$arr[] = $prop->getName();
-			}
-		}
-		
-		App::get()->getCache()->set($cacheKey, $arr);
-
-		return $arr;
-	}
-
-	private static function getProptectedProperties() {
-		$cacheKey = 'getProtectedProperties-' . str_replace('\\', '-', static::class);
-		
-		$ret = App::get()->getCache()->get($cacheKey);
-		if ($ret) {
-			return $ret;
-		}
-
-		$reflectionObject = new ReflectionClass(static::class);
-		$props = $reflectionObject->getProperties(ReflectionProperty::IS_PROTECTED);
-
-		$arr = array_map(function($i){return $i->getName();}, $props);
-
-		App::get()->getCache()->set($cacheKey, $arr);
-
-		return $arr;
+		return array_keys(array_filter(static::getApiProperties(), function($props){
+			return $props['setter'] || $props['access'] == ReflectionProperty::IS_PUBLIC;
+		}));
 	}
 
 	protected static function isProtectedProperty($name) {
-		return in_array($name, static::getProptectedProperties());
+		$props = static::getApiProperties();
+
+		if(!isset($props[$name])) {
+			return false;
+		}
+
+		return $props[$name]['access'] === ReflectionProperty::IS_PROTECTED;
 	}	
 	/**
 	 * Convert model into array for API output.
@@ -231,83 +225,66 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 	}
 	
 	
-	/**
-	 * Magic getter that calls get<NAME> functions in objects
-	 
-	 * @param string $name property name
-	 * @return mixed property value
-	 * @throws Exception If the property setter does not exist
-	 */
-	public function __get($name)
-	{			
-		$getter = 'get'.$name;
 
-		if(method_exists($this,$getter)){
-			return $this->$getter();
-		}else
-		{
-			throw new Exception("Can't get not existing property '$name' in '".static::class."'. Available properties: ". implode(', ', $this->getReadableProperties()));
-		}
-	}		
 	
-	/**
-	 * Magic function that checks the get<NAME> functions
-	 * 
-	 * @param string $name
-	 * @return bool
-	 */
-	public function __isset($name) {
-		$getter = 'get' . $name;
-		if (method_exists($this, $getter)) {
-			// property is not null
-			return $this->$getter() !== null;
-		} else {
-			return false;
-		}
-	}
+// 	/**
+// 	 * Magic function that checks the get<NAME> functions
+// 	 * 
+// 	 * @param string $name
+// 	 * @return bool
+// 	 */
+// 	public function __isset($name) {
+// 		$getter = 'get' . $name;
+// 		if (method_exists($this, $getter)) {
+// 			// property is not null
+// 			return $this->$getter() !== null;
+// 		} else {
+// 			return false;
+// 		}
+// 	}
 
-	/**
-	 * Magic properties can't be unset unless you implement logic to this
-	 * 
-	 * In most cases you want to set the property to null.
-	 * 
-	 * @param string $name
-	 * @throws Exception2
-	 */
-	public function __unset($name) {
-		throw new Exception("Can't unset magic property $name");
-	}
+// 	/**
+// 	 * Magic properties can't be unset unless you implement logic to this
+// 	 * 
+// 	 * In most cases you want to set the property to null.
+// 	 * 
+// 	 * @param string $name
+// 	 * @throws Exception2
+// 	 */
+// 	public function __unset($name) {
+// 		throw new Exception("Can't unset magic property $name");
+// 	}
 
-	/**
-	 * Magic setter that calls set<NAME> functions in objects
-	 * 
-	 * @param string $name property name
-	 * @param mixed $value property value
-	 * @throws Exception If the property getter does not exist
-	 */
-	public function __set($name,$value)
-	{
-		$setter = 'set'.$name;
+// 	/**
+// 	 * Magic setter that calls set<NAME> functions in objects
+// 	 * 
+// 	 * @param string $name property name
+// 	 * @param mixed $value property value
+// 	 * @throws Exception If the property getter does not exist
+// 	 */
+// 	public function __set($name,$value)
+// 	{
+// 		$setter = 'set'.$name;
 			
-		if(method_exists($this,$setter)){
-			$this->$setter($value);
-		}else
-		{				
+// 		if(method_exists($this,$setter)){
+// 			$this->$setter($value);
+// 		}else
+// 		{				
 			
-			$getter = 'get' . $name;
-			if(method_exists($this, $getter)){
+// 			$getter = 'get' . $name;
+// 			if(method_exists($this, $getter)){
 				
-				//Allow to set read only properties with their original value.
-				//http://stackoverflow.com/questions/20533712/how-should-a-restful-service-expose-read-only-properties-on-mutable-resources								
-//				$errorMsg = "Can't set read only property '$name' in '".static::class."'";
-				//for performance reasons we simply ignore it.
-				App::get()->getDebugger()->debug("Discarding read only property '$name' in '".static::class."'");
-			}else {
-				$errorMsg = "Cannot set non-existent property '$name' in '".static::class."'. Available properties: ". implode(', ', $this->getWritableProperties());
-				throw new Exception($errorMsg);
-			}						
-		}
-	}
+// 				//Allow to set read only properties with their original value.
+// 				//http://stackoverflow.com/questions/20533712/how-should-a-restful-service-expose-read-only-properties-on-mutable-resources								
+// //				$errorMsg = "Can't set read only property '$name' in '".static::class."'";
+// 				//for performance reasons we simply ignore it.
+// 				App::get()->getDebugger()->debug("Discarding read only property '$name' in '".static::class."'");
+// 			}else {
+// 				$errorMsg = "Cannot set non-existent property '$name' in '".static::class."'. Available properties: ". implode(', ', $this->getWritableProperties());
+// 				throw new Exception($errorMsg);
+// 			}						
+// 		}
+// 	}
 	
 	public function jsonSerialize() {
 		return $this->toArray();
