@@ -86,7 +86,7 @@ go.search.Panel = Ext.extend(Ext.Panel, {
 		}
 
 		filter.text = q;
-		this.grid.store.baseParams.limit = 10;
+		this.grid.store.baseParams.limit = 20;
 		this.grid.store.removeAll();
 		
 		this.grid.store.load({

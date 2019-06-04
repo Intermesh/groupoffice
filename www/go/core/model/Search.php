@@ -9,6 +9,7 @@ use go\core\orm\EntityType;
 use go\core\orm\Query;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
+use go\core\db\Expression;
 
 class Search extends AclOwnerEntity {
 
@@ -120,8 +121,15 @@ class Search extends AclOwnerEntity {
 
 							$criteria->where($sub);		
 							
-						});
-					
+						})
+						->add('text', function(Criteria $criteria, $value, Query $query) {
+							$criteria->where('MATCH (s.name, s.keywords) AGAINST (:keyword1 IN BOOLEAN MODE)')
+							->bind(':keyword1', $value)
+							->bind(':keyword2', $value);
+
+							// Order by relevance
+							$query->orderBy([new Expression('MATCH (s.name, s.keywords) AGAINST (:keyword2 IN BOOLEAN MODE) DESC')]);
+						});					
 	}
 	
 	

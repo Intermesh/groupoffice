@@ -556,10 +556,9 @@ class Contact extends AclItemEntity {
 		$orgStr = "";	
 		
 		if(!$this->isOrganization) {
-			$organizationIds = $this->getOrganizationIds();
-			
-			if(!empty($organizationIds)) {
-				$orgStr = ' - '.implode(', ', Contact::find()->selectSingleValue('name')->where(['id' => $organizationIds])->all());
+			$orgs = $this->findOrganizations()->selectSingleValue('name')->all();
+			if(!empty($orgs)) {
+				$orgStr = ' - '.implode(', ', $orgs);			
 			}
 		}
 		return $addressBook->name . $orgStr;
@@ -571,6 +570,19 @@ class Contact extends AclItemEntity {
 
 	protected function getSearchFilter() {
 		return $this->isOrganization ? 'isOrganization' : 'isContact';
+	}
+
+	protected function getSearchKeywords()
+	{
+		$keywords = [$this->name, $this->debtorNumber];
+		foreach($this->emailAddresses as $e) {
+			$keywords[] = $e->emai;
+		}
+		if(!$this->isOrganization) {
+			$keywords = array_merge($keywords, $this->findOrganizations()->selectSingleValue('name')->all());
+		}
+
+		return $keywords;
 	}
 
 	public function getSalutation() 

@@ -70,6 +70,7 @@ abstract class EntityController extends Controller {
 		$cls = $this->entityClass();
 
 		$query = $cls::find($cls::getPrimaryKey(false))
+						->select($cls::getPrimaryKey(true)) //only select primary key
 						->limit($params['limit'])
 						->offset($params['position'])
 						->debug();
