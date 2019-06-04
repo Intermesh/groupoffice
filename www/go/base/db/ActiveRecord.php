@@ -3570,6 +3570,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		// Always unset ctime, we don't use it anymore in the searchcache table
 		unset($attr['ctime']);
+		unset($attr['type']);
 
 		if(!isset($attr['description'])) {
 			$attr['description'] = '';
