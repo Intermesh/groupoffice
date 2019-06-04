@@ -32,10 +32,12 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	
 	hideLabel: true,		
 	
-	addButtonText: t("Add"),
-	addButtonIconCls: "ic-add",
+	addButtonText: null, // deprecated, use btnCfg
+	btnCfg: {}, // @type Ext.Button
 	
 	layout: "form",
+	// @string name of property, when set getValue will build an object map with this property as key
+	mapKey: null,
 	
 	defaults: {
 		anchor: "100%"
@@ -69,9 +71,9 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	
 	initBbar: function() {
 		this.bbar = [
-			{
+			Ext.apply(this.btnCfg,{
 				//iconCls: this.addButtonIconCls,
-				text: this.addButtonText,
+				text: this.addButtonText || this.btnCfg.text || t("Add"),
 				handler: function() {
 					var wrap = this.addPanel();
 					this.doLayout();
@@ -80,7 +82,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 				
 				},
 				scope: this
-			}
+			})
 		];
 	},
 	
@@ -179,22 +181,34 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		this.removeAll();
 		
 		var me = this, wrap;
-		records.forEach(function(r) {						
+		function set(r) {
 			wrap = me.addPanel();
+			wrap.formField.key = r.id;
 			wrap.formField.setValue(r);
-		});		
+		}
+		if(this.mapKey) {
+			for(var r in records) {
+				set(records[r]);
+			}
+		} else {
+			records.forEach(set);
+		}
 		
 		this.doLayout();
 	},
 	
 
 	getValue: function () {
-		var v = [];
+		var v = this.mapKey ? {} : [];
 		if(!this.items) {
 			return v;
 		}
 		this.items.each(function(wrap) {
-			v.push(wrap.formField.getValue());
+			if(this.mapKey) {
+				v[wrap.formField.key] = wrap.formField.getValue();
+			} else {
+				v.push(wrap.formField.getValue());
+			}
 		}, this);
 		
 		return v;
