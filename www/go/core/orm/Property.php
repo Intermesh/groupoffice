@@ -862,10 +862,10 @@ abstract class Property extends Model {
 			\GO()->getDbConnection()->delete($first->getName(), $where)->execute();		
 			
 			//set state to new for all models. Models could have been saved if save() is called multiple times.
-			foreach($models as $model) {
-				$model->isNew = true;
-				$model->primaryKeys = [];
-			}
+			$models = array_map(function($model) {
+				return $model->internalCopy();
+			}, $models);
+			
 			
 		} else{
 			if (isset($modified[$relation->name][1])) {			
