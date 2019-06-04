@@ -9,7 +9,7 @@ CREATE TABLE `comments_comment` (
   `createdAt` datetime NOT NULL,
   `entityId` int(11) NOT NULL,
   `entityTypeId` int(11) NOT NULL,
-  `createdBy` int(11) NOT NULL,
+  `createdBy` int(11) DEFAULT NULL,
   `modifiedBy` int(11) DEFAULT NULL,
   `modifiedAt` datetime DEFAULT NULL,
   `text` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL
@@ -59,8 +59,8 @@ ALTER TABLE `comments_attachment`
   ADD CONSTRAINT `fk_comments_attachment_core_blob1` FOREIGN KEY (`blobId`) REFERENCES `core_blob` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `comments_comment`
-  ADD CONSTRAINT `fk_comments_comment_core_user1` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_comments_comment_core_user2` FOREIGN KEY (`modifiedBy`) REFERENCES `core_user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_comments_comment_core_user1` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_comments_comment_core_user2` FOREIGN KEY (`modifiedBy`) REFERENCES `core_user` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
 
 ALTER TABLE `comments_comment_label`
   ADD CONSTRAINT `fk_comments_label_has_comments_comment_comments_comment1` FOREIGN KEY (`commentId`) REFERENCES `comments_comment` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
