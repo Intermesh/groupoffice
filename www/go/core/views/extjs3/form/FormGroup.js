@@ -38,6 +38,8 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	layout: "form",
 	// @string name of property, when set getValue will build an object map with this property as key
 	mapKey: null,
+	// When mapKey is set we remember the keys of properties that are going to be deleted here
+	markDeleted: [],
 	
 	defaults: {
 		anchor: "100%"
@@ -51,7 +53,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 //		
 //		//to prevent adding to the ExtJS basic form
 //		this.itemCfg.isFormField = false;
-		
+		this.markDeleted = [];
 		this.itemCfg.columnWidth = 1;
 		
 		if(!this.itemCfg.xtype) {
@@ -138,6 +140,10 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 						xtype: "button",
 						iconCls: 'ic-delete',
 						handler: function() {
+							debugger;
+							if(this.ownerCt.ownerCt.formField.key) {
+								me.markDeleted.push(this.ownerCt.ownerCt.formField.key);
+							}
 							this.ownerCt.ownerCt.destroy();
 							me.dirty = true;
 						}
@@ -179,7 +185,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 	setValue: function (records) {	
 		this.removeAll();
-		
+		this.markDeleted = [];
 		var me = this, wrap;
 		function set(r) {
 			wrap = me.addPanel();
@@ -205,11 +211,16 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		}
 		this.items.each(function(wrap) {
 			if(this.mapKey) {
-				v[wrap.formField.key] = wrap.formField.getValue();
+				if(wrap.formField.isDirty()) {
+					v[wrap.formField.key || Ext.id()] = wrap.formField.getValue();
+				}
 			} else {
 				v.push(wrap.formField.getValue());
 			}
 		}, this);
+		if(this.mapKey) {
+			this.markDeleted.forEach(function(key) { v[key] = null; });
+		}
 		
 		return v;
 	},
