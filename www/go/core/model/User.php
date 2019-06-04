@@ -279,6 +279,8 @@ class User extends Entity {
 			}
 		}
 	}
+
+	private $currentPassword;
 	
 	public function setCurrentPassword($currentPassword){
 		$this->currentPassword = $currentPassword;
