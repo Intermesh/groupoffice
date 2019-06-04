@@ -28,7 +28,8 @@ class Migrate63to64 {
 		
 		$db = GO()->getDbConnection();
 		//Start from scratch
-		$db->query("DELETE FROM addressbook_addressbook");
+		// $db->query("DELETE FROM addressbook_contact");
+		// $db->query("DELETE FROM addressbook_addressbook");
 		
 			
 		$this->migrateCustomFields();
@@ -265,6 +266,7 @@ class Migrate63to64 {
 
 		$contacts = $db->select()->from('ab_contacts')
 						->where(['addressbook_id' => $addressBook->id])
+						->andWhere('id not in (select id from addressbook_contact)')
 						->orderBy(['id' => 'ASC']);
 		
 		//continue where we left last time if failed.
@@ -489,7 +491,10 @@ class Migrate63to64 {
 	private function copyCompanies(AddressBook $addressBook) {
 		$db = GO()->getDbConnection();		
 
-		$contacts = $db->select()->from('ab_companies')->where(['addressbook_id' => $addressBook->id]);
+		$contacts = $db->select()
+		->from('ab_companies')
+		->where(['addressbook_id' => $addressBook->id])
+		->andWhere('id not in (select id + '.$this->getCompanyIdIncrement().' from addressbook_contact)');
 		
 		//continue where we left last time if failed.
 		$max = $db->selectSingleValue('max(id)')->from("addressbook_contact")->andWhere(['addressBookId' => $addressBook->id])->single();

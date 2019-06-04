@@ -188,7 +188,7 @@ CREATE TABLE `core_search` (
   `name` varchar(100) DEFAULT NULL,
   `description` varchar(190) NOT NULL DEFAULT '',
   `entityTypeId` int(11) NOT NULL,
-  `keywords` varchar(190) NOT NULL DEFAULT '',
+  `keywords` TEXT NOT NULL DEFAULT '',
   `filter` VARCHAR(50) NULL DEFAULT NULL,
   `modifiedAt` datetime DEFAULT NULL,
   `aclId` int(11) NOT NULL
@@ -522,12 +522,10 @@ ALTER TABLE `core_search`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `entityId` (`entityId`,`entityTypeId`),
   ADD KEY `acl_id` (`aclId`),
-  ADD KEY `name` (`name`),
   ADD KEY `moduleId` (`moduleId`),
   ADD KEY `entityTypeId` (`entityTypeId`),
   ADD KEY `filter` (`filter`);
 
-ALTER TABLE `core_search` ADD INDEX(`keywords`);
 
 ALTER TABLE `core_setting`
   ADD PRIMARY KEY (`moduleId`,`name`);
@@ -868,3 +866,7 @@ ALTER TABLE `core_email_template`
 ALTER TABLE `core_email_template_attachment`
   ADD CONSTRAINT `core_email_template_attachment_ibfk_1` FOREIGN KEY (`blobId`) REFERENCES `core_blob` (`id`),
   ADD CONSTRAINT `core_email_template_attachment_ibfk_2` FOREIGN KEY (`emailTemplateId`) REFERENCES `core_email_template` (`id`) ON DELETE CASCADE;
+
+
+ALTER TABLE `core_search` ADD FULLTEXT( `name`, `keywords`);
+

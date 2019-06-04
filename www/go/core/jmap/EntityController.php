@@ -70,6 +70,7 @@ abstract class EntityController extends Controller {
 		$cls = $this->entityClass();
 
 		$query = $cls::find($cls::getPrimaryKey(false))
+						->select($cls::getPrimaryKey(true)) //only select primary key
 						->limit($params['limit'])
 						->offset($params['position'])
 						->debug();
@@ -77,6 +78,16 @@ abstract class EntityController extends Controller {
 		/* @var $query Query */
 
 		$sort = $this->transformSort($params['sort']);		
+
+		if(!empty($query->getGroupBy())) {
+			//always add primary key for a stable sort. (https://dba.stackexchange.com/questions/22609/mysql-group-by-and-order-by-giving-inconsistent-results)		
+			$keys = $cls::getPrimaryKey();
+			foreach($keys as $key) {
+				if(!isset($sort[$key])) {
+					$sort[$key] = 'ASC';
+				}
+			}
+		}
 		
 		$cls::sort($query, $sort);
 
@@ -263,15 +274,6 @@ abstract class EntityController extends Controller {
 
 		foreach ($sort as $s) {
 			$transformed[$s['property']] = (isset($s['isAscending']) && $s['isAscending']===false) ? 'DESC' : 'ASC';
-		}
-
-		//always add primary key for a stable sort. (https://dba.stackexchange.com/questions/22609/mysql-group-by-and-order-by-giving-inconsistent-results)		
-		$cls = $this->entityClass();
-		$keys = $cls::getPrimaryKey();
-		foreach($keys as $key) {
-			if(!isset($transformed[$key])) {
-				$transformed[$key] = 'ASC';
-			}
 		}
 		
 		return $transformed;		

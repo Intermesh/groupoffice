@@ -191,9 +191,21 @@ class Table {
 				break;
 			
 			case 'text':
+				$c->length = 65535;
+				$c->trimInput = true;
+				break;
 			case 'longtext':
+				$c->length = 4294967296;
+				$c->trimInput = true;
+				break;
 			case 'mediumtext':
+				$c->length = 16777216;
+				$c->trimInput = true;
+				break;
+
 			case 'tinytext':
+				$c->length = 255;
+				$c->trimInput = true;
 				break;
 			
 			default:				

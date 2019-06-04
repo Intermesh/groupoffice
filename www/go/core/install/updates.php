@@ -588,3 +588,8 @@ $updates['201905201227'][] = function() {
    }
   }
 };
+
+$updates['201906032000'][] = "ALTER TABLE `core_search` DROP INDEX `keywords`;";
+$updates['201906032000'][] = "ALTER TABLE `core_search` CHANGE `keywords` `keywords` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '';";
+$updates['201906032000'][] = "ALTER TABLE `core_search` DROP INDEX `name`;";
+$updates['201906032000'][] = "ALTER TABLE `core_search` ADD FULLTEXT( `name`, `keywords`);";
