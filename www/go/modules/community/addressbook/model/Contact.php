@@ -713,7 +713,7 @@ class Contact extends AclItemEntity {
 			return false;
 		}
 		
-		return $this->$propName[0] ?? false;
+		return isset($this->$propName[0]) ? $this->$propName[0] : false;
 	}
 
 	/**
