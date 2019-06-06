@@ -47187,7 +47187,7 @@ Ext.grid.GridView = Ext.extend(Ext.util.Observable, {
                     '<div {tooltip} {attr} class="x-grid3-hd-inner x-grid3-hd-{id}" unselectable="on" style="{istyle}">', 
                         this.grid.enableHdMenu ? '<a class="x-grid3-hd-btn" ></a>' : '',
                         '{value}',
-                        '<img alt="" class="x-grid3-sort-icon" src="', Ext.BLANK_IMAGE_URL, '" />',
+                        '<span alt="" class="x-grid3-sort-icon"></span>',
                     '</div>',
                 '</td>'
             ),

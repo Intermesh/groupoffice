@@ -1316,31 +1316,44 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 	//background-image:url(../images/default/grid/grid3-hrow-over.gif);
 
 }
-.sort-asc, .sort-desc {
-	position: relative;
+// .sort-asc, .sort-desc {
+// 	position: relative;
+// 	&:after{
+// 		@extend %icon;
+// 		color: color($fg, 'hint-text');
+// 		left: dp(14);
+// 		top: dp(10); 
+// 		font-size: sp(13);
+// 		position:absolute;
+// 	}
+	
+// 	.x-grid3-hd-inner {
+// 		padding-left: dp(32);
+// 	}
+// }
+// .sort-asc:after { //}.x-grid3-sort-icon {
+// 	content: 'arrow_upward';
+// 	//background-image: url(../images/default/grid/sort_asc.gif);
+// }
+// .sort-desc:after {
+// 	content: 'arrow_downward';
+// }
+
+.x-grid3-sort-icon {
+	background: none;
 	&:after{
 		@extend %icon;
 		color: color($fg, 'hint-text');
 		left: dp(14);
 		top: dp(10); 
 		font-size: sp(13);
-		position:absolute;
+		margin: 0 dp(4);		
+		content: 'arrow_downward';
 	}
-	
-	.x-grid3-hd-inner {
-		padding-left: dp(32);
-	}
-}
-.sort-asc:after { //}.x-grid3-sort-icon {
-	content: 'arrow_upward';
-	//background-image: url(../images/default/grid/sort_asc.gif);
-}
-.sort-desc:after {
-	content: 'arrow_downward';
 }
 
-.sort-desc .x-grid3-sort-icon {
-	//background-image: url(../images/default/grid/sort_desc.gif);
+.sort-desc .x-grid3-sort-icon:after {
+	content: 'arrow_upward';
 }
 
 .col-move-top, .col-move-bottom{

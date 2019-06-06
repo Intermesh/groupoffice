@@ -69,7 +69,7 @@ Ext.ux.tree.TreeGrid = Ext.extend(Ext.tree.TreePanel, {
                             '<td class="x-grid3-hd x-grid3-cell x-treegrid-hd" style="text-align: {align};" id="', this.id, '-xlhd-{#}">',
                                 '<div class="x-grid3-hd-inner x-treegrid-hd-inner" unselectable="on">',
                                      this.enableHdMenu ? '<a class="x-grid3-hd-btn" ></a>' : '',
-                                     '{header}<img class="x-grid3-sort-icon" src="', Ext.BLANK_IMAGE_URL, '" />',
+                                     '{header}<span class="x-grid3-sort-icon"></span>',
                                  '</div>',
                             '</td></tpl>',
                             '</tr></thead>',

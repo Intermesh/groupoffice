@@ -790,11 +790,11 @@ Ext.override(Ext.grid.GridView,{
             };
             
 						//disable padding right in GO theme because it looks ugly
-            if (GO.settings.theme!='Group-Office' && colModel.config[i].align == 'right') {
-                properties.istyle = 'padding-right: 16px;';
-            } else {
+            // if (GO.settings.theme!='Group-Office' && colModel.config[i].align == 'right') {
+            //     properties.istyle = 'padding-right: 16px;';
+            // } else {
                 delete properties.istyle;
-            }
+            // }
             
             cells[i] = headerTpl.apply(properties);
         }
