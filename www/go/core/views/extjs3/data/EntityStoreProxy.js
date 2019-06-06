@@ -51,12 +51,20 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 //			go.Jmap.abort(this.activeRequest[action]);
 //		}
 //		this.activeRequest[action] = 
-		if (params.sort && Ext.isString(params.sort)) {
-			var srt = params.sort.split(' ');
-			params.sort = [{property:srt[0]}];
-			if(srt[1] && srt[1] === 'DESC') {
-				params.sort[0].isAscending = false;
-			}
+		// if (params.sort && Ext.isString(params.sort)) {
+		// 	var srt = params.sort.split(' ');
+		// 	params.sort = [{property:srt[0]}];
+		// 	if(srt[1] && srt[1] === 'DESC') {
+		// 		params.sort[0].isAscending = false;
+		// 	}
+		// }
+
+		if (params.dir) {
+			params.sort = [{
+				property: params.sort,
+				isAscending: params.dir === "ASC"
+			}];
+			delete params.dir;
 		}
 		
 		this.entityStore.query(params, function (response) {
