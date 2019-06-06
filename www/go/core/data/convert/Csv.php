@@ -236,7 +236,7 @@ class Csv extends AbstractConverter {
 	protected function exportEntity(Entity $entity, $fp, $index, $total) {
 
 		if ($index == 0) {
-			fputcsv($fp, array_column($this->getHeaders($entity), 'label'));
+			fputcsv($fp, array_column($this->getHeaders($entity), 'name'));
 		}
 
 		$record = $this->export($entity);

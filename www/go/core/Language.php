@@ -162,7 +162,12 @@ class Language {
 	
 	private function loadFile($file) {
 		
-		$langData = require($file);
+		try {
+			$langData = require($file);
+		} catch(\ParseError $e) {
+			ErrorHandler::logException($e);
+			$langData = [];
+		}
 		if(!is_array($langData)){
 			throw new \Exception("Invalid language file  " . $file);
 		}
