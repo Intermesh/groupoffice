@@ -99,3 +99,4 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 		return p;
 	}
 });
+Ext.reg('gocombo', go.form.ComboBox);
