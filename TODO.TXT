@@ -13,23 +13,20 @@ ticket groups
 
 Todo
 Adres list convert
-houtwerf search loopt vast
-bug
-
 
 New in 6.4:
 
-System settings
-Default permissions
-LDAP sync
-Address book
+System settings d
+Default permissions d
+LDAP sync d
+Address book d
 Newsletters
-Comments
-Profile
-Modules in group configurarable
-Filters
-Global search improved
-Bookmarks backend refactored
+Comments d
+Profile d
+Modules in group configurarable d
+Filters d
+Global search improved d
+Bookmarks backend refactored d
 Search Query
 Sync data with browser
 

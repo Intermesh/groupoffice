@@ -372,7 +372,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 			panel.show();
 		}
 
-		firstFieldWithError.focus();
+		// Focus make server side errors dissappear 
+		// firstFieldWithError.focus();
 	},
 
 	initFormItems: function () {
