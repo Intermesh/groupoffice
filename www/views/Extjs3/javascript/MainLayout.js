@@ -365,7 +365,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		}).catch(function(error){
 			console.error(error);
 			Ext.getBody().unmask();
-			Ext.MessageBox.alert(t("Error"), t("An error occurred. MOre details can be found in the console."));
+			Ext.MessageBox.alert(t("Error"), t("An error occurred. More details can be found in the console."));
 		});
 		
 		
