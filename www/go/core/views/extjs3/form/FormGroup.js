@@ -140,7 +140,6 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 						xtype: "button",
 						iconCls: 'ic-delete',
 						handler: function() {
-							debugger;
 							if(this.ownerCt.ownerCt.formField.key) {
 								me.markDeleted.push(this.ownerCt.ownerCt.formField.key);
 							}
