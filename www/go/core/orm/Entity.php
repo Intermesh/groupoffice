@@ -546,7 +546,7 @@ abstract class Entity extends Property {
 		$columns = static::textFilterColumns();
 		
 		if(empty($columns)) {
-			GO()->warn(static::class . ' entity has no searchColumns() defined. The q filter will not work.');
+			GO()->warn(static::class . ' entity has no textFilterColumns() defined. The q filter will not work.');
 		}
 		
 		//Explode string into tokens and wrap in wildcard signs to search within the texts.

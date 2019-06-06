@@ -13,11 +13,14 @@ go.emailtemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 
 		Ext.apply(this, {	
 			tbar: [
-				{
-					xtype:'tbtitle',
-					text: t("E-mail templates")
-				},
+				// {
+				// 	xtype:'tbtitle',
+				// 	text: t("E-mail templates")
+				// },
 				'->',
+				{
+					xtype: 'tbsearch'
+				},
 				{
 					iconCls: 'ic-add',
 					handler: function() {

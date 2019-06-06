@@ -70,6 +70,10 @@ class EmailTemplate extends AclOwnerEntity
 						});
 					
 	}
+
+	protected static function textFilterColumns() {
+		return ['name'];
+	}
 	
 	/**
 	 *  
