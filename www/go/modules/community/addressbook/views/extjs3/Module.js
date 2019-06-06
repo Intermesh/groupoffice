@@ -80,6 +80,11 @@ go.Modules.register("community", "addressbook", {
 					name: 'modified',
 					multiple: false,
 					type: 'date'
+				},{
+					title: t("Created at"),
+					name: 'created',
+					multiple: false,
+					type: 'date'
 				},
 				{
 					title: t("Age"),
