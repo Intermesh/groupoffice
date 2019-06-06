@@ -1793,3 +1793,15 @@ table[id^="comments-ext"] b {
 .go-top-right {
 	position:absolute;top: dp(8); right: dp(8);
 }
+
+.x-toolbar.summary{
+	padding:0;
+	.x-toolbar-left , .x-toolbar-right, .x-toolbar-cell {
+		padding:0;
+	}
+	.x-toolbar-cell > div {
+		border-right: 1px solid color($fg,'line');
+		min-height:dp(40);
+    	padding: 0 dp(4) 0 dp(16);
+	}
+}
