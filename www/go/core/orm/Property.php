@@ -169,7 +169,7 @@ abstract class Property extends Model {
 				} else{
 					$o = [];
 					foreach($values as $v) {
-						$o[$v->id()] = $v;
+						$o[$this->buildMapKey($v, $relation)] = $v;
 					}
 					$this->{$relation->name} = $o;
 				}
@@ -181,6 +181,21 @@ abstract class Property extends Model {
 				$this->{$relation->name} = $prop ? $prop : null;
 			}
 		}
+	}
+
+	/**
+	 * Build a key of the primary keys but omit the key from the releation because it's not needed as it's a property,
+	 * 
+	 */
+	private function buildMapKey(Property $v, Relation $relation) {
+		$pk = array_diff($v->getPrimaryKey(), array_values($relation->keys));
+
+		$id = [];
+		foreach($pk as $field) {
+			$id[] = $v->$field;
+		}
+
+		return implode('-', $id);
 	}
 	
 	/**

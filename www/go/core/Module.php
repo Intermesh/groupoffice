@@ -58,6 +58,11 @@ abstract class Module {
 	}
 
 	public function isInstallable() {
+
+		if(GO()->getDebugger()->enabled) {
+			return true;
+		}
+
 		$lic = $this->requiredLicense();
 
 		if(!isset($lic)) {
