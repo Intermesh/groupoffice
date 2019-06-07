@@ -570,7 +570,7 @@ abstract class Property extends Model {
 			
 			$newValue = $this->{$key};
 			
-			if($newValue instanceof Property) {
+			if($newValue instanceof self) {
 				if($newValue->isModified()) {
 					$modified[$key] = [$newValue, null];
 				}
@@ -578,7 +578,7 @@ abstract class Property extends Model {
 			{
 				if ($newValue !== $oldValue) {
 					$modified[$key] = [$newValue, $oldValue];
-				} else if(is_array($newValue) && isset($newValue[0]) && $newValue[0] instanceof Property) {
+				} else if(is_array($newValue) && (($v = array_values($newValue)) && isset($v[0]) && $v[0] instanceof self)) {
 					// Array comparison above might return false because the array contains identical objects but the objects itself might have changed.
 					foreach($newValue as $v) {
 						if($v->isModified()) {
