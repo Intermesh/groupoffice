@@ -125,7 +125,7 @@ class Module extends AclOwnerEntity {
 		
 		//todo, how to handle licenses for future packages?
 		$cls = $this->getModuleClass();
-		return class_exists($cls);
+		return class_exists($cls) && (new $cls)->isLicensed();
 	}
 
 	/**
