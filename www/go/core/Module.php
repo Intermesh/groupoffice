@@ -70,10 +70,14 @@ abstract class Module {
 
 		$file = GO()->getEnvironment()->getInstallFolder()->getFile('licensechecks/'.$lic. '.php');
 
-		// $data = $file->getContents(0, 100);
-		// if(strpos($data, 'ionCube') !== false && !extension_loaded('ionCube Loader')) {			
-		// 	return false;
-		// }
+		$data = $file->getContents(0, 100);
+		if(strpos($data, 'ionCube') !== false && !extension_loaded('ionCube Loader')) {			
+			return false;
+		}
+
+		if(!GO()->getEnvironment()->getInstallFolder()->getFile($lic . '-' . substr(GO()->getVersion(), 0, 3) .'-license.txt')->exists()) {
+			return false;
+		}
 
 		return require($file->getPath());
 		
