@@ -51,33 +51,28 @@ abstract class Module {
 	}
 
 	public function isInstallable() {
-
-		// $lic = $this->requiredLicense();
-
-		// if(!isset($lic)) {
-		// 	return $this->name() != 'core';
-		// }
-	 
-		// if(!extension_loaded('ionCube Loader')) {
-		// 	return false;
-		// }
-
-		// return GO()->getEnvironment()->getInstallFolder()->getFile( $lic . '-' . substr(GO()->getVersion(), 0, 3) .' license.txt')->exists();
-
 		return $this->isLicensed();
 	}
 
 	public function isLicensed() {
-		$cls = static::class;
-		$namespace = substr($cls, 0, strrpos($cls, '\\'));
+		$path = $this->getPath() . '/LicenseCheck.php';
+		$exists = file_exists($path);
+		if(!$exists) {
+			return true;
+		}
 
+		// $data = $file->getContents(0, 100);
+		$data = file_get_contents($path, false, null, 0, 100);
+		if(strpos($data, 'ionCube') !== false && !extension_loaded('ionCube Loader')) {			
+			return false;
+		}
+
+		$cls = static::class;
+		$namespace = substr($cls, 0, strrpos($cls, '\\'));		
 		$licenseCheckClass = $namespace . '\\LicenseCheck';
 
-		if(!class_exists($licenseCheckClass)) {
-			return true;
-		} else{
-			return $licenseCheckClass::check();
-		}
+		return $licenseCheckClass::check();
+		
 	}
 
 
