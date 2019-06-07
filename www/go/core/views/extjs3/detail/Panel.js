@@ -156,11 +156,12 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		}	
 		
 		go.Relations.get(me.entityStore, data, this.relations).then(function(result) {
-			me.watchRelations = result.watch;		
+			me.watchRelations = result.watch;					
+		}).catch(function(result) {
+			console.warn("Failed to fetch relation", result);
+		}).finally(function() {
 			me.onLoad();
 			me.fireEvent('load', me);
-		}).catch(function(result) {
-			throw result;
 		});
 		
 	},
