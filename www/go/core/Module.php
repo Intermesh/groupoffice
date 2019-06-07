@@ -54,24 +54,28 @@ abstract class Module {
 		return $this->isLicensed();
 	}
 
+	/**
+	 * For example "groupoffice-pro"
+	 */
+	public function requiredLicense(){
+		return null;
+	}
+
 	public function isLicensed() {
-		$path = $this->getPath() . '/LicenseCheck.php';
-		$exists = file_exists($path);
-		if(!$exists) {
+		
+		$lic = $this->requiredLicense();
+		if(!isset($lic)) {
 			return true;
 		}
 
+		$file = GO()->getEnvironment()->getInstallFolder()->getFile('licensechecks/'.$lic. '.php');
+
 		// $data = $file->getContents(0, 100);
-		$data = file_get_contents($path, false, null, 0, 100);
-		if(strpos($data, 'ionCube') !== false && !extension_loaded('ionCube Loader')) {			
-			return false;
-		}
+		// if(strpos($data, 'ionCube') !== false && !extension_loaded('ionCube Loader')) {			
+		// 	return false;
+		// }
 
-		$cls = static::class;
-		$namespace = substr($cls, 0, strrpos($cls, '\\'));		
-		$licenseCheckClass = $namespace . '\\LicenseCheck';
-
-		return $licenseCheckClass::check();
+		return require($file->getPath());
 		
 	}
 
