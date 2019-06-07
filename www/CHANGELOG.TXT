@@ -1,3 +1,5 @@
+- Fixed issue that foldernotifications could not be checked anymore after a folder was deleted.
+
 03-06-2019 6.2.118
 - Email: Detect charset from HTML body if not present in IMAP structure
 - Files: Ignore permissions on folder notifications
