@@ -45,7 +45,7 @@ GO.mainLayout.on('render', function () {
 	var container, searchField, searchContainer, panel;
 
 	var search = function () {
-
+		searchField.clearInvalid();
 		panel.setWidth(searchField.getWidth());
 		panel.setHeight(dp(500));
 		panel.getEl().alignTo(searchField.getEl(), "tl-bl");
@@ -60,7 +60,12 @@ GO.mainLayout.on('render', function () {
 
 		if (!panel) {
 			panel = new go.search.Panel({
-				searchContainer: searchContainer
+				searchContainer: searchContainer,
+				listeners: {
+					searchexception: function() {
+						searchField.markInvalid(t("Invalid search query"));
+					}
+				}
 			});
 			panel.render(Ext.getBody());
 			panel.on("collapse", function () {

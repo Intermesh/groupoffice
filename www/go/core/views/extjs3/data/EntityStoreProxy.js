@@ -67,27 +67,31 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 			delete params.dir;
 		}
 		
-		this.entityStore.query(params, function (response) {
+		var me = this;
+		this.entityStore.query(params).then(function (response) {
+			return me.entityStore.get(response.ids).then(function(result) {
 
-			this.entityStore.get(response.ids, function (items) {
 				var data = {
 					total: response.total,
-					records: items,
+					records: result.entities,
 					success: true
 				};
-
-				this.activeRequest[action] = undefined;
-
+	
+				me.activeRequest[action] = undefined;
+	
 				if (action === Ext.data.Api.actions.read) {
-					this.onRead(action, o, data);
+					me.onRead(action, o, data);
 				} else {
-					this.onWrite(action, o, data, rs);
+					me.onWrite(action, o, data, rs);
 				}
-			}, this);
-
-		}, this);
-
-
+				
+			});
+		}).catch(function(response) {
+			//hack to pass error message to load callback in Store.js
+			o.request.arg.error = response;
+			me.fireEvent('exception', this, 'remote', action, o, response, null);			
+			o.request.callback.call(o.request.scope, response, o.request.arg, false);
+		});
 	},
 
 //exact copy from httpproxy only it uses o.reader.readRecords instead.
