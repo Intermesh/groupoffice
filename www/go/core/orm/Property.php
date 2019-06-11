@@ -1357,7 +1357,7 @@ abstract class Property extends Model {
 		}
 
 		$column = static::getMapping()->getColumn($propName);
-		if ($column) {
+		if ($column && !static::isProtectedProperty($column->name)) {
 			return $column->normalizeInput($value);
 		}
 
