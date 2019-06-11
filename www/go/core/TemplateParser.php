@@ -534,12 +534,7 @@ class TemplateParser {
 					return null;
 				}
 				$model = $model[$pathPart];
-			}else if($model instanceof Property) {
-				$model = ModelHelper::getValue($model, $pathPart);
-				if(!isset($model)) {
-					return null;
-				}
-			} else
+			}else 
 			{				
 				if (!isset($model->$pathPart)) {
 					return null;

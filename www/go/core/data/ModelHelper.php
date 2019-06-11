@@ -49,7 +49,7 @@ class ModelHelper {
 	 */
 	public static function getValue(Model $model, $propName) {
 		$props = $model->getApiProperties();
-
+		
 		if(!isset($props[$propName])) {
 			throw new \Exception("Not existing property $propName for ". get_class($model));
 		}
