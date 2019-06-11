@@ -27,6 +27,7 @@ grid/DateColumn.js
 
 Window.js
 form/EntityPanel.js
+form/MultiEntityDialog.js
 form/Dialog.js
 form/FormFieldSet.js
 form/PasswordGeneratorField.js

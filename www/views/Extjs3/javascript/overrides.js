@@ -610,6 +610,7 @@ var noBoxAdjust = Ext.isStrict ? {
 } : {
     input:1, select:1, textarea:1
 };
+Ext.isBorderBox = true;
 Ext.override(Ext.Element, {
 	/**
      * @cfg {string} printCSS The file path of a CSS file for printout.
