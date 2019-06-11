@@ -26,6 +26,7 @@ go.form.MultiEntityDialog = Ext.extend(go.Window, {
 			},
 			items: [this.formGroup = new go.form.FormGroup({
 				name: "entities",
+				mapKey: 'id',//for markDeleted
 				pad: true,
 				btnCfg: this.btnCfg,
 				itemCfg: {
@@ -52,7 +53,7 @@ go.form.MultiEntityDialog = Ext.extend(go.Window, {
 				return;
 			}
 			for(var key in this.constantValues) {
-				values[key] = constantValues[key];
+				values[key] = this.constantValues[key];
 			}
 			if (form.currentId) {
 				params.update[form.currentId] = values;
@@ -60,10 +61,10 @@ go.form.MultiEntityDialog = Ext.extend(go.Window, {
 				params.create[Ext.id()] = values;
 			}
 		}, this);
-
-		params.destory = [];
-		for(var id in this.formGroup.markDeleted) {
-			params.destory.push(id);
+debugger;
+		params.destroy = [];
+		for(var i = 0; i < this.formGroup.markDeleted.length; i++) {
+			params.destroy.push(this.formGroup.markDeleted[i]);
 		}
 
 		if(!valid) {
@@ -80,9 +81,11 @@ go.form.MultiEntityDialog = Ext.extend(go.Window, {
 	load: function(ids) {
 		this.entityStore.get(ids, function(entries) {
 			entries.forEach(function(entry) {
-				var entityPanel = this.formGroup.addPanel().formField.items.get(0);
+				var ff = this.formGroup.addPanel().formField, 
+					entityPanel = ff.items.get(0);
 				this.formGroup.doLayout();
-				entityPanel.currentId = entry.id;
+				this.formGroup.markDeleted = [];
+				entityPanel.currentId = ff.key = entry.id;
 				entityPanel.setValues(entry);
 				entityPanel.entity = entry;
 				this.loadEntity(entityPanel, entry);
