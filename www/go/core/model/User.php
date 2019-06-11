@@ -771,5 +771,4 @@ class User extends Entity {
 	
 		$this->displayName = $this->contact->name;
 	}
-
 }

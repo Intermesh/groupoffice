@@ -7,6 +7,8 @@ use go\core\util\DateTime;
 use stdClass;
 use Traversable;
 use function GO;
+use go\core\data\ModelHelper;
+use go\core\orm\Property;
 
 /**
  * Template parser
@@ -532,8 +534,13 @@ class TemplateParser {
 					return null;
 				}
 				$model = $model[$pathPart];
-			}else
-			{
+			}else if($model instanceof Property) {
+				$model = ModelHelper::getValue($model, $pathPart);
+				if(!isset($model)) {
+					return null;
+				}
+			} else
+			{				
 				if (!isset($model->$pathPart)) {
 					return null;
 				}
