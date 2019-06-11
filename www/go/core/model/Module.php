@@ -19,6 +19,15 @@ class Module extends AclOwnerEntity {
 	public $admin_menu;
 	public $version;
 	public $enabled;
+
+
+	/**
+	 * This is here for compatibility with old modules management page that's not refactored yet. Remove when refactored.
+	 * @deprecated
+	 */
+	public function getAclId() {
+		return $this->aclId;
+	}
 	
 	protected static function textFilterColumns()
 	{
