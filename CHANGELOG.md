@@ -1,3 +1,6 @@
+11-06-2019 6.4.21
+- First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
+
 03-06-2019 6.3.76
 - Fixed some 6.2 upgrade issues.
 

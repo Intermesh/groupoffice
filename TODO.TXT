@@ -11,25 +11,6 @@ Demodata
 ticket groups
 
 
-Todo
-Adres list convert
-
-New in 6.4:
-
-System settings d
-Default permissions d
-LDAP sync d
-Address book d
-Newsletters
-Comments d
-Profile d
-Modules in group configurarable d
-Filters d
-Global search improved d
-Bookmarks backend refactored d
-Search Query
-Sync data with browser
-
 DG::
 
 Income contracts als maatwerk:
