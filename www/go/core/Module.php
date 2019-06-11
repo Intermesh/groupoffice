@@ -70,8 +70,13 @@ abstract class Module {
 
 		$file = GO()->getEnvironment()->getInstallFolder()->getFile('licensechecks/'.$lic. '.php');
 
+		//Check if file is encoded
 		$data = $file->getContents(0, 100);
-		if(strpos($data, 'ionCube') !== false && !extension_loaded('ionCube Loader')) {			
+		if(strpos($data, '<?php //004fb') === false) {	
+			return true;
+		}
+
+		if(!extension_loaded('ionCube Loader')) {
 			return false;
 		}
 
