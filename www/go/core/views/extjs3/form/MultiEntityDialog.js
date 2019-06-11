@@ -61,7 +61,7 @@ go.form.MultiEntityDialog = Ext.extend(go.Window, {
 				params.create[Ext.id()] = values;
 			}
 		}, this);
-debugger;
+
 		params.destroy = [];
 		for(var i = 0; i < this.formGroup.markDeleted.length; i++) {
 			params.destroy.push(this.formGroup.markDeleted[i]);
