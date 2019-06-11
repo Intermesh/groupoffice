@@ -7,8 +7,6 @@ use go\core\util\DateTime;
 use stdClass;
 use Traversable;
 use function GO;
-use go\core\data\ModelHelper;
-use go\core\orm\Property;
 
 /**
  * Template parser

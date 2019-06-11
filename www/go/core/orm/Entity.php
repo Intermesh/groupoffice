@@ -3,17 +3,13 @@
 namespace go\core\orm;
 
 use Exception;
-use GO;
 use go\core\model\Acl;
 use go\core\App;
 use go\core\db\Criteria;
 use go\core\orm\Query;
-use go\core\jmap\EntityController;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\model\Module;
-use GO\Base\Util\TemplateParser;
-use go\core\data\ModelHelper;
 use go\core\data\exception\NotArrayable;
 
 /**
@@ -690,7 +686,7 @@ abstract class Entity extends Property {
 
 		foreach ($properties as $propName) {
 			try {
-				$value = ModelHelper::getValue($this, $propName);
+				$value = $this->getValue($this, $propName);
 				$arr[$propName] = method_exists($value, 'toTemplate') ? $value->toTemplate() : $value;
 			} catch (NotArrayable $e) {
 				

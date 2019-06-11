@@ -18,7 +18,6 @@ use PDO;
 use PDOException;
 use ReflectionClass;
 use function GO;
-use go\core\data\ModelHelper;
 
 /**
  * Property model
@@ -1288,54 +1287,13 @@ abstract class Property extends Model {
 	}
 
 	/**
-	 * Set public properties with key value array.
-	 * 
-	 * This function should also normalize input when you extend this class.
-	 * 
-	 * For example dates in ISO format should be converted into DateTime objects
-	 * and related models should be converted to an instance of their class.
-	 * 
-	 *
-	 * @Example
-	 * ```````````````````````````````````````````````````````````````````````````
-	 * $model = User::findByIds([1]);
-	 * $model->setValues(['username' => 'admin']);
-	 * $model->save();
-	 * ```````````````````````````````````````````````````````````````````````````
-	 *
-	 * 
-	 * @param array $values  ["propNamne" => "value"]
-	 * @return \static
-	 */
-	public function setValues(array $values) {
-		foreach ($values as $propName => &$value) {
-			$value = $this->normalizeValue($propName, $value);
-		}
-
-		return parent::setValues($values);
-	}
-
-	/**
-	 * Set a property
-	 * 
-	 * @param string $name
-	 * @param mixed $value
-	 * @return $this
-	 */
-	public function setValue($name, $value) {
-		$value = $this->normalizeValue($name, $value);
-		ModelHelper::setValue($this, $name, $value);
-		return $this;
-	}
-
-	/**
-	 * Turns array values into relation models and ISO date strings into DateTime objects
+	 * Normalizes API input for this model.
 	 * 
 	 * @param string $propName
 	 * @param mixed $value
 	 * @return mixed
 	 */
-	private function normalizeValue($propName, $value) {
+	protected function normalizeValue($propName, $value) {
 		$relation = static::getMapping()->getRelation($propName);
 		if ($relation) {
 			
