@@ -678,7 +678,7 @@ namespace {
 
 	use go\core\App;
 	/**
-	 * @return App
+	 * @return go\core\App
 	 */
 	function GO() {
 		return App::get();
