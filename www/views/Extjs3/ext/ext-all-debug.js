@@ -50416,7 +50416,6 @@ Ext.grid.RowSelectionModel = Ext.extend(Ext.grid.AbstractSelectionModel,  {
         }
 
         this.rowNav = new Ext.KeyNav(this.grid.getGridEl(), {
-            forceKeyDown: true, // Required for Firefox 67
             up: this.onKeyPress, 
             down: this.onKeyPress,
             scope: this
