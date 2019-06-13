@@ -612,3 +612,7 @@ Ext.override(Ext.layout.ToolbarLayout ,{
     }
 	}
 );
+
+Ext.override(Ext.KeyNav, {
+	forceKeyDown: true // Required for Firefox 67	
+});
