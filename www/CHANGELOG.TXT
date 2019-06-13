@@ -1,3 +1,4 @@
+- Fixed firefox keyboard navigation problem in grids
 - Fixed issue that foldernotifications could not be checked anymore after a folder was deleted.
 
 03-06-2019 6.2.118
