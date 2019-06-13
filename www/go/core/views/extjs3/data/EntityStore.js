@@ -678,23 +678,15 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	 */
 	query : function(params, cb, scope) {
 		var me = this;
-		return new Promise(function(resolve, reject) {
-			go.Jmap.request({
+		return go.Jmap.request({
 				method: me.entity.name + "/query",
-				params: params,
-				callback: function(options, success, response) {
+				params: params				
+		}).then(function(response) {
+			if(cb) {
+				cb.call(scope || me, response);
+			}
 
-					if(!success) {
-						throw me.entity.name + "/query failed!";
-					}
-
-					resolve(response);
-					if(cb) {
-						cb.call(scope || me, response);
-					}
-				},
-				scope: me
-			});
+			return response;
 		});
 	}
 });

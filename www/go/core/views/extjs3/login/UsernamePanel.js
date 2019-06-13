@@ -111,10 +111,10 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 
 	submit: function () {
 
-		if (!this.getForm().isValid()) {
+		if (!this.getForm().isValid() || this.submitting) {
 			return;
 		}
-
+		this.submitting = true;
 		this.getEl().mask();
 		
 		var username = this.usernameField.getValue(), domain = this.domainCombo ? this.domainCombo.getValue() : "";
@@ -127,6 +127,7 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 
 		go.AuthenticationManager.getAvailableMethods(username, this.passwordField.getValue(), function (authMan, success, result) {
 			this.getEl().unmask();
+			this.submitting = false;
 			if (success) {
 				this.onSuccess();
 			} else {

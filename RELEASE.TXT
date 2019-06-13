@@ -1,8 +1,14 @@
+2019/06/11 6.4.21
+
+Please read the release notes here:
+
+https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
+
 2018/07/30 6.3.25
 
 Please read the release notes here:
 
-http://groupoffice.blogspot.com/2018/07/group-office-63-released.html
+https://groupoffice.blogspot.com/2018/07/group-office-63-released.html
 
 
 2016/03/23 6.2.1

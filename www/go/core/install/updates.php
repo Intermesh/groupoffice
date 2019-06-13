@@ -594,3 +594,7 @@ $updates['201906032000'][] = "ALTER TABLE `core_search` CHANGE `keywords` `keywo
 $updates['201906032000'][] = "ALTER TABLE `core_search` DROP INDEX `name`;";
 $updates['201906032000'][] = "ALTER TABLE `core_search` CHANGE `name` `name` VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;";
 $updates['201906032000'][] = "ALTER TABLE `core_search` ADD FULLTEXT( `name`, `keywords`);";
+
+
+$updates['201906032000'][] = "ALTER TABLE `core_acl` DROP FOREIGN KEY `core_acl_ibfk_1`;";
+$updates['201906032000'][] = "ALTER TABLE `core_acl` ADD CONSTRAINT `core_acl_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";

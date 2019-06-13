@@ -2,7 +2,6 @@
 
 namespace go\core\data;
 
-use Exception;
 use go\core\App;
 use go\core\data\ArrayableInterface;
 use go\core\data\exception\NotArrayable;
@@ -10,7 +9,6 @@ use go\core\util\DateTime;
 use JsonSerializable;
 use ReflectionClass;
 use ReflectionMethod;
-use ReflectionParameter;
 use ReflectionProperty;
 
 /**
@@ -156,7 +154,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 
 		foreach ($properties as $propName) {
 			try {
-				$value = ModelHelper::getValue($this, $propName);
+				$value = $this->getValue($propName);
 				$arr[$propName] = $this->convertValue($value);
 			} catch (NotArrayable $e) {
 				
@@ -220,71 +218,78 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 	 * @return \static
 	 */
 	public function setValues(array $values) {
-		ModelHelper::setValues($this, $values);
+		foreach($values as $name => $value) {
+			$this->setValue($name, $value);
+		}
 		return $this;
 	}
-	
-	
 
-	
-// 	/**
-// 	 * Magic function that checks the get<NAME> functions
-// 	 * 
-// 	 * @param string $name
-// 	 * @return bool
-// 	 */
-// 	public function __isset($name) {
-// 		$getter = 'get' . $name;
-// 		if (method_exists($this, $getter)) {
-// 			// property is not null
-// 			return $this->$getter() !== null;
-// 		} else {
-// 			return false;
-// 		}
-// 	}
 
-// 	/**
-// 	 * Magic properties can't be unset unless you implement logic to this
-// 	 * 
-// 	 * In most cases you want to set the property to null.
-// 	 * 
-// 	 * @param string $name
-// 	 * @throws Exception2
-// 	 */
-// 	public function __unset($name) {
-// 		throw new Exception("Can't unset magic property $name");
-// 	}
+		/**
+	 * Set a property with API input normalization.
+	 * 
+	 * It also uses a setter function if available
+	 * 
+	 * @param string $propName
+	 * @param mixed $value
+	 * @return $this
+	 */
+	public function setValue($propName, $value) {
 
-// 	/**
-// 	 * Magic setter that calls set<NAME> functions in objects
-// 	 * 
-// 	 * @param string $name property name
-// 	 * @param mixed $value property value
-// 	 * @throws Exception If the property getter does not exist
-// 	 */
-// 	public function __set($name,$value)
-// 	{
-// 		$setter = 'set'.$name;
-			
-// 		if(method_exists($this,$setter)){
-// 			$this->$setter($value);
-// 		}else
-// 		{				
-			
-// 			$getter = 'get' . $name;
-// 			if(method_exists($this, $getter)){
-				
-// 				//Allow to set read only properties with their original value.
-// 				//http://stackoverflow.com/questions/20533712/how-should-a-restful-service-expose-read-only-properties-on-mutable-resources								
-// //				$errorMsg = "Can't set read only property '$name' in '".static::class."'";
-// 				//for performance reasons we simply ignore it.
-// 				App::get()->getDebugger()->debug("Discarding read only property '$name' in '".static::class."'");
-// 			}else {
-// 				$errorMsg = "Cannot set non-existent property '$name' in '".static::class."'. Available properties: ". implode(', ', $this->getWritableProperties());
-// 				throw new Exception($errorMsg);
-// 			}						
-// 		}
-// 	}
+		$props = $this->getApiProperties();
+
+		if(!isset($props[$propName])) {
+			throw new \Exception("Not existing property $propName for " . static::class);
+		}
+
+		if($props[$propName]['setter']) {
+			$setter = 'set' . $propName;	
+			$this->$setter($value);
+		} else if($props[$propName]['access'] == \ReflectionProperty::IS_PUBLIC){
+			$this->{$propName} = $this->normalizeValue($propName, $value);
+		}	else if($props[$propName]['getter']) {
+			GO()->warn("Ignoring setting of read only property ". $propName ." for " . static::class);
+		} else{
+			throw new \Exception("Invalid property ". $propName ." for " . static::class);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Normalizes API input for this model.
+	 * 
+	 * @param string $propName
+	 * @param mixed $value
+	 * @return mixed
+	 */
+	protected function normalizeValue($propName, $value) {
+		return $value;
+	}
+
+		/**
+	 * Helper function to get a value from an object externally.
+	 * 
+	 * @param \go\core\data\Model $model
+	 * @param string $propName
+	 * @return mixed
+	 */
+	public function getValue($propName) {
+		$props = $this->getApiProperties();
+		
+		if(!isset($props[$propName])) {
+			throw new \Exception("Not existing property $propName in " . static::class);
+		}
+
+		if($props[$propName]['getter']) {
+			$getter = 'get' . $propName;	
+			return $this->$getter();
+		} elseif($props[$propName]['access'] === \ReflectionProperty::IS_PUBLIC){
+			return $this->{$propName};
+		}	else{
+			throw new \Exception("Can't get write only property ". $propName . " in " . static::class);
+		}
+	}
 	
 	public function jsonSerialize() {
 		return $this->toArray();

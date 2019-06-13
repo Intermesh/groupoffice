@@ -36,3 +36,5 @@ $updates['201905281248'][] = "ALTER TABLE `addressbook_url` DROP PRIMARY KEY;";
 $updates['201905281248'][] = "ALTER TABLE `addressbook_url` DROP `id`;";
 $updates['201905281248'][] = "ALTER TABLE `addressbook_url` ADD FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
 $updates['201905281248'][] = "ALTER TABLE `addressbook_address` DROP `id`";
+
+$updates['201905281248'][] = "DELETE FROM core_entity WHERE moduleId = (select id from core_module where name='addressbook' and package='community') and name='Addresslist';";

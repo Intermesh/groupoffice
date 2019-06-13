@@ -6,6 +6,10 @@ use go\core\orm\Query;
 use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\orm\Entity as OrmEntity;
 use PDO;
+use go\core\util\ClassFinder;
+use go\core\orm\EntityType;
+use go\core\acl\model\AclOwnerEntity;
+use go\core\acl\model\AclItemEntity;
 
 /**
  * Entity model
@@ -75,6 +79,8 @@ abstract class Entity  extends OrmEntity {
 	 */
 	protected function internalDelete() {
 		
+		$this->changeReferencedEntities();
+
 		if(!parent::internalDelete()) {
 			return false;
 		}
@@ -84,10 +90,54 @@ abstract class Entity  extends OrmEntity {
 		} else
 		{
 			GO()->warn('Track changes was disabled during delete of '. static::class);
-		}
+		}	
 		
 		return true;
 	}	
+
+	/**
+	 * This function finds all entities that might change because of this delete. 
+	 * This happens when they have a foreign key constraint with SET NULL
+	 */
+	private function changeReferencedEntities() {
+		foreach($this->getEntityReferences() as $r) {
+			$cls = $r['cls'];			
+
+			$isAclOwnerEntity = is_a($cls, AclOwnerEntity::class, true);
+			$isAclItemEntity = is_a($cls, AclItemEntity::class, true);
+
+			foreach($r['paths'] as $path) {
+				$query = $cls::find();
+
+				if(!empty($path)) {
+					$query->joinProperties($path);
+					$query->where(array_pop($path) . '.' .$r['column'], '=', $this->id);
+				} else{
+					$query->where($query->getTableAlias()  . '.' .$r['column'], '=', $this->id);					
+				}
+
+				$query->select($query->getTableAlias() . '.id AS entityId');
+
+				if($isAclItemEntity) {
+					$aclAlias = $cls::joinAclEntity($query);
+					$query->select($aclAlias .'.aclId', true);
+				} else if($isAclOwnerEntity) {
+					$query->select('aclId', true);
+				} else{
+					$query->select('NULL AS aclId', true);
+				}
+
+				$query->select('"0" AS destroyed', true);
+
+				$type = $cls::entityType();
+
+				//GO()->warn($query);
+
+				/** @var EntityType $type */
+				$type->changes($query);
+			}		
+		}
+	}
 	
 	/**
 	 * A state contains:
@@ -271,6 +321,74 @@ abstract class Entity  extends OrmEntity {
 		
 	
 		return $changes;
+	}
+
+
+
+	/**
+	 * Get all table columns referencing the id column of the entity's main table.
+	 * 
+	 * It uses the 'information_schema' to read all foreign key relations.
+	 * 
+	 * @return array [['cls'=>'Contact', 'column' => 'id', 'paths' => []]]
+	 */
+	private static function getEntityReferences() {
+		$cacheKey = "refs-" . static::class;
+		$refs = GO()->getCache()->get("refs-" . $cacheKey);
+		if(!$refs) {
+
+			$tableName = array_values(static::getMapping()->getTables())[0]->getName();
+
+			$dbName = GO()->getDatabase()->getName();
+			GO()->getDbConnection()->exec("USE information_schema");
+			//somehow bindvalue didn't work here
+			$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where ".
+				"constraint_schema=" . GO()->getDbConnection()->getPDO()->quote($dbName) . 
+				" and referenced_table_name=".GO()->getDbConnection()->getPDO()->quote($tableName)." and referenced_column_name = 'id'";
+
+			$stmt = GO()->getDbConnection()->getPDO()->query($sql);
+			$refs = $stmt->fetchAll(\PDO::FETCH_ASSOC);					
+			GO()->getDbConnection()->exec("USE `" . $dbName . "`");		
+
+			$entityClasses = [];
+			foreach($refs as $r) {
+				$entityClasses = array_merge($entityClasses, static::findEntitiesByTable($r['table'], $r['column']));
+			}	
+			
+			GO()->getCache()->set("refs-" . $cacheKey, $entityClasses);			
+		}		
+		
+		return $entityClasses;
+	}
+
+
+	/**
+	 * Find's entities that have the given table name mapped
+	 * 
+	 * @return string[]
+	 */
+	private static function findEntitiesByTable($tableName, $col) {
+		$cf = new ClassFinder();
+		$allEntitites = $cf->findByParent(self::class);
+
+		//don't find the entity itself
+		$allEntitites = array_filter($allEntitites, function($e) {
+			return $e != static::class;
+		});
+
+		$mapped = array_map(function($e) use ($tableName, $col) {
+			$paths = $e::getMapping()->hasTable($tableName);
+			return [
+				'cls' => $e,
+				'paths' => $paths,
+				'column' => $col
+			];
+
+		}, $allEntitites);
+
+		return array_filter($mapped, function($m) {
+			return !empty($m['paths']);
+		});
 	}
 
 }

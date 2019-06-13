@@ -88,19 +88,25 @@ go.search.Panel = Ext.extend(Ext.Panel, {
 		filter.text = q;
 		this.grid.store.baseParams.limit = 20;
 		this.grid.store.removeAll();
+
+		var me = this;
 		
 		this.grid.store.load({
 			params: {
 				filter: filter
-			},
-			callback: function() {
-				this.getEl().unmask();
-			},
-			scope: this
+			}
+		}).finally(function() {
+			me.getEl().unmask();
+			me.expand();
+		}).catch(function(response) {			
+			me.fireEvent("searchexception", this, response);
+			//me.collapse();
+		}).then(function() {
+			
 		});
 		
 		//this.setHeight(dp(600));
-		this.expand();
+		
 	},
 	// private
 	collapseIf : function(e){

@@ -109,7 +109,7 @@ class HttpClient{
 	
 	public function readHeader($ch, $header){
 		if(preg_match('/([\w-]+): (.*)/i', $header, $matches))		
-			$this->lastHeaders[$matches[1]]=$matches[2];
+			$this->lastHeaders[$matches[1]] = trim($matches[2]);
 		
 		return strlen($header);
 	}

@@ -749,7 +749,7 @@ ALTER TABLE `core_user_group`
 
 
 ALTER TABLE `core_acl`
-  ADD CONSTRAINT `core_acl_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`);
+  ADD CONSTRAINT `core_acl_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;
 
 CREATE TABLE IF NOT EXISTS `go_templates` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

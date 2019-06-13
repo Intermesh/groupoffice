@@ -3,17 +3,13 @@
 namespace go\core\orm;
 
 use Exception;
-use GO;
 use go\core\model\Acl;
 use go\core\App;
 use go\core\db\Criteria;
 use go\core\orm\Query;
-use go\core\jmap\EntityController;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\model\Module;
-use GO\Base\Util\TemplateParser;
-use go\core\data\ModelHelper;
 use go\core\data\exception\NotArrayable;
 
 /**
@@ -206,6 +202,7 @@ abstract class Entity extends Property {
 		}
 		
 		if (!$this->internalSave()) {
+			GO()->warn(static::class .'::internalSave() returned false');
 			$this->rollback();
 			return false;
 		}		
@@ -546,7 +543,7 @@ abstract class Entity extends Property {
 		$columns = static::textFilterColumns();
 		
 		if(empty($columns)) {
-			GO()->warn(static::class . ' entity has no searchColumns() defined. The q filter will not work.');
+			GO()->warn(static::class . ' entity has no textFilterColumns() defined. The q filter will not work.');
 		}
 		
 		//Explode string into tokens and wrap in wildcard signs to search within the texts.
@@ -690,7 +687,7 @@ abstract class Entity extends Property {
 
 		foreach ($properties as $propName) {
 			try {
-				$value = ModelHelper::getValue($this, $propName);
+				$value = $this->getValue($this, $propName);
 				$arr[$propName] = method_exists($value, 'toTemplate') ? $value->toTemplate() : $value;
 			} catch (NotArrayable $e) {
 				

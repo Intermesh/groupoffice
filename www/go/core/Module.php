@@ -50,6 +50,10 @@ abstract class Module {
 		return false;
 	}
 
+	public function isInstallable() {
+		return $this->isLicensed();
+	}
+
 	/**
 	 * For example "groupoffice-pro"
 	 */
@@ -57,19 +61,34 @@ abstract class Module {
 		return null;
 	}
 
-	public function isInstallable() {
+	public function isLicensed() {
+		
 		$lic = $this->requiredLicense();
-
 		if(!isset($lic)) {
-			return $this->name() != 'core';
+			return true;
 		}
-	 
+
+		$file = GO()->getEnvironment()->getInstallFolder()->getFile('licensechecks/'.$lic. '.php');
+
+		//Check if file is encoded
+		$data = $file->getContents(0, 100);
+		if(strpos($data, '<?php //004fb') === false) {	
+			return true;
+		}
+
 		if(!extension_loaded('ionCube Loader')) {
 			return false;
 		}
 
-		return GO()->getEnvironment()->getInstallFolder()->getFile( $lic . '-' . substr(GO()->getVersion(), 0, 3) .' license.txt')->exists();
+		if(!GO()->getEnvironment()->getInstallFolder()->getFile($lic . '-' . substr(GO()->getVersion(), 0, 3) .'-license.txt')->exists()) {
+			return false;
+		}
+
+		return require($file->getPath());
+		
 	}
+
+
 	
 	/**
 	 * Install the module

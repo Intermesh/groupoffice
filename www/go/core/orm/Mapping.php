@@ -117,6 +117,7 @@ class Mapping {
 	}
 
 	/**
+	 * Get all mapped tables
 	 * 
 	 * @return MappedTable[]
 	 */
@@ -125,12 +126,32 @@ class Mapping {
 	}	
 	
 	/**
+	 * Get the table by name
 	 * 
 	 * @param string $name
 	 * @return MappedTable
 	 */
 	public function getTable($name) {
 		return $this->tables[$name];
+	}	
+
+	/**
+	 * Check if this mapping has the given table or one of it's property relations has it.
+	 * 
+	 * @return bool|string path
+	 */
+	public function hasTable($name, $path = [], &$paths = []) {
+		
+		if(isset($this->tables[$name])) {
+			$paths[] = $path;
+		}
+
+		foreach($this->getRelations() as $r) {
+			$cls = $r->entityName;
+			$cls::getMapping()->hasTable($name, array_merge($path, [$r->name]), $paths);			
+		}
+
+		return $paths;
 	}	
 	
 	/**

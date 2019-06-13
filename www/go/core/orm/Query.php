@@ -89,4 +89,34 @@ class Query extends DbQuery {
 		return true;
 	}
 
+
+	/**
+	 * Join properties on the main model
+	 * 
+	 * @param string[] $path eg. ['emailAddreses']
+	 * @return $this;
+	 */
+	public function joinProperties(array $path) {
+		$cls = $this->model;
+		$alias = $this->getTableAlias();
+
+		foreach($path as $part) {
+			$relation = $cls::getMapping()->getRelation($part);
+			/** @var Relation $relation */
+
+			$cls = $relation->entityName;
+			
+			$table = array_values($cls::getMapping()->getTables())[0]->getName();
+			$on = [];
+			foreach($relation->keys as $from => $to) {
+				$on[] = $alias . '.' .$from . ' = ' . $part . '.' . $to;
+			}
+			$this->join($table, $part, implode(' AND ', $on));
+
+			$alias = $part;
+		}
+
+		return $this;
+	}
+
 }

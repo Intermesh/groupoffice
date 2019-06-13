@@ -18,7 +18,6 @@ use PDO;
 use PDOException;
 use ReflectionClass;
 use function GO;
-use go\core\data\ModelHelper;
 
 /**
  * Property model
@@ -141,9 +140,9 @@ abstract class Property extends Model {
 
 		$fetchedRelations = [];
 
-		$relations = $this->getMapping()->getRelations();
+		$relations = $this->getMapping()->getRelations();		
 		foreach ($relations as $relation) {
-			if (in_array($relation->name, $this->fetchProperties)) {
+			if (in_array($relation->name, $this->fetchProperties) || static::isProtectedProperty($relation->name)) {
 				$fetchedRelations[] = $relation;
 			}
 		}
@@ -169,7 +168,7 @@ abstract class Property extends Model {
 				} else{
 					$o = [];
 					foreach($values as $v) {
-						$o[$v->id()] = $v;
+						$o[$this->buildMapKey($v, $relation)] = $v;
 					}
 					$this->{$relation->name} = $o;
 				}
@@ -181,6 +180,21 @@ abstract class Property extends Model {
 				$this->{$relation->name} = $prop ? $prop : null;
 			}
 		}
+	}
+
+	/**
+	 * Build a key of the primary keys but omit the key from the releation because it's not needed as it's a property,
+	 * 
+	 */
+	private function buildMapKey(Property $v, Relation $relation) {
+		$pk = array_diff($v->getPrimaryKey(), array_values($relation->keys));
+
+		$id = [];
+		foreach($pk as $field) {
+			$id[] = $v->$field;
+		}
+
+		return implode('-', $id);
 	}
 	
 	/**
@@ -555,7 +569,7 @@ abstract class Property extends Model {
 			
 			$newValue = $this->{$key};
 			
-			if($newValue instanceof Property) {
+			if($newValue instanceof self) {
 				if($newValue->isModified()) {
 					$modified[$key] = [$newValue, null];
 				}
@@ -563,7 +577,7 @@ abstract class Property extends Model {
 			{
 				if ($newValue !== $oldValue) {
 					$modified[$key] = [$newValue, $oldValue];
-				} else if(is_array($newValue) && isset($newValue[0]) && $newValue[0] instanceof Property) {
+				} else if(is_array($newValue) && (($v = array_values($newValue)) && isset($v[0]) && $v[0] instanceof self)) {
 					// Array comparison above might return false because the array contains identical objects but the objects itself might have changed.
 					foreach($newValue as $v) {
 						if($v->isModified()) {
@@ -1273,54 +1287,13 @@ abstract class Property extends Model {
 	}
 
 	/**
-	 * Set public properties with key value array.
-	 * 
-	 * This function should also normalize input when you extend this class.
-	 * 
-	 * For example dates in ISO format should be converted into DateTime objects
-	 * and related models should be converted to an instance of their class.
-	 * 
-	 *
-	 * @Example
-	 * ```````````````````````````````````````````````````````````````````````````
-	 * $model = User::findByIds([1]);
-	 * $model->setValues(['username' => 'admin']);
-	 * $model->save();
-	 * ```````````````````````````````````````````````````````````````````````````
-	 *
-	 * 
-	 * @param array $values  ["propNamne" => "value"]
-	 * @return \static
-	 */
-	public function setValues(array $values) {
-		foreach ($values as $propName => &$value) {
-			$value = $this->normalizeValue($propName, $value);
-		}
-
-		return parent::setValues($values);
-	}
-
-	/**
-	 * Set a property
-	 * 
-	 * @param string $name
-	 * @param mixed $value
-	 * @return $this
-	 */
-	public function setValue($name, $value) {
-		$value = $this->normalizeValue($name, $value);
-		ModelHelper::setValue($this, $name, $value);
-		return $this;
-	}
-
-	/**
-	 * Turns array values into relation models and ISO date strings into DateTime objects
+	 * Normalizes API input for this model.
 	 * 
 	 * @param string $propName
 	 * @param mixed $value
 	 * @return mixed
 	 */
-	private function normalizeValue($propName, $value) {
+	protected function normalizeValue($propName, $value) {
 		$relation = static::getMapping()->getRelation($propName);
 		if ($relation) {
 			
@@ -1342,7 +1315,7 @@ abstract class Property extends Model {
 		}
 
 		$column = static::getMapping()->getColumn($propName);
-		if ($column) {
+		if ($column && !static::isProtectedProperty($column->name)) {
 			return $column->normalizeInput($value);
 		}
 
