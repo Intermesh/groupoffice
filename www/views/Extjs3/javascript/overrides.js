@@ -1050,3 +1050,7 @@ Ext.override(Ext.TabPanel, {
 		}
 	},
 });
+
+Ext.override(Ext.KeyNav, {
+	forceKeyDown: true // Required for Firefox 67	
+});

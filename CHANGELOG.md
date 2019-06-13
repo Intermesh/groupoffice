@@ -1,6 +1,10 @@
 11-06-2019 6.4.21
 - First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
 
+
+
+- Fix for keyboard navigation in Firefox 67
+
 03-06-2019 6.3.76
 - Fixed some 6.2 upgrade issues.
 
