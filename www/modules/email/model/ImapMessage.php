@@ -320,7 +320,7 @@ class ImapMessage extends ComposerMessage {
 					}
 
 					if(!empty($this->charset) && $this->_struct[1]['charset']=='us-ascii'){
-						$this->_struct[1]['charset']=$this->charset;
+						//$this->_struct[1]['charset']=$this->charset;
 					}
 				}
 			}

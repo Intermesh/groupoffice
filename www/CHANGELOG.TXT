@@ -1,5 +1,13 @@
+- Fixed firefox keyboard navigation problem in grids
+- Fixed issue that foldernotifications could not be checked anymore after a folder was deleted.
+
+03-06-2019 6.2.118
+- Email: Detect charset from HTML body if not present in IMAP structure
+- Files: Ignore permissions on folder notifications
 - Comments: Add comments module to modulemanager when installed.
 - Core: Added isDeleted() function to ActiveRecord which will return a boolean
+- Core: Admin user could remove admin user from an ACL
+- Files: Users that no longer had folder permissions still received notifications. Ticket #201918666.
 
 25-04-2019 6.2.117
 - Notes: Implemented delete action in category controller

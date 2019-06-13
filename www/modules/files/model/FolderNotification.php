@@ -23,6 +23,7 @@
 
 namespace GO\Files\Model;
 
+use GO\Base\Model\Acl;
 
 class FolderNotification extends \GO\Base\Db\ActiveRecord {
 
@@ -57,12 +58,27 @@ class FolderNotification extends \GO\Base\Db\ActiveRecord {
 	 * @return array
 	 */
 	public static function getUsersToNotify($folder_id) {
+
+		$folder = Folder::model()->findByPk($folder_id);
+		if(!$folder) {
+			$stmt = self::model()->findByAttribute('folder_id', $folder_id);
+			$stmt->callOnEach('delete');
+			return [];
+		}
+		$acl = $folder->getAcl();
+		
+
 		$stmt = self::model()->findByAttribute('folder_id', $folder_id);
 		$users = array();
 		while ($fnRow = $stmt->fetch()) {
 			//ignore user who changed file(s)
 			if ($fnRow->user_id == \GO::user()->id)
 				continue;
+
+			if(!Acl::getUserPermissionLevel($acl->id, $fnRow->user_id)) {
+				$fnRow->delete();
+				continue;
+			}
 			$users[] = $fnRow->user_id;
 		}
 		return $users;
@@ -131,7 +147,7 @@ class FolderNotification extends \GO\Base\Db\ActiveRecord {
 				$messages[$notification->type] = array();
 
 			if (!isset($users[$notification->modified_user_id])) {
-				$user = \GO::user()->findByPk($notification->modified_user_id);
+				$user = \GO::user()->findByPk($notification->modified_user_id, false, true);
 				if ($user){					
 					$users[$notification->modified_user_id] = $user->getName();
 				}else {					
