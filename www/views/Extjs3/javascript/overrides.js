@@ -765,3 +765,6 @@ Ext.util.Format.dateRenderer = function(format) {
 Ext.override(Ext.form.CompositeField, {
 	submit: false //don't submit with form.getFieldValue()
 });
+Ext.override(Ext.KeyNav, {
+	forceKeyDown: true // Required for Firefox 67	
+});
