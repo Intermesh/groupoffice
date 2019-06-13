@@ -202,6 +202,7 @@ abstract class Entity extends Property {
 		}
 		
 		if (!$this->internalSave()) {
+			GO()->warn(static::class .'::internalSave() returned false');
 			$this->rollback();
 			return false;
 		}		

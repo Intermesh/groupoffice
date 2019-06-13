@@ -151,8 +151,11 @@ abstract class AclOwnerEntity extends AclEntity {
 			$defaultAcl = Acl::findById(static::entityType()->getDefaultAclId());		
 			$this->acl = $defaultAcl->copy();
 		}
-		
-		$this->acl->usedIn = $this->getMapping()->getColumn('aclId')->table->getName().'.aclId';
+		$aclColumn = $this->getMapping()->getColumn('aclId');
+		if(!$aclColumn) {
+			throw new \Exception("Column aclId is required for AclOwnerEntity ". static::class);
+		}
+		$this->acl->usedIn = $aclColumn->table->getName().'.aclId';
 		try {
 			$this->acl->entityTypeId = $this->entityType()->getId();
 		} catch(\Exception $e) {
