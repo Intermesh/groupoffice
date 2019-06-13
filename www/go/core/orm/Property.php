@@ -140,9 +140,9 @@ abstract class Property extends Model {
 
 		$fetchedRelations = [];
 
-		$relations = $this->getMapping()->getRelations();
+		$relations = $this->getMapping()->getRelations();		
 		foreach ($relations as $relation) {
-			if (in_array($relation->name, $this->fetchProperties)) {
+			if (in_array($relation->name, $this->fetchProperties) || static::isProtectedProperty($relation->name)) {
 				$fetchedRelations[] = $relation;
 			}
 		}
