@@ -1,3 +1,5 @@
+- Projects2, ProjectReport: Only show jobs who have timeentries between the given start and end date.
+- Projects2, ProjectReport: Added Job column to timeentries grid.
 - Fix for keyboard navigation in Firefox 67
 
 03-06-2019 6.3.76
