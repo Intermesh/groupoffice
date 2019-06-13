@@ -9,6 +9,7 @@ go.form.MultiEntityDialog = Ext.extend(go.Window, {
 		text: t("Add another"),
 		iconCls: 'ic-add'
 	},
+	editable: true,
 	constantValues: {}, //values to be set on every entity before save
 	
 	initComponent: function() {
@@ -27,8 +28,8 @@ go.form.MultiEntityDialog = Ext.extend(go.Window, {
 			items: [this.formGroup = new go.form.FormGroup({
 				name: "entities",
 				mapKey: 'id',//for markDeleted
-				pad: true,
 				btnCfg: this.btnCfg,
+				editable: this.editable,
 				itemCfg: {
 					items:[this.itemCfg]
 				}

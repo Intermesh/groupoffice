@@ -34,7 +34,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	
 	addButtonText: null, // deprecated, use btnCfg
 	btnCfg: {}, // @type Ext.Button
-	
+	editable: true, // show delete and add buttons when true
 	layout: "form",
 	// @string name of property, when set getValue will build an object map with this property as key
 	mapKey: null,
@@ -59,8 +59,9 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		if(!this.itemCfg.xtype) {
 			this.itemCfg.xtype = "formcontainer";
 		}		
-		
-		this.initBbar();
+		if(this.editable) {
+			this.initBbar();
+		}
 		
 		go.form.FormGroup.superclass.initComponent.call(this);
 		
@@ -125,31 +126,31 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	},
 	
 	addPanel : function() {
-		var formField = this.createNewItem(), me = this, wrap = new Ext.Container({
-			//xtype: "container",
+		var formField = this.createNewItem(), me = this, items = [formField];
+		if(this.editable) {
+			items.unshift({
+				xtype: "container",
+				width: dp(48),		
+				items: [{				
+					xtype: "button",
+					iconCls: 'ic-delete',
+					handler: function() {
+						if(this.ownerCt.ownerCt.formField.key) {
+							me.markDeleted.push(this.ownerCt.ownerCt.formField.key);
+						}
+						this.ownerCt.ownerCt.destroy();
+						me.dirty = true;
+					}
+				}]
+			})
+		}
+		var wrap = new Ext.Container({
 			layout: "column",
 			formField: formField,			
 			findBy: false,
 			isFormField: false,
 			style: this.pad ?  "padding-top: " + dp(16) + "px" : "",
-			items: [				
-				{
-					xtype: "container",
-					width: dp(48),		
-					items: [{				
-						xtype: "button",
-						iconCls: 'ic-delete',
-						handler: function() {
-							if(this.ownerCt.ownerCt.formField.key) {
-								me.markDeleted.push(this.ownerCt.ownerCt.formField.key);
-							}
-							this.ownerCt.ownerCt.destroy();
-							me.dirty = true;
-						}
-					}]
-				},
-				formField
-			]
+			items: items
 		});
 		this.add(wrap);
 		return wrap;
