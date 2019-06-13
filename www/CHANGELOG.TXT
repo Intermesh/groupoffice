@@ -1,3 +1,4 @@
+12-06-2019 6.2.119
 - Calendar: Fixed issue that event delete was not logged anymore in the Activitylog 
 - Projects2, ProjectReport: Only show jobs who have timeentries between the given start and end date.
 - Projects2, ProjectReport: Added Job column to timeentries grid.
