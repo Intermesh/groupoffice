@@ -1,3 +1,5 @@
+- Fix for keyboard navigation in Firefox 67
+
 03-06-2019 6.3.76
 - Fixed some 6.2 upgrade issues.
 
