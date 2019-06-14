@@ -48,7 +48,15 @@ class Request extends Singleton{
 		return $_GET;
 	}
 
-	
+
+	/**
+	 * Get a query parameter by name
+	 * 
+	 * @return string|bool false if not set.
+	 */
+	public function getQueryParam($name) {
+		return $_GET[$name] ?? false;
+	}
 	
 	/**
 	 * Get the values of the Accept header in lower case

@@ -34,15 +34,14 @@ class TemporaryState extends AbstractState {
 	
 	public function setUserId($userId) {
 		$this->userId = $userId;
+		\GO::session()->runAs($userId);
 		
 		return $this;
 	}
 
 	public function setUser(User $user) {
 		$this->user = $user;
-		$this->userId = $user->id;
-		
-		return $this;
+		return $this->setUserId($user->id);
 	}
 }
 

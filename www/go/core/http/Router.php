@@ -2,6 +2,7 @@
 namespace go\core\http;
 
 use go\core\exception\NotFound;
+use go\core\ErrorHandler;
 
 /**
  * Simple RESTful router
@@ -36,7 +37,7 @@ class Router {
    * @param string $regex The regular expression to match with the router path. The path is relative to the script the router is created in.
    * @param string $httpMethod eg. GET, POST, PUT etc.
    * @param string $controller Controller class name
-   * @param string $methodController method
+   * @param string $methodController method This method may output directly or return data to pass to Response::get()->output(). (An array for json);
    * 
    * @return $this 
    */
@@ -52,18 +53,41 @@ class Router {
   /**
    * Run the controller method that matches with the route.
    * 
-   * @return mixed the controller method return value
+   * @return void
    */
   public function run() {
     
     $route = $this->findRoute();
     if(!$route) {
+      
       throw new NotFound();
     }
 
-    $c = new $route['controller'];
+    
 
-    return call_user_func_array([$c, $route['method']], $route['params']);		
+    try {
+      $c = new $route['controller'];
+      GO()->debug("Router: ". $route['controller']."::".$route['method']);
+      GO()->debug($route['params']);
+
+      $response = call_user_func_array([$c, $route['method']], $route['params']);		
+      
+    } catch(\go\core\exception\Forbidden $e) {
+      Response::get()->setStatus(401, $e->getMessage());      
+      ErrorHandler::logException($e);
+    } catch(\go\core\exception\NotFound $e) {
+      Response::get()->setStatus(404, $e->getMessage());      
+      ErrorHandler::logException($e);      
+    } catch(\go\core\http\Exception $e) {
+      Response::get()->setStatus($e->code, $e->getMessage());
+      ErrorHandler::logException($e);      
+    } catch(\Exception $e) {
+      Response::get()->setStatus(500, $e->getMessage());
+      ErrorHandler::logException($e);    
+    } 
+    
+    Response::get()->output(isset($response) ? $response : null);
+    
   }
 
   private function findRoute() {
@@ -80,6 +104,8 @@ class Router {
         return array_merge($methods[$method], ['params' => $params]);
       }
     }
+
+    GO()->debug("ROUTE NOT FOUND: " . $path . '['.$method.']');
 
     return false;
   }

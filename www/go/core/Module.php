@@ -9,7 +9,7 @@ use go\core\exception\NotFound;
 use go\core\fs\File;
 use go\core\fs\Folder;
 use go\core\model;
-use go\core\orm\Entity;
+use go\core\jmap\Entity;
 use go\core\util\ClassFinder;
 use function GO;
 

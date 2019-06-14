@@ -241,7 +241,6 @@ class Response extends Singleton{
 	 * @param string $data
 	 */
 	public function output($data = null) {
-		
 		if (isset($data)) {
 			if(is_array($data)) {
 				$data = json_encode($data);
@@ -252,6 +251,8 @@ class Response extends Singleton{
 			} 
 			$this->sendHeaders();
 			echo $data;
+		} else if(!headers_sent()){
+			$this->sendHeaders();
 		}
 	}
 	

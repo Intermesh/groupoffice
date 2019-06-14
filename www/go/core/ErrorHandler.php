@@ -81,6 +81,8 @@ class ErrorHandler {
 		if(!headers_sent()) {
 			if($e instanceof http\Exception) {
 				http_response_code($e->code);				
+			} else{
+				http_response_code(500);
 			}
 			header('Content-Type: text/plain');
 		}

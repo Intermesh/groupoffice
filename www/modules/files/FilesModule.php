@@ -21,6 +21,11 @@
 
 namespace GO\Files;
 
+use go\core\util\ClassFinder;
+use GO\Files\Filehandler\FilehandlerInterface;
+use GO\Base\Util\ReflectionClass;
+use go\core\Module;
+use go\core\model\Module as GoModule;
 
 class FilesModule extends \GO\Base\Module{	
 	
@@ -118,6 +123,11 @@ class FilesModule extends \GO\Base\Module{
 						self::$fileHandlers = array_merge(self::$fileHandlers, $module->moduleManager->findClasses('filehandler'));
 					}
 				}
+
+				//For new framework
+				$cf = new ClassFinder();
+				self::$fileHandlers = array_merge(self::$fileHandlers, array_map(function($cls) {return  new ReflectionClass($cls);}, $cf->findByParent(FilehandlerInterface::class)));
+
 				\GO::cache()->set('files-file-handlers', self::$fileHandlers);
 			}
 			
@@ -126,11 +136,18 @@ class FilesModule extends \GO\Base\Module{
 			foreach(self::$fileHandlers as $key=>$handler){
 				// $handler->name holds the namespace path of the handler. Based on that we can determine if the module is enabled.
 				$nsArr = explode('\\',$handler->name);
-				$moduleName = strtolower($nsArr[1]);
-				
-				if(!\GO::modules()->$moduleName){
-					// Remove if the module is not enabled for this user
-					unset(self::$fileHandlers[$key]);
+
+				if($nsArr[0] == "GO") {
+					$moduleName = strtolower($nsArr[1]);
+					
+					if(!\GO::modules()->$moduleName){
+						// Remove if the module is not enabled for this user
+						unset(self::$fileHandlers[$key]);
+					}
+				} else{
+					if(!GoModule::isAvailableFor($nsArr[2], $nsArr[3])) {
+						unset(self::$fileHandlers[$key]);
+					}
 				}
 			}
 		}		

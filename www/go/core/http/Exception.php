@@ -3,6 +3,7 @@ namespace go\core\http;
 
 use Exception as CoreException;
 
+
 /**
  * Throw when an operation was forbidden.
  * 
@@ -67,6 +68,8 @@ class Exception extends CoreException
 		if(empty($message)){
 			$message = self::$codes[$code];
 		}		
+
+		Response::get()->setStatus($code, $message);
 		
 		parent::__construct($message, $code);
 	}
