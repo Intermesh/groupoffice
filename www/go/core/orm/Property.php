@@ -384,6 +384,10 @@ abstract class Property extends Model {
 	protected static function internalFind(array $fetchProperties = []) {
 		$tables = self::getMapping()->getTables();
 
+		if(empty($tables)) {
+			throw new \Exception("No tables defined for ". static::class);
+		}
+
 		$mainTableName = array_keys($tables)[0];
 		
 		if (empty($fetchProperties)) {
