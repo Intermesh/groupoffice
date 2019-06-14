@@ -120,7 +120,7 @@ class Authenticator extends PrimaryAuthenticator {
 			$account->imap_allow_self_signed = !$server->imapValidateCertificate;
 			$account->smtp_allow_self_signed = !$server->imapValidateCertificate;
 			$account->smtp_username = $server->smtpUsername;
-			$account->smtp_password = $server->smtpPassword;
+			$account->smtp_password = $server->getSmtpPassword();
 			$account->smtp_host = $server->smtpHostname;
 			$account->smtp_port = $server->smtpPort;
 			$account->smtp_encryption = $server->smtpEncryption;

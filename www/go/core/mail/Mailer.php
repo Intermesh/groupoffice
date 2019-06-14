@@ -91,7 +91,7 @@ class Mailer {
 		);
 		if(!empty(GO()->getSettings()->smtpUsername)){
 			$o->setUsername(GO()->getSettings()->smtpUsername)
-				->setPassword(GO()->getSettings()->smtpPassword);
+				->setPassword(GO()->getSettings()->getSmtpPassword());
 		}		
 		
 		if(!GO()->getSettings()->smtpEncryptionVerifyCertificate) {
