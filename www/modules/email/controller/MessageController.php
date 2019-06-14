@@ -1532,7 +1532,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$response['allow_quicklink']=$useQL?1:0;
 
 		
-		$contact = \go\modules\community\addressbook\model\Contact::find()->filter(['email' => $response['sender'], 'permissionLevel' => \go\core\model\Acl::LEVEL_READ])->single();
+		$contact = !empty($response['sender']) ? \go\modules\community\addressbook\model\Contact::find()->filter(['email' => $response['sender'], 'permissionLevel' => \go\core\model\Acl::LEVEL_READ])->single() : false;
 		if(!empty($contact)){
 			$response['contact_thumb_url']= GO()->getAuthState()->getDownloadUrl($contact->photoBlobId);
 
