@@ -1,3 +1,4 @@
+- Project: create invoice without grouping time entries by employees. are time record will be group into 1 group
 - Fix for keyboard navigation in Firefox 67
 
 03-06-2019 6.3.76
