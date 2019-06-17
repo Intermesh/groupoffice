@@ -49,8 +49,19 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		this.cls += " go-detail-view-" + this.entityStore.entity.name.toLowerCase();
 		
 		this.on('afterrender', function() {
-			this.reset();			
+			this.reset();
+
+			this.body.on("click", this.onBodyClick, this);
 		}, this);
+	},
+
+	onBodyClick : function (e, target) {
+
+		//prevent navigating away.
+		if(target.tagName == "A" && target.attributes.href && target.attributes.href.value) {
+			window.open(target.attributes.href.value);
+			e.preventDefault();
+		}
 	},
 	
 	onChanges : function(entityStore, added, changed, destroyed) {
