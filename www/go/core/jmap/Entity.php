@@ -110,10 +110,11 @@ abstract class Entity  extends OrmEntity {
 				$query = $cls::find();
 
 				if(!empty($path)) {
+					//TODO joinProperites only joins the first table.
 					$query->joinProperties($path);
 					$query->where(array_pop($path) . '.' .$r['column'], '=', $this->id);
 				} else{
-					$query->where($query->getTableAlias()  . '.' .$r['column'], '=', $this->id);					
+					$query->where($r['column'], '=', $this->id);					
 				}
 
 				$query->select($query->getTableAlias() . '.id AS entityId');
@@ -334,8 +335,8 @@ abstract class Entity  extends OrmEntity {
 	 */
 	private static function getEntityReferences() {
 		$cacheKey = "refs-" . static::class;
-		$refs = GO()->getCache()->get("refs-" . $cacheKey);
-		if(!$refs) {
+		$entityClasses = false;// GO()->getCache()->get("refs-" . $cacheKey);
+		if(!$entityClasses) {
 
 			$tableName = array_values(static::getMapping()->getTables())[0]->getName();
 

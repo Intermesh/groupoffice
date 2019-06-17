@@ -106,6 +106,7 @@ class Query extends DbQuery {
 
 			$cls = $relation->entityName;
 			
+			//TODO: What if the property has more than one table in the mapping? Also might be a problem in Entity::changeReferencedEntities()
 			$table = array_values($cls::getMapping()->getTables())[0]->getName();
 			$on = [];
 			foreach($relation->keys as $from => $to) {
