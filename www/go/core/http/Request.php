@@ -109,7 +109,7 @@ class Request extends Singleton{
 				$this->headers = $this->getNonApacheHeaders();
 			} else{
 				$this->headers = array_change_key_case(apache_request_headers(),CASE_LOWER);
-			}	
+			}
 		}
 		return $this->headers;
 	}

@@ -189,7 +189,9 @@ class Debugger {
 			if($debugLog->isWritable()) {
 				if (!is_scalar($mixed)) {
 					$print = print_r($mixed, true);
-				} else{
+				} else if(is_bool($mixed)) {
+					$print = $mixed ? "TRUE" : "FALSE";
+				}	else {
 					$print = $mixed;
 				}
 				$debugLog->putContents($print."\n", FILE_APPEND);
@@ -199,7 +201,9 @@ class Debugger {
 		if(GO()->getEnvironment()->isCli()) {
 			if (!is_scalar($mixed)) {
 				$print = print_r($mixed, true);
-			} else{
+			} else if(is_bool($mixed)) {
+				$print = $mixed ? "TRUE" : "FALSE";
+			} else {
 				$print = $mixed;
 			}
 

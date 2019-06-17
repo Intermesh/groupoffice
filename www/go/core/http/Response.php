@@ -101,13 +101,13 @@ class Response extends Singleton{
 	 * @return $this
 	 */
 	public function setHeader($name, $value) {
-		$name = strtolower($name);
+		$lcname = strtolower($name);
 
 		if (!is_array($value)) {
 			$value = [$value];
 		}
 
-		$this->headers[$name] = $value;	
+		$this->headers[$lcname] = [$name, $value];	
 		
 		return $this;
 	}
@@ -119,6 +119,9 @@ class Response extends Singleton{
 	 * @return $this;
 	 */
 	public function removeHeader($name) {
+
+		$name = strtolower($name);
+
 		if (!headers_sent()) {
 			header_remove($name);
 		}
@@ -139,7 +142,7 @@ class Response extends Singleton{
 		if (!isset($this->headers[$name])) {
 			return null;
 		} else {
-			return $this->headers[$name];
+			return $this->headers[$name][1];
 		}
 	}
 
@@ -153,8 +156,10 @@ class Response extends Singleton{
 		if (!isset($text)) {
 			$text = http\Exception::$codes[$httpCode];
 		}
-		
-		header("HTTP/" . $this->httpVersion . " " . $httpCode . " " . $text);
+
+		$status = "HTTP/" . $this->httpVersion . " " . $httpCode . " " . $text;
+		// GO()->debug($status);
+		header($status);
 	}
 
 	/**
@@ -224,13 +229,13 @@ class Response extends Singleton{
 			$this->setStatus(304);
 			exit();
 		}
-	}
+	}	
 	
-	
-	public function sendHeaders() {
-		foreach ($this->headers as $name => $headerSet) {
-			foreach ($headerSet as $v) {
-				header($name . ': ' . $v);
+	public function sendHeaders() {		
+		foreach ($this->headers as $name => $h) {			
+			foreach ($h[1] as $v) {
+				// GO()->debug($h[0] . ': '. $v);
+				header($h[0] . ': ' . $v);
 			}
 		}		
 	}
@@ -255,6 +260,5 @@ class Response extends Singleton{
 			$this->sendHeaders();
 		}
 	}
-	
 
 }
