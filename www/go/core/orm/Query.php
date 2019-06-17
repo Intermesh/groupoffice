@@ -89,6 +89,18 @@ class Query extends DbQuery {
 		return true;
 	}
 
+	/**
+	 * Join the custom fields table
+	 * 
+	 * @param string $alias The table alias to use.
+	 * @return $this
+	 */
+	public function joinCustomFields($alias = 'customFields') {
+		$cls = $this->model;
+		$this->join($cls::customFieldsTableName(), $alias, $alias . '.id = '.$this->getTableAlias().'.id', 'LEFT');
+
+		return $this;
+	}
 
 	/**
 	 * Join properties on the main model
