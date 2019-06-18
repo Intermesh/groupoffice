@@ -2326,7 +2326,7 @@ The following is the error message:
 	public function getDefaultOrganizerParticipant(){
 		$calendar = $this->calendar;
 		
-		$user = $calendar->user_id==1 ? \GO::user() : $calendar->user;
+		$user = $calendar->user_id==1 || !$calendar->user ? \GO::user() : $calendar->user;
 		
 		$participant = new Participant();
 		$participant->event_id=$this->id;
