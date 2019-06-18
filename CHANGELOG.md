@@ -1,4 +1,4 @@
-6.4.22
+18-06-2019 6.4.22
 - Calendar: Fixed ambiguous id error
 - Notes & Comments: Clicking hyperlinks opens new tabs
 - Tasks: Fixed comment in continue task
