@@ -1,3 +1,4 @@
+18-06-2019 6.3.77
 - Files: Fixed issue that searching files throws an error about an ambiguous column
 - Fix for keyboard navigation in Firefox 67
 
