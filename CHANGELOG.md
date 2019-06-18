@@ -1,7 +1,3 @@
-- Files: Fixed issue that type is not a property
-- Billing: fixed grouping of items
-
-
 
 6.4.22
 - Calendar: Fixed ambiguous id error
@@ -16,6 +12,9 @@
 
 
 
+- Files: Fixed issue that type is not a property
+- Billing: fixed grouping of items
+- Files: Fixed issue that searching files throws an error about an ambiguous column
 - Fix for keyboard navigation in Firefox 67
 
 03-06-2019 6.3.76
