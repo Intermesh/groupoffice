@@ -1,4 +1,4 @@
-
+- Files: Fixed issue that type is not a property
 - Billing: fixed grouping of items
 
 
