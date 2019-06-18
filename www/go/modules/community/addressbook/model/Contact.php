@@ -233,9 +233,19 @@ class Contact extends AclItemEntity {
 	/**
 	 * Starred by the current user or not.
 	 * 
-	 * @var boolean
+	 * Should not be false but null for ordering. Records might be missing.
+	 * 
+	 * @var boolean 
 	 */
-	public $starred = false;
+	protected $starred = null;
+
+	public function getStarred() {
+		return !!$this->starred;
+	}
+
+	public function setStarred($starred) {
+		$this->starred = empty($starred) ? null : true;
+	}
 	
 	
 	/**
