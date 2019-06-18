@@ -44,7 +44,7 @@ class QueryBuilder {
 	 *
 	 * @var array[]
 	 */
-	private $buildBindParameters;
+	private $buildBindParameters = [];
 
 	/**
 	 * To generate unique param tags for binding

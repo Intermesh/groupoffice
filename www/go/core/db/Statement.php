@@ -1,5 +1,6 @@
 <?php
 namespace go\core\db;
+use go\core\ErrorHandler;
 
 /**
  * PDO Statement
@@ -48,7 +49,12 @@ class Statement extends \PDOStatement implements \JsonSerializable {
 	}
 	
 	public function __toString() {
-		return QueryBuilder::debugBuild($this->build);
+		try {
+			return QueryBuilder::debugBuild($this->build);
+		} catch(\Exception $e) {
+			ErrorHandler::logException($e);
+			return "Error: Could not convert SQL to string: " . $e->getMessage();
+		}
 	}
 
 	/**
