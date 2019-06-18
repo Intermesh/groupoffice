@@ -23,8 +23,6 @@ function dbIsEmpty() {
 	//global $pdo;
 	/* @var $pdo \PDO; */
 	
-	return true;
-	
 	$stmt = App::get()->getDbConnection()->query("SHOW TABLES");
 	$stmt->execute();
 	
