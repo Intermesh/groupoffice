@@ -266,13 +266,21 @@ class Acl extends Entity {
 	 */
 	public static function applyToQuery(Query $query, $column, $level = self::LEVEL_READ, $userId = null) {
 
+		if(!isset($userId)) {
+			$userId = App::get()->getAuthState() ? App::get()->getAuthState()->getUserId() : false;
+
+			if(!$userId) {
+				throw new Forbidden("Authorization required");
+			}
+		}
+
 		// WHERE in
 		$subQuery = (new Query)
 						->select('aclId')
 						->from('core_acl_group', 'acl_g')						
 						->join('core_user_group', 'acl_u' , 'acl_u.groupId = acl_g.groupId')
 						->andWhere([
-								'acl_u.userId' => isset($userId) ? $userId : App::get()->getAuthState()->getUserId()						
+								'acl_u.userId' => $userId			
 										]);
 
 		if($level != self::LEVEL_READ) {			
@@ -288,7 +296,7 @@ class Acl extends Entity {
 		// 				->where('acl_g.aclId = '.$column)
 		// 				->join('core_user_group', 'acl_u' , 'acl_u.groupId = acl_g.groupId')
 		// 				->andWhere([
-		// 						'acl_u.userId' => isset($userId) ? $userId : App::get()->getAuthState()->getUserId()						
+		// 						'acl_u.userId' => $userId 					
 		// 								]);
 
 		// if($level != self::LEVEL_READ) {			
@@ -307,7 +315,7 @@ class Acl extends Entity {
 		// }
 
 		// $query->join('core_acl_group', 'acl_g',$on)
-		// 	->join('core_user_group', 'acl_u', 'acl_u.groupId = acl_g.groupId AND acl_u.userId=' . (isset($userId) ? $userId : App::get()->getAuthState()->getUserId()))
+		// 	->join('core_user_group', 'acl_u', 'acl_u.groupId = acl_g.groupId AND acl_u.userId=' . $userId)
 		// 	->select('MAX(acl_g.level) as permissionLevel', true)
 		// 	->groupBy(['id']);
 		

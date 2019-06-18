@@ -83,8 +83,8 @@ $caldavPlugin = new Sabre\CalDAV\Plugin();
 $server->addPlugin($caldavPlugin);
 
 // ACL plugin
-$aclPlugin = new Sabre\DAVACL\Plugin();
-$server->addPlugin($aclPlugin);
+// $aclPlugin = new Sabre\DAVACL\Plugin();
+// $server->addPlugin($aclPlugin);
 
 $server->addPlugin(
     new Sabre\CalDAV\Schedule\Plugin()
