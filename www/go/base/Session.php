@@ -93,7 +93,7 @@ class Session extends Observable{
 	}
 
 	public function isActive() {
-		return session_status() != PHP_SESSION_ACTIVE;
+		return session_status() == PHP_SESSION_ACTIVE;
 	}
 	
 	/**
