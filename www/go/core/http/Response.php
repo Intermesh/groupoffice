@@ -158,7 +158,6 @@ class Response extends Singleton{
 		}
 
 		$status = "HTTP/" . $this->httpVersion . " " . $httpCode . " " . $text;
-		// GO()->debug($status);
 		header($status);
 	}
 

@@ -1,11 +1,13 @@
 
 - Billing: fixed grouping of items
-- Tasks: Fixed comment in continue task
+
 
 
 6.4.22
 - Calendar: Fixed ambiguous id error
 - Notes & Comments: Clicking hyperlinks opens new tabs
+- Tasks: Fixed comment in continue task
+- Email: Fixed error when sending email from contact without an email address
 
 11-06-2019 6.4.21
 - First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
