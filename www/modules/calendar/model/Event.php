@@ -229,7 +229,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 
 	protected function getCacheAttributes() {
 		
-		if(GO::router()->getControllerAction()!='buildsearchcache' && !$this->isDeleted() && !$this->isModified(["calendarId", "description", "private", "start_time", "name"])) {
+		if(GO::router()->getControllerAction()!='buildsearchcache' && !$this->isDeleted() && !$this->isModified(["calendar_id", "description", "private", "start_time", "name"])) {
 			return false;
 		}
 		
