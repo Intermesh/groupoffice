@@ -34,7 +34,9 @@ class TemporaryState extends AbstractState {
 	
 	public function setUserId($userId) {
 		$this->userId = $userId;
-		\GO::session()->runAs($userId);
+		if(\GO::session()->values['user_id'] != $userId) {
+			\GO::session()->runAs($userId);
+		}
 		
 		return $this;
 	}
