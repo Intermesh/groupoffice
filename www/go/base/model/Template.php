@@ -206,6 +206,10 @@ class Template extends \GO\Base\Db\ActiveRecord{
 					case \go\modules\community\addressbook\model\PhoneNumber::TYPE_FAX:
 						$attributes[$tagPrefix . 'fax'] = $p->number;
 					break;
+
+					case \go\modules\community\addressbook\model\PhoneNumber::TYPE_MOBILE:
+						$attributes[$tagPrefix . 'cellular'] = $p->number;
+					break;
 				}
 			}
 
