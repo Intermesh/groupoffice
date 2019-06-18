@@ -8,6 +8,7 @@
 - Notes & Comments: Clicking hyperlinks opens new tabs
 - Tasks: Fixed comment in continue task
 - Email: Fixed error when sending email from contact without an email address
+- Core: Fixed upgrade and installation bugs
 
 11-06-2019 6.4.21
 - First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
