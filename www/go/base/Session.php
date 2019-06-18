@@ -51,8 +51,7 @@ class Session extends Observable{
 		//In some cases it doesn't make sense to use the session because the client is
 		//not capable. (WebDAV for example).
 		if(!defined("GO_NO_SESSION")){
-			if (session_status() == PHP_SESSION_NONE) {
-				
+			if (session_status() != PHP_SESSION_ACTIVE) {
 				if(!headers_sent()) {
 					//without cookie_httponly the cookie can be accessed by malicious scripts 
 					//injected to the site and its value can be stolen. Any information stored in 
@@ -350,7 +349,7 @@ class Session extends Observable{
 			//the application to identify a valid authenticated session. This is possible in PHP by
 			//using the session_regenerate_id() function.
 
-			if(PHP_SAPI!='cli' && !defined('GO_NO_SESSION'))
+			if(PHP_SAPI!='cli' && !defined('GO_NO_SESSION') && session_status() == PHP_SESSION_ACTIVE)
 				session_regenerate_id();
 			
 			if($countLogin)
@@ -395,7 +394,7 @@ class Session extends Observable{
 	 * the user becoming root permanently. So you can't set session variables.
 	 */
 	public function runAs($id){
-		
+
 		\GO::session()->closeWriting();
 		
 		//Close session writing so that the user won't stay root in browser sessions.
