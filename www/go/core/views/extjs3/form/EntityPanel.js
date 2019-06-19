@@ -139,14 +139,30 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 								console.warn("Could not find form field for server error " + name,notSaved[id].validationErrors[name]);
 							}
 						}
-						
-						Ext.MessageBox.alert(t("Error"), t("Sorry, something went wrong. Please try again."));
+						/**
+						 * 
+						 * You can cancel the error message with this event:
+						 * 
+						 * initComponent: function() {
+						 * 	go.modules.business.wopi.ServiceDialog.superclass.initComponent.call(this);
+						 * 
+						 * 	this.formPanel.on("beforesubmiterror", function(form, success, id, error) {			
+						 * 		if(error.validationErrors.type) {
+						 * 			Ext.MessageBox.alert(t("Error"), t("You can only add one service of the same type"));
+						 * 			return false; //return false to cancel default error message
+						 * 		}
+						 * 	}, this);
+						 * },
+						 */
+						if(this.fireEvent("beforesubmiterror", this, false, null, notSaved[id])) {
+							Ext.MessageBox.alert(t("Error"), t("Sorry, something went wrong. Please try again."));
+						}
 						break;
 				}
 				if(cb) {
 					cb.call(scope, this, false, null);
 				}
-				this.fireEvent("submit", this, true, null);
+				this.fireEvent("submit", this, false, null, notSaved[id]);
 			}
 		}, this);
 

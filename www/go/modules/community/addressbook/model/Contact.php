@@ -233,9 +233,19 @@ class Contact extends AclItemEntity {
 	/**
 	 * Starred by the current user or not.
 	 * 
-	 * @var boolean
+	 * Should not be false but null for ordering. Records might be missing.
+	 * 
+	 * @var boolean 
 	 */
-	public $starred = false;
+	protected $starred = null;
+
+	public function getStarred() {
+		return !!$this->starred;
+	}
+
+	public function setStarred($starred) {
+		$this->starred = empty($starred) ? null : true;
+	}
 	
 	
 	/**
@@ -245,7 +255,7 @@ class Contact extends AclItemEntity {
 	 * 
 	 * @var string 
 	 */
-	public $uid;
+	protected $uid;
 	
 	/**
 	 * Blob ID of the last generated vcard
@@ -259,7 +269,7 @@ class Contact extends AclItemEntity {
 	 * 
 	 * @var string
 	 */
-	public $uri;
+	protected $uri;
 	
 	
 	protected static function aclEntityClass(): string {
@@ -435,15 +445,38 @@ class Contact extends AclItemEntity {
 		return ['name', 'debtorNumber'];
 	}
 	
-	private function generateUid() {
+	public function getUid() {
 		
-		$url = trim(GO()->getSettings()->URL, '/');
-		$uid = substr($url, strpos($url, '://') + 3);
-		$uid = str_replace('/', '-', $uid );
-		return $this->id . '@' . $uid;
-		
+		if(!isset($this->uid)) {
+			$url = trim(GO()->getSettings()->URL, '/');
+			$uid = substr($url, strpos($url, '://') + 3);
+			$uid = str_replace('/', '-', $uid );
+			$this->uid = $this->id . '@' . $uid;
+		}
+
+		return $this->uid;		
 	}
-	
+
+	public function setUid($uid) {
+		$this->uid = $uid;
+	}
+
+	public function hasUid() {
+		return !empty($this->uid);
+	}
+
+	public function getUri() {
+		if(!isset($this->uri)) {
+			$this->uri = $this->getUid() . '.vcf';
+		}
+
+		return $this->uri;
+	}
+
+	public function setUri($uri) {
+		$this->uri = $uri;
+	}
+		
 	protected function internalSave() {
 		if(!parent::internalSave()) {
 			return false;
@@ -451,10 +484,9 @@ class Contact extends AclItemEntity {
 		
 		if(!isset($this->uid)) {
 			//We need the auto increment ID for the UID so we need to save again if this is a new contact
-			$this->uid = $this->generateUid();
-			if(!isset($this->uri)) {
-				$this->uri = $this->uid . '.vcf';
-			}
+			$this->getUid();
+			$this->getUri();
+
 			if(!GO()->getDbConnection()
 							->update('addressbook_contact', 
 											['uid' => $this->uid, 'uri' => $this->uri], 

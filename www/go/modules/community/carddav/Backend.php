@@ -37,8 +37,8 @@ class Backend extends AbstractBackend {
 		
 		$contact = new Contact();
 		$contact->addressBookId = $addressBookId;
-		$contact->uid = (string) $vcardComp->uid;
-		$contact->uri = $cardUri;
+		$contact->setUid((string) $vcardComp->uid);
+		$contact->setUri($cardUri);
 		
 		$this->createBlob($contact, $cardData);
 		
@@ -61,7 +61,7 @@ class Backend extends AbstractBackend {
 		
 		$blob = \go\core\fs\Blob::fromString($cardData);
 		$blob->type = 'text/vcard';
-		$blob->name = $contact->uri;
+		$blob->name = $contact->getUri();
 		$blob->modifiedAt = $contact->modifiedAt;
 		if(!$blob->save()) {
 			throw new \Exception("could not save vcard blob");
@@ -143,7 +143,7 @@ class Backend extends AbstractBackend {
 		
 		return [
 					'carddata' => $blob->getFile()->getContents(),
-					'uri' => $contact->uri,
+					'uri' => $contact->getUri(),
 					'lastmodified' => $contact->modifiedAt->format("U"),
 					'etag' => $contact->vcardBlobId,
 					'size' => $blob->size

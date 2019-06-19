@@ -187,7 +187,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 					'extension' => $this->extension,
 					'size' => $this->size,
 					'user_id' => $this->user_id,
-					'type' => $this->type,
+//					'type' => $this->type,
 					'folder_id' => $this->folder_id,
 					'type_id' => 'f:'.$this->id,
 					'path' => $this->path,
@@ -650,7 +650,11 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 		}
 		$fsFile->setDefaultPermissions();
 
-		$this->mtime=$fsFile->mtime();
+		$old = $this->mtime;
+		$this->mtime = $this->fsFile->mtime();
+		if($this->mtime == $old) {
+			$this->mtime++; //mtime must change for WOPI!
+		}
 		$this->save();
 		
 		$this->fireEvent('replace', array($this, $isUploadedFile));
@@ -664,7 +668,11 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 //			throw new \GO\Base\Exception\InsufficientDiskSpace();
 
 		$this->fsFile->putContents($data);
-		$this->mtime=$this->fsFile->mtime();
+		$old = $this->mtime;
+		$this->mtime = $this->fsFile->mtime();
+		if($this->mtime == $old) {
+			$this->mtime++; //mtime must change for WOPI!
+		}
 		$this->save();
 	}
 

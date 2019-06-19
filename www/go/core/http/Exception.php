@@ -67,9 +67,7 @@ class Exception extends CoreException
 		$this->code = $code;
 		if(empty($message)){
 			$message = self::$codes[$code];
-		}		
-
-		Response::get()->setStatus($code, $message);
+		}	
 		
 		parent::__construct($message, $code);
 	}

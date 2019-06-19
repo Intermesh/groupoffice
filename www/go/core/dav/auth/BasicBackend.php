@@ -52,6 +52,8 @@ class BasicBackend extends AbstractBasic {
 		$state->setUserId($user->id);		
 		GO()->setAuthState($state);
 
+		GO()->debug("Authentication success: ". $user->username);
+
 		$this->user = $user;		
 
 		return true;
