@@ -16,7 +16,10 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 		var filter = {};
 		
 		filter.entities = this.entityGrid.getSelectionModel().getSelections().map(function(r){return {name: r.data.entity, filter: r.data.filter};});
-		filter.text = this.searchField.getValue();			
+		
+		if(this.searchField.getValue() !== "") {
+			filter.text = this.searchField.getValue();			
+		}
 		
 		this.grid.store.load({
 			params: {
