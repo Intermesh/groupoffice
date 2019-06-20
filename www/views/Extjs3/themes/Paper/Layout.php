@@ -43,6 +43,22 @@ $lang = GO::language()->getLanguage(); ?>
 	//$this is \GO\Core\Controller\Auth
 	\GO::router()->getController()->fireEvent('head');
 	?>
+	<style>
+		<?php
+		if(GO()->getSettings()->primaryColor) {
+		?>
+		:root {
+				--c-primary: <?= '#'.GO()->getSettings()->primaryColor; ?> !important;
+				--c-primary-tp: <?= GO()->getSettings()->getPrimaryColorTransparent(); ?> !important;
+		}
+		<?php
+			if(GO()->getSettings()->logoId) {
+				//blob id is not used by script but added only for caching.
+				echo ".go-app-logo, #go-logo {background-image: url(" . GO()->getSettings()->URL . "api/logo.php?blob=" . GO()->getSettings()->logoId . ") !important}";
+			}
+		}
+		?>	
+	</style>
 	<meta http-equiv="Content-Security-Policy" content="<?= $csp; ?>">
 </head>
 <body>

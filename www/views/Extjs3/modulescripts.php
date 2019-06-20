@@ -5,8 +5,6 @@ use go\core\App;
 require(__DIR__ . "/../../vendor/autoload.php");
 App::get();
 
-
-header('Content-Type: application/javascript; charset=utf8');
 $load_modules = GO::modules()->getAllModules();
 
 $GO_SCRIPTS_JS = "";
@@ -22,5 +20,11 @@ foreach ($load_modules as $module) {
 		require($module->moduleManager->path() . 'views/extjs3/scripts.inc.php');
 	}
 }
+
+header('Content-Type: application/javascript; charset=utf8');
+header("Expires: " . date("D, j M Y H:i:s", strtotime("+1 year")));
+header('Cache-Control: PRIVATE');
+header('Modified-At: '.date('D, j M Y H:i:s'));
+header_remove('Pragma');
 
 echo $GO_SCRIPTS_JS;

@@ -2,22 +2,8 @@
 require(__DIR__ . "/../../vendor/autoload.php");
 
 \go\core\App::get();
-header('Content-Type: text/css');    
-//header('Content-Encoding: gzip');
 		
 $webclient = new \go\core\webclient\Extjs3();
-readfile($webclient->getCSSFile()->getPath());
-
-
-if(GO()->getSettings()->primaryColor) {
-?>
-:root {
-    --c-primary: <?= '#'.GO()->getSettings()->primaryColor; ?> !important;
-    --c-primary-tp: <?= GO()->getSettings()->getPrimaryColorTransparent(); ?> !important;
-}
-<?php
-  if(GO()->getSettings()->logoId) {
-    //blob id is not used by script but added only for caching.
-    echo ".go-app-logo, #go-logo {background-image: url(" . GO()->getSettings()->URL . "api/logo.php?blob=" . GO()->getSettings()->logoId . ") !important}";
-  }
-}
+$webclient->getCSSFile()->output(true, true, [
+	"Expires" => (new DateTime("1 year"))->format("D, j M Y H:i:s")
+]);

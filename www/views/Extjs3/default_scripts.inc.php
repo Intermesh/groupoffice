@@ -105,7 +105,7 @@ GO::router()->getController()->fireEvent('inlinescripts');
 <?php
   
 if ($cacheFile->exists()) {
-	echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v= '. GO()->getVersion() . '"></script>';
+	echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v='. GO()->getVersion() . '"></script>';
 } else {
 
 	$scripts = array();
