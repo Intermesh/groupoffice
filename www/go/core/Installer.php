@@ -302,7 +302,7 @@ class Installer {
 		GO()->resetSyncState();
 		
 		echo "Registering all entities\n";		
-		$modules = model\Module::find()->all();
+		$modules = model\Module::find()->where(['enabled' => true])->all();
 		foreach($modules as $module) {
 			if(isset($module->package) && $module->isAvailable()) {
 				$module->module()->registerEntities();
