@@ -64,6 +64,20 @@ class Select extends Base {
 		return $this->field->tableName() . "_ibfk_go_" . $this->field->id;
 	}
 	
+	public function dbToText($value, &$values) {
+	
+		//new model
+		if(empty($value)) {
+			return [];
+		}
+
+		return (new Query())
+						->selectSingleValue("text")
+						->from('core_customfields_select_option')
+						->where(['id' => $value])
+						->single();
+	}
+	
 	protected function saveOptions() {
 		
 		if (!isset($this->options)) {

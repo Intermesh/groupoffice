@@ -1,3 +1,5 @@
+- Custom fields: Implemented the dbToText function for the select customfield so it's value is showed instead of it's id.
+
 6.4.23
 - Core: Create link button in dialog showed "undefined"
 - Custom fields: Updating filters didn't work always
