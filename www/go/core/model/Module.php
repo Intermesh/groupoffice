@@ -238,7 +238,7 @@ class Module extends AclOwnerEntity {
 	 * @return boolean
 	 */
 	public static function isAvailableFor($package, $name, $userId = null, $level = Acl::LEVEL_READ) {
-		$query = static::find()->where(['package' => $package, 'name' => $name]);
+		$query = static::find()->where(['package' => $package, 'name' => $name, 'enabled' => true]);
 		static::applyAclToQuery($query, $level, $userId);
 		
 		return $query->single() !== false;
@@ -249,10 +249,25 @@ class Module extends AclOwnerEntity {
 	 * 
 	 * @param string $package
 	 * @param string $name
+	 * @param bool $enabled
 	 * @return self
 	 */
-	public static function findByName($package, $name) {
-		return static::find()->where(['package' => $package, 'name' => $name])->single();
+	public static function findByName($package, $name, $enabled = true) {
+		if($package == "legacy") {
+			$package = null;
+		}
+		return static::find()->where(['package' => $package, 'name' => $name, 'enabled' => $enabled])->single();
+	}
+
+	/**
+	 * Check if a module is installed
+	 *
+	 * @param string $package
+	 * @param string $name
+	 * @return bool
+	 */
+	public static function isInstalled($package, $name) {
+		return static::findByName($package, $name) != false;
 	}
 	
 	/**

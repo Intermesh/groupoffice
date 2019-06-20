@@ -703,7 +703,7 @@ abstract class Entity extends Property {
 	 */
 	public static function check() {
 		echo "Checking ".static::class."\n";
-		if(property_exists(static::class, 'filesFolderId')) {
+		if(property_exists(static::class, 'filesFolderId') && Module::isInstalled('legacy', 'files')) {
 			echo "Fixing files folder ID's\n";
 			$tables = static::getMapping()->getTables();
 			$table = array_values($tables)[0]->getName();
