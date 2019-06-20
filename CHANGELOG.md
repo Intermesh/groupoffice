@@ -5,6 +5,7 @@
 - Core: Create link button in dialog showed "undefined"
 - Custom fields: Updating filters didn't work always
 - Core: Check if files module is installed. Fixes 6.4.22 SQLSTATE[42S02]: Base table or view not found: 1146 Table 'web36_db9.fs_folders' doesn't exist #406
+- Core: Mask UI improved. Mask will wait for 500ms until it shows.
 
 18-06-2019 6.4.22
 - Calendar: Fixed ambiguous id error
