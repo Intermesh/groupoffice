@@ -1,3 +1,7 @@
+- Address book: Fixed bug where to address in composer was not filled when creating mail from contact
+- Projects: Fixed problem where projects wouldn't load after opening a project from a link
+- Core: Faster boot time due to caching in the browser
+
 18-06-2019 6.3.77
 - Files: Fixed issue that searching files throws an error about an ambiguous column
 - Fix for keyboard navigation in Firefox 67
