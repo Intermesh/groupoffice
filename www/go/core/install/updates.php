@@ -545,7 +545,7 @@ $updates['201905201227'][] = function() {
   
   $mods = GO::modules()->getAll();
   foreach($mods as $m) {
-    if($m->package == null) {
+    if($m->package == null && $m->isAvailable()) {
       $classes = array_merge($classes, array_map(function($c){return $c->getName();},$m->moduleManager->getModels()));
     }
   }
