@@ -135,7 +135,7 @@ abstract class AclOwnerEntity extends AclEntity {
 			return true;
 		}
 
-		if(!$this->findAcl()->hasPermissionLevel(self::LEVEL_MANAGE)) {		
+		if(!$this->findAcl()->hasPermissionLevel(Acl::LEVEL_MANAGE)) {		
 			throw new Forbidden("You are not allowed to manage permissions on this ACL");
 		}
 	}
