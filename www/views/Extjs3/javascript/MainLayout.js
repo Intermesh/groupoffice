@@ -292,7 +292,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		//legacy scripts loaded from scripts.inc.php
 		var script = document.createElement('script');
 		script.type = 'text/javascript';
-		script.setAttribute('src', BaseHref + "views/Extjs3/modulescripts.php");
+		script.setAttribute('src', BaseHref + "views/Extjs3/modulescripts.php?mtime=" + go.User.modifiedAt);
 		script.charset = 'utf-8';
 		script.id = 'testing';
 		script.defer = true;
