@@ -8234,6 +8234,10 @@ Ext.Element.addMethods(
 
             
             mask : function(msg, msgCls) {
+
+                if(this.masking) {
+                    clearTimeout(this.masking);
+                }
                 var me = this;
                 this.masking = setTimeout(function() {
                     me.doMask(msg, msgCls);
