@@ -8,51 +8,24 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 	totalCount: 0,
 	addLink : function(entity, entityId) {	
 		
-		
-					
-		var promise = go.Jmap.request({
-			method: "Search/query",
-			params: {
-				filter: {
-					entities: [{name: entity}],
-					entityId: entityId
-				}
+		var me = this;
+		//We need to query the ID of the search cache so the "to" relation can be resolved.
+		go.Db.store("Search").query({
+			filter: {
+				entities: [{name: entity}],
+				entityId: entityId
 			}
-		});
-		
-		go.Jmap.request({
-			method: "Search/get",
-			params: {
-				"#ids": {
-					resultOf: promise.callId,
-					path: "ids"
-				}
-			},
-			scope: this,
-			callback: function(options, success, result) {
-				
-				if(!result.list[0]) {
-					Ext.MessageBox.alert(t("Error"), t("Could not find item to link in search cache"));
-					return;
-				}
-				
-				this.newLinks.push({						
-						toEntity: entity,
-						toId: entityId
-					});
-					
-				this.linkGrid.store.loadData({"records" :[{
-					"toId": entityId,
-					"toEntity": entity,
-					to: {
-						name: result.list[0].name,
-						description: "" 
-					}
-				}]}, true);
-		
-				this.setCount(++this.totalCount);
-			}
-		});
+		}).then(function(response) {
+			var newLink = {
+				"toId": entityId,
+				"toEntity": entity,
+				"toSearchId": response.ids[0]
+			};
+
+			me.newLinks.push(newLink);
+			me.linkGrid.store.loadData({"records" :[newLink]}, true);
+			me.setCount(++me.totalCount);
+		});		
 		
 	},
 					
@@ -63,14 +36,11 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 			hideLabel: true,
 			listeners: {
 				scope: this,
-				select: function (cmb, record, index) {
+				select: function (cmb, record, index) {					
 					this.linkGrid.store.loadData({"records" :[{
 						"toId": record.get('entityId'),
 						"toEntity": record.get('entity'),
-						to: {
-							name: record.data.name,
-							description: "" 
-						}
+						"toSearchId": record.get('id')
 					}]}, true);
 					this.searchField.reset();
 					
@@ -114,7 +84,7 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 			autoExpandColumn: 'name',
 			store: new go.data.Store({
 				autoDestroy: true,
-				fields: ['id', 'toId', 'toEntity', 'to', 'description', {name: 'modifiedAt', type: 'date'}],
+				fields: ['id', 'toId', 'toEntity', {name: "to", type: "relation"}, 'description', {name: 'modifiedAt', type: 'date'}],
 				entityStore: "Link",
 				sortInfo: {
 					field: 'modifiedAt',
