@@ -16,6 +16,7 @@ go.search.Panel = Ext.extend(Ext.Panel, {
 			}
 		});
 
+		
 		this.entityGrid = new go.links.EntityGrid({
 			width: dp(200),
 			region: "east",

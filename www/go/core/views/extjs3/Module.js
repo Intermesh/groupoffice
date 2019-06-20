@@ -46,17 +46,12 @@ GO.mainLayout.on('render', function () {
 
 	var search = function () {
 		searchField.clearInvalid();
-		panel.setWidth(searchField.getWidth());
-		panel.setHeight(dp(500));
-		panel.getEl().alignTo(searchField.getEl(), "tl-bl");
+	
 		panel.search(searchField.getValue());
 	}, enableSearch = function () {
 		searchContainer.show();
 		searchField.focus(true);
 
-		if(searchField.getValue()) {
-			panel.expand();
-		}
 
 		if (!panel) {
 			panel = new go.search.Panel({
@@ -68,11 +63,21 @@ GO.mainLayout.on('render', function () {
 				}
 			});
 			panel.render(Ext.getBody());
+			
 			panel.on("collapse", function () {
 				//searchField.setValue("");
 				searchContainer.hide();
 			});
 		}
+
+		panel.setWidth(searchField.getWidth());
+		panel.setHeight(dp(500));
+		panel.getEl().alignTo(searchField.getEl(), "tl-bl");
+		
+		// if(searchField.getValue()) {
+			panel.expand();
+		// }
+			
 	};
 
 	var dqTask = new Ext.util.DelayedTask(search);

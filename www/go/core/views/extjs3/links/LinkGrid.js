@@ -51,7 +51,8 @@ go.links.LinkGrid = Ext.extend(go.grid.GridPanel, {
 					return 'x-grid3-row-expanded';				
 			  },
 			  grid: this,
-			  emptyText: t("No items to display")
+			  emptyText: '<span class="go-hrml-formatted">' + t('Use "*" for wildcards and prefix words with "-" to omit results with that word when searching.') + '<br /><br /><a target="_blank" href="https://groupoffice.readthedocs.io/en/latest/using/search.html">' + t('Click here for more information') + '</a></span>',
+				deferEmptyText: false
 		   }),
 							 
 		this.autoExpandColumn = 'name';
