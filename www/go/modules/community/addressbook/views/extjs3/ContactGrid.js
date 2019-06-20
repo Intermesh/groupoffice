@@ -12,6 +12,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				{name: 'modifiedAt', type: 'date'},
 				{name: 'creator', type: "relation"},
 				{name: 'modifier', type: "relation"},
+				{name: 'addressbook', type: "relation"},
 				'starred',
 				'permissionLevel',
 				'photoBlobId',
@@ -102,6 +103,17 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					renderer: function (organizations, meta, record) {
 						return organizations.column("name").join(", ");
 					}
+				},
+				{
+					id: 'addressbook',
+					header: t('Address Book'),
+					sortable: false,
+					dataIndex: "addressbook",
+					renderer: function(v) {
+						return v.name;
+					},
+					width: dp(200),
+					hidden: true
 				},
 				{
 					xtype: "datecolumn",

@@ -14,7 +14,8 @@ go.Modules.register("community", "addressbook", {
 			relations: {
 				organizations: {store: "Contact", fk: "organizationIds"},
 				creator: {store: "User", fk: "createdBy"},
-				modifier: {store: "User", fk: "createdBy"}
+				modifier: {store: "User", fk: "createdBy"},
+				addressbook: {store: "AddressBook", fk: "addressBookId"}
 			},
 
 			/**
