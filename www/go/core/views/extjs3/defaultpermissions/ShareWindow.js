@@ -32,12 +32,13 @@ go.defaultpermissions.ShareWindow = Ext.extend(go.form.Dialog, {
 						return;
 					}
 
-					this.getEl().mask();
+					Ext.getBody().mask(t("Changing permissions..."));
 
 					this.submit(function (success, serverId) {
 
 						if (!success) {
-							this.getEl().unmask();
+							
+							tExt.getBody().unmask();
 							Ext.MessageBox.alert(t("Error"), t("Failed to save default permissions"));
 						}
 
@@ -48,7 +49,7 @@ go.defaultpermissions.ShareWindow = Ext.extend(go.form.Dialog, {
 								entity: this.forEntityStore
 							},
 							callback: function (options, success, response) {
-								this.getEl().unmask();
+								Ext.getBody().unmask();
 								if (!success) {
 									Ext.MessageBox.alert(t("Error"), t("Failed to reset permissions"));
 								}
@@ -71,12 +72,12 @@ go.defaultpermissions.ShareWindow = Ext.extend(go.form.Dialog, {
 						return;
 					}
 
-					this.getEl().mask();
+					Ext.getBody().mask("Changing permissions...");
 
 					this.submit(function (success, serverId) {
 
 						if (!success) {
-							this.getEl().unmask();
+							Ext.getBody().unmask();
 							Ext.MessageBox.alert(t("Error"), t("Failed to save default permissions"));
 						}
 
@@ -88,7 +89,7 @@ go.defaultpermissions.ShareWindow = Ext.extend(go.form.Dialog, {
 								entity: this.forEntityStore
 							},
 							callback: function (options, success, response) {
-								this.getEl().unmask();
+								Ext.getBody().unmask();
 								if (!success) {
 									Ext.MessageBox.alert(t("Error"), t("Failed to reset permissions"));
 								}

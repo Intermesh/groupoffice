@@ -40,31 +40,36 @@
 }
 
 .x-mask-loading {
-	border:0;
-	display: block;
-   height: dp(3);
-	padding: 0;
-   overflow: hidden;
-   position: absolute;
-	top:0 !important; //override element style
-   width: 100%;
-	background-color: rgba($cAccent,.3);
-	div{ // bar
-		  border:0;
-		  padding:0;
-		  height:dp(5);
-		  background-color: $cAccent;
-		  animation-name: indeterminate1;
-		  animation-duration: 2s;
-		  animation-iteration-count: infinite;
-		  animation-timing-function: linear;
-		  display: block;
-		  position: absolute;
-		  top: 0;
-		  bottom: 0;
-		  width: 0%;
-		  transition: width .2s cubic-bezier(.4,0,.2,1);
-		  text-indent: -9999px;
+
+	&:after {			
+		content: "";
+		border:0;
+		padding:0;
+		height:dp(5);
+		background-color: $cAccent;
+		animation-name: indeterminate1;
+		animation-duration: 2s;
+		animation-iteration-count: infinite;
+		animation-timing-function: linear;
+		display: block;
+		position: absolute;
+		top: dp(5);
+		bottom: 0;
+		width: 0%;
+		transition: width .2s cubic-bezier(.4,0,.2,1);
+		text-indent: -9999px;
+	}
+	
+	div { 
+		position: relative;
+		margin: 0 auto;
+		top: dp(5);			
+		background-color: white;
+		padding: dp(20) dp(40);
+		font-size: dp(18);
+		@extend .z12;
+		text-align: center;
+
 	}
 }
 

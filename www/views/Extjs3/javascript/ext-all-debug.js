@@ -8234,12 +8234,22 @@ Ext.Element.addMethods(
 
             
             mask : function(msg, msgCls) {
+                var me = this;
+                this.masking = setTimeout(function() {
+                    me.doMask(msg, msgCls);
+                }, 500);
+
+            },
+            
+            doMask : function(msg, msgCls) {
                 var me  = this,
                     dom = me.dom,
                     dh  = Ext.DomHelper,
                     EXTELMASKMSG = "ext-el-mask-msg",
                     el,
                     mask;
+
+                this.masking = false;
 
                 if (!/^body/i.test(dom.tagName) && me.getStyle('position') == 'static') {
                     me.addClass(XMASKEDRELATIVE);
@@ -8276,6 +8286,11 @@ Ext.Element.addMethods(
 
             
             unmask : function() {
+                if(this.masking) {
+                    clearTimeout(this.masking);
+                    this.masking = false;
+                    return;
+                }
                 var me      = this,
                     dom     = me.dom,
                     mask    = data(dom, 'mask'),

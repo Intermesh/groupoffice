@@ -148,7 +148,6 @@ class TaskController extends \GO\Base\Controller\AbstractModelController{
 
 	
 	protected function beforeStoreStatement(array &$response, array &$params, \GO\Base\Data\AbstractStore &$store, \GO\Base\Db\FindParams $storeParams) {
-		
 		$multiSel = new \GO\Base\Component\MultiSelectGrid(
 						'ta-taskslists', 
 						"GO\Tasks\Model\Tasklist",$store, $params, true);
