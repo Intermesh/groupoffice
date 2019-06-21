@@ -251,6 +251,7 @@ class Field extends AclItemEntity {
 		}
 		
 		try {
+			GO()->getDbConnection()->pauseTransactions();
 			$this->getDataType()->onFieldSave();
 		} catch(\Exception $e) {
 			GO()->warn($e);
@@ -261,6 +262,8 @@ class Field extends AclItemEntity {
 			}
 			
 			return false;
+		} finally {
+			GO()->getDbConnection()->resumeTransactions();
 		}
 		
 		return true;
@@ -270,8 +273,19 @@ class Field extends AclItemEntity {
 		if(!parent::internalDelete()) {
 			return false;
 		}
-		return $this->getDataType()->onFieldDelete();
-	}
+
+		try {
+			GO()->getDbConnection()->pauseTransactions();
+			$success = $this->getDataType()->onFieldDelete();
+		} catch(\Exception $e) {
+			GO()->warn($e);
+			return false;
+		} finally {
+			GO()->getDbConnection()->resumeTransactions();
+		}
+		
+		return true;
+}
 
 	/**
 	 * Get the table name this field is stored in.
@@ -298,10 +312,13 @@ class Field extends AclItemEntity {
 	/**
 	 * Find all fields for an entity
 	 * 
-	 * @param int $entityTypeId
+	 * @param int|string $entityTypeId
 	 * @return Query
 	 */
 	public static function findByEntity($entityTypeId) {
+		if(is_string($entityTypeId)) {
+			$entityTypeId = EntityType::findByName($entityTypeId)->getId();
+		}
 		return static::find()->where(['fs.entityId' => $entityTypeId])->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId');
 	}
 

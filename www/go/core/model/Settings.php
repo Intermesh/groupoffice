@@ -451,7 +451,8 @@ class Settings extends core\Settings {
 	 * @param array eg [['groupId' => 1]]
 	 */
 	public function setDefaultGroups($groups) {	
-		core\db\Table::getInstance("core_group_default_group")->truncate();
+		
+		GO()->getDbConnection()->exec("TRUNCATE TABLE core_group_default_group");
 		
 		foreach($groups as $groupId) {
 			if(!GO()->getDbConnection()->insert("core_group_default_group", ['groupId' => $groupId])->execute()) {

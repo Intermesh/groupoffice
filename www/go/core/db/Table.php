@@ -25,12 +25,33 @@ class Table {
 	 * @param string $name
 	 * @return self
 	 */
-	public static function getInstance($name) {
-		if(!isset(self::$cache[$name])) {
-			self::$cache[$name] = new Table($name);
+	public static function getInstance($name, Connection $conn = null) {
+		
+		if(!isset($conn)) {
+			$conn = GO()->getDbConnection();
+		}
+
+		$cacheKey = $conn->getDsn() . '-' . $name;
+		if(!isset(self::$cache[$cacheKey])) {
+			self::$cache[$cacheKey] = new Table($name, $conn);
 		}
 		
-		return self::$cache[$name];	
+		return self::$cache[$cacheKey];	
+	}
+
+	public static function destroyInstance($name, Connection $conn = null) {
+		if(!isset($conn)) {
+			$conn = GO()->getDbConnection();
+		}
+
+		$cacheKey = $conn->getDsn() . '-' . $name;
+		if(isset(self::$cache[$cacheKey])) {
+			self::$cache[$cacheKey]->clearCache();
+			unset(self::$cache[$cacheKey]);
+		}
+
+		App::get()->getCache()->delete('dbColumns_' . $name);
+		
 	}
 	
 	public static function destroyInstances() {
@@ -43,11 +64,20 @@ class Table {
 	private $name;
 	protected $columns;	
 	private $pk = [];
-	
-	public function __construct($name) {
+
+	/**
+	 * @var Connection
+	 */
+	private $conn;
+	public function __construct($name, Connection $conn) {
 		$this->name = $name;
-		
+		$this->conn = $conn;
 		$this->init();
+
+		$this->columns = array_map(function($c) {
+			$c->table = $this; //is cleared in __sleep()
+			return $c;
+		}, $this->columns);
 	}	
 	
 	/**
@@ -65,12 +95,12 @@ class Table {
 	/**
 	 * Clear the columns cache
 	 */
-	public function clearCache() {
+	private function clearCache() {
 		App::get()->getCache()->delete($this->getCacheKey());
-		$this->columns = null;
-		$this->pk = [];
+		// $this->columns = null;
+		// $this->pk = [];
 		
-		$this->init();
+		// $this->init();
 	}
 
 	private function init() {
@@ -84,6 +114,7 @@ class Table {
 		if (($cache = App::get()->getCache()->get($cacheKey))) {
 			$this->columns = $cache['columns'];
 			$this->pk = $cache['pk'];
+			$this->conn = null;
 			return;
 		}	
 		
@@ -91,12 +122,15 @@ class Table {
 
 		$sql = "SHOW FULL COLUMNS FROM `" . $this->name . "`;";
 		
-		$stmt = App::get()->getDbConnection()->query($sql);
+		$stmt = $this->conn->query($sql);
 		while ($field = $stmt->fetch()) {
 			$this->columns[$field['Field']] = $this->createColumn($field);
 		}
 
 		$this->processIndexes($this->name);
+
+		//Not needed anymore when we serialize
+		$this->conn = null;
 
 		App::get()->getCache()->set($cacheKey, ['columns' => $this->columns, 'pk' => $this->pk]);
 
@@ -231,7 +265,7 @@ class Table {
 		//group keys;
 		// ['keyName' => ['col1', 'col2']];
 
-		$stmt = App::get()->getDbConnection()->query($query);
+		$stmt = $this->conn->query($query);
 		while ($index = $stmt->fetch()) {
 
 			if ($index['Key_name'] === 'PRIMARY') {
@@ -332,13 +366,13 @@ class Table {
 		return $this->pk;
 	}
 	
-	/**
-	 * Truncate the table
-	 * 
-	 * @return boolean
-	 */
-	public function truncate() {
-		return GO()->getDbConnection()->query("TRUNCATE TABLE ".$this->getName())->execute();
-	}
+	// /**
+	//  * Truncate the table
+	//  * 
+	//  * @return boolean
+	//  */
+	// public function truncate() {
+	// 	return $this->conn->query("TRUNCATE TABLE ".$this->getName())->execute();
+	// }
 
 }

@@ -17,6 +17,8 @@ use go\core\db\Criteria;
  */
 class QueryBuilder {
 
+	
+
 	/**
 	 *
 	 * @var Query
@@ -73,6 +75,17 @@ class QueryBuilder {
 	 */
 	private $table;
 
+
+	/**
+	 * @var Connection
+	 */
+	private $conn;
+
+	public function __construct(Connection $conn) {
+		$this->conn = $conn;
+	}
+	
+
 	/**
 	 * Constructor
 	 *
@@ -85,7 +98,7 @@ class QueryBuilder {
 			
 		}
 		$this->tableName = $tableName;
-		$this->table = Table::getInstance($tableName);
+		$this->table = Table::getInstance($tableName, $this->conn);
 	}
 
 	/**
@@ -123,7 +136,7 @@ class QueryBuilder {
 
 		$this->reset();
 		$this->setTableName($tableName);
-		$this->aliasMap[$tableName] = Table::getInstance($this->tableName);
+		$this->aliasMap[$tableName] = Table::getInstance($this->tableName, $this->conn);
 
 		$sql = $command . " ";
 
@@ -167,7 +180,7 @@ class QueryBuilder {
 
 		$this->query = $query;
 		$this->tableAlias = $this->query->getTableAlias();
-		$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName);
+		$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName, $this->conn);
 
 		if (is_array($data)) {
 			$updates = [];
@@ -212,7 +225,7 @@ class QueryBuilder {
 		$this->reset();
 		$this->query = $query;
 		$this->tableAlias = $this->query->getTableAlias();
-		$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName);
+		$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName, $this->conn);
 
 		$sql = "DELETE FROM `" . $this->tableAlias . "` USING `" . $this->tableName . "` AS `" . $this->tableAlias . "` ";
 
@@ -279,7 +292,7 @@ class QueryBuilder {
 		$this->query = $query;
 		$this->buildBindParameters = $query->getBindParameters();
 
-		$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName);
+		$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName, $this->conn);
 
 		$joins = "";
 		foreach ($this->query->getJoins() as $join) {
@@ -602,7 +615,7 @@ class QueryBuilder {
 			$query->tableAlias('sub');
 		}
 
-		$builder = new QueryBuilder();
+		$builder = new QueryBuilder($this->conn);
 		$builder->aliasMap = $this->aliasMap;
 
 		$build = $builder->buildSelect($query, $prefix . "\t");
@@ -757,7 +770,7 @@ class QueryBuilder {
 		$join = "";
 
 		if ($config['src'] instanceof \go\core\db\Query) {
-			$builder = new QueryBuilder();
+			$builder = new QueryBuilder($this->conn);
 			$builder->aliasMap = $this->aliasMap;
 
 			$build = $builder->buildSelect($config['src'], $prefix . "\t");
@@ -765,7 +778,7 @@ class QueryBuilder {
 
 			$this->buildBindParameters = array_merge($build['params']);
 		} else {
-			$this->aliasMap[$config['joinTableAlias']] = Table::getInstance($config['src']);
+			$this->aliasMap[$config['joinTableAlias']] = Table::getInstance($config['src'], $this->query->getDbConnection());
 			$joinTableName = '`' . $config['src'] . '`';
 		}
 

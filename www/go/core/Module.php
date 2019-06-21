@@ -98,10 +98,14 @@ abstract class Module {
 	public final function install() {
 
 		try{
+			GO()->getDbConnection()->pauseTransactions();
 			$this->installDatabase();
+			GO()->getDbConnection()->resumeTransactions();
 					
 			GO()->rebuildCache(true);
+
 			GO()->getDbConnection()->beginTransaction();
+			
 		
 			$model = new model\Module();
 			$model->name = static::getName();

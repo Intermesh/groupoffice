@@ -52,6 +52,10 @@ class Connection {
 		];
 	}
 
+	public function getDsn() {
+		return $this->dsn;
+	}
+
 	/**
 	 * Gets the global database connection object.
 	 * 
@@ -173,6 +177,22 @@ class Connection {
 		return $ret;
 	}
 
+	private $resumeLevels = 0;
+
+	public function pauseTransactions() {
+		$this->resumeLevels = $this->transactionSavePointLevel;
+		while($this->transactionSavePointLevel > 0) {
+			$this->commit();
+		}
+	}
+
+	public function resumeTransactions() {
+		while($this->resumeLevels > 0) {
+			$this->beginTransaction();
+			$this->resumeLevels--;
+		}
+	}
+
 	/**
 	 * Rollback the DB transaction
 	 * 
@@ -279,7 +299,7 @@ class Connection {
 	public function delete($tableName, $query = null) {
 		$query = Query::normalize($query);
 
-		$queryBuilder = new QueryBuilder();
+		$queryBuilder = new QueryBuilder($this);
 		$build = $queryBuilder->buildDelete($tableName, $query);
 
 		return $this->createStatement($build);
@@ -324,7 +344,7 @@ class Connection {
 	 */
 	public function insert($tableName, $data, $columns = []) {
 
-		$queryBuilder = new QueryBuilder();
+		$queryBuilder = new QueryBuilder($this);
 		$build = $queryBuilder->buildInsert($tableName, $data, $columns);
 
 		return $this->createStatement($build);
@@ -344,7 +364,7 @@ class Connection {
 	 */
 	public function insertIgnore($tableName, $data, $columns = []) {
 
-		$queryBuilder = new QueryBuilder();
+		$queryBuilder = new QueryBuilder($this);
 		$build = $queryBuilder->buildInsert($tableName, $data, $columns, "INSERT IGNORE");
 
 		return $this->createStatement($build);
@@ -364,7 +384,7 @@ class Connection {
 	 */
 	public function replace($tableName, $data, $columns = []) {
 
-		$queryBuilder = new QueryBuilder();
+		$queryBuilder = new QueryBuilder($this);
 		$build = $queryBuilder->buildInsert($tableName, $data, $columns, "REPLACE");
 
 		return $this->createStatement($build);
@@ -406,7 +426,7 @@ class Connection {
 	public function update($tableName, $data, $query = null) {
 		$query = Query::normalize($query);
 
-		$queryBuilder = new QueryBuilder();
+		$queryBuilder = new QueryBuilder($this);
 		$build = $queryBuilder->buildUpdate($tableName, $data, $query);
 
 		return $this->createStatement($build);

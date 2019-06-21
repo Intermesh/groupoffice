@@ -7,6 +7,12 @@ use PDO;
 class Database {
 		
 	private $tableNames;	
+
+	private $conn;
+
+	public function __construct(Connection $conn = null) {
+		$this->conn = $conn ?? GO()->getDbConnection();
+	}
 	
 	/**
 	 * Check if the current database has a table
@@ -21,7 +27,7 @@ class Database {
 	
 	private function getTableNames() {
 		if(!isset($this->tableNames)) {
-			$stmt = App::get()->getDbConnection()->query('SHOW TABLES');
+			$stmt = $this->conn->query('SHOW TABLES');
 			$stmt->setFetchMode(PDO::FETCH_COLUMN, 0);
 			$this->tableNames = $stmt->fetchAll();
 		}
@@ -38,7 +44,7 @@ class Database {
 		$t = [];
 		
 		foreach($this->getTableNames() as $tableName) {
-			$t[] = Table::getInstance($tableName);
+			$t[] = Table::getInstance($tableName, $this->conn);
 		}
 		
 		return $t;
@@ -51,7 +57,7 @@ class Database {
 	 * @return Table
 	 */
 	public function getTable($name) {
-		return Table::getInstance($name);
+		return Table::getInstance($name, $this->conn);
 	}	
 	
 	/**

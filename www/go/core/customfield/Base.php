@@ -110,7 +110,7 @@ abstract class Base extends Model {
 			}
 		}
 		
-		Table::getInstance($table)->clearCache();
+		Table::destroyInstance($table);
 		
 		return true;
 	}
@@ -136,7 +136,7 @@ abstract class Base extends Model {
 			ErrorHandler::logException($e);
 		}
 		
-		Table::getInstance($table)->clearCache();
+		Table::destroyInstance($table);
 		
 		return true;
 	}
