@@ -1,7 +1,8 @@
 6.4.23
 - Custom fields: Implemented the dbToText function for the select customfield so it's value is showed instead of it's id.
 - Email: Improved autocomplete search
-- Address book Display adressbook of contact #405
+- Address book: Display adressbook of contact #405
+- Address book: Added address book to detail view and fixed default/Last choosen addressbook is not preselected anymore #399
 - Core: Create link button in dialog showed "undefined"
 - Custom fields: Updating filters didn't work always
 - Core: Check if files module is installed. Fixes 6.4.22 SQLSTATE[42S02]: Base table or view not found: 1146 Table 'web36_db9.fs_folders' doesn't exist #406
