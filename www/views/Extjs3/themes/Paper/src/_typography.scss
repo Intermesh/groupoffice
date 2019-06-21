@@ -14,7 +14,7 @@ $font-weight-l: 100;
 %font-button {
 	font-size: sp(14);
 	font-weight: $font-weight-m;
-	letter-spacing: letter-space(.4, 14);
+	letter-spacing: 0.015em;
 	text-decoration: none;
 }
 
