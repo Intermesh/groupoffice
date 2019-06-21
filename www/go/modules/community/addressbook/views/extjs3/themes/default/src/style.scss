@@ -26,6 +26,12 @@
 	}
 }
 
+.go-addressbook-name {
+	position: absolute;
+	top: dp(16);
+	right: dp(16);
+}
+
 .go-addressbook-url-panel {
 	text-align: right;
 	line-height: dp(20);

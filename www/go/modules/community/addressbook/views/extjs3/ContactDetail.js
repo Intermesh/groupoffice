@@ -3,19 +3,26 @@
 go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 	entityStore: "Contact",
 	stateId: 'addressbook-contact-detail',
-	
+	relations: ["addressbook"],
 	initComponent: function () {
 		
 		this.tbar = this.initToolbar();
 		
 		Ext.apply(this, {
-			items: [{
+			items: [	
+				{
+					xtype: "box",
+					tpl: '<tpl for="addressbook"><h4 class="go-addressbook-name">{name}</h4></tpl>'
+				},
+				
+				{
 					xtype: 'container',
 					layout: "hbox",
 					cls: "go-addressbook-name-panel",
 					items: [						
+					
 						this.namePanel = new Ext.BoxComponent({
-							tpl: "<h3>{name}</h3><h4>{jobTitle}</h4>"
+							tpl: "<h3>{name}</h3><h4>{jobTitle}</h4>" 							
 						}),						
 						this.urlPanel = new Ext.BoxComponent({
 							flex: 1,
