@@ -1,3 +1,4 @@
+- Core: Combobox, when pagesize is given the property "calculateTotal" needs to be send to the server.
 - Core: Fixed deleting mapped properties by setting them to null
 - Authentication: Fixed adding groups to LDAP and IMap auth profiles
 

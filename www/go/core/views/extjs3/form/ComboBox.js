@@ -93,6 +93,12 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 		this.store.baseParams.filter = this.store.baseParams.filter || {};
 		this.store.baseParams.filter.text = text;
 
+		if(this.pageSize > 0){
+			this.store.baseParams.calculateTotal = true;
+		} else {
+			delete(this.store.baseParams.calculateTotal);
+		}
+
 		var p = go.form.ComboBox.superclass.getParams.call(this, text);
 		delete p[this.queryParam];
 
