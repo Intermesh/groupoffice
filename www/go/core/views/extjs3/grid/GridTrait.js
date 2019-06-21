@@ -61,32 +61,35 @@ go.grid.GridTrait = {
 		}
 		
 		this.getView().scrollOffset = dp(24);
-		this.getView().refresh = function(headersToo) {
-			this.fireEvent('beforerefresh', this);
-			this.grid.stopEditing(true);
 
-			var result = this.renderBody();
-			this.mainBody.update(result).setWidth(this.getOffsetWidth());
-			if (headersToo === true) {
-				 this.updateHeaders();
-				 this.updateHeaderSortState();
-			}
-			this.processRows(0, true);
-			this.layout();
-			this.applyEmptyText();
-			this.fireEvent('refresh', this);
-		};
-		this.getView().updateHeaderWidth = function(updateMain) {
-			var innerHdChild = this.innerHd.firstChild,
-				 totalWidth   = this.getTotalWidth();
+		// This code seems unnecessary and gives an extra horizontal scrollbar on windows and linux
+		
+		// this.getView().refresh = function(headersToo) {
+		// 	this.fireEvent('beforerefresh', this);
+		// 	this.grid.stopEditing(true);
 
-			innerHdChild.style.width = this.getOffsetWidth();
-			innerHdChild.firstChild.style.width = totalWidth;
+		// 	var result = this.renderBody();
+		// 	this.mainBody.update(result).setWidth(this.getOffsetWidth());
+		// 	if (headersToo === true) {
+		// 		 this.updateHeaders();
+		// 		 this.updateHeaderSortState();
+		// 	}
+		// 	this.processRows(0, true);
+		// 	this.layout();
+		// 	this.applyEmptyText();
+		// 	this.fireEvent('refresh', this);
+		// };
+		// this.getView().updateHeaderWidth = function(updateMain) {
+		// 	var innerHdChild = this.innerHd.firstChild,
+		// 		 totalWidth   = this.getTotalWidth();
 
-			if (updateMain !== false) {
-				 this.mainBody.dom.style.width = this.getOffsetWidth();
-			}
-		};
+		// 	innerHdChild.style.width = this.getOffsetWidth();
+		// 	innerHdChild.firstChild.style.width = totalWidth;
+
+		// 	if (updateMain !== false) {
+		// 		 this.mainBody.dom.style.width = this.getOffsetWidth();
+		// 	}
+		// };
 		
 	},
 	
