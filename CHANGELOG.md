@@ -1,4 +1,4 @@
-6.4.23
+21-06-2019 6.4.23
 - Custom fields: Implemented the dbToText function for the select customfield so it's value is showed instead of it's id.
 - Email: Improved autocomplete search
 - Address book: Display adressbook of contact #405
