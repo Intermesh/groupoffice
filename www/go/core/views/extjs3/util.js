@@ -353,8 +353,8 @@ go.util =  (function () {
 			});
 		},
 
-		parseEmail : function(emails) {
-			var re  = /(?:"?([A-Z][^<"]+)"?\s*)?<?([^>\s,]+)/g;
+		parseEmail : function(emails) {			
+			var re  = /(?:"?([A-Z]?[^<"]*)"?\s*)?<?([^>\s,]+)/g;
 			var a = [];
 			while (m = re.exec(emails)) {
 				if(m[1]) { m[1] = m[1].trim(); }

@@ -59,10 +59,8 @@ GO.email.AddressContextMenu = function(config)
 		iconCls: 'btn-search',
 		text: t("Search through Group-Office", "email").replace('{product_name}', GO.settings.config.product_name),
 		cls: 'x-btn-text-icon',
-		handler: function(){
-			
-			go.util.search(this.address);
-			
+		handler: function() {
+			go.util.search('"' + this.address + '"'); 			
 		},
 		scope: this
 	});
