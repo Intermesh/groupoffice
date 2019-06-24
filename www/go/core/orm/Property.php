@@ -1002,15 +1002,7 @@ abstract class Property extends Model {
 		
 		try {
 			if ($recordIsNew) {				
-				//this if for cases when a second table extends the model but the key is not part of the properties
-				//For example Password extends User but the ket "userId" of password is not part of the properties
-				foreach($table->getKeys() as $from => $to) {
-					$modifiedForTable[$to] = $this->{$from};
-				}		
 				
-				if($table->isUserTable) {
-					$modifiedForTable["userId"] = GO()->getUserId();
-				}
 				
 				foreach($table->getConstantValues() as $colName => $value) {
 					$modifiedForTable[$colName] = $value;
@@ -1019,6 +1011,16 @@ abstract class Property extends Model {
 				if(empty($modifiedForTable)) {
 					//if there's no primary key we might get here.
 					return true;
+				}
+
+				//this if for cases when a second table extends the model but the key is not part of the properties
+				//For example Password extends User but the ket "userId" of password is not part of the properties
+				foreach($table->getKeys() as $from => $to) {
+					$modifiedForTable[$to] = $this->{$from};
+				}
+
+				if($table->isUserTable) {
+					$modifiedForTable["userId"] = GO()->getUserId();
 				}
 				
 				$stmt = App::get()->getDbConnection()->insert($table->getName(), $modifiedForTable);
@@ -1032,6 +1034,9 @@ abstract class Property extends Model {
 				$this->primaryKeys[$table->getAlias()] = [];
 				foreach($table->getKeys() as $from => $to) {
 					$this->primaryKeys[$table->getAlias()][$to] = $this->$from;
+				}
+				if($table->isUserTable) {
+					$this->primaryKeys[$table->getAlias()]['userId'] = GO()->getUserId();
 				}
 			} else {	
 				if (empty($modifiedForTable)) {

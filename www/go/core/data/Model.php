@@ -225,7 +225,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 	}
 
 
-		/**
+	/**
 	 * Set a property with API input normalization.
 	 * 
 	 * It also uses a setter function if available
@@ -267,8 +267,8 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 		return $value;
 	}
 
-		/**
-	 * Helper function to get a value from an object externally.
+	/**
+	 * Get's a public property. Also uses getters functions.
 	 * 
 	 * @param \go\core\data\Model $model
 	 * @param string $propName
