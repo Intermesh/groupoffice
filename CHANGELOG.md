@@ -1,3 +1,4 @@
+- CardDAV: It was not possible to add new carddav accounts. And sync was broken.
 - Comments: Comments cannot be deleted #414
 - Addres book: Icons and address book name were at the same place.
 - Core: Combobox, when pagesize is given the property "calculateTotal" needs to be send to the server.
