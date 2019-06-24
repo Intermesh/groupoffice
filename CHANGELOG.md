@@ -30,6 +30,13 @@
 11-06-2019 6.4.21
 - First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
 
+
+24-06-2019 6.3.80
+- Calendar: Fixed error where appointment dialog wouldn't load
+
+24-06-2019 6.3.79
+- Core: Bug in script loading prevented GO from starting
+
 21-06-2019 6.3.78
 - Address book: Fixed bug where to address in composer was not filled when creating mail from contact
 - Projects: Fixed problem where projects wouldn't load after opening a project from a link
