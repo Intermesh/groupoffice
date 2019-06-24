@@ -195,7 +195,8 @@ class ContactConvertor {
 						call_user_func($asProp, $i, $message);
 					} else
 					{
-						$message->$asProp = $i->$goProp instanceof DateTime ? $i->$goProp->format("U") : $i->$goProp;
+						$v = $i->getValue($goProp);
+						$message->$asProp = $v instanceof DateTime ? $v->format("U") : $v;
 					}
 				}
 				return true;
