@@ -1,3 +1,4 @@
+24-06-2019 6.4.24
 - CardDAV: It was not possible to add new carddav accounts. And sync was broken.
 - Comments: Comments cannot be deleted #414
 - Addres book: Icons and address book name were at the same place.
