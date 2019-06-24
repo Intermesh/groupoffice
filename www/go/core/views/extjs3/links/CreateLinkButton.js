@@ -206,7 +206,8 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 			id = "new" + (i++);
 			l.fromEntity = this.linkGrid.store.baseParams.filter.entity;
 			l.fromId = this.linkGrid.store.baseParams.filter.entityId;
-			
+			//comes from store record relation
+			delete l.to;
 			links[id] = l;
 		}, this);
 		
