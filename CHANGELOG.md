@@ -1,4 +1,7 @@
-21-06-2019 6.3.79
+24-06-2019 6.3.80
+- Calendar: Fixed error where appointment dialog wouldn't load
+
+24-06-2019 6.3.79
 - Core: Bug in script loading prevented GO from starting
 
 21-06-2019 6.3.78
