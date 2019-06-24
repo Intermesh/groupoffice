@@ -42,10 +42,7 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	initComponent: function () {
 		go.detail.Panel.superclass.initComponent.call(this, arguments);		
 		
-		if (go.Modules.isAvailable("community", "comments")) {
-			this.add(new go.modules.comments.CommentsDetailPanel());
-		}
-		
+
 		this.cls += " go-detail-view-" + this.entityStore.entity.name.toLowerCase();
 		
 		this.on('afterrender', function() {
@@ -193,8 +190,8 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	},
 
 	addComments : function() {
-		if (go.Modules.isAvailable("legacy", "comments")) {
-			return this.add(new go.modules.comments.CommentsDetailPanel());
+		if (go.Modules.isAvailable("community", "comments")) {
+			this.add(new go.modules.comments.CommentsDetailPanel());
 		}
 	},
 	addFiles : function() {

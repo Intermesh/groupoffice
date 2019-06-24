@@ -12,7 +12,7 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(go.tree.EntityLoader, {
 		
 		go.modules.community.addressbook.TreeLoader.superclass.constructor.call(this, config);
 		
-		this.baseAttrs.iconCls = 'ic-account-box';
+		this.baseAttrs.iconCls = 'ic-import-contacts';
 		
 		this.groupLoader = new go.tree.EntityLoader({
 			entityStore: "AddressBookGroup",
