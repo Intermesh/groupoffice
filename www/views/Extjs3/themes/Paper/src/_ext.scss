@@ -1114,7 +1114,7 @@
 			@extend %font-caption;
 			border-left:0;
 			border-right: 1px solid;
-			border-image: linear-gradient(to bottom, transparent, color($fg, 'divider')) 1 100%;
+			border-image: linear-gradient(to bottom, transparent, color($fg, 'line')) 1 100%;
 			height: dp(32);
 			
 			&.x-grid3-cell-last {
