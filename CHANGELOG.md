@@ -1,3 +1,6 @@
+21-06-2019 6.3.79
+- Core: Bug in script loading prevented GO from starting
+
 21-06-2019 6.3.78
 - Address book: Fixed bug where to address in composer was not filled when creating mail from contact
 - Projects: Fixed problem where projects wouldn't load after opening a project from a link
