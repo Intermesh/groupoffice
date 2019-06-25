@@ -40,6 +40,7 @@
 
 namespace GO\Site\Model;
 
+use go\core\http\Request;
 
 class Site extends \GO\Base\Db\ActiveRecord {
 	
@@ -57,6 +58,14 @@ class Site extends \GO\Base\Db\ActiveRecord {
 	
 	private static $fields;
 	
+	protected function init()
+	{
+		parent::init();
+
+		if(Request::get()->isHttps()) {
+			$this->ssl = true;
+		}
+	}
 
 	
 //	private function _loadFields(){
