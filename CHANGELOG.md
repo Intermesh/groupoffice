@@ -1,3 +1,7 @@
+24-06-2019 6.4.24
+- CardDAV: It was not possible to add new carddav accounts. And sync was broken.
+- Comments: Comments cannot be deleted #414
+- Addres book: Icons and address book name were at the same place.
 - Core: Combobox, when pagesize is given the property "calculateTotal" needs to be send to the server.
 - Core: Fixed deleting mapped properties by setting them to null
 - Authentication: Fixed adding groups to LDAP and IMap auth profiles
@@ -26,6 +30,13 @@
 
 11-06-2019 6.4.21
 - First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
+
+
+24-06-2019 6.3.80
+- Calendar: Fixed error where appointment dialog wouldn't load
+
+24-06-2019 6.3.79
+- Core: Bug in script loading prevented GO from starting
 
 21-06-2019 6.3.78
 - Address book: Fixed bug where to address in composer was not filled when creating mail from contact

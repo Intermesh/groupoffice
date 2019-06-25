@@ -10,10 +10,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 		
 		Ext.apply(this, {
 			items: [	
-				{
-					xtype: "box",
-					tpl: '<tpl for="addressbook"><h4 class="go-addressbook-name">{name}</h4></tpl>'
-				},
+			
 				
 				{
 					xtype: 'container',
@@ -153,6 +150,9 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 							<label>{[t("dateTypes")[values.type] || values.type]}</label>\
 						</a></tpl>\
 					</div>	</tpl>'
+				},	{
+					xtype: "box",
+					tpl: '<div class="icons"><hr class="indent"><tpl for="addressbook"><p><i class="icon label">import_contacts</i><span>{name}</span>	<label>{[t("Address book")]}</label>\</p></tpl></div>'
 				},
 				{
 					xtype: 'panel',

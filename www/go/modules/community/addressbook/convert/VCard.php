@@ -84,7 +84,7 @@ class VCard extends AbstractConverter {
 			$vcard->add('TEL', $phoneNb->number, ['TYPE' => [$phoneNb->type]]);
 		}
 		foreach ($contact->dates as $date) {
-			$type = ($date->type === 'birthday') ? 'BDAY' : 'ANNIVERSARY';
+			$type = ($date->type === Date::TYPE_BIRTHDAY) ? 'BDAY' : 'ANNIVERSARY';
 			$vcard->add($type, $date->date);
 		}
 		foreach ($contact->addresses as $address) {

@@ -873,6 +873,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 				{
 				xtype: 'compositefield',
 				items: [this.selectCalendar = new GO.calendar.SelectCalendar({
+					dontQueryCalendar :  true,
 					valueField : 'id',
 					displayField : 'name',
 					flex:1,

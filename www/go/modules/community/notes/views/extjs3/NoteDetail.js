@@ -26,7 +26,7 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 
 		this.addCustomFields();
 		this.addLinks();
-		//this.addComments();
+		this.addComments();
 		this.addFiles();
 	},
 

@@ -42,19 +42,23 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			this.updateView(options);
 		}, this);
 
+		this.store.on('remove', function() {
+			this.updateView();
+		}, this);
+
 		this.contextMenu = new Ext.menu.Menu({
 			items:[{
 				iconCls: 'ic-delete',
 				text: t("Delete"),
 				handler: function() {
-					if(confirm(t("Are you sure you want to delete the selected item?"))){
-						//return;
-						this.store.removeById(this.contextMenu.record.id);
-						var _this = this;
-						this.store.save(function(){
-							_this.updateView();
-						});
-					}
+
+					Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
+						if (btn !== "yes") {
+							return;
+						}
+						go.Db.store("Comment").set({destroy: [this.contextMenu.record.id]});
+					}, this);
+				
 				},
 				scope:this
 			},{
