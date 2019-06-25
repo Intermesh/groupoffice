@@ -77,11 +77,14 @@ trait CustomFieldsTrait {
 	 * data.
 	 * 
 	 * @param array $data
+	 * @return $this
 	 */
 	public function setCustomFields(array $data) {			
 		$this->customFieldsData = array_merge($this->getCustomFields(), $this->normalizeCustomFieldsInput($data));		
 		
 		$this->customFieldsModified = true;
+
+		return $this;
 	}
 	
 	/**
@@ -89,9 +92,10 @@ trait CustomFieldsTrait {
 	 * 
 	 * @param string $name
 	 * @param mixed $value
+	 * @return $this
 	 */
 	public function setCustomField($name, $value) {
-		$this->setCustomFields([$name => $value]);
+		return $this->setCustomFields([$name => $value]);
 	}
 	
 	private static $customFields;
