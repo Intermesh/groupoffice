@@ -239,6 +239,7 @@ go.Modules = (function () {
 						
 						if (config.initModule){
 							go.Translate.setModule(mod.package, mod.name);
+
 							var initModulePromise = config.initModule.call(me);
 							if(initModulePromise) {
 								promises.push(initModulePromise);
@@ -281,6 +282,16 @@ go.Modules = (function () {
 				GO.mainLayout.addModulePanel(p.prototype.id, p);
 			}, this);
 
+		},
+
+		hasPermission: function(level) {
+			// @see line 241 this info should not be in Translate as it is usefull for other components as well
+			// todo create go.currentModule
+			var module = this.get(go.Translate.package, go.Translate.module);
+			if (!module) {
+				return false;
+			}
+			return module.permissionLevel >= level;
 		}
 	});
 
