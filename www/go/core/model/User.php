@@ -399,6 +399,14 @@ class User extends Entity {
 				throw new Forbidden("The maximum number of users have been reached");
 			}
 		}
+
+		if($this->isModified(['email'])) {
+			$id = \go\core\model\User::find()->selectSingleValue('id')->where(['email' => $this->email])->single();
+			
+			if($id && $id != $this->id){
+				$this->setValidationError('email', ErrorCode::UNIQUE, 'The e-mail address must be unique in the system');
+			}
+		}
 		
 		return parent::internalValidate();
 	}
