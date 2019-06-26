@@ -74,10 +74,10 @@ class Table {
 		$this->conn = $conn;
 		$this->init();
 
-		$this->columns = array_map(function($c) {
-			$c->table = $this; //is cleared in __sleep()
-			return $c;
-		}, $this->columns);
+		// $this->columns = array_map(function($c) {
+		// 	$c->table = $this; //is cleared in __sleep()
+		// 	return $c;
+		// }, $this->columns);
 	}	
 	
 	/**

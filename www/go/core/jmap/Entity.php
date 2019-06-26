@@ -335,8 +335,8 @@ abstract class Entity  extends OrmEntity {
 	 */
 	private static function getEntityReferences() {
 		$cacheKey = "refs-" . static::class;
-		$entityClasses = GO()->getCache()->get("refs-" . $cacheKey);
-		if(!$entityClasses) {
+		$entityClasses = GO()->getCache()->get($cacheKey);
+		if($entityClasses === null) {
 
 			$tableName = array_values(static::getMapping()->getTables())[0]->getName();
 
@@ -356,7 +356,7 @@ abstract class Entity  extends OrmEntity {
 				$entityClasses = array_merge($entityClasses, static::findEntitiesByTable($r['table'], $r['column']));
 			}	
 			
-			GO()->getCache()->set("refs-" . $cacheKey, $entityClasses);			
+			GO()->getCache()->set($cacheKey, $entityClasses);			
 		}		
 		
 		return $entityClasses;
