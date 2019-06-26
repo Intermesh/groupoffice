@@ -27,7 +27,14 @@ go.PasswordPrompt = Ext.extend(go.Window, {
 							name: 'password',
 							inputType: 'password',
 							allowBlank: false,
-							anchor: '100%'
+							anchor: '100%',
+							listeners: {
+								afterrender: function(cmp) {
+									cmp.el.set({
+										autocomplete: "current-password"
+									});
+								}
+							}
 						})
 					]
 				})

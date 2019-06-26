@@ -23,17 +23,7 @@ use go\core\validate\ErrorCode;
 use go\core\model\Group;
 use go\core\model\Settings;
 
-/**
- * todo
- * 
- * $qs[] = "ALTER TABLE `core_user` CHANGE `lastlogin` `_lastlogin` INT(11) NOT NULL DEFAULT '0';";
-$qs[] = "ALTER TABLE `core_user` ADD `lastLogin` DATETIME NULL DEFAULT NULL AFTER `force_password_change`, ADD `modifiedAt` DATETIME NULL DEFAULT NULL AFTER `lastLogin`, ADD `createdAt` DATETIME NULL DEFAULT NULL AFTER `modifiedAt`;";
-$qs[] = "update `core_user` set modifiedAt=from_unixtime(mtime), createdAt =from_unixtime(ctime), lastLogin = from_unixtime(_lastlogin);";
-$qs[] = "ALTER TABLE `core_user`
-  DROP `_lastlogin`,
-  DROP `ctime`,
-  DROP `mtime`;";
- */
+
 class User extends Entity {
 	
 	use CustomFieldsTrait;
@@ -326,6 +316,10 @@ class User extends Entity {
 
 	public function setPassword($password) {
 		$this->plainPassword = $password;
+	}
+
+	public function getPassword() {
+		return null;
 	}
 
 	/**
