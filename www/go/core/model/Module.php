@@ -279,9 +279,9 @@ class Module extends AclOwnerEntity {
 		if(!isset($this->package)) {
 			return null;
 		}
-		
-		if($this->name == "core") {
-			
+
+		if(!$this->isAvailable()) {
+			return null;
 		}
 		
 		return $this->module()->getSettings();
