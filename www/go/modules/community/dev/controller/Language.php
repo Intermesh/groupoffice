@@ -99,7 +99,6 @@ class Language extends Controller {
 		$blob = Blob::fromTmp($csvFile);
 		$blob->type = "text/csv";
 		$blob->name = "lang.csv";
-		$blob->modified = time();
 		$blob->save();
 
 		Response::get()->addResponse(["blobId" => $blob->id]);
