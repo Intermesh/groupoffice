@@ -14,6 +14,10 @@ use go\modules\community\addressbook\model\Url;
 use function GO;
 use go\core\db\Table;
 
+/*
+update addressbook_contact n set filesFolderId = (select files_folder_id from ab_contacts o where o.id=n.id);
+update addressbook_contact n set filesFolderId = (select files_folder_id from ab_companies o where n.id = (o.id + (select max(id) from ab_contacts)) );
+*/
 class Migrate63to64 {
 	
 	private $countries;
@@ -447,7 +451,7 @@ class Migrate63to64 {
 
 			$contact->notes = $r['comment'];
 
-			//$contact->filesFolderId = $r['files_folder_id'];
+			$contact->filesFolderId = $r['files_folder_id'];
 
 			$contact->createdAt = new DateTime("@" . $r['ctime']);
 			$contact->modifiedAt = new DateTime("@" . $r['mtime']);
@@ -592,7 +596,7 @@ class Migrate63to64 {
 
 			$contact->notes = $r['comment'];
 
-			//$contact->filesFolderId = $r['files_folder_id'];
+			$contact->filesFolderId = $r['files_folder_id'];
 
 			$contact->createdAt = new DateTime("@" . $r['ctime']);
 			$contact->modifiedAt = new DateTime("@" . $r['mtime']);
