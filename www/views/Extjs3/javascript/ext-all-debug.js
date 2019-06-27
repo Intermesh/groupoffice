@@ -50313,7 +50313,9 @@ Ext.grid.ColumnModel = Ext.extend(Ext.util.Observable, {
 
     
     setState : function(col, state) {
+        var groupable = this.config[col].groupable;
         state = Ext.applyIf(state, this.defaults);
+        state.groupable = groupable;
         Ext.apply(this.config[col], state);
     }
 });

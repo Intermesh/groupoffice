@@ -169,7 +169,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		$attributes[$tagPrefix . 'salutation'] = GO()->t("Hi")." ".$contact->firstName;
 		$attributes[$tagPrefix . 'sirmadam']=$contact->gender=="M" ? \GO::t('sir') : \GO::t('madam');
 		
-		$attributes[$tagPrefix . 'fist_name'] = $contact->firstName;
+		$attributes[$tagPrefix . 'first_name'] = $contact->firstName;
 		$attributes[$tagPrefix . 'middle_name'] = $contact->middleName;
 		$attributes[$tagPrefix . 'last_name'] = $contact->lastName;
 
@@ -192,6 +192,8 @@ class Template extends \GO\Base\Db\ActiveRecord{
 			$attributes[$tagPrefix . 'email'] = $contact->emailAddresses[0] ?? "";
 			$attributes[$tagPrefix . 'email2'] = $contact->emailAddresses[2] ?? "";
 			$attributes[$tagPrefix . 'email3'] = $contact->emailAddresses[3] ?? "";
+
+			$attributes[$tagPrefix . 'function'] = $contact->jobTitle;
 
 			foreach($contact->phoneNumbers as $p) {
 				switch($p->type) {
