@@ -61,7 +61,7 @@ Ext.extend(GO.plugins.HtmlEditorImageInsert, Ext.util.Observable, {
 				go.util.openFileDialog({
 					multiple: true,
 					accept: "image/*",
-					directory: true,
+					directory: false,
 					autoUpload: true,
 					listeners: {
 						upload: function(response) {
