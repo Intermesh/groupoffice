@@ -1,3 +1,6 @@
+- Emailcomposer: Insert inline image in composer through the upload button 
+  opened a file chooser in which you could only choose folders. 
+  This is now changed to be able to choose (image)files.
 - Address book: Fixed "function" and "first_name" in email templates
 - Core: Fixed downloading language translation file from system settings
 - Serverclient: Fixed autoload issue of Controller.
