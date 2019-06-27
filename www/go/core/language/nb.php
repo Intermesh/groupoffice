@@ -15,7 +15,7 @@ return array (
   'Manage permissions' => 'Behandle tillatelser',
   'Module Permissions' => 'Modulrettigheter',
   'Use' => 'Bruk',
-  'name' => 'Brukergrupper',
+  'name' => 'GroupOffice Core',
   'description' => 'Administratormodul: Behandle brukegrupper.',
   'Users' => 'Brukere',
   'Admin module. Managing system users.' => 'Administratormodul: Behandle systembrukere.',

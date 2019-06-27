@@ -1,3 +1,7 @@
+- Address book: Fixed "function" and "first_name" in email templates
+- Core: Fixed downloading language translation file from system settings
+- Serverclient: Fixed autoload issue of Controller.
+
 24-06-2019 6.4.24
 - CardDAV: It was not possible to add new carddav accounts. And sync was broken.
 - Comments: Comments cannot be deleted #414

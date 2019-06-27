@@ -99,7 +99,6 @@ class Language extends Controller {
 		$blob = Blob::fromTmp($csvFile);
 		$blob->type = "text/csv";
 		$blob->name = "lang.csv";
-		$blob->modified = time();
 		$blob->save();
 
 		Response::get()->addResponse(["blobId" => $blob->id]);
@@ -258,5 +257,202 @@ class Language extends Controller {
 		
 		$file->delete();
 	}
+
+
+
+
+
+	/**
+	 * 
+	 * docker-compose exec groupoffice-master php /usr/local/share/groupoffice/cli.php community/dev/Language/convertModule --name=inventaire
+	 * 
+	 */
+	public function convertModule($name) {
+		$folder = Environment::get()->getInstallFolder()->getFolder('modules/' . $name);
+		if(!$folder->exists()) {
+			throw new \Exception("Folder for module ". $name ." does not exist");
+		}
+
+		$langFile = $folder->getFile('language/en.php');
+		if(!$langFile->exists()) {
+			throw new \Exception("Language file for module ". $name ." does not exist");
+		}
+
+		
+
+		$bakLangFile = $folder->getFile('language/en.php.bak');
+		if(!$bakLangFile->exists()) {
+			$langFile->copy($bakLangFile);
+			require($bakLangFile);
+			$modLang = isset($l) ? $l : [];
+
+			$newLang = [
+				'name' => $modLang['name'] ?? $name,
+				'description' => $modLang['description'] ?? ""
+			];
+
+			$langFile->putContents("<?php\nreturn " . var_export($newLang, true) . ";");
+			
+		} else{
+			require($bakLangFile);
+			$modLang = isset($l) ? $l : [];
+		}
+
+		require(dirname(__DIR__) . '/resources/oldcommonlang.php');
+		$commonLang = $l;
+		unset($l);
+
+		
+		$jsFiles = $folder->find("/.*\.js/", false, true);
+
+		foreach($jsFiles as $jsFile) {
+			$this->replaceJs($jsFile, $name, $modLang, $commonLang);
+		}
+
+		$phpFiles = $folder->find("/.*\.php/", false, true);
+
+		foreach($phpFiles as $phpFile) {
+			$this->replacePhp($phpFile, $name, $modLang, $commonLang);
+		}
+	}
+
+	private function replacePhp(File $file, $moduleName, array $modLang, array $commonLang) {
+		$content = $file->getContents();
+
+		$content = preg_replace_callback('/GO::t\(([\'"a-zA-Z0-9_]+)\)/', function($matches) use ($commonLang) {				
+			$key = trim($matches[1], '"\'');
+			$str = $commonLang[$key] ?? $key;
+
+			return 'GO()->t("' . str_replace('"', '\"', $str) . '")';
+		}, $content);	
+		
+		$content = preg_replace_callback('/GO::t\(([\'"a-zA-Z0-9_]+)\s*,\s*([\'"a-zA-Z0-9_]+)\)/', function($matches) use ($modLang) {				
+			$key = trim($matches[1], '"\'');
+			$str = $modLang[$key] ?? $key;
+
+			return 'GO()->t("' . str_replace('"', '\"', $str) . '", "legacy", "' . trim($matches[2], '"\'') . '")';			
+		}, $content);	
+		
+		$file->putContents($content);
+
+	}
+
+	private function replaceJs(File $file, $moduleName, array $modLang, array $commonLang) {
+		$js = $file->getContents();
+
+		$js = preg_replace_callback("/GO\.lang\[([^\]]+)\]/", function($matches) use ($commonLang) {
+
+			$key = trim($matches[1], '"\'');
+
+			$str = $commonLang[$key] ?? $key;
+
+			return 't("' . str_replace('"', '\"', $str) . '")';
+		}, $js);
+
+
+		$js = preg_replace_callback("/GO\.lang\.([a-z0-9_]+)/i", function($matches) use ($commonLang) {
+
+			$key = trim($matches[1], '"\'');
+
+			$str = $commonLang[$key] ?? $key;
+
+			return 't("' . str_replace('"', '\"', $str) . '")';
+		}, $js);
+
+
+		$js = preg_replace_callback("/GO\." . $moduleName . "\.lang\[([^\]]+)\]/", function($matches) use ($modLang) {
+
+			$key = trim($matches[1], '"\'');
+
+			$str = $modLang[$key] ?? $key;
+
+			return 't("' . str_replace('"', '\"', $str) . '")';
+		}, $js);
+
+
+		$js = preg_replace_callback("/GO\." . $moduleName . "\.lang\.([a-z0-9_]+)/i", function($matches) use ($modLang) {
+
+			$key = trim($matches[1], '"\'');
+
+			$str = $modLang[$key] ?? $key;
+
+			return 't("' . str_replace('"', '\"', $str) . '")';
+		}, $js);
+
+
+		// echo $js ."\n\n\n-----\n\n\n";
+
+		$file->putContents($js);
+
+	}
+
+	/*
+convert lang files
+	<?php
+
+define('GO_CONFIG_FILE', "/media/sf_Projects/groupoffice-6.2/config.php");
+
+require('../www/GO.php');
+
+GO::language()->setLanguage('en');
+
+chdir(dirname(__dir__));
+
+
+$cmd = 'find ./www/modules -path '.escapeshellarg("*/language/*.php");
+exec($cmd, $files);
+
+$map = array();
+$count = 0;
+foreach ($files as $file62) {
+	
+	if(basename($file62) == 'en.php') {
+		continue;
+	}
+	
+	echo $file62."\n";
+
+	$parts = explode("/", $file62);
+	$module = $parts[count($parts) - 3];
+
+	if ($module == "language") {
+		$module = $parts[count($parts) - 2];
+	}
+
+	
+
+	$file63 = str_replace('6.2', '6.3', realpath($file62));
+	
+	if(!file_exists($file63)) {
+		continue;
+	}
+	
+	$l = [];
+	require($file62);
+	$old = $l;
+
+	$l = $bak = require($file63);
+
+	foreach ($old as $key => $value) {
+		if($key == "description" || $key == "name") {
+			continue;
+		}
+		$newKey = GO::t($key, $module);
+		
+		if(!is_string($newKey) || strpos($newKey, "\n") !== false) {
+			continue;
+		}
+		if (!isset($l[$newKey])) {
+			$l[$newKey] = $value;
+		}
+	}
+	
+	var_dump(array_diff(array_keys($l), array_keys($bak)));
+	
+	$data = "<?php\nreturn " . var_export($l, true) . ";";			
+	file_put_contents($file63, $data);
+}
+	
+*/
 
 }

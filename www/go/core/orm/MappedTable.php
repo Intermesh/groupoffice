@@ -57,13 +57,13 @@ class MappedTable extends Table {
 		}
 
 		$this->keys = $keys;		
-		$this->mappedColumns = array_filter($this->columns, function($c) use ($columns) {
-			return in_array($c->name, $columns);
-		});
-		
-		foreach($this->mappedColumns as $col) {
+		foreach($this->columns as $col) {
 			$col->table = $this;
 		}
+
+		$this->mappedColumns = array_filter($this->columns, function($c) use ($columns) {
+			return in_array($c->name, $columns);
+		});	
 		
 		$this->constantValues = $constantValues;
 	}

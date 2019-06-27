@@ -18,7 +18,12 @@ go.users.CreateUserPasswordPanel = Ext.extend(Ext.form.FormPanel, {
 						allowBlank: false,
 						minLength: go.Modules.get("core","core").settings.passwordMinLength,
 						anchor: '100%',
-							listeners: {
+						listeners: {
+							afterrender: function(cmp) {
+								cmp.el.set({
+									autocomplete: "new-password"
+								});
+							},
 							generated : function(field, pass) {
 								this.passwordField2.setValue(pass);
 							},
@@ -33,6 +38,11 @@ go.users.CreateUserPasswordPanel = Ext.extend(Ext.form.FormPanel, {
 						anchor: '100%',
 						inputType: 'password',
 						fieldLabel: t("Confirm password"),
+						afterrender: function(cmp) {
+							cmp.el.set({
+								autocomplete: "new-password"
+							});
+						},
 						submit: false
 					})]
 			}

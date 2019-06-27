@@ -23,17 +23,7 @@ use go\core\validate\ErrorCode;
 use go\core\model\Group;
 use go\core\model\Settings;
 
-/**
- * todo
- * 
- * $qs[] = "ALTER TABLE `core_user` CHANGE `lastlogin` `_lastlogin` INT(11) NOT NULL DEFAULT '0';";
-$qs[] = "ALTER TABLE `core_user` ADD `lastLogin` DATETIME NULL DEFAULT NULL AFTER `force_password_change`, ADD `modifiedAt` DATETIME NULL DEFAULT NULL AFTER `lastLogin`, ADD `createdAt` DATETIME NULL DEFAULT NULL AFTER `modifiedAt`;";
-$qs[] = "update `core_user` set modifiedAt=from_unixtime(mtime), createdAt =from_unixtime(ctime), lastLogin = from_unixtime(_lastlogin);";
-$qs[] = "ALTER TABLE `core_user`
-  DROP `_lastlogin`,
-  DROP `ctime`,
-  DROP `mtime`;";
- */
+
 class User extends Entity {
 	
 	use CustomFieldsTrait;
@@ -328,6 +318,10 @@ class User extends Entity {
 		$this->plainPassword = $password;
 	}
 
+	public function getPassword() {
+		return null;
+	}
+
 	/**
 	 * Make sure to call this when changing the password with a recovery hash
 	 * @param string $hash
@@ -397,6 +391,14 @@ class User extends Entity {
 			
 			if(!empty($config['limits']['userCount']) && $config['limits']['userCount'] <= self::count()) {
 				throw new Forbidden("The maximum number of users have been reached");
+			}
+		}
+
+		if($this->isModified(['email'])) {
+			$id = \go\core\model\User::find()->selectSingleValue('id')->where(['email' => $this->email])->single();
+			
+			if($id && $id != $this->id){
+				$this->setValidationError('email', ErrorCode::UNIQUE, 'The e-mail address must be unique in the system');
 			}
 		}
 		
