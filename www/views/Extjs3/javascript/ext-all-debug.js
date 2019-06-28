@@ -6953,8 +6953,7 @@ Ext.apply(Ext.EventManager, function(){
                resizeTask = new Ext.util.DelayedTask(this.doResizeEvent);
                Ext.EventManager.on(window, "resize", this.fireWindowResize, this);
 							 Ext.EventManager.on(window, "orientationchange", function() {
-								 console.log("orientationchange");
-								 this.doResizeEvent();
+								this.doResizeEvent();
 							 }, this, {delay: 500});
            }
            resizeEvent.addListener(fn, scope, options);
@@ -8234,9 +8233,6 @@ Ext.Element.addMethods(
 
             
             mask : function(msg, msgCls) {
-
-                console.warn("MAsk", this);
-
                 if(this.masking) {
                     clearTimeout(this.masking);
                 }

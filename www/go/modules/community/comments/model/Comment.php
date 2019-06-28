@@ -5,6 +5,7 @@ use go\core\orm\Query;
 use go\core\jmap\Entity;
 use go\core\orm\EntityType;
 use go\core\util\DateTime;
+use go\core\model\Acl;
 
 class Comment extends Entity {
 
@@ -60,28 +61,13 @@ class Comment extends Entity {
 			});
 	}
 	
-//	public static function filter(Query $query, array $filter) {
-//		
-//		if(isset($filter['entityId'])){
-//			$query->where('t.entityId', '=', $filter['entityId']);
-//		}
-//		
-//		if(isset($filter['entity'])){
-//			$query->where(['e.name' => $filter['entity']]);	
-//		}
-//		
-//		return parent::filter($query, $filter);	
-//	}
-	
 	public static function sort(Query $query, array $sort) {	
-		//GO()->debug($sort);
 		if(!empty($sort['id'])) {
 			$sort = ['createdAt' => 'DESC'];
 		}
 
-		return parent::sort($query, $sort);
-		
-	}
+		return parent::sort($query, $sort);		
+	}	
 	
 	protected function internalSave() {
 		$success = parent::internalSave();
@@ -99,14 +85,61 @@ class Comment extends Entity {
 		$this->_labels = $ids;
 	}
 	
-	public function getLabelIds() {
-		//TODO: turn off ATTR_EMULATE_PREPARES to fetch Integers
+	public function getLabelIds() {		
 		return (new Query)
 			->selectSingleValue('labelId')
 			->from('comments_comment_label')
 			->where(['commentId' => $this->id])
 			->execute()
 			->fetchAll();
+	}
+
+	/**
+	 * Find the entity this comment belongs to.
+	 * 
+	 * @return Entity
+	 */
+	public function findEntity() {
+		$e = EntityType::findById($this->entityTypeId);
+		$cls = $e->getClassName();
+		return $cls::findById($this->entityId);
+	}
+
+
+	/**
+	 * Get the permission level of the current user
+	 * 
+	 * @return int
+	 */
+	public function getPermissionLevel() {
+
+		if(GO()->getAuthState()->getUser()->isAdmin()) {
+			return Acl::LEVEL_MANAGE;
+		}
+
+		if($this->isNew()) {
+			return $this->findEntity()->getPermissionLevel();
+		}
+
+		if($this->createdBy == GO()->getAuthState()->getUserId()) {
+			return Acl::LEVEL_MANAGE;
+		}
+
+		return $this->findEntity()->hasPermissionLevel(Acl::LEVEL_READ) ? Acl::LEVEL_READ : false;
+		
+	}
+	
+	/**
+	 * Applies conditions to the query so that only entities with the given permission level are fetched.
+	 * 
+	 * @param Query $query
+	 * @param int $level
+	 * @param int $userId Leave to null for the current user
+	 * @return Query $query;
+	 */
+	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null) {
+		
+		return $query;
 	}
 	
 }

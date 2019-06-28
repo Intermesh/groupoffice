@@ -8,19 +8,21 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	//
 	//collapsible: true,
 	collapseFirst:false,
-	layout:'border',
-	tools:[{
-		id: "gear",
-		handler: function () {		
-			if(!go.modules.comments.settingsForm) {
-				go.modules.comments.settingsForm = new go.modules.comments.Settings();
-			}
-			go.modules.comments.settingsForm.show(go.User.id);
-		}
-	}],
+	layout:'border',	
 	titleCollapse: true,
 	stateId: "comments-detail",
 	initComponent: function () {
+
+
+		if(go.User.isAdmin) {
+			this.tools = [{			
+				id: "gear",
+				handler: function () {		
+					var dlg = new go.modules.comments.Settings();					
+					dlg.show(go.User.id);
+				}
+			}];
+		}
 
 		this.store = new go.data.Store({
 			fields: [
@@ -33,7 +35,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				'modifiedBy',
 				'createdBy', 
 				{name: "creator", type: "relation"},
-				'text'
+				'text',
+				{name: "permissionLevel", type: "int"}
 			],
 			entityStore: "Comment"
 		});
@@ -179,9 +182,11 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			});
 			readMore.on('render',function(me){me.getEl().on("contextmenu", function(e, target, obj){
 				e.stopEvent();		
-				//todo check permission
-				this.contextMenu.record = r;
-				this.contextMenu.showAt(e.xy);
+				
+				if(r.data.permissionLevel > go.permissionLevels.read) {
+					this.contextMenu.record = r;
+					this.contextMenu.showAt(e.xy);
+				}
 
 			}, this);},this);
 			prevStr = go.util.Format.date(r.get('createdAt'));

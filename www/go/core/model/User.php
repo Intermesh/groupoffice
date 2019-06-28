@@ -247,6 +247,11 @@ class User extends Entity {
 		$this->passwordVerified = false;
 		return parent::setValues($values);
 	}
+
+	protected function canCreate()
+	{
+		return GO()->getAuthState()->getUser(['id'])->isAdmin();
+	}
 	
 	protected function init() {
 		parent::init();

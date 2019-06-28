@@ -346,15 +346,19 @@ abstract class Entity extends Property {
 	 * @return int
 	 */
 	public function getPermissionLevel() {
+		if($this->isNew()) {
+			return $this->canCreate() ? Acl::LEVEL_CREATE : false;
+		}
 		return GO()->getAuthState() && GO()->getAuthState()->getUser() && GO()->getAuthState()->getUser()->isAdmin() ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ;
 	}
 	
 	/**
 	 * Check if the current user is allowed to create new entities
 	 * 
+	 * @param array $values The values that will be applied to the new model
 	 * @return boolean
 	 */
-	public static function canCreate() {
+	protected function canCreate() {
 		return true;
 	}
 

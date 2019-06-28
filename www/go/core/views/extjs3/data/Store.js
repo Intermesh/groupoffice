@@ -26,6 +26,7 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	
 	enableCustomFields: true,
 	
+	
 	constructor: function (config) {
 		
 		config = config || {};
@@ -114,17 +115,17 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 				queue[r.phantom?'create':'update'][r.id] = change;
 			}
 		}
-		if(hasChanges) {
-			if(this.fireEvent('beforesave', this, queue) !== false){
-				//console.log(queue);
-				this.entityStore.set(queue, function(options, success, queue){
-					this.commitChanges();
-					if(cb) {
-						cb(success);
-					}
-				},this);
-			}
+		if(!hasChanges || this.fireEvent('beforesave', this, queue) === false) {
+			return Promise.resolve();
 		}
+		//console.log(queue);
+		return this.entityStore.set(queue, function(options, success, queue){
+			this.commitChanges();
+			if(cb) {
+				cb(success);
+			}
+		},this);	
+
 	},
 
 	load: function(o) {

@@ -25,10 +25,6 @@ class User extends EntityController {
 		return parent::canUpdate($entity);
 	}
 	
-	protected function canCreate() {
-		return GO()->getAuthState()->getUser()->isAdmin();
-	}
-	
 	/**
 	 * The class name of the entity this controller is for.
 	 * 

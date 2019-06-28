@@ -38,7 +38,19 @@ go.data.StoreTrait = {
     }, this);
     
 		this.initFilters();
+
+		this.trackRemoved();
 	},	
+
+	trackRemoved : function() {
+		this.removed = [];
+		this.on("remove", function(store, record) {
+			this.removed.push(record);
+		}, this);
+		this.on("load", function() {
+			this.removed = [];
+		}, this);
+	},
 	
 	initFilters : function() {
 		//JMAP remote filters. Used by setFilter()

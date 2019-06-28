@@ -105,6 +105,11 @@ class Group extends AclOwnerEntity {
 
 		return $this->setDefaultPermissions();		
 	}
+
+	protected function canCreate()
+	{
+		return GO()->getAuthState()->getUser(['id'])->isAdmin();
+	}
 	
 	private function setDefaultPermissions() {
 		$acl = $this->findAcl();

@@ -478,13 +478,13 @@ abstract class EntityController extends Controller {
 
 	private function createEntitites($create, &$result) {
 		foreach ($create as $clientId => $properties) {
+
+			$entity = $this->create($properties);
 			
-			if(!$this->canCreate()) {
+			if(!$this->canCreate($entity)) {
 				$result['notCreated'][$clientId] = new SetError("forbidden");
 				continue;
 			}
-			
-			$entity = $this->create($properties);
 
 			if ($entity->save()) {
 				$entityProps = new ArrayObject($entity->toArray());
@@ -505,9 +505,8 @@ abstract class EntityController extends Controller {
 	 * 
 	 * @return boolean
 	 */
-	protected function canCreate() {
-		$cls = $this->entityClass();
-		return $cls::canCreate();
+	protected function canCreate(Entity $entity) {		
+		return $entity->hasPermissionLevel(Acl::LEVEL_CREATE);
 	}
 	
 	/**

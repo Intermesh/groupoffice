@@ -2,7 +2,6 @@ go.modules.comments.Settings = Ext.extend(go.Window, {
 	title: t("Labels"),
 	maximizable:false,
 	iconCls: 'ic-label',
-
 	initComponent: function () {
 		
 		Ext.apply(this,{
@@ -32,7 +31,10 @@ go.modules.comments.Settings = Ext.extend(go.Window, {
 	},
 	
 	submit : function(){
-		this.labelGrid.store.save();
+		var me = this;
+		this.labelGrid.store.save().then(function() {
+			me.close();
+		});
 		//go.Db.store('CommentLabel').set({update:items});
 		// CommitChanges does not save to server????
 		//this.labelGrid.store.commitChanges();
