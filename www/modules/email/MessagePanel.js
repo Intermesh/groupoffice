@@ -302,6 +302,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			fail: function(response, options, result) {
 				Ext.Msg.alert(t("Error"), result.feedback);
 				this.loading=false;
+				this.el.unmask();
 			}
 		});
 	},
