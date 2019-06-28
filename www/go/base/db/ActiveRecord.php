@@ -1349,7 +1349,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$joinCf = !empty($params['joinCustomFields']) && $this->hasCustomFields();
 
 		if($joinCf) {
-			$cfFieldModels = array_filter(\go\core\model\Field::findByEntity($this->entityType()->getId())->all(), function($f) {
+			$cfFieldModels = array_filter(static::getCustomFieldModels(), function($f) {
 				return $f->type != 'MultiSelect'; //temporary hack
 			});
 			

@@ -118,7 +118,7 @@ trait CustomFieldsTrait {
 		if(!isset(self::$customFields)) {
 			self::$customFields = Field::find()
 						->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId')
-						->where(['fs.entityId' => static::entityType()->getId()])->all();
+						->where(['fs.entityId' => static::customFieldsEntityType()->getId()])->all();
 		}
 		
 		return self::$customFields;
@@ -211,18 +211,41 @@ trait CustomFieldsTrait {
 	 * @return string
 	 */
 	public static function customFieldsTableName() {
+
+		$cls = static::customFieldsEntityType()->getClassName();
 		
-		if(is_a(static::class, Entity::class, true)) {
+		if(is_a($cls, Entity::class, true)) {
 		
-			$tables = static::getMapping()->getTables();		
+			$tables = $cls::getMapping()->getTables();		
 			$mainTableName = array_keys($tables)[0];
 		} else
 		{
 			//ActiveRecord
-			$mainTableName = static::model()->tableName();
+			$mainTableName = $cls::model()->tableName();
 		}
 		
 		return $mainTableName.'_custom_fields';
+	}
+
+	/**
+	 * The entity type the custom fields are for.
+	 * 
+	 * Usually this is the static::entityType() but sometimes a model extends another like with filesearch. Then you can override this function:
+	 * 
+	 * ```php
+	 * use CustomFieldsTrait {
+	 * 		customFieldsEntityType as origCustomFieldsEntityType;
+	 * }
+	 * 
+	 * public static function customFieldsEntityType() {
+	 * 		return File2::entityType();
+	 * }
+	 * ```
+	 * 
+	 * @return EntityType
+	 */
+	public static function customFieldsEntityType() {
+		return static::entityType();
 	}
 	
 	/**
