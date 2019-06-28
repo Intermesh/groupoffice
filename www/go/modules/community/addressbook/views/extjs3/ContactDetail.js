@@ -38,10 +38,10 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 				
 				{
 					tpl: new Ext.XTemplate('<div class="go-detail-view-avatar">\
-<div class="avatar {[values.isOrganization ? \'organization\' : \'\']}" style="{[this.getStyle(values.photoBlobId)]}">{[this.getHtml(values.isOrganization)]}</div></div>', 
+<div class="avatar {[values.isOrganization && !values.photoBlobId ? \'organization\' : \'\']}" style="{[this.getStyle(values.photoBlobId)]}">{[this.getHtml(values.isOrganization, values.photoBlobId)]}</div></div>', 
 					{
-						getHtml: function (isOrganization) {
-							return isOrganization ? '<i class="icon">business</i>' : "";
+						getHtml: function (isOrganization, photoBlobId) {
+							return isOrganization && !photoBlobId ? '<i class="icon">business</i>' : "";
 						},
 						getStyle: function (photoBlobId) {
 							return photoBlobId ? 'background-image: url(' + go.Jmap.downloadUrl(photoBlobId) + ')"' : "";
