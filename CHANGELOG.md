@@ -1,3 +1,5 @@
+- Core: Loading mask could stick sometimes
+- Email: Click on email from list that has just been deleted elsewhere forever show the Loading ... pop-up #425
 - Emailcomposer: Insert inline image in composer through the upload button 
   opened a file chooser in which you could only choose folders. 
   This is now changed to be able to choose (image)files.

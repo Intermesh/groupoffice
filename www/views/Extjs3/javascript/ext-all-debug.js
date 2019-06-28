@@ -8235,6 +8235,8 @@ Ext.Element.addMethods(
             
             mask : function(msg, msgCls) {
 
+                console.warn("MAsk", this);
+
                 if(this.masking) {
                     clearTimeout(this.masking);
                 }
@@ -8289,11 +8291,10 @@ Ext.Element.addMethods(
             },
 
             
-            unmask : function() {
+            unmask : function() {                
                 if(this.masking) {
                     clearTimeout(this.masking);
-                    this.masking = false;
-                    return;
+                    this.masking = false;                    
                 }
                 var me      = this,
                     dom     = me.dom,
@@ -8314,6 +8315,9 @@ Ext.Element.addMethods(
 
             
             isMasked : function() {
+                if(this.masking) {
+                    return true;
+                }
                 var m = data(this.dom, 'mask');
                 return m && m.isVisible();
             },
