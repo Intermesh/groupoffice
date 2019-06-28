@@ -1,3 +1,4 @@
+- Comments: Fixed comment permissions and label editing
 - Core: Loading mask could stick sometimes
 - Email: Click on email from list that has just been deleted elsewhere forever show the Loading ... pop-up #425
 - Emailcomposer: Insert inline image in composer through the upload button 
