@@ -49,7 +49,9 @@ class DefaultsiteModule extends \GO\Base\Module {
 				$defaultSite = new \GO\Site\Model\Site();
 				$defaultSite->setAttributes($siteProperties);
 
-				$defaultSite->save();
+				if(!$defaultSite->save()) {
+					throw new \Exception("Could not save website. " . var_export($defaultSite->getValidationErrors(), true));
+				}
 			}
 		}
 		
