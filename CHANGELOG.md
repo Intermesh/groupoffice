@@ -1,3 +1,5 @@
+01-07-2019 6.4.25
+- Core: Fixed upgrade error can't find module core/groups
 - Comments: Fixed comment permissions and label editing
 - Core: Loading mask could stick sometimes
 - Email: Click on email from list that has just been deleted elsewhere forever show the Loading ... pop-up #425
