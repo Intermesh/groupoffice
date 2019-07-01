@@ -1,4 +1,5 @@
 01-07-2019 6.4.25
+- Core: Simplified search. All words will be used with AND instead of OR. A wildcard will be placed after each word. 
 - Core: Fixed upgrade error can't find module core/groups
 - Comments: Fixed comment permissions and label editing
 - Core: Loading mask could stick sometimes
