@@ -74,9 +74,9 @@ GO.mainLayout.on('render', function () {
 		panel.setHeight(dp(500));
 		panel.getEl().alignTo(searchField.getEl(), "tl-bl");
 		
-		// if(searchField.getValue()) {
+		if(searchField.getValue()) {
 			panel.expand();
-		// }
+		}
 			
 	};
 

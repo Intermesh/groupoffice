@@ -60,6 +60,8 @@ go.search.Panel = Ext.extend(Ext.Panel, {
 	},
 	
 	search: function (q) {
+
+		this.expand();
 		
 //
 //		
@@ -73,7 +75,7 @@ go.search.Panel = Ext.extend(Ext.Panel, {
 		this.lastQ = q;
 		var filter = {}, entities = [];
 
-		this.getEl().mask(t("Loading..."));
+		// this.getEl().mask(t("Loading..."));
 		
 		Ext.each(this.entityGrid.getSelectionModel().getSelections(), function (r) {
 			entities.push({
@@ -97,8 +99,8 @@ go.search.Panel = Ext.extend(Ext.Panel, {
 				filter: filter
 			}
 		}).finally(function() {
-			me.getEl().unmask();
-			me.expand();
+			// me.getEl().unmask();
+			// me.expand();
 		}).catch(function(response) {			
 			me.fireEvent("searchexception", this, response);
 			//me.collapse();
