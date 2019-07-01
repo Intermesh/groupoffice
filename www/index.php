@@ -3,6 +3,7 @@
 use go\core\auth\model\Token;
 use go\core\exception\ConfigurationException;
 use go\core\http\Request;
+use go\core\ErrorHandler;
 
 /**
  * Copyright Intermesh
@@ -96,7 +97,10 @@ if(empty($_REQUEST['r']) && PHP_SAPI!='cli'){
 
 } catch(Exception $e) {
   
-  if(!GO()->getDebugger()->enabled && ($e instanceof PDOException || $e instanceof ConfigurationException) &&  !Request::get()->isXHR() && (empty($_REQUEST['r']) || $_REQUEST['r'] != 'maintenance/upgrade')) {
+  if(!GO()->getDebugger()->enabled && !Request::get()->isXHR() && (empty($_REQUEST['r']) || $_REQUEST['r'] != 'maintenance/upgrade')) {
+		
+		ErrorHandler::logException($e);
+
     header('Location: install/');				
     exit();
   } else
