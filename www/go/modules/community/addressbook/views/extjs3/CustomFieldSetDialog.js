@@ -1,9 +1,6 @@
 go.modules.community.addressbook.CustomFieldSetDialog = Ext.extend(go.customfields.FieldSetDialog, {
 	stateId: 'addressbook-custom-field-set-dialog',
 	
-	autoHeight: false,
-	autoScroll: true,
-	height: dp(400),
 	initFormItems: function () {
 		var items = go.modules.community.addressbook.CustomFieldSetDialog.superclass.initFormItems.call(this);
 

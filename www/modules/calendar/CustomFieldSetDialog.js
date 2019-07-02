@@ -1,8 +1,5 @@
 GO.calendar.CustomFieldSetDialog = Ext.extend(go.customfields.FieldSetDialog, {	
-	height: dp(400),
-	autoHeight: false,
-	autoScroll: true,
-	
+
 	initComponent: function() {
 		GO.calendar.CustomFieldSetDialog.superclass.initComponent.call(this);
 		
