@@ -1,3 +1,6 @@
+- Custom fields: Fixed custom fields permissions not editable
+- Comments: couldn't be add by non admin users
+
 02-07-2019 6.4.26
 - Address book: Added organization filter for contacts "org"
 - Address book: configure name sorting by last or first name

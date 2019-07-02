@@ -2543,6 +2543,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		return $this->getPermissionLevel()>=$level;
 	}
 
+	public function hasPermissionLevel($level) {
+		return $this->checkPermissionLevel($level);
+	}
+
 	/**
 	 * Check when the permissions level was before moving the object to a differend
 	 * related ACL object eg. moving contact to different addressbook

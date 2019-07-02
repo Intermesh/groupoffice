@@ -6,6 +6,7 @@ use go\core\jmap\Entity;
 use go\core\orm\EntityType;
 use go\core\util\DateTime;
 use go\core\model\Acl;
+use GO\Base\Db\ActiveRecord;
 
 class Comment extends Entity {
 
@@ -97,14 +98,17 @@ class Comment extends Entity {
 	/**
 	 * Find the entity this comment belongs to.
 	 * 
-	 * @return Entity
+	 * @return Entity|ActiveRecord
 	 */
 	public function findEntity() {
 		$e = EntityType::findById($this->entityTypeId);
 		$cls = $e->getClassName();
-		return $cls::findById($this->entityId);
+		if(is_a($cls, ActiveRecord::class, true)) {
+			return $cls::model()->findByPk($this->entityId);			
+		} else {
+			return $cls::findById($this->entityId);					
+		}
 	}
-
 
 	/**
 	 * Get the permission level of the current user
