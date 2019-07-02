@@ -46,7 +46,9 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 				sort: 'sort', // The parameter name which specifies the column to sort on
 				dir: 'dir'       // The parameter name which specifies the sort direction
 			},
-			proxy: config.entityStore ? new go.data.EntityStoreProxy(config) : new go.data.JmapProxy(config)
+			proxy: config.entityStore ? 
+				new go.data.EntityStoreProxy({entityStore: config.entityStore, fields: config.fields}) :
+				new go.data.JmapProxy({method: config.method, fields: config.fields})
 		}));        
 		
 		this.setup();		

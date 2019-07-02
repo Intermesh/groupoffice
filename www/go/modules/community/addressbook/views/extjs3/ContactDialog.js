@@ -145,6 +145,10 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						entityStore: "Contact",
 						displayField: "name",
 						valueField: 'id',
+						allowNew: {
+							isOrganization: true,
+							addressBookId: go.User.addressBookSettings.defaultAddressBookId
+						},
 						storeBaseParams: {
 							filter: {
 								isOrganization: true
@@ -160,8 +164,9 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						allowBlank: false,
 						listeners: {
 							scope: this,
-							change: function() {
+							change: function(cmp, id) {
 								go.customfields.CustomFields.filterFieldSets(this.formPanel);
+								this.organizationsField.allowNew.addressBookId = id;
 							}
 						}
 					})

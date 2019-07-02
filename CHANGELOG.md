@@ -1,4 +1,5 @@
 - Address book: Added organization filter for contacts "org"
+- Address book: configure name sorting by last or first name
 
 01-07-2019 6.4.25
 - Core: Simplified search. All words will be used with AND instead of OR. A wildcard will be placed after each word. 
