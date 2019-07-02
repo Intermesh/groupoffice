@@ -390,6 +390,14 @@ class Contact extends AclItemEntity {
 											$criteria->where('adr.country', $comparator, $value);
 											
 										})
+										->addText("org", function(Criteria $criteria, $comparator, $value, Query $query) {												
+											if( !$query->isJoined('addressbook_contact', 'org')) {
+												$query->join('core_link', 'l', 'c.id=l.fromId and l.fromEntityTypeId = '.self::entityType()->getId())						
+													->join('addressbook_contact', 'org', 'org.id=l.toId AND l.toEntityTypeId=' . self::entityType()->getId() . ' AND org.isOrganization=true');
+											}
+											$criteria->where('org.name', $comparator, $value);
+											
+										})
 										->addText("city", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_address')) {
 												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "LEFT");
