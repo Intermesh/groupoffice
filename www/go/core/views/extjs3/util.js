@@ -36,6 +36,18 @@ go.util =  (function () {
 				} while(Math.abs(bytes) >= thresh && u < units.length - 1);
 				return bytes.toFixed(1)+' '+units[u];
 		},
+		
+		isEqual : function(a, b) {
+			if(a === b) {
+				return true;
+			}
+			
+			if(Ext.isObject(a) && Ext.isObject(b) && JSON.stringify(a) === JSON.stringify(b) ) {
+				return true;
+			}
+			
+			return false;
+		},
 
 		empty: function (v) {
 
