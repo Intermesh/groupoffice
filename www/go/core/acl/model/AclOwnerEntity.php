@@ -121,6 +121,13 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * Set the ACL
 	 * 
 	 * @param $acl an array with group ID as key and permission level as value. eg. ["2" => 50, "3" => 10]
+	 * 
+	 * @example
+	 * ```
+	 * $addressBook->setAcl([
+	 * 	Group::ID_INTERNAL => Acl::LEVEL_DELETE
+	 * ]);
+	 * ```
 	 */
 	public function setAcl($acl) {		
 		$this->setAcl = $acl;		
