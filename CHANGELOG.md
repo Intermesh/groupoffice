@@ -1,5 +1,8 @@
+02-07-2019 6.4.26
 - Address book: Added organization filter for contacts "org"
 - Address book: configure name sorting by last or first name
+- Address book: Create a new organisation when creating a new contact #426
+- Core: Object values were always posted even if they weren't dirty (Problem with acl's)
 
 01-07-2019 6.4.25
 - Core: Simplified search. All words will be used with AND instead of OR. A wildcard will be placed after each word. 
