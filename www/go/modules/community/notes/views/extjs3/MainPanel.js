@@ -23,7 +23,19 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	initComponent: function () {
 
 		this.createNoteGrid();
-		this.createNoteBookGrid();	
+		
+
+		this.sidePanel = new Ext.Panel({
+			width: dp(300),
+			cls: 'go-sidenav',
+			region: "west",
+			split: true,
+			autoScroll: true,			
+			items: [
+				this.createNoteBookGrid(),
+				this.createFilterPanel()
+			]
+		});
 
 		this.noteDetail = new go.modules.community.notes.NoteDetail({
 			region: 'center',
@@ -48,7 +60,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			narrowWidth: dp(400), //this will only work for panels inside another panel with layout=responsive. Not ideal but at the moment the only way I could make it work
 			items: [
 				this.noteGrid, //first is default in narrow mode
-				this.noteBookGrid
+				this.sidePanel
 			]
 		});
 
@@ -72,13 +84,44 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			scope: this
 		});
 	},
+
+	createFilterPanel: function () {
+		
+		
+		return new Ext.Panel({
+			
+			tbar: [
+				{
+					xtype: 'tbtitle',
+					text: t("Filters")
+				},
+				'->',
+				{
+					xtype: "button",
+					iconCls: "ic-add",
+					handler: function() {
+						var dlg = new go.filter.FilterDialog({
+							entity: "Note"
+						});
+						dlg.show();
+					},
+					scope: this
+				}
+			],
+			items: [
+				this.filterGrid = new go.filter.FilterGrid({
+					filterStore: this.noteGrid.store,
+					entity: "Note"
+				})
+			]
+		});
+		
+		
+	},
 	
 	createNoteBookGrid : function() {
 		this.noteBookGrid = new go.modules.community.notes.NoteBookGrid({
-			region: 'west',
-			cls: 'go-sidenav',
-			width: dp(280),
-			split: true,
+			autoHeight: true,
 			tbar: [{
 					xtype: 'tbtitle',
 					text: t('Notebooks')
@@ -113,6 +156,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		this.noteBookGrid.getSelectionModel().on('selectionchange', this.onNoteBookSelectionChange, this, {buffer: 1}); //add buffer because it clears selection first
 
+		return this.noteBookGrid;
 	},
 	
 	
@@ -198,6 +242,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			go.Router.goto("note/" + record.id);
 		}, this);
 		
+		return this.noteGrid;
 	
 	},
 	

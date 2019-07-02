@@ -13,6 +13,40 @@ go.Modules.register("community", 'notes', {
 				creator: {store: "User", fk: "createdBy"},
 				modifier: {store: "User", fk: "createdBy"}
 			},
+			filters: [
+				{
+					name: 'text',
+					type: "string",
+					multiple: false,
+					title: "Query"
+				},
+				{
+					title: t("Commented at"),
+					name: 'commentedat',
+					multiple: false,
+					type: 'date'
+				},{
+					title: t("Modified at"),
+					name: 'modifiedat',
+					multiple: false,
+					type: 'date'
+				},{
+					title: t("Modified by"),
+					name: 'modifiedBy',
+					multiple: true,
+					type: 'string'
+				},{
+					title: t("Created at"),
+					name: 'createdat',
+					multiple: false,
+					type: 'date'
+				},{
+					title: t("Created by"),
+					name: 'createdby',
+					multiple: true,
+					type: 'string'
+				}
+			],
 			links: [{
 				/**
 				 * Opens a dialog to create a new linked item

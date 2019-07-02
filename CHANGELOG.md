@@ -1,5 +1,7 @@
 - Custom fields: Fixed custom fields permissions not editable
 - Comments: couldn't be add by non admin users
+- Address book / Notes: added commentedat, createdby, modifiedby filters
+- Notes: Added custom filters component
 
 02-07-2019 6.4.26
 - Address book: Added organization filter for contacts "org"
