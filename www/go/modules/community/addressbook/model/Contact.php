@@ -16,6 +16,7 @@ use go\modules\community\addressbook\convert\VCard;
 use function GO;
 use go\core\mail\Message;
 use go\core\TemplateParser;
+use go\core\db\Expression;
 
 /**
  * Contact model
@@ -440,6 +441,21 @@ class Contact extends AclItemEntity {
 										});
 													
 										
+	}
+
+	public static function sort(\go\core\orm\Query $query, array $sort)
+	{
+		if(isset($sort['firstName'])) {
+			$sort['name'] = $sort['firstName'];
+			unset($sort['firstName']);
+		}
+		if(isset($sort['lastName'])) {
+			$dir = $sort['lastName'] == 'ASC' ? 'ASC' : 'DESC';
+			$sort[] = new Expression("IF(c.isOrganization, c.name, c.lastName) " . $dir);
+			unset($sort['lastName']);
+		}
+		
+		return parent::sort($query, $sort);
 	}
 	
 	public static function converters() {

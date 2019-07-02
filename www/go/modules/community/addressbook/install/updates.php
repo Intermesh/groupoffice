@@ -42,3 +42,5 @@ $updates['201905281248'][] = "DELETE FROM core_entity WHERE moduleId = (select i
 $updates['201906181248'][] = "update `addressbook_contact_star` set starred = null where starred = 0;";
 
 $updates['201906181248'][] = "ALTER TABLE `addressbook_contact_star` CHANGE `starred` `starred` TINYINT(1) NULL DEFAULT NULL;";
+
+$updates['201907021042'][] = "ALTER TABLE `addressbook_user_settings` ADD `salutationTemplate` TEXT NOT NULL AFTER `defaultAddressBookId`, ADD `sortBy` ENUM('name','lastName') NOT NULL DEFAULT 'name' AFTER `salutationTemplate`;";

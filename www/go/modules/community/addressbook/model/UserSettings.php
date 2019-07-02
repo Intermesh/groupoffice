@@ -20,9 +20,21 @@ class UserSettings extends Property {
 	 */
 	public $defaultAddressBookId;
 
-	public $salutationTemplate = 'Dear [if {{contact.prefixes}}]{{contact.prefixes}}[else][if !{{contact.gender}}]Ms./Mr.[else][if {{contact.gender}}=="M"]Mr.[else]Ms.[/if][/if][/if] {{contact.lastName}}';
+	public $salutationTemplate;
+
+	public $sortBy = 'name';
 
 	protected static function defineMapping() {
 		return parent::defineMapping()->addTable("addressbook_user_settings", "abs");
+	}
+
+	protected function init()
+	{
+		
+		if(empty($this->salutationTemplate)) {
+			$this->salutationTemplate = 'Dear [if {{contact.prefixes}}]{{contact.prefixes}}[else][if !{{contact.gender}}]Ms./Mr.[else][if {{contact.gender}}=="M"]Mr.[else]Ms.[/if][/if][/if] {{contact.lastName}}';
+		}
+
+		parent::init();
 	}
 }
