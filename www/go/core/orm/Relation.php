@@ -2,9 +2,6 @@
 
 namespace go\core\orm;
 
-use Exception;
-use go\core\db\Query;
-
 /**
  * Relation class
  * 
@@ -12,12 +9,11 @@ use go\core\db\Query;
  */
 class Relation {
 
-	/**
-	 * Indicates if this relation is one to many
-	 * 
-	 * @var boolean 
-	 */
-	public $many = true;
+	const TYPE_HAS_ONE = 0;
+	const TYPE_ARRAY = 1;
+	const TYPE_MAP = 2;
+	const TYPE_SCALAR = 3;
+
 
 	/**
 	 * The name of the relation
@@ -44,9 +40,6 @@ class Relation {
 	 */
 	public $keys;
 
-
-	public $mapped = false;
-
 	/**
 	 * Constructor
 	 * 
@@ -59,7 +52,7 @@ class Relation {
 	 * 
 	 * @param boolean $many Indicates if this relation is one to many
 	 */
-	public function __construct($name, $entityName, array $keys, $many = false) {
+	public function __construct($name, $entityName, array $keys, $type = self::TYPE_HAS_ONE) {
 		$this->name = $name;
 		
 		if(!is_subclass_of($entityName, Property::class, true)) {
@@ -72,6 +65,6 @@ class Relation {
 		
 		$this->entityName = $entityName;
 		$this->keys = $keys;
-		$this->many = $many;
+		$this->type = $type;
 	}
 }
