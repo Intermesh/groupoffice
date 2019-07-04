@@ -31,7 +31,7 @@ GO.email.MessagesGrid = function(config){
 		{
 			id:'icon',
 			header:"&nbsp;",
-			width:dp(32),
+			width:dp(24),
 			dataIndex: 'icon',
 			renderer: this.renderIcon,
 			hideable:false,
