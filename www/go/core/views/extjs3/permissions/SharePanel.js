@@ -107,7 +107,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 						return '<div class="user"><div class="avatar" style="' + style + '">' + html + '</div>' +
 							'<div class="wrap">'+
 								'<div class="displayName">' + value + '</div>' +
-								'<small class="username">' + memberStr + '</small>' +
+								'<small class="username">' + Ext.util.Format.htmlEncode(memberStr) + '</small>' +
 							'</div>'+
 							'</div>';
 					}
