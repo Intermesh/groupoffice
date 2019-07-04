@@ -19,6 +19,12 @@ class Language extends Controller {
 	const DELIMITER = ';';
 	const ENCLOSURE = '"';
 
+	protected function authenticate() {  
+    if (!GO()->getAuthState()->isAuthenticated()) {			
+      throw new Exception(401, "Unauthorized");
+		}  	
+	}
+
 	public function export($params) {
 		GO()->getLanguage()->setLanguage($params['language']);
 
