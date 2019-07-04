@@ -100,7 +100,7 @@ class Extjs3 {
 
 			$viewRoot = Environment::get()->getInstallFolder()->getFolder('views/Extjs3');
 
-			$extLang = $viewRoot->getFile('ext/src/locale/ext-lang-' . $extjsLang . '.js');
+			$extLang = $viewRoot->getFile('javascript/ext-locale/ext-lang-' . $extjsLang . '.js');
 			if ($extLang->exists()) {
 				$str .= $extLang->getContents();
 			}
