@@ -580,7 +580,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 						items: [
 							{
 								xtype: 'menutextitem',
-								text: go.User.displayName,
+								text: Ext.util.Format.htmlEncode(go.User.displayName),
 								cls: 'go-display-name'
 							}, '-', {
 								text: t("My account"),
