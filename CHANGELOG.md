@@ -1,4 +1,5 @@
 - Core: Enable / disable Add linked item buttons based on permissions
+- Core: Update Czech translation
 
 24-06-2019 6.3.80
 - Calendar: Fixed error where appointment dialog wouldn't load
