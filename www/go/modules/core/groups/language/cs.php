@@ -21,4 +21,5 @@ return array (
   'Use the button below to apply the above to existing groups. WARNING: This will erase all custom permissions on groups.' => 'Použitím tlačítka níže, můžete nastavit oprávnění pro již existující skupiny. UPOZORNĚNÍ: Tímto krokem smažete všechny individuální oprávnění ve skupinách.',
   'Apply to all' => 'Aplikovat na všechny skupiny',
   'Are you sure you want to reset all group permissions? This can\'t be undone.' => 'Opravdu si přejete přenastavit všechna oprávnění skupin? Tento krok již nelze vzít zpět.',
+  'Members of the groups below can access a new group when it is created. These groups can share items with users and user groups that they are not members of.' => 'Členové níže uvedených skupin mají přístup k nové skupině, pokud je vytvořena. Tyto skupiny mohou sdílet položky s uživateli a skupinami uživatelů, kteří nejsou členy.',
 );

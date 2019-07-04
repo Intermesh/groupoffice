@@ -76,4 +76,8 @@ return array (
   'Suffix' => 'Přípona',
   'Ok' => 'OK',
   'Database column name' => 'Název sloupce v databázi',
+  'undef' => 'neznámé',
+  'strGroup' => 'Skupina',
+  'Changes you make here will take affect after you reload Group-Office in your browser.' => 'Změny, které jste provedly, budou aplikovány až po znovu načtení Group-Office ve Vašem prohlížeči.',
+  'Menu' => 'Navigace',
 );

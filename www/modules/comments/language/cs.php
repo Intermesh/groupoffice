@@ -14,4 +14,5 @@ return array (
   'name' => 'Komentáře',
   'description' => 'Umožňuje přidávat komentáře do ostatních modulů',
   'Comments' => 'Komentáře',
+  '{author} wrote at {date}' => '{autor} napsal v {datum}',
 );

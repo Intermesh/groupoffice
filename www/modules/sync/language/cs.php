@@ -24,4 +24,5 @@ return array (
   'Synchronization' => 'Synchronizace',
   'Delete older events and tasks at the client (they will be kept in Group-Office)' => 'Odstranit staré události z klienta (budou i nadále uchovány v {product_name})',
   'Model' => 'Model',
+  'Notebooks' => 'Notebooky',
 );

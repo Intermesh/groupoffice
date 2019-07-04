@@ -36,4 +36,8 @@ return array (
   'The Group-Office password was incorrect.' => 'Heslo pro {product_name} je chybné.',
   'Your SMIME key password matches your Group-Office password. This is prohibited for security reasons!' => 'Vaše heslo pro SMIME klíč je stejné jako {product_name} heslo. To je z bezpečnostních důvodů zakázáno!',
   'This message is encrypted.' => 'Tato zpráva je zašifrována.',
+  'Add to SMIME certificates' => 'Přidat do SMIME certifikátu',
+  'Certificate added' => 'Certifikát byl přidán',
+  'SMIME certificate was added for' => 'SMIME certifikát byl přidán pro',
+  'Could not add SMIME certificate for' => 'Nelze přidat SMIME certifikát pro',
 );
