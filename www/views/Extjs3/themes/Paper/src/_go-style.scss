@@ -252,7 +252,7 @@ a {
 		@extend %font-body1;
 		text-align:right;
 		color:white;
-		margin-top:dp(4);
+		padding-top: dp(4);
 	}
 	input {
 		background-color: inherit;
@@ -260,9 +260,9 @@ a {
 		border:1px solid currentColor;
 	}
 	.x-form-trigger{
-		color:currentColor;
+		color:white;
 		&:before{
-			color:inherit;
+			color:white;
 		}
 	}
 	

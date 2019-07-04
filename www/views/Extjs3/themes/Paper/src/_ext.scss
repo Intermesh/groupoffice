@@ -575,7 +575,7 @@
 .x-form-label-left label.x-form-item-label{
 	@extend %font-label;
 	line-height: dp(16);
-	padding: dp(8) 0 dp(4) 0;
+	padding: dp(8) dp(8) dp(4) 0;
 }
 
 
