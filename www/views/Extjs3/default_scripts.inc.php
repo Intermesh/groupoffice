@@ -241,7 +241,7 @@ if ($cacheFile->exists()) {
 //        $js .= $script->getContents()."\n;\n";
 //        
 //     
-				echo '<script type="text/javascript" src="'.$relPath. '?mtime='.$script->getModifiedAt()->format("U").'"></script>' . "\n";
+				echo '<script type="text/javascript" src="'.$relPath. '?mtime='.$script->getModifiedAt().'"></script>' . "\n";
 			}
 //      else if($script instanceof \go\core\util\Url) {
 //				echo '<script type="text/javascript" src="'.$script.'"></script>' . "\n";
