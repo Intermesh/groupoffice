@@ -375,7 +375,7 @@ class Connection {
 	 * 
 	 * @see insert()
 	 * @param string $tableName
-	 * @param array|Query $data Key value array or select query
+	 * @param array|Query $data Key value array, array of key value arrays for multi insert or select query
 	 * @param string[] $columns If $data is a query object then you can supply the 
 	 *	selected columns with this parameter. If not given all columns must be 
 	 *	selected in the correct order.

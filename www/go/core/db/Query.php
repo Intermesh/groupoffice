@@ -426,7 +426,6 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 
 	public function __toString() {
 		$queryBuilder = new QueryBuilder($this->getDbConnection());
-		$queryBuilder->debug = true;
 		$build = $queryBuilder->buildSelect($this);
 		
 		return $queryBuilder->debugBuild($build);

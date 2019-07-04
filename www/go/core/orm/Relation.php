@@ -2,6 +2,8 @@
 
 namespace go\core\orm;
 
+use go\core\db\Table;
+
 /**
  * Relation class
  * 
@@ -40,6 +42,8 @@ class Relation {
 	 */
 	public $keys;
 
+	public $tableName;
+
 	/**
 	 * Constructor
 	 * 
@@ -52,9 +56,15 @@ class Relation {
 	 * 
 	 * @param boolean $many Indicates if this relation is one to many
 	 */
-	public function __construct($name, $entityName, array $keys, $type = self::TYPE_HAS_ONE) {
+	public function __construct($name, array $keys, $type = self::TYPE_HAS_ONE) {
 		$this->name = $name;
 		
+		
+		$this->keys = $keys;
+		$this->type = $type;
+	}
+
+	public function setEntityName ($entityName) {
 		if(!is_subclass_of($entityName, Property::class, true)) {
 			throw new \Exception($entityName . ' must extend '. Property::class);
 		}
@@ -64,7 +74,16 @@ class Relation {
 		}
 		
 		$this->entityName = $entityName;
-		$this->keys = $keys;
-		$this->type = $type;
+
+		return $this;
 	}
+
+	public function setTableName($name) 
+	{
+		$this->tableName = $name;
+
+		return $this;
+	}
+
+
 }

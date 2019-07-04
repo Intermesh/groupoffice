@@ -153,23 +153,31 @@ class QueryBuilder {
 			$this->buildBindParameters = array_merge($this->buildBindParameters, $build['params']);
 		} else {
 
-			$tags = [];
-			foreach ($data as $colName => $value) {
-				
-				if($value instanceof Expression) {
-					$tags[] = (string) $value;
-				} else
-				{				
-					$paramTag = $this->getParamTag();
-					$tags[] = $paramTag;
-					$this->addBuildBindParameter($paramTag, $value, $this->tableName, $colName);
-				}
+			if(!isset($data[0])) {
+				$data = [$data];
 			}
 
-			$sql .= " (\n\t`" . implode("`,\n\t`", array_keys($data)) . "`\n)\n" .
-							"VALUES (\n\t" . implode(",\n\t", $tags) . "\n)";
+			$sql .= " (\n\t`" . implode("`,\n\t`", array_keys($data[0])) . "`\n)\n" .
+				"VALUES \n";
+
+			foreach($data as $record) {
+				$tags = [];
+				foreach ($record as $colName => $value) {
+					
+					if($value instanceof Expression) {
+						$tags[] = (string) $value;
+					} else
+					{				
+						$paramTag = $this->getParamTag();
+						$tags[] = $paramTag;
+						$this->addBuildBindParameter($paramTag, $value, $this->tableName, $colName);
+					}
+				}
+
+				$sql .= "(\n\t" . implode(",\n\t", $tags) . "\n), ";
+			}
 		}
-		return ['sql' => $sql, 'params' => $this->buildBindParameters];
+		return ['sql' => substr($sql, 0, -2), 'params' => $this->buildBindParameters];
 	}
 
 	public function buildUpdate($tableName, $data, Query $query) {

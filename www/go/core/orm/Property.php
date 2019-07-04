@@ -19,6 +19,7 @@ use PDOException;
 use ReflectionClass;
 use function GO;
 use go\core\db\Query as GoQuery;
+use go\core\db\Table;
 
 /**
  * Property model
@@ -158,10 +159,7 @@ abstract class Property extends Model {
 		foreach ($this->getFetchedRelations() as $relation) {
 			$cls = $relation->entityName;
 
-			$where = [];
-			foreach ($relation->keys as $from => $to) {
-				$where[$to] = $this->$from;
-			}
+			$where = $this->buildRelationWhere($relation);
 
 			switch($relation->type) {
 
@@ -190,10 +188,26 @@ abstract class Property extends Model {
 				break;
 
 				case Relation::TYPE_SCALAR:
-					$this->{$relation->name} = ['todo'];
+					$key = $this->getScalarKey($relation);
+					$scalar = (new GoQuery)->selectSingleValue($key)->from($relation->tableName)->where($where)->all();
+					$this->{$relation->name} = $scalar;
 				break;
 			}
 		}
+	}
+
+	private function buildRelationWhere(Relation $relation) {
+		$where = [];
+		foreach ($relation->keys as $from => $to) {
+			$where[$to] = $this->$from;
+		}
+		return $where;
+	}
+	private function getScalarKey(Relation $relation) {
+		$table = Table::getInstance($relation->tableName, GO()->getDbConnection());
+		$diff = array_diff($table->getPrimaryKey(), $relation->keys);
+
+		return array_shift($diff);
 	}
 
 	/**
@@ -939,10 +953,9 @@ abstract class Property extends Model {
 		$cls = $relation->entityName;
 		$tables = $cls::getMapping()->getTables();
 		$first = array_shift($tables);
-		$where = [];
-		foreach($relation->keys as $from => $to) {
-			$where[$to] = $this->$from;
-		}			
+	
+		$where = $this->buildRelationWhere($relation);
+
 		$query = new GoQuery();
 		$query->where($where)->debug();
 
@@ -965,6 +978,30 @@ abstract class Property extends Model {
 			}
 		}
 		\GO()->getDbConnection()->delete($first->getName(), $query)->execute();	
+	}
+
+	private function saveRelatedScalar(Relation $relation) {
+		$modified = $this->getModified([$relation->name]);
+		if(empty($modified)) {
+			return true;
+		}
+
+		$where = $this->buildRelationWhere($relation);
+
+		$key = $this->getScalarKey($relation);
+
+		$query = (new GoQuery())->where($where)->andWhere($key, 'NOT IN', $this->{$relation->name});
+
+		GO()->getDbConnection()->delete($relation->tableName, $query)->execute();
+
+		$data = array_map(function($v) use($key, $where) {
+			return array_merge($where, [$key => $v]);
+		}, $this->{$relation->name});
+
+		GO()->getDbConnection()->insertIgnore($relation->tableName, $data)->execute();
+
+		return true;
+
 	}
 
 	private function saveRelatedMap(Relation $relation) {		
