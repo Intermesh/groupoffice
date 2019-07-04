@@ -395,13 +395,13 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 			disabled: true,
 			items: [
 				'->',
-				{
+				this.editBtn = new Ext.Button({
 					itemId: "edit",
 					iconCls: 'ic-edit',
 					tooltip: t("Edit"),
 					handler: this.editHandler,
 					scope: this
-				},
+				}),
 				
 				new go.detail.addButton({			
 					detailView: this
@@ -433,7 +433,8 @@ GO.addressbook.ContactDetail = Ext.extend(GO.DetailView, {
 			}
 		}
 		
-		this.mergeButton.setDisabled(this.data.permissionLevel < GO.permissionLevels.write);
+		this.editBtn.setDisabled(this.data.permission_level < GO.permissionLevels.write);
+		this.mergeButton.setDisabled(this.data.permission_level < GO.permissionLevels.write);
 		
 		GO.addressbook.ContactDetail.superclass.onLoad.call(this);
 	}
