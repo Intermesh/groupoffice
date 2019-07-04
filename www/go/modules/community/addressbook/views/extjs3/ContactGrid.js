@@ -104,7 +104,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 							name = record.get('name');
 						}
 
-						return '<div class="avatar ' + cls + '" style="' + style + '">'+content+'</div>' + name;
+						return '<div class="avatar ' + cls + '" style="' + style + '">'+content+'</div>' + Ext.util.Format.htmlEncode(name);
 					}
 				},
 				{

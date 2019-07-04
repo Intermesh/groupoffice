@@ -42082,7 +42082,7 @@ Ext.form.ComboBox = Ext.extend(Ext.form.TriggerField, {
 
             if(!this.tpl){
                 
-                this.tpl = '<tpl for="."><div class="'+cls+'-item">{' + this.displayField + '}</div></tpl>';
+                this.tpl = '<tpl for="."><div class="'+cls+'-item">{[fm.htmlEncode(values["' + this.displayField + '"] || "" )]}</div></tpl>';
                 
             }
 
@@ -47591,7 +47591,6 @@ Ext.grid.GridView = Ext.extend(Ext.util.Observable, {
 
             rowIndex = j + startRow;
 
-            
             for (i = 0; i < colCount; i++) {
                 column = columns[i];
                 
@@ -47599,7 +47598,20 @@ Ext.grid.GridView = Ext.extend(Ext.util.Observable, {
                 meta.css   = i === 0 ? 'x-grid3-cell-first ' : (i == last ? 'x-grid3-cell-last ' : '');
                 meta.attr  = meta.cellAttr = '';
                 meta.style = column.style;
-                meta.value = column.renderer.call(column.scope, record.data[column.name], meta, record, rowIndex, i, store);
+
+                //Merijn: htmlEncode string types en relations to prevent XSS.
+                var col = store.fields.item(column.name), v = record.data[column.name];
+                if(col) {
+                    var dataType = col.type.type, v;
+                    if((dataType == "auto" || dataType == "string") && Ext.isString(v)) {    
+                        v = Ext.util.Format.htmlEncode(v);
+                    } else if(col.type.isRelation) {
+                                                
+                        v = go.util.Format.htmlEncode(v);                                    
+                    }
+                }
+                
+                meta.value = column.renderer.call(column.scope, v, meta, record, rowIndex, i, store);
 
                 if (Ext.isEmpty(meta.value)) {
                     meta.value = '&#160;';
