@@ -34,6 +34,23 @@
 	};
 	
 	go.util.Format = {
+
+		htmlEncode  : function(v) {
+
+			if(Ext.isArray(v)) {
+				for(var i = 0, l = v.length; i < l; i++) {
+					v[i] = this.htmlEncode(v[i]);
+				}		
+			} else if(Ext.isObject(v)) {
+				for(var key in v) {
+					v[key] = this.htmlEncode(v[key]);
+				}
+			} else if(Ext.isString(v)){
+				v = Ext.util.Format.htmlEncode(v);
+			}
+
+			return v;
+		},
 		
 		dateFormats: new Ext.data.ArrayStore({
 						fields: ['format', 'label'],

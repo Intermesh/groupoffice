@@ -18,6 +18,8 @@ use PDO;
 use PDOException;
 use ReflectionClass;
 use function GO;
+use go\core\db\Query as GoQuery;
+use go\core\db\Table;
 
 /**
  * Property model
@@ -157,29 +159,55 @@ abstract class Property extends Model {
 		foreach ($this->getFetchedRelations() as $relation) {
 			$cls = $relation->entityName;
 
-			$where = [];
-			foreach ($relation->keys as $from => $to) {
-				$where[$to] = $this->$from;
-			}			
-			if($relation->mapped) {
-				$values = $cls::internalFind()->andWhere($where)->all();
-				if(!count($values)) {
-					$values = new \stdClass;
-				} else{
-					$o = [];
-					foreach($values as $v) {
-						$o[$this->buildMapKey($v, $relation)] = $v;
+			$where = $this->buildRelationWhere($relation);
+
+			switch($relation->type) {
+
+				case Relation::TYPE_HAS_ONE:
+					$prop = $this->isNew() ? null : $cls::internalFind()->andWhere($where)->single();				
+					$this->{$relation->name} = $prop ? $prop : null;
+				break;
+
+				case Relation::TYPE_ARRAY:
+					$props = $this->isNew() ? [] : $cls::internalFind()->andWhere($where)->all();
+					$this->{$relation->name} = $props;
+				break;
+
+				case Relation::TYPE_MAP:
+					$values = $this->isNew() ? [] : $cls::internalFind()->andWhere($where)->all();
+					if(!count($values)) {
+						$values = new \stdClass;
+					} else{
+						$o = [];
+						foreach($values as $v) {
+							$key = $this->buildMapKey($v, $relation);
+							$o[$key] = $v;
+						}
+						$this->{$relation->name} = $o;
 					}
-					$this->{$relation->name} = $o;
-				}
-			} else if ($relation->many) {
-				$props = $this->isNew() ? [] : $cls::internalFind()->andWhere($where)->all();
-				$this->{$relation->name} = $props;
-			} else if(!$this->isNew()){
-				$prop = $cls::internalFind()->andWhere($where)->single();				
-				$this->{$relation->name} = $prop ? $prop : null;
+				break;
+
+				case Relation::TYPE_SCALAR:
+					$key = $this->getScalarKey($relation);
+					$scalar = (new GoQuery)->selectSingleValue($key)->from($relation->tableName)->where($where)->all();
+					$this->{$relation->name} = $scalar;
+				break;
 			}
 		}
+	}
+
+	private function buildRelationWhere(Relation $relation) {
+		$where = [];
+		foreach ($relation->keys as $from => $to) {
+			$where[$to] = $this->$from;
+		}
+		return $where;
+	}
+	private function getScalarKey(Relation $relation) {
+		$table = Table::getInstance($relation->tableName, GO()->getDbConnection());
+		$diff = array_diff($table->getPrimaryKey(), $relation->keys);
+
+		return array_shift($diff);
 	}
 
 	/**
@@ -187,10 +215,18 @@ abstract class Property extends Model {
 	 * 
 	 */
 	private function buildMapKey(Property $v, Relation $relation) {
-		$pk = array_diff($v->getPrimaryKey(), array_values($relation->keys));
+
+		$pk = $v->getPrimaryKey();
+
+		// //If a mapped relation is only a primary key (link model) then this model can be represented as a boolean.
+		// //For example $group->users = [1 => [1, 3]] can be shown as [1 => true].
+		// $fetchProps = array_diff($v->getDefaultFetchProperties(), $pk);
+		// $asBoolean = empty($fetchProps);
+
+		$diff = array_diff($pk, array_values($relation->keys));
 
 		$id = [];
-		foreach($pk as $field) {
+		foreach($diff as $field) {
 			$id[] = $v->$field;
 		}
 
@@ -798,18 +834,36 @@ abstract class Property extends Model {
 	 */
 	private function saveRelatedProperties() {
 		foreach ($this->getFetchedRelations() as $relation) {
-			if ($relation->many) {
-				if (!$this->saveRelatedHasMany($relation)) {
-					$this->setValidationError($relation->name, ErrorCode::RELATIONAL, null, ['validationErrors' => $this->relatedValidationErrors, 'index' => $this->relatedValidationErrorIndex]);
-					return false;
-				}
-			} else {
-				if (!$this->saveRelatedHasOne($relation)) {
-					$this->setValidationError($relation->name, ErrorCode::RELATIONAL, null, ['validationErrors' => $this->relatedValidationErrors]);
-					return false;
-				}
-			}
 
+			switch($relation->type) {
+				case Relation::TYPE_HAS_ONE:
+					if (!$this->saveRelatedHasOne($relation)) {
+						$this->setValidationError($relation->name, ErrorCode::RELATIONAL, null, ['validationErrors' => $this->relatedValidationErrors, 'index' => $this->relatedValidationErrorIndex]);
+						return false;
+					}
+				break;
+
+				case Relation::TYPE_ARRAY: 
+					if (!$this->saveRelatedArray($relation)) {
+						$this->setValidationError($relation->name, ErrorCode::RELATIONAL, null, ['validationErrors' => $this->relatedValidationErrors, 'index' => $this->relatedValidationErrorIndex]);
+						return false;
+					}
+				break;
+
+				case Relation::TYPE_MAP: 
+					if (!$this->saveRelatedMap($relation)) {
+						$this->setValidationError($relation->name, ErrorCode::RELATIONAL, null, ['validationErrors' => $this->relatedValidationErrors, 'index' => $this->relatedValidationErrorIndex]);
+						return false;
+					}
+				break;
+
+				case Relation::TYPE_SCALAR: 
+					if (!$this->saveRelatedScalar($relation)) {
+						$this->setValidationError($relation->name, ErrorCode::RELATIONAL, null, ['validationErrors' => $this->relatedValidationErrors, 'index' => $this->relatedValidationErrorIndex]);
+						return false;
+					}
+				break;
+			}
 		}
 		return true;
 	}
@@ -853,10 +907,8 @@ abstract class Property extends Model {
 	 */
 	private $relatedValidationErrors = [];
 
-	private function saveRelatedHasMany(Relation $relation) {
-		
-		
-		//remove models that are not present in	
+	private function saveRelatedArray(Relation $relation) {
+	
 		$modified = $this->getModified([$relation->name]);
 		if(empty($modified)) {
 			return true;
@@ -867,39 +919,106 @@ abstract class Property extends Model {
 		$this->relatedValidationErrorIndex = 0;
 
 
-		if(!$relation->mapped) {
-			//arrays will always be replaced entirely.
-			//So we delete them with one query and set all models to be inserted as new records.
-			$cls = $relation->entityName;
-			$tables = $cls::getMapping()->getTables();
-			$first = array_shift($tables);
-			$where = [];
-			foreach($relation->keys as $from => $to) {
-				$where[$to] = $this->$from;
-			}			
-			\GO()->getDbConnection()->delete($first->getName(), $where)->execute();		
-			
-			//set state to new for all models. Models could have been saved if save() is called multiple times.
-			$models = array_map(function($model) {
-				return $model->internalCopy();
-			}, $models);
-			
-		} else{
-			if (isset($modified[$relation->name][1])) {			
-				foreach ($modified[$relation->name][1] as $oldProp) {
-					
-					//if not in current value then delete it.
-					//objects are compared by reference. 
-					if (!in_array($oldProp, $models) && !$oldProp->internalDelete()) {
-						$this->relatedValidationErrors = $oldProp->getValidationErrors();
-						return false;
-					}
-				}
-			}
-		}
+		$this->removeRelated($relation, $models);
+		
+		//set state to new for all models. Models could have been saved if save() is called multiple times.
+		$models = array_map(function($model) {
+			return $model->internalCopy();
+		}, $models);		
 		
 		$this->{$relation->name} = [];
-		foreach ($models as &$newProp) {
+		foreach ($models as $newProp) {
+			
+			//Check for invalid input
+			if(!($newProp instanceof Property)) {
+				throw new \Exception("Invalid value given for '". $relation->name ."'. Should be a GO\Orm\Property");
+			}
+			
+			$this->applyRelationKeys($relation, $newProp);
+			if (!$newProp->internalSave()) {
+				$this->relatedValidationErrors = $newProp->getValidationErrors();
+				return false;
+			}
+
+			$this->savedPropertyRelations[] = $newProp;
+			$this->relatedValidationErrorIndex++;
+
+			$this->{$relation->name}[] = $newProp;
+		}	
+
+		return true;
+	}
+
+	private function removeRelated(Relation $relation, array $models) {
+		$cls = $relation->entityName;
+		$tables = $cls::getMapping()->getTables();
+		$first = array_shift($tables);
+	
+		$where = $this->buildRelationWhere($relation);
+
+		$query = new GoQuery();
+		$query->where($where)->debug();
+
+		if($relation->type == Relation::TYPE_MAP) {
+		
+			$keepKeys = new Criteria();
+			foreach ($models as $keep) {
+
+				if($keep === null) {
+					//deleted model
+					continue;
+				}
+
+				if(!$keep->isNew()) {
+					$keepKeys->orWhere($keep->primaryKeyValues());
+				}
+			}
+			if($keepKeys->hasConditions()) {
+				$query->andWhereNot($keepKeys);
+			}
+		}
+		\GO()->getDbConnection()->delete($first->getName(), $query)->execute();	
+	}
+
+	private function saveRelatedScalar(Relation $relation) {
+		$modified = $this->getModified([$relation->name]);
+		if(empty($modified)) {
+			return true;
+		}
+
+		$where = $this->buildRelationWhere($relation);
+
+		$key = $this->getScalarKey($relation);
+
+		$query = (new GoQuery())->where($where)->andWhere($key, 'NOT IN', $this->{$relation->name});
+
+		GO()->getDbConnection()->delete($relation->tableName, $query)->execute();
+
+		$data = array_map(function($v) use($key, $where) {
+			return array_merge($where, [$key => $v]);
+		}, $this->{$relation->name});
+
+		GO()->getDbConnection()->insertIgnore($relation->tableName, $data)->execute();
+
+		return true;
+
+	}
+
+	private function saveRelatedMap(Relation $relation) {		
+		
+		$modified = $this->getModified([$relation->name]);
+		if(empty($modified)) {
+			return true;
+		}
+
+		//copy for overloaded properties because __get can't return by reference because we also return null sometimes.
+		$models = $this->{$relation->name} ?? [];		
+		$this->relatedValidationErrorIndex = 0;
+		
+		$this->removeRelated($relation, $models);		
+		
+		$this->{$relation->name} = [];
+		foreach ($models as $newProp) {
 			
 			if($newProp === null) {
 				//deleted model
@@ -919,13 +1038,8 @@ abstract class Property extends Model {
 
 			$this->savedPropertyRelations[] = $newProp;
 			$this->relatedValidationErrorIndex++;
-
-			if(!$relation->mapped) {
-				$this->{$relation->name}[] = $newProp;
-			} else
-			{
-				$this->{$relation->name}[$newProp->id()] = $newProp;
-			}
+			
+			$this->{$relation->name}[$newProp->id()] = $newProp;
 		}	
 
 		return true;
@@ -1311,21 +1425,32 @@ abstract class Property extends Model {
 		$relation = static::getMapping()->getRelation($propName);
 		if ($relation) {
 			
-			if(!$relation->many && isset($value) && isset($this->$propName)) {				
-				//if a has one relation exists then apply the new values to the existing property instead of creating a new one.
-				return $this->$propName->setValues($value);
-			} else {
-				if($relation->mapped) {
-					return $this->patch($relation, $propName, $value);
-				} else if($relation->many) {
+			switch($relation->type) {
+
+				case Relation::TYPE_HAS_ONE:
+					if(isset($value) && isset($this->$propName)) {
+						//if a has one relation exists then apply the new values to the existing property instead of creating a new one.
+						return $this->$propName->setValues($value);
+					} else {
+						return $this->internalNormalizeRelation($relation, $value);
+					}	
+				break;
+
+				case Relation::TYPE_ARRAY:
 					foreach($value as $key => $item) {
 						$value[$key] = $this->internalNormalizeRelation($relation, $item);
 					}
 					return $value;
-				} else{
-					return $this->internalNormalizeRelation($relation, $value);
-				}			
-			}			
+				break;
+
+				case Relation::TYPE_MAP:
+					return $this->patch($relation, $propName, $value);
+				break;
+
+				case Relation::TYPE_SCALAR:
+					return $value;
+				break;
+			}
 		}
 
 		$column = static::getMapping()->getColumn($propName);

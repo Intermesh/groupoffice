@@ -401,7 +401,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 			
 			var firstAbNode = this.addressBookTree.getRootNode().childNodes[1];
 			if (firstAbNode) {
-				this.addAddressBookId = go.User.addressBookSettings ? go.User.addressBookSettings.defaultAddressBookId : firstAbNode.attributes.data.id;
+				this.addAddressBookId = go.User.addressBookSettings && go.User.addressBookSettings.defaultAddressBookId ? go.User.addressBookSettings.defaultAddressBookId : firstAbNode.attributes.data.id;
 			} else
 			{
 				this.addButton.setDisabled(true);

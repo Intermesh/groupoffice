@@ -99,7 +99,7 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 
 	protected function internalDelete()
 	{
-		if(!Contact::find(['id'])->where(['addressBookId' => $this->id])->delete()) {
+		if(!Contact::find(['id', 'addressBookId'])->where(['addressBookId' => $this->id])->delete()) {
 			return false;
 		}
 		

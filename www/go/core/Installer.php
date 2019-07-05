@@ -87,6 +87,10 @@ class Installer {
 		// Fix chicken / egg problem for acl->entityTypeId
 		Group::check();
 		GoCoreModule::check();
+
+		$tempAuthState = new TemporaryState();
+		$tempAuthState->setUserId(1);
+		GO()->setAuthState($tempAuthState);
 		
 		$this->installEmailTemplate();
 

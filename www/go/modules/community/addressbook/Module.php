@@ -10,7 +10,10 @@ use go\modules\community\addressbook\model\Contact;
 use go\modules\community\addressbook\model\UserSettings;
 use go\core\model\Link;
 use go\core\model\User;
-							
+use go\modules\community\addressbook\model\AddressBook;
+use go\core\model\Group;
+use go\core\model\Acl;
+
 /**						
  * @copyright (c) 2018, Intermesh BV http://www.intermesh.nl
  * @author Merijn Schering <mschering@intermesh.nl>
@@ -65,6 +68,18 @@ class Module extends core\Module {
 	
 	public static function onMap(Mapping $mapping) {
 		$mapping->addRelation('addressBookSettings', UserSettings::class, ['id' => 'userId'], false);
+	}
+
+	protected function afterInstall(\go\core\model\Module $model)
+	{
+		$addressBook = new AddressBook();
+		$addressBook->name = GO()->t("Shared", 'community', 'addressbook');
+		$addressBook->setAcl([
+			Group::ID_INTERNAL => Acl::LEVEL_DELETE
+		]);
+		$addressBook->save();
+
+		return parent::afterInstall($model);
 	}
 							
 }

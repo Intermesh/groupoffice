@@ -481,20 +481,51 @@ abstract class Entity extends Property {
 						});
 						
 		if (static::getMapping()->getColumn('modifiedAt')) {
-			$filters->addDate("modified", function(Criteria $criteria, $comparator, $value) {				
+			$filters->addDate("modifiedAt", function(Criteria $criteria, $comparator, $value) {				
 				$criteria->where('modifiedAt', $comparator, $value);								
+			});
+		}
+
+
+		if (static::getMapping()->getColumn('modifiedBy')) {
+			$filters->addText("modifiedBy", function(Criteria $criteria, $comparator, $value, Query $query) {				
+				if(!$query->isJoined('core_user', 'modifier')) {
+					$query->join('core_user','modifier', 'modifier.id = '. $query->getTableAlias() .'.modifiedBy');
+				}
+	
+				$criteria->where('modifier.displayName', $comparator, $value);					
 			});
 		}
 		
 		if (static::getMapping()->getColumn('createdAt')) {
-			$filters->addDate("created", function(Criteria $criteria, $comparator, $value) {				
+			$filters->addDate("createdAt", function(Criteria $criteria, $comparator, $value) {				
 				$criteria->where('createdAt', $comparator, $value);								
 			});
 		}
+
+
+		if (static::getMapping()->getColumn('createdBy')) {
+			$filters->addText("createdBy", function(Criteria $criteria, $comparator, $value, Query $query) {				
+				if(!$query->isJoined('core_user', 'creator')) {
+					$query->join('core_user','creator', 'creator.id = '. $query->getTableAlias() .'.createdBy');
+				}
+	
+				$criteria->where('creator.displayName', $comparator, $value);					
+			});
+		}
+
 		
 		if(method_exists(static::class, 'defineCustomFieldFilters')) {
 			static::defineCustomFieldFilters($filters);
 		}
+		
+		$filters->addDate('commentedAt', function(Criteria $criteria, $comparator, $value, Query $query) {
+			if(!$query->isJoined('comments_comment', 'comment')) {
+				$query->join('comments_comment','comment', 'comment.entityId = '. $query->getTableAlias() .'.id AND comment.entityTypeId=' . static::entityType()->getId());
+			}
+
+			$criteria->where('comment.modifiedAt', $comparator, $value);					
+		});
 
 		static::fireEvent(self::EVENT_FILTER, $filters);
 		

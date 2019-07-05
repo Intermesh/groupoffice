@@ -1,5 +1,12 @@
+- Core: Core / Extjs language was missing
+- Core: Language download button only worked when dev module is installed. This is no longer necessary.
+
+02-07-2019 6.4.27
+- Core: Install without ioncube or license failed
 - Custom fields: Fixed custom fields permissions not editable
 - Comments: couldn't be add by non admin users
+- Address book / Notes: added commentedat, createdby, modifiedby filters
+- Notes: Added custom filters component
 
 02-07-2019 6.4.26
 - Address book: Added organization filter for contacts "org"

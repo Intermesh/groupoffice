@@ -172,7 +172,8 @@ class Mapping {
 	 * @return $this
 	 */
 	public function addRelation($name, $entityName, array $keys, $many = true) {
-		$this->relations[$name] = new Relation($name, $entityName, $keys, $many);
+		$this->relations[$name] = new Relation($name, $keys, $many ? Relation::TYPE_ARRAY : Relation::TYPE_HAS_ONE);
+		$this->relations[$name]->setEntityName($entityName);
 		return $this;
 	}
 
@@ -186,7 +187,8 @@ class Mapping {
 	 * @return $this;
 	 */
 	public function addHasOne($name, $entityName, array $keys) {
-		$this->relations[$name] = new Relation($name, $entityName, $keys, false);
+		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_HAS_ONE);
+		$this->relations[$name]->setEntityName($entityName);
 		return $this;
 	}
 
@@ -200,7 +202,8 @@ class Mapping {
 	 * @return $this;
 	 */
 	public function addArray($name, $entityName, array $keys) {
-		$this->relations[$name] = new Relation($name, $entityName, $keys, true);
+		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_ARRAY);
+		$this->relations[$name]->setEntityName($entityName);
 		return $this;
 	}
 
@@ -214,8 +217,23 @@ class Mapping {
 	 * @return $this;
 	 */
 	public function addMap($name, $entityName, array $keys) {
-		$this->relations[$name] = new Relation($name, $entityName, $keys, true);
-		$this->relations[$name]->mapped = true;
+		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_MAP);
+		$this->relations[$name]->setEntityName($entityName);
+		return $this;
+	}
+
+		/**
+	 * Add a mapped relation. Index is the ID.
+	 * 
+	 * @param string $name
+	 * @param string $tableName
+	 * @param array $keys
+	 * 
+	 * @return $this;
+	 */
+	public function addScalar($name, $tableName, array $keys) {
+		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_SCALAR);
+		$this->relations[$name]->setTableName($tableName);
 		return $this;
 	}
 	

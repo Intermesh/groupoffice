@@ -35,6 +35,34 @@ go.Modules.register("community", "addressbook", {
 					title: "Query"
 				},
 				{
+					title: t("Commented at"),
+					name: 'commentedat',
+					multiple: false,
+					type: 'date'
+				},{
+					title: t("Modified at"),
+					name: 'modifiedat',
+					multiple: false,
+					type: 'date'
+				},{
+					title: t("Modified by"),
+					name: 'modifiedBy',
+					multiple: true,
+					type: 'string'
+				},{
+					title: t("Created at"),
+					name: 'createdat',
+					multiple: false,
+					type: 'date'
+				},{
+					title: t("Created by"),
+					name: 'createdby',
+					multiple: true,
+					type: 'string'
+				},
+
+				
+				{
 					name: 'name',
 					title: t("Name"),
 					type: "string",
@@ -80,18 +108,7 @@ go.Modules.register("community", "addressbook", {
 							value: null,
 							title: t("Unknown")
 						}]
-				},
-				{
-					title: t("Modified at"),
-					name: 'modified',
-					multiple: false,
-					type: 'date'
-				},{
-					title: t("Created at"),
-					name: 'created',
-					multiple: false,
-					type: 'date'
-				},
+				},			
 				{
 					title: t("Age"),
 					name: 'age',
