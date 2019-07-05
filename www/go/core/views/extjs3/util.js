@@ -137,10 +137,18 @@ go.util =  (function () {
 
 		streetAddress: function (config) {
 
+			var adr = config.street + " " + config.street2;			
+			if(config.zipCode) {
+				adr += ", " + config.zipCode.replace(/ /g, ''); 
+			}
+			if(config.country) {
+				adr += ", " + config.country;
+			}
+
 			if(Ext.isSafari || Ext.isMac) {
-				document.location = "http://maps.apple.com/?address=" + encodeURIComponent(config.street + ", " + config.zipCode.replace(/ /g, '') + ", " + config.country);
+				document.location = "http://maps.apple.com/?address=" + encodeURIComponent(adr);
 			} else {
-				window.open("https://www.google.com/maps/place/" + encodeURIComponent(config.street + ", " + config.zipCode.replace(/ /g, '') + ", " + config.country));	
+				window.open("https://www.google.com/maps/place/" + encodeURIComponent(adr));	
 			}
 
 			//window.open("https://www.openstreetmap.org/search?query=" + encodeURIComponent(config.street + ", " + config.zipCode.replace(/ /g, '') + ", " + config.country));
