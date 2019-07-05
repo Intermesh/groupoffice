@@ -8,7 +8,7 @@ use go\core\orm\CustomFieldsTrait;
 use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
-
+use go\core\validate\ErrorCode;
 
 class Note extends AclItemEntity {
 
@@ -92,6 +92,16 @@ class Note extends AclItemEntity {
 						->addText('content', function(Criteria $criteria, $comparator, $value, Query $query) {
 							$criteria->andWhere('content', $comparator, $value);
 						});
+	}
+
+	
+
+	protected function internalValidate()
+	{
+		if($this->isModified(['content']) && StringUtil::detectXSS($this->content)) {
+			$this->setValidationError('content', ErrorCode::INVALID_INPUT, "You're not allowed to use scripts in the content");
+		}
+		return parent::internalValidate();
 	}
 	
 	/**
