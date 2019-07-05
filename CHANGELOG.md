@@ -1,6 +1,8 @@
 - Core: Fixed contact link to maps #438
 - Core: Core / Extjs language was missing
 - Core: Language download button only worked when dev module is installed. This is no longer necessary.
+- Address book: 6.4.27 - Address book - Add organization - cosmetic issues #436
+- Core: Fixed XSS vulnerabilities
 
 02-07-2019 6.4.27
 - Core: Install without ioncube or license failed

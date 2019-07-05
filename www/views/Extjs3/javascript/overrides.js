@@ -643,8 +643,8 @@ Ext.override(Ext.Element, {
 		Ext.apply(this, config);
         
 		var el = Ext.get(this.id).dom;
-		var c = document.getElementById('printcontainer');
-		var iFrame = document.getElementById('printframe');
+		// var c = document.getElementById('printcontainer');
+		// var iFrame = document.getElementById('printframe');
         
 		var strTemplate = '<HTML><HEAD>{0}<TITLE>{1}</TITLE></HEAD><BODY onload="{2}" style="background-color:white;"><div style="position:fixed; top:0; left:0; right:0; bottom:0; z-index:99;"></div>{3}</BODY></HTML>';
 		var strAttr = '';
@@ -653,8 +653,8 @@ Ext.override(Ext.Element, {
         
 		//Get rid of the old crap so we don't copy it
 		//to our iframe
-		if (iFrame != null) c.removeChild(iFrame);
-		if (c != null) el.removeChild(c);
+		// if (iFrame != null) c.removeChild(iFrame);
+		// if (c != null) el.removeChild(c);
         
 		//Copy attributes from this element.
 		for (var i = 0; i < el.attributes.length; i++) {
