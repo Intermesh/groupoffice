@@ -19,8 +19,8 @@ class Message extends \Swift_Message {
 
 	public function __construct(Mailer $mailer) {
 		$this->mailer = $mailer;
-		$this->setFrom(GO()->getSettings()->systemEmail,GO()->getSettings()->title);
 		parent::__construct();
+		$this->setFrom(GO()->getSettings()->systemEmail,GO()->getSettings()->title);
 	}
 
 	/**
