@@ -102,7 +102,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 			if(this.titleField) {
 				this.titleField.on("change", this.updateTitle, this);
 				this.formPanel.on("load", this.updateTitle, this);
-			}
+			}			
 		}
 	},
 

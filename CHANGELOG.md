@@ -1,3 +1,4 @@
+- Core: Fixed contact link to maps #438
 - Core: Core / Extjs language was missing
 - Core: Language download button only worked when dev module is installed. This is no longer necessary.
 

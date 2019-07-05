@@ -36,6 +36,19 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 		}, this);
 	},
 
+	updateTitle : function() {
+		if(!this.origTitle) {
+			this.origTitle = this.title;
+		}
+		var title = this.getValues().isOrganization ? t("Organization") : t("Contact"), v = this.titleField.getValue();
+
+		if(v) {
+			title += ": " + Ext.util.Format.htmlEncode(v);
+		}
+
+		this.setTitle(title);
+	},
+
 	initFormItems: function () {
 
 		this.addPanel(this.businessPanel = new Ext.Panel({
@@ -238,5 +251,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 		}
 
 		this.nameField.nameMenuEnabled = !isOrganization;
+		this.jobTitle.setFieldLabel(t("LOB"));
+		this.updateTitle();
 	}
 });
