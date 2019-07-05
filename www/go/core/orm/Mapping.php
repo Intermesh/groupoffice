@@ -199,8 +199,8 @@ class Mapping {
 		return $this;
 	}
 
-		/**
-	 * Add a mapped relation. Index is the ID.
+	/**
+	 * Add a scalar relation. For example an array of ID's.
 	 * 
 	 * @param string $name
 	 * @param string $tableName
