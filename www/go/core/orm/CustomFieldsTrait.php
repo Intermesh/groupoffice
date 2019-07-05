@@ -142,6 +142,18 @@ trait CustomFieldsTrait {
 		
 		return $data;
 	}
+
+	protected function validateCustomFields() {
+		if(!$this->customFieldsModified) {
+			return true;
+		}
+		foreach(self::getCustomFieldModels() as $field) {
+			if(!$field->getDataType()->validate(isset($this->customFieldsData[$field->databaseName]) ? $this->customFieldsData[$field->databaseName] : null, $field, $this)) {
+				return false;
+			}
+		}
+		return true;
+	}
 	
 	/**
 	 * Saves custom fields to the database. Is called by Entity::internalSave()
@@ -155,7 +167,7 @@ trait CustomFieldsTrait {
 		}
 		
 		try {			
-			$record = $this->customFieldsData;			
+			$record = &$this->customFieldsData;			
 			
 			foreach(self::getCustomFieldModels() as $field) {
 				if(!$field->getDataType()->beforeSave(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record)) {

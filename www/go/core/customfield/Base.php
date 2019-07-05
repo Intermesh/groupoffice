@@ -193,6 +193,17 @@ abstract class Base extends Model {
 		
 		return true;
 	}
+
+	/**
+	 * Validate the input on the model. 
+	 * 
+	 * Use setValidationError if data is invalid:
+	 * 
+	 * 
+	 */
+	public function validate($value, Field $field,  Entity $model) {		
+		return true;
+	}
 	
 	/**
 	 * Called before the data is saved to API.

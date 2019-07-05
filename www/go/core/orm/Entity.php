@@ -225,6 +225,16 @@ abstract class Entity extends Property {
 	public function isSaving() {
 		return $this->isSaving;
 	}
+
+	protected function internalValidate()
+	{
+		if(method_exists($this, 'validateCustomFields')) {
+			if(!$this->validateCustomFields()) {				
+				return false;
+			}
+		}
+		return parent::internalValidate();
+	}
 	
 	/**
 	 * Saves the model and property relations to the database

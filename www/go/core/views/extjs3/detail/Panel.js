@@ -154,8 +154,8 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		if(this.getTopToolbar()) {
 			this.getTopToolbar().setDisabled(false);
 		}
-		this.data = go.util.Format.htmlEncode(data);
-		console.log(this.data);
+		this.data = data;
+
 		var me = this;
 		
 		if(!this.relations.length) {
