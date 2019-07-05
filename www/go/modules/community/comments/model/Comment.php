@@ -149,7 +149,7 @@ class Comment extends Entity {
 
 	protected function internalValidate()
 	{
-		if($this->isModified(['text']) && StringUtil::detectXSS($this->content)) {
+		if($this->isModified(['text']) && StringUtil::detectXSS($this->text)) {
 			$this->setValidationError('text', ErrorCode::INVALID_INPUT, "You're not allowed to use scripts in the content");
 		}
 		return parent::internalValidate();
