@@ -176,7 +176,7 @@ abstract class Property extends Model {
 				case Relation::TYPE_MAP:
 					$values = $this->isNew() ? [] : $cls::internalFind()->andWhere($where)->all();
 					if(!count($values)) {
-						$values = new \stdClass;
+						$this->{$relation->name} = new \stdClass;
 					} else{
 						$o = [];
 						foreach($values as $v) {
@@ -1466,17 +1466,23 @@ abstract class Property extends Model {
 		$old = $this->$propName;
 		$this->$propName = [];
 		foreach($value as $id => $patch) {
-			if(!isset($patch)) {
+			if(!isset($patch) || $patch === false) {
 				if(!array_key_exists($id, $this->$propName)) {
 					GO()->warn("Key $id does not exist in ". static::class .'->'.$propName);
 				}				
 				continue;
 			}
-			if(isset($old[$id])) {
+			if(is_array($old) && isset($old[$id])) {
 				$this->$propName[$id] = $old[$id];
-				$this->$propName[$id]->setValues($patch);
+				if(is_array($patch)) { //may be given as bool
+					$this->$propName[$id]->setValues($patch);
+				}
 			} else {
+
 				$this->$propName[$id] = $this->internalNormalizeRelation($relation, $patch);	
+				foreach($this->mapKeyToValues($id, $relation) as $key => $value) {
+					$this->$propName[$id]->$key = $value;
+				}				
 			}
 			
 		}
@@ -1484,10 +1490,33 @@ abstract class Property extends Model {
 		return $this->$propName;
 	}
 
+
+	private function mapKeyToValues($id, Relation $relation) {
+
+
+		$values = explode("-", $id);
+
+		$cls = $relation->entityName;
+
+		$pk = $cls::getPrimaryKey();
+		
+		$diff = array_diff($pk, array_values($relation->keys));
+
+		$id = [];
+		foreach($diff as $field) {
+			$id[$field] = array_shift($values);
+		}
+		return $id;
+	}
+
 	private function internalNormalizeRelation(Relation $relation, $value) {
 		$cls = $relation->entityName;
 		if ($value instanceof $cls) {
 			return $value;
+		}
+
+		if(is_bool($value)) {
+			$value = $value ? [] : null;
 		}
 
 		if (is_array($value)) {

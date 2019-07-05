@@ -98,7 +98,7 @@ class ArrayObject extends \ArrayObject {
 			return empty($aObj->diff($b)) && empty($bObj->diff($a));
 		} else
 		{
-			return $a == $b;
+			return $a === $b;
 		}
 	}
 }
