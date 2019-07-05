@@ -47573,6 +47573,21 @@ Ext.grid.GridView = Ext.extend(Ext.util.Observable, {
         this.layout();
     },
 
+    encodeGridValue : function(store, column, record) {
+        //Merijn: htmlEncode string types en relations to prevent XSS.
+        var col = store.fields.item(column.name), v = record.data[column.name];
+        if(col) {
+            var dataType = col.type.type, v;
+            if((dataType == "auto" || dataType == "string") && Ext.isString(v)) {    
+                v = Ext.util.Format.htmlEncode(v);
+            } else if(col.type.isRelation) {
+                                        
+                v = go.util.Format.htmlEncode(v);                                    
+            }
+        }
+
+        return v;
+    },
     
     doRender : function(columns, records, store, startRow, colCount, stripe) {
         var templates = this.templates,
@@ -47605,17 +47620,7 @@ Ext.grid.GridView = Ext.extend(Ext.util.Observable, {
                 meta.attr  = meta.cellAttr = '';
                 meta.style = column.style;
 
-                //Merijn: htmlEncode string types en relations to prevent XSS.
-                var col = store.fields.item(column.name), v = record.data[column.name];
-                if(col) {
-                    var dataType = col.type.type, v;
-                    if((dataType == "auto" || dataType == "string") && Ext.isString(v)) {    
-                        v = Ext.util.Format.htmlEncode(v);
-                    } else if(col.type.isRelation) {
-                                                
-                        v = go.util.Format.htmlEncode(v);                                    
-                    }
-                }
+                var v = this.encodeGridValue(store, column, record);
                 
                 meta.value = column.renderer.call(column.scope, v, meta, record, rowIndex, i, store);
 
@@ -48422,8 +48427,10 @@ Ext.grid.GridView = Ext.extend(Ext.util.Observable, {
                 attr    : "",
                 cellAttr: ""
             };
+
+            var v = this.encodeGridValue(store, column, record);
             
-            meta.value = column.renderer.call(column.scope, record.data[column.name], meta, record, rowIndex, i, store);
+            meta.value = column.renderer.call(column.scope, v, meta, record, rowIndex, i, store);
             
             if (Ext.isEmpty(meta.value)) {
                 meta.value = '&#160;';
