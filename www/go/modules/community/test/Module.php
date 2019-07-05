@@ -19,7 +19,7 @@ class Module extends core\Module {
 	}
 	
 	public static function onMap(Mapping $mapping) {		
-		$mapping->addRelation("dynamic", ADynamic::class, ['id' => 'aId'], false);		
+		$mapping->addHasOne("dynamic", ADynamic::class, ['id' => 'aId']);		
 		$mapping->addTable('test_d', 'd', ['id' => 'id'], ['propD']);
 		return true;
 	}

@@ -71,7 +71,7 @@ class Acl extends Entity {
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable('core_acl')
-						->addRelation('groups', AclGroup::class, ['id' => 'aclId'], true);
+						->addArray('groups', AclGroup::class, ['id' => 'aclId']);
 	}
 	
 	protected function internalValidate() {

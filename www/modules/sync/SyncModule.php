@@ -24,9 +24,9 @@ class SyncModule extends Module{
 	
 
 	public static function onMap(Mapping $mapping) {
-		$mapping->addRelation('syncSettings', UserSettings::class, ['id' => 'user_id'], false)
-						->addRelation('syncNoteBooks', UserNoteBook::class, ['id' => 'userId'])
-						->addRelation('syncAddressBooks', UserAddressBook::class, ['id' => 'userId']);
+		$mapping->addHasOne('syncSettings', UserSettings::class, ['id' => 'user_id'])
+						->addArray('syncNoteBooks', UserNoteBook::class, ['id' => 'userId'])
+						->addArray('syncAddressBooks', UserAddressBook::class, ['id' => 'userId']);
 		
 	}
 }

@@ -84,8 +84,8 @@ class Server extends Entity {
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable('ldapauth_server', 's')
-						->addRelation("domains", Domain::class, ['id' => "serverId"])
-						->addRelation("groups", Group::class, ['id' => "serverId"]);
+						->addArray("domains", Domain::class, ['id' => "serverId"])
+						->addArray("groups", Group::class, ['id' => "serverId"]);
 	}
 	
 	/**

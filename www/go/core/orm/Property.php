@@ -270,8 +270,8 @@ abstract class Property extends Model {
 	 * 		return parent::defineMapping()
 	 * 						->addTable('test_a', 'a')
 	 * 						->addProperty('sumOfTableBIds', "SUM(b.id)", (new Query())->join('test_b', 'bc', 'bc.id=a.id')->groupBy(['a.id']))
-	 * 						->addRelation('hasMany', AHasMany::class, ['id' => 'aId'], true)
-	 * 						->addRelation('hasOne', AHasOne::class, ['id' => 'aId'], false);
+	 * 						->addArray('hasMany', AHasMany::class, ['id' => 'aId'],)
+	 * 						->adddHasOne('hasOne', AHasOne::class, ['id' => 'aId'], false);
 	 * 	}
 	 * ````
 	 * 

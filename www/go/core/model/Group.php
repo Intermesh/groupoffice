@@ -56,7 +56,6 @@ class Group extends AclOwnerEntity {
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable('core_group', 'g')
-						// ->addRelation('users', UserGroup::class, ['id' => 'groupId']);
 						->addScalar('users', 'core_user_group', ['id' => 'groupId']);
 	}
 	

@@ -30,8 +30,6 @@ class Comment extends Entity {
 	protected static function defineMapping() {
 		return parent::defineMapping()
 			->addTable("comments_comment", 't')
-			//->addRelation('labels', Label::class, ['id' => 'commentId'])
-		//	->addRelation('attachments', Attachment::class, ['id' => 'commentId'])
 			->setQuery(
 				(new Query())
 					->select("e.name AS entity")

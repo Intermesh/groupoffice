@@ -58,7 +58,7 @@ class EmailTemplate extends AclOwnerEntity
 	{
 		return parent::defineMapping()		
 			->addTable("core_email_template", "newsletter")
-			->addRelation('attachments', EmailTemplateAttachment::class, ['id' => 'emailTemplateId'], true);
+			->addArray('attachments', EmailTemplateAttachment::class, ['id' => 'emailTemplateId']);
 	}
 
 

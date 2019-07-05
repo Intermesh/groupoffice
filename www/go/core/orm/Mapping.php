@@ -152,29 +152,6 @@ class Mapping {
 		}
 
 		return $paths;
-	}	
-	
-	/**
-	 * Add a relational property
-	 * 
-	 * A relation property is saved in another property model and can be a has one
-	 * or has many type of relation.
-	 * 
-	 * When saving has many relations all properties are removed from the database
-	 * and reinserted because they are often not uniquely identifyable from the
-	 * JMAP API. eg. email addresses of contacts
-	 * 
-	 * @param string $name
-	 * @param string $entityName
-	 * @param array $keys
-	 * @param boolean $many
-	 * @depcreated Use addHasONe() addArray() or addMap()
-	 * @return $this
-	 */
-	public function addRelation($name, $entityName, array $keys, $many = true) {
-		$this->relations[$name] = new Relation($name, $keys, $many ? Relation::TYPE_ARRAY : Relation::TYPE_HAS_ONE);
-		$this->relations[$name]->setEntityName($entityName);
-		return $this;
 	}
 
 	/**

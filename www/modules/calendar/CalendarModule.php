@@ -16,7 +16,7 @@ class CalendarModule extends \GO\Base\Module{
 	}
 	
 	public static function onMap(Mapping $mapping) {
-		$mapping->addRelation('calendarSettings', UserSettings::class, ['id' => 'user_id'], false);
+		$mapping->addHasOne('calendarSettings', UserSettings::class, ['id' => 'user_id']);
 		return true;
 	}
 	
