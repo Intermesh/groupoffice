@@ -945,7 +945,7 @@ Ext.menu.Item.prototype.itemTpl = new Ext.XTemplate(
 		 '</tpl>',
 	 '>',
 		  '<span style="{iconStyle}" class="x-menu-item-icon {iconCls}"></span>',
-		  '<span class="x-menu-item-text">{text}</span>',
+		  '<span class="x-menu-item-text">{text:raw}</span>',
 	 '</a>'
 );
 Ext.layout.MenuLayout.prototype.itemTpl = new Ext.XTemplate(

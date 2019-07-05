@@ -3,6 +3,7 @@
 - Core: Language download button only worked when dev module is installed. This is no longer necessary.
 - Address book: 6.4.27 - Address book - Add organization - cosmetic issues #436
 - Core: Fixed XSS vulnerabilities
+- Email: Print of an email genarate empty pages Fixed #435
 
 02-07-2019 6.4.27
 - Core: Install without ioncube or license failed

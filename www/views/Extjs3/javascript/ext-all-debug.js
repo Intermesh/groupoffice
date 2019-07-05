@@ -39841,8 +39841,8 @@ Ext.menu.Item = Ext.extend(Ext.menu.BaseItem, {
                         ' target="{hrefTarget}"',
                     '</tpl>',
                  '>',
-                     '<img alt="{altText}" src="{icon}" class="x-menu-item-icon {iconCls}"/>',
-                     '<span class="x-menu-item-text">{text}</span>',
+                     '<img alt="{altText}" src="{icon:raw}" class="x-menu-item-icon {iconCls}"/>',
+                     '<span class="x-menu-item-text">{text:raw}</span>',
                  '</a>'
              );
         }
