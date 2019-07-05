@@ -245,13 +245,15 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 
 		if (isOrganization) {
 			this.tabPanel.unhideTabStripItem(this.businessPanel);
+			this.jobTitle.setFieldLabel(t("LOB"));
 		} else
 		{
 			this.tabPanel.hideTabStripItem(this.businessPanel);
+			this.jobTitle.setFieldLabel(t("Job title"));
 		}
 
 		this.nameField.nameMenuEnabled = !isOrganization;
-		this.jobTitle.setFieldLabel(t("LOB"));
+		
 		this.updateTitle();
 	}
 });
