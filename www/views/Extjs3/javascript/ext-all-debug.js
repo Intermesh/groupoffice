@@ -10419,7 +10419,10 @@ Ext.extend(Ext.XTemplate, Ext.Template, {
             if(math){
                 v = '(' + v + math + ')';
             }
-            if (format && useF) {
+            if(!format) {
+                format = 'htmlEncode';
+            }
+            if (useF) {
                 args = args ? ',' + args : "";
                 if(format.substr(0, 5) != "this."){
                     format = "fm." + format + '(';

@@ -113,7 +113,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 		var title = this.origTitle, v = this.titleField.getValue();
 
 		if(v) {
-			title += ": " + v;
+			title += ": " + Ext.util.Format.htmlEncode(v);
 		}
 
 		this.setTitle(title);

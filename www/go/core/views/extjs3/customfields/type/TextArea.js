@@ -37,7 +37,7 @@ go.customfields.type.TextArea = Ext.extend(go.customfields.type.Text, {
 	 * @returns {Object}
 	 */
 	createFormFieldConfig: function (customfield, config) {
-		var config = go.customfields.type.TextArea.superclass.createFormFieldConfig.call(this, customfield, config);
+		config = go.customfields.type.TextArea.superclass.createFormFieldConfig.call(this, customfield, config);
 
 		config.xtype = "textarea";
 		config.grow = true;
