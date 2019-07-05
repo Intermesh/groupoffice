@@ -754,10 +754,18 @@ hr {
 	.x-btn-mc em.x-btn-arrow > button:after {
 		content: '';
 	}
+
 	.badge {
 		@extend %badge;
-		display: inline-block;	
+		float: none;
+		display: inline-block;
 	}
+	
+}
+
+.badge {
+	@extend %badge;
+	float:right;
 }
 
 .x-tab-with-icon {
