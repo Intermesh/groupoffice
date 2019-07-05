@@ -217,7 +217,6 @@ class Mapping {
 	/**
 	 * Get all relational properties
 	 * 
-	 * @see addRelation();
 	 * @return Relation[]
 	 */
 	public function getRelations() {
@@ -227,7 +226,6 @@ class Mapping {
 	/**
 	 * Get a relational property by name.
 	 * 
-	 * @see addRelation(); 
 	 * @param string $name
 	 * @return Relation|boolean
 	 */

@@ -1039,7 +1039,8 @@ abstract class Property extends Model {
 			$this->savedPropertyRelations[] = $newProp;
 			$this->relatedValidationErrorIndex++;
 			
-			$this->{$relation->name}[$newProp->id()] = $newProp;
+			$key = $this->buildMapKey($newProp, $relation);
+			$this->{$relation->name}[$key] = $newProp;
 		}	
 
 		return true;
@@ -1462,35 +1463,35 @@ abstract class Property extends Model {
 	}
 
 	protected function patch(Relation $relation, $propName, $value) {
+		$old = $this->$propName;
+		$this->$propName = [];
 		foreach($value as $id => $patch) {
 			if(!isset($patch)) {
 				if(!array_key_exists($id, $this->$propName)) {
 					GO()->warn("Key $id does not exist in ". static::class .'->'.$propName);
-				}
-				unset($this->$propName[$id]);
+				}				
 				continue;
 			}
-
-			$this->$propName[$id] = $this->internalNormalizeRelation($relation, $patch, $id);			 
+			if(isset($old[$id])) {
+				$this->$propName[$id] = $old[$id];
+				$this->$propName[$id]->setValues($patch);
+			} else {
+				$this->$propName[$id] = $this->internalNormalizeRelation($relation, $patch);	
+			}
+			
 		}
 
 		return $this->$propName;
 	}
 
-	private function internalNormalizeRelation(Relation $relation, $value, $id = null) {
+	private function internalNormalizeRelation(Relation $relation, $value) {
 		$cls = $relation->entityName;
 		if ($value instanceof $cls) {
 			return $value;
 		}
 
 		if (is_array($value)) {
-			$propName = $relation->name;
-			if(isset($id) && isset($this->$propName[$id])) {
-				$o = $this->$propName[$id];				
-			} else {
-				$o = new $cls;
-			}
-			
+			$o = new $cls;			
 			$o->setValues($value);
 
 			return $o;
