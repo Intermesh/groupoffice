@@ -10077,6 +10077,9 @@ Ext.util.Format = function() {
             return value;
         },
 
+        raw : function(value) {
+            return this.undef(value);
+        },
         
         undef : function(value) {
             return value !== undefined ? value : "";
