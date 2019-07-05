@@ -5,6 +5,8 @@ namespace go\core\mail;
 /**
  * A mail message to send
  * 
+ * The From header defaults to the system settings e-mail and title.
+ * 
  * @example
  * ````
  * $message = GO()->getMailer()->compose();
@@ -17,6 +19,7 @@ class Message extends \Swift_Message {
 
 	public function __construct(Mailer $mailer) {
 		$this->mailer = $mailer;
+		$this->setFrom(GO()->getSettings()->systemEmail,GO()->getSettings()->title);
 		parent::__construct();
 	}
 
