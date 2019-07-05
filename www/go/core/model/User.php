@@ -207,9 +207,9 @@ class User extends Entity {
 	protected $password;
 
 	/**
-	 * The groups of the user
+	 * The group ID's of the user
 	 * 
-	 * @var UserGroup[]
+	 * @var int[]
 	 */
 	public $groups = [];
 	
@@ -231,7 +231,8 @@ class User extends Entity {
 			->addTable('core_user', 'u')
 			->addTable('core_auth_password', 'p', ['id' => 'userId'])
 			->addRelation("groups", UserGroup::class, ['id' => 'userId'])
-			->addRelation('workingWeek', WorkingWeek::class, ['id' => 'user_id'], false);
+			->addScalar('groups', 'core_user_group', ['id' => 'userId'])
+			->addHasOne('workingWeek', WorkingWeek::class, ['id' => 'user_id']);
 	}
 	
 	/**
@@ -268,9 +269,11 @@ class User extends Entity {
 			$this->listSeparator = $s->defaultListSeparator;
 			$this->textSeparator = $s->defaultTextSeparator;
 			$this->thousandsSeparator = $s->defaultThousandSeparator;
-			$this->decimalSeparator = $s->defaultDecimalSeparator;			
-			foreach($s->getDefaultGroups() as $groupId) {
-				$this->groups[] = (new UserGroup)->setValues(['groupId' => $groupId]);
+			$this->decimalSeparator = $s->defaultDecimalSeparator;
+			
+			$this->groups = array_merge($this->groups, $s->getDefaultGroups());
+			if(!in_array(Group::ID_EVERYONE, $this->groups)) { 			
+				$this->groups[] = Group::ID_EVERYONE;
 			}
 		}
 	}
@@ -367,15 +370,17 @@ class User extends Entity {
 	
 	protected function internalValidate() {
 		
-		if(!$this->isNew() && $this->isModified('groups')) {
-			$groupIds = array_column($this->groups, 'groupId');
-			
-			if(!in_array(Group::ID_EVERYONE, $groupIds)) {
+		if(!$this->isNew() && $this->isModified('groups')) {			
+			if(!in_array(Group::ID_EVERYONE, $this->groups)) {
 				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, "You can't remove group everyone");
 			}
 			
-			if(!in_array($this->getPersonalGroup()->id, $groupIds)) {
+			if(!in_array($this->getPersonalGroup()->id, $this->groups)) {
 				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, "You can't remove the user's personal group");
+			}
+
+			if($this->id == 1 && !in_array(Group::ID_ADMINS, $this->groups)) {
+				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, "You can't remove group Admins from the primary admin user");
 			}
 		}
 		
@@ -522,7 +527,7 @@ class User extends Entity {
 		
 		$this->saveContact();
 
-		$this->addSystemGroups();
+		$this->createPersonalGroup();
 
 		if($this->isNew()) {
 			$this->legacyOnSave();	
@@ -584,14 +589,13 @@ class User extends Entity {
 		return null;
 	}
 	
-	private function addSystemGroups() {
-		if($this->isNew() || $this->isModified('groups')) {						
-			$groupIds = array_column($this->groups, 'groupId');
-			
+	private function createPersonalGroup() {
+		if($this->isNew() || $this->isModified('groups')) {				
 			if($this->isNew()){// !in_array($this->getPersonalGroup()->id, $groupIds)) {
 				$personalGroup = new Group();
 				$personalGroup->name = $this->username;
 				$personalGroup->isUserGroupFor = $this->id;
+				
 				if(!$personalGroup->save()) {
 					throw new Exception("Could not create home group");
 				}
@@ -600,21 +604,9 @@ class User extends Entity {
 				$personalGroup = $this->getPersonalGroup();
 			}
 			
-			if(!in_array($personalGroup->id, $groupIds)) { 
-				$personalUserGroup = (new UserGroup)->setValues(['groupId' => $personalGroup->id, 'userId' => $this->id]);
-				if(!$personalUserGroup->internalSave()) {
-					throw new Exception("Couldn't add user to group");
-				}
-				$this->groups[] = $personalUserGroup;
-			}
-			
-			if(!in_array(Group::ID_EVERYONE, $groupIds)) { 
-				$everyoneUserGroup = (new UserGroup)->setValues(['groupId' => Group::ID_EVERYONE, 'userId' => $this->id]);
-				if(!$everyoneUserGroup->internalSave()) {
-					throw new Exception("Couldn't add user to group");
-				}
-				$this->groups[] = $everyoneUserGroup;
-			}
+			if(!in_array($personalGroup->id, $this->groups)) {			
+				$this->groups[] = $personalGroup->id;
+			}			
 		}
 	}
 	
@@ -639,13 +631,10 @@ class User extends Entity {
 	 * @return $this
 	 */
 	public function addGroup($groupId) {
-		foreach($this->groups as $group) {
-			if($group->groupId == $groupId) {
-				return $this;
-			}
-		}
 		
-		$this->groups[] = (new UserGroup)->setValues(['groupId' => $groupId]);
+		if(!in_array($groupId, $this->groups)) {
+			$this->groups[] = $groupId;
+		}
 		
 		return $this;
 	}

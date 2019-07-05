@@ -87,7 +87,7 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 						}
 
 						return '<div>' + value + '</div>' +
-										'<small class="username">' + memberStr + '</small>';
+										'<small class="username">' + Ext.util.Format.htmlEncode(memberStr) + '</small>';
 					}
 				},
 				actions

@@ -4,7 +4,7 @@ go.Modules.register("core", 'core', {
 		{
 			name: 'Group',
 			relations: {
-				users: {store: "User", fk: "users.userId"},
+				users: {store: "User", fk: "users"},
 				user: {store: "User", fk:'isUserGroupFor'}
 			}
 		},

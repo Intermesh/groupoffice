@@ -163,7 +163,7 @@ class Sync extends Controller {
           echo "Error: user '" . $username . "' does not exist in Group-Office\n";
         } else {
           echo "Adding user '$username'\n";
-          $group->users[] = (new UserGroup())->setValue('userId', $user->id);
+          $group->users[] = $user->id; //(new UserGroup())->setValue('userId', $user->id);
         }
       }
 

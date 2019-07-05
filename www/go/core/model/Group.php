@@ -49,15 +49,15 @@ class Group extends AclOwnerEntity {
 	/**
 	 * The users in this group
 	 * 
-	 * @var UserGroup[]
+	 * @var int[]
 	 */
 	public $users;	
 
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable('core_group', 'g')
-						->addRelation('users', UserGroup::class, ['id' => 'groupId']);
-						// ->addScalar('users', 'core_user_group', ['id' => 'groupId']);
+						// ->addRelation('users', UserGroup::class, ['id' => 'groupId']);
+						->addScalar('users', 'core_user_group', ['id' => 'groupId']);
 	}
 	
 	protected static function defineFilters() {
@@ -91,8 +91,15 @@ class Group extends AclOwnerEntity {
 	protected static function textFilterColumns() {
 		return ['name'];
 	}
-	
+
 	protected function internalSave() {
+
+		if($this->isNew() || $this->isModified(['users'])) {
+			if($this->isUserGroupFor && !in_array($this->isUserGroupFor, $this->users))
+			{
+				$this->users[] = $this->isUserGroupFor;
+			}
+		}
 		
 		if(!parent::internalSave()) {
 			return false;

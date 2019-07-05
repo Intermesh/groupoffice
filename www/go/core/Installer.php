@@ -165,9 +165,7 @@ class Installer {
 			$admin->recoveryEmail = $admin->email;
 		}
 
-		$admin->groups[] = (new UserGroup)->setValues(['groupId' => Group::ID_ADMINS]);
-		//$admin->groups[] = (new UserGroup)->setValues(['groupId' => Group::ID_INTERNAL]);
-
+		$admin->groups[] = Group::ID_ADMINS;		
 
 		if (!$admin->save()) {
 			throw new Exception("Failed to create admin user: " . var_export($admin->getValidationErrors(), true));
