@@ -1,12 +1,14 @@
 <?php
 namespace go\modules\community\comments\model;
 
+use go\core\model\Acl;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
-use go\core\orm\EntityType;
 use go\core\util\DateTime;
-use go\core\model\Acl;
+use go\core\orm\EntityType;
 use GO\Base\Db\ActiveRecord;
+use go\core\util\StringUtil;
+use go\core\validate\ErrorCode;
 
 class Comment extends Entity {
 
@@ -144,4 +146,12 @@ class Comment extends Entity {
 		return $query;
 	}
 	
+
+	protected function internalValidate()
+	{
+		if($this->isModified(['text']) && StringUtil::detectXSS($this->content)) {
+			$this->setValidationError('text', ErrorCode::INVALID_INPUT, "You're not allowed to use scripts in the content");
+		}
+		return parent::internalValidate();
+	}
 }
