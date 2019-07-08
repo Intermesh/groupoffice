@@ -117,7 +117,8 @@ Ext.override(Ext.form.TextArea,{
 		this.el.focus();
 		text_field.setSelectionRange(endPos+v.length, endPos+v.length);
 	},
-	growMin : dp(48)
+	growMin : dp(48),
+	height: dp(48)
 });
 
 Ext.override(Ext.form.TextField,{
