@@ -33,6 +33,10 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 			if(Ext.isDefined(v.isOrganization)) {
 				this.setOrganization(!!v.isOrganization);
 			}
+
+			if(v.addressBookId) {
+				this.organizationsField.allowNew.addressBookId = v.addressBookId;
+			}
 		}, this);
 	},
 
@@ -160,7 +164,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						valueField: 'id',
 						allowNew: {
 							isOrganization: true,
-							addressBookId: go.User.addressBookSettings.defaultAddressBookId
+							addressBookId: go.User.addressBookSettings.defaultAddressBookId 
 						},
 						storeBaseParams: {
 							filter: {
