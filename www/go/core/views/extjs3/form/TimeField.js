@@ -47,4 +47,4 @@ go.form.TimeField = Ext.extend(Ext.form.TextField, {
 	}
 });
 
-Ext.reg('timefield', go.form.TimeField);
+Ext.reg('nativetimefield', go.form.TimeField);
