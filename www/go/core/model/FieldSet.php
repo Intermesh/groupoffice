@@ -69,6 +69,11 @@ class FieldSet extends AclOwnerEntity {
 	public function getFilter() {
 		return empty($this->filter) || $this->filter == '[]'  ? new \stdClass() : json_decode($this->filter, true);
 	}
+
+	protected function canCreate()
+	{
+		return GO()->getAuthState()->getUser()->isAdmin();
+	}
 	
 	public function setFilter($filter) {
 		$this->filter = json_encode($filter);
@@ -109,14 +114,14 @@ class FieldSet extends AclOwnerEntity {
 		return parent::internalDelete();
 	}
 	
-	protected function internalSave() {
-		if(!parent::internalSave()) {
-			return false;
-		}
+	// protected function internalSave() {
+	// 	if(!parent::internalSave()) {
+	// 		return false;
+	// 	}
 		
-		return !$this->isNew() || $this->findAcl()->addGroup(\go\core\model\Group::ID_EVERYONE, \go\core\model\Acl::LEVEL_WRITE)->save();
+	// 	return !$this->isNew() || $this->findAcl()->addGroup(\go\core\model\Group::ID_EVERYONE, \go\core\model\Acl::LEVEL_WRITE)->save();
 		
-	}
+	// }
 
 		/**
 	 * Find all fields for an entity

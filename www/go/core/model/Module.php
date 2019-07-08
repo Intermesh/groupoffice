@@ -28,6 +28,11 @@ class Module extends AclOwnerEntity {
 	public function getAclId() {
 		return $this->aclId;
 	}
+
+	protected function canCreate()
+	{
+		return GO()->getAuthState()->getUser()->isAdmin();
+	}
 	
 	protected static function textFilterColumns()
 	{
