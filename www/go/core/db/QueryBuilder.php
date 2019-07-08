@@ -176,8 +176,11 @@ class QueryBuilder {
 
 				$sql .= "(\n\t" . implode(",\n\t", $tags) . "\n), ";
 			}
+
+			$sql = substr($sql, 0, -2); //strip off last ', '
 		}
-		return ['sql' => substr($sql, 0, -2), 'params' => $this->buildBindParameters];
+		
+		return ['sql' => $sql, 'params' => $this->buildBindParameters];
 	}
 
 	public function buildUpdate($tableName, $data, Query $query) {
