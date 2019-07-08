@@ -301,15 +301,6 @@ class Link extends Entity {
 		return Acl::getUserPermissionLevel($this->aclId, App::get()->getAuthState()->getUserId());
 	}
 	
-	/**
-	 * Checks if the current user has a given permission level.
-	 * 
-	 * @param int $level
-	 * @return boolean
-	 */
-	public function hasPermissionLevel($level = Acl::LEVEL_READ) {
-		return $this->getPermissionLevel() >= $level;
-	}
 //	
 //	/**
 //	 * The to properties
