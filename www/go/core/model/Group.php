@@ -91,14 +91,21 @@ class Group extends AclOwnerEntity {
 		return ['name'];
 	}
 
-	protected function internalSave() {
-
-		if($this->isNew() || $this->isModified(['users'])) {
-			if($this->isUserGroupFor && !in_array($this->isUserGroupFor, $this->users))
-			{
-				$this->users[] = $this->isUserGroupFor;
-			}
+	protected function internalValidate()
+	{
+		if($this->id === self::ID_ADMINS && !in_array(1, $this->users)) {
+			$this->setValidationError('users', ErrorCode::FORBIDDEN, GO()->t("You can't remove the admin user from the administrators group"));
 		}
+
+		if($this->isUserGroupFor && !in_array($this->isUserGroupFor, $this->users))
+		{
+			$this->setValidationError('users', ErrorCode::FORBIDDEN, GO()->t("You can't remove the group owner from the group"));
+		}
+
+		return parent::internalValidate();
+	}
+
+	protected function internalSave() {
 		
 		if(!parent::internalSave()) {
 			return false;

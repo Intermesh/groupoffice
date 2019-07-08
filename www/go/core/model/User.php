@@ -594,6 +594,7 @@ class User extends Entity {
 				$personalGroup = new Group();
 				$personalGroup->name = $this->username;
 				$personalGroup->isUserGroupFor = $this->id;
+				$personalGroup->users[] = $this->id;
 				
 				if(!$personalGroup->save()) {
 					throw new Exception("Could not create home group");
