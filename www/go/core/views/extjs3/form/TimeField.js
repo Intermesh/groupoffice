@@ -28,11 +28,14 @@ go.form.TimeField = Ext.extend(Ext.form.TextField, {
 	},
 
 	setValue : function(v) {
-		var parts = v.split(":");
-		if(parts.length == 3) {
-			parts.pop(); //pop seconds
-		}
-		go.form.TimeField.superclass.setValue.call(this, parts.join(":"));
+		if(!go.util.empty(v)) {
+			var parts = v.split(":");
+			if(parts.length == 3) {
+				parts.pop(); //pop seconds
+			}
+			v = parts.join(":");
+		} 
+		go.form.TimeField.superclass.setValue.call(this, v);
 	},
 
 	getValue: function() {
