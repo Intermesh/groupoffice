@@ -147,6 +147,9 @@ class Mapping {
 		}
 
 		foreach($this->getRelations() as $r) {
+			if(!isset($r->entityName)) {
+				continue;
+			}
 			$cls = $r->entityName;
 			$cls::getMapping()->hasTable($name, array_merge($path, [$r->name]), $paths);			
 		}
