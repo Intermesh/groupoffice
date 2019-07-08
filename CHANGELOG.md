@@ -1,4 +1,4 @@
-??-07-2019 6.4.28
+08-07-2019 6.4.28
 - Email: Fixed attachment encoding error
 - Core: Fixed contact link to maps #438
 - Core: Core / Extjs language was missing
