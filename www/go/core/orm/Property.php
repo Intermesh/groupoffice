@@ -990,7 +990,12 @@ abstract class Property extends Model {
 
 		$key = $this->getScalarKey($relation);
 
-		$query = (new GoQuery())->where($where)->andWhere($key, 'NOT IN', $this->{$relation->name});
+		$query = (new GoQuery())->where($where);
+		
+		$keepIds = $this->{$relation->name};
+		if(!empty($keepIds)) {
+			$query->andWhere($key, 'NOT IN', $keepIds);
+		}
 
 		GO()->getDbConnection()->delete($relation->tableName, $query)->execute();
 
