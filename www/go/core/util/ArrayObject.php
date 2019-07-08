@@ -1,7 +1,11 @@
 <?php
 namespace go\core\util;
 
-class ArrayObject extends \ArrayObject {
+use JsonSerializable;
+
+class ArrayObject extends \ArrayObject implements JsonSerializable {
+
+	public $serializeJsonAsObject = false;
 	
 	/**
 	 * Find the key in an array by a callable function.
@@ -100,5 +104,15 @@ class ArrayObject extends \ArrayObject {
 		{
 			return $a === $b;
 		}
+	}
+
+	public function jsonSerialize()
+	{
+		if($this->serializeJsonAsObject && empty($this)) 
+		{
+			return new \stdClass;	
+		} 
+
+		return $this;
 	}
 }

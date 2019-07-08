@@ -222,11 +222,7 @@ abstract class Module {
 		$sqlFile = $this->getFolder()->getFile('install/install.sql');
 		
 		if ($sqlFile->exists()) {
-			$queries = Utils::getSqlQueries($sqlFile);
-			
-			foreach ($queries as $query) {
-				GO()->getDbConnection()->query($query);
-			}
+			Utils::runSQLFile($sqlFile);			
 		}
 				
 		return true;
@@ -241,15 +237,10 @@ abstract class Module {
 		$sqlFile = $this->getFolder()->getFile('install/uninstall.sql');
 		
 		if ($sqlFile->exists()) {
-			$queries = Utils::getSqlQueries($sqlFile);
-
 			//disable foreign keys
-			array_unshift($queries, "SET FOREIGN_KEY_CHECKS=0;");
-			array_push($queries, "SET FOREIGN_KEY_CHECKS=1;");
-			
-			foreach ($queries as $query) {
-				GO()->getDbConnection()->query($query);
-			}
+			GO()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
+			Utils::runSQLFile($sqlFile);
+			GO()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
 		}
 		
 		return true;

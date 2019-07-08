@@ -10,6 +10,7 @@ use JsonSerializable;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
+use go\core\util\ArrayObject;
 
 /**
  * The abstract model class. 
@@ -178,15 +179,16 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 		if ($value instanceof ArrayableInterface) {
 			return $value->toArray();
 		} elseif (is_array($value)) {
-			//support an array of models too
-			//if (isset($value[0])) {
-				$arr = [];
-				foreach ($value as $key => $v) {
-					$arr[$key] = $this->convertValue($v);
-				}
-				return $arr;
-			//}
-			//return $value;
+			foreach ($value as $key => $v) {
+				$value[$key] = $this->convertValue($v);
+			}
+			return $value;
+		} else if($value instanceof ArrayObject) {
+			$arr = clone $value;
+			foreach ($arr as $key => $v) {
+				$arr[$key] = $this->convertValue($v);
+			}
+			return $arr;
 		} else if (is_scalar($value) || is_null($value)) {
 			return $value;
 		} else if ($value instanceof \StdClass) {

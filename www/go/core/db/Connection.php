@@ -123,7 +123,13 @@ class Connection {
 		if($this->debug) {
 			\go\core\App::get()->getDebugger()->debug($sql);
 		}
-		return $this->getPdo()->query($sql);
+		try {
+			return $this->getPdo()->query($sql);
+		}
+		catch(PDOException $e) {
+			GO()->error("SQL FAILED: " . $sql);
+			throw $e;
+		}
 	}
 	
 	/**
@@ -139,7 +145,13 @@ class Connection {
 		if($this->debug) {
 			\go\core\App::get()->getDebugger()->debug($sql);
 		}
-		return $this->getPdo()->exec($sql);
+		try {
+			return $this->getPdo()->exec($sql);
+		}
+		catch(PDOException $e) {
+			GO()->error("SQL FAILED: " . $sql);
+			throw $e;
+		}
 	}
 	
 

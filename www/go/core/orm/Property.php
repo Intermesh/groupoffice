@@ -20,6 +20,7 @@ use ReflectionClass;
 use function GO;
 use go\core\db\Query as GoQuery;
 use go\core\db\Table;
+use go\core\util\ArrayObject;
 
 /**
  * Property model
@@ -176,7 +177,8 @@ abstract class Property extends Model {
 				case Relation::TYPE_MAP:
 					$values = $this->isNew() ? [] : $cls::internalFind()->andWhere($where)->all();
 					if(!count($values)) {
-						$this->{$relation->name} = new \stdClass;
+						$this->{$relation->name} = new ArrayObject();
+						$this->{$relation->name}->serializeJsonAsObject = true;
 					} else{
 						$o = [];
 						foreach($values as $v) {
@@ -245,7 +247,8 @@ abstract class Property extends Model {
 		$watch = array_unique($watch);
 
 		foreach ($watch as $propName) {
-			$this->oldProps[$propName] = $this->$propName;
+			$v = $this->$propName;
+			$this->oldProps[$propName] = is_object($v) ? clone $v : $v;
 		}
 	}
 
@@ -949,7 +952,7 @@ abstract class Property extends Model {
 		return true;
 	}
 
-	private function removeRelated(Relation $relation, array $models) {
+	private function removeRelated(Relation $relation, $models) {
 		$cls = $relation->entityName;
 		$tables = $cls::getMapping()->getTables();
 		$first = array_shift($tables);
@@ -1024,7 +1027,9 @@ abstract class Property extends Model {
 		
 		$this->removeRelated($relation, $models);		
 		
-		$this->{$relation->name} = [];
+		$this->{$relation->name} = new ArrayObject();
+		$this->{$relation->name}->serializeJsonAsObject = true;
+
 		foreach ($models as $newProp) {
 			
 			if($newProp === null) {
@@ -1245,7 +1250,6 @@ abstract class Property extends Model {
 		$this->savedPropertyRelations = [];
 		$this->isNew = false;
 		$this->trackModifications();
-
 
 		return true;
 	}
@@ -1474,7 +1478,7 @@ abstract class Property extends Model {
 		$this->$propName = [];
 		foreach($value as $id => $patch) {
 			if(!isset($patch) || $patch === false) {
-				if(!array_key_exists($id, $this->$propName)) {
+				if(!array_key_exists($id, $old)) {
 					GO()->warn("Key $id does not exist in ". static::class .'->'.$propName);
 				}				
 				continue;

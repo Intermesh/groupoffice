@@ -16,7 +16,7 @@ class Utils {
 		try {
 			for ($i = 0, $c = count($queries); $i < $c; $i++) {
 				if(!empty($queries[$i])) {
-					App::get()->getDbConnection()->query($queries[$i]);
+					App::get()->getDbConnection()->exec($queries[$i]);
 				}
 			}
 		} catch (PDOException $e) {
