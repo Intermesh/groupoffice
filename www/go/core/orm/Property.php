@@ -1487,9 +1487,13 @@ abstract class Property extends Model {
 			} else {
 
 				$this->$propName[$id] = $this->internalNormalizeRelation($relation, $patch);	
-				foreach($this->mapKeyToValues($id, $relation) as $key => $value) {
-					$this->$propName[$id]->$key = $value;
-				}				
+
+				if(is_bool($patch)) {
+					//Only change key to values when using booleans. Key can also be made up by the client.
+					foreach($this->mapKeyToValues($id, $relation) as $key => $value) {
+						$this->$propName[$id]->$key = $value;
+					}				
+				}
 			}
 			
 		}
