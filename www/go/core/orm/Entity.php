@@ -346,7 +346,7 @@ abstract class Entity extends Property {
 	 * @param int $level
 	 * @return boolean
 	 */
-	public function hasPermissionLevel($level = Acl::LEVEL_READ) {
+	public final function hasPermissionLevel($level = Acl::LEVEL_READ) {
 		return $level <= $this->getPermissionLevel();
 	}
 	

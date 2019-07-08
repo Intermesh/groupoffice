@@ -1,3 +1,5 @@
+- Task / Projects and Billing: HTML encoding bugs in description
+
 08-07-2019 6.4.28
 - Email: Fixed attachment encoding error
 - Core: Fixed contact link to maps #438

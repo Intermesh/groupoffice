@@ -369,7 +369,12 @@ class User extends Entity {
 	
 	protected function internalValidate() {
 		
-		if(!$this->isNew() && $this->isModified('groups')) {			
+		if(!$this->isNew() && $this->isModified('groups')) {	
+			
+			if($this->getPermissionLevel() < Acl::LEVEL_MANAGE) {
+				throw new Forbidden("You're not allowed to change groups");
+			}
+			
 			if(!in_array(Group::ID_EVERYONE, $this->groups)) {
 				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, GO()->t("You can't remove group everyone"));
 			}
@@ -422,10 +427,14 @@ class User extends Entity {
 						->single();
 	}
 
-	
 
-	public function hasPermissionLevel($level = Acl::LEVEL_READ) {
-		return $this->id == App::get()->getAuthState()->getUserId() || App::get()->getAuthState()->getUser()->isAdmin();
+	public function getPermissionLevel()
+	{
+		if($this->id == App::get()->getAuthState()->getUserId()) {
+			return Acl::LEVEL_WRITE;
+		}
+
+		return parent::getPermissionLevel();
 	}
 	
 	protected static function textFilterColumns() {
