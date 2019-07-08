@@ -1,7 +1,6 @@
 <?php
 
 use go\core\App;
-use go\core\util\IniFile;
 use go\core\util\ClassFinder;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Expression;
@@ -10,6 +9,8 @@ use go\core\orm\EntityType;
 use GO\Base\Db\ActiveRecord;
 use go\core\model\Search;
 use GO\Base\Model\SearchCacheRecord;
+use go\core\model\Group;
+use go\core\model\Acl;
 
 $updates["201803090847"][] = "ALTER TABLE `go_log` ADD `jsonData` TEXT NULL AFTER `message`;";
 
@@ -601,4 +602,8 @@ $updates['201906032000'][] = "ALTER TABLE `core_acl` ADD CONSTRAINT `core_acl_ib
 
 $updates['201906211622'][] = function() {
 	GO()->getDbConnection()->query("ALTER TABLE `core_search` CHANGE `keywords` `keywords` VARCHAR(192) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL;");
+};
+
+$updates['201906211622'][] = function() {
+  EntityType::findByName('FieldSet')->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
 };

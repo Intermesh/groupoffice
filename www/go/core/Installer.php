@@ -27,6 +27,8 @@ use PDOException;
 use go\modules\community\ldapauthenticator\Module as GoModule;
 use go\core\model\Module as GoCoreModule;
 use GO\Base\Db\ActiveRecord;
+use go\core\orm\EntityType;
+use go\core\model\Acl;
 
 class Installer {
 	
@@ -117,6 +119,8 @@ class Installer {
 				return false;
 			}
 		}
+
+		EntityType::findByName('FieldSet')->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
 	}
 	
 	private function installCoreModule() {
