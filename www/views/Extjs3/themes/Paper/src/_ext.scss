@@ -1139,7 +1139,7 @@
 	&-cell-inner, &-hd-inner {
 		@extend .ellipsis;
 		// min-height: dp(40); //Seems to cause slightly off positioning in grid cells
-		padding: dp(6) dp(8) dp(6) dp(8); // 10 top = middle of row line-height 20dp
+		padding: dp(6) dp(8) dp(6) dp(16); // 10 top = middle of row line-height 20dp
 		.ux-row-action-cell & {
 			padding: dp(8) 0;
 		}
@@ -1235,7 +1235,7 @@
 	}
 	&-hd-inner {
 		min-height: dp(20);
-		padding: 0 dp(8) 0 dp(8);
+		padding: 0 dp(8) 0 dp(16);
 	}
 	&-dirty-cell > div {
 		border-radius: $borderRadius;
