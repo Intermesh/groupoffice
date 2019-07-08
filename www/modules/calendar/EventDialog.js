@@ -939,7 +939,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 				xtype:'textarea',
 				fieldLabel:t("Description"),
 				name : 'description',
-				anchor:'0 -300'
+				grow: true
 			}]
 
 		});
