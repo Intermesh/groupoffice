@@ -54,8 +54,6 @@ go.modules.community.addressbook.CustomFieldSetDialog = Ext.extend(go.customfiel
 		if (!this.formPanel.values.filter) {
 			this.formPanel.values.filter = {};
 		}
-
-		debugger;
 		
 		switch (this.formPanel.getForm().findField('enableFor').getValue()) {
 			case 'contacts':
