@@ -371,15 +371,15 @@ class User extends Entity {
 		
 		if(!$this->isNew() && $this->isModified('groups')) {			
 			if(!in_array(Group::ID_EVERYONE, $this->groups)) {
-				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, "You can't remove group everyone");
+				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, GO()->t("You can't remove group everyone"));
 			}
 			
 			if(!in_array($this->getPersonalGroup()->id, $this->groups)) {
-				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, "You can't remove the user's personal group");
+				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, GO()->t("You can't remove the user's personal group"));
 			}
 
 			if($this->id == 1 && !in_array(Group::ID_ADMINS, $this->groups)) {
-				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, "You can't remove group Admins from the primary admin user");
+				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, GO()->t("You can't remove group Admins from the primary admin user"));
 			}
 		}
 		
