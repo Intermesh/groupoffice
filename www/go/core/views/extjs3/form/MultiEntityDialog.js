@@ -82,19 +82,21 @@ go.form.MultiEntityDialog = Ext.extend(go.Window, {
 	load: function(ids) {
 		this.entityStore.get(ids, function(entries) {
 			entries.forEach(function(entry) {
-				var ff = this.formGroup.addPanel().formField, 
+				var wrap = this.formGroup.addPanel(),
+					ff = wrap.formField, 
 					entityPanel = ff.items.get(0);
+
 				this.formGroup.doLayout();
 				this.formGroup.markDeleted = [];
 				entityPanel.currentId = ff.key = entry.id;
 				entityPanel.setValues(entry);
 				entityPanel.entity = entry;
-				this.loadEntity(entityPanel, entry);
+				this.loadEntity(entityPanel, entry, wrap);
 			}, this)
 		}, this);
 	},
 
-	loadEntity: function(entityPanel, entity) {
+	loadEntity: function(entityPanel, entity, wrap) {
 		// overwrite todo something when entity is loaded
 		// method is called once for each entity
 	}
