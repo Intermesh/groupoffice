@@ -89,3 +89,9 @@ DROP COLUMN `ctime`;';
 $updates['201902051649'][] = "UPDATE comments_comment SET text = REPLACE(text, '\\n', '<br />');";
 
 $updates['201906032000'][] = "ALTER TABLE `comments_comment` CHANGE `createdBy` `createdBy` INT(11) NULL;";
+
+
+$updates['201906032000'][] = "ALTER TABLE `comments_comment` DROP FOREIGN KEY `fk_comments_comment_core_user1`";
+$updates['201906032000'][] = "ALTER TABLE `comments_comment` ADD CONSTRAINT `fk_comments_comment_core_user1` FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION";
+$updates['201906032000'][] = "ALTER TABLE `comments_comment` DROP FOREIGN KEY `fk_comments_comment_core_user2`";
+$updates['201906032000'][] = "ALTER TABLE `comments_comment` ADD CONSTRAINT `fk_comments_comment_core_user2` FOREIGN KEY (`modifiedBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION";
