@@ -1001,7 +1001,7 @@ abstract class Property extends Model {
 
 		$data = array_map(function($v) use($key, $where) {
 			return array_merge($where, [$key => $v]);
-		}, $this->{$relation->name});
+		}, $keepIds);
 
 		GO()->getDbConnection()->insertIgnore($relation->tableName, $data)->execute();
 
