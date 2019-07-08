@@ -999,11 +999,13 @@ abstract class Property extends Model {
 
 		GO()->getDbConnection()->delete($relation->tableName, $query)->execute();
 
-		$data = array_map(function($v) use($key, $where) {
-			return array_merge($where, [$key => $v]);
-		}, $keepIds);
+		if(!empty($keepIds)) {
+			$data = array_map(function($v) use($key, $where) {
+				return array_merge($where, [$key => $v]);
+			}, $keepIds);
 
-		GO()->getDbConnection()->insertIgnore($relation->tableName, $data)->execute();
+			GO()->getDbConnection()->insertIgnore($relation->tableName, $data)->execute();
+		}
 
 		return true;
 
