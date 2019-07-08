@@ -126,23 +126,25 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	},
 	
 	addPanel : function() {
-		var formField = this.createNewItem(), me = this, items = [formField];
+		var formField = this.createNewItem(), me = this, items = [formField], delBtn = new Ext.Button({				
+			//disabled: formField.disabled,
+			xtype: "button",
+			iconCls: 'ic-delete',
+			handler: function() {
+				if(this.ownerCt.ownerCt.formField.key) {
+					me.markDeleted.push(this.ownerCt.ownerCt.formField.key);
+				}
+				this.ownerCt.ownerCt.destroy();
+				me.dirty = true;
+			}
+		});
+
 		if(this.editable) {
 			items.unshift({
 				xtype: "container",
 				width: dp(48),		
-				items: [{				
-					xtype: "button",
-					iconCls: 'ic-delete',
-					handler: function() {
-						if(this.ownerCt.ownerCt.formField.key) {
-							me.markDeleted.push(this.ownerCt.ownerCt.formField.key);
-						}
-						this.ownerCt.ownerCt.destroy();
-						me.dirty = true;
-					}
-				}]
-			})
+				items: [delBtn]
+			});	
 		}
 		var wrap = new Ext.Container({
 			layout: "column",
