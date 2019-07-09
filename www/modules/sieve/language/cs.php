@@ -132,4 +132,6 @@ return array (
   'Ok' => 'OK',
   'autoReplyMessage' => 'Automatická odpověď',
   'Filters' => 'Filtry',
+  'nDaysText' => 'dní',
+  'Sieve' => 'Síto',
 );

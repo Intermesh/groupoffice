@@ -69,6 +69,11 @@
 - First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
 
 
+
+- Core: Enable / disable Add linked item buttons based on permissions
+- Core: Update Czech translation
+- Email: Fixed attachment encoding error
+
 24-06-2019 6.3.80
 - Calendar: Fixed error where appointment dialog wouldn't load
 
