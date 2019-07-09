@@ -110,9 +110,16 @@ abstract class Property extends Model {
 		$this->initDatabaseColumns($this->isNew);
 		$this->initRelations();
 		$this->trackModifications();
+
+		// When properties have default values in the model they are overwritten by the database defaults. We change them back here so the
+		// modification is tracked and it will be saved.
+		foreach($this->defaults as $key => $value) {
+			$this->$key = $value;
+		}
 		$this->init();
 	}
 
+	private $defaults = [];
 
 	/**
 	 * Loads defaults from the database or casts the database value to the right type in PHP
@@ -122,8 +129,17 @@ abstract class Property extends Model {
 	private function initDatabaseColumns($loadDefault) {
 		foreach ($this->getMapping()->getTables() as $table) {
 			foreach ($table->getColumns() as $colName => $column) {
-				if (in_array($colName, $this->fetchProperties)) {
-					$this->$colName = $loadDefault ? $column->castFromDb($column->default) : $column->castFromDb($this->$colName);
+				if (in_array($colName, $this->fetchProperties) || static::isProtectedProperty($colName)) {
+					if($loadDefault) {
+
+						if(isset($this->$colName)) {
+							$this->defaults[$colName] = $this->$colName;
+						}
+
+						$this->$colName = $column->castFromDb($column->default);
+					} else {
+						$this->$colName = $column->castFromDb($this->$colName);
+					}
 				}
 			}
 			foreach($table->getConstantValues() as $colName => $value) {
