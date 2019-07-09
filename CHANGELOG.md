@@ -1,3 +1,5 @@
+09-07-2019 6.4.29
+- Core: System settings dialog was reachable for non admins
 - Task / Projects and Billing: HTML encoding bugs in description
 
 08-07-2019 6.4.28
