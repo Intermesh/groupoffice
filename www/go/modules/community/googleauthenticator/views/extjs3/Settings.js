@@ -135,7 +135,7 @@ Ext.onReady(function () {
 									callback.call(this,user.id);
 								} else {
 									// When the password is not correct, call itself again to try again
-									me.requestSecret(user.id, callback);
+									me.requestSecret(user, callback);
 								}
 							});
 						},
