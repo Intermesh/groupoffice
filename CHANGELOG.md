@@ -1,3 +1,7 @@
+- Billing: Link message when emailing from edit dialog
+- imapauth / ldapauth: Fixed e-mail account creation
+- address book: Scrolling in user profile
+
 09-07-2019 6.4.29
 - Core: System settings dialog was reachable for non admins
 - Task / Projects and Billing: HTML encoding bugs in description
