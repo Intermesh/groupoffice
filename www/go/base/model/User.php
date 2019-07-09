@@ -4,6 +4,7 @@ namespace GO\Base\Model;
 use GO;
 use GO\Base\Mail\Message;
 use GO\Base\Mail\Mailer;
+use go\core\db\Query;
 
 /**
  * The User model
@@ -646,7 +647,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 */
 	public static function getGroupIds($userId) {
 
-		return GO()->getDbConnection()->selectSingleValue('groupId')->from('core_user_group')->where(['userId' => $userId])->all();
+		return (new Query)->selectSingleValue('groupId')->from('core_user_group')->where(['userId' => $userId])->all();
 		// $user = GO::user();
 		// if ($user && $userId == $user->id) {
 		// 	if (!isset(GO::session()->values['user_groups'])) {
