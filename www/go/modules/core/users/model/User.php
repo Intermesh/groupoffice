@@ -636,11 +636,18 @@ class User extends Entity {
 	/**
 	 * Check if this user has a module
 	 * 
+	 * @param string $package
 	 * @param string $name
+	 * 
 	 * @return boolean
 	 */
-	public function hasModule($name) {
-		$module = Module::find()->where(['name' => $name])->single();
+	public function hasModule($package, $name) {
+
+		if($package == "legacy") {
+			$package = null;
+		}
+
+		$module = Module::find()->where(['package' => $package, 'name' => $name])->single();
 		if(!$module) {
 			return false;
 		}
