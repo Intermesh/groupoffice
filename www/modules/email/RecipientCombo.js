@@ -4,7 +4,7 @@ GO.email.RecipientCombo = Ext.extend(GO.form.ComboBoxMulti, {
 	name: 'to',
 	flex: 1,
 	valueField: 'full_email',
-	displayField: 'name',
+	displayField: 'full_email',
 
 	initComponent: function () {
 
