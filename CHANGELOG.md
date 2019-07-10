@@ -1,3 +1,4 @@
+- Email: Fixed missing email in to field of composer bug
 - Billing: Link message when emailing from edit dialog
 - imapauth / ldapauth: Fixed e-mail account creation
 - address book: Scrolling in user profile

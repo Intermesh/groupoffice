@@ -32,7 +32,14 @@ trait CustomFieldsTrait {
 	 */
 	public function getCustomFields($asText = false) {
 		$fn = $asText ? 'dbToText' : 'dbToApi';
+		$record = $this->internalGetCustomFields();
+		foreach(self::getCustomFieldModels() as $field) {
+			$record[$field->databaseName] = $field->getDataType()->$fn(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record);			
+		}
+		return $record;	
+	}
 
+	protected function internalGetCustomFields() {
 		if(!isset($this->customFieldsData)) {
 			$record = (new Query())
 							->select('*')
@@ -46,11 +53,7 @@ trait CustomFieldsTrait {
 				$columns = Table::getInstance(static::customFieldsTableName())->getColumns();		
 				foreach($columns as $name => $column) {					
 					$record[$name] = $column->castFromDb($record[$name]);					
-				}				
-				
-				foreach(self::getCustomFieldModels() as $field) {
-					$record[$field->databaseName] = $field->getDataType()->$fn(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record);			
-				}
+				}			
 				
 				$this->customFieldsData = $record;
 				
@@ -60,8 +63,9 @@ trait CustomFieldsTrait {
 			}
 		}
 		
-		return array_filter($this->customFieldsData, function($key) {return $key != 'id';}, ARRAY_FILTER_USE_KEY);
+		return $this->customFieldsData;//array_filter($this->customFieldsData, function($key) {return $key != 'id';}, ARRAY_FILTER_USE_KEY);
 	}
+
 
 	
 	//for legacy modules
@@ -80,7 +84,7 @@ trait CustomFieldsTrait {
 	 * @return $this
 	 */
 	public function setCustomFields(array $data) {			
-		$this->customFieldsData = array_merge($this->getCustomFields(), $this->normalizeCustomFieldsInput($data));		
+		$this->customFieldsData = array_merge($this->internalGetCustomFields(), $this->normalizeCustomFieldsInput($data));		
 		
 		$this->customFieldsModified = true;
 
@@ -167,7 +171,7 @@ trait CustomFieldsTrait {
 		}
 		
 		try {			
-			$record = &$this->customFieldsData;			
+			$record = $this->customFieldsData;			
 			
 			foreach(self::getCustomFieldModels() as $field) {
 				if(!$field->getDataType()->beforeSave(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record)) {

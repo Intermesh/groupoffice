@@ -26,8 +26,9 @@ go.customfields.type.FunctionField = Ext.extend(go.customfields.type.Number, {
 	 * @returns {Object}
 	 */
 	createFormFieldConfig: function (customfield, config) {
-		var config = go.customfields.type.FunctionField.superclass.createFormFieldConfig.call(this, customfield, config);
+		config = go.customfields.type.FunctionField.superclass.createFormFieldConfig.call(this, customfield, config);
 		config.readOnly = true;
+		config.submit = false;
 
 		return config;
 	}

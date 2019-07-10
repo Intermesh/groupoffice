@@ -59,28 +59,28 @@ class MultiSelect extends Select {
 	}
 	
 	
-	public function beforeSave($value, &$values) {
+	public function beforeSave($value, &$record) {
 		
 		//remove options from record to be inserted and save them for the afterSave method.
 		$this->optionsToSave = $value;
-		unset($values[$this->field->databaseName]);
+		unset($record[$this->field->databaseName]);
 		return true;
 	}
 	
-	public function afterSave($value, &$values) {
+	public function afterSave($value, &$customFieldData) {
 		
 		if(!isset($this->optionsToSave)) {
 			return true;
 		}
 		
 		foreach($this->optionsToSave as $optionId) {
-			if(!GO()->getDbConnection()->replace($this->getMultiSelectTableName(), ['id' => $values['id'], 'optionId' => $optionId])->execute()) {
+			if(!GO()->getDbConnection()->replace($this->getMultiSelectTableName(), ['id' => $customFieldData['id'], 'optionId' => $optionId])->execute()) {
 				return false;
 			}
 		}
 		
 		
-		$query  = (new Query)->where(['id' => $values['id']]);
+		$query  = (new Query)->where(['id' => $customFieldData['id']]);
 		if (!empty($this->optionsToSave)) {	 
 			 $query	->andWhere('optionId', 'not in', $this->optionsToSave);
 		}

@@ -186,10 +186,10 @@ abstract class Base extends Model {
 	 * 
 	 * @see MultiSelect for an advaced example
 	 * @param mixed $value The value for this field
-	 * @param array $values The values inserted in the database
+	 * @param array $customFieldData The custom fields data
 	 * @return boolean
 	 */
-	public function afterSave($value, &$values) {
+	public function afterSave($value, &$customFieldData) {
 		
 		return true;
 	}
@@ -210,10 +210,10 @@ abstract class Base extends Model {
 	 * 
 	 * @see MultiSelect for an advaced example
 	 * @param mixed $value The value for this field
-	 * @param array $values The values inserted in the database
+	 * @param array $record The values inserted in the database
 	 * @return boolean
 	 */
-	public function beforeSave($value, &$values) {
+	public function beforeSave($value, &$record) {
 		
 		return true;
 	}
