@@ -25,13 +25,28 @@ go.customfields.type.Select = Ext.extend(go.customfields.type.Text, {
 	 * @param {object} customfield Field entity from custom fields
 	 * @returns {unresolved}
 	 */
-	renderDetailView: function (value, data, customfield) {
-		
-		var opt = customfield.dataType.options.find(function(o) {
-			return o.id == value;
-		});
-		
+	renderDetailView: function (value, data, customfield) {		
+		var opt = this.findRecursive(value, customfield.dataType.options);		
 		return opt ? opt.text : null;
+	},
+
+	findRecursive: function (value, options) {
+		var o;
+		for(var i = 0, l = options.length; i < l; i++) {
+			o = options[i];
+			if(o.id == value) {
+				return o;
+			}
+
+			if(o.children) {
+				var nested = this.findRecursive(value, o.children);
+				if(nested) {
+					return nested;
+				}
+			}
+		}
+
+		return false;
 	},
 	
 	/**
