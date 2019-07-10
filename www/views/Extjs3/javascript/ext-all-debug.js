@@ -10375,6 +10375,7 @@ Ext.extend(Ext.XTemplate, Ext.Template, {
     
     codeRe : /\{\[((?:\\\]|.|\n)*?)\]\}/g,
 
+    defaultFormatFunc: "htmlEncode",
     
     applySubTemplate : function(id, values, parent, xindex, xcount){
         var me = this,
@@ -10403,7 +10404,7 @@ Ext.extend(Ext.XTemplate, Ext.Template, {
         var fm = Ext.util.Format,
             useF = this.disableFormats !== true,
             sep = Ext.isGecko ? "+" : ",",
-            body;
+            body, defaultFormatFunc = this.defaultFormatFunc;
 
         function fn(m, name, format, args, math){
             if(name.substr(0, 4) == 'xtpl'){
@@ -10423,9 +10424,9 @@ Ext.extend(Ext.XTemplate, Ext.Template, {
                 v = '(' + v + math + ')';
             }
             if(!format) {
-                format = 'htmlEncode';
+                format = defaultFormatFunc;
             }
-            if (useF) {
+            if (format && useF) {
                 args = args ? ',' + args : "";
                 if(format.substr(0, 5) != "this."){
                     format = "fm." + format + '(';
@@ -47573,7 +47574,12 @@ Ext.grid.GridView = Ext.extend(Ext.util.Observable, {
         this.layout();
     },
 
+    htmlEncode: false,
+
     encodeGridValue : function(store, column, record) {
+        if(!this.htmlEncode) {
+            return record.data[column.name];
+        }
         //Merijn: htmlEncode string types en relations to prevent XSS.
         var col = store.fields.item(column.name), v = record.data[column.name];
         if(col) {

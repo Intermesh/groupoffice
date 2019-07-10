@@ -16,7 +16,7 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 	autoExpandMin: dp(200),
 
 	loadMask: true,
-
+	
 	initComponent: function () {
 		
 		Ext.applyIf(this, go.grid.GridTrait);
@@ -46,8 +46,6 @@ Ext.reg("gogrid", go.grid.GridPanel);
 						delete o.columns[i].width;
 					}            
 				}
-
-				console.log(o);
 
 				return o;
 			}

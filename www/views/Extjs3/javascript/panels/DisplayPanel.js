@@ -205,8 +205,9 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		}
 		
 		this.modifyTemplate();
-
+		this.templateConfig.defaultFormatFunc = false;
 		this.xtemplate = new Ext.XTemplate(this.template, this.templateConfig);
+		
 		this.xtemplate.compile();
 		
 		

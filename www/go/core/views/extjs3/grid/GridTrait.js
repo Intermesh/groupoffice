@@ -32,6 +32,8 @@ go.grid.GridTrait = {
 			Ext.applyIf(this, go.panels.ScrollLoader);
 			this.initScrollLoader();
 		}
+
+		this.getView().htmlEncode = true;
 	},
 	
 	initHeaderMenu : function() {
