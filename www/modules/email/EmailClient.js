@@ -1991,7 +1991,10 @@ GO.email.moveToInbox = function(mailUid,fromAccountId) {
 		 * @param {Object} config {name: "Merijn" email: "mschering@intermesh.nl", subject: "Hello", body: "Just saying hello!"}
 		 * @return {undefined}
 		 */
-go.util.mailto = function (config) {
+go.util.mailto = function (config, event) {
+
+	event.preventDefault();
+
 	config.values = {to: config.email};
 
 	if (config.name) {

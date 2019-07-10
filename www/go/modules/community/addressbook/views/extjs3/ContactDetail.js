@@ -54,13 +54,19 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					onLoad: function(dv) {
 						dv.emailButton.menu.removeAll();						
 						dv.data.emailAddresses.forEach(function(a) {
+
+							
+							var	mailto = '"' + dv.data.name.replace(/"/g, '\\"') + '" <' + a.email + '>';
+							
+
 							dv.emailButton.menu.addMenuItem({
 								text: "<div>" + a.email + "</div><small>" + (t("emailTypes")[a.type] || a.type) + "</small>",
-								handler: function() {
+								href: "mailto:" + mailto,
+								handler: function(btn, e) {
 									go.util.mailto({
 										email: a.email,
-										name: dv.name
-									});
+										name: dv.data.name
+									}, e);
 								}
 							});
 						});
@@ -71,11 +77,12 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 						dv.data.phoneNumbers.forEach(function(a) {
 							dv.callButton.menu.addMenuItem({
 								text: "<div>" + a.number + "</div><small>" + (t("phoneTypes")[a.type] || a.type)  + "</small>",
-								handler: function() {
+								href: "tel://" + a.number,
+								handler: function(btn, e) {									
 									go.util.callto({
 										number: a.number,
 										name: dv.name
-									});
+									}, e);
 								}
 							});
 						});

@@ -121,18 +121,20 @@ go.util =  (function () {
 		 * @param {Object} config {name: "Merijn" email: "mschering@intermesh.nl", subject: "Hello", body: "Just saying hello!"}
 		 * @return {undefined}
 		 */
-		mailto: function (config) {
-			var email = config.email;
+		mailto: function (config, event) {
+			// event.preventDefault();
+			// var email = config.email;
 
-			if (config.name) {
-				email = '"' + config.name.replace(/"/g, '\"') + '" <' + config.email + '>';
-			}
+			// if (config.name) {
+			// 	email = '"' + config.name.replace(/"/g, '\\"') + '" <' + config.email + '>';
+			// }
 
-			document.location = "mailto:" + email;
+			// document.location = "mailto:" + email;
 		},
 
-		callto: function (config) {
-			document.location = "tel:" + config.number;
+		callto: function (config, event) {
+			// event.preventDefault();
+			// document.location = "tel://" + config.number;
 		},
 
 		streetAddress: function (config) {
