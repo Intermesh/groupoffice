@@ -88,4 +88,7 @@ return array (
   'Remove duplicates' => 'Smazat duplicity',
   'Contact' => 'Kontakt',
   'Ok' => 'OK',
+  'project' => 'Projekt',
+  'ID' => 'ID',
+  'Add Contact' => 'Přidat kontakt',
 );

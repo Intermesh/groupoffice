@@ -86,8 +86,9 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 	},
 	
 	onAfterRender : function() {
-		this.detailView.on('load', function (dv) {
-			this.setDisabled(dv.data.permissionLevel < go.permissionLevels.write);
+		this.detailView.on('load', function (dv) {			
+			var pl = Ext.isDefined(dv.data.permissionLevel ) ? dv.data.permissionLevel : dv.data.permission_level;
+			this.setDisabled(pl < go.permissionLevels.write);
 		}, this);
 	},
 	

@@ -50,4 +50,6 @@ return array (
   'Mda' => 'Mda',
   'Email' => 'Email',
   'Ok' => 'OK',
+  'Use \'*\' for a catch all alias (not recommended).' => 'Pro přeposílání všech přezdívek použijte: * (hvězdičku). Toto nastavení se nedoporučuje.',
+  'Postfix admin' => 'Postfix administrace',
 );

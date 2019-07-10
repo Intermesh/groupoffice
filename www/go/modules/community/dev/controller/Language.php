@@ -165,8 +165,10 @@ class Language extends Controller {
 	 * 
 	 * or with docker compose:
 	 * 
+	 * First put lang.csv in root of GO source
+	 * 
 	 * ```
-	 * docker-compose exec --user root groupoffice-master php cli.php community/dev/Language/import --path=/path/to/lang.csv
+	 * docker-compose exec --user root groupoffice-master php www/cli.php community/dev/Language/import --path=lang.csv
 	 * ```
 	 * 
 	 * @param type $params

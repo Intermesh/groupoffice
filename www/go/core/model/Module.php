@@ -243,6 +243,11 @@ class Module extends AclOwnerEntity {
 	 * @return boolean
 	 */
 	public static function isAvailableFor($package, $name, $userId = null, $level = Acl::LEVEL_READ) {
+
+		if($package == "legacy") {
+			$package = null;
+		}
+
 		$query = static::find()->where(['package' => $package, 'name' => $name, 'enabled' => true]);
 		static::applyAclToQuery($query, $level, $userId);
 		

@@ -11,4 +11,10 @@ return array (
   'Deactivate' => 'Deaktivovat',
   'Deactivate instance' => 'Deaktivovat instanci',
   'Activate instance' => 'Aktivovat instanci',
+  'Multi instance' => 'Multi instance',
+  'Instance' => 'Instance',
+  'Storage quota' => 'Kvóta uložiště',
+  'Size in GB' => 'Velikost v GB',
+  'Maximum number of users' => 'Maximální počet uživatelů',
+  'E-mail selected' => 'Vybrané e-mailové adresy',
 );

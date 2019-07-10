@@ -1,3 +1,9 @@
+- Billing: Link message when emailing from edit dialog
+- imapauth / ldapauth: Fixed e-mail account creation
+- address book: Scrolling in user profile
+
+09-07-2019 6.4.29
+- Core: System settings dialog was reachable for non admins
 - Task / Projects and Billing: HTML encoding bugs in description
 
 08-07-2019 6.4.28
@@ -68,6 +74,11 @@
 11-06-2019 6.4.21
 - First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
 
+
+
+- Core: Enable / disable Add linked item buttons based on permissions
+- Core: Update Czech translation
+- Email: Fixed attachment encoding error
 
 24-06-2019 6.3.80
 - Calendar: Fixed error where appointment dialog wouldn't load

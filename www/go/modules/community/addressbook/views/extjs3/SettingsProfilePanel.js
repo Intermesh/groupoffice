@@ -6,6 +6,7 @@ go.modules.community.addressbook.SettingsProfilePanel = Ext.extend(Ext.Panel, {
 	iconCls: 'ic-person',
 	labelWidth: 125,
 	layout: "fit",
+	autoScroll: true,
 	index: 1,
 	initComponent: function () {
 

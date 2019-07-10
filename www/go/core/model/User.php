@@ -652,20 +652,13 @@ class User extends Entity {
 	/**
 	 * Check if this user has a module
 	 * 
+	 * @param string $package
 	 * @param string $name
+	 * 
 	 * @return boolean
 	 */
-	public function hasModule($name) {
-		$module = Module::find()->where(['name' => $name])->single();
-		if(!$module) {
-			return false;
-		}
-		
-		if(!Acl::getUserPermissionLevel($module->aclId, $this->id)) {
-			return false;
-		}
-		
-		return true;		
+	public function hasModule($package, $name) {
+		return Module::isAvailableFor($package, $name, $this->id);		
 	}
 	
 	
