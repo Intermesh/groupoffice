@@ -4508,7 +4508,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			"`fromId`=".intval($from_id)." AND fromEntityTypeId=".$from_model_type_id." AND toEntityTypeId=".$to_model_type_id." AND `toId`=".intval($to_model_id);
 		
 		$stmt = $this->getDbConnection()->query($sql);
-		return $stmt->fetch() !== false;
+		return $stmt->fetchColumn(0);
 	}
 //
 //	/**
