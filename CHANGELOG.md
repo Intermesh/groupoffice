@@ -1,8 +1,10 @@
 
-Email: Fixed unlinking in email message
-Address book: {contact:cellular2} and {user:cellular2} work
-Newsletters: Sent items were not showing in newsletters
-Core: IE 11 support
+11-07-2019 6.4.32
+- Email: Fixed unlinking in email message
+- Address book: {contact:cellular2} and {user:cellular2} work
+- Newsletters: Sent items were not showing in newsletters
+- Core: IE 11 support
+- Leavedays: Employees needed aproval were not bold anymore
 
 11-07-2019 6.4.31
 - Core: Bug in template parsing
