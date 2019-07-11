@@ -456,8 +456,8 @@ class Migrate63to64 {
 			$contact->createdAt = new DateTime("@" . $r['ctime']);
 			$contact->modifiedAt = new DateTime("@" . $r['mtime']);
 			$contact->createdBy = \go\core\model\User::findById($r['user_id'], ['id']) ? $r['user_id'] : 1;
-			$contact->modifiedBy = \go\core\model\User::findById($r['muser_id'], ['id']) ? $r['muser_id'] : 1;
-			$contact->goUserId = empty($r['go_user_id']) || !\go\core\model\User::findById($r['go_user_id'], ['id']) ? null : $r['go_user_id'];
+			$contact->modifiedBy = \go\core\model\User::findById($r['muser_id'], ['id']) ? $r['muser_id'] : 1;			
+			$contact->goUserId = empty($r['go_user_id']) || !\go\core\model\User::findById($r['go_user_id'], ['id']) || Contact::findForUser($r['go_user_id'], ['id']) ? null : $r['go_user_id'];
 
 			if ($r['photo']) {
 
@@ -476,7 +476,7 @@ class Migrate63to64 {
 
 			if (!$contact->save()) {
 				GO()->debug($r);
-				throw new \Exception("Could not save contact");
+				throw new \Exception("Could not save contact" . var_export($contact->getValidationErrors(), true));
 			}
 			
 			if($r['company_id']) {				
@@ -602,7 +602,6 @@ class Migrate63to64 {
 			$contact->modifiedAt = new DateTime("@" . $r['mtime']);
 			$contact->createdBy = \go\core\model\User::findById($r['user_id'], ['id']) ? $r['user_id'] : 1;
 			$contact->modifiedBy = \go\core\model\User::findById($r['muser_id'], ['id']) ? $r['muser_id'] : 1;
-			$contact->goUserId = empty($r['go_user_id']) || !\go\core\model\User::findById($r['go_user_id'], ['id']) ? null : $r['go_user_id'];
 			
 			$contact->IBAN = $r['bank_no'];
 			
@@ -631,9 +630,10 @@ class Migrate63to64 {
 				
 				GO()->debug($r);
 				
-				throw new \Exception("Could not save contact");
+				throw new \Exception("Could not save contact" . var_export($contact->getValidationErrors(), true));
 			}
 		}
 	}
 
 }
+
