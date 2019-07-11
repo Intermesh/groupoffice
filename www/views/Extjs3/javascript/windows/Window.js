@@ -111,7 +111,9 @@ GO.Window = Ext.extend(Ext.Window,{
 		}
 		this.temporaryListeners=[];		
 		
-		document.activeElement.blur();
+		if(document.activeElement){
+			document.activeElement.blur();
+		}
 	},
 	
 	close: function() {
