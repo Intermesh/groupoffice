@@ -57,7 +57,6 @@ use GO\Base\Mail\Mailer;
  * @property string $date_format
  * @property string $email
  * @property string $recoveryEmail
- * @property \GO\Addressbook\Model\Contact $contact
  * @property string $digest
  * @property int $last_password_change
  * @property boolean $force_password_change
@@ -813,7 +812,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 * Get the contact model of this user. All the user profiles are stored in the
 	 * addressbook.
 	 * 
-	 * @return \GO\Addressbook\Model\Contact 
+
 	 */
 	public function createContact(){
 		throw new \Exception("No longer supported");
