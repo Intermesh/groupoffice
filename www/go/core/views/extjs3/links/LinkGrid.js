@@ -63,9 +63,6 @@ go.links.LinkGrid = Ext.extend(go.grid.GridPanel, {
 			sortInfo: {
 				field: 'modifiedAt',
 				direction: 'DESC'
-			},
-			baseParams: {
-				filter: {}
 			}
 		});
 		
