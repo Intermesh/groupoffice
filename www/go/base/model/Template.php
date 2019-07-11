@@ -48,7 +48,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	private $_lineBreak;
 	
 	
-	public $attributesFormat = 'formatted';
+	public static $attributesFormat = 'formatted';
 	
 		/**
 	 * Returns a static model of itself
@@ -103,7 +103,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		return 'go_templates';
 	}
 	
-	private function _addTagPrefixAndRemoveEmptyValues($attributes, $tagPrefix){
+	private static function _addTagPrefixAndRemoveEmptyValues($attributes, $tagPrefix){
 		$newAttributes = [];
 		if(!empty($tagPrefix)){
 			foreach($attributes as $key=>$value){
@@ -219,7 +219,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 			$orgs = $contact->getOrganizationIds();
 			if(count($orgs) && ($company = \go\modules\community\addressbook\model\Contact::findById($orgs[0])))
 			{
-				$attributes = array_merge($attributes, $this->_getModelAttributes($company, $companyTagPrefix));
+				$attributes = array_merge($attributes, static::_getModelAttributes($company, $companyTagPrefix));
 			}
 			
 			return $attributes;
@@ -227,24 +227,24 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	
 	
 	
-	private function _getModelAttributes($model, $tagPrefix=''){
-		$attributes = $model instanceof \GO\Base\Db\ActiveRecord ? $model->getAttributes($this->attributesFormat) : $model->toArray();		
+	private static function _getModelAttributes($model, $tagPrefix=''){
+		$attributes = $model instanceof \GO\Base\Db\ActiveRecord ? $model->getAttributes(static::$attributesFormat) : $model->toArray();		
 		
 		if(method_exists($model, "getCustomFields")){
 			$attributes = array_merge($attributes, $model->getCustomFields(true));
 		}
 
-		$attributes = $this->_addTagPrefixAndRemoveEmptyValues($attributes, $tagPrefix);
+		$attributes = static::_addTagPrefixAndRemoveEmptyValues($attributes, $tagPrefix);
 		
 		$cls = get_class($model);
 		
 		switch($cls) {
 			case \go\modules\community\addressbook\model\Contact::class:
 				if($model->isOrganization) {
-					$attributes = array_merge($attributes, $this->getCompanyAttributes($model, $tagPrefix));
+					$attributes = array_merge($attributes, static::getCompanyAttributes($model, $tagPrefix));
 				} else
 				{
-					$attributes = array_merge($attributes, $this->getContactAttributes($model, $tagPrefix));
+					$attributes = array_merge($attributes, static::getContactAttributes($model, $tagPrefix));
 				}
 				
 				break;			
