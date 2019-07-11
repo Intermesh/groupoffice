@@ -124,9 +124,13 @@ abstract class AclEntity extends Entity {
 	}
 	
 	protected static function defineFilters() {
-		return parent::defineFilters()->add("permissionLevel", function(Criteria $criteria, $value, Query $query) {
+		return parent::defineFilters()
+						->add("permissionLevelUserId", function() {
+							//dummy used in permissionLevel filter.
+						})
+						->add("permissionLevel", function(Criteria $criteria, $value, Query $query, $filter) {
 			//Permission level is always added to the main query so that it's always applied with AND
-			static::applyAclToQuery($query, $value);
+			static::applyAclToQuery($query, $value, $filter['permissionLevelUserId'] ?? null);
 		});
 	}
 
