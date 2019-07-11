@@ -239,8 +239,11 @@ class MigrateCustomFields63to64 {
 		}
 
 		//Value is string <id>:<Text>
-		$id = explode(':', $v)[0];
-		
+		$id = (int) explode(':', $v)[0];
+		if(!$id) {
+			return null;
+		}
+
 		return $id + self::TREE_SELECT_OPTION_INCREMENT;
 	}
 	
