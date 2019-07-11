@@ -1,3 +1,8 @@
+
+11-07-2019 6.4.31
+- Core: Bug in template parsing
+- Core: Works in IE 11 now
+
 11-07-2019 6.4.30
 - Billing: Fixed ODF templates
 - Email: Fixed missing email in to field of composer bug

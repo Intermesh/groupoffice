@@ -314,11 +314,11 @@ class Contact extends AclItemEntity {
 	 * @param int $userId
 	 * @return static
 	 */
-	public static function findForUser($userId) {
+	public static function findForUser($userId, $properties = []) {
 		if(empty($userId)) {
 			return false;
 		}
-		return static::find()->where('goUserId', '=', $userId)->single();
+		return static::find($properties)->where('goUserId', '=', $userId)->single();
 	}
 	
 	/**

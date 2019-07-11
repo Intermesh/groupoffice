@@ -19,6 +19,15 @@ use go\core\util\StringUtil;
 class File extends FileSystemObject {
 
 	/**
+	 * Check if the file or folder exists
+	 * @return boolean
+	 */
+	public function exists() {
+		return is_file($this->path);
+	}
+
+
+	/**
 	 * Get a temporary file
 	 * 
 	 * @param string $extension

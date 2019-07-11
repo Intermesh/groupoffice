@@ -190,7 +190,7 @@ class Bookmark extends EntityController {
 			} else{
 				unset($data['logo']);
 			}
-			GO()->getDbConnection()->insert('bookmarks_bookmark', $data)->execute();
+			GO()->getDbConnection()->replace('bookmarks_bookmark', $data)->execute();
 		}
 	}
 }
