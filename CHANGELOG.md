@@ -1,7 +1,9 @@
 
+Newsletters: Sent items were not showing in newsletters
+Core: IE 11 support
+
 11-07-2019 6.4.31
 - Core: Bug in template parsing
-- Core: Works in IE 11 now
 
 11-07-2019 6.4.30
 - Billing: Fixed ODF templates

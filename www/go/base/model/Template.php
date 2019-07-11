@@ -210,7 +210,11 @@ class Template extends \GO\Base\Db\ActiveRecord{
 					break;
 
 					case \go\modules\community\addressbook\model\PhoneNumber::TYPE_MOBILE:
-						$attributes[$tagPrefix . 'cellular'] = $p->number;
+						if(isset($attributes[$tagPrefix . 'cellular'])) {
+							$attributes[$tagPrefix . 'cellular2'] = $p->number;
+						} else {
+							$attributes[$tagPrefix . 'cellular'] = $p->number;
+						}
 					break;
 				}
 			}
