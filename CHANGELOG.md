@@ -1,3 +1,5 @@
+11-07-2019 6.4.30
+- Billing: Fixed ODF templates
 - Email: Fixed missing email in to field of composer bug
 - Billing: Link message when emailing from edit dialog
 - imapauth / ldapauth: Fixed e-mail account creation
