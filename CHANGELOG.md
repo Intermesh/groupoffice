@@ -1,4 +1,5 @@
 
+Address book: {contact:cellular2} and {user:cellular2} work
 Newsletters: Sent items were not showing in newsletters
 Core: IE 11 support
 
