@@ -34,6 +34,10 @@ class Search extends AclOwnerEntity {
 	protected function deleteAcl() {
 		
 	}
+
+	public function findAclId() {
+		return $this->aclId;
+	}
 	
 	
 	/**

@@ -263,14 +263,21 @@ class Link extends Entity {
 		$reverse['createdAt'] = $this->createdAt;
 		
 		if($this->isNew()) {			
-			//make sure the description and name are set so they are returned to the client
+			$this->updateDataFromSearch();
+		}
+		
+		return App::get()->getDbConnection()->insertIgnore('core_link', $reverse)->execute();
+	}
+
+	private function updateDataFromSearch() {
+		//make sure the description and name are set so they are returned to the client
+		if(!isset($this->toSearchId)) {
 			$search = Search::find()->where(['entityId' => $this->toId, 'entityTypeId' => $this->toEntityTypeId])->single();
 			$this->toDescription = $search->description;
 			$this->toName = $search->name;
 			$this->toSearchId = $search->id;
+			$this->aclId = $search->findAclId();
 		}
-		
-		return App::get()->getDbConnection()->insertIgnore('core_link', $reverse)->execute();
 	}
 	
 	protected function internalDelete() {		
@@ -298,6 +305,9 @@ class Link extends Entity {
 	 * @return int
 	 */
 	public function getPermissionLevel() {
+		if($this->isNew()) {			
+			$this->updateDataFromSearch();
+		}
 		return Acl::getUserPermissionLevel($this->aclId, App::get()->getAuthState()->getUserId());
 	}
 	
