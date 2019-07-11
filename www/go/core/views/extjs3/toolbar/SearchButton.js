@@ -215,13 +215,22 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 		
 		if(this.store && this.store.entityStore) {
 			
-			var names = Object.keys(this.store.entityStore.entity.filters).filter(function(name) {return name != 'text'});
+			var names =  [], f;
+			
+			for ( var name in this.store.entityStore.entity.filters) {
+				f = this.store.entityStore.entity.filters[name];
+				if(f.name != 'text' && !f.customfield) {
+					names.push(name);
+				}
+			}
 			
 			if(names.length) {
 			
 				var msg = t("You can use these keywords:<br /><br />") + names.join(", ") + "<br /><br />";
 
-				msg += t("For example:<br /><br />" + names[0] + ": \"John Doe\" "+ names[0] + ": Foo%");
+				msg += t("And any custom field by 'databaseName'.") + "<br /><br />";
+
+				msg += t("For example:<br /><br />modifiedBy: \"John Doe\" modifiedBy: Foo%");
 
 				if(names.indexOf('modified') > -1) {
 					msg += " modified: >2019-01-31 23:59 modified: <2019-02-01";
