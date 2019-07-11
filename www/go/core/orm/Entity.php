@@ -732,7 +732,7 @@ abstract class Entity extends Property {
 
 		foreach ($properties as $propName) {
 			try {
-				$value = $this->getValue($this, $propName);
+				$value = $this->getValue($propName);
 				$arr[$propName] = method_exists($value, 'toTemplate') ? $value->toTemplate() : $value;
 			} catch (NotArrayable $e) {
 				

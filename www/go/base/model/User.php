@@ -67,6 +67,8 @@ use GO\Base\Mail\Mailer;
  * @property Boolean $sort_email_addresses_by_time
  */
 class User extends \GO\Base\Db\ActiveRecord {
+
+	use \go\core\orm\CustomFieldsTrait;
 	
 	/**
 	 * Get the password hash from the new framework
