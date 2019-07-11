@@ -573,11 +573,13 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 				$acl->delete();
 		}
 
-		$this->notifyUsers(
-			array($this->id, $this->parent->id),
-			FolderNotificationMessage::DELETE_FOLDER,
-			$this->getPath()
-		);
+		if($this->parent){
+			$this->notifyUsers(
+				array($this->id, $this->parent->id),
+				FolderNotificationMessage::DELETE_FOLDER,
+				$this->getPath()
+			);
+		}
 		return parent::afterDelete();
 	}
 
