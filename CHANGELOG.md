@@ -1,7 +1,11 @@
+11-07-2019 6.4.30
+- Billing: Fixed ODF templates
 - Email: Fixed missing email in to field of composer bug
 - Billing: Link message when emailing from edit dialog
 - imapauth / ldapauth: Fixed e-mail account creation
 - address book: Scrolling in user profile
+- Updated Italian
+- Updated Czech
 
 09-07-2019 6.4.29
 - Core: System settings dialog was reachable for non admins
