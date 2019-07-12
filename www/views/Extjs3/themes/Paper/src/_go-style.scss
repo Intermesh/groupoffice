@@ -1406,3 +1406,16 @@ table[id^="comments-ext"] b {
 		border-top: 0;
 	}
 }
+
+.go-chip {
+	display: inline-block; 
+	border-radius: dp(4); 
+	background-color: $cPrimaryTp; 
+	margin-right: dp(8);
+	margin-top: dp(8);
+	padding-left: dp(8);
+	
+	button.icon {
+		color: color($fg, "secondary-text");
+	}
+}
