@@ -1,3 +1,5 @@
+15-07-2019 6.4.33
+- Core: Exclude composite fields from form posting again because this gave a lot of saving problems.
 
 11-07-2019 6.4.32
 - Email: Fixed unlinking in email message
