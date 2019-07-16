@@ -1319,7 +1319,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 			$folder=$this->find($findParams);
 			
-			if(!$folder->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
+			if($folder && !$folder->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
 				$folder = false;
 			}
 
