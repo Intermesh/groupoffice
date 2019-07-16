@@ -1,3 +1,6 @@
+- Tickets: Fixed changing from agent ticket type to customer ticket type
+- DAV: Fixed PHP Fatal error:  Uncaught Error: Call to a member function checkPermissionLevel() on boolean in /usr/share/groupoffice/modules/files/model/Folder.php:1322
+
 14-06-2019 6.2.120
 - Billing: grouping invoice items could make them dissappear.
 
