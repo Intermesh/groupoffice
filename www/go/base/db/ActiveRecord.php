@@ -1350,7 +1350,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		if($joinCf) {
 			$cfFieldModels = array_filter(static::getCustomFieldModels(), function($f) {
-				return $f->type != 'MultiSelect'; //temporary hack
+				return !empty($f->databaseName);
 			});
 			
 			$names = array_map(function($f) {
