@@ -35,6 +35,14 @@ class Comment extends Entity {
 	 */
 	public $labels;
 	
+	/**
+	 * By default the section is NULL. This property can be used to create multiple comment blocks per entity. 
+	 * This works with a 'section' filter that defaults to NULL.
+	 * 
+	 * @var string
+	 */
+	public $section;
+
 	protected static function defineMapping() {
 		return parent::defineMapping()
 			->addTable("comments_comment", 'c')
@@ -72,7 +80,7 @@ class Comment extends Entity {
 
 			->add('section', function(Criteria $criteria, $value){
 				$criteria->where(['c.section' => $value]);
-			}, 0);
+			}, null);
 	}
 	
 	public static function sort(Query $query, array $sort) {	

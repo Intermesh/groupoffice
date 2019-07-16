@@ -13,7 +13,7 @@ CREATE TABLE `comments_comment` (
   `modifiedBy` int(11) DEFAULT NULL,
   `modifiedAt` datetime DEFAULT NULL,
   `text` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `section` TINYINT NOT NULL DEFAULT '0' 
+  `section` VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `comments_comment_label` (
