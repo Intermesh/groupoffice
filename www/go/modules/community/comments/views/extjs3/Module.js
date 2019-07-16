@@ -5,7 +5,8 @@ go.Modules.register('community', 'comments', {
 	entities: [{
 		name: "Comment",
 		relations: {
-			creator: {store: "User", fk: "createdBy"}
+			creator: {store: "User", fk: "createdBy"},
+			labels: {store: "CommentLabel", fk: "labels"}
 		}
 	}, 
 	"CommentLabel"],

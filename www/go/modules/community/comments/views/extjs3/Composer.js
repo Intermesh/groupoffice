@@ -52,29 +52,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			boxMaxHeight: 200,
 			boxMinHeight:35
 		});
-		this.textField.on('sync', function(me, html) {
-			//me.onResize();
-			var body = me.getEditorBody(),
-			composer = this;
-			body.style.height = 'auto';
-			body.style.display = 'inline-block';
-			body.style.width = '100%';
-			body.style.minHeight = '17px';
-			body.style.margin = '8px 0';
-			
-			setTimeout(function() {
-				var h =  Math.max(me.boxMinHeight,Math.min(body.offsetHeight + 16, me.boxMaxHeight)); // 400  max height
-				if(h > 40) {
-					me.tb.show();
-				} else {
-					me.tb.hide();
-				}
-				me.ownerCt.setHeight(h + me.tb.el.getHeight());
-				composer.grow();
-			},0)
-			
-      },this);
-		
+		this.textField.on('sync', this.onSync,this);	
 		
 		this.sendBtn = new Ext.Button({
 			tooltip: t('Send'),
@@ -88,13 +66,11 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			scope: this
 		});
 		
-		this.items = [{xtype:'hidden',name:'entity'},
-			{xtype:'hidden', name: 'entityId'},
+		this.items = [
 			this.addBtn,
 			this.middleBox = new Ext.Container({
 				layout:'vbox',
 				align:'stretch',
-				//height:37, // todo auto height.
 				flex:1,
 				items: [
 					this.commentBox = new Ext.Container({
@@ -104,7 +80,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 						items:[this.textField]
 					}),
 					this.chips = new go.form.Chips({
-						name: 'labelIds',
+						name: 'labels',
 						entityStore: 'CommentLabel',
 						style:'padding-bottom:4px',
 						store: this.store
@@ -124,19 +100,49 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		go.modules.comments.Composer.superclass.initComponent.call(this);
 
 	},
+
+	onSync : function(me) {
+		//me.onResize();
+		var body = me.getEditorBody(),
+		composer = this;
+		body.style.height = 'auto';
+		body.style.display = 'inline-block';
+		body.style.width = '100%';
+		body.style.minHeight = '17px';
+		body.style.margin = '8px 0';
+		
+		setTimeout(function() {
+			var h =  Math.max(me.boxMinHeight,Math.min(body.offsetHeight + 16, me.boxMaxHeight)); // 400  max height
+			if(h > 40) {
+				me.tb.show();
+			} else {
+				me.tb.hide();
+			}
+			me.ownerCt.setHeight(h + me.tb.el.getHeight());
+			composer.grow();
+		}, 0);
+	},
 	
 	grow: function(){
+		
 		var totalHeight = this.commentBox.getHeight() + this.chips.getHeight() + this.attachmentBox.getHeight();
 		this.setHeight(totalHeight);
 		this.middleBox.setHeight(totalHeight-2);
-		this.ownerCt.setHeight(Math.min(400,this.ownerCt.commentsContainer.getEl().dom.scrollHeight + totalHeight + dp(64)));
-		this.ownerCt.doLayout();
+		var headerHeight = this.header? dp(64) : 0;
+		var h = Math.min(400,this.ownerCt.commentsContainer.getEl().dom.scrollHeight + totalHeight + headerHeight);
+		this.ownerCt.setHeight(h);
+		this.ownerCt.doLayout();	
 		this.doLayout();
 	},
+
+
 	
-	initEntity : function(entityId,entity){
-		this.form.findField('entity').setValue(entity);
-		this.form.findField('entityId').setValue(parseInt(entityId));
+	initEntity : function(entityId,entity, section) {
+		this.setValues({
+			entityId: entityId,
+			entity: entity,
+			section: section
+		});
 	},
 	
 	loadLabels : function() {

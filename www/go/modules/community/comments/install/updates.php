@@ -95,3 +95,7 @@ $updates['201906032000'][] = "ALTER TABLE `comments_comment` DROP FOREIGN KEY `f
 $updates['201906032000'][] = "ALTER TABLE `comments_comment` ADD CONSTRAINT `fk_comments_comment_core_user1` FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION";
 $updates['201906032000'][] = "ALTER TABLE `comments_comment` DROP FOREIGN KEY `fk_comments_comment_core_user2`";
 $updates['201906032000'][] = "ALTER TABLE `comments_comment` ADD CONSTRAINT `fk_comments_comment_core_user2` FOREIGN KEY (`modifiedBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION";
+
+$updates['201907161437'][] = "ALTER TABLE `comments_comment` ADD FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+$updates['201907161437'][] = "ALTER TABLE `comments_comment` ADD `section` VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL AFTER `text`;";
+$updates['201907161437'][] = "ALTER TABLE `comments_comment` ADD INDEX(`section`);";

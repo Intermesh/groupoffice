@@ -295,6 +295,7 @@ class Link extends Entity {
 	}
 	
 	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null) {
+		$level = Acl::LEVEL_READ;
 		Acl::applyToQuery($query, 's.aclId', $level, $userId);
 		
 		return $query;
@@ -308,7 +309,8 @@ class Link extends Entity {
 		if($this->isNew()) {			
 			$this->updateDataFromSearch();
 		}
-		return Acl::getUserPermissionLevel($this->aclId, App::get()->getAuthState()->getUserId());
+		//Readable items may be linked!
+		return Acl::getUserPermissionLevel($this->aclId, App::get()->getAuthState()->getUserId()) ?  Acl::LEVEL_DELETE : false;
 	}
 	
 //	

@@ -4,6 +4,7 @@ namespace go\core\orm;
 use Exception;
 use go\core\db\Criteria;
 use go\core\util\DateTime;
+use go\core\util\ArrayObject;
 
 /**
  * Filters
@@ -14,6 +15,8 @@ class Filters {
 	
 	private $filters = [];
 
+	const NO_DEFAULT = '__NO_DEFAULT__';
+
 	
 	/**
 	 * Add generic filter function
@@ -22,10 +25,12 @@ class Filters {
 	 * 
 	 * @param string $name The name of the filter.
 	 * @param Callable $fn The filter function will be called with Criteria $criteria, $value, Query $query, array $filter 
+	 * @param mixed $default The default value for the filter. When not set the filter is not applied if no value is given.
+	 * 
 	 * @return $this
 	 */
-	public function add($name, $fn) {
-		$this->filters[strtolower($name)] = ['type' => 'generic', 'fn' => $fn];
+	public function add($name, $fn, $default = self::NO_DEFAULT) {
+		$this->filters[strtolower($name)] = ['type' => 'generic', 'fn' => $fn, 'default' => $default];
 		
 		return $this;
 	}
@@ -36,6 +41,26 @@ class Filters {
 			throw new Exception("Invalid filters supplied for '".$query->getModel()."': '". implode("', '", $invalidFilters) ."'");
 		}
 	}
+
+	private function applyDefaults(array $filter) {
+
+		$f = [];
+		foreach($filter as $k => $v) {
+			$f[strtolower($k)] = $v;
+		}
+
+		foreach($this->filters as $name => $value) {
+			if($value['default'] === self::NO_DEFAULT) {
+				continue;
+			}
+
+			if(!array_key_exists($name, $f)) {
+				$f[$name] = $value['default'];
+			}
+		}
+
+		return $f;
+	}
 	
 	/**
 	 * Applies all filters to the query object
@@ -44,9 +69,12 @@ class Filters {
 	 * @param array $filter
 	 */
 	public function apply(Query $query, Criteria $criteria, array $filter) {
+
+		$filter = $this->applyDefaults($filter);
+
 		$this->validate($query, $filter);		
 		foreach($filter as $name => $value) {
-			$filterConfig = $this->filters[strtolower($name)];
+			$filterConfig = $this->filters[$name];
 			
 			switch($filterConfig['type']) {
 				
@@ -101,10 +129,12 @@ class Filters {
 	 * 
 	 * @param string $name
 	 * @param function $fn Called with: Criteria $criteria, $comparator, $value, Query $query, array $filters
+	 * @param mixed $default The default value for the filter. When not set the filter is not applied if no value is given.
+	 * 
 	 * @return $this
 	 */
-	public function addNumber($name, $fn) {
-		$this->filters[strtolower($name)] = ['type' => 'number', 'fn' => $fn];
+	public function addNumber($name, $fn, $default = self::NO_DEFAULT) {
+		$this->filters[strtolower($name)] = ['type' => 'number', 'fn' => $fn, 'default' => $default];
 		
 		return $this;
 	}	
@@ -118,10 +148,12 @@ class Filters {
 	 * 
 	 * @param string $name
 	 * @param function $fn Called with: Criteria $criteria, $comparator, DateTime $value, Query $query, array $filters
+	 * @param mixed $default The default value for the filter. When not set the filter is not applied if no value is given.
+	 * 
 	 * @return $this
 	 */
-	public function addDate($name, $fn) {
-		$this->filters[strtolower($name)] = ['type' => 'date', 'fn' => $fn];
+	public function addDate($name, $fn, $default = self::NO_DEFAULT) {
+		$this->filters[strtolower($name)] = ['type' => 'date', 'fn' => $fn, 'default' => $default];
 		
 		return $this;
 	}	
@@ -133,10 +165,12 @@ class Filters {
 	 * 
 	 * @param string $name
 	 * @param function $fn Called with: Criteria $criteria, $comparator, $value, Query $query, array $filters
+	 * @param mixed $default The default value for the filter. When not set the filter is not applied if no value is given.
+	 * 
 	 * @return $this
 	 */
-	public function addText($name, $fn) {
-		$this->filters[strtolower($name)] = ['type' => 'text', 'fn' => $fn];
+	public function addText($name, $fn, $default = self::NO_DEFAULT) {
+		$this->filters[strtolower($name)] = ['type' => 'text', 'fn' => $fn, 'default' => $default];
 		
 		return $this;
 	}

@@ -1712,10 +1712,14 @@ table[id^="comments-ext"] b {
 	}
 }
 
-.tags {
+.tags {	
+	margin-left: -2px;
 	padding: 0 dp(16) !important;
-	&.mine {
-		text-align:right;
+	// &.mine {
+	// 	text-align:left;
+	// }
+	> i {
+		margin-top: dp(-16);
 	}
 }
 .x-emoji-menu {

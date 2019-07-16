@@ -9,10 +9,11 @@ use go\core\orm\EntityType;
 use GO\Base\Db\ActiveRecord;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
+use go\core\db\Criteria;
 
 class Comment extends Entity {
 
-	public $id; // was removed from jmap\Entity?
+	public $id;
 	
 	public $text;
 	public $entityId;
@@ -26,16 +27,30 @@ class Comment extends Entity {
 	public $modifiedAt;
 	public $createdBy;
 	public $modifiedBy;
+
+	/**
+	 * Label ID's
+	 * 
+	 * @var int[]
+	 */
+	public $labels;
 	
-	private $_labels;
-	
+	/**
+	 * By default the section is NULL. This property can be used to create multiple comment blocks per entity. 
+	 * This works with a 'section' filter that defaults to NULL.
+	 * 
+	 * @var string
+	 */
+	public $section;
+
 	protected static function defineMapping() {
 		return parent::defineMapping()
-			->addTable("comments_comment", 't')
+			->addTable("comments_comment", 'c')
+			->addScalar('labels', 'comments_comment_label', ['id' => 'commentId'])
 			->setQuery(
 				(new Query())
 					->select("e.name AS entity")
-					->join('core_entity', 'e', 'e.id = t.entityTypeId')
+					->join('core_entity', 'e', 'e.id = c.entityTypeId')
 		);
 	}
 	
@@ -55,46 +70,27 @@ class Comment extends Entity {
 	
 	protected static function defineFilters() {
 		return parent::defineFilters()
-			->add('entityId', function(\go\core\db\Criteria $criteria, $value) {
-				$criteria->where('t.entityId', '=', $value);
-			})->add('entity', function(\go\core\db\Criteria $criteria, $value) {
+			->add('entityId', function(Criteria $criteria, $value) {
+				$criteria->where('c.entityId', '=', $value);
+			})
+			
+			->add('entity', function(Criteria $criteria, $value) {
 				$criteria->where(['e.name' => $value]);	
-			});
+			})
+
+			->add('section', function(Criteria $criteria, $value){
+				$criteria->where(['c.section' => $value]);
+			}, null);
 	}
 	
 	public static function sort(Query $query, array $sort) {	
 		if(!empty($sort['id'])) {
-			$sort = ['createdAt' => 'DESC'];
+			$sort = ['c.createdAt' => 'DESC'];
 		}
 
 		return parent::sort($query, $sort);		
 	}	
 	
-	protected function internalSave() {
-		$success = parent::internalSave();
-		
-		if(isset($this->_labels)) {
-			$success = $success && GO()->getDbConnection()->delete('comments_comment_label', ['commentId' => $this->id])->execute();
-			foreach ($this->_labels as $labelId) {
-				$success = $success && GO()->getDbConnection()->insert('comments_comment_label', ['labelId'=>$labelId,'commentId'=>$this->id])->execute();
-			}
-		}
-		return $success;
-	}
-	
-	public function setLabelIds($ids) {
-		$this->_labels = $ids;
-	}
-	
-	public function getLabelIds() {		
-		return (new Query)
-			->selectSingleValue('labelId')
-			->from('comments_comment_label')
-			->where(['commentId' => $this->id])
-			->execute()
-			->fetchAll();
-	}
-
 	/**
 	 * Find the entity this comment belongs to.
 	 * 

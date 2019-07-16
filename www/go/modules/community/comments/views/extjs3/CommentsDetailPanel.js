@@ -1,6 +1,7 @@
 go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	entityId:null, 
 	entity:null,
+	section: null,
 	height: dp(150),
 	title: t("Comments", "comments"),
 	//
@@ -14,7 +15,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	initComponent: function () {
 
 
-		if(go.User.isAdmin) {
+		if(go.User.isAdmin && this.header) {
 			this.tools = [{			
 				id: "gear",
 				handler: function () {		
@@ -36,7 +37,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				'createdBy', 
 				{name: "creator", type: "relation"},
 				'text',
-				{name: "permissionLevel", type: "int"}
+				{name: "permissionLevel", type: "int"},
+				{name: "labels", type: "relation"}
 			],
 			entityStore: "Comment"
 		});
@@ -96,16 +98,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				height:60
 			})
 		];
-		
-		
-		
-//		this.composer.on('resize',function(me,w,h){
-//			this.composer.setHeight(h);
-//			this.syncSize();
-//		},this);
-			
+					
 		go.modules.comments.CommentsDetailPanel.superclass.initComponent.call(this);
-
 	},
 
 	onLoad: function (dv) {
@@ -117,17 +111,15 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		
 		this.entityId = id;
 		this.entity = type;
-		this.composer.initEntity(this.entityId, this.entity);
-		
-		this.store.load({
-			params: {
-				filter:{
-					entity: this.entity,
-					entityId: this.entityId
-				}
-				//sort: 'createdAt DESC'
-			}
+		this.composer.initEntity(this.entityId, this.entity, this.section);
+
+		this.store.setFilter('entity', {
+			entity: this.entity,
+			entityId: this.entityId,
+			section: this.section
 		});
+		
+		this.store.load();
 	},
 		
 	updateView : function(o) {
@@ -157,13 +149,10 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				avatar.html = r.get("creator").displayName.substr(0,1).toUpperCase();
 			}
 
-			if(r.json.labelIds) {
-				go.Db.store('CommentLabel').get(r.json.labelIds, function(items){
-					for(var i = 0; i < items.length; i++){
-						labelText += '<i class="icon" title="'+items[i].name+'" style="color: #'+items[i].color+'">label</i>';
-					}
-				});
-			}
+			for(var i = 0, l = r.data.labels.length; i < l; i++){
+				labelText += '<i class="icon" title="' + r.data.labels[i].name + '" style="color: #' + r.data.labels[i].color + '">label</i>';
+			} 
+			
 			readMore.setText(r.get('text'));
 			readMore.add({xtype:'box',html:labelText, cls: 'tags ' +mineCls});
 			this.commentsContainer.add({
