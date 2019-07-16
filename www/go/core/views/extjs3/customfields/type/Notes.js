@@ -45,6 +45,15 @@ go.customfields.type.Notes = Ext.extend(go.customfields.type.Text, {
 	
 	getFilter : function() {
 		return false;
+	},
+
+	//hide in grid
+	getColumn : function(field) {
+		return false;
+	},
+	
+	getFieldDefinition : function(field) {
+		return false;
 	}
 
 });

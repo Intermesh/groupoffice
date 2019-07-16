@@ -141,8 +141,9 @@
 						console.error("Custom field type " + field.type + " not found");
 						return;
 					}
+					var def = type.getFieldDefinition(field);
 					
-					defs.push(type.getFieldDefinition(field));
+					defs.push(def);
 				});
 			});
 			return defs;
@@ -164,8 +165,11 @@
 						console.error("Custom field type " + field.type + " not found");
 						return;
 					}
-					
-					cols.push(type.getColumn(field));
+					var col = type.getColumn(field);
+
+					if(col) {
+						cols.push(col);
+					}
 				});
 			});
 			return cols;
