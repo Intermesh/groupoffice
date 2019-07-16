@@ -26,12 +26,18 @@ class Comment extends Entity {
 	public $modifiedAt;
 	public $createdBy;
 	public $modifiedBy;
-	
-	private $_labels;
+
+	/**
+	 * Label ID's
+	 * 
+	 * @var int[]
+	 */
+	public $labels;
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
 			->addTable("comments_comment", 't')
+			->addScalar('labels', 'comments_comment_label', ['id' => 'commentId'])
 			->setQuery(
 				(new Query())
 					->select("e.name AS entity")
@@ -70,31 +76,6 @@ class Comment extends Entity {
 		return parent::sort($query, $sort);		
 	}	
 	
-	protected function internalSave() {
-		$success = parent::internalSave();
-		
-		if(isset($this->_labels)) {
-			$success = $success && GO()->getDbConnection()->delete('comments_comment_label', ['commentId' => $this->id])->execute();
-			foreach ($this->_labels as $labelId) {
-				$success = $success && GO()->getDbConnection()->insert('comments_comment_label', ['labelId'=>$labelId,'commentId'=>$this->id])->execute();
-			}
-		}
-		return $success;
-	}
-	
-	public function setLabelIds($ids) {
-		$this->_labels = $ids;
-	}
-	
-	public function getLabelIds() {		
-		return (new Query)
-			->selectSingleValue('labelId')
-			->from('comments_comment_label')
-			->where(['commentId' => $this->id])
-			->execute()
-			->fetchAll();
-	}
-
 	/**
 	 * Find the entity this comment belongs to.
 	 * 

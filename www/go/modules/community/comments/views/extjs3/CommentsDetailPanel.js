@@ -36,7 +36,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				'createdBy', 
 				{name: "creator", type: "relation"},
 				'text',
-				{name: "permissionLevel", type: "int"}
+				{name: "permissionLevel", type: "int"},
+				{name: "labels", type: "relation"}
 			],
 			entityStore: "Comment"
 		});
@@ -156,14 +157,11 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			} else {
 				avatar.html = r.get("creator").displayName.substr(0,1).toUpperCase();
 			}
-
-			if(r.json.labelIds) {
-				go.Db.store('CommentLabel').get(r.json.labelIds, function(items){
-					for(var i = 0; i < items.length; i++){
-						labelText += '<i class="icon" title="'+items[i].name+'" style="color: #'+items[i].color+'">label</i>';
-					}
-				});
-			}
+			
+			for(var i = 0, l = r.data.labels.length; i < l; i++){
+				labelText += '<i class="icon" title="' + r.data.labels[i].name + '" style="color: #' + r.data.labels[i].color + '">label</i>';
+			} 
+			
 			readMore.setText(r.get('text'));
 			readMore.add({xtype:'box',html:labelText, cls: 'tags ' +mineCls});
 			this.commentsContainer.add({

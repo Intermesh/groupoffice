@@ -104,7 +104,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 						items:[this.textField]
 					}),
 					this.chips = new go.form.Chips({
-						name: 'labelIds',
+						name: 'labels',
 						entityStore: 'CommentLabel',
 						style:'padding-bottom:4px',
 						store: this.store

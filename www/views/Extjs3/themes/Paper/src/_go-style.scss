@@ -1713,10 +1713,12 @@ table[id^="comments-ext"] b {
 }
 
 .tags {
+	margin-top : dp(-8); // For comments
+	margin-left: -2px;
 	padding: 0 dp(16) !important;
-	&.mine {
-		text-align:right;
-	}
+	// &.mine {
+	// 	text-align:left;
+	// }
 }
 .x-emoji-menu {
 	padding: 7px 0;
