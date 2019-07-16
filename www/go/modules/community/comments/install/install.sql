@@ -12,7 +12,8 @@ CREATE TABLE `comments_comment` (
   `createdBy` int(11) DEFAULT NULL,
   `modifiedBy` int(11) DEFAULT NULL,
   `modifiedAt` datetime DEFAULT NULL,
-  `text` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL
+  `text` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `section` TINYINT NOT NULL DEFAULT '0' 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `comments_comment_label` (
@@ -65,3 +66,7 @@ ALTER TABLE `comments_comment`
 ALTER TABLE `comments_comment_label`
   ADD CONSTRAINT `fk_comments_label_has_comments_comment_comments_comment1` FOREIGN KEY (`commentId`) REFERENCES `comments_comment` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_comments_label_has_comments_comment_comments_label1` FOREIGN KEY (`labelId`) REFERENCES `comments_label` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+
+ALTER TABLE `comments_comment` ADD FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+ALTER TABLE `comments_comment` ADD INDEX(`section`);

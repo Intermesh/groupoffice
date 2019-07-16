@@ -9,10 +9,11 @@ use go\core\orm\EntityType;
 use GO\Base\Db\ActiveRecord;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
+use go\core\db\Criteria;
 
 class Comment extends Entity {
 
-	public $id; // was removed from jmap\Entity?
+	public $id;
 	
 	public $text;
 	public $entityId;
@@ -36,12 +37,12 @@ class Comment extends Entity {
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
-			->addTable("comments_comment", 't')
+			->addTable("comments_comment", 'c')
 			->addScalar('labels', 'comments_comment_label', ['id' => 'commentId'])
 			->setQuery(
 				(new Query())
 					->select("e.name AS entity")
-					->join('core_entity', 'e', 'e.id = t.entityTypeId')
+					->join('core_entity', 'e', 'e.id = c.entityTypeId')
 		);
 	}
 	
@@ -61,16 +62,22 @@ class Comment extends Entity {
 	
 	protected static function defineFilters() {
 		return parent::defineFilters()
-			->add('entityId', function(\go\core\db\Criteria $criteria, $value) {
-				$criteria->where('t.entityId', '=', $value);
-			})->add('entity', function(\go\core\db\Criteria $criteria, $value) {
+			->add('entityId', function(Criteria $criteria, $value) {
+				$criteria->where('c.entityId', '=', $value);
+			})
+			
+			->add('entity', function(Criteria $criteria, $value) {
 				$criteria->where(['e.name' => $value]);	
-			});
+			})
+
+			->add('section', function(Criteria $criteria, $value){
+				$criteria->where(['c.section' => $value]);
+			}, 0);
 	}
 	
 	public static function sort(Query $query, array $sort) {	
 		if(!empty($sort['id'])) {
-			$sort = ['createdAt' => 'DESC'];
+			$sort = ['c.createdAt' => 'DESC'];
 		}
 
 		return parent::sort($query, $sort);		
