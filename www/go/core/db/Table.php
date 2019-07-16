@@ -63,6 +63,8 @@ class Table {
 	
 	private $name;
 	protected $columns;	
+	protected $indexes;
+
 	private $pk = [];
 
 	/**
@@ -260,6 +262,7 @@ class Table {
 	private function processIndexes($tableName) {
 		$query = "SHOW INDEXES FROM `" . $tableName . "`";
 
+		$stmt = $this->conn->query($query);
 		$unique = [];
 
 		//group keys;
@@ -267,6 +270,8 @@ class Table {
 
 		$stmt = $this->conn->query($query);
 		while ($index = $stmt->fetch()) {
+
+			$this->indexes[strtolower($index['Key_name'])] = $index;
 
 			if ($index['Key_name'] === 'PRIMARY') {
 
@@ -290,6 +295,17 @@ class Table {
 				$this->columns[$colName]->unique = $cols;
 			}
 		}
+	}
+
+
+	/**
+	 * Get index information by name
+	 * 
+	 * @link https://dev.mysql.com/doc/refman/8.0/en/show-index.html
+	 * @return array
+	 */
+	public function getIndex($name) {
+		return $this->indexes[strtolower($name)];
 	}
 
 	
