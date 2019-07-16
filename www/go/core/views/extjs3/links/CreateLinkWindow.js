@@ -4,7 +4,12 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 	modal: true,
 	singleSelect:false,
 	stateId: "go-create-link-windows",
-	
+
+	width: dp(800),
+	height: dp(600),
+	title: t("Create link", "links"),
+	layout:"border",
+
 	/**
 	 * Provide the entities to show in the list here
 	 * When not provided, the list will show all entities
@@ -60,10 +65,8 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 			}
 		});
 
-		this.grid.store.setFilter('permissions', {permissionLevel: go.permissionLevels.write});
-		
 		this.entityGrid = new go.links.EntityGrid({
-			width: dp(200),
+			width: dp(240),
 			region:"west",
 			savedSelection: "link",
 			entities:this.entities
@@ -74,17 +77,7 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 		}, this, {buffer: 1}); //add buffer because it clears selection first
 
 		Ext.apply(this, {
-			title: t("Create link", "links"),
-			width: dp(700),
-			height: dp(600),
-			layout: 'border',
 			items: [this.entityGrid, search, this.grid],
-			listeners: {
-				render: function () {
-					//this.store.load();
-				},
-				scope: this
-			},
 			buttons: [{
 					text: t("Ok"),
 					handler: function () {
