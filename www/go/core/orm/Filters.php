@@ -25,6 +25,8 @@ class Filters {
 	 * 
 	 * @param string $name The name of the filter.
 	 * @param Callable $fn The filter function will be called with Criteria $criteria, $value, Query $query, array $filter 
+	 * @param mixed $default The default value for the filter. When not set the filter is not applied if no value is given.
+	 * 
 	 * @return $this
 	 */
 	public function add($name, $fn, $default = self::NO_DEFAULT) {
@@ -127,6 +129,8 @@ class Filters {
 	 * 
 	 * @param string $name
 	 * @param function $fn Called with: Criteria $criteria, $comparator, $value, Query $query, array $filters
+	 * @param mixed $default The default value for the filter. When not set the filter is not applied if no value is given.
+	 * 
 	 * @return $this
 	 */
 	public function addNumber($name, $fn, $default = self::NO_DEFAULT) {
@@ -144,6 +148,8 @@ class Filters {
 	 * 
 	 * @param string $name
 	 * @param function $fn Called with: Criteria $criteria, $comparator, DateTime $value, Query $query, array $filters
+	 * @param mixed $default The default value for the filter. When not set the filter is not applied if no value is given.
+	 * 
 	 * @return $this
 	 */
 	public function addDate($name, $fn, $default = self::NO_DEFAULT) {
@@ -159,6 +165,8 @@ class Filters {
 	 * 
 	 * @param string $name
 	 * @param function $fn Called with: Criteria $criteria, $comparator, $value, Query $query, array $filters
+	 * @param mixed $default The default value for the filter. When not set the filter is not applied if no value is given.
+	 * 
 	 * @return $this
 	 */
 	public function addText($name, $fn, $default = self::NO_DEFAULT) {
