@@ -56,6 +56,16 @@ abstract class Base extends Model {
 	protected function getFieldSQL() {
 		return "VARCHAR(".($this->field->getOption('maxLength') ?? 190).") DEFAULT " . GO()->getDbConnection()->getPDO()->quote($this->field->getDefault() ?? "NULL");
 	}
+
+	/**
+	 * 
+	 * Check if this custom field has a column in the custom field record table.
+	 * 
+	 * @return bool
+	 */
+	public function hasColumn() {
+		return $this->getFieldSQL() != false;
+	}
 	
 	public function onFieldValidate() {
 		$fieldSql = $this->getFieldSQL();

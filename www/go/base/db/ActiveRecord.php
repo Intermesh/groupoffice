@@ -1350,10 +1350,13 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		if($joinCf) {
 			$cfFieldModels = array_filter(static::getCustomFieldModels(), function($f) {
-				return !empty($f->databaseName);
+				return $f->getDataType()->hasColumn();
 			});
 			
 			$names = array_map(function($f) {
+				if(empty($f->databaseName)) {
+					throw new Exception("Custom field ". $f->id ." has no databaseName");
+				}
 				return "cf." . $f->databaseName;
 			}, $cfFieldModels);
 			
