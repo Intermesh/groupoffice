@@ -1,3 +1,4 @@
+18-07-2019 6.4.34
 - Core: Error in duplicate with custom fields of type Notes
 - Core: Readable items may be linked
 - Core: show correct icon in create link button for contact and organization
