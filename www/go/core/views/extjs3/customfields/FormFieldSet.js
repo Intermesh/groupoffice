@@ -24,7 +24,13 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			collapsible: true
 		});
 
+		this.on("expand", function() {
+			this.doLayout();
+		}, this);
+
 		this.on("afterrender", function() {
+
+
 			//find entity panel
 			var form = this.findParentByType("form");
 			

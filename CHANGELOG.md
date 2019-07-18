@@ -1,3 +1,5 @@
+- Core: small ui enhancements
+
 18-07-2019 6.4.35
 - Core: upgrade error fixed
 
