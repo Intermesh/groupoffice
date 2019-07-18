@@ -57,6 +57,11 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 							if(value) {
 								return "";
 							}
+
+							var sortState = store.getSortState();
+							if(sortState.field != "name" && sortState.field != "firstName") {
+								return "";
+							}
 							
 							var lastRecord = rowIndex > 0 ? grid.store.getAt(rowIndex - 1) : false;
 							var lastSortBy = !lastRecord || !lastRecord.data.isOrganization ? go.User.addressBookSettings.sortBy : "name" ;
