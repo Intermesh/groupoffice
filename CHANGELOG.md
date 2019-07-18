@@ -1,3 +1,6 @@
+18-07-2019 6.4.35
+- Core: upgrade error fixed
+
 18-07-2019 6.4.34
 - Core: Error in duplicate with custom fields of type Notes
 - Core: Readable items may be linked

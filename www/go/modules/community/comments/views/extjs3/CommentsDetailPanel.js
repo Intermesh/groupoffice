@@ -3,6 +3,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	entity:null,
 	section: null,
 	height: dp(150),
+
+	growMaxHeight: dp(800),
 	title: t("Comments", "comments"),
 	//
 	/// Collapsilbe was turn off because of height recaculation issues in HtmlEditor
@@ -160,7 +162,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			} 
 			
 			readMore.setText(r.get('text'));
-			readMore.add({xtype:'box',html:labelText, cls: 'tags ' +mineCls});
+			readMore.insert(1, {xtype:'box',html:labelText, cls: 'tags ' +mineCls});
 			this.commentsContainer.add({
 				xtype:"container",
 				cls:'go-messages',
@@ -196,7 +198,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		setTimeout(function(){
 			
 			var scroll = _this.commentsContainer.getEl();
-			_this.body.setHeight(Math.max(50,Math.min(400,height + _this.composer.getHeight())));
+			_this.body.setHeight(Math.max(50,Math.min(_this.growMaxHeight,height + _this.composer.getHeight())));
 			_this.doLayout();
 			scroll.scroll("b", initScrollTop + (scroll.dom.scrollHeight));
 		});
