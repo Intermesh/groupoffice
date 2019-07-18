@@ -136,17 +136,23 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			var readMore = new go.detail.ReadMore({
 				cls: mineCls
 			});
+			var creator = r.get("creator");
+			if(!creator) {
+				creator = {
+					displayName: t("Unknown user")
+				};
+			}
 			var avatar = {
 				xtype:'box',
 				autoEl: {tag: 'span','ext:qtip': t('{author} wrote at {date}')
-					.replace('{author}', r.get("creator").displayName)
+					.replace('{author}', creator.displayName)
 					.replace('{date}', Ext.util.Format.date(r.get('createdAt'),go.User.dateTimeFormat))},
 				cls: 'photo '+mineCls
 			};
-			if(r.get("creator").avatarId) { 
-				avatar.style = 'background-image: url('+go.Jmap.downloadUrl(r.get("creator").avatarId)+');';
+			if(creator.avatarId) { 
+				avatar.style = 'background-image: url('+go.Jmap.downloadUrl(creator.avatarId)+');';
 			} else {
-				avatar.html = r.get("creator").displayName.substr(0,1).toUpperCase();
+				avatar.html = creator.displayName.substr(0,1).toUpperCase();
 			}
 
 			for(var i = 0, l = r.data.labels.length; i < l; i++){
