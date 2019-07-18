@@ -2,6 +2,7 @@
 - Core: Readable items may be linked
 - Core: show correct icon in create link button for contact and organization
 - Bookmarks: Handle non existing user id's in bookmarks upgrade
+- Billing: Fix for house numbers from address book
 
 15-07-2019 6.4.33
 - Core: Exclude composite fields from form posting again because this gave a lot of saving problems.
