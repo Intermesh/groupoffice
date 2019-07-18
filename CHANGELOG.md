@@ -6,6 +6,10 @@
 - Billing: Copy matching custom fields from address book again but by database name
 - Billing: Fixed bug in translating invoice PDF
 - Billing: Fixed unsuable UI in product dialog with custom fields.
+- Comments: Company comments were not migrated correctly. Can be fixed by finding out the old entityTypeId from the comments_comment    table. Then do:
+
+   update comments_comment n set entityTypeId=(select id from core_entity where name='Contact'), entityId = (entityId + (select max(id) from ab_contacts)) where entityTypeId = <OLD ENTITY TYPE ID>;
+
 
 15-07-2019 6.4.33
 - Core: Exclude composite fields from form posting again because this gave a lot of saving problems.
