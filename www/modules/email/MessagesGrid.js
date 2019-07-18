@@ -323,10 +323,11 @@ GO.email.MessagesGrid = function(config){
 		}
 
 		if(this.searchField.getValue()) {
-			GO.email.messagesGrid.store.baseParams['search'] = this.searchField.getValue();
-			this.searchField.hasSearch = true;
+			// GO.email.messagesGrid.store.baseParams['search'] = this.searchField.getValue();
+			// this.searchField.hasSearch = true;
 
-			GO.email.messagesGrid.store.reload();
+			// GO.email.messagesGrid.store.reload();
+			this.searchField.search();
 		}
 
 	}, this);
