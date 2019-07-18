@@ -199,6 +199,7 @@ customfields/type/EncryptedText.js
 search/Panel.js
 search/SearchEmailCombo.js
 search/SearchCombo.js
+search/SearchField.js
 
 modules/SystemSettingsModuleGrid.js
 modules/PermissionsWindow.js

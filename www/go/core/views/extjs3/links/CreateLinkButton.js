@@ -31,7 +31,8 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 					
 	initComponent: function () {
 
-		this.searchField = new go.search.SearchCombo({
+		this.searchField = new go.search.SearchField({
+			
 			anchor: "100%",
 			hideLabel: true,
 			listeners: {
@@ -42,7 +43,7 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 						"toEntity": record.get('entity'),
 						"toSearchId": record.get('id')
 					}]}, true);
-					this.searchField.reset();
+					// this.searchField.reset();
 					
 					this.newLinks.push({						
 						toEntity: record.get('entity'),
@@ -56,6 +57,32 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 				return this.el.up('.x-menu');
 			}
 		});
+
+		// this.searchField = new go.search.SearchCombo({
+		// 	anchor: "100%",
+		// 	hideLabel: true,
+		// 	listeners: {
+		// 		scope: this,
+		// 		select: function (cmb, record, index) {					
+		// 			this.linkGrid.store.loadData({"records" :[{
+		// 				"toId": record.get('entityId'),
+		// 				"toEntity": record.get('entity'),
+		// 				"toSearchId": record.get('id')
+		// 			}]}, true);
+		// 			this.searchField.reset();
+					
+		// 			this.newLinks.push({						
+		// 				toEntity: record.get('entity'),
+		// 				toId: record.get('entityId')
+		// 			});
+		// 			this.setCount(++this.totalCount);
+		// 		}
+		// 	},
+		// 	getListParent: function () {
+		// 		//this avoids hiding the menu on click in the list
+		// 		return this.el.up('.x-menu');
+		// 	}
+		// });
 
 		this.linkGrid = new go.grid.GridPanel({
 			columns: [
@@ -128,7 +155,7 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 					}
 				}
 			},
-			width: dp(500),
+			width: dp(800),
 			height: dp(400)
 		}
 		);

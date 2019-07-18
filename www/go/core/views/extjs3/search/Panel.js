@@ -54,7 +54,7 @@ go.search.Panel = Ext.extend(Ext.Panel, {
 			return;
 		}
 		
-		go.Entities.get(record.data.entity).goto(record.data.entityId);
+		this.searchField.fireEvent("select", this.searchField, record);
 		this.collapse();
 		
 	},
@@ -113,7 +113,7 @@ go.search.Panel = Ext.extend(Ext.Panel, {
 	},
 	// private
 	collapseIf : function(e){
-		if(!e.within(this.getEl()) && !e.within(this.searchContainer.getEl())){
+		if(!e.within(this.getEl()) && !e.within(this.searchField.getEl())){
 				this.collapse();
 		}
 	}
