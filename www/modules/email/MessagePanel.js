@@ -114,7 +114,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			'<div style="clear:both;"></div>'+
 			
 			'<tpl if="links.length">'+
-				'<h5>'+t("Links")+'</h5>'+
+				'<h5 class="em-links-header">'+t("Links")+'</h5>'+
 				'<div class="em-links">'+
 				'<tpl for="links">'+
 					'<div class="go-icon-list"><p><i class="label entity {[this.linkIconCls(values)]}"></i> <a href="#{entity}/{model_id}">{name}</a> <label>{description}</label></p></div>'+
