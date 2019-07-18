@@ -49,10 +49,11 @@ class Search extends EntityController {
 								->orWhere('c.name', 'LIKE', '%' . $q . '%');
 			}
 
-			$query->union($contactsQuery)
-							->offset($params['position'] ?? 0)
-							->limit(20);
+			$query->union($contactsQuery);							
 		}
+
+		$query->offset($params['position'] ?? 0)
+			->limit(20);
 
 		GO()->debug($query);
 		

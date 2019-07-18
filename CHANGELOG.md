@@ -2,6 +2,7 @@
 - Newsletters: Fixed incorrect parsing of images in email templates
 - Address book: Sanitize phone numbers
 - Email: Fixed reset buttton on search type change
+- Email: Remove links from print
 
 18-07-2019 6.4.35
 - Core: upgrade error fixed
