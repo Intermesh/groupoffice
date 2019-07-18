@@ -5,6 +5,7 @@
 - Billing: Fix for house numbers from address book
 - Billing: Copy matching custom fields from address book again but by database name
 - Billing: Fixed bug in translating invoice PDF
+- Billing: Fixed unsuable UI in product dialog with custom fields.
 
 15-07-2019 6.4.33
 - Core: Exclude composite fields from form posting again because this gave a lot of saving problems.

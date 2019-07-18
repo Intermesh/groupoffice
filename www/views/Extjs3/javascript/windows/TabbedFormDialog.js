@@ -321,9 +321,18 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 		tb.addButton(button);
 	},
 
+	/**
+	 * Change where custom field sets are added
+	 */
+	customFieldsContainer : null,
+
 	addCustomFields : function(){
 		if(!this.customFieldType) {
 			return;
+		}
+
+		if(!this.customFieldsContainer) {
+			this.customFieldsContainer = this._panels[0];
 		}
 	
 		if(go.Entities.get(this.customFieldType).customFields) {
@@ -342,7 +351,7 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 					this.addPanel(pnl);
 				}else
 				{			
-					this._panels[0].add(fs);
+					this.customFieldsContainer.add(fs);
 				}
 			}, this);
 		}
