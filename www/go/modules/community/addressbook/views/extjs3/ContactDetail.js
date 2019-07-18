@@ -75,12 +75,14 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 						
 						dv.callButton.menu.removeAll();						
 						dv.data.phoneNumbers.forEach(function(a) {
+							var sanitized = a.number.replace(/[^0-9+]/g, "");
+
 							dv.callButton.menu.addMenuItem({
 								text: "<div>" + a.number + "</div><small>" + (t("phoneTypes")[a.type] || a.type)  + "</small>",
-								href: "tel://" + a.number,
+								href: "tel://" + sanitized,
 								handler: function(btn, e) {									
 									go.util.callto({
-										number: a.number,
+										number: sanitized,
 										name: dv.name
 									}, e);
 								}
