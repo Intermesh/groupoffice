@@ -34,6 +34,9 @@ trait CustomFieldsTrait {
 		$fn = $asText ? 'dbToText' : 'dbToApi';
 		$record = $this->internalGetCustomFields();
 		foreach(self::getCustomFieldModels() as $field) {
+			if(empty($field->databaseName)) {
+				continue; //For type Notes which doesn't store any data
+			}
 			$record[$field->databaseName] = $field->getDataType()->$fn(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record);			
 		}
 		return $record;	
