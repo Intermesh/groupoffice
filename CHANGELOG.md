@@ -3,6 +3,7 @@
 - Address book: Sanitize phone numbers
 - Email: Fixed reset buttton on search type change
 - Email: Remove links from print
+- Core: Improved create link menu button with filters
 
 18-07-2019 6.4.35
 - Core: upgrade error fixed

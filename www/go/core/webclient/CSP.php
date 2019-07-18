@@ -15,6 +15,8 @@ class CSP {
   {
     $this->add("default-src", Request::get()->getHost())
     ->add("default-src", "'self'")
+    ->add('font-src', Request::get()->getHost())
+    ->add('font-src', "data:")
     ->add("script-src", Request::get()->getHost())
     // ->add("script-src", "'nonce-" . Response::get()->getCspNonce() . "'")
     ->add("script-src", "'unsafe-eval'")
