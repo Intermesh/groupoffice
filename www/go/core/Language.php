@@ -30,7 +30,7 @@ class Language {
 	}
 	
 	public function setLanguage($isoCode = null) {
-		
+		$old = $this->getIsoCode();
 		if(!isset($isoCode)) {
 			$isoCode = $this->getBrowserLanguage();
 		}
@@ -43,6 +43,8 @@ class Language {
 			$this->isoCode = $isoCode;
 			$this->data = [];
 		}
+
+		return $old;
 		
 	}
 	
