@@ -198,7 +198,7 @@ GO.email.SearchDialog = function(config){
 			config.store.baseParams['query']=this.buildQuery();
 			config.store.baseParams['searchIn']=this.formPanel.form.findField('searchInGroup').getValue().inputValue;
 			config.store.load();
-
+			
 			this.dialog.hide();					
 		},
 		

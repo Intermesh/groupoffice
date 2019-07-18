@@ -170,6 +170,8 @@ GO.email.MessagesGrid = function(config){
 	this.searchDialog = new GO.email.SearchDialog({
 		store:config.store
 	});
+
+	
 	
 	this.settingsMenu = new Ext.menu.Menu({
 		items:[{
@@ -211,6 +213,8 @@ GO.email.MessagesGrid = function(config){
 		config.tbar = [];
 	
 	GO.email.MessagesGrid.superclass.constructor.call(this, config);
+
+	var me = this;
 
 	if(!config.hideSearch)
 		this.getTopToolbar().add({
@@ -256,7 +260,13 @@ GO.email.MessagesGrid = function(config){
 					iconCls: 'ic-more',
 					tooltip: t("Search"),
 					handler: function(){
+						var first = !this.searchDialog.dialog;
 						this.searchDialog.show();
+						if(first) {
+							this.searchDialog.dialog.on('hide', function() {
+								this.searchField.updateView();
+							}, this);
+						}
 					},
 					scope: this
 				}
@@ -275,6 +285,9 @@ GO.email.MessagesGrid = function(config){
 					this.store.load({params:{start:0} });
 				},
 				scope:this
+			},
+			hasActiveSearch: function() {		
+				return  me.store.baseParams.search || me.store.baseParams.query;
 			}
 		}),{
 			iconCls: 'ic-more-vert',
