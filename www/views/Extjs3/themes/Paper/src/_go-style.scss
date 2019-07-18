@@ -1145,7 +1145,7 @@ button.filetype-pdf, button.filetype-doc {
 	&-heading {
 		@extend %font-subheading;
 		/*color: color($fg, 'secondary-text');*/
-		border-top: 1px solid color($fg, 'divider');
+		border-top: 1px solid color($fg, 'line');
 		padding: dp(8) dp(16);
 		height: dp(56);
 	}
@@ -1165,7 +1165,7 @@ button.filetype-pdf, button.filetype-doc {
 		padding: dp(8);
 		vertical-align: middle;
 		height: dp(40);
-		border-bottom: 1px solid color($fg, 'line');
+		border-bottom: 1px solid color($fg, 'divider');
 		background-color: transparent !important;
 	}
 }
@@ -1209,7 +1209,7 @@ table.display-panel {
 .collapsible-display-panel-header {
 	@extend %font-subheading;
 /*	color: color($fg, 'secondary-text');*/
-	border-top: 1px solid color($fg, 'divider');
+	border-top: 1px solid color($fg, 'line');
 	padding: 0 dp(8) 0 dp(16);
 	height: dp(56);
 	line-height: dp(56);
