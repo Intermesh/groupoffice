@@ -17,6 +17,9 @@ use go\core\db\Table;
 /*
 update addressbook_contact n set filesFolderId = (select files_folder_id from ab_contacts o where o.id=n.id);
 update addressbook_contact n set filesFolderId = (select files_folder_id from ab_companies o where n.id = (o.id + (select max(id) from ab_contacts)) );
+
+
+update comments_comment n set entityTypeId=(select id from core_entity where name='Contact'), entityId = (entityId + (select max(id) from ab_contacts)) where entityTypeId = 3;
 */
 class Migrate63to64 {
 	
@@ -77,6 +80,8 @@ class Migrate63to64 {
 		$m->migrateEntity("Contact");				
 		
 		$this->migrateCustomField();
+
+		GO()->getDbConnection()->exec("update comments_comment n set entityTypeId=(select id from core_entity where name='Contact'), entityId = (entityId + (select max(id) from ab_contacts)) where entityTypeId = (select id from core_entity where name='Company');");
 
 		GO()->getDbConnection()->delete("core_entity", ['name' => "Company"])->execute();
 		
