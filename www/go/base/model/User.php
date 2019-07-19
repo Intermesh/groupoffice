@@ -4,6 +4,7 @@ namespace GO\Base\Model;
 use GO;
 use GO\Base\Mail\Message;
 use GO\Base\Mail\Mailer;
+use go\core\db\Query;
 
 /**
  * The User model
