@@ -42,7 +42,7 @@ namespace GO\Base\Db;
 
 use GO\Base\Db\PDO;
 use GO;
-
+use go\core\util\DateTime;
 
 abstract class ActiveRecord extends \GO\Base\Model{
 
@@ -3568,12 +3568,13 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			$search = new \go\core\model\Search();
 			$search->setEntity(static::entityType());
 		}
-		// GO 6.3 backwards compatible
-		if(!empty($attr['mtime'])) {
-			$attr['modifiedAt'] = '@'.$attr['mtime'];			
-		}
 		
-		unset($attr['mtime']);
+		if(isset($attr['mtime'])) {
+			$attr['modifiedAt'] = \DateTime::createFromFormat("U", $attr['mtime']);
+			unset($attr['mtime']);
+		} else {
+			$attr['modifiedAt'] = \DateTime::createFromFormat("U", $this->mtime);
+		}
 
 		// Always unset ctime, we don't use it anymore in the searchcache table
 		unset($attr['ctime']);
@@ -3581,13 +3582,12 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		if(!isset($attr['description'])) {
 			$attr['description'] = '';
-		}
-		// end GO 6.3 compat
+		}		
 		$search->setValues($attr);
+		unset($attr['modifiedAt']);
 		
 		$search->entityId = $this->id;
-		$search->setAclId(!empty($attr['acl_id']) ? $attr['acl_id'] : $this->findAclId());
-		$search->modifiedAt = \DateTime::createFromFormat("U", $this->mtime);	
+		$search->setAclId(!empty($attr['acl_id']) ? $attr['acl_id'] : $this->findAclId());			
 		//$search->createdAt = \DateTime::createFromFormat("U", $this->mtime);		
 		$search->setKeywords($this->getSearchCacheKeywords($this->localizedName.','.implode(',', $attr)));
 		

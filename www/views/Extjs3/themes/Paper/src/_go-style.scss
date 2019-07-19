@@ -1112,6 +1112,9 @@ button.filetype-pdf, button.filetype-doc {
 			.show-on-hover {
 				display:block;
 			}
+			.hide-on-hover {
+				display: none;
+			}
 		}
 		
 		label {
@@ -1122,15 +1125,21 @@ button.filetype-pdf, button.filetype-doc {
 		}
 		
 	}
+
+	.show-on-hover {
+		display: none;		
+	}
+
+	.left {
+		top: dp(12);
+		left: dp(16);
+		position:absolute;
+	}
+
 	.right {
-		top: dp(8);
+		top: dp(12);
 		right: dp(16);
 		position:absolute;
-		
-		&.show-on-hover {
-			display: none;
-			
-		}
 	}
 }
 .go-icon-list > p, .go-icon-list > a {

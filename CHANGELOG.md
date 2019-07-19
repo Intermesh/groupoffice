@@ -7,6 +7,7 @@
 - Core: CSP Allow data: uri for fonts for browser extensions
 - Files: Fixed location bar not set initially and  not visible in popup file browser
 - Core: Fixed export CSV error
+- Calendar: Fixed missing link when creating new Event from item
 
 18-07-2019 6.4.35
 - Core: upgrade error fixed

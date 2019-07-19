@@ -235,10 +235,17 @@ class Event extends \GO\Base\Db\ActiveRecord {
 			return false;
 		}
 		
-		$calendarName = empty($this->calendar) ? '' : ', '.$this->calendar->name;
+		$calendarName = empty($this->calendar) ? '' :$this->calendar->name;
+
+		$description = $calendarName;
+
+		 if(!$this->private && !empty($this->description) ){
+			$description .= ', ' . $this->description;
+		 }
+
 		return array(
-				'name' => $this->private ?  \GO::t("Private", "calendar") : $this->name.' ('.\GO\Base\Util\Date::get_timestamp($this->start_time, false).$calendarName.')',
-				'description' => $this->private ?  "" : $this->description,
+				'name' => $this->private ?  \GO::t("Private", "calendar") : $this->name,
+				'description' =>  $description,
 				'mtime'=>$this->start_time
 		);
 	}
