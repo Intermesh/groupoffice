@@ -1,3 +1,4 @@
+19-07-2019 6.4.36
 - Core: small ui enhancements
 - Newsletters: Fixed incorrect parsing of images in email templates
 - Address book: Sanitize phone numbers
