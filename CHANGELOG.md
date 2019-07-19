@@ -13,6 +13,8 @@
 - Calendar: Home button when opening link takes you to the date in the calendar too
 - E-mail: Save attachment to item works with folder now too by saving directly in the folder
 - Address book: Sort address books alphabetically
+- Email: Link to item dialog could be destroyed
+- Core/Files: Try to clean invalid UTF8 in file names
 
 18-07-2019 6.4.35
 - Core: upgrade error fixed
