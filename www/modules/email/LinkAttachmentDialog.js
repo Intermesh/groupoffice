@@ -92,7 +92,7 @@ GO.email.LinkAttachmentDialog = Ext.extend(go.links.CreateLinkWindow,{
 					{
 						
 						dialog.hide();
-						this.hide();
+						this.close();
 					},
 					scope:this
 				});
@@ -115,7 +115,7 @@ GO.email.LinkAttachmentDialog = Ext.extend(go.links.CreateLinkWindow,{
 			success: function(options, response, result){
 				// Successfully saved all attachments
 				this.getEl().unmask();
-				this.hide();
+				this.close();
 			},
 			scope:this
 		});

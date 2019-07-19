@@ -12,6 +12,7 @@
 - Core: Link delete button does not show through date anymore.
 - Calendar: Home button when opening link takes you to the date in the calendar too
 - E-mail: Save attachment to item works with folder now too by saving directly in the folder
+- Address book: Sort address books alphabetically
 
 18-07-2019 6.4.35
 - Core: upgrade error fixed
