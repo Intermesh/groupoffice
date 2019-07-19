@@ -41,7 +41,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 	protected function actionSyncFilesystem($params){	
 		
-		if(!$this->isCli() && !\GO::modules()->tools)
+		if(!$this->isCli() && !\GO::user()->isAdmin())
 			throw new \GO\Base\Exception\AccessDenied();
 		
 		$oldAllowDeletes = \GO\Base\Fs\File::setAllowDeletes(false);
