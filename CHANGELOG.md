@@ -10,6 +10,8 @@
 - Calendar: Fixed missing link when creating new Event from item
 - Core: Link show search cache date instead of linking date
 - Core: Link delete button does not show through date anymore.
+- Calendar: Home button when opening link takes you to the date in the calendar too
+- E-mail: Save attachment to item works with folder now too by saving directly in the folder
 
 18-07-2019 6.4.35
 - Core: upgrade error fixed

@@ -21,6 +21,16 @@ GO.email.LinkAttachmentDialog = Ext.extend(go.links.CreateLinkWindow,{
 		
 		this.getEl().mask();
 
+		if(record.data.entity == "Folder") {
+			if(GO.util.empty(this.attachmentItem)){
+				this.saveAllToItem(record, record.data.entityId);
+			} else {
+				this.saveToItem(record, record.data.entityId);
+			}
+
+			return;
+		}
+
 		GO.request({
 			url:'files/folder/checkModelFolder',
 			params:{								
