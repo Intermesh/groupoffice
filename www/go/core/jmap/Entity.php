@@ -79,7 +79,9 @@ abstract class Entity  extends OrmEntity {
 	 */
 	protected function internalDelete() {
 		
-		$this->changeReferencedEntities();
+		if(self::$trackChanges) {
+			$this->changeReferencedEntities();
+		}
 
 		if(!parent::internalDelete()) {
 			return false;
