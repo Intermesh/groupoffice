@@ -13,6 +13,8 @@ use function GO;
 
 class MigrateCustomFields63to64 {	
 	
+	const MISSING_PREFIX = '** Missing ** ';
+	
 	public function migrateEntity($entityName) {
 		
 		echo "Migrating custom fields for entity: " . $entityName ."\n";
@@ -144,12 +146,23 @@ class MigrateCustomFields63to64 {
 	}
 	
 	private function updateSingleSelect(Field $field) {
+		$this->insertMissingOptions($field);
+		
 		$selectOptions = $field->getDataType()->getOptions();		
 		
-		foreach($selectOptions as $o) {			
-			GO()->getDbConnection()
-							->update($field->tableName(), [$field->databaseName => $o['id']], [$field->databaseName => $o['text']])->execute();	
-		}		
+		foreach($selectOptions as $o) {
+			$updateFilter = new Query();
+			$updateFilter->where($field->databaseName, '=' , trim($o['text']));
+			
+			if(substr($o['text'], 0, strlen(self::MISSING_PREFIX)) == self::MISSING_PREFIX) {
+				$strWithoutMissing = substr($o['text'], strlen(self::MISSING_PREFIX));
+				$updateFilter->orWhere($field->databaseName,'=' ,trim($strWithoutMissing));
+			}
+			$updateQ = GO()->getDbConnection()
+				->update($field->tableName(), [$field->databaseName => $o['id']], $updateFilter);
+
+			$updateQ->execute();
+		}
 		
 		//for changing db column
 		$field->setDefault(null);
@@ -165,6 +178,8 @@ class MigrateCustomFields63to64 {
 	
 	private function updateMultiSelect(Field $field) {
 		$field->type = "MultiSelect";		
+		
+		$this->insertMissingOptions($field);
 		try{
 			$field->getDataType()->createMultiSelectTable();
 		}catch(\PDOException $e) {
@@ -178,7 +193,7 @@ class MigrateCustomFields63to64 {
 						->where('fieldId', '=', $field->id)->all();
 		
 		foreach($options as $o) {
-			$optionMap[$o['text']] = $o['id'];
+			$optionMap[trim($o['text'])] = $o['id'];
 		}
 		
 		$query = $this->findRecords($field);
@@ -187,14 +202,19 @@ class MigrateCustomFields63to64 {
 			$values = explode("|", $record[$field->databaseName]);
 			
 			foreach($values as $value) {
-				if(!isset($optionMap[$value])) {
+				if(empty(trim($value))) {
 					continue;
 				}
+				if(!isset($optionMap[trim($value)]) && !isset($optionMap[trim(self::MISSING_PREFIX.$value)])) {
+					throw new \Exception("Invalid select option " . $value . " for field ". $field->id);
+				}
+				
+				$valueToSet = isset($optionMap[trim($value)])?$optionMap[trim($value)]:$optionMap[trim(self::MISSING_PREFIX.$value)];
 				
 				GO()->getDbConnection()
 								->replace(
 												$field->getDataType()->getMultiSelectTableName(), 
-												['id' => $record['id'], 'optionId' => $optionMap[$value]]
+												['id' => $record['id'], 'optionId' => $valueToSet]
 												)->execute();
 			}
 		}		
@@ -239,11 +259,43 @@ class MigrateCustomFields63to64 {
 		}
 
 		//Value is string <id>:<Text>
-		$id = (int) explode(':', $v)[0];
+		$parts = explode(':', $v);
+		
+		if(count($parts) < 1){
+			return null;
+		}
+		
+		$id = (int) $parts[0];
 		if(!$id) {
 			return null;
 		}
+		
+		$text = trim($parts[1]);
+		if(empty($text)) {
+			return null;
+		}
 
+		//Check if text exists in 
+		$existsQ = GO()->getDbConnection()
+				->selectSingleValue('id')
+				->from("core_customfields_select_option")
+				->where('id', '=', $id + self::TREE_SELECT_OPTION_INCREMENT)
+				->andWhere(['text'=>$parts[1]]);
+
+		$exists = $existsQ->single();
+		
+		if(!$exists){
+			$data = [
+				'id'=>$id + self::TREE_SELECT_OPTION_INCREMENT,
+				'fieldId'=>$fields[0]->id,
+				'parentId'=>NULL,
+				'text'=>self::MISSING_PREFIX.$text
+			];
+			
+			$insertQ = GO()->getDbConnection()->insert("core_customfields_select_option", $data);
+			$insertQ->execute();
+		}
+		
 		return $id + self::TREE_SELECT_OPTION_INCREMENT;
 	}
 	
@@ -267,7 +319,7 @@ class MigrateCustomFields63to64 {
 						->where('field_id', '=', $field->id)
 						->andWhere('parent_id', 'IN', $ids)
 						->orderBy(['parent_id'=>'ASC']);
-		
+
 		foreach($oldOptions as $o) {
 			GO()->getDbConnection()
 							->insertIgnore("core_customfields_select_option", [
@@ -322,6 +374,44 @@ class MigrateCustomFields63to64 {
 	}
 	
 	
+	
+	private function insertMissingOptions(Field $field) {
+		//set invalid options to null
+		$optionTexts = GO()->getDbConnection()
+						->selectSingleValue('text')
+						->from("core_customfields_select_option")
+						->where('fieldId', '=', $field->id);
+		
+		$missingQuery = GO()->getDbConnection()
+						->selectSingleValue('`'.$field->databaseName.'`')->distinct()
+						->from($field->tableName())						
+						->where($field->databaseName, 'NOT IN', $optionTexts);
+
+		$missing = $missingQuery->all();
+		
+		$missing = array_filter($missing, function($text) {
+			$text = trim($text);
+			return !empty($text);
+		});
+		
+		$data = array_map(function($text) use ($field) {
+			return [
+					"text" => trim(self::MISSING_PREFIX.$text),
+					"fieldId" => $field->id
+			];
+		}, $missing);
+		
+		if(empty($data)){
+			return;
+		}
+		
+		$insertQ = GO()->getDbConnection()->insert("core_customfields_select_option", $data);
+		
+		echo $insertQ;
+		
+		$insertQ->execute();
+	}
+	
 	private function nullifyInvalidOptions(Field $field) {
 		//set invalid options to null
 		$optionIds = GO()->getDbConnection()
@@ -329,11 +419,27 @@ class MigrateCustomFields63to64 {
 						->from("core_customfields_select_option")
 						->where('fieldId', '=', $field->id);
 		
-		GO()->getDbConnection()->update(
+//		GO()->getDbConnection()->update(
+//						$field->tableName(), 
+//						[$field->databaseName => null], 
+//						(new Query)
+//						->where($field->databaseName, 'NOT IN', $optionIds)
+//						)->execute();
+		
+				GO()->getDbConnection()->update(
 						$field->tableName(), 
 						[$field->databaseName => null], 
 						(new Query)
-						->where($field->databaseName, 'NOT IN', $optionIds)
+						->where($field->databaseName, '=' , "")
 						)->execute();
+				
+		$query = GO()->getDbConnection()
+						->selectSingleValue('`'.$field->databaseName.'`')
+						->from($field->tableName())
+						->where($field->databaseName, 'NOT IN', $optionIds)->andWhereNot([$field->databaseName => null]);
+
+		if(($missing = $query->single())) {
+			throw new \Exception("Field ". $field->id ." has invalid data '$missing'. No select option found.");
+		}
 	}
 }
