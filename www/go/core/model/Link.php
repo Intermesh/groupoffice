@@ -271,7 +271,7 @@ class Link extends Entity {
 
 	private function updateDataFromSearch() {
 		//make sure the description and name are set so they are returned to the client
-		if(!isset($this->toSearchId)) {
+		if(!isset($this->toSearchId) || !isset($this->aclId)) {
 			$search = Search::find()->where(['entityId' => $this->toId, 'entityTypeId' => $this->toEntityTypeId])->single();
 			$this->toDescription = $search->description;
 			$this->toName = $search->name;
