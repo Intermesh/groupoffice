@@ -15,6 +15,7 @@
 - Address book: Sort address books alphabetically
 - Email: Link to item dialog could be destroyed
 - Core/Files: Try to clean invalid UTF8 in file names
+- Address book: Fixed contact ActiveSync problems
 
 18-07-2019 6.4.35
 - Core: upgrade error fixed
