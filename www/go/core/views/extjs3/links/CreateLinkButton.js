@@ -244,19 +244,29 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 	},
 	
 	save : function() {
+		
 		if(this.newLinks.length === 0) {
 			return;
 		}
+
+		var me = this;
 		
 		go.Db.store("Link").set({
 			create: this.getNewLinks()
-		}, function() {
-			if(!this.isDestroyed) {
-				var e = this.linkGrid.store.baseParams.filter.entity, id = this.linkGrid.store.baseParams.filter.entityId;
-				this.reset();
-				this.setEntity(e, id);
+		})
+		.then(function(result) {
+			if(result.notCreated) {
+				Ext.MessageBox.alert(t("Error"), t("Sorry, the link could not be created."));
 			}
-		}, this);
+		})
+		
+		.finally(function() {
+			if(!me.isDestroyed) {
+				var e = me.linkGrid.store.baseParams.filter.entity, id = me.linkGrid.store.baseParams.filter.entityId;
+				me.reset();
+				me.setEntity(e, id);
+			}
+		});
 	}
 });
 
