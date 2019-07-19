@@ -75,16 +75,16 @@ GO.files.FileBrowser = function(config){
 	}, this, {single:true});
 	
 	
-	this.treePanel.getLoader().on('load', function()
-	{		
+	// this.treePanel.getLoader().on('load', function()
+	// {		
 		
-		if(!this.folder_id)
-		{
-			this.folder_id=this.treePanel.getRootNode().childNodes[0].id;
-		}
-		this.setFolderID(this.folder_id);
+	// 	if(!this.folder_id)
+	// 	{
+	// 		this.folder_id=this.treePanel.getRootNode().childNodes[0].id;
+	// 	}
+	// 	this.setFolderID(this.folder_id);
 		
-	}, this);
+	// }, this);
 	
 
 	this.treePanel.on('click', function(node)	{
@@ -223,6 +223,10 @@ GO.files.FileBrowser = function(config){
 		id: 'type_id',
 		fields:fields.fields,
 		remoteSort:true
+		// load: function() {
+		// 	debugger;
+		// 	GO.data.JsonStore.prototype.load.apply(this, arguments);
+		// }
 	});
 
 	this.gridStore.on('load', this.onStoreLoad, this);
@@ -774,8 +778,10 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
         
     this.on('beforeFolderIdSet',function(){
 
-      this.searchField.reset();
-      delete this.gridStore.baseParams['query'];
+			if(this.gridStore.baseParams.query) {
+				this.searchField.reset();
+				delete this.gridStore.baseParams['query'];
+			}
 
       // turn on buttons
       if (!GO.util.empty(this.gridStore.reader.jsonData))
@@ -1115,7 +1121,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 	setRootID : function(rootID, folder_id)
 	{
 		
-		rootID ? this.searchField.hide() : this.searchField.show();
+		this.searchField.setDisabled(!!rootID);
 		rootID ? this.bookmarksGrid.hide() : this.bookmarksGrid.show();
 		
 		this.doLayout();		
@@ -1128,8 +1134,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 				
 				this.treePanel.setExpandFolderId(folder_id);
 				
-//				if(folder_id || folder_id==0)
-//					this.setFolderID(this.folder_id);
+				if(folder_id || folder_id==0)
+					this.setFolderID(this.folder_id);
 					//this.refresh();
 		}
                 
@@ -1868,11 +1874,12 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 	setFolderID : function(id, expand)
 	{
     this.expandTree=expand;
-    this.fireEvent('beforeFolderIdSet');
-      
+		this.fireEvent('beforeFolderIdSet');
+		  
 		this.folder_id = id;
 		//this.gridStore.baseParams['id']=this.thumbsStore.baseParams['id']=id;
 		if(this.getActiveGridStore().baseParams['folder_id'] != id) {
+			
 			this.getActiveGridStore().baseParams['folder_id']=id;
 
 			this.getActiveGridStore().load({
@@ -1884,7 +1891,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 						if(activeNode){
 							activeNode.expand();
-							this.updateLocation();
+							//this.updateLocation();
 						}else{						
 							this.treePanel.setExpandFolderId(id);
 							this.treePanel.getRootNode().reload();	
