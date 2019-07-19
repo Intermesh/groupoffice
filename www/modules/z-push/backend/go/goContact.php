@@ -114,6 +114,9 @@ class goContact extends GoBaseBackendDiff {
 			$stat['mod'] = $contact->modifiedAt->format("U");			
 		}
 
+
+		ZLog::Write(LOGLEVEL_DEBUG, var_export($stat, true));
+
 		return $stat;
 	}
 
@@ -136,7 +139,7 @@ class goContact extends GoBaseBackendDiff {
 						->filter([
 								"permissionLevel" => Acl::LEVEL_READ
 						])->all();
-		
+		ZLog::Write(LOGLEVEL_DEBUG, var_export($list, true));
 		return $list;
 	}
 

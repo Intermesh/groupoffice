@@ -618,10 +618,30 @@ abstract class Property extends Model {
 	 * 
 	 * Only database columns and relations are tracked. Not the getters and setters.
 	 * 
-	 * @param array $properties If given only these properties will be checked for modifications.
+	 * @param array|string $properties If given only these properties will be checked for modifications.
 	 * @return array ["propName" => [newval, oldval]]
 	 */
-	public function getModified(array $properties = []) {
+	public function getModified($properties = []) {
+		return $this->internalGetModified($properties);
+	}
+
+	private function datesAreDifferent($a, $b) {
+		if(!isset($a) && isset($b)) {
+			return true;
+		}
+
+		if(!isset($b) && isset($a)) {
+			return true;
+		}
+
+		return $a->format('U') != $b->format('U');
+	}
+
+	private function internalGetModified($properties = [], $forIsModified = false) {
+
+		if(!is_array($properties)) {
+			$properties = [$properties];
+		}
 		$modified = [];
 		foreach ($this->oldProps as $key => $oldValue) {		
 			if (!empty($properties) && !in_array($key, $properties)) {
@@ -632,22 +652,44 @@ abstract class Property extends Model {
 			
 			if($newValue instanceof self) {
 				if($newValue->isModified()) {
+					if($forIsModified) {
+						return true;
+					}
 					$modified[$key] = [$newValue, null];
 				}
 			} else 
-			{
-				if ($newValue !== $oldValue) {
+			{			
+				if($newValue instanceof \DateTime) {
+					if($this->datesAreDifferent($oldValue, $newValue)) {
+						if($forIsModified) {
+							return true;
+						}
+
+						$modified[$key] = [$newValue, $oldValue];	
+					}
+				}	else if ($newValue !== $oldValue) {
+					if($forIsModified) {
+						return true;
+					}
 					$modified[$key] = [$newValue, $oldValue];
 				} else if(is_array($newValue) && (($v = array_values($newValue)) && isset($v[0]) && $v[0] instanceof self)) {
 					// Array comparison above might return false because the array contains identical objects but the objects itself might have changed.
 					foreach($newValue as $v) {
 						if($v->isModified()) {
+							if($forIsModified) {
+								return true;
+							}
+
 							$modified[$key] = [$newValue, $oldValue];
 							break;
 						}
 					}
 				}
 			}			
+		}
+
+		if($forIsModified) {
+			return false;
 		}
 
 		return $modified;
@@ -662,36 +704,7 @@ abstract class Property extends Model {
 	 * @return boolean
 	 */
 	public function isModified($properties = []) {
-		
-		if(!is_array($properties)) {
-			$properties = [$properties];
-		}
-
-		foreach ($this->oldProps as $key => $oldValue) {
-			if (!empty($properties) && !in_array($key, $properties)) {
-				continue;
-			}
-			$newValue = $this->{$key};
-			
-			if ($newValue !== $oldValue) {
-				return true;
-			}
-			
-			if($newValue instanceof Property && $newValue->isModified()) {
-				return true;
-			}
-			
-			if(is_array($newValue) && isset($newValue[0]) && $newValue[0] instanceof Property) {
-				// Array comparison above might return false because the array contains identical objects but the objects itself might have changed.
-				foreach($newValue as $v) {
-					if($v->isModified()) {
-						return true;
-					}
-				}
-			}
-		}
-		
-		return false;
+		return $this->internalGetModified($properties, true);
 	}
 	
 	/**

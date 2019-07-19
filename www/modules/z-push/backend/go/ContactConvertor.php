@@ -11,6 +11,7 @@ use go\modules\community\addressbook\model\EmailAddress;
 use go\modules\community\addressbook\model\PhoneNumber;
 use go\modules\community\addressbook\model\Url;
 use go\core\model\Link;
+use go\core\mail\RecipientList;
 
 /**
  * Contact convertor class
@@ -437,7 +438,7 @@ class ContactConvertor {
 		$addressbook = AddressBook::find()
 						->join('sync_addressbook_user', 'su', 'su.addressBookId = a.id')
 						->filter(['permissionLevel' => Acl::LEVEL_WRITE])
-						->where('ug.userId', '=', GO()->getAuthState()->getUserId())
+						->where('su.userId', '=', GO()->getAuthState()->getUserId())
 						->single();
 
 		if (!$addressbook)
@@ -458,24 +459,26 @@ class ContactConvertor {
 		} else {
 			$keep = [];
 		}		
+
+		//some Android phones send email as "email" <email>. So we're using RecipientList to parse this to just e-mail's
+		$clientEmails = new RecipientList();
 		
-		$clientEmails = [];
 		if(!empty($message->email1address)) {
-			$clientEmails[] = $message->email1address;
+			$clientEmails->addString($message->email1address);
 		}
 		if(!empty($message->email2address)) {
-			$clientEmails[] = $message->email2address;
+			$clientEmails->addString($message->email2address);
 		}
 		if(!empty($message->email3address)) {
-			$clientEmails[] = $message->email3address;
+			$clientEmails->addString($message->email3address);
 		}
-		
+		$clientEmails = $clientEmails->toArray();
 		for($i = 0, $c = count($clientEmails); $i < $c; $i++) {
 			if(isset($contact->emailAddresses[$i])) {
-				$contact->emailAddresses[$i]->email = $clientEmails[$i];
+				$contact->emailAddresses[$i]->email = $clientEmails[$i]->getEmail();
 			} else
 			{
-				$contact->emailAddresses[$i] = (new EmailAddress())->setValues(['type' => 'work', 'email' => $message->email1address]);
+				$contact->emailAddresses[$i] = (new EmailAddress())->setValues(['type' => 'work', 'email' => $clientEmails[$i]->getEmail()]);
 			}		
 		}
 		
