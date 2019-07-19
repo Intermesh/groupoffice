@@ -5,6 +5,8 @@
 - Email: Remove links from print
 - Core: Improved create link menu button with filters
 - Core: CSP Allow data: uri for fonts for browser extensions
+- Files: Fixed location bar not set initially and  not visible in popup file browser
+- Core: Fixed export CSV error
 
 18-07-2019 6.4.35
 - Core: upgrade error fixed

@@ -227,7 +227,7 @@ class Csv extends AbstractConverter {
 			}
 			
 			$subheader = $header . '.'. $name;
-			$headers =  $this->addSubHeaders($headers, $subheader, $value, $prop->many);
+			$headers =  $this->addSubHeaders($headers, $subheader, $value, $prop->type != Relation::TYPE_HAS_ONE);
 		}	
 		
 		return $headers;
