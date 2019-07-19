@@ -93,6 +93,10 @@ class GoSyncUtils {
 		
 		$asBodyData = \GO\Base\Util\StringHelper::normalizeCrlf($model->$attribute);
 
+		if(!isset($asBodyData)) {
+			$asBodyData = "";
+		}
+
 		if ($sbReturnType == SYNC_BODYPREFERENCE_HTML) {
 
 			ZLog::Write(LOGLEVEL_DEBUG, 'SYNCUTILS HTML');

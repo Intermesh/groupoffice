@@ -48,6 +48,10 @@ class goContact extends GoBaseBackendDiff {
 			return false;
 		}
 
+		if(!$contact->getPermissionLevel()) {
+			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+		}
+
 		$message = $this->convertor->GO2AS($contact, $contentParameters);
 		
 //		ZLog::Write(LOGLEVEL_DEBUG, var_export($message, true));
@@ -83,13 +87,12 @@ class goContact extends GoBaseBackendDiff {
 		}
 
 		if ($contact->getPermissionLevel() < Acl::LEVEL_WRITE) {
-			ZLog::Write(LOGLEVEL_DEBUG, "Skipping update of read-only contact " . $contact->name);
-			return $this->StatMessage($folderid, $id);
+			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
 		}
 
 		$this->convertor->AS2GO($message, $contact, $contentParameters);
 	
-		return $this->StatMessage($folderid, $id);		
+		return $this->StatMessage($folderid, $contact->id);		
 
 	}
 
