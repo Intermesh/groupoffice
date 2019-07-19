@@ -24,11 +24,15 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(go.tree.EntityLoader, {
 				expanded: true
 			},			
 			getParams: function(node) {
-				return {filter: {addressBookId: node.attributes.data.id}};
+				return {sort: [{property: "name", isAscending: true }], filter: {addressBookId: node.attributes.data.id}};
 			}
 		});
 	},
 	
+	getParams: function(node) {
+		return {sort: [{property: "name", isAscending: true }]};
+	},
+
 	handleResponse : function(r) {
 		r.responseData.unshift({
 						leaf: true,

@@ -86,10 +86,10 @@ go.tree.EntityLoader = Ext.extend(Ext.tree.TreeLoader, {
 	doRequest: function (params, callback, scope, options) {
 
 		//transfort sort parameters to jmap style
-		if(params.sort) {
-			params.sort = [params.sort + " " + params.dir];
-			delete params.dir;
-		}
+		// if(params.sort) {
+		// 	params.sort = [params.sort + " " + params.dir];
+		// 	delete params.dir;
+		// }
 		
 		this.result = this.entityStore.query(params, function (response) {
 			this.entityStore.get(response.ids, function (entities) {
