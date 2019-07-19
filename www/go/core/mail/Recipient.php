@@ -18,9 +18,6 @@ class Recipient extends Model {
 	private $personal;
 
 	public function __construct($email, $personal = null) {
-
-		parent::__construct();
-
 		$this->email = $email;
 		$this->personal = $personal;
 	}

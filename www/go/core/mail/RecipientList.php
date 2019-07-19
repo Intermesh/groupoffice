@@ -7,7 +7,7 @@ use Exception;
 use go\core\imap\Utils;
 use go\core\util\StringUtil;
 use go\core\validate\ValidateEmail;
-
+use Countable;
 
 /**
  * A list of e-mail recipients
@@ -17,7 +17,7 @@ use go\core\validate\ValidateEmail;
  * "Merijn Schering" <mschering@intermesh.nl>,someone@somedomain.com,Pete <pete@pete.com>
  * 
  */
-class RecipientList implements ArrayAccess {
+class RecipientList implements ArrayAccess, Countable {
 
 	/**
 	 * Pass a e-mail string like:
@@ -82,7 +82,7 @@ class RecipientList implements ArrayAccess {
 	 * 
 	 * $a[] = '"John Doe" <john@domain.com>';
 	 * 
-	 * @return array
+	 * @return Recipient[]
 	 */
 	public function toArray() {
 		return $this->recipients;
@@ -274,4 +274,8 @@ class RecipientList implements ArrayAccess {
 		unset($this->recipients[$offset]);
 	}
 
+	public function count ( )
+	{
+		return count($this->recipients);
+	}
 }
