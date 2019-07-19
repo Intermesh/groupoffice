@@ -8,6 +8,8 @@
 - Files: Fixed location bar not set initially and  not visible in popup file browser
 - Core: Fixed export CSV error
 - Calendar: Fixed missing link when creating new Event from item
+- Core: Link show search cache date instead of linking date
+- Core: Link delete button does not show through date anymore.
 
 18-07-2019 6.4.35
 - Core: upgrade error fixed

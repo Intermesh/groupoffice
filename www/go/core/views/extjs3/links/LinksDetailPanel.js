@@ -41,7 +41,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 				<a>{name}</a>\
 				<small class="go-top-right">{[go.util.Format.shortDateTime(values.modifiedAt)]}</small>\
 				<label>{description}</label>\
-				<a class="left show-on-hover"><i class="icon">delete</i></a>\
+				<a class="right show-on-hover"><i class="icon">delete</i></a>\
 				</tpl>\
 			</p>\
 		</tpl>\

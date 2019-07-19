@@ -1413,7 +1413,13 @@ table[id^="comments-ext"] b {
 	a {
 		color: color($fg, 'text');
 	}
-	
+	.icons {
+		p { 
+		  a:not(.right) {			
+				padding-right: dp(64);
+			}
+		}
+	}
 	.count {
 		float: right;
 		@extend %badge;
@@ -1422,7 +1428,15 @@ table[id^="comments-ext"] b {
 	a.show-more {
 		font-style: italic;
 		color: $cAnchor;
+		padding-right: 0;
 	}
+
+	.go-top-right {
+		right: dp(48);
+		top: dp(12);
+		padding-right: 0;
+	}
+	
 }
 
 .go-login-dialog {
