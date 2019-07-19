@@ -363,6 +363,9 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 					else
 						this.tabPanel.unhideTabStripItem(this.participantsPanel);
 
+
+					this.fireEvent('load', this);
+
 				},
 				failure : function(form, action) {
 					Ext.Msg.alert(t("Error"), action.result.feedback)
