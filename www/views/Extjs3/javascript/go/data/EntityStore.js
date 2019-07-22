@@ -119,7 +119,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				
 				break;
 
-			case this.entity.name + "/query":
+			case this.entity.name + "/query":					
 				//if a list call was made then fetch updates if state mismatch
 				if (this.state && action.payload.state !== this.state) {
 					this.getUpdates();
@@ -171,7 +171,9 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				callback: function (options, success, response) {
 					this.state = response.state;
 				
-					cb.call(scope || this, this);
+					if(cb) {
+						cb.call(scope || this, this);
+					}
 				},
 				scope: this
 			});

@@ -136,7 +136,7 @@ GO::router()->getController()->fireEvent('inlinescripts');
 <?php
   
 if ($cacheFile->exists()) {
-	echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v= '. GO()->getVersion() . '"></script>';
+	echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v='. GO()->getVersion() . '"></script>';
 } else {
 
 	$scripts = array();
@@ -241,7 +241,7 @@ if ($cacheFile->exists()) {
 //        $js .= $script->getContents()."\n;\n";
 //        
 //     
-				echo '<script type="text/javascript" src="'.$relPath. '"></script>' . "\n";
+				echo '<script type="text/javascript" src="'.$relPath. '?mtime='.$script->getModifiedAt().'"></script>' . "\n";
 			}
 //      else if($script instanceof \go\core\util\Url) {
 //				echo '<script type="text/javascript" src="'.$script.'"></script>' . "\n";

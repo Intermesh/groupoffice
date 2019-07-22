@@ -45,7 +45,7 @@ GO.calendar.SelectCalendar = function(config){
 		editable: true,
 		selectOnFocus:true,
 		forceSelection: true,
-		typeAhead: true,
+		typeAhead: true,		
 		pageSize:parseInt(GO.settings['max_rows_list']),
 		mode:'remote',
         tpl: new Ext.XTemplate(
@@ -61,9 +61,10 @@ GO.calendar.SelectCalendar = function(config){
 
 }
 Ext.extend(GO.calendar.SelectCalendar, GO.form.ComboBoxReset, {
+	dontQueryCalendar : false,
 	setValue: function (id) {
 
-		if (!id) {
+		if (!id || this.dontQueryCalendar) {
 			GO.calendar.SelectCalendar.superclass.setValue.call(this, id);
 			return;
 		}

@@ -2179,9 +2179,11 @@ go.Modules.register("legacy", 'calendar', {
 	entities: [{
 			name: "Event",			
 			linkWindow: function() {
-				var win = new GO.calendar.EventDialog();
-				win.win.closeAction = "close";
-				return win;
+				// var win = new GO.calendar.EventDialog();
+				// win.win.closeAction = "close";
+				// return win;
+
+				return GO.calendar.showEventDialog();
 			},
 			linkDetail: function() {
 				return new GO.calendar.EventPanel();
@@ -2281,6 +2283,8 @@ GO.calendar.showEventDialog = function(config){
 		GO.calendar.eventDialog = new GO.calendar.EventDialog();	
 
 	GO.calendar.eventDialog.show(config);
+
+	return GO.calendar.eventDialog;
 }
 
 

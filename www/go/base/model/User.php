@@ -4,6 +4,7 @@ namespace GO\Base\Model;
 use GO;
 use GO\Base\Mail\Message;
 use GO\Base\Mail\Mailer;
+use go\core\db\Query;
 
 /**
  * The User model
@@ -645,38 +646,40 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 * @return Array 
 	 */
 	public static function getGroupIds($userId) {
-		$user = GO::user();
-		if ($user && $userId == $user->id) {
-			if (!isset(GO::session()->values['user_groups'])) {
-				GO::session()->values['user_groups'] = array();
 
-				$stmt= UserGroup::model()->find(
-								\GO\Base\Db\FindParams::newInstance()
-								->select('t.groupId')
-								->criteria(\GO\Base\Db\FindCriteria::newInstance()
-												->addCondition("userId", $userId))
-								);
-				while ($r = $stmt->fetch()) {
-					GO::session()->values['user_groups'][] = $r->groupId;
-				}
-			}
+		return (new Query)->selectSingleValue('groupId')->from('core_user_group')->where(['userId' => $userId])->all();
+		// $user = GO::user();
+		// if ($user && $userId == $user->id) {
+		// 	if (!isset(GO::session()->values['user_groups'])) {
+		// 		GO::session()->values['user_groups'] = array();
+
+		// 		$stmt= UserGroup::model()->find(
+		// 						\GO\Base\Db\FindParams::newInstance()
+		// 						->select('t.groupId')
+		// 						->criteria(\GO\Base\Db\FindCriteria::newInstance()
+		// 										->addCondition("userId", $userId))
+		// 						);
+		// 		while ($r = $stmt->fetch()) {
+		// 			GO::session()->values['user_groups'][] = $r->groupId;
+		// 		}
+		// 	}
 		
-			return GO::session()->values['user_groups'];
-		} else {
-			$ids = array();
-			$stmt= UserGroup::model()->find(
-								\GO\Base\Db\FindParams::newInstance()
-								->select('t.groupId')
-								->debugSql()
-								->criteria(\GO\Base\Db\FindCriteria::newInstance()
-												->addCondition("userId", $userId))
-								);
+		// 	return GO::session()->values['user_groups'];
+		// } else {
+		// 	$ids = array();
+		// 	$stmt= UserGroup::model()->find(
+		// 						\GO\Base\Db\FindParams::newInstance()
+		// 						->select('t.groupId')
+		// 						->debugSql()
+		// 						->criteria(\GO\Base\Db\FindCriteria::newInstance()
+		// 										->addCondition("userId", $userId))
+		// 						);
 			
-			while ($r = $stmt->fetch()) {
-				$ids[] = $r->groupId;
-			}
-			return $ids;
-		}
+		// 	while ($r = $stmt->fetch()) {
+		// 		$ids[] = $r->groupId;
+		// 	}
+		// 	return $ids;
+		// }
 	}
 	
 	/**

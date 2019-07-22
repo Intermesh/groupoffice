@@ -162,7 +162,7 @@
 								Ext.MessageBox.alert(t("Maintenance mode"), t("Sorry, maintenance mode is enabled and you can't login right now. Please come back later or contact your system administrator."));
 								break;								
 							case 500: 
-								Ext.MessageBox.alert(t("Error"), t("An unknown error has occurred. " + reponse.statusText));
+								Ext.MessageBox.alert(t("Error"), t("An unknown error has occurred. " + response.statusText));
 							break;
 						}
 						

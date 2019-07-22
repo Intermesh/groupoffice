@@ -3,14 +3,13 @@ require(__DIR__ . "/../../vendor/autoload.php");
 
 \go\core\App::get();
 
+$cacheFile = \go\core\App::get()->getDataFolder()->getFile('clientscripts/all.js');
+
+// $cacheFile->output(true, true, [
+// 	'Content-Encoding' => 'gzip',
+// 	"Expires" => (new DateTime("1 year"))->format("D, j M Y H:i:s")
+// ]);
+
 header('Content-Type: application/javascript');
-if(!GO()->getDebugger()->enabled) {
-	header('Content-Encoding: gzip');
-	$cacheFile = \go\core\App::get()->getDataFolder()->getFolder('clientscripts')->create()->getFile('all.js');
-} else
-{
-	$cacheFile = \go\core\App::get()->getTmpFolder()->getFile('debug.js');
-}
-
-
+header('Content-Encoding: gzip');
 readfile($cacheFile->getPath());

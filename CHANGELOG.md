@@ -1,4 +1,25 @@
+
 - Project: create invoice without grouping time entries by employees. are time record will be group into 1 group
+
+11-07-2019 6.3.81
+- Core: Enable / disable Add linked item buttons based on permissions
+- Core: Update Czech translation
+- Email: Fixed attachment encoding error
+- LDAPAuth and IMAP auth: Fixed email account creation
+
+24-06-2019 6.3.80
+- Calendar: Fixed error where appointment dialog wouldn't load
+
+24-06-2019 6.3.79
+- Core: Bug in script loading prevented GO from starting
+
+21-06-2019 6.3.78
+- Address book: Fixed bug where to address in composer was not filled when creating mail from contact
+- Projects: Fixed problem where projects wouldn't load after opening a project from a link
+- Core: Faster boot time due to caching in the browser
+
+18-06-2019 6.3.77
+- Files: Fixed issue that searching files throws an error about an ambiguous column
 - Fix for keyboard navigation in Firefox 67
 
 03-06-2019 6.3.76

@@ -186,7 +186,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 					'extension' => $this->extension,
 					'size' => $this->size,
 					'user_id' => $this->user_id,
-					'type' => $this->type,
+//					'type' => $this->type,
 					'folder_id' => $this->folder_id,
 					'type_id' => 'f:'.$this->id,
 					'path' => $this->path,

@@ -23,4 +23,5 @@ return array (
   'name' => 'Přehled',
   'description' => 'Stránka na které je uveden přehled činností.',
   'Start page' => 'Přehled',
+  'webfeeds' => 'Webové zdroje',
 );

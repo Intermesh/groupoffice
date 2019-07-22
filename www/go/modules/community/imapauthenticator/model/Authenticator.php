@@ -90,7 +90,7 @@ class Authenticator extends PrimaryAuthenticator {
 	
 	private function setEmailAccount($username, $password, $email, Server $server, User $user) {
 		
-		if(!$user->hasModule('email')) {
+		if(!$user->hasModule('legacy', 'email')) {
 			return;
 		}
 		
@@ -115,24 +115,24 @@ class Authenticator extends PrimaryAuthenticator {
 			$account->port = $server->imapPort;
 			$account->username = $username;
 			$account->password = $password;
+			$account->imap_encryption = $server->imapEncryption ?? "";
 			
-			$account->imap_encryption = $server->imapEncryption;
 			$account->imap_allow_self_signed = !$server->imapValidateCertificate;
 			$account->smtp_allow_self_signed = !$server->imapValidateCertificate;
 			$account->smtp_username = $server->smtpUsername;
 			$account->smtp_password = $server->smtpPassword;
 			$account->smtp_host = $server->smtpHostname;
 			$account->smtp_port = $server->smtpPort;
-			$account->smtp_encryption = $server->smtpEncryption;
+			$account->smtp_encryption = $server->smtpEncryption ?? "";
 			
-			//$account->mbroot = ??
+			$account->mbroot = "";
 			
 			$accounts = [$account];
 			
 		}
 		
 		foreach($accounts as $account) {
-			$account->checkImapConnectionOnSave = false;
+			$account->checkImapConnectionOnSave = true;
 			
 			$account->password = $password;			
 			

@@ -109,7 +109,7 @@ class Folder extends FileSystemObject {
 	 * 
 	 * This function does not check if the folder exists.
 	 * 
-	 * @return \\go\core\fs\File
+	 * @return \go\core\fs\File
 	 */
 	public function getFile($relativePath) {
 		$childPath = $this->path . '/' . $relativePath;
@@ -123,7 +123,7 @@ class Folder extends FileSystemObject {
 	 * 
 	 * This function does not check if the folder exists.
 	 * 
-	 * @return \\go\core\fs\Folder
+	 * @return \go\core\fs\Folder
 	 */
 	public function getFolder($relativePath) {
 		$childPath = $this->path . '/' . $relativePath;		
