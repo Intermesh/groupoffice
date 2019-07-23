@@ -117,6 +117,11 @@ class Module extends AclOwnerEntity {
 	
 	private function getModuleClass() {		
 		return "\\go\\modules\\" . $this->package ."\\" . $this->name ."\\Module";
+	}
+
+	public function folder() {
+		$root = GO()->getEnvironment()->getInstallFolder();
+		return $root->getFolder("/go/modules/" . $this->package ."/" . $this->name ."/");
 	}	
 	
 	public function isAvailable() {
