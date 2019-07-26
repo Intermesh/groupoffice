@@ -405,11 +405,10 @@ class MigrateCustomFields63to64 {
 			return;
 		}
 		
-		$insertQ = GO()->getDbConnection()->insert("core_customfields_select_option", $data);
-		
-		echo $insertQ;
-		
-		$insertQ->execute();
+		foreach($data as $insertRecord){
+			$insertQ = GO()->getDbConnection()->insert("core_customfields_select_option", $insertRecord);
+			$insertQ->execute();
+		}				
 	}
 	
 	private function nullifyInvalidOptions(Field $field) {
