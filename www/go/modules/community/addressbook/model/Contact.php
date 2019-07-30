@@ -773,12 +773,15 @@ class Contact extends AclItemEntity {
 	}
 
 	/**
-   * Decorate the message for newsletter sending.
-   * This function should at least add the to address.
-   * 
-   * @param \Swift_Message $message
-   */
-  public function decorateMessage(Message $message) {
+	 * Decorate the message for newsletter sending.
+	 * This function should at least add the to address.
+	 * 
+	 * @param \Swift_Message $message
+	 */
+	public function decorateMessage(Message $message) {
+		if(!isset($this->emailAddresses[0])) {
+			return false;
+		}
 		$message->setTo($this->emailAddresses[0]->email, $this->name);
 	}
 
