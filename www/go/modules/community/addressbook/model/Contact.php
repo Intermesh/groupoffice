@@ -466,7 +466,7 @@ class Contact extends AclItemEntity {
 	}
 
 	protected static function textFilterColumns() {
-		return ['name', 'debtorNumber'];
+		return ['name', 'debtorNumber', 'notes'];
 	}
 	
 	public function getUid() {
