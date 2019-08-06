@@ -21,8 +21,7 @@
 
 namespace GO\Zpushadmin\Controller;
 
-
-class AdminController extends \GO\Professional\Controller\AbstractController {
+class AdminController extends \GO\Base\Controller\AbstractModelController {
 	
 	public function __construct() {
 		parent::__construct();
