@@ -357,6 +357,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 		});
 
 		if(!firstFieldWithError) {
+			console.warn('A validation error happend but no field with was error found.');
 			return;
 		}
 		//Check for tab panel to show tab with error.
